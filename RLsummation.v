@@ -137,8 +137,17 @@ Theorem rngl_summation_split3 : ∀ j g b k,
        (∑ (i = S b, j), g (i - 1)%nat + g j + ∑ (i = j + 1, k), g i)%F.
 Proof.
 intros * Hj.
+apply iter_seq_split3; [ | | | easy ]. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+(*
 rewrite rngl_summation_split with (j := j); [ | flia Hj ].
 now rewrite rngl_summation_split_last.
+*)
 Qed.
 
 Theorem rngl_summation_eq_compat : ∀ g h b k,

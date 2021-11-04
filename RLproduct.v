@@ -105,8 +105,17 @@ Theorem rngl_product_split3 : ∀ j g b k,
        (∏ (i = S b, j), g (i - 1)%nat * g j * ∏ (i = j + 1, k), g i)%F.
 Proof.
 intros * Hj.
+apply iter_seq_split3; [ | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  apply rngl_mul_assoc.
+}
+(*
 rewrite rngl_product_split with (j := j); [ | flia Hj ].
 now rewrite rngl_product_split_last.
+*)
 Qed.
 
 Theorem rngl_product_eq_compat : ∀ g h b k,

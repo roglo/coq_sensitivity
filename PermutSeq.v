@@ -139,15 +139,30 @@ split. {
       }
       cbn - [ nth ] in H2.
       intros Ha.
-(* on peut séparer de 0 pour i dans H2. *)
-(* dans le truc obtenu, il doit se former un false *)
-...
-      destruct l as [| b]; [ easy | ].
-      cbn - [ nth ] in H2.
-      destruct Ha as [Ha| Ha]. {
-        subst b.
-        admit.
+      rewrite iter_seq_split_first in H2; [ | | | | flia ]; cycle 1. {
+        apply Bool.andb_true_l.
+      } {
+        apply Bool.andb_true_r.
+      } {
+        apply Bool.andb_assoc.
       }
+      unfold nth in H2 at 1.
+      apply (In_nth _ _ 0) in Ha.
+      destruct Ha as (i & Hi & Ha).
+      rewrite iter_seq_split3 with (j := S i) in H2; cycle 1. {
+        apply Bool.andb_true_l.
+      } {
+        apply Bool.andb_true_r.
+      } {
+        apply Bool.andb_assoc.
+      } {
+        flia Hi.
+      }
+      rewrite List_nth_succ_cons, Ha in H2.
+      replace ((a ≠? a) || _) with false in H2 by now rewrite Nat.eqb_refl.
+      now rewrite andb_false_r, andb_false_l in H2.
+    }
+    apply IHl.
 ...
   } {
     intros i j Hi Hj Hij.

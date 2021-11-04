@@ -3091,6 +3091,20 @@ rewrite (fold_left_op_fun_from_d d); [ | easy | easy | easy ].
 now rewrite Nat.add_succ_comm.
 Qed.
 
+Theorem iter_seq_split3 : ∀ T d op j g b k
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  b ≤ j ≤ k
+  → iter_seq b k (λ (c : T) (i : nat), op c (g i)) d =
+    op (op (iter_seq (S b) j (λ (c : T) (i : nat), op c (g (i - 1))) d) (g j))
+      (iter_seq (j + 1) k (λ (c : T) (i : nat), op c (g i)) d).
+Proof.
+intros * op_d_l op_d_r op_assoc Hj.
+rewrite iter_seq_split with (j := j); [ | easy | easy | easy | flia Hj ].
+now rewrite iter_seq_split_last.
+Qed.
+
 Theorem iter_list_app : ∀ A B (d : A) (f : A → B → A) la lb,
   iter_list (la ++ lb) f d = iter_list lb f (iter_list la f d).
 Proof.
