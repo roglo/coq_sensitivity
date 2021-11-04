@@ -22,14 +22,16 @@ Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
 Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
-PermutSeq.vio: PermutSeq.v Misc.vio RingLike.vio MyVector.vio RLproduct.vio Pigeonhole.vio
-PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo RingLike.vo MyVector.vo RLproduct.vo Pigeonhole.vo
+PermutSeq.vio: PermutSeq.v Misc.vio RingLike.vio MyVector.vio RLproduct.vio RLand.vio Pigeonhole.vio
+PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo RingLike.vo MyVector.vo RLproduct.vo RLand.vo Pigeonhole.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 Qrl.vio: Qrl.v RingLike.vio Rational.vio
 Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v RingLike.vo Rational.vo
 QuadIntRl.vio: QuadIntRl.v Misc.vio RingLike.vio
 QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v Misc.vo RingLike.vo
+RLand.vio: RLand.v Misc.vio
+RLand.vo RLand.glob RLand.v.beautified RLand.required_vo: RLand.v Misc.vo
 RLproduct.vio: RLproduct.v Misc.vio RingLike.vio
 RLproduct.vo RLproduct.glob RLproduct.v.beautified RLproduct.required_vo: RLproduct.v Misc.vo RingLike.vo
 RLsummation.vio: RLsummation.v Misc.vio RingLike.vio

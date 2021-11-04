@@ -8,7 +8,7 @@ Require Import Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike MyVector.
-Require Import RLproduct.
+Require Import RLproduct RLand.
 Require Import Pigeonhole.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
