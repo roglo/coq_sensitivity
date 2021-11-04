@@ -188,7 +188,13 @@ Theorem rngl_product_mul_distr :
   (∏ (i = b, k), g i) * ∏ (i = b, k), h i)%F.
 Proof.
 intros Hic g h b k.
-now apply rngl_product_list_mul_distr.
+apply iter_seq_distr. {
+  apply rngl_mul_1_l.
+} {
+  now apply rngl_mul_comm.
+} {
+  apply rngl_mul_assoc.
+}
 Qed.
 
 Theorem rngl_product_shift : ∀ b g k,

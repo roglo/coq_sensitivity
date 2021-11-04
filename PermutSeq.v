@@ -124,47 +124,24 @@ split. {
       unfold nth in H2 at 1.
       apply (In_nth _ _ 0) in Ha.
       destruct Ha as (i & Hi & Ha).
-...
-      rewrite iter_seq_split3 with (j := S i) in H2; cycle 1. {
-        apply Bool.andb_true_l.
-      } {
-        apply Bool.andb_true_r.
-      } {
-        apply Bool.andb_assoc.
-      } {
-        flia Hi.
-      }
+      rewrite and_seq_split3 with (j := S i) in H2; [ | flia Hi ].
       rewrite List_nth_succ_cons, Ha in H2.
-      replace ((a ≠? a) || _) with false in H2 by now rewrite Nat.eqb_refl.
+      rewrite Nat.eqb_refl in H2.
       now rewrite andb_false_r, andb_false_l in H2.
     }
-    apply IHl.
-    clear IHl.
-    (* bon, c'est évident, mais c'est compliqué *)
-    rewrite iter_seq_split_first in H2; [ | | | | cbn; flia ]; cycle 1. {
-      apply Bool.andb_true_l.
-    } {
-      apply Bool.andb_true_r.
-    } {
-      apply Bool.andb_assoc.
-    }
+    apply IHl; clear IHl.
+    rewrite and_seq_split_first in H2; [ | cbn; flia ].
     apply andb_true_iff in H2.
     destruct H2 as (_, H2).
     cbn - [ nth ] in H2.
-    rewrite iter_seq_succ_succ in H2.
-    erewrite iter_seq_eq_compat in H2. 2: {
+    rewrite and_seq_succ_succ in H2.
+    erewrite and_seq_eq_compat in H2. 2: {
       intros i Hi.
       rewrite Nat.sub_succ_l; [ | easy ].
       rewrite List_nth_succ_cons.
-      rewrite iter_seq_split_first; [ | | | | flia ]; cycle 1. {
-        apply Bool.andb_true_l.
-      } {
-        apply Bool.andb_true_r.
-      } {
-        apply Bool.andb_assoc.
-      }
-      rewrite iter_seq_succ_succ.
-      erewrite iter_seq_eq_compat. 2: {
+      rewrite and_seq_split_first; [ | flia ].
+      rewrite and_seq_succ_succ.
+      erewrite and_seq_eq_compat. 2: {
         intros j Hj.
         rewrite Nat.sub_succ_l; [ | easy ].
         cbn - [ nth ].
@@ -173,7 +150,8 @@ split. {
       easy.
     }
     cbn in H2.
-    rewrite iter_seq_distr in H2; cycle 1. {
+...
+    rewrite and_seq_distr in H2; cycle 1. {
       apply Bool.andb_true_l.
     } {
       apply Bool.andb_comm.

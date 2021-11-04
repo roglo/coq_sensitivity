@@ -2,8 +2,8 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 (*Arith Permutation*).
-Require Import Misc (*RingLike*).
+Require Import Utf8 Bool.
+Require Import Misc.
 Import List (*List.ListNotations*).
 
 Notation "'⋀' ( i = b , e ) , g" :=
@@ -21,13 +21,13 @@ Proof.
 intros.
 induction l as [| b]; [ easy | ].
 rewrite iter_list_cons; cycle 1. {
-  apply Bool.andb_true_l.
+  apply andb_true_l.
 } {
-  apply Bool.andb_true_r.
+  apply andb_true_r.
 } {
-  apply Bool.andb_assoc.
+  apply andb_assoc.
 }
-rewrite Bool.andb_true_iff.
+rewrite andb_true_iff.
 split. {
   intros Hb.
   split; [ now apply Hb; left | ].
@@ -61,15 +61,30 @@ Qed.
 
 Theorem and_seq_split_first : ∀ b k g,
   b ≤ k
-  → ⋀ (i = b, k), g i = (g b && ⋀ (i = S b, k), g i)%bool.
+  → ⋀ (i = b, k), g i = g b && ⋀ (i = S b, k), g i.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
-  apply Bool.andb_true_l.
+  apply andb_true_l.
 } {
-  apply Bool.andb_true_r.
+  apply andb_true_r.
 } {
-  apply Bool.andb_assoc.
+  apply andb_assoc.
+}
+Qed.
+
+Theorem and_seq_split3 : ∀ j g b k,
+  b ≤ j ≤ k
+  → ⋀ (i = b, k), g i =
+       (⋀ (i = S b, j), g (i - 1)) && g j && ⋀ (i = j + 1, k), g i.
+Proof.
+intros * Hj.
+apply iter_seq_split3; [ | | | easy ]. {
+  apply andb_true_l.
+} {
+  apply andb_true_r.
+} {
+  apply andb_assoc.
 }
 Qed.
 
@@ -86,4 +101,32 @@ Theorem and_seq_succ_succ : ∀ b k g,
 Proof.
 intros b k g.
 apply iter_seq_succ_succ.
+Qed.
+
+Theorem and_list_and_distr : ∀ A g h (l : list A),
+  (⋀ (i ∈ l), (g i && h i)) =
+  (⋀ (i ∈ l), g i) && ⋀ (i ∈ l), h i.
+Proof.
+intros.
+apply iter_list_distr. {
+  apply andb_true_l.
+} {
+  now apply andb_comm.
+} {
+  apply andb_assoc.
+}
+Qed.
+
+Theorem and_seq_and_distr : ∀ g h b k,
+  ⋀ (i = b, k), (g i && h i) =
+  (⋀ (i = b, k), g i) && ⋀ (i = b, k), h i.
+Proof.
+intros.
+apply iter_seq_distr. {
+  apply andb_true_l.
+} {
+  now apply andb_comm.
+} {
+  apply andb_assoc.
+}
 Qed.
