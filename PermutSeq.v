@@ -527,8 +527,9 @@ Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
 specialize (Hsurj empty_vect eq_refl) as H1.
-...
-assert (H : is_permut_vect empty_vect) by easy.
+assert (H : is_permut_vect empty_vect). {
+  now apply is_permut_vect_is_permut_vect_bool.
+}
 specialize (H1 H); clear H.
 apply (In_nth _ _ empty_vect) in H1.
 destruct H1 as (i & Hil & Hi).
@@ -721,7 +722,6 @@ Definition rank_of_permut_in_canon_sym_gr_vect n v :=
 Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i in (rank_of_permut_in_canon_sym_gr_vect n v, rank_of_permut_in_canon_sym_gr_vect' n v)) (seq 0 (n! + 10))).
 *)
 
-Print is_permut_fun.
 Print is_permut_vect.
 
 ...
