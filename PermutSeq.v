@@ -67,37 +67,26 @@ split. {
     intros i Hi.
     now apply Nat.ltb_lt, H3.
   } {
-...
-    rewrite iter_seq_all_d; [ easy | easy | | | ]. {
-      apply andb_true_r.
-    } {
-      apply andb_assoc.
-    } {
-      intros i Hi.
-      rewrite iter_seq_all_d; [ easy | easy | | | ]. {
-        apply andb_true_r.
-      } {
-        apply andb_assoc.
-      } {
-        intros j Hj.
-        apply orb_true_iff.
-        specialize (proj1 (NoDup_nth _ 0) H2 (i - 1) (j - 1)) as H3.
-        assert (H : i - 1 < length l) by flia Hi.
-        specialize (H3 H); clear H.
-        assert (H : j - 1 < length l) by flia Hj.
-        specialize (H3 H); clear H.
-        destruct (Nat.eq_dec (nth (i - 1) l 0) (nth (j - 1) l 0))
-            as [H4| H4]. {
-          specialize (H3 H4); right.
-          apply Nat.eqb_eq.
-          flia Hi Hj H3.
-        } {
-          left.
-          apply negb_true_iff.
-          now apply Nat.eqb_neq.
-        }
-      }
+    apply all_true_and_seq_true_iff.
+    intros i Hi.
+    apply all_true_and_seq_true_iff.
+    intros j Hj.
+    apply orb_true_iff.
+    specialize (proj1 (NoDup_nth _ 0) H2 (i - 1) (j - 1)) as H3.
+    assert (H : i - 1 < length l) by flia Hi.
+    specialize (H3 H); clear H.
+    assert (H : j - 1 < length l) by flia Hj.
+    specialize (H3 H); clear H.
+    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+      subst j.
+      now right; rewrite Nat.eqb_eq.
     }
+    left.
+    apply negb_true_iff.
+    apply Nat.eqb_neq.
+    intros H.
+    specialize (H3 H).
+    flia Hi Hj H3 Hij.
   }
 } {
   intros Hb.
@@ -107,6 +96,7 @@ split. {
   split. {
     apply Forall_forall.
     intros i Hi.
+...
     specialize (and_list_true_if _ _ H1) as H3.
     specialize (H3 _ Hi).
     now apply Nat.ltb_lt.
