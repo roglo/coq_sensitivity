@@ -163,6 +163,44 @@ split. {
       now rewrite andb_false_r, andb_false_l in H2.
     }
     apply IHl.
+    clear IHl.
+    (* bon, c'est évident, mais c'est compliqué *)
+...
+    erewrite iter_seq_eq_compat in H2. 2: {
+      intros i Hi.
+      cbn - [ nth ].
+      rewrite iter_seq_split_last; [ | flia ].
+      rewrite Nat.sub_succ, Nat.sub_0_r.
+      rewrite iter_seq_succ_succ.
+      erewrite iter_seq_eq_compat. 2: {
+        intros j Hj.
+        rewrite Nat.sub_succ, Nat.sub_0_r.
+        easy.
+      }
+      easy.
+    }
+    cbn - [ nth ] in H2.
+    rewrite iter_seq_split_last in H2; [ | flia ].
+    rewrite Nat.sub_succ, Nat.sub_0_r in H2.
+    rewrite iter_seq_succ_succ in H2.
+    erewrite iter_seq_eq_compat in H2. 2: {
+      intros j Hj.
+      rewrite Nat.sub_succ, Nat.sub_0_r.
+      easy.
+    }
+    cbn - [ nth "=?" ] in H2.
+    rewrite andb_assoc in H2.
+    apply andb_true_iff in H2.
+    destruct H2 as (H2, _).
+    apply andb_true_iff in H2.
+    destruct H2 as (H2, _).
+...
+    apply andb_true_iff in H2.
+...
+      rewrite Nat_sub_succ_1.
+Print iter_seq.
+Search (iter_seq (S _) (S _)).
+      rewrite iter_seq_shift.
 ...
   } {
     intros i j Hi Hj Hij.
