@@ -772,6 +772,23 @@ apply permut_list_ub; [ | easy ].
 split. {
   intros k Hk.
 ...
+assert (∀ n l, l ≠ [] → firstn n (sub_canon_permut_list l) = firstn (S n) l). {
+  clear.
+  intros * Hlz.
+  revert n.
+  induction l as [| a]; intros; [ easy | ].
+  cbn - [ "<?" ].
+  rewrite firstn_map.
+
+Search (firstn (S _) _).
+Theorem in_firstn_succ_r : ∀ A (a : A) n l,
+  a ∈ firstn n l → a ∈ firstn (S n) l.
+Proof.
+Admitted.
+...
+apply in_firstn_succ_r in Hk.
+apply (Hvn k) in Hk.
+...
     now apply sub_canon_permut_list_elem_ub.
   } {
     intros i j Hi Hj.
