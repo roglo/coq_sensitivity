@@ -751,11 +751,15 @@ apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
 rewrite if_ltb_lt_dec.
+specialize (proj1 (Forall_forall _ _) Hvn) as H1.
+specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
+cbn - [ In ] in H1.
 destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
-  unfold is_permut_list in Hvn.
-  specialize (proj1 (Forall_forall _ _) Hvn) as H1.
-  specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
-  cbn - [ In ] in H1.
+  enough (H : nth i l 0 < S (length l)) by flia Hal H.
+  now apply H1; right; apply nth_In.
+}
+apply Nat.nlt_ge in Hal.
+rewrite Nat.sub_0_r.
 ...
   specialize (H1 (nth i l 0)) as H3.
   assert (H : nth i l 0 ∈ a :: l). {
