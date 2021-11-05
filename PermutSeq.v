@@ -767,6 +767,9 @@ destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. 2: {
 }
 clear Hal.
 specialize (H1 a (or_introl eq_refl)) as H3.
+rewrite <- Hia in H3.
+destruct (Nat.eq_dec (nth i l 0) (length l)) as [Hil| Hil]; [ | flia H3 Hil ].
+exfalso; clear H3.
 ...
   specialize (H1 (nth i l 0)) as H3.
   assert (H : nth i l 0 ∈ a :: l). {
