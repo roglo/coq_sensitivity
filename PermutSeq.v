@@ -751,10 +751,37 @@ Theorem rank_of_canon_permut_ub : ∀ n f,
   → rank_of_permut_in_canon_sym_gr n f < n!.
 *)
 
-Theorem rank_of_canon_permut_ub : ∀ l,
-  is_permut_list l
-  → rank_of_permut_in_canon_sym_gr_list (length l) l < (length l)!.
+Theorem rank_of_canon_permut_ub : ∀ n l,
+  is_permut_list (firstn n l)
+  → rank_of_permut_in_canon_sym_gr_list n l < n!.
 Proof.
+intros * (Hvn, Hn).
+revert l Hvn Hn.
+induction n; intros; cbn - [ firstn ]; [ flia | ].
+rewrite Nat.add_comm.
+apply Nat.add_lt_le_mono. {
+  apply IHn. {
+    intros i Hi.
+Check sub_canon_permut_list_elem_ub.
+apply (In_nth _ _ 0) in Hi.
+destruct Hi as (j & Hj & Hji).
+rewrite <- Hji.
+Search (nth _ _ _ < _).
+Check sub_canon_permut_list_elem_ub.
+apply permut_list_ub; [ | easy ].
+split. {
+  intros k Hk.
+...
+    now apply sub_canon_permut_list_elem_ub.
+  } {
+    intros i j Hi Hj.
+    now apply sub_canon_sym_gr_elem_inj1 with (n := n).
+  }
+}
+apply Nat.mul_le_mono_r.
+specialize (Hvn 0 (Nat.lt_0_succ _)).
+flia Hvn.
+...
 intros * (Hvn, Hn).
 induction l as [| a]; cbn - [ "<?" ]; [ flia | ].
 rewrite Nat.add_comm.
