@@ -755,6 +755,15 @@ destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
   unfold is_permut_list in Hvn.
   specialize (proj1 (Forall_forall _ _) Hvn) as H1.
   specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
+  cbn - [ In ] in H1.
+...
+  specialize (H1 (nth i l 0)) as H3.
+  assert (H : nth i l 0 ∈ a :: l). {
+    destruct i. {
+      destruct l as [| b]; [ easy | ].
+      now right; left.
+    }
+    right.
 (*
   specialize (H1 (S i)); cbn - [ In ] in H1.
   specialize (H2 0 (S i) (Nat.lt_0_succ _)); cbn in H2.
