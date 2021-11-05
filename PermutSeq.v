@@ -708,6 +708,22 @@ Theorem sub_canon_sym_gr_elem_inj1 : ∀ l i j,
   → i = j.
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
+destruct l as [| a]; [ easy | ].
+cbn - [ "<?" ] in Hin, Hjn, Hij.
+apply Nat.succ_lt_mono in Hin, Hjn.
+rewrite (List_map_nth' 0) in Hij; [ | easy ].
+rewrite (List_map_nth' 0) in Hij; [ | easy ].
+unfold Nat.b2n in Hij.
+do 2 rewrite if_ltb_lt_dec in Hij.
+destruct (lt_dec a (nth i l 0)) as [Hai| Hai]. {
+  destruct (lt_dec a (nth j l 0)) as [Haj| Haj]. {
+    apply Nat.succ_inj.
+    apply Nat.succ_lt_mono in Hin, Hjn.
+    apply Hn; [ easy | easy | ].
+    cbn; flia Hai Haj Hij.
+  }
+  apply Nat.nlt_ge in Haj.
+  rewrite Nat.sub_0_r in Hij.
 ...
 intros * (Hvn, Hn) Hin Hjn Hij.
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
