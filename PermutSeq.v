@@ -732,21 +732,11 @@ Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
 Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   is_permut_list l
   → S i < length l
-  → nth i (sub_canon_permut_list l) 0 < length l - 1.
+  → nth i (sub_canon_permut_list l) 0 < length l.
 Proof.
-(*
-intros * Hp Hin.
-apply is_permut_list_is_permut_list_bool in Hp.
-unfold is_permut_list_bool in Hp.
-apply andb_true_iff in Hp.
-destruct Hp as (Hvn, Hn).
-  Hvn : ⋀ (a ∈ l), (a <? length l) = true
-  Hn : ⋀ (i = 1, length l), (⋀ (j = 1, length l), ((nth (i - 1) l 0 ≠? nth (j - 1) l 0) || (i =? j))) = true
-*)
 intros * (Hvn, Hn) Hin.
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin |-*.
-rewrite Nat.sub_0_r.
 apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
@@ -765,51 +755,10 @@ destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. 2: {
   specialize (H1 a (or_introl eq_refl)).
   flia Hal Hia H1.
 }
-clear Hal.
-specialize (H1 a (or_introl eq_refl)) as H3.
-rewrite <- Hia in H3.
-destruct (Nat.eq_dec (nth i l 0) (length l)) as [Hil| Hil]; [ | flia H3 Hil ].
-exfalso; clear H3.
-...
-  specialize (H1 (nth i l 0)) as H3.
-  assert (H : nth i l 0 ∈ a :: l). {
-    destruct i. {
-      destruct l as [| b]; [ easy | ].
-      now right; left.
-    }
-    right.
-(*
-  specialize (H1 (S i)); cbn - [ In ] in H1.
-  specialize (H2 0 (S i) (Nat.lt_0_succ _)); cbn in H2.
-*)
-...
-  apply Nat.succ_lt_mono in Hin.
-  specialize (H2 Hin).
-...
-  assert (H : S i ∈ a :: l). {
-    destruct (Nat.eq_dec (S i) a) as [Hia| Hia]. {
-      now rewrite Hia; left.
-    }
-    right.
-
-  cbn in H1.
-...
-intros * (Hvn, Hn) Hin.
-destruct n; [ easy | ].
-cbn - [ "<?" ].
-unfold sub_canon_permut_fun.
-remember (f 0 <? f (S i)) as b eqn:Hb.
-symmetry in Hb.
-specialize (Hvn (S i)) as H1.
-specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H2.
-assert (H : S i < S (S n)) by flia Hin.
-specialize (H1 H); specialize (H2 H); clear H.
-destruct b; cbn; [ flia H1 | ].
-rewrite Nat.sub_0_r.
-apply Nat.ltb_ge in Hb.
-specialize (Hvn 0 (Nat.lt_0_succ _)) as H3.
-flia Hb H1 H2 H3.
+now apply H1; left.
 Qed.
+
+...
 
 Theorem sub_canon_sym_gr_elem_inj1 : ∀ n f i j,
   is_permut_fun f (S n)
