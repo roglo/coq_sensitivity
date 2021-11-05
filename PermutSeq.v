@@ -263,8 +263,6 @@ split; cbn. {
   apply permut_vect_ub; [ easy | ].
   now apply transposition_lt.
 } {
-...
-  apply (NoDup_nth _ 0).
   rewrite map_length, seq_length, fold_vect_size.
   intros i j Hi Hj Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -274,37 +272,21 @@ split; cbn. {
   do 2 rewrite Nat.add_0_l in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
-  destruct Hσ as (Hp1, Hp2).
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-      subst j.
-      now apply (proj1 (NoDup_nth _ 0) Hp2).
-    }
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now subst j; apply Hσ | ].
     apply Nat.neq_sym in Hjq.
-    exfalso; apply Hjq.
-    now apply (proj1 (NoDup_nth _ 0) Hp2).
+    now exfalso; apply Hjq, Hσ.
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-      subst i j.
-      now apply (proj1 (NoDup_nth _ 0) Hp2).
-    }
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now subst i j; apply Hσ | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
-    apply Nat.neq_sym in Hjp.
-    exfalso; apply Hjp.
-    now apply (proj1 (NoDup_nth _ 0) Hp2).
+    now apply Nat.neq_sym in Hjp; exfalso; apply Hjp; apply Hσ.
   }
-  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-    exfalso; apply Hiq.
-    now apply (proj1 (NoDup_nth _ 0) Hp2).
-  }
-  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-    exfalso; apply Hip.
-    now apply (proj1 (NoDup_nth _ 0) Hp2).
-  }
-  now apply (proj1 (NoDup_nth _ 0) Hp2).
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now exfalso; apply Hiq, Hσ | ].
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now exfalso; apply Hip, Hσ | ].
+  now apply Hσ.
 }
 Qed.
 
@@ -416,11 +398,9 @@ specialize (H1 eq_refl).
 assert (H : is_permut_vect (mk_vect (seq 0 n))). {
   split. {
     cbn; rewrite seq_length.
-    apply Forall_forall.
     intros i Hin.
     now rewrite in_seq in Hin.
   } {
-    apply (NoDup_nth _ 0).
     cbn; rewrite seq_length.
     intros i j Hi Hj Hij.
     rewrite seq_nth in Hij; [ | easy ].
@@ -707,6 +687,7 @@ apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
 rewrite if_ltb_lt_dec.
+...
 specialize (proj1 (Forall_forall _ _) Hvn) as H1.
 specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
 cbn - [ In ] in H1.
