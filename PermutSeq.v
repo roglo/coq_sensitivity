@@ -724,54 +724,28 @@ destruct (lt_dec a (nth i l 0)) as [Hai| Hai]. {
   }
   apply Nat.nlt_ge in Haj.
   rewrite Nat.sub_0_r in Hij.
-...
-intros * (Hvn, Hn) Hin Hjn Hij.
-destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
-revert Hij; rename H into Hij.
-destruct n; [ easy | ].
-cbn - [ "<?" ].
-unfold sub_canon_permut_fun.
-remember (f 0 <? f (S i)) as bi eqn:Hbi.
-remember (f 0 <? f (S j)) as bj eqn:Hbj.
-symmetry in Hbi, Hbj.
-move bj before bi.
-destruct bi; cbn. {
-  apply Nat.ltb_lt in Hbi.
-  destruct bj; cbn. {
-    apply Nat.ltb_lt in Hbj.
-    apply Nat.succ_lt_mono in Hin.
-    apply Nat.succ_lt_mono in Hjn.
-    specialize (Hn (S i) (S j) Hin Hjn) as Hs.
-    assert (H : S i ≠ S j) by flia Hij.
-    intros H'.
-    apply H, Hs.
-    flia Hbi Hbj H'.
-  } {
-    apply Nat.ltb_ge in Hbj.
-    apply Nat.succ_lt_mono in Hjn.
-    specialize (Hn 0 (S j) (Nat.lt_0_succ _) Hjn) as H1.
-    flia Hbi Hbj H1.
-  }
-} {
-  apply Nat.ltb_ge in Hbi.
-  destruct bj; cbn. {
-    apply Nat.ltb_lt in Hbj.
-    apply Nat.succ_lt_mono in Hin.
-    specialize (Hn 0 (S i) (Nat.lt_0_succ _) Hin) as H1.
-    flia Hbi Hbj H1.
-  } {
-    apply Nat.ltb_ge in Hbj.
-    apply Nat.succ_lt_mono in Hin.
-    apply Nat.succ_lt_mono in Hjn.
-    specialize (Hn (S i) (S j) Hin Hjn) as Hs.
-    assert (H : S i ≠ S j) by flia Hij.
-    intros H'.
-    apply H, Hs.
-    flia H'.
-  }
+  apply Nat.succ_lt_mono in Hjn.
+  specialize (Hn 0 (S j) (Nat.lt_0_succ _) Hjn) as H1.
+  cbn in H1.
+  replace (nth j l 0) with a in H1 by flia Hai Haj Hij.
+  now specialize (H1 eq_refl).
 }
+apply Nat.nlt_ge in Hai.
+rewrite Nat.sub_0_r in Hij.
+destruct (lt_dec a (nth j l 0)) as [Haj| Haj]. {
+  apply Nat.succ_lt_mono in Hin.
+  specialize (Hn (S i) 0 Hin (Nat.lt_0_succ _)) as H1.
+  cbn in H1.
+  replace (nth i l 0) with a in H1 by flia Hai Haj Hij.
+  now specialize (H1 eq_refl).
+}
+rewrite Nat.sub_0_r in Hij.
+apply Nat.succ_inj.
+apply Nat.succ_lt_mono in Hin, Hjn.
+now apply Hn.
 Qed.
-*)
+
+...
 
 Theorem rank_of_canon_permut_ub : ∀ n f,
   is_permut_fun f n
