@@ -729,8 +729,6 @@ Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
   → sub_canon_permut_fun f i < n.
 *)
 
-...
-
 Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   is_permut_list l
   → S i < length l
@@ -748,7 +746,7 @@ destruct Hp as (Hvn, Hn).
 intros * (Hvn, Hn) Hin.
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin |-*.
-rewrite Nat.sub_0_r in Hin |-*.
+apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0). 2: {
 ...
 rewrite (List_map_nth' 0); [ | easy ].
