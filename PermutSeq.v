@@ -745,12 +745,76 @@ apply Nat.succ_lt_mono in Hin, Hjn.
 now apply Hn.
 Qed.
 
-...
-
+(*
 Theorem rank_of_canon_permut_ub : ∀ n f,
   is_permut_fun f n
   → rank_of_permut_in_canon_sym_gr n f < n!.
+*)
+
+Theorem rank_of_canon_permut_ub : ∀ n l,
+  is_permut_list l
+  → rank_of_permut_in_canon_sym_gr_list n l < n!.
 Proof.
+intros * (Hvn, Hn).
+revert l Hvn Hn.
+induction n; intros; cbn; [ flia | ].
+rewrite Nat.add_comm.
+apply Nat.add_lt_le_mono. 2: {
+  apply Nat.mul_le_mono_r.
+  specialize (Hvn 0).
+...
+  specialize (Hvn 0 (Nat.lt_0_succ _)).
+flia Hvn.
+...
+apply Nat.add_lt_le_mono. {
+  apply IHn. {
+    intros i Hi.
+    unfold sub_canon_permut_list.
+    rewrite map_length.
+    rewrite List_tl_length.
+    destruct l as [| a]; [ easy | ].
+    cbn - [ "<?" ] in Hi |-*.
+    rewrite Nat.sub_0_r.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hj & Hji).
+    subst i.
+    unfold Nat.b2n.
+    rewrite if_ltb_lt_dec.
+    apply (In_nth _ _ 0) in Hji.
+    destruct Hji as (k & Hk & Hkj).
+    destruct (lt_dec a j) as [Haj| Haj]. {
+      subst j.
+      apply Nat.succ_lt_mono.
+      rewrite <- Nat.sub_succ_l; [ | flia Haj ].
+      rewrite Nat_sub_succ_1.
+      apply Hvn.
+      right.
+...
+    rewrite <- Nat.sub_succ_l.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (j & Hj & Hji).
+Check sub_canon_permut_list_elem_ub.
+...
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (j & Hj & Hji).
+    unfold sub_canon_permut_list in Hj |-*.
+    rewrite map_length in Hj |-*.
+    rewrite <- Hji.
+Check sub_canon_permut_list_elem_ub.
+...
+    rewrite List_tl_length in Hj.
+...
+    assert (Hsj : S j < length l) by flia Hj.
+apply sub_canon_permut_list_elem_ub in Hsj.
+...
+
+    apply sub_canon_permut_list_elem_ub.
+    now apply sub_canon_permut_fun_elem_ub.
+  } {
+    intros i j Hi Hj.
+    now apply sub_canon_sym_gr_elem_inj1 with (n := n).
+  }
+...
 intros * (Hvn, Hn).
 revert f Hvn Hn.
 induction n; intros; cbn; [ flia | ].
