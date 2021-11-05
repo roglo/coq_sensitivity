@@ -732,7 +732,7 @@ Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
 Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   is_permut_list l
   → S i < length l
-  → nth (S i) (sub_canon_permut_list l) 0 < length l - 1.
+  → nth i (sub_canon_permut_list l) 0 < length l - 1.
 Proof.
 (*
 intros * Hp Hin.
@@ -746,9 +746,8 @@ destruct Hp as (Hvn, Hn).
 intros * (Hvn, Hn) Hin.
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin |-*.
+rewrite Nat.sub_0_r.
 apply Nat.succ_lt_mono in Hin.
-rewrite (List_map_nth' 0). 2: {
-...
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
 rewrite if_ltb_lt_dec.
@@ -760,6 +759,7 @@ destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
   specialize (H1 (S i)); cbn - [ In ] in H1.
   specialize (H2 0 (S i) (Nat.lt_0_succ _)); cbn in H2.
 *)
+...
   apply Nat.succ_lt_mono in Hin.
   specialize (H2 Hin).
 ...
