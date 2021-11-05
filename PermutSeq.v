@@ -760,6 +760,13 @@ destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
 }
 apply Nat.nlt_ge in Hal.
 rewrite Nat.sub_0_r.
+cbn - [ nth ] in H2.
+destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. 2: {
+  specialize (H1 a (or_introl eq_refl)).
+  flia Hal Hia H1.
+}
+clear Hal.
+specialize (H1 a (or_introl eq_refl)) as H3.
 ...
   specialize (H1 (nth i l 0)) as H3.
   assert (H : nth i l 0 ∈ a :: l). {
