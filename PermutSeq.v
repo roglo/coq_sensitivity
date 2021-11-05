@@ -668,13 +668,6 @@ Definition rank_of_permut_in_canon_sym_gr_vect n v :=
 Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i in (rank_of_permut_in_canon_sym_gr_vect n v, rank_of_permut_in_canon_sym_gr_vect n v)) (seq 0 (n! + 10))).
 *)
 
-(*
-Theorem sub_canon_permut_fun_elem_ub : ∀ n f i,
-  is_permut_fun f (S n)
-  → i < n
-  → sub_canon_permut_fun f i < n.
-*)
-
 Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   is_permut_list l
   → S i < length l
@@ -687,22 +680,15 @@ apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
 rewrite if_ltb_lt_dec.
-...
-specialize (proj1 (Forall_forall _ _) Hvn) as H1.
-specialize (proj1 (NoDup_nth _ 0) Hn) as H2.
-cbn - [ In ] in H1.
 destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
   enough (H : nth i l 0 < S (length l)) by flia Hal H.
-  now apply H1; right; apply nth_In.
+  now apply Hvn; right; apply nth_In.
 }
 apply Nat.nlt_ge in Hal.
 rewrite Nat.sub_0_r.
-cbn - [ nth ] in H2.
-destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. 2: {
-  specialize (H1 a (or_introl eq_refl)).
-  flia Hal Hia H1.
-}
-now apply H1; left.
+apply Hvn.
+destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]; [ now left | ].
+now right; apply nth_In.
 Qed.
 
 (*
@@ -723,6 +709,7 @@ Theorem sub_canon_sym_gr_elem_inj1 : ∀ l i j,
 Proof.
 intros * (Hvn, Hn) Hin Hjn Hij.
 ...
+intros * (Hvn, Hn) Hin Hjn Hij.
 destruct (Nat.eq_dec i j) as [H| H]; [ easy | exfalso ].
 revert Hij; rename H into Hij.
 destruct n; [ easy | ].
