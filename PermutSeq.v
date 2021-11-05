@@ -751,6 +751,7 @@ Theorem rank_of_canon_permut_ub : ∀ n f,
   → rank_of_permut_in_canon_sym_gr n f < n!.
 *)
 
+(*
 Theorem rank_of_canon_permut_ub : ∀ n l,
   is_permut_list (firstn n l)
   → rank_of_permut_in_canon_sym_gr_list n l < n!.
@@ -892,11 +893,25 @@ apply Nat.mul_le_mono_r.
 specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
+*)
 
+(*
 Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
   is_permut_fun f n
   → ∀ i, i < n
   → canon_sym_gr_elem n (rank_of_permut_in_canon_sym_gr n f) i = f i.
+*)
+
+Print canon_sym_gr_elem.
+...
+
+ n (rank_of_permut_in_canon_sym_gr_list n l) i =
+
+Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
+  is_permut_list l
+  → ∀ i, i < n
+  → canon_sym_gr_elem n (rank_of_permut_in_canon_sym_gr_list n l) i =
+    nth i l 0.
 Proof.
 intros * (Hvn, Hn) * Hin.
 revert i f Hin Hvn Hn.
