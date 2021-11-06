@@ -339,11 +339,25 @@ Definition canon_sym_gr n : vector (vector nat) :=
 
 (* JELEFAIS *)
 
-Definition canon_sym_gr_list n : list (list nat) :=
 ...
 
+Definition canon_sym_gr_list_elem n l k j : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' => nth j' l 0 + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
+  end.
+
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' => canon_sym_gr_list_elem n' (canon_sym_gr_list n')
+  end.
+
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+
 Definition canon_sym_gr_vect n : vector (vector nat) :=
-  mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list n)).
+  mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
 
 ...
 
