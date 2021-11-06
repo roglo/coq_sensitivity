@@ -550,6 +550,7 @@ cbn in H4, H6.
 now subst x y.
 Qed.
 
+(*
 Fixpoint canon_sym_gr_inv n k (j : nat) :=
   match n with
   | 0 => 0
@@ -562,14 +563,47 @@ Fixpoint canon_sym_gr_inv n k (j : nat) :=
   end.
 
 Check canon_sym_gr_inv.
+*)
 
-...
+Definition canon_sym_gr_inv_list n k : list nat :=
+  map (λ j, unsome 0 (List_find_nth (Nat.eqb j) (canon_sym_gr_list n k)))
+    (seq 0 n).
 
+(*
+Print canon_sym_gr_list_list.
+Print canon_sym_gr_list.
+
+Compute (canon_sym_gr_list_list 4).
+Compute (canon_sym_gr_list 4 8).
+*)
+
+(*
+Compute (let (n, k) := (4, 20) in (canon_sym_gr_list n k, canon_sym_gr_inv_list n k)).
+*)
+
+(*
+Compute (let (n, k) := (4, 0) in let i := 2 in
+  (canon_sym_gr_inv n k (nth i (canon_sym_gr_list n k) 0), i)).
+*)
+
+(*
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
   i < n
   → k < fact n
   → canon_sym_gr_inv n k (canon_sym_gr_elem n k i) = i.
+*)
+Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
+  i < n
+  → k < n!
+  → nth ((nth i (canon_sym_gr_list n k) 0)) (canon_sym_gr_inv_list n k) 0 = i.
 Proof.
+intros * Hi Hkn.
+unfold canon_sym_gr_inv_list.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+Search (canon_sym_gr_list).
+Search (canon_sym_gr_vect).
+...
 intros * Hi Hkn.
 revert k i Hi Hkn.
 induction n; intros; [ flia Hi | ].
