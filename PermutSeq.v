@@ -338,25 +338,27 @@ Definition canon_sym_gr n : vector (vector nat) :=
     (map (λ k, mk_vect (map (canon_sym_gr_elem n k) (seq 0 n))) (seq 0 n!)).
 *)
 
-(* from some list nat, return a list of the same length where
-   values above k are shifted by 1 *)
-Definition canon_sym_gr_adjust l k :=
+(* map some list l where values above k are shifted by 1 *)
+Definition map_succ_when_gt l k :=
   map (λ a, a + Nat.b2n (k <=? a)) l.
 
-Fixpoint canon_sym_gr_list n k :=
+(* k-th canonic permutation of order n *)
+Fixpoint canon_sym_gr_list n k : list nat :=
   match n with
   | 0 => []
   | S n' =>
-      k / n'! ::
-      canon_sym_gr_adjust (canon_sym_gr_list n' (k mod n'!)) (k / n'!)
+      k / n'! :: map_succ_when_gt (canon_sym_gr_list n' (k mod n'!)) (k / n'!)
   end.
 
+(* all canonic permutations *)
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
 
+(* vector of all canonic permutations vectors *)
 Definition canon_sym_gr_vect n : vector (vector nat) :=
   mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
 
+Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
 Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
 
 ...
