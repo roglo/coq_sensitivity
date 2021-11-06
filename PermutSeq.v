@@ -320,7 +320,7 @@ Qed.
      final result: 2;0;3;1
   *)
 
-(* AFAIRE : utiliser des listes plutôt que des fonctions *)
+(*
 Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
   | 0 => k / n!
@@ -336,21 +336,22 @@ Fixpoint canon_sym_gr_elem n : nat → nat → nat :=
 Definition canon_sym_gr n : vector (vector nat) :=
   mk_vect
     (map (λ k, mk_vect (map (canon_sym_gr_elem n k) (seq 0 n))) (seq 0 n!)).
+*)
 
-(* JELEFAIS *)
+(* from some permutation f of order n (a list nat), return a list of
+   the same length where values above k are shifted by 1 *)
+Definition canon_sym_gr_adjust n v k :=
+  map
+    (λ j,
+       let a := nth j v 0 in
+       a + Nat.b2n (k <=? a)) (seq 0 n).
 
-...
-
-Definition canon_sym_gr_list_elem n l k j : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' => nth j' l 0 + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
-  end.
-
-Fixpoint canon_sym_gr_list n k : list nat :=
+Fixpoint canon_sym_gr_list n k :=
   match n with
   | 0 => []
-  | S n' => canon_sym_gr_list_elem n' (canon_sym_gr_list n')
+  | S n' =>
+      k / n'! ::
+      canon_sym_gr_adjust n' (canon_sym_gr_list n' (k mod n'!)) (k / n'!)
   end.
 
 Definition canon_sym_gr_list_list n : list (list nat) :=
@@ -358,6 +359,8 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 
 Definition canon_sym_gr_vect n : vector (vector nat) :=
   mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
+
+Compute (let n := 4 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
 
 ...
 
