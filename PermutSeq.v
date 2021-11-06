@@ -586,6 +586,37 @@ Compute (let (n, k) := (4, 0) in let i := 2 in
   (canon_sym_gr_inv n k (nth i (canon_sym_gr_list n k) 0), i)).
 *)
 
+Theorem length_canon_sym_gr_list : ∀ k n,
+  length (canon_sym_gr_list n k) = n.
+Proof.
+intros.
+revert k.
+induction n; intros; [ easy | cbn ].
+f_equal; rewrite map_length.
+apply IHn.
+Qed.
+
+Theorem canon_sym_gr_list_ub : ∀ n k i,
+  k < n!
+  → i < n
+  → nth i (canon_sym_gr_list n k) 0 < n.
+Proof.
+intros * Hkn Hi.
+revert i k Hkn Hi.
+induction n; intros; [ easy | cbn ].
+destruct i. {
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  now rewrite Nat.mul_succ_r, Nat.add_comm, Nat.mul_comm.
+}
+apply Nat.succ_lt_mono in Hi.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge.
+rewrite <- Nat.add_1_r.
+apply Nat.add_lt_le_mono; [ | apply Nat_b2n_upper_bound ].
+apply IHn; [ | easy ].
+apply Nat.mod_upper_bound, fact_neq_0.
+Qed.
+
 (*
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
   i < n
@@ -601,8 +632,24 @@ intros * Hi Hkn.
 unfold canon_sym_gr_inv_list.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
-Search (canon_sym_gr_list).
-Search (canon_sym_gr_vect).
+  now apply canon_sym_gr_list_ub.
+}
+unfold unsome.
+unfold List_find_nth.
+revert k i Hi Hkn.
+induction n; intros; [ easy | ].
+cbn - [ List_find_nth_loop seq nth ].
+destruct i. {
+Search (nth 0 (_ :: _)).
+About List_nth_succ_cons.
+...
+remember (canon_sym_gr_list n k) as l eqn:Hl; symmetry in Hl.
+revert n i k Hi Hkn Hl.
+induction l as [| a]; intros; cbn.
+...
+clear k Hkn Hl.
+revert i n Hi.
+induction l as [| a]; intros; cbn.
 ...
 intros * Hi Hkn.
 revert k i Hi Hkn.

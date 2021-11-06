@@ -1195,6 +1195,9 @@ apply Hf with (i := S i); cbn.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
+Theorem List_nth_0_cons : ∀ A (a : A) la d, nth 0 (a :: la) d = a.
+Proof. easy. Qed.
+
 Theorem List_nth_succ_cons : ∀ A (a : A) la i, nth (S i) (a :: la) = nth i la.
 Proof. easy. Qed.
 
