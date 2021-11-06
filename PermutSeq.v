@@ -339,7 +339,7 @@ Definition canon_sym_gr n : vector (vector nat) :=
 *)
 
 (* map some list l where values above k are shifted by 1 *)
-Definition map_succ_when_gt l k :=
+Definition map_succ_when_ge k l :=
   map (λ a, a + Nat.b2n (k <=? a)) l.
 
 (* k-th canonic permutation of order n *)
@@ -347,7 +347,7 @@ Fixpoint canon_sym_gr_list n k : list nat :=
   match n with
   | 0 => []
   | S n' =>
-      k / n'! :: map_succ_when_gt (canon_sym_gr_list n' (k mod n'!)) (k / n'!)
+      k / n'! :: map_succ_when_ge (k / n'!) (canon_sym_gr_list n' (k mod n'!))
   end.
 
 (* all canonic permutations *)
