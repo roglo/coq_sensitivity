@@ -212,7 +212,7 @@ Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
   nth i (vect_list V) empty_vect.
 *)
 
-(* AFAIRE : utiliser des listes plutôt que des fonctions *)
+(*
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
   | 0 => 42
@@ -223,19 +223,24 @@ Definition permut_vect_inv (σ : vector nat) :=
   mk_vect
     (map (permut_fun_inv_loop (vect_el 0 σ) (vect_size σ))
        (seq 0 (vect_size σ))).
+*)
+
+Definition permut_list_inv l :=
+  map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
+
+Definition permut_vect_inv (v : vector nat) :=
+  mk_vect (permut_list_inv (vect_list v)).
 
 (**)
 
+Definition vect_eqb A eqb (u v : vector A) :=
+  list_eqb eqb (vect_list u) (vect_list v).
+
+(*
 Compute (let n := 4 in canon_sym_gr_vect 3).
 Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in (v, permut_vect_inv v)) (seq 0 n!)).
-Compute (let n := 3 in map (λ i, permut_vect_inv (vect_el empty_vect (canon_sym_gr_vect n) i)) (seq 0 n!)).
-
-...
-
-Compute (permut_vect_inv (mk_vect [0;1;2;3])).
-Check canon_sym_gr_vect.
-
-...
+Compute (let n := 5 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in vect_eqb Nat.eqb (permut_vect_inv v) (permut_vect_inv' v)) (seq 0 n!)).
+*)
 
 (* transposition *)
 
@@ -386,9 +391,6 @@ split; cbn. {
 Qed.
 
 (* *)
-
-Definition vect_eqb A eqb (u v : vector A) :=
-  list_eqb eqb (vect_list u) (vect_list v).
 
 Definition rank_of_permut_in_sym_gr (sg : vector (vector nat)) σ :=
   unsome 0 (List_find_nth (vect_eqb Nat.eqb σ) (vect_list sg)).
