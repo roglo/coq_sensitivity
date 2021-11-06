@@ -255,6 +255,7 @@ Definition vect_swap_elem {A} d (v : vector A) i j :=
     (map (λ k, vect_el d v (transposition i j k))
        (seq 0 (length (vect_list v)))).
 
+(*
 Theorem permut_fun_inv_loop_ext_in : ∀ f g i j,
   (∀ k, k < i → f k = g k)
   → permut_fun_inv_loop f i j = permut_fun_inv_loop g i j.
@@ -273,6 +274,7 @@ apply IHi.
 intros k Hk.
 apply Hfg; flia Hk.
 Qed.
+*)
 
 Theorem permut_list_ub : ∀ l i,
   is_permut_list l → i < length l → nth i l 0 < length l.
