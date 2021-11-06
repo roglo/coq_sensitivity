@@ -144,6 +144,15 @@ Definition permut_vect_inv (σ : vector nat) :=
     (map (permut_fun_inv_loop (vect_el 0 σ) (vect_size σ))
        (seq 0 (vect_size σ))).
 
+(**)
+
+Compute (permut_vect_inv (mk_vect [0;1;2;3])).
+Check canon_sym_gr_vect.
+
+...
+
+(* transposition *)
+
 Definition transposition i j k :=
   if k =? i then j else if k =? j then i else k.
 
@@ -360,15 +369,6 @@ Definition canon_sym_gr_vect n : vector (vector nat) :=
 Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
 Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
 
-...
-
-(* ici, comparer canon_sym_gr et canon_sym_gr_vect pour voir si
-   ce dernier est korrekt *)
-
-(*
-Compute map (vect_list (T := nat)) (vect_list (canon_sym_gr 4)).
-*)
-
 Definition is_sym_gr n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
    vect_size (vect_el empty_vect vv i) = n ∧
@@ -548,6 +548,10 @@ Fixpoint canon_sym_gr_inv n k (j : nat) :=
         S (canon_sym_gr_inv n' (k mod n'!) (j - 1))
       else 0
   end.
+
+Check canon_sym_gr_inv.
+
+...
 
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
   i < n
