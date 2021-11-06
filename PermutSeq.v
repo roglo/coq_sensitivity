@@ -320,6 +320,7 @@ Qed.
      final result: 2;0;3;1
   *)
 
+(* AFAIRE : utiliser des listes plutôt que des fonctions *)
 Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
   match j with
   | 0 => k / n!
@@ -335,6 +336,19 @@ Fixpoint canon_sym_gr_elem n : nat → nat → nat :=
 Definition canon_sym_gr n : vector (vector nat) :=
   mk_vect
     (map (λ k, mk_vect (map (canon_sym_gr_elem n k) (seq 0 n))) (seq 0 n!)).
+
+(* JELEFAIS *)
+
+Definition canon_sym_gr_list n : list (list nat) :=
+...
+
+Definition canon_sym_gr_vect n : vector (vector nat) :=
+  mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list n)).
+
+...
+
+(* ici, comparer canon_sym_gr et canon_sym_gr_vect pour voir si
+   ce dernier est korrekt *)
 
 (*
 Compute map (vect_list (T := nat)) (vect_list (canon_sym_gr 4)).
@@ -902,11 +916,7 @@ Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
   → canon_sym_gr_elem n (rank_of_permut_in_canon_sym_gr n f) i = f i.
 *)
 
-Print canon_sym_gr_elem.
-...
-
- n (rank_of_permut_in_canon_sym_gr_list n l) i =
-
+(*
 Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
   is_permut_list l
   → ∀ i, i < n
@@ -999,6 +1009,7 @@ destruct (le_dec (f 0) (canon_sym_gr_elem n k i)) as [Hb| Hb]. {
   flia Hzi Hb.
 }
 Qed.
+*)
 
 Theorem canon_permut_elem_ub : ∀ n k i,
   k < n!
@@ -1011,7 +1022,7 @@ induction n; intros; [ easy | cbn ].
 unfold canon_sym_gr_fun.
 destruct i. {
   rewrite Nat_fact_succ, Nat.mul_comm in Hkn.
-  apply Nat.div_lt_ub; [ | easy ].
+  apply Nat.div_lt_upper_bound; [ | easy ].
   apply fact_neq_0.
 }
 apply Nat.succ_lt_mono in Hin.
@@ -1031,9 +1042,15 @@ apply Nat.div_lt_upper_bound; [ | easy ].
 apply fact_neq_0.
 Qed.
 
+(*
 Theorem canon_sym_gr_elem_is_permut : ∀ n k,
   k < n!
   → is_permut_fun (canon_sym_gr_elem n k) n.
+*)
+...
+Theorem canon_sym_gr_elem_is_permut : ∀ n k,
+  k < n!
+  → is_permut_list (canon_sym_gr_elem n k) n.
 Proof.
 intros * Hkn.
 split. {
