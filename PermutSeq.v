@@ -36,10 +36,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-(*
-Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
-  nth i (vect_list V) empty_vect.
-*)
+(* Permutations of {0, 1, 2, ... n-1} *)
 
 Definition is_permut_list l :=
   (∀ x, x ∈ l → x < length l) ∧
@@ -132,6 +129,89 @@ unfold is_permut_vect.
 apply is_permut_list_is_permut_list_bool.
 Qed.
 
+(*
+   Canonical Symmetric Group.
+
+   In set theory, there is one only symmetric group of order n.
+
+   Here, a symmetric group (of order n) is a list of n! permutations,
+   which can be ordered in any order. There are actually n!! (factorial
+   of factorial n) possible orders.
+
+   There is one that we call "canonical" because the generated permutation
+   are in alphabetic order.
+
+   The canonical symmetric group is built this way. The k-th permutation
+   is a vector of size n where
+   - the first value is k/fact(n-1)
+   - the rest is the (k mod fact(n-1))-th permutation of n-1 values
+     (from 0 to n-2) where
+     * all values less than the first value (k/fact(n-1)) are unchanged
+     * all values greater or equal to it are increased by 1
+   Example. For n=4 and k=0
+   - first value: 0
+   - rest: shift of 0;1;2 by 1, i.e. 1;2;3
+   Result : 0;1;2;3
+   Other example. For n=4 and k=13
+   - first value: 13/3! = 13/6 = 2
+   - rest: k' = 13 mod 3! = 13 mod 6 = 1 for n'=3, resulting 0;2;1
+     0 and 1 are not shifted (both < 2), 2 is shifted, resulting 0;3;1
+     final result: 2;0;3;1
+  *)
+
+(*
+Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
+  match j with
+  | 0 => k / n!
+  | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
+  end.
+
+Fixpoint canon_sym_gr_elem n : nat → nat → nat :=
+  match n with
+  | 0 => λ _ _, 0
+  | S n' => canon_sym_gr_fun n' (canon_sym_gr_elem n')
+  end.
+
+Definition canon_sym_gr n : vector (vector nat) :=
+  mk_vect
+    (map (λ k, mk_vect (map (canon_sym_gr_elem n k) (seq 0 n))) (seq 0 n!)).
+*)
+
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+
+(* k-th canonic permutation of order n *)
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+
+(* all canonic permutations *)
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+
+(* vector of all canonic permutations vectors *)
+Definition canon_sym_gr_vect n : vector (vector nat) :=
+  mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
+
+Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
+Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
+
+Definition is_sym_gr n (vv : vector (vector nat)) :=
+  (∀ i, i < vect_size vv →
+   vect_size (vect_el empty_vect vv i) = n ∧
+   is_permut_vect (vect_el empty_vect vv i)) ∧
+  (∀ i j, i < vect_size vv → j < vect_size vv →
+   vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
+  (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
+
+(*
+Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
+  nth i (vect_list V) empty_vect.
+*)
+
 (* AFAIRE : utiliser des listes plutôt que des fonctions *)
 Fixpoint permut_fun_inv_loop f i j :=
   match i with
@@ -145,6 +225,12 @@ Definition permut_vect_inv (σ : vector nat) :=
        (seq 0 (vect_size σ))).
 
 (**)
+
+Compute (let n := 4 in canon_sym_gr_vect 3).
+Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in (v, permut_vect_inv v)) (seq 0 n!)).
+Compute (let n := 3 in map (λ i, permut_vect_inv (vect_el empty_vect (canon_sym_gr_vect n) i)) (seq 0 n!)).
+
+...
 
 Compute (permut_vect_inv (mk_vect [0;1;2;3])).
 Check canon_sym_gr_vect.
@@ -298,84 +384,6 @@ split; cbn. {
   now apply Hσ.
 }
 Qed.
-
-(*
-   Canonical Symmetric Group.
-
-   In set theory, there is one only symmetric group of order n.
-
-   Here, a symmetric group (of order n) is a list of n! permutations,
-   which can be ordered in any order. There are actually n!! (factorial
-   of factorial n) possible orders.
-
-   There is one that we call "canonical" because the generated permutation
-   are in alphabetic order.
-
-   The canonical symmetric group is built this way. The k-th permutation
-   is a vector of size n where
-   - the first value is k/fact(n-1)
-   - the rest is the (k mod fact(n-1))-th permutation of n-1 values
-     (from 0 to n-2) where
-     * all values less than the first value (k/fact(n-1)) are unchanged
-     * all values greater or equal to it are increased by 1
-   Example. For n=4 and k=0
-   - first value: 0
-   - rest: shift of 0;1;2 by 1, i.e. 1;2;3
-   Result : 0;1;2;3
-   Other example. For n=4 and k=13
-   - first value: 13/3! = 13/6 = 2
-   - rest: k' = 13 mod 3! = 13 mod 6 = 1 for n'=3, resulting 0;2;1
-     0 and 1 are not shifted (both < 2), 2 is shifted, resulting 0;3;1
-     final result: 2;0;3;1
-  *)
-
-(*
-Definition canon_sym_gr_fun n (σ_n : nat → nat → nat) k j : nat :=
-  match j with
-  | 0 => k / n!
-  | S j' => σ_n (k mod n!) j' + Nat.b2n (k / n! <=? σ_n (k mod n!) j')
-  end.
-
-Fixpoint canon_sym_gr_elem n : nat → nat → nat :=
-  match n with
-  | 0 => λ _ _, 0
-  | S n' => canon_sym_gr_fun n' (canon_sym_gr_elem n')
-  end.
-
-Definition canon_sym_gr n : vector (vector nat) :=
-  mk_vect
-    (map (λ k, mk_vect (map (canon_sym_gr_elem n k) (seq 0 n))) (seq 0 n!)).
-*)
-
-Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
-
-(* k-th canonic permutation of order n *)
-Fixpoint canon_sym_gr_list n k : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end.
-
-(* all canonic permutations *)
-Definition canon_sym_gr_list_list n : list (list nat) :=
-  map (canon_sym_gr_list n) (seq 0 n!).
-
-(* vector of all canonic permutations vectors *)
-Definition canon_sym_gr_vect n : vector (vector nat) :=
-  mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
-
-Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
-Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
-
-Definition is_sym_gr n (vv : vector (vector nat)) :=
-  (∀ i, i < vect_size vv →
-   vect_size (vect_el empty_vect vv i) = n ∧
-   is_permut_vect (vect_el empty_vect vv i)) ∧
-  (∀ i j, i < vect_size vv → j < vect_size vv →
-   vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
-  (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
 
 (* *)
 
