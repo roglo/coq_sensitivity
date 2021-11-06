@@ -634,14 +634,26 @@ rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply canon_sym_gr_list_ub.
 }
+rewrite seq_nth; [ | now apply canon_sym_gr_list_ub ].
+rewrite Nat.add_0_l.
 unfold unsome.
 unfold List_find_nth.
 revert k i Hi Hkn.
 induction n; intros; [ easy | ].
 cbn - [ List_find_nth_loop seq nth ].
 destruct i. {
-Search (nth 0 (_ :: _)).
-About List_nth_succ_cons.
+  rewrite List_nth_0_cons.
+  cbn - [ nth seq ].
+  now rewrite Nat.eqb_refl.
+}
+apply Nat.succ_lt_mono in Hi.
+rewrite List_nth_succ_cons.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge, Nat.b2n.
+rewrite if_leb_le_dec.
+remember (canon_sym_gr_list n (k mod n!)) as l eqn:Hl.
+destruct (le_dec (k / n!) (nth i l 0)) as [H1| H1]; subst l. {
+  cbn.
 ...
 remember (canon_sym_gr_list n k) as l eqn:Hl; symmetry in Hl.
 revert n i k Hi Hkn Hl.
