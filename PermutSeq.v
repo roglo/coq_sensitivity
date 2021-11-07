@@ -569,6 +569,8 @@ Definition canon_sym_gr_inv_list n k : list nat :=
   map (λ j, unsome 0 (List_find_nth (Nat.eqb j) (canon_sym_gr_list n k)))
     (seq 0 n).
 
+...
+
 (*
 Print canon_sym_gr_list_list.
 Print canon_sym_gr_list.
