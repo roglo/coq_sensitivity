@@ -657,6 +657,7 @@ destruct (le_dec (k / n!) (nth i l 0)) as [H1| H1]. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec (nth i l 0 + 1) (k / n!)) as [H| H]; [ flia H1 H | ].
   clear H.
+...
   specialize (IHn (k / S n) i Hi).
   assert (H : k / S n < n!) by now apply Nat.div_lt_upper_bound.
   specialize (IHn H); clear H.
