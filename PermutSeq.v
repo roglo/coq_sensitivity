@@ -550,26 +550,25 @@ cbn in H4, H6.
 now subst x y.
 Qed.
 
-(*
-Fixpoint canon_sym_gr_inv n k (j : nat) :=
+Fixpoint canon_sym_gr_inv_elem n k (j : nat) :=
   match n with
   | 0 => 0
   | S n' =>
       if lt_dec j (k / n'!) then
-        S (canon_sym_gr_inv n' (k mod n'!) j)
+        S (canon_sym_gr_inv_elem n' (k mod n'!) j)
       else if lt_dec (k / n'!) j then
-        S (canon_sym_gr_inv n' (k mod n'!) (j - 1))
+        S (canon_sym_gr_inv_elem n' (k mod n'!) (j - 1))
       else 0
   end.
-
-Check canon_sym_gr_inv.
-*)
 
 Definition canon_sym_gr_inv_list n k : list nat :=
   map (λ j, unsome 0 (List_find_nth (Nat.eqb j) (canon_sym_gr_list n k)))
     (seq 0 n).
 
-...
+Definition canon_sym_gr_inv_list' n k : list nat :=
+  map (canon_sym_gr_inv_elem n k) (seq 0 n).
+
+... lequel prendre ? le premier des deux ci-dessus ? ou le deuxième ?
 
 (*
 Print canon_sym_gr_list_list.
@@ -580,13 +579,23 @@ Compute (canon_sym_gr_list 4 8).
 *)
 
 (*
+Compute (let (n, k) := (4, 20) in (canon_sym_gr_inv_list n k, canon_sym_gr_inv_list' n k)).
+
 Compute (let (n, k) := (4, 20) in (canon_sym_gr_list n k, canon_sym_gr_inv_list n k)).
 *)
 
-(*
+(**)
 Compute (let (n, k) := (4, 0) in let i := 2 in
-  (canon_sym_gr_inv n k (nth i (canon_sym_gr_list n k) 0), i)).
-*)
+  (canon_sym_gr_inv_elem n k (nth i (canon_sym_gr_list n k) 0), i)).
+Compute (let (n, k) := (4, 20) in let i := 3 in
+  let j := nth i (canon_sym_gr_list n k) 0 in
+  (nth j (canon_sym_gr_inv_list n k) 0, i)).
+Compute (let (n, k) := (4, 20) in let i := 3 in
+  let j := nth i (canon_sym_gr_list n k) 0 in
+  (nth j (canon_sym_gr_inv_list' n k) 0, i)).
+(**)
+
+...
 
 Theorem length_canon_sym_gr_list : ∀ k n,
   length (canon_sym_gr_list n k) = n.
