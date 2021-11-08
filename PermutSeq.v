@@ -562,40 +562,7 @@ Fixpoint canon_sym_gr_inv_elem n k (j : nat) :=
   end.
 
 Definition canon_sym_gr_inv_list n k : list nat :=
-  map (λ j, unsome 0 (List_find_nth (Nat.eqb j) (canon_sym_gr_list n k)))
-    (seq 0 n).
-
-Definition canon_sym_gr_inv_list' n k : list nat :=
   map (canon_sym_gr_inv_elem n k) (seq 0 n).
-
-... lequel prendre ? le premier des deux ci-dessus ? ou le deuxième ?
-
-(*
-Print canon_sym_gr_list_list.
-Print canon_sym_gr_list.
-
-Compute (canon_sym_gr_list_list 4).
-Compute (canon_sym_gr_list 4 8).
-*)
-
-(*
-Compute (let (n, k) := (4, 20) in (canon_sym_gr_inv_list n k, canon_sym_gr_inv_list' n k)).
-
-Compute (let (n, k) := (4, 20) in (canon_sym_gr_list n k, canon_sym_gr_inv_list n k)).
-*)
-
-(**)
-Compute (let (n, k) := (4, 0) in let i := 2 in
-  (canon_sym_gr_inv_elem n k (nth i (canon_sym_gr_list n k) 0), i)).
-Compute (let (n, k) := (4, 20) in let i := 3 in
-  let j := nth i (canon_sym_gr_list n k) 0 in
-  (nth j (canon_sym_gr_inv_list n k) 0, i)).
-Compute (let (n, k) := (4, 20) in let i := 3 in
-  let j := nth i (canon_sym_gr_list n k) 0 in
-  (nth j (canon_sym_gr_inv_list' n k) 0, i)).
-(**)
-
-...
 
 Theorem length_canon_sym_gr_list : ∀ k n,
   length (canon_sym_gr_list n k) = n.
@@ -647,76 +614,32 @@ rewrite (List_map_nth' 0). 2: {
 }
 rewrite seq_nth; [ | now apply canon_sym_gr_list_ub ].
 rewrite Nat.add_0_l.
-unfold unsome.
-unfold List_find_nth.
 revert k i Hi Hkn.
 induction n; intros; [ easy | ].
-cbn - [ List_find_nth_loop seq nth ].
-destruct i. {
-  rewrite List_nth_0_cons.
-  cbn - [ nth seq ].
-  now rewrite Nat.eqb_refl.
-}
-apply Nat.succ_lt_mono in Hi.
-rewrite List_nth_succ_cons.
-rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
-unfold succ_when_ge, Nat.b2n.
-rewrite if_leb_le_dec.
-remember (canon_sym_gr_list n (k mod n!)) as l eqn:Hl.
-destruct (le_dec (k / n!) (nth i l 0)) as [H1| H1]. {
-  cbn.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (nth i l 0 + 1) (k / n!)) as [H| H]; [ flia H1 H | ].
-  clear H.
-...
-  specialize (IHn (k / S n) i Hi).
-  assert (H : k / S n < n!) by now apply Nat.div_lt_upper_bound.
-  specialize (IHn H); clear H.
-  subst l.
-...
-remember (canon_sym_gr_list n k) as l eqn:Hl; symmetry in Hl.
-revert n i k Hi Hkn Hl.
-induction l as [| a]; intros; cbn.
-...
-clear k Hkn Hl.
-revert i n Hi.
-induction l as [| a]; intros; cbn.
-...
-intros * Hi Hkn.
-revert k i Hi Hkn.
-induction n; intros; [ flia Hi | ].
-destruct i. {
-  clear Hi; cbn.
-  remember (k / fact n) as p eqn:Hp.
-  destruct (lt_dec p p) as [H| H]; [ flia H | easy ].
-}
-apply Nat.succ_lt_mono in Hi.
 cbn.
-remember (k / fact n) as p eqn:Hp.
-remember (canon_sym_gr_elem n (k mod fact n) i) as q eqn:Hq.
-move q before p.
-remember (p <=? q) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  apply Nat.leb_le in Hb; cbn.
-  destruct (lt_dec (q + 1) p) as [Hpq| Hqp]; [ flia Hb Hpq | ].
-  apply Nat.nlt_ge in Hqp.
-  destruct (lt_dec p (q + 1)) as [Hpq| Hpq]; [ | flia Hb Hpq ].
-  clear Hpq Hqp.
-  f_equal.
-  rewrite Nat.add_sub.
-  rewrite Hq.
-  apply IHn; [ easy | ].
-  apply Nat.mod_upper_bound, fact_neq_0.
+destruct i. {
+  do 2 rewrite <- if_ltb_lt_dec.
+  now rewrite Nat.ltb_irrefl.
+}
+apply Nat.succ_lt_mono in Hi.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec (k / n!) _) as [H1| H1]. {
+  destruct (lt_dec _ (k / n!)) as [H| H]; [ flia H1 H | clear H ].
+  destruct (lt_dec (k / n!) _) as [H| H]; [ clear H | flia H1 H ].
+  f_equal; rewrite Nat.add_sub.
+  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
 } {
-  apply Nat.leb_gt in Hb; cbn.
   rewrite Nat.add_0_r.
-  destruct (lt_dec q p) as [H| H]; [ clear H | flia Hb H ].
+  destruct (lt_dec _ (k / n!)) as [H| H]; [ clear H | flia H1 H ].
   f_equal.
-  rewrite Hq.
-  apply IHn; [ easy | ].
-  apply Nat.mod_upper_bound, fact_neq_0.
+  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
 }
 Qed.
+
+...
 
 Theorem canon_sym_gr_elem_inj1 : ∀ n k i j,
   k < fact n
