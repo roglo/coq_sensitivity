@@ -737,11 +737,12 @@ Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr n) i
 Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   is_permut_list l
   → S i < length l
-  → nth i (sub_canon_permut_list l) 0 < length l.
+  → nth i (sub_canon_permut_list l) 0 < length l - 1.
 Proof.
 intros * (Hvn, Hn) Hin.
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin |-*.
+rewrite Nat.sub_0_r.
 apply Nat.succ_lt_mono in Hin.
 rewrite (List_map_nth' 0); [ | easy ].
 unfold Nat.b2n.
@@ -752,9 +753,14 @@ destruct (lt_dec a (nth i l 0)) as [Hal| Hal]. {
 }
 apply Nat.nlt_ge in Hal.
 rewrite Nat.sub_0_r.
-apply Hvn.
-destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]; [ now left | ].
-now right; apply nth_In.
+destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
+  rewrite Hia.
+  apply Nat.succ_lt_mono in Hin.
+  symmetry in Hia.
+  now specialize (Hn 0 (S i) (Nat.lt_0_succ _) Hin Hia).
+}
+specialize (Hvn a (or_introl eq_refl)); cbn in Hvn.
+flia Hvn Hal Hia.
 Qed.
 
 Theorem sub_canon_sym_gr_elem_inj1 : ∀ l i j,
@@ -830,12 +836,10 @@ apply Nat.add_lt_le_mono. {
     apply (In_nth _ _ 0) in Hi.
     destruct Hi as (j & Hj & Hji).
     rewrite <- Hji.
-    rewrite length_sub_canon_permut_list.
-Check sub_canon_permut_list_elem_ub.
+    rewrite length_sub_canon_permut_list in Hj |-*.
+    apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
+  } {
 ...
-Search sub_canon_permut_list.
-Print sub_canon_permut_list.
-ooo
 intros * (Hvn, Hn) Hln.
 rewrite Hln in Hvn, Hn.
 revert l Hvn Hn Hln.
