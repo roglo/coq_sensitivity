@@ -889,6 +889,30 @@ Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
   → length l = n
   → canon_sym_gr_list n (rank_of_permut_in_canon_sym_gr_list n l) = l.
 Proof.
+(*
+intros * (Hvn, Hn) Hln.
+subst n.
+induction l as [| a]; [ easy | ].
+cbn - [ sub_canon_permut_list ].
+rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+f_equal. {
+  rewrite <- Nat.add_0_r; f_equal.
+  apply Nat.div_small.
+  apply rank_of_canon_permut_ub; [ | now cbn; rewrite map_length ].
+  now apply sub_canon_permut_list_is_permut.
+} {
+  rewrite Nat.mod_small. 2: {
+    apply rank_of_canon_permut_ub. 2: {
+      rewrite length_sub_canon_permut_list; cbn.
+      now rewrite Nat.sub_0_r.
+    }
+    now apply sub_canon_permut_list_is_permut.
+  }
+  cbn.
+...
+  rewrite IHn; cycle 1. {
+*)
 intros * (Hvn, Hn) Hln.
 revert l Hvn Hn Hln.
 induction n; intros; [ now apply length_zero_iff_nil in Hln | cbn ].
@@ -906,6 +930,53 @@ f_equal. {
 } {
   cbn in Hln.
   apply Nat.succ_inj in Hln.
+  rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
+  rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
+  rewrite Nat.mod_small. 2: {
+    apply rank_of_canon_permut_ub. 2: {
+      rewrite length_sub_canon_permut_list; cbn.
+      now rewrite Hln, Nat.sub_0_r.
+    }
+    now apply sub_canon_permut_list_is_permut.
+  }
+  rewrite IHn; cycle 1. {
+    intros i Hi.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (j & Hj & Hji).
+    rewrite <- Hji.
+    apply permut_list_ub; [ | easy ].
+    now apply sub_canon_permut_list_is_permut.
+  } {
+    intros i j Hi Hj.
+    rewrite length_sub_canon_permut_list in Hi, Hj.
+    cbn in Hi, Hj.
+    rewrite Nat.sub_0_r in Hi, Hj.
+    apply sub_canon_sym_gr_elem_inj1; [ easy | cbn; flia Hi | cbn; flia Hj ].
+  } {
+    rewrite length_sub_canon_permut_list; cbn.
+    now rewrite Nat.sub_0_r.
+  }
+  cbn - [ sub_canon_permut_list ].
+  unfold succ_when_ge.
+  cbn - [ "<=?" ].
+  rewrite map_map.
+  rewrite List_map_map_seq with (d := 0).
+  rewrite List_map_nth_seq with (d := 0).
+  apply map_ext_in_iff.
+  intros i Hi; apply in_seq in Hi.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec a (nth i l 0)) as [Hai| Hai]. {
+    rewrite if_leb_le_dec.
+    destruct (le_dec _ _) as [H1| H1]; [ apply Nat.sub_add; flia Hai | ].
+    exfalso.
+    apply H1; clear H1.
+    rewrite Nat.div_small; [ flia Hai | ].
+    apply rank_of_canon_permut_ub; [ | now rewrite map_length ].
+Search (is_permut_list (map _ _)).
+...
+
+Search sub_canon_permut_list.
 ...
 intros * (Hvn, Hn) Hln.
 revert i f Hin Hvn Hn.
