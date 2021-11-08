@@ -698,8 +698,6 @@ destruct (le_dec (j / n!) _) as [H2| H2]. {
 destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
 
-...
-
 (* rank in canon symmetric group *)
 
 (*
@@ -759,15 +757,6 @@ destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]; [ now left | ].
 now right; apply nth_In.
 Qed.
 
-(*
-Theorem sub_canon_sym_gr_elem_inj1 : ∀ n f i j,
-  is_permut_fun f (S n)
-  → i < n
-  → j < n
-  → sub_canon_permut_fun f i = sub_canon_permut_fun f j
-  → i = j.
-*)
-
 Theorem sub_canon_sym_gr_elem_inj1 : ∀ l i j,
   is_permut_list l
   → S i < length l
@@ -813,12 +802,66 @@ apply Nat.succ_lt_mono in Hin, Hjn.
 now apply Hn.
 Qed.
 
+Theorem length_sub_canon_permut_list : ∀ l,
+  length (sub_canon_permut_list l) = length l - 1.
+Proof.
+intros.
+destruct l as [| a]; [ easy | ].
+now cbn; rewrite map_length, Nat.sub_0_r.
+Qed.
+
 (*
 Theorem rank_of_canon_permut_ub : ∀ n f,
   is_permut_fun f n
   → rank_of_permut_in_canon_sym_gr n f < n!.
 *)
-
+Theorem rank_of_canon_permut_ub : ∀ n l,
+  is_permut_list l
+  → length l = n
+  → rank_of_permut_in_canon_sym_gr_list n l < n!.
+Proof.
+intros * (Hvn, Hn) Hln.
+rewrite Hln in Hvn, Hn.
+revert l Hvn Hn Hln.
+induction n; intros; cbn; [ flia | ].
+rewrite Nat.add_comm.
+apply Nat.add_lt_le_mono. {
+  apply IHn. {
+    intros i Hi.
+...
+unfold sub_canon_permut_list in Hi.
+apply in_map_iff in Hi.
+destruct Hi as (j & Hj & Hji).
+subst i.
+unfold Nat.b2n; rewrite if_ltb_lt_dec.
+destruct l as [| a]; [ easy | ].
+cbn in Hji |-*.
+cbn in Hln; apply Nat.succ_inj in Hln.
+destruct (lt_dec a j) as [Haj| Haj]. {
+...
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (j & Hj & Hji).
+    rewrite length_sub_canon_permut_list, Hln, Nat_sub_succ_1 in Hj.
+    subst i.
+    unfold sub_canon_permut_list.
+    rewrite (List_map_nth' 0). 2: {
+...
+    destruct l as [| a]; [ easy | ].
+    cbn in Hln; apply Nat.succ_inj in Hln.
+...
+apply sub_canon_permut_list_elem_ub.
+...
+    now apply sub_canon_permut_fun_elem_ub.
+  } {
+    intros i j Hi Hj.
+    now apply sub_canon_sym_gr_elem_inj1 with (n := n).
+  }
+}
+apply Nat.mul_le_mono_r.
+specialize (Hvn 0 (Nat.lt_0_succ _)).
+flia Hvn.
+Qed.
+...
 (*
 Theorem rank_of_canon_permut_ub : ∀ n l,
   is_permut_list (firstn n l)
@@ -962,6 +1005,8 @@ specialize (Hvn 0 (Nat.lt_0_succ _)).
 flia Hvn.
 Qed.
 *)
+
+...
 
 (*
 Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
