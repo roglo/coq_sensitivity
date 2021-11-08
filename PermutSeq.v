@@ -1067,13 +1067,11 @@ f_equal.
 apply canon_sym_gr_sub_canon_permut_list.
 Qed.
 
-...
-
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
   is_sym_gr n sg
   → ∀ k : fin_t n!,
       (rank_of_permut_in_sym_gr sg
-         (vect_el empty_vect (canon_sym_gr n) (proj1_sig k)) <?
+         (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)) <?
        vect_size sg) = true.
 Proof.
 intros * Hsg k.
@@ -1103,19 +1101,18 @@ Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
          (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
 Proof.
 intros * Hsg k.
-apply Nat.ltb_lt, rank_of_canon_permut_ub.
-specialize (proj1 Hsg (proj1_sig k) (proj1 (Nat.ltb_lt _ _) (proj2_sig k)))
-  as H1.
-destruct H1 as (H1, H2).
-unfold is_permut_vect in H2.
-now rewrite H1 in H2.
+destruct Hsg as (Hsg & Hinj & Hsurj).
+apply Nat.ltb_lt.
+destruct k as (k, pk); cbn.
+apply Nat.ltb_lt in pk.
+now apply rank_of_canon_permut_ub; apply Hsg.
 Qed.
 
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
     (Hsg : is_sym_gr n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
   exist (λ a : nat, (a <? vect_size sg) = true)
     (rank_of_permut_in_sym_gr sg
-      (vect_el empty_vect (canon_sym_gr n) (proj1_sig k)))
+      (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
@@ -1131,6 +1128,7 @@ Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
 intros.
+...
 destruct k as (k, pk); cbn - [ "<?" ].
 apply eq_exist_uncurried.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1154,6 +1152,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   exists p.
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }  
+...
 assert
   (p :
    rank_of_permut_in_sym_gr sg
