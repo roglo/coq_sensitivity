@@ -663,7 +663,6 @@ Theorem nth_canon_sym_gr_list_inj2 : ∀ n i j,
      nth k (canon_sym_gr_list n i) 0 = nth k (canon_sym_gr_list n j) 0)
   → i = j.
 Proof.
-(*1*)
 intros * Hin Hjn Hij.
 revert i j Hin Hjn Hij.
 induction n; intros; [ apply Nat.lt_1_r in Hin, Hjn; congruence | ].
@@ -675,10 +674,6 @@ destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
   specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
   congruence.
 }
-(*
-destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
-specialize (IHn (Nat.neq_succ_0 _)).
-*)
 exfalso; apply Hijm; clear Hijm.
 apply IHn. {
   apply Nat.mod_upper_bound, fact_neq_0.
@@ -692,74 +687,18 @@ assert (H : S k < S n) by flia Hk.
 specialize (H1 H); clear H.
 cbn - [ fact ] in H1.
 rewrite Hijd in H1.
-do 2 rewrite (List_map_nth' 0) in H1.
-...
-unfold Nat.b2n in H1.
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge, Nat.b2n in H1.
 do 2 rewrite if_leb_le_dec in H1.
-remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (i mod (S n)!) k) as x eqn:Hx.
-remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (j mod (S n)!) k) as y eqn:Hy.
-destruct (le_dec (j / (S n)!) x) as [Hjx| Hjx]. {
-  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
-    now apply Nat.add_cancel_r in H1.
-  }
-  apply Nat.nle_gt in Hjy.
-  flia Hjx Hjy H1.
-} {
-  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
-    apply Nat.nle_gt in Hjx.
-    flia Hjx Hjy H1.
-  }
+destruct (le_dec (j / n!) _) as [H2| H2]. {
+  destruct (le_dec (j / n!) _) as [H3| H3]; [ | flia H1 H2 H3 ].
   now apply Nat.add_cancel_r in H1.
 }
-...1
-intros * Hin Hjn Hij.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  apply Nat.lt_1_r in Hin, Hjn; congruence.
-}
-revert i j Hin Hjn Hij.
-induction n; intros; [ easy | clear Hnz ].
-destruct (Nat.eq_dec (i / n!) (j / n!)) as [Hijd| Hijd]. 2: {
-  now specialize (Hij 0 (Nat.lt_0_succ _)).
-}
-destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
-  specialize (Nat.div_mod i n! (fact_neq_0 _)) as Hi.
-  specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
-  congruence.
-}
-destruct n; [ now do 2 rewrite Nat.div_1_r in Hijd | ].
-specialize (IHn (Nat.neq_succ_0 _)).
-exfalso; apply Hijm; clear Hijm.
-apply IHn. {
-  apply Nat.mod_upper_bound, fact_neq_0.
-} {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-intros k Hk.
-cbn - [ fact ] in Hij |-*.
-specialize (Hij (S k)) as H1.
-assert (H : S k < S (S n)) by flia Hk.
-specialize (H1 H); clear H.
-cbn - [ fact ] in H1.
-rewrite Hijd in H1.
-unfold Nat.b2n in H1.
-do 2 rewrite if_leb_le_dec in H1.
-remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (i mod (S n)!) k) as x eqn:Hx.
-remember (canon_sym_gr_fun n (canon_sym_gr_elem n) (j mod (S n)!) k) as y eqn:Hy.
-destruct (le_dec (j / (S n)!) x) as [Hjx| Hjx]. {
-  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
-    now apply Nat.add_cancel_r in H1.
-  }
-  apply Nat.nle_gt in Hjy.
-  flia Hjx Hjy H1.
-} {
-  destruct (le_dec (j / (S n)!) y) as [Hjy| Hjy]. {
-    apply Nat.nle_gt in Hjx.
-    flia Hjx Hjy H1.
-  }
-  now apply Nat.add_cancel_r in H1.
-}
+destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
+
+...
 
 (* rank in canon symmetric group *)
 
