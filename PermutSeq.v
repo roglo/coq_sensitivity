@@ -966,11 +966,6 @@ f_equal. {
 }
 Qed.
 
-(*
-Theorem canon_sym_gr_elem_is_permut : ∀ n k,
-  k < n!
-  → is_permut_fun (canon_sym_gr_elem n k) n.
-*)
 Theorem canon_sym_gr_elem_is_permut : ∀ n k,
   k < n!
   → is_permut_list (canon_sym_gr_list n k).
@@ -991,8 +986,8 @@ split. {
 }
 Qed.
 
-...
-
+(*
+ouais, bon, c'est la=lb, donc c'est trivial
 Theorem rank_of_permut_in_canon_sym_gr_eq_compat : ∀ n f g,
   (∀ i, i < n → f i = g i)
   → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g.
@@ -1007,14 +1002,22 @@ unfold sub_canon_permut_fun.
 rewrite Hfg; [ f_equal | flia Hi ].
 rewrite Hfg; [ f_equal | flia Hi ].
 Qed.
+*)
 
+(*
 Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
   k < n!
   → rank_of_permut_in_canon_sym_gr n (canon_sym_gr_elem n k) = k.
+*)
+Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
+  k < n!
+  → rank_of_permut_in_canon_sym_gr_list n (canon_sym_gr_list n k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
-induction n; intros; [ now apply Nat.lt_1_r in Hkn | cbn ].
+induction n; intros; [ now apply Nat.lt_1_r in Hkn | ].
+cbn - [ canon_sym_gr_list ].
+remember (sub_canon_permut_list _) as x; cbn; subst x.
 specialize (Nat.div_mod k (fact n) (fact_neq_0 _)) as H1.
 rewrite Nat.mul_comm in H1.
 replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
@@ -1024,7 +1027,11 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
-apply rank_of_permut_in_canon_sym_gr_eq_compat.
+(**)
+f_equal.
+(* est-ce que c'est bon, ça ? *)
+...
+apply rank_of_permut_in_canon_sym_gr_list_eq_compat.
 intros i Hi.
 symmetry.
 cbn.
