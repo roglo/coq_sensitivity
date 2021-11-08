@@ -196,8 +196,10 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 Definition canon_sym_gr_vect n : vector (vector nat) :=
   mk_vect (map (mk_vect (T := nat)) (canon_sym_gr_list_list n)).
 
+(*
 Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
 Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
+*)
 
 Definition is_sym_gr n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
