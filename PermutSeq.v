@@ -821,6 +821,22 @@ Theorem rank_of_canon_permut_ub : ∀ n l,
   → rank_of_permut_in_canon_sym_gr_list n l < n!.
 Proof.
 intros * (Hvn, Hn) Hln.
+revert l Hvn Hn Hln.
+induction n; intros; cbn; [ flia | ].
+rewrite Nat.add_comm.
+apply Nat.add_lt_le_mono. {
+  apply IHn. {
+    intros i Hi.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (j & Hj & Hji).
+    rewrite <- Hji.
+    rewrite length_sub_canon_permut_list.
+Check sub_canon_permut_list_elem_ub.
+...
+Search sub_canon_permut_list.
+Print sub_canon_permut_list.
+ooo
+intros * (Hvn, Hn) Hln.
 rewrite Hln in Hvn, Hn.
 revert l Hvn Hn Hln.
 induction n; intros; cbn; [ flia | ].
@@ -828,6 +844,9 @@ rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
   apply IHn. {
     intros i Hi.
+Check sub_canon_permut_list_elem_ub.
+Print sub_canon_permut_list.
+Search sub_canon_permut_list.
 ...
 unfold sub_canon_permut_list in Hi.
 apply in_map_iff in Hi.
