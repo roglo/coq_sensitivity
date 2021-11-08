@@ -974,7 +974,7 @@ f_equal. {
 }
 Qed.
 
-Theorem canon_sym_gr_elem_is_permut : ∀ n k,
+Theorem canon_sym_gr_list_is_permut : ∀ n k,
   k < n!
   → is_permut_list (canon_sym_gr_list n k).
 Proof.
@@ -1214,39 +1214,23 @@ assert
   unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
   unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
   rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
-...
+  unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
   rewrite (@vect_el_rank_of_permut_in_sym_gr _ _ n); cycle 1. {
     easy.
   } {
-    unfold is_permut_vect.
-    cbn; rewrite map_length, seq_length.
-    unfold vect_el at 1; cbn.
-    eapply is_permut_eq_compat. {
-      intros i Hi; symmetry.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ cbn | easy ].
-      easy.
-    }
-    now apply canon_sym_gr_elem_is_permut.
+    unfold is_permut_vect; cbn.
+    now apply canon_sym_gr_list_is_permut.
   } {
-    now cbn; rewrite map_length, seq_length.
+    apply length_canon_sym_gr_list.
   }
   unfold vect_el; cbn.
-  erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
-    intros i Hi.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ cbn | easy ].
-    easy.
-  }
   now apply rank_of_canon_permut_of_canon_rank.
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
-
-...
 
 Theorem sym_gr_size : ∀ n sg, is_sym_gr n sg → vect_size sg = n!.
 Proof.
@@ -1261,6 +1245,8 @@ split. {
   apply rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse.
 }
 Qed.
+
+...
 
 (* *)
 
