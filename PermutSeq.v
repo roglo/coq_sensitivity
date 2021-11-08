@@ -566,6 +566,14 @@ Fixpoint canon_sym_gr_inv_elem n k (j : nat) :=
 Definition canon_sym_gr_inv_list n k : list nat :=
   map (canon_sym_gr_inv_elem n k) (seq 0 n).
 
+Theorem length_canon_sym_gr_list_list : ∀ n,
+  length (canon_sym_gr_list_list n) = n!.
+Proof.
+intros.
+unfold canon_sym_gr_list_list.
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem length_canon_sym_gr_list : ∀ k n,
   length (canon_sym_gr_list n k) = n.
 Proof.
@@ -1161,12 +1169,12 @@ assert
   cbn.
   apply Nat.ltb_lt in pk.
   unfold rank_of_permut_in_canon_sym_gr_vect.
-  unfold canon_sym_gr_list_list.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   rewrite (List_map_nth' []). 2: {
-    rewrite map_length, seq_length.
+    rewrite length_canon_sym_gr_list_list.
     now apply rank_of_canon_permut_ub; apply Hsg.
   }
+  unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     now apply rank_of_canon_permut_ub; apply Hsg.
@@ -1205,6 +1213,7 @@ assert
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
   unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
   unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
+  rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
 ...
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
