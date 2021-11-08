@@ -1030,6 +1030,7 @@ rewrite <- (IHn (k mod fact n)) at 1. 2: {
 (**)
 f_equal.
 (* est-ce que c'est bon, ça ? *)
+(* c'est un peu osé, ce "f_equal" *)
 ...
 apply rank_of_permut_in_canon_sym_gr_list_eq_compat.
 intros i Hi.
