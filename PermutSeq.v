@@ -889,30 +889,6 @@ Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
   → length l = n
   → canon_sym_gr_list n (rank_of_permut_in_canon_sym_gr_list n l) = l.
 Proof.
-(*
-intros * (Hvn, Hn) Hln.
-subst n.
-induction l as [| a]; [ easy | ].
-cbn - [ sub_canon_permut_list ].
-rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
-f_equal. {
-  rewrite <- Nat.add_0_r; f_equal.
-  apply Nat.div_small.
-  apply rank_of_canon_permut_ub; [ | now cbn; rewrite map_length ].
-  now apply sub_canon_permut_list_is_permut.
-} {
-  rewrite Nat.mod_small. 2: {
-    apply rank_of_canon_permut_ub. 2: {
-      rewrite length_sub_canon_permut_list; cbn.
-      now rewrite Nat.sub_0_r.
-    }
-    now apply sub_canon_permut_list_is_permut.
-  }
-  cbn.
-...
-  rewrite IHn; cycle 1. {
-*)
 intros * (Hvn, Hn) Hln.
 revert l Hvn Hn Hln.
 induction n; intros; [ now apply length_zero_iff_nil in Hln | cbn ].
@@ -973,7 +949,19 @@ f_equal. {
     apply H1; clear H1.
     rewrite Nat.div_small; [ flia Hai | ].
     apply rank_of_canon_permut_ub; [ | now rewrite map_length ].
-Search (is_permut_list (map _ _)).
+    split. {
+      intros j Hj.
+      rewrite map_length.
+      apply in_map_iff in Hj.
+      destruct Hj as (k & Hk & Hkl).
+      subst j.
+      rewrite if_ltb_lt_dec.
+      specialize (Hvn k (or_intror Hkl)) as H1; cbn in H1.
+      destruct (lt_dec a k) as [Hak| Hak]; [ flia H1 Hak | ].
+      apply Nat.nlt_ge in Hak.
+      rewrite Nat.sub_0_r.
+      destruct (Nat.eq_dec k (length l)) as [H2| H2]; [ | flia H1 H2 ].
+      exfalso.
 ...
 
 Search sub_canon_permut_list.
