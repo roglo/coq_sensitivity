@@ -1004,11 +1004,47 @@ rewrite Hfg; [ f_equal | flia Hi ].
 Qed.
 *)
 
-(*
-Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
-  k < n!
-  → rank_of_permut_in_canon_sym_gr n (canon_sym_gr_elem n k) = k.
-*)
+Theorem canon_sym_gr_sub_canon_permut_list : ∀ n k,
+  canon_sym_gr_list n (k mod n!) =
+  sub_canon_permut_list (canon_sym_gr_list (S n) k).
+Proof.
+intros.
+destruct n; intros; [ easy | ].
+cbn - [ "<?" fact ].
+f_equal. {
+  unfold succ_when_ge.
+  rewrite <- Nat.add_sub_assoc. 2: {
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec, if_ltb_lt_dec.
+    destruct (le_dec _ _) as [H| H]; [ destruct (lt_dec _ _); cbn; flia | ].
+    rewrite Nat.add_0_r.
+    apply Nat.nle_gt in H.
+    destruct (lt_dec _ _) as [Hqr| Hqr]; [ flia H Hqr | easy ].
+  }
+  symmetry; rewrite <- Nat.add_0_r; f_equal.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec, if_ltb_lt_dec.
+  destruct (le_dec _ _) as [H1| H1]; [ | easy ].
+  destruct (lt_dec _ _) as [H2| H2]; [ easy | flia H1 H2 ].
+}
+rewrite map_map.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+remember (succ_when_ge (_ mod _ / _) _) as x eqn:Hx.
+unfold succ_when_ge, Nat.b2n.
+rewrite if_leb_le_dec, if_ltb_lt_dec.
+rewrite <- Nat.add_sub_assoc. 2: {
+  destruct (le_dec _ _) as [H| H]; [ destruct (lt_dec _ _); cbn; flia | ].
+  rewrite Nat.add_0_r.
+  apply Nat.nle_gt in H.
+  destruct (lt_dec _ _) as [Hqr| Hqr]; [ flia H Hqr | easy ].
+}
+symmetry; rewrite <- Nat.add_0_r; f_equal.
+destruct (le_dec _ _) as [H1| H1]; [ | easy ].
+destruct (lt_dec _ _) as [H2| H2]; [ easy | flia H1 H2 ].
+Qed.
+
 Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
   k < n!
   → rank_of_permut_in_canon_sym_gr_list n (canon_sym_gr_list n k) = k.
@@ -1027,33 +1063,11 @@ clear H1.
 rewrite <- (IHn (k mod fact n)) at 1. 2: {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
-(**)
 f_equal.
-(* est-ce que c'est bon, ça ? *)
-(* c'est un peu osé, ce "f_equal" *)
-...
-apply rank_of_permut_in_canon_sym_gr_list_eq_compat.
-intros i Hi.
-symmetry.
-cbn.
-apply Nat.add_sub_eq_r.
-f_equal.
-rewrite Nat.add_comm.
-unfold Nat.b2n.
-rewrite if_leb_le_dec.
-destruct (le_dec (k / n!) (canon_sym_gr_elem n (k mod n!) i)) as [Hkc| Hkc]. {
-  cbn.
-  rewrite if_leb_le_dec.
-  now destruct (le_dec (k / n!) (canon_sym_gr_elem n (k mod n!) i)).
-}
-cbn.
-remember (canon_sym_gr_elem n _ i) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-rewrite if_leb_le_dec.
-destruct (le_dec (k / n!) x) as [H| H]; [ | easy ].
-flia Hkc H.
+apply canon_sym_gr_sub_canon_permut_list.
 Qed.
+
+...
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
   is_sym_gr n sg
