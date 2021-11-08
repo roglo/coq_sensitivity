@@ -1246,39 +1246,31 @@ split. {
 }
 Qed.
 
-...
-
 (* *)
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
     sg_prop : is_sym_gr n sg_vect }.
 
+(*
 Theorem canon_is_permut_vect : ∀ n k,
   k < n!
   → is_permut_vect (vect_vect_nat_el (canon_sym_gr n) k).
+*)
+Theorem canon_sym_gr_vect_is_permut : ∀ n k,
+  k < n!
+  → is_permut_vect (vect_el empty_vect (canon_sym_gr_vect n) k).
 Proof.
 intros * Hkn.
-unfold canon_sym_gr; cbn - [ fact map seq ].
+unfold is_permut_vect; cbn.
+rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
+cbn; unfold canon_sym_gr_list_list.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
-rewrite Nat.add_0_l.
-unfold is_permut_vect, vect_el; cbn.
-rewrite map_length, seq_length.
-split. {
-  intros i Hi.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  now apply canon_permut_elem_ub.
-} {
-  intros * Hi Hj Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  now apply canon_sym_gr_elem_inj1 in Hij.
-}
+now apply canon_sym_gr_list_is_permut.
 Qed.
+
+...
 
 Theorem canon_sym_gr_elem_injective : ∀ n i j,
   i < fact n
