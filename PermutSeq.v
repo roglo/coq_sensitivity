@@ -1128,7 +1128,6 @@ Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
 intros.
-...
 destruct k as (k, pk); cbn - [ "<?" ].
 apply eq_exist_uncurried.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1152,16 +1151,16 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   exists p.
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }  
-...
 assert
   (p :
    rank_of_permut_in_sym_gr sg
-     (vect_el empty_vect (canon_sym_gr n)
+     (vect_el empty_vect (canon_sym_gr_vect n)
         (proj1_sig
            (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg (exist _ k pk)))) =
     k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hks.
   cbn; unfold rank_of_permut_in_canon_sym_gr_vect.
+...
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     apply rank_of_canon_permut_ub.
