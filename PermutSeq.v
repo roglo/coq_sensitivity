@@ -960,16 +960,12 @@ f_equal.
 apply canon_sym_gr_sub_canon_permut_list.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
-  is_sym_gr_vect n sg
+  is_sym_gr_list n sg
   → ∀ k : fin_t n!,
       (rank_of_permut_in_sym_gr sg
-         (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)) <?
-       vect_size sg) = true.
+         (nth (proj1_sig k) (canon_sym_gr_list_list n) []) <? length sg) =
+      true.
 Proof.
 intros * Hsg k.
 apply Nat.ltb_lt.
@@ -977,6 +973,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   destruct k as (k, pk); cbn.
   apply Nat.ltb_lt, Nat.lt_1_r in pk; subst k.
+...
   specialize (vect_size_of_empty_sym_gr Hsg) as Hs.
   destruct sg as (lv); cbn in Hs.
   destruct lv as [| v]; [ easy | ].
