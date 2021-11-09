@@ -7,7 +7,7 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc (*RingLike*).
+Require Import Misc.
 Require Import IterMul IterAnd.
 Require Import Pigeonhole.
 
@@ -26,14 +26,6 @@ Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40).
 Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, comp c g) (λ i, i))
   (at level 35, i at level 0, l at level 60).
-
-Section a.
-
-Context {T : Type}.
-(*
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
-*)
 
 (* Permutations of {0, 1, 2, ... n-1} *)
 
@@ -1041,15 +1033,12 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   exists p.
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 }  
+cbn.
 assert
   (p :
    rank_of_permut_in_sym_gr sg
-     (nth
-        (proj1_sig
-           (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg (exist _ k pk)))
-        (canon_sym_gr_list_list n) []) =
-    k). {
-  cbn.
+     (nth (rank_of_permut_in_canon_sym_gr_list n (nth k sg []))
+        (canon_sym_gr_list_list n) []) = k). {
   apply Nat.ltb_lt in pk.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   specialize (Hsg k pk) as H1.
@@ -1067,46 +1056,37 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-...
-
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr_vect n sg) k,
+    (Hsg : is_sym_gr_list n sg) k,
   rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
     (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg k) = k.
 Proof.
 intros.
 destruct k as (k, pk); cbn - [ "<?" ].
-apply eq_exist_uncurried.
+apply eq_exist_uncurried; cbn.
 assert
   (p :
-   rank_of_permut_in_canon_sym_gr_vect n
-     (vect_el empty_vect sg
-       (proj1_sig
-          (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg (exist _ k pk)))) =
-    k). {
+   rank_of_permut_in_canon_sym_gr_list n
+     (nth (rank_of_permut_in_sym_gr sg (nth k (canon_sym_gr_list_list n) []))
+        sg []) = k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
-  unfold rank_in_sym_gr_of_rank_in_canon_sym_gr.
-  unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
-  rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
   unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
-  rewrite (@vect_el_rank_of_permut_in_sym_gr _ _ n); cycle 1. {
+  rewrite (@nth_rank_of_permut_in_sym_gr _ _ n); cycle 1. {
     easy.
   } {
-    unfold is_permut_vect; cbn.
     now apply canon_sym_gr_list_is_permut.
   } {
     apply length_canon_sym_gr_list.
   }
-  unfold vect_el; cbn.
   now apply rank_of_canon_permut_of_canon_rank.
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem sym_gr_size : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
+Theorem sym_gr_size : ∀ n sg, is_sym_gr_list n sg → length sg = n!.
 Proof.
 intros * Hsg.
 apply (bijective_fin_t _ _ (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg)).
@@ -1122,22 +1102,16 @@ Qed.
 
 (* *)
 
-Record sym_gr_vect n :=
-  { sg_vect : vector (vector nat);
-    sg_prop : is_sym_gr_vect n sg_vect }.
+Record sym_gr_list n :=
+  { sg_list : list (list nat);
+    sg_prop : is_sym_gr_list n sg_list }.
 
-(*
-Theorem canon_is_permut_vect : ∀ n k,
-  k < n!
-  → is_permut_vect (vect_vect_nat_el (canon_sym_gr n) k).
-*)
 Theorem canon_sym_gr_vect_is_permut : ∀ n k,
   k < n!
-  → is_permut_vect (vect_el empty_vect (canon_sym_gr_vect n) k).
+  → is_permut_list (nth k (canon_sym_gr_list_list n) []).
 Proof.
 intros * Hkn.
-unfold is_permut_vect; cbn.
-rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
+unfold is_permut_list.
 cbn; unfold canon_sym_gr_list_list.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
@@ -1156,16 +1130,6 @@ rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 easy.
 Qed.
-
-Theorem canon_sym_gr_size : ∀ n, vect_size (canon_sym_gr_vect n) = n!.
-Proof.
-intros; cbn.
-now rewrite map_length, length_canon_sym_gr_list_list.
-Qed.
-
-Theorem vect_el_mk_vect : ∀ A i d (l : list A),
-  vect_el d (mk_vect l) i = nth i l d.
-Proof. easy. Qed.
 
 Theorem canon_sym_gr_is_sym_gr_list : ∀ n,
   is_sym_gr_list n (canon_sym_gr_list_list n).
@@ -1203,15 +1167,6 @@ split. {
 }
 Qed.
 
-Theorem canon_sym_gr_is_sym_gr_vect : ∀ n,
-  is_sym_gr_vect n (canon_sym_gr_vect n).
-Proof.
-intros.
-unfold is_sym_gr_vect, canon_sym_gr_vect; cbn.
-rewrite map_map, map_id.
-apply canon_sym_gr_is_sym_gr_list.
-Qed.
-
 Theorem rank_of_permut_in_canon_gr_list_inj : ∀ n la lb,
   is_permut_list la
   → is_permut_list lb
@@ -1228,6 +1183,14 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
 
+Require Import RingLike.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+
 (* signatures *)
 
 Definition δ i j u v :=
@@ -1236,6 +1199,8 @@ Definition δ i j u v :=
 Definition ε_fun f n :=
   ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
+
+...
 
 Definition ε n (p : vector nat) := ε_fun (vect_el 0 p) n.
 
