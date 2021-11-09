@@ -760,10 +760,12 @@ apply eq_rngl_div_1; [ now left | | ]. {
 rewrite <- rngl_product_product_if; symmetry.
 rewrite <- rngl_product_product_if; symmetry.
 (* changt de var *)
-...
-rewrite rngl_product_change_var with (g := permut_fun_inv_loop σ n) (h := σ). 2: {
+rewrite rngl_product_change_var with
+  (g := λ i, nth i (permut_list_inv p) 0) (h := λ i, nth i p 0). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
+Search permut_list_inv.
+...
   rewrite fun_find_prop; [ easy | easy | flia Hi Hnz ].
 }
 rewrite Nat.sub_0_r.

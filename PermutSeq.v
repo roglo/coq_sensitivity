@@ -213,6 +213,62 @@ Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect
 Compute (let n := 5 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in vect_eqb Nat.eqb (permut_vect_inv v) (permut_vect_inv' v)) (seq 0 n!)).
 *)
 
+(* *)
+
+(*
+  Hp1 : ∀ x : nat, x ∈ p → x < length p
+  Hp2 : ∀ i j : nat, i < length p → j < length p → nth i p 0 = nth j p 0 → i = j
+  Hpn : length p = n
+  Hnz : n ≠ 0
+  i : nat
+  Hi : 0 ≤ i ≤ n - 1
+  ============================
+  nth (nth i p 0) (permut_list_inv p) 0 = i
+*)
+Theorem nth_nth_permut_list_inv : ∀ n l i,
+  is_permut_list l
+  → length l = n
+  → i < n
+  → nth (nth i l 0) (permut_list_inv l) 0 = i.
+Proof.
+intros * Hp Hl Hin.
+revert i l Hp Hl Hin.
+induction n; intros; [ easy | cbn ].
+destruct l as [| a]; [ easy | ].
+destruct i. {
+  rewrite List_nth_0_cons.
+  unfold permut_list_inv.
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite seq_length; apply Hp; left.
+  }
+  rewrite seq_nth; [ cbn | now apply Hp; left ].
+  now rewrite Nat.eqb_refl.
+}
+rewrite List_nth_succ_cons.
+unfold permut_list_inv.
+cbn in Hl.
+apply Nat.succ_inj in Hl.
+apply Nat.succ_lt_mono in Hin.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply Hp; right.
+  apply nth_In; congruence.
+}
+rewrite seq_nth. 2: {
+  apply Hp; right.
+  apply nth_In; congruence.
+}
+cbn.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
+  exfalso.
+...
+Compute (let l := [1;3;7;0] in (map (λ i, (nth (nth i l 0) (permut_list_inv l) 0, i)) (seq 0 (length l)))).
+...
+  destruct i. {
+    destruct a; [ easy | cbn ].
+...
+
 (* transposition *)
 
 Definition transposition i j k :=
