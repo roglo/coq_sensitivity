@@ -5,7 +5,7 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike MyVector Matrix PermutSeq.
+Require Import Misc RingLike MyVector Matrix PermutSeq Signature.
 Require Import IterAdd IterMul.
 Import matrix_Notations.
 
