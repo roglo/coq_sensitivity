@@ -4,13 +4,12 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith (*Bool*).
-(*
 Require Import Permutation.
-*)
 Import List List.ListNotations.
 
 Require Import Misc RingLike.
 Require Import IterMul (*IterAnd*).
+Require Import PermutSeq.
 (*
 Require Import Pigeonhole.
 *)
@@ -24,11 +23,18 @@ Context (rp : ring_like_prop T).
 Definition δ i j u v :=
   if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
+(*
 Definition ε_fun f n :=
   ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
 Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
+*)
+
+Definition ε n (p : list nat) :=
+  ((∏ (i = 1, n), ∏ (j = 1, n),
+    δ i j (nth (i - 1)%nat p 0%nat) (nth (j - 1)%nat p 0%nat)) /
+   (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
 Definition minus_one_pow n :=
   match n mod 2 with
@@ -221,8 +227,6 @@ apply Hgh.
 apply in_seq in Hi.
 flia Hi.
 Qed.
-
-...
 
 Theorem rngl_product_change_list :
   rngl_is_comm = true →
@@ -449,16 +453,18 @@ erewrite rngl_product_list_eq_compat. 2: {
 easy.
 Qed.
 
+(*
 Theorem permut_swap_mul_cancel : ∀ n σ f,
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  is_permut_fun σ n
+  is_permut_list σ
+  → length σ = n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
-    (((if σ i <? σ j then f i j else 1) / (if i <? j then f i j else 1)) *
-     ((if σ j <? σ i then f j i else 1) / (if j <? i then f j i else 1)))%F =
+    (((if nth i σ 0 <? nth j σ 0 then f i j else 1) / (if i <? j then f i j else 1)) *
+     ((if nth j σ 0 <? nth i σ 0 then f j i else 1) / (if j <? i then f j i else 1)))%F =
     1%F.
 Proof.
 intros * Hic Hin H10 Hp Hfij Hfijnz * Hlin Hljn.
@@ -525,7 +531,9 @@ destruct (lt_dec j i) as [H4| H4]. {
 rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
 Qed.
+*)
 
+(*
 Theorem product_product_if_permut_div :
   rngl_is_comm = true →
   rngl_has_1_neq_0 = true →
@@ -556,7 +564,9 @@ apply in_seq in Hi.
 apply in_seq in Hj.
 apply (@permut_swap_mul_cancel n); try easy; [ flia Hi | flia Hj ].
 Qed.
+*)
 
+(*
 Theorem product_product_if_permut :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
@@ -580,7 +590,9 @@ apply rngl_product_product_div_eq_1; try easy. {
 }
 now apply product_product_if_permut_div.
 Qed.
+*)
 
+(*
 Theorem ε_ws_ε_fun :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -590,7 +602,8 @@ Theorem ε_ws_ε_fun :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ σ n,
-  is_permut_fun σ n
+  is_permut_list σ
+  → length σ = n
   → ε_fun σ n = ε_fun_ws σ n.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hp.
@@ -835,6 +848,7 @@ intros j Hj.
 do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
+*)
 
 Theorem ε_ws_ε :
   rngl_is_comm = true →
@@ -844,11 +858,13 @@ Theorem ε_ws_ε :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (p : vector nat),
-  is_permut_vect n p
+  ∀ n (p : list nat),
+  is_permut_list p
+  → length p = n
   → ε n p = ε_ws n p.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hp.
+intros Hic Hop Hin H10 Hit Hde Hch * Hp Hpn.
+...
 apply ε_ws_ε_fun; try easy.
 now destruct Hp as (Hp1, Hp2).
 Qed.
