@@ -5,6 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
+Require Import Permutation.
 
 Require Import Misc.
 Require Import IterAnd.
@@ -872,24 +873,6 @@ split. {
 }
 Qed.
 
-(*
-ouais, bon, c'est la=lb, donc c'est trivial
-Theorem rank_of_permut_in_canon_sym_gr_eq_compat : ∀ n f g,
-  (∀ i, i < n → f i = g i)
-  → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g.
-Proof.
-intros * Hfg.
-revert f g Hfg.
-induction n; intros; [ easy | cbn ].
-rewrite Hfg; [ f_equal | flia ].
-apply IHn.
-intros i Hi.
-unfold sub_canon_permut_fun.
-rewrite Hfg; [ f_equal | flia Hi ].
-rewrite Hfg; [ f_equal | flia Hi ].
-Qed.
-*)
-
 Theorem canon_sym_gr_sub_canon_permut_list : ∀ n k,
   canon_sym_gr_list n (k mod n!) =
   sub_canon_permut_list (canon_sym_gr_list (S n) k).
@@ -1181,3 +1164,468 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
+
+(*
+Definition permut_fun_inv_loop' f n i :=
+  let '(x, x') :=
+    pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else f j)
+  in
+  if Nat.eq_dec x n then x' else x.
+
+Theorem fun_find_permut_fun_inv_loop' : ∀ l n,
+  is_permut_list l
+  → length l = n
+  → ∀ i, i < n
+  → nth i (permut_list_inv l) 0 = permut_fun_inv_loop' l n i.
+...
+Theorem fun_find_permut_fun_inv_loop' : ∀ l n,
+  is_permut_list l n
+  → ∀ i, i < n
+  → permut_fun_inv_loop f n i = permut_fun_inv_loop' f n i.
+Proof.
+intros * (Hfub, Hinj) * Hin.
+unfold permut_fun_inv_loop'.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (j, j').
+unfold pigeonhole_fun in Hxx.
+remember (find_dup _ _) as fd eqn:Hfd.
+symmetry in Hfd.
+destruct fd as [(x, x')| ]. {
+  injection Hxx; clear Hxx; intros; subst x x'.
+  apply find_dup_some in Hfd.
+  destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
+    subst j.
+    destruct (Nat.eq_dec j' n) as [Hin'| Hin']. {
+      subst j'; clear Hij.
+      exfalso.
+      revert Hfd.
+      apply List_seq_nothing_after_last.
+    }
+    subst i.
+    apply fun_find_prop; [ easy | ].
+    assert (H : j' ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right; right.
+      now apply in_app_iff; right; left.
+    }
+    apply in_seq in H.
+    flia Hin' H.
+  }
+  destruct (Nat.eq_dec j' n) as [Hjn'| Hjn']. {
+    subst j' i.
+    apply fun_find_prop; [ easy | ].
+    assert (H : j ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right.
+      now left.
+    }
+    apply in_seq in H.
+    flia Hjn H.
+  }
+  apply Hinj in Hij; cycle 1. {
+    assert (H : j ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right.
+      now left.
+    }
+    apply in_seq in H.
+    flia Hjn H.
+  } {
+    assert (H : j' ∈ seq 0 (S n)). {
+      rewrite Hfd.
+      apply in_app_iff; right; right.
+      now apply in_app_iff; right; left.
+    }
+    apply in_seq in H.
+    flia Hjn' H.
+  }
+  subst j'.
+  exfalso.
+  specialize (seq_NoDup (S n) 0) as H1.
+  rewrite Hfd in H1.
+  apply NoDup_app_remove_l in H1.
+  rewrite app_comm_cons in H1.
+  specialize (proj1 (NoDup_app_iff _ _) H1) as (_ & _ & H2).
+  specialize (H2 j (or_introl eq_refl)).
+  apply H2.
+  now left.
+}
+injection Hxx; clear Hxx; intros; subst j j'.
+apply find_dup_none in Hfd.
+replace (if Nat.eq_dec _ _ then _ else _) with 0. 2: {
+  now destruct (Nat.eq_dec 0 n).
+}
+specialize (proj1 (NoDup_map_iff 0 _ _) Hfd) as H1.
+rewrite seq_length in H1.
+assert
+  (H2 : ∀ j k,
+   j < S n
+   → k < S n
+   → (if Nat.eq_dec j n then i else f j) = (if Nat.eq_dec k n then i else f k)
+   → j = k). {
+  intros j k Hj Hk.
+  specialize (H1 j k Hj Hk).
+  now do 2 rewrite seq_nth in H1.
+}
+clear H1; rename H2 into H1.
+apply not_NoDup_map_f_seq with (b := n) in Hfd; [ easy | flia | ].
+intros j Hj.
+destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ easy | ].
+apply Hfub.
+flia Hj Hjn.
+Qed.
+*)
+
+(* the proof that "vect_el σ (vect_el (permut_vect_inv σ) i) = i"
+   is proven by the pigeonhole principle *)
+
+(*
+Theorem pigeonhole' : ∀ f n,
+  (∀ i, i < n → f i < n)
+  → (∀ i j, i < n → j < n → f i = f j → i = j)
+  → ∀ i, i < n
+  → ∀ j, j = permut_fun_inv_loop' f n i
+  → j < n ∧ f j = i.
+Proof.
+intros * Hp1 Hp2 * Hin * Hj.
+subst j.
+unfold permut_fun_inv_loop'.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize pigeonhole as H1.
+specialize (H1 (S n) n).
+specialize (H1 (λ j, if Nat.eq_dec j n then i else f j)).
+specialize (H1 (Nat.lt_succ_diag_r n)).
+cbn in H1.
+assert (H : ∀ j, j < S n → (if Nat.eq_dec j n then i else f j) < n). {
+  intros j Hj.
+  destruct (Nat.eq_dec j n) as [Hjn| Hjn]; [ now subst j | ].
+  apply Hp1; flia Hj Hjn.
+}
+specialize (H1 H x x' Hxx); clear H.
+destruct H1 as (Hxn & Hx'n & Hxx' & H1).
+destruct (Nat.eq_dec x n) as [H2| H2]. {
+  subst x.
+  destruct (Nat.eq_dec x' n) as [H2| H2]; [ now subst x' | ].
+  split; [ flia Hx'n H2 | easy ].
+} {
+  destruct (Nat.eq_dec x' n) as [H3| H3]. {
+    split; [ flia Hxn H2 | easy ].
+  }
+  apply Hp2 in H1; [ easy | flia Hxn H2 | flia Hx'n H3 ].
+}
+Qed.
+
+Theorem fun_permut_fun_inv_loop : ∀ f n,
+  is_permut_fun f n
+  → ∀ i, i < n
+  → f (permut_fun_inv_loop f n i) = i.
+Proof.
+intros * (Hp1, Hp2) * Hin.
+rewrite fun_find_permut_fun_inv_loop'; [ | easy | easy ].
+apply (proj2 (pigeonhole' f Hp1 Hp2 Hin eq_refl)).
+Qed.
+*)
+
+(*
+Theorem permut_fun_inv_loop_is_permut : ∀ n f,
+  is_permut_fun f n
+  → is_permut_fun (permut_fun_inv_loop f n) n.
+Proof.
+intros * Hp.
+destruct Hp as (Hp1, Hp2).
+split. {
+  intros i Hin; cbn.
+  rewrite fun_find_permut_fun_inv_loop'; [ | easy | easy ].
+  unfold permut_fun_inv_loop'.
+  remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+  symmetry in Hxx; destruct xx as (x, x').
+  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+    subst x.
+    unfold pigeonhole_fun in Hxx.
+    remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+    destruct fd as [(x, n')| ]. {
+      injection Hxx; clear Hxx; intros; subst x x'.
+      apply find_dup_some in Hfd.
+      destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+      exfalso.
+      revert Hfd.
+      apply List_seq_nothing_after_last.
+    }
+    now injection Hxx; clear Hxx; intros; subst n x'.
+  } {
+    unfold pigeonhole_fun in Hxx.
+    remember (find_dup _ _) as fd eqn:Hfd; symmetry in Hfd.
+    destruct fd as [(n'', n')| ]. {
+      injection Hxx; clear Hxx; intros; subst x x'.
+      apply find_dup_some in Hfd.
+      destruct Hfd as (Hij & la1 & la2 & la3 & Hfd).
+      destruct (Nat.eq_dec n'' n) as [Hn''n| Hn''n]; [ now subst n'' | ].
+      destruct (Nat.eq_dec n' n) as [Hn'n| Hn'n]. {
+        subst n'.
+        now apply List_sorted_in_seq in Hfd.
+      }
+      assert (H : n' ∈ seq 0 (S n)). {
+        rewrite Hfd.
+        apply in_app_iff; right; right.
+        now apply in_app_iff; right; left.
+      }
+      apply in_seq in H.
+      apply List_sorted_in_seq in Hfd.
+      apply (Nat.lt_le_trans _ n'); [ easy | flia H ].
+    }
+    injection Hxx; clear Hxx; intros; subst x x'.
+    flia Hin.
+  }
+}
+intros i j Hi Hj Hij.
+cbn in Hij.
+rewrite fun_find_permut_fun_inv_loop' in Hij; [ | easy | easy ].
+rewrite fun_find_permut_fun_inv_loop' in Hij; [ | easy | easy ].
+unfold permut_fun_inv_loop' in Hij.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx in Hij.
+remember (pigeonhole_fun _ _) as yy eqn:Hyy in Hij.
+symmetry in Hxx; destruct xx as (x, x').
+symmetry in Hyy; destruct yy as (y, y').
+move y before x; move y' before x'.
+unfold pigeonhole_fun in Hxx, Hyy.
+remember (find_dup _ _) as fdi eqn:Hfdi in Hxx.
+remember (find_dup _ _) as fdj eqn:Hfdj in Hyy.
+symmetry in Hfdi, Hfdj.
+move fdj before fdi.
+move Hfdj before Hfdi.
+destruct fdi as [(x1, x2)| ]. {
+  injection Hxx; clear Hxx; intros; subst x1 x2.
+  apply find_dup_some in Hfdi.
+  destruct Hfdi as (Hij1 & la1 & la2 & la3 & Hfdi).
+  destruct (Nat.eq_dec x n) as [Hxn| Hxn]. {
+    subst x.
+    now apply List_seq_nothing_after_last in Hfdi.
+  }
+  destruct fdj as [(x1, x2)| ]. {
+    injection Hyy; clear Hyy; intros; subst x1 x2.
+    apply find_dup_some in Hfdj.
+    destruct Hfdj as (Hij2 & lb1 & lb2 & lb3 & Hfdj).
+    destruct (Nat.eq_dec y n) as [Hyn| Hyn]; subst y. {
+      now apply List_seq_nothing_after_last in Hfdj.
+    }
+    clear Hyn.
+    destruct (Nat.eq_dec x' n) as [Hx'n| Hx'n]. {
+      subst x'.
+      destruct (Nat.eq_dec y' n) as [Hy'n| Hy'n]; [ congruence | ].
+      apply Hp2 in Hij2; cycle 1. {
+        assert (H : x ∈ seq 0 (S n)). {
+          rewrite Hfdi.
+          now apply in_app_iff; right; left.
+        }
+        apply in_seq in H; cbn in H; flia Hxn H.
+      } {
+        assert (H : y' ∈ seq 0 (S n)). {
+          rewrite Hfdj.
+          apply in_app_iff; right; right.
+          now apply in_app_iff; right; left.
+        }
+        apply in_seq in H; cbn in H; flia Hy'n H.
+      }
+      subst y'.
+      apply List_sorted_in_seq in Hfdj.
+      now apply Nat.lt_irrefl in Hfdj.
+    }
+    apply Hp2 in Hij1; cycle 1. {
+      assert (H : x ∈ seq 0 (S n)). {
+        rewrite Hfdi.
+        now apply in_app_iff; right; left.
+      }
+      apply in_seq in H; cbn in H; flia Hxn H.
+    } {
+      assert (H : x' ∈ seq 0 (S n)). {
+        rewrite Hfdi.
+        apply in_app_iff; right; right.
+        now apply in_app_iff; right; left.
+      }
+      apply in_seq in H; cbn in H; flia Hx'n H.
+    }
+    subst x'.
+    apply List_sorted_in_seq in Hfdi.
+    now apply Nat.lt_irrefl in Hfdi.
+  }
+  apply find_dup_none in Hfdj.
+  exfalso; revert Hfdj.
+  apply not_NoDup_map_f_seq with (b := n); [ flia | ].
+  intros k Hk.
+  destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+  apply Hp1; flia Hk Hkn.
+}
+apply find_dup_none in Hfdi.
+exfalso; revert Hfdi.
+apply not_NoDup_map_f_seq with (b := n); [ flia | ].
+intros k Hk.
+destruct (Nat.eq_dec k n) as [Hkn| Hkn]; [ easy | ].
+apply Hp1; flia Hk Hkn.
+Qed.
+*)
+
+(*
+Theorem permut_fun_without_last : ∀ n i (a : _ → nat),
+  is_permut_fun a (S n)
+  → i = permut_fun_inv_loop a (S n) n
+  → ∃ b,
+     is_permut_fun b n ∧
+     map a (seq 0 i ++ seq (S i) (n - i)) = map b (seq 0 n).
+Proof.
+intros * Hp Hi.
+exists (λ j, if lt_dec j i then a j else a (j + 1)).
+split. 2: {
+  destruct n. {
+    cbn in Hi; cbn.
+    destruct (Nat.eq_dec (a 0) 0) as [Haz| Haz]; [ now subst i | exfalso ].
+    apply Haz.
+    destruct Hp as (Hp1, Hp2).
+    enough (H : a 0 < 1) by flia H.
+    apply Hp1; flia.
+  }
+  destruct (Nat.eq_dec (a (S n)) (S n)) as [Han| Han]. {
+    remember (S n) as sn; cbn in Hi; subst sn.
+    rewrite Han in Hi.
+    destruct (Nat.eq_dec (S n) (S n)) as [H| H]; [ clear H | easy ].
+    subst i.
+    rewrite Nat.sub_diag; cbn.
+    f_equal.
+    rewrite app_nil_r.
+    apply map_ext_in.
+    intros i Hi.
+    apply in_seq in Hi.
+    now destruct (lt_dec i (S n)).
+  }
+  destruct (Nat.eq_dec i (S n)) as [Hsni| Hsni]. {
+    rewrite Hsni, Nat.sub_diag.
+    cbn; f_equal.
+    rewrite app_nil_r.
+    apply map_ext_in.
+    intros j Hj.
+    destruct (lt_dec j (S n)) as [Hjsn| Hjsn]; [ easy | ].
+    exfalso; apply Hjsn; clear Hjsn.
+    now apply in_seq in Hj.
+  }
+  symmetry.
+  rewrite (List_seq_cut i). 2: {
+    apply in_seq.
+    split; [ flia | cbn ].
+    enough (H : i < S (S n)) by flia Hsni H.
+    rewrite Hi.
+    apply permut_ub; [ | flia ].
+    now apply permut_fun_inv_loop_is_permut.
+  }
+  symmetry; cbn - [ "-" ].
+  rewrite Nat.sub_0_r, Nat.sub_succ.
+  rewrite Nat.sub_succ_l. 2: {
+    assert (H : i < S (S n)). {
+      rewrite Hi.
+      apply permut_ub; [ | flia ].
+      now apply permut_fun_inv_loop_is_permut.
+    }
+    flia Hsni H.
+  }
+  do 2 rewrite map_app.
+  f_equal. {
+    apply map_ext_in_iff.
+    intros j Hj.
+    destruct (lt_dec j i) as [Hji| Hji]; [ easy | ].
+    now apply in_seq in Hj.
+  }
+  cbn.
+  destruct (lt_dec i i) as [H| H]; [ now apply lt_irrefl in H | clear H ].
+  rewrite Nat.add_1_r; f_equal.
+  rewrite <- seq_shift.
+  rewrite map_map.
+  apply map_ext_in_iff.
+  intros j Hj.
+  rewrite Nat.add_1_r.
+  destruct (lt_dec j i) as [Hji| Hji]; [ | easy ].
+  apply in_seq in Hj.
+  flia Hj Hji.
+}
+split. {
+  intros j Hj.
+  assert (Hin : a i = n). {
+    rewrite Hi.
+    apply fun_permut_fun_inv_loop; [ easy | flia ].
+  }
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    destruct (Nat.eq_dec (a j) n) as [Hajn| Hajn]. {
+      rewrite <- Hajn in Hin.
+      apply Hp in Hin; [ flia Hji Hin | | flia Hj ].
+      rewrite Hi.
+      apply permut_ub; [ | flia ].
+      now apply permut_fun_inv_loop_is_permut.
+    }
+    enough (H : a j < S n) by flia Hajn H.
+    apply Hp; flia Hj.
+  }
+  apply Nat.nlt_ge in Hji.
+  destruct Hp as (Hp1, Hp2).
+  apply Nat.succ_lt_mono in Hj.
+  specialize (Hp1 _ Hj) as H1.
+  rewrite Nat.add_1_r.
+  destruct (Nat.eq_dec (a (S j)) n) as [Hajn| Hajn]. {
+    rewrite <- Hajn in Hin.
+    apply Hp2 in Hin; [ flia Hin Hji | flia Hj Hji | easy ].
+  }
+  flia H1 Hajn.
+}
+intros j k Hj Hk Hjk.
+destruct (lt_dec j i) as [Hji| Hji]. {
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    apply Hp in Hjk; [ easy | flia Hj | flia Hk ].
+  }
+  apply Nat.nlt_ge in Hki.
+  apply Hp in Hjk; [ flia Hji Hki Hjk | flia Hj | flia Hk ].
+}
+destruct (lt_dec k i) as [Hki| Hki]. {
+  apply Hp in Hjk; [ | flia Hj | flia Hk ].
+  apply Nat.nlt_ge in Hji.
+  flia Hji Hki Hjk.
+}
+apply Hp in Hjk; [ flia Hjk | flia Hj | flia Hk ].
+Qed.
+*)
+
+(*
+Theorem permut_list_Permutation : ∀ l n,
+  is_permut_list l
+  → length l = n
+  → Permutation (map (λ i, nth i l 0) (seq 0 n)) (seq 0 n).
+...
+Theorem permut_fun_Permutation : ∀ f n,
+  is_permut_fun f n
+  → Permutation (map f (seq 0 n)) (seq 0 n).
+Proof.
+intros a n * Hp.
+symmetry.
+revert a Hp.
+induction n; intros; [ easy | ].
+rewrite seq_S at 1.
+remember (permut_fun_inv_loop a (S n) n) as i eqn:Hi.
+remember (seq 0 n) as s eqn:Hs.
+rewrite (List_seq_cut i); subst s. 2: {
+  subst i.
+  apply in_seq.
+  split; [ flia | ].
+  apply permut_ub; [ | flia ].
+  now apply permut_fun_inv_loop_is_permut.
+}
+rewrite Nat.sub_0_r; cbn.
+rewrite map_app; cbn.
+rewrite Hi at 2.
+rewrite fun_permut_fun_inv_loop; [ | easy | flia ].
+apply Permutation_elt.
+rewrite app_nil_r.
+rewrite <- map_app.
+destruct (permut_fun_without_last Hp Hi) as (g & Hpg & Hg).
+rewrite Hg.
+now apply IHn.
+Qed.
+*)
