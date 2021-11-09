@@ -1294,11 +1294,10 @@ Theorem vect_el_mk_vect : ∀ A i d (l : list A),
   vect_el d (mk_vect l) i = nth i l d.
 Proof. easy. Qed.
 
-...
-
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (canon_sym_gr_vect n).
+Theorem canon_sym_gr_is_sym_gr : ∀ n, is_sym_gr n (canon_sym_gr_vect n).
 Proof.
 intros.
+...
 split. {
   intros i Hi; cbn in Hi |-*.
   rewrite map_length, seq_length in Hi.
