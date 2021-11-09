@@ -808,9 +808,10 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-...
-rewrite Nat.sub_0_r.
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
+...
+  now apply permut_list_Permutation.
+...
   now apply permut_fun_Permutation.
 }
 erewrite rngl_product_list_eq_compat. 2: {

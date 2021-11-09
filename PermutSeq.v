@@ -1661,11 +1661,12 @@ apply Hp in Hjk; [ flia Hjk | flia Hj | flia Hk ].
 Qed.
 *)
 
-(*
 Theorem permut_list_Permutation : ∀ l n,
   is_permut_list l
   → length l = n
-  → Permutation (map (λ i, nth i l 0) (seq 0 n)) (seq 0 n).
+  → Permutation l (seq 0 n).
+Proof.
+intros * Hp Hln.
 ...
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
