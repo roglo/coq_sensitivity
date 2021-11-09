@@ -201,6 +201,18 @@ Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
 Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
 *)
 
+Definition is_sym_gr_list n (ll : list (list nat)) :=
+  (∀ i, i < length ll →
+   length (nth i ll []) = n ∧
+   is_permut_list (nth i ll [])) ∧
+  (∀ i j, i < length ll → j < length ll →
+   nth i ll [] = nth j ll [] → i = j) ∧
+  (∀ l, length l = n → is_permut_list l → l ∈ ll).
+
+(**)
+Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
+  is_sym_gr_list n (map (vect_list (T:=nat)) (vect_list vv)).
+(*
 Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
    vect_size (vect_el empty_vect vv i) = n ∧
@@ -208,6 +220,7 @@ Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i j, i < vect_size vv → j < vect_size vv →
    vect_el empty_vect vv i = vect_el empty_vect vv j → i = j) ∧
   (∀ v, vect_size v = n → is_permut_vect v → v ∈ vect_list vv).
+*)
 
 (*
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
@@ -434,11 +447,13 @@ clear Hi.
 destruct (lt_dec 0 (vect_size sg)) as [Hs| Hs]; [ easy | ].
 apply Nat.nlt_ge in Hs; exfalso.
 apply Nat.le_0_r in Hs.
+unfold is_sym_gr_vect in Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
-specialize (Hsurj (mk_vect (seq 0 n))) as H1.
-cbn in H1; rewrite seq_length in H1.
+rewrite map_length, fold_vect_size in Hsg, Hinj.
+specialize (Hsurj (seq 0 n)) as H1.
+rewrite seq_length in H1.
 specialize (H1 eq_refl).
-assert (H : is_permut_vect (mk_vect (seq 0 n))). {
+assert (H : is_permut_list (seq 0 n)). {
   split. {
     cbn; rewrite seq_length.
     intros i Hin.
@@ -478,8 +493,13 @@ assert (H : v ∉ vect_list sg). {
   apply vect_eqb_neq in H.
   now symmetry in Hjv.
 }
-exfalso; apply H.
-now apply Hsg.
+exfalso; apply H; clear H.
+destruct Hsg as (_ & _ & Hsurj).
+specialize (Hsurj (vect_list v) Hs Hp).
+apply in_map_iff in Hsurj.
+destruct Hsurj as (x & Hxv & Hx).
+destruct x as (lx), v as (lv).
+now cbn in Hxv; subst lx.
 Qed.
 
 Theorem rank_of_permut_in_sym_gr_vect_el : ∀ n sg i,
@@ -497,14 +517,23 @@ destruct j as [j| ]. {
   apply vect_eqb_eq in Hj.
   rewrite fold_vect_el in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
-  apply Hinj; [ | easy | easy ].
-  destruct (lt_dec j (vect_size sg)) as [Hjs| Hjs]; [ easy | exfalso ].
-  apply Nat.nlt_ge in Hjs.
-  unfold vect_el in Hj at 2.
-  rewrite nth_overflow in Hj; [ | easy ].
-  specialize (Hsg i Hi) as H1.
-  destruct H1 as (H1, H2).
-  now rewrite Hj in H1; cbn in H1; subst n.
+  rewrite map_length, fold_vect_size in Hsg, Hinj.
+  assert (Hjs : j < vect_size sg). {
+    destruct (lt_dec j (vect_size sg)) as [Hjs| Hjs]; [ easy | exfalso ].
+    apply Nat.nlt_ge in Hjs.
+    unfold vect_el in Hj at 2.
+    rewrite nth_overflow in Hj; [ | easy ].
+    specialize (Hsg i Hi) as H1.
+    rewrite (List_map_nth' empty_vect) in H1; [ | easy ].
+    destruct H1 as (H1, H2).
+    rewrite fold_vect_el in H1.
+    now rewrite Hj in H1; cbn in H1; subst n.
+  }
+  apply Hinj; [ easy | easy | ].
+  rewrite (List_map_nth' empty_vect); [ | easy ].
+  rewrite (List_map_nth' empty_vect); [ | easy ].
+  do 2 rewrite fold_vect_el.
+  now rewrite Hj.
 }
 specialize (List_find_nth_None empty_vect _ _ Hj Hi) as H1.
 now apply vect_eqb_neq in H1.
@@ -515,19 +544,20 @@ Theorem vect_size_of_empty_sym_gr : ∀ sg,
 Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
-specialize (Hsurj empty_vect eq_refl) as H1.
-assert (H : is_permut_vect empty_vect). {
-  now apply is_permut_vect_is_permut_vect_bool.
+specialize (Hsurj [] eq_refl) as H1.
+assert (H : is_permut_list []). {
+  now apply is_permut_list_is_permut_list_bool.
 }
 specialize (H1 H); clear H.
-apply (In_nth _ _ empty_vect) in H1.
+apply (In_nth _ _ []) in H1.
 destruct H1 as (i & Hil & Hi).
 unfold vect_el in Hi.
-rewrite fold_vect_size in Hil.
+rewrite map_length, fold_vect_size in Hil.
 destruct (Nat.eq_dec (vect_size sg) 0) as [Hvz| Hvz]. {
   now rewrite Hvz in Hil.
 }
 destruct (Nat.eq_dec (vect_size sg) 1) as [Hv1| Hv1]; [ easy | ].
+rewrite map_length, fold_vect_size in Hsg, Hinj.
 specialize (Hsg 0) as H1.
 specialize (Hsg 1) as H2.
 specialize (Hinj 0 1) as H3.
@@ -537,12 +567,25 @@ assert (H : 1 < vect_size sg) by flia Hvz Hv1.
 specialize (H2 H); specialize (H3 H); clear H.
 destruct H1 as (H4, H5).
 destruct H2 as (H6, H7).
-enough (H : vect_el empty_vect sg 0 = vect_el empty_vect sg 1). {
-  now apply H3 in H.
+rewrite (List_map_nth' empty_vect) in H3. 2: {
+  rewrite fold_vect_size; flia Hil.
 }
-unfold vect_size in H4, H6.
+rewrite (List_map_nth' empty_vect) in H3. 2: {
+  rewrite fold_vect_size; flia Hvz Hv1.
+}
+do 2 rewrite fold_vect_el in H3.
+enough (H : vect_el empty_vect sg 0 = vect_el empty_vect sg 1). {
+  rewrite H in H3.
+  now specialize (H3 eq_refl).
+}
+rewrite (List_map_nth' empty_vect) in H4. 2: {
+  rewrite fold_vect_size; flia Hil.
+}
+rewrite (List_map_nth' empty_vect) in H6. 2: {
+  rewrite fold_vect_size; flia Hvz Hv1.
+}
 apply length_zero_iff_nil in H4, H6.
-unfold vect_el in H4, H6 |-*.
+unfold vect_el.
 remember (nth 0 (vect_list sg) empty_vect) as x eqn:Hx.
 remember (nth 1 (vect_list sg) empty_vect) as y eqn:Hy.
 symmetry in Hx, Hy.
@@ -1115,7 +1158,11 @@ destruct Hsg as (Hsg & Hinj & Hsurj).
 apply Nat.ltb_lt.
 destruct k as (k, pk); cbn.
 apply Nat.ltb_lt in pk.
-now apply rank_of_canon_permut_ub; apply Hsg.
+rewrite map_length, fold_vect_size in Hsg.
+specialize (Hsg k pk).
+rewrite (List_map_nth' empty_vect) in Hsg; [ | easy ].
+rewrite fold_vect_el in Hsg.
+now apply rank_of_canon_permut_ub.
 Qed.
 
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
@@ -1174,6 +1221,7 @@ assert
   destruct Hsg as (Hsg & Hinj & Hsurj).
   rewrite (List_map_nth' []). 2: {
     rewrite length_canon_sym_gr_list_list.
+...
     now apply rank_of_canon_permut_ub; apply Hsg.
   }
   unfold canon_sym_gr_list_list.
