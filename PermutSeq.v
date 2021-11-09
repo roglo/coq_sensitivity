@@ -262,6 +262,13 @@ cbn.
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
   exfalso.
+  destruct Hp as (Hp1, Hp2).
+  specialize (Hp2 0 (S i) (Nat.lt_0_succ _)) as H1.
+  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
+  specialize (H1 H); clear H.
+  cbn in H1; symmetry in Hia.
+  now specialize (H1 Hia).
+}
 ...
 Compute (let l := [1;3;7;0] in (map (λ i, (nth (nth i l 0) (permut_list_inv l) 0, i)) (seq 0 (length l)))).
 ...
