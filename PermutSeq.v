@@ -1200,11 +1200,15 @@ Definition ε_fun f n :=
   ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
-...
-
-Definition ε n (p : vector nat) := ε_fun (vect_el 0 p) n.
+Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 
 (* signature of the k-th permutation of the symmetric group *)
+
+... minus_one_pow est actuellement dans MyVector.v
+... mais je ne suis pas censé utiliser MyVector maintenant
+... que fais-je ?
+... en plus j'ai pas de RingLike non plus au début de PermutSeq.
+... faut peut-être que je crée un nouveau fichier, non ?
 
 Fixpoint ε_permut n k :=
   match n with
