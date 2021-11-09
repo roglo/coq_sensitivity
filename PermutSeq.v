@@ -1283,6 +1283,7 @@ apply (f_equal (@rank_of_permut_in_canon_sym_gr_list n)) in Hij.
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 easy.
+Qed.
 
 Theorem canon_sym_gr_size : ∀ n, vect_size (canon_sym_gr_vect n) = n!.
 Proof.
@@ -1297,199 +1298,55 @@ Proof. easy. Qed.
 Theorem canon_sym_gr_is_sym_gr : ∀ n, is_sym_gr n (canon_sym_gr_vect n).
 Proof.
 intros.
-...
 split. {
-  intros i Hi; cbn in Hi |-*.
-  rewrite map_length, seq_length in Hi.
-  rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-  rewrite map_length, seq_length; cbn.
+  intros i Hi; cbn.
+  rewrite canon_sym_gr_size in Hi.
+  rewrite (List_map_nth' []); [ | now rewrite length_canon_sym_gr_list_list ].
+  cbn; unfold is_permut_vect; cbn.
+  unfold canon_sym_gr_list_list.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
+  rewrite length_canon_sym_gr_list.
   split; [ easy | ].
-  unfold is_permut_vect; cbn.
-  rewrite map_length, seq_length.
-  unfold vect_el; cbn.
-  eapply is_permut_eq_compat. {
-    intros j Hj; symmetry.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    easy.
-  }
-  now apply canon_sym_gr_elem_is_permut.
+  now apply canon_sym_gr_list_is_permut.
 }
 split. {
   intros i j Hi Hj Hij.
   rewrite canon_sym_gr_size in Hi, Hj.
   cbn in Hij.
+  rewrite (List_map_nth' []) in Hij. 2: {
+    now rewrite length_canon_sym_gr_list_list.
+  }
+  rewrite (List_map_nth' []) in Hij. 2: {
+    now rewrite length_canon_sym_gr_list_list.
+  }
+  injection Hij; clear Hij; intros Hij.
+  unfold canon_sym_gr_list_list in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
-  injection Hij; clear Hij; intros Hij.
-  specialize (ext_in_map Hij) as H1.
-  apply (canon_sym_gr_elem_inj2 Hi Hj).
-  intros k Hk.
-  apply H1.
-  apply in_seq.
-  split; [ flia | easy ].
+  now apply canon_sym_gr_list_inj in Hij.
 } {
-  intros v Hv Hp.
-  revert v Hv Hp.
-  induction n; intros. {
-    cbn in Hv.
-    destruct v as (l).
-    cbn in Hv.
-    apply length_zero_iff_nil in Hv; subst l.
-    now left.
-  }
-  cbn - [ fact seq ].
+  intros (l) Hv Hp.
+  cbn in Hv, Hp |-*.
+  unfold is_permut_vect in Hp; cbn in Hp.
+  apply in_map.
+  unfold canon_sym_gr_list_list.
   apply in_map_iff.
-  exists (rank_of_permut_in_canon_sym_gr_vect (S n) v).
-  split. {
-    destruct v as (l).
-    unfold is_permut_vect in Hp.
-    cbn in Hv, Hp.
-    rewrite Hv in Hp.
-    f_equal.
-    rewrite List_map_nth_seq with (d := 0).
-    rewrite Hv.
-    apply map_ext_in.
-    intros i Hi.
-    unfold canon_sym_gr_fun.
-    assert
-      (Hr :
-       rank_of_permut_in_canon_sym_gr n
-         (sub_canon_permut_fun (vect_el 0 (mk_vect l))) < n!). {
-      apply rank_of_canon_permut_ub.
-      unfold sub_canon_permut_fun.
-      cbn - [ "<?" ].
-      destruct Hp as (Hp1, Hp2).
-      cbn in Hp1, Hp2.
-      clear i Hi.
-      split. {
-        intros i Hi.
-        apply Nat.succ_lt_mono in Hi.
-        specialize (Hp1 (S i) Hi) as H1.
-        unfold Nat.b2n.
-        rewrite if_ltb_lt_dec.
-        destruct (lt_dec _ _) as [Hzi| Hzi]; [ flia H1 Hzi | ].
-        apply Nat.nlt_ge in Hzi.
-        rewrite Nat.sub_0_r.
-        destruct (Nat.eq_dec (nth (S i) l 0) n) as [Hin| Hin]; [ | flia H1 Hin ].
-        exfalso.
-        rewrite Hin in Hzi.
-        specialize (Hp1 0 (Nat.lt_0_succ _)) as H2.
-        assert (H3 : nth 0 l 0 = n) by flia Hzi H2.
-        rewrite <- Hin in H3.
-        apply Hp2 in H3; [ easy | flia | easy ].
-      } {
-        intros i j Hi Hj Hij.
-        unfold Nat.b2n in Hij.
-        do 2 rewrite if_ltb_lt_dec in Hij.
-        destruct (lt_dec (nth 0 l 0) (nth (S i) l 0)) as [H1| H1]. {
-          destruct (lt_dec (nth 0 l 0) (nth (S j) l 0)) as [H2| H2]. {
-            assert (H3 : nth (S i) l 0 = nth (S j) l 0) by flia Hij H1 H2.
-            clear Hij.
-            apply Nat.succ_lt_mono in Hi, Hj.
-            apply Hp2 in H3; [ | easy | easy ].
-            now apply Nat.succ_inj in H3.
-          }
-          apply Nat.nlt_ge in H2.
-          rewrite Nat.sub_0_r in Hij.
-          assert (Hjz : nth (S j) l 0 = nth 0 l 0) by flia H1 H2 Hij.
-          apply Nat.succ_lt_mono in Hj.
-          apply Hp2 in Hjz; [ easy | easy | flia ].
-        } {
-          apply Nat.nlt_ge in H1.
-          rewrite Nat.sub_0_r in Hij.
-          destruct (lt_dec (nth 0 l 0) (nth (S j) l 0)) as [H2| H2]. {
-            assert (Hiz : nth (S i) l 0 = nth 0 l 0) by flia H1 H2 Hij.
-            apply Nat.succ_lt_mono in Hi.
-            apply Hp2 in Hiz; [ easy | easy | flia ].
-          }
-          rewrite Nat.sub_0_r in Hij.
-          apply Nat.succ_lt_mono in Hi, Hj.
-          apply Hp2 in Hij; [ | easy | easy ].
-          now apply Nat.succ_inj in Hij.
-        }
-      }
-    }
-    destruct i. {
-      cbn.
-      rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-      rewrite <- Nat.add_0_r; f_equal.
-      now apply Nat.div_small.
-    }
-    cbn.
-    rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
-    rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
-    rewrite Nat.mod_small; [ | easy ].
-    rewrite Nat.div_small; [ | easy ].
-    rewrite Nat.add_0_r.
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-    destruct (le_dec _ _) as [H1| H1]. {
-      destruct Hp as (Hp1, Hp2).
-      cbn in Hp1, Hp2.
-      remember
-        (rank_of_permut_in_canon_sym_gr n
-           (sub_canon_permut_fun (vect_el 0 (mk_vect l)))) as k eqn:Hk.
-Search sub_canon_permut_fun.
-Print sub_canon_permut_fun.
-...
-      apply rank_of_canon_permut_ub.
-      unfold sub_canon_permut_fun.
-...
-Search (_ ∈ map _ _ ↔ _).
-Print canon_sym_gr.
-Print canon_sym_gr_elem.
-Check canon_sym_gr_elem_is_permut.
-...
-Print canon_sym_gr_fun.
-  split. {
-    destruct v as (l).
-    unfold is_permut_vect in Hp.
-    cbn in Hv, Hp.
-    rewrite Hv in Hp.
-    f_equal.
-    rewrite List_map_nth_seq with (d := 0).
-    rewrite Hv; cbn.
-    f_equal. {
-      destruct l as [| a]; [ easy | ].
-      cbn.
-      unfold rank_of_permut_in_canon_sym_gr_vect.
-      erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
-        intros i Hi.
-        unfold vect_el.
-        cbn - [ nth ].
-        easy.
-      }
-...
-      unfold vect_el in Hp; cbn - [ nth ] in Hp.
-      destruct Hp as (H1, H2).
-Search (vect_el _ (mk_vect _)).
-      cbn in Hv.
-      apply Nat.succ_inj in Hv.
-Print rank_of_permut_in_canon_sym_gr.
-Search rank_of_permut_in_canon_sym_gr.
-...
-      unfold vect_el in Hp |-*.
-      cbn - [ nth ] in Hp |-*.
-      destruct Hp as (H1, H2).
-...
-      unfold rank_of_permut_in_canon_sym_gr.
-      cbn.
-...
-Search (_ ∈ _ ↔ _).
-...
-  specialize canon_sym_gr_elem_is_permut as H1.
-...
-} {
-  intros i Hi.
-  now apply sym_gr_elem_is_permut.
+  exists (rank_of_permut_in_canon_sym_gr_list n l).
+  rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy | easy ].
+  split; [ easy | ].
+  apply in_seq.
+  split; [ flia | ].
+  now apply rank_of_canon_permut_ub.
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem rank_of_permut_injective : ∀ n f g,
   is_permut_fun f n
