@@ -1774,10 +1774,33 @@ Qed.
 
 Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
   List_find_nth_loop i f l = Some j
-  → (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
+  → j < i + length l ∧
+    (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
     f (nth (j - i) l d) = true.
 Proof.
 intros * Hi.
+split. {
+  remember (j - i) as k eqn:Hk.
+  replace j with (i + k) in Hi |-*. 2: {
+    specialize (List_find_nth_loop_interv f l i Hi) as H1.
+    flia Hk H1.
+  }
+  apply Nat.add_lt_mono_l.
+  clear j Hk.
+  revert i l Hi.
+  induction k; intros. {
+    destruct l; [ easy | cbn; flia ].
+  }
+  destruct l as [| a]; [ easy | ].
+  cbn in Hi |-*.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    injection Hi; clear Hi; intros Hi; flia Hi.
+  }
+  rewrite <- Nat.add_succ_comm in Hi.
+  apply -> Nat.succ_lt_mono.
+  now apply (IHk (S i)).
+}
 split. {
   intros p Hp.
   remember (p - i) as k eqn:Hk.
@@ -1829,13 +1852,15 @@ Qed.
 
 Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
   List_find_nth f l = Some i
-  → (∀ j, j < i → f (nth j l d) = false) ∧
+  → i < length l ∧
+    (∀ j, j < i → f (nth j l d) = false) ∧
     f (nth i l d) = true.
 Proof.
 intros * Hi.
 apply List_find_nth_loop_Some with (d := d) in Hi.
 rewrite Nat.sub_0_r in Hi.
-destruct Hi as (Hk, Hi).
+destruct Hi as (Hil & Hk & Hi).
+split; [ easy | ].
 split; [ | easy ].
 intros j Hj.
 specialize (Hk j).
@@ -1888,43 +1913,38 @@ Theorem List_find_nth_find : ∀ A d f (l : list A) i,
 Proof.
 intros * Hi.
 specialize (List_find_nth_Some d f l Hi) as H1.
-destruct H1 as (H1, H2).
+destruct H1 as (H1 & H2 & H3).
 remember (find f l) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [a| ]. {
   f_equal; symmetry.
   clear Hi.
-  revert a i H1 H2 Hr.
+  revert a i H1 H2 H3 Hr.
   induction l as [| a1]; intros; [ easy | ].
   cbn in Hr.
   remember (f a1) as b eqn:Hb; symmetry in Hb.
   destruct b. {
     injection Hr; clear Hr; intros; subst a1.
     destruct i; [ easy | cbn ].
-    specialize (H1 0 (Nat.lt_0_succ _)) as H3.
-    cbn in H3.
-    now rewrite Hb in H3.
+    specialize (H2 0 (Nat.lt_0_succ _)) as H4.
+    cbn in H4.
+    now rewrite Hb in H4.
   }
-  destruct i; [ now cbn in H2; rewrite H2 in Hb | ].
-  cbn in H2 |-*.
-  apply IHl; [ | easy | easy ].
+  destruct i; [ now cbn in H3; rewrite H3 in Hb | ].
+  cbn in H3 |-*.
+  cbn in H1; apply Nat.succ_lt_mono in H1.
+  apply IHl; [ easy | | easy | easy ].
   intros j Hj.
-  specialize (H1 (S j)).
+  specialize (H2 (S j)).
   assert (H : S j < S i) by flia Hj.
-  now specialize (H1 H); clear H.
+  now specialize (H2 H); clear H.
 } {
   exfalso.
-  specialize (find_none _ _ Hr) as H3.
-  destruct (lt_dec i (length l)) as [Hil| Hil]. {
-    specialize (H3 (nth i l d)).
-    apply nth_In with (d := d) in Hil.
-    specialize (H3 Hil).
-    now rewrite H2 in H3.
-  }
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow in H2; [ | easy ].
-  specialize (List_find_nth_loop_interv _ _ _ Hi) as H4.
-  flia Hil H4.
+  specialize (find_none _ _ Hr) as H4.
+  specialize (H4 (nth i l d)).
+  apply nth_In with (d := d) in H1.
+  specialize (H4 H1).
+  now rewrite H3 in H4.
 }
 Qed.
 

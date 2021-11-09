@@ -264,24 +264,16 @@ remember (List_find_nth _ _) as j eqn:Hj.
 symmetry in Hj.
 destruct j as [j| ]. {
   apply List_find_nth_loop_Some with (d := 0) in Hj.
-  destruct Hj as (Hj1, Hj2).
-  apply Nat.eqb_eq in Hj2.
-  rewrite Nat.sub_0_r in Hj2.
+  destruct Hj as (Hjl & Hij & Hj).
+  apply Nat.eqb_eq in Hj.
+  rewrite Nat.sub_0_r in Hj.
   destruct Hp as (Hp1, Hp2).
-  destruct (lt_dec j (length (a :: l))) as [Hjal| Hjal]. {
-    specialize (Hp2 (S i) j).
-    assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
-    specialize (Hp2 H Hjal); clear H.
-    rewrite List_nth_succ_cons in Hp2.
-    now specialize (Hp2 Hj2).
-  }
-  apply Nat.nlt_ge in Hjal.
-  rewrite (@nth_overflow _ _ j) in Hj2; [ | easy ].
-  specialize (Hj1 0).
-  assert (H : 0 ≤ 0 < j) by (cbn in Hjal; flia Hjal).
-  specialize (Hj1 H); clear H.
-  cbn in Hj1.
-  apply Nat.eqb_neq in Hj1.
+  specialize (Hp2 (S i) j).
+  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
+  specialize (Hp2 H Hjl); clear H.
+  rewrite List_nth_succ_cons in Hp2.
+  now specialize (Hp2 Hj).
+}
 ...
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
