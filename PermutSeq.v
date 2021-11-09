@@ -201,7 +201,7 @@ Compute (let n := 4 in map (canon_sym_gr_list n) (seq 0 n!)).
 Compute (let n := 3 in ((*canon_sym_gr n,*) canon_sym_gr_vect n)).
 *)
 
-Definition is_sym_gr n (vv : vector (vector nat)) :=
+Definition is_sym_gr_vect n (vv : vector (vector nat)) :=
   (∀ i, i < vect_size vv →
    vect_size (vect_el empty_vect vv i) = n ∧
    is_permut_vect (vect_el empty_vect vv i)) ∧
@@ -422,7 +422,7 @@ Qed.
 
 Theorem rank_of_permut_in_sym_gr_lt : ∀ n sg v,
   n ≠ 0
-  → is_sym_gr n sg
+  → is_sym_gr_vect n sg
   → rank_of_permut_in_sym_gr sg v < vect_size sg.
 Proof.
 intros * Hnz Hsg.
@@ -457,7 +457,7 @@ now rewrite Hs in H1.
 Qed.
 
 Theorem vect_el_rank_of_permut_in_sym_gr : ∀ sg v n,
-  is_sym_gr n sg
+  is_sym_gr_vect n sg
   → is_permut_vect v
   → vect_size v = n
   → vect_el empty_vect sg (rank_of_permut_in_sym_gr sg v) = v.
@@ -484,7 +484,7 @@ Qed.
 
 Theorem rank_of_permut_in_sym_gr_vect_el : ∀ n sg i,
   n ≠ 0
-  → is_sym_gr n sg
+  → is_sym_gr_vect n sg
   → i < vect_size sg
   → rank_of_permut_in_sym_gr sg (vect_el empty_vect sg i) = i.
 Proof.
@@ -511,7 +511,7 @@ now apply vect_eqb_neq in H1.
 Qed.
 
 Theorem vect_size_of_empty_sym_gr : ∀ sg,
-  is_sym_gr 0 sg → vect_size sg = 1.
+  is_sym_gr_vect 0 sg → vect_size sg = 1.
 Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
@@ -1078,7 +1078,7 @@ apply canon_sym_gr_sub_canon_permut_list.
 Qed.
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
-  is_sym_gr n sg
+  is_sym_gr_vect n sg
   → ∀ k : fin_t n!,
       (rank_of_permut_in_sym_gr sg
          (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)) <?
@@ -1105,7 +1105,7 @@ now apply rank_of_permut_in_sym_gr_lt with (n := n).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
-  is_sym_gr n sg
+  is_sym_gr_vect n sg
   → ∀ k : fin_t (vect_size sg),
       (rank_of_permut_in_canon_sym_gr_vect n
          (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
@@ -1119,21 +1119,21 @@ now apply rank_of_canon_permut_ub; apply Hsg.
 Qed.
 
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
-    (Hsg : is_sym_gr n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
   exist (λ a : nat, (a <? vect_size sg) = true)
     (rank_of_permut_in_sym_gr sg
       (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
-    (Hsg : is_sym_gr n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
+    (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
   exist (λ a : nat, (a <? n!) = true)
     (rank_of_permut_in_canon_sym_gr_vect n
        (vect_el empty_vect sg (proj1_sig k)))
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr n sg) k,
+    (Hsg : is_sym_gr_vect n sg) k,
   rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
@@ -1198,7 +1198,7 @@ apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr n sg) k,
+    (Hsg : is_sym_gr_vect n sg) k,
   rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg
     (rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg k) = k.
 Proof.
@@ -1234,7 +1234,7 @@ exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem sym_gr_size : ∀ n sg, is_sym_gr n sg → vect_size sg = n!.
+Theorem sym_gr_size : ∀ n sg, is_sym_gr_vect n sg → vect_size sg = n!.
 Proof.
 intros * Hsg.
 apply (bijective_fin_t _ _ (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg)).
@@ -1252,7 +1252,7 @@ Qed.
 
 Record sym_gr_vect n :=
   { sg_vect : vector (vector nat);
-    sg_prop : is_sym_gr n sg_vect }.
+    sg_prop : is_sym_gr_vect n sg_vect }.
 
 (*
 Theorem canon_is_permut_vect : ∀ n k,
@@ -1295,7 +1295,7 @@ Theorem vect_el_mk_vect : ∀ A i d (l : list A),
   vect_el d (mk_vect l) i = nth i l d.
 Proof. easy. Qed.
 
-Theorem canon_sym_gr_is_sym_gr : ∀ n, is_sym_gr n (canon_sym_gr_vect n).
+Theorem canon_sym_gr_is_sym_gr_vect : ∀ n, is_sym_gr_vect n (canon_sym_gr_vect n).
 Proof.
 intros.
 split. {
@@ -1344,27 +1344,31 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem rank_of_permut_injective : ∀ n f g,
-  is_permut_fun f n
-  → is_permut_fun g n
-  → rank_of_permut_in_canon_sym_gr n f = rank_of_permut_in_canon_sym_gr n g
-  → ∀ i, i < n → f i = g i.
+Theorem rank_of_permut_in_canon_gr_list_inj : ∀ n la lb,
+  is_permut_list la
+  → is_permut_list lb
+  → length la = n
+  → length lb = n
+  → rank_of_permut_in_canon_sym_gr_list n la =
+    rank_of_permut_in_canon_sym_gr_list n lb
+  → la = lb.
 Proof.
-intros * Hσ₁ Hσ₂ Hσσ i Hi.
-apply (f_equal (canon_sym_gr_elem n)) in Hσσ.
-apply (f_equal (λ f, f i)) in Hσσ.
-rewrite permut_in_canon_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
-rewrite permut_in_canon_sym_gr_of_its_rank in Hσσ; [ | easy | easy ].
+intros * Hla Hlb Han Hbn Hrr.
+apply (f_equal (canon_sym_gr_list n)) in Hrr.
+rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
+rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
 
 Theorem canon_sym_gr_vect_prop : ∀ n,
-  is_sym_gr n (canon_sym_gr n).
+  is_sym_gr_vect n (canon_sym_gr_vect n).
 Proof.
+intros.
+Print canon_sym_gr_vect.
+Search canon_sym_gr_list_list.
+Search (is_sym_gr_vect _ (canon_sym_gr_vect _)).
+...
+
 intros.
 split. {
   now cbn; rewrite map_length, seq_length.
