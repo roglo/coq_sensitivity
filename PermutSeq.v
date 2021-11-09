@@ -973,45 +973,41 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   destruct k as (k, pk); cbn.
   apply Nat.ltb_lt, Nat.lt_1_r in pk; subst k.
-...
-  specialize (vect_size_of_empty_sym_gr Hsg) as Hs.
-  destruct sg as (lv); cbn in Hs.
-  destruct lv as [| v]; [ easy | ].
-  destruct lv; [ clear Hs | easy ].
+  specialize (length_of_empty_sym_gr Hsg) as Hs.
+  destruct sg as [| v]; [ easy | ].
+  destruct sg; [ clear Hs | easy ].
   destruct Hsg as (Hsg & _ & _).
   specialize (Hsg 0 Nat.lt_0_1); cbn in Hsg.
   destruct Hsg as (H1, H2).
-  destruct v as (l); cbn in H1 |-*.
-  apply length_zero_iff_nil in H1; subst l.
+  apply length_zero_iff_nil in H1; subst v.
   apply Nat.lt_0_1.
 }
 now apply rank_of_permut_in_sym_gr_lt with (n := n).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
-  is_sym_gr_vect n sg
-  → ∀ k : fin_t (vect_size sg),
-      (rank_of_permut_in_canon_sym_gr_vect n
-         (vect_el empty_vect sg (proj1_sig k)) <? n!) = true.
+  is_sym_gr_list n sg
+  → ∀ k : fin_t (length sg),
+      (rank_of_permut_in_canon_sym_gr_list n (nth (proj1_sig k) sg []) <? n!)
+      = true.
 Proof.
 intros * Hsg k.
 destruct Hsg as (Hsg & Hinj & Hsurj).
 apply Nat.ltb_lt.
 destruct k as (k, pk); cbn.
 apply Nat.ltb_lt in pk.
-rewrite map_length, fold_vect_size in Hsg.
 specialize (Hsg k pk).
-rewrite (List_map_nth' empty_vect) in Hsg; [ | easy ].
-rewrite fold_vect_el in Hsg.
 now apply rank_of_canon_permut_ub.
 Qed.
 
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
-    (Hsg : is_sym_gr_vect n sg) (k : fin_t n!) : fin_t (vect_size sg) :=
-  exist (λ a : nat, (a <? vect_size sg) = true)
+    (Hsg : is_sym_gr_list n sg) (k : fin_t n!) : fin_t (length sg) :=
+  exist (λ a : nat, (a <? length sg) = true)
     (rank_of_permut_in_sym_gr sg
-      (vect_el empty_vect (canon_sym_gr_vect n) (proj1_sig k)))
+      (nth (proj1_sig k) (canon_sym_gr_list_list n) []))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
+
+...
 
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
