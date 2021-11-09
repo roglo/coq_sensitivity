@@ -33,7 +33,7 @@ Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 
 Definition ε n (p : list nat) :=
   ((∏ (i = 1, n), ∏ (j = 1, n),
-    δ i j (nth (i - 1)%nat p 0%nat) (nth (j - 1)%nat p 0%nat)) /
+    δ i j (nth (i - 1) p 0)%nat (nth (j - 1) p 0)%nat) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
 Definition minus_one_pow n :=
@@ -99,11 +99,18 @@ Fixpoint ε_permut n k :=
 Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 Definition abs_diff u v := if v <? u then u - v else v - u.
 
+(*
 Definition ε_fun_ws f n :=
   (∏ (i = 1, n), ∏ (j = 1, n),
    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
 Definition ε_ws n (p : list nat) := ε_fun_ws (λ i, nth i p 0) n.
+*)
+
+Definition ε_ws n (p : list nat) :=
+  (∏ (i = 1, n), ∏ (j = 1, n),
+   if i <? j then sign_diff (nth (j - 1) p 0)%nat (nth (i - 1) p 0)%nat
+   else 1)%F.
 
 (* equality of both definitions of ε: ε and ε_ws *)
 
@@ -592,8 +599,7 @@ now apply product_product_if_permut_div.
 Qed.
 *)
 
-(*
-Theorem ε_ws_ε_fun :
+Theorem ε_ws_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -601,12 +607,19 @@ Theorem ε_ws_ε_fun :
   rngl_is_integral = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ σ n,
-  is_permut_list σ
-  → length σ = n
-  → ε_fun σ n = ε_fun_ws σ n.
+  ∀ n (p : list nat),
+  is_permut_list p
+  → length p = n
+  → ε n p = ε_ws n p.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hp.
+intros Hic Hop Hin H10 Hit Hde Hch * Hp Hpn.
+unfold ε, ε_ws, δ.
+do 3 rewrite rngl_product_product_if.
+rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+...
+intros Hic Hop Hin H10 Hit Hde Hch * Hp Hpn.
 unfold ε_fun, ε_fun_ws, δ.
 rewrite rngl_product_product_if.
 rewrite rngl_product_product_if.
