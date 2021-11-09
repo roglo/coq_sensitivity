@@ -769,6 +769,9 @@ rewrite rngl_product_change_var with
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1.
+rewrite <- Hpn.
+rewrite <- List_map_nth_seq.
+rewrite Hpn.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_var with
@@ -779,33 +782,33 @@ erewrite rngl_product_list_eq_compat. 2: {
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1, Nat.sub_0_r.
-...
+  rewrite <- Hpn at 1.
+  rewrite <- List_map_nth_seq.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (u & Hu & Hui).
+  rewrite Hpn in Hu.
+  replace (nth (nth i _ _) _ 0) with i. 2: {
+    symmetry.
+    rewrite <- Hui at 1.
+    now rewrite (@nth_nth_permut_list_inv n).
+  }
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
-    apply in_map_iff in Hj.
-    destruct Hj as (k & Hk & Hsk).
-    apply in_seq in Hsk.
-    rewrite fun_permut_fun_inv_loop; [ | easy | ]. 2: {
-      destruct Hp as (Hp1, Hp2).
-      rewrite <- Hk.
-      apply Hp1.
-      flia Hsk Hi Hnz.
-    }
-    apply in_map_iff in Hi.
-    destruct Hi as (l & Hl & Hsl).
-    apply in_seq in Hsl.
-    rewrite fun_permut_fun_inv_loop; [ | easy | ]. 2: {
-      destruct Hp as (Hp1, Hp2).
-      rewrite <- Hl.
-      apply Hp1.
-      easy.
+    apply (In_nth _ _ 0) in Hj.
+    destruct Hj as (v & Hv & Hvi).
+    rewrite Hpn in Hv.
+    replace (nth (nth j _ _) _ 0) with j. 2: {
+      symmetry.
+      rewrite <- Hvi at 1.
+      now rewrite (@nth_nth_permut_list_inv n).
     }
     easy.
   }
-  cbn - [ "-" "<?" ].
+  cbn - [ "<?" ].
   easy.
 }
-cbn - [ "-" "<?" ].
+cbn - [ "<?" ].
+...
 rewrite Nat.sub_0_r.
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
   now apply permut_fun_Permutation.
