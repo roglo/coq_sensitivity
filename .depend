@@ -16,8 +16,8 @@ Lemma_2_1.vio: Lemma_2_1.v Misc.vio MyVector.vio Matrix.vio Determinant.vio Ring
 Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo MyVector.vo Matrix.vo Determinant.vo RingLike.vo IterAdd.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio MyVector.vio Matrix.vio IterAdd.vio
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo MyVector.vo Matrix.vo IterAdd.vo
-Matrix.vio: Matrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio MyVector.vio
-Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo MyVector.vo
+Matrix.vio: Matrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio MyVector.vio Signature.vio
+Matrix.vo Matrix.glob Matrix.v.beautified Matrix.required_vo: Matrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo MyVector.vo Signature.vo
 Misc.vio: Misc.v 
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 MyVector.vio: MyVector.v Misc.vio RingLike.vio IterAdd.vio

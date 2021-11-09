@@ -1697,4 +1697,3 @@ destruct (permut_fun_without_last Hp Hi) as (g & Hpg & Hg).
 rewrite Hg.
 now apply IHn.
 Qed.
-*)

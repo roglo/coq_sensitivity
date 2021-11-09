@@ -9,7 +9,7 @@ Require Import Init.Nat.
 
 Require Import Misc.
 Require Import RingLike IterAdd IterMul IterAnd.
-Require Import MyVector.
+Require Import MyVector Signature.
 
 Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
   match nth_error ll i with
