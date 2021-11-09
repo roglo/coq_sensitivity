@@ -7,7 +7,7 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike.
+Require Import Misc (*RingLike*).
 Require Import IterMul IterAnd.
 Require Import Pigeonhole.
 
@@ -30,8 +30,10 @@ Notation "'Comp' ( i ∈ l ) , g" :=
 Section a.
 
 Context {T : Type}.
+(*
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
+*)
 
 (* Permutations of {0, 1, 2, ... n-1} *)
 
@@ -1007,17 +1009,14 @@ Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
       (nth (proj1_sig k) (canon_sym_gr_list_list n) []))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
-...
-
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
-    (Hsg : is_sym_gr_vect n sg) (k : fin_t (vect_size sg)) : fin_t n! :=
+    (Hsg : is_sym_gr_list n sg) (k : fin_t (length sg)) : fin_t n! :=
   exist (λ a : nat, (a <? n!) = true)
-    (rank_of_permut_in_canon_sym_gr_vect n
-       (vect_el empty_vect sg (proj1_sig k)))
+    (rank_of_permut_in_canon_sym_gr_list n (nth (proj1_sig k) sg []))
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
-    (Hsg : is_sym_gr_vect n sg) k,
+    (Hsg : is_sym_gr_list n sg) k,
   rank_in_sym_gr_of_rank_in_canon_sym_gr Hsg
     (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg k) = k.
 Proof.
@@ -1026,21 +1025,18 @@ destruct k as (k, pk); cbn - [ "<?" ].
 apply eq_exist_uncurried.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
-  specialize (vect_size_of_empty_sym_gr Hsg) as Hs.
+  specialize (length_of_empty_sym_gr Hsg) as Hs.
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hk.
   rewrite Hs in Hk.
   apply Nat.lt_1_r in Hk; subst k.
-  assert (p : rank_of_permut_in_sym_gr sg {| vect_list := [] |} = 0). {
-    unfold rank_of_permut_in_sym_gr, unsome, vect_eqb; cbn.
-    destruct sg as (lv); cbn in Hs |-*.
-    destruct lv as [| v]; [ easy | ].
-    destruct lv; [ cbn | easy ].
-    cbn in Hsg.
+  assert (p : rank_of_permut_in_sym_gr sg [] = 0). {
+    unfold rank_of_permut_in_sym_gr, unsome; cbn.
+    destruct sg as [| v]; [ easy | ].
+    destruct sg; [ cbn | easy ].
     destruct Hsg as (Hsg & _ & _).
     specialize (Hsg 0 Nat.lt_0_1); cbn in Hsg.
     destruct Hsg as (H1, H2).
-    destruct v as (l); cbn in H1 |-*.
-    now apply length_zero_iff_nil in H1; subst l.
+    now apply length_zero_iff_nil in H1; subst v.
   }
   exists p.
   apply (Eqdep_dec.UIP_dec Bool.bool_dec).
@@ -1048,22 +1044,15 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 assert
   (p :
    rank_of_permut_in_sym_gr sg
-     (vect_el empty_vect (canon_sym_gr_vect n)
+     (nth
         (proj1_sig
-           (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg (exist _ k pk)))) =
+           (rank_in_canon_sym_gr_of_rank_in_sym_gr Hsg (exist _ k pk)))
+        (canon_sym_gr_list_list n) []) =
     k). {
   cbn.
   apply Nat.ltb_lt in pk.
-  unfold rank_of_permut_in_canon_sym_gr_vect.
   destruct Hsg as (Hsg & Hinj & Hsurj).
-  rewrite map_length, fold_vect_size in Hsg, Hinj.
   specialize (Hsg k pk) as H1.
-  rewrite (List_map_nth' empty_vect) in H1; [ | easy ].
-  rewrite fold_vect_el in H1.
-  rewrite (List_map_nth' []). 2: {
-    rewrite length_canon_sym_gr_list_list.
-    now apply rank_of_canon_permut_ub.
-  }
   unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
@@ -1072,14 +1061,13 @@ assert
   rewrite seq_nth; [ | now apply rank_of_canon_permut_ub ].
   rewrite Nat.add_0_l.
   rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy | easy ].
-  rewrite mk_vect_vect_list.
-  apply rank_of_permut_in_sym_gr_vect_el with (n := n); [ easy | | easy ].
-  unfold is_sym_gr_vect, is_sym_gr_list.
-  now rewrite map_length, fold_vect_size.
+  now apply rank_of_permut_in_sym_gr_list_el with (n := n).
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
+
+...
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_of_its_inverse : ∀ n sg
     (Hsg : is_sym_gr_vect n sg) k,
