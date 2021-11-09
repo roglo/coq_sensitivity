@@ -9,7 +9,7 @@ Require Import Permutation.
 *)
 Import List List.ListNotations.
 
-Require Import (*Misc*) RingLike.
+Require Import Misc RingLike.
 Require Import IterMul (*IterAnd*).
 (*
 Require Import Pigeonhole.
@@ -30,9 +30,56 @@ Definition ε_fun f n :=
 
 Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 
-(* signature of the k-th permutation of the symmetric group *)
+Definition minus_one_pow n :=
+  match n mod 2 with
+  | 0 => 1%F
+  | _ => (- 1%F)%F
+  end.
 
-... minus_one_pow est actuellement dans MyVector.v
+Theorem minus_one_pow_succ :
+  rngl_has_opp = true →
+  ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.
+Proof.
+intros Hop *.
+unfold minus_one_pow.
+remember (i mod 2) as k eqn:Hk; symmetry in Hk.
+destruct k. {
+  apply Nat.mod_divides in Hk; [ | easy ].
+  destruct Hk as (k, Hk); subst i.
+  rewrite <- Nat.add_1_l, Nat.mul_comm.
+  now rewrite Nat.mod_add.
+}
+destruct k. {
+  rewrite <- Nat.add_1_l.
+  rewrite <- Nat.add_mod_idemp_r; [ | easy ].
+  rewrite Hk; cbn.
+  symmetry.
+  now apply rngl_opp_involutive.
+}
+specialize (Nat.mod_upper_bound i 2) as H1.
+assert (H : 2 ≠ 0) by easy.
+specialize (H1 H); clear H.
+rewrite Hk in H1.
+flia H1.
+Qed.
+
+Theorem minus_one_pow_add_r :
+  rngl_has_opp = true →
+  ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%F.
+Proof.
+intros Hop *.
+revert j.
+induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
+rewrite Nat.add_succ_comm.
+rewrite IHi.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_mul_opp_l; [ | easy ].
+rewrite rngl_mul_opp_r; [ | easy ].
+easy.
+Qed.
+
+(* signature of the k-th permutation of the symmetric group *)
 
 Fixpoint ε_permut n k :=
   match n with
@@ -50,7 +97,7 @@ Definition ε_fun_ws f n :=
   (∏ (i = 1, n), ∏ (j = 1, n),
    if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
 
-Definition ε_ws n (p : vector nat) := ε_fun_ws (vect_el 0 p) n.
+Definition ε_ws n (p : list nat) := ε_fun_ws (λ i, nth i p 0) n.
 
 (* equality of both definitions of ε: ε and ε_ws *)
 
@@ -2922,3 +2969,7 @@ Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
 Arguments ε_square {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
 *)
+
+Arguments minus_one_pow {T}%type {ro} n%nat.
+Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
+Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
