@@ -281,10 +281,6 @@ specialize (H1 H); clear H.
 now rewrite Nat.eqb_refl in H1.
 Qed.
 
-Inspect 1.
-
-...
-
 (* transposition *)
 
 Definition transposition i j k :=
@@ -478,7 +474,7 @@ unfold rank_of_permut_in_sym_gr, unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   apply List_find_nth_Some with (d := []) in Hi.
-  destruct Hi as (Hji, Hi).
+  destruct Hi as (His & Hji & Hi).
   now apply list_eqb_eq in Hi.
 }
 assert (H : l ∉ sg). {
@@ -504,7 +500,7 @@ unfold rank_of_permut_in_sym_gr, unsome.
 remember (List_find_nth _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
   apply List_find_nth_Some with (d := []) in Hj.
-  destruct Hj as (Hji, Hj).
+  destruct Hj as (His & Hji & Hj).
   apply list_eqb_eq in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   assert (Hjs : j < length sg). {

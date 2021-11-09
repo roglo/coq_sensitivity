@@ -764,7 +764,7 @@ rewrite rngl_product_change_var with
   (g := λ i, nth i (permut_list_inv p) 0) (h := λ i, nth i p 0). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
-Search permut_list_inv.
+  apply (@nth_nth_permut_list_inv n).
 ...
   rewrite fun_find_prop; [ easy | easy | flia Hi Hnz ].
 }
