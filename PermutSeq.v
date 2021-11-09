@@ -274,38 +274,15 @@ destruct j as [j| ]. {
   rewrite List_nth_succ_cons in Hp2.
   now specialize (Hp2 Hj).
 }
-...
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
-  exfalso.
-  destruct Hp as (Hp1, Hp2).
-  specialize (Hp2 0 (S i) (Nat.lt_0_succ _)).
-  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
-  specialize (Hp2 H); clear H.
-  cbn in Hp2; symmetry in Hia.
-  now specialize (Hp2 Hia).
-}
-unfold unsome.
-remember (List_find_nth_loop _ _ _) as j eqn:Hj.
-symmetry in Hj.
-destruct j as [j| ]. {
-  apply List_find_nth_loop_Some with (d := 0) in Hj.
-  destruct Hj as (Hj1, Hj2).
-  apply Nat.eqb_eq in Hj2.
-...
-  destruct Hp as (Hp1, Hp2).
-...
-  destruct (lt_dec j (length (a :: l))) as [Hjal| Hjal]. {
-    specialize (Hp2 (S i) j).
-    assert (H : S i < length (a :: l)) by (cbn; flia Hl Hin).
-    specialize (Hp2 H Hjal); clear H.
-    destruct j. {
-      cbn in Hj2.
-...
-Compute (let l := [1;3;7;0] in (map (λ i, (nth (nth i l 0) (permut_list_inv l) 0, i)) (seq 0 (length l)))).
-...
-  destruct i. {
-    destruct a; [ easy | cbn ].
+specialize (List_find_nth_None 0 _ _ Hj) as H1.
+specialize (H1 (S i)).
+assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
+specialize (H1 H); clear H.
+now rewrite Nat.eqb_refl in H1.
+Qed.
+
+Inspect 1.
+
 ...
 
 (* transposition *)
