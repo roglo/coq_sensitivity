@@ -664,6 +664,7 @@ symmetry.
 now rewrite Hij.
 Qed.
 
+(*
 Theorem nth_canon_sym_gr_list_inj2 : ∀ n i j,
   i < n!
   → j < n!
@@ -705,6 +706,7 @@ destruct (le_dec (j / n!) _) as [H2| H2]. {
 }
 destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
+*)
 
 (* rank in canon symmetric group *)
 
@@ -1270,33 +1272,31 @@ rewrite seq_nth; [ | easy ].
 now apply canon_sym_gr_list_is_permut.
 Qed.
 
-...
-
-Theorem canon_sym_gr_elem_injective : ∀ n i j,
+Theorem canon_sym_gr_list_inj : ∀ n i j,
   i < fact n
   → j < fact n
-  → canon_sym_gr_elem n i = canon_sym_gr_elem n j
+  → canon_sym_gr_list n i = canon_sym_gr_list n j
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_canon_sym_gr n)) in Hij.
-Search rank_of_permut_in_canon_sym_gr.
+apply (f_equal (@rank_of_permut_in_canon_sym_gr_list n)) in Hij.
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 easy.
-Qed.
 
-Theorem canon_sym_gr_size : ∀ n, vect_size (canon_sym_gr n) = n!.
+Theorem canon_sym_gr_size : ∀ n, vect_size (canon_sym_gr_vect n) = n!.
 Proof.
 intros; cbn.
-now rewrite map_length, seq_length.
+now rewrite map_length, length_canon_sym_gr_list_list.
 Qed.
 
 Theorem vect_el_mk_vect : ∀ A i d (l : list A),
   vect_el d (mk_vect l) i = nth i l d.
 Proof. easy. Qed.
 
-Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (canon_sym_gr n).
+...
+
+Theorem canon_sym_gr_prop : ∀ n, is_sym_gr n (canon_sym_gr_vect n).
 Proof.
 intros.
 split. {
