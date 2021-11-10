@@ -1686,6 +1686,45 @@ destruct k as [k| ]. {
 subst i; flia Hj.
 Qed.
 
+Theorem permut_list_inv_inj : ∀ l,
+  is_permut_list l
+  → ∀ i j, i < length l → j < length l
+  → nth i (permut_list_inv l) 0 = nth j (permut_list_inv l) 0
+  → i = j.
+Proof.
+intros * Hl * Hi Hj Hij.
+unfold permut_list_inv in Hij.
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+rewrite seq_nth in Hij; [ | easy ].
+rewrite seq_nth in Hij; [ | easy ].
+do 2 rewrite Nat.add_0_l in Hij.
+unfold unsome in Hij.
+remember (List_find_nth (Nat.eqb i) l) as x eqn:Hx.
+remember (List_find_nth (Nat.eqb j) l) as y eqn:Hy.
+move y before x.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  destruct Hx as (Hxl & Hxbef & Hxwhi).
+  apply Nat.eqb_eq in Hxwhi.
+  rewrite Hxwhi.
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some 0) in Hy.
+    destruct Hy as (Hyl & Hybef & Hywhi).
+    apply Nat.eqb_eq in Hywhi.
+    rewrite Hywhi.
+    now destruct Hij.
+  }
+  subst x.
+  clear Hxbef.
+  specialize (List_find_nth_None 0 _ _ Hy) as H1.
+  specialize (H1 i Hi) as H2.
+  apply Nat.eqb_neq in H2.
+  specialize (H1 j Hj) as H3.
+  apply Nat.eqb_neq in H3.
+...
+
 Theorem permut_list_inv_is_permut : ∀ l,
   is_permut_list l
   → is_permut_list (permut_list_inv l).
@@ -1698,6 +1737,8 @@ split. {
 } {
   rewrite length_permut_list_inv.
   intros i j Hi Hj Hij.
+...
+  now apply permut_list_inv_inj in Hij.
 ...
 
 Theorem permut_list_Permutation : ∀ l n,
