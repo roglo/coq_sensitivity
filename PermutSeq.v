@@ -205,12 +205,21 @@ Definition permut_vect_inv (σ : vector nat) :=
 Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
 
-(**)
+Definition permut_list_inv' n l :=
+  map
+    (λ i,
+     let '(x, x') :=
+       pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else nth j l 0)
+     in
+     if Nat.eq_dec x n then x' else x)
+    (seq 0 n).
 
 (*
-Compute (let n := 4 in canon_sym_gr_vect 3).
-Compute (let n := 4 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in (v, permut_vect_inv v)) (seq 0 n!)).
-Compute (let n := 5 in map (λ i, let v := vect_el empty_vect (canon_sym_gr_vect n) i in vect_eqb Nat.eqb (permut_vect_inv v) (permut_vect_inv' v)) (seq 0 n!)).
+Compute (let n := 4 in canon_sym_gr_list n 3).
+Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (v, permut_list_inv v)) (seq 0 n!)).
+Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' n v)) (seq 0 n!)).
+...
+Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
 *)
 
 (* *)
@@ -1725,6 +1734,7 @@ destruct x as [x| ]. {
   specialize (List_find_nth_None 0 _ _ Hy) as H1.
   destruct Hp as (Hp1, Hp2).
 Print is_permut_list.
+Search pigeonhole_fun.
 (* pigeonhole! *)
 ...
   specialize (H1 i Hi) as H2.
