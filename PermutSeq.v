@@ -202,8 +202,10 @@ Definition permut_vect_inv (σ : vector nat) :=
        (seq 0 (vect_size σ))).
 *)
 
+(**)
 Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
+(**)
 
 Definition permut_list_inv' l :=
   let n := length l in
@@ -218,23 +220,14 @@ Definition permut_list_inv' l :=
 (*
 Compute (let n := 4 in canon_sym_gr_list n 3).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (v, permut_list_inv v)) (seq 0 n!)).
-Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
+Compute (let n := 3 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 (n! + 14))).
+Compute (let v := [0;1;1;3] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)).
 ...
 Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
 *)
 
 (* *)
 
-(*
-  Hp1 : ∀ x : nat, x ∈ p → x < length p
-  Hp2 : ∀ i j : nat, i < length p → j < length p → nth i p 0 = nth j p 0 → i = j
-  Hpn : length p = n
-  Hnz : n ≠ 0
-  i : nat
-  Hi : 0 ≤ i ≤ n - 1
-  ============================
-  nth (nth i p 0) (permut_list_inv p) 0 = i
-*)
 Theorem nth_nth_permut_list_inv : ∀ n l i,
   is_permut_list l
   → length l = n
@@ -290,6 +283,38 @@ assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
 specialize (H1 H); clear H.
 now rewrite Nat.eqb_refl in H1.
 Qed.
+
+(* if using pigeonhole by permut_list_inv'
+intros * Hp Hl Hin.
+subst n.
+unfold permut_list_inv.
+assert (Hil : nth i l 0 < length l) by now apply Hp, nth_In.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+apply pigeonhole with (b := length l) in Hxx; [ | flia Hin | ]. 2: {
+  intros j Hj.
+  destruct (Nat.eq_dec j (length l)) as [Hjn| Hjn]. {
+    now subst j; rewrite seq_nth.
+  }
+  apply Hp, nth_In; flia Hj Hjn.
+}
+destruct Hxx as (Hx & Hx' & Hxx & Hexx).
+destruct (Nat.eq_dec x (length l)) as [Hxn| Hxn]. {
+  rewrite seq_nth in Hexx; [ | easy ].
+  destruct (Nat.eq_dec x' (length l)) as [Hx'n| Hx'n]; [ congruence | ].
+  symmetry in Hexx; cbn in Hexx.
+  apply Hp in Hexx; [ easy | flia Hx' Hx'n | easy ].
+} {
+  destruct (Nat.eq_dec x' (length l)) as [Hx'n| Hx'n]. {
+    rewrite seq_nth in Hexx; [ | easy ].
+    apply Hp in Hexx; [ easy | flia Hx Hxn | easy ].
+  }
+  apply Hp in Hexx; [ easy | flia Hx Hxn | flia Hx' Hx'n ].
+}
+Qed.
+*)
 
 (* transposition *)
 
@@ -1681,6 +1706,24 @@ Qed.
 
 Theorem in_permut_list_inv_lt : ∀ l i, i ∈ permut_list_inv l → i < length l.
 Proof.
+(*
+intros * Hi.
+unfold permut_list_inv in Hi.
+apply in_map_iff in Hi.
+destruct Hi as (j & Hji & Hj).
+apply in_seq in Hj.
+remember (pigeonhole_fun _ _) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+...
+apply pigeonhole with (b := length l) in Hxx; [ | flia | ]. 2: {
+  intros k Hk.
+  destruct (Nat.eq_dec k (length l)) as [Hkl| Hkl]; [ easy | ].
+  destruct (Nat.eq_dec x (length l)) as [Hxl| Hxl]. {
+    subst x x'.
+...
+probably needs is_permut_list l as extra hypothesis
+*)
 intros * Hi.
 unfold permut_list_inv in Hi.
 apply in_map_iff in Hi.
