@@ -1692,7 +1692,7 @@ Theorem permut_list_inv_inj : ∀ l,
   → nth i (permut_list_inv l) 0 = nth j (permut_list_inv l) 0
   → i = j.
 Proof.
-intros * Hl * Hi Hj Hij.
+intros * Hp * Hi Hj Hij.
 unfold permut_list_inv in Hij.
 rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
 rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -1718,7 +1718,15 @@ destruct x as [x| ]. {
   }
   subst x.
   clear Hxbef.
+(**)
+  destruct l as [| a]; [ easy | ].
+  clear Hxl.
+  cbn in Hxwhi |-*; subst a.
   specialize (List_find_nth_None 0 _ _ Hy) as H1.
+  destruct Hp as (Hp1, Hp2).
+Print is_permut_list.
+(* pigeonhole! *)
+...
   specialize (H1 i Hi) as H2.
   apply Nat.eqb_neq in H2.
   specialize (H1 j Hj) as H3.
