@@ -212,6 +212,7 @@ Definition permut_list_inv l :=
    "0" and "n-1", I apply the pigeonhole principe with "n+1" pigeons for
    "n+1" holes... *)
 (* but I don't understand what I do; seems to work but I don't know why *)
+(* if x=n then i else l[x] = if x'=n then i else l[x'] *)
 ...
 Definition permut_list_inv' l :=
   map
