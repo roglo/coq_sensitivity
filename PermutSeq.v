@@ -207,15 +207,21 @@ Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
 (**)
 
+(* Computation of the inverse of a permutation by using the pigeonhole
+   principle. I take a list "l" of length "n". For each value i between
+   "0" and "n-1", I apply the pigeonhole principe with "n+1" pigeons for
+   "n+1" holes... *)
+(* but I don't understand what I do; seems to work but I don't know why *)
+...
 Definition permut_list_inv' l :=
-  let n := length l in
   map
     (λ i,
      let '(x, x') :=
-       pigeonhole_fun (S n) (λ j, if Nat.eq_dec j n then i else nth j l 0)
+       pigeonhole_fun (S (length l))
+         (λ j, if Nat.eq_dec j (length l) then i else nth j l 0)
      in
-     if Nat.eq_dec x n then x' else x)
-    (seq 0 n).
+     if Nat.eq_dec x (length l) then x' else x)
+    (seq 0 (length l)).
 
 (*
 Compute (let n := 4 in canon_sym_gr_list n 3).
