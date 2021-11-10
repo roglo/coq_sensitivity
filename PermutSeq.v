@@ -205,7 +205,8 @@ Definition permut_vect_inv (σ : vector nat) :=
 Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
 
-Definition permut_list_inv' n l :=
+Definition permut_list_inv' l :=
+  let n := length l in
   map
     (λ i,
      let '(x, x') :=
@@ -217,7 +218,7 @@ Definition permut_list_inv' n l :=
 (*
 Compute (let n := 4 in canon_sym_gr_list n 3).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (v, permut_list_inv v)) (seq 0 n!)).
-Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' n v)) (seq 0 n!)).
+Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
 ...
 Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
 *)
