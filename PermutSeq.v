@@ -1661,12 +1661,73 @@ apply Hp in Hjk; [ flia Hjk | flia Hj | flia Hk ].
 Qed.
 *)
 
+Theorem length_permut_list_inv : ∀ l,
+  length (permut_list_inv l) = length l.
+Proof.
+intros.
+destruct l as [| a]; [ easy | cbn ].
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem in_permut_list_inv_lt : ∀ l i, i ∈ permut_list_inv l → i < length l.
+Proof.
+intros * Hi.
+unfold permut_list_inv in Hi.
+apply in_map_iff in Hi.
+destruct Hi as (j & Hji & Hj).
+apply in_seq in Hj.
+unfold unsome in Hji.
+remember (List_find_nth _ _) as k eqn:Hk.
+symmetry in Hk.
+destruct k as [k| ]. {
+  subst k.
+  now apply (List_find_nth_Some 0) in Hk.
+}
+subst i; flia Hj.
+Qed.
+
+Theorem permut_list_inv_is_permut : ∀ l,
+  is_permut_list l
+  → is_permut_list (permut_list_inv l).
+Proof.
+intros * Hl.
+split. {
+  intros i Hi.
+  rewrite length_permut_list_inv.
+  now apply in_permut_list_inv_lt.
+} {
+  rewrite length_permut_list_inv.
+  intros i j Hi Hj Hij.
+...
+
 Theorem permut_list_Permutation : ∀ l n,
   is_permut_list l
   → length l = n
   → Permutation l (seq 0 n).
 Proof.
 intros * Hp Hln.
+symmetry.
+revert l Hp Hln.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hln; subst l.
+}
+rewrite seq_S; cbn.
+remember (nth n (permut_list_inv l) 0) as i eqn:Hi.
+rewrite (List_seq_cut i). 2: {
+  subst i.
+  apply in_seq.
+  split; [ flia | ].
+  specialize permut_list_ub as H1.
+  specialize (H1 (permut_list_inv l) n).
+...
+  specialize (H1 (permut_list_inv_is_permut Hp)).
+...
+  rewrite length_permut_list_inv in H1.
+  rewrite Hln in H1.
+  specialize (H1 (Nat.lt_succ_diag_r _)).
+...
+  apply permut_list_ub; [ | flia ].
+  now apply permut_fun_inv_loop_is_permut.
 ...
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
