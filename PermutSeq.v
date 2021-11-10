@@ -208,12 +208,25 @@ Definition permut_list_inv l :=
 (**)
 
 (* Computation of the inverse of a permutation by using the pigeonhole
-   principle. I take a list "l" of length "n". For each value i between
-   "0" and "n-1", I apply the pigeonhole principe with "n+1" pigeons for
-   "n+1" holes... *)
-(* but I don't understand what I do; seems to work but I don't know why *)
-(* if x=n then i else l[x] = if x'=n then i else l[x'] *)
-...
+   principle. *)
+Fixpoint find_dup' f (la : list nat) :=
+  match la with
+  | [] => 0
+  | n :: la' =>
+      match find (λ n', f n' =? f n) la' with
+      | None => find_dup' f la'
+      | Some _ => n
+      end
+  end.
+
+Definition permut_list_inv' l :=
+  map
+    (λ i,
+     find_dup' (λ j, if Nat.eq_dec j (length l) then i else nth j l 0)
+       (seq 0 (S (length l))))
+   (seq 0 (length l)).
+
+(*
 Definition permut_list_inv' l :=
   map
     (λ i,
@@ -221,17 +234,21 @@ Definition permut_list_inv' l :=
        pigeonhole_fun (S (length l))
          (λ j, if Nat.eq_dec j (length l) then i else nth j l 0)
      in
-     if Nat.eq_dec x (length l) then x' else x)
-    (seq 0 (length l)).
-
+x)
 (*
+     if Nat.eq_dec x (length l) then x' else x)
+*)
+    (seq 0 (length l)).
+*)
+
+(**)
 Compute (let n := 4 in canon_sym_gr_list n 3).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (v, permut_list_inv v)) (seq 0 n!)).
-Compute (let n := 3 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 (n! + 14))).
-Compute (let v := [0;1;1;3] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)).
-...
-Compute (let n := 5 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 n!)).
+Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (permut_list_inv v, permut_list_inv' v)) (seq 0 (n! + 14))).
+Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 (n! + 14))).
 *)
+
+...
 
 (* *)
 
