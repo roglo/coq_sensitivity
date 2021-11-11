@@ -208,7 +208,7 @@ Definition permut_list_inv l :=
 (**)
 
 (* Computation of the inverse of a permutation by using the pigeonhole
-   principle. *)
+   principle.
 Fixpoint find_dup' f (la : list nat) :=
   match la with
   | [] => 0
@@ -219,12 +219,19 @@ Fixpoint find_dup' f (la : list nat) :=
       end
   end.
 
-Definition permut_list_inv' l :=
+Definition permut_list_inv'' l :=
   map
     (λ i,
      find_dup' (λ j, if Nat.eq_dec j (length l) then i else nth j l 0)
        (seq 0 (S (length l))))
    (seq 0 (length l)).
+
+Definition permut_list_inv' l :=
+  map
+    (λ i,
+     fst (pigeonhole_fun (S (length l)) (λ j, nth j (l ++ [i]) 0)))
+    (seq 0 (length l)).
+*)
 
 (*
 Definition permut_list_inv' l :=
@@ -241,14 +248,12 @@ x)
     (seq 0 (length l)).
 *)
 
-(**)
+(*
 Compute (let n := 4 in canon_sym_gr_list n 3).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (v, permut_list_inv v)) (seq 0 n!)).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in (permut_list_inv v, permut_list_inv' v)) (seq 0 (n! + 14))).
 Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] in list_eqb Nat.eqb (permut_list_inv v) (permut_list_inv' v)) (seq 0 (n! + 14))).
 *)
-
-...
 
 (* *)
 
