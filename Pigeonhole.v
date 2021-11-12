@@ -24,6 +24,46 @@ Definition pigeonhole_fun a (f : nat → nat) :=
   | None => (0, 0)
   end.
 
+(**)
+
+Fixpoint find_dup' (l : list nat) (la : list nat) :=
+  match la with
+  | [] => (0, 0)
+  | n :: la' =>
+      match find (λ n', nth n' l 0 =? nth n l 0) la' with
+      | None => find_dup' l la'
+      | Some n' => (n, n')
+      end
+  end.
+
+Definition pigeonhole_list' (l : list nat) :=
+  find_dup' l (seq 0 (length l)).
+
+Check List_find_nth.
+
+Fixpoint find_dup'' i (l : list nat) :=
+  match l with
+  | a :: l' =>
+      match List_find_nth (Nat.eqb a) l' with
+      | Some j => (i, i + j + 1)
+      | None => find_dup'' (S i) l'
+      end
+  | [] => (0, 0)
+  end.
+
+Definition pigeonhole_list'' := find_dup'' 0.
+
+Compute (let l := [3;4;1;4] in (pigeonhole_list' l, pigeonhole_list'' l)).
+Compute (let l := [7;4;1;7;7;2] in (pigeonhole_list' l, pigeonhole_list'' l)).
+
+Theorem pigeonhole' : ∀ n l,
+  n < length l
+  → (∀ x, x ∈ l → x < n)
+  → ∀ x x', pigeonhole_list' l = (x, x')
+  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+Proof.
+...
+
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
