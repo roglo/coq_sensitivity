@@ -82,6 +82,8 @@ Proof.
 intros * Hnl Hn * Hxx.
 revert starting_hole Hxx.
 induction hole_of_pigeon as [| hole]; intros; [ easy | ].
+destruct starting_hole. 2: {
+  specialize (IHhole_of_pigeon
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
