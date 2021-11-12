@@ -102,6 +102,8 @@ destruct (lt_dec x x') as [H1| H1]. {
   split; [ easy | ].
   split; [ easy | ].
   split; [ flia H1 | ].
+  specialize (Hn a (or_introl eq_refl)) as H3.
+  specialize (Hn 0) as H4.
 ...
 
 Theorem find_dup_some : ∀ f x x' la,
