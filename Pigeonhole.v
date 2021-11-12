@@ -26,64 +26,80 @@ Definition pigeonhole_fun a (f : nat → nat) :=
 
 (**)
 
-Fixpoint find_two_pigeons starting_hole (hole_of_pigeon : list nat) :=
-  match hole_of_pigeon with
-  | hole :: holes =>
-      match List_find_nth (Nat.eqb hole) holes with
-      | Some j => (starting_hole, starting_hole + j + 1)
-      | None => find_two_pigeons (S starting_hole) holes
+Fixpoint search_double_loop {A} eqb i (l : list A) :=
+  match l with
+  | a :: l' =>
+      match List_find_nth (eqb a) l' with
+      | Some j => (i, j + 1)
+      | None => search_double_loop eqb (S i) l'
       end
   | [] => (0, 0)
   end.
 
-Definition search_two_pigeons_sharing_hole hole_of_pigeon :=
-  find_two_pigeons 0 hole_of_pigeon.
+(* from the list "l", return a couple of nat "(i, j)" where
+   * j = 0, if there is no double value in "l"
+   * j = S _, if the i-th value and the (i+j)-th value are equal *)
+Definition List_search_double {A} eqb l := @search_double_loop A eqb 0 l.
 
 (**)
-Compute (let l := [3;4;1;4] in (search_two_pigeons_sharing_hole l)).
-Compute (let l := [7;4;1;7;7;2] in (search_two_pigeons_sharing_hole l)).
+Compute (let l := [3;4;1;4] in (List_search_double Nat.eqb l)).
+Compute (let l := [7;4;1;7;7;2] in (List_search_double Nat.eqb l)).
 (**)
 
-Theorem find_two_pigeons_lt : ∀ i l x x',
-  find_two_pigeons i l = (x, x') → l = [] ∨ (x < i + length l ∧ x' < i + length l).
+Theorem search_double_loop_lt : ∀ l i j k,
+  search_double_loop Nat.eqb i l = (j, k)
+  → k = 0 ∨ j  + k < i + length l.
 Proof.
 intros * Hxx.
-revert i x x' Hxx.
-induction l as [| a]; intros; [ now left | ].
-cbn in Hxx; right.
-remember (List_find_nth (Nat.eqb a) l) as j eqn:Hj.
-symmetry in Hj.
-destruct j as [j| ]; cbn. {
-  injection Hxx; clear Hxx; intros; subst x x'.
-  split; [ flia | ].
-  apply (List_find_nth_Some 0) in Hj.
-  flia Hj.
+revert i j k Hxx.
+induction l as [| a]; cbn; intros. {
+  now left; injection Hxx; clear Hxx; intros; subst j k.
 }
-specialize (IHl _ _ _ Hxx).
-destruct IHl as [IHl| IHl]. {
-  subst l.
-  cbn in Hxx |-*.
-  injection Hxx; clear Hxx; intros; subst x x'; flia.
+rewrite <- Nat.add_succ_comm.
+remember (List_find_nth _ _) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]. {
+  right.
+  injection Hxx; clear Hxx; intros; subst j k.
+  apply (List_find_nth_Some 0) in Hb.
+  flia Hb.
 }
-now rewrite Nat.add_succ_comm in IHl.
+apply (IHl (S i) j k Hxx).
 Qed.
 
-Theorem pigeonhole_from : ∀ starting_hole nb_of_holes hole_of_pigeon,
-  nb_of_holes < length hole_of_pigeon
-  → (∀ hole : nat, hole ∈ hole_of_pigeon → hole < nb_of_holes)
-  → ∀ pigeon_1 pigeon_2,
-    find_two_pigeons starting_hole hole_of_pigeon = (pigeon_1, pigeon_2)
-  → pigeon_1 - starting_hole < length hole_of_pigeon ∧
-    pigeon_2 - starting_hole < length hole_of_pigeon ∧
-    pigeon_1 ≠ pigeon_2 ∧
-    nth (pigeon_1 - starting_hole) hole_of_pigeon 0 =
-    nth (pigeon_2 - starting_hole) hole_of_pigeon 0.
+(* "a" = #holes, "l" = list representing #pigeon → #hole *)
+Theorem pigeonhole_from : ∀ i a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → ∀ p dp,
+    search_double_loop Nat.eqb i l = (p, dp)
+  → i ≤ p ∧ p + dp < i + length l ∧ dp ≠ 0 ∧
+    nth (p - i) l 0 = nth (p + dp - i) l 0.
 Proof.
 intros * Hnl Hn * Hxx.
-revert starting_hole Hxx.
-induction hole_of_pigeon as [| hole]; intros; [ easy | ].
-destruct starting_hole. 2: {
-  specialize (IHhole_of_pigeon
+destruct dp. {
+  admit.
+}
+revert a i Hnl Hn Hxx.
+induction l as [| x]; intros; [ easy | ].
+cbn in Hxx.
+remember (List_find_nth _ _) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]. {
+  apply (List_find_nth_Some 0) in Hb.
+  destruct Hb as (Hb & Hbef & Heq).
+  apply Nat.eqb_eq in Heq.
+  rewrite Nat.add_1_r in Hxx.
+  injection Hxx; clear Hxx; intros; subst p dp.
+  split; [ easy | ].
+  split. {
+    apply Nat.add_lt_mono_l; cbn.
+    now apply -> Nat.succ_lt_mono.
+  }
+  split; [ easy | ].
+  now rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
+}
+specialize (List_find_nth_None 0 _ _ Hb) as H1.
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
