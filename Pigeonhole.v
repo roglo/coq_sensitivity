@@ -26,25 +26,26 @@ Definition pigeonhole_fun a (f : nat → nat) :=
 
 (**)
 
-Fixpoint find_dup' i (l : list nat) :=
-  match l with
-  | a :: l' =>
-      match List_find_nth (Nat.eqb a) l' with
-      | Some j => (i, i + j + 1)
-      | None => find_dup' (S i) l'
+Fixpoint find_two_pigeons starting_hole (hole_of_pigeon : list nat) :=
+  match hole_of_pigeon with
+  | hole :: holes =>
+      match List_find_nth (Nat.eqb hole) holes with
+      | Some j => (starting_hole, starting_hole + j + 1)
+      | None => find_two_pigeons (S starting_hole) holes
       end
   | [] => (0, 0)
   end.
 
-Definition pigeonhole_list' := find_dup' 0.
+Definition search_two_pigeons_sharing_hole hole_of_pigeon :=
+  find_two_pigeons 0 hole_of_pigeon.
 
-(*
-Compute (let l := [3;4;1;4] in (pigeonhole_list' l)).
-Compute (let l := [7;4;1;7;7;2] in (pigeonhole_list' l)).
-*)
+(**)
+Compute (let l := [3;4;1;4] in (search_two_pigeons_sharing_hole l)).
+Compute (let l := [7;4;1;7;7;2] in (search_two_pigeons_sharing_hole l)).
+(**)
 
-Theorem find_dup'_lt : ∀ i l x x',
-  find_dup' i l = (x, x') → l = [] ∨ (x < i + length l ∧ x' < i + length l).
+Theorem find_two_pigeons_lt : ∀ i l x x',
+  find_two_pigeons i l = (x, x') → l = [] ∨ (x < i + length l ∧ x' < i + length l).
 Proof.
 intros * Hxx.
 revert i x x' Hxx.
@@ -67,14 +68,34 @@ destruct IHl as [IHl| IHl]. {
 now rewrite Nat.add_succ_comm in IHl.
 Qed.
 
-Theorem pigeonhole' : ∀ n l,
-  n < length l
-  → (∀ x, x ∈ l → x < n)
-  → ∀ x x', pigeonhole_list' l = (x, x')
-  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+Theorem pigeonhole_from : ∀ starting_hole nb_of_holes hole_of_pigeon,
+  nb_of_holes < length hole_of_pigeon
+  → (∀ hole : nat, hole ∈ hole_of_pigeon → hole < nb_of_holes)
+  → ∀ pigeon_1 pigeon_2,
+    find_two_pigeons starting_hole hole_of_pigeon = (pigeon_1, pigeon_2)
+  → pigeon_1 - starting_hole < length hole_of_pigeon ∧
+    pigeon_2 - starting_hole < length hole_of_pigeon ∧
+    pigeon_1 ≠ pigeon_2 ∧
+    nth (pigeon_1 - starting_hole) hole_of_pigeon 0 =
+    nth (pigeon_2 - starting_hole) hole_of_pigeon 0.
 Proof.
 intros * Hnl Hn * Hxx.
-unfold pigeonhole_list' in Hxx.
+revert starting_hole Hxx.
+induction hole_of_pigeon as [| hole]; intros; [ easy | ].
+...
+
+Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
+  nb_of_holes < length hole_of_pigeon
+  → (∀ hole, hole ∈ hole_of_pigeon → hole < nb_of_holes)
+  → ∀ pigeon_1 pigeon_2,
+    search_two_pigeons_sharing_hole hole_of_pigeon = (pigeon_1, pigeon_2)
+  → pigeon_1 < length hole_of_pigeon ∧ pigeon_2 < length hole_of_pigeon ∧
+    pigeon_1 ≠ pigeon_2 ∧
+    nth pigeon_1 hole_of_pigeon 0 = nth pigeon_2 hole_of_pigeon 0.
+Proof.
+intros * Hnl Hn * Hxx.
+unfold search_two_pigeons_sharing_hole in Hxx.
+...
 destruct (lt_dec x x') as [H1| H1]. {
   revert x x' n Hnl Hn Hxx H1.
   induction l as [| a]; intros; [ easy | ].
