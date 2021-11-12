@@ -38,8 +38,34 @@ Fixpoint find_dup' i (l : list nat) :=
 
 Definition pigeonhole_list' := find_dup' 0.
 
+(*
 Compute (let l := [3;4;1;4] in (pigeonhole_list' l)).
 Compute (let l := [7;4;1;7;7;2] in (pigeonhole_list' l)).
+*)
+
+Theorem find_dup'_lt : ∀ i l x x',
+  find_dup' i l = (x, x') → l = [] ∨ (x < i + length l ∧ x' < i + length l).
+Proof.
+intros * Hxx.
+revert i x x' Hxx.
+induction l as [| a]; intros; [ now left | ].
+cbn in Hxx; right.
+remember (List_find_nth (Nat.eqb a) l) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]; cbn. {
+  injection Hxx; clear Hxx; intros; subst x x'.
+  split; [ flia | ].
+  apply (List_find_nth_Some 0) in Hj.
+  flia Hj.
+}
+specialize (IHl _ _ _ Hxx).
+destruct IHl as [IHl| IHl]. {
+  subst l.
+  cbn in Hxx |-*.
+  injection Hxx; clear Hxx; intros; subst x x'; flia.
+}
+now rewrite Nat.add_succ_comm in IHl.
+Qed.
 
 Theorem pigeonhole' : ∀ n l,
   n < length l
@@ -67,6 +93,15 @@ destruct (lt_dec x x') as [H1| H1]. {
     now rewrite Nat.add_1_r.
   }
   specialize (List_find_nth_None 0 _ _ Hi) as H2.
+  apply find_dup'_lt in Hxx.
+  destruct Hxx as [Hxx| Hxx]. {
+    subst l.
+    apply Nat.lt_1_r in Hnl; subst n.
+    now specialize (Hn a (or_introl eq_refl)).
+  }
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ flia H1 | ].
 ...
 
 Theorem find_dup_some : ∀ f x x' la,
