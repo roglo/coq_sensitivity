@@ -50,6 +50,23 @@ Proof.
 intros * Hnl Hn * Hxx.
 unfold pigeonhole_list' in Hxx.
 destruct (lt_dec x x') as [H1| H1]. {
+  revert x x' n Hnl Hn Hxx H1.
+  induction l as [| a]; intros; [ easy | ].
+  cbn in Hxx.
+  remember (List_find_nth (Nat.eqb a) l) as i eqn:Hi.
+  symmetry in Hi.
+  destruct i as [i| ]. {
+    injection Hxx; clear Hxx; intros; subst x x'; clear H1.
+    apply (List_find_nth_Some 0) in Hi.
+    destruct Hi as (Hi & Hbef & Hwhi).
+    split; [ cbn; flia | ].
+    apply Nat.eqb_eq in Hwhi.
+    split. {
+      now rewrite Nat.add_1_r; cbn; apply -> Nat.succ_lt_mono.
+    }
+    now rewrite Nat.add_1_r.
+  }
+  specialize (List_find_nth_None 0 _ _ Hi) as H2.
 ...
 
 Theorem find_dup_some : ∀ f x x' la,
