@@ -201,7 +201,17 @@ rewrite List_app_cons in Hnd.
 rewrite app_assoc in Hnd.
 apply NoDup_app_remove_r in Hnd.
 apply NoDup_app_comm in Hnd; cbn in Hnd.
+...
 Search (NoDup (_ :: _)).
+Search (NoDup (seq _ _)).
+Search Permutation.Permutation.
+Permutation.NoDup_Permutation_bis:
+  ∀ (A : Type) (l l' : list A),
+    NoDup l → length l' ≤ length l → incl l l' → Permutation.Permutation l l'
+Permutation.NoDup_Permutation:
+  ∀ (A : Type) (l l' : list A),
+    NoDup l
+    → NoDup l' → (∀ x : A, x ∈ l ↔ x ∈ l') → Permutation.Permutation l l'
 ...
 Search (nth _ (firstn _ _)).
 rewrite List_nth_firstn in H1.
