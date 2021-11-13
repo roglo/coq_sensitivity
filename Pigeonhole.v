@@ -185,6 +185,14 @@ Theorem pigeonhole_basis : ∀ a l,
   → False.
 Proof.
 intros * Hnl Hn Hnd.
+revert l Hnl Hn Hnd.
+induction a; intros. {
+  destruct l as [| b]; [ easy | ].
+  now specialize (Hn b (or_introl eq_refl)).
+}
+destruct l as [| b]; [ easy | cbn in Hnl ].
+apply Nat.succ_lt_mono in Hnl.
+remember (filter (λ i, nth i l 0 =? a) l) as la eqn:Hla.
 ...
 
 (* "a" = #holes, "l" = list representing #pigeon → #hole *)
