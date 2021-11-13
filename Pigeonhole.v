@@ -201,6 +201,16 @@ rewrite List_app_cons in Hnd.
 rewrite app_assoc in Hnd.
 apply NoDup_app_remove_r in Hnd.
 apply NoDup_app_comm in Hnd; cbn in Hnd.
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (Ha, Hnd).
+apply Ha; clear Ha.
+Search (_ ∈ firstn _ _).
+...
+Search (nth _ (firstn _ _)).
+rewrite <- List_nth_firstn with (j := S a).
+apply nth_In.
+specialize (NoDup_cons Hnd) as H2.
+Search (NoDup (_ :: _)).
 ...
 Search (NoDup (_ :: _)).
 Search (NoDup (seq _ _)).
