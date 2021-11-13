@@ -41,10 +41,10 @@ Fixpoint search_double_loop {A} eqb i (l : list A) :=
    * j = S _, if the i-th value and the (i+j)-th value are equal *)
 Definition List_search_double {A} eqb l := @search_double_loop A eqb 0 l.
 
-(**)
+(*
 Compute (let l := [3;4;1;4] in (List_search_double Nat.eqb l)).
 Compute (let l := [7;4;1;7;7;2] in (List_search_double Nat.eqb l)).
-(**)
+*)
 
 Theorem search_double_loop_0_r : ∀ l i j,
   search_double_loop Nat.eqb i l = (j, 0)
