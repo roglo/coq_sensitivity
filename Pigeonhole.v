@@ -80,6 +80,9 @@ intros * Hnl Hn * Hxx.
 destruct dp. {
   admit.
 }
+rewrite <- and_assoc, and_comm, and_assoc.
+split; [ easy | ].
+rewrite and_comm, and_assoc.
 revert a i Hnl Hn Hxx.
 induction l as [| x]; intros; [ easy | ].
 cbn in Hxx.
@@ -96,9 +99,14 @@ destruct b as [b| ]. {
     apply Nat.add_lt_mono_l; cbn.
     now apply -> Nat.succ_lt_mono.
   }
-  split; [ easy | ].
   now rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
 }
+destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
+...
+specialize (IHl a i).
+destruct a; [ now specialize (Hn x (or_introl eq_refl)) | ].
+cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+...
 specialize (List_find_nth_None 0 _ _ Hb) as H1.
 specialize (Hn x (or_introl eq_refl)) as H2.
 specialize (H1 (nth x l 0)) as H3.
