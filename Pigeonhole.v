@@ -100,6 +100,21 @@ destruct b as [b| ]. {
   now rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
 }
 specialize (List_find_nth_None 0 _ _ Hb) as H1.
+specialize (Hn x (or_introl eq_refl)) as H2.
+specialize (H1 (nth x l 0)) as H3.
+cbn in Hnl.
+assert (H : nth x l 0 < length l). {
+  specialize (Hn (nth x l 0)) as H4.
+...
+assert (H : x < length l) by flia Hnl H2.
+specialize (H1 H).
+...
+destruct l as [| b]; [ easy | ].
+cbn in Hxx.
+cbn in Hb.
+rewrite if_eqb_eq_dec in Hb.
+destruct (Nat.eq_dec x b) as [Hxb| Hxb]; [ easy | ].
+rewrite Hb in Hxx.
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
