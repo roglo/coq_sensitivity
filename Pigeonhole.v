@@ -192,6 +192,9 @@ Theorem pigeonhole_basis : ∀ a l,
   → False.
 Proof.
 intros * Hnl Hn Hnd.
+Search Permutation.Permutation.
+...
+intros * Hnl Hn Hnd.
 (*
 specialize (NoDup_firstn _ a l Hnd) as Hnd'.
 specialize (proj1 (NoDup_nth (firstn a l) 0) Hnd') as H1.
