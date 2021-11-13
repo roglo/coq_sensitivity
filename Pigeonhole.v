@@ -46,25 +46,41 @@ Compute (let l := [3;4;1;4] in (List_search_double Nat.eqb l)).
 Compute (let l := [7;4;1;7;7;2] in (List_search_double Nat.eqb l)).
 (**)
 
-Theorem search_double_loop_lt : ∀ l i j k,
-  search_double_loop Nat.eqb i l = (j, k)
-  → k = 0 ∨ j  + k < i + length l.
+Theorem search_double_loop_0_r : ∀ l i j,
+  search_double_loop Nat.eqb i l = (j, 0)
+  → j = 0.
+Proof.
+intros * Hxx.
+revert i j Hxx.
+induction l as [| a]; cbn; intros. {
+  now injection Hxx; clear Hxx; intros; subst j.
+}
+remember (List_find_nth _ _) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
+apply (IHl (S i) j Hxx).
+Qed.
+
+Theorem search_double_loop_succ_r_lt : ∀ l i j k,
+  search_double_loop Nat.eqb i l = (j, S k)
+  → i ≤ j ∧ j + S k < i + length l.
 Proof.
 intros * Hxx.
 revert i j k Hxx.
-induction l as [| a]; cbn; intros. {
-  now left; injection Hxx; clear Hxx; intros; subst j k.
-}
+induction l as [| a]; intros; [ easy | ].
 rewrite <- Nat.add_succ_comm.
+cbn in Hxx |-*.
 remember (List_find_nth _ _) as b eqn:Hb.
 symmetry in Hb.
 destruct b as [b| ]. {
-  right.
+  rewrite Nat.add_1_r in Hxx.
   injection Hxx; clear Hxx; intros; subst j k.
+  split; [ easy | ].
   apply (List_find_nth_Some 0) in Hb.
   flia Hb.
 }
-apply (IHl (S i) j k Hxx).
+specialize (IHl (S i) j k Hxx) as H1.
+flia H1.
 Qed.
 
 (* "a" = #holes, "l" = list representing #pigeon → #hole *)
@@ -73,13 +89,15 @@ Theorem pigeonhole_from : ∀ i a l,
   → (∀ x, x ∈ l → x < a)
   → ∀ p dp,
     search_double_loop Nat.eqb i l = (p, dp)
-  → i ≤ p ∧ p + dp < i + length l ∧ dp ≠ 0 ∧
+  → (p, dp) = (0, 0) ∨
+    i ≤ p ∧ p + dp < i + length l ∧ dp ≠ 0 ∧
     nth (p - i) l 0 = nth (p + dp - i) l 0.
 Proof.
 intros * Hnl Hn * Hxx.
 destruct dp. {
-  admit.
+  now left; apply search_double_loop_0_r in Hxx; subst p.
 }
+right.
 rewrite <- and_assoc, and_comm, and_assoc.
 split; [ easy | ].
 rewrite and_comm, and_assoc.
@@ -117,24 +135,9 @@ split. {
   specialize (IHl (S i) Hxx).
   cbn; flia IHl.
 }
-...
-    apply (List_find_nth_Some 0) in Hb.
-    destruct Hb as (Hb & Hbef & Heq).
-    apply Nat.eqb_eq in Heq.
-    rewrite Nat.add_1_r in Hxx.
-......
-    injection Hxx; clear Hxx; intros; subst p dp.
-    apply Nat.add_lt_mono_l; cbn.
-    now apply -> Nat.succ_lt_mono.
-    now injection Hxx; clear Hxx; intros; subst p dp.
-  }
-  specialize (IHl (S i) Hxx); flia IHl.
-...
-specialize (IHl (S i) (S p) Hxx).
-cbn - [ nth ].
-rewrite (Nat.add_succ_comm i) in IHl.
-split; [ flia IHl | ].
-split; [ easy | ].
+revert i Hxx.
+induction l as [| x]; intros; [ easy | ].
+cbn in Hxx.
 remember (List_find_nth _ _) as b eqn:Hb.
 symmetry in Hb.
 destruct b as [b| ]. {
@@ -143,39 +146,20 @@ destruct b as [b| ]. {
   apply Nat.eqb_eq in Heq.
   rewrite Nat.add_1_r in Hxx.
   injection Hxx; clear Hxx; intros; subst p dp.
-  split; [ easy | ].
-  split. {
-    apply Nat.add_lt_mono_l; cbn.
-    now apply -> Nat.succ_lt_mono.
-  }
   now rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
 }
-specialize (IHl (S i) p).
-specialize (IHl (S i) (S p) Hxx).
-cbn - [ nth ].
-rewrite (Nat.add_succ_comm i) in IHl.
-split; [ flia IHl | ].
-split; [ easy | ].
+destruct (lt_dec i p) as [Hip| Hip]. {
+  specialize (IHl (S i) Hxx).
+  rewrite Nat.add_comm.
+  replace (p - i) with (S (p - S i)) by flia Hip.
+  rewrite Nat.add_succ_l, Nat.sub_succ_l; [ cbn | flia Hip ].
+  now replace (dp + p - i) with (p + S dp - S i) by flia Hip.
+}
+apply Nat.nlt_ge in Hip.
+apply search_double_loop_succ_r_lt in Hxx.
+flia Hxx Hip.
+Qed.
 
-destruct a; [ now specialize (Hn x (or_introl eq_refl)) | ].
-cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
-...
-specialize (List_find_nth_None 0 _ _ Hb) as H1.
-specialize (Hn x (or_introl eq_refl)) as H2.
-specialize (H1 (nth x l 0)) as H3.
-cbn in Hnl.
-assert (H : nth x l 0 < length l). {
-  specialize (Hn (nth x l 0)) as H4.
-...
-assert (H : x < length l) by flia Hnl H2.
-specialize (H1 H).
-...
-destruct l as [| b]; [ easy | ].
-cbn in Hxx.
-cbn in Hb.
-rewrite if_eqb_eq_dec in Hb.
-destruct (Nat.eq_dec x b) as [Hxb| Hxb]; [ easy | ].
-rewrite Hb in Hxx.
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
@@ -249,6 +233,8 @@ destruct r as [n'| ]. {
   now exists (a :: la1), la2, la3; rewrite Hll.
 }
 Qed.
+
+...
 
 Theorem find_dup_none : ∀ f la,
   find_dup f la = None → NoDup (map f la).
