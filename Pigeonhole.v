@@ -203,8 +203,27 @@ induction l as [| b]; intros. {
   now specialize (Hal a (or_introl eq_refl)).
 }
 destruct (Nat.eq_dec a b) as [Hab| Hab]; [ now left | right ].
+remember (filter (λ x, x =? length l) (a :: b :: l)) as la eqn:Hla.
+symmetry in Hla.
+destruct la as [| x1]. {
+  apply IHl. 2: {
+    intros x Hx.
+    specialize (List_filter_nil _ _ Hla x) as H1.
+    assert (H : x ∈ a :: b :: l). {
+      now destruct Hx; [ left | right; right ].
+    }
+    specialize (H1 H).
+    specialize (Hal _ H).
+    cbn in Hal, H1.
+    apply Nat.eqb_neq in H1.
+    flia Hal H1.
+  }
+  now apply NoDup_cons_iff in Hnd.
+}
+destruct (Nat.eq_dec b x1) as [Hbz| Hbz]. {
+(* ouais, enfin, chais pas *)
+...
 apply IHl.
-(* ah bin non *)
 ...
 
 Theorem pigeonhole_1 : ∀ a l,
@@ -217,8 +236,10 @@ apply NoDup_cons_iff in Hnd.
 destruct Hnd as (H, Hnd).
 apply H; clear H.
 ...
+(*
 now apply pigeonhole_cons_in.
 ...
+*)
 
 Theorem pigeonhole_basis : ∀ a l,
   a < length l
@@ -232,6 +253,8 @@ rewrite List_app_cons in Hnd.
 rewrite app_assoc in Hnd.
 apply NoDup_app_remove_r in Hnd.
 apply NoDup_app_comm in Hnd; cbn in Hnd.
+...
+(*
 ...
 specialize (pigeonhole_1 (nth a l 0) (firstn a l)) as H1.
 rewrite firstn_length in H1.
@@ -298,6 +321,7 @@ destruct l as [| b]; [ easy | cbn in Hnl ].
 apply Nat.succ_lt_mono in Hnl.
 remember (filter (λ i, nth i l 0 =? a) l) as la eqn:Hla.
 ...
+*)
 
 (* "a" = #holes, "l" = list representing #pigeon → #hole *)
 Theorem pigeonhole : ∀ a l,
