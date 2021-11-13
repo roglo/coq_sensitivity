@@ -83,9 +83,58 @@ destruct dp. {
 rewrite <- and_assoc, and_comm, and_assoc.
 split; [ easy | ].
 rewrite and_comm, and_assoc.
-revert a i Hnl Hn Hxx.
-induction l as [| x]; intros; [ easy | ].
-cbn in Hxx.
+clear a Hnl Hn.
+split. {
+  revert i Hxx.
+  induction l as [| x]; intros; [ easy | ].
+  cbn in Hxx.
+  remember (List_find_nth _ _) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [b| ]. {
+    apply (List_find_nth_Some 0) in Hb.
+    destruct Hb as (Hb & Hbef & Heq).
+    apply Nat.eqb_eq in Heq.
+    rewrite Nat.add_1_r in Hxx.
+    now injection Hxx; clear Hxx; intros; subst p dp.
+  }
+  specialize (IHl (S i) Hxx); flia IHl.
+}
+split. {
+  revert i Hxx.
+  induction l as [| x]; intros; [ easy | ].
+  cbn in Hxx.
+  remember (List_find_nth _ _) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [b| ]. {
+    apply (List_find_nth_Some 0) in Hb.
+    destruct Hb as (Hb & Hbef & Heq).
+    apply Nat.eqb_eq in Heq.
+    rewrite Nat.add_1_r in Hxx.
+    injection Hxx; clear Hxx; intros; subst p dp.
+    apply Nat.add_lt_mono_l; cbn.
+    now apply -> Nat.succ_lt_mono.
+  }
+  specialize (IHl (S i) Hxx).
+  cbn; flia IHl.
+}
+...
+    apply (List_find_nth_Some 0) in Hb.
+    destruct Hb as (Hb & Hbef & Heq).
+    apply Nat.eqb_eq in Heq.
+    rewrite Nat.add_1_r in Hxx.
+......
+    injection Hxx; clear Hxx; intros; subst p dp.
+    apply Nat.add_lt_mono_l; cbn.
+    now apply -> Nat.succ_lt_mono.
+    now injection Hxx; clear Hxx; intros; subst p dp.
+  }
+  specialize (IHl (S i) Hxx); flia IHl.
+...
+specialize (IHl (S i) (S p) Hxx).
+cbn - [ nth ].
+rewrite (Nat.add_succ_comm i) in IHl.
+split; [ flia IHl | ].
+split; [ easy | ].
 remember (List_find_nth _ _) as b eqn:Hb.
 symmetry in Hb.
 destruct b as [b| ]. {
@@ -101,9 +150,13 @@ destruct b as [b| ]. {
   }
   now rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
 }
-destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
-...
-specialize (IHl a i).
+specialize (IHl (S i) p).
+specialize (IHl (S i) (S p) Hxx).
+cbn - [ nth ].
+rewrite (Nat.add_succ_comm i) in IHl.
+split; [ flia IHl | ].
+split; [ easy | ].
+
 destruct a; [ now specialize (Hn x (or_introl eq_refl)) | ].
 cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
 ...
