@@ -192,17 +192,23 @@ Theorem pigeonhole_basis : ∀ a l,
   → False.
 Proof.
 intros * Hnl Hn Hnd.
+(*
 specialize (NoDup_firstn _ a l Hnd) as Hnd'.
 specialize (proj1 (NoDup_nth (firstn a l) 0) Hnd') as H1.
 rewrite firstn_length in H1.
 rewrite Nat.min_l in H1; [ | flia Hnl ].
+*)
 rewrite (List_split_at_pos 0 l Hnl) in Hnd.
 rewrite List_app_cons in Hnd.
 rewrite app_assoc in Hnd.
 apply NoDup_app_remove_r in Hnd.
 apply NoDup_app_comm in Hnd; cbn in Hnd.
+specialize (Hn (nth a l 0)) as H1.
+assert (H : nth a l 0 ∈ l) by now apply nth_In.
+specialize (H1 H); clear H.
 apply NoDup_cons_iff in Hnd.
 destruct Hnd as (Ha, Hnd).
+...
 apply Ha; clear Ha.
 Search (_ ∈ firstn _ _).
 ...
