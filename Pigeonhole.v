@@ -192,12 +192,32 @@ rewrite <- (firstn_skipn n).
 now apply in_app_iff; left.
 Qed.
 
+Theorem pigeonhole_cons_in : ∀ a l,
+  (∀ x, x ∈ a :: l → x < length l)
+  → NoDup l
+  → a ∈ l.
+Proof.
+intros * Hal Hnd.
+revert a Hal.
+induction l as [| b]; intros. {
+  now specialize (Hal a (or_introl eq_refl)).
+}
+destruct (Nat.eq_dec a b) as [Hab| Hab]; [ now left | right ].
+apply IHl.
+(* ah bin non *)
+...
+
 Theorem pigeonhole_1 : ∀ a l,
   (∀ x, x ∈ a :: l → x < length l)
   → NoDup (a :: l)
   → False.
 Proof.
 intros * Hal Hnd.
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (H, Hnd).
+apply H; clear H.
+...
+now apply pigeonhole_cons_in.
 ...
 
 Theorem pigeonhole_basis : ∀ a l,
