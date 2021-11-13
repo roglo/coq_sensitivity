@@ -178,6 +178,15 @@ apply search_double_loop_succ_r_lt in Hxx.
 flia Hxx Hip.
 Qed.
 
+Theorem pigeonhole_basis : ∀ a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → NoDup l
+  → False.
+Proof.
+intros * Hnl Hn Hnd.
+...
+
 (* "a" = #holes, "l" = list representing #pigeon → #hole *)
 Theorem pigeonhole : ∀ a l,
   a < length l
@@ -195,6 +204,8 @@ exfalso.
 unfold List_search_double in Hxx.
 apply search_double_loop_0_r in Hxx.
 destruct Hxx as (_, Hnd).
+...
+now apply pigeonhole_basis in Hn.
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
