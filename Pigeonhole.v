@@ -48,17 +48,34 @@ Compute (let l := [7;4;1;7;7;2] in (List_search_double Nat.eqb l)).
 
 Theorem search_double_loop_0_r : ∀ l i j,
   search_double_loop Nat.eqb i l = (j, 0)
-  → j = 0.
+  → j = 0 ∧ NoDup l.
 Proof.
 intros * Hxx.
-revert i j Hxx.
-induction l as [| a]; cbn; intros. {
-  now injection Hxx; clear Hxx; intros; subst j.
+assert (Hj : j = 0). {
+  revert i j Hxx.
+  induction l as [| a]; cbn; intros. {
+    now injection Hxx; clear Hxx; intros; subst j.
+  }
+  remember (List_find_nth _ _) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
+  apply (IHl (S i) j Hxx).
 }
+split; [ easy | subst j ].
+revert i Hxx.
+induction l as [| a]; cbn; intros; [ constructor | ].
 remember (List_find_nth _ _) as b eqn:Hb.
 symmetry in Hb.
 destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
-apply (IHl (S i) j Hxx).
+specialize (IHl (S i) Hxx) as H1.
+constructor; [ | easy ].
+intros Ha.
+apply (In_nth _ _ 0) in Ha.
+destruct Ha as (n & Hn & Hna).
+specialize (List_find_nth_None 0 _ _ Hb) as H2.
+specialize (H2 n Hn).
+apply Nat.eqb_neq in H2.
+now symmetry in Hna.
 Qed.
 
 Theorem search_double_loop_succ_r_lt : ∀ l i j k,
@@ -95,7 +112,8 @@ Theorem pigeonhole_from : ∀ i a l,
 Proof.
 intros * Hnl Hn * Hxx.
 destruct dp. {
-  now left; apply search_double_loop_0_r in Hxx; subst p.
+  left; apply search_double_loop_0_r in Hxx.
+  now destruct Hxx; subst p.
 }
 right.
 rewrite <- and_assoc, and_comm, and_assoc.
@@ -174,6 +192,9 @@ do 2 rewrite Nat.sub_0_r in H1.
 destruct H1 as [H1| H1]; [ | easy ].
 injection H1; clear H1; intros; subst p dp.
 exfalso.
+unfold List_search_double in Hxx.
+apply search_double_loop_0_r in Hxx.
+destruct Hxx as (_, Hnd).
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
