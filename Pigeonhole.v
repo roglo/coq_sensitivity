@@ -178,12 +178,37 @@ apply search_double_loop_succ_r_lt in Hxx.
 flia Hxx Hip.
 Qed.
 
+Theorem NoDup_firstn : ∀ A n (l : list A), NoDup l → NoDup (firstn n l).
+Proof.
+intros * Hnd.
+rewrite <- (firstn_skipn n) in Hnd.
+now apply NoDup_app_remove_r in Hnd.
+Qed.
+
 Theorem pigeonhole_basis : ∀ a l,
   a < length l
   → (∀ x, x ∈ l → x < a)
   → NoDup l
   → False.
 Proof.
+intros * Hnl Hn Hnd.
+specialize (NoDup_firstn _ a l Hnd) as Hnd'.
+specialize (proj1 (NoDup_nth (firstn a l) 0) Hnd') as H1.
+rewrite firstn_length in H1.
+rewrite Nat.min_l in H1; [ | flia Hnl ].
+rewrite (List_split_at_pos 0 l Hnl) in Hnd.
+rewrite List_app_cons in Hnd.
+rewrite app_assoc in Hnd.
+apply NoDup_app_remove_r in Hnd.
+apply NoDup_app_comm in Hnd; cbn in Hnd.
+Search (NoDup (_ :: _)).
+...
+Search (nth _ (firstn _ _)).
+rewrite List_nth_firstn in H1.
+Search (NoDup).
+...
+specialize (ListDec.NoDup_dec Nat.eq_dec (firstn a l)) as Hd.
+...
 intros * Hnl Hn Hnd.
 revert l Hnl Hn Hnd.
 induction a; intros. {
