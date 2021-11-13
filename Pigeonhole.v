@@ -185,6 +185,21 @@ rewrite <- (firstn_skipn n) in Hnd.
 now apply NoDup_app_remove_r in Hnd.
 Qed.
 
+Theorem in_firstn_in : ∀ A n a (l : list A), a ∈ firstn n l → a ∈ l.
+Proof.
+intros * Ha.
+rewrite <- (firstn_skipn n).
+now apply in_app_iff; left.
+Qed.
+
+Theorem pigeonhole_1 : ∀ a l,
+  (∀ x, x ∈ a :: l → x < length l)
+  → NoDup (a :: l)
+  → False.
+Proof.
+intros * Hal Hnd.
+...
+
 Theorem pigeonhole_basis : ∀ a l,
   a < length l
   → (∀ x, x ∈ l → x < a)
@@ -192,7 +207,22 @@ Theorem pigeonhole_basis : ∀ a l,
   → False.
 Proof.
 intros * Hnl Hn Hnd.
-Search Permutation.Permutation.
+rewrite (List_split_at_pos 0 l Hnl) in Hnd.
+rewrite List_app_cons in Hnd.
+rewrite app_assoc in Hnd.
+apply NoDup_app_remove_r in Hnd.
+apply NoDup_app_comm in Hnd; cbn in Hnd.
+...
+specialize (pigeonhole_1 (nth a l 0) (firstn a l)) as H1.
+rewrite firstn_length in H1.
+rewrite Nat.min_l in H1; [ | flia Hnl ].
+apply H1; [ | easy ].
+intros i Hi.
+apply Hn.
+destruct Hi as [Hi| Hi]. {
+  now rewrite <- Hi; apply nth_In.
+}
+now apply in_firstn_in in Hi.
 ...
 intros * Hnl Hn Hnd.
 (*
