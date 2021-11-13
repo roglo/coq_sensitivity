@@ -160,6 +160,20 @@ apply search_double_loop_succ_r_lt in Hxx.
 flia Hxx Hip.
 Qed.
 
+(* "a" = #holes, "l" = list representing #pigeon → #hole *)
+Theorem pigeonhole : ∀ a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → ∀ p dp,
+    List_search_double Nat.eqb l = (p, dp)
+  → p + dp < length l ∧ dp ≠ 0 ∧ nth p l 0 = nth (p + dp) l 0.
+Proof.
+intros * Hnl Hn * Hxx.
+specialize (pigeonhole_from 0 a l Hnl Hn p dp Hxx) as H1.
+do 2 rewrite Nat.sub_0_r in H1.
+destruct H1 as [H1| H1]; [ | easy ].
+injection H1; clear H1; intros; subst p dp.
+exfalso.
 ...
 
 Theorem pigeonhole' : ∀ nb_of_holes hole_of_pigeon,
