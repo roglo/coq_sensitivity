@@ -319,6 +319,67 @@ Definition pigeonhole_comp_list l :=
   | None => (0, 0)
   end.
 
+Theorem better_pigeonhole_list : ∀ a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → ∀ x x', pigeonhole_comp_list l = (x, x')
+  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+Proof.
+intros * Hal Hla * Hpcl.
+remember (λ i, nth i l 0) as f.
+rename a into b.
+remember (length l) as a.
+assert (Hf : ∀ x, x < a → f x < b). {
+  subst a f; cbn.
+  intros y Hy.
+  now apply Hla, nth_In.
+}
+assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
+enough (x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x') by now subst f.
+(*
+  b < a
+  → (∀ x, x < a → f x < b)
+  → ∀ x x', pigeonhole_fun a f = (x, x')
+  → x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
+intros * Hba Hf * Hpf.
+*)
+unfold pigeonhole_fun in Hpf.
+remember (find_dup _ _) as fd eqn:Hfd.
+symmetry in Hfd.
+destruct fd as [(n, n') |]. {
+  injection Hpf; clear Hpf; intros; subst n n'.
+  specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
+  assert (Hxy : x ∈ seq 0 a). {
+    rewrite Hll.
+    apply in_app_iff.
+    now right; left.
+  }
+  apply in_seq in Hxy; cbn in Hxy.
+  destruct Hxy as (_, Hxa).
+  assert (Hx' : x' ∈ seq 0 a). {
+    rewrite Hll.
+    apply in_app_iff; right; right.
+    now apply in_app_iff; right; left.
+  }
+  apply in_seq in Hx'.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ | easy ].
+  specialize (seq_NoDup a 0) as H.
+  rewrite Hll in H.
+  apply NoDup_remove_2 in H.
+  intros Hxx; apply H; subst x'.
+  apply in_app_iff; right.
+  now apply in_app_iff; right; left.
+} {
+  apply find_dup_none in Hfd.
+  exfalso.
+  now apply not_NoDup_map_f_seq in Hf.
+}
+Qed.
+
+...
+
 Theorem pigeonhole_list : ∀ a l,
   a < length l
   → (∀ x, x ∈ l → x < a)
