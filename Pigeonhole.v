@@ -328,7 +328,6 @@ Proof.
 intros * Hal Hla * Hpcl.
 remember (λ i, nth i l 0) as f.
 rename a into b.
-remember (length l) as a.
 (*
   b < a
   → (∀ x, x < a → f x < b)
@@ -337,20 +336,20 @@ remember (length l) as a.
 intros * Hba Hf * Hpf.
 *)
 unfold pigeonhole_comp_list in Hpcl.
-rewrite <- Heqf, <- Heqa in Hpcl.
+rewrite <- Heqf in Hpcl.
 remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
   injection Hpcl; clear Hpcl; intros; subst n n'.
   specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
-  assert (Hxy : x ∈ seq 0 a). {
+  assert (Hxy : x ∈ seq 0 (length l)). {
     rewrite Hll.
     apply in_app_iff.
     now right; left.
   }
   apply in_seq in Hxy; cbn in Hxy.
   destruct Hxy as (_, Hxa).
-  assert (Hx' : x' ∈ seq 0 a). {
+  assert (Hx' : x' ∈ seq 0 (length l)). {
     rewrite Hll.
     apply in_app_iff; right; right.
     now apply in_app_iff; right; left.
@@ -359,7 +358,7 @@ destruct fd as [(n, n') |]. {
   split; [ easy | ].
   split; [ easy | ].
   split; [ | now rewrite Heqf in Hfxx ].
-  specialize (seq_NoDup a 0) as H.
+  specialize (seq_NoDup (length l) 0) as H.
   rewrite Hll in H.
   apply NoDup_remove_2 in H.
   intros Hxx; apply H; subst x'.
@@ -369,7 +368,7 @@ destruct fd as [(n, n') |]. {
   apply find_dup_none in Hfd.
   exfalso.
   apply not_NoDup_map_f_seq with (b := b) in Hfd; [ easy | easy | ].
-  intros y Hy; rewrite Heqa in Hy.
+  intros y Hy.
   apply Hla.
   rewrite Heqf.
   now apply nth_In.
