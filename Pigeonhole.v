@@ -334,7 +334,6 @@ assert (Hf : ∀ x, x < a → f x < b). {
   intros y Hy.
   now apply Hla, nth_In.
 }
-assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
 (*
   b < a
   → (∀ x, x < a → f x < b)
@@ -342,11 +341,12 @@ assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
   → x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
 intros * Hba Hf * Hpf.
 *)
-unfold pigeonhole_fun in Hpf.
+unfold pigeonhole_comp_list in Hpcl.
+rewrite <- Heqf, <- Heqa in Hpcl.
 remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
-  injection Hpf; clear Hpf; intros; subst n n'.
+  injection Hpcl; clear Hpcl; intros; subst n n'.
   specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
   assert (Hxy : x ∈ seq 0 a). {
     rewrite Hll.
