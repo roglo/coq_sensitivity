@@ -335,7 +335,6 @@ assert (Hf : ∀ x, x < a → f x < b). {
   now apply Hla, nth_In.
 }
 assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
-enough (x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x') by now subst f.
 (*
   b < a
   → (∀ x, x < a → f x < b)
@@ -364,7 +363,7 @@ destruct fd as [(n, n') |]. {
   apply in_seq in Hx'.
   split; [ easy | ].
   split; [ easy | ].
-  split; [ | easy ].
+  split; [ | now rewrite Heqf in Hfxx ].
   specialize (seq_NoDup a 0) as H.
   rewrite Hll in H.
   apply NoDup_remove_2 in H.
