@@ -311,6 +311,47 @@ exists x, x'.
 now apply (pigeonhole a b).
 Qed.
 
+(* version list instead of fun *)
+
+Definition pigeonhole_comp_list l :=
+  match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
+  | Some (n, n') => (n, n')
+  | None => (0, 0)
+  end.
+
+Theorem pigeonhole_list : ∀ a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → ∀ x x', pigeonhole_comp_list l = (x, x')
+  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+Proof.
+intros * Hal Hla * Hpcl.
+remember (λ i, nth i l 0) as f.
+rename a into b.
+remember (length l) as a.
+assert (Hf : ∀ x, x < a → f x < b). {
+  subst a f; cbn.
+  intros y Hy.
+  now apply Hla, nth_In.
+}
+assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
+specialize (pigeonhole a b f Hal Hf _ _ Hpf) as H1.
+now subst f.
+Qed.
+
+Theorem pigeonhole_list_exist : ∀ a l,
+  a < length l
+  → (∀ x, x ∈ l → x < a)
+  → ∃ x x', x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
+Proof.
+intros * Hal Hla.
+remember (pigeonhole_comp_list l) as xx' eqn:Hpf.
+symmetry in Hpf.
+destruct xx' as (x, x').
+exists x, x'.
+now apply (pigeonhole_list a l).
+Qed.
+
 (* fin_t : finite type, implemented with type "sig" *)
 
 Definition fin_t n := {a : nat | (a <? n) = true}.
