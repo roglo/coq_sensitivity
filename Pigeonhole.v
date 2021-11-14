@@ -313,6 +313,41 @@ Qed.
 
 (* version list instead of fun *)
 
+(*
+Fixpoint find_dup f (la : list nat) :=
+  match la with
+  | [] => None
+  | n :: la' =>
+      match find (λ n', f n' =? f n) la' with
+      | None => find_dup f la'
+      | Some n' => Some (n, n')
+      end
+  end.
+
+Definition pigeonhole_fun a (f : nat → nat) :=
+  match find_dup f (seq 0 a) with
+  | Some (n, n') => (n, n')
+  | None => (0, 0)
+  end.
+*)
+
+Fixpoint search_double_loop {A} eqb i (l : list A) :=
+  match l with
+  | a :: l' =>
+      match List_find_nth (eqb a) l' with
+      | Some j => (i, j + 1)
+      | None => search_double_loop eqb (S i) l'
+      end
+  | [] => (0, 0)
+  end.
+
+(* from the list "l", return a couple of nat "(i, j)" where
+   * j = 0, if there is no double value in "l"
+   * j = S _, if the i-th value and the (i+j)-th value are equal *)
+Definition List_search_double {A} eqb l := @search_double_loop A eqb 0 l.
+
+...
+
 Definition pigeonhole_comp_list l :=
   match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
   | Some (n, n') => (n, n')
@@ -357,6 +392,8 @@ destruct fd as [(n, n') |]. {
 } {
   apply find_dup_none in Hfd.
   exfalso.
+Check not_NoDup_map_f_seq.
+...
   apply not_NoDup_map_f_seq with (b := a) in Hfd; [ easy | easy | ].
   intros y Hy.
   apply Hla.
