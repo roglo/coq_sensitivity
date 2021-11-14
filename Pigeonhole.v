@@ -319,28 +319,19 @@ Definition pigeonhole_comp_list l :=
   | None => (0, 0)
   end.
 
-Theorem better_pigeonhole_list : ∀ a l,
+Theorem pigeonhole_list : ∀ a l,
   a < length l
   → (∀ x, x ∈ l → x < a)
   → ∀ x x', pigeonhole_comp_list l = (x, x')
   → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
 Proof.
 intros * Hal Hla * Hpcl.
-remember (λ i, nth i l 0) as f.
-(*
-  b < a
-  → (∀ x, x < a → f x < b)
-  → ∀ x x', pigeonhole_fun a f = (x, x')
-  → x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
-intros * Hba Hf * Hpf.
-*)
 unfold pigeonhole_comp_list in Hpcl.
-rewrite <- Heqf in Hpcl.
 remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
   injection Hpcl; clear Hpcl; intros; subst n n'.
-  specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
+  specialize (find_dup_some _ _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
   assert (Hxy : x ∈ seq 0 (length l)). {
     rewrite Hll.
     apply in_app_iff.
@@ -356,7 +347,7 @@ destruct fd as [(n, n') |]. {
   apply in_seq in Hx'.
   split; [ easy | ].
   split; [ easy | ].
-  split; [ | now rewrite Heqf in Hfxx ].
+  split; [ | easy ].
   specialize (seq_NoDup (length l) 0) as H.
   rewrite Hll in H.
   apply NoDup_remove_2 in H.
@@ -369,31 +360,8 @@ destruct fd as [(n, n') |]. {
   apply not_NoDup_map_f_seq with (b := a) in Hfd; [ easy | easy | ].
   intros y Hy.
   apply Hla.
-  rewrite Heqf.
   now apply nth_In.
 }
-Qed.
-
-...
-
-Theorem pigeonhole_list : ∀ a l,
-  a < length l
-  → (∀ x, x ∈ l → x < a)
-  → ∀ x x', pigeonhole_comp_list l = (x, x')
-  → x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
-Proof.
-intros * Hal Hla * Hpcl.
-remember (λ i, nth i l 0) as f.
-rename a into b.
-remember (length l) as a.
-assert (Hf : ∀ x, x < a → f x < b). {
-  subst a f; cbn.
-  intros y Hy.
-  now apply Hla, nth_In.
-}
-assert (Hpf : pigeonhole_fun a f = (x, x')) by now subst f a.
-specialize (pigeonhole a b f Hal Hf _ _ Hpf) as H1.
-now subst f.
 Qed.
 
 Theorem pigeonhole_list_exist : ∀ a l,
