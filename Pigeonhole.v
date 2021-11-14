@@ -329,11 +329,6 @@ intros * Hal Hla * Hpcl.
 remember (λ i, nth i l 0) as f.
 rename a into b.
 remember (length l) as a.
-assert (Hf : ∀ x, x < a → f x < b). {
-  subst a f; cbn.
-  intros y Hy.
-  now apply Hla, nth_In.
-}
 (*
   b < a
   → (∀ x, x < a → f x < b)
@@ -373,7 +368,11 @@ destruct fd as [(n, n') |]. {
 } {
   apply find_dup_none in Hfd.
   exfalso.
-  now apply not_NoDup_map_f_seq in Hf.
+  apply not_NoDup_map_f_seq with (b := b) in Hfd; [ easy | easy | ].
+  intros y Hy; rewrite Heqa in Hy.
+  apply Hla.
+  rewrite Heqf.
+  now apply nth_In.
 }
 Qed.
 
