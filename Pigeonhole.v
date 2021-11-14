@@ -198,33 +198,59 @@ Theorem pigeonhole_cons_in : ∀ a l,
   → a ∈ l.
 Proof.
 intros * Hal Hnd.
+remember (filter (λ x, x =? length l) (a :: l)) as la eqn:Hla.
+symmetry in Hla.
+cbn in Hla.
+rewrite if_eqb_eq_dec in Hla.
+destruct (Nat.eq_dec a (length l)) as [H| H]; [ | clear H ]. {
+  specialize (Hal a (or_introl eq_refl)).
+  rewrite H in Hal; flia Hal.
+}
+Abort. (*
+...
+intros * Hal Hnd.
 revert a Hal.
 induction l as [| b]; intros. {
   now specialize (Hal a (or_introl eq_refl)).
 }
+assert (H : NoDup l) by now apply NoDup_cons_iff in Hnd.
+specialize (IHl H); clear H.
 destruct (Nat.eq_dec a b) as [Hab| Hab]; [ now left | right ].
 remember (filter (λ x, x =? length l) (a :: b :: l)) as la eqn:Hla.
 symmetry in Hla.
 destruct la as [| x1]. {
-  apply IHl. 2: {
-    intros x Hx.
-    specialize (List_filter_nil _ _ Hla x) as H1.
-    assert (H : x ∈ a :: b :: l). {
-      now destruct Hx; [ left | right; right ].
-    }
-    specialize (H1 H).
-    specialize (Hal _ H).
-    cbn in Hal, H1.
-    apply Nat.eqb_neq in H1.
-    flia Hal H1.
+  apply IHl.
+  intros x Hx.
+  specialize (List_filter_nil _ _ Hla x) as H1.
+  assert (H : x ∈ a :: b :: l). {
+    now destruct Hx; [ left | right; right ].
   }
-  now apply NoDup_cons_iff in Hnd.
+  specialize (H1 H).
+  specialize (Hal _ H).
+  cbn in Hal, H1.
+  apply Nat.eqb_neq in H1.
+  flia Hal H1.
 }
+cbn in Hla.
+destruct (Nat.eq_dec b x1) as [Hbx1| Hbx1]. {
+  subst x1.
+  apply IHl.
+  intros x Hx.
+  destruct Hx as [Hx| Hx]. {
+    subst x.
+    cbn in Hla.
+...
+  } {
+...
+destruct la as [| x2]. {
+  specialize (IHb a (λ i, if lt_dec i x1 then f i else f (i + 1)) Hba).
+...
 destruct (Nat.eq_dec b x1) as [Hbz| Hbz]. {
 (* ouais, enfin, chais pas *)
 ...
 apply IHl.
 ...
+*)
 
 Theorem pigeonhole_1 : ∀ a l,
   (∀ x, x ∈ a :: l → x < length l)
@@ -235,10 +261,12 @@ intros * Hal Hnd.
 apply NoDup_cons_iff in Hnd.
 destruct Hnd as (H, Hnd).
 apply H; clear H.
+Abort. (*
 ...
 (*
 now apply pigeonhole_cons_in.
 ...
+*)
 *)
 
 Theorem pigeonhole_basis : ∀ a l,
@@ -247,6 +275,59 @@ Theorem pigeonhole_basis : ∀ a l,
   → NoDup l
   → False.
 Proof.
+intros * Hnl Hn Hnd.
+revert a Hnl Hn.
+induction l as [| b]; intros; [ easy | ].
+assert (H : NoDup l) by now apply NoDup_cons_iff in Hnd.
+specialize (IHl H); clear H.
+destruct a; [ now specialize (Hn b (or_introl eq_refl)) | ].
+cbn in Hnl.
+apply Nat.succ_lt_mono in Hnl.
+remember (filter (λ x, x =? a) l) as la eqn:Hla.
+symmetry in Hla.
+destruct la as [| x1]. {
+  apply (IHl a); [ easy | ].
+  intros x Hx.
+  specialize (List_filter_nil _ _ Hla x) as H1.
+  specialize (H1 Hx); cbn in H1.
+  apply Nat.eqb_neq in H1.
+  specialize (Hn x (or_intror Hx)).
+  flia Hn H1.
+}
+destruct (Nat.eq_dec a x1) as [Hax1| Hax1]. {
+  subst x1.
+...
+destruct la as [| x2]. {
+  apply (IHl _ Hnl).
+  intros x Hx.
+...
+  specialize (IHb a (λ i, if lt_dec i x1 then f i else f (i + 1)) Hba).
+  cbn in IHb.
+  assert (H : ∀ x, x < a → (if lt_dec x x1 then f x else f (x + 1)) < b). {
+    intros x Hx.
+    destruct (lt_dec x x1) as [Hxx| Hxx]. {
+      assert (Hxb : f x ≠ b). {
+        intros Hxb.
+        assert (H : x ∈ filter (λ i, f i =? b) (seq 0 (S a))). {
+          apply filter_In.
+          split; [ apply in_seq; cbn; flia Hx | ].
+...
+cbn in Hla.
+rewrite if_eqb_eq_dec in Hla.
+destruct (Nat.eq_dec b a) as [Hba| Hba]. {
+  subst b.
+  injection Hla; clear Hla; intros Hla H; subst x1.
+
+
+destruct (Nat.eq_dec b x1) as [Hbx1| Hbx1]. {
+  subst x1.
+  apply IHl.
+  intros x Hx.
+  destruct Hx as [Hx| Hx]. {
+    subst x.
+    cbn in Hla.
+...
+...
 intros * Hnl Hn Hnd.
 rewrite (List_split_at_pos 0 l Hnl) in Hnd.
 rewrite List_app_cons in Hnd.
