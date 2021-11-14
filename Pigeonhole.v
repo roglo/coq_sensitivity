@@ -346,13 +346,59 @@ Fixpoint search_double_loop {A} eqb i (l : list A) :=
    * j = S _, if the i-th value and the (i+j)-th value are equal *)
 Definition List_search_double {A} eqb l := @search_double_loop A eqb 0 l.
 
-...
-
 Definition pigeonhole_comp_list l :=
   match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
   end.
+
+Definition pigeonhole_comp_list' l :=
+  match List_search_double Nat.eqb l with
+  | (n, S n') => (n, n + S n')
+  | (_, 0) => (0, 0)
+  end.
+
+Theorem search_double_loop_0_r : ∀ l i j,
+  search_double_loop Nat.eqb i l = (j, 0)
+  → j = 0 ∧ NoDup l.
+Proof.
+Admitted.
+
+Theorem glop : ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
+Proof.
+intros.
+unfold pigeonhole_comp_list, pigeonhole_comp_list'.
+remember (find_dup _ _) as a eqn:Ha.
+remember (List_search_double _ _) as b eqn:Hb.
+symmetry in Ha, Hb.
+move b before a.
+destruct b as (y, y').
+destruct a as [(x, x')| ]. {
+  apply find_dup_some in Ha.
+  destruct Ha as (Hxx & la1 & la2 & la3 & Hla).
+  destruct y'. {
+    apply search_double_loop_0_r in Hb.
+    destruct Hb as (_, Hb); clear y.
+    specialize (proj1 (NoDup_nth l 0) Hb x x') as H1.
+    assert (H : x < length l). {
+      clear - Hla.
+      rewrite (List_seq_cut (length la1)) in Hla. 2: {
+...
+      rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
+      apply List_app_eq_app' in Hla; cycle 1.
+        now rewrite seq_length.
+      } {
+...
+      apply (f_equal length) in Hla.
+      rewrite seq_length in Hla; rewrite Hla.
+      assert (H : x = length la1). {
+...
+        apply (f_equal (map (λ i, nth i l 0))) in Hla.
+        rewrite <- List_map_nth_seq in Hla.
+      rewrite Hla, map_length.
+      rewrite app_length; cbn.
+      rewrite app_length; cbn.
+...
 
 Theorem pigeonhole_list : ∀ a l,
   a < length l
