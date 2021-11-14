@@ -327,7 +327,6 @@ Theorem better_pigeonhole_list : ∀ a l,
 Proof.
 intros * Hal Hla * Hpcl.
 remember (λ i, nth i l 0) as f.
-rename a into b.
 (*
   b < a
   → (∀ x, x < a → f x < b)
@@ -367,7 +366,7 @@ destruct fd as [(n, n') |]. {
 } {
   apply find_dup_none in Hfd.
   exfalso.
-  apply not_NoDup_map_f_seq with (b := b) in Hfd; [ easy | easy | ].
+  apply not_NoDup_map_f_seq with (b := a) in Hfd; [ easy | easy | ].
   intros y Hy.
   apply Hla.
   rewrite Heqf.
