@@ -380,14 +380,48 @@ destruct a as [(x, x')| ]. {
     apply search_double_loop_0_r in Hb.
     destruct Hb as (_, Hb); clear y.
     specialize (proj1 (NoDup_nth l 0) Hb x x') as H1.
+    assert (Hlla1 : length la1 < length l). {
+      apply (f_equal length) in Hla.
+      rewrite seq_length, app_length in Hla.
+      cbn in Hla; flia Hla.
+    }
     assert (H : x < length l). {
-      clear - Hla.
       rewrite (List_seq_cut (length la1)) in Hla. 2: {
-...
+        apply in_seq.
+        split; [ flia | easy ].
+      }
       rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
-      apply List_app_eq_app' in Hla; cycle 1.
-        now rewrite seq_length.
-      } {
+      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+      destruct Hla as (Hla1 & Hla).
+      cbn in Hla.
+      now injection Hla; clear Hla; intros Hla Hla2; subst x.
+    }
+    specialize (H1 H); clear H.
+    assert (H : x' < length l). {
+      assert (Hlla2 : length la1 + S (length la2) < length l). {
+        apply (f_equal length) in Hla.
+        rewrite seq_length, app_length in Hla; cbn in Hla.
+        rewrite app_length in Hla; cbn in Hla.
+        flia Hla.
+      }
+      rewrite (List_seq_cut (length la1 + S (length la2))) in Hla. 2: {
+        apply in_seq.
+        split; [ flia | easy ].
+      }
+      rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
+      rewrite seq_app in Hla; cbn in Hla.
+      rewrite <- app_assoc in Hla.
+      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+      destruct Hla as (Hla1 & Hla).
+      cbn in Hla.
+      injection Hla; clear Hla; intros Hla Hla2; subst x.
+      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+      destruct Hla as (Hla2 & Hla).
+      injection Hla; clear Hla; intros Hla H; subst x'.
+      easy.
+    }
+    specialize (H1 H Hxx); clear H.
+    subst x'.
 ...
       apply (f_equal length) in Hla.
       rewrite seq_length in Hla; rewrite Hla.
