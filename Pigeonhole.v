@@ -27,7 +27,8 @@ Definition pigeonhole_fun a (f : nat → nat) :=
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
-     ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3.
+    (∀ x'', x < x'' < x' → f x ≠ f x'') ∧
+    ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3.
 Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
@@ -40,6 +41,9 @@ destruct r as [n'| ]. {
   destruct Hr as (Hx'la, Hba).
   apply Nat.eqb_eq in Hba.
   split; [ easy | ].
+  split. {
+    intros n'' Hn''.
+...
   exists []; cbn.
   apply in_split in Hx'la.
   destruct Hx'la as (l1 & l2 & Hll).
@@ -457,6 +461,7 @@ symmetry in Ha, Hb.
 move b before a.
 destruct b as (y, y').
 destruct a as [(x, x')| ]. {
+...
   apply find_dup_some in Ha.
   destruct Ha as (Hxx & la1 & la2 & la3 & Hla).
   assert (Hlla1 : length la1 < length l). {
