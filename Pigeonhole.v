@@ -24,14 +24,74 @@ Definition pigeonhole_fun a (f : nat → nat) :=
   | None => (0, 0)
   end.
 
-Check nth_In.
+Theorem List_eq_dec_In_nth :
+  ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) (l : list A) (x d : A),
+  x ∈ l →
+  ∃ n : nat, n < length l ∧ nth n l d = x ∧ ∀ m, m < n → nth m l d ≠ x.
+Proof.
+intros * eq_dec * Hxl.
+revert x Hxl.
+induction l as [| y]; intros; [ easy | ].
+rewrite List_length_cons.
+destruct Hxl as [Hxl| Hxl]. {
+  subst y.
+  exists 0.
+  rewrite List_nth_0_cons.
+  split; [ flia | easy ].
+}
+specialize (IHl x Hxl) as H1.
+destruct H1 as (n & Hnl & Hyx & Hm).
+destruct (eq_dec y x) as [Hxy| Hxy]. {
+  subst y.
+  exists 0.
+  split; [ flia | easy ].
+}
+exists (S n).
+rewrite List_nth_succ_cons.
+split; [ now apply Nat.succ_lt_mono in Hnl | ].
+split; [ easy | ].
+intros m Hm'.
+destruct m; [ easy | cbn ].
+apply Nat.succ_lt_mono in Hm'.
+now apply Hm.
+Qed.
 
-...
-
-Theorem List_find_some_iff : ∀ A f (l : list A) x,
-  find f l = Some x ↔
-  x ∈ l ∧ (∀ y, y ∈ l → y before x in l → f y = false) ∧ f x = true.
-...
+Theorem List_find_some_if :
+  ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) f d (l : list A) x,
+  find f l = Some x →
+  ∃ i, i < length l ∧ x = nth i l d ∧ f x = true ∧
+  ∀ j, j < i → f (nth j l d) = false.
+Proof.
+  intros * eq_dec * Hf.
+  specialize (find_some _ _ Hf) as H1.
+  destruct H1 as (Hx, Hfx).
+  apply (List_eq_dec_In_nth A eq_dec l x d) in Hx.
+  destruct Hx as (i & Hi & Hix & Hx).
+  exists i.
+  split; [ easy | ].
+  split; [ easy | ].
+  split; [ easy | ].
+  intros j Hj.
+  revert i j Hi Hix Hx Hj.
+  induction l as [| a]; intros; [ easy | ].
+  cbn in Hf.
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    injection Hf; clear Hf; intros; subst a.
+    clear Hb.
+    destruct i; [ easy | ].
+    now specialize (Hx 0 (Nat.lt_0_succ _)) as H1.
+  }
+  destruct i; [ easy | ].
+  cbn in Hi, Hix; apply Nat.succ_lt_mono in Hi.
+  destruct j; [ easy | cbn ].
+  apply Nat.succ_lt_mono in Hj.
+  apply IHl with (i := i); [ easy | easy | easy | | easy ].
+  intros m Hm.
+  specialize (Hx (S m)); cbn in Hx.
+  apply Hx.
+  now apply -> Nat.succ_lt_mono.
+Qed.
 
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
@@ -46,10 +106,12 @@ remember (find (λ x', f x' =? f a) la) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [n'| ]. {
   injection Hfd; clear Hfd; intros; subst x x'.
-About find_some.
-Search (find _ _ = Some _).
-...
-apply List_find_some_iff in Hr.
+  apply (List_find_some_if _ Nat.eq_dec _ 0) in Hr.
+  destruct Hr as (i & Hi & Hn'i & Heq & Hbef).
+  apply Nat.eqb_eq in Heq.
+  split; [ easy | ].
+  split. {
+    intros n'' (Han'', Hx''n').
 ...
   apply find_some in Hr; cbn in Hr.
   destruct Hr as (Hx'la, Hba).
