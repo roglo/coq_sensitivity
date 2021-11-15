@@ -493,6 +493,7 @@ destruct a as [(x, x')| ]. {
     apply in_app_iff; right.
     now left.
   }
+...
   apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
   destruct Hb as (_ & Hyyl & Hyy).
   do 2 rewrite Nat.sub_0_r in Hyy.
