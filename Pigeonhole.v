@@ -390,7 +390,7 @@ apply Nat.eqb_neq in H2.
 now symmetry in Hna.
 Qed.
 
-Theorem search_double_loop_succ_r_lt : ∀ l i j k,
+Theorem search_double_loop_succ_r_if : ∀ l i j k,
   search_double_loop Nat.eqb i l = (j, S k)
   → i ≤ j ∧ j + S k < i + length l ∧
     (∀ a b, i ≤ a < j → a + S b < i + length l →
@@ -516,7 +516,7 @@ destruct a as [(x, x')| ]. {
     apply in_app_iff; right.
     now left.
   }
-  apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
+  apply search_double_loop_succ_r_if in Hb; cbn in Hb.
   destruct Hb as (_ & Hyyl & Hcab & Hby & Hyy).
   do 2 rewrite Nat.sub_0_r in Hyy.
   assert (Hxlx : x < x') by now apply List_sorted_in_seq in Hla.
