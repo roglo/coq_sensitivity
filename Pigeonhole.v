@@ -395,6 +395,7 @@ Theorem search_double_loop_succ_r_lt : ∀ l i j k,
   → i ≤ j ∧ j + S k < i + length l ∧
     (∀ a b, i ≤ a < j → a + S b < i + length l →
      nth (a - i) l 0 ≠ nth (a + S b - i) l 0) ∧
+    (∀ b, b < k → nth (j - i) l 0 ≠ nth (j + S b - i) l 0) ∧
     nth (j - i) l 0 = nth (j + S k - i) l 0.
 Proof.
 intros * Hxx.
@@ -414,13 +415,16 @@ destruct b as [b| ]. {
   destruct Hb as (Hbl & Hbef & Heq).
   apply Nat.eqb_eq in Heq; subst a.
   split; [ cbn; flia Hbl | ].
+  split; [ intros j k Hij Hjk; flia Hij | ].
   split; [ | easy ].
-  intros j k Hij Hjk.
-  flia Hij.
+  intros j Hj.
+  replace (i + S j - i) with (S j) by flia; cbn.
+  specialize (Hbef j Hj).
+  now apply Nat.eqb_neq in Hbef.
 }
 specialize (IHl (S i) j k Hxx) as H1.
 rewrite List_length_cons.
-destruct H1 as (H1 & H2 & H3 & H4).
+destruct H1 as (H1 & H2 & H3 & H4 & H5).
 split; [ flia H1 | ].
 split; [ flia H2 | ].
 split. {
@@ -437,7 +441,10 @@ split. {
 }
 replace (j - i) with (S (j - S i)) by flia H1.
 replace (S j + k - i) with (S (j + S k - S i)) by flia H1.
-easy.
+split; [ | easy ].
+intros c Hc.
+replace (j + S c - i) with (S (j + S c - S i)) by flia H1; cbn.
+now apply H4.
 Qed.
 
 Theorem glop : ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
@@ -510,7 +517,7 @@ destruct a as [(x, x')| ]. {
     now left.
   }
   apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
-  destruct Hb as (_ & Hyyl & Hcab & Hyy).
+  destruct Hb as (_ & Hyyl & Hcab & Hby & Hyy).
   do 2 rewrite Nat.sub_0_r in Hyy.
   assert (Hxlx : x < x') by now apply List_sorted_in_seq in Hla.
   destruct (Nat.lt_trichotomy x y) as [Hxy| [Hxy| Hxy]]. {
