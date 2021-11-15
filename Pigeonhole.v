@@ -24,6 +24,11 @@ Definition pigeonhole_fun a (f : nat → nat) :=
   | None => (0, 0)
   end.
 
+Theorem List_find_some_iff : ∀ A f (l : list A) x,
+  find f l = Some x ↔
+  x ∈ l ∧ (∀ y, y ∈ l → y before x in l → f y = false) ∧ f x = true.
+...
+
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
@@ -37,6 +42,9 @@ remember (find (λ x', f x' =? f a) la) as r eqn:Hr.
 symmetry in Hr.
 destruct r as [n'| ]. {
   injection Hfd; clear Hfd; intros; subst x x'.
+About find_some.
+Search (find _ _ = Some _).
+...
   apply find_some in Hr; cbn in Hr.
   destruct Hr as (Hx'la, Hba).
   apply Nat.eqb_eq in Hba.
