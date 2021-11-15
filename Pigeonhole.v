@@ -393,6 +393,8 @@ Qed.
 Theorem search_double_loop_succ_r_lt : ∀ l i j k,
   search_double_loop Nat.eqb i l = (j, S k)
   → i ≤ j ∧ j + S k < i + length l ∧
+    (∀ a b, i ≤ a < j → a + S b < i + length l →
+     nth (a - i) l 0 ≠ nth (a + S b - i) l 0) ∧
     nth (j - i) l 0 = nth (j + S k - i) l 0.
 Proof.
 intros * Hxx.
@@ -411,13 +413,28 @@ destruct b as [b| ]. {
   apply (List_find_nth_Some 0) in Hb.
   destruct Hb as (Hbl & Hbef & Heq).
   apply Nat.eqb_eq in Heq; subst a.
-  split; [ cbn; flia Hbl | easy ].
+  split; [ cbn; flia Hbl | ].
+  split; [ | easy ].
+  intros j k Hij Hjk.
+  flia Hij.
 }
 specialize (IHl (S i) j k Hxx) as H1.
 rewrite List_length_cons.
-destruct H1 as (H1 & H2 & H3).
+destruct H1 as (H1 & H2 & H3 & H4).
 split; [ flia H1 | ].
 split; [ flia H2 | ].
+split. {
+  intros c d Hicj Hcdi.
+  destruct (Nat.eq_dec c i) as [Hci| Hci]. {
+    subst c.
+    rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
+    apply List_find_nth_None with (d := 0) (j := d) in Hb; [ | flia Hcdi ].
+    now apply Nat.eqb_neq in Hb.
+  }
+  replace (c - i) with (S (c - S i)) by flia Hicj Hci.
+  replace (c + S d - i) with (S (c + S d - S i)) by flia Hicj; cbn.
+  apply H3; [ flia Hicj Hci | flia Hcdi ].
+}
 replace (j - i) with (S (j - S i)) by flia H1.
 replace (S j + k - i) with (S (j + S k - S i)) by flia H1.
 easy.
@@ -435,51 +452,50 @@ destruct b as (y, y').
 destruct a as [(x, x')| ]. {
   apply find_dup_some in Ha.
   destruct Ha as (Hxx & la1 & la2 & la3 & Hla).
+  assert (Hlla1 : length la1 < length l). {
+    apply (f_equal length) in Hla.
+    rewrite seq_length, app_length in Hla.
+    cbn in Hla; flia Hla.
+  }
+  assert (Hx : x < length l). {
+    rewrite (List_seq_cut (length la1)) in Hla. 2: {
+      apply in_seq.
+      split; [ flia | easy ].
+    }
+    rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
+    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+    destruct Hla as (Hla1 & Hla).
+    cbn in Hla.
+    now injection Hla; clear Hla; intros Hla Hla2; subst x.
+  }
+  assert (Hx' : x' < length l). {
+    assert (Hlla2 : length la1 + S (length la2) < length l). {
+      apply (f_equal length) in Hla.
+      rewrite seq_length, app_length in Hla; cbn in Hla.
+      rewrite app_length in Hla; cbn in Hla.
+      flia Hla.
+    }
+    rewrite (List_seq_cut (length la1 + S (length la2))) in Hla. 2: {
+      apply in_seq.
+      split; [ flia | easy ].
+    }
+    rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
+    rewrite seq_app in Hla; cbn in Hla.
+    rewrite <- app_assoc in Hla.
+    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+    destruct Hla as (Hla1 & Hla).
+    cbn in Hla.
+    injection Hla; clear Hla; intros Hla Hla2; subst x.
+    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+    destruct Hla as (Hla2 & Hla).
+    injection Hla; clear Hla; intros Hla H; subst x'.
+    easy.
+  }
   destruct y'. {
     apply search_double_loop_0_r in Hb.
     destruct Hb as (_, Hb); clear y.
     specialize (proj1 (NoDup_nth l 0) Hb x x') as H1.
-    assert (Hlla1 : length la1 < length l). {
-      apply (f_equal length) in Hla.
-      rewrite seq_length, app_length in Hla.
-      cbn in Hla; flia Hla.
-    }
-    assert (H : x < length l). {
-      rewrite (List_seq_cut (length la1)) in Hla. 2: {
-        apply in_seq.
-        split; [ flia | easy ].
-      }
-      rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
-      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-      destruct Hla as (Hla1 & Hla).
-      cbn in Hla.
-      now injection Hla; clear Hla; intros Hla Hla2; subst x.
-    }
-    specialize (H1 H); clear H.
-    assert (H : x' < length l). {
-      assert (Hlla2 : length la1 + S (length la2) < length l). {
-        apply (f_equal length) in Hla.
-        rewrite seq_length, app_length in Hla; cbn in Hla.
-        rewrite app_length in Hla; cbn in Hla.
-        flia Hla.
-      }
-      rewrite (List_seq_cut (length la1 + S (length la2))) in Hla. 2: {
-        apply in_seq.
-        split; [ flia | easy ].
-      }
-      rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
-      rewrite seq_app in Hla; cbn in Hla.
-      rewrite <- app_assoc in Hla.
-      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-      destruct Hla as (Hla1 & Hla).
-      cbn in Hla.
-      injection Hla; clear Hla; intros Hla Hla2; subst x.
-      apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-      destruct Hla as (Hla2 & Hla).
-      injection Hla; clear Hla; intros Hla H; subst x'.
-      easy.
-    }
-    specialize (H1 H Hxx); clear H.
+    specialize (H1 Hx Hx' Hxx).
     subst x'.
     apply (f_equal (map (λ i, nth i l 0))) in Hla.
     rewrite <- List_map_nth_seq in Hla.
@@ -493,10 +509,23 @@ destruct a as [(x, x')| ]. {
     apply in_app_iff; right.
     now left.
   }
-...
   apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
-  destruct Hb as (_ & Hyyl & Hyy).
+  destruct Hb as (_ & Hyyl & Hcab & Hyy).
   do 2 rewrite Nat.sub_0_r in Hyy.
+  assert (Hxlx : x < x'). {
+...
+  destruct (Nat.lt_trichotomy x y) as [Hxy| [Hxy| Hxy]]. {
+    exfalso.
+    apply (Hcab x (x' - S x)); [ flia Hxy | | ]. 2: {
+      do 2 rewrite Nat.sub_0_r.
+      now replace (x + S (x' - S x)) with x' by flia Hxlx.
+    }
+...
+    specialize (Hcab x (x' - S x)) as H1.
+    assert (H : 0 ≤ x < y) by (split; [ flia | easy ]).
+    specialize (H1 H); clear H.
+    enough (H : x < x').
+    replace (x + S (x' - S x)) with x' in H1 by flia H.
 ...
       apply (f_equal length) in Hla.
       rewrite seq_length in Hla; rewrite Hla.
