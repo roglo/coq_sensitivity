@@ -457,6 +457,12 @@ destruct a as [(x, x')| ]. {
     rewrite seq_length, app_length in Hla.
     cbn in Hla; flia Hla.
   }
+  assert (Hlla2 : length la1 + S (length la2) < length l). {
+    apply (f_equal length) in Hla.
+    rewrite seq_length, app_length in Hla; cbn in Hla.
+    rewrite app_length in Hla; cbn in Hla.
+    flia Hla.
+  }
   assert (Hx : x < length l). {
     rewrite (List_seq_cut (length la1)) in Hla. 2: {
       apply in_seq.
@@ -469,12 +475,6 @@ destruct a as [(x, x')| ]. {
     now injection Hla; clear Hla; intros Hla Hla2; subst x.
   }
   assert (Hx' : x' < length l). {
-    assert (Hlla2 : length la1 + S (length la2) < length l). {
-      apply (f_equal length) in Hla.
-      rewrite seq_length, app_length in Hla; cbn in Hla.
-      rewrite app_length in Hla; cbn in Hla.
-      flia Hla.
-    }
     rewrite (List_seq_cut (length la1 + S (length la2))) in Hla. 2: {
       apply in_seq.
       split; [ flia | easy ].
@@ -512,14 +512,20 @@ destruct a as [(x, x')| ]. {
   apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
   destruct Hb as (_ & Hyyl & Hcab & Hyy).
   do 2 rewrite Nat.sub_0_r in Hyy.
-  assert (Hxlx : x < x'). {
-...
+  assert (Hxlx : x < x') by now apply List_sorted_in_seq in Hla.
   destruct (Nat.lt_trichotomy x y) as [Hxy| [Hxy| Hxy]]. {
     exfalso.
     apply (Hcab x (x' - S x)); [ flia Hxy | | ]. 2: {
       do 2 rewrite Nat.sub_0_r.
       now replace (x + S (x' - S x)) with x' by flia Hxlx.
     }
+    flia Hxlx Hx'.
+  } {
+    subst y; f_equal.
+...
+    specialize (Hcab x y') as H1.
+...
+    do 2 rewrite Nat.sub_0_r in H1.
 ...
     specialize (Hcab x (x' - S x)) as H1.
     assert (H : 0 ≤ x < y) by (split; [ flia | easy ]).
