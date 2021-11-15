@@ -362,7 +362,66 @@ Theorem search_double_loop_0_r : ∀ l i j,
   search_double_loop Nat.eqb i l = (j, 0)
   → j = 0 ∧ NoDup l.
 Proof.
-Admitted.
+intros * Hxx.
+assert (Hj : j = 0). {
+  revert i j Hxx.
+  induction l as [| a]; cbn; intros. {
+    now injection Hxx; clear Hxx; intros; subst j.
+  }
+  remember (List_find_nth _ _) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
+  apply (IHl (S i) j Hxx).
+}
+split; [ easy | subst j ].
+revert i Hxx.
+induction l as [| a]; cbn; intros; [ constructor | ].
+remember (List_find_nth _ _) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
+specialize (IHl (S i) Hxx) as H1.
+constructor; [ | easy ].
+intros Ha.
+apply (In_nth _ _ 0) in Ha.
+destruct Ha as (n & Hn & Hna).
+specialize (List_find_nth_None 0 _ _ Hb) as H2.
+specialize (H2 n Hn).
+apply Nat.eqb_neq in H2.
+now symmetry in Hna.
+Qed.
+
+Theorem search_double_loop_succ_r_lt : ∀ l i j k,
+  search_double_loop Nat.eqb i l = (j, S k)
+  → i ≤ j ∧ j + S k < i + length l ∧
+    nth (j - i) l 0 = nth (j + S k - i) l 0.
+Proof.
+intros * Hxx.
+revert i j k Hxx.
+induction l as [| a]; intros; [ easy | ].
+rewrite <- Nat.add_succ_comm.
+cbn in Hxx.
+remember (List_find_nth _ _) as b eqn:Hb.
+symmetry in Hb.
+destruct b as [b| ]. {
+  rewrite Nat.add_1_r in Hxx.
+  injection Hxx; clear Hxx; intros; subst j k.
+  split; [ easy | ].
+  replace (S i + b - i) with (S b) by flia.
+  rewrite Nat.sub_diag, List_nth_0_cons, List_nth_succ_cons.
+  apply (List_find_nth_Some 0) in Hb.
+  destruct Hb as (Hbl & Hbef & Heq).
+  apply Nat.eqb_eq in Heq; subst a.
+  split; [ cbn; flia Hbl | easy ].
+}
+specialize (IHl (S i) j k Hxx) as H1.
+rewrite List_length_cons.
+destruct H1 as (H1 & H2 & H3).
+split; [ flia H1 | ].
+split; [ flia H2 | ].
+replace (j - i) with (S (j - S i)) by flia H1.
+replace (S j + k - i) with (S (j + S k - S i)) by flia H1.
+easy.
+Qed.
 
 Theorem glop : ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
 Proof.
@@ -422,6 +481,21 @@ destruct a as [(x, x')| ]. {
     }
     specialize (H1 H Hxx); clear H.
     subst x'.
+    apply (f_equal (map (λ i, nth i l 0))) in Hla.
+    rewrite <- List_map_nth_seq in Hla.
+    rewrite Hla in Hb.
+    apply NoDup_map_inv in Hb.
+    apply NoDup_app_iff in Hb.
+    destruct Hb as (_ & Hb & _).
+    apply NoDup_cons_iff in Hb.
+    destruct Hb as (Hb, _).
+    exfalso; apply Hb.
+    apply in_app_iff; right.
+    now left.
+  }
+  apply search_double_loop_succ_r_lt in Hb; cbn in Hb.
+  destruct Hb as (_ & Hyyl & Hyy).
+  do 2 rewrite Nat.sub_0_r in Hyy.
 ...
       apply (f_equal length) in Hla.
       rewrite seq_length in Hla; rewrite Hla.
