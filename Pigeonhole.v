@@ -687,9 +687,21 @@ destruct a as [(x, x')| ]. {
       specialize (Hbef (x + S y')) as H1.
       assert (H : x + S y' ∈ la1 ++ la2). {
         apply in_or_app; right.
+move Hla at bottom.
+move Hxy' at bottom.
+remember (x + S y') as z eqn:Hz.
+assert (Hxz : x < z < x') by flia Hz Hxy'.
+clear Hxy'.
 ...
 (*
-        clear - Hla Hxy'.
+assert (la2 = seq (S (length la1)) (length la2)). {
+Search (seq _ (length _)).
+...
+        clear - Hla Hxy' Hlla1.
+Search (_ ∈ _ ↔ _).
+in_seq: ∀ len start n : nat, n ∈ seq start len ↔ start ≤ n < start + len
+Check In_nth.
+Check nth_In.
 *)
         rewrite (List_seq_cut (length la1)) in Hla. 2: {
           apply in_seq.
@@ -700,6 +712,9 @@ destruct a as [(x, x')| ]. {
         }
         destruct Hla as (_, Hla); cbn in Hla.
         injection Hla; clear Hla; intros Hxl Hla.
+...
+        rewrite (List_seq_cut (length la2)) in Hxl. 2: {
+          apply in_seq.
 ...
         apply (f_equal (map (λ i, nth i l 0))) in Hla.
         rewrite <- List_map_nth_seq in Hla.
