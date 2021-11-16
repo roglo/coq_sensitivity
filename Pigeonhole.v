@@ -24,6 +24,30 @@ Definition pigeonhole_fun a (f : nat → nat) :=
   | None => (0, 0)
   end.
 
+Theorem List_in_split' :
+  ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) (x : A) (l : list A),
+  x ∈ l → ∃ l1 l2 : list A, l = l1 ++ x :: l2 ∧ x ∉ l1.
+Proof.
+intros * eq_dec * Hx.
+revert x Hx.
+induction l as [| y]; intros; [ easy | ].
+destruct Hx as [Hx| Hx]. {
+  subst y.
+  now exists [], l.
+}
+specialize (IHl _ Hx) as H1.
+destruct H1 as (l1 & l2 & Hll & Hl1).
+rewrite Hll.
+destruct (eq_dec y x) as [Hxy| Hxy]. {
+  subst y.
+  now exists [], (l1 ++ x :: l2).
+}
+exists (y :: l1), l2.
+split; [ easy | ].
+intros H; apply Hl1.
+now destruct H.
+Qed.
+
 Theorem List_eq_dec_In_nth :
   ∀ (A : Type) (eq_dec : ∀ x y : A, {x = y} + {x ≠ y}) (l : list A) (x d : A),
   x ∈ l →
@@ -93,11 +117,18 @@ Proof.
   now apply -> Nat.succ_lt_mono.
 Qed.
 
+(*
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
     (∀ x'', x < x'' < x' → f x ≠ f x'') ∧
     ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3.
+*)
+Theorem find_dup_some : ∀ f x x' la,
+  find_dup f la = Some (x, x')
+  → f x = f x' ∧
+    ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3 ∧
+    ∀ x'', x'' ∈ la1 ++ la2 → f x'' ≠ f x.
 Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
@@ -110,28 +141,65 @@ destruct r as [n'| ]. {
   destruct Hr as (i & Hi & Hn'i & Heq & Hbef).
   apply Nat.eqb_eq in Heq.
   split; [ easy | ].
-  split. {
-    intros n'' (Han'', Hx''n').
-...
-  apply find_some in Hr; cbn in Hr.
-  destruct Hr as (Hx'la, Hba).
-  apply Nat.eqb_eq in Hba.
-  split; [ easy | ].
-  split. {
-    intros n'' Hn''.
-...
   exists []; cbn.
-  apply in_split in Hx'la.
-  destruct Hx'la as (l1 & l2 & Hll).
+  assert (Hx'la : n' ∈ la) by now rewrite Hn'i; apply nth_In.
+  apply (List_in_split' _ Nat.eq_dec) in Hx'la.
+  destruct Hx'la as (l1 & l2 & Hla & Hn').
   exists l1, l2.
-  now rewrite Hll.
+  rewrite Hla.
+  split; [ easy | ].
+  intros n'' Hx''.
+  assert (Hil : i = length l1). {
+    rewrite Hla in Hn'i.
+    destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
+      rewrite app_nth1 in Hn'i; [ | easy ].
+      exfalso; apply Hn'; clear Hn'.
+      now subst n'; apply nth_In.
+    } {
+      easy.
+    } {
+      rewrite app_nth2 in Hn'i; [ | flia Hil ].
+      specialize (Hbef (length l1) Hil) as H1.
+      apply Nat.eqb_neq in H1.
+      rewrite Hla in H1.
+      rewrite app_nth2 in H1; [ | now unfold ge ].
+      now rewrite Nat.sub_diag in H1; cbn in H1.
+    }
+  }
+  apply (In_nth _ _ 0) in Hx''.
+  destruct Hx'' as (j & Hj & Hjn).
+  rewrite <- Hil in Hj.
+  specialize (Hbef _ Hj) as H1.
+  apply Nat.eqb_neq in H1.
+  rewrite Hla in H1.
+  rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
+  now rewrite Hjn in H1.
 } {
   specialize (IHla Hfd).
-  destruct IHla as (H & la1 & la2 & la3 & Hll).
+  destruct IHla as (Hxx & la1 & la2 & la3 & Hll & Hbef).
+(**)
   split; [ easy | ].
-  now exists (a :: la1), la2, la3; rewrite Hll.
+  exists (a :: la1), la2, la3; rewrite Hll.
+  split; [ easy | ].
+  intros x'' Hx''.
+  destruct Hx'' as [Hx''| Hx'']. {
+    subst x''.
+    specialize (find_none _ _ Hr x) as H1.
+    assert (H : x ∈ la). {
+      rewrite Hll.
+      now apply in_or_app; right; left.
+    }
+    specialize (H1 H); clear H.
+    apply Nat.eqb_neq in H1.
+    now apply Nat.neq_sym in H1.
+  }
+  now apply Hbef.
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem find_dup_none : ∀ f la,
   find_dup f la = None → NoDup (map f la).
