@@ -86,44 +86,37 @@ Theorem List_find_some_if :
   ∃ i, i < length l ∧ x = nth i l d ∧ f x = true ∧
   ∀ j, j < i → f (nth j l d) = false.
 Proof.
-  intros * eq_dec * Hf.
-  specialize (find_some _ _ Hf) as H1.
-  destruct H1 as (Hx, Hfx).
-  apply (List_eq_dec_In_nth A eq_dec l x d) in Hx.
-  destruct Hx as (i & Hi & Hix & Hx).
-  exists i.
-  split; [ easy | ].
-  split; [ easy | ].
-  split; [ easy | ].
-  intros j Hj.
-  revert i j Hi Hix Hx Hj.
-  induction l as [| a]; intros; [ easy | ].
-  cbn in Hf.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    injection Hf; clear Hf; intros; subst a.
-    clear Hb.
-    destruct i; [ easy | ].
-    now specialize (Hx 0 (Nat.lt_0_succ _)) as H1.
-  }
+intros * eq_dec * Hf.
+specialize (find_some _ _ Hf) as H1.
+destruct H1 as (Hx, Hfx).
+apply (List_eq_dec_In_nth A eq_dec l x d) in Hx.
+destruct Hx as (i & Hi & Hix & Hx).
+exists i.
+split; [ easy | ].
+split; [ easy | ].
+split; [ easy | ].
+intros j Hj.
+revert i j Hi Hix Hx Hj.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hf.
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  injection Hf; clear Hf; intros; subst a.
+  clear Hb.
   destruct i; [ easy | ].
-  cbn in Hi, Hix; apply Nat.succ_lt_mono in Hi.
-  destruct j; [ easy | cbn ].
-  apply Nat.succ_lt_mono in Hj.
-  apply IHl with (i := i); [ easy | easy | easy | | easy ].
-  intros m Hm.
-  specialize (Hx (S m)); cbn in Hx.
-  apply Hx.
-  now apply -> Nat.succ_lt_mono.
+  now specialize (Hx 0 (Nat.lt_0_succ _)) as H1.
+}
+destruct i; [ easy | ].
+cbn in Hi, Hix; apply Nat.succ_lt_mono in Hi.
+destruct j; [ easy | cbn ].
+apply Nat.succ_lt_mono in Hj.
+apply IHl with (i := i); [ easy | easy | easy | | easy ].
+intros m Hm.
+specialize (Hx (S m)); cbn in Hx.
+apply Hx.
+now apply -> Nat.succ_lt_mono.
 Qed.
 
-(*
-Theorem find_dup_some : ∀ f x x' la,
-  find_dup f la = Some (x, x')
-  → f x = f x' ∧
-    (∀ x'', x < x'' < x' → f x ≠ f x'') ∧
-    ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3.
-*)
 Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
@@ -166,8 +159,13 @@ destruct r as [n'| ]. {
       now rewrite Nat.sub_diag in H1; cbn in H1.
     }
   }
+(**)
+  apply (List_eq_dec_In_nth _ Nat.eq_dec _ _ 0) in Hx''.
+  destruct Hx'' as (j & Hj & Hjn & Hbefn).
+(*
   apply (In_nth _ _ 0) in Hx''.
   destruct Hx'' as (j & Hj & Hjn).
+*)
   rewrite <- Hil in Hj.
   specialize (Hbef _ Hj) as H1.
   apply Nat.eqb_neq in H1.
@@ -196,10 +194,6 @@ destruct r as [n'| ]. {
   now apply Hbef.
 }
 Qed.
-
-Inspect 1.
-
-...
 
 Theorem find_dup_none : ∀ f la,
   find_dup f la = None → NoDup (map f la).
@@ -416,7 +410,8 @@ remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
   injection Hpf; clear Hpf; intros; subst n n'.
-  specialize (find_dup_some f _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
+  specialize (find_dup_some f _ _ _ Hfd) as H.
+  destruct H as (Hfxx & la1 & la2 & la3 & Hll & Hbef).
   assert (Hxy : x ∈ seq 0 a). {
     rewrite Hll.
     apply in_app_iff.
@@ -605,9 +600,8 @@ symmetry in Ha, Hb.
 move b before a.
 destruct b as (y, y').
 destruct a as [(x, x')| ]. {
-...
   apply find_dup_some in Ha.
-  destruct Ha as (Hxx & la1 & la2 & la3 & Hla).
+  destruct Ha as (Hxx & la1 & la2 & la3 & Hla & Hbef).
   assert (Hlla1 : length la1 < length l). {
     apply (f_equal length) in Hla.
     rewrite seq_length, app_length in Hla.
@@ -678,6 +672,41 @@ destruct a as [(x, x')| ]. {
     flia Hxlx Hx'.
   } {
     subst y; f_equal.
+    destruct (Nat.lt_trichotomy x' (x + S y')) as [Hxy'| [Hxy'| Hxy']]. {
+      exfalso.
+      specialize (Hby (x' - S x)) as H1.
+      assert (H : x' - S x < y') by flia Hxy' Hxlx.
+      specialize (H1 H); clear H.
+      do 2 rewrite Nat.sub_0_r in H1.
+      rewrite <- Nat.sub_succ_l in H1 by easy; cbn in H1.
+      rewrite Nat.add_sub_assoc in H1; [ | flia Hxlx ].
+      now rewrite Nat.add_comm, Nat.add_sub in H1.
+    } {
+      easy.
+    } {
+      specialize (Hbef (x + S y')) as H1.
+      assert (H : x + S y' ∈ la1 ++ la2). {
+        apply in_or_app; right.
+...
+(*
+        clear - Hla Hxy'.
+*)
+        rewrite (List_seq_cut (length la1)) in Hla. 2: {
+          apply in_seq.
+          split; [ flia | easy ].
+        }
+        apply List_app_eq_app' in Hla. 2: {
+          now rewrite seq_length, Nat.sub_0_r.
+        }
+        destruct Hla as (_, Hla); cbn in Hla.
+        injection Hla; clear Hla; intros Hxl Hla.
+...
+        apply (f_equal (map (λ i, nth i l 0))) in Hla.
+        rewrite <- List_map_nth_seq in Hla.
+    rewrite Hla in Hb.
+Check nth_In.
+Check In_nth.
+Check List_sorted_in_seq.
 ...
     replace x' with (x + S (x' - S x)) by flia Hxlx.
     f_equal; f_equal.
