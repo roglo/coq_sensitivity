@@ -535,19 +535,30 @@ Qed.
 
 Theorem seq_app_cons_app_cons : ∀ sta len x y la1 la2 la3,
   seq sta len = la1 ++ x :: la2 ++ y :: la3
+  ↔ len = length la1 + length la2 + length la3 + 2 ∧
+    x = sta + length la1 ∧
+    y = S x + length la2 ∧
+    la1 = seq sta (length la1) ∧
+    la2 = seq (S x) (length la2) ∧
+    la3 = seq (S y) (sta + len - S y).
+(*
   ↔ x = sta + length la1 ∧
    y = sta + length la1 + length la2 + 1 ∧
    (∀ a, sta ≤ a < x → a ∈ la1) ∧
    (∀ a, x + 1 ≤ a < y → a ∈ la2) ∧
    (∀ a, y + 1 ≤ a < sta + len → a ∈ la3).
+*)
 Proof.
 intros.
 split. {
   intros Hs.
+  generalize Hs; intros Hsv.
+  move Hsv after Hs.
   rewrite (List_seq_cut (sta + length la1)) in Hs. 2: {
     apply in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
+    clear Hsv.
     revert sta la1 Hs.
     induction len; intros; cbn. {
       now symmetry in Hs; apply app_eq_nil in Hs.
@@ -566,32 +577,54 @@ split. {
   rewrite Nat.add_comm, Nat.add_sub in Hla1.
   cbn in Hs.
   injection Hs; clear Hs; intros Hs Hx; symmetry in Hx.
+  move Hx after Hla1.
+  split. {
+    apply (f_equal length) in Hsv.
+    rewrite seq_length in Hsv.
+    rewrite app_length in Hsv; cbn in Hsv.
+    rewrite app_length in Hsv; cbn in Hsv.
+    flia Hsv.
+  }
   split; [ easy | ].
-(*
-  rewrite <- Nat.add_succ_r in Hs.
-  rewrite Nat.sub_add_distr in Hs.
-  rewrite (Nat.add_comm _ len) in Hs.
-  rewrite Nat.add_sub in Hs.
-*)
   rewrite <- Hx in Hs.
   rewrite (List_seq_cut (S x + length la2)) in Hs. 2: {
     apply in_seq.
     split; [ flia | ].
     apply Nat.add_lt_mono_l.
-    remember (sta + len - S x) as len' eqn:Hlen'.
-...
-    induction len'. {
-      now symmetry in Hs; apply app_eq_nil in Hs.
-    }
-...
-  assert (Hx : x = sta + length la1). {
-...
-Check List_seq_cut.
-...  
-  revert sta la1 la2 la3 x y Hs.
-  induction len; intros; cbn. {
-    now symmetry in Hs; apply app_eq_nil in Hs.
+    apply (f_equal length) in Hs.
+    rewrite seq_length in Hs.
+    rewrite app_length in Hs.
+    cbn in Hs; flia Hs.
   }
+  rewrite Nat.add_comm, Nat.add_sub in Hs.
+  apply List_app_eq_app' in Hs; [ | now rewrite seq_length ].
+  destruct Hs as (Hla2, Hs); symmetry in Hla2; cbn in Hs.
+  injection Hs; clear Hs; intros Hla3 Hy.
+  move Hy before Hx; symmetry in Hy.
+  symmetry in Hla3; rewrite <- Hy in Hla3.
+  rewrite Nat.add_sub_assoc in Hla3. 2: {
+    rewrite Hx, <- Nat.add_succ_r.
+    apply Nat.add_le_mono_l.
+    apply (f_equal length) in Hsv.
+    rewrite seq_length, app_length in Hsv; cbn in Hsv.
+    flia Hsv.
+  }
+  rewrite Nat.add_comm in Hla3.
+  rewrite <- (Nat.add_1_r x) in Hla3.
+  rewrite Nat.sub_add_distr, Nat.add_sub in Hla3.
+  rewrite <- Nat.sub_add_distr in Hla3; cbn in Hla3.
+  now rewrite Nat.add_comm.
+} {
+  intros (Hlen & Hx & Hy & Hla1 & Hla2 & Hla3).
+  rewrite (List_seq_cut x). 2: {
+    apply in_seq; rewrite Hx.
+    split; [ flia | ].
+    apply Nat.add_lt_mono_l.
+    flia Hlen.
+  }
+  cbn; rewrite Hx at 1.
+  rewrite Nat.add_comm, Nat.add_sub, <- Hla1, Hla2.
+  f_equal; f_equal.
 ...
 
 Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
