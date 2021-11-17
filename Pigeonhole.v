@@ -121,7 +121,8 @@ Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
     ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3 ∧
-    ∀ x'', x'' ∈ la1 ++ la2 → f x'' ≠ f x.
+    (∀ x'', x'' ∈ la1 ++ la2 → f x'' ≠ f x) ∧
+    (∀ y dy, y < x → f y ≠ f (y + S dy)).
 Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
@@ -141,37 +142,37 @@ destruct r as [n'| ]. {
   exists l1, l2.
   rewrite Hla.
   split; [ easy | ].
-  intros n'' Hx''.
-  assert (Hil : i = length l1). {
-    rewrite Hla in Hn'i.
-    destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
-      rewrite app_nth1 in Hn'i; [ | easy ].
-      exfalso; apply Hn'; clear Hn'.
-      now subst n'; apply nth_In.
-    } {
-      easy.
-    } {
-      rewrite app_nth2 in Hn'i; [ | flia Hil ].
-      specialize (Hbef (length l1) Hil) as H1.
-      apply Nat.eqb_neq in H1.
-      rewrite Hla in H1.
-      rewrite app_nth2 in H1; [ | now unfold ge ].
-      now rewrite Nat.sub_diag in H1; cbn in H1.
+  split. {
+    intros n'' Hx''.
+    assert (Hil : i = length l1). {
+      rewrite Hla in Hn'i.
+      destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
+        rewrite app_nth1 in Hn'i; [ | easy ].
+        exfalso; apply Hn'; clear Hn'.
+        now subst n'; apply nth_In.
+      } {
+        easy.
+      } {
+        rewrite app_nth2 in Hn'i; [ | flia Hil ].
+        specialize (Hbef (length l1) Hil) as H1.
+        apply Nat.eqb_neq in H1.
+        rewrite Hla in H1.
+        rewrite app_nth2 in H1; [ | now unfold ge ].
+        now rewrite Nat.sub_diag in H1; cbn in H1.
+      }
     }
-  }
-(**)
-  apply (List_eq_dec_In_nth _ Nat.eq_dec _ _ 0) in Hx''.
-  destruct Hx'' as (j & Hj & Hjn & Hbefn).
-(*
-  apply (In_nth _ _ 0) in Hx''.
-  destruct Hx'' as (j & Hj & Hjn).
-*)
-  rewrite <- Hil in Hj.
-  specialize (Hbef _ Hj) as H1.
-  apply Nat.eqb_neq in H1.
-  rewrite Hla in H1.
-  rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
-  now rewrite Hjn in H1.
+    apply (List_eq_dec_In_nth _ Nat.eq_dec _ _ 0) in Hx''.
+    destruct Hx'' as (j & Hj & Hjn & Hbefn).
+    rewrite <- Hil in Hj.
+    specialize (Hbef _ Hj) as H1.
+    apply Nat.eqb_neq in H1.
+    rewrite Hla in H1.
+    rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
+    now rewrite Hjn in H1.
+  } {
+    intros y dy Hya.
+Check List_find_some_if.
+...
 } {
   specialize (IHla Hfd).
   destruct IHla as (Hxx & la1 & la2 & la3 & Hll & Hbef).
@@ -716,6 +717,7 @@ move b before a.
 destruct b as (y, y').
 destruct a as [(x, x')| ]. {
   apply find_dup_some in Ha.
+...
   destruct Ha as (Hxx & la1 & la2 & la3 & Hla & Hbef).
   assert (Hlla1 : length la1 < length l). {
     apply (f_equal length) in Hla.
@@ -811,6 +813,9 @@ destruct a as [(x, x')| ]. {
     }
   } {
     exfalso.
+...
+    specialize (Hby (x' - S y)) as H1.
+...
     specialize (Hbef y) as H1.
     assert (H : y ∈ la1 ++ la2). {
       apply in_or_app; left.
