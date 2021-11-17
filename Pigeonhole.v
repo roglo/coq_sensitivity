@@ -803,7 +803,7 @@ destruct a as [(x, x')| ]. {
       assert (H : x + S y' ∈ la1 ++ la2). {
         apply in_or_app; right.
         remember (x + S y') as y eqn:Hy.
-        apply (seq_app_cons_app_cons_interv_in _ _ y)in Hla; [ easy | ].
+        apply (seq_app_cons_app_cons_interv_in _ _ y) in Hla; [ easy | ].
         subst y; split; [ flia | easy ].
       }
       specialize (H1 H); clear H.
@@ -811,6 +811,21 @@ destruct a as [(x, x')| ]. {
     }
   } {
     exfalso.
+    specialize (Hbef y) as H1.
+    assert (H : y ∈ la1 ++ la2). {
+      apply in_or_app; left.
+      admit.
+    }
+    specialize (H1 H); clear H.
+    rewrite Hyy in H1.
+...
+    specialize (Hby (y - S y)) as H2.
+...
+    specialize (Hby (x - S y)) as H2.
+Search y.
+...
+    specialize (proj1 (seq_app_cons_app_cons _ _ _ _ _ _ _) Hla) as H1.
+    specialize (Hby (x - S y)) as H1.
 ...
 move Hla at bottom.
 move Hxy' at bottom.
