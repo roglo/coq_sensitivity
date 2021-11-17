@@ -533,6 +533,37 @@ apply Nat.eqb_neq in H2.
 now symmetry in Hna.
 Qed.
 
+Theorem seq_app_cons_app_cons : ∀ n x y la1 la2 la3,
+  seq 0 n = la1 ++ x :: la2 ++ y :: la3
+  → x = length la1 ∧
+   y = length la1 + length la2 + 1 ∧
+   (∀ a, a < x → a ∈ la1) ∧
+   (∀ a, x + 1 ≤ a < y → a ∈ la2).
+Proof.
+intros * Hs.
+...
+
+Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
+  seq 0 n = la1 ++ x :: la2 ++ z :: la3
+  → x < y < z
+  → y ∈ la2.
+Proof.
+intros * Hs Hxyz.
+...
+specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx & Hz & H1 & H2).
+apply H2.
+rewrite <- Hz, <- Hx.
+flia Hxyz.
+Check Sorted.Sorted.
+Search (Sorted.Sorted).
+Search (Sorted.Sorted _ (_ ++ _)).
+Search (Sorted.LocallySorted _ (_ ++ _)).
+Search (Sorted.StronglySorted _ (_ ++ _)).
+
+...
+specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx, Hz).
+...
+
 Theorem search_double_loop_succ_r_if : ∀ l i j k,
   search_double_loop Nat.eqb i l = (j, S k)
   → i ≤ j ∧ j + S k < i + length l ∧
@@ -687,12 +718,21 @@ destruct a as [(x, x')| ]. {
       specialize (Hbef (x + S y')) as H1.
       assert (H : x + S y' ∈ la1 ++ la2). {
         apply in_or_app; right.
+        remember (x + S y') as y eqn:Hy.
+...
+        apply (seq_app_cons_app_cons_interv_in _ _ y)in Hla; [ easy | ].
+        subst y; split; [ flia | easy ].
+      }
+...
 move Hla at bottom.
 move Hxy' at bottom.
-remember (x + S y') as z eqn:Hz.
-assert (Hxz : x < z < x') by flia Hz Hxy'.
+remember (x + S y') as y eqn:Hy.
+assert (Hxz : x < y < x') by flia Hy Hxy'.
 clear Hxy'.
+clear - Hla Hxz.
 ...
+clear - Hla Hxz Hlla1 Hlla2.
+Search (seq _ _ = _ ++ _).
 (*
 assert (la2 = seq (S (length la1)) (length la2)). {
 Search (seq _ (length _)).
@@ -707,11 +747,20 @@ Check nth_In.
           apply in_seq.
           split; [ flia | easy ].
         }
-        apply List_app_eq_app' in Hla. 2: {
-          now rewrite seq_length, Nat.sub_0_r.
-        }
-        destruct Hla as (_, Hla); cbn in Hla.
+        rewrite Nat.sub_0_r in Hla; cbn in Hla.
+        apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
+        destruct Hla as (_, Hla).
         injection Hla; clear Hla; intros Hxl Hla.
+        rewrite Hla in Hxl.
+        rewrite (List_seq_cut (S x + length la2)) in Hxl. 2: {
+          apply in_seq.
+          split; [ flia | ].
+          apply Nat.add_lt_mono_l.
+          rewrite <- Hla; flia Hlla2.
+        }
+        rewrite Nat.add_comm, Nat.add_sub in Hxl.
+        apply List_app_eq_app' in Hxl; [ | now rewrite seq_length ].
+        destruct Hxl as (_, Hxl).
 ...
         rewrite (List_seq_cut (length la2)) in Hxl. 2: {
           apply in_seq.
