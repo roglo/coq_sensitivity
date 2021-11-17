@@ -625,7 +625,14 @@ split. {
   cbn; rewrite Hx at 1.
   rewrite Nat.add_comm, Nat.add_sub, <- Hla1, Hla2.
   f_equal; f_equal.
-...
+  rewrite Hla3.
+  rewrite cons_seq.
+  rewrite Hy at 1.
+  rewrite <- seq_app.
+  f_equal.
+  flia Hx Hy Hlen.
+}
+Qed.
 
 Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
   seq 0 n = la1 ++ x :: la2 ++ z :: la3
@@ -633,20 +640,13 @@ Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
   → y ∈ la2.
 Proof.
 intros * Hs Hxyz.
-Abort. (*
-specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx & Hz & H1 & H2).
-apply H2.
-rewrite <- Hz, <- Hx.
-flia Hxyz.
-Check Sorted.Sorted.
-Search (Sorted.Sorted).
-Search (Sorted.Sorted _ (_ ++ _)).
-Search (Sorted.LocallySorted _ (_ ++ _)).
-Search (Sorted.StronglySorted _ (_ ++ _)).
-...
-specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx, Hz).
-...
-*)
+specialize (seq_app_cons_app_cons 0 n x z la1 la2 la3) as H1.
+specialize (proj1 H1 Hs) as (Hn & Hx & Hz & Hla1 & Hla2 & Hla3).
+rewrite Hla2.
+apply in_seq.
+rewrite <- Hz.
+easy.
+Qed.
 
 Theorem search_double_loop_succ_r_if : ∀ l i j k,
   search_double_loop Nat.eqb i l = (j, S k)
@@ -803,10 +803,14 @@ destruct a as [(x, x')| ]. {
       assert (H : x + S y' ∈ la1 ++ la2). {
         apply in_or_app; right.
         remember (x + S y') as y eqn:Hy.
-...
         apply (seq_app_cons_app_cons_interv_in _ _ y)in Hla; [ easy | ].
         subst y; split; [ flia | easy ].
       }
+      specialize (H1 H); clear H.
+      now symmetry in Hyy.
+    }
+  } {
+    exfalso.
 ...
 move Hla at bottom.
 move Hxy' at bottom.
