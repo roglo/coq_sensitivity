@@ -121,8 +121,8 @@ Theorem find_dup_some : ∀ f x x' la,
   find_dup f la = Some (x, x')
   → f x = f x' ∧
     ∃ la1 la2 la3, la = la1 ++ x :: la2 ++ x' :: la3 ∧
-    (∀ x'', x'' ∈ la1 ++ la2 → f x'' ≠ f x) ∧
-    (∀ y dy, y < x → f y ≠ f (y + S dy)).
+    (∀ y y', y ∈ la1 → y' ∈ la → f y = f y' → y = y') ∧
+    (∀ x'', x'' ∈ la1 ++ la2 → f x'' ≠ f x).
 Proof.
 intros * Hfd.
 induction la as [| a]; [ easy | ].
@@ -142,44 +142,54 @@ destruct r as [n'| ]. {
   exists l1, l2.
   rewrite Hla.
   split; [ easy | ].
-  split. {
-    intros n'' Hx''.
-    assert (Hil : i = length l1). {
-      rewrite Hla in Hn'i.
-      destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
-        rewrite app_nth1 in Hn'i; [ | easy ].
-        exfalso; apply Hn'; clear Hn'.
-        now subst n'; apply nth_In.
-      } {
-        easy.
-      } {
-        rewrite app_nth2 in Hn'i; [ | flia Hil ].
-        specialize (Hbef (length l1) Hil) as H1.
-        apply Nat.eqb_neq in H1.
-        rewrite Hla in H1.
-        rewrite app_nth2 in H1; [ | now unfold ge ].
-        now rewrite Nat.sub_diag in H1; cbn in H1.
-      }
+  split; [ easy | ].
+  intros n'' Hx''.
+  assert (Hil : i = length l1). {
+    rewrite Hla in Hn'i.
+    destruct (Nat.lt_trichotomy i (length l1)) as [Hil| [Hil| Hil]]. {
+      rewrite app_nth1 in Hn'i; [ | easy ].
+      exfalso; apply Hn'; clear Hn'.
+      now subst n'; apply nth_In.
+    } {
+      easy.
+    } {
+      rewrite app_nth2 in Hn'i; [ | flia Hil ].
+      specialize (Hbef (length l1) Hil) as H1.
+      apply Nat.eqb_neq in H1.
+      rewrite Hla in H1.
+      rewrite app_nth2 in H1; [ | now unfold ge ].
+      now rewrite Nat.sub_diag in H1; cbn in H1.
     }
-    apply (List_eq_dec_In_nth _ Nat.eq_dec _ _ 0) in Hx''.
-    destruct Hx'' as (j & Hj & Hjn & Hbefn).
-    rewrite <- Hil in Hj.
-    specialize (Hbef _ Hj) as H1.
-    apply Nat.eqb_neq in H1.
-    rewrite Hla in H1.
-    rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
-    now rewrite Hjn in H1.
-  } {
-    intros y dy Hya.
-Check List_find_some_if.
-...
+  }
+  apply (List_eq_dec_In_nth _ Nat.eq_dec _ _ 0) in Hx''.
+  destruct Hx'' as (j & Hj & Hjn & Hbefn).
+  rewrite <- Hil in Hj.
+  specialize (Hbef _ Hj) as H1.
+  apply Nat.eqb_neq in H1.
+  rewrite Hla in H1.
+  rewrite app_nth1 in H1; [ | now rewrite Hil in Hj ].
+  now rewrite Hjn in H1.
 } {
   specialize (IHla Hfd).
-  destruct IHla as (Hxx & la1 & la2 & la3 & Hll & Hbef).
-(**)
+  destruct IHla as (Hxx & la1 & la2 & la3 & Hll & Hfstx & Hfstx').
   split; [ easy | ].
   exists (a :: la1), la2, la3; rewrite Hll.
   split; [ easy | ].
+  split. {
+    intros y y' Hy Hy' Hyy.
+    rewrite <- Hll in Hy'.
+    destruct Hy as [Hy| Hy]. {
+      subst y.
+      destruct Hy' as [Hy'| Hy']; [ easy | ].
+...
+    specialize (find_none _ _ Hr y') as H1; cbn in H1.
+...
+    destruct Hy as [Hy| Hy]. {
+      subst y.
+      destruct Hy' as [Hy'| Hy']; [ easy | ].
+...
+    apply Hfstx.
+...
   intros x'' Hx''.
   destruct Hx'' as [Hx''| Hx'']. {
     subst x''.
