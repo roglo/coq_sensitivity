@@ -533,14 +533,65 @@ apply Nat.eqb_neq in H2.
 now symmetry in Hna.
 Qed.
 
-Theorem seq_app_cons_app_cons : ∀ n x y la1 la2 la3,
-  seq 0 n = la1 ++ x :: la2 ++ y :: la3
-  → x = length la1 ∧
-   y = length la1 + length la2 + 1 ∧
-   (∀ a, a < x → a ∈ la1) ∧
-   (∀ a, x + 1 ≤ a < y → a ∈ la2).
+Theorem seq_app_cons_app_cons : ∀ sta len x y la1 la2 la3,
+  seq sta len = la1 ++ x :: la2 ++ y :: la3
+  ↔ x = sta + length la1 ∧
+   y = sta + length la1 + length la2 + 1 ∧
+   (∀ a, sta ≤ a < x → a ∈ la1) ∧
+   (∀ a, x + 1 ≤ a < y → a ∈ la2) ∧
+   (∀ a, y + 1 ≤ a < sta + len → a ∈ la3).
 Proof.
-intros * Hs.
+intros.
+split. {
+  intros Hs.
+  rewrite (List_seq_cut (sta + length la1)) in Hs. 2: {
+    apply in_seq.
+    split; [ flia | ].
+    apply Nat.add_lt_mono_l.
+    revert sta la1 Hs.
+    induction len; intros; cbn. {
+      now symmetry in Hs; apply app_eq_nil in Hs.
+    }
+    destruct la1 as [| a]; cbn; [ flia | ].
+    apply -> Nat.succ_lt_mono.
+    cbn in Hs.
+    injection Hs; clear Hs; intros Hs Ha.
+    now apply IHlen in Hs.
+  }
+  apply List_app_eq_app' in Hs. 2: {
+    rewrite seq_length, Nat.add_comm.
+    apply Nat.add_sub.
+  }
+  destruct Hs as (Hla1 & Hs); symmetry in Hla1.
+  rewrite Nat.add_comm, Nat.add_sub in Hla1.
+  cbn in Hs.
+  injection Hs; clear Hs; intros Hs Hx; symmetry in Hx.
+  split; [ easy | ].
+(*
+  rewrite <- Nat.add_succ_r in Hs.
+  rewrite Nat.sub_add_distr in Hs.
+  rewrite (Nat.add_comm _ len) in Hs.
+  rewrite Nat.add_sub in Hs.
+*)
+  rewrite <- Hx in Hs.
+  rewrite (List_seq_cut (S x + length la2)) in Hs. 2: {
+    apply in_seq.
+    split; [ flia | ].
+    apply Nat.add_lt_mono_l.
+    remember (sta + len - S x) as len' eqn:Hlen'.
+...
+    induction len'. {
+      now symmetry in Hs; apply app_eq_nil in Hs.
+    }
+...
+  assert (Hx : x = sta + length la1). {
+...
+Check List_seq_cut.
+...  
+  revert sta la1 la2 la3 x y Hs.
+  induction len; intros; cbn. {
+    now symmetry in Hs; apply app_eq_nil in Hs.
+  }
 ...
 
 Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
@@ -549,7 +600,7 @@ Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
   → y ∈ la2.
 Proof.
 intros * Hs Hxyz.
-...
+Abort. (*
 specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx & Hz & H1 & H2).
 apply H2.
 rewrite <- Hz, <- Hx.
@@ -559,10 +610,10 @@ Search (Sorted.Sorted).
 Search (Sorted.Sorted _ (_ ++ _)).
 Search (Sorted.LocallySorted _ (_ ++ _)).
 Search (Sorted.StronglySorted _ (_ ++ _)).
-
 ...
 specialize (seq_app_cons_app_cons _ _ _ _ _ _ Hs) as (Hx, Hz).
 ...
+*)
 
 Theorem search_double_loop_succ_r_if : ∀ l i j k,
   search_double_loop Nat.eqb i l = (j, S k)
