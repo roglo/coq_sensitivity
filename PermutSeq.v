@@ -1921,7 +1921,57 @@ rewrite (nth_nth_permut_list_inv_list Hp Hln (Nat.lt_succ_diag_r _)).
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
+remember (λ i, nth i l 0) as f eqn:Hf.
+replace (map f _) with (map f (butn i (seq 0 (S n)))). 2: {
+  rewrite map_butn_seq.
+  replace (i <? S n) with true. 2: {
+    symmetry; apply Nat.ltb_lt.
+    rewrite Hi, <- Hln.
+    rewrite <- length_permut_list_inv.
+    apply permut_list_ub; [ now apply permut_list_inv_is_permut | ].
+    rewrite length_permut_list_inv, Hln.
+    apply Nat.lt_succ_diag_r.
+  }
+  cbn; rewrite Nat.sub_0_r.
+  rewrite Hln; cbn.
+  subst f; cbn.
+  destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+    rewrite Hin, Nat.sub_diag; cbn; rewrite app_nil_r.
+    apply map_ext_in.
+    intros j Hj.
+    apply in_seq in Hj.
+    destruct Hj as (_, Hj); cbn in Hj.
+    apply Nat.nle_gt, Nat.leb_nle in Hj; rewrite Hj.
+    now rewrite Nat.add_0_r.
+  }
+  rewrite (List_seq_cut i). 2: {
+    apply in_seq.
+    split; [ flia | ].
+    enough (Hil : i < S n) by flia Hin Hil.
+    rewrite Hi, <- Hln.
+    rewrite <- length_permut_list_inv.
+    apply permut_list_ub; [ | rewrite length_permut_list_inv, Hln; flia ].
+    now apply permut_list_inv_is_permut.
+  }
+  rewrite Nat.sub_0_r, Nat.add_0_l.
+...
+Search (
+    specialize (nth_
+Search (seq _ _ = _ ++ _).
+
+  rewrite seq_cut.
+Search (map _ _ = map _ _).
+
+Search (butn _ (seq _ _)).
+
+  rewrite seq_butn.
+...
 rewrite <- Nat.add_1_r.
+specialize (List_map_nth_seq (butn i (seq 0 (S n))) 0) as H2.
+rewrite butn_length in H1, H2.
+rewrite seq_length in H2.
+...
+remember (λ j, if lt_dec j i then a j else a (j + 1)) as x.
 ...
 Search (seq _ _ ++ seq _ _).
 specialize (seq_app i (length (butn n l) - (i + 1)) 0) as H1.
