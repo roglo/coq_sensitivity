@@ -1799,10 +1799,18 @@ destruct x as [x| ]. {
   apply Nat.eqb_eq in Hxwhi.
 (**)
   destruct Hp as (Hp1, Hp2).
+  specialize pigeonhole_list as H1.
 ...
-  specialize (pigeonhole_list (length l) l) as H1.
+Check remove.
+Check pigeonhole_list.
+remember (length (remove Nat.eq_dec j l)) as a eqn:Ha.
+  specialize (pigeonhole_list a l) as H1.
 ...
+  specialize (pigeonhole_list (length l) (remove Nat.eq_dec j l)) as H1.
+Search (length (remove _ _ _)).
+  rewrite remove_length in H1.
   specialize (List_find_nth_None 0 _ _ Hy) as H1.
+...
 ...
   apply Nat.eqb_neq in H1.
   specialize (H1
