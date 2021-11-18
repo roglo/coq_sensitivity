@@ -713,7 +713,8 @@ replace (j + S c - i) with (S (j + S c - S i)) by flia H1; cbn.
 now apply H4.
 Qed.
 
-Theorem glop : ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
+Theorem pigeonhole_comp_list_comp_list' :
+   ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
 Proof.
 intros.
 unfold pigeonhole_comp_list, pigeonhole_comp_list'.
@@ -838,83 +839,20 @@ destruct a as [(x, x')| ]. {
   }
 }
 destruct y'; [ easy | exfalso ].
-...
-move Hla at bottom.
-move Hxy' at bottom.
-remember (x + S y') as y eqn:Hy.
-assert (Hxz : x < y < x') by flia Hy Hxy'.
-clear Hxy'.
-clear - Hla Hxz.
-...
-clear - Hla Hxz Hlla1 Hlla2.
-Search (seq _ _ = _ ++ _).
-(*
-assert (la2 = seq (S (length la1)) (length la2)). {
-Search (seq _ (length _)).
-...
-        clear - Hla Hxy' Hlla1.
-Search (_ ∈ _ ↔ _).
-in_seq: ∀ len start n : nat, n ∈ seq start len ↔ start ≤ n < start + len
-Check In_nth.
-Check nth_In.
-*)
-        rewrite (List_seq_cut (length la1)) in Hla. 2: {
-          apply in_seq.
-          split; [ flia | easy ].
-        }
-        rewrite Nat.sub_0_r in Hla; cbn in Hla.
-        apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-        destruct Hla as (_, Hla).
-        injection Hla; clear Hla; intros Hxl Hla.
-        rewrite Hla in Hxl.
-        rewrite (List_seq_cut (S x + length la2)) in Hxl. 2: {
-          apply in_seq.
-          split; [ flia | ].
-          apply Nat.add_lt_mono_l.
-          rewrite <- Hla; flia Hlla2.
-        }
-        rewrite Nat.add_comm, Nat.add_sub in Hxl.
-        apply List_app_eq_app' in Hxl; [ | now rewrite seq_length ].
-        destruct Hxl as (_, Hxl).
-...
-        rewrite (List_seq_cut (length la2)) in Hxl. 2: {
-          apply in_seq.
-...
-        apply (f_equal (map (λ i, nth i l 0))) in Hla.
-        rewrite <- List_map_nth_seq in Hla.
-    rewrite Hla in Hb.
-Check nth_In.
-Check In_nth.
-Check List_sorted_in_seq.
-...
-    replace x' with (x + S (x' - S x)) by flia Hxlx.
-    f_equal; f_equal.
-...
-rewrite Hxx in Hyy.
-...
-destruct y'. {
-  clear Hby.
-...
-    specialize (Hcab x y') as H1.
-...
-    do 2 rewrite Nat.sub_0_r in H1.
-...
-    specialize (Hcab x (x' - S x)) as H1.
-    assert (H : 0 ≤ x < y) by (split; [ flia | easy ]).
-    specialize (H1 H); clear H.
-    enough (H : x < x').
-    replace (x + S (x' - S x)) with x' in H1 by flia H.
-...
-      apply (f_equal length) in Hla.
-      rewrite seq_length in Hla; rewrite Hla.
-      assert (H : x = length la1). {
-...
-        apply (f_equal (map (λ i, nth i l 0))) in Hla.
-        rewrite <- List_map_nth_seq in Hla.
-      rewrite Hla, map_length.
-      rewrite app_length; cbn.
-      rewrite app_length; cbn.
-...
+apply find_dup_none in Ha.
+unfold List_search_double in Hb.
+apply search_double_loop_succ_r_if in Hb.
+destruct Hb as (_ & Hyyl & Hcab & Hby & Hyy).
+do 2 rewrite Nat.sub_0_r in Hyy.
+specialize (proj1 (NoDup_map_iff 0 _ _) Ha) as H1.
+rewrite seq_length in H1.
+specialize (H1 y (y + S y')).
+assert (H : y < length l) by flia Hyyl.
+specialize (H1 H Hyyl); clear H.
+rewrite seq_nth in H1; [ | flia Hyyl ].
+rewrite seq_nth in H1; [ | easy ].
+specialize (H1 Hyy); flia H1.
+Qed.
 
 Theorem pigeonhole_list : ∀ a l,
   a < length l
@@ -930,6 +868,7 @@ destruct fd as [(n, n') |]. {
   injection Hpcl; clear Hpcl; intros; subst n n'.
   specialize (find_dup_some _ _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
   assert (Hxy : x ∈ seq 0 (length l)). {
+...
     rewrite Hll.
     apply in_app_iff.
     now right; left.
