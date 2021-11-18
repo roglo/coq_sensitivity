@@ -1849,10 +1849,6 @@ destruct x as [x| ]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem permut_list_inv_is_permut : ∀ l,
   is_permut_list l
   → is_permut_list (permut_list_inv l).
@@ -1865,9 +1861,9 @@ split. {
 } {
   rewrite length_permut_list_inv.
   intros i j Hi Hj Hij.
-...
   now apply permut_list_inv_inj in Hij.
-...
+}
+Qed.
 
 Theorem permut_list_Permutation : ∀ l n,
   is_permut_list l
@@ -1888,11 +1884,8 @@ rewrite (List_seq_cut i). 2: {
   split; [ flia | ].
   specialize permut_list_ub as H1.
   specialize (H1 (permut_list_inv l) n).
-...
   specialize (H1 (permut_list_inv_is_permut Hp)).
-...
-  rewrite length_permut_list_inv in H1.
-  rewrite Hln in H1.
+  rewrite length_permut_list_inv, Hln in H1.
   specialize (H1 (Nat.lt_succ_diag_r _)).
 ...
   apply permut_list_ub; [ | flia ].
