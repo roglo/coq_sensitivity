@@ -1877,6 +1877,8 @@ induction n; intros. {
   now apply length_zero_iff_nil in Hln; subst l.
 }
 rewrite seq_S; cbn.
+Search permut_list_inv.
+...
 remember (nth n (permut_list_inv l) 0) as i eqn:Hi.
 rewrite (List_seq_cut i). 2: {
   subst i.
