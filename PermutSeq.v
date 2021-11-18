@@ -1768,6 +1768,44 @@ destruct k as [k| ]. {
 subst i; flia Hj.
 Qed.
 
+Theorem permut_list_without : ∀ n l,
+  is_permut_list l
+  → n < length l
+  → (∀ i, i < length l → nth i l 0 ≠ n)
+  → False.
+Proof.
+intros * Hp Hn Hnn.
+destruct Hp as (Hp1, Hp2).
+specialize (pigeonhole_list (length l) (n :: l)) as H1.
+specialize (H1 (Nat.lt_succ_diag_r _)).
+assert (H : ∀ x, x ∈ n :: l → x < length l). {
+  intros z Hz.
+  destruct Hz as [Hz| Hz]; [ now subst z | now apply Hp1 ].
+}
+specialize (H1 H); clear H.
+remember (pigeonhole_comp_list (n :: l)) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize (H1 x x' eq_refl).
+destruct H1 as (Hxl & Hx'l & Hxx' & Hnxx).
+destruct x. {
+  destruct x'; [ easy | cbn in Hnxx ].
+  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
+  specialize (Hnn x' Hx'l).
+  now symmetry in Hnxx.
+} {
+  cbn in Hxl; apply Nat.succ_lt_mono in Hxl.
+  destruct x'. {
+    cbn in Hnxx.
+    now specialize (Hnn x Hxl).
+  }
+  cbn in Hnxx.
+  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
+  specialize (Hp2 x x' Hxl Hx'l Hnxx) as H1.
+  now destruct H1.
+}
+Qed.
+
 Theorem permut_list_inv_inj : ∀ l,
   is_permut_list l
   → ∀ i j, i < length l → j < length l
@@ -1795,39 +1833,24 @@ destruct x as [x| ]. {
     apply Nat.eqb_eq in Hxwhi, Hywhi.
     destruct Hij; congruence.
   }
-  clear Hxbef; subst x.
-  apply Nat.eqb_eq in Hxwhi.
-(**)
-  destruct Hp as (Hp1, Hp2).
-  specialize pigeonhole_list as H1.
-...
-Check remove.
-Check pigeonhole_list.
-remember (length (remove Nat.eq_dec j l)) as a eqn:Ha.
-  specialize (pigeonhole_list a l) as H1.
-...
-  specialize (pigeonhole_list (length l) (remove Nat.eq_dec j l)) as H1.
-Search (length (remove _ _ _)).
-  rewrite remove_length in H1.
-  specialize (List_find_nth_None 0 _ _ Hy) as H1.
-...
-...
+  subst x; exfalso.
+  apply (permut_list_without Hp Hj).
+  intros k Hk.
+  specialize (List_find_nth_None 0 _ _ Hy Hk) as H1.
   apply Nat.eqb_neq in H1.
-  specialize (H1
-...
-  destruct l as [| a]; [ easy | ].
-  clear Hxl.
-  cbn in Hxwhi |-*; subst a.
-  specialize (List_find_nth_None 0 _ _ Hy) as H1.
-  destruct Hp as (Hp1, Hp2).
-Print is_permut_list.
-Check pigeonhole_list.
-(* pigeonhole! *)
-...
-  specialize (H1 i Hi) as H2.
-  apply Nat.eqb_neq in H2.
-  specialize (H1 j Hj) as H3.
-  apply Nat.eqb_neq in H3.
+  now apply Nat.neq_sym.
+} {
+  exfalso.
+  apply (permut_list_without Hp Hi).
+  intros k Hk.
+  specialize (List_find_nth_None 0 _ _ Hx Hk) as H1.
+  apply Nat.eqb_neq in H1.
+  now apply Nat.neq_sym.
+}
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem permut_list_inv_is_permut : ∀ l,
