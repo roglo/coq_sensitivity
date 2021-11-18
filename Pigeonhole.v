@@ -171,7 +171,7 @@ destruct r as [n'| ]. {
   now rewrite Hjn in H1.
 } {
   specialize (IHla Hfd).
-  destruct IHla as (Hxx & la1 & la2 & la3 & Hll & Hfstx & Hfstx').
+  destruct IHla as (Hxx & la1 & la2 & la3 & Hll & H1stx & H1stx').
   split; [ easy | ].
   exists (a :: la1), la2, la3; rewrite Hll.
   split; [ easy | ].
@@ -181,15 +181,19 @@ destruct r as [n'| ]. {
     destruct Hy as [Hy| Hy]. {
       subst y.
       destruct Hy' as [Hy'| Hy']; [ easy | ].
-...
-    specialize (find_none _ _ Hr y') as H1; cbn in H1.
-...
-    destruct Hy as [Hy| Hy]. {
-      subst y.
-      destruct Hy' as [Hy'| Hy']; [ easy | ].
-...
-    apply Hfstx.
-...
+      specialize (find_none _ _ Hr y' Hy') as H1; cbn in H1.
+      apply Nat.eqb_neq in H1.
+      now symmetry in Hyy.
+    }
+    destruct Hy' as [Hy'| Hy']. {
+      subst y'.
+      specialize (find_none _ _ Hr y) as H1.
+      assert (H : y ∈ la) by now rewrite Hll; apply in_or_app; left.
+      specialize (H1 H); clear H.
+      now apply Nat.eqb_neq in H1.
+    }
+    now apply H1stx.
+  }
   intros x'' Hx''.
   destruct Hx'' as [Hx''| Hx'']. {
     subst x''.
@@ -202,7 +206,7 @@ destruct r as [n'| ]. {
     apply Nat.eqb_neq in H1.
     now apply Nat.neq_sym in H1.
   }
-  now apply Hbef.
+  now apply H1stx'.
 }
 Qed.
 
@@ -727,8 +731,7 @@ move b before a.
 destruct b as (y, y').
 destruct a as [(x, x')| ]. {
   apply find_dup_some in Ha.
-...
-  destruct Ha as (Hxx & la1 & la2 & la3 & Hla & Hbef).
+  destruct Ha as (Hxx & la1 & la2 & la3 & Hla & H1stx & H1stx').
   assert (Hlla1 : length la1 < length l). {
     apply (f_equal length) in Hla.
     rewrite seq_length, app_length in Hla.
@@ -811,7 +814,7 @@ destruct a as [(x, x')| ]. {
     } {
       easy.
     } {
-      specialize (Hbef (x + S y')) as H1.
+      specialize (H1stx' (x + S y')) as H1.
       assert (H : x + S y' ∈ la1 ++ la2). {
         apply in_or_app; right.
         remember (x + S y') as y eqn:Hy.
@@ -829,7 +832,7 @@ destruct a as [(x, x')| ]. {
     specialize (Hbef y) as H1.
     assert (H : y ∈ la1 ++ la2). {
       apply in_or_app; left.
-      admit.
+...
     }
     specialize (H1 H); clear H.
     rewrite Hyy in H1.
