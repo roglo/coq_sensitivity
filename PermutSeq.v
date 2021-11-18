@@ -257,7 +257,7 @@ Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] i
 
 (* *)
 
-Theorem nth_nth_permut_list_inv : ∀ n l i,
+Theorem nth_nth_list_permut_list_inv : ∀ n l i,
   is_permut_list l
   → length l = n
   → i < n
@@ -343,6 +343,84 @@ destruct (Nat.eq_dec x (length l)) as [Hxn| Hxn]. {
   apply Hp in Hexx; [ easy | flia Hx Hxn | flia Hx' Hx'n ].
 }
 Qed.
+*)
+
+Theorem nth_nth_permut_list_inv_list : ∀ n l i,
+  is_permut_list l
+  → length l = n
+  → i < n
+  → nth (nth i (permut_list_inv l) 0) l 0 = i.
+Proof.
+intros * Hp Hl Hin.
+unfold permut_list_inv, unsome.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; congruence ].
+rewrite seq_nth; [ | congruence ].
+rewrite Nat.add_0_l.
+remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  destruct Hx as (Hxl & Hbef & Hix).
+  now apply Nat.eqb_eq in Hix.
+} {
+  specialize (List_find_nth_None 0 _ _ Hx) as H1.
+(* pigeonhole, once again??? *)
+...
+intros * Hp Hl Hin.
+revert i l Hp Hl Hin.
+induction n; intros; [ easy | cbn ].
+destruct l as [| a]; [ easy | ].
+destruct i. {
+  unfold permut_list_inv.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; cbn; flia ].
+  rewrite seq_nth; [ | cbn; flia ].
+  rewrite Nat.add_0_l.
+
+...
+  rewrite List_nth_0_cons.
+  unfold permut_list_inv.
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite seq_length; apply Hp; left.
+  }
+  rewrite seq_nth; [ cbn | now apply Hp; left ].
+  now rewrite Nat.eqb_refl.
+}
+rewrite List_nth_succ_cons.
+unfold permut_list_inv.
+cbn in Hl.
+apply Nat.succ_inj in Hl.
+apply Nat.succ_lt_mono in Hin.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply Hp; right.
+  apply nth_In; congruence.
+}
+rewrite seq_nth. 2: {
+  apply Hp; right.
+  apply nth_In; congruence.
+}
+rewrite Nat.add_0_l.
+unfold unsome.
+remember (List_find_nth _ _) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]. {
+  apply List_find_nth_loop_Some with (d := 0) in Hj.
+  destruct Hj as (Hjl & Hij & Hj).
+  apply Nat.eqb_eq in Hj.
+  rewrite Nat.sub_0_r in Hj.
+  destruct Hp as (Hp1, Hp2).
+  specialize (Hp2 (S i) j).
+  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
+  specialize (Hp2 H Hjl); clear H.
+  rewrite List_nth_succ_cons in Hp2.
+  now specialize (Hp2 Hj).
+}
+specialize (List_find_nth_None 0 _ _ Hj) as H1.
+specialize (H1 (S i)).
+assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
+specialize (H1 H); clear H.
+now rewrite Nat.eqb_refl in H1.
+Qed.
+...
 *)
 
 (* transposition *)
@@ -1877,21 +1955,32 @@ induction n; intros. {
   now apply length_zero_iff_nil in Hln; subst l.
 }
 rewrite seq_S; cbn.
-Search permut_list_inv.
-...
 remember (nth n (permut_list_inv l) 0) as i eqn:Hi.
-rewrite (List_seq_cut i). 2: {
+rewrite (List_map_nth_seq l 0).
+remember (seq 0 n) as s eqn:Hs.
+rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
   split; [ flia | ].
-  specialize permut_list_ub as H1.
-  specialize (H1 (permut_list_inv l) n).
-  specialize (H1 (permut_list_inv_is_permut Hp)).
-  rewrite length_permut_list_inv, Hln in H1.
-  specialize (H1 (Nat.lt_succ_diag_r _)).
+  rewrite <- length_permut_list_inv.
+  apply permut_list_ub; [ | rewrite length_permut_list_inv, Hln; flia ].
+  now apply permut_list_inv_is_permut.
+}
+rewrite Nat.sub_0_r; cbn.
+rewrite map_app; cbn.
+rewrite Hi at 2.
+Search (nth _ (permut_list_inv _)).
+Search permut_list_inv.
+Search (nth (nth _ _ _)).
+nth (nth n (permut_list_inv l) 0) l 0 .
 ...
-  apply permut_list_ub; [ | flia ].
-  now apply permut_fun_inv_loop_is_permut.
+nth_nth_permut_list_inv:
+  ∀ (n : nat) (l : list nat) (i : nat),
+    is_permut_list l → length l = n → i < n → nth (nth i l 0) (permut_list_inv l) 0 = i
+...
+Check fun_permut_fun_inv_loop.
+rewrite nth_nth_permut_list_inv.
+rewrite list_permut_list_inv.
 ...
 Theorem permut_fun_Permutation : ∀ f n,
   is_permut_fun f n
