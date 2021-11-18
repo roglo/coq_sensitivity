@@ -471,24 +471,6 @@ Qed.
 
 (* version list instead of fun *)
 
-(*
-Fixpoint find_dup f (la : list nat) :=
-  match la with
-  | [] => None
-  | n :: la' =>
-      match find (λ n', f n' =? f n) la' with
-      | None => find_dup f la'
-      | Some n' => Some (n, n')
-      end
-  end.
-
-Definition pigeonhole_fun a (f : nat → nat) :=
-  match find_dup f (seq 0 a) with
-  | Some (n, n') => (n, n')
-  | None => (0, 0)
-  end.
-*)
-
 Fixpoint search_double_loop {A} eqb i (l : list A) :=
   match l with
   | a :: l' =>
@@ -866,9 +848,9 @@ remember (find_dup _ _) as fd eqn:Hfd.
 symmetry in Hfd.
 destruct fd as [(n, n') |]. {
   injection Hpcl; clear Hpcl; intros; subst n n'.
-  specialize (find_dup_some _ _ _ _ Hfd) as (Hfxx & la1 & la2 & la3 & Hll).
+  apply find_dup_some in Hfd.
+  destruct Hfd as (Hxx & la1 & la2 & la3 & Hll & H1stx & H1stx').
   assert (Hxy : x ∈ seq 0 (length l)). {
-...
     rewrite Hll.
     apply in_app_iff.
     now right; left.
@@ -887,14 +869,12 @@ destruct fd as [(n, n') |]. {
   specialize (seq_NoDup (length l) 0) as H.
   rewrite Hll in H.
   apply NoDup_remove_2 in H.
-  intros Hxx; apply H; subst x'.
+  intros Hxix; apply H; subst x'.
   apply in_app_iff; right.
   now apply in_app_iff; right; left.
 } {
   apply find_dup_none in Hfd.
-  exfalso.
-Check not_NoDup_map_f_seq.
-...
+  exfalso; clear Hpcl.
   apply not_NoDup_map_f_seq with (b := a) in Hfd; [ easy | easy | ].
   intros y Hy.
   apply Hla.
