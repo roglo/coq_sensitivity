@@ -1789,25 +1789,31 @@ symmetry in Hx, Hy.
 destruct x as [x| ]. {
   apply (List_find_nth_Some 0) in Hx.
   destruct Hx as (Hxl & Hxbef & Hxwhi).
-  apply Nat.eqb_eq in Hxwhi.
-  rewrite Hxwhi.
   destruct y as [y| ]. {
     apply (List_find_nth_Some 0) in Hy.
     destruct Hy as (Hyl & Hybef & Hywhi).
-    apply Nat.eqb_eq in Hywhi.
-    rewrite Hywhi.
-    now destruct Hij.
+    apply Nat.eqb_eq in Hxwhi, Hywhi.
+    destruct Hij; congruence.
   }
-  subst x.
-  clear Hxbef.
+  clear Hxbef; subst x.
+  apply Nat.eqb_eq in Hxwhi.
 (**)
+  destruct Hp as (Hp1, Hp2).
+...
+  specialize (pigeonhole_list (length l) l) as H1.
+...
+  specialize (List_find_nth_None 0 _ _ Hy) as H1.
+...
+  apply Nat.eqb_neq in H1.
+  specialize (H1
+...
   destruct l as [| a]; [ easy | ].
   clear Hxl.
   cbn in Hxwhi |-*; subst a.
   specialize (List_find_nth_None 0 _ _ Hy) as H1.
   destruct Hp as (Hp1, Hp2).
 Print is_permut_list.
-Search pigeonhole_fun.
+Check pigeonhole_list.
 (* pigeonhole! *)
 ...
   specialize (H1 i Hi) as H2.
