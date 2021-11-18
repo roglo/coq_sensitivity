@@ -556,13 +556,6 @@ Theorem seq_app_cons_app_cons : ∀ sta len x y la1 la2 la3,
     la1 = seq sta (length la1) ∧
     la2 = seq (S x) (length la2) ∧
     la3 = seq (S y) (sta + len - S y).
-(*
-  ↔ x = sta + length la1 ∧
-   y = sta + length la1 + length la2 + 1 ∧
-   (∀ a, sta ≤ a < x → a ∈ la1) ∧
-   (∀ a, x + 1 ≤ a < y → a ∈ la2) ∧
-   (∀ a, y + 1 ≤ a < sta + len → a ∈ la3).
-*)
 Proof.
 intros.
 split. {
@@ -826,24 +819,25 @@ destruct a as [(x, x')| ]. {
     }
   } {
     exfalso.
-...
-    specialize (Hby (x' - S y)) as H1.
-...
-    specialize (Hbef y) as H1.
-    assert (H : y ∈ la1 ++ la2). {
-      apply in_or_app; left.
-...
+    specialize (H1stx y (y + S y')) as H1.
+    assert (H : y ∈ la1). {
+      apply seq_app_cons_app_cons in Hla.
+      destruct Hla as (Hl & Hx2 & Hx'2 & Hla1 & Hla2 & Hla3).
+      rewrite Hla1.
+      apply in_seq.
+      split; [ flia | ].
+      now rewrite <- Hx2.
     }
     specialize (H1 H); clear H.
-    rewrite Hyy in H1.
-...
-    specialize (Hby (y - S y)) as H2.
-...
-    specialize (Hby (x - S y)) as H2.
-Search y.
-...
-    specialize (proj1 (seq_app_cons_app_cons _ _ _ _ _ _ _) Hla) as H1.
-    specialize (Hby (x - S y)) as H1.
+    assert (H : y + S y' ∈ seq 0 (length l)). {
+      apply in_seq.
+      split; [ flia | easy ].
+    }
+    specialize (H1 H Hyy); clear H.
+    flia H1.
+  }
+}
+destruct y'; [ easy | exfalso ].
 ...
 move Hla at bottom.
 move Hxy' at bottom.
