@@ -257,6 +257,44 @@ Compute (let n := 4 in map (λ i, let v := nth i (canon_sym_gr_list_list n) [] i
 
 (* *)
 
+Theorem permut_list_without : ∀ n l,
+  is_permut_list l
+  → n < length l
+  → (∀ i, i < length l → nth i l 0 ≠ n)
+  → False.
+Proof.
+intros * Hp Hn Hnn.
+destruct Hp as (Hp1, Hp2).
+specialize (pigeonhole_list (length l) (n :: l)) as H1.
+specialize (H1 (Nat.lt_succ_diag_r _)).
+assert (H : ∀ x, x ∈ n :: l → x < length l). {
+  intros z Hz.
+  destruct Hz as [Hz| Hz]; [ now subst z | now apply Hp1 ].
+}
+specialize (H1 H); clear H.
+remember (pigeonhole_comp_list (n :: l)) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize (H1 x x' eq_refl).
+destruct H1 as (Hxl & Hx'l & Hxx' & Hnxx).
+destruct x. {
+  destruct x'; [ easy | cbn in Hnxx ].
+  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
+  specialize (Hnn x' Hx'l).
+  now symmetry in Hnxx.
+} {
+  cbn in Hxl; apply Nat.succ_lt_mono in Hxl.
+  destruct x'. {
+    cbn in Hnxx.
+    now specialize (Hnn x Hxl).
+  }
+  cbn in Hnxx.
+  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
+  specialize (Hp2 x x' Hxl Hx'l Hnxx) as H1.
+  now destruct H1.
+}
+Qed.
+
 Theorem nth_nth_list_permut_list_inv : ∀ n l i,
   is_permut_list l
   → length l = n
@@ -362,66 +400,14 @@ destruct x as [x| ]. {
   destruct Hx as (Hxl & Hbef & Hix).
   now apply Nat.eqb_eq in Hix.
 } {
-  specialize (List_find_nth_None 0 _ _ Hx) as H1.
-(* pigeonhole, once again??? *)
-...
-intros * Hp Hl Hin.
-revert i l Hp Hl Hin.
-induction n; intros; [ easy | cbn ].
-destruct l as [| a]; [ easy | ].
-destruct i. {
-  unfold permut_list_inv.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; cbn; flia ].
-  rewrite seq_nth; [ | cbn; flia ].
-  rewrite Nat.add_0_l.
-
-...
-  rewrite List_nth_0_cons.
-  unfold permut_list_inv.
-  rewrite (List_map_nth' 0). 2: {
-    now rewrite seq_length; apply Hp; left.
-  }
-  rewrite seq_nth; [ cbn | now apply Hp; left ].
-  now rewrite Nat.eqb_refl.
+  exfalso.
+  rewrite <- Hl in Hin.
+  apply (permut_list_without Hp Hin).
+  intros j Hj.
+  specialize (List_find_nth_None 0 _ _ Hx Hj) as H1.
+  now apply Nat.eqb_neq, Nat.neq_sym in H1.
 }
-rewrite List_nth_succ_cons.
-unfold permut_list_inv.
-cbn in Hl.
-apply Nat.succ_inj in Hl.
-apply Nat.succ_lt_mono in Hin.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  apply Hp; right.
-  apply nth_In; congruence.
-}
-rewrite seq_nth. 2: {
-  apply Hp; right.
-  apply nth_In; congruence.
-}
-rewrite Nat.add_0_l.
-unfold unsome.
-remember (List_find_nth _ _) as j eqn:Hj.
-symmetry in Hj.
-destruct j as [j| ]. {
-  apply List_find_nth_loop_Some with (d := 0) in Hj.
-  destruct Hj as (Hjl & Hij & Hj).
-  apply Nat.eqb_eq in Hj.
-  rewrite Nat.sub_0_r in Hj.
-  destruct Hp as (Hp1, Hp2).
-  specialize (Hp2 (S i) j).
-  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
-  specialize (Hp2 H Hjl); clear H.
-  rewrite List_nth_succ_cons in Hp2.
-  now specialize (Hp2 Hj).
-}
-specialize (List_find_nth_None 0 _ _ Hj) as H1.
-specialize (H1 (S i)).
-assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
-specialize (H1 H); clear H.
-now rewrite Nat.eqb_refl in H1.
 Qed.
-...
-*)
 
 (* transposition *)
 
@@ -1846,44 +1832,6 @@ destruct k as [k| ]. {
 subst i; flia Hj.
 Qed.
 
-Theorem permut_list_without : ∀ n l,
-  is_permut_list l
-  → n < length l
-  → (∀ i, i < length l → nth i l 0 ≠ n)
-  → False.
-Proof.
-intros * Hp Hn Hnn.
-destruct Hp as (Hp1, Hp2).
-specialize (pigeonhole_list (length l) (n :: l)) as H1.
-specialize (H1 (Nat.lt_succ_diag_r _)).
-assert (H : ∀ x, x ∈ n :: l → x < length l). {
-  intros z Hz.
-  destruct Hz as [Hz| Hz]; [ now subst z | now apply Hp1 ].
-}
-specialize (H1 H); clear H.
-remember (pigeonhole_comp_list (n :: l)) as xx eqn:Hxx.
-symmetry in Hxx.
-destruct xx as (x, x').
-specialize (H1 x x' eq_refl).
-destruct H1 as (Hxl & Hx'l & Hxx' & Hnxx).
-destruct x. {
-  destruct x'; [ easy | cbn in Hnxx ].
-  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
-  specialize (Hnn x' Hx'l).
-  now symmetry in Hnxx.
-} {
-  cbn in Hxl; apply Nat.succ_lt_mono in Hxl.
-  destruct x'. {
-    cbn in Hnxx.
-    now specialize (Hnn x Hxl).
-  }
-  cbn in Hnxx.
-  cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
-  specialize (Hp2 x x' Hxl Hx'l Hnxx) as H1.
-  now destruct H1.
-}
-Qed.
-
 Theorem permut_list_inv_inj : ∀ l,
   is_permut_list l
   → ∀ i j, i < length l → j < length l
@@ -1969,14 +1917,19 @@ rewrite (List_seq_cut i); subst s. 2: {
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
-Search (nth _ (permut_list_inv _)).
-Search permut_list_inv.
-Search (nth (nth _ _ _)).
-nth (nth n (permut_list_inv l) 0) l 0 .
+rewrite (nth_nth_permut_list_inv_list Hp Hln (Nat.lt_succ_diag_r _)).
+apply Permutation_elt.
+rewrite app_nil_r.
+rewrite <- map_app.
+rewrite <- Nat.add_1_r.
 ...
-nth_nth_permut_list_inv:
-  ∀ (n : nat) (l : list nat) (i : nat),
-    is_permut_list l → length l = n → i < n → nth (nth i l 0) (permut_list_inv l) 0 = i
+Search (seq _ _ ++ seq _ _).
+specialize (seq_app i (length (butn n l) - (i + 1)) 0) as H1.
+rewrite <- (seq_app (i + 1) (length l - (i + 1)) 0).
+...
+rewrite <- seq_app.
+Search (map _ (_ ++ _)).
+rewrite <- map_app.
 ...
 Check fun_permut_fun_inv_loop.
 rewrite nth_nth_permut_list_inv.
