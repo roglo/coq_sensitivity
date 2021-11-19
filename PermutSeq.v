@@ -11,10 +11,10 @@ Require Import Misc.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
-Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
+Definition nat_nth l i := nth i l 0.
 
-Definition comp_list (la lb : list nat) :=
-  map (λ i, nth i la 0) lb.
+Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
+Definition comp_list (la lb : list nat) := map (nat_nth la) lb.
 
 (*
 Compute (comp_list [0;2;1] [2;1;0]).
@@ -37,7 +37,10 @@ Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
   (⋀ (i = 1, length l),
      (⋀ (j = 1, length l),
-        ((nth (i - 1) l 0 ≠? nth (j - 1) l 0) || (i =? j)))).
+        ((nat_nth l (i - 1) ≠? nat_nth l (j - 1)) || (i =? j)))).
+
+Theorem List_map_nat_nth_seq : ∀ l, l = map (nat_nth l) (seq 0 (length l)).
+Proof. intros; apply List_map_nth_seq. Qed.
 
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
   is_permut_list l ↔ is_permut_list_bool l = true.

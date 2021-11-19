@@ -31,8 +31,6 @@ Definition ε_fun f n :=
 Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 *)
 
-Definition nat_nth l i := nth i l 0.
-
 Definition ε n (p : list nat) :=
   ((∏ (i = 1, n), ∏ (j = 1, n),
     δ i j (nat_nth p (i - 1)) (nat_nth p (j - 1))) /
@@ -43,9 +41,6 @@ Definition minus_one_pow n :=
   | 0 => 1%F
   | _ => (- 1%F)%F
   end.
-
-Theorem List_map_nat_nth_seq : ∀ l, l = map (nat_nth l) (seq 0 (length l)).
-Proof. intros; apply List_map_nth_seq. Qed.
 
 Theorem minus_one_pow_succ :
   rngl_has_opp = true →
@@ -1297,14 +1292,32 @@ Theorem signature_comp_fun_expand_1 :
   → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
-unfold ε, comp; cbn.
-remember
-   ((∏ (i = 1, n),
-   (∏ (j = 1, n),
-    δ i j (nat_nth f (nat_nth g (i - 1))) (nat_nth f (nat_nth g (j - 1)))) /
-   ∏ (i = 1, n),
-   (∏ (j = 1, n), δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1)))))%F as x.
+unfold ε, comp_list; cbn.
 rewrite <- Hs; symmetry.
+remember
+   (∏ (i = 1, n),
+    (∏ (j = 1, n),
+     δ i j (nat_nth f (nat_nth g (i - 1))) (nat_nth f (nat_nth g (j - 1)))))
+   as x eqn:Hx.
+remember
+   (∏ (i = 1, n),
+    (∏ (j = 1, n), δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1)))) as y eqn:Hy.
+remember (∏ (i = 1, n), (∏ (j = 1, n), δ i j i j)) as z eqn:Hz.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold nat_nth.
+    rewrite (List_map_nth' 0); [ | flia Hi Hn ].
+    rewrite (List_map_nth' 0); [ | flia Hj Hn ].
+    easy.
+  }
+  easy.
+}
+cbn.
+unfold nat_nth in Hx.
+rewrite <- Hx.
+(* ouais, bon *)
 ...
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
