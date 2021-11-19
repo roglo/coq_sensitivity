@@ -1921,7 +1921,6 @@ rewrite (nth_nth_permut_list_inv_list Hp Hln (Nat.lt_succ_diag_r _)).
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
-(*1*)
 rewrite Hln; cbn.
 assert (Hin : i ≤ n). {
   apply Nat.lt_succ_r.
@@ -1947,117 +1946,66 @@ split. {
   destruct Hj as (k & Hkj & Hk).
   apply in_app_iff in Hk.
   subst j.
-  destruct Hk as [Hk| Hk]. {
-    apply in_seq in Hk.
+  assert (Hkn : nth k l 0 < n). {
     specialize permut_list_ub as H1.
     specialize (H1 l k Hp).
     rewrite Hln in H1.
-    assert (H : k < S n) by flia Hk Hin.
+    assert (H : k < S n). {
+      destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk Hin.
+    }
     specialize (H1 H); clear H.
     enough (H : nth k l 0 ≠ n) by flia H H1.
-...1
-remember (λ i, nth i l 0) as f eqn:Hf.
-replace (map f _) with (map f (butn i (seq 0 (S n)))). 2: {
-  rewrite map_butn_seq.
-  replace (i <? S n) with true. 2: {
-    symmetry; apply Nat.ltb_lt.
-    rewrite Hi, <- Hln.
-    rewrite <- length_permut_list_inv.
-    apply permut_list_ub; [ now apply permut_list_inv_is_permut | ].
-    rewrite length_permut_list_inv, Hln.
-    apply Nat.lt_succ_diag_r.
+    intros H; rewrite Hn in H.
+    apply Hp in H; [ | | flia Hin Hln ]. 2: {
+      rewrite Hln.
+      destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk Hin.
+    }
+    subst k.
+    destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk.
   }
-  cbn; rewrite Nat.sub_0_r.
-  rewrite Hln; cbn.
-  subst f; cbn.
-  destruct (Nat.eq_dec i n) as [Hin| Hin]. {
-    rewrite Hin, Nat.sub_diag; cbn; rewrite app_nil_r.
-    apply map_ext_in.
-    intros j Hj.
-    apply in_seq in Hj.
-    destruct Hj as (_, Hj); cbn in Hj.
-    apply Nat.nle_gt, Nat.leb_nle in Hj; rewrite Hj.
-    now rewrite Nat.add_0_r.
+  destruct Hk as [Hk| Hk]; [ now apply in_seq in Hk | ].
+  apply in_seq in Hk.
+  now replace (S i + (n - i)) with (S n) in Hk by flia Hin.
+} {
+  rewrite map_length, map_app, app_length, seq_length, seq_length.
+  replace (i + (n - i)) with n by flia Hin.
+  intros j k Hj Hk Hjk.
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hjk; [ | easy ].
+    destruct (lt_dec k i) as [Hki| Hki]. {
+      rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+      rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hjk; [ | easy ].
+      apply Hp in Hjk; [ easy | flia Hln Hj | flia Hln Hk ].
+    }
+    apply Nat.nlt_ge in Hki; exfalso.
+    rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite map_length, seq_length in Hjk.
+    rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
+    rewrite seq_nth in Hjk; [ | flia Hk Hki ].
+    replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
+    apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
   }
-  rewrite (List_seq_cut i). 2: {
-    apply in_seq.
-    split; [ flia | ].
-    enough (Hil : i < S n) by flia Hin Hil.
-    rewrite Hi, <- Hln.
-    rewrite <- length_permut_list_inv.
-    apply permut_list_ub; [ | rewrite length_permut_list_inv, Hln; flia ].
-    now apply permut_list_inv_is_permut.
+  apply Nat.nlt_ge in Hji.
+  rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+  rewrite map_length, seq_length in Hjk.
+  rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hj Hji ].
+  rewrite seq_nth in Hjk; [ | flia Hj Hji ].
+  replace (S i + (j - i)) with (S j) in Hjk by flia Hji.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hjk; [ | easy ].
+    apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
   }
-  rewrite Nat.sub_0_r, Nat.add_0_l.
-  do 3 rewrite map_app.
-  f_equal. {
-    apply map_ext_in.
-    intros j Hj.
-    apply in_seq in Hj.
-    unfold Nat.b2n; rewrite if_leb_le_dec.
-    destruct (le_dec i j) as [H| H]; [ flia Hj H | clear H ].
-    now rewrite Nat.add_0_r.
-  }
-  cbn; rewrite Nat.leb_refl; cbn.
-  rewrite <- seq_shift, map_map.
-  rewrite <- seq_shift, map_map; cbn.
-...
-Search (
-    specialize (nth_
-Search (seq _ _ = _ ++ _).
-
-  rewrite seq_cut.
-Search (map _ _ = map _ _).
-
-Search (butn _ (seq _ _)).
-
-  rewrite seq_butn.
-...
-rewrite <- Nat.add_1_r.
-specialize (List_map_nth_seq (butn i (seq 0 (S n))) 0) as H2.
-rewrite butn_length in H1, H2.
-rewrite seq_length in H2.
-...
-remember (λ j, if lt_dec j i then a j else a (j + 1)) as x.
-...
-Search (seq _ _ ++ seq _ _).
-specialize (seq_app i (length (butn n l) - (i + 1)) 0) as H1.
-rewrite <- (seq_app (i + 1) (length l - (i + 1)) 0).
-...
-rewrite <- seq_app.
-Search (map _ (_ ++ _)).
-rewrite <- map_app.
-...
-Check fun_permut_fun_inv_loop.
-rewrite nth_nth_permut_list_inv.
-rewrite list_permut_list_inv.
-...
-Theorem permut_fun_Permutation : ∀ f n,
-  is_permut_fun f n
-  → Permutation (map f (seq 0 n)) (seq 0 n).
-Proof.
-intros a n * Hp.
-symmetry.
-revert a Hp.
-induction n; intros; [ easy | ].
-rewrite seq_S at 1.
-remember (permut_fun_inv_loop a (S n) n) as i eqn:Hi.
-remember (seq 0 n) as s eqn:Hs.
-rewrite (List_seq_cut i); subst s. 2: {
-  subst i.
-  apply in_seq.
-  split; [ flia | ].
-  apply permut_ub; [ | flia ].
-  now apply permut_fun_inv_loop_is_permut.
+  apply Nat.nlt_ge in Hki.
+  rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+  rewrite map_length, seq_length in Hjk.
+  rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
+  rewrite seq_nth in Hjk; [ | flia Hk Hki ].
+  replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
+  apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
 }
-rewrite Nat.sub_0_r; cbn.
-rewrite map_app; cbn.
-rewrite Hi at 2.
-rewrite fun_permut_fun_inv_loop; [ | easy | flia ].
-apply Permutation_elt.
-rewrite app_nil_r.
-rewrite <- map_app.
-destruct (permut_fun_without_last Hp Hi) as (g & Hpg & Hg).
-rewrite Hg.
-now apply IHn.
 Qed.
