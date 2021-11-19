@@ -1290,7 +1290,12 @@ Theorem signature_comp_fun_expand_1 :
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
 unfold ε, comp; cbn.
+remember
+   ( (∏ (i = 1, n),
+   (∏ (j = 1, n), δ i j (nth (nth (i - 1) g O) f O) (nth (nth (j - 1) g O) f O)) /
+   ∏ (i = 1, n), (∏ (j = 1, n), δ i j (nth (i - 1) g O) (nth (j - 1) g O))))%F as x.
 rewrite <- Hs; symmetry.
+Check rngl_div_mul_div.
 ...
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
