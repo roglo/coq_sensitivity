@@ -1031,20 +1031,6 @@ split. {
 Qed.
 *)
 
-(*
-Theorem transposition_signature_lt :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n p q,
-  p < q
-  → q < n
-  → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
-*)
 Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1076,17 +1062,24 @@ rewrite ε_ws_ε; try easy; [ | | now rewrite map_length, seq_length ]. 2: {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   cbn in Hij.
-...
-rewrite ε_ws_ε; try easy. 2: {
-  split; cbn; [ now rewrite map_length, seq_length | ].
-  unfold vect_el; cbn.
-  apply is_permut_map.
-  apply transposition_is_permut; [ | easy ].
-  now transitivity q.
+  unfold transposition in Hij.
+  do 4 rewrite if_eqb_eq_dec in Hij.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    subst i.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ flia Hpq Hij | ].
+    now symmetry in Hij.
+  }
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    subst i.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hpq Hij | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ easy | ].
+    now symmetry in Hij.
+  }
+  destruct (Nat.eq_dec j p) as [H| H]; [ easy | clear H ].
+  now destruct (Nat.eq_dec j q).
 }
-unfold ε_ws; cbn.
-unfold ε_fun_ws.
-cbn - [ "<?" ].
+unfold ε_ws; cbn - [ "<?" ].
 unfold sign_diff.
 rewrite rngl_product_shift; [ | flia Hq ].
 erewrite rngl_product_eq_compat. 2: {
@@ -1228,6 +1221,8 @@ rewrite transposition_out; [ | flia Hj | flia Hj ].
 do 2 rewrite if_ltb_lt_dec.
 now destruct (lt_dec (i - 1) (j - 1)).
 Qed.
+
+...
 
 Theorem transposition_signature :
   rngl_is_comm = true →
