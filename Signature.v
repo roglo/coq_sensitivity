@@ -872,19 +872,23 @@ Definition permut_swap {n} (p q : nat) (σ : vector nat) :=
 Definition list_swap p q l :=
   map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
 
+Theorem length_list_swap : ∀ p q l, length (list_swap p q l) = length l.
+Proof.
+intros.
+unfold list_swap.
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
   → q < n
   → is_permut_list σ
   → length σ = n
-  → is_permut_list (list_swap p q σ) ∧
-    length (list_swap p q σ) = n.
+  → is_permut_list (list_swap p q σ).
 Proof.
 intros * Hp Hq Hσ Hn.
 unfold list_swap.
 rewrite <- Hn in Hp, Hq.
-rewrite map_length, seq_length.
-split; [ | easy ].
 split. {
   intros x Hx.
   apply in_map_iff in Hx.
@@ -934,10 +938,6 @@ split. {
 }
 Qed.
 
-(*
-Theorem transposition_is_permut : ∀ p q n,
-  p < n → q < n → is_permut_fun (transposition p q) n.
-*)
 Theorem list_swap_is_permut : ∀ p q n l,
   n = length l
   → p < n
@@ -946,6 +946,7 @@ Theorem list_swap_is_permut : ∀ p q n l,
   → is_permut_list (list_swap p q l).
 Proof.
 intros * Hn Hp Hq Hpl.
+rewrite Hn in Hp, Hq.
 split. {
   intros j Hj.
   unfold list_swap in Hj |-*.
@@ -956,27 +957,46 @@ split. {
   rewrite <- Hij.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-...
-  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
-  now destruct (Nat.eq_dec i q).
+  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hpl, nth_In | ].
+  now destruct (Nat.eq_dec i q); apply Hpl, nth_In.
 } {
   intros i j Hi Hj Hs.
+  rewrite length_list_swap in Hi, Hj.
+  unfold list_swap in Hs.
+  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hs; [ | easy ].
+  rewrite seq_nth in Hs; [ | easy ].
+  cbn in Hs.
   unfold transposition in Hs.
   do 4 rewrite if_eqb_eq_dec in Hs.
+  apply Hpl; [ easy | easy | ].
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now subst j | ].
+    now symmetry in Hs; apply Hpl in Hs.
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+    subst i.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now subst j | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
+    apply Hpl in Hs; [ | easy | easy ].
+    now symmetry in Hs.
   }
-  destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
-  destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ easy | ].
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    now subst j; apply Hpl in Hs.
+  }
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    now subst j; apply Hpl in Hs.
+  }
   easy.
 }
 Qed.
+
+Inspect 1.
+
+...
 
 (*
 Theorem transposition_is_permut_vect : ∀ n p q,
