@@ -1954,6 +1954,18 @@ replace (map f _) with (map f (butn i (seq 0 (S n)))). 2: {
     now apply permut_list_inv_is_permut.
   }
   rewrite Nat.sub_0_r, Nat.add_0_l.
+  do 3 rewrite map_app.
+  f_equal. {
+    apply map_ext_in.
+    intros j Hj.
+    apply in_seq in Hj.
+    unfold Nat.b2n; rewrite if_leb_le_dec.
+    destruct (le_dec i j) as [H| H]; [ flia Hj H | clear H ].
+    now rewrite Nat.add_0_r.
+  }
+  cbn; rewrite Nat.leb_refl; cbn.
+  rewrite <- seq_shift, map_map.
+  rewrite <- seq_shift, map_map; cbn.
 ...
 Search (
     specialize (nth_
