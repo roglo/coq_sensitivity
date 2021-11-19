@@ -869,25 +869,42 @@ Definition permut_swap {n} (p q : nat) (σ : vector nat) :=
   mk_vect n (permut_fun_swap p q (vect_el σ)).
 *)
 
-...
+Definition list_swap p q l :=
+  map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
 
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
   → q < n
-  → is_permut_fun σ n
-  → is_permut_fun (permut_fun_swap p q σ) n.
+  → is_permut_list σ
+  → length σ = n
+  → is_permut_list (list_swap p q σ) ∧
+    length (list_swap p q σ) = n.
 Proof.
-intros * Hp Hq Hσ.
-unfold permut_fun_swap.
+intros * Hp Hq Hσ Hn.
+unfold list_swap.
+rewrite <- Hn in Hp, Hq.
+rewrite map_length, seq_length.
+split; [ | easy ].
 split. {
-  intros i Hi.
+  intros x Hx.
+  apply in_map_iff in Hx.
+  destruct Hx as (i & Hix & Hi).
+  apply in_seq in Hi.
+  rewrite map_length, seq_length.
+  rewrite <- Hix.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hσ | ].
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now apply Hσ | ].
-  now apply Hσ.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hσ, nth_In | ].
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now apply Hσ, nth_In | ].
+  now apply Hσ, nth_In.
 } {
+  rewrite map_length, seq_length.
   intros i j Hi Hj Hs.
+  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hs; [ | easy ].
+  rewrite seq_nth in Hs; [ | easy ].
+  cbn in Hs.
   unfold transposition in Hs.
   do 4 rewrite if_eqb_eq_dec in Hs.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -916,6 +933,8 @@ split. {
   apply Hσ in Hs; [ congruence | easy | easy ].
 }
 Qed.
+
+...
 
 Theorem transposition_is_permut : ∀ p q n,
   p < n → q < n → is_permut_fun (transposition p q) n.
