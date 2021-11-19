@@ -600,17 +600,19 @@ Theorem product_product_if_permut :
   → length σ = n
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
-...
-  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
-    (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
+        if (nth i σ 0 <? nth j σ 0)%nat then f i j else 1))%F =
+    (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
+        if i <? j then f i j else 1))%F.
 Proof.
-intros Hom Hic Hid Hin H10 Hed * Hp Hfij Hfijnz.
+intros Hom Hic Hid Hin H10 Hed * Hp Hn Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
   intros i j Hi Hj.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [Hij| Hij]; [ | now apply rngl_1_neq_0 ].
   apply Hfijnz; [ easy | easy | flia Hij ].
 }
+...
 now apply product_product_if_permut_div.
 Qed.
 
