@@ -1222,8 +1222,6 @@ do 2 rewrite if_ltb_lt_dec.
 now destruct (lt_dec (i - 1) (j - 1)).
 Qed.
 
-...
-
 Theorem transposition_signature :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1236,7 +1234,7 @@ Theorem transposition_signature :
   p ≠ q
   → p < n
   → q < n
-  → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
+  → ε n (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hp Hq.
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
@@ -1245,7 +1243,7 @@ destruct (lt_dec p q) as [Hpq'| Hpq']. {
 apply Nat.nlt_ge in Hpq'.
 assert (H : q < p) by flia Hpq Hpq'.
 rewrite <- transposition_signature_lt with (p := q) (q := p) (n := n); try easy.
-f_equal; f_equal.
+f_equal.
 apply map_ext_in.
 intros i Hi.
 apply transposition_comm.
@@ -1253,6 +1251,7 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
+(*
 Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1260,17 +1259,39 @@ Theorem signature_comp_fun_expand_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_fun g n
+  is_permut_list g
+  → length g = n
   → (∏ (i = 1, n),
         (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
     (∏ (i = 1, n), (∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
-  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+  → ε_list (comp f g) n = (ε_fun f n * ε_fun g n)%F.
+*)
+Theorem signature_comp_fun_expand_1 :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n f g,
+  is_permut_list g
+  → length g = n
+  → (∏ (i = 1, n),
+        (∏ (j = 1, n),
+         δ i j (nth (nth (i - 1) g O) f O) (nth (nth (j - 1) g O) f O)) /
+      ∏ (i = 1, n),
+        (∏ (j = 1, n),
+         δ i j (nth (i - 1) g O) (nth (j - 1) g O)))%F =
+    (∏ (i = 1, n),
+       (∏ (j = 1, n), δ i j (nth (i - 1) f O) (nth (j - 1) f O)) /
+      ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
+  → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
-intros Hop Hin H10 Hit Hch * Hp2 Hs.
-unfold ε_fun, comp; cbn.
+intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
+unfold ε, comp; cbn.
 rewrite <- Hs; symmetry.
+...
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
 apply rngl_product_integral in Hij; [ | now left | easy | easy ].
