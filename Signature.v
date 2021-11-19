@@ -994,10 +994,6 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 (*
 Theorem transposition_is_permut_vect : ∀ n p q,
   p < n
@@ -1009,6 +1005,10 @@ now apply transposition_is_permut.
 Qed.
 *)
 
+(*
+Theorem is_permut_map : ∀ f n,
+  is_permut_fun f n
+  → is_permut_fun (λ i, nth i (map f (seq 0 n)) 0) n.
 Theorem is_permut_map : ∀ f n,
   is_permut_fun f n
   → is_permut_fun (λ i, nth i (map f (seq 0 n)) 0) n.
@@ -1029,7 +1029,9 @@ split. {
   now apply Hff.
 }
 Qed.
+*)
 
+(*
 Theorem transposition_signature_lt :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1042,8 +1044,39 @@ Theorem transposition_signature_lt :
   p < q
   → q < n
   → ε n (mk_vect (map (transposition p q) (seq 0 n))) = (-1)%F.
+*)
+Theorem transposition_signature_lt :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n p q,
+  p < q
+  → q < n
+  → ε n (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
+rewrite ε_ws_ε; try easy; [ | | now rewrite map_length, seq_length ]. 2: {
+  split; cbn. {
+    intros x Hx.
+    rewrite map_length, seq_length.
+    apply in_map_iff in Hx.
+    destruct Hx as (y & Hyx & Hy).
+    apply in_seq in Hy.
+    rewrite <- Hyx.
+    apply transposition_lt; [ flia Hpq Hq | easy | easy ].
+  }
+  rewrite map_length, seq_length.
+  intros i j Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  cbn in Hij.
+...
 rewrite ε_ws_ε; try easy. 2: {
   split; cbn; [ now rewrite map_length, seq_length | ].
   unfold vect_el; cbn.
