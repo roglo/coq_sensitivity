@@ -587,6 +587,22 @@ Theorem product_product_if_permut :
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
     (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
+*)
+Theorem product_product_if_permut :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  rngl_is_integral = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  ∀ n σ f,
+  is_permut_list σ
+  → length σ = n
+  → (∀ i j, f i j = f j i)
+  → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
+...
+  → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if σ i <? σ j then f i j else 1))%F =
+    (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), if i <? j then f i j else 1))%F.
 Proof.
 intros Hom Hic Hid Hin H10 Hed * Hp Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
@@ -597,7 +613,8 @@ apply rngl_product_product_div_eq_1; try easy. {
 }
 now apply product_product_if_permut_div.
 Qed.
-*)
+
+...
 
 Theorem ε_ws_ε :
   rngl_is_comm = true →
@@ -764,7 +781,7 @@ rewrite rngl_product_change_var with
   (g := λ i, nth i (permut_list_inv p) 0) (h := λ i, nth i p 0). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
-  apply (@nth_nth_permut_list_inv n); [ easy | easy | flia Hi Hnz ].
+  apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hi Hnz ].
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
@@ -778,7 +795,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     (g := λ i, nth i (permut_list_inv p) 0) (h := λ i, nth i p 0). 2: {
     intros j Hj.
     destruct Hp as (Hp1, Hp2).
-    apply (@nth_nth_permut_list_inv n); [ easy | easy | flia Hj Hnz ].
+    apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1, Nat.sub_0_r.
@@ -790,7 +807,7 @@ erewrite rngl_product_list_eq_compat. 2: {
   replace (nth (nth i _ _) _ 0) with i. 2: {
     symmetry.
     rewrite <- Hui at 1.
-    now rewrite (@nth_nth_permut_list_inv n).
+    now rewrite (@nth_nth_list_permut_list_inv n).
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
@@ -800,7 +817,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     replace (nth (nth j _ _) _ 0) with j. 2: {
       symmetry.
       rewrite <- Hvi at 1.
-      now rewrite (@nth_nth_permut_list_inv n).
+      now rewrite (@nth_nth_list_permut_list_inv n).
     }
     easy.
   }
@@ -809,19 +826,17 @@ erewrite rngl_product_list_eq_compat. 2: {
 }
 cbn - [ "<?" ].
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
-...
   now apply permut_list_Permutation.
-...
-  now apply permut_fun_Permutation.
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-    now apply permut_fun_Permutation.
+    now apply permut_list_Permutation.
   }
   easy.
 }
 cbn - [ "<?" ].
+...
 rewrite product_product_if_permut; try easy; cycle 1. {
   now left.
 } {
