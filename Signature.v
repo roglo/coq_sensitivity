@@ -938,7 +938,7 @@ split. {
 }
 Qed.
 
-Theorem list_swap_is_permut : ∀ p q n l,
+Theorem permut_list_swap_is_permut : ∀ p q n l,
   n = length l
   → p < n
   → q < n
