@@ -934,16 +934,30 @@ split. {
 }
 Qed.
 
-...
-
+(*
 Theorem transposition_is_permut : ∀ p q n,
   p < n → q < n → is_permut_fun (transposition p q) n.
+*)
+Theorem list_swap_is_permut : ∀ p q n l,
+  n = length l
+  → p < n
+  → q < n
+  → is_permut_list l
+  → is_permut_list (list_swap p q l).
 Proof.
-intros * Hp Hq.
+intros * Hn Hp Hq Hpl.
 split. {
-  intros i Hi.
+  intros j Hj.
+  unfold list_swap in Hj |-*.
+  apply in_map_iff in Hj.
+  destruct Hj as (i & Hij & Hi).
+  apply in_seq in Hi.
+  rewrite map_length, seq_length.
+  rewrite <- Hij.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+...
   destruct (Nat.eq_dec i p) as [Hip| Hip]; [ easy | ].
   now destruct (Nat.eq_dec i q).
 } {
