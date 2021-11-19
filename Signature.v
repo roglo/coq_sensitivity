@@ -31,9 +31,11 @@ Definition ε_fun f n :=
 Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 *)
 
+Definition nth_nat i l := nth i l 0.
+
 Definition ε n (p : list nat) :=
   ((∏ (i = 1, n), ∏ (j = 1, n),
-    δ i j (nth (i - 1) p 0)%nat (nth (j - 1) p 0)%nat) /
+    δ i j (nth_nat (i - 1) p) (nth_nat (j - 1) p)) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
 Definition minus_one_pow n :=
@@ -469,15 +471,15 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
-    ((if nth i σ O <? nth j σ O then f i j else 1) /
+    ((if nth_nat i σ <? nth_nat j σ then f i j else 1) /
       (if i <? j then f i j else 1) *
-     ((if nth j σ O <? nth i σ O then f j i else 1) /
+     ((if nth_nat j σ <? nth_nat i σ then f j i else 1) /
       (if j <? i then f j i else 1)))%F = 1%F.
 Proof.
 intros * Hic Hin H10 Hp Hn Hfij Hfijnz * Hlin Hljn.
 do 4 rewrite if_ltb_lt_dec.
-destruct (lt_dec (nth i σ 0) (nth j σ 0)) as [H1| H1]. {
-  destruct (lt_dec (nth j σ 0) (nth i σ 0)) as [H| H]; [ flia H1 H | ].
+destruct (lt_dec (nth_nat i σ) (nth_nat j σ)) as [H1| H1]. {
+  destruct (lt_dec (nth_nat j σ) (nth_nat i σ)) as [H| H]; [ flia H1 H | ].
   clear H.
   destruct (lt_dec i j) as [H3| H3]. {
     destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
@@ -502,7 +504,7 @@ destruct (lt_dec (nth i σ 0) (nth j σ 0)) as [H1| H1]. {
   apply Nat.le_antisymm in H3; [ | easy ].
   subst j; flia H1.
 }
-destruct (lt_dec (nth j σ 0) (nth i σ 0)) as [H2| H2]. {
+destruct (lt_dec (nth_nat j σ) (nth_nat i σ)) as [H2| H2]. {
   destruct (lt_dec i j) as [H3| H3]. {
     destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
     rewrite Hfij.
@@ -762,7 +764,7 @@ rewrite <- rngl_product_product_if; symmetry.
 rewrite <- rngl_product_product_if; symmetry.
 (* changt de var *)
 rewrite rngl_product_change_var with
-  (g := λ i, nth i (permut_list_inv p) 0) (h := λ i, nth i p 0). 2: {
+  (g := λ i, nth_nat i (permut_list_inv p)) (h := λ i, nth_nat i p). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
   apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hi Hnz ].
@@ -771,6 +773,7 @@ rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1.
 rewrite <- Hpn.
+...
 rewrite <- List_map_nth_seq.
 rewrite Hpn.
 erewrite rngl_product_list_eq_compat. 2: {
@@ -1279,21 +1282,24 @@ Theorem signature_comp_fun_expand_1 :
   → length g = n
   → (∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ i j (nth (nth (i - 1) g O) f O) (nth (nth (j - 1) g O) f O)) /
+         δ i j (nth_nat (nth_nat (i - 1) g) f)
+           (nth_nat (nth_nat (j - 1) g) f)) /
       ∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ i j (nth (i - 1) g O) (nth (j - 1) g O)))%F =
+         δ i j (nth_nat (i - 1) g) (nth_nat (j - 1) g)))%F =
     (∏ (i = 1, n),
-       (∏ (j = 1, n), δ i j (nth (i - 1) f O) (nth (j - 1) f O)) /
+       (∏ (j = 1, n), δ i j (nth_nat (i - 1) f) (nth_nat (j - 1) f)) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
   → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
 unfold ε, comp; cbn.
 remember
-   ( (∏ (i = 1, n),
-   (∏ (j = 1, n), δ i j (nth (nth (i - 1) g O) f O) (nth (nth (j - 1) g O) f O)) /
-   ∏ (i = 1, n), (∏ (j = 1, n), δ i j (nth (i - 1) g O) (nth (j - 1) g O))))%F as x.
+   ((∏ (i = 1, n),
+   (∏ (j = 1, n),
+    δ i j (nth_nat (nth_nat (i - 1) g) f) (nth_nat (nth_nat (j - 1) g) f)) /
+   ∏ (i = 1, n),
+   (∏ (j = 1, n), δ i j (nth_nat (i - 1) g) (nth_nat (j - 1) g))))%F as x.
 rewrite <- Hs; symmetry.
 Check rngl_div_mul_div.
 ...
