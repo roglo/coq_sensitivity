@@ -16,8 +16,10 @@ Definition ff_app l i := nth i l 0.
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
+(*
 Theorem fold_ff_app : ∀ f i, nth i f 0 = ff_app f i.
 Proof. easy. Qed.
+*)
 
 (*
 Compute (comp_list [0;2;1] [2;1;0]).
@@ -1884,8 +1886,11 @@ induction n; intros. {
   now apply length_zero_iff_nil in Hln; subst l.
 }
 rewrite seq_S; cbn.
-remember (nth n (permut_list_inv l) 0) as i eqn:Hi.
+remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
+rewrite (List_map_ff_app_seq l).
+(*
 rewrite (List_map_nth_seq l 0).
+*)
 remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
@@ -1898,7 +1903,6 @@ rewrite (List_seq_cut i); subst s. 2: {
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
-do 2 rewrite fold_ff_app.
 rewrite (permut_permut_inv _ (conj Hp Hln) (Nat.lt_succ_diag_r _)).
 apply Permutation_elt.
 rewrite app_nil_r.
@@ -1908,7 +1912,6 @@ assert (Hin : i ≤ n). {
   apply Nat.lt_succ_r.
   rewrite Hi, <- Hln.
   rewrite <- length_permut_list_inv.
-  rewrite fold_ff_app.
   apply permut_list_ub; [ apply permut_list_inv_is_permut, Hp | ].
   rewrite length_permut_list_inv, Hln.
   apply Nat.lt_succ_diag_r.
@@ -1919,7 +1922,6 @@ apply IHn. 2: {
 }
 assert (Hn : n = nth i l 0). {
   rewrite Hi; symmetry.
-  do 2 rewrite fold_ff_app.
   apply (permut_permut_inv (S n)); [ easy | flia ].
 }
 split. {

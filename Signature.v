@@ -1502,11 +1502,10 @@ rewrite Nat_sub_succ_1, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_shift; [ | flia Hnz ].
-...
   rewrite rngl_product_change_var with
-      (g := permut_fun_inv_loop g n) (h := g). 2: {
+      (g := ff_app (permut_list_inv g)) (h := ff_app g). 2: {
     intros j Hj.
-    rewrite fun_find_prop; [ easy | apply Hp2 | flia Hj Hnz ].
+    apply (permut_inv_permut n); [ easy | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1, Nat.sub_0_r.
@@ -1514,6 +1513,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm _ 1).
     rewrite Nat_ltb_mono_l.
+...
     rewrite fun_permut_fun_inv_loop; [ | apply Hp2 | ]. 2: {
       apply in_map_iff in Hi.
       destruct Hi as (k & Hk & Hkn).
