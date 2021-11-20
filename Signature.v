@@ -1513,15 +1513,16 @@ erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm _ 1).
     rewrite Nat_ltb_mono_l.
-...
-    rewrite fun_permut_fun_inv_loop; [ | apply Hp2 | ]. 2: {
+    rewrite (permut_permut_inv n); [ | easy | ]. 2: {
       apply in_map_iff in Hi.
       destruct Hi as (k & Hk & Hkn).
       apply in_seq in Hkn.
-      rewrite <- Hk.
-      now apply Hp2.
+      rewrite <- Hk, <- Hn2.
+      apply Hp2, nth_In.
+      now rewrite Hn2.
     }
     rewrite Nat.add_comm, Nat.add_sub.
+...
     rewrite fun_permut_fun_inv_loop; [ | apply Hp2 | ]. 2: {
       apply in_map_iff in Hj.
       destruct Hj as (k & Hk & Hkn).
