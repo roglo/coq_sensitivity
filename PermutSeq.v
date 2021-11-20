@@ -387,6 +387,9 @@ destruct x as [x| ]. {
 }
 Qed.
 
+Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
+Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
+
 (* transposition *)
 
 Definition transposition i j k :=
@@ -1897,7 +1900,7 @@ rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
 do 2 rewrite fold_ff_app.
-rewrite (permut_permut_inv (conj Hp Hln) (Nat.lt_succ_diag_r _)).
+rewrite (permut_permut_inv _ (conj Hp Hln) (Nat.lt_succ_diag_r _)).
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
@@ -1918,7 +1921,7 @@ apply IHn. 2: {
 assert (Hn : n = nth i l 0). {
   rewrite Hi; symmetry.
   do 2 rewrite fold_ff_app.
-  apply (@permut_permut_inv (S n)); [ easy | flia ].
+  apply (permut_permut_inv (S n)); [ easy | flia ].
 }
 split. {
   intros j Hj.

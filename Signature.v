@@ -765,8 +765,7 @@ rewrite rngl_product_change_var with
   (g := ff_app (permut_list_inv p)) (h := ff_app p). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
-...
-  apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hi Hnz ].
+  apply (permut_inv_permut n); [ easy | flia Hi Hnz ].
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
@@ -780,7 +779,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     (g := ff_app (permut_list_inv p)) (h := ff_app p). 2: {
     intros j Hj.
     destruct Hp as (Hp1, Hp2).
-    apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hj Hnz ].
+    apply (permut_inv_permut n); [ easy | flia Hj Hnz ].
   }
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1, Nat.sub_0_r.
@@ -791,20 +790,20 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite Hpn in Hu.
   replace (ff_app _ (ff_app _ i)) with i. 2: {
     symmetry.
-    rewrite <- Hui at 1.
-    unfold ff_app.
-    now rewrite (@nth_nth_list_permut_list_inv n).
+    apply (permut_permut_inv n); [ easy | ].
+    rewrite <- Hui, <- Hpn.
+    apply permut_list_ub; [ easy | now rewrite Hpn ].
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
     apply (In_nth _ _ 0) in Hj.
-    destruct Hj as (v & Hv & Hvi).
+    destruct Hj as (v & Hv & Hvj).
     rewrite Hpn in Hv.
     replace (ff_app _ (ff_app _ j)) with j. 2: {
       symmetry.
-      rewrite <- Hvi at 1.
-      unfold ff_app.
-      now rewrite (@nth_nth_list_permut_list_inv n).
+      apply (permut_permut_inv n); [ easy | ].
+      rewrite <- Hvj, <- Hpn.
+      apply permut_list_ub; [ easy | now rewrite Hpn ].
     }
     easy.
   }
@@ -907,6 +906,7 @@ split. {
 } {
   rewrite map_length, seq_length.
   intros i j Hi Hj Hs.
+  unfold ff_app in Hs.
   rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
   rewrite seq_nth in Hs; [ | easy ].
@@ -966,6 +966,7 @@ split. {
   intros i j Hi Hj Hs.
   rewrite length_list_swap in Hi, Hj.
   unfold list_swap in Hs.
+  unfold ff_app in Hs.
   rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
   rewrite seq_nth in Hs; [ | easy ].
@@ -1060,6 +1061,7 @@ rewrite ε_ws_ε; try easy; [ | | now rewrite map_length, seq_length ]. 2: {
   }
   rewrite map_length, seq_length.
   intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
@@ -1496,16 +1498,14 @@ cbn - [ "<?" ].
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv g)) (h := ff_app g). 2: {
   intros i Hi.
-Search permut_list_inv.
-About permut_list_inv.
-...
-  rewrite fun_find_prop; [ easy | apply Hp2 | flia Hi Hnz ].
+  apply (permut_inv_permut n); [ easy | flia Hi Hnz ].
 }
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_shift; [ | flia Hnz ].
+...
   rewrite rngl_product_change_var with
       (g := permut_fun_inv_loop g n) (h := g). 2: {
     intros j Hj.
