@@ -1304,8 +1304,6 @@ rewrite <- Hn in Hi, Hj.
 apply Hp22 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 Qed.
 
-...
-
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1314,23 +1312,31 @@ Theorem signature_comp_fun_expand_2_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_fun g n
+  is_permut_list g
+  → length g = n
   → (∏ (i = 1, n),
-      (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
-     ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
+      (∏ (j = 1, n),
+       δ i j (nat_nth f (nat_nth g (i - 1)))
+         (nat_nth f (nat_nth g (j - 1)))) /
+     ∏ (i = 1, n),
+      (∏ (j = 1, n), δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1))))%F =
     (∏ (i = 1, n),
       (∏ (j = 1, n),
        (if i <? j then
-         (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-         (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+         (rngl_of_nat (nat_nth f (nat_nth g (j - 1))) -
+          rngl_of_nat (nat_nth f (nat_nth g (i - 1)))) /
+         (rngl_of_nat (nat_nth g (j - 1)) - rngl_of_nat (nat_nth g (i - 1)))
        else 1)))%F.
 Proof.
-intros Hop Hin Hic H10 Hit Hch * Hp2.
+intros Hop Hin Hic H10 Hit Hch * Hp2 Hn.
 unfold rngl_div; rewrite Hin.
-rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: {
+rewrite rngl_inv_product_comm; [ | | easy | easy | easy | easy | ]; cycle 1. {
+  now left.
+} {
   intros i Hi Hij.
   apply rngl_product_integral in Hij; [ | now left | easy | easy ].
   destruct Hij as (j & Hj & Hij).
+  rewrite <- Hn in Hi, Hj.
   unfold δ in Hij.
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
@@ -1341,8 +1347,10 @@ rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: 
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_comm;
+      [ | now left | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
+    rewrite <- Hn in Hi, Hj.
     unfold δ in Hij.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
@@ -1454,23 +1462,26 @@ Theorem signature_comp_fun_changement_of_variable :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_fun f n
-  → is_permut_fun g n
+  is_permut_list f
+  → is_permut_list g
+  → length f = n
+  → length g = n
   → (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
-         (rngl_of_nat (f (g (j - 1)%nat)) - rngl_of_nat (f (g (i - 1)%nat))) /
-         (rngl_of_nat (g (j - 1)%nat) - rngl_of_nat (g (i - 1)%nat))
+         (rngl_of_nat (nat_nth f (nat_nth g (j - 1))) -
+          rngl_of_nat (nat_nth f (nat_nth g (i - 1)))) /
+         (rngl_of_nat (nat_nth g (j - 1)) - rngl_of_nat (nat_nth g (i - 1)))
        else 1)))%F =
     (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
-         (rngl_of_nat (f (j - 1)%nat) - rngl_of_nat (f (i - 1)%nat)) /
+         (rngl_of_nat (nat_nth f (j - 1)) - rngl_of_nat (nat_nth f (i - 1))) /
          rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2 Hn1 Hn2.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -1481,8 +1492,12 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_change_var with (g := permut_fun_inv_loop g n) (h := g). 2: {
+rewrite rngl_product_change_var with
+    (g := nat_nth (permut_list_inv g)) (h := nat_nth g). 2: {
   intros i Hi.
+Search permut_list_inv.
+About permut_list_inv.
+...
   rewrite fun_find_prop; [ easy | apply Hp2 | flia Hi Hnz ].
 }
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].

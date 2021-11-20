@@ -31,7 +31,7 @@ Notation "'Comp' ( i ∈ l ) , g" :=
 
 Definition is_permut_list l :=
   (∀ x, x ∈ l → x < length l) ∧
-  (∀ i j, i < length l → j < length l → nth i l 0 = nth j l 0 → i = j).
+  (∀ i j, i < length l → j < length l → nat_nth l i = nat_nth l j → i = j).
 
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
@@ -344,6 +344,7 @@ destruct j as [j| ]. {
   specialize (Hp2 (S i) j).
   assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
   specialize (Hp2 H Hjl); clear H.
+  unfold nat_nth in Hp2.
   rewrite List_nth_succ_cons in Hp2.
   now specialize (Hp2 Hj).
 }
@@ -528,6 +529,7 @@ split; cbn. {
   now apply transposition_lt.
 } {
   intros i j Hi Hj Hij.
+  unfold nat_nth in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
@@ -586,6 +588,7 @@ assert (H : is_permut_list (seq 0 n)). {
   } {
     cbn; rewrite seq_length.
     intros i j Hi Hj Hij.
+    unfold nat_nth in Hij.
     rewrite seq_nth in Hij; [ | easy ].
     rewrite seq_nth in Hij; [ | easy ].
     easy.
@@ -1363,6 +1366,38 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
+
+Print is_permut_list.
+...
+Theorem list_find_prop : ∀ f n i,
+  (∀ i j, i < n → j < n → f i = f j → i = j)
+  → i < n
+  → nat_nth (permut_list_inv f) (nat_nth f i) = i.
+Proof.
+...
+(*
+Theorem fun_find_prop : ∀ f n i,
+  (∀ i j, i < n → j < n → f i = f j → i = j)
+  → i < n
+  → permut_fun_inv_loop f n (f i) = i.
+Proof.
+intros * Hp2 Hin.
+revert i Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec (f n) (f i)) as [Hfni| Hfni]. {
+  apply Hp2; [ flia | easy | easy ].
+}
+rename Hin into Hisn.
+assert (Hin : i < n). {
+  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
+  flia Hisn H.
+}
+clear Hisn.
+apply IHn; [ | easy ].
+intros j k Hj Hk Hjk.
+apply Hp2; [ flia Hj | flia Hk | easy ].
+Qed.
+*)
 
 (*
 Definition permut_fun_inv_loop' f n i :=
