@@ -3,16 +3,13 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith (*Bool*).
+Require Import Utf8 Arith.
 Require Import Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike.
-Require Import IterMul (*IterAnd*).
+Require Import IterMul.
 Require Import PermutSeq.
-(*
-Require Import Pigeonhole.
-*)
 
 Section a.
 

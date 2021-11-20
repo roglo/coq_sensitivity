@@ -11,7 +11,6 @@ Require Import Misc.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
-(* applying a finite function, represented by a list *)
 Definition ff_app l i := nth i l 0.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
