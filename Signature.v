@@ -1522,13 +1522,13 @@ erewrite rngl_product_list_eq_compat. 2: {
       now rewrite Hn2.
     }
     rewrite Nat.add_comm, Nat.add_sub.
-...
-    rewrite fun_permut_fun_inv_loop; [ | apply Hp2 | ]. 2: {
+    rewrite (permut_permut_inv n); [ | easy | ]. 2: {
       apply in_map_iff in Hj.
       destruct Hj as (k & Hk & Hkn).
       apply in_seq in Hkn.
-      rewrite <- Hk.
-      now apply Hp2.
+      rewrite <- Hk, <- Hn2.
+      apply Hp2, nth_In.
+      now rewrite Hn2.
     }
     easy.
   }
@@ -1537,14 +1537,17 @@ erewrite rngl_product_list_eq_compat. 2: {
 cbn - [ "<?" ].
 erewrite rngl_product_list_eq_compat. 2: {
   intros j Hj.
+  rewrite <- Hn2 at 1.
+  rewrite <- List_map_ff_app_seq.
   erewrite rngl_product_change_list; [ | easy | ]. 2: {
-    now apply permut_fun_Permutation.
+    now apply permut_list_Permutation.
   }
   easy.
 }
 cbn - [ "<?" ].
 erewrite rngl_product_change_list; [ | easy | ]. 2: {
-  now apply permut_fun_Permutation.
+  rewrite <- Hn2 at 1.
+  now rewrite <- List_map_ff_app_seq.
 }
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -1566,6 +1569,7 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1, Nat.sub_0_r.
 symmetry.
+...
 rewrite product_product_if_permut; try easy. {
   apply rngl_product_list_eq_compat.
   intros i Hi.
