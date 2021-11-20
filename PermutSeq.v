@@ -11,10 +11,11 @@ Require Import Misc.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
-Definition nat_nth l i := nth i l 0.
+(* applying a finite function, represented by a list *)
+Definition ff_app l i := nth i l 0.
 
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
-Definition comp_list (la lb : list nat) := map (nat_nth la) lb.
+Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
 (*
 Compute (comp_list [0;2;1] [2;1;0]).
@@ -31,15 +32,17 @@ Notation "'Comp' ( i ∈ l ) , g" :=
 
 Definition is_permut_list l :=
   (∀ x, x ∈ l → x < length l) ∧
-  (∀ i j, i < length l → j < length l → nat_nth l i = nat_nth l j → i = j).
+  (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j).
 
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
   (⋀ (i = 1, length l),
      (⋀ (j = 1, length l),
-        ((nat_nth l (i - 1) ≠? nat_nth l (j - 1)) || (i =? j)))).
+        ((ff_app l (i - 1) ≠? ff_app l (j - 1)) || (i =? j)))).
 
-Theorem List_map_nat_nth_seq : ∀ l, l = map (nat_nth l) (seq 0 (length l)).
+Definition is_permut n f := is_permut_list f ∧ length f = n.
+
+Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
 Proof. intros; apply List_map_nth_seq. Qed.
 
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
@@ -344,7 +347,7 @@ destruct j as [j| ]. {
   specialize (Hp2 (S i) j).
   assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
   specialize (Hp2 H Hjl); clear H.
-  unfold nat_nth in Hp2.
+  unfold ff_app in Hp2.
   rewrite List_nth_succ_cons in Hp2.
   now specialize (Hp2 Hj).
 }
@@ -529,7 +532,7 @@ split; cbn. {
   now apply transposition_lt.
 } {
   intros i j Hi Hj Hij.
-  unfold nat_nth in Hij.
+  unfold ff_app in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
@@ -588,7 +591,7 @@ assert (H : is_permut_list (seq 0 n)). {
   } {
     cbn; rewrite seq_length.
     intros i j Hi Hj Hij.
-    unfold nat_nth in Hij.
+    unfold ff_app in Hij.
     rewrite seq_nth in Hij; [ | easy ].
     rewrite seq_nth in Hij; [ | easy ].
     easy.
@@ -1367,12 +1370,30 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
 
-Print is_permut_list.
-Theorem list_find_prop : ∀ f n i,
-  (∀ i j, i < n → j < n → nat_nth f i = nat_nth f j → i = j)
+Theorem permut_inv_permut : ∀ f n i,
+  is_permut n f
   → i < n
-  → nat_nth (permut_list_inv f) (nat_nth f i) = i.
+  → ff_app (permut_list_inv f) (ff_app f i) = i.
 Proof.
+intros * Hp Hin.
+revert f i Hp Hin.
+induction n; intros; [ easy | cbn ].
+destruct (Nat.eq_dec i n) as [Hien| Hien]. {
+  subst i.
+...
+  apply Hp2; [ | easy | ].
+
+  apply Hp2; [ flia | easy | easy ].
+}
+rename Hin into Hisn.
+assert (Hin : i < n). {
+  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
+  flia Hisn H.
+}
+clear Hisn.
+apply IHn; [ | easy ].
+intros j k Hj Hk Hjk.
+apply Hp2; [ flia Hj | flia Hk | easy ].
 ...
 (*
 Theorem fun_find_prop : ∀ f n i,
