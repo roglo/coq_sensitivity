@@ -1368,9 +1368,8 @@ easy.
 Qed.
 
 Print is_permut_list.
-...
 Theorem list_find_prop : ∀ f n i,
-  (∀ i j, i < n → j < n → f i = f j → i = j)
+  (∀ i j, i < n → j < n → nat_nth f i = nat_nth f j → i = j)
   → i < n
   → nat_nth (permut_list_inv f) (nat_nth f i) = i.
 Proof.
