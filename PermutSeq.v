@@ -17,6 +17,9 @@ Definition ff_app l i := nth i l 0.
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
+Theorem fold_ff_app : ∀ f i, nth i f 0 = ff_app f i.
+Proof. easy. Qed.
+
 (*
 Compute (comp_list [0;2;1] [2;1;0]).
 Compute (map (comp (λ i, nth i [0;2;1] 0) (λ i, nth i [2;1;0] 0)) [0;1;2]).
@@ -301,17 +304,17 @@ destruct x. {
 }
 Qed.
 
-Theorem nth_nth_list_permut_list_inv : ∀ n l i,
-  is_permut_list l
-  → length l = n
+Theorem permut_inv_permut : ∀ n l i,
+  is_permut n l
   → i < n
-  → nth (nth i l 0) (permut_list_inv l) 0 = i.
+  → ff_app (permut_list_inv l) (ff_app l i) = i.
 Proof.
-intros * Hp Hl Hin.
+intros * (Hp, Hl) Hin.
 revert i l Hp Hl Hin.
 induction n; intros; [ easy | cbn ].
 destruct l as [| a]; [ easy | ].
 destruct i. {
+  unfold ff_app.
   rewrite List_nth_0_cons.
   unfold permut_list_inv.
   rewrite (List_map_nth' 0). 2: {
@@ -320,6 +323,7 @@ destruct i. {
   rewrite seq_nth; [ cbn | now apply Hp; left ].
   now rewrite Nat.eqb_refl.
 }
+unfold ff_app.
 rewrite List_nth_succ_cons.
 unfold permut_list_inv.
 cbn in Hl.
@@ -358,46 +362,13 @@ specialize (H1 H); clear H.
 now rewrite Nat.eqb_refl in H1.
 Qed.
 
-(* if using pigeonhole by permut_list_inv'
-intros * Hp Hl Hin.
-subst n.
-unfold permut_list_inv.
-assert (Hil : nth i l 0 < length l) by now apply Hp, nth_In.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-remember (pigeonhole_fun _ _) as xx eqn:Hxx.
-symmetry in Hxx.
-destruct xx as (x, x').
-apply pigeonhole with (b := length l) in Hxx; [ | flia Hin | ]. 2: {
-  intros j Hj.
-  destruct (Nat.eq_dec j (length l)) as [Hjn| Hjn]. {
-    now subst j; rewrite seq_nth.
-  }
-  apply Hp, nth_In; flia Hj Hjn.
-}
-destruct Hxx as (Hx & Hx' & Hxx & Hexx).
-destruct (Nat.eq_dec x (length l)) as [Hxn| Hxn]. {
-  rewrite seq_nth in Hexx; [ | easy ].
-  destruct (Nat.eq_dec x' (length l)) as [Hx'n| Hx'n]; [ congruence | ].
-  symmetry in Hexx; cbn in Hexx.
-  apply Hp in Hexx; [ easy | flia Hx' Hx'n | easy ].
-} {
-  destruct (Nat.eq_dec x' (length l)) as [Hx'n| Hx'n]. {
-    rewrite seq_nth in Hexx; [ | easy ].
-    apply Hp in Hexx; [ easy | flia Hx Hxn | easy ].
-  }
-  apply Hp in Hexx; [ easy | flia Hx Hxn | flia Hx' Hx'n ].
-}
-Qed.
-*)
-
-Theorem nth_nth_permut_list_inv_list : ∀ n l i,
-  is_permut_list l
-  → length l = n
+Theorem permut_permut_inv : ∀ n l i,
+  is_permut n l
   → i < n
-  → nth (nth i (permut_list_inv l) 0) l 0 = i.
+  → ff_app l (ff_app (permut_list_inv l) i) = i.
 Proof.
-intros * Hp Hl Hin.
-unfold permut_list_inv, unsome.
+intros * (Hp, Hl) Hin.
+unfold permut_list_inv, unsome, ff_app.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; congruence ].
 rewrite seq_nth; [ | congruence ].
 rewrite Nat.add_0_l.
@@ -1370,55 +1341,6 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy | easy ].
 easy.
 Qed.
 
-Theorem permut_inv_permut : ∀ f n i,
-  is_permut n f
-  → i < n
-  → ff_app (permut_list_inv f) (ff_app f i) = i.
-Proof.
-intros * Hp Hin.
-revert f i Hp Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec i n) as [Hien| Hien]. {
-  subst i.
-...
-  apply Hp2; [ | easy | ].
-
-  apply Hp2; [ flia | easy | easy ].
-}
-rename Hin into Hisn.
-assert (Hin : i < n). {
-  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
-  flia Hisn H.
-}
-clear Hisn.
-apply IHn; [ | easy ].
-intros j k Hj Hk Hjk.
-apply Hp2; [ flia Hj | flia Hk | easy ].
-...
-(*
-Theorem fun_find_prop : ∀ f n i,
-  (∀ i j, i < n → j < n → f i = f j → i = j)
-  → i < n
-  → permut_fun_inv_loop f n (f i) = i.
-Proof.
-intros * Hp2 Hin.
-revert i Hin.
-induction n; intros; [ easy | cbn ].
-destruct (Nat.eq_dec (f n) (f i)) as [Hfni| Hfni]. {
-  apply Hp2; [ flia | easy | easy ].
-}
-rename Hin into Hisn.
-assert (Hin : i < n). {
-  destruct (Nat.eq_dec n i) as [H| H]; [ now subst n | ].
-  flia Hisn H.
-}
-clear Hisn.
-apply IHn; [ | easy ].
-intros j k Hj Hk Hjk.
-apply Hp2; [ flia Hj | flia Hk | easy ].
-Qed.
-*)
-
 (*
 Definition permut_fun_inv_loop' f n i :=
   let '(x, x') :=
@@ -1950,11 +1872,10 @@ split. {
 Qed.
 
 Theorem permut_list_Permutation : ∀ l n,
-  is_permut_list l
-  → length l = n
+  is_permut n l
   → Permutation l (seq 0 n).
 Proof.
-intros * Hp Hln.
+intros * (Hp, Hln).
 symmetry.
 revert l Hp Hln.
 induction n; intros. {
@@ -1975,7 +1896,8 @@ rewrite (List_seq_cut i); subst s. 2: {
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
-rewrite (nth_nth_permut_list_inv_list Hp Hln (Nat.lt_succ_diag_r _)).
+do 2 rewrite fold_ff_app.
+rewrite (permut_permut_inv (conj Hp Hln) (Nat.lt_succ_diag_r _)).
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
@@ -1984,7 +1906,8 @@ assert (Hin : i ≤ n). {
   apply Nat.lt_succ_r.
   rewrite Hi, <- Hln.
   rewrite <- length_permut_list_inv.
-  apply permut_list_ub; [ now apply permut_list_inv_is_permut | ].
+  rewrite fold_ff_app.
+  apply permut_list_ub; [ apply permut_list_inv_is_permut, Hp | ].
   rewrite length_permut_list_inv, Hln.
   apply Nat.lt_succ_diag_r.
 }
@@ -1993,7 +1916,9 @@ apply IHn. 2: {
   rewrite Nat.add_sub_assoc; [ now rewrite Nat.add_comm, Nat.add_sub | easy ].
 }
 assert (Hn : n = nth i l 0). {
-  rewrite Hi, (nth_nth_permut_list_inv_list Hp Hln); [ easy | flia ].
+  rewrite Hi; symmetry.
+  do 2 rewrite fold_ff_app.
+  apply (@permut_permut_inv (S n)); [ easy | flia ].
 }
 split. {
   intros j Hj.
@@ -2026,6 +1951,7 @@ split. {
   now replace (S i + (n - i)) with (S n) in Hk by flia Hin.
 } {
   rewrite map_length, map_app, app_length, seq_length, seq_length.
+  unfold ff_app.
   replace (i + (n - i)) with n by flia Hin.
   intros j k Hj Hk Hjk.
   destruct (lt_dec j i) as [Hji| Hji]. {

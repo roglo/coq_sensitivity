@@ -33,7 +33,7 @@ Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
 
 Definition ε n (p : list nat) :=
   ((∏ (i = 1, n), ∏ (j = 1, n),
-    δ i j (nat_nth p (i - 1)) (nat_nth p (j - 1))) /
+    δ i j (ff_app p (i - 1)) (ff_app p (j - 1))) /
    (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
 
 Definition minus_one_pow n :=
@@ -469,15 +469,15 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
-    ((if nat_nth σ i <? nat_nth σ j then f i j else 1) /
+    ((if ff_app σ i <? ff_app σ j then f i j else 1) /
       (if i <? j then f i j else 1) *
-     ((if nat_nth σ j <? nat_nth σ i then f j i else 1) /
+     ((if ff_app σ j <? ff_app σ i then f j i else 1) /
       (if j <? i then f j i else 1)))%F = 1%F.
 Proof.
 intros * Hic Hin H10 Hp Hn Hfij Hfijnz * Hlin Hljn.
 do 4 rewrite if_ltb_lt_dec.
-destruct (lt_dec (nat_nth σ i) (nat_nth σ j)) as [H1| H1]. {
-  destruct (lt_dec (nat_nth σ j) (nat_nth σ i)) as [H| H]; [ flia H1 H | ].
+destruct (lt_dec (ff_app σ i) (ff_app σ j)) as [H1| H1]. {
+  destruct (lt_dec (ff_app σ j) (ff_app σ i)) as [H| H]; [ flia H1 H | ].
   clear H.
   destruct (lt_dec i j) as [H3| H3]. {
     destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
@@ -502,7 +502,7 @@ destruct (lt_dec (nat_nth σ i) (nat_nth σ j)) as [H1| H1]. {
   apply Nat.le_antisymm in H3; [ | easy ].
   subst j; flia H1.
 }
-destruct (lt_dec (nat_nth σ j) (nat_nth σ i)) as [H2| H2]. {
+destruct (lt_dec (ff_app σ j) (ff_app σ i)) as [H2| H2]. {
   destruct (lt_dec i j) as [H3| H3]. {
     destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
     rewrite Hfij.
@@ -550,7 +550,7 @@ Theorem product_product_if_permut_div :
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n),
-      ((if nat_nth σ i <? nat_nth σ j then f i j else 1) /
+      ((if ff_app σ i <? ff_app σ j then f i j else 1) /
        (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
@@ -586,7 +586,7 @@ Theorem product_product_if_permut :
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
-        if nat_nth σ i <? nat_nth σ j then f i j else 1))%F =
+        if ff_app σ i <? ff_app σ j then f i j else 1))%F =
     (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
         if i <? j then f i j else 1))%F.
 Proof.
@@ -762,21 +762,22 @@ rewrite <- rngl_product_product_if; symmetry.
 rewrite <- rngl_product_product_if; symmetry.
 (* changt de var *)
 rewrite rngl_product_change_var with
-  (g := nat_nth (permut_list_inv p)) (h := nat_nth p). 2: {
+  (g := ff_app (permut_list_inv p)) (h := ff_app p). 2: {
   intros i Hi.
   destruct Hp as (Hp1, Hp2).
+...
   apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hi Hnz ].
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1.
 rewrite <- Hpn.
-rewrite <- List_map_nat_nth_seq.
+rewrite <- List_map_ff_app_seq.
 rewrite Hpn.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_var with
-    (g := nat_nth (permut_list_inv p)) (h := nat_nth p). 2: {
+    (g := ff_app (permut_list_inv p)) (h := ff_app p). 2: {
     intros j Hj.
     destruct Hp as (Hp1, Hp2).
     apply (@nth_nth_list_permut_list_inv n); [ easy | easy | flia Hj Hnz ].
@@ -784,14 +785,14 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1, Nat.sub_0_r.
   rewrite <- Hpn at 1.
-  rewrite <- List_map_nat_nth_seq.
+  rewrite <- List_map_ff_app_seq.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (u & Hu & Hui).
   rewrite Hpn in Hu.
-  replace (nat_nth _ (nat_nth _ i)) with i. 2: {
+  replace (ff_app _ (ff_app _ i)) with i. 2: {
     symmetry.
     rewrite <- Hui at 1.
-    unfold nat_nth.
+    unfold ff_app.
     now rewrite (@nth_nth_list_permut_list_inv n).
   }
   erewrite rngl_product_list_eq_compat. 2: {
@@ -799,10 +800,10 @@ erewrite rngl_product_list_eq_compat. 2: {
     apply (In_nth _ _ 0) in Hj.
     destruct Hj as (v & Hv & Hvi).
     rewrite Hpn in Hv.
-    replace (nat_nth _ (nat_nth _ j)) with j. 2: {
+    replace (ff_app _ (ff_app _ j)) with j. 2: {
       symmetry.
       rewrite <- Hvi at 1.
-      unfold nat_nth.
+      unfold ff_app.
       now rewrite (@nth_nth_list_permut_list_inv n).
     }
     easy.
@@ -1264,13 +1265,13 @@ Theorem signature_comp_fun_expand_1 :
   → length g = n
   → (∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ i j (nat_nth f (nat_nth g (i - 1)))
-           (nat_nth f (nat_nth g (j - 1)))) /
+         δ i j (ff_app f (ff_app g (i - 1)))
+           (ff_app f (ff_app g (j - 1)))) /
       ∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1))))%F =
+         δ i j (ff_app g (i - 1)) (ff_app g (j - 1))))%F =
     (∏ (i = 1, n),
-       (∏ (j = 1, n), δ i j (nat_nth f (i - 1)) (nat_nth f (j - 1))) /
+       (∏ (j = 1, n), δ i j (ff_app f (i - 1)) (ff_app f (j - 1))) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
   → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
@@ -1280,7 +1281,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    unfold nat_nth.
+    unfold ff_app.
     rewrite (List_map_nth' 0); [ | flia Hi Hn ].
     rewrite (List_map_nth' 0); [ | flia Hj Hn ].
     easy.
@@ -1316,16 +1317,16 @@ Theorem signature_comp_fun_expand_2_1 :
   → length g = n
   → (∏ (i = 1, n),
       (∏ (j = 1, n),
-       δ i j (nat_nth f (nat_nth g (i - 1)))
-         (nat_nth f (nat_nth g (j - 1)))) /
+       δ i j (ff_app f (ff_app g (i - 1)))
+         (ff_app f (ff_app g (j - 1)))) /
      ∏ (i = 1, n),
-      (∏ (j = 1, n), δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1))))%F =
+      (∏ (j = 1, n), δ i j (ff_app g (i - 1)) (ff_app g (j - 1))))%F =
     (∏ (i = 1, n),
       (∏ (j = 1, n),
        (if i <? j then
-         (rngl_of_nat (nat_nth f (nat_nth g (j - 1))) -
-          rngl_of_nat (nat_nth f (nat_nth g (i - 1)))) /
-         (rngl_of_nat (nat_nth g (j - 1)) - rngl_of_nat (nat_nth g (i - 1)))
+         (rngl_of_nat (ff_app f (ff_app g (j - 1))) -
+          rngl_of_nat (ff_app f (ff_app g (i - 1)))) /
+         (rngl_of_nat (ff_app g (j - 1)) - rngl_of_nat (ff_app g (i - 1)))
        else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * Hp2 Hn.
@@ -1469,14 +1470,14 @@ Theorem signature_comp_fun_changement_of_variable :
   → (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
-         (rngl_of_nat (nat_nth f (nat_nth g (j - 1))) -
-          rngl_of_nat (nat_nth f (nat_nth g (i - 1)))) /
-         (rngl_of_nat (nat_nth g (j - 1)) - rngl_of_nat (nat_nth g (i - 1)))
+         (rngl_of_nat (ff_app f (ff_app g (j - 1))) -
+          rngl_of_nat (ff_app f (ff_app g (i - 1)))) /
+         (rngl_of_nat (ff_app g (j - 1)) - rngl_of_nat (ff_app g (i - 1)))
        else 1)))%F =
     (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
-         (rngl_of_nat (nat_nth f (j - 1)) - rngl_of_nat (nat_nth f (i - 1))) /
+         (rngl_of_nat (ff_app f (j - 1)) - rngl_of_nat (ff_app f (i - 1))) /
          rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
@@ -1493,7 +1494,7 @@ erewrite rngl_product_eq_compat. 2: {
 }
 cbn - [ "<?" ].
 rewrite rngl_product_change_var with
-    (g := nat_nth (permut_list_inv g)) (h := nat_nth g). 2: {
+    (g := ff_app (permut_list_inv g)) (h := ff_app g). 2: {
   intros i Hi.
 Search permut_list_inv.
 About permut_list_inv.
