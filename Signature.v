@@ -1253,23 +1253,6 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-(*
-Theorem signature_comp_fun_expand_1 :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
-  ∀ n f g,
-  is_permut_list g
-  → length g = n
-  → (∏ (i = 1, n),
-        (∏ (j = 1, n), δ i j (f (g (i - 1)%nat)) (f (g (j - 1)%nat))) /
-      ∏ (i = 1, n), (∏ (j = 1, n), δ i j (g (i - 1)%nat) (g (j - 1)%nat)))%F =
-    (∏ (i = 1, n), (∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-      ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
-  → ε_list (comp f g) n = (ε_fun f n * ε_fun g n)%F.
-*)
 Theorem signature_comp_fun_expand_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1293,16 +1276,6 @@ Theorem signature_comp_fun_expand_1 :
 Proof.
 intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
 unfold ε, comp_list; cbn.
-rewrite <- Hs; symmetry.
-remember
-   (∏ (i = 1, n),
-    (∏ (j = 1, n),
-     δ i j (nat_nth f (nat_nth g (i - 1))) (nat_nth f (nat_nth g (j - 1)))))
-   as x eqn:Hx.
-remember
-   (∏ (i = 1, n),
-    (∏ (j = 1, n), δ i j (nat_nth g (i - 1)) (nat_nth g (j - 1)))) as y eqn:Hy.
-remember (∏ (i = 1, n), (∏ (j = 1, n), δ i j i j)) as z eqn:Hz.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1314,11 +1287,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn.
-unfold nat_nth in Hx.
-rewrite <- Hx.
-(* ouais, bon *)
-...
+rewrite <- Hs; symmetry.
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
 apply rngl_product_integral in Hij; [ | now left | easy | easy ].
@@ -1331,8 +1300,11 @@ destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
 apply rngl_sub_move_0_r in Hij; [ | easy ].
 apply rngl_of_nat_inj in Hij; [ | now left | easy ].
 destruct Hp2 as (Hp21, Hp22).
+rewrite <- Hn in Hi, Hj.
 apply Hp22 in Hij; [ flia Hi Hj Hlij Hij | flia Hj | flia Hi ].
 Qed.
+
+...
 
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
