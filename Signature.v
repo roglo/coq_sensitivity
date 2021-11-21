@@ -1759,10 +1759,23 @@ Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
     | 0 => k / n!
     | S i' =>
         if ((k <? n!) && (n <=? i'))%bool then 0
-        else succ_when_ge (k / n!) (ff_app σ' i)
+        else succ_when_ge (k / n!) (ff_app σ' i')
     end.
 Proof.
 intros * Hσ Hσ' i.
+(**)
+Compute (
+  let (n, k) := (4, 120) in
+  let σ := canon_sym_gr_list (S n) k in
+  let σ' := nth (k mod n!) (canon_sym_gr_list_list n) [] in
+  map (λ i,
+    (ff_app σ i,
+     match i with
+     | 0 => k / n!
+     | S i' =>
+         if ((k <? n!) && (n <=? i'))%bool then 0
+         else succ_when_ge (k / n!) (ff_app σ' i')
+     end)) (seq 0 (n + 14))).
 destruct i; [ now subst σ | ].
 subst σ; cbn - [ "<=?" ].
 remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
@@ -1780,8 +1793,38 @@ unfold succ_when_ge, Nat.b2n.
 rewrite if_leb_le_dec.
 destruct Hb as [Hb| Hb]. {
   apply Nat.ltb_ge in Hb.
-  destruct (le_dec (k / n!) (ff_app σ' (S i))) as [Hkn| Hkn]. {
-    rewrite Hσ' in Hkn; cbn in Hkn.
+  destruct (le_dec (k / n!) (ff_app σ' i)) as [Hkn| Hkn]. {
+    destruct (lt_dec i n) as [Hin| Hin]. {
+      rewrite Hσ' in Hkn |-*.
+      unfold ff_app; cbn.
+      unfold canon_sym_gr_list_list in Hkn |-*.
+      rewrite (List_map_nth' 0) in Hkn. 2: {
+        rewrite seq_length.
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite length_canon_sym_gr_list.
+      }
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+      rewrite seq_nth in Hkn |-*; cycle 1. {
+        apply Nat.mod_upper_bound, fact_neq_0.
+      } {
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+      cbn.
+      apply Nat.leb_le in Hkn.
+      unfold ff_app in Hkn; cbn in Hkn.
+      now rewrite Hkn.
+    } {
+      apply Nat.nlt_ge in Hin.
+      rewrite nth_overflow. 2: {
+        rewrite map_length.
+        now rewrite length_canon_sym_gr_list.
+      }
+(* enculé ! *)
 ...
   rewrite (List_map_nth' 0). 2: {
     rewrite length_canon_sym_gr_list.
