@@ -1547,7 +1547,8 @@ erewrite rngl_product_list_eq_compat. 2: {
 cbn - [ "<?" ].
 erewrite rngl_product_change_list; [ | easy | ]. 2: {
   rewrite <- Hn2 at 1.
-  now rewrite <- List_map_ff_app_seq.
+  rewrite <- List_map_ff_app_seq.
+  now apply permut_list_Permutation.
 }
 symmetry.
 rewrite rngl_product_shift; [ | flia Hnz ].
@@ -1569,7 +1570,7 @@ unfold iter_seq.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1, Nat.sub_0_r.
 symmetry.
-...
+rewrite Hn2.
 rewrite product_product_if_permut; try easy. {
   apply rngl_product_list_eq_compat.
   intros i Hi.
@@ -1582,7 +1583,9 @@ rewrite product_product_if_permut; try easy. {
 } {
   now left.
 } {
-  now apply permut_fun_inv_loop_is_permut.
+  now apply permut_list_inv_is_permut.
+} {
+  now rewrite length_permut_list_inv.
 } {
   intros i j.
   destruct (Nat.eq_dec i j) as [Hij| Hij]; [ now subst j | ].
@@ -1609,6 +1612,7 @@ rewrite product_product_if_permut; try easy. {
     apply rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | now left | easy ].
     apply Hij; symmetry.
+    rewrite <- Hn1 in Hi, Hj.
     now apply Hp1 in H.
   } {
     revert H.
@@ -1620,6 +1624,10 @@ rewrite product_product_if_permut; try easy. {
   }
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem signature_comp_fun :
   rngl_has_opp = true →
