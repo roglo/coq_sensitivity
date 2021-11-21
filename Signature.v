@@ -1719,12 +1719,28 @@ Definition sym_gr_elem_swap_with_0 p n k :=
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
 
-...
+(*
+Definition sym_gr_elem_swap_last (p q : nat) n k :=
+  list_swap_elem 0
+    (list_swap_elem 0 (nth k (canon_sym_gr_list_list n) []) p (n - 2))
+    q (n - 1).
 
+Compute (sym_gr_elem_swap_last 0 0 4 0).
+(*     = [3; 1; 0; 2] *)
+Compute (sym_gr_elem_swap_last 0 1 4 0).
+(*     = [2; 3; 0; 1] *)
+Compute (sym_gr_elem_swap_last 0 2 4 0).
+(*     = [2; 1; 3; 0] *)
+Compute (nth 0 (canon_sym_gr_list_list 4) []).
+Check permut_swap_with_0.
+*)
+
+(*
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   vect_swap_elem 0
     (vect_swap_elem 0 (vect_vect_nat_el (canon_sym_gr n) k) p (n - 2))
     q (n - 1).
+*)
 
 (* *)
 
@@ -1733,6 +1749,85 @@ Theorem ε_permut_succ : ∀ n k,
   → ε_permut (S n) k =
      (minus_one_pow (k / fact n) * ε_permut n (k mod fact n))%F.
 Proof. easy. Qed.
+
+Print canon_sym_gr_list.
+
+Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
+  σ = canon_sym_gr_list (S n) k
+  → σ' = nth (k mod n!) (canon_sym_gr_list_list n) []
+  → ∀ i,
+    ff_app σ i =
+    match i with
+    | 0 => k / n!
+    | S i' =>
+        if ff_app σ' i' <? k / n! then ff_app σ' i' else ff_app σ' i' + 1
+    end.
+Proof.
+intros * Hσ Hσ' i.
+(*
+Compute (let '(n, k) := (4, 50) in canon_sym_gr_list (S n) k).
+(*     = [2; 0; 3; 1; 4] *)
+Compute (let '(n, k) := (4, 50) in nth (k mod n!) (canon_sym_gr_list_list n) []).
+(*     = [0; 2; 1; 3] *)
+Print canon_sym_gr_list.
+k / n! = 2
+i=1
+i'=0
+ff_app σ' i' = ff_app [0;2;1;3] 0 = 0
+<? oui
+ff_app σ i = ff_app [2;0;3;1;4] 1 = 0
+i=2
+i'=1
+ff_app σ' i' = ff_app [0;2;1;3] 0 = 2
+<? non
+ff_app σ i = ff_app [2;0;3;1;4] 2 = 3 = 2 + 1
+i=3
+i'=2
+ff_app σ' i' = ff_app [0;2;1;3] 0 = 1
+<? oui
+ff_app σ i = ff_app [2;0;3;1;4] 3 = 1
+i=4
+i'=3
+ff_app σ' i' = ff_app [0;2;1;3] 0 = 3
+<? non
+ff_app σ i = ff_app [2;0;3;1;4] 4 = 4
+*)
+destruct i; [ now subst σ | ].
+subst σ; cbn - [ "<?" ].
+subst σ'; cbn - [ "<?" ].
+unfold succ_when_ge.
+destruct (lt_dec i n) as [Hin| Hin]. {
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite length_canon_sym_gr_list.
+  }
+  rewrite Nat.leb_antisym.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  rewrite Bool.negb_if.
+  rewrite if_ltb_lt_dec.
+unfold ff_app.
+Print canon_sym_gr_list.
+...
+  destruct (lt_dec _ _) as [H1| H1]. {
+...
+    destruct (lt_dec _ _) as [H2| H2]. 2: {
+      f_equal.
+      unfold ff_app.
+Search (nth _ (nth _ _ _)).
+Search (ff_app (ff_app _ _)).
+...
+    cbn.
+  destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
+apply Nat.add_0_r.
+...
+rewrite Nat.leb_antisym.
+unfold Nat.b2n.
+rewrite if_ltb_lt_dec.
+rewrite negb_if.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
+apply Nat.add_0_r.
+...
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
   σ = canon_sym_gr_fun n (canon_sym_gr_elem n) k
