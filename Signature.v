@@ -1758,16 +1758,74 @@ Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
     match i with
     | 0 => k / n!
     | S i' =>
-        if ff_app σ' i' <? k / n! then ff_app σ' i' else ff_app σ' i' + 1
+        if ((k <? n!) && (n <=? i'))%bool then 0
+        else succ_when_ge (k / n!) (ff_app σ' i)
     end.
 Proof.
 intros * Hσ Hσ' i.
+destruct i; [ now subst σ | ].
+subst σ; cbn - [ "<=?" ].
+remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply Bool.andb_true_iff in Hb.
+  destruct Hb as (Hkn, Hni).
+  apply Nat.leb_le in Hkn, Hni.
+  rewrite nth_overflow; [ easy | ].
+  rewrite map_length.
+  now rewrite length_canon_sym_gr_list.
+}
+apply Bool.andb_false_iff in Hb.
+unfold succ_when_ge, Nat.b2n.
+rewrite if_leb_le_dec.
+destruct Hb as [Hb| Hb]. {
+  apply Nat.ltb_ge in Hb.
+  destruct (le_dec (k / n!) (ff_app σ' (S i))) as [Hkn| Hkn]. {
+    rewrite Hσ' in Hkn; cbn in Hkn.
+...
+  rewrite (List_map_nth' 0). 2: {
+    rewrite length_canon_sym_gr_list.
+
+subst σ'; cbn - [ "<?" ].
+unfold succ_when_ge.
+destruct (lt_dec i n) as [Hin| Hin]. {
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite length_canon_sym_gr_list.
+  }
+  rewrite Nat.leb_antisym.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  rewrite Bool.negb_if.
+  rewrite if_ltb_lt_dec.
+  unfold canon_sym_gr_list_list.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+  unfold ff_app.
+  destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
+  apply Nat.add_0_r.
+}
+apply Nat.nlt_ge in Hin.
+rewrite nth_overflow. 2: {
+  now rewrite map_length, length_canon_sym_gr_list.
+}
+unfold ff_app.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]. {
+  symmetry; apply nth_overflow.
+  Search (canon_sym_gr_list_list).
+  etransitivity; [ | apply Hin ].
+Compute (let (n, k) := (1, 5) in length (nth (k mod n!) (canon_sym_gr_list_list n) [])).
+(* mmm... devrait être bon *)
+...
+Print succ_when_ge.
 rewrite Hσ.
 cbn - [ "<?" ].
 destruct i; [ easy | ].
 unfold succ_when_ge.
 unfold Nat.b2n.
-...
 rewrite (List_map_nth' 0). 2: {
   rewrite length_canon_sym_gr_list.
 cbn.
