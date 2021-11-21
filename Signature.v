@@ -1750,8 +1750,6 @@ Theorem ε_permut_succ : ∀ n k,
      (minus_one_pow (k / fact n) * ε_permut n (k mod fact n))%F.
 Proof. easy. Qed.
 
-Print canon_sym_gr_list.
-
 Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
   σ = canon_sym_gr_list (S n) k
   → σ' = nth (k mod n!) (canon_sym_gr_list_list n) []
@@ -1805,20 +1803,47 @@ destruct (lt_dec i n) as [Hin| Hin]. {
   rewrite if_ltb_lt_dec.
   rewrite Bool.negb_if.
   rewrite if_ltb_lt_dec.
-unfold ff_app.
-Print canon_sym_gr_list.
-...
-  destruct (lt_dec _ _) as [H1| H1]. {
-...
-    destruct (lt_dec _ _) as [H2| H2]. 2: {
-      f_equal.
-      unfold ff_app.
-Search (nth _ (nth _ _ _)).
-Search (ff_app (ff_app _ _)).
-...
-    cbn.
+  unfold canon_sym_gr_list_list.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+  unfold ff_app.
   destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
-apply Nat.add_0_r.
+  apply Nat.add_0_r.
+}
+apply Nat.nlt_ge in Hin.
+rewrite nth_overflow. 2: {
+  now rewrite map_length, length_canon_sym_gr_list.
+}
+unfold ff_app.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec _ _) as [H1| H1]. {
+  symmetry; apply nth_overflow.
+  Search (canon_sym_gr_list_list).
+  etransitivity; [ | apply Hin ].
+Compute (let (n, k) := (1, 5) in length (nth (k mod n!) (canon_sym_gr_list_list n) [])).
+(* mmm... devrait être bon *)
+admit.
+} {
+  exfalso.
+  destruct (le_dec k n!) as [Hkn| Hkn]. 2: {
+    apply Nat.nle_gt in Hkn.
+    apply H1; clear H1.
+    rewrite nth_overflow. 2: {
+      etransitivity; [ | apply Hin ].
+Compute (let (n, k) := (4, 50) in (nth i (nth (k mod n!) (canon_sym_gr_list_list n) []) 0, k / n!)).
+(* devrait aller mais faut voir *)
+      admit.
+    }
+(* devrait aller *)
+    admit.
+  }
+  apply Nat.nlt_ge in H1.
+(* là, je pense que non *)
+...
+}
 ...
 rewrite Nat.leb_antisym.
 unfold Nat.b2n.
