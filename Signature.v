@@ -1762,6 +1762,58 @@ Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
     end.
 Proof.
 intros * Hσ Hσ' i.
+rewrite Hσ.
+cbn - [ "<?" ].
+destruct i; [ easy | ].
+unfold succ_when_ge.
+unfold Nat.b2n.
+...
+rewrite (List_map_nth' 0). 2: {
+  rewrite length_canon_sym_gr_list.
+cbn.
+...
+intros * Hσ Hσ' i.
+Check List_map_nth'.
+Print succ_when_ge.
+
+
+succ_when_ge (k / n'!) (nth (k / n!) (canon_sym_gr_list n' (k mod n'!))
+
+ nth n (map f l) b = f (nth n l a)
+...
+canon_sym_gr_list = 
+fix canon_sym_gr_list (n k : nat) {struct n} : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'!
+      :: map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end
+...
+canon_sym_gr_list_list = 
+λ n : nat, map (canon_sym_gr_list n) (seq 0 n!)
+     : nat → list (list nat)
+...
+Compute (let '(n, k) := (4, 50) in
+  (canon_sym_gr_list (S n) k)).
+
+Compute (let '(n, k) := (5, 120) in
+let σ := canon_sym_gr_list (S n) k in
+let σ' :=  nth (k mod n!) (canon_sym_gr_list_list n) [] in
+  (
+map (λ i,
+   (ff_app σ i,
+    match i with
+    | 0 => k / n!
+    | S i' =>
+        if ff_app σ' i' <? k / n! then ff_app σ' i' else ff_app σ' i' + 1
+    end)) (seq 0 (S n + 14)))).
+Print canon_sym_gr_list.
+Print canon_sym_gr_list_list.
+...
+marche pas si k < n! et n < i
+...
+Compute (let '(n, k) := (4, 50) in ff_app σ 3).
 (*
 Compute (let '(n, k) := (4, 50) in canon_sym_gr_list (S n) k).
 (*     = [2; 0; 3; 1; 4] *)
