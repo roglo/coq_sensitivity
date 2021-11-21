@@ -1765,7 +1765,7 @@ Proof.
 intros * Hσ Hσ' i.
 (**)
 Compute (
-  let (n, k) := (4, 120) in
+  let (n, k) := (4, 23) in
   let σ := canon_sym_gr_list (S n) k in
   let σ' := nth (k mod n!) (canon_sym_gr_list_list n) [] in
   map (λ i,
@@ -1783,7 +1783,8 @@ symmetry in Hb.
 destruct b. {
   apply Bool.andb_true_iff in Hb.
   destruct Hb as (Hkn, Hni).
-  apply Nat.leb_le in Hkn, Hni.
+  apply Nat.ltb_lt in Hkn.
+  apply Nat.leb_le in Hni.
   rewrite nth_overflow; [ easy | ].
   rewrite map_length.
   now rewrite length_canon_sym_gr_list.
@@ -1820,15 +1821,52 @@ destruct Hb as [Hb| Hb]. {
       now rewrite Hkn.
     } {
       apply Nat.nlt_ge in Hin.
-      rewrite nth_overflow. 2: {
-        rewrite map_length.
+      rewrite Hσ' in Hkn.
+      unfold ff_app in Hkn.
+      rewrite nth_overflow in Hkn. 2: {
+        unfold canon_sym_gr_list_list.
+        rewrite (List_map_nth' 0). 2: {
+          rewrite seq_length.
+          apply Nat.mod_upper_bound, fact_neq_0.
+        }
         now rewrite length_canon_sym_gr_list.
       }
-(* enculé ! *)
+      apply Nat.le_0_r in Hkn.
+      apply Nat.div_small_iff in Hkn; [ | apply fact_neq_0 ].
+      now apply Nat.nle_gt in Hkn.
+    }
+  } {
+    apply Nat.nle_gt in Hkn.
+    rewrite Nat.add_0_r.
+    unfold ff_app.
+    rewrite Hσ'; cbn.
+    unfold canon_sym_gr_list_list.
+    symmetry.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+    rewrite seq_nth. 2: {
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+    cbn.
+    destruct (lt_dec i n) as [Hin| Hin]. {
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite length_canon_sym_gr_list.
+      }
+      rewrite if_leb_le_dec.
+      destruct (le_dec _ _) as [H1| H1]; [ | now rewrite Nat.add_0_r ].
+      exfalso.
+      apply Nat.nlt_ge in H1; apply H1; clear H1.
+      transitivity n. {
+        apply canon_sym_gr_list_ub; [ | easy ].
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+(* aïe aïe aïe *)
 ...
-  rewrite (List_map_nth' 0). 2: {
-    rewrite length_canon_sym_gr_list.
-
+canon_sym_gr_list_ub:
+  ∀ n k i : nat, k < n! → i < n → nth i (canon_sym_gr_list n k) 0 < n
+...
 subst σ'; cbn - [ "<?" ].
 unfold succ_when_ge.
 destruct (lt_dec i n) as [Hin| Hin]. {
