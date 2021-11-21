@@ -1625,30 +1625,6 @@ rewrite product_product_if_permut; try easy. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem signature_comp_fun :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_comm = true →
-  rngl_has_dec_eq = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
-  ∀ n f g,
-  is_permut_fun f n
-  → is_permut_fun g n
-  → ε_fun (comp f g) n = (ε_fun f n * ε_fun g n)%F.
-Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-apply signature_comp_fun_expand_1; try easy.
-rewrite signature_comp_fun_expand_2_1; try easy.
-rewrite signature_comp_fun_expand_2_2; try easy.
-now apply signature_comp_fun_changement_of_variable.
-Qed.
-
 Theorem signature_comp :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -1657,26 +1633,18 @@ Theorem signature_comp :
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
-  ∀ n (σ₁ σ₂ : vector nat),
-  is_permut_vect n σ₁
-  → is_permut_vect n σ₂
-  → ε n (σ₁ ° σ₂) = (ε n σ₁ * ε n σ₂)%F.
+  ∀ n f g,
+  is_permut n f
+  → is_permut n g
+  → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2.
-unfold ε.
-destruct Hp1 as (Hp1, Hp'1).
-destruct Hp2 as (Hp2, Hp'2).
-rewrite <- signature_comp_fun; try easy.
-unfold comp, "°".
-unfold ε_fun; f_equal.
-apply rngl_product_eq_compat.
-intros i Hi.
-apply rngl_product_eq_compat.
-intros j Hj.
-cbn; unfold comp_list.
-rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hp2 Hi ].
-rewrite (List_map_nth' 0); [ | rewrite fold_vect_size; flia Hp2 Hj ].
-easy.
+intros Hop Hin Hic Hde H10 Hit Hch * Hpf Hpg.
+destruct Hpf as (Hp11, Hpf2).
+destruct Hpg as (Hpg1, Hpg2).
+apply signature_comp_fun_expand_1; try easy.
+rewrite signature_comp_fun_expand_2_1; try easy.
+rewrite signature_comp_fun_expand_2_2; try easy.
+now apply signature_comp_fun_changement_of_variable.
 Qed.
 
 Theorem transposition_involutive : ∀ p q i,
@@ -1750,6 +1718,8 @@ Definition sym_gr_elem_swap_with_0 p n k :=
 *)
 
 (* k' such that permut_swap_with_0 p n k = permut n k' *)
+
+...
 
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   vect_swap_elem 0
