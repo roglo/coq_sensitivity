@@ -2094,19 +2094,76 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-...
-remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr (S n)) k))
-  as σ eqn:Hσ.
-remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr n) (k mod n!)))
-  as σ' eqn:Hσ'.
-rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hj ].
-rewrite (sym_gr_vect_succ_values Hkn Hσ Hσ'); [ | flia Hi ].
+unfold canon_sym_gr_list_list.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+do 2 rewrite Nat.add_0_l.
+remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
+remember (nth (k mod n!) (canon_sym_gr_list_list n) []) as σ' eqn:Hσ'.
+specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
+unfold ff_app in H1.
+do 2 rewrite H1.
 destruct j; [ flia Hj | ].
 destruct i; [ flia Hi | ].
 rewrite Nat_sub_succ_1.
 rewrite Nat_sub_succ_1.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec (σ' j) (k / fact n)) as [Hsfj| Hsfj]. {
+unfold succ_when_ge, Nat.b2n.
+do 2 rewrite if_leb_le_dec.
+remember ((k <? n!) && (n <=? i))%bool as bi eqn:Hbi.
+remember ((k <? n!) && (n <=? j))%bool as bj eqn:Hbj.
+symmetry in Hbi, Hbj.
+move σ' before σ; move bj before bi.
+unfold canon_sym_gr_list_list in Hσ'.
+rewrite (List_map_nth' 0) in Hσ'. 2: {
+  rewrite seq_length.
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+rewrite seq_nth in Hσ'; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+rewrite Nat.add_0_l in Hσ'.
+rewrite <- Hσ'.
+destruct bi. {
+  apply Bool.andb_true_iff in Hbi.
+  destruct Hbi as (Hkni, Hni).
+  apply Nat.leb_le in Hni.
+  flia Hi Hni.
+}
+destruct bj. {
+  apply Bool.andb_true_iff in Hbj.
+  destruct Hbj as (Hknj, Hnj).
+  apply Nat.leb_le in Hnj.
+  flia Hj Hnj.
+}
+apply Bool.andb_false_iff in Hbi, Hbj.
+unfold sign_diff.
+destruct (le_dec (k / n!) (nth j σ' 0)) as [Hsfj| Hsfj]. {
+  destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
+    now do 2 rewrite Nat.add_1_r.
+  }
+  rewrite Nat.add_0_r.
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec (nth i σ' 0) (nth j σ' 0 + 1)) as [Hsij1| Hsij1]. {
+    destruct (lt_dec (nth i σ' 0) (nth j σ' 0) ) as [Hsij| Hsij]; [ easy | ].
+    flia Hsij1 Hsij Hsfj Hsfi.
+  }
+  destruct (lt_dec (nth i σ' 0) (nth j σ' 0) ) as [Hsij| Hsij]; [ | easy ].
+  flia Hsij1 Hsij.
+}
+...
+  destruct (lt_dec (nth i σ' 0 + 1) (nth j σ' 0 + 1)) as [Hsi1j| Hsi1j]. {
+...
+destruct (lt_dec (σ' i + 1) (σ' j + 1)) as [Hsi1j| Hsi1j]. {
+  destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ easy | ].
+  flia Hsi1j Hsij.
+}
+destruct (lt_dec (σ' i) (σ' j)) as [Hsij| Hsij]; [ | easy ].
+flia Hsi1j Hsij.
+...
+destruct (lt_dec (nth j σ' 0) (k / fact n)) as [Hsfj| Hsfj]. {
   destruct (lt_dec (σ' i) (k / fact n)) as [Hsfi| Hsfi]; [ easy | ].
   unfold sign_diff.
   do 2 rewrite if_ltb_lt_dec.
