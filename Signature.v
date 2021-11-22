@@ -1952,16 +1952,28 @@ f_equal. {
       rewrite (Nat.add_1_l i).
       unfold ff_app in H1.
       rewrite H1.
+      unfold succ_when_ge, Nat.b2n.
       do 2 rewrite if_ltb_lt_dec.
-...
-      destruct (lt_dec (σ' i) x) as [H2| H2]; [ | easy ].
-      destruct (lt_dec x (σ' i)) as [H| H]; [ flia H H2 | clear H ].
-      destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ | easy ].
+      rewrite if_leb_le_dec.
+      remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
+      symmetry in Hb.
+      destruct b. {
+        apply Bool.andb_true_iff in Hb.
+        destruct Hb as (_, Hb).
+        apply Nat.leb_le in Hb.
+        flia Hi Hb Hnz.
+      }
+      destruct (le_dec x (nth i σ' 0)) as [H2| H2]; [ easy | ].
+      rewrite Nat.add_0_r.
+      destruct (lt_dec x (nth i σ' 0)) as [H| H]; [ flia H H2 | clear H ].
+      destruct (lt_dec x (ff_app σ' i + 1)) as [H3| H3]; [ | easy ].
+      unfold ff_app in H3.
       flia H2 H3.
     }
     easy.
   }
   cbn - [ "<?" ].
+...
   assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.
     apply mk_canon_is_permut_vect.
