@@ -1936,26 +1936,11 @@ f_equal. {
   remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
   remember (nth (k mod n!) (canon_sym_gr_list_list n) []) as σ' eqn:Hσ'.
   specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
-...
-  remember (nth k (canon_sym_gr_list_list (S n)) []) as σ eqn:Hσ.
-Check canon_sym_gr_succ_values.
-remember (nth (k mod n!) (canon_sym_gr_list_list (S n)) []) as σ' eqn:Hσ'.
-specialize canon_sym_gr_succ_values as H1.
-specialize (H1 n k).
-...
-specialize (canon_sym_gr_succ_values _ _ _ _ Hσ' Hσ) as H1.
-...
-  remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr (S n)) k))
-    as σ eqn:Hσ.
-  remember
-    (vect_el 0 (vect_vect_nat_el (canon_sym_gr n) (k mod n!)))
-    as σ' eqn:Hσ'.
-  specialize (sym_gr_vect_succ_values Hkn Hσ Hσ') as H1.
   unfold sign_diff.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
-    rewrite H1; [ | flia ].
-    easy.
+    unfold ff_app in H1.
+    now rewrite H1.
   }
   cbn - [ "<?" ].
   rewrite rngl_product_shift; [ | flia Hnz ].
@@ -1963,10 +1948,12 @@ specialize (canon_sym_gr_succ_values _ _ _ _ Hσ' Hσ) as H1.
   erewrite rngl_product_eq_compat. 2: {
     intros i (_, Hi).
     replace (if x <? _ then _ else _) with
-      (if x <? σ' i + 1 then 1%F else (-1)%F). 2: {
+      (if x <? ff_app σ' i + 1 then 1%F else (-1)%F). 2: {
       rewrite (Nat.add_1_l i).
-      rewrite H1; [ | flia Hi Hnz ].
-      do 3 rewrite if_ltb_lt_dec.
+      unfold ff_app in H1.
+      rewrite H1.
+      do 2 rewrite if_ltb_lt_dec.
+...
       destruct (lt_dec (σ' i) x) as [H2| H2]; [ | easy ].
       destruct (lt_dec x (σ' i)) as [H| H]; [ flia H H2 | clear H ].
       destruct (lt_dec x (σ' i + 1)) as [H3| H3]; [ | easy ].
