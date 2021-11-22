@@ -1763,19 +1763,6 @@ Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
     end.
 Proof.
 intros * Hσ Hσ' i.
-(**)
-Compute (
-  let (n, k) := (4, 23) in
-  let σ := canon_sym_gr_list (S n) k in
-  let σ' := nth (k mod n!) (canon_sym_gr_list_list n) [] in
-  map (λ i,
-    (ff_app σ i,
-     match i with
-     | 0 => k / n!
-     | S i' =>
-         if ((k <? n!) && (n <=? i'))%bool then 0
-         else succ_when_ge (k / n!) (ff_app σ' i')
-     end)) (seq 0 (n + 14))).
 destruct i; [ now subst σ | ].
 subst σ; cbn - [ "<=?" ].
 remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
@@ -1858,191 +1845,40 @@ destruct Hb as [Hb| Hb]. {
       destruct (le_dec _ _) as [H1| H1]; [ | now rewrite Nat.add_0_r ].
       exfalso.
       apply Nat.nlt_ge in H1; apply H1; clear H1.
-      transitivity n. {
-        apply canon_sym_gr_list_ub; [ | easy ].
+      apply (le_lt_trans _ (ff_app σ' i)); [ | easy ].
+      unfold ff_app; rewrite Hσ'.
+      unfold canon_sym_gr_list_list.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
         apply Nat.mod_upper_bound, fact_neq_0.
       }
-(* aïe aïe aïe *)
-...
-canon_sym_gr_list_ub:
-  ∀ n k i : nat, k < n! → i < n → nth i (canon_sym_gr_list n k) 0 < n
-...
-subst σ'; cbn - [ "<?" ].
-unfold succ_when_ge.
-destruct (lt_dec i n) as [Hin| Hin]. {
-  rewrite (List_map_nth' 0). 2: {
-    now rewrite length_canon_sym_gr_list.
-  }
-  rewrite Nat.leb_antisym.
-  unfold Nat.b2n.
-  rewrite if_ltb_lt_dec.
-  rewrite Bool.negb_if.
-  rewrite if_ltb_lt_dec.
-  unfold canon_sym_gr_list_list.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
-  unfold ff_app.
-  destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
-  apply Nat.add_0_r.
-}
-apply Nat.nlt_ge in Hin.
-rewrite nth_overflow. 2: {
-  now rewrite map_length, length_canon_sym_gr_list.
-}
-unfold ff_app.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec _ _) as [H1| H1]. {
-  symmetry; apply nth_overflow.
-  Search (canon_sym_gr_list_list).
-  etransitivity; [ | apply Hin ].
-Compute (let (n, k) := (1, 5) in length (nth (k mod n!) (canon_sym_gr_list_list n) [])).
-(* mmm... devrait être bon *)
-...
-Print succ_when_ge.
-rewrite Hσ.
-cbn - [ "<?" ].
-destruct i; [ easy | ].
-unfold succ_when_ge.
-unfold Nat.b2n.
-rewrite (List_map_nth' 0). 2: {
-  rewrite length_canon_sym_gr_list.
-cbn.
-...
-intros * Hσ Hσ' i.
-Check List_map_nth'.
-Print succ_when_ge.
-
-
-succ_when_ge (k / n'!) (nth (k / n!) (canon_sym_gr_list n' (k mod n'!))
-
- nth n (map f l) b = f (nth n l a)
-...
-canon_sym_gr_list = 
-fix canon_sym_gr_list (n k : nat) {struct n} : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'!
-      :: map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end
-...
-canon_sym_gr_list_list = 
-λ n : nat, map (canon_sym_gr_list n) (seq 0 n!)
-     : nat → list (list nat)
-...
-Compute (let '(n, k) := (4, 50) in
-  (canon_sym_gr_list (S n) k)).
-
-Compute (let '(n, k) := (5, 120) in
-let σ := canon_sym_gr_list (S n) k in
-let σ' :=  nth (k mod n!) (canon_sym_gr_list_list n) [] in
-  (
-map (λ i,
-   (ff_app σ i,
-    match i with
-    | 0 => k / n!
-    | S i' =>
-        if ff_app σ' i' <? k / n! then ff_app σ' i' else ff_app σ' i' + 1
-    end)) (seq 0 (S n + 14)))).
-Print canon_sym_gr_list.
-Print canon_sym_gr_list_list.
-...
-marche pas si k < n! et n < i
-...
-Compute (let '(n, k) := (4, 50) in ff_app σ 3).
-(*
-Compute (let '(n, k) := (4, 50) in canon_sym_gr_list (S n) k).
-(*     = [2; 0; 3; 1; 4] *)
-Compute (let '(n, k) := (4, 50) in nth (k mod n!) (canon_sym_gr_list_list n) []).
-(*     = [0; 2; 1; 3] *)
-Print canon_sym_gr_list.
-k / n! = 2
-i=1
-i'=0
-ff_app σ' i' = ff_app [0;2;1;3] 0 = 0
-<? oui
-ff_app σ i = ff_app [2;0;3;1;4] 1 = 0
-i=2
-i'=1
-ff_app σ' i' = ff_app [0;2;1;3] 0 = 2
-<? non
-ff_app σ i = ff_app [2;0;3;1;4] 2 = 3 = 2 + 1
-i=3
-i'=2
-ff_app σ' i' = ff_app [0;2;1;3] 0 = 1
-<? oui
-ff_app σ i = ff_app [2;0;3;1;4] 3 = 1
-i=4
-i'=3
-ff_app σ' i' = ff_app [0;2;1;3] 0 = 3
-<? non
-ff_app σ i = ff_app [2;0;3;1;4] 4 = 4
-*)
-destruct i; [ now subst σ | ].
-subst σ; cbn - [ "<?" ].
-subst σ'; cbn - [ "<?" ].
-unfold succ_when_ge.
-destruct (lt_dec i n) as [Hin| Hin]. {
-  rewrite (List_map_nth' 0). 2: {
-    now rewrite length_canon_sym_gr_list.
-  }
-  rewrite Nat.leb_antisym.
-  unfold Nat.b2n.
-  rewrite if_ltb_lt_dec.
-  rewrite Bool.negb_if.
-  rewrite if_ltb_lt_dec.
-  unfold canon_sym_gr_list_list.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
-  unfold ff_app.
-  destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
-  apply Nat.add_0_r.
-}
-apply Nat.nlt_ge in Hin.
-rewrite nth_overflow. 2: {
-  now rewrite map_length, length_canon_sym_gr_list.
-}
-unfold ff_app.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec _ _) as [H1| H1]. {
-  symmetry; apply nth_overflow.
-  Search (canon_sym_gr_list_list).
-  etransitivity; [ | apply Hin ].
-Compute (let (n, k) := (1, 5) in length (nth (k mod n!) (canon_sym_gr_list_list n) [])).
-(* mmm... devrait être bon *)
-admit.
-} {
-  exfalso.
-  destruct (le_dec k n!) as [Hkn| Hkn]. 2: {
-    apply Nat.nle_gt in Hkn.
-    apply H1; clear H1.
-    rewrite nth_overflow. 2: {
-      etransitivity; [ | apply Hin ].
-Compute (let (n, k) := (4, 50) in (nth i (nth (k mod n!) (canon_sym_gr_list_list n) []) 0, k / n!)).
-(* devrait aller mais faut voir *)
-      admit.
+      rewrite seq_nth; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
     }
-(* devrait aller *)
-    admit.
+    apply Nat.nlt_ge in Hin.
+    rewrite nth_overflow; [ | now rewrite length_canon_sym_gr_list ].
+    rewrite nth_overflow; [ easy | ].
+    now rewrite map_length, length_canon_sym_gr_list.
   }
-  apply Nat.nlt_ge in H1.
-(* là, je pense que non *)
-...
+} {
+  apply Nat.leb_gt in Hb.
+  unfold canon_sym_gr_list_list in Hσ'.
+  rewrite (List_map_nth' 0) in Hσ'. 2: {
+    rewrite seq_length.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite seq_nth in Hσ'. 2: {
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite length_canon_sym_gr_list.
+  }
+  cbn in Hσ'.
+  now rewrite <- Hσ', if_leb_le_dec.
 }
-...
-rewrite Nat.leb_antisym.
-unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-rewrite negb_if.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
-apply Nat.add_0_r.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem sym_gr_succ_values : ∀ n k σ σ',
