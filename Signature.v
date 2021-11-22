@@ -1975,24 +1975,17 @@ f_equal. {
   cbn - [ "<?" ].
   assert (Hp' : is_permut n σ'). {
     rewrite Hσ'.
-...
-Search (is_permut _ (ff_app _ _)).
-    apply mk_canon_is_permut_list.
-...
-  assert (Hp' : is_permut_fun σ' n). {
-    rewrite Hσ'.
-    apply mk_canon_is_permut_vect.
+    apply canon_sym_gr_list_list_elem_is_permut.
     apply Nat.mod_upper_bound, fact_neq_0.
   }
-  assert (Hp : is_permut_fun σ (S n)). {
+  assert (Hp : is_permut (S n) σ). {
     rewrite Hσ.
-    now apply mk_canon_is_permut_vect.
+    now apply canon_sym_gr_list_is_permut.
   }
-  rewrite rngl_product_change_var with (g := permut_fun_inv_loop σ' n) (h := σ').
-  2: {
+  rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv σ')) (h := ff_app σ'). 2: {
     intros i (_, Hi).
-    apply fun_find_prop; [ | flia Hnz Hi ].
-    apply Hp'.
+    apply (permut_inv_permut n); [ easy | flia Hnz Hi ].
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
@@ -2002,12 +1995,20 @@ Search (is_permut _ (ff_app _ _)).
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
     apply in_seq in Hj.
-    rewrite fun_permut_fun_inv_loop; [ easy | easy | ].
-    now rewrite <- Hji; apply Hp'.
+    rewrite (permut_permut_inv n); [ | easy | ]. 2: {
+      rewrite <- Hji.
+      destruct Hp' as ((Hp'1, Hp'2), Hp'3).
+      rewrite <- Hp'3 in Hj |-*.
+      now apply Hp'1, nth_In.
+    }
+    easy.
   }
   cbn - [ "<?" seq ].
   rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-    now apply permut_fun_Permutation.
+    apply permut_list_Permutation.
+    destruct Hp' as ((Hp'1, Hp'2), Hp'3).
+    rewrite <- Hp'3 at 2.
+    now rewrite <- List_map_ff_app_seq.
   }
   rewrite rngl_product_seq_product; [ | easy ].
   rewrite Nat.add_0_l.
@@ -2022,10 +2023,11 @@ Search (is_permut _ (ff_app _ _)).
     split; [ flia | ].
     apply -> Nat.succ_le_mono.
     enough (H : x < S n) by flia H Hnz.
-    replace x with (σ 0). 2: {
-      rewrite H1; [ easy | flia ].
-    }
-    apply Hp; flia.
+    replace x with (ff_app σ 0) by now rewrite H1.
+    destruct Hp as ((Hp1, Hp2), Hp3).
+    rewrite <- Hp3.
+    apply Hp1, nth_In.
+    rewrite Hp3; flia.
   }
   remember (∏ (i = _, _), _)%F as y eqn:Hy.
   rewrite all_1_rngl_product_1. 2: {
@@ -2062,7 +2064,8 @@ Search (is_permut _ (ff_app _ _)).
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
-rewrite ε_ws_ε; try easy. 2: {
+rewrite ε_ws_ε; try easy; cycle 1. {
+...
   apply mk_canon_is_permut_vect.
   apply Nat.mod_upper_bound.
   apply fact_neq_0.
