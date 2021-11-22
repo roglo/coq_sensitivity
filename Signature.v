@@ -1877,77 +1877,23 @@ destruct Hb as [Hb| Hb]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem sym_gr_succ_values : ∀ n k σ σ',
-  σ = canon_sym_gr_fun n (canon_sym_gr_elem n) k
-  → σ' = canon_sym_gr_elem n (k mod n!)
-  → ∀ i,
-    σ i =
-    match i with
-    | 0 => k / fact n
-    | S i' => if σ' i' <? k / fact n then σ' i' else σ' i' + 1
-    end.
-Proof.
-intros * Hσ Hσ' i.
-destruct i; [ now subst σ | ].
-subst σ; cbn - [ "<?" ].
-subst σ'; cbn - [ "<?" ].
-rewrite Nat.leb_antisym.
-unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-rewrite negb_if.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec _ _) as [H1| H1]; [ | easy ].
-apply Nat.add_0_r.
-Qed.
-
-Theorem sym_gr_vect_succ_values : ∀ (n k : nat) (σ σ' : nat → nat),
-  k < (S n)!
-  → σ = vect_el 0 (vect_vect_nat_el (canon_sym_gr (S n)) k)
-  → σ' = vect_el 0 (vect_vect_nat_el (canon_sym_gr n) (k mod n!))
-  → ∀ i : nat, i < S n →
-    σ i =
-      match i with
-      | 0 => k / n!
-      | S i' => if σ' i' <? k / n! then σ' i' else σ' i' + 1
-      end.
-Proof.
-intros * Hkn Hσ Hσ' i Hin.
-unfold canon_sym_gr in Hσ.
-cbn - [ map fact seq ] in Hσ.
-rewrite (List_map_nth' 0) in Hσ; [ | now rewrite seq_length ].
-rewrite seq_nth in Hσ; [ | easy ].
-rewrite Nat.add_0_l in Hσ.
-rewrite Hσ.
-unfold vect_el.
-cbn - [ "<?" nth seq ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite Nat.add_0_l.
-destruct i; [ easy | ].
-subst σ; cbn - [ "<?" ].
-subst σ'; cbn - [ "<?" ].
-rewrite Nat.leb_antisym.
-unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-rewrite negb_if.
-rewrite if_ltb_lt_dec.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-cbn - [ fact map seq "<?" ].
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
-rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
-rewrite seq_nth; [ | flia Hin ].
-do 2 rewrite Nat.add_0_l.
-destruct (lt_dec _ _); [ apply Nat.add_0_r | easy ].
-Qed.
-
 (* equality of ε of sym_gr elem and ε_permut *)
+
+Theorem ε_of_sym_gr_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_has_dec_eq = true →
+  rngl_characteristic = 0 →
+  ∀ n k,
+  k < (S n)!
+  → ε (S n) (nth k (canon_sym_gr_list_list (S n)) []) =
+    (minus_one_pow (k / n!) *
+     ε n (nth (k mod n!) (canon_sym_gr_list_list n) []))%F.
+Proof.
+...
 
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
