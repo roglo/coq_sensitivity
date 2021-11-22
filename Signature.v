@@ -2166,8 +2166,6 @@ destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
 now do 2 rewrite Nat.add_0_r.
 Qed.
 
-...
-
 Theorem ε_of_permut_ε :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -2177,13 +2175,13 @@ Theorem ε_of_permut_ε :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n k,
-  k < fact n
-  → ε n (vect_vect_nat_el (canon_sym_gr n) k) = ε_permut n k.
+  k < n!
+  → ε n (nth k (canon_sym_gr_list_list n) []) = ε_permut n k.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
 revert k Hkn.
 induction n; intros. {
-  cbn; unfold ε, ε_fun; cbn.
+  cbn; unfold ε; cbn.
   unfold iter_seq, iter_list; cbn.
   apply rngl_div_1_r; [ now left | easy ].
 }
@@ -2191,9 +2189,10 @@ rewrite ε_of_sym_gr_permut_succ; try easy.
 cbn.
 f_equal.
 apply IHn.
-apply Nat.mod_upper_bound.
-apply fact_neq_0.
+apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
+
+...
 
 Theorem permut_vect_inv_is_permut : ∀ n (σ : vector nat),
   is_permut_vect n σ
