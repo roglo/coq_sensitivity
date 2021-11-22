@@ -1929,6 +1929,21 @@ f_equal. {
     easy.
   }
   cbn - [ canon_sym_gr_list_list ].
+  unfold canon_sym_gr_list_list.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
+  remember (nth (k mod n!) (canon_sym_gr_list_list n) []) as σ' eqn:Hσ'.
+  specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
+...
+  remember (nth k (canon_sym_gr_list_list (S n)) []) as σ eqn:Hσ.
+Check canon_sym_gr_succ_values.
+remember (nth (k mod n!) (canon_sym_gr_list_list (S n)) []) as σ' eqn:Hσ'.
+specialize canon_sym_gr_succ_values as H1.
+specialize (H1 n k).
+...
+specialize (canon_sym_gr_succ_values _ _ _ _ Hσ' Hσ) as H1.
 ...
   remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr (S n)) k))
     as σ eqn:Hσ.
