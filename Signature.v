@@ -1973,6 +1973,11 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
+  assert (Hp' : is_permut n σ'). {
+    rewrite Hσ'.
+...
+Search (is_permut _ (ff_app _ _)).
+    apply mk_canon_is_permut_list.
 ...
   assert (Hp' : is_permut_fun σ' n). {
     rewrite Hσ'.

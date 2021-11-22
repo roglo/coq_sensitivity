@@ -1064,6 +1064,37 @@ split. {
 }
 Qed.
 
+...
+
+  is_permut n (nth (k mod n!) (canon_sym_gr_list_list n) [])
+
+Theorem mk_canon_is_permut_vect : ∀ n k,
+  k < n!
+  → is_permut_vect n (vect_vect_nat_el (canon_sym_gr n) k).
+Proof.
+intros * Hkn.
+unfold canon_sym_gr; cbn - [ fact map seq ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+unfold is_permut_vect, vect_el.
+cbn - [ seq fact nth ].
+split; [ now rewrite map_length, seq_length | ].
+split. {
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  now apply permut_elem_ub.
+} {
+  intros * Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  now apply mk_canon_sym_gr_inj1 in Hij.
+}
+Qed.
+
 Theorem canon_sym_gr_sub_canon_permut_list : ∀ n k,
   canon_sym_gr_list n (k mod n!) =
   sub_canon_permut_list (canon_sym_gr_list (S n) k).
