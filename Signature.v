@@ -2065,12 +2065,13 @@ f_equal. {
   now rewrite rngl_mul_1_l.
 }
 rewrite ε_ws_ε; try easy; cycle 1. {
-...
-  apply mk_canon_is_permut_vect.
-  apply Nat.mod_upper_bound.
-  apply fact_neq_0.
+  apply canon_sym_gr_list_list_is_permut.
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply length_nth_canon_sym_gr_list_list.
+  apply Nat.mod_upper_bound, fact_neq_0.
 }
-unfold ε_ws, ε_fun_ws.
+unfold ε_ws.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_succ_succ.
@@ -2085,7 +2086,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ canon_sym_gr_elem "<?" fact map vect_vect_nat_el ].
+cbn - [ canon_sym_gr_list_list "<?" ].
 apply rngl_product_eq_compat.
 intros i Hi.
 apply rngl_product_eq_compat.
@@ -2093,6 +2094,7 @@ intros j Hj.
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+...
 remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr (S n)) k))
   as σ eqn:Hσ.
 remember (vect_el 0 (vect_vect_nat_el (canon_sym_gr n) (k mod n!)))
