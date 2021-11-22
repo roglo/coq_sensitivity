@@ -694,6 +694,17 @@ f_equal; rewrite map_length.
 apply IHn.
 Qed.
 
+Theorem length_nth_canon_sym_gr_list_list : ∀ i n d,
+  i < n!
+  → length (nth i (canon_sym_gr_list_list n) d) = n.
+Proof.
+intros * Hin.
+unfold canon_sym_gr_list_list.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+apply length_canon_sym_gr_list.
+Qed.
+
 Theorem canon_sym_gr_list_ub : ∀ n k i,
   k < n!
   → i < n
@@ -1268,7 +1279,7 @@ Record sym_gr_list n :=
   { sg_list : list (list nat);
     sg_prop : is_sym_gr_list n sg_list }.
 
-Theorem canon_sym_gr_vect_is_permut : ∀ n k,
+Theorem canon_sym_gr_list_list_is_permut : ∀ n k,
   k < n!
   → is_permut_list (nth k (canon_sym_gr_list_list n) []).
 Proof.
