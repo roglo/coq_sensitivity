@@ -873,8 +873,6 @@ destruct (le_dec (k / n!) i) as [Hkni| Hkni]; [ apply Nat.add_1_r | ].
 now apply Nat.succ_le_mono in Hknsi.
 Qed.
 
-Inspect 1.
-
 Theorem nth_canon_sym_gr_list_inj1 : ∀ n k i j,
   k < fact n
   → i < n
