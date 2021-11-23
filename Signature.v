@@ -2192,26 +2192,14 @@ apply IHn.
 apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
 
-...
-
-Theorem permut_vect_inv_is_permut : ∀ n (σ : vector nat),
-  is_permut_vect n σ
-  → is_permut_vect n (permut_vect_inv n σ).
+Theorem canon_sym_gr_inv_list_ub : ∀ n k i,
+  k < n!
+  → i < n
+  → ff_app (canon_sym_gr_inv_list n k) i < n.
 Proof.
-intros * (Hp1, Hp2).
-specialize (permut_fun_inv_loop_is_permut Hp2) as H1.
-split; [ now cbn; rewrite map_length, seq_length | ].
-unfold permut_vect_inv, vect_el; cbn.
-eapply is_permut_eq_compat. {
-  intros i Hi.
-  symmetry.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
-  easy.
-}
-easy.
-Qed.
+intros * Hkn Hjn.
+Search canon_sym_gr_inv_list.
+...
 
 Theorem canon_sym_gr_inv_ub : ∀ n k j,
   k < fact n
