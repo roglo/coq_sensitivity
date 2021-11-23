@@ -2230,8 +2230,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   destruct n. {
     now apply Nat.lt_1_r in Hjn; subst j.
   }
-  apply IHn; [ | flia Hjn Hknj ].
-  apply Nat.mod_upper_bound, fact_neq_0.
+  apply IHn; [ easy | flia Hjn Hknj ].
 }
 Qed.
 
@@ -2243,6 +2242,7 @@ Proof.
 intros * Hkn Hjn.
 exists (ff_app (canon_sym_gr_inv_list n k) j).
 split; [ now apply canon_sym_gr_inv_list_ub | ].
+...
 Search canon_sym_gr_inv_list.
 Check canon_sym_gr_inv_sym_gr.
 About canon_sym_gr_inv_sym_gr.

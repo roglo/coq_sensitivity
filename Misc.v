@@ -2048,6 +2048,12 @@ Proof.
 intros; destruct b; cbn; flia.
 Qed.
 
+Theorem Nat_mod_fact_upper_bound : ∀ k n, k mod n! < n!.
+Proof.
+intros.
+apply Nat.mod_upper_bound, fact_neq_0.
+Qed.
+
 Theorem List_skipn_skipn : ∀ A i j (la : list A),
   skipn i (skipn j la) = skipn (i + j) la.
 Proof.
@@ -3658,3 +3664,5 @@ Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
+
+Global Hint Resolve Nat_mod_fact_upper_bound : core.
