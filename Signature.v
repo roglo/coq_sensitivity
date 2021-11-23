@@ -2235,65 +2235,24 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
 }
 Qed.
 
-...
-
-Theorem sym_gr_sym_gr_inv : ∀ n k j,
-  j < n
-  → k < fact n
-  → canon_sym_gr_elem n k (canon_sym_gr_inv n k j) = j.
+Theorem canon_sym_gr_surjective : ∀ n k j,
+  k < fact n
+  → j < n
+  → ∃ i : nat, i < n ∧ ff_app (canon_sym_gr_list n k) i = j.
 Proof.
-intros * Hjn Hkn.
-revert j k Hjn Hkn.
-induction n; intros; [ easy | cbn ].
-destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
-  cbn.
-  destruct n. {
-    rewrite Nat.div_1_r in Hjkn; cbn in Hkn.
-    flia Hkn Hjkn.
-  }
-  destruct (lt_dec k (fact (S n))) as [Hksn| Hksn]. {
-    now rewrite Nat.div_small in Hjkn.
-  }
-  apply Nat.nlt_ge in Hksn.
-  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
-    subst j.
-    clear Hjn.
-    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
-    rewrite Nat_fact_succ in Hkn.
-    rewrite Nat.mul_comm in Hkn.
-    apply Nat.lt_succ_r.
-    apply Nat.div_lt_upper_bound; [ | easy ].
-    apply fact_neq_0.
-  }
-  rewrite IHn; [ | flia Hjn Hjsn | ]. 2: {
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-  remember (k / fact (S n) <=? j) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b; [ exfalso | apply Nat.add_0_r ].
-  apply Nat.leb_le in Hb.
-  flia Hjkn Hb.
-} {
-  apply Nat.nlt_ge in Hjkn.
-  destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]. 2: {
-    apply Nat.nlt_ge in Hkj; cbn.
-    now apply Nat.le_antisymm.
-  }
-  clear Hjkn.
-  destruct j; [ easy | ].
-  rewrite Nat_sub_succ_1; cbn.
-  destruct n; [ flia Hjn | ].
-  apply Nat.succ_lt_mono in Hjn.
-  rewrite IHn; [ | easy | ]. 2: {
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-  remember (k / fact (S n) <=? j) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b; [ apply Nat.add_1_r | exfalso ].
-  apply Nat.leb_nle in Hb.
-  now apply Nat.succ_le_mono in Hkj.
-}
-Qed.
+intros * Hkn Hjn.
+exists (ff_app (canon_sym_gr_inv_list n k) j).
+split; [ now apply canon_sym_gr_inv_list_ub | ].
+Search canon_sym_gr_inv_list.
+Check canon_sym_gr_inv_sym_gr.
+About canon_sym_gr_inv_sym_gr.
+Search canon_sym_gr_inv_elem.
+...
+  Hkn : k < n!
+  Hjn : j < n
+  ============================
+  ff_app (canon_sym_gr_list n k) (ff_app (canon_sym_gr_inv_list n k) j) = j
+...
 
 Theorem canon_sym_gr_surjective : ∀ n k j,
   k < fact n

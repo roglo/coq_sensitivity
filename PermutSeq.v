@@ -727,12 +727,13 @@ apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
 
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
-  i < n
-  → k < n!
-  → nth ((nth i (canon_sym_gr_list n k) 0)) (canon_sym_gr_inv_list n k) 0 = i.
+  k < n!
+  → i < n
+  → ff_app (canon_sym_gr_inv_list n k) (ff_app (canon_sym_gr_list n k) i) = i.
 Proof.
-intros * Hi Hkn.
+intros * Hkn Hi.
 unfold canon_sym_gr_inv_list.
+unfold ff_app.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply canon_sym_gr_list_ub.
@@ -740,8 +741,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite seq_nth; [ | now apply canon_sym_gr_list_ub ].
 rewrite Nat.add_0_l.
 revert k i Hi Hkn.
-induction n; intros; [ easy | ].
-cbn.
+induction n; intros; [ easy | cbn ].
 destruct i. {
   do 2 rewrite <- if_ltb_lt_dec.
   now rewrite Nat.ltb_irrefl.
@@ -764,11 +764,103 @@ destruct (le_dec (k / n!) _) as [H1| H1]. {
 }
 Qed.
 
+Theorem canon_sym_gr_inv_elem_ub : ∀ n k i,
+  k < n!
+  → i < n
+  → canon_sym_gr_inv_elem n k i < n.
+Proof.
+intros * Hkn Hi.
+revert i k Hkn Hi.
+induction n; intros; [ easy | cbn ].
+(**)
+destruct (lt_dec i (k / n!)) as [Hikn| Hikn]. {
+  apply -> Nat.succ_lt_mono.
+  destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+    subst i.
+...
+    destruct n. {
+      apply Nat.lt_1_r in Hkn; subst k.
+      now rewrite Nat.div_1_r in Hikn.
+    }
+    cbn - [ fact ].
+    rewrite Nat_fact_succ in Hkn.
+    apply Nat.mul_lt_mono_pos_r with (p := n!) in Hikn.
+...
+Search (_ * _ < _ * _).
+  apply IHn.
+...
+destruct i. {
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  now rewrite Nat.mul_succ_r, Nat.add_comm, Nat.mul_comm.
+}
+apply Nat.succ_lt_mono in Hi.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge.
+rewrite <- Nat.add_1_r.
+apply Nat.add_lt_le_mono; [ | apply Nat_b2n_upper_bound ].
+apply IHn; [ | easy ].
+apply Nat.mod_upper_bound, fact_neq_0.
+Qed.
+*)
+
+Theorem canon_sym_gr_sym_gr_inv : ∀ n k i,
+  k < n!
+  → i < n
+  → ff_app (canon_sym_gr_list n k) (ff_app (canon_sym_gr_inv_list n k) i) = i.
+Proof.
+intros * Hkn Hi.
+unfold canon_sym_gr_inv_list.
+unfold ff_app.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+revert k i Hi Hkn.
+induction n; intros; [ easy | cbn ].
+destruct i. {
+  destruct (lt_dec 0 (k / n!)) as [Hzkn| Hzkn]. {
+    unfold succ_when_ge.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite length_canon_sym_gr_list.
+Search (canon_sym_gr_inv_elem).
+Print canon_sym_gr_inv_elem.
+...
+      apply canon_sym_gr_inv_elem_ub.
+
+
+
+  do 2 rewrite <- if_ltb_lt_dec.
+  now rewrite Nat.ltb_irrefl.
+}
+apply Nat.succ_lt_mono in Hi.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec (k / n!) _) as [H1| H1]. {
+  destruct (lt_dec _ (k / n!)) as [H| H]; [ flia H1 H | clear H ].
+  destruct (lt_dec (k / n!) _) as [H| H]; [ clear H | flia H1 H ].
+  f_equal; rewrite Nat.add_sub.
+  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
+} {
+  rewrite Nat.add_0_r.
+  destruct (lt_dec _ (k / n!)) as [H| H]; [ clear H | flia H1 H ].
+  f_equal.
+  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
+}
+
+...
+Search (ff_app _ (ff_app _ _)).
+Search canon_sym_gr_inv_list.
+
+apply permut_permut_inv.
+...
+*)
+
 Theorem nth_canon_sym_gr_list_inj1 : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
-  → nth i (canon_sym_gr_list n k) 0 = nth j (canon_sym_gr_list n k) 0
+  → ff_app (canon_sym_gr_list n k) i = ff_app (canon_sym_gr_list n k) j
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
