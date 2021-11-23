@@ -2208,6 +2208,43 @@ split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
+Theorem comp_is_permut : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut n (σ₁ ° σ₂).
+Proof.
+intros * Hp1 Hp2.
+split. {
+  split. {
+    intros i Hi.
+    unfold comp_list in Hi |-*.
+    rewrite map_length.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    subst i.
+    destruct Hp1 as (Hp11, Hp12).
+    destruct Hp2 as (Hp21, Hp22).
+    rewrite Hp22, <- Hp12.
+    apply permut_list_ub; [ easy | ].
+    apply Hp21 in Hj.
+    congruence.
+  } {
+    unfold comp_list.
+    rewrite map_length.
+    intros i j Hi Hj.
+    unfold ff_app.
+    rewrite (List_map_nth' 0); [ | easy ].
+    rewrite (List_map_nth' 0); [ | easy ].
+    intros Hij.
+Search (ff_app (ff_app _ _)).
+...
+    now apply Hp1, Hp2.
+} {
+  intros i j Hi Hj Hc.
+  apply Hp2; [ easy | easy | ].
+  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
+}
+Qed.
 ...
 
 Theorem comp_is_permut : ∀ n (σ₁ σ₂ : nat → nat),
