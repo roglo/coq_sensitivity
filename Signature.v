@@ -1786,23 +1786,12 @@ destruct Hb as [Hb| Hb]. {
       rewrite Hσ' in Hkn |-*.
       unfold ff_app; cbn.
       unfold canon_sym_gr_list_list in Hkn |-*.
-      rewrite (List_map_nth' 0) in Hkn. 2: {
-        rewrite seq_length.
-        apply Nat.mod_upper_bound, fact_neq_0.
-      }
+      rewrite (List_map_nth' 0) in Hkn; [ | now rewrite seq_length ].
       rewrite (List_map_nth' 0). 2: {
         now rewrite length_canon_sym_gr_list.
       }
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        apply Nat.mod_upper_bound, fact_neq_0.
-      }
-      rewrite seq_nth in Hkn |-*; cycle 1. {
-        apply Nat.mod_upper_bound, fact_neq_0.
-      } {
-        apply Nat.mod_upper_bound, fact_neq_0.
-      }
-      cbn.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth in Hkn |-*; [ cbn | easy | easy ].
       apply Nat.leb_le in Hkn.
       unfold ff_app in Hkn; cbn in Hkn.
       now rewrite Hkn.
@@ -1811,8 +1800,7 @@ destruct Hb as [Hb| Hb]. {
       rewrite Hσ' in Hkn.
       unfold ff_app in Hkn.
       rewrite nth_overflow in Hkn. 2: {
-        rewrite length_nth_canon_sym_gr_list_list; [ easy | ].
-        apply Nat.mod_upper_bound, fact_neq_0.
+        now rewrite length_nth_canon_sym_gr_list_list.
       }
       apply Nat.le_0_r in Hkn.
       apply Nat.div_small_iff in Hkn; [ | apply fact_neq_0 ].
@@ -1825,14 +1813,8 @@ destruct Hb as [Hb| Hb]. {
     rewrite Hσ'; cbn.
     unfold canon_sym_gr_list_list.
     symmetry.
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      apply Nat.mod_upper_bound, fact_neq_0.
-    }
-    rewrite seq_nth. 2: {
-      apply Nat.mod_upper_bound, fact_neq_0.
-    }
-    cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ cbn | easy ].
     destruct (lt_dec i n) as [Hin| Hin]. {
       rewrite (List_map_nth' 0). 2: {
         now rewrite length_canon_sym_gr_list.
@@ -1844,11 +1826,8 @@ destruct Hb as [Hb| Hb]. {
       apply (le_lt_trans _ (ff_app σ' i)); [ | easy ].
       unfold ff_app; rewrite Hσ'.
       unfold canon_sym_gr_list_list.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        apply Nat.mod_upper_bound, fact_neq_0.
-      }
-      rewrite seq_nth; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      now rewrite seq_nth.
     }
     apply Nat.nlt_ge in Hin.
     rewrite nth_overflow; [ | now rewrite length_canon_sym_gr_list ].
@@ -1858,13 +1837,8 @@ destruct Hb as [Hb| Hb]. {
 } {
   apply Nat.leb_gt in Hb.
   unfold canon_sym_gr_list_list in Hσ'.
-  rewrite (List_map_nth' 0) in Hσ'. 2: {
-    rewrite seq_length.
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
-  rewrite seq_nth in Hσ'. 2: {
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
+  rewrite (List_map_nth' 0) in Hσ'; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hσ'; [ | easy ].
   rewrite (List_map_nth' 0). 2: {
     now rewrite length_canon_sym_gr_list.
   }
@@ -1975,8 +1949,7 @@ f_equal. {
   cbn - [ "<?" ].
   assert (Hp' : is_permut n σ'). {
     rewrite Hσ'.
-    apply canon_sym_gr_list_list_elem_is_permut.
-    apply Nat.mod_upper_bound, fact_neq_0.
+    now apply canon_sym_gr_list_list_elem_is_permut.
   }
   assert (Hp : is_permut (S n) σ). {
     rewrite Hσ.
@@ -2065,11 +2038,9 @@ f_equal. {
   now rewrite rngl_mul_1_l.
 }
 rewrite ε_ws_ε; try easy; cycle 1. {
-  apply canon_sym_gr_list_list_is_permut.
-  apply Nat.mod_upper_bound, fact_neq_0.
+  now apply canon_sym_gr_list_list_is_permut.
 } {
-  apply length_nth_canon_sym_gr_list_list.
-  apply Nat.mod_upper_bound, fact_neq_0.
+  now apply length_nth_canon_sym_gr_list_list.
 }
 unfold ε_ws.
 erewrite rngl_product_eq_compat. 2: {
@@ -2096,12 +2067,9 @@ do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold canon_sym_gr_list_list.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+rewrite seq_nth; [ | easy ].
 do 2 rewrite Nat.add_0_l.
 remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
 remember (nth (k mod n!) (canon_sym_gr_list_list n) []) as σ' eqn:Hσ'.
@@ -2119,11 +2087,8 @@ remember ((k <? n!) && (n <=? j))%bool as bj eqn:Hbj.
 symmetry in Hbi, Hbj.
 move σ' before σ; move bj before bi.
 unfold canon_sym_gr_list_list in Hσ'.
-rewrite (List_map_nth' 0) in Hσ'. 2: {
-  rewrite seq_length.
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
-rewrite seq_nth in Hσ'; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+rewrite (List_map_nth' 0) in Hσ'; [ | now rewrite seq_length ].
+rewrite seq_nth in Hσ'; [ | easy ].
 rewrite Nat.add_0_l in Hσ'.
 rewrite <- Hσ'.
 destruct bi. {
@@ -2188,8 +2153,7 @@ induction n; intros. {
 rewrite ε_of_sym_gr_permut_succ; try easy.
 cbn.
 f_equal.
-apply IHn.
-apply Nat.mod_upper_bound, fact_neq_0.
+now apply IHn.
 Qed.
 
 Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
@@ -2220,8 +2184,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
     apply Nat.div_lt_upper_bound; [ | easy ].
     apply fact_neq_0.
   } {
-    apply IHn; [ | flia Hjn Hjsn ].
-    apply Nat.mod_upper_bound, fact_neq_0.
+    apply IHn; [ easy | flia Hjn Hjsn ].
   }
 } {
   apply Nat.nlt_ge in Hjkn.
@@ -2279,8 +2242,7 @@ split. {
       apply Nat.div_lt_upper_bound; [ | easy ].
       apply fact_neq_0.
     }
-    apply canon_sym_gr_inv_upper_bound; [ | flia Hjn Hjsn ].
-    apply Nat.mod_upper_bound, fact_neq_0.
+    apply canon_sym_gr_inv_upper_bound; [ easy | flia Hjn Hjsn ].
   } {
     apply Nat.nlt_ge in Hjk.
     destruct (lt_dec (k / fact n) j) as [Hkj| Hkj]; [ | flia ].
