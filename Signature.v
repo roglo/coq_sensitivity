@@ -2251,8 +2251,7 @@ split. {
       apply Nat.lt_1_r in Hkn; subst k.
       flia Hjn Hkj.
     }
-    apply canon_sym_gr_inv_ub; [ | flia Hjn Hkj ].
-    apply Nat.mod_upper_bound, fact_neq_0.
+    apply canon_sym_gr_inv_ub; [ easy | flia Hjn Hkj ].
   }
 }
 now apply sym_gr_sym_gr_inv.

@@ -197,12 +197,9 @@ f_equal. {
   unfold mat_el.
   unfold vect_el, vect_vect_nat_el.
   cbn - [ subm fact ].
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | apply Nat.mod_upper_bound, fact_neq_0 ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | easy ].
   do 2 rewrite Nat.add_0_l.
   unfold subm.
