@@ -2192,30 +2192,23 @@ apply IHn.
 apply Nat.mod_upper_bound, fact_neq_0.
 Qed.
 
-Theorem canon_sym_gr_inv_list_ub : ∀ n k i,
+Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
   k < n!
-  → i < n
-  → ff_app (canon_sym_gr_inv_list n k) i < n.
-Proof.
-intros * Hkn Hjn.
-Search canon_sym_gr_inv_list.
-...
-
-Theorem canon_sym_gr_inv_ub : ∀ n k j,
-  k < fact n
   → j < n
-  → canon_sym_gr_inv n k j < n.
+  → ff_app (canon_sym_gr_inv_list n k) j < n.
 Proof.
 intros * Hkn Hjn.
+unfold canon_sym_gr_inv_list, ff_app.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
 revert k j Hkn Hjn.
-induction n; intros; [ easy | ].
-cbn.
+induction n; intros; [ easy | cbn ].
 destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   apply -> Nat.succ_lt_mono.
   destruct n. {
     cbn in Hkn.
     apply Nat.lt_1_r in Hkn; subst k.
-    now cbn in Hjkn.
+    easy.
   }
   destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
     subst j.
@@ -2241,6 +2234,8 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
 Qed.
+
+...
 
 Theorem sym_gr_sym_gr_inv : ∀ n k j,
   j < n
