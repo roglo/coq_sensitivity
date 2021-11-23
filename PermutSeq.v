@@ -722,8 +722,7 @@ rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
 unfold succ_when_ge.
 rewrite <- Nat.add_1_r.
 apply Nat.add_lt_le_mono; [ | apply Nat_b2n_upper_bound ].
-apply IHn; [ | easy ].
-apply Nat.mod_upper_bound, fact_neq_0.
+now apply IHn.
 Qed.
 
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
@@ -755,12 +754,12 @@ destruct (le_dec (k / n!) _) as [H1| H1]. {
   destruct (lt_dec _ (k / n!)) as [H| H]; [ flia H1 H | clear H ].
   destruct (lt_dec (k / n!) _) as [H| H]; [ clear H | flia H1 H ].
   f_equal; rewrite Nat.add_sub.
-  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
+  now apply IHn.
 } {
   rewrite Nat.add_0_r.
   destruct (lt_dec _ (k / n!)) as [H| H]; [ clear H | flia H1 H ].
   f_equal.
-  apply IHn; [ easy | apply Nat.mod_upper_bound, fact_neq_0 ].
+  now apply IHn.
 }
 Qed.
 
@@ -784,13 +783,11 @@ destruct (lt_dec i (k / n!)) as [Hikn| Hikn]. {
     }
     flia Hikn Hkns.
   }
-  apply IHn; [ | flia Hi Hin ].
-  apply Nat.mod_upper_bound, fact_neq_0.
+  apply IHn; [ easy | flia Hi Hin ].
 }
 destruct (lt_dec (k / n!) i) as [Hkni| Hkni]; [ | flia ].
 apply -> Nat.succ_lt_mono.
-apply IHn; [ | flia Hi Hkni ].
-apply Nat.mod_upper_bound, fact_neq_0.
+apply IHn; [ easy | flia Hi Hkni ].
 Qed.
 
 Theorem canon_sym_gr_sym_gr_inv : ∀ n k i,
@@ -816,12 +813,9 @@ destruct i. {
     unfold succ_when_ge.
     rewrite (List_map_nth' 0). 2: {
       rewrite length_canon_sym_gr_list.
-      apply canon_sym_gr_inv_elem_ub; [ | easy ].
-      apply Nat.mod_upper_bound, fact_neq_0.
+      now apply canon_sym_gr_inv_elem_ub.
     }
-    rewrite IHn; [ | easy | ]. 2: {
-      apply Nat.mod_upper_bound, fact_neq_0.
-    }
+    rewrite IHn; [ | easy | easy ].
     unfold Nat.b2n.
     rewrite if_leb_le_dec.
     destruct (le_dec (k / n!) 0) as [Hknz| Hknz]; [ | easy ].
@@ -844,12 +838,9 @@ destruct (lt_dec (S i) (k / n!)) as [Hsikn| Hsikn]. {
   }
   rewrite (List_map_nth' 0). 2: {
     rewrite length_canon_sym_gr_list.
-    apply canon_sym_gr_inv_elem_ub; [ | flia Hi Hsin ].
-    apply Nat.mod_upper_bound, fact_neq_0.
+    apply canon_sym_gr_inv_elem_ub; [ easy | flia Hi Hsin ].
   }
-  rewrite IHn; [ | flia Hi Hsin | ]. 2: {
-    apply Nat.mod_upper_bound, fact_neq_0.
-  }
+  rewrite IHn; [ | flia Hi Hsin | easy ].
   unfold succ_when_ge, Nat.b2n.
   apply Nat.nle_gt in Hsikn.
   apply Nat.leb_nle in Hsikn.
@@ -860,12 +851,9 @@ destruct (lt_dec (k / n!) (S i)) as [Hknsi| Hknsi]; [ | flia Hsikn Hknsi ].
 rewrite Nat_sub_succ_1.
 rewrite (List_map_nth' 0).  2: {
   rewrite length_canon_sym_gr_list.
-  apply canon_sym_gr_inv_elem_ub; [ | easy ].
-  apply Nat.mod_upper_bound, fact_neq_0.
+  now apply canon_sym_gr_inv_elem_ub.
 }
-rewrite IHn; [ | easy | ]. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
+rewrite IHn; [ | easy | easy ].
 unfold succ_when_ge.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
@@ -1249,9 +1237,7 @@ replace (k / fact n * fact n) with (k - k mod fact n) by flia H1.
 rewrite <- Nat.add_sub_swap; [ | apply Nat.mod_le, fact_neq_0 ].
 apply Nat.add_sub_eq_r; f_equal.
 clear H1.
-rewrite <- (IHn (k mod fact n)) at 1. 2: {
-  apply Nat.mod_upper_bound, fact_neq_0.
-}
+rewrite <- (IHn (k mod fact n)) at 1; [ | easy ].
 f_equal.
 apply canon_sym_gr_sub_canon_permut_list.
 Qed.
