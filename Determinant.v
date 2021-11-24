@@ -169,20 +169,9 @@ intros k Hk.
 (* elimination of "mat_el M 0 (k / (n!)" *)
 symmetry.
 rewrite rngl_product_split_first; [ | flia ].
-...
-cbn - [ vect_vect_nat_el mat_el fact ].
+rewrite Nat.sub_diag.
+cbn [ canon_sym_gr_list nth ].
 remember (mat_el M 0 _) as x eqn:Hx.
-cbn - [ fact ] in Hx.
-assert (Hksn : k < (S n)!). {
-  eapply le_lt_trans; [ apply Hk | ].
-  apply Nat.sub_lt; [ | flia ].
-  apply Nat.neq_0_lt_0, fact_neq_0.
-}
-rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
-cbn - [ fact ] in Hx.
-rewrite seq_nth in Hx; [ | easy ].
-rewrite Nat.add_0_l in Hx.
-subst x.
 rewrite rngl_mul_comm; [ | easy ].
 symmetry.
 rewrite <- rngl_mul_assoc.
@@ -203,6 +192,7 @@ f_equal. {
   rewrite Nat.add_comm, Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
   unfold mat_el.
+...
   unfold vect_el, vect_vect_nat_el.
   cbn - [ subm fact ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
