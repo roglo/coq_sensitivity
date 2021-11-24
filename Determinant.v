@@ -152,15 +152,14 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-...
-cbn - [ vect_vect_nat_el mat_el fact ].
+cbn - [ canon_sym_gr_list fact nth ].
 clear IHn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | now left ].
   easy.
 }
-cbn - [ vect_vect_nat_el mat_el fact ].
+cbn - [ canon_sym_gr_list fact nth ].
 rewrite rngl_summation_summation_distr.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
@@ -170,6 +169,7 @@ intros k Hk.
 (* elimination of "mat_el M 0 (k / (n!)" *)
 symmetry.
 rewrite rngl_product_split_first; [ | flia ].
+...
 cbn - [ vect_vect_nat_el mat_el fact ].
 remember (mat_el M 0 _) as x eqn:Hx.
 cbn - [ fact ] in Hx.
