@@ -492,15 +492,11 @@ Qed.
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
-...
-
 Definition determinant'_list n (M : matrix T) :=
   map (λ k,
     (ε_permut n k *
      ∏ (i = 1, n),
-     mat_el M (i - 1)
-       (vect_el 0%nat
-          (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)%nat))%F)
+     mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)))%F)
     (seq 0 n!).
 
 Arguments determinant'_list n%nat M%M.
@@ -557,6 +553,8 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 Qed.
 
 (* yet another definition of determinant *)
+
+...
 
 Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
