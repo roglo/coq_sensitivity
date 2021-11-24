@@ -96,12 +96,19 @@ Definition det_from_col {n} (M : matrix T) j :=
 
 Definition determinant' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
+    ε n (canon_sym_gr_list n k) *
+    ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)).
+
+Arguments determinant' n%nat M%M.
+
+(*
+Definition determinant' n (M : matrix T) :=
+  ∑ (k = 0, fact n - 1),
     ε n (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) *
     ∏ (i = 1, n),
     mat_el M (i - 1)
       (vect_el 0%nat (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) (i - 1)).
-
-Arguments determinant' n%nat M%M.
+*)
 
 (* Proof that both definitions of determinants are equal *)
 
@@ -122,8 +129,8 @@ unfold determinant'.
 revert M Hm.
 induction n; intros. {
   cbn.
-  unfold ε, ε_fun, iter_seq, iter_list; cbn.
-  rewrite rngl_add_0_l.
+  rewrite rngl_summation_only_one.
+  unfold ε, iter_seq, iter_list; cbn.
   rewrite rngl_mul_1_r.
   rewrite rngl_div_1_r; [ easy | now left | easy ].
 }
@@ -133,7 +140,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_product_only_one; cbn.
-  unfold ε, ε_fun; cbn.
+  unfold ε; cbn.
   do 4 rewrite rngl_product_only_one; cbn.
   rewrite rngl_mul_1_r.
   rewrite rngl_div_1_r; [ easy | now left | easy ].
@@ -145,6 +152,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
+...
 cbn - [ vect_vect_nat_el mat_el fact ].
 clear IHn.
 erewrite rngl_summation_eq_compat. 2: {
