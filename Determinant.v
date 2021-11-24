@@ -554,6 +554,18 @@ Qed.
 
 (* yet another definition of determinant *)
 
+Print determinant'.
+
+...
+
+Check sym_gr_elem_swap_last.
+
+Definition determinant'' p q n (M : matrix T) :=
+  ∑ (k = 0, n! - 1),
+    ε_permut n k *
+    ∏ (i = 1, n),
+    mat_el M (i - 1) (vect_el 0%nat (sym_gr_elem_swap_last p q n k) (i - 1)).
+
 ...
 
 Definition determinant'' p q n (M : matrix T) :=
