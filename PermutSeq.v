@@ -29,7 +29,7 @@ Compute (map (comp (λ i, nth i [0;2;1] 0) (λ i, nth i [2;1;0] 0)) [0;1;2]).
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40).
 
 Notation "'Comp' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, comp c g) (λ i, i))
+  (iter_list l (λ c i, c ° g) (seq 0 (length (hd [] l))))
   (at level 35, i at level 0, l at level 60).
 
 (* Permutations of {0, 1, 2, ... n-1} *)

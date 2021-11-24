@@ -2213,7 +2213,7 @@ Theorem comp_is_permut : ∀ n σ₁ σ₂,
   → is_permut n σ₂
   → is_permut n (σ₁ ° σ₂).
 Proof.
-intros * Hp1 Hp2.
+intros * (Hp11, Hp12) (Hp21, Hp22).
 split. {
   split. {
     intros i Hi.
@@ -2222,8 +2222,6 @@ split. {
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
     subst i.
-    destruct Hp1 as (Hp11, Hp12).
-    destruct Hp2 as (Hp21, Hp22).
     rewrite Hp22, <- Hp12.
     apply permut_list_ub; [ easy | ].
     apply Hp21 in Hj.
@@ -2236,33 +2234,73 @@ split. {
     rewrite (List_map_nth' 0); [ | easy ].
     rewrite (List_map_nth' 0); [ | easy ].
     intros Hij.
-Search (ff_app (ff_app _ _)).
-...
-    now apply Hp1, Hp2.
-} {
-  intros i j Hi Hj Hc.
-  apply Hp2; [ easy | easy | ].
-  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
+    apply Hp11 in Hij; cycle 1. {
+      rewrite Hp12, <- Hp22.
+      now apply Hp21, nth_In.
+    } {
+      rewrite Hp12, <- Hp22.
+      now apply Hp21, nth_In.
+    }
+    now apply Hp21 in Hij.
+  }
 }
+unfold "°".
+now rewrite map_length.
 Qed.
-...
 
-Theorem comp_is_permut : ∀ n (σ₁ σ₂ : nat → nat),
-  is_permut_fun σ₁ n
-  → is_permut_fun σ₂ n
-  → is_permut_fun (comp σ₁ σ₂) n.
+Theorem comp_list_is_permut : ∀ n l,
+  l ≠ []
+  → (∀ σ, σ ∈ l → is_permut n σ)
+  → is_permut n (Comp (σ ∈ l), σ).
 Proof.
-intros * Hp1 Hp2.
-split. {
-  intros i Hi.
-  now apply Hp1, Hp2.
-} {
-  intros i j Hi Hj Hc.
-  apply Hp2; [ easy | easy | ].
-  apply Hp1; [ now apply Hp2 | now apply Hp2 | easy ].
+intros * Hnn Hl.
+induction l as [| σ]; [ easy | clear Hnn; cbn ].
+destruct l as [| σ2]. {
+  unfold iter_list; cbn.
+  apply comp_is_permut; [ | now apply Hl; left ].
+  admit.
 }
-Qed.
+rewrite iter_list_cons; cycle 1. {
+  intros σ3.
+  unfold "°", ff_app.
+(* c'est pas gagné, ça *)
+...
+(*
+destruct l as [| σ2]. {
+  unfold iter_list; cbn.
+  admit.
+}
+replace (length σ) with (length σ2) by admit.
+rewrite iter_list_cons; cycle 1. {
+  intros σ3.
+  unfold "°", ff_app.
+...
+Search (map _ _ = map _ _).
+...
+*)
+  erewrite List_map_fun. 3: {
+    intros i Hi.
+    rewrite seq_nth. 2: {
 
+...
+Check List_map_nth_seq.
+
+apply comp_is_permut.
+now apply Hl; left.
+destruct l as [| σ2]. {
+  unfold iter_list; cbn.
+Search (is_permut_list (seq _ _)).
+  admit.
+}
+specialize (Hl σ (or_introl eq_refl)) as H1.
+specialize (Hl σ2 (or_intror (or_introl eq_refl))) as H2.
+destruct H2 as (H3, H4).
+destruct H1 as (H1, H2).
+rewrite H2, <- H4.
+rewrite H4 at 1.
+replace (length σ2) with (length (hd [] (σ2 :: l))) by easy.
+apply IHl; [ easy | ].
+...
 Theorem comp_list_is_permut : ∀ n l,
   (∀ σ, σ ∈ l → is_permut_fun σ n)
   → is_permut_fun (Comp (σ ∈ l), σ) n.
