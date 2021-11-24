@@ -352,24 +352,12 @@ erewrite rngl_summation_eq_compat. 2: {
       destruct Hsm as (Hr, _).
       rewrite Hr; flia Hj.
     } {
-      cbn.
-...
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
-      rewrite seq_nth; [ cbn | flia Hj ].
       rewrite Hcn.
-      apply permut_elem_ub; [ easy | flia Hj ].
+      apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
       now rewrite Hcn.
     }
-    unfold vect_el, vect_vect_nat_el; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    cbn - [ nth ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite seq_nth; [ cbn | easy ].
-    rewrite seq_nth; [ cbn | flia Hj ].
-    easy.
+    now unfold vect_el, ff_app; cbn.
   }
   easy.
 }
@@ -394,10 +382,11 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 2) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -409,10 +398,11 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 2) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -425,22 +415,23 @@ rewrite rngl_product_split_last; [ | flia ].
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 2)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 2) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     exfalso.
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
 }
 rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite Nat.add_sub.
-cbn in Hpp.
+unfold ff_app in Hpp.
 rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 subst UV.
-cbn - [ mat_el vect_vect_nat_el ].
+cbn - [ mat_el ].
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   now rewrite map_length, fold_vect_size, Hu.
 } {
@@ -451,7 +442,8 @@ rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
 do 2 rewrite fold_vect_el.
 (* elimination of the following term (q) *)
 remember
-  (∏ (i0 = 2, p + 1), mat_el M (i0 - 2) (mk_canon_sym_gr n k (i0 - 2)))
+  (∏ (i0 = 2, p + 1),
+   mat_el M (i0 - 2) (nth (i0 - 2) (canon_sym_gr_list n k) O))
   as q eqn:Hq.
 rewrite (rngl_mul_mul_swap Hic _ _ q).
 do 3 rewrite (rngl_mul_comm Hic _ q).
@@ -461,9 +453,10 @@ f_equal.
 clear q Hq.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 1) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -471,9 +464,10 @@ erewrite rngl_product_eq_compat. 2: {
 symmetry.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 1) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -481,9 +475,10 @@ erewrite rngl_product_eq_compat. 2: {
 rewrite rngl_add_comm.
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
-  destruct (Nat.eq_dec (mk_canon_sym_gr n k (j - 1)) i) as [Hpj| Hpj]. {
+  destruct (Nat.eq_dec (nth (j - 1) (canon_sym_gr_list n k) 0) i)
+    as [Hpj| Hpj]. {
     rewrite <- Hpp in Hpj.
-    apply mk_canon_sym_gr_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
+    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
     flia Hj Hpj.
   }
   easy.
@@ -496,6 +491,8 @@ Qed.
 
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
+
+...
 
 Definition determinant'_list n (M : matrix T) :=
   map (λ k,
