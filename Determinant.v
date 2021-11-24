@@ -219,9 +219,10 @@ f_equal. {
 }
 (* equality of the two "ε" *)
 symmetry.
-Check ε_of_sym_gr_permut_succ.
-...
-now apply ε_of_sym_gr_permut_succ.
+apply ε_of_sym_gr_permut_succ; try easy.
+apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
+apply Nat.sub_lt; [ | apply Nat.lt_0_1 ].
+apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
 (* multilinearity *)
@@ -286,27 +287,18 @@ erewrite rngl_summation_eq_compat. 2: {
       destruct Hsm as (Hr, _).
       rewrite Hr; flia Hj.
     } {
-      cbn.
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
-      rewrite seq_nth; [ cbn | flia Hj ].
+      unfold ff_app.
       rewrite Hcn.
-      apply permut_elem_ub; [ easy | flia Hj ].
+      apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
       now rewrite Hcn.
     }
-    unfold vect_el, vect_vect_nat_el; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    cbn - [ nth ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite seq_nth; [ cbn | easy ].
-    rewrite seq_nth; [ cbn | flia Hj ].
+    unfold vect_el, ff_app; cbn.
     easy.
   }
   easy.
 }
-cbn - [ mat_el vect_vect_nat_el ].
+cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
@@ -331,22 +323,12 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite Hr; flia Hj.
     } {
       cbn.
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
-      rewrite seq_nth; [ cbn | flia Hj ].
       rewrite Hcn.
-      apply permut_elem_ub; [ easy | flia Hj ].
+      apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
       now rewrite Hcn.
     }
-    unfold vect_el, vect_vect_nat_el; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    cbn - [ nth ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite seq_nth; [ cbn | easy ].
-    rewrite seq_nth; [ cbn | flia Hj ].
-    easy.
+    now unfold vect_el, ff_app; cbn.
   }
   easy.
 }
@@ -371,6 +353,7 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite Hr; flia Hj.
     } {
       cbn.
+...
       rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
       rewrite seq_nth; [ | easy ].
       rewrite (List_map_nth' 0); [ cbn | rewrite seq_length; flia Hj ].
