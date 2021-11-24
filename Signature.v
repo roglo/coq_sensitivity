@@ -1849,6 +1849,13 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
+...
+
+Je crois que (nth k (canon_sym_gr_list_list (S n)) [])
+doit pouvoir s'écrire plus simplement en termes de
+canon_sym_gr_list
+
+
 Theorem ε_of_sym_gr_permut_succ :
   rngl_is_comm = true →
   rngl_has_opp = true →

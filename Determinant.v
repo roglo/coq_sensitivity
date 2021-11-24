@@ -192,46 +192,35 @@ f_equal. {
   rewrite Nat.add_comm, Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
   unfold mat_el.
-...
-  unfold vect_el, vect_vect_nat_el.
+  unfold ff_app.
   cbn - [ subm fact ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | easy ].
-  do 2 rewrite Nat.add_0_l.
-  unfold subm.
-  cbn - [ fact butn ].
+  rewrite (List_map_nth' 0); [ | rewrite length_canon_sym_gr_list; flia Hi Hnz ].
+  cbn - [ butn ].
   rewrite (List_map_nth' []). 2: {
     apply is_sm_mat_iff in Hm.
     destruct Hm as (Hr & Hcr & Hc).
     rewrite butn_length, fold_mat_nrows, Hr.
     cbn; flia Hi Hnz.
   }
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
-  rewrite seq_nth; [ | flia Hi Hnz ].
-  rewrite seq_nth; [ | flia Hi Hnz ].
-  rewrite Nat.add_0_l, Nat.add_1_l.
-  remember (sym_gr_fun n (mk_canon_sym_gr n) k) as σ eqn:Hσ.
-  remember (mk_canon_sym_gr n (k mod n!)) as σ' eqn:Hσ'.
-  move σ' before σ.
-  rewrite (sym_gr_succ_values Hσ Hσ').
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec (σ' i) (k / n!)) as [Hσk| Hσk]. {
-    rewrite nth_butn_after; [ | easy ].
-    rewrite nth_butn_before; [ | flia ].
-    now rewrite Nat.add_1_r.
-  } {
-    apply Nat.nlt_ge in Hσk.
+  unfold succ_when_ge, Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (k / n!) _) as [H1| H1]. {
     rewrite nth_butn_before; [ | easy ].
     rewrite nth_butn_before; [ | easy ].
     now rewrite (Nat.add_1_r i).
+  } {
+    apply Nat.nle_gt in H1.
+    rewrite Nat.add_0_r.
+    rewrite nth_butn_after; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite Nat.add_1_r.
   }
   (* end proof equality of the two "∏" *)
 }
 (* equality of the two "ε" *)
 symmetry.
+Check ε_of_sym_gr_permut_succ.
+...
 now apply ε_of_sym_gr_permut_succ.
 Qed.
 
