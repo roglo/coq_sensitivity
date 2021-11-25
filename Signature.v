@@ -938,7 +938,7 @@ split. {
 }
 Qed.
 
-Theorem permut_list_swap_is_permut : ∀ p q n l,
+Theorem permut_list_swap_is_permut_list : ∀ p q n l,
   n = length l
   → p < n
   → q < n
@@ -993,6 +993,47 @@ split. {
   }
   easy.
 }
+Qed.
+
+Theorem transposition_is_permut : ∀ p q n,
+  p < n → q < n → is_permut n (map (transposition p q) (seq 0 n)).
+Proof.
+intros * Hp Hq.
+split. {
+  split. {
+    intros i Hi.
+    unfold transposition.
+    rewrite map_length, seq_length.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    rewrite <- Hji.
+    now apply transposition_lt.
+  } {
+    rewrite map_length, seq_length.
+    intros i j Hi Hj Hs.
+    unfold transposition in Hs.
+    unfold ff_app in Hs.
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hs; [ | easy ].
+    rewrite seq_nth in Hs; [ | easy ].
+    do 4 rewrite if_eqb_eq_dec in Hs.
+    do 2 rewrite Nat.add_0_l in Hs.
+    destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+      destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+    }
+    destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+      destruct (Nat.eq_dec j q) as [Hjq| Hjq]; congruence.
+    }
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ easy | ].
+    easy.
+  }
+}
+now rewrite map_length, seq_length.
 Qed.
 
 (*
