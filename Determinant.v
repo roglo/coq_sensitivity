@@ -955,9 +955,14 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite seq_length, length_canon_sym_gr_list.
       now apply transposition_lt.
     }
-    rewrite length_canon_sym_gr_list.
-Check transposition_involutive.
-Search (nth (transposition _ _ _)).
+    rewrite seq_nth. 2: {
+      rewrite length_canon_sym_gr_list.
+      now apply transposition_lt.
+    }
+    rewrite Nat.add_0_l.
+    now rewrite transposition_involutive.
+  }
+(*
 ...
   replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
     (mk_vect
@@ -982,37 +987,60 @@ Search (nth (transposition _ _ _)).
     rewrite seq_nth; [ | easy ].
     easy.
   }
+*)
+  replace (map (λ i, ff_app (f k) (transposition p q i)) (seq 0 n))
+  with (f k ° map (λ i, transposition p q i) (seq 0 n)). 2: {
+    unfold "°"; cbn.
+    now rewrite map_map.
+  }
+(*
+...
   replace
     (mk_vect (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n)))
   with (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n))). 2: {
     unfold "°"; f_equal; cbn.
     now rewrite map_map.
   }
+*)
   rewrite signature_comp; try easy. {
+    split. 2: {
+      unfold f.
+      apply length_list_swap_elem_canon_sym_gr_list.
+    }
     split. {
-      cbn; rewrite map_length, seq_length.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      now cbn; rewrite map_length, seq_length.
-    }
-    unfold f; cbn.
-    split; cbn. {
       intros i Hi.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        now rewrite List_map_seq_length.
+      apply In_nth with (d := 0) in Hi.
+      destruct Hi as (j & Hj & Hji).
+      rewrite <- Hji.
+      apply permut_list_ub; [ | easy ].
+      unfold f.
+      apply list_swap_elem_is_permut. {
+        now rewrite length_canon_sym_gr_list.
+      } {
+        now rewrite length_canon_sym_gr_list.
+      } {
+        now apply canon_sym_gr_list_is_permut.
       }
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite List_map_seq_length.
-      rewrite seq_nth; [ | easy ].
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now apply transposition_lt.
-      }
-      apply permut_elem_ub; [ easy | ].
-      now rewrite seq_nth; apply transposition_lt.
     }
+    unfold f, ff_app.
+    rewrite length_list_swap_elem_canon_sym_gr_list.
+    intros i j Hi Hj Hij.
+(* lemme à faire ? *)
+    unfold list_swap_elem in Hij.
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      now rewrite seq_length, length_canon_sym_gr_list.
+    }
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      now rewrite seq_length, length_canon_sym_gr_list.
+    }
+    rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
+    rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
+    cbn in Hij.
+    unfold transposition.
+Search (nth (transposition _ _ _)).
+...
+Search (nth _ (list_swap_elem _ _ _ _)).
+...
     intros i j Hi Hj Hij.
     rewrite (List_map_nth' 0) in Hij. 2: {
       rewrite seq_length.
