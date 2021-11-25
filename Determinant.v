@@ -1038,67 +1038,37 @@ erewrite rngl_summation_eq_compat. 2: {
     cbn in Hij.
     unfold transposition in Hij.
     do 4 rewrite if_eqb_eq_dec in Hij.
+(*
+    apply nth_canon_sym_gr_list_inj1 in Hij; [ | easy | | ].
+*)
     destruct (Nat.eq_dec i p) as [Hip| Hip]. {
       destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
       destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-        subst i j.
+        apply nth_canon_sym_gr_list_inj1 in Hij; [ | easy | easy | easy ].
+        congruence.
+      }
+      apply Nat.neq_sym in Hjq.
+      now apply nth_canon_sym_gr_list_inj1 in Hij.
+    }
+    destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
         now apply nth_canon_sym_gr_list_inj1 in Hij.
       }
-Search (nth (transposition _ _ _)).
-...
-Search (nth _ (list_swap_elem _ _ _ _)).
-...
-    intros i j Hi Hj Hij.
-    rewrite (List_map_nth' 0) in Hij. 2: {
-      rewrite seq_length.
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      now rewrite List_map_seq_length.
+      destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
+      apply Nat.neq_sym in Hjp.
+      now apply nth_canon_sym_gr_list_inj1 in Hij.
     }
-    rewrite (List_map_nth' 0) in Hij; [ cbn in Hij | now rewrite seq_length ].
-    rewrite List_map_seq_length in Hij.
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite (List_map_nth' 0) in Hij. 2: {
-      rewrite seq_length.
-      now apply transposition_lt.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+      now apply nth_canon_sym_gr_list_inj1 in Hij.
     }
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Hij. 2: {
-      rewrite seq_length.
-      rewrite seq_nth; [ | easy ].
-      now apply transposition_lt.
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      now apply nth_canon_sym_gr_list_inj1 in Hij.
     }
-    rewrite seq_nth in Hij; [ | now apply transposition_lt ].
-    rewrite seq_nth in Hij. 2: {
-      rewrite seq_nth; [ | easy ].
-      now apply transposition_lt.
-    }
-    rewrite seq_nth in Hij; [ | easy ].
-    cbn in Hij.
-    apply mk_canon_sym_gr_inj1 in Hij; [ | easy | | ]; cycle 1. {
-      now apply transposition_lt.
-    } {
-      now apply transposition_lt.
-    }
-    now apply transposition_injective in Hij.
+    now apply nth_canon_sym_gr_list_inj1 in Hij.
   }
-  split; [ now cbn; rewrite map_length, seq_length | ].
-  split. {
-    intros i Hi; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    now apply transposition_lt.
-  }
-  intros i j Hi Hj Hij; cbn in Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  now apply transposition_injective in Hij.
-  easy.
+  now apply transposition_is_permut.
 }
-*)
-cbn - [ f ].
+cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
 ...
