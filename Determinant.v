@@ -866,7 +866,9 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-...
+cbn.
+set (f := canon_sym_gr_list n).
+(*
 set
   (f :=
    λ k, vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
@@ -1016,6 +1018,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   now apply transposition_injective in Hij.
+  easy.
 }
 cbn - [ f ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -1030,7 +1033,11 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
+*)
+set (g := λ k, rank_of_permut_in_canon_sym_gr_list n (f k)).
+(*
 set (g := λ k, rank_of_permut_in_canon_sym_gr_vect n (f k)).
+*)
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -1038,6 +1045,13 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
+(**)
+  rewrite rank_of_canon_permut_of_canon_rank. 2: {
+    apply rank_of_canon_permut_ub; [ | apply length_canon_sym_gr_list ].
+    now apply canon_sym_gr_list_is_permut.
+  }
+  now apply rank_of_canon_permut_of_canon_rank.
+(*
   unfold rank_of_permut_in_canon_sym_gr_vect; cbn.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
@@ -1132,21 +1146,36 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     now rewrite transposition_involutive.
   }
   now apply rank_of_permut_of_rank.
+*)
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
-  apply permut_fun_Permutation.
+  apply permut_list_Permutation.
+(* lemma to do? *)
   unfold g, f.
+(*
   eapply is_permut_eq_compat. {
     intros j Hj; symmetry; cbn.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite seq_nth; [ cbn | easy ].
     easy.
   }
+*)
+  split; [ | now rewrite map_length, seq_length ].
   split. {
     intros i Hi.
+(**)
+    rewrite map_length, seq_length.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    rewrite <- Hji.
+    apply rank_of_canon_permut_ub; [ | apply length_canon_sym_gr_list ].
+    now apply canon_sym_gr_list_is_permut.
+(*
+...
     unfold rank_of_permut_in_canon_sym_gr_vect.
     unfold vect_el; cbn.
     erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
@@ -1165,8 +1194,21 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     }
     apply rank_of_permut_upper_bound.
     now apply is_permut_mk_canon_transp.
+*)
   } {
+    rewrite map_length, seq_length.
     intros i j Hi Hj Hij.
+(**)
+    unfold ff_app in Hij.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
+    rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    easy.
+(*
+...
     unfold vect_swap_elem in Hij.
     cbn in Hij.
     unfold rank_of_permut_in_canon_sym_gr_vect in Hij.
@@ -1212,8 +1254,10 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     destruct (Nat.eq_dec k p) as [Hkp| Hkp]; [ now subst k | ].
     destruct (Nat.eq_dec k q) as [Hkq| Hkq]; [ now subst k | ].
     now rewrite transposition_out in H1.
+*)
   }
 }
+(*
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -1285,10 +1329,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
+*)
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+...
 apply rngl_summation_eq_compat.
 intros k Hk.
 assert (Hkn : k < n!). {
