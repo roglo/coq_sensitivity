@@ -819,29 +819,24 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
-...
     replace (mat_el _ _ _) with
       (mat_el M i
-         (vect_el 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k)
-            (transposition p q i))). 2: {
-      cbn.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ cbn | easy ].
-      assert (Ht : transposition p q i < length (seq 0 n)). {
+         (ff_app (canon_sym_gr_list n k) (transposition p q i))). 2: {
+      unfold ff_app; cbn.
+      unfold mat_el; f_equal.
+      unfold list_swap_elem.
+      rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        unfold transposition.
-        do 2 rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now subst p | ].
-        destruct (Nat.eq_dec i q) as [Hiq| Hiq]; [ now subst q | ].
-        now apply in_seq in Hi.
+        rewrite fold_mat_nrows.
+        apply square_matrix_nrows in Hsm.
+        rewrite Hsm.
+        apply in_seq in Hi.
+        now apply transposition_lt.
       }
-      rewrite (List_map_nth' 0); [ | easy ].
-      unfold list_swap_scal.
       rewrite fold_mat_nrows.
       apply is_sm_mat_iff in Hsm.
       destruct Hsm as (Hr, _).
       rewrite Hr.
-      rewrite (List_map_nth' 0); [ | easy ].
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -849,30 +844,29 @@ erewrite rngl_summation_eq_compat. 2: {
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
         rewrite Nat.eqb_refl.
-        rewrite if_eqb_eq_dec.
         apply Nat.neq_sym in Hpq.
         now destruct (Nat.eq_dec q p).
       }
+      rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
         subst i.
         rewrite seq_nth; [ | easy ].
         rewrite Nat.add_0_l.
+        rewrite <- if_eqb_eq_dec.
         now rewrite Nat.eqb_refl.
       }
       apply in_seq in Hi.
       rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
-      do 2 rewrite if_eqb_eq_dec.
+      rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
       now destruct (Nat.eq_dec i q).
     }
     easy.
   }
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
   easy.
 }
+...
 set
   (f :=
    λ k, vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
