@@ -867,11 +867,34 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-set (f := canon_sym_gr_list n).
+(**)
+set (f := λ k, list_swap_elem 0 (canon_sym_gr_list n k) p q).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    apply in_seq in Hi.
+    replace (ff_app _ _) with
+       (ff_app (list_swap_elem 0 (canon_sym_gr_list n k) p q) i). 2: {
+(* lemme à faire *)
+      unfold list_swap_elem.
+      unfold ff_app.
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite seq_length, length_canon_sym_gr_list.
+      }
+      rewrite seq_nth; [ easy | now rewrite length_canon_sym_gr_list ].
+    }
+    fold (f k).
+    easy.
+  }
+  easy.
+}
+cbn.
 (*
 set
   (f :=
    λ k, vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
+*)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -880,6 +903,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   erewrite rngl_product_seq_product; [ | flia Hp ].
   rewrite Nat.add_0_l.
+(*
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi; cbn.
     rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
@@ -917,6 +941,24 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn - [ f ].
+*)
+(**)
+  replace (canon_sym_gr_list n k) with
+     (map (λ i, ff_app (f k) (transposition p q i)) (seq 0 n)). 2: {
+    rewrite List_map_nth_seq with (d := 0).
+    rewrite length_canon_sym_gr_list.
+    apply map_ext_in.
+    intros i Hi; cbn.
+    apply in_seq in Hi.
+    unfold ff_app, f, list_swap_elem.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length, length_canon_sym_gr_list.
+      now apply transposition_lt.
+    }
+    rewrite length_canon_sym_gr_list.
+Check transposition_involutive.
+Search (nth (transposition _ _ _)).
+...
   replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
     (mk_vect
        (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n))). 2: {
@@ -1020,9 +1062,11 @@ erewrite rngl_summation_eq_compat. 2: {
   now apply transposition_injective in Hij.
   easy.
 }
+*)
 cbn - [ f ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
+...
   rewrite (rngl_mul_comm Hic (ε n (f k))).
   rewrite <- rngl_mul_assoc.
   now rewrite transposition_signature.
@@ -1334,6 +1378,7 @@ rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+(**)
 ...
 apply rngl_summation_eq_compat.
 intros k Hk.
