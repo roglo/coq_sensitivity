@@ -1710,10 +1710,10 @@ now do 2 rewrite vect_swap_elem_involutive in Huv.
 Qed.
 *)
 
-(* *)
+(*
 
-Definition sym_gr_elem_swap_with_0 p n k :=
-  list_swap_elem (ff_app (canon_sym_gr_list n k) 0) p.
+Definition canon_sym_gr_elem_swap_with_0 p n k u v :=
+  list_swap_elem (ff_app (canon_sym_gr_list n k) 0) p u v.
 
 (*
 Compute (list_swap_elem 0 [3;2;1;0] 0 1).
@@ -1727,6 +1727,8 @@ Compute (sym_gr_elem_swap_with_0 [3;2;1;0] 4 13 0 1).
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   list_swap_elem 0 (list_swap_elem 0 (canon_sym_gr_list n k) p (n - 2))
     q (n - 1).
+*)
+
 (*
 Definition sym_gr_elem_swap_last (p q : nat) n k :=
   list_swap_elem 0

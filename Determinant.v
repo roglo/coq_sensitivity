@@ -552,17 +552,14 @@ apply rngl_summation_permut; [ now symmetry | | ]. {
 }
 Qed.
 
+(*
 (* yet another definition of determinant *)
-
-Check sym_gr_elem_swap_last.
 
 Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, n! - 1),
     ε_permut n k *
     ∏ (i = 1, n),
     mat_el M (i - 1) (ff_app (sym_gr_elem_swap_last p q n k) (i - 1)).
-
-...
 
 Definition determinant'' p q n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
@@ -593,15 +590,18 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 now rewrite Nat.add_0_l.
 Qed.
+*)
 
+(* already defined as list_swap_elem in PermutSeq.v
 Definition list_swap_scal {A} d i1 i2 (l : list A) :=
   map (λ i, nth (transposition i1 i2 i) l d) (seq 0 (length l)).
+*)
 
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
-  mk_mat (list_swap_scal [] i1 i2 (mat_list_list M)).
+  mk_mat (list_swap_elem [] (mat_list_list M) i1 i2).
 
 Theorem list_swap_scal_0_succ_cons : ∀ A (d : A) j a l,
-  list_swap_scal d 0 (S j) (a :: l) =
+  list_swap_elem d (a :: l) 0 (S j) =
   nth j l d :: map (λ i, if i =? j then a else nth i l d) (seq 0 (length l)).
 Proof.
 intros.
@@ -628,9 +628,9 @@ specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
 destruct Hsm as (Hr & Hcr & Hc).
-cbn; unfold list_swap_scal.
+cbn; unfold list_swap_elem.
 rewrite List_map_seq_length.
-unfold mat_swap_rows, list_swap_scal; cbn.
+unfold mat_swap_rows, list_swap_elem; cbn.
 split; [ easy | ].
 split. {
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
@@ -667,7 +667,7 @@ Theorem mat_swap_rows_nrows : ∀ (M : matrix T) p q,
 Proof.
 intros.
 unfold mat_swap_rows; cbn.
-unfold list_swap_scal.
+unfold list_swap_elem.
 rewrite map_length.
 now rewrite seq_length.
 Qed.
@@ -687,7 +687,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
 }
 apply Nat.neq_0_lt_0 in Hrz.
 unfold mat_swap_rows; cbn.
-unfold list_swap_scal.
+unfold list_swap_elem.
 unfold mat_ncols; cbn.
 rewrite List_hd_nth_0.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -703,6 +703,8 @@ destruct (Nat.eq_dec 0 q) as [Hzq| Hzq]. {
 }
 now rewrite List_hd_nth_0.
 Qed.
+
+...
 
 Theorem is_permut_mk_canon_transp : ∀ n k p q,
   k < n!
