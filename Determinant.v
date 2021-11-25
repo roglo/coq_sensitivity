@@ -1036,7 +1036,14 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
     rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
     cbn in Hij.
-    unfold transposition.
+    unfold transposition in Hij.
+    do 4 rewrite if_eqb_eq_dec in Hij.
+    destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
+      destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+        subst i j.
+        now apply nth_canon_sym_gr_list_inj1 in Hij.
+      }
 Search (nth (transposition _ _ _)).
 ...
 Search (nth _ (list_swap_elem _ _ _ _)).
