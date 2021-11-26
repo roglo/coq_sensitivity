@@ -3439,16 +3439,33 @@ Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
-...
-destruct Hσ as (Hs & H1 & H2).
+destruct Hσ as ((Hs, H1) & H2).
 revert σ Hs H1 H2.
-induction n; intros. cbn. {
+induction n; intros; cbn. {
   rewrite rngl_product_only_one.
   rewrite rngl_product_only_one.
-  specialize (H1 0 Nat.lt_0_1) as H3.
-  apply Nat.lt_1_r in H3.
-  now rewrite H3.
+  destruct σ as [| a l]; [ easy | ].
+  destruct l; [ | easy ].
+  specialize (Hs a (or_introl eq_refl)).
+  now apply Nat.lt_1_r in Hs; subst a.
 }
+(**)
+set
+  (g := λ i,
+   if lt_dec i (ff_app (permut_list_inv σ) (S n)) then i else i + 1).
+set (σ' := map (λ i, ff_app σ (g i)) (seq 0 (S n))).
+specialize (IHn σ').
+assert (H : ∀ x, x ∈ σ' → x < length σ'). {
+  intros i Hi.
+  unfold σ'; cbn - [ seq ].
+  rewrite map_length, seq_length.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj); apply in_seq in Hj.
+  rewrite <- Hji.
+  unfold g.
+...
+(*
+...
 set
   (g := λ i,
    if lt_dec i (vect_el 0 (permut_inv (S (S n)) σ) (S n)) then i else i + 1).
@@ -3459,6 +3476,7 @@ assert (H : vect_size σ' = S n). {
   now rewrite map_length, seq_length.
 }
 specialize (IHn H); clear H.
+*)
 assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
