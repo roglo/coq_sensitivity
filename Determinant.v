@@ -1375,14 +1375,19 @@ eapply IHit; [ | apply Hs ].
 flia Hik H2.
 Qed.
 
-Fixpoint nb_good_loop it i σ :=
+(*
+Fixpoint nb_gool_loop it i σ :=
   match it with
   | 0 => 0
-  | S it' => Nat.b2n (σ i =? i) + nb_good_loop it' (i + 1) σ
+  | S it' => Nat.b2n (σ i =? i) + nb_gool_loop it' (i + 1) σ
   end.
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
 
+Print count_occ.
+*)
+
+(*
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
   is_permut n σ
   → k < i ≤ n
@@ -1416,27 +1421,33 @@ f_equal.
 apply IHit; [ | flia Hski | easy ].
 split; [ flia Hkin | flia Hnit ].
 Qed.
+*)
 
 Theorem comp_transp_permut_id : ∀ n σ i j k,
-  is_permut_fun σ n
+  is_permut n σ
   → i < k
   → k < j < n
-  → σ k = i
-  → comp (transposition i (σ i)) σ j = σ j.
+  → ff_app σ k = i
+  → comp (transposition i (ff_app σ i)) (ff_app σ) j = ff_app σ j.
 Proof.
 intros * Hp Hikn Hkp Hski.
 unfold comp, transposition.
 do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (σ j) i) as [Hsji| Hsji]. {
+destruct (Nat.eq_dec (ff_app σ j) i) as [Hsji| Hsji]. {
   exfalso.
   rewrite <- Hski in Hsji.
-  apply Hp in Hsji; [ flia Hkp Hsji | easy | flia Hkp ].
+  destruct Hp as (Hp1, Hp2).
+  rewrite <- Hp2 in Hkp.
+  apply Hp1 in Hsji; [ flia Hkp Hsji | easy | flia Hkp ].
 }
-destruct (Nat.eq_dec (σ j) (σ i)) as [Hspi| Hspi]; [ | easy ].
-apply Hp in Hspi; [ | easy | flia Hikn Hkp ].
+destruct (Nat.eq_dec (ff_app σ j) (ff_app σ i)) as [Hspi| Hspi]; [ | easy ].
+destruct Hp as (Hp1, Hp2).
+rewrite <- Hp2 in Hkp.
+apply Hp1 in Hspi; [ | easy | flia Hikn Hkp ].
 flia Hikn Hkp Hspi.
 Qed.
 
+(*
 Theorem nb_good_loop_comp_transp_permit_id : ∀ n it σ i k,
   is_permut_fun σ n
   → i < n
@@ -1716,6 +1727,7 @@ rewrite if_eqb_eq_dec.
 symmetry.
 apply Nat.add_assoc.
 Qed.
+*)
 
 Theorem first_non_fixpoint_enough_iter : ∀ n m σ i j,
   n ≤ m
@@ -2358,6 +2370,8 @@ destruct (lt_dec i k) as [Hik| Hik]. {
   now replace l with j by flia Hjl Hlj.
 }
 Qed.
+
+...
 
 Definition swap_in_permut n i j k :=
   vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) i j.
