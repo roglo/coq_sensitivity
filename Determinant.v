@@ -1149,7 +1149,6 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
   split; [ | now rewrite map_length, seq_length ].
   split. {
     intros i Hi.
-(**)
     rewrite map_length, seq_length.
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
@@ -1159,37 +1158,19 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
       rewrite length_list_swap_elem.
       apply length_canon_sym_gr_list.
     }
-...
-    apply rank_of_canon_permut_ub; [ | apply length_canon_sym_gr_list ].
-    now apply canon_sym_gr_list_is_permut.
-(*
-...
-    unfold rank_of_permut_in_canon_sym_gr_vect.
-    unfold vect_el; cbn.
-    erewrite rank_of_permut_in_canon_sym_gr_eq_compat. 2: {
-      intros u Hu.
-      rewrite (List_map_nth' 0). 2: {
-        now rewrite List_map_seq_length, seq_length.
-      }
-      rewrite List_map_seq_length.
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now apply transposition_lt.
-      }
-      rewrite seq_nth; [ cbn | now apply transposition_lt ].
-      easy.
+    apply list_swap_elem_is_permut. {
+      now rewrite length_canon_sym_gr_list.
+    } {
+      now rewrite length_canon_sym_gr_list.
     }
-    apply rank_of_permut_upper_bound.
-    now apply is_permut_mk_canon_transp.
-*)
+    now apply canon_sym_gr_list_is_permut.
   } {
     rewrite map_length, seq_length.
     intros i j Hi Hj Hij.
-(**)
     unfold ff_app in Hij.
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+...
     rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
     rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
     rewrite seq_nth in Hij; [ | easy ].
