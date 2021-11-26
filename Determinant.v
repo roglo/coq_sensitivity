@@ -1071,7 +1071,6 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-...
   rewrite (rngl_mul_comm Hic (ε n (f k))).
   rewrite <- rngl_mul_assoc.
   now rewrite transposition_signature.
@@ -1082,7 +1081,6 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-*)
 set (g := λ k, rank_of_permut_in_canon_sym_gr_list n (f k)).
 (*
 set (g := λ k, rank_of_permut_in_canon_sym_gr_vect n (f k)).
@@ -1094,6 +1092,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     flia Hk Hn.
   }
   unfold g, f.
+...
 (**)
   rewrite rank_of_canon_permut_of_canon_rank. 2: {
     apply rank_of_canon_permut_ub; [ | apply length_canon_sym_gr_list ].
