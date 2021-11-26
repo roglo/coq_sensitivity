@@ -1688,24 +1688,6 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-Theorem transposition_involutive : ∀ p q i,
-  transposition p q (transposition p q i) = i.
-Proof.
-intros.
-unfold transposition.
-do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-  destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ congruence | ].
-  destruct (Nat.eq_dec q q) as [H| H]; [ congruence | easy ].
-}
-destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-  destruct (Nat.eq_dec p p) as [H| H]; [ congruence | easy ].
-}
-destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
-destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
-easy.
-Qed.
-
 Theorem transposition_injective : ∀ p q i j,
   transposition p q i = transposition p q j
   → i = j.

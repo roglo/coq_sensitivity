@@ -899,7 +899,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-(**)
 set (f := λ k, list_swap_elem 0 (canon_sym_gr_list n k) p q).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -922,11 +921,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-(*
-set
-  (f :=
-   λ k, vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q).
-*)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -935,46 +929,6 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   erewrite rngl_product_seq_product; [ | flia Hp ].
   rewrite Nat.add_0_l.
-(*
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi; cbn.
-    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      apply transposition_lt; [ easy | easy | flia Hi Hp ].
-    }
-    rewrite seq_nth; [ | easy ].
-    rewrite Nat.add_0_l.
-    rewrite seq_nth. 2: {
-      apply transposition_lt; [ easy | easy | flia Hi Hp ].
-    }
-    rewrite Nat.add_0_l.
-    replace (mk_canon_sym_gr _ _ _) with (vect_el 0 (f k) i). 2: {
-      unfold f; cbn.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        rewrite List_map_seq_length; flia Hi Hp.
-      }
-      rewrite (List_map_nth' 0); cbn; [ | now rewrite seq_length ].
-      rewrite List_map_seq_length.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        rewrite seq_nth; [ | flia Hi Hp ].
-        apply transposition_lt; [ easy | easy | flia Hi Hp ].
-      }
-      rewrite seq_nth; [ | easy ].
-      rewrite seq_nth. 2: {
-        rewrite seq_nth; [ | flia Hi Hp ].
-        apply transposition_lt; [ easy | easy | flia Hi Hp ].
-      }
-      rewrite seq_nth; [ easy | flia Hi Hp ].
-    }
-    easy.
-  }
-  cbn - [ f ].
-*)
-(**)
   replace (canon_sym_gr_list n k) with
      (map (λ i, ff_app (f k) (transposition p q i)) (seq 0 n)). 2: {
     rewrite List_map_nth_seq with (d := 0).
@@ -994,46 +948,11 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite Nat.add_0_l.
     now rewrite transposition_involutive.
   }
-(*
-...
-  replace ({| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}) with
-    (mk_vect
-       (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n))). 2: {
-    f_equal.
-    apply map_ext_in.
-    intros i Hi; cbn.
-    apply in_seq in Hi.
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite List_map_seq_length.
-      now apply transposition_lt.
-    }
-    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite List_map_seq_length.
-    rewrite seq_nth; [ | now apply transposition_lt ].
-    rewrite Nat.add_0_l.
-    rewrite transposition_involutive.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite seq_nth; [ | easy ].
-    easy.
-  }
-*)
   replace (map (λ i, ff_app (f k) (transposition p q i)) (seq 0 n))
   with (f k ° map (λ i, transposition p q i) (seq 0 n)). 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
-(*
-...
-  replace
-    (mk_vect (map (λ i, vect_el 0 (f k) (transposition p q i)) (seq 0 n)))
-  with (f k ° mk_vect (map (λ i, transposition p q i) (seq 0 n))). 2: {
-    unfold "°"; f_equal; cbn.
-    now rewrite map_map.
-  }
-*)
   rewrite signature_comp; try easy. {
     split. 2: {
       unfold f.
@@ -1088,9 +1007,6 @@ f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
 set (g := λ k, rank_of_permut_in_canon_sym_gr_list n (f k)).
-(*
-set (g := λ k, rank_of_permut_in_canon_sym_gr_vect n (f k)).
-*)
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -1170,255 +1086,82 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!); [ | easy | ]. 2: {
     unfold ff_app in Hij.
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
     rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-...
-    rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
-    rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | now rewrite seq_nth ].
     rewrite seq_nth in Hij; [ | easy ].
     rewrite seq_nth in Hij; [ | easy ].
-    easy.
-(*
-...
-    unfold vect_swap_elem in Hij.
-    cbn in Hij.
-    unfold rank_of_permut_in_canon_sym_gr_vect in Hij.
-    unfold vect_el in Hij.
-    cbn in Hij.
-    erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
-      intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
-      rewrite List_map_seq_length.
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now apply transposition_lt.
+    do 2 rewrite Nat.add_0_l in Hij.
+(* lemme à faire ? *)
+    apply rank_of_permut_in_canon_gr_list_inj in Hij; cycle 1. {
+      apply list_swap_elem_is_permut. {
+        now rewrite length_canon_sym_gr_list.
+      } {
+        now rewrite length_canon_sym_gr_list.
       }
-      rewrite seq_nth; [ cbn | now apply transposition_lt ].
-      easy.
-    }
-    symmetry in Hij.
-    erewrite rank_of_permut_in_canon_sym_gr_eq_compat in Hij. 2: {
-      intros u Hu.
-      rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
-      rewrite List_map_seq_length.
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now apply transposition_lt.
+      now apply canon_sym_gr_list_is_permut.
+    } {
+      apply list_swap_elem_is_permut. {
+        now rewrite length_canon_sym_gr_list.
+      } {
+        now rewrite length_canon_sym_gr_list.
       }
-      rewrite seq_nth; [ cbn | now apply transposition_lt ].
-      easy.
+      now apply canon_sym_gr_list_is_permut.
+    } {
+      rewrite length_list_swap_elem.
+      apply length_canon_sym_gr_list.
+    } {
+      rewrite length_list_swap_elem.
+      apply length_canon_sym_gr_list.
     }
-    symmetry in Hij.
-    specialize (is_permut_mk_canon_transp Hi Hp Hq) as Hf.
-    specialize (is_permut_mk_canon_transp Hj Hp Hq) as Hg.
-    specialize (rank_of_permut_injective Hf Hg Hij) as H1.
-    cbn in H1.
-    specialize (H1 p Hp) as Hp1.
-    specialize (H1 q Hq) as Hq1.
-    rewrite transposition_1 in Hp1.
-    rewrite transposition_2 in Hq1.
-    apply (mk_canon_sym_gr_inj2 Hi Hj).
-    intros k Hk.
-    specialize (H1 k Hk).
-    destruct (Nat.eq_dec k p) as [Hkp| Hkp]; [ now subst k | ].
-    destruct (Nat.eq_dec k q) as [Hkq| Hkq]; [ now subst k | ].
-    now rewrite transposition_out in H1.
-*)
-  }
-}
-(*
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n!). {
-    apply in_seq in Hk.
-    specialize (fact_neq_0 n) as Hn.
-    flia Hk Hn.
-  }
-  unfold g, f.
-  unfold mk_canon_sym_gr_vect at 1.
-  unfold vect_vect_nat_el at 1.
-  cbn - [ vect_vect_nat_el vect_el ].
-  assert (Hps :
-    is_permut_fun
-      (vect_el 0
-         (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q))
-      n). {
-    eapply is_permut_eq_compat. {
-      intros i Hi; symmetry.
-      unfold vect_el; cbn.
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-        now rewrite List_map_seq_length.
-      }
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      rewrite seq_nth; [ | now rewrite List_map_seq_length ].
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length.
-        now apply transposition_lt.
-      }
-      rewrite seq_nth; [ cbn | now apply transposition_lt ].
-      easy.
-    }
-    now apply is_permut_mk_canon_transp.
-  }
-  assert
-  (Hrpq :
-     rank_of_permut_in_canon_sym_gr_vect n
-       (vect_swap_elem 0 (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) p q) <
-     n!). {
-    unfold rank_of_permut_in_canon_sym_gr_vect.
-    now apply rank_of_permut_upper_bound.
-  }
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
-  unfold rank_of_permut_in_canon_sym_gr_vect.
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    apply in_seq in Hi.
-    unfold rank_of_permut_in_canon_sym_gr_vect in Hrpq.
-    rewrite permut_in_canon_sym_gr_of_its_rank; [ cbn | easy | easy ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-      now rewrite List_map_seq_length.
-    }
-    rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-    rewrite List_map_seq_length.
-    rewrite seq_nth; [ | easy ].
-    rewrite seq_nth; [ | easy ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
+(* lemme à faire ? *)
+    unfold list_swap_elem in Hij.
+    do 2 rewrite length_canon_sym_gr_list in Hij.
+    apply nth_canon_sym_gr_list_inj2 with (n := n); [ easy | easy | ].
+    intros k Hkn.
+    apply ext_in_map with (a := transposition p q k) in Hij. 2: {
+      apply in_seq.
+      split; [ flia | ].
       now apply transposition_lt.
     }
-    rewrite seq_nth; [ cbn | now apply transposition_lt ].
-    easy.
+    now rewrite transposition_involutive in Hij.
   }
-  easy.
 }
-*)
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
-(**)
-...
 apply rngl_summation_eq_compat.
 intros k Hk.
 assert (Hkn : k < n!). {
   specialize (fact_neq_0 n) as Hn.
   flia Hk Hn.
 }
-f_equal. {
-  cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  unfold vect_swap_elem; cbn.
-  rewrite List_map_seq_length.
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    now apply transposition_lt.
+assert (Hc : canon_sym_gr_list n k = f (g k)). {
+  unfold g, f.
+  rewrite permut_in_canon_sym_gr_of_its_rank; cycle 1. {
+    apply list_swap_elem_is_permut. {
+      now rewrite length_canon_sym_gr_list.
+    } {
+      now rewrite length_canon_sym_gr_list.
+    }
+    now apply canon_sym_gr_list_is_permut.
+  } {
+    rewrite length_list_swap_elem.
+    apply length_canon_sym_gr_list.
   }
-  rewrite seq_nth; [ | now apply transposition_lt ].
-  rewrite Nat.add_0_l.
-  now rewrite transposition_involutive.
+  rewrite list_swap_elem_involutive; [ easy | | ]. {
+    now rewrite length_canon_sym_gr_list.
+  } {
+    now rewrite length_canon_sym_gr_list.
+  }
 }
+f_equal; [ now rewrite Hc | ].
 rewrite rngl_product_shift; [ | flia Hp ].
 apply rngl_product_eq_compat.
 intros i Hi.
 rewrite Nat.add_comm, Nat.add_sub.
-unfold vect_swap_elem at 1.
-cbn - [ vect_vect_nat_el ].
-assert
-  (Hrg :
-   rank_of_permut_in_canon_sym_gr n
-     (vect_el 0
-        (vect_swap_elem 0 {| vect_list := map (mk_canon_sym_gr n k) (seq 0 n) |}
-           p q)) < n!). {
-  unfold vect_el.
-  apply rank_of_permut_upper_bound; cbn.
-  rewrite List_map_seq_length.
-  eapply is_permut_eq_compat. {
-    intros j Hj; symmetry.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_nth; [ | easy ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply transposition_lt.
-    }
-    rewrite seq_nth; [ cbn | now apply transposition_lt ].
-    easy.
-  }
-  now apply is_permut_mk_canon_transp.
-}
-assert (Hi' : i < n) by flia Hi Hp.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length; cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite seq_length.
-    rewrite seq_nth; [ cbn | easy ].
-    apply Hrg.
-  }
-  cbn.
-  now rewrite List_map_seq_length.
-}
-rewrite seq_nth. 2: {
-  cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    now rewrite seq_nth.
-  }
-  cbn.
-  now rewrite List_map_seq_length.
-}
-cbn.
-rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
-rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply transposition_lt.
-}
-rewrite seq_nth; [ cbn | easy ].
-rewrite seq_nth; [ cbn | now apply transposition_lt ].
-rewrite permut_in_canon_sym_gr_of_its_rank; cycle 1. {
-  unfold vect_el.
-  eapply is_permut_eq_compat. {
-    intros j Hj; symmetry; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length, seq_length ].
-    rewrite seq_nth; [ | now rewrite List_map_seq_length ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply transposition_lt.
-    }
-    rewrite seq_nth; [ cbn | now apply transposition_lt ].
-    easy.
-  }
-  now apply is_permut_mk_canon_transp.
-} {
-  now apply transposition_lt.
-}
-cbn.
-rewrite List_map_seq_length.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  now apply transposition_lt.
-}
-rewrite seq_nth; [ cbn | now apply transposition_lt ].
-rewrite transposition_involutive.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-now rewrite seq_nth.
+now rewrite Hc.
 Qed.
+
+Inspect 1.
 
 ...
 

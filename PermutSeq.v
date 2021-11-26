@@ -402,12 +402,64 @@ Definition swap_elem (f : nat → nat) i j k :=
 Definition list_swap_elem {A} d (l : list A) i j :=
   map (λ k, nth (transposition i j k) l d) (seq 0 (length l)).
 
+Theorem transposition_lt : ∀ i j k n,
+  i < n
+  → j < n
+  → k < n
+  → transposition i j k < n.
+Proof.
+intros * Hi Hj Hk.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec k i); [ easy | ].
+now destruct (Nat.eq_dec k j).
+Qed.
+
+Theorem transposition_involutive : ∀ p q i,
+  transposition p q (transposition p q i) = i.
+Proof.
+intros.
+unfold transposition.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  destruct (Nat.eq_dec q p) as [Hqp| Hqp]; [ congruence | ].
+  destruct (Nat.eq_dec q q) as [H| H]; [ congruence | easy ].
+}
+destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+  destruct (Nat.eq_dec p p) as [H| H]; [ congruence | easy ].
+}
+destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
+destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
+easy.
+Qed.
+
 Theorem length_list_swap_elem : ∀ A (d : A) l p q,
   length (list_swap_elem d l p q) = length l.
 Proof.
 intros.
 unfold list_swap_elem.
 now rewrite map_length, seq_length.
+Qed.
+
+Theorem list_swap_elem_involutive : ∀ A (d : A) l i j,
+  i < length l
+  → j < length l
+  → list_swap_elem d (list_swap_elem d l i j) i j = l.
+Proof.
+intros * Hi Hj.
+unfold list_swap_elem.
+rewrite map_length, seq_length.
+erewrite map_ext_in. 2: {
+  intros k Hk; apply in_seq in Hk.
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite seq_length; apply transposition_lt.
+  }
+  rewrite seq_nth; [ | now apply transposition_lt ].
+  rewrite Nat.add_0_l.
+  now rewrite transposition_involutive.
+}
+symmetry.
+apply List_map_nth_seq.
 Qed.
 
 (*
@@ -437,20 +489,6 @@ Proof.
 intros * Hp Hin.
 now apply Hp, nth_In.
 Qed.
-
-Theorem transposition_lt : ∀ i j k n,
-  i < n
-  → j < n
-  → k < n
-  → transposition i j k < n.
-Proof.
-intros * Hi Hj Hk.
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec k i); [ easy | ].
-now destruct (Nat.eq_dec k j).
-Qed.
-
 Theorem transposition_out : ∀ i j k, k ≠ i → k ≠ j → transposition i j k = k.
 Proof.
 intros * Hi Hj.
@@ -882,6 +920,48 @@ symmetry.
 rewrite <- canon_sym_gr_inv_sym_gr with (n := n) (k := k); [ | easy | easy ].
 symmetry.
 now rewrite Hij.
+Qed.
+
+Theorem nth_canon_sym_gr_list_inj2 : ∀ n i j,
+  i < n!
+  → j < n!
+  → (∀ k, k < n →
+     nth k (canon_sym_gr_list n i) 0 = nth k (canon_sym_gr_list n j) 0)
+  → i = j.
+Proof.
+intros * Hin Hjn Hij.
+revert i j Hin Hjn Hij.
+induction n; intros; [ apply Nat.lt_1_r in Hin, Hjn; congruence | ].
+destruct (Nat.eq_dec (i / n!) (j / n!)) as [Hijd| Hijd]. 2: {
+  now specialize (Hij 0 (Nat.lt_0_succ _)).
+}
+destruct (Nat.eq_dec (i mod n!) (j mod n!)) as [Hijm| Hijm]. {
+  specialize (Nat.div_mod i n! (fact_neq_0 _)) as Hi.
+  specialize (Nat.div_mod j n! (fact_neq_0 _)) as Hj.
+  congruence.
+}
+exfalso; apply Hijm; clear Hijm.
+apply IHn. {
+  apply Nat.mod_upper_bound, fact_neq_0.
+} {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+intros k Hk.
+cbn - [ fact nth ] in Hij |-*.
+specialize (Hij (S k)) as H1.
+assert (H : S k < S n) by flia Hk.
+specialize (H1 H); clear H.
+cbn - [ fact ] in H1.
+rewrite Hijd in H1.
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
+unfold succ_when_ge, Nat.b2n in H1.
+do 2 rewrite if_leb_le_dec in H1.
+destruct (le_dec (j / n!) _) as [H2| H2]. {
+  destruct (le_dec (j / n!) _) as [H3| H3]; [ | flia H1 H2 H3 ].
+  now apply Nat.add_cancel_r in H1.
+}
+destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
 
 (* rank in canon symmetric group *)
