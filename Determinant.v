@@ -3463,6 +3463,7 @@ assert (H : ∀ x, x ∈ σ' → x < length σ'). {
   destruct Hi as (j & Hji & Hj); apply in_seq in Hj.
   rewrite <- Hji.
   unfold g.
+  destruct (lt_dec j _) as [Hjs| Hjs]. {
 ...
 (*
 ...
