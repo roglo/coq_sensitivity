@@ -1161,10 +1161,6 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem determinant_same_rows :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1210,7 +1206,7 @@ assert (HM : determinant n M = (- determinant n M)%F). {
           f_equal; subst xx yy.
           subst la lb.
           unfold mat_swap_rows; cbn.
-          unfold list_swap_scal.
+          unfold list_swap_elem.
           rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
           rewrite seq_nth; [ | easy ].
           rewrite Nat.add_0_l.
@@ -1386,6 +1382,8 @@ Fixpoint nb_good_loop it i σ :=
   end.
 
 Definition nb_good n σ := nb_good_loop n 0 σ.
+
+...
 
 Theorem nb_good_loop_comp_transp : ∀ n it σ i k,
   is_permut_fun σ n
