@@ -2371,10 +2371,10 @@ destruct (lt_dec i k) as [Hik| Hik]. {
 }
 Qed.
 
-...
-
+(*
 Definition swap_in_permut n i j k :=
   vect_swap_elem (vect_vect_nat_el (mk_canon_sym_gr_vect n) k) i j.
+*)
 
 (* comatrix *)
 
@@ -2393,9 +2393,9 @@ Proof.
 intros.
 destruct M as (ll); cbn.
 unfold mat_swap_rows; f_equal.
-cbn - [ list_swap_scal ].
+cbn - [ list_swap_elem ].
 rewrite (List_map_nth_seq ll (nth i ll [])) at 2.
-unfold list_swap_scal.
+unfold list_swap_elem.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 unfold transposition.
@@ -2412,7 +2412,7 @@ Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
 Proof.
 intros.
 unfold mat_swap_rows; f_equal; cbn.
-unfold list_swap_scal.
+unfold list_swap_elem.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 now rewrite transposition_comm.
@@ -2917,8 +2917,8 @@ Theorem subm_mat_swap_rows_succ_succ : ∀ (M : matrix T) i j,
 Proof.
 intros * Hi2.
 destruct M as (ll); cbn in Hi2 |-*.
-unfold subm; f_equal; cbn - [ list_swap_scal butn ].
-unfold list_swap_scal.
+unfold subm; f_equal; cbn - [ list_swap_elem butn ].
+unfold list_swap_elem.
 rewrite List_map_seq_length.
 do 2 rewrite <- map_butn.
 do 2 rewrite map_map.
@@ -3409,7 +3409,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | easy ].
   replace (mat_el M p j) with (mat_el (mat_swap_rows 0 p M) 0 j). 2: {
     unfold mat_swap_rows.
-    cbn; unfold list_swap_scal.
+    cbn; unfold list_swap_elem.
     rewrite fold_mat_nrows.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hr ].
     rewrite seq_nth; [ | flia Hr ].
@@ -3431,14 +3431,15 @@ Qed.
 
 Theorem rngl_product_fun_permut :
   rngl_is_comm = true →
-  ∀ n (σ : vector nat) (f : nat → T),
+  ∀ n σ (f : nat → T),
   n ≠ 0
-  → is_permut_vect n σ
-  → ∏ (i = 0, n - 1), f (vect_el 0%nat σ i) = ∏ (i = 0, n - 1), f i.
+  → is_permut n σ
+  → ∏ (i = 0, n - 1), f (ff_app σ i) = ∏ (i = 0, n - 1), f i.
 Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
+...
 destruct Hσ as (Hs & H1 & H2).
 revert σ Hs H1 H2.
 induction n; intros. cbn. {
