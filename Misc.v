@@ -2704,6 +2704,15 @@ rewrite <- seq_shift.
 now rewrite map_map.
 Qed.
 
+Theorem List_map_nth_seq' : ∀ A (la : list A) d n,
+  n = length la
+  → la = map (λ i, nth i la d) (seq 0 n).
+Proof.
+intros * Hn.
+subst n.
+apply List_map_nth_seq.
+Qed.
+
 Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
 Proof.
 intros A * Hll.

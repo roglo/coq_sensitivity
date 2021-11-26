@@ -402,6 +402,14 @@ Definition swap_elem (f : nat → nat) i j k :=
 Definition list_swap_elem {A} d (l : list A) i j :=
   map (λ k, nth (transposition i j k) l d) (seq 0 (length l)).
 
+Theorem length_list_swap_elem : ∀ A (d : A) l p q,
+  length (list_swap_elem d l p q) = length l.
+Proof.
+intros.
+unfold list_swap_elem.
+now rewrite map_length, seq_length.
+Qed.
+
 (*
 Theorem permut_fun_inv_loop_ext_in : ∀ f g i j,
   (∀ k, k < i → f k = g k)
