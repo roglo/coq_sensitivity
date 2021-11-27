@@ -3468,7 +3468,7 @@ assert (H : ∀ x, x ∈ σ' → x < length σ'). {
     assert (H : ff_app σ j ∈ σ) by (apply nth_In; rewrite H2; flia Hj).
     specialize (H3 H); clear H.
     rewrite H2 in H3.
-    destruct (Nat.eq_dec (ff_app σ j) (S n)) as [Hσs| Hσs]. {
+    enough (H : ff_app σ j ≠ S n) by flia H3 H; intros Hσs.
 ...
       destruct (lt_dec i n) as [Hin| Hin]. {
         specialize (H1 i).
