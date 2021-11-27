@@ -3743,41 +3743,31 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem permut_comp_assoc : ∀ n (f g h : vector nat),
-  vect_size g = n
-  → is_permut_vect n h
+Theorem permut_comp_assoc : ∀ n f g h,
+  length g = n
+  → is_permut n h
   → (f ° (g ° h) = (f ° g) ° h)%F.
 Proof.
-intros n (f) (g) (h) Hsg Hh.
-cbn in Hsg, Hh.
+intros * Hg (Hph, Hh).
 unfold "°", comp_list; cbn.
 rewrite map_map.
-f_equal.
 apply map_ext_in.
 intros i Hi.
+unfold ff_app.
 rewrite (List_map_nth' 0); [ easy | ].
-destruct Hh as (Hsh, (Hh1, Hh2)).
-cbn in Hsh, Hh1, Hh2.
-apply (In_nth h i 0) in Hi.
-destruct Hi as (j & Hjh & Hj).
-subst i.
-rewrite Hsh in Hjh.
-rewrite Hsg.
-now apply Hh1.
+rewrite Hg, <- Hh.
+now apply Hph.
 Qed.
 
 Theorem comp_permut_inv_r : ∀ n f,
-  is_permut_vect n f
-  → (f ° permut_inv n f = mk_vect (seq 0 n)).
+  is_permut n f
+  → (f ° permut_list_inv f = seq 0 n).
 Proof.
-intros n (f) Hf.
+intros * Hf.
 unfold "°"; cbn.
-f_equal.
+unfold permut_list_inv.
 rewrite map_map.
+...
 rewrite (List_map_nth_seq (seq 0 n)) with (d := 0) at 2.
 rewrite seq_length.
 apply map_ext_in.
