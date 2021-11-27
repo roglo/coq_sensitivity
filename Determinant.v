@@ -3429,7 +3429,7 @@ f_equal.
 apply determinant_alternating; try easy; [ flia Hiz | flia ].
 Qed.
 
-Theorem rngl_product_fun_permut :
+Theorem rngl_product_seq_permut :
   rngl_is_comm = true →
   ∀ n σ (f : nat → T),
   n ≠ 0
@@ -3448,7 +3448,6 @@ induction n; intros; cbn. {
   specialize (Hs a (or_introl eq_refl)).
   now apply Nat.lt_1_r in Hs; subst a.
 }
-(**)
 set
   (g := λ i,
    if lt_dec i (ff_app (permut_list_inv σ) (S n)) then i else i + 1).
@@ -3545,9 +3544,6 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   apply (permut_permut_inv (S (S n))); [ easy | ].
   apply Nat.lt_succ_diag_r.
 }
-(* voir permut_fun_inv_loop_fun et fun_find_prop : ils font pas double
-   emploi, ceux-là ? *)
-(* et permut_fun_inv_loop_fun' aussi !!! *)
 specialize permut_list_inv_is_permut as H1.
 specialize (H1 σ).
 assert (H : is_permut_list σ) by easy.
@@ -3713,17 +3709,19 @@ destruct
 }
 assert (Hkn : S (k + 1) ≤ n). {
   rewrite Nat.add_1_r.
-  rewrite Hk.
   destruct H1 as (H1, H2).
   apply Nat.le_succ_l.
-...
-  specialize (H1 (S n) (Nat.lt_succ_diag_r _)) as H5.
-  destruct
-    (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) (S n))
-    as [H6| H6]. {
-    flia Hk Hksn H6.
+  rewrite length_permut_list_inv, Hσl in H1.
+  specialize (H1 (S k)).
+  assert (H : S k ∈ permut_list_inv σ). {
+    rewrite Hk.
+    apply nth_In.
+    rewrite length_permut_list_inv, Hσl.
+    apply Nat.lt_succ_diag_r.
   }
-  flia H5 H6 H7.
+  specialize (H1 H); clear H.
+  rewrite <- Hk in H7.
+  flia Hksn H1 H7.
 }
 rewrite rngl_product_split_first; [ | easy ].
 rewrite <- rngl_mul_assoc.
@@ -3744,67 +3742,10 @@ apply rngl_product_eq_compat.
 intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
+
+Inspect 1.
+
 ...
-(*
-replace (vect_el 0 σ (k + 1)) with (S n). 2: {
-  rewrite Nat.add_1_r.
-  rewrite Hk.
-  unfold permut_inv.
-  cbn - [ permut_fun_inv_loop seq ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
-  rewrite seq_nth; [ | flia ].
-  rewrite fun_permut_fun_inv_loop; [ easy | easy | flia ].
-}
-rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
-rewrite rngl_mul_assoc.
-f_equal.
-destruct
-  (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) n) as [H7| H7]. {
-  rewrite H7 in Hk.
-  rewrite Nat.add_1_r.
-  rewrite Hk.
-  rewrite rngl_product_empty; [ | flia ].
-  rewrite rngl_product_empty; [ | flia ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
-  rewrite seq_nth; [ | flia Hk ].
-  unfold g; cbn.
-  destruct (lt_dec (S k) (S k)) as [H| H]; [ flia H | clear H ].
-  now rewrite Nat.add_1_r, Hk.
-}
-*)
-assert (Hkn : S (k + 1) ≤ n). {
-  rewrite Nat.add_1_r.
-  rewrite Hk.
-  destruct H3 as (Hsi, (H3, H4)).
-  apply Nat.le_succ_l.
-  specialize (H3 (S n) (Nat.lt_succ_diag_r _)) as H5.
-  destruct
-    (Nat.eq_dec (vect_el 0 (permut_inv (S (S n)) σ) (S n)) (S n))
-    as [H6| H6]. {
-    flia Hk Hksn H6.
-  }
-  flia H5 H6 H7.
-}
-rewrite rngl_product_split_first; [ | easy ].
-rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
-unfold g.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hkn ].
-rewrite seq_nth; [ | flia Hkn ].
-rewrite Nat.add_1_r.
-cbn.
-destruct (lt_dec (S k) (S k)) as [H| H]; [ flia H | clear H ].
-rewrite Nat.add_1_r.
-f_equal.
-symmetry.
-rewrite rngl_product_split_last; [ | flia Hkn ].
-rewrite Nat.add_1_r.
-f_equal.
-apply rngl_product_eq_compat.
-intros i Hi.
-rewrite Nat.sub_add; [ easy | flia Hi ].
-Qed.
 
 Theorem permut_comp_assoc : ∀ n (f g h : vector nat),
   vect_size g = n
