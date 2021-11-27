@@ -3439,11 +3439,10 @@ Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
-destruct Hσ as ((Hs, H1) & H2).
-revert σ Hs H1 H2.
+destruct Hσ as ((Hs, Hinj) & Hσl).
+revert σ Hs Hinj Hσl.
 induction n; intros; cbn. {
-  rewrite rngl_product_only_one.
-  rewrite rngl_product_only_one.
+  do 2 rewrite rngl_product_only_one.
   destruct σ as [| a l]; [ easy | ].
   destruct l; [ | easy ].
   specialize (Hs a (or_introl eq_refl)).
@@ -3454,36 +3453,95 @@ set
   (g := λ i,
    if lt_dec i (ff_app (permut_list_inv σ) (S n)) then i else i + 1).
 set (σ' := map (λ i, ff_app σ (g i)) (seq 0 (S n))).
+assert (Hσ'l : length σ' = S n). {
+  now unfold σ'; rewrite map_length, seq_length.
+}
+move g after Hσl; move σ' after Hσl.
 specialize (IHn σ').
-assert (H : ∀ x, x ∈ σ' → x < length σ'). {
-  intros i Hi.
-  unfold σ'; cbn - [ seq ].
-  rewrite map_length, seq_length.
-  apply in_map_iff in Hi.
-  destruct Hi as (j & Hji & Hj); apply in_seq in Hj.
-  rewrite <- Hji.
+rewrite Hσ'l in IHn.
+assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
+  intros x Hx.
+  apply in_map_iff in Hx.
+  destruct Hx as (i & Hxi & Hi); apply in_seq in Hi.
+  rewrite <- Hxi.
   unfold g.
-  destruct (lt_dec j _) as [Hjs| Hjs]. {
-    specialize (Hs (ff_app σ j)) as H3.
-    assert (H : ff_app σ j ∈ σ) by (apply nth_In; rewrite H2; flia Hj).
-    specialize (H3 H); clear H.
-    rewrite H2 in H3.
-    enough (H : ff_app σ j ≠ S n) by flia H3 H; intros Hσs.
-...
-      destruct (lt_dec i n) as [Hin| Hin]. {
-        specialize (H1 i).
-        assert (H : i < S (S n)) by flia Hin.
-      specialize (H1 H); clear H.
-      destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]. 2: {
-        flia H1 Hσ.
-      }
-      rewrite <- Hσs in Hσ.
-      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
-    }
-    replace i with n by flia Hi Hin.
+  destruct (lt_dec i _) as [His| His]. {
+    specialize (Hs (ff_app σ i)) as H1.
+    assert (H : ff_app σ i ∈ σ) by (apply nth_In; rewrite Hσl; flia Hi).
+    specialize (H1 H); clear H.
+    rewrite Hσl in H1.
+    enough (H : ff_app σ i ≠ S n) by flia H1 H; intros Hσs.
+    rewrite <- Hσs in His.
+    rewrite (permut_inv_permut (S (S n))) in His; [ | easy | flia Hi ].
+    now apply lt_irrefl in His.
+  } {
     rewrite Nat.add_1_r.
-    specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
-    flia H1 Hσn.
+    specialize (Hs (ff_app σ (S i))) as H1.
+    assert (H : ff_app σ (S i) ∈ σ). {
+      apply nth_In; rewrite Hσl.
+      now apply -> Nat.succ_lt_mono.
+    }
+    specialize (H1 H); clear H.
+    rewrite Hσl in H1.
+    enough (H : ff_app σ (S i) ≠ S n) by flia H1 H; intros Hσs.
+    rewrite <- Hσs in His.
+    rewrite (permut_inv_permut (S (S n))) in His; [ | easy | flia Hi ].
+    apply His, Nat.lt_succ_diag_r.
+  }
+}
+move Hs' before Hs.
+specialize (IHn Hs').
+assert (H : ∀ i j, i < S n → j < S n → ff_app σ' i = ff_app σ' j → i = j). {
+  intros i j Hi Hj Hij; unfold σ', ff_app in Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  unfold g in Hij; cbn in Hij.
+  destruct (lt_dec i _) as [His| His]. {
+...
+  rewrite (List_map_nth' 0) in Hij; [ | rewrite seq_length; flia ].
+  rewrite seq_nth in Hij; [ | flia ].
+  rewrite Nat.add_0_l in Hij.
+  destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [H3| H3]. {
+    destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
+    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
+    apply H2; [ flia Hi | flia Hj | easy ].
+  }
+  destruct (Nat.eq_dec (vect_el 0 σ n) (S n)) as [H4| H4]. {
+    destruct (lt_dec i n) as [Hin| Hin]. {
+      destruct (lt_dec j n) as [Hjn| Hjn]. {
+        apply H2; [ flia Hi | flia Hj | easy ].
+      }
+      replace j with n in Hij by flia Hj Hjn.
+      rewrite Nat.add_1_r in Hij.
+      rewrite <- Hij in H3.
+      apply H2 in Hij; [ flia Hin Hij | flia Hi | flia ].
+    }
+    replace i with n in Hij |-* by flia Hi Hin.
+    rewrite Nat.add_1_r in Hij.
+    destruct (lt_dec j n) as [Hjn| Hjn]. {
+      apply H2 in Hij; [ flia Hjn Hij | flia | flia Hjn ].
+    }
+    now replace j with n by flia Hj Hjn.
+  }
+  remember (permut_fun_inv_loop (vect_el 0 σ) n (S n)) as k eqn:Hk.
+  destruct (lt_dec i k) as [H5| H5]. {
+    destruct (lt_dec j k) as [H6| H6]. {
+      apply H2; [ flia Hi | flia Hj | easy ].
+    }
+    apply H2 in Hij; [ | flia Hi | flia Hj ].
+    flia H5 H6 Hij.
+  }
+  destruct (lt_dec j k) as [H6| H6]. {
+    apply H2 in Hij; [ | flia Hi | flia Hj ].
+    flia H5 H6 Hij.
+  }
+  apply H2 in Hij; [ | flia Hi | flia Hj ].
+  flia Hij.
+}
+specialize (IHn H); clear H.
 ...
 (*
 ...
@@ -3497,7 +3555,6 @@ assert (H : vect_size σ' = S n). {
   now rewrite map_length, seq_length.
 }
 specialize (IHn H); clear H.
-*)
 assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
@@ -3569,6 +3626,7 @@ assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
   flia H1 H4.
 }
 specialize (IHn H); clear H.
+*)
 assert
   (H : ∀ i j, i < S n → j < S n →
    vect_el 0 σ' i = vect_el 0 σ' j → i = j). {
