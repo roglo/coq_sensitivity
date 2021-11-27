@@ -3464,6 +3464,26 @@ assert (H : ∀ x, x ∈ σ' → x < length σ'). {
   rewrite <- Hji.
   unfold g.
   destruct (lt_dec j _) as [Hjs| Hjs]. {
+    specialize (Hs (ff_app σ j)) as H3.
+    assert (H : ff_app σ j ∈ σ) by (apply nth_In; rewrite H2; flia Hj).
+    specialize (H3 H); clear H.
+    rewrite H2 in H3.
+    destruct (Nat.eq_dec (ff_app σ j) (S n)) as [Hσs| Hσs]. {
+...
+      destruct (lt_dec i n) as [Hin| Hin]. {
+        specialize (H1 i).
+        assert (H : i < S (S n)) by flia Hin.
+      specialize (H1 H); clear H.
+      destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]. 2: {
+        flia H1 Hσ.
+      }
+      rewrite <- Hσs in Hσ.
+      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
+    }
+    replace i with n by flia Hi Hin.
+    rewrite Nat.add_1_r.
+    specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
+    flia H1 Hσn.
 ...
 (*
 ...
