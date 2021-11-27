@@ -3526,7 +3526,7 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   erewrite rngl_product_eq_compat in IHn. 2: {
     intros i Hi.
     unfold σ', g; cbn - [ seq ].
-...
+    unfold ff_app.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
     rewrite seq_nth; [ | flia Hi ].
     rewrite Nat.add_0_l.
@@ -3534,19 +3534,25 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   }
   cbn in IHn.
   rewrite rngl_product_split_last; [ | flia ].
-  rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el 0 σ i)).
+  rewrite rngl_product_succ_succ' with (g0 := λ i, f (ff_app σ i)).
   symmetry.
   rewrite rngl_product_split_last; [ | flia ].
   rewrite rngl_product_succ_succ'.
-  symmetry.
+  symmetry; unfold ff_app.
   rewrite IHn; f_equal; f_equal.
   rewrite Hk in Hksn.
   rewrite <- Hksn at 1.
-  unfold permut_inv.
-  cbn - [ permut_fun_inv_loop seq ].
+Search permut_list_inv.
+...
+  unfold permut_list_inv, ff_app.
+  rewrite Hσl.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
+...
+Search permut_list_inv.
+Search unsome.
+...
   rewrite fun_permut_fun_inv_loop; [ easy | easy | flia ].
 }
 (* voir permut_fun_inv_loop_fun et fun_find_prop : ils font pas double
