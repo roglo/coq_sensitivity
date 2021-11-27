@@ -3499,134 +3499,62 @@ assert (H : ∀ i j, i < S n → j < S n → ff_app σ' i = ff_app σ' j → i =
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold g in Hij; cbn in Hij.
+  rewrite Hσl in Hinj.
   destruct (lt_dec i _) as [His| His]. {
-...
-  rewrite (List_map_nth' 0) in Hij; [ | rewrite seq_length; flia ].
-  rewrite seq_nth in Hij; [ | flia ].
-  rewrite Nat.add_0_l in Hij.
-  destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [H3| H3]. {
-    destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
-    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
-    apply H2; [ flia Hi | flia Hj | easy ].
-  }
-  destruct (Nat.eq_dec (vect_el 0 σ n) (S n)) as [H4| H4]. {
-    destruct (lt_dec i n) as [Hin| Hin]. {
-      destruct (lt_dec j n) as [Hjn| Hjn]. {
-        apply H2; [ flia Hi | flia Hj | easy ].
-      }
-      replace j with n in Hij by flia Hj Hjn.
-      rewrite Nat.add_1_r in Hij.
-      rewrite <- Hij in H3.
-      apply H2 in Hij; [ flia Hin Hij | flia Hi | flia ].
+    destruct (lt_dec j _) as [Hjs| Hjs]. {
+      apply Hinj in Hij; [ easy | flia Hi | flia Hj ].
     }
-    replace i with n in Hij |-* by flia Hi Hin.
     rewrite Nat.add_1_r in Hij.
-    destruct (lt_dec j n) as [Hjn| Hjn]. {
-      apply H2 in Hij; [ flia Hjn Hij | flia | flia Hjn ].
-    }
-    now replace j with n by flia Hj Hjn.
+    apply Nat.nlt_ge in Hjs.
+    apply Hinj in Hij; [ flia His Hjs Hij | flia Hi | ].
+    now apply -> Nat.succ_lt_mono.
   }
-  remember (permut_fun_inv_loop (vect_el 0 σ) n (S n)) as k eqn:Hk.
-  destruct (lt_dec i k) as [H5| H5]. {
-    destruct (lt_dec j k) as [H6| H6]. {
-      apply H2; [ flia Hi | flia Hj | easy ].
-    }
-    apply H2 in Hij; [ | flia Hi | flia Hj ].
-    flia H5 H6 Hij.
+  apply Nat.nlt_ge in His.
+  rewrite Nat.add_1_r in Hij.
+  destruct (lt_dec j _) as [Hjs| Hjs]. {
+    apply Hinj in Hij; [ flia His Hjs Hij | | flia Hj ].
+    now apply -> Nat.succ_lt_mono.
   }
-  destruct (lt_dec j k) as [H6| H6]. {
-    apply H2 in Hij; [ | flia Hi | flia Hj ].
-    flia H5 H6 Hij.
-  }
-  apply H2 in Hij; [ | flia Hi | flia Hj ].
-  flia Hij.
+  rewrite Nat.add_1_r in Hij.
+  apply Nat.succ_lt_mono in Hi, Hj.
+  apply Hinj in Hij; [ | easy | easy ].
+  now apply Nat.succ_inj in Hij.
 }
-specialize (IHn H); clear H.
+specialize (IHn H eq_refl); clear H.
+remember (ff_app (permut_list_inv σ) (S n)) as k eqn:Hk.
+destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
+  erewrite rngl_product_eq_compat in IHn. 2: {
+    intros i Hi.
+    unfold σ', g; cbn - [ seq ].
 ...
-(*
-...
-set
-  (g := λ i,
-   if lt_dec i (vect_el 0 (permut_inv (S (S n)) σ) (S n)) then i else i + 1).
-set (σ' := mk_vect (map (λ i, vect_el 0 σ (g i)) (seq 0 (S n)))).
-specialize (IHn σ').
-assert (H : vect_size σ' = S n). {
-  unfold σ'; cbn.
-  now rewrite map_length, seq_length.
-}
-specialize (IHn H); clear H.
-assert (H : ∀ i : nat, i < S n → vect_el 0 σ' i < S n). {
-  intros i Hi.
-  unfold σ'; cbn - [ seq ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite Nat.add_0_l.
-  unfold g; cbn - [ seq ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+    rewrite seq_nth; [ | flia Hi ].
+    rewrite Nat.add_0_l.
+    destruct (lt_dec i k) as [H| H]; [ easy | flia Hksn Hi H ].
+  }
+  cbn in IHn.
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_succ_succ' with (g0 := λ i, f (vect_el 0 σ i)).
+  symmetry.
+  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_succ_succ'.
+  symmetry.
+  rewrite IHn; f_equal; f_equal.
+  rewrite Hk in Hksn.
+  rewrite <- Hksn at 1.
+  unfold permut_inv.
+  cbn - [ permut_fun_inv_loop seq ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia ].
   rewrite seq_nth; [ | flia ].
   rewrite Nat.add_0_l.
-  destruct (Nat.eq_dec (vect_el 0 σ (S n)) (S n)) as [Hσn| Hσn]. {
-    destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
-    specialize (H1 i).
-    assert (H : i < S (S n)) by flia Hi.
-    specialize (H1 H); clear H.
-    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]; [ | flia H1 Hσ ].
-    rewrite <- Hσn in Hσ.
-    apply H2 in Hσ; [ flia Hi Hσ | flia Hi | flia ].
-  }
-  destruct (Nat.eq_dec (vect_el 0 σ n) (S n)) as [Hσs| Hσs]. {
-    destruct (lt_dec i n) as [Hin| Hin]. {
-      specialize (H1 i).
-      assert (H : i < S (S n)) by flia Hi.
-      specialize (H1 H); clear H.
-      destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [Hσ| Hσ]. 2: {
-        flia H1 Hσ.
-      }
-      rewrite <- Hσs in Hσ.
-      apply H2 in Hσ; [ flia Hin Hσ | flia Hi | flia ].
-    }
-    replace i with n by flia Hi Hin.
-    rewrite Nat.add_1_r.
-    specialize (H1 (S n) (Nat.lt_succ_diag_r (S n))).
-    flia H1 Hσn.
-  }
-  destruct (lt_dec i (permut_fun_inv_loop (vect_el 0 σ) n (S n))) as [H3| H3]. {
-    destruct (Nat.eq_dec (vect_el 0 σ i) (S n)) as [H4| H4]. {
-      exfalso.
-      rewrite <- H4 in H3. (* at 2 *)
-      rewrite permut_fun_inv_loop_fun' in H3; [ flia H3 | | ]. 2: {
-        destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
-        flia Hi H5.
-      }
-      intros j k Hj Hk Hjk.
-      apply H2; [ flia Hj | flia Hk | easy ].
-    }
-    specialize (H1 i).
-    assert (H : i < S (S n)) by flia Hi.
-    specialize (H1 H); clear H.
-    flia H1 H4.
-  }
-  rewrite Nat.add_1_r.
-  specialize (H1 (S i)).
-  assert (H : S i < S (S n)) by flia Hi.
-  specialize (H1 H); clear H.
-  destruct (Nat.eq_dec (vect_el 0 σ (S i)) (S n)) as [H4| H4]. {
-    exfalso.
-    rewrite <- H4 in H3. (* at 2 *)
-    rewrite permut_fun_inv_loop_fun' in H3; [ flia H3 | | ]. 2: {
-      destruct (Nat.eq_dec i n) as [H5| H5]; [ now subst i | ].
-      destruct (Nat.eq_dec (S i) n) as [H6| H6]. {
-        now rewrite H6 in H4.
-      }
-      flia Hi H5 H6.
-    }
-    intros j k Hj Hk Hjk.
-    apply H2; [ flia Hj | flia Hk | easy ].
-  }
-  flia H1 H4.
+  rewrite fun_permut_fun_inv_loop; [ easy | easy | flia ].
 }
-specialize (IHn H); clear H.
-*)
+(* voir permut_fun_inv_loop_fun et fun_find_prop : ils font pas double
+   emploi, ceux-là ? *)
+(* et permut_fun_inv_loop_fun' aussi !!! *)
+specialize permut_inv_is_permut as H3.
+...
+(*
 assert
   (H : ∀ i j, i < S n → j < S n →
    vect_el 0 σ' i = vect_el 0 σ' j → i = j). {
@@ -3678,6 +3606,7 @@ assert
   flia Hij.
 }
 specialize (IHn H); clear H.
+*)
 remember (vect_el 0 (permut_inv (S (S n)) σ) (S n)) as k eqn:Hk.
 destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   erewrite rngl_product_eq_compat in IHn. 2: {
