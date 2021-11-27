@@ -3767,13 +3767,26 @@ intros * Hf.
 unfold "°"; cbn.
 unfold permut_list_inv.
 rewrite map_map.
-...
-rewrite (List_map_nth_seq (seq 0 n)) with (d := 0) at 2.
+rewrite (List_map_nth_seq (seq 0 n)) with (d := 0).
 rewrite seq_length.
+destruct Hf as (Hs, Hf).
+rewrite Hf.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 rewrite seq_nth; [ | easy ].
-destruct Hf as (Hs, Hf).
+rewrite Nat.add_0_l.
+remember (List_find_nth (Nat.eqb i) f) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx; cbn.
+  destruct Hx as (Hx & Hbef & Hix).
+  now apply Nat.eqb_eq in Hix.
+} {
+  specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
+...
+  specialize (List_find_nth_None Hx) as H1.
+  specialize (H1 _
+...
 now apply (@fun_permut_fun_inv_loop (λ i, nth i f 0)).
 Qed.
 
