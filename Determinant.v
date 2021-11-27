@@ -3783,6 +3783,7 @@ destruct x as [x| ]. {
   now apply Nat.eqb_eq in Hix.
 } {
   specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
+(* pigeonhole? *)
 ...
   specialize (List_find_nth_None Hx) as H1.
   specialize (H1 _
