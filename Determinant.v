@@ -3782,14 +3782,48 @@ destruct x as [x| ]. {
   destruct Hx as (Hx & Hbef & Hix).
   now apply Nat.eqb_eq in Hix.
 } {
+  exfalso.
+(* lemme à faire ? *)
   specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
-Check Pigeonhole.pigeonhole_list.
-...
-  specialize (List_find_nth_None Hx) as H1.
-  specialize (H1 _
-...
-now apply (@fun_permut_fun_inv_loop (λ i, nth i f 0)).
+  specialize (pigeonhole_list n (i :: f)) as H2.
+  rewrite List_length_cons in H2.
+  assert (H : n < S (length f)) by (rewrite Hf; apply Nat.lt_succ_diag_r).
+  specialize (H2 H); clear H.
+  assert (H : ∀ x, x ∈ i :: f → x < n). {
+    intros x [Hxi| Hxf]; [ now subst x | ].
+    now rewrite <- Hf; apply Hs.
+  }
+  specialize (H2 H); clear H.
+  remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (x, x').
+  specialize (H2 x x' eq_refl).
+  destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
+  destruct x. {
+    rewrite List_nth_0_cons in Hxx'if.
+    destruct x'; [ easy | ].
+    apply Nat.succ_lt_mono in Hx'f.
+    cbn in Hxx'if.
+    specialize (H1 x' Hx'f).
+    now apply Nat.eqb_neq in H1.
+  }
+  rewrite List_nth_succ_cons in Hxx'if.
+  destruct x'. {
+    apply Nat.succ_lt_mono in Hxf.
+    cbn in Hxx'if; symmetry in Hxx'if.
+    specialize (H1 x Hxf).
+    now apply Nat.eqb_neq in H1.
+  }
+  cbn in Hxx'if.
+  apply Nat.succ_lt_mono in Hxf, Hx'f.
+  apply Hs in Hxx'if; [ | easy | easy ].
+  now rewrite Hxx'if in Hxx'.
+}
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
