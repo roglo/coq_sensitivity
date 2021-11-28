@@ -3759,7 +3759,7 @@ rewrite Hg, <- Hh.
 now apply Hph.
 Qed.
 
-Theorem comp_permut_inv_r : ∀ n f,
+Theorem comp_permut_permut_inv : ∀ n f,
   is_permut n f
   → (f ° permut_list_inv f = seq 0 n).
 Proof.
@@ -3822,8 +3822,6 @@ destruct x as [x| ]. {
 Qed.
 
 Inspect 1.
-
-...
 
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
@@ -3918,6 +3916,8 @@ destruct Hσ as (H1, H2).
 destruct Hσ' as (H3, H4).
 ...
 *)
+
+...
 
 Theorem glop : ∀ n sg,
   is_sym_gr_vect n sg
