@@ -3917,8 +3917,7 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
-...
-
+(*
 Theorem glop : ∀ n sg,
   is_sym_gr_vect n sg
   → ∀ i j k, i < n → j < n
@@ -3930,7 +3929,9 @@ destruct Hsg as (Hsg & Hsg1 & Hsg2 & Hsg3).
 ...
 destruct sg as (ll); cbn in Hsg, Hsg1, Hsg2, Hsg3 |-*.
 ...
+*)
 
+(*
 Theorem length_filter_sym_gr : ∀ n sg i,
   i ≤ n
   → is_sym_gr_vect (S n) sg
@@ -4111,7 +4112,9 @@ destruct b1. {
   now injection Hj; clear Hj; intros; subst j.
 }
 ...
+*)
 
+(*
 Theorem fun_betw_sym_gr : ∀ n (sg sg' : vector _),
   n ≠ 0
   → is_sym_gr_vect n sg
@@ -4179,10 +4182,9 @@ specialize (H1 (s + m) sg).
 remember (vect_el empty_vect sg' i) as σ eqn:Hσ.
 specialize (H1 σ).
 ...
-
 rewrite <- rank_of_permut_in_sym_gr_enough_iter.
-
 ...
+*)
 
 (*
 Theorem fun_betw_sym_gr : ∀ n (σ σ' : vector n! _),
@@ -4241,16 +4243,34 @@ Theorem det_by_any_sym_gr :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix T) (σ : vector (vector nat)),
+  ∀ n (M : matrix T) (σ : list (list nat)),
   n ≠ 0
   → is_square_matrix n M = true
-  → is_sym_gr_vect n σ
+  → is_sym_gr_list n σ
   → determinant n M =
     ∑ (k = 0, n! - 1),
-    ε n (vect_el empty_vect σ k) *
+    ε n (nth k σ []) *
     ∏ (i = 1, n),
-    mat_el M (i - 1) (vect_el 0%nat (vect_el empty_vect σ k) (i - 1)).
+    mat_el M (i - 1) (ff_app (nth k σ []) (i - 1)).
 Proof.
+intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hσ.
+rewrite det_is_det_by_canon_permut; try easy.
+unfold determinant'.
+remember (canon_sym_gr_list_list n) as σ' eqn:Hσ'.
+specialize rngl_summation_change_var as H1.
+specialize (H1 nat 0 (n! - 1)).
+(**)
+set
+  (f := λ k,
+   (ε n (nth k σ' []) *
+    ∏ (i = 1, n),
+    mat_el M (i - 1) (ff_app (nth k σ' []) (i - 1)))%F).
+specialize (H1 f).
+subst f.
+cbn in H1.
+unfold canon_sym_gr_list_list in Hσ'.
+...
+(*
 intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hσ.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
@@ -4262,6 +4282,7 @@ set
    (ε n (vect_el empty_vect σ' k) *
     ∏ (i = 1, n),
     mat_el M (i - 1) (vect_el 0%nat (vect_el empty_vect σ' k) (i - 1)))%F).
+*)
 specialize (H1 f).
 subst f.
 cbn in H1.
