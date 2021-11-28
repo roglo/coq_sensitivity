@@ -4259,6 +4259,7 @@ unfold determinant'.
 remember (canon_sym_gr_list_list n) as σ' eqn:Hσ'.
 specialize rngl_summation_change_var as H1.
 specialize (H1 nat 0 (n! - 1)).
+...
 (**)
 set
   (f := λ k,
