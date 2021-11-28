@@ -5,8 +5,8 @@ Require Import Utf8 Arith Bool.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike MyVector Matrix PermutSeq Signature.
-Require Import IterAdd IterMul.
+Require Import Misc RingLike IterAdd IterMul.
+Require Import MyVector Matrix PermutSeq Signature Pigeonhole.
 Import matrix_Notations.
 
 Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
