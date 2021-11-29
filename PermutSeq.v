@@ -192,7 +192,7 @@ Definition is_sym_gr_list n (ll : list (list nat)) :=
    is_permut_list (nth i ll [])) ∧
   (∀ i j, i < length ll → j < length ll →
    nth i ll [] = nth j ll [] → i = j) ∧
-  (∀ l, length l = n → is_permut_list l → l ∈ ll).
+  (∀ l, is_permut n l → l ∈ ll).
 
 (*
 Definition vect_vect_nat_el (V : vector (vector nat)) i : vector nat :=
@@ -584,6 +584,72 @@ Qed.
 Definition sym_gr_inv (sg : list (list nat)) σ :=
   unsome 0 (List_find_nth (list_eqb Nat.eqb σ) sg).
 
+Theorem sym_gr_inv_inj : ∀ n sg la lb,
+  is_sym_gr_list n sg
+  → is_permut n la
+  → is_permut n lb
+  → sym_gr_inv sg la = sym_gr_inv sg lb
+  → la = lb.
+Proof.
+intros * Hsg Hna Hnb Hab.
+unfold sym_gr_inv, unsome in Hab.
+remember (List_find_nth (list_eqb Nat.eqb la) sg) as x eqn:Hx.
+remember (List_find_nth (list_eqb Nat.eqb lb) sg) as y eqn:Hy.
+move y before x.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some []) in Hx.
+  destruct Hx as (Hxs & Hbefx & Hx).
+  apply list_eqb_eq in Hx.
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some []) in Hy.
+    destruct Hy as (Hys & Hbefy & Hy).
+    apply list_eqb_eq in Hy.
+    congruence.
+  }
+  specialize (List_find_nth_None [] _ _ Hy) as H1; cbn.
+  destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
+  specialize (Hsg_surj lb Hnb) as H2.
+  apply In_nth with (d := []) in H2.
+  destruct H2 as (k & Hk & Hkb).
+  specialize (H1 k Hk).
+  apply list_eqb_neq in H1.
+  now symmetry in Hkb.
+}
+specialize (List_find_nth_None [] _ _ Hx) as H1; cbn.
+destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
+specialize (Hsg_surj la Hna) as H2.
+apply In_nth with (d := []) in H2.
+destruct H2 as (k & Hk & Hka).
+specialize (H1 k Hk).
+apply list_eqb_neq in H1.
+now symmetry in Hka.
+Qed.
+
+Theorem seq_is_permut_list : ∀ n, is_permut_list (seq 0 n).
+Proof.
+intros.
+split. {
+  cbn; rewrite seq_length.
+  intros i Hin.
+  now rewrite in_seq in Hin.
+} {
+  cbn; rewrite seq_length.
+  intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  easy.
+}
+Qed.
+
+Theorem seq_is_permut : ∀ n, is_permut n (seq 0 n).
+Proof.
+intros.
+split; [ | apply seq_length ].
+apply seq_is_permut_list.
+Qed.
+
 Theorem sym_gr_inv_lt : ∀ n sg v,
   n ≠ 0
   → is_sym_gr_list n sg
@@ -601,24 +667,8 @@ apply Nat.le_0_r in Hs.
 apply length_zero_iff_nil in Hs; subst sg.
 destruct Hsg as (_ & _ & Hsurj).
 cbn in Hsurj.
-specialize (Hsurj (seq 0 n)) as H1.
-rewrite seq_length in H1.
-specialize (H1 eq_refl).
-assert (H : is_permut_list (seq 0 n)). {
-  split. {
-    cbn; rewrite seq_length.
-    intros i Hin.
-    now rewrite in_seq in Hin.
-  } {
-    cbn; rewrite seq_length.
-    intros i j Hi Hj Hij.
-    unfold ff_app in Hij.
-    rewrite seq_nth in Hij; [ | easy ].
-    rewrite seq_nth in Hij; [ | easy ].
-    easy.
-  }
-}
-congruence.
+apply (Hsurj (seq 0 n)).
+apply seq_is_permut.
 Qed.
 
 Theorem nth_sym_gr_inv_sym_gr : ∀ sg l n,
@@ -680,11 +730,11 @@ Theorem length_of_empty_sym_gr : ∀ sg,
 Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
-specialize (Hsurj [] eq_refl) as H1.
-assert (H : is_permut_list []). {
+assert (H : is_permut 0 []). {
+  split; [ | easy ].
   now apply is_permut_list_is_permut_list_bool.
 }
-specialize (H1 H); clear H.
+specialize (Hsurj _ H) as H1; clear H.
 apply (In_nth _ _ []) in H1.
 destruct H1 as (i & Hil & Hi).
 destruct (Nat.eq_dec (length sg) 0) as [Hvz| Hvz]. {
@@ -1531,7 +1581,7 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   now apply canon_sym_gr_list_inj in Hij.
 } {
-  intros l Hl Hp.
+  intros l (Hp, Hl).
   unfold canon_sym_gr_list_list.
   apply in_map_iff.
   exists (canon_sym_gr_list_inv n l).

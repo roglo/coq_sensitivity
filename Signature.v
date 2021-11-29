@@ -2225,23 +2225,6 @@ unfold "°".
 now rewrite map_length.
 Qed.
 
-Theorem seq_is_permut : ∀ n, is_permut n (seq 0 n).
-Proof.
-intros.
-split; [ | apply seq_length ].
-split. {
-  rewrite seq_length.
-  now intros x Hx; apply in_seq in Hx.
-} {
-  rewrite seq_length.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  easy.
-}
-Qed.
-
 Theorem iter_comp_is_permut : ∀ n l,
   l ≠ [] ∨ n = 0
   → (∀ σ, σ ∈ l → is_permut n σ)
