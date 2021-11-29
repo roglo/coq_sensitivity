@@ -4236,6 +4236,34 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
+(* à transférer dans PermutSeq.v *)
+Theorem sym_gr_inv_inj : ∀ sg la lb,
+  sym_gr_inv sg la = sym_gr_inv sg lb
+  → la = lb.
+Proof.
+intros * Hab.
+unfold sym_gr_inv, unsome in Hab.
+remember (List_find_nth (list_eqb Nat.eqb la) sg) as x eqn:Hx.
+remember (List_find_nth (list_eqb Nat.eqb lb) sg) as y eqn:Hy.
+move y before x.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some []) in Hx.
+  destruct Hx as (Hxs & Hbefx & Hx).
+  apply list_eqb_eq in Hx.
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some []) in Hy.
+    destruct Hy as (Hys & Hbefy & Hy).
+    apply list_eqb_eq in Hy.
+    congruence.
+  }
+  specialize (List_find_nth_None [] _ _ Hy) as H1; cbn.
+...
+  specialize (H1 x Hxs).
+  apply list_eqb_neq in H1.
+  specialize (pigeonhole_list n (i :: f)) as H2.
+...
+
 Theorem det_by_any_sym_gr :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -4320,6 +4348,8 @@ split. {
   do 2 rewrite Nat.add_0_l in Hij.
 Search (sym_gr_inv _ _ = sym_gr_inv _ _).
 Search sym_gr_inv.
+...
+apply sym_gr_inv_inj in Hij.
 ...
 destruct Hsg as (H
   apply sym_gr_inv_inj1 in Hij.
