@@ -3822,10 +3822,34 @@ destruct x as [x| ]. {
 }
 Qed.
 
-Inspect 1.
+Theorem comp_permut_inv_permut : ∀ n f,
+  is_permut n f
+  → (permut_list_inv f ° f = seq 0 n).
+Proof.
+intros * Hf.
+unfold "°"; cbn.
+rewrite (List_map_nth_seq f) with (d := 0) at 2.
+rewrite (List_map_nth_seq (seq 0 n)) with (d := 0).
+rewrite (proj2 Hf).
+rewrite seq_length.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+rewrite seq_nth; [ | easy ].
+now apply (permut_inv_permut n).
+Qed.
 
+Theorem comp_id_r : ∀ n l, length l = n → l ° seq 0 n = l.
+Proof.
+intros * Hn.
+now symmetry; apply List_map_nth_seq'.
+Qed.
+
+(*
 Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
 Proof. easy. Qed.
+*)
 
 (*
 Fixpoint vect_eqb_loop A (n : nat) (eqb : A → A → bool) d (u v : vector A) i :=
@@ -4353,17 +4377,18 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite length_permut_list_inv; apply Hσ.
     }
     rewrite <- (permut_comp_assoc _ _ H Hσ); clear H.
-unfold "°".
-Search permut_list_inv.
-...
-    rewrite <- permut_comp_assoc.
-    apply vector_eq.
-    intros i Hi; cbn.
-    unfold comp.
-    now rewrite permut_fun_inv_loop_fun.
+    rewrite (@comp_permut_inv_permut n); [ | easy ].
+    apply comp_id_r.
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    rewrite <- Hiμ.
+    apply length_canon_sym_gr_list.
   }
+  subst ν.
+  rewrite <- Hσν at 1.
+  assert (Hpμ : is_permut n μ). {
 ...
-
+(*
 Theorem det_any_permut :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4393,6 +4418,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     unfold comp.
     now rewrite permut_fun_inv_loop_fun.
   }
+*)
   subst ν.
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut_fun μ). {
