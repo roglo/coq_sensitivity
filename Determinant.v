@@ -4393,6 +4393,19 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite <- Hiμ.
     now apply canon_sym_gr_list_is_permut.
   }
+  rewrite signature_comp; try easy.
+  apply comp_is_permut; [ easy | ].
+  destruct Hσ.
+  split; [ | now rewrite length_permut_list_inv ].
+  now apply permut_list_inv_is_permut.
+}
+cbn - [ "°" ].
+...
+rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+(*1*)
+set (ν := λ i, vect_el (mk_canon_sym_gr n) i ° permut_inv σ).
 ...
 (*
 Theorem det_any_permut :
@@ -4424,7 +4437,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
     unfold comp.
     now rewrite permut_fun_inv_loop_fun.
   }
-*)
   subst ν.
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut_fun μ). {
@@ -4451,6 +4463,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
+*)
 cbn - [ "°" ].
 unfold list_of_vect.
 rewrite <- rngl_summation_list_change_var.
