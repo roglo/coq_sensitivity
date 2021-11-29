@@ -4327,8 +4327,41 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
+Theorem det_any_permut :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix T) (σ : list nat),
+  n ≠ 0
+  → is_square_matrix n M = true
+  → is_permut n σ
+  → determinant n M =
+    (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
+     ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
+Proof.
+intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros μ Hμ.
+  remember (μ ° permut_list_inv σ) as ν eqn:Hν.
+  assert (Hσν : ν ° σ = μ). {
+    rewrite Hν.
+    assert (H : length (permut_list_inv σ) = n). {
+      rewrite length_permut_list_inv; apply Hσ.
+    }
+    rewrite <- (permut_comp_assoc _ _ H Hσ); clear H.
+unfold "°".
+Search permut_list_inv.
+...
+    rewrite <- permut_comp_assoc.
+    apply vector_eq.
+    intros i Hi; cbn.
+    unfold comp.
+    now rewrite permut_fun_inv_loop_fun.
+  }
 ...
 
 Theorem det_any_permut :
