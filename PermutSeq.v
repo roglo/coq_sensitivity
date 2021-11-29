@@ -581,16 +581,16 @@ Qed.
 
 (* *)
 
-Definition rank_of_permut_in_sym_gr (sg : list (list nat)) σ :=
+Definition sym_gr_inv (sg : list (list nat)) σ :=
   unsome 0 (List_find_nth (list_eqb Nat.eqb σ) sg).
 
-Theorem rank_of_permut_in_sym_gr_lt : ∀ n sg v,
+Theorem sym_gr_inv_lt : ∀ n sg v,
   n ≠ 0
   → is_sym_gr_list n sg
-  → rank_of_permut_in_sym_gr sg v < length sg.
+  → sym_gr_inv sg v < length sg.
 Proof.
 intros * Hnz Hsg.
-unfold rank_of_permut_in_sym_gr.
+unfold sym_gr_inv.
 unfold unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]; [ now apply List_find_nth_Some_lt in Hi | ].
@@ -621,14 +621,14 @@ assert (H : is_permut_list (seq 0 n)). {
 congruence.
 Qed.
 
-Theorem nth_rank_of_permut_in_sym_gr : ∀ sg l n,
+Theorem nth_sym_gr_inv_sym_gr : ∀ sg l n,
   is_sym_gr_list n sg
   → is_permut_list l
   → length l = n
-  → nth (rank_of_permut_in_sym_gr sg l) sg [] = l.
+  → nth (sym_gr_inv sg l) sg [] = l.
 Proof.
 intros * Hsg Hp Hs.
-unfold rank_of_permut_in_sym_gr, unsome.
+unfold sym_gr_inv, unsome.
 remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   apply List_find_nth_Some with (d := []) in Hi.
@@ -647,14 +647,14 @@ exfalso; apply H; clear H.
 now apply Hsg.
 Qed.
 
-Theorem rank_of_permut_in_sym_gr_list_el : ∀ n sg i,
+Theorem sym_gr_inv_list_el : ∀ n sg i,
   n ≠ 0
   → is_sym_gr_list n sg
   → i < length sg
-  → rank_of_permut_in_sym_gr sg (nth i sg []) = i.
+  → sym_gr_inv sg (nth i sg []) = i.
 Proof.
 intros * Hnz Hsg Hi.
-unfold rank_of_permut_in_sym_gr, unsome.
+unfold sym_gr_inv, unsome.
 remember (List_find_nth _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
   apply List_find_nth_Some with (d := []) in Hj.
@@ -1310,7 +1310,7 @@ destruct (le_dec _ _) as [H1| H1]; [ | easy ].
 destruct (lt_dec _ _) as [H2| H2]; [ easy | flia H1 H2 ].
 Qed.
 
-Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
+Theorem canon_sym_gr_inv_of_canon_sym_gr : ∀ n k,
   k < n!
   → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k.
 Proof.
@@ -1333,7 +1333,7 @@ Qed.
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_prop : ∀ n sg,
   is_sym_gr_list n sg
   → ∀ k : fin_t n!,
-      (rank_of_permut_in_sym_gr sg
+      (sym_gr_inv sg
          (nth (proj1_sig k) (canon_sym_gr_list_list n) []) <? length sg) =
       true.
 Proof.
@@ -1352,7 +1352,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in H1; subst v.
   apply Nat.lt_0_1.
 }
-now apply rank_of_permut_in_sym_gr_lt with (n := n).
+now apply sym_gr_inv_lt with (n := n).
 Qed.
 
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
@@ -1373,7 +1373,7 @@ Qed.
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
     (Hsg : is_sym_gr_list n sg) (k : fin_t n!) : fin_t (length sg) :=
   exist (λ a : nat, (a <? length sg) = true)
-    (rank_of_permut_in_sym_gr sg
+    (sym_gr_inv sg
       (nth (proj1_sig k) (canon_sym_gr_list_list n) []))
     (rank_in_sym_gr_of_rank_in_canon_sym_gr_prop Hsg k).
 
@@ -1397,8 +1397,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hk.
   rewrite Hs in Hk.
   apply Nat.lt_1_r in Hk; subst k.
-  assert (p : rank_of_permut_in_sym_gr sg [] = 0). {
-    unfold rank_of_permut_in_sym_gr, unsome; cbn.
+  assert (p : sym_gr_inv sg [] = 0). {
+    unfold sym_gr_inv, unsome; cbn.
     destruct sg as [| v]; [ easy | ].
     destruct sg; [ cbn | easy ].
     destruct Hsg as (Hsg & _ & _).
@@ -1412,7 +1412,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 cbn.
 assert
   (p :
-   rank_of_permut_in_sym_gr sg
+   sym_gr_inv sg
      (nth (canon_sym_gr_list_inv n (nth k sg []))
         (canon_sym_gr_list_list n) []) = k). {
   apply Nat.ltb_lt in pk.
@@ -1426,7 +1426,7 @@ assert
   rewrite seq_nth; [ | now apply rank_of_canon_permut_ub ].
   rewrite Nat.add_0_l.
   rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy | easy ].
-  now apply rank_of_permut_in_sym_gr_list_el with (n := n).
+  now apply sym_gr_inv_list_el with (n := n).
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
@@ -1443,20 +1443,20 @@ apply eq_exist_uncurried; cbn.
 assert
   (p :
    canon_sym_gr_list_inv n
-     (nth (rank_of_permut_in_sym_gr sg (nth k (canon_sym_gr_list_list n) []))
+     (nth (sym_gr_inv sg (nth k (canon_sym_gr_list_list n) []))
         sg []) = k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
   unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ cbn | easy ].
-  rewrite (@nth_rank_of_permut_in_sym_gr _ _ n); cycle 1. {
+  rewrite (@nth_sym_gr_inv_sym_gr _ _ n); cycle 1. {
     easy.
   } {
     now apply canon_sym_gr_list_is_permut.
   } {
     apply length_canon_sym_gr_list.
   }
-  now apply rank_of_canon_permut_of_canon_rank.
+  now apply canon_sym_gr_inv_of_canon_sym_gr.
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
@@ -1502,8 +1502,8 @@ Theorem canon_sym_gr_list_inj : ∀ n i j,
 Proof.
 intros * Hi Hj Hij.
 apply (f_equal (@canon_sym_gr_list_inv n)) in Hij.
-rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
-rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
+rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
+rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
 easy.
 Qed.
 
