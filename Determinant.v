@@ -4387,6 +4387,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   subst ν.
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut n μ). {
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    apply in_seq in Hi.
+    rewrite <- Hiμ.
+    now apply canon_sym_gr_list_is_permut.
+  }
 ...
 (*
 Theorem det_any_permut :
