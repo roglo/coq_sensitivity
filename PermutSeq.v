@@ -985,12 +985,12 @@ Definition rank_of_permut_in_canon_sym_gr_vect n (v : vector nat) : nat :=
 Definition sub_canon_permut_list (l : list nat) :=
   map (λ a, a - Nat.b2n (hd 0 l <? a)) (tl l).
 
-Fixpoint rank_of_permut_in_canon_sym_gr_list n (l : list nat) : nat :=
+Fixpoint canon_sym_gr_list_inv n (l : list nat) : nat :=
   match n with
   | 0 => 0
   | S n' =>
       hd 0 l * n'! +
-      rank_of_permut_in_canon_sym_gr_list n' (sub_canon_permut_list l)
+      canon_sym_gr_list_inv n' (sub_canon_permut_list l)
   end.
 
 (*
@@ -1082,7 +1082,7 @@ Qed.
 Theorem rank_of_canon_permut_ub : ∀ n l,
   is_permut_list l
   → length l = n
-  → rank_of_permut_in_canon_sym_gr_list n l < n!.
+  → canon_sym_gr_list_inv n l < n!.
 Proof.
 intros * (Hvn, Hn) Hln.
 revert l Hvn Hn Hln.
@@ -1145,7 +1145,7 @@ Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n f,
 Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
   is_permut_list l
   → length l = n
-  → canon_sym_gr_list n (rank_of_permut_in_canon_sym_gr_list n l) = l.
+  → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l.
 Proof.
 intros * (Hvn, Hn) Hln.
 revert l Hvn Hn Hln.
@@ -1192,7 +1192,7 @@ f_equal. {
   }
   cbn - [ sub_canon_permut_list ].
   unfold succ_when_ge.
-  remember (rank_of_permut_in_canon_sym_gr_list _ _) as x.
+  remember (canon_sym_gr_list_inv _ _) as x.
   cbn - [ "<=?" ]; subst x.
   rewrite map_map.
   rewrite List_map_map_seq with (d := 0).
@@ -1312,7 +1312,7 @@ Qed.
 
 Theorem rank_of_canon_permut_of_canon_rank : ∀ n k,
   k < n!
-  → rank_of_permut_in_canon_sym_gr_list n (canon_sym_gr_list n k) = k.
+  → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k.
 Proof.
 intros * Hkn.
 revert k Hkn.
@@ -1358,7 +1358,7 @@ Qed.
 Theorem rank_in_canon_sym_gr_of_rank_in_sym_gr_prop : ∀ n sg,
   is_sym_gr_list n sg
   → ∀ k : fin_t (length sg),
-      (rank_of_permut_in_canon_sym_gr_list n (nth (proj1_sig k) sg []) <? n!)
+      (canon_sym_gr_list_inv n (nth (proj1_sig k) sg []) <? n!)
       = true.
 Proof.
 intros * Hsg k.
@@ -1380,7 +1380,7 @@ Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
 Definition rank_in_canon_sym_gr_of_rank_in_sym_gr  n sg
     (Hsg : is_sym_gr_list n sg) (k : fin_t (length sg)) : fin_t n! :=
   exist (λ a : nat, (a <? n!) = true)
-    (rank_of_permut_in_canon_sym_gr_list n (nth (proj1_sig k) sg []))
+    (canon_sym_gr_list_inv n (nth (proj1_sig k) sg []))
     (rank_in_canon_sym_gr_of_rank_in_sym_gr_prop Hsg k).
 
 Theorem rank_in_sym_gr_of_rank_in_canon_sym_gr_of_its_inverse : ∀ n sg
@@ -1413,7 +1413,7 @@ cbn.
 assert
   (p :
    rank_of_permut_in_sym_gr sg
-     (nth (rank_of_permut_in_canon_sym_gr_list n (nth k sg []))
+     (nth (canon_sym_gr_list_inv n (nth k sg []))
         (canon_sym_gr_list_list n) []) = k). {
   apply Nat.ltb_lt in pk.
   destruct Hsg as (Hsg & Hinj & Hsurj).
@@ -1442,7 +1442,7 @@ destruct k as (k, pk); cbn - [ "<?" ].
 apply eq_exist_uncurried; cbn.
 assert
   (p :
-   rank_of_permut_in_canon_sym_gr_list n
+   canon_sym_gr_list_inv n
      (nth (rank_of_permut_in_sym_gr sg (nth k (canon_sym_gr_list_list n) []))
         sg []) = k). {
   specialize (proj1 (Nat.ltb_lt _ _) pk) as Hkn.
@@ -1501,7 +1501,7 @@ Theorem canon_sym_gr_list_inj : ∀ n i j,
   → i = j.
 Proof.
 intros * Hi Hj Hij.
-apply (f_equal (@rank_of_permut_in_canon_sym_gr_list n)) in Hij.
+apply (f_equal (@canon_sym_gr_list_inv n)) in Hij.
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 rewrite rank_of_canon_permut_of_canon_rank in Hij; [ | easy ].
 easy.
@@ -1534,7 +1534,7 @@ split. {
   intros l Hl Hp.
   unfold canon_sym_gr_list_list.
   apply in_map_iff.
-  exists (rank_of_permut_in_canon_sym_gr_list n l).
+  exists (canon_sym_gr_list_inv n l).
   rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy | easy ].
   split; [ easy | ].
   apply in_seq.
@@ -1548,8 +1548,8 @@ Theorem rank_of_permut_in_canon_gr_list_inj : ∀ n la lb,
   → is_permut_list lb
   → length la = n
   → length lb = n
-  → rank_of_permut_in_canon_sym_gr_list n la =
-    rank_of_permut_in_canon_sym_gr_list n lb
+  → canon_sym_gr_list_inv n la =
+    canon_sym_gr_list_inv n lb
   → la = lb.
 Proof.
 intros * Hla Hlb Han Hbn Hrr.

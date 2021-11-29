@@ -1006,7 +1006,7 @@ rewrite rngl_mul_opp_l; [ | easy ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
-set (g := λ k, rank_of_permut_in_canon_sym_gr_list n (f k)).
+set (g := λ k, canon_sym_gr_list_inv n (f k)).
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
@@ -4256,11 +4256,37 @@ Proof.
 intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hsg.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
-set (g := λ i, rank_of_permut_in_canon_sym_gr_list n (nth i sg [])).
+set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
 set (h := λ i, rank_of_permut_in_sym_gr sg (canon_sym_gr_list n i)).
 rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
   intros i (_, Hi).
   unfold g, h.
+About canon_sym_gr_list_inv.
+...
+Check canon_sym_gr_list_inv.
+Check canon_sym_gr_list_inv.
+...
+Check rank_of_permut_in_sym_gr.
+Print rank_of_permut_in_sym_gr.
+Check canon_sym_gr_list_inv.
+Check canon_sym_gr_list.
+Check canon_sym_gr_inv.
+Check canon_sym_gr_list_inv.
+...
+Check nth_rank_of_permut_in_sym_gr.
+Search canon_sym_gr_list_list.
+Check canon_sym_gr_list_list_inv.
+Check sym_gr_inv.
+...
+rank_of_canon_permut_of_canon_rank:
+  ∀ n k : nat, k < n! → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k
+permut_in_canon_sym_gr_of_its_rank:
+  ∀ (n : nat) (l : list nat),
+    is_permut_list l → length l = n → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l
+nth_rank_of_permut_in_sym_gr
+     : ∀ (sg : list (list nat)) (l : list nat) (n : nat),
+         is_sym_gr_list n sg → is_permut_list l → length l = n → nth (rank_of_permut_in_sym_gr sg l) sg [] = l
+...
   rewrite (nth_rank_of_permut_in_sym_gr Hsg); cycle 1. {
     apply canon_sym_gr_list_is_permut_list.
     specialize (fact_neq_0 n) as H.
@@ -4364,7 +4390,7 @@ destruct Hsg as (H
   Hq : q < n
   Hsm : is_square_matrix n M = true
   f := λ k : nat, list_swap_elem 0 (canon_sym_gr_list n k) p q : nat → list nat
-  g := λ k : nat, rank_of_permut_in_canon_sym_gr_list n (f k) : nat → nat
+  g := λ k : nat, canon_sym_gr_list_inv n (f k) : nat → nat
   ============================
   Permutation (map g (seq 0 n!)) (seq 0 n!)
 ...
@@ -4379,8 +4405,8 @@ rngl_summation_list_permut:
   ∀ (T : Type) (ro : ring_like_op T),
     ring_like_prop T
     → ∀ (A : Type) (l1 l2 : list A) (f : A → T), Permutation l1 l2 → ∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i
-(λ k, rank_of_permut_in_canon_sym_gr_list n (nth k sg [])) (?h i) = i
-rank_of_permut_in_canon_sym_gr_list n (nth (?h i) sg [])) = i
+(λ k, canon_sym_gr_list_inv n (nth k sg [])) (?h i) = i
+canon_sym_gr_list_inv n (nth (?h i) sg [])) = i
 h = λ i, inv g (canon_sym_gr_list n i)
 nth (inv g (canon_sym_gr_list n i)) sg [] = canon_sym_gr_list n i
 nth (inv g l) sg [] = l
@@ -4395,25 +4421,25 @@ nth_rank_of_permut_in_sym_gr:
     is_sym_gr_list n sg → is_permut_list l → length l = n → nth (rank_of_permut_in_sym_gr sg l) sg [] = l
 erewrite rngl_summation_change_var.
 ...
-erewrite rngl_summation_change_var with (g := rank_of_permut_in_canon_sym_gr_list n ° (λ k, nth k sg [])).
+erewrite rngl_summation_change_var with (g := canon_sym_gr_list_inv n ° (λ k, nth k sg [])).
 erewrite rngl_summation_change_var.
 Print canon_sym_gr_list.
 Search (_ (canon_sym_gr_list _ _)).
 ...
 canon_sym_gr_list n (?g i) = nth i sg [])
 ?g i = inv_can (nth i sg [])
-g = rank_of_permut_in_canon_sym_gr_list n
+g = canon_sym_gr_list_inv n
 inv_can (can ...) = id
 ...
 rank_of_canon_permut_of_canon_rank:
-  ∀ n k : nat, k < n! → rank_of_permut_in_canon_sym_gr_list n (canon_sym_gr_list n k) = k
+  ∀ n k : nat, k < n! → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k
 Search canon_sym_gr_list.
-Check rank_of_permut_in_canon_sym_gr_list.
+Check canon_sym_gr_list_inv.
 ...
-g = rank_of_permut_in_canon_sym_gr_list n ...
+g = canon_sym_gr_list_inv n ...
 permut_in_canon_sym_gr_of_its_rank:
   ∀ (n : nat) (l : list nat),
-    is_permut_list l → length l = n → canon_sym_gr_list n (rank_of_permut_in_canon_sym_gr_list n l) = l
+    is_permut_list l → length l = n → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l
 canon_sym_gr_sym_gr_inv:
   ∀ n k i : nat, k < n! → i < n → ff_app (canon_sym_gr_list n k) (ff_app (canon_sym_gr_inv_list n k) i) = i
 canon_sym_gr_inv_sym_gr:
@@ -4423,7 +4449,7 @@ g = inverse_canon ° σ
 h = σ⁻¹ ° canon
 ...
 rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
-set (g := λ k, rank_of_permut_in_canon_sym_gr_list n (f k)).
+set (g := λ k, canon_sym_gr_list_inv n (f k)).
 ...
 remember (canon_sym_gr_list_list n) as σ' eqn:Hσ'.
 specialize rngl_summation_change_var as H1.
