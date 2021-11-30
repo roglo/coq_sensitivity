@@ -4426,6 +4426,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+...
   ============================
   determinant n M =
   ∑ (i ∈ canon_sym_gr_list_list n),
@@ -4442,6 +4443,7 @@ cbn.
   ∑ (i ∈ canon_sym_gr_list_list n),
   ε n (i ° σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
 *)
+(* ça voudrait dire que ε σ = ε (inv σ) ? *)
 ...
   rewrite <- signature_comp.
 Check rngl_product_seq_permut.
