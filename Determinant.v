@@ -4413,6 +4413,8 @@ erewrite rngl_summation_eq_compat. 2: {
   replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
   rewrite rngl_mul_1_r.
   rewrite rngl_mul_comm; [ | easy ].
+Inspect 1.
+...
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     replace (canon_sym_gr_list n i) with (ν (ff_app σ j)). 2: {
