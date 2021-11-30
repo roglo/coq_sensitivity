@@ -4400,12 +4400,33 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now apply permut_list_inv_is_permut.
 }
 cbn - [ "°" ].
-...
+unfold canon_sym_gr_list_list.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
-(*1*)
+set (ν := λ i, canon_sym_gr_list n i ° permut_list_inv σ).
+(*
 set (ν := λ i, vect_el (mk_canon_sym_gr n) i ° permut_inv σ).
+*)
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_comm; [ | easy ].
+  replace (canon_sym_gr_list n i ° permut_list_inv σ) with (ν i) by easy.
+(*
+  unfold "°".
+  unfold comp.
+*)
+  easy.
+}
+cbn - [ ν ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+...
+  now rewrite rngl_product_fun_permut with
+    (f := λ j, mat_el M j (vect_el (ν i) j)).
+}
+cbn - [ ν ].
+assert (Hν : is_sym_gr (mk_vect n! ν)). {
 ...
 (*
 Theorem det_any_permut :
