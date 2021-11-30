@@ -4384,7 +4384,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite <- Hiμ.
     apply length_canon_sym_gr_list.
   }
-  subst ν.
+  clear Hν.
+Check rngl_product_seq_permut.
+...
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut n μ). {
     apply in_map_iff in Hμ.
@@ -4405,15 +4407,47 @@ rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 set (ν := λ i, canon_sym_gr_list n i ° permut_list_inv σ).
+set (sg := map ν (seq 0 n!)).
+assert (Hisg : ∀ i, i < n! → nth i sg [] = ν i). {
+  intros * Hi.
+  unfold sg.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
+}
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_comm; [ | easy ].
-  fold (ν i).
   rewrite <- rngl_mul_assoc.
   replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
   rewrite rngl_mul_1_r.
   rewrite rngl_mul_comm; [ | easy ].
+  fold (ν i).
+  specialize (fact_neq_0 n) as H.
+  rewrite <- Hisg; [ | flia Hi H ].
+Check rngl_product_seq_permut.
+...
+  set (f := λ k i, mat_el M i (ff_app (nth k sg []) i)).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+Check rngl_product_seq_permut.
 Inspect 1.
+    replace (mat_el M _ _) with (mat_el M j (ff_app
+    replace (...
+    replace (canon_sym_gr_list n i) with (nth i sg []). 2: {
+      unfold sg.
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi H ].
+      rewrite seq_nth; [ | flia Hi H ].
+      unfold ν.
+Inspect 1.
+...
+ff_app (canon_sym_gr_list n i) k) =
+f_app (nth k sg []) (i - 1))
+f
+...
+Inspect 1.
+sg = map v (seq 0 n!)
+...
+sg t.q. nth i sg [] = ν i
 ...
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
