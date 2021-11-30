@@ -4368,6 +4368,7 @@ Theorem det_any_permut :
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+(*
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   remember (μ ° permut_list_inv σ) as ν eqn:Hν.
@@ -4384,9 +4385,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite <- Hiμ.
     apply length_canon_sym_gr_list.
   }
-  clear Hν.
-Check rngl_product_seq_permut.
-...
+  subst ν.
   rewrite <- Hσν at 1.
   assert (Hpμ : is_permut n μ). {
     apply in_map_iff in Hμ.
@@ -4395,11 +4394,103 @@ Check rngl_product_seq_permut.
     rewrite <- Hiμ.
     now apply canon_sym_gr_list_is_permut.
   }
-  rewrite signature_comp; try easy.
-  apply comp_is_permut; [ easy | ].
-  destruct Hσ.
-  split; [ | now rewrite length_permut_list_inv ].
-  now apply permut_list_inv_is_permut.
+  replace (ε n ((μ ° permut_list_inv σ) ° σ)) with
+      (ε n (μ ° permut_list_inv σ) * ε n σ)%F. 2: {
+    destruct Hσ.
+    rewrite <- signature_comp; try easy.
+    apply comp_is_permut; [ easy | ].
+    split; [ now apply permut_list_inv_is_permut | ].
+    now rewrite length_permut_list_inv.
+  }
+  rewrite <- (rngl_mul_assoc _ (ε n σ) (ε n σ)).
+  replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite rngl_mul_1_r.
+  easy.
+}
+cbn.
+  ============================
+  determinant n M =
+  ∑ (i ∈ canon_sym_gr_list_list n),
+  ε n (i ° permut_list_inv σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
+*)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros μ Hμ.
+  replace (ε n μ * ε n σ)%F with (ε n (μ ° σ)). 2: {
+    rewrite <- signature_comp; try easy.
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    apply in_seq in Hi.
+    rewrite <- Hiμ.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  easy.
+}
+cbn.
+  ============================
+  determinant n M =
+  ∑ (i ∈ canon_sym_gr_list_list n),
+  ε n (i ° σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
+...
+(* ça me troue le cul, ça : les deux méthodes semblent donner
+   des résultats contraires :
+  ============================
+  determinant n M =
+  ∑ (i ∈ canon_sym_gr_list_list n),
+  ε n (i ° permut_list_inv σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
+  ============================
+  determinant n M =
+  ∑ (i ∈ canon_sym_gr_list_list n),
+  ε n (i ° σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
+*)
+...
+  rewrite <- signature_comp.
+Check rngl_product_seq_permut.
+Inspect 1.
+...
+nth k sg [] ° permut_list_inv σ = μ
+μ ° σ = nth k sg []
+ε n (μ ° σ) = ε n (nth k sg [])
+ε n μ * ε n σ = ε n (nth k sg [])
+...
+ε n μ * ε n σ * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k)
+ε n (nth k sg []) * ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1))
+...
+  remember (μ ° permut_list_inv σ) as ν eqn:Hν.
+  assert (Hσν : ν ° σ = μ). {
+    rewrite Hν.
+    assert (H : length (permut_list_inv σ) = n). {
+      rewrite length_permut_list_inv; apply Hσ.
+    }
+    rewrite <- (permut_comp_assoc _ _ H Hσ); clear H.
+    rewrite (@comp_permut_inv_permut n); [ | easy ].
+    apply comp_id_r.
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    rewrite <- Hiμ.
+    apply length_canon_sym_gr_list.
+  }
+...
+  subst ν.
+  assert (Hpμ : is_permut n μ). {
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    apply in_seq in Hi.
+    rewrite <- Hiμ.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  rewrite signature_comp; try easy. 2: {
+    rewrite Hν.
+    apply comp_is_permut; [ easy | ].
+    destruct Hσ.
+    split; [ now apply permut_list_inv_is_permut | ].
+    now rewrite length_permut_list_inv.
+  }
+  rewrite <- (rngl_mul_assoc (ε n ν)).
+  replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite rngl_mul_1_r.
+...
+Check rngl_product_seq_permut.
+Inspect 1.
 }
 cbn - [ "°" ].
 unfold canon_sym_gr_list_list.
