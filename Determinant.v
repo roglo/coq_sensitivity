@@ -4405,23 +4405,39 @@ rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 set (ν := λ i, canon_sym_gr_list n i ° permut_list_inv σ).
-(*
-set (ν := λ i, vect_el (mk_canon_sym_gr n) i ° permut_inv σ).
-*)
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_comm; [ | easy ].
-  replace (canon_sym_gr_list n i ° permut_list_inv σ) with (ν i) by easy.
-(*
-  unfold "°".
-  unfold comp.
-*)
+  fold (ν i).
+  rewrite <- rngl_mul_assoc.
+  replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite rngl_mul_1_r.
+  rewrite rngl_mul_comm; [ | easy ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (canon_sym_gr_list n i) with (ν (ff_app σ j)). 2: {
+      unfold ν.
+Print comp_list.
+Search (canon_sym_gr_list _ _ ° _).
+...
   easy.
 }
 cbn - [ ν ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
+Check rngl_product_seq_permut.
 ...
+  rewrite rngl_product_seq_permut with
+    (f := λ j, mat_el M j (ff_app (ν i) j)).
+...
+Theorem rngl_product_fun_permut :
+  rngl_is_comm = true →
+  ∀ n (σ : vector nat) (f : nat → T),
+  n ≠ 0
+  → is_permut_vect n σ
+  → ∏ (i = 0, n - 1), f (vect_el 0%nat σ i) = ∏ (i = 0, n - 1), f i.
+...
+Check rngl_product_fun_permut.
   now rewrite rngl_product_fun_permut with
     (f := λ j, mat_el M j (vect_el (ν i) j)).
 }
