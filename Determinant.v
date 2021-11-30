@@ -4444,6 +4444,9 @@ cbn.
   ε n (i ° σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
 *)
 (* ça voudrait dire que ε σ = ε (inv σ) ? *)
+(* ah bin oui :
+     ε (σ) = ε (σ ° id) = ε (σ ° (σ ° σ⁻¹)) = ε ((σ ° σ) ° σ⁻¹) =
+             ε (σ ° σ) ε (σ⁻¹) = 1 ε (σ⁻¹) = ε (σ⁻¹) *)
 ...
   rewrite <- signature_comp.
 Check rngl_product_seq_permut.
