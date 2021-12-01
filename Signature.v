@@ -461,8 +461,7 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  is_permut_list σ
-  → length σ = n
+  is_permut n σ
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → ∀ i j, i < n → j < n →
@@ -471,7 +470,7 @@ Theorem permut_swap_mul_cancel : ∀ n σ f,
      ((if ff_app σ j <? ff_app σ i then f j i else 1) /
       (if j <? i then f j i else 1)))%F = 1%F.
 Proof.
-intros * Hic Hin H10 Hp Hn Hfij Hfijnz * Hlin Hljn.
+intros * Hic Hin H10 (Hp, Hn) Hfij Hfijnz * Hlin Hljn.
 do 4 rewrite if_ltb_lt_dec.
 destruct (lt_dec (ff_app σ i) (ff_app σ j)) as [H1| H1]. {
   destruct (lt_dec (ff_app σ j) (ff_app σ i)) as [H| H]; [ flia H1 H | ].
@@ -542,8 +541,7 @@ Theorem product_product_if_permut_div :
   rngl_has_1_neq_0 = true →
   rngl_has_inv = true →
   ∀ n σ f,
-  is_permut_list σ
-  → length σ = n
+  is_permut n σ
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n),
@@ -551,7 +549,7 @@ Theorem product_product_if_permut_div :
        (if i <? j then f i j else 1)))%F =
      1%F.
 Proof.
-intros Hic H10 Hin * Hp Hn Hfij Hfijnz.
+intros Hic H10 Hin * (Hp, Hn) Hfij Hfijnz.
 rewrite rngl_product_product_by_swap; [ | easy ].
 rewrite all_1_rngl_product_list_1; [ | easy | ]. 2: {
   intros i Hi.
@@ -578,8 +576,7 @@ Theorem product_product_if_permut :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   ∀ n σ f,
-  is_permut_list σ
-  → length σ = n
+  is_permut n σ
   → (∀ i j, f i j = f j i)
   → (∀ i j, i < n → j < n → i ≠ j → f i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
@@ -587,7 +584,7 @@ Theorem product_product_if_permut :
     (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
         if i <? j then f i j else 1))%F.
 Proof.
-intros Hom Hic Hid Hin H10 Hed * Hp Hn Hfij Hfijnz.
+intros Hom Hic Hid Hin H10 Hed * (Hp, Hn) Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
   intros i j Hi Hj.
   rewrite if_ltb_lt_dec.
@@ -606,11 +603,10 @@ Theorem ε_ws_ε :
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
   ∀ n (p : list nat),
-  is_permut_list p
-  → length p = n
+  is_permut n p
   → ε n p = ε_ws n p.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hp Hpn.
+intros Hic Hop Hin H10 Hit Hde Hch * (Hp, Hpn).
 unfold ε, ε_ws, δ.
 do 3 rewrite rngl_product_product_if.
 rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
@@ -824,8 +820,6 @@ rewrite product_product_if_permut; try easy; cycle 1. {
 } {
   now apply permut_list_inv_is_permut.
 } {
-  now rewrite length_permut_list_inv.
-} {
   intros.
   unfold abs_diff.
   do 2 rewrite if_ltb_lt_dec.
@@ -881,11 +875,10 @@ Qed.
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
   → q < n
-  → is_permut_list σ
-  → length σ = n
+  → is_permut n σ
   → is_permut_list (list_swap p q σ).
 Proof.
-intros * Hp Hq Hσ Hn.
+intros * Hp Hq (Hσ, Hn).
 unfold list_swap.
 rewrite <- Hn in Hp, Hq.
 split. {
@@ -939,14 +932,13 @@ split. {
 Qed.
 
 Theorem permut_list_swap_is_permut_list : ∀ p q n l,
-  n = length l
-  → p < n
+  p < n
   → q < n
-  → is_permut_list l
+  → is_permut n l
   → is_permut_list (list_swap p q l).
 Proof.
-intros * Hn Hp Hq Hpl.
-rewrite Hn in Hp, Hq.
+intros * Hp Hq (Hpl, Hn).
+rewrite <- Hn in Hp, Hq.
 split. {
   intros j Hj.
   unfold list_swap in Hj |-*.
@@ -1087,7 +1079,8 @@ Theorem transposition_signature_lt :
   → ε n (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
-rewrite ε_ws_ε; try easy; [ | | now rewrite map_length, seq_length ]. 2: {
+rewrite ε_ws_ε; try easy. 2: {
+  split; [ | now rewrite map_length, seq_length ].
   split; cbn. {
     intros x Hx.
     rewrite map_length, seq_length.
@@ -1301,8 +1294,7 @@ Theorem signature_comp_fun_expand_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_list g
-  → length g = n
+  is_permut n g
   → (∏ (i = 1, n),
         (∏ (j = 1, n),
          δ i j (ff_app f (ff_app g (i - 1)))
@@ -1315,7 +1307,7 @@ Theorem signature_comp_fun_expand_1 :
       ∏ (i = 1, n), (∏ (j = 1, n), δ i j i j))%F
   → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
-intros Hop Hin H10 Hit Hch * Hp2 Hn Hs.
+intros Hop Hin H10 Hit Hch * (Hp2, Hn) Hs.
 unfold ε, comp_list; cbn.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -1353,8 +1345,7 @@ Theorem signature_comp_fun_expand_2_1 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_list g
-  → length g = n
+  is_permut n g
   → (∏ (i = 1, n),
       (∏ (j = 1, n),
        δ i j (ff_app f (ff_app g (i - 1)))
@@ -1369,7 +1360,7 @@ Theorem signature_comp_fun_expand_2_1 :
          (rngl_of_nat (ff_app g (j - 1)) - rngl_of_nat (ff_app g (i - 1)))
        else 1)))%F.
 Proof.
-intros Hop Hin Hic H10 Hit Hch * Hp2 Hn.
+intros Hop Hin Hic H10 Hit Hch * (Hp2, Hn).
 unfold rngl_div; rewrite Hin.
 rewrite rngl_inv_product_comm; [ | | easy | easy | easy | easy | ]; cycle 1. {
   now left.
@@ -1503,10 +1494,8 @@ Theorem signature_comp_fun_changement_of_variable :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f g,
-  is_permut_list f
-  → is_permut_list g
-  → length f = n
-  → length g = n
+  is_permut n f
+  → is_permut n g
   → (∏ (i = 1, n),
      (∏ (j = 1, n),
       (if i <? j then
@@ -1521,7 +1510,7 @@ Theorem signature_comp_fun_changement_of_variable :
          rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hp1 Hp2 Hn1 Hn2.
+intros Hop Hin Hic Hde H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
 rewrite rngl_product_shift; [ | flia Hnz ].
 erewrite rngl_product_eq_compat. 2: {
@@ -1625,8 +1614,6 @@ rewrite product_product_if_permut; try easy. {
   now left.
 } {
   now apply permut_list_inv_is_permut.
-} {
-  now rewrite length_permut_list_inv.
 } {
   intros i j.
   destruct (Nat.eq_dec i j) as [Hij| Hij]; [ now subst j | ].
@@ -1856,11 +1843,7 @@ Theorem ε_of_sym_gr_permut_succ :
     (minus_one_pow (k / n!) * ε n (canon_sym_gr_list n (k mod n!)))%F.
 Proof.
 intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
-rewrite ε_ws_ε; try easy; cycle 1. {
-  now apply canon_sym_gr_list_is_permut.
-} {
-  apply length_canon_sym_gr_list.
-}
+rewrite ε_ws_ε; try easy; [ | now apply canon_sym_gr_list_is_permut ].
 unfold ε_ws.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold ε.
@@ -2025,11 +2008,7 @@ f_equal. {
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
-rewrite ε_ws_ε; try easy; cycle 1. {
-  now apply canon_sym_gr_list_is_permut.
-} {
-  apply length_canon_sym_gr_list.
-}
+rewrite ε_ws_ε; try easy; [ | now apply canon_sym_gr_list_is_permut ].
 unfold ε_ws.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -2185,44 +2164,54 @@ split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
+Theorem comp_is_permut_list : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut_list (σ₁ ° σ₂).
+Proof.
+intros * (Hp11, Hp12) (Hp21, Hp22).
+split. {
+  intros i Hi.
+  unfold comp_list in Hi |-*.
+  rewrite map_length.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj).
+  subst i.
+  rewrite Hp22, <- Hp12.
+  apply permut_list_ub; [ easy | ].
+  apply Hp21 in Hj.
+  congruence.
+} {
+  unfold comp_list.
+  rewrite map_length.
+  intros i j Hi Hj.
+  unfold ff_app.
+  rewrite (List_map_nth' 0); [ | easy ].
+  rewrite (List_map_nth' 0); [ | easy ].
+  intros Hij.
+  apply Hp11 in Hij; cycle 1. {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  } {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  }
+  now apply Hp21 in Hij.
+}
+Qed.
+
+Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list_scope.
+
 Theorem comp_is_permut : ∀ n σ₁ σ₂,
   is_permut n σ₁
   → is_permut n σ₂
   → is_permut n (σ₁ ° σ₂).
 Proof.
-intros * (Hp11, Hp12) (Hp21, Hp22).
-split. {
-  split. {
-    intros i Hi.
-    unfold comp_list in Hi |-*.
-    rewrite map_length.
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj).
-    subst i.
-    rewrite Hp22, <- Hp12.
-    apply permut_list_ub; [ easy | ].
-    apply Hp21 in Hj.
-    congruence.
-  } {
-    unfold comp_list.
-    rewrite map_length.
-    intros i j Hi Hj.
-    unfold ff_app.
-    rewrite (List_map_nth' 0); [ | easy ].
-    rewrite (List_map_nth' 0); [ | easy ].
-    intros Hij.
-    apply Hp11 in Hij; cycle 1. {
-      rewrite Hp12, <- Hp22.
-      now apply Hp21, nth_In.
-    } {
-      rewrite Hp12, <- Hp22.
-      now apply Hp21, nth_In.
-    }
-    now apply Hp21 in Hij.
-  }
-}
+intros * Hp1 Hp2.
+split; [ now apply (comp_is_permut_list n) | ].
 unfold "°".
-now rewrite map_length.
+rewrite map_length.
+now destruct Hp2.
 Qed.
 
 Theorem iter_comp_is_permut : ∀ n l,
@@ -2266,7 +2255,7 @@ Theorem ε_1_opp_1 :
   ∀ n σ, is_permut n σ → ε n σ = 1%F ∨ ε n σ = (-1)%F.
 Proof.
 intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
-rewrite ε_ws_ε; try easy; [ | apply Hσ | apply Hσ ].
+rewrite ε_ws_ε; try easy.
 unfold ε_ws.
 apply rngl_product_1_opp_1; [ easy | ].
 intros i Hi.
@@ -2313,6 +2302,7 @@ Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ (n k)%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%list.
+Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [f g].

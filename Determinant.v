@@ -4515,13 +4515,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-Check rngl_product_seq_permut.
-Inspect 3.
 set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
-(*
-rewrite det_is_det_by_canon_permut.
-unfold determinant'.
-*)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -4555,6 +4549,34 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 apply det_by_any_sym_gr; try easy.
+unfold sg.
+split. {
+  rewrite map_length, seq_length.
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  split. {
+    unfold "°"; cbn.
+    rewrite map_length.
+    rewrite length_permut_list_inv.
+    now destruct Hσ.
+  } {
+    apply (comp_is_permut_list n). {
+      now apply canon_sym_gr_list_is_permut.
+    } {
+Search (is_permut_list (permut_list_inv _)).
+About permut_list_inv_is_permut.
+...
+Search (is_permut _ (permut_list_inv _)).
+      apply permut_list_inv_is_permut.
+...
+Search (is_permut _ (_ ° _)).
+    apply comp_is_permut.
+Search (length (_ ° _)).
+  rewrite length_canon_sym_gr_list.
+  split.
+{
 ...
 nth k sg [] = canon_sym_gr_list n k ° permut_list_inv σ
 nth k sg [] = canon_sym_gr_list n k) (ff_app (permut_list_inv σ
