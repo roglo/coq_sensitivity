@@ -4580,19 +4580,77 @@ split. {
   destruct Hl as (Hl1, Hl2).
   destruct Hσ as (Hσ1, Hσ2).
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    split; [ | now rewrite map_length ].
     split. {
-      split. {
-        intros i Hi; apply in_map_iff in Hi.
-        destruct Hi as (j & Hji & Hj).
-        rewrite map_length.
-        rewrite <- Hji.
-        rewrite Hl2, <- Hσ2.
-        apply permut_list_ub; [ easy | ].
-        rewrite Hσ2, <- Hl2.
-        now apply Hl1.
+      intros i Hi; apply in_map_iff in Hi.
+      destruct Hi as (j & Hji & Hj).
+      rewrite map_length.
+      rewrite <- Hji.
+      rewrite Hl2, <- Hσ2.
+      apply permut_list_ub; [ easy | ].
+      rewrite Hσ2, <- Hl2.
+      now apply Hl1.
+    } {
+      rewrite map_length.
+      intros i j Hi Hj Hij.
+      apply NoDup_nth in Hij; [ easy | | | ]; cycle 1. {
+        now rewrite map_length.
       } {
-        rewrite map_length.
-        intros i j Hi Hj Hij.
+        now rewrite map_length.
+      }
+      apply (NoDup_map_iff 0).
+      intros u v Hu Hv Huv.
+      apply Hσ1 in Huv; cycle 1. {
+        rewrite Hσ2, <- Hl2.
+        now apply Hl1, nth_In.
+      } {
+        rewrite Hσ2, <- Hl2.
+        now apply Hl1, nth_In.
+      }
+      now apply Hl1 in Huv.
+    }
+  }
+  split. {
+...
+    unfold "°".
+    unfold ff_app.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite Hl2, <- Hσ2.
+        now apply in_permut_list_inv_lt.
+      }
+      easy.
+    }
+    unfold permut_list_inv.
+    rewrite map_map.
+    rewrite (List_map_nth_seq l n) at 1.
+    rewrite Hl2, <- Hσ2.
+    apply map_ext_in.
+    intros i Hi.
+    unfold unsome.
+    remember (List_find_nth _ _) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxσ & Hbefx & Hx).
+      apply Nat.eqb_eq in Hx.
+      rewrite Hx.
+...
+    erewrite map_ext_in.
+Search (_ ∈ permut_list_inv _).
+Search permut_list_inv.
+rewrite permut_permut_inv.
+...appl
+
+}
+...
+          apply NoDup_map_iff.
+...
+          apply FinFun.Injective_map_NoDup. {
+            intros u v Huv.
+            apply Hσ1 in Huv.
+apply nth_canon_sym
 ...
     rewrite (List_map_nth_seq l) with (d := 0).
     rewrite map_map.
