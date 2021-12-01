@@ -4351,6 +4351,61 @@ split. {
 }
 Qed.
 
+Theorem map_permut_seq_is_permut : ∀ n σ,
+  is_permut n σ
+  → is_permut n (map (ff_app σ) (seq 0 n)).
+Proof.
+intros * Hσ.
+split; [ | now rewrite map_length, seq_length ].
+split. {
+  intros i Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj).
+  apply in_seq in Hj.
+  rewrite map_length, seq_length.
+  rewrite <- Hji.
+  destruct Hσ as (H1, H2).
+  rewrite <- H2 in Hj |-*.
+  now apply permut_list_ub.
+} {
+  rewrite map_length, seq_length.
+  intros i j Hi Hj Hij.
+  apply NoDup_nth in Hij; [ easy | | | ]; cycle 1. {
+    now rewrite map_length, seq_length.
+  } {
+    now rewrite map_length, seq_length.
+  }
+  apply (NoDup_map_iff 0).
+  rewrite seq_length.
+  intros u v Hu Hv Huv.
+  rewrite seq_nth in Huv; [ | easy ].
+  rewrite seq_nth in Huv; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Huv.
+  apply Hσ; [ destruct Hσ; congruence | destruct Hσ; congruence | easy ].
+}
+Qed.
+
+Theorem rngl_product_map_permut :
+  rngl_is_comm = true →
+   ∀ n f σ,
+  is_permut n σ
+  → ∏ (i ∈ map (ff_app σ) (seq 0 n)), f i = ∏ (i = 1, n), f (i - 1)%nat.
+Proof.
+intros Hic * Hσ.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
+  apply permut_list_Permutation.
+  now apply map_permut_seq_is_permut.
+}
+unfold iter_seq.
+rewrite Nat_sub_succ_1.
+rewrite <- seq_shift.
+replace n with (S (n - 1) - 0) by flia Hnz.
+rewrite <- rngl_product_change_var; [ easy | ].
+intros i Hi.
+now rewrite Nat.sub_succ, Nat.sub_0_r.
+Qed.
+
 Theorem det_any_permut :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4430,8 +4485,47 @@ unfold canon_sym_gr_list_list.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv σ)) (h := ff_app σ). 2: {
+    intros j (_, Hj).
+    apply (@permut_inv_permut n); [ easy | ].
+    flia Hj Hnz.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    apply in_map_iff in Hj.
+    destruct Hj as (k & Hkj & Hk).
+    apply in_seq in Hk.
+    rewrite (@permut_permut_inv n); [ | easy | ]. 2: {
+      rewrite <- Hkj.
+      destruct Hσ as (H1, H2).
+      rewrite <- H2 in Hk |-*.
+      now apply permut_list_ub.
+    }
+    easy.
+  }
+  cbn.
+  rewrite rngl_product_map_permut; [ | easy | easy ].
+  easy.
+}
+cbn.
+Check rngl_product_seq_permut.
+Inspect 3.
+...
+remember (seq 0 n) as s eqn:Hs.
+replace n with (S (n - 1) - 0) in Hs by flia Hnz.
+subst s.
+Search (∏ (_ ∈ map _ _), _).
+Check rngl_product_change_var.
+erewrite <- rngl_product_change_var.
 Check rngl_product_seq_permut.
 Inspect 1.
+About rngl_product_change_var.
 ...
   ============================
   determinant n M =

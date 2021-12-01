@@ -2313,7 +2313,8 @@ Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ _ _ _ _ _ _ (n k)%nat.
 Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat p%list.
-Arguments rngl_product_change_list {T}%type {ro rp} _ [A]%type [la lb]%list.
+Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
+Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [f g].
 Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
