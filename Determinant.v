@@ -4576,6 +4576,11 @@ split. {
 } {
   intros l Hl.
   apply in_map_iff.
+...
+  exists (canon_sym_gr_list_inv n l).
+...
+  exists (ff_app σ (canon_sym_gr_list_inv n l)).
+...
   exists (canon_sym_gr_list_inv n (map (ff_app σ) l)).
   destruct Hl as (Hl1, Hl2).
   destruct Hσ as (Hσ1, Hσ2).
@@ -4611,7 +4616,6 @@ split. {
     }
   }
   split. {
-...
     unfold "°".
     unfold ff_app.
     erewrite map_ext_in. 2: {
