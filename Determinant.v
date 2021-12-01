@@ -4542,6 +4542,45 @@ split. {
 split. {
   rewrite map_length, seq_length.
   intros i j Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  unfold "°" in Hij.
+  specialize (ext_in_map Hij) as H1.
+  apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
+  intros k Hk.
+  apply H1.
+(* lemme à faire ? *)
+  unfold permut_list_inv.
+  apply in_map_iff.
+  exists (ff_app σ k).
+(*
+  exists (ff_app (permut_list_inv σ) k).
+*)
+  split. {
+    unfold unsome.
+    remember (List_find_nth _ _) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxl & Hbefx & Hx).
+      apply Nat.eqb_eq in Hx.
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite <- Hσ2 in Hk.
+      now apply Hσ1.
+    } {
+      specialize (List_find_nth_None 0 _ _ Hx) as H2.
+...
+      specialize (pigeonhole_list n (i :: f)) as H2.
+...
+Check nth_canon_sym_gr_list_inj2.
+...
+  apply nth_canon_sym_gr_list_inj2 with (n := n).
+  apply nth_canon_sym_gr_list_inj2 with (n := n) (k := i).
+Search (ff_app (canon_sym_gr_list _ _) _ = _).
+
 ...
 Search (is_permut_list (permut_list_inv _)).
 About permut_list_inv_is_permut.

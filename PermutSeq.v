@@ -1687,4 +1687,5 @@ split. {
 }
 Qed.
 
+Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
 Arguments permut_list_inv_is_permut n%nat [l]%list.
