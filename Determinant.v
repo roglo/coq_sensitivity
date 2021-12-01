@@ -3398,7 +3398,7 @@ do 2 rewrite <- determinant_succ.
 subst M'.
 rewrite <- rngl_opp_involutive; [ | easy ].
 f_equal.
-apply determinant_alternating; try easy; [ flia Hiz | flia ].
+apply determinant_alternating; try easy; flia Hiz.
 Qed.
 
 Theorem rngl_product_seq_permut :

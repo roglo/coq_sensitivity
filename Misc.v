@@ -3676,3 +3676,5 @@ Arguments iter_list {A B}%type l%list f%function : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
 Global Hint Resolve Nat.le_0_l : core.
+Global Hint Resolve Nat.lt_0_succ : core.
+Global Hint Resolve Nat.lt_succ_diag_r : core.

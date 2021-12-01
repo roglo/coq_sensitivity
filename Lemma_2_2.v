@@ -207,7 +207,7 @@ destruct llb as [| lb]. {
   destruct Hla as [Hla| Hla]. {
     subst lc; cbn.
     exists 0.
-    split; [ flia | ].
+    split; [ easy | ].
     symmetry; apply app_nil_r.
   } {
     cbn.
@@ -223,7 +223,7 @@ cbn in Hla.
 destruct Hla as [Hla| Hla]. {
   exists 0.
   subst lc; cbn.
-  split; [ flia | easy ].
+  split; [ easy | easy ].
 }
 specialize (IHlla _ Hla).
 destruct IHlla as (n & Hn & Hc).
@@ -346,7 +346,7 @@ destruct (le_dec (2 ^ n) j) as [H1| H1]. {
   rewrite Nat.sub_add; [ | easy ].
   cbn in Hj; rewrite Nat.add_0_r in Hj.
   apply (le_lt_trans _ (2 ^ n + 2 ^ n - 1)); [ easy | ].
-  apply Nat.sub_lt; [ | flia ].
+  apply Nat.sub_lt; [ | easy ].
   apply Nat.neq_0_lt_0.
   intros H.
   apply Nat.eq_add_0 in H.
@@ -364,7 +364,7 @@ Theorem le_pow_sub_1_lt : ∀ n j, j ≤ 2 ^ n - 1 → j < 2 ^ n.
 Proof.
 intros n j Hj.
 apply (le_lt_trans _ (2 ^ n - 1)); [ easy | ].
-apply Nat.sub_lt; [ | flia ].
+apply Nat.sub_lt; [ | easy ].
 apply Nat.neq_0_lt_0.
 now apply Nat.pow_nonzero.
 Qed.
@@ -401,7 +401,7 @@ induction n; intros. {
   rewrite rngl_mul_0_l; [ easy | now left ].
 }
 rewrite (rngl_summation_split (2 ^ n - 1)). 2: {
-  split; [ flia | ].
+  split; [ easy | ].
   apply -> Nat.succ_le_mono.
   apply Nat.sub_le_mono_r.
   apply Nat.pow_le_mono_r; [ easy | flia ].
@@ -681,7 +681,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     cbn.
     rewrite fold_rngl_sub; [ | easy ].
     rewrite (rngl_summation_split3 (k - 2 ^ n)). 2: {
-      split; [ flia | ].
+      split; [ easy | ].
       apply (Nat.add_le_mono_r _ _ (2 ^ n)).
       rewrite Nat.sub_add; [ | easy ].
       cbn in Hk; rewrite Nat.add_0_r in Hk.
@@ -701,7 +701,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     rewrite rngl_add_0_r.
     rewrite (rngl_summation_split3 i). 2: {
-      split; [ flia | flia Hin ].
+      split; [ easy | flia Hin ].
     }
     rewrite δ_diag, rngl_mul_1_l.
     rewrite all_0_rngl_summation_0. 2: {
@@ -826,7 +826,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     cbn.
     rewrite (rngl_summation_split3 (i - 2 ^ n)). 2: {
-      split; [ flia | ].
+      split; [ easy | ].
       cbn in Hi; flia Hi.
     }
     rewrite app_nth1. 2: {
@@ -1011,7 +1011,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     }
     cbn.
     rewrite (rngl_summation_split3 (k - 2 ^ n)). 2: {
-      split; [ flia | cbn in Hk; flia Hk ].
+      split; [ easy | cbn in Hk; flia Hk ].
     }
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.

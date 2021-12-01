@@ -905,7 +905,7 @@ apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el.
 rewrite rngl_summation_split3 with (j0 := i). 2: {
-  split; [ flia | ].
+  split; [ easy | ].
   apply Nat.succ_le_mono.
   apply in_seq in Hi.
   rewrite mI_ncols; flia Hi.
@@ -971,12 +971,12 @@ cbn - [ mat_el ].
 rewrite (HM lb (or_introl eq_refl)).
 (* rather use more modern rngl_summation_split3... *)
 rewrite rngl_summation_split with (j0 := j). 2: {
-  split; [ flia | ].
+  split; [ easy | ].
   apply -> Nat.succ_le_mono.
   apply in_seq in Hj.
   flia Hj.
 }
-rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk ].

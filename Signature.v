@@ -175,7 +175,7 @@ Theorem rngl_product_rngl_of_nat :
 Proof.
 intros Hom *.
 induction n. {
-  rewrite rngl_product_empty; [ | flia ].
+  rewrite rngl_product_empty; [ | easy ].
   symmetry; apply rngl_add_0_r.
 }
 rewrite rngl_product_split_last; [ | flia ].
@@ -1856,7 +1856,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now symmetry; apply rngl_inv_1.
 }
 rewrite rngl_product_succ_succ.
-rewrite rngl_product_split_first; [ | flia ].
+rewrite rngl_product_split_first; [ | easy ].
 rewrite Nat.sub_diag.
 f_equal. {
   rewrite rngl_product_shift; [ | flia ].
@@ -1868,7 +1868,7 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" canon_sym_gr_list ].
-  rewrite rngl_product_split_first; [ | flia ].
+  rewrite rngl_product_split_first; [ | easy ].
   replace (0 <? 0) with false by easy.
   rewrite rngl_mul_1_l.
   erewrite rngl_product_eq_compat. 2: {
@@ -1964,7 +1964,7 @@ f_equal. {
     now rewrite Nat.add_comm.
   }
   rewrite (rngl_product_split (x - 1)). 2: {
-    split; [ flia | ].
+    split; [ easy | ].
     apply -> Nat.succ_le_mono.
     enough (H : x < S n) by flia H Hnz.
     replace x with (ff_app σ 0) by now rewrite H1.
@@ -1998,7 +1998,7 @@ f_equal. {
     unfold iter_seq, iter_list; cbn.
     apply rngl_mul_1_l.
   }
-  rewrite rngl_product_split_last; [ | flia ].
+  rewrite rngl_product_split_last; [ | easy ].
   rewrite rngl_product_shift; [ | flia ].
   rewrite Nat_sub_succ_1.
   rewrite IHx.
@@ -2013,7 +2013,7 @@ unfold ε_ws.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_succ_succ.
-  rewrite rngl_product_split_first; [ | flia ].
+  rewrite rngl_product_split_first; [ | easy ].
   rewrite if_ltb_lt_dec.
   destruct (lt_dec (S i) 1) as [H| H]; [ flia H | clear H ].
   rewrite rngl_mul_1_l.
@@ -2144,7 +2144,7 @@ destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
   }
 } {
   apply Nat.nlt_ge in Hjkn.
-  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | flia ].
+  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | easy ].
   apply -> Nat.succ_lt_mono.
   destruct n. {
     now apply Nat.lt_1_r in Hjn; subst j.

@@ -771,7 +771,7 @@ destruct (lt_dec i (k / n!)) as [Hikn| Hikn]. {
   }
   apply IHn; [ easy | flia Hi Hin ].
 }
-destruct (lt_dec (k / n!) i) as [Hkni| Hkni]; [ | flia ].
+destruct (lt_dec (k / n!) i) as [Hkni| Hkni]; [ | easy ].
 apply -> Nat.succ_lt_mono.
 apply IHn; [ easy | flia Hi Hkni ].
 Qed.
@@ -1005,7 +1005,7 @@ Theorem rank_of_canon_permut_ub : ∀ n l,
 Proof.
 intros * ((Hvn, Hn), Hln).
 revert l Hvn Hn Hln.
-induction n; intros; cbn; [ flia | ].
+induction n; intros; cbn; [ easy | ].
 rewrite Nat.add_comm.
 apply Nat.add_lt_le_mono. {
   apply IHn. {
@@ -1455,7 +1455,7 @@ split. {
   rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy ].
   split; [ easy | ].
   apply in_seq.
-  split; [ flia | ].
+  split; [ easy | ].
   now apply rank_of_canon_permut_ub.
 }
 Qed.
@@ -1584,7 +1584,7 @@ remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
-  split; [ flia | ].
+  split; [ easy | ].
   rewrite <- length_permut_list_inv.
   apply permut_list_ub; [ | rewrite length_permut_list_inv, Hln; flia ].
   now apply permut_list_inv_is_permut_list.
@@ -1611,7 +1611,7 @@ apply IHn. 2: {
 }
 assert (Hn : n = nth i l 0). {
   rewrite Hi; symmetry.
-  apply (permut_permut_inv (S n)); [ easy | flia ].
+  apply (permut_permut_inv (S n)); [ easy | easy ].
 }
 split. {
   intros j Hj.
@@ -1689,3 +1689,4 @@ Qed.
 
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
 Arguments permut_list_inv_is_permut n%nat [l]%list.
+
