@@ -412,7 +412,7 @@ destruct (Nat.eq_dec k i) as [Hki| Hki]. {
 }
 Qed.
 
-Theorem list_swap_elem_is_permut : ∀ σ p q,
+Theorem list_swap_elem_is_permut_list : ∀ σ p q,
   p < length σ
   → q < length σ
   → is_permut_list σ
@@ -455,6 +455,19 @@ split; cbn. {
   destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now exfalso; apply Hip, Hσ | ].
   now apply Hσ.
 }
+Qed.
+
+Theorem list_swap_elem_is_permut : ∀ n σ p q,
+  p < n
+  → q < n
+  → is_permut n σ
+  → is_permut n (list_swap_elem 0 σ p q).
+Proof.
+intros * Hp Hq Hσ.
+split; [ | now rewrite length_list_swap_elem; destruct Hσ ].
+destruct Hσ as (H1, H2).
+rewrite <- H2 in Hp, Hq.
+now apply list_swap_elem_is_permut_list.
 Qed.
 
 (* *)
@@ -1673,3 +1686,5 @@ split. {
   apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
 }
 Qed.
+
+Arguments permut_list_inv_is_permut n%nat [l]%list.
