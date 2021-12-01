@@ -4547,9 +4547,6 @@ split. {
   unfold permut_list_inv.
   apply in_map_iff.
   exists (ff_app σ k).
-(*
-  exists (ff_app (permut_list_inv σ) k).
-*)
   split. {
     unfold unsome.
     remember (List_find_nth _ _) as x eqn:Hx.
@@ -4571,6 +4568,45 @@ split. {
   } {
     apply in_seq.
     split; [ easy | ].
+    rewrite Nat.add_0_l.
+    destruct Hσ as (Hσ1, Hσ2).
+    rewrite <- Hσ2 in Hk.
+    now apply permut_list_ub.
+  }
+} {
+  intros l Hl.
+  apply in_map_iff.
+  exists (canon_sym_gr_list_inv n (map (ff_app σ) l)).
+  destruct Hl as (Hl1, Hl2).
+  destruct Hσ as (Hσ1, Hσ2).
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    split. {
+      split. {
+        intros i Hi; apply in_map_iff in Hi.
+        destruct Hi as (j & Hji & Hj).
+        rewrite map_length.
+        rewrite <- Hji.
+        rewrite Hl2, <- Hσ2.
+        apply permut_list_ub; [ easy | ].
+        rewrite Hσ2, <- Hl2.
+        now apply Hl1.
+      } {
+        rewrite map_length.
+        intros i j Hi Hj Hij.
+...
+    rewrite (List_map_nth_seq l) with (d := 0).
+    rewrite map_map.
+    destruct Hl as (Hl1, Hl2).
+    rewrite Hl2.
+    Search (is_permut _ (map _ _)).
+    apply map_permut_seq_is_permut.
+...
+canon_sym_gr_list n (canon_sym_gr_list_inv n l) ° permut_list_inv σ = l
+canon_sym_gr_list n x ° permut_list_inv σ = l
+  exists (canon_sym_gr_list_inv n ° ff_app σ).
+...
+Search canon_sym_gr_list.
+  exists (σ ° canon_sym_gr_list_inv n).
 ...
   rewrite List_nth_succ_cons in Hxx'if.
   destruct x'. {
