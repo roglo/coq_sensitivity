@@ -4647,6 +4647,11 @@ split. {
     rewrite Hσ2 in Hi.
     now apply (List_find_nth_not_None (conj Hσ1 Hσ2)).
   }
+  apply in_seq.
+  split; [ easy | ].
+  rewrite Nat.add_0_l.
+  apply rank_of_canon_permut_ub.
+Search (is_permut _ (map _ _)).
 ...
     erewrite map_ext_in.
 Search (_ ∈ permut_list_inv _).
