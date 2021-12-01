@@ -4517,29 +4517,28 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 Check rngl_product_seq_permut.
 Inspect 3.
-set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n)).
+set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
 (*
 rewrite det_is_det_by_canon_permut.
 unfold determinant'.
 *)
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as H.
+    flia Hk H.
+  }
   replace (_ ° _) with (nth k sg []). 2: {
     unfold sg.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-    rewrite seq_nth.
-    rewrite Nat.add_0_l.
-    easy.
-...
-admit.
-admit.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite seq_nth.
   }
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     replace (ff_app _ _) with (ff_app (nth k sg []) (i - 1)). 2: {
       unfold sg.
-      rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-      rewrite seq_nth.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
       rewrite Nat.add_0_l.
       unfold "°".
       unfold ff_app.
@@ -4549,15 +4548,12 @@ admit.
         flia Hi.
       }
       easy.
-admit.
-admit.
     }
     easy.
   }
   easy.
 }
 cbn.
-Inspect 3.
 apply det_by_any_sym_gr; try easy.
 ...
 nth k sg [] = canon_sym_gr_list n k ° permut_list_inv σ
