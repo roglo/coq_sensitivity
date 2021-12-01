@@ -1602,8 +1602,7 @@ assert (Hin : i ≤ n). {
   rewrite Hi, <- Hln.
   rewrite <- length_permut_list_inv.
   apply permut_list_ub; [ apply permut_list_inv_is_permut_list, Hp | ].
-  rewrite length_permut_list_inv, Hln.
-  apply Nat.lt_succ_diag_r.
+  now rewrite length_permut_list_inv, Hln.
 }
 apply IHn. 2: {
   rewrite map_length, app_length, seq_length, seq_length.

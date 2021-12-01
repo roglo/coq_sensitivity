@@ -221,7 +221,7 @@ f_equal. {
 symmetry.
 apply ε_of_sym_gr_permut_succ; try easy.
 apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
-apply Nat.sub_lt; [ | apply Nat.lt_0_1 ].
+apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
@@ -3457,7 +3457,7 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
     enough (H : ff_app σ (S i) ≠ S n) by flia H1 H; intros Hσs.
     rewrite <- Hσs in His.
     rewrite (permut_inv_permut (S (S n))) in His; [ | easy | flia Hi ].
-    apply His, Nat.lt_succ_diag_r.
+    now apply His.
   }
 }
 move Hs' before Hs.
@@ -3513,8 +3513,7 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite IHn; f_equal; f_equal.
   rewrite Hk in Hksn.
   rewrite <- Hksn at 1.
-  apply (permut_permut_inv (S (S n))); [ easy | ].
-  apply Nat.lt_succ_diag_r.
+  now apply (permut_permut_inv (S (S n))).
 }
 specialize permut_list_inv_is_permut_list as H1.
 specialize (H1 σ).
@@ -3529,8 +3528,7 @@ rewrite rngl_product_split with (j := k) in IHn. 2: {
   assert (H : k ∈ permut_list_inv σ). {
     rewrite Hk.
     apply nth_In.
-    rewrite length_permut_list_inv, Hσl.
-    apply Nat.lt_succ_diag_r.
+    now rewrite length_permut_list_inv, Hσl.
   }
   specialize (H1 H); clear H.
   flia Hksn H1.
@@ -3567,8 +3565,7 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   f_equal.
   f_equal. 2: {
     f_equal; rewrite Hk.
-    apply (permut_permut_inv (S (S n))); [ easy | ].
-    apply Nat.lt_succ_diag_r.
+    now apply (permut_permut_inv (S (S n))).
   }
   apply rngl_product_eq_compat.
   intros i Hi.
@@ -3584,8 +3581,7 @@ erewrite rngl_product_eq_compat in IHn. 2: {
     assert (H : k ∈ permut_list_inv σ). {
       rewrite Hk; unfold ff_app.
       apply nth_In.
-      rewrite length_permut_list_inv, Hσl.
-      apply Nat.lt_succ_diag_r.
+      now rewrite length_permut_list_inv, Hσl.
     }
     specialize (H1 H); clear H.
     rewrite length_permut_list_inv, Hσl in H1.
@@ -3626,8 +3622,7 @@ rewrite rngl_product_split with (j := k). 2: {
   rewrite length_permut_list_inv, Hσl in H1.
   apply Nat.lt_le_incl.
   apply H1, nth_In.
-  rewrite length_permut_list_inv, Hσl.
-  apply Nat.lt_succ_diag_r.
+  now rewrite length_permut_list_inv, Hσl.
 }
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
@@ -3637,8 +3632,7 @@ rewrite rngl_product_split_last. 2: {
   rewrite length_permut_list_inv, Hσl in H1.
   apply Nat.lt_succ_r.
   apply H1, nth_In.
-  rewrite length_permut_list_inv, Hσl.
-  apply Nat.lt_succ_diag_r.
+  now rewrite length_permut_list_inv, Hσl.
 }
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (ff_app σ i)).
 rewrite rngl_product_split_first. 2: {
@@ -3649,8 +3643,7 @@ rewrite rngl_product_split_first. 2: {
   assert (H : S k ∈ permut_list_inv σ). {
     rewrite Hk.
     apply nth_In.
-    rewrite length_permut_list_inv, Hσl.
-    apply Nat.lt_succ_diag_r.
+    now rewrite length_permut_list_inv, Hσl.
   }
   specialize (H1 H); clear H.
   flia Hksn H1.
@@ -3659,8 +3652,7 @@ replace (ff_app σ (k + 1)) with (S n). 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
   symmetry.
-  apply (permut_permut_inv (S (S n))); [ easy | ].
-  apply Nat.lt_succ_diag_r.
+  now apply (permut_permut_inv (S (S n))).
 }
 rewrite <- rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
@@ -3688,8 +3680,7 @@ assert (Hkn : S (k + 1) ≤ n). {
   assert (H : S k ∈ permut_list_inv σ). {
     rewrite Hk.
     apply nth_In.
-    rewrite length_permut_list_inv, Hσl.
-    apply Nat.lt_succ_diag_r.
+    now rewrite length_permut_list_inv, Hσl.
   }
   specialize (H1 H); clear H.
   rewrite <- Hk in H7.
@@ -3759,7 +3750,7 @@ destruct x as [x| ]. {
   specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
   specialize (pigeonhole_list n (i :: f)) as H2.
   rewrite List_length_cons in H2.
-  assert (H : n < S (length f)) by (rewrite Hf; apply Nat.lt_succ_diag_r).
+  assert (H : n < S (length f)) by now rewrite Hf.
   specialize (H2 H); clear H.
   assert (H : ∀ x, x ∈ i :: f → x < n). {
     intros x [Hxi| Hxf]; [ now subst x | ].

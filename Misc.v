@@ -7,6 +7,10 @@ Require Import Utf8 Arith Psatz Sorted Permutation Decidable.
 Import List List.ListNotations.
 Arguments length {A}.
 
+Global Hint Resolve Nat.le_0_l : core.
+Global Hint Resolve Nat.lt_0_succ : core.
+Global Hint Resolve Nat.lt_succ_diag_r : core.
+
 (* "fast" lia, to improve compilation speed *)
 Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 
@@ -143,7 +147,7 @@ Proof.
 intros * Hf.
 unfold iter_seq.
 remember (S e - b) as len eqn:Hlen.
-destruct len; [ apply Nat.le_0_l | ].
+destruct len; [ easy | ].
 replace e with (b + len) in Hf by flia Hlen.
 clear e Hlen.
 revert b Hf.
@@ -538,7 +542,7 @@ induction n; intros.
  }
  specialize (H1 H); clear H.
  assert (H : b ≤ a). {
-   apply (Nat.mul_le_mono_pos_l _ _ (S n)); [ apply Nat.lt_0_succ | ].
+   apply (Nat.mul_le_mono_pos_l _ _ (S n)); [ easy | ].
    eapply le_trans; [ apply Hn | apply Nat.le_add_r ].
  }
  destruct b.
@@ -556,8 +560,7 @@ Theorem Nat_le_add_l : ∀ a b, b ≤ a + b.
 Proof.
 intros.
 replace b with (0 + b) at 1 by easy.
-apply Nat.add_le_mono_r.
-apply Nat.le_0_l.
+now apply Nat.add_le_mono_r.
 Qed.
 
 Theorem Nat_mul_sub_div_le : ∀ a b c,
@@ -565,9 +568,7 @@ Theorem Nat_mul_sub_div_le : ∀ a b c,
   → (a * b - c) / b ≤ a.
 Proof.
 intros * Hc.
-destruct (zerop b) as [Hb| Hb]. {
-  subst b; cbn; apply Nat.le_0_l.
-}
+destruct (zerop b) as [Hb| Hb]; [ now subst b | ].
 apply Nat.neq_0_lt_0 in Hb.
 remember (a * b - c) as d eqn:Hd.
 assert (H1 : a = (c + d) / b). {
@@ -715,7 +716,7 @@ destruct (Nat.lt_trichotomy (u / b) (v / a)) as [Hm|Hm]. {
       rewrite H1 at 1.
       apply Nat.add_le_mono_l.
       apply Nat.lt_le_incl.
-      apply Nat.mod_bound_pos; [ apply Nat.le_0_l | ].
+      apply Nat.mod_bound_pos; [ easy | ].
       now apply Nat.neq_0_lt_0.
     }
     apply Nat.mul_le_mono_r.
@@ -725,7 +726,7 @@ destruct (Nat.lt_trichotomy (u / b) (v / a)) as [Hm|Hm]. {
     rewrite H1 at 1.
     apply Nat.add_le_mono; [ now apply Nat.mul_le_mono_l | ].
     apply Nat.lt_le_incl.
-    apply Nat.mod_bound_pos; [ apply Nat.le_0_l | ].
+    apply Nat.mod_bound_pos; [ easy | ].
     now apply Nat.neq_0_lt_0.
   }
   rewrite Nat.add_comm, Nat.add_sub.
@@ -752,7 +753,7 @@ destruct (Nat.lt_trichotomy (u / b) (v / a)) as [Hm|Hm]. {
         now apply Nat.lt_le_incl.
       }
       apply Nat.lt_le_incl.
-      apply Nat.mod_bound_pos; [ apply Nat.le_0_l | ].
+      apply Nat.mod_bound_pos; [ easy | ].
       now apply Nat.neq_0_lt_0.
     }
     rewrite <- Huv.
@@ -763,7 +764,7 @@ destruct (Nat.lt_trichotomy (u / b) (v / a)) as [Hm|Hm]. {
     rewrite H1 at 1.
     apply Nat.add_le_mono_l.
     apply Nat.lt_le_incl.
-    apply Nat.mod_bound_pos; [ apply Nat.le_0_l | ].
+    apply Nat.mod_bound_pos; [ easy | ].
     now apply Nat.neq_0_lt_0.
   }
   rewrite Nat.add_comm, Nat.add_sub.
@@ -973,14 +974,14 @@ Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ a → b ≤ a * b.
 Proof.
 intros * Ha.
 replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-apply Nat.mul_le_mono_nonneg_r; [ apply Nat.le_0_l | easy ].
+now apply Nat.mul_le_mono_nonneg_r.
 Qed.
 
 Theorem Nat_mul_le_pos_r : ∀ a b, 1 ≤ b → a ≤ a * b.
 Proof.
 intros * Ha.
 replace a with (a * 1) at 1 by apply Nat.mul_1_r.
-apply Nat.mul_le_mono_nonneg_l; [ apply Nat.le_0_l | easy ].
+now apply Nat.mul_le_mono_nonneg_l.
 Qed.
 
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
@@ -1225,8 +1226,7 @@ cbn - [ nth ]; f_equal.
 rewrite <- seq_shift, map_map.
 erewrite map_ext_in. 2: {
   intros i Hi; apply in_seq in Hi.
-  rewrite List_nth_succ_cons.
-  easy.
+  now rewrite List_nth_succ_cons.
 }
 cbn in Hl; apply Nat.succ_lt_mono in Hl.
 now apply IHl.
@@ -1238,7 +1238,7 @@ Proof.
 intros * Hnl.
 do 2 rewrite List_hd_nth_0.
 apply List_map_nth'.
-destruct l; [ easy | apply Nat.lt_0_succ ].
+destruct l; [ easy | now cbn ].
 Qed.
 
 Theorem List_map_nth_seq_skipn_firstn : ∀ (A : Type) (la : list A) d sta len,
@@ -2521,8 +2521,7 @@ induction len; intros; [ apply Sorted.Sorted_nil | ].
 cbn; apply Sorted.Sorted_cons; [ apply IHlen | ].
 clear IHlen.
 induction len; [ apply Sorted.HdRel_nil | ].
-cbn. apply Sorted.HdRel_cons.
-apply Nat.lt_succ_diag_r.
+now cbn; apply Sorted.HdRel_cons.
 Qed.
 
 Theorem Forall_inv_tail {A} : ∀ P (a : A) l, Forall P (a :: l) → Forall P l.
@@ -3675,6 +3674,3 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 Arguments iter_list {A B}%type l%list f%function : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
-Global Hint Resolve Nat.le_0_l : core.
-Global Hint Resolve Nat.lt_0_succ : core.
-Global Hint Resolve Nat.lt_succ_diag_r : core.
