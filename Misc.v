@@ -3675,3 +3675,4 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 Arguments iter_list {A B}%type l%list f%function : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.
+Global Hint Resolve Nat.le_0_l : core.

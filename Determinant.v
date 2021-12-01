@@ -4572,8 +4572,26 @@ split. {
       now apply Hσ1.
     } {
       specialize (List_find_nth_None 0 _ _ Hx) as H2.
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite <- Hσ2 in Hk.
+      specialize (H2 k Hk).
+      now rewrite Nat.eqb_refl in H2.
+    }
+  } {
+    apply in_seq.
+    split; [ easy | ].
 ...
-      specialize (pigeonhole_list n (i :: f)) as H2.
+  rewrite List_nth_succ_cons in Hxx'if.
+  destruct x'. {
+    apply Nat.succ_lt_mono in Hxf.
+    cbn in Hxx'if; symmetry in Hxx'if.
+    specialize (H1 x Hxf).
+    now apply Nat.eqb_neq in H1.
+  }
+  cbn in Hxx'if.
+  apply Nat.succ_lt_mono in Hxf, Hx'f.
+  apply Hs in Hxx'if; [ | easy | easy ].
+  now rewrite Hxx'if in Hxx'.
 ...
 Check nth_canon_sym_gr_list_inj2.
 ...
