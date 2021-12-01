@@ -4426,6 +4426,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+unfold canon_sym_gr_list_list.
+rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+Check rngl_product_seq_permut.
+Inspect 1.
 ...
   ============================
   determinant n M =
