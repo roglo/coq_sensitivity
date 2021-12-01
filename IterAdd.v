@@ -328,7 +328,7 @@ Theorem rngl_summation_summation_exch : ∀ g k,
 Proof.
 intros g k.
 induction k; [ easy | ].
-rewrite rngl_summation_split_last; [ | apply Nat.le_0_l ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -337,7 +337,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 rewrite IHk.
 symmetry.
-rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -359,7 +359,7 @@ rewrite rngl_summation_add_distr.
 rewrite <- rngl_add_assoc.
 f_equal.
 symmetry.
-rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
 rewrite rngl_summation_only_one.
 f_equal.
@@ -381,7 +381,7 @@ induction k; intros. {
   intros i c Hi.
   now rewrite rngl_add_0_l.
 }
-rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -395,7 +395,7 @@ cbn.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_summation_split_last; [ | flia ].
+  rewrite rngl_summation_split_last; [ | easy ].
   rewrite rngl_summation_succ_succ.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
@@ -459,7 +459,7 @@ induction a; intros. {
   rewrite Nat.div_small; [ | flia Hi ].
   rewrite Nat.mod_small; [ easy | flia Hi ].
 }
-rewrite rngl_summation_split_last; [ | flia ].
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -499,7 +499,7 @@ f_equal. {
     rewrite Nat.sub_add_distr.
     now do 2 rewrite Nat.add_sub.
   }
-  rewrite rngl_summation_split_first; [ | flia ].
+  rewrite rngl_summation_split_first; [ | easy ].
   f_equal.
   rewrite rngl_summation_succ_succ.
   apply rngl_summation_eq_compat.
@@ -608,8 +608,8 @@ induction Hl; intros; [ easy | | | ]. {
   cbn in H1, H2.
   apply Nat.succ_inj in H1.
   apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy ].
+  rewrite rngl_summation_split_first; [ symmetry | easy ].
   destruct n; [ easy | ].
   do 2 rewrite rngl_summation_succ_succ.
   now rewrite IHHl.
@@ -618,8 +618,8 @@ induction Hl; intros; [ easy | | | ]. {
   cbn in H1, H2.
   do 2 apply Nat.succ_inj in H1.
   do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
+  rewrite rngl_summation_split_first; [ symmetry | easy ].
+  rewrite rngl_summation_split_first; [ symmetry | easy ].
   rewrite rngl_summation_split_first; [ symmetry | flia ].
   rewrite rngl_summation_split_first; [ symmetry | flia ].
   do 2 rewrite rngl_add_assoc.

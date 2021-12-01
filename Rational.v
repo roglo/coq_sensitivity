@@ -2275,9 +2275,9 @@ Proof.
 intros.
 destruct b. {
   rewrite den_0.
-  apply (le_pair 0 1); [ easy | easy | apply Nat.le_0_l ].
+  now apply (le_pair 0 1).
 }
-apply (le_pair 0 1); [ easy | easy | apply Nat.le_0_l ].
+now apply (le_pair 0 1).
 Qed.
 
 Theorem lt_0_pair : ∀ a b, (0 < a // b)%Q ↔ 0 < a.
@@ -2551,7 +2551,7 @@ rewrite intg_to_frac.
 -rewrite (frac_less_small n); [ | easy ].
  now rewrite sub_sub_distr, sub_diag.
 -eapply le_trans; [ | apply Hx ].
- apply (le_pair_mono_r 0), Nat.le_0_l.
+ now apply (le_pair_mono_r 0).
 Qed.
 
 Theorem eq_intg_0 : ∀ x, (0 ≤ x)%Q → intg x = 0 → (x < 1)%Q.
@@ -2827,8 +2827,7 @@ rewrite add_comm, <- add_assoc, frac_add_nat_l; cycle 1. {
   apply add_le_mono; [ apply frac_ge_0 | ].
   apply add_le_mono; [ | apply frac_ge_0 ].
   apply le_pair; [ easy | easy | ].
-  rewrite Nat.mul_0_l, Nat.mul_1_l.
-  apply Nat.le_0_l.
+  now rewrite Nat.mul_0_l, Nat.mul_1_l.
 }
 rewrite add_comm, <- add_assoc, frac_add_nat_l; cycle 1. {
   replace 0%Q with (0 + 0)%Q by easy.
