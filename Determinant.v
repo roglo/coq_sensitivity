@@ -4423,7 +4423,7 @@ Theorem det_any_permut :
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
-(*
+(**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   remember (μ ° permut_list_inv σ) as ν eqn:Hν.
@@ -4463,11 +4463,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+(*
   ============================
   determinant n M =
   ∑ (i ∈ canon_sym_gr_list_list n),
   ε n (i ° permut_list_inv σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
-*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   replace (ε n μ * ε n σ)%F with (ε n (μ ° σ)). 2: {
@@ -4481,6 +4481,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+*)
 unfold canon_sym_gr_list_list.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
@@ -4516,6 +4517,51 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 Check rngl_product_seq_permut.
 Inspect 3.
+set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n)).
+(*
+rewrite det_is_det_by_canon_permut.
+unfold determinant'.
+*)
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  replace (_ ° _) with (nth k sg []). 2: {
+    unfold sg.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+    rewrite seq_nth.
+    rewrite Nat.add_0_l.
+    easy.
+...
+admit.
+admit.
+  }
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    replace (ff_app _ _) with (ff_app (nth k sg []) (i - 1)). 2: {
+      unfold sg.
+      rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+      rewrite seq_nth.
+      rewrite Nat.add_0_l.
+      unfold "°".
+      unfold ff_app.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite length_permut_list_inv.
+        destruct Hσ as (H1, H2); rewrite H2.
+        flia Hi.
+      }
+      easy.
+admit.
+admit.
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+Inspect 3.
+apply det_by_any_sym_gr; try easy.
+...
+nth k sg [] = canon_sym_gr_list n k ° permut_list_inv σ
+nth k sg [] = canon_sym_gr_list n k) (ff_app (permut_list_inv σ
 ...
 remember (seq 0 n) as s eqn:Hs.
 replace n with (S (n - 1) - 0) in Hs by flia Hnz.
