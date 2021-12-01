@@ -3019,11 +3019,10 @@ destruct l as [| a]; intros; cbn.
 (*
   mat_list_list M = g M
 *)
-admit.
 ...
 intros.
 revert M.
-induction l as [| a]; intros; [ admit | cbn ].
+induction l as [| a]; intros; [ | cbn ].
 cbn.
 rewrite IHl.
 ...
@@ -3722,6 +3721,48 @@ rewrite Hg, <- Hh.
 now apply Hph.
 Qed.
 
+Theorem List_find_nth_not_None : ∀ n l i,
+  is_permut n l
+  → i < n
+  → List_find_nth (Nat.eqb i) l ≠ None.
+Proof.
+intros n f i (Hs, Hf) Hi Hx.
+specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
+specialize (pigeonhole_list n (i :: f)) as H2.
+rewrite List_length_cons in H2.
+assert (H : n < S (length f)) by now rewrite Hf.
+specialize (H2 H); clear H.
+assert (H : ∀ x, x ∈ i :: f → x < n). {
+  intros x [Hxi| Hxf]; [ now subst x | ].
+  now rewrite <- Hf; apply Hs.
+}
+specialize (H2 H); clear H.
+remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize (H2 x x' eq_refl).
+destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
+destruct x. {
+  rewrite List_nth_0_cons in Hxx'if.
+  destruct x'; [ easy | ].
+  apply Nat.succ_lt_mono in Hx'f.
+  cbn in Hxx'if.
+  specialize (H1 x' Hx'f).
+  now apply Nat.eqb_neq in H1.
+}
+rewrite List_nth_succ_cons in Hxx'if.
+destruct x'. {
+  apply Nat.succ_lt_mono in Hxf.
+  cbn in Hxx'if; symmetry in Hxx'if.
+  specialize (H1 x Hxf).
+  now apply Nat.eqb_neq in H1.
+}
+cbn in Hxx'if.
+apply Nat.succ_lt_mono in Hxf, Hx'f.
+apply Hs in Hxx'if; [ | easy | easy ].
+now rewrite Hxx'if in Hxx'.
+Qed.
+
 Theorem comp_permut_permut_inv : ∀ n f,
   is_permut n f
   → (f ° permut_list_inv f = seq 0 n).
@@ -3746,41 +3787,8 @@ destruct x as [x| ]. {
   now apply Nat.eqb_eq in Hix.
 } {
   exfalso.
-(* lemme à faire ? *)
-  specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
-  specialize (pigeonhole_list n (i :: f)) as H2.
-  rewrite List_length_cons in H2.
-  assert (H : n < S (length f)) by now rewrite Hf.
-  specialize (H2 H); clear H.
-  assert (H : ∀ x, x ∈ i :: f → x < n). {
-    intros x [Hxi| Hxf]; [ now subst x | ].
-    now rewrite <- Hf; apply Hs.
-  }
-  specialize (H2 H); clear H.
-  remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
-  symmetry in Hxx.
-  destruct xx as (x, x').
-  specialize (H2 x x' eq_refl).
-  destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
-  destruct x. {
-    rewrite List_nth_0_cons in Hxx'if.
-    destruct x'; [ easy | ].
-    apply Nat.succ_lt_mono in Hx'f.
-    cbn in Hxx'if.
-    specialize (H1 x' Hx'f).
-    now apply Nat.eqb_neq in H1.
-  }
-  rewrite List_nth_succ_cons in Hxx'if.
-  destruct x'. {
-    apply Nat.succ_lt_mono in Hxf.
-    cbn in Hxx'if; symmetry in Hxx'if.
-    specialize (H1 x Hxf).
-    now apply Nat.eqb_neq in H1.
-  }
-  cbn in Hxx'if.
-  apply Nat.succ_lt_mono in Hxf, Hx'f.
-  apply Hs in Hxx'if; [ | easy | easy ].
-  now rewrite Hxx'if in Hxx'.
+  revert Hx.
+  now apply (List_find_nth_not_None (conj Hs Hf)).
 }
 Qed.
 
@@ -4046,7 +4054,7 @@ Theorem vect_eqb_neq : ∀ u v : vector nat,
 Proof.
 Admitted.
 specialize (H1 0).
-assert (H : 0 < length (vect_list sg)) by admit.
+assert (H : 0 < length (vect_list sg)) by ...
 specialize (H1 H); clear H.
 apply vect_eqb_neq in H1.
 unfold vect_el.
@@ -4576,14 +4584,9 @@ split. {
 } {
   intros l Hl.
   apply in_map_iff.
-...
-  exists (canon_sym_gr_list_inv n l).
-...
-  exists (ff_app σ (canon_sym_gr_list_inv n l)).
-...
-  exists (canon_sym_gr_list_inv n (map (ff_app σ) l)).
   destruct Hl as (Hl1, Hl2).
   destruct Hσ as (Hσ1, Hσ2).
+  exists (canon_sym_gr_list_inv n (map (ff_app l) σ)).
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
     split; [ | now rewrite map_length ].
     split. {
@@ -4591,10 +4594,10 @@ split. {
       destruct Hi as (j & Hji & Hj).
       rewrite map_length.
       rewrite <- Hji.
-      rewrite Hl2, <- Hσ2.
-      apply permut_list_ub; [ easy | ].
       rewrite Hσ2, <- Hl2.
-      now apply Hl1.
+      apply permut_list_ub; [ easy | ].
+      rewrite Hl2, <- Hσ2.
+      now apply Hσ1.
     } {
       rewrite map_length.
       intros i j Hi Hj Hij.
@@ -4605,14 +4608,14 @@ split. {
       }
       apply (NoDup_map_iff 0).
       intros u v Hu Hv Huv.
-      apply Hσ1 in Huv; cycle 1. {
-        rewrite Hσ2, <- Hl2.
-        now apply Hl1, nth_In.
+      apply Hl1 in Huv; cycle 1. {
+        rewrite Hl2, <- Hσ2.
+        now apply Hσ1, nth_In.
       } {
-        rewrite Hσ2, <- Hl2.
-        now apply Hl1, nth_In.
+        rewrite Hl2, <- Hσ2.
+        now apply Hσ1, nth_In.
       }
-      now apply Hl1 in Huv.
+      now apply Hσ1 in Huv.
     }
   }
   split. {
@@ -4621,17 +4624,16 @@ split. {
     erewrite map_ext_in. 2: {
       intros i Hi.
       rewrite (List_map_nth' 0). 2: {
-        rewrite Hl2, <- Hσ2.
         now apply in_permut_list_inv_lt.
       }
       easy.
     }
     unfold permut_list_inv.
     rewrite map_map.
-    rewrite (List_map_nth_seq l n) at 1.
+    rewrite (List_map_nth_seq l 0) at 1.
     rewrite Hl2, <- Hσ2.
     apply map_ext_in.
-    intros i Hi.
+    intros i Hi; apply in_seq in Hi.
     unfold unsome.
     remember (List_find_nth _ _) as x eqn:Hx.
     symmetry in Hx.
@@ -4639,7 +4641,12 @@ split. {
       apply (List_find_nth_Some 0) in Hx.
       destruct Hx as (Hxσ & Hbefx & Hx).
       apply Nat.eqb_eq in Hx.
-      rewrite Hx.
+      now rewrite <- Hx.
+    }
+    exfalso; revert Hx.
+    rewrite Hσ2 in Hi.
+    now apply (List_find_nth_not_None (conj Hσ1 Hσ2)).
+  }
 ...
     erewrite map_ext_in.
 Search (_ ∈ permut_list_inv _).
