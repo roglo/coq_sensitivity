@@ -4830,8 +4830,18 @@ split. {
   }
   symmetry in Hij.
   do 2 rewrite map_id in Hij.
-Search (permut_list_inv _ = permut_list_inv _).
-Print permut_list_inv.
+Theorem permut_list_inv_inj2 : ∀ l1 l2,
+  length l1 = length l2
+  → permut_list_inv l1 = permut_list_inv l2
+  → l1 = l2.
+Proof.
+intros * Hll Hi.
+unfold permut_list_inv in Hi.
+rewrite Hll in Hi.
+specialize (ext_in_map Hi) as H1.
+cbn in H1.
+...
+apply permut_list_inv_inj2 in Hij.
 ...
   unfold permut_list_inv in Hij.
   do 2 rewrite map_map in Hij.
