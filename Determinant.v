@@ -4726,20 +4726,21 @@ apply rngl_summation_permut; cycle 1. {
 }
 unfold determinant'_list.
 cbn.
-erewrite map_ext_in. 2: {
-  intros m Hm.
-  apply in_seq in Hm.
-...
-  now rewrite <- ε_of_canon_permut_ε.
-}
-symmetry.
+(*
 erewrite map_ext_in. 2: {
   intros m Hm.
   apply in_seq in Hm.
   now rewrite <- ε_of_canon_permut_ε.
 }
 symmetry.
-remember (canon_permut n) as f eqn:Hf.
+erewrite map_ext_in. 2: {
+  intros m Hm.
+  apply in_seq in Hm.
+  now rewrite <- ε_of_canon_permut_ε.
+}
+*)
+symmetry.
+remember (canon_sym_gr_list n) as f eqn:Hf.
 ...
 look at
 https://proofwiki.org/wiki/Permutation_of_Determinant_Indices
