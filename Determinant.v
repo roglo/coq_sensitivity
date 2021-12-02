@@ -4836,13 +4836,32 @@ Theorem permut_list_inv_inj2 : ∀ l1 l2,
   → permut_list_inv l1 = permut_list_inv l2
   → l1 = l2.
 Proof.
-intros * Hl1 Hl2 Hill.
+intros * Hpl1 Hpl2 Hill.
 assert (Hll : length l1 = length l2). {
   apply List_eq_iff in Hill.
   now do 2 rewrite length_permut_list_inv in Hill.
 }
-destruct Hl1 as (Hl11, Hl12).
-destruct Hl2 as (Hl21, Hl22).
+remember (length l2) as n eqn:Hl2.
+rename Hll into Hl1; symmetry in Hl2; move Hl1 after Hl2.
+revert l1 l2 Hpl1 Hpl2 Hill Hl1 Hl2.
+induction n; intros. {
+  apply length_zero_iff_nil in Hl1, Hl2; congruence.
+}
+destruct l1 as [| a1]; [ easy | ].
+destruct l2 as [| a2]; [ easy | ].
+cbn in Hl1, Hl2.
+apply Nat.succ_inj in Hl1, Hl2.
+unfold permut_list_inv in Hill.
+cbn - [ List_find_nth seq ] in Hill.
+do 2 rewrite seq_S in Hill.
+cbn - [ List_find_nth ] in Hill.
+rewrite Hl1, Hl2 in Hill.
+rewrite map_app in Hill.
+rewrite map_app in Hill.
+cbn - [ List_find_nth ] in Hill.
+apply app_inj_tail in Hill.
+destruct Hill as (Hill & Hill').
+cbn in Hill'.
 ...
 unfold permut_list_inv in Hill.
 rewrite Hll in Hill.
