@@ -4835,12 +4835,26 @@ Theorem permut_list_inv_inj2 : ∀ l1 l2,
   → l1 = l2.
 Proof.
 intros * Hill.
+assert (Hll : length l1 = length l2). {
+  apply List_eq_iff in Hill.
+  now do 2 rewrite length_permut_list_inv in Hill.
+}
+unfold permut_list_inv in Hill.
+rewrite Hll in Hill.
+specialize (ext_in_map Hill) as H1.
+cbn in H1.
+apply List_eq_iff.
+split; [ easy | ].
+intros d i.
+...
+intros * Hill.
 apply List_eq_iff in Hill.
 destruct Hill as (Hill & Hnll).
 do 2 rewrite length_permut_list_inv in Hill.
 apply List_eq_iff.
 split; [ easy | ].
 intros d i.
+...
 Search permut_list_inv.
 ...
 specialize (Hnll d (nth i l1 d)).
