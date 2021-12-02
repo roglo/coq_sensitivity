@@ -4430,7 +4430,6 @@ Theorem det_any_permut_l :
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
-(**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   remember (μ ° permut_list_inv σ) as ν eqn:Hν.
@@ -4469,25 +4468,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-(*
-  ============================
-  determinant n M =
-  ∑ (i ∈ canon_sym_gr_list_list n),
-  ε n (i ° permut_list_inv σ) * ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app i k)
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros μ Hμ.
-  replace (ε n μ * ε n σ)%F with (ε n (μ ° σ)). 2: {
-    rewrite <- signature_comp; try easy.
-    apply in_map_iff in Hμ.
-    destruct Hμ as (i & Hiμ & Hi).
-    apply in_seq in Hi.
-    rewrite <- Hiμ.
-    now apply canon_sym_gr_list_is_permut.
-  }
-  easy.
-}
-cbn.
-*)
 unfold canon_sym_gr_list_list.
 rewrite <- rngl_summation_list_change_var.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
