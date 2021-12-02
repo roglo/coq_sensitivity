@@ -4432,6 +4432,13 @@ Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
+  assert (Hpμ : is_permut n μ). {
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    apply in_seq in Hi.
+    rewrite <- Hiμ.
+    now apply canon_sym_gr_list_is_permut.
+  }
   remember (μ ° permut_list_inv σ) as ν eqn:Hν.
   assert (Hσν : ν ° σ = μ). {
     rewrite Hν.
@@ -4440,21 +4447,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
     }
     rewrite <- (permut_comp_assoc _ _ H Hσ); clear H.
     rewrite (@comp_permut_inv_permut n); [ | easy ].
-    apply comp_id_r.
-    apply in_map_iff in Hμ.
-    destruct Hμ as (i & Hiμ & Hi).
-    rewrite <- Hiμ.
-    apply length_canon_sym_gr_list.
+    apply comp_id_r, Hpμ.
   }
   subst ν.
   rewrite <- Hσν at 1.
-  assert (Hpμ : is_permut n μ). {
-    apply in_map_iff in Hμ.
-    destruct Hμ as (i & Hiμ & Hi).
-    apply in_seq in Hi.
-    rewrite <- Hiμ.
-    now apply canon_sym_gr_list_is_permut.
-  }
   replace (ε n ((μ ° permut_list_inv σ) ° σ)) with
       (ε n (μ ° permut_list_inv σ) * ε n σ)%F. 2: {
     destruct Hσ.
@@ -4661,6 +4657,224 @@ Theorem det_any_permut_r :
      ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
 Proof.
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros μ Hμ.
+  assert (Hpμ : is_permut n μ). {
+    apply in_map_iff in Hμ.
+    destruct Hμ as (i & Hiμ & Hi).
+    apply in_seq in Hi.
+    rewrite <- Hiμ.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  remember (σ ° permut_list_inv μ) as ν eqn:Hν.
+  assert (Hσν : ν ° μ = σ). {
+    rewrite Hν.
+    assert (H : length (permut_list_inv μ) = n). {
+      rewrite length_permut_list_inv.
+      apply Hpμ.
+    }
+    rewrite <- (permut_comp_assoc _ _ H); clear H; [ | apply Hpμ ].
+    rewrite (@comp_permut_inv_permut n); [ | easy ].
+    apply comp_id_r, Hσ.
+  }
+  subst ν.
+  rewrite <- Hσν at 1.
+  replace (ε n ((σ ° permut_list_inv μ) ° μ)) with
+      (ε n (σ ° permut_list_inv μ) * ε n μ)%F. 2: {
+    rewrite <- signature_comp; try easy.
+    apply comp_is_permut; [ easy | ].
+    now apply permut_list_inv_is_permut.
+  }
+  rewrite (rngl_mul_comm Hic _ (ε n μ)).
+  rewrite rngl_mul_assoc.
+  replace (ε n μ * ε n μ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite rngl_mul_1_l.
+  easy.
+}
+cbn.
+unfold canon_sym_gr_list_list.
+rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  assert (Hc : is_permut n (canon_sym_gr_list n i)). {
+    apply canon_sym_gr_list_is_permut.
+    specialize (fact_neq_0 n) as H.
+    flia Hi H.
+  }
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv (canon_sym_gr_list n i)))
+      (h := ff_app (canon_sym_gr_list n i)). 2: {
+    intros j (_, Hj).
+    apply (@permut_inv_permut n); [ | flia Hj Hnz ].
+    apply canon_sym_gr_list_is_permut.
+    specialize (fact_neq_0 n) as H.
+    flia Hi H.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    apply in_map_iff in Hj.
+    destruct Hj as (k & Hkj & Hk).
+    apply in_seq in Hk.
+    rewrite (@permut_permut_inv n); [ easy | easy | ].
+    rewrite <- Hkj.
+    rewrite <- length_canon_sym_gr_list with (k := i).
+    apply permut_list_ub; [ apply Hc | ].
+    now rewrite length_canon_sym_gr_list.
+  }
+  cbn.
+  rewrite rngl_product_map_permut; [ | easy | easy ].
+  easy.
+}
+cbn.
+...
+set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as H.
+    flia Hk H.
+  }
+  replace (_ ° _) with (nth k sg []). 2: {
+    unfold sg.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite seq_nth.
+  }
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    replace (ff_app _ _) with (ff_app (nth k sg []) (i - 1)). 2: {
+      unfold sg.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      unfold "°".
+      unfold ff_app.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite length_permut_list_inv.
+        destruct Hσ as (H1, H2); rewrite H2.
+        flia Hi.
+      }
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+Check det_by_any_sym_gr.
+...
+apply det_by_any_sym_gr; try easy.
+unfold sg.
+split. {
+  rewrite map_length, seq_length.
+  intros i Hi.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite Nat.add_0_l.
+  split. {
+    unfold "°"; cbn.
+    rewrite map_length.
+    rewrite length_permut_list_inv.
+    now destruct Hσ.
+  } {
+    apply (comp_is_permut_list n). {
+      now apply canon_sym_gr_list_is_permut.
+    } {
+      now apply permut_list_inv_is_permut.
+    }
+  }
+}
+split. {
+  rewrite map_length, seq_length.
+  intros i j Hi Hj Hij.
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  do 2 rewrite Nat.add_0_l in Hij.
+  unfold "°" in Hij.
+  specialize (ext_in_map Hij) as H1.
+  apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
+  intros k Hk.
+  apply H1.
+(* lemme à faire ? *)
+  unfold permut_list_inv.
+  apply in_map_iff.
+  exists (ff_app σ k).
+  split. {
+    unfold unsome.
+    remember (List_find_nth _ _) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxl & Hbefx & Hx).
+      apply Nat.eqb_eq in Hx.
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite <- Hσ2 in Hk.
+      now apply Hσ1.
+    } {
+      specialize (List_find_nth_None 0 _ _ Hx) as H2.
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite <- Hσ2 in Hk.
+      specialize (H2 k Hk).
+      now rewrite Nat.eqb_refl in H2.
+    }
+  } {
+    apply in_seq.
+    split; [ easy | ].
+    rewrite Nat.add_0_l.
+    destruct Hσ as (Hσ1, Hσ2).
+    rewrite <- Hσ2 in Hk.
+    now apply permut_list_ub.
+  }
+} {
+  intros l Hl.
+  apply in_map_iff.
+  destruct Hl as (Hl1, Hl2).
+  destruct Hσ as (Hσ1, Hσ2).
+  exists (canon_sym_gr_list_inv n (map (ff_app l) σ)).
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    now apply map_ff_app_permut_permut_is_permut.
+  }
+  split. {
+    unfold "°".
+    unfold ff_app.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      rewrite (List_map_nth' 0). 2: {
+        now apply in_permut_list_inv_lt.
+      }
+      easy.
+    }
+    unfold permut_list_inv.
+    rewrite map_map.
+    rewrite (List_map_nth_seq l 0) at 1.
+    rewrite Hl2, <- Hσ2.
+    apply map_ext_in.
+    intros i Hi; apply in_seq in Hi.
+    unfold unsome.
+    remember (List_find_nth _ _) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxσ & Hbefx & Hx).
+      apply Nat.eqb_eq in Hx.
+      now rewrite <- Hx.
+    }
+    exfalso; revert Hx.
+    rewrite Hσ2 in Hi.
+    now apply (List_find_nth_not_None (conj Hσ1 Hσ2)).
+  }
+  apply in_seq.
+  split; [ easy | ].
+  rewrite Nat.add_0_l.
+  apply rank_of_canon_permut_ub.
+  now apply map_ff_app_permut_permut_is_permut.
+}
 ...
 
 Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
