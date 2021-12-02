@@ -4850,11 +4850,11 @@ specialize (ext_in_map Hill) as H1.
 cbn in H1.
 ...
 intros * Hl1 Hl2 Hill.
-clear Hl1 Hl2.
-revert l1 Hill.
+revert l1 Hl1 Hill.
 induction l2 as [| i]; intros; [ now destruct l1 | ].
 destruct l1 as [| j]; [ easy | ].
-unfold permut_list_inv in Hill.
+f_equal. 2: {
+  apply IHl2.
 ...
 assert (Hll : length l1 = length l2). {
   apply List_eq_iff in Hill.
