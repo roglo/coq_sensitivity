@@ -4792,18 +4792,60 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold "°" in Hij.
+(**)
+  apply (f_equal (map (ff_app (permut_list_inv σ)))) in Hij.
+  do 2 rewrite map_map in Hij.
+  erewrite map_ext_in in Hij. 2: {
+    intros k Hk.
+    apply (In_nth _ _ 0) in Hk.
+    destruct Hk as (u & Hu1 & Hu2).
+    rewrite permut_inv_permut with (n := n); [ | easy | ]. 2: {
+      rewrite <- Hu2.
+      eapply Nat.lt_le_trans. {
+        apply permut_list_ub; [ | easy ].
+        apply permut_list_inv_is_permut_list.
+        now apply canon_sym_gr_list_is_permut.
+      }
+      rewrite length_permut_list_inv.
+      now rewrite length_canon_sym_gr_list.
+    }
+    easy.
+  }
+  symmetry in Hij.
+  erewrite map_ext_in in Hij. 2: {
+    intros k Hk.
+    apply (In_nth _ _ 0) in Hk.
+    destruct Hk as (u & Hu1 & Hu2).
+    rewrite permut_inv_permut with (n := n); [ | easy | ]. 2: {
+      rewrite <- Hu2.
+      eapply Nat.lt_le_trans. {
+        apply permut_list_ub; [ | easy ].
+        apply permut_list_inv_is_permut_list.
+        now apply canon_sym_gr_list_is_permut.
+      }
+      rewrite length_permut_list_inv.
+      now rewrite length_canon_sym_gr_list.
+    }
+    easy.
+  }
+  symmetry in Hij.
+  do 2 rewrite map_id in Hij.
+Search (permut_list_inv _ = permut_list_inv _).
+Print permut_list_inv.
+...
   unfold permut_list_inv in Hij.
   do 2 rewrite map_map in Hij.
   do 2 rewrite length_canon_sym_gr_list in Hij.
   specialize (ext_in_map Hij) as H1.
   cbn in H1.
-...
   apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
   intros k Hk.
 (**)
+...
   specialize (H1 k).
   assert (H : k ∈ seq 0 n) by now apply in_seq.
   specialize (H1 H); clear H.
+...
   apply Hσ in H1; cycle 1. {
     unfold unsome.
     remember (List_find_nth _ _) as x eqn:Hx.
