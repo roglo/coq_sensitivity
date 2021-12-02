@@ -4413,7 +4413,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut :
+Theorem det_any_permut_l :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
@@ -4663,6 +4663,25 @@ split. {
   now apply map_ff_app_permut_permut_is_permut.
 }
 Qed.
+
+Theorem det_any_permut_r :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_1_neq_0 = true →
+  rngl_is_integral = true →
+  rngl_characteristic = 0 →
+  ∀ n (M : matrix T) (σ : list nat),
+  n ≠ 0
+  → is_square_matrix n M = true
+  → is_permut n σ
+  → determinant n M =
+    (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
+     ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
+Proof.
+intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+...
 
 Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
 Proof.
