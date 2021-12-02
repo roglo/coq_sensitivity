@@ -4841,7 +4841,8 @@ assert (Hll : length l1 = length l2). {
   apply List_eq_iff in Hill.
   now do 2 rewrite length_permut_list_inv in Hill.
 }
-Search permut_list_inv.
+destruct Hl1 as (Hl11, Hl12).
+destruct Hl2 as (Hl21, Hl22).
 ...
 unfold permut_list_inv in Hill.
 rewrite Hll in Hill.
