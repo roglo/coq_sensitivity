@@ -4731,8 +4731,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-...
-set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
+set (sg := map (λ k, σ ° permut_list_inv (canon_sym_gr_list n k)) (seq 0 n!)).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -4755,7 +4754,7 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold ff_app.
       rewrite (List_map_nth' 0). 2: {
         rewrite length_permut_list_inv.
-        destruct Hσ as (H1, H2); rewrite H2.
+        rewrite length_canon_sym_gr_list.
         flia Hi.
       }
       easy.
@@ -4765,8 +4764,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-Check det_by_any_sym_gr.
-...
 apply det_by_any_sym_gr; try easy.
 unfold sg.
 split. {
@@ -4779,13 +4776,11 @@ split. {
     unfold "°"; cbn.
     rewrite map_length.
     rewrite length_permut_list_inv.
-    now destruct Hσ.
+    apply length_canon_sym_gr_list.
   } {
-    apply (comp_is_permut_list n). {
-      now apply canon_sym_gr_list_is_permut.
-    } {
-      now apply permut_list_inv_is_permut.
-    }
+    apply (comp_is_permut_list n); [ easy | ].
+    apply permut_list_inv_is_permut.
+    now apply canon_sym_gr_list_is_permut.
   }
 }
 split. {
@@ -4797,9 +4792,78 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold "°" in Hij.
+  unfold permut_list_inv in Hij.
+  do 2 rewrite map_map in Hij.
+  do 2 rewrite length_canon_sym_gr_list in Hij.
   specialize (ext_in_map Hij) as H1.
+  cbn in H1.
+...
   apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
   intros k Hk.
+(**)
+  specialize (H1 k).
+  assert (H : k ∈ seq 0 n) by now apply in_seq.
+  specialize (H1 H); clear H.
+  apply Hσ in H1; cycle 1. {
+    unfold unsome.
+    remember (List_find_nth _ _) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxl & Hbefx & Hx).
+      rewrite length_canon_sym_gr_list in Hxl.
+      destruct Hσ as (Hσ1, Hσ2).
+      now rewrite Hσ2.
+    } {
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite Hσ2.
+      now apply Nat.neq_0_lt_0.
+    }
+  } {
+    unfold unsome.
+    remember (List_find_nth _ (canon_sym_gr_list n j)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [x| ]. {
+      apply (List_find_nth_Some 0) in Hx.
+      destruct Hx as (Hxl & Hbefx & Hx).
+      rewrite length_canon_sym_gr_list in Hxl.
+      destruct Hσ as (Hσ1, Hσ2).
+      now rewrite Hσ2.
+    } {
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite Hσ2.
+      now apply Nat.neq_0_lt_0.
+    }
+  }
+  unfold unsome in H1.
+  remember (List_find_nth _ (canon_sym_gr_list n i)) as x eqn:Hx.
+  remember (List_find_nth _ (canon_sym_gr_list n j)) as y eqn:Hy.
+  symmetry in Hx, Hy.
+  destruct x as [x| ]. {
+    apply (List_find_nth_Some 0) in Hx.
+    destruct Hx as (Hxl & Hbefx & Hx).
+    rewrite length_canon_sym_gr_list in Hxl.
+    apply Nat.eqb_eq in Hx.
+    destruct y as [y| ]. {
+      apply (List_find_nth_Some 0) in Hy.
+      destruct Hy as (Hyl & Hbefy & Hy).
+      rewrite length_canon_sym_gr_list in Hyl.
+      apply Nat.eqb_eq in Hy.
+      subst y.
+      rewrite Hx in Hy.
+Search (nth _ (canon_sym_gr_list _ _) _ = nth _ (canon_sym_gr_list _ _) _).
+      apply (nth_canon_sym_gr_list_inj2 n).
+...
+    rewrite <- Hx.
+    destruct Hσ as (Hσ1, Hσ2).
+    now rewrite Hσ2.
+    } {
+      destruct Hσ as (Hσ1, Hσ2).
+      rewrite Hσ2.
+      now apply Nat.neq_0_lt_0.
+    }
+  }
+...
   apply H1.
 (* lemme à faire ? *)
   unfold permut_list_inv.
