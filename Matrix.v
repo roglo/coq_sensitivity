@@ -3714,6 +3714,7 @@ Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [n k]%nat.
 Arguments mat_sub {T ro} MA%M MB%M.
+Arguments mat_transp {T ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
@@ -3725,6 +3726,7 @@ Arguments matrix_eq {T}%type {ro} (MA MB)%M.
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type n%nat M%M.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
+Arguments square_matrix_ncols {n}%nat {T}%type M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

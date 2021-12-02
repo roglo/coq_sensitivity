@@ -4664,11 +4664,40 @@ split. {
 }
 Qed.
 
-Inspect 1.
+Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
+Proof.
+intros * Hcr.
+unfold mat_ncols; cbn.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
+now rewrite map_length, seq_length.
+Qed.
 
-...
+Theorem mat_transp_is_square : ∀ n M,
+  is_square_matrix n M = true
+  → is_square_matrix n M⁺ = true.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols _ Hsm) as Hc.
+apply is_sm_mat_iff in Hsm.
+apply is_sm_mat_iff.
+destruct Hsm as (Hr & Hcr & Hcl).
+cbn; rewrite map_length, seq_length.
+split; [ easy | ].
+split. {
+  intros Hct.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ easy | ].
+  rewrite mat_transp_ncols in Hct; [ | easy ].
+  congruence.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Hi & Hic).
+  now rewrite <- Hi, map_length, seq_length.
+}
+Qed.
 
-Theorem determinant_transp :
+Theorem determinant_transpose :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4676,10 +4705,14 @@ Theorem determinant_transp :
   rngl_has_1_neq_0 = true →
   rngl_has_dec_eq = true →
   rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T), determinant M⁺ = determinant M.
+  ∀ n (M : matrix T),
+  is_square_matrix n M = true
+  → determinant n M⁺ = determinant n M.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-rewrite det_is_det_by_canon_permut; try easy.
+intros Hic Hop Hiv Hit H10 Hde Hch * Hsm.
+rewrite det_is_det_by_canon_permut; try easy. 2: {
+  now apply mat_transp_is_square.
+}
 rewrite determinant'_by_list; try easy.
 symmetry.
 rewrite det_is_det_by_canon_permut; try easy.
@@ -4696,6 +4729,7 @@ cbn.
 erewrite map_ext_in. 2: {
   intros m Hm.
   apply in_seq in Hm.
+...
   now rewrite <- ε_of_canon_permut_ε.
 }
 symmetry.
