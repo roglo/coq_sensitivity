@@ -4831,10 +4831,30 @@ split. {
   symmetry in Hij.
   do 2 rewrite map_id in Hij.
 Theorem permut_list_inv_inj2 : ∀ l1 l2,
-  permut_list_inv l1 = permut_list_inv l2
+  is_permut_list l1
+  → is_permut_list l2
+  → permut_list_inv l1 = permut_list_inv l2
   → l1 = l2.
 Proof.
-intros * Hill.
+intros * Hl1 Hl2 Hill.
+assert (Hll : length l1 = length l2). {
+  apply List_eq_iff in Hill.
+  now do 2 rewrite length_permut_list_inv in Hill.
+}
+Search permut_list_inv.
+...
+unfold permut_list_inv in Hill.
+rewrite Hll in Hill.
+specialize (ext_in_map Hill) as H1.
+cbn in H1.
+...
+intros * Hl1 Hl2 Hill.
+clear Hl1 Hl2.
+revert l1 Hill.
+induction l2 as [| i]; intros; [ now destruct l1 | ].
+destruct l1 as [| j]; [ easy | ].
+unfold permut_list_inv in Hill.
+...
 assert (Hll : length l1 = length l2). {
   apply List_eq_iff in Hill.
   now do 2 rewrite length_permut_list_inv in Hill.
@@ -4846,6 +4866,7 @@ cbn in H1.
 apply List_eq_iff.
 split; [ easy | ].
 intros d i.
+destruct Hl1 as (Hl11, Hl12).
 ...
 intros * Hill.
 apply List_eq_iff in Hill.
