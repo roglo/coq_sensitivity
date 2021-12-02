@@ -4831,15 +4831,30 @@ split. {
   symmetry in Hij.
   do 2 rewrite map_id in Hij.
 Theorem permut_list_inv_inj2 : ∀ l1 l2,
-  length l1 = length l2
-  → permut_list_inv l1 = permut_list_inv l2
+  permut_list_inv l1 = permut_list_inv l2
   → l1 = l2.
 Proof.
-intros * Hll Hi.
-unfold permut_list_inv in Hi.
-rewrite Hll in Hi.
-specialize (ext_in_map Hi) as H1.
-cbn in H1.
+intros * Hill.
+apply List_eq_iff in Hill.
+destruct Hill as (Hill & Hnll).
+do 2 rewrite length_permut_list_inv in Hill.
+apply List_eq_iff.
+split; [ easy | ].
+intros d i.
+Search permut_list_inv.
+...
+specialize (Hnll d (nth i l1 d)).
+Search (ff_app (ff_app _ _)).
+...
+
+rewrite List_map_nth_seq with (d := 0); symmetry.
+rewrite List_map_nth_seq with (d := 0); symmetry.
+rewrite Hll.
+apply map_ext_in.
+intros i Hi.
+apply (f_equal (λ l, ff_app l i)) in Hill.
+Search (ff_app _ _ = ff_app _ _).
+Search (nth _ _ _ = nth _ _ _).
 ...
 apply permut_list_inv_inj2 in Hij.
 ...
