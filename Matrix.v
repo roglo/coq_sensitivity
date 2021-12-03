@@ -2117,6 +2117,31 @@ split. {
   destruct M as (ll).
   cbn in Hc, Hi, Hj |-*.
   cbn - [ butn ] in Hl.
+...
+(**)
+  apply in_map_iff in Hl.
+  destruct Hl as (l' & Hll' & Hl').
+  rewrite <- Hll'.
+  rewrite butn_length.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec j (length l')) as [Hjl| Hjl]. {
+    f_equal.
+    apply Hc.
+    now apply in_butn in Hl'.
+  }
+  rewrite Nat.sub_0_r.
+  apply Nat.nlt_ge in Hjl.
+  rewrite butn_out in Hll'; [ | easy ].
+  subst l'.
+...
+  apply in_butn in Hl'.
+...
+  apply Nat.ltb_lt in Hj; rewrite Hj.
+  revert i Hi Hl.
+  induction ll as [| l']; intros; [ easy | ].
+  cbn; rewrite Nat.sub_0_r.
+...
   revert ll Hi Hj Hc Hl.
   induction i; intros. {
     apply in_map_iff in Hl.
