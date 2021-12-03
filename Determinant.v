@@ -4871,6 +4871,76 @@ split. {
 } {
   intros l Hl.
   apply in_map_iff.
+Search (permut_list_inv (canon_sym_gr_list _ _)).
+Search permut_list_inv.
+Search canon_sym_gr_list_inv.
+Search canon_sym_gr_list.
+exists (canon_sym_gr_list_inv n (permut_list_inv l ° σ)).
+Search canon_sym_gr_list.
+rewrite permut_in_canon_sym_gr_of_its_rank; [ |  ].
+Search (permut_list_inv (_ ° _)).
+Theorem permut_list_inv_comp : ∀ n l1 l2,
+  is_permut n l1
+  → is_permut n l2
+  → permut_list_inv (l1 ° l2) = permut_list_inv l2 ° permut_list_inv l1.
+Proof.
+intros * Hnl1 Hnl2.
+unfold "°".
+unfold permut_list_inv; cbn.
+rewrite map_length.
+rewrite map_map.
+destruct Hnl1 as (Hp1, Hl1).
+destruct Hnl2 as (Hp2, Hl2).
+rewrite Hl2, <- Hl1.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold unsome.
+  remember (List_find_nth _ _) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [x| ]. {
+    apply (List_find_nth_Some 0) in Hx.
+    destruct Hx as (Hxσ & Hbefx & Hx).
+    congruence.
+  }
+  flia Hi.
+}
+remember (List_find_nth _ _) as x eqn:Hx.
+remember (List_find_nth _ l2) as y eqn:Hy.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  rewrite map_length in Hx.
+  destruct Hx as (Hxl & Hbefx & Hx).
+  apply Nat.eqb_eq in Hx.
+  rewrite (List_map_nth' 0) in Hx; [ | easy ].
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some 0) in Hy.
+    destruct Hy as (Hyl & Hbefy & Hy).
+    apply Nat.eqb_eq in Hy.
+    unfold unsome in Hy.
+    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+    symmetry in Hz.
+    destruct z as [z| ]. {
+      apply (List_find_nth_Some 0) in Hz.
+      destruct Hz as (Hzl & Hbefz & Hz).
+      apply Nat.eqb_eq in Hz.
+      rewrite seq_nth in Hy; [ | congruence ].
+      rewrite Nat.add_0_l in Hy.
+      rewrite Hx in Hz.
+      apply Hp1 in Hz; [ | | easy ]. 2: {
+        rewrite Hl1, <- Hl2.
+        now apply Hp2, nth_In.
+      }
+      rewrite Hy in Hz.
+      apply Hp2 in Hz; [ | easy | easy ].
+      easy.
+    }
+...
+rewrite permut_list_inv_comp.
+Search (_ ° _ = _).
 ...
   unfold permut_list_inv in Hij.
   do 2 rewrite map_map in Hij.
