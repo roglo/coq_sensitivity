@@ -524,8 +524,7 @@ split. {
   rewrite firstn_length.
   cbn - [ skipn ].
   rewrite skipn_length.
-...
-  rewrite fold_corr_mat_ncols; [ | | now rewrite Hr ]. 2: {
+  rewrite fold_corr_mat_ncols; [ | | easy ]. 2: {
     split; [ easy | now rewrite Hcn ].
   }
   rewrite Nat.min_l; [ | flia Hkc ].
@@ -610,7 +609,7 @@ Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments vect_zero {T ro} n%nat.
 Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type n%nat M%M.
+Arguments is_square_matrix {T}%type M%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
@@ -2082,6 +2081,8 @@ cbn; rewrite butn_length.
 unfold Nat.b2n; rewrite if_ltb_lt_dec.
 now destruct (lt_dec j (length l)).
 Qed.
+
+...
 
 Theorem is_squ_mat_subm : ∀ n (M : matrix T) i j,
   n ≠ 0
