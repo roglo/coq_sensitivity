@@ -694,7 +694,7 @@ Qed.
 Theorem canon_sym_gr_list_ub : ∀ n k i,
   k < n!
   → i < n
-  → nth i (canon_sym_gr_list n k) 0 < n.
+  → ff_app (canon_sym_gr_list n k) i < n.
 Proof.
 intros * Hkn Hi.
 revert i k Hkn Hi.
@@ -709,6 +709,47 @@ unfold succ_when_ge.
 rewrite <- Nat.add_1_r.
 apply Nat.add_lt_le_mono; [ | apply Nat_b2n_upper_bound ].
 now apply IHn.
+Qed.
+
+Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
+  k < n!
+  → j < n
+  → ff_app (canon_sym_gr_inv_list n k) j < n.
+Proof.
+intros * Hkn Hjn.
+unfold canon_sym_gr_inv_list, ff_app.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+revert k j Hkn Hjn.
+induction n; intros; [ easy | cbn ].
+destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    cbn in Hkn.
+    apply Nat.lt_1_r in Hkn; subst k.
+    easy.
+  }
+  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
+    subst j.
+    clear Hjn.
+    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
+    rewrite Nat_fact_succ in Hkn.
+    rewrite Nat.mul_comm in Hkn.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ | easy ].
+    apply fact_neq_0.
+  } {
+    apply IHn; [ easy | flia Hjn Hjsn ].
+  }
+} {
+  apply Nat.nlt_ge in Hjkn.
+  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | easy ].
+  apply -> Nat.succ_lt_mono.
+  destruct n. {
+    now apply Nat.lt_1_r in Hjn; subst j.
+  }
+  apply IHn; [ easy | flia Hjn Hknj ].
+}
 Qed.
 
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
@@ -999,7 +1040,7 @@ destruct l as [| a]; [ easy | ].
 now cbn; rewrite map_length, Nat.sub_0_r.
 Qed.
 
-Theorem rank_of_canon_permut_ub : ∀ n l,
+Theorem canon_sym_gr_list_inv_ub : ∀ n l,
   is_permut n l
   → canon_sym_gr_list_inv n l < n!.
 Proof.
@@ -1068,7 +1109,7 @@ f_equal. {
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite <- Nat.add_0_r; f_equal.
   apply Nat.div_small.
-  apply rank_of_canon_permut_ub.
+  apply canon_sym_gr_list_inv_ub.
   split. {
     now apply sub_canon_permut_list_is_permut.
   } {
@@ -1081,7 +1122,7 @@ f_equal. {
   rewrite Nat.div_add_l; [ | apply fact_neq_0 ].
   rewrite Nat_mod_add_l_mul_r; [ | apply fact_neq_0 ].
   rewrite Nat.mod_small. 2: {
-    apply rank_of_canon_permut_ub.
+    apply canon_sym_gr_list_inv_ub.
     split. {
       now apply sub_canon_permut_list_is_permut.
     } {
@@ -1123,14 +1164,14 @@ f_equal. {
     exfalso.
     apply H1; clear H1.
     rewrite Nat.div_small; [ flia Hai | ].
-    apply rank_of_canon_permut_ub.
+    apply canon_sym_gr_list_inv_ub.
     split; [ | now cbn; rewrite map_length ].
     now apply sub_canon_permut_list_is_permut.
   }
   apply Nat.nlt_ge in Hai.
   rewrite Nat.sub_0_r.
   rewrite Nat.div_small. 2: {
-    apply rank_of_canon_permut_ub.
+    apply canon_sym_gr_list_inv_ub.
     split. {
       now apply sub_canon_permut_list_is_permut.
     } {
@@ -1286,7 +1327,7 @@ apply Nat.ltb_lt.
 destruct k as (k, pk); cbn.
 apply Nat.ltb_lt in pk.
 specialize (Hsg k pk).
-now apply rank_of_canon_permut_ub.
+now apply canon_sym_gr_list_inv_ub.
 Qed.
 
 Definition rank_in_sym_gr_of_rank_in_canon_sym_gr n sg
@@ -1340,9 +1381,9 @@ assert
   unfold canon_sym_gr_list_list.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
-    now apply rank_of_canon_permut_ub.
+    now apply canon_sym_gr_list_inv_ub.
   }
-  rewrite seq_nth; [ | now apply rank_of_canon_permut_ub ].
+  rewrite seq_nth; [ | now apply canon_sym_gr_list_inv_ub ].
   rewrite Nat.add_0_l.
   rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy ].
   now apply sym_gr_inv_list_el with (n := n).
@@ -1456,7 +1497,7 @@ split. {
   split; [ easy | ].
   apply in_seq.
   split; [ easy | ].
-  now apply rank_of_canon_permut_ub.
+  now apply canon_sym_gr_list_inv_ub.
 }
 Qed.
 

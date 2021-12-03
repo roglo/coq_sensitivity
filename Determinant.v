@@ -1070,7 +1070,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     destruct Hi as (j & Hji & Hj).
     apply in_seq in Hj.
     rewrite <- Hji.
-    apply rank_of_canon_permut_ub.
+    apply canon_sym_gr_list_inv_ub.
     apply list_swap_elem_is_permut; [ easy | easy | ].
     now apply canon_sym_gr_list_is_permut.
   } {
@@ -4421,6 +4421,192 @@ split. {
 }
 Qed.
 
+Theorem permut_list_inv_inj2 : ∀ l1 l2,
+  is_permut_list l1
+  → is_permut_list l2
+  → permut_list_inv l1 = permut_list_inv l2
+  → l1 = l2.
+Proof.
+intros * Hpl1 Hpl2 Hill.
+assert (Hll : length l1 = length l2). {
+  apply List_eq_iff in Hill.
+  now do 2 rewrite length_permut_list_inv in Hill.
+}
+apply (f_equal (comp_list l1)) in Hill.
+rewrite (@comp_permut_permut_inv (length l1)) in Hill; [ | easy ].
+apply (f_equal (λ l, comp_list l l2)) in Hill.
+rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy ]. 2: {
+  apply length_permut_list_inv.
+}
+rewrite (@comp_permut_inv_permut (length l2)) in Hill; [ | easy ].
+rewrite comp_id_r in Hill; [ | easy ].
+rewrite comp_id_l in Hill; [ easy | ].
+rewrite Hll.
+apply Hpl2.
+Qed.
+
+Theorem permut_list_inv_comp : ∀ n l1 l2,
+  is_permut n l1
+  → is_permut n l2
+  → permut_list_inv (l1 ° l2) = permut_list_inv l2 ° permut_list_inv l1.
+Proof.
+intros * Hnl1 Hnl2.
+unfold "°".
+unfold permut_list_inv; cbn.
+rewrite map_length.
+rewrite map_map.
+destruct Hnl1 as (Hp1, Hl1).
+destruct Hnl2 as (Hp2, Hl2).
+rewrite Hl2, <- Hl1.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold unsome.
+  remember (List_find_nth _ _) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [x| ]. {
+    apply (List_find_nth_Some 0) in Hx.
+    destruct Hx as (Hxσ & Hbefx & Hx).
+    congruence.
+  }
+  flia Hi.
+}
+remember (List_find_nth _ _) as x eqn:Hx.
+remember (List_find_nth _ l2) as y eqn:Hy.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  rewrite map_length in Hx.
+  destruct Hx as (Hxl & Hbefx & Hx).
+  apply Nat.eqb_eq in Hx.
+  rewrite (List_map_nth' 0) in Hx; [ | easy ].
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some 0) in Hy.
+    destruct Hy as (Hyl & Hbefy & Hy).
+    apply Nat.eqb_eq in Hy.
+    unfold unsome in Hy.
+    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+    symmetry in Hz.
+    destruct z as [z| ]. {
+      apply (List_find_nth_Some 0) in Hz.
+      destruct Hz as (Hzl & Hbefz & Hz).
+      apply Nat.eqb_eq in Hz.
+      rewrite seq_nth in Hy; [ | congruence ].
+      rewrite Nat.add_0_l in Hy.
+      rewrite Hx in Hz.
+      apply Hp1 in Hz; [ | | easy ]. 2: {
+        rewrite Hl1, <- Hl2.
+        now apply Hp2, nth_In.
+      }
+      rewrite Hy in Hz.
+      apply Hp2 in Hz; [ | easy | easy ].
+      easy.
+    }
+    rewrite seq_nth in Hy; [ | flia Hi ].
+    specialize (List_find_nth_None 0 _ _ Hz) as H1.
+    specialize (H1 (nth x l2 0)).
+    assert (H : nth x l2 0 < length l1). {
+      rewrite Hl1, <- Hl2.
+      apply Hp2.
+      now apply (nth_In _ 0).
+    }
+    specialize (H1 H); clear H.
+    now apply Nat.eqb_neq in H1.
+  }
+  exfalso.
+  revert Hy.
+  apply (@List_find_nth_not_None n); [ easy | ].
+  unfold unsome.
+  remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+  symmetry in Hz.
+  destruct z as [z| ]. {
+    apply (List_find_nth_Some 0) in Hz.
+    destruct Hz as (Hzl & Hbefz & Hz).
+    rewrite seq_nth; [ | easy ].
+    now rewrite Hl1 in Hzl.
+  }
+  rewrite seq_nth; [ flia Hl2 Hxl | flia Hi ].
+}
+exfalso.
+revert Hx.
+apply (@List_find_nth_not_None n); [ | now rewrite <- Hl1 ].
+now apply map_ff_app_permut_permut_is_permut.
+Qed.
+
+Theorem permut_list_inv_involutive : ∀ l,
+  is_permut_list l
+  → permut_list_inv (permut_list_inv l) = l.
+Proof.
+intros * Hl.
+unfold permut_list_inv.
+rewrite map_length, seq_length.
+rewrite List_map_nth_seq with (d := 0).
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  rewrite map_length, seq_length in Hx.
+  destruct Hx as (Hxl & Hbefx & Hx).
+  rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hx; [ | easy ].
+  rewrite Nat.add_0_l in Hx.
+  apply Nat.eqb_eq in Hx.
+  unfold unsome in Hx.
+  remember (List_find_nth (Nat.eqb x) l) as y eqn:Hy.
+  symmetry in Hy.
+  destruct y as [y| ]. {
+    subst y.
+    apply (List_find_nth_Some 0) in Hy.
+    destruct Hy as (Hyl & Hbefy & Hy).
+    now apply Nat.eqb_eq in Hy.
+  }
+  exfalso.
+  revert Hy.
+  apply (@List_find_nth_not_None (length l)); [ | easy ].
+  easy.
+}
+exfalso.
+revert Hx.
+apply (@List_find_nth_not_None (length l)); [ | easy ].
+now apply permut_list_inv_is_permut.
+Qed.
+
+Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
+Proof.
+intros * Hcr.
+unfold mat_ncols; cbn.
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem mat_transp_is_square : ∀ n M,
+  is_square_matrix n M = true
+  → is_square_matrix n M⁺ = true.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols _ Hsm) as Hc.
+apply is_sm_mat_iff in Hsm.
+apply is_sm_mat_iff.
+destruct Hsm as (Hr & Hcr & Hcl).
+cbn; rewrite map_length, seq_length.
+split; [ easy | ].
+split. {
+  intros Hct.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ easy | ].
+  rewrite mat_transp_ncols in Hct; [ | easy ].
+  congruence.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Hi & Hic).
+  now rewrite <- Hi, map_length, seq_length.
+}
+Qed.
+
 Theorem det_any_permut_l :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4643,123 +4829,9 @@ split. {
   apply in_seq.
   split; [ easy | ].
   rewrite Nat.add_0_l.
-  apply rank_of_canon_permut_ub.
+  apply canon_sym_gr_list_inv_ub.
   now apply map_ff_app_permut_permut_is_permut.
 }
-Qed.
-
-Theorem permut_list_inv_inj2 : ∀ l1 l2,
-  is_permut_list l1
-  → is_permut_list l2
-  → permut_list_inv l1 = permut_list_inv l2
-  → l1 = l2.
-Proof.
-intros * Hpl1 Hpl2 Hill.
-assert (Hll : length l1 = length l2). {
-  apply List_eq_iff in Hill.
-  now do 2 rewrite length_permut_list_inv in Hill.
-}
-apply (f_equal (comp_list l1)) in Hill.
-rewrite (@comp_permut_permut_inv (length l1)) in Hill; [ | easy ].
-apply (f_equal (λ l, comp_list l l2)) in Hill.
-rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy ]. 2: {
-  apply length_permut_list_inv.
-}
-rewrite (@comp_permut_inv_permut (length l2)) in Hill; [ | easy ].
-rewrite comp_id_r in Hill; [ | easy ].
-rewrite comp_id_l in Hill; [ easy | ].
-rewrite Hll.
-apply Hpl2.
-Qed.
-
-Theorem permut_list_inv_comp : ∀ n l1 l2,
-  is_permut n l1
-  → is_permut n l2
-  → permut_list_inv (l1 ° l2) = permut_list_inv l2 ° permut_list_inv l1.
-Proof.
-intros * Hnl1 Hnl2.
-unfold "°".
-unfold permut_list_inv; cbn.
-rewrite map_length.
-rewrite map_map.
-destruct Hnl1 as (Hp1, Hl1).
-destruct Hnl2 as (Hp2, Hl2).
-rewrite Hl2, <- Hl1.
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-unfold ff_app.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  unfold unsome.
-  remember (List_find_nth _ _) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x as [x| ]. {
-    apply (List_find_nth_Some 0) in Hx.
-    destruct Hx as (Hxσ & Hbefx & Hx).
-    congruence.
-  }
-  flia Hi.
-}
-remember (List_find_nth _ _) as x eqn:Hx.
-remember (List_find_nth _ l2) as y eqn:Hy.
-symmetry in Hx, Hy.
-destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
-  rewrite map_length in Hx.
-  destruct Hx as (Hxl & Hbefx & Hx).
-  apply Nat.eqb_eq in Hx.
-  rewrite (List_map_nth' 0) in Hx; [ | easy ].
-  destruct y as [y| ]. {
-    apply (List_find_nth_Some 0) in Hy.
-    destruct Hy as (Hyl & Hbefy & Hy).
-    apply Nat.eqb_eq in Hy.
-    unfold unsome in Hy.
-    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
-    symmetry in Hz.
-    destruct z as [z| ]. {
-      apply (List_find_nth_Some 0) in Hz.
-      destruct Hz as (Hzl & Hbefz & Hz).
-      apply Nat.eqb_eq in Hz.
-      rewrite seq_nth in Hy; [ | congruence ].
-      rewrite Nat.add_0_l in Hy.
-      rewrite Hx in Hz.
-      apply Hp1 in Hz; [ | | easy ]. 2: {
-        rewrite Hl1, <- Hl2.
-        now apply Hp2, nth_In.
-      }
-      rewrite Hy in Hz.
-      apply Hp2 in Hz; [ | easy | easy ].
-      easy.
-    }
-    rewrite seq_nth in Hy; [ | flia Hi ].
-    specialize (List_find_nth_None 0 _ _ Hz) as H1.
-    specialize (H1 (nth x l2 0)).
-    assert (H : nth x l2 0 < length l1). {
-      rewrite Hl1, <- Hl2.
-      apply Hp2.
-      now apply (nth_In _ 0).
-    }
-    specialize (H1 H); clear H.
-    now apply Nat.eqb_neq in H1.
-  }
-  exfalso.
-  revert Hy.
-  apply (@List_find_nth_not_None n); [ easy | ].
-  unfold unsome.
-  remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
-  symmetry in Hz.
-  destruct z as [z| ]. {
-    apply (List_find_nth_Some 0) in Hz.
-    destruct Hz as (Hzl & Hbefz & Hz).
-    rewrite seq_nth; [ | easy ].
-    now rewrite Hl1 in Hzl.
-  }
-  rewrite seq_nth; [ flia Hl2 Hxl | flia Hi ].
-}
-exfalso.
-revert Hx.
-apply (@List_find_nth_not_None n); [ | now rewrite <- Hl1 ].
-now apply map_ff_app_permut_permut_is_permut.
 Qed.
 
 Theorem det_any_permut_r :
@@ -4914,7 +4986,6 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold "°" in Hij.
-(**)
   apply (f_equal (map (ff_app (permut_list_inv σ)))) in Hij.
   do 2 rewrite map_map in Hij.
   erewrite map_ext_in in Hij. 2: {
@@ -4983,229 +5054,17 @@ split. {
     destruct Hl as (H1, H2).
     now rewrite H2 in Hi.
   }
-Search (permut_list_inv (permut_list_inv _)).
-Theorem permut_list_inv_involutive : ∀ l,
-  is_permut_list l
-  → permut_list_inv (permut_list_inv l) = l.
-Proof.
-intros * Hl.
-unfold permut_list_inv.
-rewrite map_length, seq_length.
-rewrite List_map_nth_seq with (d := 0).
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-unfold unsome.
-remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
-destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
-  rewrite map_length, seq_length in Hx.
-  destruct Hx as (Hxl & Hbefx & Hx).
-  rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hx; [ | easy ].
-  rewrite Nat.add_0_l in Hx.
-  apply Nat.eqb_eq in Hx.
-  remember (List_find_nth (Nat.eqb x) l) as y eqn:Hy.
-  symmetry in Hy.
-  destruct y as [y| ]. {
-    subst y.
-    apply (List_find_nth_Some 0) in Hy.
-    destruct Hy as (Hyl & Hbefy & Hy).
-    now apply Nat.eqb_eq in Hy.
-  }
-  exfalso.
-  revert Hy.
-  apply (@List_find_nth_not_None (length l)); [ | easy ].
-  easy.
-}
-exfalso.
-revert Hx.
-apply (@List_find_nth_not_None (length l)); [ | easy ].
-Search (is_permut _ (map _ _)).
-...
-  rewrite permut_list_inv_involutive.
-...
-  unfold permut_list_inv in Hij.
-  do 2 rewrite map_map in Hij.
-  do 2 rewrite length_canon_sym_gr_list in Hij.
-  specialize (ext_in_map Hij) as H1.
-  cbn in H1.
-  apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
-  intros k Hk.
-(**)
-...
-  specialize (H1 k).
-  assert (H : k ∈ seq 0 n) by now apply in_seq.
-  specialize (H1 H); clear H.
-...
-  apply Hσ in H1; cycle 1. {
-    unfold unsome.
-    remember (List_find_nth _ _) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
-      destruct Hx as (Hxl & Hbefx & Hx).
-      rewrite length_canon_sym_gr_list in Hxl.
-      destruct Hσ as (Hσ1, Hσ2).
-      now rewrite Hσ2.
-    } {
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite Hσ2.
-      now apply Nat.neq_0_lt_0.
-    }
-  } {
-    unfold unsome.
-    remember (List_find_nth _ (canon_sym_gr_list n j)) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
-      destruct Hx as (Hxl & Hbefx & Hx).
-      rewrite length_canon_sym_gr_list in Hxl.
-      destruct Hσ as (Hσ1, Hσ2).
-      now rewrite Hσ2.
-    } {
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite Hσ2.
-      now apply Nat.neq_0_lt_0.
-    }
-  }
-  unfold unsome in H1.
-  remember (List_find_nth _ (canon_sym_gr_list n i)) as x eqn:Hx.
-  remember (List_find_nth _ (canon_sym_gr_list n j)) as y eqn:Hy.
-  symmetry in Hx, Hy.
-  destruct x as [x| ]. {
-    apply (List_find_nth_Some 0) in Hx.
-    destruct Hx as (Hxl & Hbefx & Hx).
-    rewrite length_canon_sym_gr_list in Hxl.
-    apply Nat.eqb_eq in Hx.
-    destruct y as [y| ]. {
-      apply (List_find_nth_Some 0) in Hy.
-      destruct Hy as (Hyl & Hbefy & Hy).
-      rewrite length_canon_sym_gr_list in Hyl.
-      apply Nat.eqb_eq in Hy.
-      subst y.
-      rewrite Hx in Hy.
-Search (nth _ (canon_sym_gr_list _ _) _ = nth _ (canon_sym_gr_list _ _) _).
-      apply (nth_canon_sym_gr_list_inj2 n).
-...
-    rewrite <- Hx.
-    destruct Hσ as (Hσ1, Hσ2).
-    now rewrite Hσ2.
-    } {
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite Hσ2.
-      now apply Nat.neq_0_lt_0.
-    }
-  }
-...
-  apply H1.
-(* lemme à faire ? *)
-  unfold permut_list_inv.
-  apply in_map_iff.
-  exists (ff_app σ k).
-  split. {
-    unfold unsome.
-    remember (List_find_nth _ _) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
-      destruct Hx as (Hxl & Hbefx & Hx).
-      apply Nat.eqb_eq in Hx.
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite <- Hσ2 in Hk.
-      now apply Hσ1.
-    } {
-      specialize (List_find_nth_None 0 _ _ Hx) as H2.
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite <- Hσ2 in Hk.
-      specialize (H2 k Hk).
-      now rewrite Nat.eqb_refl in H2.
-    }
-  } {
-    apply in_seq.
-    split; [ easy | ].
-    rewrite Nat.add_0_l.
-    destruct Hσ as (Hσ1, Hσ2).
-    rewrite <- Hσ2 in Hk.
-    now apply permut_list_ub.
-  }
-} {
-  intros l Hl.
-  apply in_map_iff.
-  destruct Hl as (Hl1, Hl2).
-  destruct Hσ as (Hσ1, Hσ2).
-  exists (canon_sym_gr_list_inv n (map (ff_app l) σ)).
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
-    now apply map_ff_app_permut_permut_is_permut.
-  }
-  split. {
-    unfold "°".
-    unfold ff_app.
-    erewrite map_ext_in. 2: {
-      intros i Hi.
-      rewrite (List_map_nth' 0). 2: {
-        now apply in_permut_list_inv_lt.
-      }
-      easy.
-    }
-    unfold permut_list_inv.
-    rewrite map_map.
-    rewrite (List_map_nth_seq l 0) at 1.
-    rewrite Hl2, <- Hσ2.
-    apply map_ext_in.
-    intros i Hi; apply in_seq in Hi.
-    unfold unsome.
-    remember (List_find_nth _ _) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
-      destruct Hx as (Hxσ & Hbefx & Hx).
-      apply Nat.eqb_eq in Hx.
-      now rewrite <- Hx.
-    }
-    exfalso; revert Hx.
-    rewrite Hσ2 in Hi.
-    now apply (List_find_nth_not_None (conj Hσ1 Hσ2)).
-  }
+  rewrite permut_list_inv_involutive; [ | now destruct Hl ].
+  split; [ easy | ].
   apply in_seq.
   split; [ easy | ].
-  rewrite Nat.add_0_l.
-  apply rank_of_canon_permut_ub.
-  now apply map_ff_app_permut_permut_is_permut.
-}
-...
-
-Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
-Proof.
-intros * Hcr.
-unfold mat_ncols; cbn.
-rewrite List_hd_nth_0.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
-now rewrite map_length, seq_length.
-Qed.
-
-Theorem mat_transp_is_square : ∀ n M,
-  is_square_matrix n M = true
-  → is_square_matrix n M⁺ = true.
-Proof.
-intros * Hsm.
-specialize (square_matrix_ncols _ Hsm) as Hc.
-apply is_sm_mat_iff in Hsm.
-apply is_sm_mat_iff.
-destruct Hsm as (Hr & Hcr & Hcl).
-cbn; rewrite map_length, seq_length.
-split; [ easy | ].
-split. {
-  intros Hct.
-  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ easy | ].
-  rewrite mat_transp_ncols in Hct; [ | easy ].
-  congruence.
-} {
-  intros l Hl.
-  apply in_map_iff in Hl.
-  destruct Hl as (i & Hi & Hic).
-  now rewrite <- Hi, map_length, seq_length.
+  apply canon_sym_gr_list_inv_ub.
+  apply comp_is_permut; [ | easy ].
+  now apply permut_list_inv_is_permut.
 }
 Qed.
+
+(* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
 Theorem determinant_transpose :
   rngl_is_comm = true →
@@ -5220,136 +5079,49 @@ Theorem determinant_transpose :
   → determinant n M⁺ = determinant n M.
 Proof.
 intros Hic Hop Hiv Hit H10 Hde Hch * Hsm.
-rewrite det_is_det_by_canon_permut; try easy. 2: {
-  now apply mat_transp_is_square.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+specialize (mat_transp_is_square n M Hsm) as Hts.
+assert (Hs : is_permut n (seq 0 n)) by apply seq_is_permut.
+rewrite det_any_permut_l with (σ := seq 0 n); try easy.
+rewrite det_any_permut_r with (σ := seq 0 n); try easy.
+apply rngl_summation_list_eq_compat.
+intros p Hp.
+f_equal.
+apply rngl_product_eq_compat.
+intros k Hk.
+unfold mat_transp.
+cbn - [ ff_app ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold ff_app.
+  rewrite seq_nth; [ | flia Hnz Hk ].
+  rewrite (@square_matrix_ncols n); [ | easy ].
+  flia Hnz Hk.
 }
-rewrite determinant'_by_list; try easy.
-symmetry.
-rewrite det_is_det_by_canon_permut; try easy.
-rewrite determinant'_by_list; try easy.
-apply rngl_summation_permut; cycle 1. {
-  unfold determinant'_list.
-  now rewrite List_map_seq_length.
-} {
-  unfold determinant'_list.
-  now rewrite List_map_seq_length.
+assert (Hpr : ff_app p k < mat_nrows M). {
+  apply in_map_iff in Hp.
+  destruct Hp as (i & Hi & His).
+  apply in_seq in His.
+  rewrite <- Hi.
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hr, _).
+  rewrite Hr.
+  apply canon_sym_gr_list_ub; [ easy | ].
+  flia Hnz Hk.
 }
-unfold determinant'_list.
-cbn.
-(*
-erewrite map_ext_in. 2: {
-  intros m Hm.
-  apply in_seq in Hm.
-  now rewrite <- ε_of_canon_permut_ε.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth. 2: {
+  unfold ff_app.
+  rewrite seq_nth; [ | flia Hnz Hk ].
+  rewrite (@square_matrix_ncols n); [ | easy ].
+  flia Hnz Hk.
 }
-symmetry.
-erewrite map_ext_in. 2: {
-  intros m Hm.
-  apply in_seq in Hm.
-  now rewrite <- ε_of_canon_permut_ε.
-}
-*)
-symmetry.
-remember (canon_sym_gr_list n) as f eqn:Hf.
-...
-look at
-https://proofwiki.org/wiki/Permutation_of_Determinant_Indices
-...
-Search canon_permut.
-Print FinFun.Injective.
-Print FinFun.Surjective.
-Print Module FinFun.
-Print FinFun.Finite.
-Print FinFun.Full.
-Definition is_symmetric_group n (f : nat → vector n nat) :=
-  FinFun.Injective nat {
-...
-Definition is_symmetric_group n (f : nat → vector n nat) :=
-  (∀ i j, i < n! → j < n! → f i = f j → i = j) ∧
-  (∀ v, ∃ i, i < n! ∧ f i = v).
-...
-Theorem glop : ∀ n (M : matrix n n T) (f g : nat → vector n nat),
-  is_symmetric_group f
-  → is_symmetric_group f
-  → determinant M =
-      (∑ (i = 1, n!), ε (f i) * ε (g i) *
-       ∏ (j = 1, n), mat_el M (vect_el (f i) j) (vect_el (g i) j))%F.
-...
-Check determinant_multilinear.
-About nat_bijection_Permutation.
-Search (Permutation (map _ _)).
-Search determinant'_list.
-Search canon_permut.
-...
-Print FinFun.Injective.
-Print FinFun.Surjective.
-Search FinFun.Surjective.
-Theorem glop : ∀ A B (f g : A → B) l,
-  FinFun.Injective f
-  → FinFun.Injective g
-  → FinFun.Surjective f
-  → FinFun.Surjective g
-  → Permutation (map f l) (map g l).
-Proof.
-intros * Hif Hig Hsf Hsg.
-unfold FinFun.Injective in Hif, Hig.
-unfold FinFun.Surjective in Hsf, Hsg.
-induction l as [| x]; [ easy | ].
-cbn.
-Search Permutation (_ :: _).
-...
-destruct n; [ easy | ].
-destruct n. {
-  now subst f; unfold iter_seq, iter_list; cbn.
-}
-destruct n. {
-  subst f; unfold iter_seq, iter_list; cbn.
-  repeat rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
-  rewrite (rngl_mul_comm Hic (mat_el M 0 1)).
-  easy.
-}
-...
-cbn in Hf.
-subst f.
-remember (S n) as sn; cbn; subst sn.
-Print canon_permut_fun.
-...
-apply det_is_det_by_any_permut; try easy.
-unfold determinant'_list.
-Search determinant'_list.
-Search (Permutation (map _ _)).
-About nat_bijection_Permutation.
-etransitivity. {
-About permut_fun_Permutation.
-...
-Search Permutation.
-apply nat_bijection_Permutation.
-Check Permutation_map.
-Check Permutation_trans.
-...
-permut_fun_Permutation: ∀ (f : nat → nat) (n : nat), is_permut_fun f n → Permutation (map f (seq 0 n)) (seq 0 n)
+easy.
+Qed.
 
-cbn.
-transitivity (seq 0 n!).
-Check Permutation_trans.
+Inspect 1.
 
-Search (Permutation (map _ _)).
-apply Permutation_trans with (l' := seq 0 n!).
-eapply Permutation_trans. {
-apply permut_fun_Permutation.
-...
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-rewrite det_is_det_by_canon_permut; try easy.
-unfold determinant'.
-symmetry.
-rewrite det_is_det_by_canon_permut; try easy.
-unfold determinant'.
-cbn.
-Search determinant'.
-...
-intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
-intros.
 ...
 
 Theorem laplace_formula_on_cols :

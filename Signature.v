@@ -2112,47 +2112,6 @@ f_equal.
 now apply IHn.
 Qed.
 
-Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
-  k < n!
-  → j < n
-  → ff_app (canon_sym_gr_inv_list n k) j < n.
-Proof.
-intros * Hkn Hjn.
-unfold canon_sym_gr_inv_list, ff_app.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
-revert k j Hkn Hjn.
-induction n; intros; [ easy | cbn ].
-destruct (lt_dec j (k / fact n)) as [Hjkn| Hjkn]. {
-  apply -> Nat.succ_lt_mono.
-  destruct n. {
-    cbn in Hkn.
-    apply Nat.lt_1_r in Hkn; subst k.
-    easy.
-  }
-  destruct (Nat.eq_dec j (S n)) as [Hjsn| Hjsn]. {
-    subst j.
-    clear Hjn.
-    exfalso; apply Nat.nle_gt in Hjkn; apply Hjkn; clear Hjkn.
-    rewrite Nat_fact_succ in Hkn.
-    rewrite Nat.mul_comm in Hkn.
-    apply Nat.lt_succ_r.
-    apply Nat.div_lt_upper_bound; [ | easy ].
-    apply fact_neq_0.
-  } {
-    apply IHn; [ easy | flia Hjn Hjsn ].
-  }
-} {
-  apply Nat.nlt_ge in Hjkn.
-  destruct (lt_dec (k / fact n) j) as [Hknj| Hknj]; [ | easy ].
-  apply -> Nat.succ_lt_mono.
-  destruct n. {
-    now apply Nat.lt_1_r in Hjn; subst j.
-  }
-  apply IHn; [ easy | flia Hjn Hknj ].
-}
-Qed.
-
 Theorem canon_sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
