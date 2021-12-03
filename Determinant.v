@@ -117,9 +117,11 @@ Definition determinant' n (M : matrix T) :=
 Theorem det_is_det_by_canon_permut : rngl_is_field →
   ∀ n (M : matrix T),
   is_square_matrix n M = true
-  → determinant_loop n M = determinant' n M.
+  → determinant M = determinant' n M.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
+unfold determinant.
+replace (mat_nrows M) with n by now apply is_sm_mat_iff in Hm.
 unfold determinant'.
 revert M Hm.
 induction n; intros. {
@@ -228,24 +230,25 @@ Theorem determinant_multilinear : rngl_is_field →
   → vect_size U = n
   → vect_size V = n
   → i < n
-  → determinant_loop n (mat_repl_vect i M (a × U + b × V)%V) =
-       (a * determinant n (mat_repl_vect i M U) +
-        b * determinant n (mat_repl_vect i M V))%F.
+  → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * determinant (mat_repl_vect i M U) +
+        b * determinant (mat_repl_vect i M V))%F.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hu Hv Hi.
+intros Hif * Hsm Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+Check det_is_det_by_canon_permut.
+rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
   rewrite map2_length.
   do 2 rewrite map_length, fold_vect_size.
   rewrite Hu, Hv.
   apply Nat.min_id.
 }
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | easy | easy ].
 }
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | easy | easy ].
 }
 unfold determinant'.
@@ -288,8 +291,8 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -298,6 +301,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic a).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
@@ -328,6 +332,7 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic b).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
@@ -379,6 +384,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
 rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
@@ -511,9 +517,10 @@ Theorem det_is_det_by_any_permut : rngl_is_field →
   ∀ n (M : matrix T) l,
   is_square_matrix n M = true
   → Permutation l (determinant'_list n M)
-  → determinant n M = ∑ (k = 0, fact n - 1), nth k l 0.
+  → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hl.
+...
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; [ now symmetry | | ]. {
