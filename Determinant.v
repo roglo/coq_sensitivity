@@ -4672,6 +4672,96 @@ rewrite Hll.
 apply Hpl2.
 Qed.
 
+Theorem permut_list_inv_comp : ∀ n l1 l2,
+  is_permut n l1
+  → is_permut n l2
+  → permut_list_inv (l1 ° l2) = permut_list_inv l2 ° permut_list_inv l1.
+Proof.
+intros * Hnl1 Hnl2.
+unfold "°".
+unfold permut_list_inv; cbn.
+rewrite map_length.
+rewrite map_map.
+destruct Hnl1 as (Hp1, Hl1).
+destruct Hnl2 as (Hp2, Hl2).
+rewrite Hl2, <- Hl1.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold unsome.
+  remember (List_find_nth _ _) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [x| ]. {
+    apply (List_find_nth_Some 0) in Hx.
+    destruct Hx as (Hxσ & Hbefx & Hx).
+    congruence.
+  }
+  flia Hi.
+}
+remember (List_find_nth _ _) as x eqn:Hx.
+remember (List_find_nth _ l2) as y eqn:Hy.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_find_nth_Some 0) in Hx.
+  rewrite map_length in Hx.
+  destruct Hx as (Hxl & Hbefx & Hx).
+  apply Nat.eqb_eq in Hx.
+  rewrite (List_map_nth' 0) in Hx; [ | easy ].
+  destruct y as [y| ]. {
+    apply (List_find_nth_Some 0) in Hy.
+    destruct Hy as (Hyl & Hbefy & Hy).
+    apply Nat.eqb_eq in Hy.
+    unfold unsome in Hy.
+    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+    symmetry in Hz.
+    destruct z as [z| ]. {
+      apply (List_find_nth_Some 0) in Hz.
+      destruct Hz as (Hzl & Hbefz & Hz).
+      apply Nat.eqb_eq in Hz.
+      rewrite seq_nth in Hy; [ | congruence ].
+      rewrite Nat.add_0_l in Hy.
+      rewrite Hx in Hz.
+      apply Hp1 in Hz; [ | | easy ]. 2: {
+        rewrite Hl1, <- Hl2.
+        now apply Hp2, nth_In.
+      }
+      rewrite Hy in Hz.
+      apply Hp2 in Hz; [ | easy | easy ].
+      easy.
+    }
+    rewrite seq_nth in Hy; [ | flia Hi ].
+    specialize (List_find_nth_None 0 _ _ Hz) as H1.
+    specialize (H1 (nth x l2 0)).
+    assert (H : nth x l2 0 < length l1). {
+      rewrite Hl1, <- Hl2.
+      apply Hp2.
+      now apply (nth_In _ 0).
+    }
+    specialize (H1 H); clear H.
+    now apply Nat.eqb_neq in H1.
+  }
+  exfalso.
+  revert Hy.
+  apply (@List_find_nth_not_None n); [ easy | ].
+  unfold unsome.
+  remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+  symmetry in Hz.
+  destruct z as [z| ]. {
+    apply (List_find_nth_Some 0) in Hz.
+    destruct Hz as (Hzl & Hbefz & Hz).
+    rewrite seq_nth; [ | easy ].
+    now rewrite Hl1 in Hzl.
+  }
+  rewrite seq_nth; [ flia Hl2 Hxl | flia Hi ].
+}
+exfalso.
+revert Hx.
+apply (@List_find_nth_not_None n); [ | now rewrite <- Hl1 ].
+now apply map_ff_app_permut_permut_is_permut.
+Qed.
+
 Theorem det_any_permut_r :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4871,76 +4961,68 @@ split. {
 } {
   intros l Hl.
   apply in_map_iff.
-Search (permut_list_inv (canon_sym_gr_list _ _)).
-Search permut_list_inv.
-Search canon_sym_gr_list_inv.
-Search canon_sym_gr_list.
-exists (canon_sym_gr_list_inv n (permut_list_inv l ° σ)).
-Search canon_sym_gr_list.
-rewrite permut_in_canon_sym_gr_of_its_rank; [ |  ].
-Search (permut_list_inv (_ ° _)).
-Theorem permut_list_inv_comp : ∀ n l1 l2,
-  is_permut n l1
-  → is_permut n l2
-  → permut_list_inv (l1 ° l2) = permut_list_inv l2 ° permut_list_inv l1.
+  exists (canon_sym_gr_list_inv n (permut_list_inv l ° σ)).
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    apply comp_is_permut; [ | easy ].
+    now apply permut_list_inv_is_permut.
+  }
+  rewrite (@permut_list_inv_comp n); [ | | easy ]. 2: {
+    now apply permut_list_inv_is_permut.
+  }
+  rewrite (@permut_comp_assoc n); cycle 1. {
+    rewrite length_permut_list_inv.
+    now destruct Hσ.
+  } {
+    now do 2 apply permut_list_inv_is_permut.
+  }
+  rewrite (@comp_permut_permut_inv n); [ | easy ].
+  rewrite comp_id_l. 2: {
+    intros i Hi.
+    apply in_permut_list_inv_lt in Hi.
+    rewrite length_permut_list_inv in Hi.
+    destruct Hl as (H1, H2).
+    now rewrite H2 in Hi.
+  }
+Search (permut_list_inv (permut_list_inv _)).
+Theorem permut_list_inv_involutive : ∀ l,
+  is_permut_list l
+  → permut_list_inv (permut_list_inv l) = l.
 Proof.
-intros * Hnl1 Hnl2.
-unfold "°".
-unfold permut_list_inv; cbn.
-rewrite map_length.
-rewrite map_map.
-destruct Hnl1 as (Hp1, Hl1).
-destruct Hnl2 as (Hp2, Hl2).
-rewrite Hl2, <- Hl1.
+intros * Hl.
+unfold permut_list_inv.
+rewrite map_length, seq_length.
+rewrite List_map_nth_seq with (d := 0).
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
-unfold ff_app.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  unfold unsome.
-  remember (List_find_nth _ _) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x as [x| ]. {
-    apply (List_find_nth_Some 0) in Hx.
-    destruct Hx as (Hxσ & Hbefx & Hx).
-    congruence.
-  }
-  flia Hi.
-}
-remember (List_find_nth _ _) as x eqn:Hx.
-remember (List_find_nth _ l2) as y eqn:Hy.
-symmetry in Hx, Hy.
+unfold unsome.
+remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
 destruct x as [x| ]. {
   apply (List_find_nth_Some 0) in Hx.
-  rewrite map_length in Hx.
+  rewrite map_length, seq_length in Hx.
   destruct Hx as (Hxl & Hbefx & Hx).
+  rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
+  rewrite seq_nth in Hx; [ | easy ].
+  rewrite Nat.add_0_l in Hx.
   apply Nat.eqb_eq in Hx.
-  rewrite (List_map_nth' 0) in Hx; [ | easy ].
+  remember (List_find_nth (Nat.eqb x) l) as y eqn:Hy.
+  symmetry in Hy.
   destruct y as [y| ]. {
+    subst y.
     apply (List_find_nth_Some 0) in Hy.
     destruct Hy as (Hyl & Hbefy & Hy).
-    apply Nat.eqb_eq in Hy.
-    unfold unsome in Hy.
-    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
-    symmetry in Hz.
-    destruct z as [z| ]. {
-      apply (List_find_nth_Some 0) in Hz.
-      destruct Hz as (Hzl & Hbefz & Hz).
-      apply Nat.eqb_eq in Hz.
-      rewrite seq_nth in Hy; [ | congruence ].
-      rewrite Nat.add_0_l in Hy.
-      rewrite Hx in Hz.
-      apply Hp1 in Hz; [ | | easy ]. 2: {
-        rewrite Hl1, <- Hl2.
-        now apply Hp2, nth_In.
-      }
-      rewrite Hy in Hz.
-      apply Hp2 in Hz; [ | easy | easy ].
-      easy.
-    }
+    now apply Nat.eqb_eq in Hy.
+  }
+  exfalso.
+  revert Hy.
+  apply (@List_find_nth_not_None (length l)); [ | easy ].
+  easy.
+}
+exfalso.
+revert Hx.
+apply (@List_find_nth_not_None (length l)); [ | easy ].
+Search (is_permut _ (map _ _)).
 ...
-rewrite permut_list_inv_comp.
-Search (_ ° _ = _).
+  rewrite permut_list_inv_involutive.
 ...
   unfold permut_list_inv in Hij.
   do 2 rewrite map_map in Hij.
