@@ -2138,6 +2138,50 @@ split. {
     now apply Nat.ltb_lt in Hj; rewrite Hj.
   }
   cbn; rewrite Nat.sub_0_r.
+  specialize (IHi (l' :: ll)) as H1.
+  cbn in H1; rewrite Nat.sub_0_r in H1.
+  cbn in Hi.
+  apply H1; [ flia Hi | easy | easy | ].
+  apply in_map_iff in Hl.
+  apply in_map_iff.
+  destruct Hl as (x & Hxl & Hx).
+...
+exists x.
+split; [ easy | ].
+clear - Hx.
+...
+revert ll Hx.
+induction i; intros; [ now apply in_butn in Hx | ].
+rewrite butn_cons.
+destruct ll as [| l]; [ easy | ].
+rewrite butn_cons in Hx.
+...
+(*
+  destruct i. {
+    exists x.
+    split; [ easy | cbn ].
+    now apply in_butn in Hx.
+  }
+  rewrite butn_cons.
+*)
+  exists x.
+  split; [ easy | ].
+  destruct i. {
+    cbn in Hx; cbn.
+    destruct ll as [| l'']; [ easy | ].
+    now right.
+  }
+  rewrite butn_cons.
+  destruct ll as [| l'']; [ easy | ].
+  apply in_butn in Hx.
+  rewrite butn_cons in Hx.
+  apply in_butn in Hx.
+  right.
+...
+  destruct ll as [| l'']; [ easy | ].
+  rewrite butn_cons in Hx.
+  destruct Hx as [Hx| Hx]. {
+    subst l''.
 ...
   apply IHi with (ll := ll); [ flia Hi | | easy ].
   intros l'' Hl''.
