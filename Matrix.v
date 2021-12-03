@@ -617,6 +617,7 @@ Notation "A * B" := (mat_mul A B) : M_scope.
 Notation "μ × A" := (mat_mul_scal_l μ A) (at level 40) : M_scope.
 Notation "- A" := (mat_opp A) : M_scope.
 
+Arguments is_square_matrix {T}%type M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 
 Notation "A • V" := (mat_mul_vect_r A V) (at level 40) : M_scope.
@@ -2576,15 +2577,18 @@ Definition square_matrix_add (MA MB : square_matrix T) :
      sm_prop := square_matrix_add_is_square MA MB |}.
 
 Theorem square_matrix_mul_is_square : ∀ (MA MB : square_matrix T),
-  is_square_matrix (sm_mat MA * sm_mat MB)%M = true.
+  mat_ncols (sm_mat MA) = mat_nrows (sm_mat MB)
+  → is_square_matrix (sm_mat MA * sm_mat MB) = true.
 Proof.
-intros.
+intros * Hab.
 apply is_sm_mat_iff.
 split. {
-  intros Hc; cbn.
-  rewrite List_map_seq_length.
+  unfold "*"%M.
   destruct MA as (MA & Ha).
-  destruct MB as (MB & Hb).
+  destruct MB as (MB & Hb); cbn in Hab |-*.
+  rewrite map_length, seq_length.
+  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hrz| Hrz]; [ easy | ].
+  intros Hc; cbn.
   move MB before MA; cbn in Hc |-*.
   apply is_sm_mat_iff in Ha.
   apply is_sm_mat_iff in Hb.
@@ -2594,42 +2598,42 @@ split. {
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
   rewrite List_hd_nth_0 in Hc.
-...
-  destruct n; [ easy | exfalso ].
-  rewrite List_map_nth' with (a := 0) in Hc. 2: {
-    rewrite seq_length, Hra; flia.
-  }
+  apply Nat.neq_0_lt_0 in Hrz.
+  rewrite List_map_nth' with (a := 0) in Hc; [ | now rewrite seq_length ].
   apply map_eq_nil in Hc.
   apply List_seq_eq_nil in Hc.
+  rewrite fold_mat_ncols in Hc.
   apply Hcrb in Hc.
-  flia Hrb Hc.
+  rewrite Hc in Hab.
+  now rewrite Hcra in Hrz.
 } {
   intros l Hl.
   apply in_map_iff in Hl.
   destruct Hl as (i & Him & Hl).
   subst l.
   rewrite List_map_seq_length.
-  apply squ_mat_ncols.
+  rewrite squ_mat_ncols; cbn.
+  rewrite map_length, seq_length.
+  destruct MA as (MA & Ha).
+  destruct MB as (MB & Hb); cbn in Hab |-*.
+  specialize (square_matrix_ncols MA Ha) as H1.
+  congruence.
 }
 Qed.
 
-Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
-  square_matrix n T :=
+Definition square_matrix_mul (MA MB : square_matrix T) P_ca_rb :
+  square_matrix T :=
   {| sm_mat := (sm_mat MA * sm_mat MB)%M;
-     sm_prop := square_matrix_mul_is_square MA MB |}.
+     sm_prop := square_matrix_mul_is_square MA MB P_ca_rb |}.
 
-Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
-  is_square_matrix n (- sm_mat M)%M = true.
+Theorem square_matrix_opp_is_square : ∀ (M : square_matrix T),
+  is_square_matrix (- sm_mat M) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
-split; cbn. {
-  rewrite map_length.
-  rewrite fold_mat_nrows.
-  apply squ_mat_nrows.
-}
 split. {
   intros Hco.
+...
   rewrite map_length.
   rewrite fold_mat_nrows.
   destruct M as (M & Ha); cbn in Hco |-*.
