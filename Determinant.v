@@ -2317,6 +2317,8 @@ Definition comatrix n (M : matrix T) : matrix T :=
          (seq 0 (mat_ncols M)))
       (seq 0 (mat_nrows M))).
 
+Arguments comatrix n%nat M%M.
+
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
 Proof.
@@ -4506,6 +4508,13 @@ apply (@List_find_nth_not_None (length l)); [ | easy ].
 now apply permut_list_inv_is_permut.
 Qed.
 
+Theorem mat_transp_nrows : ∀ M, mat_nrows M⁺ = mat_ncols M.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+now rewrite map_length, seq_length.
+Qed.
+
 Theorem mat_transp_ncols : ∀ M, mat_ncols M ≠ 0 → mat_ncols M⁺ = mat_nrows M.
 Proof.
 intros * Hcr.
@@ -5037,7 +5046,56 @@ rewrite seq_nth. 2: {
 easy.
 Qed.
 
-Inspect 1.
+Theorem laplace_formula_on_cols : rngl_is_field →
+  ∀ n (M : matrix T) j,
+  j < n
+  → determinant n M = ∑ (i = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
+Proof.
+intros Hif * Hlin.
+Check laplace_formula_on_rows.
+Print comatrix.
+Theorem comatrix_transp : ∀ n M,
+  is_square_matrix n M = true
+  → comatrix n M⁺ = ((comatrix n M)⁺)%M.
+Proof.
+intros * Hsm.
+unfold comatrix.
+rewrite mat_transp_nrows.
+rewrite (@square_matrix_nrows n); [ | easy ].
+rewrite (@square_matrix_ncols n); [ | now apply mat_transp_is_square ].
+unfold mat_transp; cbn.
+f_equal.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  rewrite (@square_matrix_ncols n); [ now subst n | easy ].
+}
+rewrite (@square_matrix_nrows n); [ | easy ].
+rewrite map_length, seq_length.
+unfold mat_ncols; cbn.
+do 2 rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hnz ].
+rewrite map_length, seq_length.
+apply map_ext_in.
+intros i Hi.
+rewrite <- List_hd_nth_0 in Hi |-*.
+rewrite fold_mat_ncols in Hi |-*.
+apply in_seq in Hi.
+apply map_ext_in.
+intros j Hj; apply in_seq in Hj.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite (@square_matrix_ncols n) in Hi |-*; [ | easy | easy ].
+rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l, (Nat.add_comm j).
+f_equal.
+unfold subm; cbn.
+Abort.
+Abort.
+
+End a.
+
+Arguments comatrix {T}%type {ro} n%nat M%M.
+Compute (let M := mk_mat [[1]] in (comatrix (mat_nrows M) M⁺ = ((comatrix (mat_nrows M) M)⁺)%M)).
 
 ...
 
