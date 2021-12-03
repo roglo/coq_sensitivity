@@ -112,19 +112,12 @@ Definition determinant' n (M : matrix T) :=
 
 (* Proof that both definitions of determinants are equal *)
 
-Theorem det_is_det_by_canon_permut :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem det_is_det_by_canon_permut : rngl_is_field →
   ∀ n (M : matrix T),
   is_square_matrix n M = true
   → determinant n M = determinant' n M.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hm.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
 unfold determinant'.
 revert M Hm.
 induction n; intros. {
@@ -227,14 +220,7 @@ Qed.
 
 (* multilinearity *)
 
-Theorem determinant_multilinear :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_multilinear : rngl_is_field →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix n M = true
   → vect_size U = n
@@ -244,7 +230,7 @@ Theorem determinant_multilinear :
        (a * determinant n (mat_repl_vect i M U) +
         b * determinant n (mat_repl_vect i M V))%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hu Hv Hi.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
 rewrite det_is_det_by_canon_permut; try easy. 2: {
@@ -501,18 +487,11 @@ Definition determinant'_list n (M : matrix T) :=
 
 Arguments determinant'_list n%nat M%M.
 
-Theorem determinant'_by_list :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant'_by_list : rngl_is_field →
   ∀ n (M : matrix T),
   determinant' n M = ∑ (k = 0, fact n - 1), nth k (determinant'_list n M) 0.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch *.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) *.
 unfold determinant', determinant'_list.
 apply rngl_summation_eq_compat; intros k Hk.
 assert (Hkn : k < fact n). {
@@ -526,20 +505,13 @@ f_equal.
 now apply ε_of_permut_ε.
 Qed.
 
-Theorem det_is_det_by_any_permut :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem det_is_det_by_any_permut : rngl_is_field →
   ∀ n (M : matrix T) l,
   is_square_matrix n M = true
   → Permutation l (determinant'_list n M)
   → determinant n M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hl.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hl.
 rewrite det_is_det_by_canon_permut; try easy.
 rewrite determinant'_by_list; try easy.
 apply rngl_summation_permut; [ now symmetry | | ]. {
@@ -791,14 +763,7 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
-Theorem determinant_alternating :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_alternating : rngl_is_field →
   ∀ n (M : matrix T) p q,
   p ≠ q
   → p < n
@@ -806,7 +771,7 @@ Theorem determinant_alternating :
   → is_square_matrix n M = true
   → determinant n (mat_swap_rows p q M) = (- determinant n M)%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hpq Hp Hq Hsm.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hp Hq Hsm.
 rewrite det_is_det_by_canon_permut; try easy. 2: {
   now apply mat_swap_rows_is_square.
 }
@@ -1133,14 +1098,7 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Theorem determinant_same_rows :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_same_rows : rngl_is_field →
   ∀ n (M : matrix T) p q,
   is_square_matrix n M = true
   → p ≠ q
@@ -1149,7 +1107,7 @@ Theorem determinant_same_rows :
   → (∀ j, mat_el M p j = mat_el M q j)
   → determinant n M = 0%F.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hpq Hpn Hqn Hjpq.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : determinant n M = (- determinant n M)%F). {
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
@@ -3154,21 +3112,14 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
-Theorem determinant_circular_shift_rows :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_circular_shift_rows : rngl_is_field →
   ∀ n (M : matrix T) i,
   i < n
   → is_square_matrix n M = true
   → determinant n (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
     (minus_one_pow i * determinant n M)%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * Hin Hsm.
+intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
 revert M Hsm.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
 assert (H : i < n) by flia Hin.
@@ -3273,14 +3224,7 @@ rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
 
-Theorem determinant_subm_mat_swap_rows_0_i :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_subm_mat_swap_rows_0_i : rngl_is_field →
   ∀ n (M : matrix T) i j,
   is_square_matrix (S n) M = true
   → 0 < i ≤ n
@@ -3288,7 +3232,7 @@ Theorem determinant_subm_mat_swap_rows_0_i :
   → determinant n (subm (mat_swap_rows 0 i M) 0 j) =
     (- minus_one_pow i * determinant n (subm M i j))%F.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * Hsm (Hiz, Hin) Hjn.
+intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ. 2: {
   apply is_sm_mat_iff in Hsm.
   destruct Hsm as (Hr, _).
@@ -3305,21 +3249,14 @@ Qed.
 
 (* Laplace formulas *)
 
-Theorem laplace_formula_on_rows :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem laplace_formula_on_rows : rngl_is_field →
   ∀ n (M : matrix T) i,
   is_square_matrix n M = true
   → i < n
   → determinant n M =
     ∑ (j = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
 Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hsm Hlin.
+intros Hif * Hsm Hlin.
 specialize (square_matrix_ncols M Hsm) as Hc.
 specialize (proj1 (is_sm_mat_iff n M) Hsm) as H1.
 destruct H1 as (Hr & Hcr & Hc').
@@ -3330,6 +3267,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   symmetry.
   apply rngl_summation_eq_compat.
   intros j Hj.
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch).
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hr ].
@@ -3347,6 +3285,7 @@ rewrite Nat.sub_0_r.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hj.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hlin Hr ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hc ].
   rewrite seq_nth; [ | flia Hlin Hr ].
@@ -3361,23 +3300,23 @@ rename i into p.
 remember (mat_swap_rows 0 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite Nat.add_comm.
-  rewrite minus_one_pow_add_r; [ | easy ].
+  rewrite minus_one_pow_add_r; [ | now destruct Hif ].
   do 2 rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc.
   remember (minus_one_pow p * _)%F as x eqn:Hx.
-  rewrite <- rngl_opp_involutive in Hx; [ | easy ].
-  rewrite <- rngl_mul_opp_l in Hx; [ | easy ].
+  rewrite <- rngl_opp_involutive in Hx; [ | now destruct Hif ].
+  rewrite <- rngl_mul_opp_l in Hx; [ | now destruct Hif ].
   specialize determinant_subm_mat_swap_rows_0_i as H1.
-  specialize (H1 Hic Hop Hin Hit H10 Hde Hch).
+  specialize (H1 Hif).
   specialize (H1 n M p j Hsm).
   cbn in H1.
   rewrite <- H1 in Hx; [ | flia Hiz Hlin | easy ].
   subst x; clear H1.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
   replace (mat_el M p j) with (mat_el (mat_swap_rows 0 p M) 0 j). 2: {
     unfold mat_swap_rows.
     cbn; unfold list_swap_elem.
@@ -3388,14 +3327,14 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   rewrite <- HeqM'.
-  rewrite rngl_mul_opp_r; [ | easy ].
+  rewrite rngl_mul_opp_r; [ | now destruct Hif ].
   easy.
 }
 cbn.
-rewrite <- rngl_opp_summation; [ | easy ].
+rewrite <- rngl_opp_summation; [ | now destruct Hif ].
 do 2 rewrite <- determinant_succ.
 subst M'.
-rewrite <- rngl_opp_involutive; [ | easy ].
+rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
 f_equal.
 apply determinant_alternating; try easy; flia Hiz.
 Qed.
@@ -4238,14 +4177,7 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
-Theorem det_by_any_sym_gr :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem det_by_any_sym_gr : rngl_is_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → is_square_matrix n M = true
@@ -4255,7 +4187,7 @@ Theorem det_by_any_sym_gr :
     ε n (nth k sg []) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
 Proof.
-intros Hic Hop Hiv Hit H10 Hed Hch * Hnz Hsm Hsg.
+intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hnz Hsm Hsg.
 rewrite det_is_det_by_canon_permut; try easy.
 unfold determinant'.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
@@ -4607,14 +4539,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_l :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_comm = true →
-  rngl_has_dec_eq = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
+Theorem det_any_permut_l : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → is_square_matrix n M = true
@@ -4623,7 +4548,7 @@ Theorem det_any_permut_l :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
-intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+intros (Hop & Hiv & Hic & Hde & H10 & Hit & Hch) * Hnz Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : is_permut n μ). {
@@ -4834,14 +4759,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_r :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_comm = true →
-  rngl_has_dec_eq = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
+Theorem det_any_permut_r : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → is_square_matrix n M = true
@@ -4850,7 +4768,10 @@ Theorem det_any_permut_r :
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
 Proof.
+intros Hif * Hnz Hsm Hσ.
+(*
 intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
+*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : is_permut n μ). {
@@ -4875,10 +4796,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite <- Hσν at 1.
   replace (ε n ((σ ° permut_list_inv μ) ° μ)) with
       (ε n (σ ° permut_list_inv μ) * ε n μ)%F. 2: {
+    destruct Hif.
     rewrite <- signature_comp; try easy.
     apply comp_is_permut; [ easy | ].
     now apply permut_list_inv_is_permut.
   }
+  destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε n μ)).
   rewrite rngl_mul_assoc.
   replace (ε n μ * ε n μ)%F with 1%F by now symmetry; apply ε_square.
@@ -4921,6 +4844,7 @@ erewrite rngl_summation_eq_compat. 2: {
     now rewrite length_canon_sym_gr_list.
   }
   cbn.
+  destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
   rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
@@ -5066,19 +4990,12 @@ Qed.
 
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
-Theorem determinant_transpose :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem determinant_transpose : rngl_is_field →
   ∀ n (M : matrix T),
   is_square_matrix n M = true
   → determinant n M⁺ = determinant n M.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * Hsm.
+intros Hif * Hsm.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 specialize (mat_transp_is_square n M Hsm) as Hts.
 assert (Hs : is_permut n (seq 0 n)) by apply seq_is_permut.

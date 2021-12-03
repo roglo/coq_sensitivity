@@ -1067,22 +1067,13 @@ split. {
 Qed.
 *)
 
-...
-
 Theorem transposition_signature_lt : rngl_is_field →
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
   ∀ n p q,
   p < q
   → q < n
   → ε n (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hq.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hq.
 rewrite ε_ws_ε; try easy. 2: {
   split; [ | now rewrite map_length, seq_length ].
   split; cbn. {
@@ -1262,21 +1253,14 @@ do 2 rewrite if_ltb_lt_dec.
 now destruct (lt_dec (i - 1) (j - 1)).
 Qed.
 
-Theorem transposition_signature :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem transposition_signature : rngl_is_field →
   ∀ n p q,
   p ≠ q
   → p < n
   → q < n
   → ε n (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hpq Hp Hq.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hp Hq.
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
   now apply transposition_signature_lt.
 }
@@ -2084,19 +2068,12 @@ destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
 now do 2 rewrite Nat.add_0_r.
 Qed.
 
-Theorem ε_of_permut_ε :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem ε_of_permut_ε : rngl_is_field →
   ∀ n k,
   k < n!
   → ε n (canon_sym_gr_list n k) = ε_permut n k.
 Proof.
-intros Hic Hop Hin H10 Hit Hde Hch * Hkn.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hkn.
 revert k Hkn.
 induction n; intros. {
   cbn; unfold ε; cbn.
@@ -2200,17 +2177,10 @@ destruct Hσ3 as [Hσ3| Hσ3]. {
 now apply Hl; right; right.
 Qed.
 
-Theorem ε_1_opp_1 :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem ε_1_opp_1 : rngl_is_field →
   ∀ n σ, is_permut n σ → ε n σ = 1%F ∨ ε n σ = (-1)%F.
 Proof.
-intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
+intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
 rewrite ε_ws_ε; try easy.
 unfold ε_ws.
 apply rngl_product_1_opp_1; [ easy | ].
@@ -2225,23 +2195,19 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 now left.
 Qed.
 
-Theorem ε_square :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
+Theorem ε_square : rngl_is_field →
   ∀ n σ, is_permut n σ → (ε n σ * ε n σ = 1)%F.
 Proof.
-intros Hic Hop Hiv H10 Hit Hed Hch * Hσ.
+intros Hif * Hσ.
+(*
+intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
+*)
 specialize (ε_1_opp_1) as H1.
-specialize (H1 Hic Hop Hiv H10 Hit Hed Hch).
-specialize (H1 n σ Hσ).
+specialize (H1 Hif n σ Hσ).
 destruct H1 as [H1| H1]; rewrite H1. {
   apply rngl_mul_1_l.
 } {
+  destruct Hif as (Hic & Hop & Hiv & H10 & Hit & Hed & Hch).
   rewrite rngl_mul_opp_opp; [ | easy ].
   apply rngl_mul_1_l.
 }
@@ -2256,15 +2222,16 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
-Arguments ε_of_permut_ε {T}%type {ro rp} _ _ _ _ _ _ _ n%nat [k]%nat.
+Arguments ε_of_permut_ε {T}%type {ro rp} _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ n%nat p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
+Arguments rngl_is_field {T}%type {ro rp}.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [f g].
-Arguments transposition_signature {T}%type {ro rp} _ _ _ _ _ _ _ (n p q)%nat.
-Arguments ε_1_opp_1 {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
-Arguments ε_square {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [σ].
+Arguments transposition_signature {T}%type {ro rp} _ (n p q)%nat.
+Arguments ε_1_opp_1 {T}%type {ro rp} _ [n]%nat [σ].
+Arguments ε_square {T}%type {ro rp} _ [n]%nat [σ].
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
