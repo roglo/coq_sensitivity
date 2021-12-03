@@ -2535,22 +2535,25 @@ Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
      sm_prop := mI_square_matrix_prop n |}.
 
-...
-
-Theorem squ_mat_add_is_squ : ∀ n (MA MB : matrix T),
-  is_square_matrix n MA = true
-  → is_square_matrix n MB = true
-  → is_square_matrix n (MA + MB) = true.
+Theorem squ_mat_add_is_squ : ∀ (MA MB : matrix T),
+  is_square_matrix MA = true
+  → is_square_matrix MB = true
+  → is_square_matrix (MA + MB) = true.
 Proof.
 intros * Ha Hb.
 apply is_sm_mat_iff; cbn.
 apply is_sm_mat_iff in Ha.
 apply is_sm_mat_iff in Hb.
-destruct Ha as (Hra & Hcra & Hca).
-destruct Hb as (Hrb & Hcrb & Hcb).
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
 split. {
+  unfold mat_ncols; cbn.
+  rewrite List_hd_nth_0.
+Check map2_nth.
+...
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
+...
   rewrite Hra, Hrb.
   apply Nat.min_id.
 }
@@ -2596,6 +2599,8 @@ split. {
   apply Nat.min_id.
 }
 Qed.
+
+...
 
 Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix n (sm_mat MA + sm_mat MB)%M = true.
