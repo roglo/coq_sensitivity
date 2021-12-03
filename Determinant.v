@@ -38,24 +38,26 @@ n-1  | ......|    |. .....|   |.. ....|   |... ...|
    the first row.
 *)
 
-Fixpoint determinant n (M : matrix T) :=
+Fixpoint determinant_loop n (M : matrix T) :=
   (match n with
    | 0 => λ _, 1%F
    | S n' =>
        λ M' : matrix T,
        ∑ (j = 0, n'),
-       minus_one_pow j * mat_el M' 0 j * determinant n' (subm M' 0 j)
+       minus_one_pow j * mat_el M' 0 j * determinant_loop n' (subm M' 0 j)
    end) M.
 
-Arguments determinant n%nat M%M.
+Definition determinant M := determinant_loop (mat_nrows M) M.
+Arguments determinant M%M.
 
 Theorem determinant_zero : ∀ (M : matrix T),
-  determinant 0 M = 1%F.
+  determinant_loop 0 M = 1%F.
 Proof. easy. Qed.
 
 Theorem determinant_succ : ∀ n (M : matrix T),
-  determinant (S n) M =
-     ∑ (j = 0, n), minus_one_pow j * mat_el M 0 j * determinant n (subm M 0 j).
+  determinant_loop (S n) M =
+     ∑ (j = 0, n),
+     minus_one_pow j * mat_el M 0 j * determinant_loop n (subm M 0 j).
 Proof. easy. Qed.
 
 Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
@@ -71,12 +73,12 @@ Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
 Definition det_from_row {n} (M : matrix T) i :=
   (minus_one_pow i *
    ∑ (j = 0, n),
-     minus_one_pow j * mat_el M i j * determinant n (subm M i j))%F.
+     minus_one_pow j * mat_el M i j * determinant_loop n (subm M i j))%F.
 
 Definition det_from_col {n} (M : matrix T) j :=
   (minus_one_pow j *
    ∑ (i = 0, n - 1),
-     minus_one_pow i * mat_el M i j * determinant n (subm M i j))%F.
+     minus_one_pow i * mat_el M i j * determinant_loop n (subm M i j))%F.
 
 (* Alternative version of the determinant: sum of product of the
    factors a_{i,σ(i)} where σ goes through all permutations of
@@ -115,7 +117,7 @@ Definition determinant' n (M : matrix T) :=
 Theorem det_is_det_by_canon_permut : rngl_is_field →
   ∀ n (M : matrix T),
   is_square_matrix n M = true
-  → determinant n M = determinant' n M.
+  → determinant_loop n M = determinant' n M.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
 unfold determinant'.
@@ -226,7 +228,7 @@ Theorem determinant_multilinear : rngl_is_field →
   → vect_size U = n
   → vect_size V = n
   → i < n
-  → determinant n (mat_repl_vect i M (a × U + b × V)%V) =
+  → determinant_loop n (mat_repl_vect i M (a × U + b × V)%V) =
        (a * determinant n (mat_repl_vect i M U) +
         b * determinant n (mat_repl_vect i M V))%F.
 Proof.
