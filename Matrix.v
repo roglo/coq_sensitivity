@@ -2409,7 +2409,6 @@ destruct Hmp as (Hr, Hmp).
 apply Nat.eqb_eq in Hr.
 apply is_sm_mat_iff in Hmp.
 destruct Hmp as (Hrc, Hc).
-...
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_ncols.
@@ -2418,6 +2417,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now rewrite Hr.
 }
 unfold mat_ncols.
+rewrite <- Hr.
 apply Hc.
 rewrite List_hd_nth_0.
 apply nth_In.
@@ -2426,43 +2426,53 @@ rewrite Hr.
 now apply Nat.neq_0_lt_0.
 Qed.
 
-Theorem mZ_is_square_matrix : ∀ n, is_square_matrix n (mZ n n) = true.
+Theorem mZ_is_square_matrix : ∀ n,
+  (mat_nrows (mZ n n) =? n) && is_square_matrix (mZ n n) = true.
 Proof.
 intros.
-apply is_sm_mat_iff.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  now subst n; cbn.
+apply Bool.andb_true_iff.
+split. {
+  cbn; rewrite repeat_length.
+  apply Nat.eqb_refl.
 }
-split; [ now cbn; rewrite repeat_length | ].
+apply is_sm_mat_iff.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; cbn | ].
 split; [ now rewrite mZ_nrows, mZ_ncols | ].
 intros la Hla.
 cbn in Hla.
 apply repeat_spec in Hla; subst la.
-apply repeat_length.
+now cbn; do 2 rewrite repeat_length.
 Qed.
 
 Definition smZ n : square_matrix n T :=
   {| sm_mat := mZ n n;
      sm_prop := mZ_is_square_matrix n |}.
 
-Theorem mI_is_square_matrix : ∀ n, is_square_matrix n (mI n) = true.
+Theorem mI_is_square_matrix : ∀ n, is_square_matrix (mI n) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
-split; [ now cbn; rewrite List_map_seq_length | ].
-rewrite mI_nrows, mI_ncols.
-split; [ easy | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+split. {
+  unfold mat_ncols.
+  rewrite List_hd_nth_0.
+  cbn; rewrite map_length, seq_length.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite map_length, seq_length.
+}
 intros la Hla.
 cbn in Hla.
 apply in_map_iff in Hla.
 destruct Hla as (i & Hin & Hi).
-subst la.
-now rewrite List_map_seq_length.
+subst la; cbn.
+now do 2 rewrite List_map_seq_length.
 Qed.
 
 Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
 Proof.
 intros.
+...
 apply is_sm_mat_iff.
 rewrite mI_ncols.
 apply mI_is_square_matrix.
