@@ -237,18 +237,17 @@ Proof.
 intros Hif * Hsm Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
-Check det_is_det_by_canon_permut.
-rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
+rewrite (det_is_det_by_canon_permut Hif n). 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
   rewrite map2_length.
   do 2 rewrite map_length, fold_vect_size.
   rewrite Hu, Hv.
   apply Nat.min_id.
 }
-rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
+rewrite (det_is_det_by_canon_permut Hif n). 2: {
   apply mat_repl_vect_is_square; [ congruence | easy | easy ].
 }
-rewrite (det_is_det_by_canon_permut Hif n); try easy. 2: {
+rewrite (det_is_det_by_canon_permut Hif n). 2: {
   apply mat_repl_vect_is_square; [ congruence | easy | easy ].
 }
 unfold determinant'.
@@ -519,10 +518,9 @@ Theorem det_is_det_by_any_permut : rngl_is_field →
   → Permutation l (determinant'_list n M)
   → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hl.
-...
-rewrite det_is_det_by_canon_permut; try easy.
-rewrite determinant'_by_list; try easy.
+intros Hif * Hsm Hl.
+rewrite (det_is_det_by_canon_permut Hif n); [ | easy ].
+rewrite determinant'_by_list; [ | easy ].
 apply rngl_summation_permut; [ now symmetry | | ]. {
   unfold determinant'_list.
   now rewrite List_map_seq_length.
@@ -778,10 +776,10 @@ Theorem determinant_alternating : rngl_is_field →
   → p < n
   → q < n
   → is_square_matrix n M = true
-  → determinant n (mat_swap_rows p q M) = (- determinant n M)%F.
+  → determinant (mat_swap_rows p q M) = (- determinant M)%F.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hp Hq Hsm.
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+intros Hif * Hpq Hp Hq Hsm.
+rewrite (det_is_det_by_canon_permut Hif n). 2: {
   now apply mat_swap_rows_is_square.
 }
 unfold determinant'.
@@ -810,6 +808,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
     apply permut_list_Permutation.
     now apply transposition_is_permut.
@@ -927,7 +926,7 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
-  rewrite signature_comp; try easy. {
+  rewrite signature_comp; [ easy | easy | | ]. {
     split. 2: {
       unfold f.
       rewrite length_list_swap_elem.
@@ -970,13 +969,14 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
+  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic (ε n (f k))).
   rewrite <- rngl_mul_assoc.
   now rewrite transposition_signature.
 }
 cbn - [ f ].
-rewrite <- rngl_mul_summation_distr_l; [ | now left ].
-rewrite rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_opp_l; [ | now destruct Hif ].
 f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
@@ -1077,7 +1077,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     now rewrite transposition_involutive in Hij.
   }
 }
-rewrite det_is_det_by_canon_permut; try easy.
+rewrite (det_is_det_by_canon_permut Hif n); [ | easy ].
 unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -1114,11 +1114,16 @@ Theorem determinant_same_rows : rngl_is_field →
   → p < n
   → q < n
   → (∀ j, mat_el M p j = mat_el M q j)
-  → determinant n M = 0%F.
+  → determinant M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
+(*
+unfold determinant.
+replace (mat_nrows M) with n by now apply is_sm_mat_iff in Hsm.
+*)
 specialize (square_matrix_ncols M Hsm) as Hc.
-assert (HM : determinant n M = (- determinant n M)%F). {
+assert (HM : determinant M = (- determinant M)%F). {
+...
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
   apply matrix_eq.
@@ -1229,6 +1234,8 @@ apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
 apply orb_true_iff.
 now left.
 Qed.
+
+...
 
 (* transpositions list of permutation *)
 

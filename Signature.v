@@ -1641,20 +1641,13 @@ rewrite product_product_if_permut; try easy. {
 }
 Qed.
 
-Theorem signature_comp :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_comm = true →
-  rngl_has_dec_eq = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
+Theorem signature_comp : rngl_is_field →
   ∀ n f g,
   is_permut n f
   → is_permut n g
   → ε n (f ° g) = (ε n f * ε n g)%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * Hpf Hpg.
+intros (Hop & Hic & Hin & H10 & Hit & Hde & Hch) * Hpf Hpg.
 destruct Hpf as (Hp11, Hpf2).
 destruct Hpg as (Hpg1, Hpg2).
 apply signature_comp_fun_expand_1; try easy.
@@ -2228,7 +2221,7 @@ Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_is_field {T}%type {ro rp}.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
-Arguments signature_comp {T}%type {ro rp} _ _ _ _ _ _ _ [n]%nat [f g].
+Arguments signature_comp {T}%type {ro rp} _ [n]%nat [f g].
 Arguments transposition_signature {T}%type {ro rp} _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _ [n]%nat [σ].
 Arguments ε_square {T}%type {ro rp} _ [n]%nat [σ].
