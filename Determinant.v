@@ -3810,16 +3810,24 @@ rewrite seq_nth; [ | easy ].
 now apply (permut_inv_permut n).
 Qed.
 
+Theorem comp_id_l : ∀ n l, (∀ i, i ∈ l → i < n) → seq 0 n ° l = l.
+Proof.
+intros * Hn.
+unfold "°".
+unfold ff_app.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite seq_nth; [ | now apply Hn ].
+  now rewrite Nat.add_0_l.
+}
+apply map_id.
+Qed.
+
 Theorem comp_id_r : ∀ n l, length l = n → l ° seq 0 n = l.
 Proof.
 intros * Hn.
 now symmetry; apply List_map_nth_seq'.
 Qed.
-
-(*
-Theorem comp_id_l : ∀ A B (f : A → B), comp id f = f.
-Proof. easy. Qed.
-*)
 
 (*
 Fixpoint vect_eqb_loop A (n : nat) (eqb : A → A → bool) d (u v : vector A) i :=
@@ -4640,6 +4648,30 @@ split. {
 }
 Qed.
 
+Theorem permut_list_inv_inj2 : ∀ l1 l2,
+  is_permut_list l1
+  → is_permut_list l2
+  → permut_list_inv l1 = permut_list_inv l2
+  → l1 = l2.
+Proof.
+intros * Hpl1 Hpl2 Hill.
+assert (Hll : length l1 = length l2). {
+  apply List_eq_iff in Hill.
+  now do 2 rewrite length_permut_list_inv in Hill.
+}
+apply (f_equal (comp_list l1)) in Hill.
+rewrite (@comp_permut_permut_inv (length l1)) in Hill; [ | easy ].
+apply (f_equal (λ l, comp_list l l2)) in Hill.
+rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy ]. 2: {
+  apply length_permut_list_inv.
+}
+rewrite (@comp_permut_inv_permut (length l2)) in Hill; [ | easy ].
+rewrite comp_id_r in Hill; [ | easy ].
+rewrite comp_id_l in Hill; [ easy | ].
+rewrite Hll.
+apply Hpl2.
+Qed.
+
 Theorem det_any_permut_r :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -4830,88 +4862,15 @@ split. {
   }
   symmetry in Hij.
   do 2 rewrite map_id in Hij.
-Theorem permut_list_inv_inj2 : ∀ l1 l2,
-  is_permut_list l1
-  → is_permut_list l2
-  → permut_list_inv l1 = permut_list_inv l2
-  → l1 = l2.
-Proof.
-intros * Hpl1 Hpl2 Hill.
-assert (Hll : length l1 = length l2). {
-  apply List_eq_iff in Hill.
-  now do 2 rewrite length_permut_list_inv in Hill.
-}
-remember (length l2) as n eqn:Hl2.
-rename Hll into Hl1; symmetry in Hl2; move Hl1 after Hl2.
-revert l1 l2 Hpl1 Hpl2 Hill Hl1 Hl2.
-induction n; intros. {
-  apply length_zero_iff_nil in Hl1, Hl2; congruence.
-}
-destruct l1 as [| a1]; [ easy | ].
-destruct l2 as [| a2]; [ easy | ].
-cbn in Hl1, Hl2.
-apply Nat.succ_inj in Hl1, Hl2.
-unfold permut_list_inv in Hill.
-cbn - [ List_find_nth seq ] in Hill.
-do 2 rewrite seq_S in Hill.
-cbn - [ List_find_nth ] in Hill.
-rewrite Hl1, Hl2 in Hill.
-rewrite map_app in Hill.
-rewrite map_app in Hill.
-cbn - [ List_find_nth ] in Hill.
-apply app_inj_tail in Hill.
-destruct Hill as (Hill & Hill').
-cbn in Hill'.
-...
-unfold permut_list_inv in Hill.
-rewrite Hll in Hill.
-specialize (ext_in_map Hill) as H1.
-cbn in H1.
-...
-intros * Hl1 Hl2 Hill.
-revert l1 Hl1 Hill.
-induction l2 as [| i]; intros; [ now destruct l1 | ].
-destruct l1 as [| j]; [ easy | ].
-f_equal. 2: {
-  apply IHl2.
-...
-assert (Hll : length l1 = length l2). {
-  apply List_eq_iff in Hill.
-  now do 2 rewrite length_permut_list_inv in Hill.
-}
-unfold permut_list_inv in Hill.
-rewrite Hll in Hill.
-specialize (ext_in_map Hill) as H1.
-cbn in H1.
-apply List_eq_iff.
-split; [ easy | ].
-intros d i.
-destruct Hl1 as (Hl11, Hl12).
-...
-intros * Hill.
-apply List_eq_iff in Hill.
-destruct Hill as (Hill & Hnll).
-do 2 rewrite length_permut_list_inv in Hill.
-apply List_eq_iff.
-split; [ easy | ].
-intros d i.
-...
-Search permut_list_inv.
-...
-specialize (Hnll d (nth i l1 d)).
-Search (ff_app (ff_app _ _)).
-...
-
-rewrite List_map_nth_seq with (d := 0); symmetry.
-rewrite List_map_nth_seq with (d := 0); symmetry.
-rewrite Hll.
-apply map_ext_in.
-intros i Hi.
-apply (f_equal (λ l, ff_app l i)) in Hill.
-Search (ff_app _ _ = ff_app _ _).
-Search (nth _ _ _ = nth _ _ _).
-...
-apply permut_list_inv_inj2 in Hij.
+  apply permut_list_inv_inj2 in Hij; cycle 1. {
+    now apply canon_sym_gr_list_is_permut_list.
+  } {
+    now apply canon_sym_gr_list_is_permut_list.
+  }
+  now apply canon_sym_gr_list_inj in Hij.
+} {
+  intros l Hl.
+  apply in_map_iff.
 ...
   unfold permut_list_inv in Hij.
   do 2 rewrite map_map in Hij.
