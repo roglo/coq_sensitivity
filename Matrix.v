@@ -2472,10 +2472,7 @@ Qed.
 Theorem mI_is_correct_matrix : ∀ n, is_correct_matrix (mI n).
 Proof.
 intros.
-...
-apply is_sm_mat_iff.
-rewrite mI_ncols.
-apply mI_is_square_matrix.
+apply squ_mat_is_corr, mI_is_square_matrix.
 Qed.
 
 Theorem mZ_is_correct_matrix : ∀ m n,
@@ -2523,6 +2520,8 @@ destruct Hla as (lb & Hla & Hlb); subst la.
 rewrite map_length.
 now apply Hc.
 Qed.
+
+...
 
 Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
