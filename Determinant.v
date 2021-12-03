@@ -770,11 +770,15 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
+About is_square_matrix.
+
+...
+
 Theorem determinant_alternating : rngl_is_field →
   ∀ n (M : matrix T) p q,
   p ≠ q
-  → p < n
-  → q < n
+  → p < mat_nrows M
+  → q < mat_nrows M
   → is_square_matrix n M = true
   → determinant (mat_swap_rows p q M) = (- determinant M)%F.
 Proof.
@@ -1123,6 +1127,7 @@ replace (mat_nrows M) with n by now apply is_sm_mat_iff in Hsm.
 *)
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : determinant M = (- determinant M)%F). {
+Check determinant_alternating.
 ...
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.

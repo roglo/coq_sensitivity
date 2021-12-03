@@ -155,13 +155,13 @@ Qed.
 
 (* square_matrix *)
 
-Definition is_square_matrix {T} n (M : matrix T) :=
-  (mat_nrows M =? n) && ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
-  (⋀ (l ∈ mat_list_list M), (length l =? n)).
+Definition is_square_matrix {T} (M : matrix T) :=
+  ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
+  (⋀ (l ∈ mat_list_list M), (length l =? mat_nrows M)).
 
 Record square_matrix n T :=
   { sm_mat : matrix T;
-    sm_prop : is_square_matrix n sm_mat = true }.
+    sm_prop : (mat_nrows sm_mat =? n) && is_square_matrix sm_mat = true }.
 
 Theorem square_matrix_eq {n T} : ∀ (MA MB : square_matrix n T),
   sm_mat MA = sm_mat MB
@@ -178,22 +178,17 @@ Qed.
 
 (* is_square_matrix (a bool) easier to use with Prop *)
 
-Theorem is_sm_mat_iff {T} n : ∀ (M : matrix T),
-  is_square_matrix n M = true ↔
-  mat_nrows M = n ∧
+Theorem is_sm_mat_iff {T} : ∀ (M : matrix T),
+  is_square_matrix M = true ↔
   (mat_ncols M = 0 → mat_nrows M = 0) ∧
-  ∀ l, l ∈ mat_list_list M → length l = n.
+  ∀ l, l ∈ mat_list_list M → length l = mat_nrows M.
 Proof.
 intros.
 unfold is_square_matrix.
 split; intros Hm. {
   apply Bool.andb_true_iff in Hm.
-  destruct Hm as (Hm, Hc).
-  apply Bool.andb_true_iff in Hm.
-  destruct Hm as (Hr, Hrc).
+  destruct Hm as (Hrc, Hc).
   apply Bool.orb_true_iff in Hrc.
-  apply Nat.eqb_eq in Hr.
-  split; [ easy | ].
   split. {
     intros Hcz.
     destruct Hrc as [Hrc| Hrc]. {
@@ -218,19 +213,14 @@ split; intros Hm. {
   destruct Hl as [Hl| Hl]; [ now subst l | ].
   now apply IHll.
 } {
-  destruct Hm as (Hr & Hrc & Hc).
+  destruct Hm as (Hrc & Hc).
   apply Bool.andb_true_iff.
   split. {
-    apply Bool.andb_true_iff.
-    split; [ now apply Nat.eqb_eq in Hr | ].
     apply Bool.orb_true_iff.
-    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-      move Hnz at top; subst n.
-      right.
-      now apply Nat.eqb_eq.
+    destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
+      now right; apply Nat.eqb_eq.
     }
     left.
-    rewrite <- Hr in Hnz.
     apply negb_true_iff.
     apply Nat.eqb_neq.
     intros H.
@@ -252,37 +242,36 @@ split; intros Hm. {
 }
 Qed.
 
+(*
 Theorem square_matrix_nrows {n T} : ∀ (M : matrix T),
-  is_square_matrix n M = true
+  is_square_matrix M = true
   → mat_nrows M = n.
 Proof.
 intros * Hm.
 now apply is_sm_mat_iff in Hm.
 Qed.
+*)
 
-Theorem square_matrix_ncols {n T} : ∀ (M : matrix T),
-  is_square_matrix n M = true
-  → mat_ncols M = n.
+Theorem square_matrix_ncols {T} : ∀ (M : matrix T),
+  is_square_matrix M = true
+  → mat_ncols M = mat_nrows M.
 Proof.
 intros * Hm.
 apply is_sm_mat_iff in Hm.
-destruct Hm as (Hr & Hcr & Hc).
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  unfold mat_nrows in Hr.
-  apply length_zero_iff_nil in Hr.
-  unfold mat_ncols.
-  now rewrite Hr.
+destruct Hm as (Hcr & Hc).
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
+  unfold mat_nrows, mat_ncols in Hnz |-*.
+  now apply length_zero_iff_nil in Hnz; rewrite Hnz.
 }
 apply Nat.neq_0_lt_0 in Hnz.
 apply Hc.
 rewrite List_hd_nth_0.
 apply nth_In.
-now rewrite fold_mat_nrows, Hr.
+now rewrite fold_mat_nrows.
 Qed.
 
-Theorem squ_mat_is_corr {n T} : ∀ (M : matrix T),
-  is_square_matrix n M = true
+Theorem squ_mat_is_corr {T} : ∀ (M : matrix T),
+  is_square_matrix M = true
   → is_correct_matrix M.
 Proof.
 intros * Hsm.
@@ -290,7 +279,7 @@ specialize (square_matrix_ncols _ Hsm) as Hc.
 apply is_sm_mat_iff in Hsm.
 split; [ easy | ].
 intros l Hl.
-destruct Hsm as (Hr & Hcr & Hc').
+destruct Hsm as (Hcr & Hc').
 now rewrite Hc'.
 Qed.
 
@@ -514,19 +503,18 @@ rewrite fold_mat_ncols.
 flia Hkc.
 Qed.
 
-Theorem mat_repl_vect_is_square : ∀ n k (M : matrix T) V,
+Theorem mat_repl_vect_is_square : ∀ k (M : matrix T) V,
   k < mat_ncols M
-  → vect_size V = n
-  → is_square_matrix n M = true
-  → is_square_matrix n (mat_repl_vect k M V) = true.
+  → vect_size V = mat_nrows M
+  → is_square_matrix M = true
+  → is_square_matrix (mat_repl_vect k M V) = true.
 Proof.
 intros * Hkc Hv Hm.
 specialize (square_matrix_ncols _ Hm) as Hcn.
 apply is_sm_mat_iff in Hm.
 apply is_sm_mat_iff.
-destruct Hm as (Hr & Hcr & Hc).
+destruct Hm as (Hcr & Hc).
 rewrite mat_repl_vect_nrows; [ | congruence ].
-split; [ easy | ].
 split. {
   destruct (lt_dec k (mat_ncols M)) as [Hkm| Hkm]. {
     rewrite mat_repl_vect_ncols; [ easy | easy | congruence ].
@@ -538,7 +526,7 @@ split. {
   cbn - [ skipn ] in Hla.
   apply in_map2_iff in Hla.
   destruct Hla as (i & Hi & lb & a & Hla).
-  rewrite fold_mat_nrows, fold_vect_size, Hr, Hv in Hi.
+  rewrite fold_mat_nrows, fold_vect_size, Hv in Hi.
   rewrite Nat.min_id in Hi.
   subst la.
   unfold replace_at.
@@ -546,7 +534,7 @@ split. {
   rewrite firstn_length.
   cbn - [ skipn ].
   rewrite skipn_length.
-  rewrite fold_corr_mat_ncols; [ | | now rewrite Hr ]. 2: {
+  rewrite fold_corr_mat_ncols; [ | | easy ]. 2: {
     split; [ easy | now rewrite Hcn ].
   }
   rewrite Nat.min_l; [ | flia Hkc ].
@@ -631,7 +619,7 @@ Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments vect_zero {T ro} n%nat.
 Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type n%nat M%M.
+Arguments is_square_matrix {T}%type M%M.
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
@@ -2104,6 +2092,8 @@ cbn; rewrite butn_length.
 unfold Nat.b2n; rewrite if_ltb_lt_dec.
 now destruct (lt_dec j (length l)).
 Qed.
+
+...
 
 Theorem is_squ_mat_subm : ∀ n (M : matrix T) i j,
   n ≠ 0
