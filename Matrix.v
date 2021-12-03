@@ -2093,71 +2093,58 @@ unfold Nat.b2n; rewrite if_ltb_lt_dec.
 now destruct (lt_dec j (length l)).
 Qed.
 
-...
-
-Theorem is_squ_mat_subm : ∀ n (M : matrix T) i j,
-  n ≠ 0
-  → i ≤ n
-  → j ≤ n
-  → is_square_matrix (S n) M = true
-  → is_square_matrix n (subm M i j) = true.
+Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
+  i < mat_nrows M
+  → j < mat_nrows M
+  → is_square_matrix M = true
+  → is_square_matrix (subm M i j) = true.
 Proof.
-intros * Hnz Hi Hj Hm.
+intros * Hi Hj Hm.
 apply is_sm_mat_iff.
 specialize (square_matrix_ncols _ Hm) as Hcm.
-split. {
-  apply is_sm_mat_iff in Hm.
-  destruct Hm as (Hr & Hcr & Hc).
-  rewrite mat_nrows_subm.
-  unfold Nat.b2n; rewrite if_ltb_lt_dec, Hr.
-  destruct (lt_dec i (S n)) as [H| H]; [ clear H | flia Hi H ].
-  apply Nat_sub_succ_1.
+destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
+  rewrite Hr1 in Hi, Hj.
+  apply Nat.lt_1_r in Hi, Hj.
+  subst i j.
+  destruct M as (ll); cbn in Hr1 |-*.
+  destruct ll as [| l]; [ easy | ].
+  now destruct ll.
 }
 split. {
   intros Hcs.
-  rewrite mat_ncols_subm in Hcs; cycle 1. {
-    now apply (@squ_mat_is_corr (S n)).
-  } {
-    apply is_sm_mat_iff in Hm.
-    destruct Hm as (Hr & Hcr & Hc).
-    rewrite Hr; flia Hnz.
-  } {
-    rewrite Hcm; flia Hj.
+  rewrite <- Hcm in Hj.
+  rewrite mat_ncols_subm in Hcs; [ | | flia Hi Hr1 | easy ]. 2: {
+    now apply squ_mat_is_corr.
   }
-  rewrite Hcm in Hcs; flia Hnz Hcs.
+  flia Hcs Hj Hcm Hr1.
 } {
   intros l Hl.
   apply is_sm_mat_iff in Hm.
-  destruct Hm as (Hr & Hcr & Hc).
-  clear Hcr Hr Hcm Hnz.
+  destruct Hm as (Hcr & Hc).
+  clear Hcr Hcm Hr1.
+  rewrite mat_nrows_subm.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  apply Nat.ltb_lt in Hi; cbn.
   destruct M as (ll).
-  cbn in Hc.
+  cbn in Hc, Hi, Hj |-*.
   cbn - [ butn ] in Hl.
-  revert ll Hc Hl.
-  induction i; intros. {
-    apply in_map_iff in Hl.
-    destruct Hl as (la & Hl & Hla); subst l.
-    cbn in Hla, Hc.
-    destruct ll as [| l']; [ easy | ].
-    rewrite butn_length.
-    unfold Nat.b2n; rewrite if_ltb_lt_dec.
-    rewrite Hc; [ | now right ].
-    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
-    apply Nat_sub_succ_1.
+  rewrite map_butn in Hl.
+  apply in_butn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (l' & Hjl & Hl).
+  rewrite <- Hjl.
+  rewrite butn_length.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec j (length l')) as [Hljl| Hljl]. {
+    f_equal.
+    now apply Hc.
   }
-  destruct ll as [| l']; [ easy | ].
-  rewrite butn_cons in Hl.
-  cbn in Hl.
-  destruct Hl as [Hl| Hl]. {
-    subst l.
-    rewrite butn_length, Hc; [ | now left ].
-    unfold Nat.b2n; rewrite if_ltb_lt_dec.
-    destruct (lt_dec j (S n)) as [H| H]; [ clear H | flia Hj H ].
-    apply Nat_sub_succ_1.
-  }
-  apply IHi with (ll := ll); [ flia Hi | | easy ].
-  intros l'' Hl''.
-  now apply Hc; right.
+  apply Nat.nlt_ge in Hljl.
+  rewrite butn_out in Hjl; [ | easy ].
+  subst l'.
+  rewrite Hc in Hljl; [ | easy ].
+  flia Hj Hljl.
 }
 Qed.
 
@@ -2407,7 +2394,9 @@ Theorem squ_mat_nrows : ∀ n (M : square_matrix n T),
 Proof.
 intros.
 destruct M as (M & Hmp); cbn.
-now apply is_sm_mat_iff in Hmp.
+apply Bool.andb_true_iff in Hmp.
+destruct Hmp as (Hr & Hmp).
+now apply Nat.eqb_eq in Hr.
 Qed.
 
 Theorem squ_mat_ncols : ∀ n (M : square_matrix n T),
@@ -2415,8 +2404,12 @@ Theorem squ_mat_ncols : ∀ n (M : square_matrix n T),
 Proof.
 intros.
 destruct M as (M, Hmp); cbn.
+apply Bool.andb_true_iff in Hmp.
+destruct Hmp as (Hr, Hmp).
+apply Nat.eqb_eq in Hr.
 apply is_sm_mat_iff in Hmp.
-destruct Hmp as (Hr, Hc).
+destruct Hmp as (Hrc, Hc).
+...
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_ncols.
