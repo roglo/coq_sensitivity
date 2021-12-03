@@ -2521,11 +2521,21 @@ rewrite map_length.
 now apply Hc.
 Qed.
 
-...
+Theorem mI_square_matrix_prop : ∀ n,
+  (mat_nrows (mI n) =? n) && is_square_matrix (mI n) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply mI_is_square_matrix ].
+cbn; rewrite List_map_seq_length.
+apply Nat.eqb_refl.
+Qed.
 
 Definition smI n : square_matrix n T :=
   {| sm_mat := mI n;
-     sm_prop := mI_is_square_matrix n |}.
+     sm_prop := mI_square_matrix_prop n |}.
+
+...
 
 Theorem squ_mat_add_is_squ : ∀ n (MA MB : matrix T),
   is_square_matrix n MA = true
