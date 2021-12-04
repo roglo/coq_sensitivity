@@ -2593,32 +2593,6 @@ apply Bool.andb_true_iff in Ha, Hb.
 now apply squ_mat_add_is_squ.
 Qed.
 
-Theorem squ_mat_mul_scal_l_is_squ : ∀ (M : matrix T) μ,
-  is_square_matrix M = true
-  → is_square_matrix (μ × M) = true.
-Proof.
-intros * Hm.
-apply is_sm_mat_iff in Hm.
-apply is_sm_mat_iff.
-destruct Hm as (Hcr & Hc).
-cbn; rewrite map_length, fold_mat_nrows.
-split. {
-  intros H1.
-  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
-  apply Nat.neq_0_lt_0 in Hrz.
-  apply Hcr.
-  unfold mat_ncols in H1 |-*; cbn in H1 |-*.
-  rewrite List_hd_nth_0 in H1 |-*.
-  rewrite (List_map_nth' []) in H1; [ | easy ].
-  now rewrite map_length in H1.
-}
-intros la Hla.
-apply in_map_iff in Hla.
-destruct Hla as (lb & Hla & Hi); subst la.
-rewrite map_length.
-now apply Hc.
-Qed.
-
 Theorem square_matrix_add_prop : ∀ n (MA MB : square_matrix n T),
   (mat_nrows (sm_mat MA + sm_mat MB) =? n) &&
   is_square_matrix (sm_mat MA + sm_mat MB) = true.
@@ -2638,49 +2612,58 @@ Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   {| sm_mat := (sm_mat MA + sm_mat MB);
      sm_prop := square_matrix_add_prop MA MB |}.
 
-...
-
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
-  is_square_matrix n (sm_mat MA * sm_mat MB)%M = true.
+  is_square_matrix (sm_mat MA * sm_mat MB) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
+(*
 split; cbn. {
   rewrite List_map_seq_length.
+Check squ_mat_nrows.
   apply squ_mat_nrows.
 }
+*)
 split. {
-  intros Hc.
+  intros Hc; cbn.
   rewrite List_map_seq_length.
   destruct MA as (MA & Ha).
   destruct MB as (MB & Hb).
   move MB before MA; cbn in Hc |-*.
+  apply Bool.andb_true_iff in Ha, Hb.
+  destruct Ha as (Hra, Ha).
+  destruct Hb as (Hrb, Hb).
+  move Hrb before Hra.
+  apply Nat.eqb_eq in Hra, Hrb.
   apply is_sm_mat_iff in Ha.
   apply is_sm_mat_iff in Hb.
-  destruct Ha as (Hra & Hcra & Hca).
-  destruct Hb as (Hrb & Hcrb & Hcb).
-  move Hrb before Hra.
+  destruct Ha as (Hcra & Hca).
+  destruct Hb as (Hcrb & Hcb).
   move Hcrb before Hcra.
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
   rewrite List_hd_nth_0 in Hc.
-  destruct n; [ easy | exfalso ].
-  rewrite List_map_nth' with (a := 0) in Hc. 2: {
-    rewrite seq_length, Hra; flia.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+  apply Nat.neq_0_lt_0 in Hnz.
+  rewrite (List_map_nth' 0) in Hc. 2: {
+    now rewrite seq_length, Hra.
   }
   apply map_eq_nil in Hc.
   apply List_seq_eq_nil in Hc.
   apply Hcrb in Hc.
-  flia Hrb Hc.
+  now rewrite <- Hrb, Hc in Hnz.
 } {
   intros l Hl.
+  unfold mat_nrows; cbn.
   apply in_map_iff in Hl.
   destruct Hl as (i & Him & Hl).
   subst l.
-  rewrite List_map_seq_length.
-  apply squ_mat_ncols.
+  do 2 rewrite List_map_seq_length.
+  now rewrite squ_mat_nrows, squ_mat_ncols.
 }
 Qed.
+
+...
 
 Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
@@ -2751,6 +2734,32 @@ Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_le := phony_mat_le |}.
 
 Existing Instance mat_ring_like_op.
+
+Theorem squ_mat_mul_scal_l_is_squ : ∀ (M : matrix T) μ,
+  is_square_matrix M = true
+  → is_square_matrix (μ × M) = true.
+Proof.
+intros * Hm.
+apply is_sm_mat_iff in Hm.
+apply is_sm_mat_iff.
+destruct Hm as (Hcr & Hc).
+cbn; rewrite map_length, fold_mat_nrows.
+split. {
+  intros H1.
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
+  apply Nat.neq_0_lt_0 in Hrz.
+  apply Hcr.
+  unfold mat_ncols in H1 |-*; cbn in H1 |-*.
+  rewrite List_hd_nth_0 in H1 |-*.
+  rewrite (List_map_nth' []) in H1; [ | easy ].
+  now rewrite map_length in H1.
+}
+intros la Hla.
+apply in_map_iff in Hla.
+destruct Hla as (lb & Hla & Hi); subst la.
+rewrite map_length.
+now apply Hc.
+Qed.
 
 (*
 Theorem mat_opt_add_opp_l : ∀ n,
