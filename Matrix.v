@@ -3030,13 +3030,19 @@ destruct MA as (MA & Ha).
 destruct MB as (MB & Hb).
 destruct MC as (MC & Hc); cbn.
 move MB before MA; move MC before MB.
-...
+apply Bool.andb_true_iff in Ha, Hb, Hc.
+destruct Ha as (Hra, Ha).
+destruct Hb as (Hrb, Hb).
+destruct Hc as (Hrc, Hc).
+apply Nat.eqb_eq in Hra, Hrb, Hrc.
+move MB before MA; move MC before MB.
+move Hrb before Hra; move Hrc before Hrb.
 apply is_sm_mat_iff in Ha.
 apply is_sm_mat_iff in Hb.
 apply is_sm_mat_iff in Hc.
-destruct Ha as (Hra & Hcra & Hca).
-destruct Hb as (Hrb & Hcrb & Hcb).
-destruct Hc as (Hrc & Hcrc & Hcc).
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct Hc as (Hcrc & Hcc).
 move Hrb before Hra; move Hrc before Hrb.
 move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3064,6 +3070,7 @@ apply mat_mul_add_distr_l. {
   now rewrite Hrb.
 } {
   rewrite Hrb; unfold mat_ncols.
+  rewrite Hra in Hca.
   apply Hca.
   rewrite List_hd_nth_0.
   apply nth_In, Nat.neq_0_lt_0.
@@ -3082,11 +3089,9 @@ apply mat_mul_add_distr_l. {
     apply nth_In, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hrc.
   }
-  easy.
+  congruence.
 }
 Qed.
-
-...
 
 Theorem squ_mat_mul_add_distr_r {n} : ∀ (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%F.
@@ -3097,12 +3102,19 @@ destruct MA as (MA & Ha).
 destruct MB as (MB & Hb).
 destruct MC as (MC & Hc); cbn.
 move MB before MA; move MC before MB.
+apply Bool.andb_true_iff in Ha, Hb, Hc.
+destruct Ha as (Hra, Ha).
+destruct Hb as (Hrb, Hb).
+destruct Hc as (Hrc, Hc).
+apply Nat.eqb_eq in Hra, Hrb, Hrc.
+move MB before MA; move MC before MB.
+move Hrb before Hra; move Hrc before Hrb.
 apply is_sm_mat_iff in Ha.
 apply is_sm_mat_iff in Hb.
 apply is_sm_mat_iff in Hc.
-destruct Ha as (Hra & Hcra & Hca).
-destruct Hb as (Hrb & Hcrb & Hcb).
-destruct Hc as (Hrc & Hcrc & Hcc).
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct Hc as (Hcrc & Hcc).
 move Hrb before Hra; move Hrc before Hrb.
 move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3144,9 +3156,11 @@ apply mat_mul_add_distr_r. {
     apply nth_In, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hrb.
   }
-  easy.
+  congruence.
 }
 Qed.
+
+...
 
 Theorem squ_mat_opt_1_neq_0 {n} :
   if rngl_has_1_neq_0 && (n ≠? 0) then
