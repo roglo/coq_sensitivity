@@ -2723,12 +2723,21 @@ split. {
 }
 Qed.
 
-...
+Theorem square_matrix_opp_prop : ∀ n (M : square_matrix n T),
+  (mat_nrows (- sm_mat M) =? n) && is_square_matrix (- sm_mat M) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_opp_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite map_length.
+apply squ_mat_nrows.
+Qed.
 
 Definition square_matrix_opp {n} (M : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := - sm_mat M;
-     sm_prop := square_matrix_opp_is_square M |}.
+     sm_prop := square_matrix_opp_prop M |}.
 
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
 
@@ -2933,17 +2942,9 @@ Theorem square_matrix_is_correct : ∀ n (M : square_matrix n T),
 Proof.
 intros.
 destruct M as (M, Hm); cbn.
-apply is_sm_mat_iff in Hm.
-destruct Hm as (Hr & Hcr & Hc).
-split; [ now intros H; apply Hcr in H | ].
-intros l Hl.
-unfold mat_ncols.
-rewrite Hc with (l := hd _ _). 2: {
-  rewrite List_hd_nth_0.
-  apply nth_In.
-  destruct (mat_list_list M); [ easy | cbn; flia ].
-}
-now apply Hc.
+apply Bool.andb_true_iff in Hm.
+destruct Hm as (Hr, Hm).
+now apply squ_mat_is_corr.
 Qed.
 
 Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
@@ -2967,13 +2968,19 @@ apply square_matrix_eq.
 destruct MA as (MA & Ha).
 destruct MB as (MB & Hb).
 destruct MC as (MC & Hc); cbn.
+apply Bool.andb_true_iff in Ha, Hb, Hc.
+destruct Ha as (Hra, Ha).
+destruct Hb as (Hrb, Hb).
+destruct Hc as (Hrc, Hc).
+apply Nat.eqb_eq in Hra, Hrb, Hrc.
 move MB before MA; move MC before MB.
+move Hrb before Hra; move Hrc before Hrb.
 apply is_sm_mat_iff in Ha.
 apply is_sm_mat_iff in Hb.
 apply is_sm_mat_iff in Hc.
-destruct Ha as (Hra & Hcra & Hca).
-destruct Hb as (Hrb & Hcrb & Hcb).
-destruct Hc as (Hrc & Hcrc & Hcc).
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct Hc as (Hcrc & Hcc).
 move Hrb before Hra; move Hrc before Hrb.
 move Hcrb before Hcra; move Hcrc before Hcrb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -2990,6 +2997,7 @@ apply mat_mul_assoc. {
 } {
   rewrite Hrb.
   unfold mat_ncols.
+  rewrite Hra in Hca.
   apply Hca.
   rewrite List_hd_nth_0.
   apply nth_In, Nat.neq_0_lt_0.
@@ -3022,6 +3030,7 @@ destruct MA as (MA & Ha).
 destruct MB as (MB & Hb).
 destruct MC as (MC & Hc); cbn.
 move MB before MA; move MC before MB.
+...
 apply is_sm_mat_iff in Ha.
 apply is_sm_mat_iff in Hb.
 apply is_sm_mat_iff in Hc.
@@ -3076,6 +3085,8 @@ apply mat_mul_add_distr_l. {
   easy.
 }
 Qed.
+
+...
 
 Theorem squ_mat_mul_add_distr_r {n} : ∀ (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%F.
