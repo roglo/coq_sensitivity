@@ -115,15 +115,16 @@ Definition determinant' n (M : matrix T) :=
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut : rngl_is_field →
-  ∀ n (M : matrix T),
-  is_square_matrix n M = true
-  → determinant M = determinant' n M.
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → determinant M = determinant' (mat_nrows M) M.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
-unfold determinant.
-replace (mat_nrows M) with n by now apply is_sm_mat_iff in Hm.
 unfold determinant'.
-revert M Hm.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+unfold determinant.
+rewrite Hr.
+revert M Hm Hr.
 induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
@@ -144,8 +145,11 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite IHn. 2: {
-    apply is_squ_mat_subm; [ easy | flia | easy | easy ].
+  rewrite IHn; cycle 1. {
+    apply is_squ_mat_subm; [ now rewrite Hr | rewrite Hr; flia Hi | easy ].
+  } {
+    rewrite mat_nrows_subm, Hr; cbn.
+    apply Nat.sub_0_r.
   }
   easy.
 }
@@ -195,7 +199,7 @@ f_equal. {
   cbn - [ butn ].
   rewrite (List_map_nth' []). 2: {
     apply is_sm_mat_iff in Hm.
-    destruct Hm as (Hr & Hcr & Hc).
+    destruct Hm as (Hcr & Hc).
     rewrite butn_length, fold_mat_nrows, Hr.
     cbn; flia Hi Hnz.
   }
@@ -221,6 +225,8 @@ apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
+
+...
 
 (* multilinearity *)
 
