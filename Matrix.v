@@ -2685,93 +2685,45 @@ Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
 Proof.
 intros.
 apply is_sm_mat_iff.
-(*
-split; cbn. {
-  rewrite map_length.
-  rewrite fold_mat_nrows.
-  apply squ_mat_nrows.
-}
-*)
 split. {
-  intros Hco.
-...
+  intros Hco; cbn.
   rewrite map_length.
   rewrite fold_mat_nrows.
-  destruct M as (M & Ha); cbn in Hco |-*.
-  apply is_sm_mat_iff in Ha.
-  destruct Ha as (Hr & Hcr & Hc).
-  unfold mat_ncols in Hco; cbn in Hco.
+  rewrite squ_mat_nrows.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ easy | exfalso ].
+  apply Nat.neq_0_lt_0 in Hnz.
+  unfold mat_ncols in Hco.
+  cbn in Hco.
   apply length_zero_iff_nil in Hco.
   rewrite List_hd_nth_0 in Hco.
-  destruct n; [ easy | exfalso ].
-  rewrite List_map_nth' with (a := []) in Hco. 2: {
-    rewrite fold_mat_nrows, Hr; flia.
+  rewrite (List_map_nth' []) in Hco. 2: {
+    now rewrite fold_mat_nrows, squ_mat_nrows.
   }
   apply map_eq_nil in Hco.
-  apply (f_equal length) in Hco; cbn in Hco.
   rewrite <- List_hd_nth_0 in Hco.
+  apply (f_equal length) in Hco.
   rewrite fold_mat_ncols in Hco.
-  apply Hcr in Hco.
-  flia Hr Hco.
+  rewrite squ_mat_ncols in Hco.
+  now rewrite Hco in Hnz.
 } {
   intros l Hl.
-  destruct M as (M & Hrc).
-  cbn in Hl.
-  apply is_sm_mat_iff in Hrc.
-  destruct Hrc as (Hr, Hc).
+  destruct M as (M & Hrc); cbn in Hl |-*.
+  apply Bool.andb_true_iff in Hrc.
+  destruct Hrc as (Hr, Hsm).
+  apply Nat.eqb_eq in Hr.
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hrc, Hc).
+  rewrite Hr in Hrc, Hc.
+  rewrite map_length, fold_mat_nrows, Hr.
   apply in_map_iff in Hl.
   destruct Hl as (la & Hlm & Hla).
   subst l.
-  cbn in Hla.
   rewrite map_length.
   now apply Hc.
 }
 Qed.
+
 ...
-Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
-  is_square_matrix n (- sm_mat M)%M = true.
-Proof.
-intros.
-apply is_sm_mat_iff.
-split; cbn. {
-  rewrite map_length.
-  rewrite fold_mat_nrows.
-  apply squ_mat_nrows.
-}
-split. {
-  intros Hco.
-  rewrite map_length.
-  rewrite fold_mat_nrows.
-  destruct M as (M & Ha); cbn in Hco |-*.
-  apply is_sm_mat_iff in Ha.
-  destruct Ha as (Hr & Hcr & Hc).
-  unfold mat_ncols in Hco; cbn in Hco.
-  apply length_zero_iff_nil in Hco.
-  rewrite List_hd_nth_0 in Hco.
-  destruct n; [ easy | exfalso ].
-  rewrite List_map_nth' with (a := []) in Hco. 2: {
-    rewrite fold_mat_nrows, Hr; flia.
-  }
-  apply map_eq_nil in Hco.
-  apply (f_equal length) in Hco; cbn in Hco.
-  rewrite <- List_hd_nth_0 in Hco.
-  rewrite fold_mat_ncols in Hco.
-  apply Hcr in Hco.
-  flia Hr Hco.
-} {
-  intros l Hl.
-  destruct M as (M & Hrc).
-  cbn in Hl.
-  apply is_sm_mat_iff in Hrc.
-  destruct Hrc as (Hr, Hc).
-  apply in_map_iff in Hl.
-  destruct Hl as (la & Hlm & Hla).
-  subst l.
-  cbn in Hla.
-  rewrite map_length.
-  now apply Hc.
-}
-Qed.
 
 Definition square_matrix_opp {n} (M : square_matrix n T) :
   square_matrix n T :=
