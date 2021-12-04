@@ -1784,24 +1784,24 @@ Qed.
    row 0, we can prove that only when i=0; this will able us to
    prove the next theorem, swapping rows by going via row 0 *)
 
-...
-
 Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
-  → is_square_matrix n A = true
-  → is_square_matrix n B = true
-  → is_square_matrix n C = true
+  → mat_nrows A = n
+  → mat_nrows B = n
+  → mat_nrows C = n
+  → is_square_matrix A = true
+  → is_square_matrix B = true
+  → is_square_matrix C = true
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
-  → determinant n A = (determinant n B + determinant n C)%F.
+  → determinant A = (determinant B + determinant C)%F.
 Proof.
-intros * Hnz Hsma Hsmb Hsmc Hbc Hb Hc.
-assert (Hra : mat_nrows A = n) by now apply is_sm_mat_iff in Hsma.
-assert (Hrb : mat_nrows B = n) by now apply is_sm_mat_iff in Hsmb.
-assert (Hrc : mat_nrows C = n) by now apply is_sm_mat_iff in Hsmc.
+intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.
 specialize (square_matrix_ncols _ Hsma) as Hca.
 specialize (square_matrix_ncols _ Hsmb) as Hcb.
+rewrite Hra in Hca.
+rewrite Hrb in Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
 assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   intros.
@@ -1824,19 +1824,19 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   rewrite (List_map_nth_seq (nth u lla []) 0%F).
   rewrite (List_map_nth_seq (nth u llb []) 0%F).
   apply is_sm_mat_iff in Hsma.
-  destruct Hsma as (_ & _ & Hca').
+  destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.
   }
   apply is_sm_mat_iff in Hsmb.
-  destruct Hsmb as (_ & _ & Hcb').
+  destruct Hsmb as (_ & Hcb').
   rewrite Hcb'. 2: {
     cbn; apply nth_In.
     now rewrite Hrb.
   }
-  f_equal.
+  f_equal; cbn; rewrite Hra, Hrb.
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
@@ -1864,24 +1864,26 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   rewrite (List_map_nth_seq (nth u lla []) 0%F).
   rewrite (List_map_nth_seq (nth u llc []) 0%F).
   apply is_sm_mat_iff in Hsma.
-  destruct Hsma as (_ & _ & Hca').
+  destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.
   }
   apply is_sm_mat_iff in Hsmc.
-  destruct Hsmc as (_ & _ & Hcc').
+  destruct Hsmc as (_ & Hcc').
   rewrite Hcc'. 2: {
     cbn; apply nth_In.
     now rewrite Hrc.
   }
-  f_equal.
+  f_equal; cbn; rewrite Hra, Hrc.
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
   now symmetry; apply Hc.
 }
+unfold determinant; rewrite Hra, Hrb, Hrc.
+cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite Hbc.
@@ -2283,6 +2285,8 @@ Definition swap_in_permut n i j k :=
 *)
 
 (* comatrix *)
+
+...
 
 Definition comatrix n (M : matrix T) : matrix T :=
   mk_mat
