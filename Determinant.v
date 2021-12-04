@@ -262,29 +262,41 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
     eapply le_lt_trans; [ apply Hk | ].
-...
+    rewrite mat_repl_vect_nrows. 2: {
+      rewrite Hr, HUV; cbn.
+      rewrite map2_length.
+      do 2 rewrite map_length.
+      do 2 rewrite fold_vect_size.
+      rewrite Hu, Hv.
+      apply Nat.min_id.
+    }
+    rewrite Hr.
     apply Nat.sub_lt; [ | flia ].
     apply Nat.neq_0_lt_0, fact_neq_0.
   }
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
+    rewrite HUV in Hj; cbn in Hj.
+    do 2 rewrite map2_length in Hj.
+    do 2 rewrite map_length in Hj.
+    do 2 rewrite fold_vect_size in Hj.
+    rewrite fold_mat_nrows, Hr, Hu, Hv in Hj.
+    do 2 rewrite Nat.min_id in Hj.
     rewrite mat_el_repl_vect; cycle 1. {
-      now apply (@squ_mat_is_corr n).
+      now apply squ_mat_is_corr.
     } {
       subst UV; cbn.
       rewrite map2_length.
-      rewrite map_length.
-      rewrite map_length.
+      do 2 rewrite map_length.
       do 2 rewrite fold_vect_size.
       rewrite Hu, Hv, Nat.min_id.
       flia Hj.
     } {
-      apply is_sm_mat_iff in Hsm.
-      destruct Hsm as (Hr, _).
       rewrite Hr; flia Hj.
     } {
       unfold ff_app.
       rewrite Hcn.
+...
       apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
       now rewrite Hcn.
