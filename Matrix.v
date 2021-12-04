@@ -3160,8 +3160,6 @@ apply mat_mul_add_distr_r. {
 }
 Qed.
 
-...
-
 Theorem squ_mat_opt_1_neq_0 {n} :
   if rngl_has_1_neq_0 && (n ≠? 0) then
     @rngl_one (square_matrix n T) (mat_ring_like_op n) ≠
@@ -3202,8 +3200,11 @@ destruct b; [ | easy ].
 intros M; cbn.
 apply square_matrix_eq; cbn.
 destruct M as (M & Hs); cbn.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hr, Hs).
+apply Nat.eqb_eq in Hr.
 apply is_sm_mat_iff in Hs.
-destruct Hs as (Hr & Hcr & Hc).
+destruct Hs as (Hcr & Hc).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n; cbn.
   unfold mat_opp, "+"%M, mZ; cbn.
@@ -3212,6 +3213,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 apply mat_add_opp_l; [ | easy | ]. 2: {
   unfold mat_ncols.
+  rewrite Hr in Hc.
   symmetry; apply Hc.
   rewrite List_hd_nth_0.
   apply nth_In, Nat.neq_0_lt_0.
@@ -3531,8 +3533,12 @@ split. {
   remember (rngl_of_nat i) as M eqn:HM.
   destruct M as (M, Hm); cbn in Hl.
   clear HM.
+  apply Bool.andb_true_iff in Hm.
+  destruct Hm as (Hr, Hm).
+  apply Nat.eqb_eq in Hr.
   apply is_sm_mat_iff in Hm.
-  destruct Hm as (Hr & Hcr & Hc).
+  destruct Hm as (Hcr & Hc).
+  rewrite Hr in Hc.
   now apply Hc.
 }
 Qed.
@@ -3761,7 +3767,7 @@ Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
-Arguments mat_repl_vect_is_square {T}%type {ro} [n k]%nat.
+Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mat_transp {T ro} M%M.
 Arguments mI {T ro} n%nat.
@@ -3773,9 +3779,9 @@ Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
 Arguments matrix_eq {T}%type {ro} (MA MB)%M.
 Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type n%nat M%M.
+Arguments is_square_matrix {T}%type M%M.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
-Arguments square_matrix_ncols {n}%nat {T}%type M%M.
+Arguments square_matrix_ncols {T}%type M%M.
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
 
 Notation "A + B" := (mat_add A B) : M_scope.
