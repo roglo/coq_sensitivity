@@ -535,17 +535,17 @@ f_equal.
 now apply ε_of_permut_ε.
 Qed.
 
-...
-
 Theorem det_is_det_by_any_permut : rngl_is_field →
   ∀ n (M : matrix T) l,
-  is_square_matrix n M = true
+  mat_nrows M = n
+  → is_square_matrix M = true
   → Permutation l (determinant'_list n M)
   → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
 Proof.
-intros Hif * Hsm Hl.
-rewrite (det_is_det_by_canon_permut Hif n); [ | easy ].
+intros Hif * Hr Hsm Hl.
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite determinant'_by_list; [ | easy ].
+rewrite Hr.
 apply rngl_summation_permut; [ now symmetry | | ]. {
   unfold determinant'_list.
   now rewrite List_map_seq_length.
@@ -621,28 +621,27 @@ now destruct (Nat.eq_dec i j).
 Qed.
 
 Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
-  p < n
+  mat_nrows M = n
+  → p < n
   → q < n
-  → is_square_matrix n M = true
-  → is_square_matrix n (mat_swap_rows p q M) = true.
+  → is_square_matrix M = true
+  → is_square_matrix (mat_swap_rows p q M) = true.
 Proof.
-intros * Hp Hq Hsm.
+intros * Hr Hp Hq Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
-destruct Hsm as (Hr & Hcr & Hc).
+destruct Hsm as (Hcr & Hc).
 cbn; unfold list_swap_elem.
 rewrite List_map_seq_length.
 unfold mat_swap_rows, list_swap_elem; cbn.
-split; [ easy | ].
 split. {
-  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
-  apply Nat.neq_0_lt_0 in Hrz.
   unfold mat_ncols; cbn.
   rewrite List_hd_nth_0.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
+  rewrite fold_mat_nrows; rewrite Hr.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hp ].
+  rewrite seq_nth; [ | flia Hp ].
   rewrite Nat.add_0_l.
   rewrite Hc; [ now intros Hn; subst n | ].
   apply nth_In; rewrite fold_mat_nrows; rewrite Hr.
@@ -794,8 +793,6 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 }
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
-
-About is_square_matrix.
 
 ...
 
