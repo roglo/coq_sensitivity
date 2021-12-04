@@ -284,12 +284,11 @@ destruct Hla as [Hla| Hla]. {
 }
 Qed.
 
-Theorem mA_is_square_matrix : ∀ n, is_square_matrix (2 ^ n) (mA n) = true.
+Theorem mA_is_square_matrix : ∀ n, is_square_matrix (mA n) = true.
 Proof.
 intros.
 apply is_sm_mat_iff.
 rewrite mA_nrows, mA_ncols.
-split; [ easy | ].
 split; [ easy | ].
 intros la Hla.
 revert la Hla.
@@ -1049,11 +1048,14 @@ Qed.
    works *)
 
 Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
-  is_square_matrix n M1 = true
-  → is_square_matrix n M3 = true
-  → is_square_matrix n M5 = true
+  is_square_matrix M1 = true
+  → is_square_matrix M3 = true
+  → is_square_matrix M5 = true
+  → mat_nrows M1 = n
   → mat_nrows M2 = n
+  → mat_nrows M3 = n
   → mat_nrows M4 = n
+  → mat_nrows M5 = n
   → mat_ncols M2 = n
   → mat_ncols M4 = n
   → mat_ncols M6 = n
@@ -1061,19 +1063,19 @@ Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
      mat_of_mat_list_list [[M5]; [M6]])%M =
      mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
-intros * Hs1 Hs3 Hs5 Hr2 Hr4 Hc2 Hc4 Hc6.
+intros * Hs1 Hs3 Hs5 Hr1 Hr2 Hr3 Hr4 Hr5 Hc2 Hc4 Hc6.
 specialize (square_matrix_ncols _ Hs1) as Hc1.
 apply is_sm_mat_iff in Hs1.
-destruct Hs1 as (Hr1 & Hcr1 & Hc1').
-move Hr1 before Hc1.
+destruct Hs1 as (_ & Hc1').
+rewrite Hr1 in Hc1, Hc1'.
 specialize (square_matrix_ncols _ Hs3) as Hc3.
 apply is_sm_mat_iff in Hs3.
-destruct Hs3 as (Hr3 & Hcr3 & Hc3').
-move Hr3 before Hc3.
+destruct Hs3 as (_ & Hc3').
+rewrite Hr3 in Hc3, Hc3'.
 specialize (square_matrix_ncols _ Hs5) as Hc5.
 apply is_sm_mat_iff in Hs5.
-destruct Hs5 as (Hr5 & Hcr5 & Hc5').
-move Hr5 before Hc5.
+destruct Hs5 as (Hcr5 & Hc5').
+rewrite Hr5 in Hc5, Hc5'.
 unfold mat_mul, mat_add; cbn.
 unfold mat_of_mat_list_list; cbn.
 f_equal.
@@ -1166,7 +1168,7 @@ f_equal. {
     intros j Hj.
     rewrite app_nth1. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
-        split; [ easy | now rewrite Hc1 ].
+        split; [ now rewrite Hr1, Hc1 | now rewrite Hc1 ].
       } {
         now apply in_seq in Hi; rewrite Hr1.
       }
@@ -1186,14 +1188,14 @@ f_equal. {
   intros j Hj.
   rewrite app_nth2. 2: {
     rewrite fold_corr_mat_ncols; cycle 1. {
-      split; [ easy | now rewrite Hc1 ].
+      split; [ now rewrite Hr1, Hc1 | now rewrite Hc1 ].
     } {
       now rewrite Hr1.
     }
     rewrite Hc1; flia.
   }
   rewrite fold_corr_mat_ncols; cycle 1. {
-    split; [ easy | now rewrite Hc1 ].
+    split; [ now rewrite Hr1, Hc1 | now rewrite Hc1 ].
   } {
     now rewrite Hr1.
   }
@@ -1254,7 +1256,7 @@ f_equal. {
     rewrite seq_nth; [ | easy ].
     rewrite app_nth1. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
-        split; [ easy | now rewrite Hc3 ].
+        split; [ now rewrite Hr3, Hc3 | now rewrite Hc3 ].
       } {
         now rewrite Hr3.
       }
@@ -1276,14 +1278,14 @@ f_equal. {
     intros j Hj.
     rewrite app_nth2. 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
-        split; [ easy | now rewrite Hc3 ].
+        split; [ now rewrite Hr3, Hc3 | now rewrite Hc3 ].
       } {
         now rewrite Hr3.
       }
       rewrite Hc3; flia.
     }
     rewrite fold_corr_mat_ncols; cycle 1. {
-      split; [ easy | now rewrite Hc3 ].
+      split; [ now rewrite Hr3, Hc3 | now rewrite Hc3 ].
     } {
       now rewrite Hr3.
     }
@@ -1436,21 +1438,25 @@ assert (H : ∀ lb,
 apply H.
 Qed.
 
-Theorem is_corr_mat_of_list_list_squ_1_2 : ∀ n MA MB,
-  is_square_matrix n MA = true
-  → is_square_matrix n MB = true
+Theorem is_corr_mat_of_list_list_squ_1_2 : ∀ MA MB,
+  mat_nrows MA = mat_nrows MB
+  → is_square_matrix MA = true
+  → is_square_matrix MB = true
   → is_correct_matrix (mat_of_mat_list_list [[MA]; [MB]]).
 Proof.
-intros * Ha Hb.
-specialize (square_matrix_nrows MA Ha) as Hran.
+intros * Hab Ha Hb.
 specialize (square_matrix_ncols MA Ha) as Hcan.
-specialize (square_matrix_nrows MB Hb) as Hrbn.
 specialize (square_matrix_ncols MB Hb) as Hcbn.
+remember (mat_nrows MA) as n eqn:Hn.
+rename Hn into Hra; rename Hab into Hrb.
+symmetry in Hra, Hrb.
+rewrite Hrb in Hcbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   apply is_sm_mat_iff in Ha, Hb.
-  destruct Ha as (Hra & Hcra & Hca).
-  destruct Hb as (Hrb & Hcrb & Hcb).
+  destruct Ha as (_ & Hca).
+  destruct Hb as (_ & Hcb).
+  rewrite Hra in Hca; rewrite Hrb in Hcb.
   split. {
     cbn; intros Hc.
     unfold mat_of_mat_list_list; cbn.
@@ -1484,7 +1490,8 @@ split. {
   rewrite List_hd_nth_0 in Hc.
   rewrite app_nth1 in Hc. 2: {
     unfold fold_app_in_list, iter_list; cbn.
-    now rewrite fold_mat_nrows, Hran.
+    rewrite fold_mat_nrows.
+    congruence.
   }
   unfold fold_app_in_list, iter_list in Hc; cbn in Hc.
   rewrite <- List_hd_nth_0 in Hc.
@@ -1497,7 +1504,8 @@ split. {
   rewrite List_hd_nth_0.
   rewrite app_nth1. 2: {
     unfold fold_app_in_list, iter_list; cbn.
-    now rewrite fold_mat_nrows, Hran.
+    rewrite fold_mat_nrows.
+    congruence.
   }
   unfold fold_app_in_list, iter_list; cbn.
   rewrite <- List_hd_nth_0, fold_mat_ncols.
@@ -1508,11 +1516,13 @@ split. {
   rewrite Hcan.
   destruct Hla as [Hla| Hla]. {
     apply is_sm_mat_iff in Ha.
-    destruct Ha as (Hra & Hcra & Hca).
+    destruct Ha as (_ & Hca).
+    rewrite Hra in Hca.
     now apply Hca.
   } {
     apply is_sm_mat_iff in Hb.
-    destruct Hb as (Hrb & Hcrb & Hcb).
+    destruct Hb as (_ & Hcb).
+    rewrite Hrb in Hcb.
     now apply Hcb.
   }
 }
@@ -1523,7 +1533,11 @@ Theorem is_corr_mat_of_list_list_1 : ∀ n μ,
     (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))%M]; [mI (2 ^ n)]]).
 Proof.
 intros.
-apply (is_corr_mat_of_list_list_squ_1_2 (2 ^ n)). {
+apply is_corr_mat_of_list_list_squ_1_2. {
+  rewrite mat_add_nrows, mA_nrows.
+  rewrite mat_mul_scal_l_nrows, mI_nrows.
+  apply Nat.min_id.
+} {
   apply is_sm_mat_iff; cbn.
   unfold mat_ncols; cbn.
   rewrite map2_length, fold_mat_nrows, mA_nrows.
@@ -1550,7 +1564,6 @@ apply (is_corr_mat_of_list_list_squ_1_2 (2 ^ n)). {
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
   rewrite map_length, seq_length, Nat.min_id.
-  split; [ easy | ].
   split; [ easy | ].
   intros la Hla.
   apply in_map2_iff in Hla.
@@ -1702,10 +1715,18 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
     apply mI_is_square_matrix.
   }
 } {
+  apply mA_nrows.
+} {
+  apply mI_nrows.
+} {
   apply mI_nrows.
 } {
   cbn; rewrite map_length.
   apply mA_nrows.
+} {
+  rewrite mat_add_nrows, mA_nrows.
+  rewrite mat_mul_scal_l_nrows, mI_nrows.
+  apply Nat.min_id.
 } {
   apply mI_ncols.
 } {
