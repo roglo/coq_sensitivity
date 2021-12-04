@@ -226,10 +226,21 @@ apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
-...
-
 (* multilinearity *)
 
+Theorem determinant_multilinear : rngl_is_field →
+  ∀ n (M : matrix T) i a b U V,
+  is_square_matrix M = true
+  → mat_nrows M = n
+  → vect_size U = n
+  → vect_size V = n
+  → i < n
+  → determinant (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * determinant (mat_repl_vect i M U) +
+        b * determinant (mat_repl_vect i M V))%F.
+Proof.
+intros Hif * Hsm Hr Hu Hv Hi.
+...
 Theorem determinant_multilinear : rngl_is_field →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix n M = true
