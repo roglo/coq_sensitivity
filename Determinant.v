@@ -258,18 +258,19 @@ rewrite (det_is_det_by_canon_permut Hif). 2: {
 unfold determinant'.
 (* simplification of the lhs *)
 remember (a × U + b × V)%V as UV eqn:HUV.
+assert (Hvm : vect_size UV = mat_nrows M). {
+  rewrite Hr, HUV; cbn.
+  rewrite map2_length.
+  do 2 rewrite map_length.
+  do 2 rewrite fold_vect_size.
+  rewrite Hu, Hv.
+  apply Nat.min_id.
+}
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
     eapply le_lt_trans; [ apply Hk | ].
-    rewrite mat_repl_vect_nrows. 2: {
-      rewrite Hr, HUV; cbn.
-      rewrite map2_length.
-      do 2 rewrite map_length.
-      do 2 rewrite fold_vect_size.
-      rewrite Hu, Hv.
-      apply Nat.min_id.
-    }
+    rewrite mat_repl_vect_nrows; [ | easy ].
     rewrite Hr.
     apply Nat.sub_lt; [ | flia ].
     apply Nat.neq_0_lt_0, fact_neq_0.
@@ -296,12 +297,16 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       unfold ff_app.
       rewrite Hcn.
-...
+      rewrite mat_repl_vect_nrows; [ | easy ].
+      rewrite Hr.
       apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
-      now rewrite Hcn.
+      now rewrite Hcn, Hr.
     }
-    unfold vect_el, ff_app; cbn.
+    unfold vect_el, ff_app.
+    cbn - [ Nat.eq_dec ].
+    rewrite map2_length, fold_mat_nrows, fold_vect_size.
+    rewrite Hvm, Hr, Nat.min_id.
     easy.
   }
   easy.
@@ -313,6 +318,8 @@ rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+  rewrite map2_length, fold_mat_nrows, fold_vect_size in Hk |-*.
+  rewrite Hr, Hu, Nat.min_id in Hk |-*.
   assert (Hkn : k < fact n). {
     specialize (fact_neq_0 n) as Hnz.
     flia Hk Hnz.
@@ -323,24 +330,24 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
-      now apply (@squ_mat_is_corr n).
+      now apply squ_mat_is_corr.
     } {
       rewrite Hu; flia Hj.
     } {
-      apply is_sm_mat_iff in Hsm.
-      destruct Hsm as (Hr, _).
       rewrite Hr; flia Hj.
     } {
       cbn.
-      rewrite Hcn.
+      rewrite Hcn, Hr.
       apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
-      now rewrite Hcn.
+      now rewrite Hcn, Hr.
     }
     now unfold vect_el, ff_app; cbn.
   }
   easy.
 }
+do 3 rewrite map2_length, fold_mat_nrows, fold_vect_size.
+rewrite Hvm, Hr, Hu, Hv, Nat.min_id.
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -354,18 +361,16 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite mat_el_repl_vect; cycle 1. {
-      now apply (@squ_mat_is_corr n).
+      now apply squ_mat_is_corr.
     } {
       rewrite Hv; flia Hj.
     } {
-      apply is_sm_mat_iff in Hsm.
-      destruct Hsm as (Hr, _).
       rewrite Hr; flia Hj.
     } {
-      rewrite Hcn.
+      rewrite Hcn, Hr.
       apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
-      now rewrite Hcn.
+      now rewrite Hcn, Hr.
     }
     now unfold vect_el, ff_app; cbn.
   }
@@ -500,8 +505,6 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-...
-
 (* list of terms in determinant' (determinant by sum of products of
    permutations *)
 
@@ -531,6 +534,8 @@ rewrite Nat.add_0_l.
 f_equal.
 now apply ε_of_permut_ε.
 Qed.
+
+...
 
 Theorem det_is_det_by_any_permut : rngl_is_field →
   ∀ n (M : matrix T) l,
