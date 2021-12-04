@@ -620,14 +620,15 @@ do 2 rewrite if_eqb_eq_dec.
 now destruct (Nat.eq_dec i j).
 Qed.
 
-Theorem mat_swap_rows_is_square : ∀ n (M : matrix T) p q,
-  mat_nrows M = n
-  → p < n
-  → q < n
+Theorem mat_swap_rows_is_square : ∀ (M : matrix T) p q,
+  p < mat_nrows M
+  → q < mat_nrows M
   → is_square_matrix M = true
   → is_square_matrix (mat_swap_rows p q M) = true.
 Proof.
-intros * Hr Hp Hq Hsm.
+intros * Hp Hq Hsm.
+remember (mat_nrows M) as n eqn:Hr.
+symmetry in Hr.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_sm_mat_iff in Hsm.
@@ -794,21 +795,23 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
-...
-
 Theorem determinant_alternating : rngl_is_field →
-  ∀ n (M : matrix T) p q,
+  ∀ (M : matrix T) p q,
   p ≠ q
   → p < mat_nrows M
   → q < mat_nrows M
-  → is_square_matrix n M = true
+  → is_square_matrix M = true
   → determinant (mat_swap_rows p q M) = (- determinant M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
-rewrite (det_is_det_by_canon_permut Hif n). 2: {
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+  rewrite <- Hr in Hp, Hq.
   now apply mat_swap_rows_is_square.
 }
 unfold determinant'.
+rewrite mat_swap_rows_nrows.
+rewrite Hr.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_shift; [ | flia Hp ].
@@ -844,7 +847,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  assert (Hkn : k < fact n). {
+  assert (Hkn : k < n!). {
     specialize (fact_neq_0 n) as Hn.
     flia Hk Hn.
   }
@@ -858,16 +861,11 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold list_swap_elem.
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
-        rewrite fold_mat_nrows.
-        apply square_matrix_nrows in Hsm.
-        rewrite Hsm.
+        rewrite fold_mat_nrows, Hr.
         apply in_seq in Hi.
         now apply transposition_lt.
       }
-      rewrite fold_mat_nrows.
-      apply is_sm_mat_iff in Hsm.
-      destruct Hsm as (Hr, _).
-      rewrite Hr.
+      rewrite fold_mat_nrows, Hr.
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i p) as [Hip| Hip]. {
@@ -1103,7 +1101,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     now rewrite transposition_involutive in Hij.
   }
 }
-rewrite (det_is_det_by_canon_permut Hif n); [ | easy ].
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite Hr.
 unfold determinant'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -1132,6 +1131,8 @@ intros i Hi.
 rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
+
+...
 
 Theorem determinant_same_rows : rngl_is_field →
   ∀ n (M : matrix T) p q,
