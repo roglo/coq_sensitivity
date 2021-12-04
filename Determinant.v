@@ -1681,13 +1681,12 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
           (seq 0 n))
        (seq 0 n)).
 
-...
-
-Theorem subm_mat_mul_row_by_scal : ∀ (A : matrix T) n i v,
-  is_square_matrix n A = true
-  → subm (mat_mul_row_by_scal n 0 A v) 0 i = subm A 0 i.
+Theorem subm_mat_mul_row_by_scal : ∀ (A : matrix T) i v,
+  is_square_matrix A = true
+  → subm (mat_mul_row_by_scal (mat_nrows A) 0 A v) 0 i = subm A 0 i.
 Proof.
 intros * Hsm.
+remember (mat_nrows A) as n eqn:Hr; symmetry in Hr.
 unfold subm.
 f_equal.
 f_equal.
@@ -1696,16 +1695,12 @@ do 2 rewrite firstn_O.
 f_equal.
 do 2 rewrite List_skipn_1.
 destruct A as (ll).
-destruct ll as [| la ll]. {
-  cbn.
-  apply is_sm_mat_iff in Hsm.
-  cbn in Hsm.
-  now destruct Hsm as (Hr, _); subst n.
-}
+destruct ll as [| la ll]; [ now subst n; cbn | ].
 apply is_sm_mat_iff in Hsm.
 cbn in Hsm.
-destruct Hsm as (Hr & Hcr & Hc).
+destruct Hsm as (Hcr & Hc).
 destruct n; [ easy | ].
+cbn in Hr.
 apply Nat.succ_inj in Hr.
 cbn - [ mat_mul_row_by_scal ].
 rewrite List_map_nth_seq with (d := []).
@@ -1726,6 +1721,7 @@ rewrite Hc. 2: {
   apply nth_In.
   now rewrite Hr.
 }
+rewrite Hr.
 apply map_ext_in.
 intros k Hk.
 now destruct (Nat.eq_dec (S j) 0).
@@ -1743,15 +1739,21 @@ Qed.
 Theorem det_mul_row_0_by_scal :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
-  ∀ n (A : matrix T) v,
-  n ≠ 0
-  → is_square_matrix n A = true
-  → determinant n (mat_mul_row_by_scal n 0 A v) = (v * determinant n A)%F.
+  ∀ (A : matrix T) v,
+  mat_nrows A ≠ 0
+  → is_square_matrix A = true
+  → determinant (mat_mul_row_by_scal (mat_nrows A) 0 A v) =
+    (v * determinant A)%F.
 Proof.
 intros Hom Hic * Hnz Hsm.
+remember (mat_nrows A) as n eqn:Hr; symmetry in Hr.
 destruct n; [ easy | clear Hnz ].
+unfold determinant; rewrite Hr.
 cbn - [ mat_mul_row_by_scal ].
 rewrite rngl_mul_summation_distr_l; [ | easy ].
+cbn - [ seq ].
+rewrite List_map_seq_length.
+rewrite determinant_succ.
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 symmetry.
@@ -1767,6 +1769,7 @@ f_equal. {
   now rewrite seq_nth.
 }
 f_equal.
+rewrite <- Hr.
 now apply subm_mat_mul_row_by_scal.
 Qed.
 
@@ -1780,6 +1783,8 @@ Qed.
 (* Well, since my definition of the discriminant only covers the
    row 0, we can prove that only when i=0; this will able us to
    prove the next theorem, swapping rows by going via row 0 *)
+
+...
 
 Theorem det_sum_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
