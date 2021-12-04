@@ -2547,80 +2547,61 @@ apply is_sm_mat_iff in Hb.
 destruct Ha as (Hcra & Hca).
 destruct Hb as (Hcrb & Hcb).
 split. {
-  unfold mat_ncols; cbn.
-  rewrite List_hd_nth_0.
-Check map2_nth.
-...
+  intros Hcc.
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
-...
-  rewrite Hra, Hrb.
-  apply Nat.min_id.
-}
-split. {
-  intros Hc.
-  rewrite map2_length.
-  do 2 rewrite fold_mat_nrows.
-  rewrite Hra, Hrb, Nat.min_id.
-  unfold mat_ncols in Hc; cbn in Hc.
-  apply length_zero_iff_nil in Hc.
-  rewrite List_hd_nth_0 in Hc.
-  destruct n; [ easy | exfalso ].
-  rewrite map2_nth with (a := []) (b := []) in Hc; cycle 1. {
-    rewrite fold_mat_nrows, Hra; flia.
-  } {
-    rewrite fold_mat_nrows, Hrb; flia.
+  unfold mat_ncols in Hcc; cbn in Hcc.
+  rewrite List_hd_nth_0 in Hcc.
+  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
+    now rewrite Hraz, Nat.min_0_l.
   }
-  apply map2_eq_nil in Hc.
-  do 2 rewrite <- List_hd_nth_0 in Hc.
-  destruct Hc as [Hc| Hc]. {
-    apply (f_equal length) in Hc; cbn in Hc.
-    rewrite fold_mat_ncols in Hc.
-    apply Hcra in Hc.
-    flia Hra Hc.
+  destruct (Nat.eq_dec (mat_nrows MB) 0) as [Hrbz| Hrbz]. {
+    now rewrite Hrbz, Nat.min_0_r.
+  }
+  apply Nat.neq_0_lt_0 in Hraz, Hrbz.
+  rewrite map2_nth with (a := []) (b := []) in Hcc; [ | easy | easy ].
+  rewrite map2_length in Hcc.
+  do 2 rewrite <- List_hd_nth_0 in Hcc.
+  do 2 rewrite fold_mat_ncols in Hcc.
+  apply Nat.le_0_r, Nat.min_le in Hcc.
+  destruct Hcc as [Hc| Hc]; apply Nat.le_0_r in Hc. {
+    now rewrite Hcra in Hraz.
   } {
-    apply (f_equal length) in Hc; cbn in Hc.
-    rewrite fold_mat_ncols in Hc.
-    apply Hcrb in Hc.
-    flia Hrb Hc.
+    now rewrite Hcrb in Hrbz.
   }
 } {
   intros l Hl.
   apply in_map2_iff in Hl.
   destruct Hl as (i & Him & a & b & Hl).
   subst l.
-  rewrite map2_length.
-  cbn in Him |-*.
-  do 2 rewrite fold_mat_nrows in Him.
-  rewrite Hra, Hrb in Him.
-  rewrite Nat.min_id in Him.
-  rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows, Hra ].
-  rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows, Hrb ].
-  apply Nat.min_id.
+  do 2 rewrite map2_length.
+  do 2 rewrite fold_mat_nrows in Him |-*.
+  apply Nat.min_glb_lt_iff in Him.
+  rewrite Hca; [ | now apply nth_In; rewrite fold_mat_nrows ].
+  rewrite Hcb; [ | now apply nth_In; rewrite fold_mat_nrows ].
+  easy.
 }
 Qed.
 
-...
-
 Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
-  is_square_matrix n (sm_mat MA + sm_mat MB)%M = true.
+  is_square_matrix (sm_mat MA + sm_mat MB)%M = true.
 Proof.
 intros.
 destruct MA as (MA & Ha).
-destruct MB as (MB & Hb).
+destruct MB as (MB & Hb); cbn.
+apply Bool.andb_true_iff in Ha, Hb.
 now apply squ_mat_add_is_squ.
 Qed.
 
-Theorem squ_mat_mul_scal_l_is_squ : ∀ n (M : matrix T) μ,
-  is_square_matrix n M = true
-  → is_square_matrix n (μ × M) = true.
+Theorem squ_mat_mul_scal_l_is_squ : ∀ (M : matrix T) μ,
+  is_square_matrix M = true
+  → is_square_matrix (μ × M) = true.
 Proof.
 intros * Hm.
 apply is_sm_mat_iff in Hm.
 apply is_sm_mat_iff.
-destruct Hm as (Hr & Hcr & Hc).
+destruct Hm as (Hcr & Hc).
 cbn; rewrite map_length, fold_mat_nrows.
-split; [ easy | ].
 split. {
   intros H1.
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
@@ -2637,6 +2618,8 @@ destruct Hla as (lb & Hla & Hi); subst la.
 rewrite map_length.
 now apply Hc.
 Qed.
+
+...
 
 Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
