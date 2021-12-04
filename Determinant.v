@@ -2286,18 +2286,15 @@ Definition swap_in_permut n i j k :=
 
 (* comatrix *)
 
-...
-
-Definition comatrix n (M : matrix T) : matrix T :=
+Definition comatrix (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
-       map
-         (λ j, (minus_one_pow (i + j) * determinant (n - 1) (subm M i j))%F)
+       map (λ j, (minus_one_pow (i + j) * determinant (subm M i j))%F)
          (seq 0 (mat_ncols M)))
       (seq 0 (mat_nrows M))).
 
-Arguments comatrix n%nat M%M.
+Arguments comatrix M%M.
 
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
@@ -3095,27 +3092,31 @@ apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
 Theorem determinant_circular_shift_rows : rngl_is_field →
-  ∀ n (M : matrix T) i,
-  i < n
-  → is_square_matrix n M = true
-  → determinant n (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
-    (minus_one_pow i * determinant n M)%F.
+  ∀ (M : matrix T) i,
+  i < mat_nrows M
+  → is_square_matrix M = true
+  → determinant (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
+    (minus_one_pow i * determinant M)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
-revert M Hsm.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+revert M Hsm Hr.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
 assert (H : i < n) by flia Hin.
 specialize (IHi H); clear H.
 rewrite seq_S; cbn.
-rewrite fold_left_app; cbn.
-rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
-2: {
+rewrite fold_left_app; cbn - [ determinant ].
+rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
+  rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
+} {
+  now rewrite mat_nrows_fold_left_swap, Hr, Nat.add_1_r.
+} {
   specialize (square_matrix_ncols _ Hsm) as Hc1.
   apply is_sm_mat_iff.
   apply is_sm_mat_iff in Hsm.
-  destruct Hsm as (Hr & Hcr & Hc).
+  destruct Hsm as (Hcr & Hc).
+  rewrite Hr in Hc1.
   rewrite mat_nrows_fold_left_swap.
-  split; [ easy | ].
   split. {
     intros Hc'.
     unfold mat_ncols in Hc'.
@@ -3154,7 +3155,7 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
         rewrite fold_mat_nrows.
         flia Hr Hin.
       }
-      now rewrite Hr, Hc'.
+      easy.
     }
     apply Nat.nle_gt in Hri.
     cbn in Hc'.
@@ -3164,7 +3165,7 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
       rewrite fold_mat_nrows.
       flia Hr Hin.
     }
-    now rewrite Hr, Hc'.
+    easy.
   }
   intros la Hla.
   rewrite fold_left_mat_fold_left_list_list in Hla.
@@ -3201,10 +3202,12 @@ rewrite determinant_alternating; try easy; [ | flia | flia Hin | flia Hin | ].
   }
   now apply Nat.nle_gt in Hjz.
 }
-rewrite IHi; [ | easy ].
+rewrite IHi; [ | easy | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
+
+...
 
 Theorem determinant_subm_mat_swap_rows_0_i : rngl_is_field →
   ∀ n (M : matrix T) i j,
