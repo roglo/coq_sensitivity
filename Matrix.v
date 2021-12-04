@@ -2663,13 +2663,71 @@ split. {
 }
 Qed.
 
-...
+Theorem square_matrix_mul_prop : ∀ n (MA MB : square_matrix n T),
+  (mat_nrows (sm_mat MA * sm_mat MB) =? n) &&
+  is_square_matrix (sm_mat MA * sm_mat MB) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_mul_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite List_map_seq_length.
+apply squ_mat_nrows.
+Qed.
 
 Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := sm_mat MA * sm_mat MB;
-     sm_prop := square_matrix_mul_is_square MA MB |}.
+     sm_prop := square_matrix_mul_prop MA MB |}.
 
+Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
+  is_square_matrix (- sm_mat M)%M = true.
+Proof.
+intros.
+apply is_sm_mat_iff.
+(*
+split; cbn. {
+  rewrite map_length.
+  rewrite fold_mat_nrows.
+  apply squ_mat_nrows.
+}
+*)
+split. {
+  intros Hco.
+...
+  rewrite map_length.
+  rewrite fold_mat_nrows.
+  destruct M as (M & Ha); cbn in Hco |-*.
+  apply is_sm_mat_iff in Ha.
+  destruct Ha as (Hr & Hcr & Hc).
+  unfold mat_ncols in Hco; cbn in Hco.
+  apply length_zero_iff_nil in Hco.
+  rewrite List_hd_nth_0 in Hco.
+  destruct n; [ easy | exfalso ].
+  rewrite List_map_nth' with (a := []) in Hco. 2: {
+    rewrite fold_mat_nrows, Hr; flia.
+  }
+  apply map_eq_nil in Hco.
+  apply (f_equal length) in Hco; cbn in Hco.
+  rewrite <- List_hd_nth_0 in Hco.
+  rewrite fold_mat_ncols in Hco.
+  apply Hcr in Hco.
+  flia Hr Hco.
+} {
+  intros l Hl.
+  destruct M as (M & Hrc).
+  cbn in Hl.
+  apply is_sm_mat_iff in Hrc.
+  destruct Hrc as (Hr, Hc).
+  apply in_map_iff in Hl.
+  destruct Hl as (la & Hlm & Hla).
+  subst l.
+  cbn in Hla.
+  rewrite map_length.
+  now apply Hc.
+}
+Qed.
+...
 Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
   is_square_matrix n (- sm_mat M)%M = true.
 Proof.
