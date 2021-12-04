@@ -2619,12 +2619,26 @@ rewrite map_length.
 now apply Hc.
 Qed.
 
-...
+Theorem square_matrix_add_prop : ∀ n (MA MB : square_matrix n T),
+  (mat_nrows (sm_mat MA + sm_mat MB) =? n) &&
+  is_square_matrix (sm_mat MA + sm_mat MB) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_add_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite map2_length.
+do 2 rewrite fold_mat_nrows.
+do 2 rewrite squ_mat_nrows.
+apply Nat.min_id.
+Qed.
 
 Definition square_matrix_add {n} (MA MB : square_matrix n T) :
   square_matrix n T :=
   {| sm_mat := (sm_mat MA + sm_mat MB);
-     sm_prop := square_matrix_add_is_square MA MB |}.
+     sm_prop := square_matrix_add_prop MA MB |}.
+
+...
 
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix n (sm_mat MA * sm_mat MB)%M = true.
