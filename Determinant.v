@@ -1132,138 +1132,63 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-...
-
 Theorem determinant_same_rows : rngl_is_field →
-  ∀ n (M : matrix T) p q,
-  is_square_matrix n M = true
+  ∀ (M : matrix T) p q,
+  is_square_matrix M = true
   → p ≠ q
-  → p < n
-  → q < n
+  → p < mat_nrows M
+  → q < mat_nrows M
   → (∀ j, mat_el M p j = mat_el M q j)
   → determinant M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
-(*
-unfold determinant.
-replace (mat_nrows M) with n by now apply is_sm_mat_iff in Hsm.
-*)
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : determinant M = (- determinant M)%F). {
-Check determinant_alternating.
-...
+  rewrite <- Hr in Hpn, Hqn.
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
-  apply matrix_eq.
-  intros i j.
-  unfold nth_nth_error.
-  remember (nth_error (mat_list_list M) i) as x eqn:Hx; symmetry in Hx.
-  remember (nth_error (mat_list_list (mat_swap_rows p q M)) i)
-    as y eqn:Hy; symmetry in Hy.
-  destruct x as [la| ]. {
-    apply List_nth_error_Some_iff with (d := []) in Hx.
-    destruct Hx as (Hla & Hi).
-    destruct y as [lb|]. {
-      f_equal.
-      apply List_nth_error_Some_iff with (d := []) in Hy.
-      destruct Hy as (Hlb & Hi').
-      remember (nth_error la j) as xx eqn:Hxx; symmetry in Hxx.
-      remember (nth_error lb j) as yy eqn:Hyy; symmetry in Hyy.
-      destruct xx as [xx| ]. {
-        apply List_nth_error_Some_iff with (d := 0%F) in Hxx.
-        destruct Hxx as (Hxx & Hj).
-        destruct yy as [yy| ]. {
-          apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
-          destruct Hyy as (Hyy & Hj').
-          f_equal; subst xx yy.
-          subst la lb.
-          unfold mat_swap_rows; cbn.
-          unfold list_swap_elem.
-          rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-          rewrite seq_nth; [ | easy ].
-          rewrite Nat.add_0_l.
-          unfold transposition.
-          do 2 rewrite if_eqb_eq_dec.
-          destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-            subst i.
-            now rewrite fold_mat_el, Hjpq.
-          }
-          destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-            subst i.
-            now rewrite fold_mat_el, <- Hjpq.
-          }
-          easy.
-        }
-        exfalso.
-        apply nth_error_None in Hyy.
-        apply Nat.nlt_ge in Hyy; apply Hyy; clear Hyy.
-        subst lb.
-        rewrite fold_corr_mat_ncols. {
-          rewrite corr_mat_swap_rows_ncols; cycle 1. {
-            apply is_sm_mat_iff in Hsm.
-            now destruct Hsm as (Hr, _); rewrite Hr.
-          } {
-            apply is_sm_mat_iff in Hsm.
-            now destruct Hsm as (Hr, _); rewrite Hr.
-          } {
-            now apply squ_mat_is_corr in Hsm.
-          }
-          subst la.
-          rewrite fold_corr_mat_ncols in Hj; [ easy | | easy ].
-          now apply squ_mat_is_corr in Hsm.
-        } {
-          apply (@squ_mat_is_corr n).
-          now apply mat_swap_rows_is_square.
-        }
-        now rewrite mat_swap_rows_nrows.
-      }
-      apply nth_error_None in Hxx.
-      destruct yy as [yy| ]; [ exfalso | easy ].
-      apply List_nth_error_Some_iff with (d := 0%F) in Hyy.
-      destruct Hyy as (Hyy & Hj').
-      apply Nat.nlt_ge in Hxx; apply Hxx; clear Hxx.
-      subst la lb.
-      rewrite fold_corr_mat_ncols in Hj'. {
-        rewrite corr_mat_swap_rows_ncols in Hj'; cycle 1. {
-          apply is_sm_mat_iff in Hsm.
-          now destruct Hsm as (Hr, _); rewrite Hr.
-        } {
-          apply is_sm_mat_iff in Hsm.
-          now destruct Hsm as (Hr, _); rewrite Hr.
-        } {
-          now apply squ_mat_is_corr in Hsm.
-        }
-        rewrite fold_corr_mat_ncols; [ easy | | easy ].
-        now apply squ_mat_is_corr in Hsm.
-      } {
-        apply (@squ_mat_is_corr n).
-        now apply mat_swap_rows_is_square.
-      }
-      now rewrite mat_swap_rows_nrows.
-    }
-    exfalso.
-    apply nth_error_None in Hy.
-    apply Nat.nlt_ge in Hy; apply Hy; clear Hy.
-    rewrite fold_mat_nrows in Hi.
-    rewrite fold_mat_nrows.
-    now rewrite mat_swap_rows_nrows.
+(**)
+  destruct M as (ll); cbn in *.
+  unfold mat_swap_rows; cbn; f_equal.
+  rewrite (List_map_nth_seq ll) with (d := []) at 1.
+  apply map_ext_in.
+  intros i Hi; apply in_seq in Hi.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+    subst i.
+    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    apply is_sm_mat_iff in Hsm.
+    cbn in Hsm.
+    destruct Hsm as (Hcz, Hsm).
+    rewrite Hsm; [ | now apply nth_In ].
+    rewrite Hsm; [ | now apply nth_In ].
+    apply map_ext_in.
+    intros j Hj.
+    apply Hjpq.
   }
-  apply nth_error_None in Hx.
-  destruct y as [lb|]; [ exfalso | easy ].
-  apply List_nth_error_Some_iff with (d := []) in Hy.
-  destruct Hy as (Hlb & Hi').
-  apply Nat.nlt_ge in Hx; apply Hx; clear Hx.
-  rewrite fold_mat_nrows in Hi'.
-  rewrite fold_mat_nrows.
-  now rewrite mat_swap_rows_nrows in Hi'.
+  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+    subst i.
+    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    apply is_sm_mat_iff in Hsm.
+    cbn in Hsm.
+    destruct Hsm as (Hcz, Hsm).
+    rewrite Hsm; [ | now apply nth_In ].
+    rewrite Hsm; [ | now apply nth_In ].
+    apply map_ext_in.
+    intros j Hj.
+    symmetry; apply Hjpq.
+  }
+  easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
 apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
 apply orb_true_iff.
 now left.
 Qed.
-
-...
 
 (* transpositions list of permutation *)
 
@@ -1755,6 +1680,8 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
           (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
           (seq 0 n))
        (seq 0 n)).
+
+...
 
 Theorem subm_mat_mul_row_by_scal : ∀ (A : matrix T) n i v,
   is_square_matrix n A = true
