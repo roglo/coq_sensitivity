@@ -4551,20 +4551,21 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem det_any_permut_l : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
-  → is_square_matrix n M = true
+  → mat_nrows M = n
+  → is_square_matrix M = true
   → is_permut n σ
-  → determinant n M =
+  → determinant M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
+(*
 intros (Hop & Hiv & Hic & Hde & H10 & Hit & Hch) * Hnz Hsm Hσ.
+*)
+intros Hif * Hnz Hr Hsm Hσ.
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : is_permut n μ). {
