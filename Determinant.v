@@ -50,6 +50,10 @@ Fixpoint determinant_loop n (M : matrix T) :=
 Definition determinant M := determinant_loop (mat_nrows M) M.
 Arguments determinant M%M.
 
+Theorem fold_determinant : ∀ M,
+  determinant_loop (mat_nrows M) M = determinant M.
+Proof. easy. Qed.
+
 Theorem determinant_zero : ∀ (M : matrix T),
   determinant_loop 0 M = 1%F.
 Proof. easy. Qed.
@@ -3254,9 +3258,6 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   symmetry.
   apply rngl_summation_eq_compat.
   intros j Hj.
-(*
-  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch).
-*)
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -3269,16 +3270,8 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   easy.
 }
 move Hiz after Hlin.
-(*
-destruct n; [ easy | cbn ].
-*)
 unfold determinant.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz; cbn.
-(*
-destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]; [ flia Hiz Hlin Hr1 | ].
-cbn.
-rewrite Nat.sub_0_r.
-*)
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
@@ -3295,9 +3288,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn; rewrite Nat.sub_0_r.
 rename i into p.
-(*
 remember (mat_swap_rows 0 p M) as M'.
-*)
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
@@ -3311,9 +3302,15 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite <- rngl_mul_opp_l in Hx; [ | now destruct Hif ].
   specialize determinant_subm_mat_swap_rows_0_i as H1.
   specialize (H1 Hif M p j Hsm).
+  cbn - [ butn ] in H1.
+  do 2 rewrite map_length, butn_length in H1.
+  rewrite length_list_swap_elem, fold_mat_nrows in H1.
+  apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
+  apply Nat.ltb_lt in Hlin.
+  rewrite Hnz, Hlin in H1.
   cbn in H1.
-...
-  rewrite <- H1 in Hx; [ | flia Hiz Hlin | easy ].
+  apply Nat.ltb_lt in Hnz, Hlin.
+  rewrite <- H1 in Hx; [ | flia Hiz Hlin | flia Hnz Hj ].
   subst x; clear H1.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
@@ -3321,8 +3318,8 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold mat_swap_rows.
     cbn; unfold list_swap_elem.
     rewrite fold_mat_nrows.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hr ].
-    rewrite seq_nth; [ | flia Hr ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
     rewrite Nat.add_0_r, transposition_1.
     easy.
   }
@@ -3336,7 +3333,14 @@ do 2 rewrite <- determinant_succ.
 subst M'.
 rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
 f_equal.
-apply determinant_alternating; try easy; flia Hiz.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+rewrite fold_determinant.
+apply Nat.neq_sym in Hiz.
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite <- (determinant_alternating Hif M Hiz); [ | easy | easy | easy ].
+unfold determinant.
+now rewrite mat_swap_rows_nrows.
 Qed.
 
 ...
