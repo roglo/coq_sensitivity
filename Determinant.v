@@ -5048,60 +5048,84 @@ rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
 easy.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem laplace_formula_on_cols : rngl_is_field →
-  ∀ n (M : matrix T) j,
-  j < n
-  → determinant n M = ∑ (i = 0, n - 1), mat_el M i j * mat_el (comatrix n M) i j.
+  ∀ (M : matrix T) j,
+  j < mat_nrows M
+  → determinant M =
+    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
-intros Hif * Hlin.
+intros Hif * Hljn.
 Check laplace_formula_on_rows.
 Print comatrix.
-Theorem comatrix_transp : ∀ n M,
-  is_square_matrix n M = true
-  → comatrix n M⁺ = ((comatrix n M)⁺)%M.
+Theorem comatrix_transp : ∀ M,
+  is_square_matrix M = true
+  → comatrix M⁺ = ((comatrix M)⁺)%M.
 Proof.
 intros * Hsm.
 unfold comatrix.
 rewrite mat_transp_nrows.
-rewrite (@square_matrix_nrows n); [ | easy ].
-rewrite (@square_matrix_ncols n); [ | now apply mat_transp_is_square ].
+rewrite square_matrix_ncols; [ | now apply mat_transp_is_square ].
 unfold mat_transp; cbn.
 f_equal.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  rewrite (@square_matrix_ncols n); [ now subst n | easy ].
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
+  rewrite square_matrix_ncols; [ now rewrite Hnz | easy ].
 }
-rewrite (@square_matrix_nrows n); [ | easy ].
 rewrite map_length, seq_length.
 unfold mat_ncols; cbn.
 do 2 rewrite List_hd_nth_0.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hnz ].
-rewrite map_length, seq_length.
+do 2 rewrite map_length, seq_length.
+rewrite <- List_hd_nth_0, fold_mat_ncols.
 apply map_ext_in.
 intros i Hi.
-rewrite <- List_hd_nth_0 in Hi |-*.
-rewrite fold_mat_ncols in Hi |-*.
 apply in_seq in Hi.
+rewrite square_matrix_ncols; [ | easy ].
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
-rewrite (@square_matrix_ncols n) in Hi |-*; [ | easy | easy ].
-rewrite (List_map_nth' 0); [ cbn | now rewrite seq_length ].
+rewrite square_matrix_ncols in Hi; [ | easy ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l, (Nat.add_comm j).
+rewrite Nat.add_0_l.
+f_equal.
+do 2 rewrite map_length.
+rewrite butn_length.
+rewrite map_length, seq_length.
+rewrite butn_length.
+rewrite fold_mat_nrows.
+destruct Hi as (_, Hi); cbn in Hi.
+destruct Hj as (_, Hj); cbn in Hj.
+apply Nat.ltb_lt in Hi, Hj; rewrite Hi, Hj; cbn.
 f_equal.
 unfold subm; cbn.
+f_equal.
+rewrite <- map_butn.
+rewrite map_map.
+rewrite map_butn_seq.
+rewrite Hi.
+cbn.
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  rewrite <- map_butn.
+  rewrite map_butn_seq.
+  rewrite Hj; cbn.
+  easy.
+}
+...
+
 Abort.
-Abort.
+Abort. (*
+rewrite map_butn.
+rewrite map_map.
+rewrite map_butn.
+*)
 
 End a.
 
-Arguments comatrix {T}%type {ro} n%nat M%M.
-Compute (let M := mk_mat [[1]] in (comatrix (mat_nrows M) M⁺ = ((comatrix (mat_nrows M) M)⁺)%M)).
+Arguments comatrix {T}%type {ro} M%M.
+Compute (let M := mk_mat [[1]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
 
 ...
 
