@@ -3281,13 +3281,11 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite seq_nth; [ | flia Hlin ].
   rewrite seq_nth; [ | flia Hj Hc Hnz ].
   do 2 rewrite Nat.add_0_l.
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
-  rewrite map_length, butn_length, fold_mat_nrows.
-  apply Nat.ltb_lt in Hlin; rewrite Hlin; cbn.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
   easy.
 }
-cbn; rewrite Nat.sub_0_r.
+cbn.
 rename i into p.
 remember (mat_swap_rows 0 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
@@ -3303,16 +3301,16 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite <- rngl_opp_involutive in Hx; [ | now destruct Hif ].
   rewrite <- rngl_mul_opp_l in Hx; [ | now destruct Hif ].
   specialize determinant_subm_mat_swap_rows_0_i as H1.
-  specialize (H1 Hif M p j Hsm).
+  specialize (H1 Hif).
+  specialize (H1 M p j Hsm).
   cbn - [ butn ] in H1.
-  do 2 rewrite map_length, butn_length in H1.
+  rewrite map_length, map_butn, butn_length in H1.
   rewrite length_list_swap_elem, fold_mat_nrows in H1.
+  rewrite butn_length, map_length, fold_mat_nrows in H1.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
-  apply Nat.ltb_lt in Hlin.
-  rewrite Hnz, Hlin in H1.
-  cbn in H1.
-  apply Nat.ltb_lt in Hnz, Hlin.
-  rewrite <- H1 in Hx; [ | flia Hiz Hlin | flia Hnz Hj ].
+  rewrite Hnz in H1; cbn - [ "<?" ] in H1.
+  apply Nat.ltb_lt in Hnz.
+  rewrite <- H1 in Hx; [ | flia Hiz Hlin | flia Hj Hnz ].
   subst x; clear H1.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
