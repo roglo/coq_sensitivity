@@ -4561,9 +4561,6 @@ Theorem det_any_permut_l : rngl_is_field →
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
-(*
-intros (Hop & Hiv & Hic & Hde & H10 & Hit & Hch) * Hnz Hsm Hσ.
-*)
 intros Hif * Hnz Hr Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
@@ -4628,8 +4625,7 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn.
-...
-  rewrite rngl_product_map_permut; [ | easy | easy ].
+  rewrite rngl_product_map_permut; [ | now destruct Hif | easy ].
   easy.
 }
 cbn.
@@ -4775,6 +4771,10 @@ split. {
   now apply map_ff_app_permut_permut_is_permut.
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem det_any_permut_r : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
