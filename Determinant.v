@@ -4772,23 +4772,17 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem det_any_permut_r : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
-  → is_square_matrix n M = true
+  → mat_nrows M = n
+  → is_square_matrix M = true
   → is_permut n σ
-  → determinant n M =
+  → determinant M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
 Proof.
-intros Hif * Hnz Hsm Hσ.
-(*
-intros Hop Hiv Hic Hde H10 Hit Hch * Hnz Hsm Hσ.
-*)
+intros Hif * Hnz Hr Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : is_permut n μ). {
@@ -5008,51 +5002,55 @@ Qed.
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
 Theorem determinant_transpose : rngl_is_field →
-  ∀ n (M : matrix T),
-  is_square_matrix n M = true
-  → determinant n M⁺ = determinant n M.
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → determinant M⁺ = determinant M.
 Proof.
 intros Hif * Hsm.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-specialize (mat_transp_is_square n M Hsm) as Hts.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  unfold determinant.
+  rewrite mat_transp_nrows, Hr.
+  rewrite square_matrix_ncols; [ | easy ].
+  now rewrite Hr, Hnz.
+}
+specialize (mat_transp_is_square M Hsm) as Hts.
 assert (Hs : is_permut n (seq 0 n)) by apply seq_is_permut.
-rewrite det_any_permut_l with (σ := seq 0 n); try easy.
-rewrite det_any_permut_r with (σ := seq 0 n); try easy.
+assert (Hr' : mat_nrows M⁺ = n). {
+  now rewrite mat_transp_nrows, square_matrix_ncols.
+}
+rewrite (det_any_permut_l Hif M Hnz Hr Hsm Hs).
+rewrite (det_any_permut_r Hif (M⁺)%M Hnz Hr' Hts Hs).
 apply rngl_summation_list_eq_compat.
 intros p Hp.
 f_equal.
 apply rngl_product_eq_compat.
 intros k Hk.
 unfold mat_transp.
-cbn - [ ff_app ].
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  unfold ff_app.
-  rewrite seq_nth; [ | flia Hnz Hk ].
-  rewrite (@square_matrix_ncols n); [ | easy ].
-  flia Hnz Hk.
-}
+unfold ff_app; cbn.
+rewrite seq_nth; [ | flia Hk Hnz ].
 assert (Hpr : ff_app p k < mat_nrows M). {
   apply in_map_iff in Hp.
   destruct Hp as (i & Hi & His).
   apply in_seq in His.
   rewrite <- Hi.
-  apply is_sm_mat_iff in Hsm.
-  destruct Hsm as (Hr, _).
   rewrite Hr.
   apply canon_sym_gr_list_ub; [ easy | ].
   flia Hnz Hk.
 }
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth. 2: {
-  unfold ff_app.
-  rewrite seq_nth; [ | flia Hnz Hk ].
-  rewrite (@square_matrix_ncols n); [ | easy ].
-  flia Hnz Hk.
+rewrite (List_map_nth' 0). 2: {
+  now rewrite seq_length, square_matrix_ncols.
 }
+rewrite (List_map_nth' 0); [ | rewrite seq_length, Hr; flia Hk Hnz ].
+rewrite seq_nth; [ | rewrite Hr; flia Hk Hnz ].
+do 2 rewrite Nat.add_0_l.
+rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
 easy.
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem laplace_formula_on_cols : rngl_is_field →
   ∀ n (M : matrix T) j,
