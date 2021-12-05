@@ -4565,7 +4565,6 @@ Proof.
 intros (Hop & Hiv & Hic & Hde & H10 & Hit & Hch) * Hnz Hsm Hσ.
 *)
 intros Hif * Hnz Hr Hsm Hσ.
-...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : is_permut n μ). {
@@ -4629,6 +4628,7 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn.
+...
   rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }
