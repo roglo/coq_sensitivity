@@ -5114,6 +5114,14 @@ erewrite map_ext_in. 2: {
   easy.
 }
 ...
+destruct M as (ll); cbn in *.
+clear Hi Hj.
+clear Hsm Hnz.
+revert i j.
+induction ll as [| l]; intros; [ now rewrite butn_nil | ].
+cbn - [ nth ].
+rewrite Nat.sub_0_r.
+...
 
 Abort.
 Abort. (*
