@@ -3343,8 +3343,6 @@ unfold determinant.
 now rewrite mat_swap_rows_nrows.
 Qed.
 
-...
-
 Theorem rngl_product_seq_permut :
   rngl_is_comm = true →
   ∀ n σ (f : nat → T),
@@ -4186,16 +4184,18 @@ destruct Hσ' as (H3, H4).
 Theorem det_by_any_sym_gr : rngl_is_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
-  → is_square_matrix n M = true
+  → mat_nrows M = n
+  → is_square_matrix M = true
   → is_sym_gr_list n sg
-  → determinant n M =
+  → determinant M =
     ∑ (k = 0, n! - 1),
     ε n (nth k sg []) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
 Proof.
-intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hnz Hsm Hsg.
-rewrite det_is_det_by_canon_permut; try easy.
+intros Hif * Hnz Hr Hsm Hsg.
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 unfold determinant'.
+rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
 set (h := λ i, sym_gr_inv sg (canon_sym_gr_list n i)).
 rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
@@ -4528,17 +4528,16 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem mat_transp_is_square : ∀ n M,
-  is_square_matrix n M = true
-  → is_square_matrix n M⁺ = true.
+Theorem mat_transp_is_square : ∀ M,
+  is_square_matrix M = true
+  → is_square_matrix M⁺ = true.
 Proof.
 intros * Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hc.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
-destruct Hsm as (Hr & Hcr & Hcl).
+destruct Hsm as (Hcr & Hcl).
 cbn; rewrite map_length, seq_length.
-split; [ easy | ].
 split. {
   intros Hct.
   destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ easy | ].
@@ -4551,6 +4550,10 @@ split. {
   now rewrite <- Hi, map_length, seq_length.
 }
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem det_any_permut_l : rngl_is_field →
   ∀ n (M : matrix T) (σ : list nat),
