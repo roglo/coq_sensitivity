@@ -5082,6 +5082,7 @@ apply in_seq in Hi.
 rewrite square_matrix_ncols; [ | easy ].
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
+move j before i.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite square_matrix_ncols in Hi; [ | easy ].
@@ -5112,6 +5113,22 @@ erewrite map_ext_in. 2: {
   rewrite map_butn_seq.
   rewrite Hj; cbn.
   easy.
+}
+(**)
+unfold butn at 2.
+rewrite map_app.
+rewrite <- firstn_map.
+(**)
+apply Nat.ltb_lt in Hi, Hj.
+replace (mat_nrows M - 1) with (j + (mat_nrows M - 1 - j)) at 1 by flia Hj.
+rewrite seq_app, map_app.
+erewrite map_ext_in. 2: {
+  intros k Hk; apply in_seq in Hk.
+  destruct Hk as (_, Hk); cbn in Hk.
+...
+  apply Nat.nle_gt in Hk.
+  apply Nat.leb_nle in Hk; rewrite Hk.
+  now rewrite Nat.add_0_r.
 }
 ...
 destruct M as (ll); cbn in *.
