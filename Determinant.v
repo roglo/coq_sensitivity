@@ -5221,7 +5221,7 @@ Theorem determinant_with_row : in_field →
   is_square_matrix M = true
   → i < mat_nrows M
   → determinant M =
-    ∑ (j = 0, mat_nrows M),
+    ∑ (j = 0, mat_nrows M - 1),
     minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
 Proof.
 intros Hif * Hsm Hir.
@@ -5235,13 +5235,10 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
     easy.
   }
   cbn.
-Print determinant_loop.
+  replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hir.
+  now cbn; rewrite Nat.sub_0_r.
+}
 ...
-  cbn.
-...
-  rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-...
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
 apply rngl_opp_inj; [ easy | ].
 rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
   [ | flia Hiz | flia | flia Hin ].
