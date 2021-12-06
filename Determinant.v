@@ -5292,7 +5292,6 @@ Theorem determinant_with_bad_row : in_field →
     minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
-(**)
 specialize (square_matrix_ncols _ Hsm) as Hc.
 remember
   (mk_mat
@@ -5302,47 +5301,47 @@ remember
            (seq 0 (mat_ncols M)))
         (seq 0 (mat_nrows M))))
   as A eqn:HA.
-assert (H1 : determinant A = 0%F). {
+assert (Hasm : is_square_matrix A = true). {
   subst A.
-(*
-  apply Nat.lt_succ_r in Hi.
-  apply Nat.lt_succ_r in Hk.
-*)
-  apply determinant_same_rows with (p := i) (q := k); try easy; cycle 1. {
-    now cbn; rewrite List_map_seq_length.
-  } {
-    now cbn; rewrite List_map_seq_length.
-  } {
-    intros j; cbn.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    symmetry.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    f_equal.
-    apply map_ext_in.
-    intros u Hu; apply in_seq in Hu.
-    rewrite seq_nth; [ | easy ].
-    rewrite seq_nth; [ | easy ].
-    cbn; rewrite Nat.eqb_refl.
-    apply Nat.neq_sym, Nat.eqb_neq in Hik.
-    now rewrite Hik.
-  } {
-Print mat_repl_vect.
-...
+  apply is_sm_mat_iff; cbn.
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hir ].
+  rewrite List_map_seq_length.
+  rewrite fold_mat_ncols.
+  apply is_sm_mat_iff in Hsm.
+  split; [ easy | ].
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (j & Hjl & Hj).
+  apply in_seq in Hj.
+  now rewrite <- Hjl, List_map_seq_length.
 }
-...
-remember
-  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p i then k else p) q))
-  as A eqn:HA.
+assert (Hira : i < mat_nrows A). {
+  now subst A; cbn; rewrite List_map_seq_length.
+}
+assert (Hkra : k < mat_nrows A). {
+  now subst A; cbn; rewrite List_map_seq_length.
+}
 assert (H1 : determinant A = 0%F). {
-  subst A.
-  apply Nat.lt_succ_r in Hi.
-  apply Nat.lt_succ_r in Hk.
   apply determinant_same_rows with (p := i) (q := k); try easy.
-  intros j.
-  cbn.
-  rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
-  now destruct (Nat.eq_dec k i).
+  intros j; subst A; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  symmetry.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  f_equal.
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  cbn; rewrite Nat.eqb_refl.
+  apply Nat.neq_sym, Nat.eqb_neq in Hik.
+  now rewrite Hik.
 }
+(**)
+rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | easy ].
+...
 rewrite <- determinant_with_row with (i := i) in H1; try easy.
 rewrite <- H1 at 2.
 apply rngl_summation_eq_compat.
