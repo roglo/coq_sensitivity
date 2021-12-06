@@ -5048,22 +5048,94 @@ rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
 easy.
 Qed.
 
+Theorem mat_transp_el : ∀ M i j,
+  is_correct_matrix M
+  → mat_el M⁺ i j = mat_el M j i.
+Proof.
+intros * Hcm.
+unfold mat_el; cbn.
+destruct (lt_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
+  apply Nat.nlt_ge in Hic.
+  rewrite nth_overflow. 2: {
+    rewrite nth_overflow; [ easy | ].
+    now rewrite map_length, seq_length.
+  }
+  rewrite nth_overflow; [ easy | ].
+  destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
+    destruct Hcm as (H1, H2).
+    rewrite H2; [ easy | ].
+    now apply nth_In; rewrite fold_mat_nrows.
+  }
+  apply Nat.nlt_ge in Hjr.
+  now rewrite nth_overflow.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  unfold mat_el.
+  rewrite seq_nth; [ cbn | easy ].
+  rewrite seq_nth; [ cbn | easy ].
+  easy.
+}
+apply Nat.nlt_ge in Hjr.
+rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+rewrite (nth_overflow _ _ Hjr).
+now destruct i.
+Qed.
+
 Theorem laplace_formula_on_cols : rngl_is_field →
   ∀ (M : matrix T) j,
-  j < mat_nrows M
+  is_square_matrix M = true
+  → j < mat_nrows M
   → determinant M =
     ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
-intros Hif * Hljn.
+intros Hif * Hsm Hljn.
+rewrite <- determinant_transpose; [ | easy | easy ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- mat_transp_el; [ | now apply squ_mat_is_corr ].
+  easy.
+}
+cbn - [ determinant mat_el ].
+rewrite <- square_matrix_ncols; [ | easy ].
+rewrite <- mat_transp_nrows.
+specialize (@laplace_formula_on_rows Hif (M⁺)%M j) as H1.
+assert (H : is_square_matrix M⁺ = true) by now apply mat_transp_is_square.
+specialize (H1 H); clear H.
+rewrite mat_transp_nrows in H1.
+rewrite square_matrix_ncols in H1; [ | easy ].
+specialize (H1 Hljn).
+rewrite <- square_matrix_ncols in H1; [ | easy ].
+rewrite mat_transp_nrows.
+rewrite H1.
+apply rngl_summation_eq_compat.
+intros i Hi.
+f_equal.
+...
+Compute (let M := mk_mat [[1;2;7;5];[3;4;0;8];[18;1;2;0];[3;2;7;3]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
+     = {|
+         mat_list_list :=
+           [[24; 0; 112; 0]; [0; 6; 0; 1008]; [9; 0; 60; 0]; [0; 19; 0; 8]]
+       |} =
+       {|
+         mat_list_list :=
+           [[80; 0; 140; 0]; [0; 636; 0; 30]; [297; 0; 42; 0]; [0; 259; 0; 29]]
+       |}
+     : Prop
+...
 (*
-Check laplace_formula_on_rows.
+...
 Print comatrix.
-*)
+Check laplace_formula_on_rows.
+...
 Theorem comatrix_transp : ∀ M,
   is_square_matrix M = true
   → comatrix M⁺ = ((comatrix M)⁺)%M.
 Proof.
 intros * Hsm.
+(* c'est faux, j'ai fait un contre-exemple *)
+...
 unfold comatrix.
 rewrite mat_transp_nrows.
 rewrite square_matrix_ncols; [ | now apply mat_transp_is_square ].
@@ -5150,7 +5222,6 @@ f_equal. {
 (* i ≤ k < j ≤ u
    bon
    oui, je sais pas, c'est bizarre *)
-
 ...
 map (λ i, map (f i) (g i)) l = ...
 ...
@@ -5187,12 +5258,22 @@ rewrite map_butn.
 rewrite map_map.
 rewrite map_butn.
 *)
+*)
 
 End a.
 
 Require Import Nrl.
 Arguments comatrix {T}%type {ro} M%M.
-Compute (let M := mk_mat [[1;2;7];[3;4;0];[18;1;2]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
+Compute (let M := mk_mat [[1;2;7;5];[3;4;0;8];[18;1;2;0];[3;2;7;3]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
+     = {|
+         mat_list_list :=
+           [[24; 0; 112; 0]; [0; 6; 0; 1008]; [9; 0; 60; 0]; [0; 19; 0; 8]]
+       |} =
+       {|
+         mat_list_list :=
+           [[80; 0; 140; 0]; [0; 636; 0; 30]; [297; 0; 42; 0]; [0; 259; 0; 29]]
+       |}
+     : Prop
 
 ...
 
