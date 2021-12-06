@@ -5238,8 +5238,11 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hir.
   now cbn; rewrite Nat.sub_0_r.
 }
+apply rngl_opp_inj; [ now destruct Hif | ].
+(**)
+apply Nat.neq_sym in Hiz.
+rewrite <- (determinant_alternating Hif M Hiz); [ | flia Hir | easy | easy ].
 ...
-apply rngl_opp_inj; [ easy | ].
 rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
   [ | flia Hiz | flia | flia Hin ].
 rewrite determinant_succ at 1.
