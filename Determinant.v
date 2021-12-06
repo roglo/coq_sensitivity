@@ -5159,14 +5159,46 @@ apply comatrix_is_square.
 now apply mat_transp_is_square.
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem mat_swap_rows_involutive : ∀ n (M : matrix n n T) i j,
-  mat_swap_rows i j (mat_swap_rows i j M) = M.
+Theorem mat_swap_rows_involutive : ∀ (M : matrix T) i j,
+  i < mat_nrows M
+  → j < mat_nrows M
+  → is_square_matrix M = true
+  → mat_swap_rows i j (mat_swap_rows i j M) = M.
 Proof.
-intros.
+intros * Hi Hj Hsm.
+destruct M as (ll); cbn in Hj |-*.
+unfold mat_swap_rows.
+f_equal; cbn.
+rewrite List_map_seq_length.
+rewrite List_map_nth_seq with (d := []).
+apply map_ext_in.
+intros k Hk; apply in_seq in Hk.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+  subst k.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  rewrite Nat.eqb_refl.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j i) as [Hji| Hji]; [ now subst i | easy ].
+}
+destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+  subst k.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  now rewrite Nat.eqb_refl.
+}
+...
+  destruct (lt_dec j (length ll)) as [Hjl| Hjl]. 2: {
+    apply Nat.nlt_ge in Hjl.
+    rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+Print mat_swap_rows.
+Print list_swap_elem.
+...
+  rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+...
+intros * Hsm.
 apply matrix_eq.
 intros p q Hp Hq; cbn.
 destruct (Nat.eq_dec p i) as [Hpi| Hpi]. {
