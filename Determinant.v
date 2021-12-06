@@ -5326,6 +5326,7 @@ assert (H1 : determinant A = 0%F). {
     apply Nat.neq_sym, Nat.eqb_neq in Hik.
     now rewrite Hik.
   } {
+Print mat_repl_vect.
 ...
 }
 ...
