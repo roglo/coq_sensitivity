@@ -5130,6 +5130,27 @@ f_equal. {
   apply map_ext_in.
   intros k Hk; apply in_seq in Hk.
   rewrite List_nth_firstn; [ | easy ].
+  rewrite (List_map_nth_seq (butn i _)) with (d := 0%F).
+  rewrite butn_length.
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hc).
+  rewrite (Hc (nth k _ _)). 2: {
+    apply nth_In; rewrite fold_mat_nrows.
+    flia Hj Hk.
+  }
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  cbn.
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  unfold Nat.b2n.
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec i k) as [Hik| Hik]. {
+    destruct (le_dec j u) as [Hju| Hju]. {
+      unfold mat_el.
+(* i ≤ k < j ≤ u
+   bon
+   oui, je sais pas, c'est bizarre *)
+
 ...
 map (λ i, map (f i) (g i)) l = ...
 ...
@@ -5160,7 +5181,6 @@ induction ll as [| l]; intros; [ now rewrite butn_nil | ].
 cbn - [ nth ].
 rewrite Nat.sub_0_r.
 ...
-
 Abort.
 Abort. (*
 rewrite map_butn.
@@ -5170,8 +5190,9 @@ rewrite map_butn.
 
 End a.
 
+Require Import Nrl.
 Arguments comatrix {T}%type {ro} M%M.
-Compute (let M := mk_mat [[1]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
+Compute (let M := mk_mat [[1;2;7];[3;4;0];[18;1;2]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
 
 ...
 
