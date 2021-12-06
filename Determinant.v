@@ -5225,6 +5225,52 @@ Theorem determinant_with_row : in_field →
     minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
 Proof.
 intros Hif * Hsm Hir.
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i; cbn - [ determinant ].
+  unfold determinant.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite mat_nrows_subm.
+    apply Nat.ltb_lt in Hir; rewrite Hir.
+    easy.
+  }
+  cbn.
+Print determinant_loop.
+...
+  cbn.
+...
+  rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+...
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+apply rngl_opp_inj; [ easy | ].
+rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
+  [ | flia Hiz | flia | flia Hin ].
+rewrite determinant_succ at 1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite mat_swap_rows_comm.
+  rewrite mat_el_mat_swap_rows.
+  easy.
+}
+rewrite rngl_opp_summation; [ | easy | easy ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite <- rngl_mul_assoc; symmetry.
+rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite (Nat.add_comm i j).
+rewrite minus_one_pow_add_r; [ | easy | easy ].
+do 2 rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal.
+rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; [ | easy | easy ].
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite mat_swap_rows_comm.
+apply determinant_subm_mat_swap_rows_0_i; try easy.
+flia Hiz Hin.
+Qed.
 ...
 Theorem determinant_with_row :
   rngl_is_comm = true →
