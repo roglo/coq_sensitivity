@@ -5193,10 +5193,6 @@ rewrite seq_nth; [ cbn | easy ].
 now apply Nat.eqb_neq in Hki, Hkj; rewrite Hki, Hkj.
 Qed.
 
-Inspect 1.
-
-...
-
 (*
 The following two theorems, "determinant_with_row" and determinant_with_bad_row
 have some similitudes.
@@ -5219,6 +5215,16 @@ determinant_with_bad_row
 Isn't it strange? (or beautiful?)
 *)
 
+Theorem determinant_with_row : in_field →
+  ∀ i (M : matrix T),
+  is_square_matrix M = true
+  → i < mat_nrows M
+  → determinant M =
+    ∑ (j = 0, mat_nrows M),
+    minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+Proof.
+intros Hif * Hsm Hir.
+...
 Theorem determinant_with_row :
   rngl_is_comm = true →
   rngl_has_opp = true →
