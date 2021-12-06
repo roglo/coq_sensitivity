@@ -5083,12 +5083,40 @@ rewrite (nth_overflow _ _ Hjr).
 now destruct i.
 Qed.
 
+Theorem comatrix_ncols : ∀ M, mat_ncols (comatrix M) = mat_ncols M.
+Proof.
+intros.
+unfold comatrix.
+unfold mat_ncols; cbn.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  rewrite Hrz; cbn.
+  rewrite fold_mat_ncols.
+Print is_correct_matrix.
+...
+rewrite List_hd_nth_0.
+rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+now rewrite List_map_seq_length.
+...
+
+Theorem comatrix_is_square : ∀ M,
+  is_square_matrix M = true
+  → is_square_matrix (comatrix M) = true.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols _ Hsm) as Hc.
+apply is_sm_mat_iff in Hsm.
+apply is_sm_mat_iff.
+rewrite comatrix_ncols.
+...
+rewrite _ncols.
+...
+
 Theorem laplace_formula_on_cols : rngl_is_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → j < mat_nrows M
   → determinant M =
-    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
+    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M⁺)⁺ i j.
 Proof.
 intros Hif * Hsm Hljn.
 rewrite <- determinant_transpose; [ | easy | easy ].
@@ -5112,6 +5140,14 @@ rewrite H1.
 apply rngl_summation_eq_compat.
 intros i Hi.
 f_equal.
+symmetry.
+apply mat_transp_el.
+apply squ_mat_is_corr.
+...
+Search (is_square_matrix (comatrix _) = true).
+Check square_matrix_is_correct.
+...
+apply comatrix_is_square_matrix.
 ...
 Compute (let M := mk_mat [[1;2;7;5];[3;4;0;8];[18;1;2;0];[3;2;7;3]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
      = {|
