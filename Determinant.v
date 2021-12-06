@@ -5196,7 +5196,6 @@ Qed.
 (*
 The following two theorems, "determinant_with_row" and determinant_with_bad_row
 have some similitudes.
-  They are commented because I am not sure it is pertinent.
   The theorem "determinant_with_row" says that we can compute the determinant
 by going through any row (not necessarily the 0th one). Here, row "i".
   The theorem "determinant_with_bad_row" says that if we go through another
@@ -5239,85 +5238,51 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   now cbn; rewrite Nat.sub_0_r.
 }
 apply rngl_opp_inj; [ now destruct Hif | ].
-(**)
 apply Nat.neq_sym in Hiz.
 rewrite <- (determinant_alternating Hif M Hiz); [ | flia Hir | easy | easy ].
-...
-rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
-  [ | flia Hiz | flia | flia Hin ].
+unfold determinant at 1.
+rewrite mat_swap_rows_nrows.
+replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
 rewrite determinant_succ at 1.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite mat_swap_rows_comm.
-  rewrite mat_el_mat_swap_rows.
+  rewrite mat_el_mat_swap_rows; [ | flia Hir ].
   easy.
 }
-rewrite rngl_opp_summation; [ | easy | easy ].
+rewrite rngl_opp_summation; [ | now destruct Hif ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 rewrite <- rngl_mul_assoc; symmetry.
-rewrite <- rngl_mul_opp_r; [ | easy ].
+rewrite <- rngl_mul_opp_r; [ | now destruct Hif ].
 rewrite (Nat.add_comm i j).
-rewrite minus_one_pow_add_r; [ | easy | easy ].
+rewrite minus_one_pow_add_r; [ | now destruct Hif ].
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite rngl_mul_comm; [ | easy ].
+rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite <- rngl_mul_assoc.
 f_equal.
-rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; [ | easy | easy ].
-rewrite rngl_mul_comm; [ | easy ].
+rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+}
+rewrite rngl_mul_comm; [ | now destruct Hif ].
 symmetry.
 rewrite mat_swap_rows_comm.
-apply determinant_subm_mat_swap_rows_0_i; try easy.
-flia Hiz Hin.
+rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; cycle 1. {
+  flia Hir Hiz.
+} {
+  flia Hj Hir.
+}
+unfold determinant.
+rewrite mat_nrows_subm.
+rewrite mat_swap_rows_nrows.
+assert (H : 0 < mat_nrows M) by flia Hir.
+now apply Nat.ltb_lt in H; rewrite H; clear H.
 Qed.
+
 ...
-Theorem determinant_with_row :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ i n (M : matrix (S n) (S n) T),
-  i ≤ n
-  → ∑ (j = 0, n),
-    minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j) =
-    determinant M.
-Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch * Hin.
-symmetry.
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
-apply rngl_opp_inj; [ easy | ].
-rewrite <- determinant_alternating with (p := 0) (q := i); try easy;
-  [ | flia Hiz | flia | flia Hin ].
-rewrite determinant_succ at 1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite mat_swap_rows_comm.
-  rewrite mat_el_mat_swap_rows.
-  easy.
-}
-rewrite rngl_opp_summation; [ | easy | easy ].
-apply rngl_summation_eq_compat.
-intros j Hj.
-rewrite <- rngl_mul_assoc; symmetry.
-rewrite <- rngl_mul_opp_r; [ | easy ].
-rewrite (Nat.add_comm i j).
-rewrite minus_one_pow_add_r; [ | easy | easy ].
-do 2 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_comm; [ | easy ].
-rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; [ | easy | easy ].
-rewrite rngl_mul_comm; [ | easy ].
-symmetry.
-rewrite mat_swap_rows_comm.
-apply determinant_subm_mat_swap_rows_0_i; try easy.
-flia Hiz Hin.
-Qed.
 
 Theorem determinant_with_bad_row :
   rngl_is_comm = true →
