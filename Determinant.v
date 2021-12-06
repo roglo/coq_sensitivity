@@ -5055,8 +5055,10 @@ Theorem laplace_formula_on_cols : rngl_is_field →
     ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hif * Hljn.
+(*
 Check laplace_formula_on_rows.
 Print comatrix.
+*)
 Theorem comatrix_transp : ∀ M,
   is_square_matrix M = true
   → comatrix M⁺ = ((comatrix M)⁺)%M.
@@ -5117,15 +5119,24 @@ erewrite map_ext_in. 2: {
 (**)
 unfold butn at 2.
 rewrite map_app.
-rewrite <- firstn_map.
+...
+map (λ i, map (f i) (g i)) l = ...
+...
+apply Nat.ltb_lt in Hi, Hj.
+unfold butn at 2.
+rewrite map_app.
+destruct (lt_dec i j) as [Hij| Hij]. {
+...
+(**)
+unfold butn at 2.
+rewrite map_app.
 (**)
 apply Nat.ltb_lt in Hi, Hj.
-replace (mat_nrows M - 1) with (j + (mat_nrows M - 1 - j)) at 1 by flia Hj.
+replace (mat_nrows M - 1) with (i + (mat_nrows M - 1 - i)) at 1 by flia Hi.
 rewrite seq_app, map_app.
 erewrite map_ext_in. 2: {
   intros k Hk; apply in_seq in Hk.
   destruct Hk as (_, Hk); cbn in Hk.
-...
   apply Nat.nle_gt in Hk.
   apply Nat.leb_nle in Hk; rewrite Hk.
   now rewrite Nat.add_0_r.
