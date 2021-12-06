@@ -5392,7 +5392,9 @@ rewrite List_map_nth_seq with (la := ll) (d := []) at 1.
 rewrite List_seq_cut with (i := i); [ | now apply in_seq ].
 rewrite Nat.sub_0_r, Nat.add_0_l.
 do 2 rewrite map_app.
-f_equal; f_equal. {
+rewrite butn_app; [ cbn | symmetry; apply List_map_seq_length ].
+rewrite butn_app; [ cbn | symmetry; apply List_map_seq_length ].
+f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
   rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
@@ -5406,107 +5408,28 @@ f_equal; f_equal. {
   intros v Hv; apply in_seq in Hv.
   rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
   f_equal; f_equal; f_equal.
-  apply Hcl.
-  apply nth_In; flia Hu Hir.
-}
-cbn; f_equal. {
-...
-  erewrite map_ext_in. 2: {
-    intros v Hv.
-...
-f_equal.
-...
-erewrite map_ext_in
-  do 2 rewrite map_app.
-...
-  erewrite map_ext_in. 2: {
-    intros v Hv; apply in_seq in Hv.
-...
-replace (length ll) with (i + (length ll - i)) by flia Hir.
-rewrite seq_app, map_app.
-unfold butn.
-f_equal. {
-rewrite <- map_butn.
-rewrite List_map_nth_seq.
-destruct M as (ll); cbn.
-f_equal; f_equal.
-unfold mat_ncols; cbn.
-apply matrix_eq.
-intros p q Hp Hq; cbn.
-destruct (Nat.eq_dec (p + Nat.b2n (i <=? p)) i) as [Hpi| Hpi]; [ | easy ].
-destruct (le_dec i p) as [Hip| Hip]. {
-  apply Nat.leb_le in Hip.
-  rewrite Hip in Hpi.
-  cbn in Hpi.
-  apply Nat.leb_le in Hip.
-  flia Hpi Hip.
+  apply Hcl, nth_In; flia Hu Hir.
 } {
-  apply Nat.leb_nle in Hip.
-  rewrite Hip in Hpi.
-  cbn in Hpi.
-  apply Nat.leb_nle in Hip.
-  flia Hpi Hip.
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  cbn in Hcl.
+  rewrite List_hd_nth_0.
+  rewrite Hcl; [ | apply nth_In; flia Hu ].
+  rewrite Hcl; [ | apply nth_In; flia Hu ].
+  apply map_ext_in.
+  intros v Hv; apply in_seq in Hv.
+  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
+  f_equal; f_equal; f_equal.
+  apply Hcl, nth_In; flia Hu.
 }
 Qed.
+
+Inspect 1.
+
 ...
-Theorem determinant_with_bad_row :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ i k n (M : matrix (S n) (S n) T),
-  i ≤ n
-  → k ≤ n
-  → i ≠ k
-  → ∑ (j = 0, n),
-    minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
-Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch.
-intros * Hi Hk Hik.
-remember
-  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p i then k else p) q))
-  as A eqn:HA.
-assert (H1 : determinant A = 0%F). {
-  subst A.
-  apply Nat.lt_succ_r in Hi.
-  apply Nat.lt_succ_r in Hk.
-  apply determinant_same_rows with (p := i) (q := k); try easy.
-  intros j.
-  cbn.
-  rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
-  now destruct (Nat.eq_dec k i).
-}
-rewrite <- determinant_with_row with (i := i) in H1; try easy.
-rewrite <- H1 at 2.
-apply rngl_summation_eq_compat.
-intros j Hj.
-do 2 rewrite <- rngl_mul_assoc.
-f_equal; f_equal. {
-  rewrite HA; cbn.
-  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-}
-f_equal.
-rewrite HA.
-apply matrix_eq.
-intros p q Hp Hq; cbn.
-destruct (Nat.eq_dec (p + Nat.b2n (i <=? p)) i) as [Hpi| Hpi]; [ | easy ].
-destruct (le_dec i p) as [Hip| Hip]. {
-  apply Nat.leb_le in Hip.
-  rewrite Hip in Hpi.
-  cbn in Hpi.
-  apply Nat.leb_le in Hip.
-  flia Hpi Hip.
-} {
-  apply Nat.leb_nle in Hip.
-  rewrite Hip in Hpi.
-  cbn in Hpi.
-  apply Nat.leb_nle in Hip.
-  flia Hpi Hip.
-}
-Qed.
 
 Theorem matrix_comatrix_mul :
   rngl_is_comm = true →
