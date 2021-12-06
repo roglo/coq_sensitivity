@@ -5318,14 +5318,15 @@ assert (Hasm : is_square_matrix A = true). {
   apply in_seq in Hj.
   now rewrite <- Hjl, List_map_seq_length.
 }
-assert (Hira : i < mat_nrows A). {
-  now subst A; cbn; rewrite List_map_seq_length.
-}
-assert (Hkra : k < mat_nrows A). {
+assert (Hira : mat_nrows A = mat_nrows M). {
   now subst A; cbn; rewrite List_map_seq_length.
 }
 assert (H1 : determinant A = 0%F). {
-  apply determinant_same_rows with (p := i) (q := k); try easy.
+  apply determinant_same_rows with (p := i) (q := k); try easy. {
+    now rewrite Hira.
+  } {
+    now rewrite Hira.
+  }
   intros j; subst A; cbn.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   symmetry.
@@ -5340,7 +5341,13 @@ assert (H1 : determinant A = 0%F). {
   now rewrite Hik.
 }
 (**)
-rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | easy ].
+rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | ]. 2: {
+  now rewrite Hira.
+}
+rewrite <- H1 at 2.
+rewrite Hira.
+apply rngl_summation_eq_compat.
+intros j Hj.
 ...
 rewrite <- determinant_with_row with (i := i) in H1; try easy.
 rewrite <- H1 at 2.
