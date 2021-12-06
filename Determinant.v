@@ -5196,6 +5196,7 @@ Qed.
 (*
 The following two theorems, "determinant_with_row" and determinant_with_bad_row
 have some similitudes.
+  They are commented because I am not sure it is pertinent.
   The theorem "determinant_with_row" says that we can compute the determinant
 by going through any row (not necessarily the 0th one). Here, row "i".
   The theorem "determinant_with_bad_row" says that if we go through another
