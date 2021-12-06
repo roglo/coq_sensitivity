@@ -5439,10 +5439,8 @@ unfold "*"%M, "×"%M, mat_nrows; cbn - [ determinant ]; f_equal.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
-...
 rewrite laplace_formula_on_rows with (i := i); try easy.
-...
-rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
+cbn - [ mat_el ].
 ...
 rewrite mat_transp_ncols. 2: {
   rewrite comatrix_ncols; unfold mat_ncols; cbn.
