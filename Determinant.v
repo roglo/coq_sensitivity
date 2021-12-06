@@ -118,7 +118,7 @@ Definition determinant' n (M : matrix T) :=
 
 (* Proof that both definitions of determinants are equal *)
 
-Theorem det_is_det_by_canon_permut : rngl_is_field →
+Theorem det_is_det_by_canon_permut : in_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M = determinant' (mat_nrows M) M.
@@ -232,7 +232,7 @@ Qed.
 
 (* multilinearity *)
 
-Theorem determinant_multilinear : rngl_is_field →
+Theorem determinant_multilinear : in_field →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -521,7 +521,7 @@ Definition determinant'_list n (M : matrix T) :=
 
 Arguments determinant'_list n%nat M%M.
 
-Theorem determinant'_by_list : rngl_is_field →
+Theorem determinant'_by_list : in_field →
   ∀ n (M : matrix T),
   determinant' n M = ∑ (k = 0, fact n - 1), nth k (determinant'_list n M) 0.
 Proof.
@@ -539,7 +539,7 @@ f_equal.
 now apply ε_of_permut_ε.
 Qed.
 
-Theorem det_is_det_by_any_permut : rngl_is_field →
+Theorem det_is_det_by_any_permut : in_field →
   ∀ n (M : matrix T) l,
   mat_nrows M = n
   → is_square_matrix M = true
@@ -799,7 +799,7 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
-Theorem determinant_alternating : rngl_is_field →
+Theorem determinant_alternating : in_field →
   ∀ (M : matrix T) p q,
   p ≠ q
   → p < mat_nrows M
@@ -1136,7 +1136,7 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Theorem determinant_same_rows : rngl_is_field →
+Theorem determinant_same_rows : in_field →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
@@ -3095,7 +3095,7 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
-Theorem determinant_circular_shift_rows : rngl_is_field →
+Theorem determinant_circular_shift_rows : in_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
   → is_square_matrix M = true
@@ -3211,7 +3211,7 @@ rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
 
-Theorem determinant_subm_mat_swap_rows_0_i : rngl_is_field →
+Theorem determinant_subm_mat_swap_rows_0_i : in_field →
   ∀ (M : matrix T) i j,
   is_square_matrix M = true
   → 0 < i < mat_nrows M
@@ -3236,7 +3236,7 @@ Qed.
 
 (* Laplace formulas *)
 
-Theorem laplace_formula_on_rows : rngl_is_field →
+Theorem laplace_formula_on_rows : in_field →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → i < mat_nrows M
@@ -4181,7 +4181,7 @@ destruct Hσ' as (H3, H4).
 ...
 *)
 
-Theorem det_by_any_sym_gr : rngl_is_field →
+Theorem det_by_any_sym_gr : in_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → mat_nrows M = n
@@ -4551,7 +4551,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_l : rngl_is_field →
+Theorem det_any_permut_l : in_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -4772,7 +4772,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_r : rngl_is_field →
+Theorem det_any_permut_r : in_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -5001,7 +5001,7 @@ Qed.
 
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
-Theorem determinant_transpose : rngl_is_field →
+Theorem determinant_transpose : in_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M⁺ = determinant M.
@@ -5118,9 +5118,12 @@ rewrite comatrix_ncols.
 rewrite comatrix_nrows.
 split; [ easy | ].
 intros l Hl.
-...
+apply in_map_iff in Hl.
+destruct Hl as (i & Hil & Hi).
+now rewrite <- Hil; rewrite List_map_seq_length.
+Qed.
 
-Theorem laplace_formula_on_cols : rngl_is_field →
+Theorem laplace_formula_on_cols : in_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → j < mat_nrows M
@@ -5152,191 +5155,12 @@ f_equal.
 symmetry.
 apply mat_transp_el.
 apply squ_mat_is_corr.
-...
-Search (is_square_matrix (comatrix _) = true).
-Check square_matrix_is_correct.
-...
-apply comatrix_is_square_matrix.
-...
-Compute (let M := mk_mat [[1;2;7;5];[3;4;0;8];[18;1;2;0];[3;2;7;3]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
-     = {|
-         mat_list_list :=
-           [[24; 0; 112; 0]; [0; 6; 0; 1008]; [9; 0; 60; 0]; [0; 19; 0; 8]]
-       |} =
-       {|
-         mat_list_list :=
-           [[80; 0; 140; 0]; [0; 636; 0; 30]; [297; 0; 42; 0]; [0; 259; 0; 29]]
-       |}
-     : Prop
-...
-(*
-...
-Print comatrix.
-Check laplace_formula_on_rows.
-...
-Theorem comatrix_transp : ∀ M,
-  is_square_matrix M = true
-  → comatrix M⁺ = ((comatrix M)⁺)%M.
-Proof.
-intros * Hsm.
-(* c'est faux, j'ai fait un contre-exemple *)
-...
-unfold comatrix.
-rewrite mat_transp_nrows.
-rewrite square_matrix_ncols; [ | now apply mat_transp_is_square ].
-unfold mat_transp; cbn.
-f_equal.
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
-  rewrite square_matrix_ncols; [ now rewrite Hnz | easy ].
-}
-rewrite map_length, seq_length.
-unfold mat_ncols; cbn.
-do 2 rewrite List_hd_nth_0.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hnz ].
-do 2 rewrite map_length, seq_length.
-rewrite <- List_hd_nth_0, fold_mat_ncols.
-apply map_ext_in.
-intros i Hi.
-apply in_seq in Hi.
-rewrite square_matrix_ncols; [ | easy ].
-apply map_ext_in.
-intros j Hj; apply in_seq in Hj.
-move j before i.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite square_matrix_ncols in Hi; [ | easy ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite Nat.add_0_l, (Nat.add_comm j).
-rewrite Nat.add_0_l.
-f_equal.
-do 2 rewrite map_length.
-rewrite butn_length.
-rewrite map_length, seq_length.
-rewrite butn_length.
-rewrite fold_mat_nrows.
-destruct Hi as (_, Hi); cbn in Hi.
-destruct Hj as (_, Hj); cbn in Hj.
-apply Nat.ltb_lt in Hi, Hj; rewrite Hi, Hj; cbn.
-f_equal.
-unfold subm; cbn.
-f_equal.
-rewrite <- map_butn.
-rewrite map_map.
-rewrite map_butn_seq.
-rewrite Hi.
-cbn.
-erewrite map_ext_in. 2: {
-  intros k Hk.
-  rewrite <- map_butn.
-  rewrite map_butn_seq.
-  rewrite Hj; cbn.
-  easy.
-}
-(**)
-apply Nat.ltb_lt in Hi, Hj.
-unfold butn at 2.
-rewrite map_app.
-replace (mat_nrows M - 1) with (j + (mat_nrows M - 1 - j)) at 1 by flia Hj.
-rewrite seq_app, map_app.
-f_equal. {
-  rewrite (List_map_nth_seq (firstn j (mat_list_list M))) with (d := []).
-  rewrite firstn_length, fold_mat_nrows.
-  rewrite Nat.min_l; [ | flia Hj ].
-  rewrite map_map.
-  apply map_ext_in.
-  intros k Hk; apply in_seq in Hk.
-  rewrite List_nth_firstn; [ | easy ].
-  rewrite (List_map_nth_seq (butn i _)) with (d := 0%F).
-  rewrite butn_length.
-  apply is_sm_mat_iff in Hsm.
-  destruct Hsm as (Hcr, Hc).
-  rewrite (Hc (nth k _ _)). 2: {
-    apply nth_In; rewrite fold_mat_nrows.
-    flia Hj Hk.
-  }
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  cbn.
-  apply map_ext_in.
-  intros u Hu; apply in_seq in Hu.
-  unfold Nat.b2n.
-  do 2 rewrite if_leb_le_dec.
-  destruct (le_dec i k) as [Hik| Hik]. {
-    destruct (le_dec j u) as [Hju| Hju]. {
-      unfold mat_el.
-(* i ≤ k < j ≤ u
-   bon
-   oui, je sais pas, c'est bizarre *)
-...
-map (λ i, map (f i) (g i)) l = ...
-...
-unfold butn at 2.
-rewrite map_app.
-destruct (lt_dec i j) as [Hij| Hij]. {
-...
-(**)
-unfold butn at 2.
-rewrite map_app.
-(**)
-apply Nat.ltb_lt in Hi, Hj.
-replace (mat_nrows M - 1) with (i + (mat_nrows M - 1 - i)) at 1 by flia Hi.
-rewrite seq_app, map_app.
-erewrite map_ext_in. 2: {
-  intros k Hk; apply in_seq in Hk.
-  destruct Hk as (_, Hk); cbn in Hk.
-  apply Nat.nle_gt in Hk.
-  apply Nat.leb_nle in Hk; rewrite Hk.
-  now rewrite Nat.add_0_r.
-}
-...
-destruct M as (ll); cbn in *.
-clear Hi Hj.
-clear Hsm Hnz.
-revert i j.
-induction ll as [| l]; intros; [ now rewrite butn_nil | ].
-cbn - [ nth ].
-rewrite Nat.sub_0_r.
-...
-Abort.
-Abort. (*
-rewrite map_butn.
-rewrite map_map.
-rewrite map_butn.
-*)
-*)
+apply comatrix_is_square.
+now apply mat_transp_is_square.
+Qed.
 
-End a.
+Inspect 1.
 
-Require Import Nrl.
-Arguments comatrix {T}%type {ro} M%M.
-Compute (let M := mk_mat [[1;2;7;5];[3;4;0;8];[18;1;2;0];[3;2;7;3]] in (comatrix M⁺ = ((comatrix M)⁺)%M)).
-     = {|
-         mat_list_list :=
-           [[24; 0; 112; 0]; [0; 6; 0; 1008]; [9; 0; 60; 0]; [0; 19; 0; 8]]
-       |} =
-       {|
-         mat_list_list :=
-           [[80; 0; 140; 0]; [0; 636; 0; 30]; [297; 0; 42; 0]; [0; 259; 0; 29]]
-       |}
-     : Prop
-
-...
-
-Theorem laplace_formula_on_cols :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T) j,
-  j < n
-  → determinant M = ∑ (i = 0, n - 1), mat_el M i j * mat_el (comatrix M) i j.
-Proof.
-intros Hic Hop Hin Hit H10 Hde Hch * Hlin.
-...
-Check determinant_transp.
 ...
 
 Theorem mat_swap_rows_involutive : ∀ n (M : matrix n n T) i j,
