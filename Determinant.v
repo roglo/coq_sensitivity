@@ -5427,10 +5427,60 @@ f_equal. {
 }
 Qed.
 
-Inspect 1.
-
+Theorem matrix_comatrix_mul : in_field →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → (M * (comatrix M)⁺ = determinant M × mI (mat_nrows M))%M.
+Proof.
+intros Hif * Hsm.
+(**)
+destruct M as (ll); cbn - [ determinant ].
+unfold "*"%M, "×"%M, mat_nrows; cbn - [ determinant ]; f_equal.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+rewrite mat_transp_ncols. 2: {
+  rewrite comatrix_ncols; unfold mat_ncols; cbn.
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  cbn in Hcl.
+  rewrite Hcl; [ flia Hi | ].
+  rewrite List_hd_nth_0.
+  apply nth_In; flia Hi.
+}
+rewrite comatrix_nrows; cbn - [ determinant ].
+rewrite map_map.
+apply map_ext_in.
+intros j Hj; apply in_seq in Hj.
+move j before i.
+unfold mat_mul_el.
+cbn - [ mat_transp determinant ].
+Check determinant_with_bad_row.
 ...
-
+apply matrix_eq.
+intros i j Hi Hj.
+rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  now rewrite rngl_mul_1_r.
+}
+rewrite rngl_mul_0_r; [ | now left ].
+destruct n; [ easy | ].
+rewrite Nat.sub_succ at 1.
+rewrite Nat.sub_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+apply -> Nat.lt_succ_r in Hi.
+apply -> Nat.lt_succ_r in Hj.
+apply Nat.neq_sym in Hij.
+now apply determinant_with_bad_row.
+Qed.
+...
 Theorem matrix_comatrix_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
