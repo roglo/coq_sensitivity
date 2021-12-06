@@ -5282,8 +5282,95 @@ assert (H : 0 < mat_nrows M) by flia Hir.
 now apply Nat.ltb_lt in H; rewrite H; clear H.
 Qed.
 
+Theorem determinant_with_bad_row : in_field →
+  ∀ i k (M : matrix T),
+  is_square_matrix M = true
+  → i < mat_nrows M
+  → k < mat_nrows M
+  → i ≠ k
+  → ∑ (j = 0, mat_nrows M - 1),
+    minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
+Proof.
+intros Hif * Hsm Hir Hkr Hik.
+(**)
+specialize (square_matrix_ncols _ Hsm) as Hc.
+remember
+  (mk_mat
+     (map
+        (λ p,
+         map (λ q, mat_el M (if p =? i then k else p) q)
+           (seq 0 (mat_ncols M)))
+        (seq 0 (mat_nrows M))))
+  as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+  subst A.
+(*
+  apply Nat.lt_succ_r in Hi.
+  apply Nat.lt_succ_r in Hk.
+*)
+  apply determinant_same_rows with (p := i) (q := k); try easy; cycle 1. {
+    now cbn; rewrite List_map_seq_length.
+  } {
+    now cbn; rewrite List_map_seq_length.
+  } {
+    intros j; cbn.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    symmetry.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    f_equal.
+    apply map_ext_in.
+    intros u Hu; apply in_seq in Hu.
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth; [ | easy ].
+    cbn; rewrite Nat.eqb_refl.
+    apply Nat.neq_sym, Nat.eqb_neq in Hik.
+    now rewrite Hik.
+  } {
 ...
-
+}
+...
+remember
+  (mk_mat (S n) (S n) (λ p q, mat_el M (if Nat.eq_dec p i then k else p) q))
+  as A eqn:HA.
+assert (H1 : determinant A = 0%F). {
+  subst A.
+  apply Nat.lt_succ_r in Hi.
+  apply Nat.lt_succ_r in Hk.
+  apply determinant_same_rows with (p := i) (q := k); try easy.
+  intros j.
+  cbn.
+  rewrite <- (if_eqb_eq_dec i), Nat.eqb_refl.
+  now destruct (Nat.eq_dec k i).
+}
+rewrite <- determinant_with_row with (i := i) in H1; try easy.
+rewrite <- H1 at 2.
+apply rngl_summation_eq_compat.
+intros j Hj.
+do 2 rewrite <- rngl_mul_assoc.
+f_equal; f_equal. {
+  rewrite HA; cbn.
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+}
+f_equal.
+rewrite HA.
+apply matrix_eq.
+intros p q Hp Hq; cbn.
+destruct (Nat.eq_dec (p + Nat.b2n (i <=? p)) i) as [Hpi| Hpi]; [ | easy ].
+destruct (le_dec i p) as [Hip| Hip]. {
+  apply Nat.leb_le in Hip.
+  rewrite Hip in Hpi.
+  cbn in Hpi.
+  apply Nat.leb_le in Hip.
+  flia Hpi Hip.
+} {
+  apply Nat.leb_nle in Hip.
+  rewrite Hip in Hpi.
+  cbn in Hpi.
+  apply Nat.leb_nle in Hip.
+  flia Hpi Hip.
+}
+Qed.
+...
 Theorem determinant_with_bad_row :
   rngl_is_comm = true →
   rngl_has_opp = true →
