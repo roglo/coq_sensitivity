@@ -5083,6 +5083,13 @@ rewrite (nth_overflow _ _ Hjr).
 now destruct i.
 Qed.
 
+Theorem comatrix_nrows : ∀ M, mat_nrows (comatrix M) = mat_nrows M.
+Proof.
+intros.
+unfold comatrix; cbn.
+now rewrite List_map_seq_length.
+Qed.
+
 Theorem comatrix_ncols : ∀ M, mat_ncols (comatrix M) = mat_ncols M.
 Proof.
 intros.
@@ -5090,13 +5097,14 @@ unfold comatrix.
 unfold mat_ncols; cbn.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
-  rewrite fold_mat_ncols.
-Print is_correct_matrix.
-...
+  unfold mat_nrows in Hrz.
+  now apply length_zero_iff_nil in Hrz; rewrite Hrz.
+}
+apply Nat.neq_0_lt_0 in Hrz.
 rewrite List_hd_nth_0.
-rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite List_map_seq_length.
-...
+Qed.
 
 Theorem comatrix_is_square : ∀ M,
   is_square_matrix M = true
@@ -5107,8 +5115,9 @@ specialize (square_matrix_ncols _ Hsm) as Hc.
 apply is_sm_mat_iff in Hsm.
 apply is_sm_mat_iff.
 rewrite comatrix_ncols.
-...
-rewrite _ncols.
+rewrite comatrix_nrows.
+split; [ easy | ].
+intros l Hl.
 ...
 
 Theorem laplace_formula_on_cols : rngl_is_field →
