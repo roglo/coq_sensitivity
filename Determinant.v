@@ -5340,7 +5340,6 @@ assert (H1 : determinant A = 0%F). {
   apply Nat.neq_sym, Nat.eqb_neq in Hik.
   now rewrite Hik.
 }
-(**)
 rewrite determinant_with_row with (i := i) in H1; [ | easy | easy | ]. 2: {
   now rewrite Hira.
 }
@@ -5348,18 +5347,90 @@ rewrite <- H1 at 2.
 rewrite Hira.
 apply rngl_summation_eq_compat.
 intros j Hj.
-...
-rewrite <- determinant_with_row with (i := i) in H1; try easy.
-rewrite <- H1 at 2.
-apply rngl_summation_eq_compat.
-intros j Hj.
 do 2 rewrite <- rngl_mul_assoc.
+(**)
 f_equal; f_equal. {
   rewrite HA; cbn.
-  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hir ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | rewrite Hc; flia Hj Hir ].
+  now rewrite Nat.eqb_refl.
 }
+(* oops... complicated from now! doing a lemma, perhaps? *)
+unfold subm; cbn.
+do 2 rewrite map_length.
+do 2 rewrite butn_length.
+do 2 rewrite fold_mat_nrows.
+rewrite Hira.
+apply Nat.ltb_lt in Hir; rewrite Hir; cbn.
+f_equal; f_equal; f_equal.
+rewrite HA; cbn.
+destruct M as (ll); cbn in Hir, Hj |-*.
+unfold mat_ncols; cbn.
+apply Nat.ltb_lt in Hir.
+remember (seq 0 (length (hd [] ll))) as x eqn:Hx.
+rewrite List_seq_cut with (i := i); [ subst x | now apply in_seq ].
+rewrite Nat.sub_0_r, Nat.add_0_l.
+do 2 rewrite map_app; cbn.
+rewrite Nat.eqb_refl.
+erewrite map_ext_in. 2: {
+  intros u Hu; apply in_seq in Hu.
+  replace (u =? i) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hu.
+  }
+  easy.
+}
+erewrite map_ext_in with (l := seq (S i) _). 2: {
+  intros u Hu; apply in_seq in Hu.
+  replace (u =? i) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hu.
+  }
+  easy.
+}
+rewrite List_map_nth_seq with (la := ll) (d := []) at 1.
+rewrite List_seq_cut with (i := i); [ | now apply in_seq ].
+rewrite Nat.sub_0_r, Nat.add_0_l.
+do 2 rewrite map_app.
+f_equal; f_equal. {
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  cbn in Hcl.
+  rewrite List_hd_nth_0.
+  rewrite Hcl; [ | apply nth_In; flia Hu Hir ].
+  rewrite Hcl; [ | apply nth_In; flia Hu Hir ].
+  apply map_ext_in.
+  intros v Hv; apply in_seq in Hv.
+  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
+  f_equal; f_equal; f_equal.
+  apply Hcl.
+  apply nth_In; flia Hu Hir.
+}
+cbn; f_equal. {
+...
+  erewrite map_ext_in. 2: {
+    intros v Hv.
+...
 f_equal.
-rewrite HA.
+...
+erewrite map_ext_in
+  do 2 rewrite map_app.
+...
+  erewrite map_ext_in. 2: {
+    intros v Hv; apply in_seq in Hv.
+...
+replace (length ll) with (i + (length ll - i)) by flia Hir.
+rewrite seq_app, map_app.
+unfold butn.
+f_equal. {
+rewrite <- map_butn.
+rewrite List_map_nth_seq.
+destruct M as (ll); cbn.
+f_equal; f_equal.
+unfold mat_ncols; cbn.
 apply matrix_eq.
 intros p q Hp Hq; cbn.
 destruct (Nat.eq_dec (p + Nat.b2n (i <=? p)) i) as [Hpi| Hpi]; [ | easy ].
