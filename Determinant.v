@@ -5117,12 +5117,22 @@ erewrite map_ext_in. 2: {
   easy.
 }
 (**)
+apply Nat.ltb_lt in Hi, Hj.
 unfold butn at 2.
 rewrite map_app.
+replace (mat_nrows M - 1) with (j + (mat_nrows M - 1 - j)) at 1 by flia Hj.
+rewrite seq_app, map_app.
+f_equal. {
+  rewrite (List_map_nth_seq (firstn j (mat_list_list M))) with (d := []).
+  rewrite firstn_length, fold_mat_nrows.
+  rewrite Nat.min_l; [ | flia Hj ].
+  rewrite map_map.
+  apply map_ext_in.
+  intros k Hk; apply in_seq in Hk.
+  rewrite List_nth_firstn; [ | easy ].
 ...
 map (λ i, map (f i) (g i)) l = ...
 ...
-apply Nat.ltb_lt in Hi, Hj.
 unfold butn at 2.
 rewrite map_app.
 destruct (lt_dec i j) as [Hij| Hij]. {
