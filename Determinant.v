@@ -5610,6 +5610,60 @@ rewrite map_map.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 move j before i.
+(*1*)
+rewrite laplace_formula_on_cols with (j := j); [ | easy | easy | easy ].
+unfold mat_mul_el.
+rewrite mat_transp_ncols. 2: {
+  rewrite comatrix_ncols; unfold mat_ncols; cbn.
+  rewrite Hcl; [ flia Hlz | ].
+  now apply List_hd_in.
+}
+rewrite comatrix_nrows.
+cbn - [ mat_el comatrix ].
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  (* diagonal *)
+  subst j; rewrite δ_diag, rngl_mul_1_r.
+  apply rngl_summation_eq_compat.
+  intros k Hk.
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  f_equal.
+  symmetry; rewrite mat_transp_el. 2: {
+    apply squ_mat_is_corr.
+    apply comatrix_is_square.
+    now apply mat_transp_is_square.
+  }
+  f_equal.
+(* lemma to do? *)
+  cbn - [ determinant ]; unfold comatrix, mat_transp.
+  cbn - [ determinant ]; f_equal; unfold mat_ncols.
+  cbn - [ determinant ].
+  do 2 rewrite List_map_seq_length.
+  rewrite (List_hd_map 0). 2: {
+    rewrite seq_length, Hcl; [ easy | ].
+    now apply List_hd_in.
+  }
+  rewrite List_map_seq_length.
+  rewrite (List_hd_map 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  apply map_ext_in.
+  intros v Hv; apply in_seq in Hv.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  do 2 rewrite Nat.add_0_l.
+  rewrite Nat.add_comm; f_equal.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    easy.
+  }
+  cbn - [ mat_el comatrix ].
+  apply rngl
+...1
 rewrite laplace_formula_on_rows with (i := i); [ | easy | easy | easy ].
 unfold mat_mul_el.
 rewrite mat_transp_ncols. 2: {
@@ -5622,6 +5676,13 @@ cbn - [ mat_el comatrix ].
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   (* diagonal *)
   subst j; rewrite δ_diag, rngl_mul_1_r.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    easy.
+  }
+  cbn - [ mat_el comatrix ].
+...
   apply rngl_summation_eq_compat.
   intros k Hk.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
