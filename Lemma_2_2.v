@@ -149,11 +149,9 @@ rewrite List_app_hd1. 2: {
 unfold mat_ncols in IHn.
 unfold fold_app_in_list, iter_list; cbn.
 rewrite length_hd_app_in_list, IHn.
-rewrite List_map_hd with (a := 0). 2: {
-  intros H.
-  apply List_seq_eq_nil in H.
-  revert H.
-  now apply Nat.pow_nonzero.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 rewrite map_length, seq_length; cbn.
 now rewrite Nat.add_0_r.
