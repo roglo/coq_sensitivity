@@ -5420,7 +5420,7 @@ f_equal. {
 }
 Qed.
 
-Theorem matrix_comatrix_mul : in_field →
+Theorem matrix_comatrix_transp_mul : in_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (comatrix M)⁺ = determinant M × mI (mat_nrows M))%M.
@@ -5611,7 +5611,7 @@ rewrite mat_mul_mul_scal_l; cycle 1. {
   rewrite mat_transp_nrows; symmetry.
   apply comatrix_ncols.
 }
-rewrite matrix_comatrix_mul; [ | easy | easy ].
+rewrite matrix_comatrix_transp_mul; [ | easy | easy ].
 rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | now destruct Hif | now destruct Hif ].
 now apply mat_mul_scal_1_l.
@@ -5624,6 +5624,14 @@ Theorem mat_mul_inv_l : in_field →
   → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
+unfold mat_inv.
+rewrite mat_mul_scal_l_mul; [ | now destruct Hif | ]. 2: {
+  apply squ_mat_is_corr.
+  apply mat_transp_is_square.
+  now apply comatrix_is_square.
+}
+Search (_ ⁺ * _)%M.
+Check matrix_comatrix_transp_mul.
 ...
 intros Hic Hop Hiv Hit H10 Hde Hch *.
 intros Hdz.
