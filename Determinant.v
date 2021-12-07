@@ -5543,116 +5543,45 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ comatrix ].
   unfold mat_ncols.
   rewrite Hcl; [ | now apply List_hd_in ].
-...
-unfold mat_mul_el.
-cbn - [ mat_transp determinant ].
-Check determinant_with_bad_row.
-...
-apply matrix_eq.
-intros i j Hi Hj.
-rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
-  now rewrite rngl_mul_1_r.
+  remember (mk_mat ll) as M eqn:HM.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite HM at 1.
+    cbn - [ determinant ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length; unfold mat_ncols.
+      rewrite Hcl; [ flia Hk Hll | ].
+      now apply List_hd_in.
+    }
+    rewrite seq_nth; [ | easy ].
+    rewrite seq_nth. 2: {
+      unfold mat_ncols.
+      rewrite Hcl; [ flia Hk Hll | ].
+      now apply List_hd_in.
+    }
+    cbn - [ determinant ].
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+    replace ll with (mat_list_list M) at 1 by now rewrite HM.
+    rewrite fold_mat_el.
+    rewrite <- HM.
+    easy.
+  }
+  cbn - [ determinant ].
+  replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
+  apply Nat.neq_sym in Hij.
+  apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
+  apply is_sm_mat_iff; cbn.
+  split; [ easy | ].
+  intros l Hl; rewrite HM in Hl; cbn in Hl.
+  now apply Hcl.
 }
-rewrite rngl_mul_0_r; [ | now left ].
-destruct n; [ easy | ].
-rewrite Nat.sub_succ at 1.
-rewrite Nat.sub_0_r.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  easy.
-}
-cbn.
-apply -> Nat.lt_succ_r in Hi.
-apply -> Nat.lt_succ_r in Hj.
-apply Nat.neq_sym in Hij.
-now apply determinant_with_bad_row.
-Qed.
-...
-Theorem matrix_comatrix_mul :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T),
-  (M * (comatrix M)⁺ = determinant M × mI n)%M.
-Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-apply matrix_eq.
-intros i j Hi Hj.
-rewrite laplace_formula_on_rows with (i := i); try easy; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
-  now rewrite rngl_mul_1_r.
-}
-rewrite rngl_mul_0_r; [ | now left ].
-destruct n; [ easy | ].
-rewrite Nat.sub_succ at 1.
-rewrite Nat.sub_0_r.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  easy.
-}
-cbn.
-apply -> Nat.lt_succ_r in Hi.
-apply -> Nat.lt_succ_r in Hj.
-apply Nat.neq_sym in Hij.
-now apply determinant_with_bad_row.
 Qed.
 
-Theorem comatrix_matrix_mul :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T),
-  ((comatrix M)⁺ * M = determinant M × mI n)%M.
-Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-apply matrix_eq.
-intros i j Hi Hj.
-rewrite laplace_formula_on_cols with (j := j); try easy; cbn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst i.
-  rewrite rngl_mul_1_r.
-  apply rngl_summation_eq_compat.
-  intros k Hk.
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  rewrite rngl_mul_assoc.
-  f_equal.
-  now apply rngl_mul_comm.
-}
-rewrite rngl_mul_0_r; [ | now left ].
-...
-destruct n; [ easy | ].
-rewrite Nat.sub_succ at 1.
-rewrite Nat.sub_0_r.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  easy.
-}
-cbn.
-apply -> Nat.lt_succ_r in Hi.
-apply -> Nat.lt_succ_r in Hj.
-apply Nat.neq_sym in Hij.
-now apply determinant_with_bad_row.
-Qed.
+Definition mat_inv (M : matrix T) := ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
-Definition mat_inv n (M : matrix n n T) :=
-  ((determinant M)⁻¹ × (comatrix M)⁺)%M.
+...
 
 Theorem matrix_right_inv :
   rngl_is_comm = true →
