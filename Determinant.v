@@ -5623,8 +5623,25 @@ cbn - [ mat_el comatrix ].
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   (* diagonal *)
   subst j; rewrite δ_diag, rngl_mul_1_r.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    easy.
+  }
+  cbn - [ mat_el comatrix ].
   apply rngl_summation_eq_compat.
   intros k Hk.
+  symmetry; f_equal; rewrite mat_transp_el. 2: {
+    apply squ_mat_is_corr.
+    apply comatrix_is_square.
+    now apply mat_transp_is_square.
+  }
+  f_equal.
+  remember (mk_mat ll) as M eqn:HM.
+(* ah mais non, j'ai un contre-exemple ci-dessous *)
+...
+Search ((comatrix _⁺)⁺)%M.
+...
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   f_equal.
   symmetry; rewrite mat_transp_el. 2: {
@@ -5633,7 +5650,17 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now apply mat_transp_is_square.
   }
   f_equal.
-(* lemma to do? *)
+...
+
+(*
+End a.
+Require Import Nrl.
+Arguments comatrix {T ro} M%M.
+Arguments determinant {T ro} M%M.
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (determinant M, comatrix (M⁺)%M = (comatrix M)⁺%M)).
+*)
+(* donc faux *)
+...
   cbn - [ determinant ]; unfold comatrix, mat_transp.
   cbn - [ determinant ]; f_equal; unfold mat_ncols.
   cbn - [ determinant ].
@@ -5653,8 +5680,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
   rewrite seq_nth; [ | easy ].
+  rewrite Hcl; [ | now apply List_hd_in ].
   do 2 rewrite Nat.add_0_l.
   rewrite Nat.add_comm; f_equal.
+  f_equal.
+  unfold subm.
+  cbn; f_equal.
+  rewrite map_butn, map_map, <- map_butn.
+...
+  rewrite map_butn.
 ...
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
