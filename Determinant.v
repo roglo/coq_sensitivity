@@ -5441,7 +5441,6 @@ apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 rewrite laplace_formula_on_rows with (i := i); try easy.
 cbn - [ mat_el ].
-...
 rewrite mat_transp_ncols. 2: {
   rewrite comatrix_ncols; unfold mat_ncols; cbn.
   apply is_sm_mat_iff in Hsm.
@@ -5456,6 +5455,27 @@ rewrite map_map.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 move j before i.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkc : k < mat_ncols {| mat_list_list := ll |}). {
+    unfold mat_ncols; cbn.
+    apply is_sm_mat_iff in Hsm.
+    destruct Hsm as (Hcr, Hcl).
+    cbn in Hcl.
+    rewrite Hcl; [ flia Hk Hi | ].
+    rewrite List_hd_nth_0.
+    apply nth_In; flia Hi.
+  }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  cbn - [ determinant ].
+  rewrite rngl_mul_assoc.
+  easy.
+}
+cbn - [ determinant ].
+...
 unfold mat_mul_el.
 cbn - [ mat_transp determinant ].
 Check determinant_with_bad_row.
