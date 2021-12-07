@@ -5581,40 +5581,50 @@ Qed.
 
 Definition mat_inv (M : matrix T) := ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
-...
-
-Theorem matrix_right_inv :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T),
-  determinant M ≠ 0%F → (M * mat_inv M = mI n)%M.
+Theorem mat_mul_inv_r : in_field →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → determinant M ≠ 0%F
+  → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-intros Hdz.
+intros Hif * Hsm Hdz.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  rewrite Hrz; cbn.
+  unfold mat_nrows in Hrz.
+  apply length_zero_iff_nil in Hrz.
+  now destruct M as (ll); cbn in Hrz; subst ll.
+}
 unfold mat_inv.
-rewrite mat_mul_mul_scal_l; [ | easy | easy ].
-rewrite matrix_comatrix_mul; try easy.
-rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
-rewrite rngl_mul_inv_l; [ | easy | easy ].
+rewrite mat_mul_mul_scal_l; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+} {
+  apply squ_mat_is_corr.
+  apply mat_transp_is_square.
+  now apply comatrix_is_square.
+} {
+  apply is_sm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  now intros H; apply Hrz, Hcr.
+} {
+  rewrite mat_transp_nrows; symmetry.
+  apply comatrix_ncols.
+}
+rewrite matrix_comatrix_mul; [ | easy | easy ].
+rewrite mat_mul_scal_l_mul_assoc.
+rewrite rngl_mul_inv_l; [ | now destruct Hif | now destruct Hif ].
 now apply mat_mul_scal_1_l.
 Qed.
 
-Theorem matrix_left_inv :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
-  rngl_characteristic = 0 →
-  ∀ n (M : matrix n n T),
-  determinant M ≠ 0%F → (mat_inv M * M = mI n)%M.
+Theorem mat_mul_inv_l : in_field →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → determinant M ≠ 0%F
+  → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
+intros Hif * Hsm Hdz.
+...
 intros Hic Hop Hiv Hit H10 Hde Hch *.
 intros Hdz.
 unfold mat_inv.
