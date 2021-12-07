@@ -5524,25 +5524,23 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
     unfold mat_ncols in Hk; cbn in Hk.
-    rewrite Hcl in Hk. 2: {
-...
-Search (hd _ _ ∈ _).
-      rewrite List_hd_nth_0.
-Search (nth _ _ _ ∈ _).
-nth_In: ∀ (A : Type) (n : nat) (l : list A) (d : A), n < length l → nth n l d ∈ l
-...
-      apply nth_In.
-...
+    rewrite Hcl in Hk; [ | now apply List_hd_in ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length, comatrix_ncols.
       unfold mat_ncols.
-      rewrite Hcl.
-...
-    rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  easy.
-}
-
+      rewrite Hcl; [ flia Hk Hi | ].
+      now apply List_hd_in.
+    }
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length, comatrix_nrows ].
+    rewrite seq_nth; [ | now rewrite comatrix_nrows ].
+    rewrite seq_nth. 2: {
+      rewrite comatrix_ncols; unfold mat_ncols; cbn.
+      rewrite Hcl; [ flia Hk Hi | now apply List_hd_in ].
+    }
+    cbn - [ comatrix ].
+    easy.
+  }
+  cbn - [ comatrix ].
 ...
 unfold mat_mul_el.
 cbn - [ mat_transp determinant ].
