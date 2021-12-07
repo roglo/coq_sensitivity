@@ -5541,6 +5541,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     easy.
   }
   cbn - [ comatrix ].
+  unfold mat_ncols.
+  rewrite Hcl; [ | now apply List_hd_in ].
 ...
 unfold mat_mul_el.
 cbn - [ mat_transp determinant ].
