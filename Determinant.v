@@ -5629,6 +5629,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     easy.
   }
   cbn - [ mat_el comatrix ].
+  remember (mk_mat ll) as M eqn:HM.
   apply rngl_summation_eq_compat.
   intros k Hk.
   symmetry; f_equal; rewrite mat_transp_el. 2: {
@@ -5637,27 +5638,61 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now apply mat_transp_is_square.
   }
   f_equal.
-  remember (mk_mat ll) as M eqn:HM.
-(* ah mais non, j'ai un contre-exemple ci-dessous *)
-...
-Search ((comatrix _⁺)⁺)%M.
-...
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
+(* a lemma to do *)
+  unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
+  rewrite (List_hd_map 0). 2: {
+    rewrite seq_length, Hcl; [ easy | ].
+    rewrite HM.
+    now apply List_hd_in.
+  }
+  rewrite (List_hd_map 0). 2: {
+    unfold mat_nrows; rewrite HM.
+    now rewrite seq_length.
+  }
+  do 4 rewrite map_length.
+  do 2 rewrite seq_length.
+  rewrite Hcl; [ | now rewrite HM; apply List_hd_in ].
   f_equal.
-  symmetry; rewrite mat_transp_el. 2: {
-    apply squ_mat_is_corr.
-    apply comatrix_is_square.
-    now apply mat_transp_is_square.
+  apply map_ext_in.
+  intros u Hu; apply in_seq in Hu.
+  apply map_ext_in.
+  intros v Hv; apply in_seq in Hv.
+  move v before u.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  do 2 rewrite Nat.add_0_l.
+  rewrite Nat.add_comm; f_equal.
+  symmetry.
+  rewrite <- determinant_transpose; [ | easy | ]. 2: {
+    apply is_squ_mat_subm; [ easy | | easy ].
+    now rewrite HM.
   }
   f_equal.
+  unfold mat_transp, subm; cbn.
+  f_equal.
 ...
+*)
 
 (*
 End a.
-Require Import Nrl.
+Require Import Qrl.
+Require Import Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute 3.
 Arguments comatrix {T ro} M%M.
 Arguments determinant {T ro} M%M.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (determinant M, comatrix (M⁺)%M = (comatrix M)⁺%M)).
+Compute (let i := 1%nat in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in
+  ∑ (i0 = 0, mat_nrows M - 1), mat_el M i0 i * mat_el (comatrix M)⁺ i i0 =
+  ∑ (i0 = 0, mat_nrows M - 1), mat_el M i0 i * mat_el (comatrix M⁺)⁺ i0 i).
+
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in determinant M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (M * (comatrix M)⁺)%M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in ((comatrix M)⁺ * M)%M).
+
 *)
 (* donc faux *)
 ...
