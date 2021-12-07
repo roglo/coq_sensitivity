@@ -1105,6 +1105,13 @@ Proof. intros; now destruct l. Qed.
 Theorem List_map_tl : ∀ A B (f : A → B) l, tl (map f l) = map f (tl l).
 Proof. now intros; destruct l. Qed.
 
+Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → hd d l ∈ l.
+Proof.
+intros.
+rewrite List_hd_nth_0.
+now apply nth_In.
+Qed.
+
 Theorem List_tl_length : ∀ A (l : list A), length (tl l) = length l - 1.
 Proof.
 intros.
@@ -1214,6 +1221,14 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
+Theorem List_hd_map : ∀ A B a b (f : A → B) l,
+  0 < length l → hd b (map f l) = f (hd a l).
+Proof.
+intros.
+do 2 rewrite List_hd_nth_0.
+now apply List_map_nth'.
+Qed.
+
 Theorem List_map_nth_seq_firstn : ∀ A l (d : A) n,
   n < length l
   → map (λ i, nth i l d) (seq 0 n) = firstn n l.
@@ -1232,13 +1247,29 @@ cbn in Hl; apply Nat.succ_lt_mono in Hl.
 now apply IHl.
 Qed.
 
-Theorem List_map_hd : ∀ A B (f : A → B) a b l,
-  l ≠ [] → hd b (map f l) = f (hd a l).
+Theorem List_map_hd : ∀ A B a b (f : A → B) l,
+  0 < length l → hd b (map f l) = f (hd a l).
 Proof.
 intros * Hnl.
 do 2 rewrite List_hd_nth_0.
-apply List_map_nth'.
-destruct l; [ easy | now cbn ].
+now apply List_map_nth'.
+Qed.
+
+Theorem List_app_hd1 : ∀ A (l l' : list A) d,
+  0 < length l → hd d (l ++ l') = hd d l.
+Proof.
+intros.
+do 2 rewrite List_hd_nth_0.
+now apply app_nth1.
+Qed.
+
+Theorem List_app_hd2 : ∀ A (l l' : list A) d,
+  length l = 0 → hd d (l ++ l') = hd d l'.
+Proof.
+intros.
+do 2 rewrite List_hd_nth_0.
+rewrite app_nth2; [ easy | ].
+now apply Nat.le_0_r.
 Qed.
 
 Theorem List_map_nth_seq_skipn_firstn : ∀ (A : Type) (la : list A) d sta len,
@@ -1277,6 +1308,14 @@ Theorem List_seq_eq_nil : ∀ b len, seq b len = [] → len = 0.
 Proof.
 intros * Hb.
 now induction len.
+Qed.
+
+Theorem List_seq_hd : ∀ len start d, 0 < len → hd d (seq start len) = start.
+Proof.
+intros.
+rewrite List_hd_nth_0.
+rewrite seq_nth; [ | easy ].
+apply Nat.add_0_r.
 Qed.
 
 Theorem List_firstn_seq : ∀ n start len,

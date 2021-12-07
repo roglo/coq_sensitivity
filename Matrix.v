@@ -1094,8 +1094,8 @@ rewrite List_map_seq_length.
 apply map_ext_in.
 intros i Hi.
 unfold mat_ncols at 2; cbn.
-rewrite List_map_hd with (a := 0). 2: {
-  now intros H; apply List_seq_eq_nil in H.
+rewrite (List_map_hd 0). 2: {
+  now rewrite seq_length; apply Nat.neq_0_lt_0.
 }
 rewrite List_map_seq_length.
 apply map_ext_in.
@@ -1104,9 +1104,9 @@ move j before i.
 unfold mat_mul_el.
 unfold mat_ncols at 4.
 cbn.
-rewrite List_map_hd with (a := 0). 2: {
-  intros H; apply List_seq_eq_nil in H.
-  now rewrite H in Hi.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length; apply Nat.neq_0_lt_0.
+  now intros H; rewrite H in Hi.
 }
 rewrite List_map_seq_length.
 erewrite rngl_summation_eq_compat. 2: {
@@ -1396,9 +1396,8 @@ apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el; cbn.
 unfold mat_ncols at 1; cbn.
-rewrite List_map_hd with (a := []). 2: {
-  intros H; apply Hraz; unfold mat_nrows.
-  now rewrite H.
+rewrite (List_map_hd []). 2: {
+  now rewrite fold_mat_nrows; apply Nat.neq_0_lt_0.
 }
 rewrite map_length.
 rewrite fold_mat_ncols.
@@ -1443,11 +1442,7 @@ rewrite map_map.
 apply map_ext_in.
 intros i Hi.
 unfold mat_ncols at 1; cbn.
-rewrite List_map_hd with (a := []). 2: {
-  intros H; unfold mat_nrows in Hcarb.
-  rewrite H in Hcarb.
-  now rewrite Hcarb in Hcaz.
-}
+rewrite (List_map_hd []); [ | now rewrite fold_mat_nrows, <- Hcarb ].
 rewrite map_length.
 rewrite fold_mat_ncols.
 rewrite map_map.
