@@ -1221,7 +1221,7 @@ apply Nat.succ_lt_mono in Hnl.
 now apply IHl.
 Qed.
 
-Theorem List_hd_map : ∀ A B a b (f : A → B) l,
+Theorem List_map_hd : ∀ A B a b (f : A → B) l,
   0 < length l → hd b (map f l) = f (hd a l).
 Proof.
 intros.
@@ -1245,14 +1245,6 @@ erewrite map_ext_in. 2: {
 }
 cbn in Hl; apply Nat.succ_lt_mono in Hl.
 now apply IHl.
-Qed.
-
-Theorem List_map_hd : ∀ A B a b (f : A → B) l,
-  0 < length l → hd b (map f l) = f (hd a l).
-Proof.
-intros * Hnl.
-do 2 rewrite List_hd_nth_0.
-now apply List_map_nth'.
 Qed.
 
 Theorem List_app_hd1 : ∀ A (l l' : list A) d,

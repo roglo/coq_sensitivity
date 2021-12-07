@@ -644,7 +644,7 @@ unfold mat_swap_rows, list_swap_elem; cbn.
 split. {
   unfold mat_ncols; cbn.
   rewrite fold_mat_nrows; rewrite Hr.
-  rewrite (List_hd_map 0); [ | rewrite seq_length; flia Hp ].
+  rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hp ].
   rewrite List_seq_hd; [ | flia Hp ].
   rewrite Hc; [ now intros Hn; subst n | ].
   apply nth_In; rewrite fold_mat_nrows; rewrite Hr.
@@ -5640,12 +5640,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   f_equal.
 (* a lemma to do *)
   unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
-  rewrite (List_hd_map 0). 2: {
+  rewrite (List_map_hd 0). 2: {
     rewrite seq_length, Hcl; [ easy | ].
     rewrite HM.
     now apply List_hd_in.
   }
-  rewrite (List_hd_map 0). 2: {
+  rewrite (List_map_hd 0). 2: {
     unfold mat_nrows; rewrite HM.
     now rewrite seq_length.
   }
@@ -5672,6 +5672,29 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   f_equal.
   unfold mat_transp, subm; cbn.
   f_equal.
+  unfold mat_ncols; cbn.
+  unfold mat_nrows; rewrite HM; cbn.
+  do 2 rewrite map_butn.
+  rewrite map_map.
+  do 2 rewrite <- map_butn.
+  clear Hj.
+  rewrite HM in Hv; cbn in Hi, Hu, Hv.
+  destruct Hi as (_, Hi).
+  destruct Hk as (_, Hk).
+  destruct Hu as (_, Hu).
+  destruct Hv as (_, Hv).
+  move k before i; move u before k; move v before u.
+...
+  rewrite Hcl. 2: {
+      rewrite (List_map_hd []). 2: {
+        rewrite butn_length.
+        rewrite HM in Hv; cbn in Hv.
+        destruct Hv as (_, Hv).
+        now apply Nat.ltb_lt in Hv; rewrite Hv; cbn.
+      }
+replace 
+...
+    apply List_hd_in.
 ...
 *)
 

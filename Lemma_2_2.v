@@ -1719,7 +1719,7 @@ rewrite m_o_mll_2x2_2x1 with (n := 2 ^ n); cycle 1. {
   apply mI_ncols.
 } {
   unfold mat_ncols; cbn.
-  rewrite (List_hd_map []). 2: {
+  rewrite (List_map_hd []). 2: {
     rewrite fold_mat_nrows, mA_nrows.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
@@ -1786,7 +1786,7 @@ rewrite mat_mul_1_r; [ | easy | | ]; cycle 1. {
   now apply mat_opp_is_correct.
 } {
   unfold mat_ncols; cbn.
-  rewrite (List_hd_map []). 2: {
+  rewrite (List_map_hd []). 2: {
     rewrite fold_mat_nrows, mA_nrows.
     now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
   }
