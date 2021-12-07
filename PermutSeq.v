@@ -1065,9 +1065,7 @@ apply Nat.add_lt_le_mono. {
 }
 apply Nat.mul_le_mono_r.
 specialize (Hvn (hd 0 l)).
-assert (H : hd 0 l ∈ l). {
-  rewrite List_hd_nth_0; apply nth_In; rewrite Hln; flia.
-}
+assert (H : hd 0 l ∈ l) by now apply List_hd_in; rewrite Hln.
 specialize (Hvn H); clear H.
 rewrite Hln in Hvn.
 now apply Nat.succ_le_mono in Hvn.

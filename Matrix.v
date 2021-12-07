@@ -264,10 +264,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
   now apply length_zero_iff_nil in Hnz; rewrite Hnz.
 }
 apply Nat.neq_0_lt_0 in Hnz.
-apply Hc.
-rewrite List_hd_nth_0.
-apply nth_In.
-now rewrite fold_mat_nrows.
+now apply Hc, List_hd_in.
 Qed.
 
 Theorem squ_mat_is_corr {T} : ∀ (M : matrix T),
@@ -1301,10 +1298,8 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   now rewrite Hrz.
 }
 apply Nat.neq_0_lt_0 in Hrz.
-rewrite List_hd_nth_0.
-rewrite (List_map_nth' []); [ | now rewrite fold_mat_nrows ].
-rewrite map_length.
-now rewrite List_hd_nth_0.
+rewrite (List_map_hd []); [ | now rewrite fold_mat_nrows ].
+apply map_length.
 Qed.
 
 Theorem is_correct_matrix_mul_scal_l : ∀ M μ,
@@ -1316,15 +1311,13 @@ destruct Hm as (Hcr, Hc).
 split. {
   unfold mat_ncols; cbn.
   rewrite map_length, fold_mat_nrows.
-  rewrite List_hd_nth_0.
   intros Hc'.
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ easy | ].
-  rewrite (List_map_nth' []) in Hc'. 2: {
+  rewrite (List_map_hd []) in Hc'. 2: {
     rewrite fold_mat_nrows.
     now apply Nat.neq_0_lt_0 in Hrz.
   }
   rewrite map_length in Hc'.
-  rewrite <- List_hd_nth_0 in Hc'.
   rewrite fold_mat_ncols in Hc'.
   now apply Hcr.
 } {
@@ -2173,7 +2166,6 @@ split. {
       rewrite Hc; [ easy | ].
       now apply in_butn in Hla.
     }
-    rewrite List_hd_nth_0.
     destruct A as (ll).
     destruct ll as [| la]; [ easy | ].
     destruct Ha as (Hcr, Hc).
@@ -2414,8 +2406,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 unfold mat_ncols.
 rewrite <- Hr.
 apply Hc.
-rewrite List_hd_nth_0.
-apply nth_In.
+apply List_hd_in.
 unfold mat_nrows in Hr.
 rewrite Hr.
 now apply Nat.neq_0_lt_0.
@@ -2451,9 +2442,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 apply Nat.neq_0_lt_0 in Hnz.
 split. {
   unfold mat_ncols.
-  rewrite List_hd_nth_0.
   cbn; rewrite map_length, seq_length.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
   now rewrite map_length, seq_length.
 }
 intros la Hla.
@@ -2503,10 +2493,8 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
 apply Nat.neq_0_lt_0 in Hrz.
 unfold is_correct_matrix.
 unfold mat_ncols, mat_nrows; cbn.
-rewrite List_hd_nth_0.
-rewrite (List_map_nth' []); [ | easy ].
+rewrite (List_map_hd []); [ | easy ].
 do 2 rewrite map_length.
-rewrite <- List_hd_nth_0.
 rewrite fold_mat_nrows, fold_mat_ncols.
 split; [ easy | ].
 intros la Hla.
@@ -2546,7 +2534,6 @@ split. {
   rewrite map2_length.
   do 2 rewrite fold_mat_nrows.
   unfold mat_ncols in Hcc; cbn in Hcc.
-  rewrite List_hd_nth_0 in Hcc.
   destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
     now rewrite Hraz, Nat.min_0_l.
   }
@@ -2554,6 +2541,7 @@ split. {
     now rewrite Hrbz, Nat.min_0_r.
   }
   apply Nat.neq_0_lt_0 in Hraz, Hrbz.
+  rewrite List_hd_nth_0 in Hcc.
   rewrite map2_nth with (a := []) (b := []) in Hcc; [ | easy | easy ].
   rewrite map2_length in Hcc.
   do 2 rewrite <- List_hd_nth_0 in Hcc.
@@ -2637,10 +2625,9 @@ split. {
   move Hcrb before Hcra.
   unfold mat_ncols in Hc; cbn in Hc.
   apply length_zero_iff_nil in Hc.
-  rewrite List_hd_nth_0 in Hc.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
   apply Nat.neq_0_lt_0 in Hnz.
-  rewrite (List_map_nth' 0) in Hc. 2: {
+  rewrite (List_map_hd 0) in Hc. 2: {
     now rewrite seq_length, Hra.
   }
   apply map_eq_nil in Hc.
@@ -2690,12 +2677,10 @@ split. {
   unfold mat_ncols in Hco.
   cbn in Hco.
   apply length_zero_iff_nil in Hco.
-  rewrite List_hd_nth_0 in Hco.
-  rewrite (List_map_nth' []) in Hco. 2: {
+  rewrite (List_map_hd []) in Hco. 2: {
     now rewrite fold_mat_nrows, squ_mat_nrows.
   }
   apply map_eq_nil in Hco.
-  rewrite <- List_hd_nth_0 in Hco.
   apply (f_equal length) in Hco.
   rewrite fold_mat_ncols in Hco.
   rewrite squ_mat_ncols in Hco.
@@ -2764,8 +2749,7 @@ split. {
   apply Nat.neq_0_lt_0 in Hrz.
   apply Hcr.
   unfold mat_ncols in H1 |-*; cbn in H1 |-*.
-  rewrite List_hd_nth_0 in H1 |-*.
-  rewrite (List_map_nth' []) in H1; [ | easy ].
+  rewrite (List_map_hd []) in H1; [ | easy ].
   now rewrite map_length in H1.
 }
 intros la Hla.
@@ -2994,8 +2978,7 @@ apply mat_mul_assoc. {
   unfold mat_ncols.
   rewrite Hra in Hca.
   apply Hca.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hra.
 }
 Qed.
@@ -3050,16 +3033,14 @@ apply mat_mul_add_distr_l. {
   intros l Hl.
   rewrite Hcb; [ | easy ].
   symmetry; apply Hcb.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hrb.
 } {
   split; [ easy | ].
   intros l Hl.
   rewrite Hcc; [ | easy ].
   symmetry; apply Hcc.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hrc.
 } {
   now rewrite Hrb.
@@ -3067,21 +3048,18 @@ apply mat_mul_add_distr_l. {
   rewrite Hrb; unfold mat_ncols.
   rewrite Hra in Hca.
   apply Hca.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hra.
 } {
   congruence.
 } {
   unfold mat_ncols.
   rewrite Hcb. 2: {
-    rewrite List_hd_nth_0.
-    apply nth_In, Nat.neq_0_lt_0.
+    apply List_hd_in, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hrb.
   }
   rewrite Hcc. 2: {
-    rewrite List_hd_nth_0.
-    apply nth_In, Nat.neq_0_lt_0.
+    apply List_hd_in, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hrc.
   }
   congruence.
@@ -3124,16 +3102,14 @@ apply mat_mul_add_distr_r. {
   intros l Hl.
   rewrite Hca; [ | easy ].
   symmetry; apply Hca.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hra.
 } {
   split; [ easy | ].
   intros l Hl.
   rewrite Hcb; [ | easy ].
   symmetry; apply Hcb.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hrb.
 } {
   now rewrite Hra.
@@ -3142,13 +3118,11 @@ apply mat_mul_add_distr_r. {
 } {
   unfold mat_ncols.
   rewrite Hca. 2: {
-    rewrite List_hd_nth_0.
-    apply nth_In, Nat.neq_0_lt_0.
+    apply List_hd_in, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hra.
   }
   rewrite Hcb. 2: {
-    rewrite List_hd_nth_0.
-    apply nth_In, Nat.neq_0_lt_0.
+    apply List_hd_in, Nat.neq_0_lt_0.
     now rewrite fold_mat_nrows, Hrb.
   }
   congruence.
@@ -3210,8 +3184,7 @@ apply mat_add_opp_l; [ | easy | ]. 2: {
   unfold mat_ncols.
   rewrite Hr in Hc.
   symmetry; apply Hc.
-  rewrite List_hd_nth_0.
-  apply nth_In, Nat.neq_0_lt_0.
+  apply List_hd_in, Nat.neq_0_lt_0.
   now rewrite fold_mat_nrows, Hr.
 }
 split; [ easy | ].
@@ -3219,8 +3192,7 @@ intros l Hl.
 unfold mat_ncols.
 rewrite Hc; [ | easy ].
 symmetry; apply Hc.
-rewrite List_hd_nth_0.
-apply nth_In, Nat.neq_0_lt_0.
+apply List_hd_in, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
 
