@@ -5684,6 +5684,107 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct Hu as (_, Hu).
   destruct Hv as (_, Hv).
   move k before i; move u before k; move v before u.
+  replace (length (map (butn u) (butn v ll))) with (length ll - 1). 2: {
+    rewrite map_length.
+    rewrite butn_length.
+    now apply Nat.ltb_lt in Hv; rewrite Hv.
+  }
+  rewrite map_butn_seq.
+  apply Nat.ltb_lt in Hu; rewrite Hu; cbn.
+  apply Nat.ltb_lt in Hu.
+  replace (length (hd [] (map _ _))) with (length ll - 1). 2: {
+    destruct ll as [| l]; [ easy | ].
+    cbn in Hi, Hk, Hu, Hv; rewrite Nat.sub_0_r in Hk.
+    cbn; rewrite Nat.sub_0_r.
+    destruct ll as [| l']; cbn. {
+      apply Nat.lt_1_r in Hi, Hu, Hv.
+      apply Nat.le_0_r in Hk.
+      now subst i k u v.
+    }
+    cbn in Hi, Hk, Hu, Hv.
+    rewrite (List_map_hd []). 2: {
+      rewrite butn_length.
+      apply Nat.ltb_lt in Hv.
+      cbn - [ Nat.b2n "<?" ].
+      rewrite Hv; cbn; flia.
+    }
+    rewrite butn_length.
+    rewrite Hcl. 2: {
+      destruct v; [ now right; left | now left ].
+    }
+    cbn - [ "<?" ].
+    now apply Nat.ltb_lt in Hu; rewrite Hu.
+  }
+  apply map_ext_in.
+  intros p Hp; apply in_seq in Hp.
+  rewrite <- map_butn.
+...
+  rewrite (List_seq_cut v). 2: {
+    apply in_seq.
+    split; [ easy | cbn ].
+...
+  rewrite Nat.sub_0_r.
+  do 2 rewrite map_app; cbn.
+  unfold butn at 7.
+  rewrite map_app.
+  f_equal. {
+    rewrite List_firstn_seq.
+    rewrite Nat.min_l; [ | flia Hv ].
+    apply map_ext_in.
+    intros q Hq; apply in_seq in Hq.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct Hq as (_, Hq); cbn in Hq.
+    destruct (le_dec u p) as [Hup| Hup]. {
+      rewrite (List_map_nth' []). 2: {
+        rewrite butn_length.
+        apply Nat.ltb_lt in Hv; rewrite Hv; cbn.
+        apply Nat.ltb_lt in Hv.
+        flia Hq Hv.
+      }
+      rewrite nth_butn.
+      apply Nat.leb_le in Hup; rewrite Hup; cbn.
+      f_equal.
+      rewrite nth_butn.
+      apply Nat.nle_gt in Hq.
+      now apply Nat.leb_nle in Hq; rewrite Hq, Nat.add_0_r.
+    }
+    rewrite Nat.add_0_r.
+    rewrite (List_map_nth' []). 2: {
+      rewrite butn_length.
+      apply Nat.ltb_lt in Hv; rewrite Hv; cbn.
+      apply Nat.ltb_lt in Hv.
+      flia Hq Hv.
+    }
+    rewrite nth_butn.
+    apply Nat.leb_nle in Hup; rewrite Hup, Nat.add_0_r.
+    rewrite nth_butn.
+    apply Nat.nle_gt in Hq.
+    now apply Nat.leb_nle in Hq; rewrite Hq, Nat.add_0_r.
+  }
+
+Search (nth _ (butn _ _)).
+
+Search (firstn _ (seq _ _)).
+    rewrite seq_firstn.
+
+Search (seq _ _ = _ ++ _).
+...
+    cbn; rewrite Nat.sub_0_r.
+...
+    rewrite (List_map_hd []); [ | rewrite butn_length ].
+...
+    rewrite Hcl with (l := hd _ _).
+    symmetry; rewrite Hcl.
+...
+  destruct ll as [| l]; [ easy | ].
+  destruct ll as [| l']. {
+    cbn in Hi, Hk, Hu, Hv.
+    apply Nat.lt_1_r in Hi, Hu, Hv.
+    apply Nat.le_0_r in Hk.
+    now subst i k u v.
+  }
+  cbn.
 ...
   rewrite Hcl. 2: {
       rewrite (List_map_hd []). 2: {
