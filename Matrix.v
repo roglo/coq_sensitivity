@@ -128,31 +128,22 @@ apply IHlen; [ easy | easy | | | | ]; cycle 1. {
 } {
   now apply tail_is_correct_matrix in Hb.
 }
-...
-    unfold mat_ncols in Ha1, Hb1; cbn in Ha1, Hb1.
-    destruct la as [| a]. {
-      symmetry in Hcc.
-      now specialize (Hb1 Hcc).
-    }
-    destruct lb as [| b]. {
-      symmetry in Hcc.
-      now specialize (Hb1 eq_refl).
-    }
-    clear Ha1 Hb1.
-...
-    unfold mat_ncols in Ha1; cbn in Ha1.
-    unfold mat_ncols in Hb1; cbn in Hb1.
-...
-now unfold mat_ncols in Hcc; cbn in Hcc.
-rewrite Hr in Hi.
-...
-Search ((∀ _, _ → _ = _) → _ = _).
-...
-Search (list _ → list _ → _).
-Search list_eqb.
-  specialize (Hij 0 0 (Nat.lt_0_succ _)).
-  cbn in Hij.
-...
+intros * Hi Hj.
+unfold mat_ncols in Hij, Hj.
+cbn - [ nth ] in Hij.
+cbn in Hj.
+specialize (Hij (S i) j) as H1.
+assert (H : S i < S len) by now apply Nat.succ_lt_mono in Hi.
+specialize (H1 H); clear H.
+cbn in H1.
+apply H1.
+destruct Hb as (Hb1, Hb2).
+unfold mat_ncols in Hb2; cbn in Hb2.
+destruct llb as [| lb']; [ easy | ].
+cbn in Hj.
+specialize (Hb2 lb' (or_intror (or_introl eq_refl))).
+congruence.
+Qed.
 
 Theorem matrix_eq : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
   (∀ i j,
