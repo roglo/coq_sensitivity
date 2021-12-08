@@ -5650,60 +5650,70 @@ rewrite <- determinant_transpose; [ | easy | ]. 2: {
   now apply is_squ_mat_subm.
 }
 f_equal.
+specialize (square_matrix_ncols _ Hsm) as Hcr.
 destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   rewrite Hc1 in Hi.
-  rewrite square_matrix_ncols in Hc1; [ | easy ].
-  rewrite Hc1 in Hj.
+  rewrite Hc1 in Hcr; symmetry in Hcr.
+  rewrite Hcr in Hj.
   apply Nat.lt_1_r in Hi, Hj; subst i j.
   destruct M as (ll).
-  cbn in Hc1.
+  unfold mat_ncols in Hc1.
+  cbn in Hc1, Hcr.
   destruct ll as [| l]; [ easy | ].
   destruct ll; [ | easy ].
+  cbn in Hc1.
   unfold subm, mat_transp; cbn.
-...
+  destruct l as [| a]; [ easy | ].
+  now destruct l.
+}
 apply matrix_eq'; cycle 1. {
   apply mat_transp_is_corr.
-  apply subm_is_corr_mat; [ | now apply squ_mat_is_corr ].
-}
-...
+  apply subm_is_corr_mat; [ easy | now apply squ_mat_is_corr ].
+} {
+  apply subm_is_corr_mat. 2: {
+    apply mat_transp_is_corr.
+    now apply squ_mat_is_corr.
   }
-  rewrite mat_transp_ncols; [ | flia Hi ].
-  intros Hr; rewrite Hr in Hj; apply Nat.lt_1_r in Hj.
-  subst j.
-...
-  apply mat_transp_is_correct.
-  apply subm_is_corr_mat.
-...1
-apply matrix_eq.
-intros u v.
-unfold nth_nth_error.
-remember (nth_error (mat_list_list (subm M j i)⁺%M) u) as x eqn:Hx.
-remember (nth_error (mat_list_list (subm M⁺ i j)) u) as y eqn:Hy.
-symmetry in Hx, Hy.
-move y before x.
-destruct x as [x| ]. {
-  apply nth_error_In in Hx.
-  destruct y as [y| ]. {
-    apply nth_error_In in Hy.
-    f_equal.
-    remember (nth_error
-...
-Check matrix_eq.
-About matrix_eq.
-...
-apply matrix_eq'.
+  rewrite mat_transp_ncols; [ congruence | ].
+  now apply Nat.neq_0_lt_0.
+} {
+  rewrite mat_transp_nrows.
+  rewrite mat_nrows_subm.
+  rewrite mat_ncols_subm; cycle 1. {
+    now apply squ_mat_is_corr.
+  } {
+    rewrite <- Hcr; flia Hcz Hc1.
+  } {
+    easy.
+  }
+  rewrite mat_transp_nrows.
+  now apply Nat.ltb_lt in Hi; rewrite Hi.
+} {
+  rewrite mat_transp_ncols. 2: {
+    rewrite mat_ncols_subm; cycle 1. {
+      now apply squ_mat_is_corr.
+    } {
+      rewrite <- Hcr; flia Hc1 Hcz.
+    } {
+      easy.
+    }
+    flia Hc1 Hcz.
+  }
+  rewrite mat_ncols_subm; cycle 1. {
+    apply mat_transp_is_corr.
+    now apply squ_mat_is_corr.
+  } {
+    rewrite mat_transp_nrows; flia Hc1 Hcz.
+  } {
+    rewrite mat_transp_ncols; [ easy | ].
+    now apply Nat.neq_0_lt_0.
+  } {
+    rewrite mat_nrows_subm.
+    rewrite mat_transp_ncols; [ | flia Hcz ].
+    now apply Nat.ltb_lt in Hj; rewrite Hj.
+  }
+}
 intros u v Hu Hv.
-rewrite mat_transp_el.
-rewrite mat_el_subm.
-rewrite mat_el_subm.
-rewrite mat_transp_el.
-easy.
-...
-Search (subm _⁺ _ _).
-Search subm.
-Print subm'.
-mat_el_subm:
-            → mat_el (subm M u v) i j = mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j))
 ...
 unfold mat_transp, subm; cbn.
 f_equal.
