@@ -34,6 +34,46 @@ Definition is_correct_matrix {T} (M : matrix T) :=
   (mat_ncols M = 0 → mat_nrows M = 0) ∧
   ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
 
+Theorem tail_is_correct_matrix : ∀ {A} (M : matrix A),
+  is_correct_matrix M
+  → is_correct_matrix (mk_mat (tl (mat_list_list M))).
+Proof.
+intros * Hcm.
+destruct Hcm as (Hcr, Hcl).
+split. {
+  unfold mat_ncols; cbn.
+  intros Hr.
+  apply length_zero_iff_nil in Hr.
+  unfold mat_ncols in Hcr, Hcl.
+  destruct M as (ll); cbn in *.
+  destruct ll as [| la]; [ easy | ].
+  cbn in Hr |-*.
+  destruct ll as [| la']; [ easy | ].
+  cbn in Hr; subst la'; exfalso.
+  cbn in Hcr.
+  specialize (Hcl [] (or_intror (or_introl eq_refl))) as H1.
+  cbn in H1; symmetry in H1.
+  now specialize (Hcr H1).
+} {
+  intros l Hl; cbn in Hl.
+  unfold mat_ncols; cbn.
+  rewrite Hcl. 2: {
+    destruct M as (ll); cbn in Hl |-*.
+    destruct ll as [| la]; [ easy | ].
+    now right.
+  }
+  symmetry.
+  rewrite Hcl. 2: {
+    destruct M as (ll); cbn in Hl |-*.
+    destruct ll as [| la]; [ easy | ].
+    destruct ll as [| la']; [ easy | ].
+    cbn in Hl |-*.
+    now right; left.
+  }
+  easy.
+}
+Qed.
+
 Theorem matrix_eq' : ∀ T (ro : ring_like_op T) MA MB,
   (∀ i j, i < mat_nrows MA → j < mat_ncols MB → mat_el MA i j = mat_el MB i j)
   → is_correct_matrix MA
@@ -84,27 +124,11 @@ apply IHlen; [ easy | easy | | | | ]; cycle 1. {
   specialize (Hb2 (or_intror (or_introl eq_refl))).
   congruence.
 } {
-  destruct Ha as (Ha1, Ha2).
-  destruct Hb as (Hb1, Hb2).
-  split. {
-    unfold mat_ncols; cbn.
-    intros Hra.
-    apply length_zero_iff_nil in Hra.
-    destruct lla as [| la']; [ easy | exfalso ].
-    cbn in Hra; subst la'.
-    specialize (Ha2 [] (or_intror (or_introl eq_refl))).
-    cbn in Ha2.
-    rewrite <- Ha2 in Hcc; symmetry in Hcc.
-    apply length_zero_iff_nil in Hcc.
-    subst lb; unfold mat_ncols in Hb1.
-    cbn in Hb1.
-    now specialize (Hb1 eq_refl).
-  } {
-    intros l Hl; cbn in Hl.
-    unfold mat_ncols; cbn.
-    cbn in Ha2.
+  now apply tail_is_correct_matrix in Ha.
+} {
+  now apply tail_is_correct_matrix in Hb.
+}
 ...
-    specialize (Ha2 _ (or_intror Hl)).
     unfold mat_ncols in Ha1, Hb1; cbn in Ha1, Hb1.
     destruct la as [| a]. {
       symmetry in Hcc.
