@@ -3834,6 +3834,7 @@ Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_comm {T}%type {ro rp} (MA MB)%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
 Arguments mat_add_sub {T}%type {ro rp} Hro (MA MB)%M.
+Arguments mat_list_list {T}%type m%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
@@ -3863,7 +3864,8 @@ Arguments subm {T} M%M i%nat j%nat.
 Arguments subm_subm' {T}%type {ro} M%M (i j)%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
-Arguments matrix_eq {T}%type {ro} (MA MB)%M.
+Arguments matrix_eq {T ro} (MA MB)%M.
+Arguments matrix_eq' {T ro} (MA MB)%M.
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.

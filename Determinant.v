@@ -5578,9 +5578,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem comatrix_transpose : ∀ M, comatrix M⁺ = (comatrix M)⁺%M.
+Theorem comatrix_transpose : in_field →
+  ∀ M,
+  is_square_matrix M = true
+  → comatrix M⁺ = (comatrix M)⁺%M.
 Proof.
-intros.
+intros Hif * Hsm.
 destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   unfold mat_transp, comatrix; cbn - [ determinant ].
   rewrite Hcz; cbn.
@@ -5616,8 +5619,47 @@ rewrite seq_nth; [ | easy ].
 do 2 rewrite Nat.add_0_l.
 rewrite Nat.add_comm; f_equal; symmetry.
 rewrite fold_mat_transp.
-rewrite <- determinant_transpose.
+rewrite <- determinant_transpose; [ | easy | ]. 2: {
+  rewrite square_matrix_ncols in Hi; [ | easy ].
+  now apply is_squ_mat_subm.
+}
 f_equal.
+apply matrix_eq'; cycle 1. {
+Search (is_correct_matrix (_⁺)%M).
+Theorem mat_transp_is_corr : ∀ M, is_correct_matrix M → is_correct_matrix M⁺.
+Proof.
+intros * Hcm.
+destruct Hcm as (H1, H2).
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  specialize (H1 Hcz).
+  unfold mat_transp.
+  now rewrite H1, Hcz.
+}
+split. {
+  rewrite mat_transp_ncols; [ | easy ].
+  intros Hr.
+  unfold mat_nrows in Hr.
+  unfold mat_ncols in Hcz.
+  apply length_zero_iff_nil in Hr.
+  now rewrite Hr in Hcz.
+} {
+  intros l Hl.
+...
+intros Hr.
+...
+  Search (is_correct_matrix _⁺).
+  admit.
+} {
+  apply subm_is_corr_mat. 2: {
+    admit.
+  }
+  rewrite mat_transp_ncols; [ | flia Hi ].
+  intros Hr; rewrite Hr in Hj; apply Nat.lt_1_r in Hj.
+  subst j.
+...
+  apply mat_transp_is_correct.
+  apply subm_is_corr_mat.
+...1
 apply matrix_eq.
 intros u v.
 unfold nth_nth_error.
