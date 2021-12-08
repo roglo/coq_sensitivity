@@ -5629,7 +5629,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     easy.
   }
   cbn - [ mat_el comatrix ].
+(*
   remember (mk_mat ll) as M eqn:HM.
+*)
   apply rngl_summation_eq_compat.
   intros k Hk.
   symmetry; f_equal; rewrite mat_transp_el. 2: {
@@ -5642,16 +5644,21 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
   rewrite (List_map_hd 0). 2: {
     rewrite seq_length, Hcl; [ easy | ].
+(*
     rewrite HM.
+*)
     now apply List_hd_in.
   }
   rewrite (List_map_hd 0). 2: {
-    unfold mat_nrows; rewrite HM.
+    unfold mat_nrows.
+(*
+    rewrite HM.
+*)
     now rewrite seq_length.
   }
   do 4 rewrite map_length.
   do 2 rewrite seq_length.
-  rewrite Hcl; [ | now rewrite HM; apply List_hd_in ].
+  rewrite Hcl; [ | now (*rewrite HM;*) apply List_hd_in ].
   f_equal.
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
@@ -5667,23 +5674,30 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   symmetry.
   rewrite <- determinant_transpose; [ | easy | ]. 2: {
     apply is_squ_mat_subm; [ easy | | easy ].
+    easy.
+(*
     now rewrite HM.
+*)
   }
   f_equal.
   unfold mat_transp, subm; cbn.
   f_equal.
   unfold mat_ncols; cbn.
-  unfold mat_nrows; rewrite HM; cbn.
+  unfold mat_nrows; (*rewrite HM;*) cbn.
   do 2 rewrite map_butn.
   rewrite map_map.
   do 2 rewrite <- map_butn.
   clear Hj.
-  rewrite HM in Hv; cbn in Hi, Hu, Hv.
+(*
+  rewrite HM in Hv.
+*)
+  cbn in Hi, Hu, Hv.
   destruct Hi as (_, Hi).
   destruct Hk as (_, Hk).
   destruct Hu as (_, Hu).
   destruct Hv as (_, Hv).
   move k before i; move u before k; move v before u.
+  clear i k Hi Hk.
   replace (length (map (butn u) (butn v ll))) with (length ll - 1). 2: {
     rewrite map_length.
     rewrite butn_length.
@@ -5694,14 +5708,13 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply Nat.ltb_lt in Hu.
   replace (length (hd [] (map _ _))) with (length ll - 1). 2: {
     destruct ll as [| l]; [ easy | ].
-    cbn in Hi, Hk, Hu, Hv; rewrite Nat.sub_0_r in Hk.
+    cbn in Hu, Hv.
     cbn; rewrite Nat.sub_0_r.
     destruct ll as [| l']; cbn. {
-      apply Nat.lt_1_r in Hi, Hu, Hv.
-      apply Nat.le_0_r in Hk.
-      now subst i k u v.
+      apply Nat.lt_1_r in Hu, Hv.
+      now subst u v.
     }
-    cbn in Hi, Hk, Hu, Hv.
+    cbn in Hu, Hv.
     rewrite (List_map_hd []). 2: {
       rewrite butn_length.
       apply Nat.ltb_lt in Hv.
@@ -5716,9 +5729,30 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now apply Nat.ltb_lt in Hu; rewrite Hu.
   }
   apply map_ext_in.
-  intros p Hp; apply in_seq in Hp.
+  intros i Hi; apply in_seq in Hi.
   rewrite <- map_butn.
-...
+(*2*)
+  destruct Hi as (_, Hi); cbn in Hi.
+  unfold mat_ncols in Hcr; cbn in Hcr.
+  clear Hlz Hsm_v.
+  revert u v i Hu Hv Hi.
+  induction ll as [| l]; intros; [ easy | ].
+  cbn - [ seq nth ].
+  rewrite Nat.sub_0_r.
+  destruct v. {
+    cbn - [ nth ].
+    rewrite <- seq_shift.
+    rewrite map_map.
+    apply map_ext_in.
+    intros j Hj; apply in_seq in Hj.
+    rewrite List_nth_succ_cons.
+    rewrite (List_map_nth' []); [ | easy ].
+    now rewrite nth_butn.
+  }
+  cbn in Hv; apply Nat.succ_lt_mono in Hv.
+  cbn - [ butn nth ].
+  do 2 rewrite butn_cons.
+...2
   rewrite (List_seq_cut v). 2: {
     apply in_seq.
     split; [ easy | cbn ].
