@@ -5910,7 +5910,18 @@ destruct (lt_dec 1 (mat_nrows M)) as [H1r| H1r]. 2: {
   cbn in H4.
   rewrite <- seq_shift in H4.
   rewrite map_map in H4.
+...
   cbn in H4.
+  clear H1.
+  destruct l as [| b]. {
+    cbn in Hic.
+    now apply Nat.lt_1_r in Hic; subst i.
+  }
+  exfalso.
+  cbn in Hic.
+  specialize (H4 [nth 1 (b :: l) 0%F]) as H1.
+  cbn in H1.
+  specialize (H1 (or_intror (or_introl eq_refl))).
 ...
   cbn - [ mat_el ] in H4.
 ...
