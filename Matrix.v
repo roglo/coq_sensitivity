@@ -92,8 +92,32 @@ apply IHlen; [ easy | easy | | | | ]; cycle 1. {
     apply length_zero_iff_nil in Hra.
     destruct lla as [| la']; [ easy | exfalso ].
     cbn in Hra; subst la'.
+    specialize (Ha2 [] (or_intror (or_introl eq_refl))).
+    cbn in Ha2.
+    rewrite <- Ha2 in Hcc; symmetry in Hcc.
+    apply length_zero_iff_nil in Hcc.
+    subst lb; unfold mat_ncols in Hb1.
+    cbn in Hb1.
+    now specialize (Hb1 eq_refl).
+  } {
+    intros l Hl; cbn in Hl.
+    unfold mat_ncols; cbn.
+    cbn in Ha2.
+...
+    specialize (Ha2 _ (or_intror Hl)).
+    unfold mat_ncols in Ha1, Hb1; cbn in Ha1, Hb1.
+    destruct la as [| a]. {
+      symmetry in Hcc.
+      now specialize (Hb1 Hcc).
+    }
+    destruct lb as [| b]. {
+      symmetry in Hcc.
+      now specialize (Hb1 eq_refl).
+    }
+    clear Ha1 Hb1.
 ...
     unfold mat_ncols in Ha1; cbn in Ha1.
+    unfold mat_ncols in Hb1; cbn in Hb1.
 ...
 now unfold mat_ncols in Hcc; cbn in Hcc.
 rewrite Hr in Hi.
