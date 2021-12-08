@@ -1944,14 +1944,12 @@ Qed.
 
 Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
   is_correct_matrix M
-  → u ≤ mat_nrows M
-  → v ≤ mat_ncols M
   → i < mat_nrows M - 1
   → j < mat_ncols M - 1
   → mat_el (subm M u v) i j =
       mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
 Proof.
-intros * Hcm Hu Hv Hi Hj.
+intros * Hcm Hi Hj.
 unfold Nat.b2n.
 do 2 rewrite if_leb_le_dec.
 unfold mat_el, subm; cbn.
@@ -1977,7 +1975,8 @@ destruct (le_dec u i) as [Hui| Hui]. {
     rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
     rewrite firstn_length.
     rewrite Nat.min_l. 2: {
-      rewrite fold_corr_mat_ncols; [ easy | easy | flia Hi ].
+      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
+      flia Hvj Hj.
     }
     rewrite List_nth_skipn.
     now replace (j - v + S v) with (j + 1) by flia Hvj.
@@ -1987,7 +1986,7 @@ destruct (le_dec u i) as [Hui| Hui]. {
     rewrite app_nth1. 2: {
       rewrite firstn_length.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-      now rewrite Nat.min_l.
+      apply Nat.min_glb_lt; [ easy | flia Hj ].
     }
     now rewrite List_nth_firstn.
   }
@@ -1996,18 +1995,18 @@ destruct (le_dec u i) as [Hui| Hui]. {
   apply Nat.nle_gt in Hui.
   rewrite app_nth1. 2: {
     rewrite map_length, firstn_length, fold_mat_nrows.
-    now rewrite Nat.min_l.
+    apply Nat.min_glb_lt; [ easy | flia Hi ].
   }
   rewrite (List_map_nth' []). 2: {
     rewrite firstn_length, fold_mat_nrows.
-    now rewrite Nat.min_l.
+    apply Nat.min_glb_lt; [ easy | flia Hi ].
   }
   rewrite List_nth_firstn; [ | easy ].
   destruct (le_dec v j) as [Hvj| Hvj]. {
     rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
     rewrite firstn_length.
     rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-    rewrite Nat.min_l; [ | easy ].
+    rewrite Nat.min_l; [ | flia Hvj Hj ].
     rewrite List_nth_skipn.
     now replace (j - v + S v) with (j + 1) by flia Hvj.
   } {
@@ -2016,7 +2015,7 @@ destruct (le_dec u i) as [Hui| Hui]. {
     rewrite app_nth1. 2: {
       rewrite firstn_length.
       rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-      now rewrite Nat.min_l.
+      apply Nat.min_glb_lt; [ easy | flia Hj ].
     }
     now rewrite List_nth_firstn.
   }

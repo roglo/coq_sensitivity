@@ -5881,11 +5881,49 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 Search (determinant (subm _ _ _)).
 Search (subm _⁺).
 Theorem mat_transp_subm : ∀ M i j,
-  i < mat_nrows M
-  → subm M⁺ i j = ((subm M i j)⁺)%M.
+  is_correct_matrix M
+  → i < mat_ncols M
+  → j < mat_nrows M
+  → subm M⁺ i j = ((subm M j i)⁺)%M.
 Proof.
-intros * Hi.
-apply matrix_eq'.
+intros * Hcm Hic Hjr.
+assert (Hcmt : is_correct_matrix M⁺) by now apply mat_transp_is_corr.
+(*
+assert (Hirm : i < mat_nrows M⁺) by now rewrite mat_transp_nrows.
+assert (Hjcm : j < mat_ncols M⁺). {
+  rewrite mat_transp_ncols; [ easy | flia Hic ].
+}
+*)
+apply matrix_eq'. {
+  intros u v Hu Hv.
+  rewrite mat_el_subm; [ | easy | | ]; cycle 1. {
+    rewrite mat_nrows_subm in Hu.
+    replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
+    symmetry.
+    apply Nat.ltb_lt.
+    now rewrite mat_transp_nrows.
+  } {
+    rewrite mat_transp_ncols in Hv. 2: {
+      rewrite mat_ncols_subm.
+...
+    rewrite mat_ncols_subm in Hv.
+    replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
+    symmetry.
+    apply Nat.ltb_lt.
+    now rewrite mat_transp_nrows.
+    destruct (lt_dec i (mat_nrows M⁺)) as [Hirt| Hirt]; [ easy | ].
+    apply Nat.nlt_ge in Hirt.
+...
+    destruct (i <? mat_nrows M⁺); [ easy | ].
+...
+  rewrite mat_el_subm; try easy; cycle 1: {
+    rewrite mat_transp_nrows.
+...
+  rewrite mat_transp_el.
+  rewrite mat_transp_el.
+  rewrite mat_el_subm; try easy.
+  rewrite mat_el_subm; [ easy | | | | | ].
+Search (mat_el _⁺).
 ...
 intros * Hi.
 unfold subm, mat_transp, mat_ncols; cbn; f_equal.
