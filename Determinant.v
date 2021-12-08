@@ -5880,9 +5880,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply Nat.neq_sym in Hij.
 Search (determinant (subm _ _ _)).
 Search (subm _⁺).
-Theorem mat_transp_subm : ∀ M i j, subm M⁺ i j = ((subm M i j)⁺)%M.
+Theorem mat_transp_subm : ∀ M i j,
+  i < mat_nrows M
+  → subm M⁺ i j = ((subm M i j)⁺)%M.
 Proof.
-intros.
+intros * Hi.
+apply matrix_eq'.
+...
+intros * Hi.
 unfold subm, mat_transp, mat_ncols; cbn; f_equal.
 do 2 rewrite map_butn.
 rewrite map_map.
@@ -5890,6 +5895,11 @@ rewrite butn_length, map_length.
 do 2 rewrite <- map_butn.
 rewrite fold_mat_ncols.
 rewrite fold_mat_nrows.
+rewrite (List_map_hd []). 2: {
+  rewrite butn_length.
+  rewrite fold_mat_nrows.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  apply Nat.ltb_lt in Hi; cbn.
 ...
 Check determinant_with_bad_col.
 ...
