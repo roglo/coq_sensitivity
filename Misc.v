@@ -1203,6 +1203,9 @@ apply Hf with (i := S i); cbn.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
+Theorem List_nth_nil : ∀ A n (d : A), nth n [] d = d.
+Proof. now intros; destruct n. Qed.
+
 Theorem List_nth_0_cons : ∀ A (a : A) la d, nth 0 (a :: la) d = a.
 Proof. easy. Qed.
 

@@ -1942,6 +1942,15 @@ Qed.
 
 (* combinations of submatrix and other operations *)
 
+Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
+  mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
+Proof.
+intros.
+destruct M as (ll); cbn - [ "<?" ].
+rewrite map_length.
+now rewrite butn_length.
+Qed.
+
 Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
   is_correct_matrix M
   → i < mat_nrows M - 1
@@ -2134,15 +2143,6 @@ do 2 rewrite map_butn.
 rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
 rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
 easy.
-Qed.
-
-Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
-  mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
-Proof.
-intros.
-destruct M as (ll); cbn - [ "<?" ].
-rewrite map_length.
-now rewrite butn_length.
 Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,

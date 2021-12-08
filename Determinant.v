@@ -5888,6 +5888,32 @@ Theorem mat_transp_subm : ∀ M i j,
 Proof.
 intros * Hcm Hic Hjr.
 assert (Hcmt : is_correct_matrix M⁺) by now apply mat_transp_is_corr.
+destruct (lt_dec 1 (mat_nrows M)) as [H1r| H1r]. 2: {
+  assert (H : mat_nrows M = 1) by flia Hjr H1r.
+  clear H1r.
+  destruct M as (ll).
+  cbn in H.
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ clear H | easy ].
+  unfold mat_ncols in Hic.
+  cbn in Hic, Hjr.
+  apply Nat.lt_1_r in Hjr; subst j.
+  unfold subm, mat_transp; f_equal; cbn.
+  rewrite map_butn, map_map, <- map_butn; cbn.
+  destruct Hcm as (H1, H2).
+  unfold mat_ncols in H1, H2; cbn in H1, H2.
+  destruct l as [| a]; [ now specialize (H1 eq_refl) | ].
+  cbn in Hic |-*.
+  destruct Hcmt as (H3, H4).
+  unfold mat_ncols in H3, H4; cbn - [ nth ] in H3, H4.
+  clear H3.
+  cbn in H4.
+  rewrite <- seq_shift in H4.
+  rewrite map_map in H4.
+  cbn in H4.
+...
+  cbn - [ mat_el ] in H4.
+...
 (*
 assert (Hirm : i < mat_nrows M⁺) by now rewrite mat_transp_nrows.
 assert (Hjcm : j < mat_ncols M⁺). {
@@ -5904,7 +5930,7 @@ apply matrix_eq'. {
     now rewrite mat_transp_nrows.
   } {
     rewrite mat_transp_ncols in Hv. 2: {
-      rewrite mat_ncols_subm.
+      rewrite mat_ncols_subm; [ | easy | | ].
 ...
     rewrite mat_ncols_subm in Hv.
     replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
