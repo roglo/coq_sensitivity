@@ -5578,6 +5578,32 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Theorem mat_transp_is_corr : ∀ M, is_correct_matrix M → is_correct_matrix M⁺.
+Proof.
+intros * Hcm.
+destruct Hcm as (H1, H2).
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  specialize (H1 Hcz).
+  unfold mat_transp.
+  now rewrite H1, Hcz.
+}
+split. {
+  rewrite mat_transp_ncols; [ | easy ].
+  intros Hr.
+  unfold mat_nrows in Hr.
+  unfold mat_ncols in Hcz.
+  apply length_zero_iff_nil in Hr.
+  now rewrite Hr in Hcz.
+} {
+  intros l Hl.
+  rewrite mat_transp_ncols; [ | easy ].
+  unfold mat_transp in Hl; cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (j & Hjl & Hj).
+  now rewrite <- Hjl, List_map_seq_length.
+}
+Qed.
+
 Theorem comatrix_transpose : in_field →
   ∀ M,
   is_square_matrix M = true
@@ -5624,34 +5650,22 @@ rewrite <- determinant_transpose; [ | easy | ]. 2: {
   now apply is_squ_mat_subm.
 }
 f_equal.
+destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
+  rewrite Hc1 in Hi.
+  rewrite square_matrix_ncols in Hc1; [ | easy ].
+  rewrite Hc1 in Hj.
+  apply Nat.lt_1_r in Hi, Hj; subst i j.
+  destruct M as (ll).
+  cbn in Hc1.
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ | easy ].
+  unfold subm, mat_transp; cbn.
+...
 apply matrix_eq'; cycle 1. {
-Search (is_correct_matrix (_⁺)%M).
-Theorem mat_transp_is_corr : ∀ M, is_correct_matrix M → is_correct_matrix M⁺.
-Proof.
-intros * Hcm.
-destruct Hcm as (H1, H2).
-destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  specialize (H1 Hcz).
-  unfold mat_transp.
-  now rewrite H1, Hcz.
+  apply mat_transp_is_corr.
+  apply subm_is_corr_mat; [ | now apply squ_mat_is_corr ].
 }
-split. {
-  rewrite mat_transp_ncols; [ | easy ].
-  intros Hr.
-  unfold mat_nrows in Hr.
-  unfold mat_ncols in Hcz.
-  apply length_zero_iff_nil in Hr.
-  now rewrite Hr in Hcz.
-} {
-  intros l Hl.
 ...
-intros Hr.
-...
-  Search (is_correct_matrix _⁺).
-  admit.
-} {
-  apply subm_is_corr_mat. 2: {
-    admit.
   }
   rewrite mat_transp_ncols; [ | flia Hi ].
   intros Hr; rewrite Hr in Hj; apply Nat.lt_1_r in Hj.
