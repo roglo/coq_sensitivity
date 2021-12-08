@@ -5618,6 +5618,20 @@ rewrite Nat.add_comm; f_equal; symmetry.
 rewrite fold_mat_transp.
 rewrite <- determinant_transpose.
 f_equal.
+apply matrix_eq.
+intros u v.
+unfold nth_nth_error.
+remember (nth_error (mat_list_list (subm M j i)⁺%M) u) as x eqn:Hx.
+remember (nth_error (mat_list_list (subm M⁺ i j)) u) as y eqn:Hy.
+symmetry in Hx, Hy.
+move y before x.
+destruct x as [x| ]. {
+  apply nth_error_In in Hx.
+  destruct y as [y| ]. {
+    apply nth_error_In in Hy.
+    f_equal.
+    remember (nth_error
+...
 Check matrix_eq.
 About matrix_eq.
 ...

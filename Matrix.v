@@ -70,11 +70,30 @@ apply IHlen; [ easy | easy | | | | ]; cycle 1. {
   destruct Hb as (Hb1, Hb2).
   unfold mat_ncols; cbn.
   specialize (Ha2 (hd [] lla)).
-  cbn - [ In ] in Ha2.
+  specialize (Hb2 (hd [] llb)).
+  cbn - [ In ] in Ha2, Hb2.
+  destruct lla as [| la']. {
+    cbn in Hr; subst len.
+    now apply length_zero_iff_nil in Hc; subst llb.
+  }
+  destruct llb as [| lb']. {
+    now cbn in Hc; move Hc at top; subst len.
+  }
+  cbn in Ha2, Hb2 |-*.
+  specialize (Ha2 (or_intror (or_introl eq_refl))).
+  specialize (Hb2 (or_intror (or_introl eq_refl))).
+  congruence.
+} {
+  destruct Ha as (Ha1, Ha2).
+  destruct Hb as (Hb1, Hb2).
+  split. {
+    unfold mat_ncols; cbn.
+    intros Hra.
+    apply length_zero_iff_nil in Hra.
+    destruct lla as [| la']; [ easy | exfalso ].
+    cbn in Hra; subst la'.
 ...
-  specialize (Ha2 la (or_introl eq_refl)).
-
-  unfold mat_ncols in Ha2; cbn in Ha2.
+    unfold mat_ncols in Ha1; cbn in Ha1.
 ...
 now unfold mat_ncols in Hcc; cbn in Hcc.
 rewrite Hr in Hi.
