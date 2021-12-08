@@ -5752,6 +5752,31 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn in Hv; apply Nat.succ_lt_mono in Hv.
   cbn - [ butn nth ].
   do 2 rewrite butn_cons.
+  destruct u. {
+    cbn - [ butn nth ].
+    destruct ll as [| l']; [ easy | ].
+    cbn - [ butn nth ].
+    f_equal. {
+      rewrite Nat.add_1_r.
+      do 2 rewrite List_nth_0_cons.
+      destruct l as [| x]; [ now cbn; rewrite match_id | easy ].
+    }
+    destruct v. {
+      remember (butn 0 (_ :: _)) as x eqn:Hx; cbn in Hx; subst x.
+      remember (butn 0 (_ :: _)) as x eqn:Hx; cbn in Hx; subst x.
+      symmetry; rewrite <- seq_shift; symmetry.
+      rewrite map_map.
+      apply map_ext_in.
+      intros j Hj; apply in_seq in Hj.
+      rewrite List_nth_succ_cons.
+      destruct j; [ easy | ].
+      do 2 rewrite List_nth_succ_cons.
+      rewrite (List_map_nth' []); [ | flia Hj ].
+      rewrite nth_butn.
+      now replace (0 <=? i) with true by easy.
+    }
+    do 2 rewrite butn_cons.
+(* rhooo... c'est trop casse-couilles *)
 ...2
   rewrite (List_seq_cut v). 2: {
     apply in_seq.
