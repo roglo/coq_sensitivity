@@ -22,6 +22,71 @@ Definition nth_nth_error A (ll : list (list A)) (i j : nat) :=
 Record matrix T := mk_mat
   { mat_list_list : list (list T) }.
 
+Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
+Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
+Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
+  nth j (nth i (mat_list_list M) []) 0%F.
+
+(* correct_matrix: matrix whose list list is made of non
+   empty lists (rows) of same length *)
+
+Definition is_correct_matrix {T} (M : matrix T) :=
+  (mat_ncols M = 0 → mat_nrows M = 0) ∧
+  ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
+
+Theorem matrix_eq' : ∀ T (ro : ring_like_op T) MA MB,
+  (∀ i j, i < mat_nrows MA → j < mat_ncols MB → mat_el MA i j = mat_el MB i j)
+  → is_correct_matrix MA
+  → is_correct_matrix MB
+  → mat_nrows MA = mat_nrows MB
+  → mat_ncols MA = mat_ncols MB
+  → MA = MB.
+Proof.
+intros * Hij Ha Hb Hrr Hcc.
+destruct MA as (lla).
+destruct MB as (llb).
+f_equal.
+cbn in *.
+remember (length lla) as len eqn:Hr; symmetry in Hr.
+rename Hrr into Hc; symmetry in Hc; move Hc before Hr.
+revert lla llb Hr Hc Hij Hcc Ha Hb.
+induction len; intros. {
+  apply length_zero_iff_nil in Hr, Hc; congruence.
+}
+destruct lla as [| la]; [ easy | ].
+destruct llb as [| lb]; [ easy | ].
+cbn in Hr, Hc, Hcc.
+apply Nat.succ_inj in Hr, Hc.
+f_equal. {
+  apply nth_ext with (d := 0%F) (d' := 0%F); [ easy | ].
+  intros i Hi.
+  unfold mat_ncols in Hij.
+  cbn - [ nth ] in Hij.
+  apply (Hij 0 i (Nat.lt_0_succ _)).
+  congruence.
+}
+apply IHlen; [ easy | easy | | | | ]; cycle 1. {
+  destruct Ha as (Ha1, Ha2).
+  destruct Hb as (Hb1, Hb2).
+  unfold mat_ncols; cbn.
+  specialize (Ha2 (hd [] lla)).
+  cbn - [ In ] in Ha2.
+...
+  specialize (Ha2 la (or_introl eq_refl)).
+
+  unfold mat_ncols in Ha2; cbn in Ha2.
+...
+now unfold mat_ncols in Hcc; cbn in Hcc.
+rewrite Hr in Hi.
+...
+Search ((∀ _, _ → _ = _) → _ = _).
+...
+Search (list _ → list _ → _).
+Search list_eqb.
+  specialize (Hij 0 0 (Nat.lt_0_succ _)).
+  cbn in Hij.
+...
+
 Theorem matrix_eq : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
   (∀ i j,
    nth_nth_error (mat_list_list MA) i j =
@@ -73,13 +138,8 @@ Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
 Definition list_list_of_mat {T} (M : matrix T) :=
   mat_list_list M.
 
-Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
-Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
 Definition mat_nth_ncols {T} n (M : matrix T) :=
   length (nth n (mat_list_list M) []).
-
-Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
-  nth j (nth i (mat_list_list M) []) 0%F.
 
 Theorem fold_mat_nrows {T} : ∀ (M : matrix T),
   length (mat_list_list M) = mat_nrows M.
@@ -127,15 +187,9 @@ rewrite IHl; cbn.
 now destruct M.
 Qed.
 
-(* correct_matrix: matrix whose list list is made of non
-   empty lists (rows) of same length *)
 (* this definition should (if it could) be defined like
    is_square_matrix below, to allow property to be
    unique *)
-
-Definition is_correct_matrix {T} (M : matrix T) :=
-  (mat_ncols M = 0 → mat_nrows M = 0) ∧
-  ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
 
 Record correct_matrix T := mk_cm
   { cm_mat : matrix T;
@@ -1728,6 +1782,13 @@ Require Import Nrl.
 Compute (mat_transp nat_ring_like_op (mk_mat [[3;2];[5;1];[8;9]])).
 Compute (mat_transp nat_ring_like_op (mk_mat [[3;5;8];[2;1;9];[10;11;12]])).
 *)
+
+Theorem fold_mat_transp : ∀ M,
+  mk_mat
+    (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
+       (seq 0 (mat_ncols M))) =
+  mat_transp M.
+Proof. easy. Qed.
 
 (* matrix without row i and column j *)
 
