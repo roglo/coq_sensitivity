@@ -3679,6 +3679,28 @@ apply matrix_eq'. {
         apply Nat.ltb_lt in Hjr.
         flia Hr1 Hjr.
       }
+      apply length_zero_iff_nil in H1.
+      destruct M as (ll).
+      cbn in Hjr, Hc1, H1.
+      destruct ll as [| l]; [ easy | ].
+      destruct ll as [| l']; [ easy | ].
+      cbn in Hc1.
+...
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr.
+...
+      destruct M as (ll).
+      cbn in Hjr, Hc1, H1.
+      destruct ll as [| l]; [ easy | ].
+      destruct ll; [ | ]. 2: {
+        cbn in Hc1.
+
+Search (butn _ _ = []).
+...
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+
+      rewrite Hcl in H1; [ now rewrite Hc1 in H1 | ].
 ...
       rewrite butn_length in H1.
       rewrite fold_mat_ncols in H1.
