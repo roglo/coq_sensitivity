@@ -1898,3 +1898,9 @@ destruct (lt_dec i k) as [Hik| Hik]. {
 Qed.
 
 End a.
+
+Arguments determinant {T ro} M%M.
+Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
+Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
+Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
+Arguments subm {T} M%M i%nat j%nat.

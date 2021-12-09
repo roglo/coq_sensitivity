@@ -17,7 +17,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Permutation Sorted.
 
-Require Import Misc MyVector Matrix Determinant.
+Require Import Misc MyVector Matrix Determinant Comatrix.
 Require Import RingLike.
 Require Import IterAdd.
 Import matrix_Notations.

@@ -1,5 +1,27 @@
 (* comatrices *)
 
+Set Nested Proofs Allowed.
+Set Implicit Arguments.
+
+Require Import Utf8 Arith.
+(*
+Require Import Permutation.
+*)
+Import List List.ListNotations.
+
+Require Import Misc RingLike IterAdd (*IterMul*).
+Require Import (*MyVector*) Matrix PermutSeq Signature.
+Require Import Determinant.
+Import matrix_Notations.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+
+About subm.
+
 Definition comatrix (M : matrix T) : matrix T :=
   mk_mat
     (map
@@ -441,7 +463,7 @@ apply Nat.nle_gt in Hlp.
 destruct (le_dec (length ll) (p + q)) as [Hpql| Hpql]. 2: {
   apply Nat.nle_gt in Hpql.
   unfold Nat.b2n.
-  rewrite andb_if.
+  rewrite Bool.andb_if.
   do 2 rewrite if_leb_le_dec.
   destruct (le_dec p i) as [Hpi'| Hpi']; [ | now rewrite Nat.add_0_r ].
   destruct (le_dec i (p + q)) as [H| H]; [ | clear H ]. {
@@ -900,7 +922,7 @@ rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   destruct (le_dec (mat_nrows M) i) as [H| H]; [ flia Hin Hr H | clear H ].
   subst la.
   unfold Nat.b2n.
-  rewrite andb_if.
+  rewrite Bool.andb_if.
   do 2 rewrite if_leb_le_dec.
   destruct (le_dec 0 j) as [Hjz| Hjz]. {
     destruct (le_dec j i) as [Hji'| Hji']. {
@@ -3972,12 +3994,8 @@ rewrite matrix_comatrix_mul; try easy.
 rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
 rewrite rngl_mul_inv_l; [ | easy | easy ].
 now apply mat_mul_scal_1_l.
-...
+Qed.
 
 End a.
 
-Arguments determinant {T ro} {n%nat} M%M.
-Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
-Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
 Arguments comatrix {T}%type {ro} {n}%nat M%M.
-Arguments subm {T m n} M%M i%nat j%nat.
