@@ -3666,11 +3666,80 @@ apply matrix_eq'. {
     rewrite Hc1 in Hic.
     apply Nat.lt_1_r in Hic; subst i.
     unfold subm.
+    apply is_scm_mat_iff.
+    split. {
+      unfold mat_ncols; cbn.
+      do 2 rewrite map_length.
+      rewrite seq_length.
+      unfold mat_ncols; cbn.
+      intros _.
+      rewrite (List_map_hd []). 2: {
+        rewrite butn_length, fold_mat_nrows.
+        apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+        apply Nat.ltb_lt in Hjr.
+        flia Hr1 Hjr.
+      }
+      rewrite butn_length.
+      remember (length (hd [] (butn j _))) as x eqn:Hx.
+      symmetry in Hx.
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+      rewrite Hcl in Hx. 2: {
+        rewrite List_hd_nth_0.
+        rewrite nth_butn.
+        rewrite Nat.add_0_l.
+        unfold Nat.b2n.
+        rewrite if_leb_le_dec.
+        destruct (le_dec j 0) as [Hjz| Hjz]. {
+          apply nth_In.
+          rewrite fold_mat_nrows; flia Hr1 Hjr.
+        } {
+          apply nth_In.
+          rewrite fold_mat_nrows; flia Hjr.
+        }
+      }
+      now rewrite <- Hx, Hc1; cbn.
+    } {
+      intros l Hl.
+      unfold mat_ncols; cbn.
+      unfold mat_ncols; cbn.
+...
+      destruct M as (ll); cbn in *.
+      unfold mat_ncols in Hc1; cbn in Hc1.
+      destruct ll as [| l]; [ easy | ].
+      destruct ll as [| l']; [ easy | ].
+...
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+      rewrite Hcl. 2: {
+...
+      remember (length (hd [] (butn j _))) as x eqn:Hx.
+      symmetry in Hx.
+...
+      rewrite (List_map_hd 0). 2: {
+...
+        rewrite butn_length, seq_length.
+        rewrite List_hd_nth_0.
+        rewrite nth_butn.
+        rewrite Nat.add_0_l.
+        unfold Nat.b2n.
+        rewrite if_leb_le_dec.
+        destruct (le_dec j 0) as [Hjz| Hjz]. {
+          apply Nat.le_0_r in Hjz; subst j.
+          apply is_scm_mat_iff in Hcm.
+          destruct Hcm as (Hcr, Hcl).
+...
+          rewrite Hcl.
+rewrite Hc1; cbn.
+...
+        apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+        apply Nat.ltb_lt in Hjr.
+        flia Hr1 Hjr.
+      }
 ...
 Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[2]] in 
   is_correct_matrix {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}⁺ = true).
 (* true = true *)
-Abort. Abort. (*
 ...
     apply is_scm_mat_iff.
     unfold mat_ncols; cbn.
@@ -3861,6 +3930,9 @@ Open Scope Q_scope.
 Compute 3.
 Arguments comatrix {T ro} M%M.
 Arguments determinant {T ro} M%M.
+Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[2]] in 
+  (length (butn 0 (hd [] (butn j (mat_list_list M)))) = 0)%nat).
+...
 Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[2]] in 
   is_correct_matrix {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}⁺ = true).
 ...
