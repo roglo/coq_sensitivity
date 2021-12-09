@@ -3667,6 +3667,29 @@ apply matrix_eq'. {
     rewrite Hc1 in Hic.
     apply Nat.lt_1_r in Hic; subst i.
     unfold subm.
+    apply is_scm_mat_iff.
+    unfold mat_ncols; cbn.
+    rewrite map_length.
+    split. {
+      intros H1.
+      rewrite butn_length, fold_mat_nrows.
+      rewrite (List_map_hd []) in H1. 2: {
+        rewrite butn_length, fold_mat_nrows.
+        apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+        apply Nat.ltb_lt in Hjr.
+        flia Hr1 Hjr.
+      }
+...
+      rewrite butn_length in H1.
+      rewrite fold_mat_ncols in H1.
+      rewrite Hc1 in H1.
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr.
+...
+      flia Hr1 Hjr.
+
+      apply length_zero_iff_nil in H1.
+Search (hd _ (map _ _)).
 ...
   apply subm_is_corr_mat; [ | easy ].
 ...
