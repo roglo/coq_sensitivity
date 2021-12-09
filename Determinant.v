@@ -195,7 +195,7 @@ f_equal. {
   rewrite (List_map_nth' 0); [ | rewrite length_canon_sym_gr_list; flia Hi Hnz ].
   cbn - [ butn ].
   rewrite (List_map_nth' []). 2: {
-    apply is_sm_mat_iff in Hm.
+    apply is_scm_mat_iff in Hm.
     destruct Hm as (Hcr & Hc).
     rewrite butn_length, fold_mat_nrows, Hr.
     cbn; flia Hi Hnz.
@@ -583,8 +583,8 @@ remember (mat_nrows M) as n eqn:Hr.
 symmetry in Hr.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 specialize (squ_mat_is_corr M Hsm) as Hco.
-apply is_sm_mat_iff in Hsm.
-apply is_sm_mat_iff.
+apply is_scm_mat_iff in Hsm.
+apply is_scm_mat_iff.
 destruct Hsm as (Hcr & Hc).
 cbn; unfold list_swap_elem.
 rewrite List_map_seq_length.
@@ -629,7 +629,7 @@ Qed.
 Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
   p < mat_nrows M
   → q < mat_nrows M
-  → is_correct_matrix M
+  → is_correct_matrix M = true
   → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
 Proof.
 intros * Hp Hq Hcm.
@@ -1108,7 +1108,7 @@ assert (HM : determinant M = (- determinant M)%F). {
     subst i.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
-    apply is_sm_mat_iff in Hsm.
+    apply is_scm_mat_iff in Hsm.
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
     rewrite Hsm; [ | now apply nth_In ].
@@ -1121,7 +1121,7 @@ assert (HM : determinant M = (- determinant M)%F). {
     subst i.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
-    apply is_sm_mat_iff in Hsm.
+    apply is_scm_mat_iff in Hsm.
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
     rewrite Hsm; [ | now apply nth_In ].
@@ -1314,7 +1314,7 @@ f_equal.
 do 2 rewrite List_skipn_1.
 destruct A as (ll).
 destruct ll as [| la ll]; [ now subst n; cbn | ].
-apply is_sm_mat_iff in Hsm.
+apply is_scm_mat_iff in Hsm.
 cbn in Hsm.
 destruct Hsm as (Hcr & Hc).
 destruct n; [ easy | ].
@@ -1441,14 +1441,14 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   }
   rewrite (List_map_nth_seq (nth u lla []) 0%F).
   rewrite (List_map_nth_seq (nth u llb []) 0%F).
-  apply is_sm_mat_iff in Hsma.
+  apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.
   }
-  apply is_sm_mat_iff in Hsmb.
+  apply is_scm_mat_iff in Hsmb.
   destruct Hsmb as (_ & Hcb').
   rewrite Hcb'. 2: {
     cbn; apply nth_In.
@@ -1481,14 +1481,14 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   }
   rewrite (List_map_nth_seq (nth u lla []) 0%F).
   rewrite (List_map_nth_seq (nth u llc []) 0%F).
-  apply is_sm_mat_iff in Hsma.
+  apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
   rewrite Hca'. 2: {
     cbn; apply nth_In.
     now rewrite Hra.
   }
-  apply is_sm_mat_iff in Hsmc.
+  apply is_scm_mat_iff in Hsmc.
   destruct Hsmc as (_ & Hcc').
   rewrite Hcc'. 2: {
     cbn; apply nth_In.
