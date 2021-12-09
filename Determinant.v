@@ -1,12 +1,14 @@
+(* determinant *)
+
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Bool.
+Require Import Utf8 Arith.
 Require Import Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul.
-Require Import MyVector Matrix PermutSeq Signature Pigeonhole.
+Require Import MyVector Matrix PermutSeq Signature.
 Import matrix_Notations.
 
 Definition list_of_fun {A} n (f : _ → A) := map f (seq 0 n).
@@ -17,8 +19,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-
-(* determinant *)
 
 (*
    determinant n M recursively computes determinant
@@ -67,8 +67,10 @@ Proof. easy. Qed.
 Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
   mk_mat (map (λ i, nth (σ i) (mat_list_list M) []) (seq 0 (mat_nrows M))).
 
+(*
 Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
   mat_permut_rows_fun (vect_el 0 σ) M.
+*)
 
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
@@ -1132,7 +1134,7 @@ assert (HM : determinant M = (- determinant M)%F). {
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
 apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
-apply orb_true_iff.
+apply Bool.orb_true_iff.
 now left.
 Qed.
 

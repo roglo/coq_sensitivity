@@ -1,5 +1,7 @@
-Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio Pigeonhole.vio
-Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo Pigeonhole.vo
+Comatrix.vio: Comatrix.v 
+Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v 
+Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
+Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo
 FermatLittle.vio: FermatLittle.v Misc.vio
 FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
 GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
