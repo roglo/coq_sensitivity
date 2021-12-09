@@ -846,8 +846,8 @@ rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   now rewrite mat_nrows_fold_left_swap, Hr, Nat.add_1_r.
 } {
   specialize (square_matrix_ncols _ Hsm) as Hc1.
-  apply is_sm_mat_iff.
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr & Hc).
   rewrite Hr in Hc1.
   rewrite mat_nrows_fold_left_swap.
@@ -975,7 +975,7 @@ Theorem laplace_formula_on_rows : in_field →
 Proof.
 intros Hif * Hsm Hlin.
 specialize (square_matrix_ncols M Hsm) as Hc.
-specialize (proj1 (is_sm_mat_iff M) Hsm) as H1.
+specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
 destruct H1 as (Hcr & Hc').
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
   now rewrite Hnz in Hlin.
@@ -2263,8 +2263,8 @@ Theorem mat_transp_is_square : ∀ M,
 Proof.
 intros * Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hc.
-apply is_sm_mat_iff in Hsm.
-apply is_sm_mat_iff.
+apply is_scm_mat_iff in Hsm.
+apply is_scm_mat_iff.
 destruct Hsm as (Hcr & Hcl).
 cbn; rewrite map_length, seq_length.
 split. {
@@ -2840,8 +2840,8 @@ Theorem comatrix_is_square : ∀ M,
 Proof.
 intros * Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hc.
-apply is_sm_mat_iff in Hsm.
-apply is_sm_mat_iff.
+apply is_scm_mat_iff in Hsm.
+apply is_scm_mat_iff.
 rewrite comatrix_ncols.
 rewrite comatrix_nrows.
 split; [ easy | ].
@@ -3031,13 +3031,13 @@ remember
   as A eqn:HA.
 assert (Hasm : is_square_matrix A = true). {
   subst A.
-  apply is_sm_mat_iff; cbn.
+  apply is_scm_mat_iff; cbn.
   unfold mat_ncols; cbn.
   rewrite List_map_seq_length.
   rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hir ].
   rewrite List_map_seq_length.
   rewrite fold_mat_ncols.
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   split; [ easy | ].
   intros l Hl.
   apply in_map_iff in Hl.
@@ -3125,7 +3125,7 @@ f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
   rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   rewrite List_hd_nth_0.
@@ -3140,7 +3140,7 @@ f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
   rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   rewrite List_hd_nth_0.
@@ -3170,7 +3170,7 @@ rewrite laplace_formula_on_rows with (i := i); try easy.
 cbn - [ mat_el ].
 rewrite mat_transp_ncols. 2: {
   rewrite comatrix_ncols; unfold mat_ncols; cbn.
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   rewrite Hcl; [ now apply Nat.neq_0_lt_0 | ].
@@ -3186,7 +3186,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkc : k < mat_ncols {| mat_list_list := ll |}). {
     unfold mat_ncols; cbn.
-    apply is_sm_mat_iff in Hsm.
+    apply is_scm_mat_iff in Hsm.
     destruct Hsm as (Hcr, Hcl).
     cbn in Hcl.
     rewrite Hcl; [ flia Hk Hll | ].
@@ -3205,7 +3205,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; rewrite δ_diag, rngl_mul_1_r.
   unfold mat_mul_el.
   unfold mat_ncols.
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   rewrite Hcl; [ | now apply List_hd_in ].
@@ -3251,7 +3251,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold mat_transp.
   unfold mat_mul_el.
   cbn - [ comatrix ].
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   erewrite rngl_summation_eq_compat. 2: {
@@ -3305,7 +3305,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
   apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
-  apply is_sm_mat_iff; cbn.
+  apply is_scm_mat_iff; cbn.
   split; [ easy | ].
   intros l Hl; rewrite HM in Hl; cbn in Hl.
   now apply Hcl.
@@ -3518,7 +3518,7 @@ rewrite map_map.
 rewrite List_map_seq_length.
 rewrite comatrix_ncols.
 generalize Hsm; intros Hsm_v.
-apply is_sm_mat_iff in Hsm.
+apply is_scm_mat_iff in Hsm.
 cbn in Hsm.
 destruct Hsm as (Hcr, Hcl).
 unfold mat_ncols at 2.
@@ -3702,7 +3702,7 @@ rewrite (List_map_hd []). 2: {
 Check determinant_with_bad_col.
 ...
   apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
-  apply is_sm_mat_iff; cbn.
+  apply is_scm_mat_iff; cbn.
   split; [ easy | ].
   intros l Hl; rewrite HM in Hl; cbn in Hl.
   now apply Hcl.
@@ -3816,7 +3816,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 ...
   unfold mat_mul_el.
   unfold mat_ncols.
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   rewrite Hcl; [ | now apply List_hd_in ].
@@ -3862,7 +3862,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold mat_transp.
   unfold mat_mul_el.
   cbn - [ comatrix ].
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
   erewrite rngl_summation_eq_compat. 2: {
@@ -3916,7 +3916,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
   apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
-  apply is_sm_mat_iff; cbn.
+  apply is_scm_mat_iff; cbn.
   split; [ easy | ].
   intros l Hl; rewrite HM in Hl; cbn in Hl.
   now apply Hcl.
@@ -3949,7 +3949,7 @@ rewrite mat_mul_mul_scal_l; cycle 1. {
   apply mat_transp_is_square.
   now apply comatrix_is_square.
 } {
-  apply is_sm_mat_iff in Hsm.
+  apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   now intros H; apply Hrz, Hcr.
 } {
