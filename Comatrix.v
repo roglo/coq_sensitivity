@@ -9,8 +9,8 @@ Require Import Permutation.
 *)
 Import List List.ListNotations.
 
-Require Import Misc RingLike IterAdd (*IterMul*).
-Require Import (*MyVector*) Matrix PermutSeq Signature.
+Require Import Misc RingLike IterAdd IterMul Pigeonhole.
+Require Import MyVector Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
 
@@ -19,8 +19,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-
-About subm.
 
 Definition comatrix (M : matrix T) : matrix T :=
   mk_mat
@@ -3614,8 +3612,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ determinant ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
-Search (determinant (subm _ _ _)).
-Search (subm _⁺).
 Theorem mat_transp_subm : ∀ M i j,
   is_correct_matrix M
   → i < mat_ncols M
