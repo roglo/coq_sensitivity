@@ -3629,6 +3629,18 @@ apply matrix_eq'. {
     rewrite Hc1 in Hu, Hic; cbn in Hu.
     now apply Nat.lt_1_r in Hic; subst i.
   }
+  assert (Huc : u < mat_ncols M - 1). {
+    rewrite mat_nrows_subm in Hu.
+    rewrite mat_transp_nrows in Hu.
+    now apply Nat.ltb_lt in Hic; rewrite Hic in Hu.
+  }
+  assert (Hvr : v < mat_nrows M - 1). {
+    rewrite mat_transp_ncols in Hv. 2: {
+      rewrite mat_ncols_subm; [ flia Hc1 Hic | easy | flia Hr1 Hjr | easy ].
+    }
+    rewrite mat_nrows_subm in Hv.
+    now apply Nat.ltb_lt in Hjr; rewrite Hjr in Hv.
+  }
   rewrite mat_el_subm; [ | easy | | ]; cycle 1. {
     rewrite mat_nrows_subm in Hu.
     replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
@@ -3636,15 +3648,22 @@ apply matrix_eq'. {
     apply Nat.ltb_lt.
     now rewrite mat_transp_nrows.
   } {
-    rewrite mat_transp_ncols; [ | flia Hic ].
-    rewrite mat_transp_ncols in Hv. 2: {
-      rewrite mat_ncols_subm; [ flia Hc1 Hic | easy | flia Hr1 Hjr | easy ].
-    }
-    rewrite mat_nrows_subm in Hv.
-    now apply Nat.ltb_lt in Hjr; rewrite Hjr in Hv.
+    rewrite mat_transp_ncols; [ easy | flia Hic ].
   }
   rewrite mat_transp_el; [ | easy ].
   rewrite mat_transp_el; [ | now apply subm_is_corr_mat ].
+  now symmetry; apply mat_el_subm.
+} {
+  apply subm_is_corr_mat; [ | easy ].
+  rewrite mat_transp_ncols; [ easy | flia Hic ].
+} {
+  apply mat_transp_is_corr.
+  destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
+    rewrite Hc1 in Hic.
+    apply Nat.lt_1_r in Hic; subst i.
+    unfold subm.
+...
+  apply subm_is_corr_mat; [ | easy ].
 ...
     rewrite mat_ncols_subm in Hv.
     replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
