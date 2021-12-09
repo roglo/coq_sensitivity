@@ -3614,68 +3614,13 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply Nat.neq_sym in Hij.
 Theorem mat_transp_subm : ∀ M i j,
   is_correct_matrix M
+  → mat_nrows M ≠ 1
   → i < mat_ncols M
   → j < mat_nrows M
   → subm M⁺ i j = ((subm M j i)⁺)%M.
 Proof.
-intros * Hcm Hic Hjr.
+intros * Hcm Hr1 Hic Hjr.
 assert (Hcmt : is_correct_matrix M⁺) by now apply mat_transp_is_corr.
-destruct (lt_dec 1 (mat_nrows M)) as [H1r| H1r]. 2: {
-  assert (H : mat_nrows M = 1) by flia Hjr H1r.
-  clear H1r.
-  destruct M as (ll).
-  cbn in H.
-  destruct ll as [| l]; [ easy | ].
-  destruct ll; [ clear H | easy ].
-  unfold mat_ncols in Hic.
-  cbn in Hic, Hjr.
-  apply Nat.lt_1_r in Hjr; subst j.
-  unfold subm, mat_transp; f_equal; cbn.
-  rewrite map_butn, map_map, <- map_butn; cbn.
-  destruct Hcm as (H1, H2).
-  unfold mat_ncols in H1, H2; cbn in H1, H2.
-  destruct l as [| a]; [ now specialize (H1 eq_refl) | ].
-  cbn in Hic |-*.
-  destruct Hcmt as (H3, H4).
-  unfold mat_ncols in H3, H4; cbn - [ nth ] in H3, H4.
-  clear H3.
-  cbn in H4.
-  rewrite <- seq_shift in H4.
-  rewrite map_map in H4.
-...
-
-(*
-End a.
-Require Import Qrl.
-Require Import Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute 3.
-Arguments comatrix {T ro} M%M.
-Arguments determinant {T ro} M%M.
-Compute (let '(i,j):=(1,3)%nat in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
-*)
-...
-  cbn in H4.
-  clear H1.
-  destruct l as [| b]. {
-    cbn in Hic.
-    now apply Nat.lt_1_r in Hic; subst i.
-  }
-  exfalso.
-  cbn in Hic.
-  specialize (H4 [nth 1 (b :: l) 0%F]) as H1.
-  cbn in H1.
-  specialize (H1 (or_intror (or_introl eq_refl))).
-...
-  cbn - [ mat_el ] in H4.
-...
-(*
-assert (Hirm : i < mat_nrows M⁺) by now rewrite mat_transp_nrows.
-assert (Hjcm : j < mat_ncols M⁺). {
-  rewrite mat_transp_ncols; [ easy | flia Hic ].
-}
-*)
 apply matrix_eq'. {
   intros u v Hu Hv.
   rewrite mat_el_subm; [ | easy | | ]; cycle 1. {
@@ -3685,8 +3630,12 @@ apply matrix_eq'. {
     apply Nat.ltb_lt.
     now rewrite mat_transp_nrows.
   } {
+    rewrite mat_transp_ncols; [ | flia Hic ].
     rewrite mat_transp_ncols in Hv. 2: {
+...
       rewrite mat_ncols_subm; [ | easy | | ].
+...
+flia Hr1 Hjr.
 ...
     rewrite mat_ncols_subm in Hv.
     replace (i <? mat_nrows M⁺) with true in Hu; [ easy | ].
@@ -3731,6 +3680,25 @@ Check determinant_with_bad_col.
 }
 Qed.
 *)
+
+(*
+End a.
+Require Import Qrl.
+Require Import Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute 3.
+Arguments comatrix {T ro} M%M.
+Arguments determinant {T ro} M%M.
+Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[4];[5]] in subm M i j).
+(*   = {| mat_list_list := [[]; []] |} *)
+Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3;7;4;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
+(*   = {| mat_list_list := [[]; []; []] |} = {| mat_list_list := [] |} *)
+Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[7];[4];[1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
+...
+Compute (let '(i,j):=(1,3)%nat in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
+*)
+...
 
 ...
 
