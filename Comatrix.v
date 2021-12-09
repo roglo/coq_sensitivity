@@ -3662,6 +3662,95 @@ apply matrix_eq'. {
   apply subm_is_corr_mat; [ | easy ].
   rewrite mat_transp_ncols; [ easy | flia Hic ].
 } {
+  destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
+    rewrite Hc1 in Hic.
+    apply Nat.lt_1_r in Hic; subst i.
+    unfold subm.
+...
+Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[2]] in 
+  is_correct_matrix {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}⁺ = true).
+(* true = true *)
+Abort. Abort. (*
+...
+    apply is_scm_mat_iff.
+    unfold mat_ncols; cbn.
+    unfold mat_ncols; cbn.
+    do 2 rewrite map_length.
+    rewrite seq_length.
+    rewrite (List_map_hd []). 2: {
+      rewrite butn_length.
+      rewrite fold_mat_nrows.
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr.
+      flia Hr1 Hjr.
+    }
+    rewrite butn_length.
+    rewrite fold_mat_nrows.
+    apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn - [ butn ].
+    apply Nat.ltb_lt in Hjr.
+...
+destruct M as (ll).
+unfold mat_ncols in Hc1; cbn in Hc1.
+cbn in Hr1, Hjr.
+destruct ll as [| l]; [ easy | ].
+destruct ll as [| l']; [ easy | ].
+cbn in Hc1.
+destruct l as [| a]; [ easy | ].
+destruct l; [ | easy ].
+destruct j. {
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+      cbn in Hcr, Hcl.
+  rewrite Hcl. 2: {
+    cbn - [ "<?" butn ].
+    rewrite (List_map_hd 0). 2: {
+      rewrite seq_length.
+      rewrite butn_length.
+      cbn.
+  rewrite Hc1; cbn.
+...
+    rewrite (List_map_hd 0). 2: {
+      rewrite seq_length.
+      rewrite butn_length.
+destruct M as (ll).
+unfold mat_ncols in Hc1; cbn in Hc1.
+cbn - [ "<?" ].
+cbn in Hr1, Hjr.
+destruct ll as [| l]; [ easy | ].
+destruct ll as [| l']; [ easy | ].
+cbn in Hc1.
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+cbn in Hcr, Hcl.
+destruct j. {
+  rewrite Hcl; [ | now right; left ].
+  rewrite Hc1; cbn.
+(* du coup, c'est pas bon *)
+...
+      rewrite Hcl.
+      rewrite fold_mat_nrows.
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr.
+      flia Hr1 Hjr.
+    }
+...
+    split. {
+      intros H1.
+...
+  apply is_scm_mat_iff.
+  split. {
+    intros H.
+    rewrite mat_transp_ncols in H. 2: {
+      rewrite mat_ncols_subm.
+...
+    rewrite mat_transp_nrows.
+
+    unfold mat_ncols in H.
+
+    rewrite mat_transp_nrows.
+    rewrite mat_ncols_subm.
+    intros H; cbn.
+...
   apply mat_transp_is_corr.
   destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
     rewrite Hc1 in Hic.
@@ -3672,6 +3761,7 @@ apply matrix_eq'. {
     rewrite map_length.
     split. {
       intros H1.
+...
       rewrite butn_length, fold_mat_nrows.
       rewrite (List_map_hd []) in H1. 2: {
         rewrite butn_length, fold_mat_nrows.
@@ -3679,6 +3769,9 @@ apply matrix_eq'. {
         apply Nat.ltb_lt in Hjr.
         flia Hr1 Hjr.
       }
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr.
+...
       apply length_zero_iff_nil in H1.
       destruct M as (ll).
       cbn in Hjr, Hc1, H1.
@@ -3757,8 +3850,9 @@ Check determinant_with_bad_col.
   now apply Hcl.
 }
 Qed.
+*)
 
-(*
+(**)
 End a.
 Require Import Qrl.
 Require Import Rational.
@@ -3767,6 +3861,34 @@ Open Scope Q_scope.
 Compute 3.
 Arguments comatrix {T ro} M%M.
 Arguments determinant {T ro} M%M.
+Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[2]] in 
+  is_correct_matrix {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}⁺ = true).
+...
+Compute (subm (mk_mat [[5];[1]]) 0 0).
+Compute ((subm (mk_mat [[5];[1]]) 0 0)⁺)%M.
+Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[1];[7]] in 
+  (is_correct_matrix M = true,
+   mat_nrows M ≠ 1,
+   i < mat_ncols M,
+   j < mat_nrows M,
+   is_correct_matrix M⁺ = true,
+   is_correct_matrix (subm M j i)⁺ = true,
+   is_correct_matrix (subm M j i) = true)%nat).
+Check mat_transp_is_corr.
+(*
+Theorem mat_transp_subm : ∀ M i j,
+  is_correct_matrix M = true
+  → mat_nrows M ≠ 1
+  → i < mat_ncols M
+  → j < mat_nrows M
+  → subm M⁺ i j = ((subm M j i)⁺)%M.
+*)
+Compute (let '(i,j) := (0,0)%nat in let M := mk_mat [[5];[1];[7]] in 
+ (is_correct_matrix M = true
+  → mat_nrows M ≠ 1
+  → i < mat_ncols M
+  → j < mat_nrows M
+  → subm M⁺ i j = ((subm M j i)⁺)%M)%nat).
 Compute (let 'j:=0%nat in let M := mk_mat [[3];[4];[5]] in {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}).
 About is_correct_matrix.
 Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[4];[5]] in subm M i j).
