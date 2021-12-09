@@ -31,14 +31,87 @@ Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
    empty lists (rows) of same length *)
 
 Definition is_correct_matrix {T} (M : matrix T) :=
+  ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
+  (⋀ (l ∈ mat_list_list M), (length l =? mat_ncols M)).
+
+(* is_correct_matrix (a bool) easier to use with Prop *)
+
+(* same proof as is_sm_mat_iff. isn't it strange?
+   perhaps I could unify is_square_matrix and is_correct_matrix
+   somehow *)
+...
+Theorem is_cm_mat_iff {T} : ∀ (M : matrix T),
+  is_correct_matrix M = true ↔
   (mat_ncols M = 0 → mat_nrows M = 0) ∧
   ∀ l, l ∈ mat_list_list M → length l = mat_ncols M.
+Proof.
+intros.
+unfold is_correct_matrix.
+split; intros Hm. {
+  apply Bool.andb_true_iff in Hm.
+  destruct Hm as (Hrc, Hc).
+  apply Bool.orb_true_iff in Hrc.
+  split. {
+    intros Hcz.
+    destruct Hrc as [Hrc| Hrc]. {
+      apply negb_true_iff in Hrc.
+      now apply Nat.eqb_neq in Hrc.
+    } {
+      now apply Nat.eqb_eq in Hrc.
+    }
+  }
+  intros l Hl.
+  remember (mat_list_list M) as ll eqn:Hll.
+  clear Hll.
+  induction ll as [| la]; [ easy | cbn ].
+  rewrite iter_list_cons in Hc; cycle 1; try easy. {
+    intros b; apply andb_true_r.
+  } {
+    intros; apply andb_assoc.
+  }
+  apply Bool.andb_true_iff in Hc.
+  destruct Hc as (Hla, Hc).
+  apply Nat.eqb_eq in Hla.
+  destruct Hl as [Hl| Hl]; [ now subst l | ].
+  now apply IHll.
+} {
+  destruct Hm as (Hrc & Hc).
+  apply Bool.andb_true_iff.
+  split. {
+    apply Bool.orb_true_iff.
+    destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
+      now right; apply Nat.eqb_eq.
+    }
+    left.
+    apply negb_true_iff.
+    apply Nat.eqb_neq.
+    intros H.
+    now apply Hnz, Hrc.
+  }
+  remember (mat_list_list M) as ll eqn:Hll.
+  clear Hll.
+  induction ll as [| la]; [ easy | ].
+  rewrite iter_list_cons; cycle 1; try easy. {
+    intros b; apply andb_true_r.
+  } {
+    intros; apply andb_assoc.
+  }
+  apply Bool.andb_true_iff.
+  split; [ now apply Nat.eqb_eq, Hc; left | ].
+  apply IHll.
+  intros l Hl.
+  now apply Hc; right.
+}
+Qed.
+
+...
 
 Theorem tail_is_correct_matrix : ∀ {A} (M : matrix A),
-  is_correct_matrix M
-  → is_correct_matrix (mk_mat (tl (mat_list_list M))).
+  is_correct_matrix M = true
+  → is_correct_matrix (mk_mat (tl (mat_list_list M))) = true.
 Proof.
 intros * Hcm.
+...
 destruct Hcm as (Hcr, Hcl).
 split. {
   unfold mat_ncols; cbn.
