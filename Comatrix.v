@@ -3662,6 +3662,7 @@ apply matrix_eq'. {
     rewrite Hc1 in Hic.
     apply Nat.lt_1_r in Hic; subst i.
     unfold subm.
+Abort. Abort. (*
 ...
   apply subm_is_corr_mat; [ | easy ].
 ...
@@ -3709,7 +3710,6 @@ Check determinant_with_bad_col.
 Qed.
 *)
 
-(*
 End a.
 Require Import Qrl.
 Require Import Rational.
@@ -3718,6 +3718,9 @@ Open Scope Q_scope.
 Compute 3.
 Arguments comatrix {T ro} M%M.
 Arguments determinant {T ro} M%M.
+Compute (let 'j:=0%nat in let M := mk_mat [[3];[4];[5]] in {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}).
+About is_correct_matrix.
+...
 Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[4];[5]] in subm M i j).
 (*   = {| mat_list_list := [[]; []] |} *)
 Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3;7;4;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
