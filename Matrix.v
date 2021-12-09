@@ -39,7 +39,6 @@ Definition is_correct_matrix {T} (M : matrix T) :=
 (* same proof as is_sm_mat_iff. isn't it strange?
    perhaps I could unify is_square_matrix and is_correct_matrix
    somehow *)
-...
 Theorem is_cm_mat_iff {T} : ∀ (M : matrix T),
   is_correct_matrix M = true ↔
   (mat_ncols M = 0 → mat_nrows M = 0) ∧
@@ -47,6 +46,7 @@ Theorem is_cm_mat_iff {T} : ∀ (M : matrix T),
 Proof.
 intros.
 unfold is_correct_matrix.
+...
 split; intros Hm. {
   apply Bool.andb_true_iff in Hm.
   destruct Hm as (Hrc, Hc).
