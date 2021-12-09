@@ -2778,7 +2778,7 @@ easy.
 Qed.
 
 Theorem mat_transp_el : ∀ M i j,
-  is_correct_matrix M
+  is_correct_matrix M = true
   → mat_el M⁺ i j = mat_el M j i.
 Proof.
 intros * Hcm.
@@ -2791,6 +2791,7 @@ destruct (lt_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
   }
   rewrite nth_overflow; [ easy | ].
   destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
+    apply is_scm_mat_iff in Hcm.
     destruct Hcm as (H1, H2).
     rewrite H2; [ easy | ].
     now apply nth_In; rewrite fold_mat_nrows.
@@ -3312,15 +3313,19 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem mat_transp_is_corr : ∀ M, is_correct_matrix M → is_correct_matrix M⁺.
+Theorem mat_transp_is_corr : ∀ M,
+  is_correct_matrix M = true
+  → is_correct_matrix M⁺ = true.
 Proof.
 intros * Hcm.
+apply is_scm_mat_iff in Hcm.
 destruct Hcm as (H1, H2).
 destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   specialize (H1 Hcz).
   unfold mat_transp.
   now rewrite H1, Hcz.
 }
+apply is_scm_mat_iff.
 split. {
   rewrite mat_transp_ncols; [ | easy ].
   intros Hr.
@@ -3410,8 +3415,8 @@ destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   destruct l as [| a]; [ easy | ].
   now destruct l.
 }
-assert (Hcm : is_correct_matrix M) by now apply squ_mat_is_corr.
-assert (Hcmt : is_correct_matrix M⁺) by now apply mat_transp_is_corr.
+assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
+assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
 apply matrix_eq'; cycle 1. {
   now apply mat_transp_is_corr, subm_is_corr_mat.
 } {
@@ -3613,14 +3618,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
 Theorem mat_transp_subm : ∀ M i j,
-  is_correct_matrix M
+  is_correct_matrix M = true
   → mat_nrows M ≠ 1
   → i < mat_ncols M
   → j < mat_nrows M
   → subm M⁺ i j = ((subm M j i)⁺)%M.
 Proof.
 intros * Hcm Hr1 Hic Hjr.
-assert (Hcmt : is_correct_matrix M⁺) by now apply mat_transp_is_corr.
+assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
 apply matrix_eq'. {
   intros u v Hu Hv.
   destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
@@ -3662,7 +3667,6 @@ apply matrix_eq'. {
     rewrite Hc1 in Hic.
     apply Nat.lt_1_r in Hic; subst i.
     unfold subm.
-Abort. Abort. (*
 ...
   apply subm_is_corr_mat; [ | easy ].
 ...
@@ -3708,8 +3712,8 @@ Check determinant_with_bad_col.
   now apply Hcl.
 }
 Qed.
-*)
 
+(*
 End a.
 Require Import Qrl.
 Require Import Rational.
@@ -3720,8 +3724,8 @@ Arguments comatrix {T ro} M%M.
 Arguments determinant {T ro} M%M.
 Compute (let 'j:=0%nat in let M := mk_mat [[3];[4];[5]] in {| mat_list_list := map (butn 0) (butn j (mat_list_list M)) |}).
 About is_correct_matrix.
-...
 Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[4];[5]] in subm M i j).
+Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3];[4];[5]] in is_correct_matrix (subm M i j)).
 (*   = {| mat_list_list := [[]; []] |} *)
 Compute (let '(i,j):=(0,0)%nat in let M := mk_mat [[3;7;4;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
 (*   = {| mat_list_list := [[]; []; []] |} = {| mat_list_list := [] |} *)
