@@ -5911,6 +5911,19 @@ destruct (lt_dec 1 (mat_nrows M)) as [H1r| H1r]. 2: {
   rewrite <- seq_shift in H4.
   rewrite map_map in H4.
 ...
+
+(*
+End a.
+Require Import Qrl.
+Require Import Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute 3.
+Arguments comatrix {T ro} M%M.
+Arguments determinant {T ro} M%M.
+Compute (let '(i,j):=(1,3)%nat in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (subm M⁺ i j = ((subm M j i)⁺)%M)).
+*)
+...
   cbn in H4.
   clear H1.
   destruct l as [| b]. {
