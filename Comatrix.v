@@ -3701,8 +3701,20 @@ apply matrix_eq'. {
       now rewrite <- Hx, Hc1; cbn.
     } {
       intros l Hl.
+      unfold mat_ncols in Hl; cbn in Hl.
+      unfold mat_ncols in Hl; cbn in Hl.
+      unfold mat_ncols in Hc1; cbn in Hc1.
+...
       unfold mat_ncols; cbn.
       unfold mat_ncols; cbn.
+      rewrite (List_map_hd 0). 2: {
+        assert (H : is_correct_matrix (subm M j 0) = true). {
+          apply subm_is_corr_mat; [ | easy ].
+        rewrite seq_length.
+        destruct M as (ll); cbn in *.
+        destruct ll as [| l']; [ easy | ].
+        destruct ll as [| l'']; [ easy | ].
+        cbn.
 ...
       destruct M as (ll); cbn in *.
       unfold mat_ncols in Hc1; cbn in Hc1.
