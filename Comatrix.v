@@ -3452,24 +3452,14 @@ apply matrix_eq'; cycle 1. {
   rewrite mat_transp_nrows.
   replace (mat_ncols M) with (S (S (mat_ncols M - 2))) at 3 by flia Hc1 Hi.
   rewrite mat_transp_ncols.
+  rewrite mat_nrows_subm.
+  apply Nat.neq_0_lt_0 in Hcz.
+  apply Nat.eqb_neq in Hcz; rewrite Hcz.
   apply Nat.ltb_lt in Hi; rewrite Hi.
-...
-    now apply mat_nrows_subm.
-...
-  rewrite mat_transp_ncols. 2: {
-    rewrite mat_ncols_subm; [ | easy ].
-    replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
-    apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
-    flia Hc1 Hcz.
-  }
-  rewrite mat_ncols_subm; cycle 1. {
-    easy.
-  } {
-    rewrite mat_transp_nrows.
-    replace (mat_ncols M) with (S (S (mat_ncols M - 2))) by flia Hc1 Hi.
-    rewrite mat_transp_ncols; [ | flia Hi ].
-    now apply mat_nrows_subm.
-  }
+  apply Nat.ltb_lt in Hj; rewrite Hj; cbn.
+  rewrite if_eqb_eq_dec.
+  rewrite Hcr.
+  now destruct (Nat.eq_dec (mat_nrows M - 1) 0).
 }
 intros u v Hu Hv.
 rewrite mat_transp_el; [ | now apply subm_is_corr_mat ].
@@ -3482,6 +3472,7 @@ rewrite (List_map_nth' []). 2: {
   rewrite mat_ncols_subm in Hv; [ | easy ].
   rewrite mat_transp_nrows in Hv.
   replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+...
   rewrite mat_transp_ncols in Hv; [ | flia Hi ].
   now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
 }
