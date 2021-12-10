@@ -2310,6 +2310,50 @@ destruct (lt_dec j (mat_ncols M)) as [Hjc| Hjc]. {
 }
 apply Nat.ltb_nlt in Hjc; rewrite Hjc, Nat.sub_0_r.
 apply Nat.ltb_ge in Hjc.
+unfold mat_ncols, subm; cbn.
+destruct M as (ll).
+cbn in Hr, Hjc |-*.
+destruct (lt_dec i (length ll)) as [Hir| Hir]. {
+  rewrite (List_map_hd []). 2: {
+    rewrite butn_length.
+    apply Nat.ltb_lt in Hir; rewrite Hir.
+    destruct ll; [ easy | ].
+    destruct ll; [ easy | cbn; flia ].
+  }
+  rewrite butn_length.
+  unfold mat_ncols in Hjc; cbn in Hjc.
+  rewrite List_hd_nth_0.
+  rewrite nth_butn, Nat.add_0_l.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec i 0) as [Hiz| Hiz]. {
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j (length (nth 1 ll []))) as [Hjl| Hjl]. {
+      destruct ll; [ easy | ].
+      cbn in Hjl |-*.
+      apply is_scm_mat_iff in Hcm.
+      unfold mat_ncols in Hcm; cbn in Hcm.
+      destruct Hcm as (_, Hcl).
+...
+  apply is_scm_mat_iff in Hcm.
+  unfold mat_ncols in Hcm; cbn in Hcm.
+  destruct Hcm as (_, Hcl).
+
+
+  rewrite (List_map_hd []). 2: {
+    rewrite butn_length.
+    unfold Nat.b2n.
+    rewrite if_ltb_lt_dec.
+    rewrite Hr.
+    destruct (lt_dec i (S (S r))); cbn; flia.
+  }
+...
+  rewrite List_hd_nth_0.
+  rewrite (
+
+  destruct ll; [ easy | ].
+  destruct ll; [ easy | ].
+  cbn in Hr, Hjc |-*.
 ...
   apply Nat.ltb_lt in Hjc.
     destruct (lt_dec i (length ll)) as [Hir| Hir]. {
