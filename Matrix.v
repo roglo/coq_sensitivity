@@ -2357,122 +2357,13 @@ destruct (lt_dec i (length ll)) as [Hir| Hir]. {
   rewrite Nat.sub_0_r.
   now destruct ll.
 }
-...
-  apply is_scm_mat_iff in Hcm.
-  unfold mat_ncols in Hcm; cbn in Hcm.
-  destruct Hcm as (_, Hcl).
-
-
-  rewrite (List_map_hd []). 2: {
-    rewrite butn_length.
-    unfold Nat.b2n.
-    rewrite if_ltb_lt_dec.
-    rewrite Hr.
-    destruct (lt_dec i (S (S r))); cbn; flia.
-  }
-...
-  rewrite List_hd_nth_0.
-  rewrite (
-
-  destruct ll; [ easy | ].
-  destruct ll; [ easy | ].
-  cbn in Hr, Hjc |-*.
-...
-  apply Nat.ltb_lt in Hjc.
-    destruct (lt_dec i (length ll)) as [Hir| Hir]. {
-      rewrite butn_length.
-      apply Nat.ltb_lt in Hir; rewrite Hir; cbn.
-      destruct ll; [ easy | ].
-      destruct ll; [ easy | cbn; flia ].
-    }
-    apply Nat.nlt_ge in Hir.
-    rewrite butn_length.
-...
-    unfold mat_nrows in Hr.
-    unfold mat_ncols; cbn.
-...
-   if mat_nrows M =? 0 then 0
-   else
-...
-  → i < mat_nrows M
-  → j < mat_ncols M
-  → mat_ncols (subm M i j) = if mat_nrows M <=? 1 then 0 else mat_ncols M - 1.
-Proof.
-intros * Hcm Hir Hjc.
-...
-destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
-  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hjc H | ].
-  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
-  rewrite Hc1 in Hjc |-*.
-  apply Nat.lt_1_r in Hjc; subst j.
-  rewrite Tauto.if_same; cbn.
-  destruct M as (ll); cbn.
-  unfold mat_ncols, subm in Hc1 |-*.
-  cbn in Hc1 |-*.
-  apply is_scm_mat_iff in Hcm.
-  destruct Hcm as (_, Hcl).
-  unfold mat_ncols in Hcl; cbn in Hcl.
-  rewrite Hc1 in Hcl.
-  destruct i. {
-    destruct ll as [| l]; [ easy | ].
-    cbn in Hc1.
-    destruct ll as [| l']; [ easy | ].
-    rewrite (List_map_hd []); [ | cbn; flia ].
-    rewrite butn_length.
-    cbn - [ "<?" ].
-    destruct l' as [| a]; [ easy | ].
-    destruct l' as [| b]; [ easy | ].
-    now specialize (Hcl _ (or_intror (or_introl eq_refl))).
-  }
-  destruct ll as [| l]; [ easy | ].
-  cbn in Hc1.
-  rewrite butn_cons.
-  rewrite (List_map_hd []); [ | cbn; flia ].
-  rewrite butn_length.
-  cbn - [ "<?" ].
-  destruct l as [| a]; [ easy | ].
-  destruct l as [| b]; [ easy | ].
-  now specialize (Hcl _ (or_introl eq_refl)).
-}
-apply Nat.nle_gt in H1c.
-rewrite if_leb_le_dec.
-destruct (le_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
-  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-    unfold mat_nrows in Hrz.
-    apply length_zero_iff_nil in Hrz.
-    unfold mat_ncols; cbn; rewrite Hrz.
-    now rewrite butn_nil.
-  }
-  assert (H : mat_nrows M = 1) by flia Hr1 Hrz.
-  clear Hr1 Hrz; rename H into Hr1.
-  rewrite Hr1 in Hir.
-  apply Nat.lt_1_r in Hir; subst i.
-  unfold mat_ncols, subm; cbn.
-  unfold mat_nrows in Hr1.
-  destruct M as (ll); cbn in Hr1 |-*.
-  destruct ll as [| l]; [ easy | ].
-  now destruct ll.
-}
-apply Nat.nle_gt in Hr1.
-unfold mat_ncols in H1c, Hjc |-*.
-destruct M as (ll); cbn in *.
-destruct ll as [| l]; [ easy | ].
-destruct ll as [| l']; [ cbn in Hr1; flia Hr1 | ].
-clear Hr1.
-cbn in H1c, Hjc.
-apply is_scm_mat_iff in Hcm.
-destruct Hcm as (Hcr, Hcm).
-cbn in Hcr |-*.
-unfold mat_ncols in Hcm; cbn in Hcm.
-destruct i. {
-  specialize (Hcm l' (or_intror (or_introl eq_refl))) as H1.
-  cbn; rewrite butn_length; rewrite H1.
-  unfold Nat.b2n; rewrite if_ltb_lt_dec.
-  now destruct (lt_dec j (length l)).
-}
-cbn; rewrite butn_length.
-unfold Nat.b2n; rewrite if_ltb_lt_dec.
-now destruct (lt_dec j (length l)).
+apply Nat.nlt_ge in Hir.
+rewrite butn_out; [ | easy ].
+destruct ll; [ easy | cbn ].
+rewrite butn_length.
+unfold mat_ncols in Hjc; cbn in Hjc.
+apply Nat.ltb_ge in Hjc.
+now rewrite Hjc, Nat.sub_0_r.
 Qed.
 
 (*
@@ -2553,12 +2444,14 @@ destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
 split. {
   intros Hcs.
   rewrite <- Hcm in Hj.
-  rewrite mat_ncols_subm in Hcs; [ | | flia Hi Hr1 | easy ]. 2: {
+  rewrite mat_ncols_subm in Hcs. 2: {
     now apply squ_mat_is_corr.
   }
-  rewrite if_leb_le_dec in Hcs.
-  destruct (le_dec (mat_nrows M) 1) as [H| H]; [ flia Hr1 Hi H | ].
-  flia Hcs Hj Hcm Hr1.
+  remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+  destruct r; [ easy | ].
+  destruct r; [ easy | ].
+  apply Nat.ltb_lt in Hj; rewrite Hj in Hcs; cbn in Hcs.
+  now rewrite Hcm in Hcs.
 } {
   intros l Hl.
   apply is_scm_mat_iff in Hm.
@@ -2603,15 +2496,16 @@ split. {
   destruct (lt_dec i (mat_nrows A)) as [Hir| Hir]. {
     destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
       destruct (lt_dec 1 (mat_nrows A)) as [H1r| H1r]. {
-        rewrite mat_ncols_subm; [ | easy | easy | easy ].
-        apply is_scm_mat_iff in Ha.
-        destruct Ha as (Hcr, Hc).
+        rewrite mat_ncols_subm; [ | easy ].
+        remember (mat_nrows A) as r eqn:Hr; symmetry in Hr.
+        destruct r; [ easy | ].
+        destruct r; [ easy | ].
+        apply Nat.ltb_lt in Hjc; rewrite Hjc.
+        apply Nat.ltb_lt in Hjc.
+        intros H; cbn in H.
         destruct (Nat.eq_dec (mat_ncols A) 0) as [Hcz| Hcz]. {
           flia Hjc Hcz.
         }
-        rewrite if_leb_le_dec.
-        intros H.
-        destruct (le_dec (mat_nrows A) 1) as [H1| H1]; [ flia H1 | ].
         flia Hc1 Hcz H.
       }
       apply Nat.nlt_ge in H1r.
@@ -2696,6 +2590,9 @@ split. {
   specialize (in_butn _ _ _ Hla) as H.
   specialize (Hc _ H) as H1; clear H.
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+(**)
+    rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff ].
+...
     rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | | easy ]. 2: {
 ...
     rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | easy | easy ].
