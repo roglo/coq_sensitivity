@@ -3402,16 +3402,6 @@ rewrite <- determinant_transpose; [ | easy | ]. 2: {
   now apply is_squ_mat_subm.
 }
 f_equal.
-(*
-Theorem mat_transp_subm : ∀ M i j,
-  is_square_matrix M = true
-  → i < mat_ncols M
-  → j < mat_nrows M
-  → subm M⁺ i j = ((subm M j i)⁺)%M.
-Proof.
-intros * Hsm Hi Hj.
-symmetry.
-*)
 specialize (square_matrix_ncols _ Hsm) as Hcr.
 destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   rewrite Hc1 in Hi.
@@ -3472,8 +3462,9 @@ rewrite (List_map_nth' []). 2: {
   rewrite mat_ncols_subm in Hv; [ | easy ].
   rewrite mat_transp_nrows in Hv.
   replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
-...
-  rewrite mat_transp_ncols in Hv; [ | flia Hi ].
+  rewrite mat_transp_ncols in Hv.
+  apply Nat.neq_0_lt_0 in Hcz.
+  apply Nat.eqb_neq in Hcz; rewrite Hcz in Hv.
   now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
 }
 rewrite (List_map_nth' []). 2: {
@@ -3492,9 +3483,10 @@ rewrite mat_transp_nrows in Hu.
 rewrite mat_ncols_subm in Hu; [ | easy ].
 rewrite mat_ncols_subm in Hv; [ | easy ].
 rewrite mat_transp_nrows in Hv.
-rewrite mat_transp_ncols in Hv; [ | flia Hi ].
+rewrite mat_transp_ncols in Hv.
 replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by flia Hj Hcr Hc1.
 replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+cbn - [ "<?" ] in Hv.
 apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
 apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
 cbn in Hu, Hv.
