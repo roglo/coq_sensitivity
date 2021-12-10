@@ -3742,10 +3742,25 @@ apply matrix_eq'. {
   now apply Nat.ltb_lt in Hic; rewrite Hic.
 } {
   destruct (Nat.eq_dec (mat_ncols M) 1) as [H1c| H1c]. {
+    rewrite mat_transp_ncols. 2: {
+      unfold subm, mat_ncols; cbn.
+About mat_ncols_subm.
+...
+      rewrite mat_ncols_subm.
+...
+Check @mat_ncols_subm.
+@mat_ncols_subm
+     : ∀ (T : Type) (M : matrix T) (i j : nat),
+         is_correct_matrix M = true → 1 < mat_nrows M → j < mat_ncols M →
+         mat_ncols (subm M i j) = mat_ncols M - 1
+...
+      rewrite mat_ncols_subm.
+...
     rewrite H1c in Hic.
     apply Nat.lt_1_r in Hic; subst i.
     apply is_scm_mat_iff in Hcmt.
     destruct Hcmt as (_, Hcl).
+    rewrite mat_transp_ncols in Hcl; [ | flia H1c ].
 ...
     rewrite mat_ncols_subm; [ | easy | | ]; cycle 1. {
       rewrite mat_transp_nrows.
