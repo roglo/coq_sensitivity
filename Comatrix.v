@@ -3635,9 +3635,19 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   cbn - [ determinant ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
+  destruct Hi as (_, Hi); cbn in Hi.
+  destruct Hj as (_, Hj); cbn in Hj.
+(*
   apply Nat.neq_sym in Hij.
-...
-Check mat_transp_subm.
+*)
+  specialize (determinant_with_bad_row Hif) as H1.
+  specialize (H1 i j M Hsm_v Hi Hj Hij).
+Search (determinant _⁺).
+Search ((subm _ _ _)⁺)%M.
+(*
+Check determinant_with_bad_row.
+Check determinant_with_bad_col.
+*)
 Theorem mat_transp_subm : ∀ M i j,
   is_correct_matrix M = true
   → mat_nrows M ≠ 1
@@ -3645,6 +3655,39 @@ Theorem mat_transp_subm : ∀ M i j,
   → j < mat_nrows M
   → subm M⁺ i j = ((subm M j i)⁺)%M.
 Proof.
+intros * Hcm Hr1 Hic Hjr.
+unfold mat_transp at 2.
+unfold subm at 1.
+f_equal.
+rewrite mat_nrows_subm.
+rewrite mat_ncols_subm; [ | easy ].
+replace (mat_nrows M) with (S (S (mat_nrows M - 2))) at 1 by flia Hjr Hr1.
+apply Nat.ltb_lt in Hic; rewrite Hic.
+apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+apply Nat.ltb_lt in Hic, Hjr.
+rewrite map_butn, map_map, <- map_butn.
+unfold butn at 2.
+rewrite List_firstn_seq.
+rewrite Nat.min_l; [ | flia Hic ].
+destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
+  rewrite Hic1.
+  rewrite skipn_all2; [ | rewrite seq_length; flia Hjr ].
+  rewrite app_nil_r.
+  apply map_ext_in.
+  intros k Hk; apply in_seq in Hk.
+  rewrite <- map_butn.
+(* ah, l'autre enculé, là *)
+...
+... suite ok
+}
+replace (mat_ncols M - 1) with (i + (mat_ncols M - 1 - i)) at 1. 2: {
+  flia Hic Hic1.
+}
+rewrite seq_app, Nat.add_0_l.
+do 2 rewrite map_app.
+f_equal.
+...
+...
 intros * Hcm Hr1 Hic Hjr.
 assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
 apply matrix_eq'. {
