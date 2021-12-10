@@ -2331,9 +2331,32 @@ destruct (lt_dec i (length ll)) as [Hir| Hir]. {
     destruct (lt_dec j (length (nth 1 ll []))) as [Hjl| Hjl]. {
       destruct ll; [ easy | ].
       cbn in Hjl |-*.
+      destruct ll; [ easy | ].
+      cbn in Hjc, Hjl.
       apply is_scm_mat_iff in Hcm.
       unfold mat_ncols in Hcm; cbn in Hcm.
       destruct Hcm as (_, Hcl).
+      rewrite Hcl in Hjl; [ | now right; left ].
+      now apply Nat.nlt_ge in Hjc.
+    }
+    rewrite Nat.sub_0_r.
+    destruct ll; [ easy | ].
+    destruct ll; [ easy | cbn ].
+    apply is_scm_mat_iff in Hcm.
+    unfold mat_ncols in Hcm; cbn in Hcm.
+    destruct Hcm as (_, Hcl).
+    now apply Hcl; right; left.
+  }
+  clear i Hir Hiz.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec j (length (nth 0 ll []))) as [Hjl| Hjl]. {
+    destruct ll; [ easy | ].
+    cbn in Hjc, Hjl.
+    now apply Nat.nlt_ge in Hjc.
+  }
+  rewrite Nat.sub_0_r.
+  now destruct ll.
+}
 ...
   apply is_scm_mat_iff in Hcm.
   unfold mat_ncols in Hcm; cbn in Hcm.
