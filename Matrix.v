@@ -2242,6 +2242,7 @@ destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
   rewrite Hc1 in Hic |-*.
   apply Nat.lt_1_r in Hic; subst j.
   rewrite Tauto.if_same; cbn.
+...
   apply is_scm_mat_iff in Hcm.
   destruct Hcm as (_, Hcl).
   unfold mat_ncols in Hcl, Hc1 |-*.
@@ -2288,7 +2289,16 @@ destruct ll as [| l']. {
     destruct i; [ easy | cbn; flia ].
   }
   rewrite butn_length.
+...
   cbn - [ "-" "<?" ].
+  rewrite List_hd_nth_0.
+  rewrite nth_butn.
+  rewrite Nat.add_0_l.
+  destruct i; [ easy | ].
+  cbn - [ "<?" length ].
+  apply Nat.ltb_lt in Hic; rewrite Hic.
+  cbn.
+
 ...
 destruct ll as [| l']; [ cbn in H1r; flia H1r | ].
 clear H1r.
