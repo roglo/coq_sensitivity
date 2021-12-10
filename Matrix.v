@@ -2232,6 +2232,101 @@ Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
+  → mat_ncols (subm M i j) =
+   match mat_nrows M with
+   | 0 => 0
+   | 1 => if i =? 0 then 0 else mat_ncols M - Nat.b2n (j <? mat_ncols M)
+   | _ => mat_ncols M - Nat.b2n (j <? mat_ncols M)
+   end.
+Proof.
+intros * Hcm.
+remember (mat_nrows M) as r eqn:Hr; symmetry in Hr.
+destruct r. {
+  unfold mat_nrows in Hr.
+  apply length_zero_iff_nil in Hr.
+  unfold mat_ncols; cbn; rewrite Hr; cbn.
+  now rewrite butn_nil.
+}
+destruct r. {
+  rewrite if_eqb_eq_dec.
+  destruct M as (ll); cbn - [ "<?" ] in Hr |-*.
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ clear Hr | easy ].
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+  destruct i; [ easy | clear Hiz ].
+  cbn - [ "<?" ].
+  apply butn_length.
+}
+destruct (lt_dec j (mat_ncols M)) as [Hjc| Hjc]. {
+  apply Nat.ltb_lt in Hjc; rewrite Hjc; cbn.
+  apply Nat.ltb_lt in Hjc.
+  unfold mat_ncols in Hjc |-*.
+  destruct M as (ll); cbn in Hr, Hjc |-*.
+  apply is_scm_mat_iff in Hcm.
+  unfold mat_ncols in Hcm; cbn in Hcm.
+  destruct Hcm as (_, Hcl).
+  rewrite (List_map_hd []). 2: {
+    rewrite butn_length.
+    unfold Nat.b2n.
+    rewrite if_ltb_lt_dec.
+    rewrite Hr.
+    destruct (lt_dec i (S (S r))); cbn; flia.
+  }
+  rewrite butn_length.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec j (length (hd [] (butn i ll)))) as [Hjc'| Hjc']. {
+    rewrite List_hd_nth_0.
+    rewrite nth_butn, Nat.add_0_l.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec i 0) as [Hiz| Hiz]. {
+      rewrite Hcl; [ easy | ].
+      apply nth_In; rewrite Hr; flia.
+    }
+    now rewrite List_hd_nth_0.
+  }
+  apply Nat.nlt_ge in Hjc'.
+  rewrite Nat.sub_0_r.
+  rewrite List_hd_nth_0.
+  rewrite nth_butn.
+  rewrite Nat.add_0_l.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec i 0) as [Hiz| Hiz]. {
+    apply Nat.le_0_r in Hiz; subst i; cbn.
+    destruct ll; [ easy | ].
+    destruct ll; [ easy | ].
+    cbn in Hcl, Hjc, Hjc' |-*.
+    rewrite Hcl in Hjc'; [ | now right; left ].
+    now apply Nat.nle_gt in Hjc'.
+  }
+  apply Nat.nle_gt in Hiz.
+  rewrite List_hd_nth_0 in Hjc'.
+  destruct i; [ flia Hiz | ].
+  destruct ll; [ easy | ].
+  cbn in Hjc, Hjc'.
+  now apply Nat.nlt_ge in Hjc'.
+}
+apply Nat.ltb_nlt in Hjc; rewrite Hjc, Nat.sub_0_r.
+apply Nat.ltb_ge in Hjc.
+...
+  apply Nat.ltb_lt in Hjc.
+    destruct (lt_dec i (length ll)) as [Hir| Hir]. {
+      rewrite butn_length.
+      apply Nat.ltb_lt in Hir; rewrite Hir; cbn.
+      destruct ll; [ easy | ].
+      destruct ll; [ easy | cbn; flia ].
+    }
+    apply Nat.nlt_ge in Hir.
+    rewrite butn_length.
+...
+    unfold mat_nrows in Hr.
+    unfold mat_ncols; cbn.
+...
+   if mat_nrows M =? 0 then 0
+   else
+...
   → i < mat_nrows M
   → j < mat_ncols M
   → mat_ncols (subm M i j) = if mat_nrows M <=? 1 then 0 else mat_ncols M - 1.
