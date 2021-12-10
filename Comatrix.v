@@ -3425,28 +3425,23 @@ apply matrix_eq'; cycle 1. {
 } {
   rewrite mat_transp_nrows.
   rewrite mat_nrows_subm.
-  rewrite mat_ncols_subm; [ | easy | | easy ]. 2: {
-    rewrite <- Hcr; flia Hi Hc1.
-  }
-  rewrite mat_transp_nrows.
-  now apply Nat.ltb_lt in Hi; rewrite Hi.
+  rewrite mat_ncols_subm; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
+  now rewrite mat_transp_nrows.
 } {
   rewrite mat_transp_ncols. 2: {
-    rewrite mat_ncols_subm; [ | easy | | easy ]. 2: {
-      rewrite <- Hcr; flia Hc1 Hi.
-    }
-    flia Hc1 Hi.
+    rewrite mat_ncols_subm; [ | easy ].
+    replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
+    apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
+    flia Hc1 Hcz.
   }
   rewrite mat_ncols_subm; cycle 1. {
     easy.
   } {
-    rewrite mat_transp_nrows; flia Hc1 Hi.
-  } {
-    rewrite mat_transp_ncols; [ easy | flia Hi ].
-  } {
-    rewrite mat_nrows_subm.
+    rewrite mat_transp_nrows.
+    replace (mat_ncols M) with (S (S (mat_ncols M - 2))) by flia Hc1 Hi.
     rewrite mat_transp_ncols; [ | flia Hi ].
-    now apply Nat.ltb_lt in Hj; rewrite Hj.
+    now apply mat_nrows_subm.
   }
 }
 intros u v Hu Hv.
@@ -3457,12 +3452,11 @@ rewrite (List_map_nth' []). 2: {
   rewrite fold_mat_nrows.
   apply Nat.ltb_lt in Hj; rewrite Hj.
   apply Nat.ltb_lt in Hj; cbn.
-  rewrite mat_ncols_subm in Hv; [ | easy | | ]; cycle 1. {
-    rewrite mat_transp_nrows; flia Hi Hc1.
-  } {
-    rewrite mat_transp_ncols; [ easy | flia Hi Hc1 ].
-  }
-  rewrite mat_transp_ncols in Hv; [ easy | flia Hi Hc1 ].
+  rewrite mat_ncols_subm in Hv; [ | easy ].
+  rewrite mat_transp_nrows in Hv.
+  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+  rewrite mat_transp_ncols in Hv; [ | flia Hi ].
+  now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
 }
 rewrite (List_map_nth' []). 2: {
   rewrite butn_length.
@@ -3470,11 +3464,15 @@ rewrite (List_map_nth' []). 2: {
   apply Nat.ltb_lt in Hi; rewrite Hi.
   apply Nat.ltb_lt in Hi; cbn.
   rewrite mat_transp_nrows in Hu.
-  rewrite mat_ncols_subm in Hu; [ easy | easy | | easy ].
-  rewrite <- Hcr; flia Hi Hc1.
+  rewrite mat_ncols_subm in Hu; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by
+    flia Hj Hcr Hc1.
+  now apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
 }
 do 4 rewrite nth_butn.
 rewrite mat_transp_nrows in Hu.
+rewrite mat_ncols_subm in Hu; [ | easy ].
+...
 rewrite mat_ncols_subm in Hu; [ | easy | | easy ]. 2: {
   rewrite <- Hcr; flia Hi Hc1.
 }
