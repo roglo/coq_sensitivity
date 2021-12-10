@@ -3472,16 +3472,14 @@ rewrite (List_map_nth' []). 2: {
 do 4 rewrite nth_butn.
 rewrite mat_transp_nrows in Hu.
 rewrite mat_ncols_subm in Hu; [ | easy ].
-...
-rewrite mat_ncols_subm in Hu; [ | easy | | easy ]. 2: {
-  rewrite <- Hcr; flia Hi Hc1.
-}
-rewrite mat_ncols_subm in Hv; [ | easy | | ]; cycle 1. {
-  rewrite mat_transp_nrows; flia Hi Hc1.
-} {
-  rewrite mat_transp_ncols; [ easy | flia Hi ].
-}
+rewrite mat_ncols_subm in Hv; [ | easy ].
+rewrite mat_transp_nrows in Hv.
 rewrite mat_transp_ncols in Hv; [ | flia Hi ].
+replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by flia Hj Hcr Hc1.
+replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
+apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
+cbn in Hu, Hv.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   unfold Nat.b2n; rewrite if_leb_le_dec.
@@ -3639,7 +3637,11 @@ apply matrix_eq'. {
   }
   assert (Hvr : v < mat_nrows M - 1). {
     rewrite mat_transp_ncols in Hv. 2: {
-      rewrite mat_ncols_subm; [ flia Hc1 Hic | easy | flia Hr1 Hjr | easy ].
+      rewrite mat_ncols_subm; [ | easy ].
+      replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hr1 Hjr.
+      apply Nat.ltb_lt in Hic; rewrite Hic; cbn.
+      apply Nat.ltb_lt in Hic.
+      flia Hic Hc1.
     }
     rewrite mat_nrows_subm in Hv.
     now apply Nat.ltb_lt in Hjr; rewrite Hjr in Hv.
@@ -3736,8 +3738,9 @@ apply matrix_eq'. {
   rewrite mat_nrows_subm.
   rewrite mat_transp_nrows.
   rewrite mat_transp_nrows.
-  rewrite mat_ncols_subm; [ | easy | flia Hjr Hr1 | easy ].
-  now apply Nat.ltb_lt in Hic; rewrite Hic.
+  rewrite mat_ncols_subm; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hjr Hr1.
+  easy.
 } {
   destruct (Nat.eq_dec (mat_ncols M) 1) as [H1c| H1c]. {
     rewrite mat_transp_ncols. 2: {
