@@ -3701,15 +3701,65 @@ apply matrix_eq'. {
       now rewrite <- Hx, Hc1; cbn.
     } {
       intros l Hl.
-(**)
       apply in_map_iff in Hl.
-destruct Hl as (k & _ & Hk).
-exfalso.
-apply is_scm_mat_iff in Hcm.
-destruct Hcm as (_, Hcl).
-rewrite Hc1 in Hcl.
-clear - Hcl Hk.
-destruct M as (ll); cbn in Hcl, Hk.
+      destruct Hl as (k & _ & Hk).
+      exfalso.
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (_, Hcl).
+      rewrite Hc1 in Hcl.
+      clear - Hcl Hk.
+      destruct M as (ll); cbn in Hcl, Hk.
+      unfold mat_ncols in Hk.
+      cbn in Hk.
+      destruct j. {
+        destruct ll as [| l]; [ easy | ].
+        cbn in Hk.
+        destruct ll as [| l']; [ easy | ].
+        rewrite (List_map_hd []) in Hk; [ | cbn; flia ].
+        rewrite butn_length in Hk.
+        cbn - [ "<?" ] in Hk.
+        destruct l' as [| a]; [ easy | ].
+        destruct l' as [| b]; [ easy | ].
+        now specialize (Hcl _ (or_intror (or_introl eq_refl))).
+      }
+      destruct ll as [| l]; [ easy | ].
+      rewrite butn_cons in Hk.
+      rewrite (List_map_hd []) in Hk; [ | cbn; flia ].
+      rewrite butn_length in Hk.
+      cbn - [ "<?" ] in Hk.
+      destruct l as [| a]; [ easy | ].
+      destruct l as [| b]; [ easy | ].
+      now specialize (Hcl _ (or_introl eq_refl)).
+    }
+  }
+  apply mat_transp_is_corr.
+  now apply subm_is_corr_mat.
+} {
+  rewrite mat_nrows_subm.
+  rewrite mat_transp_nrows.
+  rewrite mat_transp_nrows.
+  rewrite mat_ncols_subm; [ | easy | flia Hjr Hr1 | easy ].
+  now apply Nat.ltb_lt in Hic; rewrite Hic.
+} {
+  destruct (Nat.eq_dec (mat_ncols M) 1) as [H1c| H1c]. {
+    rewrite H1c in Hic.
+    apply Nat.lt_1_r in Hic; subst i.
+    apply is_scm_mat_iff in Hcmt.
+    destruct Hcmt as (_, Hcl).
+...
+    rewrite mat_ncols_subm; [ | easy | | ]; cycle 1. {
+      rewrite mat_transp_nrows.
+...
+  rewrite mat_transp_nrows.
+  rewrite mat_transp_nrows.
+  rewrite mat_ncols_subm; [ | easy | flia Hjr Hr1 | easy ].
+  now apply Nat.ltb_lt in Hic; rewrite Hic.
+...
+revert ll Hcl Hk.
+induction j; intros. {
+  induction ll as [| l]; [ easy | ].
+  cbn in Hk.
+...
 revert j Hk.
 induction ll as [| l]; intros; cbn in Hk. {
   now rewrite butn_nil in Hk.
