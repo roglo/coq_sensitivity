@@ -2232,77 +2232,72 @@ Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
+  → i < mat_nrows M
   → j < mat_ncols M
   → mat_ncols (subm M i j) = if mat_nrows M <=? 1 then 0 else mat_ncols M - 1.
 Proof.
-intros * Hcm Hic.
-destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
-  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
-  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
-  rewrite Hc1 in Hic |-*.
-  apply Nat.lt_1_r in Hic; subst j.
-  rewrite Tauto.if_same; cbn.
+intros * Hcm Hir Hjc.
 ...
+destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hjc H | ].
+  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
+  rewrite Hc1 in Hjc |-*.
+  apply Nat.lt_1_r in Hjc; subst j.
+  rewrite Tauto.if_same; cbn.
+  destruct M as (ll); cbn.
+  unfold mat_ncols, subm in Hc1 |-*.
+  cbn in Hc1 |-*.
   apply is_scm_mat_iff in Hcm.
   destruct Hcm as (_, Hcl).
-  unfold mat_ncols in Hcl, Hc1 |-*.
-  destruct M as (ll); cbn in Hcl, Hc1 |-*.
+  unfold mat_ncols in Hcl; cbn in Hcl.
   rewrite Hc1 in Hcl.
-  destruct ll as [| l1]; [ now rewrite butn_nil | ].
+  destruct i. {
+    destruct ll as [| l]; [ easy | ].
+    cbn in Hc1.
+    destruct ll as [| l']; [ easy | ].
+    rewrite (List_map_hd []); [ | cbn; flia ].
+    rewrite butn_length.
+    cbn - [ "<?" ].
+    destruct l' as [| a]; [ easy | ].
+    destruct l' as [| b]; [ easy | ].
+    now specialize (Hcl _ (or_intror (or_introl eq_refl))).
+  }
+  destruct ll as [| l]; [ easy | ].
   cbn in Hc1.
-  destruct ll as [| l2]. {
-    destruct i; [ easy | ].
-    destruct l1; [ easy | ].
-    now destruct l1.
-  }
-  rewrite (List_map_hd []). 2: {
-    rewrite butn_length; cbn - [ "-" ].
-    destruct (i <=? S (length ll)); cbn; flia.
-  }
+  rewrite butn_cons.
+  rewrite (List_map_hd []); [ | cbn; flia ].
   rewrite butn_length.
-  rewrite List_hd_nth_0.
-  rewrite nth_butn.
-  rewrite Nat.add_0_l.
-  unfold Nat.b2n.
-  rewrite if_leb_le_dec.
-  destruct (le_dec i 0) as [Hiz| Hiz]. {
-    destruct l2; [ easy | cbn ].
-    specialize (Hcl _ (or_intror (or_introl eq_refl))).
-    cbn in Hcl.
-    now apply Nat.succ_inj in Hcl; rewrite Hcl.
-  }
-  now cbn; rewrite Hc1.
+  cbn - [ "<?" ].
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]; [ easy | ].
+  now specialize (Hcl _ (or_introl eq_refl)).
 }
 apply Nat.nle_gt in H1c.
-unfold mat_ncols in H1c, Hic |-*.
+rewrite if_leb_le_dec.
+destruct (le_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+    unfold mat_nrows in Hrz.
+    apply length_zero_iff_nil in Hrz.
+    unfold mat_ncols; cbn; rewrite Hrz.
+    now rewrite butn_nil.
+  }
+  assert (H : mat_nrows M = 1) by flia Hr1 Hrz.
+  clear Hr1 Hrz; rename H into Hr1.
+  rewrite Hr1 in Hir.
+  apply Nat.lt_1_r in Hir; subst i.
+  unfold mat_ncols, subm; cbn.
+  unfold mat_nrows in Hr1.
+  destruct M as (ll); cbn in Hr1 |-*.
+  destruct ll as [| l]; [ easy | ].
+  now destruct ll.
+}
+apply Nat.nle_gt in Hr1.
+unfold mat_ncols in H1c, Hjc |-*.
 destruct M as (ll); cbn in *.
 destruct ll as [| l]; [ easy | ].
-destruct ll as [| l']. {
-  cbn in Hic, H1c.
-  destruct l as [| a]; [ easy | ].
-  destruct l as [| b]; [ cbn in H1c; flia H1c | cbn ].
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
-  rewrite (List_map_hd []). 2: {
-    rewrite butn_length.
-    cbn - [ "-" ].
-    unfold Nat.b2n.
-    destruct i; [ easy | cbn; flia ].
-  }
-  rewrite butn_length.
-...
-  cbn - [ "-" "<?" ].
-  rewrite List_hd_nth_0.
-  rewrite nth_butn.
-  rewrite Nat.add_0_l.
-  destruct i; [ easy | ].
-  cbn - [ "<?" length ].
-  apply Nat.ltb_lt in Hic; rewrite Hic.
-  cbn.
-
-...
-destruct ll as [| l']; [ cbn in H1r; flia H1r | ].
-clear H1r.
-cbn in H1c, Hic.
+destruct ll as [| l']; [ cbn in Hr1; flia Hr1 | ].
+clear Hr1.
+cbn in H1c, Hjc.
 apply is_scm_mat_iff in Hcm.
 destruct Hcm as (Hcr, Hcm).
 cbn in Hcr |-*.
@@ -2317,34 +2312,8 @@ cbn; rewrite butn_length.
 unfold Nat.b2n; rewrite if_ltb_lt_dec.
 now destruct (lt_dec j (length l)).
 Qed.
-...
-  unfold mat_ncols in Hc1 |-*.
-  unfold subm; cbn.
-...
-  apply Nat.lt_1_r in Hic; subst j.
-  unfold mat_ncols, subm; cbn.
-  unfold mat_ncols in Hc1.
-  destruct M as (ll).
-  cbn in Hc1 |-*.
-(**)
-  apply is_scm_mat_iff in Hcm.
-  destruct Hcm as (_, Hcl).
-  unfold mat_ncols in Hcl; cbn in Hcl.
-  rewrite Hc1 in Hcl.
-Search (if _ then _ else _).
-rewrite Tauto.if_same.
-...
-  destruct ll as [| la1]; [ easy | ].
-  destruct ll as [| la2]. {
-    cbn in Hc1 |-*.
-    destruct la1 as [| a]; [ easy | ].
-    destruct la1; [ | easy ].
-    now destruct i.
-  }
-  cbn in Hc1 |-*.
-  destruct la1 as [| a]; [ easy | ].
-  destruct la1; [ | easy ].
-...
+
+(*
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
   → 1 < mat_nrows M
@@ -2400,6 +2369,7 @@ cbn; rewrite butn_length.
 unfold Nat.b2n; rewrite if_ltb_lt_dec.
 now destruct (lt_dec j (length l)).
 Qed.
+*)
 
 Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
   i < mat_nrows M
@@ -2424,6 +2394,8 @@ split. {
   rewrite mat_ncols_subm in Hcs; [ | | flia Hi Hr1 | easy ]. 2: {
     now apply squ_mat_is_corr.
   }
+  rewrite if_leb_le_dec in Hcs.
+  destruct (le_dec (mat_nrows M) 1) as [H| H]; [ flia Hr1 Hi H | ].
   flia Hcs Hj Hcm Hr1.
 } {
   intros l Hl.
@@ -2475,7 +2447,10 @@ split. {
         destruct (Nat.eq_dec (mat_ncols A) 0) as [Hcz| Hcz]. {
           flia Hjc Hcz.
         }
-        intros H; flia Hc1 Hcz H.
+        rewrite if_leb_le_dec.
+        intros H.
+        destruct (le_dec (mat_nrows A) 1) as [H1| H1]; [ flia H1 | ].
+        flia Hc1 Hcz H.
       }
       apply Nat.nlt_ge in H1r.
       flia H1r Hir.
@@ -2559,6 +2534,8 @@ split. {
   specialize (in_butn _ _ _ Hla) as H.
   specialize (Hc _ H) as H1; clear H.
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
+    rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | | easy ]. 2: {
+...
     rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | easy | easy ].
     rewrite butn_length.
     unfold Nat.b2n; rewrite if_ltb_lt_dec, H1.
