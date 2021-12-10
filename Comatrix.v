@@ -3511,8 +3511,6 @@ rewrite seq_nth. 2: {
 easy.
 Qed.
 
-...
-
 Theorem comatrix_transp_matrix_mul : in_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -3546,6 +3544,18 @@ intros j Hj; apply in_seq in Hj.
 move j before i.
 rewrite laplace_formula_on_cols with (j := j); [ | easy | easy | easy ].
 unfold mat_mul_el.
+rewrite mat_transp_ncols.
+(**)
+rewrite comatrix_ncols.
+unfold mat_ncols.
+rewrite Hcl; [ | now apply List_hd_in ].
+rewrite comatrix_nrows.
+cbn - [ mat_el comatrix ].
+apply Nat.neq_0_lt_0 in Hlz.
+apply Nat.eqb_neq in Hlz; rewrite Hlz.
+apply Nat.eqb_neq, Nat.neq_0_lt_0 in Hlz.
+(*
+...
 rewrite mat_transp_ncols. 2: {
   rewrite comatrix_ncols; unfold mat_ncols; cbn.
   rewrite Hcl; [ flia Hlz | ].
@@ -3553,6 +3563,7 @@ rewrite mat_transp_ncols. 2: {
 }
 rewrite comatrix_nrows.
 cbn - [ mat_el comatrix ].
+*)
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   (* diagonal *)
   subst j; rewrite δ_diag, rngl_mul_1_r.
@@ -3625,6 +3636,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ determinant ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
+...
+Check mat_transp_subm.
 Theorem mat_transp_subm : ∀ M i j,
   is_correct_matrix M = true
   → mat_nrows M ≠ 1
