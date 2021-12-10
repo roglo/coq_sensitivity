@@ -3674,9 +3674,38 @@ destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
   rewrite skipn_all2; [ | rewrite seq_length; flia Hjr ].
   rewrite app_nil_r.
   apply map_ext_in.
-  intros k Hk; apply in_seq in Hk.
+  intros u Hu; apply in_seq in Hu.
   rewrite <- map_butn.
-(* ah, l'autre enculé, là *)
+  unfold butn at 1.
+  rewrite List_firstn_seq.
+  rewrite Nat.min_l; [ | flia Hjr ].
+  destruct (Nat.eq_dec j (mat_nrows M - 1)) as [Hjr1| Hjr1]. {
+    rewrite Hjr1.
+    rewrite skipn_all2; [ | rewrite seq_length; flia Hjr ].
+    rewrite app_nil_r.
+    apply map_ext_in.
+    intros v Hv.
+    rewrite map_butn.
+    rewrite nth_butn.
+    apply in_seq in Hv.
+    destruct Hv as (_, Hv); cbn in Hv.
+    apply Nat.leb_gt in Hv; rewrite Hv.
+    apply Nat.leb_gt in Hv.
+    rewrite Nat.add_0_r.
+    rewrite (List_map_nth' []); [ | rewrite fold_mat_nrows; flia Hv ].
+    rewrite nth_butn.
+    destruct Hu as (_, Hu); cbn in Hu.
+    apply Nat.leb_gt in Hu; rewrite Hu.
+    now rewrite Nat.add_0_r.
+  }
+  replace (mat_nrows M - 1) with (j + (mat_nrows M - 1 - j)) at 1. 2: {
+    flia Hjr Hjr1.
+  }
+  rewrite seq_app, Nat.add_0_l.
+  do 2 rewrite map_app.
+  f_equal. {
+    apply map_ext_in.
+    intros v Hv; apply in_seq in Hv.
 ...
 ... suite ok
 }
