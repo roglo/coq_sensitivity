@@ -2366,64 +2366,6 @@ apply Nat.ltb_ge in Hjc.
 now rewrite Hjc, Nat.sub_0_r.
 Qed.
 
-(*
-Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
-  is_correct_matrix M = true
-  → 1 < mat_nrows M
-  → j < mat_ncols M
-  → mat_ncols (subm M i j) = mat_ncols M - 1.
-Proof.
-intros * Hcm H1r Hic.
-destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
-  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
-  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
-  rewrite Hc1 in Hic |-*.
-  apply Nat.lt_1_r in Hic; subst j.
-  unfold mat_ncols, subm; cbn.
-  unfold mat_ncols in Hc1.
-  destruct M as (ll).
-  cbn in Hc1 |-*.
-  destruct ll as [| la1]; [ easy | ].
-  cbn in H1r, Hc1 |-*.
-  apply Nat.succ_lt_mono in H1r.
-  destruct ll as [| la2]; [ easy | ].
-  destruct i. {
-    cbn.
-    destruct la2 as [| a2]; [ easy | ].
-    apply is_scm_mat_iff in Hcm.
-    destruct Hcm as (Hcr, Hc).
-    cbn in Hc.
-    specialize (Hc (a2 :: la2) (or_intror (or_introl eq_refl))).
-    rewrite Hc1 in Hc; cbn in Hc.
-    now apply Nat.succ_inj in Hc.
-  }
-  cbn.
-  destruct la1 as [| a1]; [ easy | cbn in Hc1 ].
-  now apply Nat.succ_inj in Hc1.
-}
-apply Nat.nle_gt in H1c.
-unfold mat_ncols in H1c, Hic |-*.
-destruct M as (ll); cbn in *.
-destruct ll as [| l]; [ easy | ].
-destruct ll as [| l']; [ cbn in H1r; flia H1r | ].
-clear H1r.
-cbn in H1c, Hic.
-apply is_scm_mat_iff in Hcm.
-destruct Hcm as (Hcr, Hcm).
-cbn in Hcr |-*.
-unfold mat_ncols in Hcm; cbn in Hcm.
-destruct i. {
-  specialize (Hcm l' (or_intror (or_introl eq_refl))) as H1.
-  cbn; rewrite butn_length; rewrite H1.
-  unfold Nat.b2n; rewrite if_ltb_lt_dec.
-  now destruct (lt_dec j (length l)).
-}
-cbn; rewrite butn_length.
-unfold Nat.b2n; rewrite if_ltb_lt_dec.
-now destruct (lt_dec j (length l)).
-Qed.
-*)
-
 Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
   i < mat_nrows M
   → j < mat_nrows M
@@ -2590,15 +2532,9 @@ split. {
   specialize (in_butn _ _ _ Hla) as H.
   specialize (Hc _ H) as H1; clear H.
   destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
-(**)
     rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff ].
-...
-    rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | | easy ]. 2: {
-...
-    rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff | easy | easy ].
-    rewrite butn_length.
-    unfold Nat.b2n; rewrite if_ltb_lt_dec, H1.
-    destruct (lt_dec j (mat_ncols A)) as [H| H]; [ easy | flia Hjc H ].
+    replace (mat_nrows A) with (S (S (mat_nrows A - 2))) by flia H1r.
+    now rewrite butn_length, H1.
   }
   apply Nat.nlt_ge in Hjc.
   unfold butn.
