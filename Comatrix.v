@@ -3702,12 +3702,37 @@ apply matrix_eq'. {
     } {
       intros l Hl.
 (**)
+      apply in_map_iff in Hl.
+destruct Hl as (k & _ & Hk).
+exfalso.
+apply is_scm_mat_iff in Hcm.
+destruct Hcm as (_, Hcl).
+rewrite Hc1 in Hcl.
+clear - Hcl Hk.
+destruct M as (ll); cbn in Hcl, Hk.
+revert j Hk.
+induction ll as [| l]; intros; cbn in Hk. {
+  now rewrite butn_nil in Hk.
+}
+destruct j. {
+  cbn in Hk.
+...
+(**)
+
       unfold mat_ncols in Hc1.
       destruct M as (ll); cbn in *.
       destruct ll as [| l']; [ easy | ].
       destruct ll as [| l'']; [ easy | ].
       cbn in Hc1.
       apply in_map_iff in Hl.
+(**)
+destruct Hl as (k & _ & Hk).
+exfalso.
+apply is_scm_mat_iff in Hcm.
+destruct Hcm as (_, Hcl).
+cbn - [ In ] in Hcl.
+rewrite Hc1 in Hcl.
+...
       destruct Hl as (k & Hkl & Hk).
       rewrite <- Hkl.
       do 2 rewrite map_length.
