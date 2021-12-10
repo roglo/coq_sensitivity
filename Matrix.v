@@ -2232,6 +2232,111 @@ Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
+  → j < mat_ncols M
+  → mat_ncols (subm M i j) = if mat_nrows M <=? 1 then 0 else mat_ncols M - 1.
+Proof.
+intros * Hcm Hic.
+destruct (le_dec (mat_ncols M) 1) as [H1c| H1c]. {
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hic H | ].
+  assert (Hc1 : mat_ncols M = 1) by flia H1c H; clear H1c H.
+  rewrite Hc1 in Hic |-*.
+  apply Nat.lt_1_r in Hic; subst j.
+  rewrite Tauto.if_same; cbn.
+  apply is_scm_mat_iff in Hcm.
+  destruct Hcm as (_, Hcl).
+  unfold mat_ncols in Hcl, Hc1 |-*.
+  destruct M as (ll); cbn in Hcl, Hc1 |-*.
+  rewrite Hc1 in Hcl.
+  destruct ll as [| l1]; [ now rewrite butn_nil | ].
+  cbn in Hc1.
+  destruct ll as [| l2]. {
+    destruct i; [ easy | ].
+    destruct l1; [ easy | ].
+    now destruct l1.
+  }
+  rewrite (List_map_hd []). 2: {
+    rewrite butn_length; cbn - [ "-" ].
+    destruct (i <=? S (length ll)); cbn; flia.
+  }
+  rewrite butn_length.
+  rewrite List_hd_nth_0.
+  rewrite nth_butn.
+  rewrite Nat.add_0_l.
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec i 0) as [Hiz| Hiz]. {
+    destruct l2; [ easy | cbn ].
+    specialize (Hcl _ (or_intror (or_introl eq_refl))).
+    cbn in Hcl.
+    now apply Nat.succ_inj in Hcl; rewrite Hcl.
+  }
+  now cbn; rewrite Hc1.
+}
+apply Nat.nle_gt in H1c.
+unfold mat_ncols in H1c, Hic |-*.
+destruct M as (ll); cbn in *.
+destruct ll as [| l]; [ easy | ].
+destruct ll as [| l']. {
+  cbn in Hic, H1c.
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]; [ cbn in H1c; flia H1c | cbn ].
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ now subst i | ].
+  rewrite (List_map_hd []). 2: {
+    rewrite butn_length.
+    cbn - [ "-" ].
+    unfold Nat.b2n.
+    destruct i; [ easy | cbn; flia ].
+  }
+  rewrite butn_length.
+  cbn - [ "-" "<?" ].
+...
+destruct ll as [| l']; [ cbn in H1r; flia H1r | ].
+clear H1r.
+cbn in H1c, Hic.
+apply is_scm_mat_iff in Hcm.
+destruct Hcm as (Hcr, Hcm).
+cbn in Hcr |-*.
+unfold mat_ncols in Hcm; cbn in Hcm.
+destruct i. {
+  specialize (Hcm l' (or_intror (or_introl eq_refl))) as H1.
+  cbn; rewrite butn_length; rewrite H1.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec.
+  now destruct (lt_dec j (length l)).
+}
+cbn; rewrite butn_length.
+unfold Nat.b2n; rewrite if_ltb_lt_dec.
+now destruct (lt_dec j (length l)).
+Qed.
+...
+  unfold mat_ncols in Hc1 |-*.
+  unfold subm; cbn.
+...
+  apply Nat.lt_1_r in Hic; subst j.
+  unfold mat_ncols, subm; cbn.
+  unfold mat_ncols in Hc1.
+  destruct M as (ll).
+  cbn in Hc1 |-*.
+(**)
+  apply is_scm_mat_iff in Hcm.
+  destruct Hcm as (_, Hcl).
+  unfold mat_ncols in Hcl; cbn in Hcl.
+  rewrite Hc1 in Hcl.
+Search (if _ then _ else _).
+rewrite Tauto.if_same.
+...
+  destruct ll as [| la1]; [ easy | ].
+  destruct ll as [| la2]. {
+    cbn in Hc1 |-*.
+    destruct la1 as [| a]; [ easy | ].
+    destruct la1; [ | easy ].
+    now destruct i.
+  }
+  cbn in Hc1 |-*.
+  destruct la1 as [| a]; [ easy | ].
+  destruct la1; [ | easy ].
+...
+Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
+  is_correct_matrix M = true
   → 1 < mat_nrows M
   → j < mat_ncols M
   → mat_ncols (subm M i j) = mat_ncols M - 1.
