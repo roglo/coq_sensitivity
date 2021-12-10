@@ -3701,6 +3701,53 @@ apply matrix_eq'. {
       now rewrite <- Hx, Hc1; cbn.
     } {
       intros l Hl.
+(**)
+      unfold mat_ncols in Hc1.
+      destruct M as (ll); cbn in *.
+      destruct ll as [| l']; [ easy | ].
+      destruct ll as [| l'']; [ easy | ].
+      cbn in Hc1.
+      apply in_map_iff in Hl.
+      destruct Hl as (k & Hkl & Hk).
+      rewrite <- Hkl.
+      do 2 rewrite map_length.
+      rewrite seq_length.
+      apply in_seq in Hk.
+      cbn in Hk.
+      apply is_scm_mat_iff in Hcm.
+      destruct Hcm as (Hcr, Hcl).
+      cbn - [ In ] in Hcl.
+      unfold mat_ncols; cbn.
+      rewrite Hcl. 2: {
+        unfold mat_ncols; cbn - [ In ].
+        rewrite (List_map_hd []). 2: {
+          rewrite butn_length.
+          now apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+        }
+        rewrite (List_map_hd 0). 2: {
+          rewrite seq_length.
+          rewrite butn_length.
+          rewrite List_hd_nth_0.
+          rewrite nth_butn.
+          cbn - [ nth "<?" ].
+          unfold Nat.b2n.
+          rewrite if_leb_le_dec.
+          destruct (le_dec j 0) as [Hjz| Hjz]. {
+            apply Nat.le_0_r in Hjz; subst j.
+            unfold mat_ncols in Hk.
+            cbn - [ map ] in Hk.
+            rewrite (List_map_hd []) in Hk; [ | now cbn ].
+            cbn - [ butn ] in Hk.
+            rewrite butn_length in Hk.
+            rewrite Hcl in Hk; [ | now right; left ].
+            rewrite Hc1 in Hk; cbn in Hk.
+            easy.
+          }
+          exfalso.
+          apply Nat.nle_gt in Hjz.
+          rewrite map_length in Hkl.
+          rewrite butn_length in Hkl.
+...
       unfold mat_ncols in Hl; cbn in Hl.
       unfold mat_ncols in Hl; cbn in Hl.
       unfold mat_ncols in Hc1; cbn in Hc1.
