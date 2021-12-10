@@ -3338,9 +3338,10 @@ destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
   now rewrite H1, Hcz.
 }
 apply is_scm_mat_iff.
+rewrite mat_transp_ncols.
+apply Nat.eqb_neq in Hcz; rewrite Hcz.
+apply Nat.eqb_neq in Hcz.
 split. {
-...
-  rewrite mat_transp_ncols; [ | easy ].
   intros Hr.
   unfold mat_nrows in Hr.
   unfold mat_ncols in Hcz.
@@ -3348,7 +3349,6 @@ split. {
   now rewrite Hr in Hcz.
 } {
   intros l Hl.
-  rewrite mat_transp_ncols; [ | easy ].
   unfold mat_transp in Hl; cbn in Hl.
   apply in_map_iff in Hl.
   destruct Hl as (j & Hjl & Hj).
@@ -3434,7 +3434,10 @@ apply matrix_eq'; cycle 1. {
   now apply mat_transp_is_corr, subm_is_corr_mat.
 } {
   apply subm_is_corr_mat; [ | easy ].
-  rewrite mat_transp_ncols; [ congruence | flia Hi ].
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  rewrite Hcr in Hc1.
+  now destruct (Nat.eq_dec (mat_ncols M) 0).
 } {
   rewrite mat_transp_nrows.
   rewrite mat_nrows_subm.
@@ -3442,6 +3445,17 @@ apply matrix_eq'; cycle 1. {
   replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
   now rewrite mat_transp_nrows.
 } {
+  rewrite mat_transp_ncols.
+  rewrite mat_ncols_subm; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
+  rewrite mat_ncols_subm; [ | easy ].
+  rewrite mat_transp_nrows.
+  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) at 3 by flia Hc1 Hi.
+  rewrite mat_transp_ncols.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+...
+    now apply mat_nrows_subm.
+...
   rewrite mat_transp_ncols. 2: {
     rewrite mat_ncols_subm; [ | easy ].
     replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
@@ -3513,6 +3527,8 @@ rewrite seq_nth. 2: {
 }
 easy.
 Qed.
+
+...
 
 Theorem comatrix_transp_matrix_mul : in_field →
   ∀ (M : matrix T),
