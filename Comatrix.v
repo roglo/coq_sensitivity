@@ -3976,10 +3976,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Inspect 2.
-
-...
-
 Definition mat_inv (M : matrix T) := ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
 Theorem mat_mul_inv_r : in_field →
@@ -4031,22 +4027,12 @@ rewrite mat_mul_scal_l_mul; [ | now destruct Hif | ]. 2: {
   apply mat_transp_is_square.
   now apply comatrix_is_square.
 }
-...
-rewrite comatrix_transp_matrix_mul.
-Search (_ ⁺ * _)%M.
-Check matrix_comatrix_transp_mul.
-...
-intros Hic Hop Hiv Hit H10 Hde Hch *.
-intros Hdz.
-unfold mat_inv.
-rewrite mat_mul_scal_l_mul; [ | easy ].
-...
-rewrite matrix_comatrix_mul; try easy.
-rewrite mat_mul_scal_l_mul_assoc; [ | easy ].
-rewrite rngl_mul_inv_l; [ | easy | easy ].
+rewrite comatrix_transp_matrix_mul; [ | easy | easy ].
+rewrite mat_mul_scal_l_mul_assoc.
+rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
 End a.
 
-Arguments comatrix {T}%type {ro} {n}%nat M%M.
+Arguments comatrix {T}%type {ro} M%M.
