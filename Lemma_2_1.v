@@ -88,8 +88,7 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-...
-rewrite <- (rngl_mul_0_r 0).
+rewrite <- (rngl_mul_0_r (or_introl Hop) 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
@@ -110,6 +109,8 @@ destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   }
 }
 Qed.
+
+...
 
 Definition is_ordered_field :=
   rngl_is_comm = true ∧
