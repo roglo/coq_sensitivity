@@ -1048,8 +1048,21 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
 Proof.
 intros * Hn; subst n.
 (**)
-apply vector_eq.
+apply vector_eq. 2: {
+  cbn; do 2 rewrite map_length.
+  apply seq_length.
+}
 intros i Hi.
+cbn in Hi; do 2 rewrite map_length in Hi.
+rewrite seq_length in Hi; cbn.
+rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+unfold vect_dot_mul; cbn.
+destruct V as (l); cbn in Hi |-*.
+rewrite (List_seq_cut i); [ | now apply in_seq ].
+do 2 rewrite map_app; cbn.
+rewrite δ_diag, Nat.sub_0_r.
 ...
 apply vector_eq.
 intros i.
