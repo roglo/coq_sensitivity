@@ -1063,14 +1063,16 @@ destruct V as (l); cbn in Hi |-*.
 rewrite map2_map_l.
 rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
 rewrite Nat.sub_0_r.
-Print map2.
-...
 rewrite map2_app_l.
 rewrite seq_length.
-
+erewrite map2_ext_in. 2: {
+  intros j k Hj Hk; apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  rewrite δ_ndiag; [ | flia Hj ].
+  rewrite rngl_mul_0_l; [ easy | now left ].
+}
 Search (∑ (_ ∈ _ ++ _), _).
 Search (∏ (_ ∈ _ ++ _), _).
-Search (map2 _ (_  ++ _)).
 ...
 do 2 rewrite map_app; cbn.
 rewrite δ_diag, Nat.sub_0_r.
