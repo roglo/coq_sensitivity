@@ -35,9 +35,7 @@ Definition is_symm_mat (A : matrix T) :=
    mat_nrows partout ? ou bien "min (mat_nrows M) (mat_ncols M)" ?
  *)
 
-...
-
-Definition princ_subm_1 m n (A : matrix T) k := subm A k k.
+Definition princ_subm_1 (A : matrix T) k := subm A k k.
 
 Theorem Nat_sub_length_nil_r : ∀ n, n = n - @length nat [].
 Proof.
@@ -52,18 +50,18 @@ intros.
 now rewrite <- Nat.sub_add_distr.
 Qed.
 
-Fixpoint mat_princ_subm n (A : matrix n n T) l :
-    matrix (n - length l) (n - length l) T :=
+Fixpoint mat_princ_subm (A : matrix T) l : matrix T :=
   match l with
-  | [] =>
-      eq_rect _ (λ m, matrix m m T) A _ (Nat_sub_length_nil_r n)
-  | i :: l' =>
-      eq_rect _ (λ m, matrix m m T) (mat_princ_subm (subm A i i) l') _
-        (Nat_sub_1_sub_length n l')
+  | [] => A
+  | i :: l' => mat_princ_subm (subm A i i) l'
   end.
 
-Theorem subm_z : ∀ f i j, subm (mk_mat 0 0 f) i j = mZ 0 0.
-Proof. now intros; apply matrix_eq. Qed.
+Theorem subm_z : ∀ i j, subm (mk_mat []) i j = mZ 0 0.
+Proof.
+intros.
+unfold subm, mZ; cbn.
+now rewrite butn_nil.
+Qed.
 
 Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
@@ -78,10 +76,10 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
 
 (* Rayleigh quotient *)
 
-Definition Rayleigh_quotient n (M : matrix n n T) (x : vector n T) :=
+Definition Rayleigh_quotient (M : matrix T) (x : vector T) :=
   (≺ x, M • x ≻ / ≺ x, x ≻)%F.
 
-Arguments Rayleigh_quotient [n]%nat_scope M%M x%V.
+Arguments Rayleigh_quotient M%M x%V.
 
 Theorem rngl_0_le_squ :
   rngl_has_dec_le = true →
@@ -90,6 +88,7 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
+...
 rewrite <- (rngl_mul_0_r 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
