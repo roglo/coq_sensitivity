@@ -1002,6 +1002,17 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   → (mI n • V)%M = V.
 Proof.
 intros * Hn; subst n.
+apply (vector_eq 0%F). 2: {
+  now cbn; do 2 rewrite map_length; rewrite seq_length.
+}
+cbn; do 2 rewrite map_length; rewrite seq_length.
+intros i Hi.
+rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+unfold vect_dot_mul; cbn.
+...
+intros * Hn; subst n.
 apply vector_eq'.
 intros i.
 remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.
