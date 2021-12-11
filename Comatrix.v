@@ -3881,27 +3881,36 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite mat_transp_nrows in H1.
   rewrite square_matrix_ncols in H1; [ | easy ].
   specialize (H1 Hi Hj Hij).
-...
-  specialize (H1 i j M Hsm_v Hi Hj Hij).
   erewrite rngl_summation_eq_compat in H1. 2: {
     intros k Hk.
     destruct Hk as (_, Hk).
     rewrite <- determinant_transpose; [ | easy | ]. 2: {
-     apply is_squ_mat_subm; [ easy | | easy ].
-     flia Hk Hi.
+      apply is_squ_mat_subm. {
+        rewrite mat_transp_nrows, square_matrix_ncols; [ | easy ].
+        flia Hk Hi.
+      } {
+        rewrite mat_transp_nrows, square_matrix_ncols; [ | easy ].
+        flia Hk Hi.
+      }
+      now apply mat_transp_is_square.
     }
-    rewrite <- mat_transp_subm; [ | | | | easy ]; cycle 1. {
+    rewrite mat_transp_subm; cycle 1. {
       now apply squ_mat_is_corr.
     } {
-      intros H; rewrite H in Hi, Hj.
-      now apply Nat.lt_1_r in Hi, Hj; subst i j.
+...
     } {
-      rewrite square_matrix_ncols; [ | easy ].
+...
+    } {
       flia Hk Hi.
     }
-    rewrite <- mat_transp_el; [ | now apply squ_mat_is_corr ].
+Search ((_⁺)⁺)%M.
+...
+    rewrite mat_transp_el; [ | now apply squ_mat_is_corr ].
+    rewrite Nat.add_comm.
     easy.
   }
+  cbn - [ determinant ] in H1.
+...
 Search (determinant _⁺).
 Search ((subm _ _ _)⁺)%M.
 (*
