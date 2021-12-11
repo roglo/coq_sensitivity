@@ -28,12 +28,8 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Definition is_symm_mat (A : matrix T) :=
-  ∀ i j, i < mat_nrows A → j < mat_ncols A → mat_el A i j = mat_el A j i.
-
-(* ouais, mais faut que ce soye une matrice carrée ! alors je mets
-   mat_nrows partout ? ou bien "min (mat_nrows M) (mat_ncols M)" ?
- *)
+Definition is_sym_mat (A : matrix T) :=
+  ∀ i j, i < mat_nrows A → j < mat_nrows A → mat_el A i j = mat_el A j i.
 
 Definition princ_subm_1 (A : matrix T) k := subm A k k.
 

@@ -3267,7 +3267,7 @@ destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
 }
 assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
 assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
-apply matrix_eq'; cycle 1. {
+apply matrix_eq; cycle 1. {
   now apply mat_transp_is_corr, subm_is_corr_mat.
 } {
   apply subm_is_corr_mat; [ | easy ].

@@ -149,7 +149,7 @@ split. {
 }
 Qed.
 
-Theorem matrix_eq' : ∀ T (ro : ring_like_op T) MA MB,
+Theorem matrix_eq : ∀ T (ro : ring_like_op T) MA MB,
   (∀ i j, i < mat_nrows MA → j < mat_ncols MB → mat_el MA i j = mat_el MB i j)
   → is_correct_matrix MA = true
   → is_correct_matrix MB = true
@@ -223,7 +223,7 @@ specialize (Hb2 lb' (or_intror (or_introl eq_refl))).
 congruence.
 Qed.
 
-Theorem matrix_eq : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
+Theorem matrix_eq' : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
   (∀ i j,
    nth_nth_error (mat_list_list MA) i j =
    nth_nth_error (mat_list_list MB) i j)
@@ -357,82 +357,6 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-(*
-Theorem is_sm_mat_iff {T} : ∀ (M : matrix T),
-  is_square_matrix M = true ↔
-  (mat_ncols M = 0 → mat_nrows M = 0) ∧
-  ∀ l, l ∈ mat_list_list M → length l = mat_nrows M.
-Proof.
-intros.
-unfold is_square_matrix.
-split; intros Hm. {
-  apply Bool.andb_true_iff in Hm.
-  destruct Hm as (Hrc, Hc).
-  apply Bool.orb_true_iff in Hrc.
-  split. {
-    intros Hcz.
-    destruct Hrc as [Hrc| Hrc]. {
-      apply negb_true_iff in Hrc.
-      now apply Nat.eqb_neq in Hrc.
-    } {
-      now apply Nat.eqb_eq in Hrc.
-    }
-  }
-  intros l Hl.
-  remember (mat_list_list M) as ll eqn:Hll.
-  clear Hll.
-  induction ll as [| la]; [ easy | cbn ].
-  rewrite iter_list_cons in Hc; cycle 1; try easy. {
-    intros b; apply andb_true_r.
-  } {
-    intros; apply andb_assoc.
-  }
-  apply Bool.andb_true_iff in Hc.
-  destruct Hc as (Hla, Hc).
-  apply Nat.eqb_eq in Hla.
-  destruct Hl as [Hl| Hl]; [ now subst l | ].
-  now apply IHll.
-} {
-  destruct Hm as (Hrc & Hc).
-  apply Bool.andb_true_iff.
-  split. {
-    apply Bool.orb_true_iff.
-    destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
-      now right; apply Nat.eqb_eq.
-    }
-    left.
-    apply negb_true_iff.
-    apply Nat.eqb_neq.
-    intros H.
-    now apply Hnz, Hrc.
-  }
-  remember (mat_list_list M) as ll eqn:Hll.
-  clear Hll.
-  induction ll as [| la]; [ easy | ].
-  rewrite iter_list_cons; cycle 1; try easy. {
-    intros b; apply andb_true_r.
-  } {
-    intros; apply andb_assoc.
-  }
-  apply Bool.andb_true_iff.
-  split; [ now apply Nat.eqb_eq, Hc; left | ].
-  apply IHll.
-  intros l Hl.
-  now apply Hc; right.
-}
-Qed.
-*)
-
-(*
-Theorem square_matrix_nrows {n T} : ∀ (M : matrix T),
-  is_square_matrix M = true
-  → mat_nrows M = n.
-Proof.
-intros * Hm.
-now apply is_sm_mat_iff in Hm.
-Qed.
-*)
-
 Theorem square_matrix_ncols {T} : ∀ (M : matrix T),
   is_square_matrix M = true
   → mat_ncols M = mat_nrows M.
@@ -488,15 +412,6 @@ Context {rp : ring_like_prop T}.
 Definition mat_add (MA MB : matrix T) : matrix T :=
   mk_mat (map2 (map2 rngl_add) (mat_list_list MA) (mat_list_list MB)).
 
-(*
-End a.
-
-Require Import Nrl.
-Print Nrl.
-Check nat_ring_like_op.
-Compute (mat_add nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3]; [12;0;13]])).
-*)
-
 (* multiplication *)
 
 Definition mat_mul_el MA MB i k :=
@@ -506,14 +421,6 @@ Definition mat_mul (MA MB : matrix T) : matrix T :=
   mk_mat
     (map (λ i, map (mat_mul_el MA MB i) (seq 0 (mat_ncols MB)))
        (seq 0 (mat_nrows MA))).
-
-(*
-End a.
-
-Require Import Nrl.
-Compute (mat_mul nat_ring_like_op (mat_of_list_list [[2;3;5]; [3;8;17]]) (mat_of_list_list [[17;22;3;5]; [12;0;13;0]; [7;15;3;2]])).
-     = {| mat_list_list := [[105; 119; 60; 20]; [266; 321; 164; 49]] |}
-*)
 
 (* opposite *)
 
@@ -535,24 +442,10 @@ Definition vect_of_mat_col (M : matrix T) j :=
 Definition mat_vect_concat (M : matrix T) V :=
   mk_mat (map2 (λ row e, row ++ [e]) (mat_list_list M) (vect_list V)).
 
-(*
-End a.
-Compute (list_list_of_mat (mat_vect_concat (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-*)
-
 (* multiplication of a matrix by a vector *)
 
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
   mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
-
-(*
-End a.
-Require Import Nrl.
-Compute (list_of_vect (mat_mul_vect_r nat_ring_like_op (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-Compute (1*43+2*12+3*29).
-Compute (5*43+6*12+7*29).
-Compute (9*43+10*12+11*29).
-*)
 
 (* multiplication of a matrix by a scalar *)
 
@@ -563,13 +456,6 @@ Definition mat_mul_scal_l s (M : matrix T) :=
 
 Definition mat_repl_vect k (M : matrix T) (V : vector T) :=
   mk_mat (map2 (replace_at k) (mat_list_list M) (vect_list V)).
-
-(*
-End a.
-Compute (list_list_of_mat (mat_repl_vect 2 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-Compute (list_list_of_mat (mat_repl_vect 0 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-Compute (list_list_of_mat (mat_repl_vect 15 (mat_of_list_list [[1; 2; 3; 4]; [5; 6; 7; 8]; [9; 10; 11; 12]]) (vect_of_list [43; 12; 29]))).
-*)
 
 Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   is_correct_matrix M = true
@@ -728,13 +614,6 @@ Qed.
 Definition mZ m n : matrix T :=
   mk_mat (repeat (repeat 0%F n) m).
 
-(*
-End a.
-Require Import Nrl.
-Compute (mZ nat_ring_like_op 2 7).
-Compute (mZ nat_ring_like_op 7 2).
-*)
-
 (* identity square matrix of dimension n *)
 
 Definition δ i j := if i =? j then 1%F else 0%F.
@@ -761,13 +640,6 @@ unfold δ.
 rewrite if_eqb_eq_dec.
 now destruct (Nat.eq_dec i j).
 Qed.
-
-(*
-End a.
-Require Import Nrl.
-Compute (mI nat_ring_like_op 2).
-Compute (mI nat_ring_like_op 7).
-*)
 
 End a.
 
@@ -1919,13 +1791,6 @@ Definition mat_transp (M : matrix T) : matrix T :=
     (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
        (seq 0 (mat_ncols M))).
 
-(*
-End a.
-Require Import Nrl.
-Compute (mat_transp nat_ring_like_op (mk_mat [[3;2];[5;1];[8;9]])).
-Compute (mat_transp nat_ring_like_op (mk_mat [[3;5;8];[2;1;9];[10;11;12]])).
-*)
-
 Theorem fold_mat_transp : ∀ M,
   mk_mat
     (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
@@ -1937,16 +1802,6 @@ Proof. easy. Qed.
 
 Definition subm (M : matrix T) i j :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
-
-(*
-End a.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 0.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 1.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 0 2.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 0.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 1.
-Compute subm (mk_mat [[3;5;8];[2;1;9];[10;11;12]]) 1 2.
-*)
 
 (* alternative definition *)
 Definition subm' (M : matrix T) u v :=
@@ -2901,13 +2756,6 @@ Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
 Proof.
 intros.
 apply is_scm_mat_iff.
-(*
-split; cbn. {
-  rewrite List_map_seq_length.
-Check squ_mat_nrows.
-  apply squ_mat_nrows.
-}
-*)
 split. {
   intros Hc; cbn.
   rewrite List_map_seq_length.
@@ -3059,147 +2907,6 @@ destruct Hla as (lb & Hla & Hi); subst la.
 rewrite map_length.
 now apply Hc.
 Qed.
-
-(*
-Theorem mat_opt_add_opp_l : ∀ n,
-  if @rngl_has_opp (matrix n n T) _ then
-    ∀ a : matrix n n T, (- a + a)%F = 0%F
-  else True.
-Proof.
-intros.
-remember rngl_has_opp as x eqn:Hx in |-*; symmetry in Hx.
-destruct x; [ | easy ].
-intros MA.
-now apply mat_add_opp_l.
-Qed.
-
-Theorem mat_characteristic_prop : ∀ n,
-  match
-    match Nat.eq_dec n O return nat with
-    | left _ => S O
-    | right x => rngl_characteristic
-    end return Prop
-  with
-  | O =>
-      forall i : nat,
-      not
-        (@eq (matrix n n T) (@rngl_of_nat (matrix n n T) (mat_ring_like_op n) (S i))
-           (@rngl_zero (matrix n n T) (mat_ring_like_op n)))
-  | S _ =>
-      @eq (matrix n n T)
-        (@rngl_of_nat (matrix n n T) (mat_ring_like_op n)
-           match Nat.eq_dec n O return nat with
-           | left _ => S O
-           | right x => rngl_characteristic
-           end) (@rngl_zero (matrix n n T) (mat_ring_like_op n))
-  end.
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  now apply matrix_eq.
-}
-remember rngl_characteristic as c eqn:Hc.
-symmetry in Hc.
-specialize (rngl_characteristic_prop) as Hcp.
-rewrite Hc in Hcp.
-destruct c. {
-  intros.
-  apply matrix_neq; cbn.
-  intros H.
-  destruct n; [ easy | ].
-(*
-  specialize (H 0 0 (Nat.lt_0_succ _) (Nat.lt_0_succ _)).
-*)
-  specialize (H 0 0).
-(**)
-  cbn in H.
-  replace
-    (@mat_el (S n) (S n) T
-       (@rngl_of_nat (matrix (S n) (S n) T) (mat_ring_like_op (S n)) i)
-       0 0)%F
-  with (@rngl_of_nat T ro i) in H. 2: {
-    clear H.
-    induction i; [ easy | cbn ].
-    now rewrite <- IHi.
-  }
-  now specialize (Hcp i).
-}
-cbn in Hcp |-*.
-apply matrix_eq; cbn.
-intros * Hi Hn.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
-  replace
-    (@mat_el n n T (@rngl_of_nat (matrix n n T) (mat_ring_like_op n) c) i i)%F
-  with (@rngl_of_nat T ro c). 2: {
-    clear Hc.
-    clear Hcp.
-    induction c; [ easy | cbn ].
-    destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-    now rewrite <- IHc.
-  }
-  easy.
-}
-rewrite rngl_add_0_l.
-clear Hc Hcp.
-induction c; [ easy | cbn ].
-destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
-now rewrite rngl_add_0_l.
-Qed.
-
-Theorem mat_opt_eq_dec : ∀ n,
-  if rngl_has_dec_eq then ∀ a b : matrix n n T, {a = b} + {a ≠ b}
-  else not_applicable.
-Proof.
-intros.
-remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
-destruct de; [ | easy ].
-intros MA MB.
-destruct MA as (fa).
-destruct MB as (fb).
-assert (∀ i j, {fa i j = fb i j} + {fa i j ≠ fb i j}). {
-  intros.
-  now apply rngl_eq_dec.
-}
-induction n; intros; [ now left; apply matrix_eq | ].
-destruct IHn as [IHn| IHn]. {
-  injection IHn; clear IHn; intros IHn.
-  now left; subst fb.
-} {
-  right.
-  intros H1; apply IHn; clear IHn.
-  injection H1; clear H1; intros H1.
-  now subst fb.
-}
-Qed.
-
-Theorem mat_1_neq_0 : ∀ n,
-  if rngl_has_1_neq_0 && (n ≠? 0) then @mI T ro n ≠ mZ n n
-  else not_applicable.
-Proof.
-intros.
-remember (rngl_has_1_neq_0 && n ≠? 0) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Bool.andb_true_iff in Hb.
-destruct Hb as (H10, Hb).
-apply Bool.negb_true_iff in Hb.
-apply Nat.eqb_neq in Hb.
-apply matrix_neq.
-intros H; cbn in H.
-destruct n; [ easy | ].
-specialize (H 0 0); cbn in H.
-now apply rngl_1_neq_0 in H.
-Qed.
-
-Theorem mat_consistent : ∀ n,
-  let TM := matrix n n T in
-  let rom := mat_ring_like_op n in
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now intros; split; right. Qed.
-*)
 
 Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
   (MA + MB)%F = (MB + MA)%F.
