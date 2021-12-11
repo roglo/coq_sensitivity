@@ -3874,6 +3874,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 *)
   specialize (determinant_with_bad_row Hif) as H1.
   specialize (H1 i j (M⁺)%M).
+  assert (Hsmt : is_square_matrix M⁺ = true). {
+    now apply mat_transp_is_square.
+  }
+  specialize (H1 Hsmt).
 ...
   specialize (H1 i j M Hsm_v Hi Hj Hij).
   erewrite rngl_summation_eq_compat in H1. 2: {
