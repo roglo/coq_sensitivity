@@ -223,51 +223,6 @@ specialize (Hb2 lb' (or_intror (or_introl eq_refl))).
 congruence.
 Qed.
 
-Theorem matrix_eq' : ∀ T (ro : ring_like_op T) (MA MB : matrix T),
-  (∀ i j,
-   nth_nth_error (mat_list_list MA) i j =
-   nth_nth_error (mat_list_list MB) i j)
-  → MA = MB.
-Proof.
-intros * ro * Hab.
-destruct MA as (lla).
-destruct MB as (llb).
-cbn in Hab; f_equal.
-remember (length lla) as len eqn:Hlen.
-symmetry in Hlen.
-revert lla llb Hab Hlen.
-induction len; intros. {
-  apply length_zero_iff_nil in Hlen.
-  subst lla.
-  destruct llb as [| lb]; [ easy | exfalso ].
-  now specialize (Hab 0 0).
-}
-destruct lla as [| la]; [ easy | ].
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-destruct llb as [| lb]; [ now specialize (Hab 0 0) | ].
-f_equal. {
-  specialize (Hab 0); cbn in Hab.
-  revert lb Hab.
-  induction la as [| a]; intros. {
-    destruct lb as [| b]; [ easy | ].
-    now specialize (Hab 0).
-  }
-  destruct lb as [| b]; [ now specialize (Hab 0) | ].
-  f_equal. {
-    specialize (Hab 0); cbn in Hab.
-    now injection Hab.
-  }
-  apply IHla.
-  intros j.
-  now specialize (Hab (S j)).
-} {
-  apply IHlen; [ | easy ].
-  intros i j.
-  now specialize (Hab (S i) j).
-}
-Qed.
-
 Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
   mk_mat l.
 
@@ -3764,7 +3719,6 @@ Arguments subm_subm' {T}%type {ro} M%M (i j)%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
 Arguments matrix_eq {T ro} (MA MB)%M.
-Arguments matrix_eq' {T ro} (MA MB)%M.
 Arguments is_correct_matrix {T}%type M%M.
 Arguments is_square_matrix {T}%type M%M.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
