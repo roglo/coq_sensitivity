@@ -3922,6 +3922,48 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     } {
       flia Hk Hi.
     }
+Theorem mat_transp_inj : ∀ M,
+  is_correct_matrix M = true
+  → (M⁺⁺)%M = M.
+Proof.
+intros * Hcm.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  destruct M as (ll); cbn.
+  unfold mat_ncols in Hcz; cbn in Hcz.
+  apply length_zero_iff_nil in Hcz.
+  destruct ll as [| l]; [ easy | ].
+  cbn in Hcz; subst l; cbn.
+  unfold mat_transp, mat_ncols; cbn; f_equal.
+  apply is_scm_mat_iff in Hcm.
+  unfold mat_ncols in Hcm; cbn in Hcm.
+  destruct Hcm as (Hcr, _).
+  now specialize (Hcr eq_refl).
+}
+destruct M as (ll); cbn.
+unfold mat_transp, mat_ncols; cbn; f_equal.
+rewrite (List_map_nth_seq ll []) at 2.
+rewrite List_map_seq_length.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  unfold mat_ncols in Hcz.
+  cbn in Hcz.
+  now apply Nat.neq_0_lt_0.
+}
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+erewrite map_ext_in. 2: {
+  intros j Hj; apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  now cbn.
+}
+...
+2: rewrite fold_mat_ncols.
 Search ((_⁺)⁺)%M.
 ...
     rewrite mat_transp_el; [ | now apply squ_mat_is_corr ].
