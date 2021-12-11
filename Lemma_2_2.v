@@ -1652,7 +1652,7 @@ destruct n. {
     now rewrite rngl_mul_1_l in Hμ.
   }
   subst μ.
-  apply vector_eq.
+  apply vector_eq'.
   intros i; cbn.
   rewrite nth_error_map.
   unfold option_map.

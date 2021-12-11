@@ -1160,8 +1160,10 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
 
 Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
 
+Definition vect_nat_el V i := nth i (vect_list V) 0.
+
 Definition transp_list_of_permut {n} (σ : vector nat) :=
-  transp_list_of_permut_fun n (vect_el 0 σ).
+  transp_list_of_permut_fun n (vect_nat_el σ).
 
 Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j

@@ -464,7 +464,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → j < mat_ncols M
   → k < mat_ncols M
   → mat_el (mat_repl_vect k M V) i j =
-    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
+    if Nat.eq_dec j k then vect_el 0%F V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -1047,38 +1047,7 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   → (mI n • V)%M = V.
 Proof.
 intros * Hn; subst n.
-(**)
-apply vector_eq. 2: {
-  cbn; do 2 rewrite map_length.
-  apply seq_length.
-}
-intros i Hi.
-cbn in Hi; do 2 rewrite map_length in Hi.
-rewrite seq_length in Hi; cbn.
-rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
-unfold vect_dot_mul; cbn.
-destruct V as (l); cbn in Hi |-*.
-rewrite map2_map_l.
-rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
-rewrite Nat.sub_0_r.
-rewrite map2_app_l.
-rewrite seq_length.
-erewrite map2_ext_in. 2: {
-  intros j k Hj Hk; apply in_seq in Hj.
-  destruct Hj as (_, Hj); cbn in Hj.
-  rewrite δ_ndiag; [ | flia Hj ].
-  rewrite rngl_mul_0_l; [ easy | now left ].
-}
-Search (∑ (_ ∈ _ ++ _), _).
-Search (∏ (_ ∈ _ ++ _), _).
-...
-do 2 rewrite map_app; cbn.
-rewrite δ_diag, Nat.sub_0_r.
-rewrite map2_map_l.
-...
-apply vector_eq.
+apply vector_eq'.
 intros i.
 remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.
 remember (nth_error _ _) as y eqn:Hy in |-*; symmetry in Hy.

@@ -358,19 +358,14 @@ destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite seq_S.
-  rewrite rngl_product_list_app; [ | easy ].
-  cbn.
-(*
   rewrite iter_list_app.
   unfold iter_list at 1; cbn.
-*)
   easy.
 }
 cbn - [ seq ].
 rewrite Nat.sub_0_r.
 rewrite rngl_product_list_mul_distr; [ | easy ].
 rewrite seq_S.
-...
 rewrite iter_list_app.
 unfold iter_list at 1; cbn.
 rewrite IHn.
