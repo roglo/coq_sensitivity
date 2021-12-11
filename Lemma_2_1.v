@@ -110,8 +110,6 @@ destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
 }
 Qed.
 
-...
-
 Definition is_ordered_field :=
   rngl_is_comm = true ∧
   rngl_has_opp = true ∧
@@ -129,7 +127,8 @@ Theorem eq_vect_squ_0 :
   ∀ n v, ≺ v, v ≻ = 0%F → v = vect_zero n.
 Proof.
 intros Hop Hed Hdo Hor * H.
-unfold vect_dot_product in H.
+unfold vect_dot_mul in H.
+...
 apply vector_eq.
 intros i Hi.
 cbn.
