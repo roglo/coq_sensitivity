@@ -3743,10 +3743,6 @@ f_equal. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem comatrix_transp_matrix_mul : in_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -3877,7 +3873,28 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply Nat.neq_sym in Hij.
 *)
   specialize (determinant_with_bad_row Hif) as H1.
+  specialize (H1 i j (M⁺)%M).
+...
   specialize (H1 i j M Hsm_v Hi Hj Hij).
+  erewrite rngl_summation_eq_compat in H1. 2: {
+    intros k Hk.
+    destruct Hk as (_, Hk).
+    rewrite <- determinant_transpose; [ | easy | ]. 2: {
+     apply is_squ_mat_subm; [ easy | | easy ].
+     flia Hk Hi.
+    }
+    rewrite <- mat_transp_subm; [ | | | | easy ]; cycle 1. {
+      now apply squ_mat_is_corr.
+    } {
+      intros H; rewrite H in Hi, Hj.
+      now apply Nat.lt_1_r in Hi, Hj; subst i j.
+    } {
+      rewrite square_matrix_ncols; [ | easy ].
+      flia Hk Hi.
+    }
+    rewrite <- mat_transp_el; [ | now apply squ_mat_is_corr ].
+    easy.
+  }
 Search (determinant _⁺).
 Search ((subm _ _ _)⁺)%M.
 (*
