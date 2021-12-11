@@ -464,7 +464,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → j < mat_ncols M
   → k < mat_ncols M
   → mat_el (mat_repl_vect k M V) i j =
-    if Nat.eq_dec j k then vect_el 0%F V i else mat_el M i j.
+    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -1047,6 +1047,10 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   → (mI n • V)%M = V.
 Proof.
 intros * Hn; subst n.
+(**)
+apply vector_eq.
+intros i Hi.
+...
 apply vector_eq.
 intros i.
 remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.

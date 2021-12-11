@@ -29,12 +29,33 @@ Proof. easy. Qed.
 Theorem mk_vect_vect_list : ∀ A (v : vector A), mk_vect (vect_list v) = v.
 Proof. now intros; destruct v. Qed.
 
+Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
+  nth i (vect_list V) 0%F.
+
 (*
 Compute (list_of_vect (vect_of_list [3;7;2])).
 Compute (vect_of_list [3;7;2]).
 *)
 
-Theorem vector_eq {T} (U V : vector T) :
+Theorem vector_eq : ∀ T (ro : ring_like_op T) (U V : vector T),
+  (∀ i, i < vect_size U → vect_el U i = vect_el V i)
+  → vect_size U = vect_size V
+  → U = V.
+Proof.
+intros * Heq Huv.
+destruct U as (lu).
+destruct V as (lv).
+cbn in Heq, Huv; f_equal.
+rewrite (List_map_nth_seq _ 0%F); symmetry.
+rewrite (List_map_nth_seq _ 0%F); symmetry.
+rewrite <- Huv.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+now apply Heq.
+Qed.
+
+Theorem vector_eq' {T} (U V : vector T) :
   (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
   → U = V.
 Proof.
@@ -71,10 +92,8 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
-Definition vect_el d (V : vector T) i := nth i (vect_list V) d.
-
-Theorem fold_vect_el : ∀ d (V : vector T) i,
-  nth i (vect_list V) d = vect_el d V i.
+Theorem fold_vect_el : ∀ (V : vector T) i,
+  nth i (vect_list V) 0%F = vect_el V i.
 Proof. easy. Qed.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
@@ -105,6 +124,7 @@ Declare Scope V_scope.
 Delimit Scope V_scope with V.
 
 Arguments vect_dot_mul (U V)%V.
+Arguments vector_eq {T}%type {ro} (U V)%V.
 
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
@@ -137,22 +157,14 @@ specialize (ext_in_map Hab) as H1.
 cbn in H1.
 destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
 exfalso; apply Hvz; clear Hvz.
-apply vector_eq.
-intros i; cbn.
-destruct (lt_dec i (vect_size V)) as [Hiv| Hiv]. {
-  rewrite nth_error_repeat; [ | easy ].
-  rewrite nth_error_nth' with (d := 0%F); [ | easy ].
-  f_equal.
-  specialize (H1 (nth i (vect_list V) 0%F)) as H2.
-  assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
-  specialize (H2 H); clear H.
-  destruct (rngl_eq_dec Hde (vect_el 0%F V i) 0%F) as [Hvi| Hvi]; [ easy | ].
-  now apply rngl_mul_cancel_r in H2.
-}
-apply Nat.nlt_ge in Hiv.
-rewrite (proj2 (nth_error_None _ _)); [ | easy ].
-rewrite (proj2 (nth_error_None _ _)); [ easy | ].
-now rewrite repeat_length.
+apply vector_eq; [ | now cbn; rewrite repeat_length ].
+intros i Hi; cbn.
+rewrite nth_repeat.
+specialize (H1 (nth i (vect_list V) 0%F)) as H2.
+assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
+specialize (H2 H); clear H.
+destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
+now apply rngl_mul_cancel_r in H2.
 Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
@@ -226,8 +238,9 @@ Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
-Arguments vect_el {T}%type d V%V i%nat.
+Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_squ_norm {T}%type {ro} V%V.
+Arguments vector_eq {T}%type {ro} (U V)%V.
 
 Notation "U + V" := (vect_add U V) : V_scope.
 Notation "U - V" := (vect_sub U V) : V_scope.
