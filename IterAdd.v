@@ -527,6 +527,15 @@ apply iter_list_cons. {
 }
 Qed.
 
+Theorem rngl_summation_list_app : ∀ A (la lb : list A) f,
+  ∑ (i ∈ la ++ lb), f i = (∑ (i ∈ la), f i + ∑ (i ∈ lb), f i)%F.
+Proof.
+intros.
+rewrite iter_list_app.
+unfold iter_list.
+apply fold_left_rngl_add_fun_from_0.
+Qed.
+
 Theorem rngl_summation_list_permut : ∀ A (l1 l2 : list A) f,
   Permutation l1 l2
   → (∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i)%F.

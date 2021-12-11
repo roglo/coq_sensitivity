@@ -143,6 +143,15 @@ rewrite rngl_mul_1_l.
 now apply fold_left_rngl_mul_fun_from_1.
 Qed.
 
+Theorem rngl_product_list_app : ∀ A (la lb : list A) f,
+  ∏ (i ∈ la ++ lb), f i = (∏ (i ∈ la), f i * ∏ (i ∈ lb), f i)%F.
+Proof.
+intros.
+rewrite iter_list_app.
+unfold iter_list.
+apply fold_left_rngl_mul_fun_from_1.
+Qed.
+
 Theorem rngl_product_succ_succ : ∀ b k g,
   (∏ (i = S b, S k), g i = ∏ (i = b, k), g (S i))%F.
 Proof.
