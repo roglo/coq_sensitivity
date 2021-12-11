@@ -4038,8 +4038,7 @@ End a.
 Arguments comatrix {T}%type {ro} M%M.
 Arguments mat_inv {T}%type {ro} M%M.
 
-(* test
-
+(* tests
 Require Import Qrl.
 Require Import Rational.
 Import Q.Notations.
@@ -4048,4 +4047,6 @@ Compute 3.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (determinant M, mat_inv M)).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (M * mat_inv M)%M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (mat_inv M * M)%M).
+Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (determinant M, comatrix M)).
+Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (determinant M, (M * comatrix M)%M, (comatrix M * M)%M)).
 *)
