@@ -1776,6 +1776,18 @@ intros * Hab.
 destruct la; intros; [ now left | now right; destruct lb ].
 Qed.
 
+Theorem map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
+  map2 f (l1 ++ l2) l =
+  map2 f l1 (firstn (length l1) l) ++ map2 f l2 (skipn (length l1) l).
+Proof.
+intros.
+revert l2 l.
+induction l1 as [| a1]; intros; [ easy | cbn ].
+destruct l as [| a]; [ now rewrite map2_nil_r | cbn ].
+f_equal.
+apply IHl1.
+Qed.
+
 (* end map2 *)
 
 (* List_find_nth: like find but doesn't return the element found

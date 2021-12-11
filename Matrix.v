@@ -1062,6 +1062,14 @@ unfold vect_dot_mul; cbn.
 destruct V as (l); cbn in Hi |-*.
 rewrite map2_map_l.
 rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
+rewrite Nat.sub_0_r.
+Print map2.
+...
+rewrite map2_app_l.
+rewrite seq_length.
+
+Search (∑ (_ ∈ _ ++ _), _).
+Search (∏ (_ ∈ _ ++ _), _).
 Search (map2 _ (_  ++ _)).
 ...
 do 2 rewrite map_app; cbn.
