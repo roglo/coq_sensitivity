@@ -1060,9 +1060,13 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
 unfold vect_dot_mul; cbn.
 destruct V as (l); cbn in Hi |-*.
-rewrite (List_seq_cut i); [ | now apply in_seq ].
+rewrite map2_map_l.
+rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
+Search (map2 _ (_  ++ _)).
+...
 do 2 rewrite map_app; cbn.
 rewrite δ_diag, Nat.sub_0_r.
+rewrite map2_map_l.
 ...
 apply vector_eq.
 intros i.
