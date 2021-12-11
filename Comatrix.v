@@ -3878,6 +3878,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now apply mat_transp_is_square.
   }
   specialize (H1 Hsmt).
+  rewrite mat_transp_nrows in H1.
+  rewrite square_matrix_ncols in H1; [ | easy ].
+  specialize (H1 Hi Hj Hij).
 ...
   specialize (H1 i j M Hsm_v Hi Hj Hij).
   erewrite rngl_summation_eq_compat in H1. 2: {
