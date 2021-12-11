@@ -3675,6 +3675,7 @@ destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
   rewrite app_nil_r.
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
+  destruct Hu as (_, Hu); cbn in Hu.
   rewrite <- map_butn.
   unfold butn at 1.
   rewrite List_firstn_seq.
@@ -3694,7 +3695,6 @@ destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
     rewrite Nat.add_0_r.
     rewrite (List_map_nth' []); [ | rewrite fold_mat_nrows; flia Hv ].
     rewrite nth_butn.
-    destruct Hu as (_, Hu); cbn in Hu.
     apply Nat.leb_gt in Hu; rewrite Hu.
     now rewrite Nat.add_0_r.
   }
@@ -3706,6 +3706,18 @@ destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
   f_equal. {
     apply map_ext_in.
     intros v Hv; apply in_seq in Hv.
+    destruct Hv as (_, Hv); cbn in Hv.
+    rewrite (List_map_nth' []). 2: {
+      rewrite butn_length, fold_mat_nrows.
+      apply Nat.ltb_lt in Hjr; rewrite Hjr; cbn.
+      apply Nat.ltb_lt in Hjr; flia Hv Hjr.
+    }
+    rewrite nth_butn.
+    apply Nat.leb_gt in Hu; rewrite Hu, Nat.add_0_r.
+    rewrite nth_butn.
+    apply Nat.leb_gt in Hv; rewrite Hv, Nat.add_0_r.
+    easy.
+  } {
 ...
 ... suite ok
 }
