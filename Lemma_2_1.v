@@ -28,10 +28,12 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Definition is_symm_mat n (A : matrix n n T) :=
-  ∀ i j, i < n → j < n → mat_el A i j = mat_el A j i.
+Definition is_symm_mat (A : matrix T) :=
+  ∀ i j, i < mat_nrows A → j < mat_ncols A → mat_el A i j = mat_el A j i.
 
-Definition princ_subm_1 m n (A : matrix m n T) k := subm A k k.
+...
+
+Definition princ_subm_1 m n (A : matrix T) k := subm A k k.
 
 Theorem Nat_sub_length_nil_r : ∀ n, n = n - @length nat [].
 Proof.
