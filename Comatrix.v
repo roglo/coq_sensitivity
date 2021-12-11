@@ -3756,6 +3756,18 @@ destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
   apply mat_mul_scal_1_l.
 }
 apply Nat.neq_0_lt_0 in Hlz.
+destruct (Nat.eq_dec (length ll) 1) as [Hl1| Hl1]. {
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ clear Hl1 | easy ].
+  apply is_scm_mat_iff in Hsm.
+  unfold mat_ncols in Hsm; cbn - [ In ] in Hsm.
+  destruct Hsm as (_, Hcl).
+  unfold "*"%M, "×"%M, mat_transp, mat_mul_el, comatrix; cbn.
+  rewrite Hcl; [ cbn | now left ].
+  do 2 rewrite rngl_summation_only_one; cbn.
+  do 2 rewrite rngl_mul_1_l.
+  now do 2 rewrite rngl_mul_1_r.
+}
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ determinant ]; f_equal.
 rewrite map_map.
 rewrite List_map_seq_length.
@@ -3897,9 +3909,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite mat_transp_subm; cycle 1. {
       now apply squ_mat_is_corr.
     } {
-...
+      subst M; unfold mat_nrows.
+      destruct ll; [ easy | ].
+      now destruct ll.
     } {
-...
+      subst M; unfold mat_ncols.
+      destruct ll; [ easy | ].
+      destruct ll; [ easy | ].
+      cbn in Hi |-*.
+      cbn - [ In ] in Hcl.
+      rewrite Hcl; [ easy | now left ].
     } {
       flia Hk Hi.
     }
