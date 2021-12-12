@@ -1862,24 +1862,6 @@ destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
 now do 2 rewrite Nat.add_0_r.
 Qed.
 
-Theorem ε_of_permut_ε : in_field →
-  ∀ n k,
-  k < n!
-  → ε n (canon_sym_gr_list n k) = ε_permut n k.
-Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hkn.
-revert k Hkn.
-induction n; intros. {
-  cbn; unfold ε; cbn.
-  unfold iter_seq, iter_list; cbn.
-  apply rngl_div_1_r; [ now left | easy ].
-}
-rewrite ε_of_sym_gr_permut_succ; try easy.
-cbn.
-f_equal.
-now apply IHn.
-Qed.
-
 Theorem canon_sym_gr_surjective : ∀ n k j,
   k < fact n
   → j < n
@@ -2013,7 +1995,6 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
-Arguments ε_of_permut_ε {T}%type {ro rp} _ n%nat [k]%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ n%nat p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments in_field {T}%type {ro rp}.

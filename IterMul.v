@@ -490,54 +490,6 @@ rewrite Nat.sub_diag; simpl.
 apply rngl_mul_1_l.
 Qed.
 
-Theorem rngl_product_permut :
-  rngl_is_comm = true →
-  ∀ n l1 l2,
-  Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
-  → ∏ (i = 0, n - 1), nth i l1 0 = ∏ (i = 0, n - 1), nth i l2 0.
-Proof.
-intros Hic * Hl H1 H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-rewrite Nat.sub_succ, Nat.sub_0_r.
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  destruct n; [ easy | ].
-  do 2 rewrite rngl_product_succ_succ.
-  now rewrite IHHl.
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  rewrite rngl_product_split_first; [ symmetry | flia ].
-  do 2 rewrite rngl_mul_assoc.
-  do 2 rewrite rngl_product_succ_succ.
-  f_equal; [ now apply rngl_mul_comm | ].
-  apply rngl_product_eq_compat.
-  intros i Hi; cbn.
-  destruct i; [ flia Hi | easy ].
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite IHHl1; [ | easy | easy ].
-  now rewrite IHHl2.
-}
-Qed.
-
 End a.
 
 Arguments all_1_rngl_product_1 {T}%type {ro rp} (b e)%nat.
@@ -555,5 +507,4 @@ Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
 Arguments rngl_product_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
-Arguments rngl_product_permut {T}%type {ro rp} Hic n%nat (l1 l2)%list.
 Arguments rngl_product_only_one {T}%type {ro rp} g%function n%nat.
