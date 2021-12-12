@@ -508,15 +508,6 @@ rewrite List_hd_nth_0.
 now apply nth_In.
 Qed.
 
-Theorem List_flat_map_length {A B} : ∀ (l : list A) (f : _ → list B),
-  length (flat_map f l) =
-    List.fold_right Nat.add 0 (map length (map f l)).
-Proof.
-intros.
-induction l as [| a l]; [ easy | cbn ].
-now rewrite app_length, IHl.
-Qed.
-
 Theorem List_map_fun : ∀ A B d l l' (f g : A → B),
   length l = length l'
   → (∀ i, i < length l → f (nth i l d) = g (nth i l' d))
@@ -1655,23 +1646,6 @@ induction l as [| a la]; intros. {
 destruct j; [ now rewrite Nat.add_0_r | ].
 rewrite Nat.add_succ_r; cbn.
 apply IHla.
-Qed.
-
-Theorem List_nth_map_seq : ∀ A i sta len d (f : _ → A),
-  i < len
-  → nth i (map f (seq sta len)) d = f (sta + i).
-Proof.
-intros * Hi.
-revert i Hi.
-induction len; intros; [ easy | ].
-rewrite seq_S, map_app; cbn.
-destruct (Nat.eq_dec i len) as [Hil| Hil]. {
-  subst i.
-  rewrite app_nth2; [ | rewrite List_map_seq_length; flia Hi ].
-  now rewrite List_map_seq_length, Nat.sub_diag.
-}
-rewrite app_nth1; [ | rewrite List_map_seq_length; flia Hi Hil ].
-apply IHlen; flia Hi Hil.
 Qed.
 
 Theorem List_app_eq_app' :
