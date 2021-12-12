@@ -736,7 +736,7 @@ destruct x as [| xp| xp], y as [| yp| yp], z as [| zp| zp]; try easy.
 Qed.
 Arguments le_lt_trans x%Q y%Q z%Q.
 
-Theorem lt_le_trans: ∀ x y z, (x < y)%Q → (y ≤ z)%Q → (x < z)%Q.
+Theorem lt_le_trans : ∀ x y z, (x < y)%Q → (y ≤ z)%Q → (x < z)%Q.
 Proof.
 intros * Hxy Hyz.
 unfold "≤"%Q, "<"%Q in *.

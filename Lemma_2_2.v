@@ -65,35 +65,6 @@ Fixpoint mA (n : nat) : matrix T :=
          [mI (2 ^ n'); (- mA n')%M]]
   end.
 
-(*
-End a.
-Check @mA.
-Require Import ZArith Zrl.
-Open Scope Z_scope.
-Compute list_list_of_mat (@mA Z Z_ring_like_op 2).
-Compute list_list_of_mat (@mA Z Z_ring_like_op 3).
-...
-*)
-
-(*
-Theorem flatten_list_list_length : ∀ A f (llll : list (list (list (list A)))),
-  length (flatten_list_list f llll) =
-  length llll * length (hd [] llll) * length (hd [] (hd [] llll)).
-Proof.
-intros.
-unfold flatten_list_list.
-rewrite List_flat_map_length.
-rewrite map_map.
-induction llll as [| lll]; [ easy | cbn ].
-rewrite IHllll.
-(* pas sûr qu'il soit bon, ce lemme *)
-
-Check flatten_list_list (@app nat) [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]]].
-Compute length (flatten_list_list (@app nat) [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]]).
-Compute length [[[[1;2];[3;4];[5;6]];[[7;8;9;10]]];[[[11;12]]]].
-...
-*)
-
 Theorem length_app_in_list : ∀ la lb,
   length (map3 (app (A := T)) la lb) = max (length la) (length lb).
 Proof.
@@ -104,7 +75,7 @@ destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem length_hd_app_in_list: ∀ la lb : list (list T),
+Theorem length_hd_app_in_list : ∀ la lb : list (list T),
   length (hd [] (map3 (app (A := T)) la lb)) =
   length (hd [] la) + length (hd [] lb).
 Proof.
@@ -1305,86 +1276,6 @@ Definition base_vector_1 dim :=
 
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector T) : vector T :=
   (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))]; [mI (2 ^ n)]] • V)%M.
-
-Theorem mA_diag_zero :
-  rngl_has_opp = true →
-  ∀ n i, i < 2 ^ n → mat_el (mA n) i i = 0%F.
-Proof.
-intros Hop * Hi2n.
-revert i Hi2n.
-induction n; intros. {
-  destruct i; [ easy | now destruct i ].
-}
-unfold mat_el.
-destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
-  cbn.
-  unfold fold_app_in_list, iter_list; cbn.
-  rewrite app_nth1. 2: {
-    rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
-    now rewrite map_length, seq_length, Nat.max_id.
-  }
-  rewrite nth_map3_app; cycle 1. {
-    now rewrite fold_mat_nrows, mA_nrows.
-  } {
-    now rewrite map_length, seq_length.
-  }
-  rewrite app_nth1. 2: {
-    rewrite fold_corr_mat_ncols; cycle 1. {
-      apply mA_is_correct.
-    } {
-      now rewrite mA_nrows.
-    }
-    now rewrite mA_ncols.
-  }
-  now apply IHn.
-} {
-  apply Nat.nlt_ge in Hin.
-  cbn; rewrite app_nil_r.
-  unfold fold_app_in_list, iter_list; cbn.
-  rewrite app_nth2. 2: {
-    rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
-    now rewrite map_length, seq_length, Nat.max_id.
-  }
-  rewrite length_app_in_list, fold_mat_nrows, mA_nrows.
-  rewrite map_length, seq_length, Nat.max_id.
-  rewrite nth_map3_app; cycle 1. {
-    rewrite map_length, seq_length.
-    apply le_pow_succ_sub_1_lt; flia Hi2n.
-  } {
-    rewrite map_length, fold_mat_nrows, mA_nrows.
-    apply le_pow_succ_sub_1_lt; flia Hi2n.
-  }
-  rewrite app_nth2. 2: {
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      apply le_pow_succ_sub_1_lt; flia Hi2n.
-    }
-    now rewrite map_length, seq_length.
-  }
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    apply le_pow_succ_sub_1_lt; flia Hi2n.
-  }
-  rewrite map_length, seq_length.
-  rewrite (List_map_nth' []). 2: {
-    rewrite fold_mat_nrows, mA_nrows.
-    apply le_pow_succ_sub_1_lt; flia Hi2n.
-  }
-  rewrite (List_map_nth' 0%F). 2: {
-    rewrite fold_corr_mat_ncols; cycle 1. {
-      apply mA_is_correct.
-    } {
-      rewrite mA_nrows.
-      apply le_pow_succ_sub_1_lt; flia Hi2n.
-    }
-    rewrite mA_ncols.
-    apply le_pow_succ_sub_1_lt; flia Hi2n.
-  }
-  rewrite fold_mat_el.
-  rewrite IHn; [ | apply le_pow_succ_sub_1_lt; flia Hi2n ].
-  now apply rngl_opp_0.
-}
-Qed.
 
 Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%F.
 Proof.

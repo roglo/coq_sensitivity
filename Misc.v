@@ -70,33 +70,9 @@ Notation "'Max' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, max c (g)) 0)
   (at level 45, i at level 0, l at level 60) : nat_scope.
 
-Theorem fold_left_max_fun_from_0 : ∀ a l (f : nat → _),
-  fold_left (λ c i, max c (f i)) l a =
-  max a (fold_left (λ c i, max c (f i)) l 0).
-Proof.
-intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply Nat.max_0_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-now rewrite Nat.max_assoc.
-Qed.
-
 Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
   fold_left f l d = iter_list l f d.
 Proof. easy. Qed.
-
-Theorem fold_iter_seq : ∀ {T} b e f (d : T),
-  fold_left f (seq b (S e - b)) d = iter_seq b e f d.
-Proof. easy. Qed.
-
-Theorem fold_iter_seq_2 : ∀ {T} b len f (d : T),
-  0 < b + len
-  → fold_left f (seq b len) d = iter_seq b (b + len - 1) f d.
-Proof.
-intros * Hblen.
-unfold iter_seq.
-now replace (S (b + len - 1) - b) with len by flia Hblen.
-Qed.
 
 Theorem List_seq_shift' : ∀ len sta,
   map (Nat.add sta) (seq 0 len) = seq sta len.
@@ -179,40 +155,6 @@ do 2 rewrite fold_left_app; cbn.
 now rewrite IHlen.
 Qed.
 
-Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
-  fold_left (λ c i, c + f i) l a =
-  a + fold_left (λ c i, c + f i) l 0.
-Proof.
-intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply Nat.add_0_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-apply Nat.add_assoc.
-Qed.
-
-Theorem fold_left_mul_fun_from_1 {A} : ∀ a l (f : A → nat),
-  fold_left (λ c i, c * f i) l a =
-  a * fold_left (λ c i, c * f i) l 1.
-Proof.
-intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply Nat.mul_1_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-rewrite Nat.add_0_r.
-apply Nat.mul_assoc.
-Qed.
-
-Theorem fold_left_mul_from_1 : ∀ a l,
-  fold_left Nat.mul l a = a * fold_left Nat.mul l 1.
-Proof.
-intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply Nat.mul_1_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-rewrite Nat.add_0_r.
-apply Nat.mul_assoc.
-Qed.
-
 Theorem fold_right_max_ge : ∀ m l, m ≤ fold_right max m l.
 Proof.
 intros.
@@ -222,9 +164,6 @@ apply Nat.le_max_r.
 Qed.
 
 (* *)
-
-Theorem match_id {A} : ∀ a (b : A), match a with O => b | S _ => b end = b.
-Proof. now intros; destruct a. Qed.
 
 Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
 Proof.
@@ -771,38 +710,6 @@ intros.
 now destruct la.
 Qed.
 
-Theorem firstn_map2 : ∀ A B C (f : A → B → C) n la lb,
-  firstn n (map2 f la lb) = map2 f (firstn n la) (firstn n lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; cbn; intros. {
-  now do 2 rewrite firstn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite firstn_nil.
-  now destruct n.
-}
-destruct n; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
-Theorem skipn_map2 : ∀ A B C (f : A → B → C) n la lb,
-  skipn n (map2 f la lb) = map2 f (skipn n la) (skipn n lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; cbn; intros. {
-  now do 2 rewrite skipn_nil.
-}
-destruct lb as [| b]. {
-  do 2 rewrite skipn_nil.
-  now rewrite map2_nil_r.
-}
-destruct n; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
 Theorem in_map2_iff : ∀ A B C (f : A → B → C) la lb c,
   c ∈ map2 f la lb ↔
   ∃ i,
@@ -883,7 +790,7 @@ rewrite map2_map_r.
 apply IHla.
 Qed.
 
-Theorem map2_eq_nil: ∀ A B C (f : A → B → C) la lb,
+Theorem map2_eq_nil : ∀ A B C (f : A → B → C) la lb,
   map2 f la lb = [] → la = [] ∨ lb = [].
 Proof.
 intros * Hab.

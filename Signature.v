@@ -840,9 +840,6 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
-Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
-  λ i, σ (transposition p q i).
-
 Definition list_swap p q l :=
   map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
 
@@ -909,62 +906,6 @@ split. {
     apply Hσ in Hs; [ congruence | easy | easy ].
   }
   apply Hσ in Hs; [ congruence | easy | easy ].
-}
-Qed.
-
-Theorem permut_list_swap_is_permut_list : ∀ p q n l,
-  p < n
-  → q < n
-  → is_permut n l
-  → is_permut_list (list_swap p q l).
-Proof.
-intros * Hp Hq (Hpl, Hn).
-rewrite <- Hn in Hp, Hq.
-split. {
-  intros j Hj.
-  unfold list_swap in Hj |-*.
-  apply in_map_iff in Hj.
-  destruct Hj as (i & Hij & Hi).
-  apply in_seq in Hi.
-  rewrite map_length, seq_length.
-  rewrite <- Hij.
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]; [ now apply Hpl, nth_In | ].
-  now destruct (Nat.eq_dec i q); apply Hpl, nth_In.
-} {
-  intros i j Hi Hj Hs.
-  rewrite length_list_swap in Hi, Hj.
-  unfold list_swap in Hs.
-  unfold ff_app in Hs.
-  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hs; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hs; [ | easy ].
-  rewrite seq_nth in Hs; [ | easy ].
-  cbn in Hs.
-  unfold transposition in Hs.
-  do 4 rewrite if_eqb_eq_dec in Hs.
-  apply Hpl; [ easy | easy | ].
-  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-    subst i.
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now subst j | ].
-    now symmetry in Hs; apply Hpl in Hs.
-  }
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    subst i.
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now subst j | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
-    apply Hpl in Hs; [ | easy | easy ].
-    now symmetry in Hs.
-  }
-  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-    now subst j; apply Hpl in Hs.
-  }
-  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-    now subst j; apply Hpl in Hs.
-  }
-  easy.
 }
 Qed.
 

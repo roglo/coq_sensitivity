@@ -662,14 +662,6 @@ Fixpoint canon_sym_gr_inv_elem n k (j : nat) :=
 Definition canon_sym_gr_inv_list n k : list nat :=
   map (canon_sym_gr_inv_elem n k) (seq 0 n).
 
-Theorem length_canon_sym_gr_list_list : ∀ n,
-  length (canon_sym_gr_list_list n) = n!.
-Proof.
-intros.
-unfold canon_sym_gr_list_list.
-now rewrite map_length, seq_length.
-Qed.
-
 Theorem length_canon_sym_gr_list : ∀ k n,
   length (canon_sym_gr_list n k) = n.
 Proof.
@@ -678,17 +670,6 @@ revert k.
 induction n; intros; [ easy | cbn ].
 f_equal; rewrite map_length.
 apply IHn.
-Qed.
-
-Theorem length_nth_canon_sym_gr_list_list : ∀ i n d,
-  i < n!
-  → length (nth i (canon_sym_gr_list_list n) d) = n.
-Proof.
-intros * Hin.
-unfold canon_sym_gr_list_list.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-apply length_canon_sym_gr_list.
 Qed.
 
 Theorem canon_sym_gr_list_ub : ∀ n k i,

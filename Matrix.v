@@ -11,12 +11,6 @@ Require Import Misc.
 Require Import RingLike IterAdd IterMul IterAnd.
 Require Import MyVector Signature.
 
-Definition nth_nth_error A (ll : list (list A)) (i j : nat) := 
-  match nth_error ll i with
-  | None => None
-  | Some l => Some (nth_error l j)
-  end.
-
 (* matrices *)
 
 Record matrix T := mk_mat
@@ -223,14 +217,8 @@ specialize (Hb2 lb' (or_intror (or_introl eq_refl))).
 congruence.
 Qed.
 
-Definition mat_of_list_list {T} (l : list (list T)) : matrix T :=
-  mk_mat l.
-
 Definition list_list_of_mat {T} (M : matrix T) :=
   mat_list_list M.
-
-Definition mat_nth_ncols {T} n (M : matrix T) :=
-  length (nth n (mat_list_list M) []).
 
 Theorem fold_mat_nrows {T} : ∀ (M : matrix T),
   length (mat_list_list M) = mat_nrows M.
@@ -238,10 +226,6 @@ Proof. easy. Qed.
 
 Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
   length (hd [] (mat_list_list M)) = mat_ncols M.
-Proof. easy. Qed.
-
-Theorem fold_mat_nth_ncols {T} : ∀ i (M : matrix T),
-  length (nth i (mat_list_list M) []) = mat_nth_ncols i M.
 Proof. easy. Qed.
 
 Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
@@ -1822,86 +1806,6 @@ rewrite map_length.
 now rewrite butn_length.
 Qed.
 
-Theorem mat_el_subm : ∀ (M : matrix T) i j u v,
-  is_correct_matrix M = true
-  → i < mat_nrows M - 1
-  → j < mat_ncols M - 1
-  → mat_el (subm M u v) i j =
-      mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)).
-Proof.
-intros * Hcm Hi Hj.
-unfold Nat.b2n.
-do 2 rewrite if_leb_le_dec.
-unfold mat_el, subm; cbn.
-unfold butn.
-rewrite map_app.
-destruct (le_dec u i) as [Hui| Hui]. {
-  rewrite app_nth2. 2: {
-    rewrite map_length, firstn_length, fold_mat_nrows.
-    unfold ge.
-    rewrite Nat.min_l; [ easy | flia Hi Hui ].
-  }
-  rewrite map_length, firstn_length.
-  rewrite fold_mat_nrows.
-  rewrite Nat.min_l; [ | flia Hi Hui ].
-  rewrite <- skipn_map.
-  rewrite List_nth_skipn.
-  replace (i - u + S u) with (i + 1) by flia Hui.
-  rewrite (List_map_nth' []). 2: {
-    rewrite fold_mat_nrows.
-    flia Hi.
-  }
-  destruct (le_dec v j) as [Hvj| Hvj]. {
-    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
-    rewrite firstn_length.
-    rewrite Nat.min_l. 2: {
-      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-      flia Hvj Hj.
-    }
-    rewrite List_nth_skipn.
-    now replace (j - v + S v) with (j + 1) by flia Hvj.
-  } {
-    rewrite Nat.add_0_r.
-    apply Nat.nle_gt in Hvj.
-    rewrite app_nth1. 2: {
-      rewrite firstn_length.
-      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-      apply Nat.min_glb_lt; [ easy | flia Hj ].
-    }
-    now rewrite List_nth_firstn.
-  }
-} {
-  rewrite Nat.add_0_r.
-  apply Nat.nle_gt in Hui.
-  rewrite app_nth1. 2: {
-    rewrite map_length, firstn_length, fold_mat_nrows.
-    apply Nat.min_glb_lt; [ easy | flia Hi ].
-  }
-  rewrite (List_map_nth' []). 2: {
-    rewrite firstn_length, fold_mat_nrows.
-    apply Nat.min_glb_lt; [ easy | flia Hi ].
-  }
-  rewrite List_nth_firstn; [ | easy ].
-  destruct (le_dec v j) as [Hvj| Hvj]. {
-    rewrite app_nth2; [ | rewrite firstn_length; flia Hvj ].
-    rewrite firstn_length.
-    rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-    rewrite Nat.min_l; [ | flia Hvj Hj ].
-    rewrite List_nth_skipn.
-    now replace (j - v + S v) with (j + 1) by flia Hvj.
-  } {
-    rewrite Nat.add_0_r.
-    apply Nat.nle_gt in Hvj.
-    rewrite app_nth1. 2: {
-      rewrite firstn_length.
-      rewrite fold_corr_mat_ncols; [ | easy | flia Hi ].
-      apply Nat.min_glb_lt; [ easy | flia Hj ].
-    }
-    now rewrite List_nth_firstn.
-  }
-}
-Qed.
-
 Theorem subm_subm_r_r : ∀ i j k (M : matrix T),
   i ≤ k → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
 Proof.
@@ -3207,18 +3111,6 @@ destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
 apply map2_length.
 Qed.
 
-Theorem mat_nrows_of_nat {n} : ∀ i,
-  mat_nrows (@sm_mat n T (rngl_of_nat i)) = n.
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
-induction i; [ now apply mZ_nrows | cbn ].
-rewrite map2_length.
-rewrite List_map_seq_length.
-rewrite fold_mat_nrows, IHi.
-apply Nat.min_id.
-Qed.
-
 Theorem mat_ncols_of_nat {n} : ∀ i,
   mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
 Proof.
@@ -3260,79 +3152,6 @@ rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   now rewrite fold_mat_nrows.
 }
 easy.
-Qed.
-
-Theorem mat_add_is_correct : ∀ MA MB : matrix T,
-  is_correct_matrix MA = true
-  → is_correct_matrix MB = true
-  → is_correct_matrix (MA + MB) = true.
-Proof.
-intros * Ha Hb.
-apply is_scm_mat_iff in Ha, Hb.
-destruct Ha as (Hcra, Hca).
-destruct Hb as (Hcrb, Hcb).
-move Hcrb before Hcra.
-destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hraz| Hraz]. {
-  unfold mat_nrows in Hraz.
-  apply length_zero_iff_nil in Hraz.
-  now destruct MA as (lla); cbn in Hraz |-*; subst lla.
-}
-destruct (Nat.eq_dec (mat_nrows MB) 0) as [Hrbz| Hrbz]. {
-  unfold mat_nrows in Hrbz.
-  apply length_zero_iff_nil in Hrbz.
-  destruct MB as (llb); cbn in Hrbz |-*; subst llb.
-  now rewrite mat_add_comm.
-}
-apply Nat.neq_0_lt_0 in Hraz, Hrbz.
-apply is_scm_mat_iff.
-split. {
-  unfold mat_ncols, mat_nrows; cbn.
-  intros Hab.
-  apply length_zero_iff_nil in Hab.
-  apply length_zero_iff_nil.
-  remember (map2 _ _ _) as ll eqn:Hll.
-  symmetry in Hll.
-  destruct ll as [| l]; [ easy | exfalso ].
-  cbn in Hab; subst l.
-  apply (f_equal (hd [])) in Hll.
-  cbn in Hll.
-  rewrite List_hd_nth_0 in Hll.
-  rewrite map2_nth with (a := []) (b := []) in Hll; [ | easy | easy ].
-  apply map2_eq_nil in Hll.
-  destruct Hll as [Hll| Hll]. {
-    apply (f_equal length) in Hll; cbn in Hll.
-    rewrite <- List_hd_nth_0 in Hll.
-    rewrite fold_mat_ncols in Hll.
-    apply Hcra in Hll.
-    now rewrite Hll in Hraz.
-  } {
-    apply (f_equal length) in Hll; cbn in Hll.
-    rewrite <- List_hd_nth_0 in Hll.
-    rewrite fold_mat_ncols in Hll.
-    apply Hcrb in Hll.
-    now rewrite Hll in Hrbz.
-  }
-} {
-  intros l Hl.
-  rewrite mat_add_ncols.
-  cbn in Hl.
-  apply in_map2_iff in Hl.
-  destruct Hl as (i & Him & la & lb & Hab).
-  do 2 rewrite fold_mat_nrows in Him.
-  subst l.
-  rewrite map2_length.
-  rewrite Hca. 2: {
-    apply nth_In.
-    rewrite fold_mat_nrows.
-    now apply Nat.min_glb_lt_iff in Him.
-  }
-  rewrite Hcb. 2: {
-    apply nth_In.
-    rewrite fold_mat_nrows.
-    now apply Nat.min_glb_lt_iff in Him.
-  }
-  easy.
-}
 Qed.
 
 Theorem List_repeat_as_map : ∀ A (a : A) n,

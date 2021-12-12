@@ -15,9 +15,6 @@ Record vector T := mk_vect
 Definition vect_of_list {T} (l : list T) : vector T :=
   mk_vect l.
 
-Definition list_of_vect {T} (v : vector T) :=
-  vect_list v.
-
 Definition empty_vect {A} : vector A := mk_vect [].
 
 Definition vect_size {T} (v : vector T) := length (vect_list v).
@@ -25,9 +22,6 @@ Definition vect_size {T} (v : vector T) := length (vect_list v).
 Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
-
-Theorem mk_vect_vect_list : ∀ A (v : vector A), mk_vect (vect_list v) = v.
-Proof. now intros; destruct v. Qed.
 
 Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
   nth i (vect_list V) 0%F.
