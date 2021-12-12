@@ -1001,9 +1001,8 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   n = vect_size V
   → (mI n • V)%M = V.
 Proof.
-(*
 intros * Hn; subst n.
-apply (vector_eq 0%F). 2: {
+apply vector_eq. 2: {
   now cbn; do 2 rewrite map_length; rewrite seq_length.
 }
 cbn; do 2 rewrite map_length; rewrite seq_length.
@@ -1012,94 +1011,61 @@ rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
 unfold vect_dot_mul; cbn.
-...
-*)
-intros * Hn; subst n.
-apply vector_eq'.
-intros i.
-remember (nth_error _ _) as x eqn:Hx in |-*; symmetry in Hx.
-remember (nth_error _ _) as y eqn:Hy in |-*; symmetry in Hy.
-move y before x.
-destruct x as [x| ]. {
-  apply List_nth_error_Some_iff with (d := 0%F) in Hx.
-  destruct Hx as (Hx, Hii).
-  cbn in Hii.
-  rewrite map_length, List_map_seq_length in Hii.
-  destruct y as [y| ]. {
-    apply List_nth_error_Some_iff with (d := 0%F) in Hy.
-    destruct Hy as (Hy, Hiv).
-    f_equal.
-    subst x y; cbn.
-    rewrite List_map_nth' with (a := []). 2: {
-      now rewrite List_map_seq_length.
-    }
-    unfold vect_size in Hii.
-    clear Hii.
-    destruct V as (la).
-    cbn in Hiv; cbn.
-    unfold vect_dot_mul; cbn.
-    rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-    rewrite map2_map_l.
-    rewrite seq_nth; [ cbn | easy ].
-    rewrite rngl_summation_list_split with (n := i).
-    rewrite all_0_rngl_summation_list_0. 2: {
-      intros j Hj.
-      rewrite firstn_map2 in Hj.
-      rewrite List_firstn_seq in Hj.
-      rewrite Nat.min_l in Hj; [ | flia Hiv ].
-      apply in_map2_iff in Hj.
-      destruct Hj as (k & Hkm & a & b & Hk).
-      subst j.
-      rewrite seq_length, firstn_length in Hkm.
-      rewrite Nat.min_assoc in Hkm.
-      rewrite Nat.min_id in Hkm.
-      apply Nat.min_glb_lt_iff in Hkm.
-      rewrite seq_nth; [ | easy ].
-      unfold δ.
-      rewrite if_eqb_eq_dec, Nat.add_0_l.
-      destruct (Nat.eq_dec i k) as [H| H]; [ flia Hkm H | clear H ].
-      now apply rngl_mul_0_l; left.
-    }
-    rewrite rngl_add_0_l.
-    rewrite skipn_map2.
-    rewrite List_skipn_seq; [ cbn | flia Hiv ].
-    revert i Hiv.
-    induction la as [| a]; intros; [ easy | ].
-    destruct i. {
-      cbn.
-      rewrite rngl_mul_1_l.
-      rewrite rngl_summation_list_cons.
-      rewrite all_0_rngl_summation_list_0. 2: {
-        intros i Hi.
-        rewrite <- seq_shift in Hi.
-        rewrite map2_map_l in Hi.
-        apply in_map2_iff in Hi.
-        destruct Hi as (k & Hkm & a' & b & Hk).
-        unfold δ in Hk; cbn in Hk.
-        rewrite rngl_mul_0_l in Hk; [ easy | now left ].
-      }
-      apply rngl_add_0_r.
-    }
-    cbn - [ "=?" ].
-    rewrite <- seq_shift.
-    rewrite map2_map_l.
-    cbn in Hiv.
-    apply Nat.succ_lt_mono in Hiv.
-    erewrite map2_ext_in; [ | now intros j k Hj Hk; cbn ].
-    now apply IHla.
-  } {
-    exfalso.
-    apply nth_error_None in Hy.
-    now apply Nat.nlt_ge in Hy.
-  }
+destruct V as (l); cbn in Hi |-*.
+rewrite map2_map_l.
+rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
+rewrite Nat.sub_0_r.
+rewrite map2_app_l.
+rewrite seq_length.
+erewrite map2_ext_in. 2: {
+  intros j k Hj Hk; apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  rewrite δ_ndiag; [ | flia Hj ].
+  rewrite rngl_mul_0_l; [ easy | now left ].
 }
-destruct y as [y| ]; [ | easy ].
-exfalso.
-apply nth_error_None in Hx.
-cbn in Hx.
-rewrite map_length, List_map_seq_length in Hx.
-apply List_nth_error_Some_iff with (d := 0%F) in Hy.
-now apply Nat.nlt_ge in Hx.
+rewrite rngl_summation_list_app; [ | easy ].
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros j Hj.
+  apply in_map2_iff in Hj.
+  destruct Hj as (k & Hki & u & v & Hu).
+  easy.
+}
+rewrite rngl_add_0_l.
+remember (skipn i l) as l' eqn:Hl'.
+symmetry in Hl'.
+destruct l' as [| a']. {
+  exfalso.
+  revert l Hi Hl'.
+  induction i; intros; [ now cbn in Hl'; subst l | ].
+  destruct l as [| a]; [ easy | ].
+  cbn in Hi.
+  apply Nat.succ_lt_mono in Hi.
+  cbn in Hl'.
+  now apply (IHi l).
+}
+cbn.
+rewrite δ_diag.
+rewrite rngl_mul_1_l.
+erewrite map2_ext_in. 2: {
+  intros j k Hj Hk; apply in_seq in Hj.
+  destruct Hj as (Hj, _).
+  rewrite δ_ndiag; [ | flia Hj ].
+  rewrite rngl_mul_0_l; [ easy | now left ].
+}
+rewrite rngl_summation_list_cons.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros j Hj.
+  apply in_map2_iff in Hj.
+  destruct Hj as (k & Hki & u & v & Hu).
+  easy.
+}
+rewrite rngl_add_0_r.
+revert l Hl' Hi.
+induction i; intros; [ now cbn in Hl'; subst l | ].
+destruct l as [| b]; [ easy | ].
+cbn in Hi, Hl' |-*.
+apply Nat.succ_lt_mono in Hi.
+now apply IHi.
 Qed.
 
 (* associativity of multiplication *)
