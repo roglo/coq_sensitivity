@@ -53,9 +53,6 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
-Theorem Nat_add_sub_simpl_l : ∀ a b c, (a + b - (a + c)) = (b - c).
-Proof. flia. Qed.
-
 Theorem Nat_mul_sub_distr_l : ∀ a b c, (a * (b - c))%F = (a * b - a * c)%F.
 Proof.
 intros.

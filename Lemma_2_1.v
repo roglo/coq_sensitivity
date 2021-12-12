@@ -33,19 +33,6 @@ Definition is_sym_mat (A : matrix T) :=
 
 Definition princ_subm_1 (A : matrix T) k := subm A k k.
 
-Theorem Nat_sub_length_nil_r : ∀ n, n = n - @length nat [].
-Proof.
-intros.
-now rewrite Nat.sub_0_r.
-Qed.
-
-Theorem Nat_sub_1_sub_length : ∀ n l,
-  n - 1 - length l = n - S (@length nat l).
-Proof.
-intros.
-now rewrite <- Nat.sub_add_distr.
-Qed.
-
 Fixpoint mat_princ_subm (A : matrix T) l : matrix T :=
   match l with
   | [] => A

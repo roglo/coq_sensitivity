@@ -756,19 +756,6 @@ rewrite rngl_add_opp_l in Hab; [ | easy ].
 now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 Qed.
 
-(* exist in Arith, but by principle I don't want Import Arith in the
-   present module *)
-Theorem Nat_nlt_ge : ∀ a b, a ≤ b → not (b < a).
-Proof.
-intros * Hab Hba.
-revert b Hab Hba.
-induction a; intros; [ easy | ].
-destruct b; [ easy | ].
-apply le_S_n in Hab.
-apply le_S_n in Hba.
-now apply IHa in Hab.
-Qed.
-
 Theorem rngl_div_cancel_l : ∀ a b c,
   (a = b)%F → (a / c = b / c)%F.
 Proof.

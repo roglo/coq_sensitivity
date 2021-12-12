@@ -81,93 +81,6 @@ rewrite IHl; symmetry; rewrite IHl.
 now rewrite Nat.max_assoc.
 Qed.
 
-Theorem Max_fold_left_max : ∀ b e f,
-  Max (i = b, e), f i = fold_left max (map f (seq b (S e - b))) 0.
-Proof.
-intros.
-unfold iter_seq.
-symmetry.
-apply List_fold_left_map.
-Qed.
-
-Theorem Max_lub_lt : ∀ b e f n,
-  0 < n
-  → (∀ i, b ≤ i ≤ e → f i < n)
-  → Max (i = b, e), f i < n.
-Proof.
-intros * Hn Hf.
-unfold iter_seq.
-remember (S e - b) as len eqn:Hlen.
-destruct len; [ easy | ].
-replace e with (b + len) in Hf by flia Hlen.
-clear e Hlen.
-revert b Hf.
-induction len; intros. {
-  now apply Hf; rewrite Nat.add_0_r.
-}
-unfold iter_list.
-remember (S len) as slen; cbn; subst slen.
-rewrite fold_left_max_fun_from_0.
-remember (fold_left _ _ _) as x eqn:Hx.
-destruct (le_dec (f b) x) as [Hfx| Hfx]. {
-  rewrite Nat.max_r; [ | easy ].
-  subst x.
-  apply IHlen.
-  intros i Hi.
-  apply Hf; flia Hi.
-}
-rewrite Nat.max_l; [ | flia Hfx ].
-apply Hf; flia.
-Qed.
-
-Theorem Max_lub_le : ∀ b e f n,
-  (∀ i, b ≤ i ≤ e → f i ≤ n)
-  → Max (i = b, e), f i ≤ n.
-Proof.
-intros * Hf.
-unfold iter_seq.
-remember (S e - b) as len eqn:Hlen.
-destruct len; [ easy | ].
-replace e with (b + len) in Hf by flia Hlen.
-clear e Hlen.
-revert b Hf.
-induction len; intros. {
-  now apply Hf; rewrite Nat.add_0_r.
-}
-unfold iter_list.
-remember (S len) as slen; cbn; subst slen.
-rewrite fold_left_max_fun_from_0.
-remember (fold_left _ _ _) as x eqn:Hx.
-destruct (le_dec (f b) x) as [Hfx| Hfx]. {
-  rewrite Nat.max_r; [ | easy ].
-  subst x.
-  apply IHlen.
-  intros i Hi.
-  apply Hf; flia Hi.
-}
-rewrite Nat.max_l; [ | flia Hfx ].
-apply Hf; flia.
-Qed.
-
-Theorem Max_le_compat : ∀ b e g h,
-  (∀ i, b ≤ i ≤ e → g i ≤ h i)
-  → Max (i = b, e), g i ≤ Max (i = b, e), h i.
-Proof.
-intros * Hgh.
-unfold iter_seq, iter_list; cbn - [ "-" ].
-remember (S e - b) as n eqn:Hn.
-remember 0 as a eqn:Ha; clear Ha.
-revert a b Hn Hgh.
-induction n as [| n IHn]; intros; [ easy | cbn ].
-do 2 rewrite (fold_left_max_fun_from_0 (max _ _)).
-do 2 rewrite <- Nat.max_assoc.
-apply Nat.max_le_compat_l.
-apply Nat.max_le_compat; [ apply Hgh; flia Hn | ].
-apply IHn; [ flia Hn | ].
-intros i Hbie.
-apply Hgh; flia Hbie.
-Qed.
-
 Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
   fold_left f l d = iter_list l f d.
 Proof. easy. Qed.
@@ -321,60 +234,12 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add_distr.
 Qed.
 
-Theorem Nat_add_div_same : ∀ a b c,
-  Nat.divide c a
-  → a / c + b / c = (a + b) / c.
-Proof.
-intros * Hca.
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]; [ now subst c | ].
-destruct Hca as (d, Hd).
-rewrite Hd, Nat.div_mul; [ | easy ].
-now rewrite Nat.div_add_l.
-Qed.
-
-Theorem Nat_sub_div_same: ∀ a b c,
-  Nat.divide c a
-  → Nat.divide c b
-  → a / c - b / c = (a - b) / c.
-Proof.
-intros * Hca Hcb.
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]; [ now subst c | ].
-destruct Hca as (ka, Hka).
-destruct Hcb as (kb, Hkb).
-subst a b.
-rewrite Nat.div_mul; [ | easy ].
-rewrite Nat.div_mul; [ | easy ].
-rewrite <- Nat.mul_sub_distr_r.
-now rewrite Nat.div_mul.
-Qed.
-
-Theorem Nat_mod_add_same_l : ∀ a b, a ≠ 0 → (a + b) mod a = b mod a.
-Proof.
-intros * Ha.
-rewrite <- Nat.add_mod_idemp_l; [ | easy ].
-now rewrite Nat.mod_same.
-Qed.
-
-Theorem Nat_mod_add_same_r : ∀ a b, b ≠ 0 → (a + b) mod b = a mod b.
-Proof.
-intros * Ha.
-rewrite <- Nat.add_mod_idemp_r; [ | easy ].
-now rewrite Nat.mod_same, Nat.add_0_r.
-Qed.
-
 Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
 Proof.
 intros * Ha.
 replace a with (1 * a) at 1 by apply Nat.mul_1_l.
 rewrite Nat.add_comm.
 rewrite Nat.div_add; [ apply Nat.add_comm | easy ].
-Qed.
-
-Theorem Nat_div_add_same_r : ∀ a b, b ≠ 0 → (a + b) / b = a / b + 1.
-Proof.
-intros * Ha.
-replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-now rewrite Nat.div_add.
 Qed.
 
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
@@ -397,22 +262,6 @@ rewrite <- Nat.mul_sub_distr_l, Nat.mul_comm.
 now apply Nat.mod_mul.
 Qed.
 
-Theorem Nat_mod_add_r_mul_l : ∀ a b c,
-  b ≠ 0 → (a + b * c) mod b = a mod b.
-Proof.
-intros * Hbz.
-rewrite Nat.mul_comm.
-now apply Nat.mod_add.
-Qed.
-
-Theorem Nat_mod_add_l_mul_l : ∀ a b c,
-  b ≠ 0 → (b * c + a) mod b = a mod b.
-Proof.
-intros * Hbz.
-rewrite Nat.add_comm, Nat.mul_comm.
-now apply Nat.mod_add.
-Qed.
-
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   b ≠ 0 → (c * b + a) mod b = a mod b.
 Proof.
@@ -421,61 +270,8 @@ rewrite Nat.add_comm.
 now apply Nat.mod_add.
 Qed.
 
-Theorem Nat_mod_0_mod_div : ∀ a b,
-  0 < b ≤ a → a mod b = 0 → a mod (a / b) = 0.
-Proof.
-intros * Hba Ha.
-assert (Hbz : b ≠ 0) by flia Hba.
-assert (Habz : a / b ≠ 0). {
-  intros H.
-  apply Nat.div_small_iff in H; [ | flia Hba ].
-  now apply Nat.nle_gt in H.
-}
-specialize (Nat.div_mod a (a / b) Habz) as H1.
-specialize (Nat.div_mod a b Hbz) as H2.
-rewrite Ha, Nat.add_0_r in H2.
-rewrite H2 in H1 at 3.
-rewrite Nat.div_mul in H1; [ | easy ].
-rewrite Nat.mul_comm in H1.
-flia H1 H2.
-Qed.
-
-Theorem Nat_mod_0_div_div : ∀ a b,
-  0 < b ≤ a → a mod b = 0 → a / (a / b) = b.
-Proof.
-intros * Hba Ha.
-assert (Hbz : b ≠ 0) by flia Hba.
-assert (Habz : a / b ≠ 0). {
-  intros H.
-  apply Nat.div_small_iff in H; [ | easy ].
-  now apply Nat.nle_gt in H.
-}
-specialize (Nat.div_mod a (a / b) Habz) as H1.
-rewrite Nat_mod_0_mod_div in H1; [ | easy | easy ].
-rewrite Nat.add_0_r in H1.
-apply (Nat.mul_cancel_l _ _ (a / b)); [ easy | ].
-rewrite <- H1; symmetry.
-rewrite Nat.mul_comm.
-apply Nat.mod_divide in Ha; [ | easy ].
-rewrite <- Nat.divide_div_mul_exact; [ | easy | easy ].
-now rewrite Nat.mul_comm, Nat.div_mul.
-Qed.
-
 Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
 Proof. easy. Qed.
-
-Theorem Nat_div_lt_le_mul : ∀ a b c, b ≠ 0 → a / b < c → a ≤ b * c.
-Proof.
-intros * Hbz Habc.
-apply (Nat.mul_le_mono_l _ _ b) in Habc.
-transitivity (b * S (a / b)); [ | easy ].
-specialize (Nat.div_mod a b Hbz) as H1.
-rewrite <- Nat.add_1_r.
-rewrite Nat.mul_add_distr_l, Nat.mul_1_r.
-rewrite H1 at 1.
-apply Nat.add_le_mono_l.
-now apply Nat.lt_le_incl, Nat.mod_upper_bound.
-Qed.
 
 Theorem Nat_div_interv : ∀ n a b,
   n * b ≤ a < (n + 1) * b
@@ -578,163 +374,6 @@ rewrite Nat.add_comm in Hab; cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
-Theorem Nat_divide_fact_fact : ∀ n d, Nat.divide (fact (n - d)) (fact n).
-Proof.
-intros *.
-revert n.
-induction d; intros; [ rewrite Nat.sub_0_r; apply Nat.divide_refl | ].
-destruct n; [ apply Nat.divide_refl | ].
-rewrite Nat.sub_succ.
-apply (Nat.divide_trans _ (fact n)); [ apply IHd | ].
-rewrite Nat_fact_succ.
-now exists (S n).
-Qed.
-
-Theorem Nat_divide_small_fact : ∀ n k, 0 < k ≤ n → Nat.divide k (fact n).
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ flia Hkn | ].
-rewrite Nat_fact_succ.
-destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
-  rewrite Hksn.
-  apply Nat.divide_factor_l.
-}
-apply (Nat.divide_trans _ (fact n)). {
-  apply IHn; flia Hkn Hksn.
-}
-apply Nat.divide_factor_r.
-Qed.
-
-Theorem Nat_divide_mul_fact : ∀ n a b,
-  0 < a ≤ n
-  → 0 < b ≤ n
-  → a < b
-  → Nat.divide (a * b) (fact n).
-Proof.
-intros * Han Hbn Hab.
-exists (fact (a - 1) * (fact (b - 1) / fact a) * (fact n / fact b)).
-rewrite Nat.mul_comm.
-rewrite (Nat.mul_shuffle0 _ b).
-do 2 rewrite Nat.mul_assoc.
-replace (a * fact (a - 1)) with (fact a). 2: {
-  destruct a; [ flia Han | ].
-  rewrite Nat_fact_succ.
-  now rewrite Nat_sub_succ_1.
-}
-replace (fact a * (fact (b - 1) / fact a)) with (fact (b - 1)). 2: {
-  specialize (Nat_divide_fact_fact (b - 1) (b - 1 - a)) as H1.
-  replace (b - 1 - (b - 1 - a)) with a in H1 by flia Hab.
-  destruct H1 as (c, Hc).
-  rewrite Hc, Nat.div_mul; [ | apply fact_neq_0 ].
-  apply Nat.mul_comm.
-}
-rewrite Nat.mul_comm, Nat.mul_assoc.
-replace (b * fact (b - 1)) with (fact b). 2: {
-  destruct b; [ flia Hbn | ].
-  rewrite Nat_fact_succ.
-  now rewrite Nat_sub_succ_1.
-}
-replace (fact b * (fact n / fact b)) with (fact n). 2: {
-  specialize (Nat_divide_fact_fact n (n - b)) as H1.
-  replace (n - (n - b)) with b in H1 by flia Hbn.
-  destruct H1 as (c, Hc).
-  rewrite Hc, Nat.div_mul; [ | apply fact_neq_0 ].
-  apply Nat.mul_comm.
-}
-easy.
-Qed.
-
-(** Bezout commutes *)
-
-Theorem Nat_bezout_comm : ∀ a b g,
-  b ≠ 0 → Nat.Bezout a b g → Nat.Bezout b a g.
-Proof.
-intros * Hbz (u & v & Huv).
-destruct (Nat.eq_0_gt_0_cases a) as [Haz| Haz]. {
-  rewrite Haz in Huv |-*.
-  rewrite Nat.mul_0_r in Huv; symmetry in Huv.
-  apply Nat.eq_add_0 in Huv.
-  rewrite (proj1 Huv).
-  now exists 0, 0; Nat.nzsimpl.
-}
-apply Nat.neq_0_lt_0 in Haz.
-destruct (Nat.lt_trichotomy (u / b) (v / a)) as [Hm|Hm]. {
-  apply Nat.lt_le_incl in Hm.
-  remember (v / a + 1) as k eqn:Hk.
-  exists (k * a - v), (k * b - u).
-  do 2 rewrite Nat.mul_sub_distr_r.
-  rewrite Huv.
-  rewrite (Nat.add_comm _ (v * b)).
-  rewrite Nat.sub_add_distr.
-  rewrite Nat.add_sub_assoc. 2: {
-    apply (Nat.add_le_mono_r _ _ (v * b)).
-    rewrite <- Huv.
-    rewrite Nat.sub_add. 2: {
-      rewrite Nat.mul_shuffle0.
-      apply Nat.mul_le_mono_r.
-      rewrite Hk.
-      specialize (Nat.div_mod v a Haz) as H1.
-      rewrite Nat.mul_add_distr_r, Nat.mul_1_l, Nat.mul_comm.
-      rewrite H1 at 1.
-      apply Nat.add_le_mono_l.
-      apply Nat.lt_le_incl.
-      apply Nat.mod_bound_pos; [ easy | ].
-      now apply Nat.neq_0_lt_0.
-    }
-    apply Nat.mul_le_mono_r.
-    rewrite Hk.
-    specialize (Nat.div_mod u b Hbz) as H1.
-    rewrite Nat.mul_add_distr_r, Nat.mul_1_l, Nat.mul_comm.
-    rewrite H1 at 1.
-    apply Nat.add_le_mono; [ now apply Nat.mul_le_mono_l | ].
-    apply Nat.lt_le_incl.
-    apply Nat.mod_bound_pos; [ easy | ].
-    now apply Nat.neq_0_lt_0.
-  }
-  rewrite Nat.add_comm, Nat.add_sub.
-  now rewrite Nat.mul_shuffle0.
-} {
-  remember (u / b + 1) as k eqn:Hk.
-  exists (k * a - v), (k * b - u).
-  do 2 rewrite Nat.mul_sub_distr_r.
-  rewrite Huv.
-  rewrite (Nat.add_comm _ (v * b)).
-  rewrite Nat.sub_add_distr.
-  rewrite Nat.add_sub_assoc. 2: {
-    apply (Nat.add_le_mono_r _ _ (v * b)).
-    rewrite Nat.sub_add. 2: {
-      rewrite Nat.mul_shuffle0.
-      apply Nat.mul_le_mono_r.
-      rewrite Hk.
-      specialize (Nat.div_mod v a Haz) as H1.
-      rewrite Nat.mul_add_distr_r, Nat.mul_1_l, Nat.mul_comm.
-      rewrite H1 at 1.
-      apply Nat.add_le_mono. {
-        apply Nat.mul_le_mono_l.
-        destruct Hm as [Hm| Hm]; [ now rewrite Hm | ].
-        now apply Nat.lt_le_incl.
-      }
-      apply Nat.lt_le_incl.
-      apply Nat.mod_bound_pos; [ easy | ].
-      now apply Nat.neq_0_lt_0.
-    }
-    rewrite <- Huv.
-    apply Nat.mul_le_mono_r.
-    rewrite Hk.
-    specialize (Nat.div_mod u b Hbz) as H1.
-    rewrite Nat.mul_add_distr_r, Nat.mul_1_l, Nat.mul_comm.
-    rewrite H1 at 1.
-    apply Nat.add_le_mono_l.
-    apply Nat.lt_le_incl.
-    apply Nat.mod_bound_pos; [ easy | ].
-    now apply Nat.neq_0_lt_0.
-  }
-  rewrite Nat.add_comm, Nat.add_sub.
-  now rewrite Nat.mul_shuffle0.
-}
-Qed.
-
 Theorem Nat_bezout_mul : ∀ a b c,
   Nat.Bezout a c 1
   → Nat.Bezout b c 1
@@ -799,17 +438,6 @@ rewrite Nat.gcd_comm.
 now apply Nat_gcd_1_mul_l; rewrite Nat.gcd_comm.
 Qed.
 
-Theorem Nat_gcd_sub_diag_l : ∀ m n, n ≤ m → Nat.gcd m (m - n) = Nat.gcd m n.
-Proof.
-intros * Hnm.
-replace m with (n + (m - n)) at 1 by flia Hnm.
-rewrite Nat.gcd_comm.
-rewrite Nat.gcd_add_diag_r.
-rewrite Nat.gcd_comm.
-rewrite Nat.gcd_sub_diag_r; [ | easy ].
-apply Nat.gcd_comm.
-Qed.
-
 (* (a ^ b) mod c defined like that so that we can use "Compute"
    for testing; proved equal to (a ^ b) mod c just below *)
 
@@ -831,40 +459,6 @@ cbn; rewrite IHb.
 now rewrite Nat.mul_mod_idemp_r.
 Qed.
 
-Theorem Nat_sqr_sub_sqr : ∀ a b, a ^ 2 - b ^ 2 = (a + b) * (a - b).
-Proof.
-intros.
-destruct (lt_dec a b) as [Hab| Hba]. {
-  rewrite (proj2 (Nat.sub_0_le _ _)). 2: {
-    now apply Nat.pow_le_mono_l, Nat.lt_le_incl.
-  }
-  rewrite (proj2 (Nat.sub_0_le _ _)). 2: {
-    now apply Nat.lt_le_incl.
-  }
-  now rewrite Nat.mul_0_r.
-}
-apply Nat.nlt_ge in Hba.
-rewrite Nat.mul_add_distr_r.
-rewrite Nat.mul_sub_distr_l.
-rewrite Nat.mul_sub_distr_l.
-rewrite Nat.add_sub_assoc; [ | now apply Nat.mul_le_mono_l ].
-rewrite (Nat.mul_comm b).
-rewrite Nat.sub_add; [ | now apply Nat.mul_le_mono_l ].
-now do 2 rewrite Nat.pow_2_r.
-Qed.
-
-Theorem Nat_sqr_sub_1 : ∀ a, a ^ 2 - 1 = (a + 1) * (a - 1).
-Proof.
-intros.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ now subst a | ].
-rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
-rewrite Nat.mul_sub_distr_l, Nat.mul_1_r.
-rewrite Nat.add_sub_assoc; [ | flia Haz ].
-rewrite Nat.pow_2_r.
-rewrite Nat.sub_add; [ easy | ].
-destruct a; [ easy | flia ].
-Qed.
-
 Theorem Nat_sub_sub_assoc : ∀ a b c,
   c ≤ b ≤ a + c
   → a - (b - c) = a + c - b.
@@ -884,43 +478,6 @@ induction b; intros.
  now rewrite Nat.sub_succ.
 Qed.
 
-Theorem Nat_sub_sub_distr : ∀ a b c, c ≤ b ≤ a → a - (b - c) = a - b + c.
-Proof.
-intros.
-rewrite <- Nat.add_sub_swap; [ | easy ].
-apply Nat_sub_sub_assoc.
-split; [ easy | ].
-apply (Nat.le_trans _ a); [ easy | ].
-apply Nat.le_add_r.
-Qed.
-
-Theorem Nat_sqr_sub : ∀ a b, b ≤ a → (a - b) ^ 2 = a ^ 2 + b ^ 2 - 2 * a * b.
-Proof.
-intros * Hba.
-do 3 rewrite Nat.pow_2_r.
-rewrite Nat.mul_sub_distr_l.
-do 2 rewrite Nat.mul_sub_distr_r.
-rewrite (Nat.mul_comm b).
-rewrite <- Nat.sub_add_distr.
-rewrite Nat.add_comm.
-rewrite Nat.sub_add_distr.
-rewrite Nat_sub_sub_distr. 2: {
-  split; [ now apply Nat.mul_le_mono_r | now apply Nat.mul_le_mono_l ].
-}
-replace 2 with (1 + 1) by easy.
-rewrite Nat.mul_add_distr_r, Nat.mul_1_l.
-rewrite Nat.mul_add_distr_r.
-rewrite Nat.sub_add_distr; f_equal.
-rewrite Nat.add_sub_swap; [ easy | ].
-now apply Nat.mul_le_mono_l.
-Qed.
-
-Theorem Nat_sqr_add : ∀ a b, (a + b) ^ 2 = a ^ 2 + b ^ 2 + 2 * a * b.
-Proof.
-intros.
-do 3 rewrite Nat.pow_2_r; flia.
-Qed.
-
 Theorem Nat_mod_pow_mod : ∀ a b c, (a mod b) ^ c mod b = a ^ c mod b.
 Proof.
 intros.
@@ -931,13 +488,6 @@ rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite <- Nat.mul_mod_idemp_r; [ | easy ].
 rewrite IHc; [ | easy ].
 now rewrite Nat.mul_mod_idemp_r.
-Qed.
-
-Theorem Nat_mul_le_pos_l : ∀ a b, 1 ≤ a → b ≤ a * b.
-Proof.
-intros * Ha.
-replace b with (1 * b) at 1 by apply Nat.mul_1_l.
-now apply Nat.mul_le_mono_nonneg_r.
 Qed.
 
 Theorem Nat_mul_le_pos_r : ∀ a b, 1 ≤ b → a ≤ a * b.
@@ -997,62 +547,6 @@ Proof.
 intros * Hg Hab.
 setoid_rewrite Nat.mul_comm in Hab.
 now apply Nat_mul_mod_cancel_r in Hab.
-Qed.
-
-Theorem Nat_eq_max_0 : ∀ a b, max a b = 0 → a = 0 ∧ b = 0.
-Proof.
-intros * Hm.
-destruct (le_dec a b) as [H| H]. {
-  rewrite Nat.max_r in Hm; [ | easy ].
-  now subst b; apply Nat.le_0_r in H.
-}
-apply Nat.nle_gt, Nat.lt_le_incl in H.
-rewrite Nat.max_l in Hm; [ | easy ].
-now subst a; apply Nat.le_0_r in H.
-Qed.
-
-Theorem Nat_le_fold_left_max : ∀ ln n k,
-  n ≤ k → n ≤ fold_left max ln k.
-Proof.
-intros * Hnk.
-revert k Hnk.
-induction ln as [| m]; intros; [ easy | ].
-apply IHln.
-transitivity k; [ easy | ].
-apply Nat.le_max_l.
-Qed.
-
-Theorem Nat_le_fold_left_fold_left_max : ∀ lln n k,
-  n ≤ k → n ≤ fold_left (λ m ln, fold_left max ln m) lln k.
-Proof.
-intros * Hnk.
-revert k Hnk.
-induction lln as [| ln]; intros; [ easy | cbn ].
-apply IHlln.
-now apply Nat_le_fold_left_max.
-Qed.
-
-Theorem Nat_fold_left_max_le : ∀ nl n k,
-  n ≤ k
-  → fold_left max nl n ≤ fold_left max nl k.
-Proof.
-intros * Hkn.
-revert n k Hkn.
-induction nl as [| n1]; intros; [ easy | cbn ].
-apply IHnl.
-now apply Nat.max_le_compat_r.
-Qed.
-
-Theorem Nat_fold_left_fold_left_max_le : ∀ nll a b,
-  a ≤ b
-  → fold_left (λ m nl, fold_left max nl m) nll a ≤
-     fold_left (λ m nl, fold_left max nl m) nll b.
-Proof.
-intros * Hab.
-revert a b Hab.
-induction nll as [| nl]; intros; [ easy | cbn ].
-apply IHnll.
-now apply Nat_fold_left_max_le.
 Qed.
 
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
