@@ -67,11 +67,6 @@ Proof. easy. Qed.
 Definition mat_permut_rows_fun (σ : nat → nat) (M : matrix T) :=
   mk_mat (map (λ i, nth (σ i) (mat_list_list M) []) (seq 0 (mat_nrows M))).
 
-(*
-Definition mat_permut_rows (σ : vector nat) (M : matrix T) :=
-  mat_permut_rows_fun (vect_el 0 σ) M.
-*)
-
 (* the following versions of computing the determinant should
    (to be proven) be equivalent; perhaps could help for proving
    Cramer's rule of resolving equations *)
@@ -1004,7 +999,6 @@ rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
-(* *** *)
   apply permut_list_Permutation.
 (* lemma to do? *)
   unfold g, f.
@@ -1096,7 +1090,6 @@ assert (HM : determinant M = (- determinant M)%F). {
   rewrite <- Hr in Hpn, Hqn.
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
-(**)
   destruct M as (ll); cbn in *.
   unfold mat_swap_rows; cbn; f_equal.
   rewrite (List_map_nth_seq ll) with (d := []) at 1.
@@ -1157,13 +1150,6 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
           (i, σ i) :: tlopf_loop it' n σ'
       end
   end.
-
-Definition transp_list_of_permut_fun n (σ : nat → nat) := tlopf_loop n n σ.
-
-Definition vect_nat_el V i := nth i (vect_list V) 0.
-
-Definition transp_list_of_permut {n} (σ : vector nat) :=
-  transp_list_of_permut_fun n (vect_nat_el σ).
 
 Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
   first_non_fixpoint it i σ = Some j

@@ -20,14 +20,6 @@ Context (rp : ring_like_prop T).
 Definition δ_nat i j u v :=
   if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
-(*
-Definition ε_fun f n :=
-  ((∏ (i = 1, n), ∏ (j = 1, n), δ i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-   (∏ (i = 1, n), ∏ (j = 1, n), δ i j i j))%F.
-
-Definition ε n (p : list nat) := ε_fun (λ i, nth i p 0) n.
-*)
-
 Definition ε n (p : list nat) :=
   ((∏ (i = 1, n), ∏ (j = 1, n),
     δ_nat i j (ff_app p (i - 1)) (ff_app p (j - 1))) /
@@ -95,14 +87,6 @@ Fixpoint ε_permut n k :=
 
 Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
 Definition abs_diff u v := if v <? u then u - v else v - u.
-
-(*
-Definition ε_fun_ws f n :=
-  (∏ (i = 1, n), ∏ (j = 1, n),
-   if i <? j then sign_diff (f (j - 1)%nat) (f (i - 1)%nat) else 1)%F.
-
-Definition ε_ws n (p : list nat) := ε_fun_ws (λ i, nth i p 0) n.
-*)
 
 Definition ε_ws n (p : list nat) :=
   (∏ (i = 1, n), ∏ (j = 1, n),
@@ -1025,43 +1009,6 @@ split. {
 now rewrite map_length, seq_length.
 Qed.
 
-(*
-Theorem transposition_is_permut_vect : ∀ n p q,
-  p < n
-  → q < n
-  → is_permut_vect (mk_vect (transposition p q)).
-Proof.
-intros.
-now apply transposition_is_permut.
-Qed.
-*)
-
-(*
-Theorem is_permut_map : ∀ f n,
-  is_permut_fun f n
-  → is_permut_fun (λ i, nth i (map f (seq 0 n)) 0) n.
-Theorem is_permut_map : ∀ f n,
-  is_permut_fun f n
-  → is_permut_fun (λ i, nth i (map f (seq 0 n)) 0) n.
-Proof.
-intros * Hf.
-destruct Hf as (Hf, Hff).
-split. {
-  intros i Hi.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  now apply Hf.
-} {
-  intros i j Hi Hj Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  now apply Hff.
-}
-Qed.
-*)
-
 Theorem transposition_signature_lt : in_field →
   ∀ n p q,
   p < q
@@ -1660,88 +1607,6 @@ apply (f_equal (transposition p q)) in Hpq.
 now do 2 rewrite transposition_involutive in Hpq.
 Qed.
 
-(*
-Theorem swap_elem_involutive : ∀ f p q,
-  swap_elem (swap_elem f p q) p q = f.
-Proof.
-intros.
-Print fin_fun_ext.
-Theorem my_false : ∀ A (f g : nat → A), f = g.
-Proof.
-intros.
-apply fin_fun_ext with (n := 0).
-easy.
-Print fin_fun_ext.
-...
-apply fin_fun_ext with (n := n).
-intros i Hi.
-unfold swap_elem.
-rewrite transposition_involutive.
-...
-apply vector_eq.
-intros i Hi; cbn.
-unfold swap_elem.
-now rewrite transposition_involutive.
-Qed.
-*)
-
-(*
-Theorem vect_swap_elem_injective : ∀ (u v : vector nat) p q,
-  vect_swap_elem u p q = vect_swap_elem v p q
-  → u = v.
-Proof.
-intros * Huv.
-apply (f_equal (λ u, vect_swap_elem u p q)) in Huv.
-now do 2 rewrite vect_swap_elem_involutive in Huv.
-Qed.
-*)
-
-(*
-
-Definition canon_sym_gr_elem_swap_with_0 p n k u v :=
-  list_swap_elem (ff_app (canon_sym_gr_list n k) 0) p u v.
-
-(*
-Compute (list_swap_elem 0 [3;2;1;0] 0 1).
-Compute (canon_sym_gr_list 4 13).
-Compute (ff_app (canon_sym_gr_list 4 13) 0).
-Compute (sym_gr_elem_swap_with_0 [3;2;1;0] 4 13 0 1).
-*)
-
-(* *)
-
-Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  list_swap_elem 0 (list_swap_elem 0 (canon_sym_gr_list n k) p (n - 2))
-    q (n - 1).
-*)
-
-(*
-Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  list_swap_elem 0
-    (list_swap_elem 0 (nth k (canon_sym_gr_list_list n) []) p (n - 2))
-    q (n - 1).
-*)
-
-(*
-Compute (canon_sym_gr_list 4 0).
-(*     = [0; 1; 2; 3] *)
-Compute (sym_gr_elem_swap_last 0 0 4 0).
-(*     = [3; 1; 0; 2] *)
-Compute (sym_gr_elem_swap_last 0 1 4 0).
-(*     = [2; 3; 0; 1] *)
-Compute (sym_gr_elem_swap_last 0 2 4 0).
-(*     = [2; 1; 3; 0] *)
-Compute (nth 0 (canon_sym_gr_list_list 4) []).
-Check permut_swap_with_0.
-*)
-
-(*
-Definition sym_gr_elem_swap_last (p q : nat) n k :=
-  vect_swap_elem 0
-    (vect_swap_elem 0 (vect_vect_nat_el (canon_sym_gr n) k) p (n - 2))
-    q (n - 1).
-*)
-
 (* *)
 
 Theorem ε_permut_succ : ∀ n k,
@@ -2187,9 +2052,6 @@ Theorem ε_square : in_field →
   ∀ n σ, is_permut n σ → (ε n σ * ε n σ = 1)%F.
 Proof.
 intros Hif * Hσ.
-(*
-intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
-*)
 specialize (ε_1_opp_1) as H1.
 specialize (H1 Hif n σ Hσ).
 destruct H1 as [H1| H1]; rewrite H1. {
