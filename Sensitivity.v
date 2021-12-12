@@ -315,18 +315,6 @@ Compute (dispatch 3 16).
 Compute (dispatch 4 23).
 Compute (locate [[0]; [1; 2]; []; [3]]).
 
-Theorem cons_nth_length : ∀ {A} i ll (v : A),
-  i < length ll → length (cons_nth i v ll) = length ll.
-Proof.
-intros * Hi.
-revert i v Hi.
-induction ll as [| l]; intros; cbn in Hi; [ flia Hi | ].
-destruct i; [ easy | cbn ].
-apply Nat.succ_lt_mono in Hi.
-f_equal.
-now apply IHll.
-Qed.
-
 Definition sub_list {A} (l : list A) start len :=
   firstn len (skipn start l).
 

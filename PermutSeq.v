@@ -1216,17 +1216,6 @@ split; [ now apply canon_sym_gr_list_is_permut_list | ].
 apply length_canon_sym_gr_list.
 Qed.
 
-Theorem canon_sym_gr_list_list_elem_is_permut : ∀ n k,
-  k < n!
-  → is_permut n (nth k (canon_sym_gr_list_list n) []).
-Proof.
-intros * Hkn.
-unfold canon_sym_gr_list_list.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-now apply canon_sym_gr_list_is_permut.
-Qed.
-
 Theorem canon_sym_gr_sub_canon_permut_list : ∀ n k,
   canon_sym_gr_list n (k mod n!) =
   sub_canon_permut_list (canon_sym_gr_list (S n) k).
@@ -1438,18 +1427,6 @@ Record sym_gr_list n :=
   { sg_list : list (list nat);
     sg_prop : is_sym_gr_list n sg_list }.
 
-Theorem canon_sym_gr_list_list_is_permut : ∀ n k,
-  k < n!
-  → is_permut_list (nth k (canon_sym_gr_list_list n) []).
-Proof.
-intros * Hkn.
-unfold is_permut_list.
-cbn; unfold canon_sym_gr_list_list.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-now apply canon_sym_gr_list_is_permut.
-Qed.
-
 Theorem canon_sym_gr_list_inj : ∀ n i j,
   i < fact n
   → j < fact n
@@ -1461,42 +1438,6 @@ apply (f_equal (@canon_sym_gr_list_inv n)) in Hij.
 rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
 rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
 easy.
-Qed.
-
-Theorem canon_sym_gr_is_sym_gr_list : ∀ n,
-  is_sym_gr_list n (canon_sym_gr_list_list n).
-Proof.
-intros.
-split. {
-  rewrite length_canon_sym_gr_list_list.
-  intros i Hi.
-  unfold canon_sym_gr_list_list.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite length_canon_sym_gr_list.
-  split; [ easy | ].
-  now apply canon_sym_gr_list_is_permut.
-}
-split. {
-  rewrite length_canon_sym_gr_list_list.
-  intros i j Hi Hj Hij.
-  unfold canon_sym_gr_list_list in Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  now apply canon_sym_gr_list_inj in Hij.
-} {
-  intros l (Hp, Hl).
-  unfold canon_sym_gr_list_list.
-  apply in_map_iff.
-  exists (canon_sym_gr_list_inv n l).
-  rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy ].
-  split; [ easy | ].
-  apply in_seq.
-  split; [ easy | ].
-  now apply canon_sym_gr_list_inv_ub.
-}
 Qed.
 
 Theorem rank_of_permut_in_canon_gr_list_inj : ∀ n la lb,

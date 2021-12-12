@@ -1313,7 +1313,7 @@ apply le_sub_le_add_l.
 now rewrite sub_diag.
 Qed.
 
-Theorem add_cancel_l: ∀ x y z, (x + y = x + z)%Q ↔ (y = z)%Q.
+Theorem add_cancel_l : ∀ x y z, (x + y = x + z)%Q ↔ (y = z)%Q.
 Proof.
 intros.
 split; intros Hxy; [ | now subst y ].

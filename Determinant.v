@@ -527,27 +527,6 @@ f_equal.
 now apply ε_of_permut_ε.
 Qed.
 
-Theorem det_is_det_by_any_permut : in_field →
-  ∀ n (M : matrix T) l,
-  mat_nrows M = n
-  → is_square_matrix M = true
-  → Permutation l (determinant'_list n M)
-  → determinant M = ∑ (k = 0, fact n - 1), nth k l 0.
-Proof.
-intros Hif * Hr Hsm Hl.
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite determinant'_by_list; [ | easy ].
-rewrite Hr.
-apply rngl_summation_permut; [ now symmetry | | ]. {
-  unfold determinant'_list.
-  now rewrite List_map_seq_length.
-} {
-  apply Permutation_length in Hl.
-  unfold determinant'_list in Hl.
-  now rewrite List_map_seq_length in Hl.
-}
-Qed.
-
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_swap_elem [] (mat_list_list M) i1 i2).
 
@@ -619,36 +598,6 @@ unfold mat_swap_rows; cbn.
 unfold list_swap_elem.
 rewrite map_length.
 now rewrite seq_length.
-Qed.
-
-Theorem corr_mat_swap_rows_ncols : ∀ (M : matrix T) p q,
-  p < mat_nrows M
-  → q < mat_nrows M
-  → is_correct_matrix M = true
-  → mat_ncols (mat_swap_rows p q M) = mat_ncols M.
-Proof.
-intros * Hp Hq Hcm.
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-  unfold mat_nrows in Hrz.
-  apply length_zero_iff_nil in Hrz.
-  unfold mat_ncols; cbn.
-  now rewrite Hrz.
-}
-apply Nat.neq_0_lt_0 in Hrz.
-unfold mat_swap_rows; cbn.
-unfold list_swap_elem.
-unfold mat_ncols; cbn.
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-rewrite List_seq_hd; [ | easy ].
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec 0 p) as [Hzp| Hzp]. {
-  now rewrite fold_corr_mat_ncols.
-}
-destruct (Nat.eq_dec 0 q) as [Hzq| Hzq]. {
-  now rewrite fold_corr_mat_ncols.
-}
-now rewrite List_hd_nth_0.
 Qed.
 
 Theorem is_permut_canon_transp : ∀ n k p q,
@@ -1208,30 +1157,6 @@ destruct (Nat.eq_dec i (σ i)) as [H1| H1]; [ | easy ].
 destruct (Nat.eq_dec i k) as [H2| H2]; [ now subst i | ].
 eapply IHit; [ | apply Hs ].
 flia Hik H2.
-Qed.
-
-Theorem comp_transp_permut_id : ∀ n σ i j k,
-  is_permut n σ
-  → i < k
-  → k < j < n
-  → ff_app σ k = i
-  → comp (transposition i (ff_app σ i)) (ff_app σ) j = ff_app σ j.
-Proof.
-intros * Hp Hikn Hkp Hski.
-unfold comp, transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (ff_app σ j) i) as [Hsji| Hsji]. {
-  exfalso.
-  rewrite <- Hski in Hsji.
-  destruct Hp as (Hp1, Hp2).
-  rewrite <- Hp2 in Hkp.
-  apply Hp1 in Hsji; [ flia Hkp Hsji | easy | flia Hkp ].
-}
-destruct (Nat.eq_dec (ff_app σ j) (ff_app σ i)) as [Hspi| Hspi]; [ | easy ].
-destruct Hp as (Hp1, Hp2).
-rewrite <- Hp2 in Hkp.
-apply Hp1 in Hspi; [ | easy | flia Hikn Hkp ].
-flia Hikn Hkp Hspi.
 Qed.
 
 Theorem first_non_fixpoint_enough_iter : ∀ n m σ i j,

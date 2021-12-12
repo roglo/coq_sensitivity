@@ -1477,16 +1477,6 @@ rewrite List_skipn_skipn.
 f_equal; flia Hji.
 Qed.
 
-Theorem butn_0 : ∀ A (l : list A), butn 0 l = tl l.
-Proof. now intros; destruct l. Qed.
-
-Theorem butn_cons_nil : ∀ A n (l : list A), l = [] → butn (S n) l = [].
-Proof.
-intros * Hl.
-destruct l as [| a]; [ easy | cbn ].
-now destruct l.
-Qed.
-
 (* end butn *)
 
 (* insert in a list (reverse of butn) *)
@@ -1616,17 +1606,6 @@ Definition unsome A (d : A) o :=
 
 Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
 Proof. easy. Qed.
-
-Theorem Sorted_Sorted_seq : ∀ start len, Sorted.Sorted lt (seq start len).
-Proof.
-intros.
-revert start.
-induction len; intros; [ apply Sorted.Sorted_nil | ].
-cbn; apply Sorted.Sorted_cons; [ apply IHlen | ].
-clear IHlen.
-induction len; [ apply Sorted.HdRel_nil | ].
-now cbn; apply Sorted.HdRel_cons.
-Qed.
 
 Theorem NoDup_app_comm {A} : ∀ l l' : list A,
   NoDup (l ++ l') → NoDup (l' ++ l).

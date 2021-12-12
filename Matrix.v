@@ -353,9 +353,6 @@ Fixpoint concat_list_in_list {T} (ll1 ll2 : list (list T)) :=
        end
   end.
 
-Definition concat_list_list_list {T} (lll : list (list (list T))) :=
-  fold_left concat_list_in_list lll [].
-
 Section a.
 
 Context {T : Type}.
