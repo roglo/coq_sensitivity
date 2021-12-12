@@ -859,11 +859,6 @@ Qed.
 Definition permut_fun_swap (p q : nat) (σ : nat → nat) :=
   λ i, σ (transposition p q i).
 
-(*
-Definition permut_swap {n} (p q : nat) (σ : vector nat) :=
-  mk_vect n (permut_fun_swap p q (vect_el σ)).
-*)
-
 Definition list_swap p q l :=
   map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
 

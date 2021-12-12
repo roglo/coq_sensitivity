@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
-Require Import MyVector Matrix PermutSeq Signature.
+Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
 
@@ -1376,16 +1376,6 @@ Proof.
 intros * Hn.
 now symmetry; apply List_map_nth_seq'.
 Qed.
-
-Fixpoint vect_find_loop A (f : A → bool) d (u : vector A) i :=
-  match i with
-  | 0 => 0
-  | S i' => if f (vect_el d u i') then i else vect_find_loop f d u i'
-  end.
-
-(* 0 => not found ; S n => found at position n *)
-Definition vect_find A n (f : A → bool) d (u : vector A) : nat :=
-  vect_find_loop f d u n.
 
 Theorem det_by_any_sym_gr : in_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
