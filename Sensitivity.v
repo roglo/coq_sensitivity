@@ -1265,55 +1265,6 @@ specialize (in_nth_nth_find_loop ll 0 Huni Hi) as H1.
 now rewrite Nat.sub_0_r in H1.
 Qed.
 
-Theorem NoDup_concat_in_in : ∀ A ll (a : A) b c,
-  NoDup (concat ll)
-  → a ∈ nth b ll []
-  → a ∈ nth c ll []
-  → b = c.
-Proof.
-intros * Hnd Hb Hc.
-revert b c Hb Hc.
-induction ll as [| l]; intros. {
-  cbn in Hb.
-  now rewrite match_id in Hb.
-}
-cbn in Hnd.
-apply NoDup_app_iff in Hnd.
-destruct Hnd as (Hnd & Hndc & Hll).
-specialize (IHll Hndc).
-cbn in Hb, Hc.
-destruct b. {
-  destruct c; [ easy | exfalso ].
-  specialize (Hll _ Hb) as H1.
-  apply H1; clear H1.
-  clear - Hc.
-  revert c a Hc.
-  induction ll as [| l]; intros. {
-    rewrite nth_overflow in Hc; [ easy | cbn; flia ].
-  }
-  cbn in Hc; cbn.
-  destruct c; [ now apply in_or_app; left | ].
-  apply in_or_app; right.
-  now apply (IHll c).
-}
-destruct c. {
-  exfalso.
-  specialize (Hll _ Hc) as H1.
-  apply H1; clear H1.
-  clear - Hb.
-  revert b Hb.
-  induction ll as [| l]; intros. {
-    rewrite nth_overflow in Hb; [ easy | cbn; flia ].
-  }
-  cbn in Hb; cbn.
-  destruct b; [ now apply in_or_app; left | ].
-  apply in_or_app; right.
-  now apply (IHll b).
-}
-f_equal.
-now apply IHll.
-Qed.
-
 Theorem eq_nth_find_all_loop_iff : ∀ A f (d : A) l l1 i,
   nth_find_all_loop f l i = l1 ↔
     match l1 with

@@ -1645,23 +1645,6 @@ apply IHl'.
 now apply NoDup_remove_1 in Hll.
 Qed.
 
-Theorem List_in_app_app_swap {A} : ∀ (a : A) l1 l2 l3,
-  In a (l1 ++ l3 ++ l2)
-  → In a (l1 ++ l2 ++ l3).
-Proof.
-intros * Hin.
-revert l2 l3 Hin.
-induction l1 as [| a2 l1]; intros. {
-  cbn in Hin; cbn.
-  apply in_app_or in Hin.
-  apply in_or_app.
-  now destruct Hin; [ right | left ].
-}
-cbn in Hin; cbn.
-destruct Hin as [Hin| Hin]; [ now left | right ].
-now apply IHl1.
-Qed.
-
 Theorem List_fold_left_ext_in : ∀ A B (f g : A → B → A) l a,
   (∀ b c, b ∈ l → f c b = g c b)
   → fold_left f l a = fold_left g l a.
@@ -2196,46 +2179,6 @@ Qed.
 
 (* *)
 
-Theorem NoDup_app_app_swap {A} : ∀ l1 l2 l3 : list A,
-  NoDup (l1 ++ l2 ++ l3) → NoDup (l1 ++ l3 ++ l2).
-Proof.
-intros * Hlll.
-revert l2 l3 Hlll.
-induction l1 as [| a1 l1]; intros; [ now cbn; apply NoDup_app_comm | ].
-cbn; constructor. {
-  intros Hin.
-  cbn in Hlll.
-  apply NoDup_cons_iff in Hlll.
-  destruct Hlll as (Hin2, Hlll).
-  apply Hin2; clear Hin2.
-  now apply List_in_app_app_swap.
-}
-apply IHl1.
-cbn in Hlll.
-now apply NoDup_cons_iff in Hlll.
-Qed.
-
-Theorem NoDup_concat_rev {A} : ∀ (ll : list (list A)),
-  NoDup (concat (rev ll)) → NoDup (concat ll).
-Proof.
-intros * Hll.
-destruct ll as [| l ll]; [ easy | ].
-cbn; cbn in Hll.
-rewrite concat_app in Hll; cbn in Hll.
-rewrite app_nil_r in Hll.
-apply NoDup_app_comm.
-revert l Hll.
-induction ll as [| l' ll]; intros; [ easy | ].
-cbn in Hll; cbn.
-rewrite concat_app in Hll; cbn in Hll.
-rewrite app_nil_r, <- app_assoc in Hll.
-rewrite <- app_assoc.
-apply NoDup_app_app_swap.
-rewrite app_assoc.
-apply NoDup_app_comm.
-now apply IHll.
-Qed.
-
 Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
 Proof.
 intros * Hnd.
@@ -2369,51 +2312,6 @@ split. {
     intros a Ha.
     now apply Hll; right.
   }
-}
-Qed.
-
-Theorem NoDup_prod {A} {B} : ∀ (l : list A) (l' : list B),
-  NoDup l → NoDup l' → NoDup (list_prod l l').
-Proof.
-intros * Hnl Hnl'.
-revert l' Hnl'.
-induction l as [| a l]; intros; [ constructor | ].
-cbn.
-apply NoDup_app_iff.
-split. {
-  induction l' as [| b l']; [ constructor | ].
-  apply NoDup_cons. {
-    intros Hab.
-    apply NoDup_cons_iff in Hnl'; apply Hnl'.
-    clear - Hab.
-    induction l' as [| c l']; [ easy | ].
-    cbn in Hab.
-    destruct Hab as [Hab| Hab]. {
-      injection Hab; clear Hab; intros; subst c.
-      now left.
-    } {
-      now right; apply IHl'.
-    }
-  }
-  apply IHl'.
-  now apply NoDup_cons_iff in Hnl'.
-}
-split. {
-  apply IHl; [ | easy ].
-  now apply NoDup_cons_iff in Hnl.
-} {
-  intros (a', b) Hab.
-  assert (H : a = a'). {
-    clear - Hab.
-    induction l' as [| b' l']; [ easy | ].
-    cbn in Hab.
-    destruct Hab as [Hab| Hab]; [ congruence | ].
-    now apply IHl'.
-  }
-  subst a'.
-  intros H.
-  apply in_prod_iff in H.
-  now apply NoDup_cons_iff in Hnl.
 }
 Qed.
 
