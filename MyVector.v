@@ -50,37 +50,6 @@ destruct Hi as (_, Hi); cbn in Hi.
 now apply Heq.
 Qed.
 
-Theorem vector_eq' {T} (U V : vector T) :
-  (∀ i, nth_error (vect_list U) i = nth_error (vect_list V) i)
-  → U = V.
-Proof.
-intros * Huv.
-destruct U as (lu).
-destruct V as (lv).
-cbn in Huv; f_equal.
-remember (length lu) as len eqn:Hlen.
-symmetry in Hlen.
-revert lu lv Huv Hlen.
-induction len; intros. {
-  apply length_zero_iff_nil in Hlen.
-  subst lu; cbn in Huv.
-  destruct lv as [| a]; [ easy | exfalso ].
-  now specialize (Huv 0).
-}
-destruct lu as [| a]; [ easy | ].
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-destruct lv as [| b]. {
-  exfalso.
-  now specialize (Huv 0).
-}
-specialize (Huv 0) as H1; cbn in H1.
-injection H1; clear H1; intros; subst b; f_equal.
-apply IHlen; [ | easy ].
-intros i.
-now specialize (Huv (S i)).
-Qed.
-
 Section a.
 
 Context {T : Type}.

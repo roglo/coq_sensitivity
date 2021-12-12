@@ -1652,20 +1652,16 @@ destruct n. {
     now rewrite rngl_mul_1_l in Hμ.
   }
   subst μ.
-  apply vector_eq'.
-  intros i; cbn.
-  rewrite nth_error_map.
-  unfold option_map.
+  apply vector_eq; [ | cbn; rewrite map_length; easy ].
+  intros i Hi.
+  cbn in Hi.
+  apply Nat.lt_1_r in Hi; subst i; cbn.
   unfold vect_dot_mul; cbn.
   destruct V as (la); cbn.
   destruct la as [| a]; [ easy | ].
   destruct la; [ | easy ].
   unfold iter_list; cbn.
-  rewrite rngl_add_0_l, rngl_mul_0_l; [ | now left ].
-  destruct i; cbn. {
-    rewrite rngl_mul_0_l; [ easy | now left ].
-  }
-  now destruct i.
+  rewrite rngl_add_0_l, rngl_mul_0_l; [ easy | now left ].
 }
 intros * HU HV.
 subst V.
