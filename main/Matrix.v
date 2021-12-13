@@ -1025,6 +1025,86 @@ apply Nat.succ_lt_mono in Hi.
 now apply IHi.
 Qed.
 
+(* associativity of multiplication *)
+
+Theorem mat_mul_assoc :
+  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
+  mat_nrows MB ≠ 0
+  → mat_ncols MB ≠ 0
+  → mat_ncols MA = mat_nrows MB
+  → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Proof.
+intros * Hrbz Hcbz Hcarb.
+unfold "*"%M.
+f_equal.
+unfold mat_nrows at 5; cbn.
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros i Hi.
+unfold mat_ncols at 2; cbn.
+rewrite (List_map_hd 0). 2: {
+  now rewrite seq_length; apply Nat.neq_0_lt_0.
+}
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros j Hj.
+move j before i.
+unfold mat_mul_el.
+unfold mat_ncols at 4.
+cbn.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length; apply Nat.neq_0_lt_0.
+  now intros H; rewrite H in Hi.
+}
+rewrite List_map_seq_length.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    rewrite Hcarb in Hk.
+    flia Hrbz Hk.
+  }
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hj.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | rewrite Hcarb in Hk; flia Hrbz Hk ].
+    rewrite seq_nth; [ | now apply in_seq in Hj ].
+    easy.
+  }
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    now rewrite rngl_mul_assoc.
+  }
+  easy.
+}
+cbn.
+erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
+  intros k Hk.
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hi.
+  }
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    flia Hcbz Hk.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | now apply in_seq in Hi ].
+    rewrite seq_nth; [ | flia Hcbz Hk ].
+    easy.
+  }
+  rewrite rngl_mul_summation_distr_r; [ | now left ].
+  easy.
+}
+cbn.
+apply rngl_summation_summation_exch'.
+Qed.
+
 (* left distributivity of multiplication over addition *)
 
 Theorem mat_mul_add_distr_l :
@@ -2980,6 +3060,7 @@ Arguments mat_add_sub {T}%type {ro rp} Hro (MA MB)%M.
 Arguments mat_list_list {T}%type m%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
+Arguments mat_mul_assoc {T}%type {ro rp} Hro (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
 Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.
