@@ -226,38 +226,6 @@ induction la as [| a]; intros; [ easy | cbn ].
 now rewrite IHla.
 Qed.
 
-Theorem nth_0_fold_left_nth_transp: ∀ A (b : A) lb d f n,
-  nth 0
-    (fold_left
-       (λ v i, nth (transposition i (i + 1) 0) v d :: f v i) (seq 0 (S n))
-       (b :: lb))
-    d = nth 0 lb d.
-Proof.
-intros; cbn.
-rewrite <- seq_shift.
-rewrite List_fold_left_map; cbn.
-now rewrite nth_0_fold_left_cons_cons.
-Qed.
-
-Theorem nth_succ_fold_left_app_cons : ∀ A B n (b : A) (la : list B) lb d f g,
-  length lb = S n
-  → (∀ v i, length (g v i) = n)
-  → nth (S n)
-       (fold_left (λ v i, f v i :: g v i ++ [nth (S n) v d]) la (b :: lb)) d =
-    nth n lb d.
-Proof.
-intros * Hlb Hf.
-revert b lb Hlb Hf.
-induction la as [| a]; intros; [ easy | cbn ].
-rewrite IHla; [ | | apply Hf ]. 2: {
-  rewrite app_length; cbn.
-  rewrite Nat.add_1_r; f_equal.
-  apply Hf.
-}
-rewrite app_nth2; [ | now unfold "≥"; rewrite Hf ].
-now rewrite Hf, Nat.sub_diag.
-Qed.
-
 Theorem nth_fold_left_seq_gen : ∀ A (u : list A) i d n sta,
   sta + n ≤ length u
   → sta ≤ i < sta + n - 1
@@ -2211,40 +2179,6 @@ apply mat_transp_el.
 apply squ_mat_is_corr.
 apply comatrix_is_square.
 now apply mat_transp_is_square.
-Qed.
-
-Theorem mat_swap_rows_involutive : ∀ (M : matrix T) i j,
-  i < mat_nrows M
-  → j < mat_nrows M
-  → mat_swap_rows i j (mat_swap_rows i j M) = M.
-Proof.
-intros * Hi Hj.
-destruct M as (ll); cbn in Hj |-*.
-unfold mat_swap_rows.
-f_equal; cbn.
-rewrite List_map_seq_length.
-rewrite List_map_nth_seq with (d := []).
-apply map_ext_in.
-intros k Hk; apply in_seq in Hk.
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec k i) as [Hki| Hki]. {
-  subst k.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  rewrite Nat.eqb_refl.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec j i) as [Hji| Hji]; [ now subst i | easy ].
-}
-destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
-  subst k.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ cbn | easy ].
-  now rewrite Nat.eqb_refl.
-}
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
-now apply Nat.eqb_neq in Hki, Hkj; rewrite Hki, Hkj.
 Qed.
 
 (*

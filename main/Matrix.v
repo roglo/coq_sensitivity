@@ -217,9 +217,6 @@ specialize (Hb2 lb' (or_intror (or_introl eq_refl))).
 congruence.
 Qed.
 
-Definition list_list_of_mat {T} (M : matrix T) :=
-  mat_list_list M.
-
 Theorem fold_mat_nrows {T} : ∀ (M : matrix T),
   length (mat_list_list M) = mat_nrows M.
 Proof. easy. Qed.
@@ -231,15 +228,6 @@ Proof. easy. Qed.
 Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
   nth j (nth i (mat_list_list M) []) 0%F = mat_el M i j.
 Proof. easy. Qed.
-
-Theorem mat_eq_map_seq : ∀ T (M : matrix T),
-  M =
-  mk_mat (map (λ i, nth i (mat_list_list M) []) (seq 0 (mat_nrows M))).
-Proof.
-intros.
-rewrite <- List_map_nth_seq.
-now destruct M.
-Qed.
 
 Theorem eq_mat_nrows_0 {T} : ∀ M : matrix T,
   mat_nrows M = 0

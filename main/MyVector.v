@@ -15,8 +15,6 @@ Record vector T := mk_vect
 Definition vect_of_list {T} (l : list T) : vector T :=
   mk_vect l.
 
-Definition empty_vect {A} : vector A := mk_vect [].
-
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
 Theorem fold_vect_size {T} : ∀ (V : vector T),

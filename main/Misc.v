@@ -476,13 +476,6 @@ rewrite map2_map_r.
 apply IHla.
 Qed.
 
-Theorem map2_eq_nil : ∀ A B C (f : A → B → C) la lb,
-  map2 f la lb = [] → la = [] ∨ lb = [].
-Proof.
-intros * Hab.
-destruct la; intros; [ now left | now right; destruct lb ].
-Qed.
-
 Theorem map2_app_l : ∀ A B C l1 l2 l (f : A → B → C),
   map2 f (l1 ++ l2) l =
   map2 f l1 (firstn (length l1) l) ++ map2 f l2 (skipn (length l1) l).
@@ -1084,22 +1077,6 @@ Definition insert_at A k (la : list A) e :=
 Definition replace_at {A} k (la : list A) e :=
   firstn k la ++ e :: skipn (S k) la.
 
-Theorem nth_replace_id : ∀ A i (la : list A) a d,
-  i ≤ length la
-  → nth i (replace_at i la a) d = a.
-Proof.
-intros * Hi.
-unfold replace_at.
-rewrite app_nth2. 2: {
-  unfold "≥".
-  rewrite firstn_length.
-  now rewrite Nat.min_l.
-}
-rewrite firstn_length.
-rewrite Nat.min_l; [ | easy ].
-now rewrite Nat.sub_diag.
-Qed.
-
 (* end replace_at *)
 
 (* repeat_apply: applying a function n times *)
@@ -1175,9 +1152,6 @@ Definition unsome A (d : A) o :=
   | Some x => x
   | None => d
   end.
-
-Theorem not_equiv_imp_False : ∀ P : Prop, (P → False) ↔ ¬ P.
-Proof. easy. Qed.
 
 Theorem NoDup_app_comm {A} : ∀ l l' : list A,
   NoDup (l ++ l') → NoDup (l' ++ l).
@@ -1886,39 +1860,6 @@ induction Hl; intros; [ easy | | | ]. {
   rewrite (IHHl2 n); [ | easy | easy ].
   easy.
 }
-Qed.
-
-Theorem not_forall_in_interv_imp_exist : ∀ a b (P : nat → Prop),
-  (∀ n, decidable (P n))
-  → a ≤ b
-  → (¬ (∀ n, a ≤ n ≤ b → ¬ P n))
-  → ∃ n, P n.
-Proof.
-intros * Hdec Hab Hnab.
-revert a Hab Hnab.
-induction b; intros. {
-  apply Nat.le_0_r in Hab; subst a.
-  exists 0.
-  destruct (Hdec 0) as [H1| H1]; [ easy | ].
-  exfalso; apply Hnab.
-  intros * Hn.
-  now replace n with 0 by flia Hn.
-}
-destruct (Nat.eq_dec a (S b)) as [Hasb| Hasb]. {
-  exists (S b).
-  destruct (Hdec (S b)) as [H1| H1]; [ easy | ].
-  exfalso; apply Hnab.
-  intros * Hn.
-  now replace n with (S b) by flia Hasb Hn.
-}
-assert (H : a ≤ b) by flia Hab Hasb.
-move H before Hab; clear Hab Hasb; rename H into Hab.
-destruct (Hdec (S b)) as [H1| H1]; [ now exists (S b) | ].
-apply (IHb a); [ easy | ].
-intros H; apply Hnab.
-intros n Hn.
-destruct (Nat.eq_dec n (S b)) as [H2| H2]; [ now rewrite H2 | ].
-apply H; flia Hn H2.
 Qed.
 
 Fixpoint merge {A} (le : A → A → bool) l1 l2 :=

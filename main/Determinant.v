@@ -987,22 +987,6 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
       end
   end.
 
-(* If we add a row (column) of A multiplied by a scalar k to another
-   row (column) of A, then the determinant will not change. *)
-(* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
-(* doing it only when the first row is 0; can be generalized later *)
-
-Definition mat_add_row_mul_scal_row n (M : matrix T) i1 v i2 :=
-  mk_mat
-    (map
-      (λ i,
-       map
-         (λ j,
-          if Nat.eq_dec i i1 then (mat_el M i1 j + v * mat_el M i2 j)%F
-          else mat_el M i j)
-         (seq 0 n))
-     (seq 0 n)).
-
 (* *)
 
 Definition mat_mul_row_by_scal n k (M : matrix T) s :=

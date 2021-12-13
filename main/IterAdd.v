@@ -273,16 +273,6 @@ f_equal.
 apply mul_add_distr_l.
 Qed.
 
-Theorem mul_iter_seq_distr_l : ∀ A a b e f (add mul : A → A → A) d
-    (mul_add_distr_l : ∀ y z, mul a (add y z) = add (mul a y) (mul a z)),
-  mul a (iter_seq b e (λ c i, add c (f i)) d) =
-  iter_seq b e (λ c i, add c (mul a (f i))) (mul a d).
-Proof.
-intros.
-clear Hom.
-now apply mul_iter_list_distr_l.
-Qed.
-
 Theorem rngl_mul_summation_list_distr_l : ∀ A a (la : list A) f,
   (a * (∑ (i ∈ la), f i) = ∑ (i ∈ la), a * f i)%F.
 Proof.
