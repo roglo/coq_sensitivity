@@ -107,6 +107,75 @@ apply mat_mul_1_l; [ easy | | symmetry; apply squ_mat_nrows ].
 apply square_matrix_is_correct.
 Qed.
 
+Theorem squ_mat_mul_add_distr_l {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA * (MB + MC) = MA * MB + MA * MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+destruct MC as (MC & Hc); cbn.
+move MB before MA; move MC before MB.
+apply Bool.andb_true_iff in Ha, Hb, Hc.
+destruct Ha as (Hra, Ha).
+destruct Hb as (Hrb, Hb).
+destruct Hc as (Hrc, Hc).
+apply Nat.eqb_eq in Hra, Hrb, Hrc.
+move MB before MA; move MC before MB.
+move Hrb before Hra; move Hrc before Hrb.
+apply is_scm_mat_iff in Ha.
+apply is_scm_mat_iff in Hb.
+apply is_scm_mat_iff in Hc.
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct Hc as (Hcrc & Hcc).
+move Hrb before Hra; move Hrc before Hrb.
+move Hcrb before Hcra; move Hcrc before Hcrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n; cbn.
+  unfold "*"%M, "+"%M; cbn.
+  now rewrite Hra.
+}
+apply mat_mul_add_distr_l. {
+  apply is_scm_mat_iff.
+  split; [ easy | ].
+  intros l Hl.
+  rewrite Hcb; [ | easy ].
+  symmetry; apply Hcb.
+  apply List_hd_in, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hrb.
+} {
+  apply is_scm_mat_iff.
+  split; [ easy | ].
+  intros l Hl.
+  rewrite Hcc; [ | easy ].
+  symmetry; apply Hcc.
+  apply List_hd_in, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hrc.
+} {
+  now rewrite Hrb.
+} {
+  rewrite Hrb; unfold mat_ncols.
+  rewrite Hra in Hca.
+  apply Hca.
+  apply List_hd_in, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hra.
+} {
+  congruence.
+} {
+  unfold mat_ncols.
+  rewrite Hcb. 2: {
+    apply List_hd_in, Nat.neq_0_lt_0.
+    now rewrite fold_mat_nrows, Hrb.
+  }
+  rewrite Hcc. 2: {
+    apply List_hd_in, Nat.neq_0_lt_0.
+    now rewrite fold_mat_nrows, Hrc.
+  }
+  congruence.
+}
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
