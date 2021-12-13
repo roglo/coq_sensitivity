@@ -2441,49 +2441,6 @@ destruct Hm as (Hr, Hm).
 now apply squ_mat_is_corr.
 Qed.
 
-Theorem squ_mat_opt_add_opp_l {n} :
-  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
-    ∀ M : square_matrix n T, (- M + M)%F = 0%F
-  else not_applicable.
-(*
-  if rngl_has_opp then ∀ M : square_matrix n T, (- M + M)%F = 0%F
-  else not_applicable.
-*)
-Proof.
-remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n)) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-intros M; cbn.
-apply square_matrix_eq; cbn.
-destruct M as (M & Hs); cbn.
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (Hr, Hs).
-apply Nat.eqb_eq in Hr.
-apply is_scm_mat_iff in Hs.
-destruct Hs as (Hcr & Hc).
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n; cbn.
-  unfold mat_opp, "+"%M, mZ; cbn.
-  apply length_zero_iff_nil in Hr.
-  now rewrite Hr.
-}
-apply mat_add_opp_l; [ | easy | ]. 2: {
-  unfold mat_ncols.
-  rewrite Hr in Hc.
-  symmetry; apply Hc.
-  apply List_hd_in, Nat.neq_0_lt_0.
-  now rewrite fold_mat_nrows, Hr.
-}
-apply is_scm_mat_iff.
-split; [ easy | ].
-intros l Hl.
-unfold mat_ncols.
-rewrite Hc; [ | easy ].
-symmetry; apply Hc.
-apply List_hd_in, Nat.neq_0_lt_0.
-now rewrite fold_mat_nrows, Hr.
-Qed.
-
 Theorem mat_opt_eq_dec :
   if rngl_has_dec_eq then ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}
   else not_applicable.
