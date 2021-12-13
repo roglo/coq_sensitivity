@@ -2514,31 +2514,6 @@ apply mat_mul_add_distr_r. {
 }
 Qed.
 
-Theorem squ_mat_opt_1_neq_0 {n} :
-  if rngl_has_1_neq_0 && (n ≠? 0) then
-    @rngl_one (square_matrix n T) (mat_ring_like_op n) ≠
-    @rngl_zero (square_matrix n T) (mat_ring_like_op n)
-  else not_applicable.
-(*
-  if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
-*)
-Proof.
-remember (rngl_has_1_neq_0 && (n ≠? 0)) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Bool.andb_true_iff in Hb.
-destruct Hb as (H10, Hb).
-apply Bool.negb_true_iff in Hb.
-apply Nat.eqb_neq in Hb.
-intros H; cbn in H.
-unfold smI, smZ in H.
-injection H; clear H; intros H.
-destruct n; [ easy | ].
-cbn in H.
-injection H; intros H1 H2.
-now apply rngl_1_neq_0.
-Qed.
-
 Theorem squ_mat_opt_add_opp_l {n} :
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
     ∀ M : square_matrix n T, (- M + M)%F = 0%F
