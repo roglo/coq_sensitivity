@@ -17,7 +17,7 @@ depend:
 .SUFFIXES: .v .vo
 
 .v.vo:
-	coqc $<
+	coqc -R . Main $<
 
 .PHONY: all clean depend
 
