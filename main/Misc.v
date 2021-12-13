@@ -211,25 +211,6 @@ replace b with (0 + b) at 1 by easy.
 now apply Nat.add_le_mono_r.
 Qed.
 
-Theorem Nat_mul_sub_div_le : ∀ a b c,
-  c ≤ a * b
-  → (a * b - c) / b ≤ a.
-Proof.
-intros * Hc.
-destruct (zerop b) as [Hb| Hb]; [ now subst b | ].
-apply Nat.neq_0_lt_0 in Hb.
-remember (a * b - c) as d eqn:Hd.
-assert (H1 : a = (c + d) / b). {
-  rewrite Hd.
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub.
-  now rewrite Nat.div_mul.
-}
-rewrite H1.
-apply Nat.div_le_mono; [ easy | ].
-apply Nat_le_add_l.
-Qed.
-
 (* (a ^ b) mod c defined like that so that we can use "Compute"
    for testing; proved equal to (a ^ b) mod c just below *)
 
@@ -240,35 +221,6 @@ Fixpoint Nat_pow_mod_loop a b c :=
   end.
 
 Definition Nat_pow_mod a b c := Nat_pow_mod_loop a b c.
-
-Theorem Nat_pow_mod_is_pow_mod : ∀ a b c,
-  c ≠ 0 → Nat_pow_mod a b c = (a ^ b) mod c.
-Proof.
-intros * Hcz.
-revert a.
-induction b; intros; [ easy | ].
-cbn; rewrite IHb.
-now rewrite Nat.mul_mod_idemp_r.
-Qed.
-
-Theorem Nat_sub_sub_assoc : ∀ a b c,
-  c ≤ b ≤ a + c
-  → a - (b - c) = a + c - b.
-Proof.
-intros * (Hcb, Hba).
-revert a c Hcb Hba.
-induction b; intros.
--apply Nat.le_0_r in Hcb; subst c.
- now rewrite Nat.add_0_r.
--destruct c; [ now rewrite Nat.add_0_r | ].
- apply Nat.succ_le_mono in Hcb.
- rewrite Nat.add_succ_r in Hba.
- apply Nat.succ_le_mono in Hba.
- specialize (IHb a c Hcb Hba) as H1.
- rewrite Nat.sub_succ, H1.
- rewrite Nat.add_succ_r.
- now rewrite Nat.sub_succ.
-Qed.
 
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
@@ -310,16 +262,6 @@ destruct (le_dec b a) as [Hba| Hba]. {
   replace b with (a + k * n) by flia Hba Hk.
   now rewrite Nat.mod_add.
 }
-Qed.
-
-Theorem Nat_mul_mod_cancel_l : ∀ a b c n,
-  Nat.gcd c n = 1
-  → c * a ≡ (c * b) mod n
-  → a ≡ b mod n.
-Proof.
-intros * Hg Hab.
-setoid_rewrite Nat.mul_comm in Hab.
-now apply Nat_mul_mod_cancel_r in Hab.
 Qed.
 
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
@@ -2000,19 +1942,6 @@ split. {
     now apply Hll; right.
   }
 }
-Qed.
-
-Theorem Permutation_fold_mul : ∀ l1 l2 a,
-  Permutation l1 l2 → fold_left Nat.mul l1 a = fold_left Nat.mul l2 a.
-Proof.
-intros * Hperm.
-induction Hperm using Permutation_ind; [ easy | | | ]. {
-  cbn; do 2 rewrite <- List_fold_left_mul_assoc.
-  now rewrite IHHperm.
-} {
-  now cbn; rewrite Nat.mul_shuffle0.
-}
-etransitivity; [ apply IHHperm1 | apply IHHperm2 ].
 Qed.
 
 Theorem iter_list_permut : ∀ T A (d : T) (op : T → T → T) (l1 l2 : list A) f

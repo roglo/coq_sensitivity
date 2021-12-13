@@ -3,10 +3,10 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith (*Psatz Sorted Permutation Decidable*).
+Require Import Utf8 Arith (*Psatz Sorted*) Permutation (*Decidable*).
 Require Import Main.Misc.
+Import List (*List.ListNotations*).
 (*
-Import List List.ListNotations.
 Arguments length {A}.
 
 Global Hint Resolve Nat.le_0_l : core.
@@ -207,4 +207,75 @@ Proof.
 intros * Ha.
 replace a with (a * 1) at 1 by apply Nat.mul_1_r.
 now apply Nat.mul_le_mono_nonneg_l.
+Qed.
+
+Theorem Nat_mul_mod_cancel_l : ∀ a b c n,
+  Nat.gcd c n = 1
+  → c * a ≡ (c * b) mod n
+  → a ≡ b mod n.
+Proof.
+intros * Hg Hab.
+setoid_rewrite Nat.mul_comm in Hab.
+now apply Nat_mul_mod_cancel_r in Hab.
+Qed.
+
+Theorem Nat_mul_sub_div_le : ∀ a b c,
+  c ≤ a * b
+  → (a * b - c) / b ≤ a.
+Proof.
+intros * Hc.
+destruct (zerop b) as [Hb| Hb]; [ now subst b | ].
+apply Nat.neq_0_lt_0 in Hb.
+remember (a * b - c) as d eqn:Hd.
+assert (H1 : a = (c + d) / b). {
+  rewrite Hd.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  now rewrite Nat.div_mul.
+}
+rewrite H1.
+apply Nat.div_le_mono; [ easy | ].
+apply Nat_le_add_l.
+Qed.
+
+Theorem Nat_pow_mod_is_pow_mod : ∀ a b c,
+  c ≠ 0 → Nat_pow_mod a b c = (a ^ b) mod c.
+Proof.
+intros * Hcz.
+revert a.
+induction b; intros; [ easy | ].
+cbn; rewrite IHb.
+now rewrite Nat.mul_mod_idemp_r.
+Qed.
+
+Theorem Nat_sub_sub_assoc : ∀ a b c,
+  c ≤ b ≤ a + c
+  → a - (b - c) = a + c - b.
+Proof.
+intros * (Hcb, Hba).
+revert a c Hcb Hba.
+induction b; intros.
+-apply Nat.le_0_r in Hcb; subst c.
+ now rewrite Nat.add_0_r.
+-destruct c; [ now rewrite Nat.add_0_r | ].
+ apply Nat.succ_le_mono in Hcb.
+ rewrite Nat.add_succ_r in Hba.
+ apply Nat.succ_le_mono in Hba.
+ specialize (IHb a c Hcb Hba) as H1.
+ rewrite Nat.sub_succ, H1.
+ rewrite Nat.add_succ_r.
+ now rewrite Nat.sub_succ.
+Qed.
+
+Theorem Permutation_fold_mul : ∀ l1 l2 a,
+  Permutation l1 l2 → fold_left Nat.mul l1 a = fold_left Nat.mul l2 a.
+Proof.
+intros * Hperm.
+induction Hperm using Permutation_ind; [ easy | | | ]. {
+  cbn; do 2 rewrite <- List_fold_left_mul_assoc.
+  now rewrite IHHperm.
+} {
+  now cbn; rewrite Nat.mul_shuffle0.
+}
+etransitivity; [ apply IHHperm1 | apply IHHperm2 ].
 Qed.
