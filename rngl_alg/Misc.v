@@ -36,6 +36,29 @@ Notation "∃! x .. y , p" :=
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 *)
 
+(* (a ^ b) mod c defined like that so that we can use "Compute"
+   for testing; proved equal to (a ^ b) mod c just below *)
+
+Fixpoint Nat_pow_mod_loop a b c :=
+  match b with
+  | 0 => 1 mod c
+  | S b' => (a * Nat_pow_mod_loop a b' c) mod c
+  end.
+
+Definition Nat_pow_mod a b c := Nat_pow_mod_loop a b c.
+
+(* *)
+
+Theorem List_fold_left_mul_assoc : ∀ a b l,
+  fold_left Nat.mul l a * b = fold_left Nat.mul l (a * b).
+Proof.
+intros.
+revert a b.
+induction l as [| c l]; intros; [ easy | ].
+cbn; rewrite IHl.
+now rewrite Nat.mul_shuffle0.
+Qed.
+
 Theorem Nat_div_less_small : ∀ n a b,
   n * b ≤ a < (n + 1) * b
   → a / b = n.
@@ -167,6 +190,13 @@ destruct H1 as (c, Hc); rewrite Hc at 2.
 destruct c; [ easy | flia ].
 Qed.
 
+Theorem Nat_le_add_l : ∀ a b, b ≤ a + b.
+Proof.
+intros.
+replace b with (0 + b) at 1 by easy.
+now apply Nat.add_le_mono_r.
+Qed.
+
 Definition Nat_le_neq_lt : ∀ x y : nat, x ≤ y → x ≠ y → (x < y)%nat :=
   λ x y Hxy Hnxy,
   match le_lt_eq_dec x y Hxy with
@@ -207,6 +237,45 @@ Proof.
 intros * Ha.
 replace a with (a * 1) at 1 by apply Nat.mul_1_r.
 now apply Nat.mul_le_mono_nonneg_l.
+Qed.
+
+Theorem Nat_mul_mod_cancel_r : ∀ a b c n,
+  Nat.gcd c n = 1
+  → a * c ≡ (b * c) mod n
+  → a ≡ b mod n.
+Proof.
+intros * Hg Hab.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  cbn in Hab.
+  rewrite Nat.gcd_0_r in Hg.
+  subst c.
+  do 2 rewrite Nat.mul_1_r in Hab.
+  now subst a.
+}
+destruct (le_dec b a) as [Hba| Hba]. {
+  apply Nat_eq_mod_sub_0 in Hab.
+  rewrite <- Nat.mul_sub_distr_r in Hab.
+  apply Nat.mod_divide in Hab; [ | easy ].
+  rewrite Nat.gcd_comm in Hg.
+  rewrite Nat.mul_comm in Hab.
+  specialize (Nat.gauss n c (a - b) Hab Hg) as H1.
+  destruct H1 as (k, Hk).
+  replace a with (b + k * n) by flia Hba Hk.
+  now rewrite Nat.mod_add.
+} {
+  apply Nat.nle_gt in Hba.
+  symmetry in Hab.
+  apply Nat_eq_mod_sub_0 in Hab.
+  rewrite <- Nat.mul_sub_distr_r in Hab.
+  apply Nat.mod_divide in Hab; [ | easy ].
+  rewrite Nat.gcd_comm in Hg.
+  rewrite Nat.mul_comm in Hab.
+  specialize (Nat.gauss n c (b - a) Hab Hg) as H1.
+  destruct H1 as (k, Hk).
+  replace b with (a + k * n) by flia Hba Hk.
+  now rewrite Nat.mod_add.
+}
 Qed.
 
 Theorem Nat_mul_mod_cancel_l : ∀ a b c n,

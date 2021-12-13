@@ -204,65 +204,8 @@ Qed.
 Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
 Proof. easy. Qed.
 
-Theorem Nat_le_add_l : ∀ a b, b ≤ a + b.
-Proof.
-intros.
-replace b with (0 + b) at 1 by easy.
-now apply Nat.add_le_mono_r.
-Qed.
-
-(* (a ^ b) mod c defined like that so that we can use "Compute"
-   for testing; proved equal to (a ^ b) mod c just below *)
-
-Fixpoint Nat_pow_mod_loop a b c :=
-  match b with
-  | 0 => 1 mod c
-  | S b' => (a * Nat_pow_mod_loop a b' c) mod c
-  end.
-
-Definition Nat_pow_mod a b c := Nat_pow_mod_loop a b c.
-
 Notation "a ≡ b 'mod' c" := (a mod c = b mod c) (at level 70, b at level 36).
 Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36).
-
-Theorem Nat_mul_mod_cancel_r : ∀ a b c n,
-  Nat.gcd c n = 1
-  → a * c ≡ (b * c) mod n
-  → a ≡ b mod n.
-Proof.
-intros * Hg Hab.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  cbn in Hab.
-  rewrite Nat.gcd_0_r in Hg.
-  subst c.
-  do 2 rewrite Nat.mul_1_r in Hab.
-  now subst a.
-}
-destruct (le_dec b a) as [Hba| Hba]. {
-  apply Nat_eq_mod_sub_0 in Hab.
-  rewrite <- Nat.mul_sub_distr_r in Hab.
-  apply Nat.mod_divide in Hab; [ | easy ].
-  rewrite Nat.gcd_comm in Hg.
-  rewrite Nat.mul_comm in Hab.
-  specialize (Nat.gauss n c (a - b) Hab Hg) as H1.
-  destruct H1 as (k, Hk).
-  replace a with (b + k * n) by flia Hba Hk.
-  now rewrite Nat.mod_add.
-} {
-  apply Nat.nle_gt in Hba.
-  symmetry in Hab.
-  apply Nat_eq_mod_sub_0 in Hab.
-  rewrite <- Nat.mul_sub_distr_r in Hab.
-  apply Nat.mod_divide in Hab; [ | easy ].
-  rewrite Nat.gcd_comm in Hg.
-  rewrite Nat.mul_comm in Hab.
-  specialize (Nat.gauss n c (b - a) Hab Hg) as H1.
-  destruct H1 as (k, Hk).
-  replace b with (a + k * n) by flia Hba Hk.
-  now rewrite Nat.mod_add.
-}
-Qed.
 
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
 Proof. intros; now destruct l. Qed.
@@ -1318,16 +1261,6 @@ rewrite IHlen.
 apply List_fold_left_ext_in.
 intros i lb Hi; apply in_seq in Hi.
 now rewrite map_length, seq_length.
-Qed.
-
-Theorem List_fold_left_mul_assoc : ∀ a b l,
-  fold_left Nat.mul l a * b = fold_left Nat.mul l (a * b).
-Proof.
-intros.
-revert a b.
-induction l as [| c l]; intros; [ easy | ].
-cbn; rewrite IHl.
-now rewrite Nat.mul_shuffle0.
 Qed.
 
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
