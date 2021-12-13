@@ -36,6 +36,23 @@ Notation "∃! x .. y , p" :=
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 *)
 
+Theorem Nat_div_less_small : ∀ n a b,
+  n * b ≤ a < (n + 1) * b
+  → a / b = n.
+Proof.
+intros * Hab.
+assert (Hb : b ≠ 0). {
+  now intros Hb; rewrite Hb, (Nat.mul_comm (n + 1)) in Hab.
+}
+replace a with (a - n * b + n * b) at 1 by now apply Nat.sub_add.
+rewrite Nat.div_add; [ | easy ].
+replace n with (0 + n) at 3 by easy; f_equal.
+apply Nat.div_small.
+apply Nat.add_lt_mono_r with (p := n * b).
+rewrite Nat.add_comm in Hab; cbn in Hab.
+now rewrite Nat.sub_add.
+Qed.
+
 Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
 Proof.
 intros * Ha.
@@ -84,4 +101,30 @@ induction n; intros.
   rewrite Nat_div_add_same_l; [ | easy ].
   rewrite Nat.add_1_l.
   now f_equal.
+Qed.
+
+Theorem Nat_gcd_1_mul_r : ∀ a b c,
+  Nat.gcd a b = 1
+  → Nat.gcd a c = 1
+  → Nat.gcd a (b * c) = 1.
+Proof.
+intros * Hab Hac.
+rewrite Nat.gcd_comm.
+now apply Nat_gcd_1_mul_l; rewrite Nat.gcd_comm.
+Qed.
+
+Theorem Nat_gcd_le_l : ∀ a b, a ≠ 0 → Nat.gcd a b ≤ a.
+Proof.
+intros * Haz.
+specialize (Nat.gcd_divide_l a b) as H1.
+destruct H1 as (c, Hc); rewrite Hc at 2.
+destruct c; [ easy | flia ].
+Qed.
+
+Theorem Nat_gcd_le_r : ∀ a b, b ≠ 0 → Nat.gcd a b ≤ b.
+Proof.
+intros * Hbz.
+specialize (Nat.gcd_divide_r a b) as H1.
+destruct H1 as (c, Hc); rewrite Hc at 2.
+destruct c; [ easy | flia ].
 Qed.
