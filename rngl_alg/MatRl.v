@@ -4,13 +4,13 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith (*Bool*).
+Import List (* List.ListNotations *).
 (*
-Import List List.ListNotations.
 Require Import Init.Nat.
 *)
 
 Require Import Main.Misc.
-Require Import Main.RingLike (*IterAdd IterMul IterAnd*).
+Require Import Main.RingLike Main.IterAdd (*IterMul IterAnd*).
 (*
 Require Import MyVector Signature.
 *)
@@ -23,6 +23,86 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Context {Hro : @rngl_has_opp T ro = true}.
+
+(* associativity of multiplication *)
+
+Theorem mat_mul_assoc :
+  ∀ (MA : matrix T) (MB : matrix T) (MC : matrix T),
+  mat_nrows MB ≠ 0
+  → mat_ncols MB ≠ 0
+  → mat_ncols MA = mat_nrows MB
+  → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
+Proof.
+intros * Hrbz Hcbz Hcarb.
+unfold "*"%M.
+f_equal.
+unfold mat_nrows at 5; cbn.
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros i Hi.
+unfold mat_ncols at 2; cbn.
+rewrite (List_map_hd 0). 2: {
+  now rewrite seq_length; apply Nat.neq_0_lt_0.
+}
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros j Hj.
+move j before i.
+unfold mat_mul_el.
+unfold mat_ncols at 4.
+cbn.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length; apply Nat.neq_0_lt_0.
+  now intros H; rewrite H in Hi.
+}
+rewrite List_map_seq_length.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    rewrite Hcarb in Hk.
+    flia Hrbz Hk.
+  }
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hj.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | rewrite Hcarb in Hk; flia Hrbz Hk ].
+    rewrite seq_nth; [ | now apply in_seq in Hj ].
+    easy.
+  }
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    now rewrite rngl_mul_assoc.
+  }
+  easy.
+}
+cbn.
+erewrite rngl_summation_eq_compat with (k := mat_ncols MB - 1). 2: {
+  intros k Hk.
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    now apply in_seq in Hi.
+  }
+  rewrite List_map_nth' with (a := 0). 2: {
+    rewrite seq_length.
+    flia Hcbz Hk.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros m Hm.
+    rewrite seq_nth; [ | now apply in_seq in Hi ].
+    rewrite seq_nth; [ | flia Hcbz Hk ].
+    easy.
+  }
+  rewrite rngl_mul_summation_distr_r; [ | now left ].
+  easy.
+}
+cbn.
+apply rngl_summation_summation_exch'.
+Qed.
 
 Existing Instance mat_ring_like_op.
 
@@ -83,7 +163,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold "*"%M; cbn.
   now rewrite Hra, Hrb.
 }
-apply mat_mul_assoc; [ easy | | | ]. {
+apply mat_mul_assoc. {
   now rewrite Hrb.
 } {
   intros H; apply Hnz.
