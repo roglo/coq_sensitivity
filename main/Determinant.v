@@ -61,20 +61,6 @@ Theorem determinant_succ : ∀ n (M : matrix T),
      minus_one_pow j * mat_el M 0 j * determinant_loop n (subm M 0 j).
 Proof. easy. Qed.
 
-(* the following versions of computing the determinant should
-   (to be proven) be equivalent; perhaps could help for proving
-   Cramer's rule of resolving equations *)
-
-Definition det_from_row {n} (M : matrix T) i :=
-  (minus_one_pow i *
-   ∑ (j = 0, n),
-     minus_one_pow j * mat_el M i j * determinant_loop n (subm M i j))%F.
-
-Definition det_from_col {n} (M : matrix T) j :=
-  (minus_one_pow j *
-   ∑ (i = 0, n - 1),
-     minus_one_pow i * mat_el M i j * determinant_loop n (subm M i j))%F.
-
 (* Alternative version of the determinant: sum of product of the
    factors a_{i,σ(i)} where σ goes through all permutations of
    the naturals of the interval [0, n-1].
@@ -1048,50 +1034,6 @@ Fixpoint tlopf_loop it n (σ : nat → nat) :=
       end
   end.
 
-Theorem first_non_fixpoint_Some_iff : ∀ σ it i j,
-  first_non_fixpoint it i σ = Some j
-  ↔ i ≤ j ∧ j - i < it ∧ (∀ k, i ≤ k < j → σ k = k) ∧ σ j ≠ j.
-Proof.
-intros.
-split. {
-  intros Hs.
-  revert σ i j Hs.
-  induction it; intros; [ easy | cbn in Hs ].
-  rewrite if_eqb_eq_dec in Hs.
-  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    specialize (IHit σ (i + 1) j Hs) as (H1 & H2 & H3 & H4).
-    split; [ flia H1 | ].
-    split; [ flia H2 | ].
-    split; [ | easy ].
-    intros k Hk.
-    destruct (Nat.eq_dec i k) as [Hik| Hik]; [ now subst k | ].
-    apply H3; flia Hk Hik.
-  } {
-    injection Hs; clear Hs; intros; subst j.
-    split; [ flia | ].
-    split; [ flia | ].
-    split; [ | now apply Nat.neq_sym ].
-    intros k Hk; flia Hk.
-  }
-} {
-  intros (Hij & Hji & Hj & Hjj).
-  revert i j Hij Hji Hj Hjj.
-  induction it; intros; [ easy | cbn ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i (σ i)) as [Hii| Hii]. {
-    assert (Heij : i ≠ j) by now intros H; symmetry in Hii; subst i.
-    apply IHit; [ flia Hij Hji Heij | flia Hij Hji Heij | | easy ].
-    intros k Hk.
-    apply Hj.
-    flia Hk.
-  }
-  destruct (Nat.eq_dec i j) as [Heij| Heij]; [ congruence | exfalso ].
-  assert (H : i ≤ i < j) by flia Hij Heij.
-  specialize (Hj _ H) as H1.
-  now symmetry in H1.
-}
-Qed.
-
 (* If we add a row (column) of A multiplied by a scalar k to another
    row (column) of A, then the determinant will not change. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html *)
@@ -1170,47 +1112,6 @@ Qed.
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html
    point 1 *)
 
-(* Well, since my definition of the determinant only covers the
-   row 0, we can prove that only when i=0; this will able us to
-   prove next theorems, swapping rows by going via row 0 *)
-
-Theorem det_mul_row_0_by_scal :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_is_comm = true →
-  ∀ (A : matrix T) v,
-  mat_nrows A ≠ 0
-  → is_square_matrix A = true
-  → determinant (mat_mul_row_by_scal (mat_nrows A) 0 A v) =
-    (v * determinant A)%F.
-Proof.
-intros Hom Hic * Hnz Hsm.
-remember (mat_nrows A) as n eqn:Hr; symmetry in Hr.
-destruct n; [ easy | clear Hnz ].
-unfold determinant; rewrite Hr.
-cbn - [ mat_mul_row_by_scal ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-cbn - [ seq ].
-rewrite List_map_seq_length.
-rewrite determinant_succ.
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-symmetry.
-rewrite (rngl_mul_comm Hic).
-symmetry.
-do 3 rewrite <- rngl_mul_assoc.
-f_equal.
-rewrite rngl_mul_assoc, (rngl_mul_mul_swap Hic).
-rewrite (rngl_mul_comm Hic _ v).
-f_equal. {
-  destruct i; [ easy | cbn ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  now rewrite seq_nth.
-}
-f_equal.
-rewrite <- Hr.
-now apply subm_mat_mul_row_by_scal.
-Qed.
-
 (* If the i-th row (column) in A is a sum of the i-th row (column) of
    a matrix B and the i-th row (column) of a matrix C and all other
    rows in B and C are equal to the corresponding rows in A (that is B
@@ -1222,7 +1123,7 @@ Qed.
    row 0, we can prove that only when i=0; this will able us to
    prove the next theorem, swapping rows by going via row 0 *)
 
-Theorem det_sum_row_row : ∀ n (A B C : matrix T),
+Theorem det_add_row_row : ∀ n (A B C : matrix T),
   n ≠ 0
   → mat_nrows A = n
   → mat_nrows B = n
@@ -1342,7 +1243,5 @@ End a.
 Arguments determinant {T ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
-Arguments det_from_row {T}%type {ro} {n}%nat M%M i%nat.
-Arguments det_from_col {T}%type {ro} {n}%nat M%M j%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
 Arguments subm {T} M%M i%nat j%nat.

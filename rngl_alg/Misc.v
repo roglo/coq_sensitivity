@@ -126,6 +126,23 @@ induction n; intros.
   now f_equal.
 Qed.
 
+Theorem Nat_eq_mod_sub_0 : ∀ a b c,
+  a mod c = b mod c → (a - b) mod c = 0.
+Proof.
+intros * Hab.
+destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
+  subst c; cbn in Hab |-*.
+  subst; flia.
+}
+specialize (Nat.div_mod a c Hcz) as H1.
+specialize (Nat.div_mod b c Hcz) as H2.
+rewrite H1, H2, Hab.
+rewrite (Nat.add_comm (c * (b / c))).
+rewrite Nat.sub_add_distr, Nat.add_sub.
+rewrite <- Nat.mul_sub_distr_l, Nat.mul_comm.
+now apply Nat.mod_mul.
+Qed.
+
 Theorem Nat_bezout_mul : ∀ a b c,
   Nat.Bezout a c 1
   → Nat.Bezout b c 1

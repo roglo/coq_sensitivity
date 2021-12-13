@@ -176,23 +176,6 @@ Qed.
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 
-Theorem Nat_eq_mod_sub_0 : ∀ a b c,
-  a mod c = b mod c → (a - b) mod c = 0.
-Proof.
-intros * Hab.
-destruct (Nat.eq_dec c 0) as [Hcz| Hcz]. {
-  subst c; cbn in Hab |-*.
-  subst; flia.
-}
-specialize (Nat.div_mod a c Hcz) as H1.
-specialize (Nat.div_mod b c Hcz) as H2.
-rewrite H1, H2, Hab.
-rewrite (Nat.add_comm (c * (b / c))).
-rewrite Nat.sub_add_distr, Nat.add_sub.
-rewrite <- Nat.mul_sub_distr_l, Nat.mul_comm.
-now apply Nat.mod_mul.
-Qed.
-
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   b ≠ 0 → (c * b + a) mod b = a mod b.
 Proof.
