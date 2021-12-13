@@ -173,14 +173,6 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add_distr.
 Qed.
 
-Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
-Proof.
-intros * Ha.
-replace a with (1 * a) at 1 by apply Nat.mul_1_l.
-rewrite Nat.add_comm.
-rewrite Nat.div_add; [ apply Nat.add_comm | easy ].
-Qed.
-
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 

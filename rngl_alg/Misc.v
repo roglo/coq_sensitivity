@@ -36,6 +36,14 @@ Notation "∃! x .. y , p" :=
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 *)
 
+Theorem Nat_div_add_same_l : ∀ a b, a ≠ 0 → (a + b) / a = 1 + b / a.
+Proof.
+intros * Ha.
+replace a with (1 * a) at 1 by apply Nat.mul_1_l.
+rewrite Nat.add_comm.
+rewrite Nat.div_add; [ apply Nat.add_comm | easy ].
+Qed.
+
 Theorem Nat_div_interv : ∀ n a b,
   n * b ≤ a < (n + 1) * b
   → a / b = n.
