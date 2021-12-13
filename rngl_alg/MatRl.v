@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import (*Utf8*) Arith (*Bool*).
+Require Import Utf8 Arith (*Bool*).
 (*
 Import List List.ListNotations.
 Require Import Init.Nat.
@@ -15,6 +15,8 @@ Require Import Main.RingLike (*IterAdd IterMul IterAnd*).
 Require Import MyVector Signature.
 *)
 Require Import Main.Matrix.
+
+Existing Instance mat_ring_like_op.
 
 Section a.
 
