@@ -99,6 +99,14 @@ apply mat_mul_assoc; [ easy | | | ]. {
 }
 Qed.
 
+Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
+Proof.
+intros.
+apply square_matrix_eq; cbn.
+apply mat_mul_1_l; [ easy | | symmetry; apply squ_mat_nrows ].
+apply square_matrix_is_correct.
+Qed.
+
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;

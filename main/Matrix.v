@@ -2441,14 +2441,6 @@ destruct Hm as (Hr, Hm).
 now apply squ_mat_is_corr.
 Qed.
 
-Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
-Proof.
-intros.
-apply square_matrix_eq; cbn.
-apply mat_mul_1_l; [ | symmetry; apply squ_mat_nrows ].
-apply square_matrix_is_correct.
-Qed.
-
 Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
 Proof.
 intros.
@@ -3075,6 +3067,8 @@ Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro a%F MA%M V%V.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
 Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
+About mat_mul_1_l.
+...
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
