@@ -177,23 +177,10 @@ apply mat_mul_add_distr_l. {
 Qed.
 
 Theorem squ_mat_opt_1_neq_0 {n} :
-  match
-    andb (@rngl_has_1_neq_0 T ro rp) (negb (Nat.eqb n O))
-    return Prop
-  with
-  | true =>
-      not
-        (@eq (square_matrix n T)
-           (@rngl_one (square_matrix n T) (@mat_ring_like_op T ro n))
-           (@rngl_zero (square_matrix n T) (@mat_ring_like_op T ro n)))
-  | false => not_applicable
-  end.
-(*
   if rngl_has_1_neq_0 && (n ≠? 0) then
-    @rngl_one (square_matrix n T) (mat_ring_like_op n) ≠
-    @rngl_zero (square_matrix n T) (mat_ring_like_op n)
+    @rngl_one _ (mat_ring_like_op ro n) ≠
+    @rngl_zero _ (mat_ring_like_op ro n)
   else not_applicable.
-*)
 (*
   if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
 *)
@@ -212,6 +199,14 @@ destruct n; [ easy | ].
 cbn in H.
 injection H; intros H1 H2.
 now apply rngl_1_neq_0.
+Qed.
+
+Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
+Proof.
+intros.
+apply square_matrix_eq; cbn.
+apply mat_mul_1_r; [ easy | | symmetry; apply squ_mat_ncols ].
+apply square_matrix_is_correct.
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :

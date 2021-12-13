@@ -2441,14 +2441,6 @@ destruct Hm as (Hr, Hm).
 now apply squ_mat_is_corr.
 Qed.
 
-Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
-Proof.
-intros.
-apply square_matrix_eq; cbn.
-apply mat_mul_1_r; [ | symmetry; apply squ_mat_ncols ].
-apply square_matrix_is_correct.
-Qed.
-
 Theorem squ_mat_mul_add_distr_r {n} : ∀ (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%F.
 Proof.
