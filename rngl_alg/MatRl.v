@@ -5,15 +5,9 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
-(*
-Require Import Init.Nat.
-*)
 
 Require Import Main.Misc.
-Require Import Main.RingLike Main.IterAdd (*IterMul IterAnd*).
-(*
-Require Import MyVector Signature.
-*)
+Require Import Main.RingLike Main.IterAdd.
 Require Import Main.Matrix.
 Import matrix_Notations.
 
