@@ -217,15 +217,6 @@ apply IHlen.
 flia Hip His.
 Qed.
 
-Theorem nth_0_fold_left_cons_cons : ∀ A B (b : A) (la : list B) lb lc d f,
-  nth 0 (fold_left (λ v i, nth 0 v d :: f v i) la (b :: lb)) lc = b.
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-now rewrite IHla.
-Qed.
-
 Theorem nth_fold_left_seq_gen : ∀ A (u : list A) i d n sta,
   sta + n ≤ length u
   → sta ≤ i < sta + n - 1

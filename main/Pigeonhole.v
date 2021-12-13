@@ -456,19 +456,6 @@ destruct fd as [(n, n') |]. {
 }
 Qed.
 
-Theorem pigeonhole_exist : ∀ a b f,
-  b < a
-  → (∀ x, x < a → f x < b)
-  → ∃ x x', x < a ∧ x' < a ∧ x ≠ x' ∧ f x = f x'.
-Proof.
-intros * Hba Hf.
-remember (pigeonhole_fun a f) as xx' eqn:Hpf.
-symmetry in Hpf.
-destruct xx' as (x, x').
-exists x, x'.
-now apply (pigeonhole a b).
-Qed.
-
 (* version list instead of fun *)
 
 Fixpoint search_double_loop {A} eqb i (l : list A) :=
@@ -490,12 +477,6 @@ Definition pigeonhole_comp_list l :=
   match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
-  end.
-
-Definition pigeonhole_comp_list' l :=
-  match List_search_double Nat.eqb l with
-  | (n, S n') => (n, n + S n')
-  | (_, 0) => (0, 0)
   end.
 
 Theorem search_double_loop_0_r : ∀ l i j,
@@ -695,147 +676,6 @@ replace (j + S c - i) with (S (j + S c - S i)) by flia H1; cbn.
 now apply H4.
 Qed.
 
-Theorem pigeonhole_comp_list_comp_list' :
-   ∀ l, pigeonhole_comp_list l = pigeonhole_comp_list' l.
-Proof.
-intros.
-unfold pigeonhole_comp_list, pigeonhole_comp_list'.
-remember (find_dup _ _) as a eqn:Ha.
-remember (List_search_double _ _) as b eqn:Hb.
-symmetry in Ha, Hb.
-move b before a.
-destruct b as (y, y').
-destruct a as [(x, x')| ]. {
-  apply find_dup_some in Ha.
-  destruct Ha as (Hxx & la1 & la2 & la3 & Hla & H1stx & H1stx').
-  assert (Hlla1 : length la1 < length l). {
-    apply (f_equal length) in Hla.
-    rewrite seq_length, app_length in Hla.
-    cbn in Hla; flia Hla.
-  }
-  assert (Hlla2 : length la1 + S (length la2) < length l). {
-    apply (f_equal length) in Hla.
-    rewrite seq_length, app_length in Hla; cbn in Hla.
-    rewrite app_length in Hla; cbn in Hla.
-    flia Hla.
-  }
-  assert (Hx : x < length l). {
-    rewrite (List_seq_cut (length la1)) in Hla. 2: {
-      apply in_seq.
-      split; [ flia | easy ].
-    }
-    rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
-    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-    destruct Hla as (Hla1 & Hla).
-    cbn in Hla.
-    now injection Hla; clear Hla; intros Hla Hla2; subst x.
-  }
-  assert (Hx' : x' < length l). {
-    rewrite (List_seq_cut (length la1 + S (length la2))) in Hla. 2: {
-      apply in_seq.
-      split; [ flia | easy ].
-    }
-    rewrite Nat.sub_0_r, Nat.add_0_l in Hla.
-    rewrite seq_app in Hla; cbn in Hla.
-    rewrite <- app_assoc in Hla.
-    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-    destruct Hla as (Hla1 & Hla).
-    cbn in Hla.
-    injection Hla; clear Hla; intros Hla Hla2; subst x.
-    apply List_app_eq_app' in Hla; [ | now rewrite seq_length ].
-    destruct Hla as (Hla2 & Hla).
-    injection Hla; clear Hla; intros Hla H; subst x'.
-    easy.
-  }
-  destruct y'. {
-    apply search_double_loop_0_r in Hb.
-    destruct Hb as (_, Hb); clear y.
-    specialize (proj1 (NoDup_nth l 0) Hb x x') as H1.
-    specialize (H1 Hx Hx' Hxx).
-    subst x'.
-    apply (f_equal (map (λ i, nth i l 0))) in Hla.
-    rewrite <- List_map_nth_seq in Hla.
-    rewrite Hla in Hb.
-    apply NoDup_map_inv in Hb.
-    apply NoDup_app_iff in Hb.
-    destruct Hb as (_ & Hb & _).
-    apply NoDup_cons_iff in Hb.
-    destruct Hb as (Hb, _).
-    exfalso; apply Hb.
-    apply in_app_iff; right.
-    now left.
-  }
-  apply search_double_loop_succ_r_if in Hb; cbn in Hb.
-  destruct Hb as (_ & Hyyl & Hcab & Hby & Hyy).
-  do 2 rewrite Nat.sub_0_r in Hyy.
-  assert (Hxlx : x < x') by now apply List_sorted_in_seq in Hla.
-  destruct (Nat.lt_trichotomy x y) as [Hxy| [Hxy| Hxy]]. {
-    exfalso.
-    apply (Hcab x (x' - S x)); [ flia Hxy | | ]. 2: {
-      do 2 rewrite Nat.sub_0_r.
-      now replace (x + S (x' - S x)) with x' by flia Hxlx.
-    }
-    flia Hxlx Hx'.
-  } {
-    subst y; f_equal.
-    destruct (Nat.lt_trichotomy x' (x + S y')) as [Hxy'| [Hxy'| Hxy']]. {
-      exfalso.
-      specialize (Hby (x' - S x)) as H1.
-      assert (H : x' - S x < y') by flia Hxy' Hxlx.
-      specialize (H1 H); clear H.
-      do 2 rewrite Nat.sub_0_r in H1.
-      rewrite <- Nat.sub_succ_l in H1 by easy; cbn in H1.
-      rewrite Nat.add_sub_assoc in H1; [ | flia Hxlx ].
-      now rewrite Nat.add_comm, Nat.add_sub in H1.
-    } {
-      easy.
-    } {
-      specialize (H1stx' (x + S y')) as H1.
-      assert (H : x + S y' ∈ la1 ++ la2). {
-        apply in_or_app; right.
-        remember (x + S y') as y eqn:Hy.
-        apply (seq_app_cons_app_cons_interv_in _ _ y) in Hla; [ easy | ].
-        subst y; split; [ flia | easy ].
-      }
-      specialize (H1 H); clear H.
-      now symmetry in Hyy.
-    }
-  } {
-    exfalso.
-    specialize (H1stx y (y + S y')) as H1.
-    assert (H : y ∈ la1). {
-      apply seq_app_cons_app_cons in Hla.
-      destruct Hla as (Hl & Hx2 & Hx'2 & Hla1 & Hla2 & Hla3).
-      rewrite Hla1.
-      apply in_seq.
-      split; [ flia | ].
-      now rewrite <- Hx2.
-    }
-    specialize (H1 H); clear H.
-    assert (H : y + S y' ∈ seq 0 (length l)). {
-      apply in_seq.
-      split; [ flia | easy ].
-    }
-    specialize (H1 H Hyy); clear H.
-    flia H1.
-  }
-}
-destruct y'; [ easy | exfalso ].
-apply find_dup_none in Ha.
-unfold List_search_double in Hb.
-apply search_double_loop_succ_r_if in Hb.
-destruct Hb as (_ & Hyyl & Hcab & Hby & Hyy).
-do 2 rewrite Nat.sub_0_r in Hyy.
-specialize (proj1 (NoDup_map_iff 0 _ _) Ha) as H1.
-rewrite seq_length in H1.
-specialize (H1 y (y + S y')).
-assert (H : y < length l) by flia Hyyl.
-specialize (H1 H Hyyl); clear H.
-rewrite seq_nth in H1; [ | flia Hyyl ].
-rewrite seq_nth in H1; [ | easy ].
-specialize (H1 Hyy); flia H1.
-Qed.
-
 Theorem pigeonhole_list : ∀ a l,
   a < length l
   → (∀ x, x ∈ l → x < a)
@@ -880,19 +720,6 @@ destruct fd as [(n, n') |]. {
   apply Hla.
   now apply nth_In.
 }
-Qed.
-
-Theorem pigeonhole_list_exist : ∀ a l,
-  a < length l
-  → (∀ x, x ∈ l → x < a)
-  → ∃ x x', x < length l ∧ x' < length l ∧ x ≠ x' ∧ nth x l 0 = nth x' l 0.
-Proof.
-intros * Hal Hla.
-remember (pigeonhole_comp_list l) as xx' eqn:Hpf.
-symmetry in Hpf.
-destruct xx' as (x, x').
-exists x, x'.
-now apply (pigeonhole_list a l).
 Qed.
 
 (* fin_t : finite type, implemented with type "sig" *)
