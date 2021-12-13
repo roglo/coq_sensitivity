@@ -1,11 +1,13 @@
+FermatLittle.vio: FermatLittle.v ../main/Misc.vio
+FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo
 GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
 GaussIntRl.vio: GaussIntRl.v ../main/RingLike.vio
 GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v ../main/RingLike.vo
 Nat_ggcd.vio: Nat_ggcd.v ../main/Misc.vio
 Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v ../main/Misc.vo
-Nrl.vio: Nrl.v ../main/Misc.vio ../main/RingLike.vio ./FermatLittle.vio
-Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo ../main/RingLike.vo ./FermatLittle.vo
+Nrl.vio: Nrl.v ../main/Misc.vio ../main/RingLike.vio FermatLittle.vio
+Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v ../main/Misc.vo ../main/RingLike.vo FermatLittle.vo
 PQ.vio: PQ.v ../main/Misc.vio Nat_ggcd.vio
 PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v ../main/Misc.vo Nat_ggcd.vo
 Qrl.vio: Qrl.v ../main/RingLike.vio Rational.vio

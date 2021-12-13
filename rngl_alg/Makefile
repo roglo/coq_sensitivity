@@ -12,12 +12,12 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -R ../main $(FILESFORDEP) | LC_ALL=C sort > .depend
+	coqdep -R ../main Main $(FILESFORDEP) | LC_ALL=C sort > .depend
 
 .SUFFIXES: .v .vo
 
 .v.vo:
-	coqc -R ../main $<
+	coqc -R ../main Main $<
 
 .PHONY: all clean depend
 
