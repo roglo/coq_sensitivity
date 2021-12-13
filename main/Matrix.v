@@ -2656,19 +2656,6 @@ split. {
 }
 Qed.
 
-Theorem squ_mat_consistent {n} :
-  (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
-   ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
-  ∧ (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
-     ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
-(*
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
-  (rngl_has_inv = false ∨ rngl_has_quot = false)
-*)
-Proof.
-now split; right.
-Qed.
-
 Theorem mat_vect_mul_0_r : ∀ m n (M : matrix T),
   m = mat_nrows M
   → n = mat_ncols M
