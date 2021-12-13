@@ -2,12 +2,6 @@ Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhol
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
 Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo
-FermatLittle.vio: FermatLittle.v Misc.vio
-FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v Misc.vo
-GQ.vio: GQ.v Misc.vio PQ.vio Nat_ggcd.vio
-GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v Misc.vo PQ.vo Nat_ggcd.vo
-GaussIntRl.vio: GaussIntRl.v RingLike.vio
-GaussIntRl.vo GaussIntRl.glob GaussIntRl.v.beautified GaussIntRl.required_vo: GaussIntRl.v RingLike.vo
 IterAdd.vio: IterAdd.v Misc.vio RingLike.vio
 IterAdd.vo IterAdd.glob IterAdd.v.beautified IterAdd.required_vo: IterAdd.v Misc.vo RingLike.vo
 IterAnd.vio: IterAnd.v Misc.vio
@@ -24,27 +18,13 @@ Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 MyVector.vio: MyVector.v Misc.vio RingLike.vio IterAdd.vio
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo IterAdd.vo
-Nat_ggcd.vio: Nat_ggcd.v Misc.vio
-Nat_ggcd.vo Nat_ggcd.glob Nat_ggcd.v.beautified Nat_ggcd.required_vo: Nat_ggcd.v Misc.vo
-Nrl.vio: Nrl.v Misc.vio RingLike.vio FermatLittle.vio
-Nrl.vo Nrl.glob Nrl.v.beautified Nrl.required_vo: Nrl.v Misc.vo RingLike.vo FermatLittle.vo
-PQ.vio: PQ.v Misc.vio Nat_ggcd.vio
-PQ.vo PQ.glob PQ.v.beautified PQ.required_vo: PQ.v Misc.vo Nat_ggcd.vo
 PermutSeq.vio: PermutSeq.v Misc.vio IterAnd.vio Pigeonhole.vio
 PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo IterAnd.vo Pigeonhole.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
-Qrl.vio: Qrl.v RingLike.vio Rational.vio
-Qrl.vo Qrl.glob Qrl.v.beautified Qrl.required_vo: Qrl.v RingLike.vo Rational.vo
-QuadIntRl.vio: QuadIntRl.v Misc.vio RingLike.vio
-QuadIntRl.vo QuadIntRl.glob QuadIntRl.v.beautified QuadIntRl.required_vo: QuadIntRl.v Misc.vo RingLike.vo
-Rational.vio: Rational.v Misc.vio GQ.vio
-Rational.vo Rational.glob Rational.v.beautified Rational.required_vo: Rational.v Misc.vo GQ.vo
 RingLike.vio: RingLike.v 
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
 Signature.vio: Signature.v Misc.vio RingLike.vio IterMul.vio PermutSeq.vio
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo RingLike.vo IterMul.vo PermutSeq.vo
-Zrl.vio: Zrl.v RingLike.vio
-Zrl.vo Zrl.glob Zrl.v.beautified Zrl.required_vo: Zrl.v RingLike.vo
