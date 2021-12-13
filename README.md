@@ -4,6 +4,11 @@ Proved by Hao Huang
 
 Work in progress...
 
+# DIRECTORIES
+
+main: minimun files for the proof
+rngl_alg: examples of algebras of the theory RingLike
+
 # AUTHOR
 Daniel de Rauglaudre
 
