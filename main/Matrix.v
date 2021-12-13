@@ -560,7 +560,7 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-Context {Hro : @rngl_has_opp T ro = true}.
+Context {Hop : @rngl_has_opp T ro = true}.
 
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
@@ -2467,25 +2467,6 @@ rewrite Hde in H1.
 apply H1.
 Qed.
 
-Theorem squ_mat_opt_eq_dec {n} :
-  if rngl_has_dec_eq then ∀ MA MB : square_matrix n T, {MA = MB} + {MA ≠ MB}
-  else not_applicable.
-Proof.
-remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
-destruct b; [ | easy ].
-intros.
-destruct MA as (MA & Ha).
-destruct MB as (MB & Hb).
-move MB before MA.
-destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
-  left; subst MB.
-  now apply square_matrix_eq.
-} {
-  right; intros H; apply Hab; clear Hab.
-  now injection H.
-}
-Qed.
-
 Theorem mat_add_nrows : ∀ MA MB : matrix T,
   mat_nrows (MA + MB) = min (mat_nrows MA) (mat_nrows MB).
 Proof.
@@ -2570,7 +2551,7 @@ Theorem sm_mat_of_nat :
 *)
 Proof.
 cbn.
-intros Hop; cbn.
+intros Hro; cbn.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
@@ -2675,111 +2656,6 @@ split. {
 }
 Qed.
 
-Theorem squ_mat_characteristic_prop {n} :
-  if (if n =? 0 then 1 else rngl_characteristic) =? 0
-  then ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
-  else
-    @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
-      (if n =? 0 then 1 else rngl_characteristic) = 0%F.
-Proof.
-rewrite (if_eqb_eq_dec n).
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  now apply square_matrix_eq.
-}
-apply Nat.neq_0_lt_0 in Hnz.
-specialize @rngl_characteristic_prop as H1.
-specialize (H1 T ro rp).
-rewrite if_eqb_eq_dec in H1 |-*.
-destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
-  intros i Hi.
-  apply (f_equal (λ M, mat_el (sm_mat M) 0 0)) in Hi.
-  cbn in Hi.
-  rewrite List_nth_repeat in Hi.
-  destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
-  rewrite List_nth_repeat in Hi.
-  destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
-  rewrite map2_map_l in Hi.
-  rewrite map2_nth with (a := 0) (b := []) in Hi; cycle 1. {
-    now rewrite seq_length.
-  } {
-    rewrite fold_mat_nrows.
-    clear Hi.
-    induction i; cbn; [ now rewrite repeat_length | ].
-    rewrite map2_length, List_map_seq_length.
-    rewrite fold_mat_nrows.
-    flia Hnz IHi.
-  }
-  rewrite map2_nth with (a := 0%F) (b := 0%F) in Hi; cycle 1. {
-    now rewrite List_map_seq_length.
-  } {
-    rewrite <- List_hd_nth_0, fold_mat_ncols.
-    now rewrite mat_ncols_of_nat.
-  }
-  rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hi; [ cbn in Hi | easy ].
-  rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (rngl_of_nat i)) 0 0) with
-    (@rngl_of_nat T ro i) in Hi. 2: {
-    symmetry.
-    clear Hi.
-    induction i. {
-      cbn.
-      rewrite List_nth_repeat.
-      destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
-      rewrite List_nth_repeat.
-      now destruct (lt_dec 0 n).
-    }
-    cbn - [ mat_el ].
-    rewrite mat_el_add; cycle 1. {
-      apply mI_is_correct_matrix.
-    } {
-      now apply rngl_of_nat_is_correct_matrix.
-    } {
-      now rewrite mI_nrows.
-    } {
-      now rewrite squ_mat_nrows.
-    } {
-      now rewrite mI_ncols.
-    } {
-      now rewrite squ_mat_ncols.
-    }
-    rewrite mat_el_mI_diag; [ | easy ].
-    now rewrite IHi.
-  }
-  now specialize (H1 i); cbn in H1.
-}
-cbn.
-apply square_matrix_eq; cbn.
-rewrite sm_mat_of_nat; [ | now left ].
-unfold "×"%M, mZ.
-f_equal; rewrite H1.
-destruct n; [ flia Hnz | clear Hnz ].
-cbn.
-f_equal. {
-  f_equal; [ now apply rngl_mul_0_l; left | ].
-  rewrite <- seq_shift.
-  rewrite map_map, map_map.
-  rewrite List_repeat_as_map.
-  apply map_ext_in.
-  intros i Hi.
-  now apply rngl_mul_0_l; left.
-}
-rewrite <- seq_shift.
-rewrite map_map, map_map.
-rewrite List_repeat_as_map.
-apply map_ext_in.
-intros i Hi.
-rewrite map_map; cbn.
-rewrite rngl_mul_0_l; [ | now left ].
-f_equal.
-rewrite List_repeat_as_map.
-rewrite map_map.
-apply map_ext_in.
-intros j Hj.
-now apply rngl_mul_0_l; left.
-Qed.
-
 Theorem squ_mat_consistent {n} :
   (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
    ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
@@ -2837,28 +2713,28 @@ Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_add_swap {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_comm {T}%type {ro rp} (MA MB)%M.
-Arguments mat_add_opp_r {T}%type {ro rp} Hro M%M.
-Arguments mat_add_sub {T}%type {ro rp} Hro (MA MB)%M.
+Arguments mat_add_opp_r {T}%type {ro rp} Hop M%M.
+Arguments mat_add_sub {T}%type {ro rp} Hop (MA MB)%M.
 Arguments mat_list_list {T}%type m%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
-Arguments mat_mul_assoc {T}%type {ro rp} Hro (MA MB MC)%M.
+Arguments mat_mul_assoc {T}%type {ro rp} Hop (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
 Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.
 Arguments mat_mul_scal_1_l {T}%type {ro rp} M%M.
-Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hro a%F (MA MB)%M.
+Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%F (MA MB)%M.
 Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%F M%M.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hro Hic a%F (MA MB)%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hop Hic a%F (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hro Hic a%F MA%M V%V.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro a%F MA%M V%V.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%F MA%M V%V.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hop a%F MA%M V%V.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
-Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
-Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} Hop (A B)%M V%V.
+Arguments mat_mul_1_l {T}%type {ro rp} Hop {n}%nat M%M.
+Arguments mat_mul_1_r {T}%type {ro rp} Hop {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
 Arguments mat_sub {T ro} MA%M MB%M.
@@ -2867,7 +2743,7 @@ Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
-Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
+Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
 Arguments matrix_eq {T ro} (MA MB)%M.
 Arguments is_correct_matrix {T}%type M%M.
@@ -2875,6 +2751,7 @@ Arguments is_square_matrix {T}%type M%M.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
 Arguments square_matrix_ncols {T}%type M%M.
 Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
+Arguments rngl_of_nat_is_correct_matrix {T}%type {ro rp} Hop n%nat Hch i%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.
