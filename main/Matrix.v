@@ -3067,8 +3067,6 @@ Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hro a%F MA%M V%V.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
 Arguments mat_vect_mul_assoc {T}%type {ro rp} Hro (A B)%M V%V.
-About mat_mul_1_l.
-...
 Arguments mat_mul_1_l {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_mul_1_r {T}%type {ro rp} Hro {n}%nat M%M.
 Arguments mat_opp {T ro} M%M.
