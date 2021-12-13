@@ -71,7 +71,11 @@ Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
      rngl_opt_opp := Some gi_opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-     rngl_opt_eucl_div := Some (gi_eucl_div, gi_gauge);
+      rngl_opt_quot := Some gi_div;
      rngl_le := phony_gi_le |}.
 
+(*
 Compute (mk_gi (- 36) 242 / mk_gi 50 50)%G.
+*)
+
+(* to be completed with gauss_int_ring_like_prop... *)
