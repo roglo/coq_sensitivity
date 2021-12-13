@@ -2431,14 +2431,6 @@ rewrite map_length.
 now apply Hc.
 Qed.
 
-Theorem squ_mat_add_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA + (MB + MC) = (MA + MB) + MC)%F.
-Proof.
-intros.
-apply square_matrix_eq.
-apply mat_add_assoc.
-Qed.
-
 Theorem square_matrix_is_correct : ∀ n (M : square_matrix n T),
   is_correct_matrix (sm_mat M) = true.
 Proof.
@@ -2447,63 +2439,6 @@ destruct M as (M, Hm); cbn.
 apply Bool.andb_true_iff in Hm.
 destruct Hm as (Hr, Hm).
 now apply squ_mat_is_corr.
-Qed.
-
-Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
-Proof.
-intros.
-apply square_matrix_eq.
-cbn.
-apply mat_add_0_l; cycle 1. {
-  symmetry; apply squ_mat_nrows.
-} {
-  symmetry; apply squ_mat_ncols.
-}
-apply square_matrix_is_correct.
-Qed.
-
-Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA * (MB * MC) = (MA * MB) * MC)%F.
-Proof.
-intros.
-apply square_matrix_eq.
-destruct MA as (MA & Ha).
-destruct MB as (MB & Hb).
-destruct MC as (MC & Hc); cbn.
-apply Bool.andb_true_iff in Ha, Hb, Hc.
-destruct Ha as (Hra, Ha).
-destruct Hb as (Hrb, Hb).
-destruct Hc as (Hrc, Hc).
-apply Nat.eqb_eq in Hra, Hrb, Hrc.
-move MB before MA; move MC before MB.
-move Hrb before Hra; move Hrc before Hrb.
-apply is_scm_mat_iff in Ha.
-apply is_scm_mat_iff in Hb.
-apply is_scm_mat_iff in Hc.
-destruct Ha as (Hcra & Hca).
-destruct Hb as (Hcrb & Hcb).
-destruct Hc as (Hcrc & Hcc).
-move Hrb before Hra; move Hrc before Hrb.
-move Hcrb before Hcra; move Hcrc before Hcrb.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n; cbn.
-  unfold "*"%M; cbn.
-  now rewrite Hra, Hrb.
-}
-apply mat_mul_assoc. {
-  now rewrite Hrb.
-} {
-  intros H; apply Hnz.
-  apply Hcrb in H.
-  rewrite <- Hrb; apply H.
-} {
-  rewrite Hrb.
-  unfold mat_ncols.
-  rewrite Hra in Hca.
-  apply Hca.
-  apply List_hd_in, Nat.neq_0_lt_0.
-  now rewrite fold_mat_nrows, Hra.
-}
 Qed.
 
 Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
@@ -3115,6 +3050,7 @@ Delimit Scope M_scope with M.
 
 Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add {T}%type {ro} (MA MB)%M.
+Arguments mat_add_0_l {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_add_swap {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
@@ -3124,6 +3060,7 @@ Arguments mat_add_sub {T}%type {ro rp} Hro (MA MB)%M.
 Arguments mat_list_list {T}%type m%M.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
+Arguments mat_mul_assoc {T}%type {ro rp} Hro (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
 Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
 Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.

@@ -1,4 +1,4 @@
-(* matrices *)
+(* square matrix ring like algebra *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
@@ -15,14 +15,16 @@ Require Import Main.RingLike (*IterAdd IterMul IterAnd*).
 Require Import MyVector Signature.
 *)
 Require Import Main.Matrix.
-
-Existing Instance mat_ring_like_op.
+Import matrix_Notations.
 
 Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
+Context {Hro : @rngl_has_opp T ro = true}.
+
+Existing Instance mat_ring_like_op.
 
 Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
   (MA + MB)%F = (MB + MA)%F.
@@ -30,6 +32,71 @@ Proof.
 intros.
 apply square_matrix_eq.
 apply mat_add_comm.
+Qed.
+
+Theorem squ_mat_add_assoc {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA + (MB + MC) = (MA + MB) + MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+apply mat_add_assoc.
+Qed.
+
+Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
+Proof.
+intros.
+apply square_matrix_eq.
+cbn.
+apply mat_add_0_l; cycle 1. {
+  symmetry; apply squ_mat_nrows.
+} {
+  symmetry; apply squ_mat_ncols.
+}
+apply square_matrix_is_correct.
+Qed.
+
+Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
+  (MA * (MB * MC) = (MA * MB) * MC)%F.
+Proof.
+intros.
+apply square_matrix_eq.
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb).
+destruct MC as (MC & Hc); cbn.
+apply Bool.andb_true_iff in Ha, Hb, Hc.
+destruct Ha as (Hra, Ha).
+destruct Hb as (Hrb, Hb).
+destruct Hc as (Hrc, Hc).
+apply Nat.eqb_eq in Hra, Hrb, Hrc.
+move MB before MA; move MC before MB.
+move Hrb before Hra; move Hrc before Hrb.
+apply is_scm_mat_iff in Ha.
+apply is_scm_mat_iff in Hb.
+apply is_scm_mat_iff in Hc.
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+destruct Hc as (Hcrc & Hcc).
+move Hrb before Hra; move Hrc before Hrb.
+move Hcrb before Hcra; move Hcrc before Hcrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n; cbn.
+  unfold "*"%M; cbn.
+  now rewrite Hra, Hrb.
+}
+apply mat_mul_assoc; [ easy | | | ]. {
+  now rewrite Hrb.
+} {
+  intros H; apply Hnz.
+  apply Hcrb in H.
+  rewrite <- Hrb; apply H.
+} {
+  rewrite Hrb.
+  unfold mat_ncols.
+  rewrite Hra in Hca.
+  apply Hca.
+  apply List_hd_in, Nat.neq_0_lt_0.
+  now rewrite fold_mat_nrows, Hra.
+}
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :
