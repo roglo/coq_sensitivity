@@ -1,4 +1,4 @@
-TARGET=Qrl.vo Zrl.vo Nrl.vo QuadIntRl.vo
+TARGET=Qrl.vo Zrl.vo Nrl.vo QuadIntRl.vo GaussIntRl.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: $(TARGET)
@@ -12,12 +12,12 @@ clean:
 
 depend:
 	mv .depend .depend.bak
-	coqdep -R ../main Main $(FILESFORDEP) | LC_ALL=C sort > .depend
+	coqdep -Q ../main Main $(FILESFORDEP) | LC_ALL=C sort > .depend
 
 .SUFFIXES: .v .vo
 
 .v.vo:
-	coqc -R ../main Main $<
+	coqc -Q ../main Main $<
 
 .PHONY: all clean depend
 

@@ -4,7 +4,7 @@
 Set Implicit Arguments.
 Require Import Utf8.
 
-Require Import RingLike Rational.
+Require Import Main.RingLike Rational.
 Import Q.Notations.
 
 Canonical Structure Q_ring_like_op : ring_like_op Q :=

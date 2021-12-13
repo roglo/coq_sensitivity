@@ -5,7 +5,7 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
-Require Import Misc RingLike FermatLittle.
+Require Import Main.Misc Main.RingLike FermatLittle.
 
 Canonical Structure nat_ring_like_op : ring_like_op nat :=
   {| rngl_zero := 0;

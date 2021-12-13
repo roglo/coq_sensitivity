@@ -1,6 +1,6 @@
 Set Nested Proofs Allowed.
 Require Import Utf8 ZArith.
-Require Import RingLike.
+Require Import Main.RingLike.
 Open Scope Z_scope.
 
 Record gauss_int := mk_gi { gi_re : Z; gi_im : Z }.

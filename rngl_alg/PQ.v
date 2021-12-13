@@ -1,7 +1,7 @@
 (* Implementation of positive (non zero) rationals using only nat *)
 
 Require Import Utf8 Arith Morphisms Psatz.
-Require Import Misc.
+Require Import Main.Misc.
 
 Set Nested Proofs Allowed.
 
