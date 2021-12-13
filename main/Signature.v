@@ -843,13 +843,6 @@ Qed.
 Definition list_swap p q l :=
   map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
 
-Theorem length_list_swap : ∀ p q l, length (list_swap p q l) = length l.
-Proof.
-intros.
-unfold list_swap.
-now rewrite map_length, seq_length.
-Qed.
-
 Theorem permut_swap_fun_is_permut : ∀ p q σ n,
   p < n
   → q < n
@@ -1921,36 +1914,6 @@ split; [ now apply (comp_is_permut_list n) | ].
 unfold "°".
 rewrite map_length.
 now destruct Hp2.
-Qed.
-
-Theorem iter_comp_is_permut : ∀ n l,
-  l ≠ [] ∨ n = 0
-  → (∀ σ, σ ∈ l → is_permut n σ)
-  → is_permut n (Comp (σ ∈ l), σ).
-Proof.
-intros * Hnn Hl.
-destruct l as [| σ]. {
-  destruct Hnn as [Hnn| Hnn]; [ easy | ].
-  now subst n; cbn; unfold iter_list; cbn.
-}
-clear Hnn; cbn.
-unfold iter_list; cbn.
-unfold "°" at 2.
-unfold ff_app.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite seq_nth; [ apply Nat.add_0_l | ].
-  apply Hl; [ now left | easy ].
-}
-rewrite map_id.
-revert σ Hl.
-induction l as [| σ2]; intros; [ now apply Hl; left | cbn ].
-apply IHl.
-intros σ3 Hσ3.
-destruct Hσ3 as [Hσ3| Hσ3]. {
-  now subst σ3; apply comp_is_permut; apply Hl; [ | right ]; left.
-}
-now apply Hl; right; right.
 Qed.
 
 Theorem ε_1_opp_1 : in_field →

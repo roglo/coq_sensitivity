@@ -534,53 +534,6 @@ rewrite map_length.
 now rewrite seq_length.
 Qed.
 
-Theorem is_permut_canon_transp : ∀ n k p q,
-  k < n!
-  → p < n
-  → q < n
-  → is_permut n (list_swap_elem 0 (canon_sym_gr_list n k) p q).
-Proof.
-intros * Hkn Hpn Hqn.
-split. {
-  split. {
-    intros j Hj.
-    rewrite length_list_swap_elem, length_canon_sym_gr_list.
-    unfold list_swap_elem in Hj.
-    rewrite length_canon_sym_gr_list in Hj.
-    apply in_map_iff in Hj.
-    destruct Hj as (i & Hij & Hi).
-    apply in_seq in Hi.
-    rewrite <- Hij.
-    unfold transposition.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-      now apply canon_sym_gr_list_ub.
-    }
-    destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-      now apply canon_sym_gr_list_ub.
-    }
-    now apply canon_sym_gr_list_ub.
-  } {
-    intros u v Hu Hv Huv.
-    rewrite length_list_swap_elem in Hu, Hv.
-    unfold list_swap_elem in Huv.
-    rewrite length_canon_sym_gr_list in Hu, Hv, Huv.
-    unfold ff_app in Huv.
-    rewrite (List_map_nth' 0) in Huv; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Huv; [ | now rewrite seq_length ].
-    rewrite seq_nth in Huv; [ | easy ].
-    rewrite seq_nth in Huv; [ | easy ].
-    cbn in Huv.
-    assert (Htu : transposition p q u < n) by now apply transposition_lt.
-    assert (Htv : transposition p q v < n) by now apply transposition_lt.
-    apply nth_canon_sym_gr_list_inj1 in Huv; [ | easy | easy | easy ].
-    now apply transposition_injective in Huv.
-  }
-}
-rewrite length_list_swap_elem.
-apply length_canon_sym_gr_list.
-Qed.
-
 Theorem nth_transposition_canon_sym_gr_list_inj : ∀ n k p q i j,
   k < n!
   → p < n
