@@ -24,7 +24,166 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 Context {Hro : @rngl_has_opp T ro = true}.
 
+Theorem mZ_is_square_matrix : ∀ n,
+  (mat_nrows (mZ n n) =? n) && is_square_matrix (mZ n n) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split. {
+  cbn; rewrite repeat_length.
+  apply Nat.eqb_refl.
+}
+apply is_scm_mat_iff.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; cbn | ].
+split; [ now rewrite mZ_nrows, mZ_ncols | ].
+intros la Hla.
+cbn in Hla.
+apply repeat_spec in Hla; subst la.
+now cbn; do 2 rewrite repeat_length.
+Qed.
+
+Definition smZ n : square_matrix n T :=
+  {| sm_mat := mZ n n;
+     sm_prop := mZ_is_square_matrix n |}.
+
+Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
+  {| rngl_zero := smZ n;
+     rngl_one := smI n;
+     rngl_add := square_matrix_add;
+     rngl_mul := square_matrix_mul;
+     rngl_opt_opp := Some square_matrix_opp;
+     rngl_opt_inv := None;
+     rngl_opt_sous := None;
+     rngl_opt_quot := None;
+     rngl_le := phony_mat_le |}.
+
 Existing Instance mat_ring_like_op.
+
+Theorem mat_ncols_of_nat {n} : ∀ i,
+  mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
+induction i; [ now apply mZ_ncols | cbn ].
+rewrite mat_add_ncols.
+rewrite mI_ncols, IHi.
+apply Nat.min_id.
+Qed.
+
+Theorem sm_mat_of_nat :
+  @rngl_has_opp T ro = true ∨ @rngl_has_sous T ro = true
+  → ∀ n m,
+     sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
+(*
+  rngl_has_opp = true ∨ rngl_has_sous = true
+  → ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
+*)
+Proof.
+cbn.
+intros Hro; cbn.
+induction m; cbn. {
+  unfold "×"%M, mZ, mI.
+  f_equal; cbn.
+  rewrite map_map.
+  rewrite List_repeat_as_map.
+  apply map_ext_in.
+  intros i Hi.
+  rewrite List_repeat_as_map.
+  rewrite map_map.
+  apply map_ext_in.
+  intros j Hj.
+  now symmetry; apply rngl_mul_0_l.
+}
+rewrite mat_mul_scal_l_add_distr_r.
+now rewrite mat_mul_scal_1_l, IHm.
+Qed.
+
+Theorem mat_el_of_nat_diag {n} : ∀ m i,
+  i < n
+  → mat_el
+      (sm_mat
+         (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)) i i =
+    rngl_of_nat m.
+(*
+  ∀ m i : nat, i < n → mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+*)
+Proof.
+intros * Hin.
+rewrite sm_mat_of_nat; [ | now left ].
+cbn.
+rewrite map_map.
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite List_map_nth' with (a := 0%F). 2: {
+  now rewrite List_map_seq_length.
+}
+rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+unfold δ.
+now rewrite Nat.eqb_refl, rngl_mul_1_r.
+Qed.
+
+Theorem rngl_of_nat_is_correct_matrix {n} :
+  rngl_characteristic = 0
+  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)) = true.
+Proof.
+intros Hch *.
+apply is_scm_mat_iff.
+split. {
+  intros Hc.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    now subst n; destruct i.
+  }
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+    subst i; cbn in Hc |-*.
+    now rewrite mZ_ncols in Hc.
+  }
+  unfold mat_ncols in Hc.
+  unfold mat_nrows.
+  apply length_zero_iff_nil in Hc.
+  apply length_zero_iff_nil.
+  remember (mat_list_list _) as lla eqn:Hlla.
+  symmetry in Hlla.
+  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  rewrite fold_mat_el in Hlla.
+  rewrite List_hd_nth_0 in Hc.
+  rewrite Hc in Hlla; cbn in Hlla.
+  exfalso; clear lla Hc.
+  destruct i; [ easy | clear Hiz ].
+  cbn - [ mat_el ] in Hlla.
+  apply Nat.neq_0_lt_0 in Hnz.
+  rewrite mat_el_add in Hlla; cycle 1. {
+    apply mI_is_correct_matrix.
+  } {
+    apply square_matrix_is_correct.
+  } {
+    now rewrite mI_nrows.
+  } {
+    now rewrite squ_mat_nrows.
+  } {
+    now rewrite mI_ncols.
+  } {
+    now rewrite squ_mat_ncols.
+  }
+  rewrite mat_el_mI_diag in Hlla; [ | easy ].
+  rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
+  specialize rngl_characteristic_prop as H1.
+  rewrite Hch in H1; cbn in H1.
+  now apply (H1 i).
+} {
+  intros l Hl.
+  rewrite mat_ncols_of_nat.
+  remember (rngl_of_nat i) as M eqn:HM.
+  destruct M as (M, Hm); cbn in Hl.
+  clear HM.
+  apply Bool.andb_true_iff in Hm.
+  destruct Hm as (Hr, Hm).
+  apply Nat.eqb_eq in Hr.
+  apply is_scm_mat_iff in Hm.
+  destruct Hm as (Hcr & Hc).
+  rewrite Hr in Hc.
+  now apply Hc.
+}
+Qed.
 
 Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
   (MA + MB)%F = (MB + MA)%F.
