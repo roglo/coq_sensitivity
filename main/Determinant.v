@@ -998,52 +998,6 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
           (seq 0 n))
        (seq 0 n)).
 
-Theorem subm_mat_mul_row_by_scal : ∀ (A : matrix T) i v,
-  is_square_matrix A = true
-  → subm (mat_mul_row_by_scal (mat_nrows A) 0 A v) 0 i = subm A 0 i.
-Proof.
-intros * Hsm.
-remember (mat_nrows A) as n eqn:Hr; symmetry in Hr.
-unfold subm.
-f_equal.
-f_equal.
-unfold butn.
-do 2 rewrite firstn_O.
-f_equal.
-do 2 rewrite List_skipn_1.
-destruct A as (ll).
-destruct ll as [| la ll]; [ now subst n; cbn | ].
-apply is_scm_mat_iff in Hsm.
-cbn in Hsm.
-destruct Hsm as (Hcr & Hc).
-destruct n; [ easy | ].
-cbn in Hr.
-apply Nat.succ_inj in Hr.
-cbn - [ mat_mul_row_by_scal ].
-rewrite List_map_nth_seq with (d := []).
-rewrite Hr.
-cbn - [ seq mat_el ].
-rewrite List_map_tl.
-remember (tl (seq 0 (S n))) as x eqn:Hx.
-cbn in Hx; subst x.
-rewrite <- seq_shift.
-rewrite map_map.
-apply map_ext_in.
-intros j Hj.
-apply in_seq in Hj.
-destruct Hj as (_, Hj).
-rewrite List_map_nth_seq with (d := 0%F).
-rewrite Hc. 2: {
-  right.
-  apply nth_In.
-  now rewrite Hr.
-}
-rewrite Hr.
-apply map_ext_in.
-intros k Hk.
-now destruct (Nat.eq_dec (S j) 0).
-Qed.
-
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
 (* https://math.vanderbilt.edu/sapirmv/msapir/proofdet1.html

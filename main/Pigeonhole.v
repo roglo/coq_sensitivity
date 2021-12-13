@@ -468,48 +468,11 @@ Fixpoint search_double_loop {A} eqb i (l : list A) :=
   | [] => (0, 0)
   end.
 
-(* from the list "l", return a couple of nat "(i, j)" where
-   * j = 0, if there is no double value in "l"
-   * j = S _, if the i-th value and the (i+j)-th value are equal *)
-Definition List_search_double {A} eqb l := @search_double_loop A eqb 0 l.
-
 Definition pigeonhole_comp_list l :=
   match find_dup (λ i, nth i l 0) (seq 0 (length l)) with
   | Some (n, n') => (n, n')
   | None => (0, 0)
   end.
-
-Theorem search_double_loop_0_r : ∀ l i j,
-  search_double_loop Nat.eqb i l = (j, 0)
-  → j = 0 ∧ NoDup l.
-Proof.
-intros * Hxx.
-assert (Hj : j = 0). {
-  revert i j Hxx.
-  induction l as [| a]; cbn; intros. {
-    now injection Hxx; clear Hxx; intros; subst j.
-  }
-  remember (List_find_nth _ _) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
-  apply (IHl (S i) j Hxx).
-}
-split; [ easy | subst j ].
-revert i Hxx.
-induction l as [| a]; cbn; intros; [ constructor | ].
-remember (List_find_nth _ _) as b eqn:Hb.
-symmetry in Hb.
-destruct b as [b| ]; [ now rewrite Nat.add_1_r in Hxx | ].
-specialize (IHl (S i) Hxx) as H1.
-constructor; [ | easy ].
-intros Ha.
-apply (In_nth _ _ 0) in Ha.
-destruct Ha as (n & Hn & Hna).
-specialize (List_find_nth_None 0 _ _ Hb) as H2.
-specialize (H2 n Hn).
-apply Nat.eqb_neq in H2.
-now symmetry in Hna.
-Qed.
 
 Theorem seq_app_cons_app_cons : ∀ sta len x y la1 la2 la3,
   seq sta len = la1 ++ x :: la2 ++ y :: la3
@@ -603,77 +566,6 @@ split. {
   f_equal.
   flia Hx Hy Hlen.
 }
-Qed.
-
-Theorem seq_app_cons_app_cons_interv_in : ∀ n x y z la1 la2 la3,
-  seq 0 n = la1 ++ x :: la2 ++ z :: la3
-  → x < y < z
-  → y ∈ la2.
-Proof.
-intros * Hs Hxyz.
-specialize (seq_app_cons_app_cons 0 n x z la1 la2 la3) as H1.
-specialize (proj1 H1 Hs) as (Hn & Hx & Hz & Hla1 & Hla2 & Hla3).
-rewrite Hla2.
-apply in_seq.
-rewrite <- Hz.
-easy.
-Qed.
-
-Theorem search_double_loop_succ_r_if : ∀ l i j k,
-  search_double_loop Nat.eqb i l = (j, S k)
-  → i ≤ j ∧ j + S k < i + length l ∧
-    (∀ a b, i ≤ a < j → a + S b < i + length l →
-     nth (a - i) l 0 ≠ nth (a + S b - i) l 0) ∧
-    (∀ b, b < k → nth (j - i) l 0 ≠ nth (j + S b - i) l 0) ∧
-    nth (j - i) l 0 = nth (j + S k - i) l 0.
-Proof.
-intros * Hxx.
-revert i j k Hxx.
-induction l as [| a]; intros; [ easy | ].
-rewrite <- Nat.add_succ_comm.
-cbn in Hxx.
-remember (List_find_nth _ _) as b eqn:Hb.
-symmetry in Hb.
-destruct b as [b| ]. {
-  rewrite Nat.add_1_r in Hxx.
-  injection Hxx; clear Hxx; intros; subst j k.
-  split; [ easy | ].
-  replace (S i + b - i) with (S b) by flia.
-  rewrite Nat.sub_diag, List_nth_0_cons, List_nth_succ_cons.
-  apply (List_find_nth_Some 0) in Hb.
-  destruct Hb as (Hbl & Hbef & Heq).
-  apply Nat.eqb_eq in Heq; subst a.
-  split; [ cbn; flia Hbl | ].
-  split; [ intros j k Hij Hjk; flia Hij | ].
-  split; [ | easy ].
-  intros j Hj.
-  replace (i + S j - i) with (S j) by flia; cbn.
-  specialize (Hbef j Hj).
-  now apply Nat.eqb_neq in Hbef.
-}
-specialize (IHl (S i) j k Hxx) as H1.
-rewrite List_length_cons.
-destruct H1 as (H1 & H2 & H3 & H4 & H5).
-split; [ flia H1 | ].
-split; [ flia H2 | ].
-split. {
-  intros c d Hicj Hcdi.
-  destruct (Nat.eq_dec c i) as [Hci| Hci]. {
-    subst c.
-    rewrite Nat.sub_diag, Nat.add_comm, Nat.add_sub; cbn.
-    apply List_find_nth_None with (d := 0) (j := d) in Hb; [ | flia Hcdi ].
-    now apply Nat.eqb_neq in Hb.
-  }
-  replace (c - i) with (S (c - S i)) by flia Hicj Hci.
-  replace (c + S d - i) with (S (c + S d - S i)) by flia Hicj; cbn.
-  apply H3; [ flia Hicj Hci | flia Hcdi ].
-}
-replace (j - i) with (S (j - S i)) by flia H1.
-replace (S j + k - i) with (S (j + S k - S i)) by flia H1.
-split; [ | easy ].
-intros c Hc.
-replace (j + S c - i) with (S (j + S c - S i)) by flia H1; cbn.
-now apply H4.
 Qed.
 
 Theorem pigeonhole_list : ∀ a l,

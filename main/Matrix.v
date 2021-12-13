@@ -1716,73 +1716,6 @@ Definition subm' (M : matrix T) u v :=
             (seq 0 (mat_ncols M - 1)))
        (seq 0 (mat_nrows M - 1))).
 
-(* equivalence between subm and subm' *)
-
-Theorem subm_subm' : ∀ (M : matrix T) i j,
-  is_correct_matrix M = true
-  → i < mat_nrows M
-  → j < mat_ncols M
-  → subm M i j = subm' M i j.
-Proof.
-intros * Hm Hi Hj.
-unfold subm, subm'.
-f_equal.
-rewrite (List_map_nth_seq (mat_list_list M) []) at 1.
-rewrite fold_mat_nrows.
-rewrite <- map_butn, map_map.
-rewrite map_butn_seq.
-unfold Nat.b2n at 2.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec i (mat_nrows M)) as [H| H]; [ clear H | flia Hi H ].
-apply map_ext_in.
-intros u Hu.
-apply in_seq in Hu; cbn.
-unfold Nat.b2n at 1; rewrite if_leb_le_dec.
-destruct (le_dec i u) as [Hui| Hui]. 2: {
-  apply Nat.nle_gt in Hui.
-  rewrite (List_map_nth_seq _ 0%F).
-  rewrite butn_length.
-  rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
-  unfold Nat.b2n.
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
-  apply map_ext_in.
-  intros v Hv.
-  unfold Nat.b2n.
-  do 2 rewrite if_leb_le_dec.
-  destruct (le_dec i u) as [H| H]; [ flia Hui H | clear H ].
-  rewrite Nat.add_0_r.
-  destruct (le_dec j v) as [Hvj| Hjv]. {
-    now rewrite nth_butn_before.
-  } {
-    apply Nat.nle_gt in Hjv.
-    rewrite nth_butn_after; [ | easy ].
-    now rewrite Nat.add_0_r.
-  }
-} {
-  unfold Nat.b2n.
-  rewrite if_leb_le_dec.
-  destruct (le_dec i u) as [H| H]; [ clear H | flia Hui H ].
-  rewrite (List_map_nth_seq _ 0%F).
-  rewrite butn_length.
-  unfold Nat.b2n; rewrite if_ltb_lt_dec.
-  rewrite fold_corr_mat_ncols; [ | easy | flia Hu ].
-  destruct (lt_dec j (mat_ncols M)) as [H| H]; [ clear H | flia Hj H ].
-  apply map_ext_in.
-  intros v Hv.
-  apply in_seq in Hv.
-  unfold Nat.b2n.
-  rewrite if_leb_le_dec.
-  destruct (le_dec j v) as [Hjv| Hjv]. {
-    now rewrite nth_butn_before.
-  } {
-    apply Nat.nle_gt in Hjv.
-    rewrite Nat.add_0_r.
-    now rewrite nth_butn_after.
-  }
-}
-Qed.
-
 (* combinations of submatrix and other operations *)
 
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
@@ -1792,28 +1725,6 @@ intros.
 destruct M as (ll); cbn - [ "<?" ].
 rewrite map_length.
 now rewrite butn_length.
-Qed.
-
-Theorem subm_subm_r_r : ∀ i j k (M : matrix T),
-  i ≤ k → subm (subm M i j) k j = subm (subm M (k + 1) j) i j.
-Proof.
-intros * Hik.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-now rewrite butn_butn.
-Qed.
-
-Theorem subm_subm_l_l : ∀ i j k (M : matrix T),
-  j ≤ k → subm (subm M i j) i k = subm (subm M i (k + 1)) i j.
-Proof.
-intros * Hkj.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-f_equal; f_equal.
-do 2 rewrite map_map.
-apply map_ext_in.
-intros la Hla.
-now rewrite butn_butn.
 Qed.
 
 Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
@@ -1879,33 +1790,6 @@ destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. {
 replace j with (l + 1) by flia Hlj Hlj1.
 rewrite Nat.add_sub.
 now rewrite butn_butn.
-Qed.
-
-Theorem subm_subm_exch'' : ∀ i j k (M : matrix T),
-  i ≤ j → subm (subm M i (k + 1)) j k = subm (subm M (j + 1) k) i k.
-Proof.
-intros * Hij.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-do 2 rewrite map_map.
-rewrite butn_butn; [ | easy ].
-f_equal; f_equal.
-apply map_ext_in.
-intros l Hl.
-now symmetry; apply butn_butn.
-Qed.
-
-Theorem subm_out_l : ∀ i j (M : matrix T),
-  mat_nrows M ≤ i
-  → mat_nrows M ≤ j
-  → ∀ k, subm M i k = subm M j k.
-Proof.
-intros * Hi Hj *.
-unfold subm; f_equal.
-do 2 rewrite map_butn.
-rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
-rewrite butn_out; [ | now rewrite map_length, fold_mat_nrows ].
-easy.
 Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
@@ -3498,7 +3382,6 @@ Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} M%M i%nat j%nat.
-Arguments subm_subm' {T}%type {ro} M%M (i j)%nat.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hro {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
 Arguments matrix_eq {T ro} (MA MB)%M.

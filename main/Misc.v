@@ -110,32 +110,6 @@ rewrite seq_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
-Theorem List_sorted_in_seq : ∀ sta len a b la1 la2 la3,
-  seq sta len = la1 ++ a :: la2 ++ b :: la3 → a < b.
-Proof.
-intros * Hs.
-revert sta a b la1 la2 la3 Hs.
-induction len; intros. {
-  apply (f_equal length) in Hs; cbn in Hs.
-  rewrite app_length in Hs; cbn in Hs.
-  rewrite app_length in Hs; cbn in Hs.
-  flia Hs.
-}
-cbn in Hs.
-destruct la1 as [| c]. {
-  cbn in Hs.
-  injection Hs; clear Hs; intros Hs H; subst a.
-  assert (H : b ∈ seq (S sta) len). {
-    rewrite Hs.
-    now apply in_app_iff; right; left.
-  }
-  now apply in_seq in H.
-}
-cbn in Hs.
-injection Hs; clear Hs; intros Hs H; subst c.
-now apply IHlen in Hs.
-Qed.
-
 Theorem iter_shift : ∀ {T} b k f (d : T),
   b ≤ k
   → iter_seq b k f d =
