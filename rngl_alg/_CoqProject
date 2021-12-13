@@ -1,1 +1,1 @@
--Q ../main Main
+-R . RnglAlg -Q ../main Main
