@@ -3346,8 +3346,8 @@ Arguments comatrix {T}%type {ro} M%M.
 Arguments mat_inv {T}%type {ro} M%M.
 
 (* tests
-Require Import Qrl.
-Require Import Rational.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute 3.

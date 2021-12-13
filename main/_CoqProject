@@ -1,1 +1,1 @@
--R . Main
+-R . Main -Q ../rngl_alg RnglAlg

@@ -19,7 +19,7 @@ depend:
 
 .v.vo:
 	@$(TEST_DIR)
-	coqc -Q ../main Main $<
+	coqc -R . RnglAlg -Q ../main Main $<
 
 .PHONY: all clean depend
 
