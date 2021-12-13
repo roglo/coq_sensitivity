@@ -2161,20 +2161,6 @@ rewrite map_length.
 now apply Hc.
 Qed.
 
-Theorem mI_square_matrix_prop : ∀ n,
-  (mat_nrows (mI n) =? n) && is_square_matrix (mI n) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-split; [ | apply mI_is_square_matrix ].
-cbn; rewrite List_map_seq_length.
-apply Nat.eqb_refl.
-Qed.
-
-Definition smI n : square_matrix n T :=
-  {| sm_mat := mI n;
-     sm_prop := mI_square_matrix_prop n |}.
-
 Theorem squ_mat_add_is_squ : ∀ (MA MB : matrix T),
   is_square_matrix MA = true
   → is_square_matrix MB = true
@@ -2233,25 +2219,6 @@ apply Bool.andb_true_iff in Ha, Hb.
 now apply squ_mat_add_is_squ.
 Qed.
 
-Theorem square_matrix_add_prop : ∀ n (MA MB : square_matrix n T),
-  (mat_nrows (sm_mat MA + sm_mat MB) =? n) &&
-  is_square_matrix (sm_mat MA + sm_mat MB) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-split; [ | apply square_matrix_add_is_square ].
-apply Nat.eqb_eq; cbn.
-rewrite map2_length.
-do 2 rewrite fold_mat_nrows.
-do 2 rewrite squ_mat_nrows.
-apply Nat.min_id.
-Qed.
-
-Definition square_matrix_add {n} (MA MB : square_matrix n T) :
-  square_matrix n T :=
-  {| sm_mat := (sm_mat MA + sm_mat MB);
-     sm_prop := square_matrix_add_prop MA MB |}.
-
 Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix (sm_mat MA * sm_mat MB) = true.
 Proof.
@@ -2295,23 +2262,6 @@ split. {
 }
 Qed.
 
-Theorem square_matrix_mul_prop : ∀ n (MA MB : square_matrix n T),
-  (mat_nrows (sm_mat MA * sm_mat MB) =? n) &&
-  is_square_matrix (sm_mat MA * sm_mat MB) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-split; [ | apply square_matrix_mul_is_square ].
-apply Nat.eqb_eq; cbn.
-rewrite List_map_seq_length.
-apply squ_mat_nrows.
-Qed.
-
-Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
-  square_matrix n T :=
-  {| sm_mat := sm_mat MA * sm_mat MB;
-     sm_prop := square_matrix_mul_prop MA MB |}.
-
 Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
   is_square_matrix (- sm_mat M)%M = true.
 Proof.
@@ -2352,22 +2302,6 @@ split. {
   now apply Hc.
 }
 Qed.
-
-Theorem square_matrix_opp_prop : ∀ n (M : square_matrix n T),
-  (mat_nrows (- sm_mat M) =? n) && is_square_matrix (- sm_mat M) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-split; [ | apply square_matrix_opp_is_square ].
-apply Nat.eqb_eq; cbn.
-rewrite map_length.
-apply squ_mat_nrows.
-Qed.
-
-Definition square_matrix_opp {n} (M : square_matrix n T) :
-  square_matrix n T :=
-  {| sm_mat := - sm_mat M;
-     sm_prop := square_matrix_opp_prop M |}.
 
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
 

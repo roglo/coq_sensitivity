@@ -42,9 +42,75 @@ apply repeat_spec in Hla; subst la.
 now cbn; do 2 rewrite repeat_length.
 Qed.
 
+Theorem mI_square_matrix_prop : ∀ n,
+  (mat_nrows (mI n) =? n) && is_square_matrix (mI n) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply mI_is_square_matrix ].
+cbn; rewrite List_map_seq_length.
+apply Nat.eqb_refl.
+Qed.
+
+Theorem square_matrix_add_prop : ∀ n (MA MB : square_matrix n T),
+  (mat_nrows (sm_mat MA + sm_mat MB) =? n) &&
+  is_square_matrix (sm_mat MA + sm_mat MB) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_add_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite map2_length.
+do 2 rewrite fold_mat_nrows.
+do 2 rewrite squ_mat_nrows.
+apply Nat.min_id.
+Qed.
+
+Theorem square_matrix_mul_prop : ∀ n (MA MB : square_matrix n T),
+  (mat_nrows (sm_mat MA * sm_mat MB) =? n) &&
+  is_square_matrix (sm_mat MA * sm_mat MB) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_mul_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite List_map_seq_length.
+apply squ_mat_nrows.
+Qed.
+
+Theorem square_matrix_opp_prop : ∀ n (M : square_matrix n T),
+  (mat_nrows (- sm_mat M) =? n) && is_square_matrix (- sm_mat M) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+split; [ | apply square_matrix_opp_is_square ].
+apply Nat.eqb_eq; cbn.
+rewrite map_length.
+apply squ_mat_nrows.
+Qed.
+
 Definition smZ n : square_matrix n T :=
   {| sm_mat := mZ n n;
      sm_prop := mZ_is_square_matrix n |}.
+
+Definition smI n : square_matrix n T :=
+  {| sm_mat := mI n;
+     sm_prop := mI_square_matrix_prop n |}.
+
+Definition square_matrix_add {n} (MA MB : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := (sm_mat MA + sm_mat MB);
+     sm_prop := square_matrix_add_prop MA MB |}.
+
+Definition square_matrix_mul {n} (MA MB : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := sm_mat MA * sm_mat MB;
+     sm_prop := square_matrix_mul_prop MA MB |}.
+
+Definition square_matrix_opp {n} (M : square_matrix n T) :
+  square_matrix n T :=
+  {| sm_mat := - sm_mat M;
+     sm_prop := square_matrix_opp_prop M |}.
 
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
@@ -80,7 +146,7 @@ Theorem sm_mat_of_nat :
 *)
 Proof.
 cbn.
-intros Hro; cbn.
+intros Hop; cbn.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
@@ -337,8 +403,8 @@ Qed.
 
 Theorem squ_mat_opt_1_neq_0 {n} :
   if rngl_has_1_neq_0 && (n ≠? 0) then
-    @rngl_one _ (mat_ring_like_op ro n) ≠
-    @rngl_zero _ (mat_ring_like_op ro n)
+    @rngl_one _ (mat_ring_like_op n) ≠
+    @rngl_zero _ (mat_ring_like_op n)
   else not_applicable.
 (*
   if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
@@ -434,7 +500,7 @@ apply mat_mul_add_distr_r; [ easy | | | | | ]. {
 Qed.
 
 Theorem squ_mat_opt_add_opp_l {n} :
-  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op ro n) then
+  if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
     ∀ M : square_matrix n T, (- M + M)%F = 0%F
   else not_applicable.
 (*
@@ -442,7 +508,7 @@ Theorem squ_mat_opt_add_opp_l {n} :
   else not_applicable.
 *)
 Proof.
-remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op ro n)) as b
+remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n)) as b
   eqn:Hb.
 symmetry in Hb.
 destruct b; [ | easy ].
@@ -499,9 +565,9 @@ Qed.
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
   then
-    ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op ro n) (S i) ≠ 0%F
+    ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
   else
-    @rngl_of_nat (square_matrix n T) (mat_ring_like_op ro n)
+    @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
       (if n =? 0 then 1 else rngl_characteristic) = 0%F.
 Proof.
 rewrite (if_eqb_eq_dec n).
@@ -573,7 +639,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
 }
 cbn.
 apply square_matrix_eq; cbn.
-rewrite sm_mat_of_nat; [ | easy | now left ].
+rewrite sm_mat_of_nat; [ | now left ].
 unfold "×"%M, mZ.
 f_equal; rewrite H1.
 destruct n; [ flia Hnz | clear Hnz ].
@@ -603,10 +669,10 @@ now apply rngl_mul_0_l; left.
 Qed.
 
 Theorem squ_mat_consistent {n} :
-  (@rngl_has_opp (square_matrix n T) (mat_ring_like_op ro n) = false
-   ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op ro n) = false)
-  ∧ (@rngl_has_inv (square_matrix n T) (mat_ring_like_op ro n) = false
-     ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op ro n) = false).
+  (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
+   ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
+  ∧ (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
+     ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
 (*
   (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false)
