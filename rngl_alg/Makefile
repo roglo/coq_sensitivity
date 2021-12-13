@@ -1,5 +1,6 @@
 TARGET=Qrl.vo Zrl.vo Nrl.vo QuadIntRl.vo GaussIntRl.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
+TEST_DIR=test `basename "$<"` = "$<" || { echo "File \"$<\" needs to be recompiled."; echo "Please run 'make' in directory '$$(dirname "$<")' first."; exit 1; }
 
 all: $(TARGET)
 
@@ -17,6 +18,7 @@ depend:
 .SUFFIXES: .v .vo
 
 .v.vo:
+	@$(TEST_DIR)
 	coqc -Q ../main Main $<
 
 .PHONY: all clean depend
