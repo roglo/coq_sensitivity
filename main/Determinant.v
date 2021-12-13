@@ -1127,8 +1127,6 @@ cbn.
 now apply rngl_summation_add_distr.
 Qed.
 
-Definition δ_lt i k := Nat.b2n (i <? k).
-
 End a.
 
 Arguments determinant {T ro} M%M.

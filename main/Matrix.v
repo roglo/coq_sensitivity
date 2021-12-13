@@ -356,11 +356,6 @@ Definition mat_opp (M : matrix T) : matrix T :=
 Definition mat_sub (MA MB : matrix T) :=
   mat_add MA (mat_opp MB).
 
-(* vector from a matrix column *)
-
-Definition vect_of_mat_col (M : matrix T) j :=
-  mk_vect (map (λ row, nth j row 0%F) (mat_list_list M)).
-
 (* concatenation of a matrix and a column vector *)
 
 Definition mat_vect_concat (M : matrix T) V :=
@@ -542,13 +537,6 @@ Definition mZ m n : matrix T :=
 
 Definition δ i j := if i =? j then 1%F else 0%F.
 Definition mI n : matrix T := mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
-
-Theorem δ_comm : ∀ i j, δ i j = δ j i.
-Proof.
-intros.
-unfold δ.
-now rewrite Nat.eqb_sym.
-Qed.
 
 Theorem δ_diag : ∀ i, δ i i = 1%F.
 Proof.
@@ -1706,16 +1694,6 @@ Proof. easy. Qed.
 Definition subm (M : matrix T) i j :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
 
-(* alternative definition *)
-Definition subm' (M : matrix T) u v :=
-  mk_mat
-    (map
-       (λ i,
-          map
-            (λ j, mat_el M (i + Nat.b2n (u <=? i)) (j + Nat.b2n (v <=? j)))
-            (seq 0 (mat_ncols M - 1)))
-       (seq 0 (mat_nrows M - 1))).
-
 (* combinations of submatrix and other operations *)
 
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
@@ -1725,71 +1703,6 @@ intros.
 destruct M as (ll); cbn - [ "<?" ].
 rewrite map_length.
 now rewrite butn_length.
-Qed.
-
-Theorem subm_subm_exch : ∀ i j k l (M : matrix T),
-  k < i → j ≤ l → subm (subm M i j) k l = subm (subm M k (l + 1)) (i - 1) j.
-Proof.
-intros * Hki Hjl.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-do 2 rewrite map_map.
-destruct (le_dec k (i - 1)) as [Hki1| Hki1]. {
-  symmetry.
-  rewrite butn_butn; [ | easy ].
-  rewrite Nat.sub_add; [ | flia Hki ].
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros la Hla.
-  symmetry.
-  now rewrite butn_butn.
-}
-replace i with (k + 1) by flia Hki Hki1.
-clear i Hki Hki1.
-rename k into i.
-rewrite Nat.add_sub.
-symmetry.
-rewrite butn_butn; [ | easy ].
-f_equal; f_equal.
-apply map_ext_in.
-intros la Hla.
-symmetry.
-now apply butn_butn.
-Qed.
-
-Theorem subm_subm_exch' : ∀ i j k l (M : matrix T),
-  k < i → l < j → subm (subm M i j) k l = subm (subm M k l) (i - 1) (j - 1).
-Proof.
-intros * Hki Hlj.
-unfold subm; f_equal; cbn.
-do 6 rewrite map_butn.
-do 2 rewrite map_map.
-destruct (le_dec k (i - 1)) as [Hki1| Hki1]. {
-  symmetry.
-  rewrite butn_butn; [ | easy ].
-  rewrite Nat.sub_add; [ | flia Hki ].
-  f_equal; f_equal.
-  apply map_ext_in.
-  intros la Hla.
-  rewrite butn_butn; [ | flia Hlj ].
-  rewrite Nat.sub_add; [ easy | flia Hlj ].
-}
-replace i with (k + 1) by flia Hki Hki1.
-clear i Hki Hki1.
-rename k into i.
-rewrite Nat.add_sub.
-symmetry.
-rewrite butn_butn; [ | easy ].
-f_equal; f_equal.
-apply map_ext_in.
-intros la Hla.
-destruct (lt_dec l (j - 1)) as [Hlj1| Hlj1]. {
-  rewrite butn_butn; [ | flia Hlj1 ].
-  rewrite Nat.sub_add; [ easy | flia Hlj ].
-}
-replace j with (l + 1) by flia Hlj Hlj1.
-rewrite Nat.add_sub.
-now rewrite butn_butn.
 Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
@@ -2122,103 +2035,6 @@ split. {
     rewrite nth_butn_after; [ cbn | flia Hiz ].
     apply nth_In; rewrite fold_mat_nrows; flia H1r.
   }
-}
-Qed.
-
-Theorem submatrix_sub : ∀ (MA MB : matrix T) i j,
-  subm (MA - MB)%M i j = (subm MA i j - subm MB i j)%M.
-Proof.
-intros.
-unfold subm, mat_sub, "+"%M, mat_opp; cbn.
-f_equal.
-rewrite map2_map_l.
-do 3 rewrite map2_map_r.
-rewrite map_butn, map2_butn.
-f_equal; clear i.
-rewrite map_map2.
-apply map2_ext_in.
-intros la lb Hla Hlb.
-rewrite map2_map_r.
-rewrite map_butn.
-rewrite map2_butn.
-f_equal.
-now rewrite map2_map_r.
-Qed.
-
-Theorem submatrix_mul_scal_l : ∀ (μ : T) (M : matrix T) i j,
-  subm (μ × M)%M i j = (μ × subm M i j)%M.
-Proof.
-intros.
-unfold subm, "×"%M; cbn.
-f_equal.
-do 3 rewrite map_butn.
-do 2 rewrite map_map.
-f_equal; clear i.
-apply map_ext_in.
-intros la Hla.
-symmetry.
-apply map_butn.
-Qed.
-
-Theorem submatrix_mI : ∀ i n, i < n → subm (mI n) i i = mI (n - 1).
-Proof.
-intros * Hnr.
-unfold subm, mI; cbn.
-f_equal.
-destruct n; [ easy | ].
-rewrite Nat_sub_succ_1.
-rewrite <- map_butn.
-rewrite map_map.
-erewrite map_ext_in. 2: {
-  intros j Hj.
-  now rewrite <- map_butn.
-}
-unfold butn at 2.
-rewrite List_firstn_seq.
-rewrite Nat.min_l; [ | flia Hnr ].
-rewrite List_skipn_seq; [ | easy ].
-cbn - [ seq ].
-replace n with (i + (n - i)) at 2 by flia Hnr.
-rewrite seq_app.
-cbn - [ seq ].
-do 2 rewrite map_app.
-unfold butn.
-rewrite List_firstn_seq.
-rewrite Nat.min_l; [ | flia Hnr ].
-rewrite List_skipn_seq; [ cbn | easy ].
-rewrite <- seq_shift.
-rewrite map_map.
-f_equal. {
-  apply map_ext_in.
-  intros j Hj.
-  replace n with (i + (n - i)) at 2 by flia Hnr.
-  rewrite seq_app.
-  do 2 rewrite map_app.
-  f_equal; cbn.
-  rewrite map_map.
-  apply map_ext_in.
-  intros k Hk.
-  apply in_seq in Hj.
-  apply in_seq in Hk.
-  unfold δ.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec j (S k)) as [H| H]; [ flia Hj Hk H | clear H ].
-  destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
-} {
-  apply map_ext_in.
-  intros j Hj.
-  replace n with (i + (n - i)) at 2 by flia Hnr.
-  rewrite seq_app.
-  do 2 rewrite map_app; cbn.
-  f_equal; [ | now rewrite map_map ].
-  apply map_ext_in.
-  intros k Hk.
-  apply in_seq in Hj.
-  apply in_seq in Hk.
-  unfold δ.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (S j) k) as [H| H]; [ flia Hj Hk H | clear H ].
-  destruct (Nat.eq_dec j k) as [H| H]; [ flia Hj Hk H | easy ].
 }
 Qed.
 

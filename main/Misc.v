@@ -33,9 +33,6 @@ Notation "∃! x .. y , p" :=
 
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 
-Theorem List_skipn_1 : ∀ A (l : list A), skipn 1 l = tl l.
-Proof. easy. Qed.
-
 Theorem List_fold_left_map :
   ∀ A B C (f : A → B → A) (g : C → B) (l : list C) a,
   fold_left f (map g l) a = fold_left (λ c b, f c (g b)) l a.
@@ -166,9 +163,6 @@ Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36)
 
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
 Proof. intros; now destruct l. Qed.
-
-Theorem List_map_tl : ∀ A B (f : A → B) l, tl (map f l) = map f (tl l).
-Proof. now intros; destruct l. Qed.
 
 Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → hd d l ∈ l.
 Proof.
@@ -771,22 +765,6 @@ revert n.
 induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
 destruct n; [ easy | ].
 do 2 rewrite butn_cons.
-cbn; f_equal.
-apply IHla.
-Qed.
-
-Theorem map2_butn : ∀ A B C (f : A → B → C) (la : list A) (lb : list B) n,
-  map2 f (butn n la) (butn n lb) = butn n (map2 f la lb).
-Proof.
-intros.
-revert n lb.
-induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
-destruct lb as [| b]; cbn. {
-  do 2 rewrite butn_nil.
-  now rewrite map2_nil_r.
-}
-destruct n; [ easy | ].
-do 3 rewrite butn_cons.
 cbn; f_equal.
 apply IHla.
 Qed.

@@ -295,9 +295,6 @@ Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
 Definition transposition i j k :=
   if k =? i then j else if k =? j then i else k.
 
-Definition swap_elem (f : nat → nat) i j k :=
-  f (transposition i j k).
-
 Definition list_swap_elem {A} d (l : list A) i j :=
   map (λ k, nth (transposition i j k) l d) (seq 0 (length l)).
 
@@ -374,14 +371,6 @@ unfold transposition.
 do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec k i) as [H| H]; [ easy | clear H ].
 now destruct (Nat.eq_dec k j).
-Qed.
-
-Theorem transposition_id : ∀ i k, transposition i i k = k.
-Proof.
-intros.
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-now destruct (Nat.eq_dec k i).
 Qed.
 
 Theorem transposition_1 : ∀ i j, transposition i j i = j.

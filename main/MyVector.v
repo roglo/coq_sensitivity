@@ -12,9 +12,6 @@ Require Import RingLike IterAdd.
 Record vector T := mk_vect
   { vect_list : list T }.
 
-Definition vect_of_list {T} (l : list T) : vector T :=
-  mk_vect l.
-
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
 Theorem fold_vect_size {T} : ∀ (V : vector T),

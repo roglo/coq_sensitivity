@@ -840,9 +840,6 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
-Definition list_swap p q l :=
-  map (λ i, nth (transposition p q i) l 0) (seq 0 (length l)).
-
 Theorem transposition_is_permut : ∀ p q n,
   p < n → q < n → is_permut n (map (transposition p q) (seq 0 n)).
 Proof.
@@ -1473,22 +1470,7 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-Theorem transposition_injective : ∀ p q i j,
-  transposition p q i = transposition p q j
-  → i = j.
-Proof.
-intros * Hpq.
-apply (f_equal (transposition p q)) in Hpq.
-now do 2 rewrite transposition_involutive in Hpq.
-Qed.
-
 (* *)
-
-Theorem ε_permut_succ : ∀ n k,
-  k < fact (S n)
-  → ε_permut (S n) k =
-     (minus_one_pow (k / fact n) * ε_permut n (k mod fact n))%F.
-Proof. easy. Qed.
 
 Theorem canon_sym_gr_succ_values : ∀ n k σ σ',
   σ = canon_sym_gr_list (S n) k
