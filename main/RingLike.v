@@ -349,6 +349,16 @@ rewrite Hor in H.
 apply H.
 Qed.
 
+Theorem rngl_le_trans :
+  rngl_is_ordered = true →
+   ∀ a b c : T, (a ≤ b)%F → (b ≤ c)%F → (a ≤ c)%F.
+Proof.
+intros H1 *.
+specialize rngl_opt_le_trans as H.
+rewrite H1 in H.
+apply H.
+Qed.
+
 Theorem rngl_add_le_compat :
   rngl_is_ordered = true →
   ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F.
@@ -1302,6 +1312,7 @@ Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%F.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%F.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
+Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%F.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%F.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.

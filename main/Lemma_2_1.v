@@ -121,65 +121,38 @@ revert i Hi.
 induction la as [| a]; intros; [ easy | ].
 cbn in Hvvz, Hi.
 rewrite rngl_summation_list_cons in Hvvz.
-Check rngl_integral.
-...
-intros Hop Hed Hdo Hor * H.
-unfold vect_dot_mul in H.
-apply vector_eq.
-intros i Hi.
-cbn.
-revert v i Hi H.
-induction n; intros; [ easy | ].
-rewrite Nat_sub_succ_1 in H.
-rewrite rngl_summation_split_last in H; [ | flia ].
-destruct n. {
-  unfold iter_seq, iter_list in H.
-  cbn in H.
-  rewrite rngl_add_0_l in H.
-  apply Nat.lt_1_r in Hi; subst i.
-  apply rngl_integral in H; [ | now rewrite Hdo ].
-  now destruct H.
-}
-rewrite rngl_summation_shift in H; [ | flia ].
-rewrite Nat_sub_succ_1 in H.
-erewrite rngl_summation_eq_compat in H. 2: {
-  intros j Hj.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ iter_seq ] in H.
-apply rngl_eq_add_0 in H; [ | easy | | ]; cycle 1. {
-  clear H Hi IHn.
-  induction n. {
-    unfold iter_seq, iter_list.
-    cbn; rewrite rngl_add_0_l.
+apply rngl_eq_add_0 in Hvvz; [ | easy | | ]; cycle 1. {
+  now apply rngl_0_le_squ.
+} {
+  clear a Hvvz Hi IHla.
+  induction la as [| a]. {
+    unfold iter_list; cbn.
+    now apply rngl_le_refl.
+  }
+  cbn.
+  rewrite rngl_summation_list_cons.
+  apply (rngl_le_trans Hor _ (a * a)). {
     now apply rngl_0_le_squ.
   }
-  rewrite rngl_summation_split_last; [ | flia ].
-  rewrite rngl_summation_shift; [ | flia ].
-  rewrite Nat_sub_succ_1.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  cbn - [ iter_seq ].
-  rewrite <- (rngl_add_0_r 0%F) at 1.
-  apply rngl_add_le_compat; [ easy | | now apply rngl_0_le_squ ].
-  remember (mk_vect (S (S n)) (λ i, vect_el v i)) as u eqn:Hu.
-  specialize (IHn u) as H1.
-  now subst u.
-} {
-  now apply rngl_0_le_squ.
+  rewrite <- rngl_add_0_r at 1.
+  apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
 }
-destruct H as (H1, H2).
-apply rngl_integral in H2; [ | now rewrite Hdo ].
-destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ now subst i; destruct H2 | ].
-remember (mk_vect (S n) (λ i, vect_el v i)) as u eqn:Hu.
-specialize (IHn u) as H4.
-subst u.
-cbn - [ iter_seq ] in H4.
-apply H4; [ flia Hi Hisn | ].
-now rewrite Nat.sub_0_r.
+destruct Hvvz as (Haz, Hvvz).
+specialize (IHla Hvvz).
+destruct i. {
+  apply rngl_integral in Haz; [ | now left | ]. 2: {
+    now apply Bool.orb_true_iff; left.
+  }
+  now destruct Haz.
+}
+cbn.
+apply Nat.succ_lt_mono in Hi.
+now apply IHla.
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
