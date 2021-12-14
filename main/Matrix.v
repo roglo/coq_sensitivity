@@ -2303,8 +2303,6 @@ split. {
 }
 Qed.
 
-Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
-
 Theorem squ_mat_mul_scal_l_is_squ : ∀ (M : matrix T) μ,
   is_square_matrix M = true
   → is_square_matrix (μ × M) = true.

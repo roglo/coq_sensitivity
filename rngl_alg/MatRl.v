@@ -106,6 +106,8 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
   {| sm_mat := - sm_mat M;
      sm_prop := square_matrix_opp_prop M |}.
 
+Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
+
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_one := smI n;

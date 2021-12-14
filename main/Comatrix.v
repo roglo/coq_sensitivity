@@ -2190,8 +2190,6 @@ determinant_with_bad_row
   ∀ (i k n : nat) (M : matrix (S n) (S n) T),
   i ≤ n → k ≤ n → i ≠ k
   → ∑ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
-
-Isn't it strange? (or beautiful?)
 *)
 
 Theorem determinant_with_row : in_field →
