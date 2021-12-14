@@ -164,18 +164,40 @@ destruct (vect_eq_dec Hed x (vect_zero (mat_nrows M))) as [Hxz| Hxz]. {
   subst x; cbn.
 (**)
   unfold vect_dot_mul; cbn.
-  f_equal.
-  erewrite map2_ext_in. 2: {
-    intros i j Hi Hj.
-    apply in_map_iff in Hi.
-    apply in_map_iff in Hj.
-    destruct Hi as (x & Hix & Hx).
-    apply repeat_spec in Hx.
-    subst x.
-    destruct Hj as (y & Hjy & Hy).
-Check rngl_mul_0_l.
+  unfold vect_dot_mul, iter_list; cbn.
+  do 3 rewrite map2_map_r.
+  do 2 rewrite map2_map_l.
+  f_equal. {
+    rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+      intros i j Hi Hj.
+      apply repeat_spec in Hi; subst i.
+      rewrite rngl_mul_0_r. 2: {
+        now destruct Hof as (_ & Hop & _); left.
+      }
+      apply rngl_mul_0_l.
+      now destruct Hof as (_ & Hop & _); left.
+    }
 ...
-    rewrite rngl_mul_0_r in Hix; [ | destruct Hof ].
+    apply in_map_iff in Hi.
+      destruct Hi as (x & Hix & Hx).
+      apply repeat_spec in Hx.
+      subst x.
+      rewrite rngl_mul_0_r in Hix. 2: {
+        now destruct Hof as (_ & Hop & _); left.
+      }
+      subst i.
+      apply rngl_mul_0_l.
+      now destruct Hof as (_ & Hop & _); left.
+    }
+  }
+...
+  ∑ (t
+  ∈ map2 rngl_mul (map (λ x : T, (c * x)%F) (repeat 0%F (mat_nrows M)))
+      (map (λ row : list T, ≺ {| vect_list := row |}, c × vect_zero (mat_nrows M) ≻) (mat_list_list M))), t =
+  ∑ (t
+  ∈ map2 rngl_mul (repeat 0%F (mat_nrows M))
+      (map (λ row : list T, ≺ {| vect_list := row |}, vect_zero (mat_nrows M) ≻) (mat_list_list M))), t
+
 ...
   unfold vect_dot_mul, iter_list; cbn.
   unfold vect_dot_mul, iter_list; cbn.
