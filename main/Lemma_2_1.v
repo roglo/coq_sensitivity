@@ -107,11 +107,24 @@ Theorem eq_vect_squ_0 :
   rngl_has_dec_le = true →
   rngl_is_integral = true →
   rngl_is_ordered = true →
-  ∀ n v, ≺ v, v ≻ = 0%F → v = vect_zero n.
+  ∀ v, ≺ v, v ≻ = 0%F → v = vect_zero (vect_size v).
 Proof.
+(**)
+intros Hop Hed Hdo Hor * Hvvz.
+unfold vect_dot_mul in Hvvz.
+apply vector_eq; [ | now cbn; rewrite repeat_length ].
+intros i Hi.
+destruct v as (la).
+cbn in Hvvz, Hi |-*.
+rewrite nth_repeat.
+revert i Hi.
+induction la as [| a]; intros; [ easy | ].
+cbn in Hvvz, Hi.
+rewrite rngl_summation_list_cons in Hvvz.
+Check rngl_integral.
+...
 intros Hop Hed Hdo Hor * H.
 unfold vect_dot_mul in H.
-...
 apply vector_eq.
 intros i Hi.
 cbn.

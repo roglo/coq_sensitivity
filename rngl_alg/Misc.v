@@ -3,38 +3,9 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith (*Psatz Sorted*) Permutation (*Decidable*).
+Require Import Utf8 Arith Permutation.
 Require Import Main.Misc.
-Import List (*List.ListNotations*).
-(*
-Arguments length {A}.
-
-Global Hint Resolve Nat.le_0_l : core.
-Global Hint Resolve Nat.lt_0_succ : core.
-Global Hint Resolve Nat.lt_succ_diag_r : core.
-
-(* "fast" lia, to improve compilation speed *)
-Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
-
-Notation "n !" := (fact n) (at level 1, format "n !").
-Notation "x '∈' l" := (List.In x l) (at level 70).
-Notation "x '∉' l" := (¬ List.In x l) (at level 70).
-
-Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%nat (at level 70, y at next level) :
-                          nat_scope.
-Notation "x < y ≤ z" := (x < y ∧ y <= z)%nat (at level 70, y at next level) :
-                          nat_scope.
-Notation "x ≤ y < z" := (x ≤ y ∧ y < z)%nat (at level 70, y at next level) :
-                          nat_scope.
-Notation "x < y < z" := (x < y ∧ y < z)%nat (at level 70, y at next level).
-
-Notation "∃! x .. y , p" :=
-  (ex (unique (λ x, .. (ex (unique (λ y, p))) ..)))
-    (at level 200, x binder, right associativity)
-  : type_scope.
-
-Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
-*)
+Import List.
 
 (* (a ^ b) mod c defined like that so that we can use "Compute"
    for testing; proved equal to (a ^ b) mod c just below *)
