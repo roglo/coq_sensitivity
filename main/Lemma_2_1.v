@@ -195,17 +195,53 @@ Qed.
 
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
-  ∀ (M : matrix T) x c,
-  c ≠ 0%F
-  → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
+  ∀ (M : matrix T) V c,
+  is_square_matrix M = true
+  → vect_size V = mat_nrows M
+  → c ≠ 0%F
+  → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
-intros Hof * Hcz.
+intros Hof * Hsm Hsr Hcz.
 assert (Hed : rngl_has_dec_eq = true) by now destruct Hof.
-destruct (vect_eq_dec Hed x (vect_zero (mat_nrows M))) as [Hxz| Hxz]. {
-  subst x; cbn.
+destruct (vect_eq_dec Hed V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
+  subst V; cbn.
   apply Rayleigh_quotient_mul_scal_l_zero.
   now destruct Hof as (_ & Hop & _); left.
 }
+unfold Rayleigh_quotient.
+rewrite <- mat_mul_scal_vect_comm; cycle 1. {
+  now destruct Hof.
+} {
+  now destruct Hof.
+} {
+  now apply squ_mat_is_corr.
+} {
+  now rewrite square_matrix_ncols.
+}
+...
+rewrite <- mat_mul_scal_vect_comm; [ | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+do 2 rewrite vect_scal_mul_dot_mul_comm.
+do 2 rewrite rngl_mul_assoc.
+unfold rngl_div.
+specialize (rngl_inv_mul_distr Hdo Hin) as H1.
+rewrite Hin.
+rewrite H1; cycle 1. {
+  intros H; apply Hcz.
+  apply rngl_integral in H; [ | now rewrite Hdo ].
+  now destruct H.
+} {
+  intros H; apply Hxz.
+  now apply eq_vect_squ_0.
+}
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+do 2 rewrite rngl_mul_assoc.
+rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
+intros H; apply Hcz.
+apply rngl_integral in H; [ | now rewrite Hdo ].
+now destruct H.
 ...
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
