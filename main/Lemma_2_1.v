@@ -156,6 +156,8 @@ Theorem RQ_mul_scal_prop :
   c ≠ 0%F
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
+intros Hof * Hcz.
+unfold Rayleigh_quotient.
 ...
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
