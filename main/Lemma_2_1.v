@@ -158,6 +158,39 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros Hof * Hcz.
 unfold Rayleigh_quotient.
+Check vect_eq_dec.
+assert (Hed : rngl_has_dec_eq = true) by now destruct Hof.
+destruct (vect_eq_dec Hed x (vect_zero (mat_nrows M))) as [Hxz| Hxz]. {
+  subst x; cbn.
+(**)
+  unfold vect_dot_mul; cbn.
+  f_equal.
+  erewrite map2_ext_in. 2: {
+    intros i j Hi Hj.
+    apply in_map_iff in Hi.
+    apply in_map_iff in Hj.
+    destruct Hi as (x & Hix & Hx).
+    apply repeat_spec in Hx.
+    subst x.
+    destruct Hj as (y & Hjy & Hy).
+Check rngl_mul_0_l.
+...
+    rewrite rngl_mul_0_r in Hix; [ | destruct Hof ].
+...
+  unfold vect_dot_mul, iter_list; cbn.
+  unfold vect_dot_mul, iter_list; cbn.
+  do 3 rewrite map2_map_r.
+  do 2 rewrite map2_map_l.
+  f_equal. {
+    erewrite map2_ext_in. 2: {
+
+Search (map2 _ (repeat _ _)).
+Search (map2 rngl_mul).
+...
+  do 2 rewrite rngl_mul_0_l.
+  do 3 rewrite rngl_mul_0_r.
+  now rewrite rngl_mul_0_l.
+}
 ...
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
