@@ -150,10 +150,13 @@ apply Nat.succ_lt_mono in Hi.
 now apply IHla.
 Qed.
 
-Inspect 1.
-
+Theorem RQ_mul_scal_prop :
+  is_ordered_field →
+  ∀ (M : matrix T) x c,
+  c ≠ 0%F
+  → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
+Proof.
 ...
-
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
   ∀ n (M : matrix n n T) x c,
