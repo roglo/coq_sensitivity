@@ -221,70 +221,24 @@ do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hin.
 rewrite rngl_inv_mul_distr; [ | now left | easy | easy | | ]; cycle 1. {
-...
-specialize (rngl_inv_mul_distr Hdo Hin) as H1.
-...
-do 2 rewrite vect_scal_mul_dot_mul_comm.
-do 2 rewrite rngl_mul_assoc.
-unfold rngl_div.
-specialize (rngl_inv_mul_distr Hdo Hin) as H1.
-rewrite Hin.
-rewrite H1; cycle 1. {
-  intros H; apply Hcz.
-  apply rngl_integral in H; [ | now rewrite Hdo ].
-  now destruct H.
+  intros H.
+  apply rngl_integral in H; [ now destruct H | now left | ].
+  now apply Bool.orb_true_iff; left.
 } {
-  intros H; apply Hxz.
-  now apply eq_vect_squ_0.
+  intros H.
+  apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
+  now rewrite Hsr in H.
 }
 rewrite rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
 intros H; apply Hcz.
-apply rngl_integral in H; [ | now rewrite Hdo ].
-now destruct H.
-...
-Theorem RQ_mul_scal_prop :
-  is_ordered_field →
-  ∀ n (M : matrix n n T) x c,
-  c ≠ 0%F
-  → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
-Proof.
-intros (Hic & Hop & Hed & Hld & Hdo & Hin & Hor) * Hcz.
-unfold Rayleigh_quotient.
-destruct (vect_eq_dec Hed n x (vect_zero n)) as [Hxz| Hxz]. {
-  subst x; cbn.
-  unfold vect_dot_product, iter_seq, iter_list; cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 2 rewrite rngl_mul_0_l.
-  do 3 rewrite rngl_mul_0_r.
-  now rewrite rngl_mul_0_l.
-}
-rewrite <- mat_mul_scal_vect_comm; [ | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
-do 2 rewrite vect_scal_mul_dot_mul_comm.
-do 2 rewrite rngl_mul_assoc.
-unfold rngl_div.
-specialize (rngl_inv_mul_distr Hdo Hin) as H1.
-rewrite Hin.
-rewrite H1; cycle 1. {
-  intros H; apply Hcz.
-  apply rngl_integral in H; [ | now rewrite Hdo ].
-  now destruct H.
-} {
-  intros H; apply Hxz.
-  now apply eq_vect_squ_0.
-}
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
-do 2 rewrite rngl_mul_assoc.
-rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
-intros H; apply Hcz.
-apply rngl_integral in H; [ | now rewrite Hdo ].
-now destruct H.
+apply rngl_integral in H; [ now destruct H| now left | ].
+now apply Bool.orb_true_iff; left.
 Qed.
+
+...
 
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
