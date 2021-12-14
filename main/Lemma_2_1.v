@@ -164,6 +164,7 @@ destruct (vect_eq_dec Hed x (vect_zero (mat_nrows M))) as [Hxz| Hxz]. {
   subst x; cbn.
 (**)
   unfold vect_dot_mul; cbn.
+...
   unfold vect_dot_mul, iter_list; cbn.
   do 3 rewrite map2_map_r.
   do 2 rewrite map2_map_l.
