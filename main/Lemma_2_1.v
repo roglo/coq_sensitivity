@@ -202,38 +202,25 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-assert (Hed : rngl_has_dec_eq = true) by now destruct Hof.
+destruct Hof as (Hic & Hop & Hed & Hld & Hdo & Hin & Hor).
 destruct (vect_eq_dec Hed V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
   subst V; cbn.
-  apply Rayleigh_quotient_mul_scal_l_zero.
-  now destruct Hof as (_ & Hop & _); left.
+  now apply Rayleigh_quotient_mul_scal_l_zero; left.
 }
 unfold Rayleigh_quotient.
-rewrite <- mat_mul_scal_vect_comm; cycle 1. {
-  now destruct Hof.
-} {
-  now destruct Hof.
-} {
+rewrite <- mat_mul_scal_vect_comm; [ | easy | easy | | ]; cycle 1. {
   now apply squ_mat_is_corr.
 } {
   now rewrite square_matrix_ncols.
 }
-rewrite vect_dot_mul_scal_mul_comm; cycle 1. {
-  now destruct Hof; left.
-} {
-  now destruct Hof.
-}
-rewrite vect_dot_mul_scal_mul_comm; cycle 1. {
-  now destruct Hof; left.
-} {
-  now destruct Hof.
-}
-rewrite vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
-rewrite vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
+rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
+rewrite vect_scal_mul_dot_mul_comm; [ | now left ].
+rewrite vect_scal_mul_dot_mul_comm; [ | now left ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
-replace rngl_has_inv with true by now destruct Hof.
-rewrite rngl_inv_mul_distr; cycle 1. {
+rewrite Hin.
+rewrite rngl_inv_mul_distr; [ | now left | easy | easy | | ]; cycle 1. {
 ...
 specialize (rngl_inv_mul_distr Hdo Hin) as H1.
 ...
