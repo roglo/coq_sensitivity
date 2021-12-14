@@ -150,6 +150,49 @@ apply Nat.succ_lt_mono in Hi.
 now apply IHla.
 Qed.
 
+Theorem Rayleigh_quotient_mul_scal_l_zero :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ c M,
+  Rayleigh_quotient M (c × vect_zero (mat_nrows M)) =
+  Rayleigh_quotient M (vect_zero (mat_nrows M)).
+Proof.
+intros Hop *.
+unfold Rayleigh_quotient.
+unfold vect_dot_mul; cbn.
+unfold vect_dot_mul; cbn.
+do 3 rewrite map2_map_r.
+do 2 rewrite map2_map_l.
+f_equal. {
+  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+    intros i j Hi Hj.
+    apply repeat_spec in Hi; subst i.
+    rewrite rngl_mul_0_r; [ | easy ].
+    now apply rngl_mul_0_l.
+  }
+  symmetry.
+  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+    intros i j Hi Hj.
+    apply repeat_spec in Hi; subst i.
+    now apply rngl_mul_0_l.
+  }
+  easy.
+} {
+  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+    intros i j Hi Hj.
+    apply repeat_spec in Hi; subst i.
+    rewrite rngl_mul_0_r; [ | easy ].
+    now apply rngl_mul_0_l.
+  }
+  symmetry.
+  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+    intros i j Hi Hj.
+    apply repeat_spec in Hi; subst i.
+    now apply rngl_mul_0_l.
+  }
+  easy.
+}
+Qed.
+
 Theorem RQ_mul_scal_prop :
   is_ordered_field →
   ∀ (M : matrix T) x c,
@@ -157,66 +200,11 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × x) = Rayleigh_quotient M x.
 Proof.
 intros Hof * Hcz.
-unfold Rayleigh_quotient.
-Check vect_eq_dec.
 assert (Hed : rngl_has_dec_eq = true) by now destruct Hof.
 destruct (vect_eq_dec Hed x (vect_zero (mat_nrows M))) as [Hxz| Hxz]. {
   subst x; cbn.
-(**)
-  unfold vect_dot_mul; cbn.
-  unfold vect_dot_mul; cbn.
-  do 3 rewrite map2_map_r.
-  do 2 rewrite map2_map_l.
-  f_equal. {
-...
-  unfold vect_dot_mul, iter_list; cbn.
-  do 3 rewrite map2_map_r.
-  do 2 rewrite map2_map_l.
-  f_equal. {
-    rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
-      intros i j Hi Hj.
-      apply repeat_spec in Hi; subst i.
-      rewrite rngl_mul_0_r. 2: {
-        now destruct Hof as (_ & Hop & _); left.
-      }
-      apply rngl_mul_0_l.
-      now destruct Hof as (_ & Hop & _); left.
-    }
-...
-    apply in_map_iff in Hi.
-      destruct Hi as (x & Hix & Hx).
-      apply repeat_spec in Hx.
-      subst x.
-      rewrite rngl_mul_0_r in Hix. 2: {
-        now destruct Hof as (_ & Hop & _); left.
-      }
-      subst i.
-      apply rngl_mul_0_l.
-      now destruct Hof as (_ & Hop & _); left.
-    }
-  }
-...
-  ∑ (t
-  ∈ map2 rngl_mul (map (λ x : T, (c * x)%F) (repeat 0%F (mat_nrows M)))
-      (map (λ row : list T, ≺ {| vect_list := row |}, c × vect_zero (mat_nrows M) ≻) (mat_list_list M))), t =
-  ∑ (t
-  ∈ map2 rngl_mul (repeat 0%F (mat_nrows M))
-      (map (λ row : list T, ≺ {| vect_list := row |}, vect_zero (mat_nrows M) ≻) (mat_list_list M))), t
-
-...
-  unfold vect_dot_mul, iter_list; cbn.
-  unfold vect_dot_mul, iter_list; cbn.
-  do 3 rewrite map2_map_r.
-  do 2 rewrite map2_map_l.
-  f_equal. {
-    erewrite map2_ext_in. 2: {
-
-Search (map2 _ (repeat _ _)).
-Search (map2 rngl_mul).
-...
-  do 2 rewrite rngl_mul_0_l.
-  do 3 rewrite rngl_mul_0_r.
-  now rewrite rngl_mul_0_l.
+  apply Rayleigh_quotient_mul_scal_l_zero.
+  now destruct Hof as (_ & Hop & _); left.
 }
 ...
 Theorem RQ_mul_scal_prop :
