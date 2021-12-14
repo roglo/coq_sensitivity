@@ -218,10 +218,25 @@ rewrite <- mat_mul_scal_vect_comm; cycle 1. {
 } {
   now rewrite square_matrix_ncols.
 }
+rewrite vect_dot_mul_scal_mul_comm; cycle 1. {
+  now destruct Hof; left.
+} {
+  now destruct Hof.
+}
+rewrite vect_dot_mul_scal_mul_comm; cycle 1. {
+  now destruct Hof; left.
+} {
+  now destruct Hof.
+}
+rewrite vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
+rewrite vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
+do 2 rewrite rngl_mul_assoc.
+unfold rngl_div.
+replace rngl_has_inv with true by now destruct Hof.
+rewrite rngl_inv_mul_distr; cycle 1. {
 ...
-rewrite <- mat_mul_scal_vect_comm; [ | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+specialize (rngl_inv_mul_distr Hdo Hin) as H1.
+...
 do 2 rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
