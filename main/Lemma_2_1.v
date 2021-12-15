@@ -28,7 +28,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Definition is_sym_mat (A : matrix T) :=
+Definition is_symm_mat (A : matrix T) :=
   ∀ i j, i < mat_nrows A → j < mat_nrows A → mat_el A i j = mat_el A j i.
 
 Definition princ_subm_1 (A : matrix T) k := subm A k k.
@@ -50,9 +50,9 @@ Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
-  (∀ i j, 0 ≤ i < n → 0 ≤ j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
-  (∀ i, 0 ≤ i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
-  ∀ i μ V, 0 ≤ i < n →
+  (∀ i j, i < n → j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
+  (∀ i, i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
+  ∀ i μ V, i < n →
   μ = nth i ev 0%F
   → V = nth i eV (vect_zero n)
   → (M • V = μ × V)%V.
@@ -238,41 +238,81 @@ apply rngl_integral in H; [ now destruct H| now left | ].
 now apply Bool.orb_true_iff; left.
 Qed.
 
-...
-
 Theorem Rayleigh_quotient_of_eigenvector :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_dec_le = true →
   rngl_is_integral = true →
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
+  rngl_has_inv = true →
   rngl_is_ordered = true →
-  ∀ n (M : matrix n n T) V μ,
-  V ≠ vect_zero n
+  ∀ (M : matrix T) V μ,
+  V ≠ vect_zero (vect_size V)
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
 unfold Rayleigh_quotient.
 rewrite Hmv.
-rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
-apply rngl_mul_div_l; [ easy | ].
+rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
+apply rngl_mul_div_l; [ now left | ].
 intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
 
-Definition is_orthogonal_matrix n (M : matrix n n T) :=
-  (mat_transp M * M)%M = mI n.
+Theorem mat_mul_is_corr : ∀ A B,
+  is_correct_matrix A = true
+  → is_correct_matrix B = true
+  → mat_nrows B ≠ 0
+  → is_correct_matrix (A * B) = true.
+Proof.
+intros * Ha Hb Hbz.
+destruct (Nat.eq_dec (mat_nrows A) 0) as [Haz| Haz]. {
+  unfold mat_nrows in Haz.
+  apply length_zero_iff_nil in Haz.
+  now destruct A as (lla); cbn in Haz; subst lla.
+}
+apply Nat.neq_0_lt_0 in Haz, Hbz.
+apply is_scm_mat_iff in Ha.
+apply is_scm_mat_iff in Hb.
+apply is_scm_mat_iff.
+destruct Ha as (Hacr & Hac).
+destruct Hb as (Hbcr & Hbc).
+split. {
+  intros Hab.
+  unfold mat_ncols in Hab.
+  cbn in Hab |-*.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0) in Hab; [ | now rewrite seq_length ].
+  rewrite List_map_seq_length in Hab.
+  now rewrite Hbcr in Hbz.
+} {
+  intros lab Hlab.
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  cbn in Hlab.
+  apply in_map_iff in Hlab.
+  destruct Hlab as (x & Hlab & Hx).
+  now rewrite <- Hlab, List_map_seq_length.
+}
+Qed.
+
+Definition is_orthogonal_matrix (M : matrix T) :=
+  (mat_transp M * M)%M = mI (mat_nrows M).
 
 (* diagonal matrix with diagonal d being given *)
 
 Definition mat_with_diag n d :=
-  mk_mat n n (λ i j, if Nat.eq_dec i j then nth i d 0%F else 0%F).
+  mk_mat
+    (map (λ i, map (λ j, if i =? j then nth i d 0%F else 0%F) (seq 0 n))
+       (seq 0 n)).
 
 (* matrix with columns given as list of vectors *)
 
 Definition mat_with_vect n Vl :=
-  mk_mat n n (λ i j, vect_el (nth j Vl (vect_zero n)) i).
+  mk_mat
+    (map (λ i, map (λ j, vect_el (nth j Vl (vect_zero n)) i) (seq 0 n))
+       (seq 0 n)).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix U (the columns of which
@@ -282,24 +322,331 @@ Definition mat_with_vect n Vl :=
 
 Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
-  ∀ n (M : matrix n n T) ev eV D U,
-  is_symm_mat M
-  → eigenvalues_and_norm_vectors M ev eV
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ n (M : matrix T) ev eV D U,
+  mat_nrows M = n
+  → length eV = n
+  → (∀ V, V ∈ eV → vect_size V = n)
+  → is_square_matrix M = true
+  → is_symm_mat M
+  → eigenvalues_and_norm_vectors n M ev eV
   → D = mat_with_diag n ev
-  → U = mat_with_vect eV
+  → U = mat_with_vect n eV
    → (M * U = U * D)%M.
 Proof.
-intros Hic * Hsy Hvv Hd Ho.
+intros Hic Hos * Hrn Hlev Hevn Hsm Hsy Hvv Hd Ho.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+
+  move Hnz at top; subst n.
+  unfold mat_with_vect in Ho; cbn in Ho.
+  unfold mat_with_diag in Hd; cbn in Hd.
+  rewrite Ho, Hd.
+  destruct M as (ll); cbn.
+  cbn in Hrn.
+  now apply length_zero_iff_nil in Hrn; cbn in Hrn; subst ll.
+}
+apply Nat.neq_0_lt_0 in Hnz.
 subst U D; cbn.
-remember (mat_with_vect eV) as U eqn:Hmo.
+remember (mat_with_vect n eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
 destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
 unfold is_symm_mat in Hsy.
-apply matrix_eq.
+assert (Hus : is_square_matrix U = true). {
+  rewrite Hmo; cbn.
+  unfold mat_with_vect; cbn.
+  apply is_scm_mat_iff; cbn.
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  split; [ easy | ].
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (x & Hl & Hx).
+  now rewrite <- Hl, List_map_seq_length.
+}
+assert (Hdc : is_correct_matrix D = true). {
+  rewrite Hmd; cbn.
+  unfold mat_with_diag; cbn.
+  apply is_scm_mat_iff; cbn.
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  split; [ easy | ].
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (x & Hl & Hx).
+  now rewrite <- Hl, List_map_seq_length.
+}
+apply matrix_eq; cycle 1. {
+  apply mat_mul_is_corr. {
+    now apply squ_mat_is_corr.
+  } {
+    now apply squ_mat_is_corr.
+  }
+  rewrite Hmo; cbn.
+  rewrite List_map_seq_length.
+  now apply Nat.neq_0_lt_0.
+} {
+  apply mat_mul_is_corr; [ now apply squ_mat_is_corr | easy | ].
+  rewrite Hmd; cbn.
+  rewrite List_map_seq_length.
+  now apply Nat.neq_0_lt_0.
+} {
+  rewrite Hmo; cbn.
+  now do 3 rewrite List_map_seq_length.
+} {
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length, Hrn ].
+  rewrite (List_map_hd 0). 2: {
+    rewrite seq_length, Hmo; cbn.
+    now rewrite List_map_seq_length.
+  }
+  do 2 rewrite List_map_seq_length.
+  rewrite Hmo, Hmd; unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now do 2 rewrite List_map_seq_length.
+}
+unfold mat_ncols; cbn.
+rewrite List_map_seq_length, Hrn, Hmd.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  rewrite Hmo; cbn.
+  now rewrite List_map_seq_length.
+}
+rewrite List_map_seq_length.
+intros i j Hi Hj.
+unfold mat_ncols, mat_with_diag in Hj; cbn in Hj.
+rewrite (List_map_hd 0) in Hj; [ | now rewrite seq_length ].
+rewrite List_map_seq_length in Hj.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite Hmo; unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite Hmo; cbn.
+  now rewrite List_map_seq_length.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+}
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth. 2: {
+  rewrite Hmo; unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+}
+rewrite seq_nth. 2: {
+  rewrite Hmo; cbn.
+  now rewrite List_map_seq_length.
+}
+rewrite seq_nth. 2: {
+  unfold mat_ncols, mat_with_diag; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+}
+cbn.
+rewrite <- Hmd.
+unfold mat_mul_el.
+(**)
+symmetry.
+rewrite (rngl_summation_split j). 2: {
+  split; [ easy | ].
+  rewrite square_matrix_ncols; [ | easy ].
+  rewrite Hmo; cbn.
+  rewrite List_map_seq_length.
+  apply -> Nat.succ_le_mono; flia Hj.
+}
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite Hmo; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
+  rewrite seq_nth; [ | flia Hk Hj ].
+  rewrite seq_nth; [ | easy ].
+  cbn.
+  rewrite Hmd; cbn.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | flia Hk Hj ].
+  rewrite seq_nth; [ | easy ].
+  cbn; rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  now apply rngl_mul_0_r.
+}
+rewrite rngl_add_0_l.
+replace (mat_ncols U) with (mat_ncols M). 2: {
+  rewrite square_matrix_ncols; [ | easy ].
+  rewrite Hrn.
+  rewrite Hmo; unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+}
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite square_matrix_ncols in Hk; [ | easy ].
+  rewrite Hrn in Hk.
+  rewrite Hmd; cbn.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | flia Hk Hj ].
+  rewrite seq_nth; [ | easy ].
+  cbn; rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  now apply rngl_mul_0_r.
+}
+rewrite rngl_add_0_r.
+rewrite Hmd; cbn - [ iter_seq ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+rewrite Nat.eqb_refl.
+rewrite Hmo.
+cbn - [ iter_seq ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+cbn - [ iter_seq ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros u (_, Hu).
+  rewrite square_matrix_ncols in Hu; [ | easy ].
+  rewrite Hrn in Hu.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hnz ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hu Hnz ].
+  now cbn.
+}
+cbn.
+specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
+specialize (H1 Hj eq_refl eq_refl).
+remember (nth j ev 0%F) as μ eqn:Hμ.
+remember (nth j eV (vect_zero n)) as V eqn:Hv.
+symmetry.
+apply (f_equal (λ x, vect_el x i)) in H1.
+cbn - [ iter_seq ] in H1.
+rewrite (List_map_nth' []) in H1; [ | now rewrite fold_mat_nrows, Hrn ].
+rewrite (List_map_nth' 0%F) in H1. 2: {
+  rewrite fold_vect_size.
+  rewrite Hevn; [ easy | ].
+  rewrite Hv.
+  apply nth_In.
+  now rewrite Hlev.
+}
+rewrite fold_vect_el in H1.
+rewrite rngl_mul_comm in H1; [ | easy ].
+(*
+unfold vect_dot_mul in H1.
+*)
+cbn in H1.
+rewrite <- H1.
+unfold mat_el.
+remember (nth i (mat_list_list M) []) as l eqn:Hl.
+erewrite rngl_summation_eq_compat. 2: {
+  intros u Hu.
+  replace (nth u l 0%F) with (vect_el (mk_vect l) u) by easy.
+  easy.
+}
+remember (mk_vect l) as W eqn:HW.
+subst l.
+Print vect_dot_mul.
+(* on pourrait pas redéfinir vect_dot_mul avec la partie gauche, là,
+   plutôt qu'avec ce map2 rngl_mul de merde ? *)
+...
+unfold iter_seq.
+unfold iter_list.
+...
+cbn in H1.
+
+Check fold_mat_el.
+Locate "•"%M.
+Search (∑ (t ∈ map2 _ _ _), _).
+Search (map2 rngl_mul).
+...
+Check fold_mat_vect_mul.
+...
+  rewrite Hv.
+  rewrite Hv; cbn.
+  rewrite fold_vect_size.
+Search ev.
+...
+assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
+...
+cbn - [ iter_seq ] in H.
+
+rewrite rngl_mul_comm in H.
+now rewrite rngl_mul_comm in H.
+...
+rewrite (rngl_summation_split j). 2: {
+  split; [ easy | ].
+  rewrite square_matrix_ncols; [ | easy ].
+  rewrite Hrn, <- Nat.sub_succ_l; [ | easy ].
+  now rewrite Nat_sub_succ_1.
+}
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros k Hk.
+  rewrite Hmo; cbn.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hk Hj ].
+  cbn.
+...
+  rewrite Hmd; cbn.
+  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  apply rngl_mul_0_r.
+}
+...
 cbn - [ iter_seq ].
 intros * Hi Hj.
 symmetry.
+(**)
+rewrite List_map_seq_length in Hi.
+rewrite Hrn in Hi.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, Hmo.
+  unfold mat_with_vect; cbn.
+  now rewrite List_map_seq_length.
+}
+rewrite Hmo, Hmd in Hj.
+unfold "*"%M in Hj; cbn in Hj.
+unfold mat_ncols in Hj; cbn in Hj.
+rewrite (List_map_hd 0) in Hj. 2: {
+  rewrite seq_length, List_map_seq_length; flia Hi.
+}
+rewrite List_map_seq_length in Hj.
+rewrite (List_map_hd 0) in Hj; [ | rewrite seq_length; flia Hi ].
+rewrite List_map_seq_length in Hj.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, Hmd.
+  unfold mat_with_diag; cbn.
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hi ].
+  rewrite List_map_seq_length.
+  rewrite Hmo, Hmd in Hj.
+  unfold "*"%M in Hj; cbn in Hj.
+  unfold mat_ncols in Hj; cbn in Hj.
+  rewrite (List_map_hd 0) in Hj. 2: {
+    rewrite seq_length, List_map_seq_length; flia Hi.
+  }
+  rewrite List_map_seq_length in Hj.
+  rewrite (List_map_hd 0) in Hj; [ | rewrite seq_length; flia Hi ].
+  now rewrite List_map_seq_length in Hj.
+}
+...
 rewrite (rngl_summation_split _ j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia ].
 rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
