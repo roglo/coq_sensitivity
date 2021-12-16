@@ -2820,7 +2820,7 @@ f_equal. {
 }
 Qed.
 
-Theorem mat_transp_inj : ∀ M,
+Theorem mat_transp_involutive : ∀ M,
   is_correct_matrix M = true
   → (M⁺⁺)%M = M.
 Proof.
@@ -3192,7 +3192,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     } {
       flia Hk Hi.
     }
-    rewrite mat_transp_inj. 2: {
+    rewrite mat_transp_involutive. 2: {
       apply subm_is_corr_mat; [ | now apply squ_mat_is_corr ].
       unfold mat_ncols; rewrite HM; cbn.
       rewrite Hcl; [ | now apply List_hd_in ].

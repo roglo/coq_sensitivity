@@ -581,16 +581,23 @@ rewrite square_matrix_ncols; [ | easy ].
 now rewrite Hrn.
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem mat_transp_invol : ∀ m n (M : matrix m n T), (M⁺)⁺%M = M.
+Theorem mat_transp_mul :
+  rngl_is_comm = true →
+  ∀ (MA : matrix T) (MB : matrix T),
+  ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
 Proof.
-intros.
-now apply matrix_eq.
+intros Hic *.
+apply matrix_eq.
+...
+intros Hic *.
+apply matrix_eq.
+cbn - [ iter_seq ].
+intros * Hi Hj.
+apply rngl_summation_eq_compat.
+intros k Hk.
+now apply rngl_mul_comm.
 Qed.
-
+...
 Theorem mat_transp_mul :
   rngl_is_comm = true →
   ∀ m n p (MA : matrix m n T) (MB : matrix n p T),
