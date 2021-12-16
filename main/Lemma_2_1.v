@@ -581,6 +581,40 @@ rewrite square_matrix_ncols; [ | easy ].
 now rewrite Hrn.
 Qed.
 
+Theorem mat_mul_nrows : ∀ MA MB, mat_nrows (MA * MB) = mat_nrows MA.
+Proof.
+intros; cbn.
+now rewrite List_map_seq_length.
+Qed.
+
+Theorem mat_mul_ncols : ∀ MA MB,
+  mat_nrows MA ≠ 0
+  → mat_ncols (MA * MB) = mat_ncols MB.
+Proof.
+intros * Hraz; unfold mat_ncols; cbn.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  now apply Nat.neq_0_lt_0.
+}
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem mat_el_mul : ∀ MA MB i j,
+  i < mat_nrows (MA * MB)
+  → j < mat_ncols (MA * MB)
+  → mat_el (MA * MB) i j =
+    ∑ (k = 0, mat_ncols MA - 1), mat_el MA i k * mat_el MB k j.
+Proof.
+intros * Hir Hjc; cbn.
+rewrite mat_mul_nrows in Hir.
+rewrite mat_mul_ncols in Hjc; [ | flia Hir ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+easy.
+Qed.
+
 Theorem mat_transp_mul :
   rngl_is_comm = true →
   ∀ (MA : matrix T) (MB : matrix T),
@@ -643,6 +677,18 @@ apply matrix_eq; cycle 1. {
   now apply Ha.
 }
 intros i j Hi Hj.
+rewrite mat_transp_nrows in Hi.
+rewrite mat_transp_el; [ | now apply mat_mul_is_corr ].
+rewrite mat_mul_ncols in Hi; [ | easy ].
+rewrite mat_mul_ncols in Hj; [ | rewrite mat_transp_nrows; flia Hi ].
+rewrite mat_transp_ncols in Hj.
+rewrite if_eqb_eq_dec in Hj.
+destruct (Nat.eq_dec (mat_ncols MA) 0) as [H| H]; [ easy | ].
+rewrite mat_el_mul; cycle 1. {
+  now rewrite mat_mul_nrows.
+} {
+  now rewrite mat_mul_ncols.
+}
 ...
 intros Hic *.
 apply matrix_eq.
