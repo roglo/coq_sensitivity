@@ -189,6 +189,9 @@ apply Hf with (i := S i); cbn.
 now apply -> Nat.succ_lt_mono.
 Qed.
 
+Theorem List_nth_nil : ∀ A i (d : A), nth i [] d = d.
+Proof. now intros; destruct i. Qed.
+
 Theorem List_nth_0_cons : ∀ A (a : A) la d, nth 0 (a :: la) d = a.
 Proof. easy. Qed.
 
@@ -356,6 +359,12 @@ revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
+Qed.
+
+Theorem map2_nil_l : ∀ A B C (f : A → B → C) la, map2 f [] la = [].
+Proof.
+intros.
+now destruct la.
 Qed.
 
 Theorem map2_nil_r : ∀ A B C (f : A → B → C) la, map2 f la [] = [].

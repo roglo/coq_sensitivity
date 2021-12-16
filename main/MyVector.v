@@ -4,6 +4,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
+Import Init.Nat.
 Import List List.ListNotations.
 
 Require Import Misc.
@@ -69,7 +70,62 @@ Definition vect_mul_scal_l s (V : vector T) :=
 (* dot product *)
 
 Definition vect_dot_mul (U V : vector T) :=
+  ∑ (i = 0, min (vect_size U) (vect_size V) - 1),
+  vect_el U i * vect_el V i.
+Definition vect_dot_mul' (U V : vector T) :=
   ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
+
+Theorem vect_dot_mul_dot_mul' :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ U V,
+  vect_dot_mul U V = vect_dot_mul' U V.
+Proof.
+intros Hos *.
+unfold vect_dot_mul, vect_dot_mul'.
+destruct U as (lu).
+destruct V as (lv).
+cbn.
+revert lv.
+induction lu as [| a]; intros. {
+  cbn; rewrite rngl_summation_only_one.
+  unfold iter_list; cbn.
+  now apply rngl_mul_0_l.
+}
+destruct lv as [| b]. {
+  cbn; rewrite rngl_summation_only_one.
+  unfold iter_list; cbn.
+  now apply rngl_mul_0_r.
+}
+cbn - [ nth ].
+rewrite Nat.sub_0_r.
+rewrite rngl_summation_split_first; [ | easy ].
+do 2 rewrite List_nth_0_cons.
+rewrite rngl_summation_list_cons.
+f_equal.
+destruct (Nat.eq_dec (length lu) 0) as [Huz| Huz]. {
+  rewrite Huz; cbn - [ nth ].
+  apply length_zero_iff_nil in Huz; subst lu.
+  rewrite rngl_summation_empty; [ | easy ].
+  now rewrite map2_nil_l; unfold iter_list.
+}
+destruct (Nat.eq_dec (length lv) 0) as [Hvz| Hvz]. {
+  rewrite Hvz; cbn - [ nth ].
+  apply length_zero_iff_nil in Hvz; subst lv.
+  rewrite Nat.min_r; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  now rewrite map2_nil_r; unfold iter_list.
+}
+rewrite rngl_summation_shift. 2: {
+  destruct (length lu); [ easy | ].
+  destruct (length lv); [ easy | ].
+  now cbn; apply -> Nat.succ_le_mono.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  now do 2 rewrite List_nth_succ_cons.
+}
+apply IHlu.
+Qed.
 
 Definition vect_squ_norm (V : vector T) := vect_dot_mul V V.
 
@@ -82,6 +138,9 @@ Arguments vector_eq {T}%type {ro} (U V)%V.
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+
+Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
   (a × (b × V))%V = ((a * b)%F × V)%V.
@@ -120,6 +179,9 @@ destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
 now apply rngl_mul_cancel_r in H2.
 Qed.
 
+Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
+Proof. now intros; cbn; rewrite map_length. Qed.
+
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
@@ -128,18 +190,40 @@ Theorem vect_dot_mul_scal_mul_comm :
 Proof.
 intros Hom Hic *.
 unfold vect_dot_mul.
-rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite vect_mul_scal_size.
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_mul_swap; [ | easy ].
+rewrite rngl_mul_comm; [ | easy ].
+destruct (Nat.eq_dec (vect_size U) 0) as [Huz| Huz]. {
+  destruct U as (lu); cbn in Huz |-*.
+  apply length_zero_iff_nil in Huz; subst lu.
+  rewrite List_nth_nil.
+  rewrite rngl_mul_0_r; [ | easy ].
+  rewrite rngl_mul_0_r; [ | easy ].
+  easy.
+}
+f_equal.
 unfold "×"; cbn.
-unfold iter_list.
-rewrite map2_map_r.
-rewrite List_fold_left_map2.
-rewrite List_fold_left_map2.
-apply List_fold_left_ext_in.
-intros * Hb.
-f_equal.
-do 2 rewrite rngl_mul_assoc.
-f_equal.
-now apply rngl_mul_comm.
+destruct (Nat.eq_dec (vect_size V) 0) as [Hvz| Hvz]. {
+  rewrite Hvz in Hi.
+  rewrite Nat.min_r in Hi; [ | easy ].
+  apply Nat.le_0_r in Hi; subst i.
+  destruct V as (lv); cbn in Hvz |-*.
+  apply length_zero_iff_nil in Hvz; subst lv; cbn.
+  symmetry.
+  now apply rngl_mul_0_r.
+}
+rewrite (List_map_nth' 0%F). 2: {
+  rewrite fold_vect_size.
+  apply (lt_le_trans _ (min (vect_size U) (vect_size V))). {
+    flia Hi Huz Hvz.
+  }
+  apply Nat.le_min_r.
+}
+easy.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
@@ -148,7 +232,9 @@ Theorem vect_scal_mul_dot_mul_comm :
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom *.
-unfold vect_dot_mul.
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'; cbn.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.
@@ -188,6 +274,8 @@ Arguments vect_mul_scal_l {T ro} s%F V%V.
 Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
 Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
