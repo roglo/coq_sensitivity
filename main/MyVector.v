@@ -70,10 +70,10 @@ Definition vect_mul_scal_l s (V : vector T) :=
 (* dot product *)
 
 Definition vect_dot_mul (U V : vector T) :=
+  ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
+Definition vect_dot_mul' (U V : vector T) :=
   ∑ (i = 0, min (vect_size U) (vect_size V) - 1),
   vect_el U i * vect_el V i.
-Definition vect_dot_mul' (U V : vector T) :=
-  ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 
 Theorem vect_dot_mul_dot_mul' :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -89,12 +89,12 @@ revert lv.
 induction lu as [| a]; intros. {
   cbn; rewrite rngl_summation_only_one.
   unfold iter_list; cbn.
-  now apply rngl_mul_0_l.
+  now symmetry; apply rngl_mul_0_l.
 }
 destruct lv as [| b]. {
   cbn; rewrite rngl_summation_only_one.
   unfold iter_list; cbn.
-  now apply rngl_mul_0_r.
+  now symmetry; apply rngl_mul_0_r.
 }
 cbn - [ nth ].
 rewrite Nat.sub_0_r.
@@ -190,40 +190,18 @@ Theorem vect_dot_mul_scal_mul_comm :
 Proof.
 intros Hom Hic *.
 unfold vect_dot_mul.
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-rewrite vect_mul_scal_size.
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_mul_swap; [ | easy ].
-rewrite rngl_mul_comm; [ | easy ].
-destruct (Nat.eq_dec (vect_size U) 0) as [Huz| Huz]. {
-  destruct U as (lu); cbn in Huz |-*.
-  apply length_zero_iff_nil in Huz; subst lu.
-  rewrite List_nth_nil.
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_r; [ | easy ].
-  easy.
-}
-f_equal.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
-destruct (Nat.eq_dec (vect_size V) 0) as [Hvz| Hvz]. {
-  rewrite Hvz in Hi.
-  rewrite Nat.min_r in Hi; [ | easy ].
-  apply Nat.le_0_r in Hi; subst i.
-  destruct V as (lv); cbn in Hvz |-*.
-  apply length_zero_iff_nil in Hvz; subst lv; cbn.
-  symmetry.
-  now apply rngl_mul_0_r.
-}
-rewrite (List_map_nth' 0%F). 2: {
-  rewrite fold_vect_size.
-  apply (lt_le_trans _ (min (vect_size U) (vect_size V))). {
-    flia Hi Huz Hvz.
-  }
-  apply Nat.le_min_r.
-}
-easy.
+unfold iter_list.
+rewrite map2_map_r.
+rewrite List_fold_left_map2.
+rewrite List_fold_left_map2.
+apply List_fold_left_ext_in.
+intros * Hb.
+f_equal.
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
@@ -232,9 +210,7 @@ Theorem vect_scal_mul_dot_mul_comm :
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
 intros Hom *.
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-unfold vect_dot_mul'; cbn.
+unfold vect_dot_mul; cbn.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 unfold "×"; cbn.
 unfold iter_list.

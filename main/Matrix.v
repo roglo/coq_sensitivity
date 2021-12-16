@@ -967,8 +967,7 @@ intros i Hi.
 rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
-rewrite vect_dot_mul_dot_mul'; [ | now left ].
-unfold vect_dot_mul'; cbn.
+unfold vect_dot_mul; cbn.
 destruct V as (l); cbn in Hi |-*.
 rewrite map2_map_l.
 rewrite (List_seq_cut i); [ cbn | now apply in_seq ].
@@ -1483,9 +1482,7 @@ rewrite map_map.
 rewrite List_map_map_seq with (d := []).
 apply map_ext_in.
 intros i Hi.
-rewrite vect_dot_mul_dot_mul'; [ cbn | now left ].
-rewrite vect_dot_mul_dot_mul'; [ cbn | now left ].
-unfold vect_dot_mul'; cbn.
+unfold vect_dot_mul; cbn.
 rewrite map2_map_r.
 rewrite map2_map2_seq_l with (d := 0%F).
 rewrite map2_map2_seq_r with (d := []).
@@ -1514,8 +1511,7 @@ destruct Hb as (Hbrc, Hb).
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite fold_mat_el.
-  rewrite vect_dot_mul_dot_mul'; [ | now left ].
-  unfold vect_dot_mul'; cbn.
+  unfold vect_dot_mul; cbn.
   rewrite map2_map2_seq_l with (d := 0%F).
   rewrite Hb with (l := nth j (mat_list_list B) []). 2: {
     apply nth_In.
@@ -1582,7 +1578,6 @@ rewrite List_map_map_seq with (d := []).
 rewrite fold_mat_nrows.
 apply map_ext_in.
 intros i Hi.
-...
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
 rewrite rngl_mul_summation_list_distr_l; [ | now left ].

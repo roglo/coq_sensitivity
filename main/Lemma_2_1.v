@@ -14,7 +14,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List List.ListNotations.
+Import Init.Nat List List.ListNotations.
 Require Import Permutation Sorted.
 
 Require Import Misc MyVector Matrix Determinant Comatrix.
@@ -561,122 +561,29 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 remember (mk_vect l) as W eqn:HW.
 subst l.
-Print vect_dot_mul.
-(* on pourrait pas redéfinir vect_dot_mul avec la partie gauche, là,
-   plutôt qu'avec ce map2 rngl_mul de merde ? *)
-...
-unfold iter_seq.
-unfold iter_list.
-...
-cbn in H1.
-
-Check fold_mat_el.
-Locate "•"%M.
-Search (∑ (t ∈ map2 _ _ _), _).
-Search (map2 rngl_mul).
-...
-Check fold_mat_vect_mul.
-...
-  rewrite Hv.
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'.
+rewrite (Hevn V). 2: {
   rewrite Hv; cbn.
-  rewrite fold_vect_size.
-Search ev.
-...
-assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
-...
-cbn - [ iter_seq ] in H.
-
-rewrite rngl_mul_comm in H.
-now rewrite rngl_mul_comm in H.
-...
-rewrite (rngl_summation_split j). 2: {
-  split; [ easy | ].
-  rewrite square_matrix_ncols; [ | easy ].
-  rewrite Hrn, <- Nat.sub_succ_l; [ | easy ].
-  now rewrite Nat_sub_succ_1.
+  apply nth_In.
+  now rewrite Hlev.
 }
-rewrite rngl_summation_split_last; [ | easy ].
-rewrite all_0_rngl_summation_0. 2: {
-  intros k Hk.
-  rewrite Hmo; cbn.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | flia Hk Hj ].
-  cbn.
-...
-  rewrite Hmd; cbn.
-  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
-  apply rngl_mul_0_r.
+replace (vect_size W) with n. 2: {
+  rewrite HW; cbn; symmetry.
+  apply is_scm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  rewrite Hcl; [ easy | ].
+  apply nth_In.
+  now rewrite fold_mat_nrows, Hrn.
 }
-...
-cbn - [ iter_seq ].
-intros * Hi Hj.
-symmetry.
-(**)
-rewrite List_map_seq_length in Hi.
-rewrite Hrn in Hi.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, Hmo.
-  unfold mat_with_vect; cbn.
-  now rewrite List_map_seq_length.
-}
-rewrite Hmo, Hmd in Hj.
-unfold "*"%M in Hj; cbn in Hj.
-unfold mat_ncols in Hj; cbn in Hj.
-rewrite (List_map_hd 0) in Hj. 2: {
-  rewrite seq_length, List_map_seq_length; flia Hi.
-}
-rewrite List_map_seq_length in Hj.
-rewrite (List_map_hd 0) in Hj; [ | rewrite seq_length; flia Hi ].
-rewrite List_map_seq_length in Hj.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, Hmd.
-  unfold mat_with_diag; cbn.
-  unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hi ].
-  rewrite List_map_seq_length.
-  rewrite Hmo, Hmd in Hj.
-  unfold "*"%M in Hj; cbn in Hj.
-  unfold mat_ncols in Hj; cbn in Hj.
-  rewrite (List_map_hd 0) in Hj. 2: {
-    rewrite seq_length, List_map_seq_length; flia Hi.
-  }
-  rewrite List_map_seq_length in Hj.
-  rewrite (List_map_hd 0) in Hj; [ | rewrite seq_length; flia Hi ].
-  now rewrite List_map_seq_length in Hj.
-}
-...
-rewrite (rngl_summation_split _ j); [ | flia Hj ].
-rewrite rngl_summation_split_last; [ | flia ].
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  rewrite Hmd; cbn.
-  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
-  apply rngl_mul_0_r.
-}
-rewrite rngl_add_0_l.
-rewrite all_0_rngl_summation_0; [ | easy | ]. 2: {
-  intros k Hk.
-  rewrite Hmd; cbn.
-  destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
-  apply rngl_mul_0_r.
-}
-rewrite rngl_add_0_r.
-rewrite Hmd; cbn - [ iter_seq ].
-destruct (Nat.eq_dec j j) as [H| H]; [ clear H | easy ].
-rewrite Hmo.
-cbn - [ iter_seq ].
-specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
-assert (H : 0 ≤ j < n) by flia Hj.
-specialize (H1 H eq_refl eq_refl); clear H.
-remember (nth j ev 0%F) as μ eqn:Hμ.
-remember (nth j eV (vect_zero n)) as V eqn:Hv.
-symmetry.
-assert (H : vect_el (M • V) i = vect_el (μ × V) i) by now rewrite H1.
-cbn - [ iter_seq ] in H.
-now rewrite rngl_mul_comm in H.
+rewrite Nat.min_id.
+rewrite square_matrix_ncols; [ | easy ].
+now rewrite Hrn.
 Qed.
+
+Inspect 1.
+
+...
 
 Theorem mat_transp_invol : ∀ m n (M : matrix m n T), (M⁺)⁺%M = M.
 Proof.
