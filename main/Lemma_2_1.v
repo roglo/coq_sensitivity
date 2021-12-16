@@ -584,10 +584,65 @@ Qed.
 Theorem mat_transp_mul :
   rngl_is_comm = true →
   ∀ (MA : matrix T) (MB : matrix T),
-  ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
+  is_correct_matrix MA = true
+  → is_correct_matrix MB = true
+  → mat_nrows MA ≠ 0
+  → mat_nrows MB ≠ 0
+  → ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
 Proof.
-intros Hic *.
-apply matrix_eq.
+intros Hic * Ha Hb Haz Hbz.
+apply matrix_eq; cycle 1. {
+  apply mat_transp_is_corr.
+  now apply mat_mul_is_corr.
+} {
+  apply mat_mul_is_corr. {
+    now apply mat_transp_is_corr.
+  } {
+    now apply mat_transp_is_corr.
+  }
+  rewrite mat_transp_nrows.
+  intros H.
+  apply is_scm_mat_iff in Ha.
+  destruct Ha as (Hcra, Hcla).
+  now apply Hcra in H.
+} {
+  cbn.
+  unfold mat_ncols; cbn.
+  do 3 rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
+  now rewrite List_map_seq_length.
+} {
+  unfold mat_ncols; cbn.
+  do 2 rewrite List_map_seq_length.
+  rewrite (List_map_hd 0). 2: {
+    rewrite seq_length.
+    unfold mat_ncols; cbn.
+    rewrite (List_map_hd 0). 2: {
+      rewrite seq_length.
+      now apply Nat.neq_0_lt_0.
+    }
+    rewrite List_map_seq_length.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply is_scm_mat_iff in Hb.
+    now apply Hb in H.
+  }
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0). 2: {
+    rewrite seq_length.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply is_scm_mat_iff in Hb.
+    now apply Hb in H.
+  }
+  rewrite List_map_seq_length.
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hacz| Hacz]; [ | easy ].
+  apply is_scm_mat_iff in Ha.
+  now apply Ha.
+}
+intros i j Hi Hj.
 ...
 intros Hic *.
 apply matrix_eq.
