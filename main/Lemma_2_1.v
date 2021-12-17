@@ -742,6 +742,28 @@ Theorem mat_mul_vect_dot_vect :
   ∀ (M : matrix T) U V,
   ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
+(*
+intros Hic *.
+unfold vect_dot_mul.
+destruct M as (ll).
+destruct U as (lu).
+destruct V as (lv); cbn.
+rewrite map_map.
+unfold vect_dot_mul; cbn.
+rewrite map2_map_l.
+rewrite map2_map_r.
+unfold mat_ncols; cbn.
+symmetry.
+erewrite map2_ext_in. 2: {
+  intros a  i Ha Hi.
+  rewrite rngl_mul_summation_list_distr_l.
+  rewrite map2_map_l.
+  easy.
+admit.
+}
+symmetry.
+...
+*)
 intros Hic *.
 rewrite vect_dot_mul_dot_mul'.
 rewrite vect_dot_mul_dot_mul'.
@@ -750,10 +772,22 @@ cbn.
 do 3 rewrite map_length.
 rewrite seq_length.
 rewrite fold_mat_nrows.
+destruct M as (ll).
+destruct U as (lu).
+destruct V as (lv); cbn.
+rewrite map_map.
 erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite (List_map_nth' []); [ | rewrite fold_mat_nrows ].
-  unfold vect_dot_mul; cbn.
+  intros i (_, Hi).
+  rewrite (List_map_nth' []). 2: {
+   apply Nat.min_glb_lt_iff with (m := length lv).
+admit.
+  }
+Search (vect_dot_mul _ _ * _)%F.
+Search (≺ _, _ ≻ * _)%F.
+admit.
+}
+unfold mat_ncols; cbn.
+...
 (*
 Search ((∑ (_ ∈ _), _) * _)%F.
 ...
