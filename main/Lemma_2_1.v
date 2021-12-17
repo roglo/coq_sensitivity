@@ -851,6 +851,11 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (A⁺ * A = mI n)%M.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
+rewrite Hm.
+apply matrix_eq; cycle 1. {
+  apply mat_mul_is_corr. {
+    apply mat_transp_is_corr.
+Search (is_correct_matrix (mat_with_vect _ _)).
 ...
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
