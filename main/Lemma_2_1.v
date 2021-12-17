@@ -547,9 +547,6 @@ rewrite (List_map_nth' 0%F) in H1. 2: {
 }
 rewrite fold_vect_el in H1.
 rewrite rngl_mul_comm in H1; [ | easy ].
-(*
-unfold vect_dot_mul in H1.
-*)
 cbn in H1.
 rewrite <- H1.
 unfold mat_el.
@@ -712,23 +709,43 @@ erewrite rngl_summation_eq_compat. 2: {
 easy.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
 Proof.
 intros.
-apply matrix_eq.
+apply matrix_eq; cycle 1. {
+  apply mat_transp_is_corr.
+  apply mI_is_correct_matrix.
+} {
+  apply mI_is_correct_matrix.
+} {
+  rewrite mat_transp_nrows.
+  now rewrite mI_nrows, mI_ncols.
+} {
+  rewrite mat_transp_ncols.
+  rewrite mI_nrows, mI_ncols.
+  now destruct n.
+}
+rewrite mat_transp_nrows, mI_ncols.
 intros * Hi Hj.
-cbn.
+rewrite mat_transp_el; [ | apply mI_is_correct_matrix ].
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now subst i; destruct (Nat.eq_dec j j).
 } {
-  destruct (Nat.eq_dec j i); [ now subst j | easy ].
+  rewrite mat_el_mI_ndiag; [ | now apply Nat.neq_sym ].
+  rewrite mat_el_mI_ndiag; [ | easy ].
+  easy.
 }
 Qed.
 
+Theorem mat_mul_vect_dot_vect :
+  rngl_is_comm = true →
+  ∀ (M : matrix T) U V,
+  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
+Proof.
+intros Hic *.
+unfold vect_dot_mul.
+unfold mat_mul_vect_r, mat_transp.
+...
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
