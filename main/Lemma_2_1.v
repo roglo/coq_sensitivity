@@ -743,6 +743,46 @@ Theorem mat_mul_vect_dot_vect :
   ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
 intros Hic *.
+rewrite vect_dot_mul_dot_mul'.
+rewrite vect_dot_mul_dot_mul'.
+unfold vect_dot_mul'.
+cbn.
+do 3 rewrite map_length.
+rewrite seq_length.
+rewrite fold_mat_nrows.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' []); [ | rewrite fold_mat_nrows ].
+  unfold vect_dot_mul; cbn.
+(*
+Search ((∑ (_ ∈ _), _) * _)%F.
+...
+  rewrite rngl_mul_summation_list_distr_r.
+*)
+  easy.
+admit.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite map_map.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length ].
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite seq_nth.
+    rewrite Nat.add_0_l.
+    easy.
+admit.
+  }
+  unfold vect_dot_mul; cbn.
+  rewrite rngl_mul_summation_list_distr_l.
+  easy.
+admit.
+admit.
+}
+cbn.
+...
+intros Hic *.
 unfold vect_dot_mul.
 unfold mat_mul_vect_r, mat_transp; cbn.
 rewrite map_map.
@@ -760,7 +800,6 @@ erewrite map2_ext_in. 2: {
 }
 cbn.
 ...
-
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
