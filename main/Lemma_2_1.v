@@ -739,8 +739,12 @@ Qed.
 
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ (M : matrix T) U V,
-  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
+  is_square_matrix M = true
+  → vect_size U = mat_nrows M
+  → vect_size V = mat_nrows M
+  → ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
 (*
 intros Hic *.
@@ -764,29 +768,49 @@ admit.
 symmetry.
 ...
 *)
-intros Hic *.
-rewrite vect_dot_mul_dot_mul'.
-rewrite vect_dot_mul_dot_mul'.
+intros Hic Hos * Hsm Hur Hvr.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  rewrite Hrz in Hur, Hvr.
+  destruct M as (ll).
+  destruct U as (lu).
+  destruct V as (lv); cbn.
+  cbn in Hur, Hvr, Hrz.
+  apply length_zero_iff_nil in Hur, Hvr, Hrz.
+  now subst lu lv ll.
+}
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
 unfold vect_dot_mul'.
+rewrite Hur, Hvr.
 cbn.
 do 3 rewrite map_length.
 rewrite seq_length.
 rewrite fold_mat_nrows.
+rewrite square_matrix_ncols; [ | easy ].
+rewrite Nat.min_id.
 destruct M as (ll).
 destruct U as (lu).
 destruct V as (lv); cbn.
+cbn in Hur, Hvr, Hrz.
 rewrite map_map.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite (List_map_nth' []). 2: {
    apply Nat.min_glb_lt_iff with (m := length lv).
-admit.
+   rewrite Hvr, Nat.min_id.
+   flia Hi Hrz.
   }
-Search (vect_dot_mul _ _ * _)%F.
-Search (≺ _, _ ≻ * _)%F.
-admit.
+  rewrite vect_dot_mul_dot_mul'; [ | easy ].
+  unfold vect_dot_mul'; cbn.
+  apply is_scm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  rewrite (Hcl (nth i ll [])). 2: {
+    cbn; apply nth_In; flia Hi Hrz.
+  }
+  cbn; rewrite Hur, Nat.min_id.
+  easy.
 }
-unfold mat_ncols; cbn.
+cbn.
 ...
 (*
 Search ((∑ (_ ∈ _), _) * _)%F.
