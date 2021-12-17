@@ -744,8 +744,23 @@ Theorem mat_mul_vect_dot_vect :
 Proof.
 intros Hic *.
 unfold vect_dot_mul.
-unfold mat_mul_vect_r, mat_transp.
+unfold mat_mul_vect_r, mat_transp; cbn.
+rewrite map_map.
+rewrite map2_map_l.
+rewrite map2_map_r.
 ...
+symmetry.
+erewrite map2_ext_in. 2: {
+  intros la a Hla Ha.
+  rewrite <- vect_scal_mul_dot_mul_comm.
+  unfold vect_mul_scal_l.
+  cbn; rewrite map_map.
+  easy.
+...
+}
+cbn.
+...
+
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   ∀ n (M : matrix n n T) U V,
