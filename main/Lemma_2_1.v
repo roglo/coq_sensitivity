@@ -808,85 +808,39 @@ erewrite rngl_summation_eq_compat. 2: {
     cbn; apply nth_In; flia Hi Hrz.
   }
   cbn; rewrite Hur, Nat.min_id.
+  rewrite rngl_mul_summation_distr_r; [ | easy ].
   easy.
 }
 cbn.
-...
-(*
-Search ((∑ (_ ∈ _), _) * _)%F.
-...
-  rewrite rngl_mul_summation_list_distr_r.
-*)
-  easy.
-admit.
-}
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite map_map.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-  erewrite map_ext_in. 2: {
-    intros j Hj.
-    rewrite seq_nth.
-    rewrite Nat.add_0_l.
-    easy.
-admit.
-  }
-  unfold vect_dot_mul; cbn.
-  rewrite rngl_mul_summation_list_distr_l.
-  easy.
-admit.
-admit.
-}
-cbn.
-...
-intros Hic *.
-unfold vect_dot_mul.
-unfold mat_mul_vect_r, mat_transp; cbn.
-rewrite map_map.
-rewrite map2_map_l.
-rewrite map2_map_r.
-...
-symmetry.
-erewrite map2_ext_in. 2: {
-  intros la a Hla Ha.
-  rewrite <- vect_scal_mul_dot_mul_comm.
-  unfold vect_mul_scal_l.
-  cbn; rewrite map_map.
-  easy.
-...
-}
-cbn.
-...
-Theorem mat_mul_vect_dot_vect :
-  rngl_is_comm = true →
-  ∀ n (M : matrix n n T) U V,
-  ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
-Proof.
-intros Hic *.
-unfold vect_dot_product.
-unfold mat_mul_vect_r, mat_transp.
-cbn - [ iter_seq ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  now rewrite rngl_mul_summation_distr_r.
-}
-cbn - [ iter_seq ].
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  now rewrite rngl_mul_summation_distr_l.
-}
-cbn - [ iter_seq ].
-symmetry.
-rewrite rngl_summation_summation_exch'; [ | easy ].
+rewrite rngl_summation_summation_exch'.
 apply rngl_summation_eq_compat.
-intros i Hi.
-apply rngl_summation_eq_compat.
-intros j Hj.
-rewrite rngl_mul_assoc; f_equal.
-now apply rngl_mul_comm.
+intros i (_, Hi).
+erewrite rngl_summation_eq_compat. 2: {
+  intros j (_, Hj).
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  easy.
+}
+cbn.
+rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+f_equal.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hrz ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'; cbn.
+rewrite List_map_seq_length.
+rewrite Hvr, Nat.min_id.
+eapply rngl_summation_eq_compat.
+intros j (_, Hj).
+f_equal.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hrz ].
+rewrite seq_nth; [ | flia Hi Hrz ].
+rewrite seq_nth; [ | flia Hj Hrz ].
+easy.
 Qed.
+
+Inspect 1.
+
+...
 
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
