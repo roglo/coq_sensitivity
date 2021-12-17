@@ -838,12 +838,20 @@ rewrite seq_nth; [ | flia Hj Hrz ].
 easy.
 Qed.
 
-Inspect 1.
-
-...
-
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
+Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
+  rngl_is_comm = true →
+  rngl_has_dec_eq = true →
+  rngl_has_inv = true →
+  ∀ n (M : matrix T) ev eV A,
+  is_symm_mat M
+  → eigenvalues_and_norm_vectors n M ev eV
+  → A = mat_with_vect n eV
+  → (A⁺ * A = mI n)%M.
+Proof.
+intros Hic Heq Hii * Hsy Hvv Hm.
+...
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
