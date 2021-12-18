@@ -880,19 +880,17 @@ now rewrite List_map_seq_length.
 Qed.
 
 Theorem mat_with_vect_el : ∀ n lv i j,
-  mat_el (mat_with_vect n lv) i j = vect_el (nth i lv (mk_vect [])) j.
+  i < n
+  → j < n
+  → mat_el (mat_with_vect n lv) i j = vect_el (nth j lv (vect_zero n)) i.
 Proof.
-intros; cbn.
-destruct (lt_dec i n) as [Hin| Hin]. 2: {
-  apply Nat.nlt_ge in Hin.
-  rewrite nth_overflow with (n := i); [ | now rewrite List_map_seq_length ].
-  rewrite List_nth_nil.
-  unfold vect_el.
-...
-  rewrite nth_overflow with (n := i); [ | ].
-...
-rewrite (List_map_nth' 0); [ | rewrite seq_length ].
-...
+intros * Hin Hjn; cbn.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+easy.
+Qed.
 
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
@@ -949,10 +947,53 @@ rewrite mat_with_vect_nrows.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite mat_transp_el; [ | apply mat_with_vect_is_corr ].
-Search (mat_el (mat_with_vect _ _)).
+  rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
+  rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
+  easy.
+}
+cbn.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+cbn.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
+  rewrite δ_diag.
+Print vect_squ_norm.
 ...
-  rewrite mat_with_vect_el.
-...
+  enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
+  specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
+  (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
+  specialize (Hvv i (nth i ev 0%F) vi) as H2.
+  assert (H : 0 ≤ i < n) by flia Hi.
+  specialize (H2 H eq_refl Hvi); clear H.
+  rewrite H2 in H1.
+  clear H2.
+  replace (M⁺)%M with M in H1. 2: {
+    unfold mat_transp; cbn.
+    apply matrix_eq; cbn.
+    intros i' j' Hi' Hj'.
+    now rewrite Hsy.
+  }
+  specialize (Hvv j (nth j ev 0%F) vj) as H2.
+  assert (H : 0 ≤ j < n) by flia Hj.
+  specialize (H2 H eq_refl Hvj); clear H.
+  rewrite H2 in H1.
+  clear H2.
+  rewrite vect_scal_mul_dot_mul_comm in H1.
+  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
+  destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
+  exfalso.
+  apply rngl_mul_cancel_r in H1; [ | easy | easy ].
+  revert H1.
+  apply Hall_diff; [ | | easy ]. {
+    split; [ flia | easy ].
+  } {
+    split; [ flia | easy ].
+  }
+}...
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_dec_eq = true →
