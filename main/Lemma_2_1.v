@@ -838,6 +838,31 @@ rewrite seq_nth; [ | flia Hj Hrz ].
 easy.
 Qed.
 
+Theorem mat_with_vect_is_corr : ∀ n vl,
+  is_correct_matrix (mat_with_vect n vl) = true.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+apply is_scm_mat_iff.
+split. {
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+} {
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (x & Hxl & Hx).
+  apply in_seq in Hx.
+  rewrite <- Hxl.
+  now rewrite List_map_seq_length.
+}
+Qed.
+
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
@@ -851,11 +876,19 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → (A⁺ * A = mI n)%M.
 Proof.
 intros Hic Heq Hii * Hsy Hvv Hm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n A | ].
 rewrite Hm.
 apply matrix_eq; cycle 1. {
   apply mat_mul_is_corr. {
     apply mat_transp_is_corr.
-Search (is_correct_matrix (mat_with_vect _ _)).
+    apply mat_with_vect_is_corr.
+  } {
+    apply mat_with_vect_is_corr.
+  }
+  now cbn; rewrite List_map_seq_length.
+} {
+  apply mI_is_correct_matrix.
+} {
 ...
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
