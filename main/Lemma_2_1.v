@@ -863,6 +863,22 @@ split. {
 }
 Qed.
 
+Theorem mat_with_vect_nrows : ∀ n vl, mat_nrows (mat_with_vect n vl) = n.
+Proof.
+intros.
+now cbn; rewrite List_map_seq_length.
+Qed.
+
+Theorem mat_with_vect_ncols : ∀ n vl, mat_ncols (mat_with_vect n vl) = n.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+now rewrite List_map_seq_length.
+Qed.
+
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
@@ -889,6 +905,28 @@ apply matrix_eq; cycle 1. {
 } {
   apply mI_is_correct_matrix.
 } {
+  cbn; do 3 rewrite List_map_seq_length.
+  apply mat_with_vect_ncols.
+} {
+  rewrite mI_ncols.
+  rewrite mat_mul_ncols. 2: {
+    now rewrite mat_transp_nrows, mat_with_vect_ncols.
+  }
+  apply mat_with_vect_ncols.
+}
+rewrite mat_mul_nrows.
+rewrite mat_transp_nrows.
+rewrite mat_with_vect_ncols.
+rewrite mI_ncols.
+intros * Hi Hj.
+rewrite mat_el_mul; cycle 1. {
+  now rewrite mat_mul_nrows, mat_transp_nrows, mat_with_vect_ncols.
+} {
+  rewrite mat_mul_ncols. 2: {
+    now rewrite mat_transp_nrows, mat_with_vect_ncols.
+  }
+  now rewrite mat_with_vect_ncols.
+}
 ...
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
