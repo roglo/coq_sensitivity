@@ -50,6 +50,7 @@ Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
+  (∀ V, V ∈ eV → vect_size V = n) ∧
   (∀ i j, i < n → j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
   (∀ i, i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
   ∀ i μ V, i < n →
@@ -350,7 +351,7 @@ subst U D; cbn.
 remember (mat_with_vect n eV) as U eqn:Hmo.
 remember (mat_with_diag n ev) as D eqn:Hmd.
 move D before U.
-destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
+destruct Hvv as (HeV & Hall_diff & Hall_norm_1 & Hvv).
 unfold is_symm_mat in Hsy.
 assert (Hus : is_square_matrix U = true). {
   rewrite Hmo; cbn.
@@ -959,9 +960,17 @@ rewrite seq_nth; [ | easy ].
 cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
-  destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
+  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
+  specialize (Hall_norm_1 i Hi) as H1.
   rewrite δ_diag.
-Print vect_squ_norm.
+  unfold vect_squ_norm in H1.
+  rewrite vect_dot_mul_dot_mul' in H1; [ | ].
+  unfold vect_dot_mul' in H1.
+  rewrite Nat.min_id in H1.
+  rewrite Hev in H1. 2: {
+    apply nth_In.
+...
+Print eigenvalues_and_norm_vectors.
 ...
   enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
