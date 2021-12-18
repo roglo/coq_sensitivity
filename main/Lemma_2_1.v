@@ -897,6 +897,7 @@ Qed.
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_dec_eq = true →
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
@@ -905,7 +906,7 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → A = mat_with_vect n eV
   → (A⁺ * A = mI n)%M.
 Proof.
-intros Hic Heq Hii * Hsy Hvv Hm.
+intros Hic Hos Heq Hii * Hsy Hvv Hm.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n A | ].
 rewrite Hm.
 apply matrix_eq; cycle 1. {
@@ -964,9 +965,11 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (Hall_norm_1 i Hi) as H1.
   rewrite δ_diag.
   unfold vect_squ_norm in H1.
-  rewrite vect_dot_mul_dot_mul' in H1; [ | ].
+  rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
   unfold vect_dot_mul' in H1.
   rewrite Nat.min_id in H1.
+  destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
+...
   rewrite Hev in H1. 2: {
     apply nth_In.
 ...
