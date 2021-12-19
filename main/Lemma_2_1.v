@@ -984,14 +984,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Hvj; cbn.
     unfold vect_el; cbn.
     rewrite List_nth_repeat.
-...
-    rewrite Hvj.
-    rewrite fold_vect_el.
-    rewrite List_nth_repeat.
-...
-    now rewrite repeat_length.
+    rewrite <- if_ltb_lt_dec.
+    rewrite Tauto.if_same.
+    rewrite nth_overflow with (n := i); [ | easy ].
+    now cbn; rewrite nth_repeat.
   }
-  rewrite Hev in H1; [ easy | now apply nth_In ].
+  rewrite Hev in H1. 2: {
+    rewrite Hvi.
+    now apply nth_In.
+  }
+  now rewrite Hvj, <- Hvi.
 } {
   rewrite δ_ndiag; [ | easy ].
 ...
