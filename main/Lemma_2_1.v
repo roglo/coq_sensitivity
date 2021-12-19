@@ -1091,6 +1091,10 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix T) D U x y ev,
        ∑ (i = 1, n), rngl_squ (vect_el y i))%F.
 Proof.
 intros * Hsy Hr Hev Hmin Hmax.
+unfold Rayleigh_quotient.
+rewrite vect_dot_mul_dot_mul'.
+rewrite vect_dot_mul_dot_mul'.
+unfold vect_dot_mul'.
 ...
 Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   is_symm_mat M
