@@ -975,9 +975,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     unfold vect_zero; cbn.
     now rewrite repeat_length.
   }
-  rewrite Hev in H1; [ | now apply nth_In ].
-...
-Print eigenvalues_and_norm_vectors.
+  rewrite Hev in H1; [ easy | now apply nth_In ].
+} {
+  rewrite δ_ndiag; [ | easy ].
 ...
   enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
