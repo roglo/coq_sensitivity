@@ -978,6 +978,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite nth_overflow in Hvi; [ subst vi | easy ].
     unfold vect_zero; cbn.
     rewrite repeat_length.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
+    f_equal.
+    rewrite Hvj; cbn.
+    unfold vect_el; cbn.
+    rewrite List_nth_repeat.
+...
+    rewrite Hvj.
+    rewrite fold_vect_el.
+    rewrite List_nth_repeat.
 ...
     now rewrite repeat_length.
   }
