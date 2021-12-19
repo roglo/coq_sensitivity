@@ -29,6 +29,7 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 Definition is_symm_mat (A : matrix T) :=
+  is_square_matrix A = true ∧
   ∀ i j, i < mat_nrows A → j < mat_nrows A → mat_el A i j = mat_el A j i.
 
 Definition princ_subm_1 (A : matrix T) k := subm A k k.
@@ -1027,13 +1028,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   rewrite fold_vect_dot_mul'.
   rewrite <- vect_dot_mul_dot_mul'; [ | easy ].
+  specialize (mat_mul_vect_dot_vect Hic Hos M vi vj) as H1.
+  destruct Hsy as (Hsm, Hsy).
+  specialize (H1 Hsm).
 ...
-  remember (vect_dot_mul' vi vj) as x eqn:Hx.
-Print vect_dot_mul'.
-...
-  rewrite <- vect_dot_mul_dot_mul'.
-  enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
-  specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
   (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
   specialize (Hvv i (nth i ev 0%F) vi) as H2.
   assert (H : 0 ≤ i < n) by flia Hi.
