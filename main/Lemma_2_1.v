@@ -893,6 +893,11 @@ rewrite seq_nth; [ | easy ].
 easy.
 Qed.
 
+Theorem fold_vect_dot_mul' : ∀ U V,
+  ∑ (i = 0, min (vect_size U) (vect_size V) - 1), vect_el U i * vect_el V i =
+  vect_dot_mul' U V.
+Proof. easy. Qed.
+
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
@@ -996,7 +1001,37 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now rewrite Hvj, <- Hvi.
 } {
   rewrite δ_ndiag; [ | easy ].
+  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
+  destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
+    apply Nat.nlt_ge in Hie.
+    apply all_0_rngl_summation_0.
+    intros k Hk.
+    rewrite Hvi.
+    rewrite nth_overflow; [ cbn | easy ].
+    rewrite nth_repeat.
+    now apply rngl_mul_0_l.
+  }
+  destruct (lt_dec j (length eV)) as [Hje| Hje]. 2: {
+    apply Nat.nlt_ge in Hje.
+    apply all_0_rngl_summation_0.
+    intros k Hk.
+    rewrite Hvj.
+    rewrite nth_overflow; [ cbn | easy ].
+    rewrite nth_repeat.
+    now apply rngl_mul_0_r.
+  }
+  replace n with (min (vect_size vi) (vect_size vj)). 2: {
+    rewrite Hev; [ | now rewrite Hvi; apply nth_In ].
+    rewrite Hev; [ | now rewrite Hvj; apply nth_In ].
+    apply Nat.min_id.
+  }
+  rewrite fold_vect_dot_mul'.
+  rewrite <- vect_dot_mul_dot_mul'; [ | easy ].
 ...
+  remember (vect_dot_mul' vi vj) as x eqn:Hx.
+Print vect_dot_mul'.
+...
+  rewrite <- vect_dot_mul_dot_mul'.
   enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
   specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
   (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
