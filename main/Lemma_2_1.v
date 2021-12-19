@@ -908,12 +908,13 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
   is_symm_mat M
+  → mat_nrows M = n
   → eigenvalues_and_norm_vectors n M ev eV
   → A = mat_with_vect n eV
   → (A⁺ * A = mI n)%M.
 Proof.
-intros Hic Hos Heq Hii * Hsy Hvv Hm.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n A | ].
+intros Hic Hos Heq Hii * Hsy Hr Hvv Hm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
 rewrite Hm.
 apply matrix_eq; cycle 1. {
   apply mat_mul_is_corr. {
@@ -1031,99 +1032,66 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (mat_mul_vect_dot_vect Hic Hos M vi vj) as H1.
   destruct Hsy as (Hsm, Hsy).
   specialize (H1 Hsm).
-...
-  (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
-  specialize (Hvv i (nth i ev 0%F) vi) as H2.
-  assert (H : 0 ≤ i < n) by flia Hi.
-  specialize (H2 H eq_refl Hvi); clear H.
+  rewrite Hr in H1.
+  assert (H : vect_size vi = n). {
+    rewrite Hvi, Hev; [ easy | ].
+    now apply nth_In.
+  }
+  specialize (H1 H); clear H.
+  assert (H : vect_size vj = n). {
+    rewrite Hvj, Hev; [ easy | ].
+    now apply nth_In.
+  }
+  specialize (H1 H); clear H.
+  (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
+  specialize (Hvv i (nth i ev 0%F) vi Hi eq_refl Hvi) as H2.
   rewrite H2 in H1.
   clear H2.
   replace (M⁺)%M with M in H1. 2: {
     unfold mat_transp; cbn.
-    apply matrix_eq; cbn.
-    intros i' j' Hi' Hj'.
-    now rewrite Hsy.
+    rewrite square_matrix_ncols; [ rewrite Hr | easy ].
+    destruct M as (ll); cbn in Hr, Hsy |-*; f_equal.
+    rewrite (List_map_nth_seq ll []) at 1.
+    rewrite Hr.
+    apply map_ext_in.
+    intros i' Hi'; apply in_seq in Hi'.
+    rewrite (List_map_nth_seq (nth i' ll []) 0%F) at 1.
+    apply is_scm_mat_iff in Hsm; cbn in Hsm.
+    destruct Hsm as (Hcr, Hcl).
+    rewrite Hcl; [ rewrite Hr | now apply nth_In; rewrite Hr ].
+    apply map_ext_in.
+    intros j' Hj'; apply in_seq in Hj'.
+    now apply Hsy; rewrite Hr.
   }
-  specialize (Hvv j (nth j ev 0%F) vj) as H2.
-  assert (H : 0 ≤ j < n) by flia Hj.
-  specialize (H2 H eq_refl Hvj); clear H.
+  specialize (Hvv j (nth j ev 0%F) vj Hj eq_refl Hvj) as H2.
   rewrite H2 in H1.
   clear H2.
-  rewrite vect_scal_mul_dot_mul_comm in H1.
-  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
+  rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
+  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
   destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
   exfalso.
-  apply rngl_mul_cancel_r in H1; [ | easy | easy ].
+  apply rngl_mul_cancel_r in H1; [ | now left | easy ].
   revert H1.
-  apply Hall_diff; [ | | easy ]. {
-    split; [ flia | easy ].
-  } {
-    split; [ flia | easy ].
-  }
-}...
-Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
-  rngl_is_comm = true →
-  rngl_has_dec_eq = true →
-  rngl_has_inv = true ∨ rngl_has_eucl_div = true →
-  ∀ n (M : matrix n n T) ev eV U,
-  is_symm_mat M
-  → eigenvalues_and_norm_vectors M ev eV
-  → U = mat_with_vect eV
-  → (U⁺ * U = mI n)%M.
-Proof.
-intros Hic Heq Hii * Hsy Hvv Hm.
-rewrite Hm; cbn.
-apply matrix_eq.
-cbn - [ iter_seq ].
-intros * Hi Hj.
-remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
-remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
-move vj before vi.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. 2: {
-  destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
-  enough (Hvvz : ≺ vi, vj ≻ = 0%F) by easy.
-  specialize (mat_mul_vect_dot_vect Hic M vi vj) as H1.
-  (* H1 : ((M • vi) · vj)%V = (vi · (M⁺ • vj))%V *)
-  specialize (Hvv i (nth i ev 0%F) vi) as H2.
-  assert (H : 0 ≤ i < n) by flia Hi.
-  specialize (H2 H eq_refl Hvi); clear H.
-  rewrite H2 in H1.
-  clear H2.
-  replace (M⁺)%M with M in H1. 2: {
-    unfold mat_transp; cbn.
-    apply matrix_eq; cbn.
-    intros i' j' Hi' Hj'.
-    now rewrite Hsy.
-  }
-  specialize (Hvv j (nth j ev 0%F) vj) as H2.
-  assert (H : 0 ≤ j < n) by flia Hj.
-  specialize (H2 H eq_refl Hvj); clear H.
-  rewrite H2 in H1.
-  clear H2.
-  rewrite vect_scal_mul_dot_mul_comm in H1.
-  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
-  destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
-  exfalso.
-  apply rngl_mul_cancel_r in H1; [ | easy | easy ].
-  revert H1.
-  apply Hall_diff; [ | | easy ]. {
-    split; [ flia | easy ].
-  } {
-    split; [ flia | easy ].
-  }
+  now apply Hall_diff.
 }
-subst j.
-rewrite Hvj, <- Hvi.
-destruct Hvv as (Hall_diff & Hall_norm_1 & Hvv).
-specialize (Hall_norm_1 i) as H1.
-rewrite <- Hvi in H1.
-apply H1; flia Hi.
 Qed.
 
-(* changing variable x as y = O^T . x, the Rayleigh quotient R (M, x)
+(* changing variable x as y = O⁺ . x, the Rayleigh quotient R (M, x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
+Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix T) D U x y ev,
+  is_symm_mat M
+  → mat_nrows M = n
+  → eigenvalues n M ev
+  → M = (mat_transp U * D * U)%M
+  → y = (mat_transp U • x)%M
+  → Rayleigh_quotient M x =
+      (∑ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
+       ∑ (i = 1, n), rngl_squ (vect_el y i))%F.
+Proof.
+intros * Hsy Hr Hev Hmin Hmax.
+...
 Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   is_symm_mat M
   → eigenvalues M ev
@@ -1134,9 +1102,7 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
        Σ (i = 1, n), rngl_squ (vect_el y i))%F.
 Proof.
 intros * Hsy Hev Hmin Hmax.
-Abort. (*
 ...
-*)
 
 (* The Rayleigh quotient reaches its minimum value μ_min (the smallest
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
