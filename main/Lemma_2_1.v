@@ -959,20 +959,26 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite seq_nth; [ | easy ].
 cbn.
+remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
+remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+move vj before vi.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; clear Hj.
   rewrite δ_diag.
   destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
   specialize (Hall_norm_1 i Hi) as H1.
   unfold vect_squ_norm in H1.
+  rewrite <- Hvi in H1.
   rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
   unfold vect_dot_mul' in H1.
   rewrite Nat.min_id in H1.
   destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
     apply Nat.nlt_ge in Hie.
     rewrite <- H1.
-    rewrite nth_overflow; [ | easy ].
+    rewrite nth_overflow in Hvi; [ subst vi | easy ].
     unfold vect_zero; cbn.
+    rewrite repeat_length.
+...
     now rewrite repeat_length.
   }
   rewrite Hev in H1; [ easy | now apply nth_In ].
