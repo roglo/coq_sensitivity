@@ -960,18 +960,22 @@ rewrite seq_nth; [ | easy ].
 rewrite seq_nth; [ | easy ].
 cbn.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
+  subst j; clear Hj.
+  rewrite δ_diag.
   destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
   specialize (Hall_norm_1 i Hi) as H1.
-  rewrite δ_diag.
   unfold vect_squ_norm in H1.
   rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
   unfold vect_dot_mul' in H1.
   rewrite Nat.min_id in H1.
   destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
-...
-  rewrite Hev in H1. 2: {
-    apply nth_In.
+    apply Nat.nlt_ge in Hie.
+    rewrite <- H1.
+    rewrite nth_overflow; [ | easy ].
+    unfold vect_zero; cbn.
+    now rewrite repeat_length.
+  }
+  rewrite Hev in H1; [ | now apply nth_In ].
 ...
 Print eigenvalues_and_norm_vectors.
 ...
