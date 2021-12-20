@@ -1076,25 +1076,41 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-(* changing variable x as y = O⁺ . x, the Rayleigh quotient R (M, x)
+(* changing variable x as y = O⁺ . x, the Rayleigh quotient R(M,x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
-Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix T) D U x y ev,
+Theorem Rayleigh_quotient_from_ortho :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ n (M : matrix T) D U x y ev,
   is_symm_mat M
   → mat_nrows M = n
+  → vect_size x = n
   → eigenvalues n M ev
   → M = (mat_transp U * D * U)%M
   → y = (mat_transp U • x)%M
   → Rayleigh_quotient M x =
-      (∑ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
-       ∑ (i = 1, n), rngl_squ (vect_el y i))%F.
+      (∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1)) /
+       ∑ (i = 1, n), rngl_squ (vect_el y (i - 1)))%F.
 Proof.
-intros * Hsy Hr Hev Hmin Hmax.
+intros Hos * Hsy Hr Hsx Hev Hmin Hmax.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  rewrite rngl_summation_empty; [ | easy ].
+  unfold Rayleigh_quotient.
+  subst M; cbn.
+...
 unfold Rayleigh_quotient.
-rewrite vect_dot_mul_dot_mul'.
-rewrite vect_dot_mul_dot_mul'.
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
 unfold vect_dot_mul'.
+rewrite Nat.min_id.
+cbn - [ vect_el ].
+rewrite map_length, fold_mat_nrows, Hr, Hsx.
+rewrite Nat.min_id.
+unfold rngl_squ.
+symmetry.
+rewrite rngl_summation_shift.
 ...
 Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   is_symm_mat M
