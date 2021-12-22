@@ -256,6 +256,7 @@ Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_size {T}%type v%V.
 Arguments vect_squ_norm {T}%type {ro} V%V.
 Arguments vector_eq {T}%type {ro} (U V)%V.
 

@@ -1076,30 +1076,61 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
+Proof.
+intros; cbn.
+now rewrite map_length.
+Qed.
+
 (* changing variable x as y = O⁺ . x, the Rayleigh quotient R(M,x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
 Theorem Rayleigh_quotient_from_ortho :
   rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_inv = true →
   ∀ n (M : matrix T) D U x y ev,
-  is_symm_mat M
+  n ≠ 0
+  → is_symm_mat M
+  → is_square_matrix U = true
+  → is_square_matrix D = true
   → mat_nrows M = n
   → vect_size x = n
   → eigenvalues n M ev
-  → M = (mat_transp U * D * U)%M
-  → y = (mat_transp U • x)%M
+  → M = (U⁺ * D * U)%M
+  → y = (U⁺ • x)%M
   → Rayleigh_quotient M x =
       (∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1)) /
        ∑ (i = 1, n), rngl_squ (vect_el y (i - 1)))%F.
 Proof.
-intros Hos * Hsy Hr Hsx Hev Hmin Hmax.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  rewrite rngl_summation_empty; [ | easy ].
-  unfold Rayleigh_quotient.
-  subst M; cbn.
-...
+intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
+assert (Hsy : vect_size y = n). {
+  apply (f_equal vect_size) in Hmax.
+  rewrite mat_mul_vect_size in Hmax.
+  rewrite mat_transp_nrows in Hmax.
+  generalize Hmin; intros H.
+  apply (f_equal mat_nrows) in Hmin.
+  apply (f_equal mat_ncols) in H.
+  do 2 rewrite mat_mul_nrows in Hmin.
+  rewrite mat_transp_nrows in Hmin.
+  rewrite mat_mul_ncols in H. 2: {
+    rewrite mat_mul_nrows.
+    rewrite mat_transp_nrows.
+    congruence.
+  }
+  congruence.
+}
+move Hsy before Hsx.
+assert (Hcu : mat_ncols U = n). {
+  apply (f_equal mat_nrows) in Hmin.
+  do 2 rewrite mat_mul_nrows in Hmin.
+  rewrite mat_transp_nrows in Hmin.
+  congruence.
+}
+assert (Hru : mat_nrows U = n). {
+  now rewrite square_matrix_ncols in Hcu.
+}
+move Hru after Hcu.
 unfold Rayleigh_quotient.
 rewrite vect_dot_mul_dot_mul'; [ | easy ].
 rewrite vect_dot_mul_dot_mul'; [ | easy ].
@@ -1110,7 +1141,58 @@ rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 unfold rngl_squ.
 symmetry.
-rewrite rngl_summation_shift.
+rewrite rngl_summation_shift; [ | now apply Nat.neq_0_lt_0 ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite rngl_summation_shift; [ | now apply Nat.neq_0_lt_0 ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite Nat.add_comm, Nat.add_sub.
+    easy.
+  }
+  easy.
+}
+cbn - [ vect_el ].
+unfold "/"%F.
+rewrite Hiv.
+rewrite <- rngl_mul_summation_distr_r; [ | easy ].
+f_equal. {
+  apply rngl_summation_eq_compat.
+  intros i (_, Hi).
+  unfold eigenvalues in Hev.
+...
+f_equal. 2: {
+  f_equal.
+  rewrite Hmax.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi); cbn.
+    rewrite (List_map_nth' []). 2: {
+      rewrite List_map_seq_length.
+      apply (f_equal mat_ncols) in Hmin.
+(*
+      rewrite <- mat_mul_assoc in Hmin.
+*)
+      rewrite Hcu; flia Hi Hnz.
+    }
+    rewrite (List_map_nth' 0); [ | rewrite seq_length, Hcu; flia Hi Hnz ].
+    erewrite map_ext_in. 2: {
+      intros j Hj; apply in_seq in Hj.
+      rewrite Hru in Hj.
+      rewrite seq_nth; [ cbn | rewrite Hcu; flia Hi Hnz ].
+      easy.
+    }
+    easy.
+  }
+  cbn.
+...
+  rewrite fold_mat_transp.
+Check List_map_nth_seq.
+Print mat_transp.
+Check fold_mat_transp.
+...
+  rewrite vect_dot_mul_dot_mul'; [ | easy ].
+  cbn.
 ...
 Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   is_symm_mat M
