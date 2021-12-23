@@ -1087,6 +1087,7 @@ Qed.
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
 (* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
+(* https://en.wikipedia.org/wiki/Normal_matrix *)
 
 Theorem Rayleigh_quotient_from_ortho :
   rngl_has_opp = true ∨ rngl_has_sous = true →
