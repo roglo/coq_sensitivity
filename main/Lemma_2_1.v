@@ -1085,6 +1085,7 @@ Qed.
 (* changing variable x as y = O⁺.x, the Rayleigh quotient R(M,x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
+
 (* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
 
 Theorem Rayleigh_quotient_from_ortho :
