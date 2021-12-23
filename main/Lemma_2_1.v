@@ -1085,6 +1085,7 @@ Qed.
 (* changing variable x as y = O⁺.x, the Rayleigh quotient R(M,x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
+(* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
 
 Theorem Rayleigh_quotient_from_ortho :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -1100,8 +1101,8 @@ Theorem Rayleigh_quotient_from_ortho :
   → M = (U⁺ * D * U)%M
   → y = (U⁺ • x)%M
   → Rayleigh_quotient M x =
-      (∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1)) /
-       ∑ (i = 1, n), rngl_squ (vect_el y (i - 1)))%F.
+      ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1))) /
+       (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
 intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
 assert (Hsy : vect_size y = n). {
@@ -1139,6 +1140,9 @@ rewrite Nat.min_id.
 cbn - [ vect_el ].
 rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
+(**)
+f_equal.
+...
 unfold rngl_squ.
 symmetry.
 rewrite rngl_summation_shift; [ | now apply Nat.neq_0_lt_0 ].
@@ -1161,6 +1165,7 @@ f_equal. {
   apply rngl_summation_eq_compat.
   intros i (_, Hi).
   unfold eigenvalues in Hev.
+Print Rayleigh_quotient.
 ...
 f_equal. 2: {
   f_equal.
