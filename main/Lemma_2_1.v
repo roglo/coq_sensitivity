@@ -1107,7 +1107,7 @@ Theorem Rayleigh_quotient_from_ortho :
        (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
 intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
-(**)
+(*1*)
 specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H1.
 enough (Hic : rngl_is_comm = true).
 specialize (H1 Hic Hos).
@@ -1118,10 +1118,74 @@ destruct H as (eV & HeV).
 specialize (H1 eV U Hsym Hr HeV).
 enough (HU : U = mat_with_vect n eV).
 specialize (H1 HU).
+(*
 ...
 M y = U⁺ D U U⁺ x = U⁺ D x (ou presque, puisque j'ai U⁺U=I et non pas UU⁺=I)
 U y = U U⁺ x = x (pareil)
 ...
+*)
+assert (Hsy : vect_size y = n). {
+  apply (f_equal vect_size) in Hmax.
+  rewrite mat_mul_vect_size in Hmax.
+  rewrite mat_transp_nrows in Hmax.
+  generalize Hmin; intros H.
+  apply (f_equal mat_nrows) in Hmin.
+  apply (f_equal mat_ncols) in H.
+  do 2 rewrite mat_mul_nrows in Hmin.
+  rewrite mat_transp_nrows in Hmin.
+  rewrite mat_mul_ncols in H. 2: {
+    rewrite mat_mul_nrows.
+    rewrite mat_transp_nrows.
+    congruence.
+  }
+  congruence.
+}
+move Hsy before Hsx.
+assert (Hcu : mat_ncols U = n). {
+  apply (f_equal mat_nrows) in Hmin.
+  do 2 rewrite mat_mul_nrows in Hmin.
+  rewrite mat_transp_nrows in Hmin.
+  congruence.
+}
+assert (Hru : mat_nrows U = n). {
+  now rewrite square_matrix_ncols in Hcu.
+}
+move Hru after Hcu.
+unfold Rayleigh_quotient.
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'.
+rewrite Nat.min_id.
+cbn - [ vect_el ].
+rewrite map_length, fold_mat_nrows, Hr, Hsx.
+rewrite Nat.min_id.
+f_equal. 2: {
+  replace x with (U • y)%M; cbn.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i (_, Hi).
+    rewrite (List_map_nth' []). 2: {
+      rewrite fold_mat_nrows, Hru.
+      flia Hi Hnz.
+    }
+    rewrite vect_dot_mul_dot_mul'; [ | easy ].
+    unfold vect_dot_mul'; cbn.
+    rewrite Hsy.
+    apply is_scm_mat_iff in Hsmu.
+    destruct Hsmu as (Hcru, Hclu).
+    rewrite Hclu; [ | apply nth_In; rewrite fold_mat_nrows, Hru; flia Hi Hnz ].
+    rewrite Hru, Nat.min_id.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j (_, Hj).
+      rewrite fold_mat_el.
+      easy.
+    }
+    cbn.
+    easy.
+  }
+  cbn.
+  unfold rngl_squ.
+(* bof, non, ça le fait pas *)
+...1
 assert (Hsy : vect_size y = n). {
   apply (f_equal vect_size) in Hmax.
   rewrite mat_mul_vect_size in Hmax.
