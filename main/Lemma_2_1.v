@@ -1108,22 +1108,24 @@ Theorem Rayleigh_quotient_from_ortho :
 Proof.
 intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
 (*1*)
-specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H1.
+specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
 enough (Hic : rngl_is_comm = true).
-specialize (H1 Hic Hos).
+specialize (HUU Hic Hos).
 enough (Hde : rngl_has_dec_eq = true).
-specialize (H1 Hde Hiv n M ev).
+specialize (HUU Hde Hiv n M ev).
 enough (H : ∃ eV, eigenvalues_and_norm_vectors n M ev eV).
 destruct H as (eV & HeV).
-specialize (H1 eV U Hsym Hr HeV).
+specialize (HUU eV U Hsym Hr HeV).
 enough (HU : U = mat_with_vect n eV).
-specialize (H1 HU).
+specialize (HUU HU).
 (*
 ...
 M y = U⁺ D U U⁺ x = U⁺ D x (ou presque, puisque j'ai U⁺U=I et non pas UU⁺=I)
 U y = U U⁺ x = x (pareil)
 ...
 *)
+move HUU at bottom.
+...
 assert (Hsy : vect_size y = n). {
   apply (f_equal vect_size) in Hmax.
   rewrite mat_mul_vect_size in Hmax.
