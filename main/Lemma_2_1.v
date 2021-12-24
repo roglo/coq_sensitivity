@@ -1107,6 +1107,18 @@ Theorem Rayleigh_quotient_from_ortho :
        (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
 intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
+(**)
+specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as H1.
+enough (Hic : rngl_is_comm = true).
+specialize (H1 Hic Hos).
+enough (Hde : rngl_has_dec_eq = true).
+specialize (H1 Hde Hiv n M ev).
+enough (H : ∃ eV, eigenvalues_and_norm_vectors n M ev eV).
+destruct H as (eV & HeV).
+specialize (H1 eV U Hsym Hr HeV).
+enough (HU : U = mat_with_vect n eV).
+specialize (H1 HU).
+...
 assert (Hsy : vect_size y = n). {
   apply (f_equal vect_size) in Hmax.
   rewrite mat_mul_vect_size in Hmax.
@@ -1144,6 +1156,7 @@ rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 (**)
 f_equal.
+Search (_⁺ * _)%M.
 ...
 unfold rngl_squ.
 symmetry.
@@ -1225,9 +1238,7 @@ Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
   → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%F.
 Proof.
 intros * Hev Hsev Hmin Hmax.
-Abort. (*
 ...
-*)
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
 
@@ -1248,8 +1259,6 @@ Theorem lemma_2_1 :
     (nth (i-n+m) seva 0%F ≤ nth i sevb 0%F ≤ nth i seva 0%F)%F.
 Proof.
 intros * Hm Hmn Hisa Hb Heva Hevb Hsa Hsb * Him.
-Abort. (*
 ...
-*)
 
 End a.
