@@ -1119,6 +1119,9 @@ specialize (H1 eV U Hsym Hr HeV).
 enough (HU : U = mat_with_vect n eV).
 specialize (H1 HU).
 ...
+M y = U⁺ D U U⁺ x = U⁺ D x (ou presque, puisque j'ai U⁺U=I et non pas UU⁺=I)
+U y = U U⁺ x = x (pareil)
+...
 assert (Hsy : vect_size y = n). {
   apply (f_equal vect_size) in Hmax.
   rewrite mat_mul_vect_size in Hmax.
