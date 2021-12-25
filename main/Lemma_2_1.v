@@ -1151,8 +1151,7 @@ assert (Hru : mat_nrows U = n). {
 }
 move Hru after Hcu.
 unfold Rayleigh_quotient.
-destruct Hof.
-...
+destruct Hof as (Hic & Hop & Hde & Hdl & Hit & Hiv & Hor).
 rewrite vect_dot_mul_dot_mul'; [ | now left ].
 rewrite vect_dot_mul_dot_mul'; [ | now left ].
 unfold vect_dot_mul'.
@@ -1167,9 +1166,28 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
     now rewrite Nat.min_id, Hsx in H.
   }
   intros H.
-  apply eq_vect_squ_0 in H; [ | easy | | | ].
+  apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
   now rewrite Hsx in H.
 } {
+  enough (H : ≺ y, y ≻ ≠ 0%F). {
+    rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
+    unfold vect_dot_mul' in H.
+    rewrite Nat.min_id, Hsy in H.
+    rewrite rngl_summation_shift; [ | now apply Nat.neq_0_lt_0 ].
+    erewrite rngl_summation_eq_compat. 2: {
+      intros i Hi.
+      rewrite Nat.add_comm, Nat.add_sub.
+      unfold rngl_squ.
+      easy.
+    }
+    easy.
+  }
+  intros H.
+  apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
+  rewrite Hsy in H.
+  rewrite Hmax in H.
+Search ((_ • _)%V = vect_zero _).
+(* oui mais non, c'est pas intègre *)
 ...
 rewrite fold_vect_dot_mul'.
 eq_vect_squ_0:
