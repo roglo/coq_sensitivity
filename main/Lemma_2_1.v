@@ -1125,7 +1125,6 @@ U y = U U⁺ x = x (pareil)
 ...
 *)
 move HUU at bottom.
-...
 assert (Hsy : vect_size y = n). {
   apply (f_equal vect_size) in Hmax.
   rewrite mat_mul_vect_size in Hmax.
@@ -1161,6 +1160,8 @@ rewrite Nat.min_id.
 cbn - [ vect_el ].
 rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
+apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
+...
 f_equal. 2: {
   replace x with (U • y)%M; cbn.
   erewrite rngl_summation_eq_compat. 2: {

@@ -428,6 +428,18 @@ assert (m * p = p * m)%F as H by now apply rngl_mul_comm.
 rewrite H; reflexivity.
 Qed.
 
+Theorem rngl_div_div_swap :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  ∀ a b c,
+  (a / b / c = a / c / b)%F.
+Proof.
+intros Hic Hin *.
+unfold rngl_div.
+rewrite Hin.
+now apply rngl_mul_mul_swap.
+Qed.
+
 Theorem rngl_add_compat_l : ∀ a b c,
   (a = b)%F → (c + a = c + b)%F.
 Proof.
@@ -701,6 +713,18 @@ destruct iv. {
 }
 Qed.
 
+Theorem rngl_div_mul :
+  rngl_has_inv = true →
+  ∀ a b, b ≠ 0%F → (a / b * b)%F = a.
+Proof.
+intros Hin * Hbz.
+unfold rngl_div.
+rewrite Hin.
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_inv_l; [ | easy | easy ].
+apply rngl_mul_1_r.
+Qed.
+
 Theorem rngl_div_0_l :
   (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
   (rngl_has_inv = true ∨ rngl_has_quot = true) →
@@ -713,6 +737,34 @@ replace 0%F with (0 * a)%F in Hx. 2: {
 }
 subst x.
 now apply rngl_mul_div_l.
+Qed.
+
+Theorem rngl_div_div_mul_mul :
+  rngl_is_comm = true →
+  rngl_has_inv = true →
+  ∀ a b c d,
+  b ≠ 0%F
+  → d ≠ 0%F
+  → (a / b = c / d)%F ↔ (a * d = b * c)%F.
+Proof.
+intros Hic Hin * Hbz Hdz.
+split. {
+  intros Habcd.
+  apply (f_equal (λ x, rngl_mul x b)) in Habcd.
+  rewrite rngl_div_mul in Habcd; [ | easy | easy ].
+  apply (f_equal (λ x, rngl_mul x d)) in Habcd.
+  rewrite (rngl_mul_comm Hic _ b) in Habcd.
+  rewrite <- rngl_mul_assoc in Habcd.
+  now rewrite rngl_div_mul in Habcd.
+} {
+  intros Habcd.
+  apply (f_equal (λ x, rngl_div x d)) in Habcd.
+  rewrite rngl_mul_div_l in Habcd; [ | now left | easy ].
+  apply (f_equal (λ x, rngl_div x b)) in Habcd.
+  rewrite rngl_div_div_swap in Habcd; [ | easy | easy ].
+  rewrite rngl_mul_comm in Habcd; [ | easy ].
+  rewrite rngl_mul_div_l in Habcd; [ easy | now left | easy ].
+}
 Qed.
 
 Theorem rngl_integral :
