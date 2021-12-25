@@ -95,7 +95,7 @@ destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
 }
 Qed.
 
-Definition is_ordered_field :=
+Definition in_ordered_field :=
   rngl_is_comm = true ∧
   rngl_has_opp = true ∧
   rngl_has_dec_eq = true ∧
@@ -196,7 +196,7 @@ f_equal. {
 Qed.
 
 Theorem RQ_mul_scal_prop :
-  is_ordered_field →
+  in_ordered_field →
   ∀ (M : matrix T) V c,
   is_square_matrix M = true
   → vect_size V = mat_nrows M
@@ -1089,35 +1089,33 @@ Qed.
 (* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
 (* https://en.wikipedia.org/wiki/Normal_matrix *)
 
-Theorem Rayleigh_quotient_from_ortho :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_inv = true →
-  ∀ n (M : matrix T) D U x y ev,
+Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
+  ∀ n (M : matrix T) D U eV x y ev,
   n ≠ 0
   → is_symm_mat M
   → is_square_matrix U = true
   → is_square_matrix D = true
   → mat_nrows M = n
   → vect_size x = n
-  → eigenvalues n M ev
+  → x ≠ vect_zero n
+  → eigenvalues_and_norm_vectors n M ev eV
+  → U = mat_with_vect n eV
   → M = (U⁺ * D * U)%M
   → y = (U⁺ • x)%M
   → Rayleigh_quotient M x =
       ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1))) /
        (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
-intros Hos Hiv * Hnz Hsym Hsmu Hsmd Hr Hsx Hev Hmin Hmax.
+intros Hof * Hnz Hsym Hsmu Hsmd Hr Hsx Hxz HeV HU Hmin Hmax.
 (*1*)
-specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
-enough (Hic : rngl_is_comm = true).
-specialize (HUU Hic Hos).
-enough (Hde : rngl_has_dec_eq = true).
-specialize (HUU Hde Hiv n M ev).
-enough (H : ∃ eV, eigenvalues_and_norm_vectors n M ev eV).
-destruct H as (eV & HeV).
-specialize (HUU eV U Hsym Hr HeV).
-enough (HU : U = mat_with_vect n eV).
-specialize (HUU HU).
+assert (HUU : (U⁺ * U)%M = mI n). {
+  specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
+  destruct Hof as (Hic & Hop & Hde & _ & _ & Hiv & _).
+  specialize (HUU Hic (or_introl Hop)).
+  specialize (HUU Hde Hiv n M ev).
+  specialize (HUU eV U Hsym Hr HeV).
+  now specialize (HUU HU).
+}
 (*
 ...
 M y = U⁺ D U U⁺ x = U⁺ D x (ou presque, puisque j'ai U⁺U=I et non pas UU⁺=I)
@@ -1153,8 +1151,10 @@ assert (Hru : mat_nrows U = n). {
 }
 move Hru after Hcu.
 unfold Rayleigh_quotient.
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
+destruct Hof.
+...
+rewrite vect_dot_mul_dot_mul'; [ | now left ].
+rewrite vect_dot_mul_dot_mul'; [ | now left ].
 unfold vect_dot_mul'.
 rewrite Nat.min_id.
 cbn - [ vect_el ].
@@ -1162,13 +1162,14 @@ rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   enough (H : ≺ x, x ≻ ≠ 0%F). {
-    rewrite vect_dot_mul_dot_mul' in H; [ | easy ].
+    rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
     now rewrite Nat.min_id, Hsx in H.
   }
   intros H.
-  apply eq_vect_squ_0 in H; [ | | | | ].
-  rewrite Hsx in H.
+  apply eq_vect_squ_0 in H; [ | easy | | | ].
+  now rewrite Hsx in H.
+} {
 ...
 rewrite fold_vect_dot_mul'.
 eq_vect_squ_0:
