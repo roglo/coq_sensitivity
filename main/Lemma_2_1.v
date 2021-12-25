@@ -1161,6 +1161,17 @@ cbn - [ vect_el ].
 rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
 apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
+  enough (H : ≺ x, x ≻ ≠ 0%F). {
+    rewrite vect_dot_mul_dot_mul' in H; [ | easy ].
+    unfold vect_dot_mul' in H.
+    now rewrite Nat.min_id, Hsx in H.
+  }
+  intros H.
+  apply eq_vect_squ_0 in H; [ | | | | ].
+  rewrite Hsx in H.
+...
+rewrite fold_vect_dot_mul'.
+eq_vect_squ_0:
 ...
 f_equal. 2: {
   replace x with (U • y)%M; cbn.
