@@ -1083,6 +1083,7 @@ now rewrite map_length.
 Qed.
 
 (* https://people.orie.cornell.edu/dpw/orie6334/Fall2016/lecture4.pdf *)
+(* https://en.wikipedia.org/wiki/Min-max_theorem#Cauchy_interlacing_theorem *)
 
 (* changing variable x as y = O⁺.x, the Rayleigh quotient R(M,x)
    is equal to
