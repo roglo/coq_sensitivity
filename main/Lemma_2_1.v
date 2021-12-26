@@ -1082,12 +1082,15 @@ intros; cbn.
 now rewrite map_length.
 Qed.
 
+(* https://people.orie.cornell.edu/dpw/orie6334/Fall2016/lecture4.pdf *)
+
 (* changing variable x as y = O⁺.x, the Rayleigh quotient R(M,x)
    is equal to
       Σ (i = 1, n), μ_i * y_i ^ 2 / Σ (i = 1, n), y_i ^ 2 *)
 
 (* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
 (* https://en.wikipedia.org/wiki/Normal_matrix *)
+(* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   ∀ n (M : matrix T) D U eV x y ev,
