@@ -1093,6 +1093,7 @@ Qed.
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
+  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix T) D U eV x y ev,
   n ≠ 0
   → is_symm_mat M
@@ -1100,6 +1101,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → is_square_matrix D = true
   → mat_nrows M = n
   → vect_size x = n
+  → ≺ x, x ≻ = 1%F
   → eigenvalues_and_norm_vectors n M ev eV
   → U = mat_with_vect n eV
   → M = (U⁺ * D * U)%M
@@ -1109,7 +1111,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
       ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1))) /
        (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
-intros Hof * Hnz Hsym Hsmu Hsmd Hr Hsx HeV HU Hmin Hmax Hyz.
+intros Hof H10 * Hnz Hsym Hsmu Hsmd Hr Hsx Hx1 HeV HU Hmin Hmax Hyz.
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
@@ -1155,14 +1157,25 @@ assert (Hru : mat_nrows U = n). {
 move Hru after Hcu.
 unfold Rayleigh_quotient.
 destruct Hof as (Hic & Hop & Hde & Hdl & Hit & Hiv & Hor).
-rewrite vect_dot_mul_dot_mul'; [ | now left ].
+rewrite Hx1.
 rewrite vect_dot_mul_dot_mul'; [ | now left ].
 unfold vect_dot_mul'.
-rewrite Nat.min_id.
 cbn - [ vect_el ].
 rewrite map_length, fold_mat_nrows, Hr, Hsx.
 rewrite Nat.min_id.
+(*
+...
+, rngl_div_1_r; [ | now left | easy ].
+Search (_ = _ * _ ↔ _ / _ = _)%F.
+Search (_ = _ * _ ↔ _ = _ / _)%F.
+Search (_ * _ = _ ↔ _ / _ = _)%F.
+Search (_ * _ = _ ↔ _ = _ / _)%F.
+Search (_ = _ / _)%F.
+...
+*)
 apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
+  now apply rngl_1_neq_0.
+(*
   enough (H : ≺ x, x ≻ ≠ 0%F). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
@@ -1179,6 +1192,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
     rewrite mat_transp_ncols, Hcu, Hru.
     now destruct n.
   }
+*)
 } {
   enough (H : ≺ y, y ≻ ≠ 0%F). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
@@ -1197,6 +1211,8 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
   now rewrite Hsy in H.
 }
+rewrite rngl_mul_1_l.
+...
 (* faudrait que j'essaie avec des exemples *)
 (* mais, bon, c'est compliqué... *)
 ...
