@@ -1194,6 +1194,13 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
   now rewrite Hsy in H.
 }
+(* faudrait que j'essaie avec des exemples *)
+(* mais, bon, c'est compliqué... *)
+...
+Mx = (a₁₁ x₁ + a₁₂ x₂  ; a₂₁ x₁ + a₂₂ x₂)
+...
+(x₁ * (a₁₁ x₁ + a₁₂ x₂) + x₂ (a₂₁ x₁ + a₂₂ x₂)) *
+((u₁₁ x₁ + u₂₁ x₂) * (u₁₁ x₁ + u₂₁ x₂) + (u₁₂ x₁ + u₂₂ x₂) (u₁₂ x₁ + u₂₂ x₂))
 ...
 f_equal. 2: {
   replace x with (U • y)%M; cbn.
