@@ -1097,16 +1097,16 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → is_square_matrix D = true
   → mat_nrows M = n
   → vect_size x = n
-  → x ≠ vect_zero n
   → eigenvalues_and_norm_vectors n M ev eV
   → U = mat_with_vect n eV
   → M = (U⁺ * D * U)%M
   → y = (U⁺ • x)%M
+  → y ≠ vect_zero n
   → Rayleigh_quotient M x =
       ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1))) /
        (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
 Proof.
-intros Hof * Hnz Hsym Hsmu Hsmd Hr Hsx Hxz HeV HU Hmin Hmax.
+intros Hof * Hnz Hsym Hsmu Hsmd Hr Hsx HeV HU Hmin Hmax Hyz.
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
@@ -1167,7 +1167,15 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   }
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
-  now rewrite Hsx in H.
+  rewrite Hsx in H.
+  rewrite Hmax, H in Hyz.
+  apply Hyz.
+  apply mat_vect_mul_0_r; [ easy | | ]. {
+    now rewrite mat_transp_nrows.
+  } {
+    rewrite mat_transp_ncols, Hcu, Hru.
+    now destruct n.
+  }
 } {
   enough (H : ≺ y, y ≻ ≠ 0%F). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
@@ -1184,13 +1192,8 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   }
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
-  rewrite Hsy in H.
-  rewrite Hmax in H.
-Search ((_ • _)%V = vect_zero _).
-(* oui mais non, c'est pas intègre *)
-...
-rewrite fold_vect_dot_mul'.
-eq_vect_squ_0:
+  now rewrite Hsy in H.
+}
 ...
 f_equal. 2: {
   replace x with (U • y)%M; cbn.
