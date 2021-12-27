@@ -326,19 +326,17 @@ Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ n (M : matrix T) ev eV D U,
-  mat_nrows M = n
+  is_symm_mat M
+  → mat_nrows M = n
+  → eigenvalues_and_norm_vectors n M ev eV
   → length eV = n
   → (∀ V, V ∈ eV → vect_size V = n)
-  → is_square_matrix M = true
-  → is_symm_mat M
-  → eigenvalues_and_norm_vectors n M ev eV
   → D = mat_with_diag n ev
   → U = mat_with_vect n eV
    → (M * U = U * D)%M.
 Proof.
-intros Hic Hos * Hrn Hlev Hevn Hsm Hsy Hvv Hd Ho.
+intros Hic Hos * Hsy Hrn Hvv Hlev Hevn Hd Ho.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-
   move Hnz at top; subst n.
   unfold mat_with_vect in Ho; cbn in Ho.
   unfold mat_with_diag in Hd; cbn in Hd.
@@ -460,7 +458,6 @@ rewrite seq_nth. 2: {
 cbn.
 rewrite <- Hmd.
 unfold mat_mul_el.
-(**)
 symmetry.
 rewrite (rngl_summation_split j). 2: {
   split; [ easy | ].
@@ -569,6 +566,7 @@ rewrite (Hevn V). 2: {
 }
 replace (vect_size W) with n. 2: {
   rewrite HW; cbn; symmetry.
+  destruct Hsy as (Hsm, Hsy).
   apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   rewrite Hcl; [ easy | ].
@@ -579,6 +577,8 @@ rewrite Nat.min_id.
 rewrite square_matrix_ncols; [ | easy ].
 now rewrite Hrn.
 Qed.
+
+...
 
 Theorem mat_mul_nrows : ∀ MA MB, mat_nrows (MA * MB) = mat_nrows MA.
 Proof.
@@ -1213,6 +1213,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   now rewrite Hsy in H.
 }
 rewrite rngl_mul_1_l.
+Check diagonalized_matrix_prop_1.
 ...
 (* faudrait que j'essaie avec des exemples *)
 (* mais, bon, c'est compliqué... *)
