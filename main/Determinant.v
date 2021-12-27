@@ -1127,22 +1127,6 @@ cbn.
 now apply rngl_summation_add_distr.
 Qed.
 
-Theorem determinant_mul : ∀ A B,
-  determinant (A * B) = (determinant A * determinant B)%F.
-Proof.
-intros.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-cbn; rewrite List_map_seq_length.
-unfold determinant'.
-...
-intros.
-unfold determinant; cbn.
-rewrite List_map_seq_length.
-Print determinant_loop.
-...
-
 End a.
 
 Arguments determinant {T ro} M%M.

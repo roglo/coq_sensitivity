@@ -657,10 +657,11 @@ Theorem laplace_formula_on_rows : in_charac_0_field →
   is_square_matrix M = true
   → i < mat_nrows M
   → determinant M =
-    ∑ (j = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
+    ∑ (j = 0, mat_ncols M - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hif * Hsm Hlin.
 specialize (square_matrix_ncols M Hsm) as Hc.
+rewrite Hc.
 specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
 destruct H1 as (Hcr & Hc').
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
@@ -2079,12 +2080,235 @@ destruct Hl as (i & Hil & Hi).
 now rewrite <- Hil; rewrite List_map_seq_length.
 Qed.
 
+Theorem comatrix_is_correct : ∀ M,
+  is_correct_matrix M = true
+  → is_correct_matrix (comatrix M) = true.
+Proof.
+intros * Hsm.
+apply is_scm_mat_iff in Hsm.
+apply is_scm_mat_iff.
+rewrite comatrix_ncols.
+rewrite comatrix_nrows.
+split; [ easy | ].
+intros l Hl.
+apply in_map_iff in Hl.
+destruct Hl as (i & Hil & Hi).
+now rewrite <- Hil; rewrite List_map_seq_length.
+Qed.
+
+Theorem comatrix_transpose : in_charac_0_field →
+  ∀ M,
+  is_square_matrix M = true
+  → comatrix M⁺ = (comatrix M)⁺%M.
+Proof.
+intros Hif * Hsm.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  unfold mat_transp, comatrix; cbn - [ determinant ].
+  rewrite Hcz; cbn.
+  unfold mat_ncols; cbn.
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ now rewrite Hrz | ].
+  now replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hrz.
+}
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  unfold mat_ncols in Hcz.
+  unfold mat_nrows in Hrz.
+  apply length_zero_iff_nil in Hrz.
+  now rewrite Hrz in Hcz.
+}
+apply Nat.neq_0_lt_0 in Hcz, Hrz.
+unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
+f_equal.
+rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+do 4 rewrite map_length.
+do 2 rewrite seq_length.
+rewrite fold_mat_ncols.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+apply map_ext_in.
+intros j Hj; apply in_seq in Hj.
+destruct Hj as (_, Hj); cbn in Hj.
+move j before i.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+do 2 rewrite Nat.add_0_l.
+rewrite Nat.add_comm; f_equal; symmetry.
+rewrite fold_mat_transp.
+rewrite <- determinant_transpose; [ | easy | ]. 2: {
+  rewrite square_matrix_ncols in Hi; [ | easy ].
+  now apply is_squ_mat_subm.
+}
+f_equal.
+specialize (square_matrix_ncols _ Hsm) as Hcr.
+destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
+  rewrite Hc1 in Hi.
+  rewrite Hc1 in Hcr; symmetry in Hcr.
+  rewrite Hcr in Hj.
+  apply Nat.lt_1_r in Hi, Hj; subst i j.
+  destruct M as (ll).
+  unfold mat_ncols in Hc1.
+  cbn in Hc1, Hcr.
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ | easy ].
+  cbn in Hc1.
+  unfold subm, mat_transp; cbn.
+  destruct l as [| a]; [ easy | ].
+  now destruct l.
+}
+assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
+assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
+apply matrix_eq; cycle 1. {
+  now apply mat_transp_is_corr, subm_is_corr_mat.
+} {
+  apply subm_is_corr_mat; [ | easy ].
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  rewrite Hcr in Hc1.
+  now destruct (Nat.eq_dec (mat_ncols M) 0).
+} {
+  rewrite mat_transp_nrows.
+  rewrite mat_nrows_subm.
+  rewrite mat_ncols_subm; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
+  now rewrite mat_transp_nrows.
+} {
+  rewrite mat_transp_ncols.
+  rewrite mat_ncols_subm; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
+  rewrite mat_ncols_subm; [ | easy ].
+  rewrite mat_transp_nrows.
+  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) at 3 by flia Hc1 Hi.
+  rewrite mat_transp_ncols.
+  rewrite mat_nrows_subm.
+  apply Nat.neq_0_lt_0 in Hcz.
+  apply Nat.eqb_neq in Hcz; rewrite Hcz.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  apply Nat.ltb_lt in Hj; rewrite Hj; cbn.
+  rewrite if_eqb_eq_dec.
+  rewrite Hcr.
+  now destruct (Nat.eq_dec (mat_nrows M - 1) 0).
+}
+intros u v Hu Hv.
+rewrite mat_transp_el; [ | now apply subm_is_corr_mat ].
+unfold mat_transp; cbn.
+rewrite (List_map_nth' []). 2: {
+  rewrite butn_length.
+  rewrite fold_mat_nrows.
+  apply Nat.ltb_lt in Hj; rewrite Hj.
+  apply Nat.ltb_lt in Hj; cbn.
+  rewrite mat_ncols_subm in Hv; [ | easy ].
+  rewrite mat_transp_nrows in Hv.
+  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+  rewrite mat_transp_ncols in Hv.
+  apply Nat.neq_0_lt_0 in Hcz.
+  apply Nat.eqb_neq in Hcz; rewrite Hcz in Hv.
+  now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
+}
+rewrite (List_map_nth' []). 2: {
+  rewrite butn_length.
+  rewrite List_map_seq_length.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  apply Nat.ltb_lt in Hi; cbn.
+  rewrite mat_transp_nrows in Hu.
+  rewrite mat_ncols_subm in Hu; [ | easy ].
+  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by
+    flia Hj Hcr Hc1.
+  now apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
+}
+do 4 rewrite nth_butn.
+rewrite mat_transp_nrows in Hu.
+rewrite mat_ncols_subm in Hu; [ | easy ].
+rewrite mat_ncols_subm in Hv; [ | easy ].
+rewrite mat_transp_nrows in Hv.
+rewrite mat_transp_ncols in Hv.
+replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by flia Hj Hcr Hc1.
+replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
+cbn - [ "<?" ] in Hv.
+apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
+apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
+cbn in Hu, Hv.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec i u); flia Hu.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec j v); flia Hv.
+}
+rewrite seq_nth. 2: {
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec j v); flia Hv.
+}
+rewrite seq_nth. 2: {
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec i u); flia Hu.
+}
+easy.
+Qed.
+
+Theorem mat_transp_involutive : ∀ M,
+  is_correct_matrix M = true
+  → (M⁺⁺)%M = M.
+Proof.
+intros * Hcm.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  destruct M as (ll); cbn.
+  unfold mat_ncols in Hcz; cbn in Hcz.
+  apply length_zero_iff_nil in Hcz.
+  destruct ll as [| l]; [ easy | ].
+  cbn in Hcz; subst l; cbn.
+  unfold mat_transp, mat_ncols; cbn; f_equal.
+  apply is_scm_mat_iff in Hcm.
+  unfold mat_ncols in Hcm; cbn in Hcm.
+  destruct Hcm as (Hcr, _).
+  now specialize (Hcr eq_refl).
+}
+destruct M as (ll); cbn.
+unfold mat_transp, mat_ncols; cbn; f_equal.
+rewrite (List_map_nth_seq ll []) at 2.
+rewrite List_map_seq_length.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  unfold mat_ncols in Hcz.
+  cbn in Hcz.
+  now apply Nat.neq_0_lt_0.
+}
+rewrite List_map_seq_length.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+erewrite map_ext_in. 2: {
+  intros j Hj; apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | easy ].
+  now cbn.
+}
+destruct ll as [| l]; [ easy | ].
+unfold mat_ncols in Hcz; cbn in Hcz.
+cbn - [ nth ].
+rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%F) at 1.
+apply is_scm_mat_iff in Hcm.
+unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
+destruct Hcm as (_, Hcl).
+symmetry.
+rewrite Hcl; [ easy | ].
+now apply nth_In.
+Qed.
+
 Theorem laplace_formula_on_cols : in_charac_0_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
-  → j < mat_nrows M
+  → j < mat_ncols M
   → determinant M =
-    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M⁺)⁺ i j.
+    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
 Proof.
 intros Hif * Hsm Hljn.
 rewrite <- determinant_transpose; [ | easy | easy ].
@@ -2094,25 +2318,26 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ determinant mat_el ].
-rewrite <- square_matrix_ncols; [ | easy ].
-rewrite <- mat_transp_nrows.
 specialize (@laplace_formula_on_rows Hif (M⁺)%M j) as H1.
 assert (H : is_square_matrix M⁺ = true) by now apply mat_transp_is_square.
 specialize (H1 H); clear H.
 rewrite mat_transp_nrows in H1.
-rewrite square_matrix_ncols in H1; [ | easy ].
+rewrite mat_transp_ncols in H1.
+rewrite if_eqb_eq_dec in H1.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  now rewrite Hcz in Hljn.
+}
 specialize (H1 Hljn).
-rewrite <- square_matrix_ncols in H1; [ | easy ].
-rewrite mat_transp_nrows.
 rewrite H1.
 apply rngl_summation_eq_compat.
 intros i Hi.
 f_equal.
 symmetry.
+rewrite comatrix_transpose; [ | easy | easy ].
+symmetry.
 apply mat_transp_el.
-apply squ_mat_is_corr.
-apply comatrix_is_square.
-now apply mat_transp_is_square.
+apply comatrix_is_correct.
+now apply squ_mat_is_corr.
 Qed.
 
 (*
@@ -2343,161 +2568,6 @@ f_equal. {
   f_equal; f_equal; f_equal.
   apply Hcl, nth_In; flia Hu.
 }
-Qed.
-
-Theorem comatrix_transpose : in_charac_0_field →
-  ∀ M,
-  is_square_matrix M = true
-  → comatrix M⁺ = (comatrix M)⁺%M.
-Proof.
-intros Hif * Hsm.
-destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  unfold mat_transp, comatrix; cbn - [ determinant ].
-  rewrite Hcz; cbn.
-  unfold mat_ncols; cbn.
-  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ now rewrite Hrz | ].
-  now replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hrz.
-}
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-  unfold mat_ncols in Hcz.
-  unfold mat_nrows in Hrz.
-  apply length_zero_iff_nil in Hrz.
-  now rewrite Hrz in Hcz.
-}
-apply Nat.neq_0_lt_0 in Hcz, Hrz.
-unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
-f_equal.
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-do 4 rewrite map_length.
-do 2 rewrite seq_length.
-rewrite fold_mat_ncols.
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-destruct Hi as (_, Hi); cbn in Hi.
-apply map_ext_in.
-intros j Hj; apply in_seq in Hj.
-destruct Hj as (_, Hj); cbn in Hj.
-move j before i.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | easy ].
-do 2 rewrite Nat.add_0_l.
-rewrite Nat.add_comm; f_equal; symmetry.
-rewrite fold_mat_transp.
-rewrite <- determinant_transpose; [ | easy | ]. 2: {
-  rewrite square_matrix_ncols in Hi; [ | easy ].
-  now apply is_squ_mat_subm.
-}
-f_equal.
-specialize (square_matrix_ncols _ Hsm) as Hcr.
-destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
-  rewrite Hc1 in Hi.
-  rewrite Hc1 in Hcr; symmetry in Hcr.
-  rewrite Hcr in Hj.
-  apply Nat.lt_1_r in Hi, Hj; subst i j.
-  destruct M as (ll).
-  unfold mat_ncols in Hc1.
-  cbn in Hc1, Hcr.
-  destruct ll as [| l]; [ easy | ].
-  destruct ll; [ | easy ].
-  cbn in Hc1.
-  unfold subm, mat_transp; cbn.
-  destruct l as [| a]; [ easy | ].
-  now destruct l.
-}
-assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
-assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
-apply matrix_eq; cycle 1. {
-  now apply mat_transp_is_corr, subm_is_corr_mat.
-} {
-  apply subm_is_corr_mat; [ | easy ].
-  rewrite mat_transp_ncols.
-  rewrite if_eqb_eq_dec.
-  rewrite Hcr in Hc1.
-  now destruct (Nat.eq_dec (mat_ncols M) 0).
-} {
-  rewrite mat_transp_nrows.
-  rewrite mat_nrows_subm.
-  rewrite mat_ncols_subm; [ | easy ].
-  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
-  now rewrite mat_transp_nrows.
-} {
-  rewrite mat_transp_ncols.
-  rewrite mat_ncols_subm; [ | easy ].
-  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) by flia Hcr Hc1 Hi.
-  rewrite mat_ncols_subm; [ | easy ].
-  rewrite mat_transp_nrows.
-  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) at 3 by flia Hc1 Hi.
-  rewrite mat_transp_ncols.
-  rewrite mat_nrows_subm.
-  apply Nat.neq_0_lt_0 in Hcz.
-  apply Nat.eqb_neq in Hcz; rewrite Hcz.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  apply Nat.ltb_lt in Hj; rewrite Hj; cbn.
-  rewrite if_eqb_eq_dec.
-  rewrite Hcr.
-  now destruct (Nat.eq_dec (mat_nrows M - 1) 0).
-}
-intros u v Hu Hv.
-rewrite mat_transp_el; [ | now apply subm_is_corr_mat ].
-unfold mat_transp; cbn.
-rewrite (List_map_nth' []). 2: {
-  rewrite butn_length.
-  rewrite fold_mat_nrows.
-  apply Nat.ltb_lt in Hj; rewrite Hj.
-  apply Nat.ltb_lt in Hj; cbn.
-  rewrite mat_ncols_subm in Hv; [ | easy ].
-  rewrite mat_transp_nrows in Hv.
-  replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
-  rewrite mat_transp_ncols in Hv.
-  apply Nat.neq_0_lt_0 in Hcz.
-  apply Nat.eqb_neq in Hcz; rewrite Hcz in Hv.
-  now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
-}
-rewrite (List_map_nth' []). 2: {
-  rewrite butn_length.
-  rewrite List_map_seq_length.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  apply Nat.ltb_lt in Hi; cbn.
-  rewrite mat_transp_nrows in Hu.
-  rewrite mat_ncols_subm in Hu; [ | easy ].
-  replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by
-    flia Hj Hcr Hc1.
-  now apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
-}
-do 4 rewrite nth_butn.
-rewrite mat_transp_nrows in Hu.
-rewrite mat_ncols_subm in Hu; [ | easy ].
-rewrite mat_ncols_subm in Hv; [ | easy ].
-rewrite mat_transp_nrows in Hv.
-rewrite mat_transp_ncols in Hv.
-replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by flia Hj Hcr Hc1.
-replace (mat_ncols M) with (S (S (mat_ncols M - 2))) in Hv by flia Hi Hc1.
-cbn - [ "<?" ] in Hv.
-apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
-apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
-cbn in Hu, Hv.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec i u); flia Hu.
-}
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec j v); flia Hv.
-}
-rewrite seq_nth. 2: {
-  unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec j v); flia Hv.
-}
-rewrite seq_nth. 2: {
-  unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec i u); flia Hu.
-}
-easy.
 Qed.
 
 Theorem mat_transp_subm : ∀ M i j,
@@ -2732,58 +2802,6 @@ f_equal. {
 }
 Qed.
 
-Theorem mat_transp_involutive : ∀ M,
-  is_correct_matrix M = true
-  → (M⁺⁺)%M = M.
-Proof.
-intros * Hcm.
-destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  destruct M as (ll); cbn.
-  unfold mat_ncols in Hcz; cbn in Hcz.
-  apply length_zero_iff_nil in Hcz.
-  destruct ll as [| l]; [ easy | ].
-  cbn in Hcz; subst l; cbn.
-  unfold mat_transp, mat_ncols; cbn; f_equal.
-  apply is_scm_mat_iff in Hcm.
-  unfold mat_ncols in Hcm; cbn in Hcm.
-  destruct Hcm as (Hcr, _).
-  now specialize (Hcr eq_refl).
-}
-destruct M as (ll); cbn.
-unfold mat_transp, mat_ncols; cbn; f_equal.
-rewrite (List_map_nth_seq ll []) at 2.
-rewrite List_map_seq_length.
-rewrite (List_map_hd 0). 2: {
-  rewrite seq_length.
-  unfold mat_ncols in Hcz.
-  cbn in Hcz.
-  now apply Nat.neq_0_lt_0.
-}
-rewrite List_map_seq_length.
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-destruct Hi as (_, Hi); cbn in Hi.
-erewrite map_ext_in. 2: {
-  intros j Hj; apply in_seq in Hj.
-  destruct Hj as (_, Hj); cbn in Hj.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | easy ].
-  now cbn.
-}
-destruct ll as [| l]; [ easy | ].
-unfold mat_ncols in Hcz; cbn in Hcz.
-cbn - [ nth ].
-rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%F) at 1.
-apply is_scm_mat_iff in Hcm.
-unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
-destruct Hcm as (_, Hcl).
-symmetry.
-rewrite Hcl; [ easy | ].
-now apply nth_In.
-Qed.
-
 Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -2980,7 +2998,9 @@ rewrite map_map.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 move j before i.
-rewrite laplace_formula_on_cols with (j := j); [ | easy | easy | easy ].
+rewrite laplace_formula_on_cols with (j := j); [ | easy | easy | ]. 2: {
+  now rewrite square_matrix_ncols.
+}
 unfold mat_mul_el.
 rewrite mat_transp_ncols.
 rewrite comatrix_ncols.
@@ -3002,13 +3022,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ mat_el comatrix ].
   apply rngl_summation_eq_compat.
   intros k Hk.
-  symmetry; f_equal; rewrite mat_transp_el. 2: {
-    apply squ_mat_is_corr.
-    apply comatrix_is_square.
-    now apply mat_transp_is_square.
-  }
-  f_equal.
-  now apply comatrix_transpose.
+  symmetry; f_equal; rewrite mat_transp_el; [ easy | ].
+  apply squ_mat_is_corr.
+  now apply comatrix_is_square.
 } {
   (* not on diagonal: zeroes *)
   rewrite δ_ndiag; [ | easy ].

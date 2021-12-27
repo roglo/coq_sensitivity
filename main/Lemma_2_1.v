@@ -684,6 +684,29 @@ Theorem fold_vect_dot_mul' : ∀ U V,
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
+Theorem determinant_mul : ∀ A B,
+  determinant (A * B) = (determinant A * determinant B)%F.
+Proof.
+intros.
+rewrite det_is_det_by_canon_permut.
+rewrite det_is_det_by_canon_permut.
+rewrite det_is_det_by_canon_permut.
+cbn; rewrite List_map_seq_length.
+unfold determinant'.
+...
+Check laplace_formula_on_rows.
+Check laplace_formula_on_cols.
+Search comatrix.
+...
+Require Import IterMul.
+Search determinant.
+...
+intros.
+unfold determinant; cbn.
+rewrite List_map_seq_length.
+Print determinant_loop.
+...
+
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
