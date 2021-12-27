@@ -86,7 +86,7 @@ Arguments determinant' n%nat M%M.
 
 (* Proof that both definitions of determinants are equal *)
 
-Theorem det_is_det_by_canon_permut : in_field →
+Theorem det_is_det_by_canon_permut : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M = determinant' (mat_nrows M) M.
@@ -200,7 +200,7 @@ Qed.
 
 (* multilinearity *)
 
-Theorem determinant_multilinear : in_field →
+Theorem determinant_multilinear : in_charac_0_field →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -574,7 +574,7 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
-Theorem determinant_alternating : in_field →
+Theorem determinant_alternating : in_charac_0_field →
   ∀ (M : matrix T) p q,
   p ≠ q
   → p < mat_nrows M
@@ -910,7 +910,7 @@ rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
 
-Theorem determinant_same_rows : in_field →
+Theorem determinant_same_rows : in_charac_0_field →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q

@@ -511,7 +511,7 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
-Theorem determinant_circular_shift_rows : in_field →
+Theorem determinant_circular_shift_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
   → is_square_matrix M = true
@@ -627,7 +627,7 @@ rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
 
-Theorem determinant_subm_mat_swap_rows_0_i : in_field →
+Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   ∀ (M : matrix T) i j,
   is_square_matrix M = true
   → 0 < i < mat_nrows M
@@ -652,7 +652,7 @@ Qed.
 
 (* Laplace formulas *)
 
-Theorem laplace_formula_on_rows : in_field →
+Theorem laplace_formula_on_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → i < mat_nrows M
@@ -1188,7 +1188,7 @@ intros * Hn.
 now symmetry; apply List_map_nth_seq'.
 Qed.
 
-Theorem det_by_any_sym_gr : in_field →
+Theorem det_by_any_sym_gr : in_charac_0_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
   → mat_nrows M = n
@@ -1543,7 +1543,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_l : in_field →
+Theorem det_any_permut_l : in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -1764,7 +1764,7 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_r : in_field →
+Theorem det_any_permut_r : in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -1993,7 +1993,7 @@ Qed.
 
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
-Theorem determinant_transpose : in_field →
+Theorem determinant_transpose : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M⁺ = determinant M.
@@ -2079,7 +2079,7 @@ destruct Hl as (i & Hil & Hi).
 now rewrite <- Hil; rewrite List_map_seq_length.
 Qed.
 
-Theorem laplace_formula_on_cols : in_field →
+Theorem laplace_formula_on_cols : in_charac_0_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → j < mat_nrows M
@@ -2135,7 +2135,7 @@ determinant_with_bad_row
   → ∑ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
 *)
 
-Theorem determinant_with_row : in_field →
+Theorem determinant_with_row : in_charac_0_field →
   ∀ i (M : matrix T),
   is_square_matrix M = true
   → i < mat_nrows M
@@ -2202,7 +2202,7 @@ assert (H : 0 < mat_nrows M) by flia Hir.
 now apply Nat.ltb_lt in H; rewrite H; clear H.
 Qed.
 
-Theorem determinant_with_bad_row : in_field →
+Theorem determinant_with_bad_row : in_charac_0_field →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
   → i < mat_nrows M
@@ -2345,7 +2345,7 @@ f_equal. {
 }
 Qed.
 
-Theorem comatrix_transpose : in_field →
+Theorem comatrix_transpose : in_charac_0_field →
   ∀ M,
   is_square_matrix M = true
   → comatrix M⁺ = (comatrix M)⁺%M.
@@ -2784,7 +2784,7 @@ rewrite Hcl; [ easy | ].
 now apply nth_In.
 Qed.
 
-Theorem matrix_comatrix_transp_mul : in_field →
+Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → (M * (comatrix M)⁺ = determinant M × mI (mat_nrows M))%M.
@@ -2937,7 +2937,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem comatrix_transp_matrix_mul : in_field →
+Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → ((comatrix M)⁺ * M = determinant M × mI (mat_nrows M))%M.
@@ -3120,7 +3120,7 @@ Qed.
 
 Definition mat_inv (M : matrix T) := ((determinant M)⁻¹ × (comatrix M)⁺)%M.
 
-Theorem mat_mul_inv_r : in_field →
+Theorem mat_mul_inv_r : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M ≠ 0%F
@@ -3156,7 +3156,7 @@ rewrite rngl_mul_inv_l; [ | now destruct Hif | now destruct Hif ].
 now apply mat_mul_scal_1_l.
 Qed.
 
-Theorem mat_mul_inv_l : in_field →
+Theorem mat_mul_inv_l : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → determinant M ≠ 0%F
@@ -3178,7 +3178,10 @@ Qed.
 End a.
 
 Arguments comatrix {T}%type {ro} M%M.
+Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%F.
 Arguments mat_inv {T}%type {ro} M%M.
+
+Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
 
 (* tests
 Require Import RnglAlg.Qrl.

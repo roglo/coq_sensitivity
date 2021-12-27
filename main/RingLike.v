@@ -1356,6 +1356,15 @@ cbn in H4.
 now rewrite rngl_add_0_r in H4.
 Qed.
 
+Definition in_charac_0_field :=
+  rngl_is_comm = true ∧
+  rngl_has_opp = true ∧
+  rngl_has_inv = true ∧
+  rngl_has_1_neq_0 = true ∧
+  rngl_is_integral = true ∧
+  rngl_has_dec_eq = true ∧
+  rngl_characteristic = 0.
+
 End a.
 
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.

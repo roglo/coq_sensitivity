@@ -295,7 +295,7 @@ Theorem diagonalized_matrix_prop_1 :
   → (∀ V, V ∈ eV → vect_size V = n)
   → D = mat_with_diag n ev
   → U = mat_with_vect n eV
-   → (M * U = U * D)%M.
+  → (M * U = U * D)%M.
 Proof.
 intros Hic Hos * Hsy Hrn Hvv Hlev Hevn Hd Ho.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -540,36 +540,6 @@ rewrite square_matrix_ncols; [ | easy ].
 now rewrite Hrn.
 Qed.
 
-...
-
-Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
-Proof.
-intros.
-apply matrix_eq; cycle 1. {
-  apply mat_transp_is_corr.
-  apply mI_is_correct_matrix.
-} {
-  apply mI_is_correct_matrix.
-} {
-  rewrite mat_transp_nrows.
-  now rewrite mI_nrows, mI_ncols.
-} {
-  rewrite mat_transp_ncols.
-  rewrite mI_nrows, mI_ncols.
-  now destruct n.
-}
-rewrite mat_transp_nrows, mI_ncols.
-intros * Hi Hj.
-rewrite mat_transp_el; [ | apply mI_is_correct_matrix ].
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  now subst i; destruct (Nat.eq_dec j j).
-} {
-  rewrite mat_el_mI_ndiag; [ | now apply Nat.neq_sym ].
-  rewrite mat_el_mI_ndiag; [ | easy ].
-  easy.
-}
-Qed.
-
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -579,28 +549,6 @@ Theorem mat_mul_vect_dot_vect :
   → vect_size V = mat_nrows M
   → ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
 Proof.
-(*
-intros Hic *.
-unfold vect_dot_mul.
-destruct M as (ll).
-destruct U as (lu).
-destruct V as (lv); cbn.
-rewrite map_map.
-unfold vect_dot_mul; cbn.
-rewrite map2_map_l.
-rewrite map2_map_r.
-unfold mat_ncols; cbn.
-symmetry.
-erewrite map2_ext_in. 2: {
-  intros a  i Ha Hi.
-  rewrite rngl_mul_summation_list_distr_l.
-  rewrite map2_map_l.
-  easy.
-admit.
-}
-symmetry.
-...
-*)
 intros Hic Hos * Hsm Hur Hvr.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz in Hur, Hvr.
@@ -671,8 +619,8 @@ rewrite seq_nth; [ | flia Hj Hrz ].
 easy.
 Qed.
 
-Theorem mat_with_vect_is_corr : ∀ n vl,
-  is_correct_matrix (mat_with_vect n vl) = true.
+Theorem mat_with_vect_is_square : ∀ n vl,
+  is_square_matrix (mat_with_vect n vl) = true.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
@@ -685,7 +633,6 @@ split. {
   now rewrite List_map_seq_length.
 } {
   unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
   rewrite List_map_seq_length.
   intros l Hl.
   apply in_map_iff in Hl.
@@ -694,6 +641,13 @@ split. {
   rewrite <- Hxl.
   now rewrite List_map_seq_length.
 }
+Qed.
+
+Theorem mat_with_vect_is_corr : ∀ n vl,
+  is_correct_matrix (mat_with_vect n vl) = true.
+Proof.
+intros.
+apply squ_mat_is_corr, mat_with_vect_is_square.
 Qed.
 
 Theorem mat_with_vect_nrows : ∀ n vl, mat_nrows (mat_with_vect n vl) = n.
@@ -906,6 +860,50 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now apply Hall_diff.
 }
 Qed.
+
+Theorem diagonalized_matrix_prop : in_charac_0_field →
+  ∀ n (M : matrix T) ev eV D U,
+  is_symm_mat M
+  → mat_nrows M = n
+  → eigenvalues_and_norm_vectors n M ev eV
+  → length eV = n
+  → (∀ V, V ∈ eV → vect_size V = n)
+  → D = mat_with_diag n ev
+  → U = mat_with_vect n eV
+  → (M = U * D * U⁻¹)%M.
+Proof.
+intros Hif * Hsy Hrn Hvv Hlev Hevn Hd Ho.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  unfold mat_with_vect in Ho; cbn in Ho.
+  unfold mat_with_diag in Hd; cbn in Hd.
+  rewrite Ho, Hd.
+  destruct M as (ll); cbn.
+  cbn in Hrn.
+  now apply length_zero_iff_nil in Hrn; cbn in Hrn; subst ll.
+}
+specialize diagonalized_matrix_prop_1 as H1.
+assert (H : rngl_is_comm = true) by now destruct Hif.
+specialize (H1 H); clear H.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (H1 (or_introl H)); clear H.
+specialize (H1 n M ev eV D U Hsy Hrn Hvv Hlev Hevn Hd Ho).
+apply (f_equal (λ A, (A * U⁻¹)%M)) in H1.
+rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
+  now rewrite Ho, mat_with_vect_nrows.
+} {
+  now rewrite Ho, mat_with_vect_ncols.
+} {
+  rewrite Ho, mat_with_vect_nrows.
+  rewrite square_matrix_ncols; [ easy | now destruct Hsy ].
+}
+rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
+  rewrite Ho.
+  apply mat_with_vect_is_square.
+} {
+  rewrite Ho.
+Search (determinant (mat_with_vect _ _)).
+...
 
 Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
 Proof.

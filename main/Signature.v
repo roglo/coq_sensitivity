@@ -578,16 +578,7 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Definition in_field :=
-  rngl_is_comm = true ∧
-  rngl_has_opp = true ∧
-  rngl_has_inv = true ∧
-  rngl_has_1_neq_0 = true ∧
-  rngl_is_integral = true ∧
-  rngl_has_dec_eq = true ∧
-  rngl_characteristic = 0.
-
-Theorem ε_ws_ε : in_field →
+Theorem ε_ws_ε : in_charac_0_field →
   ∀ n (p : list nat),
   is_permut n p
   → ε n p = ε_ws n p.
@@ -881,7 +872,7 @@ split. {
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem transposition_signature_lt : in_field →
+Theorem transposition_signature_lt : in_charac_0_field →
   ∀ n p q,
   p < q
   → q < n
@@ -1067,7 +1058,7 @@ do 2 rewrite if_ltb_lt_dec.
 now destruct (lt_dec (i - 1) (j - 1)).
 Qed.
 
-Theorem transposition_signature : in_field →
+Theorem transposition_signature : in_charac_0_field →
   ∀ n p q,
   p ≠ q
   → p < n
@@ -1455,7 +1446,7 @@ rewrite product_product_if_permut; try easy. {
 }
 Qed.
 
-Theorem signature_comp : in_field →
+Theorem signature_comp : in_charac_0_field →
   ∀ n f g,
   is_permut n f
   → is_permut n g
@@ -1527,7 +1518,7 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
-Theorem ε_of_sym_gr_permut_succ : in_field →
+Theorem ε_of_sym_gr_permut_succ : in_charac_0_field →
   ∀ n k,
   k < (S n)!
   → ε (S n) (canon_sym_gr_list (S n) k) =
@@ -1839,7 +1830,7 @@ rewrite map_length.
 now destruct Hp2.
 Qed.
 
-Theorem ε_1_opp_1 : in_field →
+Theorem ε_1_opp_1 : in_charac_0_field →
   ∀ n σ, is_permut n σ → ε n σ = 1%F ∨ ε n σ = (-1)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
@@ -1857,7 +1848,7 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 now left.
 Qed.
 
-Theorem ε_square : in_field →
+Theorem ε_square : in_charac_0_field →
   ∀ n σ, is_permut n σ → (ε n σ * ε n σ = 1)%F.
 Proof.
 intros Hif * Hσ.
@@ -1883,7 +1874,6 @@ Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments ε_ws_ε {T}%type {ro rp} _ n%nat p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
-Arguments in_field {T}%type {ro rp}.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments signature_comp {T}%type {ro rp} _ [n]%nat [f g].
