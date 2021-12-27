@@ -1519,27 +1519,6 @@ apply (@List_find_nth_not_None (length l)); [ | easy ].
 now apply permut_list_inv_is_permut.
 Qed.
 
-Theorem mat_transp_nrows : ∀ M, mat_nrows M⁺ = mat_ncols M.
-Proof.
-intros.
-unfold mat_ncols; cbn.
-now rewrite map_length, seq_length.
-Qed.
-
-Theorem mat_transp_ncols : ∀ M,
-  mat_ncols M⁺ = if mat_ncols M =? 0 then 0 else mat_nrows M.
-Proof.
-intros.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  now unfold mat_ncols; cbn; rewrite Hcz.
-}
-apply Nat.neq_0_lt_0 in Hcz.
-unfold mat_ncols; cbn.
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-now rewrite List_map_seq_length.
-Qed.
-
 Theorem mat_transp_is_square : ∀ M,
   is_square_matrix M = true
   → is_square_matrix M⁺ = true.
@@ -2061,42 +2040,6 @@ rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
 easy.
 Qed.
 
-Theorem mat_transp_el : ∀ M i j,
-  is_correct_matrix M = true
-  → mat_el M⁺ i j = mat_el M j i.
-Proof.
-intros * Hcm.
-unfold mat_el; cbn.
-destruct (lt_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
-  apply Nat.nlt_ge in Hic.
-  rewrite nth_overflow. 2: {
-    rewrite nth_overflow; [ easy | ].
-    now rewrite map_length, seq_length.
-  }
-  rewrite nth_overflow; [ easy | ].
-  destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
-    apply is_scm_mat_iff in Hcm.
-    destruct Hcm as (H1, H2).
-    rewrite H2; [ easy | ].
-    now apply nth_In; rewrite fold_mat_nrows.
-  }
-  apply Nat.nlt_ge in Hjr.
-  now rewrite nth_overflow.
-}
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  unfold mat_el.
-  rewrite seq_nth; [ cbn | easy ].
-  rewrite seq_nth; [ cbn | easy ].
-  easy.
-}
-apply Nat.nlt_ge in Hjr.
-rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
-rewrite (nth_overflow _ _ Hjr).
-now destruct i.
-Qed.
-
 Theorem comatrix_nrows : ∀ M, mat_nrows (comatrix M) = mat_nrows M.
 Proof.
 intros.
@@ -2399,37 +2342,6 @@ f_equal. {
   rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
   f_equal; f_equal; f_equal.
   apply Hcl, nth_In; flia Hu.
-}
-Qed.
-
-Theorem mat_transp_is_corr : ∀ M,
-  is_correct_matrix M = true
-  → is_correct_matrix M⁺ = true.
-Proof.
-intros * Hcm.
-apply is_scm_mat_iff in Hcm.
-destruct Hcm as (H1, H2).
-destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  specialize (H1 Hcz).
-  unfold mat_transp.
-  now rewrite H1, Hcz.
-}
-apply is_scm_mat_iff.
-rewrite mat_transp_ncols.
-apply Nat.eqb_neq in Hcz; rewrite Hcz.
-apply Nat.eqb_neq in Hcz.
-split. {
-  intros Hr.
-  unfold mat_nrows in Hr.
-  unfold mat_ncols in Hcz.
-  apply length_zero_iff_nil in Hr.
-  now rewrite Hr in Hcz.
-} {
-  intros l Hl.
-  unfold mat_transp in Hl; cbn in Hl.
-  apply in_map_iff in Hl.
-  destruct Hl as (j & Hjl & Hj).
-  now rewrite <- Hjl, List_map_seq_length.
 }
 Qed.
 

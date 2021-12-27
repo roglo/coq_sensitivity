@@ -827,6 +827,42 @@ unfold δ.
 now rewrite Nat.eqb_refl.
 Qed.
 
+(* *)
+
+Theorem mat_mul_nrows : ∀ MA MB, mat_nrows (MA * MB) = mat_nrows MA.
+Proof.
+intros; cbn.
+now rewrite List_map_seq_length.
+Qed.
+
+Theorem mat_mul_ncols : ∀ MA MB,
+  mat_nrows MA ≠ 0
+  → mat_ncols (MA * MB) = mat_ncols MB.
+Proof.
+intros * Hraz; unfold mat_ncols; cbn.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  now apply Nat.neq_0_lt_0.
+}
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem mat_el_mul : ∀ MA MB i j,
+  i < mat_nrows (MA * MB)
+  → j < mat_ncols (MA * MB)
+  → mat_el (MA * MB) i j =
+    ∑ (k = 0, mat_ncols MA - 1), mat_el MA i k * mat_el MB k j.
+Proof.
+intros * Hir Hjc; cbn.
+rewrite mat_mul_nrows in Hir.
+rewrite mat_mul_ncols in Hjc; [ | flia Hir ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+easy.
+Qed.
+
 (* multiplication left and right with identity *)
 
 Theorem mat_mul_1_l {n} : ∀ (M : matrix T),
@@ -1683,12 +1719,237 @@ Definition mat_transp (M : matrix T) : matrix T :=
     (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
        (seq 0 (mat_ncols M))).
 
+Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
+
 Theorem fold_mat_transp : ∀ M,
   mk_mat
     (map (λ j, map (λ i, mat_el M i j) (seq 0 (mat_nrows M)))
        (seq 0 (mat_ncols M))) =
   mat_transp M.
 Proof. easy. Qed.
+
+Theorem mat_transp_nrows : ∀ M, mat_nrows M⁺ = mat_ncols M.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem mat_transp_ncols : ∀ M,
+  mat_ncols M⁺ = if mat_ncols M =? 0 then 0 else mat_nrows M.
+Proof.
+intros.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  now unfold mat_ncols; cbn; rewrite Hcz.
+}
+apply Nat.neq_0_lt_0 in Hcz.
+unfold mat_ncols; cbn.
+rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+now rewrite List_map_seq_length.
+Qed.
+
+Theorem mat_transp_is_corr : ∀ M,
+  is_correct_matrix M = true
+  → is_correct_matrix M⁺ = true.
+Proof.
+intros * Hcm.
+apply is_scm_mat_iff in Hcm.
+destruct Hcm as (H1, H2).
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  specialize (H1 Hcz).
+  unfold mat_transp.
+  now rewrite H1, Hcz.
+}
+apply is_scm_mat_iff.
+rewrite mat_transp_ncols.
+apply Nat.eqb_neq in Hcz; rewrite Hcz.
+apply Nat.eqb_neq in Hcz.
+split. {
+  intros Hr.
+  unfold mat_nrows in Hr.
+  unfold mat_ncols in Hcz.
+  apply length_zero_iff_nil in Hr.
+  now rewrite Hr in Hcz.
+} {
+  intros l Hl.
+  unfold mat_transp in Hl; cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (j & Hjl & Hj).
+  now rewrite <- Hjl, List_map_seq_length.
+}
+Qed.
+
+Theorem mat_mul_is_corr : ∀ A B,
+  is_correct_matrix A = true
+  → is_correct_matrix B = true
+  → mat_nrows B ≠ 0
+  → is_correct_matrix (A * B) = true.
+Proof.
+intros * Ha Hb Hbz.
+destruct (Nat.eq_dec (mat_nrows A) 0) as [Haz| Haz]. {
+  unfold mat_nrows in Haz.
+  apply length_zero_iff_nil in Haz.
+  now destruct A as (lla); cbn in Haz; subst lla.
+}
+apply Nat.neq_0_lt_0 in Haz, Hbz.
+apply is_scm_mat_iff in Ha.
+apply is_scm_mat_iff in Hb.
+apply is_scm_mat_iff.
+destruct Ha as (Hacr & Hac).
+destruct Hb as (Hbcr & Hbc).
+split. {
+  intros Hab.
+  unfold mat_ncols in Hab.
+  cbn in Hab |-*.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0) in Hab; [ | now rewrite seq_length ].
+  rewrite List_map_seq_length in Hab.
+  now rewrite Hbcr in Hbz.
+} {
+  intros lab Hlab.
+  unfold mat_ncols; cbn.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  rewrite List_map_seq_length.
+  cbn in Hlab.
+  apply in_map_iff in Hlab.
+  destruct Hlab as (x & Hlab & Hx).
+  now rewrite <- Hlab, List_map_seq_length.
+}
+Qed.
+
+Theorem mat_transp_el : ∀ M i j,
+  is_correct_matrix M = true
+  → mat_el M⁺ i j = mat_el M j i.
+Proof.
+intros * Hcm.
+unfold mat_el; cbn.
+destruct (lt_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
+  apply Nat.nlt_ge in Hic.
+  rewrite nth_overflow. 2: {
+    rewrite nth_overflow; [ easy | ].
+    now rewrite map_length, seq_length.
+  }
+  rewrite nth_overflow; [ easy | ].
+  destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
+    apply is_scm_mat_iff in Hcm.
+    destruct Hcm as (H1, H2).
+    rewrite H2; [ easy | ].
+    now apply nth_In; rewrite fold_mat_nrows.
+  }
+  apply Nat.nlt_ge in Hjr.
+  now rewrite nth_overflow.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+destruct (lt_dec j (mat_nrows M)) as [Hjr| Hjr]. {
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  unfold mat_el.
+  rewrite seq_nth; [ cbn | easy ].
+  rewrite seq_nth; [ cbn | easy ].
+  easy.
+}
+apply Nat.nlt_ge in Hjr.
+rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+rewrite (nth_overflow _ _ Hjr).
+now destruct i.
+Qed.
+
+Theorem mat_transp_mul :
+  rngl_is_comm = true →
+  ∀ (MA : matrix T) (MB : matrix T),
+  is_correct_matrix MA = true
+  → is_correct_matrix MB = true
+  → mat_nrows MA ≠ 0
+  → mat_nrows MB ≠ 0
+  → mat_ncols MA = mat_nrows MB
+  → ((MA * MB)⁺ = MB⁺ * MA⁺)%M.
+Proof.
+intros Hic * Ha Hb Haz Hbz Hcarb.
+apply matrix_eq; cycle 1. {
+  apply mat_transp_is_corr.
+  now apply mat_mul_is_corr.
+} {
+  apply mat_mul_is_corr. {
+    now apply mat_transp_is_corr.
+  } {
+    now apply mat_transp_is_corr.
+  }
+  rewrite mat_transp_nrows.
+  intros H.
+  apply is_scm_mat_iff in Ha.
+  destruct Ha as (Hcra, Hcla).
+  now apply Hcra in H.
+} {
+  cbn.
+  unfold mat_ncols; cbn.
+  do 3 rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length; apply Nat.neq_0_lt_0 ].
+  now rewrite List_map_seq_length.
+} {
+  unfold mat_ncols; cbn.
+  do 2 rewrite List_map_seq_length.
+  rewrite (List_map_hd 0). 2: {
+    rewrite seq_length.
+    unfold mat_ncols; cbn.
+    rewrite (List_map_hd 0). 2: {
+      rewrite seq_length.
+      now apply Nat.neq_0_lt_0.
+    }
+    rewrite List_map_seq_length.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply is_scm_mat_iff in Hb.
+    now apply Hb in H.
+  }
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0). 2: {
+    rewrite seq_length.
+    apply Nat.neq_0_lt_0.
+    intros H.
+    apply is_scm_mat_iff in Hb.
+    now apply Hb in H.
+  }
+  rewrite List_map_seq_length.
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hacz| Hacz]; [ | easy ].
+  apply is_scm_mat_iff in Ha.
+  now apply Ha.
+}
+intros i j Hi Hj.
+rewrite mat_transp_nrows in Hi.
+rewrite mat_transp_el; [ | now apply mat_mul_is_corr ].
+rewrite mat_mul_ncols in Hi; [ | easy ].
+rewrite mat_mul_ncols in Hj; [ | rewrite mat_transp_nrows; flia Hi ].
+rewrite mat_transp_ncols in Hj.
+rewrite if_eqb_eq_dec in Hj.
+destruct (Nat.eq_dec (mat_ncols MA) 0) as [H1| H1]; [ easy | ].
+rewrite mat_el_mul; cycle 1. {
+  now rewrite mat_mul_nrows.
+} {
+  now rewrite mat_mul_ncols.
+}
+rewrite mat_el_mul; cycle 1. {
+  now rewrite mat_mul_nrows, mat_transp_nrows.
+} {
+  rewrite mat_mul_ncols, mat_transp_ncols. 2: {
+    rewrite mat_transp_nrows; flia Hi.
+  }
+  now apply Nat.eqb_neq in H1; rewrite H1.
+}
+rewrite mat_transp_ncols.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mat_ncols MB) 0) as [H2| H2]; [ flia Hi H2 | ].
+rewrite <- Hcarb; symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k (_, Hk).
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite mat_transp_el; [ | easy ].
+  rewrite mat_transp_el; [ | easy ].
+  easy.
+}
+easy.
+Qed.
 
 (* matrix without row i and column j *)
 
@@ -2498,6 +2759,7 @@ Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mat_transp {T ro} M%M.
+Arguments mat_transp_nrows {T}%type {ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
