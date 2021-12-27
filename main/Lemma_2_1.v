@@ -888,6 +888,7 @@ specialize (H1 H); clear H.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (H1 (or_introl H)); clear H.
 specialize (H1 n M ev eV D U Hsy Hrn Hvv Hlev Hevn Hd Ho).
+generalize H1; intros H1v.
 apply (f_equal (λ A, (A * U⁻¹)%M)) in H1.
 rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
   now rewrite Ho, mat_with_vect_nrows.
@@ -926,6 +927,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 Print determinant'.
+...
 unfold eigenvalues_and_norm_vectors in Hvv.
 ...
   unfold mat_with_vect; cbn.
