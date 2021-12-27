@@ -861,6 +861,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Inspect 1.
+
+(* can I prove, with that, that A⁻¹ = A⁺ ? *)
+
+...
+
 Theorem diagonalized_matrix_prop : in_charac_0_field →
   ∀ n (M : matrix T) ev eV D U,
   is_symm_mat M
