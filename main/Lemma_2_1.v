@@ -902,7 +902,35 @@ rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
   apply mat_with_vect_is_square.
 } {
   rewrite Ho.
-Search (determinant (mat_with_vect _ _)).
+(* tout un programme ! *)
+...
+  rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+    apply mat_with_vect_is_square.
+  }
+Require Import IterMul.
+Require Import PermutSeq Signature.
+unfold determinant'.
+rewrite mat_with_vect_nrows.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite mat_with_vect_el; [ | flia Hj | ]. 2: {
+      apply canon_sym_gr_list_ub; [ | flia Hj ].
+      specialize (fact_neq_0 n) as H2.
+      flia Hi H2.
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+Print determinant'.
+unfold eigenvalues_and_norm_vectors in Hvv.
+...
+  unfold mat_with_vect; cbn.
+  rewrite List_map_seq_length.
+  cb
 ...
 
 Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.

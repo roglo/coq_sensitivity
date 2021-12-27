@@ -1130,6 +1130,7 @@ Qed.
 End a.
 
 Arguments determinant {T ro} M%M.
+Arguments determinant' {T}%type {ro} n%nat M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
