@@ -904,6 +904,12 @@ rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
 } {
   rewrite Ho.
 (* tout un programme ! *)
+Search mat_with_vect.
+(* for_symm_squ_mat_eigen_vect_mat_is_ortho seems to say that U⁻¹=U⁺ and,
+   therefore their determinants are equal, therefore equal to det(U) *)
+(* or I can also "f_equal (λ A, (A * U⁺)%M)" instead of U⁻¹ and use
+   for_symm_squ_mat_eigen_vect_mat_is_ortho with version "U * U⁺ = I" *)
+(* I don't know *)
 ...
   rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
     apply mat_with_vect_is_square.
