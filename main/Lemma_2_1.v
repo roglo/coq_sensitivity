@@ -688,6 +688,9 @@ Theorem determinant_mul : ∀ A B,
   determinant (A * B) = (determinant A * determinant B)%F.
 Proof.
 intros.
+Check @laplace_formula_on_rows.
+(* https://www.youtube.com/watch?v=-CySi7uauCg *)
+...
 rewrite det_is_det_by_canon_permut.
 rewrite det_is_det_by_canon_permut.
 rewrite det_is_det_by_canon_permut.
