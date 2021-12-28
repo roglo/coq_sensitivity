@@ -743,6 +743,25 @@ cbn.
 (* ça peut peut-être le faire, ça... à voir... *)
 Search ((∑ (_ = _, _), _) * (∑ (_ = _, _), _))%F.
 Search ((∑ (_ ∈ _), _) * (∑ (_ ∈ _), _))%F.
+Theorem rngl_summation_mul_summation :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ bi bj ei ej f g,
+  ((∑ (i = bi, ei), f i) * (∑ (j = bj, ej), g j))%F =
+  ∑ (i = bi, ei), (∑ (j = bj, ej), f i * g j).
+Proof.
+intros Hos *.
+unfold iter_seq.
+remember (S ei - bi) as leni eqn:Hi.
+remember (S ej - bj) as lenj eqn:Hj.
+clear ei ej Hi Hj.
+(* lemma for summation_list to do *)
+revert bi bj lenj.
+induction leni; intros. {
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  now apply rngl_mul_0_l.
+}
+Search (∑ (_ = _, _ + _), _).
 ...
 intros.
 (* essai avec le déterminant défini par récurrence *)
