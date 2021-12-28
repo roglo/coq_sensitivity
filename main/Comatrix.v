@@ -17,15 +17,15 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Definition comatrix (M : matrix T) : matrix T :=
+Definition com (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
-       map (λ j, (minus_one_pow (i + j) * determinant (subm M i j))%F)
+       map (λ j, (minus_one_pow (i + j) * det (subm M i j))%F)
          (seq 0 (mat_ncols M)))
       (seq 0 (mat_nrows M))).
 
-Arguments comatrix M%M.
+Arguments com M%M.
 
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
   mat_swap_rows i i M = M.
@@ -515,8 +515,8 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
   → is_square_matrix M = true
-  → determinant (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
-    (minus_one_pow i * determinant M)%F.
+  → det (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
+    (minus_one_pow i * det M)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -525,7 +525,7 @@ induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
 assert (H : i < n) by flia Hin.
 specialize (IHi H); clear H.
 rewrite seq_S; cbn.
-rewrite fold_left_app; cbn - [ determinant ].
+rewrite fold_left_app; cbn - [ det ].
 rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {
@@ -632,8 +632,8 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   is_square_matrix M = true
   → 0 < i < mat_nrows M
   → j < mat_nrows M
-  → determinant (subm (mat_swap_rows 0 i M) 0 j) =
-    (- minus_one_pow i * determinant (subm M i j))%F.
+  → det (subm (mat_swap_rows 0 i M) 0 j) =
+    (- minus_one_pow i * det (subm M i j))%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ; [ | easy ].
@@ -656,8 +656,7 @@ Theorem laplace_formula_on_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → i < mat_nrows M
-  → determinant M =
-    ∑ (j = 0, mat_ncols M - 1), mat_el M i j * mat_el (comatrix M) i j.
+  → det M = ∑ (j = 0, mat_ncols M - 1), mat_el M i j * mat_el (com M) i j.
 Proof.
 intros Hif * Hsm Hlin.
 specialize (square_matrix_ncols M Hsm) as Hc.
@@ -670,7 +669,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   subst i; cbn.
   symmetry.
-  unfold determinant.
+  unfold det.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
   cbn - [ butn ]; rewrite Nat.sub_0_r.
   apply rngl_summation_eq_compat.
@@ -686,7 +685,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
   now rewrite Hnz.
 }
-unfold determinant.
+unfold det.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
 cbn; rewrite Nat.sub_0_r.
 symmetry.
@@ -752,11 +751,11 @@ rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
 f_equal.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1.
-rewrite fold_determinant.
+rewrite fold_det.
 apply Nat.neq_sym in Hiz.
 apply Nat.neq_0_lt_0 in Hnz.
 rewrite <- (determinant_alternating Hif M Hiz); [ | easy | easy | easy ].
-unfold determinant.
+unfold det.
 now rewrite mat_swap_rows_nrows.
 Qed.
 
@@ -1195,14 +1194,14 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
   → mat_nrows M = n
   → is_square_matrix M = true
   → is_sym_gr_list n sg
-  → determinant M =
+  → det M =
     ∑ (k = 0, n! - 1),
     ε n (nth k sg []) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-unfold determinant'.
+unfold det'.
 rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
 set (h := λ i, sym_gr_inv sg (canon_sym_gr_list n i)).
@@ -1550,7 +1549,7 @@ Theorem det_any_permut_l : in_charac_0_field →
   → mat_nrows M = n
   → is_square_matrix M = true
   → is_permut n σ
-  → determinant M =
+  → det M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
@@ -1771,7 +1770,7 @@ Theorem det_any_permut_r : in_charac_0_field →
   → mat_nrows M = n
   → is_square_matrix M = true
   → is_permut n σ
-  → determinant M =
+  → det M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
 Proof.
@@ -1997,12 +1996,12 @@ Qed.
 Theorem determinant_transpose : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → determinant M⁺ = determinant M.
+  → det M⁺ = det M.
 Proof.
 intros Hif * Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  unfold determinant.
+  unfold det.
   rewrite mat_transp_nrows, Hr.
   rewrite square_matrix_ncols; [ | easy ].
   now rewrite Hr, Hnz.
@@ -2041,17 +2040,17 @@ rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
 easy.
 Qed.
 
-Theorem comatrix_nrows : ∀ M, mat_nrows (comatrix M) = mat_nrows M.
+Theorem comatrix_nrows : ∀ M, mat_nrows (com M) = mat_nrows M.
 Proof.
 intros.
-unfold comatrix; cbn.
+unfold com; cbn.
 now rewrite List_map_seq_length.
 Qed.
 
-Theorem comatrix_ncols : ∀ M, mat_ncols (comatrix M) = mat_ncols M.
+Theorem comatrix_ncols : ∀ M, mat_ncols (com M) = mat_ncols M.
 Proof.
 intros.
-unfold comatrix.
+unfold com.
 unfold mat_ncols; cbn.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   rewrite Hrz; cbn.
@@ -2065,7 +2064,7 @@ Qed.
 
 Theorem comatrix_is_square : ∀ M,
   is_square_matrix M = true
-  → is_square_matrix (comatrix M) = true.
+  → is_square_matrix (com M) = true.
 Proof.
 intros * Hsm.
 specialize (square_matrix_ncols _ Hsm) as Hc.
@@ -2082,7 +2081,7 @@ Qed.
 
 Theorem comatrix_is_correct : ∀ M,
   is_correct_matrix M = true
-  → is_correct_matrix (comatrix M) = true.
+  → is_correct_matrix (com M) = true.
 Proof.
 intros * Hsm.
 apply is_scm_mat_iff in Hsm.
@@ -2099,11 +2098,11 @@ Qed.
 Theorem comatrix_transpose : in_charac_0_field →
   ∀ M,
   is_square_matrix M = true
-  → comatrix M⁺ = (comatrix M)⁺%M.
+  → com M⁺ = (com M)⁺%M.
 Proof.
 intros Hif * Hsm.
 destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  unfold mat_transp, comatrix; cbn - [ determinant ].
+  unfold mat_transp, com; cbn - [ det ].
   rewrite Hcz; cbn.
   unfold mat_ncols; cbn.
   destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]; [ now rewrite Hrz | ].
@@ -2116,7 +2115,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   now rewrite Hrz in Hcz.
 }
 apply Nat.neq_0_lt_0 in Hcz, Hrz.
-unfold mat_transp, comatrix, mat_ncols; cbn - [ determinant ].
+unfold mat_transp, com, mat_ncols; cbn - [ det ].
 f_equal.
 rewrite (List_map_hd 0); [ | now rewrite seq_length ].
 rewrite (List_map_hd 0); [ | now rewrite seq_length ].
@@ -2307,8 +2306,7 @@ Theorem laplace_formula_on_cols : in_charac_0_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
   → j < mat_ncols M
-  → determinant M =
-    ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (comatrix M) i j.
+  → det M = ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (com M) i j.
 Proof.
 intros Hif * Hsm Hljn.
 rewrite <- determinant_transpose; [ | easy | easy ].
@@ -2317,7 +2315,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite <- mat_transp_el; [ | now apply squ_mat_is_corr ].
   easy.
 }
-cbn - [ determinant mat_el ].
+cbn - [ det mat_el ].
 specialize (@laplace_formula_on_rows Hif (M⁺)%M j) as H1.
 assert (H : is_square_matrix M⁺ = true) by now apply mat_transp_is_square.
 specialize (H1 H); clear H.
@@ -2364,14 +2362,14 @@ Theorem determinant_with_row : in_charac_0_field →
   ∀ i (M : matrix T),
   is_square_matrix M = true
   → i < mat_nrows M
-  → determinant M =
+  → det M =
     ∑ (j = 0, mat_nrows M - 1),
-    minus_one_pow (i + j) * mat_el M i j * determinant (subm M i j).
+    minus_one_pow (i + j) * mat_el M i j * det (subm M i j).
 Proof.
 intros Hif * Hsm Hir.
 destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-  subst i; cbn - [ determinant ].
-  unfold determinant.
+  subst i; cbn - [ det ].
+  unfold det.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     rewrite mat_nrows_subm.
@@ -2385,7 +2383,7 @@ destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
 apply rngl_opp_inj; [ now destruct Hif | ].
 apply Nat.neq_sym in Hiz.
 rewrite <- (determinant_alternating Hif M Hiz); [ | flia Hir | easy | easy ].
-unfold determinant at 1.
+unfold det at 1.
 rewrite mat_swap_rows_nrows.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
 rewrite determinant_succ at 1.
@@ -2420,7 +2418,7 @@ rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; cycle 1. {
 } {
   flia Hj Hir.
 }
-unfold determinant.
+unfold det.
 rewrite mat_nrows_subm.
 rewrite mat_swap_rows_nrows.
 assert (H : 0 < mat_nrows M) by flia Hir.
@@ -2434,7 +2432,7 @@ Theorem determinant_with_bad_row : in_charac_0_field →
   → k < mat_nrows M
   → i ≠ k
   → ∑ (j = 0, mat_nrows M - 1),
-    minus_one_pow (i + j) * mat_el M k j * determinant (subm M i j) = 0%F.
+    minus_one_pow (i + j) * mat_el M k j * det (subm M i j) = 0%F.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
 specialize (square_matrix_ncols _ Hsm) as Hc.
@@ -2465,7 +2463,7 @@ assert (Hasm : is_square_matrix A = true). {
 assert (Hira : mat_nrows A = mat_nrows M). {
   now subst A; cbn; rewrite List_map_seq_length.
 }
-assert (H1 : determinant A = 0%F). {
+assert (H1 : det A = 0%F). {
   apply determinant_same_rows with (p := i) (q := k); try easy. {
     now rewrite Hira.
   } {
@@ -2805,11 +2803,11 @@ Qed.
 Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → (M * (comatrix M)⁺ = determinant M × mI (mat_nrows M))%M.
+  → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-destruct M as (ll); cbn - [ determinant ].
-unfold "*"%M, "×"%M, mat_nrows; cbn - [ determinant ]; f_equal.
+destruct M as (ll); cbn - [ det ].
+unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
@@ -2819,7 +2817,7 @@ cbn - [ mat_el ].
 rewrite mat_transp_ncols.
 rewrite comatrix_nrows, comatrix_ncols.
 unfold mat_ncols.
-cbn - [ mat_el mat_nrows comatrix ].
+cbn - [ mat_el mat_nrows com ].
 apply is_scm_mat_iff in Hsm.
 destruct Hsm as (Hcr, Hcl).
 cbn in Hcl.
@@ -2839,7 +2837,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite Hcl; [ flia Hk Hll | ].
     now apply List_hd_in.
   }
-  cbn - [ determinant ].
+  cbn - [ det ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
   rewrite seq_nth; [ | easy ].
@@ -2848,7 +2846,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite rngl_mul_assoc.
   easy.
 }
-cbn - [ determinant ].
+cbn - [ det ].
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   (* diagonal *)
   subst j; rewrite δ_diag, rngl_mul_1_r.
@@ -2858,7 +2856,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply rngl_summation_eq_compat.
   intros k Hk.
   rewrite <- rngl_mul_assoc; f_equal.
-  cbn - [ determinant ].
+  cbn - [ det ].
   rewrite List_map_seq_length.
   rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
@@ -2896,7 +2894,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
   unfold mat_transp.
   unfold mat_mul_el.
-  cbn - [ comatrix ].
+  cbn - [ com ].
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
     unfold mat_ncols in Hk; cbn in Hk.
@@ -2913,17 +2911,17 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite comatrix_ncols; unfold mat_ncols; cbn.
       rewrite Hcl; [ flia Hk Hi | now apply List_hd_in ].
     }
-    cbn - [ comatrix ].
+    cbn - [ com ].
     easy.
   }
-  cbn - [ comatrix ].
+  cbn - [ com ].
   unfold mat_ncols.
   rewrite Hcl; [ | now apply List_hd_in ].
   remember (mk_mat ll) as M eqn:HM.
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
     rewrite HM at 1.
-    cbn - [ determinant ].
+    cbn - [ det ].
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length; unfold mat_ncols.
@@ -2936,7 +2934,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite Hcl; [ flia Hk Hll | ].
       now apply List_hd_in.
     }
-    cbn - [ determinant ].
+    cbn - [ det ].
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
     replace ll with (mat_list_list M) at 1 by now rewrite HM.
@@ -2944,7 +2942,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite <- HM.
     easy.
   }
-  cbn - [ determinant ].
+  cbn - [ det ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
   apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
@@ -2958,10 +2956,10 @@ Qed.
 Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → ((comatrix M)⁺ * M = determinant M × mI (mat_nrows M))%M.
+  → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-destruct M as (ll); cbn - [ determinant ].
+destruct M as (ll); cbn - [ det ].
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
   apply length_zero_iff_nil in Hlz; subst ll; cbn.
   unfold "*"%M, mI; cbn; symmetry.
@@ -2974,13 +2972,13 @@ destruct (Nat.eq_dec (length ll) 1) as [Hl1| Hl1]. {
   apply is_scm_mat_iff in Hsm.
   unfold mat_ncols in Hsm; cbn - [ In ] in Hsm.
   destruct Hsm as (_, Hcl).
-  unfold "*"%M, "×"%M, mat_transp, mat_mul_el, comatrix; cbn.
+  unfold "*"%M, "×"%M, mat_transp, mat_mul_el, com; cbn.
   rewrite Hcl; [ cbn | now left ].
   do 2 rewrite rngl_summation_only_one; cbn.
   do 2 rewrite rngl_mul_1_l.
   now do 2 rewrite rngl_mul_1_r.
 }
-unfold "*"%M, "×"%M, mat_nrows; cbn - [ determinant ]; f_equal.
+unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
 rewrite List_map_seq_length.
 rewrite comatrix_ncols.
@@ -3007,7 +3005,7 @@ rewrite comatrix_ncols.
 unfold mat_ncols.
 rewrite Hcl; [ | now apply List_hd_in ].
 rewrite comatrix_nrows.
-cbn - [ mat_el comatrix ].
+cbn - [ mat_el com ].
 apply Nat.neq_0_lt_0 in Hlz.
 apply Nat.eqb_neq in Hlz; rewrite Hlz.
 apply Nat.eqb_neq, Nat.neq_0_lt_0 in Hlz.
@@ -3019,7 +3017,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     easy.
   }
-  cbn - [ mat_el comatrix ].
+  cbn - [ mat_el com ].
   apply rngl_summation_eq_compat.
   intros k Hk.
   symmetry; f_equal; rewrite mat_transp_el; [ easy | ].
@@ -3030,7 +3028,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite δ_ndiag; [ | easy ].
   rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
   unfold mat_transp.
-  cbn - [ comatrix ].
+  cbn - [ com ].
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
     rewrite (List_map_nth' 0). 2: {
@@ -3048,15 +3046,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite comatrix_ncols; unfold mat_ncols; cbn.
       rewrite Hcl; [ flia Hk Hi | now apply List_hd_in ].
     }
-    cbn - [ comatrix ].
+    cbn - [ com ].
     easy.
   }
-  cbn - [ comatrix ].
+  cbn - [ com ].
   remember (mk_mat ll) as M eqn:HM.
   erewrite rngl_summation_eq_compat. 2: {
     intros k Hk.
     rewrite HM at 1.
-    cbn - [ determinant ].
+    cbn - [ det ].
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hlz ].
     rewrite (List_map_nth' 0). 2: {
       rewrite seq_length; unfold mat_ncols.
@@ -3069,14 +3067,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite Hcl; [ easy | ].
       now apply List_hd_in.
     }
-    cbn - [ determinant ].
+    cbn - [ det ].
     rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
     replace ll with (mat_list_list M) at 1 by now rewrite HM.
     rewrite fold_mat_el.
     rewrite <- HM.
     easy.
   }
-  cbn - [ determinant ].
+  cbn - [ det ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   destruct Hi as (_, Hi); cbn in Hi.
   destruct Hj as (_, Hj); cbn in Hj.
@@ -3134,12 +3132,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Definition mat_inv (M : matrix T) := ((determinant M)⁻¹ × (comatrix M)⁺)%M.
+Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
 Theorem mat_mul_inv_r : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → determinant M ≠ 0%F
+  → det M ≠ 0%F
   → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
@@ -3175,7 +3173,7 @@ Qed.
 Theorem mat_mul_inv_l : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → determinant M ≠ 0%F
+  → det M ≠ 0%F
   → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
@@ -3191,9 +3189,30 @@ rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
+Theorem comatrix_mul : ∀ A B, com (A * B) = (com A * com B)%M.
+Proof.
+intros.
+unfold mat_mul; cbn.
+unfold com at 1; cbn - [ det ].
+do 2 rewrite List_map_seq_length.
+f_equal.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+unfold mat_ncols at 2.
+cbn - [ det ].
+rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hi ].
+rewrite List_map_seq_length.
+rewrite comatrix_ncols.
+apply map_ext_in.
+intros j Hj; apply in_seq in Hj.
+destruct Hj as (_, Hj); cbn in Hj.
+symmetry.
+...
+
 End a.
 
-Arguments comatrix {T}%type {ro} M%M.
+Arguments com {T}%type {ro} M%M.
 Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%F.
 Arguments mat_inv {T}%type {ro} M%M.
 Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
@@ -3207,9 +3226,9 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute 3.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (determinant M, mat_inv M)).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (det M, mat_inv M)).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (M * mat_inv M)%M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in (mat_inv M * M)%M).
-Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (determinant M, comatrix M)).
-Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (determinant M, (M * comatrix M)%M, (comatrix M * M)%M)).
+Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, com M)).
+Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (M * com M)%M, (com M * M)%M)).
 *)

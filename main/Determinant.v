@@ -18,7 +18,7 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (*
-   determinant n M recursively computes determinant
+   det n M recursively computes determinant
 
       0     n-1
       |     |
@@ -44,11 +44,10 @@ Fixpoint determinant_loop n (M : matrix T) :=
        minus_one_pow j * mat_el M' 0 j * determinant_loop n' (subm M' 0 j)
    end) M.
 
-Definition determinant M := determinant_loop (mat_nrows M) M.
-Arguments determinant M%M.
+Definition det M := determinant_loop (mat_nrows M) M.
+Arguments det M%M.
 
-Theorem fold_determinant : ∀ M,
-  determinant_loop (mat_nrows M) M = determinant M.
+Theorem fold_det : ∀ M, determinant_loop (mat_nrows M) M = det M.
 Proof. easy. Qed.
 
 Theorem determinant_zero : ∀ (M : matrix T),
@@ -77,24 +76,24 @@ Proof. easy. Qed.
 (* definition of determinant by sum of products involving all
    permutations *)
 
-Definition determinant' n (M : matrix T) :=
+Definition det' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
     ε n (canon_sym_gr_list n k) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)).
 
-Arguments determinant' n%nat M%M.
+Arguments det' n%nat M%M.
 
 (* Proof that both definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → determinant M = determinant' (mat_nrows M) M.
+  → det M = det' (mat_nrows M) M.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
-unfold determinant'.
+unfold det'.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-unfold determinant.
+unfold det.
 rewrite Hr.
 revert M Hm Hr.
 induction n; intros. {
@@ -207,9 +206,9 @@ Theorem determinant_multilinear : in_charac_0_field →
   → vect_size U = n
   → vect_size V = n
   → i < n
-  → determinant (mat_repl_vect i M (a × U + b × V)%V) =
-       (a * determinant (mat_repl_vect i M U) +
-        b * determinant (mat_repl_vect i M V))%F.
+  → det (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * det (mat_repl_vect i M U) +
+        b * det (mat_repl_vect i M V))%F.
 Proof.
 intros Hif * Hsm Hr Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
@@ -227,7 +226,7 @@ rewrite (det_is_det_by_canon_permut Hif). 2: {
 rewrite (det_is_det_by_canon_permut Hif). 2: {
   apply mat_repl_vect_is_square; [ congruence | congruence | easy ].
 }
-unfold determinant'.
+unfold det'.
 (* simplification of the lhs *)
 remember (a × U + b × V)%V as UV eqn:HUV.
 assert (Hvm : vect_size UV = mat_nrows M). {
@@ -580,7 +579,7 @@ Theorem determinant_alternating : in_charac_0_field →
   → p < mat_nrows M
   → q < mat_nrows M
   → is_square_matrix M = true
-  → determinant (mat_swap_rows p q M) = (- determinant M)%F.
+  → det (mat_swap_rows p q M) = (- det M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -588,7 +587,7 @@ rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
   rewrite <- Hr in Hp, Hq.
   now apply mat_swap_rows_is_square.
 }
-unfold determinant'.
+unfold det'.
 rewrite mat_swap_rows_nrows.
 rewrite Hr.
 erewrite rngl_summation_eq_compat. 2: {
@@ -881,7 +880,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
 }
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite Hr.
-unfold determinant'.
+unfold det'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 apply rngl_summation_eq_compat.
@@ -917,12 +916,12 @@ Theorem determinant_same_rows : in_charac_0_field →
   → p < mat_nrows M
   → q < mat_nrows M
   → (∀ j, mat_el M p j = mat_el M q j)
-  → determinant M = 0%F.
+  → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
-assert (HM : determinant M = (- determinant M)%F). {
+assert (HM : det M = (- det M)%F). {
   rewrite <- Hr in Hpn, Hqn.
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
@@ -1025,7 +1024,7 @@ Theorem det_add_row_row : ∀ n (A B C : matrix T),
   → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
   → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
-  → determinant A = (determinant B + determinant C)%F.
+  → det A = (det B + det C)%F.
 Proof.
 intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.
 specialize (square_matrix_ncols _ Hsma) as Hca.
@@ -1112,7 +1111,7 @@ assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
   apply in_seq in Hv.
   now symmetry; apply Hc.
 }
-unfold determinant; rewrite Hra, Hrb, Hrc.
+unfold det; rewrite Hra, Hrb, Hrc.
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
@@ -1129,8 +1128,8 @@ Qed.
 
 End a.
 
-Arguments determinant {T ro} M%M.
-Arguments determinant' {T}%type {ro} n%nat M%M.
+Arguments det {T ro} M%M.
+Arguments det' {T}%type {ro} n%nat M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.

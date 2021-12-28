@@ -684,8 +684,7 @@ Theorem fold_vect_dot_mul' : ∀ U V,
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
-Theorem determinant_mul : ∀ A B,
-  determinant (A * B) = (determinant A * determinant B)%F.
+Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
 Proof.
 intros.
 rewrite laplace_formula_on_rows with (i := 0).
@@ -693,6 +692,7 @@ rewrite laplace_formula_on_rows with (i := 0).
 rewrite laplace_formula_on_rows with (i := 0).
 rewrite mat_mul_ncols.
 (* déjà, ce serait pas mal si on  prouvait que com(A*B)=com(A)*com(B) *)
+Check comatrix_mul.
 ...
 intros.
 Check @laplace_formula_on_rows.
@@ -716,6 +716,7 @@ unfold determinant; cbn.
 rewrite List_map_seq_length.
 Print determinant_loop.
 ...
+*)
 
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
