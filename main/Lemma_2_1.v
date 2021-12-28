@@ -741,6 +741,8 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 (* ça peut peut-être le faire, ça... à voir... *)
+Search ((∑ (_ = _, _), _) * (∑ (_ = _, _), _))%F.
+Search ((∑ (_ ∈ _), _) * (∑ (_ ∈ _), _))%F.
 ...
 intros.
 (* essai avec le déterminant défini par récurrence *)
