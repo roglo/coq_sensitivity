@@ -753,9 +753,24 @@ f_equal.
 symmetry.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
+Example toto : ∀ (a11 a12 a21 a22 a23 a31 a32 : nat),
+  (a11 + a12) * (a21 + a22) * (a31 + a32) = 42.
+intros.
+ring_simplify.
+...
+k=0 111 000
+k=1 112 001
+k=2 121 010
+k=3 122 011
+k=4 211 100
+k=5 212 101
+k=6 221 110
+k=7 222 111
+je compte en base n jusqu'à n^m
+...
 Theorem rngl_product_summation_distr : ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
-  ∑ (k = 1, n ^ m), ∏ (j = 1, n), f (k - 1)%nat (j - 1)%nat.
+  ∑ (k = 1, n ^ m), ∏ (i = 1, m), f (i - 1)%nat k???.
 Proof.
 intros.
 unfold iter_seq.
