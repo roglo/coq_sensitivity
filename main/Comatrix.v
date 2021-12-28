@@ -3269,7 +3269,6 @@ rewrite Hcb, Hra in H.
 rewrite <- H, HC; clear C HC H.
 symmetry.
 (* lemma, perhaps? *)
-...
 (*1
 rewrite det_is_det_by_canon_permut.
 erewrite rngl_summation_eq_compat. 2: {
@@ -3323,10 +3322,27 @@ erewrite rngl_summation_eq_compat. 2: {
   now cbn.
 }
 cbn.
-... à voir... c'est peut-être bon?
+(*
   ============================
   determinant_loop (n - 1) (subm (A * B) i j) =
   ∑ (i0 = 0, n - 1), determinant_loop (n - 1) (subm A i i0) * determinant_loop (n - 1) (subm B i0 j)
+*)
+...
+destruct n. {
+  cbn.
+  rewrite rngl_summation_only_one.
+  symmetry.
+  apply rngl_mul_1_l.
+}
+rewrite Nat_sub_succ_1.
+induction n. {
+  cbn.
+  rewrite rngl_summation_only_one.
+  symmetry.
+  apply rngl_mul_1_l.
+}
+Search (determinant_loop (S _)).
+rewrite determinant_succ.
 ...
 rewrite subm_mat_swap_rows_circ; [ | easy ].
 destruct i; [ flia Hiz | ].
