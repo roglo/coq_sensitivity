@@ -3327,6 +3327,10 @@ cbn.
   determinant_loop (n - 1) (subm (A * B) i j) =
   ∑ (i0 = 0, n - 1), determinant_loop (n - 1) (subm A i i0) * determinant_loop (n - 1) (subm B i0 j)
 *)
+Abort. (*
+j'avorte parce que ce théorème essaie de prouver com(A*B)=com(A)*com(B) dans
+le but lointain de prouver det(A*B)=det(A)*det(B), sauf que com fait déjà
+intervenir det ; c'est donc peut-être une mauvaise piste
 ...
 destruct n. {
   cbn.
@@ -3357,6 +3361,7 @@ apply determinant_circular_shift_rows; [ easy | | ]. {
 }
 apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
 ...
+*)
 
 End a.
 

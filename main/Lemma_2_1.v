@@ -687,11 +687,36 @@ Proof. easy. Qed.
 Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
 Proof.
 intros.
+rewrite det_is_det_by_canon_permut.
+rewrite det_is_det_by_canon_permut.
+rewrite det_is_det_by_canon_permut.
+rewrite mat_mul_nrows.
+remember (mat_nrows A) as n eqn:Hra.
+symmetry in Hra.
+enough (Hrb : mat_nrows B = n).
+rewrite Hrb.
+unfold det'.
+Require Import IterMul Signature PermutSeq.
+Show.
+(* ouais, chais pas *)
+...
+intros.
+cbn.
+rewrite List_map_seq_length.
+unfold det.
+remember (mat_nrows A) as n eqn:Hra.
+symmetry in Hra.
+enough (Hrb : mat_nrows B = n).
+...
+intros.
 rewrite laplace_formula_on_rows with (i := 0).
 rewrite laplace_formula_on_rows with (i := 0).
 rewrite laplace_formula_on_rows with (i := 0).
 rewrite mat_mul_ncols.
 (* déjà, ce serait pas mal si on  prouvait que com(A*B)=com(A)*com(B) *)
+(* mais je viens de laisser tomber cette idée parce que, de toutes façons,
+   la définition de com fait déjà intervenir det : ça boucle ! *)
+...
 Check comatrix_mul.
 ...
 intros.
