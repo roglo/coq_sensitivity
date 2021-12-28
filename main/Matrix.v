@@ -1016,7 +1016,7 @@ erewrite map2_ext_in. 2: {
   rewrite δ_ndiag; [ | flia Hj ].
   rewrite rngl_mul_0_l; [ easy | now left ].
 }
-rewrite rngl_summation_list_app; [ | easy ].
+rewrite rngl_summation_list_app.
 rewrite all_0_rngl_summation_list_0. 2: {
   intros j Hj.
   apply in_map2_iff in Hj.

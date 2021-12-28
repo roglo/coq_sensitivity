@@ -167,6 +167,13 @@ symmetry.
 now rewrite <- iter_seq_succ_succ'.
 Qed.
 
+Theorem rngl_product_list_empty : ∀ A g (l : list A),
+  l = [] → ∏ (i ∈ l), g i = 1%F.
+Proof.
+intros * Hl.
+now apply iter_list_empty.
+Qed.
+
 Theorem rngl_product_empty : ∀ g b k,
   k < b → (∏ (i = b, k), g i = 1)%F.
 Proof.

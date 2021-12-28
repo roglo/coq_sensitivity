@@ -303,6 +303,13 @@ rewrite rngl_mul_add_distr_r.
 rewrite (IHn e); [ easy | flia Hn ].
 Qed.
 
+Theorem rngl_summation_list_only_one : ∀ A g (a : A), (∑ (i ∈ [a]), g i = g a)%F.
+Proof.
+intros.
+unfold iter_list; cbn.
+apply rngl_add_0_l.
+Qed.
+
 Theorem rngl_summation_only_one : ∀ g n, (∑ (i = n, n), g i = g n)%F.
 Proof.
 intros g n.
@@ -565,6 +572,29 @@ f_equal.
 apply IHlen.
 Qed.
 
+Theorem rngl_summation_mul_summation : ∀ bi bj ei ej f g,
+  ((∑ (i = bi, ei), f i) * (∑ (j = bj, ej), g j))%F =
+  ∑ (i = bi, ei), (∑ (j = bj, ej), f i * g j).
+Proof.
+intros.
+unfold iter_seq.
+remember (S ei - bi) as leni eqn:Hi.
+remember (S ej - bj) as lenj eqn:Hj.
+clear ei ej Hi Hj.
+(* lemma for summation_list to do *)
+induction leni. {
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  now apply rngl_mul_0_l.
+}
+rewrite seq_S.
+do 2 rewrite rngl_summation_list_app.
+do 2 rewrite rngl_summation_list_only_one.
+rewrite rngl_mul_add_distr_r.
+rewrite IHleni; f_equal.
+now apply rngl_mul_summation_list_distr_l.
+Qed.
+
 Theorem rngl_summation_list_change_var :
   ∀ A B (f : A → B) (g : B → _) l,
   ∑ (i ∈ l), g (f i) = ∑ (j ∈ map f l), g j.
@@ -646,10 +676,13 @@ Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
 Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat.
+Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
+Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T}%type {ro rp} A%type (l1 l2)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat.
+Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.

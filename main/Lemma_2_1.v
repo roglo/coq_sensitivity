@@ -739,29 +739,46 @@ erewrite rngl_summation_eq_compat. 2: {
   cbn.
   easy.
 }
-cbn.
-(* ça peut peut-être le faire, ça... à voir... *)
-Search ((∑ (_ = _, _), _) * (∑ (_ = _, _), _))%F.
-Search ((∑ (_ ∈ _), _) * (∑ (_ ∈ _), _))%F.
-Theorem rngl_summation_mul_summation :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ bi bj ei ej f g,
-  ((∑ (i = bi, ei), f i) * (∑ (j = bj, ej), g j))%F =
-  ∑ (i = bi, ei), (∑ (j = bj, ej), f i * g j).
-Proof.
-intros Hos *.
-unfold iter_seq.
-remember (S ei - bi) as leni eqn:Hi.
-remember (S ej - bj) as lenj eqn:Hj.
-clear ei ej Hi Hj.
-(* lemma for summation_list to do *)
-revert bi bj lenj.
-induction leni; intros. {
-  rewrite rngl_summation_list_empty; [ symmetry | easy ].
-  rewrite rngl_summation_list_empty; [ symmetry | easy ].
-  now apply rngl_mul_0_l.
+rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+  easy.
 }
-Search (∑ (_ = _, _ + _), _).
+symmetry.
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+rewrite <- rngl_mul_assoc.
+f_equal.
+symmetry.
+rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+symmetry.
+Search (∏ (_ = _, _), (∑ (_ = _, _), _)).
+Search (∏ (_ ∈ _), (∑ (_ = _, _), _)).
+Search (∏ (_ ∈ _), (∑ (_ ∈ _), _)).
+Search (∏ (_ = _, _), (∑ (_ ∈ _), _)).
+Theorem rngl_product_summation_distr : ∀ bi bj ei ej f,
+  ∏ (i = bi, ei), (∑ (j = bj, ej), f i j) =
+  ∑ (j = bj, ej), ∏ (i = bi, ei), f i j.
+Proof.
+intros.
+unfold iter_seq.
+remember (S ei - bi) as leni.
+remember (S ej - bj) as lenj.
+clear ei ej Heqleni Heqlenj.
+induction leni; cbn. {
+  rewrite rngl_product_list_empty; [ | easy ].
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_product_list_empty; [ | easy ].
+    easy.
+  }
+  cbn.
+(* c'est donc faux : c'est bien ce que je pensais
+   donc faut revoir l'énoncé du théorème *)
+...
+rewrite rngl_product_summation_distr.
 ...
 intros.
 (* essai avec le déterminant défini par récurrence *)
