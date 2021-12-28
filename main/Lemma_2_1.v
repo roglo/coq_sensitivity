@@ -686,10 +686,37 @@ Proof. easy. Qed.
 
 Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
 Proof.
+(*
 intros.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
+(* essai avec les formes multilinéaires alternées...
+
+trouvé sur le web
+(https://les-mathematiques.net/vanilla/index.php?p=discussion/1339028#Comment_1339028)
+
+ Il vaut mieux éviter à tout prix la formule explicite. On peut
+ utiliser la méthode de Gauss, ou bien utiliser le fait que
+ l'application B↦det(AB) est multilinéaire alternée, et donc est un
+ multiple de B↦detB
+
+ Il faut d'abord avoir établi que l'espace des formes multilinéaires
+ alternées est de dimension 1 et que le déterminant est l'unique telle
+ forme qui vaut 1 en l'identité. Une fois ceci acquis, on en déduit
+ que det(AB)=αdetB où α est un scalaire qui ne dépend que de A. On le
+ trouve en prenant B=I, ce qui donne detA=αdetI=α.
+*)
+Check determinant_multilinear.
+Check determinant_alternating.
+...
+*)
+intros.
+(* essai avec le déterminant défini par permutations *)
+enough (Hif : in_charac_0_field).
+enough (Hasm : is_square_matrix A = true).
+enough (Hbsm : is_square_matrix B = true).
+enough (Habsm : is_square_matrix (A * B) = true).
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows.
 remember (mat_nrows A) as n eqn:Hra.
 symmetry in Hra.
@@ -698,9 +725,25 @@ rewrite Hrb.
 unfold det'.
 Require Import IterMul Signature PermutSeq.
 Show.
-(* ouais, chais pas *)
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite mat_el_mul.
+    rewrite square_matrix_ncols; [ | easy ].
+    rewrite Hra.
+    easy.
+    admit.
+    admit.
+  }
+  cbn.
+  easy.
+}
+cbn.
+(* ça peut peut-être le faire, ça... à voir... *)
 ...
 intros.
+(* essai avec le déterminant défini par récurrence *)
 cbn.
 rewrite List_map_seq_length.
 unfold det.
