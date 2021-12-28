@@ -724,7 +724,6 @@ enough (Hrb : mat_nrows B = n).
 rewrite Hrb.
 unfold det'.
 Require Import IterMul Signature PermutSeq.
-Show.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   erewrite rngl_product_eq_compat. 2: {
@@ -754,10 +753,19 @@ f_equal.
 symmetry.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
-Search (∏ (_ = _, _), (∑ (_ = _, _), _)).
-Search (∏ (_ ∈ _), (∑ (_ = _, _), _)).
-Search (∏ (_ ∈ _), (∑ (_ ∈ _), _)).
-Search (∏ (_ = _, _), (∑ (_ ∈ _), _)).
+Theorem rngl_product_summation_distr : ∀ m n f,
+  ∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
+  ∑ (k = 1, n ^ m), ∏ (j = 1, n), f (k - 1)%nat (j - 1)%nat.
+Proof.
+intros.
+unfold iter_seq.
+do 3 rewrite Nat_sub_succ_1.
+revert n.
+induction m; cbn; intros. {
+  rewrite rngl_product_list_empty; [ | easy ].
+  rewrite rngl_summation_list_only_one.
+(* ouais, enfin, c'est pas ça *)
+...
 Theorem rngl_product_summation_distr : ∀ bi bj ei ej f,
   ∏ (i = bi, ei), (∑ (j = bj, ej), f i j) =
   ∑ (j = bj, ej), ∏ (i = bi, ei), f i j.
