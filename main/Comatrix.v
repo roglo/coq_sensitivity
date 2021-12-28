@@ -3262,6 +3262,84 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ det ].
 rewrite <- rngl_mul_summation_distr_l; [ | now left ].
 f_equal.
+remember (mat_mul A B) as C eqn:HC.
+generalize HC; intros H.
+unfold mat_mul in H.
+rewrite Hcb, Hra in H.
+rewrite <- H, HC; clear C HC H.
+symmetry.
+(* lemma, perhaps? *)
+...
+(*1
+rewrite det_is_det_by_canon_permut.
+erewrite rngl_summation_eq_compat. 2: {
+  intros u (_, Hu).
+  rewrite det_is_det_by_canon_permut.
+  rewrite det_is_det_by_canon_permut.
+  do 2 rewrite mat_nrows_subm.
+  rewrite Hra, Hrb.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  assert (H : u < n) by flia Hu Hj.
+  apply Nat.ltb_lt in H; rewrite H.
+  now cbn.
+  admit.
+  admit.
+  admit.
+  admit.
+}
+cbn.
+rewrite map_length.
+rewrite <- map_butn.
+rewrite map_butn_seq.
+rewrite map_length.
+rewrite seq_length.
+rewrite Hra.
+apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
+apply Nat.ltb_lt in Hi.
+cbn.
+Print det'.
+...
+  ============================
+  det' (n - 1) (subm (A * B) i j) = ∑ (i0 = 0, n - 1), det' (n - 1) (subm A i i0) * det' (n - 1) (subm B i0 j)
+1*)
+cbn.
+rewrite map_length.
+rewrite <- map_butn.
+rewrite map_butn_seq.
+rewrite map_length.
+rewrite seq_length.
+rewrite Hra.
+apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
+apply Nat.ltb_lt in Hi.
+erewrite rngl_summation_eq_compat. 2: {
+  intros u (_, Hu).
+  do 2 rewrite map_length.
+  do 2 rewrite butn_length.
+  do 2 rewrite fold_mat_nrows.
+  rewrite Hra, Hrb.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  assert (H : u < n) by flia Hu Hj.
+  apply Nat.ltb_lt in H; rewrite H.
+  now cbn.
+}
+cbn.
+... à voir... c'est peut-être bon?
+  ============================
+  determinant_loop (n - 1) (subm (A * B) i j) =
+  ∑ (i0 = 0, n - 1), determinant_loop (n - 1) (subm A i i0) * determinant_loop (n - 1) (subm B i0 j)
+...
+rewrite subm_mat_swap_rows_circ; [ | easy ].
+destruct i; [ flia Hiz | ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+rewrite Nat_sub_succ_1.
+rewrite subm_fold_left_lt; [ | flia ].
+apply determinant_circular_shift_rows; [ easy | | ]. {
+  rewrite mat_nrows_subm.
+  apply Nat.ltb_lt in Hin; rewrite Hin; cbn.
+  apply Nat.ltb_lt in Hin; flia Hin.
+}
+apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
 ...
 
 End a.
