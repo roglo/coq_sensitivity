@@ -3189,25 +3189,78 @@ rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
-Theorem comatrix_mul : ∀ A B, com (A * B) = (com A * com B)%M.
+Theorem minus_one_pow_mul_same :
+  rngl_has_opp = true →
+  ∀ i, (minus_one_pow i * minus_one_pow i = 1)%F.
 Proof.
-intros.
+intros Hop *.
+unfold minus_one_pow.
+destruct (i mod 2); [ apply rngl_mul_1_l | ].
+now apply rngl_sqr_opp_1.
+Qed.
+
+Theorem comatrix_mul :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  ∀ n A B,
+  is_square_matrix A = true
+  → is_square_matrix B = true
+  → mat_nrows A = n
+  → mat_nrows B = n
+  → com (A * B) = (com A * com B)%M.
+Proof.
+intros Hic Hop * Hsma Hsmb Hra Hrb.
 unfold mat_mul; cbn.
+assert (Hca : mat_ncols A = n) by now rewrite square_matrix_ncols.
+assert (Hcb : mat_ncols B = n) by now rewrite square_matrix_ncols.
+rewrite Hra, Hca, Hcb.
 unfold com at 1; cbn - [ det ].
 do 2 rewrite List_map_seq_length.
+rewrite comatrix_ncols, Hcb.
 f_equal.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
-unfold mat_ncols at 2.
+unfold mat_ncols.
 cbn - [ det ].
 rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hi ].
 rewrite List_map_seq_length.
-rewrite comatrix_ncols.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 destruct Hj as (_, Hj); cbn in Hj.
+move j before i.
 symmetry.
+unfold mat_mul_el at 1.
+rewrite comatrix_ncols, Hca.
+unfold com at 1.
+unfold com at 1.
+cbn - [ det ].
+rewrite Hra, Hrb, Hca, Hcb.
+erewrite rngl_summation_eq_compat. 2: {
+  intros u Hu.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hu Hi ].
+  rewrite seq_nth; [ | easy ].
+  do 3 rewrite Nat.add_0_l.
+  rewrite rngl_mul_mul_swap with (n0 := minus_one_pow (i + u)); [ | easy ].
+  rewrite rngl_mul_assoc.
+  rewrite minus_one_pow_add_r; [ | easy ].
+  rewrite minus_one_pow_add_r; [ | easy ].
+  rewrite rngl_mul_assoc.
+  rewrite <- rngl_mul_assoc with (a := minus_one_pow i).
+  rewrite minus_one_pow_mul_same; [ | easy ].
+  rewrite rngl_mul_1_r.
+  rewrite <- minus_one_pow_add_r; [ | easy ].
+  rewrite <- rngl_mul_assoc.
+  easy.
+}
+cbn - [ det ].
+rewrite <- rngl_mul_summation_distr_l; [ | now left ].
+f_equal.
 ...
 
 End a.
