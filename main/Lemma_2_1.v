@@ -688,6 +688,13 @@ Theorem determinant_mul : ∀ A B,
   determinant (A * B) = (determinant A * determinant B)%F.
 Proof.
 intros.
+rewrite laplace_formula_on_rows with (i := 0).
+rewrite laplace_formula_on_rows with (i := 0).
+rewrite laplace_formula_on_rows with (i := 0).
+rewrite mat_mul_ncols.
+(* déjà, ce serait pas mal si on  prouvait que com(A*B)=com(A)*com(B) *)
+...
+intros.
 Check @laplace_formula_on_rows.
 (* https://www.youtube.com/watch?v=-CySi7uauCg *)
 ...
