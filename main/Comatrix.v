@@ -3255,6 +3255,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite minus_one_pow_mul_same; [ | easy ].
   rewrite rngl_mul_1_r.
   rewrite <- minus_one_pow_add_r; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite <- rngl_mul_assoc.
   easy.
 }
