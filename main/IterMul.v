@@ -222,6 +222,14 @@ intros b g k Hbk.
 now apply iter_shift.
 Qed.
 
+Theorem rngl_product_ub_mul_distr : ∀ a b f,
+  (∏ (i = 0, a + b), f i)%F = (∏ (i = 0, a), f i * ∏ (i = S a, a + b), f i)%F.
+Proof.
+intros.
+rewrite (rngl_product_split a); [ | flia ].
+now rewrite Nat.add_1_r.
+Qed.
+
 Theorem rngl_product_list_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_integral = true →
@@ -610,6 +618,46 @@ rewrite rngl_summation_mul_summation; [ | easy ].
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_comm.
 rewrite rngl_summation_ub_mul_distr.
+apply rngl_summation_eq_compat.
+intros i Hi.
+apply rngl_summation_eq_compat.
+intros j Hj.
+move j before i.
+symmetry.
+rewrite rngl_product_split with (j0 := m); [ | flia ].
+f_equal. 2: {
+  rewrite Nat.add_1_r.
+  rewrite rngl_product_only_one.
+  rewrite Nat_sub_succ_1.
+  f_equal.
+(* mouais, c'est pas sûr, ça *)
+(* faudrait que je teste sur des exemples,
+   mais ça pue *)
+...
+rewrite rngl_product_split_last; [ | flia ].
+rewrite <- (Nat.add_1_r m).
+
+...
+rewrite rngl_product_succ_succ.
+rewrite rngl_product_shift.
+...
+rewrite rngl_product_shift.
+symmetry.
+rewrite rngl_product_shift; [ | flia ].
+
+rewrite Nat_sub_succ_1.
+Search (∑ (_ = _, _ + _), _).
+Search (∏ (_ = _, _ + _), _).
+symmetry.
+rewrite <- (Nat.add_1_r m).
+...
+rewrite rngl_product_ub_mul_distr.
+...
+rewrite rngl_product_shift; [ | ].
+symmetry.
+Search (∑ (_ = _, S _), _).
+Search (∏ (_ = _, S _), _).
+rewrite rngl_product_succ_succ.
 ...
 (*
 Abort. Abort.
