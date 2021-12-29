@@ -770,13 +770,40 @@ k=7 222 111
 je compte en base n jusqu'à n^m
 ...
 *)
-... ouais, bon, faut voir, hein.
-Theorem rngl_product_summation_distr : ∀ a b m n f,
-  ∏ (i = a, m), (∑ (j = b, n), f i j) =
-  ∑ (k = 1, n ^ m),
-  ∏ (i = b, m), f i (a + (k - a) / (n ^ (i - 1)) mod n).
+Theorem rngl_product_summation_distr : ∀ a m n f,
+  ∏ (i = a, m), (∑ (j = 1, n), f i j) =
+  ∑ (k = 1, n ^ (m + 1 - a)),
+  ∏ (i = a, m), f i ((k - 1) / (n ^ (i - a)) mod n + 1)%nat.
 Proof.
 intros.
+(* bon d'après le test ci-dessous ; mais il faut que je généralise
+   j et k aussi en faisant démarrer j à une certaine valeur b *)
+...
+Abort. Abort.
+End a.
+Require Import RnglAlg.Nrl.
+Compute (let '(a,m,n):=(2,3,4) in let f i j := nth (j-1) (nth (i-a) [[5;7;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
+  ∏ (i = a, m), (∑ (j = 1, n), f i j) =
+  ∑ (k = 1, n ^ (m + 1 - a)),
+  ∏ (i = a, m), f i ((k - 1) / (n ^ (i - a)) mod n + 1)%nat).
+...
+Theorem rngl_product_summation_distr : ∀ m n f,
+  ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
+  ∑ (k = 1, n ^ m),
+  ∏ (i = 1, m), f i ((k - 1) / (n ^ (i - 1)) mod n + 1)%nat.
+Proof.
+intros.
+Abort. Abort.
+End a.
+Require Import RnglAlg.Nrl.
+Compute (let '(m,n):=(3,4) in let f i j := nth (j-1) (nth (i-1) [[5;2;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
+  ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
+  ∑ (k = 1, n ^ m),
+  ∏ (i = 1, m), f i ((k - 1) / (n ^ (i - 1)) mod n + 1)%nat).
+...
+g i j = f (i - 1) (j - 1)
+...
+*)
 ...
 (* bon, d'après les tests, mais pas assez général *)
 Theorem rngl_product_summation_distr : ∀ m n f,
