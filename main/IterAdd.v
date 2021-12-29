@@ -442,6 +442,61 @@ rewrite (rngl_summation_split a); [ | flia ].
 now rewrite Nat.add_1_r.
 Qed.
 
+Theorem rngl_summation_ub_mul_distr : ∀ a b f,
+  ∑ (k = 1, a * b), f k = ∑ (i = 1, a), ∑ (j = 1, b), f (b * (i - 1) + j)%nat.
+Proof.
+intros.
+destruct a. {
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_summation_empty; [ | easy ].
+  easy.
+}
+destruct b. {
+  rewrite Nat.mul_comm; cbn.
+  rewrite rngl_summation_empty; [ | easy ].
+  now symmetry; apply all_0_rngl_summation_0.
+}
+rewrite rngl_summation_shift; [ | cbn; flia ].
+symmetry.
+rewrite rngl_summation_shift; [ | cbn; flia ].
+rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite rngl_summation_shift; [ | flia ].
+  rewrite Nat_sub_succ_1.
+  remember (S b) as b'; cbn; subst b'.
+  easy.
+}
+symmetry.
+induction a. {
+  cbn.
+  rewrite Nat.add_0_r, Nat.sub_0_r.
+  rewrite rngl_summation_only_one.
+  rewrite Nat.add_0_l.
+  now rewrite Nat.mul_0_r.
+}
+rewrite Nat.mul_succ_l.
+rewrite Nat.add_sub_swap; [ | cbn; flia ].
+rewrite rngl_summation_ub_add_distr.
+rewrite IHa.
+symmetry.
+rewrite <- Nat.add_1_r at 1.
+rewrite rngl_summation_ub_add_distr.
+f_equal.
+rewrite Nat.add_1_r at 1.
+rewrite rngl_summation_only_one.
+replace (S (S a * S b - 1)) with (S a * S b) by (cbn; flia).
+replace (S a * S b - 1 + S b) with (S a * S b + b) by (cbn; flia).
+symmetry.
+rewrite rngl_summation_shift; [ | flia ].
+rewrite Nat.add_sub_swap; [ | easy ].
+rewrite Nat.sub_diag, Nat.add_0_l.
+apply rngl_summation_eq_compat.
+intros i Hi.
+f_equal; flia.
+Qed.
+
 Theorem rngl_summation_summation_distr : ∀ a b f,
   (∑ (i = 0, a), ∑ (j = 0, b), f i j)%F =
   (∑ (i = 0, (S a * S b - 1)%nat), f (i / S b)%nat (i mod S b))%F.
@@ -692,3 +747,4 @@ Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
 Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.
 Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
 Arguments rngl_summation_summation_exch' {T}%type {ro rp} _ (k l)%nat.
+Arguments rngl_summation_ub_mul_distr {T}%type {ro rp} (a b)%nat.

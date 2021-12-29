@@ -532,6 +532,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(*
 Theorem rngl_product_summation_distr :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ m n f,
@@ -568,6 +569,7 @@ Compute (let '(m,n):=(3,4) in let f i j := nth (j-1) (nth (i-1) [[5;2;1;2];[3;7;
   ∏ (i = 0, m - 1), f (S i) (S ((k / (n ^ i)) mod n))
 ).
 ...
+*)
 
 (*
 Example toto : ∀ (a11 a12 a21 a22 a23 a31 a32 : nat),
@@ -605,7 +607,16 @@ rewrite Nat.add_1_r.
 rewrite rngl_product_only_one.
 rewrite IHm.
 rewrite rngl_summation_mul_summation; [ | easy ].
-(**)
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+rewrite rngl_summation_ub_mul_distr.
+...
+(*
+Abort. Abort.
+End a.
+Require Import RnglAlg.Nrl.
+Compute (let '(a,b):=(3,4) in let f i := nth (i-1) [5;2;0;2;3;7;3;3;5;1;2;4] 10 in
+  ∑ (k = 1, a * b), f k = ∑ (i = 1, a), ∑ (j = 1, b), f (b * (i - 1) + j)%nat).
 ...
 set (g := λ i k, f i (S (((k - 1) / n ^ (i - 1)) mod n))).
 erewrite rngl_summation_eq_compat. 2: {
