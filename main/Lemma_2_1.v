@@ -773,9 +773,19 @@ je compte en base n jusqu'à n^m
 Theorem rngl_product_summation_distr : ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
   ∑ (k = 1, n ^ m),
-  ∏ (i = 1, m), f (i - 1)%nat (k / ((n - 1) ^ i) mod (n - 1)).
+  ∏ (i = 1, m), f (i - 1)%nat ((k - 1) / (n ^ (i - 1)) mod n).
 Proof.
 intros.
+(*
+Abort. Abort.
+End a.
+Require Import RnglAlg.Nrl.
+Compute 3.
+Compute (let '(m,n):=(3,4) in let f i j := nth j (nth i [[5;2;1;2];[3;7;3;3];[5;6;2;4]] []) 0 in (∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
+  ∑ (k = 1, n ^ m),
+  ∏ (i = 1, m), f (i - 1)%nat ((k - 1) / (n ^ (i - 1)) mod n))).
+...
+*)
 unfold iter_seq.
 do 3 rewrite Nat_sub_succ_1.
 revert n.
