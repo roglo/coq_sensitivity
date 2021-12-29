@@ -549,86 +549,79 @@ k=7 222 111
 je compte en base n jusqu'à n^m
 ...
 *)
-Theorem rngl_product_summation_distr : ∀ a b m n f,
-  ∏ (i = a, m), (∑ (j = b, n), f i j) =
-  ∑ (k = 0, (n + 1 - b) ^ (m + 1 - a) - 1),
-  ∏ (i = a, m), f i (b + k / ((n + 1 - b) ^ (i - a)) mod (n + 1 - b))%nat.
-Proof.
-intros.
-unfold iter_seq.
-rewrite Nat.sub_0_r.
-remember (seq a (S m - a)) as la eqn:Hla.
-remember (seq b (S n - b)) as lb eqn:Hlb.
-move lb before la.
-destruct (le_dec b n) as [Hbn| Hbn]. {
-  assert (Hnlb : n = last lb 0). {
-    subst lb.
-    rewrite Nat.sub_succ_l; [ | easy ].
-    rewrite seq_S.
-    rewrite last_last.
-    flia Hbn.
-  }
-  assert (Hblb : b = hd 0 lb). {
-    subst lb.
-    symmetry; apply List_seq_hd.
-    flia Hbn.
-  }
-  subst n b.
-...
-Abort.
-End a.
-Require Import RnglAlg.Nrl.
-Compute (let '(a,b,m,n):=(1,2,3,4) in let f i j := nth (j-b) (nth (i-a) [[5;7;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
-  ∏ (i = a, m), (∑ (j = b, n), f i j) =
-  ∑ (k = 0, (n + 1 - b) ^ (m + 1 - a) - 1),
-  ∏ (i = a, m), f i (b + k / ((n + 1 - b) ^ (i - a)) mod (n + 1 - b))%nat
-).
-...
-Compute (let '(a,b,m,n):=(1,2,3,4) in let f i j := nth (j-b) (nth (i-a) [[5;7;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
-  ∏ (i = a, m), (∑ (j = b, n), f i j) =
-  ∑ (k = b, b + (n + 1 - b) ^ (m + 1 - a) - 1),
-  ∏ (i = a, m), f i (b + (k - b) / ((n + 1 - b) ^ (i - a)) mod (n + 1 - b))%nat
-).
-...
-Compute (let '(a,b,m,n):=(2,3,3,4) in let f i j := nth (j-b) (nth (i-a) [[5;7;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
-  ∏ (i = a, m), (∑ (j = b, b + n - 1), f i j) =
-  ∑ (k = b, b + n ^ (m + 1 - a) - 1),
-  ∏ (i = a, m), f i (b + (k - b) / (n ^ (i - a)) mod n)%nat
-).
-...
-*)
-Theorem rngl_product_summation_distr : ∀ a m n f,
-  ∏ (i = a, m), (∑ (j = 1, n), f i j) =
-  ∑ (k = 1, n ^ (m + 1 - a)),
-  ∏ (i = a, m), f i ((k - 1) / (n ^ (i - a)) mod n + 1)%nat.
-Proof.
-intros.
-(* bon d'après le test ci-dessous ; mais il faut que je généralise
-   j et k aussi en faisant démarrer j à une certaine valeur b *)
-Search ((_ * _ + _) / _).
-...
-1 ≤ k ≤ n ^ (m + 1 - a)
-k - 1 ≤ n ^ (m + 1 - a) - 1
-(k - 1) / (n ^ (i - a)) ≤ ((n ^ (i - a) * n ^ (m + 1 - i)) - 1) / (n ^ (i - a))
-(k - 1) / (n ^ (i - a)) ≤ n ^ (m + 1 - i) - 1
-(k - 1) / (n ^ (i - a)) mod n ≤ n - 1
-(k - 1) / (n ^ (i - a)) mod n + 1 ≤ n
-...
-Abort. Abort.
-End a.
-Require Import RnglAlg.Nrl.
-Compute (let '(a,m,n):=(2,3,4) in let f i j := nth (j-1) (nth (i-a) [[5;7;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
-  ∏ (i = a, m), (∑ (j = 1, n), f i j) =
-  ∑ (k = 1, n ^ (m + 1 - a)),
-  ∏ (i = a, m), f i ((k - 1) / (n ^ (i - a)) mod n + 1)%nat).
-...
-Theorem rngl_product_summation_distr : ∀ m n f,
+Theorem rngl_product_summation_distr :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
   ∑ (k = 1, n ^ m),
-  ∏ (i = 1, m), f i ((k - 1) / (n ^ (i - 1)) mod n + 1)%nat.
+  ∏ (i = 1, m), f i (S ((k - 1) / (n ^ (i - 1)) mod n)).
 Proof.
-intros.
-Abort. Abort.
+intros Hos *.
+revert n.
+induction m; intros. {
+  rewrite rngl_product_empty; [ cbn | easy ].
+  rewrite rngl_summation_only_one.
+  now symmetry; apply rngl_product_list_empty.
+}
+rewrite rngl_product_split with (j := m); [ | flia ].
+rewrite Nat.add_1_r.
+rewrite rngl_product_only_one.
+rewrite IHm.
+rewrite rngl_summation_mul_summation; [ | easy ].
+(**)
+...
+set (g := λ i k, f i (S (((k - 1) / n ^ (i - 1)) mod n))).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    erewrite rngl_product_eq_compat. 2: {
+      intros i Hi.
+      fold (g i k).
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ Nat.pow ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    fold (g i k).
+    easy.
+  }
+  easy.
+}
+cbn - [ Nat.pow ].
+...
+rewrite rngl_product_split_last; [ | flia ].
+...
+rewrite seq_S.
+About rngl_product_list_app.
+Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
+rewrite rngl_product_list_app.
+About rngl_product_list_only_one.
+Arguments rngl_product_list_only_one {T}%type {ro rp} A%type.
+rewrite rngl_product_list_only_one.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_list_app.
+  rewrite rngl_product_list_only_one.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+rewrite IHm.
+...
 End a.
 Require Import RnglAlg.Nrl.
 Compute (let '(m,n):=(3,4) in let f i j := nth (j-1) (nth (i-1) [[5;2;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
