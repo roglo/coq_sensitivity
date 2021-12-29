@@ -210,6 +210,16 @@ intros b g k Hbk.
 now apply iter_shift.
 Qed.
 
+Theorem rngl_summation_rshift : ∀ b e f,
+  ∑ (i = b, e), f i = ∑ (i = S b, S e), f (i - 1)%nat.
+Proof.
+intros.
+rewrite rngl_summation_succ_succ.
+apply rngl_summation_eq_compat.
+intros i Hi.
+now rewrite Nat_sub_succ_1.
+Qed.
+
 Theorem rngl_opp_summation :
   rngl_has_opp = true →
   ∀ b e f, ((- ∑ (i = b, e), f i) = ∑ (i = b, e), (- f i))%F.
