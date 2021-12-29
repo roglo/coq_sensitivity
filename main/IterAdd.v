@@ -303,7 +303,8 @@ rewrite rngl_mul_add_distr_r.
 rewrite (IHn e); [ easy | flia Hn ].
 Qed.
 
-Theorem rngl_summation_list_only_one : ∀ A g (a : A), (∑ (i ∈ [a]), g i = g a)%F.
+Theorem rngl_summation_list_only_one : ∀ A g (a : A),
+  (∑ (i ∈ [a]), g i = g a)%F.
 Proof.
 intros.
 unfold iter_list; cbn.

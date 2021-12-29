@@ -753,6 +753,7 @@ f_equal.
 symmetry.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
+(*
 Example toto : ∀ (a11 a12 a21 a22 a23 a31 a32 : nat),
   (a11 + a12) * (a21 + a22) * (a31 + a32) = 42.
 intros.
@@ -768,38 +769,43 @@ k=6 221 110
 k=7 222 111
 je compte en base n jusqu'à n^m
 ...
+*)
 Theorem rngl_product_summation_distr : ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
-  ∑ (k = 1, n ^ m), ∏ (i = 1, m), f (i - 1)%nat k???.
+  ∑ (k = 1, n ^ m),
+  ∏ (i = 1, m), f (i - 1)%nat (k / ((n - 1) ^ i) mod (n - 1)).
 Proof.
 intros.
 unfold iter_seq.
 do 3 rewrite Nat_sub_succ_1.
 revert n.
-induction m; cbn; intros. {
-  rewrite rngl_product_list_empty; [ | easy ].
+induction m; intros. {
+  rewrite rngl_product_list_empty; [ cbn | easy ].
   rewrite rngl_summation_list_only_one.
-(* ouais, enfin, c'est pas ça *)
-...
-Theorem rngl_product_summation_distr : ∀ bi bj ei ej f,
-  ∏ (i = bi, ei), (∑ (j = bj, ej), f i j) =
-  ∑ (j = bj, ej), ∏ (i = bi, ei), f i j.
-Proof.
-intros.
-unfold iter_seq.
-remember (S ei - bi) as leni.
-remember (S ej - bj) as lenj.
-clear ei ej Heqleni Heqlenj.
-induction leni; cbn. {
-  rewrite rngl_product_list_empty; [ | easy ].
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros i Hi.
-    rewrite rngl_product_list_empty; [ | easy ].
-    easy.
-  }
-  cbn.
-(* c'est donc faux : c'est bien ce que je pensais
-   donc faut revoir l'énoncé du théorème *)
+  now symmetry; apply rngl_product_list_empty.
+}
+rewrite seq_S.
+About rngl_product_list_app.
+Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
+rewrite rngl_product_list_app.
+About rngl_product_list_only_one.
+Arguments rngl_product_list_only_one {T}%type {ro rp} A%type.
+rewrite rngl_product_list_only_one.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+rewrite Nat.pow_succ_r'.
+rewrite Nat.mul_comm.
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_list_app.
+  rewrite rngl_product_list_only_one.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+rewrite IHm.
 ...
 rewrite rngl_product_summation_distr.
 ...

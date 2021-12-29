@@ -488,6 +488,14 @@ destruct H1 as [H1| H1]; rewrite H1. {
 }
 Qed.
 
+Theorem rngl_product_list_only_one : ∀ A g (a : A),
+  (∏ (i ∈ [a]), g i = g a)%F.
+Proof.
+intros.
+unfold iter_list; cbn.
+apply rngl_mul_1_l.
+Qed.
+
 Theorem rngl_product_only_one : ∀ g n, (∏ (i = n, n), g i = g n)%F.
 Proof.
 intros g n.
