@@ -536,8 +536,9 @@ Theorem rngl_product_summation_distr :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-  ∑ (k = 0, n ^ m - 1),
-  ∏ (i = 0, m - 1), f (S i) (S ((k / (n ^ i)) mod n)).
+  ∑ (u = 0, n ^ (m - 1) - 1),
+  ∑ (v = n * u, n * S u - 1),
+  ∏ (i = 0, m - 1), f (S i) (S ((v / (n ^ i)) mod n)).
 Proof.
 intros Hos *.
 Abort.
@@ -545,10 +546,9 @@ End a.
 Require Import RnglAlg.Nrl.
 Compute (let '(m,n):=(3,4) in let f i j := nth (j-1) (nth (i-1) [[5;2;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
   ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-  ∑ (u = 0, m - 1),
-  ∑ (v = n ^ u, n ^ S u - 1),
-  let k := v - 1 in
-  ∏ (i = 0, m - 1), f (S i) (S ((k / (n ^ i)) mod n))
+  ∑ (u = 0, n ^ (m - 1) - 1),
+  ∑ (v = n * u, n * S u - 1),
+  ∏ (i = 0, m - 1), f (S i) (S ((v / (n ^ i)) mod n))
 ).
 ...
 Theorem rngl_product_summation_distr :
