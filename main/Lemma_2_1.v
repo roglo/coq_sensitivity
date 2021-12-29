@@ -770,6 +770,15 @@ k=7 222 111
 je compte en base n jusqu'à n^m
 ...
 *)
+... ouais, bon, faut voir, hein.
+Theorem rngl_product_summation_distr : ∀ a b m n f,
+  ∏ (i = a, m), (∑ (j = b, n), f i j) =
+  ∑ (k = 1, n ^ m),
+  ∏ (i = b, m), f i (a + (k - a) / (n ^ (i - 1)) mod n).
+Proof.
+intros.
+...
+(* bon, d'après les tests, mais pas assez général *)
 Theorem rngl_product_summation_distr : ∀ m n f,
   ∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
   ∑ (k = 1, n ^ m),
@@ -781,7 +790,7 @@ Abort. Abort.
 End a.
 Require Import RnglAlg.Nrl.
 Compute 3.
-Compute (let '(m,n):=(3,4) in let f i j := nth j (nth i [[5;2;1;2];[3;7;3;3];[5;6;2;4]] []) 0 in (∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
+Compute (let '(m,n):=(3,4) in let f i j := nth j (nth i [[5;2;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in (∏ (i = 1, m), (∑ (j = 1, n), f (i - 1)%nat (j - 1)%nat) =
   ∑ (k = 1, n ^ m),
   ∏ (i = 1, m), f (i - 1)%nat ((k - 1) / (n ^ (i - 1)) mod n))).
 ...
