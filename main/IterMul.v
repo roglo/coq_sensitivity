@@ -568,7 +568,6 @@ rewrite Nat.add_1_r.
 rewrite rngl_product_only_one.
 rewrite IHm.
 rewrite rngl_summation_mul_summation; [ | easy ].
-(**)
 symmetry.
 rewrite Nat.pow_succ_r'.
 rewrite Nat.mul_comm.
@@ -581,107 +580,48 @@ rewrite <- Nat.sub_succ_l. 2: {
 }
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_ub_mul_distr.
-...
-rewrite rngl_summation_ub_mul_distr.
+rewrite rngl_summation_shift. 2: {
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
 apply rngl_summation_eq_compat.
 intros i Hi.
+rewrite rngl_summation_shift; [ | flia ].
+rewrite Nat_sub_succ_1.
 apply rngl_summation_eq_compat.
 intros j Hj.
 move j before i.
-symmetry.
 rewrite rngl_product_split with (j0 := m); [ | flia ].
 f_equal. 2: {
   rewrite Nat.add_1_r.
   rewrite rngl_product_only_one.
   f_equal.
+  rewrite (Nat.add_comm 1 i), Nat.add_sub.
   rewrite Nat.sub_diag.
   rewrite Nat.pow_0_r.
   rewrite Nat.div_1_r.
+  rewrite <- Nat.add_sub_assoc; [ | flia ].
+  rewrite (Nat.add_comm 1 j), Nat.add_sub.
   rewrite Nat.mul_comm.
-  rewrite <- Nat.add_sub_assoc; [ | easy ].
   rewrite Nat_mod_add_l_mul_r; [ | flia Hj ].
-  rewrite Nat.mod_small; [ | flia Hj ].
+  apply Nat.mod_small.
   flia Hj.
 }
 apply rngl_product_eq_compat.
 intros k Hk.
 f_equal.
 f_equal.
+rewrite (Nat.add_comm 1 i), Nat.add_sub.
+rewrite <- Nat.add_sub_assoc; [ | flia ].
+rewrite (Nat.add_comm 1 j), Nat.add_sub.
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite Nat.pow_succ_r; [ | easy ].
 rewrite <- Nat.div_div; [ | flia Hj | ]. 2: {
   apply Nat.pow_nonzero; flia Hj.
 }
-rewrite <- Nat.add_sub_assoc; [ | easy ].
 rewrite Nat.mul_comm.
 rewrite Nat.div_add_l; [ | flia Hj ].
-rewrite Nat.div_small with (a := j - 1); [ | flia Hj ].
-now rewrite Nat.add_0_r.
-Qed.
-...
-End a.
-Require Import RnglAlg.Nrl.
-Compute (let '(m,n):=(2,3) in let f := λ i j, nth j (nth i [[5;2;1;2];[3;7;3;3];[5;6;2;4]] [42]) 42 in
-  ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
-  ∑ (k = 0, S n ^ S m - 1),
-  ∏ (i = 0, m), f i (k / (S n ^ (m - i)) mod S n)
-).
-...
-Theorem rngl_product_summation_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ m n f,
-  ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-  ∑ (k = 1, n ^ m),
-  ∏ (i = 1, m), f i (S ((k - 1) / (n ^ (m - i)) mod n)).
-Proof.
-intros Hos *.
-revert n.
-induction m; intros. {
-  rewrite rngl_product_empty; [ cbn | easy ].
-  rewrite rngl_summation_only_one.
-  now symmetry; apply rngl_product_list_empty.
-}
-rewrite rngl_product_split with (j := m); [ | flia ].
-rewrite Nat.add_1_r.
-rewrite rngl_product_only_one.
-rewrite IHm.
-rewrite rngl_summation_mul_summation; [ | easy ].
-rewrite Nat.pow_succ_r'.
-rewrite Nat.mul_comm.
-rewrite rngl_summation_ub_mul_distr.
-apply rngl_summation_eq_compat.
-intros i Hi.
-apply rngl_summation_eq_compat.
-intros j Hj.
-move j before i.
-symmetry.
-rewrite rngl_product_split with (j0 := m); [ | flia ].
-f_equal. 2: {
-  rewrite Nat.add_1_r.
-  rewrite rngl_product_only_one.
-  f_equal.
-  rewrite Nat.sub_diag.
-  rewrite Nat.pow_0_r.
-  rewrite Nat.div_1_r.
-  rewrite Nat.mul_comm.
-  rewrite <- Nat.add_sub_assoc; [ | easy ].
-  rewrite Nat_mod_add_l_mul_r; [ | flia Hj ].
-  rewrite Nat.mod_small; [ | flia Hj ].
-  flia Hj.
-}
-apply rngl_product_eq_compat.
-intros k Hk.
-f_equal.
-f_equal.
-rewrite Nat.sub_succ_l; [ | easy ].
-rewrite Nat.pow_succ_r; [ | easy ].
-rewrite <- Nat.div_div; [ | flia Hj | ]. 2: {
-  apply Nat.pow_nonzero; flia Hj.
-}
-rewrite <- Nat.add_sub_assoc; [ | easy ].
-rewrite Nat.mul_comm.
-rewrite Nat.div_add_l; [ | flia Hj ].
-rewrite Nat.div_small with (a := j - 1); [ | flia Hj ].
+rewrite Nat.div_small with (a := j); [ | flia Hj ].
 now rewrite Nat.add_0_r.
 Qed.
 

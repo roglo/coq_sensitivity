@@ -753,12 +753,8 @@ f_equal.
 symmetry.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros j Hj.
-...
-Search (∑ (_ = 0, _), _).
-rewrite <- rngl_summation_shift.
+rewrite rngl_product_shift.
+rewrite rngl_product_summation_distr.
 ...
 rewrite rngl_product_summation_distr.
 ...
