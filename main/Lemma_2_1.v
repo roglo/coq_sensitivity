@@ -790,7 +790,16 @@ cbn.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+  rewrite rngl_mul_assoc.
+  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+  rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
   rewrite rngl_mul_comm; [ | now destruct Hif ].
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros k Hk.
+    rewrite Nat.add_comm, Nat.add_sub.
+    easy.
+  }
   easy.
 }
 symmetry.
