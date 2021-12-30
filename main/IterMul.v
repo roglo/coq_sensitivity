@@ -626,3 +626,5 @@ now rewrite Nat.add_0_r.
 Qed.
 
 End a.
+
+Arguments rngl_product_summation_distr {T}%type {ro rp} _ (m n)%nat.

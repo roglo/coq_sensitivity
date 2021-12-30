@@ -684,9 +684,9 @@ Theorem fold_vect_dot_mul' : ∀ U V,
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
+(*
 Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
 Proof.
-(*
 intros.
 (* essai avec les formes multilinéaires alternées...
 
@@ -708,32 +708,53 @@ Check determinant_multilinear.
 Check determinant_alternating.
 ...
 *)
-intros.
+
+Theorem determinant_mul : in_charac_0_field →
+  ∀ A B,
+  is_square_matrix A = true
+  → is_square_matrix B = true
+  → mat_nrows A = mat_nrows B
+  → det (A * B) = (det A * det B)%F.
+Proof.
+intros Hif * Hasm Hbsm Hrab.
 (* essai avec le déterminant défini par permutations *)
-enough (Hif : in_charac_0_field).
-enough (Hasm : is_square_matrix A = true).
-enough (Hbsm : is_square_matrix B = true).
-enough (Habsm : is_square_matrix (A * B) = true).
+assert (Habsm : is_square_matrix (A * B) = true). {
+  now apply squ_mat_mul_is_squ.
+}
+remember (mat_nrows A) as n eqn:Hra.
+rename Hrab into Hrb.
+symmetry in Hra, Hrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  unfold det; cbn.
+  move Hnz at top; subst n; cbn.
+  rewrite Hra, Hrb; cbn.
+  symmetry; apply rngl_mul_1_l.
+}
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows.
-remember (mat_nrows A) as n eqn:Hra.
-symmetry in Hra.
-enough (Hrb : mat_nrows B = n).
-rewrite Hrb.
 unfold det'.
+rewrite Hra, Hrb.
 Require Import IterMul Signature PermutSeq.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite mat_el_mul.
+    rewrite mat_el_mul; cycle 1. {
+      rewrite mat_mul_nrows, Hra.
+      flia Hj.
+    } {
+      rewrite mat_mul_ncols; [ | rewrite Hra; flia Hj ].
+      rewrite square_matrix_ncols; [ | easy ].
+      rewrite Hrb.
+      apply canon_sym_gr_list_ub; [ | flia Hj ].
+      specialize (fact_neq_0 n) as Hfnz.
+      flia Hi Hfnz.
+    }
     rewrite square_matrix_ncols; [ | easy ].
     rewrite Hra.
     easy.
-    admit.
-    admit.
   }
   cbn.
   easy.
@@ -753,10 +774,27 @@ f_equal.
 symmetry.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 symmetry.
-rewrite rngl_product_shift.
-rewrite rngl_product_summation_distr.
-...
-rewrite rngl_product_summation_distr.
+rewrite rngl_product_shift; [ | flia Hnz ].
+rewrite rngl_product_summation_distr; [ | destruct Hif; now left ].
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  erewrite rngl_product_eq_compat. 2: {
+    intros k Hk.
+    now rewrite (Nat.add_comm 1 k), Nat.add_sub.
+  }
+  easy.
+}
+cbn.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  easy.
+}
+symmetry.
+(* bizarre: n^n termes vs n! termes *)
 ...
 intros.
 (* essai avec le déterminant défini par récurrence *)

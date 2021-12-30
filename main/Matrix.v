@@ -2499,6 +2499,42 @@ split. {
 }
 Qed.
 
+Theorem squ_mat_mul_is_squ : ∀ (MA MB : matrix T),
+  is_square_matrix MA = true
+  → is_square_matrix MB = true
+  → mat_nrows MA = mat_nrows MB
+  → is_square_matrix (MA * MB) = true.
+Proof.
+intros * Ha Hb Hrab.
+apply is_scm_mat_iff; cbn.
+(*
+apply is_scm_mat_iff in Ha.
+apply is_scm_mat_iff in Hb.
+destruct Ha as (Hcra & Hca).
+destruct Hb as (Hcrb & Hcb).
+*)
+rewrite List_map_seq_length.
+rewrite (square_matrix_ncols MB); [ | easy ].
+split. {
+  intros Hcc.
+  unfold mat_ncols in Hcc; cbn in Hcc.
+  rewrite square_matrix_ncols in Hcc; [ | easy ].
+  rewrite <- Hrab in Hcc.
+  apply length_zero_iff_nil in Hcc.
+  destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hrz| Hrz]; [ easy | ].
+  apply Nat.neq_0_lt_0 in Hrz.
+  rewrite (List_map_hd 0) in Hcc; [ | now rewrite seq_length ].
+  apply map_eq_nil in Hcc.
+  now apply List_seq_eq_nil in Hcc.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Hil & Hi).
+  subst l.
+  now rewrite List_map_seq_length.
+}
+Qed.
+
 Theorem square_matrix_add_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix (sm_mat MA + sm_mat MB)%M = true.
 Proof.
@@ -2513,43 +2549,15 @@ Theorem square_matrix_mul_is_square : ∀ n (MA MB : square_matrix n T),
   is_square_matrix (sm_mat MA * sm_mat MB) = true.
 Proof.
 intros.
-apply is_scm_mat_iff.
-split. {
-  intros Hc; cbn.
-  rewrite List_map_seq_length.
-  destruct MA as (MA & Ha).
-  destruct MB as (MB & Hb).
-  move MB before MA; cbn in Hc |-*.
-  apply Bool.andb_true_iff in Ha, Hb.
-  destruct Ha as (Hra, Ha).
-  destruct Hb as (Hrb, Hb).
-  move Hrb before Hra.
-  apply Nat.eqb_eq in Hra, Hrb.
-  apply is_scm_mat_iff in Ha.
-  apply is_scm_mat_iff in Hb.
-  destruct Ha as (Hcra & Hca).
-  destruct Hb as (Hcrb & Hcb).
-  move Hcrb before Hcra.
-  unfold mat_ncols in Hc; cbn in Hc.
-  apply length_zero_iff_nil in Hc.
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-  apply Nat.neq_0_lt_0 in Hnz.
-  rewrite (List_map_hd 0) in Hc. 2: {
-    now rewrite seq_length, Hra.
-  }
-  apply map_eq_nil in Hc.
-  apply List_seq_eq_nil in Hc.
-  apply Hcrb in Hc.
-  now rewrite <- Hrb, Hc in Hnz.
-} {
-  intros l Hl.
-  unfold mat_nrows; cbn.
-  apply in_map_iff in Hl.
-  destruct Hl as (i & Him & Hl).
-  subst l.
-  do 2 rewrite List_map_seq_length.
-  now rewrite squ_mat_nrows, squ_mat_ncols.
-}
+destruct MA as (MA & Ha).
+destruct MB as (MB & Hb); cbn.
+apply Bool.andb_true_iff in Ha, Hb.
+apply squ_mat_mul_is_squ; [ easy | easy | ].
+destruct Ha as (Ha, _).
+destruct Hb as (Hb, _).
+apply Nat.eqb_eq in Ha.
+apply Nat.eqb_eq in Hb.
+congruence.
 Qed.
 
 Theorem square_matrix_opp_is_square : ∀ n (M : square_matrix n T),
