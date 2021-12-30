@@ -792,6 +792,20 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 symmetry.
+(*
+Noting
+   ε(i) = signature of the i-th permutation in the canonic symmetric group
+   σ(i,j) = j-th element of the i-th permutation in the canonic sym gr
+We have to prove that
+  ∑ (i = 0, n!-1), ε(i) ∏ (j = 0, n-1), ∑ (k = 0, n-1), a(j,k) * b(k,σ(i,j)) =
+  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), a(j,σ(i,j)) *
+  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), b(j,σ(i,j))
+The problem is that the lhs contains
+  n!*n^n terms
+But the rhs contains
+  n!*n! terms
+Some terms of the lhs must cancel each other. But which ones?
+*)
 ...1
 rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
 symmetry.
