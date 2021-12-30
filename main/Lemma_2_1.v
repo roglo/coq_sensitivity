@@ -777,7 +777,26 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite rngl_product_shift; [ | flia Hnz ].
+    erewrite rngl_product_eq_compat. 2: {
+      intros k (_, Hk).
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    easy.
+  }
+  easy.
+}
+symmetry.
 ...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
