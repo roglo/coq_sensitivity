@@ -735,8 +735,8 @@ rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows.
 unfold det'.
-rewrite Hra, Hrb.
 Require Import IterMul Signature PermutSeq.
+rewrite Hra, Hrb.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   erewrite rngl_product_eq_compat. 2: {
