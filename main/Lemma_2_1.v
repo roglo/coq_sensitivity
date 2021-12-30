@@ -797,6 +797,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+erewrite <- rngl_mul_summation_distr_r; [ | now destruct Hif; left ].
 ...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
