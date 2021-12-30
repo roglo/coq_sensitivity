@@ -691,16 +691,35 @@ Proof. easy. Qed.
 
 (* det(AB)= ∑ 1≤j1<j2<⋯<jm≤n det(Aj1j2…jm)det(Bj1j2…jm)
    where A is a m×n matrix, B a n×m matrix
-   and Aj1j2…jm denotes the m×m matrix consisting of columns j1,j2,…,jm of A. *)
+   Aj1j2…jm denotes the m×m matrix consisting of columns j1,j2,…,jm of A.
+   Bj1j2…jm denotes the m×m matrix consisting of rows j1,j2,…,jm of B. *)
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
-Definition ordered_tuples (m n : nat) := [[3]].
+Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
+  match m with
+  | 0 => []
+  | 1 => [[0]]
+  | S m' =>
+      map (λ l, 0 :: map (Nat.add 1) l) (ordered_tuples m' n) ++
+      map (λ l, 1 :: map (Nat.add 2) l) (ordered_tuples m' n) ++
+      map (λ l, 2 :: map (Nat.add 3) l) (ordered_tuples m' n)
+  end.
+
+Compute (ordered_tuples 1 5).
+Compute (ordered_tuples 2 5).
+Compute (ordered_tuples 3 5).
 
 ...
 
-(* submatrix of A from the ordered tuple jl *)
+Definition ordered_tuples (m n : nat) := [[3]].
+
+(* submatrix of A with list cols jl *)
 (* phony definition for the moment... *)
-Definition subm_ord_tup (jl : list nat) (A : matrix T) := A.
+Definition mat_with_cols (jl : list nat) (A : matrix T) := A.
+
+(* submatrix of B with list rows jl *)
+(* phony definition for the moment... *)
+Definition mat_with_rows (jl : list nat) (B : matrix T) := B.
 
 Theorem cauchy_binet_formula : ∀ m n A B,
   is_correct_matrix A = true
@@ -711,7 +730,7 @@ Theorem cauchy_binet_formula : ∀ m n A B,
   → mat_ncols B = m
   → det (A * B) =
      ∑ (jl ∈ ordered_tuples m n),
-     det (subm_ord_tup jl A) * det (subm_ord_tup jl B).
+     det (mat_with_cols jl A) * det (mat_with_rows jl B).
 
 ...
 
