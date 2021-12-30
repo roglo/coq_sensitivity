@@ -767,6 +767,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 rewrite <- rngl_mul_assoc.
@@ -804,6 +805,43 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 symmetry.
 (* bizarre: n^n termes vs n! termes *)
+destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
+  move Hn2 at top; subst n.
+  cbn - [ "/" "mod" Nat.pow "-" canon_sym_gr_list ].
+  replace (2 - 1) with 1 by easy.
+  replace (2 ^ 2 - 1) with 3 by easy.
+  cbn in Hi.
+  cbn - [ "/" "mod" ].
+  unfold iter_seq, iter_list.
+  cbn - [ "/" "mod" ].
+  do 2 rewrite rngl_add_0_l.
+  do 6 rewrite rngl_mul_1_l.
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.div_0_l; [ | easy ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  rewrite Nat.mod_0_l; [ | easy ].
+  do 4 rewrite Nat.div_1_r.
+  rewrite Nat.div_same; [ | easy ].
+  rewrite Nat.mod_same; [ | easy ].
+  rewrite Nat.mod_small; [ | flia ].
+  cbn.
+  unfold ε; cbn.
+  unfold iter_seq, iter_list; cbn.
+  do 8 rewrite rngl_mul_1_l.
+  repeat rewrite rngl_add_0_r.
+  rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_mul_1_r.
+  rewrite rngl_add_sub; [ | now destruct Hif; left ].
+  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
+  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
+  rewrite rngl_mul_1_l.
+  rewrite rngl_mul_1_r.
+  destruct i. {
+    cbn.
 ...
 intros.
 (* essai avec le déterminant défini par récurrence *)
