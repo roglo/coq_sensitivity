@@ -767,6 +767,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
+...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 rewrite <- rngl_mul_assoc.
@@ -839,7 +840,8 @@ destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
   rewrite rngl_mul_1_l.
   rewrite rngl_mul_1_r.
-  destruct i. {
+  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+    subst i.
     cbn.
 ...
 intros.
