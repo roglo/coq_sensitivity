@@ -767,7 +767,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
-...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 rewrite <- rngl_mul_assoc.
