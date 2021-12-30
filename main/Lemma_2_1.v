@@ -709,6 +709,10 @@ Check determinant_alternating.
 ...
 *)
 
+(* very interesting, too, contains several proofs of det(AB)=det(A)det(B)
+https://proofwiki.org/wiki/Determinant_of_Matrix_Product
+*)
+
 (* stuff to play with "ring_simplify" below *)
 Context {Hic : @rngl_is_comm T ro rp = true}.
 Context {Hop : @rngl_has_opp T ro = true}.
