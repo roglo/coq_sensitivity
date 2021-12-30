@@ -759,6 +759,40 @@ erewrite rngl_summation_eq_compat. 2: {
   cbn.
   easy.
 }
+cbn.
+(*1*)
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_shift; [ | flia Hnz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+symmetry.
+...1
 rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
@@ -767,38 +801,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry.
-(**)
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j (_, Hj).
-    rewrite rngl_product_shift; [ | flia Hnz ].
-    erewrite rngl_product_eq_compat. 2: {
-      intros k (_, Hk).
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    easy.
-  }
-  easy.
-}
-symmetry.
-erewrite <- rngl_mul_summation_distr_r; [ | now destruct Hif; left ].
-...
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 rewrite <- rngl_mul_assoc.
