@@ -831,19 +831,21 @@ destruct n. {
   do 8 rewrite rngl_mul_1_l.
   rewrite rngl_add_0_r.
   rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
-  rewrite rngl_mul_1_l.
   rewrite rngl_add_sub; [ | now destruct Hif; left ].
   rewrite rngl_mul_1_l.
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  do 3 rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
+  remember (mat_el A) as a eqn:Ha.
+  remember (mat_el B) as b eqn:Hb.
+  move b before a.
+(**)
+  ring_simplify.
+(*
+  rewrite rngl_mul_1_l.
+  do 2 rewrite rngl_mul_1_l.
   unfold rngl_sub.
   replace rngl_has_opp with true by now destruct Hif.
-...
-  ring_simplify.
-...
-(*
+  rewrite rngl_mul_1_r.
   rewrite rngl_add_0_l.
   rewrite rngl_mul_opp_l; [ | now destruct Hif ].
   rewrite rngl_mul_opp_l; [ | now destruct Hif ].
@@ -852,10 +854,8 @@ destruct n. {
   rewrite fold_rngl_sub; [ | now destruct Hif ].
   rewrite fold_rngl_sub; [ | now destruct Hif ].
   rewrite fold_rngl_sub; [ | now destruct Hif ].
-  remember (mat_el A) as a eqn:Ha.
-  remember (mat_el B) as b eqn:Hb.
-  move b before a.
 *)
+...
 (*
   (a 0 0 * b 0 0 + a 0 1 * b 1 0) * (a 1 0 * b 0 1 + a 1 1 * b 1 1) -
   (a 0 0 * b 0 1 + a 0 1 * b 1 1) * (a 1 0 * b 0 0 + a 1 1 * b 1 0) =
