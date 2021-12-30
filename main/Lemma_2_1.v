@@ -684,6 +684,39 @@ Theorem fold_vect_dot_mul' : ∀ U V,
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
+(* trying to prove that det(AB)=det(A)det(B) *)
+(* there are several proofs of that, none of them being simple *)
+(* here, trying to prove it by the Cauchy-Binet Formula *)
+(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
+
+(* det(AB)= ∑ 1≤j1<j2<⋯<jm≤n det(Aj1j2…jm)det(Bj1j2…jm)
+   where A is a m×n matrix, B a n×m matrix
+   and Aj1j2…jm denotes the m×m matrix consisting of columns j1,j2,…,jm of A. *)
+
+(* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
+Definition ordered_tuples (m n : nat) := [[3]].
+
+...
+
+(* submatrix of A from the ordered tuple jl *)
+(* phony definition for the moment... *)
+Definition subm_ord_tup (jl : list nat) (A : matrix T) := A.
+
+Theorem cauchy_binet_formula : ∀ m n A B,
+  is_correct_matrix A = true
+  → is_correct_matrix B = true
+  → mat_nrows A = m
+  → mat_ncols A = n
+  → mat_nrows B = n
+  → mat_ncols B = m
+  → det (A * B) =
+     ∑ (jl ∈ ordered_tuples m n),
+     det (subm_ord_tup jl A) * det (subm_ord_tup jl B).
+
+...
+
+(* other attempts to prove det(AB)=det(A)det(B) *)
+
 (*
 Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
 Proof.
