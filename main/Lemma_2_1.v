@@ -709,6 +709,13 @@ Check determinant_alternating.
 ...
 *)
 
+(* stuff to play with "ring_simplify" below *)
+Context {Hic : @rngl_is_comm T ro rp = true}.
+Context {Hop : @rngl_has_opp T ro = true}.
+Require Import Ring.
+Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
+(* end stuff *)
+
 Theorem determinant_mul : in_charac_0_field →
   ∀ A B,
   is_square_matrix A = true
@@ -833,6 +840,10 @@ destruct n. {
   rewrite rngl_mul_1_r.
   unfold rngl_sub.
   replace rngl_has_opp with true by now destruct Hif.
+...
+  ring_simplify.
+...
+(*
   rewrite rngl_add_0_l.
   rewrite rngl_mul_opp_l; [ | now destruct Hif ].
   rewrite rngl_mul_opp_l; [ | now destruct Hif ].
@@ -844,6 +855,7 @@ destruct n. {
   remember (mat_el A) as a eqn:Ha.
   remember (mat_el B) as b eqn:Hb.
   move b before a.
+*)
 (*
   (a 0 0 * b 0 0 + a 0 1 * b 1 0) * (a 1 0 * b 0 1 + a 1 1 * b 1 1) -
   (a 0 0 * b 0 1 + a 0 1 * b 1 1) * (a 1 0 * b 0 0 + a 1 1 * b 1 0) =
