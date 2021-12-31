@@ -3430,8 +3430,6 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Print mat_repl_vect.
-
 (* submatrix with list rows jl *)
 Definition mat_with_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
@@ -3451,7 +3449,7 @@ Definition mat_with_cols (jl : list nat) (M : matrix T) :=
 Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
   ((mat_with_rows jl M⁺)⁺)%M.
 
-(**)
+(*
 End a.
 Require Import RnglAlg.Nrl.
 Print mat_with_cols.
@@ -3465,8 +3463,9 @@ Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;
    faudra se la taper dans les preuves, en double exemplaire, ici, en
    plus ? *)
 ...
-(**)
+*)
 
+(*
 Theorem map_with_cols_cols' : ∀ M jl,
   mat_with_cols jl M = mat_with_cols' jl M.
 Proof.
@@ -3483,11 +3482,13 @@ rewrite List_map_hd with (a := 0).
 ...
 rewrite List_map_nth' with (a := 0). 2: {
   rewrite seq_length.
-  admit.
+...
 }
 rewrite List_map_seq_length.
 ...
+*)
 
+(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 Theorem cauchy_binet_formula : ∀ m n A B,
   is_correct_matrix A = true
   → is_correct_matrix B = true
@@ -3498,6 +3499,8 @@ Theorem cauchy_binet_formula : ∀ m n A B,
   → det (A * B) =
      ∑ (jl ∈ ordered_tuples m n),
      det (mat_with_cols jl A) * det (mat_with_rows jl B).
+Proof.
+intros * Hca Hcb Har Hac Hbr Hbc.
 ...
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
