@@ -3489,7 +3489,8 @@ rewrite List_map_seq_length.
 *)
 
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
-Theorem cauchy_binet_formula : ∀ m n A B,
+Theorem cauchy_binet_formula : in_charac_0_field →
+  ∀ m n A B,
   is_correct_matrix A = true
   → is_correct_matrix B = true
   → mat_nrows A = m
@@ -3500,7 +3501,33 @@ Theorem cauchy_binet_formula : ∀ m n A B,
      ∑ (jl ∈ ordered_tuples m n),
      det (mat_with_cols jl A) * det (mat_with_rows jl B).
 Proof.
-intros * Hca Hcb Har Hac Hbr Hbc.
+intros Hif * Hca Hcb Har Hac Hbr Hbc.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  move Hmz at top; subst m.
+  apply is_scm_mat_iff in Hcb.
+  destruct Hcb as (Hcrb, Hclb).
+  specialize (Hcrb Hbc) as H1.
+  rewrite Hbr in H1.
+  move H1 at top; subst n.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in Har, Hbr.
+  apply length_zero_iff_nil in Har, Hbr.
+  subst lla llb; cbn.
+  rewrite rngl_summation_list_only_one; cbn.
+  symmetry; apply rngl_mul_1_l.
+}
+rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+  apply is_scm_mat_iff.
+  split. {
+    rewrite mat_mul_ncols; [ | now rewrite Har ].
+    now intros H; rewrite H in Hbc; symmetry in Hbc.
+  } {
+    intros l Hl.
+    rewrite mat_mul_nrows, Har.
+    apply In_nth with (d := []) in Hl.
+    destruct Hl as (p & Hp & Hl).
+    rewrite <- Hl.
 ...
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
