@@ -3445,8 +3445,48 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_
 *)
 
 (* submatrix with list cols jl *)
-(* not yet implemented *)
-Definition mat_with_cols (jl : list nat) (M : matrix T) := M.
+Definition mat_with_cols (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ i, map (λ j, mat_el M i j) jl) (seq 0 (mat_nrows M))).
+
+Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
+  ((mat_with_rows jl M⁺)⁺)%M.
+
+(**)
+End a.
+Require Import RnglAlg.Nrl.
+Print mat_with_cols.
+About mat_with_cols.
+Arguments mat_with_cols {T}%type {ro} jl%list M%M.
+Arguments mat_with_cols' {T}%type {ro} jl%list M%M.
+Compute (let jl := [0;2;3] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_with_cols jl M = mat_with_cols' jl M).
+Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_with_cols jl M = mat_with_cols' jl M).
+(* conclusion: la première version se comporte mal si jl=[] ; faut-il donc
+   préférer absolument la version avec la transposée ? sachant que bon,
+   faudra se la taper dans les preuves, en double exemplaire, ici, en
+   plus ? *)
+...
+(**)
+
+Theorem map_with_cols_cols' : ∀ M jl,
+  mat_with_cols jl M = mat_with_cols' jl M.
+Proof.
+intros.
+destruct (Nat.eq_dec (length jl) 0) as [Hjz| Hjz]. {
+  apply length_zero_iff_nil in Hjz; subst jl.
+  unfold mat_with_cols, mat_with_cols', mat_with_rows; cbn.
+...
+unfold mat_with_cols, mat_with_cols', mat_with_rows, mat_transp, mat_ncols.
+cbn; f_equal.
+rewrite map_length.
+rewrite fold_mat_ncols.
+rewrite List_map_hd with (a := 0).
+...
+rewrite List_map_nth' with (a := 0). 2: {
+  rewrite seq_length.
+  admit.
+}
+rewrite List_map_seq_length.
+...
 
 Theorem cauchy_binet_formula : ∀ m n A B,
   is_correct_matrix A = true
