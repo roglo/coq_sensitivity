@@ -698,7 +698,7 @@ Proof. easy. Qed.
 Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   match m with
   | 0 => []
-  | 1 => [[0]]
+  | 1 => map (λ i, [i]) (seq 0 n)
   | S m' =>
       map (λ l, 0 :: map (Nat.add 1) l) (ordered_tuples m' n) ++
       map (λ l, 1 :: map (Nat.add 2) l) (ordered_tuples m' n) ++
