@@ -699,24 +699,17 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   match m with
   | 0 => [[]]
   | S m' =>
+      let ot := ordered_tuples m' n in
       List.concat
         (map
            (λ i,
             map (λ l, i :: map (Nat.add (S i)) l)
-              (filter (forallb (λ j, Nat.ltb (S (i + j)) n))
-                 (ordered_tuples m' n)))
+              (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
            (seq 0 n))
   end.
 
-Compute (let l := ordered_tuples 0 6 in (length l, l)).
-Compute (let l := ordered_tuples 1 6 in (length l, l)).
-Compute (let l := ordered_tuples 2 6 in (length l, l)).
-Compute (let l := ordered_tuples 3 6 in (length l, l)).
-Compute (let l := ordered_tuples 4 6 in (length l, l)).
-Compute (let l := ordered_tuples 5 6 in (length l, l)).
-Compute (let l := ordered_tuples 6 6 in (length l, l)).
-Compute (let l := ordered_tuples 7 6 in (length l, l)).
-Compute (let l := ordered_tuples 8 6 in (length l, l)).
+Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
+Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
 
 ...
 
