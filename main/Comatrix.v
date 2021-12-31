@@ -3539,6 +3539,21 @@ assert (Hab : is_square_matrix (A * B) = true). {
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
 unfold det'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj; cbn.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length, Har; flia Hj ].
+    rewrite Har, Hbc.
+    unfold mat_mul_el.
+    rewrite Hac.
+    rewrite seq_nth; [ | flia Hj ].
+    rewrite Nat.add_0_l.
+    easy.
+  }
+  easy.
+}
+symmetry; symmetry.
 ...
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
