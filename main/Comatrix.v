@@ -3517,7 +3517,7 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite rngl_summation_list_only_one; cbn.
   symmetry; apply rngl_mul_1_l.
 }
-rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+assert (Hab : is_square_matrix (A * B) = true). {
   apply is_scm_mat_iff.
   split. {
     rewrite mat_mul_ncols; [ | now rewrite Har ].
@@ -3527,7 +3527,17 @@ rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
     rewrite mat_mul_nrows, Har.
     apply In_nth with (d := []) in Hl.
     destruct Hl as (p & Hp & Hl).
-    rewrite <- Hl.
+    rewrite <- Hl; cbn.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      cbn in Hp.
+      now rewrite List_map_seq_length in Hp.
+    }
+    now rewrite List_map_seq_length.
+  }
+}
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+unfold det'.
 ...
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
