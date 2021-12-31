@@ -697,22 +697,28 @@ Proof. easy. Qed.
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   match m with
-  | 0 => []
-  | 1 => map (λ i, [i]) (seq 0 n)
+  | 0 => [[]]
   | S m' =>
-      map (λ l, 0 :: map (Nat.add 1) l) (ordered_tuples m' n) ++
-      map (λ l, 1 :: map (Nat.add 2) l) (ordered_tuples m' n) ++
-      map (λ l, 2 :: map (Nat.add 3) l) (ordered_tuples m' n) ++
-      map (λ l, 3 :: map (Nat.add 4) l) (ordered_tuples m' n)
+      List.concat
+        (map
+           (λ i,
+            map (λ l, i :: map (Nat.add (S i)) l)
+              (filter (forallb (λ j, Nat.ltb (S (i + j)) n))
+                 (ordered_tuples m' n)))
+           (seq 0 n))
   end.
 
-Compute (ordered_tuples 1 5).
-Compute (ordered_tuples 2 5).
-Compute (ordered_tuples 3 5).
+Compute (let l := ordered_tuples 0 6 in (length l, l)).
+Compute (let l := ordered_tuples 1 6 in (length l, l)).
+Compute (let l := ordered_tuples 2 6 in (length l, l)).
+Compute (let l := ordered_tuples 3 6 in (length l, l)).
+Compute (let l := ordered_tuples 4 6 in (length l, l)).
+Compute (let l := ordered_tuples 5 6 in (length l, l)).
+Compute (let l := ordered_tuples 6 6 in (length l, l)).
+Compute (let l := ordered_tuples 7 6 in (length l, l)).
+Compute (let l := ordered_tuples 8 6 in (length l, l)).
 
 ...
-
-Definition ordered_tuples (m n : nat) := [[3]].
 
 (* submatrix of A with list cols jl *)
 (* phony definition for the moment... *)
