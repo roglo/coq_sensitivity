@@ -702,7 +702,8 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   | S m' =>
       map (λ l, 0 :: map (Nat.add 1) l) (ordered_tuples m' n) ++
       map (λ l, 1 :: map (Nat.add 2) l) (ordered_tuples m' n) ++
-      map (λ l, 2 :: map (Nat.add 3) l) (ordered_tuples m' n)
+      map (λ l, 2 :: map (Nat.add 3) l) (ordered_tuples m' n) ++
+      map (λ l, 3 :: map (Nat.add 4) l) (ordered_tuples m' n)
   end.
 
 Compute (ordered_tuples 1 5).
