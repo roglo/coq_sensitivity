@@ -3537,6 +3537,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
   }
 }
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite mat_mul_nrows, Har.
 unfold det'.
 ...
 
