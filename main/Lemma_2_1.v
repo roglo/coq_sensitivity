@@ -684,380 +684,6 @@ Theorem fold_vect_dot_mul' : ∀ U V,
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
-(* trying to prove that det(AB)=det(A)det(B) *)
-(* there are several proofs of that, none of them being simple *)
-(* here, trying to prove it by the Cauchy-Binet Formula *)
-(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
-
-(* det(AB)= ∑ 1≤j1<j2<⋯<jm≤n det(Aj1j2…jm)det(Bj1j2…jm)
-   where A is a m×n matrix, B a n×m matrix
-   Aj1j2…jm denotes the m×m matrix consisting of columns j1,j2,…,jm of A.
-   Bj1j2…jm denotes the m×m matrix consisting of rows j1,j2,…,jm of B. *)
-
-(* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
-
-Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
-  match m with
-  | 0 => [[]]
-  | S m' =>
-      let ot := ordered_tuples m' n in
-      List.concat
-        (map
-           (λ i,
-            map (λ l, i :: map (Nat.add (S i)) l)
-              (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
-           (seq 0 n))
-  end.
-
-(*
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
-*)
-
-Print mat_repl_vect.
-
-(* submatrix with list rows jl *)
-Definition mat_with_rows (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
-
-End a.
-
-Require Import RnglAlg.Nrl.
-Print mat_with_rows.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows [0;2;3] M).
-
-...
-
-(* submatrix with list cols jl *)
-Definition mat_with_cols (jl : list nat) (M : matrix T) :=
-  mk_vect
-
-Theorem cauchy_binet_formula : ∀ m n A B,
-  is_correct_matrix A = true
-  → is_correct_matrix B = true
-  → mat_nrows A = m
-  → mat_ncols A = n
-  → mat_nrows B = n
-  → mat_ncols B = m
-  → det (A * B) =
-     ∑ (jl ∈ ordered_tuples m n),
-     det (mat_with_cols jl A) * det (mat_with_rows jl B).
-
-...
-
-(* other attempts to prove det(AB)=det(A)det(B) *)
-
-(*
-Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
-Proof.
-intros.
-(* essai avec les formes multilinéaires alternées...
-
-trouvé sur le web
-(https://les-mathematiques.net/vanilla/index.php?p=discussion/1339028#Comment_1339028)
-
- Il vaut mieux éviter à tout prix la formule explicite. On peut
- utiliser la méthode de Gauss, ou bien utiliser le fait que
- l'application B↦det(AB) est multilinéaire alternée, et donc est un
- multiple de B↦detB
-
- Il faut d'abord avoir établi que l'espace des formes multilinéaires
- alternées est de dimension 1 et que le déterminant est l'unique telle
- forme qui vaut 1 en l'identité. Une fois ceci acquis, on en déduit
- que det(AB)=αdetB où α est un scalaire qui ne dépend que de A. On le
- trouve en prenant B=I, ce qui donne detA=αdetI=α.
-*)
-Check determinant_multilinear.
-Check determinant_alternating.
-...
-*)
-
-(* very interesting, too, contains several proofs of det(AB)=det(A)det(B)
-https://proofwiki.org/wiki/Determinant_of_Matrix_Product
-*)
-
-(* stuff to play with "ring_simplify" below *)
-Context {Hic : @rngl_is_comm T ro rp = true}.
-Context {Hop : @rngl_has_opp T ro = true}.
-Require Import Ring.
-Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
-(* end stuff *)
-
-Theorem determinant_mul : in_charac_0_field →
-  ∀ A B,
-  is_square_matrix A = true
-  → is_square_matrix B = true
-  → mat_nrows A = mat_nrows B
-  → det (A * B) = (det A * det B)%F.
-Proof.
-intros Hif * Hasm Hbsm Hrab.
-(* essai avec le déterminant défini par permutations *)
-assert (Habsm : is_square_matrix (A * B) = true). {
-  now apply squ_mat_mul_is_squ.
-}
-remember (mat_nrows A) as n eqn:Hra.
-rename Hrab into Hrb.
-symmetry in Hra, Hrb.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  unfold det; cbn.
-  move Hnz at top; subst n; cbn.
-  rewrite Hra, Hrb; cbn.
-  symmetry; apply rngl_mul_1_l.
-}
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite mat_mul_nrows.
-unfold det'.
-Require Import IterMul Signature PermutSeq.
-rewrite Hra, Hrb.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_el_mul; cycle 1. {
-      rewrite mat_mul_nrows, Hra.
-      flia Hj.
-    } {
-      rewrite mat_mul_ncols; [ | rewrite Hra; flia Hj ].
-      rewrite square_matrix_ncols; [ | easy ].
-      rewrite Hrb.
-      apply canon_sym_gr_list_ub; [ | flia Hj ].
-      specialize (fact_neq_0 n) as Hfnz.
-      flia Hi Hfnz.
-    }
-    rewrite square_matrix_ncols; [ | easy ].
-    rewrite Hra.
-    easy.
-  }
-  cbn.
-  easy.
-}
-cbn.
-(*1*)
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-symmetry.
-(*
-Noting
-   ε(i) = signature of the i-th permutation in the canonic symmetric group
-   σ(i,j) = j-th element of the i-th permutation in the canonic sym gr
-We have to prove that
-  ∑ (i = 0, n!-1), ε(i) ∏ (j = 0, n-1), ∑ (k = 0, n-1), a(j,k) * b(k,σ(i,j)) =
-  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), a(j,σ(i,j)) *
-  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), b(j,σ(i,j))
-The problem is that the lhs contains
-  n!*n^n terms
-But the rhs contains
-  n!*n! terms
-Some terms of the lhs must cancel each other. But which ones?
-*)
-destruct n; [ easy | ].
-destruct n. {
-  cbn - [ "/" ff_app ].
-  unfold ε.
-  do 3 rewrite rngl_summation_only_one.
-  do 7 rewrite rngl_product_only_one.
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  now do 3 rewrite rngl_mul_1_l.
-}
-destruct n. {
-  unfold iter_seq, iter_list; cbn.
-  do 7 rewrite rngl_add_0_l.
-  do 6 rewrite rngl_mul_1_l.
-  unfold ε, iter_seq, iter_list; cbn.
-  do 8 rewrite rngl_mul_1_l.
-  rewrite rngl_add_0_r.
-  rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
-  rewrite rngl_add_sub; [ | now destruct Hif; left ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  remember (mat_el A) as a eqn:Ha.
-  remember (mat_el B) as b eqn:Hb.
-  move b before a.
-(**)
-  ring_simplify.
-(*
-  rewrite rngl_mul_1_l.
-  do 2 rewrite rngl_mul_1_l.
-  unfold rngl_sub.
-  replace rngl_has_opp with true by now destruct Hif.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_add_0_l.
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  do 3 rewrite rngl_mul_1_l.
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-*)
-...
-(*
-  (a 0 0 * b 0 0 + a 0 1 * b 1 0) * (a 1 0 * b 0 1 + a 1 1 * b 1 1) -
-  (a 0 0 * b 0 1 + a 0 1 * b 1 1) * (a 1 0 * b 0 0 + a 1 1 * b 1 0) =
-
-  (a 0 0 * a 1 1 - a 0 1 * a 1 0) * (b 0 0 * b 1 1 - b 0 1 * b 1 0)
-*)
-...1
-rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-  easy.
-}
-symmetry.
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-rewrite <- rngl_mul_assoc.
-f_equal.
-symmetry.
-rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-symmetry.
-rewrite rngl_product_shift; [ | flia Hnz ].
-rewrite rngl_product_summation_distr; [ | destruct Hif; now left ].
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat_sub_succ_1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  erewrite rngl_product_eq_compat. 2: {
-    intros k Hk.
-    now rewrite (Nat.add_comm 1 k), Nat.add_sub.
-  }
-  easy.
-}
-cbn.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite rngl_mul_assoc.
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
-  rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros k Hk.
-    rewrite Nat.add_comm, Nat.add_sub.
-    easy.
-  }
-  easy.
-}
-symmetry.
-(* bizarre: n^n termes vs n! termes *)
-destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-  move Hn2 at top; subst n.
-  cbn - [ "/" "mod" Nat.pow "-" canon_sym_gr_list ].
-  replace (2 - 1) with 1 by easy.
-  replace (2 ^ 2 - 1) with 3 by easy.
-  cbn in Hi.
-  cbn - [ "/" "mod" ].
-  unfold iter_seq, iter_list.
-  cbn - [ "/" "mod" ].
-  do 2 rewrite rngl_add_0_l.
-  do 6 rewrite rngl_mul_1_l.
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  do 4 rewrite Nat.div_1_r.
-  rewrite Nat.div_same; [ | easy ].
-  rewrite Nat.mod_same; [ | easy ].
-  rewrite Nat.mod_small; [ | flia ].
-  cbn.
-  unfold ε; cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 8 rewrite rngl_mul_1_l.
-  repeat rewrite rngl_add_0_r.
-  rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_add_sub; [ | now destruct Hif; left ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
-  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-    subst i.
-    cbn.
-...
-intros.
-(* essai avec le déterminant défini par récurrence *)
-cbn.
-rewrite List_map_seq_length.
-unfold det.
-remember (mat_nrows A) as n eqn:Hra.
-symmetry in Hra.
-enough (Hrb : mat_nrows B = n).
-...
-intros.
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite mat_mul_ncols.
-(* déjà, ce serait pas mal si on  prouvait que com(A*B)=com(A)*com(B) *)
-(* mais je viens de laisser tomber cette idée parce que, de toutes façons,
-   la définition de com fait déjà intervenir det : ça boucle ! *)
-...
-Check comatrix_mul.
-...
-intros.
-Check @laplace_formula_on_rows.
-(* https://www.youtube.com/watch?v=-CySi7uauCg *)
-...
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-cbn; rewrite List_map_seq_length.
-unfold determinant'.
-...
-Check laplace_formula_on_rows.
-Check laplace_formula_on_cols.
-Search comatrix.
-...
-Require Import IterMul.
-Search determinant.
-...
-intros.
-unfold determinant; cbn.
-rewrite List_map_seq_length.
-Print determinant_loop.
-...
-*)
-
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
@@ -1239,6 +865,13 @@ Inspect 1.
 
 (* can I prove, with that, that A⁻¹ = A⁺ ? *)
 
+(* à un moment, j'en avais déduit qu'il fallait que je prouve que
+   det(AB)=det(A)det(B) mais, bête que je suis, je ne me rappelle
+   plus pourquoi *)
+
+(* peut-être que, comme je dis ci-dessus en anglais, pour prouver
+   que A⁻¹ = A⁺ dans les conditions de ce théorème ? *)
+
 ...
 
 Theorem diagonalized_matrix_prop : in_charac_0_field →
@@ -1283,6 +916,7 @@ rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
   apply mat_with_vect_is_square.
 } {
   rewrite Ho.
+...
 (* tout un programme ! *)
 Search mat_with_vect.
 (* for_symm_squ_mat_eigen_vect_mat_is_ortho seems to say that U⁻¹=U⁺ and,
@@ -1290,13 +924,12 @@ Search mat_with_vect.
 (* or I can also "f_equal (λ A, (A * U⁺)%M)" instead of U⁻¹ and use
    for_symm_squ_mat_eigen_vect_mat_is_ortho with version "U * U⁺ = I" *)
 (* I don't know *)
-...
   rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
     apply mat_with_vect_is_square.
   }
 Require Import IterMul.
 Require Import PermutSeq Signature.
-unfold determinant'.
+unfold det'.
 rewrite mat_with_vect_nrows.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
