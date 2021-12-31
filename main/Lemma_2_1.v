@@ -709,38 +709,28 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
            (seq 0 n))
   end.
 
+(*
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
+*)
+
+Print mat_repl_vect.
+
+(* submatrix with list rows jl *)
+Definition mat_with_rows (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
+
+End a.
+
+Require Import RnglAlg.Nrl.
+Print mat_with_rows.
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows [0;2;3] M).
 
 ...
 
-Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
-  match m with
-  | 0 => [[]]
-  | S m' =>
-      let ot := ordered_tuples m' n in
-      List.concat
-        (map
-           (λ i,
-            map (λ l, i :: map (Nat.add (S i)) l)
-              (filter
-                 (λ l,
-                  match rev l with
-                  | [] => true
-                  | j :: _ => Nat.ltb (S (i + j)) n
-                 end) ot))
-           (seq 0 n))
-  end.
-
-...
-
-(* submatrix of A with list cols jl *)
-(* phony definition for the moment... *)
-Definition mat_with_cols (jl : list nat) (A : matrix T) := A.
-
-(* submatrix of B with list rows jl *)
-(* phony definition for the moment... *)
-Definition mat_with_rows (jl : list nat) (B : matrix T) := B.
+(* submatrix with list cols jl *)
+Definition mat_with_cols (jl : list nat) (M : matrix T) :=
+  mk_vect
 
 Theorem cauchy_binet_formula : ∀ m n A B,
   is_correct_matrix A = true
