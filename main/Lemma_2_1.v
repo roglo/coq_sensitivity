@@ -695,6 +695,7 @@ Proof. easy. Qed.
    Bj1j2…jm denotes the m×m matrix consisting of rows j1,j2,…,jm of B. *)
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
+
 Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   match m with
   | 0 => [[]]
@@ -710,6 +711,26 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
 
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
+
+...
+
+Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
+  match m with
+  | 0 => [[]]
+  | S m' =>
+      let ot := ordered_tuples m' n in
+      List.concat
+        (map
+           (λ i,
+            map (λ l, i :: map (Nat.add (S i)) l)
+              (filter
+                 (λ l,
+                  match rev l with
+                  | [] => true
+                  | j :: _ => Nat.ltb (S (i + j)) n
+                 end) ot))
+           (seq 0 n))
+  end.
 
 ...
 
