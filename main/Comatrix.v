@@ -3565,7 +3565,7 @@ replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
     intros t Ht.
     now apply H1.
   }
-  clear Hnz Hll.
+  clear Hll.
   induction ll as [| l]; [ easy | ].
   cbn - [ "<?" ].
   rewrite IHll; [ | now intros; apply H1; right ].
@@ -3573,19 +3573,31 @@ replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   remember (forallb _ _) as b eqn:Hb.
   symmetry in Hb.
   destruct b; [ exfalso | easy ].
-...
   specialize (proj1 (forallb_forall _ _) Hb) as H2.
-  cbn - [ "<?" ] in H2.
+  cbn in H2.
   specialize (H1 l (or_introl eq_refl)).
-  destruct l as [| a]; [ easy | clear H1 ].
-...
-  specialize (H2 a (or_introl eq_refl)).
-  apply Nat.ltb_lt in H2.
-  flia H2.
+  destruct l as [| a]; [ easy | ].
+  cbn in H2.
+  specialize (H2 _ (or_introl eq_refl)).
+  apply Nat.leb_le, Nat.nlt_ge in H2.
+  apply H2; flia.
 }
-cbn - [ "<?" ].
 rewrite app_nil_r.
-Search (concat (map _ _)).
+rewrite flat_map_concat_map.
+rewrite <- map_map.
+rewrite concat_filter_map.
+(* bof, chais pas *)
+...
+rewrite <- flat_map_concat_map.
+...
+rewrite <- concat_filter_map.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
+...
+Search (filter _ (map _ _)).
+...
+rewrite concat_filter_map.
+Print ordered_tuples.
 ...
 concat_filter_map:
   ∀ (A : Type) (f : A → bool) (l : list (list A)),
