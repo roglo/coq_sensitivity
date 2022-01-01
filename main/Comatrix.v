@@ -3487,6 +3487,16 @@ rewrite List_map_seq_length.
 ...
 *)
 
+Theorem ordered_tuples_1_l : ∀ n,
+  ordered_tuples 1 n = map (λ i, [i]) (seq 0 n).
+Proof.
+intros; cbn.
+induction n; [ easy | ].
+rewrite seq_S; cbn.
+rewrite flat_map_app, map_app; cbn.
+now rewrite IHn.
+Qed.
+
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
 Proof.
 intros.
@@ -3501,6 +3511,18 @@ replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   symmetry.
   clear IHn.
   remember (ordered_tuples _ _) as ll eqn:Hll.
+  symmetry in Hll.
+Theorem ordered_tuples_are_correct : ∀ m n t,
+  m ≠ 0 → t ∈ ordered_tuples m n → t ≠ [].
+Proof.
+intros * Hmz Ht Htz; subst t.
+induction m; [ easy | clear Hmz ].
+destruct m. {
+  rewrite ordered_tuples_1_l in Ht.
+  apply in_map_iff in Ht.
+  now destruct Ht as (x & Hx & Hxn).
+}
+specialize (IHm (Nat.neq_succ_0 _)).
 ...
   clear Hnz Hll.
   induction ll as [| l]; [ easy | ].
