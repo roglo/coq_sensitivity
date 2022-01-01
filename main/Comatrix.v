@@ -3497,6 +3497,25 @@ rewrite flat_map_app, map_app; cbn.
 now rewrite IHn.
 Qed.
 
+Theorem ordered_tuples_are_correct : ∀ m n t,
+  m ≠ 0 → t ∈ ordered_tuples m n → t ≠ [].
+Proof.
+intros * Hmz Ht Htz; subst t.
+induction m; [ easy | clear Hmz ].
+destruct m. {
+  rewrite ordered_tuples_1_l in Ht.
+  apply in_map_iff in Ht.
+  now destruct Ht as (x & Hx & Hxn).
+}
+specialize (IHm (Nat.neq_succ_0 _)).
+remember (S m) as sm; cbn - [ "<?" ] in Ht; subst sm.
+apply in_flat_map in Ht.
+destruct Ht as (i & Hi & Ht).
+apply in_map_iff in Ht.
+destruct Ht as (l & Hl & Ht).
+easy.
+Qed.
+
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
 Proof.
 intros.
@@ -3511,28 +3530,30 @@ replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   symmetry.
   clear IHn.
   remember (ordered_tuples _ _) as ll eqn:Hll.
-  symmetry in Hll.
-Theorem ordered_tuples_are_correct : ∀ m n t,
-  m ≠ 0 → t ∈ ordered_tuples m n → t ≠ [].
-Proof.
-intros * Hmz Ht Htz; subst t.
-induction m; [ easy | clear Hmz ].
-destruct m. {
-  rewrite ordered_tuples_1_l in Ht.
-  apply in_map_iff in Ht.
-  now destruct Ht as (x & Hx & Hxn).
-}
-specialize (IHm (Nat.neq_succ_0 _)).
-...
+  assert (H1 : ∀ t, t ∈ ll → t ≠ []). {
+    specialize ordered_tuples_are_correct as H1.
+    specialize (H1 n (S n)).
+    rewrite <- Hll in H1.
+    intros t Ht.
+    now apply H1.
+  }
   clear Hnz Hll.
   induction ll as [| l]; [ easy | ].
   cbn - [ "<?" ].
-  rewrite IHll.
+  rewrite IHll; [ | now intros; apply H1; right ].
   remember (forallb _ _) as b eqn:Hb.
   symmetry in Hb.
   destruct b; [ | easy ].
-  specialize (proj1 (forallb_forall _ l) Hb) as H1.
-  cbn - [ "<?" ] in H1.
+  specialize (proj1 (forallb_forall _ l) Hb) as H2.
+  cbn - [ "<?" ] in H2.
+  specialize (H1 l (or_introl eq_refl)).
+  destruct l as [| a]; [ easy | ].
+  specialize (H2 a (or_introl eq_refl)).
+  apply Nat.ltb_lt in H2.
+  flia H2.
+}
+cbn - [ "<?" ].
+rewrite app_nil_r.
 ...
 Search (forallb _ _ = true).
 apply forallb_forall in Hb.
