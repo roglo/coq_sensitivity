@@ -3411,12 +3411,11 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   | 0 => [[]]
   | S m' =>
       let ot := ordered_tuples m' n in
-      List.concat
-        (map
-           (λ i,
-            map (λ l, i :: map (Nat.add (S i)) l)
-              (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
-           (seq 0 n))
+      flat_map
+        (λ i,
+         map (λ l, i :: map (Nat.add (S i)) l)
+           (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
+        (seq 0 n)
   end.
 
 (*
@@ -3488,6 +3487,54 @@ rewrite List_map_seq_length.
 ...
 *)
 
+Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
+Proof.
+intros.
+induction n; [ easy | ].
+cbn - [ seq "<?" ].
+rewrite seq_S; cbn - [ "<?" ].
+rewrite flat_map_app.
+cbn - [ "<?" ].
+rewrite app_nil_r.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
+  symmetry.
+  clear IHn.
+...
+  erewrite filter_ext. 2: {
+    intros l.
+    replace (forallb _ _) with false. 2: {
+      symmetry.
+      apply Bool.negb_true_iff.
+      apply Bool.eq_true_not_negb.
+      intros H1.
+      specialize (proj1 (forallb_forall _ l) H1) as H2.
+      cbn - [ "<?" ] in H2.
+      destruct l as [| a]. {
+        cbn in H1.
+...
+apply -> forallb_forall in H.
+Print forallb.
+...
+  induction n; [ easy | clear Hnz ].
+  destruct n; [ easy | ].
+  specialize (IHn (Nat.neq_succ_0 _)).
+
+cbn.
+  induction n; cbn.
+...
+Search (forallb _ _ = false).
+Search (filter _ _ = []).
+Search (map _ (filter _ _)).
+...
+concat_filter_map:
+  ∀ (A : Type) (f : A → bool) (l : list (list A)),
+    concat (map (filter f) l) = filter f (concat l)
+...
+rewrite map_app; cbn.
+rewrite concat_app; cbn.
+...
+
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -3554,6 +3601,9 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 symmetry; symmetry.
+...
+(* interesting property, even if, perhaps, not useful here *)
+assert (ordered_tuples m m = [seq 0 m]).
 ...
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
