@@ -3411,16 +3411,27 @@ Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   | 0 => [[]]
   | S m' =>
       let ot := ordered_tuples m' n in
+      filter (forallb (λ j, Nat.ltb j n))
+        (flat_map (λ i, map (λ l, i :: map (Nat.add (S i)) l) ot) (seq 0 n))
+  end.
+
+(*
+Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
+Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
+*)
+
+(*
+Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
+  match m with
+  | 0 => [[]]
+  | S m' =>
+      let ot := ordered_tuples m' n in
       flat_map
         (λ i,
          map (λ l, i :: map (Nat.add (S i)) l)
            (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
         (seq 0 n)
   end.
-
-(*
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
 *)
 
 Section a.
@@ -3490,11 +3501,22 @@ rewrite List_map_seq_length.
 Theorem ordered_tuples_1_l : ∀ n,
   ordered_tuples 1 n = map (λ i, [i]) (seq 0 n).
 Proof.
-intros; cbn.
-induction n; [ easy | ].
-rewrite seq_S; cbn.
-rewrite flat_map_app, map_app; cbn.
-now rewrite IHn.
+intros.
+cbn - [ "<?" ].
+rewrite flat_map_concat_map.
+rewrite <- concat_filter_map.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+  cbn - [ "<?" ].
+  rewrite Bool.andb_true_r.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  easy.
+}
+rewrite <- flat_map_concat_map.
+(* ça me troue le cul que "easy" sache résoudre ça ! *)
+easy.
 Qed.
 
 Theorem ordered_tuples_are_correct : ∀ m n t,
@@ -3509,6 +3531,8 @@ destruct m. {
 }
 specialize (IHm (Nat.neq_succ_0 _)).
 remember (S m) as sm; cbn - [ "<?" ] in Ht; subst sm.
+apply filter_In in Ht.
+destruct Ht as (Ht, _).
 apply in_flat_map in Ht.
 destruct Ht as (i & Hi & Ht).
 apply in_map_iff in Ht.
@@ -3522,10 +3546,14 @@ intros.
 induction n; [ easy | ].
 cbn - [ seq "<?" ].
 rewrite seq_S; cbn - [ "<?" ].
-rewrite flat_map_app.
+rewrite flat_map_app, filter_app.
 cbn - [ "<?" ].
 rewrite app_nil_r.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+rewrite flat_map_concat_map.
+rewrite <- concat_filter_map.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
 replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   symmetry.
   clear IHn.
@@ -3541,19 +3569,27 @@ replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   induction ll as [| l]; [ easy | ].
   cbn - [ "<?" ].
   rewrite IHll; [ | now intros; apply H1; right ].
+  cbn; rewrite Nat.leb_refl, Bool.andb_true_l.
   remember (forallb _ _) as b eqn:Hb.
   symmetry in Hb.
-  destruct b; [ | easy ].
-  specialize (proj1 (forallb_forall _ l) Hb) as H2.
+  destruct b; [ exfalso | easy ].
+...
+  specialize (proj1 (forallb_forall _ _) Hb) as H2.
   cbn - [ "<?" ] in H2.
   specialize (H1 l (or_introl eq_refl)).
-  destruct l as [| a]; [ easy | ].
+  destruct l as [| a]; [ easy | clear H1 ].
+...
   specialize (H2 a (or_introl eq_refl)).
   apply Nat.ltb_lt in H2.
   flia H2.
 }
 cbn - [ "<?" ].
 rewrite app_nil_r.
+Search (concat (map _ _)).
+...
+concat_filter_map:
+  ∀ (A : Type) (f : A → bool) (l : list (list A)),
+    concat (map (filter f) l) = filter f (concat l)
 ...
 Search (forallb _ _ = true).
 apply forallb_forall in Hb.
