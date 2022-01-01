@@ -3500,6 +3500,20 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
   symmetry.
   clear IHn.
+  remember (ordered_tuples _ _) as ll eqn:Hll.
+...
+  clear Hnz Hll.
+  induction ll as [| l]; [ easy | ].
+  cbn - [ "<?" ].
+  rewrite IHll.
+  remember (forallb _ _) as b eqn:Hb.
+  symmetry in Hb.
+  destruct b; [ | easy ].
+  specialize (proj1 (forallb_forall _ l) Hb) as H1.
+  cbn - [ "<?" ] in H1.
+...
+Search (forallb _ _ = true).
+apply forallb_forall in Hb.
 ...
   erewrite filter_ext. 2: {
     intros l.
