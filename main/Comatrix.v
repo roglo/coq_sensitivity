@@ -3406,6 +3406,15 @@ Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 
+...
+
+(* pourrait-on définir ordered_tuples par induction sur n
+   au lieu de m ? Ça permettrait peut-être de mieux prouver
+   que sa longueur est binomial n m puisque celui-ci est
+   défini par induction sur n *)
+
+...
+
 Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
   match m with
   | 0 => [[]]
@@ -3583,6 +3592,21 @@ Fixpoint binomial n k :=
 
 (* end borrowed code *)
 
+Theorem List_length_concat : ∀ A (ll : list (list A)),
+  length (concat ll) = iter_list ll (λ a l, a + length l) 0.
+Proof.
+intros.
+unfold iter_list.
+induction ll as [| l]; cbn; [ easy | ].
+rewrite app_length, IHll.
+symmetry.
+apply fold_left_op_fun_from_d with (d := 0); intros; [ easy | | ]. {
+  apply Nat.add_0_r.
+} {
+  apply Nat.add_assoc.
+}
+Qed.
+
 Theorem ordered_tuple_length : ∀ m n,
   length (ordered_tuples m n) = binomial n m.
 Proof.
@@ -3590,9 +3614,24 @@ intros.
 revert n.
 induction m; intros; [ now destruct n | ].
 cbn - [ "<?" ].
+...
+destruct n; [ easy | ].
+cbn - [ ordered_tuples seq ].
+...
+intros.
+revert n.
+induction m; intros; [ now destruct n | ].
+cbn - [ "<?" ].
 rewrite flat_map_concat_map.
 rewrite <- concat_filter_map.
 rewrite map_map.
+rewrite List_length_concat.
+Search (iter_list (map _ _)).
+unfold iter_list.
+Search (fold_left _ (map _ _)).
+rewrite List_fold_left_map.
+Search (length (filter _ _)).
+Search (filter _ (map _ _)).
 ...
 rewrite <- flat_map_concat_map.
 Search (length (flat_map _ _)).
