@@ -3540,6 +3540,20 @@ destruct Ht as (l & Hl & Ht).
 easy.
 Qed.
 
+Require Import Sorted.
+Theorem ordered_tuples_prop : ∀ m n ll,
+  ll = ordered_tuples m n
+  → (∀ l, l ∈ ll → Sorted lt l) ∧
+    (∀ i j, i < length ll → j < length ll →
+     nth i ll [] = nth j ll [] → i = j) ∧
+    (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
+Proof.
+intros * Hll.
+split. {
+  intros l Hl.
+Print Term Sorted.
+...
+
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
 Proof.
 intros.
@@ -3589,6 +3603,10 @@ rewrite concat_filter_map.
 Compute (let n := 5 in (ordered_tuples 0 n, ordered_tuples n n)).
 Compute (let n := 5 in map (λ i, ordered_tuples i (S i)) (seq 0 n)).
 (* bof, chais pas *)
+(* bon, je vais essayer de faire un théorème qui prouve les
+   propriétés de ordered_tuples (triés, injectif, surjectif)
+   pour voir si ça peut m'aider pour ce théorème-ci ; ça sera
+   de toutes façons utile, même si ça ne marche pas ici *)
 ...
 rewrite <- flat_map_concat_map.
 ...
