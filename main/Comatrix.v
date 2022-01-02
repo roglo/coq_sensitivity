@@ -3586,6 +3586,7 @@ rewrite app_nil_r.
 rewrite flat_map_concat_map.
 rewrite <- map_map.
 rewrite concat_filter_map.
+Compute (let n := 5 in (ordered_tuples 0 n, ordered_tuples n n)).
 Compute (let n := 5 in map (λ i, ordered_tuples i (S i)) (seq 0 n)).
 (* bof, chais pas *)
 ...
