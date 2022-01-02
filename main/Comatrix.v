@@ -3420,20 +3420,6 @@ Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
 *)
 
-(*
-Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
-  match m with
-  | 0 => [[]]
-  | S m' =>
-      let ot := ordered_tuples m' n in
-      flat_map
-        (λ i,
-         map (λ l, i :: map (Nat.add (S i)) l)
-           (filter (forallb (λ j, Nat.ltb (S (i + j)) n)) ot))
-        (seq 0 n)
-  end.
-*)
-
 Section a.
 
 Context {T : Type}.
