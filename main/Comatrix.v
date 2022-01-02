@@ -3406,28 +3406,34 @@ Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 
-...
-
-(* pourrait-on définir ordered_tuples par induction sur n
-   au lieu de m ? Ça permettrait peut-être de mieux prouver
-   que sa longueur est binomial n m puisque celui-ci est
-   défini par induction sur n *)
-
-...
-
-Fixpoint ordered_tuples (m n : nat) : list (list nat) :=
+Fixpoint rev_ordered_tuples (m n : nat) : list (list nat) :=
   match m with
   | 0 => [[]]
   | S m' =>
-      let ot := ordered_tuples m' n in
+      match n with
+      | 0 => []
+      | S n' =>
+          map (λ l, n' :: l) (rev_ordered_tuples m' n') ++
+          rev_ordered_tuples (S m') n'
+      end
+  end.
+
+Definition ordered_tuples m n :=
+  map (map (λ i, n - 1 - i)) (rev_ordered_tuples m n).
+
+(*
+Fixpoint old_ordered_tuples (m n : nat) : list (list nat) :=
+  match m with
+  | 0 => [[]]
+  | S m' =>
+      let ot := old_ordered_tuples m' n in
       filter (forallb (λ j, Nat.ltb j n))
         (flat_map (λ i, map (λ l, i :: map (Nat.add (S i)) l) ot) (seq 0 n))
   end.
+*)
 
-(*
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
-*)
 
 Section a.
 
@@ -3493,9 +3499,22 @@ rewrite List_map_seq_length.
 ...
 *)
 
+Theorem ordered_tuples_0_l : ∀ n, ordered_tuples 0 n = [[]].
+Proof. now intros; destruct n. Qed.
+
 Theorem ordered_tuples_1_l : ∀ n,
   ordered_tuples 1 n = map (λ i, [i]) (seq 0 n).
 Proof.
+intros.
+unfold ordered_tuples.
+specialize (ordered_tuples_0_l n) as H1.
+unfold ordered_tuples in H1.
+(* ah shit *)
+...
+destruct n; [ easy | ].
+rewrite Nat_sub_succ_1; cbn.
+rewrite map_map.
+...
 intros.
 cbn - [ "<?" ].
 rewrite flat_map_concat_map.
