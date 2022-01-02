@@ -3607,7 +3607,9 @@ cbn - [ "<?" ].
 rewrite flat_map_concat_map.
 rewrite <- concat_filter_map.
 rewrite map_map.
+...
 rewrite <- flat_map_concat_map.
+Search (length (flat_map _ _)).
 ...
 
 Theorem ordered_tuples_inj : ∀ m n ll,
@@ -3617,12 +3619,12 @@ Theorem ordered_tuples_inj : ∀ m n ll,
 Proof.
 intros * Hll * Hi Hj Hij.
 subst ll.
-...
-revert n l Hl.
+revert n i j Hi Hj Hij.
 induction m; intros. {
-  destruct Hl; [ now subst l | easy ].
+  cbn in Hi, Hj.
+  apply Nat.lt_1_r in Hi, Hj; congruence.
 }
-cbn - [ "<?" ] in Hl.
+cbn - [ "<?" ] in Hi, Hj, Hij.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
@@ -3635,6 +3637,10 @@ Proof.
 intros * Hll.
 split. {
   intros l Hl.
+...
+
+(* TODO: see https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
+
 ...
 
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
