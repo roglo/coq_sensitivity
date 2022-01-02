@@ -3582,12 +3582,47 @@ destruct l' as [| b]; [ constructor | ].
 cbn; apply HdRel_cons; flia.
 Qed.
 
+(* binomial *)
+(* code borrowed from my work "coq_euler_prod_form" *)
+
+Fixpoint binomial n k :=
+  match k with
+  | 0 => 1
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' => binomial n' k' + binomial n' k
+     end
+  end.
+
+(* end borrowed code *)
+
+Theorem ordered_tuple_length : ∀ m n,
+  length (ordered_tuples m n) = binomial n m.
+Proof.
+intros.
+revert n.
+induction m; intros; [ now destruct n | ].
+cbn - [ "<?" ].
+rewrite flat_map_concat_map.
+rewrite <- concat_filter_map.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
+...
+
 Theorem ordered_tuples_inj : ∀ m n ll,
   ll = ordered_tuples m n
   → ∀ i j, i < length ll → j < length ll →
    nth i ll [] = nth j ll [] → i = j.
 Proof.
 intros * Hll * Hi Hj Hij.
+subst ll.
+...
+revert n l Hl.
+induction m; intros. {
+  destruct Hl; [ now subst l | easy ].
+}
+cbn - [ "<?" ] in Hl.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
