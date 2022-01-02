@@ -3552,7 +3552,48 @@ intros * Hll.
 split. {
   intros l Hl.
   subst ll.
-  revert n Hl.
+  apply Sorted_LocallySorted_iff.
+  revert m n Hl.
+  induction l as [| a]; intros; [ constructor | cbn ].
+  destruct l as [| b]; [ constructor | ].
+  constructor. {
+    apply IHl with (m := 42) (n := 18).
+...
+  destruct l as [| b]; [ constructor | ].
+  constructor.
+...
+  revert n l Hl.
+  induction m; intros. {
+    destruct Hl; [ | easy ].
+    subst l; constructor.
+  }
+  cbn - [ "<?" ] in Hl.
+  apply filter_In in Hl.
+  destruct Hl as (Hl, Hal).
+  apply in_flat_map in Hl.
+  destruct Hl as (a & Ha & Hl).
+  apply in_seq in Ha.
+  destruct Ha as (_, Ha); cbn in Ha.
+  apply in_map_iff in Hl.
+  destruct Hl as (l' & Hal' & Hl').
+  subst l.
+  destruct l' as [| b]; [ constructor | cbn ].
+  constructor; [ | flia ].
+  apply IHm with (n := n).
+...
+  constructor. {
+    specialize (IHm n l' Hl') as H1.
+    clear m n Ha IHm Hl' Hal.
+    rename l' into l.
+    induction l as [| b]; intros; [ constructor | ].
+    cbn; constructor. {
+      apply IHl.
+      now apply Sorted_inv in H1.
+    }
+...
+  intros l Hl.
+  subst ll.
+  revert n l Hl.
   induction m; intros. {
     destruct Hl; [ now subst l | easy ].
   }
@@ -3567,7 +3608,15 @@ split. {
   destruct Hl as (l' & Hal' & Hl').
   subst l.
   constructor. {
-(* souvent, j'ai du mal avec les trucs triés, moi *)
+    specialize (IHm n l' Hl') as H1.
+    clear m n Ha IHm Hl' Hal.
+    rename l' into l.
+    induction l as [| b]; intros; [ constructor | ].
+    cbn; constructor. {
+      apply IHl.
+      now apply Sorted_inv in H1.
+    }
+Print Term HdRel.
 ...
 Print Term Sorted.
 Print Term HdRel.
