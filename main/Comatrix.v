@@ -3541,6 +3541,57 @@ easy.
 Qed.
 
 Require Import Sorted.
+Theorem ordered_tuples_sorted : ∀ m n ll,
+  ll = ordered_tuples m n
+  → ∀ l, l ∈ ll → Sorted lt l.
+Proof.
+intros * Hll * Hl.
+subst ll.
+revert n l Hl.
+induction m; intros. {
+  destruct Hl; [ now subst l | easy ].
+}
+cbn - [ "<?" ] in Hl.
+apply filter_In in Hl.
+destruct Hl as (Hl, Hal).
+apply in_flat_map in Hl.
+destruct Hl as (a & Ha & Hl).
+apply in_seq in Ha.
+destruct Ha as (_, Ha); cbn in Ha.
+apply in_map_iff in Hl.
+destruct Hl as (l' & Hal' & Hl').
+subst l.
+constructor. {
+  specialize (IHm n l' Hl') as H1.
+  clear m n Ha IHm Hl' Hal.
+  rename l' into l.
+  induction l as [| b]; intros; [ constructor | ].
+  cbn; constructor. {
+    apply IHl.
+    now apply Sorted_inv in H1.
+  }
+  destruct l as [| c]; [ constructor | ].
+  cbn; constructor.
+  apply -> Nat.succ_lt_mono.
+  apply Nat.add_lt_mono_l.
+  apply Sorted_inv in H1.
+  destruct H1 as (_, H1).
+  now apply HdRel_inv in H1.
+}
+destruct l' as [| b]; [ constructor | ].
+cbn; apply HdRel_cons; flia.
+Qed.
+
+Inspect 1.
+
+Theorem ordered_tuples_inj : ∀ m n ll,
+  ll = ordered_tuples m n
+  → ∀ i j, i < length ll → j < length ll →
+   nth i ll [] = nth j ll [] → i = j.
+Proof.
+intros * Hll * Hi Hj Hij.
+...
+
 Theorem ordered_tuples_prop : ∀ m n ll,
   ll = ordered_tuples m n
   → (∀ l, l ∈ ll → Sorted lt l) ∧
@@ -3551,77 +3602,6 @@ Proof.
 intros * Hll.
 split. {
   intros l Hl.
-  subst ll.
-  apply Sorted_LocallySorted_iff.
-  revert m n Hl.
-  induction l as [| a]; intros; [ constructor | cbn ].
-  destruct l as [| b]; [ constructor | ].
-  constructor. {
-    apply IHl with (m := 42) (n := 18).
-...
-  destruct l as [| b]; [ constructor | ].
-  constructor.
-...
-  revert n l Hl.
-  induction m; intros. {
-    destruct Hl; [ | easy ].
-    subst l; constructor.
-  }
-  cbn - [ "<?" ] in Hl.
-  apply filter_In in Hl.
-  destruct Hl as (Hl, Hal).
-  apply in_flat_map in Hl.
-  destruct Hl as (a & Ha & Hl).
-  apply in_seq in Ha.
-  destruct Ha as (_, Ha); cbn in Ha.
-  apply in_map_iff in Hl.
-  destruct Hl as (l' & Hal' & Hl').
-  subst l.
-  destruct l' as [| b]; [ constructor | cbn ].
-  constructor; [ | flia ].
-  apply IHm with (n := n).
-...
-  constructor. {
-    specialize (IHm n l' Hl') as H1.
-    clear m n Ha IHm Hl' Hal.
-    rename l' into l.
-    induction l as [| b]; intros; [ constructor | ].
-    cbn; constructor. {
-      apply IHl.
-      now apply Sorted_inv in H1.
-    }
-...
-  intros l Hl.
-  subst ll.
-  revert n l Hl.
-  induction m; intros. {
-    destruct Hl; [ now subst l | easy ].
-  }
-  cbn - [ "<?" ] in Hl.
-  apply filter_In in Hl.
-  destruct Hl as (Hl, Hal).
-  apply in_flat_map in Hl.
-  destruct Hl as (a & Ha & Hl).
-  apply in_seq in Ha.
-  destruct Ha as (_, Ha); cbn in Ha.
-  apply in_map_iff in Hl.
-  destruct Hl as (l' & Hal' & Hl').
-  subst l.
-  constructor. {
-    specialize (IHm n l' Hl') as H1.
-    clear m n Ha IHm Hl' Hal.
-    rename l' into l.
-    induction l as [| b]; intros; [ constructor | ].
-    cbn; constructor. {
-      apply IHl.
-      now apply Sorted_inv in H1.
-    }
-Print Term HdRel.
-...
-Print Term Sorted.
-Print Term HdRel.
-Print Term LocallySorted.
-Print Term StronglySorted.
 ...
 
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
