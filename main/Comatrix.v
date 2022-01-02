@@ -3582,8 +3582,6 @@ destruct l' as [| b]; [ constructor | ].
 cbn; apply HdRel_cons; flia.
 Qed.
 
-Inspect 1.
-
 Theorem ordered_tuples_inj : ∀ m n ll,
   ll = ordered_tuples m n
   → ∀ i j, i < length ll → j < length ll →
