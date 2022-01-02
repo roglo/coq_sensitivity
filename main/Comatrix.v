@@ -3551,7 +3551,28 @@ Proof.
 intros * Hll.
 split. {
   intros l Hl.
+  subst ll.
+  revert n Hl.
+  induction m; intros. {
+    destruct Hl; [ now subst l | easy ].
+  }
+  cbn - [ "<?" ] in Hl.
+  apply filter_In in Hl.
+  destruct Hl as (Hl, Hal).
+  apply in_flat_map in Hl.
+  destruct Hl as (a & Ha & Hl).
+  apply in_seq in Ha.
+  destruct Ha as (_, Ha); cbn in Ha.
+  apply in_map_iff in Hl.
+  destruct Hl as (l' & Hal' & Hl').
+  subst l.
+  constructor. {
+(* souvent, j'ai du mal avec les trucs triés, moi *)
+...
 Print Term Sorted.
+Print Term HdRel.
+Print Term LocallySorted.
+Print Term StronglySorted.
 ...
 
 Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
