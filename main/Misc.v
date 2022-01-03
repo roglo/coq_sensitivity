@@ -467,16 +467,49 @@ Qed.
 
 (* end map2 *)
 
-(* List_find_nth: like find but doesn't return the element found
-   but its rank in the list *)
+Check option_map.
 
-Fixpoint List_find_nth_loop i A (f : A → bool) (l : list A) :=
+(* rank: rank of the first element satisfying a predicate *)
+(* like "find" but returning the rank, not the element itself *)
+
+Fixpoint List_rank_loop i A (f : A → bool) (l : list A) : option nat :=
   match l with
   | [] => None
-  | x :: tl => if f x then Some i else List_find_nth_loop (S i) f tl
+  | x :: tl => if f x then Some i else List_rank_loop (S i) f tl
 end.
 
-Definition List_find_nth := List_find_nth_loop 0.
+Definition List_rank := List_rank_loop 0.
+
+Theorem find_vs_rank_loop : ∀ A f l (d : A) i,
+  find f l = option_map (λ j, nth (j - i) l d) (List_rank_loop i f l).
+Proof.
+intros.
+revert i.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+remember (f a) as b eqn:Hb; symmetry  in Hb.
+destruct b; [ now cbn; rewrite Nat.sub_diag | ].
+...
+cbn - [  ].
+
+...
+
+Theorem find_vs_rank : ∀ A f l (d : A),
+  find f l = option_map (λ i, nth i l d) (List_rank f l).
+Proof.
+intros.
+unfold List_rank.
+induction l as [| a]; [ easy | cbn ].
+remember (f a) as b eqn:Hb; symmetry  in Hb.
+destruct
+...
+     rank P l =
+       match find P l with
+       | None => None
+       | Some a =>
+
+     rank P l = option_map (λ a, find (eq a)) (find P l)
+...
 
 Theorem List_find_nth_loop_interv : ∀ A f (l : list A) i j,
   List_find_nth_loop i f l = Some j
