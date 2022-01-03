@@ -3418,7 +3418,7 @@ Fixpoint ordered_tuples (n k : nat) : list (list nat) :=
       end
   end.
 
-Fixpoint ordered_tuples_inv n k (t : list nat) : nat :=
+Fixpoint ordered_tuple_rank n k (t : list nat) : nat :=
   match k with
   | 0 => 0
   | S k' =>
@@ -3427,19 +3427,25 @@ Fixpoint ordered_tuples_inv n k (t : list nat) : nat :=
       | S n' =>
           if last t 0 =? n' then
             length (ordered_tuples n' k) +
-            ordered_tuples_inv n' k' (removelast t)
+            ordered_tuple_rank n' k' (removelast t)
           else
-            ordered_tuples_inv n' k t
+            ordered_tuple_rank n' k t
       end
   end.
 
 (*
 Compute (let n := 5 in map (λ i, let l := ordered_tuples n i in length l) (seq 0 (n + 3))).
 Compute (let n := 5 in map (λ i, let l := ordered_tuples n i in (length l, l)) (seq 0 (n + 3))).
-Compute (let '(n,k) := (5,3) in let ll := ordered_tuples n k in map (λ i, (i, ordered_tuples_inv n k (nth i ll []))) (seq 0 (length ll))).
+Compute (let '(n,k) := (5,3) in let ll := ordered_tuples n k in map (λ i, (i, ordered_tuple_rank n k (nth i ll []))) (seq 0 (length ll))).
 *)
 
-(* prouver que c'est bien l'inverse *)
+(* *)
+
+Theorem ordered_tuple_rank_of_nth : ∀ n k i,
+  ordered_tuple_rank n k (nth i (ordered_tuples n k) []) = i.
+
+Theorem nth_of_ordered_tuple_rank : ∀ n k t,
+  nth (ordered_tuple_rank n k t) (ordered_tuples n k) [] = t.
 
 ...
 
