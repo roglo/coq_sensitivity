@@ -164,6 +164,17 @@ Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36)
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
 Proof. intros; now destruct l. Qed.
 
+Theorem List_last_nth {A} : ∀ l (d : A), last l d = nth (length l - 1) l d.
+Proof.
+intros.
+induction l using rev_ind; [ easy | ].
+rewrite app_length; cbn.
+rewrite Nat.add_sub.
+rewrite last_last.
+rewrite app_nth2; [ | now unfold ge ].
+now rewrite Nat.sub_diag.
+Qed.
+
 Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → hd d l ∈ l.
 Proof.
 intros.

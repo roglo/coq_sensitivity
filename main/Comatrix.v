@@ -3468,6 +3468,33 @@ Qed.
 
 (* *)
 
+Theorem ordered_tuples_lt : ∀ k n t,
+  t ∈ ordered_tuples n k
+  → ∀ a, a ∈ t → a < n.
+Proof.
+intros * Ht a Hat.
+revert k t Ht Hat.
+induction n; intros. {
+  destruct k; [ cbn in Ht | easy ].
+  destruct Ht; [ now subst t | easy ].
+}
+destruct k; cbn in Ht. {
+  destruct Ht; [ now subst t | easy ].
+}
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. {
+  specialize (IHn _ _ Ht Hat).
+  now apply Nat.lt_lt_succ_r.
+}
+apply in_map_iff in Ht.
+destruct Ht as (l & Hln & Hl); subst t.
+apply in_app_iff in Hat.
+cbn in Hat.
+destruct Hat as [Hal| [Hal| Hal]]; [ | now subst a | easy ].
+apply Nat.lt_lt_succ_r.
+now apply (IHn k l).
+Qed.
+
 Theorem ordered_tuple_rank_of_nth : ∀ n k i,
   i < binomial n k
   → ordered_tuple_rank n k (nth i (ordered_tuples n k) []) = i.
@@ -3481,13 +3508,44 @@ cbn.
 rewrite ordered_tuples_length.
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
 cbn in Hi.
+(**)
 destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
   rewrite app_nth1; [ | now rewrite ordered_tuples_length ].
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ n) as [Hlz| Hlz]. {
     exfalso.
-    clear IHn Hi.
-    induction n; [ easy | ].
+    specialize (ordered_tuples_lt (S k) n) as H1.
+...
+    remember (ordered_tuples n (S k)) as ll eqn:Hll.
+    specialize (H1 (nth i ll [])).
+    assert (H : nth i ll [] ∈ ll). {
+      now apply nth_In; rewrite Hll, ordered_tuples_length.
+    }
+    specialize (H1 H); clear H.
+    specialize (H1 (last (nth i ll []) 0)).
+    rewrite Hlz in H1.
+    assert (H : n ∈ nth i ll []). {
+      rewrite <- Hlz.
+      rewrite List_last_nth.
+      apply nth_In.
+      apply Nat.sub_lt; [ | easy ].
+      rewrite Hll.
+      destruct n; [ easy | ].
+      cbn.
+      rewrite app_nth1. 2: {
+        rewrite ordered_tuples_length.
+      rewrite app_length.
+
+Search (_ - _ < _).
+...
+Search (last _ _ ∈ _).
+Search last.
+...
+Search (nth _ _ _ ∈ _).
+specialize (nth_In
+...
+    revert k Hik Hlz.
+    induction n; intros; [ easy | ].
     cbn in Hik, Hlz.
 ...
   destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
@@ -3625,33 +3683,6 @@ destruct Ht as [Ht| Ht]; [ easy | ].
 apply in_map_iff in Ht.
 destruct Ht as (x & Hx & Hxn).
 now apply app_eq_nil in Hx.
-Qed.
-
-Theorem ordered_tuples_lt : ∀ k n t,
-  t ∈ ordered_tuples n k
-  → ∀ a, a ∈ t → a < n.
-Proof.
-intros * Ht a Hat.
-revert k t Ht Hat.
-induction n; intros. {
-  destruct k; [ cbn in Ht | easy ].
-  destruct Ht; [ now subst t | easy ].
-}
-destruct k; cbn in Ht. {
-  destruct Ht; [ now subst t | easy ].
-}
-apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]. {
-  specialize (IHn _ _ Ht Hat).
-  now apply Nat.lt_lt_succ_r.
-}
-apply in_map_iff in Ht.
-destruct Ht as (l & Hln & Hl); subst t.
-apply in_app_iff in Hat.
-cbn in Hat.
-destruct Hat as [Hal| [Hal| Hal]]; [ | now subst a | easy ].
-apply Nat.lt_lt_succ_r.
-now apply (IHn k l).
 Qed.
 
 Fixpoint sorted {A} (ord : A → A → bool) l :=
