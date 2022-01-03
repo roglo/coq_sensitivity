@@ -3439,10 +3439,97 @@ Compute (let n := 5 in map (λ i, let l := ordered_tuples n i in (length l, l)) 
 Compute (let '(n,k) := (5,3) in let ll := ordered_tuples n k in map (λ i, (i, ordered_tuple_rank n k (nth i ll []))) (seq 0 (length ll))).
 *)
 
+(* binomial *)
+(* code borrowed from my work "coq_euler_prod_form" *)
+
+Fixpoint binomial n k :=
+  match k with
+  | 0 => 1
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' => binomial n' k' + binomial n' k
+     end
+  end.
+
+(* end borrowed code *)
+
+Theorem ordered_tuples_length : ∀ k n,
+  length (ordered_tuples n k) = binomial n k.
+Proof.
+intros.
+revert k.
+induction n; intros; [ now destruct k | ].
+destruct k; [ easy | cbn ].
+rewrite app_length, map_length.
+rewrite IHn, IHn.
+apply Nat.add_comm.
+Qed.
+
 (* *)
 
 Theorem ordered_tuple_rank_of_nth : ∀ n k i,
-  ordered_tuple_rank n k (nth i (ordered_tuples n k) []) = i.
+  i < binomial n k
+  → ordered_tuple_rank n k (nth i (ordered_tuples n k) []) = i.
+Proof.
+intros * Hi.
+revert k i Hi.
+induction n; intros. {
+  destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
+}
+cbn.
+rewrite ordered_tuples_length.
+destruct k; [ now apply Nat.lt_1_r in Hi | ].
+cbn in Hi.
+destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite ordered_tuples_length ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ n) as [Hlz| Hlz]. {
+    exfalso.
+    clear IHn Hi.
+    induction n; [ easy | ].
+    cbn in Hik, Hlz.
+...
+  destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
+    rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+    now apply IHn in Hij.
+  }
+  apply Nat.nlt_ge in Hjk.
+  rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+  rewrite ordered_tuples_length in Hij.
+  rewrite (List_map_nth' []) in Hij. 2: {
+    rewrite ordered_tuples_length; flia Hj Hjk.
+  }
+  exfalso; clear IHn Hi Hj.
+  now apply (H1 i j).
+}
+apply Nat.nlt_ge in Hik.
+rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+rewrite ordered_tuples_length in Hij.
+rewrite (List_map_nth' []) in Hij. 2: {
+  rewrite ordered_tuples_length; flia Hi Hik.
+}
+destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
+  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+  exfalso; clear IHn Hi Hj.
+  now apply (H1 j i).
+}
+clear H1.
+apply Nat.nlt_ge in Hjk.
+rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+rewrite ordered_tuples_length in Hij.
+rewrite (List_map_nth' []) in Hij. 2: {
+  rewrite ordered_tuples_length; flia Hj Hjk.
+}
+apply app_inv_tail_iff in Hij.
+specialize (IHn k (i - binomial n (S k)) (j - binomial n (S k))).
+assert (H : i - binomial n (S k) < binomial n k) by flia Hi Hik.
+specialize (IHn H); clear H.
+assert (H : j - binomial n (S k) < binomial n k) by flia Hj Hjk.
+specialize (IHn H); clear H.
+specialize (IHn Hij).
+flia IHn Hik Hjk.
+...
 
 Theorem nth_of_ordered_tuple_rank : ∀ n k t,
   nth (ordered_tuple_rank n k t) (ordered_tuples n k) [] = t.
@@ -3622,33 +3709,9 @@ apply H1.
 now right.
 Qed.
 
-(* binomial *)
-(* code borrowed from my work "coq_euler_prod_form" *)
+...
 
-Fixpoint binomial n k :=
-  match k with
-  | 0 => 1
-  | S k' =>
-      match n with
-      | 0 => 0
-      | S n' => binomial n' k' + binomial n' k
-     end
-  end.
-
-(* end borrowed code *)
-
-Theorem ordered_tuples_length : ∀ k n,
-  length (ordered_tuples n k) = binomial n k.
-Proof.
-intros.
-revert k.
-induction n; intros; [ now destruct k | ].
-destruct k; [ easy | cbn ].
-rewrite app_length, map_length.
-rewrite IHn, IHn.
-apply Nat.add_comm.
-Qed.
-
+(* should be useless if there is an inverse *)
 Theorem ordered_tuples_inj : ∀ k n ll,
   ll = ordered_tuples n k
   → ∀ i j, i < length ll → j < length ll →
