@@ -3553,6 +3553,24 @@ intros.
 apply Bool.andb_true_iff.
 Qed.
 
+Theorem sorted_extends : ∀ A ord (a : A) l,
+  (∀ a b c, ord a b = true → ord b c = true → ord a c = true)
+  → sorted ord (a :: l) = true
+  → ∀ b, b ∈ l → ord a b = true.
+Proof.
+intros * Htrans Hsort b Hb.
+induction l as [| c]; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hac, Hsort).
+destruct Hb as [Hb| Hb]; [ now subst c | ].
+apply IHl; [ | easy ].
+destruct l as [| d]; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+apply sorted_cons_cons_true_iff.
+destruct Hsort as (Hcd, Hsort).
+split; [ now apply Htrans with (b := c) | easy ].
+Qed.
+
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
@@ -3674,6 +3692,36 @@ Theorem nth_of_ordered_tuple_rank : ∀ n k t,
 Proof.
 intros * Hs Htk Hlt.
 destruct (le_dec k n) as [Hkn| Hkn]. 2: {
+  assert
+    (Hsa : ∀ a i l,
+        sorted Nat.ltb (a :: l) = true
+        → i < length l
+        → a = nth i l 0
+        → False). {
+    clear.
+    intros * Hsort Hil Ha.
+    destruct l as [| b]; [ cbn in Hil; flia Hil | ].
+    apply sorted_cons_cons_true_iff in Hsort.
+    destruct Hsort as (Hab & Hs).
+    apply Nat.ltb_lt in Hab.
+    specialize (sorted_extends Nat.ltb b l) as H1.
+    destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
+    assert (H : ∀ a b c, (a <? b) = true → (b <? c) = true → (a <? c) = true). {
+      clear.
+      intros * Hab Hbc.
+      apply Nat.ltb_lt in Hab, Hbc.
+      apply Nat.ltb_lt.
+      now transitivity b.
+    }
+    specialize (H1 H); clear H.
+    specialize (H1 Hs a).
+    cbn in Hil.
+    apply Nat.succ_lt_mono in Hil.
+    assert (H : a ∈ l) by now subst a; apply nth_In.
+    specialize (H1 H).
+    apply Nat.ltb_lt in H1.
+    flia Hab H1.
+  }
   apply Nat.nle_gt in Hkn.
   rewrite ordered_tuple_rank_out; [ | easy ].
   rewrite ordered_tuples_out; [ | easy ].
@@ -3688,39 +3736,38 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   specialize (H1 x x' eq_refl).
   destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
   exfalso; apply Hxx'; clear Hxx'.
-  clear - Hs Hx Hx' Hxxt.
+  clear - Hs Hx Hx' Hxxt Hsa.
   revert x x' Hx Hx' Hxxt.
   induction t as [| a]; intros; [ easy | ].
   destruct x. {
     destruct x'; [ easy | exfalso ].
-    cbn in Hxxt.
-    destruct t as [| b]; [ cbn in Hx'; flia Hx' | ].
-    destruct x'. {
-      cbn in Hxxt; subst b.
-      apply sorted_cons_cons_true_iff in Hs.
-      now rewrite Nat.ltb_irrefl in Hs.
-    }
-    cbn in Hxxt.
-    apply sorted_cons_cons_true_iff in Hs.
-    destruct Hs as (Hab & Hs).
-    apply Nat.ltb_lt in Hab.
     cbn in Hx'.
     apply Nat.succ_lt_mono in Hx'.
-(* ouais alors je sais pas, je sais plus *)
-...
-    specialize (IHt Hs 0 (S x') (Nat.lt_0_succ _)).
-    specialize (IHt Hx').
-    cbn in IHt.
-    rewrite <- Hxxt in IHt.
-...
-revert k t Hs Htk Hlt.
+    now apply (Hsa a x' t).
+  }
+  cbn in Hx.
+  apply Nat.succ_lt_mono in Hx.
+  destruct x'. {
+    exfalso.
+    cbn in Hxxt; symmetry in Hxxt.
+    now apply (Hsa a x t).
+  }
+  cbn in Hx', Hxxt.
+  apply Nat.succ_lt_mono in Hx'.
+  f_equal.
+  apply IHt; [ | easy | easy | easy ].
+  destruct t as [| b]; [ easy | ].
+  now apply sorted_cons_cons_true_iff in Hs.
+}
+revert k t Hs Htk Hlt Hkn.
 induction n; intros. {
-  destruct t as [| a]; [ now destruct k | ].
-  now specialize (Hlt a (or_introl eq_refl)).
+  apply Nat.le_0_r in Hkn; subst k.
+  now apply length_zero_iff_nil in Hkn; subst t.
 }
 destruct k. {
   now apply length_zero_iff_nil in Htk; subst t.
 }
+apply Nat.succ_le_mono in Hkn.
 cbn.
 rewrite ordered_tuples_length.
 rewrite if_eqb_eq_dec.
@@ -3728,9 +3775,8 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   rewrite app_nth2; [ | rewrite ordered_tuples_length; flia ].
   rewrite ordered_tuples_length.
   rewrite Nat.add_comm, Nat.add_sub.
-  destruct (le_dec k n) as [Hkn| Hkn]. 2: {
-    apply Nat.nle_gt in Hkn.
-    rewrite ordered_tuple_rank_lt; [ | easy ].
+(* bin ouais mais, j'ai l'air d'un con, avec ça, moi.
+   qu'est-ce que je fais de ça ? *)
 ...
     rewrite (List_map_nth' []).
 2: rewrite ordered_tuples_length.
