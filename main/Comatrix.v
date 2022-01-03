@@ -3605,7 +3605,7 @@ Fixpoint binomial n k :=
 
 (* end borrowed code *)
 
-Theorem ordered_tuple_length : ∀ k n,
+Theorem ordered_tuples_length : ∀ k n,
   length (ordered_tuples k n) = binomial n k.
 Proof.
 intros.
@@ -3624,7 +3624,7 @@ Theorem ordered_tuples_inj : ∀ k n ll,
 Proof.
 intros * Hll * Hi Hj Hij.
 subst ll.
-rewrite ordered_tuple_length in Hi, Hj.
+rewrite ordered_tuples_length in Hi, Hj.
 revert k i j Hi Hj Hij.
 induction n; intros. {
   destruct k; cbn in Hi, Hj; [ | easy ].
@@ -3635,6 +3635,43 @@ destruct k. {
   apply Nat.lt_1_r in Hi, Hj; congruence.
 }
 cbn in Hi, Hj, Hij.
+destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
+  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+  destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
+    rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+    now apply IHn in Hij.
+  }
+  apply Nat.nlt_ge in Hjk.
+  rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+  rewrite ordered_tuples_length in Hij.
+  rewrite (List_map_nth' []) in Hij. 2: {
+    rewrite ordered_tuples_length; flia Hj Hjk.
+  }
+  exfalso; clear IHn.
+  specialize ordered_tuples_lt as H1.
+  specialize (H1 (S k) n).
+  specialize (H1 (nth i (ordered_tuples (S k) n) [])).
+  remember (ordered_tuples (S k) n) as ll eqn:Hll.
+  assert (H : nth i ll [] ∈ ll). {
+    apply nth_In; subst ll.
+    now rewrite ordered_tuples_length.
+  }
+  specialize (H1 H); clear H.
+  rewrite Hij in H1.
+  specialize (H1 n).
+  remember (ordered_tuples k n) as ll1 eqn:Hll1.
+  assert (H : n ∈ nth (j - binomial n (S k)) ll1 [] ++ [n]). {
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H.
+  now apply Nat.lt_irrefl in H1.
+}
+apply Nat.nlt_ge in Hik.
+rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
+... même galère que ci-dessus
+  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+  rewrite (List_map_nth' []) in Hij.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
