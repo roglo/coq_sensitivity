@@ -3704,8 +3704,11 @@ specialize (IHn Hij).
 flia IHn Hik Hjk.
 Qed.
 
-Inspect 1.
-
+Theorem ordered_tuples_surj : ∀ m n ll,
+  ll = ordered_tuples m n
+  → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
+Proof.
+intros * Hll * Hl.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
