@@ -3635,19 +3635,14 @@ destruct k. {
   apply Nat.lt_1_r in Hi, Hj; congruence.
 }
 cbn in Hi, Hj, Hij.
-destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
-  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-  destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
-    rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-    now apply IHn in Hij.
-  }
-  apply Nat.nlt_ge in Hjk.
-  rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
-  rewrite ordered_tuples_length in Hij.
-  rewrite (List_map_nth' []) in Hij. 2: {
-    rewrite ordered_tuples_length; flia Hj Hjk.
-  }
-  exfalso; clear IHn.
+assert (H1 : ∀ i j,
+  nth i (ordered_tuples (S k) n) [] =
+  nth (j - binomial n (S k)) (ordered_tuples k n) [] ++ [n]
+  → i < binomial n (S k)
+  → binomial n (S k) ≤ j
+  → False). {
+  clear i j Hi Hj Hij.
+  intros * Hij Hik Hjk.
   specialize ordered_tuples_lt as H1.
   specialize (H1 (S k) n).
   specialize (H1 (nth i (ordered_tuples (S k) n) [])).
@@ -3666,12 +3661,33 @@ destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
   specialize (H1 H); clear H.
   now apply Nat.lt_irrefl in H1.
 }
+destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
+  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+  destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
+    rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
+    now apply IHn in Hij.
+  }
+  apply Nat.nlt_ge in Hjk.
+  rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+  rewrite ordered_tuples_length in Hij.
+  rewrite (List_map_nth' []) in Hij. 2: {
+    rewrite ordered_tuples_length; flia Hj Hjk.
+  }
+  exfalso; clear IHn Hi Hj.
+  now apply (H1 i j).
+}
 apply Nat.nlt_ge in Hik.
 rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+rewrite ordered_tuples_length in Hij.
 destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
-... même galère que ci-dessus
   rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-  rewrite (List_map_nth' []) in Hij.
+  rewrite (List_map_nth' []) in Hij. 2: {
+    rewrite ordered_tuples_length; flia Hi Hik.
+  }
+  exfalso; clear IHn Hi Hj.
+  now apply (H1 j i).
+}
+apply Nat.nlt_ge in Hjk.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
