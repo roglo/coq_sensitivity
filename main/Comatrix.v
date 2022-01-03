@@ -3775,18 +3775,17 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   rewrite app_nth2; [ | rewrite ordered_tuples_length; flia ].
   rewrite ordered_tuples_length.
   rewrite Nat.add_comm, Nat.add_sub.
-(* bin ouais mais, j'ai l'air d'un con, avec ça, moi.
-   qu'est-ce que je fais de ça ? *)
-...
-    rewrite (List_map_nth' []).
-2: rewrite ordered_tuples_length.
-
-Search (hd (ordered_tuples _ _)).
-Search (nth 0 (ordered_tuples _ _)).
-...
   rewrite (List_map_nth' []). 2: {
     rewrite ordered_tuples_length.
-    apply ordered_tuple_rank_ub.
+    now apply ordered_tuple_rank_ub.
+  }
+  destruct t as [| a] using rev_ind; [ easy | ].
+  rewrite last_last in Hln; subst a.
+  rewrite removelast_last.
+  rewrite app_length, Nat.add_1_r in Htk; cbn in Htk.
+  apply Nat.succ_inj in Htk.
+  f_equal.
+  apply IHn; [ | easy | | easy ].
 ...
   clear Hln.
   revert k Htk.
