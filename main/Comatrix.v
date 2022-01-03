@@ -3406,22 +3406,42 @@ Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 
-Fixpoint ordered_tuples (k n : nat) : list (list nat) :=
+Fixpoint ordered_tuples (n k : nat) : list (list nat) :=
   match k with
   | 0 => [[]]
   | S k' =>
       match n with
       | 0 => []
       | S n' =>
-          ordered_tuples (S k') n' ++
-          map (λ l, l ++ [n']) (ordered_tuples k' n')
+          ordered_tuples n' k ++
+          map (λ l, l ++ [n']) (ordered_tuples n' k')
+      end
+  end.
+
+Fixpoint ordered_tuples_inv n k (t : list nat) : nat :=
+  match k with
+  | 0 => 0
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' =>
+          if last t 0 =? n' then
+            length (ordered_tuples n' k) +
+            ordered_tuples_inv n' k' (removelast t)
+          else
+            ordered_tuples_inv n' k t
       end
   end.
 
 (*
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
-Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
+Compute (let n := 5 in map (λ i, let l := ordered_tuples n i in length l) (seq 0 (n + 3))).
+Compute (let n := 5 in map (λ i, let l := ordered_tuples n i in (length l, l)) (seq 0 (n + 3))).
+Compute (let '(n,k) := (5,3) in let ll := ordered_tuples n k in map (λ i, (i, ordered_tuples_inv n k (nth i ll []))) (seq 0 (length ll))).
 *)
+
+(* prouver que c'est bien l'inverse *)
+
+...
 
 Section a.
 
@@ -3487,22 +3507,22 @@ rewrite List_map_seq_length.
 ...
 *)
 
-Theorem ordered_tuples_0_l : ∀ n, ordered_tuples 0 n = [[]].
+Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
-Theorem ordered_tuples_1_l : ∀ n,
-  ordered_tuples 1 n = map (λ i, [i]) (seq 0 n).
+Theorem ordered_tuples_1_r : ∀ n,
+  ordered_tuples n 1 = map (λ i, [i]) (seq 0 n).
 Proof.
 intros.
 induction n; [ easy | ].
 rewrite seq_S; cbn.
 rewrite map_app; cbn.
 rewrite <- IHn; f_equal.
-now rewrite ordered_tuples_0_l.
+now rewrite ordered_tuples_0_r.
 Qed.
 
 Theorem ordered_tuples_are_correct : ∀ k n t,
-  k ≠ 0 → t ∈ ordered_tuples k n → t ≠ [].
+  k ≠ 0 → t ∈ ordered_tuples n k → t ≠ [].
 Proof.
 intros * Hkz Ht Htz; subst t.
 destruct k; [ easy | clear Hkz ].
@@ -3515,7 +3535,7 @@ now apply app_eq_nil in Hx.
 Qed.
 
 Theorem ordered_tuples_lt : ∀ k n t,
-  t ∈ ordered_tuples k n
+  t ∈ ordered_tuples n k
   → ∀ a, a ∈ t → a < n.
 Proof.
 intros * Ht a Hat.
@@ -3548,8 +3568,16 @@ Fixpoint sorted {A} (ord : A → A → bool) l :=
   | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
   end.
 
+Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
+  sorted ord (a :: b :: l) = true
+  ↔ ord a b = true ∧ sorted ord (b :: l) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+Qed.
+
 Theorem ordered_tuples_sorted : ∀ k n ll,
-  ll = ordered_tuples k n
+  ll = ordered_tuples n k
   → ∀ l, l ∈ ll → sorted Nat.ltb l = true.
 Proof.
 intros * Hll * Hl.
@@ -3578,72 +3606,14 @@ destruct l as [| b]. {
   now apply Nat.ltb_lt, H1; left.
 }
 cbn - [ sorted ] in IHl |-*.
-...
-cbn.
-constructor. {
-  apply IHl. {
-    apply Sorted_LocallySorted_iff in IHn.
-    apply Sorted_inv in IHn.
-    destruct IHn as (IHn, _).
-    now apply Sorted_LocallySorted_iff in IHn.
-  }
-  intros c Hc.
-  now apply H1; right.
-}
-apply Sorted_LocallySorted_iff in IHn.
-apply Sorted_inv in IHn.
-destruct IHn as (_, IHn).
-now apply HdRel_inv in IHn.
-Qed.
-...
-
-Require Import Sorted.
-Theorem ordered_tuples_sorted : ∀ k n ll,
-  ll = ordered_tuples k n
-  → ∀ l, l ∈ ll → Sorted lt l.
-Proof.
-intros * Hll * Hl.
-subst ll.
-revert k l Hl.
-induction n; intros. {
-  destruct k; [ cbn in Hl | easy ].
-  destruct Hl; [ now subst l | easy ].
-}
-destruct k; cbn in Hl. {
-  destruct Hl; [ now subst l | easy ].
-}
-apply in_app_iff in Hl.
-destruct Hl as [Hl| Hl]; [ now apply IHn in Hl | ].
-apply in_map_iff in Hl.
-destruct Hl as (l' & Hl'n & Hl); subst l.
-rename l' into l.
-specialize (IHn _ _ Hl).
-specialize (ordered_tuples_lt _ _ _ Hl) as H1.
-clear k Hl.
-apply Sorted_LocallySorted_iff in IHn.
-apply Sorted_LocallySorted_iff.
-revert n H1.
-induction l as [| a]; intros; [ constructor | cbn ].
-destruct l as [| b]. {
-  cbn.
-  constructor; [ constructor | ].
-  now apply H1; left.
-}
-cbn.
-constructor. {
-  apply IHl. {
-    apply Sorted_LocallySorted_iff in IHn.
-    apply Sorted_inv in IHn.
-    destruct IHn as (IHn, _).
-    now apply Sorted_LocallySorted_iff in IHn.
-  }
-  intros c Hc.
-  now apply H1; right.
-}
-apply Sorted_LocallySorted_iff in IHn.
-apply Sorted_inv in IHn.
-destruct IHn as (_, IHn).
-now apply HdRel_inv in IHn.
+apply sorted_cons_cons_true_iff in IHn.
+apply sorted_cons_cons_true_iff.
+destruct IHn as (Hab, Hbl).
+split; [ easy | ].
+apply IHl; [ | easy ].
+intros c Hc.
+apply H1.
+now right.
 Qed.
 
 (* binomial *)
@@ -3662,7 +3632,7 @@ Fixpoint binomial n k :=
 (* end borrowed code *)
 
 Theorem ordered_tuples_length : ∀ k n,
-  length (ordered_tuples k n) = binomial n k.
+  length (ordered_tuples n k) = binomial n k.
 Proof.
 intros.
 revert k.
@@ -3674,7 +3644,7 @@ apply Nat.add_comm.
 Qed.
 
 Theorem ordered_tuples_inj : ∀ k n ll,
-  ll = ordered_tuples k n
+  ll = ordered_tuples n k
   → ∀ i j, i < length ll → j < length ll →
    nth i ll [] = nth j ll [] → i = j.
 Proof.
@@ -3692,8 +3662,8 @@ destruct k. {
 }
 cbn in Hi, Hj, Hij.
 assert (H1 : ∀ i j,
-  nth i (ordered_tuples (S k) n) [] =
-  nth (j - binomial n (S k)) (ordered_tuples k n) [] ++ [n]
+  nth i (ordered_tuples n (S k)) [] =
+  nth (j - binomial n (S k)) (ordered_tuples n k) [] ++ [n]
   → i < binomial n (S k)
   → binomial n (S k) ≤ j
   → False). {
@@ -3701,8 +3671,8 @@ assert (H1 : ∀ i j,
   intros * Hij Hik Hjk.
   specialize ordered_tuples_lt as H1.
   specialize (H1 (S k) n).
-  specialize (H1 (nth i (ordered_tuples (S k) n) [])).
-  remember (ordered_tuples (S k) n) as ll eqn:Hll.
+  specialize (H1 (nth i (ordered_tuples n (S k)) [])).
+  remember (ordered_tuples n (S k)) as ll eqn:Hll.
   assert (H : nth i ll [] ∈ ll). {
     apply nth_In; subst ll.
     now rewrite ordered_tuples_length.
@@ -3710,7 +3680,7 @@ assert (H1 : ∀ i j,
   specialize (H1 H); clear H.
   rewrite Hij in H1.
   specialize (H1 n).
-  remember (ordered_tuples k n) as ll1 eqn:Hll1.
+  remember (ordered_tuples n k) as ll1 eqn:Hll1.
   assert (H : n ∈ nth (j - binomial n (S k)) ll1 [] ++ [n]). {
     now apply in_or_app; right; left.
   }
@@ -3761,7 +3731,7 @@ flia IHn Hik Hjk.
 Qed.
 
 Theorem ordered_tuples_surj : ∀ m n ll,
-  ll = ordered_tuples m n
+  ll = ordered_tuples n m
   → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
 Proof.
 intros * Hll * Hl.
@@ -3769,7 +3739,7 @@ Print Module Sorted.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
-  ll = ordered_tuples m n
+  ll = ordered_tuples n m
   → (∀ l, l ∈ ll → Sorted lt l) ∧
     (∀ i j, i < length ll → j < length ll →
      nth i ll [] = nth j ll [] → i = j) ∧
@@ -3830,8 +3800,8 @@ rewrite app_nil_r.
 rewrite flat_map_concat_map.
 rewrite <- map_map.
 rewrite concat_filter_map.
-Compute (let n := 5 in (ordered_tuples 0 n, ordered_tuples n n)).
-Compute (let n := 5 in map (λ i, ordered_tuples i (S i)) (seq 0 n)).
+Compute (let n := 5 in (ordered_tuples n 0, ordered_tuples n n)).
+Compute (let n := 5 in map (λ i, ordered_tuples (S i) i) (seq 0 n)).
 (* bof, chais pas *)
 (* bon, je vais essayer de faire un théorème qui prouve les
    propriétés de ordered_tuples (triés, injectif, surjectif)
@@ -3900,7 +3870,7 @@ Theorem cauchy_binet_formula : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → det (A * B) =
-     ∑ (jl ∈ ordered_tuples m n),
+     ∑ (jl ∈ ordered_tuples n m,
      det (mat_with_cols jl A) * det (mat_with_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
