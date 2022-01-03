@@ -3452,6 +3452,26 @@ Fixpoint binomial n k :=
      end
   end.
 
+Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; [ now destruct k | cbn ].
+destruct k; [ flia Hnk | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | easy ].
+rewrite Nat.add_0_l.
+apply IHn; flia Hnk.
+Qed.
+
+Theorem binomial_diag : ∀ n, binomial n n = 1.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn.
+now rewrite binomial_lt.
+Qed.
+
 (* end borrowed code *)
 
 Theorem ordered_tuples_length : ∀ k n,
@@ -3528,6 +3548,54 @@ Fixpoint sorted {A} (ord : A → A → bool) l :=
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
+Theorem ordered_tuple_rank_lt : ∀ n k t,
+  n < k
+  → ordered_tuple_rank n k t = 0.
+Proof.
+intros * Hnk.
+revert t k Hnk.
+induction n; intros; cbn; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite ordered_tuples_length.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (last t 0) n) as [Htn| Htn]. {
+  rewrite IHn; [ | easy ].
+  rewrite Nat.add_0_r.
+  rewrite binomial_lt; [ easy | flia Hnk ].
+}
+apply IHn; flia Hnk.
+Qed.
+
+Theorem ordered_tuple_rank_ub : ∀ n k t,
+  k ≤ n
+  → ordered_tuple_rank n k t < binomial n k.
+Proof.
+intros * Hkn.
+revert k t Hkn.
+induction n; intros. {
+  now apply Nat.le_0_r in Hkn; subst k; cbn.
+}
+destruct k; cbn; [ easy | ].
+apply Nat.succ_le_mono in Hkn.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
+  rewrite ordered_tuples_length, Nat.add_comm.
+  apply Nat.add_lt_mono_r.
+  now apply IHn.
+} {
+  destruct (Nat.eq_dec k n) as [Hk| Hk]. {
+    subst k.
+    rewrite ordered_tuple_rank_lt; [ | easy ].
+    now rewrite binomial_diag.
+  }
+  transitivity (binomial n (S k)); [ apply IHn; flia Hkn Hk | ].
+  apply Nat.lt_add_pos_l.
+  specialize (IHn k [] Hkn).
+  flia IHn.
+}
+Qed.
+
 Theorem ordered_tuple_rank_of_nth : ∀ n k i,
   i < binomial n k
   → ordered_tuple_rank n k (nth i (ordered_tuples n k) []) = i.
@@ -3599,8 +3667,9 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   rewrite app_nth2; [ | rewrite ordered_tuples_length; flia ].
   rewrite ordered_tuples_length.
   rewrite Nat.add_comm, Nat.add_sub.
-rewrite (List_map_nth' []). 2: {
-  rewrite ordered_tuples_length.
+  rewrite (List_map_nth' []). 2: {
+    rewrite ordered_tuples_length.
+    apply ordered_tuple_rank_ub.
 ...
   clear Hln.
   revert k Htk.
