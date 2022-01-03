@@ -3563,42 +3563,31 @@ destruct Hl as (l' & Hl'n & Hl); subst l.
 rename l' into l.
 specialize (IHn _ _ Hl).
 specialize (ordered_tuples_lt _ _ _ Hl) as H1.
-...
-intros * Hll * Hl.
-subst ll.
-revert n l Hl.
-induction m; intros. {
-  destruct Hl; [ now subst l | easy ].
+clear k Hl.
+apply Sorted_LocallySorted_iff in IHn.
+apply Sorted_LocallySorted_iff.
+revert n H1.
+induction l as [| a]; intros; [ constructor | cbn ].
+destruct l as [| b]. {
+  cbn.
+  constructor; [ constructor | ].
+  now apply H1; left.
 }
-cbn - [ "<?" ] in Hl.
-apply filter_In in Hl.
-destruct Hl as (Hl, Hal).
-apply in_flat_map in Hl.
-destruct Hl as (a & Ha & Hl).
-apply in_seq in Ha.
-destruct Ha as (_, Ha); cbn in Ha.
-apply in_map_iff in Hl.
-destruct Hl as (l' & Hal' & Hl').
-subst l.
+cbn.
 constructor. {
-  specialize (IHm n l' Hl') as H1.
-  clear m n Ha IHm Hl' Hal.
-  rename l' into l.
-  induction l as [| b]; intros; [ constructor | ].
-  cbn; constructor. {
-    apply IHl.
-    now apply Sorted_inv in H1.
+  apply IHl. {
+    apply Sorted_LocallySorted_iff in IHn.
+    apply Sorted_inv in IHn.
+    destruct IHn as (IHn, _).
+    now apply Sorted_LocallySorted_iff in IHn.
   }
-  destruct l as [| c]; [ constructor | ].
-  cbn; constructor.
-  apply -> Nat.succ_lt_mono.
-  apply Nat.add_lt_mono_l.
-  apply Sorted_inv in H1.
-  destruct H1 as (_, H1).
-  now apply HdRel_inv in H1.
+  intros c Hc.
+  now apply H1; right.
 }
-destruct l' as [| b]; [ constructor | ].
-cbn; apply HdRel_cons; flia.
+apply Sorted_LocallySorted_iff in IHn.
+apply Sorted_inv in IHn.
+destruct IHn as (_, IHn).
+now apply HdRel_inv in IHn.
 Qed.
 
 (* binomial *)
@@ -3616,64 +3605,36 @@ Fixpoint binomial n k :=
 
 (* end borrowed code *)
 
-Theorem List_length_concat : ∀ A (ll : list (list A)),
-  length (concat ll) = iter_list ll (λ a l, a + length l) 0.
+Theorem ordered_tuple_length : ∀ k n,
+  length (ordered_tuples k n) = binomial n k.
 Proof.
 intros.
-unfold iter_list.
-induction ll as [| l]; cbn; [ easy | ].
-rewrite app_length, IHll.
-symmetry.
-apply fold_left_op_fun_from_d with (d := 0); intros; [ easy | | ]. {
-  apply Nat.add_0_r.
-} {
-  apply Nat.add_assoc.
-}
+revert k.
+induction n; intros; [ now destruct k | ].
+destruct k; [ easy | cbn ].
+rewrite app_length, map_length.
+rewrite IHn, IHn.
+apply Nat.add_comm.
 Qed.
 
-Theorem ordered_tuple_length : ∀ m n,
-  length (ordered_tuples m n) = binomial n m.
-Proof.
-intros.
-revert n.
-induction m; intros; [ now destruct n | ].
-cbn - [ "<?" ].
-...
-destruct n; [ easy | ].
-cbn - [ ordered_tuples seq ].
-...
-intros.
-revert n.
-induction m; intros; [ now destruct n | ].
-cbn - [ "<?" ].
-rewrite flat_map_concat_map.
-rewrite <- concat_filter_map.
-rewrite map_map.
-rewrite List_length_concat.
-Search (iter_list (map _ _)).
-unfold iter_list.
-Search (fold_left _ (map _ _)).
-rewrite List_fold_left_map.
-Search (length (filter _ _)).
-Search (filter _ (map _ _)).
-...
-rewrite <- flat_map_concat_map.
-Search (length (flat_map _ _)).
-...
-
-Theorem ordered_tuples_inj : ∀ m n ll,
-  ll = ordered_tuples m n
+Theorem ordered_tuples_inj : ∀ k n ll,
+  ll = ordered_tuples k n
   → ∀ i j, i < length ll → j < length ll →
    nth i ll [] = nth j ll [] → i = j.
 Proof.
 intros * Hll * Hi Hj Hij.
 subst ll.
-revert n i j Hi Hj Hij.
-induction m; intros. {
+rewrite ordered_tuple_length in Hi, Hj.
+revert k i j Hi Hj Hij.
+induction n; intros. {
+  destruct k; cbn in Hi, Hj; [ | easy ].
+  apply Nat.lt_1_r in Hi, Hj; congruence.
+}
+destruct k. {
   cbn in Hi, Hj.
   apply Nat.lt_1_r in Hi, Hj; congruence.
 }
-cbn - [ "<?" ] in Hi, Hj, Hij.
+cbn in Hi, Hj, Hij.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
