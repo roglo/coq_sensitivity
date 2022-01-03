@@ -3545,10 +3545,31 @@ Fixpoint sorted {A} (ord : A → A → bool) l :=
   | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
   end.
 
+Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
+  sorted ord (a :: b :: l) = true
+  ↔ ord a b = true ∧ sorted ord (b :: l) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
+Qed.
+
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
-Theorem ordered_tuple_rank_lt : ∀ n k t,
+Theorem ordered_tuples_out : ∀ n k,
+  n < k
+  → ordered_tuples n k = [].
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; cbn; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | flia Hnk ].
+now rewrite IHn.
+Qed.
+
+Theorem ordered_tuple_rank_out : ∀ n k t,
   n < k
   → ordered_tuple_rank n k t = 0.
 Proof.
@@ -3586,7 +3607,7 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
 } {
   destruct (Nat.eq_dec k n) as [Hk| Hk]. {
     subst k.
-    rewrite ordered_tuple_rank_lt; [ | easy ].
+    rewrite ordered_tuple_rank_out; [ | easy ].
     now rewrite binomial_diag.
   }
   transitivity (binomial n (S k)); [ apply IHn; flia Hkn Hk | ].
@@ -3652,6 +3673,46 @@ Theorem nth_of_ordered_tuple_rank : ∀ n k t,
   → nth (ordered_tuple_rank n k t) (ordered_tuples n k) [] = t.
 Proof.
 intros * Hs Htk Hlt.
+destruct (le_dec k n) as [Hkn| Hkn]. 2: {
+  apply Nat.nle_gt in Hkn.
+  rewrite ordered_tuple_rank_out; [ | easy ].
+  rewrite ordered_tuples_out; [ | easy ].
+  cbn; symmetry.
+  specialize (pigeonhole_list) as H1.
+  specialize (H1 n t).
+  rewrite <- Htk in Hkn.
+  specialize (H1 Hkn Hlt).
+  remember (pigeonhole_comp_list t) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (x, x').
+  specialize (H1 x x' eq_refl).
+  destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
+  exfalso; apply Hxx'; clear Hxx'.
+  clear - Hs Hx Hx' Hxxt.
+  revert x x' Hx Hx' Hxxt.
+  induction t as [| a]; intros; [ easy | ].
+  destruct x. {
+    destruct x'; [ easy | exfalso ].
+    cbn in Hxxt.
+    destruct t as [| b]; [ cbn in Hx'; flia Hx' | ].
+    destruct x'. {
+      cbn in Hxxt; subst b.
+      apply sorted_cons_cons_true_iff in Hs.
+      now rewrite Nat.ltb_irrefl in Hs.
+    }
+    cbn in Hxxt.
+    apply sorted_cons_cons_true_iff in Hs.
+    destruct Hs as (Hab & Hs).
+    apply Nat.ltb_lt in Hab.
+    cbn in Hx'.
+    apply Nat.succ_lt_mono in Hx'.
+(* ouais alors je sais pas, je sais plus *)
+...
+    specialize (IHt Hs 0 (S x') (Nat.lt_0_succ _)).
+    specialize (IHt Hx').
+    cbn in IHt.
+    rewrite <- Hxxt in IHt.
+...
 revert k t Hs Htk Hlt.
 induction n; intros. {
   destruct t as [| a]; [ now destruct k | ].
@@ -3667,6 +3728,16 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   rewrite app_nth2; [ | rewrite ordered_tuples_length; flia ].
   rewrite ordered_tuples_length.
   rewrite Nat.add_comm, Nat.add_sub.
+  destruct (le_dec k n) as [Hkn| Hkn]. 2: {
+    apply Nat.nle_gt in Hkn.
+    rewrite ordered_tuple_rank_lt; [ | easy ].
+...
+    rewrite (List_map_nth' []).
+2: rewrite ordered_tuples_length.
+
+Search (hd (ordered_tuples _ _)).
+Search (nth 0 (ordered_tuples _ _)).
+...
   rewrite (List_map_nth' []). 2: {
     rewrite ordered_tuples_length.
     apply ordered_tuple_rank_ub.
@@ -3792,14 +3863,6 @@ destruct Ht as [Ht| Ht]; [ easy | ].
 apply in_map_iff in Ht.
 destruct Ht as (x & Hx & Hxn).
 now apply app_eq_nil in Hx.
-Qed.
-
-Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
-  sorted ord (a :: b :: l) = true
-  ↔ ord a b = true ∧ sorted ord (b :: l) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
 Qed.
 
 Theorem ordered_tuples_sorted : ∀ k n ll,
