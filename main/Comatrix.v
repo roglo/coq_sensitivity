@@ -3406,34 +3406,22 @@ Compute (let M := mk_mat [[3;0;0;1];[0;0;2;7];[1;0;1;1];[18;0;2;1]] in (det M, (
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 
-Fixpoint rev_ordered_tuples (m n : nat) : list (list nat) :=
-  match m with
+Fixpoint ordered_tuples (k n : nat) : list (list nat) :=
+  match k with
   | 0 => [[]]
-  | S m' =>
+  | S k' =>
       match n with
       | 0 => []
       | S n' =>
-          map (λ l, n' :: l) (rev_ordered_tuples m' n') ++
-          rev_ordered_tuples (S m') n'
+          ordered_tuples (S k') n' ++
+          map (λ l, l ++ [n']) (ordered_tuples k' n')
       end
   end.
 
-Definition ordered_tuples m n :=
-  map (map (λ i, n - 1 - i)) (rev_ordered_tuples m n).
-
 (*
-Fixpoint old_ordered_tuples (m n : nat) : list (list nat) :=
-  match m with
-  | 0 => [[]]
-  | S m' =>
-      let ot := old_ordered_tuples m' n in
-      filter (forallb (λ j, Nat.ltb j n))
-        (flat_map (λ i, map (λ l, i :: map (Nat.add (S i)) l) ot) (seq 0 n))
-  end.
-*)
-
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in length l) (seq 0 (n + 3))).
 Compute (let n := 5 in map (λ i, let l := ordered_tuples i n in (length l, l)) (seq 0 (n + 3))).
+*)
 
 Section a.
 
@@ -3506,59 +3494,76 @@ Theorem ordered_tuples_1_l : ∀ n,
   ordered_tuples 1 n = map (λ i, [i]) (seq 0 n).
 Proof.
 intros.
-unfold ordered_tuples.
-specialize (ordered_tuples_0_l n) as H1.
-unfold ordered_tuples in H1.
-(* ah shit *)
-...
-destruct n; [ easy | ].
-rewrite Nat_sub_succ_1; cbn.
-rewrite map_map.
-...
-intros.
-cbn - [ "<?" ].
-rewrite flat_map_concat_map.
-rewrite <- concat_filter_map.
-rewrite map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi; apply in_seq in Hi.
-  destruct Hi as (_, Hi); cbn in Hi.
-  cbn - [ "<?" ].
-  rewrite Bool.andb_true_r.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  easy.
-}
-rewrite <- flat_map_concat_map.
-(* ça me troue le cul que "easy" sache résoudre ça ! *)
-easy.
+induction n; [ easy | ].
+rewrite seq_S; cbn.
+rewrite map_app; cbn.
+rewrite <- IHn; f_equal.
+now rewrite ordered_tuples_0_l.
 Qed.
 
-Theorem ordered_tuples_are_correct : ∀ m n t,
-  m ≠ 0 → t ∈ ordered_tuples m n → t ≠ [].
+Theorem ordered_tuples_are_correct : ∀ k n t,
+  k ≠ 0 → t ∈ ordered_tuples k n → t ≠ [].
 Proof.
-intros * Hmz Ht Htz; subst t.
-induction m; [ easy | clear Hmz ].
-destruct m. {
-  rewrite ordered_tuples_1_l in Ht.
-  apply in_map_iff in Ht.
-  now destruct Ht as (x & Hx & Hxn).
-}
-specialize (IHm (Nat.neq_succ_0 _)).
-remember (S m) as sm; cbn - [ "<?" ] in Ht; subst sm.
-apply filter_In in Ht.
-destruct Ht as (Ht, _).
-apply in_flat_map in Ht.
-destruct Ht as (i & Hi & Ht).
+intros * Hkz Ht Htz; subst t.
+destruct k; [ easy | clear Hkz ].
+induction n; [ easy | cbn in Ht ].
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]; [ easy | ].
 apply in_map_iff in Ht.
-destruct Ht as (l & Hl & Ht).
-easy.
+destruct Ht as (x & Hx & Hxn).
+now apply app_eq_nil in Hx.
+Qed.
+
+Theorem ordered_tuples_lt : ∀ k n t,
+  t ∈ ordered_tuples k n
+  → ∀ a, a ∈ t → a < n.
+Proof.
+intros * Ht a Hat.
+revert k t Ht Hat.
+induction n; intros. {
+  destruct k; [ cbn in Ht | easy ].
+  destruct Ht; [ now subst t | easy ].
+}
+destruct k; cbn in Ht. {
+  destruct Ht; [ now subst t | easy ].
+}
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. {
+  specialize (IHn _ _ Ht Hat).
+  now apply Nat.lt_lt_succ_r.
+}
+apply in_map_iff in Ht.
+destruct Ht as (l & Hln & Hl); subst t.
+apply in_app_iff in Hat.
+cbn in Hat.
+destruct Hat as [Hal| [Hal| Hal]]; [ | now subst a | easy ].
+apply Nat.lt_lt_succ_r.
+now apply (IHn k l).
 Qed.
 
 Require Import Sorted.
-Theorem ordered_tuples_sorted : ∀ m n ll,
-  ll = ordered_tuples m n
+Theorem ordered_tuples_sorted : ∀ k n ll,
+  ll = ordered_tuples k n
   → ∀ l, l ∈ ll → Sorted lt l.
 Proof.
+intros * Hll * Hl.
+subst ll.
+revert k l Hl.
+induction n; intros. {
+  destruct k; [ cbn in Hl | easy ].
+  destruct Hl; [ now subst l | easy ].
+}
+destruct k; cbn in Hl. {
+  destruct Hl; [ now subst l | easy ].
+}
+apply in_app_iff in Hl.
+destruct Hl as [Hl| Hl]; [ now apply IHn in Hl | ].
+apply in_map_iff in Hl.
+destruct Hl as (l' & Hl'n & Hl); subst l.
+rename l' into l.
+specialize (IHn _ _ Hl).
+specialize (ordered_tuples_lt _ _ _ Hl) as H1.
+...
 intros * Hll * Hl.
 subst ll.
 revert n l Hl.
