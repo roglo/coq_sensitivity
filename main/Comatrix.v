@@ -3679,15 +3679,33 @@ destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
 apply Nat.nlt_ge in Hik.
 rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
 rewrite ordered_tuples_length in Hij.
+rewrite (List_map_nth' []) in Hij. 2: {
+  rewrite ordered_tuples_length; flia Hi Hik.
+}
 destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
   rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-  rewrite (List_map_nth' []) in Hij. 2: {
-    rewrite ordered_tuples_length; flia Hi Hik.
-  }
   exfalso; clear IHn Hi Hj.
   now apply (H1 j i).
 }
+clear H1.
 apply Nat.nlt_ge in Hjk.
+rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
+rewrite ordered_tuples_length in Hij.
+rewrite (List_map_nth' []) in Hij. 2: {
+  rewrite ordered_tuples_length; flia Hj Hjk.
+}
+apply app_inv_tail_iff in Hij.
+specialize (IHn k (i - binomial n (S k)) (j - binomial n (S k))).
+assert (H : i - binomial n (S k) < binomial n k) by flia Hi Hik.
+specialize (IHn H); clear H.
+assert (H : j - binomial n (S k) < binomial n k) by flia Hj Hjk.
+specialize (IHn H); clear H.
+specialize (IHn Hij).
+flia IHn Hik Hjk.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
