@@ -3541,6 +3541,62 @@ apply Nat.lt_lt_succ_r.
 now apply (IHn k l).
 Qed.
 
+Fixpoint sorted {A} (ord : A → A → bool) l :=
+  match l with
+  | [] => true
+  | [a] => true
+  | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
+  end.
+
+Theorem ordered_tuples_sorted : ∀ k n ll,
+  ll = ordered_tuples k n
+  → ∀ l, l ∈ ll → sorted Nat.ltb l = true.
+Proof.
+intros * Hll * Hl.
+subst ll.
+revert k l Hl.
+induction n; intros. {
+  destruct k; [ cbn in Hl | easy ].
+  destruct Hl; [ now subst l | easy ].
+}
+destruct k; cbn in Hl. {
+  destruct Hl; [ now subst l | easy ].
+}
+apply in_app_iff in Hl.
+destruct Hl as [Hl| Hl]; [ now apply IHn in Hl | ].
+apply in_map_iff in Hl.
+destruct Hl as (l' & Hl'n & Hl); subst l.
+rename l' into l.
+specialize (ordered_tuples_lt _ _ _ Hl) as H1.
+specialize (IHn _ _ Hl).
+clear k Hl.
+revert n H1 IHn.
+induction l as [| a]; intros; [ easy | ].
+destruct l as [| b]. {
+  cbn - [ "<?" ].
+  rewrite Bool.andb_true_r.
+  now apply Nat.ltb_lt, H1; left.
+}
+cbn - [ sorted ] in IHl |-*.
+...
+cbn.
+constructor. {
+  apply IHl. {
+    apply Sorted_LocallySorted_iff in IHn.
+    apply Sorted_inv in IHn.
+    destruct IHn as (IHn, _).
+    now apply Sorted_LocallySorted_iff in IHn.
+  }
+  intros c Hc.
+  now apply H1; right.
+}
+apply Sorted_LocallySorted_iff in IHn.
+apply Sorted_inv in IHn.
+destruct IHn as (_, IHn).
+now apply HdRel_inv in IHn.
+Qed.
+...
+
 Require Import Sorted.
 Theorem ordered_tuples_sorted : ∀ k n ll,
   ll = ordered_tuples k n
@@ -3709,6 +3765,7 @@ Theorem ordered_tuples_surj : ∀ m n ll,
   → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
 Proof.
 intros * Hll * Hl.
+Print Module Sorted.
 ...
 
 Theorem ordered_tuples_prop : ∀ m n ll,
