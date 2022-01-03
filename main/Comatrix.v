@@ -1080,13 +1080,13 @@ rewrite Hg, <- Hh.
 now apply Hph.
 Qed.
 
-Theorem List_find_nth_not_None : ∀ n l i,
+Theorem List_rank_not_None : ∀ n l i,
   is_permut n l
   → i < n
-  → List_find_nth (Nat.eqb i) l ≠ None.
+  → List_rank (Nat.eqb i) l ≠ None.
 Proof.
 intros n f i (Hs, Hf) Hi Hx.
-specialize (List_find_nth_None 0 _ _ Hx) as H1; cbn.
+specialize (List_rank_None 0 _ _ Hx) as H1; cbn.
 specialize (pigeonhole_list n (i :: f)) as H2.
 rewrite List_length_cons in H2.
 assert (H : n < S (length f)) by now rewrite Hf.
@@ -1138,16 +1138,16 @@ apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
-remember (List_find_nth (Nat.eqb i) f) as x eqn:Hx.
+remember (List_rank (Nat.eqb i) f) as x eqn:Hx.
 symmetry in Hx.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx; cbn.
+  apply (List_rank_Some 0) in Hx; cbn.
   destruct Hx as (Hx & Hbef & Hix).
   now apply Nat.eqb_eq in Hix.
 } {
   exfalso.
   revert Hx.
-  now apply (List_find_nth_not_None (conj Hs Hf)).
+  now apply (List_rank_not_None (conj Hs Hf)).
 }
 Qed.
 
@@ -1409,33 +1409,33 @@ unfold ff_app.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   unfold unsome.
-  remember (List_find_nth _ _) as x eqn:Hx.
+  remember (List_rank _ _) as x eqn:Hx.
   symmetry in Hx.
   destruct x as [x| ]. {
-    apply (List_find_nth_Some 0) in Hx.
+    apply (List_rank_Some 0) in Hx.
     destruct Hx as (Hxσ & Hbefx & Hx).
     congruence.
   }
   flia Hi.
 }
-remember (List_find_nth _ _) as x eqn:Hx.
-remember (List_find_nth _ l2) as y eqn:Hy.
+remember (List_rank _ _) as x eqn:Hx.
+remember (List_rank _ l2) as y eqn:Hy.
 symmetry in Hx, Hy.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
+  apply (List_rank_Some 0) in Hx.
   rewrite map_length in Hx.
   destruct Hx as (Hxl & Hbefx & Hx).
   apply Nat.eqb_eq in Hx.
   rewrite (List_map_nth' 0) in Hx; [ | easy ].
   destruct y as [y| ]. {
-    apply (List_find_nth_Some 0) in Hy.
+    apply (List_rank_Some 0) in Hy.
     destruct Hy as (Hyl & Hbefy & Hy).
     apply Nat.eqb_eq in Hy.
     unfold unsome in Hy.
-    remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+    remember (List_rank (Nat.eqb i) l1) as z eqn:Hz.
     symmetry in Hz.
     destruct z as [z| ]. {
-      apply (List_find_nth_Some 0) in Hz.
+      apply (List_rank_Some 0) in Hz.
       destruct Hz as (Hzl & Hbefz & Hz).
       apply Nat.eqb_eq in Hz.
       rewrite seq_nth in Hy; [ | congruence ].
@@ -1450,7 +1450,7 @@ destruct x as [x| ]. {
       easy.
     }
     rewrite seq_nth in Hy; [ | flia Hi ].
-    specialize (List_find_nth_None 0 _ _ Hz) as H1.
+    specialize (List_rank_None 0 _ _ Hz) as H1.
     specialize (H1 (nth x l2 0)).
     assert (H : nth x l2 0 < length l1). {
       rewrite Hl1, <- Hl2.
@@ -1462,12 +1462,12 @@ destruct x as [x| ]. {
   }
   exfalso.
   revert Hy.
-  apply (@List_find_nth_not_None n); [ easy | ].
+  apply (@List_rank_not_None n); [ easy | ].
   unfold unsome.
-  remember (List_find_nth (Nat.eqb i) l1) as z eqn:Hz.
+  remember (List_rank (Nat.eqb i) l1) as z eqn:Hz.
   symmetry in Hz.
   destruct z as [z| ]. {
-    apply (List_find_nth_Some 0) in Hz.
+    apply (List_rank_Some 0) in Hz.
     destruct Hz as (Hzl & Hbefz & Hz).
     rewrite seq_nth; [ | easy ].
     now rewrite Hl1 in Hzl.
@@ -1476,7 +1476,7 @@ destruct x as [x| ]. {
 }
 exfalso.
 revert Hx.
-apply (@List_find_nth_not_None n); [ | now rewrite <- Hl1 ].
+apply (@List_rank_not_None n); [ | now rewrite <- Hl1 ].
 now apply map_ff_app_permut_permut_is_permut.
 Qed.
 
@@ -1490,9 +1490,9 @@ rewrite map_length, seq_length.
 rewrite List_map_nth_seq with (d := 0).
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
-remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
+remember (List_rank _ _) as x eqn:Hx; symmetry in Hx.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
+  apply (List_rank_Some 0) in Hx.
   rewrite map_length, seq_length in Hx.
   destruct Hx as (Hxl & Hbefx & Hx).
   rewrite (List_map_nth' 0) in Hx; [ | now rewrite seq_length ].
@@ -1500,22 +1500,22 @@ destruct x as [x| ]. {
   rewrite Nat.add_0_l in Hx.
   apply Nat.eqb_eq in Hx.
   unfold unsome in Hx.
-  remember (List_find_nth (Nat.eqb x) l) as y eqn:Hy.
+  remember (List_rank (Nat.eqb x) l) as y eqn:Hy.
   symmetry in Hy.
   destruct y as [y| ]. {
     subst y.
-    apply (List_find_nth_Some 0) in Hy.
+    apply (List_rank_Some 0) in Hy.
     destruct Hy as (Hyl & Hbefy & Hy).
     now apply Nat.eqb_eq in Hy.
   }
   exfalso.
   revert Hy.
-  apply (@List_find_nth_not_None (length l)); [ | easy ].
+  apply (@List_rank_not_None (length l)); [ | easy ].
   easy.
 }
 exfalso.
 revert Hx.
-apply (@List_find_nth_not_None (length l)); [ | easy ].
+apply (@List_rank_not_None (length l)); [ | easy ].
 now apply permut_list_inv_is_permut.
 Qed.
 
@@ -1694,17 +1694,17 @@ split. {
   exists (ff_app σ k).
   split. {
     unfold unsome.
-    remember (List_find_nth _ _) as x eqn:Hx.
+    remember (List_rank _ _) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
+      apply (List_rank_Some 0) in Hx.
       destruct Hx as (Hxl & Hbefx & Hx).
       apply Nat.eqb_eq in Hx.
       destruct Hσ as (Hσ1, Hσ2).
       rewrite <- Hσ2 in Hk.
       now apply Hσ1.
     } {
-      specialize (List_find_nth_None 0 _ _ Hx) as H2.
+      specialize (List_rank_None 0 _ _ Hx) as H2.
       destruct Hσ as (Hσ1, Hσ2).
       rewrite <- Hσ2 in Hk.
       specialize (H2 k Hk).
@@ -1744,17 +1744,17 @@ split. {
     apply map_ext_in.
     intros i Hi; apply in_seq in Hi.
     unfold unsome.
-    remember (List_find_nth _ _) as x eqn:Hx.
+    remember (List_rank _ _) as x eqn:Hx.
     symmetry in Hx.
     destruct x as [x| ]. {
-      apply (List_find_nth_Some 0) in Hx.
+      apply (List_rank_Some 0) in Hx.
       destruct Hx as (Hxσ & Hbefx & Hx).
       apply Nat.eqb_eq in Hx.
       now rewrite <- Hx.
     }
     exfalso; revert Hx.
     rewrite Hσ2 in Hi.
-    now apply (List_find_nth_not_None (conj Hσ1 Hσ2)).
+    now apply (List_rank_not_None (conj Hσ1 Hσ2)).
   }
   apply in_seq.
   split; [ easy | ].
@@ -4247,4 +4247,3 @@ unfold determinant; cbn.
 rewrite List_map_seq_length.
 Print determinant_loop.
 ...
-

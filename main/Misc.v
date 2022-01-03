@@ -467,8 +467,6 @@ Qed.
 
 (* end map2 *)
 
-Check option_map.
-
 (* rank: rank of the first element satisfying a predicate *)
 (* like "find" but returning the rank, not the element itself *)
 
@@ -480,39 +478,8 @@ end.
 
 Definition List_rank := List_rank_loop 0.
 
-Theorem find_vs_rank_loop : ∀ A f l (d : A) i,
-  find f l = option_map (λ j, nth (j - i) l d) (List_rank_loop i f l).
-Proof.
-intros.
-revert i.
-induction l as [| a]; intros; [ easy | ].
-cbn - [ nth ].
-remember (f a) as b eqn:Hb; symmetry  in Hb.
-destruct b; [ now cbn; rewrite Nat.sub_diag | ].
-...
-cbn - [  ].
-
-...
-
-Theorem find_vs_rank : ∀ A f l (d : A),
-  find f l = option_map (λ i, nth i l d) (List_rank f l).
-Proof.
-intros.
-unfold List_rank.
-induction l as [| a]; [ easy | cbn ].
-remember (f a) as b eqn:Hb; symmetry  in Hb.
-destruct
-...
-     rank P l =
-       match find P l with
-       | None => None
-       | Some a =>
-
-     rank P l = option_map (λ a, find (eq a)) (find P l)
-...
-
-Theorem List_find_nth_loop_interv : ∀ A f (l : list A) i j,
-  List_find_nth_loop i f l = Some j
+Theorem List_rank_loop_interv : ∀ A f (l : list A) i j,
+  List_rank_loop i f l = Some j
   → i ≤ j < i + length l.
 Proof.
 intros * Hi.
@@ -528,8 +495,8 @@ specialize (IHl (S i) Hi).
 cbn; flia IHl.
 Qed.
 
-Theorem List_find_nth_loop_Some : ∀ A d f (l : list A) i j,
-  List_find_nth_loop i f l = Some j
+Theorem List_rank_loop_Some : ∀ A d f (l : list A) i j,
+  List_rank_loop i f l = Some j
   → j < i + length l ∧
     (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
     f (nth (j - i) l d) = true.
@@ -538,7 +505,7 @@ intros * Hi.
 split. {
   remember (j - i) as k eqn:Hk.
   replace j with (i + k) in Hi |-*. 2: {
-    specialize (List_find_nth_loop_interv f l i Hi) as H1.
+    specialize (List_rank_loop_interv f l i Hi) as H1.
     flia Hk H1.
   }
   apply Nat.add_lt_mono_l.
@@ -580,7 +547,7 @@ split. {
 } {
   remember (j - i) as k eqn:Hk.
   replace j with (i + k) in Hi. 2: {
-    specialize (List_find_nth_loop_interv f l i Hi) as H1.
+    specialize (List_rank_loop_interv f l i Hi) as H1.
     flia Hk H1.
   }
   clear j Hk.
@@ -592,7 +559,7 @@ split. {
     cbn in Hi |-*.
     remember (f a) as b eqn:Hb; symmetry in Hb.
     destruct b; [ easy | exfalso ].
-    specialize (List_find_nth_loop_interv f l (S i) Hi) as H1.
+    specialize (List_rank_loop_interv f l (S i) Hi) as H1.
     flia H1.
   }
   destruct l as [| a]; [ easy | ].
@@ -606,14 +573,14 @@ split. {
 }
 Qed.
 
-Theorem List_find_nth_Some : ∀ A d f (l : list A) i,
-  List_find_nth f l = Some i
+Theorem List_rank_Some : ∀ A d f (l : list A) i,
+  List_rank f l = Some i
   → i < length l ∧
     (∀ j, j < i → f (nth j l d) = false) ∧
     f (nth i l d) = true.
 Proof.
 intros * Hi.
-apply List_find_nth_loop_Some with (d := d) in Hi.
+apply List_rank_loop_Some with (d := d) in Hi.
 rewrite Nat.sub_0_r in Hi.
 destruct Hi as (Hil & Hk & Hi).
 split; [ easy | ].
@@ -625,8 +592,8 @@ specialize (Hk H); clear H.
 now rewrite Nat.sub_0_r in Hk.
 Qed.
 
-Theorem List_find_nth_loop_None : ∀ A (d : A) f l i,
-  List_find_nth_loop i f l = None
+Theorem List_rank_loop_None : ∀ A (d : A) f l i,
+  List_rank_loop i f l = None
   → ∀ j, i ≤ j < i + length l
   → f (nth (j - i) l d) = false.
 Proof.
@@ -650,21 +617,21 @@ destruct b; [ easy | ].
 now apply IHk with (i := S i).
 Qed.
 
-Theorem List_find_nth_None : ∀ A d f (l : list A),
-  List_find_nth f l = None
+Theorem List_rank_None : ∀ A d f (l : list A),
+  List_rank f l = None
   → ∀ j, j < length l
   → f (nth j l d) = false.
 Proof.
 intros * Hi j Hj.
-specialize (List_find_nth_loop_None d f l Hi) as H1.
+specialize (List_rank_loop_None d f l Hi) as H1.
 specialize (H1 j).
 rewrite Nat.sub_0_r in H1.
 apply H1.
 split; [ flia | easy ].
 Qed.
 
-Theorem List_find_nth_loop_Some_lt : ∀ A f (l : list A) i j,
-  List_find_nth_loop i f l = Some j → j < i + length l.
+Theorem List_rank_loop_Some_lt : ∀ A f (l : list A) i j,
+  List_rank_loop i f l = Some j → j < i + length l.
 Proof.
 intros * Hij.
 revert i Hij.
@@ -678,14 +645,53 @@ rewrite <- Nat.add_succ_comm.
 now apply IHl.
 Qed.
 
-Theorem List_find_nth_Some_lt : ∀ A f (l : list A) i,
-  List_find_nth f l = Some i → i < length l.
+Theorem List_rank_Some_lt : ∀ A f (l : list A) i,
+  List_rank f l = Some i → i < length l.
 Proof.
 intros * Hi.
-now apply List_find_nth_loop_Some_lt in Hi.
+now apply List_rank_loop_Some_lt in Hi.
 Qed.
 
-(* end List_find_nth *)
+Theorem find_vs_rank : ∀ A f l (d : A),
+  find f l = option_map (λ i, nth i l d) (List_rank f l).
+Proof.
+intros.
+remember (List_rank f l) as n eqn:Hn; symmetry in Hn.
+destruct n as [n| ]; cbn. {
+  apply (List_rank_Some d) in Hn.
+  destruct Hn as (Hnl & Hfn & Hn).
+  revert n Hnl Hfn Hn.
+  induction l as [| a]; intros; [ easy | cbn ].
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    destruct n; [ easy | f_equal ].
+    specialize (Hfn 0 (Nat.lt_0_succ _)).
+    cbn in Hfn; congruence.
+  }
+  destruct n; [ cbn in Hn; congruence | ].
+  cbn in Hnl, Hn.
+  apply Nat.succ_lt_mono in Hnl.
+  apply IHl; [ easy | | easy ].
+  intros i Hi.
+  apply (Hfn (S i)).
+  now apply Nat.succ_lt_mono in Hi.
+} {
+  specialize (List_rank_None d _ _ Hn) as Hfn.
+  clear Hn.
+  induction l as [| a]; [ easy | cbn ].
+  remember (f a) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    specialize (Hfn 0 (Nat.lt_0_succ _)).
+    cbn in Hfn; congruence.
+  }
+  apply IHl.
+  intros i Hi.
+  apply (Hfn (S i)).
+  now apply Nat.succ_lt_mono in Hi.
+}
+Qed.
+
+(* end List_rank *)
 
 (* conversions if ...? into if ..._dec *)
 

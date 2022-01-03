@@ -162,7 +162,7 @@ Definition is_sym_gr_list n (ll : list (list nat)) :=
   (∀ l, is_permut n l → l ∈ ll).
 
 Definition permut_list_inv l :=
-  map (λ i, unsome 0 (List_find_nth (Nat.eqb i) l)) (seq 0 (length l)).
+  map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)).
 
 (* *)
 
@@ -240,13 +240,12 @@ rewrite seq_nth. 2: {
 }
 rewrite Nat.add_0_l.
 unfold unsome.
-remember (List_find_nth _ _) as j eqn:Hj.
+remember (List_rank _ _) as j eqn:Hj.
 symmetry in Hj.
 destruct j as [j| ]. {
-  apply List_find_nth_loop_Some with (d := 0) in Hj.
+  apply (List_rank_Some 0) in Hj.
   destruct Hj as (Hjl & Hij & Hj).
   apply Nat.eqb_eq in Hj.
-  rewrite Nat.sub_0_r in Hj.
   destruct Hp as (Hp1, Hp2).
   specialize (Hp2 (S i) j).
   assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
@@ -255,7 +254,7 @@ destruct j as [j| ]. {
   rewrite List_nth_succ_cons in Hp2.
   now specialize (Hp2 Hj).
 }
-specialize (List_find_nth_None 0 _ _ Hj) as H1.
+specialize (List_rank_None 0 _ _ Hj) as H1.
 specialize (H1 (S i)).
 assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
 specialize (H1 H); clear H.
@@ -272,9 +271,9 @@ unfold permut_list_inv, unsome, ff_app.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; congruence ].
 rewrite seq_nth; [ | congruence ].
 rewrite Nat.add_0_l.
-remember (List_find_nth _ _) as x eqn:Hx; symmetry in Hx.
+remember (List_rank _ _) as x eqn:Hx; symmetry in Hx.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
+  apply (List_rank_Some 0) in Hx.
   destruct Hx as (Hxl & Hbef & Hix).
   now apply Nat.eqb_eq in Hix.
 } {
@@ -282,7 +281,7 @@ destruct x as [x| ]. {
   rewrite <- Hl in Hin.
   apply (permut_list_without Hp Hin).
   intros j Hj.
-  specialize (List_find_nth_None 0 _ _ Hx Hj) as H1.
+  specialize (List_rank_None 0 _ _ Hx Hj) as H1.
   now apply Nat.eqb_neq, Nat.neq_sym in H1.
 }
 Qed.
@@ -462,7 +461,7 @@ Qed.
 (* *)
 
 Definition sym_gr_inv (sg : list (list nat)) σ :=
-  unsome 0 (List_find_nth (list_eqb Nat.eqb σ) sg).
+  unsome 0 (List_rank (list_eqb Nat.eqb σ) sg).
 
 Theorem sym_gr_inv_inj : ∀ n sg la lb,
   is_sym_gr_list n sg
@@ -473,21 +472,21 @@ Theorem sym_gr_inv_inj : ∀ n sg la lb,
 Proof.
 intros * Hsg Hna Hnb Hab.
 unfold sym_gr_inv, unsome in Hab.
-remember (List_find_nth (list_eqb Nat.eqb la) sg) as x eqn:Hx.
-remember (List_find_nth (list_eqb Nat.eqb lb) sg) as y eqn:Hy.
+remember (List_rank (list_eqb Nat.eqb la) sg) as x eqn:Hx.
+remember (List_rank (list_eqb Nat.eqb lb) sg) as y eqn:Hy.
 move y before x.
 symmetry in Hx, Hy.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some []) in Hx.
+  apply (List_rank_Some []) in Hx.
   destruct Hx as (Hxs & Hbefx & Hx).
   apply list_eqb_eq in Hx.
   destruct y as [y| ]. {
-    apply (List_find_nth_Some []) in Hy.
+    apply (List_rank_Some []) in Hy.
     destruct Hy as (Hys & Hbefy & Hy).
     apply list_eqb_eq in Hy.
     congruence.
   }
-  specialize (List_find_nth_None [] _ _ Hy) as H1; cbn.
+  specialize (List_rank_None [] _ _ Hy) as H1; cbn.
   destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
   specialize (Hsg_surj lb Hnb) as H2.
   apply In_nth with (d := []) in H2.
@@ -496,7 +495,7 @@ destruct x as [x| ]. {
   apply list_eqb_neq in H1.
   now symmetry in Hkb.
 }
-specialize (List_find_nth_None [] _ _ Hx) as H1; cbn.
+specialize (List_rank_None [] _ _ Hx) as H1; cbn.
 destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
 specialize (Hsg_surj la Hna) as H2.
 apply In_nth with (d := []) in H2.
@@ -538,8 +537,8 @@ Proof.
 intros * Hnz Hsg.
 unfold sym_gr_inv.
 unfold unsome.
-remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
-destruct i as [i| ]; [ now apply List_find_nth_Some_lt in Hi | ].
+remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
+destruct i as [i| ]; [ now apply List_rank_Some_lt in Hi | ].
 clear Hi.
 destruct (lt_dec 0 (length sg)) as [Hs| Hs]; [ easy | ].
 apply Nat.nlt_ge in Hs; exfalso.
@@ -558,9 +557,9 @@ Theorem nth_sym_gr_inv_sym_gr : ∀ sg l n,
 Proof.
 intros * Hsg (Hp, Hs).
 unfold sym_gr_inv, unsome.
-remember (List_find_nth _ _) as i eqn:Hi; symmetry in Hi.
+remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
-  apply List_find_nth_Some with (d := []) in Hi.
+  apply List_rank_Some with (d := []) in Hi.
   destruct Hi as (His & Hji & Hi).
   now apply list_eqb_eq in Hi.
 }
@@ -568,7 +567,7 @@ assert (H : l ∉ sg). {
   intros H.
   apply In_nth with (d := []) in H.
   destruct H as (j & Hj & Hjv).
-  specialize (List_find_nth_None [] _ _ Hi Hj) as H.
+  specialize (List_rank_None [] _ _ Hi Hj) as H.
   apply list_eqb_neq in H.
   now symmetry in Hjv.
 }
@@ -584,9 +583,9 @@ Theorem sym_gr_inv_list_el : ∀ n sg i,
 Proof.
 intros * Hnz Hsg Hi.
 unfold sym_gr_inv, unsome.
-remember (List_find_nth _ _) as j eqn:Hj; symmetry in Hj.
+remember (List_rank _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
-  apply List_find_nth_Some with (d := []) in Hj.
+  apply List_rank_Some with (d := []) in Hj.
   destruct Hj as (His & Hji & Hj).
   apply list_eqb_eq in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
@@ -600,7 +599,7 @@ destruct j as [j| ]. {
   }
   now apply Hinj.
 }
-specialize (List_find_nth_None [] _ _ Hj Hi) as H1.
+specialize (List_rank_None [] _ _ Hj Hi) as H1.
 now apply list_eqb_neq in H1.
 Qed.
 
@@ -1440,11 +1439,11 @@ apply in_map_iff in Hi.
 destruct Hi as (j & Hji & Hj).
 apply in_seq in Hj.
 unfold unsome in Hji.
-remember (List_find_nth _ _) as k eqn:Hk.
+remember (List_rank _ _) as k eqn:Hk.
 symmetry in Hk.
 destruct k as [k| ]. {
   subst k.
-  now apply (List_find_nth_Some 0) in Hk.
+  now apply (List_rank_Some 0) in Hk.
 }
 subst i; flia Hj.
 Qed.
@@ -1463,15 +1462,15 @@ rewrite seq_nth in Hij; [ | easy ].
 rewrite seq_nth in Hij; [ | easy ].
 do 2 rewrite Nat.add_0_l in Hij.
 unfold unsome in Hij.
-remember (List_find_nth (Nat.eqb i) l) as x eqn:Hx.
-remember (List_find_nth (Nat.eqb j) l) as y eqn:Hy.
+remember (List_rank (Nat.eqb i) l) as x eqn:Hx.
+remember (List_rank (Nat.eqb j) l) as y eqn:Hy.
 move y before x.
 symmetry in Hx, Hy.
 destruct x as [x| ]. {
-  apply (List_find_nth_Some 0) in Hx.
+  apply (List_rank_Some 0) in Hx.
   destruct Hx as (Hxl & Hxbef & Hxwhi).
   destruct y as [y| ]. {
-    apply (List_find_nth_Some 0) in Hy.
+    apply (List_rank_Some 0) in Hy.
     destruct Hy as (Hyl & Hybef & Hywhi).
     apply Nat.eqb_eq in Hxwhi, Hywhi.
     destruct Hij; congruence.
@@ -1479,14 +1478,14 @@ destruct x as [x| ]. {
   subst x; exfalso.
   apply (permut_list_without Hp Hj).
   intros k Hk.
-  specialize (List_find_nth_None 0 _ _ Hy Hk) as H1.
+  specialize (List_rank_None 0 _ _ Hy Hk) as H1.
   apply Nat.eqb_neq in H1.
   now apply Nat.neq_sym.
 } {
   exfalso.
   apply (permut_list_without Hp Hi).
   intros k Hk.
-  specialize (List_find_nth_None 0 _ _ Hx Hk) as H1.
+  specialize (List_rank_None 0 _ _ Hx Hk) as H1.
   apply Nat.eqb_neq in H1.
   now apply Nat.neq_sym.
 }
