@@ -573,6 +573,25 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
 apply Nat.nlt_ge in Hrb.
 rewrite app_nth2; [ | now rewrite ordered_tuples_length ].
 rewrite ordered_tuples_length.
+rewrite (List_map_nth' []). 2: {
+  rewrite ordered_tuples_length.
+  destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
+    subst k.
+    rewrite ordered_tuple_rank_out; [ | easy ].
+    now rewrite binomial_diag.
+  }
+  assert (H : S k ≤ n) by flia Hkn Hkn'.
+  specialize (ordered_tuple_rank_ub t H) as H1; clear H.
+  flia Hrb H1.
+}
+exfalso. (* since last t ≠ m *)
+destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
+  subst k; clear Hrb Hkn.
+(* pigeonhole probable *)
+...
+  rewrite ordered_tuple_rank_out in Hrb; [ | easy ].
+  rewrite binomial_out in Hrb; [ | easy ].
+}
 ...
 
 Section a.
