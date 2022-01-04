@@ -254,7 +254,24 @@ split. {
 }
 Qed.
 
-Theorem sorted_any : ∀ A i j d (ord : A → A → bool) l,
+Theorem sorted_middle : ∀ A ord (a b : A) la lb lc,
+  transitive ord
+  → sorted ord (la ++ a :: lb ++ b :: lc) = true
+  → ord a b = true.
+Proof.
+intros * Htrans Hsort.
+replace (la ++ a :: lb ++ b :: lc) with (la ++ [a] ++ lb ++ [b] ++ lc)
+  in Hsort by easy.
+rewrite app_assoc in Hsort.
+apply sorted_app in Hsort.
+destruct Hsort as (Hla & Hsort & H1).
+specialize (H1 Htrans).
+apply H1; [ now apply in_or_app; right; left | ].
+apply in_or_app; right.
+now apply in_or_app; left; left.
+Qed.
+
+Theorem sorted_any : ∀ A (ord : A → A → bool) i j d l,
   transitive ord
   → sorted ord l = true
   → i < j
@@ -266,7 +283,26 @@ assert (Hi : i < length l) by now transitivity j.
 specialize nth_split as H1.
 specialize (H1 A i l d Hi).
 destruct H1 as (la & lb & Hl & Hla).
-...
+remember (nth i l d) as a eqn:Ha; clear Ha.
+subst l i.
+replace (la ++ a :: lb) with (la ++ [a] ++ lb) by easy.
+rewrite app_assoc.
+rewrite app_nth2; rewrite app_length, Nat.add_comm; cbn; [ | easy ].
+remember (j - S (length la)) as k eqn:Hkj.
+assert (Hk : k < length lb). {
+  subst k.
+  rewrite app_length in Hj; cbn in Hj.
+  flia Hj Hij.
+}
+specialize nth_split as H1.
+specialize (H1 A k lb d Hk).
+destruct H1 as (lc & ld & Hl & Hlc).
+remember (nth k lb d) as b eqn:Hb.
+subst lb.
+clear j k Hb Hij Hj Hkj Hk Hlc Hi.
+rename lc into lb; rename ld into lc.
+now apply sorted_middle in Hsort.
+Qed.
 
 (* *)
 
@@ -510,11 +546,33 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
   subst i; exfalso; clear H1.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (m & Hmt & Hmn).
-  assert (H : nth m t 0 < last t 0). {
-...
+  assert (Hmtl : nth m t 0 < last t 0). {
     rewrite List_last_nth.
-    specialize (@sorted_any nat m (length t - 1) 0 Nat.ltb t) as H1.
-    specialize (H1 transitive_nat_lt Hs Hmt).
+    specialize (@sorted_any _ Nat.ltb m (length t - 1) 0 t) as H1.
+    specialize (H1 transitive_nat_lt Hs).
+    assert (H : m < length t - 1). {
+      destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
+        exfalso; clear Hmt H1; subst m.
+        now rewrite List_last_nth in Hln.
+      }
+      flia Hmt Hmt1.
+    }
+    specialize (H1 H); clear H.
+    assert (H : length t - 1 < length t) by flia Hmt.
+    specialize (H1 H); clear H.
+    now apply Nat.ltb_lt in H1.
+  }
+  rewrite Hmn in Hmtl.
+  apply Nat.nle_gt in Hmtl; apply Hmtl; clear Hmtl.
+  apply Nat.lt_succ_r.
+  apply Hlt.
+  rewrite List_last_nth.
+  apply nth_In.
+  flia Hmt.
+}
+apply Nat.nlt_ge in Hrb.
+rewrite app_nth2; [ | now rewrite ordered_tuples_length ].
+rewrite ordered_tuples_length.
 ...
 
 Section a.
