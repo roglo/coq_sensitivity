@@ -3556,6 +3556,15 @@ intros.
 apply Bool.andb_true_iff.
 Qed.
 
+Theorem sorted_cons : ∀ A ord (a : A) l,
+  sorted ord (a :: l) = true
+  → sorted ord l = true.
+Proof.
+intros * Hsort.
+destruct l as [| b]; [ easy | ].
+now apply sorted_cons_cons_true_iff in Hsort.
+Qed.
+
 Theorem sorted_app : ∀ A ord (la lb : list A),
   sorted ord (la ++ lb) = true
   → sorted ord la = true ∧ sorted ord lb = true ∧
@@ -3589,39 +3598,14 @@ split. {
   intros Htrans * Ha Hb.
   revert a lb Ha Hab Hb.
   induction la as [| a1]; intros; [ easy | ].
-  destruct Ha as [Ha| Ha]. {
-    subst a1.
-    destruct lb as [| b1]; [ easy | ].
-    destruct Hb as [Hb| Hb]. {
-      subst b1.
-...
+  destruct Ha as [Ha| Ha]. 2: {
+    apply (IHla a lb); [ easy | | easy ].
     cbn - [ sorted ] in Hab.
-    apply (IHla lb).
+    now apply sorted_cons in Hab.
+  }
+  subst a1.
+  cbn - [ sorted ] in Hab.
 ...
-  cbn in Hab |-*.
-  cbn in Hab.
-  apply Bool.andb_true_iff in Hab.
-  apply Bool.andb_true_iff.
-  destruct Hab as (Haa & Hab).
-  split; [ easy | ].
-  apply (IHla lb).
-
-
-  destruct lb as [| b1]; [ easy | ].
-  split; [ now apply Bool.andb_true_iff in Hab | ].
-  intros Hto * Ha Hb.
-  destruct Ha as [Ha| Ha]; [ subst a1 | easy ].
-  apply Bool.andb_true_iff in Hab.
-  destruct Hab as (Hab1 & Hb1).
-  destruct Hb as [Hb| Hb]; [ now subst b1 | ].
-}
-cbn - [ sorted ] in Hab |-*.
-apply Bool.andb_true_iff in Hab.
-destruct Hab as (Haa & Hab).
-specialize (IHla lb Hab).
-split; [ | easy ].
-now apply Bool.andb_true_iff.
-Qed.
 
 Theorem sorted_extends : ∀ A ord (a : A) l,
   transitive ord
@@ -3640,6 +3624,8 @@ apply sorted_cons_cons_true_iff.
 destruct Hsort as (Hcd, Hsort).
 split; [ now apply Htrans with (b := c) | easy ].
 Qed.
+
+(* *)
 
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
 Proof. now intros; destruct n. Qed.
