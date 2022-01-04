@@ -3452,7 +3452,7 @@ Fixpoint binomial n k :=
      end
   end.
 
-Theorem binomial_lt : ∀ n k, n < k → binomial n k = 0.
+Theorem binomial_out : ∀ n k, n < k → binomial n k = 0.
 Proof.
 intros * Hnk.
 revert k Hnk.
@@ -3469,7 +3469,7 @@ Proof.
 intros.
 induction n; [ easy | cbn ].
 rewrite IHn.
-now rewrite binomial_lt.
+now rewrite binomial_out.
 Qed.
 
 (* end borrowed code *)
@@ -3689,7 +3689,7 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (last t 0) n) as [Htn| Htn]. {
   rewrite IHn; [ | easy ].
   rewrite Nat.add_0_r.
-  rewrite binomial_lt; [ easy | flia Hnk ].
+  rewrite binomial_out; [ easy | flia Hnk ].
 }
 apply IHn; flia Hnk.
 Qed.
@@ -3883,6 +3883,17 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   specialize (Hs transitive_nat_lt i n Hi (or_introl eq_refl)).
   now apply Nat.ltb_lt in Hs.
 }
+destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
+    as [Hrb| Hrb]. {
+  rewrite app_nth1; [ | now rewrite ordered_tuples_length ].
+  destruct (Nat.eq_dec n k) as [Hnk| Hnk]. {
+    subst k.
+    rewrite ordered_tuple_rank_out in Hrb; [ cbn in Hrb | easy ].
+    now rewrite binomial_out in Hrb.
+  }
+  apply IHn; [ easy | easy | | flia Hkn Hnk ].
+  intros i Hi.
+(* ah, trou du cul *)
 ...
 
 Section a.
