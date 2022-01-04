@@ -3893,7 +3893,7 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
   }
   apply IHn; [ easy | easy | | flia Hkn Hnk ].
   intros i Hi.
-(* ah, trou du cul *)
+  clear - Hs Hlt Hln Hi.
 ...
 
 Section a.
