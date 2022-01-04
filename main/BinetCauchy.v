@@ -254,6 +254,20 @@ split. {
 }
 Qed.
 
+Theorem sorted_any : ∀ A i j d (ord : A → A → bool) l,
+  transitive ord
+  → sorted ord l = true
+  → i < j
+  → j < length l
+  → ord (nth i l d) (nth j l d) = true.
+Proof.
+intros * Htrans Hsort Hij Hj.
+assert (Hi : i < length l) by now transitivity j.
+specialize nth_split as H1.
+specialize (H1 A i l d Hi).
+destruct H1 as (la & lb & Hl & Hla).
+...
+
 (* *)
 
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
@@ -490,13 +504,17 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
   }
   apply IHn; [ easy | easy | | flia Hkn Hnk ].
   intros i Hi.
-  clear - Hs Hlt Hln Hi.
+  clear - T Hs Hlt Hln Hi.
   specialize (Hlt i Hi) as H1.
   destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
   subst i; exfalso; clear H1.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (m & Hmt & Hmn).
-Search sorted.
+  assert (H : nth m t 0 < last t 0). {
+...
+    rewrite List_last_nth.
+    specialize (@sorted_any nat m (length t - 1) 0 Nat.ltb t) as H1.
+    specialize (H1 transitive_nat_lt Hs Hmt).
 ...
 
 Section a.
