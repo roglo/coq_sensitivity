@@ -15,11 +15,9 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 
-Require Import Misc RingLike (*IterAdd IterMul*) Pigeonhole.
-Require Import Matrix (*PermutSeq Signature*).
-(*
+Require Import Misc RingLike IterAdd IterMul Pigeonhole.
+Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
-*)
 Import matrix_Notations.
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
@@ -833,117 +831,18 @@ split. {
 }
 Qed.
 
-(* TODO: see https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
-
-...
-
-Theorem ordered_tuples_id : ∀ n, ordered_tuples n n = [seq 0 n].
+Theorem ordered_tuples_diag : ∀ n, ordered_tuples n n = [seq 0 n].
 Proof.
 intros.
 induction n; [ easy | ].
-cbn - [ seq "<?" ].
-rewrite seq_S; cbn - [ "<?" ].
-rewrite flat_map_app, filter_app.
-cbn - [ "<?" ].
-rewrite app_nil_r.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite flat_map_concat_map.
-rewrite <- concat_filter_map.
-rewrite map_map.
-rewrite <- flat_map_concat_map.
-replace (filter (forallb _) _) with ([] : list (list nat)). 2: {
-  symmetry.
-  clear IHn.
-  remember (ordered_tuples _ _) as ll eqn:Hll.
-  assert (H1 : ∀ t, t ∈ ll → t ≠ []). {
-    specialize ordered_tuples_are_correct as H1.
-    specialize (H1 n (S n)).
-    rewrite <- Hll in H1.
-    intros t Ht.
-    now apply H1.
-  }
-  clear Hll.
-  induction ll as [| l]; [ easy | ].
-  cbn - [ "<?" ].
-  rewrite IHll; [ | now intros; apply H1; right ].
-  cbn; rewrite Nat.leb_refl, Bool.andb_true_l.
-  remember (forallb _ _) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b; [ exfalso | easy ].
-  specialize (proj1 (forallb_forall _ _) Hb) as H2.
-  cbn in H2.
-  specialize (H1 l (or_introl eq_refl)).
-  destruct l as [| a]; [ easy | ].
-  cbn in H2.
-  specialize (H2 _ (or_introl eq_refl)).
-  apply Nat.leb_le, Nat.nlt_ge in H2.
-  apply H2; flia.
-}
-rewrite app_nil_r.
-rewrite flat_map_concat_map.
-rewrite <- map_map.
-rewrite concat_filter_map.
-Compute (let n := 5 in (ordered_tuples n 0, ordered_tuples n n)).
-Compute (let n := 5 in map (λ i, ordered_tuples (S i) i) (seq 0 n)).
-(* bof, chais pas *)
-(* bon, je vais essayer de faire un théorème qui prouve les
-   propriétés de ordered_tuples (triés, injectif, surjectif)
-   pour voir si ça peut m'aider pour ce théorème-ci ; ça sera
-   de toutes façons utile, même si ça ne marche pas ici *)
-...
-rewrite <- flat_map_concat_map.
-...
-rewrite <- concat_filter_map.
-rewrite map_map.
-rewrite <- flat_map_concat_map.
-...
-Search (filter _ (map _ _)).
-...
-rewrite concat_filter_map.
-Print ordered_tuples.
-...
-concat_filter_map:
-  ∀ (A : Type) (f : A → bool) (l : list (list A)),
-    concat (map (filter f) l) = filter f (concat l)
-...
-Search (forallb _ _ = true).
-apply forallb_forall in Hb.
-...
-  erewrite filter_ext. 2: {
-    intros l.
-    replace (forallb _ _) with false. 2: {
-      symmetry.
-      apply Bool.negb_true_iff.
-      apply Bool.eq_true_not_negb.
-      intros H1.
-      specialize (proj1 (forallb_forall _ l) H1) as H2.
-      cbn - [ "<?" ] in H2.
-      destruct l as [| a]. {
-        cbn in H1.
-...
-apply -> forallb_forall in H.
-Print forallb.
-...
-  induction n; [ easy | clear Hnz ].
-  destruct n; [ easy | ].
-  specialize (IHn (Nat.neq_succ_0 _)).
+rewrite seq_S; cbn.
+rewrite ordered_tuples_out; [ | easy ].
+now rewrite IHn.
+Qed.
 
-cbn.
-  induction n; cbn.
-...
-Search (forallb _ _ = false).
-Search (filter _ _ = []).
-Search (map _ (filter _ _)).
-...
-concat_filter_map:
-  ∀ (A : Type) (f : A → bool) (l : list (list A)),
-    concat (map (filter f) l) = filter f (concat l)
-...
-rewrite map_app; cbn.
-rewrite concat_app; cbn.
-...
-
+(* TODO: see https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -953,7 +852,7 @@ Theorem cauchy_binet_formula : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → det (A * B) =
-     ∑ (jl ∈ ordered_tuples n m,
+     ∑ (jl ∈ ordered_tuples n m),
      det (mat_with_cols jl A) * det (mat_with_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
