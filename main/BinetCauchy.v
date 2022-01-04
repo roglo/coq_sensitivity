@@ -16,11 +16,11 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc RingLike (*IterAdd IterMul*) Pigeonhole.
+Require Import Matrix (*PermutSeq Signature*).
 (*
-Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
-Import matrix_Notations.
 *)
+Import matrix_Notations.
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
 
@@ -129,7 +129,7 @@ Qed.
 
 (* *)
 
-Theorem ordered_tuples_lt : ∀ k n t,
+Theorem ordered_tuples_lt : ∀ n k t,
   t ∈ ordered_tuples n k
   → ∀ a, a ∈ t → a < n.
 Proof.
@@ -411,7 +411,7 @@ destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ n) as [Hlz| Hlz]; [ | now apply IHn ].
   exfalso.
-  specialize (ordered_tuples_lt (S k) n) as H1.
+  specialize (ordered_tuples_lt n (S k)) as H1.
   remember (ordered_tuples n (S k)) as ll eqn:Hll.
   specialize (H1 (nth i ll [])).
   assert (H : nth i ll [] ∈ ll). {
@@ -738,7 +738,7 @@ destruct Ht as (x & Hx & Hxn).
 now apply app_eq_nil in Hx.
 Qed.
 
-Theorem ordered_tuples_sorted : ∀ k n ll,
+Theorem ordered_tuples_sorted : ∀ n k ll,
   ll = ordered_tuples n k
   → ∀ l, l ∈ ll → sorted Nat.ltb l = true.
 Proof.
@@ -778,107 +778,45 @@ apply H1.
 now right.
 Qed.
 
-...
-
-(* should be useless if there is an inverse *)
-Theorem ordered_tuples_inj : ∀ k n ll,
+Theorem ordered_tuples_inj : ∀ n k ll,
   ll = ordered_tuples n k
   → ∀ i j, i < length ll → j < length ll →
    nth i ll [] = nth j ll [] → i = j.
 Proof.
 intros * Hll * Hi Hj Hij.
-subst ll.
+rewrite Hll in Hi, Hj.
 rewrite ordered_tuples_length in Hi, Hj.
-revert k i j Hi Hj Hij.
-induction n; intros. {
-  destruct k; cbn in Hi, Hj; [ | easy ].
-  apply Nat.lt_1_r in Hi, Hj; congruence.
-}
-destruct k. {
-  cbn in Hi, Hj.
-  apply Nat.lt_1_r in Hi, Hj; congruence.
-}
-cbn in Hi, Hj, Hij.
-assert (H1 : ∀ i j,
-  nth i (ordered_tuples n (S k)) [] =
-  nth (j - binomial n (S k)) (ordered_tuples n k) [] ++ [n]
-  → i < binomial n (S k)
-  → binomial n (S k) ≤ j
-  → False). {
-  clear i j Hi Hj Hij.
-  intros * Hij Hik Hjk.
-  specialize ordered_tuples_lt as H1.
-  specialize (H1 (S k) n).
-  specialize (H1 (nth i (ordered_tuples n (S k)) [])).
-  remember (ordered_tuples n (S k)) as ll eqn:Hll.
-  assert (H : nth i ll [] ∈ ll). {
-    apply nth_In; subst ll.
-    now rewrite ordered_tuples_length.
-  }
-  specialize (H1 H); clear H.
-  rewrite Hij in H1.
-  specialize (H1 n).
-  remember (ordered_tuples n k) as ll1 eqn:Hll1.
-  assert (H : n ∈ nth (j - binomial n (S k)) ll1 [] ++ [n]). {
-    now apply in_or_app; right; left.
-  }
-  specialize (H1 H); clear H.
-  now apply Nat.lt_irrefl in H1.
-}
-destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
-  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-  destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
-    rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-    now apply IHn in Hij.
-  }
-  apply Nat.nlt_ge in Hjk.
-  rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
-  rewrite ordered_tuples_length in Hij.
-  rewrite (List_map_nth' []) in Hij. 2: {
-    rewrite ordered_tuples_length; flia Hj Hjk.
-  }
-  exfalso; clear IHn Hi Hj.
-  now apply (H1 i j).
-}
-apply Nat.nlt_ge in Hik.
-rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
-rewrite ordered_tuples_length in Hij.
-rewrite (List_map_nth' []) in Hij. 2: {
-  rewrite ordered_tuples_length; flia Hi Hik.
-}
-destruct (lt_dec j (binomial n (S k))) as [Hjk| Hjk]. {
-  rewrite app_nth1 in Hij; [ | now rewrite ordered_tuples_length ].
-  exfalso; clear IHn Hi Hj.
-  now apply (H1 j i).
-}
-clear H1.
-apply Nat.nlt_ge in Hjk.
-rewrite app_nth2 in Hij; [ | now rewrite ordered_tuples_length ].
-rewrite ordered_tuples_length in Hij.
-rewrite (List_map_nth' []) in Hij. 2: {
-  rewrite ordered_tuples_length; flia Hj Hjk.
-}
-apply app_inv_tail_iff in Hij.
-specialize (IHn k (i - binomial n (S k)) (j - binomial n (S k))).
-assert (H : i - binomial n (S k) < binomial n k) by flia Hi Hik.
-specialize (IHn H); clear H.
-assert (H : j - binomial n (S k) < binomial n k) by flia Hj Hjk.
-specialize (IHn H); clear H.
-specialize (IHn Hij).
-flia IHn Hik Hjk.
+specialize ordered_tuple_rank_of_nth as H1.
+specialize (H1 n k i Hi).
+specialize ordered_tuple_rank_of_nth as H2.
+specialize (H2 n k j Hj).
+congruence.
 Qed.
 
-Theorem ordered_tuples_surj : ∀ m n ll,
-  ll = ordered_tuples n m
+Theorem ordered_tuples_surj : ∀ n k ll,
+  ll = ordered_tuples n k
   → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
 Proof.
 intros * Hll * Hl.
-Print Module Sorted.
-...
+specialize (ordered_tuples_sorted n k Hll l Hl) as Hsort.
+specialize nth_of_ordered_tuple_rank as H1.
+specialize (H1 n k l Hsort).
+assert (H : length l = k). {
+  apply (ordered_tuple_length n).
+  now rewrite <- Hll.
+}
+specialize (H1 H); clear H.
+rewrite <- Hll in H1.
+exists (ordered_tuple_rank n k l).
+apply H1.
+intros i Hi.
+apply (ordered_tuples_lt _ k l); [ | easy ].
+now rewrite <- Hll.
+Qed.
 
-Theorem ordered_tuples_prop : ∀ m n ll,
-  ll = ordered_tuples n m
-  → (∀ l, l ∈ ll → Sorted lt l) ∧
+Theorem ordered_tuples_prop : ∀ n k ll,
+  ll = ordered_tuples n k
+  → (∀ l, l ∈ ll → sorted Nat.ltb l = true) ∧
     (∀ i j, i < length ll → j < length ll →
      nth i ll [] = nth j ll [] → i = j) ∧
     (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
@@ -886,7 +824,14 @@ Proof.
 intros * Hll.
 split. {
   intros l Hl.
-...
+  now apply (ordered_tuples_sorted n k Hll).
+}
+split. {
+  now apply (ordered_tuples_inj n k).
+} {
+  now apply (ordered_tuples_surj n k).
+}
+Qed.
 
 (* TODO: see https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 
