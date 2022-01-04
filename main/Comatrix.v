@@ -3565,6 +3565,35 @@ destruct l as [| b]; [ easy | ].
 now apply sorted_cons_cons_true_iff in Hsort.
 Qed.
 
+Theorem sorted_trans : ∀ A ord (a b : A) l,
+  transitive ord
+  → sorted ord (a :: l) = true
+  → b ∈ l
+  → ord a b = true.
+Proof.
+intros * Htrans Hsort Hb.
+revert a b Hsort Hb.
+induction l as [| c]; intros; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hb as [Hb| Hb]; [ now subst c | ].
+apply IHl; [ | easy ].
+destruct Hsort as (Hac & Hsort).
+cbn.
+destruct l as [| d]; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hcd & Hsort).
+apply Bool.andb_true_iff.
+split; [ | easy ].
+destruct Hb as [Hb| Hb]. {
+  subst d.
+  now apply Htrans with (b := c).
+}
+apply IHl; [ | now left ].
+apply sorted_cons_cons_true_iff.
+split; [ | easy ].
+now apply Htrans with (b := c).
+Qed.
+
 Theorem sorted_app : ∀ A ord (la lb : list A),
   sorted ord (la ++ lb) = true
   → sorted ord la = true ∧ sorted ord lb = true ∧
@@ -3605,7 +3634,10 @@ split. {
   }
   subst a1.
   cbn - [ sorted ] in Hab.
-...
+  apply sorted_trans with (l := la ++ lb); [ easy | easy | ].
+  now apply in_or_app; right.
+}
+Qed.
 
 Theorem sorted_extends : ∀ A ord (a : A) l,
   transitive ord
@@ -3740,6 +3772,14 @@ rewrite removelast_last.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
+Theorem transitive_nat_lt : transitive Nat.ltb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.ltb_lt in Hab, Hbc.
+apply Nat.ltb_lt.
+now transitivity b.
+Qed.
+
 Theorem nth_of_ordered_tuple_rank : ∀ n k t,
   sorted Nat.ltb t = true
   → length t = k
@@ -3760,16 +3800,9 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
     apply sorted_cons_cons_true_iff in Hsort.
     destruct Hsort as (Hab & Hs).
     apply Nat.ltb_lt in Hab.
-    specialize (sorted_extends Nat.ltb b l) as H1.
+    specialize (@sorted_extends _ Nat.ltb b l) as H1.
     destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
-    assert (H : ∀ a b c, (a <? b) = true → (b <? c) = true → (a <? c) = true). {
-      clear.
-      intros * Hab Hbc.
-      apply Nat.ltb_lt in Hab, Hbc.
-      apply Nat.ltb_lt.
-      now transitivity b.
-    }
-    specialize (H1 H); clear H.
+    specialize (H1 transitive_nat_lt).
     specialize (H1 Hs a).
     cbn in Hil.
     apply Nat.succ_lt_mono in Hil.
@@ -3845,36 +3878,11 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
     now apply sorted_app in Hs.
   }
   intros i Hi.
-...
-destruct k. {
-  rewrite ordered_tuples_0_r.
-cbn.
-destruct n; cbn.
-...
-  induction t as [| a] using rev_ind; intros; [ easy | ].
-  rewrite removelast_last.
-  rewrite app_length, Nat.add_1_r in Htk; cbn in Htk.
-  apply Nat.succ_inj in Htk.
-...
-  destruct k. {
-    apply length_zero_iff_nil in Htk; subst t.
-    cbn; rewrite ordered_tuples_0_r; cbn.
-    destruct n; cbn.
-...
-
-
-destruct (Nat.eq_
-
-destruct t as [| a]; [ easy | ].
-cbn in Htk.
-apply Nat.succ_inj in Htk.
-
-
-
-destruct t as [| a]. {
-  destruct k; [ easy | cbn ].
-  destruct n.
-cbn.
+  apply sorted_app in Hs.
+  destruct Hs as (Ht & _ & Hs).
+  specialize (Hs transitive_nat_lt i n Hi (or_introl eq_refl)).
+  now apply Nat.ltb_lt in Hs.
+}
 ...
 
 Section a.
