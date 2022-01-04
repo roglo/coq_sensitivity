@@ -191,33 +191,22 @@ destruct l as [| b]; [ easy | ].
 now apply sorted_cons_cons_true_iff in Hsort.
 Qed.
 
-Theorem sorted_trans : ∀ A ord (a b : A) l,
+Theorem sorted_extends : ∀ A ord (a : A) l,
   transitive ord
   → sorted ord (a :: l) = true
-  → b ∈ l
-  → ord a b = true.
+  → ∀ b, b ∈ l → ord a b = true.
 Proof.
-intros * Htrans Hsort Hb.
-revert a b Hsort Hb.
-induction l as [| c]; intros; [ easy | ].
+intros * Htrans Hsort b Hb.
+induction l as [| c]; [ easy | ].
 apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hac, Hsort).
 destruct Hb as [Hb| Hb]; [ now subst c | ].
 apply IHl; [ | easy ].
-destruct Hsort as (Hac & Hsort).
-cbn.
 destruct l as [| d]; [ easy | ].
 apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hcd & Hsort).
-apply Bool.andb_true_iff.
-split; [ | easy ].
-destruct Hb as [Hb| Hb]. {
-  subst d.
-  now apply Htrans with (b := c).
-}
-apply IHl; [ | now left ].
 apply sorted_cons_cons_true_iff.
-split; [ | easy ].
-now apply Htrans with (b := c).
+destruct Hsort as (Hcd, Hsort).
+split; [ now apply Htrans with (b := c) | easy ].
 Qed.
 
 Theorem sorted_app : ∀ A ord (la lb : list A),
@@ -260,27 +249,9 @@ split. {
   }
   subst a1.
   cbn - [ sorted ] in Hab.
-  apply sorted_trans with (l := la ++ lb); [ easy | easy | ].
+  apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
   now apply in_or_app; right.
 }
-Qed.
-
-Theorem sorted_extends : ∀ A ord (a : A) l,
-  transitive ord
-  → sorted ord (a :: l) = true
-  → ∀ b, b ∈ l → ord a b = true.
-Proof.
-intros * Htrans Hsort b Hb.
-induction l as [| c]; [ easy | ].
-apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hac, Hsort).
-destruct Hb as [Hb| Hb]; [ now subst c | ].
-apply IHl; [ | easy ].
-destruct l as [| d]; [ easy | ].
-apply sorted_cons_cons_true_iff in Hsort.
-apply sorted_cons_cons_true_iff.
-destruct Hsort as (Hcd, Hsort).
-split; [ now apply Htrans with (b := c) | easy ].
 Qed.
 
 (* *)
@@ -520,6 +491,12 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
   apply IHn; [ easy | easy | | flia Hkn Hnk ].
   intros i Hi.
   clear - Hs Hlt Hln Hi.
+  specialize (Hlt i Hi) as H1.
+  destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
+  subst i; exfalso; clear H1.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (m & Hmt & Hmn).
+Search sorted.
 ...
 
 Section a.
