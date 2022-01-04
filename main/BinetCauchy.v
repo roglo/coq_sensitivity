@@ -15,19 +15,11 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 
-Require Import Misc (*RingLike IterAdd IterMul*) Pigeonhole.
+Require Import Misc RingLike (*IterAdd IterMul*) Pigeonhole.
 (*
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
-*)
-
-Section a.
-
-Context {T : Type}.
-(*
-Context (ro : ring_like_op T).
-Context (rp : ring_like_prop T).
 *)
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n *)
@@ -174,6 +166,14 @@ Fixpoint sorted {A} (ord : A → A → bool) l :=
 Definition transitive A (ord : A → A → bool) :=
   ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
 
+Theorem transitive_nat_lt : transitive Nat.ltb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.ltb_lt in Hab, Hbc.
+apply Nat.ltb_lt.
+now transitivity b.
+Qed.
+
 Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
   sorted ord (a :: b :: l) = true
   ↔ ord a b = true ∧ sorted ord (b :: l) = true.
@@ -304,6 +304,29 @@ rename lc into lb; rename ld into lc.
 now apply sorted_middle in Hsort.
 Qed.
 
+Theorem sorted_hd_no_dup : ∀ a i l,
+  sorted Nat.ltb (a :: l) = true
+  → i < length l
+  → a = nth i l 0
+  → False.
+Proof.
+intros * Hsort Hil Ha.
+destruct l as [| b]; [ cbn in Hil; flia Hil | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hab & Hs).
+apply Nat.ltb_lt in Hab.
+specialize (@sorted_extends _ Nat.ltb b l) as H1.
+destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
+specialize (H1 transitive_nat_lt).
+specialize (H1 Hs a).
+cbn in Hil.
+apply Nat.succ_lt_mono in Hil.
+assert (H : a ∈ l) by now subst a; apply nth_In.
+specialize (H1 H).
+apply Nat.ltb_lt in H1.
+flia Hab H1.
+Qed.
+
 (* *)
 
 Theorem ordered_tuples_0_r : ∀ n, ordered_tuples n 0 = [[]].
@@ -419,14 +442,6 @@ rewrite removelast_last.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
-Theorem transitive_nat_lt : transitive Nat.ltb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.ltb_lt in Hab, Hbc.
-apply Nat.ltb_lt.
-now transitivity b.
-Qed.
-
 Theorem nth_of_ordered_tuple_rank : ∀ n k t,
   sorted Nat.ltb t = true
   → length t = k
@@ -435,29 +450,6 @@ Theorem nth_of_ordered_tuple_rank : ∀ n k t,
 Proof.
 intros * Hs Htk Hlt.
 destruct (le_dec k n) as [Hkn| Hkn]. 2: {
-  assert
-    (Hsa : ∀ a i l,
-        sorted Nat.ltb (a :: l) = true
-        → i < length l
-        → a = nth i l 0
-        → False). {
-    clear.
-    intros * Hsort Hil Ha.
-    destruct l as [| b]; [ cbn in Hil; flia Hil | ].
-    apply sorted_cons_cons_true_iff in Hsort.
-    destruct Hsort as (Hab & Hs).
-    apply Nat.ltb_lt in Hab.
-    specialize (@sorted_extends _ Nat.ltb b l) as H1.
-    destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
-    specialize (H1 transitive_nat_lt).
-    specialize (H1 Hs a).
-    cbn in Hil.
-    apply Nat.succ_lt_mono in Hil.
-    assert (H : a ∈ l) by now subst a; apply nth_In.
-    specialize (H1 H).
-    apply Nat.ltb_lt in H1.
-    flia Hab H1.
-  }
   apply Nat.nle_gt in Hkn.
   rewrite ordered_tuple_rank_out; [ | easy ].
   rewrite ordered_tuples_out; [ | easy ].
@@ -472,21 +464,21 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   specialize (H1 x x' eq_refl).
   destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
   exfalso; apply Hxx'; clear Hxx'.
-  clear - Hs Hx Hx' Hxxt Hsa.
+  clear - Hs Hx Hx' Hxxt.
   revert x x' Hx Hx' Hxxt.
   induction t as [| a]; intros; [ easy | ].
   destruct x. {
     destruct x'; [ easy | exfalso ].
     cbn in Hx'.
     apply Nat.succ_lt_mono in Hx'.
-    now apply (Hsa a x' t).
+    now apply (@sorted_hd_no_dup a x' t).
   }
   cbn in Hx.
   apply Nat.succ_lt_mono in Hx.
   destruct x'. {
     exfalso.
     cbn in Hxxt; symmetry in Hxxt.
-    now apply (Hsa a x t).
+    now apply (@sorted_hd_no_dup a x t).
   }
   cbn in Hx', Hxxt.
   apply Nat.succ_lt_mono in Hx'.
@@ -540,7 +532,7 @@ destruct (lt_dec (ordered_tuple_rank n (S k) t) (binomial n (S k)))
   }
   apply IHn; [ easy | easy | | flia Hkn Hnk ].
   intros i Hi.
-  clear - T Hs Hlt Hln Hi.
+  clear - Hs Hlt Hln Hi.
   specialize (Hlt i Hi) as H1.
   destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
   subst i; exfalso; clear H1.
@@ -587,12 +579,76 @@ rewrite (List_map_nth' []). 2: {
 exfalso. (* since last t ≠ m *)
 destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
   subst k; clear Hrb Hkn.
-(* pigeonhole probable *)
-...
-  rewrite ordered_tuple_rank_out in Hrb; [ | easy ].
-  rewrite binomial_out in Hrb; [ | easy ].
+  specialize (pigeonhole_list) as H1.
+  specialize (H1 n t).
+  assert (H : n < length t) by flia Htk.
+  specialize (H1 H); clear H.
+  assert (H : ∀ x, x ∈ t → x < n). {
+    intros x Hx.
+    specialize (Hlt x Hx) as H2.
+    destruct (Nat.eq_dec x n) as [Hxn| Hxn]; [ | flia H2 Hxn ].
+    subst x.
+    clear H2.
+    exfalso; clear IHn H1.
+    apply (In_nth _ _ 0) in Hx.
+    destruct Hx as (i & Hi & Hin).
+    specialize (sorted_any) as H1.
+    specialize (H1 nat Nat.ltb i (length t - 1) 0 t transitive_nat_lt Hs).
+    assert (H : i < length t - 1). {
+      destruct (Nat.eq_dec i (length t - 1)) as [Hit| Hit]. {
+        rewrite Hit in Hin.
+        now rewrite <- List_last_nth in Hin.
+      }
+      flia Hi Hit.
+    }
+    specialize (H1 H); clear H.
+    assert (H : length t - 1 < length t) by flia Hi.
+    specialize (H1 H); clear H.
+    rewrite Hin in H1.
+    rewrite <- List_last_nth in H1.
+    apply Nat.ltb_lt in H1.
+    specialize (Hlt (last t 0)).
+    assert (H : last t 0 ∈ t). {
+      rewrite List_last_nth.
+      apply nth_In; flia Hi.
+    }
+    specialize (Hlt H); clear H.
+    flia Hlt H1.
+  }
+  specialize (H1 H); clear H.
+  remember (pigeonhole_comp_list t) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (x, x').
+  specialize (H1 x x' eq_refl).
+  destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
+  exfalso; apply Hxx'; clear Hxx'.
+  clear - Hs Hx Hx' Hxxt.
+  revert x x' Hx Hx' Hxxt.
+  induction t as [| a]; intros; [ easy | ].
+  destruct x. {
+    destruct x'; [ easy | exfalso ].
+    cbn in Hx'.
+    apply Nat.succ_lt_mono in Hx'.
+    cbn in Hxxt.
+    now apply (@sorted_hd_no_dup a x' t).
+  }
+  cbn in Hx.
+  apply Nat.succ_lt_mono in Hx.
+  destruct x'. {
+    exfalso.
+    cbn in Hxxt; symmetry in Hxxt.
+    now apply (@sorted_hd_no_dup a x t).
+  }
+  cbn in Hx', Hxxt.
+  apply Nat.succ_lt_mono in Hx'.
+  f_equal.
+  apply IHt; [ | easy | easy | easy ].
+  now apply sorted_cons in Hs.
 }
-...
+apply Nat.nlt_ge in Hrb; apply Hrb.
+apply ordered_tuple_rank_ub.
+flia Hkn Hkn'.
+Qed.
 
 Section a.
 

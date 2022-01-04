@@ -1,5 +1,5 @@
-BinetCauchy.vio: BinetCauchy.v Misc.vio Pigeonhole.vio IterMul.vio
-BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo Pigeonhole.vo IterMul.vo
+BinetCauchy.vio: BinetCauchy.v Misc.vio RingLike.vio Pigeonhole.vio IterMul.vio
+BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo RingLike.vo Pigeonhole.vo IterMul.vo
 Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
