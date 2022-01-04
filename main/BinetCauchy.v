@@ -840,7 +840,7 @@ rewrite ordered_tuples_out; [ | easy ].
 now rewrite IHn.
 Qed.
 
-(* TODO: see https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
+(* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
 Theorem cauchy_binet_formula : in_charac_0_field →
@@ -912,6 +912,21 @@ symmetry; symmetry.
 (* interesting property, even if, perhaps, not useful here *)
 assert (ordered_tuples m m = [seq 0 m]).
 ...
+
+(*
+Abort.
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Arguments mat_with_cols {T}%type {ro} jl%list.
+Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let jl := [0;2]%nat in mat_with_rows jl A).
+Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let B := mk_mat [[0;6;7];[1;3;1];[3;2;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ ordered_tuples n m), det (mat_with_cols jl A) * det (mat_with_rows jl B), det A * det B)).
+Compute (let B := mk_mat [[3;4];[2;6];[1;3]] in let A := mk_mat [[1;6;7];[1;3;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ ordered_tuples n m), det (mat_with_cols jl A) * det (mat_with_rows jl B), det A * det B, m, n, ordered_tuples n m)).
+Compute (ordered_tuples 3 3).
+...
+*)
+
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
 
