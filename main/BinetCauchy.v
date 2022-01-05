@@ -913,6 +913,34 @@ erewrite map_ext_in. 2: {
  *)
 unfold det'.
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros k Hk.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      apply canon_sym_gr_list_ub; [ | flia Hk ].
+      specialize (fact_neq_0 m) as H.
+      flia Hi H.
+    }
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite seq_nth. 2: {
+        apply canon_sym_gr_list_ub; [ | flia Hk ].
+        specialize (fact_neq_0 m) as H.
+        flia Hi H.
+      }
+      rewrite Nat.add_0_l.
+      rewrite seq_nth; [ | flia Hk ].
+      rewrite Nat.add_0_l.
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
 ...
 Require Import MyVector.
 Check @determinant_multilinear.
