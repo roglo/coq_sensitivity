@@ -911,6 +911,10 @@ erewrite map_ext_in. 2: {
 (* k-th col of AB is
      ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
  *)
+(* i.e.
+     let As j := mat_el A i j in
+     ∑ (j = 0, n - 1), mat_el B j k * As j)
+ *)
 unfold det'.
 cbn - [ det ].
 erewrite rngl_summation_eq_compat. 2: {
