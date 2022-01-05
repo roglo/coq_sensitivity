@@ -891,6 +891,8 @@ assert (Hab : is_square_matrix (A * B) = true). {
   }
 }
 (*1*)
+rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite mat_mul_nrows, Har.
 unfold mat_mul, mat_mul_el.
 rewrite Har, Hac, Hbc.
 erewrite map_ext_in. 2: {
@@ -909,6 +911,8 @@ erewrite map_ext_in. 2: {
 (* k-th col of AB is
      ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
  *)
+unfold det'.
+cbn - [ det ].
 ...
 Require Import MyVector.
 Check @determinant_multilinear.
@@ -916,7 +920,7 @@ Print mat_repl_vect.
 map2 (replace_at k) (mat_list_list M) (vect_list V) =
 map
   (λ i : nat,
-   map (λ k : nat, ∑ (j = 0, n - 1), mat_el A i j * mat_el B j k)
+   map (λ k : nat, ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
      (seq 0 m))
   (seq 0 m)
 

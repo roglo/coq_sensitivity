@@ -75,6 +75,7 @@ Proof. easy. Qed.
 
 (* definition of determinant by sum of products involving all
    permutations *)
+(* known as "Leibniz formula" *)
 
 Definition det' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
