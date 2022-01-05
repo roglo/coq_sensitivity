@@ -893,6 +893,22 @@ assert (Hab : is_square_matrix (A * B) = true). {
 (*1*)
 unfold mat_mul, mat_mul_el.
 rewrite Har, Hac, Hbc.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite rngl_mul_comm; [ | now destruct Hif ].
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+(* k-th col of AB is
+     ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
+ *)
 ...
 Require Import MyVector.
 Check @determinant_multilinear.
