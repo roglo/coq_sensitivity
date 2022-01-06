@@ -947,6 +947,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 ...
 Require Import MyVector.
 Check @determinant_multilinear.
