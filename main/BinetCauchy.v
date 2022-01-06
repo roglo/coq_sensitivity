@@ -942,6 +942,13 @@ remember (canon_sym_gr_list m) as σ eqn:Hσ.
   ...
   (a (m-1) 0 * b 0 (σ k (m-1)) + a (m-1) 1 * b 1 (σ k (m-1)) + ... + a (m-1) (n-1) * b (n-1) (σ k (m-1)))
 *)
+About rngl_summation_change_var.
+erewrite rngl_summation_change_var.
+...
+unfold iter_seq at 1.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat_sub_succ_1.
 ...2
 erewrite map_ext_in. 2: {
   intros i Hi.
