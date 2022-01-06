@@ -941,6 +941,11 @@ remember (canon_sym_gr_list m) as σ eqn:Hσ.
   (a 1 0 * b 0 (σ k 1) + a 1 1 * b 1 (σ k 1) + ... + a 1 (n-1) * b (n-1) (σ k 1)) *
   ...
   (a (m-1) 0 * b 0 (σ k (m-1)) + a (m-1) 1 * b 1 (σ k (m-1)) + ... + a (m-1) (n-1) * b (n-1) (σ k (m-1)))
+
+In the initial theorem,
+  lhs has m!(n^m) terms
+  rhs has n!/(m!(n-m)!) terms
+how is it possible to make both sides equal?
 *)
 ...
 erewrite rngl_summation_change_var.
