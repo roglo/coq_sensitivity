@@ -929,6 +929,9 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ det ].
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 remember (canon_sym_gr_list m) as σ eqn:Hσ.
+(* k-th col of AB is
+     ∑ (j = 0, n - 1), mat_el A i j * mat_el B j k
+ *)
 ...2
 erewrite map_ext_in. 2: {
   intros i Hi.
@@ -944,11 +947,11 @@ erewrite map_ext_in. 2: {
   easy.
 }
 (* k-th col of AB is
-     ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
+     ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j
  *)
 (* i.e.
      let As j := mat_el A i j in
-     ∑ (j = 0, n - 1), mat_el B j k * As j)
+     ∑ (j = 0, n - 1), mat_el B j k * As j
  *)
 unfold det'.
 cbn - [ det ].
