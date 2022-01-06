@@ -944,8 +944,6 @@ remember (canon_sym_gr_list m) as σ eqn:Hσ.
 *)
 About rngl_summation_change_var.
 erewrite rngl_summation_change_var.
-...
-unfold iter_seq at 1.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
