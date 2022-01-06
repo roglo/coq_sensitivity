@@ -944,7 +944,7 @@ remember (canon_sym_gr_list m) as σ eqn:Hσ.
 
 In the initial theorem,
   lhs has m!(n^m) terms
-  rhs has n!/(m!(n-m)!) terms
+  rhs has n!/(m!(n-m)!).(m!/(2!(n-2)!)) terms
 how is it possible to make both sides equal?
 *)
 ...
