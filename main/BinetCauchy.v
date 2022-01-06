@@ -895,6 +895,41 @@ rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
 unfold mat_mul, mat_mul_el.
 rewrite Har, Hac, Hbc.
+(*2*)
+unfold det'.
+cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | flia Hmz ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros k Hk.
+    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hmz ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      apply canon_sym_gr_list_ub; [ | flia Hk Hmz ].
+      specialize (fact_neq_0 m) as H.
+      flia Hi H.
+    }
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite seq_nth; [ | flia Hk Hmz ].
+      rewrite seq_nth. 2: {
+        apply canon_sym_gr_list_ub; [ | flia Hk Hmz ].
+        specialize (fact_neq_0 m) as H.
+        flia Hi H.
+      }
+      do 2 rewrite Nat.add_0_l.
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
+remember (canon_sym_gr_list m) as σ eqn:Hσ.
+...2
 erewrite map_ext_in. 2: {
   intros i Hi.
   erewrite map_ext_in. 2: {
@@ -947,7 +982,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 ...
 Require Import MyVector.
 Check @determinant_multilinear.
