@@ -934,6 +934,41 @@ unfold det'.
 rewrite mat_with_rows_nrows, Hkln.
 rewrite mat_with_rows_nrows.
 rewrite bsort_length, Hkln.
+rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+erewrite rngl_summation_eq_compat; [ | easy ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k (_, Hk).
+  rewrite rngl_mul_assoc.
+  rewrite <- signature_comp with (n0 := m); [ | easy | | ]; cycle 1. {
+    split; [ | easy ].
+(* en fait non, c'est pas une permutation, ça *)
+(* donc on peut pas les composer *)
+(* enfin, je crois pas *)
+...
+  easy.
+}
+symmetry.
+(*
+  ============================
+  ∑ (i = 0, m! - 1),
+  ε (canon_sym_gr_list m i) *
+  ∏ (i0 = 1, m),
+  mat_el (mat_with_rows kl A) (i0 - 1)
+    (ff_app (canon_sym_gr_list m i) (i0 - 1)) =
+  ∑ (i = 0, m! - 1),
+  ε kl * ε (canon_sym_gr_list m i) *
+  ∏ (i0 = 1, m),
+  mat_el (mat_with_rows (bsort Nat.eqb kl) A) (i0 - 1)
+    (ff_app (canon_sym_gr_list m i) (i0 - 1))
+*)
+symmetry.
+erewrite rngl_summation_change_var.
+(*
+  ε kl * ε (canon_sym_gr_list m (?g i)) *
+must be equal to
+  ε (canon_sym_gr_list m i)
+*)
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
