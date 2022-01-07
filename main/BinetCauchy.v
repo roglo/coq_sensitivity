@@ -947,6 +947,18 @@ In the initial theorem,
   rhs has n!/(m!(n-m)!).(m!/(2!(n-2)!)) terms
 how is it possible to make both sides equal?
 *)
+Restart. Show.
+intros Hif * Hca Hcb Har Hac Hbr Hbc.
+(* attention: "ordered tuple", dans la litterature, semble vouloir dire simplement
+   "tuple" (je pense par opposition avec "ensemble" où les éléments ne sont pas
+   ordonnés); mais ça ne veut pas dire que les éléments du tuple soient dans
+   l'ordre! *)
+...
+Theorem det_with_row : ∀ m n A kl,
+  mat_nrows A = n
+  → mat_ncols A = m
+  → kl ∈ ordered_tuples n m
+  → det (mat_with_rows kl A) = (sgn kl * det (mat_with_rows (sort kl) A))%F.
 ...
 erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
