@@ -843,6 +843,13 @@ Qed.
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
+Theorem mat_with_rows_nrows : ∀ A kl,
+  mat_nrows (mat_with_rows kl A) = length kl.
+Proof.
+intros.
+now cbn; rewrite map_length.
+Qed.
+
 Theorem mat_with_rows_is_square : ∀ kl A,
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -858,8 +865,8 @@ apply is_scm_mat_iff.
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Hcra, Hcla).
 split. {
+  rewrite mat_with_rows_nrows.
   unfold mat_ncols; cbn.
-  rewrite map_length.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
   clear Hnz; cbn in Hra, Hc.
@@ -871,7 +878,7 @@ split. {
   congruence.
 } {
   intros l Hl.
-  cbn; rewrite map_length.
+  rewrite mat_with_rows_nrows.
   cbn in Hl.
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
@@ -923,60 +930,10 @@ rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
   apply Hkn.
   now apply in_bsort in Hk.
 }
-...
-
-Print merge_stack.
-Print merge.
-Theorem merge_aux_length : ∀ A n leb (la lb : list A),
-  length la + length lb ≤ n
-  → length (merge_aux n leb la lb) = length la + length lb.
-Proof.
-intros * Habn.
-revert la lb Habn.
-induction n; intros; [ now apply Nat.le_0_r in Habn | cbn ].
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ now cbn; rewrite Nat.add_0_r | ].
-destruct (leb a b). {
-  cbn; rewrite IHn; [ easy | cbn in Habn |-*; flia Habn ].
-} {
-  cbn; rewrite IHn; [ | cbn in Habn |-*; flia Habn ].
-  now rewrite <- Nat.add_succ_comm.
-}
-Qed.
-Theorem merge_length : ∀ A leb (la lb : list A),
-  length (merge leb la lb) = length la + length lb.
-Proof.
-intros.
-unfold merge.
-now apply merge_aux_length.
-Qed.
-Theorem merge_stack_length : ∀ A leb (stack : list (option (list A))),
-  length (merge_stack leb stack) = length stack.
-Proof.
-intros.
-induction stack; [ easy | cbn ].
-destruct a as [a| ]. {
-Print merge_stack.
-(* bon, faut que je le revoie, ce "bsort", là *)
-...
-Print merge.
-rewrite merge_length.
-rewrite IHstack; cbn.
-...
-revert lb.
-induction la as [| a]; intros; cbn.
-...
-destruct l as [| a]; [ easy | cbn ].
-revert a.
-induction l as [| b]; intros; [ easy | cbn ].
-...
-    rewrite bsort_length.
-    congruence.
-...
-  apply mat_with_rows_is_square; [ | now rewrite Hkln | ].
-  intros k Hk; rewrite Hra.
-  now apply Hkn.
-}
+unfold det'.
+rewrite mat_with_rows_nrows, Hkln.
+rewrite mat_with_rows_nrows.
+rewrite bsort_length, Hkln.
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
