@@ -1873,15 +1873,23 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
-Fixpoint merge {A} (le : A → A → bool) l1 l2 :=
-  let fix merge_aux l2 :=
-  match l1, l2 with
-  | [], _ => l2
-  | _, [] => l1
-  | a1::l1', a2::l2' =>
-      if le a1 a2 then a1 :: merge le l1' l2 else a2 :: merge_aux l2'
-  end
-  in merge_aux l2.
+(* bsort *)
+
+Fixpoint merge_aux {A} n (leb : A → A → bool) la lb :=
+  match n with
+  | 0  => []
+  | S n' =>
+      match la, lb with
+      | [], _ => lb
+      | _, [] => la
+      | a :: la', b :: lb' =>
+          if leb a b then a :: merge_aux n' leb la' lb
+          else b :: merge_aux n' leb la lb'
+      end
+  end.
+
+Definition merge {A} (leb : A → A → bool) la lb :=
+  merge_aux (length la + length lb) leb la lb.
 
 Fixpoint merge_list_to_stack {A} (le : A → A → bool) stack l :=
   match stack with

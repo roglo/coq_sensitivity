@@ -845,14 +845,11 @@ Qed.
 
 Theorem mat_with_rows_is_square : ∀ kl A,
   is_correct_matrix A = true
-  → mat_nrows A = length kl
+  → mat_ncols A = length kl
+  → (∀ k, k ∈ kl → k < mat_nrows A)
   → is_square_matrix (mat_with_rows kl A) = true.
 Proof.
-intros * Ha Hra.
-Print mat_with_rows.
-(* il faut que les valeurs dans kl soient toutes inférieures à
-   mat_nrows A *)
-...
+intros * Ha Hra Hkc.
 destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in Hnz; subst kl; cbn in Hra.
   now cbn; rewrite iter_list_empty.
@@ -866,30 +863,44 @@ split. {
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
   clear Hnz; cbn in Hra, Hc.
-  destruct (lt_dec k (mat_nrows A)) as [Hkn| Hkn]. {
-    rewrite Hcla in Hc. 2: {
-      apply nth_In.
-      now rewrite fold_mat_nrows.
-    }
-    apply Hcra in Hc.
-    congruence.
+  rewrite Hcla in Hc. 2: {
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    now apply Hkc; left.
   }
-  apply Nat.nlt_ge in Hkn.
-(* ah bin non mais ça marche pas *)
-...
+  congruence.
+} {
+  intros l Hl.
+  cbn; rewrite map_length.
+  cbn in Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (a & Hal & Ha).
+  subst l.
+  rewrite Hcla; [ easy | ].
+  apply nth_In; rewrite fold_mat_nrows.
+  now apply Hkc.
+}
+Qed.
 
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
   mat_nrows A = n
   → mat_ncols A = m
   → is_correct_matrix A = true
-  → length kl = n
+  → length kl = m
+  → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
        (ε kl * det (mat_with_rows (bsort Nat.eqb kl) A))%F.
 Proof.
-intros Hif * Hra Hca Ha Hkln.
+intros Hif * Hra Hca Ha Hkln Hkn.
+(*
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
+  apply is_scm_mat_iff in Ha.
+...
+  rewrite <- Hca in Hkln.
+  destruct Ha as (Hcra, Hcla).
+  rewrite Hcla in Hkln.
   apply length_zero_iff_nil in Hkln; subst kl.
   cbn; unfold ε; cbn.
   rewrite rngl_product_empty; [ | easy ].
@@ -897,9 +908,80 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
   symmetry; apply rngl_mul_1_l.
 }
+*)
 rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+  apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
+  intros k Hk; rewrite Hra.
+  now apply Hkn.
+}
+rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+  apply mat_with_rows_is_square; [ easy | | ]. {
+Search bsort.
+Print bsort.
+Theorem bsort_length : ∀ A leb (l : list A), length (bsort leb l) = length l.
+Proof.
+intros.
+unfold bsort.
+Print iter_merge.
+Theorem iter_merge_length : ∀ A leb stack (l : list A),
+  length (iter_merge leb stack l) = length stack + length l.
+Proof.
+intros.
+revert stack.
+induction l as [| a]; intros. {
+  cbn.
+Print merge_stack.
+Print merge.
+Theorem merge_aux_length : ∀ A n leb (la lb : list A),
+  length la + length lb ≤ n
+  → length (merge_aux n leb la lb) = length la + length lb.
+Proof.
+intros * Habn.
+revert la lb Habn.
+induction n; intros; [ now apply Nat.le_0_r in Habn | cbn ].
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ now cbn; rewrite Nat.add_0_r | ].
+destruct (leb a b). {
+  cbn; rewrite IHn; [ easy | cbn in Habn |-*; flia Habn ].
+} {
+  cbn; rewrite IHn; [ | cbn in Habn |-*; flia Habn ].
+  now rewrite <- Nat.add_succ_comm.
+}
+Qed.
+Theorem merge_length : ∀ A leb (la lb : list A),
+  length (merge leb la lb) = length la + length lb.
+Proof.
+intros.
+unfold merge.
+now apply merge_aux_length.
+Qed.
+Theorem merge_stack_length : ∀ A leb (stack : list (option (list A))),
+  length (merge_stack leb stack) = length stack.
+Proof.
+intros.
+induction stack; [ easy | cbn ].
+destruct a as [a| ]. {
+Print merge_stack.
+(* bon, faut que je le revoie, ce "bsort", là *)
 ...
-  apply mat_with_rows_is_square; [ easy | now rewrite Hkln ]
+Print merge.
+rewrite merge_length.
+rewrite IHstack; cbn.
+...
+revert lb.
+induction la as [| a]; intros; cbn.
+...
+destruct l as [| a]; [ easy | cbn ].
+revert a.
+induction l as [| b]; intros; [ easy | cbn ].
+...
+    rewrite bsort_length.
+    congruence.
+...
+  apply mat_with_rows_is_square; [ | now rewrite Hkln | ].
+  intros k Hk; rewrite Hra.
+  now apply Hkn.
+}
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
