@@ -15,7 +15,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 
-Require Import Misc RingLike IterAdd IterMul Pigeonhole.
+Require Import Misc RingLike IterAdd IterMul IterAnd Pigeonhole.
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
@@ -843,14 +843,59 @@ Qed.
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-Theorem det_with_rows : ∀ m n A kl,
+Theorem mat_with_rows_is_square : ∀ kl A,
+  is_correct_matrix A = true
+  → mat_nrows A = length kl
+  → is_square_matrix (mat_with_rows kl A) = true.
+Proof.
+intros * Ha Hra.
+destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
+  apply length_zero_iff_nil in Hnz; subst kl; cbn in Hra.
+  now cbn; rewrite iter_list_empty.
+}
+apply is_scm_mat_iff.
+apply is_scm_mat_iff in Ha.
+destruct Ha as (Hcra, Hcla).
+split. {
+  unfold mat_ncols; cbn.
+  rewrite map_length.
+  intros Hc.
+  destruct kl as [| k]; [ easy | exfalso ].
+  clear Hnz; cbn in Hra, Hc.
+  destruct (lt_dec k (mat_nrows A)) as [Hkn| Hkn]. {
+    rewrite Hcla in Hc. 2: {
+      apply nth_In.
+      now rewrite fold_mat_nrows.
+    }
+    apply Hcra in Hc.
+    congruence.
+  }
+  apply Nat.nlt_ge in Hkn.
+(* ah bin non mais ça marche pas *)
+...
+
+Theorem det_with_rows : in_charac_0_field →
+  ∀ m n A kl,
   mat_nrows A = n
   → mat_ncols A = m
+  → is_correct_matrix A = true
   → length kl = n
   → det (mat_with_rows kl A) =
        (ε kl * det (mat_with_rows (bsort Nat.eqb kl) A))%F.
 Proof.
-intros * Hra Hca Hkln.
+intros Hif * Hra Hca Ha Hkln.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  apply length_zero_iff_nil in Hkln; subst kl.
+  cbn; unfold ε; cbn.
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
+  symmetry; apply rngl_mul_1_l.
+}
+rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+...
+  apply mat_with_rows_is_square; [ easy | now rewrite Hkln ]
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
