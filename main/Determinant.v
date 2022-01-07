@@ -79,7 +79,7 @@ Proof. easy. Qed.
 
 Definition det' n (M : matrix T) :=
   ∑ (k = 0, fact n - 1),
-    ε n (canon_sym_gr_list n k) *
+    ε (canon_sym_gr_list n k) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)).
 
 Arguments det' n%nat M%M.
@@ -729,7 +729,7 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
-  rewrite signature_comp; [ easy | easy | | ]. {
+  rewrite signature_comp with (n0 := n); [ easy | easy | | ]. {
     split. 2: {
       unfold f.
       rewrite length_list_swap_elem.
@@ -773,7 +773,7 @@ cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
-  rewrite (rngl_mul_comm Hic (ε n (f k))).
+  rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
   now rewrite transposition_signature.
 }

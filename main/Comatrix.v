@@ -1196,7 +1196,7 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
   → is_sym_gr_list n sg
   → det M =
     ∑ (k = 0, n! - 1),
-    ε n (nth k sg []) *
+    ε (nth k sg []) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
@@ -1550,7 +1550,7 @@ Theorem det_any_permut_l : in_charac_0_field →
   → is_square_matrix M = true
   → is_permut n σ
   → det M =
-    (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
+    (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app σ k) (ff_app μ k))%F.
 Proof.
 intros Hif * Hnz Hr Hsm Hσ.
@@ -1575,15 +1575,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
-  replace (ε n ((μ ° permut_list_inv σ) ° σ)) with
-      (ε n (μ ° permut_list_inv σ) * ε n σ)%F. 2: {
+  replace (ε ((μ ° permut_list_inv σ) ° σ)) with
+      (ε (μ ° permut_list_inv σ) * ε σ)%F. 2: {
     destruct Hσ.
-    rewrite <- signature_comp; try easy.
+    rewrite <- signature_comp with (n0 := n); try easy.
     apply comp_is_permut; [ easy | ].
     now apply permut_list_inv_is_permut.
   }
-  rewrite <- (rngl_mul_assoc _ (ε n σ) (ε n σ)).
-  replace (ε n σ * ε n σ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
+  rewrite ε_square; [ | easy | now destruct Hσ ].
   rewrite rngl_mul_1_r.
   easy.
 }
@@ -1771,7 +1771,7 @@ Theorem det_any_permut_r : in_charac_0_field →
   → is_square_matrix M = true
   → is_permut n σ
   → det M =
-    (∑ (μ ∈ canon_sym_gr_list_list n), ε n μ * ε n σ *
+    (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (ff_app μ k) (ff_app σ k))%F.
 Proof.
 intros Hif * Hnz Hr Hsm Hσ.
@@ -1797,17 +1797,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   subst ν.
   rewrite <- Hσν at 1.
-  replace (ε n ((σ ° permut_list_inv μ) ° μ)) with
-      (ε n (σ ° permut_list_inv μ) * ε n μ)%F. 2: {
+  replace (ε ((σ ° permut_list_inv μ) ° μ)) with
+      (ε (σ ° permut_list_inv μ) * ε μ)%F. 2: {
     destruct Hif.
-    rewrite <- signature_comp; try easy.
+    rewrite <- signature_comp with (n0 := n); try easy.
     apply comp_is_permut; [ easy | ].
     now apply permut_list_inv_is_permut.
   }
   destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
-  rewrite (rngl_mul_comm Hic _ (ε n μ)).
+  rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
-  replace (ε n μ * ε n μ)%F with 1%F by now symmetry; apply ε_square.
+  rewrite ε_square; [ | easy | now destruct Hpμ ].
   rewrite rngl_mul_1_l.
   easy.
 }

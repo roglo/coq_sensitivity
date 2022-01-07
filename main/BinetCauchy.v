@@ -947,6 +947,7 @@ In the initial theorem,
   rhs has n!/(m!(n-m)!).(m!/(2!(n-2)!)) terms
 how is it possible to make both sides equal?
 *)
+...
 Restart. Show.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 About ε.
