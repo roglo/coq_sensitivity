@@ -916,20 +916,15 @@ rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
 }
 rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
   apply mat_with_rows_is_square; [ easy | | ]. {
-Search bsort.
-Print bsort.
-Theorem bsort_length : ∀ A leb (l : list A), length (bsort leb l) = length l.
-Proof.
-intros.
-unfold bsort.
-Print iter_merge.
-Theorem iter_merge_length : ∀ A leb stack (l : list A),
-  length (iter_merge leb stack l) = length stack + length l.
-Proof.
-intros.
-revert stack.
-induction l as [| a]; intros. {
-  cbn.
+    rewrite bsort_length.
+    congruence.
+  }
+  intros k Hk; rewrite Hra.
+  apply Hkn.
+  now apply in_bsort in Hk.
+}
+...
+
 Print merge_stack.
 Print merge.
 Theorem merge_aux_length : ∀ A n leb (la lb : list A),

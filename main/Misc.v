@@ -1875,43 +1875,93 @@ Qed.
 
 (* bsort *)
 
-Fixpoint merge_aux {A} n (leb : A → A → bool) la lb :=
-  match n with
-  | 0  => []
-  | S n' =>
-      match la, lb with
-      | [], _ => lb
-      | _, [] => la
-      | a :: la', b :: lb' =>
-          if leb a b then a :: merge_aux n' leb la' lb
-          else b :: merge_aux n' leb la lb'
-      end
+Fixpoint bsort_insert {A} (ord : A → A → bool) a lsorted :=
+  match lsorted with
+  | [] => [a]
+  | b :: l =>
+      if ord a b then a :: lsorted
+      else b :: bsort_insert ord a l
   end.
 
-Definition merge {A} (leb : A → A → bool) la lb :=
-  merge_aux (length la + length lb) leb la lb.
-
-Fixpoint merge_list_to_stack {A} (le : A → A → bool) stack l :=
-  match stack with
-  | [] => [Some l]
-  | None :: stack' => Some l :: stack'
-  | Some l' :: stack' => None :: merge_list_to_stack le stack' (merge le l' l)
-  end.
-
-Fixpoint merge_stack {A} (le : A → A → bool) stack :=
-  match stack with
-  | [] => []
-  | None :: stack' => merge_stack le stack'
-  | Some l :: stack' => merge le l (merge_stack le stack')
-  end.
-
-Fixpoint iter_merge {A} (le : A → A → bool) stack l :=
+Fixpoint bsort_loop {A} (ord : A → A → bool) lsorted l :=
   match l with
-  | [] => merge_stack le stack
-  | a::l' => iter_merge le (merge_list_to_stack le stack [a]) l'
+  | [] => lsorted
+  | a :: l' => bsort_loop ord (bsort_insert ord a lsorted) l'
   end.
 
-Definition bsort {A} (le : A → A → bool) := iter_merge le [].
+Definition bsort {A} (ord : A → A → bool) := bsort_loop ord [].
+
+(* bsort length *)
+
+Theorem bsort_insert_length : ∀ A ord (a : A) lsorted,
+  length (bsort_insert ord a lsorted) = S (length lsorted).
+Proof.
+intros.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+destruct (ord a b); [ easy | ].
+cbn; f_equal.
+apply IHlsorted.
+Qed.
+
+Theorem bsort_loop_length : ∀ A ord (lsorted l : list A),
+  length (bsort_loop ord lsorted l) = length lsorted + length l.
+Proof.
+intros.
+revert lsorted.
+induction l as [| a]; intros; [ now cbn; rewrite Nat.add_0_r | cbn ].
+rewrite IHl, <- Nat.add_succ_comm; f_equal.
+apply bsort_insert_length.
+Qed.
+
+Theorem bsort_length : ∀ A ord (l : list A), length (bsort ord l) = length l.
+Proof.
+intros.
+apply bsort_loop_length.
+Qed.
+
+(* in bsort *)
+
+Theorem in_bsort_insert : ∀ A (ord : A → A → bool) a b lsorted,
+  a ∈ bsort_insert ord b lsorted
+  → a ∈ b :: lsorted.
+Proof.
+intros * Ha.
+revert a b Ha.
+induction lsorted as [| c]; intros. {
+  cbn in Ha.
+  destruct Ha as [Ha| Ha]; [ now left | easy ].
+}
+cbn in Ha.
+destruct (ord b c); [ easy | ].
+cbn in Ha.
+destruct Ha as [Ha| Ha]; [ now right; left | ].
+apply IHlsorted in Ha.
+destruct Ha as [Ha| Ha]; [ now left | now right; right ].
+Qed.
+
+Theorem in_bsort_loop : ∀ A (ord : A → A → bool) a lsorted l,
+  a ∈ bsort_loop ord lsorted l
+  → a ∈ lsorted ∨ a ∈ l.
+Proof.
+intros * Ha.
+revert a lsorted Ha.
+induction l as [| b]; intros; [ now left | ].
+cbn in Ha.
+apply IHl in Ha.
+destruct Ha as [Ha| Ha]. {
+  apply in_bsort_insert in Ha.
+  destruct Ha as [Ha| Ha]; [ now right; left | now left ].
+} {
+  now right; right.
+}
+Qed.
+
+Theorem in_bsort : ∀ A (ord : A → A → bool) a l, a ∈ bsort ord l → a ∈ l.
+Proof.
+intros * Ha.
+apply in_bsort_loop in Ha.
+now destruct Ha.
+Qed.
 
 (* *)
 
