@@ -896,6 +896,14 @@ rewrite mat_mul_nrows, Har.
 unfold mat_mul, mat_mul_el.
 rewrite Har, Hac, Hbc.
 (*2*)
+...
+Theorem det_with_rows : ∀ m n A kl,
+  mat_nrows A = n
+  → mat_ncols A = m
+  → length kl = n
+  → det (mat_with_rows kl A) =
+       (ε kl * det (mat_with_rows (bsort Nat.eqb kl) A))%F.
+...
 unfold det'.
 cbn - [ det ].
 erewrite rngl_summation_eq_compat. 2: {
@@ -948,16 +956,12 @@ In the initial theorem,
 how is it possible to make both sides equal?
 *)
 ...
-Restart. Show.
+Restart.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
-About ε.
+Show.
+
 ...
-Theorem det_with_rows : ∀ m n A kl,
-  mat_nrows A = n
-  → mat_ncols A = m
-  → length kl = n
-  → det (mat_with_rows kl A) =
-       (ε kl * det (mat_with_rows (bsort kl) A))%F.
+*)
 ...
 erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
