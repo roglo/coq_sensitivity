@@ -849,6 +849,10 @@ Theorem mat_with_rows_is_square : ∀ kl A,
   → is_square_matrix (mat_with_rows kl A) = true.
 Proof.
 intros * Ha Hra.
+Print mat_with_rows.
+(* il faut que les valeurs dans kl soient toutes inférieures à
+   mat_nrows A *)
+...
 destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in Hnz; subst kl; cbn in Hra.
   now cbn; rewrite iter_list_empty.
