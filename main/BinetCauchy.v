@@ -897,38 +897,10 @@ Theorem det_with_rows : in_charac_0_field →
   → length kl = m
   → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
-       (ε kl * det (mat_with_rows (bsort Nat.eqb kl) A))%F.
+       (ε_ws kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hra Hca Ha Hkln Hkn.
-Abort.
-End a.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, det (mat_with_rows kl M) =
-       (ε_ws kl * det (mat_with_rows (bsort Nat.eqb kl) M))%F)).
-(* bizarre, c'est la même valeur absolue mais pas le même signe *)
-...
-Compute (
-Compute (ε_ws [3;5;4]%nat).
-Print ε.
-Print ε_ws.
-(*
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  apply is_scm_mat_iff in Ha.
-...
-  rewrite <- Hca in Hkln.
-  destruct Ha as (Hcra, Hcla).
-  rewrite Hcla in Hkln.
-  apply length_zero_iff_nil in Hkln; subst kl.
-  cbn; unfold ε; cbn.
-  rewrite rngl_product_empty; [ | easy ].
-  rewrite rngl_product_empty; [ | easy ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  symmetry; apply rngl_mul_1_l.
-}
-*)
+(* formule testée. Ça devrait être bon *)
 rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
   intros k Hk; rewrite Hra.
@@ -981,7 +953,20 @@ erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
+...
+Abort.
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε kl, ε_ws kl, det (mat_with_rows kl M) =
+       (ε_ws kl * det (mat_with_rows (bsort Nat.leb kl) M))%F)).
+...
+Compute (
+Compute (ε_ws [3;5;4]%nat).
 Print ε.
+Print ε_ws.
+...
 Abort.
 End a.
 Require Import RnglAlg.Zrl.
