@@ -951,9 +951,15 @@ erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  unfold ε.
+  rewrite Hkln, length_canon_sym_gr_list.
 ...
 Search (ε (canon_sym_gr_list _ _)).
 ...
+(*
+Abort.
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
