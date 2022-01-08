@@ -580,7 +580,7 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem ε_ws_ε : in_charac_0_field →
+Theorem ε_ε_ws : in_charac_0_field →
   ∀ (p : list nat),
   is_permut_list p
   → ε p = ε_ws p.
@@ -879,7 +879,7 @@ Theorem transposition_signature_lt : in_charac_0_field →
   → ε (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hq.
-rewrite ε_ws_ε; try easy. 2: {
+rewrite ε_ε_ws; try easy. 2: {
   split; cbn. {
     intros x Hx.
     rewrite map_length, seq_length.
@@ -1525,7 +1525,7 @@ Theorem ε_of_sym_gr_permut_succ : in_charac_0_field →
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hkn.
-rewrite ε_ws_ε; try easy; [ | now apply canon_sym_gr_list_is_permut ].
+rewrite ε_ε_ws; try easy; [ | now apply canon_sym_gr_list_is_permut ].
 unfold ε_ws.
 rewrite length_canon_sym_gr_list.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -1691,7 +1691,7 @@ f_equal. {
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
-rewrite ε_ws_ε; try easy; [ | now apply canon_sym_gr_list_is_permut ].
+rewrite ε_ε_ws; try easy; [ | now apply canon_sym_gr_list_is_permut ].
 unfold ε_ws.
 rewrite length_canon_sym_gr_list.
 erewrite rngl_product_eq_compat. 2: {
@@ -1836,7 +1836,7 @@ Theorem ε_1_opp_1 : in_charac_0_field →
   ∀ σ, is_permut_list σ → ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
-rewrite ε_ws_ε; try easy.
+rewrite ε_ε_ws; try easy.
 unfold ε_ws.
 apply rngl_product_1_opp_1; [ easy | ].
 intros i Hi.
@@ -1874,7 +1874,7 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
-Arguments ε_ws_ε {T}%type {ro rp} _ p%list.
+Arguments ε_ε_ws {T}%type {ro rp} _ p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
