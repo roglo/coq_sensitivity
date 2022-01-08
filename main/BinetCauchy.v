@@ -940,12 +940,13 @@ symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
+(*
   rewrite <- signature_comp with (n0 := m); [ | easy | | ]; cycle 1. {
     split; [ | easy ].
 (* en fait non, c'est pas une permutation, ça *)
 (* donc on peut pas les composer *)
 (* enfin, je crois pas *)
-...
+*)
   easy.
 }
 symmetry.
@@ -964,6 +965,9 @@ symmetry.
 *)
 symmetry.
 erewrite rngl_summation_change_var.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat_sub_succ_1.
 (*
   ε kl * ε (canon_sym_gr_list m (?g i)) *
 must be equal to
