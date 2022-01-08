@@ -1472,6 +1472,31 @@ unfold ε.
 rewrite Han, Hbn.
 rewrite comp_length, Hbn.
 rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold "°".
+    rewrite (List_map_nth' 0); [ | rewrite Hbn; flia Hj ].
+    rewrite (List_map_nth' 0); [ | rewrite Hbn; flia Hi ].
+    easy.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_if_then_else_distr.
+    rewrite rngl_mul_1_l.
+    easy.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_change_var.
 ...
 apply rngl_product_eq_compat.
 intros i Hi.
