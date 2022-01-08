@@ -1451,6 +1451,14 @@ rewrite product_product_if_permut; try easy. {
 }
 Qed.
 
+Theorem comp_length : ∀ la lb,
+  length (la ° lb) = length lb.
+Proof.
+intros.
+unfold "°"; cbn.
+now rewrite map_length.
+Qed.
+
 (* if signature_comp_fun_expand_1 does not require in_charac_0_field
    this one should not *)
 Theorem signature_comp : in_charac_0_field →
@@ -1459,6 +1467,11 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n g
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
+intros Hif n la lb (Hap, Han) (Hbp, Hbn).
+unfold ε.
+rewrite Han, Hbn.
+rewrite comp_length, Hbn.
+...
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hp11, Hpf2).
 destruct Hpg as (Hpg1, Hpg2).
