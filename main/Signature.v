@@ -1471,6 +1471,30 @@ intros Hif n la lb (Hap, Han) (Hbp, Hbn).
 unfold ε.
 rewrite Han, Hbn.
 rewrite comp_length, Hbn.
+rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+...
+apply rngl_product_eq_compat.
+intros i Hi.
+rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+apply rngl_product_eq_compat.
+intros j Hj.
+do 3 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | symmetry; apply rngl_mul_1_l ].
+...
+unfold "°"; cbn.
+rewrite (List_map_nth' 0); [ | rewrite Hbn; flia Hj ].
+rewrite (List_map_nth' 0); [ | rewrite Hbn; flia Hi ].
+unfold ff_app.
+unfold sign_diff.
+do 3 rewrite if_ltb_lt_dec.
+move j before i.
+destruct (lt_dec (nth (nth (i - 1) lb 0) la 0) (nth (nth (j - 1) lb 0) la 0))
+    as [Hnij| Hnij]. {
+  destruct (lt_dec (nth (i - 1) la 0) (nth (j - 1) la 0)) as [Hna| Hna]. {
+    destruct (lt_dec (nth (i - 1) lb 0) (nth (j - 1) lb 0)) as [Hnb| Hnb]. {
+      symmetry; apply rngl_mul_1_l.
+    }
+    exfalso; apply Nat.nlt_ge in Hnb.
 ...
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hp11, Hpf2).
