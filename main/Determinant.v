@@ -86,12 +86,16 @@ Arguments det' n%nat M%M.
 
 (* Proof that both definitions of determinants are equal *)
 
-Theorem det_is_det_by_canon_permut : in_charac_0_field →
+Theorem det_is_det_by_canon_permut :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det' (mat_nrows M) M.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hm.
+intros Hic Hop Hin H10 * Hm.
 unfold det'.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 unfold det.
@@ -101,8 +105,7 @@ induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
   unfold ε, iter_seq, iter_list; cbn.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_div_1_r; [ easy | now left | easy ].
+  symmetry; apply rngl_mul_1_l.
 }
 rewrite determinant_succ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -110,10 +113,9 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_product_only_one; cbn.
-  unfold ε; cbn.
-  do 4 rewrite rngl_product_only_one; cbn.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_div_1_r; [ easy | now left | easy ].
+  unfold ε.
+  do 2 rewrite rngl_product_only_one; cbn.
+  now rewrite rngl_mul_1_r.
 }
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -200,7 +202,11 @@ Qed.
 
 (* multilinearity *)
 
-Theorem determinant_multilinear : in_charac_0_field →
+Theorem determinant_multilinear :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -211,20 +217,20 @@ Theorem determinant_multilinear : in_charac_0_field →
        (a * det (mat_repl_vect i M U) +
         b * det (mat_repl_vect i M V))%F.
 Proof.
-intros Hif * Hsm Hr Hu Hv Hi.
+intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
-rewrite (det_is_det_by_canon_permut Hif). 2: {
+rewrite det_is_det_by_canon_permut; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
   rewrite map2_length.
   do 2 rewrite map_length, fold_vect_size.
   rewrite Hu, Hv.
   now rewrite Nat.min_id.
 }
-rewrite (det_is_det_by_canon_permut Hif). 2: {
+rewrite det_is_det_by_canon_permut; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | congruence | easy ].
 }
-rewrite (det_is_det_by_canon_permut Hif). 2: {
+rewrite det_is_det_by_canon_permut; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | congruence | easy ].
 }
 unfold det'.
@@ -285,8 +291,8 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
-rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -297,7 +303,6 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic a).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
@@ -328,7 +333,6 @@ erewrite rngl_summation_eq_compat. 2: {
     flia Hk Hnz.
   }
   rewrite rngl_mul_assoc.
-  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic b).
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
@@ -378,7 +382,6 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
 rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
 rewrite rngl_add_comm.
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
@@ -584,7 +587,7 @@ Theorem determinant_alternating : in_charac_0_field →
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   rewrite <- Hr in Hp, Hq.
   now apply mat_swap_rows_is_square.
 }
@@ -879,7 +882,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     now rewrite transposition_involutive in Hij.
   }
 }
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
+rewrite det_is_det_by_canon_permut; try now destruct Hif.
 rewrite Hr.
 unfold det'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].

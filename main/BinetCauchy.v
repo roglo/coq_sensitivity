@@ -897,16 +897,16 @@ Theorem det_with_rows : in_charac_0_field →
   → length kl = m
   → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
-       (ε_ws kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
+       (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 (* formule testée. Ça devrait être bon *)
 intros Hif * Hra Hca Ha Hkln Hkn.
-rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
   intros k Hk; rewrite Hra.
   now apply Hkn.
 }
-rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
+rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | | ]. {
     rewrite bsort_length.
     congruence.
@@ -955,34 +955,27 @@ rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 Search (ε (canon_sym_gr_list _ _)).
 ...
-Abort.
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε kl, ε_ws kl, det (mat_with_rows kl M) =
-       (ε_ws kl * det (mat_with_rows (bsort Nat.leb kl) M))%F)).
+Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε' kl, ε kl, det (mat_with_rows kl M) =
+       (ε kl * det (mat_with_rows (bsort Nat.leb kl) M))%F)).
 ...
 Compute (
-Compute (ε_ws [3;5;4]%nat).
+Compute (ε [3;5;4]%nat).
+Print ε'.
 Print ε.
-Print ε_ws.
 ...
 Abort.
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Compute (ε [3;2;7]%nat).
-Compute (ε_ws [3;5;4]%nat).
+Compute (ε' [3;2;7]%nat).
+Compute (ε [3;5;4]%nat).
+Print ε'.
 Print ε.
-Print ε_ws.
-(* bon. pour kl, il semble que ce soit ε_wc la bonne version, car ε
-   donne des valeurs supérieures à 1 ou inférieures à -1;
-   cependant, il semble que signum donne parfois 0 aussi ;
-   mai est-ce que ε_ws est censé être signum ou pas ? *)
-...
-unfold ε at 1.
 (*
   ε kl * ε (canon_sym_gr_list m (?g i)) *
 must be equal to
@@ -1346,7 +1339,7 @@ Some terms of the lhs must cancel each other. But which ones?
 destruct n; [ easy | ].
 destruct n. {
   cbn - [ "/" ff_app ].
-  unfold ε.
+  unfold ε'.
   do 3 rewrite rngl_summation_only_one.
   do 7 rewrite rngl_product_only_one.
   rewrite rngl_summation_only_one; cbn.
@@ -1357,7 +1350,7 @@ destruct n. {
   unfold iter_seq, iter_list; cbn.
   do 7 rewrite rngl_add_0_l.
   do 6 rewrite rngl_mul_1_l.
-  unfold ε, iter_seq, iter_list; cbn.
+  unfold ε', iter_seq, iter_list; cbn.
   do 8 rewrite rngl_mul_1_l.
   rewrite rngl_add_0_r.
   rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
@@ -1461,7 +1454,7 @@ destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
   rewrite Nat.mod_same; [ | easy ].
   rewrite Nat.mod_small; [ | flia ].
   cbn.
-  unfold ε; cbn.
+  unfold ε'; cbn.
   unfold iter_seq, iter_list; cbn.
   do 8 rewrite rngl_mul_1_l.
   repeat rewrite rngl_add_0_r.

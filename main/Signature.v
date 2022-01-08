@@ -17,10 +17,23 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(* version of signature of a permutation using sign *)
+
+Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
+Definition abs_diff u v := if v <? u then u - v else v - u.
+
+Definition ε (p : list nat) :=
+  let n := length p in
+  (∏ (i = 1, n), ∏ (j = 1, n),
+   if i <? j then sign_diff (nth (j - 1) p 0)%nat (nth (i - 1) p 0)%nat
+   else 1)%F.
+
 Definition δ_nat i j u v :=
   if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
 
-Definition ε (p : list nat) :=
+(* other definition of ε *)
+
+Definition ε' (p : list nat) :=
   let n := length p in
   ((∏ (i = 1, n), ∏ (j = 1, n),
     δ_nat i j (ff_app p (i - 1)) (ff_app p (j - 1))) /
@@ -82,20 +95,6 @@ Fixpoint ε_permut n k :=
   | 0 => 1%F
   | S n' => (minus_one_pow (k / fact n') * ε_permut n' (k mod fact n'))%F
   end.
-
-(* alternative version of signature of a permutation
-   using only signs: ws = with sign *)
-
-Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
-Definition abs_diff u v := if v <? u then u - v else v - u.
-
-Definition ε_ws (p : list nat) :=
-  let n := length p in
-  (∏ (i = 1, n), ∏ (j = 1, n),
-   if i <? j then sign_diff (nth (j - 1) p 0)%nat (nth (i - 1) p 0)%nat
-   else 1)%F.
-
-(* equality of both definitions of ε: ε and ε_ws *)
 
 Theorem rngl_product_product_if : ∀ b e f,
   (∏ (i = b, e), ∏ (j = b, e), if i <? j then f i j else 1)%F =
@@ -580,13 +579,13 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem ε_ε_ws : in_charac_0_field →
+Theorem ε'_ε : in_charac_0_field →
   ∀ (p : list nat),
   is_permut_list p
-  → ε p = ε_ws p.
+  → ε' p = ε p.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
-unfold ε, ε_ws, δ_nat.
+unfold ε', ε, δ_nat.
 do 3 rewrite rngl_product_product_if.
 rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
   intros i Hi.
@@ -872,49 +871,16 @@ split. {
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem transposition_signature_lt : in_charac_0_field →
+Theorem transposition_signature_lt :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
   ∀ n p q,
   p < q
   → q < n
   → ε (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hq.
-rewrite ε_ε_ws; try easy. 2: {
-  split; cbn. {
-    intros x Hx.
-    rewrite map_length, seq_length.
-    apply in_map_iff in Hx.
-    destruct Hx as (y & Hyx & Hy).
-    apply in_seq in Hy.
-    rewrite <- Hyx.
-    apply transposition_lt; [ flia Hpq Hq | easy | easy ].
-  }
-  rewrite map_length, seq_length.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  cbn in Hij.
-  unfold transposition in Hij.
-  do 4 rewrite if_eqb_eq_dec in Hij.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
-    subst i.
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ flia Hpq Hij | ].
-    now symmetry in Hij.
-  }
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    subst i.
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hpq Hij | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ easy | ].
-    now symmetry in Hij.
-  }
-  destruct (Nat.eq_dec j p) as [H| H]; [ easy | clear H ].
-  now destruct (Nat.eq_dec j q).
-}
-unfold ε_ws; cbn - [ "<?" ].
+intros Hic Hop * Hpq Hq.
+unfold ε; cbn - [ "<?" ].
 rewrite List_map_seq_length.
 unfold sign_diff.
 rewrite rngl_product_shift; [ | flia Hq ].
@@ -1058,14 +1024,16 @@ do 2 rewrite if_ltb_lt_dec.
 now destruct (lt_dec (i - 1) (j - 1)).
 Qed.
 
-Theorem transposition_signature : in_charac_0_field →
+Theorem transposition_signature :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
   ∀ n p q,
   p ≠ q
   → p < n
   → q < n
   → ε (map (transposition p q) (seq 0 n)) = (-1)%F.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hpq Hp Hq.
+intros Hic Hop * Hpq Hp Hq.
 destruct (lt_dec p q) as [Hpq'| Hpq']. {
   now apply transposition_signature_lt.
 }
@@ -1099,10 +1067,10 @@ Theorem signature_comp_fun_expand_1 :
     (∏ (i = 1, n),
        (∏ (j = 1, n), δ_nat i j (ff_app f (i - 1)) (ff_app f (j - 1))) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j i j))%F
-  → ε (f ° g) = (ε f * ε g)%F.
+  → ε' (f ° g) = (ε' f * ε' g)%F.
 Proof.
 intros Hop Hin H10 Hit Hch * Hfn (Hgp, Hgn) Hs.
-unfold ε, comp_list; cbn.
+unfold ε', comp_list; cbn.
 rewrite map_length, Hfn, Hgn.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -1240,7 +1208,8 @@ rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: 
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: {
+  rewrite rngl_inv_product_comm;
+      [ | now left | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     unfold δ_nat in Hij.
     rewrite if_ltb_lt_dec in Hij.
@@ -1452,9 +1421,47 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n g
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
-intros (Hop & Hic & Hin & H10 & Hit & Hde & Hch) * Hpf Hpg.
+intros Hif * Hpf Hpg.
 destruct Hpf as (Hp11, Hpf2).
 destruct Hpg as (Hpg1, Hpg2).
+rewrite <- ε'_ε; [ | easy | ]. 2: {
+  split. {
+    intros i Hi.
+    unfold "°" in Hi |-*.
+    rewrite map_length, Hpg2.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    subst i.
+    unfold ff_app.
+    rewrite <- Hpf2.
+    apply Hp11.
+    apply nth_In.
+    rewrite Hpf2, <- Hpg2.
+    now apply Hpg1.
+  } {
+    intros i j Hi Hj Hij.
+    unfold "°" in Hi, Hj.
+    rewrite map_length, Hpg2 in Hi, Hj.
+    unfold "°" in Hij; cbn in Hij.
+    unfold ff_app in Hij.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hpg2 ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hpg2 ].
+    apply Hp11 in Hij; cycle 1. {
+      rewrite Hpf2, <- Hpg2.
+      apply Hpg1, nth_In.
+      now rewrite Hpg2.
+    } {
+      rewrite Hpf2, <- Hpg2.
+      apply Hpg1, nth_In.
+      now rewrite Hpg2.
+    }
+    apply Hpg1 in Hij; [ | now rewrite Hpg2 | now rewrite Hpg2 ].
+    easy.
+  }
+}
+rewrite <- ε'_ε; [ | easy | easy ].
+rewrite <- ε'_ε; [ | easy | easy ].
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 apply signature_comp_fun_expand_1 with (n := n); try easy.
 rewrite signature_comp_fun_expand_2_1; try easy.
 rewrite signature_comp_fun_expand_2_2; try easy.
@@ -1518,25 +1525,26 @@ Qed.
 
 (* equality of ε of sym_gr elem and ε_permut *)
 
-Theorem ε_of_sym_gr_permut_succ : in_charac_0_field →
+Theorem ε_of_sym_gr_permut_succ :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
   ∀ n k,
   k < (S n)!
   → ε (canon_sym_gr_list (S n) k) =
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%F.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hkn.
-rewrite ε_ε_ws; try easy; [ | now apply canon_sym_gr_list_is_permut ].
-unfold ε_ws.
+intros Hic Hop Hin H10 * Hkn.
+unfold ε at 1.
 rewrite length_canon_sym_gr_list.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold ε.
-  subst n.
-  apply Nat.lt_1_r in Hkn.
-  subst k; cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 3 rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_l; [ | easy ].
-  now symmetry; apply rngl_inv_1.
+  subst n; cbn.
+  apply Nat.lt_1_r in Hkn; subst k; cbn.
+  do 2 rewrite rngl_product_only_one; cbn.
+  rewrite rngl_product_empty; [ | easy ].
+  symmetry; apply rngl_mul_1_l.
 }
 rewrite rngl_product_succ_succ.
 rewrite rngl_product_split_first; [ | easy ].
@@ -1691,8 +1699,7 @@ f_equal. {
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 }
-rewrite ε_ε_ws; try easy; [ | now apply canon_sym_gr_list_is_permut ].
-unfold ε_ws.
+unfold ε.
 rewrite length_canon_sym_gr_list.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -1832,12 +1839,12 @@ rewrite map_length.
 now destruct Hp2.
 Qed.
 
-Theorem ε_1_opp_1 : in_charac_0_field →
+Theorem ε_1_opp_1 :
+  rngl_has_opp = true →
   ∀ σ, is_permut_list σ → ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
-intros (Hic & Hop & Hiv & H10 & Hit & Hed & Hch) * Hσ.
-rewrite ε_ε_ws; try easy.
-unfold ε_ws.
+intros Hop * Hσ.
+unfold ε.
 apply rngl_product_1_opp_1; [ easy | ].
 intros i Hi.
 apply rngl_product_1_opp_1; [ easy | ].
@@ -1850,16 +1857,16 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 now left.
 Qed.
 
-Theorem ε_square : in_charac_0_field →
+Theorem ε_square :
+  rngl_has_opp = true →
   ∀ σ, is_permut_list σ → (ε σ * ε σ = 1)%F.
 Proof.
-intros Hif * Hσ.
+intros Hop * Hσ.
 specialize (ε_1_opp_1) as H1.
-specialize (H1 Hif σ Hσ).
+specialize (H1 Hop σ Hσ).
 destruct H1 as [H1| H1]; rewrite H1. {
   apply rngl_mul_1_l.
 } {
-  destruct Hif as (Hic & Hop & Hiv & H10 & Hit & Hed & Hch).
   rewrite rngl_mul_opp_opp; [ | easy ].
   apply rngl_mul_1_l.
 }
@@ -1868,18 +1875,18 @@ Qed.
 End a.
 
 Arguments δ_nat {T}%type {ro} (i j u v)%nat.
-Arguments ε {T}%type {ro} p%list.
-Arguments ε_ws {T}%type {ro}.
+Arguments ε' {T}%type {ro} p%list.
+Arguments ε {T}%type {ro}.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
-Arguments ε_ε_ws {T}%type {ro rp} _ p%list.
+Arguments ε'_ε {T}%type {ro rp} _ p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments signature_comp {T}%type {ro rp} _ [n]%nat [f g].
-Arguments transposition_signature {T}%type {ro rp} _ (n p q)%nat.
+Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _  [σ].
 Arguments ε_square {T}%type {ro rp} _ [σ].
 
