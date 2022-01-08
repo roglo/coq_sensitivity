@@ -899,8 +899,8 @@ Theorem det_with_rows : in_charac_0_field →
   → det (mat_with_rows kl A) =
        (ε_ws kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
-intros Hif * Hra Hca Ha Hkln Hkn.
 (* formule testée. Ça devrait être bon *)
+intros Hif * Hra Hca Ha Hkln Hkn.
 rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
   intros k Hk; rewrite Hra.
@@ -953,6 +953,7 @@ erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
+Search (ε (canon_sym_gr_list _ _)).
 ...
 Abort.
 End a.
