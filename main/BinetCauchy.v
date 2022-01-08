@@ -968,6 +968,22 @@ erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
+Print ε.
+Abort.
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (ε [3;2;7]%nat).
+Compute (ε_ws [3;5;4]%nat).
+Print ε.
+Print ε_ws.
+(* bon. pour kl, il semble que ce soit ε_wc la bonne version, car ε
+   donne des valeurs supérieures à 1 ou inférieures à -1;
+   cependant, il semble que signum donne parfois 0 aussi ;
+   mai est-ce que ε_ws est censé être signum ou pas ? *)
+...
+unfold ε at 1.
 (*
   ε kl * ε (canon_sym_gr_list m (?g i)) *
 must be equal to
