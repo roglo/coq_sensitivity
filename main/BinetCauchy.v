@@ -926,11 +926,9 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
 (*
-  rewrite <- signature_comp with (n0 := m); [ | easy | | ]; cycle 1. {
-    split; [ | easy ].
-(* en fait non, c'est pas une permutation, ça *)
-(* donc on peut pas les composer *)
-(* enfin, je crois pas *)
+unfold ε.
+rewrite Hkln.
+rewrite length_canon_sym_gr_list.
 *)
   easy.
 }
@@ -953,18 +951,18 @@ erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
+...
 Search (ε (canon_sym_gr_list _ _)).
 ...
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε' kl, ε kl, det (mat_with_rows kl M) =
+Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε kl, det (mat_with_rows kl M) =
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) M))%F)).
 ...
 Compute (
 Compute (ε [3;5;4]%nat).
-Print ε'.
 Print ε.
 ...
 Abort.
@@ -972,9 +970,7 @@ End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Compute (ε' [3;2;7]%nat).
 Compute (ε [3;5;4]%nat).
-Print ε'.
 Print ε.
 (*
   ε kl * ε (canon_sym_gr_list m (?g i)) *
@@ -1339,6 +1335,7 @@ Some terms of the lhs must cancel each other. But which ones?
 destruct n; [ easy | ].
 destruct n. {
   cbn - [ "/" ff_app ].
+...
   unfold ε'.
   do 3 rewrite rngl_summation_only_one.
   do 7 rewrite rngl_product_only_one.

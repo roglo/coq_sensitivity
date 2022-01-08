@@ -1048,14 +1048,12 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-Theorem signature_comp_fun_expand_1 :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_is_integral = true →
-  rngl_characteristic = 0 →
+(* perhaps it is possible not to go through ε' to prove this
+   theorem; in that case, the hypothesis in_charac_0_field
+   would not be completely required *)
+Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   ∀ n f g,
-  length f = n
+  is_permut n f
   → is_permut n g
   → (∏ (i = 1, n),
         (∏ (j = 1, n),
@@ -1067,9 +1065,46 @@ Theorem signature_comp_fun_expand_1 :
     (∏ (i = 1, n),
        (∏ (j = 1, n), δ_nat i j (ff_app f (i - 1)) (ff_app f (j - 1))) /
       ∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j i j))%F
-  → ε' (f ° g) = (ε' f * ε' g)%F.
+  → ε (f ° g) = (ε f * ε g)%F.
 Proof.
-intros Hop Hin H10 Hit Hch * Hfn (Hgp, Hgn) Hs.
+intros Hif * (Hfp, Hfn) (Hgp, Hgn) Hs.
+rewrite <- ε'_ε; [ | easy | ]. 2: {
+  split. {
+    intros i Hi.
+    unfold "°" in Hi |-*.
+    rewrite map_length, Hgn.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    subst i.
+    unfold ff_app.
+    rewrite <- Hfn.
+    apply Hfp.
+    apply nth_In.
+    rewrite Hfn, <- Hgn.
+    now apply Hgp.
+  } {
+    intros i j Hi Hj Hij.
+    unfold "°" in Hi, Hj.
+    rewrite map_length, Hgn in Hi, Hj.
+    unfold "°" in Hij; cbn in Hij.
+    unfold ff_app in Hij.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hgn ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hgn ].
+    apply Hfp in Hij; cycle 1. {
+      rewrite Hfn, <- Hgn.
+      apply Hgp, nth_In.
+      now rewrite Hgn.
+    } {
+      rewrite Hfn, <- Hgn.
+      apply Hgp, nth_In.
+      now rewrite Hgn.
+    }
+    apply Hgp in Hij; [ | now rewrite Hgn | now rewrite Hgn ].
+    easy.
+  }
+}
+rewrite <- ε'_ε; [ | easy | easy ].
+rewrite <- ε'_ε; [ | easy | easy ].
 unfold ε', comp_list; cbn.
 rewrite map_length, Hfn, Hgn.
 erewrite rngl_product_eq_compat. 2: {
@@ -1084,6 +1119,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 rewrite <- Hs; symmetry.
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
 apply rngl_product_integral in Hij; [ | now left | easy | easy ].
@@ -1415,6 +1451,8 @@ rewrite product_product_if_permut; try easy. {
 }
 Qed.
 
+(* if signature_comp_fun_expand_1 does not require in_charac_0_field
+   this one should not *)
 Theorem signature_comp : in_charac_0_field →
   ∀ n f g,
   is_permut n f
@@ -1424,45 +1462,8 @@ Proof.
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hp11, Hpf2).
 destruct Hpg as (Hpg1, Hpg2).
-rewrite <- ε'_ε; [ | easy | ]. 2: {
-  split. {
-    intros i Hi.
-    unfold "°" in Hi |-*.
-    rewrite map_length, Hpg2.
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj).
-    subst i.
-    unfold ff_app.
-    rewrite <- Hpf2.
-    apply Hp11.
-    apply nth_In.
-    rewrite Hpf2, <- Hpg2.
-    now apply Hpg1.
-  } {
-    intros i j Hi Hj Hij.
-    unfold "°" in Hi, Hj.
-    rewrite map_length, Hpg2 in Hi, Hj.
-    unfold "°" in Hij; cbn in Hij.
-    unfold ff_app in Hij.
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hpg2 ].
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hpg2 ].
-    apply Hp11 in Hij; cycle 1. {
-      rewrite Hpf2, <- Hpg2.
-      apply Hpg1, nth_In.
-      now rewrite Hpg2.
-    } {
-      rewrite Hpf2, <- Hpg2.
-      apply Hpg1, nth_In.
-      now rewrite Hpg2.
-    }
-    apply Hpg1 in Hij; [ | now rewrite Hpg2 | now rewrite Hpg2 ].
-    easy.
-  }
-}
-rewrite <- ε'_ε; [ | easy | easy ].
-rewrite <- ε'_ε; [ | easy | easy ].
+apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
 destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-apply signature_comp_fun_expand_1 with (n := n); try easy.
 rewrite signature_comp_fun_expand_2_1; try easy.
 rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
