@@ -222,6 +222,16 @@ intros b g k Hbk.
 now apply iter_shift.
 Qed.
 
+Theorem rngl_product_rshift : ∀ b e f,
+  ∏ (i = b, e), f i =  ∏ (i = S b, S e), f (i - 1)%nat.
+Proof.
+intros.
+rewrite rngl_product_succ_succ.
+apply rngl_product_eq_compat.
+intros i Hi.
+now rewrite Nat_sub_succ_1.
+Qed.
+
 Theorem rngl_product_ub_mul_distr : ∀ a b f,
   (∏ (i = 0, a + b), f i)%F = (∏ (i = 0, a), f i * ∏ (i = S a, a + b), f i)%F.
 Proof.

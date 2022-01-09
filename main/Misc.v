@@ -71,6 +71,10 @@ Theorem fold_iter_list : ∀ {A B} (f : A → B → A) l d,
   fold_left f l d = iter_list l f d.
 Proof. easy. Qed.
 
+Theorem fold_iter_seq : ∀ A b e f (d : A),
+  iter_list (seq b (S e - b)) f d = iter_seq b e f d.
+Proof. easy. Qed.
+
 Theorem List_seq_shift' : ∀ len sta,
   map (Nat.add sta) (seq 0 len) = seq sta len.
 Proof.

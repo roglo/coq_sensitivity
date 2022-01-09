@@ -36,6 +36,9 @@ Definition is_permut_list_bool l :=
 
 Definition is_permut n f := is_permut_list f ∧ length f = n.
 
+Theorem fold_ff_app : ∀ l i, nth i l 0 = ff_app l i.
+Proof. easy. Qed.
+
 Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
 Proof. intros; apply List_map_nth_seq. Qed.
 

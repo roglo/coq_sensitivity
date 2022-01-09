@@ -1496,7 +1496,54 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
+rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv lb)) (h := ff_app lb). 2: {
+  intros i Hi.
+  apply permut_inv_permut with (n := n); [ easy | ].
+  flia Hnz Hi.
+}
+rewrite rngl_product_change_list with
+    (lb := seq 0 (S (n - 1) - 0)); [ | now destruct Hif | ]. 2: {
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
+  rewrite Nat_sub_succ_1.
+  apply permut_list_Permutation.
+  rewrite <- Hbn.
+  rewrite <- List_map_ff_app_seq.
+  now rewrite Hbn.
+}
+rewrite fold_iter_seq.
+rewrite rngl_product_rshift.
+rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
+rewrite Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite fold_ff_app.
+  rewrite permut_permut_inv with (n := n); [ | easy | flia Hi ].
+  easy.
+}
+symmetry; symmetry.
+(* ouais, bof, faudrait quand même que je vérifie mes trucs avant
+   de les utiliser *)
+...
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_product_change_list with (lb := seq 0 n).
+...
+Search (ff_app (permut_list_inv _)).
+erewrite rngl_product_change_var with (g := ff_app (permut_list_inv lb)).
+Search (ff_app (permut_list_inv _)).
 erewrite rngl_product_change_var.
+Print permut_list_inv.
 ...
 apply rngl_product_eq_compat.
 intros i Hi.
