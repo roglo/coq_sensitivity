@@ -1502,6 +1502,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
+...
 rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv lb)) (h := ff_app lb). 2: {
@@ -1533,6 +1534,18 @@ erewrite rngl_product_eq_compat. 2: {
 symmetry; symmetry.
 (* ouais, bof, faudrait quand même que je vérifie mes trucs avant
    de les utiliser *)
+...
+  ============================
+  ∏ (i = 1, n),
+  (∏ (i0 = 1, n),
+   (if ff_app (permut_list_inv lb) (i - 1) + 1 <? i0
+    then sign_diff (ff_app la (nth (i0 - 1) lb 0)) (ff_app la (i - 1))
+    else 1)) =
+  ∏ (i = 1, n),
+  (∏ (i0 = 1, n),
+   (if i <? i0
+    then sign_diff (nth (i0 - 1) la 0) (nth (i - 1) la 0) * sign_diff (nth (i0 - 1) lb 0) (nth (i - 1) lb 0)
+    else 1))
 ...
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
