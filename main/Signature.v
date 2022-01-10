@@ -1504,8 +1504,8 @@ Theorem signature_comp : in_charac_0_field →
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
 intros Hif * Hpf Hpg.
-destruct Hpf as (Hp11, Hpf2).
-destruct Hpg as (Hpg1, Hpg2).
+destruct Hpf as (Hfp, Hfn).
+destruct Hpg as (Hgp, Hgn).
 apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
 destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 rewrite signature_comp_fun_expand_2_1; try easy.
