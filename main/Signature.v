@@ -1495,50 +1495,58 @@ unfold "°"; cbn.
 now rewrite map_length.
 Qed.
 
+(*
+Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
+  ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → ∏ (i = 1, n),
+       (∏ (j = 1, n),
+          (if i <? j then
+             sign_diff (ff_app (la ° lb) (j - 1)) (ff_app (la ° lb) (i - 1))
+           else 1)) =
+     ∏ (i = 1, n),
+       (∏ (j = 1, n),
+          (if i <? j then
+             (sign_diff (ff_app la (j - 1)) (ff_app la (i - 1)) *
+              sign_diff (ff_app lb (j - 1)) (ff_app lb (i - 1)))
+           else 1)).
+Proof.
+intros Hif * Ha Hb.
+...
+*)
+
 (* if signature_comp_fun_expand_1 does not require in_charac_0_field
    this one should not *)
 Theorem signature_comp : in_charac_0_field →
-  ∀ n f g,
-  is_permut n f
-  → is_permut n g
-  → ε (f ° g) = (ε f * ε g)%F.
+  ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-intros Hif * Hpf Hpg.
-destruct Hpf as (Hfp, Hfn).
-destruct Hpg as (Hgp, Hgn).
+(*
+intros Hif * Hpa Hpb.
+destruct Hpa as (Hap, Han).
+destruct Hpb as (Hbp, Hbn).
 unfold ε.
-rewrite comp_length, Hfn, Hgn.
-unfold comp_list.
+rewrite comp_length, Han, Hbn.
+rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+symmetry.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
+  rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    unfold ff_app.
-    rewrite (List_map_nth' 0); [ | flia Hj Hgn ].
-    rewrite (List_map_nth' 0); [ | flia Hi Hgn ].
+    rewrite rngl_mul_if_then_else_distr.
+    rewrite rngl_mul_1_l.
     easy.
   }
   easy.
 }
-cbn - [ "<?" ].
-Check signature_comp_fun_expand_2_1.
+symmetry.
 ...
-rewrite <- Hs; symmetry.
-destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-apply rngl_div_mul_div; [ easy | ].
-intros Hij.
-apply rngl_product_integral in Hij; [ | now left | easy | easy ].
-destruct Hij as (i & Hi & Hij).
-apply rngl_product_integral in Hij; [ | now left | easy | easy ].
-destruct Hij as (j & Hj & Hij).
-unfold δ_nat in Hij.
-rewrite if_ltb_lt_dec in Hij.
-destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
-apply rngl_sub_move_0_r in Hij; [ | easy ].
-apply rngl_of_nat_inj in Hij; [ | now left | easy ].
-apply Hgp in Hij; [ flia Hi Hj Hlij Hij | flia Hj Hgn | flia Hi Hgn ].
-Qed.
-...
+now apply rngl_product_product_sign_diff_comp.
+*)
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
@@ -1986,7 +1994,7 @@ Arguments ε'_ε {T}%type {ro rp} _ p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
-Arguments signature_comp {T}%type {ro rp} _ [n]%nat [f g].
+Arguments signature_comp {T}%type {ro rp} _ [n]%nat [la lb].
 Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _  [σ].
 Arguments ε_square {T}%type {ro rp} _ [σ].
