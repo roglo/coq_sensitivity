@@ -1506,6 +1506,42 @@ Proof.
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
+unfold ε.
+rewrite comp_length, Hfn, Hgn.
+unfold comp_list.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold ff_app.
+    rewrite (List_map_nth' 0); [ | flia Hj Hgn ].
+    rewrite (List_map_nth' 0); [ | flia Hi Hgn ].
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+Check signature_comp_fun_expand_2_1.
+...
+rewrite <- Hs; symmetry.
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+apply rngl_div_mul_div; [ easy | ].
+intros Hij.
+apply rngl_product_integral in Hij; [ | now left | easy | easy ].
+destruct Hij as (i & Hi & Hij).
+apply rngl_product_integral in Hij; [ | now left | easy | easy ].
+destruct Hij as (j & Hj & Hij).
+unfold δ_nat in Hij.
+rewrite if_ltb_lt_dec in Hij.
+destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
+apply rngl_sub_move_0_r in Hij; [ | easy ].
+apply rngl_of_nat_inj in Hij; [ | now left | easy ].
+apply Hgp in Hij; [ flia Hi Hj Hlij Hij | flia Hj Hgn | flia Hi Hgn ].
+Qed.
+...
+intros Hif * Hpf Hpg.
+destruct Hpf as (Hfp, Hfn).
+destruct Hpg as (Hgp, Hgn).
 apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
 destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 rewrite signature_comp_fun_expand_2_1; try easy.
