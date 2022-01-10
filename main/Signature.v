@@ -1495,7 +1495,93 @@ unfold "°"; cbn.
 now rewrite map_length.
 Qed.
 
-(*
+Theorem sign_diff_id : ∀ a, sign_diff a a = 0%F.
+Proof.
+intros.
+unfold sign_diff.
+now rewrite Nat.compare_refl.
+Qed.
+
+Theorem sign_diff_swap :
+  rngl_has_opp = true →
+  ∀ u v, sign_diff u v = (- sign_diff v u)%F.
+Proof.
+intros Hop u v.
+unfold sign_diff.
+remember (u ?= v) as b1 eqn:Hb1; symmetry in Hb1.
+remember (v ?= u) as b2 eqn:Hb2; symmetry in Hb2.
+destruct b1. {
+  apply Nat.compare_eq_iff in Hb1; subst v.
+  rewrite Nat.compare_refl in Hb2; subst b2.
+  now symmetry; apply rngl_opp_0.
+} {
+  apply Nat.compare_lt_iff in Hb1.
+  destruct b2; [ | | easy ]. {
+    apply Nat.compare_eq_iff in Hb2; subst v.
+    now apply Nat.lt_irrefl in Hb1.
+  } {
+    apply Nat.compare_lt_iff, Nat.lt_le_incl in Hb2.
+    now apply Nat.nlt_ge in Hb2.
+  }
+} {
+  rewrite <- (rngl_opp_involutive Hop 1%F) at 1.
+  apply Nat.compare_gt_iff in Hb1.
+  destruct b2; [ | easy | ]. {
+    apply Nat.compare_eq_iff in Hb2; subst v.
+    now apply Nat.lt_irrefl in Hb1.
+  } {
+    apply Nat.compare_gt_iff, Nat.lt_le_incl in Hb2.
+    now apply Nat.nlt_ge in Hb2.
+  }
+}
+Qed.
+
+Theorem permut_without_highest : ∀ n l,
+  is_permut (S n) l
+  → ∃ i, nth i l 0 = n ∧ is_permut n (butn i l).
+Proof.
+intros * Hl.
+exists (ff_app (permut_list_inv l) n).
+split. {
+  rewrite fold_ff_app.
+  now apply (permut_permut_inv (S n)).
+}
+specialize (permut_list_inv_is_permut (S n) Hl) as Hil.
+split. {
+  split. {
+    intros a Ha.
+    rewrite butn_length.
+    unfold Nat.b2n.
+    specialize (@permut_list_ub (permut_list_inv l) n) as H1.
+    rewrite length_permut_list_inv in H1.
+    destruct Hl as (Hp, Hl); rewrite Hl in H1.
+    specialize (H1 (permut_list_inv_is_permut_list Hp)).
+    specialize (H1 (Nat.lt_succ_diag_r _)).
+    rewrite <- Hl in H1.
+    apply Nat.ltb_lt in H1.
+    rewrite fold_ff_app in H1; rewrite H1.
+    apply Nat.ltb_lt in H1.
+    rewrite Hl, Nat_sub_succ_1.
+    remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
+    destruct Hp as (Hll, Hli).
+    specialize (in_butn _ _ _ Ha) as Hal.
+    specialize (Hll _ Hal) as H2.
+    rewrite Hl in H2.
+    destruct (Nat.eq_dec a n) as [Han| Han]; [ exfalso | flia H2 Han ].
+    subst a; clear H2.
+    destruct Hil as (Hip, Hil).
+    destruct Hip as (Hill, Hili).
+    rewrite Hil in Hili.
+    rewrite Hl in H1.
+    rewrite Hl in Hli.
+    rewrite Hil in Hill.
+    specialize (Hili i n H1 (Nat.lt_succ_diag_r _)) as H2.
+    rewrite <- Hi in H2.
+(* mouais, ça va pas, ça, faut que je réfléchisse *)
+...
+    apply in_butn in Hi.
+...
+
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1513,8 +1599,73 @@ Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
            else 1)).
 Proof.
 intros Hif * Ha Hb.
+revert la lb Ha Hb.
+induction n; intros. {
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
 ...
-*)
+apply permut_without_highest in Ha.
+...
+destruct la as [| a]; [ now destruct Ha | ].
+destruct lb as [| b]; [ now destruct Hb | ].
+destruct Ha as (Hap, Han).
+cbn in Han; apply Nat.succ_inj in Han.
+...
+intros Hif * Ha Hb.
+destruct n. {
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
+destruct n. {
+  now do 4 rewrite rngl_product_only_one.
+}
+destruct n. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_mul_1_l.
+  repeat rewrite rngl_mul_1_r.
+  unfold "°"; cbn.
+  unfold ff_app.
+  destruct Ha as (Hap, Han).
+  destruct Hb as (Hbp, Hbn).
+  rewrite (List_map_nth' 0); [ | now rewrite Hbn ].
+  rewrite (List_map_nth' 0); [ | now rewrite Hbn ].
+  destruct la as [| a1]; [ easy | ].
+  destruct la as [| a2]; [ easy | ].
+  destruct la; [ clear Han | easy ].
+  destruct lb as [| b1]; [ easy | ].
+  destruct lb as [| b2]; [ easy | ].
+  destruct lb; [ clear Hbn | easy ].
+  remember (nth 0 _ _) as x eqn:Hx; cbn in Hx; subst x.
+  remember (nth 0 _ _) as x eqn:Hx; cbn in Hx; subst x.
+  remember (nth 1 _ _) as x eqn:Hx; cbn in Hx; subst x.
+  remember (nth 1 _ _) as x eqn:Hx; cbn in Hx; subst x.
+  destruct Hap as (Hal, Hai).
+  cbn - [ In ff_app ] in Hal, Hai.
+  destruct Hbp as (Hbl, Hbi).
+  cbn - [ In ff_app ] in Hbl, Hbi.
+  destruct b2. {
+    destruct b1. {
+      specialize (Hbi 0 1 (Nat.lt_0_succ _) (Nat.lt_succ_diag_r _)).
+      now specialize (Hbi eq_refl).
+    }
+    destruct b1; [ cbn | specialize (Hbl _ (or_introl eq_refl)); flia Hbl ].
+    rewrite sign_diff_swap; [ | now destruct Hif ].
+    rewrite rngl_mul_opp_r; [ | now destruct Hif ].
+    now rewrite rngl_mul_1_r.
+  }
+  destruct b2. 2: {
+    specialize (Hbl _ (or_intror (or_introl eq_refl))); flia Hbl.
+  }
+  destruct b1; [ symmetry; apply rngl_mul_1_r | ].
+  destruct b1; [ cbn | specialize (Hbl _ (or_introl eq_refl)); flia Hbl ].
+  rewrite sign_diff_id.
+  now symmetry; apply rngl_mul_0_r; destruct Hif; left.
+}
+destruct n. {
+...
 
 (* if signature_comp_fun_expand_1 does not require in_charac_0_field
    this one should not *)
@@ -1524,7 +1675,7 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-(*
+(**)
 intros Hif * Hpa Hpb.
 destruct Hpa as (Hap, Han).
 destruct Hpb as (Hbp, Hbn).
@@ -1547,7 +1698,7 @@ symmetry.
 ...
 now apply rngl_product_product_sign_diff_comp.
 ...
-*)
+(**)
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
