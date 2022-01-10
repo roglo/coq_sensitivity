@@ -1569,6 +1569,7 @@ split. {
     rewrite Hl in H2.
     destruct (Nat.eq_dec a n) as [Han| Han]; [ exfalso | flia H2 Han ].
     subst a; clear H2.
+...
     destruct Hil as (Hip, Hil).
     destruct Hip as (Hill, Hili).
     rewrite Hil in Hili.
