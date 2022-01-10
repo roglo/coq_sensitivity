@@ -1569,17 +1569,11 @@ split. {
     rewrite Hl in H2.
     destruct (Nat.eq_dec a n) as [Han| Han]; [ exfalso | flia H2 Han ].
     subst a; clear H2.
-    assert (Hn : n = ff_app l i) by now rewrite Hi, (permut_permut_inv (S n)).
-    move Hn before Hi.
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
 specialize (H2 H); clear H.
-rewrite <- Hn in H2.
-destruct (Nat.eq_dec n (ff_app l n)) as [Hnn| Hnn]. 2: {
-  specialize (H2 Hnn).
-...
-rewrite Hi in H2 at 2.
+rewrite Hi in H2 at 1.
 rewrite (permut_permut_inv (S n)) in H2; [ | easy | easy ].
 destruct (Nat.eq_dec n (ff_app l n)) as [H3| H3]. {
   specialize (H2 H3).
