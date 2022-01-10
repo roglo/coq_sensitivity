@@ -19,7 +19,12 @@ Context (rp : ring_like_prop T).
 
 (* version of signature of a permutation using sign *)
 
-Definition sign_diff u v := if v <? u then 1%F else (-1)%F.
+Definition sign_diff u v :=
+  match Nat.compare u v with
+  | Lt => (-1)%F
+  | Eq => 0%F
+  | Gt => 1%F
+  end.
 Definition abs_diff u v := if v <? u then u - v else v - u.
 
 Definition ε (p : list nat) :=
@@ -183,22 +188,24 @@ Theorem rngl_sub_is_mul_sign_abs :
 Proof.
 intros Hop *.
 unfold sign_diff, abs_diff.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec b a) as [Hba| Hba]. {
-  rewrite rngl_mul_1_l.
-  apply rngl_of_nat_sub; [ now left | easy ].
+rewrite if_ltb_lt_dec.
+remember (a ?= b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Nat.compare_eq in Hab; subst b.
+  rewrite rngl_sub_diag; [ | now left ].
+  rewrite rngl_mul_0_l; [ easy | now left ].
 } {
-  apply Nat.nlt_ge in Hba.
-  destruct (Nat.eq_dec a b) as [Hab| Hab]. {
-    subst b.
-    rewrite rngl_sub_diag, Nat.sub_diag; cbn; [ | now left ].
-    symmetry.
-    now apply rngl_mul_0_r; left.
-  }
+  apply nat_compare_lt in Hab.
+  destruct (lt_dec b a) as [H| H]; [ flia Hab H | clear H ].
   rewrite <- rngl_opp_sub_distr; [ | easy ].
-  rewrite rngl_of_nat_sub; [ | now left | flia Hba Hab ].
+  rewrite rngl_of_nat_sub; [ | now left | easy ].
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
+} {
+  apply nat_compare_gt in Hab.
+  rewrite rngl_mul_1_l.
+  destruct (lt_dec b a) as [H| H]; [ clear H | flia Hab H ].
+  apply rngl_of_nat_sub; [ now left | easy ].
 }
 Qed.
 
@@ -631,8 +638,12 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
     replace (sign_diff j i) with 1%F. 2: {
       unfold sign_diff.
-      rewrite if_ltb_lt_dec.
-      destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+      remember (j ?= i) as b eqn:Hb; symmetry in Hb.
+      destruct b; [ | | easy ]. {
+        apply Nat.compare_eq in Hb; subst j; flia Hj.
+      } {
+        apply nat_compare_lt in Hb; flia Hj Hb.
+      }
     }
     rewrite rngl_mul_1_l.
     replace (rngl_of_nat (abs_diff j i)) with (rngl_of_nat (j - i)). 2: {
@@ -892,12 +903,11 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite (Nat.add_comm 1 j), Nat.add_sub.
     rewrite (Nat.add_comm 1 i), Nat.add_sub.
     rewrite Nat_ltb_mono_r.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hq ].
-    rewrite seq_nth; [ | flia Hi Hq ].
-    rewrite Nat.add_0_l.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hq ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hq ].
     rewrite seq_nth; [ | flia Hj Hq ].
-    rewrite Nat.add_0_l.
+    rewrite seq_nth; [ | flia Hi Hq ].
+    do 2 rewrite Nat.add_0_l.
     easy.
   }
   easy.
@@ -910,22 +920,41 @@ rewrite all_1_rngl_product_1. 2: {
   intros i Hi.
   apply all_1_rngl_product_1.
   intros j Hj.
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
-  destruct (lt_dec (transposition p q (i - 1)) (transposition p q j))
-    as [Htij| Htij]; [ easy | ].
-  exfalso; apply Htij; clear Htij.
-  rewrite transposition_out; [ | flia Hi | flia Hpq Hi ].
   unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ flia Hpq Hi | ].
-  destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ flia Hpq Hi | easy ].
+  rewrite if_ltb_lt_dec.
+  do 4 rewrite if_eqb_eq_dec.
+  destruct (lt_dec (i - 1) j) as [Hij| Hij]; [ | easy ].
+  destruct (Nat.eq_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+  destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi Hpq H | clear H ].
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    remember (q ?= i - 1) as b eqn:Hb; symmetry in Hb.
+    destruct b; [ | | easy ]. {
+      apply Nat.compare_eq in Hb; flia Hij Hjp Hb Hpq.
+    } {
+      apply nat_compare_lt in Hb; flia Hij Hjp Hb Hpq.
+    }
+  }
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    remember (p ?= i - 1) as b eqn:Hb; symmetry in Hb.
+    destruct b; [ | | easy ]. {
+      apply Nat.compare_eq in Hb; flia Hi Hb.
+    } {
+      apply nat_compare_lt in Hb; flia Hi Hb.
+    }
+  }
+  remember (j ?= i - 1) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ | | easy ]. {
+    apply Nat.compare_eq in Hb; flia Hij Hb.
+  } {
+    apply nat_compare_lt in Hb; flia Hij Hb.
+  }
 }
 rewrite rngl_mul_1_l.
 rewrite transposition_1.
 rewrite (rngl_product_split3 p); [ | flia Hpq Hq ].
-rewrite if_ltb_lt_dec.
-destruct (lt_dec p p) as [H| H]; [ flia H | clear H ].
+unfold transposition at 2.
+rewrite Nat.eqb_refl.
+rewrite Nat.ltb_irrefl.
 rewrite rngl_mul_1_r.
 rewrite all_1_rngl_product_1. 2: {
   intros i Hi.
@@ -937,13 +966,17 @@ erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec p i) as [H| H]; [ clear H | flia Hi H ].
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i p) as [H| H]; [ flia Hi H | clear H ].
   easy.
 }
 cbn - [ "<?" ].
 rewrite <- rngl_product_mul_distr; [ | easy ].
 rewrite (rngl_product_split3 q); [ | flia Hpq Hq ].
 rewrite transposition_2.
-rewrite if_ltb_lt_dec.
+destruct (Nat.eq_dec q q) as [H| H]; [ clear H | easy ].
+replace (p ?= q) with Lt by now symmetry; apply nat_compare_lt.
 destruct (lt_dec q p) as [H| H]; [ flia Hpq H | clear H ].
 rewrite <- rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
@@ -967,25 +1000,25 @@ rewrite all_1_rngl_product_1. 2: {
   destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
   rewrite rngl_mul_assoc.
   rewrite transposition_out; [ | flia Hpq Hi | flia Hi ].
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec p i) as [H| H]; [ clear H | flia Hpq Hi H ].
+  replace (i ?= p) with Gt by now symmetry; apply nat_compare_gt; flia Hi Hpq.
   rewrite rngl_mul_1_l.
-  destruct (lt_dec q i) as [H| H]; [ clear H | flia Hi H ].
+  destruct (Nat.eq_dec i q) as [H| H]; [ flia Hi H | clear H ].
+  replace (i ?= q) with Gt by now symmetry; apply nat_compare_gt; flia Hi.
   rewrite rngl_mul_1_l.
   apply all_1_rngl_product_1.
   intros j Hj.
   rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   rewrite transposition_out; [ | flia Hpq Hi Hij | flia Hi Hij ].
-  rewrite if_ltb_lt_dec.
-  now destruct (lt_dec i j).
+  replace (j ?= i) with Gt by now symmetry; apply nat_compare_gt; flia Hij.
+  easy.
 }
 rewrite rngl_mul_1_l.
 rewrite all_1_rngl_product_1; [ apply rngl_mul_1_l | ].
 intros i Hi.
 rewrite transposition_out; [ | flia Hi | flia Hi ].
-rewrite if_ltb_lt_dec.
-destruct (lt_dec q (i - 1)) as [H| H]; [ flia Hi H | clear H ].
+destruct (Nat.eq_dec (i - 1) q) as [H| H]; [ flia Hi H | clear H ].
+replace (i - 1 ?= q) with Lt by now symmetry; apply nat_compare_lt; flia Hi.
 rewrite (rngl_product_split3 p); [ | flia Hp ].
 rewrite transposition_1.
 rewrite if_ltb_lt_dec.
@@ -993,7 +1026,7 @@ destruct (lt_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
 rewrite rngl_mul_1_r.
 rewrite all_1_rngl_product_1. 2: {
   intros j Hj.
-  do 2 rewrite if_ltb_lt_dec.
+  rewrite if_ltb_lt_dec.
   destruct (lt_dec (i - 1) (j - 1)) as [H| H]; [ flia Hi Hj H | easy ].
 }
 rewrite rngl_mul_1_l.
@@ -1001,8 +1034,7 @@ rewrite (rngl_product_split3 q); [ | flia Hpq Hq ].
 rewrite if_ltb_lt_dec.
 destruct (lt_dec (i - 1) q) as [H| H]; [ clear H | flia Hi H ].
 rewrite transposition_2.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec (i - 1) p) as [H| H]; [ flia Hi H | clear H ].
+replace (p ?= i - 1) with Lt by now symmetry; apply nat_compare_lt; flia Hi.
 rewrite rngl_mul_mul_swap; [ | easy ].
 rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
@@ -1013,15 +1045,19 @@ rewrite (all_1_rngl_product_1 (q + 1)). 2: {
   rewrite if_ltb_lt_dec.
   destruct (lt_dec (i - 1) j) as [H| H]; [ clear H | flia Hi Hj H ].
   rewrite transposition_out; [ | flia Hpq Hj | flia Hj ].
-  rewrite if_ltb_lt_dec.
-  destruct (lt_dec (i - 1) j) as [H| H]; [ easy | flia Hi Hj H ].
+  replace (j ?= i - 1) with Gt. 2: {
+    symmetry; apply nat_compare_gt; flia Hi Hj.
+  }
+  easy.
 }
 rewrite rngl_mul_1_r.
 apply all_1_rngl_product_1.
 intros j Hj.
 rewrite transposition_out; [ | flia Hj | flia Hj ].
-do 2 rewrite if_ltb_lt_dec.
-now destruct (lt_dec (i - 1) (j - 1)).
+rewrite if_ltb_lt_dec.
+destruct (lt_dec (i - 1) (j - 1)) as [Hij| Hij]; [ | easy ].
+apply nat_compare_gt in Hij.
+now rewrite Hij.
 Qed.
 
 Theorem transposition_signature :
@@ -1577,28 +1613,30 @@ f_equal. {
     destruct (lt_dec 0 i) as [H| H]; [ clear H | flia Hi H ].
     easy.
   }
-  cbn - [ canon_sym_gr_list ].
+  cbn - [ "<?" canon_sym_gr_list ].
   remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
   remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
   specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
-  unfold sign_diff.
+  unfold sign_diff at 1.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     unfold ff_app in H1.
-    now rewrite H1.
+    rewrite H1.
+    replace i with (S (i - 1)) at 1 by flia Hi.
+    easy.
   }
   cbn - [ "<?" ].
   rewrite rngl_product_shift; [ | flia Hnz ].
   remember (k / fact n) as x eqn:Hx.
   erewrite rngl_product_eq_compat. 2: {
     intros i (_, Hi).
-    replace (if x <? _ then _ else _) with
+    rewrite Nat.add_comm, Nat.add_sub.
+    replace (match _ with Eq => _ | Lt => _ | Gt => _ end) with
       (if x <? ff_app σ' i + 1 then 1%F else (-1)%F). 2: {
-      rewrite (Nat.add_1_l i).
       unfold ff_app in H1.
       rewrite H1.
       unfold succ_when_ge, Nat.b2n.
-      do 2 rewrite if_ltb_lt_dec.
+      rewrite if_ltb_lt_dec.
       rewrite if_leb_le_dec.
       remember ((k <? n!) && (n <=? i))%bool as b eqn:Hb.
       symmetry in Hb.
@@ -1608,8 +1646,19 @@ f_equal. {
         apply Nat.leb_le in Hb.
         flia Hi Hb Hnz.
       }
-      destruct (le_dec x (nth i σ' 0)) as [H2| H2]; [ easy | ].
+      destruct (le_dec x (nth i σ' 0)) as [H2| H2]. {
+        destruct (lt_dec x (ff_app σ' i + 1)) as [H3| H3]. 2: {
+          unfold ff_app in H3; flia H2 H3.
+        }
+        unfold ff_app in H3.
+        apply Nat.compare_gt_iff in H3.
+        now rewrite H3.
+      }
       rewrite Nat.add_0_r.
+      apply Nat.nle_gt in H2.
+      apply Nat.compare_lt_iff in H2.
+      rewrite H2.
+      apply Nat.compare_lt_iff in H2.
       destruct (lt_dec x (nth i σ' 0)) as [H| H]; [ flia H H2 | clear H ].
       destruct (lt_dec x (ff_app σ' i + 1)) as [H3| H3]; [ | easy ].
       unfold ff_app in H3.
@@ -1766,23 +1815,27 @@ destruct (le_dec (k / n!) (nth j σ' 0)) as [Hsfj| Hsfj]. {
     now do 2 rewrite Nat.add_1_r.
   }
   rewrite Nat.add_0_r.
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (nth i σ' 0) (nth j σ' 0 + 1)) as [Hsij1| Hsij1]. {
-    destruct (lt_dec (nth i σ' 0) (nth j σ' 0) ) as [Hsij| Hsij]; [ easy | ].
-    flia Hsij1 Hsij Hsfj Hsfi.
+  replace (nth j σ' 0 + 1 ?= nth i σ' 0) with Gt. 2: {
+    symmetry; apply Nat.compare_gt_iff.
+    flia Hsfi Hsfj.
   }
-  destruct (lt_dec (nth i σ' 0) (nth j σ' 0) ) as [Hsij| Hsij]; [ | easy ].
-  flia Hsij1 Hsij.
+  replace (nth j σ' 0 ?= nth i σ' 0) with Gt. 2: {
+    symmetry; apply Nat.compare_gt_iff.
+    flia Hsfi Hsfj.
+  }
+  easy.
 }
 destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
   rewrite Nat.add_0_r.
-  do 2 rewrite if_ltb_lt_dec.
-  destruct (lt_dec (nth i σ' 0 + 1) (nth j σ' 0)) as [Hsi1j| Hsi1j]. {
-    destruct (lt_dec (nth i σ' 0) (nth j σ' 0)) as [Hsij| Hsij]; [ easy | ].
-    flia Hsi1j Hsij.
+  replace (nth j σ' 0 ?= nth i σ' 0 + 1) with Lt. 2: {
+    symmetry; apply Nat.compare_lt_iff.
+    flia Hsfi Hsfj.
   }
-  destruct (lt_dec (nth i σ' 0) (nth j σ' 0)) as [Hsij| Hsij]; [ | easy ].
-  flia Hsi1j Hsij Hsfj Hsfi.
+  replace (nth j σ' 0 ?= nth i σ' 0) with Lt. 2: {
+    symmetry; apply Nat.compare_lt_iff.
+    flia Hsfi Hsfj.
+  }
+  easy.
 }
 now do 2 rewrite Nat.add_0_r.
 Qed.
@@ -1859,11 +1912,14 @@ intros i Hi.
 apply rngl_product_1_opp_1; [ easy | ].
 intros j Hj.
 unfold sign_diff.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]. {
-  now destruct (lt_dec _ _) as [Hvv| Hvv]; [ left | right ].
-}
-now left.
+rewrite if_ltb_lt_dec.
+remember (nth (j - 1) σ 0 ?= nth (i - 1) σ 0) as b eqn:Hb.
+symmetry in Hb.
+destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
+destruct b; [ | now right | now left ].
+apply Nat.compare_eq_iff in Hb.
+apply Hσ in Hb; [ | flia Hj | flia Hi ].
+flia Hi Hj Hb Hij.
 Qed.
 
 Theorem ε_square :
