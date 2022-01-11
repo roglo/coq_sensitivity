@@ -1683,6 +1683,87 @@ Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
            else 1)).
 Proof.
 intros Hif * Ha Hb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
+erewrite rngl_product_eq_compat. 2: {
+  intros u Hu.
+  erewrite rngl_product_eq_compat. 2: {
+    intros v Hv.
+    unfold "°", ff_app.
+    rewrite (List_map_nth' 0). 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hv.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hu.
+    }
+    do 4 rewrite fold_ff_app.
+    easy.
+  }
+  easy.
+}
+rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
+rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (1 + i <? 1 + j) with (i <? j) by easy.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    easy.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (1 + i <? 1 + j) with (i <? j) by easy.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    easy.
+  }
+  easy.
+}
+symmetry.
+...
+revert la lb Ha Hb.
+induction n; intros; [ easy | clear Hnz ].
+rewrite Nat_sub_succ_1.
+apply permut_without_highest in Ha.
+apply permut_without_highest in Hb.
+destruct Ha as (i & Hni & Hba).
+destruct Hb as (j & Hnj & Hbb).
+move j before i; move Hnj before Hni.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  now do 4 rewrite rngl_product_only_one.
+}
+specialize (IHn Hnz (butn i la) (butn j lb) Hba Hbb).
+rewrite (rngl_product_split3 j) in IHn.
+...
+erewrite rngl_product_eq_compat in IHn. 2: {
+  intros u Hu.
+  erewrite rngl_product_eq_compat. 2: {
+    intros v Hv.
+    unfold ff_app.
+    do 4 rewrite nth_butn.
+    unfold Nat.b2n.
+    do 4 rewrite if_leb_le_dec.
+    destruct (le_dec j v) as [Hjv| Hjv]. {
+      destruct (le_dec j u) as [Hju| Hju]. {
+
+...
+intros Hif * Ha Hb.
 revert la lb Ha Hb.
 induction n; intros. {
   rewrite rngl_product_empty; [ | easy ].
@@ -1694,6 +1775,8 @@ destruct Ha as (i & Hni & Hba).
 apply permut_without_highest in Hb.
 destruct Hb as (j & Hnj & Hbb).
 specialize (IHn (butn i la) (butn j lb) Hba Hbb).
+...
+unfold "°" in IHn.
 ...
 intros Hif * Ha Hb.
 destruct n. {
