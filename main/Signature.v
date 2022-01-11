@@ -1589,6 +1589,7 @@ split. {
       specialize (H2 H).
       now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
     }
+...
     apply in_split in Ha.
     destruct Ha as (la & lb & Hn).
     apply in_split in Hal.
@@ -1611,8 +1612,11 @@ split. {
       specialize (H2 eq_refl).
       rewrite H2 in Hil1.
       now apply Nat.lt_irrefl in Hil1.
-    } {
-      apply Nat.nlt_ge in Hil1.
+    }
+    apply Nat.nlt_ge in Hil1.
+    destruct (lt_dec (length l1) i) as [Hl1i| Hl1i]. {
+      replace (i - length l1) with (S (i - S (length l1))) in Hn by flia Hl1i.
+      rewrite butn_cons in Hn.
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
