@@ -1038,7 +1038,7 @@ replace (p ?= i - 1) with Lt by now symmetry; apply nat_compare_lt; flia Hi.
 rewrite rngl_mul_mul_swap; [ | easy ].
 rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
-rewrite rngl_sqr_opp_1; [ | easy ].
+rewrite rngl_squ_opp_1; [ | easy ].
 rewrite rngl_mul_1_r.
 rewrite (all_1_rngl_product_1 (q + 1)). 2: {
   intros j Hj.
@@ -1666,6 +1666,43 @@ apply butn_is_permut; [ easy | | ]. {
 }
 Qed.
 
+Theorem sign_diff_mul :
+  rngl_has_opp = true →
+   ∀ a b c d,
+  (sign_diff a b * sign_diff c d)%F =
+  sign_diff (a * c + b * d) (b * c + a * d).
+Proof.
+intros Hop *.
+unfold sign_diff.
+remember (a ?= b) as b1 eqn:Hb1; symmetry in Hb1.
+remember (c ?= d) as b2 eqn:Hb2; symmetry in Hb2.
+(*
+remember (a * c + b * d ?= b * c + a * d) as b3 eqn:Hb3.
+symmetry in Hb3.
+*)
+move b2 before b1(*; move b3 before b2*).
+destruct b1. {
+  rewrite rngl_mul_0_l; [ | now left ].
+  apply Nat.compare_eq_iff in Hb1; subst b.
+  now (*subst b3; *)rewrite Nat.compare_refl.
+} {
+  destruct b2. {
+    rewrite rngl_mul_0_r; [ | now left ].
+    apply Nat.compare_eq_iff in Hb2; subst d.
+    (*subst b3; *)rewrite Nat.add_comm.
+    now rewrite Nat.compare_refl.
+  } {
+    rewrite rngl_squ_opp_1; [ | easy ].
+    apply Nat.compare_lt_iff in Hb1, Hb2.
+...
+    assert (H : a * c + b * d < b * c + a * d). {
+      apply Nat.add_lt_mono. {
+        apply Nat.mul_lt_mono.
+
+    destruct b3; [ | | easy ]; exfalso. {
+      apply Nat.compare_eq_iff in Hb3.
+...
+
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1734,6 +1771,13 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+Search sign_diff.
+...
+rewrite sign_diff_mul.
 symmetry.
 ...
 revert la lb Ha Hb.

@@ -1089,7 +1089,7 @@ rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_sqr_opp_1 : rngl_has_opp = true → (-1 * -1)%F = 1%F.
+Theorem rngl_squ_opp_1 : rngl_has_opp = true → (-1 * -1)%F = 1%F.
 Proof.
 intros Hop.
 rewrite rngl_mul_opp_opp; [ | easy ].
