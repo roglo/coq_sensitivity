@@ -1595,6 +1595,9 @@ specialize (Hll n Hal) as H.
 specialize (H2 H); clear H.
 rewrite Hi in H2 at 1.
 rewrite (permut_permut_inv (S n)) in H2; [ | easy | easy ].
+apply Nat.neq_sym in Hni.
+apply Hni, H2.
+...
 destruct (Nat.eq_dec n (ff_app l n)) as [H3| H3]. {
   specialize (H2 H3).
   move i at top; subst i.
