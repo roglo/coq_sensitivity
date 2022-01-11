@@ -1589,34 +1589,49 @@ split. {
       specialize (H2 H).
       now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
     }
-...
-    apply in_split in Ha.
-    destruct Ha as (la & lb & Hn).
-    apply in_split in Hal.
-    destruct Hal as (l1 & l2 & Hln).
-    rewrite Hln in Hn.
-    rewrite butn_app in Hn.
-    rewrite if_ltb_lt_dec in Hn.
-    destruct (lt_dec i (length l1)) as [Hil1| Hil1]. {
-      specialize (Hli i (length l1) H1) as H2.
-      assert (H : length l1 < length l). {
-        rewrite Hln, app_length; cbn; flia.
-      }
-      specialize (H2 H); clear H.
-      rewrite Hi in H2 at 1.
-      rewrite (permut_permut_inv (S n)) in H2; [ | easy | easy ].
-      rewrite Hln in H2.
-      unfold ff_app in H2.
-      rewrite app_nth2 in H2; [ | now unfold ge ].
-      rewrite Nat.sub_diag in H2.
-      specialize (H2 eq_refl).
-      rewrite H2 in Hil1.
-      now apply Nat.lt_irrefl in Hil1.
+    assert (Hin : n = ff_app l i). {
+      now rewrite Hi, (permut_permut_inv (S n)).
     }
-    apply Nat.nlt_ge in Hil1.
-    destruct (lt_dec (length l1) i) as [Hl1i| Hl1i]. {
-      replace (i - length l1) with (S (i - S (length l1))) in Hn by flia Hl1i.
-      rewrite butn_cons in Hn.
+    unfold butn in Ha.
+    apply in_app_or in Ha.
+    destruct Ha as [Hini| Hini]. {
+      apply (In_nth _ _ 0) in Hini.
+      destruct Hini as (j & Hjl & Hjn).
+      rewrite firstn_length, min_l in Hjl; [ | flia H1 ].
+      specialize (Hli i j H1) as H2.
+      assert (H : j < length l) by flia Hjl H1.
+      specialize (H2 H); clear H.
+      rewrite <- Hin in H2.
+      rewrite List_nth_firstn in Hjn; [ | easy ].
+      unfold ff_app in H2.
+      rewrite Hjn in H2.
+      specialize (H2 eq_refl).
+      rewrite <- H2 in Hjl.
+      now apply Nat.lt_irrefl in Hjl.
+    } {
+      apply (In_nth _ _ 0) in Hini.
+      destruct Hini as (j & Hjl & Hjn).
+      rewrite skipn_length in Hjl.
+      rewrite List_nth_skipn in Hjn.
+      specialize (Hli i (j + S i) H1) as H2.
+      assert (H : j + S i < length l) by flia Hjl.
+      specialize (H2 H); clear H.
+      rewrite <- Hin in H2.
+      unfold ff_app in H2.
+      rewrite Hjn in H2.
+      specialize (H2 eq_refl).
+      flia H2.
+    }
+  } {
+    rewrite butn_length.
+    unfold Nat.b2n.
+    remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
+    destruct Hl as (Hp, Hl); rewrite Hl.
+    destruct Hp as (Hll, Hli).
+    replace (i <? S n) with true. 2: {
+      symmetry.
+      apply Nat.ltb_lt.
+      rewrite Hi.
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
