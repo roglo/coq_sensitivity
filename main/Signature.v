@@ -1690,11 +1690,10 @@ induction n; intros. {
   easy.
 }
 apply permut_without_highest in Ha.
-...
-destruct la as [| a]; [ now destruct Ha | ].
-destruct lb as [| b]; [ now destruct Hb | ].
-destruct Ha as (Hap, Han).
-cbn in Han; apply Nat.succ_inj in Han.
+destruct Ha as (i & Hni & Hba).
+apply permut_without_highest in Hb.
+destruct Hb as (j & Hnj & Hbb).
+specialize (IHn (butn i la) (butn j lb) Hba Hbb).
 ...
 intros Hif * Ha Hb.
 destruct n. {
