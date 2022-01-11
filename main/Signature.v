@@ -1536,6 +1536,30 @@ destruct b1. {
 }
 Qed.
 
+Theorem butn_is_permut : ∀ n i l,
+  is_permut (S n) l
+  → n = ff_app l i
+  → is_permut n (butn i l).
+Proof.
+intros * Hp Hni.
+split. {
+  split. {
+    intros j Hj.
+    rewrite butn_length.
+    destruct Hp as (Hp, Hl).
+    rewrite Hl.
+...
+          rewrite Hl.
+          apply Nat.ltb_lt in Hin; rewrite Hin.
+          apply Nat.ltb_lt in Hin.
+          rewrite Nat_sub_succ_1.
+          apply (In_nth _ _ 0) in Hu.
+          rewrite butn_length in Hu.
+          destruct Hu as (v & Hni & Hun).
+          rewrite <- Hun.
+          rewrite nth_butn.
+...
+
 Theorem permut_without_highest : ∀ n l,
   is_permut (S n) l
   → ∃ i, nth i l 0 = n ∧ is_permut n (butn i l).
@@ -1628,10 +1652,38 @@ split. {
     remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
     destruct Hl as (Hp, Hl); rewrite Hl.
     destruct Hp as (Hll, Hli).
-    replace (i <? S n) with true. 2: {
-      symmetry.
-      apply Nat.ltb_lt.
+    assert (Hin : i < S n). {
       rewrite Hi.
+      unfold ff_app.
+      destruct Hil as (Hip, Hil).
+      specialize permut_list_ub as H1.
+      specialize (H1 (permut_list_inv l) n).
+      rewrite Hil in H1.
+      apply (H1 Hip (Nat.lt_succ_diag_r _)).
+    }
+    apply Nat.ltb_lt in Hin; rewrite Hin.
+    apply Nat.ltb_lt in Hin.
+    rewrite Nat_sub_succ_1.
+    intros j k Hj Hk Hjk.
+    assert (H : is_permut n (butn i l)). {
+...
+apply butn_is_permut; [ easy | ].
+now rewrite Hi, (permut_permut_inv (S n)).
+...
+    enough (H : is_permut n (butn i l)). {
+      destruct H as (Hbp, Hbl).
+      apply Hbp in Hjk; [ easy | | ]. {
+        rewrite butn_length, Hl.
+        apply Nat.ltb_lt in Hin.
+        now rewrite Hin, Nat_sub_succ_1.
+      } {
+        rewrite butn_length, Hl.
+        apply Nat.ltb_lt in Hin.
+        now rewrite Hin, Nat_sub_succ_1.
+      }
+    }
+...
+    apply Hil in Hjk.
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
