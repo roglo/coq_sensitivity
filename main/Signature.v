@@ -1539,26 +1539,108 @@ Qed.
 Theorem butn_is_permut : ∀ n i l,
   is_permut (S n) l
   → n = ff_app l i
+  → i < length l
   → is_permut n (butn i l).
 Proof.
-intros * Hp Hni.
+intros * Hp Hni Hil.
 split. {
   split. {
     intros j Hj.
     rewrite butn_length.
     destruct Hp as (Hp, Hl).
-    rewrite Hl.
-...
-          rewrite Hl.
-          apply Nat.ltb_lt in Hin; rewrite Hin.
-          apply Nat.ltb_lt in Hin.
-          rewrite Nat_sub_succ_1.
-          apply (In_nth _ _ 0) in Hu.
-          rewrite butn_length in Hu.
-          destruct Hu as (v & Hni & Hun).
-          rewrite <- Hun.
-          rewrite nth_butn.
-...
+    apply Nat.ltb_lt in Hil; rewrite Hil.
+    apply Nat.ltb_lt in Hil.
+    rewrite Hl, Nat_sub_succ_1.
+    destruct Hp as (Hpl, Hpi).
+    specialize (Hpl j) as Hjl.
+    assert (H : j ∈ l) by now apply in_butn in Hj.
+    specialize (Hjl H); clear H.
+    rewrite Hl in Hjl.
+    destruct (Nat.eq_dec j n) as [H| H]; [ | flia H Hjl ].
+    subst j; clear Hjl; exfalso.
+    assert (Hnni : n ≠ i). {
+      intros H; move H at top; subst i.
+      apply (In_nth _ _ 0) in Hj.
+      rewrite butn_length, Hl in Hj.
+      replace (n <? S n) with true in Hj by now symmetry; apply Nat.ltb_lt.
+      rewrite Nat_sub_succ_1 in Hj.
+      destruct Hj as (j & Hjn & Hnj); symmetry in Hnj.
+      rewrite nth_butn in Hnj.
+      apply Nat.leb_gt in Hjn.
+      rewrite Hjn, Nat.add_0_r in Hnj.
+      apply Nat.leb_gt in Hjn.
+      specialize (Hpi j n) as H2.
+      assert (H : j < length l) by now rewrite Hl; flia Hjn.
+      specialize (H2 H Hil); clear H.
+      assert (H : ff_app l j = ff_app l n) by now rewrite <- Hni.
+      specialize (H2 H).
+      now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
+    }
+    unfold butn in Hj.
+    apply in_app_or in Hj.
+    destruct Hj as [Hini| Hini]. {
+      apply (In_nth _ _ 0) in Hini.
+      destruct Hini as (j & Hjl & Hjn).
+      rewrite firstn_length, min_l in Hjl; [ | flia Hil ].
+      specialize (Hpi i j Hil) as H2.
+      assert (H : j < length l) by flia Hjl Hil.
+      specialize (H2 H); clear H.
+      rewrite <- Hni in H2.
+      rewrite List_nth_firstn in Hjn; [ | easy ].
+      symmetry in Hjn.
+      specialize (H2 Hjn).
+      rewrite <- H2 in Hjl.
+      now apply Nat.lt_irrefl in Hjl.
+    } {
+      apply (In_nth _ _ 0) in Hini.
+      destruct Hini as (j & Hjl & Hjn).
+      rewrite skipn_length in Hjl.
+      rewrite List_nth_skipn in Hjn.
+      specialize (Hpi i (j + S i) Hil) as H2.
+      assert (H : j + S i < length l) by flia Hjl.
+      specialize (H2 H); clear H.
+      rewrite <- Hni in H2.
+      unfold ff_app in H2.
+      rewrite Hjn in H2.
+      specialize (H2 eq_refl).
+      flia H2.
+    }
+  } {
+    rewrite butn_length.
+    apply Nat.ltb_lt in Hil; rewrite Hil.
+    apply Nat.ltb_lt in Hil.
+    destruct Hp as (Hpp, Hpl).
+    rewrite Hpl, Nat_sub_succ_1.
+    intros j k Hj Hk Hjk.
+    destruct Hpp as (Hp, Hpi).
+    unfold ff_app in Hjk.
+    do 2 rewrite nth_butn in Hjk.
+    apply Hpi in Hjk; cycle 1. {
+      rewrite Hpl, <- Nat.add_1_r.
+      apply Nat.add_lt_le_mono; [ easy | ].
+      apply Nat_b2n_upper_bound.
+    } {
+      rewrite Hpl, <- Nat.add_1_r.
+      apply Nat.add_lt_le_mono; [ easy | ].
+      apply Nat_b2n_upper_bound.
+    }
+    unfold Nat.b2n in Hjk.
+    do 2 rewrite if_leb_le_dec in Hjk.
+    destruct (le_dec i j) as [Hij| Hij].  {
+      destruct (le_dec i k) as [Hik| Hik]; [ flia Hjk | ].
+      exfalso; flia Hik Hij Hjk.
+    } {
+      destruct (le_dec i k) as [Hik| Hik]; [ | flia Hjk ].
+      exfalso; flia Hik Hij Hjk.
+    }
+  }
+} {
+  rewrite butn_length.
+  apply Nat.ltb_lt in Hil.
+  destruct Hp as (Hpp, Hpl).
+  now rewrite Hil, Hpl, Nat_sub_succ_1.
+}
+Qed.
 
 Theorem permut_without_highest : ∀ n l,
   is_permut (S n) l
@@ -1570,152 +1652,19 @@ split. {
   rewrite fold_ff_app.
   now apply (permut_permut_inv (S n)).
 }
-specialize (permut_list_inv_is_permut (S n) Hl) as Hil.
-split. {
-  split. {
-    intros a Ha.
-    rewrite butn_length.
-    unfold Nat.b2n.
-    specialize (@permut_list_ub (permut_list_inv l) n) as H1.
-    rewrite length_permut_list_inv in H1.
-    destruct Hl as (Hp, Hl); rewrite Hl in H1.
-    specialize (H1 (permut_list_inv_is_permut_list Hp)).
-    specialize (H1 (Nat.lt_succ_diag_r _)).
-    rewrite <- Hl in H1.
-    apply Nat.ltb_lt in H1.
-    rewrite fold_ff_app in H1; rewrite H1.
-    apply Nat.ltb_lt in H1.
-    rewrite Hl, Nat_sub_succ_1.
-    remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
-    destruct Hp as (Hll, Hli).
-    specialize (in_butn _ _ _ Ha) as Hal.
-    specialize (Hll _ Hal) as H2.
-    rewrite Hl in H2.
-    destruct (Nat.eq_dec a n) as [Han| Han]; [ exfalso | flia H2 Han ].
-    subst a; clear H2.
-    assert (Hni : n ≠ i). {
-      intros H; move H at top; subst i.
-      apply (In_nth _ _ 0) in Ha.
-      rewrite butn_length, Hl in Ha.
-      replace (n <? S n) with true in Ha by now symmetry; apply Nat.ltb_lt.
-      rewrite Nat_sub_succ_1 in Ha.
-      destruct Ha as (j & Hjn & Hnj); symmetry in Hnj.
-      rewrite nth_butn in Hnj.
-      apply Nat.leb_gt in Hjn.
-      rewrite Hjn, Nat.add_0_r in Hnj.
-      apply Nat.leb_gt in Hjn.
-      specialize (Hli j n) as H2.
-      assert (H : j < length l) by now rewrite Hl; flia Hjn.
-      specialize (H2 H H1); clear H.
-      assert (H : ff_app l j = ff_app l n). {
-        now rewrite Hi, (permut_permut_inv (S n)).
-      }
-      specialize (H2 H).
-      now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
-    }
-    assert (Hin : n = ff_app l i). {
-      now rewrite Hi, (permut_permut_inv (S n)).
-    }
-    unfold butn in Ha.
-    apply in_app_or in Ha.
-    destruct Ha as [Hini| Hini]. {
-      apply (In_nth _ _ 0) in Hini.
-      destruct Hini as (j & Hjl & Hjn).
-      rewrite firstn_length, min_l in Hjl; [ | flia H1 ].
-      specialize (Hli i j H1) as H2.
-      assert (H : j < length l) by flia Hjl H1.
-      specialize (H2 H); clear H.
-      rewrite <- Hin in H2.
-      rewrite List_nth_firstn in Hjn; [ | easy ].
-      unfold ff_app in H2.
-      rewrite Hjn in H2.
-      specialize (H2 eq_refl).
-      rewrite <- H2 in Hjl.
-      now apply Nat.lt_irrefl in Hjl.
-    } {
-      apply (In_nth _ _ 0) in Hini.
-      destruct Hini as (j & Hjl & Hjn).
-      rewrite skipn_length in Hjl.
-      rewrite List_nth_skipn in Hjn.
-      specialize (Hli i (j + S i) H1) as H2.
-      assert (H : j + S i < length l) by flia Hjl.
-      specialize (H2 H); clear H.
-      rewrite <- Hin in H2.
-      unfold ff_app in H2.
-      rewrite Hjn in H2.
-      specialize (H2 eq_refl).
-      flia H2.
-    }
-  } {
-    rewrite butn_length.
-    unfold Nat.b2n.
-    remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
-    destruct Hl as (Hp, Hl); rewrite Hl.
-    destruct Hp as (Hll, Hli).
-    assert (Hin : i < S n). {
-      rewrite Hi.
-      unfold ff_app.
-      destruct Hil as (Hip, Hil).
-      specialize permut_list_ub as H1.
-      specialize (H1 (permut_list_inv l) n).
-      rewrite Hil in H1.
-      apply (H1 Hip (Nat.lt_succ_diag_r _)).
-    }
-    apply Nat.ltb_lt in Hin; rewrite Hin.
-    apply Nat.ltb_lt in Hin.
-    rewrite Nat_sub_succ_1.
-    intros j k Hj Hk Hjk.
-    assert (H : is_permut n (butn i l)). {
-...
-apply butn_is_permut; [ easy | ].
-now rewrite Hi, (permut_permut_inv (S n)).
-...
-    enough (H : is_permut n (butn i l)). {
-      destruct H as (Hbp, Hbl).
-      apply Hbp in Hjk; [ easy | | ]. {
-        rewrite butn_length, Hl.
-        apply Nat.ltb_lt in Hin.
-        now rewrite Hin, Nat_sub_succ_1.
-      } {
-        rewrite butn_length, Hl.
-        apply Nat.ltb_lt in Hin.
-        now rewrite Hin, Nat_sub_succ_1.
-      }
-    }
-...
-    apply Hil in Hjk.
-...
-specialize (Hli i n H1) as H2.
-specialize (Hll n Hal) as H.
-specialize (H2 H); clear H.
-rewrite Hi in H2 at 1.
-rewrite (permut_permut_inv (S n)) in H2; [ | easy | easy ].
-apply Nat.neq_sym in Hni.
-apply Hni, H2.
-...
-destruct (Nat.eq_dec n (ff_app l n)) as [H3| H3]. {
-  specialize (H2 H3).
-  move i at top; subst i.
-  rewrite H2 in Ha.
-  unfold butn in Ha.
-  apply in_app_or in Ha.
-  rewrite <- Hl in Ha.
-  rewrite skipn_all in Ha.
-  destruct Ha as [Ha| Ha]; [ | easy ].
-Search (_ ∈ firstn _ _).
-...
-    destruct Hil as (Hip, Hil).
-    destruct Hip as (Hill, Hili).
-    rewrite Hil in Hili.
-    rewrite Hl in H1.
-    rewrite Hl in Hli.
-    rewrite Hil in Hill.
-    specialize (Hili i n H1 (Nat.lt_succ_diag_r _)) as H2.
-    rewrite <- Hi in H2.
-(* mouais, ça va pas, ça, faut que je réfléchisse *)
-...
-    apply in_butn in Hi.
-...
+apply butn_is_permut; [ easy | | ]. {
+  now rewrite (permut_permut_inv (S n)).
+} {
+  specialize (@permut_list_inv_is_permut_list l) as H1.
+  destruct Hl as (H2, H3).
+  specialize (H1 H2).
+  destruct H1 as (H4, H5).
+  rewrite length_permut_list_inv in H4.
+  apply H4.
+  apply nth_In.
+  now rewrite length_permut_list_inv, H3.
+}
+Qed.
 
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
@@ -1740,7 +1689,6 @@ induction n; intros. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
-...
 apply permut_without_highest in Ha.
 ...
 destruct la as [| a]; [ now destruct Ha | ].
