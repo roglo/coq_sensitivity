@@ -1670,37 +1670,29 @@ Theorem sign_diff_mul :
   rngl_has_opp = true →
    ∀ a b c d,
   (sign_diff a b * sign_diff c d)%F =
-  sign_diff (a * c + b * d) (b * c + a * d).
+  sign_diff (a * c + b * d) (a * d + b * c).
 Proof.
 intros Hop *.
 unfold sign_diff.
 remember (a ?= b) as b1 eqn:Hb1; symmetry in Hb1.
 remember (c ?= d) as b2 eqn:Hb2; symmetry in Hb2.
-(*
-remember (a * c + b * d ?= b * c + a * d) as b3 eqn:Hb3.
-symmetry in Hb3.
-*)
-move b2 before b1(*; move b3 before b2*).
+move b2 before b1.
 destruct b1. {
   rewrite rngl_mul_0_l; [ | now left ].
   apply Nat.compare_eq_iff in Hb1; subst b.
-  now (*subst b3; *)rewrite Nat.compare_refl.
+  now rewrite Nat.add_comm, Nat.compare_refl.
 } {
   destruct b2. {
     rewrite rngl_mul_0_r; [ | now left ].
     apply Nat.compare_eq_iff in Hb2; subst d.
-    (*subst b3; *)rewrite Nat.add_comm.
     now rewrite Nat.compare_refl.
   } {
     rewrite rngl_squ_opp_1; [ | easy ].
     apply Nat.compare_lt_iff in Hb1, Hb2.
-...
-    assert (H : a * c + b * d < b * c + a * d). {
-      apply Nat.add_lt_mono. {
-        apply Nat.mul_lt_mono.
-
-    destruct b3; [ | | easy ]; exfalso. {
-      apply Nat.compare_eq_iff in Hb3.
+    specialize (Nat_lt_lt_sum_mul_lt_sum_mul Hb1 Hb2) as H1.
+    apply Nat.compare_gt_iff in H1.
+    now rewrite H1.
+  }
 ...
 
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →

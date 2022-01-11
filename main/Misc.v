@@ -805,6 +805,22 @@ rewrite skipn_cons.
 apply IHla.
 Qed.
 
+Theorem Nat_lt_lt_sum_mul_lt_sum_mul : ∀ a b c d,
+  a < b
+  → c < d
+  → a * d + b * c < a * c + b * d.
+Proof.
+intros * Hab Hcd.
+rewrite Nat.add_comm.
+apply Nat.lt_add_lt_sub_r.
+rewrite <- Nat.add_sub_assoc; [ | apply Nat.mul_le_mono_r; flia Hab ].
+rewrite <- Nat.mul_sub_distr_r.
+apply Nat.lt_sub_lt_add_l.
+rewrite <- Nat.mul_sub_distr_r.
+apply Nat.mul_lt_mono_pos_l; [ | easy ].
+flia Hab.
+Qed.
+
 (* butn: list without its nth element *)
 
 Definition butn {A} n (l : list A) :=
