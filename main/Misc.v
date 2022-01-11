@@ -998,16 +998,29 @@ destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
 Qed.
 
 Theorem butn_app : ∀ A (l1 l2 : list A) i,
-  i = length l1
-  → butn i (l1 ++ l2) = l1 ++ butn 0 l2.
+  butn i (l1 ++ l2) =
+    if i <? length l1 then butn i l1 ++ l2
+    else l1 ++ butn (i - length l1) l2.
 Proof.
-intros * Hi.
-subst i.
-induction l1 as [| a]; [ easy | ].
-rewrite List_length_cons.
-do 2 rewrite <- app_comm_cons.
-rewrite butn_cons.
-now f_equal.
+intros.
+rewrite if_ltb_lt_dec.
+unfold butn.
+rewrite firstn_app, skipn_app.
+destruct (lt_dec i (length l1)) as [Hil| Hil]. {
+  rewrite (proj2 (Nat.sub_0_le i _)); [ | now apply Nat.lt_le_incl ].
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite firstn_O, skipn_O, app_nil_r.
+  apply app_assoc.
+} {
+  apply Nat.nlt_ge in Hil.
+  rewrite firstn_all2; [ | easy ].
+  rewrite skipn_all2. 2: {
+    now apply Nat.lt_le_incl; apply -> Nat.succ_le_mono.
+  }
+  rewrite app_nil_l.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  symmetry; apply app_assoc.
+}
 Qed.
 
 Theorem butn_butn : ∀ A i j (la : list A),

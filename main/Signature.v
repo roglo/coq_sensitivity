@@ -1589,6 +1589,30 @@ split. {
       specialize (H2 H).
       now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
     }
+    apply in_split in Ha.
+    destruct Ha as (la & lb & Hn).
+    apply in_split in Hal.
+    destruct Hal as (l1 & l2 & Hln).
+    rewrite Hln in Hn.
+    rewrite butn_app in Hn.
+    rewrite if_ltb_lt_dec in Hn.
+    destruct (lt_dec i (length l1)) as [Hil1| Hil1]. {
+      specialize (Hli i (length l1) H1) as H2.
+      assert (H : length l1 < length l). {
+        rewrite Hln, app_length; cbn; flia.
+      }
+      specialize (H2 H); clear H.
+      rewrite Hi in H2 at 1.
+      rewrite (permut_permut_inv (S n)) in H2; [ | easy | easy ].
+      rewrite Hln in H2.
+      unfold ff_app in H2.
+      rewrite app_nth2 in H2; [ | now unfold ge ].
+      rewrite Nat.sub_diag in H2.
+      specialize (H2 eq_refl).
+      rewrite H2 in Hil1.
+      now apply Nat.lt_irrefl in Hil1.
+    } {
+      apply Nat.nlt_ge in Hil1.
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
