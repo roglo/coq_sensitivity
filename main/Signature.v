@@ -1569,6 +1569,26 @@ split. {
     rewrite Hl in H2.
     destruct (Nat.eq_dec a n) as [Han| Han]; [ exfalso | flia H2 Han ].
     subst a; clear H2.
+    assert (Hni : n ≠ i). {
+      intros H; move H at top; subst i.
+      apply (In_nth _ _ 0) in Ha.
+      rewrite butn_length, Hl in Ha.
+      replace (n <? S n) with true in Ha by now symmetry; apply Nat.ltb_lt.
+      rewrite Nat_sub_succ_1 in Ha.
+      destruct Ha as (j & Hjn & Hnj); symmetry in Hnj.
+      rewrite nth_butn in Hnj.
+      apply Nat.leb_gt in Hjn.
+      rewrite Hjn, Nat.add_0_r in Hnj.
+      apply Nat.leb_gt in Hjn.
+      specialize (Hli j n) as H2.
+      assert (H : j < length l) by now rewrite Hl; flia Hjn.
+      specialize (H2 H H1); clear H.
+      assert (H : ff_app l j = ff_app l n). {
+        now rewrite Hi, (permut_permut_inv (S n)).
+      }
+      specialize (H2 H).
+      now rewrite H2 in Hjn; apply Nat.lt_irrefl in Hjn.
+    }
 ...
 specialize (Hli i n H1) as H2.
 specialize (Hll n Hal) as H.
