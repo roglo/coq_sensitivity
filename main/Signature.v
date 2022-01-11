@@ -1692,8 +1692,37 @@ destruct b1. {
     specialize (Nat_lt_lt_sum_mul_lt_sum_mul Hb1 Hb2) as H1.
     apply Nat.compare_gt_iff in H1.
     now rewrite H1.
+  } {
+    rewrite rngl_mul_1_r.
+    apply Nat.compare_lt_iff in Hb1.
+    apply Nat.compare_gt_iff in Hb2.
+    specialize (Nat_lt_lt_sum_mul_lt_sum_mul Hb1 Hb2) as H1.
+    apply Nat.compare_lt_iff in H1.
+    now rewrite H1.
   }
-...
+} {
+  destruct b2. {
+    rewrite rngl_mul_0_r; [ | now left ].
+    apply Nat.compare_eq_iff in Hb2; subst d.
+    now rewrite Nat.compare_refl.
+  } {
+    rewrite rngl_mul_1_l.
+    apply Nat.compare_gt_iff in Hb1.
+    apply Nat.compare_lt_iff in Hb2.
+    specialize (Nat_lt_lt_sum_mul_lt_sum_mul Hb1 Hb2) as H1.
+    apply Nat.compare_lt_iff in H1.
+    rewrite Nat.add_comm, (Nat.add_comm (a * d)).
+    now rewrite H1.
+  } {
+    rewrite rngl_mul_1_l.
+    apply Nat.compare_gt_iff in Hb1, Hb2.
+    specialize (Nat_lt_lt_sum_mul_lt_sum_mul Hb1 Hb2) as H1.
+    apply Nat.compare_gt_iff in H1.
+    rewrite Nat.add_comm, (Nat.add_comm (a * d)).
+    now rewrite H1.
+  }
+}
+Qed.
 
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
@@ -1767,9 +1796,11 @@ erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-Search sign_diff.
-...
-rewrite sign_diff_mul.
+    rewrite sign_diff_mul; [ | now destruct Hif ].
+    easy.
+  }
+  easy.
+}
 symmetry.
 ...
 revert la lb Ha Hb.
