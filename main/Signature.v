@@ -1797,6 +1797,52 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+Print sign_diff.
+Theorem sign_diff_neq : ∀ u v,
+  u ≠ v
+  → sign_diff u v = if u <? v then (-1)%F else 1%F.
+Admitted.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]. {
+  rewrite sign_diff_neq. 2: {
+    admit.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+apply Nat.nlt_ge in Hij.
+...
+Theorem sign_diff_comp_rngl_of_nat : ∀ la lb i j,
+  i < j
+  → sign_diff (ff_app (la ° lb) j) (ff_app (la ° lb) i) =
+       ((rngl_of_nat (ff_app la (ff_app lb j)) -
+         rngl_of_nat (ff_app la (ff_app lb i))) /
+            (rngl_of_nat (ff_app lb j) - rngl_of_nat (ff_app lb i)))%F.
+...
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]. {
+  rewrite sign_diff_comp_rngl_of_nat.
+  2: flia Hij Hi Hj.
+  easy.
+}
+cbn.
+apply Nat.nlt_ge in Hij.
+...
+    (rngl_of_nat (ff_app f (ff_app g (j - 1))) -
+     rngl_of_nat (ff_app f (ff_app g (i - 1)))) /
+         (rngl_of_nat (ff_app g (j - 1)) - rngl_of_nat (ff_app g (i - 1)))
+...
+intros Hif * Ha Hb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
 rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
 rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
 erewrite rngl_product_eq_compat. 2: {
