@@ -1803,6 +1803,19 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 ...
+(*
+Abort.
+End a.
+Arguments sign_diff {T}%type {ro} (u v)%nat.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Check sign_diff.
+Compute (let la := [0;3;1;2] in let lb := [3;1;0;2] in let '(i,i0):=(1,2)%nat in
+(sign_diff (ff_app la (ff_app lb i0)) (ff_app la (ff_app lb i)),
+     sign_diff (ff_app la i0 * ff_app lb i0 + ff_app la i * ff_app lb i)
+       (ff_app la i0 * ff_app lb i + ff_app la i * ff_app lb i0))).
+*)
+...
 revert la lb Ha Hb.
 induction n; intros; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
