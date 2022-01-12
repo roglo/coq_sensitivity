@@ -1724,6 +1724,7 @@ destruct b1. {
 }
 Qed.
 
+(* j'arrive pas à le prouver...
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1911,6 +1912,7 @@ destruct n. {
 }
 destruct n. {
 ...
+*)
 
 (* if signature_comp_fun_expand_1 does not require in_charac_0_field
    this one should not *)
@@ -1920,7 +1922,7 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-(**)
+(* j'arrive pas à prouver son lemme
 intros Hif * Hpa Hpb.
 destruct Hpa as (Hap, Han).
 destruct Hpb as (Hbp, Hbn).
@@ -1943,7 +1945,7 @@ symmetry.
 ...
 now apply rngl_product_product_sign_diff_comp.
 ...
-(**)
+*)
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
