@@ -1797,54 +1797,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-Print sign_diff.
-Theorem sign_diff_neq : ∀ la i j,
-  is_permut_list la
-  → i < length la
-  → j < length la
-  → (if i <? j then sign_diff (ff_app la j) (ff_app la i) else 1%F) =
-    if i <? j then
-      if ff_app la j <? ff_app la i then (-1)%F else 1%F
-    else 1%F.
-Proof.
-intros * Hp Hi Hj.
-do 3 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-destruct (lt_dec (ff_app la j) (ff_app la i)) as [Hlij| Hlij]. {
-  unfold sign_diff.
-  apply Nat.compare_lt_iff in Hlij.
-  now rewrite Hlij.
-} {
-  unfold sign_diff.
-  remember (ff_app la j ?= ff_app la i) as b eqn:Hb.
-  symmetry in Hb.
-  destruct b; [ | | easy ]; exfalso. {
-    apply Nat.compare_eq_iff in Hb.
-    apply Hp in Hb; [ flia Hij Hb | easy | easy ].
-  } {
-    now apply Nat.compare_lt_iff in Hb.
-  }
-}
-Qed.
-replace (i <? j) with (i - 1 <? j - 1). 2: {
-  destruct i; [ easy | ].
-  destruct j; [ easy | ].
-  now do 2 rewrite Nat_sub_succ_1.
-}
-rewrite sign_diff_neq; [ | admit | admit | admit ].
-easy.
-}
-easy.
-}
-cbn - [ "<?" ].
-...
-    (rngl_of_nat (ff_app f (ff_app g (j - 1))) -
-     rngl_of_nat (ff_app f (ff_app g (i - 1)))) /
-         (rngl_of_nat (ff_app g (j - 1)) - rngl_of_nat (ff_app g (i - 1)))
 ...
 intros Hif * Ha Hb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
