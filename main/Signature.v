@@ -1724,7 +1724,56 @@ destruct b1. {
 }
 Qed.
 
-(* j'arrive pas à le prouver...
+Theorem comp_is_permut_list : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut_list (σ₁ ° σ₂).
+Proof.
+intros * (Hp11, Hp12) (Hp21, Hp22).
+split. {
+  intros i Hi.
+  unfold comp_list in Hi |-*.
+  rewrite map_length.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj).
+  subst i.
+  rewrite Hp22, <- Hp12.
+  apply permut_list_ub; [ easy | ].
+  apply Hp21 in Hj.
+  congruence.
+} {
+  unfold comp_list.
+  rewrite map_length.
+  intros i j Hi Hj.
+  unfold ff_app.
+  rewrite (List_map_nth' 0); [ | easy ].
+  rewrite (List_map_nth' 0); [ | easy ].
+  intros Hij.
+  apply Hp11 in Hij; cycle 1. {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  } {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  }
+  now apply Hp21 in Hij.
+}
+Qed.
+
+Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list_scope.
+
+Theorem comp_is_permut : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut n (σ₁ ° σ₂).
+Proof.
+intros * Hp1 Hp2.
+split; [ now apply (comp_is_permut_list n) | ].
+unfold "°".
+rewrite map_length.
+now destruct Hp2.
+Qed.
+
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1746,24 +1795,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   rewrite rngl_product_empty; [ | easy ].
   rewrite rngl_product_empty; [ | easy ].
-  easy.
-}
-erewrite rngl_product_eq_compat. 2: {
-  intros u Hu.
-  erewrite rngl_product_eq_compat. 2: {
-    intros v Hv.
-    unfold "°", ff_app.
-    rewrite (List_map_nth' 0). 2: {
-      destruct Hb as (Hbp, Hbl).
-      rewrite Hbl; flia Hv.
-    }
-    rewrite (List_map_nth' 0). 2: {
-      destruct Hb as (Hbp, Hbl).
-      rewrite Hbl; flia Hu.
-    }
-    do 4 rewrite fold_ff_app.
-    easy.
-  }
   easy.
 }
 rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
@@ -1793,6 +1824,97 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+symmetry.
+...
+(*
+erewrite rngl_product_eq_compat. 2: {
+  intros u Hu.
+  erewrite rngl_product_eq_compat. 2: {
+    intros v Hv.
+    unfold "°", ff_app.
+    rewrite (List_map_nth' 0). 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hv.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hu.
+    }
+    do 4 rewrite fold_ff_app.
+    easy.
+  }
+  easy.
+}
+*)
+(*1*)
+rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+  intros i (_, Hi).
+  apply (permut_inv_permut n); [ | flia Hnz Hi ].
+  now apply comp_is_permut.
+}
+rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+replace n with (length (la ° lb)) at 1. 2: {
+  rewrite comp_length.
+  now destruct Hb as (Hbp, Hbl).
+}
+unfold ff_app at 1.
+rewrite <- List_map_nth_seq.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+    intros j (_, Hj).
+    apply (permut_inv_permut n); [ | flia Hnz Hj ].
+    now apply comp_is_permut.
+  }
+  rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  replace n with (length (la ° lb)) at 1. 2: {
+    rewrite comp_length.
+    now destruct Hb as (Hbp, Hbl).
+  }
+  unfold ff_app at 1.
+  rewrite <- List_map_nth_seq.
+  rewrite (permut_permut_inv n); cycle 1. {
+    now apply comp_is_permut.
+  } {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    rewrite <- Hji.
+    destruct Ha as (Hap, Hal).
+    destruct Hb as (Hbp, Hbl).
+    rewrite <- Hal.
+    unfold ff_app.
+    apply Hap, nth_In.
+    rewrite Hal.
+    rewrite <- Hbl.
+    now apply Hbp.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (permut_permut_inv n); cycle 1. {
+      now apply comp_is_permut.
+    } {
+      apply in_map_iff in Hj.
+      destruct Hj as (k & Hkj & Hk).
+      rewrite <- Hkj.
+      destruct Ha as (Hap, Hal).
+      destruct Hb as (Hbp, Hbl).
+      rewrite <- Hal.
+      unfold ff_app.
+      apply Hap, nth_In.
+      rewrite Hal.
+      rewrite <- Hbl.
+      now apply Hbp.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+...1
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1912,7 +2034,6 @@ destruct n. {
 }
 destruct n. {
 ...
-*)
 
 (* if signature_comp_fun_expand_1 does not require in_charac_0_field
    this one should not *)
@@ -1922,7 +2043,7 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-(* j'arrive pas à prouver son lemme
+(**)
 intros Hif * Hpa Hpb.
 destruct Hpa as (Hap, Han).
 destruct Hpb as (Hbp, Hbn).
@@ -1945,7 +2066,7 @@ symmetry.
 ...
 now apply rngl_product_product_sign_diff_comp.
 ...
-*)
+(**)
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
@@ -2292,56 +2413,6 @@ intros * Hkn Hjn.
 exists (ff_app (canon_sym_gr_inv_list n k) j).
 split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
-Qed.
-
-Theorem comp_is_permut_list : ∀ n σ₁ σ₂,
-  is_permut n σ₁
-  → is_permut n σ₂
-  → is_permut_list (σ₁ ° σ₂).
-Proof.
-intros * (Hp11, Hp12) (Hp21, Hp22).
-split. {
-  intros i Hi.
-  unfold comp_list in Hi |-*.
-  rewrite map_length.
-  apply in_map_iff in Hi.
-  destruct Hi as (j & Hji & Hj).
-  subst i.
-  rewrite Hp22, <- Hp12.
-  apply permut_list_ub; [ easy | ].
-  apply Hp21 in Hj.
-  congruence.
-} {
-  unfold comp_list.
-  rewrite map_length.
-  intros i j Hi Hj.
-  unfold ff_app.
-  rewrite (List_map_nth' 0); [ | easy ].
-  rewrite (List_map_nth' 0); [ | easy ].
-  intros Hij.
-  apply Hp11 in Hij; cycle 1. {
-    rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
-  } {
-    rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
-  }
-  now apply Hp21 in Hij.
-}
-Qed.
-
-Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list_scope.
-
-Theorem comp_is_permut : ∀ n σ₁ σ₂,
-  is_permut n σ₁
-  → is_permut n σ₂
-  → is_permut n (σ₁ ° σ₂).
-Proof.
-intros * Hp1 Hp2.
-split; [ now apply (comp_is_permut_list n) | ].
-unfold "°".
-rewrite map_length.
-now destruct Hp2.
 Qed.
 
 Theorem ε_1_opp_1 :
