@@ -1797,6 +1797,55 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
+(* Tous les sign_diff devraient pouvoir être remplacés par une
+   fonction sign_diff' u v = si u < v alors -1 sinon 1 car, dans
+   le but, il ne peut pas arriver que sign_diff s'applique sur
+   des valeurs égales, cela parce que la et lb sont des
+   permutations *)
+Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (if i <? j then _ else _) with
+        (if i <? j then
+           sign_diff' (ff_app (la ° lb) (j - 1)) (ff_app (la ° lb) (i - 1))
+         else 1%F). 2: {
+      do 2 rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      unfold sign_diff', sign_diff.
+      remember (ff_app (la ° lb) (j - 1) ?= ff_app (la ° lb) (i - 1))
+        as b eqn:Hb1.
+      symmetry in Hb1.
+      destruct b. {
+        apply Nat.compare_eq_iff in Hb1.
+        assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
+        apply Hab in Hb1; cycle 1. {
+          rewrite comp_length.
+          destruct Hb as (Hbp, Hbl).
+          rewrite Hbl; flia Hj.
+        } {
+          rewrite comp_length.
+          destruct Hb as (Hbp, Hbl).
+          rewrite Hbl; flia Hi.
+        }
+        flia Hb1 Hij Hi Hj.
+      } {
+        apply Nat.compare_lt_iff in Hb1.
+        apply Nat.ltb_lt in Hb1.
+        now rewrite Hb1.
+      } {
+        apply Nat.compare_gt_iff in Hb1.
+        rewrite if_ltb_lt_dec.
+        destruct (lt_dec _ _) as [Hji| Hji]; [ | easy ].
+        flia Hb1 Hji.
+      }
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
 ...
 intros Hif * Ha Hb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
