@@ -2006,6 +2006,12 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+...
+intros Hif * Ha Hb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  now do 4 rewrite rngl_product_only_one.
+}
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
   intros i (_, Hi).
