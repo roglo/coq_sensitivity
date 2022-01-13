@@ -16,7 +16,7 @@ Definition ff_app l i := nth i l 0.
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
 Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
-Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40).
+Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
 Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ° g) (seq 0 (length (hd [] l))))
@@ -41,6 +41,22 @@ Proof. easy. Qed.
 
 Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
 Proof. intros; apply List_map_nth_seq. Qed.
+
+Theorem permut_comp_assoc : ∀ n f g h,
+  length g = n
+  → is_permut n h
+  → f ° (g ° h) = (f ° g) ° h.
+Proof.
+intros * Hg (Hph, Hh).
+unfold "°", comp_list; cbn.
+rewrite map_map.
+apply map_ext_in.
+intros i Hi.
+unfold ff_app.
+rewrite (List_map_nth' 0); [ easy | ].
+rewrite Hg, <- Hh.
+now apply Hph.
+Qed.
 
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
   is_permut_list l ↔ is_permut_list_bool l = true.

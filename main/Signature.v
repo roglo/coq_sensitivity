@@ -1810,6 +1810,147 @@ unfold ff_app.
 now rewrite (List_map_nth' 0).
 Qed.
 
+Theorem fold_permut_list_inv : ∀ l,
+  map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)) =
+  permut_list_inv l.
+Proof. easy. Qed.
+
+Theorem fold_ff_app_permut_list_inv : ∀ l i,
+  is_permut_list l
+  → unsome 0 (List_rank (Nat.eqb i) l) =
+    ff_app (permut_list_inv l) i.
+Proof.
+intros * Hp.
+destruct (lt_dec i (length l)) as [Hil| Hil]. {
+  unfold ff_app, permut_list_inv.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
+}
+apply Nat.nlt_ge in Hil.
+unfold List_rank.
+unfold permut_list_inv, ff_app.
+rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+unfold unsome.
+remember (List_rank_loop 0 (Nat.eqb i) l) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]; [ | easy ].
+apply (List_rank_loop_Some 0) in Hj.
+rewrite Nat.add_0_l, Nat.sub_0_r in Hj.
+destruct Hj as (Hjl & Hbef & Hat).
+apply Nat.eqb_eq in Hat.
+exfalso; apply Nat.nlt_ge in Hil; apply Hil.
+apply Hp.
+rewrite Hat.
+now apply nth_In.
+Qed.
+
+Theorem map_ff_app_is_permut_list : ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → is_permut_list (map (ff_app la) lb).
+Proof.
+intros * (Hap, Hal) (Hbp, Hbl).
+split. {
+  intros j Hj.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hkj & Hk).
+  rewrite <- Hkj.
+  rewrite map_length, Hbl, <- Hal.
+  apply Hap, nth_In.
+  rewrite Hal, <- Hbl.
+  now apply Hbp.
+} {
+  rewrite map_length.
+  intros j k Hj Hk Hjk.
+  assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
+  apply Hab in Hjk; [ easy | | ]; now rewrite comp_length.
+}
+Qed.
+
+Theorem fold_comp_list : ∀ la lb, map (ff_app la) lb = la ° lb.
+Proof. easy. Qed.
+
+Theorem permut_list_inv_comp : ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → permut_list_inv (la ° lb) = permut_list_inv lb ° permut_list_inv la.
+Proof.
+intros * Ha Hb.
+unfold permut_list_inv.
+rewrite comp_length.
+unfold "°".
+rewrite map_map.
+destruct Ha as (Hap, Hal).
+destruct Hb as (Hbp, Hbl).
+rewrite Hbl, <- Hal.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+specialize (permut_list_inv_is_permut n (conj Hap Hal)) as Hai.
+specialize (comp_is_permut (conj Hap Hal) (conj Hbp Hbl)) as Hac.
+assert (Haic : is_permut n (permut_list_inv (la ° lb))). {
+  now apply permut_list_inv_is_permut.
+}
+unfold ff_app at 2.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite fold_ff_app_permut_list_inv; [ | easy ].
+  destruct Hai as (Haip, Hail).
+  rewrite Hal, <- Hail.
+  apply Haip, nth_In.
+  now rewrite Hail, <- Hal.
+}
+rewrite seq_nth. 2: {
+  rewrite fold_ff_app_permut_list_inv; [ | easy ].
+  destruct Hai as (Haip, Hail).
+  rewrite Hal, <- Hail.
+  apply Haip, nth_In.
+  now rewrite Hail, <- Hal.
+}
+rewrite Nat.add_0_l.
+rewrite fold_ff_app_permut_list_inv. 2: {
+  now apply map_ff_app_is_permut_list with (n := n).
+}
+rewrite fold_ff_app_permut_list_inv; [ | easy ].
+rewrite fold_ff_app_permut_list_inv; [ | easy ].
+rewrite fold_comp_lt; [ | now rewrite length_permut_list_inv ].
+rewrite fold_comp_list.
+remember (ff_app (permut_list_inv (la ° lb)) i) as j eqn:Hj.
+generalize Hj; intros Hjv.
+apply (f_equal (ff_app (la ° lb))) in Hj.
+rewrite Hal in Hi.
+rewrite (permut_permut_inv n) in Hj; [ | easy | easy ].
+assert (Hjn : j < n). {
+  rewrite Hjv.
+  destruct Hai as (Haip, Hail).
+  destruct Hac as (Hacp, Hacl).
+  destruct Haic as (Haicp, Haicl).
+  rewrite <- Haicl.
+  apply Haicp, nth_In.
+  now rewrite Haicl.
+}
+rewrite <- Hj.
+unfold "°".
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite length_permut_list_inv, Hal.
+  rewrite (List_map_nth' 0); [ | now rewrite Hbl ].
+  rewrite <- Hal.
+  apply Hap, nth_In.
+  rewrite Hal, <- Hbl.
+  apply Hbp, nth_In.
+  now rewrite Hbl.
+}
+rewrite (List_map_nth' 0); [ | now rewrite Hbl ].
+do 4 rewrite fold_ff_app.
+rewrite (permut_inv_permut n); [ | easy | ]. 2: {
+  rewrite <- Hbl.
+  apply Hbp, nth_In.
+  now rewrite Hbl.
+}
+now rewrite (permut_inv_permut n).
+Qed.
+
 Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
 
 Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
@@ -1956,6 +2097,20 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 symmetry.
+rewrite permut_list_inv_comp with (n := n); [ | easy | easy ].
+rewrite permut_comp_assoc with (n := n); cycle 1. {
+  rewrite length_permut_list_inv.
+  now destruct Hb.
+} {
+  now apply permut_list_inv_is_permut.
+}
+rewrite permut_comp_assoc with (n := n); cycle 1. {
+  rewrite length_permut_list_inv.
+  now destruct Hb.
+} {
+  now apply permut_list_inv_is_permut.
+}
+Search (_ ° permut_list_inv _ = id).
 ...
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv la)) (h := ff_app la). 2: {

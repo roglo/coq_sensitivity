@@ -1064,22 +1064,6 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-Theorem permut_comp_assoc : ∀ n f g h,
-  length g = n
-  → is_permut n h
-  → (f ° (g ° h) = (f ° g) ° h)%F.
-Proof.
-intros * Hg (Hph, Hh).
-unfold "°", comp_list; cbn.
-rewrite map_map.
-apply map_ext_in.
-intros i Hi.
-unfold ff_app.
-rewrite (List_map_nth' 0); [ easy | ].
-rewrite Hg, <- Hh.
-now apply Hph.
-Qed.
-
 Theorem List_rank_not_None : ∀ n l i,
   is_permut n l
   → i < n
