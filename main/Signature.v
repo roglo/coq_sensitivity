@@ -1951,6 +1951,39 @@ rewrite (permut_inv_permut n); [ | easy | ]. 2: {
 now rewrite (permut_inv_permut n).
 Qed.
 
+Theorem permut_comp_permut_list_inv : ∀ l,
+  is_permut_list l
+  → l ° permut_list_inv l = seq 0 (length l).
+Proof.
+intros * Hp.
+unfold "°".
+unfold permut_list_inv.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi; apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+  rewrite fold_ff_app_permut_list_inv; [ | easy ].
+  now rewrite (permut_permut_inv (length l)).
+}
+apply map_id.
+Qed.
+
+Theorem comp_id_l : ∀ n l, is_permut n l → seq 0 n ° l = l.
+Proof.
+intros * Hp.
+unfold "°", ff_app.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite seq_nth. 2: {
+    destruct Hp as (Hp, Hl).
+    rewrite <- Hl.
+    now apply Hp.
+  }
+  apply Nat.add_0_l.
+}
+apply map_id.
+Qed.
+
 Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
 
 Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
@@ -2110,7 +2143,13 @@ rewrite permut_comp_assoc with (n := n); cycle 1. {
 } {
   now apply permut_list_inv_is_permut.
 }
-Search (_ ° permut_list_inv _ = id).
+rewrite permut_comp_permut_list_inv; [ | now destruct Hb ].
+rewrite comp_id_l. 2: {
+  apply permut_list_inv_is_permut.
+  destruct Ha as (Hap, Hal).
+  destruct Hb as (Hbp, Hbl).
+  now rewrite Hbl, <- Hal.
+}
 ...
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv la)) (h := ff_app la). 2: {
