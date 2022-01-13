@@ -1832,6 +1832,178 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+  intros i (_, Hi).
+  apply (permut_inv_permut n); [ | flia Hnz Hi ].
+  now apply comp_is_permut.
+}
+rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+replace n with (length (la ° lb)) at 1. 2: {
+  rewrite comp_length.
+  now destruct Hb as (Hbp, Hbl).
+}
+unfold ff_app at 1.
+rewrite <- List_map_nth_seq.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+    intros j (_, Hj).
+    apply (permut_inv_permut n); [ | flia Hnz Hj ].
+    now apply comp_is_permut.
+  }
+  rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  replace n with (length (la ° lb)) at 1. 2: {
+    rewrite comp_length.
+    now destruct Hb as (Hbp, Hbl).
+  }
+  unfold ff_app at 1.
+  rewrite <- List_map_nth_seq.
+  rewrite (permut_permut_inv n); [ | now apply comp_is_permut | ]. 2: {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    rewrite <- Hji.
+    destruct Ha as (Hap, Hal).
+    destruct Hb as (Hbp, Hbl).
+    rewrite <- Hal.
+    unfold ff_app.
+    apply Hap, nth_In.
+    rewrite Hal, <- Hbl.
+    now apply Hbp.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (permut_permut_inv n); [ | now apply comp_is_permut | ]. 2: {
+      apply in_map_iff in Hj.
+      destruct Hj as (k & Hkj & Hk).
+      rewrite <- Hkj.
+      destruct Ha as (Hap, Hal).
+      destruct Hb as (Hbp, Hbl).
+      rewrite <- Hal.
+      unfold ff_app.
+      apply Hap, nth_In.
+      rewrite Hal, <- Hbl.
+      now apply Hbp.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+symmetry.
+rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+  intros i (_, Hi).
+  apply (permut_inv_permut n); [ | flia Hnz Hi ].
+  now apply comp_is_permut.
+}
+rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+replace n with (length (la ° lb)) at 1. 2: {
+  rewrite comp_length.
+  now destruct Hb as (Hbp, Hbl).
+}
+unfold ff_app at 1.
+rewrite <- List_map_nth_seq.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv (la ° lb))) (h := ff_app (la ° lb)). 2: {
+    intros j (_, Hj).
+    apply (permut_inv_permut n); [ | flia Hnz Hj ].
+    now apply comp_is_permut.
+  }
+  rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  replace n with (length (la ° lb)) at 1. 2: {
+    rewrite comp_length.
+    now destruct Hb as (Hbp, Hbl).
+  }
+  unfold ff_app at 1.
+  rewrite <- List_map_nth_seq.
+  unfold "°" at 4.
+  assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
+  rewrite fold_comp_lt. 2: {
+    rewrite length_permut_list_inv.
+    now apply Hab.
+  }
+  rewrite fold_comp_lt. 2: {
+    rewrite length_permut_list_inv.
+    now apply Hab.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite fold_comp_lt. 2: {
+      rewrite length_permut_list_inv.
+      rewrite map_length.
+      destruct Hb as (Hbp, Hbl).
+      destruct Hab as (Habp, Habl).
+      rewrite Hbl, <- Habl.
+      now apply Habp.
+    }
+    rewrite fold_comp_lt. 2: {
+      rewrite length_permut_list_inv.
+      destruct Hab as (Habp, Habl).
+      now apply Habp.
+    }
+    replace (permut_list_inv (map (ff_app la) lb)) with
+        (permut_list_inv (la ° lb)) by easy.
+    easy.
+  }
+  easy.
+}
+symmetry.
+...
+rewrite rngl_product_change_var with
+    (g := ff_app (permut_list_inv la)) (h := ff_app la). 2: {
+  intros i (_, Hi).
+  apply (permut_inv_permut n); [ easy | flia Hi Hnz ].
+}
+rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+replace n with (length la) at 1 by now destruct Ha.
+unfold ff_app at 1.
+rewrite <- List_map_nth_seq.
+erewrite rngl_product_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_change_var with
+      (g := ff_app (permut_list_inv la)) (h := ff_app la). 2: {
+    intros j (_, Hj).
+    apply (permut_inv_permut n); [ easy | flia Hnz Hj ].
+  }
+  rewrite Nat.sub_0_r, <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  replace n with (length la) at 1 by now destruct Ha.
+  unfold ff_app at 1.
+  rewrite <- List_map_nth_seq.
+  rewrite (permut_permut_inv n); [ | easy | ]. 2: {
+    destruct Ha as (Hap, Hal).
+    rewrite <- Hal.
+    now apply Hap.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros j Hj.
+    rewrite (permut_permut_inv n); [ | easy | ]. 2: {
+      destruct Ha as (Hap, Hal).
+      rewrite <- Hal.
+      now apply Hap.
+    }
+    rewrite fold_comp_lt. 2: {
+      rewrite length_permut_list_inv.
+      now apply Ha.
+    }
+    rewrite fold_comp_lt. 2: {
+      rewrite length_permut_list_inv.
+      now apply Ha.
+    }
+    easy.
+  }
+  easy.
+}
+symmetry.
 ...
 
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
