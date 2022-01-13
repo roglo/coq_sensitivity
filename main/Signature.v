@@ -1810,6 +1810,30 @@ unfold ff_app.
 now rewrite (List_map_nth' 0).
 Qed.
 
+Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
+
+Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
+  ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → ∏ (i = 0, n - 1),
+       (∏ (j = 0, n - 1),
+          (if i <? j then sign_diff' (ff_app (la ° lb) j) (ff_app (la ° lb) i)
+           else 1)) =
+     ∏ (i = 0, n - 1),
+       (∏ (j = 0, n - 1),
+        (if i <? j then
+           sign_diff' (ff_app la j) (ff_app la i) *
+           sign_diff' (ff_app lb j) (ff_app lb i)
+         else 1)).
+Proof.
+intros Hif * Ha Hb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  now do 4 rewrite rngl_product_only_one.
+}
+...
+
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1833,12 +1857,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
-(* Tous les sign_diff devraient pouvoir être remplacés par une
-   fonction sign_diff' u v = si u < v alors -1 sinon 1 car, dans
-   le but, il ne peut pas arriver que sign_diff s'applique sur
-   des valeurs égales, cela parce que la et lb sont des
-   permutations *)
-Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1881,10 +1899,92 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ "<?" ].
-Print sign_diff'.
-(* on peut faire la même chose pour la partie droite, mais à quoi ça va
-   nous mener, tout ça ? *)
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (if i <? j then _ else _) with
+        (if i <? j then
+           (sign_diff' (ff_app la (j - 1)) (ff_app la (i - 1)) *
+            sign_diff' (ff_app lb (j - 1)) (ff_app lb (i - 1)))%F
+         else 1%F). 2: {
+      do 2 rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      unfold sign_diff', sign_diff.
+      f_equal. {
+        remember (ff_app la (j - 1) ?= ff_app la (i - 1)) as b1 eqn:Hb1.
+        symmetry in Hb1.
+        destruct b1. {
+          apply Nat.compare_eq_iff in Hb1.
+          destruct Ha as (Hap, Hal).
+          apply Hap in Hb1; [ | rewrite Hal; flia Hj | rewrite Hal; flia Hi ].
+          flia Hb1 Hij Hi Hj.
+        } {
+          apply Nat.compare_lt_iff in Hb1.
+          apply Nat.ltb_lt in Hb1.
+          now rewrite Hb1.
+        } {
+          apply Nat.compare_gt_iff in Hb1.
+          rewrite if_ltb_lt_dec.
+          destruct (lt_dec _ _) as [Hji| Hji]; [ | easy ].
+          flia Hb1 Hji.
+        }
+      } {
+        remember (ff_app lb (j - 1) ?= ff_app lb (i - 1)) as b1 eqn:Hb1.
+        symmetry in Hb1.
+        destruct b1. {
+          apply Nat.compare_eq_iff in Hb1.
+          destruct Hb as (Hbp, Hbl).
+          apply Hbp in Hb1; [ | rewrite Hbl; flia Hj | rewrite Hbl; flia Hi ].
+          flia Hb1 Hij Hi Hj.
+        } {
+          apply Nat.compare_lt_iff in Hb1.
+          apply Nat.ltb_lt in Hb1.
+          now rewrite Hb1.
+        } {
+          apply Nat.compare_gt_iff in Hb1.
+          rewrite if_ltb_lt_dec.
+          destruct (lt_dec _ _) as [Hji| Hji]; [ | easy ].
+          flia Hb1 Hji.
+        }
+      }
+    }
+    easy.
+  }
+  easy.
+}
+symmetry.
+rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
+rewrite rngl_product_shift; [ symmetry | now apply Nat.neq_0_lt_0 ].
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (1 + i <? 1 + j) with (i <? j) by easy.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    easy.
+  }
+  easy.
+}
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_shift; [ | now apply Nat.neq_0_lt_0 ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (1 + i <? 1 + j) with (i <? j) by easy.
+    rewrite (Nat.add_comm 1 i), Nat.add_sub.
+    rewrite (Nat.add_comm 1 j), Nat.add_sub.
+    easy.
+  }
+  easy.
+}
+symmetry.
+...
+now apply rngl_product_product_sign_diff'_comp.
 ...
 intros Hif * Ha Hb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
