@@ -122,21 +122,41 @@ destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 
 Theorem rngl_of_nat_sub :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp = true →
   ∀ i j,
-  i < j
-  → (rngl_of_nat j - rngl_of_nat i)%F = rngl_of_nat (j - i).
+  (rngl_of_nat j - rngl_of_nat i)%F =
+     if i <? j then rngl_of_nat (j - i)
+     else (- rngl_of_nat (i - j))%F.
 Proof.
-intros Hom * Hij.
-revert j Hij.
-induction i; intros; cbn. {
-  rewrite rngl_sub_0_r; f_equal; [ | easy ].
-  now destruct j.
+intros Hom *.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]. {
+  revert j Hij.
+  induction i; intros; cbn. {
+    rewrite rngl_sub_0_r; f_equal; [ | now left ].
+    now destruct j.
+  }
+  destruct j; [ easy | cbn ].
+  rewrite rngl_add_sub_simpl_l; [ | now left ].
+  apply IHi.
+  now apply Nat.succ_lt_mono in Hij.
+} {
+  apply Nat.nlt_ge in Hij.
+  revert j Hij.
+  induction i; intros; cbn. {
+    rewrite rngl_sub_0_r; f_equal; [ | now left ].
+    rewrite rngl_opp_0; [ | easy ].
+    now apply Nat.le_0_r in Hij; subst j.
+  }
+  destruct j. {
+    unfold rngl_sub; rewrite Hom; cbn.
+    now rewrite rngl_add_0_l.
+  }
+  cbn.
+  rewrite rngl_add_sub_simpl_l; [ | now left ].
+  apply IHi.
+  now apply Nat.succ_le_mono in Hij.
 }
-destruct j; [ easy | cbn ].
-rewrite rngl_add_sub_simpl_l; [ | easy ].
-apply IHi.
-now apply Nat.succ_lt_mono in Hij.
 Qed.
 
 Theorem rngl_of_nat_add : ∀ a b,
@@ -198,14 +218,16 @@ destruct ab. {
   apply nat_compare_lt in Hab.
   destruct (lt_dec b a) as [H| H]; [ flia Hab H | clear H ].
   rewrite <- rngl_opp_sub_distr; [ | easy ].
-  rewrite rngl_of_nat_sub; [ | now left | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
+  apply Nat.ltb_lt in Hab; rewrite Hab.
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
 } {
   apply nat_compare_gt in Hab.
   rewrite rngl_mul_1_l.
   destruct (lt_dec b a) as [H| H]; [ clear H | flia Hab H ].
-  apply rngl_of_nat_sub; [ now left | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
+  now apply Nat.ltb_lt in Hab; rewrite Hab.
 }
 Qed.
 
@@ -598,7 +620,9 @@ rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite rngl_of_nat_sub; [ | now left | flia Hj ].
+    rewrite rngl_of_nat_sub; [ | easy ].
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i j) as [Hij| Hij]; [ | flia Hj Hij ].
     easy.
   }
   cbn.
@@ -1316,7 +1340,8 @@ intros j Hj.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 f_equal; f_equal.
-apply rngl_of_nat_sub; [ now left | easy ].
+rewrite rngl_of_nat_sub; [ | easy ].
+now apply Nat.ltb_lt in Hij; rewrite Hij.
 Qed.
 
 Theorem signature_comp_fun_changement_of_variable :
@@ -1443,7 +1468,8 @@ rewrite product_product_if_permut; try easy. {
   do 2 rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   f_equal.
-  apply rngl_of_nat_sub; [ now left | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
+  now apply Nat.ltb_lt in Hij; rewrite Hij.
 } {
   now left.
 } {
@@ -1774,6 +1800,16 @@ rewrite map_length.
 now destruct Hp2.
 Qed.
 
+Theorem fold_comp_lt : ∀ la lb i,
+  i < length lb
+  → ff_app la (ff_app lb i) = ff_app (la ° lb) i.
+Proof.
+intros * Hib.
+unfold "°".
+unfold ff_app.
+now rewrite (List_map_nth' 0).
+Qed.
+
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -1797,80 +1833,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (if i <? j then _ else _) with
-      (if i <? j then
-         (rngl_of_nat (ff_app la (ff_app lb (j - 1))) -
-          rngl_of_nat (ff_app la (ff_app lb (i - 1)))) /
-         (rngl_of_nat (ff_app lb (j - 1)) - rngl_of_nat (ff_app lb (i - 1)))
-       else 1)%F. 2: {
-      do 2 rewrite if_ltb_lt_dec.
-      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-      unfold sign_diff.
-      remember (ff_app (la ° lb) (j - 1) ?= ff_app (la ° lb) (i - 1))
-        as b eqn:Hb1.
-      symmetry in Hb1.
-      destruct b. {
-        apply Nat.compare_eq_iff in Hb1.
-        assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
-        apply Hab in Hb1; cycle 1. {
-          rewrite comp_length.
-          destruct Hb as (Hbp, Hbl).
-          rewrite Hbl; flia Hj.
-        } {
-          rewrite comp_length.
-          destruct Hb as (Hbp, Hbl).
-          rewrite Hbl; flia Hi.
-        }
-        flia Hb1 Hij Hi Hj.
-      } {
-        apply Nat.compare_lt_iff in Hb1.
-        unfold "°" in Hb1.
-(*
-unfold ff_app in Hb1.
-rewrite (List_map_nth' 0) in Hb1.
-rewrite (List_map_nth' 0) in Hb1.
-do 4 rewrite fold_ff_app in Hb1.
-Search ((rngl_of_nat _ rngl_of_nat _)/ _)%F.
-...
-*)
-Theorem fold_comp : ∀ la lb i, ff_app la (ff_app lb i) = ff_app (la ° lb) i.
-Proof.
-intros.
-unfold "°".
-unfold ff_app.
-destruct (lt_dec i (length lb)) as [Hib| Hib]. {
-  now rewrite (List_map_nth' 0).
-}
-apply Nat.nlt_ge in Hib.
-rewrite (nth_overflow lb); [ | easy ].
-...
-        rewrite fold_comp.
-Search (ff_app _ (ff_app _ _)).
-        unfold "°" in Hb1.
-
-        rewrite rngl_of_nat_sub; [ | | ].
-Check rngl_of_nat_sub.
-Search (rngl_of_nat _ < _)
-...
-
-        now rewrite Hb1.
-      } {
-        apply Nat.compare_gt_iff in Hb1.
-        rewrite if_ltb_lt_dec.
-        destruct (lt_dec _ _) as [Hji| Hji]; [ | easy ].
-        flia Hb1 Hji.
-      }
-    }
-    easy.
-  }
-  easy.
-}
-cbn - [ "<?" ].
-...
 (* Tous les sign_diff devraient pouvoir être remplacés par une
    fonction sign_diff' u v = si u < v alors -1 sinon 1 car, dans
    le but, il ne peut pas arriver que sign_diff s'applique sur
@@ -1920,6 +1882,9 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
+Print sign_diff'.
+(* on peut faire la même chose pour la partie droite, mais à quoi ça va
+   nous mener, tout ça ? *)
 ...
 intros Hif * Ha Hb.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
