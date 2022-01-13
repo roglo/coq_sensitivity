@@ -1797,6 +1797,80 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_product_empty; [ | easy ].
   easy.
 }
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (if i <? j then _ else _) with
+      (if i <? j then
+         (rngl_of_nat (ff_app la (ff_app lb (j - 1))) -
+          rngl_of_nat (ff_app la (ff_app lb (i - 1)))) /
+         (rngl_of_nat (ff_app lb (j - 1)) - rngl_of_nat (ff_app lb (i - 1)))
+       else 1)%F. 2: {
+      do 2 rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      unfold sign_diff.
+      remember (ff_app (la ° lb) (j - 1) ?= ff_app (la ° lb) (i - 1))
+        as b eqn:Hb1.
+      symmetry in Hb1.
+      destruct b. {
+        apply Nat.compare_eq_iff in Hb1.
+        assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
+        apply Hab in Hb1; cycle 1. {
+          rewrite comp_length.
+          destruct Hb as (Hbp, Hbl).
+          rewrite Hbl; flia Hj.
+        } {
+          rewrite comp_length.
+          destruct Hb as (Hbp, Hbl).
+          rewrite Hbl; flia Hi.
+        }
+        flia Hb1 Hij Hi Hj.
+      } {
+        apply Nat.compare_lt_iff in Hb1.
+        unfold "°" in Hb1.
+(*
+unfold ff_app in Hb1.
+rewrite (List_map_nth' 0) in Hb1.
+rewrite (List_map_nth' 0) in Hb1.
+do 4 rewrite fold_ff_app in Hb1.
+Search ((rngl_of_nat _ rngl_of_nat _)/ _)%F.
+...
+*)
+Theorem fold_comp : ∀ la lb i, ff_app la (ff_app lb i) = ff_app (la ° lb) i.
+Proof.
+intros.
+unfold "°".
+unfold ff_app.
+destruct (lt_dec i (length lb)) as [Hib| Hib]. {
+  now rewrite (List_map_nth' 0).
+}
+apply Nat.nlt_ge in Hib.
+rewrite (nth_overflow lb); [ | easy ].
+...
+        rewrite fold_comp.
+Search (ff_app _ (ff_app _ _)).
+        unfold "°" in Hb1.
+
+        rewrite rngl_of_nat_sub; [ | | ].
+Check rngl_of_nat_sub.
+Search (rngl_of_nat _ < _)
+...
+
+        now rewrite Hb1.
+      } {
+        apply Nat.compare_gt_iff in Hb1.
+        rewrite if_ltb_lt_dec.
+        destruct (lt_dec _ _) as [Hji| Hji]; [ | easy ].
+        flia Hb1 Hji.
+      }
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+...
 (* Tous les sign_diff devraient pouvoir être remplacés par une
    fonction sign_diff' u v = si u < v alors -1 sinon 1 car, dans
    le but, il ne peut pas arriver que sign_diff s'applique sur
