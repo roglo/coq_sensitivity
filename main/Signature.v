@@ -2006,6 +2006,41 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+Print sign_diff'.
+Print ε.
+Print ε'.
+Print δ_nat.
+...
+i < j
+→ sign_diff' (ff_app p j) (ff_app p i) =
+    (rngl_of_nat (ff_app p j) - rngl_of_nat (ff_app p i)) / (j - i)
+(* ah oui, non, parce que, en fait, c'est pas divisible !
+   c'est divisible uniquement si on multiplie tous les termes et
+   qu'on divise par le *produit* des (j - i) *)
+...
+sign_diff' = λ u v : nat, if u <? v then (-1)%F else 1%F
+     : nat → nat → T
+
+ε = 
+λ p : list nat,
+  let n := length p in
+  ∏ (i = 1, n),
+  (∏ (j = 1, n),
+   (if i <? j then sign_diff (nth (j - 1) p 0) (nth (i - 1) p 0) else 1))
+     : list nat → T
+
+ε' = 
+λ p : list nat,
+  let n := length p in
+  (∏ (i = 1, n),
+   (∏ (j = 1, n), δ_nat i j (ff_app p (i - 1)) (ff_app p (j - 1))) /
+   ∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j i j))%F
+     : list nat → T
+
+δ_nat = 
+λ i j u v : nat, if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F
+     : nat → nat → nat → nat → T
+...
 Abort.
 End a.
 Arguments sign_diff' {T}%type {ro} (u v)%nat.
