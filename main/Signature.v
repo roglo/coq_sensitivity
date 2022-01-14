@@ -2006,6 +2006,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+...
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv lb)) (h := ff_app lb). 2: {
   intros i (_, Hi).
@@ -2070,6 +2071,25 @@ erewrite rngl_product_list_eq_compat. 2: {
 }
 cbn - [ "<?" ].
 (* remplacement de "i ∈ b" en "i = 0, n-1" *)
+rewrite rngl_product_change_list with (lb := seq 0 n); cycle 1. {
+  now destruct Hif.
+} {
+  now apply permut_list_Permutation.
+}
+rewrite rngl_product_seq_product; [ | easy ].
+rewrite Nat.add_0_l.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_product_change_list with (lb := seq 0 n); cycle 1. {
+    now destruct Hif.
+  } {
+    now apply permut_list_Permutation.
+  }
+  rewrite rngl_product_seq_product; [ | easy ].
+  rewrite Nat.add_0_l.
+  easy.
+}
+cbn - [ "<?" ].
 ...
 
     rewrite (permut_permut_inv n); [ | now apply comp_is_permut | ]. 2: {
