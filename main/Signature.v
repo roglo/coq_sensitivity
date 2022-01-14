@@ -1984,11 +1984,8 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-(*
 Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
-*)
 
-(*
 Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -2009,6 +2006,25 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+Abort.
+End a.
+Arguments sign_diff' {T}%type {ro} (u v)%nat.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Print sign_diff'.
+Open Scope Z_scope.
+Compute (let la := [0;3;1;2]%nat in let lb := [3;1;0;2]%nat in let n := length la in
+let ro := Z_ring_like_op in
+    map (λ i,
+       map (λ j : nat,
+          (if Nat.ltb i j then sign_diff' (ff_app (la ° lb) j) (ff_app (la ° lb) i)
+           else 0)) (seq 0 n)) (seq 0 n) =
+     map (λ i,
+       map (λ j,
+        (if Nat.ltb i j then
+           sign_diff' (ff_app la j) (ff_app la i) *
+           sign_diff' (ff_app lb j) (ff_app lb i)
+         else 0)) (seq 0 n)) (seq 0 n))%F.
 ...
 rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv lb)) (h := ff_app lb). 2: {
