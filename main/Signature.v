@@ -200,6 +200,19 @@ rewrite Nat.mul_comm.
 now apply rngl_of_nat_mul.
 Qed.
 
+Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
+
+Theorem rngl_sign_div_sub_abs :
+  ∀ a b,
+  sign_diff' a b =
+    ((rngl_of_nat b - rngl_of_nat a) / rngl_of_nat (abs_diff b a))%F.
+Proof.
+intros.
+unfold sign_diff', abs_diff.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec a b) as [Hab| Hab]. {
+...
+
 Theorem rngl_sub_is_mul_sign_abs :
   rngl_has_opp = true →
   ∀ a b,
@@ -1984,8 +1997,6 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
-
 Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -2011,6 +2022,13 @@ Print ε.
 Print ε'.
 Print δ_nat.
 Check rngl_sub_is_mul_sign_abs.
+Print sign_diff'.
+...
+erewrite rngl_product_eq_compat. 2: {
+  intros i (_, Hi).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite rngl_sign_div_sub_abs.
 ...
 i < j
 → sign_diff' (ff_app p j) (ff_app p i) =
