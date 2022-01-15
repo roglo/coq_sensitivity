@@ -2109,6 +2109,18 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 subst f.
+erewrite rngl_product_eq_compat. 2: {
+  intros i (_, Hi).
+  erewrite rngl_product_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite <- fold_comp_lt. 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hj Hnz.
+    }
+    easy.
+  }
+  easy.
+}
 symmetry.
 remember (ff_app la) as fa.
 remember (ff_app lb) as fb.
@@ -2156,6 +2168,10 @@ symmetry.
 subst fa fb.
 Check signature_comp_fun_expand_2_2.
 Check signature_comp_fun_changement_of_variable.
+(* ah oui, non, il commence à 1, lui *)
+...
+rewrite signature_comp_fun_changement_of_variable.
+...
 ...
 Print sign_diff'.
 Print ε.
