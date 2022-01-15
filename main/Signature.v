@@ -2010,6 +2010,7 @@ Print sign_diff'.
 Print ε.
 Print ε'.
 Print δ_nat.
+Check rngl_sub_is_mul_sign_abs.
 ...
 i < j
 → sign_diff' (ff_app p j) (ff_app p i) =
