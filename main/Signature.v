@@ -2154,7 +2154,6 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 subst fa fb.
-...
 Check signature_comp_fun_expand_2_2.
 Check signature_comp_fun_changement_of_variable.
 ...
