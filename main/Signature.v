@@ -2117,6 +2117,10 @@ erewrite rngl_product_eq_compat. 2: {
       destruct Hb as (Hbp, Hbl).
       rewrite Hbl; flia Hj Hnz.
     }
+    rewrite <- fold_comp_lt. 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite Hbl; flia Hi Hnz.
+    }
     easy.
   }
   easy.
@@ -2166,7 +2170,58 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 subst fa fb.
+erewrite rngl_product_rshift.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_rshift.
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i - 1 <? j - 1) with (i <? j). 2: {
+      remember (i <? j) as b1 eqn:Hb1; symmetry in Hb1.
+      remember (i - 1 <? j - 1) as b2 eqn:Hb2; symmetry in Hb2.
+      destruct b1, b2; cbn; try easy. {
+        apply Nat.ltb_lt in Hb1.
+        apply Nat.ltb_nlt in Hb2.
+        flia Hi Hj Hb1 Hb2.
+      } {
+        apply Nat.ltb_nlt in Hb1.
+        apply Nat.ltb_lt in Hb2.
+        flia Hi Hj Hb1 Hb2.
+      }
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ "<?" ].
+(* ah oui, non, c'est pas ça, j'ai un abs_diff en numérateur. *)
+...
+rewrite signature_comp_fun_changement_of_variable.
+...
 Check signature_comp_fun_expand_2_2.
+Check signature_comp_fun_changement_of_variable.
+...
+                         → ∏ (i = 1, n),
+                           (∏ (j = 1, n),
+                            (if i <? j
+                             then
+                              (rngl_of_nat (ff_app f (ff_app g (j - 1))) -
+                               rngl_of_nat (ff_app f (ff_app g (i - 1)))) /
+                              (rngl_of_nat (ff_app g (j - 1)) -
+                               rngl_of_nat (ff_app g (i - 1)))
+                             else 1)) =
+                           ∏ (i = 1, n),
+                           (∏ (j = 1, n),
+                            (if i <? j
+                             then
+                              (rngl_of_nat (ff_app f (j - 1)) -
+                               rngl_of_nat (ff_app f (i - 1))) /
+                              rngl_of_nat (j - i)
+                             else 1))
 Check signature_comp_fun_changement_of_variable.
 (* ah oui, non, il commence à 1, lui *)
 ...
