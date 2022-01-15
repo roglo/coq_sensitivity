@@ -202,17 +202,6 @@ Qed.
 
 Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
 
-Theorem rngl_sign_div_sub_abs :
-  ∀ a b,
-  sign_diff' a b =
-    ((rngl_of_nat b - rngl_of_nat a) / rngl_of_nat (abs_diff b a))%F.
-Proof.
-intros.
-unfold sign_diff', abs_diff.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec a b) as [Hab| Hab]. {
-...
-
 Theorem rngl_sub_is_mul_sign_abs :
   rngl_has_opp = true →
   ∀ a b,
@@ -241,6 +230,47 @@ destruct ab. {
   destruct (lt_dec b a) as [H| H]; [ clear H | flia Hab H ].
   rewrite rngl_of_nat_sub; [ | easy ].
   now apply Nat.ltb_lt in Hab; rewrite Hab.
+}
+Qed.
+
+Theorem rngl_sign_div_sub_abs :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_characteristic = 0 →
+  ∀ a b,
+  a ≠ b
+  → sign_diff' a b =
+       ((rngl_of_nat a - rngl_of_nat b) / rngl_of_nat (abs_diff a b))%F.
+Proof.
+intros Hop Hiv Hch * Hab.
+assert (Hnz : rngl_of_nat (abs_diff a b) ≠ 0%F). {
+  unfold abs_diff.
+  rewrite if_ltb_lt_dec.
+  intros H.
+  destruct (lt_dec b a) as [Hba| Hba]. {
+    apply eq_rngl_of_nat_0 in H; [ | easy ].
+    flia Hba H.
+  } {
+    apply eq_rngl_of_nat_0 in H; [ | easy ].
+    flia Hab Hba H.
+  }
+}
+apply rngl_mul_cancel_r with (c := rngl_of_nat (abs_diff a b)). {
+  now left.
+} {
+  easy.
+}
+rewrite rngl_div_mul; [ | easy | easy ].
+rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
+f_equal.
+unfold sign_diff', sign_diff.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec a b) as [Hab1| Hab1]. {
+  now apply Nat.compare_lt_iff in Hab1; rewrite Hab1.
+} {
+  apply Nat.nlt_ge in Hab1.
+  assert (H : b < a) by flia Hab Hab1.
+  now apply Nat.compare_gt_iff in H; rewrite H.
 }
 Qed.
 
@@ -2017,18 +2047,46 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
   now do 4 rewrite rngl_product_only_one.
 }
+assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
+move Hab before Hb.
+destruct Hif as (Hic & Hop & Hinv & H10 & Hed & Hit & Hch).
+remember (ff_app (la ° lb)) as f eqn:Hf.
+replace
+  (∏ (i = 0, n - 1),
+     (∏ (j = 0, n - 1), (if i <? j then sign_diff' (f j) (f i) else 1)))
+  with
+  (∏ (i = 0, n - 1),
+     (∏ (j = 0, n - 1),
+        (if i <? j then
+           ((rngl_of_nat (f j) - rngl_of_nat (f i)) /
+            rngl_of_nat (abs_diff (f j) (f i)))%F
+         else 1))). 2: {
+  apply rngl_product_eq_compat.
+  intros i (_, Hi).
+  apply rngl_product_eq_compat.
+  intros j (_, Hj).
+  do 2 rewrite if_ltb_lt_dec.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+  symmetry.
+  apply rngl_sign_div_sub_abs; [ easy | easy | easy | ].
+  intros H; subst f.
+  destruct Hb as (Hbp, Hbl).
+  apply Hab in H; cycle 1. {
+    rewrite comp_length, Hbl; flia Hj Hnz.
+  } {
+    rewrite comp_length, Hbl; flia Hi Hnz.
+  }
+  now rewrite H in Hij; apply Nat.lt_irrefl in Hij.
+}
+subst f.
+Check signature_comp_fun_changement_of_variable.
+...
 Print sign_diff'.
 Print ε.
 Print ε'.
 Print δ_nat.
 Check rngl_sub_is_mul_sign_abs.
 Print sign_diff'.
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros i (_, Hi).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    rewrite rngl_sign_div_sub_abs.
 ...
 i < j
 → sign_diff' (ff_app p j) (ff_app p i) =
