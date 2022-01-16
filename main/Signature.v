@@ -2198,8 +2198,9 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-(* ah oui, non, c'est pas ça, j'ai un abs_diff en numérateur. *)
+Check signature_comp_fun_expand_2_1.
 ...
+(* ah oui, non, c'est pas ça, j'ai un abs_diff en numérateur. *)
 rewrite signature_comp_fun_changement_of_variable.
 ...
 Check signature_comp_fun_expand_2_2.
