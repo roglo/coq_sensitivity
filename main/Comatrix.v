@@ -2517,8 +2517,15 @@ rewrite List_map_nth_seq with (la := ll) (d := []) at 1.
 rewrite List_seq_cut with (i := i); [ | now apply in_seq ].
 rewrite Nat.sub_0_r, Nat.add_0_l.
 do 2 rewrite map_app.
-rewrite butn_app; [ cbn | symmetry; apply List_map_seq_length ].
-rewrite butn_app; [ cbn | symmetry; apply List_map_seq_length ].
+do 3 rewrite butn_app.
+do 2 rewrite List_map_seq_length.
+rewrite Nat.ltb_irrefl.
+rewrite Nat.sub_diag.
+rewrite map_length.
+replace (0 <? length [i]) with true by easy.
+rewrite <- map_butn.
+rewrite app_nil_l.
+remember (butn 0 _) as x; cbn in Heqx; subst x.
 f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
@@ -3180,7 +3187,7 @@ Proof.
 intros Hop *.
 unfold minus_one_pow.
 destruct (i mod 2); [ apply rngl_mul_1_l | ].
-now apply rngl_sqr_opp_1.
+now apply rngl_squ_opp_1.
 Qed.
 
 Theorem comatrix_mul :
