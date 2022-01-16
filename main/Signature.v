@@ -2058,6 +2058,7 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
+(*
 Theorem rngl_product_product_sign_diff'_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
@@ -2590,6 +2591,7 @@ symmetry.
 ...
 *)
 
+(*
 Theorem rngl_product_product_sign_diff_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
