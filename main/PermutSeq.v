@@ -316,6 +316,10 @@ Definition transposition i j k :=
 Definition list_swap_elem {A} d (l : list A) i j :=
   map (λ k, nth (transposition i j k) l d) (seq 0 (length l)).
 
+Theorem fold_transposition : ∀ i j k,
+  (if k =? i then j else if k =? j then i else k) = transposition i j k.
+Proof. easy. Qed.
+
 Theorem transposition_lt : ∀ i j k n,
   i < n
   → j < n
