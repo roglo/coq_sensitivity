@@ -1166,6 +1166,56 @@ intros i Hi.
 apply transposition_comm.
 Qed.
 
+Theorem comp_is_permut_list : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut_list (σ₁ ° σ₂).
+Proof.
+intros * (Hp11, Hp12) (Hp21, Hp22).
+split. {
+  intros i Hi.
+  unfold comp_list in Hi |-*.
+  rewrite map_length.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hji & Hj).
+  subst i.
+  rewrite Hp22, <- Hp12.
+  apply permut_list_ub; [ easy | ].
+  apply Hp21 in Hj.
+  congruence.
+} {
+  unfold comp_list.
+  rewrite map_length.
+  intros i j Hi Hj.
+  unfold ff_app.
+  rewrite (List_map_nth' 0); [ | easy ].
+  rewrite (List_map_nth' 0); [ | easy ].
+  intros Hij.
+  apply Hp11 in Hij; cycle 1. {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  } {
+    rewrite Hp12, <- Hp22.
+    now apply Hp21, nth_In.
+  }
+  now apply Hp21 in Hij.
+}
+Qed.
+
+Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list_scope.
+
+Theorem comp_is_permut : ∀ n σ₁ σ₂,
+  is_permut n σ₁
+  → is_permut n σ₂
+  → is_permut n (σ₁ ° σ₂).
+Proof.
+intros * Hp1 Hp2.
+split; [ now apply (comp_is_permut_list n) | ].
+unfold "°".
+rewrite map_length.
+now destruct Hp2.
+Qed.
+
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 (* perhaps it is possible not to go through ε' to prove this
@@ -1188,41 +1238,7 @@ Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
 intros Hif * (Hfp, Hfn) (Hgp, Hgn) Hs.
-rewrite <- ε'_ε; [ | easy | ]. 2: {
-  split. {
-    intros i Hi.
-    unfold "°" in Hi |-*.
-    rewrite map_length, Hgn.
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj).
-    subst i.
-    unfold ff_app.
-    rewrite <- Hfn.
-    apply Hfp.
-    apply nth_In.
-    rewrite Hfn, <- Hgn.
-    now apply Hgp.
-  } {
-    intros i j Hi Hj Hij.
-    unfold "°" in Hi, Hj.
-    rewrite map_length, Hgn in Hi, Hj.
-    unfold "°" in Hij; cbn in Hij.
-    unfold ff_app in Hij.
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hgn ].
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite Hgn ].
-    apply Hfp in Hij; cycle 1. {
-      rewrite Hfn, <- Hgn.
-      apply Hgp, nth_In.
-      now rewrite Hgn.
-    } {
-      rewrite Hfn, <- Hgn.
-      apply Hgp, nth_In.
-      now rewrite Hgn.
-    }
-    apply Hgp in Hij; [ | now rewrite Hgn | now rewrite Hgn ].
-    easy.
-  }
-}
+rewrite <- ε'_ε; [ | easy | now apply (comp_is_permut_list n) ].
 rewrite <- ε'_ε; [ | easy | easy ].
 rewrite <- ε'_ε; [ | easy | easy ].
 unfold ε', comp_list; cbn.
@@ -1822,56 +1838,6 @@ intros Hop * Hab Hcd.
 rewrite sign_diff'_sign_diff; [ | easy ].
 rewrite sign_diff'_sign_diff; [ | easy ].
 now apply sign_diff_mul.
-Qed.
-
-Theorem comp_is_permut_list : ∀ n σ₁ σ₂,
-  is_permut n σ₁
-  → is_permut n σ₂
-  → is_permut_list (σ₁ ° σ₂).
-Proof.
-intros * (Hp11, Hp12) (Hp21, Hp22).
-split. {
-  intros i Hi.
-  unfold comp_list in Hi |-*.
-  rewrite map_length.
-  apply in_map_iff in Hi.
-  destruct Hi as (j & Hji & Hj).
-  subst i.
-  rewrite Hp22, <- Hp12.
-  apply permut_list_ub; [ easy | ].
-  apply Hp21 in Hj.
-  congruence.
-} {
-  unfold comp_list.
-  rewrite map_length.
-  intros i j Hi Hj.
-  unfold ff_app.
-  rewrite (List_map_nth' 0); [ | easy ].
-  rewrite (List_map_nth' 0); [ | easy ].
-  intros Hij.
-  apply Hp11 in Hij; cycle 1. {
-    rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
-  } {
-    rewrite Hp12, <- Hp22.
-    now apply Hp21, nth_In.
-  }
-  now apply Hp21 in Hij.
-}
-Qed.
-
-Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list_scope.
-
-Theorem comp_is_permut : ∀ n σ₁ σ₂,
-  is_permut n σ₁
-  → is_permut n σ₂
-  → is_permut n (σ₁ ° σ₂).
-Proof.
-intros * Hp1 Hp2.
-split; [ now apply (comp_is_permut_list n) | ].
-unfold "°".
-rewrite map_length.
-now destruct Hp2.
 Qed.
 
 Theorem fold_comp_lt : ∀ la lb i,
