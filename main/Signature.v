@@ -33,16 +33,17 @@ Definition ε (p : list nat) :=
    if i <? j then sign_diff (nth (j - 1) p 0)%nat (nth (i - 1) p 0)%nat
    else 1)%F.
 
-Definition δ_nat i j u v :=
-  if i <? j then (rngl_of_nat v - rngl_of_nat u)%F else 1%F.
+Definition rngl_sub_nat i j := (rngl_of_nat i - rngl_of_nat j)%F.
 
 (* other definition of ε *)
 
 Definition ε' (p : list nat) :=
   let n := length p in
   ((∏ (i = 1, n), ∏ (j = 1, n),
-    δ_nat i j (ff_app p (i - 1)) (ff_app p (j - 1))) /
-   (∏ (i = 1, n), ∏ (j = 1, n), δ_nat i j i j))%F.
+    if i <? j then rngl_sub_nat (ff_app p (j - 1)) (ff_app p (i - 1))
+    else 1) /
+   (∏ (i = 1, n), ∏ (j = 1, n),
+    if i <? j then rngl_sub_nat j i else 1))%F.
 
 Definition minus_one_pow n :=
   match n mod 2 with
@@ -674,7 +675,7 @@ Theorem ε'_ε : in_charac_0_field →
   → ε' p = ε p.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
-unfold ε', ε, δ_nat.
+unfold ε', ε, rngl_sub_nat.
 do 3 rewrite rngl_product_product_if.
 rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
   intros i Hi.
@@ -1227,29 +1228,36 @@ Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   → is_permut n g
   → (∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ_nat i j (ff_app f (ff_app g (i - 1)))
-           (ff_app f (ff_app g (j - 1)))) /
+         if i <? j then
+           rngl_sub_nat
+             (ff_app f (ff_app g (j - 1)))
+             (ff_app f (ff_app g (i - 1)))
+         else 1) /
       ∏ (i = 1, n),
         (∏ (j = 1, n),
-         δ_nat i j (ff_app g (i - 1)) (ff_app g (j - 1))))%F =
+         if i <? j then
+           rngl_sub_nat (ff_app g (j - 1)) (ff_app g (i - 1))
+         else 1))%F =
     (∏ (i = 1, n),
-       (∏ (j = 1, n), δ_nat i j (ff_app f (i - 1)) (ff_app f (j - 1))) /
-      ∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j i j))%F
+       (∏ (j = 1, n),
+        if i <? j then rngl_sub_nat (ff_app f (j - 1)) (ff_app f (i - 1))
+        else 1) /
+      ∏ (i = 1, n), (∏ (j = 1, n), if i <? j then rngl_sub_nat j i else 1))%F
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
 intros Hif * (Hfp, Hfn) (Hgp, Hgn) Hs.
 rewrite <- ε'_ε; [ | easy | now apply (comp_is_permut_list n) ].
 rewrite <- ε'_ε; [ | easy | easy ].
 rewrite <- ε'_ε; [ | easy | easy ].
-unfold ε', comp_list; cbn.
+unfold ε', comp_list; cbn - [ "<?" ].
 rewrite map_length, Hfn, Hgn.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     unfold ff_app.
-    rewrite (List_map_nth' 0); [ | flia Hi Hgn ].
     rewrite (List_map_nth' 0); [ | flia Hj Hgn ].
+    rewrite (List_map_nth' 0); [ | flia Hi Hgn ].
     easy.
   }
   easy.
@@ -1262,7 +1270,6 @@ apply rngl_product_integral in Hij; [ | now left | easy | easy ].
 destruct Hij as (i & Hi & Hij).
 apply rngl_product_integral in Hij; [ | now left | easy | easy ].
 destruct Hij as (j & Hj & Hij).
-unfold δ_nat in Hij.
 rewrite if_ltb_lt_dec in Hij.
 destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
 apply rngl_sub_move_0_r in Hij; [ | easy ].
@@ -1281,10 +1288,15 @@ Theorem signature_comp_fun_expand_2_1 :
   is_permut n g
   → (∏ (i = 1, n),
       (∏ (j = 1, n),
-       δ_nat i j (ff_app f (ff_app g (i - 1)))
-         (ff_app f (ff_app g (j - 1)))) /
+       if i <? j then
+         rngl_sub_nat
+           (ff_app f (ff_app g (j - 1)))
+           (ff_app f (ff_app g (i - 1)))
+       else 1) /
      ∏ (i = 1, n),
-      (∏ (j = 1, n), δ_nat i j (ff_app g (i - 1)) (ff_app g (j - 1))))%F =
+      (∏ (j = 1, n),
+       if i <? j then rngl_sub_nat (ff_app g (j - 1)) (ff_app g (i - 1))
+       else 1))%F =
     (∏ (i = 1, n),
       (∏ (j = 1, n),
        (if i <? j then
@@ -1302,7 +1314,6 @@ rewrite rngl_inv_product_comm; [ | | easy | easy | easy | easy | ]; cycle 1. {
   apply rngl_product_integral in Hij; [ | now left | easy | easy ].
   destruct Hij as (j & Hj & Hij).
   rewrite <- Hn in Hi, Hj.
-  unfold δ_nat in Hij.
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
@@ -1316,7 +1327,6 @@ erewrite rngl_product_eq_compat. 2: {
       [ | now left | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
     rewrite <- Hn in Hi, Hj.
-    unfold δ_nat in Hij.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
@@ -1332,7 +1342,6 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     move j before i.
-    unfold δ_nat.
     rewrite rngl_inv_if_then_else_distr.
     rewrite rngl_mul_if_then_else_distr.
     rewrite fold_rngl_div; [ | easy ].
@@ -1355,8 +1364,12 @@ Theorem signature_comp_fun_expand_2_2 :
   rngl_is_integral = true →
   rngl_characteristic = 0 →
   ∀ n f,
-  (∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j (f (i - 1)%nat) (f (j - 1)%nat)) /
-   ∏ (i = 1, n), (∏ (j = 1, n), δ_nat i j i j))%F =
+  (∏ (i = 1, n),
+   (∏ (j = 1, n),
+    if i <? j then rngl_sub_nat (f (j - 1)%nat) (f (i - 1)%nat) else 1) /
+   ∏ (i = 1, n),
+   (∏ (j = 1, n),
+    if i <? j then rngl_sub_nat j i else 1))%F =
   (∏ (i = 1, n),
    (∏ (j = 1, n),
     (if i <? j then
@@ -1370,7 +1383,6 @@ rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: 
   intros i Hi Hij.
   apply rngl_product_integral in Hij; [ | now left | easy | easy ].
   destruct Hij as (j & Hj & Hij).
-  unfold δ_nat in Hij.
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply rngl_sub_move_0_r in Hij; [ | easy ].
@@ -1383,7 +1395,6 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_inv_product_comm;
       [ | now left | easy | easy | easy | easy | ]. 2: {
     intros j Hj Hij.
-    unfold δ_nat in Hij.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply rngl_sub_move_0_r in Hij; [ | easy ].
@@ -1398,7 +1409,6 @@ erewrite rngl_product_eq_compat. 2: {
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     move j before i.
-    unfold δ_nat.
     rewrite rngl_inv_if_then_else_distr.
     rewrite rngl_mul_if_then_else_distr.
     rewrite fold_rngl_div; [ | easy ].
@@ -1416,6 +1426,7 @@ intros j Hj.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 f_equal; f_equal.
+unfold rngl_sub_nat.
 rewrite rngl_of_nat_sub; [ | easy ].
 now apply Nat.ltb_lt in Hij; rewrite Hij.
 Qed.
@@ -2418,7 +2429,6 @@ Qed.
 
 End a.
 
-Arguments δ_nat {T}%type {ro} (i j u v)%nat.
 Arguments ε' {T}%type {ro} p%list.
 Arguments ε {T}%type {ro}.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
