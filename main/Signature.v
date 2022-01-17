@@ -27,8 +27,24 @@ Definition sign_diff u v :=
   end.
 Definition abs_diff u v := if v <? u then u - v else v - u.
 
-(* changer les 1,n en 0,n-1 *)
-...
+(* changer les 1,n en 0,n-1 ainsi
+
+Definition ε (p : list nat) :=
+  let n := length p in
+  ∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
+  if i <? j then sign_diff (ff_app p j) (ff_app p i) else 1.
+
+Definition rngl_sub_nat i j := (rngl_of_nat i - rngl_of_nat j)%F.
+
+(* other definition of ε *)
+
+Definition ε' (p : list nat) :=
+  let n := length p in
+  ((∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
+    if i <? j then rngl_sub_nat (ff_app p j) (ff_app p i) else 1) /
+   (∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
+    if i <? j then rngl_sub_nat j i else 1))%F.
+*)
 
 Definition ε (p : list nat) :=
   let n := length p in
