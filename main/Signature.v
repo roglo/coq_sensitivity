@@ -2264,13 +2264,7 @@ destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
 remember (canon_sym_gr_list  n (k mod n!)) as σ' eqn:Hσ'.
 specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
-unfold ff_app in H1.
-...
 do 2 rewrite H1.
-destruct j; [ flia Hj | ].
-destruct i; [ flia Hi | ].
-rewrite Nat_sub_succ_1.
-rewrite Nat_sub_succ_1.
 unfold succ_when_ge, Nat.b2n.
 do 2 rewrite if_leb_le_dec.
 remember ((k <? n!) && (n <=? i))%bool as bi eqn:Hbi.
@@ -2281,38 +2275,38 @@ destruct bi. {
   apply Bool.andb_true_iff in Hbi.
   destruct Hbi as (Hkni, Hni).
   apply Nat.leb_le in Hni.
-  flia Hi Hni.
+  flia Hi Hni Hnz.
 }
 destruct bj. {
   apply Bool.andb_true_iff in Hbj.
   destruct Hbj as (Hknj, Hnj).
   apply Nat.leb_le in Hnj.
-  flia Hj Hnj.
+  flia Hj Hnj Hnz.
 }
 apply Bool.andb_false_iff in Hbi, Hbj.
 unfold sign_diff.
-destruct (le_dec (k / n!) (nth j σ' 0)) as [Hsfj| Hsfj]. {
-  destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
+destruct (le_dec (k / n!) (ff_app σ' j)) as [Hsfj| Hsfj]. {
+  destruct (le_dec (k / n!) (ff_app σ' i)) as [Hsfi| Hsfi]. {
     now do 2 rewrite Nat.add_1_r.
   }
   rewrite Nat.add_0_r.
-  replace (nth j σ' 0 + 1 ?= nth i σ' 0) with Gt. 2: {
+  replace (ff_app σ' j + 1 ?= ff_app σ' i) with Gt. 2: {
     symmetry; apply Nat.compare_gt_iff.
     flia Hsfi Hsfj.
   }
-  replace (nth j σ' 0 ?= nth i σ' 0) with Gt. 2: {
+  replace (ff_app σ' j ?= ff_app σ' i) with Gt. 2: {
     symmetry; apply Nat.compare_gt_iff.
     flia Hsfi Hsfj.
   }
   easy.
 }
-destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
+destruct (le_dec (k / n!) (ff_app σ' i)) as [Hsfi| Hsfi]. {
   rewrite Nat.add_0_r.
-  replace (nth j σ' 0 ?= nth i σ' 0 + 1) with Lt. 2: {
+  replace (ff_app σ' j ?= ff_app σ' i + 1) with Lt. 2: {
     symmetry; apply Nat.compare_lt_iff.
     flia Hsfi Hsfj.
   }
-  replace (nth j σ' 0 ?= nth i σ' 0) with Lt. 2: {
+  replace (ff_app σ' j ?= ff_app σ' i) with Lt. 2: {
     symmetry; apply Nat.compare_lt_iff.
     flia Hsfi Hsfj.
   }
@@ -2320,8 +2314,6 @@ destruct (le_dec (k / n!) (nth i σ' 0)) as [Hsfi| Hsfi]. {
 }
 now do 2 rewrite Nat.add_0_r.
 Qed.
-
-...
 
 Theorem canon_sym_gr_surjective : ∀ n k j,
   k < fact n
@@ -2340,18 +2332,22 @@ Theorem ε_1_opp_1 :
 Proof.
 intros Hop * Hσ.
 unfold ε.
+destruct (le_dec (length σ) 1) as [Hn1| Hn1]. {
+  replace (length σ - 1) with 0 by flia Hn1.
+  now do 2 rewrite rngl_product_only_one; cbn; left.
+}
 apply rngl_product_1_opp_1; [ easy | ].
 intros i Hi.
 apply rngl_product_1_opp_1; [ easy | ].
 intros j Hj.
 unfold sign_diff.
 rewrite if_ltb_lt_dec.
-remember (nth (j - 1) σ 0 ?= nth (i - 1) σ 0) as b eqn:Hb.
+remember (ff_app σ j ?= ff_app σ i) as b eqn:Hb.
 symmetry in Hb.
 destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
 destruct b; [ | now right | now left ].
 apply Nat.compare_eq_iff in Hb.
-apply Hσ in Hb; [ | flia Hj | flia Hi ].
+apply Hσ in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
 flia Hi Hj Hb Hij.
 Qed.
 
