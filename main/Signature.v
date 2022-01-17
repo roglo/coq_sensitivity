@@ -27,6 +27,9 @@ Definition sign_diff u v :=
   end.
 Definition abs_diff u v := if v <? u then u - v else v - u.
 
+(* changer les 1,n en 0,n-1 *)
+...
+
 Definition ε (p : list nat) :=
   let n := length p in
   (∏ (i = 1, n), ∏ (j = 1, n),
