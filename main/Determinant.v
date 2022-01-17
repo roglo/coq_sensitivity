@@ -105,7 +105,7 @@ induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
   unfold ε, iter_seq, iter_list; cbn.
-  symmetry; apply rngl_mul_1_l.
+  now do 3 rewrite rngl_mul_1_l.
 }
 rewrite determinant_succ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
