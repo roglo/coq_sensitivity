@@ -111,6 +111,27 @@ rewrite seq_app; cbn.
 now rewrite Nat.add_1_r.
 Qed.
 
+Theorem iter_shift : ∀ {T} s b k f (d : T),
+  s ≤ b ≤ k
+  → iter_seq b k f d =
+    iter_seq (b - s) (k - s) (λ c i, f c (s + i)) d.
+Proof.
+intros * (Hsb, Hbk).
+unfold iter_seq, iter_list.
+replace (S (k - s) - (b - s)) with (S (k - b)) by flia Hsb Hbk.
+rewrite <- Nat.sub_succ_l; [ | easy ].
+remember (S k - b)%nat as len; clear Heqlen.
+clear k Hbk.
+revert b d Hsb.
+induction len; intros; [ easy | ].
+rewrite seq_S; symmetry.
+rewrite seq_S; symmetry.
+do 2 rewrite fold_left_app; cbn.
+rewrite IHlen; [ | easy ].
+now replace (s + (b - s + len)) with (b + len) by flia Hsb.
+Qed.
+
+(*
 Theorem iter_shift : ∀ {T} b k f (d : T),
   b ≤ k
   → iter_seq b k f d =
@@ -129,6 +150,7 @@ rewrite seq_S; symmetry.
 do 2 rewrite fold_left_app; cbn.
 now rewrite IHlen.
 Qed.
+*)
 
 Theorem fold_right_max_ge : ∀ m l, m ≤ fold_right max m l.
 Proof.
@@ -2014,5 +2036,6 @@ Notation "a ∨∨ b" := (sumbool_or a b) (at level 85).
 Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
+Arguments iter_shift {T}%type s [b k]%nat.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.

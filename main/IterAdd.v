@@ -201,13 +201,12 @@ apply iter_seq_distr. {
 }
 Qed.
 
-Theorem rngl_summation_shift : ∀ b g k,
-  b ≤ k
-  → (∑ (i = b, k), g i =
-     ∑ (i = 0, k - b), g (b + i)%nat)%F.
+Theorem rngl_summation_shift : ∀ s b g k,
+  s ≤ b ≤ k
+  → ∑ (i = b, k), g i = ∑ (i = b - s, k - s), g (s + i)%nat.
 Proof.
-intros b g k Hbk.
-now apply iter_shift.
+intros s b g k Hbk.
+now apply (iter_shift s).
 Qed.
 
 Theorem rngl_summation_rshift : ∀ b e f,
@@ -466,14 +465,14 @@ destruct b. {
   rewrite rngl_summation_empty; [ | easy ].
   now symmetry; apply all_0_rngl_summation_0.
 }
-rewrite rngl_summation_shift; [ | cbn; flia ].
+rewrite (rngl_summation_shift 1); [ | cbn; flia ].
 symmetry.
-rewrite rngl_summation_shift; [ | cbn; flia ].
+rewrite (rngl_summation_shift 1); [ | cbn; flia ].
 rewrite Nat_sub_succ_1.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite Nat.add_comm, Nat.add_sub.
-  rewrite rngl_summation_shift; [ | flia ].
+  rewrite (rngl_summation_shift 1); [ | flia ].
   rewrite Nat_sub_succ_1.
   remember (S b) as b'; cbn; subst b'.
   easy.
@@ -491,6 +490,7 @@ rewrite Nat.add_sub_swap; [ | cbn; flia ].
 rewrite rngl_summation_ub_add_distr.
 rewrite IHa.
 symmetry.
+do 3 rewrite Nat_sub_succ_1.
 rewrite <- Nat.add_1_r at 1.
 rewrite rngl_summation_ub_add_distr.
 f_equal.
@@ -499,7 +499,8 @@ rewrite rngl_summation_only_one.
 replace (S (S a * S b - 1)) with (S a * S b) by (cbn; flia).
 replace (S a * S b - 1 + S b) with (S a * S b + b) by (cbn; flia).
 symmetry.
-rewrite rngl_summation_shift; [ | flia ].
+rewrite (rngl_summation_shift (S a * S b)); [ | flia ].
+rewrite Nat.sub_diag.
 rewrite Nat.add_sub_swap; [ | easy ].
 rewrite Nat.sub_diag, Nat.add_0_l.
 apply rngl_summation_eq_compat.
@@ -539,7 +540,10 @@ rewrite Nat.sub_0_r.
 rewrite (Nat.add_comm b).
 rewrite rngl_summation_ub_add_distr.
 rewrite (rngl_summation_split_last _ (S a * S b)); [ | cbn; flia ].
+symmetry.
 rewrite (rngl_summation_shift 1); [ | cbn; flia ].
+symmetry.
+rewrite Nat.sub_diag.
 rewrite <- rngl_add_assoc.
 f_equal. {
   apply rngl_summation_eq_compat.
@@ -555,7 +559,10 @@ f_equal. {
     rewrite rngl_summation_empty; [ | flia ].
     now rewrite rngl_add_0_r.
   }
+  symmetry.
   rewrite (rngl_summation_shift (S (S a * S (S b)))); [ | flia ].
+  symmetry.
+  rewrite Nat.sub_diag.
   replace (S a * S (S b) + S b - S (S a * S (S b))) with b. 2: {
     cbn.
     rewrite <- Nat.add_succ_l.
@@ -752,6 +759,7 @@ Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
+Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
 Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
 Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.

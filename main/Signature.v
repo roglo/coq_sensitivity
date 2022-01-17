@@ -456,7 +456,8 @@ symmetry.
 rewrite rngl_product_seq_product; [ | easy ].
 cbn - [ seq ].
 rewrite rngl_product_split_last; [ | flia Hnz ].
-rewrite rngl_product_shift; [ | flia Hnz Hn1 ].
+rewrite (rngl_product_shift 1); [ | flia Hnz Hn1 ].
+rewrite Nat.sub_diag.
 rewrite Nat.sub_add; [ | flia Hnz ].
 unfold iter_seq.
 rewrite Nat.sub_0_r.
@@ -496,7 +497,8 @@ rewrite rngl_mul_1_l.
 rewrite rngl_product_seq_product; [ | easy ].
 cbn - [ seq ].
 rewrite rngl_product_split_last; [ | flia Hnz ].
-rewrite rngl_product_shift; [ | flia Hnz Hn1 ].
+rewrite (rngl_product_shift 1); [ | flia Hnz Hn1 ].
+rewrite Nat.sub_diag.
 unfold iter_seq.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz Hn1 ].
@@ -519,7 +521,8 @@ symmetry.
 rewrite rngl_product_seq_product; [ | easy ].
 cbn - [ seq ].
 rewrite rngl_product_split_last; [ | flia Hnz ].
-rewrite rngl_product_shift; [ | flia Hnz Hn1 ].
+rewrite (rngl_product_shift 1); [ | flia Hnz Hn1 ].
+rewrite Nat.sub_diag.
 unfold iter_seq.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hnz Hn1 ].
@@ -691,7 +694,8 @@ rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
     subst i.
     rewrite rngl_product_empty; [ now apply rngl_1_neq_0 | flia ].
   }
-  rewrite rngl_product_shift; [ | flia Hi Hein ].
+  rewrite (rngl_product_shift (i + 1)); [ | flia Hi Hein ].
+  rewrite Nat.sub_diag.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     replace (i + 1 + j - i) with (S j) by flia.
@@ -790,7 +794,8 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "-" ].
-erewrite rngl_product_shift; [ | flia Hnz ].
+erewrite (rngl_product_shift 1); [ | flia Hnz ].
+rewrite Nat.sub_diag.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   rewrite (Nat.add_comm 1).
@@ -979,10 +984,12 @@ intros Hic Hop * Hpq Hq.
 unfold ε; cbn - [ "<?" ].
 rewrite List_map_seq_length.
 unfold sign_diff.
-rewrite rngl_product_shift; [ | flia Hq ].
+rewrite (rngl_product_shift 1); [ | flia Hq ].
+rewrite Nat.sub_diag.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_product_shift; [ | flia Hq ].
+  rewrite (rngl_product_shift 1); [ | flia Hq ].
+  rewrite Nat.sub_diag.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite (Nat.add_comm 1 j), Nat.add_sub.
@@ -1458,7 +1465,8 @@ Theorem signature_comp_fun_changement_of_variable :
 Proof.
 intros Hop Hin Hic Hde H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
-rewrite rngl_product_shift; [ | flia Hnz ].
+rewrite (rngl_product_shift 1); [ | flia Hnz ].
+rewrite Nat.sub_diag.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1477,7 +1485,8 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
   rewrite rngl_product_change_var with
       (g := ff_app (permut_list_inv g)) (h := ff_app g). 2: {
     intros j Hj.
@@ -1527,10 +1536,12 @@ erewrite rngl_product_change_list; [ | easy | ]. 2: {
   now apply permut_list_Permutation.
 }
 symmetry.
-rewrite rngl_product_shift; [ | flia Hnz ].
+rewrite (rngl_product_shift 1); [ | flia Hnz ].
+rewrite Nat.sub_diag.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
     rewrite Nat_ltb_mono_l.
@@ -2135,7 +2146,8 @@ rewrite rngl_product_succ_succ.
 rewrite rngl_product_split_first; [ | easy ].
 rewrite Nat.sub_diag.
 f_equal. {
-  rewrite rngl_product_shift; [ | flia ].
+  rewrite (rngl_product_shift 1); [ | flia ].
+  rewrite Nat.sub_diag.
   rewrite Nat_sub_succ_1.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
@@ -2166,7 +2178,8 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" ].
-  rewrite rngl_product_shift; [ | flia Hnz ].
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
   remember (k / fact n) as x eqn:Hx.
   erewrite rngl_product_eq_compat. 2: {
     intros i (_, Hi).
@@ -2288,7 +2301,8 @@ f_equal. {
     apply rngl_mul_1_l.
   }
   rewrite rngl_product_split_last; [ | easy ].
-  rewrite rngl_product_shift; [ | flia ].
+  rewrite (rngl_product_shift 1); [ | flia ].
+  rewrite Nat.sub_diag.
   rewrite Nat_sub_succ_1.
   rewrite IHx.
   symmetry.

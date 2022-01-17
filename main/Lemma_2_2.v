@@ -512,11 +512,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite IHn; [ | easy | easy ].
     rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
     f_equal.
-    rewrite rngl_summation_shift. 2: {
+    rewrite (rngl_summation_shift (2 ^ n)). 2: {
+      split; [ easy | ].
       cbn; rewrite Nat.add_0_r.
       rewrite <- Nat.add_sub_assoc; [ flia | ].
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
+    rewrite Nat.sub_diag.
     cbn; rewrite Nat.add_0_r.
     rewrite Nat_sub_sub_swap.
     rewrite Nat.add_sub.
@@ -602,11 +604,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite fold_mat_el.
       now rewrite rngl_mul_opp_r.
     }
-    rewrite rngl_summation_shift. 2: {
+    rewrite (rngl_summation_shift (2 ^ n)). 2: {
+      split; [ easy | ].
       cbn; rewrite Nat.add_0_r.
       rewrite <- Nat.add_sub_assoc; [ flia | ].
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
+    rewrite Nat.sub_diag.
     rewrite <- rngl_opp_summation; [ | easy ].
     cbn; rewrite Nat.add_0_r.
     rewrite Nat_sub_sub_swap, Nat.add_sub.
@@ -883,7 +887,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       now rewrite fold_mat_el.
     }
     cbn - [ "^" ].
-    rewrite rngl_summation_shift; [ | cbn; flia ].
+    rewrite (rngl_summation_shift (2 ^ n)); [ | cbn; flia ].
+    rewrite Nat.sub_diag.
     rewrite Nat_sub_sub_swap.
     cbn; rewrite Nat.add_0_r, Nat.add_sub.
     erewrite rngl_summation_eq_compat. 2: {
@@ -1149,7 +1154,8 @@ f_equal. {
   }
   f_equal.
   apply in_seq in Hi.
-  rewrite rngl_summation_shift; [ | flia ].
+  rewrite (rngl_summation_shift n); [ | flia ].
+  rewrite Nat.sub_diag.
   rewrite Nat_sub_sub_swap, Nat.add_sub.
   apply rngl_summation_eq_compat.
   intros j Hj.
@@ -1240,7 +1246,8 @@ f_equal. {
     apply fold_mat_el.
   } {
     rewrite Nat.sub_add; [ | easy ].
-    rewrite rngl_summation_shift; [ | flia ].
+    rewrite (rngl_summation_shift n); [ | flia ].
+    rewrite Nat.sub_diag.
     rewrite Nat_sub_sub_swap, Nat.add_sub.
     unfold mat_mul_el; rewrite Hc4.
     apply rngl_summation_eq_compat.

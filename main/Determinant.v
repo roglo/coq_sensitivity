@@ -159,8 +159,10 @@ rewrite rngl_mul_comm; [ | easy ].
 rewrite <- rngl_mul_assoc.
 f_equal. {
   (* equality of the two "∏" *)
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  rewrite (rngl_product_shift _ 2); [ | flia Hnz ].
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite (rngl_product_shift 2 2); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
   rewrite Nat.sub_succ.
   apply rngl_product_eq_compat.
   intros i Hi.
@@ -596,7 +598,8 @@ rewrite mat_swap_rows_nrows.
 rewrite Hr.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite rngl_product_shift; [ | flia Hp ].
+  rewrite (rngl_product_shift 1); [ | flia Hp ].
+  rewrite Nat.sub_diag.
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     now rewrite Nat.add_comm, Nat.add_sub.
@@ -906,7 +909,7 @@ assert (Hc : canon_sym_gr_list n k = f (g k)). {
   }
 }
 f_equal; [ now rewrite Hc | ].
-rewrite rngl_product_shift; [ | flia Hp ].
+rewrite (rngl_product_shift 1); [ | flia Hp ].
 apply rngl_product_eq_compat.
 intros i Hi.
 rewrite Nat.add_comm, Nat.add_sub.

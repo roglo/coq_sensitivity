@@ -115,7 +115,8 @@ destruct (Nat.eq_dec (length lv) 0) as [Hvz| Hvz]. {
   rewrite rngl_summation_empty; [ | easy ].
   now rewrite map2_nil_r; unfold iter_list.
 }
-rewrite rngl_summation_shift. 2: {
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
   destruct (length lu); [ easy | ].
   destruct (length lv); [ easy | ].
   now cbn; apply -> Nat.succ_le_mono.

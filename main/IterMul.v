@@ -213,13 +213,12 @@ apply iter_seq_distr. {
 }
 Qed.
 
-Theorem rngl_product_shift : ∀ b g k,
-  b ≤ k
-  → (∏ (i = b, k), g i =
-     ∏ (i = 0, k - b), g (b + i)%nat)%F.
+Theorem rngl_product_shift : ∀ s b g k,
+  s ≤ b ≤ k
+  → ∏ (i = b, k), g i = ∏ (i = b - s, k - s), g (s + i)%nat.
 Proof.
-intros b g k Hbk.
-now apply iter_shift.
+intros s b g k Hbk.
+now apply (iter_shift s).
 Qed.
 
 Theorem rngl_product_rshift : ∀ b e f,
@@ -590,14 +589,15 @@ rewrite <- Nat.sub_succ_l. 2: {
 }
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_ub_mul_distr.
-rewrite rngl_summation_shift. 2: {
+rewrite (rngl_summation_shift 1). 2: {
+  split; [ easy | ].
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
 apply rngl_summation_eq_compat.
 intros i Hi.
-rewrite rngl_summation_shift; [ | flia ].
-rewrite Nat_sub_succ_1.
+rewrite (rngl_summation_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
 apply rngl_summation_eq_compat.
 intros j Hj.
 move j before i.
@@ -638,3 +638,4 @@ Qed.
 End a.
 
 Arguments rngl_product_summation_distr {T}%type {ro rp} _ (m n)%nat.
+Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
