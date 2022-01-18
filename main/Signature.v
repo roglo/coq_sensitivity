@@ -930,6 +930,7 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
+cbn - [ "<?" ].
 rewrite rngl_product_product_abs_diff_div_diff; [ | easy | easy ].
 apply rngl_mul_1_r.
 Qed.
