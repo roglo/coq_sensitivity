@@ -49,6 +49,13 @@ Definition minus_one_pow n :=
   | _ => (- 1%F)%F
   end.
 
+Theorem fold_ε : ∀ p,
+  ∏ (i = 0, length p - 1),
+  (∏ (j = 0, length p - 1),
+   (if i <? j then sign_diff (ff_app p j) (ff_app p i) else 1)) =
+  ε p.
+Proof. easy. Qed.
+
 Theorem minus_one_pow_succ :
   rngl_has_opp = true →
   ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.
@@ -819,9 +826,11 @@ Theorem ε'_ε : in_charac_0_field →
   → ε' p = ε p.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
-unfold ε', ε, rngl_sub_nat.
-do 3 rewrite rngl_product_product_if.
+unfold ε', rngl_sub_nat.
+do 2 rewrite rngl_product_product_if.
 destruct (lt_dec (length p) 1) as [Hn1| Hn1]. {
+  unfold ε.
+  rewrite rngl_product_product_if.
   replace (length p - 1) with 0 by flia Hn1.
   do 3 rewrite rngl_product_only_one.
   rewrite rngl_product_empty; [ | now cbn ].
@@ -910,7 +919,8 @@ erewrite rngl_product_eq_compat. 2: {
 }
 cbn.
 rewrite rngl_product_mul_distr; [ | easy ].
-rewrite <- rngl_mul_1_r; f_equal.
+rewrite <- rngl_product_product_if.
+rewrite fold_ε.
 rewrite <- rngl_product_product_if.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
@@ -920,7 +930,8 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-now apply rngl_product_product_abs_diff_div_diff.
+rewrite rngl_product_product_abs_diff_div_diff; [ | easy | easy ].
+apply rngl_mul_1_r.
 Qed.
 
 Theorem transposition_is_permut : ∀ p q n,
