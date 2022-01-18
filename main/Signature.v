@@ -670,104 +670,22 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem ε'_ε : in_charac_0_field →
-  ∀ (p : list nat),
+Theorem rngl_product_product_abs_diff_mul_inv_diff : in_charac_0_field →
+  ∀ p,
   is_permut_list p
-  → ε' p = ε p.
+  → ∏ (i = 0, length p - 1),
+    (∏ (j = 0, length p - 1),
+     (if i <? j then
+        rngl_of_nat (abs_diff (ff_app p j) (ff_app p i)) *
+        (rngl_of_nat (j - i))⁻¹
+      else 1)) = 1%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
-unfold ε', ε, rngl_sub_nat.
-do 3 rewrite rngl_product_product_if.
-destruct (lt_dec (length p) 1) as [Hn1| Hn1]. {
+destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
   replace (length p - 1) with 0 by flia Hn1.
-  do 3 rewrite rngl_product_only_one.
-  rewrite rngl_product_empty; [ | now cbn ].
-  rewrite rngl_product_empty; [ | now cbn ].
-  rewrite rngl_product_empty; [ | now cbn ].
-  apply rngl_div_1_r; [ now left | easy ].
+  now do 2 rewrite rngl_product_only_one.
 }
-apply Nat.nlt_ge in Hn1.
-rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_of_nat_sub; [ | easy ].
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec i j) as [Hij| Hij]; [ | flia Hj Hij ].
-    easy.
-  }
-  cbn.
-  destruct (Nat.eq_dec i (length p - 1)) as [Hein| Hein]. {
-    subst i.
-    rewrite rngl_product_empty; [ now apply rngl_1_neq_0 | flia ].
-  }
-  rewrite (rngl_product_shift (i + 1)); [ | flia Hi Hein ].
-  rewrite Nat.sub_diag.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    replace (i + 1 + j - i) with (S j) by flia.
-    easy.
-  }
-  cbn - [ rngl_of_nat ].
-  erewrite <- rngl_product_succ_succ.
-  replace (S (length p - 1 - (i + 1))) with (length p - S i) by flia Hi Hein.
-  rewrite rngl_product_rngl_of_nat; [ | now left ].
-  intros H.
-  apply eq_rngl_of_nat_0 in H; [ | easy ].
-  now apply fact_neq_0 in H.
-}
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite <- rngl_product_div_distr; try easy; [ now left | ].
-  intros j Hj.
-  intros H.
-  apply rngl_sub_move_0_r in H; [ | easy ].
-  apply rngl_of_nat_inj in H; [ | now left | easy ].
-  flia Hj H.
-}
-cbn.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
-    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
-    replace (sign_diff j i) with 1%F. 2: {
-      unfold sign_diff.
-      remember (j ?= i) as b eqn:Hb; symmetry in Hb.
-      destruct b; [ | | easy ]. {
-        apply Nat.compare_eq in Hb; subst j; flia Hj.
-      } {
-        apply nat_compare_lt in Hb; flia Hj Hb.
-      }
-    }
-    rewrite rngl_mul_1_l.
-    replace (rngl_of_nat (abs_diff j i)) with (rngl_of_nat (j - i)). 2: {
-      unfold abs_diff.
-      rewrite if_ltb_lt_dec.
-      destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
-    }
-    easy.
-  }
-  easy.
-}
-cbn.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    unfold rngl_div.
-    rewrite Hin.
-    rewrite <- rngl_mul_assoc.
-    easy.
-  }
-  cbn.
-  rewrite rngl_product_mul_distr; [ | easy ].
-  easy.
-}
-cbn.
-rewrite rngl_product_mul_distr; [ | easy ].
-rewrite <- rngl_mul_1_r; f_equal.
+rewrite rngl_product_product_if.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -899,6 +817,108 @@ apply rngl_product_eq_compat.
 intros j Hj.
 do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
+Qed.
+
+Theorem ε'_ε : in_charac_0_field →
+  ∀ (p : list nat),
+  is_permut_list p
+  → ε' p = ε p.
+Proof.
+intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
+unfold ε', ε, rngl_sub_nat.
+do 3 rewrite rngl_product_product_if.
+destruct (lt_dec (length p) 1) as [Hn1| Hn1]. {
+  replace (length p - 1) with 0 by flia Hn1.
+  do 3 rewrite rngl_product_only_one.
+  rewrite rngl_product_empty; [ | now cbn ].
+  rewrite rngl_product_empty; [ | now cbn ].
+  rewrite rngl_product_empty; [ | now cbn ].
+  apply rngl_div_1_r; [ now left | easy ].
+}
+apply Nat.nlt_ge in Hn1.
+rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_of_nat_sub; [ | easy ].
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i j) as [Hij| Hij]; [ | flia Hj Hij ].
+    easy.
+  }
+  cbn.
+  destruct (Nat.eq_dec i (length p - 1)) as [Hein| Hein]. {
+    subst i.
+    rewrite rngl_product_empty; [ now apply rngl_1_neq_0 | flia ].
+  }
+  rewrite (rngl_product_shift (i + 1)); [ | flia Hi Hein ].
+  rewrite Nat.sub_diag.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    replace (i + 1 + j - i) with (S j) by flia.
+    easy.
+  }
+  cbn - [ rngl_of_nat ].
+  erewrite <- rngl_product_succ_succ.
+  replace (S (length p - 1 - (i + 1))) with (length p - S i) by flia Hi Hein.
+  rewrite rngl_product_rngl_of_nat; [ | now left ].
+  intros H.
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
+  now apply fact_neq_0 in H.
+}
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- rngl_product_div_distr; try easy; [ now left | ].
+  intros j Hj.
+  intros H.
+  apply rngl_sub_move_0_r in H; [ | easy ].
+  apply rngl_of_nat_inj in H; [ | now left | easy ].
+  flia Hj H.
+}
+cbn.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
+    rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
+    replace (sign_diff j i) with 1%F. 2: {
+      unfold sign_diff.
+      remember (j ?= i) as b eqn:Hb; symmetry in Hb.
+      destruct b; [ | | easy ]. {
+        apply Nat.compare_eq in Hb; subst j; flia Hj.
+      } {
+        apply nat_compare_lt in Hb; flia Hj Hb.
+      }
+    }
+    rewrite rngl_mul_1_l.
+    replace (rngl_of_nat (abs_diff j i)) with (rngl_of_nat (j - i)). 2: {
+      unfold abs_diff.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold rngl_div.
+    rewrite Hin.
+    rewrite <- rngl_mul_assoc.
+    easy.
+  }
+  cbn.
+  rewrite rngl_product_mul_distr; [ | easy ].
+  easy.
+}
+cbn.
+rewrite rngl_product_mul_distr; [ | easy ].
+rewrite <- rngl_mul_1_r; f_equal.
+rewrite <- rngl_product_product_if.
+now apply rngl_product_product_abs_diff_mul_inv_diff.
 Qed.
 
 Theorem transposition_is_permut : ∀ p q n,
