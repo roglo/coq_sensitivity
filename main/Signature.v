@@ -670,14 +670,14 @@ apply rngl_product_product_div_eq_1; try easy. {
 now apply product_product_if_permut_div.
 Qed.
 
-Theorem rngl_product_product_abs_diff_mul_inv_diff : in_charac_0_field →
+Theorem rngl_product_product_abs_diff_div_diff : in_charac_0_field →
   ∀ p,
   is_permut_list p
   → ∏ (i = 0, length p - 1),
     (∏ (j = 0, length p - 1),
      (if i <? j then
-        rngl_of_nat (abs_diff (ff_app p j) (ff_app p i)) *
-        (rngl_of_nat (j - i))⁻¹
+        rngl_of_nat (abs_diff (ff_app p j) (ff_app p i)) /
+        rngl_of_nat (j - i)
       else 1)) = 1%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
@@ -688,12 +688,6 @@ destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
 rewrite rngl_product_product_if.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite fold_rngl_div; [ | easy ].
-    easy.
-  }
-  cbn.
   rewrite rngl_product_div_distr; try easy; [ now left | ].
   intros j Hj.
   intros H.
@@ -918,7 +912,15 @@ cbn.
 rewrite rngl_product_mul_distr; [ | easy ].
 rewrite <- rngl_mul_1_r; f_equal.
 rewrite <- rngl_product_product_if.
-now apply rngl_product_product_abs_diff_mul_inv_diff.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    now rewrite fold_rngl_div.
+  }
+  easy.
+}
+now apply rngl_product_product_abs_diff_div_diff.
 Qed.
 
 Theorem transposition_is_permut : ∀ p q n,
