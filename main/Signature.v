@@ -1189,6 +1189,14 @@ rewrite map_length.
 now destruct Hp2.
 Qed.
 
+Theorem comp_length : ∀ la lb,
+  length (la ° lb) = length lb.
+Proof.
+intros.
+unfold "°"; cbn.
+now rewrite map_length.
+Qed.
+
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 (* perhaps it is possible not to go through ε' to prove this
@@ -1550,14 +1558,6 @@ rewrite product_product_if_permut; try easy. {
     now apply Hij; symmetry.
   }
 }
-Qed.
-
-Theorem comp_length : ∀ la lb,
-  length (la ° lb) = length lb.
-Proof.
-intros.
-unfold "°"; cbn.
-now rewrite map_length.
 Qed.
 
 Theorem sign_diff_id : ∀ a, sign_diff a a = 0%F.
