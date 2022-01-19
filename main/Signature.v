@@ -828,7 +828,7 @@ Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
 unfold ε', rngl_sub_nat.
 do 2 rewrite rngl_product_product_if.
-destruct (lt_dec (length p) 1) as [Hn1| Hn1]. {
+destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
   unfold ε.
   rewrite rngl_product_product_if.
   replace (length p - 1) with 0 by flia Hn1.
@@ -838,7 +838,7 @@ destruct (lt_dec (length p) 1) as [Hn1| Hn1]. {
   rewrite rngl_product_empty; [ | now cbn ].
   apply rngl_div_1_r; [ now left | easy ].
 }
-apply Nat.nlt_ge in Hn1.
+apply Nat.nle_gt in Hn1.
 rewrite <- rngl_product_div_distr; try easy; [ | now left | ]. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
