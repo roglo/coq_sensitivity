@@ -1233,9 +1233,6 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-(* perhaps it is possible not to go through ε' to prove this
-   theorem; in that case, the hypothesis in_charac_0_field
-   would not be completely required *)
 Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   ∀ n f g,
   is_permut n f
@@ -2021,20 +2018,12 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-(* if signature_comp_fun_expand_1 does not require in_charac_0_field
-   this one should not *)
 Theorem signature_comp : in_charac_0_field →
   ∀ n la lb,
   is_permut n la
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-intros Hif * Hpf Hpg.
-destruct Hpf as (Hfp, Hfn).
-destruct Hpg as (Hgp, Hgn).
-unfold ε.
-rewrite comp_length, Hfn, Hgn.
-...
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
@@ -2408,13 +2397,11 @@ Qed.
 
 End a.
 
-Arguments ε' {T}%type {ro} p%list.
 Arguments ε {T}%type {ro}.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
-Arguments ε'_ε {T}%type {ro rp} _ p%list.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
