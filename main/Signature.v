@@ -688,7 +688,6 @@ Theorem rngl_product_product_abs_diff_div_diff : in_charac_0_field →
       else 1)) = 1%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
-clear Hp.
 destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
   replace (length p - 1) with 0 by flia Hn1.
   now do 2 rewrite rngl_product_only_one.
@@ -723,12 +722,9 @@ rewrite <- rngl_product_product_if; symmetry.
 rewrite <- rngl_product_product_if; symmetry.
 apply Nat.nle_gt in Hn1.
 (* changt of var *)
-(* is it possible to continue that proof without using permut_list_inv? *)
-...
 rewrite rngl_product_change_var with
   (g := ff_app (permut_list_inv p)) (h := ff_app p). 2: {
   intros i Hi.
-...
   destruct Hp as (Hp1, Hp2).
   apply (permut_inv_permut (length p)); [ easy | flia Hi Hn1 ].
 }
@@ -825,8 +821,6 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
-...
-
 Theorem ε'_ε : in_charac_0_field →
   ∀ (p : list nat),
   is_permut_list p
@@ -834,8 +828,6 @@ Theorem ε'_ε : in_charac_0_field →
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
 unfold ε', rngl_sub_nat.
-destruct Hp as (Hpp, Hpl).
-clear Hpl.
 do 2 rewrite rngl_product_product_if.
 destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
   unfold ε.
@@ -940,13 +932,9 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_product_abs_diff_div_diff; [ | easy | ].
-...
 rewrite rngl_product_product_abs_diff_div_diff; [ | easy | easy ].
 apply rngl_mul_1_r.
 Qed.
-
-...
 
 Theorem transposition_is_permut : ∀ p q n,
   p < n → q < n → is_permut n (map (transposition p q) (seq 0 n)).
@@ -1268,9 +1256,6 @@ Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   → ε (f ° g) = (ε f * ε g)%F.
 Proof.
 intros Hif * (Hfp, Hfn) (Hgp, Hgn) Hs.
-clear Hfp Hfn.
-rewrite <- ε'_ε; [ | easy | apply (comp_is_permut_list n) ].
-...
 rewrite <- ε'_ε; [ | easy | now apply (comp_is_permut_list n) ].
 rewrite <- ε'_ε; [ | easy | easy ].
 rewrite <- ε'_ε; [ | easy | easy ].
@@ -2034,6 +2019,31 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
+Theorem sign_comp :
+  ∀ la lb,
+  (∀ i j, i ∈ la → j ∈ la → ff_app la i = ff_app la j → i = j)
+  → (∀ i, i ∈ lb → i < length la)
+  → ε (la ° lb) = (ε la * ε lb)%F.
+Proof.
+intros * Haa Hba.
+unfold ε.
+rewrite comp_length.
+...
+Abort.
+End a.
+Arguments ε {T}%type {ro}.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (canon_sym_gr_list_list 4).
+Compute (let la := [2;3;4;0]%nat in map (λ lb, (ε (la ° lb), ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
+Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
+Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 5)).
+Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in Z.eqb (ε (la ° lb)) (ε la * ε lb)%F).
+Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
+Compute (let la := [7;4;8;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
+...
+
 (* for Binet-Cauchy formula, I need that this applies even if la and lb are
    not permutations, but just lists of nat. Is it true? If yes, how to prove
    it? We probably need some hypotheses on la and lb, but which ones? *)
@@ -2043,19 +2053,14 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-(*
 intros Hif * Hpf Hpg.
 clear Hpf Hpg.
 unfold ε.
 rewrite comp_length.
 ...
-*)
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
-clear Hfp Hfn.
-apply signature_comp_fun_expand_1 with (n := n); [ easy | | easy | ].
-...
 apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
 destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 rewrite signature_comp_fun_expand_2_1; try easy.

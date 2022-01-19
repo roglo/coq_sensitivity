@@ -901,6 +901,10 @@ Theorem det_with_rows : in_charac_0_field →
 Proof.
 (* formule testée. Ça devrait être bon *)
 intros Hif * Hra Hca Ha Hkln Hkn.
+(* AFAIRE : traiter le cas où kl contient des duplications. Dans
+   ce cas-là, les deux parties sont nulles puisque les matrices
+   ont des lignes dupliquée ; sinon, on continue en supposant que
+   kl ne contient pas de duplication *)
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
   intros k Hk; rewrite Hra.
