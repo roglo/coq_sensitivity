@@ -384,8 +384,11 @@ Theorem permut_list_ub : ∀ l i,
   is_permut_list l → i < length l → nth i l 0 < length l.
 Proof.
 intros * Hp Hin.
-now apply Hp, nth_In.
+destruct Hp as (Hp1, Hp2).
+clear Hp2.
+now apply Hp1, nth_In.
 Qed.
+
 Theorem transposition_out : ∀ i j k, k ≠ i → k ≠ j → transposition i j k = k.
 Proof.
 intros * Hi Hj.
