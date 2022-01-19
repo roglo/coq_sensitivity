@@ -2029,6 +2029,8 @@ intros * Haa Hba.
 unfold ε.
 rewrite comp_length.
 ...
+
+(*
 Abort.
 End a.
 Arguments ε {T}%type {ro}.
@@ -2043,6 +2045,7 @@ Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in Z.eqb (ε (la ° lb))
 Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
 Compute (let la := [7;4;8;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
 ...
+*)
 
 (* for Binet-Cauchy formula, I need that this applies even if la and lb are
    not permutations, but just lists of nat. Is it true? If yes, how to prove

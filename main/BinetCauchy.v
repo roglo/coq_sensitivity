@@ -934,6 +934,18 @@ erewrite rngl_summation_eq_compat. 2: {
    but perhaps I don't need that!? *)
 Check signature_comp.
 ...
+Check sign_comp.
+rewrite <- sign_comp; [ | | rewrite Hkln ]. 3: {
+  intros i Hi.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (j & Hjl & Hj).
+  rewrite length_canon_sym_gr_list in Hjl.
+  rewrite <- Hj.
+  apply canon_sym_gr_list_ub; [ | easy ].
+  specialize (fact_neq_0 m) as H1.
+  flia Hk H1.
+}
+...
 (*
 unfold ε.
 rewrite Hkln.
