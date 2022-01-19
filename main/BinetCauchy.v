@@ -925,7 +925,10 @@ symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
-Search (ε _ * ε _)%F.
+(* cannot apply ε (la ° lb) = ε la * ε lb, since kl is not a permutation;
+   is it a problem? If yes, I must prove it for other than permutations;
+   but perhaps I don't need that!? *)
+Check signature_comp.
 ...
 (*
 unfold ε.

@@ -2028,7 +2028,11 @@ Theorem signature_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros Hif * Hpf Hpg.
+clear Hpf Hpg.
+unfold ε.
+rewrite comp_length.
 ...
+intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
 apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
