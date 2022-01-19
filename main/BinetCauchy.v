@@ -925,6 +925,7 @@ symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
+Search (ε _ * ε _)%F.
 ...
 (*
 unfold ε.
