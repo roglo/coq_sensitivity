@@ -2034,8 +2034,6 @@ destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
 unfold ε.
 rewrite comp_length, Hfn, Hgn.
-Check signature_comp_fun_expand_1.
-Print sign_diff.
 ...
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
