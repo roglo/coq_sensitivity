@@ -821,12 +821,17 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
-Theorem ε'_ε : in_charac_0_field →
-  ∀ (p : list nat),
-  is_permut_list p
+Theorem ε'_ε_1 : in_charac_0_field →
+  ∀ p,
+  (∏ (i = 0, length p - 1),
+   ∏ (j = 0, length p - 1),
+   if i <? j then
+      rngl_of_nat (abs_diff (ff_app p j) (ff_app p i)) / rngl_of_nat (j - i)
+   else 1) = 1%F
   → ε' p = ε p.
 Proof.
-intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
+intros Hif * Hij1.
+destruct Hif as (Hic & Hop & Hin & H10 & Hit & _ & Hch).
 unfold ε', rngl_sub_nat.
 do 2 rewrite rngl_product_product_if.
 destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
@@ -932,8 +937,16 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_product_abs_diff_div_diff; [ | easy | easy ].
+rewrite Hij1.
 apply rngl_mul_1_r.
+Qed.
+
+Theorem ε'_ε : in_charac_0_field →
+  ∀ p, is_permut_list p → ε' p = ε p.
+Proof.
+intros Hif * Hp.
+apply ε'_ε_1; [ easy | ].
+now rewrite rngl_product_product_abs_diff_div_diff.
 Qed.
 
 Theorem transposition_is_permut : ∀ p q n,
@@ -2044,6 +2057,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 symmetry.
+do 2 rewrite <- rngl_product_product_if.
 Search (∏ (_ = _, _), sign_diff _ _).
 ...
 End a.
