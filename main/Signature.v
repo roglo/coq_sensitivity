@@ -2032,6 +2032,19 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
+(* to_perm: transforms a list of n different naturals into a permutation of
+   {0..n-1} such that they are in the same order than the initial list;
+   E.g. to_perm [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
+   I pretend that that list has the same ε than the initial list i.e.
+      ε (to_perm l) = ε l
+   I also pretend that
+      to_perm (to_perml l) = to_perm l
+      to_perm (la ° lb) = to_perm la ° to_perm lb
+      to_perm la = la, if la is a permutation
+   To be proved *)
+Definition to_perm l :=
+...
+
 Theorem sign_comp :
   rngl_is_comm = true →
   rngl_has_opp = true →
