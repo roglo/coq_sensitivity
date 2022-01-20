@@ -2028,6 +2028,7 @@ Proof.
 intros * Haa Hba.
 unfold ε.
 rewrite comp_length.
+do 3 rewrite rngl_product_product_if.
 ...
 
 (*
