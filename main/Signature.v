@@ -2042,6 +2042,8 @@ Qed.
       to_perm (la ° lb) = to_perm la ° to_perm lb
       to_perm la = la, if la is a permutation
    To be proved *)
+...
+
 Definition to_perm l :=
 ...
 

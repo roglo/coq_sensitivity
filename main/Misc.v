@@ -2018,6 +2018,32 @@ apply in_bsort_loop in Ha.
 now destruct Ha.
 Qed.
 
+(* bsort_rank: like bsort but return the rank of what have been
+   sorted  *)
+
+Fixpoint bsort_rank_insert {A} (ord : A → A → bool) d l ia lsorted :=
+  match lsorted with
+  | [] => [ia]
+  | i :: lsorted' =>
+      if ord (nth ia l d) (nth i l d) then ia :: lsorted
+      else i :: bsort_rank_insert ord d l ia lsorted'
+  end.
+
+Fixpoint bsort_rank_loop {A} (ord : A → A → bool) d l i reml lsorted :=
+  match reml with
+  | 0 => lsorted
+  | S reml' =>
+      bsort_rank_loop ord d l (S i) reml'
+        (bsort_rank_insert ord d l i lsorted)
+  end.
+
+Definition bsort_rank {A} (ord : A → A → bool) d l :=
+  bsort_rank_loop ord d l 0 (length l) [].
+
+Compute (bsort_rank Nat.leb 0 [3;1;7;0]).
+
+(* non, je voudrais que ça me rende [2; 1; 3; 0] *)
+
 (* *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
