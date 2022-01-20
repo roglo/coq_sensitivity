@@ -2020,22 +2020,32 @@ apply map_id.
 Qed.
 
 Theorem sign_comp :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
   ∀ la lb,
   (∀ i j, i ∈ la → j ∈ la → ff_app la i = ff_app la j → i = j)
-  → (∀ i, i ∈ lb → i < length la)
+  → is_permut (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-intros * Haa Hba.
-(* apparement, hypothèses pas suffisantes. Contre-exemple :
-     ε ([1;2;0] ° [0;2]) = ε [1;0] = -1
-   mais
-     ε [1;2;0] = 1 et
-     ε [0;2] = 1
- *)
+intros Hic Hop * Haa (Hbp, Hbl).
 unfold ε.
-rewrite comp_length.
+rewrite comp_length, Hbl.
 do 3 rewrite rngl_product_product_if.
-Abort.
+rewrite <- rngl_product_mul_distr; [ | easy ].
+symmetry.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- rngl_product_mul_distr; [ | easy ].
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite  sign_diff_mul; [ | easy ].
+    easy.
+  }
+  easy.
+}
+symmetry.
+Search (∏ (_ = _, _), sign_diff _ _).
+...
 End a.
 Arguments ε {T}%type {ro}.
 Require Import RnglAlg.Zrl.
