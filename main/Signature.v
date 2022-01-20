@@ -2026,12 +2026,15 @@ Theorem sign_comp :
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros * Haa Hba.
+(* apparement, hypothèses pas suffisantes. Contre-exemple :
+     ε ([1;2;0] ° [0;2]) = ε [1;0] = -1
+   mais
+     ε [1;2;0] = 1 et
+     ε [0;2] = 1
+ *)
 unfold ε.
 rewrite comp_length.
 do 3 rewrite rngl_product_product_if.
-...
-
-(*
 Abort.
 End a.
 Arguments ε {T}%type {ro}.
@@ -2039,12 +2042,8 @@ Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
 Compute (canon_sym_gr_list_list 4).
-Compute (let la := [2;3;4;0]%nat in map (λ lb, (ε (la ° lb), ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
-Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
-Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 5)).
-Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in Z.eqb (ε (la ° lb)) (ε la * ε lb)%F).
-Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
-Compute (let la := [7;4;8;5]%nat in let lb := [0;1]%nat in (ε (la ° lb), ε la * ε lb)%F).
+Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in (ε (la ° lb), ε la * ε lb)%F).
+Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in ((la ° lb))).
 ...
 *)
 
