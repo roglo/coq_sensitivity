@@ -2040,9 +2040,21 @@ Fixpoint bsort_rank_loop {A} (ord : A → A → bool) d l i reml lsorted :=
 Definition bsort_rank {A} (ord : A → A → bool) d l :=
   bsort_rank_loop ord d l 0 (length l) [].
 
+(*
 Compute (bsort_rank Nat.leb 0 [3;1;7;0]).
-
-(* non, je voudrais que ça me rende [2; 1; 3; 0] *)
+     = [3; 1; 0; 2]
+   non, pour ce que je veux en faire, je voudrais que ça me
+   rende [2; 1; 3; 0], que ça "aplatisse" les valeurs dans
+   [3;1;7;0]
+   - plus petite valeur dans [3;1;7;0] = 0, je mets 0 à sa place
+     (je ne change rien)
+   - plus petite valeur suivante = 1, je mets 1 à sa place (je
+     ne change rien non plus)
+   - plus petite valeur suivante = 3, je mets 2 à sa place, ça
+     donne [2;1;7;0]
+   - plus petite valeur suivante = 7, je mets 3 à sa place, ça
+     donne [2;1;3;0]
+*)
 
 (* *)
 
