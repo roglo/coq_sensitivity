@@ -2060,6 +2060,7 @@ symmetry.
 do 2 rewrite <- rngl_product_product_if.
 Search (∏ (_ = _, _), sign_diff _ _).
 ...
+(*
 End a.
 Arguments ε {T}%type {ro}.
 Require Import RnglAlg.Zrl.
@@ -2080,11 +2081,6 @@ Theorem signature_comp : in_charac_0_field →
   → is_permut n lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-intros Hif * Hpf Hpg.
-clear Hpf Hpg.
-unfold ε.
-rewrite comp_length.
-...
 intros Hif * Hpf Hpg.
 destruct Hpf as (Hfp, Hfn).
 destruct Hpg as (Hgp, Hgn).
