@@ -2107,6 +2107,7 @@ apply rngl_product_eq_compat.
 intros i (_, Hi).
 apply rngl_product_eq_compat.
 intros j (_, Hj).
+move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
@@ -2126,6 +2127,7 @@ destruct c2. {
     exfalso.
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
+...
     apply NoDup_nth in Hc1.
 2: {
 ...
