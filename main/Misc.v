@@ -2019,7 +2019,135 @@ now destruct Ha.
 Qed.
 
 (* bsort_rank: like bsort but return the rank of what have been
-   sorted  *)
+   sorted
+
+Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (ia : B) a lsorted :=
+  match lsorted with
+  | [] => [(ia, a)]
+  | (ib, b) :: l =>
+      if ord a b then (ia, a) :: lsorted
+      else (ib, b) :: bsort_rank_insert ord ia a l
+  end.
+
+Fixpoint bsort_rank_loop {A} (ord : A → A → bool) lsorted l :=
+  match l with
+  | [] => lsorted
+  | a :: l' =>
+      bsort_rank_loop ord
+        (bsort_rank_insert ord (length lsorted) a lsorted) l'
+  end.
+
+Definition bsort_rank {A} (ord : A → A → bool) := bsort_rank_loop ord [].
+
+Print bsort_loop.
+
+Theorem bsort_loop_bsort_loop_rank :  ∀ A (ord : A → A → bool) l lsorted,
+  bsort_loop ord (map snd lsorted) l = map snd (bsort_rank_loop ord lsorted l).
+Proof.
+intros.
+revert lsorted.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite <- IHl; clear IHl.
+f_equal; clear l.
+induction lsorted as [| b]; [ easy | cbn ].
+destruct b as (ib, b); cbn.
+destruct (ord a b); [ easy | cbn ].
+f_equal.
+rewrite IHlsorted.
+...
+  bsort_loop ord (map snd lsorted) l =
+  map (@snd nat A) (bsort_rank_loop ord lsorted l).
+Proof.
+intros.
+revert lsorted.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite <- IHl; clear IHl.
+f_equal; clear l.
+induction lsorted as [| b]; [ easy | cbn ].
+destruct b as (ib, b); cbn.
+destruct (ord a b); [ easy | cbn ].
+f_equal.
+...
+f_equal; apply IHlsorted.
+Qed.
+
+Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
+  bsort ord l = map snd (bsort_rank ord l) ∧
+  ∀ ia a, (ia, a) ∈ bsort_rank ord l → nth ia l d = a.
+Proof.
+intros.
+split. {
+  induction l as [| a]; [ easy | cbn ].
+...
+  now rewrite <- bsort_loop_bsort_loop_rank.
+} {
+  intros * Hia.
+  revert ia a Hia.
+  induction l as [| b]; intros; [ easy | ].
+  destruct ia. {
+    cbn.
+Theorem in_bsort_rank_loop_cons : ∀ A (ord : A → A → bool) lsorted l a b,
+  (0, a) ∈ bsort_rank_loop ord lsorted (b :: l)
+  → b = a.
+Proof.
+intros * Hza.
+revert a b lsorted Hza.
+induction l as [| c]; intros. {
+  cbn in Hza.
+  revert a b Hza.
+  induction lsorted as [| c]; intros. {
+    cbn in Hza.
+    destruct Hza as [Hza| Hza]; [ | easy ].
+    now injection Hza.
+  }
+  destruct c as (ic, c).
+  cbn in Hza.
+  remember (ord b c) as b1 eqn:Hb1.
+  symmetry in Hb1.
+  destruct b1. {
+    cbn in Hza.
+    destruct Hza as [Hza| [Hza| Hza]]; [ easy | | ]. {
+      injection Hza; clear Hza; intros; subst ic c.
+...
+Compute (let l := [2;7;1] in bsort_rank Nat.leb l).
+Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
+...
+Theorem in_bsort_rank_loop : ∀ A (ord : A → A → bool) lsorted l ia a,
+  (ia, a) ∈ bsort_rank_loop ord lsorted l
+  → nth ia (b :: l) d = a.
+
+  Hia : (ia, a) ∈ bsort_rank_loop ord [(0, b)] l
+  ============================
+  nth ia (b :: l) d = a
+
+...
+
+  destruct ia. {
+    cbn.
+    clear IHl.
+    revert a b Hia.
+    induction l as [| c]; intros. {
+      cbn in Hia.
+      destruct Hia as [Hia| Hia]; [ | easy ].
+      now injection Hia.
+    }
+    cbn in Hia.
+    destruct (ord c b). {
+
+...
+    destruct l as [| c]. {
+      cbn in Hia.
+      destruct Hia as [Hia| Hia]; [ | easy ].
+      now injection Hia.
+    }
+    cbn in Hia.
+    destruct (ord c b). {
+...
+cbn - [ nth ].
+split. {
+  destruct l as [| b]; [ easy | ].
+  cbn.
+...
 
 Fixpoint bsort_rank_insert {A} (ord : A → A → bool) d l ia lsorted :=
   match lsorted with
@@ -2076,6 +2204,7 @@ cbn - [ nth ].
 (*
 Compute (let l := [5;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;7;0] in (bsort Nat.leb l, map (λ i, nth i l 0) (bsort_rank Nat.leb l))).
+*)
 *)
 
 (* *)
