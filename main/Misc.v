@@ -2019,7 +2019,7 @@ now destruct Ha.
 Qed.
 
 (* bsort_rank: like bsort but return the rank of what have been
-   sorted
+   sorted *)
 
 Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (ia : B) a lsorted :=
   match lsorted with
@@ -2048,11 +2048,12 @@ intros.
 revert lsorted.
 induction l as [| a]; intros; [ easy | cbn ].
 rewrite <- IHl; clear IHl.
-f_equal; clear l.
-induction lsorted as [| b]; [ easy | cbn ].
+revert a l.
+induction lsorted as [| b]; intros; [ easy | cbn ].
 destruct b as (ib, b); cbn.
 destruct (ord a b); [ easy | cbn ].
 f_equal.
+...
 rewrite IHlsorted.
 ...
   bsort_loop ord (map snd lsorted) l =
