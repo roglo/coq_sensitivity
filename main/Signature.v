@@ -2042,13 +2042,78 @@ Qed.
       to_perm (la ° lb) = to_perm la ° to_perm lb
       to_perm la = la, if la is a permutation
    To be proven *)
-(* could be done with a sorting function returning, not the list sorted, but
-   the indices of that list; then
-     map (λ i, replace_at (nth i that_list 0) l i) (seq 0 (len l)) *)
-(* mmm... I don't know *)
-...
+
+Definition to_perm_fun l i :=
+  let v := nth i (bsort Nat.leb l) 0 in
+  match List_rank (Nat.eqb v) l with
+  | Some j => replace_at j l i
+  | None => l
+  end.
 
 Definition to_perm l :=
+  fold_left to_perm_fun (seq 0 (length l)) l.
+
+Theorem length_replace_at : ∀ A k la (e : A),
+  k < length la
+  → length (replace_at k la e) = length la.
+Proof.
+intros * Hkla.
+unfold replace_at.
+rewrite app_length, firstn_length.
+rewrite List_length_cons, skipn_length.
+flia Hkla.
+Qed.
+
+Theorem length_to_perm_fun : ∀ l i, length (to_perm_fun l i) = length l.
+Proof.
+intros.
+unfold to_perm_fun; cbn - [ List_rank ].
+remember (nth i (bsort Nat.leb l) 0) as v eqn:Hv.
+remember (List_rank (Nat.eqb v) l) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]; [ | easy ].
+apply length_replace_at.
+now apply List_rank_Some_lt in Hj.
+Qed.
+
+Theorem length_fold_left_to_perm_fun : ∀ l l',
+  length (fold_left to_perm_fun l' l) = length l.
+Proof.
+intros.
+revert l.
+induction l' as [| a']; intros; [ easy | cbn ].
+rewrite IHl'.
+apply length_to_perm_fun.
+Qed.
+
+Theorem length_to_perm : ∀ l, length (to_perm l) = length l.
+Proof.
+intros.
+unfold to_perm.
+apply length_fold_left_to_perm_fun.
+Qed.
+
+Theorem ε_to_perm_ε : ∀ l, ε (to_perm l) = ε l.
+Proof.
+intros.
+unfold ε.
+rewrite length_to_perm.
+apply rngl_product_eq_compat.
+intros i (_, Hi).
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+unfold sign_diff.
+...
+Abort.
+End a.
+Arguments ε {T}%type {ro}.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (let l := [1;1;3;4]%nat in (ε (to_perm l), ε l)).
+Compute (ε (to_perm [1;2;3;4]%nat)).
 ...
 
 Theorem sign_comp :
