@@ -2037,23 +2037,45 @@ Fixpoint bsort_rank_loop {A} (ord : A → A → bool) d l i reml lsorted :=
         (bsort_rank_insert ord d l i lsorted)
   end.
 
-Definition bsort_rank {A} (ord : A → A → bool) d l :=
-  bsort_rank_loop ord d l 0 (length l) [].
+Definition bsort_rank {A} (ord : A → A → bool) l :=
+  match l with
+  | [] => []
+  | d :: _ => bsort_rank_loop ord d l 0 (length l) []
+  end.
+
+(* we should have
+      bsort ord l = map (λ i, nth i l d) (bsort_rank ord l)
+*)
 
 (*
-Compute (bsort_rank Nat.leb 0 [3;1;7;0]).
-     = [3; 1; 0; 2]
-   non, pour ce que je veux en faire, je voudrais que ça me
-   rende [2; 1; 3; 0], que ça "aplatisse" les valeurs dans
-   [3;1;7;0]
-   - plus petite valeur dans [3;1;7;0] = 0, je mets 0 à sa place
-     (je ne change rien)
-   - plus petite valeur suivante = 1, je mets 1 à sa place (je
-     ne change rien non plus)
-   - plus petite valeur suivante = 3, je mets 2 à sa place, ça
-     donne [2;1;7;0]
-   - plus petite valeur suivante = 7, je mets 3 à sa place, ça
-     donne [2;1;3;0]
+Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
+  bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
+Proof.
+intros.
+unfold bsort, bsort_rank.
+destruct l as [| d' l']; [ easy | ].
+remember (d' :: l') as l eqn:Hl; clear l' Hl.
+Print bsort_loop.
+Theorem bsort_loop_bsort_rank_loop : ∀ A ord (d d' : A) l i reml lsorted,
+  map (λ i, nth i l d) (bsort_rank_loop ord d' l i reml lsorted) =
+  bsort_loop ord (map (λ i, nth i l d) lsorted) (skipn (length lsorted) l).
+Proof.
+intros.
+revert l i lsorted.
+induction reml; intros; cbn. {
+...
+induction l as [| a]; [ easy | ].
+cbn - [ nth ].
+destruct l as [| b]; [ easy | ].
+cbn - [ nth ].
+unfold nth at 2 3.
+cbn - [ nth ].
+...
+*)
+
+(*
+Compute (let l := [5;2;7;0] in bsort_rank Nat.leb l).
+Compute (let l := [5;2;7;0] in (bsort Nat.leb l, map (λ i, nth i l 0) (bsort_rank Nat.leb l))).
 *)
 
 (* *)
