@@ -286,6 +286,28 @@ rewrite seq_nth; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
+Theorem List_in_firstn : ∀ A (a : A) k la, a ∈ firstn k la → a ∈ la.
+Proof.
+intros * Haf.
+revert la Haf.
+induction k; intros; [ easy | ].
+destruct la as [| b]; [ easy | ].
+cbn in Haf.
+destruct Haf; [ now left | right ].
+now apply IHk.
+Qed.
+
+Theorem List_in_skipn : ∀ A (a : A) k la, a ∈ skipn k la → a ∈ la.
+Proof.
+intros * Has.
+revert la Has.
+induction k; intros; [ easy | ].
+destruct la as [| b]; [ easy | ].
+cbn in Has.
+right.
+now apply IHk.
+Qed.
+
 Theorem List_firstn_seq : ∀ n start len,
   firstn n (seq start len) = seq start (min n len).
 Proof.
@@ -1742,6 +1764,22 @@ now rewrite inv_op_distr.
 Qed.
 
 (* *)
+
+Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).
+Proof.
+intros * Hnd.
+revert la Hnd.
+induction k; intros; [ constructor | cbn ].
+destruct la as [| a]; [ constructor | cbn ].
+apply NoDup_cons_iff.
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (Ha & Hnd).
+split. {
+  intros Haf; apply Ha; clear Ha.
+  now apply List_in_firstn in Haf.
+}
+now apply IHk.
+Qed.
 
 Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
 Proof.

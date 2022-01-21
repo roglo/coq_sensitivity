@@ -2141,14 +2141,16 @@ remember (nth a (bsort Nat.leb l) 0) as v eqn:Hv.
 remember (List_rank (Nat.eqb v) l) as i eqn:Hi.
 symmetry in Hi.
 destruct i; [ | easy ].
-Print replace_at.
-Theorem NoDup_replace_at : ∀ A k (la : list A) e,
-  NoDup la → NoDup (replace_at k la e).
-Proof.
-intros * Hnd.
+apply (List_rank_Some 0) in Hi.
+destruct Hi as (Hnl & Hbef & Hvl).
+apply Nat.eqb_eq in Hvl.
 unfold replace_at.
 apply NoDup_app_iff.
+split; [ now apply NoDup_firstn | ].
 split. {
+  apply NoDup_cons_iff.
+  split. {
+    intros He.
 ...
 induction la as [| a]; cbn.
 ...
