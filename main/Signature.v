@@ -2127,10 +2127,22 @@ destruct c2. {
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
     apply NoDup_nth in Hc1.
+2: {
+...
 Theorem NoDup_to_perm : ∀ l, NoDup l → NoDup (to_perm l).
 Proof.
 intros * Hnd.
 unfold to_perm.
+Theorem NoDup_fold_left_to_perm_fun : ∀ l l',
+  NoDup l
+  → NoDup (fold_left to_perm_fun l' l).
+Proof.
+intros * Hnd.
+revert l Hnd.
+induction l' as [| a']; intros; [ easy | cbn ].
+apply IHl'.
+Print to_perm_fun.
+...
 Theorem NoDup_to_perm_fun : ∀ l a,
   NoDup l
   → NoDup (to_perm_fun l a).
@@ -2150,22 +2162,15 @@ split; [ now apply NoDup_firstn | ].
 split. {
   apply NoDup_cons_iff.
   split. {
-    intros He.
+    intros Ha.
+Print to_perm_fun.
+Search List_rank.
 ...
 induction la as [| a]; cbn.
 ...
 Search (NoDup (replace_at _ _ _)).
 
 apply (List_rank_Some 0) in Hi.
-...
-Theorem NoDup_fold_left_to_perm_fun : ∀ l l',
-  NoDup l
-  → NoDup (fold_left to_perm_fun l' l).
-Proof.
-intros * Hnd.
-revert l Hnd.
-induction l' as [| a']; intros; [ easy | cbn ].
-apply IHl'.
 ...
 (*
 ...
