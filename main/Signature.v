@@ -2093,9 +2093,14 @@ unfold to_perm.
 apply length_fold_left_to_perm_fun.
 Qed.
 
-Theorem ε_to_perm_ε : ∀ l, ε (to_perm l) = ε l.
+Theorem ε_to_perm_ε : ∀ l,
+  NoDup l
+  → ε (to_perm l) = ε l.
 Proof.
-intros.
+intros * Hnd.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  now apply length_zero_iff_nil in Hlz; subst l; cbn.
+}
 unfold ε.
 rewrite length_to_perm.
 apply rngl_product_eq_compat.
@@ -2105,13 +2110,77 @@ intros j (_, Hj).
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
+remember (ff_app (to_perm l) j ?= ff_app (to_perm l) i) as c1 eqn:Hc1.
+remember (ff_app l j ?= ff_app l i) as c2 eqn:Hc2.
+symmetry in Hc1, Hc2.
+move c2 before c1.
+destruct c2. {
+  apply Nat.compare_eq_iff in Hc2.
+  unfold ff_app in Hc2.
+  apply NoDup_nth in Hc2; [ flia Hij Hc2 | easy | | flia Hij Hj ].
+  flia Hj Hlz.
+} {
+  apply Nat.compare_lt_iff in Hc2.
+  unfold ff_app in Hc2.
+  destruct c1; [ | easy | ]. {
+    exfalso.
+    apply Nat.compare_eq_iff in Hc1.
+    unfold ff_app in Hc1.
+    apply NoDup_nth in Hc1.
+Theorem NoDup_to_perm : ∀ l, NoDup l → NoDup (to_perm l).
+Proof.
+intros * Hnd.
+unfold to_perm.
+Theorem NoDup_to_perm_fun : ∀ l a,
+  NoDup l
+  → NoDup (to_perm_fun l a).
+Proof.
+intros * Hnd.
+unfold to_perm_fun.
+remember (nth a (bsort Nat.leb l) 0) as v eqn:Hv.
+remember (List_rank (Nat.eqb v) l) as i eqn:Hi.
+symmetry in Hi.
+destruct i; [ | easy ].
+Print replace_at.
+Theorem NoDup_replace_at : ∀ A k (la : list A) e,
+  NoDup la → NoDup (replace_at k la e).
+Proof.
+intros * Hnd.
+unfold replace_at.
+apply NoDup_app_iff.
+split. {
 ...
+induction la as [| a]; cbn.
+...
+Search (NoDup (replace_at _ _ _)).
+
+apply (List_rank_Some 0) in Hi.
+...
+Theorem NoDup_fold_left_to_perm_fun : ∀ l l',
+  NoDup l
+  → NoDup (fold_left to_perm_fun l' l).
+Proof.
+intros * Hnd.
+revert l Hnd.
+induction l' as [| a']; intros; [ easy | cbn ].
+apply IHl'.
+...
+(*
+...
+induction l as [| a]; [ constructor | ].
+cbn - [ to_perm_fun ].
+...
+*)
+Abort.
+Abort.
 Abort.
 End a.
 Arguments ε {T}%type {ro}.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
+Compute (let l := [1;2;1;2]%nat in (to_perm l, ε (to_perm l), ε l)).
+Compute (let l := [1;1;3;4]%nat in (to_perm l, ε (to_perm l), ε l)).
 Compute (let l := [1;1;3;4]%nat in (ε (to_perm l), ε l)).
 Compute (ε (to_perm [1;2;3;4]%nat)).
 ...
