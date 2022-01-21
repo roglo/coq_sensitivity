@@ -2042,6 +2042,10 @@ Qed.
       to_perm (la ° lb) = to_perm la ° to_perm lb
       to_perm la = la, if la is a permutation
    To be proven *)
+(* could be done with a sorting function returning, not the list sorted, but
+   the indices of that list; then
+     map (λ i, replace_at (nth i that_list 0) l i) (seq 0 (len l)) *)
+(* mmm... I don't know *)
 ...
 
 Definition to_perm l :=
