@@ -2095,14 +2095,15 @@ unfold bsort, bsort_rank.
 destruct l as [| d' l']; [ easy | ].
 remember (d' :: l') as l eqn:Hl; clear l' Hl.
 Theorem bsort_loop_bsort_rank_loop : ∀ A ord (d d' : A) lrank l_ini (l : list A),
-  l = skipn (length lrank) l_ini
+  bsort ord (map (λ i, nth i l_ini d) lrank) = map (λ i, nth i l_ini d) lrank
+  → l = skipn (length lrank) l_ini
   → bsort_loop ord (map (λ i, nth i l_ini d) lrank) l =
     map (λ i, nth i l_ini d)
       (bsort_rank_loop ord (λ i, nth i l d') (length lrank) lrank l).
 Proof.
-intros * Hli.
+intros * Hs Hli.
 remember (λ i, nth i l_ini d) as f eqn:Hf.
-revert lrank Hli.
+revert lrank Hs Hli.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
 assert (Ha : a = nth (length lrank) l_ini d). {
@@ -2113,8 +2114,9 @@ assert (Ha : a = nth (length lrank) l_ini d). {
   destruct l_ini as [| b]; [ easy | cbn ].
   now apply IHlrank.
 }
+...
 assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
-  subst f; clear - Ha.
+  subst f; clear - Hs Ha.
   revert a Ha.
   induction lrank as [| ib]; intros; cbn in Ha. {
     exists [0]; cbn.
@@ -2123,6 +2125,14 @@ assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
   destruct l_ini as [| a']; [ cbn in Ha | ]. {
     subst a.
     rewrite List_nth_nil in IHlrank.
+    remember (λ i, nth i [] d) as f eqn:Hf.
+    assert (H : bsort ord (map f lrank) = map f lrank). {
+      cbn in Hs |-*.
+      remember (map f lrank) as lsorted eqn:Hls.
+      destruct lsorted as [| a]; [ easy | ].
+      cbn in Hs |-*.
+      destruct (ord a (f ib)). {
+...
     specialize (IHlrank d eq_refl).
     destruct IHlrank as (lrank', Hr).
     exists (0 :: lrank').
@@ -2149,7 +2159,18 @@ assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
   assert (H : a = nth (S (length lrank)) (a' :: l_ini) d) by easy.
   clear Ha; rename H into Ha; move Ha after Ha''.
   remember (a' :: l_ini) as l eqn:Hl.
-  clear - Ha Ha'' Hr.
+  cbn.
+  destruct (ord a (nth ib l d)). {
+    exists (S (length lrank) :: ib :: lrank); cbn.
+    now rewrite <- Ha.
+  } {
+    exists (ib :: lrank'); cbn.
+    f_equal.
+...
+  }
+}
+destruct H as (lrank', Hr).
+rewrite Hr.
 ...
   destruct l_ini as [| a']; [ easy | cbn ].
   cbn in Ha.
