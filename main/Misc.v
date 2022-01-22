@@ -2106,6 +2106,30 @@ revert lrank Hli.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
 assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
+  destruct lrank as [| ib]; cbn in Hli |-*. {
+    exists [0]; rewrite Hf; cbn.
+    now rewrite <- Hli; cbn.
+  }
+  destruct l_ini as [| a']; [ easy | cbn ].
+  assert (Ha : a = nth (length lrank) l_ini d). {
+    clear - Hli.
+    revert a l_ini Hli.
+    induction lrank as [| ib]; intros; [ now cbn in Hli; rewrite <- Hli | ].
+    cbn in Hli.
+    destruct l_ini as [| b]; [ easy | cbn ].
+    now apply IHlrank.
+  }
+  destruct (ord a (f ib)). {
+    rewrite Hf; cbn - [ nth ].
+    exists (S (length lrank) :: ib :: lrank).
+    now cbn; f_equal.
+  } {
+    exists (ib :: S (length lrank) :: lrank).
+    cbn - [ nth ]; f_equal.
+    rewrite Hf.
+    rewrite List_nth_succ_cons.
+    rewrite <- Hf, <- Ha.
+(* ouais, chais pas *)
 ...
 apply (bsort_loop_bsort_rank_loop ord d d' []).
 ...
