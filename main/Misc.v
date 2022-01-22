@@ -2105,27 +2105,53 @@ remember (λ i, nth i l_ini d) as f eqn:Hf.
 revert lrank Hli.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
+assert (Ha : a = nth (length lrank) l_ini d). {
+  clear - Hli.
+  revert a l_ini Hli.
+  induction lrank as [| ib]; intros; [ now cbn in Hli; rewrite <- Hli | ].
+  cbn in Hli.
+  destruct l_ini as [| b]; [ easy | cbn ].
+  now apply IHlrank.
+}
 assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
-  destruct lrank as [| ib]; cbn in Hli |-*. {
-    exists [0]; rewrite Hf; cbn.
-    now rewrite <- Hli; cbn.
+  subst f; clear - Ha.
+  revert a Ha.
+  induction lrank as [| ib]; intros; cbn in Ha. {
+    exists [0]; cbn.
+    now rewrite Ha.
   }
+  destruct l_ini as [| a']; [ cbn in Ha | ]. {
+    subst a.
+    rewrite List_nth_nil in IHlrank.
+    specialize (IHlrank d eq_refl).
+    destruct IHlrank as (lrank', Hr).
+    exists (0 :: lrank').
+    cbn - [ nth ].
+    rewrite List_nth_nil.
+    destruct (ord d d). {
+      remember (λ i, nth i [] d) as f; cbn; subst f.
+      f_equal.
+      rewrite <- Hr; clear.
+      induction lrank as [| ia]; [ easy | ].
+      remember (λ i, nth i [] d) as f; cbn; subst f.
+      rewrite List_nth_nil.
+      destruct (ord d d); [ easy | ].
+      now f_equal.
+    } {
+      now rewrite Hr.
+    }
+  }
+  cbn in Ha.
+...
   destruct l_ini as [| a']; [ easy | cbn ].
-  assert (Ha : a = nth (length lrank) l_ini d). {
-    clear - Hli.
-    revert a l_ini Hli.
-    induction lrank as [| ib]; intros; [ now cbn in Hli; rewrite <- Hli | ].
-    cbn in Hli.
-    destruct l_ini as [| b]; [ easy | cbn ].
-    now apply IHlrank.
-  }
+  cbn in Ha.
   destruct (ord a (f ib)). {
     rewrite Hf; cbn - [ nth ].
     exists (S (length lrank) :: ib :: lrank).
     now cbn; f_equal.
   } {
 (**)
-    exists (ib :: ...)
++    exists (ib :: ...)
 ...
     exists (ib :: S (length lrank) :: lrank).
     cbn - [ nth ]; f_equal.

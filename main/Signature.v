@@ -2127,6 +2127,16 @@ destruct c2. {
     exfalso.
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
+Theorem to_perm_inj : ∀ l i j,
+  NoDup l
+  → ff_app (to_perm l) i = ff_app (to_perm l) j
+  → i = j.
+Proof.
+intros * Hnd Hij.
+unfold to_perm in Hij.
+Print to_perm_fun.
+...
+apply to_perm_inj in Hc1.
 ...
     apply NoDup_nth in Hc1.
 2: {
