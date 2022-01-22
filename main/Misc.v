@@ -2096,6 +2096,17 @@ destruct (ord (f ia) (f ib)); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
+Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
+  bsort_insert ord (f ia) (map f lrank) =
+  map f (bsort_rank_insert ord f ia lrank).
+Proof.
+intros.
+induction lrank as [| ib]; [ easy | cbn ].
+destruct (ord (f ia) (f ib)); [ easy | ].
+cbn; f_equal.
+apply IHlrank.
+Qed.
+
 Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
@@ -2111,7 +2122,7 @@ Theorem bsort_loop_bsort_rank_loop : ∀ A ord (d d' : A) lrank l_ini (l : list 
       (bsort_rank_loop ord (λ i, nth i l d') (length lrank) lrank l).
 Proof.
 intros * Hs Hli.
-remember (λ i, nth i l_ini d) as f eqn:Hf.
+set (f := λ i, nth i l_ini d) in Hs |-*.
 revert lrank Hs Hli.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
@@ -2123,17 +2134,34 @@ assert (Ha : a = nth (length lrank) l_ini d). {
   destruct l_ini as [| b]; [ easy | cbn ].
   now apply IHlrank.
 }
-Print bsort_rank_insert.
-Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
-  bsort_insert ord (f ia) (map f lrank) =
-  map f (bsort_rank_insert ord f ia lrank).
-Proof.
-intros.
-...
-assert (Ha' : a = f (length lrank)) by now rewrite Hf.
+assert (Ha' : a = f (length lrank)) by easy.
 rewrite Ha' at 1.
 rewrite bsort_insert_bsort_rank_insert.
-rewrite IHl.
+rewrite IHl; cycle 1. {
+  remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
+...
+} {
+  rewrite length_bsort_rank_insert; cbn.
+  destruct l_ini as [| b]; [ now rewrite skipn_nil in Hli | ].
+  destruct lrank as [| c]. {
+    cbn in Hli, Ha' |-*.
+    now injection Hli.
+  }
+  cbn in Ha', Hli.
+  rewrite List_length_cons.
+  remember (length lrank) as len.
+  clear - Hli.
+  revert l len Hli.
+  induction l_ini as [| d]; intros; [ now rewrite skipn_nil in Hli | ].
+  cbn in Hli |-*.
+  destruct len. {
+    cbn in Hli |-*.
+    now injection Hli.
+  }
+  cbn in Hli.
+  now apply IHl_ini.
+}
+...
 rewrite length_bsort_rank_insert.
 ...
 assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
