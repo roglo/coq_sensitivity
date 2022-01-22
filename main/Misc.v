@@ -2146,6 +2146,10 @@ assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
   move Ha after Ha''.
   specialize (IHlrank a'' eq_refl).
   destruct IHlrank as (lrank', Hr).
+  assert (H : a = nth (S (length lrank)) (a' :: l_ini) d) by easy.
+  clear Ha; rename H into Ha; move Ha after Ha''.
+  remember (a' :: l_ini) as l eqn:Hl.
+  clear - Ha Ha'' Hr.
 ...
   destruct l_ini as [| a']; [ easy | cbn ].
   cbn in Ha.
