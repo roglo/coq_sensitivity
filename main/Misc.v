@@ -2087,6 +2087,15 @@ Check @bsort_rank_insert.
 Check @bsort_rank_loop.
 Check @bsort_rank.
 
+Theorem length_bsort_rank_insert : ∀ A B ord (f : B → A) ia lrank,
+  length (bsort_rank_insert ord f ia lrank) = S (length lrank).
+Proof.
+intros.
+induction lrank as [| ib]; [ easy | cbn ].
+destruct (ord (f ia) (f ib)); [ easy | cbn ].
+now rewrite IHlrank.
+Qed.
+
 Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
@@ -2114,6 +2123,18 @@ assert (Ha : a = nth (length lrank) l_ini d). {
   destruct l_ini as [| b]; [ easy | cbn ].
   now apply IHlrank.
 }
+Print bsort_rank_insert.
+Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
+  bsort_insert ord (f ia) (map f lrank) =
+  map f (bsort_rank_insert ord f ia lrank).
+Proof.
+intros.
+...
+assert (Ha' : a = f (length lrank)) by now rewrite Hf.
+rewrite Ha' at 1.
+rewrite bsort_insert_bsort_rank_insert.
+rewrite IHl.
+rewrite length_bsort_rank_insert.
 ...
 assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
   subst f; clear - Hs Ha.
