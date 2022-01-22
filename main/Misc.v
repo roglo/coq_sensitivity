@@ -2124,6 +2124,9 @@ assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
     exists (S (length lrank) :: ib :: lrank).
     now cbn; f_equal.
   } {
+(**)
+    exists (ib :: ...)
+...
     exists (ib :: S (length lrank) :: lrank).
     cbn - [ nth ]; f_equal.
     rewrite Hf.
