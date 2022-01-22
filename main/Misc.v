@@ -2057,7 +2057,74 @@ now destruct Ha.
 Qed.
 
 (* bsort_rank: like bsort but return the rank of what have been
-   sorted
+   sorted *)
+
+Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
+  match lrank with
+  | [] => [ia]
+  | ib :: l =>
+      if ord (f ia) (f ib) then ia :: lrank
+      else ib :: bsort_rank_insert ord f ia l
+  end.
+
+Fixpoint bsort_rank_loop {A} (ord : A → A → bool) f ia lrank (l : list A) :=
+  match l with
+  | [] => lrank
+  | _ :: l' => bsort_rank_loop ord f (S ia) (bsort_rank_insert ord f ia lrank) l'
+  end.
+
+Definition bsort_rank {A} (ord : A → A → bool) l :=
+  match l with
+  | [] => []
+  | d :: _ => bsort_rank_loop ord (λ i, nth i l d) 0 [] l
+  end.
+
+Compute (let l := [2;7;1] in bsort_rank Nat.leb l).
+Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
+Compute (let l := [5;2;2;7;0] in bsort_rank Nat.ltb l).
+
+Check @bsort_rank_insert.
+Check @bsort_rank_loop.
+Check @bsort_rank.
+
+Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
+  bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
+Proof.
+intros.
+unfold bsort, bsort_rank.
+destruct l as [| d' l']; [ easy | ].
+remember (d' :: l') as l eqn:Hl; clear l' Hl.
+Theorem bsort_loop_bsort_rank_loop : ∀ A ord (d d' : A) lrank l_ini (l : list A),
+  l = skipn (length lrank) l_ini
+  → bsort_loop ord (map (λ i, nth i l_ini d) lrank) l =
+    map (λ i, nth i l_ini d)
+      (bsort_rank_loop ord (λ i, nth i l d') (length lrank) lrank l).
+Proof.
+intros * Hli.
+remember (λ i, nth i l_ini d) as f eqn:Hf.
+revert lrank Hli.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+assert (∃ lrank', bsort_insert ord a (map f lrank) = map f lrank'). {
+...
+apply (bsort_loop_bsort_rank_loop ord d d' []).
+...
+
+  map (λ i, nth i l d) (bsort_rank_loop ord d' l i reml lsorted) =
+  bsort_loop ord (map (λ i, nth i l d) lsorted) (skipn (length lsorted) l).
+Proof.
+intros.
+revert l i lsorted.
+induction reml; intros; cbn. {
+...
+induction l as [| a]; [ easy | ].
+cbn - [ nth ].
+destruct l as [| b]; [ easy | ].
+cbn - [ nth ].
+unfold nth at 2 3.
+cbn - [ nth ].
+...
+
 
 Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (ia : B) a lsorted :=
   match lsorted with
