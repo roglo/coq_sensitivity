@@ -2139,7 +2139,18 @@ rewrite Ha' at 1.
 rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; cycle 1. {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
+  clear - Hs Hls.
+  unfold bsort.
 ...
+  revert lsorted Hls.
+  induction lrank as [| ia]; intros; [ now subst lsorted | ].
+  cbn in Hs, Hls.
+  destruct (ord (f (S (length lrank))) (f ia)). {
+    unfold bsort.
+    rewrite Hls; cbn.
+    destruct (ord (f ia) (f (S (length lrank)))). {
+...
+... suite ok
 } {
   rewrite length_bsort_rank_insert; cbn.
   destruct l_ini as [| b]; [ now rewrite skipn_nil in Hli | ].
