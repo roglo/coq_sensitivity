@@ -2140,6 +2140,7 @@ rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; cycle 1. {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
   clear - Hs Hls.
+...
   unfold bsort; subst lsorted.
   induction lrank as [| ia]; intros; [ easy | ].
   cbn in Hs |-*.
