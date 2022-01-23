@@ -2153,6 +2153,30 @@ rewrite Ha at 1.
 rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; [ | | now rewrite length_bsort_rank_insert ]. 2: {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
+  clear a Ha.
+Print bsort_rank_insert.
+Theorem glop : ∀ A ord (d : A) ia lrank l,
+  bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
+  → bsort ord (map (λ i, nth i l d)
+      (bsort_rank_insert ord (λ i, nth i l d) ia lrank)) =
+    map (λ i, nth i l d) (bsort_rank_insert ord (λ i, nth i l d) ia lrank).
+Proof.
+intros * Hs.
+revert d ia l Hs.
+induction lrank as [| ib]; intros; [ easy | cbn ].
+remember (ord (nth ia l d) (nth ib l d)) as x eqn:Hx.
+symmetry in Hx.
+destruct x. {
+  cbn.
+  remember (ord (nth ib l d) (nth ia l d)) as y eqn:Hy.
+  symmetry in Hy.
+  destruct y. {
+    cbn in Hs.
+    rewrite <- Hs.
+...
+apply (glop ord d (length lrank)) in Hs.
+fold f in Hs.
+congruence.
 ...
   clear - Hs Hls.
 Search bsort.
