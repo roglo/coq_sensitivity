@@ -2135,21 +2135,62 @@ assert (Ha : a = nth (length lrank) l_ini d). {
   now apply IHlrank.
 }
 assert (Ha' : a = f (length lrank)) by easy.
-rewrite Ha' at 1.
+clear Ha; rename Ha' into Ha.
+assert (Hl : l = skipn (S (length lrank)) l_ini). {
+  clear - Hli.
+  revert lrank l Hli.
+  induction l_ini as [| b]; intros; [ now rewrite skipn_nil in Hli | ].
+  destruct lrank as [| ia]. {
+    now injection Hli; clear Hli; intros; subst b l.
+  }
+  cbn in Hli.
+  rewrite skipn_cons.
+  rewrite List_length_cons.
+  now apply IHl_ini.
+}
+clear Hli.
+rewrite Ha at 1.
 rewrite bsort_insert_bsort_rank_insert.
-rewrite IHl; cycle 1. {
+rewrite IHl; [ | | now rewrite length_bsort_rank_insert ]. 2: {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
+...
   clear - Hs Hls.
 Search bsort.
 Theorem bsort_bsort_rank_id : ∀ A ord (d : A) l lrank,
-  bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
+  length lrank = length l
+  → bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
   → bsort_rank ord l = lrank.
 Proof.
-intros * Hs.
-revert l Hs.
+intros * Hl Hs.
+revert l Hl Hs.
 induction lrank as [| ia]; intros. {
-  cbn in Hs.
-  cbn in Hsl.
+  cbn in Hl.
+  symmetry in Hl.
+  now apply length_zero_iff_nil in Hl; subst l.
+}
+...
+Theorem glop : ∀ A ord (d : A) l ia lrank,
+  bsort_rank ord l = ia :: lrank
+  ↔ ∀ a, a ∈ l → ord (nth ia l d) a = true.
+Proof.
+intros.
+split. {
+  intros Hl a Hal.
+  induction lrank as [| ib]. {
+    revert ia a Hal Hl.
+    induction l as [| b]; intros; [ easy | ].
+    destruct Hal as [Hal| Hal]. {
+      subst b.
+      destruct ia. {
+        rewrite List_nth_0_cons.
+        cbn - [ nth ] in Hl.
+...
+apply (glop _ d).
+...
+destruct l as [| a]; [ easy | ].
+cbn in Hl.
+apply Nat.succ_inj in Hl.
+remember (a :: l) as l'; cbn in Hs; subst l'.
 ...
 specialize (bsort_bsort_rank_id _ _ _ _ Hs) as H1.
 ...
@@ -2160,28 +2201,6 @@ specialize (bsort_bsort_rank_id _ _ _ _ Hs) as H1.
     cbn.
     destruct (ord (f ia) (f (S (length lrank)))). {
 ...
-... suite ok
-} {
-  rewrite length_bsort_rank_insert; cbn.
-  destruct l_ini as [| b]; [ now rewrite skipn_nil in Hli | ].
-  destruct lrank as [| c]. {
-    cbn in Hli, Ha' |-*.
-    now injection Hli.
-  }
-  cbn in Ha', Hli.
-  rewrite List_length_cons.
-  remember (length lrank) as len.
-  clear - Hli.
-  revert l len Hli.
-  induction l_ini as [| d]; intros; [ now rewrite skipn_nil in Hli | ].
-  cbn in Hli |-*.
-  destruct len. {
-    cbn in Hli |-*.
-    now injection Hli.
-  }
-  cbn in Hli.
-  now apply IHl_ini.
-}
 ...
 rewrite length_bsort_rank_insert.
 ...
