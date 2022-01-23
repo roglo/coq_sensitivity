@@ -2140,6 +2140,18 @@ rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; cycle 1. {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
   clear - Hs Hls.
+Search bsort.
+Theorem bsort_bsort_rank_id : ∀ A ord (d : A) l lrank,
+  bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
+  → bsort_rank ord l = lrank.
+Proof.
+intros * Hs.
+revert l Hs.
+induction lrank as [| ia]; intros. {
+  cbn in Hs.
+  cbn in Hsl.
+...
+specialize (bsort_bsort_rank_id _ _ _ _ Hs) as H1.
 ...
   unfold bsort; subst lsorted.
   induction lrank as [| ia]; intros; [ easy | ].
