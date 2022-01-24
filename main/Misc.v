@@ -2147,6 +2147,8 @@ apply Hini.
 now right.
 Qed.
 
+...
+
 Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
   ia < length l_ini
   → (∀ i, i ∈ lrank → i < length l_ini)
@@ -2158,7 +2160,14 @@ clear Hia.
 revert ia lrank Hini.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ].
-rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | | easy ].
+rewrite IHl. 2: {
+  intros i Hi.
+  admit. (* vraisemblable *)
+}
+destruct (lt_dec ia (length l_ini)) as [Hil| Hil]. {
+  now rewrite bsort_rank_insert_nth_indep with (d' := d').
+}
+apply Nat.nlt_ge in Hil.
 ...
 rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | easy | easy ].
 destruct (Nat.eq_dec (S ia) (length l_ini)) as [Hil| Hil]. {
