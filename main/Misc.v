@@ -2158,6 +2158,10 @@ revert ia lrank Hia Hini.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ].
 rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | easy | easy ].
+destruct (Nat.eq_dec (S ia) (length l_ini)) as [Hil| Hil]. {
+  destruct l as [| c]; [ easy | ].
+  cbn.
+...
 destruct (Nat.eq_dec (S ia) (length l_ini)) as [Hil| Hil]. 2: {
   apply IHl; [ flia Hil Hia | ].
   intros i Hi.
