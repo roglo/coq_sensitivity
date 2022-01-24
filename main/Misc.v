@@ -2156,17 +2156,40 @@ rewrite IHl; [ | | now rewrite length_bsort_rank_insert ]. 2: {
   clear a Ha.
 (**)
   subst lsorted.
-  destruct lrank as [| ia1]; [ easy | ].
+(**)
+  clear - Hs.
+  induction lrank as [| ia]; [ easy | ].
+  cbn in Hs |-*.
+...
+  destruct lrank as [| ia1]; [ easy | cbn ].
+  remember (ord (f (S (length lrank))) (f ia1)) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x; cbn. {
+    remember (ord (f ia1) (f (S (length lrank)))) as y eqn:Hy.
+    symmetry in Hy.
+    destruct y; cbn. 2: {
+      remember (map f lrank) as lsorted eqn:Hlsorted.
+      remember (length lrank) as len eqn:Hlen.
+      clear lrank Hs Hl Hlen Hlsorted.
+      induction lsorted as [| a la]; [ easy | cbn ].
+      remember (ord a (f (S len))) as z eqn:Hz.
+      symmetry in Hz.
+      destruct z. {
+        destruct la as [| b].
+...
   destruct lrank as [| ia2]. {
     cbn.
     remember (ord (f 1) (f ia1)) as x eqn:Hx.
     symmetry in Hx.
-    destruct x. {
-      cbn.
-      remember (ord (f ia1) (f 1)) as y eqn:Hy.
-      symmetry in Hy.
-      destruct y; [ | easy ].
+    destruct x; cbn; [ | now rewrite Hx ].
+    remember (ord (f ia1) (f 1)) as y eqn:Hy.
+    symmetry in Hy.
+    destruct y; [ | easy ].
 (* ord must be antisymmetric *)
+    admit.
+  }
+  cbn.
+}
 ...
 Print bsort_rank_insert.
 Theorem glop : ∀ A ord (d : A) ia lrank l,
