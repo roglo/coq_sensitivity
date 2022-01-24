@@ -2079,13 +2079,11 @@ Definition bsort_rank {A} (ord : A → A → bool) l :=
   | d :: _ => bsort_rank_loop ord (λ i, nth i l d) 0 [] l
   end.
 
+(*
 Compute (let l := [2;7;1] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.ltb l).
-
-Check @bsort_rank_insert.
-Check @bsort_rank_loop.
-Check @bsort_rank.
+*)
 
 Theorem length_bsort_rank_insert : ∀ A B ord (f : B → A) ia lrank,
   length (bsort_rank_insert ord f ia lrank) = S (length lrank).
@@ -2127,11 +2125,80 @@ specialize (Hia (S i) Hi) as H2.
 now rewrite <- Nat.add_succ_comm in H2.
 Qed.
 
+Theorem bsort_rank_insert_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini,
+  ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → bsort_rank_insert ord (λ i : nat, nth i l_ini d) ia lrank =
+    bsort_rank_insert ord (λ i : nat, nth i l_ini d') ia lrank.
+Proof.
+intros * Hia Hini.
+induction lrank as [| ib]; intros; [ easy | ].
+cbn - [ nth ].
+specialize (Hini ib (or_introl eq_refl)) as Hib.
+rewrite (nth_indep _ _ d' Hia).
+rewrite (nth_indep _ _ d' Hib).
+remember (ord (nth ia l_ini d') (nth ib l_ini d')) as x eqn:Hx.
+symmetry in Hx.
+destruct x; [ easy | ].
+f_equal.
+apply IHlrank.
+intros i Hi.
+apply Hini.
+now right.
+Qed.
+
+Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
+  ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l =
+    bsort_rank_loop ord (λ i, nth i l_ini d') ia lrank l.
+Proof.
+intros * Hia Hini.
+revert ia lrank Hia Hini.
+induction l as [| b]; intros; [ easy | ].
+cbn - [ nth ].
+rewrite IHl.
+...
+f_equal.
+apply bsort_rank_insert_nth_indep.
+...
+  intros i Hi.
+  apply Hn.
+  destruct Hi as [Hi| Hi]. 2: {
+...
+...
+
+Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) a ia lrank l,
+  bsort_rank_loop ord (λ i, nth i (a :: l) d) ia lrank l =
+  bsort_rank_loop ord (λ i, nth i (a :: l) d') ia lrank l.
+Proof.
+intros.
+induction l as [| b]; [ easy | ].
+cbn - [ nth ].
 ...
 
 Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
+intros.
+destruct l as [| d' l]; [ easy | ].
+cbn - [ nth ].
+replace [d'] with (map (λ i, nth i (d' :: l) d) [0]) by easy.
+rewrite bsort_loop_bsort_rank_loop with (d := d').
+cbn - [ nth ].
+f_equal.
+...
+apply bsort_rank_loop_nth_indep.
+...
+  ============================
+  map (λ i : nat, nth i (d' :: l) d)
+    (bsort_rank_loop ord (λ i : nat, nth i (d' :: l) d) 1 [0] l) =
+  map (λ i : nat, nth i (d' :: l) d)
+    (bsort_rank_loop ord (λ i : nat, nth i (d' :: l) d') 1 [0] l)
+...
+rewrite bsort_loop_bsort_rank_loop with (d := d'); [ | ].
+
+...
 intros.
 destruct l as [| d' l]; [ easy | ].
 cbn - [ nth ].
