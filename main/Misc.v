@@ -2111,9 +2111,31 @@ Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
 intros.
-unfold bsort, bsort_rank.
-destruct l as [| d' l']; [ easy | ].
+destruct l as [| d' l]; [ easy | ].
+cbn - [ nth ].
+rewrite map_ext_in with (g := λ i, nth i (d' :: l) d'). 2: {
+  intros a Ha.
+  apply nth_indep.
+...
+  destruct l as [| b]; [ | cbn ].
+...
 remember (d' :: l') as l eqn:Hl; clear l' Hl.
+...
+rewrite map_ext_in with (g := λ i, nth i l d'). 2: {
+  intros a Ha.
+  apply nth_indep.
+  destruct l as [| b]; [ easy | cbn ].
+  cbn - [ nth ] in Ha.
+  set (f := λ i, nth i (b :: l) b) in Ha.
+  cbn in Ha; subst f.
+  induction l as [| c]; [ cbn in Ha |-*; flia Ha | ].
+  cbn - [ nth ] in IHl.
+...
+Search (_ ∈ bsort_rank _ _).
+...
+set (f := λ i, nth i l d).
+destruct l as [| a1]; [ easy | ].
+...
 Theorem bsort_loop_bsort_rank_loop : ∀ A ord (d d' : A) lrank l_ini (l : list A),
   bsort ord (map (λ i, nth i l_ini d) lrank) = map (λ i, nth i l_ini d) lrank
   → l = skipn (length lrank) l_ini
@@ -2160,6 +2182,9 @@ rewrite IHl; [ | | now rewrite length_bsort_rank_insert ]. 2: {
   clear - Hs.
   induction lrank as [| ia]; [ easy | ].
   cbn in Hs |-*.
+  remember (ord (f (S (length lrank))) (f ia)) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x; cbn.
 ...
   destruct lrank as [| ia1]; [ easy | cbn ].
   remember (ord (f (S (length lrank))) (f ia1)) as x eqn:Hx.
