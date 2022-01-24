@@ -2107,6 +2107,49 @@ cbn; f_equal.
 apply IHlrank.
 Qed.
 
+Print bsort_loop.
+Print bsort_rank_loop.
+
+Theorem bsort_loop_bsort_rank_loop : ∀ A ord d (f : nat → A) lrank l,
+  (∀ i, i < length lrank + length l → f i = nth i l d)
+  → bsort_loop ord (map f lrank) l =
+    map f (bsort_rank_loop ord f (length lrank) lrank l).
+Proof.
+intros * Hia.
+revert lrank Hia.
+induction l as [| a]; intros; [ easy | cbn ].
+specialize (Hia (length lrank)) as H1.
+(* bon, y a un truc qui déconne, là *)
+...
+rewrite <- Nat.add_succ_comm in H1.
+specialize (Hia (length l) (Nat.lt_succ_diag_r _)) as H1.
+specialize (Hia 0 (Nat.lt_0_succ _)) as H1.
+cbn in H1; subst a.
+rewrite bsort_insert_bsort_rank_insert.
+rewrite IHl.
+rewrite length_bsort_rank_insert.
+f_equal; f_equal.
+...
+...
+specialize (Hia (length l) (Nat.lt_succ_diag_r _)) as H1.
+cbn in H1; subst a.
+
+...
+specialize (Hia 0 (Nat.lt_0_succ _)) as H1.
+cbn in H1; subst a.
+rewrite bsort_insert_bsort_rank_insert.
+rewrite IHl with (ia := 0).
+...
+specialize (Hia (length l) (Nat.lt_succ_diag_r _)) as H1.
+
+...
+...
+rewrite (Hia 0).
+rewrite bsort_insert_bsort_rank_insert.
+rewrite IHl with (ia := S ia); [ easy | ].
+(
+...
+
 Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
