@@ -2117,6 +2117,28 @@ rewrite map_ext_in with (g := λ i, nth i (d' :: l) d'). 2: {
   intros a Ha.
   apply nth_indep.
 ...
+(* glop ci-dessous va pas... *)
+Theorem glop : ∀ A ord f ia ib lrank (l : list A),
+  (∀ i, i ∈ lrank → i < length lrank)
+  → ib ∈ bsort_rank_loop ord f ia lrank l
+  → ib < length lrank + length l.
+Proof.
+intros * Hil Hib.
+revert ia ib lrank Hil Hib.
+induction l as [| a]; intros; cbn in Hib. {
+  rewrite Nat.add_0_r.
+  apply Hil, Hib.
+}
+apply IHl in Hib. 2: {
+  intros i Hi.
+  rewrite length_bsort_rank_insert.
+Print bsort_rank_insert.
+Theorem glop : ∀ A B ord (f : B → A) ia ib lrank,
+  ib ∈ bsort_rank_insert ord f ia lrank
+  → ib < length lrank.
+Proof.
+...
+...
   destruct l as [| b]; [ | cbn ].
 ...
 remember (d' :: l') as l eqn:Hl; clear l' Hl.
