@@ -2154,16 +2154,30 @@ rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; [ | | now rewrite length_bsort_rank_insert ]. 2: {
   remember (map f (bsort_rank_insert _ _ _ _)) as lsorted eqn:Hls.
   clear a Ha.
-Print bsort_rank_insert.
+(**)
+  subst lsorted.
+  destruct lrank as [| ia1]; [ easy | ].
+  destruct lrank as [| ia2]. {
+    cbn.
+    remember (ord (f 1) (f ia1)) as x eqn:Hx.
+    symmetry in Hx.
+    destruct x. {
+      cbn.
+      remember (ord (f ia1) (f 1)) as y eqn:Hy.
+      symmetry in Hy.
+      destruct y; [ | easy ].
+(* ord must be antisymmetric *)
 ...
+Print bsort_rank_insert.
 Theorem glop : ∀ A ord (d : A) ia lrank l,
-  bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
+  length lrank ≤ ia
+  → bsort ord (map (λ i, nth i l d) lrank) = map (λ i, nth i l d) lrank
   → bsort ord (map (λ i, nth i l d)
       (bsort_rank_insert ord (λ i, nth i l d) ia lrank)) =
     map (λ i, nth i l d) (bsort_rank_insert ord (λ i, nth i l d) ia lrank).
 Proof.
-intros * Hs.
-revert d ia l Hs.
+intros * Hia Hs.
+revert d ia l Hia Hs.
 induction lrank as [| ib]; intros; [ easy | cbn ].
 remember (ord (nth ia l d) (nth ib l d)) as x eqn:Hx.
 symmetry in Hx.
