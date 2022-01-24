@@ -2154,11 +2154,15 @@ Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
     bsort_rank_loop ord (λ i, nth i l_ini d') ia lrank l.
 Proof.
 intros * Hia Hini.
-revert ia lrank Hia Hini.
+clear Hia.
+revert ia lrank Hini.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ].
+rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | | easy ].
+...
 rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | easy | easy ].
 destruct (Nat.eq_dec (S ia) (length l_ini)) as [Hil| Hil]. {
+  rewrite Hil.
   destruct l as [| c]; [ easy | ].
   cbn.
 ...
