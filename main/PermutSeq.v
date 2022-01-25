@@ -22,11 +22,11 @@ Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ° g) (seq 0 (length (hd [] l))))
   (at level 35, i at level 0, l at level 60).
 
+Definition AllLt u l := ∀ i, i ∈ l → i < u.
+
 (* Permutations of {0, 1, 2, ... n-1} *)
 
-Definition is_permut_list l :=
-  (∀ x, x ∈ l → x < length l) ∧
-  (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j).
+Definition is_permut_list l := AllLt (length l) l ∧ NoDup l.
 
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
@@ -41,6 +41,23 @@ Proof. easy. Qed.
 
 Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
 Proof. intros; apply List_map_nth_seq. Qed.
+
+Theorem NoDup_nat : ∀ l,
+  NoDup l
+  → (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j).
+Proof.
+intros * Hnd.
+now apply NoDup_nth.
+Qed.
+Arguments NoDup_nat : clear implicits.
+
+Theorem nat_NoDup : ∀ l,
+  (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j)
+  → NoDup l.
+Proof.
+intros * Hnd.
+now apply NoDup_nth in Hnd.
+Qed.
 
 Theorem permut_comp_assoc : ∀ n f g h,
   length g = n
@@ -77,7 +94,7 @@ split. {
     apply all_true_and_seq_true_iff.
     intros j Hj.
     apply orb_true_iff.
-    specialize (H2 (i - 1) (j - 1)) as H3.
+    specialize (NoDup_nat _ H2 (i - 1) (j - 1)) as H3.
     assert (H : i - 1 < length l) by flia Hi.
     specialize (H3 H); clear H.
     assert (H : j - 1 < length l) by flia Hj.
@@ -105,6 +122,7 @@ split. {
     now apply Nat.ltb_lt.
   } {
     clear H1.
+    apply nat_NoDup.
     intros i j Hi Hj Hij.
     specialize (proj2 (all_true_and_list_true_iff _ _ _) H2) as H3.
     rewrite Nat_sub_succ_1 in H3.
@@ -218,7 +236,7 @@ destruct x. {
   }
   cbn in Hnxx.
   cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
-  specialize (Hp2 x x' Hxl Hx'l Hnxx) as H1.
+  specialize (NoDup_nat _ Hp2 x x' Hxl Hx'l Hnxx) as H1.
   now destruct H1.
 }
 Qed.
@@ -266,12 +284,12 @@ destruct j as [j| ]. {
   destruct Hj as (Hjl & Hij & Hj).
   apply Nat.eqb_eq in Hj.
   destruct Hp as (Hp1, Hp2).
-  specialize (Hp2 (S i) j).
+  specialize (NoDup_nat _ Hp2 (S i) j) as H1.
   assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
-  specialize (Hp2 H Hjl); clear H.
-  unfold ff_app in Hp2.
-  rewrite List_nth_succ_cons in Hp2.
-  now specialize (Hp2 Hj).
+  specialize (H1 H Hjl); clear H.
+  unfold ff_app in H1.
+  rewrite List_nth_succ_cons in H1.
+  now specialize (H1 Hj).
 }
 specialize (List_rank_None 0 _ _ Hj) as H1.
 specialize (H1 (S i)).
@@ -444,6 +462,8 @@ split; cbn. {
   apply permut_list_ub; [ easy | ].
   now apply transposition_lt.
 } {
+  apply nat_NoDup.
+  rewrite List_map_seq_length.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
@@ -456,18 +476,27 @@ split; cbn. {
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
-    destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now subst j; apply Hσ | ].
+    destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+      now subst j; apply (NoDup_nat _ (proj2 Hσ)).
+    }
     apply Nat.neq_sym in Hjq.
-    now exfalso; apply Hjq, Hσ.
+    now exfalso; apply Hjq, (NoDup_nat _ (proj2 Hσ)).
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
-    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now subst i j; apply Hσ | ].
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+      now subst i j; apply (NoDup_nat _ (proj2 Hσ)).
+    }
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
-    now apply Nat.neq_sym in Hjp; exfalso; apply Hjp; apply Hσ.
+    apply Nat.neq_sym in Hjp; exfalso; apply Hjp.
+    now apply (NoDup_nat _ (proj2 Hσ)).
   }
-  destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ now exfalso; apply Hiq, Hσ | ].
-  destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ now exfalso; apply Hip, Hσ | ].
-  now apply Hσ.
+  destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
+    now exfalso; apply Hiq, (NoDup_nat _ (proj2 Hσ)).
+  }
+  destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
+    now exfalso; apply Hip, (NoDup_nat _ (proj2 Hσ)).
+  }
+  now apply (NoDup_nat _ (proj2 Hσ)).
 }
 Qed.
 
@@ -539,6 +568,7 @@ split. {
   intros i Hin.
   now rewrite in_seq in Hin.
 } {
+  apply nat_NoDup.
   cbn; rewrite seq_length.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
@@ -976,7 +1006,7 @@ destruct (Nat.eq_dec (nth i l 0) a) as [Hia| Hia]. {
   rewrite Hia.
   apply Nat.succ_lt_mono in Hin.
   symmetry in Hia.
-  now specialize (Hn 0 (S i) (Nat.lt_0_succ _) Hin Hia).
+  now specialize (NoDup_nat _ Hn 0 (S i) (Nat.lt_0_succ _) Hin Hia).
 }
 specialize (Hvn a (or_introl eq_refl)); cbn in Hvn.
 flia Hvn Hal Hia.
@@ -1001,13 +1031,13 @@ destruct (lt_dec a (nth i l 0)) as [Hai| Hai]. {
   destruct (lt_dec a (nth j l 0)) as [Haj| Haj]. {
     apply Nat.succ_inj.
     apply Nat.succ_lt_mono in Hin, Hjn.
-    apply Hn; [ easy | easy | ].
+    apply (NoDup_nat _ Hn); [ easy | easy | ].
     cbn; flia Hai Haj Hij.
   }
   apply Nat.nlt_ge in Haj.
   rewrite Nat.sub_0_r in Hij.
   apply Nat.succ_lt_mono in Hjn.
-  specialize (Hn 0 (S j) (Nat.lt_0_succ _) Hjn) as H1.
+  specialize (NoDup_nat _ Hn 0 (S j) (Nat.lt_0_succ _) Hjn) as H1.
   cbn in H1.
   replace (nth j l 0) with a in H1 by flia Hai Haj Hij.
   now specialize (H1 eq_refl).
@@ -1016,7 +1046,7 @@ apply Nat.nlt_ge in Hai.
 rewrite Nat.sub_0_r in Hij.
 destruct (lt_dec a (nth j l 0)) as [Haj| Haj]. {
   apply Nat.succ_lt_mono in Hin.
-  specialize (Hn (S i) 0 Hin (Nat.lt_0_succ _)) as H1.
+  specialize (NoDup_nat _ Hn (S i) 0 Hin (Nat.lt_0_succ _)) as H1.
   cbn in H1.
   replace (nth i l 0) with a in H1 by flia Hai Haj Hij.
   now specialize (H1 eq_refl).
@@ -1024,7 +1054,7 @@ destruct (lt_dec a (nth j l 0)) as [Haj| Haj]. {
 rewrite Nat.sub_0_r in Hij.
 apply Nat.succ_inj.
 apply Nat.succ_lt_mono in Hin, Hjn.
-now apply Hn.
+now apply (NoDup_nat _ Hn).
 Qed.
 
 Theorem length_sub_canon_permut_list : ∀ l,
@@ -1052,6 +1082,7 @@ apply Nat.add_lt_le_mono. {
     rewrite length_sub_canon_permut_list in Hj |-*.
     apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
   } {
+    apply nat_NoDup.
     intros i j Hi Hj.
     rewrite length_sub_canon_permut_list in Hi, Hj.
     apply sub_canon_sym_gr_elem_inj1; [ easy | flia Hi | flia Hj ].
@@ -1079,6 +1110,7 @@ split. {
   rewrite length_sub_canon_permut_list in Hj |-*.
   apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
 } {
+  apply nat_NoDup.
   intros i j Hi Hj Hij.
   rewrite length_sub_canon_permut_list in Hi, Hj.
   apply sub_canon_sym_gr_elem_inj1 in Hij; [ easy | easy | | ]. {
@@ -1131,6 +1163,7 @@ f_equal. {
     apply permut_list_ub; [ | easy ].
     now apply sub_canon_permut_list_is_permut.
   } {
+    apply nat_NoDup.
     intros i j Hi Hj.
     rewrite length_sub_canon_permut_list in Hi, Hj.
     cbn in Hi, Hj.
@@ -1176,7 +1209,7 @@ f_equal. {
   destruct (le_dec _ _) as [H1| H1]; [ | apply Nat.add_0_r ].
   exfalso.
   apply Nat.le_antisymm in H1; [ symmetry in H1 | easy ].
-  specialize (Hn 0 (S i) (Nat.lt_0_succ _)) as H2.
+  specialize (NoDup_nat _ Hn 0 (S i) (Nat.lt_0_succ _)) as H2.
   assert (H : S i < length (a :: l)) by (cbn; flia Hi).
   now specialize (H2 H H1); clear H.
 }
@@ -1196,6 +1229,7 @@ split. {
   rewrite <- Hji.
   now apply canon_sym_gr_list_ub.
 } {
+  apply nat_NoDup.
   intros * Hi Hj Hij.
   rewrite length_canon_sym_gr_list in Hi, Hj.
   now apply nth_canon_sym_gr_list_inj1 in Hij.
@@ -1527,6 +1561,7 @@ split. {
   rewrite length_permut_list_inv.
   now apply in_permut_list_inv_lt.
 } {
+  apply nat_NoDup.
   rewrite length_permut_list_inv.
   intros i j Hi Hj Hij.
   now apply permut_list_inv_inj in Hij.
@@ -1606,7 +1641,7 @@ split. {
     specialize (H1 H); clear H.
     enough (H : nth k l 0 ≠ n) by flia H H1.
     intros H; rewrite Hn in H.
-    apply Hp in H; [ | | flia Hin Hln ]. 2: {
+    apply (NoDup_nat _ (proj2 Hp)) in H; [ | | flia Hin Hln ]. 2: {
       rewrite Hln.
       destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk Hin.
     }
@@ -1617,6 +1652,7 @@ split. {
   apply in_seq in Hk.
   now replace (S i + (n - i)) with (S n) in Hk by flia Hin.
 } {
+  apply nat_NoDup.
   rewrite map_length, map_app, app_length, seq_length, seq_length.
   unfold ff_app.
   replace (i + (n - i)) with n by flia Hin.
@@ -1629,7 +1665,8 @@ split. {
       rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
       rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
       rewrite seq_nth in Hjk; [ | easy ].
-      apply Hp in Hjk; [ easy | flia Hln Hj | flia Hln Hk ].
+      apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+      easy.
     }
     apply Nat.nlt_ge in Hki; exfalso.
     rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
@@ -1637,7 +1674,8 @@ split. {
     rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
     rewrite seq_nth in Hjk; [ | flia Hk Hki ].
     replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
-    apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
+    apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+    flia Hjk Hji Hki.
   }
   apply Nat.nlt_ge in Hji.
   rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
@@ -1649,7 +1687,8 @@ split. {
     rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
     rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
     rewrite seq_nth in Hjk; [ | easy ].
-    apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
+    apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+    flia Hjk Hji Hki.
   }
   apply Nat.nlt_ge in Hki.
   rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
@@ -1657,7 +1696,8 @@ split. {
   rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
   rewrite seq_nth in Hjk; [ | flia Hk Hki ].
   replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
-  apply Hp in Hjk; [ flia Hjk Hji Hki | flia Hln Hj | flia Hln Hk ].
+  apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+  flia Hjk Hji Hki.
 }
 Qed.
 

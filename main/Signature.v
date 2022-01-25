@@ -610,10 +610,14 @@ apply Nat.nlt_ge in H2.
 apply Nat.le_antisymm in H1; [ | easy ].
 destruct (lt_dec i j) as [H3| H3]. {
   destruct (lt_dec j i) as [H| H]; [ flia H3 H | clear H ].
-  apply Hp in H1; [ flia H1 H3 | now rewrite Hn | now rewrite Hn ].
+  destruct Hp as (_, Hp).
+  apply (NoDup_nat _ Hp) in H1; [ | now rewrite Hn | now rewrite Hn ].
+  flia H1 H3.
 }
 destruct (lt_dec j i) as [H4| H4]. {
-  apply Hp in H1; [ flia H1 H4 | now rewrite Hn | now rewrite Hn ].
+  destruct Hp as (_, Hp).
+  apply (NoDup_nat _ Hp) in H1; [ | now rewrite Hn | now rewrite Hn ].
+  flia H1 H4.
 }
 rewrite rngl_div_1_r; [ | now left | easy ].
 apply rngl_mul_1_l.
@@ -964,7 +968,8 @@ split. {
     rewrite <- Hji.
     now apply transposition_lt.
   } {
-    rewrite map_length, seq_length.
+    apply nat_NoDup.
+    rewrite List_map_seq_length.
     intros i j Hi Hj Hs.
     unfold transposition in Hs.
     unfold ff_app in Hs.
@@ -1206,20 +1211,23 @@ split. {
   congruence.
 } {
   unfold comp_list.
+  apply nat_NoDup.
   rewrite map_length.
   intros i j Hi Hj.
   unfold ff_app.
   rewrite (List_map_nth' 0); [ | easy ].
   rewrite (List_map_nth' 0); [ | easy ].
   intros Hij.
-  apply Hp11 in Hij; cycle 1. {
+  destruct Hp11 as (_, Hp11).
+  apply (NoDup_nat _ Hp11) in Hij; cycle 1. {
     rewrite Hp12, <- Hp22.
     now apply Hp21, nth_In.
   } {
     rewrite Hp12, <- Hp22.
     now apply Hp21, nth_In.
   }
-  now apply Hp21 in Hij.
+  destruct Hp21 as (_, Hp21).
+  now apply (NoDup_nat _ Hp21) in Hij.
 }
 Qed.
 
@@ -1304,7 +1312,9 @@ rewrite if_ltb_lt_dec in Hij.
 destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
 apply rngl_sub_move_0_r in Hij; [ | easy ].
 apply rngl_of_nat_inj in Hij; [ | now left | easy ].
-apply Hgp in Hij; [ flia Hi Hj Hlij Hij | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
+destruct Hgp as (_, Hgp).
+apply (NoDup_nat _ Hgp) in Hij; [ | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
+flia Hi Hj Hlij Hij.
 Qed.
 
 Theorem signature_comp_fun_expand_2_1 :
@@ -1352,7 +1362,9 @@ rewrite rngl_inv_product_comm; [ | | easy | easy | easy | easy | ]; cycle 1. {
   apply rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | now left | easy ].
   rewrite <- Hn in Hnz.
-  apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj Hnz | flia Hi Hnz ].
+  destruct Hp2 as (_, Hp2).
+  apply (NoDup_nat _ Hp2) in Hij; [ | flia Hj Hnz | flia Hi Hnz ].
+  flia Hi Hj Hlij Hij.
 }
 erewrite <- rngl_product_mul_distr; [ | easy ].
 erewrite rngl_product_eq_compat. 2: {
@@ -1366,7 +1378,9 @@ erewrite rngl_product_eq_compat. 2: {
     apply rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | now left | easy ].
     rewrite <- Hn in Hnz.
-    apply Hp2 in Hij; [ flia Hi Hj Hlij Hij | flia Hj Hnz | flia Hi Hnz ].
+    destruct Hp2 as (_, Hp2).
+    apply (NoDup_nat _ Hp2) in Hij; [ | flia Hj Hnz | flia Hi Hnz ].
+    flia Hi Hj Hlij Hij.
   }
   erewrite <- rngl_product_mul_distr; [ | easy ].
   easy.
@@ -1593,7 +1607,8 @@ rewrite product_product_if_permut; try easy. {
     apply rngl_of_nat_inj in H; [ | now left | easy ].
     apply Hij; symmetry.
     rewrite <- Hn1 in Hi, Hj.
-    now apply Hp1 in H.
+    destruct Hp1 as (_, Hp1).
+    now apply (NoDup_nat _ Hp1) in H.
   } {
     revert H.
     apply rngl_inv_neq_0; [ now left | easy | easy | ].
@@ -1679,7 +1694,7 @@ split. {
       apply Nat.leb_gt in Hjn.
       rewrite Hjn, Nat.add_0_r in Hnj.
       apply Nat.leb_gt in Hjn.
-      specialize (Hpi j n) as H2.
+      specialize (NoDup_nat _ Hpi j n) as H2.
       assert (H : j < length l) by now rewrite Hl; flia Hjn.
       specialize (H2 H Hil); clear H.
       assert (H : ff_app l j = ff_app l n) by now rewrite <- Hni.
@@ -1692,7 +1707,7 @@ split. {
       apply (In_nth _ _ 0) in Hini.
       destruct Hini as (j & Hjl & Hjn).
       rewrite firstn_length, min_l in Hjl; [ | flia Hil ].
-      specialize (Hpi i j Hil) as H2.
+      specialize (NoDup_nat _ Hpi i j Hil) as H2.
       assert (H : j < length l) by flia Hjl Hil.
       specialize (H2 H); clear H.
       rewrite <- Hni in H2.
@@ -1706,7 +1721,7 @@ split. {
       destruct Hini as (j & Hjl & Hjn).
       rewrite skipn_length in Hjl.
       rewrite List_nth_skipn in Hjn.
-      specialize (Hpi i (j + S i) Hil) as H2.
+      specialize (NoDup_nat _ Hpi i (j + S i) Hil) as H2.
       assert (H : j + S i < length l) by flia Hjl.
       specialize (H2 H); clear H.
       rewrite <- Hni in H2.
@@ -1716,6 +1731,7 @@ split. {
       flia H2.
     }
   } {
+    apply nat_NoDup.
     rewrite butn_length.
     apply Nat.ltb_lt in Hil; rewrite Hil.
     apply Nat.ltb_lt in Hil.
@@ -1725,7 +1741,7 @@ split. {
     destruct Hpp as (Hp, Hpi).
     unfold ff_app in Hjk.
     do 2 rewrite nth_butn in Hjk.
-    apply Hpi in Hjk; cycle 1. {
+    apply (NoDup_nat _ Hpi) in Hjk; cycle 1. {
       rewrite Hpl, <- Nat.add_1_r.
       apply Nat.add_lt_le_mono; [ easy | ].
       apply Nat_b2n_upper_bound.
@@ -1908,10 +1924,12 @@ split. {
   rewrite Hal, <- Hbl.
   now apply Hbp.
 } {
+  apply nat_NoDup.
   rewrite map_length.
   intros j k Hj Hk Hjk.
   assert (Hab : is_permut n (la ° lb)) by now apply comp_is_permut.
-  apply Hab in Hjk; [ easy | | ]; now rewrite comp_length.
+  destruct Hab as ((_, Hab), _).
+  apply (NoDup_nat _ Hab) in Hjk; [ easy | | ]; now rewrite comp_length.
 }
 Qed.
 
@@ -2045,23 +2063,38 @@ Qed.
 
 (*
 Definition collapse_fun l i :=
-  let v := nth i (bsort Nat.leb l) 0 in
-  match List_rank (Nat.eqb v) l with
-  | Some j => replace_at j l i
-  | None => l
-  end.
-*)
-
-(*
-Definition collapse l :=
-  fold_left collapse_fun (seq 0 (length l)) l.
-*)
-
-Definition collapse_fun l i :=
   replace_at (nth i (bsort_rank Nat.leb l) 0) l i.
 
 Definition collapse l :=
   fold_left collapse_fun (seq 0 (length l)) l.
+*)
+
+Definition collapse_fun lrank l i :=
+  replace_at (nth i lrank 0) l i.
+
+Definition collapse l :=
+  fold_left (collapse_fun (bsort_rank Nat.leb l)) (seq 0 (length l)) l.
+
+Theorem length_collapse : ∀ l, length (collapse l) = length l.
+Proof.
+intros.
+unfold collapse.
+induction l as [| a]; [ easy | ].
+cbn - [ nth seq ].
+rewrite seq_S.
+rewrite fold_left_app.
+cbn - [ nth ].
+...
+intros.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  now apply length_zero_iff_nil in Hlz; subst l.
+}
+unfold collapse.
+apply length_fold_left_collapse_fun.
+now intros H; apply Hlz; subst l.
+Qed.
+
+...
 
 Theorem length_collapse_fun : ∀ l i,
   l ≠ []
@@ -2116,6 +2149,130 @@ Theorem glop : ∀ l l',
   → AllLt (length l) l
   → NoDup (fold_left collapse_fun l l').
 Proof.
+...
+
+Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
+Proof.
+...
+
+Theorem length_collapse_fun : ∀ lrank l i,
+  l ≠ []
+  → AllLt (length l) lrank
+  → length (collapse_fun lrank l i) = length l.
+Proof.
+intros * Hlz Halt.
+unfold collapse_fun.
+apply length_replace_at.
+apply Halt.
+...
+apply nth_In.
+now apply bsort_rank_ub.
+Qed.
+
+Theorem length_fold_left_collapse_fun : ∀ l,
+  l ≠ []
+  → length
+       (fold_left (collapse_fun (bsort_rank Nat.leb l))
+          (seq 0 (length l)) l) =
+    length l.
+Proof.
+intros * Hlz.
+remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
+revert lrank Hr.
+induction l as [| a]; intros; [ easy | clear Hlz ].
+cbn - [ seq nth ].
+rewrite seq_S.
+rewrite fold_left_app; cbn.
+rewrite Hr.
+rewrite length_collapse_fun.
+...
+rewrite IHl. 2: {
+  unfold collapse_fun.
+  intros Hr; apply Hlz; clear Hlz.
+  apply (f_equal length) in Hr.
+  rewrite length_replace_at in Hr. {
+    now apply length_zero_iff_nil in Hr.
+  }
+  apply bsort_rank_ub.
+  intros H; subst l; cbn in Hr.
+  now destruct a'.
+}
+now apply length_collapse_fun.
+Qed.
+*)
+
+Theorem length_collapse : ∀ l, length (collapse l) = length l.
+Proof.
+intros.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  now apply length_zero_iff_nil in Hlz; subst l.
+}
+unfold collapse.
+...
+apply length_fold_left_collapse_fun.
+now intros H; apply Hlz; subst l.
+Qed.
+
+Theorem seq_0_AllLt : ∀ len, AllLt len (seq 0 len).
+Proof.
+intros * i Hi.
+now apply in_seq in Hi.
+Qed.
+
+Theorem NoDup_fold_left_collapse_fun : ∀ l l',
+  NoDup l
+  → AllLt (length l) l
+  → NoDup (fold_left collapse_fun l l').
+Proof.
+intros * Hnd Halt.
+destruct (Nat.eq_dec (length l') 0) as [Hlz| Hlz]. {
+  apply length_zero_iff_nil in Hlz; subst l'.
+  apply nat_NoDup.
+  intros * Hi Hj Hij.
+  destruct l as [| a]; [ easy | cbn ].
+  cbn in Hi, Hj.
+  destruct a; cbn. {
+    rewrite length_fold_left_collapse_fun in Hi; [ | easy ].
+    rewrite length_fold_left_collapse_fun in Hj; [ | easy ].
+    apply Nat.lt_1_r in Hi, Hj; congruence.
+  } {
+    rewrite length_fold_left_collapse_fun in Hi; [ | easy ].
+    rewrite length_fold_left_collapse_fun in Hj; [ | easy ].
+    apply Nat.lt_1_r in Hi, Hj; congruence.
+  }
+}
+specialize (NoDup_nat _ Hnd) as Hinj; clear Hnd.
+unfold AllLt in Halt.
+apply nat_NoDup.
+apply length_nzero_iff_nnil in Hlz.
+rewrite length_fold_left_collapse_fun; [ | easy ].
+intros * Hi Hj Hij.
+unfold collapse_fun in Hij.
+...
+remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
+...
+revert l' Hi Hj Hij Hlz.
+induction l as [| a]; intros; cbn in Hij. {
+  revert i j Hi Hj Hij.
+  induction l' as [| b]; intros; [ easy | ].
+  destruct i. {
+    destruct j; [ easy | exfalso ].
+...
+
+Theorem NoDup_collapse : ∀ l, NoDup (collapse l).
+Proof.
+intros.
+unfold collapse.
+apply nat_NoDup.
+intros * Hi Hj Hij.
+...
+specialize NoDup_fold_left_collapse_fun as H1.
+specialize (H1 (seq 0 (length l)) l (seq_NoDup _ _)).
+rewrite seq_length in H1.
+specialize (H1 (seq_0_AllLt _)).
+...
+specialize (glop _ (seq_NoDup _ _)) as H1.
+specialize (glop (seq 0 (length l)) l) as H1.
 ...
 
 Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).

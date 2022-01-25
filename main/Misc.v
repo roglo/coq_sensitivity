@@ -1385,6 +1385,12 @@ rewrite Nat.add_succ_r; cbn.
 apply IHla.
 Qed.
 
+Theorem length_nzero_iff_nnil : ∀ A (l : list A), length l ≠ 0 ↔ l ≠ [].
+Proof.
+intros.
+now split; intros H1 H2; apply H1; apply length_zero_iff_nil.
+Qed.
+
 Theorem List_app_eq_app' :
   ∀ (X : Type) (x1 x2 y1 y2 : list X),
     length x1 = length y1
