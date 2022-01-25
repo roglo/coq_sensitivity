@@ -2032,26 +2032,26 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-(* to_perm: transforms a list of n different naturals into a permutation of
+(* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
-   E.g. to_perm [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
+   E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
    I pretend that that list has the same ε than the initial list i.e.
-      ε (to_perm l) = ε l
+      ε (collapse l) = ε l
    I also pretend that
-      to_perm (to_perml l) = to_perm l
-      to_perm (la ° lb) = to_perm la ° to_perm lb
-      to_perm la = la, if la is a permutation
+      collapse (collapsel l) = collapse l
+      collapse (la ° lb) = collapse la ° collapse lb
+      collapse la = la, if la is a permutation
    To be proven *)
 
-Definition to_perm_fun l i :=
+Definition collapse_fun l i :=
   let v := nth i (bsort Nat.leb l) 0 in
   match List_rank (Nat.eqb v) l with
   | Some j => replace_at j l i
   | None => l
   end.
 
-Definition to_perm l :=
-  fold_left to_perm_fun (seq 0 (length l)) l.
+Definition collapse l :=
+  fold_left collapse_fun (seq 0 (length l)) l.
 
 Theorem length_replace_at : ∀ A k la (e : A),
   k < length la
@@ -2064,10 +2064,10 @@ rewrite List_length_cons, skipn_length.
 flia Hkla.
 Qed.
 
-Theorem length_to_perm_fun : ∀ l i, length (to_perm_fun l i) = length l.
+Theorem length_collapse_fun : ∀ l i, length (collapse_fun l i) = length l.
 Proof.
 intros.
-unfold to_perm_fun; cbn - [ List_rank ].
+unfold collapse_fun; cbn - [ List_rank ].
 remember (nth i (bsort Nat.leb l) 0) as v eqn:Hv.
 remember (List_rank (Nat.eqb v) l) as j eqn:Hj.
 symmetry in Hj.
@@ -2076,33 +2076,33 @@ apply length_replace_at.
 now apply List_rank_Some_lt in Hj.
 Qed.
 
-Theorem length_fold_left_to_perm_fun : ∀ l l',
-  length (fold_left to_perm_fun l' l) = length l.
+Theorem length_fold_left_collapse_fun : ∀ l l',
+  length (fold_left collapse_fun l' l) = length l.
 Proof.
 intros.
 revert l.
 induction l' as [| a']; intros; [ easy | cbn ].
 rewrite IHl'.
-apply length_to_perm_fun.
+apply length_collapse_fun.
 Qed.
 
-Theorem length_to_perm : ∀ l, length (to_perm l) = length l.
+Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
-unfold to_perm.
-apply length_fold_left_to_perm_fun.
+unfold collapse.
+apply length_fold_left_collapse_fun.
 Qed.
 
-Theorem ε_to_perm_ε : ∀ l,
+Theorem ε_collapse_ε : ∀ l,
   NoDup l
-  → ε (to_perm l) = ε l.
+  → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
   now apply length_zero_iff_nil in Hlz; subst l; cbn.
 }
 unfold ε.
-rewrite length_to_perm.
+rewrite length_collapse.
 apply rngl_product_eq_compat.
 intros i (_, Hi).
 apply rngl_product_eq_compat.
@@ -2111,7 +2111,7 @@ move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
-remember (ff_app (to_perm l) j ?= ff_app (to_perm l) i) as c1 eqn:Hc1.
+remember (ff_app (collapse l) j ?= ff_app (collapse l) i) as c1 eqn:Hc1.
 remember (ff_app l j ?= ff_app l i) as c2 eqn:Hc2.
 symmetry in Hc1, Hc2.
 move c2 before c1.
@@ -2127,43 +2127,49 @@ destruct c2. {
     exfalso.
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
-Theorem to_perm_inj : ∀ l i j,
+Theorem collapse_inj : ∀ l i j,
   NoDup l
-  → ff_app (to_perm l) i = ff_app (to_perm l) j
+  → ff_app (collapse l) i = ff_app (collapse l) j
   → i = j.
 Proof.
 intros * Hnd Hij.
-unfold to_perm in Hij.
-Print to_perm_fun.
+unfold collapse in Hij.
+Print collapse_fun.
 Check @bsort_rank.
 (* merde, je me rappelle plus pourquoi il fallait que je fasse
    bsort_rank *)
+Print collapse_fun.
+(* ah si : pour redéfinir collapse sans avoir à utiliser bsort, puis
+   List_rank, parce que List_rank recherche le minimum alors que
+   bsort l'a déjà fait : double emploi, donc preuves supplémentaires
+   à faire ; alors qu'avec bsort_rank, ça se fait en un seul coup ;
+   bon, faut voir, c'est tard, là, je vais me coucher *)
 ...
-apply to_perm_inj in Hc1.
+apply collapse_inj in Hc1.
 ...
     apply NoDup_nth in Hc1.
 2: {
 ...
-Theorem NoDup_to_perm : ∀ l, NoDup l → NoDup (to_perm l).
+Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
 Proof.
 intros * Hnd.
-unfold to_perm.
-Theorem NoDup_fold_left_to_perm_fun : ∀ l l',
+unfold collapse.
+Theorem NoDup_fold_left_collapse_fun : ∀ l l',
   NoDup l
-  → NoDup (fold_left to_perm_fun l' l).
+  → NoDup (fold_left collapse_fun l' l).
 Proof.
 intros * Hnd.
 revert l Hnd.
 induction l' as [| a']; intros; [ easy | cbn ].
 apply IHl'.
-Print to_perm_fun.
+Print collapse_fun.
 ...
-Theorem NoDup_to_perm_fun : ∀ l a,
+Theorem NoDup_collapse_fun : ∀ l a,
   NoDup l
-  → NoDup (to_perm_fun l a).
+  → NoDup (collapse_fun l a).
 Proof.
 intros * Hnd.
-unfold to_perm_fun.
+unfold collapse_fun.
 remember (nth a (bsort Nat.leb l) 0) as v eqn:Hv.
 remember (List_rank (Nat.eqb v) l) as i eqn:Hi.
 symmetry in Hi.
@@ -2178,7 +2184,7 @@ split. {
   apply NoDup_cons_iff.
   split. {
     intros Ha.
-Print to_perm_fun.
+Print collapse_fun.
 Search List_rank.
 ...
 induction la as [| a]; cbn.
@@ -2190,7 +2196,7 @@ apply (List_rank_Some 0) in Hi.
 (*
 ...
 induction l as [| a]; [ constructor | ].
-cbn - [ to_perm_fun ].
+cbn - [ collapse_fun ].
 ...
 *)
 Abort.
@@ -2201,10 +2207,10 @@ Arguments ε {T}%type {ro}.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Compute (let l := [1;2;1;2]%nat in (to_perm l, ε (to_perm l), ε l)).
-Compute (let l := [1;1;3;4]%nat in (to_perm l, ε (to_perm l), ε l)).
-Compute (let l := [1;1;3;4]%nat in (ε (to_perm l), ε l)).
-Compute (ε (to_perm [1;2;3;4]%nat)).
+Compute (let l := [1;2;1;2]%nat in (collapse l, ε (collapse l), ε l)).
+Compute (let l := [1;1;3;4]%nat in (collapse l, ε (collapse l), ε l)).
+Compute (let l := [1;1;3;4]%nat in (ε (collapse l), ε l)).
+Compute (ε (collapse [1;2;3;4]%nat)).
 ...
 
 Theorem sign_comp :
