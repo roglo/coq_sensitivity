@@ -2112,6 +2112,7 @@ Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank ia i j,
     ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) ia lrank l) j
   → i = j.
 Search (nth _ (bsort_rank_loop _ _ _ _ _)).
+Print bsort_rank_insert.
 ...
 destruct i. {
   destruct j; [ easy | ].
