@@ -2219,6 +2219,79 @@ intros i Hi.
 destruct Hi as [Hi| Hi]; [ subst i; cbn; easy | easy ].
 Qed.
 
+Theorem bsort_rank_insert_ub : ∀ A ord (d : A) ia lrank l_ini i,
+  ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → nth i (bsort_rank_insert ord (λ i, nth i l_ini d) ia lrank) 0 <
+    length l_ini.
+Proof.
+intros * Hia Hini.
+revert i.
+induction lrank as [| ib]; intros. {
+  destruct i; [ easy | cbn ].
+  destruct i; flia Hia.
+}
+cbn - [ nth ].
+remember (ord (nth ia l_ini d) (nth ib l_ini d)) as x eqn:Hx.
+symmetry in Hx.
+destruct x. {
+  destruct i; [ easy | ].
+  rewrite List_nth_succ_cons.
+  destruct (lt_dec i (length (ib :: lrank))) as [Hii| Hii]. 2: {
+    apply Nat.nlt_ge in Hii.
+    rewrite nth_overflow; [ flia Hia | easy ].
+  }
+  now apply Hini, nth_In.
+} {
+  destruct i; [ now apply Hini; left | cbn ].
+  apply IHlrank.
+  intros j Hj.
+  now apply Hini; right.
+}
+Qed.
+
+Theorem bsort_rank_loop_ub : ∀ A ord (d : A) ia lrank l_ini l i,
+  l_ini ≠ []
+  → ia + length l ≤ length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l) 0 <
+    length l_ini.
+Proof.
+intros * Hiz Hia Hil.
+destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
+  apply Nat.nlt_ge in Hir.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
+  destruct l_ini; [ easy | now cbn ].
+}
+revert ia lrank Hia Hil Hir.
+induction l as [| b]; intros. {
+  rewrite Nat.add_0_r in Hir.
+  apply Hil; cbn.
+  now apply nth_In.
+}
+cbn in Hia, Hir |-*.
+rewrite <- Nat.add_succ_comm in Hia, Hir.
+apply IHl; [ easy | | ]. {
+  intros j Hj.
+  apply in_bsort_rank_insert in Hj.
+  destruct Hj as [Hj| Hj]; [ | now apply Hil ].
+  subst j; flia Hia.
+} {
+  now rewrite length_bsort_rank_insert.
+}
+Qed.
+
+Theorem bsort_rank_ub : ∀ A ord (l : list A) i,
+  l ≠ [] → nth i (bsort_rank ord l) 0 < length l.
+Proof.
+intros * Hlz.
+destruct l as [| ia]; [ easy | clear Hlz ].
+cbn - [ nth ].
+apply bsort_rank_loop_ub; [ easy | easy | ].
+intros j Hj.
+destruct Hj; [ now subst j; cbn | easy ].
+Qed.
+
 (* *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=

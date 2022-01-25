@@ -2058,94 +2058,10 @@ Definition collapse l :=
 *)
 
 Definition collapse_fun l i :=
-  let ls := bsort_rank Nat.leb l in
-  replace_at (nth i ls 0) l i.
+  replace_at (nth i (bsort_rank Nat.leb l) 0) l i.
 
 Definition collapse l :=
   fold_left collapse_fun (seq 0 (length l)) l.
-
-Theorem bsort_rank_insert_ub : ∀ A ord (d : A) ia lrank l_ini i,
-  ia < length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (bsort_rank_insert ord (λ i, nth i l_ini d) ia lrank) 0 <
-    length l_ini.
-Proof.
-intros * Hia Hini.
-revert i.
-induction lrank as [| ib]; intros. {
-  destruct i; [ easy | cbn ].
-  destruct i; flia Hia.
-}
-cbn - [ nth ].
-remember (ord (nth ia l_ini d) (nth ib l_ini d)) as x eqn:Hx.
-symmetry in Hx.
-destruct x. {
-  destruct i; [ easy | ].
-  rewrite List_nth_succ_cons.
-  destruct (lt_dec i (length (ib :: lrank))) as [Hii| Hii]. 2: {
-    apply Nat.nlt_ge in Hii.
-    rewrite nth_overflow; [ flia Hia | easy ].
-  }
-  now apply Hini, nth_In.
-} {
-  destruct i; [ now apply Hini; left | cbn ].
-  apply IHlrank.
-  intros j Hj.
-  now apply Hini; right.
-}
-Qed.
-
-Theorem bsort_rank_loop_ub : ∀ A ord (d : A) ia lrank l_ini l i,
-  ia + length l < length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l) 0 <
-    length l_ini.
-Proof.
-intros * Hia Hil.
-destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
-  apply Nat.nlt_ge in Hir.
-  rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
-  flia Hia.
-}
-revert ia lrank Hia Hil Hir.
-induction l as [| b]; intros. {
-  rewrite Nat.add_0_r in Hir.
-  apply Hil; cbn.
-  now apply nth_In.
-}
-cbn in Hia, Hir |-*.
-rewrite <- Nat.add_succ_comm in Hia, Hir.
-apply IHl; [ easy | | ]. {
-  intros j Hj.
-  apply in_bsort_rank_insert in Hj.
-  destruct Hj as [Hj| Hj]; [ | now apply Hil ].
-  subst j; flia Hia.
-} {
-  now rewrite length_bsort_rank_insert.
-}
-Qed.
-
-Theorem bsort_rank_ub : ∀ A ord (l : list A) i,
-  l ≠ [] → nth i (bsort_rank ord l) 0 < length l.
-Proof.
-intros * Hlz.
-destruct l as [| ia]; [ easy | clear Hlz ].
-cbn - [ nth ].
-apply bsort_rank_loop_ub.
-...
-cbn - [ nth ].
-unfold bsort_rank.
-...
-cbn - [ nth ].
-destruct l as [| ib]. {
-  destruct i; [ easy | now destruct i ].
-}
-assert (H : ib :: l ≠ []) by easy.
-specialize (IHl H); clear H.
-cbn - [ nth ].
-...
-specialize (IHl (cons_nil
-...
 
 Theorem length_collapse_fun : ∀ l i,
   l ≠ []
@@ -2154,40 +2070,39 @@ Proof.
 intros * Hlz.
 unfold collapse_fun.
 apply length_replace_at.
-Search (nth _ _ _ < length _).
-About bsort_length.
-Theorem bsort_rank_length : ∀ A ord (l : list A),
-  length (bsort_rank ord l) = length l.
-Proof.
-intros.
-...
-Search bsort_rank.
-...
-intros.
-unfold collapse_fun; cbn - [ List_rank ].
-remember (nth i (bsort Nat.leb l) 0) as v eqn:Hv.
-remember (List_rank (Nat.eqb v) l) as j eqn:Hj.
-symmetry in Hj.
-destruct j as [j| ]; [ | easy ].
-apply length_replace_at.
-now apply List_rank_Some_lt in Hj.
+now apply bsort_rank_ub.
 Qed.
 
 Theorem length_fold_left_collapse_fun : ∀ l l',
-  length (fold_left collapse_fun l' l) = length l.
+  l ≠ []
+  → length (fold_left collapse_fun l' l) = length l.
 Proof.
-intros.
-revert l.
+intros * Hlz.
+revert l Hlz.
 induction l' as [| a']; intros; [ easy | cbn ].
-rewrite IHl'.
-apply length_collapse_fun.
+rewrite IHl'. 2: {
+  unfold collapse_fun.
+  intros Hr; apply Hlz; clear Hlz.
+  apply (f_equal length) in Hr.
+  rewrite length_replace_at in Hr. {
+    now apply length_zero_iff_nil in Hr.
+  }
+  apply bsort_rank_ub.
+  intros H; subst l; cbn in Hr.
+  now destruct a'.
+}
+now apply length_collapse_fun.
 Qed.
 
 Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  now apply length_zero_iff_nil in Hlz; subst l.
+}
 unfold collapse.
 apply length_fold_left_collapse_fun.
+now intros H; apply Hlz; subst l.
 Qed.
 
 Theorem ε_collapse_ε : ∀ l,
@@ -2231,16 +2146,6 @@ Theorem collapse_inj : ∀ l i j,
 Proof.
 intros * Hnd Hij.
 unfold collapse in Hij.
-Print collapse_fun.
-Check @bsort_rank.
-(* merde, je me rappelle plus pourquoi il fallait que je fasse
-   bsort_rank *)
-Print collapse_fun.
-(* ah si : pour redéfinir collapse sans avoir à utiliser bsort, puis
-   List_rank, parce que List_rank recherche le minimum alors que
-   bsort l'a déjà fait : double emploi, donc preuves supplémentaires
-   à faire ; alors qu'avec bsort_rank, ça se fait en un seul coup ;
-   bon, faut voir, c'est tard, là, je vais me coucher *)
 ...
 apply collapse_inj in Hc1.
 ...
