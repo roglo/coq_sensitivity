@@ -2105,6 +2105,20 @@ apply length_fold_left_collapse_fun.
 now intros H; apply Hlz; subst l.
 Qed.
 
+Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
+Proof.
+...
+
+Theorem collapse_is_permut_list : ∀ l, NoDup l → is_permut_list (collapse l).
+Proof.
+intros * Hnd.
+split. 2: {
+  apply NoDup_nth.
+...
+  now apply NoDup_collapse.
+}
+...
+
 Theorem ε_collapse_ε : ∀ l,
   NoDup l
   → ε (collapse l) = ε l.
@@ -2147,12 +2161,22 @@ Theorem collapse_inj : ∀ l i j,
   → i = j.
 Proof.
 intros * Hnd Hi Hj Hij.
+assert (H : is_permut_list (collapse l)). {
+...
+  apply collapse_is_permut_list.
+}
+destruct H as (Hlen, Hinj).
+rewrite length_collapse in Hlen, Hinj.
+now apply Hinj in Hij.
+...
+intros * Hnd Hi Hj Hij.
 unfold collapse, ff_app in Hij.
 revert i j Hi Hj Hij.
 induction l as [| ia]; intros; [ easy | ].
 rewrite List_length_cons in Hij.
 rewrite seq_S in Hij; cbn in Hij.
 rewrite fold_left_app in Hij; cbn in Hij.
+Print is_permut_list.
 ...
 apply collapse_inj in Hc1.
 ...
