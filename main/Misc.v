@@ -1165,6 +1165,17 @@ Definition insert_at A k (la : list A) e :=
 Definition replace_at {A} k (la : list A) e :=
   firstn k la ++ e :: skipn (S k) la.
 
+Theorem length_replace_at : ∀ A k la (e : A),
+  k < length la
+  → length (replace_at k la e) = length la.
+Proof.
+intros * Hkla.
+unfold replace_at.
+rewrite app_length, firstn_length.
+rewrite List_length_cons, skipn_length.
+flia Hkla.
+Qed.
+
 (* end replace_at *)
 
 (* repeat_apply: applying a function n times *)
@@ -2094,6 +2105,17 @@ destruct (ord (f ia) (f ib)); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
+Theorem length_bsort_rank_loop : ∀ A ord (f : _ → A) ia lrank l,
+  length (bsort_rank_loop ord f ia lrank l) = length lrank + length l.
+Proof.
+intros.
+revert ia lrank.
+induction l as [| b]; intros; [ easy | cbn ].
+rewrite IHl.
+rewrite length_bsort_rank_insert.
+apply Nat.add_succ_comm.
+Qed.
+
 Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
   bsort_insert ord (f ia) (map f lrank) =
   map f (bsort_rank_insert ord f ia lrank).
@@ -2132,7 +2154,7 @@ Theorem bsort_rank_insert_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini,
     bsort_rank_insert ord (λ i : nat, nth i l_ini d') ia lrank.
 Proof.
 intros * Hia Hini.
-induction lrank as [| ib]; intros; [ easy | ].
+induction lrank as [| ib]; [ easy | ].
 cbn - [ nth ].
 specialize (Hini ib (or_introl eq_refl)) as Hib.
 rewrite (nth_indep _ _ d' Hia).

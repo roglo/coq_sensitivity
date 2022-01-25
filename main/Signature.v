@@ -2043,29 +2043,146 @@ Qed.
       collapse la = la, if la is a permutation
    To be proven *)
 
+(*
 Definition collapse_fun l i :=
   let v := nth i (bsort Nat.leb l) 0 in
   match List_rank (Nat.eqb v) l with
   | Some j => replace_at j l i
   | None => l
   end.
+*)
+
+(*
+Definition collapse l :=
+  fold_left collapse_fun (seq 0 (length l)) l.
+*)
+
+Definition collapse_fun l i :=
+  let ls := bsort_rank Nat.leb l in
+  replace_at (nth i ls 0) l i.
 
 Definition collapse l :=
   fold_left collapse_fun (seq 0 (length l)) l.
 
-Theorem length_replace_at : ∀ A k la (e : A),
-  k < length la
-  → length (replace_at k la e) = length la.
+Theorem bsort_rank_insert_ub : ∀ A ord (d : A) ia lrank l_ini i,
+  ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → nth i (bsort_rank_insert ord (λ i, nth i l_ini d) ia lrank) 0 <
+    length l_ini.
 Proof.
-intros * Hkla.
-unfold replace_at.
-rewrite app_length, firstn_length.
-rewrite List_length_cons, skipn_length.
-flia Hkla.
+intros * Hia Hini.
+revert i.
+induction lrank as [| ib]; intros. {
+  destruct i; [ easy | cbn ].
+  destruct i; flia Hia.
+}
+cbn - [ nth ].
+remember (ord (nth ia l_ini d) (nth ib l_ini d)) as x eqn:Hx.
+symmetry in Hx.
+destruct x. {
+  destruct i; [ easy | ].
+  rewrite List_nth_succ_cons.
+  destruct (lt_dec i (length (ib :: lrank))) as [Hii| Hii]. 2: {
+    apply Nat.nlt_ge in Hii.
+    rewrite nth_overflow; [ flia Hia | easy ].
+  }
+  now apply Hini, nth_In.
+} {
+  destruct i; [ now apply Hini; left | cbn ].
+  apply IHlrank.
+  intros j Hj.
+  now apply Hini; right.
+}
 Qed.
 
-Theorem length_collapse_fun : ∀ l i, length (collapse_fun l i) = length l.
+Theorem bsort_rank_loop_ub : ∀ A ord (d : A) ia lrank l_ini l i,
+  ia + length l ≤ length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l) 0 <
+    length l_ini.
 Proof.
+intros * Hia Hil.
+destruct (lt_dec i (length l_ini)) as [Hii| Hii]. 2: {
+  apply Nat.nlt_ge in Hii.
+  rewrite nth_overflow. 2: {
+    rewrite length_bsort_rank_loop.
+...
+revert ia lrank Hia Hil.
+induction l as [| b]; intros. {
+  apply Hil; cbn.
+  apply nth_In.
+...
+    rewrite length_bsort_rank_loop; [ flia Hia | ].
+  rewrite nth_overflow; [ | rewrite length_bsort_rank_insert ].
+  }
+  now apply Hini, nth_In.
+...
+revert ia lrank Hia Hil.
+induction l as [| b]; intros. {
+  apply Hil; cbn.
+  apply nth_In.
+...
+cbn - [ nth ] in Hia |-*.
+rewrite <- Nat.add_succ_comm in Hia.
+rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | flia Hia | easy ].
+rewrite IHl; [ easy | easy | ].
+intros i Hi.
+apply in_bsort_rank_insert in Hi.
+destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
+now apply Hil.
+Qed.
+...
+
+Theorem bsort_rank_insert_ub : ∀ A ord (f : _ → A) ia lrank i,
+  nth i (bsort_rank_insert ord f ia lrank) 0 < S (length lrank).
+Proof.
+intros.
+induction lrank; cbn.
+...
+Theorem bsort_rank_loop_ub : ∀ A ord (f : nat → A) ia lrank l i,
+  nth i (bsort_rank_loop ord f ia lrank l) 0 < length l + length lrank.
+Proof.
+intros.
+induction l; cbn.
+Print bsort_rank_loop.
+...
+
+Theorem bsort_rank_ub : ∀ A ord (l : list A) i,
+  l ≠ [] → nth i (bsort_rank ord l) 0 < length l.
+Proof.
+intros * Hlz.
+destruct l as [| ia]; [ easy | clear Hlz ].
+...
+cbn - [ nth ].
+unfold bsort_rank.
+...
+cbn - [ nth ].
+destruct l as [| ib]. {
+  destruct i; [ easy | now destruct i ].
+}
+assert (H : ib :: l ≠ []) by easy.
+specialize (IHl H); clear H.
+cbn - [ nth ].
+...
+specialize (IHl (cons_nil
+...
+
+Theorem length_collapse_fun : ∀ l i,
+  l ≠ []
+  → length (collapse_fun l i) = length l.
+Proof.
+intros * Hlz.
+unfold collapse_fun.
+apply length_replace_at.
+Search (nth _ _ _ < length _).
+About bsort_length.
+Theorem bsort_rank_length : ∀ A ord (l : list A),
+  length (bsort_rank ord l) = length l.
+Proof.
+intros.
+...
+Search bsort_rank.
+...
 intros.
 unfold collapse_fun; cbn - [ List_rank ].
 remember (nth i (bsort Nat.leb l) 0) as v eqn:Hv.
