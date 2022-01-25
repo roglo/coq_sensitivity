@@ -2079,6 +2079,21 @@ Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
 unfold collapse.
+remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
+Search (length (fold_left _ _ _)).
+Print fold_left.
+Theorem length_fold_left : ∀ A B (f : list A → B → list A) l la,
+  (∀ l' i, length (f l' i) = length l')
+  → length (fold_left f l la) = length la.
+Admitted.
+apply length_fold_left.
+intros l' i.
+unfold collapse_fun.
+apply length_replace_at.
+(* bof, chais pas *)
+...
+unfold collapse_fun.
+...
 induction l as [| a]; [ easy | ].
 cbn - [ nth seq ].
 rewrite seq_S.
