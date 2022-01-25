@@ -2141,11 +2141,18 @@ destruct c2. {
     unfold ff_app in Hc1.
 Theorem collapse_inj : ∀ l i j,
   NoDup l
+  → i < length l
+  → j < length l
   → ff_app (collapse l) i = ff_app (collapse l) j
   → i = j.
 Proof.
-intros * Hnd Hij.
-unfold collapse in Hij.
+intros * Hnd Hi Hj Hij.
+unfold collapse, ff_app in Hij.
+revert i j Hi Hj Hij.
+induction l as [| ia]; intros; [ easy | ].
+rewrite List_length_cons in Hij.
+rewrite seq_S in Hij; cbn in Hij.
+rewrite fold_left_app in Hij; cbn in Hij.
 ...
 apply collapse_inj in Hc1.
 ...
