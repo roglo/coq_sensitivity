@@ -2147,7 +2147,30 @@ apply Hini.
 now right.
 Qed.
 
+Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
+  length lrank + length l = length l_ini
+  → ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l =
+    bsort_rank_loop ord (λ i, nth i l_ini d') ia lrank l.
+Proof.
+intros * Hia Hini Hil.
+revert ia lrank Hia Hini Hil.
+induction l as [| b]; intros; [ easy | ].
+cbn - [ nth ] in Hia |-*.
+rewrite <- Nat.add_succ_comm in Hia.
+rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | easy | easy ].
+rewrite IHl. 2: {
+  now rewrite length_bsort_rank_insert.
+}
+2: {
 ...
+destruct (lt_dec ia (length l_ini)) as [Hil| Hil]. {
+  now rewrite bsort_rank_insert_nth_indep with (d' := d').
+}
+apply Nat.nlt_ge in Hil.
+...
+*)
 
 Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
   ia < length l_ini
@@ -2156,10 +2179,11 @@ Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
     bsort_rank_loop ord (λ i, nth i l_ini d') ia lrank l.
 Proof.
 intros * Hia Hini.
-clear Hia.
-revert ia lrank Hini.
+revert ia lrank Hia Hini.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ].
+rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | easy | easy ].
+...
 rewrite IHl. 2: {
   intros i Hi.
   admit. (* vraisemblable *)
