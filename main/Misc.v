@@ -2122,6 +2122,18 @@ rewrite length_bsort_rank_insert.
 apply Nat.add_succ_comm.
 Qed.
 
+Theorem length_bsort_rank : ∀ A ord (l : list A),
+  length (bsort_rank ord l) = length l.
+Proof.
+intros.
+unfold bsort_rank.
+destruct l as [| d]; [ easy | ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'.
+rename l' into l.
+apply length_bsort_rank_loop.
+Qed.
+
 Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
   bsort_insert ord (f ia) (map f lrank) =
   map f (bsort_rank_insert ord f ia lrank).
