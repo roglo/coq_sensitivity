@@ -2105,13 +2105,26 @@ apply length_fold_left_collapse_fun.
 now intros H; apply Hlz; subst l.
 Qed.
 
+Theorem NoDup_collapse : ∀ l, NoDup (collapse l).
+Proof.
+intros.
+unfold collapse.
+Print collapse_fun.
+...
+Theorem glop : ∀ l l',
+  NoDup l
+  → AllLt (length l) l
+  → NoDup (fold_left collapse_fun l l').
+Proof.
+...
+
 Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
 Proof.
 ...
 
-Theorem collapse_is_permut_list : ∀ l, NoDup l → is_permut_list (collapse l).
+Theorem collapse_is_permut_list : ∀ l, is_permut_list (collapse l).
 Proof.
-intros * Hnd.
+intros.
 split. 2: {
   apply NoDup_nth.
 ...
