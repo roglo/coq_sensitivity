@@ -2135,6 +2135,9 @@ Proof.
 intros * Hnd Hij.
 unfold to_perm in Hij.
 Print to_perm_fun.
+Check @bsort_rank.
+(* merde, je me rappelle plus pourquoi il fallait que je fasse
+   bsort_rank *)
 ...
 apply to_perm_inj in Hc1.
 ...
