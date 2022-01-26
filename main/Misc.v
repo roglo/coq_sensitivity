@@ -2312,6 +2312,34 @@ intros j Hj.
 destruct Hj; [ now subst j; cbn | easy ].
 Qed.
 
+Theorem NoDup_bsort_rank_insert : ∀ A (d : A) ord l_ini ia lrank,
+  NoDup (ia :: lrank)
+  → NoDup (bsort_rank_insert ord (λ k : nat, nth k l_ini d) ia lrank).
+Proof.
+intros * Hnd.
+revert ia Hnd.
+induction lrank as [| ib]; intros. {
+  cbn; constructor; [ easy | constructor ].
+}
+cbn.
+destruct (ord (nth ia l_ini d) (nth ib l_ini d)); [ easy | ].
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (Hia, Hnd).
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (Hib, Hnd).
+apply NoDup_cons. 2: {
+  apply IHlrank.
+  apply NoDup_cons_iff.
+  split; [ | easy ].
+  now intros H; apply Hia; right.
+}
+intros Hib'.
+apply in_bsort_rank_insert in Hib'.
+destruct Hib' as [Hib'| Hib']; [ | easy ].
+subst ib; apply Hia.
+now left.
+Qed.
+
 (* *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=

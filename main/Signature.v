@@ -2104,7 +2104,6 @@ intros i j Hi Hj Hij.
 destruct l as [| d]; [ easy | ].
 cbn in Hi, Hj.
 unfold bsort_rank in Hij.
-Print bsort_rank_loop.
 Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank i j,
   NoDup lrank
   → i < length lrank + length l
@@ -2128,40 +2127,9 @@ apply IHl in Hij; [ easy | | | ]; cycle 1. {
 } {
   now rewrite length_bsort_rank_insert.
 }
-Print bsort_rank_insert.
-Theorem NoDup_bsort_rank_insert : ∀ A (d : A) ord l_ini ia lrank,
-  length lrank ≤ ia
-  → NoDup lrank
-  → AllLt (length lrank) lrank
-  → NoDup (bsort_rank_insert ord (λ k : nat, nth k l_ini d) ia lrank).
-Proof.
-intros * Hia Har Hnd.
-revert ia Hia.
-induction lrank as [| ib]; intros. {
-  cbn; constructor; [ easy | constructor ].
-}
-cbn.
-destruct (ord (nth ia l_ini d) (nth ib l_ini d)). {
-  constructor; [ | easy ].
-  intros Hiab.
-  specialize (Hnd _ Hiab) as H1.
-  cbn in H1.
-  now apply Nat.nle_gt in H1.
-} {
-  constructor. 2: {
-    apply IHlrank; cycle 1. {
-      intros i Hi.
-      specialize (Hnd i (or_intror Hi)) as H1.
-      cbn in H1.
-}
-apply NoDup_cons. 2: {
-  apply IHlrank.
-  now apply NoDup_cons_iff in Hnd.
-}
-intros Hib.
-apply in_bsort_rank_insert in Hib.
-...
 apply NoDup_bsort_rank_insert.
+apply NoDup_cons_iff.
+split; [ | easy ].
 ...
 Search (nth _ (bsort_rank_loop _ _ _ _ _)).
 Print bsort_rank_loop.
