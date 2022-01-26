@@ -2061,27 +2061,25 @@ Qed.
       collapse la = la, if la is a permutation
    To be proven *)
 
-Definition collapse_fun l :=
-  ff_app (permut_list_inv (bsort_rank Nat.leb l)).
-
-Definition collapse l :=
-  map (collapse_fun l) (seq 0 (length l)).
+Definition collapse l := permut_list_inv (bsort_rank Nat.leb l).
 
 (*
-Compute (let l := [19;3;7;6] in collapse l).
-Compute (let l := [3;2;7;9] in collapse l).
+Compute (let l := [19;3;7;6] in (collapse l, collapse' l)).
+Compute (let l := [3;3;7;9] in (collapse l, collapse' l)).
 *)
 
 Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
 unfold collapse.
-now rewrite List_map_seq_length.
+rewrite length_permut_list_inv.
+apply length_bsort_rank.
 Qed.
 
 Theorem bsort_rank_is_permut : ∀ l,
   is_permut (length l) (bsort_rank Nat.leb l).
 Proof.
+intros.
 split. {
   split. {
     intros i Hi.
@@ -2099,45 +2097,12 @@ split. {
 apply length_bsort_rank.
 Qed.
 
-Theorem NoDup_collapse : ∀ l, NoDup (collapse l).
+Theorem collapse_is_permut : ∀ l, is_permut (length l) (collapse l).
 Proof.
 intros.
-unfold collapse.
-apply NoDup_map_iff with (d := 0).
-rewrite seq_length.
-intros i j Hi Hj Hij.
-rewrite seq_nth in Hij; [ | easy ].
-rewrite seq_nth in Hij; [ | easy ].
-cbn in Hij.
-unfold collapse_fun in Hij.
-remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
-apply (f_equal (ff_app lrank)) in Hij.
-rewrite (permut_permut_inv (length l)) in Hij; [ | | easy ]. 2: {
-  rewrite Hr.
-  apply bsort_rank_is_permut.
-}
-rewrite (permut_permut_inv (length l)) in Hij; [ | | easy ]. 2: {
-  rewrite Hr.
-  apply bsort_rank_is_permut.
-}
-easy.
+apply permut_list_inv_is_permut.
+apply bsort_rank_is_permut.
 Qed.
-
-Theorem seq_0_AllLt : ∀ len, AllLt len (seq 0 len).
-Proof.
-intros * i Hi.
-now apply in_seq in Hi.
-Qed.
-
-Theorem collapse_is_permut_list : ∀ l, is_permut_list (collapse l).
-Proof.
-intros.
-split; [ | apply NoDup_collapse ].
-rewrite length_collapse.
-intros i Hi.
-Search (_ ∈ collapse _).
-Search collapse.
-...
 
 Theorem ε_collapse_ε : ∀ l,
   NoDup l
@@ -2173,88 +2138,20 @@ destruct c2. {
     exfalso.
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
-Theorem collapse_inj : ∀ l i j,
-  NoDup l
-  → i < length l
-  → j < length l
-  → ff_app (collapse l) i = ff_app (collapse l) j
-  → i = j.
-Proof.
-intros * Hnd Hi Hj Hij.
-assert (H : is_permut_list (collapse l)). {
+    specialize (collapse_is_permut l) as Hc.
+    destruct Hc as (Hcp, Hcl).
+    destruct Hcp as (Hca, Hcn).
+    apply (NoDup_nat _ Hcn) in Hc1; cycle 1. {
+      rewrite Hcl; flia Hj Hlz.
+    } {
+      rewrite Hcl; flia Hi Hlz.
+    }
+    rewrite Hc1 in Hij.
+    now apply Nat.lt_irrefl in Hij.
+  }
 ...
-  apply collapse_is_permut_list.
-}
-destruct H as (Hlen, Hinj).
-rewrite length_collapse in Hlen, Hinj.
-now apply Hinj in Hij.
-...
-intros * Hnd Hi Hj Hij.
-unfold collapse, ff_app in Hij.
-revert i j Hi Hj Hij.
-induction l as [| ia]; intros; [ easy | ].
-rewrite List_length_cons in Hij.
-rewrite seq_S in Hij; cbn in Hij.
-rewrite fold_left_app in Hij; cbn in Hij.
-Print is_permut_list.
-...
-apply collapse_inj in Hc1.
-...
-    apply NoDup_nth in Hc1.
-2: {
-...
-Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
-Proof.
-intros * Hnd.
-unfold collapse.
-Theorem NoDup_fold_left_collapse_fun : ∀ l l',
-  NoDup l
-  → NoDup (fold_left collapse_fun l' l).
-Proof.
-intros * Hnd.
-revert l Hnd.
-induction l' as [| a']; intros; [ easy | cbn ].
-apply IHl'.
-Print collapse_fun.
-...
-Theorem NoDup_collapse_fun : ∀ l a,
-  NoDup l
-  → NoDup (collapse_fun l a).
-Proof.
-intros * Hnd.
-unfold collapse_fun.
-remember (nth a (bsort Nat.leb l) 0) as v eqn:Hv.
-remember (List_rank (Nat.eqb v) l) as i eqn:Hi.
-symmetry in Hi.
-destruct i; [ | easy ].
-apply (List_rank_Some 0) in Hi.
-destruct Hi as (Hnl & Hbef & Hvl).
-apply Nat.eqb_eq in Hvl.
-unfold replace_at.
-apply NoDup_app_iff.
-split; [ now apply NoDup_firstn | ].
-split. {
-  apply NoDup_cons_iff.
-  split. {
-    intros Ha.
-Print collapse_fun.
-Search List_rank.
-...
-induction la as [| a]; cbn.
-...
-Search (NoDup (replace_at _ _ _)).
 
-apply (List_rank_Some 0) in Hi.
-...
 (*
-...
-induction l as [| a]; [ constructor | ].
-cbn - [ collapse_fun ].
-...
-*)
-Abort.
-Abort.
-Abort.
 End a.
 Arguments ε {T}%type {ro}.
 Require Import RnglAlg.Zrl.
@@ -2263,7 +2160,11 @@ Open Scope Z_scope.
 Compute (let l := [1;2;1;2]%nat in (collapse l, ε (collapse l), ε l)).
 Compute (let l := [1;1;3;4]%nat in (collapse l, ε (collapse l), ε l)).
 Compute (let l := [1;1;3;4]%nat in (ε (collapse l), ε l)).
+Compute (let l := [7;8;1;2]%nat in (ε (collapse l), ε l)).
+Compute (let l := [7;1;8;2]%nat in (ε (collapse l), ε l)).
 Compute (ε (collapse [1;2;3;4]%nat)).
+*)
+
 ...
 
 Theorem sign_comp :
