@@ -2087,7 +2087,8 @@ Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank
 Fixpoint bsort_rank_loop {A} (ord : A → A → bool) f ia lrank (l : list A) :=
   match l with
   | [] => lrank
-  | _ :: l' => bsort_rank_loop ord f (S ia) (bsort_rank_insert ord f ia lrank) l'
+  | _ :: l' =>
+      bsort_rank_loop ord f (S ia) (bsort_rank_insert ord f ia lrank) l'
   end.
 
 Definition bsort_rank {A} (ord : A → A → bool) l :=
@@ -2098,6 +2099,7 @@ Definition bsort_rank {A} (ord : A → A → bool) l :=
 
 (*
 Compute (let l := [2;7;1] in bsort_rank Nat.leb l).
+Compute (let l := [5;10;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.ltb l).
 *)
