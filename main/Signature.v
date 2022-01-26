@@ -2061,22 +2061,6 @@ Qed.
       collapse la = la, if la is a permutation
    To be proven *)
 
-(*
-Definition collapse_fun l i :=
-  replace_at (nth i (bsort_rank Nat.leb l) 0) l i.
-
-Definition collapse l :=
-  fold_left collapse_fun (seq 0 (length l)) l.
-*)
-
-(*
-Definition collapse_fun lrank l i :=
-  replace_at (nth i lrank 0) l i.
-
-Definition collapse l :=
-  fold_left (collapse_fun (bsort_rank Nat.leb l)) (seq 0 (length l)) l.
-*)
-
 Definition collapse_fun l :=
   ff_app (permut_list_inv (bsort_rank Nat.leb l)).
 
@@ -2152,6 +2136,7 @@ split; [ | apply NoDup_collapse ].
 rewrite length_collapse.
 intros i Hi.
 Search (_ ∈ collapse _).
+Search collapse.
 ...
 
 Theorem ε_collapse_ε : ∀ l,
