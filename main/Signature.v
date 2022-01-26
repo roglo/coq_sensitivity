@@ -2116,6 +2116,42 @@ apply permut_list_inv_is_permut.
 apply bsort_rank_is_permut.
 Qed.
 
+Definition is_sorted {A} ord (l : list A) := bsort ord l = l.
+
+Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
+  transitive ord
+  → is_sorted ord lsorted
+  → i < j < length (a :: lsorted)
+  → ord
+      (nth i (bsort_insert ord a lsorted) d)
+      (nth j (bsort_insert ord a lsorted) d) =
+    true.
+Proof.
+intros * Htr Hs Hij.
+revert i j Hij.
+induction lsorted as [| b]; intros; [ cbn in Hij; flia Hij | ].
+cbn - [ nth ].
+remember (ord a b) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  destruct i. {
+    destruct j; [ easy | ].
+    rewrite List_nth_0_cons, List_nth_succ_cons.
+    destruct j; [ easy | ].
+    rewrite List_nth_succ_cons.
+    eapply Htr; [ apply Hx | ].
+...
+
+Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
+  i < length l
+  → j < length l
+  → i < j
+  → ord (nth i (bsort ord l) d) (nth j (bsort ord l) d) = true.
+Proof.
+intros * Hi Hj Hij.
+destruct l as [| d']; [ easy | cbn ].
+Print bsort_loop.
+...
+
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
   → i < length l
@@ -2156,13 +2192,7 @@ destruct c1. {
     destruct H as (j' & Hj').
     rewrite Hj' in Hc1.
     rewrite (permut_inv_permut (length l)) in Hc1.
-Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
-  i < length l
-  → j < length l
-  → i < j
-  → ord (nth i (bsort ord l) d) (nth j (bsort ord l) d) = true.
-Proof.
-Admitted.
+...
 specialize (bsort_is_sorted 0 Nat.leb l) as H1.
 specialize (H1 i' j').
 enough (H : i' < length l).

@@ -161,9 +161,6 @@ Fixpoint sorted {A} (ord : A → A → bool) l :=
   | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
   end.
 
-Definition transitive A (ord : A → A → bool) :=
-  ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
-
 Theorem transitive_nat_lt : transitive Nat.ltb.
 Proof.
 intros a b c Hab Hbc.

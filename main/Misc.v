@@ -2383,7 +2383,10 @@ rewrite Nat.add_0_l in H2.
 apply (H2 i j Hi Hj Hij).
 Qed.
 
-(* *)
+(* end bsort_rank *)
+
+Definition transitive A (ord : A → A → bool) :=
+  ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
