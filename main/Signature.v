@@ -2106,18 +2106,66 @@ cbn in Hi, Hj.
 unfold bsort_rank in Hij.
 Print bsort_rank_loop.
 Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank i j,
-  i ≤ length l
-  → j ≤ length l
+  NoDup lrank
+  → i < length lrank + length l
+  → j < length lrank + length l
   → ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) i =
     ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) j
   → i = j.
+Proof.
+intros * Hnd Hi Hj Hij.
+revert i j lrank Hnd Hi Hj Hij.
+induction l as [| a]; intros. {
+  rewrite Nat.add_0_r in Hi, Hj.
+  cbn in Hij.
+  now apply (NoDup_nat _ Hnd) in Hij.
+}
+cbn in Hi, Hj, Hij.
+rewrite <- Nat.add_succ_comm in Hi, Hj.
+do 2 rewrite fold_ff_app in Hij.
+apply IHl in Hij; [ easy | | | ]; cycle 1. {
+  now rewrite length_bsort_rank_insert.
+} {
+  now rewrite length_bsort_rank_insert.
+}
+Print bsort_rank_insert.
+Theorem NoDup_bsort_rank_insert : ∀ A (d : A) ord l_ini ia lrank,
+  length lrank ≤ ia
+  → NoDup lrank
+  → AllLt (length lrank) lrank
+  → NoDup (bsort_rank_insert ord (λ k : nat, nth k l_ini d) ia lrank).
+Proof.
+intros * Hia Har Hnd.
+revert ia Hia.
+induction lrank as [| ib]; intros. {
+  cbn; constructor; [ easy | constructor ].
+}
+cbn.
+destruct (ord (nth ia l_ini d) (nth ib l_ini d)). {
+  constructor; [ | easy ].
+  intros Hiab.
+  specialize (Hnd _ Hiab) as H1.
+  cbn in H1.
+  now apply Nat.nle_gt in H1.
+} {
+  constructor. 2: {
+    apply IHlrank; cycle 1. {
+      intros i Hi.
+      specialize (Hnd i (or_intror Hi)) as H1.
+      cbn in H1.
+}
+apply NoDup_cons. 2: {
+  apply IHlrank.
+  now apply NoDup_cons_iff in Hnd.
+}
+intros Hib.
+apply in_bsort_rank_insert in Hib.
+...
+apply NoDup_bsort_rank_insert.
+...
 Search (nth _ (bsort_rank_loop _ _ _ _ _)).
 Print bsort_rank_loop.
 Print bsort_rank_insert.
-...
-destruct i. {
-  destruct j; [ easy | ].
-  cbn - [ nth ] in Hij.
 ...
 cbn - [ nth ] in Hij.
 ...
