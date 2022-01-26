@@ -2134,25 +2134,48 @@ move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
+(**)
+specialize (collapse_is_permut l) as Hc.
+destruct Hc as ((Hca, Hcn), Hcl).
+specialize (NoDup_nat _ Hcn j i) as H1.
+rewrite length_collapse in H1.
+assert (H : j < length l) by flia Hj Hlz.
+specialize (H1 H); clear H.
+assert (H : i < length l) by flia Hi Hlz.
+specialize (H1 H); clear H.
 remember (ff_app (collapse l) j ?= ff_app (collapse l) i) as c1 eqn:Hc1.
 remember (ff_app l j ?= ff_app l i) as c2 eqn:Hc2.
 symmetry in Hc1, Hc2.
 move c2 before c1.
-destruct c2. {
-  apply Nat.compare_eq_iff in Hc2.
-  unfold ff_app in Hc2.
-  apply NoDup_nth in Hc2; [ flia Hij Hc2 | easy | | flia Hij Hj ].
-  flia Hj Hlz.
+destruct c1. {
+  apply Nat.compare_eq_iff in Hc1.
+  apply H1 in Hc1.
+  rewrite Hc1 in Hij.
+  now apply Nat.lt_irrefl in Hij.
 } {
+  destruct c2; [ | easy | ]; exfalso. {
+    apply Nat.compare_eq_iff in Hc2.
+    unfold ff_app in Hc2.
+    apply NoDup_nth in Hc2; [ flia Hij Hc2 | easy | | flia Hij Hj ].
+    flia Hj Hlz.
+  } {
+    apply Nat.compare_lt_iff in Hc1.
+    apply Nat.compare_gt_iff in Hc2.
+(* "collapse l" est censé, justement, être dans le même ordre que "l"
+   c'est fait pour ; faut le prouver ; en tous cas, ça donne une
+   contradiction dans les hypothèses, ici, et c'est donc bon *)
+...
   apply Nat.compare_lt_iff in Hc2.
   unfold ff_app in Hc2.
+  specialize (collapse_is_permut l) as Hc.
+  destruct Hc as (Hcp, Hcl).
+  destruct Hcp as (Hca, Hcn).
+  specialize (NoDup_nat _ Hcn) as H1.
+
   destruct c1; [ | easy | ]. {
     exfalso.
     apply Nat.compare_eq_iff in Hc1.
     unfold ff_app in Hc1.
-    specialize (collapse_is_permut l) as Hc.
-    destruct Hc as (Hcp, Hcl).
-    destruct Hcp as (Hca, Hcn).
     apply (NoDup_nat _ Hcn) in Hc1; cycle 1. {
       rewrite Hcl; flia Hj Hlz.
     } {
@@ -2160,7 +2183,10 @@ destruct c2. {
     }
     rewrite Hc1 in Hij.
     now apply Nat.lt_irrefl in Hij.
-  }
+  } {
+    exfalso.
+    apply Nat.compare_gt_iff in Hc1.
+    unfold ff_app in Hc1.
 ...
 
 (*
