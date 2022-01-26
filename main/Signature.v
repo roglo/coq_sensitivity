@@ -2146,7 +2146,46 @@ destruct c1. {
     now apply Nat.lt_irrefl in Hc1.
   } {
     apply Nat.compare_gt_iff in Hc2.
+    unfold collapse in Hc1.
+    remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
+    enough (H : ∃ i', i = ff_app lrank i').
+    destruct H as (i' & Hi').
+    rewrite Hi' in Hc1.
+    rewrite (permut_inv_permut (length l)) in Hc1.
+    enough (H : ∃ j', j = ff_app lrank j').
+    destruct H as (j' & Hj').
+    rewrite Hj' in Hc1.
+    rewrite (permut_inv_permut (length l)) in Hc1.
+Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
+  i < length l
+  → j < length l
+  → i < j
+  → ord (nth i (bsort ord l) d) (nth j (bsort ord l) d) = true.
+Proof.
+Admitted.
+specialize (bsort_is_sorted 0 Nat.leb l) as H1.
+specialize (H1 i' j').
+enough (H : i' < length l).
+specialize (H1 H); clear H.
+enough (H : j' < length l).
+specialize (H1 H); clear H.
+specialize (H1 Hc1).
+apply Nat.leb_le in H1.
+rewrite Hi', Hj' in Hc2.
+rewrite Hlr in Hc2.
+rewrite (bsort_bsort_rank _ 0) in H1.
+rewrite (List_map_nth' 0) in H1.
+rewrite (List_map_nth' 0) in H1.
+do 2 rewrite fold_ff_app in H1.
+now apply Nat.nlt_ge in H1.
+(* bon, c'est bon, faut prouver tout le reste, main'nant *)
 ...
+Search bsort.
+Search bsort_rank.
+Search permut_list_inv.
+Search bsort_rank.
+...
+... suite ok
   }
 } {
   apply Nat.compare_gt_iff in Hc1.
