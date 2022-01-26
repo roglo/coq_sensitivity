@@ -2118,10 +2118,28 @@ Qed.
 
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
+  → i < length l
+  → j < length l
   → (ff_app (collapse l) i ?= ff_app (collapse l) j) =
     (ff_app l i ?= ff_app l j).
 Proof.
-intros * Hnd.
+intros * Hnd Hi Hj.
+remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
+remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
+move c2 before c1.
+symmetry in Hc1, Hc2.
+destruct c1. {
+  apply Nat.compare_eq_iff in Hc1.
+  specialize (collapse_is_permut l) as Hc.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  specialize (NoDup_nat _ Hcn i j) as H1.
+  rewrite Hcl in H1.
+  specialize (H1 Hi Hj Hc1).
+  subst j.
+  now rewrite Nat.compare_refl in Hc2.
+} {
+  apply Nat.compare_lt_iff in Hc1.
+  destruct c2. {
 ...
 
 Theorem ε_collapse_ε : ∀ l,
