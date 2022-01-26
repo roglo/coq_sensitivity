@@ -2138,26 +2138,25 @@ destruct x. {
     rewrite List_nth_0_cons, List_nth_succ_cons.
     destruct j; [ easy | ].
     rewrite List_nth_succ_cons.
-    eapply Htr; [ apply Hx | ].
     cbn in Hij.
     destruct Hij as (_, Hj).
     do 2 apply Nat.succ_lt_mono in Hj.
-    clear - Hj Hs Hx.
-    revert a b j Hs Hx Hj.
+    eapply Htr; [ apply Hx | ].
+    clear - Hj Hs.
+    revert b j Hs Hj.
     induction lsorted as [| c]; intros; [ easy | cbn ].
     destruct j. {
       unfold is_sorted in Hs.
       cbn in Hs.
       remember (ord c b) as y eqn:Hy; symmetry in Hy.
-      move Hx after Hy.
       destruct y. {
 ...
-        destruct lsorted as [| e]. {
-          cbn in Hs.
+        clear - Hy Hs.
+        revert b c Hy Hs.
+        induction lsorted as [| a]; intros; cbn in Hs. {
           now injection Hs; clear Hs; intros; subst b.
         }
-        cbn in Hs.
-        destruct (ord e c). {
+        destruct (ord a c). {
 ...
 
 Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
