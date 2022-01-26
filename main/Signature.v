@@ -2063,10 +2063,11 @@ Qed.
 
 Definition collapse l := permut_list_inv (bsort_rank Nat.leb l).
 
-(*
-Compute (let l := [19;3;7;6] in (collapse l, collapse' l)).
-Compute (let l := [3;3;7;9] in (collapse l, collapse' l)).
-*)
+(**)
+Compute (let l := [19;3;7;6] in (collapse l, bsort_rank Nat.leb l)).
+(**)
+
+...
 
 Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
