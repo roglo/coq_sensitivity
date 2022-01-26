@@ -2116,6 +2116,14 @@ apply permut_list_inv_is_permut.
 apply bsort_rank_is_permut.
 Qed.
 
+Theorem collapse_keeps_order : ∀ l i j,
+  NoDup l
+  → (ff_app (collapse l) i ?= ff_app (collapse l) j) =
+    (ff_app l i ?= ff_app l j).
+Proof.
+intros * Hnd.
+...
+
 Theorem ε_collapse_ε : ∀ l,
   NoDup l
   → ε (collapse l) = ε l.
@@ -2134,6 +2142,9 @@ move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
+...
+now rewrite collapse_keeps_order.
+...
 (**)
 specialize (collapse_is_permut l) as Hc.
 destruct Hc as ((Hca, Hcn), Hcl).
@@ -2161,9 +2172,6 @@ destruct c1. {
   } {
     apply Nat.compare_lt_iff in Hc1.
     apply Nat.compare_gt_iff in Hc2.
-(* "collapse l" est censé, justement, être dans le même ordre que "l"
-   c'est fait pour ; faut le prouver ; en tous cas, ça donne une
-   contradiction dans les hypothèses, ici, et c'est donc bon *)
 ...
   apply Nat.compare_lt_iff in Hc2.
   unfold ff_app in Hc2.
