@@ -2105,11 +2105,11 @@ destruct l as [| d]; [ easy | ].
 cbn in Hi, Hj.
 unfold bsort_rank in Hij.
 Print bsort_rank_loop.
-Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank ia i j,
+Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank i j,
   i ≤ length l
   → j ≤ length l
-  → ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) ia lrank l) i =
-    ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) ia lrank l) j
+  → ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) i =
+    ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) j
   → i = j.
 Search (nth _ (bsort_rank_loop _ _ _ _ _)).
 Print bsort_rank_loop.

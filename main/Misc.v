@@ -2084,17 +2084,17 @@ Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank
       else ib :: bsort_rank_insert ord f ia l
   end.
 
-Fixpoint bsort_rank_loop {A} (ord : A → A → bool) f ia lrank (l : list A) :=
+Fixpoint bsort_rank_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
   | [] => lrank
   | _ :: l' =>
-      bsort_rank_loop ord f (S ia) (bsort_rank_insert ord f ia lrank) l'
+      bsort_rank_loop ord f (bsort_rank_insert ord f (length lrank) lrank) l'
   end.
 
 Definition bsort_rank {A} (ord : A → A → bool) l :=
   match l with
   | [] => []
-  | d :: _ => bsort_rank_loop ord (λ i, nth i l d) 0 [] l
+  | d :: _ => bsort_rank_loop ord (λ i, nth i l d) [] l
   end.
 
 (*
@@ -2113,11 +2113,11 @@ destruct (ord (f ia) (f ib)); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
-Theorem length_bsort_rank_loop : ∀ A ord (f : _ → A) ia lrank l,
-  length (bsort_rank_loop ord f ia lrank l) = length lrank + length l.
+Theorem length_bsort_rank_loop : ∀ A ord (f : _ → A) lrank l,
+  length (bsort_rank_loop ord f lrank l) = length lrank + length l.
 Proof.
 intros.
-revert ia lrank.
+revert lrank.
 induction l as [| b]; intros; [ easy | cbn ].
 rewrite IHl.
 rewrite length_bsort_rank_insert.
@@ -2149,8 +2149,7 @@ Qed.
 
 Theorem bsort_loop_bsort_rank_loop : ∀ A ord d (f : nat → A) lrank l,
   (∀ i, i < length l → f (length lrank + i) = nth i l d)
-  → bsort_loop ord (map f lrank) l =
-    map f (bsort_rank_loop ord f (length lrank) lrank l).
+  → bsort_loop ord (map f lrank) l = map f (bsort_rank_loop ord f lrank l).
 Proof.
 intros * Hia.
 revert lrank Hia.
@@ -2159,7 +2158,7 @@ specialize (Hia 0 (Nat.lt_0_succ _)) as H1.
 cbn in H1; rewrite Nat.add_0_r in H1.
 rewrite <- H1.
 rewrite bsort_insert_bsort_rank_insert.
-rewrite IHl; [ now rewrite length_bsort_rank_insert | ].
+rewrite IHl; [ easy | ].
 intros i Hi.
 rewrite length_bsort_rank_insert.
 apply Nat.succ_lt_mono in Hi.
@@ -2202,19 +2201,19 @@ specialize (IHlrank Hil).
 destruct IHlrank as [Hi| Hi]; [ now subst i; left | now right; right ].
 Qed.
 
-Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini l,
-  ia + length l ≤ length l_ini
+Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) lrank l_ini l,
+  length lrank + length l ≤ length l_ini
   → (∀ i, i ∈ lrank → i < length l_ini)
-  → bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l =
-    bsort_rank_loop ord (λ i, nth i l_ini d') ia lrank l.
+  → bsort_rank_loop ord (λ i, nth i l_ini d) lrank l =
+    bsort_rank_loop ord (λ i, nth i l_ini d') lrank l.
 Proof.
 intros * Hia Hil.
-revert ia lrank Hia Hil.
+revert lrank Hia Hil.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ] in Hia |-*.
-rewrite <- Nat.add_succ_comm in Hia.
 rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | flia Hia | easy ].
-rewrite IHl; [ easy | easy | ].
+rewrite <- Nat.add_succ_comm in Hia.
+rewrite IHl; [ easy | now rewrite length_bsort_rank_insert | ].
 intros i Hi.
 apply in_bsort_rank_insert in Hi.
 destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
@@ -2270,11 +2269,11 @@ destruct x. {
 }
 Qed.
 
-Theorem bsort_rank_loop_ub : ∀ A ord (d : A) ia lrank l_ini l i,
+Theorem bsort_rank_loop_ub : ∀ A ord (d : A) lrank l_ini l i,
   l_ini ≠ []
-  → ia + length l ≤ length l_ini
+  → length lrank + length l ≤ length l_ini
   → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) ia lrank l) 0 <
+  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) lrank l) 0 <
     length l_ini.
 Proof.
 intros * Hiz Hia Hil.
@@ -2283,7 +2282,7 @@ destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
   rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
   destruct l_ini; [ easy | now cbn ].
 }
-revert ia lrank Hia Hil Hir.
+revert lrank Hia Hil Hir.
 induction l as [| b]; intros. {
   rewrite Nat.add_0_r in Hir.
   apply Hil; cbn.
@@ -2291,7 +2290,7 @@ induction l as [| b]; intros. {
 }
 cbn in Hia, Hir |-*.
 rewrite <- Nat.add_succ_comm in Hia, Hir.
-apply IHl; [ easy | | ]. {
+apply IHl; cycle 1. {
   intros j Hj.
   apply in_bsort_rank_insert in Hj.
   destruct Hj as [Hj| Hj]; [ | now apply Hil ].
@@ -2299,6 +2298,7 @@ apply IHl; [ easy | | ]. {
 } {
   now rewrite length_bsort_rank_insert.
 }
+now rewrite length_bsort_rank_insert.
 Qed.
 
 Theorem bsort_rank_ub : ∀ A ord (l : list A) i,
