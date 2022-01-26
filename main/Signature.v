@@ -2139,7 +2139,13 @@ destruct c1. {
   now rewrite Nat.compare_refl in Hc2.
 } {
   apply Nat.compare_lt_iff in Hc1.
-  destruct c2. {
+  destruct c2; [ | easy | ]; exfalso. {
+    apply Nat.compare_eq_iff in Hc2.
+    specialize (NoDup_nat _ Hnd i j Hi Hj Hc2) as H1.
+    rewrite H1 in Hc1.
+    now apply Nat.lt_irrefl in Hc1.
+  } {
+    apply Nat.compare_gt_iff in Hc2.
 ...
 
 Theorem ε_collapse_ε : ∀ l,
