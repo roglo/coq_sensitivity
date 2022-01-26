@@ -2053,18 +2053,31 @@ Qed.
 (* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
    E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
-   I pretend that that list has the same ε than the initial list i.e.
+   I claim that list has the same ε than the initial list i.e.
       ε (collapse l) = ε l
-   I also pretend that
-      collapse (collapsel l) = collapse l
+   I also claim that
+      collapse (collapse l) = collapse l
       collapse (la ° lb) = collapse la ° collapse lb
       collapse la = la, if la is a permutation
-   To be proven *)
+   And
+      collapse is a permutation
+      it is the invert permutation of bsort_rank
+      bsort_rank ord l = rank of the elements in the sorted list
+      e.g.
+        bsort_rank Nat.leb [19;3;7;6] = [1;3;2;0] means thatn
+        - the first element of [1;3;2;0], 1, is the rank of the lowest
+          value in [19;3;7;6] which is 3,
+        - the second element of [1;3;2;0], 3, is the rank of the next
+          lowest value in [19;3;7;6] which is 6,
+        - and so on
+*)
 
 Definition collapse l := permut_list_inv (bsort_rank Nat.leb l).
 
 (*
 Compute (let l := [19;3;7;6] in (collapse l, bsort_rank Nat.leb l)).
+Compute (let l := [19;3;7;6] in (collapse l, bsort_rank Nat.leb l)).
+Compute (let l := [19;3;7;6] in (collapse l, collapse (collapse l))).
 *)
 
 Theorem length_collapse : ∀ l, length (collapse l) = length l.
