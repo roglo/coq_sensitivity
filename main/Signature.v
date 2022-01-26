@@ -2095,51 +2095,6 @@ unfold collapse.
 now rewrite List_map_seq_length.
 Qed.
 
-Theorem NoDup_bsort_rank : ∀ A ord (l : list A), NoDup (bsort_rank ord l).
-Proof.
-intros.
-apply nat_NoDup.
-rewrite length_bsort_rank.
-intros i j Hi Hj Hij.
-destruct l as [| d]; [ easy | ].
-cbn in Hi, Hj.
-unfold bsort_rank in Hij.
-Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank i j,
-  NoDup lrank
-  → i < length lrank + length l
-  → j < length lrank + length l
-  → ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) i =
-    ff_app (bsort_rank_loop ord  (λ k, nth k l_ini d) lrank l) j
-  → i = j.
-Proof.
-intros * Hnd Hi Hj Hij.
-revert i j lrank Hnd Hi Hj Hij.
-induction l as [| a]; intros. {
-  rewrite Nat.add_0_r in Hi, Hj.
-  cbn in Hij.
-  now apply (NoDup_nat _ Hnd) in Hij.
-}
-cbn in Hi, Hj, Hij.
-rewrite <- Nat.add_succ_comm in Hi, Hj.
-do 2 rewrite fold_ff_app in Hij.
-apply IHl in Hij; [ easy | | | ]; cycle 1. {
-  now rewrite length_bsort_rank_insert.
-} {
-  now rewrite length_bsort_rank_insert.
-}
-apply NoDup_bsort_rank_insert.
-apply NoDup_cons_iff.
-split; [ | easy ].
-...
-Search (nth _ (bsort_rank_loop _ _ _ _ _)).
-Print bsort_rank_loop.
-Print bsort_rank_insert.
-...
-cbn - [ nth ] in Hij.
-...
-unfold bsort_rank in Hij.
-...
-
 Theorem bsort_rank_is_permut : ∀ l,
   is_permut (length l) (bsort_rank Nat.leb l).
 Proof.
@@ -2154,9 +2109,11 @@ split. {
     apply bsort_rank_ub.
     now intros H; rewrite H in Hial.
   } {
-...
     apply NoDup_bsort_rank.
-...
+  }
+}
+apply length_bsort_rank.
+Qed.
 
 Theorem NoDup_collapse : ∀ l, NoDup (collapse l).
 Proof.
@@ -2173,89 +2130,13 @@ remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
 apply (f_equal (ff_app lrank)) in Hij.
 rewrite (permut_permut_inv (length l)) in Hij; [ | | easy ]. 2: {
   rewrite Hr.
-...
   apply bsort_rank_is_permut.
-...
-Search (NoDup (map _ _)).
-...
-apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
-intros i j Hij.
-unfold collapse_fun in Hij.
-remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
-apply (f_equal (ff_app lrank)) in Hij.
-rewrite (permut_permut_inv (length l)) in Hij.
-...
-rewrite (permut_permut_inv (length l)) in Hij.
-...
-Print collapse_fun.
-...
-Theorem glop : ∀ l l',
-  NoDup l
-  → AllLt (length l) l
-  → NoDup (fold_left collapse_fun l l').
-Proof.
-...
-
-Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
-Proof.
-...
-
-Theorem length_collapse_fun : ∀ lrank l i,
-  l ≠ []
-  → AllLt (length l) lrank
-  → length (collapse_fun lrank l i) = length l.
-Proof.
-intros * Hlz Halt.
-unfold collapse_fun.
-apply length_replace_at.
-apply Halt.
-...
-apply nth_In.
-now apply bsort_rank_ub.
-Qed.
-
-Theorem length_fold_left_collapse_fun : ∀ l,
-  l ≠ []
-  → length
-       (fold_left (collapse_fun (bsort_rank Nat.leb l))
-          (seq 0 (length l)) l) =
-    length l.
-Proof.
-intros * Hlz.
-remember (bsort_rank Nat.leb l) as lrank eqn:Hr.
-revert lrank Hr.
-induction l as [| a]; intros; [ easy | clear Hlz ].
-cbn - [ seq nth ].
-rewrite seq_S.
-rewrite fold_left_app; cbn.
-rewrite Hr.
-rewrite length_collapse_fun.
-...
-rewrite IHl. 2: {
-  unfold collapse_fun.
-  intros Hr; apply Hlz; clear Hlz.
-  apply (f_equal length) in Hr.
-  rewrite length_replace_at in Hr. {
-    now apply length_zero_iff_nil in Hr.
-  }
-  apply bsort_rank_ub.
-  intros H; subst l; cbn in Hr.
-  now destruct a'.
 }
-now apply length_collapse_fun.
-Qed.
-*)
-
-Theorem length_collapse : ∀ l, length (collapse l) = length l.
-Proof.
-intros.
-destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
-  now apply length_zero_iff_nil in Hlz; subst l.
+rewrite (permut_permut_inv (length l)) in Hij; [ | | easy ]. 2: {
+  rewrite Hr.
+  apply bsort_rank_is_permut.
 }
-unfold collapse.
-...
-apply length_fold_left_collapse_fun.
-now intros H; apply Hlz; subst l.
+easy.
 Qed.
 
 Theorem seq_0_AllLt : ∀ len, AllLt len (seq 0 len).
@@ -2264,74 +2145,13 @@ intros * i Hi.
 now apply in_seq in Hi.
 Qed.
 
-Theorem NoDup_fold_left_collapse_fun : ∀ l l',
-  NoDup l
-  → AllLt (length l) l
-  → NoDup (fold_left collapse_fun l l').
-Proof.
-intros * Hnd Halt.
-destruct (Nat.eq_dec (length l') 0) as [Hlz| Hlz]. {
-  apply length_zero_iff_nil in Hlz; subst l'.
-  apply nat_NoDup.
-  intros * Hi Hj Hij.
-  destruct l as [| a]; [ easy | cbn ].
-  cbn in Hi, Hj.
-  destruct a; cbn. {
-    rewrite length_fold_left_collapse_fun in Hi; [ | easy ].
-    rewrite length_fold_left_collapse_fun in Hj; [ | easy ].
-    apply Nat.lt_1_r in Hi, Hj; congruence.
-  } {
-    rewrite length_fold_left_collapse_fun in Hi; [ | easy ].
-    rewrite length_fold_left_collapse_fun in Hj; [ | easy ].
-    apply Nat.lt_1_r in Hi, Hj; congruence.
-  }
-}
-specialize (NoDup_nat _ Hnd) as Hinj; clear Hnd.
-unfold AllLt in Halt.
-apply nat_NoDup.
-apply length_nzero_iff_nnil in Hlz.
-rewrite length_fold_left_collapse_fun; [ | easy ].
-intros * Hi Hj Hij.
-unfold collapse_fun in Hij.
-...
-remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
-...
-revert l' Hi Hj Hij Hlz.
-induction l as [| a]; intros; cbn in Hij. {
-  revert i j Hi Hj Hij.
-  induction l' as [| b]; intros; [ easy | ].
-  destruct i. {
-    destruct j; [ easy | exfalso ].
-...
-
-Theorem NoDup_collapse : ∀ l, NoDup (collapse l).
-Proof.
-intros.
-unfold collapse.
-apply nat_NoDup.
-intros * Hi Hj Hij.
-...
-specialize NoDup_fold_left_collapse_fun as H1.
-specialize (H1 (seq 0 (length l)) l (seq_NoDup _ _)).
-rewrite seq_length in H1.
-specialize (H1 (seq_0_AllLt _)).
-...
-specialize (glop _ (seq_NoDup _ _)) as H1.
-specialize (glop (seq 0 (length l)) l) as H1.
-...
-
-Theorem NoDup_collapse : ∀ l, NoDup l → NoDup (collapse l).
-Proof.
-...
-
 Theorem collapse_is_permut_list : ∀ l, is_permut_list (collapse l).
 Proof.
 intros.
-split. 2: {
-  apply NoDup_nth.
-...
-  now apply NoDup_collapse.
-}
+split; [ | apply NoDup_collapse ].
+rewrite length_collapse.
+intros i Hi.
+Search (_ ∈ collapse _).
 ...
 
 Theorem ε_collapse_ε : ∀ l,

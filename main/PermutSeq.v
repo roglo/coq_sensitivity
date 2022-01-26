@@ -22,8 +22,6 @@ Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ° g) (seq 0 (length (hd [] l))))
   (at level 35, i at level 0, l at level 60).
 
-Definition AllLt u l := ∀ i, i ∈ l → i < u.
-
 (* Permutations of {0, 1, 2, ... n-1} *)
 
 Definition is_permut_list l := AllLt (length l) l ∧ NoDup l.

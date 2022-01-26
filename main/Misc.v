@@ -42,6 +42,8 @@ revert a.
 induction l as [| c]; intros; [ easy | apply IHl ].
 Qed.
 
+Definition AllLt u l := ∀ i, i ∈ l → i < u.
+
 (* iterations in list of naturals
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
@@ -2338,6 +2340,47 @@ apply in_bsort_rank_insert in Hib'.
 destruct Hib' as [Hib'| Hib']; [ | easy ].
 subst ib; apply Hia.
 now left.
+Qed.
+
+Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank,
+  NoDup lrank
+  → AllLt (length lrank) lrank
+  → NoDup (bsort_rank_loop ord (λ k, nth k l_ini d) lrank l).
+Proof.
+intros * Hnd Halt.
+revert lrank Hnd Halt.
+induction l as [| a]; intros; [ easy | cbn ].
+apply IHl.
+apply NoDup_bsort_rank_insert. 2: {
+  rewrite length_bsort_rank_insert.
+  intros i Hi.
+  apply in_bsort_rank_insert in Hi.
+  destruct Hi as [Hi| Hi]; [ now rewrite Hi | ].
+  specialize (Halt _ Hi) as H1.
+  flia H1.
+}
+apply NoDup_cons_iff.
+split; [ | easy ].
+intros H.
+specialize (Halt _ H) as H1.
+now apply Nat.lt_irrefl in H1.
+Qed.
+
+Theorem NoDup_bsort_rank : ∀ A ord (l : list A), NoDup (bsort_rank ord l).
+Proof.
+intros.
+apply (proj2 (NoDup_nth _ 0)).
+rewrite length_bsort_rank.
+intros i j Hi Hj Hij.
+destruct l as [| d]; [ easy | ].
+unfold bsort_rank in Hij.
+specialize (NoDup_bsort_rank_loop d ord (d :: l) (d :: l) (NoDup_nil _)) as H1.
+assert (H : AllLt (length ([] : list nat)) []) by easy.
+specialize (H1 H); clear H.
+specialize (proj1 (NoDup_nth _ 0) H1) as H2.
+rewrite length_bsort_rank_loop in H2.
+rewrite Nat.add_0_l in H2.
+apply (H2 i j Hi Hj Hij).
 Qed.
 
 (* *)
