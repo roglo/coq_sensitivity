@@ -2236,7 +2236,14 @@ destruct c1. {
       now rewrite Hcl.
     }
     rewrite Hii', Hjj' in Hc2.
+    specialize bsort_is_sorted as Hsl.
+    specialize (Hsl _ Nat.leb l).
+    rewrite (bsort_bsort_rank _ 0) in Hsl.
+    rewrite <- Hlr in Hsl.
+Search Nat.leb.
+Check bsort_is_sorted.
 Check bsort_bsort_rank.
+...
 Search bsort_rank.
 ...
     rewrite Hii', Hjj', Hi', Hj', Hlr in Hc2.
