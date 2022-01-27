@@ -2414,12 +2414,30 @@ Theorem collapse_comp : ∀ la lb,
   → ε (collapse la ° lb) = ε (collapse (la ° lb)).
 Proof.
 intros * Hb Hab.
+enough (Hif : in_charac_0_field).
+assert (H : is_permut (length lb) lb) by easy.
+specialize (signature_comp Hif) as H1.
+specialize (H1 (length la) (collapse la) lb).
+specialize (H1 (collapse_is_permut _)).
+rewrite Hab in H1.
+specialize (H1 H); clear H.
+rewrite H1.
+...
+  H1 : ε (collapse la ° lb) = (ε (collapse la) * ε lb)%F
+  ============================
+  (ε (collapse la) * ε lb)%F = ε (collapse (la ° lb))
+
+goal 2 (ID 1778) is:
+ in_charac_0_field
+...
+intros * Hb Hab.
 specialize permut_list_inv_comp as H1.
 specialize (H1 (length la) (collapse la) lb).
 specialize (H1 (collapse_is_permut _)).
 rewrite Hab in H1.
 assert (H : is_permut (length lb) lb) by easy.
 specialize (H1 H); clear H.
+...
 unfold collapse.
 (* mouais, bof, chais pas trop ce que je fous, là *)
 ...
