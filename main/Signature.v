@@ -2408,6 +2408,48 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
+Theorem collapse_comp : ∀ la lb,
+  is_permut_list lb
+  → length la = length lb
+  → ε (collapse la ° lb) = ε (collapse (la ° lb)).
+Proof.
+intros * Hb Hab.
+specialize permut_list_inv_comp as H1.
+specialize (H1 (length la) (collapse la) lb).
+specialize (H1 (collapse_is_permut _)).
+rewrite Hab in H1.
+assert (H : is_permut (length lb) lb) by easy.
+specialize (H1 H); clear H.
+unfold collapse.
+(* mouais, bof, chais pas trop ce que je fous, là *)
+...
+specialize (permut_list_inv_comp (length la) la lb) as H1.
+unfold collapse.
+Search (permut_list_inv _ ° _).
+Check permut_list_inv_comp.
+Search permut_list_inv.
+Check list_eqb.
+unfold ε.
+rewrite length_permut_list_inv, length_bsort_rank.
+do 2 rewrite comp_length.
+...
+apply rngl_product_eq_compat.
+intros i Hi.
+apply rngl_product_eq_compat.
+intros j Hj.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+Check permut_list_inv_comp.
+unfold "°".
+Check permut_permut_inv.
+unfold ff_app.
+rewrite (List_map_nth' 0).
+rewrite (List_map_nth' 0).
+...
+Search list_eqb.
+apply list_eqb_eq.
+...
+
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   NoDup la
@@ -2417,7 +2459,12 @@ Proof.
 intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
 erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
+...
+rewrite collapse_comp.
+symmetry; apply ε_collapse_ε.
+...
 unfold "°".
+Search (ε _ = ε _).
 ...
 intros Hic Hop * Haa (Hbp, Hbl).
 unfold ε.
