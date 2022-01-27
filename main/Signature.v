@@ -2409,11 +2409,11 @@ now apply signature_comp_fun_changement_of_variable.
 Qed.
 
 Theorem collapse_comp : ∀ la lb,
-  AllLt (length la) lb
-  → collapse (la ° lb) = collapse la ° collapse lb.
+  is_permut_list lb
+  → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Hb.
-...
+..
 
 Theorem ε_collapse_comp : ∀ la lb,
   is_permut_list lb
