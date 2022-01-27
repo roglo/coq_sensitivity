@@ -2128,7 +2128,7 @@ Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
     true.
 Proof.
 intros * Htr Hs Hij.
-revert i j Hij.
+revert i j a Hij.
 induction lsorted as [| b]; intros; [ cbn in Hij; flia Hij | ].
 cbn - [ nth ].
 remember (ord a b) as x eqn:Hx; symmetry in Hx.
