@@ -2392,16 +2392,31 @@ unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
 
-Theorem sign_comp :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
+Theorem signature_comp : in_charac_0_field →
+  ∀ n la lb,
+  is_permut n la
+  → is_permut n lb
+  → ε (la ° lb) = (ε la * ε lb)%F.
+Proof.
+intros Hif * Hpf Hpg.
+destruct Hpf as (Hfp, Hfn).
+destruct Hpg as (Hgp, Hgn).
+apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+rewrite signature_comp_fun_expand_2_1; try easy.
+rewrite signature_comp_fun_expand_2_2; try easy.
+now apply signature_comp_fun_changement_of_variable.
+Qed.
+
+Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
-  (∀ i j, i ∈ la → j ∈ la → ff_app la i = ff_app la j → i = j)
+  NoDup la
   → is_permut (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
-intros Hic Hop * Haa (Hbp, Hbl).
-Inspect 1.
+intros Hif * Haa Hbp.
+rewrite <- (ε_collapse_ε Haa).
+erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
 ...
 intros Hic Hop * Haa (Hbp, Hbl).
 unfold ε.
@@ -2434,25 +2449,6 @@ Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in (ε (la ° lb), ε la *
 Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in ((la ° lb))).
 ...
 *)
-
-(* for Binet-Cauchy formula, I need that this applies even if la and lb are
-   not permutations, but just lists of nat. Is it true? If yes, how to prove
-   it? We probably need some hypotheses on la and lb, but which ones? *)
-Theorem signature_comp : in_charac_0_field →
-  ∀ n la lb,
-  is_permut n la
-  → is_permut n lb
-  → ε (la ° lb) = (ε la * ε lb)%F.
-Proof.
-intros Hif * Hpf Hpg.
-destruct Hpf as (Hfp, Hfn).
-destruct Hpg as (Hgp, Hgn).
-apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
-destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-rewrite signature_comp_fun_expand_2_1; try easy.
-rewrite signature_comp_fun_expand_2_2; try easy.
-now apply signature_comp_fun_changement_of_variable.
-Qed.
 ...
 
 Abort.
