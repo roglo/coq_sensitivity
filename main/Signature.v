@@ -2126,85 +2126,53 @@ Fixpoint sorted {A} ord (l : list A) :=
       end
   end.
 
-Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
-  transitive ord
-  → sorted ord lsorted = true
-  → i < j < length (a :: lsorted)
-  → ord
-      (nth i (bsort_insert ord a lsorted) d)
-      (nth j (bsort_insert ord a lsorted) d) =
-    true.
-Proof.
-intros * Htr Hs Hij.
-revert i j a Hij.
-induction lsorted as [| b]; intros; [ cbn in Hij; flia Hij | ].
-cbn - [ nth ].
-remember (ord a b) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  destruct i. {
-    destruct j; [ easy | ].
-    destruct Hij as (_, Hj).
-    cbn in Hj.
-    apply Nat.succ_lt_mono in Hj.
-    rewrite List_nth_0_cons, List_nth_succ_cons.
-    destruct j; [ easy | ].
-    apply Nat.succ_lt_mono in Hj.
-    rewrite List_nth_succ_cons.
-...
-    eapply Htr; [ apply Hx | ].
-    clear - Hj Hs.
-    revert b j Hs Hj.
-    induction lsorted as [| c]; intros; [ easy | cbn ].
-    destruct j. {
-      unfold is_sorted in Hs.
-      cbn in Hs.
-      remember (ord c b) as y eqn:Hy; symmetry in Hy.
-      destruct y. {
-        clear - Hy Hs.
-        revert b c Hy Hs.
-        induction lsorted as [| a]; intros. {
-          now injection Hs; clear Hs; intros; subst b.
-        }
-        apply IHlsorted; [ easy | ].
-...
-destruct lsorted as [| e]. {
-  cbn in Hs |-*.
-  remember (ord a c) as x eqn:Hx.
-  symmetry in Hx.
-  destruct x. {
-    injection Hs; intros; subst a.
-    admit. (* il faut que ord soit antisymétrique *)
-  }
-  now injection Hs; intros; subst c.
-}
-cbn in Hs |-*.
-remember (ord e c) as z eqn:Hz; symmetry in Hz.
-destruct z. {
-  remember (ord a c) as t eqn:Ht; symmetry in Ht.
-  destruct t. {
-    cbn in Hs.
-    rewrite Hz in Hs.
-    remember (ord e a) as u eqn:Hu; symmetry in Hu.
-    destruct u. 2: {
-...
-        specialize (IHlsorted _ _ Hy) as H1.
-        remember (ord a c) as x eqn:Hx.
-        symmetry in Hx.
-        destruct x. {
-          specialize (IHlsorted _ _ Hx) as H2.
-          apply H1.
-...
+Definition total_order {A} (ord : A → _) := ∀ a b,
+  (ord a b || ord b a)%bool = true.
 
-Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
-  i < length l
-  → j < length l
-  → i < j
-  → ord (nth i (bsort ord l) d) (nth j (bsort ord l) d) = true.
+Theorem bsort_insert_is_sorted : ∀ A ord (a : A) lsorted,
+  total_order ord
+  → sorted ord lsorted = true
+  → sorted ord (bsort_insert ord a lsorted) = true.
 Proof.
-intros * Hi Hj Hij.
-destruct l as [| d']; [ easy | cbn ].
-Print bsort_loop.
-...
+intros * Hto Hs.
+induction lsorted as [| b]; [ easy | cbn ].
+remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (b :: lsorted) as l; cbn; subst l.
+  now apply Bool.andb_true_iff.
+} {
+  specialize (Hto a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
+  remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  rewrite IHlsorted; [ | easy ].
+  cbn.
+  remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac; [ now rewrite Hba | now rewrite Hbc ].
+}
+Qed.
+
+Theorem bsort_loop_is_sorted : ∀ A ord (lsorted l : list A),
+  total_order ord
+  → sorted ord lsorted = true
+  → sorted ord (bsort_loop ord lsorted l) = true.
+Proof.
+intros * Hto Hs.
+revert lsorted Hs.
+induction l as [| a]; intros; [ easy | cbn ].
+now apply IHl, bsort_insert_is_sorted.
+Qed.
+
+Theorem bsort_is_sorted : ∀ A ord (l : list A),
+  total_order ord
+  → sorted ord (bsort ord l) = true.
+Proof.
+intros * Hto.
+destruct l as [| a]; [ easy | cbn ].
+now apply bsort_loop_is_sorted.
+Qed.
 
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
@@ -2216,11 +2184,11 @@ Proof.
 intros * Hnd Hi Hj.
 remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
 remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
+specialize (collapse_is_permut l) as Hc.
 move c2 before c1.
 symmetry in Hc1, Hc2.
 destruct c1. {
   apply Nat.compare_eq_iff in Hc1.
-  specialize (collapse_is_permut l) as Hc.
   destruct Hc as ((Hca, Hcn), Hcl).
   specialize (NoDup_nat _ Hcn i j) as H1.
   rewrite Hcl in H1.
@@ -2238,13 +2206,50 @@ destruct c1. {
     apply Nat.compare_gt_iff in Hc2.
     unfold collapse in Hc1.
     remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
-    enough (H : ∃ i', i = ff_app lrank i').
-    destruct H as (i' & Hi').
-    rewrite Hi' in Hc1.
-    rewrite (permut_inv_permut (length l)) in Hc1.
-    enough (H : ∃ j', j = ff_app lrank j').
-    destruct H as (j' & Hj').
-    rewrite Hj' in Hc1.
+    remember (ff_app (collapse l) i) as i' eqn:Hi'.
+    assert (Hii' : i = ff_app lrank i'). {
+      subst i'; unfold collapse.
+      rewrite <- Hlr; symmetry.
+      apply (permut_permut_inv (length l)); [ | easy ].
+      rewrite Hlr; apply bsort_rank_is_permut.
+    }
+    rewrite Hii' in Hc1.
+    rewrite (permut_inv_permut (length l)) in Hc1; cycle 1. {
+      rewrite Hlr; apply bsort_rank_is_permut.
+    } {
+      rewrite Hi'.
+      destruct Hc as ((Hca, Hcn), Hcl).
+      rewrite Hcl in Hca.
+      apply Hca, nth_In.
+      now rewrite Hcl.
+    }
+    remember (ff_app (collapse l) j) as j' eqn:Hj'.
+    assert (Hjj' : j = ff_app lrank j'). {
+      subst j'; unfold collapse.
+      rewrite <- Hlr; symmetry.
+      apply (permut_permut_inv (length l)); [ | easy ].
+      rewrite Hlr; apply bsort_rank_is_permut.
+    }
+    rewrite Hjj' in Hc1.
+    rewrite (permut_inv_permut (length l)) in Hc1; cycle 1. {
+      rewrite Hlr; apply bsort_rank_is_permut.
+    } {
+      rewrite Hj'.
+      destruct Hc as ((Hca, Hcn), Hcl).
+      rewrite Hcl in Hca.
+      apply Hca, nth_In.
+      now rewrite Hcl.
+    }
+    rewrite Hi', Hj' in Hc1.
+    destruct Hc as ((Hca, Hcn), Hcl).
+...
+    specialize (NoDup_nat _  Hcn i j) as H1.
+...
+    rewrite Hii', Hjj', Hlr in Hc2.
+    rewrite (permut_permut_inv (length l)) in Hc2.
+    rewrite
+    rewrite Hi', Hj' in Hc1.
+...
     rewrite (permut_inv_permut (length l)) in Hc1.
 ...
 specialize (bsort_is_sorted 0 Nat.leb l) as H1.
