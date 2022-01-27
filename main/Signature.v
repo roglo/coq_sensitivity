@@ -2408,12 +2408,50 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
+Theorem bsort_rank_comp : ∀ ord la lb,
+  is_permut_list lb
+  → bsort_rank ord (la ° lb) = bsort_rank ord la.
+Proof.
+Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (bsort_rank Nat.leb (la ° lb), bsort_rank Nat.leb la ° lb)).
+Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
+Abort. (* c'est faux *)
+
 Theorem collapse_comp : ∀ la lb,
   is_permut_list lb
+  → length la = length lb
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
-intros * Hb.
-..
+intros * Hb Hab.
+unfold collapse.
+unfold permut_list_inv.
+rewrite length_bsort_rank, comp_length.
+rewrite length_bsort_rank.
+unfold "°".
+unfold ff_app.
+symmetry.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (j & Hjl & Hji).
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length, Hab, <- Hji.
+    now apply Hb, nth_In.
+  }
+  rewrite seq_nth. 2: {
+    rewrite Hab, <- Hji.
+    now apply Hb, nth_In.
+  }
+  rewrite Nat.add_0_l.
+  rewrite fold_ff_app_permut_list_inv. 2: {
+    apply bsort_rank_is_permut.
+  }
+  easy.
+}
+rewrite (List_map_map_seq _ 0).
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+...
 
 Theorem ε_collapse_comp : ∀ la lb,
   is_permut_list lb
