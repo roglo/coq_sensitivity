@@ -2250,47 +2250,16 @@ apply Htr with (b := nth (S i) l d). 2: {
 apply sorted_rel; [ easy | flia Hj ].
 Qed.
 
-Theorem collapse_keeps_order : ∀ l i j,
-  NoDup l
-  → i < length l
-  → j < length l
-  → (ff_app (collapse l) i ?= ff_app (collapse l) j) =
-    (ff_app l i ?= ff_app l j).
-Proof.
-intros * Hnd Hi Hj.
-remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
-remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
-specialize (collapse_is_permut l) as Hc.
-specialize (bsort_rank_is_permut l) as Hr.
-move c2 before c1.
-symmetry in Hc1, Hc2.
-destruct c1. {
-  apply Nat.compare_eq_iff in Hc1.
-  destruct Hc as ((Hca, Hcn), Hcl).
-  specialize (NoDup_nat _ Hcn i j) as H1.
-  rewrite Hcl in H1.
-  specialize (H1 Hi Hj Hc1).
-  subst j.
-  now rewrite Nat.compare_refl in Hc2.
-} {
-  apply Nat.compare_lt_iff in Hc1.
-  destruct c2; [ | easy | ]; exfalso. {
-    apply Nat.compare_eq_iff in Hc2.
-    specialize (NoDup_nat _ Hnd i j Hi Hj Hc2) as H1.
-    rewrite H1 in Hc1.
-    now apply Nat.lt_irrefl in Hc1.
-  } {
-    apply Nat.compare_gt_iff in Hc2.
-Theorem collapse_lt_not_ge : ∀ l i j,
+Theorem collapse_lt_le_compat : ∀ l i j,
   i < length l
   → j < length l
-  → ff_app (collapse l) i < ff_app (collapse l) j
-  → ff_app l i ≤ ff_app l j.
+  → ff_app l i < ff_app l j
+  → ff_app (collapse l) i ≤ ff_app (collapse l) j.
 Proof.
-intros * Hi Hj Hc1.
+intros l j i Hj Hi Hc2.
 specialize (collapse_is_permut l) as Hc.
 specialize (bsort_rank_is_permut l) as Hr.
-apply Nat.nlt_ge; intros Hc2.
+apply Nat.nlt_ge; intros Hc1.
     unfold collapse in Hc1.
     remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
     remember (ff_app (collapse l) i) as i' eqn:Hi'.
@@ -2354,10 +2323,40 @@ apply Nat.nlt_ge; intros Hc2.
     rewrite <- Hlr in Hc2.
     now apply Nat.nle_gt in Hc2.
 Qed.
-Inspect 1.
-apply Nat.nle_gt in Hc2; apply Hc2.
-now apply collapse_lt_not_ge.
-...
+
+Theorem collapse_keeps_order : ∀ l i j,
+  NoDup l
+  → i < length l
+  → j < length l
+  → (ff_app (collapse l) i ?= ff_app (collapse l) j) =
+    (ff_app l i ?= ff_app l j).
+Proof.
+intros * Hnd Hi Hj.
+remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
+remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
+specialize (collapse_is_permut l) as Hc.
+specialize (bsort_rank_is_permut l) as Hr.
+move c2 before c1.
+symmetry in Hc1, Hc2.
+destruct c1. {
+  apply Nat.compare_eq_iff in Hc1.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  specialize (NoDup_nat _ Hcn i j) as H1.
+  rewrite Hcl in H1.
+  specialize (H1 Hi Hj Hc1).
+  subst j.
+  now rewrite Nat.compare_refl in Hc2.
+} {
+  apply Nat.compare_lt_iff in Hc1.
+  destruct c2; [ | easy | ]; exfalso. {
+    apply Nat.compare_eq_iff in Hc2.
+    specialize (NoDup_nat _ Hnd i j Hi Hj Hc2) as H1.
+    rewrite H1 in Hc1.
+    now apply Nat.lt_irrefl in Hc1.
+  } {
+    apply Nat.compare_gt_iff in Hc2.
+    apply Nat.nle_gt in Hc1; apply Hc1.
+    now apply collapse_lt_le_compat.
   }
 } {
   apply Nat.compare_gt_iff in Hc1.
@@ -2368,18 +2367,13 @@ now apply collapse_lt_not_ge.
     now apply Nat.lt_irrefl in Hc1.
   } {
     apply Nat.compare_lt_iff in Hc2.
-(* s'inspirer sur ce qui est fait plus haut ; faire un lemme *)
-...
-  Hc1 : ff_app (collapse l) j < ff_app (collapse l) i
-  Hc2 : ff_app l i < ff_app l j
-...
+    apply Nat.nle_gt in Hc1; apply Hc1.
+    now apply collapse_lt_le_compat.
   }
 }
-...
+Qed.
 
-Theorem ε_collapse_ε : ∀ l,
-  NoDup l
-  → ε (collapse l) = ε l.
+Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
@@ -2395,76 +2389,8 @@ move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
-...
-now rewrite collapse_keeps_order.
-...
-(**)
-specialize (collapse_is_permut l) as Hc.
-destruct Hc as ((Hca, Hcn), Hcl).
-specialize (NoDup_nat _ Hcn j i) as H1.
-rewrite length_collapse in H1.
-assert (H : j < length l) by flia Hj Hlz.
-specialize (H1 H); clear H.
-assert (H : i < length l) by flia Hi Hlz.
-specialize (H1 H); clear H.
-remember (ff_app (collapse l) j ?= ff_app (collapse l) i) as c1 eqn:Hc1.
-remember (ff_app l j ?= ff_app l i) as c2 eqn:Hc2.
-symmetry in Hc1, Hc2.
-move c2 before c1.
-destruct c1. {
-  apply Nat.compare_eq_iff in Hc1.
-  apply H1 in Hc1.
-  rewrite Hc1 in Hij.
-  now apply Nat.lt_irrefl in Hij.
-} {
-  destruct c2; [ | easy | ]; exfalso. {
-    apply Nat.compare_eq_iff in Hc2.
-    unfold ff_app in Hc2.
-    apply NoDup_nth in Hc2; [ flia Hij Hc2 | easy | | flia Hij Hj ].
-    flia Hj Hlz.
-  } {
-    apply Nat.compare_lt_iff in Hc1.
-    apply Nat.compare_gt_iff in Hc2.
-...
-  apply Nat.compare_lt_iff in Hc2.
-  unfold ff_app in Hc2.
-  specialize (collapse_is_permut l) as Hc.
-  destruct Hc as (Hcp, Hcl).
-  destruct Hcp as (Hca, Hcn).
-  specialize (NoDup_nat _ Hcn) as H1.
-
-  destruct c1; [ | easy | ]. {
-    exfalso.
-    apply Nat.compare_eq_iff in Hc1.
-    unfold ff_app in Hc1.
-    apply (NoDup_nat _ Hcn) in Hc1; cycle 1. {
-      rewrite Hcl; flia Hj Hlz.
-    } {
-      rewrite Hcl; flia Hi Hlz.
-    }
-    rewrite Hc1 in Hij.
-    now apply Nat.lt_irrefl in Hij.
-  } {
-    exfalso.
-    apply Nat.compare_gt_iff in Hc1.
-    unfold ff_app in Hc1.
-...
-
-(*
-End a.
-Arguments ε {T}%type {ro}.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (let l := [1;2;1;2]%nat in (collapse l, ε (collapse l), ε l)).
-Compute (let l := [1;1;3;4]%nat in (collapse l, ε (collapse l), ε l)).
-Compute (let l := [1;1;3;4]%nat in (ε (collapse l), ε l)).
-Compute (let l := [7;8;1;2]%nat in (ε (collapse l), ε l)).
-Compute (let l := [7;1;8;2]%nat in (ε (collapse l), ε l)).
-Compute (ε (collapse [1;2;3;4]%nat)).
-*)
-
-...
+rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
+Qed.
 
 Theorem sign_comp :
   rngl_is_comm = true →
@@ -2474,6 +2400,9 @@ Theorem sign_comp :
   → is_permut (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
+intros Hic Hop * Haa (Hbp, Hbl).
+Inspect 1.
+...
 intros Hic Hop * Haa (Hbp, Hbl).
 unfold ε.
 rewrite comp_length, Hbl.
