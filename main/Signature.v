@@ -2185,6 +2185,7 @@ intros * Hnd Hi Hj.
 remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
 remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
 specialize (collapse_is_permut l) as Hc.
+specialize (bsort_rank_is_permut l) as Hr.
 move c2 before c1.
 symmetry in Hc1, Hc2.
 destruct c1. {
@@ -2210,13 +2211,10 @@ destruct c1. {
     assert (Hii' : i = ff_app lrank i'). {
       subst i'; unfold collapse.
       rewrite <- Hlr; symmetry.
-      apply (permut_permut_inv (length l)); [ | easy ].
-      rewrite Hlr; apply bsort_rank_is_permut.
+      now apply (permut_permut_inv (length l)).
     }
     rewrite Hii' in Hc1.
-    rewrite (permut_inv_permut (length l)) in Hc1; cycle 1. {
-      rewrite Hlr; apply bsort_rank_is_permut.
-    } {
+    rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
       rewrite Hi'.
       destruct Hc as ((Hca, Hcn), Hcl).
       rewrite Hcl in Hca.
@@ -2227,20 +2225,36 @@ destruct c1. {
     assert (Hjj' : j = ff_app lrank j'). {
       subst j'; unfold collapse.
       rewrite <- Hlr; symmetry.
-      apply (permut_permut_inv (length l)); [ | easy ].
-      rewrite Hlr; apply bsort_rank_is_permut.
+      now apply (permut_permut_inv (length l)).
     }
     rewrite Hjj' in Hc1.
-    rewrite (permut_inv_permut (length l)) in Hc1; cycle 1. {
-      rewrite Hlr; apply bsort_rank_is_permut.
-    } {
+    rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
       rewrite Hj'.
       destruct Hc as ((Hca, Hcn), Hcl).
       rewrite Hcl in Hca.
       apply Hca, nth_In.
       now rewrite Hcl.
     }
-    rewrite Hi', Hj' in Hc1.
+    rewrite Hii', Hjj' in Hc2.
+Check bsort_bsort_rank.
+Search bsort_rank.
+...
+    rewrite Hii', Hjj', Hi', Hj', Hlr in Hc2.
+    unfold collapse in Hc2.
+    rewrite <- Hlr in Hc2.
+    rewrite (permut_permut_inv (length l)) in Hc2; [ | easy | easy ].
+    rewrite (permut_permut_inv (length l)) in Hc2; [ | easy | easy ].
+...
+  Hc1 : ff_app (collapse l) i < ff_app (collapse l) j
+  Hc2 : ff_app l j < ff_app l i
+  Hc : is_permut (length l) (collapse l)
+  Hi' : i' = ff_app (collapse l) i
+  Hii' : i = ff_app lrank i'
+  Hj' : j' = ff_app (collapse l) j
+  Hjj' : j = ff_app lrank j'
+  ============================
+  False
+...
     destruct Hc as ((Hca, Hcn), Hcl).
 ...
     specialize (NoDup_nat _  Hcn i j) as H1.
