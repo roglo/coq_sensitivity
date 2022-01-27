@@ -2005,7 +2005,7 @@ Definition bsort {A} (ord : A → A → bool) := bsort_loop ord [].
 
 (* bsort length *)
 
-Theorem bsort_insert_length : ∀ A ord (a : A) lsorted,
+Theorem length_bsort_insert : ∀ A ord (a : A) lsorted,
   length (bsort_insert ord a lsorted) = S (length lsorted).
 Proof.
 intros.
@@ -2015,20 +2015,20 @@ cbn; f_equal.
 apply IHlsorted.
 Qed.
 
-Theorem bsort_loop_length : ∀ A ord (lsorted l : list A),
+Theorem length_bsort_loop : ∀ A ord (lsorted l : list A),
   length (bsort_loop ord lsorted l) = length lsorted + length l.
 Proof.
 intros.
 revert lsorted.
 induction l as [| a]; intros; [ now cbn; rewrite Nat.add_0_r | cbn ].
 rewrite IHl, <- Nat.add_succ_comm; f_equal.
-apply bsort_insert_length.
+apply length_bsort_insert.
 Qed.
 
-Theorem bsort_length : ∀ A ord (l : list A), length (bsort ord l) = length l.
+Theorem length_bsort : ∀ A ord (l : list A), length (bsort ord l) = length l.
 Proof.
 intros.
-apply bsort_loop_length.
+apply length_bsort_loop.
 Qed.
 
 (* in bsort *)

@@ -2174,6 +2174,16 @@ destruct l as [| a]; [ easy | cbn ].
 now apply bsort_loop_is_sorted.
 Qed.
 
+Theorem nth_ff_app_bsort_rank : ∀ A d ord (l : list A) i,
+  i < length l
+  → nth (ff_app (bsort_rank ord l) i) l d = nth i (bsort ord l) d.
+Proof.
+intros * Hil.
+rewrite (bsort_bsort_rank _ d).
+rewrite (List_map_nth' 0); [ easy | ].
+now rewrite length_bsort_rank.
+Qed.
+
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
   → i < length l
@@ -2236,10 +2246,30 @@ destruct c1. {
       now rewrite Hcl.
     }
     rewrite Hii', Hjj' in Hc2.
+    rewrite Hlr in Hc2.
+    unfold ff_app in Hc2 at 1 3.
+    assert (Hi'l : i' < length l). {
+      rewrite Hi'.
+      destruct Hc as ((Hca, Hcn), Hcl).
+      rewrite Hcl in Hca.
+      apply Hca, nth_In.
+      now rewrite length_collapse.
+    }
+    assert (Hj'l : j' < length l). {
+      rewrite Hj'.
+      destruct Hc as ((Hca, Hcn), Hcl).
+      rewrite Hcl in Hca.
+      apply Hca, nth_In.
+      now rewrite length_collapse.
+    }
+    rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
+    rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
+...
     specialize bsort_is_sorted as Hsl.
     specialize (Hsl _ Nat.leb l).
     rewrite (bsort_bsort_rank _ 0) in Hsl.
     rewrite <- Hlr in Hsl.
+...
 Search Nat.leb.
 Check bsort_is_sorted.
 Check bsort_bsort_rank.
