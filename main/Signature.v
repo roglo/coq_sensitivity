@@ -2463,12 +2463,13 @@ rewrite seq_nth. 2: {
   now apply Hb, nth_In.
 }
 rewrite Nat.add_0_l.
-Check List_map_nth_seq.
-Search (map (λ _, nth _ _ _)).
+Search (bsort_rank _ (map _ _)).
 Search List_rank.
 ...
+Check List_map_nth_seq.
+Search (map (λ _, nth _ _ _)).
+...
 Search (Nat.eqb (nth _ _ _)).
-Search (bsort_rank _ (map _ _)).
 unfold unsome.
 remember (List_rank _ _) as x eqn:Hx in |-*.
 remember (List_rank _ _) as y eqn:Hy in |-*.
