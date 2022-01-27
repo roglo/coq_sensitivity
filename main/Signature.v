@@ -2451,6 +2451,39 @@ rewrite (List_map_map_seq _ 0).
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
+unfold permut_list_inv.
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, length_bsort_rank, Hab.
+  now apply Hb, nth_In.
+}
+rewrite length_bsort_rank.
+rewrite seq_nth. 2: {
+  rewrite Hab.
+  now apply Hb, nth_In.
+}
+rewrite Nat.add_0_l.
+Check List_map_nth_seq.
+Search (map (λ _, nth _ _ _)).
+Search List_rank.
+...
+Search (Nat.eqb (nth _ _ _)).
+Search (bsort_rank _ (map _ _)).
+unfold unsome.
+remember (List_rank _ _) as x eqn:Hx in |-*.
+remember (List_rank _ _) as y eqn:Hy in |-*.
+move y before x.
+symmetry in Hx, Hy.
+destruct x as [x| ]. {
+  apply (List_rank_Some 0) in Hx.
+  rewrite length_bsort_rank in Hx.
+  destruct Hx as (Hxl & Hbefx & Hx).
+  apply Nat.eqb_eq in Hx.
+  destruct y as [y| ]. {
+    apply (List_rank_Some 0) in Hy.
+    rewrite length_bsort_rank, map_length in Hy.
+    destruct Hy as (Hyl & Hbefy & Hy).
+    apply Nat.eqb_eq in Hy.
 ...
 
 Theorem ε_collapse_comp : ∀ la lb,
