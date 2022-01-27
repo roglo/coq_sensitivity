@@ -2281,6 +2281,16 @@ destruct c1. {
     now apply Nat.lt_irrefl in Hc1.
   } {
     apply Nat.compare_gt_iff in Hc2.
+Theorem collapse_lt_not_ge : ∀ l i j,
+  i < length l
+  → j < length l
+  → ff_app (collapse l) i < ff_app (collapse l) j
+  → ff_app l i ≤ ff_app l j.
+Proof.
+intros * Hi Hj Hc1.
+specialize (collapse_is_permut l) as Hc.
+specialize (bsort_rank_is_permut l) as Hr.
+apply Nat.nlt_ge; intros Hc2.
     unfold collapse in Hc1.
     remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
     remember (ff_app (collapse l) i) as i' eqn:Hi'.
@@ -2343,6 +2353,11 @@ destruct c1. {
     rewrite (bsort_bsort_rank _ 0) in Hc2.
     rewrite <- Hlr in Hc2.
     now apply Nat.nle_gt in Hc2.
+Qed.
+Inspect 1.
+apply Nat.nle_gt in Hc2; apply Hc2.
+now apply collapse_lt_not_ge.
+...
   }
 } {
   apply Nat.compare_gt_iff in Hc1.
@@ -2354,6 +2369,9 @@ destruct c1. {
   } {
     apply Nat.compare_lt_iff in Hc2.
 (* s'inspirer sur ce qui est fait plus haut ; faire un lemme *)
+...
+  Hc1 : ff_app (collapse l) j < ff_app (collapse l) i
+  Hc2 : ff_app l i < ff_app l j
 ...
   }
 }
