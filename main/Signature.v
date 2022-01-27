@@ -2128,8 +2128,6 @@ Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
     true.
 Proof.
 intros * Htr Hs Hij.
-...
-intros * Htr Hs Hij.
 revert i j a Hij.
 induction lsorted as [| b]; intros; [ cbn in Hij; flia Hij | ].
 cbn - [ nth ].
@@ -2137,12 +2135,14 @@ remember (ord a b) as x eqn:Hx; symmetry in Hx.
 destruct x. {
   destruct i. {
     destruct j; [ easy | ].
+    destruct Hij as (_, Hj).
+    cbn in Hj.
+    apply Nat.succ_lt_mono in Hj.
     rewrite List_nth_0_cons, List_nth_succ_cons.
     destruct j; [ easy | ].
+    apply Nat.succ_lt_mono in Hj.
     rewrite List_nth_succ_cons.
-    cbn in Hij.
-    destruct Hij as (_, Hj).
-    do 2 apply Nat.succ_lt_mono in Hj.
+...
     eapply Htr; [ apply Hx | ].
     clear - Hj Hs.
     revert b j Hs Hj.
