@@ -2408,7 +2408,7 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-Theorem collapse_comp : ∀ la lb,
+Theorem ε_collapse_comp : ∀ la lb,
   is_permut_list lb
   → length la = length lb
   → ε (collapse la ° lb) = ε (collapse (la ° lb)).
@@ -2422,6 +2422,14 @@ specialize (H1 (collapse_is_permut _)).
 rewrite Hab in H1.
 specialize (H1 H); clear H.
 rewrite H1.
+Search (collapse (_ ° _)).
+Theorem collapse_comp : ∀ la lb,
+  collapse (la ° lb) = collapse la ° collapse lb.
+Proof.
+intros.
+(* c'est vrai, ça ? *)
+unfold collapse.
+Search (bsort_rank _ (_ ° _)).
 ...
   H1 : ε (collapse la ° lb) = (ε (collapse la) * ε lb)%F
   ============================
