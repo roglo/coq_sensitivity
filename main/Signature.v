@@ -2116,11 +2116,19 @@ apply permut_list_inv_is_permut.
 apply bsort_rank_is_permut.
 Qed.
 
-Definition is_sorted {A} ord (l : list A) := bsort ord l = l.
+Fixpoint sorted {A} ord (l : list A) :=
+  match l with
+  | [] => true
+  | a :: l' =>
+      match l' with
+      | [] => true
+      | b :: _ => (ord a b && sorted ord l')%bool
+      end
+  end.
 
 Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
   transitive ord
-  → is_sorted ord lsorted
+  → sorted ord lsorted = true
   → i < j < length (a :: lsorted)
   → ord
       (nth i (bsort_insert ord a lsorted) d)
