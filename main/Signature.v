@@ -2128,6 +2128,8 @@ Theorem bsort_insert_is_sorted : ∀ A (d : A) ord a lsorted i j,
     true.
 Proof.
 intros * Htr Hs Hij.
+...
+intros * Htr Hs Hij.
 revert i j a Hij.
 induction lsorted as [| b]; intros; [ cbn in Hij; flia Hij | ].
 cbn - [ nth ].
@@ -2150,13 +2152,39 @@ destruct x. {
       cbn in Hs.
       remember (ord c b) as y eqn:Hy; symmetry in Hy.
       destruct y. {
-...
         clear - Hy Hs.
         revert b c Hy Hs.
-        induction lsorted as [| a]; intros; cbn in Hs. {
+        induction lsorted as [| a]; intros. {
           now injection Hs; clear Hs; intros; subst b.
         }
-        destruct (ord a c). {
+        apply IHlsorted; [ easy | ].
+...
+destruct lsorted as [| e]. {
+  cbn in Hs |-*.
+  remember (ord a c) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x. {
+    injection Hs; intros; subst a.
+    admit. (* il faut que ord soit antisymétrique *)
+  }
+  now injection Hs; intros; subst c.
+}
+cbn in Hs |-*.
+remember (ord e c) as z eqn:Hz; symmetry in Hz.
+destruct z. {
+  remember (ord a c) as t eqn:Ht; symmetry in Ht.
+  destruct t. {
+    cbn in Hs.
+    rewrite Hz in Hs.
+    remember (ord e a) as u eqn:Hu; symmetry in Hu.
+    destruct u. 2: {
+...
+        specialize (IHlsorted _ _ Hy) as H1.
+        remember (ord a c) as x eqn:Hx.
+        symmetry in Hx.
+        destruct x. {
+          specialize (IHlsorted _ _ Hx) as H2.
+          apply H1.
 ...
 
 Theorem bsort_is_sorted : ∀ A (d : A) ord l i j,
