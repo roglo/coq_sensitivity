@@ -2076,7 +2076,8 @@ now destruct Ha.
 Qed.
 
 (* bsort_rank: like bsort but return the rank of what have been
-   sorted *)
+   sorted; its result, when applied to the initial list as an
+   operator, returns the sorted list  *)
 
 Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
   match lrank with

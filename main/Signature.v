@@ -2417,6 +2417,7 @@ Proof.
 intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
 erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
+unfold "°".
 ...
 intros Hic Hop * Haa (Hbp, Hbl).
 unfold ε.
