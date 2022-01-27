@@ -2204,6 +2204,23 @@ destruct (le_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+Theorem sorted_rel : ∀ A (d : A) ord l,
+  sorted ord l = true
+  → ∀ i, S i < length l
+  → ord (nth i l d) (nth (S i) l d) = true.
+Proof.
+intros * Hs i Hi.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+destruct l as [| b]; [ easy | ].
+remember (b :: l) as l'; cbn in Hs |-*; subst l'.
+apply Bool.andb_true_iff in Hs.
+destruct i; [ easy | ].
+now apply IHl.
+Qed.
+
 Theorem sorted_strongly_sorted : ∀ A (d : A) ord l,
   transitive ord
   → sorted ord l = true
@@ -2214,7 +2231,24 @@ Theorem sorted_strongly_sorted : ∀ A (d : A) ord l,
     → ord (nth i l d) (nth j l d) = true.
 Proof.
 intros * Htr Hso * Hi Hj Hij.
-...
+remember (j - i) as n eqn:Hn.
+replace j with (i + n) in * by flia Hn Hij.
+assert (Hnz : n ≠ 0) by flia Hij.
+clear Hi Hij Hn.
+revert i Hj.
+induction n; intros; [ easy | clear Hnz; cbn ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite Nat.add_1_r in Hj |-*.
+  now apply sorted_rel.
+}
+apply Htr with (b := nth (S i) l d). 2: {
+  rewrite <- Nat.add_succ_comm in Hj.
+  rewrite <- Nat.add_succ_comm.
+  now apply IHn.
+}
+apply sorted_rel; [ easy | flia Hj ].
+Qed.
 
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
@@ -2300,10 +2334,6 @@ destruct c1. {
     specialize (Hsl _ Nat.leb l Nat_leb_has_total_order).
     rewrite (bsort_bsort_rank _ 0) in Hsl.
     rewrite <- Hlr in Hsl.
-Print Term Sorted.LocallySorted.
-Print Term Sorted.StronglySorted.
-Check Sorted.Sorted_StronglySorted.
-...
     specialize sorted_strongly_sorted as H1.
     specialize (H1 _ 0 _ _ Nat_leb_transitive Hsl).
     rewrite map_length, Hlr, length_bsort_rank in H1.
@@ -2314,67 +2344,6 @@ Check Sorted.Sorted_StronglySorted.
     rewrite <- Hlr in Hc2.
     now apply Nat.nle_gt in Hc2.
   }
-...
-rewrite Nat.leb_antisym.
-Search (negb _ = true ∨ _).
-Search Nat.leb.
-...
-Check bsort_is_sorted.
-Check bsort_bsort_rank.
-...
-Search bsort_rank.
-...
-    rewrite Hii', Hjj', Hi', Hj', Hlr in Hc2.
-    unfold collapse in Hc2.
-    rewrite <- Hlr in Hc2.
-    rewrite (permut_permut_inv (length l)) in Hc2; [ | easy | easy ].
-    rewrite (permut_permut_inv (length l)) in Hc2; [ | easy | easy ].
-...
-  Hc1 : ff_app (collapse l) i < ff_app (collapse l) j
-  Hc2 : ff_app l j < ff_app l i
-  Hc : is_permut (length l) (collapse l)
-  Hi' : i' = ff_app (collapse l) i
-  Hii' : i = ff_app lrank i'
-  Hj' : j' = ff_app (collapse l) j
-  Hjj' : j = ff_app lrank j'
-  ============================
-  False
-...
-    destruct Hc as ((Hca, Hcn), Hcl).
-...
-    specialize (NoDup_nat _  Hcn i j) as H1.
-...
-    rewrite Hii', Hjj', Hlr in Hc2.
-    rewrite (permut_permut_inv (length l)) in Hc2.
-    rewrite
-    rewrite Hi', Hj' in Hc1.
-...
-    rewrite (permut_inv_permut (length l)) in Hc1.
-...
-specialize (bsort_is_sorted 0 Nat.leb l) as H1.
-specialize (H1 i' j').
-enough (H : i' < length l).
-specialize (H1 H); clear H.
-enough (H : j' < length l).
-specialize (H1 H); clear H.
-specialize (H1 Hc1).
-apply Nat.leb_le in H1.
-rewrite Hi', Hj' in Hc2.
-rewrite Hlr in Hc2.
-rewrite (bsort_bsort_rank _ 0) in H1.
-rewrite (List_map_nth' 0) in H1.
-rewrite (List_map_nth' 0) in H1.
-do 2 rewrite fold_ff_app in H1.
-now apply Nat.nlt_ge in H1.
-(* bon, c'est bon, faut prouver tout le reste, main'nant *)
-...
-Search bsort.
-Search bsort_rank.
-Search permut_list_inv.
-Search bsort_rank.
-...
-... suite ok
-  }
 } {
   apply Nat.compare_gt_iff in Hc1.
   destruct c2; [ | | easy ]; exfalso. {
@@ -2384,6 +2353,7 @@ Search bsort_rank.
     now apply Nat.lt_irrefl in Hc1.
   } {
     apply Nat.compare_lt_iff in Hc2.
+(* s'inspirer sur ce qui est fait plus haut ; faire un lemme *)
 ...
   }
 }
