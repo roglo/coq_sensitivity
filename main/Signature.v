@@ -2184,6 +2184,38 @@ rewrite (List_map_nth' 0); [ easy | ].
 now rewrite length_bsort_rank.
 Qed.
 
+Theorem Nat_leb_transitive : transitive Nat.leb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.leb_le in Hab, Hbc.
+apply Nat.leb_le.
+now transitivity b.
+Qed.
+
+Theorem Nat_leb_has_total_order : total_order Nat.leb.
+Proof.
+intros i j.
+apply Bool.orb_true_iff.
+destruct (le_dec i j) as [Hij| Hij]. {
+  now apply Nat.leb_le in Hij; rewrite Hij; left.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hij.
+  now apply Nat.leb_le in Hij; rewrite Hij; right.
+}
+Qed.
+
+Theorem sorted_strongly_sorted : ∀ A (d : A) ord l,
+  transitive ord
+  → sorted ord l = true
+  → ∀ i j,
+    i < length l
+    → j < length l
+    → i < j
+    → ord (nth i l d) (nth j l d) = true.
+Proof.
+intros * Htr Hso * Hi Hj Hij.
+...
+
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
   → i < length l
@@ -2264,13 +2296,29 @@ destruct c1. {
     }
     rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
     rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
-...
     specialize bsort_is_sorted as Hsl.
-    specialize (Hsl _ Nat.leb l).
+    specialize (Hsl _ Nat.leb l Nat_leb_has_total_order).
     rewrite (bsort_bsort_rank _ 0) in Hsl.
     rewrite <- Hlr in Hsl.
+Print Term Sorted.LocallySorted.
+Print Term Sorted.StronglySorted.
+Check Sorted.Sorted_StronglySorted.
 ...
+    specialize sorted_strongly_sorted as H1.
+    specialize (H1 _ 0 _ _ Nat_leb_transitive Hsl).
+    rewrite map_length, Hlr, length_bsort_rank in H1.
+    specialize (H1 i' j' Hi'l Hj'l Hc1).
+    apply Nat.leb_le in H1.
+    rewrite <- Hlr in H1.
+    rewrite (bsort_bsort_rank _ 0) in Hc2.
+    rewrite <- Hlr in Hc2.
+    now apply Nat.nle_gt in Hc2.
+  }
+...
+rewrite Nat.leb_antisym.
+Search (negb _ = true ∨ _).
 Search Nat.leb.
+...
 Check bsort_is_sorted.
 Check bsort_bsort_rank.
 ...
