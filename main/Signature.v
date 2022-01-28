@@ -2419,6 +2419,48 @@ Proof.
 intros * Ha.
 unfold collapse.
 ...
+intros * Ha.
+unfold collapse.
+specialize (bsort_rank_is_permut la) as H1.
+destruct H1 as (H1, _).
+specialize (permut_comp_permut_list_inv H1) as H2.
+unfold "°" in H2.
+rewrite length_bsort_rank in H2.
+Check List_eq_iff.
+specialize (proj1 (List_eq_iff _ _) H2) as H3.
+destruct H3 as (_, H3).
+...
+specialize (permut_comp_permut_list_inv Ha) as H1.
+specialize (permut_comp_permut_list_inv Ha) as H1.
+unfold "°" in H1.
+...
+intros * Ha.
+unfold collapse.
+apply List_eq_iff.
+rewrite length_permut_list_inv, length_bsort_rank.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow. 2: {
+    now rewrite length_permut_list_inv, length_bsort_rank.
+  }
+  now symmetry; apply nth_overflow.
+}
+Search permut_list_inv.
+permut_comp_permut_list_inv: ∀ l : list nat, is_permut_list l → l ° permut_list_inv l = seq 0 (length l)
+...
+unfold permut_list_inv.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length, length_bsort_rank ].
+rewrite length_bsort_rank.
+rewrite seq_nth; [ cbn | easy ].
+rewrite fold_ff_app_permut_list_inv; [ | apply bsort_rank_is_permut ].
+...
+Search permut_list_inv.
+rewrite fold_collapse.
+...
+rewrite fold_permut_list_inv.
+...
 
 Theorem collapse_idemp : ∀ la,
   collapse (collapse la) = collapse la.
