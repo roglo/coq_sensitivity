@@ -2449,6 +2449,50 @@ assert (Hb : is_permut_list lb). {
   rewrite Hlb.
   split. {
     intros j Hj.
+    destruct Ha as (Hap, Hal).
+    specialize (Hap j) as H2.
+    assert (H : j ∈ la). {
+      rewrite Hla12.
+      apply in_app_iff in Hj.
+      apply in_app_iff.
+      destruct Hj; [ now left | now right; right ].
+    }
+    specialize (H2 H); clear H.
+    rewrite Hla12 in H2.
+    rewrite app_length in H2; cbn in H2.
+    rewrite <- Nat.add_succ_comm in H2; cbn in H2.
+    rewrite <- app_length in H2.
+    rewrite <- Hlb in Hj, H2 |-*.
+    rewrite Hib in H2 |-*.
+    destruct (Nat.eq_dec j len) as [Hjl| Hjl]; [ exfalso | flia H2 Hjl ].
+...
+    specialize (NoDup_nat _ Hal) as H3.
+    rewrite Hlen in H3.
+    rewrite Hlen in Hil.
+    specialize (H3 i).
+    specialize (H3 (ff_app (permut_list_inv la) j)).
+    specialize (H3 Hil).
+    rewrite (permut_permut_inv (S len)) in H3; [ | | easy ]. 2: {
+      now rewrite <- Hlen.
+    }
+    assert (H : ff_app (permut_list_inv la) j < S len). {
+      rewrite <- Hlen.
+      replace (length la) with (length (permut_list_inv la)). 2: {
+        apply length_permut_list_inv.
+      }
+      apply Hia, nth_In.
+      rewrite length_permut_list_inv.
+      now rewrite Hlen.
+    }
+    specialize (H3 H); clear H.
+    rewrite Hi in H3 at 1.
+    rewrite (permut_permut_inv (S len)) in H3. 2: {
+      now rewrite <- Hlen.
+    }
+    symmetry in Hjl.
+    specialize (H3 Hjl).
+...
+    specialize (H3 j len H2 (Nat.lt_succ_diag_r _)).
 ...
 intros * Ha.
 unfold collapse.
