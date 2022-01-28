@@ -2421,6 +2421,29 @@ Theorem ff_app_collapse_map : ∀ la lb,
   ff_app (collapse la) (nth i lb 0).
 Proof.
 intros * Ha Hb Hab i Hi.
+unfold collapse.
+...
+specialize (bsort_rank_is_permut la) as H1.
+remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
+destruct H1 as ((H1, H2), _).
+specialize (NoDup_nat _ H2) as H3.
+apply H3. 3: {
+  rewrite (permut_permut_inv (length lb)). 1: {
+...
+remember (map (ff_app la) lb) as lc eqn:Hlc.
+specialize (bsort_rank_is_permut lc) as H1.
+destruct H1 as ((H1, H2), _).
+specialize (NoDup_nat _ H2) as H3.
+rewrite length_bsort_rank in H3.
+apply H3. 3: {
+  rewrite (permut_permut_inv (length lb)).
+...
+specialize (permut_list_inv_is_permut_list Hb) as H1.
+destruct H1 as (Hbip, Hbil).
+specialize (NoDup_nat _ Hbil) as H2.
+rewrite length_permut_list_inv in H2.
+apply H2. 3: {
+  rewrite permut_permut_inv.
 ...
 intros * Ha Hb Hab i Hi.
 revert lb i Hb Hab Hi.
