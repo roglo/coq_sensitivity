@@ -2418,7 +2418,7 @@ Theorem ff_app_collapse_map : ∀ la lb,
   → length la = length lb
   → ∀ i, i < length lb →
   ff_app (collapse (map (ff_app la) lb)) i =
-  ff_app (collapse la) (nth i lb 0).
+  ff_app (collapse la) (ff_app lb i).
 Proof.
 intros * Ha Hb Hab i Hi.
 unfold collapse.
