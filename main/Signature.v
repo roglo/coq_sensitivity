@@ -2416,11 +2416,12 @@ Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (bsort_rank Nat.leb (la
 Abort. (* c'est faux *)
 
 Theorem collapse_comp : ∀ la lb,
-  is_permut_list lb
+  NoDup la
+  → is_permut_list lb
   → length la = length lb
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
-intros * Hb Hab.
+intros * Ha Hb Hab.
 (*
 Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
 *)
@@ -2493,8 +2494,31 @@ destruct lb as [| b3]. {
           rewrite List_nth_succ_cons, List_nth_0_cons in Hb21.
           destruct b2. {
             cbn in Hb21.
-(* fail *)
-Compute (let la := [18;18] in let lb := [1;0] in (collapse (la ° lb), collapse la ° lb)).
+            apply Nat.le_antisymm in Ha21; [ | easy ].
+            subst a2.
+            apply NoDup_cons_iff in Ha.
+            destruct Ha as (Ha, _).
+            now apply Ha; left.
+          }
+          rewrite List_nth_succ_cons in Hb21.
+          destruct Hb as (Hbp, Hbl).
+          destruct b2. {
+            apply NoDup_cons_iff in Hbl.
+            destruct Hbl as (Hbl, _).
+            now apply Hbl; left.
+          }
+          specialize (Hbp _ (or_intror (or_introl eq_refl))).
+          cbn in Hbp; flia Hbp.
+        }
+        rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec b1 0) as [Hb1z| Hb1z]; [ easy | ].
+        destruct b1; [ easy | ].
+        destruct b1; [ easy | ].
+        destruct Hb as (Hbp, Hbl).
+        specialize (Hbp _ (or_introl eq_refl)).
+        cbn in Hbp; flia Hbp.
+      }
+(* ouais bon, ok, faut faire une vraie preuve, main'nant *)
 ...
 Search (bsort_rank _ (map _ _)).
 Search List_rank.
