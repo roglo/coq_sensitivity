@@ -2412,6 +2412,24 @@ Theorem fold_collapse : ∀ l,
   permut_list_inv (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem permut_collapse : ∀ la,
+  is_permut_list la
+  → collapse la = la.
+Proof.
+intros * Ha.
+unfold collapse.
+...
+
+Theorem collapse_idemp : ∀ la,
+  collapse (collapse la) = collapse la.
+Proof.
+intros.
+apply permut_collapse.
+apply collapse_is_permut.
+Qed.
+
+...
+
 Theorem ff_app_collapse_map : ∀ la lb,
   NoDup la
   → is_permut_list lb
