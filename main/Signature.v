@@ -2413,7 +2413,6 @@ Theorem bsort_rank_comp : ∀ ord la lb,
   → bsort_rank ord (la ° lb) = bsort_rank ord la.
 Proof.
 Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (bsort_rank Nat.leb (la ° lb), bsort_rank Nat.leb la ° lb)).
-Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
 Abort. (* c'est faux *)
 
 Theorem collapse_comp : ∀ la lb,
@@ -2422,6 +2421,9 @@ Theorem collapse_comp : ∀ la lb,
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Hb Hab.
+(*
+Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
+*)
 unfold collapse.
 unfold permut_list_inv.
 rewrite length_bsort_rank, comp_length.
@@ -2463,6 +2465,37 @@ rewrite seq_nth. 2: {
   now apply Hb, nth_In.
 }
 rewrite Nat.add_0_l.
+destruct lb as [| b1]; [ easy | ].
+destruct lb as [| b2]. {
+  cbn - [ nth ].
+  destruct i; [ cbn | cbn in Hi; flia Hi ].
+  destruct la as [| a1]; [ easy | cbn ].
+  destruct la; [ cbn | easy ].
+  now destruct (b1 =? 0).
+}
+destruct lb as [| b3]. {
+  cbn - [ nth ].
+  rewrite List_nth_succ_cons.
+  do 2 rewrite List_nth_0_cons.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (nth b2 la 0) (nth b1 la 0)) as [Hb21| Hb21]. {
+    destruct i. {
+      cbn.
+      destruct la as [| a1]; [ easy | ].
+      destruct la as [| a2]; [ easy | ].
+      destruct la; [ | easy ].
+      cbn.
+      rewrite if_leb_le_dec.
+      destruct (le_dec a2 a1) as [Ha21| Ha21]; cbn. {
+        rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec b1 1) as [Hb1| Hb1]. {
+          exfalso; subst b1.
+          rewrite List_nth_succ_cons, List_nth_0_cons in Hb21.
+          destruct b2. {
+            cbn in Hb21.
+(* fail *)
+Compute (let la := [18;18] in let lb := [1;0] in (collapse (la ° lb), collapse la ° lb)).
+...
 Search (bsort_rank _ (map _ _)).
 Search List_rank.
 ...
