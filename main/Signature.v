@@ -2417,7 +2417,7 @@ Theorem ff_app_collapse_map : ∀ la lb,
   → is_permut_list lb
   → length la = length lb
   → ∀ i, i < length lb →
-  ff_app (collapse (map (ff_app la) lb)) i =
+  ff_app (collapse (la ° lb)) i =
   ff_app (collapse la) (ff_app lb i).
 Proof.
 intros * Ha Hb Hab i Hi.
