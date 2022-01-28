@@ -2418,6 +2418,24 @@ Theorem permut_collapse : ∀ la,
 Proof.
 intros * Ha.
 unfold collapse.
+remember (length la) as len eqn:Hlen.
+symmetry in Hlen.
+revert la Ha Hlen.
+induction len; intros; cbn. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+remember (ff_app (permut_list_inv la) len) as i eqn:Hi.
+specialize (permut_list_inv_is_permut_list Ha) as Hia.
+assert (Hil : i < length (permut_list_inv la)). {
+  rewrite Hi.
+  apply Hia.
+  unfold ff_app.
+  now apply nth_In; rewrite length_permut_list_inv, Hlen.
+}
+rewrite length_permut_list_inv in Hil.
+specialize nth_split as H1.
+specialize (H1 nat i la 0 Hil).
+destruct H1 as (la1 & la2 & Hla12 & Hla1).
 ...
 intros * Ha.
 unfold collapse.
