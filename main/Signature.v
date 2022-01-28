@@ -2436,6 +2436,19 @@ rewrite length_permut_list_inv in Hil.
 specialize nth_split as H1.
 specialize (H1 nat i la 0 Hil).
 destruct H1 as (la1 & la2 & Hla12 & Hla1).
+remember (la1 ++ la2) as lb eqn:Hlb.
+specialize (IHlen lb) as H1.
+assert (Hib : length lb = len). {
+  rewrite Hla12 in Hlen.
+  rewrite app_length in Hlen; cbn in Hlen.
+  rewrite <- Nat.add_succ_comm in Hlen; cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+  now rewrite Hlb, app_length.
+}
+assert (Hb : is_permut_list lb). {
+  rewrite Hlb.
+  split. {
+    intros j Hj.
 ...
 intros * Ha.
 unfold collapse.
