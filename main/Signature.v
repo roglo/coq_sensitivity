@@ -2441,8 +2441,7 @@ destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
   now rewrite map_length.
 }
 rewrite (List_map_nth' 0); [ | easy ].
-unfold ff_app.
-unfold "°".
+unfold ff_app, "°".
 ...
 Check permut_permut_inv.
 Search permut_list_inv.
