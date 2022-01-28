@@ -2408,12 +2408,38 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-Theorem bsort_rank_comp : ∀ ord la lb,
-  is_permut_list lb
-  → bsort_rank ord (la ° lb) = bsort_rank ord la.
+Theorem fold_collapse : ∀ l,
+  permut_list_inv (bsort_rank Nat.leb l) = collapse l.
+Proof. easy. Qed.
+
+Theorem ff_app_collapse_map : ∀ la lb,
+  NoDup la
+  → is_permut_list lb
+  → length la = length lb
+  → ∀ i, i < length lb →
+  ff_app (collapse (map (ff_app la) lb)) i =
+  ff_app (collapse la) (nth i lb 0).
 Proof.
-Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (bsort_rank Nat.leb (la ° lb), bsort_rank Nat.leb la ° lb)).
-Abort. (* c'est faux *)
+intros * Ha Hb Hab i Hi.
+revert lb i Hb Hab Hi.
+induction la as [| a]; intros. {
+  now rewrite <- Hab in Hi.
+}
+destruct lb as [| b]; [ easy | ].
+unfold ff_app.
+cbn - [ nth ].
+rewrite (List_map_nth' 0). 2: {
+  now rewrite length_bsort_rank_loop, seq_length, map_length.
+}
+rewrite seq_nth. 2: {
+  now rewrite length_bsort_rank_loop, map_length.
+}
+rewrite length_bsort_rank_loop.
+cbn - [ nth ].
+destruct i. {
+  cbn.
+(* oh la la la la... quel merdier ! *)
+...
 
 Theorem collapse_comp : ∀ la lb,
   NoDup la
@@ -2442,6 +2468,51 @@ destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
 }
 rewrite (List_map_nth' 0); [ | easy ].
 unfold ff_app, "°".
+unfold permut_list_inv.
+rewrite (List_map_nth' 0). 2: {
+  now rewrite length_bsort_rank, seq_length, map_length.
+}
+rewrite seq_nth; [ | now rewrite length_bsort_rank, map_length ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite length_bsort_rank, seq_length, Hab.
+  now apply Hb, nth_In.
+}
+rewrite seq_nth. 2: {
+  rewrite length_bsort_rank, Hab.
+  now apply Hb, nth_In.
+}
+cbn.
+rewrite fold_ff_app_permut_list_inv; [ | apply bsort_rank_is_permut ].
+rewrite fold_ff_app_permut_list_inv; [ | apply bsort_rank_is_permut ].
+do 2 rewrite fold_collapse.
+...
+Search (ff_app (collapse _)).
+Search (collapse (map _ _)).
+...
+unfold ff_app.
+...
+  nth i (permut_list_inv (bsort_rank Nat.leb (map (λ i0 : nat, nth i0 la 0) lb))) 0 =
+  nth (nth i lb 0) (permut_list_inv (bsort_rank Nat.leb la)) 0
+...
+  ============================
+  ff_app (permut_list_inv (bsort_rank Nat.leb (map (ff_app la) lb))) i =
+  ff_app (permut_list_inv (bsort_rank Nat.leb la)) (nth i lb 0)
+...
+  ============================
+  match List_rank (Nat.eqb i) (bsort_rank Nat.leb (map (ff_app la) lb)) with
+  | Some x => x
+  | None => 0
+  end = match List_rank (Nat.eqb (nth i lb 0)) (bsort_rank Nat.leb la) with
+        | Some x => x
+        | None => 0
+        end
+...
+revert la d i Ha Hab Hil.
+induction lb as [| b]; intros; [ easy | ].
+destruct i. {
+  rewrite List_nth_0_cons.
+  rewrite map_cons.
+  cbn - [ nth ].
 ...
 Check permut_permut_inv.
 Search permut_list_inv.
