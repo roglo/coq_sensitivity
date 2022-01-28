@@ -2424,6 +2424,11 @@ revert la Ha Hlen.
 induction len; intros; cbn. {
   now apply length_zero_iff_nil in Hlen; subst la.
 }
+assert (H1 : is_permut (S len) la) by easy.
+destruct (permut_without_highest H1) as (i & Hilen & Hip).
+destruct Hip as (Hip, Hil).
+specialize (IHlen (butn i la) Hip Hil).
+...
 remember (ff_app (permut_list_inv la) len) as i eqn:Hi.
 specialize (permut_list_inv_is_permut_list Ha) as Hia.
 assert (Hil : i < length (permut_list_inv la)). {
