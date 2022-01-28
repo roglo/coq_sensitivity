@@ -2422,6 +2422,37 @@ Theorem collapse_comp : ∀ la lb,
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Ha Hb Hab.
+unfold collapse.
+apply List_eq_iff.
+rewrite length_permut_list_inv.
+rewrite length_bsort_rank.
+do 2 rewrite comp_length.
+split; [ easy | ].
+intros d i.
+unfold "°" at 2.
+destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow. 2: {
+    rewrite length_permut_list_inv.
+    rewrite length_bsort_rank.
+    now rewrite comp_length.
+  }
+  rewrite nth_overflow; [ easy | ].
+  now rewrite map_length.
+}
+rewrite (List_map_nth' 0); [ | easy ].
+unfold ff_app.
+unfold "°".
+...
+Check permut_permut_inv.
+Search permut_list_inv.
+Check permut_comp_permut_list_inv.
+Search (permut_list_inv (_ ° _)).
+Check permut_list_inv_comp.
+Search permut_list_inv.
+Search (nth _ _ _ = nth _ _ _).
+...
+intros * Ha Hb Hab.
 (*
 Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
 *)
@@ -2518,7 +2549,6 @@ destruct lb as [| b3]. {
         specialize (Hbp _ (or_introl eq_refl)).
         cbn in Hbp; flia Hbp.
       }
-(* ouais bon, ok, faut faire une vraie preuve, main'nant *)
 ...
 Search (bsort_rank _ (map _ _)).
 Search List_rank.
