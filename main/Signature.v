@@ -2421,6 +2421,8 @@ Theorem ff_app_collapse_map : ∀ la lb,
   ff_app (collapse la) (nth i lb 0).
 Proof.
 intros * Ha Hb Hab i Hi.
+...
+intros * Ha Hb Hab i Hi.
 revert lb i Hb Hab Hi.
 induction la as [| a]; intros. {
   now rewrite <- Hab in Hi.
