@@ -2477,7 +2477,25 @@ assert (Hla : la = firstn i la ++ len :: skipn (S i) la). {
   rewrite List_nth_skipn.
   rewrite Nat.sub_add; [ easy | flia Hji Hij ].
 }
-Print permut_list_inv.
+apply List_eq_iff.
+rewrite length_permut_list_inv, length_bsort_rank.
+split; [ easy | ].
+intros d j.
+Check permut_permut_inv.
+destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+  apply Nat.nlt_ge in Hjla.
+  rewrite nth_overflow. 2: {
+    now rewrite length_permut_list_inv, length_bsort_rank.
+  }
+  now symmetry; apply nth_overflow.
+}
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite length_permut_list_inv, length_bsort_rank.
+}
+symmetry.
+rewrite nth_indep with (d' := 0); [ | easy ].
+symmetry.
+do 2 rewrite fold_ff_app.
 ...
 
 Theorem collapse_idemp : ∀ la,
