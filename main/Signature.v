@@ -2435,7 +2435,6 @@ assert (H1 : is_permut (S len) la) by easy.
 destruct (permut_without_highest H1) as (i & Hia & Hilen & Hip).
 destruct Hip as (Hip, Hil).
 specialize (IHlen (butn i la) Hip Hil).
-unfold butn in IHlen.
 assert (Hla : la = firstn i la ++ len :: skipn (S i) la). {
   assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
     rewrite app_length, firstn_length; cbn - [ skipn ].
