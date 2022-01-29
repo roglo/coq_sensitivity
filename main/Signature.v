@@ -2444,7 +2444,7 @@ assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
   rewrite Nat.add_sub_assoc; [ | easy ].
   now rewrite Nat.add_comm, Nat.add_sub.
 }
-assert (H : la = firstn i la ++ len :: skipn (S i) la). {
+assert (Hla : la = firstn i la ++ len :: skipn (S i) la). {
   apply List_eq_iff.
   split; [ easy | ].
   intros d j.
@@ -2468,6 +2468,16 @@ assert (H : la = firstn i la ++ len :: skipn (S i) la). {
   }
   rewrite firstn_length.
   rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
+  destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+    subst j; rewrite Nat.sub_diag; cbn.
+    rewrite <- Hilen.
+    now apply nth_indep.
+  }
+  replace (j - i) with (S (j - S i)) by flia Hji Hij.
+  rewrite List_nth_succ_cons.
+  rewrite List_nth_skipn.
+  rewrite Nat.sub_add; [ easy | flia Hji Hij ].
+}
 ...
     rewrite app_nth1; [ | rewrite firstn_length ].
 
