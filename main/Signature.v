@@ -1770,10 +1770,17 @@ Qed.
 
 Theorem permut_without_highest : ∀ n l,
   is_permut (S n) l
-  → ∃ i, nth i l 0 = n ∧ is_permut n (butn i l).
+  → ∃ i, i < length l ∧ nth i l 0 = n ∧ is_permut n (butn i l).
 Proof.
 intros * Hl.
 exists (ff_app (permut_list_inv l) n).
+split. {
+  rewrite <- length_permut_list_inv.
+  specialize (permut_list_inv_is_permut _ Hl) as Hil.
+  apply Hil, nth_In.
+  rewrite length_permut_list_inv.
+  now rewrite (proj2 Hl).
+}
 split. {
   rewrite fold_ff_app.
   now apply (permut_permut_inv (S n)).
@@ -2425,12 +2432,48 @@ induction len; intros; cbn. {
   now apply length_zero_iff_nil in Hlen; subst la.
 }
 assert (H1 : is_permut (S len) la) by easy.
-destruct (permut_without_highest H1) as (i & Hilen & Hip).
+destruct (permut_without_highest H1) as (i & Hia & Hilen & Hip).
 destruct Hip as (Hip, Hil).
 specialize (IHlen (butn i la) Hip Hil).
 unfold butn in IHlen.
+assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
+  rewrite app_length, firstn_length; cbn - [ skipn ].
+  rewrite skipn_length.
+  rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
+  rewrite <- Nat.add_succ_comm.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
 assert (H : la = firstn i la ++ len :: skipn (S i) la). {
+  apply List_eq_iff.
+  split; [ easy | ].
+  intros d j.
+  destruct (lt_dec j (length la)) as [Hja| Hja]. 2: {
+    apply Nat.nlt_ge in Hja.
+    rewrite nth_overflow; [ | easy ].
+    rewrite nth_overflow; [ easy | ].
+    now rewrite Hfs.
+  }
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    rewrite app_nth1. 2: {
+      rewrite firstn_length.
+      rewrite Nat.min_l; [ easy | now apply Nat.lt_le_incl ].
+    }
+    now symmetry; apply List_nth_firstn.
+  }
+  apply Nat.nlt_ge in Hji.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    rewrite Nat.min_l; [ easy | now apply Nat.lt_le_incl ].
+  }
+  rewrite firstn_length.
+  rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
+...
+    rewrite app_nth1; [ | rewrite firstn_length ].
+
+About permut_without_highest.
 Search firstn.
+Search (skipn (S _)).
 ...
 remember (ff_app (permut_list_inv la) len) as i eqn:Hi.
 specialize (permut_list_inv_is_permut_list Ha) as Hia.
