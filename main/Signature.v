@@ -2436,15 +2436,15 @@ destruct (permut_without_highest H1) as (i & Hia & Hilen & Hip).
 destruct Hip as (Hip, Hil).
 specialize (IHlen (butn i la) Hip Hil).
 unfold butn in IHlen.
-assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
-  rewrite app_length, firstn_length; cbn - [ skipn ].
-  rewrite skipn_length.
-  rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
-  rewrite <- Nat.add_succ_comm.
-  rewrite Nat.add_sub_assoc; [ | easy ].
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
 assert (Hla : la = firstn i la ++ len :: skipn (S i) la). {
+  assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
+    rewrite app_length, firstn_length; cbn - [ skipn ].
+    rewrite skipn_length.
+    rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
+    rewrite <- Nat.add_succ_comm.
+    rewrite Nat.add_sub_assoc; [ | easy ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
   apply List_eq_iff.
   split; [ easy | ].
   intros d j.
