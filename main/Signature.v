@@ -2419,6 +2419,19 @@ Theorem fold_collapse : ∀ l,
   permut_list_inv (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem bsort_rank_is_inv : ∀ ord la,
+  is_permut_list la
+  → bsort_rank ord la = permut_list_inv la.
+Proof.
+intros * Hp.
+unfold permut_list_inv.
+induction la as [| a]; [ easy | ].
+unfold permut_list_inv.
+cbn - [ List_rank nth seq ].
+rewrite seq_S.
+rewrite map_app.
+...
+
 Theorem bsort_rank_of_last : ∀ ord n la i,
   is_permut (S n) la
   → i ≤ n
@@ -2426,6 +2439,7 @@ Theorem bsort_rank_of_last : ∀ ord n la i,
   → ff_app (bsort_rank ord la) n = i.
 Proof.
 intros * Hla Hin Hlin.
+...
 revert la i Hla Hin Hlin.
 induction n; intros. {
   apply Nat.le_0_r in Hin; subst i.
@@ -2433,6 +2447,8 @@ induction n; intros. {
   destruct la as [| a]; [ easy | ].
   now destruct la.
 }
+Compute (let la := [2;3;0;1] in (bsort_rank Nat.leb la, permut_list_inv la)).
+Compute (map (λ la, (bsort_rank Nat.leb la, permut_list_inv la)) (canon_sym_gr_list_list 3)).
 ...
 specialize (permut_without_highest Hla) as H1.
 destruct H1 as (j & Hjl & Hjn & Hb).
