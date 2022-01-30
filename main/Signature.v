@@ -2479,10 +2479,6 @@ apply NoDup_butn.
 now destruct Hp.
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem bsort_rank_is_inv : ∀ ord la,
   is_permut_list la
   → bsort_rank ord la = permut_list_inv la.
@@ -2493,11 +2489,25 @@ revert la Hp Hn.
 induction n; intros. {
   now apply length_zero_iff_nil in Hn; subst la; cbn.
 }
+specialize (permut_list_inv_is_permut_list Hp) as Hpi.
 remember (ff_app (permut_list_inv la) n) as i eqn:Hi.
 specialize (IHn (butn i la)).
-Search (is_permut_list (butn _ _)).
-...
-Check butn_is_permut_list.
+assert (Hpb : is_permut_list (butn i la)). {
+  apply butn_is_permut_list; [ easy | ].
+  now rewrite Hn, Nat_sub_succ_1.
+}
+specialize (IHn Hpb).
+rewrite butn_length in IHn.
+unfold Nat.b2n in IHn; rewrite if_ltb_lt_dec in IHn.
+destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+  exfalso; apply Hila; clear Hila.
+  rewrite <- length_permut_list_inv.
+  rewrite Hi.
+  apply Hpi, nth_In.
+  now rewrite length_permut_list_inv, Hn.
+}
+rewrite Hn, Nat_sub_succ_1 in IHn.
+specialize (IHn eq_refl).
 ...
 intros * Hp.
 unfold permut_list_inv.
