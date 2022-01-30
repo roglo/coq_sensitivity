@@ -2528,6 +2528,12 @@ destruct (Nat.eq_dec j n) as [Hji| Hji]. {
   subst j.
   do 2 rewrite fold_ff_app.
   rewrite <- Hi.
+  replace n with (ff_app la i).
+...
+Search (ff_app (bsort_rank _ _)).
+unfold ff_app at 1.
+Search (nth _ (bsort_rank _ _)).
+rewrite nth_ff_app_bsort_rank.
 ...
 intros * Hp.
 unfold permut_list_inv.
