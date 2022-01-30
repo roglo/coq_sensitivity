@@ -2503,6 +2503,7 @@ rewrite fold_collapse in IHlen.
 apply List_eq_iff in IHlen.
 destruct IHlen as (_, Hdi).
 rewrite Hla.
+rewrite <- Hla at 1.
 unfold ff_app.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
@@ -2512,6 +2513,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
   rewrite Nat.sub_diag; cbn - [ skipn ].
+Search (bsort_rank _ (_ ++ _)).
 ...
 
 Theorem collapse_idemp : ∀ la,
