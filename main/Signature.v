@@ -2513,7 +2513,42 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
   rewrite Nat.sub_diag; cbn - [ skipn ].
-Search (bsort_rank _ (_ ++ _)).
+  specialize (bsort_rank_is_permut la) as H2.
+  specialize (permut_list_inv_is_permut (length la) H2) as H4.
+  destruct H2 as ((H2, H3), _).
+  destruct H4 as (H4, H5).
+  apply (NoDup_nat _ H3). {
+    rewrite length_bsort_rank, <- H5.
+    apply H4, nth_In.
+    now rewrite H5.
+  } {
+    now rewrite length_bsort_rank, Hlen.
+  }
+  rewrite fold_ff_app.
+  rewrite (permut_permut_inv (length la)); [ | | easy ]. 2: {
+    split; [ easy | ].
+    apply length_bsort_rank.
+  }
+Search bsort_rank.
+...
+  destruct H4 as (H4, H6).
+  apply (NoDup_nat _ H6).
+(* ff_app (permut_list_inv (bsort_rank Nat.leb la)) i = len ? *)
+...
+  rewrite <- Hilen, fold_ff_app; symmetry.
+  destruct H4 as (H4, H6).
+  apply (NoDup_nat _ H6).
+Search bsort_rank.
+...
+  specialize permut_list_inv_is_permut_list as H3.
+  specialize (H3 _ H2).
+  destruct H3 as (H3, H4).
+  apply (NoDup_nat _ H4). {
+    apply H3, nth_In.
+    now rewrite length_permut_list_inv, length_bsort_rank.
+  } {
+    now rewrite length_permut_list_inv, length_bsort_rank, Hlen.
+  }
 ...
 
 Theorem collapse_idemp : ∀ la,
