@@ -2419,6 +2419,18 @@ Theorem fold_collapse : ∀ l,
   permut_list_inv (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem bsort_rank_of_last : ∀ ord n la i,
+  is_permut (S n) la
+  → ff_app la i = n
+  → ff_app (bsort_rank ord la) n = i.
+Proof.
+intros * Hla Hin.
+...
+specialize (permut_without_highest Hla) as H1.
+destruct H1 as (j & Hjl & Hjn & Hb).
+rewrite fold_ff_app in Hjn.
+...
+
 Theorem permut_collapse : ∀ la,
   is_permut_list la
   → collapse la = la.
@@ -2530,6 +2542,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     apply length_bsort_rank.
   }
 Search bsort_rank.
+...
+symmetry.
+now apply bsort_rank_of_last.
 ...
   destruct H4 as (H4, H6).
   apply (NoDup_nat _ H6).
