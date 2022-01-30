@@ -2491,14 +2491,14 @@ induction n; intros. {
 }
 specialize (permut_list_inv_is_permut_list Hp) as Hpi.
 remember (ff_app (permut_list_inv la) n) as i eqn:Hi.
-specialize (IHn (butn i la)).
+specialize (IHn (butn i la)) as H1.
 assert (Hpb : is_permut_list (butn i la)). {
   apply butn_is_permut_list; [ easy | ].
   now rewrite Hn, Nat_sub_succ_1.
 }
-specialize (IHn Hpb).
-rewrite butn_length in IHn.
-unfold Nat.b2n in IHn; rewrite if_ltb_lt_dec in IHn.
+specialize (H1 Hpb).
+rewrite butn_length in H1.
+unfold Nat.b2n in H1; rewrite if_ltb_lt_dec in H1.
 destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
   exfalso; apply Hila; clear Hila.
   rewrite <- length_permut_list_inv.
@@ -2506,8 +2506,8 @@ destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
   apply Hpi, nth_In.
   now rewrite length_permut_list_inv, Hn.
 }
-rewrite Hn, Nat_sub_succ_1 in IHn.
-specialize (IHn eq_refl).
+rewrite Hn, Nat_sub_succ_1 in H1.
+specialize (H1 eq_refl).
 ...
 intros * Hp.
 unfold permut_list_inv.
