@@ -1800,6 +1800,16 @@ split. {
 now apply IHk.
 Qed.
 
+Theorem NoDup_skipn : ∀ A k (la : list A), NoDup la → NoDup (skipn k la).
+Proof.
+intros * Hnd.
+revert la Hnd.
+induction k; intros; [ easy | cbn ].
+destruct la as [| a]; [ constructor | cbn ].
+apply IHk.
+now apply NoDup_cons_iff in Hnd.
+Qed.
+
 Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
 Proof.
 intros * Hnd.
@@ -1934,6 +1944,32 @@ split. {
     now apply Hll; right.
   }
 }
+Qed.
+
+Theorem NoDup_butn : ∀ A k (la : list A), NoDup la → NoDup (butn k la).
+Proof.
+intros * Hnd.
+apply NoDup_app_iff.
+split. {
+  rewrite <- (firstn_skipn k) in Hnd.
+  now apply NoDup_app_iff in Hnd.
+}
+split. {
+  rewrite <- (firstn_skipn (S k)) in Hnd.
+  now apply NoDup_app_iff in Hnd.
+}
+intros i Hif.
+rewrite <- (firstn_skipn (S k)) in Hnd.
+apply NoDup_app_iff in Hnd.
+destruct Hnd as (H1 & H2 & H3).
+apply H3.
+clear - Hif.
+revert la Hif.
+induction k; intros; [ easy | ].
+destruct la as [| a]; [ easy | ].
+rewrite firstn_cons in Hif |-*.
+destruct Hif as [Hif| Hif]; [ now left | right ].
+now apply IHk.
 Qed.
 
 Theorem iter_list_permut : ∀ T A (d : T) (op : T → T → T) (l1 l2 : list A) f

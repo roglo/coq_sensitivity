@@ -2425,40 +2425,62 @@ Theorem butn_is_permut_list : ∀ i la,
   → is_permut_list (butn i la).
 Proof.
 intros * Hp Hi.
-destruct la as [| a]; [ now subst i | ].
-rewrite List_length_cons, Nat_sub_succ_1 in Hi.
+destruct (Nat.eq_dec (length la) 0) as [Hlz| Hlz]. {
+  apply length_zero_iff_nil in Hlz;subst la.
+  now cbn in Hi; subst i; cbn.
+}
 split. {
   intros j Hj.
   rewrite butn_length.
   unfold Nat.b2n; rewrite if_ltb_lt_dec.
-  destruct (lt_dec i (length (a :: la))) as [Hila| Hila]. 2: {
+  destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
     specialize (permut_list_inv_is_permut_list) as H1.
     specialize (H1 _ Hp).
-    specialize (length_permut_list_inv (a :: la)) as H2.
+    specialize (length_permut_list_inv la) as H2.
     rewrite <- H2.
     apply H1, nth_In.
-    now rewrite H2; cbn.
+    rewrite H2; cbn.
+    apply in_butn in Hj.
+    flia Hlz.
   }
-  cbn; rewrite Nat.sub_0_r.
   specialize (in_butn _ _ _ Hj) as H1.
   apply Hp in H1.
-  destruct (Nat.eq_dec j (length la)) as [H| H]; [ | cbn in H1; flia H1 H ].
+  destruct (Nat.eq_dec j (length la - 1)) as [Hjl| H]; [ | flia H1 H ].
   clear H1; exfalso.
-  rewrite <- H in Hi.
-  assert (Hji : j = ff_app (a :: la) i). {
+  rewrite <- Hjl in Hi.
+  assert (Hji : j = ff_app la i). {
     rewrite Hi; symmetry.
-    apply (permut_permut_inv (length (a :: la))); [ | now rewrite H; cbn ].
+    apply (permut_permut_inv (length la)); [ | flia Hjl Hlz ].
     now split.
   }
-  unfold butn in Hj.
-  apply in_app_or in Hj.
-  destruct Hj as [Hj| Hj]. {
-...
-intros * Hp Hi.
-destruct la as [| a]; [ now subst i | ].
-rewrite List_length_cons, Nat_sub_succ_1 in Hi.
+  apply (In_nth _ _ 0) in Hj.
+  rewrite butn_length in Hj.
+  apply Nat.ltb_lt in Hila.
+  rewrite Hila in Hj.
+  apply Nat.ltb_lt in Hila.
+  destruct Hj as (k & Hki & Hkj).
+  cbn in Hki.
+  rewrite nth_butn in Hkj.
+  rewrite <- Hkj in Hji.
+  unfold ff_app in Hji.
+  destruct Hp as (Hpa, Hpd).
+  apply (NoDup_nat _ Hpd) in Hji; [ | | easy ]. 2: {
+    unfold Nat.b2n; rewrite if_leb_le_dec.
+    destruct (le_dec i k) as [Hik| Hik]; [ flia Hki | ].
+    apply Nat.nle_gt in Hik.
+    flia Hila Hik.
+  }
+  unfold Nat.b2n in Hji; rewrite if_leb_le_dec in Hji.
+  destruct (le_dec i k) as [H| H]; flia H Hji.
+}
+apply NoDup_butn.
+now destruct Hp.
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem bsort_rank_is_inv : ∀ ord la,
