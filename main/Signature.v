@@ -2427,6 +2427,38 @@ Proof.
 intros * Hp Hi.
 destruct la as [| a]; [ now subst i | ].
 rewrite List_length_cons, Nat_sub_succ_1 in Hi.
+split. {
+  intros j Hj.
+  rewrite butn_length.
+  unfold Nat.b2n; rewrite if_ltb_lt_dec.
+  destruct (lt_dec i (length (a :: la))) as [Hila| Hila]. 2: {
+    exfalso; apply Hila; clear Hila.
+    rewrite Hi.
+    specialize (permut_list_inv_is_permut_list) as H1.
+    specialize (H1 _ Hp).
+    specialize (length_permut_list_inv (a :: la)) as H2.
+    rewrite <- H2.
+    apply H1, nth_In.
+    now rewrite H2; cbn.
+  }
+  cbn; rewrite Nat.sub_0_r.
+  specialize (in_butn _ _ _ Hj) as H1.
+  apply Hp in H1.
+  destruct (Nat.eq_dec j (length la)) as [H| H]; [ | cbn in H1; flia H1 H ].
+  clear H1; exfalso.
+  rewrite <- H in Hi.
+  assert (Hji : j = ff_app (a :: la) i). {
+    rewrite Hi; symmetry.
+    apply (permut_permut_inv (length (a :: la))); [ | now rewrite H; cbn ].
+    now split.
+  }
+  unfold butn in Hj.
+  apply in_app_or in Hj.
+  destruct Hj as [Hj| Hj]. {
+...
+intros * Hp Hi.
+destruct la as [| a]; [ now subst i | ].
+rewrite List_length_cons, Nat_sub_succ_1 in Hi.
 ...
 
 Theorem bsort_rank_is_inv : ∀ ord la,
