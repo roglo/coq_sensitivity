@@ -2421,10 +2421,18 @@ Proof. easy. Qed.
 
 Theorem bsort_rank_of_last : ∀ ord n la i,
   is_permut (S n) la
+  → i ≤ n
   → ff_app la i = n
   → ff_app (bsort_rank ord la) n = i.
 Proof.
-intros * Hla Hin.
+intros * Hla Hin Hlin.
+revert la i Hla Hin Hlin.
+induction n; intros. {
+  apply Nat.le_0_r in Hin; subst i.
+  destruct Hla as ((H1, H2), H3).
+  destruct la as [| a]; [ easy | ].
+  now destruct la.
+}
 ...
 specialize (permut_without_highest Hla) as H1.
 destruct H1 as (j & Hjl & Hjn & Hb).
