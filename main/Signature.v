@@ -2513,9 +2513,21 @@ rewrite length_bsort_rank, length_permut_list_inv.
 split; [ easy | ].
 intros d j.
 apply List_eq_iff in H1.
+destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+  apply Nat.nlt_ge in Hjla.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank ].
+  rewrite nth_overflow; [ | now rewrite length_permut_list_inv ].
+  easy.
+}
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
+symmetry.
+rewrite nth_indep with (d' := 0); [ | now rewrite length_permut_list_inv ].
+symmetry.
 destruct H1 as (_, H1).
-destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+destruct (Nat.eq_dec j n) as [Hji| Hji]. {
   subst j.
+  do 2 rewrite fold_ff_app.
+  rewrite <- Hi.
 ...
 intros * Hp.
 unfold permut_list_inv.
