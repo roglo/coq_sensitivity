@@ -2419,10 +2419,32 @@ Theorem fold_collapse : ∀ l,
   permut_list_inv (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem butn_is_permut_list : ∀ i la,
+  is_permut_list la
+  → i = ff_app (permut_list_inv la) (length la - 1)
+  → is_permut_list (butn i la).
+Proof.
+intros * Hp Hi.
+destruct la as [| a]; [ now subst i | ].
+rewrite List_length_cons, Nat_sub_succ_1 in Hi.
+...
+
 Theorem bsort_rank_is_inv : ∀ ord la,
   is_permut_list la
   → bsort_rank ord la = permut_list_inv la.
 Proof.
+intros * Hp.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+revert la Hp Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst la; cbn.
+}
+remember (ff_app (permut_list_inv la) n) as i eqn:Hi.
+specialize (IHn (butn i la)).
+Search (is_permut_list (butn _ _)).
+...
+Check butn_is_permut_list.
+...
 intros * Hp.
 unfold permut_list_inv.
 induction la as [| a]; [ easy | ].
