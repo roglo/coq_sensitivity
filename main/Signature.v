@@ -2508,6 +2508,14 @@ destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
 }
 rewrite Hn, Nat_sub_succ_1 in H1.
 specialize (H1 eq_refl).
+apply List_eq_iff.
+rewrite length_bsort_rank, length_permut_list_inv.
+split; [ easy | ].
+intros d j.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+  subst j.
 ...
 intros * Hp.
 unfold permut_list_inv.
