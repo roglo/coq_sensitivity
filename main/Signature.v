@@ -2496,24 +2496,29 @@ symmetry.
 rewrite nth_indep with (d' := 0); [ | easy ].
 symmetry.
 do 2 rewrite fold_ff_app.
+(*
 rewrite fold_collapse.
 rewrite fold_collapse in IHlen.
+*)
 apply List_eq_iff in IHlen.
 destruct IHlen as (_, Hdi).
 rewrite Hla.
 unfold ff_app.
-destruct (lt_dec j i) as [Hji| Hji]. {
-  rewrite app_nth1. 2: {
-    rewrite firstn_length, Nat.min_l; [ easy | now apply Nat.lt_le_incl ].
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
+    now unfold ge.
   }
-Search (nth _ (firstn _ _)).
-Search (collapse (_ ++ _)).
+  rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
+  rewrite Nat.sub_diag; cbn - [ skipn ].
 ...
 
 Theorem collapse_idemp : ∀ la,
   collapse (collapse la) = collapse la.
 Proof.
 intros.
+...
 apply permut_collapse.
 apply collapse_is_permut.
 Qed.
