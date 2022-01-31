@@ -1245,14 +1245,6 @@ rewrite map_length.
 now destruct Hp2.
 Qed.
 
-Theorem comp_length : ∀ la lb,
-  length (la ° lb) = length lb.
-Proof.
-intros.
-unfold "°"; cbn.
-now rewrite map_length.
-Qed.
-
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
 Theorem signature_comp_fun_expand_1 : in_charac_0_field →

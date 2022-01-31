@@ -324,6 +324,74 @@ Qed.
 Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
 Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
 
+Theorem comp_length : ∀ la lb,
+  length (la ° lb) = length lb.
+Proof.
+intros.
+unfold "°"; cbn.
+now rewrite map_length.
+Qed.
+
+Theorem length_permut_list_inv : ∀ l,
+  length (permut_list_inv l) = length l.
+Proof.
+intros.
+destruct l as [| a]; [ easy | cbn ].
+now rewrite map_length, seq_length.
+Qed.
+
+Theorem comp_permut_inv_l : ∀ l,
+  is_permut_list l
+  → permut_list_inv l ° l = seq 0 (length l).
+Proof.
+intros * Hp.
+apply List_eq_iff.
+rewrite comp_length, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite comp_length ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
+symmetry.
+rewrite nth_indep with (d' := 0); [ | now rewrite seq_length ].
+symmetry.
+unfold "°".
+rewrite (List_map_nth' 0); [ | easy ].
+rewrite seq_nth; [ | easy ].
+now apply (permut_inv_permut (length l)).
+Qed.
+
+Theorem comp_permut_inv_r : ∀ l,
+  is_permut_list l
+  → l ° permut_list_inv l = seq 0 (length l).
+Proof.
+intros * Hp.
+apply List_eq_iff.
+rewrite comp_length, length_permut_list_inv, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow. 2: {
+    now rewrite comp_length, length_permut_list_inv.
+  }
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite comp_length, length_permut_list_inv.
+}
+symmetry.
+rewrite nth_indep with (d' := 0); [ | now rewrite seq_length ].
+symmetry.
+unfold "°".
+rewrite (List_map_nth' 0); [ | now rewrite length_permut_list_inv ].
+rewrite seq_nth; [ | easy ].
+now apply (permut_permut_inv (length l)).
+Qed.
+
 (* transposition *)
 
 Definition transposition i j k :=
@@ -1479,14 +1547,6 @@ apply (f_equal (canon_sym_gr_list n)) in Hrr.
 rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
 rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
 easy.
-Qed.
-
-Theorem length_permut_list_inv : ∀ l,
-  length (permut_list_inv l) = length l.
-Proof.
-intros.
-destruct l as [| a]; [ easy | cbn ].
-now rewrite map_length, seq_length.
 Qed.
 
 Theorem in_permut_list_inv_lt : ∀ l i, i ∈ permut_list_inv l → i < length l.
