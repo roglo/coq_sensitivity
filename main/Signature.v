@@ -2529,6 +2529,11 @@ destruct (Nat.eq_dec j n) as [Hji| Hji]. {
   do 2 rewrite fold_ff_app.
   rewrite <- Hi.
   replace n with (ff_app la i).
+Check nth_ff_app_bsort_rank.
+...
+bsort_bsort_rank:
+  ∀ (A : Type) (ord : A → A → bool) (d : A) (l : list A),
+    bsort ord l = map (λ i : nat, nth i l d) (bsort_rank ord l)
 ...
 Search (ff_app (bsort_rank _ _)).
 unfold ff_app at 1.
