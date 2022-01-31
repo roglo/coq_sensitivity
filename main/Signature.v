@@ -2528,6 +2528,9 @@ destruct (Nat.eq_dec j n) as [Hji| Hji]. {
   subst j.
   do 2 rewrite fold_ff_app.
   rewrite <- Hi.
+  specialize (H1 0 (n - 1)) as H2.
+  do 2 rewrite fold_ff_app in H2.
+...
   replace n with (ff_app la i).
 Check nth_ff_app_bsort_rank.
 ...
