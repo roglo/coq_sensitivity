@@ -394,8 +394,8 @@ Qed.
 
 (* *)
 
-Theorem comp_bsort_rank_r : ∀ l,
-  l ° bsort_rank Nat.leb l = bsort Nat.leb l.
+Theorem comp_bsort_rank_r : ∀ ord l,
+  l ° bsort_rank ord l = bsort ord l.
 Proof.
 intros.
 apply List_eq_iff.
@@ -415,7 +415,7 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
 symmetry.
 unfold "°".
 rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
-specialize (bsort_bsort_rank Nat.leb 0 l) as H1.
+specialize (bsort_bsort_rank ord 0 l) as H1.
 do 2 rewrite fold_ff_app; cbn.
 apply (f_equal (λ l, nth i l 0)) in H1.
 rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].

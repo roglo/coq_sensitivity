@@ -2476,6 +2476,14 @@ Theorem bsort_rank_is_inv : ∀ ord la,
   → bsort_rank ord la = permut_list_inv la.
 Proof.
 intros * Hp.
+specialize comp_bsort_rank_r as H1.
+specialize (H1 ord la).
+unfold "°" in H1.
+specialize comp_permut_inv_r as H2.
+specialize (H2 la Hp).
+unfold "°" in H2.
+...
+intros * Hp.
 remember (length la) as n eqn:Hn; symmetry in Hn.
 revert la Hp Hn.
 induction n; intros. {
@@ -2520,6 +2528,7 @@ destruct (Nat.eq_dec j n) as [Hji| Hji]. {
   subst j.
   do 2 rewrite fold_ff_app.
   rewrite <- Hi.
+...
   specialize (H1 0 (n - 1)) as H2.
   do 2 rewrite fold_ff_app in H2.
 ...
