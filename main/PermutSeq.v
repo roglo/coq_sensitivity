@@ -444,6 +444,59 @@ apply IHl. 2: {
 ...
 *)
 
+Theorem glop : ∀ a l,
+  is_permut_list (a :: l)
+  → bsort_loop Nat.leb [a] l = a :: l
+  → a = 0.
+Proof.
+intros * Hp Hal.
+...
+
+Theorem nth_bsort_loop_sorted_permut : ∀ l lsorted i,
+  bsort_loop Nat.leb lsorted l = l
+  → is_permut_list (lsorted ++ l)
+  → length lsorted ≤ i < length (lsorted ++ l)
+  → nth i l 0 = length lsorted + i.
+Proof.
+intros * Hs Hp Hil.
+revert i lsorted Hs Hp Hil.
+induction l as [| a]; intros. {
+  rewrite app_nil_r in Hil; flia Hil.
+}
+destruct i. {
+  cbn.
+  destruct Hil as (Hls, Hil).
+  apply Nat.le_0_r, length_zero_iff_nil in Hls; subst lsorted.
+  cbn in Hp, Hs |-*; clear Hil.
+...
+
+Theorem nth_sorted_permut : ∀ l i,
+  bsort Nat.leb l = l
+  → is_permut_list l
+  → i < length l
+  → nth i l 0 = i.
+Proof.
+intros * Hs Hp Hil.
+...
+unfold bsort in Hs.
+specialize nth_bsort_loop_sorted_permut as H1.
+specialize (H1 l []).
+now apply H1.
+...
+
+Theorem nth_permut_bsort_loop : ∀ l lsorted i,
+  bsort Nat.leb lsorted = lsorted
+  → is_permut_list (lsorted ++ l)
+  → i < length (lsorted ++ l)
+  → nth i (bsort_loop Nat.leb lsorted l) 0 = i.
+Proof.
+intros * Hls Hp Hil.
+revert i lsorted Hls Hp Hil.
+induction l as [| a]; intros; cbn. {
+  rewrite app_nil_r in Hp, Hil.
+Check is_sorted.
+...
+
 Theorem nth_permut_bsort_leb : ∀ l d i,
   is_permut_list l
   → i < length l
