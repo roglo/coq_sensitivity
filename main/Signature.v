@@ -2115,64 +2115,6 @@ apply permut_list_inv_is_permut.
 apply bsort_rank_is_permut.
 Qed.
 
-Fixpoint sorted {A} ord (l : list A) :=
-  match l with
-  | [] => true
-  | a :: l' =>
-      match l' with
-      | [] => true
-      | b :: _ => (ord a b && sorted ord l')%bool
-      end
-  end.
-
-Definition total_order {A} (ord : A → _) := ∀ a b,
-  (ord a b || ord b a)%bool = true.
-
-Theorem bsort_insert_is_sorted : ∀ A ord (a : A) lsorted,
-  total_order ord
-  → sorted ord lsorted = true
-  → sorted ord (bsort_insert ord a lsorted) = true.
-Proof.
-intros * Hto Hs.
-induction lsorted as [| b]; [ easy | cbn ].
-remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (b :: lsorted) as l; cbn; subst l.
-  now apply Bool.andb_true_iff.
-} {
-  specialize (Hto a b) as Hba.
-  rewrite Hab in Hba; cbn in Hba.
-  destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
-  remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbc, Hs).
-  rewrite IHlsorted; [ | easy ].
-  cbn.
-  remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac; [ now rewrite Hba | now rewrite Hbc ].
-}
-Qed.
-
-Theorem bsort_loop_is_sorted : ∀ A ord (lsorted l : list A),
-  total_order ord
-  → sorted ord lsorted = true
-  → sorted ord (bsort_loop ord lsorted l) = true.
-Proof.
-intros * Hto Hs.
-revert lsorted Hs.
-induction l as [| a]; intros; [ easy | cbn ].
-now apply IHl, bsort_insert_is_sorted.
-Qed.
-
-Theorem bsort_is_sorted : ∀ A ord (l : list A),
-  total_order ord
-  → sorted ord (bsort ord l) = true.
-Proof.
-intros * Hto.
-destruct l as [| a]; [ easy | cbn ].
-now apply bsort_loop_is_sorted.
-Qed.
-
 Theorem nth_ff_app_bsort_rank : ∀ A d ord (l : list A) i,
   i < length l
   → nth (ff_app (bsort_rank ord l) i) l d = nth i (bsort ord l) d.
