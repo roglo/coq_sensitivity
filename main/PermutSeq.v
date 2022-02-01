@@ -430,6 +430,14 @@ Theorem nth_permut_bsort_leb : ∀ l d i,
 Proof.
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+clear d.
+remember (length l) as n eqn:Hn; symmetry in Hn.
+revert n l Hp Hn Hil.
+induction n; intros; [ easy | ].
+destruct i. {
+  clear - Hp.
+  induction l as [| a]; [ easy | ].
+cbn.
 ...
 
 Theorem permut_bsort_leb : ∀ l,
