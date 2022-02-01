@@ -453,6 +453,7 @@ intros * Hp Hs.
 revert lsorted Hp Hs.
 induction l as [| a]; intros; cbn; [ now rewrite app_nil_r in Hp | ].
 cbn in Hs.
+Print bsort_insert.
 ...
 specialize (IHl (lsorted ++ [a])) as H1.
 rewrite <- app_assoc in H1.
