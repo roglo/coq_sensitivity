@@ -2482,6 +2482,22 @@ unfold "°" in H1.
 specialize comp_permut_inv_r as H2.
 specialize (H2 la Hp).
 unfold "°" in H2.
+apply List_eq_iff.
+rewrite length_bsort_rank, length_permut_list_inv.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank ].
+  rewrite nth_overflow; [ | now rewrite length_permut_list_inv ].
+  easy.
+}
+apply (f_equal (λ p, nth i p d)) in H1.
+rewrite (List_map_nth' d) in H1; [ | now rewrite length_bsort_rank ].
+apply (f_equal (λ p, nth i p d)) in H2.
+rewrite (List_map_nth' d) in H2; [ | now rewrite length_permut_list_inv ].
+rewrite seq_nth in H2; [ | easy ].
+rewrite Nat.add_0_l in H2.
 ...
 intros * Hp.
 remember (length la) as n eqn:Hn; symmetry in Hn.
