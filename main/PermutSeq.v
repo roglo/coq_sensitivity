@@ -394,9 +394,77 @@ Qed.
 
 (* *)
 
-Theorem comp_bsort_rank_l : ∀ ord l,
+Theorem comp_bsort_rank_r : ∀ ord l,
+  l ° bsort_rank ord l = bsort ord l.
+Proof.
+intros.
+apply List_eq_iff.
+rewrite comp_length, length_bsort_rank, length_bsort.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite comp_length, length_bsort_rank ].
+  rewrite nth_overflow; [ easy | now rewrite length_bsort ].
+}
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite comp_length, length_bsort_rank.
+}
+symmetry.
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+symmetry.
+unfold "°".
+rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
+specialize (bsort_bsort_rank ord 0 l) as H1.
+do 2 rewrite fold_ff_app; cbn.
+apply (f_equal (λ l, nth i l 0)) in H1.
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+do 3 rewrite fold_ff_app in H1.
+easy.
+Qed.
+
+Theorem nth_permut_bsort_leb : ∀ l d i,
   is_permut_list l
-  → bsort_rank ord l ° l = seq 0 (length l).
+  → i < length l
+  → nth i (bsort Nat.leb l) d = i.
+Proof.
+intros * Hp Hil.
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+...
+
+Theorem permut_bsort_leb : ∀ l,
+  is_permut_list l
+  → bsort Nat.leb l = seq 0 (length l).
+Proof.
+intros * Hp.
+apply List_eq_iff.
+rewrite length_bsort, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite length_bsort ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+...
+now apply nth_permut_bsort_leb.
+...
+
+Theorem permut_comp_bsort_rank_leb_r : ∀ l,
+  is_permut_list l
+  → l ° bsort_rank Nat.leb l = seq 0 (length l).
+Proof.
+intros * Hp.
+rewrite comp_bsort_rank_r.
+...
+now apply permut_bsort_leb.
+...
+
+Theorem permut_comp_bsort_rank_leb_l : ∀ l,
+  is_permut_list l
+  → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
 intros * Hp.
 apply List_eq_iff.
@@ -429,35 +497,6 @@ easy.
 Qed.
 
 ...
-
-Theorem comp_bsort_rank_r : ∀ ord l,
-  l ° bsort_rank ord l = bsort ord l.
-Proof.
-intros.
-apply List_eq_iff.
-rewrite comp_length, length_bsort_rank, length_bsort.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite comp_length, length_bsort_rank ].
-  rewrite nth_overflow; [ easy | now rewrite length_bsort ].
-}
-rewrite nth_indep with (d' := 0). 2: {
-  now rewrite comp_length, length_bsort_rank.
-}
-symmetry.
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
-symmetry.
-unfold "°".
-rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
-specialize (bsort_bsort_rank ord 0 l) as H1.
-do 2 rewrite fold_ff_app; cbn.
-apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
-do 3 rewrite fold_ff_app in H1.
-easy.
-Qed.
 
 (* transposition *)
 
