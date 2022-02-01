@@ -423,15 +423,26 @@ do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
+(*
 Theorem nth_permut_bsort_loop_leb : ∀ l lsorted i,
   is_permut_list (lsorted ++ l)
   → length lsorted ≤ i < length l
   → nth i (bsort_loop Nat.leb lsorted l) 0 = i.
 Proof.
 intros * Hp Hil.
-revert lsorted Hp Hil.
+revert i lsorted Hp Hil.
 induction l as [| a]; intros; cbn; [ easy | ].
+destruct i. {
+  destruct Hil as (Hil, _).
+  apply Nat.le_0_r, length_zero_iff_nil in Hil; subst lsorted.
+  cbn in Hp |-*.
 ...
+specialize (IHl (S i) (bsort_insert Nat.leb a lsorted)) as H1.
+rewrite length_bsort_insert in H1.
+apply IHl. 2: {
+  rewrite length_bsort_insert.
+...
+*)
 
 Theorem nth_permut_bsort_leb : ∀ l d i,
   is_permut_list l
@@ -441,6 +452,13 @@ Proof.
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
 clear d.
+remember (length l) as n eqn:Hn.
+symmetry in Hn.
+revert i l Hp Hn Hil.
+induction n; intros; [ easy | cbn ].
+destruct i. {
+  clear - Hp.
+  induction l as [| a]; [ easy | cbn ].
 ...
 apply nth_permut_bsort_loop_leb.
 ...
