@@ -452,6 +452,10 @@ Proof.
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
 clear d.
+...
+intros * Hp Hil.
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+clear d.
 remember (length l) as n eqn:Hn.
 symmetry in Hn.
 revert i l Hp Hn Hil.
@@ -459,6 +463,8 @@ induction n; intros; [ easy | cbn ].
 destruct i. {
   clear - Hp.
   induction l as [| a]; [ easy | cbn ].
+  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
+    subst a.
 ...
 apply nth_permut_bsort_loop_leb.
 ...
