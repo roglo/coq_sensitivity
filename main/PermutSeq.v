@@ -442,7 +442,6 @@ rewrite length_bsort_insert in H1.
 apply IHl. 2: {
   rewrite length_bsort_insert.
 ...
-*)
 
 Theorem glop : ∀ lsorted l,
   is_permut_list (lsorted ++ l)
