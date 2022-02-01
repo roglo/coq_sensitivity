@@ -2477,6 +2477,17 @@ Theorem bsort_rank_is_inv : ∀ ord la,
 Proof.
 intros * Hp.
 specialize comp_bsort_rank_r as H1.
+Compute (let l := [3;2;7;8] in (l ° bsort_rank Nat.leb l)).
+Compute (let l := [3;2;7;8] in (bsort_rank Nat.leb l ° l)).
+Compute (let l := [3;2;0;1] in (l ° bsort_rank Nat.leb l)).
+Compute (let l := [3;2;0;1] in (bsort_rank Nat.leb l ° l)).
+Compute (let l := [2;3;0;1] in (bsort_rank Nat.leb l ° l)).
+...
+unfold "°" in H1.
+unfold ff_app in H1.
+Check bsort_bsort_rank.
+...
+specialize comp_bsort_rank_r as H1.
 specialize (H1 ord la).
 unfold "°" in H1.
 specialize comp_permut_inv_r as H2.
