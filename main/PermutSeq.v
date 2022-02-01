@@ -444,12 +444,36 @@ apply IHl. 2: {
 ...
 *)
 
-Theorem glop : ∀ a l,
+Theorem glop : ∀ lsorted l,
+  is_permut_list (lsorted ++ l)
+  → bsort_loop Nat.leb lsorted l = lsorted ++ l
+  → is_permut_list lsorted.
+Proof.
+intros * Hp Hs.
+revert lsorted Hp Hs.
+induction l as [| a]; intros; cbn; [ now rewrite app_nil_r in Hp | ].
+cbn in Hs.
+...
+specialize (IHl (lsorted ++ [a])) as H1.
+rewrite <- app_assoc in H1.
+specialize (H1 Hp).
+...
+
+Theorem glip : ∀ a l,
   is_permut_list (a :: l)
   → bsort_loop Nat.leb [a] l = a :: l
   → a = 0.
 Proof.
 intros * Hp Hal.
+...
+specialize (glop [a] l Hp Hal) as H1.
+destruct H1 as (H1, H2).
+specialize (H1 a (or_introl eq_refl)).
+now apply Nat.lt_1_r in H1.
+...
+intros * Hp Hal.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ easy | exfalso ].
+Check pigeonhole.
 ...
 
 Theorem nth_bsort_loop_sorted_permut : ∀ l lsorted i,
