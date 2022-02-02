@@ -563,33 +563,34 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-(*
-Theorem sorted_app_at : ∀ A (ord : A → _) la a,
-  sorted ord (la ++ [a]) = true
-  → sorted ord la = true.
-Proof.
-intros * Hs.
-revert a Hs.
-induction la as [| b] using rev_ind; intros; [ easy | ].
-...
-*)
-
 Theorem sorted_app : ∀ A (ord : A → _) la lb,
   sorted ord (la ++ lb) = true
   → sorted ord la = true ∧ sorted ord lb = true.
 Proof.
 intros * Htr.
 split. {
-Print sorted.
-...
-  revert la Htr.
-  induction lb as [| b]; intros; [ now rewrite app_nil_r in Htr | ].
-  specialize (IHlb (la ++ [b])) as H1.
-  rewrite <- app_assoc in H1.
-  specialize (H1 Htr).
-...
-  now apply sorted_app_at in H1.
-...
+  revert lb Htr.
+  induction la as [| a]; intros; [ easy | ].
+  cbn in Htr |-*.
+  destruct la as [| a']; [ easy | ].
+  cbn in Htr.
+  apply Bool.andb_true_iff in Htr.
+  apply Bool.andb_true_iff.
+  split; [ easy | ].
+  now apply IHla with (lb := lb).
+} {
+  revert lb Htr.
+  induction la as [| a]; intros; [ easy | ].
+  destruct la as [| a']. {
+    cbn in Htr.
+    destruct lb as [| b]; [ easy | ].
+    now apply Bool.andb_true_iff in Htr.
+  }
+  apply IHla.
+  cbn in Htr |-*.
+  now apply Bool.andb_true_iff in Htr.
+}
+Qed.
 
 Theorem sorted_app_trans : ∀ A (ord : A → _),
   transitive ord
@@ -702,12 +703,7 @@ assert (Hal : a = length l). {
   easy.
 }
 rewrite Hal; f_equal.
-apply IHl. 2: {
-...
-  specialize sorted_app as H1.
-  specialize (H1 nat Nat.leb Nat_leb_trans).
-  specialize (H1 _ _ Hs).
-Check Nat_leb_trans.
+apply IHl; [ | apply (sorted_app Nat.leb l [a] Hs) ].
 ...
 
 Theorem permut_bsort_leb : ∀ l,

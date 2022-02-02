@@ -2427,11 +2427,8 @@ Qed.
 Fixpoint sorted {A} ord (l : list A) :=
   match l with
   | [] => true
-  | a :: l' =>
-      match l' with
-      | [] => true
-      | b :: _ => (ord a b && sorted ord l')%bool
-      end
+  | [_] => true
+  | a :: (b :: _) as l' => (ord a b && sorted ord l')%bool
   end.
 
 Definition transitive A (ord : A → A → bool) :=
