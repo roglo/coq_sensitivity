@@ -606,6 +606,69 @@ cbn.
 ...
 *)
 
+Theorem Permutation_bsort_insert_sorted : ∀ A (ord : A → _) la lb c,
+  Permutation la lb
+  → Permutation (bsort_insert ord c la) (bsort_insert ord c lb).
+Proof.
+intros * Hp.
+revert la Hp.
+induction lb as [| b]; intros; cbn. {
+  now apply Permutation_sym, Permutation_nil in Hp; subst la; cbn.
+}
+remember (ord c b) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  destruct la as [| a]; [ now apply Permutation_nil in Hp | cbn ].
+  remember (ord c a) as y eqn:Hy; symmetry in Hy.
+  destruct y; [ now apply Permutation_cons | ].
+  clear IHlb Hx Hy.
+  revert a b c lb Hp.
+  induction la as [| a']; intros; cbn. {
+    destruct lb as [| b']. {
+      apply Permutation_length_1 in Hp; subst b.
+      apply perm_swap.
+    }
+    now apply Permutation_length in Hp.
+  }
+  remember (ord c a') as  x eqn:Hx; symmetry in Hx.
+  destruct x. {
+    apply Permutation_trans with (l' := c :: a :: a' :: la). {
+      apply perm_swap.
+    }
+    now apply Permutation_cons.
+  } {
+    apply Permutation_sym.
+    apply Permutation_Add.
+Search Add.
+(* ah, putain, j'en ai marre, tiens ; fait chier *)
+...
+    eapply Permutation_trans. 2: {
+...
+apply Permutation_sym.
+Check perm_swap.
+apply Permutation_cons_inv in Hp.
+...
+  apply Permutation_Add.
+Print Add.
+Search Add.
+Search (Permutation (_ :: _)).
+...
+  apply Permutation_cons.
+...
+  apply Permutation_cons in Hp.
+...
+
+Theorem Permutation_bsort_loop_sorted : ∀ A (ord : A → _) la lb lc,
+  Permutation la lb
+  → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc).
+Proof.
+intros * Hp.
+revert la lb Hp.
+induction lc as [| c]; intros; [ easy | cbn ].
+apply IHlc.
+...
+now apply Permutation_bsort_insert_sorted.
+...
+
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb,
   Permutation (la ++ lb) (bsort_loop ord la lb).
 Proof.
@@ -616,6 +679,14 @@ specialize (IHlb (la ++ [b])) as H1.
 rewrite <- app_assoc in H1; cbn in H1.
 eapply Permutation_trans; [ apply H1 | ].
 cbn.
+clear IHlb H1.
+revert lb b.
+induction la as [| a]; intros; [ easy | ].
+cbn.
+remember (ord b a) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+...
+apply Permutation_bsort_loop_sorted.
 ...
 
 Theorem Permutation_bsort : ∀ A (ord : A → _) l, Permutation l (bsort ord l).
