@@ -735,8 +735,12 @@ split. {
 }
 Qed.
 
-Inspect 1.
-
+Theorem sorted_permut : ∀ l,
+  is_permut_list l
+  → sorted Nat.leb l = true
+  → l = seq 0 (length l).
+Proof.
+intros * Hl Hs.
 ...
 
 Theorem permut_bsort_leb : ∀ l,
@@ -748,18 +752,12 @@ specialize bsort_is_sorted as Hbs.
 specialize (Hbs _ Nat.leb l Nat_leb_has_total_order).
 specialize (Permutation_bsort Nat.leb l) as Hps.
 remember (bsort Nat.leb l) as l'; clear Heql'.
-move l' before l.
-...
-apply Permutation_permut in Hps; [ | easy ].
-replace (length l) with (length l').
-clear l Hp.
+specialize (Permutation_permut) as Hpl'.
+specialize (Hpl' l l' Hps Hp).
+move l' before l; move Hpl' before Hp.
+replace (length l) with (length l') by now apply Permutation_length.
+clear l Hp Hps.
 rename l' into l.
-Theorem sorted_permut : ∀ l,
-  is_permut_list l
-  → sorted Nat.leb l = true
-  → l = seq 0 (length l).
-Proof.
-intros * Hl Hs.
 ...
 now apply sorted_permut.
 ...
