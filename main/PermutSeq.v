@@ -604,8 +604,6 @@ apply sorted_cons in Hs.
 apply IHla; [ easy | now left ].
 Qed.
 
-...
-
 Theorem sorted_permut : ∀ l,
   is_permut_list l
   → sorted Nat.leb l = true
@@ -623,10 +621,10 @@ assert (Hal : a = length l). {
   specialize (H1 a) as H3.
   assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
   specialize (H3 H); clear H.
-Search sorted.
 ...
-specialize (sorted_app Nat_leb_has_total_order) as H4.
-specialize (H4 l [a] Hs).
+  specialize (sorted_app Nat_leb_trans) as H4.
+...
+  specialize (H4 l [a] Hs).
 ...
 rewrite <- IHl.
 f_equal.

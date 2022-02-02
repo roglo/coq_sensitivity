@@ -2434,6 +2434,9 @@ Fixpoint sorted {A} ord (l : list A) :=
       end
   end.
 
+Definition transitive A (ord : A → A → bool) :=
+  ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
+
 Definition total_order {A} (ord : A → _) := ∀ a b,
   (ord a b || ord b a)%bool = true.
 
@@ -2494,10 +2497,15 @@ destruct (le_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-(* end sorted *)
+Theorem Nat_leb_trans : transitive Nat.leb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.leb_le in Hab, Hbc.
+apply Nat.leb_le.
+now transitivity b.
+Qed.
 
-Definition transitive A (ord : A → A → bool) :=
-  ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
+(* end sorted *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
