@@ -519,6 +519,7 @@ induction l as [| a]; intros; cbn. {
   rewrite app_nil_r in Hp, Hil.
 Check is_sorted.
 ...
+*)
 
 Theorem nth_permut_bsort_leb : ∀ l d i,
   is_permut_list l
@@ -528,6 +529,9 @@ Proof.
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
 clear d.
+destruct i. {
+  destruct l as [| a]; [ easy | cbn ].
+  clear Hil.
 ...
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
