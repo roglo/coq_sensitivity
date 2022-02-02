@@ -592,6 +592,31 @@ split. {
 }
 Qed.
 
+Theorem is_permut_list_app_max : ∀ l,
+  is_permut_list (l ++ [length l])
+  → is_permut_list l.
+Proof.
+intros * Hp.
+destruct Hp as (Hp, Hl).
+unfold AllLt in Hp.
+rewrite app_length, Nat.add_comm in Hp.
+cbn in Hp.
+split. {
+  intros i Hi.
+  specialize (Hp i) as H1.
+  assert (H : i ∈ l ++ [length l]) by now apply in_or_app; left.
+  specialize (H1 H); clear H.
+  destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
+  clear H1; exfalso.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (j & Hjl & Hji).
+  specialize pigeonhole as H1.
+  specialize (H1 (length l) j).
+  specialize (H1 (λ i, nth i l 0)).
+  cbn in H1.
+  specialize (H1 Hjl).
+...
+
 Theorem sorted_app_trans : ∀ A (ord : A → _),
   transitive ord
   → ∀ la lb,
@@ -704,6 +729,9 @@ assert (Hal : a = length l). {
 }
 rewrite Hal; f_equal.
 apply IHl; [ | apply (sorted_app Nat.leb l [a] Hs) ].
+...
+subst a.
+now apply is_permut_list_app_max.
 ...
 
 Theorem permut_bsort_leb : ∀ l,
