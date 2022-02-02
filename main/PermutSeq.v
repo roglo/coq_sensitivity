@@ -650,7 +650,8 @@ destruct x. {
   eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
   constructor.
   apply Permutation_sym.
-  eapply Permutation_trans; [ | apply IHlb ].
+  eapply Permutation_trans; [ | apply IHlb; easy ].
+
 ...
 Check Permutation_middle.
 ...
