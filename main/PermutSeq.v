@@ -618,17 +618,12 @@ induction lb as [| b]; intros; cbn. {
 }
 remember (ord a b) as x eqn:Hx; symmetry in Hx.
 destruct x; [ now constructor | ].
-replace (b :: lb
-Permutation_cons_app:
-  ∀ (A : Type) (l l1 l2 : list A) (a : A), Permutation l (l1 ++ l2) → Permutation (a :: l) (l1 ++ a :: l2)
-...
-apply Permutation_sym.
-eapply Permutation_trans. {
-  apply Permutation_cons_app.
-  apply Permutation_sym.
-  specialize (IHlb
-Search (Permutation (_ :: _)).
-...
+replace (b :: lb) with ([b] ++ lb) in Hab by easy.
+apply Permutation_cons_app with (a := a) in Hab.
+eapply Permutation_trans; [ apply Hab | cbn ].
+apply perm_skip.
+now apply IHlb.
+Qed.
 
 Theorem Permutation_bsort_insert_sorted : ∀ A (ord : A → _) la lb c,
   Permutation la lb
@@ -641,13 +636,12 @@ induction lb as [| b]; intros; cbn. {
 }
 remember (ord c b) as x eqn:Hx; symmetry in Hx.
 destruct x. {
-(**)
   apply Permutation_sym.
-...
   apply Permutation_cons_bsort_insert.
   now apply Permutation_sym.
-}
-    eapply Permutation_cons_app.
+} {
+...
+  eapply Permutation_cons_app.
 ...
   destruct la as [| a]; [ now apply Permutation_nil in Hp | cbn ].
   remember (ord c a) as y eqn:Hy; symmetry in Hy.
