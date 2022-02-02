@@ -610,12 +610,22 @@ split. {
   clear H1; exfalso.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (j & Hjl & Hji).
-  specialize pigeonhole as H1.
-  specialize (H1 (length l) j).
-  specialize (H1 (λ i, nth i l 0)).
-  cbn in H1.
-  specialize (H1 Hjl).
-...
+  specialize (NoDup_nat _ Hl) as H1.
+  rewrite app_length, Nat.add_comm in H1; cbn in H1.
+  specialize (H1 j (length l)).
+  assert (H : j < S (length l)) by flia Hjl.
+  specialize (H1 H); clear H.
+  specialize (H1 (Nat.lt_succ_diag_r _)).
+  unfold ff_app in H1.
+  rewrite app_nth1 in H1; [ | easy ].
+  rewrite app_nth2 in H1; [ | now unfold ge ].
+  rewrite Nat.sub_diag, Hji in H1.
+  specialize (H1 Hil).
+  flia Hjl H1.
+} {
+  now apply NoDup_app_remove_r in Hl.
+}
+Qed.
 
 Theorem sorted_app_trans : ∀ A (ord : A → _),
   transitive ord
@@ -729,10 +739,9 @@ assert (Hal : a = length l). {
 }
 rewrite Hal; f_equal.
 apply IHl; [ | apply (sorted_app Nat.leb l [a] Hs) ].
-...
 subst a.
 now apply is_permut_list_app_max.
-...
+Qed.
 
 Theorem permut_bsort_leb : ∀ l,
   is_permut_list l
@@ -749,24 +758,8 @@ move l' before l; move Hpl' before Hp.
 replace (length l) with (length l') by now apply Permutation_length.
 clear l Hp Hps.
 rename l' into l.
-...
 now apply sorted_permut.
-...
-intros * Hp.
-apply List_eq_iff.
-rewrite length_bsort, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite length_bsort ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite seq_nth; [ | easy ].
-rewrite Nat.add_0_l.
-...
-now apply nth_permut_bsort_leb.
-...
+Qed.
 
 Theorem permut_comp_bsort_rank_leb_r : ∀ l,
   is_permut_list l
@@ -774,14 +767,15 @@ Theorem permut_comp_bsort_rank_leb_r : ∀ l,
 Proof.
 intros * Hp.
 rewrite comp_bsort_rank_r.
-...
 now apply permut_bsort_leb.
-...
+Qed.
 
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
+intros * Hp.
+...
 intros * Hp.
 apply List_eq_iff.
 rewrite comp_length, seq_length.
