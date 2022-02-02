@@ -423,188 +423,7 @@ do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
-(*
-Theorem nth_permut_bsort_loop_leb : ∀ l lsorted i,
-  is_permut_list (lsorted ++ l)
-  → length lsorted ≤ i < length l
-  → nth i (bsort_loop Nat.leb lsorted l) 0 = i.
-Proof.
-intros * Hp Hil.
-revert i lsorted Hp Hil.
-induction l as [| a]; intros; cbn; [ easy | ].
-destruct i. {
-  destruct Hil as (Hil, _).
-  apply Nat.le_0_r, length_zero_iff_nil in Hil; subst lsorted.
-  cbn in Hp |-*.
-...
-specialize (IHl (S i) (bsort_insert Nat.leb a lsorted)) as H1.
-rewrite length_bsort_insert in H1.
-apply IHl. 2: {
-  rewrite length_bsort_insert.
-...
-
-Theorem glop : ∀ lsorted l,
-  is_permut_list (lsorted ++ l)
-  → bsort_loop Nat.leb lsorted l = lsorted ++ l
-  → is_permut_list lsorted.
-Proof.
-intros * Hp Hs.
-revert lsorted Hp Hs.
-induction l as [| a]; intros; cbn; [ now rewrite app_nil_r in Hp | ].
-cbn in Hs.
-...
-specialize (IHl (lsorted ++ [a])) as H1.
-rewrite <- app_assoc in H1.
-specialize (H1 Hp).
-...
-
-Theorem glip : ∀ a l,
-  is_permut_list (a :: l)
-  → bsort_loop Nat.leb [a] l = a :: l
-  → a = 0.
-Proof.
-intros * Hp Hal.
-...
-specialize (glop [a] l Hp Hal) as H1.
-destruct H1 as (H1, H2).
-specialize (H1 a (or_introl eq_refl)).
-now apply Nat.lt_1_r in H1.
-...
-intros * Hp Hal.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]; [ easy | exfalso ].
-Check pigeonhole.
-...
-
-Theorem nth_bsort_loop_sorted_permut : ∀ l lsorted i,
-  bsort_loop Nat.leb lsorted l = l
-  → is_permut_list (lsorted ++ l)
-  → length lsorted ≤ i < length (lsorted ++ l)
-  → nth i l 0 = length lsorted + i.
-Proof.
-intros * Hs Hp Hil.
-revert i lsorted Hs Hp Hil.
-induction l as [| a]; intros. {
-  rewrite app_nil_r in Hil; flia Hil.
-}
-destruct i. {
-  cbn.
-  destruct Hil as (Hls, Hil).
-  apply Nat.le_0_r, length_zero_iff_nil in Hls; subst lsorted.
-  cbn in Hp, Hs |-*; clear Hil.
-...
-
-Theorem nth_sorted_permut : ∀ l i,
-  bsort Nat.leb l = l
-  → is_permut_list l
-  → i < length l
-  → nth i l 0 = i.
-Proof.
-intros * Hs Hp Hil.
-...
-unfold bsort in Hs.
-specialize nth_bsort_loop_sorted_permut as H1.
-specialize (H1 l []).
-now apply H1.
-...
-
-Theorem nth_permut_bsort_loop : ∀ l lsorted i,
-  bsort Nat.leb lsorted = lsorted
-  → is_permut_list (lsorted ++ l)
-  → i < length (lsorted ++ l)
-  → nth i (bsort_loop Nat.leb lsorted l) 0 = i.
-Proof.
-intros * Hls Hp Hil.
-revert i lsorted Hls Hp Hil.
-induction l as [| a]; intros; cbn. {
-  rewrite app_nil_r in Hp, Hil.
-Check is_sorted.
-...
-*)
-
-(*
-Theorem nth_permut_bsort_leb : ∀ l d i,
-  is_permut_list l
-  → i < length l
-  → nth i (bsort Nat.leb l) d = i.
-Proof.
-intros * Hp Hil.
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
-clear d.
-...
-intros * Hp Hil.
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
-clear d.
-destruct i. {
-  induction l as [| a]; [ easy | cbn ].
-  clear Hil.
-  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
-    assert (H : is_permut_list l). {
-      split. {
-        intros i Hi.
-        destruct (Nat.eq_dec i (length l)) as [Hil| Hil]. {
-          rewrite <- Hal in Hil; subst i.
-          destruct Hp as (Hp, Hl).
-          now apply NoDup_cons_iff in Hl.
-        }
-        destruct Hp as (Hp, Hl).
-        specialize (Hp i) as H1.
-        specialize (H1 (or_intror Hi)).
-        cbn in H1.
-        flia Hil H1.
-      } {
-        destruct Hp as (Hp, Hl).
-        now apply NoDup_cons_iff in Hl.
-      }
-    }
-    specialize (IHl H) as H1.
-    destruct l as [| b]; [ easy | ].
-    cbn.
-    specialize (H1 (Nat.lt_0_succ _)).
-    rewrite if_leb_le_dec.
-    destruct (le_dec b a) as [Hba| Hba]. {
-      cbn in H1 |-*.
-      destruct l as [| c]; [ easy | ].
-      cbn in H1 |-*.
-...
-intros * Hp Hil.
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
-clear d.
-remember (length l) as n eqn:Hn.
-symmetry in Hn.
-revert i l Hp Hn Hil.
-induction n; intros; [ easy | cbn ].
-destruct i. {
-  clear - Hp.
-  induction l as [| a]; [ easy | cbn ].
-  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
-    subst a.
-...
-apply nth_permut_bsort_loop_leb.
-...
-(*
-Search bsort.
-rewrite bsort_bsort_rank with (d := 0).
-rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
-unfold bsort_rank.
-destruct l as [| d]; [ easy | ].
-remember (d :: l) as l'; clear l Heql'.
-rename l' into l.
-Print bsort_rank_loop.
-...
-unfold bsort.
-Print bsort_loop.
-...
-*)
-...
-remember (length l) as n eqn:Hn; symmetry in Hn.
-revert n l Hp Hn Hil.
-induction n; intros; [ easy | ].
-destruct i. {
-  clear - Hp.
-  induction l as [| a]; [ easy | ].
-cbn.
-...
-*)
+(* *)
 
 Theorem Permutation_cons_bsort_insert : ∀ A (ord : A → _) a la lb,
   Permutation la lb
@@ -735,33 +554,56 @@ split. {
 }
 Qed.
 
+Theorem sorted_cons : ∀ A (ord : A → _) a la,
+  sorted ord (a :: la) = true → sorted ord la = true.
+Proof.
+intros * Hs.
+cbn in Hs.
+destruct la as [| a']; [ easy | ].
+now apply Bool.andb_true_iff in Hs.
+Qed.
+
 Theorem sorted_app : ∀ A (ord : A → _),
-  total_order ord
+  transitive ord
   → ∀ la lb,
     sorted ord (la ++ lb) = true
     → ∀ a, a ∈ la → ∀ b, b ∈ lb → ord a b = true.
 Proof.
-intros * Ht * Hs a Ha b Hb.
+intros * Htr * Hs a Ha b Hb.
 move b before a.
-revert a b la Hs Ha Hb.
+revert la Hs Ha.
 induction lb as [| b']; intros; [ easy | ].
 replace (b' :: lb) with ([b'] ++ lb) in Hs by easy.
 rewrite app_assoc in Hs.
 destruct Hb as [Hb| Hb]. 2: {
-  apply IHlb with (la := la ++ [b']); [ easy | | easy ].
+  apply IHlb with (la := la ++ [b']); [ easy | easy | ].
   now apply in_or_app; left.
 }
 subst b'.
-...
-apply IHlb with (la := la ++ [b]); [ easy | | ].
-  specialize (IHlb a b _ Hs) as H1.
-...
-intros * Ht * Hs a Ha b Hb.
-move b before a.
-revert a b lb Hs Ha Hb.
+clear IHlb.
+rewrite <- app_assoc in Hs.
+cbn in Hs.
+revert a Ha.
 induction la as [| a']; intros; [ easy | ].
-destruct Ha as [Ha| Ha]. {
-  subst a'.
+destruct Ha as [Ha| Ha]. 2: {
+  cbn - [ sorted ] in Hs.
+  apply IHla; [ | easy ].
+  now apply sorted_cons in Hs.
+}
+subst a'.
+cbn - [ sorted ] in Hs.
+destruct la as [| a']. {
+  cbn in Hs.
+  now apply Bool.andb_true_iff in Hs.
+}
+apply Htr with (b := a'). {
+  cbn in Hs.
+  now apply Bool.andb_true_iff in Hs.
+}
+apply sorted_cons in Hs.
+apply IHla; [ easy | now left ].
+Qed.
+
 ...
 
 Theorem sorted_permut : ∀ l,
