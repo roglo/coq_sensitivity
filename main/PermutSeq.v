@@ -710,6 +710,18 @@ Theorem Permutation_permut : ∀ la lb,
   → is_permut_list lb.
 Proof.
 intros * Hab Ha.
+assert (Hlab : length la = length lb). {
+  now apply Permutation_length.
+}
+split. {
+  intros i Hi.
+  rewrite <- Hlab.
+  apply Ha.
+  apply Permutation_in with (l := lb); [ | easy ].
+  now apply Permutation_sym.
+} {
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
 ...
 
 Theorem permut_bsort_leb : ∀ l,
