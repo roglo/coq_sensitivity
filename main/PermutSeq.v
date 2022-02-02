@@ -745,6 +745,13 @@ induction l as [| a] using rev_ind; [ easy | ].
 rewrite app_length; cbn.
 rewrite Nat.add_1_r.
 rewrite seq_S; cbn.
+assert (Hal : a = length l). {
+Search sorted.
+Search (is_permut_list (_ ++ _)).
+...
+rewrite <- IHl.
+f_equal.
+f_equal.
 rewrite <- IHl; cycle 1. {
 ...
 
