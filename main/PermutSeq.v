@@ -640,6 +640,27 @@ destruct x. {
   apply Permutation_cons_bsort_insert.
   now apply Permutation_sym.
 } {
+  apply Permutation_sym.
+  eapply Permutation_trans. 2: {
+    apply Permutation_cons_bsort_insert.
+    apply Permutation_sym.
+    apply Hp.
+  }
+  replace (c :: b :: lb) with ([c] ++ b :: lb) by easy.
+  eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
+  constructor.
+  apply Permutation_sym.
+  eapply Permutation_trans; [ | apply IHlb ].
+...
+Check Permutation_middle.
+...
+  eapply Permutation_trans. 2: {
+    apply IHlb.
+    apply Permutation_cons_bsort_insert.
+    now apply IHlb.
+  }
+...
+  now apply Permutation_sym.
 ...
   eapply Permutation_cons_app.
 ...
