@@ -655,10 +655,6 @@ destruct x. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem Permutation_bsort_loop_sorted : ∀ A (ord : A → _) la lb lc,
   Permutation la lb
   → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc).
@@ -667,9 +663,8 @@ intros * Hp.
 revert la lb Hp.
 induction lc as [| c]; intros; [ easy | cbn ].
 apply IHlc.
-...
 now apply Permutation_bsort_insert_sorted.
-...
+Qed.
 
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb,
   Permutation (la ++ lb) (bsort_loop ord la lb).
@@ -687,8 +682,22 @@ induction la as [| a]; intros; [ easy | ].
 cbn.
 remember (ord b a) as x eqn:Hx; symmetry in Hx.
 destruct x. {
-...
-apply Permutation_bsort_loop_sorted.
+  apply Permutation_bsort_loop_sorted.
+  rewrite app_comm_cons.
+  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
+  apply Permutation_app_comm.
+} {
+  apply Permutation_bsort_loop_sorted.
+  constructor.
+  eapply Permutation_trans. 2: {
+    now apply Permutation_cons_bsort_insert.
+  }
+  apply Permutation_app_comm.
+}
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem Permutation_bsort : ∀ A (ord : A → _) l, Permutation l (bsort ord l).
