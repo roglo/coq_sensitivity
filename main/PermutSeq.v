@@ -521,6 +521,7 @@ Check is_sorted.
 ...
 *)
 
+(*
 Theorem nth_permut_bsort_leb : ∀ l d i,
   is_permut_list l
   → i < length l
@@ -609,6 +610,10 @@ Theorem permut_bsort_leb : ∀ l,
   is_permut_list l
   → bsort Nat.leb l = seq 0 (length l).
 Proof.
+intros * Hp.
+specialize bsort_is_sorted as H1.
+specialize (H1 _ Nat.leb l Nat_leb_has_total_order).
+...
 intros * Hp.
 apply List_eq_iff.
 rewrite length_bsort, seq_length.

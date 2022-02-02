@@ -2482,6 +2482,18 @@ destruct l as [| a]; [ easy | cbn ].
 now apply bsort_loop_is_sorted.
 Qed.
 
+Theorem Nat_leb_has_total_order : total_order Nat.leb.
+Proof.
+intros i j.
+apply Bool.orb_true_iff.
+destruct (le_dec i j) as [Hij| Hij]. {
+  now apply Nat.leb_le in Hij; rewrite Hij; left.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hij.
+  now apply Nat.leb_le in Hij; rewrite Hij; right.
+}
+Qed.
+
 (* end sorted *)
 
 Definition transitive A (ord : A → A → bool) :=

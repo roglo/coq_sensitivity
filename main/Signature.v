@@ -2133,18 +2133,6 @@ apply Nat.leb_le.
 now transitivity b.
 Qed.
 
-Theorem Nat_leb_has_total_order : total_order Nat.leb.
-Proof.
-intros i j.
-apply Bool.orb_true_iff.
-destruct (le_dec i j) as [Hij| Hij]. {
-  now apply Nat.leb_le in Hij; rewrite Hij; left.
-} {
-  apply Nat.nle_gt, Nat.lt_le_incl in Hij.
-  now apply Nat.leb_le in Hij; rewrite Hij; right.
-}
-Qed.
-
 Theorem sorted_rel : ∀ A (d : A) ord l,
   sorted ord l = true
   → ∀ i, S i < length l
