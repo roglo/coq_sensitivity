@@ -606,6 +606,20 @@ cbn.
 ...
 *)
 
+Theorem Permutation_cons_bsort_insert : ∀ A (ord : A → _) a la lb,
+  Permutation la lb
+  → Permutation (a :: la) (bsort_insert ord a lb).
+Proof.
+intros * Hab.
+revert a la Hab.
+induction lb as [| b]; intros; cbn. {
+  apply Permutation_sym in Hab.
+  now apply Permutation_nil in Hab; subst la.
+}
+remember (ord a b) as x eqn:Hx; symmetry in Hx.
+destruct x; [ now constructor | ].
+...
+
 Theorem Permutation_bsort_insert_sorted : ∀ A (ord : A → _) la lb c,
   Permutation la lb
   → Permutation (bsort_insert ord c la) (bsort_insert ord c lb).
@@ -617,6 +631,14 @@ induction lb as [| b]; intros; cbn. {
 }
 remember (ord c b) as x eqn:Hx; symmetry in Hx.
 destruct x. {
+(**)
+  apply Permutation_sym.
+...
+  apply Permutation_cons_bsort_insert.
+  now apply Permutation_sym.
+}
+    eapply Permutation_cons_app.
+...
   destruct la as [| a]; [ now apply Permutation_nil in Hp | cbn ].
   remember (ord c a) as y eqn:Hy; symmetry in Hy.
   destruct y; [ now apply Permutation_cons | ].
@@ -636,6 +658,18 @@ destruct x. {
     }
     now apply Permutation_cons.
   } {
+...
+    apply Permutation_sym.
+Check Permutation_cons_app.
+eapply Permutation_trans.
+apply Permutation_cons_app.
+...
+Search (Permutation (_ :: _)).
+Permutation_middle: ∀ (A : Type) (l1 l2 : list A) (a : A), Permutation (a :: l1 ++ l2) (l1 ++ a :: l2)
+Permutation_cons_app:
+  ∀ (A : Type) (l l1 l2 : list A) (a : A), Permutation l (l1 ++ l2) → Permutation (a :: l) (l1 ++ a :: l2)
+...
+Permutation_cons_app:
     apply Permutation_sym.
     apply Permutation_Add.
 Search Add.
