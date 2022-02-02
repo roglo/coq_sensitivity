@@ -529,9 +529,41 @@ Proof.
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
 clear d.
+...
+intros * Hp Hil.
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+clear d.
 destruct i. {
-  destruct l as [| a]; [ easy | cbn ].
+  induction l as [| a]; [ easy | cbn ].
   clear Hil.
+  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]. {
+    assert (H : is_permut_list l). {
+      split. {
+        intros i Hi.
+        destruct (Nat.eq_dec i (length l)) as [Hil| Hil]. {
+          rewrite <- Hal in Hil; subst i.
+          destruct Hp as (Hp, Hl).
+          now apply NoDup_cons_iff in Hl.
+        }
+        destruct Hp as (Hp, Hl).
+        specialize (Hp i) as H1.
+        specialize (H1 (or_intror Hi)).
+        cbn in H1.
+        flia Hil H1.
+      } {
+        destruct Hp as (Hp, Hl).
+        now apply NoDup_cons_iff in Hl.
+      }
+    }
+    specialize (IHl H) as H1.
+    destruct l as [| b]; [ easy | ].
+    cbn.
+    specialize (H1 (Nat.lt_0_succ _)).
+    rewrite if_leb_le_dec.
+    destruct (le_dec b a) as [Hba| Hba]. {
+      cbn in H1 |-*.
+      destruct l as [| c]; [ easy | ].
+      cbn in H1 |-*.
 ...
 intros * Hp Hil.
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
