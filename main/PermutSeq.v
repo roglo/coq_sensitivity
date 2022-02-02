@@ -722,6 +722,21 @@ split. {
 } {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  rewrite <- Hlab in Hi, Hj.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  destruct Ha as (Hap, Hal).
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+}
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem permut_bsort_leb : ∀ l,
