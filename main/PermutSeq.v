@@ -606,13 +606,56 @@ cbn.
 ...
 *)
 
+Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb,
+  Permutation (la ++ lb) (bsort_loop ord la lb).
+Proof.
+intros.
+revert la.
+induction lb as [| b]; intros; [ now rewrite app_nil_r | ].
+specialize (IHlb (la ++ [b])) as H1.
+rewrite <- app_assoc in H1; cbn in H1.
+eapply Permutation_trans; [ apply H1 | ].
+cbn.
+...
+
+Theorem Permutation_bsort : ∀ A (ord : A → _) l, Permutation l (bsort ord l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+...
+specialize Permutation_bsort_loop as H1.
+apply (H1 _ ord [a] l).
+...
+
+Theorem sorted_permut : ∀ l,
+  is_permut_list l
+  → sorted Nat.leb l = true
+  → l = seq 0 (length l).
+Proof.
+intros * Hl Hs.
+...
+
 Theorem permut_bsort_leb : ∀ l,
   is_permut_list l
   → bsort Nat.leb l = seq 0 (length l).
 Proof.
 intros * Hp.
-specialize bsort_is_sorted as H1.
-specialize (H1 _ Nat.leb l Nat_leb_has_total_order).
+specialize bsort_is_sorted as Hbs.
+specialize (Hbs _ Nat.leb l Nat_leb_has_total_order).
+...
+specialize (Permutation_bsort Nat.leb l) as Hps.
+remember (bsort Nat.leb l) as l'; clear Heql'.
+move l' before l.
+Theorem Permutation_permut : ∀ la lb,
+  Permutation la lb
+  → is_permut_list la
+  → is_permut_list lb.
+Proof.
+Admitted.
+apply Permutation_permut in Hps; [ | easy ].
+replace (length l) with (length l').
+clear l Hp.
+rename l' into l.
 ...
 intros * Hp.
 apply List_eq_iff.
