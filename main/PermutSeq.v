@@ -563,7 +563,35 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-Theorem sorted_app : ∀ A (ord : A → _),
+(*
+Theorem sorted_app_at : ∀ A (ord : A → _) la a,
+  sorted ord (la ++ [a]) = true
+  → sorted ord la = true.
+Proof.
+intros * Hs.
+revert a Hs.
+induction la as [| b] using rev_ind; intros; [ easy | ].
+...
+*)
+
+Theorem sorted_app : ∀ A (ord : A → _) la lb,
+  sorted ord (la ++ lb) = true
+  → sorted ord la = true ∧ sorted ord lb = true.
+Proof.
+intros * Htr.
+split. {
+Print sorted.
+...
+  revert la Htr.
+  induction lb as [| b]; intros; [ now rewrite app_nil_r in Htr | ].
+  specialize (IHlb (la ++ [b])) as H1.
+  rewrite <- app_assoc in H1.
+  specialize (H1 Htr).
+...
+  now apply sorted_app_at in H1.
+...
+
+Theorem sorted_app_trans : ∀ A (ord : A → _),
   transitive ord
   → ∀ la lb,
     sorted ord (la ++ lb) = true
@@ -623,15 +651,63 @@ assert (Hal : a = length l). {
   specialize (H3 H); clear H.
   assert (H4 : ∀ c, c ∈ l → c ≤ a). {
     intros c Hc.
-    specialize (sorted_app Nat_leb_trans) as H4.
+    specialize (sorted_app_trans Nat_leb_trans) as H4.
     specialize (H4 l [a] Hs c Hc a (or_introl eq_refl)).
     now apply Nat.leb_le in H4.
   }
+  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].
+  assert (H5 : a < length l) by flia H3 Hal; clear H3 Hal.
+  specialize (pigeonhole (length l) a) as H3.
+  specialize (H3 (λ i, nth i l 0)).
+  specialize (H3 H5).
+  cbn in H3.
+  assert (H : ∀ x, x < length l → nth x l 0 < a). {
+    intros x Hx.
+    specialize (H4 (nth x l 0)) as H7.
+    assert (H : nth x l 0 ∈ l) by now apply nth_In.
+    specialize (H7 H); clear H.
+    destruct (Nat.eq_dec (nth x l 0) a) as [Hxa| Hxa]; [ | flia H7 Hxa ].
+    replace a with (nth (length l) (l ++ [a]) 0) in Hxa. 2: {
+      rewrite app_nth2; [ | now unfold ge ].
+      now rewrite Nat.sub_diag.
+    }
+    replace (nth x l 0) with (nth x (l ++ [a]) 0) in Hxa. 2: {
+      now rewrite app_nth1.
+    }
+    apply (NoDup_nat _ H2) in Hxa; cycle 1. {
+      rewrite app_length, Nat.add_comm; cbn.
+      flia Hx.
+    } {
+      now rewrite app_length, Nat.add_comm; cbn.
+    }
+    flia Hx Hxa.
+  }
+  specialize (H3 H); clear H.
+  remember (pigeonhole_fun (length l) (λ i : nat, nth i l 0)) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (x, x').
+  specialize (H3 x x' eq_refl).
+  destruct H3 as (H3 & H6 & H7 & H8).
+  specialize (NoDup_nat _ H2) as H9.
+  specialize (H9 x x').
+  rewrite app_length, Nat.add_comm in H9; cbn in H9.
+  assert (H : x < S (length l)) by flia H3.
+  specialize (H9 H); clear H.
+  assert (H : x' < S (length l)) by flia H6.
+  specialize (H9 H); clear H.
+  unfold ff_app in H9.
+  apply H7, H9.
+  rewrite app_nth1; [ | easy ].
+  rewrite app_nth1; [ | easy ].
+  easy.
+}
+rewrite Hal; f_equal.
+apply IHl. 2: {
 ...
-rewrite <- IHl.
-f_equal.
-f_equal.
-rewrite <- IHl; cycle 1. {
+  specialize sorted_app as H1.
+  specialize (H1 nat Nat.leb Nat_leb_trans).
+  specialize (H1 _ _ Hs).
+Check Nat_leb_trans.
 ...
 
 Theorem permut_bsort_leb : ∀ l,
