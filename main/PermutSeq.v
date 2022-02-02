@@ -621,10 +621,12 @@ assert (Hal : a = length l). {
   specialize (H1 a) as H3.
   assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
   specialize (H3 H); clear H.
-...
-  specialize (sorted_app Nat_leb_trans) as H4.
-...
-  specialize (H4 l [a] Hs).
+  assert (H4 : ∀ c, c ∈ l → c ≤ a). {
+    intros c Hc.
+    specialize (sorted_app Nat_leb_trans) as H4.
+    specialize (H4 l [a] Hs c Hc a (or_introl eq_refl)).
+    now apply Nat.leb_le in H4.
+  }
 ...
 rewrite <- IHl.
 f_equal.
