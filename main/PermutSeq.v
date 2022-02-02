@@ -651,70 +651,12 @@ destruct x. {
   constructor.
   apply Permutation_sym.
   eapply Permutation_trans; [ | apply IHlb; easy ].
+  now apply Permutation_cons_bsort_insert.
+}
+Qed.
 
-...
-Check Permutation_middle.
-...
-  eapply Permutation_trans. 2: {
-    apply IHlb.
-    apply Permutation_cons_bsort_insert.
-    now apply IHlb.
-  }
-...
-  now apply Permutation_sym.
-...
-  eapply Permutation_cons_app.
-...
-  destruct la as [| a]; [ now apply Permutation_nil in Hp | cbn ].
-  remember (ord c a) as y eqn:Hy; symmetry in Hy.
-  destruct y; [ now apply Permutation_cons | ].
-  clear IHlb Hx Hy.
-  revert a b c lb Hp.
-  induction la as [| a']; intros; cbn. {
-    destruct lb as [| b']. {
-      apply Permutation_length_1 in Hp; subst b.
-      apply perm_swap.
-    }
-    now apply Permutation_length in Hp.
-  }
-  remember (ord c a') as  x eqn:Hx; symmetry in Hx.
-  destruct x. {
-    apply Permutation_trans with (l' := c :: a :: a' :: la). {
-      apply perm_swap.
-    }
-    now apply Permutation_cons.
-  } {
-...
-    apply Permutation_sym.
-Check Permutation_cons_app.
-eapply Permutation_trans.
-apply Permutation_cons_app.
-...
-Search (Permutation (_ :: _)).
-Permutation_middle: ∀ (A : Type) (l1 l2 : list A) (a : A), Permutation (a :: l1 ++ l2) (l1 ++ a :: l2)
-Permutation_cons_app:
-  ∀ (A : Type) (l l1 l2 : list A) (a : A), Permutation l (l1 ++ l2) → Permutation (a :: l) (l1 ++ a :: l2)
-...
-Permutation_cons_app:
-    apply Permutation_sym.
-    apply Permutation_Add.
-Search Add.
-(* ah, putain, j'en ai marre, tiens ; fait chier *)
-...
-    eapply Permutation_trans. 2: {
-...
-apply Permutation_sym.
-Check perm_swap.
-apply Permutation_cons_inv in Hp.
-...
-  apply Permutation_Add.
-Print Add.
-Search Add.
-Search (Permutation (_ :: _)).
-...
-  apply Permutation_cons.
-...
-  apply Permutation_cons in Hp.
+Inspect 1.
+
 ...
 
 Theorem Permutation_bsort_loop_sorted : ∀ A (ord : A → _) la lb lc,
