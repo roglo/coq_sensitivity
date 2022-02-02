@@ -741,6 +741,11 @@ Theorem sorted_permut : ∀ l,
   → l = seq 0 (length l).
 Proof.
 intros * Hl Hs.
+induction l as [| a] using rev_ind; [ easy | ].
+rewrite app_length; cbn.
+rewrite Nat.add_1_r.
+rewrite seq_S; cbn.
+rewrite <- IHl; cycle 1. {
 ...
 
 Theorem permut_bsort_leb : ∀ l,
