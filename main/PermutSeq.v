@@ -735,6 +735,35 @@ split. {
 }
 Qed.
 
+Theorem sorted_app : ∀ A (ord : A → _),
+  total_order ord
+  → ∀ la lb,
+    sorted ord (la ++ lb) = true
+    → ∀ a, a ∈ la → ∀ b, b ∈ lb → ord a b = true.
+Proof.
+intros * Ht * Hs a Ha b Hb.
+move b before a.
+revert a b la Hs Ha Hb.
+induction lb as [| b']; intros; [ easy | ].
+replace (b' :: lb) with ([b'] ++ lb) in Hs by easy.
+rewrite app_assoc in Hs.
+destruct Hb as [Hb| Hb]. 2: {
+  apply IHlb with (la := la ++ [b']); [ easy | | easy ].
+  now apply in_or_app; left.
+}
+subst b'.
+...
+apply IHlb with (la := la ++ [b]); [ easy | | ].
+  specialize (IHlb a b _ Hs) as H1.
+...
+intros * Ht * Hs a Ha b Hb.
+move b before a.
+revert a b lb Hs Ha Hb.
+induction la as [| a']; intros; [ easy | ].
+destruct Ha as [Ha| Ha]. {
+  subst a'.
+...
+
 Theorem sorted_permut : ∀ l,
   is_permut_list l
   → sorted Nat.leb l = true
@@ -746,8 +775,16 @@ rewrite app_length; cbn.
 rewrite Nat.add_1_r.
 rewrite seq_S; cbn.
 assert (Hal : a = length l). {
+  destruct Hl as (H1, H2).
+  rewrite app_length, Nat.add_comm in H1; cbn in H1.
+  unfold AllLt in H1.
+  specialize (H1 a) as H3.
+  assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
+  specialize (H3 H); clear H.
 Search sorted.
-Search (is_permut_list (_ ++ _)).
+...
+specialize (sorted_app Nat_leb_has_total_order) as H4.
+specialize (H4 l [a] Hs).
 ...
 rewrite <- IHl.
 f_equal.
