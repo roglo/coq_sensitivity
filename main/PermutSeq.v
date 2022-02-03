@@ -789,8 +789,14 @@ rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite fold_ff_app; cbn.
-Check bsort_bsort_rank.
-Check List_map_nth_seq.
+Inspect 1.
+specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
+unfold "°" in H1.
+apply (f_equal (λ l, nth i l 0)) in H1.
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+rewrite seq_nth in H1; [ | easy ].
+cbn in H1.
+rewrite fold_ff_app in H1.
 ...
 specialize (bsort_bsort_rank Nat.leb 0 l) as H1.
 apply (f_equal (λ l, nth i l 0)) in H1.
