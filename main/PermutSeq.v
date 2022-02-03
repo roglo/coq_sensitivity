@@ -775,8 +775,6 @@ Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
 intros * Hp.
-...
-intros * Hp.
 apply List_eq_iff.
 rewrite comp_length, seq_length.
 split; [ easy | ].
@@ -786,15 +784,18 @@ destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
   rewrite nth_overflow; [ | now rewrite comp_length ].
   rewrite nth_overflow; [ easy | now rewrite seq_length ].
 }
+rewrite seq_nth; [ | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
-symmetry.
-rewrite nth_indep with (d' := 0); [ | now rewrite seq_length ].
-symmetry.
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
-rewrite seq_nth; [ | easy ].
 rewrite fold_ff_app; cbn.
-Search bsort_rank.
+...
+Compute (let l := [3;0;2;1] in (bsort_rank Nat.leb l ° l = seq 0 (length l))).
+...
+specialize (bsort_bsort_rank Nat.leb 0 l) as H1.
+apply (f_equal (λ l, nth i l 0)) in H1.
+rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+do 3 rewrite fold_ff_app in H1.
 ...
 Compute (let l := [3;7;2;8] in (map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i)) (seq 0 (length l)))).
 Compute (map (λ l, map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i)) (seq 0 (length l))) (canon_sym_gr_list_list 4)).
