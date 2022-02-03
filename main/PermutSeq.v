@@ -770,6 +770,30 @@ rewrite comp_bsort_rank_r.
 now apply permut_bsort_leb.
 Qed.
 
+Theorem permut_app_bsort_rank_loop_app : ∀ l_ini lrank l i,
+  is_permut_list l_ini
+  → length lrank + length l ≤ length l_ini
+  → i < length l_ini
+  → ff_app (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lrank l)
+       (ff_app l_ini i) = i.
+Proof.
+intros * Hini Hll Hil.
+revert lrank i Hll Hil.
+induction l as [| a]; intros; cbn. {
+  unfold ff_app.
+...
+
+Theorem permut_app_bsort_rank_app : ∀ l i,
+  is_permut_list l
+  → i < length l
+  → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
+Proof.
+intros * Hp Hil.
+destruct l as [| d]; [ easy | ].
+cbn - [ nth ].
+remember (d :: l) as l' eqn:Hl'.
+...
+
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
@@ -786,10 +810,33 @@ destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
 }
 rewrite seq_nth; [ | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
+clear d.
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite fold_ff_app; cbn.
-Inspect 1.
+...
+now apply permut_app_bsort_rank_app.
+...
+destruct l as [| d]; [ easy | ].
+cbn - [ nth ].
+remember (d :: l) as l' eqn:Hl'.
+unfold ff_app.
+Print bsort_rank_loop.
+...
+rewrite bsort_rank_loop_nth_indep with (d' := 0).
+apply nth_nth_bsort_rank_loop_nat.
+...
+  Hp : is_permut_list l'
+  i : nat
+  Hil : i < length l'
+  ============================
+  nth (nth i l' 0) (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l' d) [0] l) 0 = i
+...
+clear l Hl'.
+rename l' into l.
+...
+Compute (map (λ l, bsort_rank Nat.leb l ° l) (canon_sym_gr_list_list 4)).
+...
 specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
 unfold "°" in H1.
 apply (f_equal (λ l, nth i l 0)) in H1.
