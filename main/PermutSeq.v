@@ -813,6 +813,7 @@ remember (d :: l) as l' eqn:Hl'.
 ...
 *)
 
+(*
 Theorem sorted_bsorted_loop_idemp : ∀ A (ord : A → _) lsorted l,
   total_order ord
   → sorted ord (lsorted ++ l) = true
@@ -847,14 +848,24 @@ induction l as [| b]; intros; cbn. {
     destruct Hs as (Hbc, Hscl).
     rewrite <- Hla in Hscl.
 ...
+*)
 
 Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
   sorted ord l = true
   → bsort ord l = l.
 Proof.
 intros * Hs.
-destruct l as [| a]; [ easy | cbn ].
+induction l as [| a]; [ easy | cbn in Hs |-* ].
+destruct l as [| b]; [ easy | cbn ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+specialize (IHl Hs).
+remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+move Hba before Hab.
+cbn in IHl.
+destruct ba. {
 ...
+destruct l as [| a]; [ easy | cbn ].
 now rewrite sorted_bsorted_loop_idemp.
 ...
 
