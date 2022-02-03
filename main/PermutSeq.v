@@ -861,6 +861,11 @@ induction l as [| c]; intros; [ now rewrite app_nil_r | ].
 remember (b :: lsorted) as l'; cbn; subst l'.
 remember (ord c a) as ca eqn:Hca; symmetry in Hca.
 destruct ca. {
+  cbn in Hs.
+  remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+(* donc ça marche pas¸ ça ; c'est pas assez général,
+   c'est pas la bonne généralité *)
 ...
 
 Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
