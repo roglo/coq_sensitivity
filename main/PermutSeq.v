@@ -813,15 +813,60 @@ remember (d :: l) as l' eqn:Hl'.
 ...
 *)
 
+Theorem sorted_bsorted_loop_idemp : ∀ A (ord : A → _) lsorted l,
+  total_order ord
+  → sorted ord (lsorted ++ l) = true
+  → bsort_loop ord lsorted l = lsorted ++ l.
+Proof.
+intros * Hto Hs.
+revert lsorted Hs.
+induction l as [| a]; intros; [ now rewrite app_nil_r | cbn ].
+replace (lsorted ++ a :: l) with ((lsorted ++ [a]) ++ l) in Hs by now rewrite <- app_assoc.
+specialize (IHl (lsorted ++ [a]) Hs) as H1.
+rewrite <- app_assoc in Hs, H1; cbn in Hs, H1.
+rewrite <- H1.
+clear IHl H1.
+revert a lsorted Hs.
+induction l as [| b]; intros; cbn. {
+  specialize bsort_insert_is_sorted as H1.
+  specialize (H1 A ord a lsorted Hto).
+  assert (H : sorted ord lsorted = true) by now apply sorted_app in Hs.
+  specialize (H1 H); clear H.
+  revert a Hs H1.
+  induction lsorted as [| b]; intros; [ easy | cbn ].
+  remember (ord a b) as x eqn:Hx; symmetry in Hx.
+  destruct x. {
+    exfalso.
+    cbn in Hs, H1.
+    rewrite Hx in H1.
+    remember (lsorted ++ [a]) as la eqn:Hla.
+    symmetry in Hla.
+    destruct la as [| c]; [ now apply app_eq_nil in Hla | ].
+    clear H1.
+...
+
+Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → bsort ord l = l.
+Proof.
+intros * Hs.
+destruct l as [| a]; [ easy | cbn ].
+...
+now rewrite sorted_bsorted_loop_idemp.
+...
+
 Theorem bsort_rank_bsort_rank_loop : ∀ ord l_ini lrank l,
-  length lrank + length l = length l_ini
+  bsort ord (lrank ++ l) = bsort ord l_ini
   → sorted ord lrank = true
   → bsort_rank ord (bsort_rank_loop ord (λ i, nth i l_ini 0) lrank l) = l_ini.
 Proof.
 intros * Hll Hsl.
 revert lrank Hll Hsl.
-induction l as [| a]; intros; cbn.
-(* non *)
+induction l as [| a]; intros; cbn. {
+  rewrite app_nil_r in Hll.
+...
+rewrite sorted_bsorted_idemp in Hll; [ | easy ].
+(* aucun intérêt *)
 ...
 
 Theorem bsort_rank_involutive : ∀ ord l,
