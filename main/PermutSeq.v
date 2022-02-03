@@ -770,17 +770,35 @@ rewrite comp_bsort_rank_r.
 now apply permut_bsort_leb.
 Qed.
 
+(*
 Theorem permut_app_bsort_rank_loop_app : ∀ l_ini lrank l i,
   is_permut_list l_ini
-  → length lrank + length l ≤ length l_ini
-  → i < length l_ini
+  → length lrank + length l = length l_ini
+  → length lrank ≤ i < length l_ini
   → ff_app (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lrank l)
        (ff_app l_ini i) = i.
 Proof.
 intros * Hini Hll Hil.
 revert lrank i Hll Hil.
 induction l as [| a]; intros; cbn. {
-  unfold ff_app.
+  rewrite Nat.add_0_r in Hll.
+  flia Hll Hil.
+}
+cbn in Hll.
+rewrite <- Nat.add_succ_comm in Hll.
+destruct (Nat.eq_dec i (length lrank)) as [Hir| Hir]. 2: {
+  apply IHl; [ now rewrite length_bsort_rank_insert | ].
+  rewrite length_bsort_rank_insert.
+  split; [ flia Hil Hir | easy ].
+}
+destruct Hil as (_, Hil).
+clear IHl.
+Search bsort.
+Check bsort_bsort_rank.
+...
+sorted ord lsorted = true
+sorted_rank...
+lsorted = map (λ i, nth i l d) (lsorted_rank ord l)
 ...
 
 Theorem permut_app_bsort_rank_app : ∀ l i,
@@ -793,11 +811,45 @@ destruct l as [| d]; [ easy | ].
 cbn - [ nth ].
 remember (d :: l) as l' eqn:Hl'.
 ...
+*)
+
+Theorem bsort_rank_bsort_rank_loop : ∀ ord l_ini lrank l,
+  length lrank + length l = length l_ini
+  → sorted ord lrank = true
+  → bsort_rank ord (bsort_rank_loop ord (λ i, nth i l_ini 0) lrank l) = l_ini.
+Proof.
+intros * Hll Hsl.
+revert lrank Hll Hsl.
+induction l as [| a]; intros; cbn.
+(* non *)
+...
+
+Theorem bsort_rank_involutive : ∀ ord l,
+  bsort_rank ord (bsort_rank ord l) = l.
+Proof.
+intros.
+destruct l as [| d]; [ easy | ].
+cbn - [ nth ].
+rewrite bsort_rank_loop_nth_indep with (d' := 0).
+...
+apply bsort_rank_bsort_rank_loop.
+...
+Compute (map (λ l, (l, bsort_rank Nat.leb (bsort_rank Nat.leb l))) (canon_sym_gr_list_list 3)).
+Search bsort_rank.
+...
 
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
+intros * Hp.
+...
+remember (bsort_rank Nat.leb l) as l'.
+rewrite <- (bsort_rank_involutive Nat.leb l) at 1.
+subst l'.
+rewrite permut_comp_bsort_rank_leb_r.
+rewrite length_bsort_rank.
+...
 intros * Hp.
 apply List_eq_iff.
 rewrite comp_length, seq_length.
