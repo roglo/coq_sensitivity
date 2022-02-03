@@ -2431,6 +2431,9 @@ Fixpoint sorted {A} ord (l : list A) :=
   | a :: (b :: _) as l' => (ord a b && sorted ord l')%bool
   end.
 
+Definition antisymmetric A (ord : A → A → bool) :=
+  ∀ a b, ord a b = true → ord b a = true → a = b.
+
 Definition transitive A (ord : A → A → bool) :=
   ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
 

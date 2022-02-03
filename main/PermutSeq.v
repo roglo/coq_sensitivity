@@ -850,11 +850,25 @@ induction l as [| b]; intros; cbn. {
 ...
 *)
 
+Theorem bsort_loop_cons_cons : ∀ A (ord : A → _) a b lsorted l,
+  ord a b = true
+  → bsort_loop ord (b :: lsorted) l = b :: lsorted ++ l
+  → bsort_loop ord (a :: b :: lsorted) l = a :: b :: lsorted ++ l.
+Proof.
+intros * Hab Hs.
+revert a b lsorted Hab Hs.
+induction l as [| c]; intros; [ now rewrite app_nil_r | ].
+remember (b :: lsorted) as l'; cbn; subst l'.
+remember (ord c a) as ca eqn:Hca; symmetry in Hca.
+destruct ca. {
+...
+
 Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
-  sorted ord l = true
+  antisymmetric ord
+  → sorted ord l = true
   → bsort ord l = l.
 Proof.
-intros * Hs.
+intros * Han Hs.
 induction l as [| a]; [ easy | cbn in Hs |-* ].
 destruct l as [| b]; [ easy | cbn ].
 apply Bool.andb_true_iff in Hs.
@@ -864,6 +878,22 @@ remember (ord b a) as ba eqn:Hba; symmetry in Hba.
 move Hba before Hab.
 cbn in IHl.
 destruct ba. {
+  apply Han in Hba.
+  specialize (Hba Hab); subst b.
+  rename Hab into Haa.
+  clear IHl.
+  induction l as [| b]; [ easy | cbn ].
+  remember (ord b a) as ba eqn:Hba.
+  symmetry in Hba.
+  destruct ba. {
+    remember (b :: l) as l'; cbn in Hs; subst l'.
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hab, Hs).
+    apply Han in Hba.
+    specialize (Hba Hab); subst b.
+    specialize (IHl Hs).
+...
+now apply bsort_loop_cons_cons.
 ...
 destruct l as [| a]; [ easy | cbn ].
 now rewrite sorted_bsorted_loop_idemp.
