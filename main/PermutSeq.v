@@ -842,7 +842,10 @@ induction l as [| b]; intros; cbn. {
     remember (lsorted ++ [a]) as la eqn:Hla.
     symmetry in Hla.
     destruct la as [| c]; [ now apply app_eq_nil in Hla | ].
-    clear H1.
+    clear IHlsorted.
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hbc, Hscl).
+    rewrite <- Hla in Hscl.
 ...
 
 Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
