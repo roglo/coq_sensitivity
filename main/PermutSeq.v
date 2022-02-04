@@ -870,6 +870,7 @@ destruct ca. {
 ...
 *)
 
+(*
 Theorem bsort_loop_repeat_l : ∀ A (ord : A → _) a n la lb,
   transitive ord
   → n ≠ 0
@@ -965,19 +966,29 @@ apply bsort_rank_bsort_rank_loop.
 Compute (map (λ l, (l, bsort_rank Nat.leb (bsort_rank Nat.leb l))) (canon_sym_gr_list_list 3)).
 Search bsort_rank.
 ...
+*)
+
+Theorem permut_app_bsort_rank_app : ∀ ord i l,
+  is_permut_list l
+  → i < length l
+  → ff_app (bsort_rank ord l) (ff_app l i) = i.
+Proof.
+intros * Hp Hil.
+...
 
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
+(*
 intros * Hp.
-...
 remember (bsort_rank Nat.leb l) as l'.
 rewrite <- (bsort_rank_involutive Nat.leb l) at 1.
 subst l'.
 rewrite permut_comp_bsort_rank_leb_r.
 rewrite length_bsort_rank.
 ...
+*)
 intros * Hp.
 apply List_eq_iff.
 rewrite comp_length, seq_length.
