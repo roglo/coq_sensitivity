@@ -196,6 +196,10 @@ Definition is_sym_gr_list n (ll : list (list nat)) :=
    nth i ll [] = nth j ll [] → i = j) ∧
   (∀ l, is_permut n l → l ∈ ll).
 
+...
+
+Definition permut_list_inv l := bsort_rank Nat.leb l.
+
 Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)).
 

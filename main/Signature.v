@@ -2401,6 +2401,8 @@ apply NoDup_butn.
 now destruct Hp.
 Qed.
 
+...
+
 Theorem bsort_rank_is_inv : ∀ ord la,
   is_permut_list la
   → bsort_rank ord la = permut_list_inv la.
