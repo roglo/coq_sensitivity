@@ -2067,6 +2067,106 @@ intros.
 apply length_bsort_loop.
 Qed.
 
+(* *)
+
+Theorem Permutation_cons_bsort_insert : ∀ A (ord : A → _) a la lb,
+  Permutation la lb
+  → Permutation (a :: la) (bsort_insert ord a lb).
+Proof.
+intros * Hab.
+revert a la Hab.
+induction lb as [| b]; intros; cbn. {
+  apply Permutation_sym in Hab.
+  now apply Permutation_nil in Hab; subst la.
+}
+remember (ord a b) as x eqn:Hx; symmetry in Hx.
+destruct x; [ now constructor | ].
+replace (b :: lb) with ([b] ++ lb) in Hab by easy.
+apply Permutation_cons_app with (a := a) in Hab.
+eapply Permutation_trans; [ apply Hab | cbn ].
+apply perm_skip.
+now apply IHlb.
+Qed.
+
+Theorem Permutation_bsort_insert_sorted : ∀ A (ord : A → _) la lb c,
+  Permutation la lb
+  → Permutation (bsort_insert ord c la) (bsort_insert ord c lb).
+Proof.
+intros * Hp.
+revert la Hp.
+induction lb as [| b]; intros; cbn. {
+  now apply Permutation_sym, Permutation_nil in Hp; subst la; cbn.
+}
+remember (ord c b) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Permutation_sym.
+  apply Permutation_cons_bsort_insert.
+  now apply Permutation_sym.
+} {
+  apply Permutation_sym.
+  eapply Permutation_trans. 2: {
+    apply Permutation_cons_bsort_insert.
+    apply Permutation_sym.
+    apply Hp.
+  }
+  replace (c :: b :: lb) with ([c] ++ b :: lb) by easy.
+  eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
+  constructor.
+  apply Permutation_sym.
+  eapply Permutation_trans; [ | apply IHlb; easy ].
+  now apply Permutation_cons_bsort_insert.
+}
+Qed.
+
+Theorem Permutation_bsort_loop_sorted : ∀ A (ord : A → _) la lb lc,
+  Permutation la lb
+  → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc).
+Proof.
+intros * Hp.
+revert la lb Hp.
+induction lc as [| c]; intros; [ easy | cbn ].
+apply IHlc.
+now apply Permutation_bsort_insert_sorted.
+Qed.
+
+Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb,
+  Permutation (la ++ lb) (bsort_loop ord la lb).
+Proof.
+intros.
+revert la.
+induction lb as [| b]; intros; [ now rewrite app_nil_r | ].
+specialize (IHlb (la ++ [b])) as H1.
+rewrite <- app_assoc in H1; cbn in H1.
+eapply Permutation_trans; [ apply H1 | ].
+cbn.
+clear IHlb H1.
+revert lb b.
+induction la as [| a]; intros; [ easy | ].
+cbn.
+remember (ord b a) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Permutation_bsort_loop_sorted.
+  rewrite app_comm_cons.
+  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
+  apply Permutation_app_comm.
+} {
+  apply Permutation_bsort_loop_sorted.
+  constructor.
+  eapply Permutation_trans. 2: {
+    now apply Permutation_cons_bsort_insert.
+  }
+  apply Permutation_app_comm.
+}
+Qed.
+
+Theorem Permutation_bsort : ∀ A (ord : A → _) l, Permutation l (bsort ord l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+specialize Permutation_bsort_loop as H1.
+apply (H1 _ ord [a] l).
+Qed.
+
 (* in bsort *)
 
 Theorem in_bsort_insert : ∀ A (ord : A → A → bool) a b lsorted,
@@ -2503,6 +2603,85 @@ intros a b c Hab Hbc.
 apply Nat.leb_le in Hab, Hbc.
 apply Nat.leb_le.
 now transitivity b.
+Qed.
+
+Theorem sorted_cons : ∀ A (ord : A → _) a la,
+  sorted ord (a :: la) = true → sorted ord la = true.
+Proof.
+intros * Hs.
+cbn in Hs.
+destruct la as [| a']; [ easy | ].
+now apply Bool.andb_true_iff in Hs.
+Qed.
+
+Theorem sorted_app : ∀ A (ord : A → _) la lb,
+  sorted ord (la ++ lb) = true
+  → sorted ord la = true ∧ sorted ord lb = true.
+Proof.
+intros * Htr.
+split. {
+  revert lb Htr.
+  induction la as [| a]; intros; [ easy | ].
+  cbn in Htr |-*.
+  destruct la as [| a']; [ easy | ].
+  cbn in Htr.
+  apply Bool.andb_true_iff in Htr.
+  apply Bool.andb_true_iff.
+  split; [ easy | ].
+  now apply IHla with (lb := lb).
+} {
+  revert lb Htr.
+  induction la as [| a]; intros; [ easy | ].
+  destruct la as [| a']. {
+    cbn in Htr.
+    destruct lb as [| b]; [ easy | ].
+    now apply Bool.andb_true_iff in Htr.
+  }
+  apply IHla.
+  cbn in Htr |-*.
+  now apply Bool.andb_true_iff in Htr.
+}
+Qed.
+
+Theorem sorted_app_trans : ∀ A (ord : A → _),
+  transitive ord
+  → ∀ la lb,
+    sorted ord (la ++ lb) = true
+    → ∀ a, a ∈ la → ∀ b, b ∈ lb → ord a b = true.
+Proof.
+intros * Htr * Hs a Ha b Hb.
+move b before a.
+revert la Hs Ha.
+induction lb as [| b']; intros; [ easy | ].
+replace (b' :: lb) with ([b'] ++ lb) in Hs by easy.
+rewrite app_assoc in Hs.
+destruct Hb as [Hb| Hb]. 2: {
+  apply IHlb with (la := la ++ [b']); [ easy | easy | ].
+  now apply in_or_app; left.
+}
+subst b'.
+clear IHlb.
+rewrite <- app_assoc in Hs.
+cbn in Hs.
+revert a Ha.
+induction la as [| a']; intros; [ easy | ].
+destruct Ha as [Ha| Ha]. 2: {
+  cbn - [ sorted ] in Hs.
+  apply IHla; [ | easy ].
+  now apply sorted_cons in Hs.
+}
+subst a'.
+cbn - [ sorted ] in Hs.
+destruct la as [| a']. {
+  cbn in Hs.
+  now apply Bool.andb_true_iff in Hs.
+}
+apply Htr with (b := a'). {
+  cbn in Hs.
+  now apply Bool.andb_true_iff in Hs.
+}
+apply sorted_cons in Hs.
+apply IHla; [ easy | now left ].
 Qed.
 
 (* end sorted *)

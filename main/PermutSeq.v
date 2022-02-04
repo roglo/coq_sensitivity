@@ -196,12 +196,12 @@ Definition is_sym_gr_list n (ll : list (list nat)) :=
    nth i ll [] = nth j ll [] → i = j) ∧
   (∀ l, is_permut n l → l ∈ ll).
 
-(*
 Definition permut_list_inv l := bsort_rank Nat.leb l.
-*)
 
+(*
 Definition permut_list_inv l :=
   map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)).
+*)
 
 (* *)
 
@@ -243,91 +243,6 @@ destruct x. {
 }
 Qed.
 
-Theorem permut_inv_permut : ∀ n l i,
-  is_permut n l
-  → i < n
-  → ff_app (permut_list_inv l) (ff_app l i) = i.
-Proof.
-intros * (Hp, Hl) Hin.
-revert i l Hp Hl Hin.
-induction n; intros; [ easy | cbn ].
-destruct l as [| a]; [ easy | ].
-destruct i. {
-  unfold ff_app.
-  rewrite List_nth_0_cons.
-  unfold permut_list_inv.
-  rewrite (List_map_nth' 0). 2: {
-    now rewrite seq_length; apply Hp; left.
-  }
-  rewrite seq_nth; [ cbn | now apply Hp; left ].
-  now rewrite Nat.eqb_refl.
-}
-unfold ff_app.
-rewrite List_nth_succ_cons.
-unfold permut_list_inv.
-cbn in Hl.
-apply Nat.succ_inj in Hl.
-apply Nat.succ_lt_mono in Hin.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length.
-  apply Hp; right.
-  apply nth_In; congruence.
-}
-rewrite seq_nth. 2: {
-  apply Hp; right.
-  apply nth_In; congruence.
-}
-rewrite Nat.add_0_l.
-unfold unsome.
-remember (List_rank _ _) as j eqn:Hj.
-symmetry in Hj.
-destruct j as [j| ]. {
-  apply (List_rank_Some 0) in Hj.
-  destruct Hj as (Hjl & Hij & Hj).
-  apply Nat.eqb_eq in Hj.
-  destruct Hp as (Hp1, Hp2).
-  specialize (NoDup_nat _ Hp2 (S i) j) as H1.
-  assert (H : S i < length (a :: l)) by (cbn; rewrite Hl; flia Hin).
-  specialize (H1 H Hjl); clear H.
-  unfold ff_app in H1.
-  rewrite List_nth_succ_cons in H1.
-  now specialize (H1 Hj).
-}
-specialize (List_rank_None 0 _ _ Hj) as H1.
-specialize (H1 (S i)).
-assert (H : S i < length (a :: l)) by (cbn; flia Hin Hl).
-specialize (H1 H); clear H.
-now rewrite Nat.eqb_refl in H1.
-Qed.
-
-Theorem permut_permut_inv : ∀ n l i,
-  is_permut n l
-  → i < n
-  → ff_app l (ff_app (permut_list_inv l) i) = i.
-Proof.
-intros * (Hp, Hl) Hin.
-unfold permut_list_inv, unsome, ff_app.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; congruence ].
-rewrite seq_nth; [ | congruence ].
-rewrite Nat.add_0_l.
-remember (List_rank _ _) as x eqn:Hx; symmetry in Hx.
-destruct x as [x| ]. {
-  apply (List_rank_Some 0) in Hx.
-  destruct Hx as (Hxl & Hbef & Hix).
-  now apply Nat.eqb_eq in Hix.
-} {
-  exfalso.
-  rewrite <- Hl in Hin.
-  apply (permut_list_without Hp Hin).
-  intros j Hj.
-  specialize (List_rank_None 0 _ _ Hx Hj) as H1.
-  now apply Nat.eqb_neq, Nat.neq_sym in H1.
-}
-Qed.
-
-Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
-Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
-
 Theorem comp_length : ∀ la lb,
   length (la ° lb) = length lb.
 Proof.
@@ -335,68 +250,6 @@ intros.
 unfold "°"; cbn.
 now rewrite map_length.
 Qed.
-
-Theorem length_permut_list_inv : ∀ l,
-  length (permut_list_inv l) = length l.
-Proof.
-intros.
-destruct l as [| a]; [ easy | cbn ].
-now rewrite map_length, seq_length.
-Qed.
-
-Theorem comp_permut_inv_l : ∀ l,
-  is_permut_list l
-  → permut_list_inv l ° l = seq 0 (length l).
-Proof.
-intros * Hp.
-apply List_eq_iff.
-rewrite comp_length, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite comp_length ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
-symmetry.
-rewrite nth_indep with (d' := 0); [ | now rewrite seq_length ].
-symmetry.
-unfold "°".
-rewrite (List_map_nth' 0); [ | easy ].
-rewrite seq_nth; [ | easy ].
-now apply (permut_inv_permut (length l)).
-Qed.
-
-Theorem comp_permut_inv_r : ∀ l,
-  is_permut_list l
-  → l ° permut_list_inv l = seq 0 (length l).
-Proof.
-intros * Hp.
-apply List_eq_iff.
-rewrite comp_length, length_permut_list_inv, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow. 2: {
-    now rewrite comp_length, length_permut_list_inv.
-  }
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite nth_indep with (d' := 0). 2: {
-  now rewrite comp_length, length_permut_list_inv.
-}
-symmetry.
-rewrite nth_indep with (d' := 0); [ | now rewrite seq_length ].
-symmetry.
-unfold "°".
-rewrite (List_map_nth' 0); [ | now rewrite length_permut_list_inv ].
-rewrite seq_nth; [ | easy ].
-now apply (permut_permut_inv (length l)).
-Qed.
-
-(* *)
 
 Theorem comp_bsort_rank_r : ∀ ord l,
   l ° bsort_rank ord l = bsort ord l.
@@ -427,106 +280,6 @@ do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
-(* *)
-
-Theorem Permutation_cons_bsort_insert : ∀ A (ord : A → _) a la lb,
-  Permutation la lb
-  → Permutation (a :: la) (bsort_insert ord a lb).
-Proof.
-intros * Hab.
-revert a la Hab.
-induction lb as [| b]; intros; cbn. {
-  apply Permutation_sym in Hab.
-  now apply Permutation_nil in Hab; subst la.
-}
-remember (ord a b) as x eqn:Hx; symmetry in Hx.
-destruct x; [ now constructor | ].
-replace (b :: lb) with ([b] ++ lb) in Hab by easy.
-apply Permutation_cons_app with (a := a) in Hab.
-eapply Permutation_trans; [ apply Hab | cbn ].
-apply perm_skip.
-now apply IHlb.
-Qed.
-
-Theorem Permutation_bsort_insert_sorted : ∀ A (ord : A → _) la lb c,
-  Permutation la lb
-  → Permutation (bsort_insert ord c la) (bsort_insert ord c lb).
-Proof.
-intros * Hp.
-revert la Hp.
-induction lb as [| b]; intros; cbn. {
-  now apply Permutation_sym, Permutation_nil in Hp; subst la; cbn.
-}
-remember (ord c b) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Permutation_sym.
-  apply Permutation_cons_bsort_insert.
-  now apply Permutation_sym.
-} {
-  apply Permutation_sym.
-  eapply Permutation_trans. 2: {
-    apply Permutation_cons_bsort_insert.
-    apply Permutation_sym.
-    apply Hp.
-  }
-  replace (c :: b :: lb) with ([c] ++ b :: lb) by easy.
-  eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
-  constructor.
-  apply Permutation_sym.
-  eapply Permutation_trans; [ | apply IHlb; easy ].
-  now apply Permutation_cons_bsort_insert.
-}
-Qed.
-
-Theorem Permutation_bsort_loop_sorted : ∀ A (ord : A → _) la lb lc,
-  Permutation la lb
-  → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc).
-Proof.
-intros * Hp.
-revert la lb Hp.
-induction lc as [| c]; intros; [ easy | cbn ].
-apply IHlc.
-now apply Permutation_bsort_insert_sorted.
-Qed.
-
-Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb,
-  Permutation (la ++ lb) (bsort_loop ord la lb).
-Proof.
-intros.
-revert la.
-induction lb as [| b]; intros; [ now rewrite app_nil_r | ].
-specialize (IHlb (la ++ [b])) as H1.
-rewrite <- app_assoc in H1; cbn in H1.
-eapply Permutation_trans; [ apply H1 | ].
-cbn.
-clear IHlb H1.
-revert lb b.
-induction la as [| a]; intros; [ easy | ].
-cbn.
-remember (ord b a) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Permutation_bsort_loop_sorted.
-  rewrite app_comm_cons.
-  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
-  apply Permutation_app_comm.
-} {
-  apply Permutation_bsort_loop_sorted.
-  constructor.
-  eapply Permutation_trans. 2: {
-    now apply Permutation_cons_bsort_insert.
-  }
-  apply Permutation_app_comm.
-}
-Qed.
-
-Theorem Permutation_bsort : ∀ A (ord : A → _) l, Permutation l (bsort ord l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-specialize Permutation_bsort_loop as H1.
-apply (H1 _ ord [a] l).
-Qed.
-
 Theorem Permutation_permut : ∀ la lb,
   Permutation la lb
   → is_permut_list la
@@ -555,44 +308,6 @@ split. {
   destruct Ha as (Hap, Hal).
   apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
   now apply H3.
-}
-Qed.
-
-Theorem sorted_cons : ∀ A (ord : A → _) a la,
-  sorted ord (a :: la) = true → sorted ord la = true.
-Proof.
-intros * Hs.
-cbn in Hs.
-destruct la as [| a']; [ easy | ].
-now apply Bool.andb_true_iff in Hs.
-Qed.
-
-Theorem sorted_app : ∀ A (ord : A → _) la lb,
-  sorted ord (la ++ lb) = true
-  → sorted ord la = true ∧ sorted ord lb = true.
-Proof.
-intros * Htr.
-split. {
-  revert lb Htr.
-  induction la as [| a]; intros; [ easy | ].
-  cbn in Htr |-*.
-  destruct la as [| a']; [ easy | ].
-  cbn in Htr.
-  apply Bool.andb_true_iff in Htr.
-  apply Bool.andb_true_iff.
-  split; [ easy | ].
-  now apply IHla with (lb := lb).
-} {
-  revert lb Htr.
-  induction la as [| a]; intros; [ easy | ].
-  destruct la as [| a']. {
-    cbn in Htr.
-    destruct lb as [| b]; [ easy | ].
-    now apply Bool.andb_true_iff in Htr.
-  }
-  apply IHla.
-  cbn in Htr |-*.
-  now apply Bool.andb_true_iff in Htr.
 }
 Qed.
 
@@ -629,47 +344,6 @@ split. {
 } {
   now apply NoDup_app_remove_r in Hl.
 }
-Qed.
-
-Theorem sorted_app_trans : ∀ A (ord : A → _),
-  transitive ord
-  → ∀ la lb,
-    sorted ord (la ++ lb) = true
-    → ∀ a, a ∈ la → ∀ b, b ∈ lb → ord a b = true.
-Proof.
-intros * Htr * Hs a Ha b Hb.
-move b before a.
-revert la Hs Ha.
-induction lb as [| b']; intros; [ easy | ].
-replace (b' :: lb) with ([b'] ++ lb) in Hs by easy.
-rewrite app_assoc in Hs.
-destruct Hb as [Hb| Hb]. 2: {
-  apply IHlb with (la := la ++ [b']); [ easy | easy | ].
-  now apply in_or_app; left.
-}
-subst b'.
-clear IHlb.
-rewrite <- app_assoc in Hs.
-cbn in Hs.
-revert a Ha.
-induction la as [| a']; intros; [ easy | ].
-destruct Ha as [Ha| Ha]. 2: {
-  cbn - [ sorted ] in Hs.
-  apply IHla; [ | easy ].
-  now apply sorted_cons in Hs.
-}
-subst a'.
-cbn - [ sorted ] in Hs.
-destruct la as [| a']. {
-  cbn in Hs.
-  now apply Bool.andb_true_iff in Hs.
-}
-apply Htr with (b := a'). {
-  cbn in Hs.
-  now apply Bool.andb_true_iff in Hs.
-}
-apply sorted_cons in Hs.
-apply IHla; [ easy | now left ].
 Qed.
 
 Theorem sorted_permut : ∀ l,
@@ -802,6 +476,46 @@ apply bsort_rank_ub.
 now intros H; subst l.
 Qed.
 
+Theorem permut_inv_permut : ∀ n l i,
+  is_permut n l
+  → i < n
+  → ff_app (permut_list_inv l) (ff_app l i) = i.
+Proof.
+intros * Hp Hin.
+destruct Hp as (Hp, Hl).
+rewrite <- Hl in Hin.
+now apply permut_app_bsort_rank_app.
+Qed.
+
+Theorem permut_permut_inv : ∀ n l i,
+  is_permut n l
+  → i < n
+  → ff_app l (ff_app (permut_list_inv l) i) = i.
+Proof.
+intros * Hp Hin.
+unfold permut_list_inv.
+destruct Hp as (Hp, Hl).
+specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+rewrite <- Hl in Hin.
+specialize (H1 0 i).
+rewrite seq_nth in H1; [ | easy ].
+unfold "°" in H1.
+rewrite (List_map_nth' 0) in H1; [ easy | ].
+now rewrite length_bsort_rank.
+Qed.
+
+Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
+Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
+
+Theorem length_permut_list_inv : ∀ l,
+  length (permut_list_inv l) = length l.
+Proof.
+intros.
+apply length_bsort_rank.
+Qed.
+
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
@@ -823,6 +537,22 @@ unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite fold_ff_app; cbn.
 now apply permut_app_bsort_rank_app.
+Qed.
+
+Theorem comp_permut_inv_l : ∀ l,
+  is_permut_list l
+  → permut_list_inv l ° l = seq 0 (length l).
+Proof.
+intros * Hp.
+now apply permut_comp_bsort_rank_leb_l.
+Qed.
+
+Theorem comp_permut_inv_r : ∀ l,
+  is_permut_list l
+  → l ° permut_list_inv l = seq 0 (length l).
+Proof.
+intros * Hp.
+now apply permut_comp_bsort_rank_leb_r.
 Qed.
 
 (* transposition *)
@@ -1986,17 +1716,12 @@ Theorem in_permut_list_inv_lt : ∀ l i, i ∈ permut_list_inv l → i < length 
 Proof.
 intros * Hi.
 unfold permut_list_inv in Hi.
-apply in_map_iff in Hi.
-destruct Hi as (j & Hji & Hj).
-apply in_seq in Hj.
-unfold unsome in Hji.
-remember (List_rank _ _) as k eqn:Hk.
-symmetry in Hk.
-destruct k as [k| ]. {
-  subst k.
-  now apply (List_rank_Some 0) in Hk.
-}
-subst i; flia Hj.
+apply (In_nth _ _ 0) in Hi.
+destruct Hi as (j & Hjl & Hji).
+rewrite length_bsort_rank in Hjl.
+rewrite <- Hji.
+apply bsort_rank_ub.
+now intros H; subst l.
 Qed.
 
 Theorem permut_list_inv_inj : ∀ l,
@@ -2005,6 +1730,9 @@ Theorem permut_list_inv_inj : ∀ l,
   → nth i (permut_list_inv l) 0 = nth j (permut_list_inv l) 0
   → i = j.
 Proof.
+intros * Hp * Hi Hj Hij.
+unfold permut_list_inv in Hij.
+...
 intros * Hp * Hi Hj Hij.
 unfold permut_list_inv in Hij.
 rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
