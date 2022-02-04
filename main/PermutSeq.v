@@ -1027,6 +1027,27 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
 ...
 *)
 
+Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
+  is_permut_list l_ini
+  → i < length l_ini
+  → nth (nth i l_ini 0)
+       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i.
+Proof.
+intros * Hp Hil.
+Compute (let l_ini := [3;2;0;1] in let lsorted := [0] in let l := tl l_ini in
+ map (λ i,
+ (nth (nth i l_ini 0)
+       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i))
+(seq 0 (length l_ini))).
+Compute (let l_ini := [3;2;0;1] in let lsorted := [1] in let l := tl l_ini in
+ map (λ i,
+ (nth (nth i l_ini 0)
+       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i))
+(seq 0 (length l_ini))).
+Compute (let l_ini := [3;2;0;1] in let lsorted := [0] in let l := tl l_ini in
+ (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l)).
+...
+
 Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
   → i < length l
