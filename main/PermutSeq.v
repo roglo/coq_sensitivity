@@ -476,6 +476,65 @@ apply bsort_rank_ub.
 now intros H; subst l.
 Qed.
 
+Theorem permut_comp_bsort_rank_leb_l : ∀ l,
+  is_permut_list l
+  → bsort_rank Nat.leb l ° l = seq 0 (length l).
+Proof.
+intros * Hp.
+apply List_eq_iff.
+rewrite comp_length, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite comp_length ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite seq_nth; [ | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
+clear d.
+unfold "°".
+rewrite (List_map_nth' 0); [ | easy ].
+rewrite fold_ff_app; cbn.
+now apply permut_app_bsort_rank_app.
+Qed.
+
+Theorem permut_bsort_rank_app_app : ∀ i l,
+  is_permut_list l
+  → i < length l
+  → ff_app l (ff_app (bsort_rank Nat.leb l) i) = i.
+Proof.
+intros * Hp Hil.
+specialize (permut_comp_bsort_rank_leb_l Hp) as H1.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+specialize (H1 0).
+unfold "°" in H1.
+assert
+  (H2 : ∀ j, j < length l → ff_app (bsort_rank Nat.leb l) (ff_app l j) = j). {
+  intros j Hj.
+  specialize (H1 j).
+  rewrite (List_map_nth' 0) in H1; [ | easy ].
+  now rewrite seq_nth in H1.
+}
+clear H1.
+specialize (H2 (ff_app (bsort_rank Nat.leb l) i)) as H2.
+assert (H : ff_app (bsort_rank Nat.leb l) i < length l). {
+  apply bsort_rank_ub.
+  now intros H; subst l.
+}
+specialize (H2 H); clear H.
+destruct Hp as (Ha, Hp).
+specialize (NoDup_bsort_rank Nat.leb l) as H3.
+apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
+  now rewrite length_bsort_rank.
+}
+rewrite length_bsort_rank.
+apply Ha, nth_In.
+apply bsort_rank_ub.
+now intros H; subst l.
+Qed.
+
 Theorem permut_inv_permut : ∀ n l i,
   is_permut n l
   → i < n
@@ -514,29 +573,6 @@ Theorem length_permut_list_inv : ∀ l,
 Proof.
 intros.
 apply length_bsort_rank.
-Qed.
-
-Theorem permut_comp_bsort_rank_leb_l : ∀ l,
-  is_permut_list l
-  → bsort_rank Nat.leb l ° l = seq 0 (length l).
-Proof.
-intros * Hp.
-apply List_eq_iff.
-rewrite comp_length, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite comp_length ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite seq_nth; [ | easy ].
-rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
-clear d.
-unfold "°".
-rewrite (List_map_nth' 0); [ | easy ].
-rewrite fold_ff_app; cbn.
-now apply permut_app_bsort_rank_app.
 Qed.
 
 Theorem comp_permut_inv_l : ∀ l,

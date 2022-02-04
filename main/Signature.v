@@ -1937,11 +1937,99 @@ Qed.
 Theorem fold_comp_list : ∀ la lb, map (ff_app la) lb = la ° lb.
 Proof. easy. Qed.
 
+Theorem permut_comp_cancel_r : ∀ n la lb lc,
+  is_permut n la
+  → is_permut n lb
+  → is_permut n lc
+  → la ° lc = lb ° lc ↔ la = lb.
+Proof.
+intros * Ha Hb Hc.
+split; [ | now intros; subst la ].
+intros Hab.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct Ha as (Hap, Hal).
+  destruct Hb as (Hbp, Hbl).
+  apply length_zero_iff_nil in Hal, Hbl.
+  congruence.
+}
+apply List_eq_iff in Hab.
+destruct Hab as (_, Hab).
+apply List_eq_iff.
+destruct Ha as (Hap, Hal).
+destruct Hb as (Hbp, Hbl).
+rewrite Hal, <- Hbl.
+split; [ easy | ].
+intros d i.
+specialize (Hab d (nth i (bsort_rank Nat.leb lc) 0)).
+unfold "°" in Hab.
+rewrite (List_map_nth' 0) in Hab. 2: {
+  apply bsort_rank_ub.
+  intros H; subst lc.
+  destruct Hc as (Hcp, Hcl).
+  now symmetry in Hcl.
+}
+rewrite (List_map_nth' 0) in Hab. 2: {
+  apply bsort_rank_ub.
+  intros H; subst lc.
+  destruct Hc as (Hcp, Hcl).
+  now symmetry in Hcl.
+}
+do 2 rewrite fold_ff_app in Hab.
+destruct Hc as (Hcp, Hcl).
+destruct (lt_dec i n) as [Hin| Hin]. 2: {
+  apply Nat.nlt_ge in Hin.
+  rewrite nth_overflow; [ | now rewrite Hal ].
+  rewrite nth_overflow; [ | now rewrite Hbl ].
+  easy.
+}
+rewrite <- Hcl in Hin.
+rewrite permut_bsort_rank_app_app in Hab; [ | easy | easy ].
+rewrite Hcl, <- Hal in Hin.
+rewrite nth_indep with (d' := 0); [ symmetry | easy ].
+rewrite Hal, <- Hbl in Hin.
+rewrite nth_indep with (d' := 0); [ symmetry | easy ].
+easy.
+Qed.
+
 Theorem permut_list_inv_comp : ∀ n la lb,
   is_permut n la
   → is_permut n lb
   → permut_list_inv (la ° lb) = permut_list_inv lb ° permut_list_inv la.
 Proof.
+intros * Ha Hb.
+unfold permut_list_inv.
+apply permut_comp_cancel_r with (n := n) (lc := la).
+...
+Search (ff_app _ (ff_app (bsort_rank _ _) _)).
+...
+Search (nth (nth _ _ _)).
+Search bsort_rank.
+About permut_app_bsort_rank_app.
+...
+do 2 rewrite comp_length in Hab.
+...
+apply List_eq_iff.
+rewrite length_bsort_rank, comp_length.
+rewrite comp_length, length_bsort_rank.
+destruct Ha as (Hap, Hal).
+destruct Hb as (Hbp, Hbl).
+rewrite Hbl, <- Hal.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hia| Hia]. 2: {
+  apply Nat.nlt_ge in Hia.
+  rewrite Hal, <- Hbl in Hia.
+  rewrite nth_overflow. 2: {
+    now rewrite length_bsort_rank, comp_length.
+  }
+  rewrite Hbl, <- Hal in Hia.
+  rewrite nth_overflow. 2: {
+    now rewrite comp_length, length_bsort_rank.
+  }
+  easy.
+}
+...
 intros * Ha Hb.
 unfold permut_list_inv.
 unfold "°", ff_app.
@@ -1965,6 +2053,8 @@ rewrite nth_indep with (d' := 0). 2: {
   now rewrite length_bsort_rank, map_length, Hbl, <- Hal.
 }
 do 3 rewrite fold_ff_app.
+rewrite fold_comp_lt; [ | now rewrite length_bsort_rank ].
+Search bsort_rank.
 ...
 intros * Ha Hb.
 unfold permut_list_inv.
