@@ -977,7 +977,7 @@ Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
        (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lsorted l) 0 = i.
 Proof.
 intros * Hini Hp Hs Hil.
-revert i lsorted Hini Hs Hil.
+revert l_ini i lsorted Hini Hp Hs Hil.
 induction l as [| a]; intros. {
   cbn.
   rewrite app_nil_r in Hini; subst lsorted.
@@ -986,15 +986,43 @@ induction l as [| a]; intros. {
   now rewrite seq_nth.
 }
 cbn.
+destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
+  subst a.
+  destruct lsorted as [| a]. {
+    cbn in Hini.
+    subst l_ini; cbn - [ nth ].
+    destruct i. {
+      rewrite List_nth_0_cons.
+      clear - Hp.
+      induction l as [| a]; [ easy | ].
+      cbn - [ nth ].
+      rewrite List_nth_succ_cons.
+      do 2 rewrite List_nth_0_cons.
+      rewrite if_leb_le_dec.
+      destruct (le_dec a 0) as [Haz| Haz]. {
+        apply Nat.le_0_r in Haz; subst a.
+        destruct Hp as (_, Hp).
+        apply NoDup_cons_iff in Hp.
+        now exfalso; apply Hp; left.
+      }
+      apply Nat.nle_gt in Haz.
 ...
-apply IHl; [ | | easy ]. {
-  rewrite Hini at 1.
-  replace (lsorted ++ a :: l) with ((lsorted ++ [a]) ++ l) by
-    now rewrite <- app_assoc.
-  f_equal.
-  destruct lsorted as [| b]. {
-    cbn.
-(* non *)
+  apply IHl; [ | easy | | easy ]. {
+    rewrite Hini at 1.
+    replace (lsorted ++ 0 :: l) with ((lsorted ++ [0]) ++ l) by
+        now rewrite <- app_assoc.
+    f_equal.
+    destruct lsorted as [| b]; [ easy | ].
+    subst l_ini; cbn - [ nth ].
+    rewrite List_nth_succ_cons.
+    rewrite app_nth2; [ | now unfold ge ].
+    rewrite Nat.sub_diag, List_nth_0_cons.
+    rewrite if_leb_le_dec.
+    destruct (le_dec 0 _) as [H| H]; [ clear H | now apply Nat.nle_gt in H ].
+    f_equal. {
+      clear i Hil.
+...
+    }
 ...
 
 Theorem permut_app_bsort_rank_app : ∀ i l,
