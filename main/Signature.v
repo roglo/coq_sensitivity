@@ -1944,8 +1944,27 @@ Theorem permut_list_inv_comp : ∀ n la lb,
 Proof.
 intros * Ha Hb.
 unfold permut_list_inv.
-unfold "°".
-unfold ff_app.
+unfold "°", ff_app.
+apply List_eq_iff.
+do 2 rewrite map_length, length_bsort_rank.
+destruct Ha as (Hap, Hal).
+destruct Hb as (Hbp, Hbl).
+rewrite Hbl, <- Hal.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hia| Hia]. 2: {
+  apply Nat.nlt_ge in Hia.
+  rewrite Hal, <- Hbl in Hia.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank, map_length ].
+  rewrite Hbl, <- Hal in Hia.
+  rewrite nth_overflow; [ | now rewrite map_length, length_bsort_rank ].
+  easy.
+}
+rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite length_bsort_rank, map_length, Hbl, <- Hal.
+}
+do 3 rewrite fold_ff_app.
 ...
 intros * Ha Hb.
 unfold permut_list_inv.
