@@ -1873,6 +1873,7 @@ unfold ff_app.
 now rewrite (List_map_nth' 0).
 Qed.
 
+(*
 Theorem fold_permut_list_inv : ∀ l,
   map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)) =
   permut_list_inv l.
@@ -1906,6 +1907,7 @@ apply Hp.
 rewrite Hat.
 now apply nth_In.
 Qed.
+*)
 
 Theorem map_ff_app_is_permut_list : ∀ n la lb,
   is_permut n la
@@ -1940,6 +1942,11 @@ Theorem permut_list_inv_comp : ∀ n la lb,
   → is_permut n lb
   → permut_list_inv (la ° lb) = permut_list_inv lb ° permut_list_inv la.
 Proof.
+intros * Ha Hb.
+unfold permut_list_inv.
+unfold "°".
+unfold ff_app.
+...
 intros * Ha Hb.
 unfold permut_list_inv.
 rewrite comp_length.
@@ -2084,27 +2091,6 @@ Proof.
 intros.
 unfold collapse.
 rewrite length_permut_list_inv.
-apply length_bsort_rank.
-Qed.
-
-Theorem bsort_rank_is_permut : ∀ l,
-  is_permut (length l) (bsort_rank Nat.leb l).
-Proof.
-intros.
-split. {
-  split. {
-    intros i Hi.
-    rewrite length_bsort_rank.
-    apply (In_nth _ _ 0) in Hi.
-    rewrite length_bsort_rank in Hi.
-    destruct Hi as (ia & Hial & Hia).
-    rewrite <- Hia.
-    apply bsort_rank_ub.
-    now intros H; rewrite H in Hial.
-  } {
-    apply NoDup_bsort_rank.
-  }
-}
 apply length_bsort_rank.
 Qed.
 

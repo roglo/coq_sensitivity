@@ -1732,42 +1732,29 @@ Theorem permut_list_inv_inj : ∀ l,
 Proof.
 intros * Hp * Hi Hj Hij.
 unfold permut_list_inv in Hij.
-...
-intros * Hp * Hi Hj Hij.
-unfold permut_list_inv in Hij.
-rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-rewrite seq_nth in Hij; [ | easy ].
-rewrite seq_nth in Hij; [ | easy ].
-do 2 rewrite Nat.add_0_l in Hij.
-unfold unsome in Hij.
-remember (List_rank (Nat.eqb i) l) as x eqn:Hx.
-remember (List_rank (Nat.eqb j) l) as y eqn:Hy.
-move y before x.
-symmetry in Hx, Hy.
-destruct x as [x| ]. {
-  apply (List_rank_Some 0) in Hx.
-  destruct Hx as (Hxl & Hxbef & Hxwhi).
-  destruct y as [y| ]. {
-    apply (List_rank_Some 0) in Hy.
-    destruct Hy as (Hyl & Hybef & Hywhi).
-    apply Nat.eqb_eq in Hxwhi, Hywhi.
-    destruct Hij; congruence.
+rewrite <- (length_bsort_rank Nat.leb) in Hi, Hj.
+now apply (NoDup_nat _ (NoDup_bsort_rank _ _)) in Hij.
+Qed.
+
+Theorem bsort_rank_is_permut : ∀ l,
+  is_permut (length l) (bsort_rank Nat.leb l).
+Proof.
+intros.
+split. {
+  split. {
+    intros i Hi.
+    rewrite length_bsort_rank.
+    apply (In_nth _ _ 0) in Hi.
+    rewrite length_bsort_rank in Hi.
+    destruct Hi as (ia & Hial & Hia).
+    rewrite <- Hia.
+    apply bsort_rank_ub.
+    now intros H; rewrite H in Hial.
+  } {
+    apply NoDup_bsort_rank.
   }
-  subst x; exfalso.
-  apply (permut_list_without Hp Hj).
-  intros k Hk.
-  specialize (List_rank_None 0 _ _ Hy Hk) as H1.
-  apply Nat.eqb_neq in H1.
-  now apply Nat.neq_sym.
-} {
-  exfalso.
-  apply (permut_list_without Hp Hi).
-  intros k Hk.
-  specialize (List_rank_None 0 _ _ Hx Hk) as H1.
-  apply Nat.eqb_neq in H1.
-  now apply Nat.neq_sym.
 }
+apply length_bsort_rank.
 Qed.
 
 Theorem permut_list_inv_is_permut_list : ∀ l,
@@ -1775,16 +1762,8 @@ Theorem permut_list_inv_is_permut_list : ∀ l,
   → is_permut_list (permut_list_inv l).
 Proof.
 intros * Hl.
-split. {
-  intros i Hi.
-  rewrite length_permut_list_inv.
-  now apply in_permut_list_inv_lt.
-} {
-  apply nat_NoDup.
-  rewrite length_permut_list_inv.
-  intros i j Hi Hj Hij.
-  now apply permut_list_inv_inj in Hij.
-}
+unfold permut_list_inv.
+apply bsort_rank_is_permut.
 Qed.
 
 Theorem permut_list_inv_is_permut : ∀ n l,
