@@ -870,22 +870,23 @@ destruct ca. {
 ...
 *)
 
-Theorem bsort_loop_repeat_l : ∀ A (ord : A → _) a n l,
+Theorem bsort_loop_repeat_l : ∀ A (ord : A → _) a n la lb,
   transitive ord
   → n ≠ 0
-  → bsort_loop ord (repeat a n) l = repeat a n ++ l
-  → bsort_loop ord (repeat a (S n)) l = repeat a (S n) ++ l.
+  → bsort_loop ord (la ++ repeat a n) lb = la ++ repeat a n ++ lb
+  → bsort_loop ord (la ++ repeat a (S n)) lb = la ++ repeat a (S n) ++ lb.
 Proof.
 intros * Htr Hnz Hbr; cbn.
-revert l Hnz Hbr.
+revert a la lb Hnz Hbr.
 induction n; intros; [ easy | cbn in Hbr |-* ].
 clear Hnz.
 destruct n. {
   clear IHn.
   cbn in Hbr |-*.
-  revert a Hbr.
-  induction l as [| b]; intros; [ easy | cbn ].
+  revert a la Hbr.
+  induction lb as [| b]; intros; [ easy | cbn ].
   cbn in Hbr.
+...
   remember (ord b a) as ba eqn:Hba; symmetry in Hba.
   destruct ba. {
     destruct l as [| c]. {
