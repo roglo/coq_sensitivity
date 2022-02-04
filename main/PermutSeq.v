@@ -968,24 +968,34 @@ Search bsort_rank.
 ...
 *)
 
-(*
 Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
   l_ini = lsorted ++ l
   → is_permut_list l_ini
+  → sorted Nat.leb lsorted = true
   → i < length l_ini
   → nth (nth i l_ini 0)
        (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lsorted l) 0 = i.
 Proof.
-intros * Hini Hp Hil.
-revert i lsorted Hini Hil.
+intros * Hini Hp Hs Hil.
+revert i lsorted Hini Hs Hil.
 induction l as [| a]; intros. {
   cbn.
   rewrite app_nil_r in Hini; subst lsorted.
-  destruct l_ini as [| a]; [ easy | cbn ].
-  destruct i; cbn.
-  destruct a; [ easy | cbn ].
+  rewrite (sorted_permut Hp Hs).
+  rewrite seq_nth; [ now rewrite seq_nth | ].
+  now rewrite seq_nth.
+}
+cbn.
 ...
-*)
+apply IHl; [ | | easy ]. {
+  rewrite Hini at 1.
+  replace (lsorted ++ a :: l) with ((lsorted ++ [a]) ++ l) by
+    now rewrite <- app_assoc.
+  f_equal.
+  destruct lsorted as [| b]. {
+    cbn.
+(* non *)
+...
 
 Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
