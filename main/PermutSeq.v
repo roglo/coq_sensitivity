@@ -770,386 +770,38 @@ rewrite comp_bsort_rank_r.
 now apply permut_bsort_leb.
 Qed.
 
-(*
-Theorem permut_app_bsort_rank_loop_app : ∀ l_ini lrank l i,
-  is_permut_list l_ini
-  → length lrank + length l = length l_ini
-  → length lrank ≤ i < length l_ini
-  → ff_app (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lrank l)
-       (ff_app l_ini i) = i.
-Proof.
-intros * Hini Hll Hil.
-revert lrank i Hll Hil.
-induction l as [| a]; intros; cbn. {
-  rewrite Nat.add_0_r in Hll.
-  flia Hll Hil.
-}
-cbn in Hll.
-rewrite <- Nat.add_succ_comm in Hll.
-destruct (Nat.eq_dec i (length lrank)) as [Hir| Hir]. 2: {
-  apply IHl; [ now rewrite length_bsort_rank_insert | ].
-  rewrite length_bsort_rank_insert.
-  split; [ flia Hil Hir | easy ].
-}
-destruct Hil as (_, Hil).
-clear IHl.
-Search bsort.
-Check bsort_bsort_rank.
-...
-sorted ord lsorted = true
-sorted_rank...
-lsorted = map (λ i, nth i l d) (lsorted_rank ord l)
-...
-
-Theorem permut_app_bsort_rank_app : ∀ l i,
-  is_permut_list l
-  → i < length l
-  → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
-Proof.
-intros * Hp Hil.
-destruct l as [| d]; [ easy | ].
-cbn - [ nth ].
-remember (d :: l) as l' eqn:Hl'.
-...
-*)
-
-(*
-Theorem sorted_bsorted_loop_idemp : ∀ A (ord : A → _) lsorted l,
-  total_order ord
-  → sorted ord (lsorted ++ l) = true
-  → bsort_loop ord lsorted l = lsorted ++ l.
-Proof.
-intros * Hto Hs.
-revert lsorted Hs.
-induction l as [| a]; intros; [ now rewrite app_nil_r | cbn ].
-replace (lsorted ++ a :: l) with ((lsorted ++ [a]) ++ l) in Hs by now rewrite <- app_assoc.
-specialize (IHl (lsorted ++ [a]) Hs) as H1.
-rewrite <- app_assoc in Hs, H1; cbn in Hs, H1.
-rewrite <- H1.
-clear IHl H1.
-revert a lsorted Hs.
-induction l as [| b]; intros; cbn. {
-  specialize bsort_insert_is_sorted as H1.
-  specialize (H1 A ord a lsorted Hto).
-  assert (H : sorted ord lsorted = true) by now apply sorted_app in Hs.
-  specialize (H1 H); clear H.
-  revert a Hs H1.
-  induction lsorted as [| b]; intros; [ easy | cbn ].
-  remember (ord a b) as x eqn:Hx; symmetry in Hx.
-  destruct x. {
-    exfalso.
-    cbn in Hs, H1.
-    rewrite Hx in H1.
-    remember (lsorted ++ [a]) as la eqn:Hla.
-    symmetry in Hla.
-    destruct la as [| c]; [ now apply app_eq_nil in Hla | ].
-    clear IHlsorted.
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hbc, Hscl).
-    rewrite <- Hla in Hscl.
-...
-*)
-
-(*
-Theorem bsort_loop_cons_cons : ∀ A (ord : A → _) a b lsorted l,
-  ord a b = true
-  → bsort_loop ord (b :: lsorted) l = b :: lsorted ++ l
-  → bsort_loop ord (a :: b :: lsorted) l = a :: b :: lsorted ++ l.
-Proof.
-intros * Hab Hs.
-revert a b lsorted Hab Hs.
-induction l as [| c]; intros; [ now rewrite app_nil_r | ].
-remember (b :: lsorted) as l'; cbn; subst l'.
-remember (ord c a) as ca eqn:Hca; symmetry in Hca.
-destruct ca. {
-  cbn in Hs.
-  remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
-  destruct cb. {
-(* donc ça marche pas¸ ça ; c'est pas assez général,
-   c'est pas la bonne généralité *)
-...
-*)
-
-(*
-Theorem bsort_loop_repeat_l : ∀ A (ord : A → _) a n la lb,
-  transitive ord
-  → n ≠ 0
-  → bsort_loop ord (la ++ repeat a n) lb = la ++ repeat a n ++ lb
-  → bsort_loop ord (la ++ repeat a (S n)) lb = la ++ repeat a (S n) ++ lb.
-Proof.
-intros * Htr Hnz Hbr; cbn.
-revert a la lb Hnz Hbr.
-induction n; intros; [ easy | cbn in Hbr |-* ].
-clear Hnz.
-destruct n. {
-  clear IHn.
-  cbn in Hbr |-*.
-  revert a la Hbr.
-  induction lb as [| b]; intros; [ easy | cbn ].
-  cbn in Hbr.
-...
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba. {
-    destruct l as [| c]. {
-      cbn in Hbr.
-      now injection Hbr; clear Hbr; intros; subst b.
-    }
-    cbn in IHl, Hbr |-*.
-    remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
-    destruct cb. {
-      specialize (IHl a) as H1.
-      rewrite (Htr c b a) in H1; [ | easy | easy ].
-...
-
-Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
-  antisymmetric ord
-  → sorted ord l = true
-  → bsort ord l = l.
-Proof.
-intros * Han Hs.
-induction l as [| a]; [ easy | cbn in Hs |-* ].
-destruct l as [| b]; [ easy | cbn ].
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (Hab, Hs).
-specialize (IHl Hs).
-remember (ord b a) as ba eqn:Hba; symmetry in Hba.
-move Hba before Hab.
-cbn in IHl.
-destruct ba. {
-  apply Han in Hba.
-  specialize (Hba Hab); subst b.
-  rename Hab into Haa.
-  clear IHl.
-  induction l as [| b]; [ easy | cbn ].
-  remember (ord b a) as ba eqn:Hba.
-  symmetry in Hba.
-  destruct ba. {
-    remember (b :: l) as l'; cbn in Hs; subst l'.
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hab, Hs).
-    apply Han in Hba.
-    specialize (Hba Hab); subst b.
-    specialize (IHl Hs).
-...
-    now apply (bsort_loop_repeat_l ord a 2 l).
-...
-now apply bsort_loop_cons_cons.
-...
-destruct l as [| a]; [ easy | cbn ].
-now rewrite sorted_bsorted_loop_idemp.
-...
-
-Theorem bsort_rank_bsort_rank_loop : ∀ ord l_ini lrank l,
-  bsort ord (lrank ++ l) = bsort ord l_ini
-  → sorted ord lrank = true
-  → bsort_rank ord (bsort_rank_loop ord (λ i, nth i l_ini 0) lrank l) = l_ini.
-Proof.
-intros * Hll Hsl.
-revert lrank Hll Hsl.
-induction l as [| a]; intros; cbn. {
-  rewrite app_nil_r in Hll.
-...
-rewrite sorted_bsorted_idemp in Hll; [ | easy ].
-(* aucun intérêt *)
-...
-
-Theorem bsort_rank_involutive : ∀ ord l,
-  bsort_rank ord (bsort_rank ord l) = l.
-Proof.
-intros.
-destruct l as [| d]; [ easy | ].
-cbn - [ nth ].
-rewrite bsort_rank_loop_nth_indep with (d' := 0).
-...
-apply bsort_rank_bsort_rank_loop.
-...
-Compute (map (λ l, (l, bsort_rank Nat.leb (bsort_rank Nat.leb l))) (canon_sym_gr_list_list 3)).
-Search bsort_rank.
-...
-*)
-
-(*
-Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
-  l_ini = lsorted ++ l
-  → is_permut_list l_ini
-  → sorted Nat.leb lsorted = true
-  → i < length l_ini
-  → nth (nth i l_ini 0)
-       (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lsorted l) 0 = i.
-Proof.
-intros * Hini Hp Hs Hil.
-revert l_ini i lsorted Hini Hp Hs Hil.
-induction l as [| a]; intros. {
-  cbn.
-  rewrite app_nil_r in Hini; subst lsorted.
-  rewrite (sorted_permut Hp Hs).
-  rewrite seq_nth; [ now rewrite seq_nth | ].
-  now rewrite seq_nth.
-}
-cbn.
-destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
-  subst a.
-  destruct lsorted as [| a]. {
-    cbn in Hini.
-    subst l_ini; cbn - [ nth ].
-    destruct i. {
-      rewrite List_nth_0_cons.
-      clear - Hp.
-      induction l as [| a]; [ easy | ].
-      cbn - [ nth ].
-      rewrite List_nth_succ_cons.
-      do 2 rewrite List_nth_0_cons.
-      rewrite if_leb_le_dec.
-      destruct (le_dec a 0) as [Haz| Haz]. {
-        apply Nat.le_0_r in Haz; subst a.
-        destruct Hp as (_, Hp).
-        apply NoDup_cons_iff in Hp.
-        now exfalso; apply Hp; left.
-      }
-      apply Nat.nle_gt in Haz.
-...
-  apply IHl; [ | easy | | easy ]. {
-    rewrite Hini at 1.
-    replace (lsorted ++ 0 :: l) with ((lsorted ++ [0]) ++ l) by
-        now rewrite <- app_assoc.
-    f_equal.
-    destruct lsorted as [| b]; [ easy | ].
-    subst l_ini; cbn - [ nth ].
-    rewrite List_nth_succ_cons.
-    rewrite app_nth2; [ | now unfold ge ].
-    rewrite Nat.sub_diag, List_nth_0_cons.
-    rewrite if_leb_le_dec.
-    destruct (le_dec 0 _) as [H| H]; [ clear H | now apply Nat.nle_gt in H ].
-    f_equal. {
-      clear i Hil.
-...
-    }
-...
-*)
-
-Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
-  is_permut_list l_ini
-  → i < length l_ini
-  → nth (nth i l_ini 0)
-       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i.
-Proof.
-intros * Hp Hil.
-Compute (let l_ini := [3;2;0;1] in let lsorted := [0] in let l := tl l_ini in
- map (λ i,
- (nth (nth i l_ini 0)
-       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i))
-(seq 0 (length l_ini))).
-Compute (let l_ini := [3;2;0;1] in let lsorted := [1] in let l := tl l_ini in
- map (λ i,
- (nth (nth i l_ini 0)
-       (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l) 0 = i))
-(seq 0 (length l_ini))).
-Compute (let l_ini := [3;2;0;1] in let lsorted := [0] in let l := tl l_ini in
- (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l_ini 0) lsorted l)).
-...
-
 Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
   → i < length l
   → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
 Proof.
 intros * Hp Hil.
-unfold ff_app.
-destruct l as [| d]; [ easy | ].
-cbn - [ nth bsort_rank_loop ].
-rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
-remember (d :: l) as l_ini eqn:Hini.
-clear l d Hini.
-...
-now apply permut_nth_nth_bsort_rank_loop.
-...
-intros * Hp Hil.
-unfold ff_app.
-revert l Hp Hil.
-induction i; intros. {
-  destruct l as [| a]; [ easy | ].
-  cbn - [ nth ].
-  rewrite List_nth_0_cons.
-...
-intros * Hp Hil.
-unfold ff_app.
-revert i Hil.
-induction l as [| a]; intros; [ easy | ].
-cbn - [ nth ].
-...
-intros * Hp Hil.
-unfold ff_app.
-destruct l as [| a]; [ easy | ].
-cbn - [ nth ].
-destruct i. {
-  rewrite List_nth_0_cons.
-  destruct l as [| b]. {
-    destruct a; [ easy | now destruct a ].
-  }
-  cbn - [ nth ].
-  rewrite List_nth_succ_cons.
-  do 2 rewrite List_nth_0_cons.
-  rewrite if_leb_le_dec.
-  destruct (le_dec b a) as [Hba| Hba]. {
-    destruct a. {
-      apply Nat.le_0_r in Hba; subst b; cbn.
-      destruct Hp as (_, Hp).
-      apply NoDup_cons_iff in Hp.
-      destruct Hp as (Hp, _).
-      now exfalso; apply Hp; left.
-    }
-    destruct l as [| c]. {
-      destruct a; [ easy | now destruct a ].
-    }
-    cbn - [ nth ].
-    do 3 rewrite List_nth_succ_cons.
-    do 3 rewrite List_nth_0_cons.
-    do 2 rewrite if_leb_le_dec.
-    destruct (le_dec c b) as [Hcb| Hcb]. {
-      destruct l as [| d]. {
-        cbn.
-        destruct a. 2: {
-          destruct a; [ easy | now destruct a ].
-        }
-        apply Nat.le_1_r in Hba.
-        destruct Hba as [Hba| Hba]. {
-          subst b.
-          apply Nat.le_0_r in Hcb.
-          subst c.
-          destruct Hp as (_, Hp).
-          apply NoDup_cons_iff in Hp.
-          destruct Hp as (_, Hp).
-          apply NoDup_cons_iff in Hp.
-          now exfalso; apply Hp; left.
-        }
-        subst b.
-        destruct Hp as (_, Hp).
-        apply NoDup_cons_iff in Hp.
-        now exfalso; apply Hp; left.
-      }
-      cbn - [ nth ].
-...
-
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba. {
-    destruct l as [| c]. {
-      destruct a. {
-        cbn.
-...
+specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+specialize (H1 0).
+unfold "°" in H1.
+assert
+  (H2 : ∀ j, j < length l → ff_app l (ff_app (bsort_rank Nat.leb l) j) = j). {
+  intros j Hj.
+  specialize (H1 j).
+  rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+  now rewrite seq_nth in H1.
+}
+clear H1.
+specialize (H2 (ff_app l i)) as H2.
+assert (H : ff_app l i < length l) by now apply Hp, nth_In.
+specialize (H2 H); clear H.
+destruct Hp as (Ha, Hp).
+apply (NoDup_nat _ Hp) in H2; [ easy | | easy ].
+apply bsort_rank_ub.
+now intros H; subst l.
+Qed.
 
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
-(*
-intros * Hp.
-remember (bsort_rank Nat.leb l) as l'.
-rewrite <- (bsort_rank_involutive Nat.leb l) at 1.
-subst l'.
-rewrite permut_comp_bsort_rank_leb_r.
-rewrite length_bsort_rank.
-...
-*)
 intros * Hp.
 apply List_eq_iff.
 rewrite comp_length, seq_length.
@@ -1166,63 +818,8 @@ clear d.
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite fold_ff_app; cbn.
-...
 now apply permut_app_bsort_rank_app.
-...
-destruct l as [| d]; [ easy | ].
-cbn - [ nth ].
-remember (d :: l) as l' eqn:Hl'.
-unfold ff_app.
-Print bsort_rank_loop.
-...
-rewrite bsort_rank_loop_nth_indep with (d' := 0).
-apply nth_nth_bsort_rank_loop_nat.
-...
-  Hp : is_permut_list l'
-  i : nat
-  Hil : i < length l'
-  ============================
-  nth (nth i l' 0) (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 l' d) [0] l) 0 = i
-...
-clear l Hl'.
-rename l' into l.
-...
-Compute (map (λ l, bsort_rank Nat.leb l ° l) (canon_sym_gr_list_list 4)).
-...
-specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
-unfold "°" in H1.
-apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
-rewrite seq_nth in H1; [ | easy ].
-cbn in H1.
-rewrite fold_ff_app in H1.
-...
-specialize (bsort_bsort_rank Nat.leb 0 l) as H1.
-apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
-rewrite permut_bsort_leb in H1; [ | easy ].
-rewrite seq_nth in H1; [ | easy ].
-symmetry in H1.
-do 2 rewrite fold_ff_app in H1.
-...
-Compute (let l := [3;0;2;1] in (bsort_rank Nat.leb l ° l = seq 0 (length l))).
-...
-specialize (bsort_bsort_rank Nat.leb 0 l) as H1.
-apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
-do 3 rewrite fold_ff_app in H1.
-...
-Compute (let l := [3;7;2;8] in (map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i)) (seq 0 (length l)))).
-Compute (map (λ l, map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i)) (seq 0 (length l))) (canon_sym_gr_list_list 4)).
-...
-specialize (bsort_bsort_rank ord 0 l) as H1.
-apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
-do 3 rewrite fold_ff_app in H1.
-easy.
 Qed.
-
-...
 
 (* transposition *)
 
