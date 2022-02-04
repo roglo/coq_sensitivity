@@ -850,6 +850,7 @@ induction l as [| b]; intros; cbn. {
 ...
 *)
 
+(*
 Theorem bsort_loop_cons_cons : ∀ A (ord : A → _) a b lsorted l,
   ord a b = true
   → bsort_loop ord (b :: lsorted) l = b :: lsorted ++ l
@@ -866,6 +867,36 @@ destruct ca. {
   destruct cb. {
 (* donc ça marche pas¸ ça ; c'est pas assez général,
    c'est pas la bonne généralité *)
+...
+*)
+
+Theorem bsort_loop_repeat_l : ∀ A (ord : A → _) a n l,
+  transitive ord
+  → n ≠ 0
+  → bsort_loop ord (repeat a n) l = repeat a n ++ l
+  → bsort_loop ord (repeat a (S n)) l = repeat a (S n) ++ l.
+Proof.
+intros * Htr Hnz Hbr; cbn.
+revert l Hnz Hbr.
+induction n; intros; [ easy | cbn in Hbr |-* ].
+clear Hnz.
+destruct n. {
+  clear IHn.
+  cbn in Hbr |-*.
+  revert a Hbr.
+  induction l as [| b]; intros; [ easy | cbn ].
+  cbn in Hbr.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    destruct l as [| c]. {
+      cbn in Hbr.
+      now injection Hbr; clear Hbr; intros; subst b.
+    }
+    cbn in IHl, Hbr |-*.
+    remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb. {
+      specialize (IHl a) as H1.
+      rewrite (Htr c b a) in H1; [ | easy | easy ].
 ...
 
 Theorem sorted_bsorted_idemp : ∀ A (ord : A → _) l,
@@ -897,6 +928,8 @@ destruct ba. {
     apply Han in Hba.
     specialize (Hba Hab); subst b.
     specialize (IHl Hs).
+...
+    now apply (bsort_loop_repeat_l ord a 2 l).
 ...
 now apply bsort_loop_cons_cons.
 ...
