@@ -968,6 +968,7 @@ Search bsort_rank.
 ...
 *)
 
+(*
 Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
   l_ini = lsorted ++ l
   → is_permut_list l_ini
@@ -1024,6 +1025,7 @@ destruct (Nat.eq_dec a 0) as [Haz| Haz]. {
 ...
     }
 ...
+*)
 
 Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
@@ -1036,7 +1038,7 @@ destruct l as [| d]; [ easy | ].
 cbn - [ nth bsort_rank_loop ].
 rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
 remember (d :: l) as l_ini eqn:Hini.
-clear l Hini.
+clear l d Hini.
 ...
 now apply permut_nth_nth_bsort_rank_loop.
 ...
