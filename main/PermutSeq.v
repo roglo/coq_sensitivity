@@ -968,13 +968,24 @@ Search bsort_rank.
 ...
 *)
 
+(*
 Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
   l_ini = lsorted ++ l
   → is_permut_list l_ini
   → i < length l_ini
   → nth (nth i l_ini 0)
        (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lsorted l) 0 = i.
-Admitted.
+Proof.
+intros * Hini Hp Hil.
+revert i lsorted Hini Hil.
+induction l as [| a]; intros. {
+  cbn.
+  rewrite app_nil_r in Hini; subst lsorted.
+  destruct l_ini as [| a]; [ easy | cbn ].
+  destruct i; cbn.
+  destruct a; [ easy | cbn ].
+...
+*)
 
 Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
@@ -984,25 +995,12 @@ Proof.
 intros * Hp Hil.
 unfold ff_app.
 destruct l as [| d]; [ easy | ].
-cbn - [ nth ].
-rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | ]. 2: {
-  intros j Hj.
-  destruct Hj as [Hj| Hj]; [ | easy ].
-  now subst j; cbn.
-}
+cbn - [ nth bsort_rank_loop ].
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
 remember (d :: l) as l_ini eqn:Hini.
+clear l Hini.
 ...
-destruct i. {
-  rewrite List_nth_0_cons.
-  destruct l as [| a]. {
-    destruct d; [ easy | now destruct d ].
-  }
-  remember (a :: l) as l'; cbn; subst l'.
-...
-remember (d :: l) as l_ini eqn:Hini.
-...
-apply permut_nth_nth_bsort_rank_loop; [ | easy | easy ].
-(* non *)
+now apply permut_nth_nth_bsort_rank_loop.
 ...
 intros * Hp Hil.
 unfold ff_app.
