@@ -991,6 +991,16 @@ rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | ]. 2: {
   now subst j; cbn.
 }
 remember (d :: l) as l_ini eqn:Hini.
+...
+destruct i. {
+  rewrite List_nth_0_cons.
+  destruct l as [| a]. {
+    destruct d; [ easy | now destruct d ].
+  }
+  remember (a :: l) as l'; cbn; subst l'.
+...
+remember (d :: l) as l_ini eqn:Hini.
+...
 apply permut_nth_nth_bsort_rank_loop; [ | easy | easy ].
 (* non *)
 ...
