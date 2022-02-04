@@ -968,12 +968,104 @@ Search bsort_rank.
 ...
 *)
 
-Theorem permut_app_bsort_rank_app : ∀ ord i l,
+Theorem permut_nth_nth_bsort_rank_loop : ∀ l_ini lsorted l i,
+  l_ini = lsorted ++ l
+  → is_permut_list l_ini
+  → i < length l_ini
+  → nth (nth i l_ini 0)
+       (bsort_rank_loop Nat.leb (λ j, nth j l_ini 0) lsorted l) 0 = i.
+Admitted.
+
+Theorem permut_app_bsort_rank_app : ∀ i l,
   is_permut_list l
   → i < length l
-  → ff_app (bsort_rank ord l) (ff_app l i) = i.
+  → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
 Proof.
 intros * Hp Hil.
+unfold ff_app.
+destruct l as [| d]; [ easy | ].
+cbn - [ nth ].
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | ]. 2: {
+  intros j Hj.
+  destruct Hj as [Hj| Hj]; [ | easy ].
+  now subst j; cbn.
+}
+remember (d :: l) as l_ini eqn:Hini.
+apply permut_nth_nth_bsort_rank_loop; [ | easy | easy ].
+(* non *)
+...
+intros * Hp Hil.
+unfold ff_app.
+revert l Hp Hil.
+induction i; intros. {
+  destruct l as [| a]; [ easy | ].
+  cbn - [ nth ].
+  rewrite List_nth_0_cons.
+...
+intros * Hp Hil.
+unfold ff_app.
+revert i Hil.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+...
+intros * Hp Hil.
+unfold ff_app.
+destruct l as [| a]; [ easy | ].
+cbn - [ nth ].
+destruct i. {
+  rewrite List_nth_0_cons.
+  destruct l as [| b]. {
+    destruct a; [ easy | now destruct a ].
+  }
+  cbn - [ nth ].
+  rewrite List_nth_succ_cons.
+  do 2 rewrite List_nth_0_cons.
+  rewrite if_leb_le_dec.
+  destruct (le_dec b a) as [Hba| Hba]. {
+    destruct a. {
+      apply Nat.le_0_r in Hba; subst b; cbn.
+      destruct Hp as (_, Hp).
+      apply NoDup_cons_iff in Hp.
+      destruct Hp as (Hp, _).
+      now exfalso; apply Hp; left.
+    }
+    destruct l as [| c]. {
+      destruct a; [ easy | now destruct a ].
+    }
+    cbn - [ nth ].
+    do 3 rewrite List_nth_succ_cons.
+    do 3 rewrite List_nth_0_cons.
+    do 2 rewrite if_leb_le_dec.
+    destruct (le_dec c b) as [Hcb| Hcb]. {
+      destruct l as [| d]. {
+        cbn.
+        destruct a. 2: {
+          destruct a; [ easy | now destruct a ].
+        }
+        apply Nat.le_1_r in Hba.
+        destruct Hba as [Hba| Hba]. {
+          subst b.
+          apply Nat.le_0_r in Hcb.
+          subst c.
+          destruct Hp as (_, Hp).
+          apply NoDup_cons_iff in Hp.
+          destruct Hp as (_, Hp).
+          apply NoDup_cons_iff in Hp.
+          now exfalso; apply Hp; left.
+        }
+        subst b.
+        destruct Hp as (_, Hp).
+        apply NoDup_cons_iff in Hp.
+        now exfalso; apply Hp; left.
+      }
+      cbn - [ nth ].
+...
+
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    destruct l as [| c]. {
+      destruct a. {
+        cbn.
 ...
 
 Theorem permut_comp_bsort_rank_leb_l : ∀ l,
