@@ -2032,7 +2032,7 @@ apply permut_comp_cancel_r with (n := n) (lc := la). {
 rewrite <- (@permut_comp_assoc n); [ | | easy ]. 2: {
   now rewrite length_bsort_rank; destruct Ha.
 }
-rewrite permut_comp_bsort_rank_leb_l; [ | now destruct Ha ].
+rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
 rewrite comp_1_r. 2: {
   rewrite length_bsort_rank.
   destruct Ha as (Hap, Hal).
@@ -2051,12 +2051,12 @@ apply permut_comp_cancel_r with (n := n) (lc := lb). {
   easy.
 }
 rewrite <- (@permut_comp_assoc n); [ | now destruct Ha | easy ].
-rewrite permut_comp_bsort_rank_leb_l. 2: {
+rewrite permut_comp_bsort_rank_l. 2: {
   now apply (comp_is_permut_list n).
 }
 rewrite comp_length.
 symmetry.
-apply permut_comp_bsort_rank_leb_l.
+apply permut_comp_bsort_rank_l.
 now destruct Hb.
 Qed.
 
@@ -2410,6 +2410,7 @@ apply NoDup_butn.
 now destruct Hp.
 Qed.
 
+(*
 Theorem bsort_rank_of_last : ∀ ord n la i,
   is_permut (S n) la
   → i ≤ n
@@ -2417,6 +2418,10 @@ Theorem bsort_rank_of_last : ∀ ord n la i,
   → ff_app (bsort_rank ord la) n = i.
 Proof.
 intros * Hla Hin Hlin.
+rewrite <- Hlin.
+Search (ff_app (bsort_rank _ _)).
+(* ord must be Nat.leb *)
+apply permut_app_bsort_rank_app.
 ...
 revert la i Hla Hin Hlin.
 induction n; intros. {
@@ -2432,6 +2437,28 @@ specialize (permut_without_highest Hla) as H1.
 destruct H1 as (j & Hjl & Hjn & Hb).
 rewrite fold_ff_app in Hjn.
 ...
+*)
+
+Theorem permut_bsort_rank_involutive : ∀ la,
+  is_permut_list la
+  → bsort_rank Nat.leb (bsort_rank Nat.leb la) = la.
+Proof.
+intros * Hp.
+remember (bsort_rank Nat.leb la) as lb eqn:Hlb.
+apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
+  apply bsort_rank_is_permut.
+} {
+  now rewrite Hlb, length_bsort_rank.
+} {
+  rewrite Hlb, length_bsort_rank.
+  apply bsort_rank_is_permut.
+}
+subst lb.
+rewrite comp_bsort_rank_r.
+rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut ].
+rewrite length_bsort_rank; symmetry.
+now apply permut_bsort_leb.
+Qed.
 
 Theorem permut_collapse : ∀ la,
   is_permut_list la
@@ -2439,145 +2466,17 @@ Theorem permut_collapse : ∀ la,
 Proof.
 intros * Ha.
 unfold collapse.
-remember (length la) as len eqn:Hlen.
-symmetry in Hlen.
-revert la Ha Hlen.
-induction len; intros; cbn. {
-  now apply length_zero_iff_nil in Hlen; subst la.
-}
-assert (H1 : is_permut (S len) la) by easy.
-destruct (permut_without_highest H1) as (i & Hia & Hilen & Hip).
-destruct Hip as (Hip, Hil).
-specialize (IHlen (butn i la) Hip Hil).
-assert (Hla : la = firstn i la ++ len :: skipn (S i) la). {
-  assert (Hfs : length (firstn i la ++ len :: skipn (S i) la) = length la). {
-    rewrite app_length, firstn_length; cbn - [ skipn ].
-    rewrite skipn_length.
-    rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
-    rewrite <- Nat.add_succ_comm.
-    rewrite Nat.add_sub_assoc; [ | easy ].
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  apply List_eq_iff.
-  split; [ easy | ].
-  intros d j.
-  destruct (lt_dec j (length la)) as [Hja| Hja]. 2: {
-    apply Nat.nlt_ge in Hja.
-    rewrite nth_overflow; [ | easy ].
-    rewrite nth_overflow; [ easy | ].
-    now rewrite Hfs.
-  }
-  destruct (lt_dec j i) as [Hji| Hji]. {
-    rewrite app_nth1. 2: {
-      rewrite firstn_length.
-      rewrite Nat.min_l; [ easy | now apply Nat.lt_le_incl ].
-    }
-    now symmetry; apply List_nth_firstn.
-  }
-  apply Nat.nlt_ge in Hji.
-  rewrite app_nth2. 2: {
-    rewrite firstn_length.
-    rewrite Nat.min_l; [ easy | now apply Nat.lt_le_incl ].
-  }
-  rewrite firstn_length.
-  rewrite Nat.min_l; [ | now apply Nat.lt_le_incl ].
-  destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-    subst j; rewrite Nat.sub_diag; cbn.
-    rewrite <- Hilen.
-    now apply nth_indep.
-  }
-  replace (j - i) with (S (j - S i)) by flia Hji Hij.
-  rewrite List_nth_succ_cons.
-  rewrite List_nth_skipn.
-  rewrite Nat.sub_add; [ easy | flia Hji Hij ].
-}
-apply List_eq_iff.
-rewrite length_permut_list_inv, length_bsort_rank.
-split; [ easy | ].
-intros d j.
-Check permut_permut_inv.
-destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
-  apply Nat.nlt_ge in Hjla.
-  rewrite nth_overflow. 2: {
-    now rewrite length_permut_list_inv, length_bsort_rank.
-  }
-  now symmetry; apply nth_overflow.
-}
-rewrite nth_indep with (d' := 0). 2: {
-  now rewrite length_permut_list_inv, length_bsort_rank.
-}
-symmetry.
-rewrite nth_indep with (d' := 0); [ | easy ].
-symmetry.
-do 2 rewrite fold_ff_app.
-(*
-rewrite fold_collapse.
-rewrite fold_collapse in IHlen.
-*)
-apply List_eq_iff in IHlen.
-destruct IHlen as (_, Hdi).
-rewrite Hla.
-rewrite <- Hla at 1.
-unfold ff_app.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
-  rewrite app_nth2. 2: {
-    rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
-    now unfold ge.
-  }
-  rewrite firstn_length, Nat.min_l; [ | now apply Nat.lt_le_incl ].
-  rewrite Nat.sub_diag; cbn - [ skipn ].
-  specialize (bsort_rank_is_permut la) as H2.
-  specialize (permut_list_inv_is_permut (length la) H2) as H4.
-  destruct H2 as ((H2, H3), _).
-  destruct H4 as (H4, H5).
-  apply (NoDup_nat _ H3). {
-    rewrite length_bsort_rank, <- H5.
-    apply H4, nth_In.
-    now rewrite H5.
-  } {
-    now rewrite length_bsort_rank, Hlen.
-  }
-  rewrite fold_ff_app.
-  rewrite (permut_permut_inv (length la)); [ | | easy ]. 2: {
-    split; [ easy | ].
-    apply length_bsort_rank.
-  }
-Search bsort_rank.
-...
-symmetry.
-now apply bsort_rank_of_last.
-...
-  destruct H4 as (H4, H6).
-  apply (NoDup_nat _ H6).
-(* ff_app (permut_list_inv (bsort_rank Nat.leb la)) i = len ? *)
-...
-  rewrite <- Hilen, fold_ff_app; symmetry.
-  destruct H4 as (H4, H6).
-  apply (NoDup_nat _ H6).
-Search bsort_rank.
-...
-  specialize permut_list_inv_is_permut_list as H3.
-  specialize (H3 _ H2).
-  destruct H3 as (H3, H4).
-  apply (NoDup_nat _ H4). {
-    apply H3, nth_In.
-    now rewrite length_permut_list_inv, length_bsort_rank.
-  } {
-    now rewrite length_permut_list_inv, length_bsort_rank, Hlen.
-  }
-...
+unfold permut_list_inv.
+now apply permut_bsort_rank_involutive.
+Qed.
 
 Theorem collapse_idemp : ∀ la,
   collapse (collapse la) = collapse la.
 Proof.
 intros.
-...
 apply permut_collapse.
 apply collapse_is_permut.
 Qed.
-
-...
 
 Theorem ff_app_collapse_map : ∀ la lb,
   NoDup la

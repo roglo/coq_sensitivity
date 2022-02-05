@@ -476,7 +476,7 @@ apply bsort_rank_ub.
 now intros H; subst l.
 Qed.
 
-Theorem permut_comp_bsort_rank_leb_l : ∀ l,
+Theorem permut_comp_bsort_rank_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
@@ -505,7 +505,7 @@ Theorem permut_bsort_rank_app_app : ∀ i l,
   → ff_app l (ff_app (bsort_rank Nat.leb l) i) = i.
 Proof.
 intros * Hp Hil.
-specialize (permut_comp_bsort_rank_leb_l Hp) as H1.
+specialize (permut_comp_bsort_rank_l Hp) as H1.
 apply List_eq_iff in H1.
 destruct H1 as (_, H1).
 specialize (H1 0).
@@ -580,7 +580,7 @@ Theorem comp_permut_inv_l : ∀ l,
   → permut_list_inv l ° l = seq 0 (length l).
 Proof.
 intros * Hp.
-now apply permut_comp_bsort_rank_leb_l.
+now apply permut_comp_bsort_rank_l.
 Qed.
 
 Theorem comp_permut_inv_r : ∀ l,
