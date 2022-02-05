@@ -2181,10 +2181,39 @@ unfold collapse.
 specialize (bsort_rank_is_permut l) as Hr.
 apply Nat.nlt_ge; intros Hc1.
 remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
-remember (ff_app (bsort_rank Nat.leb l) i) as i' eqn:Hi'.
+remember (ff_app lrank i) as i' eqn:Hi'.
 assert (Hii' : i = ff_app lrank i'). {
-  subst i'; rewrite Hlr; symmetry.
+  subst i'; symmetry.
+  rewrite Hlr.
+  assert (bsort_rank Nat.leb l ° bsort_rank Nat.leb l = seq 0 (length l)).
+Search (bsort_rank _ _ ° _).
+Compute (let l := [42;12;0;7] in bsort_rank Nat.leb l ° bsort_rank Nat.leb l).
+(* ah bin non, c'est pas bon *)
+...
+  enough (bsort_rank Nat.leb l ° bsort_rank Nat.leb l = seq 0 (length l)). {
+    unfold "°" in H.
+    apply List_eq_iff in H.
+    destruct H as (_, H).
+    assert
+      (H' : ∀ i, i < length l →
+       ff_app (bsort_rank Nat.leb l) (ff_app (bsort_rank Nat.leb l) i) = i). {
+      intros k Hk.
+      specialize (H 0 k).
+      rewrite seq_nth in H; [ | easy ].
+      rewrite (List_map_nth' 0) in H; [ | now rewrite length_bsort_rank ].
+      easy.
+    }
+    clear H.
+    now apply H'.
+  }
+...
   specialize permut_bsort_rank_involutive as H1.
+specialize (H1 lrank).
+assert (H : is_permut_list lrank). {
+  rewrite Hlr.
+  apply bsort_rank_is_permut.
+}
+specialize (H1 H); clear H.
 ...
 Search (nth _ (bsort_rank _ _)).
 Search (ff_app (bsort_rank _ _)).
