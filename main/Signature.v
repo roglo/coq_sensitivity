@@ -2170,12 +2170,27 @@ rewrite length_bsort_rank; symmetry.
 now apply permut_bsort_leb.
 Qed.
 
+Theorem bsort_rank_lt_compat : ∀ l i j,
+  i < length l
+  → j < length l
+  → ff_app l i < ff_app l j
+  → ff_app (bsort_rank Nat.leb l) i < ff_app (bsort_rank Nat.leb l) j.
+Proof.
+intros * Hi Hj Hij.
+...
+
 Theorem collapse_lt_le_compat : ∀ l i j,
   i < length l
   → j < length l
   → ff_app l i < ff_app l j
   → ff_app (collapse l) i ≤ ff_app (collapse l) j.
 Proof.
+intros l j i Hj Hi Hc2.
+unfold collapse.
+...
+apply Nat.lt_le_incl.
+now apply bsort_rank_lt_compat.
+...
 intros l j i Hj Hi Hc2.
 unfold collapse.
 specialize (bsort_rank_is_permut l) as Hr.
