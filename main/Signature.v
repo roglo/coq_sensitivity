@@ -2170,6 +2170,22 @@ rewrite length_bsort_rank; symmetry.
 now apply permut_bsort_leb.
 Qed.
 
+Theorem bsort_rank_loop_lt_compat : ∀ lrank l i j,
+  length lrank ≤ i < length (lrank ++ l)
+  → length lrank ≤ j < length (lrank ++ l)
+  → ff_app l i < ff_app l j
+  → ff_app (bsort_rank_loop Nat.leb (λ k, nth k l 0) lrank l) i <
+    ff_app (bsort_rank_loop Nat.leb (λ k, nth k l 0) lrank l) j.
+Proof.
+intros * Hi Hj Hij.
+revert lrank i j Hi Hj Hij.
+induction l as [| a]; intros. {
+  unfold ff_app in Hij.
+  now do 2 rewrite List_nth_nil in Hij.
+}
+cbn - [ nth ].
+...
+
 Theorem bsort_rank_lt_compat : ∀ l i j,
   i < length l
   → j < length l
@@ -2183,6 +2199,8 @@ remember (d :: l) as l' eqn:Hl'.
 rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
 clear l d Hl'.
 rename l' into l.
+...
+now apply bsort_rank_loop_lt_compat.
 ...
 
 Theorem collapse_lt_le_compat : ∀ l i j,
