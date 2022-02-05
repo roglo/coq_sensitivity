@@ -2177,6 +2177,12 @@ Theorem bsort_rank_lt_compat : ∀ l i j,
   → ff_app (bsort_rank Nat.leb l) i < ff_app (bsort_rank Nat.leb l) j.
 Proof.
 intros * Hi Hj Hij.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+clear l d Hl'.
+rename l' into l.
 ...
 
 Theorem collapse_lt_le_compat : ∀ l i j,
