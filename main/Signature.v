@@ -1783,12 +1783,9 @@ apply butn_is_permut; [ easy | | ]. {
 } {
   specialize (@permut_list_inv_is_permut_list l) as H1.
   destruct Hl as (H2, H3).
-...
-  specialize (H1 H2).
   destruct H1 as (H4, H5).
   rewrite length_permut_list_inv in H4.
-  apply H4.
-  apply nth_In.
+  apply H4, nth_In.
   now rewrite length_permut_list_inv, H3.
 }
 Qed.
@@ -2085,10 +2082,7 @@ Qed.
 Theorem collapse_is_permut : ∀ l, is_permut (length l) (collapse l).
 Proof.
 intros.
-apply permut_list_inv_is_permut.
-About permut_list_inv_is_permut.
-...
-apply bsort_rank_is_permut.
+now apply permut_list_inv_is_permut.
 Qed.
 
 Theorem nth_ff_app_bsort_rank : ∀ A d ord (l : list A) i,
@@ -2155,6 +2149,27 @@ apply Htr with (b := nth (S i) l d). 2: {
 apply sorted_rel; [ easy | flia Hj ].
 Qed.
 
+Theorem permut_bsort_rank_involutive : ∀ la,
+  is_permut_list la
+  → bsort_rank Nat.leb (bsort_rank Nat.leb la) = la.
+Proof.
+intros * Hp.
+remember (bsort_rank Nat.leb la) as lb eqn:Hlb.
+apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
+  apply bsort_rank_is_permut.
+} {
+  now rewrite Hlb, length_bsort_rank.
+} {
+  rewrite Hlb, length_bsort_rank.
+  apply bsort_rank_is_permut.
+}
+subst lb.
+rewrite comp_bsort_rank_r.
+rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut ].
+rewrite length_bsort_rank; symmetry.
+now apply permut_bsort_leb.
+Qed.
+
 Theorem collapse_lt_le_compat : ∀ l i j,
   i < length l
   → j < length l
@@ -2162,15 +2177,25 @@ Theorem collapse_lt_le_compat : ∀ l i j,
   → ff_app (collapse l) i ≤ ff_app (collapse l) j.
 Proof.
 intros l j i Hj Hi Hc2.
-specialize (collapse_is_permut l) as Hc.
+unfold collapse.
 specialize (bsort_rank_is_permut l) as Hr.
 apply Nat.nlt_ge; intros Hc1.
-    unfold collapse in Hc1.
-    remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
-    remember (ff_app (collapse l) i) as i' eqn:Hi'.
-    assert (Hii' : i = ff_app lrank i'). {
-      subst i'; unfold collapse.
+remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
+remember (ff_app (bsort_rank Nat.leb l) i) as i' eqn:Hi'.
+assert (Hii' : i = ff_app lrank i'). {
+  subst i'; rewrite Hlr; symmetry.
+  specialize permut_bsort_rank_involutive as H1.
+...
+Search (nth _ (bsort_rank _ _)).
+Search (ff_app (bsort_rank _ _)).
+Check permut_inv_permut.
+...
+  subst i'; unfold collapse.
+rewrite Hlr; symmetry.
+Search (ff_app
       rewrite <- Hlr; symmetry.
+Check permut_permut_inv.
+      apply (permut_permut_inv (length l)).
       now apply (permut_permut_inv (length l)).
     }
     rewrite Hii' in Hc1.
@@ -2405,27 +2430,6 @@ destruct H1 as (j & Hjl & Hjn & Hb).
 rewrite fold_ff_app in Hjn.
 ...
 *)
-
-Theorem permut_bsort_rank_involutive : ∀ la,
-  is_permut_list la
-  → bsort_rank Nat.leb (bsort_rank Nat.leb la) = la.
-Proof.
-intros * Hp.
-remember (bsort_rank Nat.leb la) as lb eqn:Hlb.
-apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
-  apply bsort_rank_is_permut.
-} {
-  now rewrite Hlb, length_bsort_rank.
-} {
-  rewrite Hlb, length_bsort_rank.
-  apply bsort_rank_is_permut.
-}
-subst lb.
-rewrite comp_bsort_rank_r.
-rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut ].
-rewrite length_bsort_rank; symmetry.
-now apply permut_bsort_leb.
-Qed.
 
 Theorem permut_collapse : ∀ la,
   is_permut_list la
