@@ -196,15 +196,6 @@ Definition is_sym_gr_list n (ll : list (list nat)) :=
    nth i ll [] = nth j ll [] → i = j) ∧
   (∀ l, is_permut n l → l ∈ ll).
 
-Definition permut_list_inv l := bsort_rank Nat.leb l.
-
-(*
-Definition permut_list_inv l :=
-  map (λ i, unsome 0 (List_rank (Nat.eqb i) l)) (seq 0 (length l)).
-*)
-
-(* *)
-
 Theorem permut_list_without : ∀ n l,
   is_permut_list l
   → n < length l
@@ -538,7 +529,7 @@ Qed.
 Theorem permut_inv_permut : ∀ n l i,
   is_permut n l
   → i < n
-  → ff_app (permut_list_inv l) (ff_app l i) = i.
+  → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
 Proof.
 intros * Hp Hin.
 destruct Hp as (Hp, Hl).
@@ -549,10 +540,9 @@ Qed.
 Theorem permut_permut_inv : ∀ n l i,
   is_permut n l
   → i < n
-  → ff_app l (ff_app (permut_list_inv l) i) = i.
+  → ff_app l (ff_app (bsort_rank Nat.leb l) i) = i.
 Proof.
 intros * Hp Hin.
-unfold permut_list_inv.
 destruct Hp as (Hp, Hl).
 specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
 apply List_eq_iff in H1.
@@ -569,7 +559,7 @@ Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
 Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
 
 Theorem length_permut_list_inv : ∀ l,
-  length (permut_list_inv l) = length l.
+  length (bsort_rank Nat.leb l) = length l.
 Proof.
 intros.
 apply length_bsort_rank.
@@ -577,7 +567,7 @@ Qed.
 
 Theorem comp_permut_inv_l : ∀ l,
   is_permut_list l
-  → permut_list_inv l ° l = seq 0 (length l).
+  → bsort_rank Nat.leb l ° l = seq 0 (length l).
 Proof.
 intros * Hp.
 now apply permut_comp_bsort_rank_l.
@@ -585,7 +575,7 @@ Qed.
 
 Theorem comp_permut_inv_r : ∀ l,
   is_permut_list l
-  → l ° permut_list_inv l = seq 0 (length l).
+  → l ° bsort_rank Nat.leb l = seq 0 (length l).
 Proof.
 intros * Hp.
 now apply permut_comp_bsort_rank_leb_r.
@@ -1748,10 +1738,10 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
 easy.
 Qed.
 
-Theorem in_permut_list_inv_lt : ∀ l i, i ∈ permut_list_inv l → i < length l.
+Theorem in_permut_list_inv_lt :
+  ∀ l i, i ∈ bsort_rank Nat.leb l → i < length l.
 Proof.
 intros * Hi.
-unfold permut_list_inv in Hi.
 apply (In_nth _ _ 0) in Hi.
 destruct Hi as (j & Hjl & Hji).
 rewrite length_bsort_rank in Hjl.
@@ -1763,11 +1753,10 @@ Qed.
 Theorem permut_list_inv_inj : ∀ l,
   is_permut_list l
   → ∀ i j, i < length l → j < length l
-  → nth i (permut_list_inv l) 0 = nth j (permut_list_inv l) 0
+  → nth i (bsort_rank Nat.leb l) 0 = nth j (bsort_rank Nat.leb l) 0
   → i = j.
 Proof.
 intros * Hp * Hi Hj Hij.
-unfold permut_list_inv in Hij.
 rewrite <- (length_bsort_rank Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_bsort_rank _ _)) in Hij.
 Qed.
@@ -1794,21 +1783,19 @@ apply length_bsort_rank.
 Qed.
 
 Theorem permut_list_inv_is_permut_list : ∀ l,
-  is_permut_list l
-  → is_permut_list (permut_list_inv l).
+  is_permut_list (bsort_rank Nat.leb l).
 Proof.
-intros * Hl.
-unfold permut_list_inv.
+intros.
 apply bsort_rank_is_permut.
 Qed.
 
 Theorem permut_list_inv_is_permut : ∀ n l,
-  is_permut n l
-  → is_permut n (permut_list_inv l).
+  length l = n
+  → is_permut n (bsort_rank Nat.leb l).
 Proof.
 intros * Hl.
-split; [ now apply permut_list_inv_is_permut_list; destruct Hl | ].
-now rewrite length_permut_list_inv; destruct Hl.
+split; [ now apply permut_list_inv_is_permut_list | ].
+now rewrite length_bsort_rank.
 Qed.
 
 Theorem permut_list_Permutation : ∀ l n,
@@ -1822,15 +1809,15 @@ induction n; intros. {
   now apply length_zero_iff_nil in Hln; subst l.
 }
 rewrite seq_S; cbn.
-remember (ff_app (permut_list_inv l) n) as i eqn:Hi.
+remember (ff_app (bsort_rank Nat.leb l) n) as i eqn:Hi.
 rewrite (List_map_ff_app_seq l).
 remember (seq 0 n) as s eqn:Hs.
 rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
   split; [ easy | ].
-  rewrite <- length_permut_list_inv.
-  apply permut_list_ub; [ | rewrite length_permut_list_inv, Hln; flia ].
+  rewrite <- (length_bsort_rank Nat.leb).
+  apply permut_list_ub; [ | rewrite length_bsort_rank, Hln; flia ].
   now apply permut_list_inv_is_permut_list.
 }
 rewrite Nat.sub_0_r; cbn.
@@ -1844,9 +1831,9 @@ rewrite Hln; cbn.
 assert (Hin : i ≤ n). {
   apply Nat.lt_succ_r.
   rewrite Hi, <- Hln.
-  rewrite <- length_permut_list_inv.
-  apply permut_list_ub; [ apply permut_list_inv_is_permut_list, Hp | ].
-  now rewrite length_permut_list_inv, Hln.
+  rewrite <- (length_bsort_rank Nat.leb).
+  apply permut_list_ub; [ apply permut_list_inv_is_permut_list | ].
+  now rewrite length_bsort_rank, Hln.
 }
 apply IHn. 2: {
   rewrite map_length, app_length, seq_length, seq_length.
