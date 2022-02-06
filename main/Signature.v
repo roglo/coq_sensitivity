@@ -2066,8 +2066,28 @@ assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
   apply bsort_rank_is_permut.
   now destruct Hb.
 }
-(**)
+remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
+apply permut_comp_cancel_r with (n := n) (lc := bsort_rank Nat.leb lc). {
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  now apply comp_is_permut.
+} {
+  now apply bsort_rank_is_permut; destruct Hapb.
+}
+rewrite <- (@permut_comp_assoc n); cycle 1. {
+  now destruct Hapb.
+} {
+  now apply bsort_rank_is_permut; destruct Hapb.
+}
+rewrite permut_comp_bsort_rank_r; [ | now destruct Hapb ].
+rewrite comp_1_r. 2: {
+  rewrite length_bsort_rank.
+  destruct Hb, Hapb; congruence.
+}
+subst lc.
 ...
+(**)
 apply permut_comp_cancel_r with (n := n) (lc := la). {
   apply bsort_rank_is_permut.
   now rewrite comp_length; destruct Hb.
