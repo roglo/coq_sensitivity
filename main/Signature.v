@@ -2029,6 +2029,7 @@ Theorem permut_comp_permut_list_inv : ∀ l,
 Proof.
 intros * Hp.
 now apply permut_comp_bsort_rank_leb_r.
+Qed.
 
 Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
 Proof.
@@ -2218,16 +2219,28 @@ now apply bsort_rank_loop_lt_compat.
 *)
 *)
 
-Theorem collapse_lt_le_compat : ∀ l i j,
+Theorem collapse_lt_compat : ∀ l i j,
   i < length l
   → j < length l
   → ff_app l i < ff_app l j
-  → ff_app (collapse l) i ≤ ff_app (collapse l) j.
+  → ff_app (collapse l) i < ff_app (collapse l) j.
 Proof.
 intros l j i Hj Hi Hc2.
 specialize (collapse_is_permut l) as Hc.
 specialize (bsort_rank_is_permut l) as Hr.
-apply Nat.nlt_ge; intros Hc1.
+apply Nat.nle_gt; intros Hc1.
+destruct (Nat.eq_dec (ff_app (collapse l) i) (ff_app (collapse l) j))
+  as [H| H]. {
+  destruct Hc as ((Hca, Hcn), Hcl).
+  apply (NoDup_nat _ Hcn) in H; cycle 1. {
+    now rewrite length_collapse.
+  } {
+    now rewrite length_collapse.
+  }
+  now subst j; apply Nat.lt_irrefl in Hc2.
+}
+assert (H' : ff_app (collapse l) i < ff_app (collapse l) j) by flia Hc1 H.
+clear Hc1 H; rename H' into Hc1.
 unfold collapse in Hc1.
 remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
 remember (ff_app (collapse l) i) as i' eqn:Hi'.
@@ -2292,8 +2305,6 @@ rewrite <- Hlr in Hc2.
 now apply Nat.nle_gt in Hc2.
 Qed.
 
-...
-
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
   → i < length l
@@ -2326,7 +2337,7 @@ destruct c1. {
   } {
     apply Nat.compare_gt_iff in Hc2.
     apply Nat.nle_gt in Hc1; apply Hc1.
-    now apply collapse_lt_le_compat.
+    now apply Nat.lt_le_incl, collapse_lt_compat.
   }
 } {
   apply Nat.compare_gt_iff in Hc1.
@@ -2338,7 +2349,7 @@ destruct c1. {
   } {
     apply Nat.compare_lt_iff in Hc2.
     apply Nat.nle_gt in Hc1; apply Hc1.
-    now apply collapse_lt_le_compat.
+    now apply Nat.lt_le_incl, collapse_lt_compat.
   }
 }
 Qed.
@@ -2377,6 +2388,8 @@ rewrite signature_comp_fun_expand_2_1; try easy.
 rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
+
+...
 
 Theorem fold_collapse : ∀ l,
   permut_list_inv (bsort_rank Nat.leb l) = collapse l.
