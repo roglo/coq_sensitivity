@@ -2054,6 +2054,7 @@ Qed.
    And
       collapse is a permutation
       it is the invert permutation of bsort_rank
+      i.e. bsort_rank of bsort_rank
       bsort_rank ord l = rank of the elements in the sorted list
       e.g.
         bsort_rank Nat.leb [19;3;7;6] = [1;3;2;0] means thatn
@@ -2064,7 +2065,7 @@ Qed.
         - and so on
 *)
 
-Definition collapse l := bsort_rank Nat.leb l.
+Definition collapse l := bsort_rank Nat.leb (bsort_rank Nat.leb l).
 
 (*
 Compute (let l := [19;3;7;6] in (collapse l, bsort_rank Nat.leb l)).
@@ -2076,13 +2077,14 @@ Theorem length_collapse : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
 unfold collapse.
-apply length_permut_list_inv.
+now do 2 rewrite length_bsort_rank.
 Qed.
 
 Theorem collapse_is_permut : ∀ l, is_permut (length l) (collapse l).
 Proof.
 intros.
-now apply permut_list_inv_is_permut.
+apply permut_list_inv_is_permut.
+apply length_bsort_rank.
 Qed.
 
 Theorem nth_ff_app_bsort_rank : ∀ A d ord (l : list A) i,
@@ -2093,14 +2095,6 @@ intros * Hil.
 rewrite (bsort_bsort_rank _ d).
 rewrite (List_map_nth' 0); [ easy | ].
 now rewrite length_bsort_rank.
-Qed.
-
-Theorem Nat_leb_transitive : transitive Nat.leb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.leb_le in Hab, Hbc.
-apply Nat.leb_le.
-now transitivity b.
 Qed.
 
 Theorem sorted_rel : ∀ A (d : A) ord l,
@@ -2170,6 +2164,7 @@ rewrite length_bsort_rank; symmetry.
 now apply permut_bsort_leb.
 Qed.
 
+(*
 Theorem bsort_rank_loop_lt_compat : ∀ lrank l i j,
   length lrank ≤ i < length (lrank ++ l)
   → length lrank ≤ j < length (lrank ++ l)
@@ -2185,13 +2180,31 @@ induction l as [| a]; intros. {
 }
 cbn - [ nth ].
 ...
+*)
 
-Theorem bsort_rank_lt_compat : ∀ l i j,
-  i < length l
+(*
+Theorem permut_bsort_rank_lt_compat : ∀ l i j,
+  is_permut_list l
+  → i < length l
   → j < length l
   → ff_app l i < ff_app l j
   → ff_app (bsort_rank Nat.leb l) i < ff_app (bsort_rank Nat.leb l) j.
 Proof.
+intros * Hp Hi Hj Hij.
+remember (ff_app l i) as i' eqn:Hi'.
+assert (Hii' : i = ff_app (bsort_rank Nat.leb l) i'). {
+  rewrite Hi'; symmetry.
+Search (ff_app (bsort_rank _ _)).
+Search (bsort_rank _ _ ° _).
+Compute (let l := [7;2;5;6] in (l, bsort_rank Nat.leb l)).
+Compute (let l := [7;2;5;6] in bsort_rank Nat.leb (bsort_rank Nat.leb l)).
+Compute (let l := [7;2;5;6] in bsort_rank Nat.leb (bsort_rank Nat.leb (bsort_rank Nat.leb l))).
+Compute (let l := [7;2;5;6] in map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i) = i) (seq 0 (length l))).
+Print is_permut_list.
+...
+  apply permut_inv_permut with (n := length l).
+...
+(*
 intros * Hi Hj Hij.
 destruct l as [| d]; [ easy | ].
 cbn - [ bsort_rank_loop nth ].
@@ -2202,6 +2215,8 @@ rename l' into l.
 ...
 now apply bsort_rank_loop_lt_compat.
 ...
+*)
+*)
 
 Theorem collapse_lt_le_compat : ∀ l i j,
   i < length l
@@ -2210,117 +2225,74 @@ Theorem collapse_lt_le_compat : ∀ l i j,
   → ff_app (collapse l) i ≤ ff_app (collapse l) j.
 Proof.
 intros l j i Hj Hi Hc2.
-unfold collapse.
-...
-apply Nat.lt_le_incl.
-now apply bsort_rank_lt_compat.
-...
-intros l j i Hj Hi Hc2.
-unfold collapse.
+specialize (collapse_is_permut l) as Hc.
 specialize (bsort_rank_is_permut l) as Hr.
 apply Nat.nlt_ge; intros Hc1.
+unfold collapse in Hc1.
 remember (bsort_rank Nat.leb l) as lrank eqn:Hlr.
-remember (ff_app lrank i) as i' eqn:Hi'.
+remember (ff_app (collapse l) i) as i' eqn:Hi'.
 assert (Hii' : i = ff_app lrank i'). {
-  subst i'; symmetry.
-  rewrite Hlr.
-  assert (bsort_rank Nat.leb l ° bsort_rank Nat.leb l = seq 0 (length l)).
-Search (bsort_rank _ _ ° _).
-Compute (let l := [42;12;0;7] in bsort_rank Nat.leb l ° bsort_rank Nat.leb l).
-(* ah bin non, c'est pas bon *)
-...
-  enough (bsort_rank Nat.leb l ° bsort_rank Nat.leb l = seq 0 (length l)). {
-    unfold "°" in H.
-    apply List_eq_iff in H.
-    destruct H as (_, H).
-    assert
-      (H' : ∀ i, i < length l →
-       ff_app (bsort_rank Nat.leb l) (ff_app (bsort_rank Nat.leb l) i) = i). {
-      intros k Hk.
-      specialize (H 0 k).
-      rewrite seq_nth in H; [ | easy ].
-      rewrite (List_map_nth' 0) in H; [ | now rewrite length_bsort_rank ].
-      easy.
-    }
-    clear H.
-    now apply H'.
-  }
-...
-  specialize permut_bsort_rank_involutive as H1.
-specialize (H1 lrank).
-assert (H : is_permut_list lrank). {
-  rewrite Hlr.
-  apply bsort_rank_is_permut.
-}
-specialize (H1 H); clear H.
-...
-Search (nth _ (bsort_rank _ _)).
-Search (ff_app (bsort_rank _ _)).
-Check permut_inv_permut.
-...
   subst i'; unfold collapse.
-rewrite Hlr; symmetry.
-Search (ff_app
-      rewrite <- Hlr; symmetry.
-Check permut_permut_inv.
-      apply (permut_permut_inv (length l)).
-      now apply (permut_permut_inv (length l)).
-    }
-    rewrite Hii' in Hc1.
-    rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
-      rewrite Hi'.
-      destruct Hc as ((Hca, Hcn), Hcl).
-      rewrite Hcl in Hca.
-      apply Hca, nth_In.
-      now rewrite Hcl.
-    }
-    remember (ff_app (collapse l) j) as j' eqn:Hj'.
-    assert (Hjj' : j = ff_app lrank j'). {
-      subst j'; unfold collapse.
-      rewrite <- Hlr; symmetry.
-      now apply (permut_permut_inv (length l)).
-    }
-    rewrite Hjj' in Hc1.
-    rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
-      rewrite Hj'.
-      destruct Hc as ((Hca, Hcn), Hcl).
-      rewrite Hcl in Hca.
-      apply Hca, nth_In.
-      now rewrite Hcl.
-    }
-    rewrite Hii', Hjj' in Hc2.
-    rewrite Hlr in Hc2.
-    unfold ff_app in Hc2 at 1 3.
-    assert (Hi'l : i' < length l). {
-      rewrite Hi'.
-      destruct Hc as ((Hca, Hcn), Hcl).
-      rewrite Hcl in Hca.
-      apply Hca, nth_In.
-      now rewrite length_collapse.
-    }
-    assert (Hj'l : j' < length l). {
-      rewrite Hj'.
-      destruct Hc as ((Hca, Hcn), Hcl).
-      rewrite Hcl in Hca.
-      apply Hca, nth_In.
-      now rewrite length_collapse.
-    }
-    rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
-    rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
-    specialize bsort_is_sorted as Hsl.
-    specialize (Hsl _ Nat.leb l Nat_leb_has_total_order).
-    rewrite (bsort_bsort_rank _ 0) in Hsl.
-    rewrite <- Hlr in Hsl.
-    specialize sorted_strongly_sorted as H1.
-    specialize (H1 _ 0 _ _ Nat_leb_transitive Hsl).
-    rewrite map_length, Hlr, length_bsort_rank in H1.
-    specialize (H1 i' j' Hi'l Hj'l Hc1).
-    apply Nat.leb_le in H1.
-    rewrite <- Hlr in H1.
-    rewrite (bsort_bsort_rank _ 0) in Hc2.
-    rewrite <- Hlr in Hc2.
-    now apply Nat.nle_gt in Hc2.
+  rewrite <- Hlr; symmetry.
+  now apply (permut_permut_inv (length l)).
+}
+rewrite Hii' in Hc1.
+rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
+  rewrite Hi'.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  rewrite Hcl in Hca.
+  apply Hca, nth_In.
+  now rewrite Hcl.
+}
+remember (ff_app (collapse l) j) as j' eqn:Hj'.
+assert (Hjj' : j = ff_app lrank j'). {
+  subst j'; unfold collapse.
+  rewrite <- Hlr; symmetry.
+  now apply (permut_permut_inv (length l)).
+}
+rewrite Hjj' in Hc1.
+rewrite (permut_inv_permut (length l)) in Hc1; [ | easy | ]. 2: {
+  rewrite Hj'.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  rewrite Hcl in Hca.
+  apply Hca, nth_In.
+  now rewrite Hcl.
+}
+rewrite Hii', Hjj' in Hc2.
+rewrite Hlr in Hc2.
+unfold ff_app in Hc2 at 1 3.
+assert (Hi'l : i' < length l). {
+  rewrite Hi'.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  rewrite Hcl in Hca.
+  apply Hca, nth_In.
+  now rewrite length_collapse.
+}
+assert (Hj'l : j' < length l). {
+  rewrite Hj'.
+  destruct Hc as ((Hca, Hcn), Hcl).
+  rewrite Hcl in Hca.
+  apply Hca, nth_In.
+  now rewrite length_collapse.
+}
+rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
+rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
+specialize bsort_is_sorted as Hsl.
+specialize (Hsl _ Nat.leb l Nat_leb_has_total_order).
+rewrite (bsort_bsort_rank _ 0) in Hsl.
+rewrite <- Hlr in Hsl.
+specialize sorted_strongly_sorted as H1.
+specialize (H1 _ 0 _ _ Nat_leb_trans Hsl).
+rewrite map_length, Hlr, length_bsort_rank in H1.
+specialize (H1 i' j' Hi'l Hj'l Hc1).
+apply Nat.leb_le in H1.
+rewrite <- Hlr in H1.
+rewrite (bsort_bsort_rank _ 0) in Hc2.
+rewrite <- Hlr in Hc2.
+now apply Nat.nle_gt in Hc2.
 Qed.
+
+...
 
 Theorem collapse_keeps_order : ∀ l i j,
   NoDup l
