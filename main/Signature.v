@@ -1903,28 +1903,23 @@ Theorem fold_comp_list : ∀ la lb, map (ff_app la) lb = la ° lb.
 Proof. easy. Qed.
 
 Theorem permut_comp_cancel_r : ∀ n la lb lc,
-  is_permut n la
-  → is_permut n lb
+  length la = n
+  → length lb = n
   → is_permut n lc
   → la ° lc = lb ° lc ↔ la = lb.
 Proof.
-intros * Ha Hb Hc.
+intros * Hal Hbl Hc.
 split; [ | now intros; subst la ].
 intros Hab.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  destruct Ha as (Hap, Hal).
-  destruct Hb as (Hbp, Hbl).
+  move Hnz at top; subst n.
   apply length_zero_iff_nil in Hal, Hbl.
   congruence.
 }
 apply List_eq_iff in Hab.
 destruct Hab as (_, Hab).
 apply List_eq_iff.
-destruct Ha as (Hap, Hal).
-destruct Hb as (Hbp, Hbl).
-rewrite Hal, <- Hbl.
-split; [ easy | ].
+split; [ congruence | ].
 intros d i.
 specialize (Hab d (nth i (bsort_rank Nat.leb lc) 0)).
 unfold "°" in Hab.
@@ -1970,11 +1965,72 @@ apply List_map_nth_seq.
 Qed.
 
 Theorem permut_bsort_rank_comp : ∀ n la lb,
+  NoDup la
+  → length la = n
+  → is_permut n lb
+  → bsort_rank Nat.leb (la ° lb) =
+    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
+Proof.
+(*
+Compute (let la := [7;2;29;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+*)
+intros * Ha Hal Hb.
+assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
+  now apply bsort_rank_is_permut.
+}
+assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
+  apply bsort_rank_is_permut.
+  now destruct Hb.
+}
+Search (bsort_rank _ _ ° _).
+...
+apply permut_comp_cancel_r with (n := n) (lc := la). {
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  now apply comp_is_permut.
+} {
+  easy.
+}
+rewrite <- (@permut_comp_assoc n); [ | | easy ]. 2: {
+  now rewrite length_bsort_rank; destruct Ha.
+}
+rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
+rewrite comp_1_r. 2: {
+  rewrite length_bsort_rank.
+  destruct Ha as (Hap, Hal).
+  destruct Hb as (Hbp, Hbl).
+  congruence.
+}
+apply permut_comp_cancel_r with (n := n) (lc := lb). {
+  apply comp_is_permut; [ | easy ].
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  easy.
+} {
+  easy.
+}
+rewrite <- (@permut_comp_assoc n); [ | now destruct Ha | easy ].
+rewrite permut_comp_bsort_rank_l. 2: {
+  now apply (comp_is_permut_list n).
+}
+rewrite comp_length.
+symmetry.
+apply permut_comp_bsort_rank_l.
+now destruct Hb.
+Qed.
+
+Theorem permut_bsort_rank_comp : ∀ n la lb,
   is_permut n la
   → is_permut n lb
   → bsort_rank Nat.leb (la ° lb) =
     bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
 Proof.
+Compute (let la := [7;2;3;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+...
 intros * Ha Hb.
 assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
   apply bsort_rank_is_permut.
@@ -2415,6 +2471,33 @@ Theorem collapse_comp : ∀ la lb,
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Ha Hb Hab.
+clear Ha.
+unfold collapse.
+Check permut_bsort_rank_comp.
+..
+Compute (let la := [7;2;3;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+...
+intros * Ha Hb Hab.
+Search (bsort_rank _ _ ° _).
+rewrite (permut_bsort_rank_comp (length la)); [ | | easy ].
+rewrite (permut_bsort_rank_comp (length la)); cycle 1. {
+  now apply bsort_rank_is_permut.
+} {
+  now apply bsort_rank_is_permut.
+}
+rewrite permut_bsort_rank_involutive; [ | easy ].
+rewrite permut_bsort_rank_involutive; [ | easy ].
+easy.
+Qed.
+
+Theorem collapse_comp : ∀ la lb,
+  is_permut_list la
+  → is_permut_list lb
+  → length la = length lb
+  → collapse (la ° lb) = collapse la ° lb.
+Proof.
+intros * Ha Hb Hab.
 unfold collapse.
 rewrite (permut_bsort_rank_comp (length la)); [ | easy | easy ].
 rewrite (permut_bsort_rank_comp (length la)); cycle 1. {
@@ -2449,8 +2532,15 @@ Theorem sign_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros Hif * Haa Hbp.
+rewrite <- ε_collapse_ε.
+Search (collapse (_ ° _)).
+...
+intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
 erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
+Search (ε (_ ° _)).
+
+Check ε_collapse_ε.
 rewrite <- collapse_comp.
 symmetry.
 apply ε_collapse_ε.
