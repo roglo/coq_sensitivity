@@ -789,7 +789,7 @@ cbn - [ "<?" ].
 rewrite product_product_if_permut; try easy; cycle 1. {
   now left.
 } {
-  now apply permut_list_inv_is_permut.
+  now apply (bsort_rank_is_permut (length p)).
 } {
   intros.
   unfold abs_diff.
@@ -1571,7 +1571,7 @@ rewrite product_product_if_permut; try easy. {
 } {
   now left.
 } {
-  now apply permut_list_inv_is_permut.
+  now apply (bsort_rank_is_permut n).
 } {
   intros i j.
   destruct (Nat.eq_dec i j) as [Hij| Hij]; [ now subst j | ].
@@ -1769,7 +1769,7 @@ exists (ff_app (bsort_rank Nat.leb l) n).
 split. {
   rewrite <- length_permut_list_inv.
   destruct Hl as (Hp, Hl).
-  specialize (permut_list_inv_is_permut _ Hl) as Hil.
+  specialize (bsort_rank_is_permut _ Hl) as Hil.
   apply Hil, nth_In.
   rewrite length_permut_list_inv.
   now rewrite Hl.
@@ -1781,7 +1781,7 @@ split. {
 apply butn_is_permut; [ easy | | ]. {
   now rewrite (permut_permut_inv (S n)).
 } {
-  specialize (@permut_list_inv_is_permut_list l) as H1.
+  specialize (@bsort_rank_is_permut_list l) as H1.
   destruct Hl as (H2, H3).
   destruct H1 as (H4, H5).
   rewrite length_permut_list_inv in H4.
@@ -1975,18 +1975,16 @@ Theorem permut_list_inv_comp : ∀ n la lb,
 Proof.
 intros * Ha Hb.
 assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
-  replace n with (length la) by now destruct Ha.
   apply bsort_rank_is_permut.
+  now destruct Ha.
 }
 assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
-  replace n with (length lb) by now destruct Hb.
   apply bsort_rank_is_permut.
+  now destruct Hb.
 }
 apply permut_comp_cancel_r with (n := n) (lc := la). {
-  replace n with (length (la ° lb)). 2: {
-    now rewrite comp_length; destruct Hb.
-  }
   apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
 } {
   now apply comp_is_permut.
 } {
@@ -2004,10 +2002,8 @@ rewrite comp_1_r. 2: {
 }
 apply permut_comp_cancel_r with (n := n) (lc := lb). {
   apply comp_is_permut; [ | easy ].
-  replace n with (length (la ° lb)). 2: {
-    now rewrite comp_length; destruct Hb.
-  }
   apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
 } {
   easy.
 } {
@@ -2084,7 +2080,7 @@ Qed.
 Theorem collapse_is_permut : ∀ l, is_permut (length l) (collapse l).
 Proof.
 intros.
-apply permut_list_inv_is_permut.
+apply bsort_rank_is_permut.
 apply length_bsort_rank.
 Qed.
 
@@ -2151,73 +2147,19 @@ Proof.
 intros * Hp.
 remember (bsort_rank Nat.leb la) as lb eqn:Hlb.
 apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
-  apply bsort_rank_is_permut.
+  now apply bsort_rank_is_permut.
 } {
   now rewrite Hlb, length_bsort_rank.
 } {
   rewrite Hlb, length_bsort_rank.
-  apply bsort_rank_is_permut.
+  now apply bsort_rank_is_permut.
 }
 subst lb.
 rewrite comp_bsort_rank_r.
-rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut ].
+rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut_list ].
 rewrite length_bsort_rank; symmetry.
 now apply permut_bsort_leb.
 Qed.
-
-(*
-Theorem bsort_rank_loop_lt_compat : ∀ lrank l i j,
-  length lrank ≤ i < length (lrank ++ l)
-  → length lrank ≤ j < length (lrank ++ l)
-  → ff_app l i < ff_app l j
-  → ff_app (bsort_rank_loop Nat.leb (λ k, nth k l 0) lrank l) i <
-    ff_app (bsort_rank_loop Nat.leb (λ k, nth k l 0) lrank l) j.
-Proof.
-intros * Hi Hj Hij.
-revert lrank i j Hi Hj Hij.
-induction l as [| a]; intros. {
-  unfold ff_app in Hij.
-  now do 2 rewrite List_nth_nil in Hij.
-}
-cbn - [ nth ].
-...
-*)
-
-(*
-Theorem permut_bsort_rank_lt_compat : ∀ l i j,
-  is_permut_list l
-  → i < length l
-  → j < length l
-  → ff_app l i < ff_app l j
-  → ff_app (bsort_rank Nat.leb l) i < ff_app (bsort_rank Nat.leb l) j.
-Proof.
-intros * Hp Hi Hj Hij.
-remember (ff_app l i) as i' eqn:Hi'.
-assert (Hii' : i = ff_app (bsort_rank Nat.leb l) i'). {
-  rewrite Hi'; symmetry.
-Search (ff_app (bsort_rank _ _)).
-Search (bsort_rank _ _ ° _).
-Compute (let l := [7;2;5;6] in (l, bsort_rank Nat.leb l)).
-Compute (let l := [7;2;5;6] in bsort_rank Nat.leb (bsort_rank Nat.leb l)).
-Compute (let l := [7;2;5;6] in bsort_rank Nat.leb (bsort_rank Nat.leb (bsort_rank Nat.leb l))).
-Compute (let l := [7;2;5;6] in map (λ i, ff_app (bsort_rank Nat.leb l) (ff_app l i) = i) (seq 0 (length l))).
-Print is_permut_list.
-...
-  apply permut_inv_permut with (n := length l).
-...
-(*
-intros * Hi Hj Hij.
-destruct l as [| d]; [ easy | ].
-cbn - [ bsort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
-clear l d Hl'.
-rename l' into l.
-...
-now apply bsort_rank_loop_lt_compat.
-...
-*)
-*)
 
 Theorem collapse_lt_compat : ∀ l i j,
   i < length l
@@ -2227,7 +2169,7 @@ Theorem collapse_lt_compat : ∀ l i j,
 Proof.
 intros l j i Hj Hi Hc2.
 specialize (collapse_is_permut l) as Hc.
-specialize (bsort_rank_is_permut l) as Hr.
+specialize (bsort_rank_is_permut (length l) eq_refl) as Hr.
 apply Nat.nle_gt; intros Hc1.
 destruct (Nat.eq_dec (ff_app (collapse l) i) (ff_app (collapse l) j))
   as [H| H]. {
@@ -2316,7 +2258,7 @@ intros * Hnd Hi Hj.
 remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
 remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
 specialize (collapse_is_permut l) as Hc.
-specialize (bsort_rank_is_permut l) as Hr.
+specialize (bsort_rank_is_permut (length l) eq_refl) as Hr.
 move c2 before c1.
 symmetry in Hc1, Hc2.
 destruct c1. {
@@ -2411,7 +2353,7 @@ split. {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
     rewrite <- (length_permut_list_inv la).
-    apply permut_list_inv_is_permut_list, nth_In.
+    apply bsort_rank_is_permut_list, nth_In.
     rewrite length_bsort_rank; cbn.
     apply in_butn in Hj.
     flia Hlz.
@@ -2506,6 +2448,7 @@ Theorem ff_app_collapse_map : ∀ la lb,
 Proof.
 intros * Ha Hb Hab i Hi.
 unfold collapse.
+Search bsort_rank.
 ...
 specialize (bsort_rank_is_permut la) as H1.
 remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
@@ -2522,7 +2465,7 @@ rewrite length_bsort_rank in H3.
 apply H3. 3: {
   rewrite (permut_permut_inv (length lb)).
 ...
-specialize (permut_list_inv_is_permut_list Hb) as H1.
+specialize (bsort_rank_is_permut_list Hb) as H1.
 destruct H1 as (Hbip, Hbil).
 specialize (NoDup_nat _ Hbil) as H2.
 rewrite length_permut_list_inv in H2.
