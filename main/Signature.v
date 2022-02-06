@@ -1902,6 +1902,15 @@ Qed.
 Theorem fold_comp_list : ∀ la lb, map (ff_app la) lb = la ° lb.
 Proof. easy. Qed.
 
+Theorem permut_comp_cancel_l : ∀ n la lb lc,
+  length la = n
+  → is_permut n lb
+  → is_permut n lc
+  → la ° lb = la ° lc ↔ lb = lc.
+Proof.
+intros * Hal Hb Hc.
+Admitted.
+
 Theorem permut_comp_cancel_r : ∀ n la lb lc,
   length la = n
   → length lb = n
@@ -1952,6 +1961,18 @@ rewrite nth_indep with (d' := 0); [ symmetry | easy ].
 easy.
 Qed.
 
+Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
+Proof.
+intros * Hp.
+unfold "°", ff_app.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite seq_nth; [ | now apply Hp ].
+  now apply Nat.add_0_l.
+}
+apply map_id.
+Qed.
+
 Theorem comp_1_r : ∀ n la,
   length la = n
   → la ° seq 0 n = la.
@@ -1964,6 +1985,64 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
+(*
+Theorem bsort_rank_comp_bsort_rank_comp_bsort_rank_l : ∀ la lb,
+  bsort_rank Nat.leb (la ° lb) =
+  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb).
+Proof.
+intros.
+(*
+Compute (let la := [2;29;7;1] in map (λ lb,
+  bsort_rank Nat.leb (la ° lb) =
+  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb)) (canon_sym_gr_list_list 4)).
+Compute (let la := [29;2;7;1] in map (λ lb,
+  bsort_rank Nat.leb (la ° lb) =
+  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb)) (canon_sym_gr_list_list 4)).
+*)
+
+apply List_eq_iff.
+do 2 rewrite length_bsort_rank, comp_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length lb)) as [Hilb| Hilb]. 2: {
+  apply Nat.nlt_ge in Hilb.
+  rewrite nth_overflow. 2: {
+    now rewrite length_bsort_rank, comp_length.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite length_bsort_rank, comp_length.
+  }
+  easy.
+}
+unfold "°".
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite length_bsort_rank, map_length.
+}
+symmetry.
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite length_bsort_rank, map_length.
+}
+symmetry.
+unfold ff_app.
+revert la.
+induction lb as [| b]; intros; [ easy | ].
+cbn - [ bsort_rank ].
+Search (bsort_rank _ (_ :: _)).
+Print bsort_rank.
+Theorem glop : ∀ A (ord : A → _) d d' l,
+  bsort_rank ord (d :: l) = bsort_rank ord (d' :: l).
+Proof.
+intros.
+cbn - [ nth ].
+Print bsort_rank_loop.
+rewrite bsort_rank_loop_nth_indep with (d' := d').
+destruct l as [| a]; [ easy | ].
+cbn - [ nth ].
+do 2 rewrite List_nth_succ_cons.
+do 3 rewrite List_nth_0_cons.
+...
+*)
+
 Theorem permut_bsort_rank_comp : ∀ n la lb,
   NoDup la
   → length la = n
@@ -1972,6 +2051,10 @@ Theorem permut_bsort_rank_comp : ∀ n la lb,
     bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
 Proof.
 (*
+Compute (let la := [2;29;7;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+Compute (let la := [29;2;7;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 Compute (let la := [7;2;29;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 *)
@@ -1983,7 +2066,7 @@ assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
   apply bsort_rank_is_permut.
   now destruct Hb.
 }
-Search (bsort_rank _ _ ° _).
+(**)
 ...
 apply permut_comp_cancel_r with (n := n) (lc := la). {
   apply bsort_rank_is_permut.
@@ -2020,6 +2103,10 @@ rewrite comp_length.
 symmetry.
 apply permut_comp_bsort_rank_l.
 now destruct Hb.
+(**)
+......
+(**)
+......
 Qed.
 
 Theorem permut_bsort_rank_comp : ∀ n la lb,
@@ -2078,18 +2165,6 @@ now destruct Hb.
 Qed.
 
 Arguments permut_bsort_rank_comp n%nat [la lb]%list.
-
-Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
-Proof.
-intros * Hp.
-unfold "°", ff_app.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite seq_nth; [ | now apply Hp ].
-  now apply Nat.add_0_l.
-}
-apply map_id.
-Qed.
 
 (* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
