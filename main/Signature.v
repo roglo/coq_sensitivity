@@ -2389,15 +2389,13 @@ rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
 
-...
-
 Theorem fold_collapse : ∀ l,
-  permut_list_inv (bsort_rank Nat.leb l) = collapse l.
+  bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
 Theorem butn_is_permut_list : ∀ i la,
   is_permut_list la
-  → i = ff_app (permut_list_inv la) (length la - 1)
+  → i = ff_app (bsort_rank Nat.leb la) (length la - 1)
   → is_permut_list (butn i la).
 Proof.
 intros * Hp Hi.
@@ -2412,12 +2410,9 @@ split. {
   destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
-    specialize (permut_list_inv_is_permut_list) as H1.
-    specialize (H1 _ Hp).
-    specialize (length_permut_list_inv la) as H2.
-    rewrite <- H2.
-    apply H1, nth_In.
-    rewrite H2; cbn.
+    rewrite <- (length_permut_list_inv la).
+    apply permut_list_inv_is_permut_list, nth_In.
+    rewrite length_bsort_rank; cbn.
     apply in_butn in Hj.
     flia Hlz.
   }
@@ -2490,7 +2485,6 @@ Theorem permut_collapse : ∀ la,
 Proof.
 intros * Ha.
 unfold collapse.
-unfold permut_list_inv.
 now apply permut_bsort_rank_involutive.
 Qed.
 
