@@ -439,7 +439,7 @@ rewrite comp_bsort_rank_r.
 now apply permut_bsort_leb.
 Qed.
 
-Theorem permut_app_bsort_rank_app : ∀ i l,
+Theorem permut_bsort_permut : ∀ i l,
   is_permut_list l
   → i < length l
   → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
@@ -487,10 +487,10 @@ clear d.
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
 rewrite fold_ff_app; cbn.
-now apply permut_app_bsort_rank_app.
+now apply permut_bsort_permut.
 Qed.
 
-Theorem permut_bsort_rank_app_app : ∀ i l,
+Theorem permut_permut_bsort : ∀ i l,
   is_permut_list l
   → i < length l
   → ff_app l (ff_app (bsort_rank Nat.leb l) i) = i.
@@ -525,38 +525,6 @@ apply Ha, nth_In.
 apply bsort_rank_ub.
 now intros H; subst l.
 Qed.
-
-Theorem permut_inv_permut : ∀ n l i,
-  is_permut n l
-  → i < n
-  → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
-Proof.
-intros * Hp Hin.
-destruct Hp as (Hp, Hl).
-rewrite <- Hl in Hin.
-now apply permut_app_bsort_rank_app.
-Qed.
-
-Theorem permut_permut_inv : ∀ n l i,
-  is_permut n l
-  → i < n
-  → ff_app l (ff_app (bsort_rank Nat.leb l) i) = i.
-Proof.
-intros * Hp Hin.
-destruct Hp as (Hp, Hl).
-specialize (permut_comp_bsort_rank_r Hp) as H1.
-apply List_eq_iff in H1.
-destruct H1 as (_, H1).
-rewrite <- Hl in Hin.
-specialize (H1 0 i).
-rewrite seq_nth in H1; [ | easy ].
-unfold "°" in H1.
-rewrite (List_map_nth' 0) in H1; [ easy | ].
-now rewrite length_bsort_rank.
-Qed.
-
-Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
-Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
 
 (* transposition *)
 
@@ -1795,7 +1763,7 @@ rewrite (List_seq_cut i); subst s. 2: {
 rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
-rewrite (permut_permut_inv _ (conj Hp Hln) (Nat.lt_succ_diag_r _)).
+rewrite permut_permut_bsort; [ | easy | now rewrite Hln ].
 apply Permutation_elt.
 rewrite app_nil_r.
 rewrite <- map_app.
@@ -1813,7 +1781,7 @@ apply IHn. 2: {
 }
 assert (Hn : n = nth i l 0). {
   rewrite Hi; symmetry.
-  apply (permut_permut_inv (S n)); [ easy | easy ].
+  apply permut_permut_bsort; [ easy | now rewrite Hln ].
 }
 split. {
   intros j Hj.
