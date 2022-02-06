@@ -430,7 +430,7 @@ rename l' into l.
 now apply sorted_permut.
 Qed.
 
-Theorem permut_comp_bsort_rank_leb_r : ∀ l,
+Theorem permut_comp_bsort_rank_r : ∀ l,
   is_permut_list l
   → l ° bsort_rank Nat.leb l = seq 0 (length l).
 Proof.
@@ -445,7 +445,7 @@ Theorem permut_app_bsort_rank_app : ∀ i l,
   → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i.
 Proof.
 intros * Hp Hil.
-specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
+specialize (permut_comp_bsort_rank_r Hp) as H1.
 apply List_eq_iff in H1.
 destruct H1 as (_, H1).
 specialize (H1 0).
@@ -544,7 +544,7 @@ Theorem permut_permut_inv : ∀ n l i,
 Proof.
 intros * Hp Hin.
 destruct Hp as (Hp, Hl).
-specialize (permut_comp_bsort_rank_leb_r Hp) as H1.
+specialize (permut_comp_bsort_rank_r Hp) as H1.
 apply List_eq_iff in H1.
 destruct H1 as (_, H1).
 rewrite <- Hl in Hin.
@@ -557,22 +557,6 @@ Qed.
 
 Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
 Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
-
-Theorem comp_permut_inv_l : ∀ l,
-  is_permut_list l
-  → bsort_rank Nat.leb l ° l = seq 0 (length l).
-Proof.
-intros * Hp.
-now apply permut_comp_bsort_rank_l.
-Qed.
-
-Theorem comp_permut_inv_r : ∀ l,
-  is_permut_list l
-  → l ° bsort_rank Nat.leb l = seq 0 (length l).
-Proof.
-intros * Hp.
-now apply permut_comp_bsort_rank_leb_r.
-Qed.
 
 (* transposition *)
 

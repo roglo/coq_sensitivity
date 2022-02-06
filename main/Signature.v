@@ -2019,14 +2019,6 @@ apply permut_comp_bsort_rank_l.
 now destruct Hb.
 Qed.
 
-Theorem permut_comp_permut_list_inv : ∀ l,
-  is_permut_list l
-  → l ° bsort_rank Nat.leb l = seq 0 (length l).
-Proof.
-intros * Hp.
-now apply permut_comp_bsort_rank_leb_r.
-Qed.
-
 Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
 Proof.
 intros * Hp.
