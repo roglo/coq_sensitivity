@@ -1969,7 +1969,7 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
-Theorem permut_list_inv_comp : ∀ n la lb,
+Theorem permut_bsort_rank_comp : ∀ n la lb,
   is_permut n la
   → is_permut n lb
   → bsort_rank Nat.leb (la ° lb) =
@@ -2020,6 +2020,8 @@ symmetry.
 apply permut_comp_bsort_rank_l.
 now destruct Hb.
 Qed.
+
+Arguments permut_bsort_rank_comp n%nat [la lb]%list.
 
 Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
 Proof.
@@ -2406,343 +2408,40 @@ apply permut_collapse.
 apply collapse_is_permut.
 Qed.
 
-Theorem ff_app_collapse_map : ∀ la lb,
-  NoDup la
-  → is_permut_list lb
-  → length la = length lb
-  → ∀ i, i < length lb →
-  ff_app (collapse (la ° lb)) i =
-  ff_app (collapse la) (ff_app lb i).
-Proof.
-intros * Ha Hb Hab i Hi.
-unfold collapse.
-Search bsort_rank.
-...
-specialize (bsort_rank_is_permut la) as H1.
-remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
-destruct H1 as ((H1, H2), _).
-specialize (NoDup_nat _ H2) as H3.
-apply H3. 3: {
-  rewrite (permut_permut_inv (length lb)). 1: {
-...
-remember (map (ff_app la) lb) as lc eqn:Hlc.
-specialize (bsort_rank_is_permut lc) as H1.
-destruct H1 as ((H1, H2), _).
-specialize (NoDup_nat _ H2) as H3.
-rewrite length_bsort_rank in H3.
-apply H3. 3: {
-  rewrite (permut_permut_inv (length lb)).
-...
-specialize (bsort_rank_is_permut_list Hb) as H1.
-destruct H1 as (Hbip, Hbil).
-specialize (NoDup_nat _ Hbil) as H2.
-rewrite length_bsort_rank in H2.
-apply H2. 3: {
-  rewrite permut_permut_inv.
-...
-intros * Ha Hb Hab i Hi.
-revert lb i Hb Hab Hi.
-induction la as [| a]; intros. {
-  now rewrite <- Hab in Hi.
-}
-destruct lb as [| b]; [ easy | ].
-unfold ff_app.
-cbn - [ nth ].
-rewrite (List_map_nth' 0). 2: {
-  now rewrite length_bsort_rank_loop, seq_length, map_length.
-}
-rewrite seq_nth. 2: {
-  now rewrite length_bsort_rank_loop, map_length.
-}
-rewrite length_bsort_rank_loop.
-cbn - [ nth ].
-destruct i. {
-  cbn.
-(* oh la la la la... quel merdier ! *)
-...
-
 Theorem collapse_comp : ∀ la lb,
-  NoDup la
+  is_permut_list la
   → is_permut_list lb
   → length la = length lb
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Ha Hb Hab.
 unfold collapse.
-apply List_eq_iff.
-rewrite length_bsort_rank.
-rewrite length_bsort_rank.
-do 2 rewrite comp_length.
-split; [ easy | ].
-intros d i.
-unfold "°" at 2.
-destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow. 2: {
-    rewrite length_bsort_rank.
-    rewrite length_bsort_rank.
-    now rewrite comp_length.
-  }
-  rewrite nth_overflow; [ easy | ].
-  now rewrite map_length.
+rewrite (permut_bsort_rank_comp (length la)); [ | easy | easy ].
+rewrite (permut_bsort_rank_comp (length la)); cycle 1. {
+  now apply bsort_rank_is_permut.
+} {
+  now apply bsort_rank_is_permut.
 }
-rewrite (List_map_nth' 0); [ | easy ].
-unfold ff_app, "°".
-unfold permut_list_inv.
-rewrite (List_map_nth' 0). 2: {
-  now rewrite length_bsort_rank, seq_length, map_length.
-}
-rewrite seq_nth; [ | now rewrite length_bsort_rank, map_length ].
-rewrite (List_map_nth' 0). 2: {
-  rewrite length_bsort_rank, seq_length, Hab.
-  now apply Hb, nth_In.
-}
-rewrite seq_nth. 2: {
-  rewrite length_bsort_rank, Hab.
-  now apply Hb, nth_In.
-}
-cbn.
-rewrite fold_ff_app_permut_list_inv; [ | apply bsort_rank_is_permut ].
-rewrite fold_ff_app_permut_list_inv; [ | apply bsort_rank_is_permut ].
-do 2 rewrite fold_collapse.
-...
-Search (ff_app (collapse _)).
-Search (collapse (map _ _)).
-...
-unfold ff_app.
-...
-  nth i (permut_list_inv (bsort_rank Nat.leb (map (λ i0 : nat, nth i0 la 0) lb))) 0 =
-  nth (nth i lb 0) (permut_list_inv (bsort_rank Nat.leb la)) 0
-...
-  ============================
-  ff_app (permut_list_inv (bsort_rank Nat.leb (map (ff_app la) lb))) i =
-  ff_app (permut_list_inv (bsort_rank Nat.leb la)) (nth i lb 0)
-...
-  ============================
-  match List_rank (Nat.eqb i) (bsort_rank Nat.leb (map (ff_app la) lb)) with
-  | Some x => x
-  | None => 0
-  end = match List_rank (Nat.eqb (nth i lb 0)) (bsort_rank Nat.leb la) with
-        | Some x => x
-        | None => 0
-        end
-...
-revert la d i Ha Hab Hil.
-induction lb as [| b]; intros; [ easy | ].
-destruct i. {
-  rewrite List_nth_0_cons.
-  rewrite map_cons.
-  cbn - [ nth ].
-...
-Check permut_permut_inv.
-Search permut_list_inv.
-Check permut_comp_permut_list_inv.
-Search (permut_list_inv (_ ° _)).
-Check permut_list_inv_comp.
-Search permut_list_inv.
-Search (nth _ _ _ = nth _ _ _).
-...
-intros * Ha Hb Hab.
-(*
-Compute (let la := [33;18;1;7] in let lb := [1;3;2;0] in (collapse (la ° lb), collapse la ° lb)).
-*)
-unfold collapse.
-unfold permut_list_inv.
-rewrite length_bsort_rank, comp_length.
-rewrite length_bsort_rank.
-unfold "°".
-unfold ff_app.
-symmetry.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (j & Hjl & Hji).
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length, Hab, <- Hji.
-    now apply Hb, nth_In.
-  }
-  rewrite seq_nth. 2: {
-    rewrite Hab, <- Hji.
-    now apply Hb, nth_In.
-  }
-  rewrite Nat.add_0_l.
-  rewrite fold_ff_app_permut_list_inv. 2: {
-    apply bsort_rank_is_permut.
-  }
-  easy.
-}
-rewrite (List_map_map_seq _ 0).
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-destruct Hi as (_, Hi); cbn in Hi.
-unfold permut_list_inv.
-unfold ff_app.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, length_bsort_rank, Hab.
-  now apply Hb, nth_In.
-}
-rewrite length_bsort_rank.
-rewrite seq_nth. 2: {
-  rewrite Hab.
-  now apply Hb, nth_In.
-}
-rewrite Nat.add_0_l.
-destruct lb as [| b1]; [ easy | ].
-destruct lb as [| b2]. {
-  cbn - [ nth ].
-  destruct i; [ cbn | cbn in Hi; flia Hi ].
-  destruct la as [| a1]; [ easy | cbn ].
-  destruct la; [ cbn | easy ].
-  now destruct (b1 =? 0).
-}
-destruct lb as [| b3]. {
-  cbn - [ nth ].
-  rewrite List_nth_succ_cons.
-  do 2 rewrite List_nth_0_cons.
-  rewrite if_leb_le_dec.
-  destruct (le_dec (nth b2 la 0) (nth b1 la 0)) as [Hb21| Hb21]. {
-    destruct i. {
-      cbn.
-      destruct la as [| a1]; [ easy | ].
-      destruct la as [| a2]; [ easy | ].
-      destruct la; [ | easy ].
-      cbn.
-      rewrite if_leb_le_dec.
-      destruct (le_dec a2 a1) as [Ha21| Ha21]; cbn. {
-        rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec b1 1) as [Hb1| Hb1]. {
-          exfalso; subst b1.
-          rewrite List_nth_succ_cons, List_nth_0_cons in Hb21.
-          destruct b2. {
-            cbn in Hb21.
-            apply Nat.le_antisymm in Ha21; [ | easy ].
-            subst a2.
-            apply NoDup_cons_iff in Ha.
-            destruct Ha as (Ha, _).
-            now apply Ha; left.
-          }
-          rewrite List_nth_succ_cons in Hb21.
-          destruct Hb as (Hbp, Hbl).
-          destruct b2. {
-            apply NoDup_cons_iff in Hbl.
-            destruct Hbl as (Hbl, _).
-            now apply Hbl; left.
-          }
-          specialize (Hbp _ (or_intror (or_introl eq_refl))).
-          cbn in Hbp; flia Hbp.
-        }
-        rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec b1 0) as [Hb1z| Hb1z]; [ easy | ].
-        destruct b1; [ easy | ].
-        destruct b1; [ easy | ].
-        destruct Hb as (Hbp, Hbl).
-        specialize (Hbp _ (or_introl eq_refl)).
-        cbn in Hbp; flia Hbp.
-      }
-...
-Search (bsort_rank _ (map _ _)).
-Search List_rank.
-...
-Check List_map_nth_seq.
-Search (map (λ _, nth _ _ _)).
-...
-Search (Nat.eqb (nth _ _ _)).
-unfold unsome.
-remember (List_rank _ _) as x eqn:Hx in |-*.
-remember (List_rank _ _) as y eqn:Hy in |-*.
-move y before x.
-symmetry in Hx, Hy.
-destruct x as [x| ]. {
-  apply (List_rank_Some 0) in Hx.
-  rewrite length_bsort_rank in Hx.
-  destruct Hx as (Hxl & Hbefx & Hx).
-  apply Nat.eqb_eq in Hx.
-  destruct y as [y| ]. {
-    apply (List_rank_Some 0) in Hy.
-    rewrite length_bsort_rank, map_length in Hy.
-    destruct Hy as (Hyl & Hbefy & Hy).
-    apply Nat.eqb_eq in Hy.
-...
+rewrite permut_bsort_rank_involutive; [ | easy ].
+rewrite permut_bsort_rank_involutive; [ | easy ].
+easy.
+Qed.
 
-Theorem ε_collapse_comp : ∀ la lb,
-  is_permut_list lb
+Theorem ff_app_collapse_map : ∀ la lb,
+  is_permut_list la
+  → is_permut_list lb
   → length la = length lb
-  → ε (collapse la ° lb) = ε (collapse (la ° lb)).
+  → ∀ i, i < length lb
+  → ff_app (collapse (la ° lb)) i = ff_app (collapse la) (ff_app lb i).
 Proof.
-intros * Hb Hab.
-enough (Hif : in_charac_0_field).
-assert (H : is_permut (length lb) lb) by easy.
-specialize (signature_comp Hif) as H1.
-specialize (H1 (length la) (collapse la) lb).
-specialize (H1 (collapse_is_permut _)).
-rewrite Hab in H1.
-specialize (H1 H); clear H.
-rewrite H1.
-...
-rewrite signature_comp with (n := length la).
-...
-Theorem glop : ∀ la lb,
-  is_permut_list lb
-  → collapse (la ° lb) = collapse la ° lb.
-Proof.
-intros * Hb.
-unfold collapse.
-specialize bsort_bsort_rank as H1.
-specialize (H1 _ Nat.eqb 0 la).
-Print permut_list_inv.
-...
-is_permut_list lb
-bsort_rank ord (la ° lb) = bsort_rank ord la.
-bsort ord (la ° lb) = bsort ord la.
-...
-
-Search (bsort_rank _ (_ ° _)).
-...
-  H1 : ε (collapse la ° lb) = (ε (collapse la) * ε lb)%F
-  ============================
-  (ε (collapse la) * ε lb)%F = ε (collapse (la ° lb))
-
-goal 2 (ID 1778) is:
- in_charac_0_field
-...
-intros * Hb Hab.
-specialize permut_list_inv_comp as H1.
-specialize (H1 (length la) (collapse la) lb).
-specialize (H1 (collapse_is_permut _)).
-rewrite Hab in H1.
-assert (H : is_permut (length lb) lb) by easy.
-specialize (H1 H); clear H.
-...
-unfold collapse.
-(* mouais, bof, chais pas trop ce que je fous, là *)
-...
-specialize (permut_list_inv_comp (length la) la lb) as H1.
-unfold collapse.
-Search (permut_list_inv _ ° _).
-Check permut_list_inv_comp.
-Search permut_list_inv.
-Check list_eqb.
-unfold ε.
-rewrite length_bsort_rank, length_bsort_rank.
-do 2 rewrite comp_length.
-...
-apply rngl_product_eq_compat.
-intros i Hi.
-apply rngl_product_eq_compat.
-intros j Hj.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-Check permut_list_inv_comp.
+intros * Ha Hb Hab i Hi.
+rewrite collapse_comp; [ | easy | easy | easy ].
 unfold "°".
-Check permut_permut_inv.
-unfold ff_app.
-rewrite (List_map_nth' 0).
-rewrite (List_map_nth' 0).
-...
-Search list_eqb.
-apply list_eqb_eq.
-...
+unfold ff_app at 1.
+now apply (List_map_nth' 0).
+Qed.
 
+(* version signature_comp less constraining (la not a permutation) *)
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   NoDup la
@@ -2752,6 +2451,11 @@ Proof.
 intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
 erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
+rewrite <- collapse_comp.
+symmetry.
+apply ε_collapse_ε.
+...
+Search (ε (collapse (_ ° _))).
 ...
 rewrite collapse_comp.
 symmetry; apply ε_collapse_ε.
