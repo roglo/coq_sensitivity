@@ -558,13 +558,6 @@ Qed.
 Arguments permut_inv_permut n%nat [l]%list [i]%nat _ _.
 Arguments permut_permut_inv n%nat [l]%list [i]%nat _ _.
 
-Theorem length_permut_list_inv : ∀ l,
-  length (bsort_rank Nat.leb l) = length l.
-Proof.
-intros.
-apply length_bsort_rank.
-Qed.
-
 Theorem comp_permut_inv_l : ∀ l,
   is_permut_list l
   → bsort_rank Nat.leb l ° l = seq 0 (length l).

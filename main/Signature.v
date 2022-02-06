@@ -1767,11 +1767,11 @@ Proof.
 intros * Hl.
 exists (ff_app (bsort_rank Nat.leb l) n).
 split. {
-  rewrite <- length_permut_list_inv.
+  rewrite <- length_bsort_rank with (ord := Nat.leb).
   destruct Hl as (Hp, Hl).
   specialize (bsort_rank_is_permut _ Hl) as Hil.
   apply Hil, nth_In.
-  rewrite length_permut_list_inv.
+  rewrite length_bsort_rank.
   now rewrite Hl.
 }
 split. {
@@ -1784,9 +1784,9 @@ apply butn_is_permut; [ easy | | ]. {
   specialize (@bsort_rank_is_permut_list l) as H1.
   destruct Hl as (H2, H3).
   destruct H1 as (H4, H5).
-  rewrite length_permut_list_inv in H4.
+  rewrite length_bsort_rank in H4.
   apply H4, nth_In.
-  now rewrite length_permut_list_inv, H3.
+  now rewrite length_bsort_rank, H3.
 }
 Qed.
 
@@ -2352,7 +2352,7 @@ split. {
   destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
-    rewrite <- (length_permut_list_inv la).
+    rewrite <- length_bsort_rank with (ord := Nat.leb).
     apply bsort_rank_is_permut_list, nth_In.
     rewrite length_bsort_rank; cbn.
     apply in_butn in Hj.
@@ -2468,7 +2468,7 @@ apply H3. 3: {
 specialize (bsort_rank_is_permut_list Hb) as H1.
 destruct H1 as (Hbip, Hbil).
 specialize (NoDup_nat _ Hbil) as H2.
-rewrite length_permut_list_inv in H2.
+rewrite length_bsort_rank in H2.
 apply H2. 3: {
   rewrite permut_permut_inv.
 ...
@@ -2502,7 +2502,7 @@ Proof.
 intros * Ha Hb Hab.
 unfold collapse.
 apply List_eq_iff.
-rewrite length_permut_list_inv.
+rewrite length_bsort_rank.
 rewrite length_bsort_rank.
 do 2 rewrite comp_length.
 split; [ easy | ].
@@ -2511,7 +2511,7 @@ unfold "°" at 2.
 destruct (lt_dec i (length lb)) as [Hil| Hil]. 2: {
   apply Nat.nlt_ge in Hil.
   rewrite nth_overflow. 2: {
-    rewrite length_permut_list_inv.
+    rewrite length_bsort_rank.
     rewrite length_bsort_rank.
     now rewrite comp_length.
   }
@@ -2755,7 +2755,7 @@ Check permut_list_inv_comp.
 Search permut_list_inv.
 Check list_eqb.
 unfold ε.
-rewrite length_permut_list_inv, length_bsort_rank.
+rewrite length_bsort_rank, length_bsort_rank.
 do 2 rewrite comp_length.
 ...
 apply rngl_product_eq_compat.
