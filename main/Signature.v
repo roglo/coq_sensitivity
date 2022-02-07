@@ -2044,109 +2044,11 @@ do 3 rewrite List_nth_0_cons.
 *)
 
 Theorem permut_bsort_rank_comp : ∀ n la lb,
-  NoDup la
-  → length la = n
-  → is_permut n lb
-  → bsort_rank Nat.leb (la ° lb) =
-    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
-Proof.
-(*
-Compute (let la := [2;29;7;1] in map (λ lb,
-bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
-Compute (let la := [29;2;7;1] in map (λ lb,
-bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
-Compute (let la := [7;2;29;1] in map (λ lb,
-bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
-*)
-intros * Ha Hal Hb.
-assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
-  now apply bsort_rank_is_permut.
-}
-assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
-  apply bsort_rank_is_permut.
-  now destruct Hb.
-}
-remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
-apply permut_comp_cancel_r with (n := n) (lc := bsort_rank Nat.leb lc). {
-  apply bsort_rank_is_permut.
-  now rewrite comp_length; destruct Hb.
-} {
-  now apply comp_is_permut.
-} {
-  now apply bsort_rank_is_permut; destruct Hapb.
-}
-rewrite <- (@permut_comp_assoc n); cycle 1. {
-  now destruct Hapb.
-} {
-  now apply bsort_rank_is_permut; destruct Hapb.
-}
-rewrite permut_comp_bsort_rank_r; [ | now destruct Hapb ].
-rewrite comp_1_r. 2: {
-  rewrite length_bsort_rank.
-  destruct Hb, Hapb; congruence.
-}
-subst lc.
-...
-Theorem glop : ∀ la lb,
-  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb) =
-  bsort_rank Nat.leb (la ° lb).
-Proof.
-Compute (let la := [2;7;15;1] in map (λ lb,
-  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb) =
-  bsort_rank Nat.leb (la ° lb)
-) (canon_sym_gr_list_list (length la))).
-...
-(**)
-apply permut_comp_cancel_r with (n := n) (lc := la). {
-  apply bsort_rank_is_permut.
-  now rewrite comp_length; destruct Hb.
-} {
-  now apply comp_is_permut.
-} {
-  easy.
-}
-rewrite <- (@permut_comp_assoc n); [ | | easy ]. 2: {
-  now rewrite length_bsort_rank; destruct Ha.
-}
-rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
-rewrite comp_1_r. 2: {
-  rewrite length_bsort_rank.
-  destruct Ha as (Hap, Hal).
-  destruct Hb as (Hbp, Hbl).
-  congruence.
-}
-apply permut_comp_cancel_r with (n := n) (lc := lb). {
-  apply comp_is_permut; [ | easy ].
-  apply bsort_rank_is_permut.
-  now rewrite comp_length; destruct Hb.
-} {
-  easy.
-} {
-  easy.
-}
-rewrite <- (@permut_comp_assoc n); [ | now destruct Ha | easy ].
-rewrite permut_comp_bsort_rank_l. 2: {
-  now apply (comp_is_permut_list n).
-}
-rewrite comp_length.
-symmetry.
-apply permut_comp_bsort_rank_l.
-now destruct Hb.
-(**)
-......
-(**)
-......
-Qed.
-
-Theorem permut_bsort_rank_comp : ∀ n la lb,
   is_permut n la
   → is_permut n lb
   → bsort_rank Nat.leb (la ° lb) =
     bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
 Proof.
-Compute (let la := [7;2;3;1] in map (λ lb,
-bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
-...
 intros * Ha Hb.
 assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
   apply bsort_rank_is_permut.
@@ -2179,7 +2081,7 @@ apply permut_comp_cancel_r with (n := n) (lc := lb). {
   apply bsort_rank_is_permut.
   now rewrite comp_length; destruct Hb.
 } {
-  easy.
+  now rewrite length_bsort_rank; destruct Hb.
 } {
   easy.
 }
@@ -2474,6 +2376,97 @@ destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
+
+Theorem permut_r_bsort_rank_comp : ∀ n la lb,
+  NoDup la
+  → length la = n
+  → is_permut n lb
+  → bsort_rank Nat.leb (la ° lb) =
+    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
+Proof.
+(*
+Compute (let la := [2;29;7;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+Compute (let la := [29;2;7;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+Compute (let la := [7;2;29;1] in map (λ lb,
+bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
+*)
+intros * Ha Hal Hb.
+assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
+  now apply bsort_rank_is_permut.
+}
+assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
+  apply bsort_rank_is_permut.
+  now destruct Hb.
+}
+remember (bsort_rank Nat.leb la) as lc eqn:Hlc.
+apply permut_comp_cancel_r with (n := n) (lc := bsort_rank Nat.leb lc). {
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  now apply comp_is_permut.
+} {
+  now apply bsort_rank_is_permut; destruct Hapb.
+}
+rewrite <- (@permut_comp_assoc n); cycle 1. {
+  now destruct Hapb.
+} {
+  now apply bsort_rank_is_permut; destruct Hapb.
+}
+rewrite permut_comp_bsort_rank_r; [ | now destruct Hapb ].
+rewrite comp_1_r. 2: {
+  rewrite length_bsort_rank.
+  destruct Hb, Hapb; congruence.
+}
+subst lc.
+Search bsort_rank.
+Search (bsort_rank _ (bsort_rank _ _)).
+Inspect 1.
+...
+(**)
+apply permut_comp_cancel_r with (n := n) (lc := la). {
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  now apply comp_is_permut.
+} {
+  easy.
+}
+rewrite <- (@permut_comp_assoc n); [ | | easy ]. 2: {
+  now rewrite length_bsort_rank; destruct Ha.
+}
+rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
+rewrite comp_1_r. 2: {
+  rewrite length_bsort_rank.
+  destruct Ha as (Hap, Hal).
+  destruct Hb as (Hbp, Hbl).
+  congruence.
+}
+apply permut_comp_cancel_r with (n := n) (lc := lb). {
+  apply comp_is_permut; [ | easy ].
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  easy.
+} {
+  easy.
+}
+rewrite <- (@permut_comp_assoc n); [ | now destruct Ha | easy ].
+rewrite permut_comp_bsort_rank_l. 2: {
+  now apply (comp_is_permut_list n).
+}
+rewrite comp_length.
+symmetry.
+apply permut_comp_bsort_rank_l.
+now destruct Hb.
+(**)
+......
+(**)
+......
+Qed.
+
+...
 
 Theorem signature_comp : in_charac_0_field →
   ∀ n la lb,
