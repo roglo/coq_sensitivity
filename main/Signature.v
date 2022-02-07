@@ -2424,6 +2424,24 @@ rewrite comp_1_l. 2: {
   destruct Hb as (Hbp, Hbl).
   congruence.
 }
+clear Hapb Hbpb.
+destruct la as [| d]. {
+  cbn in Hal; subst n.
+  destruct Hb as (Hbp, Hbl).
+  now apply length_zero_iff_nil in Hbl; subst lb.
+}
+cbn - [ bsort_rank_loop nth ].
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+remember (d :: la) as lc.
+clear d la Heqlc.
+rename lc into la.
+destruct lb as [| d]. {
+  destruct Hb as (Hbp, Hbl); cbn in Hbl; subst n.
+  now symmetry in Hbl; apply length_zero_iff_nil in Hbl; subst la.
+}
+cbn - [ bsort_rank_loop nth ].
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+(* bof *)
 ...
 intros * Ha Hal Hb.
 assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
