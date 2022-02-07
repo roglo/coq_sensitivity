@@ -2087,6 +2087,15 @@ rewrite comp_1_r. 2: {
 }
 subst lc.
 ...
+Theorem glop : ∀ la lb,
+  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb) =
+  bsort_rank Nat.leb (la ° lb).
+Proof.
+Compute (let la := [2;7;15;1] in map (λ lb,
+  bsort_rank Nat.leb (bsort_rank Nat.leb la ° lb) =
+  bsort_rank Nat.leb (la ° lb)
+) (canon_sym_gr_list_list (length la))).
+...
 (**)
 apply permut_comp_cancel_r with (n := n) (lc := la). {
   apply bsort_rank_is_permut.
