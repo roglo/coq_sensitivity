@@ -2474,22 +2474,6 @@ Qed.
 
 ...
 
-Theorem signature_comp : in_charac_0_field →
-  ∀ n la lb,
-  is_permut n la
-  → is_permut n lb
-  → ε (la ° lb) = (ε la * ε lb)%F.
-Proof.
-intros Hif * Hpf Hpg.
-destruct Hpf as (Hfp, Hfn).
-destruct Hpg as (Hgp, Hgn).
-apply signature_comp_fun_expand_1 with (n := n); [ easy | easy | easy | ].
-destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-rewrite signature_comp_fun_expand_2_1; try easy.
-rewrite signature_comp_fun_expand_2_2; try easy.
-now apply signature_comp_fun_changement_of_variable.
-Qed.
-
 Theorem butn_is_permut_list : ∀ i la,
   is_permut_list la
   → i = ff_app (bsort_rank Nat.leb la) (length la - 1)
