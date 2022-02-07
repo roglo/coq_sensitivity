@@ -2640,8 +2640,18 @@ Theorem sign_comp : in_charac_0_field →
 Proof.
 intros Hif * Haa Hbp.
 rewrite <- ε_collapse_ε.
+rewrite <- (ε_collapse_ε Haa).
+Search (ε (collapse _)).
+Search (collapse (_ ° _)).
+...
+Check collapse_comp.
+Check ε_collapse_ε.
+...
+intros Hif * Haa Hbp.
+rewrite <- (ε_collapse_ε Haa).
 Search (collapse (_ ° _)).
 Check collapse_comp.
+Check ε_collapse_ε.
 ...
 intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
