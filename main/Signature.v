@@ -2391,6 +2391,8 @@ Compute (let la := [7;2;29;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 *)
 intros * Ha Hal Hb.
+Check permut_bsort_rank_comp.
+...
 assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
   now apply bsort_rank_is_permut.
 }
