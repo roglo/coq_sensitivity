@@ -2600,42 +2600,20 @@ Theorem collapse_comp : ∀ la lb,
   → collapse (la ° lb) = collapse la ° lb.
 Proof.
 intros * Ha Hb Hab.
-clear Ha.
 unfold collapse.
-Check permut_bsort_rank_comp.
-..
-Compute (let la := [7;2;3;1] in map (λ lb,
-bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
-...
-intros * Ha Hb Hab.
-Search (bsort_rank _ _ ° _).
-rewrite (permut_bsort_rank_comp (length la)); [ | | easy ].
-rewrite (permut_bsort_rank_comp (length la)); cycle 1. {
+symmetry.
+rewrite <- (permut_bsort_rank_involutive Hb) at 1.
+rewrite (permut_bsort_rank_comp (length lb)); cycle 1. {
+  now destruct Ha.
+} {
+  now destruct Hb.
+}
+rewrite (permut_bsort_rank_comp (length lb)); cycle 1. {
   now apply bsort_rank_is_permut.
 } {
+  rewrite <- Hab.
   now apply bsort_rank_is_permut.
 }
-rewrite permut_bsort_rank_involutive; [ | easy ].
-rewrite permut_bsort_rank_involutive; [ | easy ].
-easy.
-Qed.
-
-Theorem collapse_comp : ∀ la lb,
-  is_permut_list la
-  → is_permut_list lb
-  → length la = length lb
-  → collapse (la ° lb) = collapse la ° lb.
-Proof.
-intros * Ha Hb Hab.
-unfold collapse.
-rewrite (permut_bsort_rank_comp (length la)); [ | easy | easy ].
-rewrite (permut_bsort_rank_comp (length la)); cycle 1. {
-  now apply bsort_rank_is_permut.
-} {
-  now apply bsort_rank_is_permut.
-}
-rewrite permut_bsort_rank_involutive; [ | easy ].
-rewrite permut_bsort_rank_involutive; [ | easy ].
 easy.
 Qed.
 
@@ -2663,6 +2641,7 @@ Proof.
 intros Hif * Haa Hbp.
 rewrite <- ε_collapse_ε.
 Search (collapse (_ ° _)).
+Check collapse_comp.
 ...
 intros Hif * Haa Hbp.
 rewrite <- (ε_collapse_ε Haa).
