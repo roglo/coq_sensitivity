@@ -2376,7 +2376,6 @@ Theorem fold_collapse : ∀ l,
 Proof. easy. Qed.
 
 (* perhaps true, but perhaps not necessary; anyway, I don't know how to prove it *)
-(*
 Theorem permut_r_bsort_rank_comp : ∀ n la lb,
   NoDup la
   → length la = n
@@ -2392,6 +2391,18 @@ bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) 
 Compute (let la := [7;2;29;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 *)
+intros * Ha Hal Hb.
+apply List_eq_iff.
+split. 2: {
+  intros d i.
+  unfold "°"; cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite length_bsort_rank.
+    admit.
+  }
+  unfold ff_app.
+Search (bsort_rank _ (map _ _)).
+...
 intros * Ha Hal Hb.
 Check permut_bsort_rank_comp.
 ...
