@@ -2385,7 +2385,7 @@ Theorem permut_r_bsort_rank_comp : ∀ n la lb,
     bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
 Proof.
 (*
-Compute (let la := [18;2;29;7;1] in map (λ lb,
+Compute (let la := [1;17;18;29;7] in map (λ lb,
 list_eqb Nat.eqb (bsort_rank Nat.leb (la ° lb)) (bsort_rank Nat.leb lb ° bsort_rank Nat.leb la)) (canon_sym_gr_list_list 5)).
 Compute (let la := [29;2;7;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
