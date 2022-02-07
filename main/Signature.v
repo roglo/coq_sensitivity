@@ -2399,6 +2399,8 @@ assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
   now destruct Hb.
 }
 apply permut_comp_cancel_l with (n := n) (la := lb). {
+  now destruct Hb as ((Hba, Hbd), Hbl).
+} {
   now destruct Hb.
 } {
   apply bsort_rank_is_permut.
