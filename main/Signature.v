@@ -2377,6 +2377,10 @@ unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
 
+Theorem fold_collapse : ∀ l,
+  bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
+Proof. easy. Qed.
+
 Theorem permut_r_bsort_rank_comp : ∀ n la lb,
   NoDup la
   → length la = n
@@ -2423,6 +2427,8 @@ subst lc.
 Search bsort_rank.
 Search (bsort_rank _ (bsort_rank _ _)).
 Inspect 1.
+Inspect 7.
+rewrite fold_collapse.
 ...
 (**)
 apply permut_comp_cancel_r with (n := n) (lc := la). {
@@ -2483,10 +2489,6 @@ rewrite signature_comp_fun_expand_2_1; try easy.
 rewrite signature_comp_fun_expand_2_2; try easy.
 now apply signature_comp_fun_changement_of_variable.
 Qed.
-
-Theorem fold_collapse : ∀ l,
-  bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
-Proof. easy. Qed.
 
 Theorem butn_is_permut_list : ∀ i la,
   is_permut_list la
