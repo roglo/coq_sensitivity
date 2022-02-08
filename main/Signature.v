@@ -2419,14 +2419,17 @@ induction l as [| a]; intros; cbn. {
     now rewrite List_nth_nil.
   }
   rewrite map_const.
-  destruct (lt_dec i (length lsorted + length p)) as [Hil| Hil]. 2: {
-    apply Nat.nlt_ge in Hil.
+  destruct (lt_dec i (length lsorted + length p)) as [Hil2| Hil2]. 2: {
+    apply Nat.nlt_ge in Hil2.
     rewrite nth_overflow. 2: {
       rewrite length_bsort_loop.
       now rewrite repeat_length.
     }
-    rewrite nth_overflow; [ easy | flia Hil ].
+    rewrite nth_overflow; [ easy | flia Hil2 ].
   }
+  destruct (lt_dec i (length lsorted)) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil; symmetry.
+    rewrite nth_overflow; [ symmetry | easy ].
 ...
 Search (map (λ _, _)).
 Search (map (λ _, nth _ _ _)).
