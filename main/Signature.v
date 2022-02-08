@@ -2391,7 +2391,10 @@ Compute (let la := [7;2;29;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 *)
 intros * Ha Hal Hb.
-apply List_eq_iff.
+Compute (let la := [8;7;3] in let lb := [1;2;0] in
+bsort_rank Nat.leb (la ° lb) =
+    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la).
+...
 split. 2: {
   intros d i.
   destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
