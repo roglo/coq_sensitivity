@@ -2375,7 +2375,6 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
-(* perhaps true, but perhaps not necessary; anyway, I don't know how to prove it *)
 Theorem permut_r_bsort_rank_comp : ∀ n la lb,
   NoDup la
   → length la = n
@@ -2417,12 +2416,7 @@ split. 2: {
   }
   do 2 rewrite fold_ff_app.
 clear d.
-destruct la as [| d]; [ easy | ].
-cbn - [ nth bsort_rank_loop ].
-remember (d :: la) as la' eqn:Hla'.
-rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
-clear la d Hla'.
-rename la' into la.
+(**)
 destruct lb as [| d]. {
   destruct Hb as (Hbp, Hbl); cbn in Hbl; subst n; cbn.
   now rewrite <- Hbl in Hila.
@@ -2433,6 +2427,38 @@ rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
 clear lb d Hlb'.
 rename lb' into lb.
 move lb before la; move i before n.
+(*
+  ============================
+  ff_app (bsort_rank Nat.leb (map (ff_app la) lb)) i =
+  ff_app (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 lb 0) [] lb) (ff_app (bsort_rank Nat.leb la) i)
+*)
+...
+destruct la as [| d]; [ easy | ].
+cbn - [ nth bsort_rank_loop ].
+remember (d :: la) as la' eqn:Hla'.
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+clear la d Hla'.
+rename la' into la.
+(*
+  ============================
+  ff_app (bsort_rank Nat.leb (map (ff_app la) lb)) i =
+  ff_app (bsort_rank Nat.leb lb) (ff_app (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 la 0) [] la) i)
+*)
+destruct lb as [| d]. {
+  destruct Hb as (Hbp, Hbl); cbn in Hbl; subst n; cbn.
+  now rewrite <- Hbl in Hila.
+}
+cbn - [ nth bsort_rank_loop map ].
+remember (d :: lb) as lb' eqn:Hlb'.
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+clear lb d Hlb'.
+rename lb' into lb.
+move lb before la; move i before n.
+...
+  ============================
+  ff_app (bsort_rank Nat.leb (map (ff_app la) lb)) i =
+  ff_app (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 lb 0) [] lb)
+    (ff_app (bsort_rank_loop Nat.leb (λ i0 : nat, nth i0 la 0) [] la) i)
 ...
 intros * Ha Hal Hb.
 Check permut_bsort_rank_comp.
