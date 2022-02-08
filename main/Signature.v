@@ -2396,10 +2396,45 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
+unfold "°".
+unfold bsort.
+Theorem glop : ∀ l p lsorted i,
+  nth i (bsort_loop Nat.leb lsorted (map (ff_app l) p)) 0 =
+  nth i (bsort_loop Nat.leb lsorted l) 0.
+Proof.
+(* oui non c'est pas bon, ça ; y a le map qui perturbe le lsorted *)
+...
+intros.
+revert i lsorted p.
+induction l as [| a]; intros; cbn. {
+  unfold ff_app.
+  erewrite map_ext_in. 2: {
+    intros.
+    now rewrite List_nth_nil.
+  }
+Theorem map_const : ∀ A B (l : list A) (b : B),
+  map (λ _, b) l = repeat b (length l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
+Qed.
+rewrite map_const.
+destruct (lt_dec i (length lsorted)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow. 2: {
+    rewrite length_bsort_loop.
+    rewrite repeat_length.
+...
+Search (map (λ _, _)).
+Search (map (λ _, nth _ _ _)).
+...
+apply glop.
+...
 rewrite bsort_bsort_rank with (d := 0).
 rewrite bsort_bsort_rank with (d := 0).
 rewrite (List_map_nth' 0).
 rewrite (List_map_nth' 0).
+Search (bsort_rank _ (_ ° _)).
 ...
 Search bsort_rank.
 ...
