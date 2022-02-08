@@ -2432,6 +2432,7 @@ remember (d :: lb) as lb' eqn:Hlb'.
 rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
 clear lb d Hlb'.
 rename lb' into lb.
+move lb before la; move i before n.
 ...
 intros * Ha Hal Hb.
 Check permut_bsort_rank_comp.
