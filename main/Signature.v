@@ -2396,6 +2396,12 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
+rewrite bsort_bsort_rank with (d := 0).
+rewrite bsort_bsort_rank with (d := 0).
+rewrite (List_map_nth' 0).
+rewrite (List_map_nth' 0).
+...
+Search bsort_rank.
 ...
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
    tel qu'il existe exactement i-1 éléments inférieurs à lui *)
