@@ -2405,13 +2405,15 @@ rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
 unfold "°".
 unfold bsort.
+...
 Theorem glop : ∀ l p lsorted i,
   sorted Nat.leb lsorted = true
+  → NoDup (lsorted ++ p)
   → nth i (bsort_loop Nat.leb lsorted (map (ff_app l) p)) 0 =
     nth i (bsort_loop Nat.leb lsorted l) 0.
 Proof.
-intros * Hs.
-revert i lsorted p Hs.
+intros * Hs Hnd.
+revert i lsorted p Hs Hnd.
 induction l as [| a]; intros; cbn. {
   unfold ff_app.
   erewrite map_ext_in. 2: {
@@ -2430,6 +2432,10 @@ induction l as [| a]; intros; cbn. {
   destruct (lt_dec i (length lsorted)) as [Hil| Hil]. 2: {
     apply Nat.nlt_ge in Hil; symmetry.
     rewrite nth_overflow; [ symmetry | easy ].
+    destruct p as [| b]; [ cbn in Hil2; flia Hil2 Hil | ].
+    destruct p as [| b']. {
+      cbn in Hil2.
+      replace i with (length lsorted) by flia Hil2 Hil; cbn.
 ...
 Search (map (λ _, _)).
 Search (map (λ _, nth _ _ _)).
