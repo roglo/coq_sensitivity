@@ -2395,13 +2395,27 @@ intros * Ha Hal Hb.
 apply List_eq_iff.
 split. 2: {
   intros d i.
-  unfold "°"; cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite length_bsort_rank.
-    admit.
+  destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+    apply Nat.nlt_ge in Hila.
+    rewrite nth_overflow. 2: {
+      destruct Hb as (Hbp, Hbl).
+      rewrite length_bsort_rank, comp_length.
+      congruence.
+    }
+    rewrite nth_overflow. 2: {
+      destruct Hb as (Hbp, Hbl).
+      now rewrite comp_length, length_bsort_rank.
+    }
+    easy.
   }
-  unfold ff_app.
-Search (bsort_rank _ (map _ _)).
+  unfold "°"; cbn.
+  rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
+  rewrite nth_indep with (d' := 0). 2: {
+    destruct Hb as (Hbp, Hbl).
+    rewrite length_bsort_rank, map_length.
+    congruence.
+  }
+  do 2 rewrite fold_ff_app.
 ...
 intros * Ha Hal Hb.
 Check permut_bsort_rank_comp.
