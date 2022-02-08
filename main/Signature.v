@@ -2398,6 +2398,9 @@ rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
    tel qu'il existe exactement i-1 éléments inférieurs à lui *)
+Theorem glop : ∀ l i,
+  i = length (filter (λ a, Nat.leb a (nth i l 0)) l).
+...
 Print Module List.
 Check find.
 find (λ a, Nat.eqb (
