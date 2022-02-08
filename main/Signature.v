@@ -2416,18 +2416,22 @@ split. 2: {
     congruence.
   }
   do 2 rewrite fold_ff_app.
-destruct la as [| d']; [ easy | ].
+clear d.
+destruct la as [| d]; [ easy | ].
 cbn - [ nth bsort_rank_loop ].
-remember (d' :: la) as la' eqn:Hla'.
+remember (d :: la) as la' eqn:Hla'.
 rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
-clear la d' Hla'.
+clear la d Hla'.
 rename la' into la.
-...
-destruct lb as [| b]. {
+destruct lb as [| d]. {
   destruct Hb as (Hbp, Hbl); cbn in Hbl; subst n; cbn.
   now rewrite <- Hbl in Hila.
 }
-cbn - [ nth bsort_rank_loop ].
+cbn - [ nth bsort_rank_loop map ].
+remember (d :: lb) as lb' eqn:Hlb'.
+rewrite bsort_rank_loop_nth_indep with (d' := 0); [ | easy | easy ].
+clear lb d Hlb'.
+rename lb' into lb.
 ...
 intros * Ha Hal Hb.
 Check permut_bsort_rank_comp.
