@@ -2375,12 +2375,12 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
-Theorem permut_r_bsort_rank_comp : ∀ n la lb,
-  NoDup la
-  → length la = n
-  → is_permut n lb
-  → bsort_rank Nat.leb (la ° lb) =
-    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
+Theorem permut_r_bsort_rank_comp : ∀ A ord d n (l : list A) p,
+  NoDup l
+  → length l = n
+  → is_permut n p
+  → bsort_rank ord (map (λ i, nth i l d) p) =
+    bsort_rank Nat.leb p ° bsort_rank ord l.
 Proof.
 (*
 Compute (let la := [1;17;18;29;7] in map (λ lb,
