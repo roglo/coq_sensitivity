@@ -2060,7 +2060,7 @@ apply permut_comp_cancel_r with (n := n) (lc := la). {
 } {
   easy.
 }
-rewrite <- (@permut_comp_assoc n); [ | | easy ]. 2: {
+rewrite <- (permut_comp_assoc n); [ | | easy ]. 2: {
   now rewrite length_bsort_rank; destruct Ha.
 }
 rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
@@ -2079,7 +2079,7 @@ apply permut_comp_cancel_r with (n := n) (lc := lb). {
 } {
   easy.
 }
-rewrite <- (@permut_comp_assoc n); [ | now destruct Ha | easy ].
+rewrite <- (permut_comp_assoc n); [ | now destruct Ha | easy ].
 rewrite permut_comp_bsort_rank_l. 2: {
   now apply (comp_is_permut_list n).
 }
@@ -2375,12 +2375,12 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
-Theorem permut_r_bsort_rank_comp : ∀ A ord d n (l : list A) p,
-  NoDup l
-  → length l = n
-  → is_permut n p
-  → bsort_rank ord (map (λ i, nth i l d) p) =
-    bsort_rank Nat.leb p ° bsort_rank ord l.
+Theorem permut_r_bsort_rank_comp : ∀ n la lb,
+  NoDup la
+  → length la = n
+  → is_permut n lb
+  → bsort_rank Nat.leb (la ° lb) =
+    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
 Proof.
 (*
 Compute (let la := [1;17;18;29;7] in map (λ lb,
@@ -2390,6 +2390,66 @@ bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) 
 Compute (let la := [7;2;29;1] in map (λ lb,
 bsort_rank Nat.leb (la ° lb) = bsort_rank Nat.leb lb ° bsort_rank Nat.leb la) (canon_sym_gr_list_list 4)).
 *)
+intros * Ha Hal Hb.
+apply permut_comp_cancel_l with (n := n) (la := la ° lb). {
+  destruct Hb as ((Hba, Hbn), Hbl).
+  unfold "°".
+  apply (NoDup_map_iff 0).
+  intros i j Hi Hj Hij.
+  apply (NoDup_nat _ Ha) in Hij; cycle 1. {
+    rewrite Hal, <- Hbl.
+    now apply Hba, nth_In.
+  } {
+    rewrite Hal, <- Hbl.
+    now apply Hba, nth_In.
+  }
+  now apply (NoDup_nat _ Hbn) in Hij.
+} {
+  now rewrite comp_length; destruct Hb.
+} {
+  apply bsort_rank_is_permut.
+  now rewrite comp_length; destruct Hb.
+} {
+  destruct Hb.
+  now apply comp_is_permut; apply bsort_rank_is_permut.
+}
+rewrite comp_bsort_rank_r.
+rewrite <- (permut_comp_assoc n); cycle 1. {
+  now destruct Hb.
+} {
+  destruct Hb as ((Hba, Hbn), Hbl).
+  now apply comp_is_permut; apply bsort_rank_is_permut.
+}
+rewrite (permut_comp_assoc n) with (f := lb); cycle 1. {
+  destruct Hb as ((Hba, Hbn), Hbl).
+  now rewrite length_bsort_rank.
+} {
+  now apply bsort_rank_is_permut.
+}
+rewrite comp_bsort_rank_r.
+destruct Hb as (Hbp, Hbl).
+rewrite (permut_bsort_leb Hbp).
+rewrite comp_1_l. 2: {
+  intros i Hi.
+  rewrite Hbl, <- Hal.
+  now apply in_permut_list_inv_lt.
+}
+rewrite comp_bsort_rank_r.
+...
+rewrite <- (permut_comp_assoc n); cycle 1. {
+  now rewrite length_bsort_rank; destruct Hb.
+} {
+  now apply bsort_rank_is_permut.
+}
+...
+rewrite (permut_comp_assoc n); cycle 1. {
+  now rewrite length_bsort_rank; destruct Hb.
+} {
+  now apply bsort_rank_is_permut.
+}
+rewrite <- (permut_comp_assoc n).
+rewrite <- (permut_comp_assoc n) with (f := lb).
+...
 intros * Ha Hal Hb.
 Compute (let la := [8;7;3] in let lb := [1;2;0] in
 bsort_rank Nat.leb (la ° lb) =

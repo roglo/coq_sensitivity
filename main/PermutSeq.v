@@ -73,6 +73,8 @@ rewrite Hg, <- Hh.
 now apply Hph.
 Qed.
 
+Arguments permut_comp_assoc n%nat [f g h]%list.
+
 Theorem is_permut_list_is_permut_list_bool : ∀ l,
   is_permut_list l ↔ is_permut_list_bool l = true.
 Proof.
