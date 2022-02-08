@@ -2396,10 +2396,12 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
+...
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
    tel qu'il existe exactement i-1 éléments inférieurs à lui *)
-Theorem glop : ∀ l i,
-  i = length (filter (λ a, Nat.leb a (nth i l 0)) l).
+Definition glop l i := length (filter (λ a, Nat.leb a (nth i l 0)) l) - 1.
+Compute (let l := [3;7;8;17;1] in (map (glop l) (seq 0 (length l)), bsort_rank Nat.leb (bsort_rank Nat.leb l))).
+Compute (let l := [7;3;8;17;1] in (map (glop l) (seq 0 (length l)), bsort_rank Nat.leb (bsort_rank Nat.leb l))).
 ...
 Print Module List.
 Check find.
