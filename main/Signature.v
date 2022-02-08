@@ -2375,6 +2375,13 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem map_const : ∀ A B (l : list A) (b : B),
+  map (λ _, b) l = repeat b (length l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
+Qed.
+
 Theorem bsort_comp_permut_r : ∀ l p,
   is_permut (length l) p
   → bsort Nat.leb (l ° p) = bsort Nat.leb l.
@@ -2399,31 +2406,27 @@ symmetry.
 unfold "°".
 unfold bsort.
 Theorem glop : ∀ l p lsorted i,
-  nth i (bsort_loop Nat.leb lsorted (map (ff_app l) p)) 0 =
-  nth i (bsort_loop Nat.leb lsorted l) 0.
+  sorted Nat.leb lsorted = true
+  → nth i (bsort_loop Nat.leb lsorted (map (ff_app l) p)) 0 =
+    nth i (bsort_loop Nat.leb lsorted l) 0.
 Proof.
-(* oui non c'est pas bon, ça ; y a le map qui perturbe le lsorted *)
-...
-intros.
-revert i lsorted p.
+intros * Hs.
+revert i lsorted p Hs.
 induction l as [| a]; intros; cbn. {
   unfold ff_app.
   erewrite map_ext_in. 2: {
     intros.
     now rewrite List_nth_nil.
   }
-Theorem map_const : ∀ A B (l : list A) (b : B),
-  map (λ _, b) l = repeat b (length l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
-Qed.
-rewrite map_const.
-destruct (lt_dec i (length lsorted)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow. 2: {
-    rewrite length_bsort_loop.
-    rewrite repeat_length.
+  rewrite map_const.
+  destruct (lt_dec i (length lsorted + length p)) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil.
+    rewrite nth_overflow. 2: {
+      rewrite length_bsort_loop.
+      now rewrite repeat_length.
+    }
+    rewrite nth_overflow; [ easy | flia Hil ].
+  }
 ...
 Search (map (λ _, _)).
 Search (map (λ _, nth _ _ _)).
