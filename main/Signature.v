@@ -2375,6 +2375,36 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
+Theorem bsort_comp_permut_r : ∀ l p,
+  is_permut (length l) p
+  → bsort Nat.leb (l ° p) = bsort Nat.leb l.
+Proof.
+intros * Hp.
+apply List_eq_iff.
+do 2 rewrite length_bsort.
+rewrite comp_length.
+destruct Hp as (Hpp, Hpl).
+split; [ easy | ].
+intros.
+destruct (lt_dec i (length p)) as [Hip| Hip]. 2: {
+  apply Nat.nlt_ge in Hip.
+  rewrite nth_overflow; [ | now rewrite length_bsort, comp_length ].
+  rewrite nth_overflow; [ | rewrite length_bsort; congruence ].
+  easy.
+}
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
+symmetry.
+rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
+symmetry.
+(* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
+   tel qu'il existe exactement i-1 éléments inférieurs à lui *)
+Print Module List.
+Check find.
+find (λ a, Nat.eqb (
+nth i (bsort ord l) =
+nth i (bsort ord l) = length (filter (λ a, Nat.leb a (nth
+...
+
 Theorem permut_r_bsort_rank_comp : ∀ n la lb,
   NoDup la
   → length la = n
@@ -2435,6 +2465,8 @@ rewrite comp_1_l. 2: {
   now apply in_permut_list_inv_lt.
 }
 rewrite comp_bsort_rank_r.
+...
+now apply bsort_comp_permut_r.
 ...
 rewrite <- (permut_comp_assoc n); cycle 1. {
   now rewrite length_bsort_rank; destruct Hb.
