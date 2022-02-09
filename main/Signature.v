@@ -2415,6 +2415,22 @@ Permutation_bsort_loop_sorted:
 Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
 *)
 
+Theorem glop : ∀ A (ord : A → _) la lb a,
+  bsort ord la = bsort ord lb
+  → bsort ord (a :: la) = bsort ord (a :: lb).
+Proof.
+intros * Hab.
+unfold bsort in Hab |-*; cbn.
+Theorem glip :
+  bsort_loop ord ls1 la = bsort_loop ord ls1 lb
+  → bsort_loop ord ls2 la = bsort_loop ord ls2 lb.
+...
+
+remember (length la) as n eqn:Hn; symmetry in Hn.
+revert la lb Hab Hn.
+induction n; intros; cbn. {
+...
+
 Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
   Permutation la lb
   → bsort ord la = bsort ord lb.
