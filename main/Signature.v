@@ -2404,7 +2404,43 @@ symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
 unfold "°".
+...
+Theorem glop : ∀ l i,
+∃ k,
+nth i (bsort Nat.leb l) 0 = k ∧
+length (filter (λ a, Nat.leb a k) l) - 1 = i.
+Admitted.
+specialize (glop (map (ff_app l) p) i) as H1.
+destruct H1 as (u & Hu & Hui).
+specialize (glop l i) as H1.
+destruct H1 as (v & Hv & Hvi).
+rewrite Hu, Hv.
+(* ouais, chais pas *)
+...
 unfold bsort.
+(* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
+   tel qu'il existe exactement i-1 éléments inférieurs à lui *)
+Compute (
+let l := [7;2;9;4] in
+map (λ i,
+let k := nth i (bsort Nat.leb l) 0 in
+length (filter (λ a, Nat.leb a k) l) - 1 = i) (seq 0 (length l))
+).
+...
+Theorem glop : ∀ l p lsorted i,
+  sorted Nat.leb lsorted = true
+  → NoDup (lsorted ++ p)
+  → i =
+    length
+      (filter (λ a, Nat.leb a (nth i (bsort_loop Nat.leb lsorted l) 0))
+         (lsorted ++ p)).
+Proof.
+Compute (let lsorted := [] in let p := [3;1;2;0] in
+let i := 0 in
+i =
+    length
+      (filter (λ a, Nat.leb a (nth i (bsort_loop Nat.leb lsorted l) 0))
+         (lsorted ++ p))).
 ...
 Theorem glop : ∀ l p lsorted i,
   sorted Nat.leb lsorted = true
