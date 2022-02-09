@@ -2390,7 +2390,6 @@ specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
 specialize (H1 (l ° p)) as H2.
 specialize (H1 l) as H3.
 ...
-intros * Hp.
 apply List_eq_iff.
 do 2 rewrite length_bsort.
 rewrite comp_length.
@@ -2407,6 +2406,7 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
+...
 specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
 specialize (H1 (l ° p)) as H2.
 specialize (H1 l) as H3.
