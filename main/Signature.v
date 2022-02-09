@@ -2288,8 +2288,7 @@ assert (Hj'l : j' < length l). {
 }
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
-specialize bsort_is_sorted as Hsl.
-specialize (Hsl _ Nat.leb l Nat_leb_has_total_order).
+specialize (bsort_is_sorted Nat_leb_has_total_order l) as Hsl.
 rewrite (bsort_bsort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
@@ -2382,65 +2381,15 @@ intros.
 induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
 Qed.
 
-Theorem sorted_bsort_insert : ∀ A (ord : A → _),
-  total_order ord
-  → ∀ a lsorted,
-  sorted ord lsorted = true
-  → sorted ord (bsort_insert ord a lsorted) = true.
-Proof.
-intros * Hto * Hs.
-induction lsorted as [| b]; [ easy | cbn ].
-remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (b :: lsorted) as l; cbn; subst l.
-  now apply Bool.andb_true_iff.
-} {
-  cbn in Hs |-*.
-  destruct lsorted as [| c]. {
-    cbn; rewrite Bool.andb_true_r.
-    specialize (Hto a b) as H1.
-    now rewrite Hab in H1.
-  } {
-    remember (bsort_insert ord a (c :: lsorted)) as l eqn:Hl.
-    symmetry in Hl.
-    destruct l as [| d]; [ easy | ].
-    apply Bool.andb_true_iff.
-    apply Bool.andb_true_iff in Hs.
-    cbn in Hl.
-    remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-    destruct ac. {
-      injection Hl; clear Hl; intros; subst d l.
-      specialize (Hto a b) as H1.
-      rewrite Hab in H1.
-      split; [ easy | ].
-      remember (c :: lsorted) as l; cbn; subst l.
-      now apply Bool.andb_true_iff.
-    } {
-      injection Hl; clear Hl; intros; subst d l.
-      split; [ easy | ].
-      now apply IHlsorted.
-    }
-  }
-}
-Qed.
-
-Theorem sorted_bsort_loop : ∀ A (ord : A → _),
-  total_order ord
-  → ∀ lsorted l,
-  sorted ord lsorted = true
-  → sorted ord (bsort_loop ord lsorted l) = true.
-Proof.
-intros * Htot * Hs.
-revert lsorted Hs.
-induction l as [| a]; intros; [ easy | cbn ].
-apply IHl.
-now apply sorted_bsort_insert.
-Qed.
-
-Theorem bsort_comp_permut_r : ∀ l p,
+Theorem bsort_comp_permut_r' : ∀ l p,
   is_permut (length l) p
   → bsort Nat.leb (l ° p) = bsort Nat.leb l.
 Proof.
+intros * Hp.
+specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
+specialize (H1 (l ° p)) as H2.
+specialize (H1 l) as H3.
+...
 intros * Hp.
 apply List_eq_iff.
 do 2 rewrite length_bsort.
@@ -2458,12 +2407,10 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
-unfold bsort.
-specialize (sorted_bsort_loop Nat_leb_has_total_order []) as H1.
-assert (H : sorted Nat.leb [] = true) by easy.
-specialize (H1 (l ° p) H) as H2.
-specialize (H1 l H) as H3.
-clear H.
+specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
+specialize (H1 (l ° p)) as H2.
+specialize (H1 l) as H3.
+Search (sorted _ _ = true).
 ...
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
    tel qu'il existe exactement i-1 éléments inférieurs à lui *)
@@ -2483,6 +2430,7 @@ find (λ a, Nat.eqb (
 nth i (bsort ord l) =
 nth i (bsort ord l) = length (filter (λ a, Nat.leb a (nth
 ...
+*)
 
 Theorem permut_r_bsort_rank_comp : ∀ n la lb,
   NoDup la
@@ -2545,7 +2493,8 @@ rewrite comp_1_l. 2: {
 }
 rewrite comp_bsort_rank_r.
 ...
-now apply bsort_comp_permut_r.
+apply bsort_comp_permut_r.
+now rewrite Hal, <- Hbl.
 ...
 rewrite <- (permut_comp_assoc n); cycle 1. {
   now rewrite length_bsort_rank; destruct Hb.

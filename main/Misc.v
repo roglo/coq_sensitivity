@@ -2579,11 +2579,11 @@ induction l as [| a]; intros; [ easy | cbn ].
 now apply IHl, bsort_insert_is_sorted.
 Qed.
 
-Theorem bsort_is_sorted : ∀ A ord (l : list A),
+Theorem bsort_is_sorted : ∀ A (ord : A → _),
   total_order ord
-  → sorted ord (bsort ord l) = true.
+  → ∀ l, sorted ord (bsort ord l) = true.
 Proof.
-intros * Hto.
+intros * Hto *.
 destruct l as [| a]; [ easy | cbn ].
 now apply bsort_loop_is_sorted.
 Qed.
