@@ -2381,6 +2381,38 @@ intros.
 induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
 Qed.
 
+Theorem comp_0_l : ∀ l, [] ° l = repeat 0 (length l).
+Proof.
+intros.
+unfold "°".
+induction l as [| a]; [ easy | cbn ].
+now destruct a; rewrite IHl.
+Qed.
+
+Theorem permut_bsort_loop : ∀ n ord la lb l p q,
+  is_permut n p
+  → is_permut n q
+  → sorted ord la = true
+  → sorted ord lb = true
+  → Permutation la lb
+  → bsort_loop ord la (l ° p) = bsort_loop ord lb (l ° q).
+Proof.
+intros * Hp Hq Ha Hb Hab.
+induction l as [| a]; cbn. {
+  do 2 rewrite comp_0_l.
+  destruct Hp as (Hpp, Hpl).
+  destruct Hq as (Hqp, Hql).
+  rewrite Hpl, Hql.
+...
+  apply Permutation_bsort_loop_sorted with (ord := ord) (lc := repeat 0 n) in Hab.
+...
+Permutation_bsort_loop_sorted:
+  ∀ (A : Type) (ord : A → A → bool) (la lb lc : list A),
+    Permutation la lb → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc)
+...
+
+Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
+
 Theorem permut_bsort : ∀ n ord l p q,
   is_permut n p
   → is_permut n q
@@ -2388,6 +2420,8 @@ Theorem permut_bsort : ∀ n ord l p q,
 Proof.
 intros * Hp Hq.
 unfold bsort.
+...
+now apply (permut_bsort_loop n).
 ...
 
 Theorem bsort_comp_permut_r : ∀ l p,
