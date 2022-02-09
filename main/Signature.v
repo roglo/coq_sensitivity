@@ -2427,7 +2427,19 @@ induction n; intros; cbn. {
   now apply Permutation_nil in Hab; subst lb.
 }
 destruct la as [| a]; [ easy | ].
+inversion Hab. {
+  subst x l lb.
+  cbn in Hn.
+  apply Nat.succ_inj in Hn.
+  specialize (IHn la l' H2 Hn) as H3.
+...
+} {
+  subst y la lb.
+...
 Search (Permutation (_ :: _)).
+Permutation_cons_app_inv:
+  ∀ (A : Type) (l l1 l2 : list A) (a : A),
+    Permutation (a :: l) (l1 ++ a :: l2) → Permutation l (l1 ++ l2)
 ...
 
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb lsorted a,
