@@ -2382,12 +2382,69 @@ intros.
 induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
 Qed.
 
-Theorem sorted_bsort_insert : ∀ A (ord : A → _) a lsorted,
+Theorem sorted_bsort_insert : ∀ A (ord : A → _),
+  total_order ord
+  → ∀ a lsorted,
   sorted ord lsorted = true
   → NoDup (a :: lsorted)
   → sorted ord (bsort_insert ord a lsorted) = true.
 Proof.
-intros * Hs Hnd.
+intros * Hto * Hs Hnd.
+induction lsorted as [| b]; [ easy | cbn ].
+remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (b :: lsorted) as l; cbn; subst l.
+  now apply Bool.andb_true_iff.
+} {
+...
+  cbn in Hs |-*.
+  destruct lsorted as [| c]; cbn. {
+    rewrite Bool.andb_true_r.
+    specialize (Hto a b) as H1.
+    now rewrite Hab in H1.
+  } {
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hbc, Hs).
+    remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+    destruct ac. {
+      apply Bool.andb_true_iff.
+      split. {
+        specialize (Hto a b) as H1.
+        now rewrite Hab in H1.
+      }
+      remember (c :: lsorted) as l; cbn; subst l.
+      now apply Bool.andb_true_iff.
+    } {
+      apply Bool.andb_true_iff.
+      split; [ easy | ].
+      cbn in Hs |-*.
+      destruct lsorted as [| d]; cbn. {
+        rewrite Bool.andb_true_r.
+        specialize (Hto c a) as H1.
+        now rewrite Hac, Bool.orb_false_r in H1.
+      }
+      remember (ord a d) as ad eqn:Had; symmetry in Had.
+      apply Bool.andb_true_iff in Hs.
+      destruct Hs as (Hcd, Hs).
+      destruct ad. {
+        apply Bool.andb_true_iff.
+        specialize (Hto a c) as H1.
+        rewrite Hac in H1.
+        split; [ easy | ].
+        remember (d :: lsorted) as l; cbn; subst l.
+        now apply Bool.andb_true_iff.
+      } {
+        apply Bool.andb_true_iff.
+        split; [ easy | ].
+...
+    specialize (Hant b a) as H1.
+    apply Hant in Hx.
+...
+  remember (bsort_insert ord a lsorted) as l eqn:Hl.
+  symmetry in Hl.
+  destruct l as [| c]; [ easy | ].
+  apply Bool.andb_true_iff.
+  cbn in Hs.
 ...
 
 Theorem sorted_bsort_loop : ∀ A (ord : A → _),
