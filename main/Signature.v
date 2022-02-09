@@ -2389,6 +2389,7 @@ induction l as [| a]; [ easy | cbn ].
 now destruct a; rewrite IHl.
 Qed.
 
+(*
 Theorem permut_bsort_loop : ∀ n ord la lb l p q,
   is_permut n p
   → is_permut n q
@@ -2412,6 +2413,53 @@ Permutation_bsort_loop_sorted:
 ...
 
 Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
+*)
+
+Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
+  Permutation la lb
+  → bsort ord la = bsort ord lb.
+Proof.
+intros * Hab.
+unfold bsort.
+Theorem Permutation_bsort_loop' : ∀ A (ord : A → _) lsorted la lb,
+  Permutation la lb
+  → bsort_loop ord lsorted la = bsort_loop ord lsorted lb.
+Proof.
+intros * Hab.
+revert lsorted lb Hab.
+induction la as [| a]; intros; cbn. {
+  destruct lb as [| b]; [ easy | ].
+  now apply Permutation_nil_cons in Hab.
+}
+destruct lb as [| b]. {
+  apply Permutation_sym in Hab.
+  now apply Permutation_nil_cons in Hab.
+}
+cbn.
+inversion Hab. {
+  subst x l l' b.
+  now apply IHla.
+} {
+  subst x y la lb; cbn.
+  admit.
+} {
+  subst l l''.
+  clear IHla.
+  clear l' H H0.
+  revert a b lb lsorted Hab.
+  induction la as [| a']; intros. {
+    cbn.
+    inversion Hab. {
+      subst x l b l'.
+      now apply Permutation_nil in H0; subst lb.
+    } {
+      subst l l''.
+      apply Permutation_length_1_inv in Hab.
+      now injection Hab; clear Hab; intros; subst b lb.
+    }
+  }
+  cbn.
+...
 
 Theorem permut_bsort : ∀ n ord l p q,
   is_permut n p
@@ -2421,6 +2469,11 @@ Proof.
 intros * Hp Hq.
 unfold bsort.
 ...
+Permutation_bsort_loop_sorted:
+  ∀ (A : Type) (ord : A → A → bool) (la lb lc : list A),
+    Permutation la lb → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc)
+...
+unfold bsort.
 now apply (permut_bsort_loop n).
 ...
 
