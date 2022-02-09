@@ -2413,7 +2413,6 @@ Permutation_bsort_loop_sorted:
 ...
 
 Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
-*)
 
 Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
   Permutation la lb
@@ -2476,11 +2475,84 @@ Permutation_bsort_loop_sorted:
 unfold bsort.
 now apply (permut_bsort_loop n).
 ...
+*)
+
+Theorem nth_bsort : ∀ A d (ord : A → _) l i a,
+  nth i (bsort ord l) d = a ↔ i = length (filter (ord a) l).
+Proof.
+intros.
+split. {
+  intros Hi.
+  subst a.
+  unfold bsort.
+Theorem glop : ∀ A d (ord : A → _) l_ini lsorted l i,
+  Permutation (lsorted ++ l) l_ini
+  → sorted ord lsorted = true
+  → i < length l_ini
+  → i = length (filter (ord (nth i (bsort_loop ord lsorted l) d)) l_ini).
+Proof.
+intros * Hp Hs Hil.
+revert l_ini lsorted i Hp Hs Hil.
+induction l as [| a]; intros; cbn. {
+  rewrite app_nil_r in Hp.
+  revert lsorted i Hp Hs Hil.
+  induction l_ini as [| a]; intros; [ easy | cbn ].
+  remember (ord (nth i lsorted d) a) as ia eqn:Hia.
+  symmetry in Hia.
+  destruct ia. {
+    cbn.
+    destruct i. {
+      exfalso.
+      clear Hil.
+(* ouais, c'est n'importe quoi *)
+...
 
 Theorem bsort_comp_permut_r : ∀ l p,
   is_permut (length l) p
   → bsort Nat.leb (l ° p) = bsort Nat.leb l.
 Proof.
+intros * Hp.
+apply List_eq_iff.
+do 2 rewrite length_bsort.
+rewrite comp_length.
+destruct Hp as (Hpp, Hpl).
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length p)) as [Hip| Hip]. 2: {
+  apply Nat.nlt_ge in Hip.
+  rewrite nth_overflow; [ | now rewrite length_bsort, comp_length ].
+  rewrite nth_overflow; [ | rewrite length_bsort; congruence ].
+  easy.
+}
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
+symmetry.
+rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
+symmetry.
+...
+specialize nth_bsort as H1.
+specialize (H1 nat 0 Nat.leb (l ° p) i) as H2.
+specialize (H2 (nth i (bsort Nat.leb l) 0)).
+apply H2.
+...
+  ============================
+  i = length (filter (Nat.leb (nth i (bsort Nat.leb l) 0)) (l ° p))
+specialize (H1 nat 0 Nat.leb l i) as H3.
+specialize (H3 (nth i (bsort Nat.leb (l ° p)) 0)).
+symmetry; apply H3.
+  ============================
+  i = length (filter (Nat.leb (nth i (bsort Nat.leb (l ° p)) 0)) l)
+cbn.
+specialize
+...
+intros * Hp.
+revert p Hp.
+induction l as [| a]; intros. {
+  destruct Hp as (Hpp, Hpl).
+  now apply length_zero_iff_nil in Hpl; subst p.
+}
+unfold bsort.
+unfold "°".
+...
 intros * Hp.
 specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
 specialize (H1 (l ° p)) as H2.
