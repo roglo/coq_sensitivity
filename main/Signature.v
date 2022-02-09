@@ -2409,7 +2409,7 @@ Theorem glop : ∀ l i,
 ∃ k,
 nth i (bsort Nat.leb l) 0 = k ∧
 length (filter (λ a, Nat.leb a k) l) - 1 = i.
-Admitted.
+...
 specialize (glop (map (ff_app l) p) i) as H1.
 destruct H1 as (u & Hu & Hui).
 specialize (glop l i) as H1.
