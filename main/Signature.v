@@ -2415,6 +2415,7 @@ Permutation_bsort_loop_sorted:
 Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
 *)
 
+(*
 Theorem glop : ∀ A (ord : A → _) la lb a,
   bsort ord la = bsort ord lb
   → bsort ord (a :: la) = bsort ord (a :: lb).
@@ -2430,7 +2431,9 @@ remember (length la) as n eqn:Hn; symmetry in Hn.
 revert la lb Hab Hn.
 induction n; intros; cbn. {
 ...
+*)
 
+(*
 Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
   Permutation la lb
   → bsort ord la = bsort ord lb.
@@ -2457,6 +2460,54 @@ Permutation_cons_app_inv:
   ∀ (A : Type) (l l1 l2 : list A) (a : A),
     Permutation (a :: l) (l1 ++ a :: l2) → Permutation l (l1 ++ l2)
 ...
+*)
+
+Theorem bsort_insert_insert_sym : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → total_order ord
+  → ∀ a b l,
+  bsort_insert ord a (bsort_insert ord b l) =
+  bsort_insert ord b (bsort_insert ord a l).
+Proof.
+intros * Hant Htr Htot *.
+revert a b.
+induction l as [| c]; intros; cbn. {
+  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ab, ba; [ | easy | easy | ]. {
+    specialize (Hant _ _ Hab Hba).
+    now subst b.
+  } {
+    specialize (Htot a b).
+    now rewrite Hab, Hba in Htot.
+  }
+}
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+remember (ord b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct ac, bc; cbn. {
+  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ab, ba. {
+    now rewrite (Hant a b Hab Hba).
+  } {
+    now rewrite Hbc.
+  } {
+    now rewrite Hac.
+  } {
+    specialize (Htot a b).
+    now rewrite Hab, Hba in Htot.
+  }
+} {
+  rewrite Hac.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    now rewrite (Htr b a c Hba Hac) in Hbc.
+  } {
+    now rewrite Hbc.
+  }
+} {
+...
 
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb lsorted a,
   Permutation la lb
@@ -2466,6 +2517,15 @@ Proof.
 intros * Hab Hsab; cbn.
 revert a lsorted Hsab.
 induction Hab as [| b la lb| | ]; intros; [ easy | | | ]. {
+  specialize (IHHab a _ Hsab) as H1; cbn.
+...
+  now rewrite bsort_insert_insert_sym.
+...
+  clear IHHab Hsab.
+  revert a b lsorted H1.
+  induction Hab as [| c la lb| |]; intros; [ easy | | | ]. {
+    specialize (IHHab _ _ _ H1) as H2; cbn.
+...
   cbn; apply IHHab.
   cbn in Hsab.
 ...
