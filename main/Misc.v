@@ -2531,6 +2531,9 @@ Fixpoint sorted {A} ord (l : list A) :=
   | a :: (b :: _) as l' => (ord a b && sorted ord l')%bool
   end.
 
+Definition reflexive A (ord : A → A → bool) :=
+  ∀ a, ord a a = true.
+
 Definition antisymmetric A (ord : A → A → bool) :=
   ∀ a b, ord a b = true → ord b a = true → a = b.
 
@@ -2595,6 +2598,12 @@ destruct (le_dec i j) as [Hij| Hij]. {
   apply Nat.nle_gt, Nat.lt_le_incl in Hij.
   now apply Nat.leb_le in Hij; rewrite Hij; right.
 }
+Qed.
+
+Theorem Nat_leb_refl : reflexive Nat.leb.
+Proof.
+intros a.
+apply Nat.leb_refl.
 Qed.
 
 Theorem Nat_leb_trans : transitive Nat.leb.

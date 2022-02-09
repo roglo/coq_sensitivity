@@ -2382,6 +2382,76 @@ intros.
 induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
 Qed.
 
+Theorem sorted_bsort_insert : ∀ A (ord : A → _) a lsorted,
+  sorted ord lsorted = true
+  → NoDup (a :: lsorted)
+  → sorted ord (bsort_insert ord a lsorted) = true.
+Proof.
+intros * Hs Hnd.
+...
+
+Theorem sorted_bsort_loop : ∀ A (ord : A → _),
+  reflexive ord
+  → ∀ lsorted l,
+  sorted ord lsorted = true
+  → NoDup (lsorted ++ l)
+  → sorted ord (bsort_loop ord lsorted l) = true.
+Proof.
+intros * Hrefl * Hs Hnd.
+revert lsorted Hs Hnd.
+induction l as [| a]; intros; [ easy | cbn ].
+apply IHl. 2: {
+  apply NoDup_app_iff in Hnd.
+  apply NoDup_app_iff.
+  destruct Hnd as (Hnds & Hndl & Hlp).
+  split. {
+    clear - Hrefl Hnds Hndl Hlp.
+    apply NoDup_cons_iff in Hndl.
+    destruct Hndl as (Hal & Hndl).
+    induction lsorted as [| b]; [ now constructor | ].
+    apply NoDup_cons_iff in Hnds; cbn.
+    remember (ord a b) as x eqn:Hx; symmetry in Hx.
+    destruct x. {
+      constructor. {
+        intros Ha.
+        specialize (Hlp a Ha); apply Hlp.
+        now left.
+      }
+      now constructor.
+    } {
+      constructor. {
+        intros Hb.
+        apply in_bsort_insert in Hb.
+        destruct Hb as [Hb| Hb]; [ | easy ].
+        now subst b; rewrite Hrefl in Hx.
+      }
+      apply IHlsorted; [ easy | ].
+      intros c Hc.
+      now apply Hlp; right.
+    }
+  }
+  split; [ now apply NoDup_cons_iff in Hndl | ].
+  intros b Hb.
+  apply in_bsort_insert in Hb.
+  destruct Hb as [Hb| Hb]. {
+    subst b.
+    now apply NoDup_cons_iff in Hndl.
+  } {
+    specialize (Hlp b Hb).
+    intros H; apply Hlp.
+    now right.
+  }
+}
+replace (a :: l) with ([a] ++ l) in Hnd by easy.
+rewrite app_assoc in Hnd.
+apply NoDup_app_iff in Hnd.
+destruct Hnd as (Hnd, _).
+apply NoDup_app_comm in Hnd; cbn in Hnd.
+clear - Hs Hnd.
+...
+now apply sorted_bsort_insert.
+...
+
 Theorem bsort_comp_permut_r : ∀ l p,
   is_permut (length l) p
   → bsort Nat.leb (l ° p) = bsort Nat.leb l.
@@ -2405,17 +2475,9 @@ rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
 unfold "°".
 ...
-Theorem glop : ∀ l i,
-∃ k,
-nth i (bsort Nat.leb l) 0 = k ∧
-length (filter (λ a, Nat.leb a k) l) - 1 = i.
-...
-specialize (glop (map (ff_app l) p) i) as H1.
-destruct H1 as (u & Hu & Hui).
-specialize (glop l i) as H1.
-destruct H1 as (v & Hv & Hvi).
-rewrite Hu, Hv.
-(* ouais, chais pas *)
+unfold bsort.
+specialize (sorted_bsort_loop Nat_leb_refl) as H1.
+specialize (H1 [] (map (ff_app l) p)).
 ...
 unfold bsort.
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
