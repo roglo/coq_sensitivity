@@ -2396,65 +2396,50 @@ destruct ab. {
   remember (b :: lsorted) as l; cbn; subst l.
   now apply Bool.andb_true_iff.
 } {
-...
   cbn in Hs |-*.
-  destruct lsorted as [| c]; cbn. {
-    rewrite Bool.andb_true_r.
+  destruct lsorted as [| c]. {
+    cbn; rewrite Bool.andb_true_r.
     specialize (Hto a b) as H1.
     now rewrite Hab in H1.
   } {
+    remember (bsort_insert ord a (c :: lsorted)) as l eqn:Hl.
+    symmetry in Hl.
+    destruct l as [| d]; [ easy | ].
+    apply Bool.andb_true_iff.
     apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hbc, Hs).
+    cbn in Hl.
     remember (ord a c) as ac eqn:Hac; symmetry in Hac.
     destruct ac. {
-      apply Bool.andb_true_iff.
-      split. {
-        specialize (Hto a b) as H1.
-        now rewrite Hab in H1.
-      }
+      injection Hl; clear Hl; intros; subst d l.
+      specialize (Hto a b) as H1.
+      rewrite Hab in H1.
+      split; [ easy | ].
       remember (c :: lsorted) as l; cbn; subst l.
       now apply Bool.andb_true_iff.
     } {
-      apply Bool.andb_true_iff.
+      injection Hl; clear Hl; intros; subst d l.
       split; [ easy | ].
-      cbn in Hs |-*.
-      destruct lsorted as [| d]; cbn. {
-        rewrite Bool.andb_true_r.
-        specialize (Hto c a) as H1.
-        now rewrite Hac, Bool.orb_false_r in H1.
-      }
-      remember (ord a d) as ad eqn:Had; symmetry in Had.
-      apply Bool.andb_true_iff in Hs.
-      destruct Hs as (Hcd, Hs).
-      destruct ad. {
-        apply Bool.andb_true_iff.
-        specialize (Hto a c) as H1.
-        rewrite Hac in H1.
-        split; [ easy | ].
-        remember (d :: lsorted) as l; cbn; subst l.
-        now apply Bool.andb_true_iff.
-      } {
-        apply Bool.andb_true_iff.
-        split; [ easy | ].
-...
-    specialize (Hant b a) as H1.
-    apply Hant in Hx.
-...
-  remember (bsort_insert ord a lsorted) as l eqn:Hl.
-  symmetry in Hl.
-  destruct l as [| c]; [ easy | ].
-  apply Bool.andb_true_iff.
-  cbn in Hs.
-...
+      apply IHlsorted; [ easy | ].
+      apply NoDup_cons_iff in Hnd.
+      destruct Hnd as (Habc, Hnd).
+      apply NoDup_cons_iff in Hnd.
+      apply NoDup_cons_iff.
+      split; [ | easy ].
+      now intros H; apply Habc; right.
+    }
+  }
+}
+Qed.
 
 Theorem sorted_bsort_loop : ∀ A (ord : A → _),
   reflexive ord
+  → total_order ord
   → ∀ lsorted l,
   sorted ord lsorted = true
   → NoDup (lsorted ++ l)
   → sorted ord (bsort_loop ord lsorted l) = true.
 Proof.
-intros * Hrefl * Hs Hnd.
+intros * Hrefl Htot * Hs Hnd.
 revert lsorted Hs Hnd.
 induction l as [| a]; intros; [ easy | cbn ].
 apply IHl. 2: {
@@ -2499,15 +2484,13 @@ apply IHl. 2: {
     now right.
   }
 }
+apply sorted_bsort_insert; [ easy | easy | ].
 replace (a :: l) with ([a] ++ l) in Hnd by easy.
 rewrite app_assoc in Hnd.
 apply NoDup_app_iff in Hnd.
 destruct Hnd as (Hnd, _).
-apply NoDup_app_comm in Hnd; cbn in Hnd.
-clear - Hs Hnd.
-...
-now apply sorted_bsort_insert.
-...
+now apply NoDup_app_comm in Hnd.
+Qed.
 
 Theorem bsort_comp_permut_r : ∀ l p,
   is_permut (length l) p
@@ -2531,10 +2514,16 @@ symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
 unfold "°".
-...
 unfold bsort.
-specialize (sorted_bsort_loop Nat_leb_refl) as H1.
-specialize (H1 [] (map (ff_app l) p)).
+specialize (sorted_bsort_loop Nat_leb_refl Nat_leb_has_total_order) as H1.
+specialize (H1 [] (map (ff_app l) p)) as H2.
+assert (H : sorted Nat.leb [] = true) by easy.
+specialize (H2 H); clear H.
+rewrite app_nil_l in H2.
+...
+assert (H : NoDup (map (ff_app l) p)). {
+  apply (NoDup_map_iff 0).
+  intros j k Hj Hk Hjk.
 ...
 unfold bsort.
 (* selon Ésaïe, le i-ème élément de la liste tri(l), c'est l'élément de l
