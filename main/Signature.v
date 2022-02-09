@@ -2413,11 +2413,46 @@ Permutation_bsort_loop_sorted:
 ...
 
 Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
+*)
 
 Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
   Permutation la lb
   → bsort ord la = bsort ord lb.
 Proof.
+intros * Hab.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+revert la lb Hab Hn.
+induction n; intros; cbn. {
+  apply length_zero_iff_nil in Hn; subst la.
+  now apply Permutation_nil in Hab; subst lb.
+}
+destruct la as [| a]; [ easy | ].
+Search (Permutation (_ :: _)).
+...
+
+Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb lsorted a,
+  Permutation la lb
+  → bsort_loop ord lsorted la = bsort_loop ord lsorted lb
+  → bsort_loop ord lsorted (a :: la) = bsort_loop ord lsorted (a :: lb).
+Proof.
+intros * Hab Hsab; cbn.
+revert a lsorted Hsab.
+induction Hab as [| b la lb| | ]; intros; [ easy | | | ]. {
+  cbn; apply IHHab.
+  cbn in Hsab.
+...
+
+Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
+  Permutation la lb
+  → bsort ord la = bsort ord lb.
+Proof.
+intros * Hab.
+induction Hab as [| a la lb| | ]; [ easy | | | ]. {
+  unfold bsort.
+  unfold bsort in IHHab.
+...
+now apply Permutation_bsort_loop.
+...
 intros * Hab.
 unfold bsort.
 Theorem Permutation_bsort_loop' : ∀ A (ord : A → _) lsorted la lb,
