@@ -2458,11 +2458,10 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort, comp_length ].
 symmetry.
 rewrite nth_indep with (d' := 0); [ | rewrite length_bsort; congruence ].
 symmetry.
-unfold "°".
 unfold bsort.
 specialize (sorted_bsort_loop Nat_leb_has_total_order []) as H1.
 assert (H : sorted Nat.leb [] = true) by easy.
-specialize (H1 (map (ff_app l) p) H) as H2.
+specialize (H1 (l ° p) H) as H2.
 specialize (H1 l H) as H3.
 clear H.
 ...
