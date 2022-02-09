@@ -2381,7 +2381,16 @@ intros.
 induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
 Qed.
 
-Theorem bsort_comp_permut_r' : ∀ l p,
+Theorem permut_bsort : ∀ n ord l p q,
+  is_permut n p
+  → is_permut n q
+  → bsort ord (l ° p) = bsort ord (l ° q).
+Proof.
+intros * Hp Hq.
+unfold bsort.
+...
+
+Theorem bsort_comp_permut_r : ∀ l p,
   is_permut (length l) p
   → bsort Nat.leb (l ° p) = bsort Nat.leb l.
 Proof.
@@ -2389,6 +2398,20 @@ intros * Hp.
 specialize (bsort_is_sorted Nat_leb_has_total_order) as H1.
 specialize (H1 (l ° p)) as H2.
 specialize (H1 l) as H3.
+...
+symmetry.
+rewrite <- (@comp_1_r (length l) l) at 1; [ symmetry | easy ].
+apply (@permut_bsort (length l)); [ easy | ].
+apply seq_is_permut.
+...
+Theorem glop : ∀ A (ord : A → _) la lb,
+  Permutation la lb
+  → bsort ord la = bsort ord lb.
+Proof.
+intros * Hab.
+...
+apply glop.
+Search Permutation.
 ...
 apply List_eq_iff.
 do 2 rewrite length_bsort.
