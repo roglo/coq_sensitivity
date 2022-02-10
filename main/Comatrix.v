@@ -820,38 +820,40 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
 }
 move Hs' before Hs.
 specialize (IHn Hs').
-assert (H : ∀ i j, i < S n → j < S n → ff_app σ' i = ff_app σ' j → i = j). {
+assert (H : NoDup σ'). {
+  apply nat_NoDup.
   intros i j Hi Hj Hij; unfold σ', ff_app in Hij.
+  rewrite Hσ'l in Hi, Hj.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold g in Hij; cbn in Hij.
-...
-  rewrite Hσl in Hinj.
+  specialize (NoDup_nat _ Hinj) as Hinj'.
+  rewrite Hσl in Hinj'.
   destruct (lt_dec i _) as [His| His]. {
     destruct (lt_dec j _) as [Hjs| Hjs]. {
-      apply Hinj in Hij; [ easy | flia Hi | flia Hj ].
+      apply Hinj' in Hij; [ easy | flia Hi | flia Hj ].
     }
     rewrite Nat.add_1_r in Hij.
     apply Nat.nlt_ge in Hjs.
-    apply Hinj in Hij; [ flia His Hjs Hij | flia Hi | ].
+    apply Hinj' in Hij; [ flia His Hjs Hij | flia Hi | ].
     now apply -> Nat.succ_lt_mono.
   }
   apply Nat.nlt_ge in His.
   rewrite Nat.add_1_r in Hij.
   destruct (lt_dec j _) as [Hjs| Hjs]. {
-    apply Hinj in Hij; [ flia His Hjs Hij | | flia Hj ].
+    apply Hinj' in Hij; [ flia His Hjs Hij | | flia Hj ].
     now apply -> Nat.succ_lt_mono.
   }
   rewrite Nat.add_1_r in Hij.
   apply Nat.succ_lt_mono in Hi, Hj.
-  apply Hinj in Hij; [ | easy | easy ].
+  apply Hinj' in Hij; [ | easy | easy ].
   now apply Nat.succ_inj in Hij.
 }
 specialize (IHn H eq_refl); clear H.
-remember (ff_app (permut_list_inv σ) (S n)) as k eqn:Hk.
+remember (ff_app (bsort_rank Nat.leb σ) (S n)) as k eqn:Hk.
 destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   erewrite rngl_product_eq_compat in IHn. 2: {
     intros i Hi.
@@ -872,22 +874,20 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite IHn; f_equal; f_equal.
   rewrite Hk in Hksn.
   rewrite <- Hksn at 1.
-  now apply (permut_permut_inv (S (S n))).
+  apply permut_permut_bsort; [ easy | now rewrite Hσl ].
 }
-specialize permut_list_inv_is_permut_list as H1.
+specialize bsort_rank_is_permut_list as H1.
 specialize (H1 σ).
-assert (H : is_permut_list σ) by easy.
-specialize (H1 H); clear H.
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
   destruct H1 as (H1 & H2).
   apply -> Nat.succ_le_mono.
-  rewrite length_permut_list_inv, Hσl in H1.
+  rewrite length_bsort_rank, Hσl in H1.
   specialize (H1 k).
-  assert (H : k ∈ permut_list_inv σ). {
+  assert (H : k ∈ bsort_rank Nat.leb σ). {
     rewrite Hk.
     apply nth_In.
-    now rewrite length_permut_list_inv, Hσl.
+    now rewrite length_bsort_rank, Hσl.
   }
   specialize (H1 H); clear H.
   flia Hksn H1.
@@ -924,6 +924,7 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   f_equal.
   f_equal. 2: {
     f_equal; rewrite Hk.
+...
     now apply (permut_permut_inv (S (S n))).
   }
   apply rngl_product_eq_compat.
