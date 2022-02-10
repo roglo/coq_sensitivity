@@ -2813,7 +2813,58 @@ destruct Hbp as (Hba, Hbn).
 now apply (NoDup_nat _ Hbn) in Hij.
 Qed.
 
-(* gros nettoyage à faire *)
+Theorem ε_when_dup : in_charac_0_field →
+  ∀ la,
+  ¬ NoDup la
+  → ε la = 0%F.
+Proof.
+intros Hif * Haa.
+symmetry.
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+destruct (rngl_eq_dec Hde (ε la) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+apply Haa; clear Haa.
+apply nat_NoDup.
+intros i j Hi Hj Hij.
+unfold ε in Hez.
+destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
+apply Hez; clear Hez.
+destruct (lt_dec i j) as [Hlij| Hlij]. {
+  erewrite (rngl_product_split3 i). 2: {
+    split; [ easy | flia Hi ].
+  }
+  remember (∏ (_ = _, _), _) as x eqn:Hx.
+  erewrite (rngl_product_split3 j); subst x. 2: {
+    split; [ easy | flia Hj ].
+  }
+  apply Nat.ltb_lt in Hlij; rewrite Hlij.
+  rewrite Hij.
+  rewrite sign_diff_id.
+  rewrite rngl_mul_0_r; [ | now left ].
+  rewrite rngl_mul_0_l; [ | now left ].
+  rewrite rngl_mul_0_r; [ | now left ].
+  rewrite rngl_mul_0_l; [ | now left ].
+  easy.
+} {
+  assert (H : j < i) by flia Heqj Hlij.
+  clear Hlij; rename H into Hlij.
+  erewrite (rngl_product_split3 j). 2: {
+    split; [ easy | flia Hj ].
+  }
+  remember (∏ (_ = _, _), _) as x eqn:Hx.
+  erewrite (rngl_product_split3 i); subst x. 2: {
+    split; [ easy | flia Hi ].
+  }
+  apply Nat.ltb_lt in Hlij; rewrite Hlij.
+  rewrite Hij.
+  rewrite sign_diff_id.
+  rewrite rngl_mul_0_r; [ | now left ].
+  rewrite rngl_mul_0_l; [ | now left ].
+  rewrite rngl_mul_0_r; [ | now left ].
+  rewrite rngl_mul_0_l; [ | now left ].
+  easy.
+}
+Qed.
+
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   is_permut (length la) lb
@@ -2821,233 +2872,57 @@ Theorem sign_comp : in_charac_0_field →
 Proof.
 intros Hif * Hbp.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
-  replace (ε la) with 0%F. 2: {
-    symmetry.
-    destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-    destruct (rngl_eq_dec Hde (ε la) 0%F) as [Hez| Hez]; [ easy | exfalso ].
-    apply Haa; clear Haa.
-    clear Hbp.
+  rewrite (ε_when_dup Hif Haa).
+(**)
+  rewrite (ε_when_dup Hif). 2: {
+    intros H; apply Haa; clear Haa.
     apply nat_NoDup.
+    specialize (NoDup_nat _ H) as H1; clear H.
     intros i j Hi Hj Hij.
-    unfold ε in Hez.
-    destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
-    apply Hez; clear Hez.
-    destruct (lt_dec i j) as [Hlij| Hlij]. {
-      erewrite (rngl_product_split3 i). 2: {
-        split; [ easy | flia Hi ].
-      }
-      remember (∏ (_ = _, _), _) as x eqn:Hx.
-      erewrite (rngl_product_split3 j); subst x. 2: {
-        split; [ easy | flia Hj ].
-      }
-      apply Nat.ltb_lt in Hlij; rewrite Hlij.
-      rewrite Hij.
-      rewrite sign_diff_id.
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      easy.
-    } {
-      assert (H : j < i) by flia Heqj Hlij.
-      clear Hlij; rename H into Hlij.
-      erewrite (rngl_product_split3 j). 2: {
-        split; [ easy | flia Hj ].
-      }
-      remember (∏ (_ = _, _), _) as x eqn:Hx.
-      erewrite (rngl_product_split3 i); subst x. 2: {
-        split; [ easy | flia Hi ].
-      }
-      apply Nat.ltb_lt in Hlij; rewrite Hlij.
-      rewrite Hij.
-      rewrite sign_diff_id.
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      easy.
-    }
-  }
-  replace (ε (la ° lb)) with 0%F. 2: {
-    symmetry.
-    destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-    destruct (rngl_eq_dec Hde (ε (la ° lb)) 0%F) as [Hez| Hez]; [ easy | exfalso ].
-    apply Haa; clear Haa.
-    apply nat_NoDup.
-    intros i j Hi Hj Hij.
-    unfold ε in Hez.
-    destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
-    apply Hez; clear Hez.
+    rewrite comp_length in H1.
+    destruct Hbp as (Hbp, Hbl).
+    rewrite <- Hbl in Hi, Hj.
     remember (ff_app (bsort_rank Nat.leb lb) i) as i' eqn:Hi'.
     remember (ff_app (bsort_rank Nat.leb lb) j) as j' eqn:Hj'.
-    destruct (lt_dec i' j') as [Hlij| Hlij]. {
-      erewrite (rngl_product_split3 i'). 2: {
-        split; [ easy | ].
-        rewrite comp_length.
-        destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
-          apply length_zero_iff_nil in Hbz; subst lb; cbn.
-          subst i'; cbn.
-          now destruct i.
-        }
-        apply Nat.le_add_le_sub_l.
-        apply Nat.le_succ_l.
-        unfold ff_app.
-        subst i'.
+    specialize (H1 i' j').
+    assert (H : i' < length lb). {
+      rewrite Hi'; unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : j' < length lb). {
+      rewrite Hj'; unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : ff_app (la ° lb) i' = ff_app (la ° lb) j'). {
+      rewrite Hi', Hj'.
+      unfold "°", ff_app.
+      rewrite (List_map_nth' 0). 2: {
         apply bsort_rank_ub.
         now intros H; subst lb.
       }
-      remember (∏ (_ = _, _), _) as x eqn:Hx.
-      erewrite (rngl_product_split3 j'). 2: {
-        split; [ easy | ].
-        rewrite comp_length.
-        destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
-          apply length_zero_iff_nil in Hbz; subst lb; cbn.
-          subst j'; cbn.
-          now destruct j.
-        }
-        apply Nat.le_add_le_sub_l.
-        apply Nat.le_succ_l.
-        unfold ff_app.
-        subst j'.
+      rewrite (List_map_nth' 0). 2: {
         apply bsort_rank_ub.
         now intros H; subst lb.
       }
-      apply Nat.ltb_lt in Hlij; rewrite Hlij.
-      remember (sign_diff _ _) as y eqn:Hy.
-      rewrite Hi', Hj' in Hy.
-      unfold "°" in Hy.
-      unfold ff_app in Hy.
-      rewrite (List_map_nth' 0) in Hy. 2: {
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        replace i' with 0 in Hlij. 2: {
-          cbn in Hi'; now destruct i.
-        }
-        replace j' with 0 in Hlij. 2: {
-          cbn in Hj'; now destruct j.
-        }
-        easy.
-      }
-      do 5 rewrite fold_ff_app in Hy.
-      rewrite permut_permut_bsort in Hy; [ | now destruct Hbp | ]. 2: {
-        destruct Hbp as (Hbp, Hbl).
-        congruence.
-      }
-      unfold ff_app in Hy.
-      rewrite (List_map_nth' 0) in Hy. 2: {
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        replace i' with 0 in Hlij. 2: {
-          cbn in Hi'; now destruct i.
-        }
-        replace j' with 0 in Hlij. 2: {
-          cbn in Hj'; now destruct j.
-        }
-        easy.
-      }
-      do 4 rewrite fold_ff_app in Hy.
-      rewrite permut_permut_bsort in Hy; [ | now destruct Hbp | ]. 2: {
-        destruct Hbp as (Hbp, Hbl).
-        congruence.
-      }
-      rewrite Hij, sign_diff_id in Hy; subst y.
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
+      do 6 rewrite fold_ff_app.
+      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
+      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
       easy.
+    }
+    specialize (H1 H); clear H.
+    rewrite Hi', Hj' in H1.
+    assert (H : is_permut_list (bsort_rank Nat.leb lb)). {
+      now apply bsort_rank_is_permut_list.
+    }
+    destruct H as (Hra, Hrn).
+    apply (NoDup_nat _ Hrn) in H1; [ easy | | ]. {
+      now rewrite length_bsort_rank.
     } {
-      assert (Heqj' : i' ≠ j'). {
-        intros H; apply Heqj; clear Heqj.
-        move H at top; subst j'.
-        rewrite Hi' in Hj'.
-        assert (H : is_permut_list (bsort_rank Nat.leb lb)). {
-          now apply bsort_rank_is_permut_list.
-        }
-        destruct H as (Ha, Hp).
-        apply (NoDup_nat _ Hp) in Hj'; [ easy | | ]. {
-          rewrite length_bsort_rank.
-          destruct Hbp as (Hbp, Hbl).
-          now rewrite Hbl.
-        } {
-          rewrite length_bsort_rank.
-          destruct Hbp as (Hbp, Hbl).
-          now rewrite Hbl.
-        }
-      }
-      assert (H : j' < i') by flia Hlij Heqj'.
-      clear Hlij; rename H into Hlij.
-      erewrite (rngl_product_split3 j'). 2: {
-        split; [ easy | ].
-        rewrite comp_length.
-        rewrite Hj'.
-        apply Nat.le_add_le_sub_l.
-        apply Nat.le_succ_l.
-        unfold ff_app.
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        apply Heqj'.
-        subst i' j'; cbn.
-        now destruct i, j.
-      }
-      remember (∏ (_ = _, _), _) as x eqn:Hx.
-      erewrite (rngl_product_split3 i'); subst x. 2: {
-        split; [ easy | ].
-        rewrite comp_length.
-        rewrite Hi'.
-        apply Nat.le_add_le_sub_l.
-        apply Nat.le_succ_l.
-        unfold ff_app.
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        apply Heqj'.
-        subst i' j'; cbn.
-        now destruct i, j.
-      }
-      apply Nat.ltb_lt in Hlij; rewrite Hlij.
-      remember (sign_diff _ _) as y eqn:Hy.
-      rewrite Hi', Hj' in Hy.
-      unfold "°" in Hy.
-      unfold ff_app in Hy.
-      rewrite (List_map_nth' 0) in Hy. 2: {
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        replace i' with 0 in Hlij. 2: {
-          cbn in Hi'; now destruct i.
-        }
-        replace j' with 0 in Hlij. 2: {
-          cbn in Hj'; now destruct j.
-        }
-        easy.
-      }
-      do 5 rewrite fold_ff_app in Hy.
-      rewrite permut_permut_bsort in Hy; [ | now destruct Hbp | ]. 2: {
-        destruct Hbp as (Hbp, Hbl).
-        congruence.
-      }
-      unfold ff_app in Hy.
-      rewrite (List_map_nth' 0) in Hy. 2: {
-        apply bsort_rank_ub.
-        intros H; subst lb.
-        replace i' with 0 in Hlij. 2: {
-          cbn in Hi'; now destruct i.
-        }
-        replace j' with 0 in Hlij. 2: {
-          cbn in Hj'; now destruct j.
-        }
-        easy.
-      }
-      do 4 rewrite fold_ff_app in Hy.
-      rewrite permut_permut_bsort in Hy; [ | now destruct Hbp | ]. 2: {
-        destruct Hbp as (Hbp, Hbl).
-        congruence.
-      }
-      rewrite Hij, sign_diff_id in Hy; subst y.
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      rewrite rngl_mul_0_r; [ | now left ].
-      rewrite rngl_mul_0_l; [ | now left ].
-      easy.
+      now rewrite length_bsort_rank.
     }
   }
   symmetry.
