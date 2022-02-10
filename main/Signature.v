@@ -2517,9 +2517,34 @@ destruct ac, bc; cbn. {
 }
 Qed.
 
+(*
+Theorem my_Permutation_length_1_inv : ∀ (A : Type) (a : A) (l : list A),
+  Permutation [a] l → l = [a].
+Proof.
+intros * Hal.
+remember [a] as m in Hal.
+induction Hal; [ easy | | | ]. {
+  injection Heqm; clear Heqm; intros.
+  subst x l.
+  now apply Permutation_nil in Hal; subst .
+} {
+  easy.
+}
+subst l.
+apply IHHal2.
+apply IHHal1.
+easy.
+...
+  induction Hal; try (injection Heqm as [= -> ->]);
+    discriminate || auto.
+apply Permutation_nil in Hal.
+now subst l'.
+...
+*)
+
+(*
 Theorem Permutation_cons_in : ∀ A (a : A) la lb,
-  (∀ x y : A, {x = y} + {x ≠ y})
-  → Permutation (a :: la) lb
+  Permutation (a :: la) lb
   → a ∈ lb.
 Proof.
 (*
@@ -2549,6 +2574,8 @@ induction Hab; intros; [ easy | | | ]. {
   now right; left.
 }
 subst l.
+apply IHHab2 with (la := la).
+...
 specialize (IHHab1 a la eq_refl).
 apply in_split in IHHab1.
 destruct IHHab1 as (l1 & l2 & Hll).
@@ -2567,32 +2594,6 @@ cbn in Hn.
 apply Nat.succ_inj in Hn.
 destruct (eq_dec a b) as [Heab| Heab]; [ now left | right ].
 Check Permutation_length_1_inv.
-Theorem my_Permutation_length_1_inv : ∀ (A : Type) (a : A) (l : list A),
-  Permutation [a] l → l = [a].
-Proof.
-intros * Hal.
-induction Hal; [ easy | now subst l | | ]. {
-  
-...
-intros * Hal.
-remember [a] as m in Hal.
-induction Hal; [ easy | | | ]. {
-  injection Heqm; clear Heqm; intros.
-  subst x l.
-  now apply Permutation_nil in Hal; subst .
-} {
-  easy.
-}
-subst l.
-apply IHHal2.
-apply IHHal1.
-easy.
-...
-
-  induction Hal; try (injection Heqm as [= -> ->]);
-    discriminate || auto.
-apply Permutation_nil in Hal.
-now subst l'.
 ...
 intros * Hal.
 remember [a] as m in Hal.
@@ -2651,6 +2652,7 @@ inversion Hab. {
 }
 subst l l''.
 ...
+*)
 
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
   antisymmetric ord
@@ -2674,16 +2676,14 @@ destruct la as [| b]; [ easy | ].
 move b after a.
 cbn in Hn.
 apply Nat.succ_inj in Hn.
-...
-specialize (Permutation_cons_in Hab) as H1.
+specialize Permutation_in as H1.
+specialize (H1 _ (b :: la) lb b Hab (or_introl eq_refl)).
 apply in_split in H1.
 destruct H1 as (lb1 & lb2 & Hlb).
 subst lb.
 apply Permutation_cons_app_inv in Hab.
 cbn in Hsab |-*.
 specialize (IHn _ _ lsorted a Hab) as H1.
-Search (Permutation (_ :: _)).
-(* mouais, bon *)
 ...
 destruct lb as [| c]. {
   apply Permutation_sym in Hab.
