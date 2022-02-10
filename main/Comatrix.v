@@ -780,7 +780,7 @@ induction n; intros; cbn. {
 }
 set
   (g := λ i,
-   if lt_dec i (ff_app (permut_list_inv σ) (S n)) then i else i + 1).
+   if lt_dec i (ff_app (bsort_rank Nat.leb σ) (S n)) then i else i + 1).
 set (σ' := map (λ i, ff_app σ (g i)) (seq 0 (S n))).
 assert (Hσ'l : length σ' = S n). {
   now unfold σ'; rewrite map_length, seq_length.
@@ -801,7 +801,7 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
     rewrite Hσl in H1.
     enough (H : ff_app σ i ≠ S n) by flia H1 H; intros Hσs.
     rewrite <- Hσs in His.
-    rewrite (permut_inv_permut (S (S n))) in His; [ | easy | flia Hi ].
+    rewrite permut_bsort_permut in His; [ | easy | rewrite Hσl; flia Hi ].
     now apply lt_irrefl in His.
   } {
     rewrite Nat.add_1_r.
@@ -814,7 +814,7 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
     rewrite Hσl in H1.
     enough (H : ff_app σ (S i) ≠ S n) by flia H1 H; intros Hσs.
     rewrite <- Hσs in His.
-    rewrite (permut_inv_permut (S (S n))) in His; [ | easy | flia Hi ].
+    rewrite permut_bsort_permut in His; [ | easy | rewrite Hσl; flia Hi ].
     now apply His.
   }
 }
@@ -828,6 +828,7 @@ assert (H : ∀ i j, i < S n → j < S n → ff_app σ' i = ff_app σ' j → i =
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   unfold g in Hij; cbn in Hij.
+...
   rewrite Hσl in Hinj.
   destruct (lt_dec i _) as [His| His]. {
     destruct (lt_dec j _) as [Hjs| Hjs]. {
@@ -1063,6 +1064,8 @@ apply rngl_product_eq_compat.
 intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
+
+...
 
 Theorem List_rank_not_None : ∀ n l i,
   is_permut n l
