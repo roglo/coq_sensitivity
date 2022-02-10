@@ -2862,6 +2862,14 @@ replace (ε la) with 0%F. 2: {
     apply Nat.ltb_lt in Hlij; rewrite Hlij.
     rewrite Hij.
     rewrite sign_diff_id.
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    easy.
+  } {
+    assert (H : j < i) by flia Heqj Hlij.
+    clear Hlij; rename H into Hlkj.
 ...
 Search NoDup.
   induction la as [| a]; [ constructor | ].
