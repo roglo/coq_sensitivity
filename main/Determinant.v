@@ -818,16 +818,12 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
         apply canon_sym_gr_list_ub; [ easy | ].
         now apply transposition_lt.
       } {
-...
-        rewrite map_length, seq_length.
-        intros u v Hu Hv.
-        unfold ff_app.
-        rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-        rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-        rewrite seq_nth; [ | easy ].
-        rewrite seq_nth; [ | easy ].
-        do 2 rewrite Nat.add_0_l.
-        intros Huv.
+        apply (NoDup_map_iff 0).
+        rewrite seq_length.
+        intros u v Hu Hv Huv.
+        rewrite seq_nth in Huv; [ | easy ].
+        rewrite seq_nth in Huv; [ | easy ].
+        cbn in Huv.
         now apply nth_transposition_canon_sym_gr_list_inj in Huv.
       }
     }
@@ -861,6 +857,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     apply list_swap_elem_is_permut; [ easy | easy | ].
     now apply canon_sym_gr_list_is_permut.
   } {
+...
     rewrite map_length, seq_length.
     intros i j Hi Hj Hij.
     unfold ff_app in Hij.
