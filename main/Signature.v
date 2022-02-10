@@ -1309,6 +1309,8 @@ apply (NoDup_nat _ Hgp) in Hij; [ | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
 flia Hi Hj Hlij Hij.
 Qed.
 
+Arguments signature_comp_fun_expand_1 _ n%nat [f g]%list.
+
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -2769,7 +2771,7 @@ apply collapse_is_permut.
 Qed.
 
 Theorem collapse_comp : ∀ la lb,
-  is_permut_list la
+  NoDup la
   → is_permut_list lb
   → length la = length lb
   → collapse (la ° lb) = collapse la ° lb.
@@ -2778,9 +2780,7 @@ intros * Ha Hb Hab.
 unfold collapse.
 symmetry.
 rewrite <- (permut_bsort_rank_involutive Hb) at 1.
-rewrite (permut_bsort_rank_comp (length lb)); [ | | easy | ]; cycle 1. {
-  now destruct Ha.
-} {
+rewrite (permut_bsort_rank_comp (length lb)); [ | easy | easy | ]. 2: {
   now destruct Hb.
 }
 rewrite (permut_bsort_rank_comp (length lb)); [ easy | | | ]. {
@@ -2792,6 +2792,7 @@ rewrite (permut_bsort_rank_comp (length lb)); [ easy | | | ]. {
 }
 Qed.
 
+(*
 Theorem ff_app_collapse_map : ∀ la lb,
   is_permut_list la
   → is_permut_list lb
@@ -2800,11 +2801,12 @@ Theorem ff_app_collapse_map : ∀ la lb,
   → ff_app (collapse (la ° lb)) i = ff_app (collapse la) (ff_app lb i).
 Proof.
 intros * Ha Hb Hab i Hi.
-rewrite collapse_comp; [ | easy | easy | easy ].
+rewrite collapse_comp; [ | now destruct Ha | easy | easy ].
 unfold "°".
 unfold ff_app at 1.
 now apply (List_map_nth' 0).
 Qed.
+*)
 
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
@@ -2813,94 +2815,37 @@ Theorem sign_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros Hif * Haa Hbp.
-rewrite <- ε_collapse_ε.
-...
-rewrite <- collapse_idemp.
-rewrite collapse_comp.
-rewrite permut_collapse.
-Inspect 2.
-rewrite collapse_comp.
-Search collapse.
-
-rewrite permut_collapse.
-
-rewrite <- (ε_collapse_ε Haa).
-Inspect 
-
-Search (ε (collapse _)).
-Search (collapse (_ ° _)).
-...
-Check collapse_comp.
-Check ε_collapse_ε.
-...
-intros Hif * Haa Hbp.
-rewrite <- (ε_collapse_ε Haa).
-Search (collapse (_ ° _)).
-Check collapse_comp.
-Check ε_collapse_ε.
-...
-intros Hif * Haa Hbp.
-rewrite <- (ε_collapse_ε Haa).
-erewrite <- signature_comp; [ | easy | apply collapse_is_permut | apply Hbp ].
-Search (ε (_ ° _)).
-
-Check ε_collapse_ε.
-rewrite <- collapse_comp.
-symmetry.
-apply ε_collapse_ε.
-...
-Search (ε (collapse (_ ° _))).
-...
-rewrite collapse_comp.
-symmetry; apply ε_collapse_ε.
-...
-unfold "°".
-Search (ε _ = ε _).
-...
-intros Hic Hop * Haa (Hbp, Hbl).
-unfold ε.
-rewrite comp_length, Hbl.
-do 3 rewrite rngl_product_product_if.
-rewrite <- rngl_product_mul_distr; [ | easy ].
-symmetry.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite <- rngl_product_mul_distr; [ | easy ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite  sign_diff_mul; [ | easy ].
-    easy.
+rewrite <- ε_collapse_ε. 2: {
+  unfold "°".
+  apply (NoDup_map_iff 0).
+  intros i j Hi Hj Hij.
+  destruct Hbp as (Hbp, Hbl).
+  apply (NoDup_nat _ Haa) in Hij; cycle 1. {
+    rewrite <- Hbl.
+    now apply Hbp, nth_In.
+  } {
+    rewrite <- Hbl.
+    now apply Hbp, nth_In.
   }
-  easy.
+  destruct Hbp as (Hba, Hbn).
+  now apply (NoDup_nat _ Hbn) in Hij.
 }
+rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
-do 2 rewrite <- rngl_product_product_if.
-Search (∏ (_ = _, _), sign_diff _ _).
-...
-(*
-End a.
-Arguments ε {T}%type {ro}.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (canon_sym_gr_list_list 4).
-Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in (ε (la ° lb), ε la * ε lb)%F).
-Compute (let la := [1;2;0]%nat in let lb := [0;2]%nat in ((la ° lb))).
-...
-*)
-...
+rewrite <- ε_collapse_ε; [ | easy ].
+symmetry.
+apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
+  apply collapse_is_permut.
+}
+destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+rewrite signature_comp_fun_expand_2_1; try easy.
+rewrite signature_comp_fun_expand_2_2; try easy.
+apply signature_comp_fun_changement_of_variable; try easy.
+apply collapse_is_permut.
+Qed.
 
-Abort.
-End a.
-Arguments ε {T}%type {ro}.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (canon_sym_gr_list_list 4).
-Compute (let la := [2;3;4;0]%nat in map (λ lb, (ε (la ° lb), ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
-Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 4)).
-Compute (let la := [7;3;4;5]%nat in map (λ lb, Z.eqb (ε (la ° lb)) (ε la * ε lb)%F) (canon_sym_gr_list_list 5)).
-Compute (let la := [7;4;4;5]%nat in let lb := [0;1]%nat in Z.eqb (ε (la ° lb)) (ε la * ε lb)%F).
+Inspect 1.
+
 ...
 
 (* *)
