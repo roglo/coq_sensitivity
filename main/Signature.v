@@ -3096,33 +3096,34 @@ f_equal. {
     rewrite Hσ.
     now apply canon_sym_gr_list_is_permut.
   }
-...
   rewrite rngl_product_change_var with
-    (g := ff_app (permut_list_inv σ')) (h := ff_app σ'). 2: {
+    (g := ff_app (bsort_rank Nat.leb σ')) (h := ff_app σ'). 2: {
     intros i (_, Hi).
-    apply (permut_inv_permut n); [ easy | flia Hnz Hi ].
+    destruct Hp' as (Hp'p, Hp'l).
+    apply permut_bsort_permut; [ easy | rewrite Hp'l; flia Hnz Hi ].
   }
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1.
+  destruct Hp' as (Hp'p, Hp'l).
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj).
     apply in_seq in Hj.
-    rewrite (permut_permut_inv n); [ | easy | ]. 2: {
+    rewrite permut_permut_bsort; [ | easy | ]. 2: {
       rewrite <- Hji.
-      destruct Hp' as ((Hp'1, Hp'2), Hp'3).
-      rewrite <- Hp'3 in Hj |-*.
-      now apply Hp'1, nth_In.
+      destruct Hp'p as (Hp'a, Hp'n).
+      apply Hp'a, nth_In.
+      now rewrite Hp'l.
     }
     easy.
   }
   cbn - [ "<?" seq ].
   rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
     apply permut_list_Permutation.
-    destruct Hp' as ((Hp'1, Hp'2), Hp'3).
-    rewrite <- Hp'3 at 2.
+    destruct Hp'p as (Hp'a, Hp'n).
+    rewrite <- Hp'l at 2.
     now rewrite <- List_map_ff_app_seq.
   }
   rewrite rngl_product_seq_product; [ | easy ].
@@ -3292,7 +3293,8 @@ symmetry in Hb.
 destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
 destruct b; [ | now right | now left ].
 apply Nat.compare_eq_iff in Hb.
-apply Hσ in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
+destruct Hσ as (Hσa, Hσn).
+apply (NoDup_nat _ Hσn) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
 flia Hi Hj Hb Hij.
 Qed.
 
@@ -3321,7 +3323,7 @@ Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
-Arguments signature_comp {T}%type {ro rp} _ [n]%nat [la lb].
+Arguments sign_comp {T}%type {ro rp} _ [la lb]%list.
 Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
 Arguments ε_1_opp_1 {T}%type {ro rp} _  [σ].
 Arguments ε_square {T}%type {ro rp} _ [σ].
