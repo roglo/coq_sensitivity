@@ -2517,6 +2517,141 @@ destruct ac, bc; cbn. {
 }
 Qed.
 
+Theorem Permutation_cons_in : ∀ A (a : A) la lb,
+  (∀ x y : A, {x = y} + {x ≠ y})
+  → Permutation (a :: la) lb
+  → a ∈ lb.
+Proof.
+(*
+intros * Hab.
+inversion Hab as [| | | ld lc le Hac Hbc]. {
+  now left.
+} {
+  now right; left.
+}
+subst ld le.
+apply Permutation_sym in Hbc.
+clear Hab.
+revert a la Hac.
+induction Hbc as [| | |]; intros. {
+  now apply Permutation_sym, Permutation_nil in Hac.
+} {
+...
+*)
+intros * eq_dec Hab.
+remember (a :: la) as lc eqn:Hc.
+revert a la Hc.
+induction Hab; intros; [ easy | | | ]. {
+  injection Hc; clear Hc; intros; subst.
+  now left.
+} {
+  injection Hc; clear Hc; intros; subst.
+  now right; left.
+}
+subst l.
+specialize (IHHab1 a la eq_refl).
+apply in_split in IHHab1.
+destruct IHHab1 as (l1 & l2 & Hll).
+subst l'.
+apply Permutation_cons_app_inv in Hab1.
+...
+intros * eq_dec Hab.
+remember (length lb) as n eqn:Hn; symmetry in Hn.
+revert a la lb Hab Hn.
+induction n; intros. {
+  apply length_zero_iff_nil in Hn; subst lb.
+  now apply Permutation_sym, Permutation_nil in Hab.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+destruct (eq_dec a b) as [Heab| Heab]; [ now left | right ].
+Check Permutation_length_1_inv.
+Theorem my_Permutation_length_1_inv : ∀ (A : Type) (a : A) (l : list A),
+  Permutation [a] l → l = [a].
+Proof.
+intros * Hal.
+induction Hal; [ easy | now subst l | | ]. {
+  
+...
+intros * Hal.
+remember [a] as m in Hal.
+induction Hal; [ easy | | | ]. {
+  injection Heqm; clear Heqm; intros.
+  subst x l.
+  now apply Permutation_nil in Hal; subst .
+} {
+  easy.
+}
+subst l.
+apply IHHal2.
+apply IHHal1.
+easy.
+...
+
+  induction Hal; try (injection Heqm as [= -> ->]);
+    discriminate || auto.
+apply Permutation_nil in Hal.
+now subst l'.
+...
+intros * Hal.
+remember [a] as m in Hal.
+  induction Hal; try (injection Heqm as [= -> ->]);
+    discriminate || auto.
+  apply Permutation_nil in Hal as ->; trivial.
+...
+About Permutation_length_1_inv.
+induction Hal. {
+  easy.
+} {
+  now f_equal.
+} {
+Show Proof.
+...
+revert a Hal.
+induction l as [| b]; intros; cbn. {
+  apply Permutation_sym in Hal.
+  now apply Permutation_nil in Hal.
+}
+inversion Hal. {
+  subst x l0 l'.
+  now apply Permutation_nil in H0; subst l.
+}
+subst l0 l''.
+Print Permutation_length_1_inv.
+...
+intros * eq_dec Hab.
+destruct lb as [| b]. {
+  now apply Permutation_sym, Permutation_nil in Hab.
+}
+destruct (eq_dec a b) as [Heab| Heab]; [ now left | right ].
+...
+intros * Hab.
+destruct lb as [| b]. {
+  now apply Permutation_sym, Permutation_nil in Hab.
+}
+revert a b la Hab.
+induction lb as [| c]; intros. {
+  apply Permutation_sym in Hab.
+  apply Permutation_length_1_inv in Hab.
+  injection Hab; clear Hab; intros; subst b la.
+  now left.
+}
+...
+intros * Hab.
+revert a la Hab.
+induction lb as [| b]; intros. {
+  now apply Permutation_sym, Permutation_nil in Hab.
+}
+Search (Permutation (_ :: _) (_ :: _)).
+inversion Hab. {
+  now left.
+} {
+  now right; left.
+}
+subst l l''.
+...
+
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
@@ -2524,19 +2659,62 @@ Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
   → ∀ la lb lsorted a,
   Permutation la lb
   → bsort_loop ord lsorted la = bsort_loop ord lsorted lb
-  → bsort_loop ord lsorted (a :: la) = bsort_loop ord lsorted (a :: lb).
+  → bsort_loop ord (bsort_insert ord a lsorted) la =
+    bsort_loop ord (bsort_insert ord a lsorted) lb.
 Proof.
-intros * Hant Htr Hto * Hab Hsab; cbn.
+intros * Hant Htr Hto * Hab Hsab.
+remember (length la) as n eqn:Hn; symmetry in Hn.
+revert la lb lsorted a Hab Hsab Hn.
+induction n; intros; cbn. {
+  apply length_zero_iff_nil in Hn; subst la.
+  apply Permutation_nil in Hab; subst lb.
+  easy.
+}
+destruct la as [| b]; [ easy | ].
+move b after a.
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+...
+specialize (Permutation_cons_in Hab) as H1.
+apply in_split in H1.
+destruct H1 as (lb1 & lb2 & Hlb).
+subst lb.
+apply Permutation_cons_app_inv in Hab.
+cbn in Hsab |-*.
+specialize (IHn _ _ lsorted a Hab) as H1.
+Search (Permutation (_ :: _)).
+(* mouais, bon *)
+...
+destruct lb as [| c]. {
+  apply Permutation_sym in Hab.
+  now apply Permutation_nil in Hab.
+}
+cbn in Hsab |-*.
+Search (Permutation (_ :: _) (_ :: _)).
+...
+rewrite IHn with (lb := lb); [ | | | easy ].
+...
+rewrite bsort_insert_insert_sym; [ symmetry | easy | easy | easy ].
+rewrite bsort_insert_insert_sym; [ symmetry | easy | easy | easy ].
+...
+intros * Hant Htr Hto * Hab Hsab.
 revert a lsorted Hsab.
-induction Hab as [| b la lb| b c la| ]; intros; [ easy | | | ]. {
+induction Hab as [| b la lb| b c la| la lb lc]; intros; [ easy | | | ]. {
   specialize (IHHab a _ Hsab) as H1; cbn.
   now rewrite bsort_insert_insert_sym.
 } {
   cbn in Hsab |-*.
   now rewrite bsort_insert_insert_sym.
 } {
+(*
+  apply Permutation_trans with (l := la) in Hab2; [ | easy ].
+  clear lb Hab1 IHHab1 IHHab2.
+  rename lc into lb.
+(* retour au point de départ *)
+*)
+  rewrite IHHab1. 2: {
+    rewrite Hsab.
 ...
-  rewrite IHHab1.
   rewrite IHHab2; [ easy | ].
 ...
   clear IHHab Hsab.
