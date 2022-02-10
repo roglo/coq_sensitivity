@@ -2606,6 +2606,13 @@ intros a.
 apply Nat.leb_refl.
 Qed.
 
+Theorem Nat_leb_antisym : antisymmetric Nat.leb.
+Proof.
+intros a b Hab Hba.
+apply Nat.leb_le in Hab, Hba.
+now apply le_antisym.
+Qed.
+
 Theorem Nat_leb_trans : transitive Nat.leb.
 Proof.
 intros a b c Hab Hbc.
