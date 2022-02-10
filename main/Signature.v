@@ -2897,40 +2897,57 @@ replace (ε (la ° lb)) with 0%F. 2: {
   unfold ε in Hez.
   destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
   apply Hez; clear Hez.
-  destruct (lt_dec i j) as [Hlij| Hlij]. {
-    erewrite (rngl_product_split3 (ff_app (bsort_rank Nat.leb lb) i)). 2: {
+  remember (ff_app (bsort_rank Nat.leb lb) i) as i' eqn:Hi'.
+  remember (ff_app (bsort_rank Nat.leb lb) j) as j' eqn:Hj'.
+  destruct (lt_dec i' j') as [Hlij| Hlij]. {
+    erewrite (rngl_product_split3 i'). 2: {
       split; [ easy | ].
       rewrite comp_length.
       destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
         apply length_zero_iff_nil in Hbz; subst lb; cbn.
+        subst i'; cbn.
         now destruct i.
       }
       apply Nat.le_add_le_sub_l.
       apply Nat.le_succ_l.
       unfold ff_app.
+      subst i'.
       apply bsort_rank_ub.
       now intros H; subst lb.
     }
     remember (∏ (_ = _, _), _) as x eqn:Hx.
-    erewrite (rngl_product_split3 (ff_app (bsort_rank Nat.leb lb) j)). 2: {
+    erewrite (rngl_product_split3 j'). 2: {
       split; [ easy | ].
       rewrite comp_length.
       destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
         apply length_zero_iff_nil in Hbz; subst lb; cbn.
+        subst j'; cbn.
         now destruct j.
       }
       apply Nat.le_add_le_sub_l.
       apply Nat.le_succ_l.
       unfold ff_app.
+      subst j'.
       apply bsort_rank_ub.
       now intros H; subst lb.
     }
-    remember (ff_app _ _ <? ff_app _ _) as y eqn:Hy.
-    symmetry in Hy.
-    destruct y. {
-      apply Nat.ltb_lt in Hy.
-...
     apply Nat.ltb_lt in Hlij; rewrite Hlij.
+    remember (sign_diff _ _) as y eqn:Hy.
+    rewrite Hi', Hj' in Hy.
+    unfold "°" in Hy.
+    unfold ff_app in Hy.
+    rewrite (List_map_nth' 0) in Hy. 2: {
+      apply bsort_rank_ub.
+      intros H; subst lb.
+      replace i' with 0 in Hlij. 2: {
+        cbn in Hi'; now destruct i.
+      }
+      replace j' with 0 in Hlij. 2: {
+        cbn in Hj'; now destruct j.
+      }
+      easy.
+    }
+...
     rewrite Hij.
     rewrite sign_diff_id.
     rewrite rngl_mul_0_r; [ | now left ].
