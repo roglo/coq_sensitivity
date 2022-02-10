@@ -735,27 +735,45 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
-  rewrite signature_comp with (n0 := n); [ easy | easy | | ]. {
+  rewrite sign_comp; [ | easy | ]. 2: {
     split. 2: {
+      rewrite List_map_seq_length.
       unfold f.
       rewrite length_list_swap_elem.
+      symmetry.
       apply length_canon_sym_gr_list.
     }
     split. {
       intros i Hi.
+      rewrite List_map_seq_length.
       apply In_nth with (d := 0) in Hi.
+      rewrite List_map_seq_length in Hi.
       destruct Hi as (j & Hj & Hji).
+      rewrite (List_map_nth' 0) in Hji; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hji; [ | easy ].
       rewrite <- Hji.
-      apply permut_list_ub; [ | easy ].
-      unfold f.
-      apply list_swap_elem_is_permut_list. {
-        now rewrite length_canon_sym_gr_list.
-      } {
-        now rewrite length_canon_sym_gr_list.
-      } {
-        now apply canon_sym_gr_list_is_permut.
-      }
+      now apply transposition_lt.
     }
+    apply (NoDup_map_iff 0).
+    rewrite seq_length.
+    intros i j Hi Hj Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    cbn in Hij.
+    unfold transposition in Hij.
+...
+Search transposition.
+Check nth_transposition_canon_sym_gr_list_inj.
+...
+    apply (f_equal (λ i, nth i (transposition p q) 0)) in Hij.
+Check (transposition p q).
+    apply nth_transposition_canon_sym_gr_list_inj.
+...
+    unfold transposition in Hij.
+Check nth_transposition_canon_sym_gr_list_inj.
+
+Search (transposition _ _ _ = transposition _ _ _).
+...
     unfold f, ff_app.
     rewrite length_list_swap_elem.
     rewrite length_canon_sym_gr_list.
@@ -915,6 +933,8 @@ intros i Hi.
 rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
+
+...
 
 Theorem determinant_same_rows : in_charac_0_field →
   ∀ (M : matrix T) p q,
