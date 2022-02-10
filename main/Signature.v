@@ -2507,19 +2507,37 @@ destruct ac, bc; cbn. {
     now rewrite Hbc.
   }
 } {
-...
+  rewrite Hbc, Hac.
+  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  now rewrite (Htr _ _ _ Hab Hbc) in Hac.
+} {
+  rewrite Hac, Hbc.
+  now rewrite IHl.
+}
+Qed.
 
-Theorem Permutation_bsort_loop : ∀ A (ord : A → _) la lb lsorted a,
+Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → total_order ord
+  → ∀ la lb lsorted a,
   Permutation la lb
   → bsort_loop ord lsorted la = bsort_loop ord lsorted lb
   → bsort_loop ord lsorted (a :: la) = bsort_loop ord lsorted (a :: lb).
 Proof.
-intros * Hab Hsab; cbn.
+intros * Hant Htr Hto * Hab Hsab; cbn.
 revert a lsorted Hsab.
-induction Hab as [| b la lb| | ]; intros; [ easy | | | ]. {
+induction Hab as [| b la lb| b c la| ]; intros; [ easy | | | ]. {
   specialize (IHHab a _ Hsab) as H1; cbn.
-...
   now rewrite bsort_insert_insert_sym.
+} {
+  cbn in Hsab |-*.
+  now rewrite bsort_insert_insert_sym.
+} {
+...
+  rewrite IHHab1.
+  rewrite IHHab2; [ easy | ].
 ...
   clear IHHab Hsab.
   revert a b lsorted H1.
