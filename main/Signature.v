@@ -2792,25 +2792,78 @@ rewrite (permut_bsort_rank_comp (length lb)); [ easy | | | ]. {
 }
 Qed.
 
-Theorem NoDup_comp : ∀ la lb,
-  NoDup la
-  → is_permut (length la) lb
-  → NoDup (la ° lb).
+Theorem NoDup_comp_iff : ∀ la lb,
+  is_permut (length la) lb
+  → NoDup la
+  ↔ NoDup (la ° lb).
 Proof.
-intros * Haa Hbp.
-unfold "°".
-apply (NoDup_map_iff 0).
-intros i j Hi Hj Hij.
-destruct Hbp as (Hbp, Hbl).
-apply (NoDup_nat _ Haa) in Hij; cycle 1. {
-  rewrite <- Hbl.
-  now apply Hbp, nth_In.
+intros * Hbp.
+split. {
+  intros Haa.
+  unfold "°".
+  apply (NoDup_map_iff 0).
+  intros i j Hi Hj Hij.
+  destruct Hbp as (Hbp, Hbl).
+  apply (NoDup_nat _ Haa) in Hij; cycle 1. {
+    rewrite <- Hbl.
+    now apply Hbp, nth_In.
+  } {
+    rewrite <- Hbl.
+    now apply Hbp, nth_In.
+  }
+  destruct Hbp as (Hba, Hbn).
+  now apply (NoDup_nat _ Hbn) in Hij.
 } {
-  rewrite <- Hbl.
-  now apply Hbp, nth_In.
-}
-destruct Hbp as (Hba, Hbn).
-now apply (NoDup_nat _ Hbn) in Hij.
+  intros Haa.
+  apply nat_NoDup.
+  specialize (NoDup_nat _ Haa) as H1.
+    intros i j Hi Hj Hij.
+    rewrite comp_length in H1.
+    destruct Hbp as (Hbp, Hbl).
+    rewrite <- Hbl in Hi, Hj.
+    remember (ff_app (bsort_rank Nat.leb lb) i) as i' eqn:Hi'.
+    remember (ff_app (bsort_rank Nat.leb lb) j) as j' eqn:Hj'.
+    specialize (H1 i' j').
+    assert (H : i' < length lb). {
+      rewrite Hi'; unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : j' < length lb). {
+      rewrite Hj'; unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : ff_app (la ° lb) i' = ff_app (la ° lb) j'). {
+      rewrite Hi', Hj'.
+      unfold "°", ff_app.
+      rewrite (List_map_nth' 0). 2: {
+        apply bsort_rank_ub.
+        now intros H; subst lb.
+      }
+      rewrite (List_map_nth' 0). 2: {
+        apply bsort_rank_ub.
+        now intros H; subst lb.
+      }
+      do 6 rewrite fold_ff_app.
+      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
+      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
+      easy.
+    }
+    specialize (H1 H); clear H.
+    rewrite Hi', Hj' in H1.
+    assert (H : is_permut_list (bsort_rank Nat.leb lb)). {
+      now apply bsort_rank_is_permut_list.
+    }
+    destruct H as (Hra, Hrn).
+    apply (NoDup_nat _ Hrn) in H1; [ easy | | ]. {
+      now rewrite length_bsort_rank.
+    } {
+      now rewrite length_bsort_rank.
+    }
+  }
 Qed.
 
 Theorem ε_when_dup : in_charac_0_field →
@@ -2873,79 +2926,28 @@ Proof.
 intros Hif * Hbp.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   rewrite (ε_when_dup Hif Haa).
-(**)
   rewrite (ε_when_dup Hif). 2: {
     intros H; apply Haa; clear Haa.
-    apply nat_NoDup.
-    specialize (NoDup_nat _ H) as H1; clear H.
-    intros i j Hi Hj Hij.
-    rewrite comp_length in H1.
-    destruct Hbp as (Hbp, Hbl).
-    rewrite <- Hbl in Hi, Hj.
-    remember (ff_app (bsort_rank Nat.leb lb) i) as i' eqn:Hi'.
-    remember (ff_app (bsort_rank Nat.leb lb) j) as j' eqn:Hj'.
-    specialize (H1 i' j').
-    assert (H : i' < length lb). {
-      rewrite Hi'; unfold ff_app.
-      apply bsort_rank_ub.
-      now intros H; rewrite H in Hi.
-    }
-    specialize (H1 H); clear H.
-    assert (H : j' < length lb). {
-      rewrite Hj'; unfold ff_app.
-      apply bsort_rank_ub.
-      now intros H; rewrite H in Hi.
-    }
-    specialize (H1 H); clear H.
-    assert (H : ff_app (la ° lb) i' = ff_app (la ° lb) j'). {
-      rewrite Hi', Hj'.
-      unfold "°", ff_app.
-      rewrite (List_map_nth' 0). 2: {
-        apply bsort_rank_ub.
-        now intros H; subst lb.
-      }
-      rewrite (List_map_nth' 0). 2: {
-        apply bsort_rank_ub.
-        now intros H; subst lb.
-      }
-      do 6 rewrite fold_ff_app.
-      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
-      rewrite permut_permut_bsort; [ | now destruct Hbp | easy ].
-      easy.
-    }
-    specialize (H1 H); clear H.
-    rewrite Hi', Hj' in H1.
-    assert (H : is_permut_list (bsort_rank Nat.leb lb)). {
-      now apply bsort_rank_is_permut_list.
-    }
-    destruct H as (Hra, Hrn).
-    apply (NoDup_nat _ Hrn) in H1; [ easy | | ]. {
-      now rewrite length_bsort_rank.
-    } {
-      now rewrite length_bsort_rank.
-    }
+    now apply NoDup_comp_iff in H.
   }
   symmetry.
   now apply rngl_mul_0_l; destruct Hif; left.
-}
-rewrite <- ε_collapse_ε; [ | now apply NoDup_comp ].
-rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
-symmetry.
-rewrite <- ε_collapse_ε; [ | easy ].
-symmetry.
-apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
+} {
+  rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
+  rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
+  symmetry.
+  rewrite <- ε_collapse_ε; [ | easy ].
+  symmetry.
+  apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
+    apply collapse_is_permut.
+  }
+  destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+  rewrite signature_comp_fun_expand_2_1; try easy.
+  rewrite signature_comp_fun_expand_2_2; try easy.
+  apply signature_comp_fun_changement_of_variable; try easy.
   apply collapse_is_permut.
 }
-destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
-rewrite signature_comp_fun_expand_2_1; try easy.
-rewrite signature_comp_fun_expand_2_2; try easy.
-apply signature_comp_fun_changement_of_variable; try easy.
-apply collapse_is_permut.
 Qed.
-
-Inspect 1.
-
-...
 
 (* *)
 
@@ -3094,6 +3096,7 @@ f_equal. {
     rewrite Hσ.
     now apply canon_sym_gr_list_is_permut.
   }
+...
   rewrite rngl_product_change_var with
     (g := ff_app (permut_list_inv σ')) (h := ff_app σ'). 2: {
     intros i (_, Hi).
