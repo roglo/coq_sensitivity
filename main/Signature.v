@@ -2836,6 +2836,39 @@ Theorem sign_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros Hif * Haa Hbp.
+Search ({NoDup _} + {_}).
+clear Haa.
+destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
+Search (¬ NoDup _).
+replace (ε la) with 0%F. 2: {
+  symmetry.
+  destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+  destruct (rngl_eq_dec Hde (ε la) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+  apply Haa; clear Haa.
+  clear Hbp.
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ε in Hez.
+  destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
+  apply Hez; clear Hez.
+  destruct (lt_dec i j) as [Hlij| Hlij]. {
+    erewrite (rngl_product_split3 i). 2: {
+      split; [ easy | flia Hi ].
+    }
+    remember (∏ (_ = _, _), _) as x eqn:Hx.
+    erewrite (rngl_product_split3 j); subst x. 2: {
+      split; [ easy | flia Hj ].
+    }
+    apply Nat.ltb_lt in Hlij; rewrite Hlij.
+    rewrite Hij.
+    rewrite sign_diff_id.
+...
+Search NoDup.
+  induction la as [| a]; [ constructor | ].
+  constructor.
+cbn in Hez.
+...
+intros Hif * Haa Hbp.
 rewrite <- ε_collapse_ε; [ | now apply NoDup_comp ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
