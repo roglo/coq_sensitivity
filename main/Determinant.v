@@ -761,37 +761,23 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite seq_nth in Hij; [ | easy ].
     cbn in Hij.
     unfold transposition in Hij.
-...
-Search transposition.
-Check nth_transposition_canon_sym_gr_list_inj.
-...
-    apply (f_equal (λ i, nth i (transposition p q) 0)) in Hij.
-Check (transposition p q).
-    apply nth_transposition_canon_sym_gr_list_inj.
-...
-    unfold transposition in Hij.
-Check nth_transposition_canon_sym_gr_list_inj.
-
-Search (transposition _ _ _ = transposition _ _ _).
-...
-    unfold f, ff_app.
-    rewrite length_list_swap_elem.
-    rewrite length_canon_sym_gr_list.
-    intros i j Hi Hj Hij.
-(* lemme à faire ? *)
-    unfold list_swap_elem in Hij.
-    rewrite (List_map_nth' 0) in Hij. 2: {
-      now rewrite seq_length, length_canon_sym_gr_list.
+    do 4 rewrite if_eqb_eq_dec in Hij.
+    destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+      subst i.
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+      symmetry in Hij.
+      now destruct (Nat.eq_dec j q).
     }
-    rewrite (List_map_nth' 0) in Hij. 2: {
-      now rewrite seq_length, length_canon_sym_gr_list.
+    destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+      subst i.
+      symmetry in Hij.
+      destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+      now destruct (Nat.eq_dec j q).
     }
-    rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
-    rewrite seq_nth in Hij; [ | now rewrite length_canon_sym_gr_list ].
-    cbn in Hij.
-    now apply nth_transposition_canon_sym_gr_list_inj in Hij.
+    destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ easy | ].
+    now destruct (Nat.eq_dec j q).
   }
-  now apply transposition_is_permut.
+  easy.
 }
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
@@ -832,6 +818,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
         apply canon_sym_gr_list_ub; [ easy | ].
         now apply transposition_lt.
       } {
+...
         rewrite map_length, seq_length.
         intros u v Hu Hv.
         unfold ff_app.
