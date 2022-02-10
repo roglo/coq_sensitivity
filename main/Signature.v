@@ -2695,8 +2695,6 @@ Qed.
 
 Arguments permut_bsort_rank_comp n%nat [la lb]%list.
 
-...
-
 Theorem butn_is_permut_list : ∀ i la,
   is_permut_list la
   → i = ff_app (bsort_rank Nat.leb la) (length la - 1)
@@ -2780,18 +2778,18 @@ intros * Ha Hb Hab.
 unfold collapse.
 symmetry.
 rewrite <- (permut_bsort_rank_involutive Hb) at 1.
-rewrite (permut_bsort_rank_comp (length lb)); cycle 1. {
+rewrite (permut_bsort_rank_comp (length lb)); [ | | easy | ]; cycle 1. {
   now destruct Ha.
 } {
   now destruct Hb.
 }
-rewrite (permut_bsort_rank_comp (length lb)); cycle 1. {
-  now apply bsort_rank_is_permut.
+rewrite (permut_bsort_rank_comp (length lb)); [ easy | | | ]. {
+  apply NoDup_bsort_rank.
 } {
-  rewrite <- Hab.
+  apply length_bsort_rank.
+} {
   now apply bsort_rank_is_permut.
 }
-easy.
 Qed.
 
 Theorem ff_app_collapse_map : ∀ la lb,
@@ -2808,7 +2806,6 @@ unfold ff_app at 1.
 now apply (List_map_nth' 0).
 Qed.
 
-(* version signature_comp less constraining (la not a permutation) *)
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   NoDup la
@@ -2817,7 +2814,19 @@ Theorem sign_comp : in_charac_0_field →
 Proof.
 intros Hif * Haa Hbp.
 rewrite <- ε_collapse_ε.
+...
+rewrite <- collapse_idemp.
+rewrite collapse_comp.
+rewrite permut_collapse.
+Inspect 2.
+rewrite collapse_comp.
+Search collapse.
+
+rewrite permut_collapse.
+
 rewrite <- (ε_collapse_ε Haa).
+Inspect 
+
 Search (ε (collapse _)).
 Search (collapse (_ ° _)).
 ...
