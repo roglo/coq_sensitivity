@@ -2839,7 +2839,6 @@ intros Hif * Haa Hbp.
 Search ({NoDup _} + {_}).
 clear Haa.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
-Search (¬ NoDup _).
 replace (ε la) with 0%F. 2: {
   symmetry.
   destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
@@ -2869,7 +2868,96 @@ replace (ε la) with 0%F. 2: {
     easy.
   } {
     assert (H : j < i) by flia Heqj Hlij.
-    clear Hlij; rename H into Hlkj.
+    clear Hlij; rename H into Hlij.
+    erewrite (rngl_product_split3 j). 2: {
+      split; [ easy | flia Hj ].
+    }
+    remember (∏ (_ = _, _), _) as x eqn:Hx.
+    erewrite (rngl_product_split3 i); subst x. 2: {
+      split; [ easy | flia Hi ].
+    }
+    apply Nat.ltb_lt in Hlij; rewrite Hlij.
+    rewrite Hij.
+    rewrite sign_diff_id.
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    easy.
+  }
+}
+replace (ε (la ° lb)) with 0%F. 2: {
+  symmetry.
+  destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+  destruct (rngl_eq_dec Hde (ε (la ° lb)) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+  apply Haa; clear Haa.
+  clear Hbp.
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ε in Hez.
+  destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
+  apply Hez; clear Hez.
+  destruct (lt_dec i j) as [Hlij| Hlij]. {
+    erewrite (rngl_product_split3 (ff_app (bsort_rank Nat.leb lb) i)). 2: {
+      split; [ easy | ].
+      rewrite comp_length.
+      destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
+        apply length_zero_iff_nil in Hbz; subst lb; cbn.
+        now destruct i.
+      }
+      apply Nat.le_add_le_sub_l.
+      apply Nat.le_succ_l.
+      unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; subst lb.
+    }
+    remember (∏ (_ = _, _), _) as x eqn:Hx.
+    erewrite (rngl_product_split3 (ff_app (bsort_rank Nat.leb lb) j)). 2: {
+      split; [ easy | ].
+      rewrite comp_length.
+      destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
+        apply length_zero_iff_nil in Hbz; subst lb; cbn.
+        now destruct j.
+      }
+      apply Nat.le_add_le_sub_l.
+      apply Nat.le_succ_l.
+      unfold ff_app.
+      apply bsort_rank_ub.
+      now intros H; subst lb.
+    }
+    remember (ff_app _ _ <? ff_app _ _) as y eqn:Hy.
+    symmetry in Hy.
+    destruct y. {
+      apply Nat.ltb_lt in Hy.
+...
+    apply Nat.ltb_lt in Hlij; rewrite Hlij.
+    rewrite Hij.
+    rewrite sign_diff_id.
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    easy.
+  } {
+    assert (H : j < i) by flia Heqj Hlij.
+    clear Hlij; rename H into Hlij.
+    erewrite (rngl_product_split3 j). 2: {
+      split; [ easy | flia Hj ].
+    }
+    remember (∏ (_ = _, _), _) as x eqn:Hx.
+    erewrite (rngl_product_split3 i); subst x. 2: {
+      split; [ easy | flia Hi ].
+    }
+    apply Nat.ltb_lt in Hlij; rewrite Hlij.
+    rewrite Hij.
+    rewrite sign_diff_id.
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_l; [ | now left ].
+    easy.
+  }
+}
 ...
 Search NoDup.
   induction la as [| a]; [ constructor | ].
