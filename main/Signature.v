@@ -2808,6 +2808,27 @@ now apply (List_map_nth' 0).
 Qed.
 *)
 
+Theorem NoDup_comp : ∀ la lb,
+  NoDup la
+  → is_permut (length la) lb
+  → NoDup (la ° lb).
+Proof.
+intros * Haa Hbp.
+unfold "°".
+apply (NoDup_map_iff 0).
+intros i j Hi Hj Hij.
+destruct Hbp as (Hbp, Hbl).
+apply (NoDup_nat _ Haa) in Hij; cycle 1. {
+  rewrite <- Hbl.
+  now apply Hbp, nth_In.
+} {
+  rewrite <- Hbl.
+  now apply Hbp, nth_In.
+}
+destruct Hbp as (Hba, Hbn).
+now apply (NoDup_nat _ Hbn) in Hij.
+Qed.
+
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   NoDup la
@@ -2815,21 +2836,7 @@ Theorem sign_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%F.
 Proof.
 intros Hif * Haa Hbp.
-rewrite <- ε_collapse_ε. 2: {
-  unfold "°".
-  apply (NoDup_map_iff 0).
-  intros i j Hi Hj Hij.
-  destruct Hbp as (Hbp, Hbl).
-  apply (NoDup_nat _ Haa) in Hij; cycle 1. {
-    rewrite <- Hbl.
-    now apply Hbp, nth_In.
-  } {
-    rewrite <- Hbl.
-    now apply Hbp, nth_In.
-  }
-  destruct Hbp as (Hba, Hbn).
-  now apply (NoDup_nat _ Hbn) in Hij.
-}
+rewrite <- ε_collapse_ε; [ | now apply NoDup_comp ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
 rewrite <- ε_collapse_ε; [ | easy ].
