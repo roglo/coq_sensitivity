@@ -857,16 +857,13 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     apply list_swap_elem_is_permut; [ easy | easy | ].
     now apply canon_sym_gr_list_is_permut.
   } {
-...
-    rewrite map_length, seq_length.
+(**)
+    apply (NoDup_map_iff 0).
+    rewrite seq_length.
     intros i j Hi Hj Hij.
-    unfold ff_app in Hij.
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
-    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
     rewrite seq_nth in Hij; [ | easy ].
     rewrite seq_nth in Hij; [ | easy ].
     do 2 rewrite Nat.add_0_l in Hij.
-(* lemme à faire ? *)
     apply rank_of_permut_in_canon_gr_list_inj in Hij; cycle 1. {
       apply list_swap_elem_is_permut; [ easy | easy | ].
       now apply canon_sym_gr_list_is_permut.
@@ -917,8 +914,6 @@ intros i Hi.
 rewrite Nat.add_comm, Nat.add_sub.
 now rewrite Hc.
 Qed.
-
-...
 
 Theorem determinant_same_rows : in_charac_0_field →
   ∀ (M : matrix T) p q,
