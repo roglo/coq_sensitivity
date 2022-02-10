@@ -2654,6 +2654,21 @@ subst l l''.
 ...
 *)
 
+Theorem bsort_loop_insert_middle : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → total_order ord
+  → ∀ ls la lb a,
+  bsort_loop ord ls (la ++ a :: lb) =
+  bsort_loop ord (bsort_insert ord a ls) (la ++ lb).
+Proof.
+intros * Hant Htr Hto *.
+revert a ls lb.
+induction la as [| b]; intros; [ easy | cbn ].
+rewrite IHla.
+now rewrite bsort_insert_insert_sym.
+Qed.
+
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
@@ -2683,7 +2698,16 @@ destruct H1 as (lb1 & lb2 & Hlb).
 subst lb.
 apply Permutation_cons_app_inv in Hab.
 cbn in Hsab |-*.
+remember (bsort_insert ord b lsorted) as ls eqn:Hls.
+specialize (IHn _ _ ls a Hab) as H1.
+assert (H : bsort_loop ord ls la = bsort_loop ord ls (lb1 ++ lb2)). {
+  rewrite Hsab, Hls.
+  now apply bsort_loop_insert_middle.
+}
+specialize (H1 H Hn); clear H.
+...
 specialize (IHn _ _ lsorted a Hab) as H1.
+Inspect 1.
 ...
 destruct lb as [| c]. {
   apply Permutation_sym in Hab.
