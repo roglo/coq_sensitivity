@@ -2222,26 +2222,26 @@ Qed.
    sorted; its result, when applied to the initial list as an
    operator, returns the sorted list  *)
 
-Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
+Fixpoint bsort_rank_insert {A B} (ord : A → A → bool) (ia : B) a lrank :=
   match lrank with
-  | [] => [ia]
-  | ib :: l =>
-      if ord (f ia) (f ib) then ia :: lrank
-      else ib :: bsort_rank_insert ord f ia l
+  | [] => [(ia, a)]
+  | (ib, b) :: l =>
+      if ord a b then (ia, a) :: lrank
+      else (ib, b) :: bsort_rank_insert ord ia a l
   end.
 
-Fixpoint bsort_rank_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
+Fixpoint bsort_rank_loop {A} (ord : A → A → bool) lrank (l : list A) :=
   match l with
   | [] => lrank
-  | _ :: l' =>
-      bsort_rank_loop ord f (bsort_rank_insert ord f (length lrank) lrank) l'
+  | a :: l' =>
+      bsort_rank_loop ord (bsort_rank_insert ord (length lrank) a lrank) l'
   end.
 
+Definition bsort_rank_sort {A} (ord : A → A → bool) l :=
+  bsort_rank_loop ord [] l.
+
 Definition bsort_rank {A} (ord : A → A → bool) l :=
-  match l with
-  | [] => []
-  | d :: _ => bsort_rank_loop ord (λ i, nth i l d) [] l
-  end.
+  map fst (bsort_rank_sort ord l).
 
 (*
 Compute (let l := [2;7;1] in bsort_rank Nat.leb l).
@@ -2250,17 +2250,17 @@ Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.ltb l).
 *)
 
-Theorem length_bsort_rank_insert : ∀ A B ord (f : B → A) ia lrank,
-  length (bsort_rank_insert ord f ia lrank) = S (length lrank).
+Theorem length_bsort_rank_insert : ∀ A B (ord : A → _) (ia : B) a lrank,
+  length (bsort_rank_insert ord ia a lrank) = S (length lrank).
 Proof.
 intros.
-induction lrank as [| ib]; [ easy | cbn ].
-destruct (ord (f ia) (f ib)); [ easy | cbn ].
+induction lrank as [| (ib, b)]; [ easy | cbn ].
+destruct (ord a b); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
-Theorem length_bsort_rank_loop : ∀ A ord (f : _ → A) lrank l,
-  length (bsort_rank_loop ord f lrank l) = length lrank + length l.
+Theorem length_bsort_rank_loop : ∀ A (ord : A → _) lrank l,
+  length (bsort_rank_loop ord lrank l) = length lrank + length l.
 Proof.
 intros.
 revert lrank.
@@ -2275,65 +2275,11 @@ Theorem length_bsort_rank : ∀ A ord (l : list A),
 Proof.
 intros.
 unfold bsort_rank.
-destruct l as [| d]; [ easy | ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'.
-rename l' into l.
+rewrite map_length.
 apply length_bsort_rank_loop.
 Qed.
 
-Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
-  bsort_insert ord (f ia) (map f lrank) =
-  map f (bsort_rank_insert ord f ia lrank).
-Proof.
-intros.
-induction lrank as [| ib]; [ easy | cbn ].
-destruct (ord (f ia) (f ib)); [ easy | ].
-cbn; f_equal.
-apply IHlrank.
-Qed.
-
-Theorem bsort_loop_bsort_rank_loop : ∀ A ord d (f : nat → A) lrank l,
-  (∀ i, i < length l → f (length lrank + i) = nth i l d)
-  → bsort_loop ord (map f lrank) l = map f (bsort_rank_loop ord f lrank l).
-Proof.
-intros * Hia.
-revert lrank Hia.
-induction l as [| a]; intros; [ easy | cbn ].
-specialize (Hia 0 (Nat.lt_0_succ _)) as H1.
-cbn in H1; rewrite Nat.add_0_r in H1.
-rewrite <- H1.
-rewrite bsort_insert_bsort_rank_insert.
-rewrite IHl; [ easy | ].
-intros i Hi.
-rewrite length_bsort_rank_insert.
-apply Nat.succ_lt_mono in Hi.
-specialize (Hia (S i) Hi) as H2.
-now rewrite <- Nat.add_succ_comm in H2.
-Qed.
-
-Theorem bsort_rank_insert_nth_indep : ∀ A ord (d d' : A) ia lrank l_ini,
-  ia < length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → bsort_rank_insert ord (λ i : nat, nth i l_ini d) ia lrank =
-    bsort_rank_insert ord (λ i : nat, nth i l_ini d') ia lrank.
-Proof.
-intros * Hia Hini.
-induction lrank as [| ib]; [ easy | ].
-cbn - [ nth ].
-specialize (Hini ib (or_introl eq_refl)) as Hib.
-rewrite (nth_indep _ _ d' Hia).
-rewrite (nth_indep _ _ d' Hib).
-remember (ord (nth ia l_ini d') (nth ib l_ini d')) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-f_equal.
-apply IHlrank.
-intros i Hi.
-apply Hini.
-now right.
-Qed.
-
+(*
 Theorem in_bsort_rank_insert : ∀ A B ord (f : B → A) ia lrank i,
   i ∈ bsort_rank_insert ord f ia lrank
   → i ∈ ia :: lrank.
@@ -2346,29 +2292,166 @@ destruct Hil as [Hil| Hil]; [ now subst i; right; left | ].
 specialize (IHlrank Hil).
 destruct IHlrank as [Hi| Hi]; [ now subst i; left | now right; right ].
 Qed.
+*)
 
-Theorem bsort_rank_loop_nth_indep : ∀ A ord (d d' : A) lrank l_ini l,
-  length lrank + length l ≤ length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → bsort_rank_loop ord (λ i, nth i l_ini d) lrank l =
-    bsort_rank_loop ord (λ i, nth i l_ini d') lrank l.
+Theorem bsort_insert_map_snd_bsort_insert :
+  ∀ {A B} (ord : A → _) (ia : B) a lrank,
+  bsort_insert ord a (map snd lrank) =
+  map snd (bsort_rank_insert ord ia a lrank).
 Proof.
-intros * Hia Hil.
-revert lrank Hia Hil.
-induction l as [| b]; intros; [ easy | ].
-cbn - [ nth ] in Hia |-*.
-rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | flia Hia | easy ].
-rewrite <- Nat.add_succ_comm in Hia.
-rewrite IHl; [ easy | now rewrite length_bsort_rank_insert | ].
-intros i Hi.
-apply in_bsort_rank_insert in Hi.
-destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
-now apply Hil.
+intros.
+induction lrank as [| (ib, b)]; [ easy | cbn ].
+destruct (ord a b); [ easy | cbn ].
+f_equal.
+apply IHlrank.
 Qed.
+
+Theorem bsort_loop_map_snd_bsort_rank_loop : ∀ A (ord : A → _) lrank l,
+  bsort_loop ord (map snd lrank) l =
+  map snd (bsort_rank_loop ord lrank l).
+Proof.
+intros.
+revert lrank.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite <- IHl.
+f_equal.
+apply bsort_insert_map_snd_bsort_insert.
+Qed.
+
+Theorem bsort_snd_bsort_rank : ∀ A (ord : A → _) l,
+  bsort ord l = map snd (bsort_rank_sort ord l).
+Proof.
+intros.
+unfold bsort, bsort_rank_sort.
+now rewrite <- bsort_loop_map_snd_bsort_rank_loop.
+Qed.
+
+(*
+  Haa : (ia, a) ∈ bsort_rank_loop ord [] la
+  ============================
+  a = nth ia la d
+*)
+
+Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
+  (ia, a) ∉ ls
+  → (ia, a) ∈ bsort_rank_loop ord ls la
+  → length ls ≤ ia
+  → a = nth (ia - length ls) la d.
+Proof.
+intros * Hls Haa Hia.
+...
+revert ia a ls Hls Haa Hia.
+induction la as [| b]; intros; [ easy | ].
+cbn in Haa.
+destruct (Nat.eq_dec ia (length ls)) as [His| His]. {
+  rewrite His, Nat.sub_diag; cbn.
+  destruct ls as [| (ic, c)]. {
+    cbn in Hia; subst ia; cbn in Haa.
+    clear - Haa.
+Theorem glop : ∀ A (ord : A → _) la lb a b i,
+  (i, a) ∉ lb
+  → (i, a) ∈ bsort_rank_loop ord ((i, b) :: lb) la
+  → a = b.
+Proof.
+intros * Hib Hia.
+revert a b lb i Hib Hia.
+induction la as [| c]; intros; cbn in Hia. {
+  destruct Hia as [Hia| Hia]; [ now injection Hia | easy ].
+}
+remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+eapply IHla.
+  specialize (IHla a c ((i, b) :: lb) (S (length lb))) as H1.
+  assert (H : (S (length lb), a) ∉ (i, b) :: lb). {
+    intros H.
+    destruct H as [H| H]. {
+      injection H; clear H; intros; subst b i.
+...
+      destruct Haa as [Haa| ]; [ | easy ].
+      now injection Haa.
+    }
+...
+remember (bsort_rank_insert ord (length ls) b ls) as ls' eqn:Hls'.
+specialize (IHla ia a ls') as H1.
+...
+induction la as [| b]; intros; [ easy | ].
+cbn in Haa.
+replace (lb ++ b :: la) with (lb ++ [b] ++ la) by easy.
+rewrite app_assoc.
+apply IHla with (ls := (0, b) :: ls). {
+  now rewrite app_length, Nat.add_comm, Hb.
+} {
+  intros H.
+  destruct H as [H| H]; [ | easy ].
+  injection H; clear H; intros; subst ia b.
+...
+*)
+
+Theorem in_bsort_rank_sort : ∀ A d (ord : A → _) la ia a,
+  (ia, a) ∈ bsort_rank_sort ord la
+  → a = nth ia la d.
+Proof.
+intros * Haa.
+unfold bsort_rank_sort in Haa.
+...
+now apply (in_bsort_rank_loop d) in Haa.
+...
+destruct la as [| b]; [ easy | ].
+cbn in Haa |-*.
+destruct ia. {
+  clear d.
+  revert a b Haa.
+  induction la as [| c]; intros; cbn in Haa. {
+    destruct Haa as [Haa| ]; [ | easy ].
+    now injection Haa.
+  }
+  remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    destruct la as [| d]. {
+      cbn in Haa.
+      destruct Haa as [| Haa]; [ easy | ].
+      destruct Haa as [Haa| ]; [ | easy ].
+      now injection Haa.
+    }
+    remember [(1, c); (0, b)] as l.
+    cbn in Haa; subst l.
+...
+    cbn in Haa.
+    remember (ord d c) as dc eqn:Hdc; symmetry in Hdc.
+    destruct dc. {
+    destruct la as [| e]. {
+      cbn in Haa.
+      destruct Haa as [| Haa]; [ easy | ].
+      destruct Haa as [| Haa]; [ easy | ].
+      destruct Haa as [Haa| ]; [ | easy ].
+      now injection Haa.
+    }
+    cbn in Haa.
+...
+apply (in_bsort_rank_loop d) in Haa; [ | easy ].
+now rewrite Nat.sub_0_r in Haa.
+...
+induction la as [| b]; [ easy | ].
+cbn in Haa.
+destruct ia. {
+  cbn in Haa |-*.
+
+...
 
 Theorem bsort_bsort_rank : ∀ A (ord : A → A → bool) (d : A) l,
   bsort ord l = map (λ i, nth i l d) (bsort_rank ord l).
 Proof.
+intros.
+unfold bsort_rank.
+rewrite map_map.
+rewrite bsort_snd_bsort_rank.
+apply map_ext_in.
+intros (ia, a) Ha; cbn.
+...
+now apply (in_bsort_rank_sort d) in Ha.
+...
+rewrite bsort_loop_bsort_rank_loop.
+...
 intros.
 destruct l as [| d' l]; [ easy | ].
 cbn - [ nth ].
