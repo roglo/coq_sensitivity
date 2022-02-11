@@ -1400,8 +1400,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-...
-set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
+set
+  (sg := map (λ k, canon_sym_gr_list n k ° bsort_rank Nat.leb σ) (seq 0 n!)).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -1451,7 +1451,7 @@ split. {
     apply (comp_is_permut_list n). {
       now apply canon_sym_gr_list_is_permut.
     } {
-      now apply permut_list_inv_is_permut.
+      now apply bsort_rank_is_permut; destruct Hσ.
     }
   }
 }
@@ -1469,6 +1469,7 @@ split. {
   intros k Hk.
   apply H1.
 (* lemme à faire ? *)
+...
   unfold permut_list_inv.
   apply in_map_iff.
   exists (ff_app σ k).
