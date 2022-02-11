@@ -2041,62 +2041,6 @@ Qed.
 
 Arguments comp_1_r n%nat [la]%list.
 
-(*
-Theorem permut_bsort_rank_comp : ∀ n la lb,
-  is_permut n la
-  → is_permut n lb
-  → bsort_rank Nat.leb (la ° lb) =
-    bsort_rank Nat.leb lb ° bsort_rank Nat.leb la.
-Proof.
-intros * Ha Hb.
-assert (Hapb : is_permut n (bsort_rank Nat.leb la)). {
-  apply bsort_rank_is_permut.
-  now destruct Ha.
-}
-assert (Hbpb : is_permut n (bsort_rank Nat.leb lb)). {
-  apply bsort_rank_is_permut.
-  now destruct Hb.
-}
-apply permut_comp_cancel_r with (n := n) (lc := la). {
-  apply bsort_rank_is_permut.
-  now rewrite comp_length; destruct Hb.
-} {
-  now apply comp_is_permut.
-} {
-  easy.
-}
-rewrite <- (permut_comp_assoc n); [ | | easy ]. 2: {
-  now rewrite length_bsort_rank; destruct Ha.
-}
-rewrite permut_comp_bsort_rank_l; [ | now destruct Ha ].
-rewrite comp_1_r. 2: {
-  rewrite length_bsort_rank.
-  destruct Ha as (Hap, Hal).
-  destruct Hb as (Hbp, Hbl).
-  congruence.
-}
-apply permut_comp_cancel_r with (n := n) (lc := lb). {
-  apply comp_is_permut; [ | easy ].
-  apply bsort_rank_is_permut.
-  now rewrite comp_length; destruct Hb.
-} {
-  now rewrite length_bsort_rank; destruct Hb.
-} {
-  easy.
-}
-rewrite <- (permut_comp_assoc n); [ | now destruct Ha | easy ].
-rewrite permut_comp_bsort_rank_l. 2: {
-  now apply (comp_is_permut_list n).
-}
-rewrite comp_length.
-symmetry.
-apply permut_comp_bsort_rank_l.
-now destruct Hb.
-Qed.
-
-Arguments permut_bsort_rank_comp n%nat [la lb]%list.
-*)
-
 (* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
    E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
@@ -3241,6 +3185,7 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
+Arguments permut_bsort_rank_comp n%nat [la lb]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments sign_comp {T}%type {ro rp} _ [la lb]%list.

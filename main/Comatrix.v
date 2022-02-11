@@ -1716,31 +1716,34 @@ split. {
     apply bsort_rank_is_permut.
     now destruct Hl.
   }
-...
-  rewrite (@permut_list_inv_comp n); [ | | easy ]. 2: {
-    now apply permut_list_inv_is_permut.
+  rewrite (permut_bsort_rank_comp n); [ | | | easy ]; cycle 1. {
+    apply NoDup_bsort_rank.
+  } {
+    rewrite length_bsort_rank.
+    now destruct Hl.
   }
-  rewrite (@permut_comp_assoc n); cycle 1. {
+  rewrite (permut_comp_assoc n); cycle 1. {
     rewrite length_bsort_rank.
     now destruct Hσ.
   } {
-    now do 2 apply permut_list_inv_is_permut.
+    do 2 apply bsort_rank_is_permut.
+    now destruct Hl.
   }
-  rewrite (@comp_permut_permut_bsort n); [ | easy ].
-  rewrite comp_id_l. 2: {
+  rewrite permut_comp_bsort_rank_r; [ | now destruct Hσ ].
+  rewrite comp_1_l. 2: {
     intros i Hi.
-    apply in_permut_list_inv_lt in Hi.
+    apply in_bsort_rank_lt in Hi.
     rewrite length_bsort_rank in Hi.
-    destruct Hl as (H1, H2).
-    now rewrite H2 in Hi.
+    destruct Hσ, Hl; congruence.
   }
-  rewrite permut_list_inv_involutive; [ | now destruct Hl ].
+  rewrite permut_bsort_rank_involutive; [ | now destruct Hl ].
   split; [ easy | ].
   apply in_seq.
   split; [ easy | ].
   apply canon_sym_gr_list_inv_ub.
   apply comp_is_permut; [ | easy ].
-  now apply permut_list_inv_is_permut.
+  apply bsort_rank_is_permut.
+  now destruct Hl.
 }
 Qed.
 
