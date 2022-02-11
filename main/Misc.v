@@ -2326,11 +2326,66 @@ unfold bsort, bsort_rank_sort.
 now rewrite <- bsort_loop_map_snd_bsort_rank_loop.
 Qed.
 
-(*
-  Haa : (ia, a) ∈ bsort_rank_loop ord [] la
-  ============================
-  a = nth ia la d
-*)
+Theorem glop : ∀ A d (ord : A → _) la ia a,
+  (ia, a) ∈ bsort_rank_loop ord [] la
+  → a = nth ia la d.
+Proof.
+intros * Haa.
+destruct la as [| a1]; [ easy | ].
+cbn in Haa.
+destruct la as [| a2]. {
+  destruct Haa as [Haa| ]; [ | easy ].
+  now injection Haa; clear Haa; intros; subst a ia.
+}
+cbn in Haa.
+remember (ord a2 a1) as a21 eqn:H21; symmetry in H21.
+destruct a21. {
+  destruct la as [| a3]. {
+    cbn in Haa.
+    destruct Haa as [Haa| Haa]. {
+      now injection Haa; clear Haa; intros; subst a ia.
+    }
+    destruct Haa as [Haa| Haa]. {
+      now injection Haa; clear Haa; intros; subst a ia.
+    }
+    easy.
+  }
+  cbn in Haa.
+  remember (ord a3 a2) as a32 eqn:H32; symmetry in H32.
+  destruct a32. {
+    destruct la as [| a4]. {
+      cbn in Haa.
+      destruct Haa as [Haa| Haa]. {
+        now injection Haa; clear Haa; intros; subst a ia.
+      }
+      destruct Haa as [Haa| Haa]. {
+        now injection Haa; clear Haa; intros; subst a ia.
+      }
+      destruct Haa as [Haa| Haa]. {
+        now injection Haa; clear Haa; intros; subst a ia.
+      }
+      easy.
+    }
+    cbn in Haa.
+    remember (ord a4 a3) as a43 eqn:H43; symmetry in H43.
+    destruct a43. {
+      destruct la as [| a5]. {
+        cbn in Haa.
+        destruct Haa as [Haa| Haa]. {
+          now injection Haa; clear Haa; intros; subst a ia.
+        }
+        destruct Haa as [Haa| Haa]. {
+          now injection Haa; clear Haa; intros; subst a ia.
+        }
+        destruct Haa as [Haa| Haa]. {
+          now injection Haa; clear Haa; intros; subst a ia.
+        }
+        destruct Haa as [Haa| Haa]. {
+          now injection Haa; clear Haa; intros; subst a ia.
+        }
+        easy.
+      }
+...
 
 Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
   (∀ x, x ∈ ls → fst x < length ls)
