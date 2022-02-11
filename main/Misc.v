@@ -2421,8 +2421,15 @@ destruct ls as [| (ia, a)]. {
     destruct Hcc as [Hcc| Hcc]. {
       injection Hcc; clear Hcc; intros; subst ic c.
       cbn in Hbs.
+      specialize (Hnth _ _ (or_introl eq_refl)) as H1.
+      destruct (lt_dec ia (length lb)) as [Hab| Hab]. {
+        now rewrite app_nth1.
+      }
+      apply Nat.nlt_ge in Hab.
+      rewrite nth_overflow in H1; [ | easy ].
+      subst d.
+      rewrite app_nth2; [ | easy ].
 ...
-
   subst ls'.
   rewrite length_bsort_rank_insert.
   rewrite seq_S; cbn.
