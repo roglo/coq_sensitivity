@@ -1527,15 +1527,16 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite <- Hiμ.
     now apply canon_sym_gr_list_is_permut.
   }
-...
-  remember (σ ° permut_list_inv μ) as ν eqn:Hν.
+  remember (σ ° bsort_rank Nat.leb μ) as ν eqn:Hν.
   assert (Hσν : ν ° μ = σ). {
     rewrite Hν.
-    assert (H : length (permut_list_inv μ) = n). {
+    assert (H : length (bsort_rank Nat.leb μ) = n). {
       rewrite length_bsort_rank.
       apply Hpμ.
     }
-    rewrite <- (permut_comp_assoc _ _ H); clear H; [ | apply Hpμ ].
+    rewrite <- (permut_comp_assoc _ H); clear H; [ | apply Hpμ ].
+...
+    rewrite comp_bsort_rank_l.
     rewrite (@comp_permut_inv_permut n); [ | easy ].
     apply comp_id_r, Hσ.
   }
@@ -1734,8 +1735,6 @@ split. {
   now apply permut_list_inv_is_permut.
 }
 Qed.
-
-...
 
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
