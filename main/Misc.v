@@ -2326,6 +2326,7 @@ unfold bsort, bsort_rank_sort.
 now rewrite <- bsort_loop_map_snd_bsort_rank_loop.
 Qed.
 
+(*
 Theorem glop : ∀ A d (ord : A → _) la ia a,
   (ia, a) ∈ bsort_rank_loop ord [] la
   → a = nth ia la d.
@@ -2491,7 +2492,7 @@ destruct ia. {
   apply Nat.le_0_r in Hia.
   apply length_zero_iff_nil in Hia; subst ls.
   cbn in Haa |-*.
-  admit.
+...
 }
 cbn in Haa |-*.
 destruct ls as [| (ic, c)]. {
@@ -2560,6 +2561,7 @@ Theorem in_bsort_rank_sort : ∀ A d (ord : A → _) la ia a,
 Proof.
 intros * Haa.
 unfold bsort_rank_sort in Haa.
+Print bsort_rank_loop.
 ...
 now apply (in_bsort_rank_loop d) in Haa.
 ...
