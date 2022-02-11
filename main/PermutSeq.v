@@ -1864,4 +1864,3 @@ split. {
 Qed.
 
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
-
