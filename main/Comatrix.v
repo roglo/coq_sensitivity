@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
@@ -1468,74 +1468,36 @@ split. {
   apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
   intros k Hk.
   apply H1.
-(* lemme à faire ? *)
-...
-  unfold permut_list_inv.
-  apply in_map_iff.
-  exists (ff_app σ k).
-  split. {
-    unfold unsome.
-    remember (List_rank _ _) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_rank_Some 0) in Hx.
-      destruct Hx as (Hxl & Hbefx & Hx).
-      apply Nat.eqb_eq in Hx.
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite <- Hσ2 in Hk.
-      now apply Hσ1.
-    } {
-      specialize (List_rank_None 0 _ _ Hx) as H2.
-      destruct Hσ as (Hσ1, Hσ2).
-      rewrite <- Hσ2 in Hk.
-      specialize (H2 k Hk).
-      now rewrite Nat.eqb_refl in H2.
+  apply Permutation.Permutation_in with (l := seq 0 n). 2: {
+    clear - Hk.
+    induction n; intros; [ easy | ].
+    rewrite seq_S; cbn.
+    apply in_or_app.
+    destruct (Nat.eq_dec k n) as [Hkn| Hkn]. {
+      now subst k; right; left.
     }
-  } {
-    apply in_seq.
-    split; [ easy | ].
-    rewrite Nat.add_0_l.
-    destruct Hσ as (Hσ1, Hσ2).
-    rewrite <- Hσ2 in Hk.
-    now apply permut_list_ub.
+    left; apply IHn; flia Hk Hkn.
   }
+  apply Permutation_sym.
+  apply permut_list_Permutation.
+  apply bsort_rank_is_permut.
+  now destruct Hσ.
 } {
   intros l Hl.
   apply in_map_iff.
   destruct Hl as (Hl1, Hl2).
   destruct Hσ as (Hσ1, Hσ2).
-  exists (canon_sym_gr_list_inv n (map (ff_app l) σ)).
+  exists (canon_sym_gr_list_inv n (l ° σ)).
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
     now apply map_ff_app_permut_permut_is_permut.
   }
   split. {
-    unfold "°".
-    unfold ff_app.
-    erewrite map_ext_in. 2: {
-      intros i Hi.
-      rewrite (List_map_nth' 0). 2: {
-        now apply in_permut_list_inv_lt.
-      }
-      easy.
+    rewrite <- (permut_comp_assoc n); [ | easy | ]. 2: {
+      now apply bsort_rank_is_permut.
     }
-    unfold permut_list_inv.
-    rewrite map_map.
-    rewrite (List_map_nth_seq l 0) at 1.
-    rewrite Hl2, <- Hσ2.
-    apply map_ext_in.
-    intros i Hi; apply in_seq in Hi.
-    unfold unsome.
-    remember (List_rank _ _) as x eqn:Hx.
-    symmetry in Hx.
-    destruct x as [x| ]. {
-      apply (List_rank_Some 0) in Hx.
-      destruct Hx as (Hxσ & Hbefx & Hx).
-      apply Nat.eqb_eq in Hx.
-      now rewrite <- Hx.
-    }
-    exfalso; revert Hx.
-    rewrite Hσ2 in Hi.
-    now apply (List_rank_not_None (conj Hσ1 Hσ2)).
+    rewrite permut_comp_bsort_rank_r; [ | easy ].
+    apply comp_1_r.
+    congruence.
   }
   apply in_seq.
   split; [ easy | ].
@@ -1544,8 +1506,6 @@ split. {
   now apply map_ff_app_permut_permut_is_permut.
 }
 Qed.
-
-...
 
 Theorem det_any_permut_r : in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
@@ -1567,6 +1527,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite <- Hiμ.
     now apply canon_sym_gr_list_is_permut.
   }
+...
   remember (σ ° permut_list_inv μ) as ν eqn:Hν.
   assert (Hσν : ν ° μ = σ). {
     rewrite Hν.
@@ -1773,6 +1734,8 @@ split. {
   now apply permut_list_inv_is_permut.
 }
 Qed.
+
+...
 
 (* https://proofwiki.org/wiki/Permutation_of_Determinant_Indices *)
 
