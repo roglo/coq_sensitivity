@@ -2372,10 +2372,78 @@ destruct a21. {
 Theorem glop : ∀ A d (ord : A → _) la ia a ls lb,
   Permutation (map fst ls) (seq 0 (length ls))
   → Permutation (map snd ls) lb
+(*
   → is_sorted ord (map snd ls) = true
+*)
   → (∀ ic c, (ic, c) ∈ ls → c = nth ic lb d)
   → (ia, a) ∈ bsort_rank_loop ord ls la
   → a = nth ia (lb ++ la) d.
+Proof.
+intros * Hp1 Hp2 Hnth Hin.
+enough (Hbs : length lb = length ls).
+clear Hp1 Hp2.
+revert ia a ls lb Hnth Hin Hbs.
+induction la as [| b]; intros; cbn. {
+  cbn in Hin.
+  rewrite app_nil_r.
+  now specialize (Hnth _ _ Hin) as H1.
+}
+cbn in Hin.
+remember (bsort_rank_insert ord (length ls) b ls) as ls' eqn:Hls'.
+specialize (IHla ia a ls' (lb ++ [b])) as H1.
+rewrite <- app_assoc in H1.
+apply H1; [ | easy | ]. 2: {
+  rewrite Hls'.
+  rewrite length_bsort_rank_insert.
+  rewrite app_length, Nat.add_comm; cbn.
+  now rewrite Hbs.
+}
+intros * Hcc.
+clear H1.
+subst ls'.
+clear - Hcc Hbs Hnth.
+destruct ls as [| (ia, a)]. {
+  cbn in Hcc.
+  destruct Hcc as [Hcc| ]; [ | easy ].
+  injection Hcc; clear Hcc; intros; subst c ic.
+  now apply length_zero_iff_nil in Hbs; subst lb.
+} {
+  cbn in Hcc.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    cbn in Hcc.
+    destruct Hcc as [Hcc| Hcc]. {
+      injection Hcc; intros; subst c ic.
+      rewrite app_nth2; [ | now rewrite Hbs; unfold ge ].
+      rewrite Hbs; cbn.
+      now rewrite Nat.sub_diag.
+    }
+    destruct Hcc as [Hcc| Hcc]. {
+      injection Hcc; clear Hcc; intros; subst ic c.
+      cbn in Hbs.
+...
+
+  subst ls'.
+  rewrite length_bsort_rank_insert.
+  rewrite seq_S; cbn.
+  Search (Permutation (_ ++ _)).
+...
+intros * Hp1 Hp2 Hnth Hin.
+revert ia a ls lb Hp1 Hp2 Hnth Hin.
+induction la as [| b]; intros; cbn. {
+  cbn in Hin.
+  rewrite app_nil_r.
+  now specialize (Hnth _ _ Hin) as H1.
+}
+cbn in Hin.
+remember (bsort_rank_insert ord (length ls) b ls) as ls' eqn:Hls'.
+specialize (IHla ia a ls' (lb ++ [b])) as H1.
+rewrite <- app_assoc in H1.
+apply H1; [ | | | easy ]. {
+  subst ls'.
+  rewrite length_bsort_rank_insert.
+  rewrite seq_S; cbn.
+  Search (Permutation (_ ++ _)).
 ...
       destruct la as [| a5]. {
         cbn in Haa.
