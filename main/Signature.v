@@ -2380,13 +2380,6 @@ Theorem fold_collapse : ∀ l,
   bsort_rank Nat.leb (bsort_rank Nat.leb l) = collapse l.
 Proof. easy. Qed.
 
-Theorem map_const : ∀ A B (l : list A) (b : B),
-  map (λ _, b) l = repeat b (length l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
-Qed.
-
 Theorem comp_0_l : ∀ l, [] ° l = repeat 0 (length l).
 Proof.
 intros.
@@ -2394,79 +2387,6 @@ unfold "°".
 induction l as [| a]; [ easy | cbn ].
 now destruct a; rewrite IHl.
 Qed.
-
-(*
-Theorem permut_bsort_loop : ∀ n ord la lb l p q,
-  is_permut n p
-  → is_permut n q
-  → sorted ord la = true
-  → sorted ord lb = true
-  → Permutation la lb
-  → bsort_loop ord la (l ° p) = bsort_loop ord lb (l ° q).
-Proof.
-intros * Hp Hq Ha Hb Hab.
-induction l as [| a]; cbn. {
-  do 2 rewrite comp_0_l.
-  destruct Hp as (Hpp, Hpl).
-  destruct Hq as (Hqp, Hql).
-  rewrite Hpl, Hql.
-...
-  apply Permutation_bsort_loop_sorted with (ord := ord) (lc := repeat 0 n) in Hab.
-...
-Permutation_bsort_loop_sorted:
-  ∀ (A : Type) (ord : A → A → bool) (la lb lc : list A),
-    Permutation la lb → Permutation (bsort_loop ord la lc) (bsort_loop ord lb lc)
-...
-
-Arguments permut_bsort_loop n%nat _ [la lb l p q]%list.
-*)
-
-(*
-Theorem glop : ∀ A (ord : A → _) la lb a,
-  bsort ord la = bsort ord lb
-  → bsort ord (a :: la) = bsort ord (a :: lb).
-Proof.
-intros * Hab.
-unfold bsort in Hab |-*; cbn.
-Theorem glip :
-  bsort_loop ord ls1 la = bsort_loop ord ls1 lb
-  → bsort_loop ord ls2 la = bsort_loop ord ls2 lb.
-...
-
-remember (length la) as n eqn:Hn; symmetry in Hn.
-revert la lb Hab Hn.
-induction n; intros; cbn. {
-...
-*)
-
-(*
-Theorem Permutation_bsort : ∀ A (ord : A → _) la lb,
-  Permutation la lb
-  → bsort ord la = bsort ord lb.
-Proof.
-intros * Hab.
-remember (length la) as n eqn:Hn; symmetry in Hn.
-revert la lb Hab Hn.
-induction n; intros; cbn. {
-  apply length_zero_iff_nil in Hn; subst la.
-  now apply Permutation_nil in Hab; subst lb.
-}
-destruct la as [| a]; [ easy | ].
-inversion Hab. {
-  subst x l lb.
-  cbn in Hn.
-  apply Nat.succ_inj in Hn.
-  specialize (IHn la l' H2 Hn) as H3.
-...
-} {
-  subst y la lb.
-...
-Search (Permutation (_ :: _)).
-Permutation_cons_app_inv:
-  ∀ (A : Type) (l l1 l2 : list A) (a : A),
-    Permutation (a :: l) (l1 ++ a :: l2) → Permutation l (l1 ++ l2)
-...
-*)
 
 Theorem bsort_insert_insert_sym : ∀ A (ord : A → _),
   antisymmetric ord

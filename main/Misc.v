@@ -257,6 +257,13 @@ do 2 rewrite List_hd_nth_0.
 now apply List_map_nth'.
 Qed.
 
+Theorem List_map_const_is_repeat : ∀ A B (l : list A) (b : B),
+  map (λ _, b) l = repeat b (length l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn; f_equal; apply IHl ].
+Qed.
+
 Theorem List_app_hd1 : ∀ A (l l' : list A) d,
   0 < length l → hd d (l ++ l') = hd d l.
 Proof.
