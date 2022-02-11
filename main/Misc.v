@@ -2369,6 +2369,14 @@ destruct a21. {
     cbn in Haa.
     remember (ord a4 a3) as a43 eqn:H43; symmetry in H43.
     destruct a43. {
+Theorem glop : ∀ A d (ord : A → _) la ia a ls lb,
+  Permutation (map fst ls) (seq 0 (length ls))
+  → Permutation (map snd ls) lb
+  → is_sorted ord (map snd ls) = true
+  → (∀ ic c, (ic, c) ∈ ls → c = nth ic lb d)
+  → (ia, a) ∈ bsort_rank_loop ord ls la
+  → a = nth ia (lb ++ la) d.
+...
       destruct la as [| a5]. {
         cbn in Haa.
         destruct Haa as [Haa| Haa]. {
