@@ -2333,12 +2333,25 @@ Qed.
 *)
 
 Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
+  (∀ x, x ∈ ls → fst x < length ls)
+  → (ia, a) ∈ bsort_rank_loop ord ls la
+  → a = nth ia la d.
+Proof.
+intros * Hls Haa.
+revert ia a ls Hls Haa.
+induction la as [| b]; intros. {
+  cbn in Haa |-*.
+  specialize (Hls _ Haa) as H1; cbn in H1.
+...
+
+Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
   (ia, a) ∉ ls
   → (ia, a) ∈ bsort_rank_loop ord ls la
   → length ls ≤ ia
   → a = nth (ia - length ls) la d.
 Proof.
 intros * Hls Haa Hia.
+Print bsort_rank_loop.
 ...
 revert ia a ls Hls Haa Hia.
 induction la as [| b]; intros; [ easy | ].
