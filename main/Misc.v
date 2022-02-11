@@ -2451,6 +2451,18 @@ intros j Hj.
 destruct Hj; [ now subst j; cbn | easy ].
 Qed.
 
+Theorem in_bsort_rank_lt : ∀ A (ord : A → _) l i,
+  i ∈ bsort_rank ord l → i < length l.
+Proof.
+intros * Hi.
+apply (In_nth _ _ 0) in Hi.
+destruct Hi as (j & Hjl & Hji).
+rewrite length_bsort_rank in Hjl.
+rewrite <- Hji.
+apply bsort_rank_ub.
+now intros H; subst l.
+Qed.
+
 Theorem NoDup_bsort_rank_insert : ∀ A (d : A) ord l_ini ia lrank,
   NoDup (ia :: lrank)
   → NoDup (bsort_rank_insert ord (λ k : nat, nth k l_ini d) ia lrank).
