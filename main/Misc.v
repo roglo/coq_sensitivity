@@ -2401,19 +2401,19 @@ apply H1; [ | easy | ]. 2: {
 intros * Hcc.
 clear H1.
 subst ls'.
-clear - Hcc Hbs Hnth.
-destruct ls as [| (ia, a)]. {
+clear - Hcc Hbs Hnth Hin.
+destruct ls as [| (ie, e)]. {
   cbn in Hcc.
   destruct Hcc as [Hcc| ]; [ | easy ].
   injection Hcc; clear Hcc; intros; subst c ic.
   now apply length_zero_iff_nil in Hbs; subst lb.
 } {
   cbn in Hcc.
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba. {
+  remember (ord b e) as be eqn:Hbe; symmetry in Hbe.
+  destruct be. {
     cbn in Hcc.
     destruct Hcc as [Hcc| Hcc]. {
-      injection Hcc; intros; subst c ic.
+      injection Hcc; clear Hcc; intros; subst c ic.
       rewrite app_nth2; [ | now rewrite Hbs; unfold ge ].
       rewrite Hbs; cbn.
       now rewrite Nat.sub_diag.
@@ -2422,13 +2422,16 @@ destruct ls as [| (ia, a)]. {
       injection Hcc; clear Hcc; intros; subst ic c.
       cbn in Hbs.
       specialize (Hnth _ _ (or_introl eq_refl)) as H1.
-      destruct (lt_dec ia (length lb)) as [Hab| Hab]. {
+      destruct (lt_dec ie (length lb)) as [Hab| Hab]. {
         now rewrite app_nth1.
       }
       apply Nat.nlt_ge in Hab.
       rewrite nth_overflow in H1; [ | easy ].
       subst d.
       rewrite app_nth2; [ | easy ].
+      cbn in Hin.
+      rewrite Hbe in Hin.
+      cbn in Hin.
 ...
   subst ls'.
   rewrite length_bsort_rank_insert.
