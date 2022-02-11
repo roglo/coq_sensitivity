@@ -1372,11 +1372,11 @@ rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
-...
   rewrite rngl_product_change_var with
-      (g := ff_app (permut_list_inv σ)) (h := ff_app σ). 2: {
+      (g := ff_app (bsort_rank Nat.leb σ)) (h := ff_app σ). 2: {
     intros j (_, Hj).
-    apply (@permut_inv_permut n); [ easy | ].
+    apply permut_bsort_permut; [ now destruct Hσ | ].
+    destruct Hσ as (Hσp, Hσl); rewrite Hσl.
     flia Hj Hnz.
   }
   rewrite Nat.sub_0_r.
@@ -1387,10 +1387,10 @@ erewrite rngl_summation_eq_compat. 2: {
     apply in_map_iff in Hj.
     destruct Hj as (k & Hkj & Hk).
     apply in_seq in Hk.
-    rewrite (@permut_permut_bsort n); [ | easy | ]. 2: {
+    rewrite permut_permut_bsort; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hkj.
       destruct Hσ as (H1, H2).
-      rewrite <- H2 in Hk |-*.
+      rewrite <- H2 in Hk.
       now apply permut_list_ub.
     }
     easy.
@@ -1400,6 +1400,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
+...
 set (sg := map (λ k, canon_sym_gr_list n k ° permut_list_inv σ) (seq 0 n!)).
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
