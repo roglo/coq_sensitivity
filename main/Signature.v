@@ -2688,7 +2688,7 @@ rewrite (permut_bsort_leb Hbp).
 rewrite comp_1_l. 2: {
   intros i Hi.
   rewrite Hbl, <- Hal.
-  now apply in_permut_list_inv_lt.
+  now apply in_bsort_rank_lt.
 }
 rewrite comp_bsort_rank_r.
 apply bsort_comp_permut_r.

@@ -1684,7 +1684,7 @@ rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
 easy.
 Qed.
 
-Theorem in_permut_list_inv_lt :
+Theorem in_bsort_rank_lt :
   ∀ l i, i ∈ bsort_rank Nat.leb l → i < length l.
 Proof.
 intros * Hi.

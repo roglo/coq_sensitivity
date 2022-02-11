@@ -909,7 +909,7 @@ rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
 }
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | | ]. {
-    rewrite bsort_length.
+    rewrite length_bsort.
     congruence.
   }
   intros k Hk; rewrite Hra.
@@ -919,29 +919,19 @@ rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
 unfold det'.
 rewrite mat_with_rows_nrows, Hkln.
 rewrite mat_with_rows_nrows.
-rewrite bsort_length, Hkln.
+rewrite length_bsort, Hkln.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 erewrite rngl_summation_eq_compat; [ | easy ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
-(* cannot apply ε (la ° lb) = ε la * ε lb, since kl is not a permutation;
-   is it a problem? If yes, I must prove it for other than permutations;
-   but perhaps I don't need that!? *)
-Check signature_comp.
-...
-Check sign_comp.
-rewrite <- sign_comp; [ | | rewrite Hkln ]. 3: {
-  intros i Hi.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (j & Hjl & Hj).
-  rewrite length_canon_sym_gr_list in Hjl.
-  rewrite <- Hj.
-  apply canon_sym_gr_list_ub; [ | easy ].
-  specialize (fact_neq_0 m) as H1.
-  flia Hk H1.
-}
+  rewrite <- sign_comp; [ | easy | ]. 2: {
+    rewrite Hkln.
+    apply canon_sym_gr_list_is_permut.
+    specialize (fact_neq_0 m) as H.
+    flia Hk H.
+  }
 ...
 (*
 unfold ε.
