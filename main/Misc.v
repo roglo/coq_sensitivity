@@ -2334,14 +2334,27 @@ Qed.
 
 Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
   (∀ x, x ∈ ls → fst x < length ls)
+  → NoDup (map fst ls)
+  → length ls ≤ ia
   → (ia, a) ∈ bsort_rank_loop ord ls la
-  → a = nth ia la d.
+  → a = nth (ia - length ls) la d.
 Proof.
-intros * Hls Haa.
-revert ia a ls Hls Haa.
+intros * Hls Hnd Hia Haa.
+revert ia a ls Hls Hnd Hia Haa.
 induction la as [| b]; intros. {
   cbn in Haa |-*.
-  specialize (Hls _ Haa) as H1; cbn in H1.
+  apply Nat.nlt_ge in Hia.
+  now specialize (Hls _ Haa) as H1; cbn in H1.
+}
+destruct ia. {
+  apply Nat.le_0_r in Hia.
+  apply length_zero_iff_nil in Hia; subst ls.
+  cbn in Haa |-*.
+  admit.
+}
+cbn in Haa |-*.
+destruct ls as [| (ic, c)]. {
+  cbn in Haa |-*.
 ...
 
 Theorem in_bsort_rank_loop : ∀ A d (ord : A → _) la ia ls a,
