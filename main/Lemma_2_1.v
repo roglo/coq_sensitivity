@@ -861,19 +861,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Inspect 1.
-
-(* can I prove, with that, that A⁻¹ = A⁺ ? *)
-
-(* à un moment, j'en avais déduit qu'il fallait que je prouve que
-   det(AB)=det(A)det(B) mais, bête que je suis, je ne me rappelle
-   plus pourquoi *)
-
-(* peut-être que, comme je dis ci-dessus en anglais, pour prouver
-   que A⁻¹ = A⁺ dans les conditions de ce théorème ? *)
-
-...
-
 Theorem diagonalized_matrix_prop : in_charac_0_field →
   ∀ n (M : matrix T) ev eV D U,
   is_symm_mat M
