@@ -891,6 +891,17 @@ Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f n l,
   → (∀ i, i < length l → f (n + i) = nth i l d)
   → bsort_rank_loop ord f (seq 0 n) l = seq 0 (n + length l).
 Proof.
+intros * Hs Hf.
+revert n Hf.
+induction l as [| a]; intros; cbn. {
+  now rewrite Nat.add_0_r.
+}
+rewrite seq_length.
+rewrite <- Nat.add_succ_comm.
+rewrite Nat.add_succ_l.
+rewrite seq_S.
+cbn.
+rewrite <- IHl.
 ...
 
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f ls l,
