@@ -12,7 +12,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul IterAnd Pigeonhole.
@@ -1056,6 +1056,14 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el ].
+rewrite rngl_summation_list_permut with (l2 := seq 0 m!). 2: {
+Search (Permutation (map _ _)).
+apply nat_bijection_Permutation.
+...
+Search (Permutation _ (seq _ _)).
+apply permut_list_Permutation.
+Search (is_permut _ (map _ _)).
+...
 (* yeah! *)
 Search (∑ (_ ∈ map _ _), _).
 (* oui, mais faut pas appliquer rngl_summation_map_seq *)
