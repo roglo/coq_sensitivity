@@ -942,6 +942,9 @@ Search canon_sym_gr_list_inv.
 ...
 kl ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
 ...
+app (kl ° canon_sym_gr_list m (g i)) j = app (canon_sym_gr_list m i) j
+app kl (app (canon_sym_gr_list m (g i)) j) = app (canon_sym_gr_list m i) j
+...
 (*
 unfold ε.
 rewrite Hkln.
