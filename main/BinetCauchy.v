@@ -927,13 +927,9 @@ symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
-(*
   rewrite <- ε_collapse_ε; [ | easy ].
-*)
   rewrite <- sign_comp; [ | easy | ]. 2: {
-(*
     rewrite length_collapse.
-*)
     rewrite Hklm.
     apply canon_sym_gr_list_is_permut.
     specialize (fact_neq_0 m) as H.
@@ -942,6 +938,86 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el ].
+remember (collapse kl) as p eqn:Hp.
+set (g := λ i,
+  canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
+set (h := λ i,
+  canon_sym_gr_list_inv m
+    (bsort_rank Nat.leb
+        (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))).
+rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
+  intros i (_, Hi).
+  unfold g, h.
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    apply bsort_rank_is_permut.
+    now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
+  }
+  rewrite (permut_bsort_rank_comp m); cycle 1. {
+    apply NoDup_bsort_rank.
+  } {
+    now rewrite length_bsort_rank, length_canon_sym_gr_list.
+  } {
+    apply bsort_rank_is_permut.
+    now rewrite Hp, length_collapse.
+  }
+...
+Search (canon_sym_gr_list_inv _ (_ ° _)).
+Search canon_sym_gr_list_inv.
+Search (bsort_rank _ _ ° _).
+...
+g (h i) = i
+canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
+h i = canon_sym_gr_list_inv m l
+canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (canon_sym_gr_list_inv m l)) = i
+canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° l) = i
+canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° bsort_rank Nat.leb (bsort_rank Nat.leb l)) = i
+canon_sym_gr_list_inv m (bsort_rank Nat.leb (bsort_rank Nat.leb l ° p)) = i
+canon_sym_gr_list m (...) = canon_sym_gr_list m i
+bsort_rank Nat.leb (bsort_rank Nat.leb l ° p) = canon_sym_gr_list m i
+bsort_rank Nat.leb (bsort_rank Nat.leb (bsort_rank Nat.leb l ° p)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb l ° p = bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb l ° p ° bsort_rank Nat.leb p = bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p
+bsort_rank Nat.leb l = bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p
+l = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p)
+h i =
+  canon_sym_gr_list_inv m
+    (bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))
+...
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  assert (Hin : i < n!).
+...
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    apply comp_is_permut. {
+      apply bsort_rank_is_permut.
+      rewrite Hp.
+      now rewrite length_collapse.
+    }
+    apply canon_sym_gr_list_is_permut.
+    admit.
+  }
+  rewrite (permut_comp_assoc m); cycle 1. {
+    now rewrite length_bsort_rank, Hp, length_collapse.
+  } {
+    apply canon_sym_gr_list_is_permut.
+    admit.
+  }
+  rewrite comp_bsort_rank_r.
+  rewrite permut_bsort_leb. 2: {
+    rewrite Hp.
+    apply collapse_is_permut.
+  }
+  rewrite comp_1_l. 2: {
+    intros j Hj.
+    rewrite Hp, length_collapse, Hklm.
+    apply (In_nth _ _ 0) in Hj.
+    rewrite length_canon_sym_gr_list in Hj.
+    destruct Hj as (k & Hkm & Hkj).
+    rewrite <- Hkj.
+    apply canon_sym_gr_list_ub; [ | easy ].
+    admit.
+...
+remember (collapse kl) as p eqn:Hp.
 Search (bsort_rank _ (_ ° _)).
 Search (collapse (_ ° _)).
 Search canon_sym_gr_list_inv.
@@ -952,11 +1028,26 @@ erewrite rngl_summation_change_var.
 Search (bsort_rank _ _ ° bsort_rank _ _).
 Search (_ ° collapse _).
 Search (collapse _ ° _).
+Search (bsort_rank _ (bsort_rank _ _)).
+Search (bsort_rank _ (_ ° _)).
 ...
-kl ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
-bsort_rank Nat.leb (kl ° canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb kl = bsort_rank Nat.leb (canon_sym_gr_list m i)
+p ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
+bsort_rank Nat.leb (p ° canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb p = bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb p ° p =
+  bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
+bsort_rank Nat.leb (canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
 g i = canon_sym_gr_list_inv m l
+bsort_rank Nat.leb (canon_sym_gr_list m (canon_sym_gr_list_inv m l)) =
+  bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
+bsort_rank Nat.leb l = bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
+bsort_rank Nat.leb (bsort_rank Nat.leb l) = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° p)
+l = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° p)
+l = bsort_rank Nat.leb p ° bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i))
+l = bsort_rank Nat.leb p ° canon_sym_gr_list m i)
+l = bsort_rank Nat.leb kl ° canon_sym_gr_list m i)
+g i = canon_sym_gr_list_inv m (bsort_rank Nat.leb kl ° canon_sym_gr_list m i)
+...
 bsort_rank Nat.leb (canon_sym_gr_list m (canon_sym_gr_list_inv m l))) ° bsort_rank Nat.leb kl =
   bsort_rank Nat.leb (canon_sym_gr_list m i)
 bsort_rank Nat.leb l ° bsort_rank Nat.leb kl = bsort_rank Nat.leb (canon_sym_gr_list m i)
