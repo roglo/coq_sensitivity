@@ -886,6 +886,40 @@ split. {
 }
 Qed.
 
+Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → bsort_rank ord l = seq 0 (length l).
+Proof.
+intros * Hs.
+remember (length l) as n eqn:Hn; symmetry in Hn.
+revert l Hs Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst l.
+}
+destruct l as [| a]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+rewrite seq_S.
+Check permut_without_highest.
+assert (Hps : is_permut (S n) (bsort_rank ord (a :: l))). {
+About bsort_rank_is_permut_list.
+...
+  specialize bsort_rank_is_permut_list as H1.
+Search bsort_rank.
+  specialize (H1 (a :: l)).
+  rewrite <- Hn.
+  apply bsort_rank_is_permut_list.
+  apply bsort_rank_is_permut_list.
+...
+...
+Search (bsort_rank_highest).
+rewrite <- IHn.
+cbn - [ bsort_rank_loop nth seq ].
+...
+intros * Hs.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ bsort_rank_loop nth seq ].
+...
+
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
   mat_nrows A = n
@@ -893,16 +927,12 @@ Theorem det_with_rows : in_charac_0_field →
   → is_correct_matrix A = true
   → NoDup kl
   → length kl = m
+  → sorted Nat.leb kl = true
   → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
-(* formule testée. Ça devrait être bon *)
-intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
-(* AFAIRE : traiter le cas où kl contient des duplications. Dans
-   ce cas-là, les deux parties sont nulles puisque les matrices
-   ont des lignes dupliquées ; sinon, on continue en supposant que
-   kl ne contient pas de duplication *)
+intros Hif * Hra Hca Ha Hnkl Hklm Hks Hkn.
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
@@ -1103,6 +1133,8 @@ f_equal. 2: {
   rewrite permut_bsort_rank_involutive. 2: {
     apply bsort_rank_is_permut_list.
   }
+...
+  rewrite bsort_rank_of_sorted; [ | easy ].
 ...
 g (h i) = i
 canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
