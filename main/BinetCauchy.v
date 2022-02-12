@@ -901,7 +901,36 @@ rewrite <- Nat.add_succ_comm.
 rewrite Nat.add_succ_l.
 rewrite seq_S.
 cbn.
+Print bsort_rank_insert.
+Theorem glop : ∀ A (ord : A → _) f l (n : nat),
+  (∀ i, i ∈ l → ord (f n) (f i) = false)
+  → bsort_rank_insert ord f n l = l ++ [n].
+Proof.
+intros * Hn.
+revert n Hn.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite Hn; [ | now left ].
+f_equal.
+apply IHl.
+intros i Hi.
+apply Hn.
+now right.
+Qed.
+rewrite glop. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+  specialize (Hf 0 (Nat.lt_0_succ _)) as H1.
+  rewrite Nat.add_comm in H1; cbn in H1; rewrite H1.
+  specialize (Hf (length l)) as H2.
+  specialize (H2 (Nat.lt_succ_diag_r _)).
+(* ouais, chais pas *)
+...
 rewrite <- IHl.
+rewrite glop.
+rewrite seq_S.
+cbn.
+Search (bsort_rank_loop _ _ (_ ++ _)).
 ...
 
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f ls l,
