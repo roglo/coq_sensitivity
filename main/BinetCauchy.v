@@ -945,8 +945,8 @@ set (h := λ i,
   canon_sym_gr_list_inv m
     (bsort_rank Nat.leb
         (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))).
-rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
-  intros i (_, Hi).
+assert (Hgh : ∀ i, i < m! → g (h i) = i). {
+  intros i Hi.
   unfold g, h.
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
     apply bsort_rank_is_permut.
@@ -960,6 +960,122 @@ rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
     apply bsort_rank_is_permut.
     now rewrite Hp, length_collapse.
   }
+  rewrite (permut_comp_assoc m); cycle 1. {
+    do 2 rewrite length_bsort_rank.
+    now rewrite Hp, length_collapse.
+  } {
+    apply bsort_rank_is_permut.
+    now rewrite length_bsort_rank, length_canon_sym_gr_list.
+  }
+  rewrite permut_comp_bsort_rank_r; [ | apply bsort_rank_is_permut_list ].
+  rewrite length_bsort_rank, Hp, length_collapse, Hklm.
+  rewrite comp_1_l. 2: {
+    intros j Hj.
+    rewrite permut_bsort_rank_involutive in Hj. 2: {
+      now apply canon_sym_gr_list_is_permut_list.
+    }
+    apply (In_nth _ _ 0) in Hj.
+    rewrite length_canon_sym_gr_list in Hj.
+    destruct Hj as (k & Hkm & Hkj).
+    rewrite <- Hkj.
+    now apply canon_sym_gr_list_ub.
+  }
+  rewrite permut_bsort_rank_involutive. 2: {
+    now apply canon_sym_gr_list_is_permut_list.
+  }
+  now apply canon_sym_gr_inv_of_canon_sym_gr.
+}
+specialize (fact_neq_0 m) as Hmz.
+rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
+  intros i Hi.
+  apply Hgh.
+  flia Hi Hmz.
+}
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+rewrite Nat_sub_succ_1.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  assert (Him : i < m!). {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    destruct Hj as (_, Hj); cbn in Hj.
+    rewrite <- Hji; unfold h.
+    rewrite (permut_bsort_rank_comp m); cycle 1. {
+      apply NoDup_bsort_rank.
+    } {
+      now rewrite length_bsort_rank, length_canon_sym_gr_list.
+    } {
+      apply bsort_rank_is_permut.
+      now rewrite Hp, length_collapse.
+    }
+    rewrite permut_bsort_rank_involutive. 2: {
+      rewrite Hp.
+      apply collapse_is_permut.
+    }
+    rewrite permut_bsort_rank_involutive. 2: {
+      now apply canon_sym_gr_list_is_permut_list.
+    }
+    apply canon_sym_gr_list_inv_ub.
+    apply comp_is_permut. {
+      rewrite Hp.
+      split; [ apply collapse_is_permut | ].
+      now rewrite length_collapse.
+    }
+    now apply canon_sym_gr_list_is_permut.
+  }
+  unfold g at 1.
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    apply comp_is_permut. {
+      apply bsort_rank_is_permut.
+      now rewrite Hp, length_collapse.
+    } {
+      now apply canon_sym_gr_list_is_permut.
+    }
+  }
+  rewrite (permut_comp_assoc m); cycle 1. {
+    now rewrite length_bsort_rank, Hp, length_collapse.
+  } {
+    now apply canon_sym_gr_list_is_permut.
+  }
+  rewrite comp_bsort_rank_r.
+  rewrite permut_bsort_leb. 2: {
+    rewrite Hp.
+    apply collapse_is_permut.
+  }
+  rewrite comp_1_l. 2: {
+    intros j Hj.
+    rewrite Hp, length_collapse, Hklm.
+    apply (In_nth _ _ 0) in Hj.
+    rewrite length_canon_sym_gr_list in Hj.
+    destruct Hj as (k & Hkm & Hkj).
+    rewrite <- Hkj.
+    now apply canon_sym_gr_list_ub.
+  }
+  easy.
+}
+cbn - [ mat_el ].
+(* yeah! *)
+Search (∑ (_ ∈ map _ _), _).
+(* oui, mais faut pas appliquer rngl_summation_map_seq *)
+(* mais un lemme, à écrire, comme quoi
+     ∑ (i ∈ map h (seq 0 m!)), _ =
+     ∑ (i ∈ seq 0 m!), _
+   moyennant la commutativité *)
+...
+rewrite rngl_summation_map_seq.
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite Nat.add_0_l.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite Hgh; [ | flia Hmz Hi ].
+  easy.
+}
+cbn - [ mat_el ].
+...
+Search (map _ (seq _ _)).
+  assert (Hin : i < n!).
 ...
 Search (canon_sym_gr_list_inv _ (_ ° _)).
 Search canon_sym_gr_list_inv.
@@ -982,40 +1098,6 @@ l = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank
 h i =
   canon_sym_gr_list_inv m
     (bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))
-...
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
-  assert (Hin : i < n!).
-...
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
-    apply comp_is_permut. {
-      apply bsort_rank_is_permut.
-      rewrite Hp.
-      now rewrite length_collapse.
-    }
-    apply canon_sym_gr_list_is_permut.
-    admit.
-  }
-  rewrite (permut_comp_assoc m); cycle 1. {
-    now rewrite length_bsort_rank, Hp, length_collapse.
-  } {
-    apply canon_sym_gr_list_is_permut.
-    admit.
-  }
-  rewrite comp_bsort_rank_r.
-  rewrite permut_bsort_leb. 2: {
-    rewrite Hp.
-    apply collapse_is_permut.
-  }
-  rewrite comp_1_l. 2: {
-    intros j Hj.
-    rewrite Hp, length_collapse, Hklm.
-    apply (In_nth _ _ 0) in Hj.
-    rewrite length_canon_sym_gr_list in Hj.
-    destruct Hj as (k & Hkm & Hkj).
-    rewrite <- Hkj.
-    apply canon_sym_gr_list_ub; [ | easy ].
-    admit.
 ...
 remember (collapse kl) as p eqn:Hp.
 Search (bsort_rank _ (_ ° _)).
