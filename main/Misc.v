@@ -2393,6 +2393,18 @@ rewrite <- app_assoc in H1.
 apply H1; [ | easy | | ]. {
   intros * Hcc.
   subst ls'.
+Theorem glop : ∀ A d ord lb ls b ic c,
+  (∀ (ic : nat) (c : A), (ic, c) ∈ ls → c = nth ic lb d)
+  → (ic, c) ∈ bsort_rank_insert ord (length ls) b ls
+  → c = nth ic (lb ++ [b]) d.
+Proof.
+intros * Hnth Hcc.
+destruct ls as [| (ie, e)]. {
+  cbn in Hcc.
+  destruct Hcc as [Hcc| ]; [ | easy ].
+  injection Hcc; clear Hcc; intros; subst c ic.
+...
+  now apply length_zero_iff_nil in Hbs; subst lb.
 ...
 destruct ls as [| (ie, e)]. {
   cbn in Hcc.
