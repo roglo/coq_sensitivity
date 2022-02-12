@@ -2326,7 +2326,6 @@ unfold bsort, bsort_rank_sort.
 now rewrite <- bsort_loop_map_snd_bsort_rank_loop.
 Qed.
 
-(*
 Theorem glop : ∀ A d (ord : A → _) la ia a,
   (ia, a) ∈ bsort_rank_loop ord [] la
   → a = nth ia la d.
@@ -2381,9 +2380,7 @@ Theorem glop : ∀ A d (ord : A → _) la ia a ls lb,
   → a = nth ia (lb ++ la) d.
 Proof.
 intros * Hp1 Hp2 Hnth Hin.
-enough (Hbs : length lb = length ls).
-clear Hp1 Hp2.
-revert ia a ls lb Hnth Hin Hbs.
+revert ia a ls lb Hnth Hin Hp1 Hp2.
 induction la as [| b]; intros; cbn. {
   cbn in Hin.
   rewrite app_nil_r.
@@ -2393,16 +2390,10 @@ cbn in Hin.
 remember (bsort_rank_insert ord (length ls) b ls) as ls' eqn:Hls'.
 specialize (IHla ia a ls' (lb ++ [b])) as H1.
 rewrite <- app_assoc in H1.
-apply H1; [ | easy | ]. 2: {
-  rewrite Hls'.
-  rewrite length_bsort_rank_insert.
-  rewrite app_length, Nat.add_comm; cbn.
-  now rewrite Hbs.
-}
-intros * Hcc.
-clear H1.
-subst ls'.
-clear - Hcc Hbs Hnth Hin.
+apply H1; [ | easy | | ]. {
+  intros * Hcc.
+  subst ls'.
+...
 destruct ls as [| (ie, e)]. {
   cbn in Hcc.
   destruct Hcc as [Hcc| ]; [ | easy ].
