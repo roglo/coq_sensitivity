@@ -900,7 +900,7 @@ Proof.
 intros Hif * Hra Hca Ha Hkln Hkn.
 (* AFAIRE : traiter le cas où kl contient des duplications. Dans
    ce cas-là, les deux parties sont nulles puisque les matrices
-   ont des lignes dupliquée ; sinon, on continue en supposant que
+   ont des lignes dupliquées ; sinon, on continue en supposant que
    kl ne contient pas de duplication *)
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
@@ -932,6 +932,9 @@ erewrite rngl_summation_eq_compat. 2: {
     specialize (fact_neq_0 m) as H.
     flia Hk H.
   }
+  easy.
+}
+cbn - [ mat_el ].
 ...
 (*
 unfold ε.
