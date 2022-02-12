@@ -891,19 +891,20 @@ Theorem det_with_rows : in_charac_0_field →
   mat_nrows A = n
   → mat_ncols A = m
   → is_correct_matrix A = true
+  → NoDup kl
   → length kl = m
   → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 (* formule testée. Ça devrait être bon *)
-intros Hif * Hra Hca Ha Hkln Hkn.
+intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 (* AFAIRE : traiter le cas où kl contient des duplications. Dans
    ce cas-là, les deux parties sont nulles puisque les matrices
    ont des lignes dupliquées ; sinon, on continue en supposant que
    kl ne contient pas de duplication *)
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
-  apply mat_with_rows_is_square; [ easy | now rewrite Hkln | ].
+  apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
   now apply Hkn.
 }
@@ -917,17 +918,23 @@ rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   now apply in_bsort in Hk.
 }
 unfold det'.
-rewrite mat_with_rows_nrows, Hkln.
+rewrite mat_with_rows_nrows, Hklm.
 rewrite mat_with_rows_nrows.
-rewrite length_bsort, Hkln.
+rewrite length_bsort, Hklm.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 erewrite rngl_summation_eq_compat; [ | easy ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
   rewrite rngl_mul_assoc.
+(*
+  rewrite <- ε_collapse_ε; [ | easy ].
+*)
   rewrite <- sign_comp; [ | easy | ]. 2: {
-    rewrite Hkln.
+(*
+    rewrite length_collapse.
+*)
+    rewrite Hklm.
     apply canon_sym_gr_list_is_permut.
     specialize (fact_neq_0 m) as H.
     flia Hk H.
@@ -935,12 +942,29 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el ].
-Check rngl_summation_change_var.
-erewrite rngl_summation_change_var.
-Search canon_sym_gr_list.
+Search (bsort_rank _ (_ ° _)).
+Search (collapse (_ ° _)).
 Search canon_sym_gr_list_inv.
+Compute (canon_sym_gr_list 4 13).
+Compute (canon_sym_gr_list_inv 4 (canon_sym_gr_list 4 13)).
+Compute (bsort_rank Nat.leb (canon_sym_gr_list 4 13)).
+erewrite rngl_summation_change_var.
+Search (bsort_rank _ _ ° bsort_rank _ _).
+Search (_ ° collapse _).
+Search (collapse _ ° _).
 ...
 kl ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
+bsort_rank Nat.leb (kl ° canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb kl = bsort_rank Nat.leb (canon_sym_gr_list m i)
+g i = canon_sym_gr_list_inv m l
+bsort_rank Nat.leb (canon_sym_gr_list m (canon_sym_gr_list_inv m l))) ° bsort_rank Nat.leb kl =
+  bsort_rank Nat.leb (canon_sym_gr_list m i)
+bsort_rank Nat.leb l ° bsort_rank Nat.leb kl = bsort_rank Nat.leb (canon_sym_gr_list m i)
+...
+collapse kl ° canon_sym_gr_list m (canon_sym_gr_list_inv m l)
+kl ° l = canon_sym_gr_list m i
+kl ° l ° bsort_rank Nat.leb l = canon_sym_gr_list m i ° bsort_rank Nat.leb l
+kl = canon_sym_gr_list m i ° bsort_rank Nat.leb l
 ...
 app (kl ° canon_sym_gr_list m (g i)) j = app (canon_sym_gr_list m i) j
 app kl (app (canon_sym_gr_list m (g i)) j) = app (canon_sym_gr_list m i) j
