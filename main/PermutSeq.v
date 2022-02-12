@@ -1695,9 +1695,9 @@ rewrite <- (length_bsort_rank Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_bsort_rank _ _)) in Hij.
 Qed.
 
-Theorem bsort_rank_is_permut : ∀ n l,
+Theorem bsort_rank_is_permut : ∀ A (ord : A → _) n l,
   length l = n
-  → is_permut n (bsort_rank Nat.leb l).
+  → is_permut n (bsort_rank ord l).
 Proof.
 intros.
 subst n.
@@ -1718,13 +1718,13 @@ split. {
 apply length_bsort_rank.
 Qed.
 
-Arguments bsort_rank_is_permut n%nat [l]%list.
+Arguments bsort_rank_is_permut {A} ord n%nat [l]%list.
 
-Theorem bsort_rank_is_permut_list : ∀ l,
-  is_permut_list (bsort_rank Nat.leb l).
+Theorem bsort_rank_is_permut_list : ∀ A (ord : A → _) l,
+  is_permut_list (bsort_rank ord l).
 Proof.
 intros.
-now apply (bsort_rank_is_permut (length l)).
+now apply (bsort_rank_is_permut _ (length l)).
 Qed.
 
 Theorem permut_list_Permutation : ∀ l n,

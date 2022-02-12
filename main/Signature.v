@@ -789,7 +789,7 @@ cbn - [ "<?" ].
 rewrite product_product_if_permut; try easy; cycle 1. {
   now left.
 } {
-  now apply (bsort_rank_is_permut (length p)).
+  now apply (bsort_rank_is_permut _ (length p)).
 } {
   intros.
   unfold abs_diff.
@@ -1573,7 +1573,7 @@ rewrite product_product_if_permut; try easy. {
 } {
   now left.
 } {
-  now apply (bsort_rank_is_permut n).
+  now apply (bsort_rank_is_permut _ n).
 } {
   intros i j.
   destruct (Nat.eq_dec i j) as [Hij| Hij]; [ now subst j | ].
@@ -1771,7 +1771,7 @@ exists (ff_app (bsort_rank Nat.leb l) n).
 split. {
   rewrite <- length_bsort_rank with (ord := Nat.leb).
   destruct Hl as (Hp, Hl).
-  specialize (bsort_rank_is_permut _ Hl) as Hil.
+  specialize (bsort_rank_is_permut Nat.leb _ Hl) as Hil.
   apply Hil, nth_In.
   rewrite length_bsort_rank.
   now rewrite Hl.
@@ -1785,7 +1785,7 @@ apply butn_is_permut; [ easy | | ]. {
   destruct Hl as (Hp, Hl).
   rewrite permut_permut_bsort; [ easy | easy | now rewrite Hl ].
 } {
-  specialize (@bsort_rank_is_permut_list l) as H1.
+  specialize (bsort_rank_is_permut_list Nat.leb l) as H1.
   destruct Hl as (H2, H3).
   destruct H1 as (H4, H5).
   rewrite length_bsort_rank in H4.
@@ -2171,7 +2171,7 @@ Theorem collapse_lt_compat : ∀ l i j,
 Proof.
 intros l j i Hj Hi Hc2.
 specialize (collapse_is_permut l) as Hc.
-specialize (bsort_rank_is_permut (length l) eq_refl) as Hr.
+specialize (bsort_rank_is_permut Nat.leb (length l) eq_refl) as Hr.
 apply Nat.nle_gt; intros Hc1.
 destruct (Nat.eq_dec (ff_app (collapse l) i) (ff_app (collapse l) j))
   as [H| H]. {
@@ -2263,7 +2263,7 @@ intros * Hnd Hi Hj.
 remember (ff_app (collapse l) i ?= ff_app (collapse l) j) as c1 eqn:Hc1.
 remember (ff_app l i ?= ff_app l j) as c2 eqn:Hc2.
 specialize (collapse_is_permut l) as Hc.
-specialize (bsort_rank_is_permut (length l) eq_refl) as Hr.
+specialize (bsort_rank_is_permut Nat.leb (length l) eq_refl) as Hr.
 move c2 before c1.
 symmetry in Hc1, Hc2.
 destruct c1. {

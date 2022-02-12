@@ -876,7 +876,7 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite <- Hksn at 1.
   apply permut_permut_bsort; [ easy | now rewrite Hσl ].
 }
-specialize bsort_rank_is_permut_list as H1.
+specialize (bsort_rank_is_permut_list Nat.leb) as H1.
 specialize (H1 σ).
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].

@@ -891,19 +891,39 @@ Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
   → bsort_rank ord l = seq 0 (length l).
 Proof.
 intros * Hs.
+induction l as [| a]; [ easy | ].
+cbn - [ bsort_rank_loop nth seq ].
+rewrite seq_S.
+cbn - [ bsort_rank_loop nth ].
+(* mouais... *)
+...
+intros * Hs.
 remember (length l) as n eqn:Hn; symmetry in Hn.
-revert l Hs Hn.
+revert A ord l Hs Hn.
 induction n; intros. {
   now apply length_zero_iff_nil in Hn; subst l.
 }
 destruct l as [| a]; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
 rewrite seq_S.
-Check permut_without_highest.
 assert (Hps : is_permut (S n) (bsort_rank ord (a :: l))). {
-About bsort_rank_is_permut_list.
+  now apply bsort_rank_is_permut.
+}
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+specialize (permut_without_highest Hps) as H1.
+rewrite length_bsort_rank in H1.
+destruct H1 as (i & Hil & Hin & Hpb).
+specialize (IHn _ Nat.leb (butn i (bsort_rank ord (a :: l)))) as H1.
+rewrite butn_length in H1.
+rewrite length_bsort_rank in H1.
+apply Nat.ltb_lt in Hil.
+rewrite Hil in H1.
+rewrite List_length_cons in H1.
+rewrite Nat_sub_succ_1 in H1.
+rewrite Hn in H1.
+Search (bsort_rank _ (butn _ _)).
 ...
-  specialize bsort_rank_is_permut_list as H1.
+erewrite <- IHn.
 Search bsort_rank.
   specialize (H1 (a :: l)).
   rewrite <- Hn.
