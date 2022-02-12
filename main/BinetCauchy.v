@@ -935,6 +935,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el ].
+Check rngl_summation_change_var.
+erewrite rngl_summation_change_var.
+Search canon_sym_gr_list.
+Search canon_sym_gr_list_inv.
+...
+kl ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
 ...
 (*
 unfold ε.
