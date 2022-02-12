@@ -1086,13 +1086,23 @@ rewrite Nat.add_0_l.
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 f_equal.
-...
-Search (map _ (seq _ _)).
-  assert (Hin : i < n!).
-...
-Search (canon_sym_gr_list_inv _ (_ ° _)).
-Search canon_sym_gr_list_inv.
-Search (bsort_rank _ _ ° _).
+apply rngl_product_eq_compat.
+intros j Hj.
+unfold g.
+rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+  apply comp_is_permut. {
+    apply bsort_rank_is_permut.
+    now rewrite Hp, length_collapse.
+  } {
+    apply canon_sym_gr_list_is_permut.
+    flia Hi Hmz.
+  }
+}
+f_equal. 2: {
+  rewrite Hp; unfold collapse.
+  rewrite permut_bsort_rank_involutive. 2: {
+    apply bsort_rank_is_permut_list.
+  }
 ...
 g (h i) = i
 canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
