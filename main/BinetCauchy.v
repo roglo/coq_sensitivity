@@ -1057,8 +1057,16 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 rewrite rngl_summation_list_permut with (l2 := seq 0 m!). 2: {
-Search (Permutation (map _ _)).
-apply nat_bijection_Permutation.
+apply nat_bijection_Permutation. {
+  intros i Hi.
+  unfold h.
+  apply canon_sym_gr_list_inv_ub.
+  apply bsort_rank_is_permut.
+  now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
+} {
+  intros i j Hij.
+...
+  rewrite <- Hgh. 2: {
 ...
 Search (Permutation _ (seq _ _)).
 apply permut_list_Permutation.
