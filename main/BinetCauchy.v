@@ -886,6 +886,13 @@ split. {
 }
 Qed.
 
+Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f n l,
+  sorted ord l = true
+  → (∀ i, i < length l → f (n + i) = nth i l d)
+  → bsort_rank_loop ord f (seq 0 n) l = seq 0 (n + length l).
+Proof.
+...
+
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f ls l,
   sorted ord l = true
   → sorted Nat.leb ls = true
@@ -895,9 +902,10 @@ Proof.
 intros * Hs Hss Hf.
 revert ls Hss Hf.
 induction l as [| a]; intros; cbn. {
-  Search (sorted Nat.leb).
-(* non, c'est faux *)
+  rewrite Nat.add_0_r.
+Search sorted.
 ...
+*)
 
 Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
   sorted ord l = true
@@ -911,7 +919,10 @@ remember (d :: l) as l' eqn:Hl'.
 subst n.
 clear l Hl'; rename l' into l.
 ...
-now apply (bsort_rank_loop_of_sorted d).
+specialize (bsort_rank_loop_of_sorted) as H1.
+specialize (H1 A d ord (λ i, nth i l d) 0 l Hs).
+cbn in H1.
+now apply H1.
 ...
 intros * Hs.
 remember (length l) as n eqn:Hn; symmetry in Hn.
