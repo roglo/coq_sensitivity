@@ -1057,38 +1057,35 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 rewrite rngl_summation_list_permut with (l2 := seq 0 m!). 2: {
-apply nat_bijection_Permutation. {
-  intros i Hi.
-  unfold h.
-  apply canon_sym_gr_list_inv_ub.
-  apply bsort_rank_is_permut.
-  now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
-} {
-  intros i j Hij.
-...
-  rewrite <- Hgh. 2: {
-...
-Search (Permutation _ (seq _ _)).
-apply permut_list_Permutation.
-Search (is_permut _ (map _ _)).
-...
-(* yeah! *)
-Search (∑ (_ ∈ map _ _), _).
-(* oui, mais faut pas appliquer rngl_summation_map_seq *)
-(* mais un lemme, à écrire, comme quoi
-     ∑ (i ∈ map h (seq 0 m!)), _ =
-     ∑ (i ∈ seq 0 m!), _
-   moyennant la commutativité *)
-...
-rewrite rngl_summation_map_seq.
+  apply permut_list_Permutation.
+  split; [ | apply List_map_seq_length ].
+  split. {
+    rewrite List_map_seq_length.
+    intros i Hi.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    destruct Hj as (_, Hj); cbn in Hj.
+    rewrite <- Hji; unfold h.
+    apply canon_sym_gr_list_inv_ub.
+    apply bsort_rank_is_permut.
+    now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
+  } {
+    apply (NoDup_map_iff 0).
+    rewrite seq_length.
+    intros i j Hi Hj Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite <- Hgh; [ symmetry | easy ].
+    rewrite <- Hgh; [ symmetry | easy ].
+    now f_equal.
+  }
+}
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite Nat.add_0_l.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite Hgh; [ | flia Hmz Hi ].
-  easy.
-}
-cbn - [ mat_el ].
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+f_equal.
 ...
 Search (map _ (seq _ _)).
   assert (Hin : i < n!).
