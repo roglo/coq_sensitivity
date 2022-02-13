@@ -799,6 +799,16 @@ intros * Hs.
 revert n.
 induction l as [| a]; intros; [ apply sorted_seq | cbn ].
 rewrite seq_length.
+Theorem glop : ∀ A (ord : A → _) f n,
+  bsort_rank_insert ord f n (seq 0 n) = seq 0 (S n).
+Proof.
+intros.
+induction n; [ easy | ].
+do 3 rewrite seq_S.
+cbn.
+...
+rewrite glop.
+apply IHl.
 ...
 
 Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
