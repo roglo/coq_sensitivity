@@ -743,10 +743,7 @@ Qed.
 
 (**)
 
-...
-
-(* c'est faux, ça *)
-Theorem bsort_rank_insert_is_sorted : ∀ A (ord : A → _) f lrank ia,
+Theorem bsort_rank_insert_is_sorted : ∀ A (ord : A → _) f ia lrank,
   sorted Nat.leb lrank = true
   → sorted Nat.leb (bsort_rank_insert ord f ia lrank) = true.
 Proof.
@@ -757,7 +754,7 @@ destruct ab. {
   remember (ib :: lrank) as l; cbn; subst l.
   apply Bool.andb_true_iff.
   split; [ | easy ].
-  apply Nat.leb_le.
+Admitted. (*
 ...
   now apply Bool.andb_true_iff.
 } {
@@ -776,47 +773,33 @@ Qed.
 *)
 
 Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f lrank l,
-  sorted Nat.leb lrank = true
+  sorted ord l = true
+  → sorted Nat.leb lrank = true
   → sorted Nat.leb (bsort_rank_loop ord f lrank l) = true.
 Proof.
-intros * Hs.
-revert lrank Hs.
+intros * Hs Hsr.
+revert lrank Hs Hsr.
 induction l as [| a]; intros; [ easy | cbn ].
-apply IHl.
+apply IHl. {
+  cbn in Hs.
+  destruct l as [| b]; [ easy | ].
+  now apply Bool.andb_true_iff in Hs.
+}
 ...
 apply bsort_rank_insert_is_sorted.
-...
 Qed.
 
-Theorem bsort_rank_is_sorted : ∀ A (ord : A → _),
-  total_order ord
-  → ∀ l, sorted Nat.leb (bsort_rank ord l) = true.
+Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → sorted Nat.leb (bsort_rank ord l) = true.
 Proof.
-intros * Hto *.
+intros * Hs.
 destruct l as [| d]; [ easy | ].
 cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
 ...
 now apply bsort_rank_loop_is_sorted.
-...
-
-Theorem bsort_rank_of_sorted_nodup : ∀ A (ord : A → _),
-  total_order ord
-  → ∀ l,
-  bsort_rank ord l = seq 0 (length l).
-Proof.
-intros * Htot *.
-replace (length l) with (length (bsort_rank ord l)).
-apply sorted_permut. {
-  apply bsort_rank_is_permut_list.
-} {
-  now apply bsort_rank_is_sorted.
-} {
-  apply length_bsort_rank.
-}
-Qed.
-
 ...
 
 Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
@@ -837,7 +820,8 @@ replace (length l) with (length (bsort_rank ord l)).
 apply sorted_permut. {
   apply bsort_rank_is_permut_list.
 } {
-  apply bsort_rank_is_sorted.
+...
+  apply sorted_bsort_rank_is_sorted.
 ...
 } {
   apply length_bsort_rank.
