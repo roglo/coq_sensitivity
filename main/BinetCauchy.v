@@ -754,7 +754,7 @@ destruct ab. {
   remember (ib :: lrank) as l; cbn; subst l.
   apply Bool.andb_true_iff.
   split; [ | easy ].
-Admitted. (*
+Abort. (*
 ...
   now apply Bool.andb_true_iff.
 } {
@@ -791,6 +791,71 @@ rewrite <- Hl.
 apply IHlen.
 Qed.
 
+
+Theorem bsort_rank_insert_is_sorted : ∀ A d (ord : A → _) ia lrank l_ini,
+  ia < length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → sorted Nat.leb lrank = true
+  → sorted ord l_ini = true
+  → sorted Nat.leb (bsort_rank_insert ord (λ i : nat, nth i l_ini d) ia lrank) = true.
+Proof.
+intros * Hia Hini Hrl Hil.
+induction lrank as [| ib]; [ easy | cbn ].
+remember (ord (nth ia l_ini d) (nth ib l_ini d)) as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  remember (ib :: lrank) as l; cbn; subst l.
+  apply Bool.andb_true_iff.
+  split; [ | easy ].
+  apply Nat.leb_le.
+  specialize (Hini ib (or_introl eq_refl)) as H1.
+Search sorted.
+...
+  destruct i; [ easy | ].
+  rewrite List_nth_succ_cons.
+  destruct (lt_dec i (length (ib :: lrank))) as [Hii| Hii]. 2: {
+    apply Nat.nlt_ge in Hii.
+    rewrite nth_overflow; [ flia Hia | easy ].
+  }
+  now apply Hini, nth_In.
+} {
+  destruct i; [ now apply Hini; left | cbn ].
+  apply IHlrank.
+  intros j Hj.
+  now apply Hini; right.
+}
+Qed.
+...
+
+Theorem bsort_rank_loop_is_sorted : ∀ A d (ord : A → _) lrank l l_ini,
+  length lrank + length l ≤ length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → sorted Nat.leb lrank = true
+  → sorted ord l = true
+  → sorted Nat.leb (bsort_rank_loop ord (λ i, nth i l_ini d) lrank l) = true.
+Proof.
+intros * Hrl Hia Hir Hil.
+revert lrank Hrl Hia Hir.
+induction l as [| b]; intros; [ easy | cbn ].
+cbn in Hrl.
+rewrite <- Nat.add_succ_comm in Hrl.
+apply IHl. {
+  now apply sorted_cons in Hil.
+} {
+  now rewrite length_bsort_rank_insert.
+} {
+  intros j Hj.
+  apply in_bsort_rank_insert in Hj.
+  destruct Hj as [Hj| Hj]; [ | now apply Hia ].
+  subst j; flia Hrl.
+}
+...
+apply bsort_rank_insert_is_sorted; [ flia Hrl | easy ].
+...
+
+...
+
+(*
 Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f n l,
   sorted ord l = true
   → sorted Nat.leb (bsort_rank_loop ord f (seq 0 n) l) = true.
@@ -799,17 +864,25 @@ intros * Hs.
 revert n.
 induction l as [| a]; intros; [ apply sorted_seq | cbn ].
 rewrite seq_length.
-Theorem glop : ∀ A (ord : A → _) f n,
-  bsort_rank_insert ord f n (seq 0 n) = seq 0 (S n).
+Theorem glop : ∀ A (ord : A → _) f n (l : list nat),
+  (∀ i, i ∈ l → ord (f n) (f i) = false)
+  → bsort_rank_insert ord f n l = l ++ [n].
 Proof.
-intros.
-induction n; [ easy | ].
-do 3 rewrite seq_S.
-cbn.
-...
-rewrite glop.
+intros * Hf.
+revert n Hf.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite Hf; [ | now left ].
+f_equal.
 apply IHl.
-...
+intros i Hi.
+now apply Hf; right.
+Qed.
+rewrite glop. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+Abort.
+*)
 
 Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
   sorted ord l = true
@@ -820,8 +893,8 @@ destruct l as [| d]; [ easy | ].
 cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
-...
 replace [] with (seq 0 0) by easy.
+...
 now apply bsort_rank_loop_is_sorted.
 ...
 
