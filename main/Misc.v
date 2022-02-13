@@ -2543,11 +2543,11 @@ Qed.
 
 (* sorted *)
 
-Fixpoint sorted {A} ord (l : list A) :=
+Fixpoint sorted {A} (ord : A → A → bool) l :=
   match l with
   | [] => true
-  | [_] => true
-  | a :: (b :: _) as l' => (ord a b && sorted ord l')%bool
+  | [a] => true
+  | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
   end.
 
 Definition reflexive A (ord : A → A → bool) :=
@@ -2649,74 +2649,125 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-Theorem sorted_app : ∀ A (ord : A → _) la lb,
-  sorted ord (la ++ lb) = true
-  → sorted ord la = true ∧ sorted ord lb = true.
+Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
+  sorted ord (a :: b :: l) = true
+  ↔ ord a b = true ∧ sorted ord (b :: l) = true.
 Proof.
-intros * Htr.
+intros.
+apply Bool.andb_true_iff.
+Qed.
+
+Theorem sorted_extends : ∀ A ord (a : A) l,
+  transitive ord
+  → sorted ord (a :: l) = true
+  → ∀ b, b ∈ l → ord a b = true.
+Proof.
+intros * Htrans Hsort b Hb.
+induction l as [| c]; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hac, Hsort).
+destruct Hb as [Hb| Hb]; [ now subst c | ].
+apply IHl; [ | easy ].
+destruct l as [| d]; [ easy | ].
+apply sorted_cons_cons_true_iff in Hsort.
+apply sorted_cons_cons_true_iff.
+destruct Hsort as (Hcd, Hsort).
+split; [ now apply Htrans with (b := c) | easy ].
+Qed.
+
+Theorem sorted_app : ∀ A ord (la lb : list A),
+  sorted ord (la ++ lb) = true
+  → sorted ord la = true ∧ sorted ord lb = true ∧
+    (transitive ord → ∀ a b, a ∈ la → b ∈ lb → ord a b = true).
+Proof.
+intros * Hab.
 split. {
-  revert lb Htr.
-  induction la as [| a]; intros; [ easy | ].
-  cbn in Htr |-*.
-  destruct la as [| a']; [ easy | ].
-  cbn in Htr.
-  apply Bool.andb_true_iff in Htr.
-  apply Bool.andb_true_iff.
+  revert lb Hab.
+  induction la as [| a1]; intros; [ easy | ].
+  destruct la as [| a2]; [ easy | ].
+  cbn - [ sorted ] in Hab |-*.
+  apply sorted_cons_cons_true_iff in Hab.
+  apply sorted_cons_cons_true_iff.
+  destruct Hab as (Haa & Hab).
   split; [ easy | ].
-  now apply IHla with (lb := lb).
-} {
-  revert lb Htr.
-  induction la as [| a]; intros; [ easy | ].
-  destruct la as [| a']. {
-    cbn in Htr.
-    destruct lb as [| b]; [ easy | ].
-    now apply Bool.andb_true_iff in Htr.
+  now apply (IHla lb).
+}
+split. {
+  revert lb Hab.
+  induction la as [| a1]; intros; [ easy | ].
+  destruct la as [| a2]. {
+    cbn in Hab.
+    destruct lb as [| b1]; [ easy | ].
+    now apply Bool.andb_true_iff in Hab.
   }
-  apply IHla.
-  cbn in Htr |-*.
-  now apply Bool.andb_true_iff in Htr.
+  cbn - [ sorted ] in Hab.
+  apply sorted_cons_cons_true_iff in Hab.
+  destruct Hab as (Haa & Hab).
+  now apply IHla.
+} {
+  intros Htrans * Ha Hb.
+  revert a lb Ha Hab Hb.
+  induction la as [| a1]; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. 2: {
+    apply (IHla a lb); [ easy | | easy ].
+    cbn - [ sorted ] in Hab.
+    now apply sorted_cons in Hab.
+  }
+  subst a1.
+  cbn - [ sorted ] in Hab.
+  apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
+  now apply in_or_app; right.
 }
 Qed.
 
-Theorem sorted_app_trans : ∀ A (ord : A → _),
+Theorem sorted_middle : ∀ A ord (a b : A) la lb lc,
   transitive ord
-  → ∀ la lb,
-    sorted ord (la ++ lb) = true
-    → ∀ a, a ∈ la → ∀ b, b ∈ lb → ord a b = true.
+  → sorted ord (la ++ a :: lb ++ b :: lc) = true
+  → ord a b = true.
 Proof.
-intros * Htr * Hs a Ha b Hb.
-move b before a.
-revert la Hs Ha.
-induction lb as [| b']; intros; [ easy | ].
-replace (b' :: lb) with ([b'] ++ lb) in Hs by easy.
-rewrite app_assoc in Hs.
-destruct Hb as [Hb| Hb]. 2: {
-  apply IHlb with (la := la ++ [b']); [ easy | easy | ].
-  now apply in_or_app; left.
+intros * Htrans Hsort.
+replace (la ++ a :: lb ++ b :: lc) with (la ++ [a] ++ lb ++ [b] ++ lc)
+  in Hsort by easy.
+rewrite app_assoc in Hsort.
+apply sorted_app in Hsort.
+destruct Hsort as (Hla & Hsort & H1).
+specialize (H1 Htrans).
+apply H1; [ now apply in_or_app; right; left | ].
+apply in_or_app; right.
+now apply in_or_app; left; left.
+Qed.
+
+Theorem sorted_any : ∀ A (ord : A → A → bool) i j d l,
+  transitive ord
+  → sorted ord l = true
+  → i < j
+  → j < length l
+  → ord (nth i l d) (nth j l d) = true.
+Proof.
+intros * Htrans Hsort Hij Hj.
+assert (Hi : i < length l) by now transitivity j.
+specialize nth_split as H1.
+specialize (H1 A i l d Hi).
+destruct H1 as (la & lb & Hl & Hla).
+remember (nth i l d) as a eqn:Ha; clear Ha.
+subst l i.
+replace (la ++ a :: lb) with (la ++ [a] ++ lb) by easy.
+rewrite app_assoc.
+rewrite app_nth2; rewrite app_length, Nat.add_comm; cbn; [ | easy ].
+remember (j - S (length la)) as k eqn:Hkj.
+assert (Hk : k < length lb). {
+  subst k.
+  rewrite app_length in Hj; cbn in Hj.
+  flia Hj Hij.
 }
-subst b'.
-clear IHlb.
-rewrite <- app_assoc in Hs.
-cbn in Hs.
-revert a Ha.
-induction la as [| a']; intros; [ easy | ].
-destruct Ha as [Ha| Ha]. 2: {
-  cbn - [ sorted ] in Hs.
-  apply IHla; [ | easy ].
-  now apply sorted_cons in Hs.
-}
-subst a'.
-cbn - [ sorted ] in Hs.
-destruct la as [| a']. {
-  cbn in Hs.
-  now apply Bool.andb_true_iff in Hs.
-}
-apply Htr with (b := a'). {
-  cbn in Hs.
-  now apply Bool.andb_true_iff in Hs.
-}
-apply sorted_cons in Hs.
-apply IHla; [ easy | now left ].
+specialize nth_split as H1.
+specialize (H1 A k lb d Hk).
+destruct H1 as (lc & ld & Hl & Hlc).
+remember (nth k lb d) as b eqn:Hb.
+subst lb.
+clear j k Hb Hij Hj Hkj Hk Hlc Hi.
+rename lc into lb; rename ld into lc.
+now apply sorted_middle in Hsort.
 Qed.
 
 (* end sorted *)

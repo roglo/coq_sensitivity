@@ -358,8 +358,9 @@ assert (Hal : a = length l). {
   specialize (H3 H); clear H.
   assert (H4 : ∀ c, c ∈ l → c ≤ a). {
     intros c Hc.
-    specialize (sorted_app_trans Nat_leb_trans) as H4.
-    specialize (H4 l [a] Hs c Hc a (or_introl eq_refl)).
+    specialize (sorted_app _ _ _ Hs) as H4.
+    destruct H4 as (_ & _ & H4).
+    specialize (H4 Nat_leb_trans c a Hc (or_introl eq_refl)).
     now apply Nat.leb_le in H4.
   }
   destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].

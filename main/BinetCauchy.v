@@ -154,174 +154,6 @@ apply Nat.lt_lt_succ_r.
 now apply (IHn k l).
 Qed.
 
-Fixpoint sorted {A} (ord : A → A → bool) l :=
-  match l with
-  | [] => true
-  | [a] => true
-  | a :: (b :: _) as la => (ord a b && sorted ord la)%bool
-  end.
-
-Theorem transitive_nat_lt : transitive Nat.ltb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.ltb_lt in Hab, Hbc.
-apply Nat.ltb_lt.
-now transitivity b.
-Qed.
-
-Theorem sorted_cons_cons_true_iff : ∀ A (ord : A → A -> bool) a b l,
-  sorted ord (a :: b :: l) = true
-  ↔ ord a b = true ∧ sorted ord (b :: l) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-Qed.
-
-Theorem sorted_cons : ∀ A ord (a : A) l,
-  sorted ord (a :: l) = true
-  → sorted ord l = true.
-Proof.
-intros * Hsort.
-destruct l as [| b]; [ easy | ].
-now apply sorted_cons_cons_true_iff in Hsort.
-Qed.
-
-Theorem sorted_extends : ∀ A ord (a : A) l,
-  transitive ord
-  → sorted ord (a :: l) = true
-  → ∀ b, b ∈ l → ord a b = true.
-Proof.
-intros * Htrans Hsort b Hb.
-induction l as [| c]; [ easy | ].
-apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hac, Hsort).
-destruct Hb as [Hb| Hb]; [ now subst c | ].
-apply IHl; [ | easy ].
-destruct l as [| d]; [ easy | ].
-apply sorted_cons_cons_true_iff in Hsort.
-apply sorted_cons_cons_true_iff.
-destruct Hsort as (Hcd, Hsort).
-split; [ now apply Htrans with (b := c) | easy ].
-Qed.
-
-Theorem sorted_app : ∀ A ord (la lb : list A),
-  sorted ord (la ++ lb) = true
-  → sorted ord la = true ∧ sorted ord lb = true ∧
-    (transitive ord → ∀ a b, a ∈ la → b ∈ lb → ord a b = true).
-Proof.
-intros * Hab.
-split. {
-  revert lb Hab.
-  induction la as [| a1]; intros; [ easy | ].
-  destruct la as [| a2]; [ easy | ].
-  cbn - [ sorted ] in Hab |-*.
-  apply sorted_cons_cons_true_iff in Hab.
-  apply sorted_cons_cons_true_iff.
-  destruct Hab as (Haa & Hab).
-  split; [ easy | ].
-  now apply (IHla lb).
-}
-split. {
-  revert lb Hab.
-  induction la as [| a1]; intros; [ easy | ].
-  destruct la as [| a2]. {
-    cbn in Hab.
-    destruct lb as [| b1]; [ easy | ].
-    now apply Bool.andb_true_iff in Hab.
-  }
-  cbn - [ sorted ] in Hab.
-  apply sorted_cons_cons_true_iff in Hab.
-  destruct Hab as (Haa & Hab).
-  now apply IHla.
-} {
-  intros Htrans * Ha Hb.
-  revert a lb Ha Hab Hb.
-  induction la as [| a1]; intros; [ easy | ].
-  destruct Ha as [Ha| Ha]. 2: {
-    apply (IHla a lb); [ easy | | easy ].
-    cbn - [ sorted ] in Hab.
-    now apply sorted_cons in Hab.
-  }
-  subst a1.
-  cbn - [ sorted ] in Hab.
-  apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
-  now apply in_or_app; right.
-}
-Qed.
-
-Theorem sorted_middle : ∀ A ord (a b : A) la lb lc,
-  transitive ord
-  → sorted ord (la ++ a :: lb ++ b :: lc) = true
-  → ord a b = true.
-Proof.
-intros * Htrans Hsort.
-replace (la ++ a :: lb ++ b :: lc) with (la ++ [a] ++ lb ++ [b] ++ lc)
-  in Hsort by easy.
-rewrite app_assoc in Hsort.
-apply sorted_app in Hsort.
-destruct Hsort as (Hla & Hsort & H1).
-specialize (H1 Htrans).
-apply H1; [ now apply in_or_app; right; left | ].
-apply in_or_app; right.
-now apply in_or_app; left; left.
-Qed.
-
-Theorem sorted_any : ∀ A (ord : A → A → bool) i j d l,
-  transitive ord
-  → sorted ord l = true
-  → i < j
-  → j < length l
-  → ord (nth i l d) (nth j l d) = true.
-Proof.
-intros * Htrans Hsort Hij Hj.
-assert (Hi : i < length l) by now transitivity j.
-specialize nth_split as H1.
-specialize (H1 A i l d Hi).
-destruct H1 as (la & lb & Hl & Hla).
-remember (nth i l d) as a eqn:Ha; clear Ha.
-subst l i.
-replace (la ++ a :: lb) with (la ++ [a] ++ lb) by easy.
-rewrite app_assoc.
-rewrite app_nth2; rewrite app_length, Nat.add_comm; cbn; [ | easy ].
-remember (j - S (length la)) as k eqn:Hkj.
-assert (Hk : k < length lb). {
-  subst k.
-  rewrite app_length in Hj; cbn in Hj.
-  flia Hj Hij.
-}
-specialize nth_split as H1.
-specialize (H1 A k lb d Hk).
-destruct H1 as (lc & ld & Hl & Hlc).
-remember (nth k lb d) as b eqn:Hb.
-subst lb.
-clear j k Hb Hij Hj Hkj Hk Hlc Hi.
-rename lc into lb; rename ld into lc.
-now apply sorted_middle in Hsort.
-Qed.
-
-Theorem sorted_hd_no_dup : ∀ a i l,
-  sorted Nat.ltb (a :: l) = true
-  → i < length l
-  → a = nth i l 0
-  → False.
-Proof.
-intros * Hsort Hil Ha.
-destruct l as [| b]; [ cbn in Hil; flia Hil | ].
-apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hab & Hs).
-apply Nat.ltb_lt in Hab.
-specialize (@sorted_extends _ Nat.ltb b l) as H1.
-destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
-specialize (H1 transitive_nat_lt).
-specialize (H1 Hs a).
-cbn in Hil.
-apply Nat.succ_lt_mono in Hil.
-assert (H : a ∈ l) by now subst a; apply nth_In.
-specialize (H1 H).
-apply Nat.ltb_lt in H1.
-flia Hab H1.
-Qed.
-
 (* *)
 
 Theorem sub_lists_of_seq_0_n_0_r : ∀ n, sub_lists_of_seq_0_n n 0 = [[]].
@@ -437,6 +269,37 @@ rewrite removelast_last.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
+Theorem Nat_ltb_trans : transitive Nat.ltb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.ltb_lt in Hab, Hbc.
+apply Nat.ltb_lt.
+now transitivity b.
+Qed.
+
+Theorem sorted_hd_no_dup : ∀ a i l,
+  sorted Nat.ltb (a :: l) = true
+  → i < length l
+  → a = nth i l 0
+  → False.
+Proof.
+intros * Hsort Hil Ha.
+destruct l as [| b]; [ cbn in Hil; flia Hil | ].
+apply sorted_cons_cons_true_iff in Hsort.
+destruct Hsort as (Hab & Hs).
+apply Nat.ltb_lt in Hab.
+specialize (@sorted_extends _ Nat.ltb b l) as H1.
+destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
+specialize (H1 Nat_ltb_trans).
+specialize (H1 Hs a).
+cbn in Hil.
+apply Nat.succ_lt_mono in Hil.
+assert (H : a ∈ l) by now subst a; apply nth_In.
+specialize (H1 H).
+apply Nat.ltb_lt in H1.
+flia Hab H1.
+Qed.
+
 Theorem nth_of_rank_of_sub_list_of_seq_0_n : ∀ n k t,
   sorted Nat.ltb t = true
   → length t = k
@@ -514,7 +377,7 @@ destruct (Nat.eq_dec (last t 0) n) as [Hln| Hln]. {
   intros i Hi.
   apply sorted_app in Hs.
   destruct Hs as (Ht & _ & Hs).
-  specialize (Hs transitive_nat_lt i n Hi (or_introl eq_refl)).
+  specialize (Hs Nat_ltb_trans i n Hi (or_introl eq_refl)).
   now apply Nat.ltb_lt in Hs.
 }
 destruct (lt_dec (rank_of_sub_list_of_seq_0_n n (S k) t) (binomial n (S k)))
@@ -536,7 +399,7 @@ destruct (lt_dec (rank_of_sub_list_of_seq_0_n n (S k) t) (binomial n (S k)))
   assert (Hmtl : nth m t 0 < last t 0). {
     rewrite List_last_nth.
     specialize (@sorted_any _ Nat.ltb m (length t - 1) 0 t) as H1.
-    specialize (H1 transitive_nat_lt Hs).
+    specialize (H1 Nat_ltb_trans Hs).
     assert (H : m < length t - 1). {
       destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
         exfalso; clear Hmt H1; subst m.
@@ -588,7 +451,7 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     apply (In_nth _ _ 0) in Hx.
     destruct Hx as (i & Hi & Hin).
     specialize (sorted_any) as H1.
-    specialize (H1 nat Nat.ltb i (length t - 1) 0 t transitive_nat_lt Hs).
+    specialize (H1 nat Nat.ltb i (length t - 1) 0 t Nat_ltb_trans Hs).
     assert (H : i < length t - 1). {
       destruct (Nat.eq_dec i (length t - 1)) as [Hit| Hit]. {
         rewrite Hit in Hin.
@@ -963,6 +826,17 @@ cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 subst n.
 clear l Hl'; rename l' into l.
+...
+Search sorted.
+Check bsort_is_sorted.
+About sorted.
+...
+Theorem glop : ∀ A d (ord : A → _) l,
+  NoDup l
+  → sorted ord l = true
+  → bsort_rank_loop ord (λ i : nat, nth i l d) [] l = seq 0 (length l).
+Proof.
+...
 (**)
 destruct l as [| a1]; [ easy | ].
 destruct l as [| a2]; [ easy | ].
