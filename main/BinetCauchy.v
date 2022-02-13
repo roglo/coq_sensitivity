@@ -886,6 +886,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f n l,
   sorted ord l = true
   → (∀ i, i < length l → f (n + i) = nth i l d)
@@ -947,17 +948,62 @@ Search sorted.
 ...
 *)
 
-Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
-  sorted ord l = true
+Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l,
+  NoDup l
+  → sorted ord l = true
   → bsort_rank ord l = seq 0 (length l).
 Proof.
-intros * Hs.
+intros * Hant Htra * Hnd Hs.
 destruct l as [| d]; [ easy | ].
 remember (length (d :: l)) as n eqn:Hn.
 cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 subst n.
 clear l Hl'; rename l' into l.
+destruct l as [| a1]; [ easy | ].
+destruct l as [| a2]; [ easy | ].
+destruct l as [| a3]. {
+  cbn in Hs |-*.
+  remember (ord a2 a1) as a21 eqn:H21; symmetry in H21.
+  destruct a21; [ exfalso | easy ].
+  apply NoDup_cons_iff in Hnd.
+  destruct Hnd as (Hnd, _).
+  apply Hnd; clear Hnd; left.
+  apply Bool.andb_true_iff in Hs.
+  now apply Hant.
+}
+destruct l as [| a4]. {
+  cbn in Hs |-*.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (H12 & Hs).
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (H23, _).
+  apply NoDup_cons_iff in Hnd.
+  destruct Hnd as (Ha123, Hnd).
+  apply NoDup_cons_iff in Hnd.
+  destruct Hnd as (Ha23, _).
+  remember (ord a2 a1) as a21 eqn:H21; symmetry in H21.
+  destruct a21. {
+    exfalso.
+    apply Ha123; clear Ha123; left.
+    now apply Hant.
+  }
+  cbn.
+  remember (ord a3 a1) as a31 eqn:H31; symmetry in H31.
+  destruct a31. {
+    exfalso.
+    apply Ha123; clear Ha123; right; left.
+    apply Hant; [ easy | ].
+    now apply Htra with (b := a2).
+  }
+  remember (ord a3 a2) as a32 eqn:H32; symmetry in H32.
+  destruct a32; [ exfalso | easy ].
+  apply Ha23; clear Ha23; left.
+  now apply Hant.
+}
 ...
 specialize (bsort_rank_loop_of_sorted) as H1.
 specialize (H1 A d ord (λ i, nth i l d) 0 l Hs).
