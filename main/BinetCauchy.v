@@ -791,6 +791,36 @@ rewrite <- Hl.
 apply IHlen.
 Qed.
 
+Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → sorted Nat.leb (bsort_rank ord l) = true.
+Proof.
+intros * Hs.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+...
+specialize bsort_is_sorted as H1.
+specialize (H1 A ord).
+enough (Htot : total_order ord).
+specialize (H1 Htot l).
+rewrite (bsort_bsort_rank ord d) in H1.
+destruct l as [| d']; [ easy | ].
+cbn - [ bsort_rank_loop nth ] in H1.
+remember (d' :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+...
+intros * Hs.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+replace [] with (seq 0 0) by easy.
+...
+now apply bsort_rank_loop_is_sorted.
+...
+
 Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f n l,
   sorted ord l = true
   → sorted Nat.leb (bsort_rank_loop ord f (seq 0 n) l) = true.
@@ -809,20 +839,6 @@ cbn.
 ...
 rewrite glop.
 apply IHl.
-...
-
-Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
-  sorted ord l = true
-  → sorted Nat.leb (bsort_rank ord l) = true.
-Proof.
-intros * Hs.
-destruct l as [| d]; [ easy | ].
-cbn - [ bsort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
-...
-replace [] with (seq 0 0) by easy.
-now apply bsort_rank_loop_is_sorted.
 ...
 
 Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
