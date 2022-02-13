@@ -772,22 +772,34 @@ Admitted. (*
 Qed.
 *)
 
-Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f lrank l,
-  sorted ord l = true
-  → sorted Nat.leb lrank = true
-  → sorted Nat.leb (bsort_rank_loop ord f lrank l) = true.
+Theorem sorted_seq : ∀ sta len, sorted Nat.leb (seq sta len) = true.
 Proof.
-intros * Hs Hsr.
-revert lrank Hs Hsr.
-induction l as [| a]; intros; [ easy | cbn ].
-apply IHl. {
-  cbn in Hs.
-  destruct l as [| b]; [ easy | ].
-  now apply Bool.andb_true_iff in Hs.
+intros.
+revert sta.
+induction len; intros; [ easy | ].
+cbn.
+remember (seq (S sta) len) as l eqn:Hl; symmetry in Hl.
+destruct l as [| a]; [ easy | ].
+apply Bool.andb_true_iff.
+split. {
+  apply Nat.leb_le.
+  destruct len; [ easy | ].
+  cbn in Hl.
+  injection Hl; clear Hl; intros; subst a; flia.
 }
-...
-apply bsort_rank_insert_is_sorted.
+rewrite <- Hl.
+apply IHlen.
 Qed.
+
+Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f n l,
+  sorted ord l = true
+  → sorted Nat.leb (bsort_rank_loop ord f (seq 0 n) l) = true.
+Proof.
+intros * Hs.
+revert n.
+induction l as [| a]; intros; [ apply sorted_seq | cbn ].
+rewrite seq_length.
+...
 
 Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
   sorted ord l = true
@@ -799,6 +811,7 @@ cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
 ...
+replace [] with (seq 0 0) by easy.
 now apply bsort_rank_loop_is_sorted.
 ...
 
