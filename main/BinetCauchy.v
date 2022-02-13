@@ -269,14 +269,6 @@ rewrite removelast_last.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
-Theorem Nat_ltb_trans : transitive Nat.ltb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.ltb_lt in Hab, Hbc.
-apply Nat.ltb_lt.
-now transitivity b.
-Qed.
-
 Theorem sorted_hd_no_dup : ∀ a i l,
   sorted Nat.ltb (a :: l) = true
   → i < length l

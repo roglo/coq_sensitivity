@@ -2640,6 +2640,14 @@ apply Nat.leb_le.
 now transitivity b.
 Qed.
 
+Theorem Nat_ltb_trans : transitive Nat.ltb.
+Proof.
+intros a b c Hab Hbc.
+apply Nat.ltb_lt in Hab, Hbc.
+apply Nat.ltb_lt.
+now transitivity b.
+Qed.
+
 Theorem sorted_cons : ∀ A (ord : A → _) a la,
   sorted ord (a :: la) = true → sorted ord la = true.
 Proof.
