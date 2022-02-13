@@ -754,7 +754,7 @@ destruct ab. {
   remember (ib :: lrank) as l; cbn; subst l.
   apply Bool.andb_true_iff.
   split; [ | easy ].
-Admitted. (*
+Abort. (*
 ...
   now apply Bool.andb_true_iff.
 } {
