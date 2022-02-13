@@ -963,6 +963,7 @@ cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 subst n.
 clear l Hl'; rename l' into l.
+(**)
 destruct l as [| a1]; [ easy | ].
 destruct l as [| a2]; [ easy | ].
 destruct l as [| a3]. {
