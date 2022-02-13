@@ -741,6 +741,113 @@ split. {
 }
 Qed.
 
+(**)
+
+...
+
+(* c'est faux, ça *)
+Theorem bsort_rank_insert_is_sorted : ∀ A (ord : A → _) f lrank ia,
+  sorted Nat.leb lrank = true
+  → sorted Nat.leb (bsort_rank_insert ord f ia lrank) = true.
+Proof.
+intros * Hs.
+induction lrank as [| ib]; [ easy | cbn ].
+remember (ord (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (ib :: lrank) as l; cbn; subst l.
+  apply Bool.andb_true_iff.
+  split; [ | easy ].
+  apply Nat.leb_le.
+...
+  now apply Bool.andb_true_iff.
+} {
+  specialize (Hto a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
+  remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  rewrite IHlsorted; [ | easy ].
+  cbn.
+  remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac; [ now rewrite Hba | now rewrite Hbc ].
+}
+Qed.
+*)
+
+Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f lrank l,
+  sorted Nat.leb lrank = true
+  → sorted Nat.leb (bsort_rank_loop ord f lrank l) = true.
+Proof.
+intros * Hs.
+revert lrank Hs.
+induction l as [| a]; intros; [ easy | cbn ].
+apply IHl.
+...
+apply bsort_rank_insert_is_sorted.
+...
+Qed.
+
+Theorem bsort_rank_is_sorted : ∀ A (ord : A → _),
+  total_order ord
+  → ∀ l, sorted Nat.leb (bsort_rank ord l) = true.
+Proof.
+intros * Hto *.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+...
+now apply bsort_rank_loop_is_sorted.
+...
+
+Theorem bsort_rank_of_sorted_nodup : ∀ A (ord : A → _),
+  total_order ord
+  → ∀ l,
+  bsort_rank ord l = seq 0 (length l).
+Proof.
+intros * Htot *.
+replace (length l) with (length (bsort_rank ord l)).
+apply sorted_permut. {
+  apply bsort_rank_is_permut_list.
+} {
+  now apply bsort_rank_is_sorted.
+} {
+  apply length_bsort_rank.
+}
+Qed.
+
+...
+
+Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l,
+  NoDup l
+  → sorted ord l = true
+  → bsort_rank ord l = seq 0 (length l).
+Proof.
+intros * Hant Htra * Hnd Hs.
+(*
+specialize (bsort_rank_is_sorted) as H1.
+specialize (H1 Nat.leb Nat_leb_has_total_order (bsort_rank ord l)).
+Search (_ = seq _ _).
+*)
+replace (length l) with (length (bsort_rank ord l)).
+apply sorted_permut. {
+  apply bsort_rank_is_permut_list.
+} {
+  apply bsort_rank_is_sorted.
+...
+} {
+  apply length_bsort_rank.
+}
+...
+Check bsort_rank_is_sorted.
+...
+
+...
+
 (*
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f n l,
   sorted ord l = true
@@ -818,10 +925,6 @@ cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 subst n.
 clear l Hl'; rename l' into l.
-...
-Search sorted.
-Check bsort_is_sorted.
-About sorted.
 ...
 Theorem glop : ∀ A d (ord : A → _) l,
   NoDup l
