@@ -792,6 +792,27 @@ destruct ab. {
     replace (b :: ls) with ([b] ++ ls) in Hs by easy.
     apply sorted_app_iff in Hs; [ | easy ].
     destruct Hs as (Hls & Hal & Hs).
+Search (bsort_insert _ _ _ = _ :: _).
+Theorem eq_bsort_insert_cons : ∀ A (ord : A → _) a b ls l,
+  bsort_insert ord a ls = b :: l
+  → b ∈ a :: ls.
+Admitted.
+specialize (Htot a b) as H1.
+rewrite Hab in H1; cbn in H1.
+apply eq_bsort_insert_cons in Hls'.
+destruct Hls' as [Hls'| Hls']; [ now subst a' | ].
+...
+apply Htra with (b := a); [ easy | ].
+apply Hs.
+...
+  subst a'.
+  specialize (Htot a b) as H1.
+  now rewrite Hab in H1; cbn in H1.
+} {
+...
+  apply Hs; [ now left | ].
+    apply bsort_insert_cons in Hls'.
+...
     apply Hs; [ now left | ].
 ...
   specialize (Htot a' b) as H1.
