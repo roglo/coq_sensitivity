@@ -762,18 +762,12 @@ rewrite <- Hl.
 apply IHlen.
 Qed.
 
-Theorem nth_bsort_rank_insert_of_nodup_sorted :
-  ∀ A d (ord : A → _) l_ini n ls l i a,
-  NoDup l_ini
-  → NoDup (a :: l)
-  → sorted ord l_ini = true
-  → sorted ord (a :: l) = true
-  → i < length l_ini
-  → n + S (length l) = length l_ini
-  → (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
+Theorem nth_bsort_rank_insert_of_sorted :
+  ∀ A d (ord : A → _) l_ini n ls,
+  (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
   → bsort_rank_insert ord (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
 Proof.
-intros * Hndi Hnd Hsi Hs Hil Hnl Hls.
+intros * Hls.
 induction ls as [| b]; [ easy | cbn ].
 rewrite Hls; [ | now left ].
 f_equal.
@@ -811,8 +805,7 @@ apply IHl; try easy. {
   now apply sorted_cons in Hs.
 }
 symmetry.
-rewrite nth_bsort_rank_insert_of_nodup_sorted with (l := l) (i := i) (a := a);
-  try easy. {
+rewrite nth_bsort_rank_insert_of_sorted; try easy. {
   symmetry; apply seq_S.
 }
 intros j Hj.
