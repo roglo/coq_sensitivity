@@ -816,6 +816,22 @@ rewrite IHl. 2: {
     now apply sorted_cons in Hs.
   } {
     intros b c Hb Hc.
+    apply in_bsort_insert in Hb.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hs as (Hss & Hsa & Hs).
+    destruct Hb as [Hb| Hb]. {
+      subst b.
+      now apply sorted_extends with (l := l).
+    } {
+      apply Hs; [ easy | now right ].
+    }
+  }
+}
+replace (a :: l) with ([a] ++ l) by easy.
+rewrite app_assoc; f_equal.
+...
+apply sorted_bsort_insert in Hs; [ | easy | easy | easy ].
+Search (sorted _ _ = true → _).
 ...
 specialize (Htot a b) as H1.
 rewrite Hab in H1; cbn in H1.
