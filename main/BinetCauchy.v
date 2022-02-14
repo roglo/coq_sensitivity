@@ -743,25 +743,6 @@ Qed.
 
 (**)
 
-Theorem sorted_seq : ∀ sta len, sorted Nat.leb (seq sta len) = true.
-Proof.
-intros.
-revert sta.
-induction len; intros; [ easy | ].
-cbn.
-remember (seq (S sta) len) as l eqn:Hl; symmetry in Hl.
-destruct l as [| a]; [ easy | ].
-apply Bool.andb_true_iff.
-split. {
-  apply Nat.leb_le.
-  destruct len; [ easy | ].
-  cbn in Hl.
-  injection Hl; clear Hl; intros; subst a; flia.
-}
-rewrite <- Hl.
-apply IHlen.
-Qed.
-
 Theorem nth_bsort_rank_insert_of_sorted :
   ∀ A d (ord : A → _) l_ini n ls,
   (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
@@ -782,50 +763,45 @@ Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
   → transitive ord
   → ∀ l_ini n l i,
   NoDup l_ini
-  → NoDup l
   → sorted ord l_ini = true
-  → sorted ord l = true
-  → i < length l_ini
   → n + length l = length l_ini
+  → i < length l_ini
   → nth i (bsort_rank_loop ord (λ j, nth j l_ini d) (seq 0 n) l) 0 = i.
 Proof.
-intros * Hant Htra * Hndi Hnd Hsi Hs Hil Hnl.
-revert i n Hil Hnl.
+intros * Hant Htra * Hndi Hsi Hnl Hil.
+revert n Hnl.
 induction l; intros; cbn. {
   rewrite seq_nth; [ easy | ].
   now rewrite Nat.add_0_r in Hnl; subst n.
 }
 rewrite seq_length.
-replace (bsort_rank_insert _ _ _ _) with (seq 0 (S n)).
+replace (bsort_rank_insert _ _ _ _) with (seq 0 (S n)). 2: {
+  symmetry.
+  rewrite nth_bsort_rank_insert_of_sorted; try easy. {
+    symmetry; apply seq_S.
+  }
+  intros j Hj.
+  apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  enough (H : ord (nth j l_ini d) (nth n l_ini d) = true). {
+    specialize (Hant (nth j l_ini d) (nth n l_ini d) H) as H1.
+    apply Bool.not_true_is_false.
+    intros H'.
+    specialize (H1 H').
+    clear H H'.
+    apply NoDup_nth in H1; [ | easy | | ]; cycle 1. {
+      rewrite <- Hnl; cbn; flia Hj.
+    } {
+      rewrite <- Hnl; cbn; flia.
+    }
+    flia Hj H1.
+  }
+  apply sorted_any; [ easy | easy | easy | ].
+  rewrite <- Hnl; cbn; flia.
+}
 cbn in Hnl.
 rewrite <- Nat.add_succ_comm in Hnl.
-apply IHl; try easy. {
-  now apply NoDup_cons_iff in Hnd.
-} {
-  now apply sorted_cons in Hs.
-}
-symmetry.
-rewrite nth_bsort_rank_insert_of_sorted; try easy. {
-  symmetry; apply seq_S.
-}
-intros j Hj.
-apply in_seq in Hj.
-destruct Hj as (_, Hj); cbn in Hj.
-enough (H : ord (nth j l_ini d) (nth n l_ini d) = true). {
-  specialize (Hant (nth j l_ini d) (nth n l_ini d) H) as H1.
-  apply Bool.not_true_is_false.
-  intros H'.
-  specialize (H1 H').
-  clear H H'.
-  apply NoDup_nth in H1; [ | easy | | ]; cycle 1. {
-    rewrite <- Hnl; cbn; flia Hj.
-  } {
-    rewrite <- Hnl; cbn; flia.
-  }
-  flia Hj H1.
-}
-apply sorted_any; try easy.
-rewrite <- Hnl; cbn; flia.
+now apply IHl.
 Qed.
 
 Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
