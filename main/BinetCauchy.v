@@ -820,6 +820,7 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank_loop ].
 clear d'; cbn.
 *)
 
+(*
 Theorem glop : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
@@ -856,7 +857,9 @@ Search (bsort_rank_loop _ _ (_ ++ _)).
 Search (nth _ (bsort_rank_loop _ _ _)).
 apply IHl.
 ...
+*)
 
+(*
 Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
   antisymmetric ord
   → transitive ord
@@ -911,6 +914,25 @@ destruct i. {
         cbn - [ nth ].
         do 6 rewrite List_nth_succ_cons.
         do 4 rewrite List_nth_0_cons.
+...
+*)
+
+Theorem glop : ∀ A d (ord : A → _) l_ini l i,
+  NoDup l
+  → sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank_loop ord (λ j, nth j l_ini d) [] l) 0 = i.
+Proof.
+intros * Hnd Hs Hil.
+...
+
+Theorem glop : ∀ A d (ord : A → _) l i,
+  NoDup l
+  → sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
+Proof.
+intros * Hnd Hs Hil.
 ...
 
 Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _) l i,
