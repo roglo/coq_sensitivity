@@ -743,6 +743,7 @@ Qed.
 
 (**)
 
+(*
 Theorem bsort_rank_insert_is_sorted : ∀ A (ord : A → _) f ia lrank,
   sorted Nat.leb lrank = true
   → sorted Nat.leb (bsort_rank_insert ord f ia lrank) = true.
@@ -754,7 +755,6 @@ destruct ab. {
   remember (ib :: lrank) as l; cbn; subst l.
   apply Bool.andb_true_iff.
   split; [ | easy ].
-Abort. (*
 ...
   now apply Bool.andb_true_iff.
 } {
@@ -798,7 +798,7 @@ Theorem nth_bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) l i,
   → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
 Proof.
 intros * Hs Hil.
-Abort.
+...
 
 Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) l,
   sorted ord l = true
@@ -818,22 +818,84 @@ destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
 rewrite seq_nth; [ | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank_loop ].
 clear d'; cbn.
-Abort.
 *)
 
-Theorem nth_bsort_rank_of_sorted : ∀ A (ord : A → _) l i,
-  sorted ord l = true
+Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l i,
+  NoDup l
+  → sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
+Proof.
+intros * Hant Htra * Hnd Hs Hil.
+revert i Hil.
+induction l as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+destruct i. {
+  destruct l as [| b]; [ easy | ].
+  cbn - [ nth ].
+  rewrite List_nth_succ_cons.
+  do 2 rewrite List_nth_0_cons.
+  cbn in Hs.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hab, Hs).
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    cbn.
+    specialize (Hant a b Hab Hba) as H1; subst b.
+    apply NoDup_cons_iff in Hnd.
+    now exfalso; apply Hnd; left.
+  } {
+    destruct l as [| c]; [ easy | ].
+    cbn - [ nth ].
+    do 3 rewrite List_nth_succ_cons.
+    do 3 rewrite List_nth_0_cons.
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hbc, Hs).
+    specialize (Htra a b c Hab Hbc) as Hac.
+    remember (ord c a) as ca eqn:Hca; symmetry in Hca.
+    destruct ca. {
+      specialize (Hant a c Hac Hca) as H1; subst c.
+      apply NoDup_cons_iff in Hnd.
+      now exfalso; apply Hnd; right; left.
+    } {
+      remember (ord c b) as cb eqn:Hcb; symmetry in Hcb.
+      destruct cb. {
+        specialize (Hant b c Hbc Hcb) as H1; subst c.
+        apply NoDup_cons_iff in Hnd.
+        destruct Hnd as (_, Hnd).
+        apply NoDup_cons_iff in Hnd.
+        now exfalso; apply Hnd; left.
+      } {
+        destruct l as [| e]; [ easy | ].
+        cbn - [ nth ].
+        do 6 rewrite List_nth_succ_cons.
+        do 4 rewrite List_nth_0_cons.
+...
+
+Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _) l i,
+  NoDup l
+  → sorted ord l = true
   → i < length l
   → nth i (bsort_rank ord l) 0 = i.
 Proof.
-intros * Hs Hil.
+intros * Hnd Hs Hil.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+...
+Compute (let l := [19; 7; 2] in let ord i j := negb (Nat.leb i j) in (sorted ord l, bsort_rank ord l)).
 ...
 
-Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
-  sorted ord l = true
+Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _) l,
+  NoDup l
+  → sorted ord l = true
   → bsort_rank ord l = seq 0 (length l).
 Proof.
-intros * Hs.
+intros * Hnd Hs.
 apply List_eq_iff.
 rewrite length_bsort_rank, seq_length.
 split; [ easy | ].
@@ -847,12 +909,6 @@ destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
 rewrite seq_nth; [ cbn | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
 clear d.
-...
-
-destruct l as [| d]; [ easy | ].
-cbn - [ bsort_rank_loop length nth seq ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
 ...
 
 Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
