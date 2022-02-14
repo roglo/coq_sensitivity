@@ -743,6 +743,23 @@ Qed.
 
 (**)
 
+Theorem sorted_bsort : ∀ A (ord : A → _) ls l,
+  sorted ord (ls ++ l) = true
+  → bsort_loop ord ls l = ls ++ l.
+Proof.
+intros * Hs.
+revert ls Hs.
+induction l as [| a]; intros.
+...
+
+Theorem sorted_bsort : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → bsort ord l = l.
+Proof.
+intros * Hs.
+unfold bsort.
+...
+
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
   mat_nrows A = n
@@ -969,6 +986,9 @@ f_equal. 2: {
   rewrite <- Hnu, Hklm.
   apply canon_sym_gr_list_ub; [ flia Hi Hmz | easy ].
 }
+f_equal.
+...
+now apply sorted_bsort.
 ...
 g (h i) = i
 canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
