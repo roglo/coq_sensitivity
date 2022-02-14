@@ -2778,6 +2778,110 @@ rename lc into lb; rename ld into lc.
 now apply sorted_middle in Hsort.
 Qed.
 
+Theorem nth_bsort_rank_insert_of_sorted :
+  ∀ A d (ord : A → _) l_ini n ls,
+  (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
+  → bsort_rank_insert ord (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
+Proof.
+intros * Hls.
+induction ls as [| b]; [ easy | cbn ].
+rewrite Hls; [ | now left ].
+f_equal.
+apply IHls.
+intros j Hj.
+apply Hls.
+now right.
+Qed.
+
+Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l_ini n l i,
+  NoDup l_ini
+  → sorted ord l_ini = true
+  → n + length l = length l_ini
+  → i < length l_ini
+  → nth i (bsort_rank_loop ord (λ j, nth j l_ini d) (seq 0 n) l) 0 = i.
+Proof.
+intros * Hant Htra * Hndi Hsi Hnl Hil.
+revert n Hnl.
+induction l; intros; cbn. {
+  rewrite seq_nth; [ easy | ].
+  now rewrite Nat.add_0_r in Hnl; subst n.
+}
+rewrite seq_length.
+replace (bsort_rank_insert _ _ _ _) with (seq 0 (S n)). 2: {
+  symmetry.
+  rewrite nth_bsort_rank_insert_of_sorted; try easy. {
+    symmetry; apply seq_S.
+  }
+  intros j Hj.
+  apply in_seq in Hj.
+  destruct Hj as (_, Hj); cbn in Hj.
+  enough (H : ord (nth j l_ini d) (nth n l_ini d) = true). {
+    specialize (Hant (nth j l_ini d) (nth n l_ini d) H) as H1.
+    apply Bool.not_true_is_false.
+    intros H'.
+    specialize (H1 H').
+    clear H H'.
+    apply NoDup_nth in H1; [ | easy | | ]; cycle 1. {
+      rewrite <- Hnl; cbn; flia Hj.
+    } {
+      rewrite <- Hnl; cbn; flia.
+    }
+    flia Hj H1.
+  }
+  apply sorted_any; [ easy | easy | easy | ].
+  rewrite <- Hnl; cbn; flia.
+}
+cbn in Hnl.
+rewrite <- Nat.add_succ_comm in Hnl.
+now apply IHl.
+Qed.
+
+Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l i,
+  NoDup l
+  → sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank ord l) 0 = i.
+Proof.
+intros * Hant Htra * Hnd Hs Hil.
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop nth ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+replace [] with (seq 0 0) by easy.
+now apply nth_bsort_rank_loop_of_nodup_sorted.
+Qed.
+
+Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l,
+  NoDup l
+  → sorted ord l = true
+  → bsort_rank ord l = seq 0 (length l).
+Proof.
+intros * Hant Htra * Hnd Hs.
+apply List_eq_iff.
+rewrite length_bsort_rank, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank ].
+  rewrite nth_overflow; [ | now rewrite seq_length ].
+  easy.
+}
+rewrite seq_nth; [ cbn | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
+clear d.
+now apply nth_bsort_rank_of_nodup_sorted.
+Qed.
+
 (* end sorted *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
