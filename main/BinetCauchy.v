@@ -820,6 +820,43 @@ rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank_loop ].
 clear d'; cbn.
 *)
 
+Theorem glop : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ f lrank l i,
+  NoDup l
+  → sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank_loop ord f lrank l) 0 = i.
+Proof.
+intros * Hant Htra * Hnd Hs Hil.
+revert i lrank Hil.
+induction l as [| a]; intros; [ easy | cbn ].
+assert (H : NoDup l) by now apply NoDup_cons_iff in Hnd.
+specialize (IHl H); clear H.
+assert (H : sorted ord l = true) by now apply sorted_cons in Hs.
+specialize (IHl H); clear H.
+destruct (Nat.eq_dec i (length l)) as [Hil'| Hil']. 2: {
+  cbn in Hil.
+  apply IHl; flia Hil Hil'.
+}
+clear Hil.
+subst i.
+(*
+remember (bsort_rank_insert ord f (length lrank) lrank) as lrank' eqn:Hr'.
+assert (lrank' = lrank ++ [length lrank]).
+*)
+Print bsort_rank_insert.
+Theorem glop : ∀ A B (ord : A → _) (f : B → A) ia lrank,
+  bsort_rank_insert ord f ia lrank = lrank ++ [ia].
+Admitted.
+rewrite glop.
+Search (bsort_rank_loop _ _ (_ ++ _)).
+...
+Search (nth _ (bsort_rank_loop _ _ _)).
+apply IHl.
+...
+
 Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
   antisymmetric ord
   → transitive ord
@@ -830,6 +867,7 @@ Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
   → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
 Proof.
 intros * Hant Htra * Hnd Hs Hil.
+...
 revert i Hil.
 induction l as [| a]; intros; [ easy | ].
 cbn - [ nth ].
