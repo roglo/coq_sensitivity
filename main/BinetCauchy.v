@@ -762,7 +762,8 @@ rewrite <- Hl.
 apply IHlen.
 Qed.
 
-Theorem glop : ∀ A d (ord : A → _) l_ini n ls l i a,
+Theorem nth_bsort_rank_insert_of_nodup_sorted :
+  ∀ A d (ord : A → _) l_ini n ls l i a,
   NoDup l_ini
   → NoDup (a :: l)
   → sorted ord l_ini = true
@@ -782,7 +783,7 @@ apply Hls.
 now right.
 Qed.
 
-Theorem glip : ∀ A d (ord : A → _),
+Theorem nth_bsort_rank_loop_of_nodup_sorted : ∀ A d (ord : A → _),
   antisymmetric ord
   → transitive ord
   → ∀ l_ini n l i,
@@ -810,7 +811,8 @@ apply IHl; try easy. {
   now apply sorted_cons in Hs.
 }
 symmetry.
-rewrite glop with (l := l) (i := i) (a := a); try easy. {
+rewrite nth_bsort_rank_insert_of_nodup_sorted with (l := l) (i := i) (a := a);
+  try easy. {
   symmetry; apply seq_S.
 }
 intros j Hj.
@@ -848,7 +850,7 @@ cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
 replace [] with (seq 0 0) by easy.
-now apply glip.
+now apply nth_bsort_rank_loop_of_nodup_sorted.
 Qed.
 
 Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
