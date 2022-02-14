@@ -917,45 +917,104 @@ destruct i. {
 ...
 *)
 
-Theorem glop : ∀ A d (ord : A → _) l_ini l i,
-  NoDup l
-  → sorted ord l = true
-  → i < length l
-  → nth i (bsort_rank_loop ord (λ j, nth j l_ini d) [] l) 0 = i.
+Theorem glop : ∀ A d (ord : A → _) l_ini n ls l i a,
+  NoDup l_ini
+  → NoDup (a :: l)
+  → sorted ord l_ini = true
+  → sorted ord (a :: l) = true
+  → i < length l_ini
+  → n + S (length l) = length l_ini
+  → (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
+  → bsort_rank_insert ord (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
 Proof.
-intros * Hnd Hs Hil.
-...
+intros * Hndi Hnd Hsi Hs Hil Hnl Hls.
+induction ls as [| b]; [ easy | cbn ].
+rewrite Hls; [ | now left ].
+f_equal.
+apply IHls.
+intros j Hj.
+apply Hls.
+now right.
+Qed.
 
-Theorem glop : ∀ A d (ord : A → _) l i,
-  NoDup l
+Theorem glip : ∀ A d (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l_ini n l i,
+  NoDup l_ini
+  → NoDup l
+  → sorted ord l_ini = true
   → sorted ord l = true
-  → i < length l
-  → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
+  → i < length l_ini
+  → n + length l = length l_ini
+  → nth i (bsort_rank_loop ord (λ j, nth j l_ini d) (seq 0 n) l) 0 = i.
 Proof.
-intros * Hnd Hs Hil.
-...
+intros * Hant Htra * Hndi Hnd Hsi Hs Hil Hnl.
+revert i n Hil Hnl.
+induction l; intros; cbn. {
+  rewrite seq_nth; [ easy | ].
+  now rewrite Nat.add_0_r in Hnl; subst n.
+}
+rewrite seq_length.
+replace (bsort_rank_insert _ _ _ _) with (seq 0 (S n)).
+cbn in Hnl.
+rewrite <- Nat.add_succ_comm in Hnl.
+apply IHl; try easy. {
+  now apply NoDup_cons_iff in Hnd.
+} {
+  now apply sorted_cons in Hs.
+}
+symmetry.
+rewrite glop with (l := l) (i := i) (a := a); try easy. {
+  symmetry; apply seq_S.
+}
+intros j Hj.
+apply in_seq in Hj.
+destruct Hj as (_, Hj); cbn in Hj.
+enough (H : ord (nth j l_ini d) (nth n l_ini d) = true). {
+  specialize (Hant (nth j l_ini d) (nth n l_ini d) H) as H1.
+  apply Bool.not_true_is_false.
+  intros H'.
+  specialize (H1 H').
+  clear H H'.
+  apply NoDup_nth in H1; [ | easy | | ]; cycle 1. {
+    rewrite <- Hnl; cbn; flia Hj.
+  } {
+    rewrite <- Hnl; cbn; flia.
+  }
+  flia Hj H1.
+}
+apply sorted_any; try easy.
+rewrite <- Hnl; cbn; flia.
+Qed.
 
-Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _) l i,
+Theorem nth_bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l i,
   NoDup l
   → sorted ord l = true
   → i < length l
   → nth i (bsort_rank ord l) 0 = i.
 Proof.
-intros * Hnd Hs Hil.
+intros * Hant Htra * Hnd Hs Hil.
 destruct l as [| d]; [ easy | ].
 cbn - [ bsort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
-...
-Compute (let l := [19; 7; 2] in let ord i j := negb (Nat.leb i j) in (sorted ord l, bsort_rank ord l)).
-...
+replace [] with (seq 0 0) by easy.
+now apply glip.
+Qed.
 
-Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _) l,
+Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → ∀ l,
   NoDup l
   → sorted ord l = true
   → bsort_rank ord l = seq 0 (length l).
 Proof.
-intros * Hnd Hs.
+intros * Hant Htra * Hnd Hs.
 apply List_eq_iff.
 rewrite length_bsort_rank, seq_length.
 split; [ easy | ].
@@ -969,262 +1028,8 @@ destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
 rewrite seq_nth; [ cbn | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
 clear d.
-...
-
-Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
-  sorted ord l = true
-  → sorted Nat.leb (bsort_rank ord l) = true.
-Proof.
-intros * Hs.
-destruct l as [| d]; [ easy | ].
-cbn - [ bsort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
-...
-specialize bsort_is_sorted as H1.
-specialize (H1 A ord).
-enough (Htot : total_order ord).
-specialize (H1 Htot l).
-rewrite (bsort_bsort_rank ord d) in H1.
-destruct l as [| d']; [ easy | ].
-cbn - [ bsort_rank_loop nth ] in H1.
-remember (d' :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
-...
-intros * Hs.
-destruct l as [| d]; [ easy | ].
-cbn - [ bsort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
-replace [] with (seq 0 0) by easy.
-...
-now apply bsort_rank_loop_is_sorted.
-...
-
-Theorem bsort_rank_loop_is_sorted : ∀ A (ord : A → _) f n l,
-  sorted ord l = true
-  → sorted Nat.leb (bsort_rank_loop ord f (seq 0 n) l) = true.
-Proof.
-intros * Hs.
-revert n.
-induction l as [| a]; intros; [ apply sorted_seq | cbn ].
-rewrite seq_length.
-Theorem glop : ∀ A (ord : A → _) f n,
-  bsort_rank_insert ord f n (seq 0 n) = seq 0 (S n).
-Proof.
-intros.
-induction n; [ easy | ].
-do 3 rewrite seq_S.
-cbn.
-...
-rewrite glop.
-apply IHl.
-...
-
-Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → ∀ l,
-  NoDup l
-  → sorted ord l = true
-  → bsort_rank ord l = seq 0 (length l).
-Proof.
-intros * Hant Htra * Hnd Hs.
-(*
-specialize (bsort_rank_is_sorted) as H1.
-specialize (H1 Nat.leb Nat_leb_has_total_order (bsort_rank ord l)).
-Search (_ = seq _ _).
-*)
-replace (length l) with (length (bsort_rank ord l)).
-apply sorted_permut. {
-  apply bsort_rank_is_permut_list.
-} {
-...
-  apply sorted_bsort_rank_is_sorted.
-...
-} {
-  apply length_bsort_rank.
-}
-...
-Check bsort_rank_is_sorted.
-...
-
-...
-
-(*
-Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f n l,
-  sorted ord l = true
-  → (∀ i, i < length l → f (n + i) = nth i l d)
-  → bsort_rank_loop ord f (seq 0 n) l = seq 0 (n + length l).
-Proof.
-intros * Hs Hf.
-revert n Hf.
-induction l as [| a]; intros; cbn. {
-  now rewrite Nat.add_0_r.
-}
-rewrite seq_length.
-rewrite <- Nat.add_succ_comm.
-rewrite Nat.add_succ_l.
-rewrite seq_S.
-cbn.
-Print bsort_rank_insert.
-Theorem glop : ∀ A (ord : A → _) f l (n : nat),
-  (∀ i, i ∈ l → ord (f n) (f i) = false)
-  → bsort_rank_insert ord f n l = l ++ [n].
-Proof.
-intros * Hn.
-revert n Hn.
-induction l as [| a]; intros; [ easy | cbn ].
-rewrite Hn; [ | now left ].
-f_equal.
-apply IHl.
-intros i Hi.
-apply Hn.
-now right.
+now apply nth_bsort_rank_of_nodup_sorted.
 Qed.
-rewrite glop. 2: {
-  intros i Hi.
-  apply in_seq in Hi.
-  destruct Hi as (_, Hi); cbn in Hi.
-  specialize (Hf 0 (Nat.lt_0_succ _)) as H1.
-  rewrite Nat.add_comm in H1; cbn in H1; rewrite H1.
-  specialize (Hf (length l)) as H2.
-  specialize (H2 (Nat.lt_succ_diag_r _)).
-(* ouais, chais pas *)
-...
-rewrite <- IHl.
-rewrite glop.
-rewrite seq_S.
-cbn.
-Search (bsort_rank_loop _ _ (_ ++ _)).
-...
-
-Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) f ls l,
-  sorted ord l = true
-  → sorted Nat.leb ls = true
-  → (∀ i, i < length l → f (length ls + i) = nth i l d)
-  → bsort_rank_loop ord f ls l = seq 0 (length ls + length l).
-Proof.
-intros * Hs Hss Hf.
-revert ls Hss Hf.
-induction l as [| a]; intros; cbn. {
-  rewrite Nat.add_0_r.
-Search sorted.
-...
-*)
-
-Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → ∀ l,
-  NoDup l
-  → sorted ord l = true
-  → bsort_rank ord l = seq 0 (length l).
-Proof.
-intros * Hant Htra * Hnd Hs.
-destruct l as [| d]; [ easy | ].
-remember (length (d :: l)) as n eqn:Hn.
-cbn - [ bsort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-subst n.
-clear l Hl'; rename l' into l.
-...
-Theorem glop : ∀ A d (ord : A → _) l,
-  NoDup l
-  → sorted ord l = true
-  → bsort_rank_loop ord (λ i : nat, nth i l d) [] l = seq 0 (length l).
-Proof.
-...
-(**)
-destruct l as [| a1]; [ easy | ].
-destruct l as [| a2]; [ easy | ].
-destruct l as [| a3]. {
-  cbn in Hs |-*.
-  remember (ord a2 a1) as a21 eqn:H21; symmetry in H21.
-  destruct a21; [ exfalso | easy ].
-  apply NoDup_cons_iff in Hnd.
-  destruct Hnd as (Hnd, _).
-  apply Hnd; clear Hnd; left.
-  apply Bool.andb_true_iff in Hs.
-  now apply Hant.
-}
-destruct l as [| a4]. {
-  cbn in Hs |-*.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (H12 & Hs).
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (H23, _).
-  apply NoDup_cons_iff in Hnd.
-  destruct Hnd as (Ha123, Hnd).
-  apply NoDup_cons_iff in Hnd.
-  destruct Hnd as (Ha23, _).
-  remember (ord a2 a1) as a21 eqn:H21; symmetry in H21.
-  destruct a21. {
-    exfalso.
-    apply Ha123; clear Ha123; left.
-    now apply Hant.
-  }
-  cbn.
-  remember (ord a3 a1) as a31 eqn:H31; symmetry in H31.
-  destruct a31. {
-    exfalso.
-    apply Ha123; clear Ha123; right; left.
-    apply Hant; [ easy | ].
-    now apply Htra with (b := a2).
-  }
-  remember (ord a3 a2) as a32 eqn:H32; symmetry in H32.
-  destruct a32; [ exfalso | easy ].
-  apply Ha23; clear Ha23; left.
-  now apply Hant.
-}
-...
-specialize (bsort_rank_loop_of_sorted) as H1.
-specialize (H1 A d ord (λ i, nth i l d) 0 l Hs).
-cbn in H1.
-now apply H1.
-...
-intros * Hs.
-remember (length l) as n eqn:Hn; symmetry in Hn.
-revert A ord l Hs Hn.
-induction n; intros. {
-  now apply length_zero_iff_nil in Hn; subst l.
-}
-destruct l as [| a]; [ easy | ].
-rewrite seq_S.
-assert (Hps : is_permut (S n) (bsort_rank ord (a :: l))). {
-  now apply bsort_rank_is_permut.
-}
-cbn in Hn.
-apply Nat.succ_inj in Hn.
-specialize (permut_without_highest Hps) as H1.
-rewrite length_bsort_rank in H1.
-destruct H1 as (i & Hil & Hin & Hpb).
-specialize (IHn _ Nat.leb (butn i (bsort_rank ord (a :: l)))) as H1.
-rewrite butn_length in H1.
-rewrite length_bsort_rank in H1.
-apply Nat.ltb_lt in Hil.
-rewrite Hil in H1.
-rewrite List_length_cons in H1.
-rewrite Nat_sub_succ_1 in H1.
-rewrite Hn in H1.
-Search (bsort_rank _ (butn _ _)).
-...
-erewrite <- IHn.
-Search bsort_rank.
-  specialize (H1 (a :: l)).
-  rewrite <- Hn.
-  apply bsort_rank_is_permut_list.
-  apply bsort_rank_is_permut_list.
-...
-...
-Search (bsort_rank_highest).
-rewrite <- IHn.
-cbn - [ bsort_rank_loop nth seq ].
-...
-intros * Hs.
-induction l as [| a]; intros; [ easy | ].
-cbn - [ bsort_rank_loop nth seq ].
-...
 
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
@@ -1439,8 +1244,19 @@ f_equal. 2: {
   rewrite permut_bsort_rank_involutive. 2: {
     apply bsort_rank_is_permut_list.
   }
-...
-  rewrite bsort_rank_of_sorted; [ | easy ].
+  rewrite bsort_rank_of_nodup_sorted; [ | | | easy | easy ]; cycle 1. {
+    apply Nat_leb_antisym.
+  } {
+    apply Nat_leb_trans.
+  }
+  rewrite comp_1_l; [ easy | ].
+  intros k Hk.
+  apply (In_nth _ _ 0) in Hk.
+  rewrite length_canon_sym_gr_list in Hk.
+  destruct Hk as (u & Hum & Hnu).
+  rewrite <- Hnu, Hklm.
+  apply canon_sym_gr_list_ub; [ flia Hi Hmz | easy ].
+}
 ...
 g (h i) = i
 canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
