@@ -791,6 +791,70 @@ rewrite <- Hl.
 apply IHlen.
 Qed.
 
+(*
+Theorem nth_bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) l i,
+  sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank_loop ord (λ j, nth j l d) [] l) 0 = i.
+Proof.
+intros * Hs Hil.
+Abort.
+
+Theorem bsort_rank_loop_of_sorted : ∀ A d (ord : A → _) l,
+  sorted ord l = true
+  → bsort_rank_loop ord (λ i, nth i l d) [] l = seq 0 (length l).
+Proof.
+intros * Hs.
+apply List_eq_iff.
+rewrite length_bsort_rank_loop, seq_length.
+split; [ easy | ].
+intros d' i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
+  rewrite nth_overflow; [ | now rewrite seq_length ].
+  easy.
+}
+rewrite seq_nth; [ | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank_loop ].
+clear d'; cbn.
+Abort.
+*)
+
+Theorem nth_bsort_rank_of_sorted : ∀ A (ord : A → _) l i,
+  sorted ord l = true
+  → i < length l
+  → nth i (bsort_rank ord l) 0 = i.
+Proof.
+intros * Hs Hil.
+...
+
+Theorem bsort_rank_of_sorted : ∀ A (ord : A → _) l,
+  sorted ord l = true
+  → bsort_rank ord l = seq 0 (length l).
+Proof.
+intros * Hs.
+apply List_eq_iff.
+rewrite length_bsort_rank, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank ].
+  rewrite nth_overflow; [ | now rewrite seq_length ].
+  easy.
+}
+rewrite seq_nth; [ cbn | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
+clear d.
+...
+
+destruct l as [| d]; [ easy | ].
+cbn - [ bsort_rank_loop length nth seq ].
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+...
+
 Theorem sorted_bsort_rank_is_sorted : ∀ A (ord : A → _) l,
   sorted ord l = true
   → sorted Nat.leb (bsort_rank ord l) = true.
