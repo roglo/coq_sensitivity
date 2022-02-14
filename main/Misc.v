@@ -2728,6 +2728,50 @@ split. {
 }
 Qed.
 
+Theorem sorted_app_iff : ∀ A ord,
+  transitive ord
+  → ∀ (la lb : list A),
+  sorted ord (la ++ lb) = true
+  ↔ sorted ord la = true ∧ sorted ord lb = true ∧
+    (∀ a b, a ∈ la → b ∈ lb → ord a b = true).
+Proof.
+intros * Htra *.
+split. {
+  intros Hab.
+  apply sorted_app in Hab.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros a b Ha Hb.
+  now apply Hab.
+} {
+  intros (Ha & Hb & Hab).
+  revert lb Hb Hab.
+  induction la as [| a] using rev_ind; intros; [ easy | cbn ].
+  rewrite <- app_assoc; cbn.
+  apply IHla. {
+    now apply sorted_app in Ha.
+  } {
+    cbn.
+    destruct lb as [| b]; [ easy | ].
+    rewrite Hab; cycle 1. {
+      now apply in_or_app; right; left.
+    } {
+      now left.
+    }
+    now rewrite Hb.
+  }
+  intros a' b' Ha' Hb'.
+  destruct Hb' as [Hb'| Hb']. {
+    apply sorted_app in Ha.
+    subst b'.
+    apply Ha; [ easy | easy | now left ].
+  } {
+    apply Hab; [ | easy ].
+    now apply in_or_app; left.
+  }
+}
+Qed.
+
 Theorem sorted_middle : ∀ A ord (a b : A) la lb lc,
   transitive ord
   → sorted ord (la ++ a :: lb ++ b :: lc) = true

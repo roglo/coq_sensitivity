@@ -743,13 +743,85 @@ Qed.
 
 (**)
 
-Theorem sorted_bsort : ∀ A (ord : A → _) ls l,
+Theorem sorted_bsort_loop : ∀ A (ord : A → _),
+  transitive ord
+  → ∀ ls l,
   sorted ord (ls ++ l) = true
   → bsort_loop ord ls l = ls ++ l.
 Proof.
-intros * Hs.
+intros * Htra * Hs.
 revert ls Hs.
-induction l as [| a]; intros.
+induction l as [| a]; intros; [ now rewrite app_nil_r | cbn ].
+rewrite IHl. 2: {
+  apply sorted_app_iff; [ easy | ].
+  split. {
+Print bsort_insert.
+Theorem sorted_bsort_insert : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → total_order ord
+  → ∀ a ls l,
+  sorted ord (ls ++ a :: l) = true
+  → sorted ord (bsort_insert ord a ls) = true.
+Proof.
+intros * Hant Htra Htot * Hs.
+revert a l Hs.
+induction ls as [| b]; intros; [ easy | cbn ].
+remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  specialize (sorted_middle) as Hba.
+  specialize (Hba A ord b a [] ls l Htra Hs).
+  specialize (Hant a b Hab Hba) as H; subst b.
+  remember (a :: ls) as ls'; cbn; subst ls'.
+  rewrite Hba.
+  apply sorted_app_iff in Hs; [ | easy ].
+  destruct Hs as (Hs, _).
+  now rewrite Hs.
+} {
+  cbn.
+  remember (bsort_insert ord a ls) as ls' eqn:Hls'.
+  symmetry in Hls'.
+  destruct ls' as [| a']; [ easy | ].
+  apply Bool.andb_true_iff.
+  split. 2: {
+    rewrite <- Hls'.
+    apply IHls with (l := l).
+    cbn - [ sorted ] in Hs.
+    now apply sorted_cons in Hs.
+  } {
+    replace (b :: ls) with ([b] ++ ls) in Hs by easy.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hs as (Hls & Hal & Hs).
+    apply Hs; [ now left | ].
+...
+  specialize (Htot a' b) as H1.
+  rewrite Hab in H1; cbn in H1.
+  rewrite H1; cbn.
+...
+  apply sorted_app_iff in Hs; [ | easy ].
+  destruct Hs as (Hbs & Hal & Hs).
+  rewrite Hs; [ | now left | ].
+
+  now rewrite Hs.
+...
+now apply sorted_bsort_insert with (l := l).
+...
+... suite ok
+  }
+  apply sorted_app_iff in Hs; [ | easy ].
+  destruct Hs as (Hs & Has & Htr).
+  split. {
+    now apply sorted_cons in Has.
+  } {
+    intros a' b' Ha' Hb'.
+    apply in_bsort_insert in Ha'.
+    destruct Ha' as [Ha'| Ha']. {
+      subst a'.
+      now apply sorted_extends with (l := l).
+    }
+    apply Htr; [ easy | now right ].
+  }
+}
 ...
 
 Theorem sorted_bsort : ∀ A (ord : A → _) l,
