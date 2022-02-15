@@ -829,16 +829,21 @@ rewrite IHl. 2: {
 }
 replace (a :: l) with ([a] ++ l) by easy.
 rewrite app_assoc; f_equal.
+specialize (IHl (ls ++ [a])) as H1.
+rewrite <- app_assoc in H1.
+specialize (H1 Hs).
+cbn in H1.
+...
 replace (a :: l) with ([a] ++ l) in Hs by easy.
 rewrite app_assoc in Hs.
-apply sorted_app in Hs.
-destruct Hs as (Hs, _).
+apply sorted_app_iff in Hs; [ | easy ].
+destruct Hs as (Hsa & Hsl & Hs).
 induction ls as [| b]; [ easy | cbn ].
 remember (ord a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
-  apply sorted_app_iff in Hs; [ | easy ].
-  destruct Hs as (Hs & _ & Ho).
-  specialize (Ho b a (or_introl eq_refl) (or_introl eq_refl)) as H1.
+  apply sorted_app_iff in Hsa; [ | easy ].
+  destruct Hsa as (Hsb & _ & Hs').
+  specialize (Hs' b a (or_introl eq_refl) (or_introl eq_refl)) as H1.
   specialize (Hant _ _ Hab H1) as H2; subst b; clear H1.
 ...
 apply sorted_bsort_insert in Hs; [ | easy | easy | easy ].
