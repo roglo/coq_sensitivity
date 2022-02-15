@@ -917,6 +917,11 @@ Theorem det_with_rows : in_charac_0_field →
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hks Hkn.
+(* c'est quoi, ce bordel ? bsort Nat.leb kl est égal à kl !
+   donc, ça veut simplement dire que ε kl = 1 ???
+   j'ai rien prouvé du tout, là ! *)
+...
+intros Hif * Hra Hca Ha Hnkl Hklm Hks Hkn.
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
@@ -1140,6 +1145,8 @@ apply sorted_bsort; [ | | | easy ]. {
 }
 Qed.
 
+...
+
 Arguments det_with_rows Hif (m n)%nat _ [kl]%list.
 
 Theorem cauchy_binet_formula : in_charac_0_field →
@@ -1208,6 +1215,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det det' mat_nrows ].
+Search (det (mat_with_rows _ _)).
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 Print det'.
 Check det_with_rows.
