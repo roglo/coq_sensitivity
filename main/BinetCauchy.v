@@ -829,6 +829,17 @@ rewrite IHl. 2: {
 }
 replace (a :: l) with ([a] ++ l) by easy.
 rewrite app_assoc; f_equal.
+replace (a :: l) with ([a] ++ l) in Hs by easy.
+rewrite app_assoc in Hs.
+apply sorted_app in Hs.
+destruct Hs as (Hs, _).
+induction ls as [| b]; [ easy | cbn ].
+remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply sorted_app_iff in Hs; [ | easy ].
+  destruct Hs as (Hs & _ & Ho).
+  specialize (Ho b a (or_introl eq_refl) (or_introl eq_refl)) as H1.
+  specialize (Hant _ _ Hab H1) as H2; subst b; clear H1.
 ...
 apply sorted_bsort_insert in Hs; [ | easy | easy | easy ].
 Search (sorted _ _ = true → _).
