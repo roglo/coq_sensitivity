@@ -628,6 +628,25 @@ apply H1.
 now right.
 Qed.
 
+Theorem sub_list_of_seq_0_n_has_no_dup :
+  ∀ m n l, l ∈ sub_lists_of_seq_0_n m n → NoDup l.
+Proof.
+intros * Hs.
+specialize (sub_lists_of_seq_0_n_are_sorted m n) as H1.
+specialize (H1 _ eq_refl _ Hs).
+clear - H1.
+induction l as [| a]; [ constructor | ].
+constructor. {
+  intros Hal.
+  specialize sorted_extends as H2.
+  specialize (H2 _ Nat.ltb a l Nat_ltb_trans H1).
+  specialize (H2 a Hal).
+  now rewrite Nat.ltb_irrefl in H2.
+}
+apply IHl.
+now apply sorted_cons in H1.
+Qed.
+
 Theorem sub_lists_of_seq_0_n_is_inj : ∀ n k ll,
   ll = sub_lists_of_seq_0_n n k
   → ∀ i j, i < length ll → j < length ll →
@@ -1175,15 +1194,20 @@ rewrite det_is_det_by_canon_permut; try now destruct Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros s Hs.
   rewrite (det_with_rows Hif m n B Hbr Hbc Hcb); cycle 1. {
-    specialize sub_lists_of_seq_0_n_is_inj as H1.
-    specialize (H1 n m _ eq_refl).
-    rewrite sub_lists_of_seq_0_n_length in H1.
-Search (nth _ (sub_lists_of_seq_0_n _ _)).
-...
-    apply nat_NoDup.
-    intros i j Hi Hj Hij.
-    rewrite (sub_list_firstn_nat_length n m) in Hi; [ | easy ].
-    rewrite (sub_list_firstn_nat_length n m) in Hj; [ | easy ].
+    now apply (sub_list_of_seq_0_n_has_no_dup n m).
+  } {
+    now apply sub_list_firstn_nat_length in Hs.
+  } {
+    specialize (sub_lists_of_seq_0_n_are_sorted n m) as H1.
+    specialize (H1 _ eq_refl _ Hs).
+    now apply sorted_ltb_leb_incl.
+  } {
+    intros k Hk.
+    now apply sub_lists_of_seq_0_n_lt with (k := m) (t := s).
+  }
+  easy.
+}
+cbn - [ det det' mat_nrows ].
 ...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.

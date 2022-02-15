@@ -2822,6 +2822,21 @@ rename lc into lb; rename ld into lc.
 now apply sorted_middle in Hsort.
 Qed.
 
+Theorem sorted_ltb_leb_incl : ∀ l,
+  sorted Nat.ltb l = true → sorted Nat.leb l = true.
+Proof.
+intros * Hs.
+induction l as [| a]; [ easy | ].
+cbn - [ Nat.ltb ] in Hs |-*.
+destruct l as [| b]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+apply Bool.andb_true_iff.
+destruct Hs as (Hab, Hs).
+split; [ | now apply IHl ].
+apply Nat.ltb_lt in Hab.
+now apply Nat.leb_le, Nat.lt_le_incl.
+Qed.
+
 Theorem nth_bsort_rank_insert_of_sorted :
   ∀ A d (ord : A → _) l_ini n ls,
   (∀ i, i ∈ ls → ord (nth n l_ini d) (nth i l_ini d) = false)
