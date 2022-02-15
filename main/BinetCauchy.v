@@ -911,17 +911,11 @@ Theorem det_with_rows : in_charac_0_field →
   → is_correct_matrix A = true
   → NoDup kl
   → length kl = m
-  → sorted Nat.leb kl = true
   → (∀ k, k ∈ kl → k < n)
   → det (mat_with_rows kl A) =
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
-intros Hif * Hra Hca Ha Hnkl Hklm Hks Hkn.
-(* c'est quoi, ce bordel ? bsort Nat.leb kl est égal à kl !
-   donc, ça veut simplement dire que ε kl = 1 ???
-   j'ai rien prouvé du tout, là ! *)
-...
-intros Hif * Hra Hca Ha Hnkl Hklm Hks Hkn.
+intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
@@ -1122,6 +1116,9 @@ f_equal. 2: {
   rewrite permut_bsort_rank_involutive. 2: {
     apply bsort_rank_is_permut_list.
   }
+(* mmm.... si kl n'est pas trié (il n'est pas censé l'être, je ne vois
+   pas en quoi ce serait vrai, ça ; j'ai merdé quelque part *)
+...
   rewrite bsort_rank_of_nodup_sorted; [ | | | easy | easy ]; cycle 1. {
     apply Nat_leb_antisym.
   } {
