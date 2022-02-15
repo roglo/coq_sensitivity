@@ -1121,10 +1121,6 @@ apply sorted_bsort; [ | | | easy ]. {
 }
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -1173,6 +1169,9 @@ assert (Hab : is_square_matrix (A * B) = true). {
   }
 }
 (*1*)
+rewrite det_is_det_by_canon_permut.
+Check det_with_rows.
+...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
 unfold mat_mul, mat_mul_el.
