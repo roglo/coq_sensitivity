@@ -1208,6 +1208,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det det' mat_nrows ].
+(* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
+Print det'.
+Check det_with_rows.
+Search (det (mat_with_rows _ _)).
 ...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
