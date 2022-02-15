@@ -1000,14 +1000,14 @@ assert (Hgh : ∀ i, i < m! → g (h i) = i). {
   }
   now apply canon_sym_gr_inv_of_canon_sym_gr.
 }
-specialize (fact_neq_0 m) as Hmz.
+specialize (fact_neq_0 m) as Hfmz.
 rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
   intros i Hi.
   apply Hgh.
-  flia Hi Hmz.
+  flia Hi Hfmz.
 }
 rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+rewrite <- Nat.sub_succ_l; [ | flia Hfmz ].
 rewrite Nat_sub_succ_1.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
@@ -1101,11 +1101,43 @@ rewrite Nat.add_0_l.
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 f_equal.
-(* ouais, faut faire encore un changt de variable ! *)
+(**)
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  move Hmz at top; subst m.
+  rewrite rngl_product_empty; [ | easy ].
+  rewrite rngl_product_empty; [ | easy ].
+  easy.
+}
+rewrite (rngl_product_shift 1); [ | flia Hmz ].
+rewrite Nat.sub_diag.
+erewrite rngl_product_eq_compat. 2: {
+  intros j (_, Hj).
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+rewrite (rngl_product_shift 1); [ | flia Hmz ].
+rewrite Nat.sub_diag.
+erewrite rngl_product_eq_compat. 2: {
+  intros j (_, Hj).
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+erewrite rngl_product_change_var.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+rewrite Nat_sub_succ_1.
+...
+the row
+   (mat_with_rows (bsort Nat.leb kl) A)
+      (?g i0)
+must be the same row as
+   (mat_with_rows kl A)
+      i0
 ...
 apply rngl_product_eq_compat.
 intros j Hj.
 (* est-ce que c'est vrai, ça ? *)
+(* pas sûr... *)
 ...
 unfold g.
 rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
