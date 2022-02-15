@@ -904,6 +904,7 @@ unfold bsort.
 now apply sorted_bsort_loop.
 Qed.
 
+(* kl is not necessarily in order *)
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
   mat_nrows A = n
