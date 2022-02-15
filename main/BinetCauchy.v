@@ -829,40 +829,61 @@ rewrite IHl. 2: {
 }
 replace (a :: l) with ([a] ++ l) by easy.
 rewrite app_assoc; f_equal.
-specialize (IHl (ls ++ [a])) as H1.
-rewrite <- app_assoc in H1.
-specialize (H1 Hs).
-cbn in H1.
-...
+clear IHl.
 replace (a :: l) with ([a] ++ l) in Hs by easy.
 rewrite app_assoc in Hs.
 apply sorted_app_iff in Hs; [ | easy ].
-destruct Hs as (Hsa & Hsl & Hs).
-induction ls as [| b]; [ easy | cbn ].
+destruct Hs as (Hsa, _).
+clear l.
+revert a Hsa.
+induction ls as [| b]; intros; [ easy | cbn ].
 remember (ord a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply sorted_app_iff in Hsa; [ | easy ].
   destruct Hsa as (Hsb & _ & Hs').
   specialize (Hs' b a (or_introl eq_refl) (or_introl eq_refl)) as H1.
   specialize (Hant _ _ Hab H1) as H2; subst b; clear H1.
-...
-apply sorted_bsort_insert in Hs; [ | easy | easy | easy ].
-Search (sorted _ _ = true → _).
-...
-specialize (Htot a b) as H1.
-rewrite Hab in H1; cbn in H1.
-apply eq_bsort_insert_cons in Hls'.
-destruct Hls' as [Hls'| Hls']; [ now subst a' | ].
-now apply (sorted_extends _ ls).
-...
+  assert (H : ∀ b, b ∈ ls → ord b a = true). {
+    intros c Hc.
+    apply Hs'; [ now right | now left ].
+  }
+  clear Hs'; rename H into Hs.
+  specialize sorted_extends as H1.
+  specialize (H1 A ord a ls Htra Hsb).
+  f_equal.
+  assert (H2 : ∀ b, b ∈ ls → b = a). {
+    intros b Hb.
+    specialize (Hs _ Hb) as H2.
+    specialize (H1 _ Hb) as H3.
+    apply (Hant _ _ H2 H3).
+  }
+  clear IHls Hab Hsb Hs H1.
+  induction ls as [| b]; [ easy | cbn ].
+  rewrite H2 with (b0 := b); [ | now left ].
+  f_equal.
+  apply IHls.
+  intros c Hc.
+  now apply H2; right.
+} {
+  f_equal.
+  apply IHls.
+  cbn - [ sorted ] in Hsa.
+  now apply sorted_cons in Hsa.
+}
+Qed.
 
-Theorem sorted_bsort : ∀ A (ord : A → _) l,
+Theorem sorted_bsort : ∀ A (ord : A → _),
+  antisymmetric ord
+  → transitive ord
+  → total_order ord
+  → ∀ l,
   sorted ord l = true
   → bsort ord l = l.
 Proof.
-intros * Hs.
+intros * Hant Htra Htot * Hs.
 unfold bsort.
-...
+now apply sorted_bsort_loop.
+Qed.
 
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
@@ -1091,128 +1112,17 @@ f_equal. 2: {
   apply canon_sym_gr_list_ub; [ flia Hi Hmz | easy ].
 }
 f_equal.
-...
-now apply sorted_bsort.
-...
-g (h i) = i
-canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (h i)) = i
-h i = canon_sym_gr_list_inv m l
-canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m (canon_sym_gr_list_inv m l)) = i
-canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° l) = i
-canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° bsort_rank Nat.leb (bsort_rank Nat.leb l)) = i
-canon_sym_gr_list_inv m (bsort_rank Nat.leb (bsort_rank Nat.leb l ° p)) = i
-canon_sym_gr_list m (...) = canon_sym_gr_list m i
-bsort_rank Nat.leb (bsort_rank Nat.leb l ° p) = canon_sym_gr_list m i
-bsort_rank Nat.leb (bsort_rank Nat.leb (bsort_rank Nat.leb l ° p)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb l ° p = bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb l ° p ° bsort_rank Nat.leb p = bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p
-bsort_rank Nat.leb l = bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p
-l = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p)
-h i =
-  canon_sym_gr_list_inv m
-    (bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))
-...
-remember (collapse kl) as p eqn:Hp.
-Search (bsort_rank _ (_ ° _)).
-Search (collapse (_ ° _)).
-Search canon_sym_gr_list_inv.
-Compute (canon_sym_gr_list 4 13).
-Compute (canon_sym_gr_list_inv 4 (canon_sym_gr_list 4 13)).
-Compute (bsort_rank Nat.leb (canon_sym_gr_list 4 13)).
-erewrite rngl_summation_change_var.
-Search (bsort_rank _ _ ° bsort_rank _ _).
-Search (_ ° collapse _).
-Search (collapse _ ° _).
-Search (bsort_rank _ (bsort_rank _ _)).
-Search (bsort_rank _ (_ ° _)).
-...
-p ° canon_sym_gr_list m (g i) = canon_sym_gr_list m i
-bsort_rank Nat.leb (p ° canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb p = bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb (canon_sym_gr_list m (g i)) ° bsort_rank Nat.leb p ° p =
-  bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
-bsort_rank Nat.leb (canon_sym_gr_list m (g i)) = bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
-g i = canon_sym_gr_list_inv m l
-bsort_rank Nat.leb (canon_sym_gr_list m (canon_sym_gr_list_inv m l)) =
-  bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
-bsort_rank Nat.leb l = bsort_rank Nat.leb (canon_sym_gr_list m i) ° p
-bsort_rank Nat.leb (bsort_rank Nat.leb l) = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° p)
-l = bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i) ° p)
-l = bsort_rank Nat.leb p ° bsort_rank Nat.leb (bsort_rank Nat.leb (canon_sym_gr_list m i))
-l = bsort_rank Nat.leb p ° canon_sym_gr_list m i)
-l = bsort_rank Nat.leb kl ° canon_sym_gr_list m i)
-g i = canon_sym_gr_list_inv m (bsort_rank Nat.leb kl ° canon_sym_gr_list m i)
-...
-bsort_rank Nat.leb (canon_sym_gr_list m (canon_sym_gr_list_inv m l))) ° bsort_rank Nat.leb kl =
-  bsort_rank Nat.leb (canon_sym_gr_list m i)
-bsort_rank Nat.leb l ° bsort_rank Nat.leb kl = bsort_rank Nat.leb (canon_sym_gr_list m i)
-...
-collapse kl ° canon_sym_gr_list m (canon_sym_gr_list_inv m l)
-kl ° l = canon_sym_gr_list m i
-kl ° l ° bsort_rank Nat.leb l = canon_sym_gr_list m i ° bsort_rank Nat.leb l
-kl = canon_sym_gr_list m i ° bsort_rank Nat.leb l
-...
-app (kl ° canon_sym_gr_list m (g i)) j = app (canon_sym_gr_list m i) j
-app kl (app (canon_sym_gr_list m (g i)) j) = app (canon_sym_gr_list m i) j
-...
-(*
-unfold ε.
-rewrite Hkln.
-rewrite length_canon_sym_gr_list.
-*)
-  easy.
+apply sorted_bsort; [ | | | easy ]. {
+  apply Nat_leb_antisym.
+} {
+  apply Nat_leb_trans.
+} {
+  apply Nat_leb_has_total_order.
 }
-symmetry.
-(*
-  ============================
-  ∑ (i = 0, m! - 1),
-  ε (canon_sym_gr_list m i) *
-  ∏ (i0 = 1, m),
-  mat_el (mat_with_rows kl A) (i0 - 1)
-    (ff_app (canon_sym_gr_list m i) (i0 - 1)) =
-  ∑ (i = 0, m! - 1),
-  ε kl * ε (canon_sym_gr_list m i) *
-  ∏ (i0 = 1, m),
-  mat_el (mat_with_rows (bsort Nat.eqb kl) A) (i0 - 1)
-    (ff_app (canon_sym_gr_list m i) (i0 - 1))
-*)
-symmetry.
-erewrite rngl_summation_change_var.
-rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
-rewrite Nat_sub_succ_1.
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
-  unfold ε.
-  rewrite Hkln, length_canon_sym_gr_list.
-...
-Search (ε (canon_sym_gr_list _ _)).
-...
-(*
-Abort.
-End a.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (let kl := [2;3;4;0]%nat in let M := mk_mat [[3;7;-5;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in (mat_nrows M, mat_ncols M, ε kl, det (mat_with_rows kl M) =
-       (ε kl * det (mat_with_rows (bsort Nat.leb kl) M))%F)).
-...
-Compute (
-Compute (ε [3;5;4]%nat).
-Print ε.
-...
-Abort.
-End a.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (ε [3;5;4]%nat).
-Print ε.
-(*
-  ε kl * ε (canon_sym_gr_list m (?g i)) *
-must be equal to
-  ε (canon_sym_gr_list m i)
-*)
+Qed.
+
+Inspect 1.
+
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
