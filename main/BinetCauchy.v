@@ -1121,6 +1121,8 @@ apply sorted_bsort; [ | | | easy ]. {
 }
 Qed.
 
+Arguments det_with_rows Hif (m n)%nat _ [kl]%list.
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -1169,8 +1171,19 @@ assert (Hab : is_square_matrix (A * B) = true). {
   }
 }
 (*1*)
-rewrite det_is_det_by_canon_permut.
-Check det_with_rows.
+rewrite det_is_det_by_canon_permut; try now destruct Hif.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros s Hs.
+  rewrite (det_with_rows Hif m n B Hbr Hbc Hcb); cycle 1. {
+    specialize sub_lists_of_seq_0_n_is_inj as H1.
+    specialize (H1 n m _ eq_refl).
+    rewrite sub_lists_of_seq_0_n_length in H1.
+Search (nth _ (sub_lists_of_seq_0_n _ _)).
+...
+    apply nat_NoDup.
+    intros i j Hi Hj Hij.
+    rewrite (sub_list_firstn_nat_length n m) in Hi; [ | easy ].
+    rewrite (sub_list_firstn_nat_length n m) in Hj; [ | easy ].
 ...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
