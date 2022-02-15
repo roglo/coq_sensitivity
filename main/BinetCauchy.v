@@ -1101,6 +1101,8 @@ intros i (_, Hi).
 f_equal.
 apply rngl_product_eq_compat.
 intros j Hj.
+(* est-ce que c'est vrai, ça ? *)
+...
 unfold g.
 rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
   apply comp_is_permut. {
@@ -1111,6 +1113,30 @@ rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
     flia Hi Hmz.
   }
 }
+(**)
+unfold mat_el.
+unfold "°".
+unfold ff_app.
+rewrite (List_map_nth' 0). 2: {
+  rewrite length_canon_sym_gr_list; flia Hj.
+}
+remember (nth (j - 1) (canon_sym_gr_list m i) 0) as k eqn:Hk.
+rewrite Hp.
+unfold collapse.
+rewrite permut_bsort_rank_involutive. 2: {
+  apply bsort_rank_is_permut_list.
+}
+rewrite bsort_bsort_rank with (d := 0).
+remember (bsort_rank Nat.leb kl) as q eqn:Hq.
+unfold mat_with_rows.
+cbn.
+rewrite map_map.
+rewrite (List_map_nth' 0). 2: {
+  rewrite Hq, length_bsort_rank, Hklm; flia Hj.
+}
+rewrite (List_map_nth' 0); [ | rewrite Hklm; flia Hj ].
+do 2 rewrite fold_mat_el.
+...
 f_equal. 2: {
   rewrite Hp; unfold collapse.
   rewrite permut_bsort_rank_involutive. 2: {
