@@ -952,6 +952,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 remember (collapse kl) as p eqn:Hp.
+(**)
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
 set (h := λ i,
@@ -1099,6 +1100,8 @@ rewrite Nat.add_0_l.
 apply rngl_summation_eq_compat.
 intros i (_, Hi).
 f_equal.
+(* ouais, faut faire encore un changt de variable ! *)
+...
 apply rngl_product_eq_compat.
 intros j Hj.
 (* est-ce que c'est vrai, ça ? *)
