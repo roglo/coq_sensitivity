@@ -972,14 +972,16 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ mat_el ].
 set (p := collapse kl).
 (* la formule g, h ci-dessous, je pense qu'elle n'est pas bonne
+*)
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
+(*
 set (h := λ i,
   canon_sym_gr_list_inv m
     (bsort_rank Nat.leb
         (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))).
 *)
-erewrite rngl_summation_change_var.
+erewrite rngl_summation_change_var with (g0 := g).
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | ].
 rewrite Nat_sub_succ_1.
@@ -1005,7 +1007,7 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry. {
-erewrite rngl_product_change_var with (g := ff_app (collapse kl)).
+erewrite rngl_product_change_var with (g0 := ff_app (collapse kl)).
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | ].
 rewrite Nat_sub_succ_1.
@@ -1039,6 +1041,26 @@ admit.
 admit.
 admit.
 }
+fold p.
+(* la formule g, h ci-dessous, je pense qu'elle n'est pas bonne
+set (g := λ i,
+  canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
+Search (canon_sym_gr_list _ _).
+*)
+...
+set (g' := canon_sym_gr_list_inv m (bsort_rank Nat.leb kl)).
+...
+permut_in_canon_sym_gr_of_its_rank:
+  ∀ (n : nat) (l : list nat),
+    is_permut n l → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l
+...
+unfold g.
+Search (canon_sym_gr_list _ (canon_sym_gr_list_inv _ _)).
+rewrite permut_in_canon_sym_gr_of_its_rank.
+unfold "°".
+unfold ff_app.
+rewrite (List_map_nth' 0).
+do 4 rewrite fold_ff_app.
 ...
 apply rngl_product_eq_compat.
 intros j (_, Hj).
