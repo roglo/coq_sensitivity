@@ -1122,13 +1122,32 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry.
-set (g' := ff_app (canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i)).
-remember (λ i, i + 27) as h'.
-erewrite rngl_product_change_var with (g0 := g') (h0 := h').
+set (f l := ff_app (canon_sym_gr_inv_list m i ° l ° canon_sym_gr_list m i)).
+set (g' := f p).
+set (h' := f (bsort_rank Nat.leb p)).
+erewrite rngl_product_change_var with (g0 := g') (h0 := h'). 2: {
+  intros j (_, Hj).
+  unfold g', h', f, "°".
+  unfold ff_app.
+  rewrite (List_map_nth' 0).
+  rewrite (List_map_nth' 0).
+  rewrite (List_map_nth' 0).
+  rewrite (List_map_nth' 0).
+  do 6 rewrite fold_ff_app.
+  rewrite canon_sym_gr_sym_gr_inv.
+  rewrite permut_permut_bsort.
+  apply canon_sym_gr_inv_sym_gr.
+...
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
 rewrite Nat_sub_succ_1.
-rewrite rngl_product_list_permut with (l2 := seq 0 m).
+rewrite rngl_product_list_permut with (l2 := seq 0 m); cycle 1. {
+  now destruct Hif.
+} {
+Search (Permutation _ (seq _ _)).
+Search (Permutation (map _ _)).
+  apply permut_list_Permutation.
+...
 rewrite rngl_product_seq_product; [ | easy ].
 rewrite Nat.add_0_l.
 apply rngl_product_eq_compat.
