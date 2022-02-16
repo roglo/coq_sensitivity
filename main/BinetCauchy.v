@@ -953,7 +953,43 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 set (p := collapse kl).
-(**)
+(* la formule g, h ci-dessous, je pense qu'elle n'est pas bonne
+set (g := λ i,
+  canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
+set (h := λ i,
+  canon_sym_gr_list_inv m
+    (bsort_rank Nat.leb
+        (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))).
+*)
+erewrite rngl_summation_change_var.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_summation_list_permut with (l2 := seq 0 m!).
+rewrite rngl_summation_seq_summation.
+rewrite Nat.add_0_l.
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+f_equal.
+f_equal.
+2: {
+rewrite (rngl_product_shift 1).
+rewrite Nat.sub_diag.
+erewrite rngl_product_eq_compat. 2: {
+  intros j (_, Hj).
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry.
+rewrite (rngl_product_shift 1); [ | ].
+rewrite Nat.sub_diag.
+erewrite rngl_product_eq_compat. 2: {
+  intros j (_, Hj).
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+symmetry. {
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+...
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
 set (h := λ i,
@@ -1142,11 +1178,16 @@ map (λ i,
     (ff_app
        (canon_sym_gr_list m (canon_sym_gr_list_inv m (bsort_rank Nat.leb (collapse kl) ° canon_sym_gr_list m i)))
        i0) = ∏ (i0 = 0, m - 1), mat_el (mat_with_rows kl A) i0 (ff_app (canon_sym_gr_list m i) i0)) (seq 0 m!)).
-).
 (*
      = [42 = 42; 147 = 30; 0 = 147; 0 = 0; 42 = 42; 30 = 0]
 *)
 (* ils sont pas égaux, bordel de cul *)
+Compute
+  (let kl := [2;3;1]%nat in let m := length kl in
+   let A := mk_mat [[3;4;1];[0;6;7];[1;3;1];[7;6;5]] in
+  det (mat_with_rows kl A) =
+       (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F).
+(* mais là, c'est bon, là *)
 ...
 set (f l := ff_app (canon_sym_gr_inv_list m i ° l ° canon_sym_gr_list m i)).
 set (g' := f p).
