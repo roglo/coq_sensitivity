@@ -1126,6 +1126,7 @@ assert (Hpz : p ≠ []). {
 }
 assert (H : i < m!) by flia Hi Hfmz.
 clear Hi Hfmz; rename H into Hi.
+...
 set (f l := ff_app (canon_sym_gr_inv_list m i ° l ° canon_sym_gr_list m i)).
 set (g' := f p).
 set (h' := f (bsort_rank Nat.leb p)).
