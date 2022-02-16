@@ -1122,7 +1122,55 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry.
-erewrite rngl_product_change_var.
+set (g' := λ j, ff_app (canon_sym_gr_inv_list m i) j).
+remember (λ i, i + 27) as h'.
+erewrite rngl_product_change_var with (g0 := g') (h0 := h').
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_product_list_permut with (l2 := seq 0 m).
+rewrite rngl_product_seq_product; [ | easy ].
+rewrite Nat.add_0_l.
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+unfold mat_with_rows, mat_el.
+cbn.
+unfold ff_app.
+f_equal.
+do 2 rewrite fold_ff_app.
+unfold g.
+rewrite permut_in_canon_sym_gr_of_its_rank.
+unfold "°".
+unfold ff_app.
+rewrite (List_map_nth' 0).
+do 3 rewrite fold_ff_app.
+unfold g'.
+rewrite canon_sym_gr_sym_gr_inv.
+Search (ff_app (canon_sym_gr_list _ _)).
+...
+Search (ff_app (canon_sym_gr_list _ _)).
+...
+Print canon_sym_gr_inv_list.
+Print canon_sym_gr_list_inv.
+...
+canon_sym_gr_inv_list = λ n k : nat, map (canon_sym_gr_inv_elem n k) (seq 0 n)
+     : nat → nat → list nat
+canon_sym_gr_list_inv = 
+fix canon_sym_gr_list_inv (n : nat) (l : list nat) {struct n} : nat :=
+  match n with
+  | 0 => 0
+  | S n' => hd 0 l * n'! + canon_sym_gr_list_inv n' (sub_canon_permut_list l)
+  end
+     : nat → list nat → nat
+...
+  nth (g' j) (canon_sym_gr_list m (g i)) 0 = nth j (canon_sym_gr_list m i) 0
+...
+the row
+   (mat_with_rows (bsort Nat.leb kl) A)
+      (?g i0)
+must be the same row as
+   (mat_with_rows kl A)
+      i0
 ...
 rewrite rngl_product_change_var with
   (g0 := ff_app (bsort_rank Nat.leb p)) (h0 := ff_app (bsort_rank Nat.leb p)). 2: {
@@ -1173,13 +1221,6 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite fold_mat_el.
 unfold ff_app at 1.
 Search (ff_app (bsort_rank _ _)).
-...
-the row
-   (mat_with_rows (bsort Nat.leb kl) A)
-      (?g i0)
-must be the same row as
-   (mat_with_rows kl A)
-      i0
 ...
 ...
 unfold g.
