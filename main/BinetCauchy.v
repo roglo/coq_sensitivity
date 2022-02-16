@@ -1126,6 +1126,27 @@ assert (Hpz : p ≠ []). {
 }
 assert (H : i < m!) by flia Hi Hfmz.
 clear Hi Hfmz; rename H into Hi.
+unfold g, p.
+Check mk_mat.
+Abort.
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute
+  (let kl := [2;3;1]%nat in let m := length kl in
+   let A := mk_mat [[3;4;1];[0;6;7];[1;3;1];[7;6;5]] in
+map (λ i,
+  ∏ (i0 = 0, m - 1),
+  mat_el (mat_with_rows (bsort Nat.leb kl) A) i0
+    (ff_app
+       (canon_sym_gr_list m (canon_sym_gr_list_inv m (bsort_rank Nat.leb (collapse kl) ° canon_sym_gr_list m i)))
+       i0) = ∏ (i0 = 0, m - 1), mat_el (mat_with_rows kl A) i0 (ff_app (canon_sym_gr_list m i) i0)) (seq 0 m!)).
+).
+(*
+     = [42 = 42; 147 = 30; 0 = 147; 0 = 0; 42 = 42; 30 = 0]
+*)
+(* ils sont pas égaux, bordel de cul *)
 ...
 set (f l := ff_app (canon_sym_gr_inv_list m i ° l ° canon_sym_gr_list m i)).
 set (g' := f p).
@@ -1302,12 +1323,35 @@ rewrite (List_map_nth' 0). 2: {
   unfold p; rewrite length_collapse, Hklm.
   now apply canon_sym_gr_list_ub.
 }
+(*
 unfold p, collapse.
+*)
 do 5 rewrite fold_ff_app.
 f_equal.
 rewrite fold_comp_lt.
 rewrite fold_comp_lt.
 rewrite fold_comp_lt.
+replace
+  (bsort Nat.leb kl ° canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i)
+with
+  (bsort Nat.leb kl ° (canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i)).
+unfold "°" at 1.
+unfold ff_app at 1.
+rewrite (List_map_nth' 0).
+rewrite fold_ff_app.
+fold (f p).
+fold g'.
+rewrite (bsort_bsort_rank _ 0).
+unfold ff_app at 1.
+rewrite (List_map_nth' 0).
+do 2 rewrite fold_ff_app.
+rewrite permut_permut_bsort.
+unfold g', f.
+...
+rewrite <- (permut_comp_assoc n).
+rewrite <- (permut_comp_assoc n).
+rewrite <- list_comp_assoc.
+fold f.
 ...
 Compute (let kl := [7;2;28] in let m := 3 in let i := 6 in let j := 2 in
   ff_app
