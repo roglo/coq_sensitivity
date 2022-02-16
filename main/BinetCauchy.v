@@ -1123,9 +1123,56 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 erewrite rngl_product_change_var.
+...
+rewrite rngl_product_change_var with
+  (g0 := ff_app (bsort_rank Nat.leb p)) (h0 := ff_app (bsort_rank Nat.leb p)). 2: {
+  admit.
+}
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
 rewrite Nat_sub_succ_1.
+(* pour voir... *)
+erewrite rngl_product_list_eq_compat. 2: {
+  intros j Hj.
+  unfold mat_with_rows, mat_el.
+  cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite length_bsort.
+    unfold ff_app.
+    rewrite Hp.
+    unfold collapse.
+    rewrite permut_bsort_rank_involutive. 2: {
+      apply bsort_rank_is_permut_list.
+    }
+    apply bsort_rank_ub.
+    intros H; subst kl.
+    now symmetry in Hklm.
+  }
+  rewrite (bsort_bsort_rank _ 0).
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    rewrite fold_ff_app.
+    easy.
+  }
+  rewrite fold_comp_list.
+  rewrite comp_bsort_rank_r.
+  rewrite (bsort_bsort_rank _ 0).
+  unfold ff_app.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite length_bsort_rank.
+    rewrite Hp.
+    unfold collapse.
+    rewrite permut_bsort_rank_involutive. 2: {
+      apply bsort_rank_is_permut_list.
+    }
+    apply bsort_rank_ub.
+    intros H; subst kl.
+    now symmetry in Hklm.
+  }
+  do 4 rewrite fold_ff_app.
+  rewrite fold_mat_el.
+unfold ff_app at 1.
+Search (ff_app (bsort_rank _ _)).
 ...
 the row
    (mat_with_rows (bsort Nat.leb kl) A)
@@ -1134,10 +1181,6 @@ must be the same row as
    (mat_with_rows kl A)
       i0
 ...
-apply rngl_product_eq_compat.
-intros j Hj.
-(* est-ce que c'est vrai, ça ? *)
-(* pas sûr... *)
 ...
 unfold g.
 rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
