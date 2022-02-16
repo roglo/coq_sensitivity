@@ -1122,9 +1122,7 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry.
-set
-  (g' := λ j,
-   ff_app (canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i) j).
+set (g' := ff_app (canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i)).
 remember (λ i, i + 27) as h'.
 erewrite rngl_product_change_var with (g0 := g') (h0 := h').
 rewrite Nat.sub_0_r.
