@@ -924,6 +924,17 @@ Theorem det_with_rows : in_charac_0_field →
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
+(*
+Abort.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (let A := mk_mat [[1;2;0];[4;5;6];[7;8;9];[2;5;1]] in
+  let kl := [3;1;2]%nat in
+  det (mat_with_rows kl A) =
+     (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%Z).
+...
+*)
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
@@ -994,6 +1005,41 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry. {
+erewrite rngl_product_change_var with (g := ff_app (collapse kl)).
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_product_list_permut with (l2 := seq 0 m).
+rewrite rngl_product_seq_product.
+rewrite Nat.add_0_l.
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+unfold mat_el.
+f_equal. 2: {
+unfold mat_with_rows.
+cbn.
+rewrite (List_map_nth' 0).
+symmetry.
+rewrite (List_map_nth' 0).
+symmetry.
+f_equal.
+rewrite (bsort_bsort_rank _ 0).
+rewrite (List_map_nth' 0).
+f_equal.
+rewrite fold_ff_app.
+unfold collapse.
+rewrite permut_permut_bsort.
+easy.
+apply bsort_rank_is_permut_list.
+rewrite length_bsort_rank.
+rewrite Hklm.
+admit.
+rewrite length_bsort_rank.
+admit.
+admit.
+admit.
+}
+...
 apply rngl_product_eq_compat.
 intros j (_, Hj).
 (* bin non, c'est pas possible, ça !
