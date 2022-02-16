@@ -525,8 +525,15 @@ Definition mat_with_cols (jl : list nat) (M : matrix T) :=
 Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
   ((mat_with_rows jl M⁺)⁺)%M.
 
-(*
 End a.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+
+(*
 Require Import RnglAlg.Nrl.
 Print mat_with_cols.
 About mat_with_cols.
@@ -714,14 +721,14 @@ Qed.
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-Theorem mat_with_rows_nrows : ∀ A kl,
+Theorem mat_with_rows_nrows : ∀ (A : matrix T) kl,
   mat_nrows (mat_with_rows kl A) = length kl.
 Proof.
 intros.
 now cbn; rewrite map_length.
 Qed.
 
-Theorem mat_with_rows_is_square : ∀ kl A,
+Theorem mat_with_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
   → mat_ncols A = length kl
   → (∀ k, k ∈ kl → k < mat_nrows A)
@@ -989,6 +996,15 @@ erewrite rngl_product_eq_compat. 2: {
 symmetry. {
 apply rngl_product_eq_compat.
 intros j (_, Hj).
+(* bin non, c'est pas possible, ça !
+   on prend la ligne j dans les deux cas ! *)
+...
+Print mat_with_rows.
+Compute (mat_with_rows [1;0;2] (mk_mat [[1;2;3];[4;5;6];[7;8;9]])).
+Compute (let A := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+  let kl := [1;0;2] in
+  (mat_el (mat_with_rows (bsort Nat.leb kl) A) 0 =
+   mat_el (mat_with_rows kl A) 0)).
 ...
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
