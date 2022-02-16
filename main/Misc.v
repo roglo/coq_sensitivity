@@ -2539,6 +2539,15 @@ rewrite Nat.add_0_l in H2.
 apply (H2 i j Hi Hj Hij).
 Qed.
 
+Theorem eq_bsort_rank_nil : ∀ A (ord : A → _) l,
+  bsort_rank ord l = [] → l = [].
+Proof.
+intros * Hl.
+apply (f_equal length) in Hl.
+rewrite length_bsort_rank in Hl.
+now apply length_zero_iff_nil in Hl.
+Qed.
+
 (* end bsort_rank *)
 
 (* sorted *)

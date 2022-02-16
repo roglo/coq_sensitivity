@@ -1172,6 +1172,47 @@ destruct (le_dec (j / n!) _) as [H2| H2]. {
 destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
 
+Theorem length_canon_sym_gr_inv_list : ∀ n i,
+  length (canon_sym_gr_inv_list n i) = n.
+Proof.
+intros.
+unfold canon_sym_gr_inv_list.
+apply List_map_seq_length.
+Qed.
+
+Theorem NoDup_canon_sym_gr_inv_list : ∀ n i,
+  i < n!
+  → NoDup (canon_sym_gr_inv_list n i).
+Proof.
+intros * Hi.
+apply nat_NoDup.
+rewrite length_canon_sym_gr_inv_list.
+intros j k Hj Hk Hjk.
+apply (f_equal (ff_app (canon_sym_gr_list n i))) in Hjk.
+rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
+rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
+easy.
+Qed.
+
+Theorem canon_sym_gr_inv_list_is_permut_list : ∀ n i,
+  i < n!
+  → is_permut_list (canon_sym_gr_inv_list n i).
+Proof.
+intros * Hi.
+split. {
+  unfold canon_sym_gr_inv_list.
+  rewrite List_map_seq_length.
+  intros j Hj.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hkj & Hk).
+  apply in_seq in Hk.
+  rewrite <- Hkj.
+  now apply canon_sym_gr_inv_elem_ub.
+} {
+  now apply NoDup_canon_sym_gr_inv_list.
+}
+Qed.
+
 (* *)
 
 Definition sub_canon_permut_list (l : list nat) :=

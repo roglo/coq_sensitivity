@@ -972,19 +972,19 @@ assert (Hgh : ∀ i, i < m! → g (h i) = i). {
   } {
     now rewrite length_bsort_rank, length_canon_sym_gr_list.
   } {
-    apply bsort_rank_is_permut; unfold collapse.
-...
+    apply bsort_rank_is_permut; unfold p.
     now rewrite length_collapse.
   }
   rewrite (permut_comp_assoc m); cycle 1. {
     do 2 rewrite length_bsort_rank.
-    now rewrite Hp, length_collapse.
+    now unfold p; rewrite length_collapse.
   } {
     apply bsort_rank_is_permut.
     now rewrite length_bsort_rank, length_canon_sym_gr_list.
   }
   rewrite permut_comp_bsort_rank_r; [ | apply bsort_rank_is_permut_list ].
-  rewrite length_bsort_rank, Hp, length_collapse, Hklm.
+  unfold p.
+  rewrite length_bsort_rank, length_collapse, Hklm.
   rewrite comp_1_l. 2: {
     intros j Hj.
     rewrite permut_bsort_rank_involutive in Hj. 2: {
@@ -1023,11 +1023,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
     } {
       now rewrite length_bsort_rank, length_canon_sym_gr_list.
     } {
-      apply bsort_rank_is_permut.
-      now rewrite Hp, length_collapse.
+      apply bsort_rank_is_permut; unfold p.
+      now rewrite length_collapse.
     }
     rewrite permut_bsort_rank_involutive. 2: {
-      rewrite Hp.
       apply collapse_is_permut.
     }
     rewrite permut_bsort_rank_involutive. 2: {
@@ -1035,34 +1034,30 @@ erewrite rngl_summation_list_eq_compat. 2: {
     }
     apply canon_sym_gr_list_inv_ub.
     apply comp_is_permut. {
-      rewrite Hp.
       split; [ apply collapse_is_permut | ].
-      now rewrite length_collapse.
+      now unfold p; rewrite length_collapse.
     }
     now apply canon_sym_gr_list_is_permut.
   }
   unfold g at 1.
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
     apply comp_is_permut. {
-      apply bsort_rank_is_permut.
-      now rewrite Hp, length_collapse.
+      apply bsort_rank_is_permut; unfold p.
+      now rewrite length_collapse.
     } {
       now apply canon_sym_gr_list_is_permut.
     }
   }
   rewrite (permut_comp_assoc m); cycle 1. {
-    now rewrite length_bsort_rank, Hp, length_collapse.
+    now unfold p; rewrite length_bsort_rank, length_collapse.
   } {
     now apply canon_sym_gr_list_is_permut.
   }
   rewrite comp_bsort_rank_r.
-  rewrite permut_bsort_leb. 2: {
-    rewrite Hp.
-    apply collapse_is_permut.
-  }
+  rewrite permut_bsort_leb; [ | apply collapse_is_permut ].
   rewrite comp_1_l. 2: {
     intros j Hj.
-    rewrite Hp, length_collapse, Hklm.
+    unfold p; rewrite length_collapse, Hklm.
     apply (In_nth _ _ 0) in Hj.
     rewrite length_canon_sym_gr_list in Hj.
     destruct Hj as (k & Hkm & Hkj).
@@ -1084,8 +1079,8 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 m!). 2: {
     destruct Hj as (_, Hj); cbn in Hj.
     rewrite <- Hji; unfold h.
     apply canon_sym_gr_list_inv_ub.
-    apply bsort_rank_is_permut.
-    now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
+    apply bsort_rank_is_permut; unfold p.
+    now rewrite comp_length, length_bsort_rank, length_collapse.
   } {
     apply (NoDup_map_iff 0).
     rewrite seq_length.
@@ -1124,11 +1119,10 @@ erewrite rngl_product_eq_compat. 2: {
 }
 symmetry.
 assert (Hpz : p ≠ []). {
-  intros H; move H at top; subst p.
-  symmetry in Hp.
-  apply length_zero_iff_nil in Hp.
-  rewrite length_collapse in Hp.
-  now rewrite Hklm in Hp.
+  intros H; unfold p in H.
+  apply length_zero_iff_nil in H.
+  rewrite length_collapse in H.
+  now rewrite Hklm in H.
 }
 assert (H : i < m!) by flia Hi Hfmz.
 clear Hi Hfmz; rename H into Hi.
@@ -1146,14 +1140,14 @@ erewrite rngl_product_change_var with (g0 := g') (h0 := h'). 2: {
       now rewrite length_canon_sym_gr_list.
     }
     rewrite (List_map_nth' 0). 2: {
-      rewrite length_bsort_rank, Hp, length_collapse, Hklm.
+      unfold p; rewrite length_bsort_rank, length_collapse, Hklm.
       now apply canon_sym_gr_list_ub.
     }
     do 3 rewrite fold_ff_app.
     rewrite length_canon_sym_gr_list.
     apply canon_sym_gr_inv_list_ub; [ easy | ].
     unfold ff_app.
-    replace m with (length p); [ | now rewrite <- Hklm, Hp, length_collapse ].
+    replace m with (length p); [ | now unfold p; rewrite <- Hklm, length_collapse ].
     now apply bsort_rank_ub.
   }
   rewrite (List_map_nth' 0). 2: {
@@ -1161,33 +1155,36 @@ erewrite rngl_product_change_var with (g0 := g') (h0 := h'). 2: {
       now rewrite length_canon_sym_gr_list.
     }
     rewrite (List_map_nth' 0). 2: {
-      rewrite length_bsort_rank, Hp, length_collapse, Hklm.
+      unfold p; rewrite length_bsort_rank, length_collapse, Hklm.
       now apply canon_sym_gr_list_ub.
     }
-    rewrite Hp, length_collapse, Hklm.
+    unfold p; rewrite length_collapse, Hklm.
     apply canon_sym_gr_list_ub; [ easy | ].
     apply canon_sym_gr_inv_list_ub; [ easy | ].
     do 2 rewrite fold_ff_app.
-    replace m with (length p); [ | now rewrite <- Hklm, Hp, length_collapse ].
-    rewrite <- Hp.
+    replace m with (length p). 2: {
+      now unfold p; rewrite <- Hklm, length_collapse.
+    }
     now apply bsort_rank_ub.
   }
   rewrite (List_map_nth' 0). 2: {
     now rewrite length_canon_sym_gr_list.
   }
   rewrite (List_map_nth' 0). 2: {
-    rewrite length_bsort_rank, Hp, length_collapse, Hklm.
+    unfold p; rewrite length_bsort_rank, length_collapse, Hklm.
     now apply canon_sym_gr_list_ub.
   }
   do 6 rewrite fold_ff_app.
   rewrite canon_sym_gr_sym_gr_inv; [ | easy | ]. 2: {
-    replace m with (length p); [ | now rewrite <- Hklm, Hp, length_collapse ].
+    replace m with (length p). 2: {
+      now unfold p; rewrite <- Hklm, length_collapse.
+    }
     now apply bsort_rank_ub.
   }
   rewrite permut_permut_bsort; cycle 1. {
-    rewrite Hp; apply collapse_is_permut.
+    apply collapse_is_permut.
   } {
-    rewrite Hp, length_collapse, Hklm.
+    unfold p; rewrite length_collapse, Hklm.
     now apply canon_sym_gr_list_ub.
   }
   now apply canon_sym_gr_inv_sym_gr.
@@ -1198,52 +1195,82 @@ rewrite Nat_sub_succ_1.
 rewrite rngl_product_list_permut with (l2 := seq 0 m); cycle 1. {
   now destruct Hif.
 } {
-(*
-Search (Permutation _ (seq _ _)).
-Search (Permutation (map _ _)).
-*)
   apply permut_list_Permutation.
   unfold h', f.
   split; [ | now rewrite List_map_seq_length ].
   apply (map_ff_app_is_permut_list m); [ | apply seq_is_permut ].
   apply comp_is_permut; [ | now apply canon_sym_gr_list_is_permut ].
-...
-  apply comp_is_permut; [ | now apply bsort_rank_is_permut; rewrite Hp, length_collapse ].
-...
-Search (is_permut _ (map _ _)).
-...
+  apply comp_is_permut. 2: {
+    unfold p; apply bsort_rank_is_permut.
+    now rewrite length_collapse.
+  }
+  split. {
+    now apply canon_sym_gr_inv_list_is_permut_list.
+  }
+  apply length_canon_sym_gr_inv_list.
+}
 rewrite rngl_product_seq_product; [ | easy ].
 rewrite Nat.add_0_l.
 apply rngl_product_eq_compat.
 intros j (_, Hj).
+assert (H : j < m) by flia Hj Hmz.
+clear Hj Hmz; rename H into Hj.
 unfold mat_with_rows, mat_el.
 cbn.
 unfold ff_app.
-f_equal.
-do 2 rewrite fold_ff_app.
-unfold g.
-rewrite permut_in_canon_sym_gr_of_its_rank.
-unfold "°".
-unfold ff_app.
-rewrite (List_map_nth' 0).
-do 3 rewrite fold_ff_app.
-unfold g'.
-unfold "°".
-unfold ff_app.
-rewrite (List_map_nth' 0).
-rewrite (List_map_nth' 0).
-repeat rewrite fold_ff_app.
-rewrite canon_sym_gr_sym_gr_inv.
-rewrite permut_bsort_permut.
-...
-Search (ff_app (bsort_rank _ _)).
-rewrite permut_bsort_permut.
-
-rewrite <- fold_comp_list.
-rewrite permut_bsort_rank_involutive.
-Search (ff_app (canon_sym_gr_list _ _)).
-...
-Search (ff_app (canon_sym_gr_list _ _)).
+f_equal. {
+  do 2 rewrite fold_ff_app.
+  unfold g', g, f.
+  assert (Hpc : ff_app p (ff_app (canon_sym_gr_list m i) j) < m). {
+    unfold p, collapse.
+    eapply lt_le_trans. {
+      apply bsort_rank_ub.
+      intros H.
+      apply eq_bsort_rank_nil in H.
+      now subst kl.
+    }
+    now rewrite length_bsort_rank, Hklm.
+  }
+  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    apply comp_is_permut. {
+      apply bsort_rank_is_permut; unfold p.
+      now rewrite length_collapse.
+    } {
+      now apply canon_sym_gr_list_is_permut.
+    }
+  }
+  unfold "°", ff_app.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite (List_map_nth' 0). 2: {
+      now rewrite length_canon_sym_gr_list.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      unfold p; rewrite length_collapse, Hklm.
+      now apply canon_sym_gr_list_ub.
+    }
+    do 3 rewrite fold_ff_app.
+    rewrite length_canon_sym_gr_list.
+    now apply canon_sym_gr_inv_list_ub.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite length_canon_sym_gr_list.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    unfold p; rewrite length_collapse, Hklm.
+    now apply canon_sym_gr_list_ub.
+  }
+  do 5 rewrite fold_ff_app.
+  rewrite canon_sym_gr_sym_gr_inv; [ | easy | easy ].
+  rewrite permut_bsort_permut; cycle 1. {
+    apply collapse_is_permut.
+  } {
+    unfold p; rewrite length_collapse, Hklm.
+    now apply canon_sym_gr_list_ub.
+  }
+  easy.
+} {
+  unfold g', f.
+  rewrite (List_map_nth' 0). 2: {
 ...
 Print canon_sym_gr_inv_list.
 Print canon_sym_gr_list_inv.
@@ -1269,7 +1296,7 @@ must be the same row as
 ...
 rewrite rngl_product_change_var with
   (g0 := ff_app (bsort_rank Nat.leb p)) (h0 := ff_app (bsort_rank Nat.leb p)). 2: {
-  admit.
+...
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
