@@ -1122,7 +1122,9 @@ erewrite rngl_product_eq_compat. 2: {
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 symmetry.
-set (g' := λ j, ff_app (canon_sym_gr_inv_list m i) j).
+set
+  (g' := λ j,
+   ff_app (canon_sym_gr_inv_list m i ° p ° canon_sym_gr_list m i) j).
 remember (λ i, i + 27) as h'.
 erewrite rngl_product_change_var with (g0 := g') (h0 := h').
 rewrite Nat.sub_0_r.
@@ -1145,7 +1147,19 @@ unfold ff_app.
 rewrite (List_map_nth' 0).
 do 3 rewrite fold_ff_app.
 unfold g'.
+unfold "°".
+unfold ff_app.
+rewrite (List_map_nth' 0).
+rewrite (List_map_nth' 0).
+repeat rewrite fold_ff_app.
 rewrite canon_sym_gr_sym_gr_inv.
+rewrite permut_bsort_permut.
+...
+Search (ff_app (bsort_rank _ _)).
+rewrite permut_bsort_permut.
+
+rewrite <- fold_comp_list.
+rewrite permut_bsort_rank_involutive.
 Search (ff_app (canon_sym_gr_list _ _)).
 ...
 Search (ff_app (canon_sym_gr_list _ _)).
