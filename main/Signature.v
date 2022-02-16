@@ -3185,6 +3185,7 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
+Arguments map_ff_app_is_permut_list n%nat [la lb]%list.
 Arguments permut_bsort_rank_comp n%nat [la lb]%list.
 Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.

@@ -952,7 +952,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ mat_el ].
-remember (collapse kl) as p eqn:Hp.
+set (p := collapse kl).
 (**)
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
@@ -964,16 +964,17 @@ assert (Hgh : ∀ i, i < m! → g (h i) = i). {
   intros i Hi.
   unfold g, h.
   rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
-    apply bsort_rank_is_permut.
-    now rewrite comp_length, length_bsort_rank, Hp, length_collapse.
+    apply bsort_rank_is_permut; unfold p.
+    now rewrite comp_length, length_bsort_rank, length_collapse.
   }
   rewrite (permut_bsort_rank_comp m); cycle 1. {
     apply NoDup_bsort_rank.
   } {
     now rewrite length_bsort_rank, length_canon_sym_gr_list.
   } {
-    apply bsort_rank_is_permut.
-    now rewrite Hp, length_collapse.
+    apply bsort_rank_is_permut; unfold collapse.
+...
+    now rewrite length_collapse.
   }
   rewrite (permut_comp_assoc m); cycle 1. {
     do 2 rewrite length_bsort_rank.
@@ -1203,6 +1204,12 @@ Search (Permutation (map _ _)).
 *)
   apply permut_list_Permutation.
   unfold h', f.
+  split; [ | now rewrite List_map_seq_length ].
+  apply (map_ff_app_is_permut_list m); [ | apply seq_is_permut ].
+  apply comp_is_permut; [ | now apply canon_sym_gr_list_is_permut ].
+...
+  apply comp_is_permut; [ | now apply bsort_rank_is_permut; rewrite Hp, length_collapse ].
+...
 Search (is_permut _ (map _ _)).
 ...
 rewrite rngl_product_seq_product; [ | easy ].
