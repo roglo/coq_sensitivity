@@ -1218,7 +1218,9 @@ clear Hj Hmz; rename H into Hj.
 unfold mat_with_rows, mat_el.
 cbn.
 unfold ff_app.
-f_equal. {
+assert (H1 :
+  nth (g' j) (canon_sym_gr_list m (g i)) 0 =
+  nth j (canon_sym_gr_list m i) 0). {
   do 2 rewrite fold_ff_app.
   unfold g', g, f.
   assert (Hpc : ff_app p (ff_app (canon_sym_gr_list m i) j) < m). {
@@ -1268,9 +1270,54 @@ f_equal. {
     now apply canon_sym_gr_list_ub.
   }
   easy.
-} {
-  unfold g', f.
+}
+rewrite H1.
+f_equal.
+rewrite (List_map_nth' 0). 2: {
+  rewrite length_bsort.
+  unfold g', f, "°", ff_app.
+  rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
   rewrite (List_map_nth' 0). 2: {
+    unfold p; rewrite length_collapse, Hklm.
+    now apply canon_sym_gr_list_ub.
+  }
+  do 3 rewrite fold_ff_app.
+  rewrite Hklm.
+  apply canon_sym_gr_inv_list_ub; [ easy | ].
+  unfold p, collapse.
+  unfold ff_app at 1.
+  eapply lt_le_trans. {
+    apply bsort_rank_ub.
+    intros H.
+    apply eq_bsort_rank_nil in H.
+    now subst kl.
+  }
+  now rewrite length_bsort_rank, Hklm.
+}
+rewrite (List_map_nth' 0); [ | now rewrite Hklm ].
+unfold g', f, "°", ff_app.
+rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0). 2: {
+  unfold p; rewrite length_collapse, Hklm.
+  now apply canon_sym_gr_list_ub.
+}
+unfold p, collapse.
+do 5 rewrite fold_ff_app.
+f_equal.
+rewrite fold_comp_lt.
+rewrite fold_comp_lt.
+rewrite fold_comp_lt.
+...
+Compute (let kl := [7;2;28] in let m := 3 in let i := 6 in let j := 2 in
+  ff_app
+    (bsort Nat.leb kl ° canon_sym_gr_inv_list m i ° bsort_rank Nat.leb (bsort_rank Nat.leb kl)
+     ° canon_sym_gr_list m i) j = ff_app kl j
+).
+unfold g, g', f in H1.
+do 2 rewrite fold_ff_app in H1.
+rewrite fold_comp_lt in H1.
+...
+Search (ff_app (bsort _ _)).
 ...
 Print canon_sym_gr_inv_list.
 Print canon_sym_gr_list_inv.
