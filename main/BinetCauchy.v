@@ -1017,6 +1017,9 @@ rewrite Nat.add_0_l.
 apply rngl_product_eq_compat.
 intros j (_, Hj).
 unfold mat_el.
+(*1*)
+f_equal. {
+...1
 f_equal. 2: {
 unfold mat_with_rows.
 cbn.
