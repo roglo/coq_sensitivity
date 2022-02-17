@@ -911,17 +911,42 @@ unfold bsort.
 now apply sorted_bsort_loop.
 Qed.
 
-Theorem glop : in_charac_0_field →
+(* ouais chais pas...
+Theorem aaa : in_charac_0_field →
+  ∀ m n A kl,
+  mat_nrows A = n
+  → mat_ncols A = m
+  → is_correct_matrix A = true
+  → NoDup kl
+  → length kl = m
+  → (∀ k, k ∈ kl → k < n)
+  → Permutation jl kl
+  → (ε jl * det (mat_with_rows jl A)%F =
+    (ε kl * det (mat_with_rows kl A))%F.
+Proof.
+...
+*)
+
+Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   ∀ p q A jl,
-  p < length jl
+  is_correct_matrix A = true
+  → (∀ k, k ∈ jl → k < mat_nrows A)
+  → mat_ncols A = length jl
+  → p < length jl
+  → q < length jl
   → p ≠ q
   → det (mat_swap_rows p q (mat_with_rows jl A)) =
     (- det (mat_with_rows jl A))%F.
 Proof.
-intros Hif * Hp Hpq.
+intros Hif * Hcm Hro Hco Hp Hq Hpq.
 apply determinant_alternating; [ easy | easy | | | ]. {
   now rewrite mat_with_rows_nrows.
 } {
+  now rewrite mat_with_rows_nrows.
+}
+now apply mat_with_rows_is_square.
+Qed.
+
 ...
 
 (* kl is not necessarily in order *)
