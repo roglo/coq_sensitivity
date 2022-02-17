@@ -911,6 +911,19 @@ unfold bsort.
 now apply sorted_bsort_loop.
 Qed.
 
+Theorem glop : in_charac_0_field →
+  ∀ p q A jl,
+  p < length jl
+  → p ≠ q
+  → det (mat_swap_rows p q (mat_with_rows jl A)) =
+    (- det (mat_with_rows jl A))%F.
+Proof.
+intros Hif * Hp Hpq.
+apply determinant_alternating; [ easy | easy | | | ]. {
+  now rewrite mat_with_rows_nrows.
+} {
+...
+
 (* kl is not necessarily in order *)
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
