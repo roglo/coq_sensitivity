@@ -1023,6 +1023,12 @@ intros j (_, Hj).
 unfold mat_el.
 (*1*)
 f_equal. {
+  fold p.
+Check canon_sym_gr_list_inv.
+  replace (g i) with (ff_app p i).
+...
+  replace (g i) with (canon_sym_gr_list_inv m []).
+  rewrite permut_in_canon_sym_gr_of_its_rank.
 ...
   unfold g, "°".
   rewrite permut_in_canon_sym_gr_of_its_rank.
