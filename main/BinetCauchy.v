@@ -1035,12 +1035,33 @@ do 4 rewrite fold_ff_app.
 rewrite permut_bsort_permut.
 ...
 *)
-rewrite <- (@canon_sym_gr_sym_gr_inv m i).
+rewrite <- (@canon_sym_gr_sym_gr_inv m (g i)).
 symmetry.
-rewrite <- (@canon_sym_gr_sym_gr_inv m i).
-symmetry.
+rewrite <- (@canon_sym_gr_sym_gr_inv m (g i)).
 rewrite canon_sym_gr_inv_sym_gr.
 f_equal.
+Search (canon_sym_gr_inv_list _ _).
+Print canon_sym_gr_inv_list.
+Print canon_sym_gr_inv_elem.
+Compute (nth 7 (canon_sym_gr_list_list 4) []).
+Compute (canon_sym_gr_inv_list 4 7).
+Compute (let n := 3 in map (λ i, nth i (canon_sym_gr_list_list n) []) (seq 0 n!)).
+Compute (let n := 3 in map (λ i, bsort_rank Nat.leb (canon_sym_gr_inv_list n i)) (seq 0 n!)).
+Compute (let n := 4 in map (λ i, bsort_rank Nat.leb (nth i (canon_sym_gr_list_list n) [])) (seq 0 n!)).
+Compute (let n := 4 in map (λ i, canon_sym_gr_inv_list n i) (seq 0 n!)).
+Theorem pouet : ∀ n k,
+  canon_sym_gr_inv_list n k =
+  bsort_rank Nat.leb (nth k (canon_sym_gr_list_list n) []).
+Print canon_sym_gr_inv_list.
+...
+Theorem pouet : ∀ n i,
+  nth i (canon_sym_gr_list_list n) [] =
+  bsort_rank Nat.leb (canon_sym_gr_inv_list n i).
+...
+...
+  replace (g i) with (ff_app (canon_sym_gr_list m i) j).
+Search (ff_app (canon_sym_gr_inv_list _ _)).
+Search canon_sym_gr_inv_list.
 ...
   replace (g i) with (canon_sym_gr_list_inv m (bsort_rank Nat.leb p)).
   rewrite permut_in_canon_sym_gr_of_its_rank.
