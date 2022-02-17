@@ -1047,12 +1047,73 @@ Compute (nth 7 (canon_sym_gr_list_list 4) []).
 Compute (canon_sym_gr_inv_list 4 7).
 Compute (let n := 3 in map (λ i, nth i (canon_sym_gr_list_list n) []) (seq 0 n!)).
 Compute (let n := 3 in map (λ i, bsort_rank Nat.leb (canon_sym_gr_inv_list n i)) (seq 0 n!)).
-Compute (let n := 4 in map (λ i, bsort_rank Nat.leb (nth i (canon_sym_gr_list_list n) [])) (seq 0 n!)).
-Compute (let n := 4 in map (λ i, canon_sym_gr_inv_list n i) (seq 0 n!)).
+Compute (let n := 4 in map (λ i, bsort_rank Nat.leb (nth i (canon_sym_gr_list_list n) [])) (seq 0 (n! + 1))).
+Compute (let n := 4 in map (λ i, canon_sym_gr_inv_list n i) (seq 0 (n! + 1))).
 Theorem pouet : ∀ n k,
-  canon_sym_gr_inv_list n k =
-  bsort_rank Nat.leb (nth k (canon_sym_gr_list_list n) []).
-Print canon_sym_gr_inv_list.
+  k < n!
+  → canon_sym_gr_inv_list n k =
+    bsort_rank Nat.leb (nth k (canon_sym_gr_list_list n) []).
+Proof.
+intros * Hk.
+apply List_eq_iff.
+rewrite length_canon_sym_gr_inv_list.
+rewrite length_bsort_rank.
+unfold canon_sym_gr_list_list at 1.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite length_canon_sym_gr_list.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i n) as [Hin| Hin]. 2: {
+  apply Nat.nlt_ge in Hin.
+  rewrite nth_overflow; [ | now rewrite length_canon_sym_gr_inv_list ].
+  rewrite nth_overflow. 2: {
+    rewrite length_bsort_rank.
+    unfold canon_sym_gr_list_list.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite length_canon_sym_gr_list.
+  }
+  easy.
+}
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite length_canon_sym_gr_inv_list.
+}
+symmetry.
+rewrite nth_indep with (d' := 0). 2: {
+  rewrite length_bsort_rank.
+  unfold canon_sym_gr_list_list.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite length_canon_sym_gr_list.
+}
+symmetry.
+clear d.
+move i before k.
+unfold canon_sym_gr_inv_list.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+unfold canon_sym_gr_list_list.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_0_l.
+revert k i Hk Hin.
+induction n; intros; [ now destruct i | ].
+cbn - [ nth bsort_rank ].
+destruct (lt_dec i (k / n!)) as [Hik| Hik]. {
+...
+Search (length (nth _ _ _)).
+Search canon_sym_gr_list_list.
+Print canon_sym_gr_list_list.
+Print sym_gr_inv.
+...
+permut_bsort_permut:
+  ∀ (i : nat) (l : list nat), is_permut_list l → i < length l → ff_app (bsort_rank Nat.leb l) (ff_app l i) = i
+canon_sym_gr_sym_gr_inv:
+  ∀ n k i : nat, k < n! → i < n → ff_app (canon_sym_gr_list n k) (ff_app (canon_sym_gr_inv_list n k) i) = i
+...
+Search canon_sym_gr_inv_list.
+...
+Search (ff_app (canon_sym_gr_list _ _)).
+unfold canon_sym_gr_inv_list.
 ...
 Theorem pouet : ∀ n i,
   nth i (canon_sym_gr_list_list n) [] =
