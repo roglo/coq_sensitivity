@@ -924,8 +924,7 @@ Theorem det_with_rows : in_charac_0_field →
        (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
-(* try to restart this proof, using the property that the
-   determinant is an alternate multi-linear form *)
+Check determinant_alternating.
 ...
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 (*
