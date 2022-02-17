@@ -1099,9 +1099,6 @@ revert k i Hk Hin.
 induction n; intros; [ now destruct i | ].
 cbn - [ nth bsort_rank ].
 destruct (lt_dec i (k / n!)) as [Hik| Hik]. {
-  unfold bsort_rank.
-  cbn - [ nth ].
-  unfold succ_when_ge.
   rewrite IHn; cycle 1. {
     apply Nat.mod_upper_bound, fact_neq_0.
   } {
