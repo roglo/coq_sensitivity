@@ -981,6 +981,10 @@ set (h := λ i,
     (bsort_rank Nat.leb
         (bsort_rank Nat.leb (canon_sym_gr_list m i) ° bsort_rank Nat.leb p))).
 *)
+(* il faut que
+  ff_app (canon_sym_gr_list m (g i)) (ff_app (collapse kl) j) =
+  ff_app (canon_sym_gr_list m i) j
+*)
 erewrite rngl_summation_change_var with (g0 := g).
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | ].
@@ -1019,6 +1023,11 @@ intros j (_, Hj).
 unfold mat_el.
 (*1*)
 f_equal. {
+...
+  unfold g, "°".
+  rewrite permut_in_canon_sym_gr_of_its_rank.
+  unfold ff_app.
+  rewrite (List_map_nth' 0).
 ...1
 f_equal. 2: {
 unfold mat_with_rows.
