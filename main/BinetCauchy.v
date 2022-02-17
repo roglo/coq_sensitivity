@@ -1109,6 +1109,13 @@ destruct (lt_dec i (k / n!)) as [Hik| Hik]. {
     apply Nat.div_lt_upper_bound in Hk; [ flia Hk Hik | ].
     apply fact_neq_0.
   }
+  remember (canon_sym_gr_list n (k mod n!)) as la eqn:Hla.
+  remember (k / n!) as q eqn:Hq.
+Search (nth _ (bsort_rank _ _)).
+Search (ff_app (bsort_rank _ _)).
+...
+  symmetry.
+  rewrite nth_bsort_rank_of_nodup_sorted.
 ...
 Search (length (nth _ _ _)).
 Search canon_sym_gr_list_list.
