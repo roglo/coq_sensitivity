@@ -37,6 +37,20 @@ Definition is_permut n f := is_permut_list f ∧ length f = n.
 Theorem fold_ff_app : ∀ l i, nth i l 0 = ff_app l i.
 Proof. easy. Qed.
 
+Theorem comp_map_seq : ∀ la lb,
+  la ° lb = map (λ i, ff_app la (ff_app lb i)) (seq 0 (length lb)).
+Proof.
+intros.
+unfold "°".
+symmetry.
+rewrite List_map_nth_seq with (d := 0).
+rewrite map_length.
+apply map_ext_in.
+intros i Hi.
+apply in_seq in Hi.
+now rewrite (List_map_nth' 0).
+Qed.
+
 Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
 Proof. intros; apply List_map_nth_seq. Qed.
 
