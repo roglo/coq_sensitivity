@@ -1024,10 +1024,34 @@ unfold mat_el.
 (*1*)
 f_equal. {
   fold p.
-Check canon_sym_gr_list_inv.
-  replace (g i) with (ff_app p i).
+(*
+unfold g.
+unfold "°".
+rewrite permut_in_canon_sym_gr_of_its_rank.
+unfold ff_app.
+rewrite (List_map_nth' 0).
+do 4 rewrite fold_ff_app.
 ...
-  replace (g i) with (canon_sym_gr_list_inv m []).
+rewrite permut_bsort_permut.
+...
+*)
+rewrite <- (@canon_sym_gr_sym_gr_inv m i).
+symmetry.
+rewrite <- (@canon_sym_gr_sym_gr_inv m i).
+symmetry.
+rewrite canon_sym_gr_inv_sym_gr.
+f_equal.
+...
+  replace (g i) with (canon_sym_gr_list_inv m (bsort_rank Nat.leb p)).
+  rewrite permut_in_canon_sym_gr_of_its_rank.
+  rewrite permut_bsort_permut.
+...
+  unfold ff_app.
+Search canon_sym_gr_list.
+  replace (g i) with (canon_sym_gr_list_inv m i).
+  replace (g i) with (ff_app (bsort Nat.leb p) i).
+  unfold ff_app.
+...
   rewrite permut_in_canon_sym_gr_of_its_rank.
 ...
   unfold g, "°".
