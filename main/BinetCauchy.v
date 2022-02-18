@@ -980,6 +980,12 @@ Definition transp_list p := transp_loop (length p) p.
 
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
+Definition lse p q l := list_swap_elem 0 l p q.
+
+Theorem permut_transp_list : ∀ p,
+  is_permut_list p
+  → p = Comp (l ∈ transp_list p), lse (fst l) (snd l).
+
 ...
 
 ([3; 2; 0; 1], [(0, 3); (0, 1); (0, 2)]);
