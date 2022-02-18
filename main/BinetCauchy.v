@@ -982,9 +982,26 @@ Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
 Definition lse p q l := list_swap_elem 0 l p q.
 
+Compute (lse 3 0 (seq 0 7)).
+
+Locate "Comp".
+
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = Comp (l ∈ transp_list p), lse (fst l) (snd l).
+  → p = iter_list (transp_list p) (λ c t, lse (fst t) (snd t) c) [].
+Proof.
+intros * Hp.
+Print iter_list.
+Compute
+  (let p := [3;2;0;1] in (p = iter_list (transp_list p) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p)))).
+Compute
+  (let p := [3;2;0;1] in (p = iter_list (transp_list p) (λ c t, lse (fst t) (snd t) c) (seq 0 (length p)))).
+(* non, c'est pas ça, chié merde *)
+...
+
+Theorem permut_transp_list : ∀ p,
+  is_permut_list p
+  → p = Comp (l ∈ map (λ t, transposition (fst t) (snd t)) (transp_list p)), l.
 
 ...
 
