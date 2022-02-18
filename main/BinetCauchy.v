@@ -988,28 +988,11 @@ Locate "Comp".
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = iter_list (transp_list p) (λ c t, lse (fst t) (snd t) c) [].
+  → p = iter_list (rev (transp_list p)) (λ c t, lse (fst t) (snd t) c) (seq 0 (length p)).
 Proof.
 intros * Hp.
-Print iter_list.
 Compute
-  (let p := [3;2;0;1] in (p = iter_list (transp_list p) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p)))).
-Compute
-  (let p := [3;2;0;1] in (p = iter_list (transp_list p) (λ c t, lse (fst t) (snd t) c) (seq 0 (length p)))).
-(* non, c'est pas ça, chié merde *)
-...
-
-Theorem permut_transp_list : ∀ p,
-  is_permut_list p
-  → p = Comp (l ∈ map (λ t, transposition (fst t) (snd t)) (transp_list p)), l.
-
-...
-
-([3; 2; 0; 1], [(0, 3); (0, 1); (0, 2)]);
-[3;2;0;1] on met le 3 à sa place →
-[1;2;0;3] on met le 1 à sa place →
-[2;1;0;3] on met le 2 à sa place →
-[0;1;2;3]
+  (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 
 ...
 
