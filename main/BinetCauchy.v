@@ -980,19 +980,27 @@ Definition transp_list p := transp_loop (length p) p.
 
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-Definition lse p q l := list_swap_elem 0 l p q.
+Definition lse n p q := list_swap_elem 0 (seq 0 n) p q.
 
-Compute (lse 3 0 (seq 0 7)).
-
-Locate "Comp".
+Notation "'Comp' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ° g) (seq 0 (length l)))
+  (at level 35, i at level 0, l at level 60).
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = iter_list (rev (transp_list p)) (λ c t, lse (fst t) (snd t) c) (seq 0 (length p)).
+  → p = iter_list (rev (transp_list p)) (λ c t, c ° lse (length p) (snd t) (fst t)) (seq 0 (length (rev (transp_list p)))).
 Proof.
 intros * Hp.
 Compute
+  (map (λ p, p = Comp (t ∈ transp_list p), lse (length p) (snd t) (fst t)) (canon_sym_gr_list_list 3)).
+...
+Compute
+  (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, c ° lse (snd t) (fst t) (seq 0 (length p))) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+...
+Compute
   (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+Compute
+  (map (λ p, (p = iter_list (transp_list p) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 
 ...
 

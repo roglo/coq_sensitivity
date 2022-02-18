@@ -18,10 +18,6 @@ Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
-Notation "'Comp' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c ° g) (seq 0 (length (hd [] l))))
-  (at level 35, i at level 0, l at level 60).
-
 (* Permutations of {0, 1, 2, ... n-1} *)
 
 Definition is_permut_list l := AllLt (length l) l ∧ NoDup l.
