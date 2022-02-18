@@ -947,16 +947,47 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_with_rows_is_square.
 Qed.
 
-Fixpoint transp_list_loop i p :=
-  match p with
-  | [] => []
-  | j :: l =>
-      if i =? j then transp_list_loop (S i) l
-      else ...
-(* bon, faut voir... *)
+(*
+Definition is_transp_id (p : list nat) :=
+  if list_eq_dec Nat.eq_dec p (seq 0 (length p)) then true
+  else false.
 
-Definition transp_list (p : list nat) :=
-  transp_list_loop 0 p
+Compute (is_transp_id [0;1;2]).
+*)
+
+Fixpoint first_non_fix_transp i p :=
+  match p with
+  | [] => None
+  | j :: l =>
+      if i =? j then first_non_fix_transp (S i) l
+      else Some (i, j)
+  end.
+
+Print list_swap_elem.
+Compute list_swap_elem _ [7;1;8;9;0;7] 3 2.
+
+Fixpoint transp_loop it (p : list nat) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match first_non_fix_transp 0 p with
+      | None => []
+      | Some (k, pk) => (k, pk) :: transp_loop it' (list_swap_elem 0 p k pk)
+      end
+  end.
+
+Definition transp_list p := transp_loop (length p) p.
+
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+
+...
+
+([3; 2; 0; 1], [(0, 3); (0, 1); (0, 2)]);
+[3;2;0;1] on met le 3 à sa place →
+[1;2;0;3] on met le 1 à sa place →
+[2;1;0;3] on met le 2 à sa place →
+[0;1;2;3]
+
 ...
 
 Theorem glop : in_charac_0_field →
