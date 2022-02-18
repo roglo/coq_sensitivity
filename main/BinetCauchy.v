@@ -947,6 +947,18 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_with_rows_is_square.
 Qed.
 
+Fixpoint transp_list_loop i p :=
+  match p with
+  | [] => []
+  | j :: l =>
+      if i =? j then transp_list_loop (S i) l
+      else ...
+(* bon, faut voir... *)
+
+Definition transp_list (p : list nat) :=
+  transp_list_loop 0 p
+...
+
 Theorem glop : in_charac_0_field →
   ∀ n A p,
   is_square_matrix A = true
@@ -956,6 +968,9 @@ Theorem glop : in_charac_0_field →
 Proof.
 intros Hif * Hsm Hra Hp.
 Check determinant_alternating.
+Locate "Comp".
+...
+assert (p = Comp (l ∈ transp_list p), l).
 ...
 
 (* kl is not necessarily in order *)
