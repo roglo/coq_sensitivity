@@ -947,6 +947,14 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_with_rows_is_square.
 Qed.
 
+Theorem glop : in_charac_0_field →
+  ∀ n A p,
+  is_square_matrix A = true
+  → mat_nrows A = n
+  → is_permut n p
+  → det A = (ε p * det (mat_with_rows p A))%F.
+Proof.
+intros Hif * Hsm Hra Hp.
 ...
 
 (* kl is not necessarily in order *)
