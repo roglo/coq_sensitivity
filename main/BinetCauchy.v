@@ -955,6 +955,7 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
+Check determinant_alternating.
 ...
 
 (* kl is not necessarily in order *)
