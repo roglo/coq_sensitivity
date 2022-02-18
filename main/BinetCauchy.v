@@ -982,9 +982,9 @@ Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
 Definition lse c p q := list_swap_elem 0 c p q.
 
-Notation "'Comp' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c ° g) (seq 0 (length l)))
-  (at level 35, i at level 0, l at level 60).
+Notation "'Comp' n ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ° g) (seq 0 n))
+  (at level 35, i at level 0, l at level 60, n at level 0).
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
@@ -993,10 +993,14 @@ Proof.
 intros * Hp.
 Compute
   (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-Compute
+Check
   (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+...
+Compute
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) []))) (canon_sym_gr_list_list 4).
 Locate "Comp".
 Locate "∑".
+Print comp_list.
 ...
 Check (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))).
 Compute
