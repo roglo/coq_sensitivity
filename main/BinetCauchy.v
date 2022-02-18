@@ -980,7 +980,7 @@ Definition transp_list p := transp_loop (length p) p.
 
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-Definition lse n p q := list_swap_elem 0 (seq 0 n) p q.
+Definition lse c p q := list_swap_elem 0 c p q.
 
 Notation "'Comp' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ° g) (seq 0 (length l)))
@@ -988,19 +988,30 @@ Notation "'Comp' ( i ∈ l ) , g" :=
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = iter_list (rev (transp_list p)) (λ c t, c ° lse (length p) (snd t) (fst t)) (seq 0 (length (rev (transp_list p)))).
+  → p = iter_list (rev (transp_list p)) (λ c t, c ° lse p (snd t) (fst t)) (seq 0 (length (rev (transp_list p)))).
 Proof.
 intros * Hp.
 Compute
-  (map (λ p, p = Comp (t ∈ transp_list p), lse (length p) (snd t) (fst t)) (canon_sym_gr_list_list 3)).
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+Compute
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+Locate "Comp".
+Locate "∑".
+...
+Check (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))).
+Compute
+  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, lse c (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 ...
 Compute
-  (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, c ° lse (snd t) (fst t) (seq 0 (length p))) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+  (map (λ p, p = Comp (t ∈ transp_list p), lse (length p) (fst t) (snd t)) (canon_sym_gr_list_list 3)).
+
+
+Compute
+  (map (λ p,
+p = iter_list (rev (transp_list p)) (λ c t, c ° lse (length p) (snd t) (fst t)) (seq 0 (length (rev (transp_list p))))) (canon_sym_gr_list_list 4)).
 ...
 Compute
   (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-Compute
-  (map (λ p, (p = iter_list (transp_list p) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 
 ...
 
