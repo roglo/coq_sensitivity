@@ -980,7 +980,7 @@ Definition transp_list p := transp_loop (length p) p.
 
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-Definition lse c p q := list_swap_elem 0 c p q.
+Definition swap c p q := list_swap_elem 0 c p q.
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ° g) (seq 0 n))
@@ -988,13 +988,18 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = iter_list (rev (transp_list p)) (λ c t, c ° lse p (snd t) (fst t)) (seq 0 (length (rev (transp_list p)))).
+  → p = iter_list (rev (transp_list p)) (λ c t, c ° swap p (snd t) (fst t)) (seq 0 (length (transp_list p))).
 Proof.
 intros * Hp.
+Compute (map (λ p,
+  p = Comp (length (transp_list p)) (t ∈ rev (transp_list p)), swap p (snd t) (fst t)
+) (canon_sym_gr_list_list 4)).
 Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+Compute
+  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, c ° swap (seq 0 (length p)) (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 Check
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, c ° swap (seq 0 (length p)) (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 ...
 Compute
   (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) []))) (canon_sym_gr_list_list 4).
