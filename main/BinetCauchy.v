@@ -978,50 +978,47 @@ Fixpoint transp_loop it (p : list nat) :=
 
 Definition transp_list p := transp_loop (length p) p.
 
+(*
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+*)
 
-Definition swap c p q := list_swap_elem 0 c p q.
+Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c ° g) (seq 0 n))
+  (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
+
+Theorem permut_transp_loop : ∀ len p,
+  length p ≤ len
+  → is_permut_list p
+  → p = Comp (length p) (t ∈ transp_loop len p), swap (length p) t.
+Proof.
+intros * Hlen Hp.
+unfold iter_list.
+revert p Hlen Hp.
+induction len; intros; cbn. {
+  apply Nat.le_0_r in Hlen.
+  now apply length_zero_iff_nil in Hlen; subst p.
+}
+remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
+symmetry in Hkp.
+destruct kp as [(k, kp)| ]. {
+  cbn.
+  unfold "°" at 2.
+...
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = iter_list (rev (transp_list p)) (λ c t, c ° swap p (snd t) (fst t)) (seq 0 (length (transp_list p))).
+  → p = Comp (length p) (t ∈ transp_list p), swap (length p) t.
 Proof.
 intros * Hp.
-Compute (map (λ p,
-  p = Comp (length (transp_list p)) (t ∈ rev (transp_list p)), swap p (snd t) (fst t)
-) (canon_sym_gr_list_list 4)).
+...
+now apply permut_transp_loop.
+...
 Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, c ° swap (seq 0 (length p)) (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 Check
-  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, c ° swap (seq 0 (length p)) (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-...
-Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) []))) (canon_sym_gr_list_list 4).
-Locate "Comp".
-Locate "∑".
-Print comp_list.
-...
-Check (iter_list (transp_list p) (λ c t, lse (seq 0 (length p)) (snd t) (fst t) ° c) (seq 0 (length p))).
-Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (rev (transp_list p)) (λ c t, lse c (snd t) (fst t)) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-...
-Compute
-  (map (λ p, p = Comp (t ∈ transp_list p), lse (length p) (fst t) (snd t)) (canon_sym_gr_list_list 3)).
-
-
-Compute
-  (map (λ p,
-p = iter_list (rev (transp_list p)) (λ c t, c ° lse (length p) (snd t) (fst t)) (seq 0 (length (rev (transp_list p))))) (canon_sym_gr_list_list 4)).
-...
-Compute
-  (map (λ p, (p = iter_list (rev (transp_list p)) (λ c t, lse (snd t) (fst t) c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-
+  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 ...
 
 Theorem glop : in_charac_0_field →
