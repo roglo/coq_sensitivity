@@ -977,14 +977,30 @@ Definition transp_list p := transp_loop (length p) p.
 
 Theorem first_non_fix_transp_Some : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
-  → (∀ j, j < k → nth j p 0 = j) ∧
-    nth k p 0 = kp ∧ k ≠ kp.
+  → (∀ j, i ≤ j < k → nth (j - i) p 0 = j - i) ∧
+    nth (k - i) p 0 = kp ∧ k ≠ kp.
 Proof.
 intros * Hk.
 split. {
   intros j Hj.
+  remember (j - i) as n eqn:Hn.
+  replace j with (n + i) in Hj by flia Hn Hj.
+  clear j Hn.
+  destruct Hj as (_, Hnik).
+  revert i k n Hk Hnik.
+  induction p as [| a]; intros; [ now destruct n | ].
+  destruct i. {
+    cbn in Hk.
+    destruct n. {
+      destruct a; [ easy | exfalso ].
+      now injection Hk; clear Hk; intros; subst k kp.
+    }
+    cbn.
+(* trou du cul *)
+...
   revert j k kp Hk Hj.
   induction i; intros. {
+    rewrite Nat.sub_0_r.
     destruct p as [| a]; [ easy | ].
     cbn in Hk.
     destruct a. {
