@@ -978,9 +978,31 @@ Fixpoint transp_loop it (p : list nat) :=
 
 Definition transp_list p := transp_loop (length p) p.
 
+Fixpoint transp_loop' it i l :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match l with
+      | j :: l' =>
+          if i =? j then transp_loop' it' (S i) l'
+          else (i, j) :: transp_loop' it' (S i) (replace_at (i - 1) l' j)
 (*
-Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+transp_loop' it' (S i) (replace_at j l i)
 *)
+      | [] => []
+      end
+  end.
+
+Definition transp_list' p := transp_loop' (length p) 0 p.
+
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+Compute transp_list' [0;1;3;2].
+...
+Compute transp_list' [0;2;1;3].
+Compute (replace_at 2 [2;1;3] 1).
+Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
+
+...
 
 Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
 
