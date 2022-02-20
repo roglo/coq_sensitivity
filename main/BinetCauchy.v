@@ -985,8 +985,11 @@ Fixpoint transp_loop' it i l :=
       match l with
       | j :: l' =>
           if i =? j then transp_loop' it' (S i) l'
-          else (i, j) :: transp_loop' it' (S i) (replace_at (i - 1) l' j)
+          else (i, j) :: transp_loop' it' (S i) (replace_at (j - i - 1) l' j)
 (*
+          else (i, j) :: transp_loop' it' (S i) (tl (replace_at (j - i) l j))
+map (λ i, (42, i)) (replace_at (j - i) l j)
+replace_at (i - 1) l' j)
 transp_loop' it' (S i) (replace_at j l i)
 *)
       | [] => []
@@ -995,12 +998,31 @@ transp_loop' it' (S i) (replace_at j l i)
 
 Definition transp_list' p := transp_loop' (length p) 0 p.
 
-Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
-Compute transp_list' [0;1;3;2].
+(* pas bon *)
+Compute (transp_list' [1;3;0;2]).
 ...
-Compute transp_list' [0;2;1;3].
-Compute (replace_at 2 [2;1;3] 1).
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
+Compute (transp_list [1;3;0;2]).
+Compute (transp_list' [1;3;0;2]).
+[1;3;0;2]
+[3;1;0;2]
+[2;1;0;3]
+[0;1;2;3]
+...
+[1;3;0;2]
+[3;1;0;2]
+[0;1;3;2]
+[2;1;3;0]
+...
+     = [([0; 1; 2], []); ([0; 2; 1], [(1, 2)]); ([1; 0; 2], [(0, 1)]);
+       ([1; 2; 0], [(0, 1); (0, 2)]); ([2; 0; 1], [(0, 2); (0, 1)]);
+       ([2; 1; 0], [(0, 2)])]
+     = [([0; 1; 2], []); ([0; 2; 1], [(1, 2)]); ([1; 0; 2], [(0, 1)]);
+       ([1; 2; 0], [(0, 1); (2, 0)]); ([2; 0; 1], [(0, 2); (1, 0)]);
+       ([2; 1; 0], [(0, 2)])]
+Compute transp_list' [0;1;3;2].
+Compute transp_list' [0;2;1;3].
 
 ...
 
