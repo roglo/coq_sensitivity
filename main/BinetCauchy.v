@@ -963,9 +963,6 @@ Fixpoint first_non_fix_transp i p :=
       else Some (i, j)
   end.
 
-Print list_swap_elem.
-Compute list_swap_elem _ [7;1;8;9;0;7] 3 2.
-
 Fixpoint transp_loop it (p : list nat) :=
   match it with
   | 0 => []
@@ -978,52 +975,19 @@ Fixpoint transp_loop it (p : list nat) :=
 
 Definition transp_list p := transp_loop (length p) p.
 
-Fixpoint transp_loop' it i l :=
-  match it with
-  | 0 => []
-  | S it' =>
-      match l with
-      | j :: l' =>
-          if i =? j then transp_loop' it' (S i) l'
-          else (i, j) :: transp_loop' it' (S i) (replace_at (j - i - 1) l' j)
-(*
-          else (i, j) :: transp_loop' it' (S i) (tl (replace_at (j - i) l j))
-map (λ i, (42, i)) (replace_at (j - i) l j)
-replace_at (i - 1) l' j)
-transp_loop' it' (S i) (replace_at j l i)
-*)
-      | [] => []
-      end
-  end.
-
-Definition transp_list' p := transp_loop' (length p) 0 p.
-
-(* pas bon *)
-Compute (transp_list' [1;3;0;2]).
-...
-Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
-Compute (transp_list [1;3;0;2]).
-Compute (transp_list' [1;3;0;2]).
-[1;3;0;2]
-[3;1;0;2]
-[2;1;0;3]
-[0;1;2;3]
-...
-[1;3;0;2]
-[3;1;0;2]
-[0;1;3;2]
-[2;1;3;0]
-...
-     = [([0; 1; 2], []); ([0; 2; 1], [(1, 2)]); ([1; 0; 2], [(0, 1)]);
-       ([1; 2; 0], [(0, 1); (0, 2)]); ([2; 0; 1], [(0, 2); (0, 1)]);
-       ([2; 1; 0], [(0, 2)])]
-     = [([0; 1; 2], []); ([0; 2; 1], [(1, 2)]); ([1; 0; 2], [(0, 1)]);
-       ([1; 2; 0], [(0, 1); (2, 0)]); ([2; 0; 1], [(0, 2); (1, 0)]);
-       ([2; 1; 0], [(0, 2)])]
-Compute transp_list' [0;1;3;2].
-Compute transp_list' [0;2;1;3].
-
+Theorem first_non_fix_transp_Some : ∀ i p k kp,
+  first_non_fix_transp i p = Some (k, kp)
+  → (∀ j, j < k → nth j p 0 = j) ∧
+    nth k p 0 = kp ∧ k ≠ kp.
+Proof.
+intros * Hk.
+split. {
+  intros j Hj.
+  revert j k kp Hk Hj.
+  induction i; intros. {
+    destruct p as [| a]; [ easy | ].
+    cbn in Hk.
+    destruct a. {
 ...
 
 Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
@@ -1035,8 +999,22 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
 Theorem permut_transp_loop : ∀ len p,
   length p ≤ len
   → is_permut_list p
-  → p = Comp (length p) (t ∈ transp_loop len p), swap (length p) t.
+  → p = Comp (length p) (ij ∈ transp_loop len p), swap (length p) ij.
 Proof.
+(*
+Compute (let p := [3;2;0;1] in let len := length p in let n := 6 in
+p = Comp n (ij ∈ transp_loop len p), swap n ij
+).
+*)
+intros * Hlen Hp.
+destruct len; cbn. {
+  apply Nat.le_0_r in Hlen.
+  now apply length_zero_iff_nil in Hlen; subst p.
+}
+remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
+destruct kp as [(k, kp)| ]. {
+  symmetry in Hkp.
+...
 intros * Hlen Hp.
 unfold iter_list.
 revert p Hlen Hp.
