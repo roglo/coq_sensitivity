@@ -977,9 +977,84 @@ Definition transp_list p := transp_loop (length p) p.
 
 Theorem first_non_fix_transp_Some : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
-  → (∀ j, i ≤ j < k → nth (j - i) p 0 = j - i) ∧
-    nth (k - i) p 0 = kp ∧ k ≠ kp.
+  →  k ≠ kp ∧
+    nth (k - i) p 0 = kp ∧
+    (∀ j, i ≤ j < k → nth (j - i) p 0 = j).
 Proof.
+intros * Hk.
+split. {
+  revert i k kp Hk.
+  induction p as [| a]; intros; [ easy | ].
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    now apply IHp with (i := S i).
+  }
+  now injection Hk; clear Hk; intros; subst k kp.
+}
+split. {
+  revert i k kp Hk.
+  induction p as [| a]; intros; [ easy | ].
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    specialize (IHp _ _ _ Hk) as H1.
+    subst a.
+    destruct (le_dec k i) as [Hki| Hki]. {
+      replace (k - i) with 0 by flia Hki; cbn.
+      replace (k - S i) with 0 in H1 by flia Hki; cbn.
+Print first_non_fix_transp.
+...
+
+Print first_non_fix_transp.
+...
+Compute (let i := 0 in let p := [0;1;3;2] in first_non_fix_transp i p). (* (2, 3) *)
+...
+Compute (let i := 1 in let p := [0;1;3;2] in first_non_fix_transp i p). (* (1, 0) *)
+Compute (let i := 2 in let p := [0;1;3;2] in first_non_fix_transp i p). (* (2, 0) *)
+Compute (let i := 3 in let p := [0;1;3;2] in first_non_fix_transp i p). (* (3, 0) *)
+Compute (let i := 4 in let p := [0;1;3;2] in first_non_fix_transp i p). (* (4, 0) *)
+...
+intros * Hk.
+split. {
+  revert i k kp Hk.
+  induction p as [| a]; intros; [ easy | ].
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    specialize (IHp _ _ _ Hk) as H1.
+    destruct (le_dec k i) as [Hki| Hki]. {
+      replace (k - i) with 0 by flia Hki; cbn.
+      replace (k - S i) with 0 in H1 by flia Hki.
+      intros Ha; apply H1; clear H1.
+      subst a i.
+...
+intros * Hk.
+Compute (let i := 0 in let p := [0;2;3;1] in first_non_fix_transp i p).
+Compute (let i := 0 in let p := [0;1;3;2] in first_non_fix_transp i p).
+Compute (let i := 1 in let p := [0;1;3;2] in first_non_fix_transp i p).
+...
+Compute (let i := 0 in let p := [3;2;0;1] in first_non_fix_transp i p).
+Compute (let i := 7 in let p := [3;2;0;1] in first_non_fix_transp i p).
+Compute (let i := 9 in let p := [3;2;0;1] in let k := 7 in let kp := 3 in
+  (first_non_fix_transp i p,
+    nth (k - i) p 0 = kp ∧ k ≠ kp)).
+...
+intros * Hk.
+split. {
+  intros j Hj.
+  move j before i.
+  revert i j k kp Hk Hj.
+  induction p as [| a]; intros; [ easy | ].
+  destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+    subst j; cbn.
+    rewrite Nat.sub_diag.
+...
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    specialize (IHp _ (S j) _ _ Hk) as H1.
+...
 intros * Hk.
 split. {
   intros j Hj.
@@ -987,16 +1062,27 @@ split. {
   replace j with (n + i) in Hj by flia Hn Hj.
   clear j Hn.
   destruct Hj as (_, Hnik).
-  revert i k n Hk Hnik.
+  revert i k kp n Hk Hnik.
   induction p as [| a]; intros; [ now destruct n | ].
   destruct i. {
-    cbn in Hk.
+    cbn - [ "=?" ] in Hk.
     destruct n. {
       destruct a; [ easy | exfalso ].
       now injection Hk; clear Hk; intros; subst k kp.
     }
     cbn.
-(* trou du cul *)
+    destruct a. {
+      cbn in Hk.
+      specialize (IHp _ _ _ n Hk) as H1.
+      rewrite Nat.add_0_r, <- Nat.add_1_r in Hnik.
+      specialize (H1 Hnik).
+...
+      destruct p as [| b]; [ easy | ].
+      cbn in Hk.
+      destruct b. {
+        injection Hk; clear Hk; intros; subst k kp.
+        flia Hnik.
+      }
 ...
   revert j k kp Hk Hj.
   induction i; intros. {
