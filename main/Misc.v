@@ -1648,6 +1648,10 @@ rewrite op_d_l.
 now apply (fold_left_op_fun_from_d d).
 Qed.
 
+Theorem iter_list_cons' : ∀ A B a l (f : A → B → A) d,
+  iter_list (a :: l) f d = iter_list l f (f d a).
+Proof. easy. Qed.
+
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)
   → iter_list l (λ c i, op c (g i)) d =

@@ -1078,6 +1078,15 @@ destruct kp as [(k, kp)| ]. {
   apply first_non_fix_transp_Some in Hkp.
   destruct Hkp as (Hbef & Hkp & Hkkp).
   rewrite Nat.sub_0_r in Hkp.
+  rewrite iter_list_cons'.
+...
+Unset Printing Notations.
+specialize (@iter_list_cons _ (nat * nat) (k, kp)) as H1.
+specialize (H1 (λ ij _, (3,2))).
+specialize (H1 (k, kp)).
+specialize (H1 (transp_loop len (list_swap_elem 0 p k kp))).
+cbn in H1.
+Check (fun (c : list nat) (ij : prod nat nat) => comp_list (swap (length p) ij) c).
 ...
 intros * Hlen Hp.
 unfold iter_list.
