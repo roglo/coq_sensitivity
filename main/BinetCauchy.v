@@ -992,8 +992,19 @@ split. {
   }
   now injection Hk; clear Hk; intros; subst k kp.
 }
-split. {
+assert (Hik : i ≤ k). {
   revert i k kp Hk.
+  induction p as [| a]; intros; [ easy | ].
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    specialize (IHp _ _ _ Hk) as H1.
+    flia H1.
+  }
+  now injection Hk; clear Hk; intros; subst i a.
+}
+split. {
+  revert i k kp Hk Hik.
   induction p as [| a]; intros; [ easy | ].
   cbn in Hk.
   rewrite if_eqb_eq_dec in Hk.
@@ -1001,6 +1012,9 @@ split. {
     specialize (IHp _ _ _ Hk) as H1.
     subst a.
     destruct (le_dec k i) as [Hki| Hki]. {
+      apply Nat.le_antisymm in Hik; [ subst k | easy ].
+      rewrite Nat.sub_diag; cbn.
+...
       replace (k - i) with 0 by flia Hki; cbn.
       replace (k - S i) with 0 in H1 by flia Hki; cbn.
 Print first_non_fix_transp.
