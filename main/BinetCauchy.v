@@ -1069,7 +1069,6 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 *)
 intros * Hlen Hp.
 unfold iter_list.
-...
 revert p Hlen Hp.
 induction len; intros; cbn. {
   apply Nat.le_0_r in Hlen.
@@ -1085,6 +1084,8 @@ destruct kp as [(k, kp)| ]. {
     unfold swap; cbn.
     now rewrite length_list_swap_elem, seq_length.
   }
+  specialize (IHlen (list_swap_elem 0 p k kp)) as H1.
+  rewrite length_list_swap_elem in H1.
 ...
   rewrite iter_list_cons'.
 ...
