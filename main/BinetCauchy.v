@@ -977,7 +977,7 @@ Definition transp_list p := transp_loop (length p) p.
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
-  → i ≤ k ∧ k ≠ kp ∧ k < length p.
+  → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
 Proof.
 intros * Hk.
 split. {
@@ -1003,11 +1003,6 @@ split. {
 } {
   revert i k kp Hk.
   induction p as [| a]; intros; [ easy | ].
-(*
-  destruct k; [ now destruct p; cbn | ].
-  cbn in Hk |-*.
-  apply -> Nat.succ_lt_mono.
-*)
   cbn in Hk.
   rewrite if_eqb_eq_dec in Hk.
   destruct (Nat.eq_dec i a) as [Hia| Hia]. {
@@ -1016,7 +1011,7 @@ split. {
   }
   cbn.
   injection Hk; clear Hk; intros; subst i kp.
-...
+  flia.
 }
 Qed.
 
@@ -1025,7 +1020,7 @@ Theorem first_non_fix_transp_Some : ∀ i p k kp,
   → (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
     nth (k - i) p 0 = kp ∧
     k ≠ kp ∧
-    k < length p.
+    k < i + length p.
 Proof.
 intros * Hk.
 split. {
@@ -1069,7 +1064,8 @@ split. {
 split. {
   apply (first_non_fix_transp_Some_neq_le i p Hk).
 } {
-...
+  apply (first_non_fix_transp_Some_neq_le i p Hk).
+}
 Qed.
 
 Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
@@ -1100,26 +1096,87 @@ induction len; intros; cbn. {
 remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
 destruct kp as [(k, kp)| ]. {
   symmetry in Hkp.
-...
   apply first_non_fix_transp_Some in Hkp.
-  destruct Hkp as (Hbef & Hkp & Hkkp).
+  destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
   rewrite Nat.sub_0_r in Hkp; cbn.
+  destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
   destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
-    subst n.
+    move Hnl at top; subst n.
+    assert (Hkpl : kp < len). {
+      rewrite <- Hpl, <- Hkp.
+      apply Hpp, nth_In.
+      now rewrite Hpl.
+    }
     rewrite <- IHlen; [ | easy | | ]; cycle 1. {
-      apply list_swap_elem_is_permut; [ | | easy ].
-...
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    subst n; cbn.
-    destruct Hp as (Hpp, Hpl).
-    destruct Hq as (Hqp, Hql).
-    apply length_zero_iff_nil in Hpl; subst p.
-    apply length_zero_iff_nil in Hql; subst q.
-    now rewrite transp_loop_nil.
+      now apply list_swap_elem_is_permut.
+    } {
+      apply comp_is_permut; [ | easy ].
+      unfold swap; cbn.
+      apply list_swap_elem_is_permut; [ easy | easy | ].
+      apply seq_is_permut.
+    }
+    rewrite (permut_comp_assoc len); [ | | easy ]. 2: {
+      unfold swap.
+      now rewrite length_list_swap_elem, seq_length.
+    }
+    f_equal.
+    unfold swap; cbn.
+    unfold "°", ff_app.
+    unfold list_swap_elem at 2.
+    rewrite seq_length, map_map.
+    rewrite (List_map_nth_seq p) with (d := 0).
+    rewrite Hpl.
+    apply map_ext_in.
+    intros i Hi; apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      subst i.
+      rewrite seq_nth; [ cbn | easy ].
+      unfold list_swap_elem.
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite seq_length, List_map_seq_length.
+      }
+      rewrite List_map_seq_length.
+      unfold transposition.
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite Nat.eqb_refl.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec kp k) as [H| H]; [ now symmetry in H | clear H ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      now rewrite seq_nth.
+    }
+    destruct (Nat.eq_dec i kp) as [Hikp| Hikp]. {
+      subst i; clear Hi.
+      rewrite seq_nth; [ | easy ].
+      unfold list_swap_elem.
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite seq_length, List_map_seq_length.
+      }
+      rewrite List_map_seq_length.
+      unfold transposition.
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite Nat.eqb_refl.
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      now rewrite seq_nth.
+    }
+    rewrite seq_nth; [ | easy ].
+    unfold list_swap_elem.
+    rewrite (List_map_nth' 0). 2: {
+      now rewrite seq_length, List_map_seq_length.
+    }
+    rewrite List_map_seq_length.
+    unfold transposition.
+    rewrite seq_nth; [ cbn | easy ].
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i k) as [H| H]; [ easy | clear H ].
+    destruct (Nat.eq_dec i kp) as [H| H]; [ easy | clear H ].
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    now rewrite seq_nth.
   }
-  destruct n; [ easy | clear Hnz ].
-  apply Nat.succ_le_mono in Hlen.
   rewrite <- IHlen.
+...
+; [ | flia Hlen Hnl | | ].
   rewrite comp_1_r. 2: {
     unfold swap; cbn.
     now rewrite length_list_swap_elem, seq_length.
