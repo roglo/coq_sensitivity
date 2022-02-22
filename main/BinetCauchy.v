@@ -1069,6 +1069,7 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 *)
 intros * Hlen Hp.
 unfold iter_list.
+...
 revert p Hlen Hp.
 induction len; intros; cbn. {
   apply Nat.le_0_r in Hlen.
