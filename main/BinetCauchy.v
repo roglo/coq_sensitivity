@@ -1099,9 +1099,13 @@ destruct kp as [(k, kp)| ]. {
   apply first_non_fix_transp_Some in Hkp.
   destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
   rewrite Nat.sub_0_r in Hkp; cbn.
+(*
   destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
+*)
   destruct (Nat.eq_dec n (S len)) as [Hnl| Hnl]. {
     move Hnl at top; subst n.
+    clear Hlen.
+...
     assert (Hkpl : kp < S len). {
       rewrite <- Hpl, <- Hkp.
       apply Hpp, nth_In.
