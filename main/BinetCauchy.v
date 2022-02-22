@@ -977,7 +977,7 @@ Definition transp_list p := transp_loop (length p) p.
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
-  → i ≤ k ∧ k ≠ kp.
+  → i ≤ k ∧ k ≠ kp ∧ k < length p.
 Proof.
 intros * Hk.
 split. {
@@ -990,7 +990,8 @@ split. {
     flia H1.
   }
   now injection Hk; clear Hk; intros; subst i a.
-} {
+}
+split. {
   revert i k kp Hk.
   induction p as [| a]; intros; [ easy | ].
   cbn in Hk.
@@ -999,6 +1000,23 @@ split. {
     now apply IHp with (i := S i).
   }
   now injection Hk; clear Hk; intros; subst k kp.
+} {
+  revert i k kp Hk.
+  induction p as [| a]; intros; [ easy | ].
+(*
+  destruct k; [ now destruct p; cbn | ].
+  cbn in Hk |-*.
+  apply -> Nat.succ_lt_mono.
+*)
+  cbn in Hk.
+  rewrite if_eqb_eq_dec in Hk.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    apply IHp in Hk.
+    cbn; flia Hk.
+  }
+  cbn.
+  injection Hk; clear Hk; intros; subst i kp.
+...
 }
 Qed.
 
@@ -1006,7 +1024,8 @@ Theorem first_non_fix_transp_Some : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   → (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
     nth (k - i) p 0 = kp ∧
-    k ≠ kp.
+    k ≠ kp ∧
+    k < length p.
 Proof.
 intros * Hk.
 split. {
@@ -1046,9 +1065,11 @@ split. {
   }
   injection Hk; clear Hk; intros; subst i a.
   now rewrite Nat.sub_diag.
-} {
-  apply (first_non_fix_transp_Some_neq_le i p Hk).
 }
+split. {
+  apply (first_non_fix_transp_Some_neq_le i p Hk).
+} {
+...
 Qed.
 
 Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
@@ -1056,6 +1077,56 @@ Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
+
+Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
+Proof. now intros; destruct len. Qed.
+
+Theorem permut_transp_loop_gen : ∀ n len p q,
+  n ≤ len
+  → is_permut n p
+  → is_permut n q
+  → p ° q = fold_left (λ c ij, swap n ij ° c) (transp_loop len p) q.
+Proof.
+intros * Hlen Hp Hq.
+revert n p q Hlen Hp Hq.
+induction len; intros; cbn. {
+  apply Nat.le_0_r in Hlen; subst n.
+  destruct Hp as (Hpp, Hpl).
+  destruct Hq as (Hqp, Hql).
+  apply length_zero_iff_nil in Hpl; subst p.
+  apply length_zero_iff_nil in Hql; subst q.
+  easy.
+}
+remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
+destruct kp as [(k, kp)| ]. {
+  symmetry in Hkp.
+...
+  apply first_non_fix_transp_Some in Hkp.
+  destruct Hkp as (Hbef & Hkp & Hkkp).
+  rewrite Nat.sub_0_r in Hkp; cbn.
+  destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
+    subst n.
+    rewrite <- IHlen; [ | easy | | ]; cycle 1. {
+      apply list_swap_elem_is_permut; [ | | easy ].
+...
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n; cbn.
+    destruct Hp as (Hpp, Hpl).
+    destruct Hq as (Hqp, Hql).
+    apply length_zero_iff_nil in Hpl; subst p.
+    apply length_zero_iff_nil in Hql; subst q.
+    now rewrite transp_loop_nil.
+  }
+  destruct n; [ easy | clear Hnz ].
+  apply Nat.succ_le_mono in Hlen.
+  rewrite <- IHlen.
+  rewrite comp_1_r. 2: {
+    unfold swap; cbn.
+    now rewrite length_list_swap_elem, seq_length.
+  }
+  specialize (IHlen (list_swap_elem 0 p k kp)) as H1.
+  rewrite length_list_swap_elem in H1.
+...
 
 Theorem permut_transp_loop : ∀ len p,
   length p ≤ len
@@ -1069,6 +1140,10 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 *)
 intros * Hlen Hp.
 unfold iter_list.
+rewrite <- permut_transp_loop_gen.
+symmetry.
+now apply comp_1_r.
+...
 revert p Hlen Hp.
 induction len; intros; cbn. {
   apply Nat.le_0_r in Hlen.
