@@ -1068,6 +1068,7 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 ).
 *)
 intros * Hlen Hp.
+unfold iter_list.
 destruct len; cbn. {
   apply Nat.le_0_r in Hlen.
   now apply length_zero_iff_nil in Hlen; subst p.
@@ -1077,7 +1078,12 @@ destruct kp as [(k, kp)| ]. {
   symmetry in Hkp.
   apply first_non_fix_transp_Some in Hkp.
   destruct Hkp as (Hbef & Hkp & Hkkp).
-  rewrite Nat.sub_0_r in Hkp.
+  rewrite Nat.sub_0_r in Hkp; cbn.
+  rewrite comp_1_r. 2: {
+    unfold swap; cbn.
+    now rewrite length_list_swap_elem, seq_length.
+  }
+...
   rewrite iter_list_cons'.
 ...
 Unset Printing Notations.
