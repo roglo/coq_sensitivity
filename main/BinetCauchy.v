@@ -1100,13 +1100,16 @@ destruct kp as [(k, kp)| ]. {
   destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
   rewrite Nat.sub_0_r in Hkp; cbn.
   destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
-  destruct (Nat.eq_dec n len) as [Hnl| Hnl]. {
+  destruct (Nat.eq_dec n (S len)) as [Hnl| Hnl]. {
     move Hnl at top; subst n.
-    assert (Hkpl : kp < len). {
+    assert (Hkpl : kp < S len). {
       rewrite <- Hpl, <- Hkp.
       apply Hpp, nth_In.
       now rewrite Hpl.
     }
+...
+    rewrite <- IHlen; [ | | | ]; cycle 1. {
+...
     rewrite <- IHlen; [ | easy | | ]; cycle 1. {
       now apply list_swap_elem_is_permut.
     } {
