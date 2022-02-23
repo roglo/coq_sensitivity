@@ -1134,6 +1134,7 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
 Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
 Proof. now intros; destruct len. Qed.
 
+(*
 Theorem permut_transp_loop_gen : ∀ n len p q,
   n ≤ len
   → is_permut n p
@@ -1249,6 +1250,7 @@ destruct kp as [(k, kp)| ]. {
   specialize (IHlen (list_swap_elem 0 p k kp)) as H1.
   rewrite length_list_swap_elem in H1.
 ...
+*)
 
 Theorem permut_transp_loop : ∀ len p,
   length p ≤ len
@@ -1261,7 +1263,31 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 ).
 *)
 intros * Hlen Hp.
+remember (length p) as n eqn:Hn.
+symmetry in Hn.
+revert len p Hn Hlen Hp.
+induction n; intros. {
+  apply length_zero_iff_nil in Hn; subst p; cbn.
+  now rewrite transp_loop_nil.
+}
+...
+intros * Hlen Hp.
+destruct p as [| a1]. {
+  now rewrite transp_loop_nil.
+}
+cbn - [ nth seq ].
+rewrite seq_S.
+cbn - [ swap ].
+Search (iter_list _ (_ ++ _)).
+cbn - [ nth ].
+rewrite seq_length.
 unfold iter_list.
+
+rewrite seq_length.
+...
+intros * Hlen Hp.
+unfold iter_list.
+...
 rewrite <- permut_transp_loop_gen.
 symmetry.
 now apply comp_1_r.
