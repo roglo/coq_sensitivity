@@ -1252,6 +1252,7 @@ destruct kp as [(k, kp)| ]. {
 ...
 *)
 
+(*
 Theorem permut_transp_loop : ∀ len p,
   length p ≤ len
   → is_permut_list p
@@ -1378,6 +1379,7 @@ Compute
 Check
   (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 ...
+*)
 
 Theorem glop : in_charac_0_field →
   ∀ n A p,
