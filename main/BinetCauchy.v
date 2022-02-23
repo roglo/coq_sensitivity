@@ -1391,8 +1391,13 @@ Proof.
 intros Hif * Hsm Hra Hp.
 Check determinant_alternating.
 Locate "Comp".
-...
-assert (p = Comp (l ∈ transp_list p), l).
+enough (Hpt : p = Comp n (t ∈ transp_list p), swap n t).
+rewrite Hpt.
+enough
+  (Hpε :
+   ε (Comp n (t ∈ transp_list p), swap n t) =
+   minus_one_pow (length (transp_list p))).
+rewrite Hpε.
 ...
 
 (* kl is not necessarily in order *)
