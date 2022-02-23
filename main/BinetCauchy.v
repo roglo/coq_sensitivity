@@ -1157,7 +1157,6 @@ destruct kp as [(k, kp)| ]. {
   destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
   rewrite Nat.sub_0_r in Hkp; cbn.
   destruct Hkl as (_, Hkl).
-...
 (*
   destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
 *)
