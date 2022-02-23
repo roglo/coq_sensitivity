@@ -1417,7 +1417,16 @@ destruct m. {
 destruct m. {
   unfold iter_list; cbn.
   rewrite map_length.
-Search (length (fold_left _ _ _)).
+  remember (transp_list p) as lt eqn:Hlt.
+  symmetry in Hlt.
+  destruct lt as [| t]; [ easy | ].
+  destruct lt; [| easy ]; cbn.
+  rewrite comp_length, seq_length.
+  unfold iter_list in Hpε; cbn in Hpε.
+  rewrite sign_comp in Hpε; [ | easy | ]. 2: {
+...
+    rewrite swap_length.
+   apply seq_is_permut.
 ...
 Check determinant_alternating.
 ...
