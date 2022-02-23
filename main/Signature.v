@@ -2072,7 +2072,7 @@ Compute (let l := [19;3;7;6] in (collapse l, bsort_rank Nat.leb l)).
 Compute (let l := [19;3;7;6] in (collapse l, collapse (collapse l))).
 *)
 
-Theorem length_collapse : ∀ l, length (collapse l) = length l.
+Theorem collapse_length : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
 unfold collapse.
@@ -2177,9 +2177,9 @@ destruct (Nat.eq_dec (ff_app (collapse l) i) (ff_app (collapse l) j))
   as [H| H]. {
   destruct Hc as ((Hca, Hcn), Hcl).
   apply (NoDup_nat _ Hcn) in H; cycle 1. {
-    now rewrite length_collapse.
+    now rewrite collapse_length.
   } {
-    now rewrite length_collapse.
+    now rewrite collapse_length.
   }
   now subst j; apply Nat.lt_irrefl in Hc2.
 }
@@ -2227,14 +2227,14 @@ assert (Hi'l : i' < length l). {
   destruct Hc as ((Hca, Hcn), Hcl).
   rewrite Hcl in Hca.
   apply Hca, nth_In.
-  now rewrite length_collapse.
+  now rewrite collapse_length.
 }
 assert (Hj'l : j' < length l). {
   rewrite Hj'.
   destruct Hc as ((Hca, Hcn), Hcl).
   rewrite Hcl in Hca.
   apply Hca, nth_In.
-  now rewrite length_collapse.
+  now rewrite collapse_length.
 }
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
@@ -2308,7 +2308,7 @@ destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
   now apply length_zero_iff_nil in Hlz; subst l; cbn.
 }
 unfold ε.
-rewrite length_collapse.
+rewrite collapse_length.
 apply rngl_product_eq_compat.
 intros i (_, Hi).
 apply rngl_product_eq_compat.
