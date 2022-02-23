@@ -1397,6 +1397,28 @@ enough
    ε (Comp n (t ∈ transp_list p), swap n t) =
    minus_one_pow (length (transp_list p))).
 rewrite Hpε.
+remember (length (transp_list p)) as m eqn:Hm.
+symmetry in Hm.
+destruct m. {
+  cbn - [ det ]; rewrite rngl_mul_1_l.
+  apply length_zero_iff_nil in Hm.
+  rewrite Hm.
+  unfold iter_list; cbn.
+  unfold det; cbn.
+  rewrite List_map_seq_length.
+  rewrite Hra.
+  f_equal.
+  unfold mat_with_rows.
+  destruct A as (ll); cbn; f_equal.
+  cbn in Hra.
+  rewrite <- Hra.
+  apply List_map_nth_seq.
+}
+destruct m. {
+  unfold iter_list; cbn.
+  rewrite map_length.
+Search (length (fold_left _ _ _)).
+...
 Check determinant_alternating.
 ...
 
