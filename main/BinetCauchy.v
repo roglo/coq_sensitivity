@@ -1015,56 +1015,113 @@ split. {
 }
 Qed.
 
-Theorem first_non_fix_transp_Some : ∀ i p k kp,
+Theorem first_non_fix_transp_Some_iff : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
-  → (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
+  ↔ (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
     nth (k - i) p 0 = kp ∧
     k ≠ kp ∧
-    k < i + length p.
+    i ≤ k < i + length p.
 Proof.
-intros * Hk.
+intros.
 split. {
-  intros j Hijk.
-  revert i k kp Hk Hijk.
-  induction p as [| a]; intros; [ easy | ].
-  cbn in Hk.
-  rewrite if_eqb_eq_dec in Hk.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    specialize (IHp _ _ _ Hk) as H1.
-    subst a.
-    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-      subst j.
-      now rewrite Nat.sub_diag.
+  intros Hk.
+  split. {
+    intros j Hijk.
+    revert i k kp Hk Hijk.
+    induction p as [| a]; intros; [ easy | ].
+    cbn in Hk.
+    rewrite if_eqb_eq_dec in Hk.
+    destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+      specialize (IHp _ _ _ Hk) as H1.
+      subst a.
+      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+        subst j.
+        now rewrite Nat.sub_diag.
+      }
+      assert (H : S i ≤ j < k) by flia Hijk Hij.
+      specialize (H1 H); clear H.
+      now replace (j - i) with (S (j - S i)) by flia Hijk Hij.
     }
-    assert (H : S i ≤ j < k) by flia Hijk Hij.
-    specialize (H1 H); clear H.
-    now replace (j - i) with (S (j - S i)) by flia Hijk Hij.
+    injection Hk; clear Hk; intros; subst i a.
+    flia Hijk.
   }
-  injection Hk; clear Hk; intros; subst i a.
-  flia Hijk.
-}
-split. {
-  revert i k kp Hk.
-  induction p as [| a]; intros; [ easy | ].
-  cbn in Hk.
-  rewrite if_eqb_eq_dec in Hk.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    specialize (IHp _ _ _ Hk) as H1.
-    subst a.
-    destruct (le_dec k i) as [Hki| Hki]. {
-      specialize (first_non_fix_transp_Some_neq_le _ _ Hk) as H2.
-      flia Hki H2.
+  split. {
+    revert i k kp Hk.
+    induction p as [| a]; intros; [ easy | ].
+    cbn in Hk.
+    rewrite if_eqb_eq_dec in Hk.
+    destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+      specialize (IHp _ _ _ Hk) as H1.
+      subst a.
+      destruct (le_dec k i) as [Hki| Hki]. {
+        specialize (first_non_fix_transp_Some_neq_le _ _ Hk) as H2.
+        flia Hki H2.
+      }
+      apply Nat.nle_gt in Hki.
+      now replace (k - i) with (S (k - S i)) by flia Hki.
     }
-    apply Nat.nle_gt in Hki.
-    now replace (k - i) with (S (k - S i)) by flia Hki.
+    injection Hk; clear Hk; intros; subst i a.
+    now rewrite Nat.sub_diag.
   }
-  injection Hk; clear Hk; intros; subst i a.
-  now rewrite Nat.sub_diag.
-}
-split. {
-  apply (first_non_fix_transp_Some_neq_le i p Hk).
+  split. {
+    apply (first_non_fix_transp_Some_neq_le i p Hk).
+  } {
+    specialize (first_non_fix_transp_Some_neq_le i p Hk) as H1.
+    easy.
+  }
 } {
-  apply (first_non_fix_transp_Some_neq_le i p Hk).
+  intros (Hbef & Hkp & Hkkp & Hkl).
+  revert i k kp Hbef Hkp Hkkp Hkl.
+  induction p as [| a]; intros. {
+    rewrite Nat.add_0_r in Hkl; flia Hkl.
+  }
+  cbn.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+    subst a.
+    destruct p as [| b]. {
+      exfalso.
+      cbn in Hkl.
+      replace k with i in Hkp, Hbef, Hkkp by flia Hkl.
+      now rewrite Nat.sub_diag in Hkp.
+    }
+    destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+      subst k.
+      now rewrite Nat.sub_diag in Hkp; cbn in Hkp.
+    }
+    apply IHp; [ | | easy | ]. {
+      intros j Hj.
+      destruct j; [ easy | ].
+      rewrite Nat.sub_succ.
+      specialize (Hbef (S j)) as H1.
+      assert (H : i ≤ S j < k) by flia Hj.
+      specialize (H1 H); clear H.
+      rewrite Nat.sub_succ_l in H1; [ easy | flia Hj ].
+    } {
+      now replace (k - i) with (S (k - S i)) in Hkp by flia Hki Hkl.
+    } {
+      cbn in Hkl |-*.
+      flia Hkl Hki.
+    }
+  }
+  destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+    subst k; f_equal; f_equal.
+    now rewrite Nat.sub_diag in Hkp.
+  }
+  exfalso.
+  replace (k - i) with (S (k - S i)) in Hkp by flia Hki Hkl.
+  cbn in Hkp.
+  cbn in Hkl.
+  destruct p as [| b]. {
+    cbn in Hkl.
+    flia Hkl Hki.
+  }
+  cbn in Hkl.
+  specialize (Hbef i) as H1.
+  assert (H : i ≤ i < k) by flia Hkl Hki.
+  specialize (H1 H); clear H.
+  rewrite Nat.sub_diag in H1; cbn in H1.
+  now symmetry in H1.
 }
 Qed.
 
@@ -1096,9 +1153,11 @@ induction len; intros; cbn. {
 remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
 destruct kp as [(k, kp)| ]. {
   symmetry in Hkp.
-  apply first_non_fix_transp_Some in Hkp.
+  apply first_non_fix_transp_Some_iff in Hkp.
   destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
   rewrite Nat.sub_0_r in Hkp; cbn.
+  destruct Hkl as (_, Hkl).
+...
 (*
   destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
 *)
