@@ -1389,7 +1389,6 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
-Check determinant_alternating.
 Locate "Comp".
 enough (Hpt : p = Comp n (t ∈ transp_list p), swap n t).
 rewrite Hpt.
@@ -1398,6 +1397,7 @@ enough
    ε (Comp n (t ∈ transp_list p), swap n t) =
    minus_one_pow (length (transp_list p))).
 rewrite Hpε.
+Check determinant_alternating.
 ...
 
 (* kl is not necessarily in order *)
