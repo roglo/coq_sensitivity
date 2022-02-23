@@ -1263,11 +1263,42 @@ p = Comp n (ij ∈ transp_loop len p), swap n ij
 ).
 *)
 intros * Hlen Hp.
+unfold iter_list.
+unfold swap.
+unfold list_swap_elem.
+rewrite seq_length.
 remember (length p) as n eqn:Hn.
 symmetry in Hn.
 revert len p Hn Hlen Hp.
 induction n; intros. {
   apply length_zero_iff_nil in Hn; subst p; cbn.
+  now rewrite transp_loop_nil.
+}
+rewrite seq_S.
+cbn - [ nth swap ].
+Search (fold_left _ _ (_ ++ _)).
+Print fold_left.
+Print iter_list.
+...
+intros * Hlen Hp.
+unfold iter_list.
+unfold swap.
+unfold list_swap_elem.
+rewrite seq_length.
+rewrite <- (@comp_1_r (length p) p); [ | easy ].
+remember (seq 0 (length p)) as q eqn:Hq.
+rewrite comp_length.
+assert (Hpq : length p = length q) by now subst q; rewrite seq_length.
+rewrite <- Hpq, <- Hq.
+clear Hq.
+remember (length p) as n eqn:Hn.
+symmetry in Hn, Hpq.
+rename Hn into Hpn; rename Hpq into Hqn.
+move Hpn before Hpn.
+revert p q len Hp Hpn Hqn Hlen.
+induction n; intros. {
+  apply length_zero_iff_nil in Hpn; subst p; cbn.
+  apply length_zero_iff_nil in Hqn; subst q; cbn.
   now rewrite transp_loop_nil.
 }
 ...
