@@ -994,6 +994,8 @@ Definition transp_list p := transp_loop (length p) 0 p.
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
+...
+
 (*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
