@@ -883,7 +883,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite <- rngl_product_div_distr; try easy; [ now left | ].
   intros j Hj.
   intros H.
-  apply rngl_sub_move_0_r in H; [ | easy ].
+  apply -> rngl_sub_move_0_r in H; [ | easy ].
   apply rngl_of_nat_inj in H; [ | now left | easy ].
   flia Hj H.
 }
@@ -1302,7 +1302,7 @@ apply rngl_product_integral in Hij; [ | now left | easy | easy ].
 destruct Hij as (j & Hj & Hij).
 rewrite if_ltb_lt_dec in Hij.
 destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
-apply rngl_sub_move_0_r in Hij; [ | easy ].
+apply -> rngl_sub_move_0_r in Hij; [ | easy ].
 apply rngl_of_nat_inj in Hij; [ | now left | easy ].
 destruct Hgp as (_, Hgp).
 apply (NoDup_nat _ Hgp) in Hij; [ | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
@@ -1353,7 +1353,7 @@ rewrite rngl_inv_product_comm; [ | | easy | easy | easy | easy | ]; cycle 1. {
   rewrite <- Hn in Hi, Hj.
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
-  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply -> rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | now left | easy ].
   rewrite <- Hn in Hnz.
   destruct Hp2 as (_, Hp2).
@@ -1369,7 +1369,7 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite <- Hn in Hi, Hj.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
-    apply rngl_sub_move_0_r in Hij; [ | easy ].
+    apply -> rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | now left | easy ].
     rewrite <- Hn in Hnz.
     destruct Hp2 as (_, Hp2).
@@ -1427,7 +1427,7 @@ rewrite rngl_inv_product_comm; [ | now left | easy | easy | easy | easy | ]. 2: 
   destruct Hij as (j & Hj & Hij).
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
-  apply rngl_sub_move_0_r in Hij; [ | easy ].
+  apply -> rngl_sub_move_0_r in Hij; [ | easy ].
   apply rngl_of_nat_inj in Hij; [ | now left | easy ].
   flia Hlij Hij.
 }
@@ -1439,7 +1439,7 @@ erewrite rngl_product_eq_compat. 2: {
     intros j Hj Hij.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
-    apply rngl_sub_move_0_r in Hij; [ | easy ].
+    apply -> rngl_sub_move_0_r in Hij; [ | easy ].
     apply rngl_of_nat_inj in Hij; [ | now left | easy ].
     flia Hlij Hij.
   }
@@ -1585,7 +1585,7 @@ rewrite product_product_if_permut; try easy. {
   f_equal.
   rewrite rngl_opp_inv; [ | easy | easy | easy | ]. 2: {
     intros H.
-    apply rngl_sub_move_0_r in H; [ | easy ].
+    apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply Hij; symmetry.
     apply rngl_of_nat_inj in H; [ easy | now left | easy ].
   }
@@ -1597,7 +1597,7 @@ rewrite product_product_if_permut; try easy. {
   intros H.
   apply rngl_integral in H; [ | now left | now rewrite Hit ].
   destruct H as [H| H]. {
-    apply rngl_sub_move_0_r in H; [ | easy ].
+    apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | now left | easy ].
     apply Hij; symmetry.
     rewrite <- Hn1 in Hi, Hj.
@@ -1607,7 +1607,7 @@ rewrite product_product_if_permut; try easy. {
     revert H.
     apply rngl_inv_neq_0; [ now left | easy | easy | ].
     intros H.
-    apply rngl_sub_move_0_r in H; [ | easy ].
+    apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | now left | easy ].
     now apply Hij; symmetry.
   }

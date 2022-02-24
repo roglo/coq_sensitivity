@@ -807,15 +807,22 @@ Qed.
 
 Theorem rngl_sub_move_0_r :
   rngl_has_opp = true →
-  ∀ a b : T, (a - b)%F = 0%F → a = b.
+  ∀ a b : T, (a - b)%F = 0%F ↔ a = b.
 Proof.
-intros Hop * Hab.
-apply (rngl_add_compat_r _ _ b) in Hab.
-unfold rngl_sub in Hab.
-rewrite Hop in Hab.
-rewrite <- rngl_add_assoc in Hab.
-rewrite rngl_add_opp_l in Hab; [ | easy ].
-now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
+intros Hop *.
+split. {
+  intros Hab.
+  apply (rngl_add_compat_r _ _ b) in Hab.
+  unfold rngl_sub in Hab.
+  rewrite Hop in Hab.
+  rewrite <- rngl_add_assoc in Hab.
+  rewrite rngl_add_opp_l in Hab; [ | easy ].
+  now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
+} {
+  intros Hab.
+  rewrite Hab.
+  now apply rngl_sub_diag; left.
+}
 Qed.
 
 Theorem rngl_div_cancel_l : ∀ a b c,

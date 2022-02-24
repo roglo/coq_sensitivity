@@ -1142,6 +1142,30 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
 Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
 Proof. now intros; destruct len. Qed.
 
+Theorem transp_list_prop : ∀ p k kp,
+  (k, kp) ∈ transp_list p
+  → (∀ j : nat, j < k → nth j p 0 = j)
+    ∧ nth k p 0 = kp ∧ k ≠ kp ∧ k < length p.
+Proof.
+intros * Hkk.
+unfold transp_list in Hkk.
+induction p as [| a]; [ easy | ].
+unfold transp_list in Hkk.
+cbn - [ first_non_fix_transp list_swap_elem ] in Hkk.
+remember (first_non_fix_transp 0 (a :: p)) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(k', kp')| ]; [ | easy ].
+apply first_non_fix_transp_Some_iff in Hx.
+destruct Hkk as [Hkk| Hkk]. {
+  injection Hkk; clear Hkk; intros; subst k' kp'.
+  rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
+  split; [ | easy ].
+  intros j Hj.
+  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+  rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
+}
+...
+
 (*
 Theorem permut_transp_loop_gen : ∀ n len p q,
   n ≤ len
@@ -1428,7 +1452,40 @@ erewrite rngl_product_eq_compat. 2: {
   }
   easy.
 }
-cbn.
+apply all_1_rngl_product_1.
+intros i Hi.
+now apply all_1_rngl_product_1.
+Qed.
+
+Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%F.
+Proof.
+intros.
+destruct (Nat.eq_dec len 0) as [Hnz| Hnz]. {
+  subst len; cbn.
+  unfold ε; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+unfold ε.
+rewrite seq_length.
+unfold sign_diff, ff_app.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite seq_nth; [ | flia Hj Hnz ].
+    rewrite seq_nth; [ | flia Hi Hnz ].
+    replace (if _ <? _ then _ else _) with 1%F. 2: {
+      symmetry.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      apply Nat.add_lt_mono_l with (p := sta) in Hij.
+      now apply Nat.compare_gt_iff in Hij; rewrite Hij.
+    }
+    easy.
+  }
+  easy.
+}
 apply all_1_rngl_product_1.
 intros i Hi.
 now apply all_1_rngl_product_1.
@@ -1481,14 +1538,37 @@ destruct m. {
     apply seq_is_permut.
   }
   rewrite comp_1_r; [ | apply swap_length ].
+  destruct (lt_dec i n) as [Hin| Hin]. 2: {
+    apply Nat.nlt_ge in Hin.
+    unfold transp_list in Hlt.
+...
+    destruct p as [| a]; [ easy | ].
+
+unfold transp_list in Hlt.
+Search swap.
+unfold swap.
+...
   specialize determinant_alternating as H1.
   specialize (H1 Hif A i j).
   assert (H : i ≠ j). {
     intros H; subst j.
     rewrite ε_swap_id, rngl_mul_1_l in Hpε.
-Search (ε (seq _ _)).
-...
     rewrite ε_seq in Hpε.
+    apply rngl_sub_move_0_r in Hpε; [ | now destruct Hif ].
+    rewrite <- fold_rngl_sub in Hpε; [ | now destruct Hif ].
+    rewrite rngl_opp_involutive in Hpε; [ | now destruct Hif ].
+    replace (1 + 1)%F with (rngl_of_nat 2) in Hpε. 2: {
+      now cbn; rewrite rngl_add_0_r.
+    }
+    apply eq_rngl_of_nat_0 in Hpε; [ easy | now destruct Hif ].
+  }
+  specialize (H1 H); clear H.
+  rewrite Hra in H1.
+...
+Search (_ - _ = _)%F.
+Require Import ZArith.
+Search (_ - _ = 0)%Z.
+About rngl_sub_move_0_r.
 ...
 Check fold_det.
 ...
