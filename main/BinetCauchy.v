@@ -993,20 +993,28 @@ Fixpoint transp_loop' k (p : list nat) :=
 ...
 *)
 
+(*
 Fixpoint transp_loop' k (p : list nat) :=
   match List_rank (Nat.eqb k) p with
   | None => []
-  | Some kp =>
-      (k, kp) ::
+  | Some pk =>
+      (k, pk) ::
       match p with
       | [] => []
-      | _ :: p' => transp_loop' (S k) p'
+      | _ :: p' => transp_loop' (S k) (list_swap_elem 0 p' k pk)
       end
   end.
 
 Definition transp_list' := transp_loop' 0.
 
+Definition transp_list' p :=
+  map2 (λ i k, (i, k)) (seq 0 (length p)) (bsort_rank Nat.leb p).
+*)
+
+...
+
 Compute (transp_list' [3;2;0;1]).
+Compute (bsort_rank Nat.leb [3;2;0;1]).
 
 ...
 
