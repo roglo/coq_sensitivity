@@ -973,11 +973,42 @@ Fixpoint transp_loop it (p : list nat) :=
       end
   end.
 
-(* voir si d'autres définitions de transp_loop et
-   first_non_fix_transp marcheraient mieux *)
-...
-
 Definition transp_list p := transp_loop (length p) p.
+
+(* voir si d'autres définitions de transp_list, transp_loop et
+   first_non_fix_transp marcheraient mieux *)
+
+Check List_rank.
+
+(*
+Fixpoint transp_loop' k (p : list nat) :=
+  match p with
+  | [] => []
+  | i :: p' =>
+      if i =? p then transp_loop' (S k) p'
+      else
+        match List_rank (Nat.eqb k) p' with
+        | None => []
+        | Some kp => (k, kp) :: transp_loop' ...
+...
+*)
+
+Fixpoint transp_loop' k (p : list nat) :=
+  match List_rank (Nat.eqb k) p with
+  | None => []
+  | Some kp =>
+      (k, kp) ::
+      match p with
+      | [] => []
+      | _ :: p' => transp_loop' (S k) p'
+      end
+  end.
+
+Definition transp_list' := transp_loop' 0.
+
+Compute (transp_list' [3;2;0;1]).
+
+...
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
