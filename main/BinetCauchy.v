@@ -1149,21 +1149,79 @@ Theorem transp_list_prop : ∀ p k kp,
 Proof.
 intros * Hkk.
 unfold transp_list in Hkk.
-induction p as [| a]; [ easy | ].
-unfold transp_list in Hkk.
-cbn - [ first_non_fix_transp list_swap_elem ] in Hkk.
-remember (first_non_fix_transp 0 (a :: p)) as x eqn:Hx.
+(*
+apply (In_nth _ _ (0, 0)) in Hkk.
+destruct Hkk as (i & Hi & Hkk).
+Search transp_loop.
+*)
+remember (length p) as it eqn:H in Hkk.
+assert (Hit : length p ≤ it) by now rewrite H.
+(*
+replace it with (S it) in Hkk.
+cbn in Hkk.
+remember (first_non_fix_transp 0 p) as x eqn:Hx.
 symmetry in Hx.
 destruct x as [(k', kp')| ]; [ | easy ].
 apply first_non_fix_transp_Some_iff in Hx.
+rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
+destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+destruct Hkl as (_, Hkl).
 destruct Hkk as [Hkk| Hkk]. {
-  injection Hkk; clear Hkk; intros; subst k' kp'.
-  rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
+  injection Hkk; clear Hkk; intros H1 H2.
+  move H1 at top; move H2 at top; subst kp' k'.
   split; [ | easy ].
   intros j Hj.
-  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
   rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
 }
+*)
+clear H.
+(**)
+apply (In_nth _ _ (0, 0)) in Hkk.
+destruct Hkk as (i & Hi & Hkk).
+revert p k kp i Hkk Hi Hit.
+induction it; intros; [ easy | ].
+cbn in Hkk.
+remember (first_non_fix_transp 0 p) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(k', kp')| ]. {
+  apply first_non_fix_transp_Some_iff in Hx.
+  rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
+  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+  destruct Hkl as (_, Hkl).
+  destruct i. {
+    cbn in Hkk.
+    injection Hkk; clear Hkk; intros H1 H2.
+    move H1 at top; move H2 at top; subst kp' k'.
+    split; [ | easy ].
+    intros j Hj.
+    rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
+  }
+  cbn in Hkk.
+  specialize (IHit _ _ _ _ Hkk) as H1.
+  cbn in Hi.
+...
+rewrite length_list_swap_elem in H1.
+...
+revert p k kp Hkk Hit.
+induction it; intros; [ easy | ].
+cbn - [ first_non_fix_transp list_swap_elem ] in Hkk.
+remember (first_non_fix_transp 0 p) as x eqn:Hx.
+symmetry in Hx.
+destruct x as [(k', kp')| ]; [ | easy ].
+apply first_non_fix_transp_Some_iff in Hx.
+rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
+destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+destruct Hkl as (_, Hkl).
+destruct Hkk as [Hkk| Hkk]. {
+  injection Hkk; clear Hkk; intros H1 H2.
+  move H1 at top; move H2 at top; subst kp' k'.
+  split; [ | easy ].
+  intros j Hj.
+  rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
+}
+...
+specialize (IHit _ _ _ Hkk) as H1.
+rewrite length_list_swap_elem in H1.
 ...
 
 (*
