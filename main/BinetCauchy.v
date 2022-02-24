@@ -1125,7 +1125,15 @@ split. {
 }
 Qed.
 
-Definition swap n pq := list_swap_elem 0 (seq 0 n) (fst pq) (snd pq).
+Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
+
+Theorem swap_length : ∀ n p q, length (swap n p q) = n.
+Proof.
+intros.
+unfold swap, list_swap_elem.
+rewrite List_map_seq_length.
+apply seq_length.
+Qed.
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
@@ -1381,6 +1389,51 @@ Check
 ...
 *)
 
+Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  unfold swap, ε; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+unfold swap, list_swap_elem.
+rewrite seq_length.
+unfold ε; cbn - [ "<?" ].
+rewrite List_map_seq_length.
+unfold sign_diff.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold transposition, ff_app.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hnz ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
+    rewrite (@seq_nth _ _ j); [ | flia Hj Hnz ].
+    rewrite (@seq_nth _ _ i); [ | flia Hi Hnz ].
+    do 2 rewrite Nat.add_0_l.
+    do 2 rewrite fold_transposition.
+    do 2 rewrite transposition_refl.
+    rewrite seq_nth; [ | flia Hj Hnz ].
+    rewrite seq_nth; [ | flia Hi Hnz ].
+    do 2 rewrite Nat.add_0_l.
+    replace (if _ <? _ then _ else _) with 1%F. 2: {
+      symmetry.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      now apply Nat.compare_gt_iff in Hij; rewrite Hij.
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+apply all_1_rngl_product_1.
+intros i Hi.
+now apply all_1_rngl_product_1.
+Qed.
+
 Theorem glop : in_charac_0_field →
   ∀ n A p,
   is_square_matrix A = true
@@ -1389,12 +1442,11 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
-Locate "Comp".
-enough (Hpt : p = Comp n (t ∈ transp_list p), swap n t).
+enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 rewrite Hpt.
 enough
   (Hpε :
-   ε (Comp n (t ∈ transp_list p), swap n t) =
+   ε (Comp n (t ∈ transp_list p), swap n (fst t) (snd t)) =
    minus_one_pow (length (transp_list p))).
 rewrite Hpε.
 remember (length (transp_list p)) as m eqn:Hm.
@@ -1419,16 +1471,26 @@ destruct m. {
   rewrite map_length.
   remember (transp_list p) as lt eqn:Hlt.
   symmetry in Hlt.
-  destruct lt as [| t]; [ easy | ].
+  destruct lt as [| (i, j)]; [ easy | ].
   destruct lt; [| easy ]; cbn.
+  clear Hm.
   rewrite comp_length, seq_length.
   unfold iter_list in Hpε; cbn in Hpε.
   rewrite sign_comp in Hpε; [ | easy | ]. 2: {
-...
     rewrite swap_length.
-   apply seq_is_permut.
+    apply seq_is_permut.
+  }
+  rewrite comp_1_r; [ | apply swap_length ].
+  specialize determinant_alternating as H1.
+  specialize (H1 Hif A i j).
+  assert (H : i ≠ j). {
+    intros H; subst j.
+    rewrite ε_swap_id, rngl_mul_1_l in Hpε.
+Search (ε (seq _ _)).
 ...
-Check determinant_alternating.
+    rewrite ε_seq in Hpε.
+...
+Check fold_det.
 ...
 
 (* kl is not necessarily in order *)

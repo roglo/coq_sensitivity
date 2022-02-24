@@ -644,6 +644,14 @@ rewrite if_eqb_eq_dec.
 now destruct (Nat.eq_dec j i).
 Qed.
 
+Theorem transposition_refl : ∀ i j, transposition i i j = j.
+Proof.
+intros.
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+now destruct (Nat.eq_dec j i).
+Qed.
+
 Theorem transposition_comm : ∀ i j k, transposition i j k = transposition j i k.
 Proof.
 intros.
