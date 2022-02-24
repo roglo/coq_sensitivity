@@ -955,6 +955,7 @@ Definition is_transp_id (p : list nat) :=
 Compute (is_transp_id [0;1;2]).
 *)
 
+(*
 Fixpoint first_non_fix_transp i p :=
   match p with
   | [] => None
@@ -974,50 +975,26 @@ Fixpoint transp_loop it (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (length p) p.
-
-(* voir si d'autres définitions de transp_list, transp_loop et
-   first_non_fix_transp marcheraient mieux *)
-
-Check List_rank.
-
-(*
-Fixpoint transp_loop' k (p : list nat) :=
-  match p with
-  | [] => []
-  | i :: p' =>
-      if i =? p then transp_loop' (S k) p'
-      else
-        match List_rank (Nat.eqb k) p' with
-        | None => []
-        | Some kp => (k, kp) :: transp_loop' ...
-...
 *)
 
-(*
-Fixpoint transp_loop' k (p : list nat) :=
-  match List_rank (Nat.eqb k) p with
-  | None => []
-  | Some pk =>
-      (k, pk) ::
-      match p with
-      | [] => []
-      | _ :: p' => transp_loop' (S k) (list_swap_elem 0 p' k pk)
+Fixpoint transp_loop it k (p : list nat) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match List_rank (Nat.eqb k) p with
+      | None => []
+      | Some pk =>
+          if k =? pk then transp_loop it' (S k) (list_swap_elem 0 p k pk)
+          else (k, pk) :: transp_loop it' (S k) (list_swap_elem 0 p k pk)
       end
   end.
 
-Definition transp_list' := transp_loop' 0.
+Definition transp_list p := transp_loop (length p) 0 p.
 
-Definition transp_list' p :=
-  map2 (λ i k, (i, k)) (seq 0 (length p)) (bsort_rank Nat.leb p).
-*)
+Compute (transp_list [3;2;0;1]).
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-...
-
-Compute (transp_list' [3;2;0;1]).
-Compute (bsort_rank Nat.leb [3;2;0;1]).
-
-...
-
+(*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
@@ -1167,6 +1144,7 @@ split. {
   now symmetry in H1.
 }
 Qed.
+*)
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
@@ -1182,6 +1160,7 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
 
+(*
 Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
 Proof. now intros; destruct len. Qed.
 
@@ -1340,6 +1319,7 @@ destruct Hkk as [Hkk| Hkk]. {
 specialize (IHit _ _ _ Hkk) as H1.
 rewrite length_list_swap_elem in H1.
 ...
+*)
 
 (*
 Theorem permut_transp_loop_gen : ∀ n len p q,
@@ -1572,12 +1552,21 @@ destruct kp as [(k, kp)| ]. {
   cbn.
   unfold "°" at 2.
 ...
+*)
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
-  → p = Comp (length p) (t ∈ transp_list p), swap (length p) t.
+  → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
 Proof.
 intros * Hp.
+unfold iter_list.
+remember (length p) as n eqn:Hn; symmetry in Hn.
+revert p Hp Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst p.
+}
+rewrite seq_S.
+cbn - [ swap ].
 ...
 now apply permut_transp_loop.
 ...
@@ -1586,7 +1575,8 @@ Compute
 Check
   (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
 ...
-*)
+...
+enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 
 Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
 Proof.
@@ -1674,6 +1664,12 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
+(*
+Compute (let p := [3;2;0;1] in let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
+Compute (map (λ p, let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)) (canon_sym_gr_list_list 4)).
+Compute (map (λ p, let n := length p in list_eqb Nat.eqb p (Comp n (t ∈ transp_list p), swap n (fst t) (snd t))) (canon_sym_gr_list_list 4)).
+*)
+...
 enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 rewrite Hpt.
 enough
