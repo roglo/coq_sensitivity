@@ -996,6 +996,39 @@ Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
 ...
 
+Fixpoint bsort_gen_insert {A} (ord : A → A → bool) (f : nat → A) ia lrank :=
+  match lrank with
+  | [] => ([ia], 0)
+  | ib :: l =>
+      if ord (f ia) (f ib) then (ia :: lrank, 0)
+      else
+        let (l', n) := bsort_gen_insert ord f ia l in
+        (ib :: l', S n)
+  end.
+
+Print bsort_gen_insert.
+
+Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
+  match l with
+  | [] => (lrank, 0)
+  | _ :: l' =>
+      let (l'', n'') := bsort_gen_insert ord f (length lrank) lrank in
+      let (l''', n''') := bsort_gen_loop ord f l'' l' in
+      (l''', n'' + n''')
+  end.
+
+Print bsort_gen_loop.
+
+Definition bsort_gen {A} (ord : A → A → bool) l :=
+  match l with
+  | [] => ([], 0)
+  | d :: _ => bsort_gen_loop ord (λ i, nth i l d) [] l
+  end.
+
+Compute (bsort_gen Nat.leb [3;2;0;1]).
+
+...
+
 (*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
