@@ -973,6 +973,10 @@ Fixpoint transp_loop it (p : list nat) :=
       end
   end.
 
+(* voir si d'autres définitions de transp_loop et
+   first_non_fix_transp marcheraient mieux *)
+...
+
 Definition transp_list p := transp_loop (length p) p.
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
@@ -1142,6 +1146,66 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
 Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
 Proof. now intros; destruct len. Qed.
 
+Theorem transp_loop_enough_iter : ∀ m n p,
+  length p ≤ m
+  → length p ≤ n
+  → transp_loop m p = transp_loop n p.
+Proof.
+intros * Hm Hn.
+revert n p Hm Hn.
+induction m; intros; cbn. {
+  apply Nat.le_0_r in Hm.
+  apply length_zero_iff_nil in Hm; subst p.
+  symmetry; apply transp_loop_nil.
+}
+destruct n. {
+  apply Nat.le_0_r in Hn.
+  now apply length_zero_iff_nil in Hn; subst p.
+}
+cbn.
+remember (first_non_fix_transp 0 p) as x eqn:Hx; symmetry in Hx.
+destruct x as [(k, kp)| ]; [ | easy ].
+f_equal.
+destruct p as [| a]; [ easy | ].
+cbn in Hm, Hn.
+apply Nat.succ_le_mono in Hm, Hn.
+cbn in Hx.
+destruct a. {
+  cbn.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec 0 k) as [Hzk| Hzk]. {
+    subst k.
+    destruct kp. {
+      now apply first_non_fix_transp_Some_iff in Hx.
+    }
+    apply IHm. {
+      cbn.
+      rewrite List_map_seq_length.
+...
+  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+...
+  cbn - [ first_non_fix_transp list_swap_elem ].
+  apply first_non_fix_transp_Some_iff in Hx.
+  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+  cbn.
+
+cbn - [ "=?" ] in Hx.
+...
+apply IHm. {
+  rewrite length_list_swap_elem.
+...
+destruct (Nat.eq_dec (length p) (S m)) as [Hpm| Hpm]. {
+  apply first_non_fix_transp_Some_iff in Hx.
+  rewrite Nat.sub_0_r in Hx; cbn in Hx.
+  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
+  destruct Hkl as (_, Hkl).
+...
+apply IHm. {
+  rewrite length_list_swap_elem.
+  apply first_non_fix_transp_Some_iff in Hx.
+...
+
 Theorem transp_list_prop : ∀ p k kp,
   (k, kp) ∈ transp_list p
   → (∀ j : nat, j < k → nth j p 0 = j)
@@ -1175,9 +1239,23 @@ destruct Hkk as [Hkk| Hkk]. {
 }
 *)
 clear H.
-(**)
 apply (In_nth _ _ (0, 0)) in Hkk.
 destruct Hkk as (i & Hi & Hkk).
+(**)
+revert p k kp it Hkk Hi Hit.
+induction i; intros; cbn. {
+...
+rewrite (@transp_loop_enough_iter _ (S it)) in Hkk; [ | easy | flia Hit ].
+cbn in Hkk.
+...
+  destruct p as [| a]; [ now rewrite transp_loop_nil in Hi | ].
+
+  destruct it. {
+    now injection Hkk; clear Hkk; intros; subst k kp.
+  }
+  cbn - [ first_non_fix_transp list_swap_elem ] in Hi.
+...
+(**)
 revert p k kp i Hkk Hi Hit.
 induction it; intros; [ easy | ].
 cbn in Hkk.
