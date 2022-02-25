@@ -994,8 +994,6 @@ Definition transp_list p := transp_loop (length p) 0 p.
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-...
-
 Fixpoint bsort_gen_insert {A} (ord : A → A → bool) (f : nat → A) ia lrank :=
   match lrank with
   | [] => ([ia], 0)
@@ -1014,7 +1012,7 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | _ :: l' =>
       let (l'', n'') := bsort_gen_insert ord f (length lrank) lrank in
       let (l''', n''') := bsort_gen_loop ord f l'' l' in
-      (l''', n'' + n''')
+      (l''', length lrank - n'' + n''')
   end.
 
 Print bsort_gen_loop.
@@ -1026,6 +1024,7 @@ Definition bsort_gen {A} (ord : A → A → bool) l :=
   end.
 
 Compute (bsort_gen Nat.leb [3;2;0;1]).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 4)).
 
 ...
 
