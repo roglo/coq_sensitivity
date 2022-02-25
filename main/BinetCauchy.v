@@ -1577,6 +1577,9 @@ Theorem permut_transp_list : ∀ p,
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
 Proof.
 intros * Hp.
+unfold transp_list.
+...
+intros * Hp.
 unfold iter_list.
 remember (length p) as n eqn:Hn; symmetry in Hn.
 revert p Hp Hn.
