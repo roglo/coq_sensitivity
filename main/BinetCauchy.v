@@ -990,7 +990,7 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
-Inductive ins_pos := InsAtPos : nat → nat → ins_pos.
+Inductive ins_rule := InsAtPos : nat → nat → ins_rule.
 
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
@@ -1001,6 +1001,10 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
       (l''', InsAtPos (length lrank) n :: iap)
   end.
 
+(* return a pair
+   - the permutation to apply to the initial list to get the sorted list
+   - a list of insertions rules from the initial list to the sorted list
+*)
 Definition bsort_gen {A} (ord : A → A → bool) l :=
   match l with
   | [] => ([], [])
