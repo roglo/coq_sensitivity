@@ -997,8 +997,8 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | [] => (lrank, [])
   | _ :: l' =>
       let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
-      let (l''', t) := bsort_gen_loop ord f l'' l' in
-      (l''', InsAtPos (length lrank) n :: t)
+      let (l''', iap) := bsort_gen_loop ord f l'' l' in
+      (l''', InsAtPos (length lrank) n :: iap)
   end.
 
 Definition bsort_gen {A} (ord : A → A → bool) l :=
