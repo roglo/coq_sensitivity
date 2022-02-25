@@ -955,7 +955,6 @@ Definition is_transp_id (p : list nat) :=
 Compute (is_transp_id [0;1;2]).
 *)
 
-(*
 Fixpoint first_non_fix_transp i p :=
   match p with
   | [] => None
@@ -975,24 +974,11 @@ Fixpoint transp_loop it (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (length p) p.
-*)
 
-Fixpoint transp_loop it k (p : list nat) :=
-  match it with
-  | 0 => []
-  | S it' =>
-      match List_rank (Nat.eqb k) p with
-      | None => []
-      | Some pk =>
-          if k =? pk then transp_loop it' (S k) (list_swap_elem 0 p k pk)
-          else (k, pk) :: transp_loop it' (S k) (list_swap_elem 0 p k pk)
-      end
-  end.
-
-Definition transp_list p := transp_loop (length p) 0 p.
-
+(*
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+*)
 
 Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
   match lrank with
