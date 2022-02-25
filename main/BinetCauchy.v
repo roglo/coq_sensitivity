@@ -966,15 +966,13 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
-Inductive ins_rule := InsAtPos : nat → ins_rule.
-
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
   | [] => (lrank, [])
   | _ :: l' =>
       let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
       let (l''', iap) := bsort_gen_loop ord f l'' l' in
-      (l''', InsAtPos n :: iap)
+      (l''', n :: iap)
   end.
 
 (* return a pair
@@ -1000,9 +998,8 @@ Definition transp_of_pos m n :=
 Definition transp_list p :=
   fold_right
     (λ i l,
-     match nth i (snd (bsort_gen Nat.leb p)) (InsAtPos 0) with
-     | InsAtPos j => if i =? j then l else transp_of_pos i j ++ l
-     end)
+     let j := nth i (snd (bsort_gen Nat.leb p)) 0 in
+     if i =? j then l else transp_of_pos i j ++ l)
     []
     (seq 0 (length p)).
 
@@ -1572,8 +1569,6 @@ destruct kp as [(k, kp)| ]. {
 ...
 *)
 
-Definition un_ins iap := match iap with InsAtPos i => i end.
-
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1585,8 +1580,8 @@ unfold transp_list.
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (bsort_gen Nat.leb [1;2;0;3]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (l, fst (bsort_gen Nat.leb l), map un_ins (snd (bsort_gen Nat.leb l)))) (canon_sym_gr_list_list 3)).
-Compute (map (λ l, (l, fst (bsort_gen Nat.leb l), map un_ins (snd (bsort_gen Nat.leb l)))) (canon_sym_gr_list_list 5)).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 5)).
 ...
 intros * Hp.
 unfold iter_list.
