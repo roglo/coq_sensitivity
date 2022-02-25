@@ -994,7 +994,7 @@ Definition transp_list p := transp_loop (length p) 0 p.
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-Fixpoint bsort_gen_insert {A} (ord : A → A → bool) (f : nat → A) ia lrank :=
+Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
   match lrank with
   | [] => ([ia], 0)
   | ib :: l =>
