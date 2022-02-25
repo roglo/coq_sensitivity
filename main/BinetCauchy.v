@@ -1004,8 +1004,13 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
-Definition glop m n t :=
-  fold_left (λ t i, i :: t) (seq n (m - n)) t.
+Definition glop m n :=
+  iter_list (seq n (m - n)) (λ t i, i :: t) [].
+(*
+  fold_left (λ t i, i :: t) (seq n (m - n)) [].
+*)
+
+Print glop.
 
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
@@ -1013,7 +1018,7 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | _ :: l' =>
       let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
       let (l''', t) := bsort_gen_loop ord f l'' l' in
-      (l''', glop (length lrank) n t)
+      (l''', glop (length lrank) n ++ t)
   end.
 
 (* return a pair with
