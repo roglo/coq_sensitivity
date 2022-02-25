@@ -1004,13 +1004,7 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
-Definition glop m n :=
-  iter_list (seq n (m - n)) (λ t i, i :: t) [].
-(*
-  fold_left (λ t i, i :: t) (seq n (m - n)) [].
-*)
-
-Print glop.
+Inductive ins_pos := InsAtPos : nat → nat → ins_pos.
 
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
@@ -1018,36 +1012,9 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | _ :: l' =>
       let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
       let (l''', t) := bsort_gen_loop ord f l'' l' in
-      (l''', glop (length lrank) n ++ t)
+      (l''', InsAtPos (length lrank) n :: t)
   end.
 
-(* return a pair with
-   - the sort operator (list of indices giving the order)
-   - a list of nat i, such that (i,i+1) is the transposition to apply
-     to sort the list.
-   for example bsort_gen [7;8;5;4] returns
-      ([3; 2; 0; 1], [1; 0; 2; 1; 0])
-   the first list [3;2;1;0] gives the ranks (starting from 0) for the
-   sorted initial list
-       3 means the lowest is at 3rd position : 4
-       2 means the next lowest is at 2nd position : 5
-       0 means the next lowest is at 0th position : 7
-       1 means the next lowest is at 1st position : 8
-   therefore, sorted list is [4; 5; 7; 8]
-   the second list [1; 0; 2; 1; 0] informs the transpositions to apply
-   from the initial list to get the sorted list; each number i means that
-   we must transpose the i-th element with the next one.
-   we start from [7;8;5;4]
-      1 means apply transposition (1,2) → [7;5;8;4]
-      0 means apply transposition (0,1) → [5;7;8;4]
-      2 means apply transposition (2,3) → [5;7;4;8]
-      1 means apply transposition (1,2) → [5;4;7;8]
-      0 means apply transposition (0,1) → [4;5;7;8]
-   there are here 5 transpositions; it is odd, therefore permutation
-   signature is -1
-   The transpositions are not optimized. Here, 3 transpositions would
-   be sufficient.
-*)
 Definition bsort_gen {A} (ord : A → A → bool) l :=
   match l with
   | [] => ([], [])
@@ -1057,6 +1024,14 @@ Definition bsort_gen {A} (ord : A → A → bool) l :=
 Compute (bsort_gen Nat.leb [7;8;5;4]).
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
+
+Definition glop m n :=
+  iter_list (seq n (m - n)) (λ t i, i :: t) [].
+(*
+  fold_left (λ t i, i :: t) (seq n (m - n)) [].
+*)
+
+Print glop.
 
 ...
 
