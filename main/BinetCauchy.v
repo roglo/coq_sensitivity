@@ -990,7 +990,7 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
-Inductive ins_rule := InsAtPos : nat → nat → ins_rule.
+Inductive ins_rule := InsAtPos : nat → ins_rule.
 
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
@@ -998,7 +998,7 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | _ :: l' =>
       let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
       let (l''', iap) := bsort_gen_loop ord f l'' l' in
-      (l''', InsAtPos (length lrank) n :: iap)
+      (l''', InsAtPos n :: iap)
   end.
 
 (* return a pair
@@ -1012,26 +1012,27 @@ Definition bsort_gen {A} (ord : A → A → bool) l :=
   end.
 
 (*
+Compute (bsort_gen Nat.leb [20;12;7;9]).
 Compute (bsort_gen Nat.leb [7;8;5;4]).
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
 *)
 
 Definition glop m n :=
-  iter_list (seq n (m - n)) (λ t i, i :: t) [].
+  iter_list (seq n (m - n)) (λ t i, (i, i + 1) :: t) [].
 
 Definition transp_list' p :=
-  iter_list (snd (bsort_gen Nat.leb p))
-    (λ t iap,
-     match iap with
-     | InsAtPos i pos =>
-         if i =? pos then t else (i, pos) :: t
+  fold_right
+    (λ i l,
+     match nth i (snd (bsort_gen Nat.leb p)) (InsAtPos 0) with
+     | InsAtPos j => if i =? j then l else glop i j ++ l
      end)
-    [].
+    []
+    (seq 0 (length p)).
 
-Compute (bsort_gen Nat.leb [20;12;7;9]).
-Compute (bsort_gen Nat.leb [3;2;0;1]).
-Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 4)).
+Compute (transp_list' [20;12;7;9]).
+Compute (transp_list' [3;2;0;1]).
+Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
 
 ...
 
