@@ -931,29 +931,29 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_with_rows_is_square.
 Qed.
 
-Fixpoint first_non_fix_transp i p :=
+Fixpoint first_non_fix_transp' i p :=
   match p with
   | [] => None
   | j :: l =>
-      if i =? j then first_non_fix_transp (S i) l
+      if i =? j then first_non_fix_transp' (S i) l
       else Some (i, j)
   end.
 
-Fixpoint transp_loop it (p : list nat) :=
+Fixpoint transp_loop' it (p : list nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fix_transp 0 p with
+      match first_non_fix_transp' 0 p with
       | None => []
-      | Some (k, pk) => (k, pk) :: transp_loop it' (list_swap_elem 0 p k pk)
+      | Some (k, pk) => (k, pk) :: transp_loop' it' (list_swap_elem 0 p k pk)
       end
   end.
 
-Definition transp_list p := transp_loop (length p) p.
+Definition transp_list' p := transp_loop' (length p) p.
 
 (*
-Compute (transp_list [3;2;0;1]).
-Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+Compute (transp_list' [3;2;0;1]).
+Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
 *)
 
 Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
@@ -994,24 +994,23 @@ Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
 *)
 
-Definition glop m n :=
+Definition transp_of_pos m n :=
   iter_list (seq n (m - n)) (λ t i, (i, i + 1) :: t) [].
 
-Definition transp_list' p :=
+Definition transp_list p :=
   fold_right
     (λ i l,
      match nth i (snd (bsort_gen Nat.leb p)) (InsAtPos 0) with
-     | InsAtPos j => if i =? j then l else glop i j ++ l
+     | InsAtPos j => if i =? j then l else transp_of_pos i j ++ l
      end)
     []
     (seq 0 (length p)).
 
-Compute (transp_list' [20;12;7;9]).
-Compute (transp_list' [3;2;0;1]).
-Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
+Compute (transp_list [20;12;7;9]).
+Compute (transp_list [3;2;0;1]).
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 
-...
-
+(*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
@@ -1051,7 +1050,9 @@ split. {
   flia.
 }
 Qed.
+*)
 
+(*
 Theorem first_non_fix_transp_Some_iff : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   ↔ (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
@@ -1161,6 +1162,7 @@ split. {
   now symmetry in H1.
 }
 Qed.
+*)
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
@@ -1574,6 +1576,28 @@ Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
 Proof.
+intros * Hp.
+unfold iter_list.
+remember (length p) as n eqn:Hn; symmetry in Hn.
+revert p Hp Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst p.
+}
+rewrite seq_S.
+cbn - [ swap ].
+unfold transp_list.
+(* oh putain... *)
+...
+Compute (let p := [3;2;0;1] in
+  p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t)).
+Compute (map (λ p,
+  list_eqb Nat.eqb p (Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t))
+) (canon_sym_gr_list_list 5)).
+...
+Compute (transp_list [20;12;7;9]).
+Compute (transp_list [3;2;0;1]).
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+...
 intros * Hp.
 unfold iter_list.
 remember (length p) as n eqn:Hn; symmetry in Hn.
