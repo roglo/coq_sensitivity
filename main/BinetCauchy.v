@@ -1011,21 +1011,30 @@ Definition bsort_gen {A} (ord : A → A → bool) l :=
   | d :: _ => bsort_gen_loop ord (λ i, nth i l d) [] l
   end.
 
+(*
 Compute (bsort_gen Nat.leb [7;8;5;4]).
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
+*)
 
 Definition glop m n :=
   iter_list (seq n (m - n)) (λ t i, i :: t) [].
-(*
-  fold_left (λ t i, i :: t) (seq n (m - n)) [].
-*)
 
-Print glop.
+Definition transp_list' p :=
+  iter_list (snd (bsort_gen Nat.leb p))
+    (λ t iap,
+     match iap with
+     | InsAtPos i pos =>
+         if i =? pos then t else (i, pos) :: t
+     end)
+    [].
+
+Compute (bsort_gen Nat.leb [20;12;7;9]).
+Compute (bsort_gen Nat.leb [3;2;0;1]).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 4)).
 
 ...
 
-(*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
@@ -1175,7 +1184,6 @@ split. {
   now symmetry in H1.
 }
 Qed.
-*)
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
