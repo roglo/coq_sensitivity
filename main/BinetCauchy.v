@@ -1004,7 +1004,24 @@ Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank 
         (ib :: l', S n)
   end.
 
+(* par permutations circulaires *)
 Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
+  match l with
+  | [] => (lrank, [])
+  | _ :: l' =>
+      let (l'', n) := bsort_gen_insert ord f (length lrank) lrank in
+      let (l''', t) := bsort_gen_loop ord f l'' l' in
+      (l''', length lrank - n :: t)
+  end.
+
+Definition bsort_gen {A} (ord : A → A → bool) l :=
+  match l with
+  | [] => ([], [])
+  | d :: _ => bsort_gen_loop ord (λ i, nth i l d) [] l
+  end.
+
+(*
+Fixpoint bsort_gen_loop' {A} (ord : A → A → bool) f lrank (l : list A) :=
   match l with
   | [] => (lrank, [])
   | _ :: l' =>
@@ -1012,6 +1029,7 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
       let (l''', t) := bsort_gen_loop ord f l'' l' in
       (l''', fold_left (λ t i, i :: t) (seq n (length lrank - n)) t)
   end.
+*)
 
 (* return a pair with
    - the sort operator (list of indices giving the order)
@@ -1040,12 +1058,13 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
    The transpositions are not optimized. Here, 3 transpositions would
    be sufficient.
 *)
-
-Definition bsort_gen {A} (ord : A → A → bool) l :=
+(*
+Definition bsort_gen' {A} (ord : A → A → bool) l :=
   match l with
   | [] => ([], [])
-  | d :: _ => bsort_gen_loop ord (λ i, nth i l d) [] l
+  | d :: _ => bsort_gen_loop' ord (λ i, nth i l d) [] l
   end.
+*)
 
 Compute (bsort_gen Nat.leb [7;8;5;4]).
 Compute (bsort_gen Nat.leb [3;2;0;1]).
