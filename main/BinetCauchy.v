@@ -1572,6 +1572,8 @@ destruct kp as [(k, kp)| ]. {
 ...
 *)
 
+Definition un_ins iap := match iap with InsAtPos i => i end.
+
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1583,6 +1585,8 @@ unfold transp_list.
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (bsort_gen Nat.leb [1;2;0;3]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (l, fst (bsort_gen Nat.leb l), map un_ins (snd (bsort_gen Nat.leb l)))) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, (l, fst (bsort_gen Nat.leb l), map un_ins (snd (bsort_gen Nat.leb l)))) (canon_sym_gr_list_list 5)).
 ...
 intros * Hp.
 unfold iter_list.
