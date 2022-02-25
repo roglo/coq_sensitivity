@@ -1003,9 +1003,11 @@ Definition transp_list p :=
     []
     (seq 0 (length p)).
 
+(*
 Compute (transp_list [20;12;7;9]).
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+*)
 
 (*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
@@ -1577,6 +1579,7 @@ intros * Hp.
 unfold transp_list.
 (* hou la la... *)
 (* est-ce que je pourrais m'en sortir en ne raisonnant qu'avec bsort_gen ? *)
+...
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (bsort_gen Nat.leb [1;2;0;3]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
