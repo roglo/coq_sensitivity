@@ -911,22 +911,6 @@ unfold bsort.
 now apply sorted_bsort_loop.
 Qed.
 
-(* ouais chais pas...
-Theorem aaa : in_charac_0_field →
-  ∀ m n A kl,
-  mat_nrows A = n
-  → mat_ncols A = m
-  → is_correct_matrix A = true
-  → NoDup kl
-  → length kl = m
-  → (∀ k, k ∈ kl → k < n)
-  → Permutation jl kl
-  → (ε jl * det (mat_with_rows jl A)%F =
-    (ε kl * det (mat_with_rows kl A))%F.
-Proof.
-...
-*)
-
 Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   ∀ p q A jl,
   is_correct_matrix A = true
@@ -946,14 +930,6 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 }
 now apply mat_with_rows_is_square.
 Qed.
-
-(*
-Definition is_transp_id (p : list nat) :=
-  if list_eq_dec Nat.eq_dec p (seq 0 (length p)) then true
-  else false.
-
-Compute (is_transp_id [0;1;2]).
-*)
 
 Fixpoint first_non_fix_transp i p :=
   match p with
