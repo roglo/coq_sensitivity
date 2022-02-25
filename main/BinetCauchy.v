@@ -1578,6 +1578,11 @@ Theorem permut_transp_list : ∀ p,
 Proof.
 intros * Hp.
 unfold transp_list.
+(* hou la la... *)
+(* est-ce que je pourrais m'en sortir en ne raisonnant qu'avec bsort_gen ? *)
+Compute (bsort_gen Nat.leb [3;2;0;1]).
+Compute (bsort_gen Nat.leb [1;2;0;3]).
+Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
 ...
 intros * Hp.
 unfold iter_list.
