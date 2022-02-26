@@ -1613,8 +1613,12 @@ Theorem permut_transp_list : ∀ p,
 Proof.
 intros * Hp.
 unfold transp_list.
-(* hou la la... *)
-(* est-ce que je pourrais m'en sortir en ne raisonnant qu'avec bsort_gen ? *)
+(* en fait, snd (bsort_gen ord p) ne se convertit pas si facilement en
+   liste de transpositions *)
+Print bsort_gen_insert.
+...
+bsort ord p = f (snd (bsort_gen ord p)) ?
+bsort_rank ord p = f (snd (bsort_gen ord p)) ?
 ...
 Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (bsort_gen Nat.leb [1;2;0;3]).
