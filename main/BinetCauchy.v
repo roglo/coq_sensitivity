@@ -1571,6 +1571,42 @@ destruct kp as [(k, kp)| ]. {
 ...
 *)
 
+Theorem bsort_rank_gen_insert : ∀ A B (ord : A → _) (f : B → _) ia lr,
+  bsort_rank_insert ord f ia lr =
+  fst (bsort_gen_insert ord f ia lr).
+Proof.
+intros.
+revert ia.
+induction lr as [| ib]; intros; [ easy | cbn ].
+destruct (ord (f ia) (f ib)); [ easy | ].
+rewrite IHlr.
+now destruct (bsort_gen_insert _ _ _ _).
+Qed.
+
+Theorem bsort_rank_gen_loop : ∀ A (ord : A → _) f lr l,
+  bsort_rank_loop ord f lr l = fst (bsort_gen_loop ord f lr l).
+Proof.
+intros.
+revert lr.
+induction l as [| a]; intros; [ easy | cbn ].
+rewrite IHl.
+rewrite bsort_rank_gen_insert.
+remember (bsort_gen_insert _ _ _ _) as x eqn:Hx; symmetry in Hx.
+destruct x as (lr', n).
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy; symmetry in Hy.
+destruct y as (l'', nl); cbn.
+now rewrite Hy.
+Qed.
+
+Theorem bsort_rank_gen : ∀ A (ord : A → _) l,
+  bsort_rank ord l = fst (bsort_gen ord l).
+Proof.
+intros.
+unfold bsort_rank, bsort_gen.
+destruct l as [| d]; [ easy | ].
+apply bsort_rank_gen_loop.
+Qed.
+
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
