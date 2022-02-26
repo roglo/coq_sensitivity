@@ -1708,7 +1708,8 @@ Theorem snd_bsort_gen_loop_elem_ub : ∀ A ord (d : A) lrank l_ini l i,
   l_ini ≠ []
   → length lrank + length l ≤ length l_ini
   → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (snd (bsort_gen_loop ord (λ i, nth i l_ini d) lrank l)) 0 ≤ i.
+  → nth i (snd (bsort_gen_loop ord (λ i, nth i l_ini d) lrank l)) 0 ≤
+        i + length lrank.
 Proof.
 intros * Hiz Hia Hil.
 destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
@@ -1730,6 +1731,8 @@ cbn - [ nth ].
 specialize (length_snd_bsort_gen_loop ord (λ i, nth i l_ini d) lr' l) as H1.
 rewrite Hy in H1; cbn in H1.
 destruct i; cbn. {
+  specialize (IHl 0 lr') as H2.
+Print bsort_gen_insert.
 ...
 specialize (IHl lr') as H1.
 specialize (length_snd_bsort_gen_loop ord (λ i, nth i l_ini d) lr' l) as H2.
