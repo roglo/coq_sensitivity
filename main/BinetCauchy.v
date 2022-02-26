@@ -1710,6 +1710,20 @@ Theorem snd_bsort_gen_loop_ub : ∀ A (ord : A → _) f lrank l i,
   → nth i (snd (bsort_gen_loop ord f lrank l)) 0 ≤ i + length lrank.
 Proof.
 intros * Hi.
+Print bsort_gen_loop.
+n ≤ length lrank
+Check snd_bsort_gen_insert_ub.
+...
+Compute (
+  let i := 0 in
+  let ord := Nat.leb in
+  let l := [12;7;20] in
+  let l_ini := [9] ++ l in
+  let lrank := [0;7;0] in
+  let f k := nth k l_ini 42 in
+  nth i (snd (bsort_gen_loop ord f lrank l)) 0 ≤ i + length lrank
+).
+...
 revert lrank i Hi.
 induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
 remember (bsort_gen_insert ord _ (length lrank) lrank) as x eqn:Hx.
