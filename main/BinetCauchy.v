@@ -1607,6 +1607,87 @@ destruct l as [| d]; [ easy | ].
 apply bsort_rank_gen_loop.
 Qed.
 
+Theorem snd_bsort_gen_insert_ub : ∀ A B (ord : A → _) (f : B → _) ia lr,
+  snd (bsort_gen_insert ord f ia lr) ≤ length lr.
+Proof.
+intros.
+revert ia.
+induction lr as [| ib]; intros; [ easy | cbn ].
+destruct (ord (f ia) (f ib)); [ easy | ].
+remember (bsort_gen_insert ord f ia lr) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (lr', n); cbn.
+apply -> Nat.succ_le_mono.
+specialize (IHlr ia) as H1.
+now rewrite Hx in H1.
+Qed.
+
+Theorem snd_bsort_gen_loop_elem_ub : ∀ A (ord : A → _) f lr l i,
+  i ≤ length lr + length l
+  → nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ i.
+Proof.
+intros * Hi.
+revert i lr Hi.
+induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
+remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (lr', n).
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (l'', nl).
+cbn - [ nth ].
+specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
+rewrite Hx in H1; cbn in H1.
+specialize (IHl i lr') as H2.
+rewrite Hy in H2; cbn in H2.
+destruct i. {
+  cbn.
+...
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (l'', nl).
+cbn - [ nth ] in H1 |-*.
+...
+
+Theorem snd_bsort_gen_loop_elem_ub : ∀ A (ord : A → _) f lr l i,
+  nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ i.
+Proof.
+intros.
+revert i lr.
+induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
+remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (lr', n).
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (l'', nl).
+cbn - [ nth ].
+specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
+rewrite Hx in H1; cbn in H1.
+specialize (IHl i lr') as H2.
+rewrite Hy in H2; cbn in H2.
+destruct i. {
+  cbn.
+...
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (l'', nl).
+cbn - [ nth ] in H1 |-*.
+...
+
+Theorem snd_bsort_gen_elem_ub : ∀ A (ord : A → _) l i,
+  nth i (snd (bsort_gen ord l)) 0 ≤ i.
+Proof.
+intros.
+destruct l as [| d]; [ now cbn; rewrite match_id | ].
+unfold bsort_gen.
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'.
+rename l' into l.
+...
+apply snd_bsort_gen_loop_elem_ub.
+...
+
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1616,6 +1697,9 @@ unfold transp_list.
 (* en fait, snd (bsort_gen ord p) ne se convertit pas si facilement en
    liste de transpositions *)
 Print bsort_gen_insert.
+Compute (bsort_gen Nat.leb [20;9;12;7]).
+Compute (bsort_gen Nat.leb [20;12;7;9]).
+map2 (λ a t,
 ...
 bsort ord p = f (snd (bsort_gen ord p)) ?
 bsort_rank ord p = f (snd (bsort_gen ord p)) ?

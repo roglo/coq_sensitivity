@@ -2956,6 +2956,9 @@ Qed.
 
 (* end sorted *)
 
+Theorem match_id : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
+Proof. now intros; destruct a. Qed.
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true
