@@ -1704,6 +1704,7 @@ unfold bsort_gen.
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'.
 rename l' into l.
+...
 Theorem snd_bsort_gen_loop_elem_ub : ∀ A ord (d : A) lrank l_ini l i,
   l_ini ≠ []
   → length lrank + length l ≤ length l_ini
