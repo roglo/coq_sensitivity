@@ -1622,12 +1622,12 @@ specialize (IHlr ia) as H1.
 now rewrite Hx in H1.
 Qed.
 
+(*
 Theorem snd_bsort_gen_loop_elem_ub : ∀ A (ord : A → _) f lr l i,
-  i ≤ length lr + length l
-  → nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ i.
+  nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ length lr.
 Proof.
-intros * Hi.
-revert i lr Hi.
+intros.
+revert i lr.
 induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
 remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
 symmetry in Hx.
@@ -1638,10 +1638,12 @@ destruct y as (l'', nl).
 cbn - [ nth ].
 specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
 rewrite Hx in H1; cbn in H1.
+destruct i; [ easy | ].
 specialize (IHl i lr') as H2.
 rewrite Hy in H2; cbn in H2.
-destruct i. {
-  cbn.
+cbn.
+etransitivity.
+apply H2.
 ...
 remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
 symmetry in Hy.
@@ -1674,6 +1676,26 @@ symmetry in Hy.
 destruct y as (l'', nl).
 cbn - [ nth ] in H1 |-*.
 ...
+*)
+
+Theorem length_snd_bsort_gen_loop : ∀ A (ord : A → _) f lr l,
+  length (snd (bsort_gen_loop ord f lr l)) = length l.
+Proof.
+intros.
+revert lr.
+induction l as [| a]; intros; [ easy | cbn ].
+remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (lr', n).
+remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
+symmetry in Hy.
+destruct y as (l'', nl).
+cbn; f_equal.
+specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
+rewrite Hx in H1.
+cbn in H1.
+(* non, mais c'est pas ça *)
+...
 
 Theorem snd_bsort_gen_elem_ub : ∀ A (ord : A → _) l i,
   nth i (snd (bsort_gen ord l)) 0 ≤ i.
@@ -1684,6 +1706,41 @@ unfold bsort_gen.
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'.
 rename l' into l.
+Theorem snd_bsort_gen_loop_elem_ub : ∀ A ord (d : A) lrank l_ini l i,
+  l_ini ≠ []
+  → length lrank + length l ≤ length l_ini
+  → (∀ i, i ∈ lrank → i < length l_ini)
+  → nth i (snd (bsort_gen_loop ord (λ i, nth i l_ini d) lrank l)) 0 ≤ i.
+Proof.
+intros * Hiz Hia Hil.
+destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
+  apply Nat.nlt_ge in Hir.
+  rewrite nth_overflow. 2: {
+Search (length (snd (bsort_gen_loop _ _ _))).
+Search bsort_gen_loop.
+...
+now rewrite length_snd_bsort_gen_loop.
+...
+  rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
+  destruct l_ini; [ easy | now cbn ].
+}
+revert lrank Hia Hil Hir.
+induction l as [| b]; intros. {
+  rewrite Nat.add_0_r in Hir.
+  apply Hil; cbn.
+  now apply nth_In.
+}
+cbn in Hia, Hir |-*.
+rewrite <- Nat.add_succ_comm in Hia, Hir.
+apply IHl; cycle 1. {
+  intros j Hj.
+  apply in_bsort_rank_insert in Hj.
+  destruct Hj as [Hj| Hj]; [ | now apply Hil ].
+  subst j; flia Hia.
+} {
+  now rewrite length_bsort_rank_insert.
+}
+now rewrite length_bsort_rank_insert.
 ...
 apply snd_bsort_gen_loop_elem_ub.
 ...
