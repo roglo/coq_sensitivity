@@ -33,6 +33,9 @@ Notation "∃! x .. y , p" :=
 
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 
+Theorem match_id : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
+Proof. now intros; destruct a. Qed.
+
 Theorem List_fold_left_map :
   ∀ A B C (f : A → B → A) (g : C → B) (l : list C) a,
   fold_left f (map g l) a = fold_left (λ c b, f c (g b)) l a.
@@ -2388,20 +2391,19 @@ intros i Hi.
 destruct Hi as [Hi| Hi]; [ subst i; cbn; easy | easy ].
 Qed.
 
-Theorem bsort_rank_insert_ub : ∀ A ord (d : A) ia lrank l_ini i,
-  ia < length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (bsort_rank_insert ord (λ i, nth i l_ini d) ia lrank) 0 <
-    length l_ini.
+Theorem bsort_rank_insert_ub : ∀ A (ord : A → _) ia lrank f i n,
+  ia < n
+  → (∀ i, i ∈ lrank → i < n)
+  → nth i (bsort_rank_insert ord f ia lrank) 0 < n.
 Proof.
-intros * Hia Hini.
+intros * Hia Hn.
 revert i.
 induction lrank as [| ib]; intros. {
   destruct i; [ easy | cbn ].
-  destruct i; flia Hia.
+  rewrite match_id; flia Hia.
 }
 cbn - [ nth ].
-remember (ord (nth ia l_ini d) (nth ib l_ini d)) as x eqn:Hx.
+remember (ord (f ia) (f ib)) as x eqn:Hx.
 symmetry in Hx.
 destruct x. {
   destruct i; [ easy | ].
@@ -2410,45 +2412,49 @@ destruct x. {
     apply Nat.nlt_ge in Hii.
     rewrite nth_overflow; [ flia Hia | easy ].
   }
-  now apply Hini, nth_In.
+  now apply Hn, nth_In.
 } {
-  destruct i; [ now apply Hini; left | cbn ].
+  destruct i; [ now cbn; apply Hn; left | cbn ].
   apply IHlrank.
   intros j Hj.
-  now apply Hini; right.
+  now apply Hn; right.
 }
 Qed.
 
-Theorem bsort_rank_loop_ub : ∀ A ord (d : A) lrank l_ini l i,
-  l_ini ≠ []
-  → length lrank + length l ≤ length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → nth i (bsort_rank_loop ord (λ i, nth i l_ini d) lrank l) 0 <
-    length l_ini.
+Theorem bsort_rank_loop_ub : ∀ A (ord : A → _) f lrank l i,
+  length lrank + length l ≠ 0
+  → (∀ i, i ∈ lrank → i < length lrank + length l)
+  → nth i (bsort_rank_loop ord f lrank l) 0 <
+    length lrank + length l.
 Proof.
-intros * Hiz Hia Hil.
+intros * Hlz Hil.
 destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
   apply Nat.nlt_ge in Hir.
   rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
-  destruct l_ini; [ easy | now cbn ].
+  now apply Nat.neq_0_lt_0.
 }
-revert lrank Hia Hil Hir.
+clear Hlz.
+revert lrank Hil Hir.
 induction l as [| b]; intros. {
   rewrite Nat.add_0_r in Hir.
-  apply Hil; cbn.
-  now apply nth_In.
+  now apply Hil, nth_In.
 }
-cbn in Hia, Hir |-*.
-rewrite <- Nat.add_succ_comm in Hia, Hir.
-apply IHl; cycle 1. {
-  intros j Hj.
-  apply in_bsort_rank_insert in Hj.
-  destruct Hj as [Hj| Hj]; [ | now apply Hil ].
-  subst j; flia Hia.
-} {
-  now rewrite length_bsort_rank_insert.
-}
-now rewrite length_bsort_rank_insert.
+cbn in Hir |-*.
+rewrite <- Nat.add_succ_comm in Hir |-*.
+specialize (in_bsort_rank_insert) as H1.
+specialize (H1 A nat ord f (length lrank) lrank).
+remember (bsort_rank_insert ord f (length lrank) lrank) as lr' eqn:Hlr'.
+specialize length_bsort_rank_insert as H2.
+specialize (H2 A nat ord f (length lrank) lrank).
+rewrite <- Hlr' in H2.
+rewrite <- H2 in Hir |-*.
+apply IHl; [ | easy ].
+intros j Hj.
+rewrite H2, Nat.add_succ_comm.
+rewrite Hlr' in Hj.
+apply in_bsort_rank_insert in Hj.
+destruct Hj as [Hj| Hj]; [ subst j; flia | ].
+now apply Hil.
 Qed.
 
 Theorem bsort_rank_ub : ∀ A ord (l : list A) i,
@@ -2457,7 +2463,7 @@ Proof.
 intros * Hlz.
 destruct l as [| ia]; [ easy | clear Hlz ].
 cbn - [ nth ].
-apply bsort_rank_loop_ub; [ easy | easy | ].
+apply bsort_rank_loop_ub; [ easy | ].
 intros j Hj.
 destruct Hj; [ now subst j; cbn | easy ].
 Qed.
@@ -2955,9 +2961,6 @@ now apply nth_bsort_rank_of_nodup_sorted.
 Qed.
 
 (* end sorted *)
-
-Theorem match_id : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
-Proof. now intros; destruct a. Qed.
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
