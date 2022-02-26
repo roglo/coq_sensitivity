@@ -1716,7 +1716,7 @@ destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
   rewrite nth_overflow; [ | rewrite length_snd_bsort_gen_loop; flia Hir ].
   easy.
 }
-revert lrank Hia Hil Hir.
+revert i lrank Hia Hil Hir.
 induction l as [| b]; intros; [ now cbn; rewrite match_id | ].
 cbn in Hia, Hir |-*.
 rewrite <- Nat.add_succ_comm in Hia, Hir.
@@ -1727,8 +1727,11 @@ remember (bsort_gen_loop ord _ lr' l) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (lr'', nl).
 cbn - [ nth ].
+specialize (length_snd_bsort_gen_loop ord (λ i, nth i l_ini d) lr' l) as H1.
+rewrite Hy in H1; cbn in H1.
+destruct i; cbn. {
+...
 specialize (IHl lr') as H1.
-Inspect 1.
 specialize (length_snd_bsort_gen_loop ord (λ i, nth i l_ini d) lr' l) as H2.
 rewrite Hy in H2; cbn in H2.
 ...
