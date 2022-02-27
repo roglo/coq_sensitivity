@@ -1324,28 +1324,29 @@ now apply H1.
 Qed.
 
 (* # of transpositions of some permutation p *)
-Definition ntransp p :=
+Definition n_transp p :=
   ∑ (i in seq 0 (length p)), ff_app (snd (bsort_gen Nat.leb p)) i.
 (*
-Definition ntransp p :=
+Definition n_transp p :=
   iter_seq 0 (length p - 1)
     (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
-Definition ntransp p :=
+Definition n_transp p :=
   iter_list (seq 0 (length p))
     (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
 *)
 
 Theorem ε_sum_n_transp : ∀ p,
-  ε p = if ntransp p mod 2 =? 0 then 1%F else (-1)%F.
+  ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F.
 Proof.
 (* je veux démontrer ça pour le sport, mais je sens que ça va être
    du sport ! *)
 intros.
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec _ _) as [Hnz| Hnz]. {
-Search (_ mod _ = 0).
-unfold ntransp in Hnz.
-Print ntransp.
+  apply Nat.mod_divides in Hnz; [ | easy ].
+  destruct Hnz as (k, Hn).
+  unfold n_transp in Hn.
+  unfold ε.
 ...
 
 Theorem permut_transp_list : ∀ p,
