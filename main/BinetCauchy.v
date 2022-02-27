@@ -1289,11 +1289,7 @@ remember (bsort_gen_loop ord _ lr' l) as y eqn:Hy.
 symmetry in Hy.
 destruct y as (lr'', nl).
 cbn - [ nth ].
-destruct i; cbn. {
-  specialize snd_bsort_gen_insert_ub as H1.
-  specialize (H1 A nat ord f (length lrank) lrank).
-  rewrite Hx in H1; cbn in H1; flia H1.
-}
+destruct i; cbn; [ flia | ].
 specialize (IHl lr' i) as H1.
 rewrite Hy in H1; cbn in H1.
 specialize length_fst_bsort_gen_insert as H2.
@@ -1327,6 +1323,31 @@ rewrite Nat.add_0_r in H1.
 now apply H1.
 Qed.
 
+(* # of transpositions of some permutation p *)
+Definition ntransp p :=
+  ∑ (i in seq 0 (length p)), ff_app (snd (bsort_gen Nat.leb p)) i.
+(*
+Definition ntransp p :=
+  iter_seq 0 (length p - 1)
+    (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
+Definition ntransp p :=
+  iter_list (seq 0 (length p))
+    (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
+*)
+
+Theorem ε_sum_n_transp : ∀ p,
+  ε p = if ntransp p mod 2 =? 0 then 1%F else (-1)%F.
+Proof.
+(* je veux démontrer ça pour le sport, mais je sens que ça va être
+   du sport ! *)
+intros.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hnz| Hnz]. {
+Search (_ mod _ = 0).
+unfold ntransp in Hnz.
+Print ntransp.
+...
+
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1344,6 +1365,8 @@ Require Import ZArith.
 Compute (let p := [12;20;7;9] in (bsort_gen Nat.leb p, ε p)).
 Compute (let p := [20;12;7;9] in (bsort_gen Nat.leb p, ε p)).
 Compute (let p := [20;9;12;7] in (bsort_gen Nat.leb p, ε p)).
+Compute (let p := [20;9;12;7;5;22;3;0;18] in (bsort_gen Nat.leb p, ε p)).
+Compute (let p := [20;0;12;7;5;22;3;9;18] in (bsort_gen Nat.leb p, ε p)).
 ...
 Compute (bsort_gen Nat.leb [12;20;7;9]).
      = ([2; 3; 0; 1], [0; 1; 0; 1])

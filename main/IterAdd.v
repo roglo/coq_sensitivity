@@ -14,6 +14,10 @@ Notation "'∑' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, l at level 60).
 
+Notation "'∑' ( i 'in' l ) , g" :=
+  (iter_list l (λ c i, (c + g)) 0)
+  (at level 45, i at level 0, l at level 60).
+
 Section a.
 
 Context {T : Type}.
