@@ -931,25 +931,25 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_with_rows_is_square.
 Qed.
 
-Fixpoint first_non_fix_transp' i p :=
+Fixpoint first_non_fix_transp i p :=
   match p with
   | [] => None
   | j :: l =>
-      if i =? j then first_non_fix_transp' (S i) l
+      if i =? j then first_non_fix_transp (S i) l
       else Some (i, j)
   end.
 
-Fixpoint transp_loop' it (p : list nat) :=
+Fixpoint transp_loop it (p : list nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fix_transp' 0 p with
+      match first_non_fix_transp 0 p with
       | None => []
-      | Some (k, pk) => (k, pk) :: transp_loop' it' (list_swap_elem 0 p k pk)
+      | Some (k, pk) => (k, pk) :: transp_loop it' (list_swap_elem 0 p k pk)
       end
   end.
 
-Definition transp_list' p := transp_loop' (length p) p.
+Definition transp_list' p := transp_loop (length p) p.
 
 (*
 Compute (transp_list' [3;2;0;1]).
@@ -972,12 +972,12 @@ Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
   | _ :: l' =>
       let (lrank', n) := bsort_gen_insert ord f (length lrank) lrank in
       let (l'', nl) := bsort_gen_loop ord f lrank' l' in
-      (l'', n :: nl)
+      (l'', length lrank - n :: nl)
   end.
 
 (* return a pair
    - the permutation to apply to the initial list to get the sorted list
-   - a list of insertions rules from the initial list to the sorted list
+   - a list of the number of transpositions to insert the elements
 *)
 Definition bsort_gen {A} (ord : A → A → bool) l :=
   match l with
@@ -1009,7 +1009,6 @@ Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
 *)
 
-(*
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
@@ -1049,9 +1048,7 @@ split. {
   flia.
 }
 Qed.
-*)
 
-(*
 Theorem first_non_fix_transp_Some_iff : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
   ↔ (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
@@ -1161,7 +1158,6 @@ split. {
   now symmetry in H1.
 }
 Qed.
-*)
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
@@ -1176,400 +1172,6 @@ Qed.
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
-
-(*
-Theorem transp_loop_nil : ∀ len, transp_loop len [] = [].
-Proof. now intros; destruct len. Qed.
-
-Theorem transp_loop_enough_iter : ∀ m n p,
-  length p ≤ m
-  → length p ≤ n
-  → transp_loop m p = transp_loop n p.
-Proof.
-intros * Hm Hn.
-revert n p Hm Hn.
-induction m; intros; cbn. {
-  apply Nat.le_0_r in Hm.
-  apply length_zero_iff_nil in Hm; subst p.
-  symmetry; apply transp_loop_nil.
-}
-destruct n. {
-  apply Nat.le_0_r in Hn.
-  now apply length_zero_iff_nil in Hn; subst p.
-}
-cbn.
-remember (first_non_fix_transp 0 p) as x eqn:Hx; symmetry in Hx.
-destruct x as [(k, kp)| ]; [ | easy ].
-f_equal.
-destruct p as [| a]; [ easy | ].
-cbn in Hm, Hn.
-apply Nat.succ_le_mono in Hm, Hn.
-cbn in Hx.
-destruct a. {
-  cbn.
-  unfold transposition.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec 0 k) as [Hzk| Hzk]. {
-    subst k.
-    destruct kp. {
-      now apply first_non_fix_transp_Some_iff in Hx.
-    }
-    apply IHm. {
-      cbn.
-      rewrite List_map_seq_length.
-...
-  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-...
-  cbn - [ first_non_fix_transp list_swap_elem ].
-  apply first_non_fix_transp_Some_iff in Hx.
-  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-  cbn.
-
-cbn - [ "=?" ] in Hx.
-...
-apply IHm. {
-  rewrite length_list_swap_elem.
-...
-destruct (Nat.eq_dec (length p) (S m)) as [Hpm| Hpm]. {
-  apply first_non_fix_transp_Some_iff in Hx.
-  rewrite Nat.sub_0_r in Hx; cbn in Hx.
-  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-  destruct Hkl as (_, Hkl).
-...
-apply IHm. {
-  rewrite length_list_swap_elem.
-  apply first_non_fix_transp_Some_iff in Hx.
-...
-
-Theorem transp_list_prop : ∀ p k kp,
-  (k, kp) ∈ transp_list p
-  → (∀ j : nat, j < k → nth j p 0 = j)
-    ∧ nth k p 0 = kp ∧ k ≠ kp ∧ k < length p.
-Proof.
-intros * Hkk.
-unfold transp_list in Hkk.
-(*
-apply (In_nth _ _ (0, 0)) in Hkk.
-destruct Hkk as (i & Hi & Hkk).
-Search transp_loop.
-*)
-remember (length p) as it eqn:H in Hkk.
-assert (Hit : length p ≤ it) by now rewrite H.
-(*
-replace it with (S it) in Hkk.
-cbn in Hkk.
-remember (first_non_fix_transp 0 p) as x eqn:Hx.
-symmetry in Hx.
-destruct x as [(k', kp')| ]; [ | easy ].
-apply first_non_fix_transp_Some_iff in Hx.
-rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
-destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-destruct Hkl as (_, Hkl).
-destruct Hkk as [Hkk| Hkk]. {
-  injection Hkk; clear Hkk; intros H1 H2.
-  move H1 at top; move H2 at top; subst kp' k'.
-  split; [ | easy ].
-  intros j Hj.
-  rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
-}
-*)
-clear H.
-apply (In_nth _ _ (0, 0)) in Hkk.
-destruct Hkk as (i & Hi & Hkk).
-(**)
-revert p k kp it Hkk Hi Hit.
-induction i; intros; cbn. {
-...
-rewrite (@transp_loop_enough_iter _ (S it)) in Hkk; [ | easy | flia Hit ].
-cbn in Hkk.
-...
-  destruct p as [| a]; [ now rewrite transp_loop_nil in Hi | ].
-
-  destruct it. {
-    now injection Hkk; clear Hkk; intros; subst k kp.
-  }
-  cbn - [ first_non_fix_transp list_swap_elem ] in Hi.
-...
-(**)
-revert p k kp i Hkk Hi Hit.
-induction it; intros; [ easy | ].
-cbn in Hkk.
-remember (first_non_fix_transp 0 p) as x eqn:Hx.
-symmetry in Hx.
-destruct x as [(k', kp')| ]. {
-  apply first_non_fix_transp_Some_iff in Hx.
-  rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
-  destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-  destruct Hkl as (_, Hkl).
-  destruct i. {
-    cbn in Hkk.
-    injection Hkk; clear Hkk; intros H1 H2.
-    move H1 at top; move H2 at top; subst kp' k'.
-    split; [ | easy ].
-    intros j Hj.
-    rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
-  }
-  cbn in Hkk.
-  specialize (IHit _ _ _ _ Hkk) as H1.
-  cbn in Hi.
-...
-rewrite length_list_swap_elem in H1.
-...
-revert p k kp Hkk Hit.
-induction it; intros; [ easy | ].
-cbn - [ first_non_fix_transp list_swap_elem ] in Hkk.
-remember (first_non_fix_transp 0 p) as x eqn:Hx.
-symmetry in Hx.
-destruct x as [(k', kp')| ]; [ | easy ].
-apply first_non_fix_transp_Some_iff in Hx.
-rewrite Nat.sub_0_r, Nat.add_0_l in Hx.
-destruct Hx as (Hbef & Hkp & Hkkp & Hkl).
-destruct Hkl as (_, Hkl).
-destruct Hkk as [Hkk| Hkk]. {
-  injection Hkk; clear Hkk; intros H1 H2.
-  move H1 at top; move H2 at top; subst kp' k'.
-  split; [ | easy ].
-  intros j Hj.
-  rewrite <- Hbef; [ now rewrite Nat.sub_0_r | easy ].
-}
-...
-specialize (IHit _ _ _ Hkk) as H1.
-rewrite length_list_swap_elem in H1.
-...
-*)
-
-(*
-Theorem permut_transp_loop_gen : ∀ n len p q,
-  n ≤ len
-  → is_permut n p
-  → is_permut n q
-  → p ° q = fold_left (λ c ij, swap n ij ° c) (transp_loop len p) q.
-Proof.
-intros * Hlen Hp Hq.
-revert n p q Hlen Hp Hq.
-induction len; intros; cbn. {
-  apply Nat.le_0_r in Hlen; subst n.
-  destruct Hp as (Hpp, Hpl).
-  destruct Hq as (Hqp, Hql).
-  apply length_zero_iff_nil in Hpl; subst p.
-  apply length_zero_iff_nil in Hql; subst q.
-  easy.
-}
-remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
-destruct kp as [(k, kp)| ]. {
-  symmetry in Hkp.
-  apply first_non_fix_transp_Some_iff in Hkp.
-  destruct Hkp as (Hbef & Hkp & Hkkp & Hkl); cbn in Hkl.
-  rewrite Nat.sub_0_r in Hkp; cbn.
-  destruct Hkl as (_, Hkl).
-(*
-  destruct Hp as (Hpp, Hpl); rewrite Hpl in Hkl.
-*)
-  destruct (Nat.eq_dec n (S len)) as [Hnl| Hnl]. {
-    move Hnl at top; subst n.
-    clear Hlen.
-...
-    assert (Hkpl : kp < S len). {
-      rewrite <- Hpl, <- Hkp.
-      apply Hpp, nth_In.
-      now rewrite Hpl.
-    }
-...
-    rewrite <- IHlen; [ | | | ]; cycle 1. {
-...
-    rewrite <- IHlen; [ | easy | | ]; cycle 1. {
-      now apply list_swap_elem_is_permut.
-    } {
-      apply comp_is_permut; [ | easy ].
-      unfold swap; cbn.
-      apply list_swap_elem_is_permut; [ easy | easy | ].
-      apply seq_is_permut.
-    }
-    rewrite (permut_comp_assoc len); [ | | easy ]. 2: {
-      unfold swap.
-      now rewrite length_list_swap_elem, seq_length.
-    }
-    f_equal.
-    unfold swap; cbn.
-    unfold "°", ff_app.
-    unfold list_swap_elem at 2.
-    rewrite seq_length, map_map.
-    rewrite (List_map_nth_seq p) with (d := 0).
-    rewrite Hpl.
-    apply map_ext_in.
-    intros i Hi; apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-    unfold transposition.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-      subst i.
-      rewrite seq_nth; [ cbn | easy ].
-      unfold list_swap_elem.
-      rewrite (List_map_nth' 0). 2: {
-        now rewrite seq_length, List_map_seq_length.
-      }
-      rewrite List_map_seq_length.
-      unfold transposition.
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite Nat.eqb_refl.
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec kp k) as [H| H]; [ now symmetry in H | clear H ].
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      now rewrite seq_nth.
-    }
-    destruct (Nat.eq_dec i kp) as [Hikp| Hikp]. {
-      subst i; clear Hi.
-      rewrite seq_nth; [ | easy ].
-      unfold list_swap_elem.
-      rewrite (List_map_nth' 0). 2: {
-        now rewrite seq_length, List_map_seq_length.
-      }
-      rewrite List_map_seq_length.
-      unfold transposition.
-      rewrite seq_nth; [ cbn | easy ].
-      rewrite Nat.eqb_refl.
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      now rewrite seq_nth.
-    }
-    rewrite seq_nth; [ | easy ].
-    unfold list_swap_elem.
-    rewrite (List_map_nth' 0). 2: {
-      now rewrite seq_length, List_map_seq_length.
-    }
-    rewrite List_map_seq_length.
-    unfold transposition.
-    rewrite seq_nth; [ cbn | easy ].
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i k) as [H| H]; [ easy | clear H ].
-    destruct (Nat.eq_dec i kp) as [H| H]; [ easy | clear H ].
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    now rewrite seq_nth.
-  }
-  rewrite <- IHlen.
-...
-; [ | flia Hlen Hnl | | ].
-  rewrite comp_1_r. 2: {
-    unfold swap; cbn.
-    now rewrite length_list_swap_elem, seq_length.
-  }
-  specialize (IHlen (list_swap_elem 0 p k kp)) as H1.
-  rewrite length_list_swap_elem in H1.
-...
-*)
-
-(*
-Theorem permut_transp_loop : ∀ len p,
-  length p ≤ len
-  → is_permut_list p
-  → p = Comp (length p) (ij ∈ transp_loop len p), swap (length p) ij.
-Proof.
-(*
-Compute (let p := [3;2;0;1] in let len := length p in let n := 6 in
-p = Comp n (ij ∈ transp_loop len p), swap n ij
-).
-*)
-intros * Hlen Hp.
-unfold iter_list.
-unfold swap.
-unfold list_swap_elem.
-rewrite seq_length.
-remember (length p) as n eqn:Hn.
-symmetry in Hn.
-revert len p Hn Hlen Hp.
-induction n; intros. {
-  apply length_zero_iff_nil in Hn; subst p; cbn.
-  now rewrite transp_loop_nil.
-}
-rewrite seq_S.
-cbn - [ nth swap ].
-Search (fold_left _ _ (_ ++ _)).
-Print fold_left.
-Print iter_list.
-...
-intros * Hlen Hp.
-unfold iter_list.
-unfold swap.
-unfold list_swap_elem.
-rewrite seq_length.
-rewrite <- (@comp_1_r (length p) p); [ | easy ].
-remember (seq 0 (length p)) as q eqn:Hq.
-rewrite comp_length.
-assert (Hpq : length p = length q) by now subst q; rewrite seq_length.
-rewrite <- Hpq, <- Hq.
-clear Hq.
-remember (length p) as n eqn:Hn.
-symmetry in Hn, Hpq.
-rename Hn into Hpn; rename Hpq into Hqn.
-move Hpn before Hpn.
-revert p q len Hp Hpn Hqn Hlen.
-induction n; intros. {
-  apply length_zero_iff_nil in Hpn; subst p; cbn.
-  apply length_zero_iff_nil in Hqn; subst q; cbn.
-  now rewrite transp_loop_nil.
-}
-...
-intros * Hlen Hp.
-destruct p as [| a1]. {
-  now rewrite transp_loop_nil.
-}
-cbn - [ nth seq ].
-rewrite seq_S.
-cbn - [ swap ].
-Search (iter_list _ (_ ++ _)).
-cbn - [ nth ].
-rewrite seq_length.
-unfold iter_list.
-
-rewrite seq_length.
-...
-intros * Hlen Hp.
-unfold iter_list.
-...
-rewrite <- permut_transp_loop_gen.
-symmetry.
-now apply comp_1_r.
-...
-revert p Hlen Hp.
-induction len; intros; cbn. {
-  apply Nat.le_0_r in Hlen.
-  now apply length_zero_iff_nil in Hlen; subst p.
-}
-remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
-destruct kp as [(k, kp)| ]. {
-  symmetry in Hkp.
-  apply first_non_fix_transp_Some in Hkp.
-  destruct Hkp as (Hbef & Hkp & Hkkp).
-  rewrite Nat.sub_0_r in Hkp; cbn.
-  rewrite comp_1_r. 2: {
-    unfold swap; cbn.
-    now rewrite length_list_swap_elem, seq_length.
-  }
-  specialize (IHlen (list_swap_elem 0 p k kp)) as H1.
-  rewrite length_list_swap_elem in H1.
-...
-  rewrite iter_list_cons'.
-...
-Unset Printing Notations.
-specialize (@iter_list_cons _ (nat * nat) (k, kp)) as H1.
-specialize (H1 (λ ij _, (3,2))).
-specialize (H1 (k, kp)).
-specialize (H1 (transp_loop len (list_swap_elem 0 p k kp))).
-cbn in H1.
-Check (fun (c : list nat) (ij : prod nat nat) => comp_list (swap (length p) ij) c).
-...
-intros * Hlen Hp.
-unfold iter_list.
-revert p Hlen Hp.
-induction len; intros; cbn. {
-  apply Nat.le_0_r in Hlen.
-  now apply length_zero_iff_nil in Hlen; subst p.
-}
-remember (first_non_fix_transp 0 p) as kp eqn:Hkp.
-symmetry in Hkp.
-destruct kp as [(k, kp)| ]. {
-  cbn.
-  unfold "°" at 2.
-...
-*)
 
 Theorem bsort_rank_gen_insert : ∀ A B (ord : A → _) (f : B → _) ia lr,
   bsort_rank_insert ord f ia lr =
@@ -1621,62 +1223,6 @@ apply -> Nat.succ_le_mono.
 specialize (IHlr ia) as H1.
 now rewrite Hx in H1.
 Qed.
-
-(*
-Theorem snd_bsort_gen_loop_elem_ub : ∀ A (ord : A → _) f lr l i,
-  nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ length lr.
-Proof.
-intros.
-revert i lr.
-induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
-remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n).
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (l'', nl).
-cbn - [ nth ].
-specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
-rewrite Hx in H1; cbn in H1.
-destruct i; [ easy | ].
-specialize (IHl i lr') as H2.
-rewrite Hy in H2; cbn in H2.
-cbn.
-etransitivity.
-apply H2.
-...
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (l'', nl).
-cbn - [ nth ] in H1 |-*.
-...
-
-Theorem snd_bsort_gen_loop_elem_ub : ∀ A (ord : A → _) f lr l i,
-  nth i (snd (bsort_gen_loop ord f lr l)) 0 ≤ i.
-Proof.
-intros.
-revert i lr.
-induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
-remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n).
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (l'', nl).
-cbn - [ nth ].
-specialize (snd_bsort_gen_insert_ub ord f (length lr) lr) as H1.
-rewrite Hx in H1; cbn in H1.
-specialize (IHl i lr') as H2.
-rewrite Hy in H2; cbn in H2.
-destruct i. {
-  cbn.
-...
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (l'', nl).
-cbn - [ nth ] in H1 |-*.
-...
-*)
 
 Theorem length_snd_bsort_gen_loop : ∀ A (ord : A → _) f lr l,
   length (snd (bsort_gen_loop ord f lr l)) = length l.
@@ -1781,8 +1327,6 @@ rewrite Nat.add_0_r in H1.
 now apply H1.
 Qed.
 
-...
-
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1794,6 +1338,17 @@ unfold transp_list.
 Print bsort_gen_insert.
 Compute (bsort_gen Nat.leb [20;9;12;7]).
 Compute (bsort_gen Nat.leb [20;12;7;9]).
+Print ε.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (let p := [12;20;7;9] in (bsort_gen Nat.leb p, ε p)).
+Compute (let p := [20;12;7;9] in (bsort_gen Nat.leb p, ε p)).
+Compute (let p := [20;9;12;7] in (bsort_gen Nat.leb p, ε p)).
+...
+Compute (bsort_gen Nat.leb [12;20;7;9]).
+     = ([2; 3; 0; 1], [0; 1; 0; 1])
+(0-0)+(1-1)+(2-0)+(3-1)=4 transpositions
+12;7;20;9  7;12;20;9  7;12;9;20  7;9;12;20
 map2 (λ a t,
 ...
 bsort ord p = f (snd (bsort_gen ord p)) ?
