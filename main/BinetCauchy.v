@@ -1325,7 +1325,7 @@ Qed.
 
 (* # of transpositions of some permutation p *)
 Definition n_transp p :=
-  ∑ (i in seq 0 (length p)), ff_app (snd (bsort_gen Nat.leb p)) i.
+  ∑ (i in 0, length p), ff_app (snd (bsort_gen Nat.leb p)) i.
 (*
 Definition n_transp p :=
   iter_seq 0 (length p - 1)
