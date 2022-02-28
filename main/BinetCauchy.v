@@ -1372,6 +1372,7 @@ Check Z.eqb.
 ...
 *)
 
+(*
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
   → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
@@ -1450,6 +1451,7 @@ Check
 ...
 ...
 enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
+*)
 
 Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
 Proof.
@@ -1537,11 +1539,9 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
-(*
 Compute (let p := [3;2;0;1] in let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 Compute (map (λ p, let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)) (canon_sym_gr_list_list 4)).
 Compute (map (λ p, let n := length p in list_eqb Nat.eqb p (Comp n (t ∈ transp_list p), swap n (fst t) (snd t))) (canon_sym_gr_list_list 4)).
-*)
 ...
 enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 rewrite Hpt.
