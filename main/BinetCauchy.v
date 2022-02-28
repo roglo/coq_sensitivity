@@ -1348,6 +1348,15 @@ destruct (Nat.eq_dec _ _) as [Hnz| Hnz]. {
   unfold n_transp in Hn.
   unfold ε.
 ...
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (let p := [12;20;7;9] in
+  ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F).
+Compute (map (λ p,
+  Z.eqb (ε p) (if n_transp p mod 2 =? 0 then 1%F else (-1)%F)
+) (canon_sym_gr_list_list 5)).
+Check Z.eqb.
+...
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
