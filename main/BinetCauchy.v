@@ -992,6 +992,7 @@ Compute (bsort_gen Nat.leb [3;2;0;1]).
 Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
 *)
 
+(*
 Definition transp_of_pos m n :=
   iter_list (seq n (m - n)) (λ t i, (i, i + 1) :: t) [].
 
@@ -1002,12 +1003,23 @@ Definition transp_list p :=
      if i =? j then l else transp_of_pos i j ++ l)
     []
     (seq 0 (length p)).
+*)
 
-(*
+Fixpoint transp_of_pos n i :=
+  match i with
+  | 0 => []
+  | S i' => (n - 1, n) :: transp_of_pos (n -  1) i'
+  end.
+
+Definition transp_list p :=
+  iter_seq 0 (length p - 1)
+    (λ t n, t ++ transp_of_pos n (ff_app (snd (bsort_gen Nat.leb p)) n)) [].
+
+(**)
 Compute (transp_list [20;12;7;9]).
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
-*)
+(**)
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
@@ -1335,6 +1347,7 @@ Definition n_transp p :=
     (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
 *)
 
+(*
 Theorem ε_sum_n_transp : ∀ p,
   ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F.
 Proof.
@@ -1357,6 +1370,7 @@ Compute (map (λ p,
 ) (canon_sym_gr_list_list 5)).
 Check Z.eqb.
 ...
+*)
 
 Theorem permut_transp_list : ∀ p,
   is_permut_list p
@@ -1364,8 +1378,10 @@ Theorem permut_transp_list : ∀ p,
 Proof.
 intros * Hp.
 unfold transp_list.
-(* en fait, snd (bsort_gen ord p) ne se convertit pas si facilement en
-   liste de transpositions *)
+unfold iter_list.
+unfold iter_seq, iter_list.
+rewrite Nat.sub_0_r.
+...
 Print bsort_gen_insert.
 Compute (bsort_gen Nat.leb [20;9;12;7]).
 Compute (bsort_gen Nat.leb [20;12;7;9]).
