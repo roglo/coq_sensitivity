@@ -1559,6 +1559,11 @@ induction n; intros; cbn. {
   destruct M as (ll); cbn in Hlen.
   now apply length_zero_iff_nil in Hlen; subst ll.
 }
+Check permut_without_highest.
+(* oui, mais c'est seulement si p est une permutation : faut-il que j'ajoute
+   ça dans les hypothèses ? ce serait donc moins général. Et si non, il
+   faudrait que je dise "is_square_matrix (mat_with_rows p M)" et non pas
+   "is_square_matrix M" *)
 ...
 
 Theorem glop : in_charac_0_field →
