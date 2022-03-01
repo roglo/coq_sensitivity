@@ -1531,6 +1531,36 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
+Theorem mat_with_rows_with_transp : ∀ (M : matrix T) p,
+  is_square_matrix M = true
+  → length p = mat_nrows M
+  → mat_with_rows p M =
+      iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
+Proof.
+intros * Hsm Hlen.
+(*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (let M := mk_mat [[3;2;7];[2;1;8];[6;6;5]] in
+map (λ p,
+  mat_with_rows p M =
+    iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M
+) (canon_sym_gr_list_list 3)).
+ça a l'air juste
+*)
+symmetry in Hlen.
+remember (length p) as n eqn:Hn; symmetry in Hn.
+revert M p Hn Hsm Hlen.
+induction n; intros; cbn. {
+  apply length_zero_iff_nil in Hn; subst p; cbn.
+  unfold mat_with_rows, transp_list; cbn.
+  unfold iter_seq, iter_list; cbn.
+  destruct M as (ll); cbn in Hlen.
+  now apply length_zero_iff_nil in Hlen; subst ll.
+}
+...
+
 Theorem glop : in_charac_0_field →
   ∀ n A p,
   is_square_matrix A = true
@@ -1541,11 +1571,8 @@ Proof.
 intros Hif * Hsm Hra Hp.
 Print n_transp.
 Check determinant_alternating.
-(* en fait, si on veut utiliser determinant_alternating, il faut convertir
-   mat_with_rows en un composé de mat_swap_rows, c'est-à-dire un composé
-   de transpositions ; il faut donc fabriquer les transpositions de p et
-   prouver que "mat_with_rows p A = composé (transpositions p A)", un truc
-   comme ça ; n_transp ne sert à rien *)
+...
+rewrite mat_with_rows_with_transp.
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
