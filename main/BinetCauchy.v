@@ -1337,7 +1337,7 @@ Qed.
 
 (* # of transpositions of some permutation p *)
 Definition n_transp p :=
-  ∑ (i in 0, length p), ff_app (snd (bsort_gen Nat.leb p)) i.
+  nat_∑ (i = 0, length p), ff_app (snd (bsort_gen Nat.leb p)) i.
 (*
 Definition n_transp p :=
   iter_seq 0 (length p - 1)
@@ -1539,6 +1539,18 @@ Theorem glop : in_charac_0_field →
   → det A = (ε p * det (mat_with_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
+Print n_transp.
+Check determinant_alternating.
+(* en fait, si on veut utiliser determinant_alternating, il faut convertir
+   mat_with_rows en un composé de mat_swap_rows, c'est-à-dire un composé
+   de transpositions ; il faut donc fabriquer les transpositions de p et
+   prouver que "mat_with_rows p A = composé (transpositions p A)", un truc
+   comme ça ; n_transp ne sert à rien *)
+...
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (map (λ p, ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F) (canon_sym_gr_list_list 4)).
+Compute (map (λ p, Z.eqb (ε p) (if n_transp p mod 2 =? 0 then 1%F else (-1)%F)) (canon_sym_gr_list_list 4)).
 Compute (let p := [3;2;0;1] in let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
 Compute (map (λ p, let n := length p in p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)) (canon_sym_gr_list_list 4)).
 Compute (map (λ p, let n := length p in list_eqb Nat.eqb p (Comp n (t ∈ transp_list p), swap n (fst t) (snd t))) (canon_sym_gr_list_list 4)).
