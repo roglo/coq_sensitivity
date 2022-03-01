@@ -1531,13 +1531,14 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
-Theorem mat_with_rows_with_transp : ∀ (M : matrix T) p,
+Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
-  → length p = mat_nrows M
+  → mat_nrows M = n
+  → is_permut n p
   → mat_with_rows p M =
       iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
-intros * Hsm Hlen.
+intros * Hsm Hr Hp.
 (*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
@@ -1549,21 +1550,17 @@ map (λ p,
 ) (canon_sym_gr_list_list 3)).
 ça a l'air juste
 *)
-symmetry in Hlen.
-remember (length p) as n eqn:Hn; symmetry in Hn.
-revert M p Hn Hsm Hlen.
+revert M p Hsm Hr Hp.
 induction n; intros; cbn. {
-  apply length_zero_iff_nil in Hn; subst p; cbn.
+  destruct Hp as (Hpp, Hpl).
+  apply length_zero_iff_nil in Hpl; subst p; cbn.
   unfold mat_with_rows, transp_list; cbn.
   unfold iter_seq, iter_list; cbn.
-  destruct M as (ll); cbn in Hlen.
-  now apply length_zero_iff_nil in Hlen; subst ll.
+  destruct M as (ll); cbn in Hr.
+  now apply length_zero_iff_nil in Hr; subst ll.
 }
-Check permut_without_highest.
-(* oui, mais c'est seulement si p est une permutation : faut-il que j'ajoute
-   ça dans les hypothèses ? ce serait donc moins général. Et si non, il
-   faudrait que je dise "is_square_matrix (mat_with_rows p M)" et non pas
-   "is_square_matrix M" *)
+specialize (permut_without_highest Hp) as H1.
+destruct H1 as (i & Hip & Hin & hpi).
 ...
 
 Theorem glop : in_charac_0_field →
