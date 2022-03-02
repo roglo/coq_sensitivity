@@ -1678,7 +1678,6 @@ assert (Hpn : length p = S n). {
   rewrite <- Nat.sub_succ_l; [ | flia Hip ].
   now rewrite Nat_sub_succ_1.
 }
-(**)
 specialize (IHn (subm M n n) (butn i p)) as H1.
 assert (H : is_square_matrix (subm M n n) = true). {
   apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
@@ -1694,61 +1693,6 @@ specialize (H1 Hpi).
 rewrite mat_with_rows_butn_subm in H1; [ | easy | | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
-...
-unfold mat_with_rows; f_equal.
-destruct M as (ll); cbn.
-rewrite map_butn.
-rewrite <- map_map.
-rewrite <- map_butn.
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [2;0;1] in
-let i := 0 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [0;1;2] in
-let i := 2 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [2;1;0] in
-let i := 0 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [1;0;2] in
-let i := 2 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [1;2;0] in
-let i := 1 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [0;2;1] in
-let i := 1 in
-let n := length p - 1 in
-mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
-
-...
-mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M).
-...
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) i).
-...
-mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M).
-...
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) i i).
-...
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) i i).
-
-...
-  rewrite mat_with_rows_butn_subm in H1.
 ...
 
 Theorem glop : in_charac_0_field →
