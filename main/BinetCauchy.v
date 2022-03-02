@@ -1532,12 +1532,13 @@ now apply all_1_rngl_product_1.
 Qed.
 
 Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i n,
-  nth i p 0 = n
+  NoDup p
+  → nth i p 0 = n
   → length p = S n
   → mat_nrows M = S n
   → mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n.
 Proof.
-intros * Hi Hp Hr.
+intros * Hnd Hi Hp Hr.
 unfold mat_with_rows, subm; cbn.
 f_equal.
 destruct M as (ll); cbn in Hr |-*.
@@ -1555,12 +1556,36 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   now rewrite butn_nil.
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
-  subst j.
+  subst j; exfalso.
+  specialize (NoDup_nat _ Hnd) as H1.
+...
+  clear - Hnd Hi Hj.
+  apply (In_nth _ _ 0) in Hj.
+  destruct Hj as (j & Hnj & Hin).
+  rewrite butn_length in Hnj.
+  rewrite nth_butn in Hin.
+  unfold Nat.b2n in Hin.
+  rewrite if_leb_le_dec in Hin.
+  destruct (le_dec i j) as [Hij| Hij]. {
+    rewrite fold_ff_app in Hi, Hin.
+    specialize (H1 i (j + 1)).
+...
+  unfold butn in Hj.
+  apply in_app_or in Hj.
+  destruct Hj as [Hj| Hj].
+...
   rewrite nth_overflow. 2: {
     rewrite map_length, butn_length, Hr; cbn.
     rewrite Nat.leb_refl; cbn.
     now rewrite Nat.sub_0_r.
   }
+  apply is_scm_mat_iff in Hsm; cbn in Hsm.
+  destruct Hsm as (Hcrb, Hclb).
+  rewrite Hr in Hclb.
+...
+  specialize (Hclb (nth n ll [])) as H1.
+  specialize (Hcrb Hbc) as H1.
+
 ...
   rewrite nth_overflow. 2: {
     rewrite Hr.
