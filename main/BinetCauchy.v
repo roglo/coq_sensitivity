@@ -1618,39 +1618,17 @@ destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
     flia Hij H1.
   }
 }
-...
-  clear - Hnd Hi Hj.
-  unfold Nat.b2n in Hin.
-  rewrite if_leb_le_dec in Hin.
-    rewrite fold_ff_app in Hi, Hin.
-...
-  unfold butn in Hj.
-  apply in_app_or in Hj.
-  destruct Hj as [Hj| Hj].
-...
-  rewrite nth_overflow. 2: {
-    rewrite map_length, butn_length, Hr; cbn.
-    rewrite Nat.leb_refl; cbn.
-    now rewrite Nat.sub_0_r.
-  }
-  apply is_scm_mat_iff in Hsm; cbn in Hsm.
-  destruct Hsm as (Hcrb, Hclb).
-  rewrite Hr in Hclb.
-...
-  specialize (Hclb (nth n ll [])) as H1.
-  specialize (Hcrb Hbc) as H1.
-
-...
-  rewrite nth_overflow. 2: {
-    rewrite Hr.
-...
 rewrite (List_map_nth' []). 2: {
   rewrite butn_length, Hr; cbn.
   rewrite Nat.leb_refl; cbn.
-...
-Search (_ ∈ butn _ _).
-  apply in_butn in Hj.
-...
+  flia Hjn Hjn'.
+}
+rewrite nth_butn.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec n j) as [H| H]; [ flia Hjn Hjn' H | clear H ].
+now rewrite Nat.add_0_r.
+Qed.
 
 Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
@@ -1713,8 +1691,9 @@ assert (H : mat_nrows (subm M n n) = n). {
 }
 specialize (H1 H); clear H.
 specialize (H1 Hpi).
-...
-rewrite mat_with_rows_butn_subm in H1; [ | easy | easy ].
+rewrite mat_with_rows_butn_subm in H1; [ | easy | | easy | easy | easy ]. 2: {
+  now destruct Hp as ((Hpa, Hpd), Hpl).
+}
 ...
 unfold mat_with_rows; f_equal.
 destruct M as (ll); cbn.
