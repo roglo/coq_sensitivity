@@ -1532,13 +1532,14 @@ now apply all_1_rngl_product_1.
 Qed.
 
 Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i n,
-  NoDup p
+  is_square_matrix M = true
+  → NoDup p
   → nth i p 0 = n
   → length p = S n
   → mat_nrows M = S n
   → mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n.
 Proof.
-intros * Hnd Hi Hp Hr.
+intros * Hsm Hnd Hi Hp Hr.
 unfold mat_with_rows, subm; cbn.
 f_equal.
 destruct M as (ll); cbn in Hr |-*.
@@ -1598,27 +1599,25 @@ destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
       destruct ll as [| la]; [ easy | ].
       destruct ll; [ | easy ].
       cbn.
-      destruct la as [| a]; [ easy | clear Hr ].
-...
-
-    specialize (H1 i j).
-    assert (H : i < S n). {
-
-
-      unfold Nat.b2n in Hnj.
-      rewrite if_ltb_lt_dec in Hnj.
-      destruct (lt_dec i (S n)) as [H| Hisn]; [ easy | ].
-      flia Hisn Hnj Hij.
+      destruct la as [| a]; [ easy | ].
+      apply is_scm_mat_iff in Hsm.
+      destruct Hsm as (Hcrb, Hclb).
+      cbn - [ In ] in Hclb.
+      specialize (Hclb (a :: la) (or_introl eq_refl)) as H2.
+      cbn in H2.
+      now destruct la.
     }
-    specialize (H1 H).
-    apply Nat.ltb_lt in H.
-    rewrite H in Hnj; clear H.
-    rewrite Nat_sub_succ_1 in Hnj.
-    assert (H : j + 1 < S n) by flia Hnj.
-    specialize (H1 H); clear H.
+    specialize (H1 i j Hisn).
+    apply Nat.ltb_lt in Hisn; rewrite Hisn in Hnj.
+    cbn in Hnj.
+    assert (H : j < S n) by flia Hnj.
+    rewrite fold_ff_app in Hi, Hin.
+    rewrite Nat.add_0_r in Hin.
     rewrite Hi, Hin in H1.
-    specialize (H1 eq_refl).
-    flia Hnj Hij H1.
+    specialize (H1 H eq_refl).
+    flia Hij H1.
+  }
+}
 ...
   clear - Hnd Hi Hj.
   unfold Nat.b2n in Hin.
