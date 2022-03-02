@@ -1556,7 +1556,7 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   now rewrite butn_nil.
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
-  subst j; exfalso.
+  subst j.
   specialize (NoDup_nat _ Hnd) as H1.
   apply (In_nth _ _ 0) in Hj.
   destruct Hj as (j & Hnj & Hin).
@@ -1584,8 +1584,41 @@ destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
     rewrite Hi, Hin in H1.
     specialize (H1 eq_refl).
     flia Hnj Hij H1.
-  }
-  apply Nat.nle_gt in Hij.
+  } {
+    apply Nat.nle_gt in Hij.
+    destruct (lt_dec i (S n)) as [Hisn| Hisn]. 2: {
+      apply Nat.nlt_ge in Hisn.
+      rewrite nth_overflow in Hi; [ | now rewrite Hp ].
+      subst n.
+      unfold Nat.b2n in Hnj.
+      rewrite if_ltb_lt_dec in Hnj.
+      destruct (lt_dec i 1) as [H| H]; [ flia H Hisn | clear H ].
+      rewrite Nat.sub_0_r in Hnj.
+      apply Nat.lt_1_r in Hnj; subst j.
+      destruct ll as [| la]; [ easy | ].
+      destruct ll; [ | easy ].
+      cbn.
+      destruct la as [| a]; [ easy | clear Hr ].
+...
+
+    specialize (H1 i j).
+    assert (H : i < S n). {
+
+
+      unfold Nat.b2n in Hnj.
+      rewrite if_ltb_lt_dec in Hnj.
+      destruct (lt_dec i (S n)) as [H| Hisn]; [ easy | ].
+      flia Hisn Hnj Hij.
+    }
+    specialize (H1 H).
+    apply Nat.ltb_lt in H.
+    rewrite H in Hnj; clear H.
+    rewrite Nat_sub_succ_1 in Hnj.
+    assert (H : j + 1 < S n) by flia Hnj.
+    specialize (H1 H); clear H.
+    rewrite Hi, Hin in H1.
+    specialize (H1 eq_refl).
+    flia Hnj Hij H1.
 ...
   clear - Hnd Hi Hj.
   unfold Nat.b2n in Hin.
