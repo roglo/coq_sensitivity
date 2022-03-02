@@ -1558,11 +1558,12 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
   subst j; exfalso.
   specialize (NoDup_nat _ Hnd) as H1.
-...
-  clear - Hnd Hi Hj.
   apply (In_nth _ _ 0) in Hj.
   destruct Hj as (j & Hnj & Hin).
   rewrite butn_length in Hnj.
+  rewrite Hp in H1, Hnj.
+...
+  clear - Hnd Hi Hj.
   rewrite nth_butn in Hin.
   unfold Nat.b2n in Hin.
   rewrite if_leb_le_dec in Hin.
