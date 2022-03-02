@@ -1531,15 +1531,16 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
-Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i n,
+Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i k n,
   is_square_matrix M = true
   → NoDup p
   → nth i p 0 = n
   → length p = S n
   → mat_nrows M = S n
-  → mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n.
+  → k ≤ n
+  → mat_with_rows (butn i p) (subm M n k) = subm (mat_with_rows p M) i k.
 Proof.
-intros * Hsm Hnd Hi Hp Hr.
+intros * Hsm Hnd Hi Hp Hr Hk.
 unfold mat_with_rows, subm; cbn.
 f_equal.
 destruct M as (ll); cbn in Hr |-*.
@@ -1605,7 +1606,8 @@ destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
       cbn - [ In ] in Hclb.
       specialize (Hclb (a :: la) (or_introl eq_refl)) as H2.
       cbn in H2.
-      now destruct la.
+      destruct la; [ | easy ].
+      now apply Nat.le_0_r in Hk; subst k.
     }
     specialize (H1 i j Hisn).
     apply Nat.ltb_lt in Hisn; rewrite Hisn in Hnj.
@@ -1690,7 +1692,8 @@ assert (H : mat_nrows (subm M n n) = n). {
 }
 specialize (H1 H); clear H.
 specialize (H1 Hpi).
-rewrite mat_with_rows_butn_subm in H1; [ | easy | | easy | easy | easy ]. 2: {
+rewrite mat_with_rows_butn_subm in H1;
+  [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
 ...
