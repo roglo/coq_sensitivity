@@ -1582,6 +1582,62 @@ assert (H : mat_nrows (subm M i i) = n). {
 }
 specialize (H1 H); clear H.
 specialize (H1 Hpi).
+Search (mat_with_rows (butn _ _)).
+Search (mat_with_rows _ (subm _ _)).
+Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i,
+  nth i p 0 = length p
+  → mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M.
+Proof.
+intros * Hi.
+unfold mat_with_rows; f_equal.
+destruct M as (ll); cbn.
+rewrite map_butn.
+rewrite <- map_map.
+rewrite <- map_butn.
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [2;0;1] in
+let i := 0 in
+mat_with_rows (butn i p) (subm M i i) = subm M i i).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [2;1;0] in
+let i := 0 in
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) i).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [1;2;0] in
+let i := 1 in
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) 0 i).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [0;2;1] in
+let i := 1 in
+mat_with_rows (butn i p) (subm M i i) = subm M i i).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [0;1;2] in
+let i := 2 in
+mat_with_rows (butn i p) (subm M i i) = subm M i i).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [1;0;2] in
+let i := 2 in
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) (length p - 1)).
+
+...
+mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M).
+...
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) i).
+...
+mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M).
+...
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) i i).
+...
+mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) i i).
+
+...
+  rewrite mat_with_rows_butn_subm in H1.
 ...
 
 Theorem glop : in_charac_0_field →
