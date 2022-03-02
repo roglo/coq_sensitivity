@@ -1560,7 +1560,28 @@ induction n; intros; cbn. {
   now apply length_zero_iff_nil in Hr; subst ll.
 }
 specialize (permut_without_highest Hp) as H1.
-destruct H1 as (i & Hip & Hin & hpi).
+destruct H1 as (i & Hip & Hin & Hpi).
+specialize (IHn (subm M i i) (butn i p)) as H1.
+assert (Hi : i < S n). {
+  destruct Hpi as (Hpp, Hpl).
+  rewrite butn_length in Hpl.
+  apply Nat.ltb_lt in Hip; rewrite Hip in Hpl.
+  apply Nat.ltb_lt in Hip; cbn in Hpl.
+  rewrite <- Hpl.
+  rewrite <- Nat.sub_succ_l; [ | flia Hip ].
+  now rewrite Nat_sub_succ_1.
+}
+assert (H : is_square_matrix (subm M i i) = true). {
+  apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
+}
+specialize (H1 H); clear H.
+assert (H : mat_nrows (subm M i i) = n). {
+  rewrite mat_nrows_subm, Hr.
+  apply Nat.ltb_lt in Hi; rewrite Hi.
+  cbn; apply Nat.sub_0_r.
+}
+specialize (H1 H); clear H.
+specialize (H1 Hpi).
 ...
 
 Theorem glop : in_charac_0_field →
