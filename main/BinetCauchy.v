@@ -1531,6 +1531,48 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
+Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i n,
+  nth i p 0 = n
+  → length p = S n
+  → mat_nrows M = S n
+  → mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n.
+Proof.
+intros * Hi Hp Hr.
+unfold mat_with_rows, subm; cbn.
+f_equal.
+destruct M as (ll); cbn in Hr |-*.
+rewrite <- map_butn, map_map.
+apply map_ext_in.
+intros j Hj.
+destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
+  apply Nat.nlt_ge in Hjn.
+  rewrite nth_overflow. 2: {
+    rewrite map_length, butn_length, Hr; cbn.
+    rewrite Nat.leb_refl; cbn.
+    rewrite Nat.sub_0_r; flia Hjn.
+  }
+  rewrite nth_overflow by now rewrite Hr.
+  now rewrite butn_nil.
+}
+destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
+  subst j.
+  rewrite nth_overflow. 2: {
+    rewrite map_length, butn_length, Hr; cbn.
+    rewrite Nat.leb_refl; cbn.
+    now rewrite Nat.sub_0_r.
+  }
+...
+  rewrite nth_overflow. 2: {
+    rewrite Hr.
+...
+rewrite (List_map_nth' []). 2: {
+  rewrite butn_length, Hr; cbn.
+  rewrite Nat.leb_refl; cbn.
+...
+Search (_ ∈ butn _ _).
+  apply in_butn in Hj.
+...
+
 Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -1561,7 +1603,6 @@ induction n; intros; cbn. {
 }
 specialize (permut_without_highest Hp) as H1.
 destruct H1 as (i & Hip & Hin & Hpi).
-specialize (IHn (subm M i i) (butn i p)) as H1.
 assert (Hi : i < S n). {
   destruct Hpi as (Hpp, Hpl).
   rewrite butn_length in Hpl.
@@ -1571,59 +1612,71 @@ assert (Hi : i < S n). {
   rewrite <- Nat.sub_succ_l; [ | flia Hip ].
   now rewrite Nat_sub_succ_1.
 }
-assert (H : is_square_matrix (subm M i i) = true). {
+assert (Hpn : length p = S n). {
+  destruct Hpi as (Hpp, Hpl).
+  rewrite butn_length in Hpl.
+  apply Nat.ltb_lt in Hip; rewrite Hip in Hpl.
+  apply Nat.ltb_lt in Hip; cbn in Hpl.
+  rewrite <- Hpl.
+  rewrite <- Nat.sub_succ_l; [ | flia Hip ].
+  now rewrite Nat_sub_succ_1.
+}
+(**)
+specialize (IHn (subm M n n) (butn i p)) as H1.
+assert (H : is_square_matrix (subm M n n) = true). {
   apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
 }
 specialize (H1 H); clear H.
-assert (H : mat_nrows (subm M i i) = n). {
-  rewrite mat_nrows_subm, Hr.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
+assert (H : mat_nrows (subm M n n) = n). {
+  rewrite mat_nrows_subm, Hr; cbn.
+  rewrite Nat.leb_refl.
   cbn; apply Nat.sub_0_r.
 }
 specialize (H1 H); clear H.
 specialize (H1 Hpi).
-Search (mat_with_rows (butn _ _)).
-Search (mat_with_rows _ (subm _ _)).
-Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i,
-  nth i p 0 = length p
-  → mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M.
-Proof.
-intros * Hi.
+...
+rewrite mat_with_rows_butn_subm in H1; [ | easy | easy ].
+...
 unfold mat_with_rows; f_equal.
 destruct M as (ll); cbn.
 rewrite map_butn.
 rewrite <- map_map.
 rewrite <- map_butn.
-
 Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
 let p := [2;0;1] in
 let i := 0 in
-mat_with_rows (butn i p) (subm M i i) = subm M i i).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [2;1;0] in
-let i := 0 in
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) i).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [1;2;0] in
-let i := 1 in
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) 0 i).
-
-Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
-let p := [0;2;1] in
-let i := 1 in
-mat_with_rows (butn i p) (subm M i i) = subm M i i).
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
 
 Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
 let p := [0;1;2] in
 let i := 2 in
-mat_with_rows (butn i p) (subm M i i) = subm M i i).
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [2;1;0] in
+let i := 0 in
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
 
 Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
 let p := [1;0;2] in
 let i := 2 in
-mat_with_rows (butn i p) (subm M i i) = subm (mat_with_rows p M) (length p - 1) (length p - 1)).
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [1;2;0] in
+let i := 1 in
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
+
+Compute (let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+let p := [0;2;1] in
+let i := 1 in
+let n := length p - 1 in
+mat_with_rows (butn i p) (subm M n n) = subm (mat_with_rows p M) i n).
 
 ...
 mat_with_rows (butn i p) (subm M i i) = mat_with_rows p M).
