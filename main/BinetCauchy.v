@@ -1728,7 +1728,11 @@ assert (H : is_permut n q). {
 }
 specialize (H2 H); clear H.
 unfold q in H2 at 1.
-Print collapse.
+unfold collapse in H2.
+Search (mat_with_rows (bsort_rank _ _)).
+Check mat_with_rows_butn_subm.
+Search (bsort_rank _ (butn _ _)).
+Search (bsort_rank _ (_ ++ _)).
 ...
 rewrite mat_with_rows_butn_subm in H2;
   [ | easy | | | | | easy ]; cycle 1. {
