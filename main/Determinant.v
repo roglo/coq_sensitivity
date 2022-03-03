@@ -41,7 +41,7 @@ Fixpoint determinant_loop n (M : matrix T) :=
    | S n' =>
        λ M' : matrix T,
        ∑ (j = 0, n'),
-       minus_one_pow j * mat_el M' 0 j * determinant_loop n' (subm M' 0 j)
+       minus_one_pow j * mat_el M' 0 j * determinant_loop n' (subm 0 j M')
    end) M.
 
 Definition det M := determinant_loop (mat_nrows M) M.
@@ -57,7 +57,7 @@ Proof. easy. Qed.
 Theorem determinant_succ : ∀ n (M : matrix T),
   determinant_loop (S n) M =
      ∑ (j = 0, n),
-     minus_one_pow j * mat_el M 0 j * determinant_loop n (subm M 0 j).
+     minus_one_pow j * mat_el M 0 j * determinant_loop n (subm 0 j M).
 Proof. easy. Qed.
 
 (* Alternative version of the determinant: sum of product of the
@@ -1038,7 +1038,7 @@ specialize (square_matrix_ncols _ Hsmb) as Hcb.
 rewrite Hra in Hca.
 rewrite Hrb in Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
-assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
+assert (Hab : ∀ j, subm 0 j A = subm 0 j B). {
   intros.
   destruct A as (lla).
   destruct B as (llb).
@@ -1077,7 +1077,7 @@ assert (Hab : ∀ j, subm A 0 j = subm B 0 j). {
   apply in_seq in Hv.
   now symmetry; apply Hb.
 }
-assert (Hac : ∀ j, subm A 0 j = subm C 0 j). {
+assert (Hac : ∀ j, subm 0 j A = subm 0 j C). {
   intros.
   intros.
   destruct A as (lla).
@@ -1140,4 +1140,3 @@ Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
-Arguments subm {T} M%M i%nat j%nat.

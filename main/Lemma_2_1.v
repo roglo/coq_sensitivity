@@ -32,15 +32,15 @@ Definition is_symm_mat (A : matrix T) :=
   is_square_matrix A = true ∧
   ∀ i j, i < mat_nrows A → j < mat_nrows A → mat_el A i j = mat_el A j i.
 
-Definition princ_subm_1 (A : matrix T) k := subm A k k.
+Definition princ_subm_1 (A : matrix T) k := subm k k A.
 
 Fixpoint mat_princ_subm (A : matrix T) l : matrix T :=
   match l with
   | [] => A
-  | i :: l' => mat_princ_subm (subm A i i) l'
+  | i :: l' => mat_princ_subm (subm i i A) l'
   end.
 
-Theorem subm_z : ∀ i j, subm (mk_mat []) i j = mZ 0 0.
+Theorem subm_z : ∀ i j, subm i j (mk_mat []) = mZ 0 0.
 Proof.
 intros.
 unfold subm, mZ; cbn.

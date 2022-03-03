@@ -1015,11 +1015,11 @@ Definition transp_list p :=
   iter_seq 0 (length p - 1)
     (λ t n, t ++ transp_of_pos n (ff_app (snd (bsort_gen Nat.leb p)) n)) [].
 
-(**)
+(*
 Compute (transp_list [20;12;7;9]).
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
-(**)
+*)
 
 Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
   first_non_fix_transp i p = Some (k, kp)
@@ -1538,7 +1538,7 @@ Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i k n,
   → length p = S n
   → mat_nrows M = S n
   → k ≤ n
-  → mat_with_rows (butn i p) (subm M n k) = subm (mat_with_rows p M) i k.
+  → mat_with_rows (butn i p) (subm n k M) = subm i k (mat_with_rows p M).
 Proof.
 intros * Hsm Hnd Hi Hp Hr Hk.
 unfold mat_with_rows, subm; cbn.
@@ -1680,12 +1680,12 @@ assert (Hpn : length p = S n). {
   rewrite <- Nat.sub_succ_l; [ | flia Hip ].
   now rewrite Nat_sub_succ_1.
 }
-specialize (IHn (subm M n n) (butn i p)) as H1.
-assert (H : is_square_matrix (subm M n n) = true). {
+specialize (IHn (subm n n M) (butn i p)) as H1.
+assert (H : is_square_matrix (subm n n M) = true). {
   apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
 }
 specialize (H1 H); clear H.
-assert (H : mat_nrows (subm M n n) = n). {
+assert (H : mat_nrows (subm n n M) = n). {
   rewrite mat_nrows_subm, Hr; cbn.
   rewrite Nat.leb_refl.
   cbn; apply Nat.sub_0_r.

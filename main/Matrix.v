@@ -1953,13 +1953,13 @@ Qed.
 
 (* matrix without row i and column j *)
 
-Definition subm (M : matrix T) i j :=
+Definition subm i j (M : matrix T) :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
 
 (* combinations of submatrix and other operations *)
 
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
-  mat_nrows (subm M i j) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
+  mat_nrows (subm i j M) = mat_nrows M - Nat.b2n (i <? mat_nrows M).
 Proof.
 intros.
 destruct M as (ll); cbn - [ "<?" ].
@@ -1969,7 +1969,7 @@ Qed.
 
 Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
-  → mat_ncols (subm M i j) =
+  → mat_ncols (subm i j M) =
    match mat_nrows M with
    | 0 => 0
    | 1 => if i =? 0 then 0 else mat_ncols M - Nat.b2n (j <? mat_ncols M)
@@ -2107,7 +2107,7 @@ Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
   i < mat_nrows M
   → j < mat_nrows M
   → is_square_matrix M = true
-  → is_square_matrix (subm M i j) = true.
+  → is_square_matrix (subm i j M) = true.
 Proof.
 intros * Hi Hj Hm.
 apply is_scm_mat_iff.
@@ -2165,7 +2165,7 @@ Qed.
 Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
   mat_ncols A ≠ 1
   → is_correct_matrix A = true
-  → is_correct_matrix (subm A i j) = true.
+  → is_correct_matrix (subm i j A) = true.
 Proof.
 intros * Hc1 Ha.
 apply is_scm_mat_iff.
@@ -2799,7 +2799,7 @@ Arguments mat_transp_nrows {T}%type {ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
-Arguments subm {T} M%M i%nat j%nat.
+Arguments subm {T} i%nat j%nat M%M.
 Arguments mat_vect_mul_0_r {T}%type {ro rp} Hop [m n]%nat M%M.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
