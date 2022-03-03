@@ -1696,6 +1696,22 @@ rewrite mat_with_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
+specialize (IHn (subm 0 0 M) (butn i p)) as H2.
+assert (H : is_square_matrix (subm 0 0 M) = true). {
+  apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
+}
+specialize (H2 H); clear H.
+assert (H : mat_nrows (subm 0 0 M) = n). {
+  rewrite mat_nrows_subm, Hr; cbn.
+  apply Nat.sub_0_r.
+}
+specialize (H2 H); clear H.
+specialize (H2 Hpi).
+...
+rewrite mat_with_rows_butn_subm in H2;
+  [ | easy | | | | | easy ]; cycle 1. {
+  now destruct Hp as ((Hpa, Hpd), Hpl).
+} {
 ...
   H1 : mat_with_rows (butn i p) (subm n n M) =
   H1 : subm i n (mat_with_rows p M) =
