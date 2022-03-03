@@ -1696,6 +1696,10 @@ rewrite mat_with_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
+...
+  H1 : mat_with_rows (butn i p) (subm n n M) =
+  H1 : subm i n (mat_with_rows p M) =
+...
 (*
 Abort.
 End a.
