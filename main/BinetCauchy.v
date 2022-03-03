@@ -1696,6 +1696,72 @@ rewrite mat_with_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
+(*
+Abort.
+End a.
+
+Section a.
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+*)
+Definition surm u v row col (M : matrix T) :=
+  match row with
+  | [] => M
+  | d :: _ =>
+      mk_mat
+        (map
+           (λ i,
+            map
+              (λ j,
+               match Nat.compare i u with
+               | Lt =>
+                   match Nat.compare j v with
+                   | Lt => mat_el M i j
+                   | Eq => nth i col d
+                   | Gt => mat_el M i (j - 1)
+                   end
+               | Eq => nth j row d
+               | Gt =>
+                   match Nat.compare j v with
+                   | Lt => mat_el M (i - 1) j
+                   | Eq => nth i col d
+                   | Gt => mat_el M (i - 1) (j - 1)
+                   end
+               end)
+              (seq 0 (length row)))
+           (seq 0 (length col)))
+  end.
+(*
+End a.
+Require Import RnglAlg.Nrl.
+Compute (let M := mk_mat [[1;2;3;4];[5;6;7;8];[9;10;11;12]] in
+surm _ 1 2 [13;14;15;16;17] [18;19;20;21] M).
+surm _ 0 0 [13;14;15;16;17] [18;19;20;21] M).
+...
+Print matrix.
+*)
+Definition mat_row i (M : matrix T) :=
+  nth i (mat_list_list M) [].
+Definition mat_col j (M : matrix T) :=
+  map (λ i, mat_el M i j) (seq 0 (mat_nrows M)).
+(*
+End a.
+Require Import RnglAlg.Nrl.
+Compute (let M := mk_mat [[1;2;3;4];[5;6;7;8];[9;10;11;12]] in
+mat_col _ 4 M).
+*)
+Theorem surm_of_subm : ∀ (M : matrix T) i j,
+  M = surm i j (mat_row i M) (mat_col j M) (subm i j M).
+Proof.
+intros.
+destruct M as (ll); cbn.
+unfold surm.
+(* ouais, fait chier *)
+...
+rewrite (surm_of_subm (mat_with_rows p M) i n).
+rewrite H1.
+unfold surm.
 ...
 
 Theorem glop : in_charac_0_field →
