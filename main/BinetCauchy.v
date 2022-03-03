@@ -1696,7 +1696,8 @@ rewrite mat_with_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
-specialize (IHn (subm 0 0 M) (butn i p)) as H2.
+specialize (IHn (subm 0 0 M)) as H2.
+specialize (H2 (butn (ff_app (bsort_rank Nat.leb p) 0) p)) as H2.
 assert (H : is_square_matrix (subm 0 0 M) = true). {
   apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
 }
@@ -1706,8 +1707,11 @@ assert (H : mat_nrows (subm 0 0 M) = n). {
   apply Nat.sub_0_r.
 }
 specialize (H2 H); clear H.
-specialize (H2 Hpi).
+assert (H : is_permut n (butn (ff_app (bsort_rank Nat.leb p) 0) p)). {
+  apply butn_is_permut; [ easy | | ].
+(* ah oui mais non *)
 ...
+specialize (H2 Hpi).
 rewrite mat_with_rows_butn_subm in H2;
   [ | easy | | | | | easy ]; cycle 1. {
   now destruct Hp as ((Hpa, Hpd), Hpl).
