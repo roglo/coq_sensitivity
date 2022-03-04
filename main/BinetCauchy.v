@@ -1562,8 +1562,13 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   rewrite map_butn_seq at 1.
   do 2 rewrite List_map_seq_length.
   rewrite map_butn.
-...
   rewrite square_matrix_ncols. 2: {
+    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+      move Hnz at top; subst n.
+      apply Nat.le_0_r in Hk; subst k.
+      destruct ll as [| l]; [ easy | ].
+      now destruct ll.
+    }
     apply is_scm_mat_iff.
     split. {
       intros Hc; cbn.
@@ -1580,20 +1585,8 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
         rewrite butn_length, Hr; cbn.
         rewrite Nat.leb_refl; cbn.
         rewrite Nat.sub_0_r.
-        destruct n; [ | easy ].
-        destruct p as [| a]; [ easy | ].
-        destruct p; [ | easy ].
-        destruct ll as [| ]; [ easy | ].
-        destruct ll; [ | easy ].
-        destruct i; [ easy | ].
-        cbn in Hj.
-        destruct Hj as [Hj| Hj]. {
-          subst a.
-          cbn in Hcr.
-          specialize (Hll l (or_introl eq_refl)).
-          cbn in Hll.
-          cbn in *.
-          clear Hp Hi Hr Hc.
+        now apply Nat.neq_0_lt_0.
+      }
 ...
 Search (map (λ _, nth _ _ _)).
   apply map_ext_in.
