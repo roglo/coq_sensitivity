@@ -1731,6 +1731,7 @@ unfold q in H2 at 1.
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
+...
 apply matrix_eq.
 intros u v Hu Hv.
 rewrite mat_with_rows_nrows, Hpn in Hu.
