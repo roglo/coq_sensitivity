@@ -1731,6 +1731,11 @@ unfold q in H2 at 1.
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
+apply matrix_eq.
+intros u v Hu Hv.
+rewrite mat_with_rows_nrows, Hpn in Hu.
+Search (mat_ncols (iter_list _ _ _)).
+Search (mat_ncols (fold_left _ _ _)).
 ...
 Theorem sort_rank_butn : ∀ A (ord : A → _) l i,
   bsort_rank ord (butn i l) = butn i (bsort_rank ord l).
