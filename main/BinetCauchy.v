@@ -1731,6 +1731,7 @@ unfold q in H2 at 1.
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
+...
 Theorem sort_rank_butn : ∀ A (ord : A → _) l i,
   bsort_rank ord (butn i l) = butn i (bsort_rank ord l).
 Proof.
