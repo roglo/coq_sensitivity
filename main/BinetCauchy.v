@@ -1728,6 +1728,24 @@ assert (H : is_permut n q). {
 }
 specialize (H2 H); clear H.
 unfold q in H2 at 1.
+Search (collapse (butn _ _)).
+Search (collapse (_ ++ _)).
+unfold collapse in H2.
+Theorem sort_rank_butn : ∀ A (ord : A → _) l i,
+  bsort_rank ord (butn i l) = butn i (bsort_rank ord l).
+Proof.
+intros.
+destruct l as [| d]; intros; [ now do 2 rewrite butn_nil | ].
+unfold bsort_rank at 2.
+remember (d :: l) as l' eqn:Hl'.
+clear l Hl'; rename l' into l.
+Theorem butn_bsort_rank_loop : ∀ ord f lr l i,
+  butn i (bsort_rank_loop ord f lr l) = bsort_rank_loop ...
+...
+Theorem collapse_butn : ∀ l i,
+  collapse (butn i l) = butn i (collapse l).
+Proof.
+unfold collapse.
 ...
 unfold collapse in H2.
 Search (mat_with_rows (bsort_rank _ _)).
