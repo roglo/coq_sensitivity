@@ -508,14 +508,18 @@ Context (rp : ring_like_prop T).
 
 (* submatrix with list rows jl *)
 Definition mat_with_rows (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
+(*
+Definition mat_with_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
+*)
 
 (*
 End a.
 Require Import RnglAlg.Nrl.
 Print mat_with_rows.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows [0;2;3] M).
-...
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows _ [0;2;3] M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows _ [2;1] M).
 *)
 
 (* submatrix with list cols jl *)
@@ -526,6 +530,9 @@ Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
   ((mat_with_rows jl M⁺)⁺)%M.
 
 End a.
+
+Arguments mat_with_rows {T ro} jl%list M%M.
+Arguments mat_with_cols {T ro} jl%list M%M.
 
 Section a.
 
@@ -736,7 +743,7 @@ Theorem mat_with_rows_is_square : ∀ kl (A : matrix T),
 Proof.
 intros * Ha Hra Hkc.
 destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
-  apply length_zero_iff_nil in Hnz; subst kl; cbn in Hra.
+  apply length_zero_iff_nil in Hnz; subst kl.
   now cbn; rewrite iter_list_empty.
 }
 apply is_scm_mat_iff.
@@ -747,13 +754,10 @@ split. {
   unfold mat_ncols; cbn.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
-  clear Hnz; cbn in Hra, Hc.
-  rewrite Hcla in Hc. 2: {
-    apply nth_In.
-    rewrite fold_mat_nrows.
-    now apply Hkc; left.
-  }
-  congruence.
+  clear Hnz; cbn in Hc.
+  rewrite List_map_seq_length in Hc.
+  rewrite Hcra in Hkc; [ | easy ].
+  now specialize (Hkc k (or_introl eq_refl)).
 } {
   intros l Hl.
   rewrite mat_with_rows_nrows.
@@ -761,9 +765,7 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
-  rewrite Hcla; [ easy | ].
-  apply nth_In; rewrite fold_mat_nrows.
-  now apply Hkc.
+  now rewrite List_map_seq_length.
 }
 Qed.
 
@@ -1555,6 +1557,33 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
     rewrite Nat.sub_0_r; flia Hjn.
   }
   rewrite nth_overflow by now rewrite Hr.
+  rewrite <- map_butn.
+  apply List_eq_iff.
+  rewrite map_butn_seq at 1.
+  do 2 rewrite List_map_seq_length.
+  rewrite map_butn.
+  unfold mat_ncols at 1 2 3.
+  cbn - [ nth "<?" ].
+...
+Search (map (λ _, nth _ _ _)).
+  apply map_ext_in.
+  unfold mat_ncols; cbn.
+...
+  erewrite map_ext_in. 2: {
+    intros u Hu.
+    now rewrite List_nth_nil.
+  }
+  symmetry.
+  erewrite map_ext_in. 2: {
+    intros u Hu.
+    now rewrite List_nth_nil.
+  }
+  symmetry.
+
+Search (map
+
+  unfold mat_ncols; cbn.
+
   now rewrite butn_nil.
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
@@ -1731,6 +1760,10 @@ unfold q in H2 at 1.
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
+Check mat_with_rows_butn_subm.
+Print mat_with_rows.
+Print mat_with_cols.
+About mat_with_rows.
 ...
 apply matrix_eq.
 intros u v Hu Hv.
