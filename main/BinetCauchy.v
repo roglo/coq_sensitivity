@@ -507,12 +507,12 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (* submatrix with list rows jl *)
-Definition mat_with_rows (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
 (*
 Definition mat_with_rows (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
+  mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
 *)
+Definition mat_with_rows (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
 
 (*
 End a.
@@ -531,7 +531,7 @@ Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
 
 End a.
 
-Arguments mat_with_rows {T ro} jl%list M%M.
+Arguments mat_with_rows {T} jl%list M%M.
 Arguments mat_with_cols {T ro} jl%list M%M.
 
 Section a.
@@ -754,10 +754,19 @@ split. {
   unfold mat_ncols; cbn.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
+(**)
+  rewrite Hcla in Hc. 2: {
+    apply nth_In.
+    rewrite fold_mat_nrows.
+    now apply Hkc; left.
+  }
+  congruence.
+(*
   clear Hnz; cbn in Hc.
   rewrite List_map_seq_length in Hc.
   rewrite Hcra in Hkc; [ | easy ].
   now specialize (Hkc k (or_introl eq_refl)).
+*)
 } {
   intros l Hl.
   rewrite mat_with_rows_nrows.
@@ -765,7 +774,13 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
+(**)
+  rewrite Hcla; [ easy | ].
+  apply nth_In; rewrite fold_mat_nrows.
+  now apply Hkc.
+(*
   now rewrite List_map_seq_length.
+*)
 }
 Qed.
 
@@ -1557,56 +1572,6 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
     rewrite Nat.sub_0_r; flia Hjn.
   }
   rewrite nth_overflow by now rewrite Hr.
-  rewrite <- map_butn.
-  apply List_eq_iff.
-  rewrite map_butn_seq at 1.
-  do 2 rewrite List_map_seq_length.
-  rewrite map_butn.
-  rewrite square_matrix_ncols. 2: {
-    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-      move Hnz at top; subst n.
-      apply Nat.le_0_r in Hk; subst k.
-      destruct ll as [| l]; [ easy | ].
-      now destruct ll.
-    }
-    apply is_scm_mat_iff.
-    split. {
-      intros Hc; cbn.
-      rewrite butn_length, map_length, Hr.
-      cbn; rewrite Nat.leb_refl; cbn.
-      rewrite Nat.sub_0_r.
-      apply is_scm_mat_iff in Hsm; cbn in Hsm.
-      destruct Hsm as (Hcr & Hll).
-      unfold mat_ncols in Hcr; cbn in Hcr.
-      unfold mat_ncols in Hc; cbn in Hc.
-      apply length_zero_iff_nil in Hc.
-      rewrite <- map_butn in Hc.
-      rewrite List_map_hd with (a := []) in Hc. 2: {
-        rewrite butn_length, Hr; cbn.
-        rewrite Nat.leb_refl; cbn.
-        rewrite Nat.sub_0_r.
-        now apply Nat.neq_0_lt_0.
-      }
-...
-Search (map (λ _, nth _ _ _)).
-  apply map_ext_in.
-  unfold mat_ncols; cbn.
-...
-  erewrite map_ext_in. 2: {
-    intros u Hu.
-    now rewrite List_nth_nil.
-  }
-  symmetry.
-  erewrite map_ext_in. 2: {
-    intros u Hu.
-    now rewrite List_nth_nil.
-  }
-  symmetry.
-
-Search (map
-
-  unfold mat_ncols; cbn.
-
   now rewrite butn_nil.
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
@@ -1780,6 +1745,7 @@ assert (H : is_permut n q). {
 }
 specialize (H2 H); clear H.
 unfold q in H2 at 1.
+...
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
@@ -1787,7 +1753,6 @@ Check mat_with_rows_butn_subm.
 Print mat_with_rows.
 Print mat_with_cols.
 About mat_with_rows.
-...
 apply matrix_eq.
 intros u v Hu Hv.
 rewrite mat_with_rows_nrows, Hpn in Hu.
