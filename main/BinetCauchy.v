@@ -1549,6 +1549,31 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
+Theorem is_square_matrix_map : ∀ A B (f : list A → list B) ll n,
+  mat_nrows (mk_mat ll) = n
+  → (∀ la, la ∈ ll → length (f la) = n)
+  → is_square_matrix (mk_mat (map f ll)) = true.
+Proof.
+intros * Hr Hf.
+apply is_scm_mat_iff; cbn in Hr |-*.
+rewrite map_length.
+split. {
+  intros Hc.
+  unfold mat_ncols in Hc; cbn in Hc.
+  apply length_zero_iff_nil in Hc.
+  destruct ll as [| l]; [ easy | exfalso ].
+  cbn in Hc.
+  specialize (Hf l (or_introl eq_refl)).
+  now rewrite Hc, <- Hr in Hf.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (a & Hfa & Ha).
+  subst l.
+  now rewrite Hr, Hf.
+}
+Qed.
+
 Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i k n,
   is_square_matrix M = true
   → NoDup p
@@ -1593,42 +1618,22 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
   rewrite Hk, Nat_sub_succ_1.
   rewrite square_matrix_ncols. 2: {
-Theorem is_square_matrix_map : ∀ A B (f : list A → list B) l n,
-  (∀ la, length (f la) = n)
-  → is_square_matrix (mk_mat l) = true
-  → is_square_matrix (mk_mat (map f l)) = true.
-Proof.
-Admitted.
-apply is_square_matrix_map with (n := n).
-intros la; rewrite butn_length.
-(* non, c'est pas ça... faut voir... *)
-...
-intros * Hsm.
-destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
-  apply length_zero_iff_nil in Hlz; cbn in Hlz; subst l; cbn.
-  now apply all_true_and_list_true_iff.
-}
-apply is_scm_mat_iff.
-apply is_scm_mat_iff in Hsm.
-unfold mat_ncols in Hsm.
-cbn in Hsm.
-split. {
-  unfold mat_ncols; cbn; rewrite map_length.
-  intros Hc.
-  apply Hsm.
-  apply length_zero_iff_nil in Hc.
-  rewrite List_map_hd with (a := []) in Hc. 2: {
-    now apply Nat.neq_0_lt_0.
+    apply is_square_matrix_map with (n := n). {
+      cbn; rewrite butn_length, Hr; cbn.
+      rewrite Nat.leb_refl; cbn.
+      now rewrite Nat.sub_0_r.
+    }
+    intros la Hla; rewrite butn_length.
+    apply in_butn in Hla.
+    apply is_scm_mat_iff in Hsm.
+    cbn in Hsm.
+    destruct Hsm as (Hcr, Hc).
+    rewrite Hc; [ | easy ].
+    now rewrite Hr, Hk, Nat_sub_succ_1.
   }
-...
-apply is_square_matrix_map.
-...
-  is_square_matrix {| mat_list_list := map (butn k) (butn n ll) |} = true
-...
-cbn; rewrite map_length, butn_length, Hr; cbn.
-rewrite Nat.leb_refl; cbn.
-now rewrite Nat.sub_0_r.
-...
+  cbn; rewrite map_length, butn_length, Hr; cbn.
+  rewrite Nat.leb_refl; cbn.
+  now rewrite Nat.sub_0_r.
 (**)
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
@@ -1703,8 +1708,35 @@ rewrite nth_butn.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
 destruct (le_dec n j) as [H| H]; [ flia Hjn Hjn' H | clear H ].
+(*
 now rewrite Nat.add_0_r.
+*)
+symmetry.
+rewrite <- map_butn.
+rewrite square_matrix_ncols; [ cbn | easy ].
+rewrite square_matrix_ncols. 2: {
+  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+  apply is_square_matrix_map with (n := n). {
+    cbn; rewrite butn_length, Hr; cbn.
+    rewrite Nat.leb_refl; cbn.
+    now rewrite Nat.sub_0_r.
+  }
+  intros la Hla; rewrite butn_length.
+  apply in_butn in Hla.
+  apply is_scm_mat_iff in Hsm.
+  cbn in Hsm.
+  destruct Hsm as (Hcr, Hc).
+  rewrite Hc; [ | easy ].
+  now rewrite Hr, Hk, Nat_sub_succ_1.
+}
+cbn; rewrite map_length, butn_length, Hr; cbn.
+rewrite Nat.leb_refl; cbn.
+rewrite Nat.sub_0_r.
+...
+(**)
 Qed.
+
+...
 
 Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
