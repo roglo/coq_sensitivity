@@ -507,12 +507,13 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (* submatrix with list rows jl *)
-(*
+(**)
 Definition mat_with_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
-*)
+(*
 Definition mat_with_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
+*)
 
 (*
 End a.
@@ -531,7 +532,7 @@ Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
 
 End a.
 
-Arguments mat_with_rows {T} jl%list M%M.
+Arguments mat_with_rows {T ro} jl%list M%M.
 Arguments mat_with_cols {T ro} jl%list M%M.
 
 Section a.
@@ -754,19 +755,19 @@ split. {
   unfold mat_ncols; cbn.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
-(**)
+(*
   rewrite Hcla in Hc. 2: {
     apply nth_In.
     rewrite fold_mat_nrows.
     now apply Hkc; left.
   }
   congruence.
-(*
+*)
   clear Hnz; cbn in Hc.
   rewrite List_map_seq_length in Hc.
   rewrite Hcra in Hkc; [ | easy ].
   now specialize (Hkc k (or_introl eq_refl)).
-*)
+(**)
 } {
   intros l Hl.
   rewrite mat_with_rows_nrows.
@@ -774,13 +775,13 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
-(**)
+(*
   rewrite Hcla; [ easy | ].
   apply nth_In; rewrite fold_mat_nrows.
   now apply Hkc.
-(*
-  now rewrite List_map_seq_length.
 *)
+  now rewrite List_map_seq_length.
+(**)
 }
 Qed.
 
@@ -1572,7 +1573,64 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
     rewrite Nat.sub_0_r; flia Hjn.
   }
   rewrite nth_overflow by now rewrite Hr.
+(*
   now rewrite butn_nil.
+*)
+  rewrite <- map_butn.
+  rewrite (@List_map_const_is_repeat _ _ 0%F). 2: {
+    intros; apply List_nth_nil.
+  }
+  symmetry.
+  rewrite (@List_map_const_is_repeat _ _ 0%F). 2: {
+    intros; apply List_nth_nil.
+  }
+  f_equal.
+  rewrite butn_length.
+  do 2 rewrite seq_length.
+  rewrite square_matrix_ncols; [ | easy ].
+  cbn - [ "<?" ].
+  rewrite Hr.
+  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+  rewrite Hk, Nat_sub_succ_1.
+  rewrite square_matrix_ncols. 2: {
+Search (_ → is_square_matrix _ = true).
+Theorem is_square_matrix_map : ∀ A B (f : list A → list B) l n,
+  (∀ la, length (f la) = n)
+  → is_square_matrix (mk_mat l) = true
+  → is_square_matrix (mk_mat (map f l)) = true.
+Proof.
+Admitted.
+apply is_square_matrix_map with (n := n).
+intros la; rewrite butn_length.
+(* non, c'est pas ça... faut voir... *)
+...
+intros * Hsm.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  apply length_zero_iff_nil in Hlz; cbn in Hlz; subst l; cbn.
+  now apply all_true_and_list_true_iff.
+}
+apply is_scm_mat_iff.
+apply is_scm_mat_iff in Hsm.
+unfold mat_ncols in Hsm.
+cbn in Hsm.
+split. {
+  unfold mat_ncols; cbn; rewrite map_length.
+  intros Hc.
+  apply Hsm.
+  apply length_zero_iff_nil in Hc.
+  rewrite List_map_hd with (a := []) in Hc. 2: {
+    now apply Nat.neq_0_lt_0.
+  }
+...
+apply is_square_matrix_map.
+...
+  is_square_matrix {| mat_list_list := map (butn k) (butn n ll) |} = true
+...
+cbn; rewrite map_length, butn_length, Hr; cbn.
+rewrite Nat.leb_refl; cbn.
+now rewrite Nat.sub_0_r.
+...
+(**)
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
   subst j.
