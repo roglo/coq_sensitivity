@@ -1593,7 +1593,6 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
   rewrite Hk, Nat_sub_succ_1.
   rewrite square_matrix_ncols. 2: {
-Search (_ → is_square_matrix _ = true).
 Theorem is_square_matrix_map : ∀ A B (f : list A → list B) l n,
   (∀ la, length (f la) = n)
   → is_square_matrix (mk_mat l) = true
