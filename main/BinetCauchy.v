@@ -1732,11 +1732,16 @@ rewrite square_matrix_ncols. 2: {
 cbn; rewrite map_length, butn_length, Hr; cbn.
 rewrite Nat.leb_refl; cbn.
 rewrite Nat.sub_0_r.
-...
+rewrite cons_seq.
+rewrite map_butn_seq.
+apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+rewrite Hk, Nat_sub_succ_1.
+apply map_ext_in.
+intros u v.
+rewrite Nat.add_0_l, Nat.add_0_r.
+now rewrite nth_butn.
 (**)
 Qed.
-
-...
 
 Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
