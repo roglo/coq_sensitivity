@@ -1830,15 +1830,16 @@ Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
       ll.
 Proof.
 intros * Hcr Hc Hr Hp.
+subst n.
 unfold iter_list.
-induction ll as [| la]; cbn. {
-  unfold list_list_select_rows.
-  cbn in Hr; subst n; cbn.
+unfold list_list_select_rows.
+induction ll as [| la]. {
   destruct Hp as (Hpp, Hpl).
   apply length_zero_iff_nil in Hpl; subst p; cbn.
   unfold transp_list; cbn.
   now unfold iter_seq, iter_list.
 }
+cbn - [ length nth ].
 ...
 
 Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
