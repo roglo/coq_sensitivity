@@ -1809,6 +1809,17 @@ now rewrite nth_butn.
 (**)
 Qed.
 
+Theorem fold_left_mk_mat : ∀ A (M : matrix T) (f : _ → A → _) l,
+  fold_left (λ M a, mk_mat (f (mat_list_list M) a)) l M =
+  mk_mat (fold_left f l (mat_list_list M)).
+Proof.
+intros.
+destruct M as (ll); cbn.
+revert ll.
+induction l as [| a]; intros; [ easy | cbn ].
+apply IHl.
+Qed.
+
 Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
   (length (hd [] ll) = 0 → n = 0)
   → (∀ l, l ∈ ll → length l = n)
@@ -1829,9 +1840,25 @@ Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
       iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * Hsm Hr Hp.
-...
 unfold mat_select_rows.
-rewrite (@list_list_select_rows_with_permut_transp n); try easy.
+...
+rewrite (@list_list_select_rows_with_permut_transp n); try easy; cycle 1. {
+  intros Hc.
+  apply is_scm_mat_iff in Hsm.
+  rewrite Hr in Hsm.
+  now apply Hsm.
+} {
+  apply is_scm_mat_iff in Hsm.
+  rewrite Hr in Hsm.
+  now apply Hsm.
+}
+unfold mat_swap_rows.
+unfold iter_list.
+specialize fold_left_mk_mat as H1.
+specialize (H1 (nat * nat)%type M).
+specialize (H1 (λ ll t, list_swap_elem [] ll (fst t) (snd t))).
+symmetry.
+apply H1.
 ...
 intros * Hsm Hr Hp.
 (*
