@@ -1829,17 +1829,139 @@ Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
     iter_list (transp_list p) (λ ll t, list_swap_elem [] ll (fst t) (snd t))
       ll.
 Proof.
+(*
 intros * Hcr Hc Hr Hp.
 subst n.
-unfold iter_list.
-unfold list_list_select_rows.
-induction ll as [| la]. {
+unfold iter_list, list_list_select_rows.
+remember (transp_list p) as t eqn:Ht; symmetry in Ht.
+destruct t as [| (t1, t2)]. {
+  unfold transp_list, iter_seq, iter_list in Ht.
+  cbn in Ht |-*.
+...
+*)
+intros * Hcr Hc Hr Hp.
+revert ll p Hcr Hc Hr Hp.
+induction n; intros. {
+  destruct Hp as (Hpp, Hpl).
+  apply length_zero_iff_nil in Hpl; subst p.
+  now apply length_zero_iff_nil in Hr; subst ll.
+}
+specialize (permut_without_highest Hp) as H1.
+destruct H1 as (i & Hip & Hin & Hpi).
+assert (Hi : i < S n). {
+  destruct Hpi as (Hpp, Hpl).
+  rewrite butn_length in Hpl.
+  apply Nat.ltb_lt in Hip; rewrite Hip in Hpl.
+  apply Nat.ltb_lt in Hip; cbn in Hpl.
+  rewrite <- Hpl.
+  rewrite <- Nat.sub_succ_l; [ | flia Hip ].
+  now rewrite Nat_sub_succ_1.
+}
+assert (Hpn : length p = S n). {
+  destruct Hpi as (Hpp, Hpl).
+  rewrite butn_length in Hpl.
+  apply Nat.ltb_lt in Hip; rewrite Hip in Hpl.
+  apply Nat.ltb_lt in Hip; cbn in Hpl.
+  rewrite <- Hpl.
+  rewrite <- Nat.sub_succ_l; [ | flia Hip ].
+  now rewrite Nat_sub_succ_1.
+}
+(**)
+assert (Hkj :
+  ∀ k,
+  k ≤ n
+  → let j := ff_app (bsort_rank Nat.leb p) k in
+    let q := collapse (butn j p) in
+    list_list_select_rows q (map (butn k) (butn k ll)) =
+      iter_list (transp_list q)
+         (λ ll t, list_swap_elem [] ll (fst t) (snd t))
+         (map (butn k) (butn k ll))). {
+  intros * Hk *.
+  specialize (IHn (map (butn k) (butn k ll)) q) as H2.
+  rewrite map_length, butn_length in H2.
+  assert (H : length (hd [] (map (butn k) (butn k ll))) = 0 → n = 0). {
+    intros H.
+    apply length_zero_iff_nil in H.
+...
+    rewrite List_map_hd with (a := []) in H. 2: {
+      rewrite butn_length, Hr.
+      apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+      rewrite Hk; cbn.
+      apply Nat.ltb_lt in Hk.
+      rewrite Nat.sub_0_r.
+      apply Nat.neq_0_lt_0; intros H'.
+      move H' at top; subst n.
+      apply Nat.lt_1_r in Hk; move Hk at top; subst k.
+      destruct ll as [| la]; [ easy | ].
+      destruct ll; [ | easy ].
+      cbn in Hcr.
+      cbn in H, Hr.
+      clear H Hr.
+...
+      apply Nat.leb_le in Hk.
+      apply Nat.leb_le in Hk; rewrite Hk; cbn.
+    apply Nat.sub_0_r.
+...
+  assert (H : is_square_matrix (subm k k M) = true). {
+    apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
+  }
+  specialize (H2 H); clear H.
+  assert (H : mat_nrows (subm k k M) = n). {
+    rewrite mat_nrows_subm, Hr; cbn.
+    apply Nat.leb_le in Hk; rewrite Hk; cbn.
+    apply Nat.sub_0_r.
+  }
+  specialize (H2 H); clear H.
+  assert (H : is_permut n q). {
+    unfold q.
+    specialize collapse_is_permut as H3.
+    specialize (H3 (butn j p)).
+    rewrite butn_length, Hpn in H3.
+    assert (H : j < S n). {
+      unfold j, ff_app.
+      rewrite <- Hpn.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hip.
+    }
+    apply Nat.ltb_lt in H.
+    now rewrite H, Nat_sub_succ_1 in H3.
+  }
+  now specialize (H2 H).
+}
+specialize (Hkj n (le_refl _)) as H1.
+cbn in H1.
+rewrite permut_collapse in H1. 2: {
+  apply butn_is_permut_list; [ now destruct Hp | ].
+  now rewrite Hpn, Nat_sub_succ_1.
+}
+rewrite <- Hin in H1.
+rewrite fold_ff_app in H1.
+rewrite permut_bsort_permut in H1; [ | now destruct Hp | now rewrite Hpn ].
+unfold ff_app in H1.
+rewrite Hin in H1.
+rewrite mat_select_rows_butn_subm in H1;
+  [ | easy | | easy | easy | easy | easy ]. 2: {
+  now destruct Hp as ((Hpa, Hpd), Hpl).
+}
+specialize (Hkj 0 (Nat.le_0_l _)) as H2.
+cbn in H2.
+set (j := ff_app (bsort_rank Nat.leb p) 0) in H2.
+set (q := collapse (butn j p)) in H2.
+...
+...
+intros * Hcr Hc Hr Hp.
+subst n.
+unfold iter_list, list_list_select_rows.
+revert p Hp.
+induction ll as [| la]; intros. {
   destruct Hp as (Hpp, Hpl).
   apply length_zero_iff_nil in Hpl; subst p; cbn.
   unfold transp_list; cbn.
   now unfold iter_seq, iter_list.
 }
-cbn - [ length nth ].
+rewrite List_length_cons, seq_S.
+cbn - [ nth ].
+rewrite map_app.
 ...
 
 Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
