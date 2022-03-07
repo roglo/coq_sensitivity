@@ -1843,11 +1843,19 @@ rewrite mat_select_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
-(* ... *)
 specialize (Hkj 0 (Nat.le_0_l _)) as H2.
 cbn in H2.
 set (j := ff_app (bsort_rank Nat.leb p) 0) in H2.
 set (q := collapse (butn j p)) in H2.
+...
+Definition list_list_select_rows jl ll :=
+  map (λ i, map (λ j, nth j (nth i ll []) 0%F) (seq 0 (length ll))) jl.
+Definition mat_select_rows' jl M :=
+  mk_mat (list_list_select_rows jl (mat_list_list M)).
+Print mat_select_rows'.
+destruct M as (ll).
+unfold mat_select_rows.
+cbn.
 ...
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
