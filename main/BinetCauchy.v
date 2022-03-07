@@ -1809,21 +1809,16 @@ now rewrite nth_butn.
 (**)
 Qed.
 
-Theorem list_list_select_rows_with_permut_transp : ∀ n M p,
-  is_square_matrix M = true
-  → mat_nrows M = n
+Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
+  (length (hd [] ll) = 0 → n = 0)
+  → (∀ l, l ∈ ll → length l = n)
+  → length ll = n
   → is_permut n p
-  → mat_select_rows p M =
-      iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
+  → list_list_select_rows p ll =
+    iter_list (transp_list p) (λ ll t, list_swap_elem [] ll (fst t) (snd t))
+      ll.
 Proof.
-intros * Hsm Hr Hp.
-destruct M as (ll).
-cbn in Hr; unfold mat_select_rows; cbn.
-apply is_scm_mat_iff in Hsm.
-cbn in Hsm.
-unfold mat_ncols in Hsm; cbn in Hsm.
-destruct Hsm as (Hcr, Hc).
-rewrite Hr in Hcr, Hc.
+intros * Hcr Hc Hr Hp.
 ...
 
 Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
