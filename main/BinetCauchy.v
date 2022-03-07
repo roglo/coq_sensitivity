@@ -1829,6 +1829,11 @@ Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
       iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * Hsm Hr Hp.
+...
+unfold mat_select_rows.
+rewrite (@list_list_select_rows_with_permut_transp n); try easy.
+...
+intros * Hsm Hr Hp.
 (*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
