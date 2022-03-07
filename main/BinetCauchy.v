@@ -1791,54 +1791,63 @@ assert (Hpn : length p = S n). {
   rewrite <- Nat.sub_succ_l; [ | flia Hip ].
   now rewrite Nat_sub_succ_1.
 }
-specialize (IHn (subm n n M) (butn i p)) as H1.
-assert (H : is_square_matrix (subm n n M) = true). {
-  apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
+(**)
+assert (Hkj :
+  ∀ k,
+  k ≤ n
+  → let j := ff_app (bsort_rank Nat.leb p) k in
+    let q := collapse (butn j p) in
+    mat_with_rows q (subm k k M) =
+      iter_list (transp_list q) (λ M t, mat_swap_rows (fst t) (snd t) M)
+         (subm k k M)). {
+  intros * Hk *.
+  specialize (IHn (subm k k M) q) as H2.
+  assert (H : is_square_matrix (subm k k M) = true). {
+    apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
+  }
+  specialize (H2 H); clear H.
+  assert (H : mat_nrows (subm k k M) = n). {
+    rewrite mat_nrows_subm, Hr; cbn.
+    apply Nat.leb_le in Hk; rewrite Hk; cbn.
+    apply Nat.sub_0_r.
+  }
+  specialize (H2 H); clear H.
+  assert (H : is_permut n q). {
+    unfold q.
+    specialize collapse_is_permut as H3.
+    specialize (H3 (butn j p)).
+    rewrite butn_length, Hpn in H3.
+    assert (H : j < S n). {
+      unfold j, ff_app.
+      rewrite <- Hpn.
+      apply bsort_rank_ub.
+      now intros H; rewrite H in Hip.
+    }
+    apply Nat.ltb_lt in H.
+    now rewrite H, Nat_sub_succ_1 in H3.
+  }
+  now specialize (H2 H).
 }
-specialize (H1 H); clear H.
-assert (H : mat_nrows (subm n n M) = n). {
-  rewrite mat_nrows_subm, Hr; cbn.
-  rewrite Nat.leb_refl.
-  cbn; apply Nat.sub_0_r.
+specialize (Hkj n (le_refl _)) as H1.
+cbn in H1.
+rewrite permut_collapse in H1. 2: {
+  apply butn_is_permut_list; [ now destruct Hp | ].
+  now rewrite Hpn, Nat_sub_succ_1.
 }
-specialize (H1 H); clear H.
-specialize (H1 Hpi).
+rewrite <- Hin in H1.
+rewrite fold_ff_app in H1.
+rewrite permut_bsort_permut in H1; [ | now destruct Hp | now rewrite Hpn ].
+unfold ff_app in H1.
+rewrite Hin in H1.
 rewrite mat_with_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
-specialize (IHn (subm 0 0 M)) as H2.
-set (j := ff_app (bsort_rank Nat.leb p) 0).
-set (q := collapse (butn j p)).
-specialize (H2 q).
-assert (H : is_square_matrix (subm 0 0 M) = true). {
-  apply is_squ_mat_subm; [ now rewrite Hr | now rewrite Hr | easy ].
-}
-specialize (H2 H); clear H.
-assert (H : mat_nrows (subm 0 0 M) = n). {
-  rewrite mat_nrows_subm, Hr; cbn.
-  apply Nat.sub_0_r.
-}
-specialize (H2 H); clear H.
-assert (H : is_permut n q). {
-  unfold q.
-  specialize collapse_is_permut as H3.
-  replace n with (length (butn j p)). 2: {
-    rewrite butn_length, Hpn.
-    unfold Nat.b2n.
-    rewrite if_ltb_lt_dec.
-    destruct (lt_dec j (S n)) as [H| H]; [ apply Nat_sub_succ_1 | ].
-    exfalso; apply H; clear H.
-    specialize bsort_rank_ub as H4.
-    specialize (H4 _ Nat.leb p 0).
-    rewrite Hpn in H4.
-    apply H4.
-    now intros H; rewrite H in Hip.
-  }
-  apply collapse_is_permut.
-}
-specialize (H2 H); clear H.
-unfold q in H2 at 1.
+(* ... *)
+specialize (Hkj 0 (Nat.le_0_l _)) as H2.
+cbn in H2.
+set (j := ff_app (bsort_rank Nat.leb p) 0) in H2.
+set (q := collapse (butn j p)) in H2.
 ...
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
