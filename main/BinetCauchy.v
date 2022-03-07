@@ -508,32 +508,32 @@ Context (rp : ring_like_prop T).
 
 (* submatrix with list rows jl *)
 (**)
-Definition mat_with_rows (jl : list nat) (M : matrix T) :=
+Definition mat_select_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
 (*
-Definition mat_with_rows (jl : list nat) (M : matrix T) :=
+Definition mat_select_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ j, nth j (mat_list_list M) []) jl).
 *)
 
 (*
 End a.
 Require Import RnglAlg.Nrl.
-Print mat_with_rows.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows _ [0;2;3] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_with_rows _ [2;1] M).
+Print mat_select_rows.
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows _ [0;2;3] M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows _ [2;1] M).
 *)
 
 (* submatrix with list cols jl *)
-Definition mat_with_cols (jl : list nat) (M : matrix T) :=
+Definition mat_select_cols (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ i, map (λ j, mat_el M i j) jl) (seq 0 (mat_nrows M))).
 
-Definition mat_with_cols' (jl : list nat) (M : matrix T) :=
-  ((mat_with_rows jl M⁺)⁺)%M.
+Definition mat_select_cols' (jl : list nat) (M : matrix T) :=
+  ((mat_select_rows jl M⁺)⁺)%M.
 
 End a.
 
-Arguments mat_with_rows {T ro} jl%list M%M.
-Arguments mat_with_cols {T ro} jl%list M%M.
+Arguments mat_select_rows {T ro} jl%list M%M.
+Arguments mat_select_cols {T ro} jl%list M%M.
 
 Section a.
 
@@ -543,12 +543,12 @@ Context (rp : ring_like_prop T).
 
 (*
 Require Import RnglAlg.Nrl.
-Print mat_with_cols.
-About mat_with_cols.
-Arguments mat_with_cols {T}%type {ro} jl%list M%M.
-Arguments mat_with_cols' {T}%type {ro} jl%list M%M.
-Compute (let jl := [0;2;3] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_with_cols jl M = mat_with_cols' jl M).
-Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_with_cols jl M = mat_with_cols' jl M).
+Print mat_select_cols.
+About mat_select_cols.
+Arguments mat_select_cols {T}%type {ro} jl%list M%M.
+Arguments mat_select_cols' {T}%type {ro} jl%list M%M.
+Compute (let jl := [0;2;3] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_select_cols jl M = mat_select_cols' jl M).
+Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_select_cols jl M = mat_select_cols' jl M).
 (* conclusion: la première version se comporte mal si jl=[] ; faut-il donc
    préférer absolument la version avec la transposée ? sachant que bon,
    faudra se la taper dans les preuves, en double exemplaire, ici, en
@@ -558,14 +558,14 @@ Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;
 
 (*
 Theorem map_with_cols_cols' : ∀ M jl,
-  mat_with_cols jl M = mat_with_cols' jl M.
+  mat_select_cols jl M = mat_select_cols' jl M.
 Proof.
 intros.
 destruct (Nat.eq_dec (length jl) 0) as [Hjz| Hjz]. {
   apply length_zero_iff_nil in Hjz; subst jl.
-  unfold mat_with_cols, mat_with_cols', mat_with_rows; cbn.
+  unfold mat_select_cols, mat_select_cols', mat_select_rows; cbn.
 ...
-unfold mat_with_cols, mat_with_cols', mat_with_rows, mat_transp, mat_ncols.
+unfold mat_select_cols, mat_select_cols', mat_select_rows, mat_transp, mat_ncols.
 cbn; f_equal.
 rewrite map_length.
 rewrite fold_mat_ncols.
@@ -729,18 +729,18 @@ Qed.
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-Theorem mat_with_rows_nrows : ∀ (A : matrix T) kl,
-  mat_nrows (mat_with_rows kl A) = length kl.
+Theorem mat_select_rows_nrows : ∀ (A : matrix T) kl,
+  mat_nrows (mat_select_rows kl A) = length kl.
 Proof.
 intros.
 now cbn; rewrite map_length.
 Qed.
 
-Theorem mat_with_rows_is_square : ∀ kl (A : matrix T),
+Theorem mat_select_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
   → mat_ncols A = length kl
   → (∀ k, k ∈ kl → k < mat_nrows A)
-  → is_square_matrix (mat_with_rows kl A) = true.
+  → is_square_matrix (mat_select_rows kl A) = true.
 Proof.
 intros * Ha Hra Hkc.
 destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
@@ -751,7 +751,7 @@ apply is_scm_mat_iff.
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Hcra, Hcla).
 split. {
-  rewrite mat_with_rows_nrows.
+  rewrite mat_select_rows_nrows.
   unfold mat_ncols; cbn.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
@@ -770,7 +770,7 @@ split. {
 (**)
 } {
   intros l Hl.
-  rewrite mat_with_rows_nrows.
+  rewrite mat_select_rows_nrows.
   cbn in Hl.
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
@@ -937,16 +937,16 @@ Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   → p < length jl
   → q < length jl
   → p ≠ q
-  → det (mat_swap_rows p q (mat_with_rows jl A)) =
-    (- det (mat_with_rows jl A))%F.
+  → det (mat_swap_rows p q (mat_select_rows jl A)) =
+    (- det (mat_select_rows jl A))%F.
 Proof.
 intros Hif * Hcm Hro Hco Hp Hq Hpq.
 apply determinant_alternating; [ easy | easy | | | ]. {
-  now rewrite mat_with_rows_nrows.
+  now rewrite mat_select_rows_nrows.
 } {
-  now rewrite mat_with_rows_nrows.
+  now rewrite mat_select_rows_nrows.
 }
-now apply mat_with_rows_is_square.
+now apply mat_select_rows_is_square.
 Qed.
 
 Fixpoint first_non_fix_transp i p :=
@@ -1574,17 +1574,17 @@ split. {
 }
 Qed.
 
-Theorem mat_with_rows_butn_subm : ∀ (M : matrix T) p i k n,
+Theorem mat_select_rows_butn_subm : ∀ (M : matrix T) p i k n,
   is_square_matrix M = true
   → NoDup p
   → nth i p 0 = n
   → length p = S n
   → mat_nrows M = S n
   → k ≤ n
-  → mat_with_rows (butn i p) (subm n k M) = subm i k (mat_with_rows p M).
+  → mat_select_rows (butn i p) (subm n k M) = subm i k (mat_select_rows p M).
 Proof.
 intros * Hsm Hnd Hi Hp Hr Hk.
-unfold mat_with_rows, subm; cbn.
+unfold mat_select_rows, subm; cbn.
 f_equal.
 destruct M as (ll); cbn in Hr |-*.
 rewrite <- map_butn, map_map.
@@ -1743,11 +1743,11 @@ now rewrite nth_butn.
 (**)
 Qed.
 
-Theorem mat_with_rows_with_permut_transp : ∀ n (M : matrix T) p,
+Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
   → mat_nrows M = n
   → is_permut n p
-  → mat_with_rows p M =
+  → mat_select_rows p M =
       iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * Hsm Hr Hp.
@@ -1757,7 +1757,7 @@ Require Import ZArith.
 Open Scope Z_scope.
 Compute (let M := mk_mat [[3;2;7];[2;1;8];[6;6;5]] in
 map (λ p,
-  mat_with_rows p M =
+  mat_select_rows p M =
     iter_list (transp_list p) (λ M t, mat_swap_rows (fst t) (snd t) M) M
 ) (canon_sym_gr_list_list 3)).
 ça a l'air juste
@@ -1766,7 +1766,7 @@ revert M p Hsm Hr Hp.
 induction n; intros; cbn. {
   destruct Hp as (Hpp, Hpl).
   apply length_zero_iff_nil in Hpl; subst p; cbn.
-  unfold mat_with_rows, transp_list; cbn.
+  unfold mat_select_rows, transp_list; cbn.
   unfold iter_seq, iter_list; cbn.
   destruct M as (ll); cbn in Hr.
   now apply length_zero_iff_nil in Hr; subst ll.
@@ -1797,7 +1797,7 @@ assert (Hkj :
   k ≤ n
   → let j := ff_app (bsort_rank Nat.leb p) k in
     let q := collapse (butn j p) in
-    mat_with_rows q (subm k k M) =
+    mat_select_rows q (subm k k M) =
       iter_list (transp_list q) (λ M t, mat_swap_rows (fst t) (snd t) M)
          (subm k k M)). {
   intros * Hk *.
@@ -1839,7 +1839,7 @@ rewrite fold_ff_app in H1.
 rewrite permut_bsort_permut in H1; [ | now destruct Hp | now rewrite Hpn ].
 unfold ff_app in H1.
 rewrite Hin in H1.
-rewrite mat_with_rows_butn_subm in H1;
+rewrite mat_select_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 }
@@ -1852,13 +1852,13 @@ set (q := collapse (butn j p)) in H2.
 Search (collapse (butn _ _)).
 Search (collapse (_ ++ _)).
 unfold collapse in H2.
-Check mat_with_rows_butn_subm.
-Print mat_with_rows.
-Print mat_with_cols.
-About mat_with_rows.
+Check mat_select_rows_butn_subm.
+Print mat_select_rows.
+Print mat_select_cols.
+About mat_select_rows.
 apply matrix_eq.
 intros u v Hu Hv.
-rewrite mat_with_rows_nrows, Hpn in Hu.
+rewrite mat_select_rows_nrows, Hpn in Hu.
 Search (mat_ncols (iter_list _ _ _)).
 Search (mat_ncols (fold_left _ _ _)).
 ...
@@ -1879,12 +1879,12 @@ Proof.
 unfold collapse.
 ...
 unfold collapse in H2.
-Search (mat_with_rows (bsort_rank _ _)).
-Check mat_with_rows_butn_subm.
+Search (mat_select_rows (bsort_rank _ _)).
+Check mat_select_rows_butn_subm.
 Search (bsort_rank _ (butn _ _)).
 Search (bsort_rank _ (_ ++ _)).
 ...
-rewrite mat_with_rows_butn_subm in H2;
+rewrite mat_select_rows_butn_subm in H2;
   [ | easy | | | | | easy ]; cycle 1. {
   now destruct Hp as ((Hpa, Hpd), Hpl).
 } {
@@ -1952,7 +1952,7 @@ destruct M as (ll); cbn.
 unfold surm.
 (* ouais, fait chier *)
 ...
-rewrite (surm_of_subm (mat_with_rows p M) i n).
+rewrite (surm_of_subm (mat_select_rows p M) i n).
 rewrite H1.
 unfold surm.
 ...
@@ -1962,13 +1962,13 @@ Theorem glop : in_charac_0_field →
   is_square_matrix A = true
   → mat_nrows A = n
   → is_permut n p
-  → det A = (ε p * det (mat_with_rows p A))%F.
+  → det A = (ε p * det (mat_select_rows p A))%F.
 Proof.
 intros Hif * Hsm Hra Hp.
 Print n_transp.
 Check determinant_alternating.
 ...
-rewrite mat_with_rows_with_transp.
+rewrite mat_select_rows_with_transp.
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
@@ -1996,7 +1996,7 @@ destruct m. {
   rewrite List_map_seq_length.
   rewrite Hra.
   f_equal.
-  unfold mat_with_rows.
+  unfold mat_select_rows.
   destruct A as (ll); cbn; f_equal.
   cbn in Hra.
   rewrite <- Hra.
@@ -2061,8 +2061,8 @@ Theorem det_with_rows : in_charac_0_field →
   → NoDup kl
   → length kl = m
   → (∀ k, k ∈ kl → k < n)
-  → det (mat_with_rows kl A) =
-       (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F.
+  → det (mat_select_rows kl A) =
+       (ε kl * det (mat_select_rows (bsort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 Check determinant_alternating.
@@ -2075,17 +2075,17 @@ Require Import ZArith.
 Open Scope Z_scope.
 Compute (let A := mk_mat [[1;2;0];[4;5;6];[7;8;9];[2;5;1]] in
   let kl := [3;1;2]%nat in
-  det (mat_with_rows kl A) =
-     (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%Z).
+  det (mat_select_rows kl A) =
+     (ε kl * det (mat_select_rows (bsort Nat.leb kl) A))%Z).
 ...
 *)
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
-  apply mat_with_rows_is_square; [ easy | now rewrite Hklm | ].
+  apply mat_select_rows_is_square; [ easy | now rewrite Hklm | ].
   intros k Hk; rewrite Hra.
   now apply Hkn.
 }
 rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
-  apply mat_with_rows_is_square; [ easy | | ]. {
+  apply mat_select_rows_is_square; [ easy | | ]. {
     rewrite length_bsort.
     congruence.
   }
@@ -2094,8 +2094,8 @@ rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
   now apply in_bsort in Hk.
 }
 unfold det'.
-rewrite mat_with_rows_nrows, Hklm.
-rewrite mat_with_rows_nrows.
+rewrite mat_select_rows_nrows, Hklm.
+rewrite mat_select_rows_nrows.
 rewrite length_bsort, Hklm.
 rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
 erewrite rngl_summation_eq_compat; [ | easy ].
@@ -2227,7 +2227,7 @@ Search canon_sym_gr_list.
   rewrite (List_map_nth' 0).
 ...1
 f_equal. 2: {
-unfold mat_with_rows.
+unfold mat_select_rows.
 cbn.
 rewrite (List_map_nth' 0).
 symmetry.
@@ -2276,12 +2276,12 @@ intros j (_, Hj).
 (* bin non, c'est pas possible, ça !
    on prend la ligne j dans les deux cas ! *)
 ...
-Print mat_with_rows.
-Compute (mat_with_rows [1;0;2] (mk_mat [[1;2;3];[4;5;6];[7;8;9]])).
+Print mat_select_rows.
+Compute (mat_select_rows [1;0;2] (mk_mat [[1;2;3];[4;5;6];[7;8;9]])).
 Compute (let A := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
   let kl := [1;0;2] in
-  (mat_el (mat_with_rows (bsort Nat.leb kl) A) 0 =
-   mat_el (mat_with_rows kl A) 0)).
+  (mat_el (mat_select_rows (bsort Nat.leb kl) A) 0 =
+   mat_el (mat_select_rows kl A) 0)).
 ...
 set (g := λ i,
   canon_sym_gr_list_inv m (bsort_rank Nat.leb p ° canon_sym_gr_list m i)).
@@ -2467,10 +2467,10 @@ Compute
    let A := mk_mat [[3;4;1];[0;6;7];[1;3;1];[7;6;5]] in
 map (λ i,
   ∏ (i0 = 0, m - 1),
-  mat_el (mat_with_rows (bsort Nat.leb kl) A) i0
+  mat_el (mat_select_rows (bsort Nat.leb kl) A) i0
     (ff_app
        (canon_sym_gr_list m (canon_sym_gr_list_inv m (bsort_rank Nat.leb (collapse kl) ° canon_sym_gr_list m i)))
-       i0) = ∏ (i0 = 0, m - 1), mat_el (mat_with_rows kl A) i0 (ff_app (canon_sym_gr_list m i) i0)) (seq 0 m!)).
+       i0) = ∏ (i0 = 0, m - 1), mat_el (mat_select_rows kl A) i0 (ff_app (canon_sym_gr_list m i) i0)) (seq 0 m!)).
 (*
      = [42 = 42; 147 = 30; 0 = 147; 0 = 0; 42 = 42; 30 = 0]
 *)
@@ -2478,8 +2478,8 @@ map (λ i,
 Compute
   (let kl := [2;3;1]%nat in let m := length kl in
    let A := mk_mat [[3;4;1];[0;6;7];[1;3;1];[7;6;5]] in
-  det (mat_with_rows kl A) =
-       (ε kl * det (mat_with_rows (bsort Nat.leb kl) A))%F).
+  det (mat_select_rows kl A) =
+       (ε kl * det (mat_select_rows (bsort Nat.leb kl) A))%F).
 (* mais là, c'est bon, là *)
 ...
 set (f l := ff_app (canon_sym_gr_inv_list m i ° l ° canon_sym_gr_list m i)).
@@ -2571,7 +2571,7 @@ apply rngl_product_eq_compat.
 intros j (_, Hj).
 assert (H : j < m) by flia Hj Hmz.
 clear Hj Hmz; rename H into Hj.
-unfold mat_with_rows, mat_el.
+unfold mat_select_rows, mat_el.
 cbn.
 unfold ff_app.
 assert (H1 :
@@ -2714,10 +2714,10 @@ fix canon_sym_gr_list_inv (n : nat) (l : list nat) {struct n} : nat :=
   nth (g' j) (canon_sym_gr_list m (g i)) 0 = nth j (canon_sym_gr_list m i) 0
 ...
 the row
-   (mat_with_rows (bsort Nat.leb kl) A)
+   (mat_select_rows (bsort Nat.leb kl) A)
       (?g i0)
 must be the same row as
-   (mat_with_rows kl A)
+   (mat_select_rows kl A)
       i0
 ...
 rewrite rngl_product_change_var with
@@ -2730,7 +2730,7 @@ rewrite Nat_sub_succ_1.
 (* pour voir... *)
 erewrite rngl_product_list_eq_compat. 2: {
   intros j Hj.
-  unfold mat_with_rows, mat_el.
+  unfold mat_select_rows, mat_el.
   cbn.
   rewrite (List_map_nth' 0). 2: {
     rewrite length_bsort.
@@ -2796,7 +2796,7 @@ rewrite permut_bsort_rank_involutive. 2: {
 }
 rewrite bsort_bsort_rank with (d := 0).
 remember (bsort_rank Nat.leb kl) as q eqn:Hq.
-unfold mat_with_rows.
+unfold mat_select_rows.
 cbn.
 rewrite map_map.
 rewrite (List_map_nth' 0). 2: {
@@ -2850,7 +2850,7 @@ Theorem cauchy_binet_formula : in_charac_0_field →
   → mat_ncols B = m
   → det (A * B) =
      ∑ (jl ∈ sub_lists_of_seq_0_n n m),
-     det (mat_with_cols jl A) * det (mat_with_rows jl B).
+     det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
@@ -2906,11 +2906,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det det' mat_nrows ].
-Search (det (mat_with_rows _ _)).
+Search (det (mat_select_rows _ _)).
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 Print det'.
 Check det_with_rows.
-Search (det (mat_with_rows _ _)).
+Search (det (mat_select_rows _ _)).
 ...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite mat_mul_nrows, Har.
@@ -3074,10 +3074,10 @@ End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
-Arguments mat_with_cols {T}%type {ro} jl%list.
-Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let jl := [0;2]%nat in mat_with_rows jl A).
-Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let B := mk_mat [[0;6;7];[1;3;1];[3;2;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ sub_lists_of_seq_0_n n m), det (mat_with_cols jl A) * det (mat_with_rows jl B), det A * det B)).
-Compute (let B := mk_mat [[3;4];[2;6];[1;3]] in let A := mk_mat [[1;6;7];[1;3;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ sub_lists_of_seq_0_n n m), det (mat_with_cols jl A) * det (mat_with_rows jl B), det A * det B, m, n, sub_lists_of_seq_0_n n m)).
+Arguments mat_select_cols {T}%type {ro} jl%list.
+Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let jl := [0;2]%nat in mat_select_rows jl A).
+Compute (let A := mk_mat [[3;4;1];[0;6;7];[1;3;1]] in let B := mk_mat [[0;6;7];[1;3;1];[3;2;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ sub_lists_of_seq_0_n n m), det (mat_select_cols jl A) * det (mat_select_rows jl B), det A * det B)).
+Compute (let B := mk_mat [[3;4];[2;6];[1;3]] in let A := mk_mat [[1;6;7];[1;3;1]] in let m := mat_nrows A in let n := mat_ncols A in (det (A * B), ∑ (jl ∈ sub_lists_of_seq_0_n n m), det (mat_select_cols jl A) * det (mat_select_rows jl B), det A * det B, m, n, sub_lists_of_seq_0_n n m)).
 Compute (sub_lists_of_seq_0_n 3 3).
 ...
 *)
