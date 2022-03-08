@@ -1829,16 +1829,6 @@ Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
     iter_list (transp_list p) (λ ll t, list_swap_elem [] ll (fst t) (snd t))
       ll.
 Proof.
-(*
-intros * Hcr Hc Hr Hp.
-subst n.
-unfold iter_list, list_list_select_rows.
-remember (transp_list p) as t eqn:Ht; symmetry in Ht.
-destruct t as [| (t1, t2)]. {
-  unfold transp_list, iter_seq, iter_list in Ht.
-  cbn in Ht |-*.
-...
-*)
 intros * Hcr Hc Hr Hp.
 revert ll p Hcr Hc Hr Hp.
 induction n; intros. {
@@ -1866,23 +1856,6 @@ assert (Hpn : length p = S n). {
   rewrite <- Nat.sub_succ_l; [ | flia Hip ].
   now rewrite Nat_sub_succ_1.
 }
-(**)
-(*
-assert (Hkj :
-  ∀ k,
-  k ≤ n
-  → let j := ff_app (bsort_rank Nat.leb p) k in
-    let q := collapse (butn j p) in
-    mat_select_rows q (subm k k M) =
-      iter_list (transp_list q) (λ M t, mat_swap_rows (fst t) (snd t) M)
-         (subm k k M)). {
-  intros * Hk *.
-  specialize (IHn (subm k k M) q) as H2.
-  assert (H : is_square_matrix (subm k k M) = true). {
-    apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
-  }
-  specialize (H2 H); clear H.
-*)
 assert (Hkj :
   ∀ k,
   k ≤ n
