@@ -1832,6 +1832,9 @@ Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
   map (λ i : nat, nth i l d) p =
   iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d l0 (fst t) (snd t)) l)).
 (* ah putain, merde, c'est pas bon *)
+Compute (let l := [3;7;8] in
+  (l ° [2;0;1], list_swap_elem 0 (list_swap_elem 0 l 0 1) 1 2)).
+...
 Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
   let A := nat in
   (p, transp_list p)).
