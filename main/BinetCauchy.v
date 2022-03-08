@@ -1894,7 +1894,7 @@ assert (Hkj :
          (map (butn k) (butn k ll))). {
   intros * Hk *.
   specialize (IHn (map (butn k) (butn k ll)) q) as H2.
-  rewrite map_length, butn_length in H2.
+  rewrite map_length, butn_length, Hr in H2.
   assert (H : length (hd [] (map (butn k) (butn k ll))) = 0 → n = 0). {
     intros H.
     apply length_zero_iff_nil in H.
@@ -1927,17 +1927,22 @@ assert (Hkj :
     now destruct n.
   }
   specialize (H2 H); clear H.
-...
-  assert (H : is_square_matrix (subm k k M) = true). {
-    apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
+  assert (H : ∀ l, l ∈ map (butn k) (butn k ll) → length l = n). {
+    intros l Hl.
+    apply in_map_iff in Hl.
+    destruct Hl as (la & Hlal & Hla).
+    rewrite <- Hlal.
+    rewrite butn_length.
+    apply in_butn in Hla.
+    specialize (Hc _ Hla) as H1; rewrite H1.
+    apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+    rewrite Hk; cbn.
+    now rewrite Nat.sub_0_r.
   }
   specialize (H2 H); clear H.
-  assert (H : mat_nrows (subm k k M) = n). {
-    rewrite mat_nrows_subm, Hr; cbn.
-    apply Nat.leb_le in Hk; rewrite Hk; cbn.
-    apply Nat.sub_0_r.
-  }
-  specialize (H2 H); clear H.
+  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+  rewrite Hk, Nat_sub_succ_1 in H2.
+  specialize (H2 eq_refl).
   assert (H : is_permut n q). {
     unfold q.
     specialize collapse_is_permut as H3.
@@ -1954,6 +1959,7 @@ assert (Hkj :
   }
   now specialize (H2 H).
 }
+...
 specialize (Hkj n (le_refl _)) as H1.
 cbn in H1.
 rewrite permut_collapse in H1. 2: {
@@ -1965,6 +1971,7 @@ rewrite fold_ff_app in H1.
 rewrite permut_bsort_permut in H1; [ | now destruct Hp | now rewrite Hpn ].
 unfold ff_app in H1.
 rewrite Hin in H1.
+...
 rewrite mat_select_rows_butn_subm in H1;
   [ | easy | | easy | easy | easy | easy ]. 2: {
   now destruct Hp as ((Hpa, Hpd), Hpl).
