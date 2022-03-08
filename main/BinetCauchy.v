@@ -1898,25 +1898,15 @@ assert (Hkj :
   assert (H : length (hd [] (map (butn k) (butn k ll))) = 0 → n = 0). {
     intros H.
     apply length_zero_iff_nil in H.
-...
+    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ easy | ].
     rewrite List_map_hd with (a := []) in H. 2: {
       rewrite butn_length, Hr.
       apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
       rewrite Hk; cbn.
       apply Nat.ltb_lt in Hk.
       rewrite Nat.sub_0_r.
-      apply Nat.neq_0_lt_0; intros H'.
-      move H' at top; subst n.
-      apply Nat.lt_1_r in Hk; move Hk at top; subst k.
-      destruct ll as [| la]; [ easy | ].
-      destruct ll; [ | easy ].
-      cbn in Hcr.
-      cbn in H, Hr.
-      clear H Hr.
-...
-      apply Nat.leb_le in Hk.
-      apply Nat.leb_le in Hk; rewrite Hk; cbn.
-    apply Nat.sub_0_r.
+      now apply Nat.neq_0_lt_0.
+    }
 ...
   assert (H : is_square_matrix (subm k k M) = true). {
     apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
