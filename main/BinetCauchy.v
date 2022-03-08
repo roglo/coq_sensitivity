@@ -1820,12 +1820,20 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
-Theorem glop : ∀ p,
-  collapse p =
-  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
-    (seq 0 (length p)).
+Theorem collapse_iter_list_transp : ∀ l,
+  collapse l =
+  iter_list (transp_list l) (λ l t, swap (length l) (fst t) (snd t) ° l)
+    (seq 0 (length l)).
 Proof.
 intros.
+unfold iter_list.
+remember (length l) as n eqn:Hn; symmetry in Hn.
+revert l Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst l.
+}
+rewrite seq_S; cbn.
+Search (fold_left _ _ (_ ++ _)).
 ...
 (* ça a l'air bon
 Compute (let p := [2;8;1;7] in
