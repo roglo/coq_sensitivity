@@ -1867,6 +1867,22 @@ assert (Hpn : length p = S n). {
   now rewrite Nat_sub_succ_1.
 }
 (**)
+(*
+assert (Hkj :
+  ∀ k,
+  k ≤ n
+  → let j := ff_app (bsort_rank Nat.leb p) k in
+    let q := collapse (butn j p) in
+    mat_select_rows q (subm k k M) =
+      iter_list (transp_list q) (λ M t, mat_swap_rows (fst t) (snd t) M)
+         (subm k k M)). {
+  intros * Hk *.
+  specialize (IHn (subm k k M) q) as H2.
+  assert (H : is_square_matrix (subm k k M) = true). {
+    apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
+  }
+  specialize (H2 H); clear H.
+*)
 assert (Hkj :
   ∀ k,
   k ≤ n
