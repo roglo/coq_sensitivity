@@ -1827,6 +1827,7 @@ Theorem collapse_iter_list_transp : ∀ l,
 Proof.
 intros.
 unfold iter_list.
+Print transp_list.
 ...
 remember (length l) as n eqn:Hn; symmetry in Hn.
 revert l Hn.
