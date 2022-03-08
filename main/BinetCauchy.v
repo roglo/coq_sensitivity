@@ -1820,6 +1820,22 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
+Theorem map_iter_list_transp_list : ∀ A (d : A) l p,
+  is_permut (length l) p
+  → map (λ i, nth i l d) p =
+    iter_list (transp_list p) (λ l t, list_swap_elem d l (fst t) (snd t)) l.
+Proof.
+intros * Hp.
+Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
+  let A := nat in
+  map (λ i : nat, nth i l d) p =
+  iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d l0 (fst t) (snd t)) l).
+(* ah putain, merde, c'est pas bon *)
+Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
+  let A := nat in
+  (p, transp_list p)).
+...
+
 Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
   (length (hd [] ll) = 0 → n = 0)
   → (∀ l, l ∈ ll → length l = n)
@@ -1830,6 +1846,31 @@ Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
       ll.
 Proof.
 intros * Hcr Hc Hr Hp.
+...
+specialize map_iter_list_transp_list as H1.
+specialize (H1 (list T) []).
+specialize (H1 ll p).
+rewrite <- H1.
+assert (list_list_select_rows p ll = map (λ i, nth i ll []) p). {
+  unfold list_list_select_rows.
+  apply map_ext_in.
+  intros i Hi.
+  remember (nth i ll []) as la eqn:Hla.
+  rewrite Hr.
+  replace n with (length la). {
+    now rewrite <- List_map_nth_seq.
+  }
+  rewrite Hla.
+  apply Hc.
+  apply nth_In.
+  rewrite Hr.
+  destruct Hp as (Hpp, Hpl).
+  rewrite <- Hpl.
+  now apply Hpp.
+}
+easy.
+*)
+...
 revert ll p Hcr Hc Hr Hp.
 induction n; intros. {
   destruct Hp as (Hpp, Hpl).
