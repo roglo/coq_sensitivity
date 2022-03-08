@@ -1820,12 +1820,57 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
+Theorem glop : ∀ p,
+  collapse p =
+  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+    (seq 0 (length p)).
+Proof.
+intros.
+...
+(* ça a l'air bon
+Compute (let p := [2;8;1;7] in
+  collapse p =
+  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+    (seq 0 (length p))).
+Compute (
+map (λ p,
+  list_eqb Nat.eqb p
+    (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+      (seq 0 (length p)))) (canon_sym_gr_list_list 5)).
+Compute (
+map (λ p,
+  collapse p =
+  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+    (seq 0 (length p))) (canon_sym_gr_list_list 4)).
+*)
+...
+
 Theorem map_iter_list_transp_list : ∀ A (d : A) l p,
   is_permut (length l) p
   → map (λ i, nth i l d) p =
     iter_list (transp_list p) (λ l t, list_swap_elem d l (fst t) (snd t)) l.
 Proof.
 intros * Hp.
+Compute (let p := [2;8;1;7] in let d := 0 in
+  let A := nat in
+(collapse p =
+  iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d l0 (fst t) (snd t)) (seq 0 (length p)))).
+Compute (let p := [2;8;1;7] in let d := 0 in
+  let A := nat in
+(collapse p =
+  iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d (seq 0 (length p)) (fst t) (snd t) ° l0) (seq 0 (length p)))).
+...
+Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
+  let A := nat in
+((l ° p),
+  map (λ i : nat, nth i l d) p =
+  l ° iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d (seq 0 (length l)) (fst t) (snd t) ° l0) (seq 0 (length l)))).
+Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
+  let A := nat in
+((l ° p),
+  map (λ i : nat, nth i l d) p =
+  l ° iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), l0 ° list_swap_elem d (seq 0 (length l)) (fst t) (snd t)) (seq 0 (length l)))).
+...
 Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
   let A := nat in
 ((l ° p),
