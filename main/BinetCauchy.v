@@ -1907,6 +1907,26 @@ assert (Hkj :
       rewrite Nat.sub_0_r.
       now apply Nat.neq_0_lt_0.
     }
+    destruct ll as [| la]; [ easy | ].
+    cbn in Hcr.
+    destruct la as [| a]; [ now specialize (Hcr eq_refl) | ].
+    cbn in Hr.
+    specialize (Hc (a :: la) (or_introl eq_refl)) as H1.
+    cbn in H1.
+    apply Nat.succ_inj in Hr, H1.
+    move H1 before Hr.
+    destruct ll as [| lb]; [ easy | ].
+    cbn in Hr.
+    destruct lb as [| b]. {
+      now specialize (Hc _ (or_intror (or_introl eq_refl))).
+    }
+    destruct k; [ | easy ].
+    cbn in H; subst lb.
+    specialize (Hc _ (or_intror (or_introl eq_refl))) as H3.
+    cbn in H3.
+    now destruct n.
+  }
+  specialize (H2 H); clear H.
 ...
   assert (H : is_square_matrix (subm k k M) = true). {
     apply is_squ_mat_subm; [ flia Hr Hk | flia Hr Hk | easy ].
