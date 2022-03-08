@@ -1828,12 +1828,15 @@ Proof.
 intros * Hp.
 Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
   let A := nat in
+((l ° p),
   map (λ i : nat, nth i l d) p =
-  iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d l0 (fst t) (snd t)) l).
+  iter_list (transp_list p) (λ (l0 : list A) (t : nat * nat), list_swap_elem d l0 (fst t) (snd t)) l)).
 (* ah putain, merde, c'est pas bon *)
 Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
   let A := nat in
   (p, transp_list p)).
+...
+     = ([2; 0; 1], [(0, 1); (1, 2)])
 ...
 
 Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
