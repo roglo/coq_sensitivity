@@ -1827,6 +1827,7 @@ Theorem collapse_iter_list_transp : ∀ l,
 Proof.
 intros.
 unfold iter_list.
+...
 remember (length l) as n eqn:Hn; symmetry in Hn.
 revert l Hn.
 induction n; intros. {
@@ -1834,6 +1835,7 @@ induction n; intros. {
 }
 rewrite seq_S; cbn.
 Search (fold_left _ _ (_ ++ _)).
+Search (fold_left _ _ _ + _)%F.
 ...
 (* ça a l'air bon
 Compute (let p := [2;8;1;7] in
