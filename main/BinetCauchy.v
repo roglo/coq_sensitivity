@@ -1016,16 +1016,21 @@ Fixpoint transp_loop'' it i (p : list nat) :=
       end
   end.
 
+(*
+Definition list_swap_elem' A (d : A) l i j :=
+  replace_at j (replace_at i l (nth j l d)) (nth i l d).
+*)
+
 Definition transp_list'' p := transp_loop'' (length p) 0 p.
 
+(*
 Compute (transp_list' [3;2;0;1]).
 Compute (transp_list'' [3;2;0;1]).
 Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
 Compute (map (λ l, (l, transp_list'' l)) (canon_sym_gr_list_list 4)).
 Compute (map (λ l, (transp_list' l, transp_list'' l)) (canon_sym_gr_list_list 4)).
 Compute (map (λ l, list_eqb (pair_eqb Nat.eqb) (transp_list' l) (transp_list'' l)) (canon_sym_gr_list_list 4)).
-
-...
+*)
 
 Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
   match lrank with
