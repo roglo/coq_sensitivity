@@ -1260,6 +1260,13 @@ Qed.
 
 (* end list_eqb *)
 
+(* pair_eqb *)
+
+Definition pair_eqb {A B} (eqb : A → B → _) ab cd :=
+  (eqb (fst ab) (fst cd) && eqb (snd ab) (snd cd))%bool.
+
+(* end pair_eqb *)
+
 Definition unsome A (d : A) o :=
   match o with
   | Some x => x

@@ -991,22 +991,41 @@ Fixpoint first_non_fix_transp i p :=
       else Some (i, j)
   end.
 
-Fixpoint transp_loop it (p : list nat) :=
+Fixpoint transp_loop' it (p : list nat) :=
   match it with
   | 0 => []
   | S it' =>
       match first_non_fix_transp 0 p with
       | None => []
-      | Some (k, pk) => (k, pk) :: transp_loop it' (list_swap_elem 0 p k pk)
+      | Some (k, pk) => (k, pk) :: transp_loop' it' (list_swap_elem 0 p k pk)
       end
   end.
 
-Definition transp_list' p := transp_loop (length p) p.
+Definition transp_list' p := transp_loop' (length p) p.
 
-(*
+Fixpoint transp_loop'' it i (p : list nat) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match first_non_fix_transp i p with
+      | None => []
+      | Some (k, pk) =>
+          (k, pk) ::
+          transp_loop'' it' k
+            (skipn (k - i) (list_swap_elem 0 p (k - i) (pk - i)))
+      end
+  end.
+
+Definition transp_list'' p := transp_loop'' (length p) 0 p.
+
 Compute (transp_list' [3;2;0;1]).
+Compute (transp_list'' [3;2;0;1]).
 Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
-*)
+Compute (map (λ l, (l, transp_list'' l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (transp_list' l, transp_list'' l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, list_eqb (pair_eqb Nat.eqb) (transp_list' l) (transp_list'' l)) (canon_sym_gr_list_list 4)).
+
+...
 
 Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
   match lrank with
