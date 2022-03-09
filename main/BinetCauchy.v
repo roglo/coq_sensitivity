@@ -1858,16 +1858,18 @@ unfold transp_list, iter_seq, iter_list.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
 rewrite Nat_sub_succ_1.
-Print fold_left.
+(*
 Theorem glop : ∀ A B C (f : A → B → A) (g : list B → C → list B) a lb lc,
   fold_left f (fold_left g lc lb) a = a.
 Proof.
 intros.
-Admitted.
+...
 (* en fait, je ne sais pas ce que devient lb ; ici, il démarre à [] et
    se remplit petit à petit *)
 (* pas sûr qu'on puisse fusionner les deux fold_left *)
-Print find.
+*)
+
+(* sort by selection *)
 
 Fixpoint min_in_list {A} (ord : A → A → bool) a la :=
   match la with
@@ -1896,19 +1898,20 @@ Compute (ssort Nat.leb [3;2;1;7]).
 Compute (map (λ l, (bsort Nat.leb l, ssort Nat.leb l)) (canon_sym_gr_list_list 4)).
 *)
 
-Fixpoint bbsort_swap {A} (ord : A → A → bool) it modif l :=
+(* bubble sort *)
+
+Fixpoint bbsort_swap {A} (ord : A → A → bool) it l :=
   match it with
-  | 0 => (l, modif)
+  | 0 => (l, false)
   | S it' =>
       match l with
-      | [] | [_] => (l, modif)
+      | [] | [_] => (l, false)
       | a :: b :: l' =>
-          if ord a b then
-            let (l'', modif) := bbsort_swap ord it' modif (b :: l') in
-            (a :: l'', modif)
-          else
-            let (l'', modif) := bbsort_swap ord it' modif (a :: l') in
-            (b :: l'', true)
+          let (l'', modif) :=
+            bbsort_swap ord it' ((if ord a b then b else a) :: l')
+          in
+          if ord a b then (a :: l'', modif)
+          else (b :: l'', true)
       end
   end.
 
@@ -1916,14 +1919,14 @@ Fixpoint bbsort_loop {A} (ord : A → A → bool) it l :=
   match it with
   | 0 => l
   | S it' =>
-      let (l', modif) := bbsort_swap ord (length l) false l in
+      let (l', modif) := bbsort_swap ord (length l) l in
       if modif then bbsort_loop ord it' l' else l'
   end.
 
 Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) l.
 
 Compute (bbsort Nat.leb [3;2;1;7]).
-Compute (map (λ l, (bsort Nat.leb l, bbsort Nat.leb l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (bsort Nat.leb l, bbsort Nat.leb l)) (canon_sym_gr_list_list 04)).
 
 ...
 rewrite glop.
