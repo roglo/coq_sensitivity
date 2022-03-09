@@ -1827,7 +1827,15 @@ Theorem collapse_iter_list_transp : ∀ l,
 Proof.
 intros.
 unfold iter_list.
+...
 Print transp_list.
+Print transp_of_pos.
+Search bsort_gen.
+Compute (bsort_gen Nat.leb [3;2;0;1]).
+Compute (bsort_gen Nat.leb [1;2;0;3]).
+Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 5)).
 ...
 remember (length l) as n eqn:Hn; symmetry in Hn.
 revert l Hn.
