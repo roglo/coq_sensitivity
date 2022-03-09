@@ -1867,6 +1867,29 @@ Admitted.
 (* en fait, je ne sais pas ce que devient lb ; ici, il démarre à [] et
    se remplit petit à petit *)
 (* pas sûr qu'on puisse fusionner les deux fold_left *)
+Fixpoint min_in_list {A} (ord : A → A → bool) a la :=
+  match la with
+  | [] => (a, [])
+  | b :: lb =>
+      let (c, lc) := min_in_list ord (if ord a b then a else b) lb in
+      (c, (if ord a b then b else a) :: lc)
+  end.
+
+Fixpoint ssort_loop {A} (ord : A → A → bool) it l :=
+  match it with
+  | 0 => l
+  | S it' =>
+      match l with
+      | [] => []
+      | a :: la =>
+          let (a', la') := min_in_list ord a la in
+          a' :: ssort_loop ord it' la'
+      end
+  end.
+
+Definition ssort {A} (ord : A → _) l := ssort_loop ord (length l) l.
+
+Compute (ssort Nat.leb [3;2;1;7]).
 ...
 rewrite glop.
 specialize glop as H1.
