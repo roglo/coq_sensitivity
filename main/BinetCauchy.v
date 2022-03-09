@@ -1867,6 +1867,8 @@ Admitted.
 (* en fait, je ne sais pas ce que devient lb ; ici, il démarre à [] et
    se remplit petit à petit *)
 (* pas sûr qu'on puisse fusionner les deux fold_left *)
+Print find.
+
 Fixpoint min_in_list {A} (ord : A → A → bool) a la :=
   match la with
   | [] => (a, [])
@@ -1889,7 +1891,10 @@ Fixpoint ssort_loop {A} (ord : A → A → bool) it l :=
 
 Definition ssort {A} (ord : A → _) l := ssort_loop ord (length l) l.
 
+(*
 Compute (ssort Nat.leb [3;2;1;7]).
+Compute (map (λ l, (bsort Nat.leb l, ssort Nat.leb l)) (canon_sym_gr_list_list 4)).
+*)
 ...
 rewrite glop.
 specialize glop as H1.
