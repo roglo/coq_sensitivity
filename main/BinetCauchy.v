@@ -1902,33 +1902,33 @@ Compute (map (λ l, (bsort Nat.leb l, ssort Nat.leb l)) (canon_sym_gr_list_list 
 
 Fixpoint bbsort_swap {A} (ord : A → A → bool) it l :=
   match it with
-  | 0 => (l, [])
+  | 0 => (l, 0)
   | S it' =>
       match l with
-      | [] | [_] => (l, [])
+      | [] | [_] => (l, 0)
       | a :: b :: l' =>
-          let (l'', sl) :=
+          let (l'', exch) :=
             bbsort_swap ord it' ((if ord a b then b else a) :: l')
           in
-          if ord a b then (a :: l'', sl)
-          else (b :: l'', (a, b) :: sl)
+          if ord a b then (a :: l'', exch)
+          else (b :: l'', S exch)
       end
   end.
 
-Fixpoint bbsort_loop {A} (ord : A → A → bool) it sl l :=
+Fixpoint bbsort_loop {A} (ord : A → A → bool) it l :=
   match it with
-  | 0 => (l, sl)
+  | 0 => (l, 0)
   | S it' =>
-      let (l', sl') := bbsort_swap ord (length l) l in
-      match sl' with
-      | [] => (l', sl)
-      | _ :: _ =>
-          let (l'', sl'') := bbsort_loop ord it' sl' l' in
-          (l'', sl ++ sl'')
+      let (l', exch) := bbsort_swap ord (length l) l in
+      match exch with
+      | 0 => (l', 0)
+      | S _ =>
+          let (l'', exch'') := bbsort_loop ord it' l' in
+          (l'', exch + exch'')
       end
   end.
 
-Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) [] l.
+Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) l.
 
 Compute (let l := [3;2;1;7] in (l, bbsort Nat.leb l)).
 Compute (map (λ l, (l, bbsort Nat.leb l)) (canon_sym_gr_list_list 04)).
