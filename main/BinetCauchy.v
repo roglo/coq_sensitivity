@@ -1826,7 +1826,30 @@ Theorem collapse_iter_list_transp : ∀ l,
     (seq 0 (length l)).
 Proof.
 intros.
+destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
+  now apply length_zero_iff_nil in Hlz; subst l.
+}
 unfold iter_list.
+unfold transp_list, iter_seq, iter_list.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
+rewrite Nat_sub_succ_1.
+Print fold_left.
+Theorem glop : ∀ A B C (f : A → B → A) (g : list B → C → list B) a lb lc,
+  fold_left f (fold_left g lc lb) a = a.
+Proof.
+intros.
+Admitted.
+(* en fait, je ne sais pas ce que devient lb ; ici, il démarre à [] et
+   se remplit petit à petit *)
+(* pas sûr qu'on puisse fusionner les deux fold_left *)
+...
+rewrite glop.
+specialize glop as H1.
+specialize (H1 nat).
+specialize (H1 (nat * nat)%type).
+specialize (H1 (λ (l0 : list nat) (t : nat * nat), swap (length l0) (fst t) (snd t) ° l0)).
+specialize (H1 (λ (t : list (nat * nat)) (n : nat), t ++ transp_of_pos n (ff_app (snd (bsort_gen Nat.leb l)) n))).
 ...
 Print transp_list.
 Print transp_of_pos.
