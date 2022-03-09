@@ -1928,6 +1928,7 @@ Fixpoint bbsort_loop {A} (ord : A → A → bool) it l :=
       end
   end.
 
+(* ce tri bulles me donne en plus le nombre de transpositions *)
 Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) l.
 
 Compute (let l := [3;2;1;7] in (l, bbsort Nat.leb l)).
