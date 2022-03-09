@@ -1895,6 +1895,36 @@ Definition ssort {A} (ord : A → _) l := ssort_loop ord (length l) l.
 Compute (ssort Nat.leb [3;2;1;7]).
 Compute (map (λ l, (bsort Nat.leb l, ssort Nat.leb l)) (canon_sym_gr_list_list 4)).
 *)
+
+Fixpoint bbsort_swap {A} (ord : A → A → bool) it modif l :=
+  match it with
+  | 0 => (l, modif)
+  | S it' =>
+      match l with
+      | [] | [_] => (l, modif)
+      | a :: b :: l' =>
+          if ord a b then
+            let (l'', modif) := bbsort_swap ord it' modif (b :: l') in
+            (a :: l'', modif)
+          else
+            let (l'', modif) := bbsort_swap ord it' modif (a :: l') in
+            (b :: l'', true)
+      end
+  end.
+
+Fixpoint bbsort_loop {A} (ord : A → A → bool) it l :=
+  match it with
+  | 0 => l
+  | S it' =>
+      let (l', modif) := bbsort_swap ord (length l) false l in
+      if modif then bbsort_loop ord it' l' else l'
+  end.
+
+Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) l.
+
+Compute (bbsort Nat.leb [3;2;1;7]).
+Compute (map (λ l, (bsort Nat.leb l, bbsort Nat.leb l)) (canon_sym_gr_list_list 4)).
+
 ...
 rewrite glop.
 specialize glop as H1.
