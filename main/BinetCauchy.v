@@ -995,7 +995,7 @@ Fixpoint transp_loop it i (p : list nat) :=
       end
   end.
 
-Definition transp_list p := transp_loop (S (length p)) 0 p.
+Definition transp_list p := transp_loop (length p * length p) 0 p.
 
 (*
 Compute (transp_list [3;2;0;1]).
@@ -1261,10 +1261,11 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
-Theorem collapse_iter_list_transp : ∀ l,
-  collapse l =
-  iter_list (transp_list (collapse l))
-    (λ l t, swap (length l) (fst t) (snd t) ° l) (seq 0 (length l)).
+Theorem permut_eq_iter_list_transp : ∀ l,
+  is_permut_list l
+  → l =
+    iter_list (transp_list l)
+      (λ l t, swap (length l) (fst t) (snd t) ° l) (seq 0 (length l)).
 Proof.
 intros.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
@@ -1272,18 +1273,43 @@ destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
 }
 unfold iter_list.
 unfold transp_list, iter_seq, iter_list.
+Print transp_loop.
+...
+
+Theorem collapse_iter_list_transp : ∀ l,
+  collapse l =
+  iter_list (transp_list (collapse l))
+    (λ l t, swap (length l) (fst t) (snd t) ° l) (seq 0 (length l)).
+Proof.
+intros.
+rewrite <- collapse_length.
+...
+apply permut_eq_iter_list_transp.
+apply collapse_is_permut.
+...
 rewrite collapse_length.
 Compute (let p := collapse [2;8;1;7] in
   p =
   iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
     (seq 0 (length p))).
 Compute (
-map (λ p, (
+map (λ p, ((*p,*)
   list_eqb Nat.eqb p
     (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
       (seq 0 (length p))))) (canon_sym_gr_list_list 6)).
-(* y a des false là-dedans ! *)
-(* le nombre d'itérations n'est probablement pas suffisant *)
+Compute (let p := [1;2;3;0;5;4] in
+  p =
+  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+    (seq 0 (length p))).
+Compute (let p := [1;2;3;0;5;4] in transp_list p).
+...
+[2;1;3;0;5;4]
+[3;1;2;0;5;4]
+[0;1;2;3;5;4]
+...
+[1; 2; 3; 0; 5; 4], false);
+[2; 0; 3; 1; 5; 4], false);
+[2; 3; 1; 0; 5; 4], false);
 ...
 Compute (let p := [1;2;0;4;3] in
   p =
