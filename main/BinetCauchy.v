@@ -1306,6 +1306,15 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 (* ouais bin chais pas *)
 Print transp_loop.
 (* à chaque itération, le nombre de trucs pas à sa place diminue au moins de 1 *)
+Fixpoint nb_fit i l :=
+  match l with
+  | [] => 0
+  | j :: l' => nb_fit (S i) l' + if i =? j then 1 else 0
+  end.
+Print transp_loop.
+Theorem glop : ∀ l i j,
+  nb_fit 0 (list_swap_elem 0 l 0 (j - i)) < nb_fit 0 l.
+(* ouais, non *)
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
