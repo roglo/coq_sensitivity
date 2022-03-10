@@ -1296,6 +1296,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm in Hit |-*.
+...
   destruct (Nat.eq_dec (2 * (S i + length l)) (S it)) as [Hilt| Hilt]. 2: {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
     flia Hit Hilt.
