@@ -1278,10 +1278,9 @@ Theorem transp_loop_enough_iter : ∀ it1 it2 i l,
   → transp_loop it1 i l = transp_loop it2 i l.
 Proof.
 intros * Hli1 Hli2.
-revert l it2 Hli1 Hli2.
+revert i l it2 Hli1 Hli2.
 induction it1; intros; cbn. {
-  apply Nat.le_0_r in Hli1.
-  apply Nat.eq_mul_0 in Hli1.
+  apply Nat.le_0_r, Nat.eq_mul_0 in Hli1.
   destruct Hli1 as [Hli1| Hli1]; [ easy | ].
   apply length_zero_iff_nil in Hli1; subst l; cbn.
   symmetry; apply transp_loop_nil.
@@ -1289,9 +1288,22 @@ induction it1; intros; cbn. {
 destruct l as [| j]. {
   symmetry; apply transp_loop_nil.
 }
-rewrite if_eqb_eq_dec.
+destruct it2. {
+  apply Nat.le_0_r, Nat.eq_mul_0 in Hli2.
+  now destruct Hli2.
+}
+cbn - [ list_swap_elem ].
+do 2 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
+  apply IHit1. {
+    cbn in Hli1 |-*; flia Hli1.
+  } {
+    cbn in Hli2 |-*; flia Hli2.
+  }
+} {
+  f_equal.
+  apply IHit1; rewrite length_list_swap_elem.
+(* ouais bin chais pas *)
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
