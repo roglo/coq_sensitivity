@@ -1261,19 +1261,94 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
+Fixpoint first_non_fix_transp i p :=
+  match p with
+  | [] => i
+  | j :: l =>
+      if i =? j then first_non_fix_transp (S i) l
+      else i
+  end.
+
+Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → 2 * (i + length l) ≤ it
+  → seq 0 i ++ l =
+    fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l)).
+Proof.
+intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit.
+  apply Nat.eq_mul_0 in Hit.
+  destruct Hit as [Hit| Hit]; [ easy | ].
+  apply Nat.eq_add_0 in Hit.
+  destruct Hit as (Hi, Hl).
+  now apply length_zero_iff_nil in Hl; subst i l.
+}
+destruct l as [| j]. {
+  now rewrite app_nil_r, Nat.add_0_r.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  rewrite List_length_cons, <- Nat.add_succ_comm in Hit |-*.
+  destruct (Nat.eq_dec (2 * (S i + length l)) (S it)) as [Hilt| Hilt]. 2: {
+    apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+    flia Hit Hilt.
+  }
+...
+Compute (let p := [0;1;3;2] in
+let i := 2 in
+let l := skipn i p in
+let it' := 2 * (i + length l) in
+let it := 3 in
+seq 0 i ++ l =
+fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+  (transp_loop it i l) (seq 0 (i + length l))).
+Compute (
+map (λ p, (p,
+  first_non_fix_transp 0 p)) (canon_sym_gr_list_list 4)).
+Compute (
+map (λ p,
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := 2 * (i + length l) in
+list_eqb Nat.eqb
+  (seq 0 i ++ l)
+    (fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l))))
+    (canon_sym_gr_list_list 5)).
+...
+*)
+
 Theorem permut_eq_iter_list_transp : ∀ l,
   is_permut_list l
   → l =
     iter_list (transp_list l)
       (λ l t, swap (length l) (fst t) (snd t) ° l) (seq 0 (length l)).
 Proof.
-intros.
+intros * Hp.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
   now apply length_zero_iff_nil in Hlz; subst l.
 }
 unfold iter_list.
 unfold transp_list, iter_seq, iter_list.
-Print transp_loop.
+...
+specialize permut_eq_iter_list_transp_loop as H1.
+specialize (H1 l (2 * length l) 0 Hp (Nat.le_refl _)).
+easy.
+...
+rewrite <- Nat.double_twice; unfold Nat.double.
+remember (length l) as n eqn:Hn; symmetry in Hn.
+revert l Hp Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn.
+}
+cbn - [ transp_loop ].
 ...
 
 Theorem collapse_iter_list_transp : ∀ l,
@@ -1283,6 +1358,7 @@ Theorem collapse_iter_list_transp : ∀ l,
 Proof.
 intros.
 rewrite <- collapse_length.
+...
 apply permut_eq_iter_list_transp.
 apply collapse_is_permut.
 ...
