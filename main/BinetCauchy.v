@@ -995,7 +995,7 @@ Fixpoint transp_loop it i (p : list nat) :=
       end
   end.
 
-Definition transp_list p := transp_loop (length p * length p) 0 p.
+Definition transp_list p := transp_loop (2 * length p) 0 p.
 
 (*
 Compute (transp_list [3;2;0;1]).
@@ -1283,7 +1283,6 @@ Theorem collapse_iter_list_transp : ∀ l,
 Proof.
 intros.
 rewrite <- collapse_length.
-...
 apply permut_eq_iter_list_transp.
 apply collapse_is_permut.
 ...
