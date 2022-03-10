@@ -1304,7 +1304,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   f_equal.
   apply IHit1; rewrite length_list_swap_elem.
 (* ouais bin chais pas *)
-Print transp_loop.
+...
 (* à chaque itération, le nombre de trucs pas à sa place diminue au moins de 1 *)
 Fixpoint nb_fit i l :=
   match l with
