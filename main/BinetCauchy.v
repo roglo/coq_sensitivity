@@ -1269,6 +1269,31 @@ Fixpoint first_non_fix_transp i p :=
       else i
   end.
 
+Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
+Proof. intros; now destruct it. Qed.
+
+Theorem transp_loop_enough_iter : ∀ it1 it2 i l,
+  2 * length l ≤ it1
+  → 2 * length l ≤ it2
+  → transp_loop it1 i l = transp_loop it2 i l.
+Proof.
+intros * Hli1 Hli2.
+revert l it2 Hli1 Hli2.
+induction it1; intros; cbn. {
+  apply Nat.le_0_r in Hli1.
+  apply Nat.eq_mul_0 in Hli1.
+  destruct Hli1 as [Hli1| Hli1]; [ easy | ].
+  apply length_zero_iff_nil in Hli1; subst l; cbn.
+  symmetry; apply transp_loop_nil.
+}
+destruct l as [| j]. {
+  symmetry; apply transp_loop_nil.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+...
+
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → 2 * (i + length l) ≤ it
