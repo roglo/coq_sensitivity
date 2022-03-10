@@ -1302,15 +1302,34 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
 } {
   f_equal.
-  apply IHit1; rewrite length_list_swap_elem.
-(* ouais bin chais pas *)
-...
-(* à chaque itération, le nombre de trucs pas à sa place diminue au moins de 1 *)
 Fixpoint nb_fit i l :=
   match l with
   | [] => 0
   | j :: l' => nb_fit (S i) l' + if i =? j then 1 else 0
   end.
+Theorem glop : ∀ l i j,
+  i ≠ j
+  → nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i)) < nb_fit i l.
+Proof.
+intros * Hij.
+cbn.
+remember (j - i) as k eqn:Hk; symmetry in Hk.
+destruct k. {
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+  rewrite Nat.add_0_r.
+  erewrite map_ext_in. 2: {
+    intros n Hn.
+    apply in_seq in Hn.
+    rewrite transposition_refl.
+    replace n with (S (n - 1)) at 1 by flia Hn.
+    easy.
+  }
+...
+  apply IHit1; rewrite length_list_swap_elem.
+(* ouais bin chais pas *)
+...
+(* à chaque itération, le nombre de trucs pas à sa place diminue au moins de 1 *)
 Print transp_loop.
 Theorem glop : ∀ l i j,
   nb_fit 0 (list_swap_elem 0 l 0 (j - i)) < nb_fit 0 l.
