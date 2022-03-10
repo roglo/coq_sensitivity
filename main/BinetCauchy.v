@@ -983,269 +983,27 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_select_rows_is_square.
 Qed.
 
-Fixpoint first_non_fix_transp i p :=
-  match p with
-  | [] => None
-  | j :: l =>
-      if i =? j then first_non_fix_transp (S i) l
-      else Some (i, j)
-  end.
-
-Fixpoint transp_loop' it (p : list nat) :=
+Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => []
   | S it' =>
-      match first_non_fix_transp 0 p with
-      | None => []
-      | Some (k, pk) => (k, pk) :: transp_loop' it' (list_swap_elem 0 p k pk)
+      match p with
+      | [] => []
+      | j :: l =>
+          if i =? j then transp_loop it' (S i) l
+          else (i, j) :: transp_loop it' i (list_swap_elem 0 p 0 (j - i))
       end
   end.
 
-Definition transp_list' p := transp_loop' (length p) p.
-
-Fixpoint transp_loop'' it i (p : list nat) :=
-  match it with
-  | 0 => []
-  | S it' =>
-      match first_non_fix_transp i p with
-      | None => []
-      | Some (k, pk) =>
-          (k, pk) ::
-          transp_loop'' it' k
-            (skipn (k - i) (list_swap_elem 0 p (k - i) (pk - i)))
-      end
-  end.
+Definition transp_list p := transp_loop (S (length p)) 0 p.
 
 (*
-Definition list_swap_elem' A (d : A) l i j :=
-  replace_at j (replace_at i l (nth j l d)) (nth i l d).
-*)
-
-Definition transp_list'' p := transp_loop'' (length p) 0 p.
-
-(*
-Compute (transp_list' [3;2;0;1]).
-Compute (transp_list'' [3;2;0;1]).
-Compute (map (λ l, (l, transp_list' l)) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (l, transp_list'' l)) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (transp_list' l, transp_list'' l)) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, list_eqb (pair_eqb Nat.eqb) (transp_list' l) (transp_list'' l)) (canon_sym_gr_list_list 4)).
-*)
-
-Fixpoint bsort_gen_insert {A B} (ord : A → A → bool) (f : B → A) ia lrank :=
-  match lrank with
-  | [] => ([ia], 0)
-  | ib :: l =>
-      if ord (f ia) (f ib) then (ia :: lrank, 0)
-      else
-        let (l', n) := bsort_gen_insert ord f ia l in
-        (ib :: l', S n)
-  end.
-
-Fixpoint bsort_gen_loop {A} (ord : A → A → bool) f lrank (l : list A) :=
-  match l with
-  | [] => (lrank, [])
-  | _ :: l' =>
-      let (lrank', n) := bsort_gen_insert ord f (length lrank) lrank in
-      let (l'', nl) := bsort_gen_loop ord f lrank' l' in
-      (l'', length lrank - n :: nl)
-  end.
-
-(* return a pair
-   - the permutation to apply to the initial list to get the sorted list
-   - a list of the number of transpositions to insert the elements
-*)
-Definition bsort_gen {A} (ord : A → A → bool) l :=
-  match l with
-  | [] => ([], [])
-  | d :: _ => bsort_gen_loop ord (λ i, nth i l d) [] l
-  end.
-
-(*
-Compute (bsort_gen Nat.leb [20;12;7;9]).
-Compute (bsort_gen Nat.leb [7;8;5;4]).
-Compute (bsort_gen Nat.leb [3;2;0;1]).
-Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
-*)
-
-(*
-Definition transp_of_pos m n :=
-  iter_list (seq n (m - n)) (λ t i, (i, i + 1) :: t) [].
-
-Definition transp_list p :=
-  fold_right
-    (λ i l,
-     let j := nth i (snd (bsort_gen Nat.leb p)) 0 in
-     if i =? j then l else transp_of_pos i j ++ l)
-    []
-    (seq 0 (length p)).
-*)
-
-Fixpoint transp_of_pos n i :=
-  match i with
-  | 0 => []
-  | S i' => (n - 1, n) :: transp_of_pos (n -  1) i'
-  end.
-
-Definition transp_list p :=
-  iter_seq 0 (length p - 1)
-    (λ t n, t ++ transp_of_pos n (ff_app (snd (bsort_gen Nat.leb p)) n)) [].
-
-(*
-Compute (transp_list [20;12;7;9]).
 Compute (transp_list [3;2;0;1]).
 Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+Compute (transp_list [20;12;7;9]).
+Compute (transp_list (collapse [20;12;7;9])).
+Compute (transp_list [3;2;0;1]).
 *)
-
-Theorem first_non_fix_transp_Some_neq_le : ∀ i p k kp,
-  first_non_fix_transp i p = Some (k, kp)
-  → i ≤ k ∧ k ≠ kp ∧ k < i + length p.
-Proof.
-intros * Hk.
-split. {
-  revert i k kp Hk.
-  induction p as [| a]; intros; [ easy | ].
-  cbn in Hk.
-  rewrite if_eqb_eq_dec in Hk.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    specialize (IHp _ _ _ Hk) as H1.
-    flia H1.
-  }
-  now injection Hk; clear Hk; intros; subst i a.
-}
-split. {
-  revert i k kp Hk.
-  induction p as [| a]; intros; [ easy | ].
-  cbn in Hk.
-  rewrite if_eqb_eq_dec in Hk.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    now apply IHp with (i := S i).
-  }
-  now injection Hk; clear Hk; intros; subst k kp.
-} {
-  revert i k kp Hk.
-  induction p as [| a]; intros; [ easy | ].
-  cbn in Hk.
-  rewrite if_eqb_eq_dec in Hk.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    apply IHp in Hk.
-    cbn; flia Hk.
-  }
-  cbn.
-  injection Hk; clear Hk; intros; subst i kp.
-  flia.
-}
-Qed.
-
-Theorem first_non_fix_transp_Some_iff : ∀ i p k kp,
-  first_non_fix_transp i p = Some (k, kp)
-  ↔ (∀ j, i ≤ j < k → nth (j - i) p 0 = j) ∧
-    nth (k - i) p 0 = kp ∧
-    k ≠ kp ∧
-    i ≤ k < i + length p.
-Proof.
-intros.
-split. {
-  intros Hk.
-  split. {
-    intros j Hijk.
-    revert i k kp Hk Hijk.
-    induction p as [| a]; intros; [ easy | ].
-    cbn in Hk.
-    rewrite if_eqb_eq_dec in Hk.
-    destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-      specialize (IHp _ _ _ Hk) as H1.
-      subst a.
-      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-        subst j.
-        now rewrite Nat.sub_diag.
-      }
-      assert (H : S i ≤ j < k) by flia Hijk Hij.
-      specialize (H1 H); clear H.
-      now replace (j - i) with (S (j - S i)) by flia Hijk Hij.
-    }
-    injection Hk; clear Hk; intros; subst i a.
-    flia Hijk.
-  }
-  split. {
-    revert i k kp Hk.
-    induction p as [| a]; intros; [ easy | ].
-    cbn in Hk.
-    rewrite if_eqb_eq_dec in Hk.
-    destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-      specialize (IHp _ _ _ Hk) as H1.
-      subst a.
-      destruct (le_dec k i) as [Hki| Hki]. {
-        specialize (first_non_fix_transp_Some_neq_le _ _ Hk) as H2.
-        flia Hki H2.
-      }
-      apply Nat.nle_gt in Hki.
-      now replace (k - i) with (S (k - S i)) by flia Hki.
-    }
-    injection Hk; clear Hk; intros; subst i a.
-    now rewrite Nat.sub_diag.
-  }
-  split. {
-    apply (first_non_fix_transp_Some_neq_le i p Hk).
-  } {
-    specialize (first_non_fix_transp_Some_neq_le i p Hk) as H1.
-    easy.
-  }
-} {
-  intros (Hbef & Hkp & Hkkp & Hkl).
-  revert i k kp Hbef Hkp Hkkp Hkl.
-  induction p as [| a]; intros. {
-    rewrite Nat.add_0_r in Hkl; flia Hkl.
-  }
-  cbn.
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-    subst a.
-    destruct p as [| b]. {
-      exfalso.
-      cbn in Hkl.
-      replace k with i in Hkp, Hbef, Hkkp by flia Hkl.
-      now rewrite Nat.sub_diag in Hkp.
-    }
-    destruct (Nat.eq_dec k i) as [Hki| Hki]. {
-      subst k.
-      now rewrite Nat.sub_diag in Hkp; cbn in Hkp.
-    }
-    apply IHp; [ | | easy | ]. {
-      intros j Hj.
-      destruct j; [ easy | ].
-      rewrite Nat.sub_succ.
-      specialize (Hbef (S j)) as H1.
-      assert (H : i ≤ S j < k) by flia Hj.
-      specialize (H1 H); clear H.
-      rewrite Nat.sub_succ_l in H1; [ easy | flia Hj ].
-    } {
-      now replace (k - i) with (S (k - S i)) in Hkp by flia Hki Hkl.
-    } {
-      cbn in Hkl |-*.
-      flia Hkl Hki.
-    }
-  }
-  destruct (Nat.eq_dec k i) as [Hki| Hki]. {
-    subst k; f_equal; f_equal.
-    now rewrite Nat.sub_diag in Hkp.
-  }
-  exfalso.
-  replace (k - i) with (S (k - S i)) in Hkp by flia Hki Hkl.
-  cbn in Hkp.
-  cbn in Hkl.
-  destruct p as [| b]. {
-    cbn in Hkl.
-    flia Hkl Hki.
-  }
-  cbn in Hkl.
-  specialize (Hbef i) as H1.
-  assert (H : i ≤ i < k) by flia Hkl Hki.
-  specialize (H1 H); clear H.
-  rewrite Nat.sub_diag in H1; cbn in H1.
-  now symmetry in H1.
-}
-Qed.
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
@@ -1260,274 +1018,6 @@ Qed.
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
-
-Theorem bsort_rank_gen_insert : ∀ A B (ord : A → _) (f : B → _) ia lr,
-  bsort_rank_insert ord f ia lr =
-  fst (bsort_gen_insert ord f ia lr).
-Proof.
-intros.
-revert ia.
-induction lr as [| ib]; intros; [ easy | cbn ].
-destruct (ord (f ia) (f ib)); [ easy | ].
-rewrite IHlr.
-now destruct (bsort_gen_insert _ _ _ _).
-Qed.
-
-Theorem bsort_rank_gen_loop : ∀ A (ord : A → _) f lr l,
-  bsort_rank_loop ord f lr l = fst (bsort_gen_loop ord f lr l).
-Proof.
-intros.
-revert lr.
-induction l as [| a]; intros; [ easy | cbn ].
-rewrite IHl.
-rewrite bsort_rank_gen_insert.
-remember (bsort_gen_insert _ _ _ _) as x eqn:Hx; symmetry in Hx.
-destruct x as (lr', n).
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy; symmetry in Hy.
-destruct y as (l'', nl); cbn.
-now rewrite Hy.
-Qed.
-
-Theorem bsort_rank_gen : ∀ A (ord : A → _) l,
-  bsort_rank ord l = fst (bsort_gen ord l).
-Proof.
-intros.
-unfold bsort_rank, bsort_gen.
-destruct l as [| d]; [ easy | ].
-apply bsort_rank_gen_loop.
-Qed.
-
-Theorem snd_bsort_gen_insert_ub : ∀ A B (ord : A → _) (f : B → _) ia lr,
-  snd (bsort_gen_insert ord f ia lr) ≤ length lr.
-Proof.
-intros.
-revert ia.
-induction lr as [| ib]; intros; [ easy | cbn ].
-destruct (ord (f ia) (f ib)); [ easy | ].
-remember (bsort_gen_insert ord f ia lr) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n); cbn.
-apply -> Nat.succ_le_mono.
-specialize (IHlr ia) as H1.
-now rewrite Hx in H1.
-Qed.
-
-Theorem length_snd_bsort_gen_loop : ∀ A (ord : A → _) f lr l,
-  length (snd (bsort_gen_loop ord f lr l)) = length l.
-Proof.
-intros.
-revert lr.
-induction l as [| a]; intros; [ easy | cbn ].
-remember (bsort_gen_insert ord f (length lr) lr) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n).
-remember (bsort_gen_loop ord f lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (l'', nl).
-cbn; f_equal.
-specialize (IHl lr') as H1.
-now rewrite Hy in H1.
-Qed.
-
-Theorem length_fst_bsort_gen_insert : ∀ A B (ord : A → _) (f : B → _) ia lr,
-  length (fst (bsort_gen_insert ord f ia lr)) = S (length lr).
-Proof.
-intros.
-revert ia.
-induction lr as [| ib]; intros; [ easy | cbn ].
-destruct (ord (f ia) (f ib)); [ easy | ].
-remember (bsort_gen_insert ord f ia lr) as x eqn:Hx; symmetry in Hx.
-destruct x as (lr', n); cbn.
-f_equal.
-specialize (IHlr ia) as H1.
-now rewrite Hx in H1.
-Qed.
-
-Theorem in_bsort_gen_insert : ∀ A B (ord : A → _) (f : B → _) ia lr i,
-  i ∈ fst (bsort_gen_insert ord f ia lr) → i ∈ ia :: lr.
-Proof.
-intros * Hi.
-induction lr as [| ib]. {
-  cbn in Hi.
-  destruct Hi as [Hi| Hi]; [ | easy ].
-  now rewrite Hi; left.
-}
-cbn in Hi.
-destruct (ord (f ia) (f ib)); [ easy | ].
-remember (bsort_gen_insert ord f ia lr) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n).
-cbn - [ In ] in Hi, IHlr.
-destruct Hi as [Hi| Hi]; [ now subst i; right; left | ].
-specialize (IHlr Hi).
-destruct IHlr as [H| H]; [ now left | now right; right ].
-Qed.
-
-Theorem snd_bsort_gen_loop_ub : ∀ A (ord : A → _) f lrank l i,
-  (∀ i, i ∈ lrank → i < length lrank)
-  → nth i (snd (bsort_gen_loop ord f lrank l)) 0 ≤ i + length lrank.
-Proof.
-intros * Hi.
-revert lrank i Hi.
-induction l as [| a]; intros; [ now cbn; rewrite match_id | cbn ].
-remember (bsort_gen_insert ord _ (length lrank) lrank) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (lr', n).
-remember (bsort_gen_loop ord _ lr' l) as y eqn:Hy.
-symmetry in Hy.
-destruct y as (lr'', nl).
-cbn - [ nth ].
-destruct i; cbn; [ flia | ].
-specialize (IHl lr' i) as H1.
-rewrite Hy in H1; cbn in H1.
-specialize length_fst_bsort_gen_insert as H2.
-specialize (H2 A nat ord f (length lrank) lrank).
-rewrite Hx in H2; cbn in H2.
-rewrite <- Nat.add_succ_r, <- H2.
-apply H1.
-intros j Hj.
-rewrite H2.
-specialize in_bsort_gen_insert as H3.
-specialize (H3 A nat ord f (length lrank) lrank j).
-rewrite Hx in H3; cbn - [ In ] in H3.
-specialize (H3 Hj).
-destruct H3 as [H3| H3]; [ now subst j | ].
-specialize (Hi j H3).
-flia Hi.
-Qed.
-
-Theorem snd_bsort_gen_ub : ∀ A (ord : A → _) l i,
-  nth i (snd (bsort_gen ord l)) 0 ≤ i.
-Proof.
-intros.
-destruct l as [| d]; [ now cbn; rewrite match_id | ].
-unfold bsort_gen.
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'.
-rename l' into l.
-specialize snd_bsort_gen_loop_ub as H1.
-specialize (H1 A ord (λ j, nth j l d) [] l i).
-rewrite Nat.add_0_r in H1.
-now apply H1.
-Qed.
-
-(* # of transpositions of some permutation p *)
-Definition n_transp p :=
-  nat_∑ (i = 0, length p), ff_app (snd (bsort_gen Nat.leb p)) i.
-(*
-Definition n_transp p :=
-  iter_seq 0 (length p - 1)
-    (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
-Definition n_transp p :=
-  iter_list (seq 0 (length p))
-    (λ c i, c + ff_app (snd (bsort_gen Nat.leb p)) i) 0.
-*)
-
-(*
-Theorem ε_sum_n_transp : ∀ p,
-  ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F.
-Proof.
-(* je veux démontrer ça pour le sport, mais je sens que ça va être
-   du sport ! *)
-intros.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec _ _) as [Hnz| Hnz]. {
-  apply Nat.mod_divides in Hnz; [ | easy ].
-  destruct Hnz as (k, Hn).
-  unfold n_transp in Hn.
-  unfold ε.
-...
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Compute (let p := [12;20;7;9] in
-  ε p = if n_transp p mod 2 =? 0 then 1%F else (-1)%F).
-Compute (map (λ p,
-  Z.eqb (ε p) (if n_transp p mod 2 =? 0 then 1%F else (-1)%F)
-) (canon_sym_gr_list_list 5)).
-Check Z.eqb.
-...
-*)
-
-(*
-Theorem permut_transp_list : ∀ p,
-  is_permut_list p
-  → p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t).
-Proof.
-intros * Hp.
-unfold transp_list.
-unfold iter_list.
-unfold iter_seq, iter_list.
-rewrite Nat.sub_0_r.
-...
-Print bsort_gen_insert.
-Compute (bsort_gen Nat.leb [20;9;12;7]).
-Compute (bsort_gen Nat.leb [20;12;7;9]).
-Print ε.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Compute (let p := [12;20;7;9] in (bsort_gen Nat.leb p, ε p)).
-Compute (let p := [20;12;7;9] in (bsort_gen Nat.leb p, ε p)).
-Compute (let p := [20;9;12;7] in (bsort_gen Nat.leb p, ε p)).
-Compute (let p := [20;9;12;7;5;22;3;0;18] in (bsort_gen Nat.leb p, ε p)).
-Compute (let p := [20;0;12;7;5;22;3;9;18] in (bsort_gen Nat.leb p, ε p)).
-...
-Compute (bsort_gen Nat.leb [12;20;7;9]).
-     = ([2; 3; 0; 1], [0; 1; 0; 1])
-(0-0)+(1-1)+(2-0)+(3-1)=4 transpositions
-12;7;20;9  7;12;20;9  7;12;9;20  7;9;12;20
-map2 (λ a t,
-...
-bsort ord p = f (snd (bsort_gen ord p)) ?
-bsort_rank ord p = f (snd (bsort_gen ord p)) ?
-...
-Compute (bsort_gen Nat.leb [3;2;0;1]).
-Compute (bsort_gen Nat.leb [1;2;0;3]).
-Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 3)).
-Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 5)).
-...
-intros * Hp.
-unfold iter_list.
-remember (length p) as n eqn:Hn; symmetry in Hn.
-revert p Hp Hn.
-induction n; intros. {
-  now apply length_zero_iff_nil in Hn; subst p.
-}
-rewrite seq_S.
-cbn - [ swap ].
-unfold transp_list.
-(* oh putain... *)
-...
-Compute (let p := [3;2;0;1] in
-  p = Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t)).
-Compute (map (λ p,
-  list_eqb Nat.eqb p (Comp (length p) (t ∈ transp_list p), swap (length p) (fst t) (snd t))
-) (canon_sym_gr_list_list 5)).
-...
-Compute (transp_list [20;12;7;9]).
-Compute (transp_list [3;2;0;1]).
-Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
-...
-intros * Hp.
-unfold iter_list.
-remember (length p) as n eqn:Hn; symmetry in Hn.
-revert p Hp Hn.
-induction n; intros. {
-  now apply length_zero_iff_nil in Hn; subst p.
-}
-rewrite seq_S.
-cbn - [ swap ].
-...
-now apply permut_transp_loop.
-...
-Compute
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-Check
-  (map (λ p, list_eqb Nat.eqb p (iter_list (transp_list p) (λ c t, swap (length p) t ° c) (seq 0 (length p))))) (canon_sym_gr_list_list 4).
-...
-...
-enough (Hpt : p = Comp n (t ∈ transp_list p), swap n (fst t) (snd t)).
-*)
 
 Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
 Proof.
@@ -1657,44 +1147,6 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
     rewrite Nat.sub_0_r; flia Hjn.
   }
   rewrite nth_overflow by now rewrite Hr.
-(*
-  now rewrite butn_nil.
-*)
-(*
-  rewrite <- map_butn.
-  rewrite (@List_map_const_is_repeat _ _ 0%F). 2: {
-    intros; apply List_nth_nil.
-  }
-  symmetry.
-  rewrite (@List_map_const_is_repeat _ _ 0%F). 2: {
-    intros; apply List_nth_nil.
-  }
-  f_equal.
-  rewrite butn_length.
-  do 2 rewrite seq_length.
-  rewrite square_matrix_ncols; [ | easy ].
-  cbn - [ "<?" ].
-  rewrite Hr.
-  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
-  rewrite Hk, Nat_sub_succ_1.
-  rewrite square_matrix_ncols. 2: {
-    apply is_square_matrix_map with (n := n). {
-      cbn; rewrite butn_length, Hr; cbn.
-      rewrite Nat.leb_refl; cbn.
-      now rewrite Nat.sub_0_r.
-    }
-    intros la Hla; rewrite butn_length.
-    apply in_butn in Hla.
-    apply is_scm_mat_iff in Hsm.
-    cbn in Hsm.
-    destruct Hsm as (Hcr, Hc).
-    rewrite Hc; [ | easy ].
-    now rewrite Hr, Hk, Nat_sub_succ_1.
-  }
-  cbn; rewrite map_length, butn_length, Hr; cbn.
-  rewrite Nat.leb_refl; cbn.
-  now rewrite Nat.sub_0_r.
-*)
   rewrite map_length, butn_length, Hr.
   cbn - [ nth seq ]; rewrite Nat.leb_refl.
   cbn - [ nth seq ]; rewrite Nat.sub_0_r.
@@ -1711,7 +1163,6 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   f_equal.
   apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
   now rewrite Hk, Nat_sub_succ_1.
-(**)
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
   subst j.
@@ -1785,40 +1236,6 @@ rewrite nth_butn.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
 destruct (le_dec n j) as [H| H]; [ flia Hjn Hjn' H | clear H ].
-(*
-now rewrite Nat.add_0_r.
-*)
-(*
-symmetry.
-rewrite <- map_butn.
-rewrite square_matrix_ncols; [ cbn | easy ].
-rewrite square_matrix_ncols. 2: {
-  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
-  apply is_square_matrix_map with (n := n). {
-    cbn; rewrite butn_length, Hr; cbn.
-    rewrite Nat.leb_refl; cbn.
-    now rewrite Nat.sub_0_r.
-  }
-  intros la Hla; rewrite butn_length.
-  apply in_butn in Hla.
-  apply is_scm_mat_iff in Hsm.
-  cbn in Hsm.
-  destruct Hsm as (Hcr, Hc).
-  rewrite Hc; [ | easy ].
-  now rewrite Hr, Hk, Nat_sub_succ_1.
-}
-cbn; rewrite map_length, butn_length, Hr; cbn.
-rewrite Nat.leb_refl; cbn.
-rewrite Nat.sub_0_r.
-rewrite cons_seq.
-rewrite map_butn_seq.
-apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
-rewrite Hk, Nat_sub_succ_1.
-apply map_ext_in.
-intros u v.
-rewrite Nat.add_0_l, Nat.add_0_r.
-now rewrite nth_butn.
-*)
 rewrite map_length, butn_length, Hr.
 cbn - [ nth seq ]; rewrite Nat.leb_refl.
 cbn - [ nth seq ]; rewrite Nat.sub_0_r.
@@ -1846,8 +1263,8 @@ Qed.
 
 Theorem collapse_iter_list_transp : ∀ l,
   collapse l =
-  iter_list (transp_list l) (λ l t, swap (length l) (fst t) (snd t) ° l)
-    (seq 0 (length l)).
+  iter_list (transp_list (collapse l))
+    (λ l t, swap (length l) (fst t) (snd t) ° l) (seq 0 (length l)).
 Proof.
 intros.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
@@ -1855,121 +1272,29 @@ destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
 }
 unfold iter_list.
 unfold transp_list, iter_seq, iter_list.
-rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | now apply Nat.neq_0_lt_0 ].
-rewrite Nat_sub_succ_1.
-(*
-Theorem glop : ∀ A B C (f : A → B → A) (g : list B → C → list B) a lb lc,
-  fold_left f (fold_left g lc lb) a = a.
-Proof.
-intros.
-...
-(* en fait, je ne sais pas ce que devient lb ; ici, il démarre à [] et
-   se remplit petit à petit *)
-(* pas sûr qu'on puisse fusionner les deux fold_left *)
-*)
-
-(* sort by selection *)
-
-Fixpoint min_in_list {A} (ord : A → A → bool) a la :=
-  match la with
-  | [] => (a, [])
-  | b :: lb =>
-      let (c, lc) := min_in_list ord (if ord a b then a else b) lb in
-      (c, (if ord a b then b else a) :: lc)
-  end.
-
-Fixpoint ssort_loop {A} (ord : A → A → bool) it l :=
-  match it with
-  | 0 => l
-  | S it' =>
-      match l with
-      | [] => []
-      | a :: la =>
-          let (a', la') := min_in_list ord a la in
-          a' :: ssort_loop ord it' la'
-      end
-  end.
-
-Definition ssort {A} (ord : A → _) l := ssort_loop ord (length l) l.
-
-(*
-Compute (ssort Nat.leb [3;2;1;7]).
-Compute (map (λ l, (bsort Nat.leb l, ssort Nat.leb l)) (canon_sym_gr_list_list 4)).
-*)
-
-(* bubble sort *)
-
-Fixpoint bbsort_swap {A} (ord : A → A → bool) it l :=
-  match it with
-  | 0 => (l, 0)
-  | S it' =>
-      match l with
-      | [] | [_] => (l, 0)
-      | a :: b :: l' =>
-          let (l'', exch) :=
-            bbsort_swap ord it' ((if ord a b then b else a) :: l')
-          in
-          if ord a b then (a :: l'', exch)
-          else (b :: l'', S exch)
-      end
-  end.
-
-Fixpoint bbsort_loop {A} (ord : A → A → bool) it l :=
-  match it with
-  | 0 => (l, 0)
-  | S it' =>
-      let (l', exch) := bbsort_swap ord (length l) l in
-      match exch with
-      | 0 => (l', 0)
-      | S _ =>
-          let (l'', exch'') := bbsort_loop ord it' l' in
-          (l'', exch + exch'')
-      end
-  end.
-
-(* ce tri bulles me donne en plus le nombre de transpositions *)
-Definition bbsort {A} (ord : A → _) l := bbsort_loop ord (length l) l.
-
-Compute (let l := [3;2;1;7] in (l, bbsort Nat.leb l)).
-Compute (map (λ l, (l, bbsort Nat.leb l)) (canon_sym_gr_list_list 04)).
-
-...
-rewrite glop.
-specialize glop as H1.
-specialize (H1 nat).
-specialize (H1 (nat * nat)%type).
-specialize (H1 (λ (l0 : list nat) (t : nat * nat), swap (length l0) (fst t) (snd t) ° l0)).
-specialize (H1 (λ (t : list (nat * nat)) (n : nat), t ++ transp_of_pos n (ff_app (snd (bsort_gen Nat.leb l)) n))).
-...
-Print transp_list.
-Print transp_of_pos.
-Search bsort_gen.
-Compute (bsort_gen Nat.leb [3;2;0;1]).
-Compute (bsort_gen Nat.leb [1;2;0;3]).
-Compute (map (λ l, (l, snd (bsort_gen Nat.leb l))) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 3)).
-Compute (map (λ l, (l, bsort_gen Nat.leb l)) (canon_sym_gr_list_list 5)).
-...
-remember (length l) as n eqn:Hn; symmetry in Hn.
-revert l Hn.
-induction n; intros. {
-  now apply length_zero_iff_nil in Hn; subst l.
-}
-rewrite seq_S; cbn.
-Search (fold_left _ _ (_ ++ _)).
-Search (fold_left _ _ _ + _)%F.
-...
-(* ça a l'air bon
-Compute (let p := [2;8;1;7] in
-  collapse p =
+rewrite collapse_length.
+Compute (let p := collapse [2;8;1;7] in
+  p =
   iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
     (seq 0 (length p))).
 Compute (
-map (λ p,
+map (λ p, (
   list_eqb Nat.eqb p
     (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
-      (seq 0 (length p)))) (canon_sym_gr_list_list 5)).
+      (seq 0 (length p))))) (canon_sym_gr_list_list 6)).
+(* y a des false là-dedans ! *)
+(* le nombre d'itérations n'est probablement pas suffisant *)
+...
+Compute (let p := [1;2;0;4;3] in
+  p =
+  iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+    (seq 0 (length p))).
+Compute (let p := [1;2;0;4;3] in transp_list p).
+...
+[2;1;0;4;3]
+[0;1;2;4;3]
+[0;1;2;3;4]
+...
 Compute (
 map (λ p,
   collapse p =
