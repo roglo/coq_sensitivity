@@ -1284,13 +1284,12 @@ rewrite seq_nth; [ | easy ].
 now rewrite transposition_2.
 Qed.
 
+(*
 Theorem transp_loop_enough_iter : ∀ it1 it2 i l,
   2 * length l ≤ it1
   → 2 * length l ≤ it2
   → transp_loop it1 i l = transp_loop it2 i l.
 Proof.
-intros * Hli1 Hli2.
-...
 intros * Hli1 Hli2.
 revert i l it2 Hli1 Hli2.
 induction it1; intros; cbn. {
@@ -1490,6 +1489,7 @@ Theorem glop : ∀ l i j,
   nb_fit 0 (list_swap_elem 0 l 0 (j - i)) < nb_fit 0 l.
 (* ouais, non *)
 ...
+*)
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1522,6 +1522,19 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
     flia Hit Hilt.
   }
+  cbn in Hilt.
+  apply Nat.succ_inj in Hilt.
+  rewrite Nat.add_0_r, Nat.add_succ_r in Hilt.
+  rewrite <- Hilt.
+  cbn - [ list_swap_elem nth seq "=?" ].
+  destruct l as [| j]. {
+    cbn - [ seq ].
+    now rewrite app_nil_r, Nat.add_0_r.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S i) j) as [Hsij| Hsij]. {
+    subst j.
+    rewrite List_length_cons.
 ...
 Compute (let p := [0;1;3;2] in
 let i := 2 in
