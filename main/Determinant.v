@@ -739,7 +739,7 @@ erewrite rngl_summation_eq_compat. 2: {
     split. 2: {
       rewrite List_map_seq_length.
       unfold f.
-      rewrite length_list_swap_elem.
+      rewrite list_swap_elem_length.
       symmetry.
       apply length_canon_sym_gr_list.
     }

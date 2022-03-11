@@ -581,7 +581,7 @@ destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
 easy.
 Qed.
 
-Theorem length_list_swap_elem : ∀ A (d : A) l p q,
+Theorem list_swap_elem_length : ∀ A (d : A) l p q,
   length (list_swap_elem d l p q) = length l.
 Proof.
 intros.
@@ -727,7 +727,7 @@ Theorem list_swap_elem_is_permut : ∀ n σ p q,
   → is_permut n (list_swap_elem 0 σ p q).
 Proof.
 intros * Hp Hq Hσ.
-split; [ | now rewrite length_list_swap_elem; destruct Hσ ].
+split; [ | now rewrite list_swap_elem_length; destruct Hσ ].
 destruct Hσ as (H1, H2).
 rewrite <- H2 in Hp, Hq.
 now apply list_swap_elem_is_permut_list.

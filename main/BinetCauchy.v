@@ -1272,6 +1272,18 @@ Fixpoint first_non_fix_transp i p :=
 Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
 Proof. intros; now destruct it. Qed.
 
+Theorem nth_list_swap_elem : ∀ A (d : A) i j l,
+  i < length l
+  → j < length l
+  → nth j (list_swap_elem d l i j) d = nth i l d.
+Proof.
+intros * Hil Hjl.
+unfold list_swap_elem.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+now rewrite transposition_2.
+Qed.
+
 Theorem transp_loop_enough_iter : ∀ it1 it2 i l,
   2 * length l ≤ it1
   → 2 * length l ≤ it2
@@ -1302,6 +1314,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
 } {
   f_equal.
+...
 Fixpoint nb_fit i l :=
   match l with
   | [] => 0
@@ -1326,7 +1339,7 @@ destruct k. {
     easy.
   }
 ...
-  apply IHit1; rewrite length_list_swap_elem.
+  apply IHit1; rewrite list_swap_elem_length.
 (* ouais bin chais pas *)
 ...
 (* à chaque itération, le nombre de trucs pas à sa place diminue au moins de 1 *)
@@ -1363,7 +1376,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm in Hit |-*.
-...
   destruct (Nat.eq_dec (2 * (S i + length l)) (S it)) as [Hilt| Hilt]. 2: {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
     flia Hit Hilt.
