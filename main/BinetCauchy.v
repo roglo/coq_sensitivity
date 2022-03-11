@@ -1456,11 +1456,6 @@ destruct (Nat.eq_dec i j1) as [Hij1| Hij1]. {
           subst j1.
 ...
 ...
-Fixpoint nb_fit i l :=
-  match l with
-  | [] => 0
-  | j :: l' => nb_fit (S i) l' + if i =? j then 1 else 0
-  end.
 Theorem glop : ∀ l i j,
   i ≠ j
   → nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i)) < nb_fit i l.
@@ -1490,6 +1485,85 @@ Theorem glop : ∀ l i j,
 (* ouais, non *)
 ...
 *)
+
+Fixpoint nb_fit i l :=
+  match l with
+  | [] => 0
+  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
+  end.
+
+Theorem nb_fit_ub : ∀ i l, nb_fit i l ≤ length l.
+Proof.
+intros.
+revert i.
+induction l as [| j]; intros; cbn; [ easy | cbn ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  apply -> Nat.succ_le_mono.
+  apply IHl.
+} {
+  transitivity (length l); [ | apply Nat.le_succ_diag_r ].
+  apply IHl.
+}
+Qed.
+
+Theorem eq_nb_fit_length : ∀ i l,
+  nb_fit i l = length l
+  → l = seq i (length l).
+Proof.
+intros * Hfl.
+revert i Hfl.
+induction l as [| j]; intros; [ easy | cbn ].
+cbn in Hfl.
+rewrite if_eqb_eq_dec in Hfl.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j; f_equal.
+  apply Nat.succ_inj in Hfl.
+  now apply IHl.
+} {
+  cbn in Hfl.
+  specialize (nb_fit_ub (S i) l) as H1.
+  rewrite Hfl in H1.
+  apply Nat.nle_gt in H1.
+  now exfalso; apply H1.
+}
+Qed.
+
+Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → it + nb_fit i l = length l
+  → seq 0 i ++ l =
+    fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l)).
+Proof.
+intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  cbn in Hit.
+  rewrite seq_app; f_equal; cbn.
+  now apply eq_nb_fit_length in Hit.
+}
+destruct l as [| j]; [ easy | ].
+cbn in Hit.
+apply Nat.succ_inj in Hit.
+rewrite if_eqb_eq_dec in Hit |-*.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  rewrite List_length_cons, <- Nat.add_succ_comm.
+...
+  destruct (Nat.eq_dec (it + nb_fit (S i) l) (length l)) as [Hil| Hil]. {
+    apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
+  }
+...
+  destruct (Nat.eq_dec (2 * (S i + length l)) (S it)) as [Hilt| Hilt]. 2: {
+    apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+    flia Hit Hilt.
+  }
+...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1522,6 +1596,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
     flia Hit Hilt.
   }
+Print transp_loop.
 ...
   cbn in Hilt.
   apply Nat.succ_inj in Hilt.
@@ -1536,7 +1611,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct (Nat.eq_dec (S i) j) as [Hsij| Hsij]. {
     subst j.
     rewrite List_length_cons.
-Print transp_loop.
 ...
 Compute (let p := [0;1;3;2] in
 let i := 2 in
