@@ -1558,6 +1558,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
 ...
   destruct (Nat.eq_dec (it + nb_fit (S i) l) (length l)) as [Hil| Hil]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
