@@ -1535,6 +1535,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct (Nat.eq_dec (S i) j) as [Hsij| Hsij]. {
     subst j.
     rewrite List_length_cons.
+Print transp_loop.
 ...
 Compute (let p := [0;1;3;2] in
 let i := 2 in
