@@ -1532,7 +1532,7 @@ Qed.
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
-  → it + nb_fit i l = length l
+  → length l ≤ it + nb_fit i l
   → seq 0 i ++ l =
     fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
       (transp_loop it i l) (seq 0 (i + length l)).
@@ -1542,11 +1542,15 @@ revert l i Hp Hit.
 induction it; intros; cbn. {
   cbn in Hit.
   rewrite seq_app; f_equal; cbn.
+  specialize (nb_fit_ub i l) as H1.
+  apply le_antisym in Hit; [ | easy ].
   now apply eq_nb_fit_length in Hit.
 }
-destruct l as [| j]; [ easy | ].
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
 cbn in Hit.
-apply Nat.succ_inj in Hit.
+apply Nat.succ_le_mono in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
@@ -1554,6 +1558,11 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm.
+...
+  destruct (Nat.eq_dec (it + nb_fit (S i) l) (length l)) as [Hil| Hil]. {
+    apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+...
+  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
 ...
   destruct (Nat.eq_dec (it + nb_fit (S i) l) (length l)) as [Hil| Hil]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
