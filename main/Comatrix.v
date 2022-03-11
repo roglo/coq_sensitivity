@@ -721,7 +721,7 @@ erewrite rngl_summation_eq_compat. 2: {
   specialize (H1 M p j Hsm).
   cbn - [ butn ] in H1.
   rewrite map_length, map_butn, butn_length in H1.
-  rewrite length_list_swap_elem, fold_mat_nrows in H1.
+  rewrite list_swap_elem_length, fold_mat_nrows in H1.
   rewrite butn_length, map_length, fold_mat_nrows in H1.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
   rewrite Hnz in H1; cbn - [ "<?" ] in H1.
