@@ -1290,6 +1290,8 @@ Theorem transp_loop_enough_iter : ∀ it1 it2 i l,
   → transp_loop it1 i l = transp_loop it2 i l.
 Proof.
 intros * Hli1 Hli2.
+...
+intros * Hli1 Hli2.
 revert i l it2 Hli1 Hli2.
 induction it1; intros; cbn. {
   apply Nat.le_0_r, Nat.eq_mul_0 in Hli1.
@@ -1317,6 +1319,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn in Hli1, Hli2.
   rewrite Nat.add_0_r, Nat.add_succ_r in Hli1, Hli2.
   apply Nat.succ_le_mono in Hli1, Hli2.
+...
 Theorem glop : ∀ it1 it2 i j l,
   S (length l + length l) ≤ it1
   →  S (length l + length l) ≤ it2
