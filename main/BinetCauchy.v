@@ -1314,6 +1314,94 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
 } {
   f_equal.
+  cbn in Hli1, Hli2.
+  rewrite Nat.add_0_r, Nat.add_succ_r in Hli1, Hli2.
+  apply Nat.succ_le_mono in Hli1, Hli2.
+  destruct it1; [ easy | ].
+  destruct it2; [ easy | ].
+  apply Nat.succ_le_mono in Hli1, Hli2.
+  cbn - [ list_swap_elem ].
+  remember (list_swap_elem 0 (j :: l) 0 (j - i)) as l1 eqn:Hl1.
+  symmetry in Hl1.
+  destruct l1 as [| j1]; [ easy | ].
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i j1) as [Hij1| Hij1]. {
+    subst j1.
+    destruct it1. {
+      apply Nat.le_0_r, Nat.eq_add_0 in Hli1.
+      destruct Hli1 as (H, _).
+      apply length_zero_iff_nil in H; subst l.
+      cbn - [ nth ] in Hl1.
+      injection Hl1; clear Hl1; intros Hi H; subst l1.
+      now do 2 rewrite transp_loop_nil.
+    }
+    destruct it2. {
+      apply Nat.le_0_r, Nat.eq_add_0 in Hli2.
+      destruct Hli2 as (H, _).
+      apply length_zero_iff_nil in H; subst l.
+      cbn - [ nth ] in Hl1.
+      injection Hl1; clear Hl1; intros Hi H; subst l1.
+      now do 2 rewrite transp_loop_nil.
+    }
+    cbn - [ list_swap_elem "=?" ].
+    destruct l1 as [| j1]; [ easy | ].
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (S i) j1) as [Hsij1| Hsij1]. {
+      subst j1.
+      destruct it1. {
+        apply Nat.le_1_r in Hli1.
+        destruct Hli1 as [H| H]. {
+          apply Nat.eq_add_0 in H.
+          destruct H as (H, _).
+          now apply length_zero_iff_nil in H; subst l.
+        }
+        apply Nat.eq_add_1 in H.
+        destruct H as [H| H]. {
+          now destruct H as (H1, H2); rewrite H1 in H2.
+        } {
+          now destruct H as (H1, H2); rewrite H1 in H2.
+        }
+      }
+      destruct it2. {
+        apply Nat.le_1_r in Hli2.
+        destruct Hli2 as [H| H]. {
+          apply Nat.eq_add_0 in H.
+          destruct H as (H, _).
+          now apply length_zero_iff_nil in H; subst l.
+        }
+        apply Nat.eq_add_1 in H.
+        destruct H as [H| H]. {
+          now destruct H as (H1, H2); rewrite H1 in H2.
+        } {
+          now destruct H as (H1, H2); rewrite H1 in H2.
+        }
+      }
+      cbn - [ list_swap_elem "=?" ].
+      destruct l1 as [| j1]; [ easy | ].
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (S (S i)) j1) as [Hsij1| Hsij1]. {
+        subst j1.
+        destruct it1. {
+          destruct l as [| j1]; [ easy | ].
+          cbn in Hli1.
+          rewrite Nat.add_succ_r in Hli1.
+          do 2 apply Nat.succ_le_mono in Hli1.
+          apply Nat.le_0_r, Nat.eq_add_0 in Hli1.
+          destruct Hli1 as (H, _).
+          now apply length_zero_iff_nil in H; subst l.
+        }
+        destruct it2. {
+          destruct l as [| j1]; [ easy | ].
+          cbn in Hli2.
+          rewrite Nat.add_succ_r in Hli2.
+          do 2 apply Nat.succ_le_mono in Hli2.
+          apply Nat.le_0_r, Nat.eq_add_0 in Hli2.
+          destruct Hli2 as (H, _).
+          now apply length_zero_iff_nil in H; subst l.
+        }
+        cbn - [ list_swap_elem "=?" ].
+        destruct l1 as [| j1]; [ easy | ].
+        do 2 rewrite if_eqb_eq_dec.
 ...
 Fixpoint nb_fit i l :=
   match l with
