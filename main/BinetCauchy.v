@@ -985,7 +985,7 @@ Qed.
 
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
-  | 0 => []
+  | 0 => [(* (42,42) *)]
   | S it' =>
       match p with
       | [] => []
@@ -1269,6 +1269,54 @@ Fixpoint first_non_fix_transp i p :=
       else i
   end.
 
+Fixpoint nb_fit i l :=
+  match l with
+  | [] => 0
+  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
+  end.
+
+(*
+Compute (
+map (λ p, ((*p,*)
+  list_eqb Nat.eqb p
+    (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+      (seq 0 (length p))))) (canon_sym_gr_list_list 4)).
+Print transp_list.
+Compute (
+map (λ p, (p,
+  list_eqb Nat.eqb p
+    (iter_list (transp_loop (length p + 1) 0 p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+      (seq 0 (length p))))) (canon_sym_gr_list_list 6)).
+Compute (let p := [1;2;3;0;5;4] in
+transp_loop (length p + 2) 0 p).
+Compute (let p := [1;2;3;0;5;4] in
+transp_loop (length p + 3) 0 p).
+Compute (let p := [1;2;3;0;5;4] in
+transp_loop (length p + 4) 0 p).
+Compute (let p := [1;2;3;0;5;4] in
+transp_loop (length p + 5) 0 p).
+Compute (let p := [1;2;3;0;5;4] in
+length p - nb_fit 0 p).
+...
+[1; 2; 3; 0; 5; 4]
+213054 1
+312054 2
+012354 3
+012354 0
+012354 1
+012354 2
+012354 3
+012345 5
+012345 4
+012345 5
+...
+[1; 2; 0; 4; 3]
+[2; 0; 1; 4; 3]
+...
+Compute (map (λ l, (l, length l - nb_fit 0 l, transp_list l)) (canon_sym_gr_list_list 4)).
+...
+*)
+
 Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
 Proof. intros; now destruct it. Qed.
 
@@ -1486,12 +1534,6 @@ Theorem glop : ∀ l i j,
 ...
 *)
 
-Fixpoint nb_fit i l :=
-  match l with
-  | [] => 0
-  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
-  end.
-
 Theorem nb_fit_ub : ∀ i l, nb_fit i l ≤ length l.
 Proof.
 intros.
@@ -1532,7 +1574,7 @@ Qed.
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
-  → length l ≤ it + nb_fit i l
+  → length l + length l = it + nb_fit i l
   → seq 0 i ++ l =
     fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
       (transp_loop it i l) (seq 0 (i + length l)).
@@ -1543,6 +1585,8 @@ induction it; intros; cbn. {
   cbn in Hit.
   rewrite seq_app; f_equal; cbn.
   specialize (nb_fit_ub i l) as H1.
+  rewrite <- Hit in H1.
+...
   apply le_antisym in Hit; [ | easy ].
   now apply eq_nb_fit_length in Hit.
 }
