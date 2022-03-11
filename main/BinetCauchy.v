@@ -1586,15 +1586,14 @@ induction it; intros; cbn. {
   rewrite seq_app; f_equal; cbn.
   specialize (nb_fit_ub i l) as H1.
   rewrite <- Hit in H1.
-...
-  apply le_antisym in Hit; [ | easy ].
-  now apply eq_nb_fit_length in Hit.
+  destruct l; [ easy | ].
+  cbn in H1; flia H1.
 }
 destruct l as [| j]. {
   now cbn; rewrite app_nil_r, Nat.add_0_r.
 }
 cbn in Hit.
-apply Nat.succ_le_mono in Hit.
+apply Nat.succ_inj in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
@@ -1603,6 +1602,18 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   rewrite List_length_cons, <- Nat.add_succ_comm.
   apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+  cbn in Hit.
+  do 2 rewrite Nat.add_succ_r in Hit.
+  now apply Nat.succ_inj in Hit.
+} {
+  cbn - [ list_swap_elem ].
+  rewrite seq_length.
+  rewrite comp_1_r; [ | now rewrite swap_length ].
+...
+  unfold swap at 2.
+  specialize (IHit (j :: l) i Hp) as H1.
+  rewrite List_length_cons in H1.
+  cbn in H1.
 ...
   destruct (Nat.eq_dec (it + nb_fit (S i) l) (length l)) as [Hil| Hil]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
