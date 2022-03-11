@@ -1522,6 +1522,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     apply IHit; [ now rewrite seq_S, <- app_assoc | ].
     flia Hit Hilt.
   }
+...
   cbn in Hilt.
   apply Nat.succ_inj in Hilt.
   rewrite Nat.add_0_r, Nat.add_succ_r in Hilt.
