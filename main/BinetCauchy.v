@@ -1606,6 +1606,12 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   do 2 rewrite Nat.add_succ_r in Hit.
   now apply Nat.succ_inj in Hit.
 } {
+  rewrite IHit; [ | easy | ]. 2: {
+    cbn.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+(* et c'est mort *)
+...
   cbn - [ list_swap_elem ].
   rewrite seq_length.
   rewrite comp_1_r; [ | now rewrite swap_length ].
