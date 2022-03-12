@@ -1586,7 +1586,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 Qed.
 
 (* il manque une restriction sur la première hypothèse
-   (∀ a b, f (f a b) b = a) *)
+   (∀ a b, f (f a b) b = a)
 Theorem fold_left_invol_rev : ∀ A B (f : A → B → A) a b l,
   (∀ a b, f (f a b) b = a)
   → fold_left f l a = b
@@ -1601,8 +1601,7 @@ cbn in Hab |-*.
 rewrite (IHl _ _ Hab).
 apply Huv.
 Qed.
-
-...
+*)
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1613,12 +1612,6 @@ Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
 Proof.
 intros * Hp Hit.
 rewrite seq_app; cbn.
-(*
-Search (fold_left _ _ (_ ++ _)).
-Search fold_left.
-rewrite <- fold_left_rev_right.
-Print fold_right.
-*)
 ...
 symmetry.
 rewrite <- (rev_involutive (transp_loop _ _ _)).
