@@ -1600,21 +1600,46 @@ Search fold_left.
 rewrite <- fold_left_rev_right.
 Print fold_right.
 *)
-Theorem glop : ∀ A B (f : A → B → A) a b l,
+Theorem fold_left_invol_rev : ∀ A B (f : A → B → A) a b l,
   (∀ a b, f (f a b) b = a)
   → fold_left f l a = b
   → fold_left f (rev l) b = a.
 Proof.
-intros.
+intros * Huv Hab.
 rewrite <- fold_left_rev_right.
 rewrite rev_involutive.
-...
+revert a b Hab.
+induction l as [| c]; intros; [ easy | ].
+cbn in Hab |-*.
+rewrite (IHl _ _ Hab).
+apply Huv.
+Qed.
 symmetry.
 rewrite <- (rev_involutive (transp_loop _ _ _)).
-apply glop. {
+apply fold_left_invol_rev. {
   clear l Hp Hit.
   intros l t.
   rewrite comp_length.
+  apply List_eq_iff.
+  split; [ now do 2 rewrite comp_length | ].
+  intros d j.
+  unfold "°"; cbn.
+  destruct (lt_dec j (length l)) as [Hjl| Hjl]. 2: {
+    apply Nat.nlt_ge in Hjl.
+    rewrite nth_overflow; [ | now do 2 rewrite map_length ].
+    now rewrite nth_overflow.
+  }
+  rewrite map_map.
+  rewrite (List_map_nth' 0); [ | easy ].
+  unfold ff_app.
+  symmetry.
+  rewrite nth_indep with (d' := 0); [ | easy ].
+  unfold swap, list_swap_elem.
+  rewrite seq_length.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
 ...
 unfold swap.
 unfold list_swap_elem.
