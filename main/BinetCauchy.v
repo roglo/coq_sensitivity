@@ -1595,6 +1595,13 @@ Proof.
 intros * Hp Hit.
 rewrite seq_app; cbn.
 Search (fold_left _ _ (_ ++ _)).
+Search fold_left.
+rewrite <- fold_left_rev_right.
+Print fold_right.
+...
+Theorem glop : ∀ A B (f : A → A → A) a l1 l2,
+  fold_left f l1 a = l2
+  → fold_right (λ b a, f a b) a l2 = l1.
 ...
 intros * Hp Hit.
 revert l i Hp Hit.
