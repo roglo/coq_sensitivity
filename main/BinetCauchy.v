@@ -1585,6 +1585,25 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+(* il manque une restriction sur la première hypothèse
+   (∀ a b, f (f a b) b = a) *)
+Theorem fold_left_invol_rev : ∀ A B (f : A → B → A) a b l,
+  (∀ a b, f (f a b) b = a)
+  → fold_left f l a = b
+  → fold_left f (rev l) b = a.
+Proof.
+intros * Huv Hab.
+rewrite <- fold_left_rev_right.
+rewrite rev_involutive.
+revert a b Hab.
+induction l as [| c]; intros; [ easy | ].
+cbn in Hab |-*.
+rewrite (IHl _ _ Hab).
+apply Huv.
+Qed.
+
+...
+
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1600,31 +1619,17 @@ Search fold_left.
 rewrite <- fold_left_rev_right.
 Print fold_right.
 *)
-Theorem fold_left_invol_rev : ∀ A B (f : A → B → A) a b l,
-  (∀ a b, f (f a b) b = a)
-  → fold_left f l a = b
-  → fold_left f (rev l) b = a.
-Proof.
-intros * Huv Hab.
-rewrite <- fold_left_rev_right.
-rewrite rev_involutive.
-revert a b Hab.
-induction l as [| c]; intros; [ easy | ].
-cbn in Hab |-*.
-rewrite (IHl _ _ Hab).
-apply Huv.
-Qed.
+...
 symmetry.
 rewrite <- (rev_involutive (transp_loop _ _ _)).
 apply fold_left_invol_rev. {
-  clear l Hp Hit.
-  intros l t.
+  intros la t.
   rewrite comp_length.
   apply List_eq_iff.
   split; [ now do 2 rewrite comp_length | ].
   intros d j.
   unfold "°"; cbn.
-  destruct (lt_dec j (length l)) as [Hjl| Hjl]. 2: {
+  destruct (lt_dec j (length la)) as [Hjl| Hjl]. 2: {
     apply Nat.nlt_ge in Hjl.
     rewrite nth_overflow; [ | now do 2 rewrite map_length ].
     now rewrite nth_overflow.
