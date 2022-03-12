@@ -985,7 +985,7 @@ Qed.
 
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
-  | 0 => [(* (42,42) *)]
+  | 0 => [(42,42)]
   | S it' =>
       match p with
       | [] => []
@@ -1019,48 +1019,22 @@ Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
 
-Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
+Theorem swap_id : ∀ n k, swap n k k = seq 0 n.
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  unfold swap, ε; cbn.
-  unfold iter_seq, iter_list; cbn.
-  now do 2 rewrite rngl_mul_1_l.
-}
 unfold swap, list_swap_elem.
-rewrite seq_length.
-unfold ε; cbn - [ "<?" ].
-rewrite List_map_seq_length.
-unfold sign_diff.
-erewrite rngl_product_eq_compat. 2: {
+erewrite map_ext_in. 2: {
+  rewrite seq_length.
   intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    unfold transposition, ff_app.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hnz ].
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hnz ].
-    rewrite (@seq_nth _ _ j); [ | flia Hj Hnz ].
-    rewrite (@seq_nth _ _ i); [ | flia Hi Hnz ].
-    do 2 rewrite Nat.add_0_l.
-    do 2 rewrite fold_transposition.
-    do 2 rewrite transposition_refl.
-    rewrite seq_nth; [ | flia Hj Hnz ].
-    rewrite seq_nth; [ | flia Hi Hnz ].
-    do 2 rewrite Nat.add_0_l.
-    replace (if _ <? _ then _ else _) with 1%F. 2: {
-      symmetry.
-      rewrite if_ltb_lt_dec.
-      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-      now apply Nat.compare_gt_iff in Hij; rewrite Hij.
-    }
-    easy.
-  }
-  easy.
+  apply in_seq in Hi.
+  rewrite transposition_id.
+  now rewrite seq_nth.
 }
-apply all_1_rngl_product_1.
-intros i Hi.
-now apply all_1_rngl_product_1.
+rewrite seq_length.
+induction n; [ easy | ].
+rewrite seq_S; cbn.
+rewrite map_app; cbn; f_equal.
+apply IHn.
 Qed.
 
 Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%F.
@@ -1095,6 +1069,13 @@ erewrite rngl_product_eq_compat. 2: {
 apply all_1_rngl_product_1.
 intros i Hi.
 now apply all_1_rngl_product_1.
+Qed.
+
+Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
+Proof.
+intros.
+rewrite swap_id.
+apply ε_seq.
 Qed.
 
 Theorem is_square_matrix_map : ∀ A B (f : list A → list B) ll n,
@@ -1282,6 +1263,36 @@ map (λ p, ((*p,*)
     (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
       (seq 0 (length p))))) (canon_sym_gr_list_list 4)).
 Print transp_list.
+Compute
+map (λ p, transp_list p) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, transp_loop (length p + length p - nb_fit 0 p) 0 p) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p) 0 p) (0,0)) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0)) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0)) (canon_sym_gr_list_list 5).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p - 2) 0 p) (0,0)) (canon_sym_gr_list_list 6).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0)) (canon_sym_gr_list_list 6).
+Compute
+map (λ p, last (transp_loop (length p + length p - nb_fit 0 p) 0 p) (0,0)) (canon_sym_gr_list_list 6).
+...
+Compute
+map (λ p, (p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0))) (canon_sym_gr_list_list 4).
+Compute (let p := [2; 3; 0; 1] in transp_list p).
+Compute (let p := [2; 3; 0; 1] in
+(length p + length p - nb_fit 0 p - 1,
+transp_loop (length p + length p - nb_fit 0 p - 1) 0 p)).
+...
+Compute (let p := [2; 3; 0; 1] in
+(length p + length p - nb_fit 0 p - 2,
+transp_loop (length p + length p - nb_fit 0 p - 2) 0 p)).
+...
 Compute (
 map (λ p, (p,
   list_eqb Nat.eqb p
@@ -1317,8 +1328,10 @@ Compute (map (λ l, (l, length l - nb_fit 0 l, transp_list l)) (canon_sym_gr_lis
 ...
 *)
 
+(*
 Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
 Proof. intros; now destruct it. Qed.
+*)
 
 Theorem nth_list_swap_elem : ∀ A (d : A) i j l,
   i < length l
@@ -1518,7 +1531,7 @@ destruct k. {
   erewrite map_ext_in. 2: {
     intros n Hn.
     apply in_seq in Hn.
-    rewrite transposition_refl.
+    rewrite transposition_id.
     replace n with (S (n - 1)) at 1 by flia Hn.
     easy.
   }
@@ -1586,7 +1599,12 @@ induction it; intros; cbn. {
   rewrite seq_app; f_equal; cbn.
   specialize (nb_fit_ub i l) as H1.
   rewrite <- Hit in H1.
-  destruct l; [ easy | ].
+  destruct l as [| j]. {
+    cbn.
+    rewrite app_nil_r, seq_length.
+    rewrite swap_id.
+    symmetry; apply comp_1_r, seq_length.
+  }
   cbn in H1; flia H1.
 }
 destruct l as [| j]. {
