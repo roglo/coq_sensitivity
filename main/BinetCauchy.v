@@ -1632,6 +1632,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct k. {
     (* should work since it contradicts Hij Hk and Hp *)
 *)
+  cbn - [ list_swap_elem ].
+  rewrite seq_length.
+  rewrite comp_1_r; [ | now rewrite swap_length ].
+...
   rewrite IHit; [ | easy | ]. 2: {
     cbn.
     rewrite if_eqb_eq_dec.
