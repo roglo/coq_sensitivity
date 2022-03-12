@@ -1594,14 +1594,34 @@ Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
 Proof.
 intros * Hp Hit.
 rewrite seq_app; cbn.
+(*
 Search (fold_left _ _ (_ ++ _)).
 Search fold_left.
 rewrite <- fold_left_rev_right.
 Print fold_right.
+*)
+Theorem glop : ∀ A B (f : A → B → A) a b l,
+  (∀ a b, f (f a b) b = a)
+  → fold_left f l a = b
+  → fold_left f (rev l) b = a.
+Proof.
+intros.
+rewrite <- fold_left_rev_right.
+rewrite rev_involutive.
 ...
-Theorem glop : ∀ A B (f : A → A → A) a l1 l2,
-  fold_left f l1 a = l2
-  → fold_right (λ b a, f a b) a l2 = l1.
+symmetry.
+rewrite <- (rev_involutive (transp_loop _ _ _)).
+apply glop. {
+  clear l Hp Hit.
+  intros l t.
+  rewrite comp_length.
+...
+unfold swap.
+unfold list_swap_elem.
+rewrite seq_length.
+rewrite <- list_comp_assoc.
+  specialize swap_length as H1.
+  specialize (H1 (length l) (fst t) (snd t)).
 ...
 intros * Hp Hit.
 revert l i Hp Hit.
