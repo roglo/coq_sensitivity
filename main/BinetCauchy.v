@@ -1593,6 +1593,10 @@ Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
       (transp_loop it i l) (seq 0 (i + length l)).
 Proof.
 intros * Hp Hit.
+rewrite seq_app; cbn.
+Search (fold_left _ _ (_ ++ _)).
+...
+intros * Hp Hit.
 revert l i Hp Hit.
 induction it; intros; cbn. {
   cbn in Hit.
