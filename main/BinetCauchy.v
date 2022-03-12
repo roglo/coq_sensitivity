@@ -1624,6 +1624,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   do 2 rewrite Nat.add_succ_r in Hit.
   now apply Nat.succ_inj in Hit.
 } {
+(*
+  specialize (IHit (map (λ k, k - i) (j :: l)) 0) as H1.
+  rewrite map_length in H1.
+  cbn in H1.
+  remember (j - i) as k eqn:Hk; symmetry in Hk.
+  destruct k. {
+    (* should work since it contradicts Hij Hk and Hp *)
+*)
   rewrite IHit; [ | easy | ]. 2: {
     cbn.
     rewrite if_eqb_eq_dec.
