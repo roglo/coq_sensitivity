@@ -1603,6 +1603,7 @@ apply Huv.
 Qed.
 *)
 
+(*
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1681,6 +1682,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
 ...
+*)
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1689,6 +1691,7 @@ Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
     fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
       (transp_loop it i l) (seq 0 (i + length l)).
 Proof.
+(*
 intros * Hp Hit.
 rewrite seq_app; cbn.
 symmetry.
@@ -1725,6 +1728,7 @@ rewrite <- list_comp_assoc.
   specialize swap_length as H1.
   specialize (H1 (length l) (fst t) (snd t)).
 ...
+*)
 intros * Hp Hit.
 revert l i Hp Hit.
 induction it; intros; cbn. {
@@ -1768,7 +1772,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ list_swap_elem ].
   rewrite seq_length.
   rewrite comp_1_r; [ | now rewrite swap_length ].
-...
   rewrite IHit; [ | easy | ]. 2: {
     cbn.
     rewrite if_eqb_eq_dec.
