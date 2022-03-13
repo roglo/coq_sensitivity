@@ -1611,46 +1611,46 @@ Theorem fold_right_transp_loop : ∀ l it i,
     seq 0 (i + length l).
 Proof.
 intros * Hp Hit.
+(*
+Compute (let p := [1;2;3;0;5;4] in
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + length l - nb_fit i l in
+  fold_right
+    (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+).
+Compute (map (λ p,
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + length l - nb_fit i l in
+  fold_right
+    (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+) (canon_sym_gr_list_list 4)
+).
+*)
 revert l i Hp Hit.
 induction it; intros; cbn. {
   cbn in Hit.
+  specialize (nb_fit_ub i l) as H1.
+  rewrite <- Hit in H1.
+  destruct l; [ | cbn in H1; flia H1 ].
+  clear Hp Hit H1; cbn.
+  rewrite app_nil_r, Nat.add_0_r.
+  do 2 rewrite seq_length.
   unfold ff_app.
-  rewrite seq_length, app_length, seq_length.
   erewrite map_ext_in. 2: {
     intros j Hj.
-    destruct Hp as (Hpp, Hpl).
-    rewrite app_length, seq_length in Hpp.
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply Hpp.
-    }
+    apply in_seq in Hj.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
     rewrite transposition_id.
-    rewrite seq_nth. 2: {
-      rewrite seq_nth; [ | now apply Hpp ].
-      apply in_app_iff in Hj.
-      destruct Hj as [Hj| Hj]. {
-        apply in_seq in Hj; flia Hj.
-      } {
-        now apply Hpp, in_or_app; right.
-      }
-    }
-    rewrite seq_nth; [ | now apply Hpp ].
+    rewrite seq_nth; [ | now rewrite seq_nth ].
+    rewrite seq_nth; [ | easy ].
     do 2 rewrite Nat.add_0_l.
     easy.
   }
-  rewrite map_id, seq_app.
-  f_equal; cbn.
-...
-  rewrite seq_app; f_equal; cbn.
-  specialize (nb_fit_ub i l) as H1.
-  rewrite <- Hit in H1.
-  destruct l as [| j]. {
-    cbn.
-    rewrite app_nil_r, seq_length.
-    rewrite swap_id.
-    symmetry; apply comp_1_r, seq_length.
-  }
-  cbn in H1; flia H1.
+  apply map_id.
 }
 destruct l as [| j]. {
   now cbn; rewrite app_nil_r, Nat.add_0_r.
@@ -1669,6 +1669,17 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   do 2 rewrite Nat.add_succ_r in Hit.
   now apply Nat.succ_inj in Hit.
 } {
+  cbn - [ list_swap_elem ].
+  specialize (IHit (j :: l) i Hp) as H1.
+  cbn in H1.
+  apply Nat.eqb_neq in Hij.
+  rewrite Hij in H1.
+(* marche pas non plus *)
+...
+  rewrite IHit; [ | easy | ]. 2: {
+    cbn.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
