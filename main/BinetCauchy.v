@@ -1611,6 +1611,64 @@ Theorem fold_right_transp_loop : ∀ l it i,
     seq 0 (i + length l).
 Proof.
 intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  cbn in Hit.
+  unfold ff_app.
+  rewrite seq_length, app_length, seq_length.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    destruct Hp as (Hpp, Hpl).
+    rewrite app_length, seq_length in Hpp.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      now apply Hpp.
+    }
+    rewrite transposition_id.
+    rewrite seq_nth. 2: {
+      rewrite seq_nth; [ | now apply Hpp ].
+      apply in_app_iff in Hj.
+      destruct Hj as [Hj| Hj]. {
+        apply in_seq in Hj; flia Hj.
+      } {
+        now apply Hpp, in_or_app; right.
+      }
+    }
+    rewrite seq_nth; [ | now apply Hpp ].
+    do 2 rewrite Nat.add_0_l.
+    easy.
+  }
+  rewrite map_id, seq_app.
+  f_equal; cbn.
+...
+  rewrite seq_app; f_equal; cbn.
+  specialize (nb_fit_ub i l) as H1.
+  rewrite <- Hit in H1.
+  destruct l as [| j]. {
+    cbn.
+    rewrite app_nil_r, seq_length.
+    rewrite swap_id.
+    symmetry; apply comp_1_r, seq_length.
+  }
+  cbn in H1; flia H1.
+}
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
+cbn in Hit.
+apply Nat.succ_inj in Hit.
+rewrite if_eqb_eq_dec in Hit |-*.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  rewrite List_length_cons, <- Nat.add_succ_comm.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+  cbn in Hit.
+  do 2 rewrite Nat.add_succ_r in Hit.
+  now apply Nat.succ_inj in Hit.
+} {
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
@@ -1624,8 +1682,8 @@ intros * Hp Hit.
 rewrite seq_app; cbn.
 symmetry.
 rewrite <- (rev_involutive (transp_loop _ _ _)).
-apply fold_left_invol_rev. {
 ...
+apply fold_left_invol_rev. {
   intros la t.
   rewrite comp_length.
   apply List_eq_iff.
