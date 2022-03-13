@@ -1603,7 +1603,7 @@ apply Huv.
 Qed.
 *)
 
-(**)
+(*
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1786,6 +1786,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ list_swap_elem ].
   rewrite seq_length.
   rewrite comp_1_r; [ | now rewrite swap_length ].
+(**)
+  specialize (IHit ((list_swap_elem 0 (j :: l) 0 (j - i)))) as H1.
+  rewrite list_swap_elem_length in H1.
+  rewrite List_length_cons in H1.
 ...
   rewrite IHit; [ | easy | ]. 2: {
     cbn.
