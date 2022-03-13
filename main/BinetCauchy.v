@@ -1603,7 +1603,7 @@ apply Huv.
 Qed.
 *)
 
-(*
+(**)
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1671,6 +1671,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now apply Nat.succ_inj in Hit.
 } {
   cbn - [ list_swap_elem ].
+(**)
+  specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
+  rewrite list_swap_elem_length in H1.
+  cbn - [ list_swap_elem ] in H1.
+  assert
+    (H :
+       S (length l + S (length l)) =
+       it + nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i))). {
+    unfold list_swap_elem.
+    cbn - [ nth ].
+...
+    rewrite List_length_cons, seq_S; cbn - [ nth ].
+    cbn - [ list_swap_elem ].
+...
   specialize (IHit (j :: l) i Hp) as H1.
   cbn in H1.
   apply Nat.eqb_neq in Hij.
@@ -1772,6 +1786,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ list_swap_elem ].
   rewrite seq_length.
   rewrite comp_1_r; [ | now rewrite swap_length ].
+...
   rewrite IHit; [ | easy | ]. 2: {
     cbn.
     rewrite if_eqb_eq_dec.
