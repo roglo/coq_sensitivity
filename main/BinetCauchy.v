@@ -1692,6 +1692,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 set (f := λ (t : nat * nat) (l : list nat), swap (length l) (fst t) (snd t) ° l) in H1 |-*.
 set (u := transp_loop it i (list_swap_elem 0 (j :: l) 0 (j - i))) in H1 |-*.
   rewrite <- H1.
+  replace (length _) with (length (seq 0 i ++ j :: l)). 2: {
+    unfold f, u.
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
