@@ -1603,6 +1603,16 @@ apply Huv.
 Qed.
 *)
 
+Theorem fold_right_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → length l + length l = it + nb_fit i l
+  → fold_right (λ t l, swap (length l) (fst t) (snd t) ° l)
+      (seq 0 i ++ l) (transp_loop it i l) =
+    seq 0 (i + length l).
+Proof.
+intros * Hp Hit.
+...
+
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1612,10 +1622,10 @@ Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
 Proof.
 intros * Hp Hit.
 rewrite seq_app; cbn.
-...
 symmetry.
 rewrite <- (rev_involutive (transp_loop _ _ _)).
 apply fold_left_invol_rev. {
+...
   intros la t.
   rewrite comp_length.
   apply List_eq_iff.
