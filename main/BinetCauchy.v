@@ -1067,7 +1067,33 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   subst j.
   destruct l as [| j]; [ easy | ].
-  cbn in Hij; subst j.
+  cbn in Hit, Hij; subst j.
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit (tl (i :: l)) (S i)) as H1.
+  cbn - [ seq ] in H1.
+  rewrite seq_S in H1.
+  rewrite <- app_assoc in H1.
+  specialize (H1 Hp Hit).
+  cbn - [ seq ] in H1.
+  rewrite List_length_cons, Nat.add_succ_r.
+  apply H1.
+} {
+  cbn.
+  destruct l as [| k]; [ easy | ].
+  replace j with (S (j - 1)) in Hij by flia Hjz.
+  cbn in Hit, Hij.
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit (tl (replace_at j (k :: l) (hd 0 (k :: l))))) as H1.
+  specialize (H1 (S i)).
+  cbn - [ seq ] in H1.
+  assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
+    replace j with (S (j - 1)) by flia Hjz.
+Search replace_at.
+Print replace_at.
+    cbn - [ seq ].
+...
+  replace (0 :: 
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i)) in Hp.
 ...
   destruct l as [| j]. {
     now rewrite app_nil_r, Nat.add_0_r.
