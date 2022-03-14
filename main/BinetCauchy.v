@@ -983,6 +983,143 @@ apply determinant_alternating; [ easy | easy | | | ]. {
 now apply mat_select_rows_is_square.
 Qed.
 
+Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
+
+Fixpoint first_non_fix_transp i p :=
+  match p with
+  | [] => i
+  | j :: l =>
+      if i =? j then first_non_fix_transp (S i) l
+      else i
+  end.
+
+Fixpoint transp_loop it i (p : list nat) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match List_rank (Nat.eqb i) p with
+      | None => []
+      | Some j =>
+          if j =? 0 then transp_loop it' (S i) (tl p)
+          else
+            (i, i + j) :: transp_loop it' (S i) (tl (replace_at j p (hd 0 p)))
+      end
+  end.
+
+Definition transp_list p := transp_loop (length p) 0 p.
+
+(*
+Compute (transp_list [3;2;0;1]).
+Compute (map (λ l, (l, transp_list l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, last (transp_list l) (0, 0)) (canon_sym_gr_list_list 5)).
+Compute (transp_list [20;12;7;9]).
+Compute (transp_list (collapse [20;12;7;9])).
+Compute (transp_list [3;2;0;1]).
+Compute (
+map (λ p, ((*p,*)
+  list_eqb Nat.eqb p
+    (iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
+      (seq 0 (length p))))) (canon_sym_gr_list_list 4)).
+Compute (let p := [1;2;3;0;5;4] in
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l in
+  fold_right
+    (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+).
+Compute (map (λ p,
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l in
+  fold_right
+    (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+) (canon_sym_gr_list_list 4)
+).
+*)
+
+Theorem fold_right_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → length l ≤ it
+  → fold_right (λ t l, swap (length l) (fst t) (snd t) ° l)
+      (seq 0 i ++ l) (transp_loop it i l) =
+    seq 0 (i + length l).
+Proof.
+intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  now rewrite app_nil_r, Nat.add_0_r.
+}
+remember (List_rank (Nat.eqb i) l) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]. 2: {
+  specialize (List_rank_None 0 _ _ Hj) as H1; cbn.
+  exfalso.
+  clear - Hp H1.
+  admit. (* devrait le faire *)
+}
+apply List_rank_Some with (d := 0) in Hj.
+destruct Hj as (Hjl & Hbef & Hij).
+apply Nat.eqb_eq in Hij.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
+  subst j.
+  destruct l as [| j]; [ easy | ].
+  cbn in Hij; subst j.
+...
+  destruct l as [| j]. {
+    now rewrite app_nil_r, Nat.add_0_r.
+  }
+...
+  specialize (H1 0 (Nat.lt_0_succ _)); cbn in H1.
+...
+apply List_rank_None in Hj.
+...
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
+cbn in Hit.
+apply Nat.succ_inj in Hit.
+rewrite if_eqb_eq_dec in Hit |-*.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  rewrite List_length_cons, <- Nat.add_succ_comm.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+  cbn in Hit.
+  do 2 rewrite Nat.add_succ_r in Hit.
+  now apply Nat.succ_inj in Hit.
+} {
+  cbn - [ list_swap_elem ].
+(**)
+  specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
+  rewrite list_swap_elem_length in H1.
+  cbn - [ list_swap_elem ] in H1.
+  assert
+    (H : is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i))). {
+    admit.
+  }
+  specialize (H1 H); clear H.
+  assert
+    (H :
+       S (length l + S (length l)) =
+       it + nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i))). {
+    unfold list_swap_elem.
+    cbn - [ nth ].
+    admit.
+  }
+  specialize (H1 H); clear H.
+set (f := λ (t : nat * nat) (l : list nat), swap (length l) (fst t) (snd t) ° l) in H1 |-*.
+set (u := transp_loop it i (list_swap_elem 0 (j :: l) 0 (j - i))) in H1 |-*.
+  rewrite <- H1.
+  replace (length _) with (length (seq 0 i ++ j :: l)). 2: {
+    unfold f, u.
+...
+
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => [(42,42)]
@@ -1004,8 +1141,6 @@ Compute (transp_list [20;12;7;9]).
 Compute (transp_list (collapse [20;12;7;9])).
 Compute (transp_list [3;2;0;1]).
 *)
-
-Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
 Theorem swap_length : ∀ n p q, length (swap n p q) = n.
 Proof.
@@ -1241,14 +1376,6 @@ revert ll.
 induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
-
-Fixpoint first_non_fix_transp i p :=
-  match p with
-  | [] => i
-  | j :: l =>
-      if i =? j then first_non_fix_transp (S i) l
-      else i
-  end.
 
 Fixpoint nb_fit i l :=
   match l with
