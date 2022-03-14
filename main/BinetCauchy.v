@@ -1092,14 +1092,21 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
     admit. (* devrait le faire, j'espère *)
   }
   specialize (H1 H); clear H.
-  assert (H : length (tl (replace_at j (k :: l) k)) ≤ it). {
+  assert (Hr : length (tl (replace_at j (k :: l) k)) = length l). {
     destruct j; [ easy | ].
     cbn in Hjl; apply Nat.succ_lt_mono in Hjl.
     rewrite replace_at_succ_cons; cbn.
-    now rewrite length_replace_at.
+    now apply length_replace_at.
   }
-...
+  assert (H : length (tl (replace_at j (k :: l) k)) ≤ it) by now rewrite Hr.
   specialize (H1 H); clear H.
+  rewrite Hr in H1.
+  cbn.
+  destruct j; [ easy | ].
+  rewrite replace_at_succ_cons in H1.
+  rewrite replace_at_succ_cons.
+  cbn - [ seq  ] in H1.
+  cbn.
 ...
 
 Fixpoint transp_loop it i (p : list nat) :=
