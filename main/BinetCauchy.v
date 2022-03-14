@@ -1088,67 +1088,11 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   cbn - [ seq ] in H1.
   assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
     replace j with (S (j - 1)) by flia Hjz.
-Search replace_at.
-...
-rewrite replace_at_succ_cons.
-Print replace_at.
-Search (firstn (S _)).
-unfold replace_at.
-rewrite firstn_cons.
-    cbn - [ seq ].
-...
-  replace (0 :: 
-  replace (seq 0 i ++ i :: l) with (seq 0 (S i)) in Hp.
-...
-  destruct l as [| j]. {
-    now rewrite app_nil_r, Nat.add_0_r.
-  }
-...
-  specialize (H1 0 (Nat.lt_0_succ _)); cbn in H1.
-...
-apply List_rank_None in Hj.
-...
-destruct l as [| j]. {
-  now cbn; rewrite app_nil_r, Nat.add_0_r.
-}
-cbn in Hit.
-apply Nat.succ_inj in Hit.
-rewrite if_eqb_eq_dec in Hit |-*.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j.
-  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
-    now rewrite seq_S, <- app_assoc.
-  }
-  rewrite List_length_cons, <- Nat.add_succ_comm.
-  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
-  cbn in Hit.
-  do 2 rewrite Nat.add_succ_r in Hit.
-  now apply Nat.succ_inj in Hit.
-} {
-  cbn - [ list_swap_elem ].
-(**)
-  specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
-  rewrite list_swap_elem_length in H1.
-  cbn - [ list_swap_elem ] in H1.
-  assert
-    (H : is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i))). {
-    admit.
+    rewrite replace_at_succ_cons; cbn - [ seq ].
+    admit. (* devrait le faire, j'espère *)
   }
   specialize (H1 H); clear H.
-  assert
-    (H :
-       S (length l + S (length l)) =
-       it + nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i))). {
-    unfold list_swap_elem.
-    cbn - [ nth ].
-    admit.
-  }
-  specialize (H1 H); clear H.
-set (f := λ (t : nat * nat) (l : list nat), swap (length l) (fst t) (snd t) ° l) in H1 |-*.
-set (u := transp_loop it i (list_swap_elem 0 (j :: l) 0 (j - i))) in H1 |-*.
-  rewrite <- H1.
-  replace (length _) with (length (seq 0 i ++ j :: l)). 2: {
-    unfold f, u.
+  assert (H : length (tl (replace_at j (k :: l) k)) ≤ it). {
 ...
 
 Fixpoint transp_loop it i (p : list nat) :=
