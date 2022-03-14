@@ -1089,7 +1089,12 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
     replace j with (S (j - 1)) by flia Hjz.
 Search replace_at.
+...
+rewrite replace_at_succ_cons.
 Print replace_at.
+Search (firstn (S _)).
+unfold replace_at.
+rewrite firstn_cons.
     cbn - [ seq ].
 ...
   replace (0 :: 

@@ -1190,6 +1190,10 @@ rewrite List_length_cons, skipn_length.
 flia Hkla.
 Qed.
 
+Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
+  replace_at (S i) (a :: l) b = a :: replace_at i l b.
+Proof. easy. Qed.
+
 (* end replace_at *)
 
 (* repeat_apply: applying a function n times *)
