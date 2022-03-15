@@ -1239,7 +1239,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
 
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
-  | 0 => [(42,42)]
+  | 0 => [(* (42,42) *)]
   | S it' =>
       match p with
       | [] => []
@@ -1839,7 +1839,53 @@ apply Huv.
 Qed.
 *)
 
-(**)
+Theorem transp_loop_seq : ∀ it sta len,
+  transp_loop it sta (seq sta len) = [].
+Proof.
+intros.
+revert sta len.
+induction it; intros; cbn; [ easy | ].
+destruct len; [ easy | cbn ].
+rewrite Nat.eqb_refl.
+apply IHit.
+Qed.
+
+Theorem transp_loop_app_seq : ∀ it i la,
+  transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la).
+Proof.
+intros.
+revert i la.
+induction it; intros. {
+  cbn.
+  remember 0 as j in |-*; clear Heqj.
+  revert j la.
+  induction i; intros; [ easy | cbn ].
+  rewrite Nat.eqb_refl.
+  apply IHi.
+}
+cbn - [ seq "=?" ].
+destruct la as [| a]. {
+  rewrite app_nil_r.
+  destruct i; [ easy | cbn ].
+  symmetry; apply transp_loop_seq.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+  subst a.
+  replace (seq 0 i ++ i :: la) with (seq 0 (S i) ++ la). 2: {
+    now rewrite seq_S, Nat.add_0_l, <- app_assoc.
+  }
+  cbn.
+  rewrite IHit.
+  now rewrite Nat.add_succ_r; cbn.
+}
+remember (seq 0 i ++ a :: la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; [ now destruct i | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec 0 b) as [Hbz| Hbz]. {
+  subst b.
+...
+
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -1874,7 +1920,8 @@ induction it; intros; cbn. {
   rewrite <- Hit in H1.
   destruct l; [ | cbn in H1; flia H1 ].
   clear Hp Hit H1; cbn.
-  rewrite app_nil_r, Nat.add_0_r.
+  now rewrite app_nil_r, Nat.add_0_r.
+(*
   do 2 rewrite seq_length.
   unfold ff_app.
   erewrite map_ext_in. 2: {
@@ -1888,6 +1935,7 @@ induction it; intros; cbn. {
     easy.
   }
   apply map_id.
+*)
 }
 destruct l as [| j]. {
   now cbn; rewrite app_nil_r, Nat.add_0_r.
@@ -1936,38 +1984,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   move g before f; move la before g.
   move Hij at bottom.
 Print list_swap_elem.
-Theorem transp_loop_app_seq : ∀ it i la,
-  transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la).
-Proof.
-intros.
-(*
-Compute (
-  let la := collapse [1;3;7;2;15;6] in
-  let i := 1 in
-  let it := length la in
-(la,
-    transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la)
-,
-  list_eqb (pair_eqb Nat.eqb) (transp_loop it i la)
-    (transp_loop (it + i) 0 (seq 0 i ++ la)))
-).
-Print transp_loop.
-...
-*)
-revert i la.
-induction it; intros. {
-  cbn.
-  remember 42 as q.
-  remember 0 as j in |-*; clear Heqj; subst q.
-  revert j la.
-  induction i; intros; [ easy | cbn ].
-  rewrite Nat.eqb_refl.
-  apply IHi.
-}
-cbn - [ "=?" ].
-destruct la as [| a]. {
-  rewrite app_nil_r.
-  destruct i; [ easy | ].
+Inspect 1.
 ...
   destruct it. {
     cbn in Hit.
