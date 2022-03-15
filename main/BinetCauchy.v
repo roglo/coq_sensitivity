@@ -1935,6 +1935,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
   move Hij at bottom.
+  destruct it; cbn. {
+    rewrite Hg; cbn.
+    do 2 rewrite app_length, seq_length.
+    rewrite Hf.
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
