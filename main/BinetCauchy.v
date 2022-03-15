@@ -1192,7 +1192,6 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   cbn.
   rewrite List_length_fold_right; [ | now intros; rewrite comp_length ].
   rewrite app_length, seq_length.
-...
   destruct l as [| k]; [ easy | ].
   replace j with (S (j - 1)) in Hij by flia Hjz.
   cbn in Hit, Hij.
