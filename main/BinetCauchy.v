@@ -1935,10 +1935,40 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
   move Hij at bottom.
-  destruct it; cbn. {
-    rewrite Hg; cbn.
-    do 2 rewrite app_length, seq_length.
-    rewrite Hf.
+  destruct it. {
+    cbn in Hit.
+    specialize (nb_fit_ub (S i) l) as H1.
+    rewrite <- Hit in H1.
+    flia H1.
+  }
+  destruct it. {
+    cbn in Hit.
+    specialize (nb_fit_ub (S i) l) as H1.
+    rewrite Nat.add_succ_r in Hit.
+    apply Nat.succ_inj in Hit.
+    rewrite <- Hit in H1.
+    destruct l; [ | cbn in H1; flia H1 ].
+    destruct Hp as (Hpp, Hpl).
+    rewrite app_length, seq_length in Hpp.
+    cbn in Hpp.
+    specialize (Hpp j) as H2.
+    assert (H : j ∈ seq 0 i ++ [j]). {
+      apply in_app_iff.
+      now right; left.
+    }
+    specialize (H2 H); clear H.
+    specialize (NoDup_nat _ Hpl i j) as H3.
+    rewrite app_length, seq_length in H3.
+    cbn in H3.
+    assert (H : i < i + 1) by flia.
+    specialize (H3 H H2); clear H.
+    unfold ff_app in H3.
+    rewrite app_nth2 in H3; [ | now rewrite seq_length; unfold ge ].
+    rewrite seq_length, Nat.sub_diag in H3; cbn in H3.
+    rewrite app_nth1 in H3; [ | rewrite seq_length; flia Hij H2 ].
+    rewrite seq_nth in H3; [ | flia Hij H2 ].
+    now specialize (H3 eq_refl).
+  }
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
