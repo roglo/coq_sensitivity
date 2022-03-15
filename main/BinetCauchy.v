@@ -1935,6 +1935,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
   move Hij at bottom.
+...
   destruct it. {
     cbn in Hit.
     specialize (nb_fit_ub (S i) l) as H1.
