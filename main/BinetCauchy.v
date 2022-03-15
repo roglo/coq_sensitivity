@@ -1001,6 +1001,7 @@ Fixpoint first_non_fix_transp i p :=
       else i
   end.
 
+(*
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => []
@@ -1015,6 +1016,7 @@ Fixpoint transp_loop it i (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (length p) 0 p.
+*)
 
 (*
 Compute (transp_list [3;2;0;1]).
@@ -1138,6 +1140,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
 ...
 *)
 
+(*
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l ≤ it
@@ -1232,17 +1235,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   move g before f; move lb before g.
   move Hij at bottom.
 ...
-Theorem List_map_fold_right : ∀ A B f g (la1 la2 : list A) (lb : list B),
-  map f (fold_right g (la1 ++ la2) lb) =
-  fold_right g (la1 ++ map f (fold_right g la2 lb)).
-
-Proof.
-intros.
-induction lb as [| b]; [ easy | cbn ].
-destruct lb as [| b1]; cbn.
-...
-rewrite List_map_fold_right.
-...
+*)
 
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
@@ -1914,7 +1907,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now apply Nat.succ_inj in Hit.
 } {
   cbn - [ list_swap_elem ].
-(**)
+  rewrite List_length_fold_right by now intros; rewrite comp_length.
   specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
   rewrite list_swap_elem_length in H1.
   cbn - [ list_swap_elem ] in H1.
@@ -1932,11 +1925,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     admit.
   }
   specialize (H1 H); clear H.
-set (f := λ (t : nat * nat) (l : list nat), swap (length l) (fst t) (snd t) ° l) in H1 |-*.
-set (u := transp_loop it i (list_swap_elem 0 (j :: l) 0 (j - i))) in H1 |-*.
-  rewrite <- H1.
-  replace (length _) with (length (seq 0 i ++ j :: l)). 2: {
-    unfold f, u.
+  rewrite app_length, seq_length, List_length_cons.
+  rewrite <- H1; clear H1.
+  unfold "°"; cbn - [ seq ].
+  rewrite Nat.add_succ_r.
+  remember (ff_app (swap (S (i + length l)) i j)) as f eqn:Hf.
+  remember (λ t l, map (ff_app (swap (length l) (fst t) (snd t))) l) as g
+    eqn:Hg.
+  remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
+  move g before f; move la before g.
+  move Hij at bottom.
 ...
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
