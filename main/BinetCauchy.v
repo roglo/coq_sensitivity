@@ -1935,6 +1935,18 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
   move Hij at bottom.
+Print list_swap_elem.
+(* à voir s'il ne faut pas, ci-dessous, devoir ajouter un map bien senti *)
+(* tester sur des exemples *)
+...
+Theorem transp_loop_app_seq : ∀ it i la,
+  transp_loop it i la = transp_loop it 0 (seq 0 i ++ la).
+Proof.
+intros.
+revert i la.
+induction it; intros; [ easy | ].
+cbn.
+destruct la as [| j]. {
 ...
   destruct it. {
     cbn in Hit.
