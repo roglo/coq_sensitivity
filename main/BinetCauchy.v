@@ -1209,6 +1209,8 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   do 2 rewrite Nat.add_succ_r.
   rewrite <- H1; clear H1.
   unfold "°"; cbn - [ seq ].
+  rewrite List_length_fold_right; [ | now intros; rewrite map_length ].
+  rewrite app_length, seq_length.
 ...
 
 Fixpoint transp_loop it i (p : list nat) :=

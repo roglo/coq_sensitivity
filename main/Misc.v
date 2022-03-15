@@ -351,6 +351,15 @@ Qed.
 Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
+Theorem List_length_fold_right : ∀ A B (f : B → list A → list A) la lb,
+  (∀ b l, length (f b l) = length l)
+  → length (fold_right f la lb) = length la.
+Proof.
+intros * Hbl.
+induction lb as [| b]; [ easy | cbn ].
+now rewrite Hbl.
+Qed.
+
 (* map2: map with two lists *)
 
 Fixpoint map2 {A B C} (f : A → B → C) la lb :=
