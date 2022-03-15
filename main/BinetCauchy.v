@@ -1223,12 +1223,16 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   do 2 rewrite Nat.add_succ_r.
   rewrite <- H1; clear H1.
   unfold "°"; cbn - [ seq ].
+  remember (ff_app (swap (S (i + length l)) i (S (i + j)))) as f eqn:Hf.
+  remember (λ t l, map (ff_app (swap (length l) (fst t) (snd t))) l) as g
+    eqn:Hg.
+  remember (transp_loop it (S i) (replace_at j l k)) as lb eqn:Hlb.
+  rewrite seq_S, <- app_assoc; cbn.
 ...
-  remember (swap (i + length (k :: l)) i (S (i + j))).
-...
-Theorem List_map_fold_right : ∀ A B f g (la : list A) (lb : list B),
-  map f (fold_right g la lb) =
-  fold_right (λ b la, g b (map f la)) (map f la) lb.
+Theorem List_map_fold_right : ∀ A B f g (la1 la2 : list A) (lb : list B),
+  map f (fold_right g (la1 ++ la2) lb) =
+  fold_right g (la1 ++ map f (fold_right g la2 lb)).
+
 Proof.
 intros.
 induction lb as [| b]; [ easy | cbn ].
