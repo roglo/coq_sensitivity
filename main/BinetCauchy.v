@@ -1211,6 +1211,19 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   unfold "°"; cbn - [ seq ].
   rewrite List_length_fold_right; [ | now intros; rewrite map_length ].
   rewrite app_length, seq_length.
+Search (map _ (fold_right _ _ _)).
+Search (map (ff_app _ _)).
+remember (swap (i + length (k :: l)) i (S (i + j))).
+...
+Theorem List_map_fold_right : ∀ A B f g (la : list A) (lb : list B),
+  map f (fold_right g la lb) =
+  fold_right (λ b la, g b (map f la)) (map f la) lb.
+Proof.
+intros.
+induction lb as [| b]; [ easy | cbn ].
+destruct lb as [| b1]; cbn.
+...
+rewrite List_map_fold_right.
 ...
 
 Fixpoint transp_loop it i (p : list nat) :=
