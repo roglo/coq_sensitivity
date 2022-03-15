@@ -985,6 +985,14 @@ Qed.
 
 Definition swap n p q := list_swap_elem 0 (seq 0 n) p q.
 
+Theorem swap_length : ∀ n p q, length (swap n p q) = n.
+Proof.
+intros.
+unfold swap, list_swap_elem.
+rewrite List_map_seq_length.
+apply seq_length.
+Qed.
+
 Fixpoint first_non_fix_transp i p :=
   match p with
   | [] => i
@@ -1038,6 +1046,106 @@ Compute (map (λ p,
 ) (canon_sym_gr_list_list 4)
 ).
 *)
+
+Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → length l ≤ it
+  → seq 0 i ++ l =
+    fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l)).
+Proof.
+intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  now rewrite app_nil_r, Nat.add_0_r.
+}
+(*
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+*)
+remember (List_rank (Nat.eqb i) l) as j eqn:Hj.
+symmetry in Hj.
+destruct j as [j| ]. 2: {
+  specialize (List_rank_None 0 _ _ Hj) as H1; cbn.
+  destruct l as [| j]. {
+    now cbn; rewrite app_nil_r, Nat.add_0_r.
+  }
+  exfalso.
+  clear - Hp H1.
+  destruct Hp as (Hpp, Hpl).
+  rewrite app_length, seq_length in Hpp; cbn in Hpp.
+  (* d'après H1, i ne fait pas partie de la liste j :: l *)
+  (* du coup, avec le principe des tiroirs, Hpp et Hpl ne
+     devraient pas être possibles *)
+  admit.
+}
+apply List_rank_Some with (d := 0) in Hj.
+destruct Hj as (Hjl & Hbef & Hij).
+apply Nat.eqb_eq in Hij.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
+  subst j.
+  destruct l as [| j]; [ easy | ].
+  cbn in Hit, Hij; subst j.
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit (tl (i :: l)) (S i)) as H1.
+  cbn - [ seq ] in H1.
+  rewrite seq_S in H1.
+  rewrite <- app_assoc in H1.
+  specialize (H1 Hp Hit).
+  cbn - [ seq ] in H1.
+  rewrite List_length_cons, Nat.add_succ_r.
+  apply H1.
+} {
+  cbn.
+  destruct l as [| k]; [ easy | ].
+  replace j with (S (j - 1)) in Hij by flia Hjz.
+  cbn in Hit, Hij.
+  apply Nat.succ_le_mono in Hit.
+  rewrite seq_length.
+  specialize (IHit (tl (replace_at j (k :: l) (hd 0 (k :: l))))) as H1.
+  specialize (H1 (S i)).
+  cbn - [ seq ] in H1.
+  assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
+    replace j with (S (j - 1)) by flia Hjz.
+    rewrite replace_at_succ_cons; cbn - [ seq ].
+    admit. (* devrait le faire, j'espère *)
+  }
+  specialize (H1 H); clear H.
+  assert (Hr : length (tl (replace_at j (k :: l) k)) = length l). {
+    destruct j; [ easy | ].
+    cbn in Hjl; apply Nat.succ_lt_mono in Hjl.
+    rewrite replace_at_succ_cons; cbn.
+    now apply length_replace_at.
+  }
+  assert (H : length (tl (replace_at j (k :: l) k)) ≤ it) by now rewrite Hr.
+  specialize (H1 H); clear H.
+  rewrite Hr in H1.
+  cbn.
+  destruct j; [ easy | ].
+  rewrite replace_at_succ_cons in H1.
+  rewrite replace_at_succ_cons.
+  cbn - [ seq  ] in H1.
+  cbn.
+  do 2 rewrite Nat.add_succ_r.
+  rewrite comp_1_r by now rewrite swap_length.
+(* marche pas *)
+...
+remember (transp_loop it (S i) (replace_at j l k)) as XXXX.
+remember (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0) as FFFF.
+do 2 rewrite Nat.add_succ_r.
+rewrite <- H1; clear H1.
+rewrite replace_at_succ_cons in Hr.
+cbn in Hr.
+rewrite Nat_sub_succ_1 in Hij.
+unfold "°"; cbn - [ seq ].
+unfold ff_app.
+remember (fold_right FFFF (seq 0 i ++ k :: l) XXXX) as LL.
+...
 
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1140,14 +1248,6 @@ Compute (transp_list [20;12;7;9]).
 Compute (transp_list (collapse [20;12;7;9])).
 Compute (transp_list [3;2;0;1]).
 *)
-
-Theorem swap_length : ∀ n p q, length (swap n p q) = n.
-Proof.
-intros.
-unfold swap, list_swap_elem.
-rewrite List_map_seq_length.
-apply seq_length.
-Qed.
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
