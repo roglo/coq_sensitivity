@@ -1047,6 +1047,7 @@ Compute (map (λ p,
 ).
 *)
 
+(*
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l ≤ it
@@ -1135,17 +1136,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   rewrite comp_1_r by now rewrite swap_length.
 (* marche pas *)
 ...
-remember (transp_loop it (S i) (replace_at j l k)) as XXXX.
-remember (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0) as FFFF.
-do 2 rewrite Nat.add_succ_r.
-rewrite <- H1; clear H1.
-rewrite replace_at_succ_cons in Hr.
-cbn in Hr.
-rewrite Nat_sub_succ_1 in Hij.
-unfold "°"; cbn - [ seq ].
-unfold ff_app.
-remember (fold_right FFFF (seq 0 i ++ k :: l) XXXX) as LL.
-...
+*)
 
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -1215,16 +1206,9 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   rewrite replace_at_succ_cons.
   cbn - [ seq  ] in H1.
   cbn.
-remember (transp_loop it (S i) (replace_at j l k)) as XXXX.
-remember (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0) as FFFF.
-do 2 rewrite Nat.add_succ_r.
-rewrite <- H1; clear H1.
-rewrite replace_at_succ_cons in Hr.
-cbn in Hr.
-rewrite Nat_sub_succ_1 in Hij.
-unfold "°"; cbn - [ seq ].
-unfold ff_app.
-remember (fold_right FFFF (seq 0 i ++ k :: l) XXXX) as LL.
+  do 2 rewrite Nat.add_succ_r.
+  rewrite <- H1; clear H1.
+  unfold "°"; cbn - [ seq ].
 ...
 
 Fixpoint transp_loop it i (p : list nat) :=
