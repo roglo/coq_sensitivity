@@ -1936,17 +1936,38 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   move g before f; move la before g.
   move Hij at bottom.
 Print list_swap_elem.
-(* à voir s'il ne faut pas, ci-dessous, devoir ajouter un map bien senti *)
-(* tester sur des exemples *)
-...
 Theorem transp_loop_app_seq : ∀ it i la,
-  transp_loop it i la = transp_loop it 0 (seq 0 i ++ la).
+  transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la).
 Proof.
 intros.
+(*
+Compute (
+  let la := collapse [1;3;7;2;15;6] in
+  let i := 1 in
+  let it := length la in
+(la,
+    transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la)
+,
+  list_eqb (pair_eqb Nat.eqb) (transp_loop it i la)
+    (transp_loop (it + i) 0 (seq 0 i ++ la)))
+).
+Print transp_loop.
+...
+*)
 revert i la.
-induction it; intros; [ easy | ].
-cbn.
-destruct la as [| j]. {
+induction it; intros. {
+  cbn.
+  remember 42 as q.
+  remember 0 as j in |-*; clear Heqj; subst q.
+  revert j la.
+  induction i; intros; [ easy | cbn ].
+  rewrite Nat.eqb_refl.
+  apply IHi.
+}
+cbn - [ "=?" ].
+destruct la as [| a]. {
+  rewrite app_nil_r.
+  destruct i; [ easy | ].
 ...
   destruct it. {
     cbn in Hit.
