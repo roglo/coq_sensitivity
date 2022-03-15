@@ -1146,6 +1146,18 @@ Theorem fold_right_transp_loop : ∀ l it i,
     seq 0 (i + length l).
 Proof.
 intros * Hp Hit.
+(*
+Compute
+  (map (λ p,
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l - 1 in
+(
+  fold_right (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0) 
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)))
+ (canon_sym_gr_list_list 4)).
+...
+*)
 revert l i Hp Hit.
 induction it; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
@@ -1178,6 +1190,8 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   apply H1.
 } {
   cbn.
+  rewrite List_length_fold_right; [ | now intros; rewrite comp_length ].
+  rewrite app_length, seq_length.
   destruct l as [| k]; [ easy | ].
   replace j with (S (j - 1)) in Hij by flia Hjz.
   cbn in Hit, Hij.
@@ -1209,11 +1223,8 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   do 2 rewrite Nat.add_succ_r.
   rewrite <- H1; clear H1.
   unfold "°"; cbn - [ seq ].
-  rewrite List_length_fold_right; [ | now intros; rewrite map_length ].
-  rewrite app_length, seq_length.
-Search (map _ (fold_right _ _ _)).
-Search (map (ff_app _ _)).
-remember (swap (i + length (k :: l)) i (S (i + j))).
+...
+  remember (swap (i + length (k :: l)) i (S (i + j))).
 ...
 Theorem List_map_fold_right : ∀ A B f g (la : list A) (lb : list B),
   map f (fold_right g la lb) =
