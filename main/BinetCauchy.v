@@ -1851,11 +1851,8 @@ apply IHit.
 Qed.
 
 Theorem transp_loop_app_seq : ∀ it s i la,
-  transp_loop it i la = transp_loop (it + i) s (seq s i ++ la).
+  transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
-intros.
-(* non *)
-...
 intros.
 revert i s la.
 induction it; intros. {
@@ -1873,23 +1870,25 @@ destruct la as [| a]. {
   symmetry; apply transp_loop_seq.
 }
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+destruct (Nat.eq_dec (s + i) a) as [Hia| Hia]. {
   subst a.
-  replace (seq s i ++ i :: la) with (seq s (S i) ++ la). 2: {
-    rewrite seq_S.
-...
-    now rewrite seq_S, Nat.add_0_l, <- app_assoc.
+  replace (seq s i ++ s + i :: la) with (seq s (S i) ++ la). 2: {
+    now rewrite seq_S, <- app_assoc.
   }
   cbn.
+  rewrite Nat.eqb_refl.
+  rewrite <- Nat.add_succ_r.
   rewrite IHit.
-  now rewrite Nat.add_succ_r; cbn.
+  rewrite Nat.add_succ_r; cbn.
+  now rewrite Nat.eqb_refl.
 }
-remember (seq 0 i ++ a :: la) as lb eqn:Hlb; symmetry in Hlb.
+remember (seq s i ++ a :: la) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; [ now destruct i | ].
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec 0 b) as [Hbz| Hbz]. {
+destruct (Nat.eq_dec s b) as [Hsb| Hsb]. {
   subst b.
   destruct i. {
+    rewrite Nat.add_0_r in Hia.
     cbn in Hlb.
     now injection Hlb; clear Hlb; intros; subst a lb.
   }
