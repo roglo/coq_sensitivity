@@ -1884,6 +1884,13 @@ destruct lb as [| b]; [ now destruct i | ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec 0 b) as [Hbz| Hbz]. {
   subst b.
+  destruct i. {
+    cbn in Hlb.
+    now injection Hlb; clear Hlb; intros; subst a lb.
+  }
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros Hlb.
+  rewrite <- Hlb.
 ...
 
 Theorem fold_right_transp_loop : ∀ l it i,
