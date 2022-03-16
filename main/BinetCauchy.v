@@ -1356,7 +1356,7 @@ Fixpoint nb_fit i l :=
 
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
-  | 0 => [(* (42,42) *)]
+  | 0 => []
   | S it' =>
       match p with
       | [] => []
@@ -1367,6 +1367,8 @@ Fixpoint transp_loop it i (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (2 * length p) 0 p.
+
+...
 
 Theorem glop : ∀ p i j l,
   p = j :: l
