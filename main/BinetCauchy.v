@@ -1001,6 +1001,7 @@ Fixpoint first_non_fix_transp i p :=
       else i
   end.
 
+(*
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => []
@@ -1015,7 +1016,9 @@ Fixpoint transp_loop it i (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (length p) 0 p.
+*)
 
+(*
 Theorem transp_loop_app_seq : ∀ it s i la,
   transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
@@ -1124,6 +1127,7 @@ subst lb.
 specialize (IHit i (S s) (a :: la)) as H1.
 rewrite (Nat.add_succ_r it).
 ...
+*)
 
 (*
 Compute (transp_list [3;2;0;1]).
@@ -1344,6 +1348,12 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
 ...
 *)
 
+Fixpoint nb_fit i l :=
+  match l with
+  | [] => 0
+  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
+  end.
+
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => [(* (42,42) *)]
@@ -1357,6 +1367,35 @@ Fixpoint transp_loop it i (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (2 * length p) 0 p.
+
+Record fitted_list n := mk_fl
+  { fl_list : list nat;
+    fl_prop : nb_fit 0 fl_list = length fl_list - n }.
+
+...
+
+Theorem glop : ∀ n (l : fitted_list n) (i j : nat) (P : i = j),
+  nb_fit 0 (j :: fl_list l) = length (fl_list l) - n.
+Proof.
+Admitted.
+
+Fixpoint fl_transp_loop n i (l : fitted_list n) :=
+  match n with
+  | 0 => []
+  | S n' =>
+      match fl_list l with
+      | [] => []
+      | j :: l' =>
+          match Nat.eq_dec i j with
+          | left P => fl_transp_loop n' (mk_fl n' l' (glop l P))
+          | right _ =>
+              (i, j) ::
+              fl_transp_loop n'
+                (mk_fl (list_swap_elem 0 (j :: l) 0 (j - i)) 34)
+          end
+      end
+  end.
+...
 
 (*
 Compute (transp_list [3;2;0;1]).
@@ -1592,12 +1631,6 @@ revert ll.
 induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
-
-Fixpoint nb_fit i l :=
-  match l with
-  | [] => 0
-  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
-  end.
 
 (*
 Compute (
