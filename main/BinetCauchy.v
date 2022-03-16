@@ -1854,15 +1854,15 @@ Theorem transp_loop_app_seq : ∀ it s i la,
   transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
 intros.
+(*
 Compute (
-  let la := [3;6;5;7;4] in
+  let la := [3;6;5;8;4] in
   let s := 1 in
   let i := 2 in
-  let it := length la in
-  transp_loop it i la = transp_loop (it + i) s (seq s i ++ la)
+  let it := 8 in
+  transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la)
 ).
-...
-intros.
+*)
 revert i s la.
 induction it; intros. {
   cbn.
@@ -1894,22 +1894,56 @@ destruct (Nat.eq_dec (s + i) a) as [Hia| Hia]. {
 remember (seq s i ++ a :: la) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; [ now destruct i | ].
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec s b) as [Hsb| Hsb]. {
-  subst b.
+destruct (Nat.eq_dec s b) as [Hsb| Hsb]. 2: {
   destruct i. {
-    rewrite Nat.add_0_r in Hia.
+    do 2 rewrite Nat.add_0_r.
     cbn in Hlb.
-    now injection Hlb; clear Hlb; intros; subst a lb.
+    now injection Hlb; clear Hlb; intros; subst b lb.
   }
   cbn in Hlb.
-  injection Hlb; clear Hlb; intros Hlb.
-  rewrite (Nat.add_succ_r it).
-  cbn - [ seq "=?" ].
-  destruct lb as [| b]; [ now destruct i | ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (S s) b) as [Hsb| Hsb]. {
-    subst b.
-    rewrite IHit.
+  now injection Hlb; clear Hlb; intros.
+}
+subst b.
+destruct i. {
+  rewrite Nat.add_0_r in Hia.
+  cbn in Hlb.
+  now injection Hlb; clear Hlb; intros; subst a lb.
+}
+cbn in Hlb.
+injection Hlb; clear Hlb; intros Hlb.
+(*1*)
+subst lb.
+specialize (IHit i (S s) (a :: la)) as H1.
+rewrite (Nat.add_succ_r it).
+...
+(* more iter *)
+replace (S (it + i)) with (it + i).
+rewrite <- H1.
+...1
+rewrite (Nat.add_succ_r it).
+cbn - [ seq "=?" ].
+destruct lb as [| b]; [ now destruct i | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (S s) b) as [Hsb| Hsb]. 2: {
+  destruct i. {
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros; subst b lb.
+    rewrite Nat.add_1_r; f_equal.
+    now rewrite Nat.add_0_r.
+  }
+  cbn in Hlb.
+  now injection Hlb; clear Hlb; intros; subst b lb.
+}
+subst b.
+destruct i. {
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros; subst a lb.
+  now rewrite Nat.add_1_r in Hia.
+}
+cbn in Hlb.
+injection Hlb; clear Hlb; intros Hlb.
+...
+rewrite IHit.
 ...
 
 Theorem fold_right_transp_loop : ∀ l it i,
