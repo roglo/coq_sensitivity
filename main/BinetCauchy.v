@@ -1001,7 +1001,6 @@ Fixpoint first_non_fix_transp i p :=
       else i
   end.
 
-(*
 Fixpoint transp_loop it i (p : list nat) :=
   match it with
   | 0 => []
@@ -1016,7 +1015,115 @@ Fixpoint transp_loop it i (p : list nat) :=
   end.
 
 Definition transp_list p := transp_loop (length p) 0 p.
+
+Theorem transp_loop_app_seq : ∀ it s i la,
+  transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
+Proof.
+intros.
+(*
+Compute (
+  let la := [3;6;5;8;4] in
+  let s := 1 in
+  let i := 2 in
+  let it := 8 in
+  transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la)
+).
 *)
+revert i s la.
+induction it; intros. {
+  cbn.
+  revert s la.
+  induction i; intros; [ easy | cbn ].
+  do 2 rewrite Nat.eqb_refl.
+  apply IHi.
+}
+cbn - [ seq "=?" ].
+remember (List_rank (Nat.eqb (s + i)) la) as j1 eqn:Hj1.
+remember (List_rank (Nat.eqb s) (seq s i ++ la)) as j2 eqn:Hj2.
+symmetry in Hj1, Hj2.
+destruct j1 as [j1| ]. {
+  rewrite if_eqb_eq_dec.
+  apply List_rank_Some with (d := 0) in Hj1.
+  destruct Hj1 as (H1l & Hbef1 & Hij1).
+  apply Nat.eqb_eq in Hij1.
+  destruct j2 as [j2| ]. {
+    rewrite if_eqb_eq_dec.
+    apply List_rank_Some with (d := 0) in Hj2.
+    destruct Hj2 as (H2l & Hbef2 & Hij2).
+    apply Nat.eqb_eq in Hij2.
+    destruct (Nat.eq_dec j1 0) as [H1z| H1z]. {
+      subst j1.
+      clear Hbef1.
+      destruct (Nat.eq_dec j2 0) as [H2z| H2z]. {
+        subst j2.
+        clear Hbef2 H2l.
+        rewrite <- Nat.add_succ_l.
+        destruct i. {
+          clear Hij1; cbn in Hij2 |-*.
+          now do 2 rewrite Nat.add_0_r.
+        }
+        cbn.
+        destruct la as [| a]. {
+          cbn in Hij1; flia Hij1.
+        }
+        cbn in Hij1 |-*.
+        clear Hij2 H1l; subst a.
+        rewrite <- Nat.add_succ_l.
+        rewrite IHit.
+        replace (s + S i :: la) with ([s + S i] ++ la) by easy.
+        rewrite app_assoc.
+        f_equal; f_equal.
+        now rewrite seq_S, Nat.add_succ_r.
+      }
+      destruct la as [| a]; [ easy | ].
+      cbn in Hij1 |-*; clear H1l; subst a.
+      rewrite app_length, seq_length in H2l; cbn in H2l.
+(* ouais bon *)
+... bof
+destruct la as [| a]. {
+  rewrite app_nil_r.
+  destruct i; [ easy | cbn ].
+  rewrite Nat.eqb_refl.
+  symmetry; apply transp_loop_seq.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (s + i) a) as [Hia| Hia]. {
+  subst a.
+  replace (seq s i ++ s + i :: la) with (seq s (S i) ++ la). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  cbn.
+  rewrite Nat.eqb_refl.
+  rewrite <- Nat.add_succ_r.
+  rewrite IHit.
+  rewrite Nat.add_succ_r; cbn.
+  now rewrite Nat.eqb_refl.
+}
+remember (seq s i ++ a :: la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; [ now destruct i | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec s b) as [Hsb| Hsb]. 2: {
+  destruct i. {
+    do 2 rewrite Nat.add_0_r.
+    cbn in Hlb.
+    now injection Hlb; clear Hlb; intros; subst b lb.
+  }
+  cbn in Hlb.
+  now injection Hlb; clear Hlb; intros.
+}
+subst b.
+destruct i. {
+  rewrite Nat.add_0_r in Hia.
+  cbn in Hlb.
+  now injection Hlb; clear Hlb; intros; subst a lb.
+}
+cbn in Hlb.
+injection Hlb; clear Hlb; intros Hlb.
+(*1*)
+subst lb.
+specialize (IHit i (S s) (a :: la)) as H1.
+rewrite (Nat.add_succ_r it).
+...
 
 (*
 Compute (transp_list [3;2;0;1]).
