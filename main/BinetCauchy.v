@@ -1894,7 +1894,13 @@ destruct (Nat.eq_dec s b) as [Hsb| Hsb]. {
   }
   cbn in Hlb.
   injection Hlb; clear Hlb; intros Hlb.
-  rewrite <- Hlb.
+  rewrite (Nat.add_succ_r it).
+  cbn - [ seq "=?" ].
+  destruct lb as [| b]; [ now destruct i | ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S s) b) as [Hsb| Hsb]. {
+    subst b.
+    rewrite IHit.
 ...
 
 Theorem fold_right_transp_loop : ∀ l it i,
