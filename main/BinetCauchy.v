@@ -1368,33 +1368,31 @@ Fixpoint transp_loop it i (p : list nat) :=
 
 Definition transp_list p := transp_loop (2 * length p) 0 p.
 
-Record fitted_list n := mk_fl
-  { fl_list : list nat;
-    fl_prop : nb_fit 0 fl_list = length fl_list - n }.
-
-...
-
-Theorem glop : ∀ n (l : fitted_list n) (i j : nat) (P : i = j),
-  nb_fit 0 (j :: fl_list l) = length (fl_list l) - n.
+Theorem glop : ∀ p i j l,
+  p = j :: l
+  → i < j
+  → nb_fit i p < nb_fit i (list_swap_elem 0 p 0 (j - i)).
 Proof.
-Admitted.
-
-Fixpoint fl_transp_loop n i (l : fitted_list n) :=
-  match n with
-  | 0 => []
-  | S n' =>
-      match fl_list l with
-      | [] => []
-      | j :: l' =>
-          match Nat.eq_dec i j with
-          | left P => fl_transp_loop n' (mk_fl n' l' (glop l P))
-          | right _ =>
-              (i, j) ::
-              fl_transp_loop n'
-                (mk_fl (list_swap_elem 0 (j :: l) 0 (j - i)) 34)
-          end
-      end
-  end.
+intros * Hp Hij.
+subst p.
+revert i j Hij.
+induction l as [| k]; intros. {
+  cbn - [ nth ].
+  rewrite nth_overflow; [ | cbn; flia Hij ].
+  do 2 rewrite Nat.add_0_r.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i j) as [H| H]; [ flia Hij H | clear H ].
+  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ easy | ].
+...
+intros * Hp Hij.
+subst p.
+unfold list_swap_elem.
+cbn - [ nth seq ].
+apply Nat.eqb_neq in Hij; rewrite Hij.
+apply Nat.eqb_neq in Hij.
+rewrite Nat.add_0_l.
+unfold transposition.
+cbn - [ nth ].
 ...
 
 (*
