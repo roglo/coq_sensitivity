@@ -2044,7 +2044,10 @@ destruct (Nat.eq_dec s b) as [Hsb| Hsb]. 2: {
   now injection Hlb; clear Hlb; intros.
 }
 subst b.
-destruct i. {
+(**)
+clear IHit.
+revert it s a la lb Hia Hlb.
+induction i; intros. {
   rewrite Nat.add_0_r in Hia.
   cbn in Hlb.
   now injection Hlb; clear Hlb; intros; subst a lb.
@@ -2053,7 +2056,9 @@ cbn in Hlb.
 injection Hlb; clear Hlb; intros Hlb.
 (*1*)
 subst lb.
+(*
 specialize (IHit i (S s) (a :: la)) as H1.
+*)
 rewrite (Nat.add_succ_r it).
 cbn - [ list_swap_elem seq "=?" ].
 remember (seq (S s) i ++ a :: la) as lb eqn:Hb.
@@ -2062,6 +2067,10 @@ destruct lb as [| b]; [ now destruct i | ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (S s) b) as [Hsb| Hsb]. {
   subst b.
+  rewrite <- Nat.add_succ_comm in Hia |-*.
+  now apply IHi.
+}
+...
   destruct i. {
     cbn in Hb.
     injection Hb; clear Hb; intros; subst a lb.
