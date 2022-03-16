@@ -1850,15 +1850,17 @@ rewrite Nat.eqb_refl.
 apply IHit.
 Qed.
 
-Theorem transp_loop_app_seq : ∀ it i la,
-  transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la).
+Theorem transp_loop_app_seq : ∀ it s i la,
+  transp_loop it i la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
 intros.
-revert i la.
+(* non *)
+...
+intros.
+revert i s la.
 induction it; intros. {
   cbn.
-  remember 0 as j in |-*; clear Heqj.
-  revert j la.
+  revert s la.
   induction i; intros; [ easy | cbn ].
   rewrite Nat.eqb_refl.
   apply IHi.
@@ -1867,12 +1869,15 @@ cbn - [ seq "=?" ].
 destruct la as [| a]. {
   rewrite app_nil_r.
   destruct i; [ easy | cbn ].
+  rewrite Nat.eqb_refl.
   symmetry; apply transp_loop_seq.
 }
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i a) as [Hia| Hia]. {
   subst a.
-  replace (seq 0 i ++ i :: la) with (seq 0 (S i) ++ la). 2: {
+  replace (seq s i ++ i :: la) with (seq s (S i) ++ la). 2: {
+    rewrite seq_S.
+...
     now rewrite seq_S, Nat.add_0_l, <- app_assoc.
   }
   cbn.
