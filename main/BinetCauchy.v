@@ -1990,7 +1990,7 @@ rewrite Nat.eqb_refl.
 apply IHit.
 Qed.
 
-Theorem transp_loop_app_seq : ∀ it s i la,
+Theorem transp_loop_app_seq_gen : ∀ it s i la,
   transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
 intros.
@@ -2074,9 +2074,12 @@ cbn in Hb.
 now injection Hb; clear Hb; intros; subst b lb.
 Qed.
 
-Inspect 1.
-
-...
+Theorem transp_loop_app_seq : ∀ it i la,
+  transp_loop it i la = transp_loop (it + i) 0 (seq 0 i ++ la).
+Proof.
+intros.
+now rewrite <- transp_loop_app_seq_gen.
+Qed.
 
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
@@ -2175,8 +2178,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
   move Hij at bottom.
-Print list_swap_elem.
-Inspect 1.
+  rewrite transp_loop_app_seq.
 ...
   destruct it. {
     cbn in Hit.
