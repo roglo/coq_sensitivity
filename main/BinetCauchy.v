@@ -1854,6 +1854,15 @@ Theorem transp_loop_app_seq : ∀ it s i la,
   transp_loop it (s + i) la = transp_loop (it + i) s (seq s i ++ la).
 Proof.
 intros.
+Compute (
+  let la := [3;6;5;7;4] in
+  let s := 1 in
+  let i := 2 in
+  let it := length la in
+  transp_loop it i la = transp_loop (it + i) s (seq s i ++ la)
+).
+...
+intros.
 revert i s la.
 induction it; intros. {
   cbn.
