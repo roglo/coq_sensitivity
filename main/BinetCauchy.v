@@ -1368,8 +1368,7 @@ Fixpoint transp_loop it i (p : list nat) :=
 
 Definition transp_list p := transp_loop (2 * length p) 0 p.
 
-...
-
+(*
 Theorem glop : ∀ p i j l,
   p = j :: l
   → i < j
@@ -1396,6 +1395,7 @@ rewrite Nat.add_0_l.
 unfold transposition.
 cbn - [ nth ].
 ...
+*)
 
 (*
 Compute (transp_list [3;2;0;1]).
