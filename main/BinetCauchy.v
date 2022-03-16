@@ -2055,6 +2055,49 @@ injection Hlb; clear Hlb; intros Hlb.
 subst lb.
 specialize (IHit i (S s) (a :: la)) as H1.
 rewrite (Nat.add_succ_r it).
+cbn - [ list_swap_elem seq "=?" ].
+remember (seq (S s) i ++ a :: la) as lb eqn:Hb.
+symmetry in Hb.
+destruct lb as [| b]; [ now destruct i | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (S s) b) as [Hsb| Hsb]. {
+  subst b.
+  destruct i. {
+    cbn in Hb.
+    injection Hb; clear Hb; intros; subst a lb.
+    now rewrite Nat.add_1_r in Hia.
+  }
+  cbn in Hb.
+  injection Hb; clear Hb; intros Hb.
+  rewrite (Nat.add_succ_r it).
+  cbn - [ list_swap_elem seq "=?" ].
+  destruct lb as [| b]; [ now destruct i | ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S (S s)) b) as [Hsb| Hsb]. {
+    subst b.
+    destruct i. {
+      cbn in Hb.
+      injection Hb; clear Hb; intros; subst a lb.
+      rewrite <- Nat.add_1_r, Nat.add_assoc in Hia.
+      now do 2 rewrite Nat.add_1_r in Hia.
+    }
+    cbn in Hb.
+    injection Hb; clear Hb; intros Hb.
+    rewrite (Nat.add_succ_r it).
+    cbn - [ list_swap_elem seq "=?" ].
+    destruct lb as [| b]; [ now destruct i | ].
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (S (S (S s))) b) as [Hsb| Hsb]. {
+      subst b.
+      destruct i. {
+        cbn in Hb.
+        injection Hb; clear Hb; intros; subst a lb.
+        rewrite <- Nat.add_1_r, Nat.add_assoc in Hia.
+        rewrite <- Nat.add_1_r, Nat.add_assoc in Hia.
+        now do 3 rewrite Nat.add_1_r in Hia.
+      }
+      cbn in Hb.
+      injection Hb; clear Hb; intros Hb.
 ...
 (* more iter *)
 replace (S (it + i)) with (it + i).
