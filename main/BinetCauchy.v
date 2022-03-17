@@ -1704,10 +1704,8 @@ Compute (map (λ l, (l, length l - nb_fit 0 l, transp_list l)) (canon_sym_gr_lis
 ...
 *)
 
-(*
 Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
 Proof. intros; now destruct it. Qed.
-*)
 
 Theorem nth_list_swap_elem : ∀ A (d : A) i j l,
   i < length l
@@ -2081,6 +2079,16 @@ intros.
 now rewrite <- transp_loop_app_seq_gen.
 Qed.
 
+Theorem list_swap_elem_id : ∀ A (d : A) l i, list_swap_elem d l i i = l.
+Proof.
+intros.
+unfold list_swap_elem.
+rewrite List_map_nth_seq with (d := d).
+apply map_ext_in.
+intros j Hj.
+now rewrite transposition_id.
+Qed.
+
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -2203,6 +2211,77 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     (* "S j" is at its place in "la"; therefore not appearing in the
        result of transp_loop *)
+Theorem glop : ∀ it la i j,
+  nth j la 0 = i + j
+  → j ∉ map fst (transp_loop it i la).
+Proof.
+intros * Hi Him.
+revert i j la Hi Him.
+induction it; intros; [ easy | cbn in Him ].
+destruct la as [| k]; [ easy | ].
+rewrite if_eqb_eq_dec in Him.
+destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  subst k.
+Theorem glop : ∀ it i j l,
+  j ∈ map fst (transp_loop it i l)
+  → i ≤ j ≤ i + length l.
+Proof.
+intros * Hj.
+revert i j l Hj.
+induction it; intros; [ easy | cbn in Hj ].
+destruct l as [| k]; [ easy | ].
+rewrite if_eqb_eq_dec in Hj.
+destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+  subst k.
+  apply IHit.
+Theorem glop : ∀ it i l,
+  transp_loop it (S i) l = transp_loop (S it) i (i :: l).
+Proof.
+intros.
+now cbn; rewrite Nat.eqb_refl.
+Qed.
+rewrite glop in Hj.
+cbn - [ list_swap_elem ] in Hj.
+rewrite Nat.eqb_refl in Hj.
+apply IHit in Hj.
+Inspect 2.
+...
+now rewrite glop in Hj.
+...
+  destruct it; [ easy | ].
+  cbn in Hj |-*.
+  rewrite Nat.eqb_refl.
+  destruct l as [| k]; [ easy | cbn ].
+  destruct k. {
+    cbn in Hj.
+...
+specialize (glop it (S i) j la Him) as H1.
+destruct H1 as (H1, H2).
+destruct j; [ easy | ].
+cbn in H2.
+apply Nat.succ_le_mono in H1.
+apply Nat.succ_le_mono in H2.
+cbn in Hi.
+destruct la as [| k]. {
+  cbn in Hi.
+  now rewrite match_id, Nat.add_succ_r in Hi.
+}
+cbn in H2.
+
+Search transp_loop.
+Search transp_list.
+...
+  destruct j. {
+    clear Hi.
+...
+    destruct it; [ easy | cbn in Him ].
+    destruct la as [| i1]; [ easy | ].
+    destruct i1. {
+      cbn in Him.
+      destruct Him as [Him| Him]; [ easy | ].
+...
+  specialize (IHit i j (i :: la) Hi) as H1.
+...
     assert (Hsj : ∀ ij, ij ∈ transp_loop it 0 la → S j ∉ [fst ij; snd ij]). {
       intros * Hij Hn.
       destruct Hn as [Hn| Hn]. {
