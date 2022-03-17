@@ -2255,7 +2255,23 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   cbn in H1.
   destruct j; [ easy | ].
   rewrite List_nth_succ_cons in Hi.
+(*
+  rewrite <- Nat.add_succ_comm in Hi.
+*)
+  specialize (IHit i (S j) k (i :: la)) as H2.
+  rewrite List_nth_succ_cons in H2.
+  specialize (H2 Hi).
 ...
+(*
+Search transp_loop.
+Theorem glop :
+  (i, j) ∈ transp_loop it k la
+  → nth i la 0 ≠ k + i.
+...
+  specialize (IHit _ _ k _ Hi) as H2.
+...
+*)
+  apply (IHit _ _ k _ Hi).
   apply (IHit i j k (i :: la) Hi).
 ...
 rewrite transp_loop_app_seq in Him.
