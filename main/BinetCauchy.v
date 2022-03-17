@@ -2186,6 +2186,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.add_0_r.
     destruct j; [ easy | clear Hij ].
     cbn in Hp.
+...
     assert (H : la = nth j l 0 :: replace_at j l (S j)). {
       rewrite Hla.
       unfold list_swap_elem.
