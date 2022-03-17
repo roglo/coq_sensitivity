@@ -2254,8 +2254,22 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   specialize (H1 it (S i) (j, k) la Him).
   cbn in H1.
   apply (IHit i j k (i :: la) Hi).
+...
+rewrite transp_loop_app_seq in Him.
+rewrite transp_loop_app_seq.
+rewrite Nat.add_succ_r in Him.
+cbn - [ list_swap_elem "=?" ] in Him.
+rewrite Nat.eqb_refl in Him.
+rewrite transp_loop_app_seq in Him.
+...
   destruct it; [ easy | cbn ].
   rewrite Nat.eqb_refl.
+  cbn - [ list_swap_elem "=?" ] in Him.
+  destruct la as [| n]; [ easy | ].
+  rewrite if_eqb_eq_dec in Him.
+  destruct (Nat.eq_dec (S i) n) as [Hsin| Hsin]. {
+    subst n.
+Search transp_loop.
 ...
 Theorem glop : ∀ it i j l,
   j ∈ map fst (transp_loop it i l)
