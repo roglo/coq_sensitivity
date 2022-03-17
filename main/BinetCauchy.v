@@ -2179,6 +2179,13 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   move g before f; move la before g.
   move Hij at bottom.
   rewrite transp_loop_app_seq.
+  destruct i. {
+    cbn.
+    rewrite Nat.add_0_l in Hf.
+    rewrite Nat.sub_0_r in Hla.
+    rewrite Nat.add_0_r.
+    destruct j; [ easy | clear Hij ].
+Inspect 1.
 ...
   destruct it. {
     cbn in Hit.
