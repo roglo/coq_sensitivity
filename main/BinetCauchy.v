@@ -2089,6 +2089,34 @@ intros j Hj.
 now rewrite transposition_id.
 Qed.
 
+Theorem in_transp_loop_bounds : ∀ it k ij l,
+  ij ∈ transp_loop it k l
+  → k ≤ fst ij ≤ k + length l.
+Proof.
+intros * Hij.
+revert ij k l Hij.
+induction it; intros; [ easy | cbn in Hij ].
+destruct l as [| j]; [ easy | ].
+rewrite if_eqb_eq_dec in Hij.
+destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+  subst j.
+  specialize (IHit _ _ _ Hij) as H1.
+  destruct H1 as (H1, H2).
+  rewrite Nat.add_succ_comm in H2.
+  split; [ | easy ].
+  destruct (Nat.eq_dec (S k) (fst ij)) as [Hkij| Hkij]; [ | flia H1 Hkij ].
+  rewrite <- Hkij.
+  apply Nat.le_succ_diag_r.
+}
+destruct Hij as [Hij| Hij]. {
+  subst ij; cbn.
+  split; [ easy | ].
+  apply Nat.le_add_r.
+}
+specialize (IHit _ _ _ Hij) as H1.
+now rewrite list_swap_elem_length in H1.
+Qed.
+
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -2211,17 +2239,24 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     (* "S j" is at its place in "la"; therefore not appearing in the
        result of transp_loop *)
-Theorem glop : ∀ it la i j,
+Theorem glop : ∀ it la i j k,
   nth j la 0 = i + j
-  → j ∉ map fst (transp_loop it i la).
+  → (j, k) ∉ transp_loop it i la.
 Proof.
 intros * Hi Him.
-revert i j la Hi Him.
+revert i j k la Hi Him.
 induction it; intros; [ easy | cbn in Him ].
-destruct la as [| k]; [ easy | ].
+destruct la as [| n]; [ easy | ].
 rewrite if_eqb_eq_dec in Him.
-destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-  subst k.
+destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+  subst n.
+  specialize in_transp_loop_bounds as H1.
+  specialize (H1 it (S i) (j, k) la Him).
+  cbn in H1.
+  apply (IHit i j k (i :: la) Hi).
+  destruct it; [ easy | cbn ].
+  rewrite Nat.eqb_refl.
+...
 Theorem glop : ∀ it i j l,
   j ∈ map fst (transp_loop it i l)
   → i ≤ j ≤ i + length l.
