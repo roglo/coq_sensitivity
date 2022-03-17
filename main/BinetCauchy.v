@@ -2185,7 +2185,35 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.sub_0_r in Hla.
     rewrite Nat.add_0_r.
     destruct j; [ easy | clear Hij ].
-Inspect 1.
+(*
+unfold list_swap_elem in Hla.
+cbn - [ nth seq ] in Hla.
+*)
+    cbn in Hp.
+    assert (H : la = nth j l 0 :: replace_at j l (S j)). {
+      rewrite Hla.
+      unfold list_swap_elem.
+      cbn - [ nth ].
+      f_equal.
+      destruct j. {
+        cbn - [ nth ].
+        destruct l as [| a]. {
+          destruct Hp as (Hpp, Hpl).
+          specialize (Hpp 1 (or_introl eq_refl)).
+          cbn in Hpp; flia Hpp.
+        }
+        cbn - [ nth ]; f_equal.
+        erewrite map_ext_in. 2: {
+          intros k Hk.
+          apply in_seq in Hk.
+          unfold transposition; cbn.
+          do 2 rewrite if_eqb_eq_dec.
+          destruct (Nat.eq_dec k 0) as [H| H]; [ flia Hk H | clear H ].
+          destruct (Nat.eq_dec k 1) as [H| H]; [ flia Hk H | clear H ].
+          replace k with (S (S (k - 2))) at 1 by flia Hk.
+          easy.
+        }
+(* ah non, c'est pas ça *)
 ...
   destruct it. {
     cbn in Hit.
