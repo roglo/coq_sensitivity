@@ -2186,6 +2186,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.add_0_r.
     destruct j; [ easy | clear Hij ].
     cbn in Hp.
+    assert (Hlj : nth (S j) la 0 = S j). {
+      rewrite Hla.
+      cbn - [ nth ].
+      rewrite List_nth_succ_cons.
+      assert (H1 : j < length l). {
+        destruct Hp as (Hpp, Hpl).
+        specialize (Hpp (S j) (or_introl eq_refl)).
+        cbn in Hpp.
+        now apply Nat.succ_lt_mono in Hpp.
+      }
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | easy ].
+      now cbn; rewrite Nat.eqb_refl.
+    }
 ...
     assert (H : la = nth j l 0 :: replace_at j l (S j)). {
       rewrite Hla.
