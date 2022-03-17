@@ -2207,8 +2207,18 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       intros * Hij Hn.
       destruct Hn as [Hn| Hn]. {
         rewrite Hla in Hij.
-Search (_ ∈ _ → ∃ _, _).
-Search transp_loop.
+        clear - Hij Hn.
+        revert j l ij Hij Hn.
+        induction it; intros; [ easy | ].
+        cbn - [ list_swap_elem "=?" ] in Hij.
+        remember (list_swap_elem 0 (S j :: l) 0 (S j)) as la eqn:Hla.
+        symmetry in Hla.
+        destruct la as [| i]; [ easy | ].
+        rewrite if_eqb_eq_dec in Hij.
+        destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]. {
+          subst i.
+          cbn in Hla.
+          injection Hla; clear Hla; intros Hla H1.
 ...
 (*
                                    j
