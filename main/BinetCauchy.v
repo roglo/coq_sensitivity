@@ -2233,7 +2233,19 @@ destruct l as [| k]; [ easy | ].
 rewrite if_eqb_eq_dec in Hj.
 destruct (Nat.eq_dec i k) as [Hik| Hik]. {
   subst k.
+...
   apply IHit.
+  destruct it; [ easy | ].
+  cbn in Hj |-*.
+  rewrite Nat.eqb_refl.
+  destruct l as [| k]; [ easy | ].
+  destruct k. {
+    cbn - [ list_swap_elem transp_loop ] in Hj.
+    destruct Hj as [Hj| Hj]. {
+      subst j.
+      destruct it. {
+        cbn.
+...
 Theorem glop : ∀ it i l,
   transp_loop it (S i) l = transp_loop (S it) i (i :: l).
 Proof.
