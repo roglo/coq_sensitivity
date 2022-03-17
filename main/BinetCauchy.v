@@ -2185,10 +2185,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.sub_0_r in Hla.
     rewrite Nat.add_0_r.
     destruct j; [ easy | clear Hij ].
-(*
-unfold list_swap_elem in Hla.
-cbn - [ nth seq ] in Hla.
-*)
     cbn in Hp.
     assert (H : la = nth j l 0 :: replace_at j l (S j)). {
       rewrite Hla.
@@ -2213,7 +2209,19 @@ cbn - [ nth seq ] in Hla.
           replace k with (S (S (k - 2))) at 1 by flia Hk.
           easy.
         }
-(* ah non, c'est pas ça *)
+        clear.
+        remember 2 as sta; clear Heqsta.
+        revert sta.
+        induction l as [| a]; intros; [ easy | ].
+        cbn - [ nth ].
+        rewrite Nat.sub_diag; f_equal.
+        symmetry.
+        rewrite <- IHl with (sta := S sta) at 1.
+        apply map_ext_in.
+        intros i Hi.
+        apply in_seq in Hi.
+        now replace (i - sta) with (S (i - S sta)) by flia Hi.
+      }
 ...
   destruct it. {
     cbn in Hit.
