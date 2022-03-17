@@ -2201,6 +2201,38 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite seq_nth; [ | easy ].
       now cbn; rewrite Nat.eqb_refl.
     }
+(*
+                                   j
+     l           |   |   |   |   | * |   |   |   |   |
+     la      | * |   |   |   |   |S j|   |   |   |   |
+  S j :: l   |S j|   |   |   |   | * |   |   |   |   |
+
+Quand on applique g à partir de "la", ça ne modifie pas ce qu'il y a en "S j"
+car "la(S j)=S j" mais ce qu'il y a en 0 ("*") peut se retrouver ailleurs,
+mettons en "k".
+  Quand on applique g à partir de "S j :: l", ça ne modifie pas non plus donc
+ce qu'il y a en "S j" (en l'occurrence "*") mais ce qu'il y a en 0 ("S j")
+peut se retrouver ailleurs, en l'occurrence en "k".
+                                       S j          k
+ fold     la      |lk |   |   |   |   |S j|   |   | * |   |
+ fold  S j :: l   |lk |   |   |   |   | * |   |   |S j|   |
+Donc je pense que ça ne devrait pas marcher.
+*)
+(* ah, pourtant, si, ça a l'air de marcher ci-dessous; mais bon, c'est sur un exemple
+   j'échoue à trouver un contre-exemple *)
+...
+subst f g.
+Compute (
+  let l := [2;3;4;0;5] in
+  let j := 0 in
+  let la := list_swap_elem 0 (S j :: l) 0 (S j) in
+  let it := 42 in
+  map (ff_app (swap (S (length l)) 0 (S j)))
+    (fold_right (λ (t : nat * nat) (l0 : list nat), map (ff_app (swap (length l0) (fst t) (snd t))) l0)
+       (S j :: l) (transp_loop it 0 (list_swap_elem 0 (S j :: l) 0 (S j)))) =
+  fold_right (λ (t : nat * nat) (l0 : list nat), map (ff_app (swap (length l0) (fst t) (snd t))) l0)
+    (list_swap_elem 0 (S j :: l) 0 (S j)) (transp_loop it 0 (list_swap_elem 0 (S j :: l) 0 (S j)))
+).
 ...
     assert (H : la = nth j l 0 :: replace_at j l (S j)). {
       rewrite Hla.
