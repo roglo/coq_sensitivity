@@ -2206,6 +2206,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     assert (Hsj : ∀ ij, ij ∈ transp_loop it 0 la → S j ∉ [fst ij; snd ij]). {
       intros * Hij Hn.
       destruct Hn as [Hn| Hn]. {
+        rewrite Hla in Hij.
 Search (_ ∈ _ → ∃ _, _).
 Search transp_loop.
 ...
