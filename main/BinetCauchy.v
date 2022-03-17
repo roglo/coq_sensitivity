@@ -2201,6 +2201,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite seq_nth; [ | easy ].
       now cbn; rewrite Nat.eqb_refl.
     }
+    (* "S j" is at its place in "la"; therefore not appearing in the
+       result of transp_loop *)
+    assert (Hsj : ∀ ij, ij ∈ transp_loop it 0 la → S j ∉ [fst ij; snd ij]). {
+      intros * Hij Hn.
+      destruct Hn as [Hn| Hn]. {
+Search (_ ∈ _ → ∃ _, _).
+Search transp_loop.
+...
 (*
                                    j
      l           |   |   |   |   | * |   |   |   |   |
