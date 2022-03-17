@@ -2253,6 +2253,9 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   specialize in_transp_loop_bounds as H1.
   specialize (H1 it (S i) (j, k) la Him).
   cbn in H1.
+  destruct j; [ easy | ].
+  rewrite List_nth_succ_cons in Hi.
+...
   apply (IHit i j k (i :: la) Hi).
 ...
 rewrite transp_loop_app_seq in Him.
