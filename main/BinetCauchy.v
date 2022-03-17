@@ -2186,7 +2186,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.add_0_r.
     destruct j; [ easy | clear Hij ].
     cbn in Hp.
-    assert (Hlj : nth (S j) la 0 = S j). {
+    assert (Hlaz : nth 0 la 0 = nth j l 0) by now rewrite Hla.
+    assert (Hlaj : nth (S j) la 0 = S j). {
       rewrite Hla.
       cbn - [ nth ].
       rewrite List_nth_succ_cons.
