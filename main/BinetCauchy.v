@@ -2252,19 +2252,23 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   subst n.
 (**)
   apply (IHit _ _ k _ Hi).
-  destruct it; [ easy | ].
+  clear IHit.
+  revert i j k la Hi Him.
+  induction it; intros; [ easy | ].
   cbn; rewrite Nat.eqb_refl.
   cbn - [ list_swap_elem "=?" ] in Him.
   destruct la as [| i1]; [ easy | ].
   rewrite if_eqb_eq_dec in Him.
   destruct (Nat.eq_dec (S i) i1) as [Hi1| Hi1]. {
     subst i1.
-    destruct it; [ easy | ].
-    cbn - [ list_swap_elem "=?" ] in Him.
-    destruct la as [| i1]; [ easy | ].
-    rewrite if_eqb_eq_dec in Him.
-    destruct (Nat.eq_dec (S (S i)) i1) as [Hi1| Hi1]. {
-      subst i1.
+    apply IHit. {
+      destruct it; [ easy | ].
+      cbn - [ list_swap_elem "=?" ] in Him.
+      destruct la as [| i1]; [ easy | ].
+      rewrite if_eqb_eq_dec in Him.
+      destruct (Nat.eq_dec (S (S i)) i1) as [Hi1| Hi1]. {
+        subst i1.
+...
       destruct it; [ easy | ].
       cbn - [ list_swap_elem "=?" ] in Him.
       destruct la as [| i1]; [ easy | ].
