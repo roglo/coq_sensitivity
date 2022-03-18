@@ -2344,6 +2344,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       move Hpl at bottom.
       apply NoDup_app_iff in Hpl.
       destruct Hpl as (Hil & Hjl & Hnjl).
+...
       replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
       rewrite List_nth_succ_cons in Hiej.
 ...
