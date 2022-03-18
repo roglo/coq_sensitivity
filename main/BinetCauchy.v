@@ -2260,6 +2260,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (H1 H); clear H.
   clear IHit.
 ...
+  rewrite transp_loop_app_seq in H1 |-*.
+...
 assert (pour_rigoler : transp_loop it (S i) la = (i, i + j) :: transp_loop it (S i) (j :: l)). {
   induction it. {
     cbn in H1 |-*.
