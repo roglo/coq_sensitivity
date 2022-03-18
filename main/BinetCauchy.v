@@ -2258,11 +2258,11 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   specialize (IHit i (S j) k (i :: la)) as H2.
   rewrite List_nth_succ_cons in H2.
   specialize (H2 Hi).
-  apply H2; clear H2.
   destruct it; [ easy | ].
-  cbn; rewrite Nat.eqb_refl.
+  cbn in H2; rewrite Nat.eqb_refl in H2.
   destruct it. {
-    cbn - [ list_swap_elem "=?" ] in Him |-*.
+    cbn - [ list_swap_elem "=?" ] in Him, H2.
+    clear H2.
     destruct la as [| i1]; [ easy | ].
     rewrite if_eqb_eq_dec in Him.
     destruct (Nat.eq_dec (S i) i1) as [Hi1| Hi1]; [ easy | ].
