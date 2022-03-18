@@ -2258,6 +2258,26 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     admit.
   }
   specialize (H1 H); clear H.
+  clear IHit.
+...
+assert (pour_rigoler : transp_loop it (S i) la = (i, i + j) :: transp_loop it (S i) (j :: l)). {
+  induction it. {
+    cbn in H1 |-*.
+    specialize (nb_fit_ub (S i) l) as H2.
+    flia Hit H2.
+  }
+
+  cbn - [ list_swap_elem "=?" ].
+  destruct la as [| k]; [ easy | ].
+  cbn - [ nth "=?" ] in Hla.
+  unfold transposition in Hla at 1.
+  rewrite Nat.eqb_refl in Hla.
+  remember (nth (j - i) (j :: l) 0) as x.
+  injection Hla; clear Hla; intros Hk Hla.
+  subst x k.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S i) (nth (j - i) (j :: l) 0)) as [Hsij| Hsij]. {
+    destruct
 ...
   rewrite <- H1; clear H1.
   unfold "°"; cbn - [ seq ].
