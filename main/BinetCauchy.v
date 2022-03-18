@@ -2244,12 +2244,7 @@ Theorem glop : ∀ it la i j k,
   → (j, k) ∉ transp_loop it i la.
 Proof.
 intros * Hi Him.
-revert i j k la Hi Him.
-induction it; intros; [ easy | cbn in Him ].
-destruct la as [| n]; [ easy | ].
-rewrite if_eqb_eq_dec in Him.
-destruct (Nat.eq_dec i n) as [Hin| Hin]. {
-  subst n.
+(* contre-exemple *)
 Compute (
   let la := [3;2;7;5] in
   let j := 1 in
@@ -2259,6 +2254,13 @@ Compute (
   nth j la 0 = i + j
   → (j, k) ∉ transp_loop it i la
 ).
+...
+revert i j k la Hi Him.
+induction it; intros; [ easy | cbn in Him ].
+destruct la as [| n]; [ easy | ].
+rewrite if_eqb_eq_dec in Him.
+destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+  subst n.
 ...
 (**)
   apply (IHit _ _ k _ Hi).
