@@ -2255,12 +2255,22 @@ destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   cbn in H1.
   destruct j; [ easy | ].
   rewrite List_nth_succ_cons in Hi.
-(*
-  rewrite <- Nat.add_succ_comm in Hi.
-*)
   specialize (IHit i (S j) k (i :: la)) as H2.
   rewrite List_nth_succ_cons in H2.
   specialize (H2 Hi).
+  apply H2; clear H2.
+  destruct it; [ easy | ].
+  cbn; rewrite Nat.eqb_refl.
+  destruct it. {
+    cbn - [ list_swap_elem "=?" ] in Him |-*.
+    destruct la as [| i1]; [ easy | ].
+    rewrite if_eqb_eq_dec in Him.
+    destruct (Nat.eq_dec (S i) i1) as [Hi1| Hi1]; [ easy | ].
+    destruct Him as [Him| Him]; [ | easy ].
+    injection Him; clear Him; intros Hk Hij; subst i1 j.
+    apply Nat.neq_sym in Hi1; clear H1.
+    destruct i; [ easy | ].
+    cbn in Hi.
 ...
 (*
 Search transp_loop.
