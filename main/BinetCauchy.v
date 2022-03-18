@@ -2334,24 +2334,27 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     f_equal.
     rewrite Hla.
     cbn - [ nth ].
+    rewrite <- seq_shift.
+    rewrite map_map.
     rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i (nth (j - i) (j :: l) 0)) as [Hiej| Hiej]. {
+      exfalso.
+      destruct Hp as (Hpp, Hpl).
+      rewrite app_length, seq_length in Hpp; cbn in Hpp.
+      move Hpl at bottom.
+      apply NoDup_app_iff in Hpl.
+      destruct Hpl as (Hil & Hjl & Hnjl).
+      replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
+      rewrite List_nth_succ_cons in Hiej.
+...
     replace (j - i) with (S (j - S i)) by flia Hilj.
     rewrite List_nth_succ_cons.
+...
     destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hiej| Hiej]. {
       cbn - [ nth ]; f_equal.
-      rewrite <- seq_shift.
-      rewrite map_map.
 destruct l as [| k]; [ easy | ].
 cbn - [ nth "=?" ].
 ...
-Theorem nb_fit_cons : ∀ i j l,
-  nb_fit i (j :: l) = nb_fit i l.
-Proof.
-intros.
-cbn - [ "=?" ].
-destruct (
-
-      rewrite List_map_nth_seq with (d := 0) at 1.
 ...
       apply map_ext_in.
       intros k Hk.
