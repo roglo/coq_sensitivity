@@ -2255,6 +2255,7 @@ Compute (
   → (j, k) ∉ transp_loop it i la
 ).
 Compute (transp_loop 10 0 [0;3;2;7;5]).
+...
 03275
 0723500
 0023507
