@@ -1366,7 +1366,16 @@ Fixpoint transp_loop it i (p : list nat) :=
       end
   end.
 
-Definition transp_list p := transp_loop (2 * length p) 0 p.
+Definition transp_list p := transp_loop (length p + length p - nb_fit 0 p) 0 p.
+
+(*
+Compute
+map (λ p, (p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0))) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, (p, last (transp_loop (length p + length p - nb_fit 0 p) 0 p) (0,0))) (canon_sym_gr_list_list 4).
+Compute
+map (λ p, (p, last (transp_list p) (17,17))) (canon_sym_gr_list_list 4).
+*)
 
 (*
 Theorem glop : ∀ p i j l,
@@ -2117,6 +2126,44 @@ specialize (IHit _ _ _ Hij) as H1.
 now rewrite list_swap_elem_length in H1.
 Qed.
 
+Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → length l + length l = it + nb_fit i l
+  → seq 0 i ++ l =
+    fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l)).
+Proof.
+intros * Hp Hit.
+revert l i Hp Hit.
+induction it; intros; cbn. {
+  cbn in Hit.
+  specialize (nb_fit_ub i l) as H1.
+  rewrite <- Hit in H1.
+  destruct l; [ | cbn in H1; flia H1 ].
+  now rewrite app_nil_r, Nat.add_0_r.
+}
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
+cbn in Hit.
+apply Nat.succ_inj in Hit.
+rewrite if_eqb_eq_dec in Hit |-*.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
+    now rewrite seq_S, <- app_assoc.
+  }
+  rewrite List_length_cons, <- Nat.add_succ_comm.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
+  cbn in Hit.
+  do 2 rewrite Nat.add_succ_r in Hit.
+  now apply Nat.succ_inj in Hit.
+} {
+  cbn - [ list_swap_elem "=?" ].
+  rewrite seq_length.
+  rewrite comp_1_r by now rewrite swap_length.
+Abort.
+
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + length l = it + nb_fit i l
@@ -2187,24 +2234,31 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 } {
   cbn - [ list_swap_elem ].
   rewrite List_length_fold_right by now intros; rewrite comp_length.
+  rewrite app_length, seq_length, List_length_cons.
+  unfold "°"; cbn - [ seq ].
+  remember (ff_app (swap (i + S (length l)) i j)) as f eqn:Hf.
+  remember (λ t l, map (ff_app (swap (length l) (fst t) (snd t))) l) as g
+    eqn:Hg.
+  remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
+  move g before f; move la before g.
   specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
   rewrite list_swap_elem_length in H1.
   cbn - [ list_swap_elem ] in H1.
-  assert
-    (H : is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i))). {
+  rewrite <- Hla in H1.
+  unfold "°" in H1.
+  rewrite <- Hg in H1.
+  assert (H : is_permut_list (seq 0 i ++ la)). {
     admit.
   }
   specialize (H1 H); clear H.
   assert
-    (H :
-       S (length l + S (length l)) =
-       it + nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i))). {
+    (H : S (length l + S (length l)) = it + nb_fit i la). {
     unfold list_swap_elem.
     cbn - [ nth ].
     admit.
   }
   specialize (H1 H); clear H.
-  rewrite app_length, seq_length, List_length_cons.
+...
   rewrite <- H1; clear H1.
   unfold "°"; cbn - [ seq ].
   rewrite Nat.add_succ_r.
@@ -2239,15 +2293,67 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     }
     (* "S j" is at its place in "la"; therefore not appearing in the
        result of transp_loop *)
+...
 Theorem glop : ∀ it la i j k,
-  nth j la 0 = i + j
-  → (j, k) ∉ transp_loop it i la.
+  it = length la + length la - nb_fit i la
+  → nth j la 0 = i + j
+  → (i + j, k) ∉ transp_loop it i la.
 Proof.
-intros * Hi Him.
-(* est-ce que c'est pas plutôt
-    (i + j, k) ∉ transp_loop it i la.
-   ?
-*)
+intros * Hit Hi Him.
+revert i j k la Hit Hi Him.
+induction it; intros; [ easy | cbn in Him ].
+destruct la as [| n]; [ easy | ].
+rewrite if_eqb_eq_dec in Him.
+destruct (Nat.eq_dec i n) as [Hin| Hin]. {
+  subst n.
+  cbn in Hit.
+  rewrite Nat.eqb_refl in Hit.
+  cbn in Hit.
+  rewrite Nat.add_succ_r in Hit.
+  rewrite Nat.sub_succ_l in Hit. 2: {
+    specialize (nb_fit_ub (S i) la) as H1.
+    flia H1.
+  }
+  apply Nat.succ_inj in Hit.
+  destruct j. {
+    clear Hi.
+    rewrite Nat.add_0_r in Him.
+...
+  apply (IHit _ _ k _ Hit).
+  clear IHit.
+  revert i j k la Hi Him.
+  induction it; intros; [ easy | ].
+  cbn; rewrite Nat.eqb_refl.
+  cbn - [ list_swap_elem "=?" ] in Him.
+  destruct la as [| i1]; [ easy | ].
+  rewrite if_eqb_eq_dec in Him.
+  destruct (Nat.eq_dec (S i) i1) as [Hi1| Hi1]. {
+    subst i1.
+    destruct j. {
+      clear Hi.
+      rewrite Nat.add_0_r in Him |-*.
+      destruct it; [ easy | ].
+      cbn in Him |-*.
+      rewrite Nat.eqb_refl.
+      destruct la as [| j]; [ easy | ].
+      destruct j. {
+        cbn - [ list_swap_elem "=?" ] in Him.
+        destruct Him as [Him| Him]. {
+          injection Him; clear Him; intros H1 H2.
+          flia H2.
+        }
+        now rewrite list_swap_elem_id in Him.
+      }
+      destruct j. {
+        destruct Him as [Him| Him]. {
+          injection Him; clear Him; intros H1 H2.
+          flia H2.
+        }
+        now rewrite list_swap_elem_id in Him.
+      }
+      rewrite if_eqb_eq_dec in Him.
+      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+        subst j.
 ...
 (* contre-exemple *)
 Compute (
