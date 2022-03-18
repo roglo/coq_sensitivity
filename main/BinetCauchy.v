@@ -2245,7 +2245,83 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold "°" in H1.
   rewrite <- Hg in H1.
   assert (H : is_permut_list (seq 0 i ++ la)). {
-    admit.
+    rewrite Hla.
+    split. {
+      intros k Hk.
+      rewrite app_length, seq_length, list_swap_elem_length; cbn.
+      apply in_app_or in Hk.
+      destruct Hk as [Hk| Hk]; [ apply in_seq in Hk; flia Hk | ].
+      unfold list_swap_elem in Hk.
+      rewrite in_map_iff in Hk.
+      destruct Hk as (u & Huk & Hu).
+      subst k.
+      apply in_seq in Hu; cbn in Hu.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
+        subst u.
+        destruct Hp as (Hpp, Hpl).
+        rewrite app_length, seq_length in Hpp; cbn in Hpp.
+        specialize (Hpp (nth (j - i) (j :: l) 0)) as H2.
+        apply H2; clear H2.
+        apply in_or_app.
+        right; right.
+        assert (Hilj : i < j). {
+          apply Nat.nle_gt.
+          intros Hc.
+          specialize (NoDup_nat _ Hpl i j) as H2.
+          rewrite app_length, seq_length in H2.
+          cbn in H2.
+          assert (H : i < i + S (length l)) by flia.
+          specialize (H2 H); clear H.
+          assert (H : j < i + S (length l)) by flia Hc.
+          specialize (H2 H); clear H.
+          unfold ff_app in H2.
+          rewrite app_nth2 in H2; [ | now rewrite seq_length; unfold ge ].
+          rewrite seq_length, Nat.sub_diag in H2; cbn in H2.
+          rewrite app_nth1 in H2; [ | rewrite seq_length; flia Hij Hc ].
+          rewrite seq_nth in H2; [ | flia Hij Hc ].
+          now specialize (H2 eq_refl).
+        }
+        replace (j - i) with (S (j - S i)) by flia Hilj; cbn.
+        apply nth_In.
+        specialize (Hpp j) as H2.
+        assert (H : j ∈ seq 0 i ++ j :: l). {
+          apply in_or_app.
+          now right; left.
+        }
+        specialize (H2 H); clear H.
+        cbn in H2.
+        flia H2 Hilj.
+      }
+      destruct (Nat.eq_dec u (j - i)) as [Huj| Huj]. {
+        subst u; cbn; flia Hu.
+      }
+      destruct u; [ easy | ].
+      cbn.
+      destruct Hp as (Hpp, Hpl).
+      rewrite app_length, seq_length in Hpp; cbn in Hpp.
+      apply Hpp, in_or_app.
+      destruct (lt_dec (nth u l 0) i) as [Hui| Hui]. {
+        now left; apply in_seq.
+      }
+      right.
+      apply Nat.nlt_ge in Hui.
+      destruct (Nat.eq_dec (nth u l 0) j) as [Hnuj| Hnuj]. {
+        now rewrite Hnuj; left.
+      }
+      right.
+      apply nth_In.
+      destruct Hu as (_, Hu).
+      now apply Nat.succ_lt_mono.
+    } {
+      apply nat_NoDup.
+      rewrite app_length, seq_length, list_swap_elem_length.
+      cbn - [ list_swap_elem ].
+      intros u v Hu Hv Huv.
+      unfold ff_app in Huv.
+      admit.
+    }
   }
   specialize (H1 H); clear H.
   assert (H : length la + length la = it + nb_fit i la). {
