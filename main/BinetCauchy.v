@@ -2331,6 +2331,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Hit; cbn.
     rewrite <- Nat.add_succ_r.
     f_equal.
+    rewrite Hla.
     admit.
   }
   specialize (H1 H); clear H.
