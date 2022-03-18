@@ -2254,6 +2254,10 @@ Compute (
   nth j la 0 = i + j
   → (j, k) ∉ transp_loop it i la
 ).
+Compute (transp_loop 10 0 [0;3;2;7;5]).
+03275
+0723500
+0023507
 ...
 revert i j k la Hi Him.
 induction it; intros; [ easy | cbn in Him ].
