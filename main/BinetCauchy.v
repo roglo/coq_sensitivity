@@ -2244,6 +2244,11 @@ Theorem glop : ∀ it la i j k,
   → (j, k) ∉ transp_loop it i la.
 Proof.
 intros * Hi Him.
+(* est-ce que c'est pas plutôt
+    (i + j, k) ∉ transp_loop it i la.
+   ?
+*)
+...
 (* contre-exemple *)
 Compute (
   let la := [3;2;7;5] in
@@ -2252,7 +2257,7 @@ Compute (
   let k := 7 in
   let it := 4 in
   nth j la 0 = i + j
-  → (j, k) ∉ transp_loop it i la
+  → (i, k) ∉ transp_loop it i la
 ).
 Compute (transp_loop 10 0 [0;3;2;7;5]).
 ...
