@@ -2250,6 +2250,16 @@ destruct la as [| n]; [ easy | ].
 rewrite if_eqb_eq_dec in Him.
 destruct (Nat.eq_dec i n) as [Hin| Hin]. {
   subst n.
+Compute (
+  let la := [3;2;7;5] in
+  let j := 1 in
+  let i := 1 in
+  let k := 7 in
+  let it := 4 in
+  nth j la 0 = i + j
+  → (j, k) ∉ transp_loop it i la
+).
+...
 (**)
   apply (IHit _ _ k _ Hi).
   clear IHit.
