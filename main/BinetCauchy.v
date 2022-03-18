@@ -2338,6 +2338,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite map_map.
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec i (nth (j - i) (j :: l) 0)) as [Hiej| Hiej]. {
+...
       exfalso.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
