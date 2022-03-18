@@ -2259,6 +2259,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (H1 H); clear H.
   clear IHit.
+  subst f.
+  rewrite fold_comp_list.
 ...
   rewrite transp_loop_app_seq in H1 |-*.
 ...
