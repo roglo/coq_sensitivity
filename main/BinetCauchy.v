@@ -2241,20 +2241,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     eqn:Hg.
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
-  specialize (IHit (list_swap_elem 0 (j :: l) 0 (j - i)) i) as H1.
-  rewrite list_swap_elem_length in H1.
-  cbn - [ list_swap_elem ] in H1.
-  rewrite <- Hla in H1.
+  specialize (IHit la i) as H1.
   unfold "°" in H1.
   rewrite <- Hg in H1.
   assert (H : is_permut_list (seq 0 i ++ la)). {
     admit.
   }
   specialize (H1 H); clear H.
-  assert
-    (H : S (length l + S (length l)) = it + nb_fit i la). {
+  assert (H : length la + length la = it + nb_fit i la). {
+    rewrite Hla at 1 2.
+    rewrite list_swap_elem_length; cbn.
     unfold list_swap_elem.
-    cbn - [ nth ].
+    rewrite Hit; cbn.
+    rewrite <- Nat.add_succ_r.
+    f_equal.
     admit.
   }
   specialize (H1 H); clear H.
