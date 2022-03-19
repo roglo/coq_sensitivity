@@ -2344,7 +2344,7 @@ assert (Hj : j ∈ seq (S i) (length l)). {
   destruct Hp as (Hpp, Hpl).
   rewrite app_length, seq_length in Hpp; cbn in Hpp.
   apply in_seq.
-  split; [ flia Hilj | cbn ].
+  split; [ easy | cbn ].
   rewrite <- Nat.add_succ_r.
   apply (Hpp j).
   now apply in_or_app; right; left.
