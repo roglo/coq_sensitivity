@@ -2338,7 +2338,76 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite map_map.
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec i (nth (j - i) (j :: l) 0)) as [Hiej| Hiej]. {
+(**)
+exfalso.
+assert (Hj : j ∈ seq (S i) (length l)). {
+  destruct Hp as (Hpp, Hpl).
+  rewrite app_length, seq_length in Hpp; cbn in Hpp.
+  apply in_seq.
+  split; [ flia Hilj | cbn ].
+  rewrite <- Nat.add_succ_r.
+  apply (Hpp j).
+  now apply in_or_app; right; left.
+}
+...
+assert (Hj : j ∈ seq i (length l - i)). {
+  destruct Hp as (Hpp, Hpl).
+  rewrite app_length, seq_length in Hpp; cbn in Hpp.
+  apply NoDup_app_iff in Hpl.
+  destruct Hpl as (Hil & Hjl & Hnjl).
+  assert (H2 : j ∉ seq 0 i). {
+    intros H.
+    specialize (Hnjl _ H) as H2; apply H2.
+    now left.
+  }
+  assert (H3 : j ∈ seq (S i) (length l)). {
+    apply in_seq.
+    split; [ flia Hilj | cbn ].
+    rewrite <- Nat.add_succ_r.
+    apply (Hpp j).
+    now apply in_or_app; right; left.
+  }
+...
+  apply in_seq.
+  split; [ flia Hilj | ].
+  rewrite Nat.add_comm.
+  rewrite Nat.sub_add. 2: {
+    specialize (Hpp (i + j)) as H2.
+    assert (
+...
+    replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
+    rewrite List_nth_succ_cons in Hiej.
+    rewrite Hiej.
+    apply Nat.lt_le_incl.
+Search (nth _ _ _ ≤ _).
+    apply nth_In.
+...
+
+assert (H : i ∈ seq 0 i). {
+  replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
+  rewrite List_nth_succ_cons in Hiej.
+  rewrite Hiej at 1.
+  apply in_seq.
+  split; [ easy | cbn ].
+  destruct Hp as (Hpp, Hpl).
+  rewrite app_length, seq_length in Hpp; cbn in Hpp.
+
+
+...
       cbn - [ nth transposition ]; f_equal.
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        replace (nth _ _ _) with (if k =? j - S i then j else nth k l 0). 2: {
+          unfold transposition; cbn.
+          replace (j - i) with (S (j - S i)) by flia Hilj.
+          do 2 rewrite if_eqb_eq_dec.
+          now destruct (Nat.eq_dec k (j - S i)).
+        }
+        easy.
+      }
+      replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
+      rewrite List_nth_succ_cons in Hiej.
+
 ...
       exfalso.
       destruct Hp as (Hpp, Hpl).
