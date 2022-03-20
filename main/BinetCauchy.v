@@ -2535,6 +2535,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
               specialize (H1 H); clear H.
               flia H1 Hilj.
             }
+            flia Huiz Huv Hilj Huji.
+          }
+          destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
+            cbn in Huv.
 ...
       admit.
     }
