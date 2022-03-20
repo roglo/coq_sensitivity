@@ -2446,6 +2446,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
             replace (v - i) with (S (v - S i)) in Huv by flia Hviz Hvi.
             rewrite List_nth_succ_cons in Huv.
             rewrite List_nth_0_cons in Huv.
+            assert (H : v = j) by flia Hvij Hviz.
+            subst v; clear Hvij Hviz.
+            destruct Hp as (Hpp, Hpl).
+            rewrite app_length, seq_length in Hpp; cbn in Hpp.
+            assert (Hul : j ∈ l). {
+              rewrite <- Huv.
+              apply nth_In.
+              flia Hv Hilj.
+            }
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply NoDup_cons_iff in Hjl.
+            easy.
+          }
 ...
       admit.
     }
