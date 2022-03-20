@@ -2475,9 +2475,66 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
         }
         destruct (Nat.eq_dec (u - i) (j - i)) as [Huji| Huji]. {
           rewrite List_nth_0_cons in Huv.
+          assert (H : u = j) by flia Huji Huiz.
+          subst u.
+          clear Hui Huji Huiz Hui.
           destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
             assert (H : v = i) by flia Hviz Hvi; subst v.
             clear Hvi Hviz Hv.
+            replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+            rewrite List_nth_succ_cons in Huv.
+            assert (Hul : j ∈ l). {
+              rewrite Huv.
+              apply nth_In.
+              flia Hu Hilj.
+            }
+            destruct Hp as (Hpp, Hpl).
+            rewrite app_length, seq_length in Hpp; cbn in Hpp.
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply NoDup_cons_iff in Hjl.
+            easy.
+          }
+          destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
+            flia Hvji Hviz.
+          }
+          replace (v - i) with (S (v - S i)) in Huv by flia Hviz.
+          rewrite List_nth_succ_cons in Huv.
+          assert (Hul : j ∈ l). {
+            rewrite Huv.
+            apply nth_In.
+            flia Hv Hviz.
+          }
+          destruct Hp as (Hpp, Hpl).
+          rewrite app_length, seq_length in Hpp; cbn in Hpp.
+          apply NoDup_app_iff in Hpl.
+          destruct Hpl as (Hil & Hjl & Hnjl).
+          apply NoDup_cons_iff in Hjl.
+          easy.
+        } {
+          replace (u - i) with (S (u - S i)) in Huv by flia Hui Huiz.
+          rewrite List_nth_succ_cons in Huv.
+          destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
+            assert (H : v = i) by flia Hviz Hvi; subst v.
+            clear Hvi Hviz Hv.
+            replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+            rewrite List_nth_succ_cons in Huv.
+            destruct Hp as (Hpp, Hpl).
+            rewrite app_length, seq_length in Hpp; cbn in Hpp.
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply NoDup_cons_iff in Hjl.
+            destruct Hjl as (Hjl & Hl).
+            apply (NoDup_nat _ Hl) in Huv; cycle 1. {
+              flia Hu Huiz.
+            } {
+              specialize (Hpp j) as H1.
+              assert (H : j ∈ seq 0 i ++ j :: l). {
+                now apply in_or_app; right; left.
+              }
+              specialize (H1 H); clear H.
+              flia H1 Hilj.
+            }
 ...
       admit.
     }
