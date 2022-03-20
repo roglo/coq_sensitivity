@@ -2387,13 +2387,51 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
         }
         replace (v - i) with (S (v - S i)) by flia Hvi Hviz.
         rewrite List_nth_succ_cons.
-...
-Search (nth (transposition _ _ _)).
-rewrite nth_list_swap_elem.
-...
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
-        specialize (NoDup_nat _ Hpl) as H1.
+        unfold list_swap_elem in Huv.
+        rewrite (List_map_nth' 0) in Huv. 2: {
+          rewrite seq_length; cbn; flia Hv.
+        }
+        rewrite seq_nth in Huv; [ | cbn; flia Hv ].
+        unfold transposition in Huv.
+        rewrite Nat.add_0_l in Huv.
+        replace (v - i) with (S (v - S i)) in Huv at 1 by flia Hviz.
+        replace (S (v - S i) =? 0) with false in Huv by easy.
+        apply Nat.eqb_neq in Hvji; rewrite Hvji in Huv.
+        apply Nat.eqb_neq in Hvji.
+        replace (v - i) with (S (v - S i)) in Huv at 1 by flia Hviz.
+        rewrite List_nth_succ_cons in Huv.
+        rewrite <- Huv.
+        assert (Hul : u ∈ l). {
+          rewrite Huv.
+          apply nth_In.
+          flia Hv Hviz.
+        }
+        assert (Hus : u ∉ seq 0 i). {
+          intros H.
+          apply NoDup_app_iff in Hpl.
+          destruct Hpl as (Hil & Hjl & Hnjl).
+          apply Hnjl in H.
+          now apply H; right.
+        }
+        apply Nat.nlt_ge; intros H; apply Hus; clear Hus.
+        now apply in_seq.
+      }
+      apply Nat.nlt_ge in Hui.
+      rewrite app_nth2 in Huv; [ | now rewrite seq_length ].
+      rewrite seq_length in Huv.
+      destruct (lt_dec v i) as [Hvi| Hvi]. 2: {
+        apply Nat.nlt_ge in Hvi.
+        rewrite app_nth2 in Huv; [ | now rewrite seq_length ].
+        rewrite seq_length in Huv.
+        unfold list_swap_elem in Huv.
+        rewrite (List_map_nth' 0) in Huv; [ | rewrite seq_length; cbn; flia Hu ].
+        rewrite (List_map_nth' 0) in Huv; [ | rewrite seq_length; cbn; flia Hv ].
+        rewrite seq_nth in Huv; [ | cbn; flia Hu ].
+        rewrite seq_nth in Huv; [ | cbn; flia Hv ].
+        do 2 rewrite Nat.add_0_l in Huv.
+        unfold transposition in Huv.
 ...
       admit.
     }
