@@ -2241,9 +2241,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     eqn:Hg.
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   move g before f; move la before g.
-  specialize (IHit la i) as H1.
-  unfold "°" in H1.
-  rewrite <- Hg in H1.
   assert (Hilj : i < j). {
     apply Nat.nle_gt.
     intros Hc.
@@ -2324,6 +2321,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       admit.
     }
   }
+  specialize (IHit la i) as H1.
+  unfold "°" in H1.
+  rewrite <- Hg in H1.
   specialize (H1 H); clear H.
   assert (H : length la + length la = it + nb_fit i la). {
 (**)
