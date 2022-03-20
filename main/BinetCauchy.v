@@ -2334,6 +2334,62 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
         rewrite Huv in Hui.
         apply Nat.nle_gt in Hui.
         apply Hui; clear Hui.
+        unfold list_swap_elem.
+        rewrite (List_map_nth' 0). 2: {
+          rewrite seq_length; cbn; flia Hv.
+        }
+        rewrite seq_nth; [ | cbn; flia Hv ].
+        rewrite Nat.add_0_l.
+        unfold transposition.
+        do 2 rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
+          replace (j - i) with (S (j - S i)) by flia Hilj.
+          rewrite List_nth_succ_cons.
+          apply Nat.sub_0_le in Hviz.
+          apply Nat.le_antisymm in Hvi; [ subst v | easy ].
+          clear Hviz Hv.
+          rewrite Nat.sub_diag in Huv.
+          unfold list_swap_elem in Huv.
+          rewrite (List_map_nth' 0) in Huv; [ | now rewrite seq_length; cbn ].
+          rewrite seq_nth in Huv; [ | now cbn ].
+          unfold transposition in Huv.
+          rewrite Nat.eqb_refl in Huv.
+          replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+          rewrite List_nth_succ_cons in Huv.
+          rewrite <- Huv.
+          destruct Hp as (Hpp, Hpl).
+          rewrite app_length, seq_length in Hpp; cbn in Hpp.
+          assert (Hj : j ∈ seq (S i) (length l)). {
+            apply in_seq.
+            split; [ easy | cbn ].
+            rewrite <- Nat.add_succ_r.
+            apply (Hpp j).
+            now apply in_or_app; right; left.
+          }
+          assert (Hul : u ∈ l). {
+            rewrite Huv.
+            apply nth_In.
+            apply in_seq in Hj.
+            flia Hj.
+          }
+          assert (Hus : u ∉ seq 0 i). {
+            intros H.
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply Hnjl in H.
+            now apply H; right.
+          }
+          apply Nat.nlt_ge; intros H; apply Hus; clear Hus.
+          now apply in_seq.
+        }
+        destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
+          now apply Nat.lt_le_incl.
+        }
+        replace (v - i) with (S (v - S i)) by flia Hvi Hviz.
+        rewrite List_nth_succ_cons.
+...
+Search (nth (transposition _ _ _)).
+rewrite nth_list_swap_elem.
 ...
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
