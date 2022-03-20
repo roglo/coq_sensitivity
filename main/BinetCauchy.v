@@ -2460,6 +2460,24 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
             apply NoDup_cons_iff in Hjl.
             easy.
           }
+          destruct Hp as (Hpp, Hpl).
+          rewrite app_length, seq_length in Hpp; cbn in Hpp.
+          apply NoDup_app_iff in Hpl.
+          destruct Hpl as (Hil & Hjl & Hnjl).
+          apply Nat.neq_sym in Hvij.
+          apply (NoDup_nat _ Hjl) in Huv; [ easy | cbn | cbn; flia Hv ].
+          specialize (Hpp j) as H1.
+          assert (H : j ∈ seq 0 i ++ j :: l). {
+            now apply in_or_app; right; left.
+          }
+          specialize (H1 H); clear H.
+          flia H1.
+        }
+        destruct (Nat.eq_dec (u - i) (j - i)) as [Huji| Huji]. {
+          rewrite List_nth_0_cons in Huv.
+          destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
+            assert (H : v = i) by flia Hviz Hvi; subst v.
+            clear Hvi Hviz Hv.
 ...
       admit.
     }
