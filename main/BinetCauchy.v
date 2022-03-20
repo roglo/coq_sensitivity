@@ -1195,7 +1195,7 @@ destruct j as [j| ]. 2: {
   (* d'après H1, i ne fait pas partie de la liste j :: l *)
   (* du coup, avec le principe des tiroirs, Hpp et Hpl ne
      devraient pas être possibles *)
-  admit.
+  ...
 }
 apply List_rank_Some with (d := 0) in Hj.
 destruct Hj as (Hjl & Hbef & Hij).
@@ -1227,7 +1227,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
     replace j with (S (j - 1)) by flia Hjz.
     rewrite replace_at_succ_cons; cbn - [ seq ].
-    admit. (* devrait le faire, j'espère *)
+    ... (* devrait le faire, j'espère *)
   }
   specialize (H1 H); clear H.
   assert (Hr : length (tl (replace_at j (k :: l) k)) = length l). {
@@ -1283,7 +1283,7 @@ destruct j as [j| ]. 2: {
   specialize (List_rank_None 0 _ _ Hj) as H1; cbn.
   exfalso.
   clear - Hp H1.
-  admit. (* devrait le faire *)
+  ... (* devrait le faire *)
 }
 apply List_rank_Some with (d := 0) in Hj.
 destruct Hj as (Hjl & Hbef & Hij).
@@ -1316,7 +1316,7 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
   assert (H : is_permut_list (seq 0 (S i) ++ tl (replace_at j (k :: l) k))). {
     replace j with (S (j - 1)) by flia Hjz.
     rewrite replace_at_succ_cons; cbn - [ seq ].
-    admit. (* devrait le faire, j'espère *)
+    ... (* devrait le faire, j'espère *)
   }
   specialize (H1 H); clear H.
   assert (Hr : length (tl (replace_at j (k :: l) k)) = length l). {
@@ -2259,6 +2259,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite seq_nth in H2; [ | flia Hij Hc ].
     now specialize (H2 eq_refl).
   }
+  move Hilj before Hij.
   assert (H : is_permut_list (seq 0 i ++ la)). {
     rewrite Hla.
     split. {
@@ -2318,9 +2319,30 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       cbn - [ list_swap_elem ].
       intros u v Hu Hv Huv.
       unfold ff_app in Huv.
+      destruct (lt_dec u i) as [Hui| Hui]. {
+        rewrite app_nth1 in Huv; [ | now rewrite seq_length ].
+        rewrite seq_nth in Huv; [ | easy ].
+        rewrite Nat.add_0_l in Huv.
+        destruct (lt_dec v i) as [Hvi| Hvi]. {
+          rewrite app_nth1 in Huv; [ | now rewrite seq_length ].
+          rewrite seq_nth in Huv; [ | easy ].
+          easy.
+        }
+        apply Nat.nlt_ge in Hvi; exfalso.
+        rewrite app_nth2 in Huv; [ | now rewrite seq_length ].
+        rewrite seq_length in Huv.
+        rewrite Huv in Hui.
+        apply Nat.nle_gt in Hui.
+        apply Hui; clear Hui.
+...
+        destruct Hp as (Hpp, Hpl).
+        rewrite app_length, seq_length in Hpp; cbn in Hpp.
+        specialize (NoDup_nat _ Hpl) as H1.
+...
       admit.
     }
   }
+...
   specialize (IHit la i) as H1.
   unfold "°" in H1.
   rewrite <- Hg in H1.
