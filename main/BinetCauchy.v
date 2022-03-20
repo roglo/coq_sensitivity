@@ -2432,6 +2432,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
         rewrite seq_nth in Huv; [ | cbn; flia Hv ].
         do 2 rewrite Nat.add_0_l in Huv.
         unfold transposition in Huv.
+        do 4 rewrite if_eqb_eq_dec in Huv.
+        destruct (Nat.eq_dec (u - i) 0) as [Huiz| Huiz]. {
+          apply Nat.sub_0_le in Huiz.
+          apply Nat.le_antisymm in Huiz; [ | easy ].
+          subst u; clear Hu Hui.
+          destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
+            apply Nat.sub_0_le in Hviz.
+            now apply Nat.le_antisymm.
+          }
+          destruct (Nat.eq_dec (v - i) (j - i)) as [Hvij| Hvij]. {
+            rewrite <- Hvij in Huv.
+            replace (v - i) with (S (v - S i)) in Huv by flia Hviz Hvi.
+            rewrite List_nth_succ_cons in Huv.
+            rewrite List_nth_0_cons in Huv.
 ...
       admit.
     }
