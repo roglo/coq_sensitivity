@@ -2517,7 +2517,7 @@ Qed.
 
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
-  → it = length l + nb_nfit i l
+  → length l + nb_nfit i l ≤ it
   → fold_right (λ t l, swap (length l) (fst t) (snd t) ° l)
       (seq 0 i ++ l) (transp_loop it i l) =
     seq 0 (i + length l).
@@ -2544,16 +2544,17 @@ Compute (map (λ p,
 *)
 revert l i Hp Hit.
 induction it; intros; cbn. {
-  cbn in Hit.
-  symmetry in Hit.
+  apply Nat.le_0_r in Hit.
   apply Nat.eq_add_0 in Hit.
   destruct Hit as (Hl & Hnf).
   apply length_zero_iff_nil in Hl; subst l.
   now rewrite app_nil_r, Nat.add_0_r.
 }
-destruct l as [| j]; [ easy | ].
+destruct l as [| j]. {
+  now cbn; rewrite app_nil_r, Nat.add_0_r.
+}
 cbn in Hit.
-apply Nat.succ_inj in Hit.
+apply Nat.succ_le_mono in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
@@ -2599,7 +2600,53 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold "°" in H1.
   rewrite <- Hg in H1.
   specialize (H1 Hpa).
-  assert (H : it = length la + nb_nfit i la). {
+  assert (H : length la + nb_nfit i la ≤ it). {
+    rewrite Hla, list_swap_elem_length, List_length_cons.
+    rewrite Nat.add_succ_comm.
+    etransitivity; [ | apply Hit ].
+    apply Nat.add_le_mono_l.
+    apply -> Nat.succ_le_mono.
+(**)
+    cbn - [ nth ].
+    replace (j - i) with (S (j - S i)) by flia Hilj.
+    rewrite List_nth_succ_cons.
+    rewrite <- seq_shift, map_map.
+    remember (nth (j - S i) l 0) as k eqn:Hk.
+    erewrite map_ext_in. 2: {
+      intros u Hu.
+      unfold transposition.
+      cbn - [ nth ].
+      replace (nth _ _ _) with (if u =? j - S i then j else nth u l 0). 2: {
+        do 2 rewrite if_eqb_eq_dec.
+        now destruct (Nat.eq_dec u (j - S i)).
+      }
+      easy.
+    }
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+Print nb_nfit.
+(* donc là, ça devrait marcher, parce qu'en j-(i+1), il
+   y a bien j et que si on commence à (i+1), ça donne j
+   en j *)
+...
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+      move Hik at top; subst k.
+      rewrite Nat.add_0_l, <- Nat.add_succ_r.
+      rewrite <- seq_shift, map_map.
+      erewrite map_ext_in. 2: {
+        intros u Hu.
+        unfold transposition.
+        cbn - [ nth ].
+        easy.
+      }
+...
+      assert (nb_fit (S i) l = nb_fit (S i) (map (
+...
+Print list_swap_elem.
+Theorem nb_nfit_list_swap_elem : ∀ d l i j k,
+  nb_nfit k (list_swap_elem d l i j) = nb_nfit (S k) l.
+Proof.
+...
 (**)
 Compute (
 let it := 5 in
@@ -2608,7 +2655,8 @@ let it := 5 in
   let j := 3 in
   let la := list_swap_elem 0 (j :: l) 0 (j - i) in
 (
-  length la + nb_nfit i la = it)
+  length l + (1 + nb_nfit (S i) l) ≤ it,
+  length la + nb_nfit i la ≤ it)
 ).
 (**)
 (* du coup, ça va pas du tout ! *)
