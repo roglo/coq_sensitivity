@@ -2573,6 +2573,17 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now specialize (H2 eq_refl).
   }
   move Hilj before Hij.
+  assert (Hji : j - S i < length l). {
+    destruct Hp as (Hpp, Hpl).
+    specialize (Hpp j) as H2.
+    rewrite app_length, seq_length in H2.
+    assert (H : j ∈ seq 0 i ++ j :: l). {
+      now apply in_or_app; right; left.
+    }
+    specialize (H2 H); clear H; cbn in H2.
+    flia H2 Hilj.
+  }
+  move Hji before Hilj.
   assert (Hpa : is_permut_list (seq 0 i ++ la)). {
     rewrite Hla.
     now apply app_seq_swap_is_permut_list.
@@ -2604,16 +2615,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       nb_nfit (S i) l). {
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec i (nth _ _ _)) as [H2| H2]; [ flia H | easy ].
-    }
-    assert (Hji : j - S i < length l). {
-      destruct Hp as (Hpp, Hpl).
-      specialize (Hpp j) as H2.
-      rewrite app_length, seq_length in H2.
-      assert (H : j ∈ seq 0 i ++ j :: l). {
-        now apply in_or_app; right; left.
-      }
-      specialize (H2 H); clear H; cbn in H2.
-      flia H2 Hilj.
     }
     remember (λ u, if _ =? _ then _ else _) as f1 eqn:Hf1.
     remember (length l) as len eqn:Hlen.
@@ -2662,6 +2663,122 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite list_swap_elem_length.
   }
   cbn.
+  unfold g at 2.
+  rewrite app_length, seq_length.
+  cbn.
+  unfold "°".
+  unfold ff_app.
+  enough
+    (H : seq 0 i ++ la =
+     map (λ i0 : nat, nth i0 (seq 0 i ++ j :: l) 0) (swap (i + S (length l)) i j)). {
+    now rewrite <- H.
+  }
+  symmetry.
+  rewrite Hla.
+  unfold swap.
+  unfold list_swap_elem.
+  rewrite map_map.
+  rewrite seq_length.
+  rewrite List_length_cons.
+  rewrite List_seq_cut with (i := i). 2: {
+    apply in_seq.
+    split; [ easy | ].
+    flia.
+  }
+  rewrite Nat.sub_0_r.
+  cbn - [ nth seq ].
+  rewrite map_app.
+  cbn - [ nth seq ].
+  f_equal. {
+    rewrite List_map_nth_seq with (d := 0).
+    rewrite seq_length.
+    apply map_ext_in.
+    intros k Hk; apply in_seq in Hk.
+    rewrite seq_nth; [ | easy ].
+    replace (i + S (length l) - S i) with (length l) by flia Hji.
+    rewrite Nat.add_0_l.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hk H | clear H ].
+    destruct (Nat.eq_dec k j) as [H| H]; [ flia Hk Hilj H | clear H ].
+    remember (seq 0 i ++ j :: l) as x.
+    rewrite app_nth1; subst x; [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite app_nth1; [ | now rewrite seq_length ].
+    now apply seq_nth.
+  }
+  cbn - [ nth ].
+  f_equal. {
+    rewrite transposition_1.
+    remember (seq 0 i ++ j :: l) as x.
+    rewrite app_nth2; subst x. 2: {
+      rewrite seq_length.
+      now apply Nat.lt_le_incl.
+    }
+    rewrite seq_length.
+    replace (i + S (length l) - S i) with (length l) by flia Hji.
+    replace (i :: seq (S i) (length l)) with (seq i (S (length l))) by easy.
+    rewrite app_nth2. 2: {
+      rewrite seq_length; unfold ge.
+      rewrite seq_nth; [ | flia Hji ].
+      flia Hilj.
+    }
+    rewrite seq_length.
+    f_equal.
+    rewrite seq_nth; [ now rewrite Nat.add_comm, Nat.add_sub | ].
+    flia Hji.
+  }
+  replace (i + S (length l) - S i) with (length l) by flia Hji.
+  symmetry.
+  rewrite <- seq_shift, map_map.
+...
+  replace (seq 0 i ++ i :: seq (S i) (length l)) with (seq 0 (length l)). 2: {
+    rewrite List_seq_cut with (i := i). 2: {
+      apply in_seq.
+      split; [ easy | ].
+...
+    }
+    rewrite Nat.sub_0_r.
+    cbn.
+...
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    rewrite app_nth2. 2: {
+      rewrite seq_length; unfold ge.
+      unfold swap in Hk.
+      unfold list_swap_elem in Hk.
+      rewrite seq_length in Hk.
+      apply in_map_iff in Hk.
+      destruct Hk as (u & Hu1 & Hu2).
+      rewrite <- Hu1.
+      apply in_seq in Hu2.
+      destruct (le_dec i u) as [Hiu| Hiu]. {
+        rewrite seq_nth. 2: {
+          apply transposition_lt; [ flia | | easy ].
+          destruct Hp as (Hpp, Hpl).
+          specialize (Hpp j) as H2.
+          assert (H : j ∈ seq 0 i ++ j :: l). {
+            now apply in_or_app; right; left.
+          }
+          specialize (H2 H); clear H.
+          now rewrite app_length, seq_length in H2.
+        }
+        unfold transposition.
+        do 2 rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec u i) as [Hui| Hui]. {
+          now apply Nat.lt_le_incl.
+        }
+        now destruct (Nat.eq_dec u j).
+      }
+      apply Nat.nle_gt in Hiu.
+...
+        assert (H : j < i + S (length l)) by flia Hc.
+...
+Search (_ ∈ list_swap_elem _ _ _ _).
+...
+Print list_swap_elem.
+Print swap.
+Search (map _ (swap _ _ _)).
 ...
 
 (*
@@ -3394,14 +3511,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite List_length_cons in H1.
   assert
     (H : is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i))). {
-    admit.
+...
   }
   specialize (H1 H); clear H.
   assert
     (H :
        S (length l) + S (length l) =
        it + nb_fit i (list_swap_elem 0 (j :: l) 0 (j - i))). {
-    admit.
+...
   }
   specialize (H1 H); clear H.
 ...
@@ -4327,11 +4444,9 @@ easy.
 apply bsort_rank_is_permut_list.
 rewrite length_bsort_rank.
 rewrite Hklm.
-admit.
+...
 rewrite length_bsort_rank.
-admit.
-admit.
-admit.
+...
 }
 fold p.
 (* la formule g, h ci-dessous, je pense qu'elle n'est pas bonne
