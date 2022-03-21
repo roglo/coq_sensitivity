@@ -2046,6 +2046,14 @@ Proof.
 intros * Hp.
 specialize (permut_eq_iter_list_transp Hp) as H1.
 unfold iter_list in H1.
+(*
+remember (transp_list l) as lt eqn:Hlt; symmetry in Hlt.
+revert l Hp Hlt H1.
+induction lt as [| t]; intros; [ easy | cbn ].
+cbn in H1.
+specialize (IHlt (l ° swap (length l) (fst t) (snd t))) as H2.
+...
+*)
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
 rewrite comp_length.
@@ -2074,9 +2082,98 @@ rewrite (List_map_nth' 0). 2: {
   unfold list_swap_elem.
   rewrite seq_length.
   rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  unfold transposition.
+  rewrite (@seq_nth (length la) 0 i 0); [ | easy ].
+  rewrite Nat.add_0_l.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
+    destruct (lt_dec (snd t) (length la)) as [H2t| H2t]. 2: {
+      apply Nat.nlt_ge in H2t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  destruct (Nat.eq_dec i (snd t)) as [Hi2| Hi2]. {
+    destruct (lt_dec (fst t) (length la)) as [H1t| H1t]. 2: {
+      apply Nat.nlt_ge in H1t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  now rewrite seq_nth.
+}
+unfold list_swap_elem.
+rewrite seq_length.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (@seq_nth (length la) 0 i 0); [ | easy ].
+  rewrite Nat.add_0_l.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
+    destruct (lt_dec (snd t) (length la)) as [H2t| H2t]. 2: {
+      apply Nat.nlt_ge in H2t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  destruct (Nat.eq_dec i (snd t)) as [Hi2| Hi2]. {
+    destruct (lt_dec (fst t) (length la)) as [H1t| H1t]. 2: {
+      apply Nat.nlt_ge in H1t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  now rewrite seq_nth.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (@seq_nth _ _ i); [ | easy ].
+rewrite Nat.add_0_l.
+unfold transposition.
+do 4 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
+  subst i.
+  destruct
+    (Nat.eq_dec
+       (nth (nth (snd t) (seq 0 (length la)) 0) (seq 0 (length la)) 0)
+       (fst t)) as [H2t| H2t].
+...
+rewrite (@seq_nth _ _ (transposition _ _ i)). 2: {
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
+...
+    destruct (lt_dec (snd t) (length la)) as [H2t| H2t]. 2: {
+      apply Nat.nlt_ge in H2t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  destruct (Nat.eq_dec i (snd t)) as [Hi2| Hi2]. {
+    destruct (lt_dec (fst t) (length la)) as [H1t| H1t]. 2: {
+      apply Nat.nlt_ge in H1t.
+      rewrite nth_overflow; [ flia Hila | now rewrite seq_length ].
+    }
+    now rewrite seq_nth.
+  }
+  now rewrite seq_nth.
+...
+Search (nth _ _ _ < _).
+apply permut_list_ub.
+...
   rewrite seq_nth. 2: {
     rewrite seq_nth; [ | easy ].
-    apply transposition_lt; [ | | easy ].
+    destruct (lt_dec (fst t) (length la)) as [H1a| H1a]. {
+      destruct (lt_dec (snd t) (length la)) as [H2a| H2a]. {
+        now apply transposition_lt.
+      }
+      apply Nat.nlt_ge in H2a.
+      unfold transposition.
+      rewrite Nat.add_0_l.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (fst t)) as [Hit| Hit]. {
+
 Search (_ ∈ transp_list _).
 ...
   specialize (nth_list_swap_elem) as H2.
