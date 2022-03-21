@@ -2679,7 +2679,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     replace (S i + (j - S i)) with (j - S i + S i) by apply Nat.add_comm.
     rewrite Nat.sub_add; [ | easy ].
     rewrite Nat.add_0_l.
-...
     destruct (Nat.eq_dec j (S i)) as [Hjsi| Hjsi]. {
       rewrite Hjsi, Nat.sub_diag, Nat.sub_0_r.
       replace (length l) with (S (length l - 1)) by flia Hji.
@@ -2700,9 +2699,22 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       rewrite Hjl.
       apply nth_In; flia Hji.
     }
+    replace (j - S i) with (S (j - S (S i))) by flia Hjsi Hilj.
+Search (seq (_ + _)).
+(* ah... zut *)
+...
+    rewrite <- seq_shift.
+    do 2 rewrite map_map.
     erewrite map_ext_in. 2: {
       intros u Hu.
       apply in_seq in Hu.
+...
+      rewrite if_eqb_eq_dec.
+
+      destruct (Nat.eq_dec (S u) (S (j - S (S i)))) as [H2| H2]. {
+
+        flia Hu H2 Hjsi Hji Hilj.
+...
       rewrite Nat.add_comm, Nat.sub_add in Hu; [ | flia Hu ].
       rewrite if_eqb_eq_dec.
 ...
