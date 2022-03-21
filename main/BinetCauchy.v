@@ -2524,6 +2524,15 @@ induction la as [| j]; intros; [ now rewrite Nat.add_0_r | cbn ].
 now rewrite IHla, Nat.add_assoc, Nat.add_succ_comm.
 Qed.
 
+(*
+Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
+  is_permut_list (seq 0 i ++ l)
+  → it = length l + nb_nfit i l
+  → fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+      (transp_loop it i l) (seq 0 (i + length l)) =
+    seq 0 i ++ l.
+Proof.
+*)
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + nb_nfit i l ≤ it
@@ -2532,25 +2541,53 @@ Theorem fold_right_transp_loop : ∀ l it i,
     seq 0 (i + length l).
 Proof.
 intros * Hp Hit.
-(*
+(**)
 Compute (let p := [1;2;3;0;5;4] in
   let i := first_non_fix_transp 0 p in
   let l := skipn i p in
-  let it := length l + length l - nb_fit i l in
+  let it := length l + nb_nfit i l in
   fold_right
+    (λ t l, swap (length l) (fst t) (snd t) ° l)
+    (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+).
+Compute (let p := [1;2;3;0;5;4] in
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + nb_nfit i l in
+  fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
+    (transp_loop it i l) (seq 0 (i + length l)) =
+    seq 0 i ++ l
+).
+...
+Compute (let p := [1;2;3;0;5;4] in
+  transp_list p).
+...
+123054
+213054
+312054
+012354
+012345
+...
+Compute (map (λ p,
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + nb_nfit i l in
+  fold_left
     (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
     (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
+) (canon_sym_gr_list_list 4)
 ).
 Compute (map (λ p,
   let i := first_non_fix_transp 0 p in
   let l := skipn i p in
-  let it := length l + length l - nb_fit i l in
+  let it := length l + nb_nfit i l in
   fold_right
     (λ (t : nat * nat) (l0 : list nat), swap (length l0) (fst t) (snd t) ° l0)
     (seq 0 i ++ l) (transp_loop it i l) = seq 0 (i + length l)
 ) (canon_sym_gr_list_list 4)
 ).
-*)
+(**)
+...
 revert l i Hp Hit.
 induction it; intros; cbn. {
   apply Nat.le_0_r in Hit.
