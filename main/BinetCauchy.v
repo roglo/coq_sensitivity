@@ -2569,7 +2569,11 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
             flia Huv Hui Hvi Huiz Hviz.
           }
         }
-      }
+      } {
+        clear Hv.
+        rewrite app_nth1 in Huv; [ | now rewrite seq_length ].
+        rewrite seq_nth in Huv; [ | easy ].
+        rewrite Nat.add_0_l in Huv.
 ...
       admit.
     }
