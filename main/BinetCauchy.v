@@ -2021,6 +2021,93 @@ specialize (H1 l (length l + nb_nfit 0 l) 0).
 apply (H1 Hp (le_refl _)).
 Qed.
 
+Theorem List_fold_left_fold_right : ∀ A B (f : A → B → A) la lb l,
+  (∀ a l, f (f l a) a = l)
+  → fold_left f la l = lb
+  → fold_right (λ t l, f l t) lb la = l.
+Proof.
+intros * Hal Hll.
+revert l lb Hll.
+induction la as [| a]; intros; [ easy | cbn ].
+cbn in Hll.
+apply IHla in Hll.
+rewrite Hll.
+apply Hal.
+Qed.
+
+Theorem permut_eq_iter_list_transp' : ∀ l,
+  is_permut_list l
+  → fold_right (λ t l, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l))
+       (transp_list l) = l.
+Proof.
+intros * Hp.
+specialize (permut_eq_iter_list_transp Hp) as H1.
+unfold iter_list in H1.
+apply List_fold_left_fold_right in H1; [ easy | ].
+intros t la.
+rewrite comp_length.
+rewrite swap_length.
+unfold swap.
+apply List_eq_iff.
+rewrite comp_length, list_swap_elem_length, seq_length.
+split; [ easy | ].
+intros d i.
+unfold "°".
+unfold ff_app.
+destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow. 2: {
+    rewrite map_length, list_swap_elem_length.
+    now rewrite seq_length.
+  }
+  symmetry.
+  now apply nth_overflow.
+}
+rewrite (List_map_nth' 0). 2: {
+  now rewrite list_swap_elem_length, seq_length.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite list_swap_elem_length, seq_length.
+  unfold list_swap_elem.
+  rewrite seq_length.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth. 2: {
+    rewrite seq_nth; [ | easy ].
+    apply transposition_lt; [ | | easy ].
+...
+  specialize (nth_list_swap_elem) as H2.
+  specialize (H2 nat 0 (snd t) i).
+  specialize (H2
+
+Search (nth _ (list_swap_elem _ _ _ _)).
+
+rewrite nth_list_swap_elem with (d := 0).
+...
+Search list_swap_elem.
+...
+unfold "°".
+rewrite list_swap_elem_involutive.
+Search swap.
+
+
+remember (λ (l : list nat) (t : nat * nat), l ° swap (length l) (fst t) (snd t)) as f.
+replace (fold_right _ _ _) with
+  (fold_right (λ t l, f l t) (seq 0 (length l)) (transp_list l)). 2: {
+  clear H1.
+  induction (transp_list l) as [| a la]; [ easy | cbn ].
+  rewrite <- IHla.
+  now rewrite Heqf.
+}
+remember (transp_list l) as la.
+remember (seq 0 (length l)) as lb.
+...
+unfold iter_list.
+unfold transp_list.
+specialize permut_eq_iter_list_transp_loop as H1.
+specialize (H1 l (length l + nb_nfit 0 l) 0).
+apply (H1 Hp (le_refl _)).
+Qed.
+
 Locate "Comp".
 
 ...
