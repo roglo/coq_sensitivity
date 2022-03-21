@@ -1339,6 +1339,22 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
+Theorem List_map_seq : ∀ A (f : _ → A) sta len,
+  map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
+Proof.
+intros.
+revert sta.
+induction len; intros; [ easy | cbn ].
+symmetry.
+rewrite <- seq_shift, map_map.
+rewrite Nat.add_0_r; f_equal.
+symmetry.
+rewrite IHlen.
+apply map_ext_in.
+intros i Hi.
+now rewrite Nat.add_succ_comm.
+Qed.
+
 Theorem List_map_seq_length : ∀ A (f : _ → A) a len,
   length (map f (seq a len)) = len.
 Proof.
