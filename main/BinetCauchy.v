@@ -2130,6 +2130,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite (@seq_nth _ _ i); [ | easy ].
 rewrite Nat.add_0_l.
+...
 unfold transposition.
 do 4 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
@@ -2137,7 +2138,9 @@ destruct (Nat.eq_dec i (fst t)) as [Hi1| Hi1]. {
   destruct
     (Nat.eq_dec
        (nth (nth (snd t) (seq 0 (length la)) 0) (seq 0 (length la)) 0)
-       (fst t)) as [H2t| H2t].
+       (fst t)) as [H2t| H2t]. {
+...
+    rewrite seq_nth in H2t; [ | rewrite seq_nth ].
 ...
 rewrite (@seq_nth _ _ (transposition _ _ i)). 2: {
   unfold transposition.
