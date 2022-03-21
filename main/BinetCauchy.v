@@ -2731,6 +2731,18 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   replace (i + S (length l) - S i) with (length l) by flia Hji.
   symmetry.
   rewrite <- seq_shift, map_map.
+  symmetry.
+...
+Search (map _ (seq _ _)).
+  rewrite <- List_seq_shift'.
+...
+
+Search (map _ (seq _ _)).
+
+Check List_map_nth_seq'.
+  rewrite List_map_nth_seq' with (d := 0) (n := length l). 2: {
+    now rewrite List_map_seq_length.
+  }
 ...
   replace (seq 0 i ++ i :: seq (S i) (length l)) with (seq 0 (length l)). 2: {
     rewrite List_seq_cut with (i := i). 2: {
