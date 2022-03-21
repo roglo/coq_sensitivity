@@ -2022,7 +2022,7 @@ apply (H1 Hp (le_refl _)).
 Qed.
 
 Theorem List_fold_left_fold_right : ∀ A B (f : A → B → A) la lb l,
-  (∀ a l, f (f l a) a = l)
+  (∀ a l, a ∈ la → f (f l a) a = l)
   → fold_left f la l = lb
   → fold_right (λ t l, f l t) lb la = l.
 Proof.
@@ -2031,8 +2031,11 @@ revert l lb Hll.
 induction la as [| a]; intros; [ easy | cbn ].
 cbn in Hll.
 apply IHla in Hll.
-rewrite Hll.
-apply Hal.
+rewrite Hll. 2: {
+  intros a1 l1 Hl1.
+  now apply Hal; right.
+}
+now apply Hal; left.
 Qed.
 
 Theorem permut_eq_iter_list_transp' : ∀ l,
@@ -2044,7 +2047,7 @@ intros * Hp.
 specialize (permut_eq_iter_list_transp Hp) as H1.
 unfold iter_list in H1.
 apply List_fold_left_fold_right in H1; [ easy | ].
-intros t la.
+intros t la Ht.
 rewrite comp_length.
 rewrite swap_length.
 unfold swap.
@@ -2074,6 +2077,7 @@ rewrite (List_map_nth' 0). 2: {
   rewrite seq_nth. 2: {
     rewrite seq_nth; [ | easy ].
     apply transposition_lt; [ | | easy ].
+Search (_ ∈ transp_list _).
 ...
   specialize (nth_list_swap_elem) as H2.
   specialize (H2 nat 0 (snd t) i).
