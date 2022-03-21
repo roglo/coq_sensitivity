@@ -2539,6 +2539,37 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
           }
           destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
             cbn in Huv.
+            assert (H : v = j) by flia Hviz Hvji; subst v.
+            clear Hvji Hviz.
+            assert (Hul : j ∈ l). {
+              rewrite <- Huv.
+              apply nth_In.
+              flia Hu Huiz.
+            }
+            destruct Hp as (Hpp, Hpl).
+            rewrite app_length, seq_length in Hpp; cbn in Hpp.
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply NoDup_cons_iff in Hjl.
+            easy.
+          } {
+            replace (v - i) with (S (v - S i)) in Huv by flia Hviz.
+            rewrite List_nth_succ_cons in Huv.
+            destruct Hp as (Hpp, Hpl).
+            rewrite app_length, seq_length in Hpp; cbn in Hpp.
+            apply NoDup_app_iff in Hpl.
+            destruct Hpl as (Hil & Hjl & Hnjl).
+            apply NoDup_cons_iff in Hjl.
+            destruct Hjl as (Hjl & Hl).
+            apply (NoDup_nat _ Hl) in Huv; cycle 1. {
+              flia Hu Huiz.
+            } {
+              flia Hv Hviz.
+            }
+            flia Huv Hui Hvi Huiz Hviz.
+          }
+        }
+      }
 ...
       admit.
     }
