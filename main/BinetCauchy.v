@@ -1348,10 +1348,10 @@ destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
 ...
 *)
 
-Fixpoint nb_fit i l :=
+Fixpoint nb_nfit i l :=
   match l with
   | [] => 0
-  | j :: l' => (if i =? j then 1 else 0) + nb_fit (S i) l'
+  | j :: l' => (if i =? j then 0 else 1) + nb_nfit (S i) l'
   end.
 
 Fixpoint transp_loop it i (p : list nat) :=
@@ -1366,13 +1366,13 @@ Fixpoint transp_loop it i (p : list nat) :=
       end
   end.
 
-Definition transp_list p := transp_loop (length p + length p - nb_fit 0 p) 0 p.
+Definition transp_list p := transp_loop (length p + nb_nfit 0 p) 0 p.
 
 (*
 Compute
-map (λ p, (p, last (transp_loop (length p + length p - nb_fit 0 p - 1) 0 p) (0,0))) (canon_sym_gr_list_list 4).
+map (λ p, (p, last (transp_loop (length p + nb_nfit 0 p - 1) 0 p) (0,0))) (canon_sym_gr_list_list 4).
 Compute
-map (λ p, (p, last (transp_loop (length p + length p - nb_fit 0 p) 0 p) (0,0))) (canon_sym_gr_list_list 4).
+map (λ p, (p, last (transp_loop (length p + nb_nfit 0 p) 0 p) (0,0))) (canon_sym_gr_list_list 4).
 Compute
 map (λ p, (p, last (transp_list p) (17,17))) (canon_sym_gr_list_list 4).
 *)
@@ -1930,6 +1930,7 @@ Theorem glop : ∀ l i j,
 ...
 *)
 
+(*
 Theorem nb_fit_ub : ∀ i l, nb_fit i l ≤ length l.
 Proof.
 intros.
@@ -1945,7 +1946,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply IHl.
 }
 Qed.
+*)
 
+(*
 Theorem eq_nb_fit_length : ∀ i l,
   nb_fit i l = length l
   → l = seq i (length l).
@@ -1967,6 +1970,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now exfalso; apply H1.
 }
 Qed.
+*)
 
 (* il manque une restriction sur la première hypothèse
    (∀ a b, f (f a b) b = a)
@@ -2128,7 +2132,7 @@ Qed.
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
-  → length l + length l = it + nb_fit i l
+  → it = length l + nb_nfit i l
   → seq 0 i ++ l =
     fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
       (transp_loop it i l) (seq 0 (i + length l)).
@@ -2137,14 +2141,13 @@ intros * Hp Hit.
 revert l i Hp Hit.
 induction it; intros; cbn. {
   cbn in Hit.
-  specialize (nb_fit_ub i l) as H1.
-  rewrite <- Hit in H1.
-  destruct l; [ | cbn in H1; flia H1 ].
+  symmetry in Hit.
+  apply Nat.eq_add_0 in Hit.
+  destruct Hit as (Hl & Hnf).
+  apply length_zero_iff_nil in Hl; subst l.
   now rewrite app_nil_r, Nat.add_0_r.
 }
-destruct l as [| j]. {
-  now cbn; rewrite app_nil_r, Nat.add_0_r.
-}
+destruct l as [| j]; [ easy | ].
 cbn in Hit.
 apply Nat.succ_inj in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
@@ -2154,10 +2157,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm.
-  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
-  cbn in Hit.
-  do 2 rewrite Nat.add_succ_r in Hit.
-  now apply Nat.succ_inj in Hit.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
 } {
   cbn - [ list_swap_elem "=?" ].
   rewrite seq_length.
@@ -2517,7 +2517,7 @@ Qed.
 
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
-  → length l + length l = it + nb_fit i l
+  → it = length l + nb_nfit i l
   → fold_right (λ t l, swap (length l) (fst t) (snd t) ° l)
       (seq 0 i ++ l) (transp_loop it i l) =
     seq 0 (i + length l).
@@ -2545,30 +2545,13 @@ Compute (map (λ p,
 revert l i Hp Hit.
 induction it; intros; cbn. {
   cbn in Hit.
-  specialize (nb_fit_ub i l) as H1.
-  rewrite <- Hit in H1.
-  destruct l; [ | cbn in H1; flia H1 ].
-  clear Hp Hit H1; cbn.
+  symmetry in Hit.
+  apply Nat.eq_add_0 in Hit.
+  destruct Hit as (Hl & Hnf).
+  apply length_zero_iff_nil in Hl; subst l.
   now rewrite app_nil_r, Nat.add_0_r.
-(*
-  do 2 rewrite seq_length.
-  unfold ff_app.
-  erewrite map_ext_in. 2: {
-    intros j Hj.
-    apply in_seq in Hj.
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-    rewrite transposition_id.
-    rewrite seq_nth; [ | now rewrite seq_nth ].
-    rewrite seq_nth; [ | easy ].
-    do 2 rewrite Nat.add_0_l.
-    easy.
-  }
-  apply map_id.
-*)
 }
-destruct l as [| j]. {
-  now cbn; rewrite app_nil_r, Nat.add_0_r.
-}
+destruct l as [| j]; [ easy | ].
 cbn in Hit.
 apply Nat.succ_inj in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
@@ -2578,10 +2561,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now rewrite seq_S, <- app_assoc.
   }
   rewrite List_length_cons, <- Nat.add_succ_comm.
-  apply IHit; [ now rewrite seq_S, <- app_assoc | ].
-  cbn in Hit.
-  do 2 rewrite Nat.add_succ_r in Hit.
-  now apply Nat.succ_inj in Hit.
+  apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
 } {
   cbn - [ list_swap_elem ].
   rewrite List_length_fold_right by now intros; rewrite comp_length.
@@ -2619,7 +2599,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold "°" in H1.
   rewrite <- Hg in H1.
   specialize (H1 Hpa).
-  assert (H : length la + length la = it + nb_fit i la). {
+  assert (H : it = length la + nb_nfit i la). {
 (**)
 Compute (
 let it := 5 in
@@ -2628,9 +2608,7 @@ let it := 5 in
   let j := 3 in
   let la := list_swap_elem 0 (j :: l) 0 (j - i) in
 (
-  S (length la) + length la = it + nb_fit i la
-,
-  length l + S (length l) = it + (0 + nb_fit (S i) l))
+  length la + nb_nfit i la = it)
 ).
 (**)
 (* du coup, ça va pas du tout ! *)
