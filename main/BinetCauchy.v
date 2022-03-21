@@ -2515,6 +2515,15 @@ split. {
 }
 Qed.
 
+Theorem nb_nfit_app : ∀ i la lb,
+  nb_nfit i (la ++ lb) = nb_nfit i la + nb_nfit (i + length la) lb.
+Proof.
+intros.
+revert i lb.
+induction la as [| j]; intros; [ now rewrite Nat.add_0_r | cbn ].
+now rewrite IHla, Nat.add_assoc, Nat.add_succ_comm.
+Qed.
+
 Theorem fold_right_transp_loop : ∀ l it i,
   is_permut_list (seq 0 i ++ l)
   → length l + nb_nfit i l ≤ it
@@ -2645,18 +2654,67 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       specialize (H2 H); clear H; cbn in H2.
       flia H2 Hilj.
     }
-...
-    replace (length l) with (j - S i + (length l - (j - S i))). 2: {
+(**)
+    remember (λ u, if _ =? _ then _ else _) as f1 eqn:Hf1.
+    remember (length l) as len eqn:Hlen.
+    rewrite List_map_nth_seq with (la := l) (d := 0).
+    subst len f1.
+    remember (seq 0 (length l)) as lb eqn:Hlb.
+    replace (length l) with (j - S i + (length l - (j - S i))) in Hlb. 2: {
       rewrite Nat.add_comm.
       rewrite Nat.sub_add; [ easy | now apply Nat.lt_le_incl ].
     }
-    rewrite seq_app, map_app.
+    rewrite seq_app in Hlb.
+    subst lb.
+    do 2 rewrite map_app.
     erewrite map_ext_in. 2: {
       intros u Hu.
       apply in_seq in Hu.
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | easy ].
     }
+    do 2 rewrite nb_nfit_app.
+    apply Nat.add_lt_mono_l.
+    rewrite List_map_seq_length.
+    replace (S i + (j - S i)) with (j - S i + S i) by apply Nat.add_comm.
+    rewrite Nat.sub_add; [ | easy ].
+    rewrite Nat.add_0_l.
+...
+    destruct (Nat.eq_dec j (S i)) as [Hjsi| Hjsi]. {
+      rewrite Hjsi, Nat.sub_diag, Nat.sub_0_r.
+      replace (length l) with (S (length l - 1)) by flia Hji.
+      cbn - [ nth "=?" ].
+      rewrite Nat.eqb_refl, Nat.add_0_l.
+      rewrite <- Hjsi.
+      rewrite <- seq_shift.
+      do 2 rewrite map_map.
+      erewrite map_ext_in; [ | now intros k Hk; cbn ].
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec j (nth 0 l 0)) as [Hjl| Hjl]; [ | flia ].
+      exfalso.
+      destruct Hp as (Hpp, Hpl).
+      apply NoDup_app_iff in Hpl.
+      destruct Hpl as (Hil & Hjl' & Hnjl).
+      apply NoDup_cons_iff in Hjl'.
+      destruct Hjl' as (H2, H3); apply H2.
+      rewrite Hjl.
+      apply nth_In; flia Hji.
+    }
+    erewrite map_ext_in. 2: {
+      intros u Hu.
+      apply in_seq in Hu.
+      rewrite Nat.add_comm, Nat.sub_add in Hu; [ | flia Hu ].
+      rewrite if_eqb_eq_dec.
+...
+      destruct (Nat.eq_dec u (j - S i)) as [Huji| Huji]. {
+        flia Hji Hjsi Hu Huji Hilj.
+   ...
+   destruct (Nat.eq_dec u (j - S i)) as [H| H]. {
+...
+      destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | ].
+      easy.
+...
+
     rewrite Nat.add_0_l.
     replace (length l - (j - S i)) with (S (length l - (j - i))). 2: {
       flia Hji Hilj.
@@ -2672,7 +2730,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | ].
       easy.
     }
-Check seq_shift.
+    rewrite nb_nfit_app.
+    rewrite List_map_seq_length.
+    replace (S i + (j - S i)) with (j - S i + S i) by apply Nat.add_comm.
+    rewrite Nat.sub_add; [ | easy ].
+    cbn; rewrite Nat.eqb_refl, Nat.add_0_l.
+    remember (λ u, nth u l 0) as f1 eqn:Hf1.
+    remember (length l) as len eqn:Hlen.
+    rewrite List_map_nth_seq with (la := l) (d := 0).
 ...
   nb_nfit (S i)
     (map (λ u : nat, nth u l 0) (seq 0 (j - S i)) ++
