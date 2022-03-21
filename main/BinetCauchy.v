@@ -2573,15 +2573,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite List_length_cons, <- Nat.add_succ_comm.
   apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
 } {
-  cbn - [ list_swap_elem ].
-  rewrite List_length_fold_right by now intros; rewrite comp_length.
-  rewrite app_length, seq_length, List_length_cons.
-  unfold "°"; cbn - [ seq ].
-  remember (ff_app (swap (i + S (length l)) i j)) as f eqn:Hf.
-  remember (λ t l, map (ff_app (swap (length l) (fst t) (snd t))) l) as g
-    eqn:Hg.
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
-  move g before f; move la before g.
   assert (Hilj : i < j). {
     apply Nat.nle_gt.
     intros Hc.
@@ -2601,28 +2593,11 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     now specialize (H2 eq_refl).
   }
   move Hilj before Hij.
-(*
-(* option 1 *)
-  specialize (IHit (j :: l) i Hp) as H1.
-  rewrite List_length_cons in H1.
-  unfold "°" in H1.
-  rewrite <- Hg in H1.
-  assert (H : S (length l) + nb_nfit i (j :: l) ≤ it). {
-    rewrite Nat.add_succ_comm.
-    cbn; rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
-(* ne fontionne pas *)
-...
-(* option 2 *)
-*)
   assert (Hpa : is_permut_list (seq 0 i ++ la)). {
     rewrite Hla.
     now apply app_seq_swap_is_permut_list.
   }
-  specialize (IHit la i) as H1.
-  unfold "°" in H1.
-  rewrite <- Hg in H1.
-  specialize (H1 Hpa).
+  specialize (IHit la i Hpa) as H1.
   assert (H : length la + nb_nfit i la ≤ it). {
     rewrite Hla, list_swap_elem_length, List_length_cons.
     rewrite Nat.add_succ_comm.
@@ -2700,14 +2675,28 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (H1 H); clear H.
   clear IHit.
-  subst f.
-  rewrite fold_comp_list.
+  remember (λ t l, swap (length l) (fst t) (snd t) ° l) as g eqn:Hg.
+  rewrite List_length_cons.
   replace (length la) with (S (length l)) in H1. 2: {
     rewrite Hla.
     now rewrite list_swap_elem_length.
   }
 ...
-  rewrite transp_loop_app_seq in H1 |-*.
+(*
+  remember (ff_app (swap (i + S (length l)) i j)) as f eqn:Hf.
+*)
+  remember (λ t l, map (ff_app (swap (length l) (fst t) (snd t))) l) as g
+    eqn:Hg.
+*)
+(*
+  move g before f; move la before g.
+*)
+...
+  rewrite fold_comp_list.
+  replace (length la) with (S (length l)) in H1. 2: {
+    rewrite Hla.
+    now rewrite list_swap_elem_length.
+  }
 ...
 assert (pour_rigoler : transp_loop it (S i) la = (i, i + j) :: transp_loop it (S i) (j :: l)). {
   induction it. {
