@@ -2659,274 +2659,40 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     remember (length l) as len eqn:Hlen.
     rewrite List_map_nth_seq with (la := l) (d := 0).
     subst len f1.
-    remember (seq 0 (length l)) as lb eqn:Hlb.
-    replace (length l) with (j - S i + (length l - (j - S i))) in Hlb. 2: {
-      rewrite Nat.add_comm.
-      rewrite Nat.sub_add; [ easy | now apply Nat.lt_le_incl ].
-    }
-    rewrite seq_app in Hlb.
-    subst lb.
+(**)
+    rewrite List_seq_cut with (i := j - S i); [ | now apply in_seq ].
+    rewrite Nat.sub_0_r; cbn.
     do 2 rewrite map_app.
+    cbn; rewrite Nat.eqb_refl.
     erewrite map_ext_in. 2: {
-      intros u Hu.
-      apply in_seq in Hu.
+      intros k Hk.
+      apply in_seq in Hk.
       rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | easy ].
+      destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
+      easy.
     }
     do 2 rewrite nb_nfit_app.
     apply Nat.add_lt_mono_l.
     rewrite List_map_seq_length.
-    replace (S i + (j - S i)) with (j - S i + S i) by apply Nat.add_comm.
-    rewrite Nat.sub_add; [ | easy ].
-    rewrite Nat.add_0_l.
-    destruct (Nat.eq_dec j (S i)) as [Hjsi| Hjsi]. {
-      rewrite Hjsi, Nat.sub_diag, Nat.sub_0_r.
-      replace (length l) with (S (length l - 1)) by flia Hji.
-      cbn - [ nth "=?" ].
-      rewrite Nat.eqb_refl, Nat.add_0_l.
-      rewrite <- Hjsi.
-      rewrite <- seq_shift.
-      do 2 rewrite map_map.
-      erewrite map_ext_in; [ | now intros k Hk; cbn ].
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec j (nth 0 l 0)) as [Hjl| Hjl]; [ | flia ].
-      exfalso.
-      destruct Hp as (Hpp, Hpl).
-      apply NoDup_app_iff in Hpl.
-      destruct Hpl as (Hil & Hjl' & Hnjl).
-      apply NoDup_cons_iff in Hjl'.
-      destruct Hjl' as (H2, H3); apply H2.
-      rewrite Hjl.
-      apply nth_In; flia Hji.
-    }
-    replace (j - S i) with (S (j - S (S i))) by flia Hjsi Hilj.
-Search (seq (_ + _)).
-(* ah... zut *)
-...
-    rewrite <- seq_shift.
-    do 2 rewrite map_map.
-    erewrite map_ext_in. 2: {
-      intros u Hu.
-      apply in_seq in Hu.
-...
-      rewrite if_eqb_eq_dec.
-
-      destruct (Nat.eq_dec (S u) (S (j - S (S i)))) as [H2| H2]. {
-
-        flia Hu H2 Hjsi Hji Hilj.
-...
-      rewrite Nat.add_comm, Nat.sub_add in Hu; [ | flia Hu ].
-      rewrite if_eqb_eq_dec.
-...
-      destruct (Nat.eq_dec u (j - S i)) as [Huji| Huji]. {
-        flia Hji Hjsi Hu Huji Hilj.
-   ...
-   destruct (Nat.eq_dec u (j - S i)) as [H| H]. {
-...
-      destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | ].
-      easy.
-...
-
-    rewrite Nat.add_0_l.
-    replace (length l - (j - S i)) with (S (length l - (j - i))). 2: {
-      flia Hji Hilj.
-    }
-    cbn.
-    replace (S (j - S i)) with (j - i) by flia Hilj.
-    rewrite Nat.eqb_refl.
-    erewrite map_ext_in with (l := seq (j - i) (length l - (j - i))). 2: {
-      intros u Hu.
-      apply in_seq in Hu.
-      rewrite Nat.add_comm, Nat.sub_add in Hu; [ | flia Hu ].
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | ].
-      easy.
-    }
-    rewrite nb_nfit_app.
-    rewrite List_map_seq_length.
-    replace (S i + (j - S i)) with (j - S i + S i) by apply Nat.add_comm.
-    rewrite Nat.sub_add; [ | easy ].
+    rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
     cbn; rewrite Nat.eqb_refl, Nat.add_0_l.
-    remember (λ u, nth u l 0) as f1 eqn:Hf1.
-    remember (length l) as len eqn:Hlen.
-    rewrite List_map_nth_seq with (la := l) (d := 0).
-...
-  nb_nfit (S i)
-    (map (λ u : nat, nth u l 0) (seq 0 (j - S i)) ++
-     j :: map (λ u : nat, nth u l 0) (seq (S (j - S i)) (length l - S (j - S i)))) ≤ nb_nfit (S i) l
-
-      rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec u (j - S i)) as [H| H]. 2: {
-...
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
-
-Print nb_nfit.
-(* donc là, ça devrait marcher, parce qu'en j-(i+1), il
-   y a bien j et que si on commence à (i+1), ça donne j
-   en j *)
-...
-    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
-      move Hik at top; subst k.
-      rewrite Nat.add_0_l, <- Nat.add_succ_r.
-      rewrite <- seq_shift, map_map.
-      erewrite map_ext_in. 2: {
-        intros u Hu.
-        unfold transposition.
-        cbn - [ nth ].
-        easy.
-      }
-...
-      assert (nb_fit (S i) l = nb_fit (S i) (map (
-...
-Print list_swap_elem.
-Theorem nb_nfit_list_swap_elem : ∀ d l i j k,
-  nb_nfit k (list_swap_elem d l i j) = nb_nfit (S k) l.
-Proof.
-...
-(**)
-Compute (
-let it := 5 in
-  let l := [1;2;0] in
-  let i := 0 in
-  let j := 3 in
-  let la := list_swap_elem 0 (j :: l) 0 (j - i) in
-(
-  length l + (1 + nb_nfit (S i) l) ≤ it,
-  length la + nb_nfit i la ≤ it)
-).
-(**)
-(* du coup, ça va pas du tout ! *)
-...
-    rewrite Hla at 1 2.
-    rewrite list_swap_elem_length; cbn.
-    unfold list_swap_elem.
-    rewrite Hit; cbn.
-    rewrite <- Nat.add_succ_r.
-    f_equal.
-    rewrite Hla.
-    cbn - [ nth ].
-    rewrite <- seq_shift.
-    rewrite map_map.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec i (nth (j - i) (j :: l) 0)) as [Hiej| Hiej]. {
-(**)
-exfalso.
-assert (Hj : j ∈ seq (S i) (length l)). {
-  destruct Hp as (Hpp, Hpl).
-  rewrite app_length, seq_length in Hpp; cbn in Hpp.
-  apply in_seq.
-  split; [ easy | cbn ].
-  rewrite <- Nat.add_succ_r.
-  apply (Hpp j).
-  now apply in_or_app; right; left.
-}
-replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
-rewrite List_nth_succ_cons in Hiej.
-...
-cbn - [ nth transposition ]; f_equal.
-erewrite map_ext_in. 2: {
-  intros k Hk.
-  replace (nth _ _ _) with (if k =? j - S i then j else nth k l 0). 2: {
-    unfold transposition; cbn.
-    replace (j - i) with (S (j - S i)) by flia Hilj.
-    do 2 rewrite if_eqb_eq_dec.
-    now destruct (Nat.eq_dec k (j - S i)).
-  }
-  easy.
-}
-Compute (
-  let l := [1;2;0] in
-  let i := 0 in
-  let j := 3 in
-  nb_fit (S i) l =
-  nb_fit (S i)
-    (map (λ k : nat, if k =? j - S i then j else nth k l 0) (seq 0 (length l)))
-).
-...
-assert (Hj : j ∈ seq i (length l - i)). {
-  destruct Hp as (Hpp, Hpl).
-  rewrite app_length, seq_length in Hpp; cbn in Hpp.
-  apply NoDup_app_iff in Hpl.
-  destruct Hpl as (Hil & Hjl & Hnjl).
-  assert (H2 : j ∉ seq 0 i). {
-    intros H.
-    specialize (Hnjl _ H) as H2; apply H2.
-    now left.
-  }
-  assert (H3 : j ∈ seq (S i) (length l)). {
-    apply in_seq.
-    split; [ flia Hilj | cbn ].
-    rewrite <- Nat.add_succ_r.
-    apply (Hpp j).
-    now apply in_or_app; right; left.
-  }
-...
-  apply in_seq.
-  split; [ flia Hilj | ].
-  rewrite Nat.add_comm.
-  rewrite Nat.sub_add. 2: {
-    specialize (Hpp (i + j)) as H2.
-    assert (
-...
-    replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
-    rewrite List_nth_succ_cons in Hiej.
-    rewrite Hiej.
-    apply Nat.lt_le_incl.
-Search (nth _ _ _ ≤ _).
-    apply nth_In.
-...
-
-assert (H : i ∈ seq 0 i). {
-  replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
-  rewrite List_nth_succ_cons in Hiej.
-  rewrite Hiej at 1.
-  apply in_seq.
-  split; [ easy | cbn ].
-  destruct Hp as (Hpp, Hpl).
-  rewrite app_length, seq_length in Hpp; cbn in Hpp.
-
-
-...
-      cbn - [ nth transposition ]; f_equal.
-...
-      exfalso.
-      destruct Hp as (Hpp, Hpl).
-      rewrite app_length, seq_length in Hpp; cbn in Hpp.
-      move Hpl at bottom.
-      apply NoDup_app_iff in Hpl.
-      destruct Hpl as (Hil & Hjl & Hnjl).
-specialize (Hpp j) as H2.
-assert (H : j ∈ seq 0 i ++ j :: l). {
-  now apply in_or_app; right; left.
-}
-specialize (H2 H); clear H.
-...
-      replace (j - i) with (S (j - S i)) in Hiej by flia Hilj.
-      rewrite List_nth_succ_cons in Hiej.
-...
-    replace (j - i) with (S (j - S i)) by flia Hilj.
-    rewrite List_nth_succ_cons.
-...
-    destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hiej| Hiej]. {
-      cbn - [ nth ]; f_equal.
-destruct l as [| k]; [ easy | ].
-cbn - [ nth "=?" ].
-...
-...
-      apply map_ext_in.
+    erewrite map_ext_in. 2: {
       intros k Hk.
       apply in_seq in Hk.
-      unfold transposition.
-      cbn - [ nth ].
       rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec k (j - S i)) as [Hkji| Hkji]. {
-        cbn; subst k.
-        rewrite <- Hiej.
-Search (map _ (seq _ _)).
-Print nb_fit.
-...
-    admit.
+      destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
+      easy.
+    }
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec j (nth (j - S i) l 0)) as [Hjji| Hjji]; [ | flia ].
+    exfalso.
+    destruct Hp as (Hpp, Hpl).
+    apply NoDup_app_iff in Hpl.
+    destruct Hpl as (Hil & Hjl & Hnjl).
+    apply NoDup_cons_iff in Hjl.
+    destruct Hjl as (H2, H3); apply H2.
+    rewrite Hjji.
+    apply nth_In; flia Hji.
   }
   specialize (H1 H); clear H.
   clear IHit.
@@ -2941,7 +2707,6 @@ assert (pour_rigoler : transp_loop it (S i) la = (i, i + j) :: transp_loop it (S
     specialize (nb_fit_ub (S i) l) as H2.
     flia Hit H2.
   }
-
   cbn - [ list_swap_elem "=?" ].
   destruct la as [| k]; [ easy | ].
   cbn - [ nth "=?" ] in Hla.
