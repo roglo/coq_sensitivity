@@ -2623,10 +2623,19 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       easy.
     }
     rewrite if_eqb_eq_dec.
+    assert (Hji : j - S i ≤ length l). {
+      destruct Hp as (Hpp, Hpl).
+      specialize (Hpp j) as H2.
+      rewrite app_length, seq_length in H2.
+      assert (H : j ∈ seq 0 i ++ j :: l). {
+        now apply in_or_app; right; left.
+      }
+      specialize (H2 H); clear H; cbn in H2.
+      flia H2.
+    }
     replace (length l) with (j - S i + (length l - (j - S i))). 2: {
       rewrite Nat.add_comm.
-      rewrite Nat.sub_add; [ easy | ].
-      admit.
+      now rewrite Nat.sub_add.
     }
     rewrite seq_app.
     rewrite map_app.
@@ -2637,11 +2646,20 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | easy ].
     }
     rewrite Nat.add_0_l.
+    destruct (Nat.eq_dec (j - S i) (length l)) as [Hjil| Hjil]. {
+      rewrite Hjil, Nat.sub_diag.
+      cbn; rewrite app_nil_r.
+      rewrite <- List_map_nth_seq.
+      rewrite Hjil, nth_overflow in Hk; [ subst k | easy ].
+      destruct (Nat.eq_dec i 0) as [Hiz| Hiz]; [ easy | exfalso ].
 ...
-    replace (
     erewrite map_ext_in with (l := seq (j - S i) (length l - (j - S i))). 2: {
       intros u Hu.
       apply in_seq in Hu.
+      rewrite Nat.add_comm, Nat.sub_add in Hu; [ | easy ].
+      easy.
+    }
+
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec u (j - S i)) as [H| H]. 2: {
 ...
