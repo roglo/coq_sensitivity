@@ -2623,7 +2623,31 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       easy.
     }
     rewrite if_eqb_eq_dec.
+    replace (length l) with (j - S i + (length l - (j - S i))). 2: {
+      rewrite Nat.add_comm.
+      rewrite Nat.sub_add; [ easy | ].
+      admit.
+    }
+    rewrite seq_app.
+    rewrite map_app.
+    erewrite map_ext_in. 2: {
+      intros u Hu.
+      apply in_seq in Hu.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec u (j - S i)) as [H| H]; [ flia Hu H | easy ].
+    }
+    rewrite Nat.add_0_l.
+...
+    replace (
+    erewrite map_ext_in with (l := seq (j - S i) (length l - (j - S i))). 2: {
+      intros u Hu.
+      apply in_seq in Hu.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec u (j - S i)) as [H| H]. 2: {
+...
+    destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     destruct (Nat.eq_dec i k) as [Hik| Hik]. 2: {
+
 Print nb_nfit.
 (* donc là, ça devrait marcher, parce qu'en j-(i+1), il
    y a bien j et que si on commence à (i+1), ça donne j
