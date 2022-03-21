@@ -2554,10 +2554,27 @@ Compute (let p := [1;2;3;0;5;4] in
   let i := first_non_fix_transp 0 p in
   let l := skipn i p in
   let it := length l + nb_nfit i l in
+  fold_right
+    (λ t l, l ° swap (length l) (fst t) (snd t))
+    (seq 0 (i + length l)) (transp_loop it i l) = seq 0 i ++ l
+).
+Compute (let p := [1;2;3;0;5;4] in
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + nb_nfit i l in
   fold_left (λ l t, swap (length l) (fst t) (snd t) ° l)
     (transp_loop it i l) (seq 0 (i + length l)) =
     seq 0 i ++ l
 ).
+Compute (let p := [1;2;3;0;5;4] in
+  let i := first_non_fix_transp 0 p in
+  let l := skipn i p in
+  let it := length l + nb_nfit i l in
+  fold_left (λ l t, l ° swap (length l) (fst t) (snd t))
+    (transp_loop it i l) (seq 0 i ++ l) = seq 0 (i + length l)
+).
+(* bon, en fait, c'est cette dernière version qui est la bonne ;
+   et ça fait un fold_left, que je préfère *)
 ...
 Compute (let p := [1;2;3;0;5;4] in
   transp_list p).
