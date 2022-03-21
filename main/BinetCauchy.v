@@ -2629,16 +2629,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     etransitivity; [ | apply Hit ].
     apply Nat.add_le_mono_l.
     apply -> Nat.succ_le_mono.
-(**)
     cbn - [ nth ].
-(*
-    replace (j - i) with (S (j - S i)) by flia Hilj.
-    rewrite List_nth_succ_cons.
-*)
     rewrite <- seq_shift, map_map.
-(*
-    remember (nth (j - S i) l 0) as k eqn:Hk.
-*)
     erewrite map_ext_in. 2: {
       intros u Hu.
       replace (j - i) with (S (j - S i)) by flia Hilj.
@@ -2668,12 +2660,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
       specialize (H2 H); clear H; cbn in H2.
       flia H2 Hilj.
     }
-(**)
     remember (λ u, if _ =? _ then _ else _) as f1 eqn:Hf1.
     remember (length l) as len eqn:Hlen.
     rewrite List_map_nth_seq with (la := l) (d := 0).
     subst len f1.
-(**)
     rewrite List_seq_cut with (i := j - S i); [ | now apply in_seq ].
     rewrite Nat.sub_0_r; cbn.
     do 2 rewrite map_app.
