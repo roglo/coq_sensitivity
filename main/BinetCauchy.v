@@ -1401,6 +1401,76 @@ specialize (IHit _ _ _ Hij) as H1.
 now rewrite list_swap_elem_length in H1.
 Qed.
 
+Theorem List_fold_left_max : ∀ a b la lb,
+  a ≤ b
+  → Max (i ∈ la), i ≤ Max (i ∈ lb), i
+  → fold_left max la a ≤ fold_left max lb b.
+Proof.
+intros * Hab Hm.
+revert a b la Hab Hm.
+induction lb as [| b']; intros; cbn. {
+  unfold iter_list in Hm.
+  cbn in Hm.
+  apply Nat.le_0_r in Hm.
+  rewrite fold_left_op_fun_from_d with (d := 0); cycle 1. {
+    now intros; rewrite Nat.max_r.
+  } {
+    now intros; rewrite Nat.max_l.
+  } {
+    apply Nat.max_assoc.
+  }
+  rewrite Hm.
+  now rewrite Nat.max_l.
+}
+destruct la as [| a']. {
+  unfold iter_list; cbn.
+  clear Hm IHlb.
+  revert a b b' Hab.
+  induction lb as [| c]; intros. {
+    transitivity b; [ easy | cbn ].
+    apply Nat.le_max_l.
+  }
+  cbn.
+  rewrite <- Nat.max_assoc.
+  now apply IHlb.
+}
+cbn.
+unfold iter_list in Hm.
+cbn in Hm.
+apply IHlb.
+...
+cbn.
+  induction lb as [| a]; intros; [ apply Nat.le_max_l | cbn ].
+  etransitivity; [ | apply IHlb ].
+  apply Nat.le_max_l.
+}
+cbn.
+...
+  destruct (le_dec c b) as [Hcb| Hcb]. {
+    rewrite max_r; [ | easy ].
+    clear.
+
+Search (_ ≤ fold_left _ _ _).
+
+...
+intros * Hm.
+revert a lb Hm.
+induction la as [| a']; intros. {
+  cbn; clear Hm.
+  revert a.
+  induction lb as [| b]; intros; [ easy | cbn ].
+  etransitivity; [ | apply IHlb ].
+  apply Nat.le_max_l.
+}
+cbn.
+revert a a' Hm.
+induction lb as [| b]; intros.
+2: {
+cbn.
+
+pply IHlb.
+...
+
 Theorem in_transp_loop_bounds' : ∀ it k ij l,
   ij ∈ transp_loop it k l
   → snd ij ≤ Max (i ∈ l), i.
@@ -1443,11 +1513,16 @@ destruct Hij as [Hij| Hij]. {
 specialize (IHit _ _ _ Hij) as H1.
 etransitivity; [ apply H1 | ].
 unfold iter_list.
-remember (j :: l) as la.
+rewrite List_fold_left_ext_in with (g := max) by easy.
+remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
+rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+(*
+remember (j :: l) as l'.
 remember (j - k) as i.
-Theorem glop :
-  (∀ i, i < n → nth i la 0 ≤ ...
-  fold_left f la a ≤ fold_left f lb a.
+clear; rename l' into l.
+*)
+...
+apply List_fold_left_max.
 (*
 assert (H : i ≤ j) by flia Heqi.
 clear - H.
