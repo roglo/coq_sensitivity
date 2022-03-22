@@ -1471,7 +1471,26 @@ assert (H : ∀ i a l,
   induction l as [| b]; intros; [ easy | ].
   cbn - [ seq ].
   etransitivity; [ | apply IHl with (i := i)  ].
-  clear.
+Theorem glop : ∀ a b la lb,
+  (∀ c, c ∈ a :: la → c ≤ fold_left max lb b)
+  → fold_left max la a ≤ fold_left max lb b.
+Proof. clear.
+Admitted.
+apply glop.
+intros c Hc.
+destruct Hc as [Hc| Hc]. {
+  subst c.
+Search (fold_left _ _ (max _ _)).
+...
+Theorem glop : ∀ a b f la,
+  fold_left max (f (b :: la)) a ≤ fold_left max (f la) (max a b).
+Proof.
+clear.
+...
+specialize (glop a b) as H1.
+specialize (H1 (λ lb, list_swap_elem 0 lb 0 i) l).
+cbn - [ list_swap_elem ] in H1.
+apply H1.
 ...
   unfold list_swap_elem.
   do 2 rewrite List_fold_left_map.
