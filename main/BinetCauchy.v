@@ -1460,7 +1460,64 @@ unfold iter_list.
 rewrite List_fold_left_ext_in with (g := max) by easy.
 remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
 rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+remember (j :: l) as l'.
+remember (j - k) as i.
+clear; rename l' into l.
+assert (H : ∀ i a l,
+  fold_left max (list_swap_elem 0 l 0 i) a ≤ fold_left max l a). {
+  clear l i.
+  intros i a l.
+  revert i a.
+  induction l as [| b]; intros; [ easy | ].
+  cbn - [ seq ].
+  etransitivity; [ | apply IHl with (i := i)  ].
+  clear.
+  revert b i a.
+  induction l as [| c]; intros. {
+    cbn.
+    destruct i; [ easy | ].
+    rewrite match_id.
+    rewrite Nat.max_l; [ | easy ].
+    apply Nat.le_max_l.
+  }
+...
+  apply List_fold_left_max; [ apply Nat.le_max_l | ].
+  unfold iter_list.
+  rewrite List_fold_left_ext_in with (g := max) by easy.
+  remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
+  rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+...
+  ============================
+  fold_left max (list_swap_elem 0 (b :: l) 0 i) a ≤ fold_left max (list_swap_elem 0 l 0 i) (max a b)
+  ============================
+  fold_left max (list_swap_elem 0 (b :: l) 0 i) 0 ≤ fold_left max (list_swap_elem 0 l 0 i) 0
+...
+Search (fold_left _ _ _ ≤ _).
+revert i.
+induction l as [| a la]; intros; [ easy | ].
+cbn - [ nth seq ].
 apply List_fold_left_max; [ easy | ].
+unfold iter_list.
+rewrite List_fold_left_ext_in with (g := max) by easy.
+remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
+rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+  ============================
+  fold_left max (list_swap_elem 0 (a :: la) 0 i) 0 ≤ fold_left max la 0
+...
+apply List_fold_left_max; [ easy | ].
+unfold iter_list.
+apply List_fold_left_max; [ easy | ].
+unfold iter_list.
+...
+unfold iter_list.
+rewrite List_fold_left_ext_in with (g := max) by easy.
+remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
+rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+apply List_fold_left_max; [ easy | ].
+  ============================
+  Max (i ∈ list_swap_elem 0 (j :: l) 0 (j - k)), i ≤ Max (i ∈ j :: l), i
+  ============================
+  Max (i ∈ list_swap_elem 0 (j :: l) 0 (j - k)), i ≤ Max (i ∈ j :: l), i
 ...
 unfold iter_list.
 rewrite List_fold_left_ext_in with (g := max) by easy.
