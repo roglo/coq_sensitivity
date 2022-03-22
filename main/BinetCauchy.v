@@ -1416,7 +1416,8 @@ now apply Nat.max_le_compat.
 Qed.
 
 Theorem le_fold_left_max : ∀ a b la,
-  a ≤ b ∨ la ≠ [] ∧ (∀ c, c ∈ la → a ≤ c) → a ≤ fold_left max la b.
+  a ≤ b ∨ la ≠ [] ∧ (∀ c, c ∈ la → a ≤ c)
+  → a ≤ fold_left max la b.
 Proof.
 intros * Hab.
 revert b Hab.
