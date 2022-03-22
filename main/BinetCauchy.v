@@ -13,7 +13,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith Permutation.
-Import List List.ListNotations.
+Import List List.ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul IterAnd Pigeonhole.
 Require Import Matrix PermutSeq Signature.
@@ -1445,21 +1445,57 @@ etransitivity; [ apply H1 | ].
 unfold iter_list.
 remember (j :: l) as la.
 remember (j - k) as i.
+(*
+assert (H : i ≤ j) by flia Heqi.
+clear - H.
+rename H into Hij.
+*)
 clear.
-...
-assert (H : ∀ a la lb,
-  (∀ i,
-  fold_left (λ c i, max c i) lb a
-  ≤ fold_left (λ c i, max c i) la a). {
+assert (H : ∀ i a la,
+  fold_left (λ c i, Init.Nat.max c i) (list_swap_elem 0 la 0 i) a
+  ≤ fold_left (λ c i, Init.Nat.max c i) la a). {
+  clear i la.
   intros.
-  revert i a.
+  revert a i.
   induction la as [| b]; intros; [ easy | ].
-  cbn - [ seq ].
+  etransitivity; [ | apply IHla with (i := i) ].
   cbn - [ list_swap_elem ].
-Print list_swap_elem.
-
-apply H.
-
+  unfold list_swap_elem.
+  cbn - [ nth ].
+  rewrite <- seq_shift, map_map.
+  destruct i. {
+    rewrite List_nth_0_cons; cbn.
+    erewrite map_ext_in with (f := λ k, nth (transposition 0 0 k) la 0). 2: {
+      intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+      now rewrite transposition_id.
+    }
+    easy.
+  }
+  rewrite List_nth_succ_cons.
+  erewrite map_ext_in. 2: {
+    intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+    unfold transposition.
+    replace (S j =? 0) with false by easy.
+    replace (nth (if S j =? S i then 0 else S j) (b :: la) 0) with
+      (if j =? i then b else nth j la 0). 2: {
+      cbn.
+      do 2 rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec j i).
+    }
+    easy.
+  }
+  erewrite map_ext_in with (f := λ k, nth (transposition 0 (S i) k) la 0). 2: {
+    intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
+    unfold transposition.
+    replace (S j =? 0) with false by easy.
+    replace (nth (if S j =? S i then 0 else S j) (b :: la) 0) with
+      (if j =? i then b else nth j la 0). 2: {
+      cbn.
+      do 2 rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec j i).
+    }
+    easy.
+  }
 ...
 now rewrite list_swap_elem_length in H1.
 ...
