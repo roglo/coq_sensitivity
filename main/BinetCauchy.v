@@ -1401,6 +1401,69 @@ specialize (IHit _ _ _ Hij) as H1.
 now rewrite list_swap_elem_length in H1.
 Qed.
 
+Theorem in_transp_loop_bounds' : ∀ it k ij l,
+  ij ∈ transp_loop it k l
+  → snd ij ≤ Max (i ∈ l), i.
+Proof.
+intros * Hij.
+revert ij k l Hij.
+induction it; intros; [ easy | cbn in Hij ].
+destruct l as [| j]; [ easy | ].
+rewrite if_eqb_eq_dec in Hij.
+destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+  subst j.
+  specialize (IHit _ _ _ Hij) as H1.
+  rewrite iter_list_cons'.
+  etransitivity; [ apply H1 | ].
+  unfold iter_list at 2.
+  rewrite fold_left_op_fun_from_d with (d := 0); cycle 1. {
+    now intros; rewrite Nat.max_r.
+  } {
+    now intros; rewrite Nat.max_l.
+  } {
+    apply Nat.max_assoc.
+  }
+  rewrite fold_iter_list.
+  apply Nat.le_max_r.
+}
+destruct Hij as [Hij| Hij]. {
+  subst ij; cbn.
+  rewrite iter_list_cons'.
+  unfold iter_list.
+  rewrite fold_left_op_fun_from_d with (d := 0); cycle 1. {
+    now intros; rewrite Nat.max_r.
+  } {
+    now intros; rewrite Nat.max_l.
+  } {
+    apply Nat.max_assoc.
+  }
+  rewrite fold_iter_list.
+  apply Nat.le_max_l.
+}
+specialize (IHit _ _ _ Hij) as H1.
+etransitivity; [ apply H1 | ].
+unfold iter_list.
+remember (j :: l) as la.
+remember (j - k) as i.
+clear.
+...
+assert (H : ∀ a la lb,
+  (∀ i,
+  fold_left (λ c i, max c i) lb a
+  ≤ fold_left (λ c i, max c i) la a). {
+  intros.
+  revert i a.
+  induction la as [| b]; intros; [ easy | ].
+  cbn - [ seq ].
+  cbn - [ list_swap_elem ].
+Print list_swap_elem.
+
+apply H.
+
+...
+now rewrite list_swap_elem_length in H1.
+...
+
 Theorem in_transp_list_bounds : ∀ ij l,
   ij ∈ transp_list l
   → fst ij < length l.
@@ -2076,6 +2139,7 @@ apply IHla in H1; cycle 1. {
     apply in_transp_list_bounds.
     now rewrite <- Hla; left.
   } {
+Check in_transp_list_bounds.
 ...
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
