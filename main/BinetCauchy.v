@@ -1472,6 +1472,10 @@ assert (H : ∀ i a l,
   cbn - [ seq ].
   etransitivity; [ | apply IHl with (i := i)  ].
   clear.
+...
+  unfold list_swap_elem.
+  do 2 rewrite List_fold_left_map.
+...
   revert b i a.
   induction l as [| c]; intros. {
     cbn.
