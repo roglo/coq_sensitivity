@@ -1836,6 +1836,21 @@ Qed.
 
 (* *)
 
+Theorem fold_left_max_from_0 : ∀ a l,
+  fold_left max l a = max a (fold_left max l 0).
+Proof.
+intros.
+apply fold_left_op_fun_from_d. {
+  now intros; apply max_r.
+} {
+  now intros; rewrite Nat.max_l.
+} {
+  apply Nat.max_assoc.
+}
+Qed.
+
+(* *)
+
 Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).
 Proof.
 intros * Hnd.
