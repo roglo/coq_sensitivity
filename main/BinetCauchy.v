@@ -1521,10 +1521,9 @@ assert (H : ∀ i a l,
       apply Nat.le_max_r.
     }
     cbn in Hc; subst c.
-    remember (max a b) as c.
     clear.
-    revert i c.
-    induction l as [| a]; intros; cbn. {
+    revert i a b.
+    induction l as [| c]; intros; cbn. {
       now rewrite match_id.
     }
     destruct i. {
