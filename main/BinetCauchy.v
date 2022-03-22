@@ -1415,25 +1415,15 @@ rewrite fold_left_max_from_0 with (l := lb).
 now apply Nat.max_le_compat.
 Qed.
 
-Theorem le_fold_left_max_max_l : ∀ a b la,
-  a ≤ fold_left max la (max a b).
+Theorem le_fold_left_max : ∀ a b la,
+  a ≤ b → a ≤ fold_left max la b.
 Proof.
-intros.
-revert b.
-induction la as [| c]; intros; [ apply Nat.le_max_l | ].
-cbn; rewrite <- Nat.max_assoc.
+intros * Hab.
+revert b Hab.
+induction la as [| c]; intros; [ apply Hab | ].
 apply IHla.
-Qed.
-
-Theorem le_fold_left_max_max_r : ∀ a b la,
-  b ≤ fold_left max la (max a b).
-Proof.
-intros.
-revert a b.
-induction la as [| c]; intros; [ apply Nat.le_max_r | ].
-cbn.
-rewrite Nat.max_comm, Nat.max_assoc.
-apply IHla.
+apply Nat.max_le_iff.
+now left.
 Qed.
 
 Theorem fold_left_max_le : ∀ a b la,
@@ -1520,15 +1510,26 @@ assert (H : ∀ i a l,
   intros c Hc.
   destruct Hc as [Hc| Hc]. {
     subst c.
-    apply le_fold_left_max_max_l.
+    apply le_fold_left_max.
+    apply Nat.le_max_l.
   }
   cbn - [ nth ] in Hc.
   destruct Hc as [Hc| Hc]. {
     destruct i. {
       cbn in Hc; subst c.
-      apply le_fold_left_max_max_r.
+      apply le_fold_left_max.
+      apply Nat.le_max_r.
     }
     cbn in Hc; subst c.
+    remember (max a b) as c.
+    clear.
+    revert i c.
+    induction l as [| a]; intros; cbn. {
+      now rewrite match_id.
+    }
+    destruct i. {
+      apply le_fold_left_max.
+(* chiasse *)
 ...
 }
 apply H.
