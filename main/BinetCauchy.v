@@ -1504,7 +1504,16 @@ clear; rename l' into l.
 assert (H : ∀ i a l,
   fold_left max (list_swap_elem 0 l 0 i) a ≤ fold_left max l a). {
   clear l i.
-  intros i a l.
+(**)
+  intros.
+  apply fold_left_max_le.
+  intros * Hc.
+  destruct Hc as [Hc| Hc]. {
+    subst c.
+    now apply le_fold_left_max; left.
+  }
+...
+  intros.
   revert i a.
   induction l as [| b]; intros; [ easy | ].
   cbn - [ seq ].
