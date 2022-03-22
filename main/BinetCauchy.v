@@ -1512,6 +1512,18 @@ assert (H : ∀ i a l,
     subst c.
     now apply le_fold_left_max; left.
   }
+  unfold list_swap_elem in Hc.
+  apply in_map_iff in Hc.
+  destruct Hc as (b & Hbc & Hb).
+  subst c.
+...
+  apply le_fold_left_max.
+  destruct l as [| c]; [ easy | ].
+  right.
+  split; [ easy | ].
+  intros d Hd.
+  destruct Hd as [Hd| Hd]. {
+    subst d.
 ...
   intros.
   revert i a.
