@@ -1415,6 +1415,40 @@ rewrite fold_left_max_from_0 with (l := lb).
 now apply Nat.max_le_compat.
 Qed.
 
+Theorem le_fold_left_max_max : ∀ a b la,
+  a ≤ fold_left max la (max a b).
+Proof.
+intros.
+revert b.
+induction la as [| c]; intros; [ apply Nat.le_max_l | ].
+cbn; rewrite <- Nat.max_assoc.
+apply IHla.
+Qed.
+
+Theorem fold_left_max_le : ∀ a b la,
+  (∀ c, c ∈ a :: la → c ≤ b)
+  → fold_left max la a ≤ b.
+Proof.
+intros * Hc.
+revert a Hc.
+induction la as [| d]; intros; [ now apply Hc; left | cbn ].
+apply IHla.
+intros c Hcad.
+destruct Hcad as [Hcad| Hcla]. {
+  subst c.
+  apply Hc.
+  destruct (le_dec a d) as [H1| H1]. {
+    rewrite Nat.max_r; [ | easy ].
+    now right; left.
+  }
+  apply Nat.nle_gt, Nat.lt_le_incl in H1.
+  rewrite Nat.max_l; [ | easy ].
+  now left.
+}
+apply Hc.
+now right; right.
+Qed.
+
 Theorem in_transp_loop_bounds' : ∀ it k ij l,
   ij ∈ transp_loop it k l
   → snd ij ≤ Max (i ∈ l), i.
@@ -1471,21 +1505,12 @@ assert (H : ∀ i a l,
   induction l as [| b]; intros; [ easy | ].
   cbn - [ seq ].
   etransitivity; [ | apply IHl with (i := i)  ].
-Theorem glop : ∀ a b la lb,
-  (∀ c, c ∈ a :: la → c ≤ fold_left max lb b)
-  → fold_left max la a ≤ fold_left max lb b.
-Proof. clear.
-Admitted.
-apply glop.
-intros c Hc.
-destruct Hc as [Hc| Hc]. {
-  subst c.
-Search (fold_left _ _ (max _ _)).
-...
-Theorem glop : ∀ a b f la,
-  fold_left max (f (b :: la)) a ≤ fold_left max (f la) (max a b).
-Proof.
-clear.
+  apply fold_left_max_le.
+  intros c Hc.
+  destruct Hc as [Hc| Hc]. {
+    subst c.
+    apply le_fold_left_max_max.
+  }
 ...
 specialize (glop a b) as H1.
 specialize (H1 (λ lb, list_swap_elem 0 lb 0 i) l).
