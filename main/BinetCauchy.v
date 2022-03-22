@@ -1445,6 +1445,9 @@ etransitivity; [ apply H1 | ].
 unfold iter_list.
 remember (j :: l) as la.
 remember (j - k) as i.
+Theorem glop :
+  (∀ i, i < n → nth i la 0 ≤ ...
+  fold_left f la a ≤ fold_left f lb a.
 (*
 assert (H : i ≤ j) by flia Heqi.
 clear - H.
@@ -1452,8 +1455,8 @@ rename H into Hij.
 *)
 clear.
 assert (H : ∀ i a la,
-  fold_left (λ c i, Init.Nat.max c i) (list_swap_elem 0 la 0 i) a
-  ≤ fold_left (λ c i, Init.Nat.max c i) la a). {
+  fold_left (λ c i, max c i) (list_swap_elem 0 la 0 i) a
+  ≤ fold_left (λ c i, max c i) la a). {
   clear i la.
   intros.
   revert a i.
@@ -1484,9 +1487,12 @@ assert (H : ∀ i a la,
     }
     easy.
   }
+...
   erewrite map_ext_in with (f := λ k, nth (transposition 0 (S i) k) la 0). 2: {
     intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
     unfold transposition.
+
+
     replace (S j =? 0) with false by easy.
     replace (nth (if S j =? S i then 0 else S j) (b :: la) 0) with
       (if j =? i then b else nth j la 0). 2: {
