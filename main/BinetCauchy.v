@@ -1402,6 +1402,16 @@ specialize (IHit _ _ _ Hij) as H1.
 now rewrite list_swap_elem_length in H1.
 Qed.
 
+Theorem in_transp_list_bounds : ∀ ij l,
+  ij ∈ transp_list l
+  → fst ij < length l.
+Proof.
+intros * Hij.
+unfold transp_list in Hij.
+specialize (in_transp_loop_bounds) as H1.
+specialize (H1 _ _ _ _ Hij).
+...
+
 Theorem app_seq_swap_is_permut_list : ∀ i j l,
   is_permut_list (seq 0 i ++ j :: l)
   → i < j
@@ -2046,14 +2056,30 @@ Proof.
 intros * Hp.
 specialize (permut_eq_iter_list_transp Hp) as H1.
 unfold iter_list in H1.
-(*
-remember (transp_list l) as lt eqn:Hlt; symmetry in Hlt.
-revert l Hp Hlt H1.
-induction lt as [| t]; intros; [ easy | cbn ].
+(**)
+remember (λ l t, l ° swap (length l) (fst t) (snd t)) as f eqn:Hf.
+remember (transp_list l) as la eqn:Hla.
+remember (seq 0 (length l)) as lb eqn:Hlb.
+replace
+  (fold_right (λ t l, l ° swap (length l) (fst t) (snd t)) lb la)
+  with (fold_right (λ t l, f l t) lb la). 2: {
+  now rewrite Hf.
+}
+clear Hlb.
+revert l lb Hp H1 Hla.
+induction la as [| a]; intros; [ easy | cbn ].
 cbn in H1.
-specialize (IHlt (l ° swap (length l) (fst t) (snd t))) as H2.
+apply IHla in H1; cycle 1. {
+  rewrite Hf.
+  apply comp_is_permut_list with (n := length l); [ easy | ].
+  unfold swap.
+  apply list_swap_elem_is_permut. {
+Print transp_loop.
+Search transp_loop.
+Search transp_list.
+specialize (in_transp_loop
+    split.
 ...
-*)
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
 rewrite comp_length.
@@ -2130,6 +2156,7 @@ rewrite (List_map_nth' 0). 2: {
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite (@seq_nth _ _ i); [ | easy ].
 rewrite Nat.add_0_l.
+Search transposition.
 ...
 unfold transposition.
 do 4 rewrite if_eqb_eq_dec.
@@ -2214,6 +2241,25 @@ Qed.
 
 Locate "Comp".
 
+Theorem permut_eq_iter_list_transp' : ∀ l,
+  is_permut_list l
+  → iter_list (rev (transp_list l))
+      (λ l t, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l)) = l.
+Proof.
+intros * Hp.
+(*
+Compute (
+  map (λ l,
+    list_eqb Nat.eqb
+    (iter_list (rev (transp_list l))
+    (λ l t, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l))) l)
+    (canon_sym_gr_list_list 5)
+).
+*)
+specialize (permut_eq_iter_list_transp Hp) as H1.
+unfold iter_list.
+rewrite <- fold_left_rev_right.
+rewrite rev_involutive.
 ...
 
 Theorem collapse_iter_list_transp : ∀ l,
