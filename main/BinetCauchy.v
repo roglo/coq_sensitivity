@@ -1462,6 +1462,12 @@ remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
 rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
 apply List_fold_left_max; [ easy | ].
 ...
+unfold iter_list.
+rewrite List_fold_left_ext_in with (g := max) by easy.
+remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
+rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
+  fold_left max (list_swap_elem 0 (j :: l) 0 (j - k)) 0 ≤ fold_left max (j :: l) 0
+...
 (*
 remember (j :: l) as l'.
 remember (j - k) as i.
