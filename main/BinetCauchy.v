@@ -1415,13 +1415,24 @@ rewrite fold_left_max_from_0 with (l := lb).
 now apply Nat.max_le_compat.
 Qed.
 
-Theorem le_fold_left_max_max : ∀ a b la,
+Theorem le_fold_left_max_max_l : ∀ a b la,
   a ≤ fold_left max la (max a b).
 Proof.
 intros.
 revert b.
 induction la as [| c]; intros; [ apply Nat.le_max_l | ].
 cbn; rewrite <- Nat.max_assoc.
+apply IHla.
+Qed.
+
+Theorem le_fold_left_max_max_r : ∀ a b la,
+  b ≤ fold_left max la (max a b).
+Proof.
+intros.
+revert a b.
+induction la as [| c]; intros; [ apply Nat.le_max_r | ].
+cbn.
+rewrite Nat.max_comm, Nat.max_assoc.
 apply IHla.
 Qed.
 
@@ -1509,8 +1520,18 @@ assert (H : ∀ i a l,
   intros c Hc.
   destruct Hc as [Hc| Hc]. {
     subst c.
-    apply le_fold_left_max_max.
+    apply le_fold_left_max_max_l.
   }
+  cbn - [ nth ] in Hc.
+  destruct Hc as [Hc| Hc]. {
+    destruct i. {
+      cbn in Hc; subst c.
+      apply le_fold_left_max_max_r.
+    }
+    cbn in Hc; subst c.
+...
+}
+apply H.
 ...
 specialize (glop a b) as H1.
 specialize (H1 (λ lb, list_swap_elem 0 lb 0 i) l).
