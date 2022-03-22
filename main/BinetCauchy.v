@@ -1376,7 +1376,7 @@ Qed.
 
 Theorem in_transp_loop_bounds : ∀ it k ij l,
   ij ∈ transp_loop it k l
-  → k ≤ fst ij ≤ k + length l.
+  → k ≤ fst ij < k + length l.
 Proof.
 intros * Hij.
 revert ij k l Hij.
@@ -1395,8 +1395,7 @@ destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
 }
 destruct Hij as [Hij| Hij]. {
   subst ij; cbn.
-  split; [ easy | ].
-  apply Nat.le_add_r.
+  split; [ easy | flia ].
 }
 specialize (IHit _ _ _ Hij) as H1.
 now rewrite list_swap_elem_length in H1.
@@ -1409,8 +1408,8 @@ Proof.
 intros * Hij.
 unfold transp_list in Hij.
 specialize (in_transp_loop_bounds) as H1.
-specialize (H1 _ _ _ _ Hij).
-...
+apply (H1 _ _ _ _ Hij).
+Qed.
 
 Theorem app_seq_swap_is_permut_list : ∀ i j l,
   is_permut_list (seq 0 i ++ j :: l)
@@ -2074,11 +2073,9 @@ apply IHla in H1; cycle 1. {
   apply comp_is_permut_list with (n := length l); [ easy | ].
   unfold swap.
   apply list_swap_elem_is_permut. {
-Print transp_loop.
-Search transp_loop.
-Search transp_list.
-specialize (in_transp_loop
-    split.
+    apply in_transp_list_bounds.
+    now rewrite <- Hla; left.
+  } {
 ...
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
