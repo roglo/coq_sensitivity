@@ -1416,18 +1416,30 @@ now apply Nat.max_le_compat.
 Qed.
 
 Theorem le_fold_left_max : ∀ a b la,
-  a ≤ b ∨ la ≠ [] ∧ (∀ c, c ∈ la → a ≤ c)
+  a ≤ b ∨ (∃ c, c ∈ la ∧ a ≤ c)
   → a ≤ fold_left max la b.
 Proof.
 intros * Hab.
-revert b Hab.
-induction la as [| c]; intros; [ now destruct Hab | ].
-apply IHla.
-destruct Hab as [Hab| (Hc, Hab)]. {
-  now left; apply Nat.max_le_iff; left.
+revert a b Hab.
+induction la as [| c]; intros. {
+  destruct Hab as [Hab| Hab]; [ easy | ].
+  now destruct Hab.
 }
-specialize (Hab _ (or_introl eq_refl)) as H1.
-now left; apply Nat.max_le_iff; right.
+cbn.
+apply IHla.
+destruct Hab as [Hab| Hab]. {
+  left.
+  transitivity b; [ easy | ].
+  apply Nat.le_max_l.
+}
+destruct Hab as (d & Hd & Had).
+destruct Hd as [Hd| Hd]. {
+  subst d; left.
+  transitivity c; [ easy | ].
+  apply Nat.le_max_r.
+}
+right.
+now exists d.
 Qed.
 
 Theorem fold_left_max_le : ∀ a b la,
@@ -1516,12 +1528,19 @@ assert (H : ∀ i a l,
   unfold list_swap_elem in Hc.
   apply in_map_iff in Hc.
   destruct Hc as (b & Hbc & Hb).
+  apply in_seq in Hb; destruct Hb as (_, Hb); cbn in Hb.
   subst c.
+  destruct l as [| c]; [ easy | ].
 ...
   apply le_fold_left_max.
   destruct l as [| c]; [ easy | ].
-  right.
-  split; [ easy | ].
+  destruct i. {
+    rewrite transposition_id.
+    right.
+    exists c.
+    split; [ now left | ].
+...
+  unfold transposition.
   intros d Hd.
   destruct Hd as [Hd| Hd]. {
     subst d.
