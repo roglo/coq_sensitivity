@@ -2248,6 +2248,46 @@ rewrite IHn; [ | easy | easy ].
 apply Nat.max_r; flia.
 Qed.
 
+Theorem eq_transp_loop_cons : ∀ it i j k p l,
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → ∀ u, k + u < i → nth u p 0 = k + u.
+Proof.
+intros * Hit Hp * Hu.
+revert p k Hit Hp u Hu.
+induction it; intros; [ easy | cbn ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  destruct u; [ now rewrite Nat.add_0_r | cbn ].
+  destruct la as [| a]. {
+    now rewrite transp_loop_nil in Hp.
+  }
+  rewrite <- Nat.add_succ_comm.
+  apply IHit; [ | easy | flia Hu ].
+  cbn - [ "=?" ] in Hit |-*.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  now apply Nat.succ_le_mono in Hit.
+}
+injection Hp; clear Hp; intros Hp H1 H2; subst a k.
+flia Hu.
+Qed.
+
+Theorem eq_transp_list_cons : ∀ la lb i j,
+  transp_list la = (i, j) :: lb
+  → ∀ k, k < i → ff_app la k = k.
+Proof.
+intros * Hla * Hk.
+unfold ff_app.
+unfold transp_list in Hla.
+specialize eq_transp_loop_cons as H1.
+specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb (le_refl _)).
+specialize (H1 Hla).
+now apply H1.
+Qed.
+
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
   → fold_right (λ t l, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l))
@@ -2294,107 +2334,8 @@ apply IHla in H1; cycle 1. {
   destruct a as (i, j); cbn.
   unfold transp_list.
   rewrite comp_length, swap_length.
-Search transp_list.
-Theorem eq_transp_list_cons : ∀ la lb i j,
-  transp_list la = (i, j) :: lb
-  → ∀ k, k < i → ff_app la k = k.
-Proof.
-intros * Hla * Hk.
-unfold ff_app.
-unfold transp_list in Hla.
-Print transp_loop.
-Theorem eq_transp_loop_cons : ∀ it i j k p l,
-  length p + nb_nfit k p ≤ it
-  → transp_loop it k p = (i, j) :: l
-  → ∀ u, u < i → nth u p 0 = k + u.
-Proof.
-intros * Hit Hp * Hu.
-revert p k Hit Hp u Hu.
-induction it; intros; [ easy | cbn ].
-cbn in Hp.
-destruct p as [| a la]; [ easy | ].
-rewrite if_eqb_eq_dec in Hp.
-destruct (Nat.eq_dec k a) as [Hka| Hka]. {
-  subst a.
-  destruct u; [ now rewrite Nat.add_0_r | cbn ].
-  destruct la as [| a]. {
-    now rewrite transp_loop_nil in Hp.
-  }
-  rewrite <- Nat.add_succ_comm.
-  apply IHit; [ | easy | flia Hu ].
-  cbn - [ "=?" ] in Hit |-*.
-  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
-  now apply Nat.succ_le_mono in Hit.
-}
-injection Hp; clear Hp; intros Hp H1 H2; subst a k.
-cbn in Hit.
-rewrite if_eqb_eq_dec in Hit.
-destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
-cbn in Hit.
-apply Nat.succ_le_mono in Hit.
-destruct (Nat.eq_dec it 0) as [Hitz| Hitz]. {
-  subst it; flia Hit.
-}
-specialize (IHit la (S i)) as H1.
-assert (H : length la + nb_nfit (S i) la ≤ it) by flia Hit.
-specialize (H1 H); clear H.
-assert (H : transp_loop it (S i) la = (i, j) :: l). {
-  (* ah bin non, c'est pas possible, ça : si je commence à "S i",
-     je peux pas fabriquer "(i, j)", eh, patate ! *)
-Print transp_loop.
-...
-destruct it; [ easy | clear Hitz ].
-cbn - [ list_swap_elem "=?" ] in Hp.
-remember (list_swap_elem 0 (j :: la) 0 (j - i)) as lb eqn:Hlb.
-symmetry in Hlb.
-destruct lb as [| b]; [ easy | ].
-rewrite if_eqb_eq_dec in Hp.
-destruct (Nat.eq_dec i b) as [Hib| Hib]. {
-  subst b.
-  cbn in Hlb.
-  replace (j - i) with (S (j - S i)) in Hlb.
-  injection Hlb; clear Hlb; intros Hlb Hi.
-(* by flia Hka *)
-Print transp_list.
-...
-apply IHit; [ | easy ].
-  cbn in Hp |-*.
-...
-  specialize (IHit _ _ _ _ _ _ Hp Hu) as H1.
-  cbn in H1.
-Print transp_loop.
-...
-  destruct it; [ easy | ].
-  cbn - [ list_swap_elem "=?" ] in Hp.
-
-Search (transp_loop _ (S _)).
-  specialize (IHit _ _ _ _ _ _ Hp Hu) as H1.
-
-...
-specialize (eq_transp_loop_cons _ _ Hla) as H1.
-cbn in H1.
-specialize (H1 k).
-assert (H : 0 ≤ k < i) by easy.
-specialize (H1 H); clear H.
-rewrite Nat.sub_0_r in H1.
-(* bizarre, ça *)
-...
-intros * Hla * Hk.
-unfold ff_app.
-revert i j k lb Hla Hk.
-induction la as [| a]; intros; [ easy | ].
-unfold transp_list in Hla.
-cbn - [ list_swap_elem "=?" ] in Hla.
-rewrite Nat.sub_0_r in Hla.
-do 2 rewrite if_eqb_eq_dec in Hla.
-destruct (Nat.eq_dec 0 a) as [Haz| Haz]. {
-  subst a.
-  cbn in Hla.
-  destruct k; [ easy | cbn ].
-...
   symmetry in Hla.
   specialize (eq_transp_list_cons _ Hla) as H2.
-Print nb_nfit.
 ...
 Theorem nb_nfit_comp_swap :
   nb_nfit (l ° swap n i j)
@@ -2575,7 +2516,7 @@ unfold transp_list.
 specialize permut_eq_iter_list_transp_loop as H1.
 specialize (H1 l (length l + nb_nfit 0 l) 0).
 apply (H1 Hp (le_refl _)).
-Qed.
+...
 
 Locate "Comp".
 
