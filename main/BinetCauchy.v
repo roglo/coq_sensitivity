@@ -2291,7 +2291,23 @@ apply IHla in H1; cycle 1. {
   apply seq_is_permut.
 } {
   rewrite Hf.
-  unfold "°".
+  destruct a as (i, j); cbn.
+...
+  unfold transp_list in Hla |-*.
+  rewrite comp_length, swap_length.
+  destruct l as [| a]; [ easy | ].
+  rewrite List_length_cons in Hla.
+  rewrite Nat.add_succ_l in Hla.
+  cbn - [ list_swap_elem "=?" ] in Hla.
+  do 2 rewrite if_eqb_eq_dec in Hla.
+  destruct (Nat.eq_dec 0 a) as [Haz| Haz]. {
+    subst a.
+    cbn in Hla.
+Search nb_nfit.
+...
+Print transp_loop.
+Search (transp_loop _ _ (map _ _)).
+Search (transp_loop _ _ (_ ° _)).
 Search (transp_list (map _ _)).
 Search (transp_list (_ ° _)).
 ...
