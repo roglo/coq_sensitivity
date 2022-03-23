@@ -2292,6 +2292,51 @@ apply IHla in H1; cycle 1. {
 } {
   rewrite Hf.
   destruct a as (i, j); cbn.
+  unfold transp_list.
+  rewrite comp_length, swap_length.
+Search transp_list.
+Theorem eq_transp_list_cons : ∀ la lb i j,
+  transp_list la = (i, j) :: lb
+  → ∀ k, k < i → ff_app la k = k.
+Proof.
+intros * Hla * Hk.
+unfold ff_app.
+unfold transp_list in Hla.
+Print transp_loop.
+Theorem eq_transp_loop_cons : ∀ it i j k p l,
+  transp_loop it k p = (i, j) :: l
+  → ∀ u, k ≤ u < k + i → nth (u - k) p 0 = k.
+Proof.
+intros * Hp * Hu.
+...
+specialize (eq_transp_loop_cons _ _ Hla) as H1.
+cbn in H1.
+specialize (H1 k).
+assert (H : 0 ≤ k < i) by easy.
+specialize (H1 H); clear H.
+rewrite Nat.sub_0_r in H1.
+(* bizarre, ça *)
+...
+intros * Hla * Hk.
+unfold ff_app.
+revert i j k lb Hla Hk.
+induction la as [| a]; intros; [ easy | ].
+unfold transp_list in Hla.
+cbn - [ list_swap_elem "=?" ] in Hla.
+rewrite Nat.sub_0_r in Hla.
+do 2 rewrite if_eqb_eq_dec in Hla.
+destruct (Nat.eq_dec 0 a) as [Haz| Haz]. {
+  subst a.
+  cbn in Hla.
+  destruct k; [ easy | cbn ].
+...
+  symmetry in Hla.
+  specialize (eq_transp_list_cons _ Hla) as H2.
+Print nb_nfit.
+...
+Theorem nb_nfit_comp_swap :
+  nb_nfit (l ° swap n i j)
+Search (nb_nfit (_ ° _)).
 ...
   unfold transp_list in Hla |-*.
   rewrite comp_length, swap_length.
