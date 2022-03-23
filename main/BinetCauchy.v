@@ -2304,10 +2304,72 @@ unfold ff_app.
 unfold transp_list in Hla.
 Print transp_loop.
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
-  transp_loop it k p = (i, j) :: l
-  → ∀ u, k ≤ u < k + i → nth (u - k) p 0 = k.
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → ∀ u, u < i → nth u p 0 = k + u.
 Proof.
-intros * Hp * Hu.
+intros * Hit Hp * Hu.
+revert p k Hit Hp u Hu.
+induction it; intros; [ easy | cbn ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  destruct u; [ now rewrite Nat.add_0_r | cbn ].
+  destruct la as [| a]. {
+    now rewrite transp_loop_nil in Hp.
+  }
+  rewrite <- Nat.add_succ_comm.
+  apply IHit; [ | easy | flia Hu ].
+  cbn - [ "=?" ] in Hit |-*.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  now apply Nat.succ_le_mono in Hit.
+}
+injection Hp; clear Hp; intros Hp H1 H2; subst a k.
+cbn in Hit.
+rewrite if_eqb_eq_dec in Hit.
+destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+destruct (Nat.eq_dec it 0) as [Hitz| Hitz]. {
+  subst it; flia Hit.
+}
+specialize (IHit la (S i)) as H1.
+assert (H : length la + nb_nfit (S i) la ≤ it) by flia Hit.
+specialize (H1 H); clear H.
+assert (H : transp_loop it (S i) la = (i, j) :: l). {
+  (* ah bin non, c'est pas possible, ça : si je commence à "S i",
+     je peux pas fabriquer "(i, j)", eh, patate ! *)
+Print transp_loop.
+...
+destruct it; [ easy | clear Hitz ].
+cbn - [ list_swap_elem "=?" ] in Hp.
+remember (list_swap_elem 0 (j :: la) 0 (j - i)) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [| b]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec i b) as [Hib| Hib]. {
+  subst b.
+  cbn in Hlb.
+  replace (j - i) with (S (j - S i)) in Hlb.
+  injection Hlb; clear Hlb; intros Hlb Hi.
+(* by flia Hka *)
+Print transp_list.
+...
+apply IHit; [ | easy ].
+  cbn in Hp |-*.
+...
+  specialize (IHit _ _ _ _ _ _ Hp Hu) as H1.
+  cbn in H1.
+Print transp_loop.
+...
+  destruct it; [ easy | ].
+  cbn - [ list_swap_elem "=?" ] in Hp.
+
+Search (transp_loop _ (S _)).
+  specialize (IHit _ _ _ _ _ _ Hp Hu) as H1.
+
 ...
 specialize (eq_transp_loop_cons _ _ Hla) as H1.
 cbn in H1.
