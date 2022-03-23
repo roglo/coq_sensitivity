@@ -2252,15 +2252,11 @@ Theorem eq_transp_loop_cons : ∀ it i j k p l,
   length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
   → (∀ u, k + u < i → nth u p 0 = k + u) ∧
-     transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
+    transp_loop it i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
 intros * Hit Hp.
-Print transp_loop.
-...
-intros * Hit Hp.
 revert p k l Hit Hp.
-induction it; intros; [ easy | cbn ].
-rewrite Nat.sub_0_r.
+induction it; intros; [ easy | ].
 cbn in Hp.
 destruct p as [| a la]; [ easy | ].
 rewrite if_eqb_eq_dec in Hp.
