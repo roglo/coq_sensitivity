@@ -1849,6 +1849,19 @@ apply fold_left_op_fun_from_d. {
 }
 Qed.
 
+Theorem max_list_cons : ∀ A (a : A) la f,
+  Max (i ∈ a :: la), f i = max (f a) (Max (i ∈ la), f i).
+Proof.
+intros.
+apply iter_list_cons. {
+  now intros; apply max_r.
+} {
+  now intros; rewrite Nat.max_l.
+} {
+  apply Nat.max_assoc.
+}
+Qed.
+
 (* *)
 
 Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).

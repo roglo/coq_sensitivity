@@ -2207,6 +2207,45 @@ Theorem permut_list_max : ∀ l,
   is_permut_list l
   → Max (i ∈ l), i = length l - 1.
 Proof.
+intros * Hp.
+remember (length l) as n eqn:Hn.
+symmetry in Hn.
+revert l Hp Hn.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hn; subst l.
+}
+rewrite Nat_sub_succ_1.
+specialize permut_without_highest as H1.
+specialize (H1 n l).
+assert (H : is_permut (S n) l) by easy.
+specialize (H1 H); clear H.
+destruct H1 as (j & Hj & Hjn & Hpj & Hpjl).
+specialize (IHn _ Hpj Hpjl).
+unfold butn in IHn.
+rewrite <- (firstn_skipn j l).
+rewrite iter_list_app in IHn |-*.
+destruct l as [| a]; [ easy | ].
+rewrite skipn_cons in IHn.
+destruct j. {
+  cbn in Hjn, Hpj; subst a.
+  cbn in IHn |-*.
+  unfold iter_list in IHn at 2.
+  unfold iter_list at 2.
+  cbn in IHn |-*.
+  rewrite max_list_cons.
+  rewrite IHn.
+  rewrite Nat.max_l; [ easy | flia ].
+}
+rewrite firstn_cons in IHn |-*.
+rewrite skipn_cons.
+rewrite max_list_cons in IHn |-*.
+...
+Search (is_permut_list _ → _).
+Search (is_permut _ _ → _).
+permut_without_highest:
+  ∀ (n : nat) (l : list nat), is_permut (S n) l → ∃ i : nat, i < length l ∧ nth i l 0 = n ∧ is_permut n (butn i l)
+...
+permut_list_ub: ∀ (l : list nat) (i : nat), is_permut_list l → i < length l → nth i l 0 < length l
 ...
 
 Theorem permut_eq_iter_list_transp' : ∀ l,
