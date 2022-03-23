@@ -1374,33 +1374,6 @@ intros j Hj.
 now rewrite transposition_id.
 Qed.
 
-Theorem in_transp_loop_bounds : ∀ it k ij l,
-  ij ∈ transp_loop it k l
-  → k ≤ fst ij < k + length l.
-Proof.
-intros * Hij.
-revert ij k l Hij.
-induction it; intros; [ easy | cbn in Hij ].
-destruct l as [| j]; [ easy | ].
-rewrite if_eqb_eq_dec in Hij.
-destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
-  subst j.
-  specialize (IHit _ _ _ Hij) as H1.
-  destruct H1 as (H1, H2).
-  rewrite Nat.add_succ_comm in H2.
-  split; [ | easy ].
-  destruct (Nat.eq_dec (S k) (fst ij)) as [Hkij| Hkij]; [ | flia H1 Hkij ].
-  rewrite <- Hkij.
-  apply Nat.le_succ_diag_r.
-}
-destruct Hij as [Hij| Hij]. {
-  subst ij; cbn.
-  split; [ easy | flia ].
-}
-specialize (IHit _ _ _ Hij) as H1.
-now rewrite list_swap_elem_length in H1.
-Qed.
-
 Theorem List_fold_left_max : ∀ a b la lb,
   a ≤ b
   → Max (i ∈ la), i ≤ Max (i ∈ lb), i
@@ -1490,58 +1463,61 @@ apply Hc.
 now right; right.
 Qed.
 
-Theorem in_transp_loop_bounds' : ∀ it k ij l,
-  ij ∈ transp_loop it k l
-  → snd ij ≤ Max (i ∈ l), i.
+Theorem in_transp_loop_bounds : ∀ it k i j l,
+  (i, j) ∈ transp_loop it k l
+  → k ≤ i < k + length l ∧ j ≤ Max (u ∈ l), u.
 Proof.
 intros * Hij.
-revert ij k l Hij.
+revert i j k l Hij.
 induction it; intros; [ easy | cbn in Hij ].
-destruct l as [| j]; [ easy | ].
+destruct l as [| v]; [ easy | ].
 rewrite if_eqb_eq_dec in Hij.
-destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
-  subst j.
-  specialize (IHit _ _ _ Hij) as H1.
-  rewrite iter_list_cons'.
-  etransitivity; [ apply H1 | ].
-  unfold iter_list at 2.
-  rewrite fold_left_op_fun_from_d with (d := 0); cycle 1. {
-    now intros; rewrite Nat.max_r.
-  } {
-    now intros; rewrite Nat.max_l.
-  } {
-    apply Nat.max_assoc.
+destruct (Nat.eq_dec k v) as [Hkv| Hkv]. {
+  subst v.
+  specialize (IHit _ _ _ _ Hij) as H1.
+  destruct H1 as ((H1, H2), H3).
+  rewrite Nat.add_succ_comm in H2.
+  split. {
+    split; [ | easy ].
+    destruct (Nat.eq_dec (S k) i) as [Hkij| Hkij]; [ | flia H1 Hkij ].
+    rewrite <- Hkij.
+    apply Nat.le_succ_diag_r.
   }
+  rewrite iter_list_cons'.
+  etransitivity; [ apply H3 | ].
+  unfold iter_list at 2.
+  rewrite fold_left_max_from_0.
   rewrite fold_iter_list.
   apply Nat.le_max_r.
 }
 destruct Hij as [Hij| Hij]. {
-  subst ij; cbn.
+  injection Hij; clear Hij; intros; subst k v; cbn.
+  split. {
+    split; [ easy | flia ].
+  }
   rewrite iter_list_cons'.
   unfold iter_list.
-  rewrite fold_left_op_fun_from_d with (d := 0); cycle 1. {
-    now intros; rewrite Nat.max_r.
-  } {
-    now intros; rewrite Nat.max_l.
-  } {
-    apply Nat.max_assoc.
-  }
+  rewrite fold_left_max_from_0.
   rewrite fold_iter_list.
   apply Nat.le_max_l.
 }
-specialize (IHit _ _ _ Hij) as H1.
-etransitivity; [ apply H1 | ].
+specialize (IHit _ _ _ _ Hij) as H1.
+destruct H1 as (H1, H2).
+split. {
+  now rewrite list_swap_elem_length in H1.
+}
+etransitivity; [ apply H2 | ].
 unfold iter_list.
 rewrite List_fold_left_ext_in with (g := max) by easy.
 remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
 rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
-remember (j :: l) as l'.
-remember (j - k) as i.
+remember (v :: l) as l'.
+remember (v - k) as x.
 clear; rename l' into l.
+rename x into i.
 assert (H : ∀ i a l,
   fold_left max (list_swap_elem 0 l 0 i) a ≤ fold_left max l a). {
   clear l i.
-(**)
   intros.
   apply fold_left_max_le.
   intros * Hc.
@@ -1554,199 +1530,32 @@ assert (H : ∀ i a l,
   destruct Hc as (b & Hbc & Hb).
   apply in_seq in Hb; destruct Hb as (_, Hb); cbn in Hb.
   subst c.
-destruct i. {
-  rewrite transposition_id.
-  destruct l as [| c]; [ easy | cbn ].
-  destruct b. {
-    apply le_fold_left_max.
-    left.
-    apply Nat.le_max_r.
-  }
-  cbn in Hb.
-  apply Nat.succ_lt_mono in Hb.
-  apply le_fold_left_max.
-  right.
-  exists (nth b l 0).
-  split; [ | easy ].
-...
-  apply le_fold_left_max.
-  destruct l as [| c]; [ easy | ].
-  right.
-  exists (nth (transposition 0 i b) (c :: l) 0).
-  split; [ | easy ].
-  cbn.
-
-  destruct i. {
-    rewrite transposition_id.
-    right.
-    exists (nth b (c :: l.
-    split; [ now left | ].
-    destruct b; [ easy | ].
-    cbn in Hb |-*.
-...
-  unfold transposition.
-  intros d Hd.
-  destruct Hd as [Hd| Hd]. {
-    subst d.
-...
-  intros.
-  revert i a.
-  induction l as [| b]; intros; [ easy | ].
-  cbn - [ seq ].
-  etransitivity; [ | apply IHl with (i := i)  ].
-  apply fold_left_max_le.
-  intros c Hc.
-  destruct Hc as [Hc| Hc]. {
-    subst c.
-    apply le_fold_left_max; left.
-    apply Nat.le_max_l.
-  }
-  cbn - [ nth ] in Hc.
-  destruct Hc as [Hc| Hc]. {
-    destruct i. {
-      cbn in Hc; subst c.
-      apply le_fold_left_max; left.
-      apply Nat.le_max_r.
+  destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil.
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec b 0) as [Hbz| Hbz]. {
+      now rewrite nth_overflow.
     }
-    cbn in Hc; subst c.
-    clear.
-    revert i a b.
-    induction l as [| c]; intros; [ now cbn; rewrite match_id | ].
-    destruct i. {
-      apply le_fold_left_max.
-      rewrite List_nth_0_cons.
-      destruct (le_dec c (max a b)) as [Hcab| Hcab]; [ now left | ].
-      apply Nat.nle_gt in Hcab; right.
-      split; [ easy | ].
-      intros d Hd; cbn.
-      cbn in Hd.
-(* chiasse *)
-...
+    destruct (Nat.eq_dec b i) as [H| H]; [ flia H Hb Hil | ].
+    apply le_fold_left_max.
+    right.
+    exists (nth b l 0).
+    split; [ | easy ].
+    now apply nth_In.
+  }
+  apply le_fold_left_max.
+  right.
+  exists (nth (transposition 0 i b) l 0).
+  split; [ | easy ].
+  apply nth_In.
+  apply transposition_lt; [ flia Hb | easy | easy ].
 }
 apply H.
-...
-specialize (glop a b) as H1.
-specialize (H1 (λ lb, list_swap_elem 0 lb 0 i) l).
-cbn - [ list_swap_elem ] in H1.
-apply H1.
-...
-  unfold list_swap_elem.
-  do 2 rewrite List_fold_left_map.
-...
-  revert b i a.
-  induction l as [| c]; intros. {
-    cbn.
-    destruct i; [ easy | ].
-    rewrite match_id.
-    rewrite Nat.max_l; [ | easy ].
-    apply Nat.le_max_l.
-  }
-...
-  apply List_fold_left_max; [ apply Nat.le_max_l | ].
-  unfold iter_list.
-  rewrite List_fold_left_ext_in with (g := max) by easy.
-  remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
-  rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
-...
-  ============================
-  fold_left max (list_swap_elem 0 (b :: l) 0 i) a ≤ fold_left max (list_swap_elem 0 l 0 i) (max a b)
-  ============================
-  fold_left max (list_swap_elem 0 (b :: l) 0 i) 0 ≤ fold_left max (list_swap_elem 0 l 0 i) 0
-...
-Search (fold_left _ _ _ ≤ _).
-revert i.
-induction l as [| a la]; intros; [ easy | ].
-cbn - [ nth seq ].
-apply List_fold_left_max; [ easy | ].
-unfold iter_list.
-rewrite List_fold_left_ext_in with (g := max) by easy.
-remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
-rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
-  ============================
-  fold_left max (list_swap_elem 0 (a :: la) 0 i) 0 ≤ fold_left max la 0
-...
-apply List_fold_left_max; [ easy | ].
-unfold iter_list.
-apply List_fold_left_max; [ easy | ].
-unfold iter_list.
-...
-unfold iter_list.
-rewrite List_fold_left_ext_in with (g := max) by easy.
-remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
-rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
-apply List_fold_left_max; [ easy | ].
-  ============================
-  Max (i ∈ list_swap_elem 0 (j :: l) 0 (j - k)), i ≤ Max (i ∈ j :: l), i
-  ============================
-  Max (i ∈ list_swap_elem 0 (j :: l) 0 (j - k)), i ≤ Max (i ∈ j :: l), i
-...
-unfold iter_list.
-rewrite List_fold_left_ext_in with (g := max) by easy.
-remember (fold_left max (list_swap_elem _ _ _ _) _) as x.
-rewrite List_fold_left_ext_in with (g := max) by easy; subst x.
-  fold_left max (list_swap_elem 0 (j :: l) 0 (j - k)) 0 ≤ fold_left max (j :: l) 0
-...
-(*
-remember (j :: l) as l'.
-remember (j - k) as i.
-clear; rename l' into l.
-*)
-(*
-assert (H : i ≤ j) by flia Heqi.
-clear - H.
-rename H into Hij.
-*)
-clear.
-assert (H : ∀ i a la,
-  fold_left (λ c i, max c i) (list_swap_elem 0 la 0 i) a
-  ≤ fold_left (λ c i, max c i) la a). {
-  clear i la.
-  intros.
-  revert a i.
-  induction la as [| b]; intros; [ easy | ].
-  etransitivity; [ | apply IHla with (i := i) ].
-  cbn - [ list_swap_elem ].
-  unfold list_swap_elem.
-  cbn - [ nth ].
-  rewrite <- seq_shift, map_map.
-  destruct i. {
-    rewrite List_nth_0_cons; cbn.
-    erewrite map_ext_in with (f := λ k, nth (transposition 0 0 k) la 0). 2: {
-      intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-      now rewrite transposition_id.
-    }
-    easy.
-  }
-  rewrite List_nth_succ_cons.
-  erewrite map_ext_in. 2: {
-    intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-    unfold transposition.
-    replace (S j =? 0) with false by easy.
-    replace (nth (if S j =? S i then 0 else S j) (b :: la) 0) with
-      (if j =? i then b else nth j la 0). 2: {
-      cbn.
-      do 2 rewrite if_eqb_eq_dec.
-      now destruct (Nat.eq_dec j i).
-    }
-    easy.
-  }
-...
-  erewrite map_ext_in with (f := λ k, nth (transposition 0 (S i) k) la 0). 2: {
-    intros j Hj; apply in_seq in Hj; destruct Hj as (_, Hj); cbn in Hj.
-    unfold transposition.
+Qed.
 
+Inspect 1.
 
-    replace (S j =? 0) with false by easy.
-    replace (nth (if S j =? S i then 0 else S j) (b :: la) 0) with
-      (if j =? i then b else nth j la 0). 2: {
-      cbn.
-      do 2 rewrite if_eqb_eq_dec.
-      now destruct (Nat.eq_dec j i).
-    }
-    easy.
-  }
-...
-now rewrite list_swap_elem_length in H1.
 ...
 
 Theorem in_transp_list_bounds : ∀ ij l,
