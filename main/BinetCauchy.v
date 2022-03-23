@@ -1554,18 +1554,15 @@ assert (H : ∀ i a l,
 apply H.
 Qed.
 
-Inspect 1.
-
-...
-
-Theorem in_transp_list_bounds : ∀ ij l,
-  ij ∈ transp_list l
-  → fst ij < length l.
+Theorem in_transp_list_bounds : ∀ i j l,
+  (i, j) ∈ transp_list l
+  → i < length l ∧ j ≤ Max (u ∈ l), u.
 Proof.
 intros * Hij.
 unfold transp_list in Hij.
 specialize (in_transp_loop_bounds) as H1.
-apply (H1 _ _ _ _ Hij).
+specialize (H1 _ _ _ _ _ Hij).
+now destruct H1 as ((_, H1), H2).
 Qed.
 
 Theorem app_seq_swap_is_permut_list : ∀ i j l,
@@ -2187,6 +2184,7 @@ specialize (H1 l (length l + nb_nfit 0 l) 0).
 apply (H1 Hp (le_refl _)).
 Qed.
 
+(*
 Theorem List_fold_left_fold_right : ∀ A B (f : A → B → A) la lb l,
   (∀ a l, a ∈ la → f (f l a) a = l)
   → fold_left f la l = lb
@@ -2203,6 +2201,13 @@ rewrite Hll. 2: {
 }
 now apply Hal; left.
 Qed.
+*)
+
+Theorem permut_list_max : ∀ l,
+  is_permut_list l
+  → Max (i ∈ l), i = length l - 1.
+Proof.
+...
 
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
@@ -2229,11 +2234,21 @@ apply IHla in H1; cycle 1. {
   rewrite Hf.
   apply comp_is_permut_list with (n := length l); [ easy | ].
   unfold swap.
+  destruct a as (i, j); cbn.
   apply list_swap_elem_is_permut. {
-    apply in_transp_list_bounds.
+    apply in_transp_list_bounds with (j := j).
     now rewrite <- Hla; left.
   } {
-Check in_transp_list_bounds.
+    specialize in_transp_list_bounds as H2.
+    specialize (H2 i j l).
+    assert (H : (i, j) ∈ transp_list l). {
+      now rewrite <- Hla; left.
+    }
+    specialize (H2 H); clear H.
+    destruct H2 as (H2, H3).
+...
+    rewrite permut_list_max in H3; [ | easy ].
+    flia H3 H2.
 ...
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
