@@ -1417,29 +1417,53 @@ Qed.
 
 Theorem le_fold_left_max : ∀ a b la,
   a ≤ b ∨ (∃ c, c ∈ la ∧ a ≤ c)
-  → a ≤ fold_left max la b.
+  ↔ a ≤ fold_left max la b.
 Proof.
-intros * Hab.
-revert a b Hab.
-induction la as [| c]; intros. {
-  destruct Hab as [Hab| Hab]; [ easy | ].
-  now destruct Hab.
+intros.
+split. {
+  intros Hab.
+  revert a b Hab.
+  induction la as [| c]; intros. {
+    destruct Hab as [Hab| Hab]; [ easy | ].
+    now destruct Hab.
+  }
+  cbn.
+  apply IHla.
+  destruct Hab as [Hab| Hab]. {
+    left.
+    transitivity b; [ easy | ].
+    apply Nat.le_max_l.
+  }
+  destruct Hab as (d & Hd & Had).
+  destruct Hd as [Hd| Hd]. {
+    subst d; left.
+    transitivity c; [ easy | ].
+    apply Nat.le_max_r.
+  }
+  right.
+  now exists d.
+} {
+  intros Hab.
+  revert a b Hab.
+  induction la as [| c]; intros; [ now left | ].
+  cbn in Hab.
+  apply IHla in Hab.
+  destruct Hab as [Hab| Hab]. {
+    destruct (le_dec b c) as [Hbc| Hbc]. {
+      rewrite Nat.max_r in Hab; [ | easy ].
+      right.
+      exists c.
+      split; [ now left | easy ].
+    }
+    apply Nat.nle_gt, Nat.lt_le_incl in Hbc.
+    rewrite Nat.max_l in Hab; [ | easy ].
+    now left.
+  }
+  destruct Hab as (d & Hd & Had).
+  right.
+  exists d.
+  split; [ now right | easy ].
 }
-cbn.
-apply IHla.
-destruct Hab as [Hab| Hab]. {
-  left.
-  transitivity b; [ easy | ].
-  apply Nat.le_max_l.
-}
-destruct Hab as (d & Hd & Had).
-destruct Hd as [Hd| Hd]. {
-  subst d; left.
-  transitivity c; [ easy | ].
-  apply Nat.le_max_r.
-}
-right.
-now exists d.
 Qed.
 
 Theorem fold_left_max_le : ∀ a b la,
@@ -1530,15 +1554,35 @@ assert (H : ∀ i a l,
   destruct Hc as (b & Hbc & Hb).
   apply in_seq in Hb; destruct Hb as (_, Hb); cbn in Hb.
   subst c.
-  destruct l as [| c]; [ easy | ].
+destruct i. {
+  rewrite transposition_id.
+  destruct l as [| c]; [ easy | cbn ].
+  destruct b. {
+    apply le_fold_left_max.
+    left.
+    apply Nat.le_max_r.
+  }
+  cbn in Hb.
+  apply Nat.succ_lt_mono in Hb.
+  apply le_fold_left_max.
+  right.
+  exists (nth b l 0).
+  split; [ | easy ].
 ...
   apply le_fold_left_max.
   destruct l as [| c]; [ easy | ].
+  right.
+  exists (nth (transposition 0 i b) (c :: l) 0).
+  split; [ | easy ].
+  cbn.
+
   destruct i. {
     rewrite transposition_id.
     right.
-    exists c.
+    exists (nth b (c :: l.
     split; [ now left | ].
+    destruct b; [ easy | ].
+    cbn in Hb |-*.
 ...
   unfold transposition.
   intros d Hd.
