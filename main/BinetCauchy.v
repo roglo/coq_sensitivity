@@ -2210,6 +2210,29 @@ Proof.
 intros * Hp.
 remember (length l) as n eqn:Hn.
 symmetry in Hn.
+destruct n; intros. {
+  now apply length_zero_iff_nil in Hn; subst l.
+}
+rewrite Nat_sub_succ_1.
+specialize permut_without_highest as H1.
+specialize (H1 n l).
+assert (H : is_permut (S n) l) by easy.
+specialize (H1 H); clear H.
+destruct H1 as (j & Hj & Hjn & Hpj & Hpjl).
+specialize (nth_split _ 0 Hj) as H1.
+destruct H1 as (l1 & l2 & Hll & Hlj).
+rewrite Hjn in Hll.
+rewrite Hll.
+rewrite max_list_app, max_list_cons.
+...
+Check List_split3.
+Search (_ = _ ++ _ :: _).
+About in_split.
+Check nth_split.
+...
+intros * Hp.
+remember (length l) as n eqn:Hn.
+symmetry in Hn.
 revert l Hp Hn.
 induction n; intros. {
   now apply length_zero_iff_nil in Hn; subst l.
@@ -2224,6 +2247,7 @@ specialize (IHn _ Hpj Hpjl).
 unfold butn in IHn.
 rewrite <- (firstn_skipn j l).
 rewrite iter_list_app in IHn |-*.
+...
 destruct l as [| a]; [ easy | ].
 rewrite skipn_cons in IHn.
 destruct j. {

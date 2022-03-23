@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith Psatz Sorted Permutation Decidable.
-Import List List.ListNotations.
+Import List List.ListNotations Init.Nat.
 Arguments length {A}.
 
 Global Hint Resolve Nat.le_0_l : core.
@@ -1836,8 +1836,9 @@ Qed.
 
 (* *)
 
-Theorem fold_left_max_from_0 : ∀ a l,
-  fold_left max l a = max a (fold_left max l 0).
+Theorem fold_left_max_from_0 : ∀ A a l (f : A → _),
+  fold_left (λ c i, max c (f i)) l a =
+  max a (fold_left (λ c i, max c (f i)) l 0).
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
@@ -1847,6 +1848,15 @@ apply fold_left_op_fun_from_d. {
 } {
   apply Nat.max_assoc.
 }
+Qed.
+
+Theorem max_list_app : ∀ A (la lb : list A) f,
+  Max (i ∈ la ++ lb), f i = max (Max (i ∈ la), f i) (Max (i ∈ lb), f i).
+Proof.
+intros.
+rewrite iter_list_app.
+unfold iter_list.
+apply fold_left_max_from_0.
 Qed.
 
 Theorem max_list_cons : ∀ A (a : A) la f,
