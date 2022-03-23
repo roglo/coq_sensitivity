@@ -2255,6 +2255,9 @@ Theorem eq_transp_loop_cons : ∀ it i j k p l,
      transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
 intros * Hit Hp.
+Print transp_loop.
+...
+intros * Hit Hp.
 revert p k l Hit Hp.
 induction it; intros; [ easy | cbn ].
 rewrite Nat.sub_0_r.
