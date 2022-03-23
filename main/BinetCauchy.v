@@ -2210,7 +2210,8 @@ Proof.
 intros * Hp.
 remember (length l) as n eqn:Hn.
 symmetry in Hn.
-destruct n; intros. {
+revert l Hp Hn.
+induction n; intros. {
   now apply length_zero_iff_nil in Hn; subst l.
 }
 rewrite Nat_sub_succ_1.
@@ -2224,53 +2225,28 @@ destruct H1 as (l1 & l2 & Hll & Hlj).
 rewrite Hjn in Hll.
 rewrite Hll.
 rewrite max_list_app, max_list_cons.
-...
-Check List_split3.
-Search (_ = _ ++ _ :: _).
-About in_split.
-Check nth_split.
-...
-intros * Hp.
-remember (length l) as n eqn:Hn.
-symmetry in Hn.
-revert l Hp Hn.
-induction n; intros. {
-  now apply length_zero_iff_nil in Hn; subst l.
+rewrite (Nat.max_comm n).
+rewrite Nat.max_assoc.
+rewrite <- max_list_app.
+assert (Hb : butn j l = l1 ++ l2). {
+  unfold butn.
+  rewrite Hll.
+  rewrite firstn_app.
+  rewrite Hlj, Nat.sub_diag, firstn_O, app_nil_r.
+  rewrite <- Hlj, firstn_all.
+  replace (l1 ++ n :: l2) with (l1 ++ [n] ++ l2) by easy.
+  rewrite app_assoc, skipn_app.
+  rewrite app_length, Nat.add_1_r, Nat.sub_diag.
+  rewrite skipn_O.
+  replace (S (length l1)) with (length (l1 ++ [n])). 2: {
+    now rewrite app_length, Nat.add_1_r.
+  }
+  now rewrite skipn_all, app_assoc, app_nil_r.
 }
-rewrite Nat_sub_succ_1.
-specialize permut_without_highest as H1.
-specialize (H1 n l).
-assert (H : is_permut (S n) l) by easy.
-specialize (H1 H); clear H.
-destruct H1 as (j & Hj & Hjn & Hpj & Hpjl).
-specialize (IHn _ Hpj Hpjl).
-unfold butn in IHn.
-rewrite <- (firstn_skipn j l).
-rewrite iter_list_app in IHn |-*.
-...
-destruct l as [| a]; [ easy | ].
-rewrite skipn_cons in IHn.
-destruct j. {
-  cbn in Hjn, Hpj; subst a.
-  cbn in IHn |-*.
-  unfold iter_list in IHn at 2.
-  unfold iter_list at 2.
-  cbn in IHn |-*.
-  rewrite max_list_cons.
-  rewrite IHn.
-  rewrite Nat.max_l; [ easy | flia ].
-}
-rewrite firstn_cons in IHn |-*.
-rewrite skipn_cons.
-rewrite max_list_cons in IHn |-*.
-...
-Search (is_permut_list _ → _).
-Search (is_permut _ _ → _).
-permut_without_highest:
-  ∀ (n : nat) (l : list nat), is_permut (S n) l → ∃ i : nat, i < length l ∧ nth i l 0 = n ∧ is_permut n (butn i l)
-...
-permut_list_ub: ∀ (l : list nat) (i : nat), is_permut_list l → i < length l → nth i l 0 < length l
-...
+rewrite Hb in Hpj, Hpjl.
+rewrite IHn; [ | easy | easy ].
+apply Nat.max_r; flia.
+Qed.
 
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
@@ -2309,9 +2285,15 @@ apply IHla in H1; cycle 1. {
     }
     specialize (H2 H); clear H.
     destruct H2 as (H2, H3).
-...
     rewrite permut_list_max in H3; [ | easy ].
     flia H3 H2.
+  }
+  apply seq_is_permut.
+} {
+  rewrite Hf.
+  unfold "°".
+Search (transp_list (map _ _)).
+Search (transp_list (_ ° _)).
 ...
 apply List_fold_left_fold_right in H1; [ easy | ].
 intros t la Ht.
