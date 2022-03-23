@@ -1463,7 +1463,7 @@ apply Hc.
 now right; right.
 Qed.
 
-Theorem in_transp_loop_bounds : ∀ it k i j l,
+Theorem in_transp_loop_bounds : ∀ it k l i j,
   (i, j) ∈ transp_loop it k l
   → k ≤ i < k + length l ∧ j ≤ Max (u ∈ l), u.
 Proof.
@@ -2252,7 +2252,7 @@ Theorem eq_transp_loop_cons : ∀ it i j k p l,
   length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
   → (∀ u, k + u < i → nth u p 0 = k + u) ∧
-    transp_loop it i (list_swap_elem 0 p 0 (j - i)) = l.
+    transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
 intros * Hit Hp.
 revert p k l Hit Hp.
@@ -2275,6 +2275,17 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
     rewrite <- Nat.add_succ_comm in Hu |-*.
     now apply H1.
   }
+  rewrite Nat_sub_succ_1.
+  specialize in_transp_loop_bounds as H3.
+  specialize (H3 it (S k) la i j).
+  assert (H : (i, j) ∈ transp_loop it (S k) la) by now rewrite Hp; left.
+  specialize (H3 H); clear H.
+  destruct H3 as (H3, H4).
+  specialize in_transp_loop_bounds as H5.
+  specialize (H5 (it - 1) i).
+  specialize (H5 (list_swap_elem 0 la 0 (j - i))).
+  rewrite H2 in H5.
+  rewrite list_swap_elem_length in H5.
 ...
   destruct it; [ easy | ].
   rewrite Nat_sub_succ_1 in H2.
