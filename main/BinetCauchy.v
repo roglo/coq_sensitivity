@@ -2347,21 +2347,24 @@ Qed.
 *)
 
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
-  length p + nb_nfit k p ≤ it
+  AllLt (S k) p
+  → length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
   → transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
-intros * Hit Hp.
+intros * Hall Hit Hp.
+(*
 Compute (
-  let p := [3;2;4;0;1] in
+  let p := [3;2;4;1] in
   let it := length p + nb_nfit 0 p in
   let k := 3 in
+let (i, j) := hd (42, 42) (transp_loop it k p) in
+let l := tl (transp_loop it k p) in
   (transp_loop it k p
+, list_eqb (pair_eqb Nat.eqb) (transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i))) l
+, map (Nat.leb k) p
 )).
-(* il y a un cadre d'utilisation de transp_loop qu'il faut que je me
-   précise, et que je doive mettre en hypothèse *)
-Print transp_loop.
-...
+Print AllLt.
 Compute (
   let p := [3;2;4;0;1] in
   let it := length p + nb_nfit 0 p in
@@ -2371,6 +2374,35 @@ Compute (
   (transp_loop it k p = (i, j) :: l,
    transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l)
 ).
+*)
+revert p k l Hall Hit Hp.
+induction it; intros; [ easy | ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  specialize (IHit la (S k) l) as H1.
+  cbn in Hit.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  apply Nat.succ_le_mono in Hit.
+  assert (H : AllLt (S (S k)) la). {
+    intros u Hu.
+    specialize (Hall u (or_intror Hu)) as H2.
+    flia H2.
+  }
+  specialize (H1 H Hit Hp); clear H.
+  rewrite Nat_sub_succ_1.
+  specialize in_transp_loop_bounds as H3.
+  specialize (H3 it (S k) la i j).
+  assert (H : (i, j) ∈ transp_loop it (S k) la) by now rewrite Hp; left.
+  specialize (H3 H); clear H.
+  destruct H3 as (H3, H4).
+  specialize in_transp_loop_bounds as H5.
+  specialize (H5 (it - 1) i).
+  specialize (H5 (list_swap_elem 0 la 0 (j - i))).
+  rewrite H1 in H5.
+  rewrite list_swap_elem_length in H5.
 ...
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
