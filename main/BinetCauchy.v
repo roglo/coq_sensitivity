@@ -2248,6 +2248,7 @@ rewrite IHn; [ | easy | easy ].
 apply Nat.max_r; flia.
 Qed.
 
+(*
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
   length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
@@ -2339,6 +2340,33 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   cbn - [ "=?" ] in Hit |-*.
   rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
   now apply Nat.succ_le_mono in Hit.
+}
+injection Hp; clear Hp; intros Hp H1 H2; subst a k.
+flia Hu.
+Qed.
+*)
+
+Theorem eq_transp_loop_cons : ∀ it i j k p l,
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → ∀ u, k + u < i → nth u p 0 = k + u.
+Proof.
+intros * Hit Hp * Hu.
+revert p k l Hit Hp u Hu.
+induction it; intros; [ easy | ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  specialize (IHit la (S k) l) as H1.
+  cbn in Hit.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  apply Nat.succ_le_mono in Hit.
+  specialize (H1 Hit Hp).
+  destruct u; [ now rewrite Nat.add_0_r | cbn ].
+  rewrite <- Nat.add_succ_comm in Hu |-*.
+  now apply H1.
 }
 injection Hp; clear Hp; intros Hp H1 H2; subst a k.
 flia Hu.
