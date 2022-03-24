@@ -2403,7 +2403,6 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H5 (list_swap_elem 0 la 0 (j - i))).
   rewrite H1 in H5.
   rewrite list_swap_elem_length in H5.
-About AllLt.
 ...
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
