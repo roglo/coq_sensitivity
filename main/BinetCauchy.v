@@ -2377,6 +2377,7 @@ Compute (
 *)
 revert p k l Hall Hit Hp.
 induction it; intros; [ easy | ].
+rewrite Nat_sub_succ_1.
 cbn in Hp.
 destruct p as [| a la]; [ easy | ].
 rewrite if_eqb_eq_dec in Hp.
@@ -2392,7 +2393,6 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
     flia H2.
   }
   specialize (H1 H Hit Hp); clear H.
-  rewrite Nat_sub_succ_1.
   specialize in_transp_loop_bounds as H3.
   specialize (H3 it (S k) la i j).
   assert (H : (i, j) ∈ transp_loop it (S k) la) by now rewrite Hp; left.
