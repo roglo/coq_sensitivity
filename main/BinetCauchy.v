@@ -2346,6 +2346,33 @@ flia Hu.
 Qed.
 *)
 
+Theorem eq_transp_loop_cons' : ∀ it i j k p l,
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
+Proof.
+intros * Hit Hp.
+Compute (
+  let p := [3;2;4;0;1] in
+  let it := length p + nb_nfit 0 p in
+  let k := 3 in
+  (transp_loop it k p
+)).
+(* il y a un cadre d'utilisation de transp_loop qu'il faut que je me
+   précise, et que je doive mettre en hypothèse *)
+Print transp_loop.
+...
+Compute (
+  let p := [3;2;4;0;1] in
+  let it := length p + nb_nfit 0 p in
+  let k := 0 in
+  let (i, j) := (0, 3) in
+  let l := [(1, 2); (1, 4)] in
+  (transp_loop it k p = (i, j) :: l,
+   transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l)
+).
+...
+
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
   length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
