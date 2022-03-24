@@ -2015,7 +2015,7 @@ rewrite nth_indep with (d' := 0); [ symmetry | easy ].
 easy.
 Qed.
 
-Theorem comp_1_l : ∀ n l, AllLt n l → seq 0 n ° l = l.
+Theorem comp_1_l : ∀ n l, AllLt l n → seq 0 n ° l = l.
 Proof.
 intros * Hp.
 unfold "°", ff_app.

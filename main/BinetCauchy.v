@@ -2347,7 +2347,7 @@ Qed.
 *)
 
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
-  AllLt (S k) p
+  AllLt p (S k)
   → length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
   → transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
@@ -2387,7 +2387,7 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   cbn in Hit.
   rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
   apply Nat.succ_le_mono in Hit.
-  assert (H : AllLt (S (S k)) la). {
+  assert (H : AllLt la (S (S k))). {
     intros u Hu.
     specialize (Hall u (or_intror Hu)) as H2.
     flia H2.
@@ -2403,6 +2403,7 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H5 (list_swap_elem 0 la 0 (j - i))).
   rewrite H1 in H5.
   rewrite list_swap_elem_length in H5.
+About AllLt.
 ...
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,

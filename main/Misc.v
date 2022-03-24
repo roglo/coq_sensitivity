@@ -45,7 +45,7 @@ revert a.
 induction l as [| c]; intros; [ easy | apply IHl ].
 Qed.
 
-Definition AllLt u l := ∀ i, i ∈ l → i < u.
+Definition AllLt l u := ∀ i, i ∈ l → i < u.
 
 (* iterations in list of naturals
    in order to later define syntaxes : Max, Σ, Π, ...
@@ -2586,7 +2586,7 @@ Qed.
 
 Theorem NoDup_bsort_rank_loop : ∀ A d ord l_ini (l : list A) lrank,
   NoDup lrank
-  → AllLt (length lrank) lrank
+  → AllLt lrank (length lrank)
   → NoDup (bsort_rank_loop ord (λ k, nth k l_ini d) lrank l).
 Proof.
 intros * Hnd Halt.
@@ -2617,7 +2617,7 @@ intros i j Hi Hj Hij.
 destruct l as [| d]; [ easy | ].
 unfold bsort_rank in Hij.
 specialize (NoDup_bsort_rank_loop d ord (d :: l) (d :: l) (NoDup_nil _)) as H1.
-assert (H : AllLt (length ([] : list nat)) []) by easy.
+assert (H : AllLt [] (length ([] : list nat))) by easy.
 specialize (H1 H); clear H.
 specialize (proj1 (NoDup_nth _ 0) H1) as H2.
 rewrite length_bsort_rank_loop in H2.

@@ -20,7 +20,7 @@ Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associat
 
 (* Permutations of {0, 1, 2, ... n-1} *)
 
-Definition is_permut_list l := AllLt (length l) l ∧ NoDup l.
+Definition is_permut_list l := AllLt l (length l) ∧ NoDup l.
 
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
