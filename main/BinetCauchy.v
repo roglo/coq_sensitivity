@@ -2393,6 +2393,19 @@ apply IHit1. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; rewrite Nat.add_0_l.
+    cbn - [ nth ] in Hla.
+    remember (map _ _) as x in Hla.
+    injection Hla; clear Hla; intros H1 H2; subst x.
+    remember (j - i) as ji eqn:Hji; symmetry in Hji.
+    destruct ji; [ now subst j | ].
+    rewrite <- seq_shift, map_map in H1.
+    assert (Hlen : length l = length la). {
+      now rewrite <- H1, map_length, seq_length.
+    }
+    rewrite List_map_nth_seq with (d := 0) in H1.
+    rewrite Hlen in H1.
+    specialize (ext_in_map H1) as H3.
+    cbn - [ nth transposition ] in H3.
 ...
 Search list_swap_elem.
 ...
