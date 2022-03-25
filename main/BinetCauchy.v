@@ -2346,6 +2346,29 @@ flia Hu.
 Qed.
 *)
 
+Theorem list_swap_elem_firstn_skipn : ∀ A (d : A) i j l,
+  i < j < length l
+  → list_swap_elem d l i j =
+     firstn i l ++ [nth j l d] ++
+     firstn (j - i) (skipn (S i) l) ++ [nth i l d] ++ skipn (S j) l.
+Proof.
+intros * Hij.
+unfold list_swap_elem.
+replace (length l) with (i + (length l - i)) by flia Hij.
+rewrite seq_app, map_app.
+f_equal. {
+  erewrite map_ext_in. 2: {
+    intros k Hk; apply in_seq in Hk; cbn in Hk; destruct Hk as (_, Hk).
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec k i) as [H| H]; [ flia Hk H | clear H ].
+    destruct (Nat.eq_dec k j) as [H| H]; [ flia Hij Hk H | clear H ].
+    easy.
+  }
+Search (firstn _ _ = map _ _).
+Search (map _ _ = firstn _ _).
+...
+
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   is_permut_list (seq 0 i ++ p)
   → length p + nb_nfit i p ≤ it1
@@ -2408,6 +2431,33 @@ apply IHit1; cycle 1. {
   apply -> Nat.succ_le_mono.
   apply Nat.add_le_mono_l.
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
+Print list_swap_elem.
+...
+rewrite list_swap_elem_firstn_skipn in Hla.
+cbn in Hla.
+replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
+rewrite Nat.sub_0_r in Hla.
+...
+specialize (@nth_split _ i (seq 0 (length l)) 0) as H1.
+rewrite seq_length in H1.
+assert (H : i < length l) by flia Hij.
+specialize (H1 H); clear H.
+destruct H1 as (l1 & l2 & H1 & Hl1i).
+rewrite H1, map_app, seq_nth; [ | flia Hij ].
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  unfold transposition.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+Check seq_split.
+...
+About map_id.
+cbn - [ skipn ].
+...
+intros * Hij.
+revert i j Hij.
+induction l as [| k]; intros; [ easy | ].
+cbn.
 ...
   symmetry in Hla.
   destruct la as [| k]; [ easy | cbn ].
