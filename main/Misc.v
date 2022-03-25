@@ -1435,6 +1435,51 @@ rewrite Nat.add_succ_r; cbn.
 apply IHla.
 Qed.
 
+Theorem List_firstn_map_nth_seq : ∀ A (d : A) i l,
+  i < length l
+  → firstn i l = map (λ k : nat, nth k l d) (seq 0 i).
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| j]; intros; [ easy | ].
+cbn - [ nth ].
+destruct i; [ easy | ].
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+cbn - [ nth ].
+f_equal.
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  now rewrite List_nth_succ_cons.
+}
+now apply IHl.
+Qed.
+
+Theorem List_skipn_map_nth_seq : ∀ A (d : A) i l,
+  skipn i l = map (λ k, nth (k + i) l d) (seq 0 (length l - i)).
+Proof.
+intros.
+revert i.
+induction l as [| j]; intros; [ apply skipn_nil | ].
+rewrite List_length_cons.
+destruct i. {
+  rewrite Nat.sub_0_r.
+  cbn - [ nth ]; f_equal.
+  rewrite <- seq_shift, map_map.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    now rewrite Nat.add_0_r.
+  }
+  apply List_map_nth_seq.
+}
+cbn - [ nth ].
+rewrite IHl.
+apply map_ext_in.
+intros k Hk.
+now rewrite Nat.add_succ_r.
+Qed.
+
 Theorem length_nzero_iff_nnil : ∀ A (l : list A), length l ≠ 0 ↔ l ≠ [].
 Proof.
 intros.
