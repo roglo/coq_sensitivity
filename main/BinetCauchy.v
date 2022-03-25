@@ -2374,6 +2374,25 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   apply IHit1; [ | easy | easy ].
   now rewrite seq_S, <- app_assoc.
 }
+assert (Hilj : i < j). {
+  apply Nat.nle_gt.
+  intros Hc.
+  destruct Hp as (Hpp, Hpl).
+  specialize (NoDup_nat _ Hpl i j) as H2.
+  rewrite app_length, seq_length in H2.
+  cbn in H2.
+  assert (H : i < i + S (length l)) by flia.
+  specialize (H2 H); clear H.
+  assert (H : j < i + S (length l)) by flia Hc.
+  specialize (H2 H); clear H.
+  unfold ff_app in H2.
+  rewrite app_nth2 in H2; [ | now rewrite seq_length; unfold ge ].
+  rewrite seq_length, Nat.sub_diag in H2; cbn in H2.
+  rewrite app_nth1 in H2; [ | rewrite seq_length; flia Hij Hc ].
+  rewrite seq_nth in H2; [ | flia Hij Hc ].
+  now specialize (H2 eq_refl).
+}
+move Hilj before Hij.
 cbn in Hit1, Hit2.
 destruct it2; [ flia Hit2 | ].
 cbn - [ list_swap_elem ].
@@ -2388,7 +2407,6 @@ apply IHit1; cycle 1. {
   etransitivity; [ | apply Hit1 ].
   apply -> Nat.succ_le_mono.
   apply Nat.add_le_mono_l.
-...
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| k]; [ easy | cbn ].
@@ -2435,9 +2453,18 @@ apply IHit1; cycle 1. {
         unfold transposition in Hla at 2.
         replace (S (length l1) =? 0) with false in Hla by easy.
         rewrite Hjl1 in Hla.
-        rewrite <- Nat.sub_succ_l in Hla. 2: {
-          flia Hij H.
-
+        rewrite <- Nat.sub_succ_l in Hla; [ | easy ].
+        replace (S j - S i =? j - i) with true in Hla. 2: {
+          now rewrite Nat.eqb_refl.
+        }
+        rewrite List_nth_0_cons in Hla.
+        rewrite Hla in Hlal at 1.
+        apply List_app_eq_app' in Hlal. 2: {
+          rewrite map_length; congruence.
+        }
+        destruct Hlal as (Hla1, Hlal).
+        remember (map _ _) as x eqn:Hx in Hlal.
+        injection Hlal; clear Hlal; intros H4 H5; subst x.
 ...
         remember (j - i) as x eqn:Hx; symmetry in Hx.
         destruct x. {
