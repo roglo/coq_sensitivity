@@ -2465,6 +2465,8 @@ apply IHit1; cycle 1. {
         destruct Hlal as (Hla1, Hlal).
         remember (map _ _) as x eqn:Hx in Hlal.
         injection Hlal; clear Hlal; intros H4 H5; subst x.
+        rewrite <- Hla1.
+Search l1.
 ...
         remember (j - i) as x eqn:Hx; symmetry in Hx.
         destruct x. {
