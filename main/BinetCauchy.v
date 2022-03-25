@@ -2347,20 +2347,13 @@ Qed.
 *)
 
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
-  length p + nb_nfit i p ≤ it1
+  is_permut_list (seq 0 i ++ p)
+  → length p + nb_nfit i p ≤ it1
   → length p + nb_nfit i p ≤ it2
   → transp_loop it1 i p = transp_loop it2 i p.
 Proof.
-intros * Hit1 Hit2.
-Compute (
-  let p := [20; 3; 18; 7] in
-  let i := 0 in
-  let it := length p + nb_nfit i p in
-  transp_loop it i p = transp_loop (it + 7) i p
-).
-...
-intros * Hit1 Hit2.
-revert i p it2 Hit1 Hit2.
+intros * Hp Hit1 Hit2.
+revert i p Hp it2 Hit1 Hit2.
 induction it1; intros; cbn. {
   apply Nat.le_0_r, Nat.eq_add_0 in Hit1.
   destruct Hit1 as (H1, H2).
@@ -2370,31 +2363,32 @@ induction it1; intros; cbn. {
 destruct p as [| j l]. {
   symmetry; apply transp_loop_nil.
 }
-rewrite if_eqb_eq_dec.
+cbn in Hit1, Hit2.
+rewrite if_eqb_eq_dec in Hit1, Hit2 |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; cbn.
   destruct it2; [ cbn in Hit2; flia Hit2 | ].
   cbn in Hit1, Hit2 |-*.
-  rewrite Nat.eqb_refl in Hit1, Hit2 |-*.
-  cbn in Hit1, Hit2.
   apply Nat.succ_le_mono in Hit1, Hit2.
-  now apply IHit1.
+  rewrite Nat.eqb_refl.
+  apply IHit1; [ | easy | easy ].
+  now rewrite seq_S, <- app_assoc.
 }
 cbn in Hit1, Hit2.
 destruct it2; [ flia Hit2 | ].
 cbn - [ list_swap_elem ].
 apply Nat.succ_le_mono in Hit1, Hit2.
-rewrite if_eqb_eq_dec in Hit1, Hit2 |-*.
+rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i j) as [H| H]; [ flia Hij H | clear H ].
 f_equal.
-cbn in Hit1, Hit2.
 rewrite Nat.add_succ_r in Hit1, Hit2.
-apply IHit1. {
+apply IHit1; cycle 1. {
   rewrite list_swap_elem_length.
   cbn - [ list_swap_elem ].
   etransitivity; [ | apply Hit1 ].
   apply -> Nat.succ_le_mono.
   apply Nat.add_le_mono_l.
+...
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| k]; [ easy | cbn ].
