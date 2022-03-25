@@ -2346,6 +2346,77 @@ flia Hu.
 Qed.
 *)
 
+Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
+  length p + nb_nfit i p ≤ it1
+  → length p + nb_nfit i p ≤ it2
+  → transp_loop it1 i p = transp_loop it2 i p.
+Proof.
+intros * Hit1 Hit2.
+revert i p it2 Hit1 Hit2.
+induction it1; intros; cbn. {
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit1.
+  destruct Hit1 as (H1, H2).
+  apply length_zero_iff_nil in H1; subst p.
+  symmetry; apply transp_loop_nil.
+}
+destruct p as [| j l]. {
+  symmetry; apply transp_loop_nil.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j; cbn.
+  destruct it2; [ cbn in Hit2; flia Hit2 | ].
+  cbn in Hit1, Hit2 |-*.
+  rewrite Nat.eqb_refl in Hit1, Hit2 |-*.
+  cbn in Hit1, Hit2.
+  apply Nat.succ_le_mono in Hit1, Hit2.
+  now apply IHit1.
+}
+cbn in Hit1, Hit2.
+destruct it2; [ flia Hit2 | ].
+cbn - [ list_swap_elem ].
+apply Nat.succ_le_mono in Hit1, Hit2.
+rewrite if_eqb_eq_dec in Hit1, Hit2 |-*.
+destruct (Nat.eq_dec i j) as [H| H]; [ flia Hij H | clear H ].
+f_equal.
+cbn in Hit1, Hit2.
+rewrite Nat.add_succ_r in Hit1, Hit2.
+apply IHit1. {
+  rewrite list_swap_elem_length.
+  cbn - [ list_swap_elem ].
+  etransitivity; [ | apply Hit1 ].
+  apply -> Nat.succ_le_mono.
+  apply Nat.add_le_mono_l.
+...
+  cbn - [ nth ].
+  rewrite <- seq_shift, map_map.
+  rewrite if_eqb_eq_dec.
+...
+  destruct (Nat.eq_dec i (nth (j - i) (j :: l) 0)) as [Hiji| Hiji]. {
+    rewrite Nat.add_0_l.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk; cbn in Hk; destruct Hk as (_, Hk).
+      unfold transposition.
+      replace (S k =? 0) with false by easy.
+      replace (nth _ _ _) with (if S k =? j - i then j else nth k l 0). 2: {
+        do 2 rewrite if_eqb_eq_dec.
+        now destruct (Nat.eq_dec (S k) (j - i)).
+      }
+      easy.
+    }
+Print list_swap_elem.
+Search (map _ (seq _ _)).
+...
+  unfold list_swap_elem.
+  rewrite List_length_cons.
+  cbn - [ nth ].
+  rewrite seq_S.
+  cbn - [ length nth "=?" ].
+...
+  unfold list_swap_elem.
+  cbn - [ nb_nfit list_swap_elem ].
+...
+
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
   AllLt p (S k)
   → length p + nb_nfit k p ≤ it
@@ -2403,6 +2474,11 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H5 (list_swap_elem 0 la 0 (j - i))).
   rewrite H1 in H5.
   rewrite list_swap_elem_length in H5.
+Print transp_loop.
+...
+  rewrite transp_loop_enough_iter with (it2 := it) in H1; cycle 1. {
+    rewrite list_swap_elem_length.
+Search (nb_nfit _ (list_swap_elem _ _ _ _)).
 ...
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
