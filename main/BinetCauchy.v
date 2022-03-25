@@ -2393,9 +2393,39 @@ apply IHit1. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; rewrite Nat.add_0_l.
-(*
+    assert (Hlen : length l = length la). {
+      cbn - [ nth ] in Hla.
+      injection Hla; clear Hla; intros H1 H2.
+      now rewrite <- H1, map_length, seq_length.
+    }
+    destruct (lt_dec (j - S i) (length la)) as [Hjla| Hjla]. {
+      unfold list_swap_elem in Hla.
+      specialize (@nth_split _ (j - S i) l 0) as H1.
+      rewrite Hlen in H1.
+      specialize (H1 Hjla).
+      destruct H1 as (l1 & l2 & Hll & Hjl1).
+      specialize (@nth_split _ (j - S i) la 0) as H1.
+      specialize (H1 Hjla).
+      destruct H1 as (la1 & la2 & Hlal & Hjla1).
+      rewrite Hll, Hlal.
+      do 2 rewrite nb_nfit_app.
+      apply Nat.add_le_mono. {
+        enough (H1 : la1 = l1) by now rewrite H1.
+...
+        cbn in Hla.
+        remember (j - i) as x eqn:Hx; symmetry in Hx.
+        destruct x. {
+          apply Nat.neq_sym in Hij.
+          now injection Hla; intros.
+        }
+        replace x with (j - S i) in Hla by flia Hx Hij.
+        injection Hla; clear Hla; intros H1 H2.
+        rewrite H2 in Hll.
+
+Search (_ = _ ++ _ :: _).
+About nth_split.
+...
     generalize Hla; intros Hla_v.
-*)
     cbn - [ nth ] in Hla.
     remember (map _ _) as x in Hla.
     injection Hla; clear Hla; intros H1 H2; subst x.
