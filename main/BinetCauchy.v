@@ -2393,6 +2393,9 @@ apply IHit1. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; rewrite Nat.add_0_l.
+(*
+    generalize Hla; intros Hla_v.
+*)
     cbn - [ nth ] in Hla.
     remember (map _ _) as x in Hla.
     injection Hla; clear Hla; intros H1 H2; subst x.
@@ -2406,6 +2409,13 @@ apply IHit1. {
     rewrite Hlen in H1.
     specialize (ext_in_map H1) as H3.
     cbn - [ nth transposition ] in H3.
+    rewrite <- List_map_nth_seq in H1.
+Search nb_nfit.
+...
+    cbn - [ nth transposition ] in Hla_v.
+    remember (nth (transposition 0 (S ji) 0) (j :: l) 0) as x eqn:Hx.
+    injection Hla_v; clear Hla_v; intros H4 H5.
+    move H5 at top; subst x.
 ...
 Search list_swap_elem.
 ...
