@@ -2410,6 +2410,7 @@ apply IHit1; cycle 1. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| k]; [ easy | cbn ].
+...
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; rewrite Nat.add_0_l.
