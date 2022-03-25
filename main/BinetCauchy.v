@@ -2352,6 +2352,14 @@ Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   → transp_loop it1 i p = transp_loop it2 i p.
 Proof.
 intros * Hit1 Hit2.
+Compute (
+  let p := [20; 3; 18; 7] in
+  let i := 0 in
+  let it := length p + nb_nfit i p in
+  transp_loop it i p = transp_loop (it + 7) i p
+).
+...
+intros * Hit1 Hit2.
 revert i p it2 Hit1 Hit2.
 induction it1; intros; cbn. {
   apply Nat.le_0_r, Nat.eq_add_0 in Hit1.
@@ -2411,8 +2419,32 @@ apply IHit1. {
       do 2 rewrite nb_nfit_app.
       apply Nat.add_le_mono. {
         enough (H1 : la1 = l1) by now rewrite H1.
+        cbn - [ nth ] in Hla.
+        remember (map _ _) as x eqn:H1 in Hla.
+        injection Hla; clear Hla; intros H2 H3.
+        move H2 at top; subst x.
+        rename H1 into Hla.
+        rewrite <- seq_shift, map_map in Hla.
+        specialize (@nth_split _ (j - S i) (seq 0 (length l)) 0) as H1.
+        rewrite seq_length, <- Hjl1 in H1.
+        assert (Hl1l : length l1 < length l). {
+          rewrite Hll.
+          rewrite app_length; cbn; flia.
+        }
+        specialize (H1 Hl1l).
+        destruct H1 as (ls1 & ls2 & Hlsl & Hl12).
+        rewrite Hlsl in Hla.
+        rewrite map_app in Hla.
+        rewrite map_cons in Hla.
+        rewrite seq_nth in Hla; [ | easy ].
+        rewrite Nat.add_0_l in Hla.
+        unfold transposition in Hla at 2.
+        replace (S (length l1) =? 0) with false in Hla by easy.
+        rewrite Hjl1 in Hla.
+        rewrite <- Nat.sub_succ_l in Hla. 2: {
+          flia Hij H.
+
 ...
-        cbn in Hla.
         remember (j - i) as x eqn:Hx; symmetry in Hx.
         destruct x. {
           apply Nat.neq_sym in Hij.
