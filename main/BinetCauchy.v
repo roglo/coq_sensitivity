@@ -2387,6 +2387,14 @@ apply IHit1. {
   etransitivity; [ | apply Hit1 ].
   apply -> Nat.succ_le_mono.
   apply Nat.add_le_mono_l.
+  remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| k]; [ easy | cbn ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i k) as [Hik| Hik]. {
+    subst k; rewrite Nat.add_0_l.
+...
+Search list_swap_elem.
 ...
   cbn - [ nth ].
   rewrite <- seq_shift, map_map.
