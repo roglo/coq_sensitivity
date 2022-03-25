@@ -2504,6 +2504,10 @@ apply IHit1; cycle 1. {
   apply Nat.add_le_mono_l.
   rewrite firstn_length, Nat.min_l; [ | flia Hjil ].
   rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
+  destruct l as [| a]. {
+    cbn in Hjil; flia Hilj Hjil.
+  }
+  rewrite skipn_cons.
 ...
 cbn in Hla.
 replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
