@@ -2408,9 +2408,12 @@ apply IHit1; cycle 1. {
   apply -> Nat.succ_le_mono.
   apply Nat.add_le_mono_l.
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
+(**)
+  assert (la = replace_at (j - i) l j). {
+    (* truc comme ça *)
+...
   symmetry in Hla.
   destruct la as [| k]; [ easy | cbn ].
-...
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i k) as [Hik| Hik]. {
     subst k; rewrite Nat.add_0_l.
