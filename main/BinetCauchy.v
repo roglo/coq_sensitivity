@@ -2459,6 +2459,13 @@ assert (Hilj : i < j). {
   now specialize (H2 eq_refl).
 }
 move Hilj before Hij.
+assert (Hjil : j < i + S (length l)). {
+  destruct Hp as (Hpa, Hpn).
+  rewrite app_length, seq_length in Hpa.
+  specialize (Hpa j) as H1.
+  now apply H1, in_or_app; right; left.
+}
+move Hjil before Hilj.
 cbn in Hit1, Hit2.
 destruct it2; [ flia Hit2 | ].
 cbn - [ list_swap_elem ].
@@ -2476,6 +2483,27 @@ apply IHit1; cycle 1. {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
   rewrite list_swap_elem_firstn_skipn in Hla. 2: {
     split; [ flia Hilj | cbn ].
+    flia Hjil.
+  }
+  cbn in Hla.
+  replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
+  rewrite Nat_sub_succ_1 in Hla.
+  subst la.
+  cbn - [ skipn ].
+  rewrite nb_nfit_app.
+  rewrite firstn_length.
+  rewrite Nat.min_l; [ | flia Hjil ].
+  rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
+  cbn - [ skipn ].
+  rewrite Nat.eqb_refl, Nat.add_0_l.
+  remember (nb_nfit (S i) l) as la eqn:Hla in |-*.
+  specialize (@firstn_skipn nat (j - S i) l) as H1.
+  rewrite <- H1, nb_nfit_app in Hla.
+  clear H1; subst la.
+  rewrite Nat.add_comm, <- Nat.add_assoc.
+  apply Nat.add_le_mono_l.
+  rewrite firstn_length, Nat.min_l; [ | flia Hjil ].
+  rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
 ...
 cbn in Hla.
 replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
