@@ -2428,6 +2428,21 @@ Qed.
 Theorem nb_nfit_list_swap_elem_le : ∀ it i j l la,
   transp_loop it 0 l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 l i j) ≤ nb_nfit 0 l.
+Proof.
+intros * Hla.
+revert i j l la Hla.
+induction it; intros; [ easy | ].
+cbn - [ "=?" ] in Hla.
+destruct l as [| k]; [ easy | ].
+rewrite if_eqb_eq_dec in Hla.
+destruct (Nat.eq_dec 0 k) as [Hkz| Hkz]. {
+  subst k.
+  cbn.
+...
+rewrite list_swap_elem_firstn_skipn. 2: {
+  split; [ flia Hilj | cbn ].
+    flia Hjil.
+  }
 ...
 
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
