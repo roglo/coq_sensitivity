@@ -2665,6 +2665,66 @@ specialize (H1 Hla).
 now apply H1.
 Qed.
 
+Theorem list_swap_elem_comp_swap : ∀ l i j,
+  i < length l
+  → j < length l
+  → list_swap_elem 0 l i j = l ° swap (length l) i j.
+Proof.
+intros * Hi Hj.
+apply List_eq_iff.
+unfold "°" at 1.
+rewrite list_swap_elem_length, map_length, swap_length.
+split; [ easy | ].
+intros d k.
+unfold swap.
+revert i j k Hi Hj.
+induction l as [| n]; intros; [ easy | ].
+cbn in Hi, Hj |-*.
+destruct k. {
+  remember (transposition i j 0) as m eqn:Hm.
+  symmetry in Hm.
+  destruct m; [ easy | ].
+  rewrite <- seq_shift.
+  destruct (lt_dec m (length l)) as [Hml| Hml]. 2: {
+    apply Nat.nlt_ge in Hml.
+    unfold transposition in Hm.
+    do 2 rewrite if_eqb_eq_dec in Hm.
+    destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]; [ flia  Hj Hm Hml | ].
+    destruct (Nat.eq_dec 0 j) as [Hjz| Hjz]; [ flia  Hi Hm Hml | ].
+    easy.
+  }
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  now rewrite seq_nth.
+}
+rewrite seq_length.
+rewrite map_map.
+rewrite <- seq_shift.
+do 2 rewrite map_map.
+destruct (lt_dec k (length l)) as [Hkl| Hkl]. 2: {
+  apply Nat.nlt_ge in Hkl.
+  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+  easy.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ cbn | easy ].
+remember (transposition i j (S k)) as m eqn:Hm.
+symmetry in Hm.
+destruct m; [ easy | ].
+destruct (lt_dec m (length l)) as [Hml| Hml]. 2: {
+  apply Nat.nlt_ge in Hml.
+  unfold transposition in Hm.
+  do 2 rewrite if_eqb_eq_dec in Hm.
+  destruct (Nat.eq_dec (S k) i) as [Hiz| Hiz]; [ flia  Hj Hm Hml | ].
+  destruct (Nat.eq_dec (S k) j) as [Hjz| Hjz]; [ flia  Hi Hm Hml | ].
+  apply Nat.succ_inj in Hm; subst m.
+  now apply Nat.nlt_ge in Hml.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+now rewrite seq_nth.
+Qed.
+
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
   → fold_right (λ t l, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l))
@@ -2707,7 +2767,21 @@ apply IHla in H1; cycle 1. {
   }
   apply seq_is_permut.
 } {
+  symmetry in Hla.
   rewrite Hf.
+  replace (l ° swap (length l) (fst a) (snd a)) with
+    (list_swap_elem 0 l (fst a) (snd a)). 2: {
+    destruct a as (i, j); cbn.
+    specialize in_transp_list_bounds as H2.
+    specialize (H2 i j l).
+    rewrite Hla in H2.
+    specialize (H2 (or_introl eq_refl)).
+    destruct H2 as (Hi, Hj).
+    apply list_swap_elem_comp_swap; [ easy | ].
+    rewrite permut_list_max in Hj; [ | easy ].
+    flia Hj Hi.
+  }
+...
   destruct a as (i, j); cbn.
   symmetry in Hla.
   unfold transp_list in Hla.
