@@ -2542,8 +2542,7 @@ apply IHit1; [ | now apply H | now apply H ].
 now apply app_seq_swap_is_permut_list.
 Qed.
 
-Print is_permut_list.
-
+(*
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
   is_permut_list (seq 0 k ++ p)
 (*
@@ -2613,6 +2612,8 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H5 (list_swap_elem 0 la 0 (j - i))).
   rewrite H1 in H5.
   rewrite list_swap_elem_length in H5.
+  rewrite transp_loop_enough_iter with (it2 := S it); cycle 1. {
+Check app_seq_swap_is_permut_list.
 ...
   rewrite transp_loop_enough_iter with (it2 := it) in H1; cycle 1. {
 Check app_seq_swap_is_permut_list.
@@ -2623,6 +2624,7 @@ apply app_seq_swap_is_permut_list.
     rewrite list_swap_elem_length.
 Search (nb_nfit _ (list_swap_elem _ _ _ _)).
 ...
+*)
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
   length p + nb_nfit k p ≤ it
@@ -2709,6 +2711,11 @@ apply IHla in H1; cycle 1. {
   destruct a as (i, j); cbn.
   symmetry in Hla.
   unfold transp_list in Hla.
+  unfold transp_list.
+  rewrite comp_length, swap_length.
+  unfold "°".
+Search (nb_nfit _ (map _ _)).
+...
 Print transp_loop.
 ...
 eq_transp_loop_cons : ∀ (it i j k : nat) (p : list nat) (l : list (nat * nat)),
