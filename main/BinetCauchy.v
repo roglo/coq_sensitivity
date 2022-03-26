@@ -2769,9 +2769,8 @@ apply IHla in H1; cycle 1. {
 } {
   symmetry in Hla.
   rewrite Hf.
-  replace (l ° swap (length l) (fst a) (snd a)) with
-    (list_swap_elem 0 l (fst a) (snd a)). 2: {
-    destruct a as (i, j); cbn.
+  destruct a as (i, j); cbn.
+  replace (l ° swap (length l) i j) with (list_swap_elem 0 l i j). 2: {
     specialize in_transp_list_bounds as H2.
     specialize (H2 i j l).
     rewrite Hla in H2.
@@ -2781,7 +2780,19 @@ apply IHla in H1; cycle 1. {
     rewrite permut_list_max in Hj; [ | easy ].
     flia Hj Hi.
   }
+Theorem transp_list_cons_list_swap_elem : ∀ i j l la,
+  transp_list l = (i, j) :: la
+  → la = transp_list (list_swap_elem 0 l i j).
+Proof.
+intros * Hla.
+unfold transp_list in Hla |-*.
+rewrite list_swap_elem_length.
+Search (nb_nfit _ (list_swap_elem _ _ _ _)).
+...
+now apply transp_list_cons_list_swap_elem.
+...
 Search (transp_list (list_swap_elem _ _ _ _)).
+Search (transp_loop _ (list_swap_elem _ _ _ _)).
 ...
   destruct a as (i, j); cbn.
   symmetry in Hla.
