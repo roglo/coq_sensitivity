@@ -2781,6 +2781,7 @@ apply IHla in H1; cycle 1. {
     rewrite permut_list_max in Hj; [ | easy ].
     flia Hj Hi.
   }
+Search (transp_list (list_swap_elem _ _ _ _)).
 ...
   destruct a as (i, j); cbn.
   symmetry in Hla.
