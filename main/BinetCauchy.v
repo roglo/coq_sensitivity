@@ -2542,13 +2542,22 @@ apply IHit1; [ | now apply H | now apply H ].
 now apply app_seq_swap_is_permut_list.
 Qed.
 
+Print is_permut_list.
+
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
+  is_permut_list (seq 0 k ++ p)
+(*
   AllLt p (S k)
+*)
   → length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
   → transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
-intros * Hall Hit Hp.
+intros * Hpp Hit Hp.
+(*
+destruct Hpp as (Hpa, Hpn).
+rewrite app_length, seq_length in Hpa.
+*)
 (*
 Compute (
   let p := [3;2;4;1] in
@@ -2571,7 +2580,7 @@ Compute (
    transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l)
 ).
 *)
-revert p k l Hall Hit Hp.
+revert p k l Hpp Hit Hp.
 induction it; intros; [ easy | ].
 rewrite Nat_sub_succ_1.
 cbn in Hp.
@@ -2583,10 +2592,15 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   cbn in Hit.
   rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
   apply Nat.succ_le_mono in Hit.
+(*
   assert (H : AllLt la (S (S k))). {
     intros u Hu.
     specialize (Hall u (or_intror Hu)) as H2.
     flia H2.
+  }
+*)
+  assert (H : is_permut_list (seq 0 (S k) ++ la)). {
+    now rewrite seq_S, <- app_assoc.
   }
   specialize (H1 H Hit Hp); clear H.
   specialize in_transp_loop_bounds as H3.
@@ -2599,7 +2613,9 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H5 (list_swap_elem 0 la 0 (j - i))).
   rewrite H1 in H5.
   rewrite list_swap_elem_length in H5.
+...
   rewrite transp_loop_enough_iter with (it2 := it) in H1; cycle 1. {
+Check app_seq_swap_is_permut_list.
 ...
 Search (is_permut_list (_ ++ _)).
 apply app_seq_swap_is_permut_list.
