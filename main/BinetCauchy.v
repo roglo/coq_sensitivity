@@ -2412,6 +2412,19 @@ erewrite map_ext_in. 2: {
 apply List_skipn_map_nth_seq.
 Qed.
 
+Theorem skipn_cons_skipn_succ : ∀ A (d : A) l i,
+  i < length l
+  → skipn i l = nth i l d :: skipn (S i) l.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| j]; intros; [ easy | cbn ].
+destruct i; [ easy | ].
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+now apply IHl.
+Qed.
+
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   is_permut_list (seq 0 i ++ p)
   → length p + nb_nfit i p ≤ it1
@@ -2504,10 +2517,14 @@ apply IHit1; cycle 1. {
   apply Nat.add_le_mono_l.
   rewrite firstn_length, Nat.min_l; [ | flia Hjil ].
   rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
-  destruct l as [| a]. {
-    cbn in Hjil; flia Hilj Hjil.
-  }
-  rewrite skipn_cons.
+  rewrite (@skipn_cons_skipn_succ _ 0 l (j - S i)); [ | flia Hilj Hjil ].
+  cbn - [ nth ].
+  rewrite Nat.add_comm.
+  apply Nat.add_le_mono_r.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hin| Hin]; [ easy | ].
+  destruct (Nat.eq_dec j (nth (j - S i) l 0)) as [Hjn| Hjn]; [ | easy ].
+  (* en principe pas compatible avec Hp *)
 ...
 cbn in Hla.
 replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
