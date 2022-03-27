@@ -136,27 +136,6 @@ rewrite IHlen; [ | easy ].
 now replace (s + (b - s + len)) with (b + len) by flia Hsb.
 Qed.
 
-(*
-Theorem iter_shift : ∀ {T} b k f (d : T),
-  b ≤ k
-  → iter_seq b k f d =
-    iter_seq 0 (k - b) (λ c i, f c (b + i)) d.
-Proof.
-intros * Hbk.
-unfold iter_seq, iter_list.
-rewrite Nat.sub_0_r.
-rewrite <- Nat.sub_succ_l; [ | easy ].
-remember (S k - b)%nat as len; clear Heqlen.
-clear k Hbk.
-revert b d.
-induction len; intros; [ easy | ].
-rewrite seq_S; symmetry.
-rewrite seq_S; symmetry.
-do 2 rewrite fold_left_app; cbn.
-now rewrite IHlen.
-Qed.
-*)
-
 Theorem fold_right_max_ge : ∀ m l, m ≤ fold_right max m l.
 Proof.
 intros.
@@ -177,6 +156,9 @@ Qed.
 
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
+
+Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
+Proof. intros * Hba; flia Hba. Qed.
 
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   b ≠ 0 → (c * b + a) mod b = a mod b.
@@ -268,6 +250,9 @@ intros * Hf.
 induction l as [| a]; [ easy | ].
 cbn; rewrite Hf; f_equal; apply IHl.
 Qed.
+
+Theorem List_app_cons : ∀ A la lb (b : A), la ++ b :: lb = la ++ [b] ++ lb.
+Proof. easy. Qed.
 
 Theorem List_app_hd1 : ∀ A (l l' : list A) d,
   0 < length l → hd d (l ++ l') = hd d l.
@@ -2943,8 +2928,7 @@ specialize (H1 A i l d Hi).
 destruct H1 as (la & lb & Hl & Hla).
 remember (nth i l d) as a eqn:Ha; clear Ha.
 subst l i.
-replace (la ++ a :: lb) with (la ++ [a] ++ lb) by easy.
-rewrite app_assoc.
+rewrite List_app_cons, app_assoc.
 rewrite app_nth2; rewrite app_length, Nat.add_comm; cbn; [ | easy ].
 remember (j - S (length la)) as k eqn:Hkj.
 assert (Hk : k < length lb). {

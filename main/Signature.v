@@ -474,9 +474,9 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite Nat.add_1_r.
   rewrite Nat.sub_succ.
   apply in_seq in Hi.
-  replace (n - i) with (S (n - i - 1)) by flia Hnz Hn1 Hi.
+  rewrite Nat_succ_sub_succ_r by flia Hnz Hn1 Hi.
   rewrite seq_S.
-  replace (S i + (n - i - 1)) with n by flia Hnz Hn1 Hi.
+  rewrite Nat.add_comm, Nat.sub_add; [ | flia Hnz Hn1 Hi ].
   unfold iter_list.
   rewrite fold_left_app.
   cbn - [ seq ].
@@ -487,9 +487,8 @@ cbn - [ seq "-" ].
 symmetry.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  rewrite Nat.add_1_r.
-  rewrite Nat.sub_succ.
-  now rewrite Nat_sub_sub_swap.
+  rewrite <- Nat_succ_sub_succ_r; [ | flia Hnz ].
+  now rewrite Nat.sub_0_r, Nat.add_1_r.
 }
 cbn - [ seq "-" ].
 rewrite rngl_product_list_mul_distr; [ | easy ].

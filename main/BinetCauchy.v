@@ -901,11 +901,9 @@ rewrite IHl. 2: {
     }
   }
 }
-replace (a :: l) with ([a] ++ l) by easy.
-rewrite app_assoc; f_equal.
+rewrite List_app_cons, app_assoc; f_equal.
 clear IHl.
-replace (a :: l) with ([a] ++ l) in Hs by easy.
-rewrite app_assoc in Hs.
+rewrite List_app_cons, app_assoc in Hs.
 apply sorted_app_iff in Hs; [ | easy ].
 destruct Hs as (Hsa, _).
 clear l.
@@ -1295,10 +1293,7 @@ destruct la as [| a]. {
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (s + i) a) as [Hia| Hia]. {
   subst a.
-  replace (seq s i ++ s + i :: la) with (seq s (S i) ++ la). 2: {
-    now rewrite seq_S, <- app_assoc.
-  }
-  cbn.
+  rewrite List_app_cons, app_assoc, <- seq_S; cbn.
   rewrite Nat.eqb_refl.
   rewrite <- Nat.add_succ_r.
   rewrite IHit.
@@ -1591,7 +1586,7 @@ split. {
     apply H2; clear H2.
     apply in_or_app.
     right; right.
-    replace (j - i) with (S (j - S i)) by flia Hilj; cbn.
+    rewrite Nat_succ_sub_succ_r; [ cbn | easy ].
     apply nth_In.
     specialize (Hpp j) as H2.
     assert (H : j ∈ seq 0 i ++ j :: l). {
@@ -1652,7 +1647,7 @@ split. {
     unfold transposition.
     do 2 rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
-      replace (j - i) with (S (j - S i)) by flia Hilj.
+      rewrite Nat_succ_sub_succ_r; [ | easy ].
       rewrite List_nth_succ_cons.
       apply Nat.sub_0_le in Hviz.
       apply Nat.le_antisymm in Hvi; [ subst v | easy ].
@@ -1663,7 +1658,7 @@ split. {
       rewrite seq_nth in Huv; [ | now cbn ].
       unfold transposition in Huv.
       rewrite Nat.eqb_refl in Huv.
-      replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+      rewrite Nat_succ_sub_succ_r in Huv; [ | easy ].
       rewrite List_nth_succ_cons in Huv.
       rewrite <- Huv.
       destruct Hp as (Hpp, Hpl).
@@ -1694,7 +1689,7 @@ split. {
     destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
       now apply Nat.lt_le_incl.
     }
-    replace (v - i) with (S (v - S i)) by flia Hvi Hviz.
+    rewrite Nat_succ_sub_succ_r; [ | flia Hvi Hviz ].
     rewrite List_nth_succ_cons.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
@@ -1705,11 +1700,10 @@ split. {
     rewrite seq_nth in Huv; [ | cbn; flia Hv ].
     unfold transposition in Huv.
     rewrite Nat.add_0_l in Huv.
-    replace (v - i) with (S (v - S i)) in Huv at 1 by flia Hviz.
+    rewrite Nat_succ_sub_succ_r in Huv at 1; [ | flia Hviz ].
     replace (S (v - S i) =? 0) with false in Huv by easy.
     apply Nat.eqb_neq in Hvji; rewrite Hvji in Huv.
-    apply Nat.eqb_neq in Hvji.
-    replace (v - i) with (S (v - S i)) in Huv at 1 by flia Hviz.
+    rewrite Nat_succ_sub_succ_r in Huv at 1; [ | flia Hviz ].
     rewrite List_nth_succ_cons in Huv.
     rewrite <- Huv.
     assert (Hul : u ∈ l). {
@@ -1752,7 +1746,7 @@ split. {
       }
       destruct (Nat.eq_dec (v - i) (j - i)) as [Hvij| Hvij]. {
         rewrite <- Hvij in Huv.
-        replace (v - i) with (S (v - S i)) in Huv by flia Hviz Hvi.
+        rewrite Nat_succ_sub_succ_r in Huv; [ | flia Hviz Hvi ].
         rewrite List_nth_succ_cons in Huv.
         rewrite List_nth_0_cons in Huv.
         assert (H : v = j) by flia Hvij Hviz.
@@ -1790,7 +1784,7 @@ split. {
       destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
         assert (H : v = i) by flia Hviz Hvi; subst v.
         clear Hvi Hviz Hv.
-        replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+        rewrite Nat_succ_sub_succ_r in Huv; [ | easy ].
         rewrite List_nth_succ_cons in Huv.
         assert (Hul : j ∈ l). {
           rewrite Huv.
@@ -1807,7 +1801,7 @@ split. {
       destruct (Nat.eq_dec (v - i) (j - i)) as [Hvji| Hvji]. {
         flia Hvji Hviz.
       }
-      replace (v - i) with (S (v - S i)) in Huv by flia Hviz.
+      rewrite Nat_succ_sub_succ_r in Huv; [ | flia Hviz ].
       rewrite List_nth_succ_cons in Huv.
       assert (Hul : j ∈ l). {
         rewrite Huv.
@@ -1821,12 +1815,12 @@ split. {
       apply NoDup_cons_iff in Hjl.
       easy.
     } {
-      replace (u - i) with (S (u - S i)) in Huv by flia Hui Huiz.
+      rewrite Nat_succ_sub_succ_r in Huv; [ | flia Hui Huiz ].
       rewrite List_nth_succ_cons in Huv.
       destruct (Nat.eq_dec (v - i) 0) as [Hviz| Hviz]. {
         assert (H : v = i) by flia Hviz Hvi; subst v.
         clear Hvi Hviz Hv.
-        replace (j - i) with (S (j - S i)) in Huv by flia Hilj.
+        rewrite (@Nat_succ_sub_succ_r j i) in Huv; [ | easy ].
         rewrite List_nth_succ_cons in Huv.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
@@ -1862,7 +1856,7 @@ split. {
         apply NoDup_cons_iff in Hjl.
         easy.
       } {
-        replace (v - i) with (S (v - S i)) in Huv by flia Hviz.
+        rewrite (@Nat_succ_sub_succ_r v i) in Huv; [ | flia Hviz ].
         rewrite List_nth_succ_cons in Huv.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
@@ -1948,9 +1942,7 @@ apply Nat.succ_le_mono in Hit.
 rewrite if_eqb_eq_dec in Hit |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
-  replace (seq 0 i ++ i :: l) with (seq 0 (S i) ++ l). 2: {
-    now rewrite seq_S, <- app_assoc.
-  }
+  rewrite List_app_cons, app_assoc, <- seq_S.
   rewrite List_length_cons, <- Nat.add_succ_comm.
   apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
 } {
@@ -2000,7 +1992,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite <- seq_shift, map_map.
     erewrite map_ext_in. 2: {
       intros u Hu.
-      replace (j - i) with (S (j - S i)) by flia Hilj.
+      rewrite Nat_succ_sub_succ_r; [ | easy ].
       unfold transposition.
       cbn - [ nth ].
       replace (nth _ _ _) with (if u =? j - S i then j else nth u l 0). 2: {
@@ -2136,9 +2128,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite List_map_seq.
   apply map_ext_in.
   intros k Hk; apply in_seq in Hk; destruct Hk as (_, Hk); cbn in Hk.
-  replace (seq 0 i ++ i :: seq (S i) (length l)) with (seq 0 (i + S (length l))). 2: {
-    now rewrite seq_app.
-  }
+  rewrite List_app_cons, app_assoc, <- seq_S, <- seq_app.
+  rewrite (Nat.add_succ_comm _ (length l)).
   unfold transposition.
   replace (S k =? 0) with false by easy.
   do 2 rewrite if_eqb_eq_dec.
@@ -2234,8 +2225,7 @@ assert (Hb : butn j l = l1 ++ l2). {
   rewrite firstn_app.
   rewrite Hlj, Nat.sub_diag, firstn_O, app_nil_r.
   rewrite <- Hlj, firstn_all.
-  replace (l1 ++ n :: l2) with (l1 ++ [n] ++ l2) by easy.
-  rewrite app_assoc, skipn_app.
+  rewrite List_app_cons, app_assoc, skipn_app.
   rewrite app_length, Nat.add_1_r, Nat.sub_diag.
   rewrite skipn_O.
   replace (S (length l1)) with (length (l1 ++ [n])). 2: {
@@ -2370,7 +2360,7 @@ f_equal. {
   symmetry.
   now apply List_firstn_map_nth_seq.
 }
-replace (length l - i) with (S (length l - S i)) by flia Hij.
+rewrite Nat_succ_sub_succ_r; [ | flia Hij ].
 cbn - [ skipn ].
 f_equal. {
   unfold transposition.
@@ -2395,7 +2385,7 @@ f_equal. {
   now rewrite List_nth_skipn, Nat.add_comm.
 }
 rewrite <- List_seq_shift', map_map.
-replace (length l - j) with (S (length l - S j)) by flia Hij.
+rewrite Nat_succ_sub_succ_r; [ | easy ].
 cbn - [ skipn ].
 rewrite Nat.add_0_r, transposition_2; f_equal.
 rewrite <- seq_shift, map_map.
@@ -2439,7 +2429,41 @@ destruct (Nat.eq_dec 0 k) as [Hkz| Hkz]. {
   subst k.
   cbn - [ seq "=?" ].
   rewrite Nat.eqb_refl, Nat.add_0_l.
-Search nb_nfit.
+  destruct it; [ easy | ].
+  cbn - [ "=?" ] in Hla.
+  destruct l as [| k]; [ easy | ].
+  rewrite if_eqb_eq_dec in Hla.
+  destruct (Nat.eq_dec 1 k) as [Hk1| Hk1]. {
+    subst k.
+    cbn - [ seq "=?" ].
+    rewrite Nat.eqb_refl, Nat.add_0_l.
+Theorem glop : ∀ it i j k l la,
+  transp_loop it k l = (i, j) :: la
+  → nb_nfit 0 (list_swap_elem 0 (seq 0 k ++ l) i j) ≤ nb_nfit k l.
+Proof.
+intros * Hla.
+revert i j k l Hla.
+induction it; intros; [ easy | ].
+cbn - [ "=?" ] in Hla.
+destruct l as [| a]; [ easy | ].
+rewrite if_eqb_eq_dec in Hla.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  cbn - [ seq "=?" ].
+  rewrite Nat.eqb_refl, Nat.add_0_l.
+  rewrite List_app_cons, app_assoc, <- seq_S.
+  now apply IHit.
+}
+injection Hla; clear Hla; intros Hla H1 H2; subst k a.
+apply IHit.
+destruct it. {
+  cbn in Hla |-*.
+(* aïe aïe aïe *)
+...
+rewrite List_app_cons.
+
+Search (_ ++ _ ++ _ = _ ++ _ :: _).
+  replace (seq 0 k ++ k) with (seq 0 (S k)) by easy.
 ...
 rewrite list_swap_elem_firstn_skipn. 2: {
   split; [ flia Hilj | cbn ].
@@ -2527,6 +2551,7 @@ assert (H : ∀ it,
     flia Hjil.
   }
   cbn in Hla.
+...
   replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
   rewrite Nat_sub_succ_1 in Hla.
   subst la.

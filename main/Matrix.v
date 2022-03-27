@@ -423,12 +423,10 @@ destruct (lt_dec j k) as [Hljk| Hljk]. {
   rewrite firstn_length.
   rewrite fold_corr_mat_ncols; [ | easy | easy ].
   rewrite Nat.min_l; [ | flia Hkc ].
-  replace (j - k) with (S (j - k - 1)) by flia Hjk Hljk.
+  rewrite Nat_succ_sub_succ_r; [ | flia Hjk Hljk ].
   cbn - [ skipn ].
   rewrite List_nth_skipn.
-  rewrite <- (Nat.add_1_l k), Nat.add_assoc.
-  rewrite Nat.sub_add; [ | flia Hjk Hljk ].
-  now rewrite Nat.sub_add.
+  rewrite Nat.sub_add; [ easy | flia Hjk Hljk ].
 }
 Qed.
 
