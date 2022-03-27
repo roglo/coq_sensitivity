@@ -2437,7 +2437,9 @@ destruct l as [| k]; [ easy | ].
 rewrite if_eqb_eq_dec in Hla.
 destruct (Nat.eq_dec 0 k) as [Hkz| Hkz]. {
   subst k.
-  cbn.
+  cbn - [ seq "=?" ].
+  rewrite Nat.eqb_refl, Nat.add_0_l.
+Search nb_nfit.
 ...
 rewrite list_swap_elem_firstn_skipn. 2: {
   split; [ flia Hilj | cbn ].
