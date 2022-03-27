@@ -2442,7 +2442,44 @@ Theorem glop : ∀ it i j k l la,
   → transp_loop it k l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 (seq 0 k ++ l) i j) ≤ nb_nfit k l.
 Proof.
-Admitted.
+intros * Hit Hla.
+revert k l Hit Hla.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  now apply length_zero_iff_nil in H1; subst l.
+}
+cbn in Hla.
+destruct l as [| a]; [ easy | cbn ].
+rewrite if_eqb_eq_dec in Hla |-*.
+cbn in Hit.
+rewrite if_eqb_eq_dec in Hit.
+apply Nat.succ_le_mono in Hit.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a; rewrite Nat.add_0_l in Hit |-*.
+  rewrite List_app_cons, app_assoc, <- seq_S.
+  now apply IHit.
+}
+injection Hla; clear Hla; intros Hla H1 H2; subst k a.
+replace (1 + nb_nfit (S i) l) with (nb_nfit i (j :: l)) in Hit |-*. 2: {
+  cbn; rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec i j).
+}
+destruct (Nat.eq_dec (length l + nb_nfit i (j :: l)) it) as [Hit1| Hit1]. 2: {
+  apply IHit. {
+    cbn in Hit |-*.
+    apply Nat.eqb_neq in Hka; rewrite Hka in Hit |-*.
+    apply Nat.eqb_neq in Hka.
+    replace (1 + nb_nfit (S i) l) with (nb_nfit i (j :: l)) in Hit |-*. 2: {
+      cbn; rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec i j).
+    }
+    flia Hit Hit1.
+  }
+  subst la.
+  destruct it; cbn.
+(* bin non, ça va pas *)
+...
 replace (0 :: 1 :: l) with (seq 0 2 ++ l) by easy.
 eapply glop; [ | apply Hla ].
 (*
