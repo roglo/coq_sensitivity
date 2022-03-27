@@ -2442,6 +2442,14 @@ Theorem glop : ∀ it i j k l la,
   → transp_loop it k l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 (seq 0 k ++ l) i j) ≤ nb_nfit k l.
 Proof.
+Admitted.
+replace (0 :: 1 :: l) with (seq 0 2 ++ l) by easy.
+eapply glop; [ | apply Hla ].
+(*
+  length l + nb_nfit 0 l ≤ it
+*)
+apply le_refl.
+...
 intros * Hit Hla.
 revert i j k l Hit Hla.
 induction it; intros; [ easy | ].
@@ -2465,6 +2473,7 @@ apply IHit. {
   cbn in Hit |-*.
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
+(* ah bin non *)
 ...
 rewrite List_app_cons.
 
