@@ -2438,27 +2438,33 @@ destruct (Nat.eq_dec 0 k) as [Hkz| Hkz]. {
     cbn - [ seq "=?" ].
     rewrite Nat.eqb_refl, Nat.add_0_l.
 Theorem glop : ∀ it i j k l la,
-  transp_loop it k l = (i, j) :: la
+  length l + nb_nfit k l ≤ it
+  → transp_loop it k l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 (seq 0 k ++ l) i j) ≤ nb_nfit k l.
 Proof.
-intros * Hla.
-revert i j k l Hla.
+intros * Hit Hla.
+revert i j k l Hit Hla.
 induction it; intros; [ easy | ].
 cbn - [ "=?" ] in Hla.
 destruct l as [| a]; [ easy | ].
-rewrite if_eqb_eq_dec in Hla.
+cbn - [ nb_nfit "=?" ] in Hit.
+apply Nat.succ_le_mono in Hit.
+cbn in Hit |-*.
+rewrite if_eqb_eq_dec in Hit, Hla |-*.
 destruct (Nat.eq_dec k a) as [Hka| Hka]. {
-  subst a.
-  cbn - [ seq "=?" ].
-  rewrite Nat.eqb_refl, Nat.add_0_l.
+  subst a; cbn.
   rewrite List_app_cons, app_assoc, <- seq_S.
   now apply IHit.
 }
 injection Hla; clear Hla; intros Hla H1 H2; subst k a.
-apply IHit.
-destruct it. {
-  cbn in Hla |-*.
-(* aïe aïe aïe *)
+replace (1 + nb_nfit (S i) l) with (nb_nfit i (j :: l)). 2: {
+  cbn; rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec i j).
+}
+apply IHit. {
+  cbn in Hit |-*.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i j) as [H| H]; [ easy | clear H ].
 ...
 rewrite List_app_cons.
 
