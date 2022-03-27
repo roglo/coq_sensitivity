@@ -2465,6 +2465,8 @@ replace (1 + nb_nfit (S i) l) with (nb_nfit i (j :: l)) in Hit |-*. 2: {
   cbn; rewrite if_eqb_eq_dec.
   now destruct (Nat.eq_dec i j).
 }
+Search nb_nfit.
+...
 destruct (Nat.eq_dec (length l + nb_nfit i (j :: l)) it) as [Hit1| Hit1]. 2: {
   apply IHit. {
     cbn in Hit |-*.
