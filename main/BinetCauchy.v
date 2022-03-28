@@ -2855,6 +2855,7 @@ destruct p as [| a la]; [ easy | ].
 rewrite if_eqb_eq_dec in Hp.
 destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   subst a.
+...
   specialize (IHit la (S k) l) as H1.
   cbn in Hit.
   rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
