@@ -2700,6 +2700,50 @@ assert
   destruct H1 as (l1 & l2 & Hll & Hl1l).
   rewrite Hll at 2.
   rewrite nb_nfit_app.
+(**)
+  subst x.
+  destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hjsi| Hjsi]. {
+    rewrite Nat.add_0_l.
+    apply Nat.add_le_mono. {
+      erewrite map_ext_in. 2: {
+        intros k Hk; apply in_seq in Hk.
+        destruct Hk as (_, Hk); cbn in Hk.
+        erewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
+        rewrite Hll at 1.
+        rewrite app_nth1; [ | now rewrite Hl1l ].
+        easy.
+      }
+      rewrite <- Hl1l.
+      now rewrite <- List_map_nth_seq.
+    }
+    rewrite Hl1l, (Nat.add_comm (S i)).
+    rewrite Nat.sub_add; [ | easy ].
+    rewrite <- List_seq_shift', map_map.
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      destruct Hk as (_, Hk); cbn in Hk.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (S (j - S i) + k) _) as [H| H]; [ flia H | clear H ].
+      rewrite Hll at 1.
+      rewrite app_nth2 at 1; [ | rewrite Hl1l; flia Hk ].
+      rewrite Hl1l.
+      replace (_ - _) with (S k) by flia.
+      rewrite List_nth_succ_cons.
+      easy.
+    }
+    replace (length l - S (j - S i)) with (length l2). 2: {
+      rewrite Hll.
+      rewrite app_length, Hl1l.
+      cbn; flia.
+    }
+    rewrite <- List_map_nth_seq.
+    rewrite Hll.
+    rewrite app_nth2; [ | now rewrite Hl1l; unfold ge ].
+    rewrite Hl1l, Nat.sub_diag.
+    rewrite List_nth_0_cons.
+    rewrite <- Hjsi; cbn; flia.
+  }
   rewrite Nat.add_comm, <- Nat.add_assoc.
   apply Nat.add_le_mono. {
     erewrite map_ext_in. 2: {
@@ -2738,70 +2782,21 @@ assert
   rewrite Hll.
   rewrite app_nth2; [ | now rewrite Hl1l; unfold ge ].
   rewrite Hl1l, Nat.sub_diag.
-  rewrite List_nth_0_cons.
-...
-  destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hij| Hij]. {
-    rewrite Nat.add_0_l.
-    rewrite List_seq_cut with (i := j - S i). 2: {
-      apply in_seq.
-      split; [ easy | ].
-      flia Hilj Hjil.
-    }
-    rewrite Nat.sub_0_r, Nat.add_0_l.
-    rewrite map_app; cbn.
-    rewrite Nat.eqb_refl.
-    rewrite nb_nfit_app.
-    rewrite List_map_seq_length.
-    rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
-    cbn; rewrite Nat.eqb_refl, Nat.add_0_l.
-    specialize nth_split as H1.
-    specialize (H1 _ (j - S i) l 0).
-    rewrite <- Hij in H1.
-    assert (H : j - S i < length l) by flia Hjil Hilj.
-    specialize (H1 H); clear H.
-    destruct H1 as (l1 & l2 & Hll & Hl1l).
-    rewrite Hll at 2.
-    rewrite nb_nfit_app.
-    apply Nat.add_le_mono. {
-      erewrite map_ext_in. 2: {
-        intros k Hk; apply in_seq in Hk.
-        destruct Hk as (_, Hk); cbn in Hk.
-        erewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
-        rewrite Hll at 1.
-        rewrite app_nth1; [ | now rewrite Hl1l ].
-        easy.
-      }
-      rewrite <- Hl1l.
-      now rewrite <- List_map_nth_seq.
-    } {
-      rewrite <- List_seq_shift', map_map.
-      erewrite map_ext_in. 2: {
-        intros k Hk; apply in_seq in Hk.
-        destruct Hk as (_, Hk); cbn in Hk.
-        rewrite if_eqb_eq_dec.
-        destruct (Nat.eq_dec _ _) as [H| H]; [ flia H | clear H ].
-        rewrite Hll at 1.
-        rewrite app_nth2 at 1; [ | rewrite Hl1l; flia Hk ].
-        rewrite Hl1l.
-        replace (_ - _) with (S k) by flia.
-        rewrite List_nth_succ_cons.
-        easy.
-      }
-      replace (length l - S (j - S i)) with (length l2). 2: {
-        rewrite Hll.
-        rewrite app_length, Hl1l.
-        cbn; flia.
-      }
-      rewrite <- List_map_nth_seq.
-      rewrite Hl1l.
-      rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-      cbn; flia.
-    }
+  rewrite List_nth_0_cons; cbn.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec j (nth (j - S i) l 0)) as [Hjjsi| Hjjsi]. 2: {
+    now rewrite Nat.add_comm.
   }
-...
+  exfalso.
+  rewrite <- Hjjsi in Hll.
+  destruct Hp as (Hpa, Hpn).
+  apply NoDup_app_iff in Hpn.
+  destruct Hpn as (Hni & Hnjl & Hsjl).
+  apply NoDup_cons_iff in Hnjl.
+  destruct Hnjl as (H2, H3); apply H2.
+  rewrite Hjjsi.
+  apply nth_In; flia Hjil Hilj.
 }
-... suite ok
 apply IHit1; cycle 1. {
   rewrite list_swap_elem_length.
   cbn - [ list_swap_elem ].
@@ -2816,62 +2811,11 @@ apply IHit1; cycle 1. {
   now apply Nat.add_le_mono_l.
 }
 now apply app_seq_swap_is_permut_list.
-...
-assert (H : ∀ it,
-  S (length l + nb_nfit (S i) l) ≤ it
-  → length (list_swap_elem 0 (j :: l) 0 (j - i)) +
-    nb_nfit i (list_swap_elem 0 (j :: l) 0 (j - i)) ≤ it). {
-  clear Hit1.
-  intros * Hit.
-  rewrite list_swap_elem_length.
-  cbn - [ list_swap_elem ].
-  etransitivity; [ | apply Hit ].
-  apply -> Nat.succ_le_mono.
-  apply Nat.add_le_mono_l.
-  remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
-  rewrite list_swap_elem_firstn_skipn in Hla. 2: {
-    split; [ flia Hilj | cbn ].
-    flia Hjil.
-  }
-  cbn in Hla.
-...
-  replace (j - i) with (S (j - S i)) in Hla by flia Hilj.
-  rewrite Nat_sub_succ_1 in Hla.
-  subst la.
-  cbn - [ skipn ].
-  rewrite nb_nfit_app.
-  rewrite firstn_length.
-  rewrite Nat.min_l; [ | flia Hjil ].
-  rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
-  cbn - [ skipn ].
-  rewrite Nat.eqb_refl, Nat.add_0_l.
-  remember (nb_nfit (S i) l) as la eqn:Hla in |-*.
-  specialize (@firstn_skipn nat (j - S i) l) as H1.
-  rewrite <- H1, nb_nfit_app in Hla.
-  clear H1; subst la.
-  rewrite Nat.add_comm, <- Nat.add_assoc.
-  apply Nat.add_le_mono_l.
-  rewrite firstn_length, Nat.min_l; [ | flia Hjil ].
-  rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
-  rewrite (@skipn_cons_skipn_succ _ 0 l (j - S i)); [ | flia Hilj Hjil ].
-  cbn - [ nth ].
-  rewrite Nat.add_comm.
-  apply Nat.add_le_mono_r.
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hin| Hin]; [ easy | ].
-  destruct (Nat.eq_dec j (nth (j - S i) l 0)) as [Hjn| Hjn]; [ | easy ].
-  exfalso.
-  destruct Hp as (Hpa, Hpn).
-  apply NoDup_app_iff in Hpn.
-  destruct Hpn as (Hni & Hnjl & Hsjl).
-  apply NoDup_cons_iff in Hnjl.
-  destruct Hnjl as (H2, H3); apply H2.
-  rewrite Hjn.
-  apply nth_In; flia Hjil Hilj.
-}
-apply IHit1; [ | now apply H | now apply H ].
-now apply app_seq_swap_is_permut_list.
 Qed.
+
+Inspect 1.
+
+...
 
 (*
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
