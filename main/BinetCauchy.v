@@ -2415,10 +2415,95 @@ apply Nat.succ_lt_mono in Hi.
 now apply IHl.
 Qed.
 
+Theorem eq_transp_loop_cons : ∀ it i j k p l,
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → (∀ u, k + u < i → nth u p 0 = k + u) ∧
+    nth (i - k) p 0 = j ∧
+    transp_loop it (S i) (skipn (i - k) p) = l.
+Proof.
+intros * Hit Hp *.
+revert p k l Hit Hp.
+induction it; intros; [ easy | ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  specialize (IHit la (S k) l) as H1.
+  cbn in Hit.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  apply Nat.succ_le_mono in Hit.
+  specialize (H1 Hit Hp).
+  destruct H1 as (H1 & H2 & H3).
+  split. {
+    intros u Hu.
+    destruct u; [ now rewrite Nat.add_0_r | cbn ].
+    rewrite <- Nat.add_succ_comm in Hu |-*.
+    now apply H1.
+  }
+  specialize in_transp_loop_bounds as H4.
+  specialize (H4 it (S k) la i j).
+  rewrite Hp in H4.
+  specialize (H4 (or_introl eq_refl)).
+  split. {
+    now rewrite Nat_succ_sub_succ_r.
+  }
+  rewrite Nat_succ_sub_succ_r; [ | easy ].
+  rewrite skipn_cons.
+...
+}
+injection Hp; clear Hp; intros Hp H1 H2; subst a k.
+flia Hu.
+Qed.
+
+...
+
+Theorem eq_transp_loop_cons : ∀ it i j k p l,
+  length p + nb_nfit k p ≤ it
+  → transp_loop it k p = (i, j) :: l
+  → ∀ u, k + u < i → nth u p 0 = k + u.
+Proof.
+intros * Hit Hp * Hu.
+revert p k l Hit Hp u Hu.
+induction it; intros; [ easy | ].
+cbn in Hp.
+destruct p as [| a la]; [ easy | ].
+rewrite if_eqb_eq_dec in Hp.
+destruct (Nat.eq_dec k a) as [Hka| Hka]. {
+  subst a.
+  specialize (IHit la (S k) l) as H1.
+  cbn in Hit.
+  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
+  apply Nat.succ_le_mono in Hit.
+  specialize (H1 Hit Hp).
+  destruct u; [ now rewrite Nat.add_0_r | cbn ].
+  rewrite <- Nat.add_succ_comm in Hu |-*.
+  now apply H1.
+}
+injection Hp; clear Hp; intros Hp H1 H2; subst a k.
+flia Hu.
+Qed.
+
+Theorem eq_transp_list_cons : ∀ la lb i j,
+  transp_list la = (i, j) :: lb
+  → ∀ k, k < i → ff_app la k = k.
+Proof.
+intros * Hla * Hk.
+unfold ff_app.
+unfold transp_list in Hla.
+specialize eq_transp_loop_cons as H1.
+specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb (le_refl _)).
+specialize (H1 Hla).
+now apply H1.
+Qed.
+
 Theorem nb_nfit_list_swap_elem_le : ∀ it i j l la,
   transp_loop it 0 l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 l i j) ≤ nb_nfit 0 l.
 Proof.
+intros * Hla.
+...
 intros * Hla.
 revert i j l la Hla.
 induction it; intros; [ easy | ].
@@ -2727,45 +2812,6 @@ apply app_seq_swap_is_permut_list.
 Search (nb_nfit _ (list_swap_elem _ _ _ _)).
 ...
 *)
-
-Theorem eq_transp_loop_cons : ∀ it i j k p l,
-  length p + nb_nfit k p ≤ it
-  → transp_loop it k p = (i, j) :: l
-  → ∀ u, k + u < i → nth u p 0 = k + u.
-Proof.
-intros * Hit Hp * Hu.
-revert p k l Hit Hp u Hu.
-induction it; intros; [ easy | ].
-cbn in Hp.
-destruct p as [| a la]; [ easy | ].
-rewrite if_eqb_eq_dec in Hp.
-destruct (Nat.eq_dec k a) as [Hka| Hka]. {
-  subst a.
-  specialize (IHit la (S k) l) as H1.
-  cbn in Hit.
-  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
-  apply Nat.succ_le_mono in Hit.
-  specialize (H1 Hit Hp).
-  destruct u; [ now rewrite Nat.add_0_r | cbn ].
-  rewrite <- Nat.add_succ_comm in Hu |-*.
-  now apply H1.
-}
-injection Hp; clear Hp; intros Hp H1 H2; subst a k.
-flia Hu.
-Qed.
-
-Theorem eq_transp_list_cons : ∀ la lb i j,
-  transp_list la = (i, j) :: lb
-  → ∀ k, k < i → ff_app la k = k.
-Proof.
-intros * Hla * Hk.
-unfold ff_app.
-unfold transp_list in Hla.
-specialize eq_transp_loop_cons as H1.
-specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb (le_refl _)).
-specialize (H1 Hla).
-now apply H1.
-Qed.
 
 Theorem list_swap_elem_comp_swap : ∀ l i j,
   i < length l
