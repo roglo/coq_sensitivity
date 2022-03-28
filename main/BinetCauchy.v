@@ -2416,26 +2416,20 @@ now apply IHl.
 Qed.
 
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
-  length p + nb_nfit k p ≤ it
-  → transp_loop it k p = (i, j) :: l
+  transp_loop it k p = (i, j) :: l
   → (∀ u, k + u < i → nth u p 0 = k + u) ∧
-    nth (i - k) p 0 = j ∧
-    transp_loop it (S i) (skipn (i - k) p) = l.
+    nth (i - k) p 0 = j.
 Proof.
-intros * Hit Hp *.
-revert p k l Hit Hp.
+intros * Hp *.
+revert p k l Hp.
 induction it; intros; [ easy | ].
 cbn in Hp.
 destruct p as [| a la]; [ easy | ].
 rewrite if_eqb_eq_dec in Hp.
 destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   subst a.
-  specialize (IHit la (S k) l) as H1.
-  cbn in Hit.
-  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
-  apply Nat.succ_le_mono in Hit.
-  specialize (H1 Hit Hp).
-  destruct H1 as (H1 & H2 & H3).
+  specialize (IHit la (S k) l Hp) as H1.
+  destruct H1 as (H1 & H2).
   split. {
     intros u Hu.
     destruct u; [ now rewrite Nat.add_0_r | cbn ].
@@ -2446,55 +2440,23 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   specialize (H4 it (S k) la i j).
   rewrite Hp in H4.
   specialize (H4 (or_introl eq_refl)).
-  split. {
-    now rewrite Nat_succ_sub_succ_r.
-  }
-  rewrite Nat_succ_sub_succ_r; [ | easy ].
-  rewrite skipn_cons.
-...
+  now rewrite Nat_succ_sub_succ_r.
 }
 injection Hp; clear Hp; intros Hp H1 H2; subst a k.
-flia Hu.
-Qed.
-
-...
-
-Theorem eq_transp_loop_cons : ∀ it i j k p l,
-  length p + nb_nfit k p ≤ it
-  → transp_loop it k p = (i, j) :: l
-  → ∀ u, k + u < i → nth u p 0 = k + u.
-Proof.
-intros * Hit Hp * Hu.
-revert p k l Hit Hp u Hu.
-induction it; intros; [ easy | ].
-cbn in Hp.
-destruct p as [| a la]; [ easy | ].
-rewrite if_eqb_eq_dec in Hp.
-destruct (Nat.eq_dec k a) as [Hka| Hka]. {
-  subst a.
-  specialize (IHit la (S k) l) as H1.
-  cbn in Hit.
-  rewrite Nat.eqb_refl, Nat.add_0_l in Hit.
-  apply Nat.succ_le_mono in Hit.
-  specialize (H1 Hit Hp).
-  destruct u; [ now rewrite Nat.add_0_r | cbn ].
-  rewrite <- Nat.add_succ_comm in Hu |-*.
-  now apply H1.
-}
-injection Hp; clear Hp; intros Hp H1 H2; subst a k.
-flia Hu.
+split; [ flia | ].
+now rewrite Nat.sub_diag; cbn.
 Qed.
 
 Theorem eq_transp_list_cons : ∀ la lb i j,
   transp_list la = (i, j) :: lb
-  → ∀ k, k < i → ff_app la k = k.
+  → (∀ k, k < i → ff_app la k = k) ∧ nth i la 0 = j.
 Proof.
-intros * Hla * Hk.
+intros * Hla.
 unfold ff_app.
 unfold transp_list in Hla.
 specialize eq_transp_loop_cons as H1.
-specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb (le_refl _)).
-specialize (H1 Hla).
+specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb Hla).
+rewrite Nat.sub_0_r in H1.
 now apply H1.
 Qed.
 
@@ -2503,8 +2465,11 @@ Theorem nb_nfit_list_swap_elem_le : ∀ it i j l la,
   → nb_nfit 0 (list_swap_elem 0 l i j) ≤ nb_nfit 0 l.
 Proof.
 intros * Hla.
-...
-intros * Hla.
+(*
+specialize (eq_transp_loop_cons it _ _ Hla) as H1.
+rewrite Nat.sub_0_r in H1; cbn in H1.
+destruct H1 as (H1, H2).
+*)
 revert i j l la Hla.
 induction it; intros; [ easy | ].
 cbn - [ "=?" ] in Hla.
@@ -2522,6 +2487,11 @@ destruct (Nat.eq_dec 0 k) as [Hkz| Hkz]. {
     subst k.
     cbn - [ seq "=?" ].
     rewrite Nat.eqb_refl, Nat.add_0_l.
+(*
+    specialize (eq_transp_loop_cons it _ _ Hla) as H1.
+    destruct H1 as (H1, H2).
+...
+*)
 Theorem glop : ∀ it i j k l la,
   length l + nb_nfit k l ≤ it
   → transp_loop it k l = (i, j) :: la
