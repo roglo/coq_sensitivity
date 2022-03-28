@@ -2818,7 +2818,7 @@ Theorem eq_transp_loop_cons' : ∀ it i j k p l,
 *)
   → length p + nb_nfit k p ≤ it
   → transp_loop it k p = (i, j) :: l
-  → transp_loop (it - 1) i (list_swap_elem 0 p 0 (j - i)) = l.
+  → transp_loop it i (list_swap_elem 0 p 0 (j - i)) = l.
 Proof.
 intros * Hpp Hit Hp.
 (*
@@ -2849,12 +2849,18 @@ Compute (
 *)
 revert p k l Hpp Hit Hp.
 induction it; intros; [ easy | ].
-rewrite Nat_sub_succ_1.
-cbn in Hp.
+cbn in Hp |-*.
 destruct p as [| a la]; [ easy | ].
 rewrite if_eqb_eq_dec in Hp.
 destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   subst a.
+  remember (list_swap_elem 0 (k :: la) 0 (j - i)) as x eqn:Hx.
+  symmetry in Hx.
+  destruct x as [| b lb]; [ easy | ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i b) as [Hib| Hib]. {
+    subst b.
+    apply IHit in Hp.
 ...
   specialize (IHit la (S k) l) as H1.
   cbn in Hit.
