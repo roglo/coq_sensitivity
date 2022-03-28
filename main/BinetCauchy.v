@@ -2678,6 +2678,127 @@ assert
     }
     easy.
   }
+  rewrite if_eqb_eq_dec.
+(**)
+  remember (if Nat.eq_dec _ _ then _ else _) as x eqn:Hx.
+  rewrite List_seq_cut with (i := j - S i). 2: {
+    apply in_seq.
+    split; [ easy | ].
+    flia Hilj Hjil.
+  }
+  rewrite Nat.sub_0_r, Nat.add_0_l.
+  rewrite map_app; cbn.
+  rewrite Nat.eqb_refl.
+  rewrite nb_nfit_app.
+  rewrite List_map_seq_length.
+  rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
+  cbn; rewrite Nat.eqb_refl, Nat.add_0_l.
+  specialize nth_split as H1.
+  specialize (H1 _ (j - S i) l 0).
+  assert (H : j - S i < length l) by flia Hjil Hilj.
+  specialize (H1 H); clear H.
+  destruct H1 as (l1 & l2 & Hll & Hl1l).
+  rewrite Hll at 2.
+  rewrite nb_nfit_app.
+  rewrite Nat.add_comm, <- Nat.add_assoc.
+  apply Nat.add_le_mono. {
+    erewrite map_ext_in. 2: {
+      intros k Hk; apply in_seq in Hk.
+      destruct Hk as (_, Hk); cbn in Hk.
+      erewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
+      rewrite Hll at 1.
+      rewrite app_nth1; [ | now rewrite Hl1l ].
+      easy.
+    }
+    rewrite <- Hl1l.
+    now rewrite <- List_map_nth_seq.
+  }
+  rewrite Hl1l, (Nat.add_comm (S i)).
+  rewrite Nat.sub_add; [ | easy ].
+  rewrite <- List_seq_shift', map_map.
+  erewrite map_ext_in. 2: {
+    intros k Hk; apply in_seq in Hk.
+    destruct Hk as (_, Hk); cbn in Hk.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (S (j - S i) + k) _) as [H| H]; [ flia H | clear H ].
+    rewrite Hll at 1.
+    rewrite app_nth2 at 1; [ | rewrite Hl1l; flia Hk ].
+    rewrite Hl1l.
+    replace (_ - _) with (S k) by flia.
+    rewrite List_nth_succ_cons.
+    easy.
+  }
+  replace (length l - S (j - S i)) with (length l2). 2: {
+    rewrite Hll.
+    rewrite app_length, Hl1l.
+    cbn; flia.
+  }
+  rewrite <- List_map_nth_seq.
+  rewrite Hll.
+  rewrite app_nth2; [ | now rewrite Hl1l; unfold ge ].
+  rewrite Hl1l, Nat.sub_diag.
+  rewrite List_nth_0_cons.
+...
+  destruct (Nat.eq_dec i (nth (j - S i) l 0)) as [Hij| Hij]. {
+    rewrite Nat.add_0_l.
+    rewrite List_seq_cut with (i := j - S i). 2: {
+      apply in_seq.
+      split; [ easy | ].
+      flia Hilj Hjil.
+    }
+    rewrite Nat.sub_0_r, Nat.add_0_l.
+    rewrite map_app; cbn.
+    rewrite Nat.eqb_refl.
+    rewrite nb_nfit_app.
+    rewrite List_map_seq_length.
+    rewrite (Nat.add_comm (S i)), Nat.sub_add; [ | easy ].
+    cbn; rewrite Nat.eqb_refl, Nat.add_0_l.
+    specialize nth_split as H1.
+    specialize (H1 _ (j - S i) l 0).
+    rewrite <- Hij in H1.
+    assert (H : j - S i < length l) by flia Hjil Hilj.
+    specialize (H1 H); clear H.
+    destruct H1 as (l1 & l2 & Hll & Hl1l).
+    rewrite Hll at 2.
+    rewrite nb_nfit_app.
+    apply Nat.add_le_mono. {
+      erewrite map_ext_in. 2: {
+        intros k Hk; apply in_seq in Hk.
+        destruct Hk as (_, Hk); cbn in Hk.
+        erewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec k (j - S i)) as [H| H]; [ flia Hk H | ].
+        rewrite Hll at 1.
+        rewrite app_nth1; [ | now rewrite Hl1l ].
+        easy.
+      }
+      rewrite <- Hl1l.
+      now rewrite <- List_map_nth_seq.
+    } {
+      rewrite <- List_seq_shift', map_map.
+      erewrite map_ext_in. 2: {
+        intros k Hk; apply in_seq in Hk.
+        destruct Hk as (_, Hk); cbn in Hk.
+        rewrite if_eqb_eq_dec.
+        destruct (Nat.eq_dec _ _) as [H| H]; [ flia H | clear H ].
+        rewrite Hll at 1.
+        rewrite app_nth2 at 1; [ | rewrite Hl1l; flia Hk ].
+        rewrite Hl1l.
+        replace (_ - _) with (S k) by flia.
+        rewrite List_nth_succ_cons.
+        easy.
+      }
+      replace (length l - S (j - S i)) with (length l2). 2: {
+        rewrite Hll.
+        rewrite app_length, Hl1l.
+        cbn; flia.
+      }
+      rewrite <- List_map_nth_seq.
+      rewrite Hl1l.
+      rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+      cbn; flia.
+    }
+  }
 ...
 }
 ... suite ok
