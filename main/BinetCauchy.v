@@ -2596,6 +2596,9 @@ rewrite list_swap_elem_firstn_skipn. 2: {
 ...
 *)
 
+Theorem nb_nfit_succ_le : ∀ i j l, nb_nfit (S i) l ≤ nb_nfit i (j :: l).
+Proof. cbn; flia. Qed.
+
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   is_permut_list (seq 0 i ++ p)
   → length p + nb_nfit i p ≤ it1
@@ -2661,6 +2664,20 @@ rewrite Nat.add_succ_r in Hit1, Hit2.
 assert
   (H : nb_nfit i (list_swap_elem 0 (j :: l) 0 (j - i)) ≤ nb_nfit (S i) l). {
   clear Hij it1 it2 IHit1 Hit1 Hit2.
+  cbn - [ nth ].
+  rewrite Nat_succ_sub_succ_r; [ | easy ].
+  rewrite List_nth_succ_cons.
+  rewrite <- seq_shift, map_map.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    unfold transposition.
+    replace (nth _ _ _) with (if k =? j - S i then j else nth k l 0). 2: {
+      cbn.
+      do 2 rewrite if_eqb_eq_dec.
+      now destruct (Nat.eq_dec k (j - S i)).
+    }
+    easy.
+  }
 ...
 }
 ... suite ok
