@@ -2763,8 +2763,6 @@ Qed.
 Theorem nb_nfit_succ_le : ∀ i j l, nb_nfit (S i) l ≤ nb_nfit i (j :: l).
 Proof. cbn; flia. Qed.
 
-...
-
 Theorem eq_transp_loop_cons : ∀ it i j k p l,
   transp_loop it k p = (i, j) :: l
   → (∀ u, k + u < i → nth u p 0 = k + u) ∧
@@ -2813,9 +2811,6 @@ rewrite Nat.sub_0_r in H1.
 now destruct H1 as (H1 & H2 & H3).
 Qed.
 
-...
-
-(*
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
   is_permut_list (seq 0 k ++ p)
 (*
@@ -3019,6 +3014,7 @@ Theorem transp_list_cons_list_swap_elem : ∀ i j l la,
   → la = transp_list (list_swap_elem 0 l i j).
 Proof.
 intros * Hla.
+...
 unfold transp_list in Hla |-*.
 rewrite list_swap_elem_length.
 remember (length l + nb_nfit 0 l) as it1 eqn:Hit1.
@@ -3028,8 +3024,6 @@ move Hit2 before Hit1.
 assert (Hit : it2 ≤ it1). {
   rewrite Hit1, Hit2.
   apply Nat.add_le_mono_l.
-...
-Search (nb_nfit _ (list_swap_elem _ _ _ _)).
 ...
 now apply transp_list_cons_list_swap_elem.
 ...
