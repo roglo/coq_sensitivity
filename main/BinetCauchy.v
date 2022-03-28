@@ -2463,6 +2463,7 @@ rewrite Nat.sub_0_r in H1.
 now destruct H1 as (H1 & H2 & H3).
 Qed.
 
+(*
 Theorem nb_nfit_list_swap_elem_le : ∀ it i j l la,
   transp_loop it 0 l = (i, j) :: la
   → nb_nfit 0 (list_swap_elem 0 l i j) ≤ nb_nfit 0 l.
@@ -2531,6 +2532,9 @@ replace (1 + nb_nfit (S i) l) with (nb_nfit i (j :: l)) in Hit |-*. 2: {
   cbn; rewrite if_eqb_eq_dec.
   now destruct (Nat.eq_dec i j).
 }
+Theorem glop :
+  nb_nfit 0 (list_swap_elem 0 (seq 0 i ++ j :: l) i j) ≤
+  nb_nfit 0 (list_swap_elem 0 (seq 0 i ++ i :: l) i j).
 Search nb_nfit.
 ...
 destruct (Nat.eq_dec (length l + nb_nfit i (j :: l)) it) as [Hit1| Hit1]. 2: {
@@ -2590,6 +2594,7 @@ rewrite list_swap_elem_firstn_skipn. 2: {
     flia Hjil.
   }
 ...
+*)
 
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   is_permut_list (seq 0 i ++ p)
@@ -2653,6 +2658,26 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec i j) as [H| H]; [ flia Hij H | clear H ].
 f_equal.
 rewrite Nat.add_succ_r in Hit1, Hit2.
+assert
+  (H : nb_nfit i (list_swap_elem 0 (j :: l) 0 (j - i)) ≤ nb_nfit (S i) l). {
+  clear Hij it1 it2 IHit1 Hit1 Hit2.
+...
+}
+... suite ok
+apply IHit1; cycle 1. {
+  rewrite list_swap_elem_length.
+  cbn - [ list_swap_elem ].
+  etransitivity; [ | apply Hit1 ].
+  apply -> Nat.succ_le_mono.
+  now apply Nat.add_le_mono_l.
+} {
+  rewrite list_swap_elem_length.
+  cbn - [ list_swap_elem ].
+  etransitivity; [ | apply Hit2 ].
+  apply -> Nat.succ_le_mono.
+  now apply Nat.add_le_mono_l.
+}
+now apply app_seq_swap_is_permut_list.
 ...
 assert (H : ∀ it,
   S (length l + nb_nfit (S i) l) ≤ it
