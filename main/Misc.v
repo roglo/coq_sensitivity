@@ -2965,6 +2965,46 @@ assert (H : sorted ord l = true). {
   now apply Bool.andb_true_iff in Hs.
 }
 specialize (H1 H); clear H.
+clear - Hit Hla' H1.
+revert a l la' Hit Hla' H1.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  cbn in Hla'.
+  now injection Hla'; clear Hla'; intros; subst la'.
+}
+cbn in H1.
+destruct l as [| b]. {
+  cbn in Hla'.
+  now injection Hla'; clear Hla'; intros; subst la'.
+}
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (select_first ord b l) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+injection H1; clear H1; intros; subst c l.
+cbn in Hla'.
+remember (if ord a b then a else b) as x eqn:Hx.
+symmetry in Hx.
+destruct la' as [| d]. {
+  now destruct (select_first ord x (ssort_loop ord it lc)).
+}
+remember (ord a b) as y eqn:Hy; symmetry in Hy.
+destruct y; subst x. 2: {
+  rewrite Hlc in Hla'.
+  injection Hla'; clear Hla'; intros H1 H2 H3.
+  subst d b la'.
+  admit. (* ajouter reflexivité *)
+}
+remember (select_first ord a (ssort_loop ord it lc)) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as (e, le).
+injection Hla'; clear Hla'; intros H1 H2 H3.
+subst d e le.
+remember (select_first ord b la') as le eqn:Hle.
+symmetry in Hle.
+destruct le as (e, le).
+specialize (IHit _ _ _ Hit Hld) as H1.
+(* ouais, bon, là, je pars en couille, là *)
 ...
   specialize ssort_loop_cons as H3.
   specialize (H3 _ ord (length (c :: la))).
