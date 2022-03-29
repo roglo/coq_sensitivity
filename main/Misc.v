@@ -2211,6 +2211,141 @@ intros.
 apply bsort_loop_length.
 Qed.
 
+(* ssort length *)
+
+Theorem select_first_length : ∀ A ord (a : A) la b lb,
+  select_first ord a la = (b, lb)
+  → length lb = length la.
+Proof.
+intros * Hab.
+revert a b lb Hab.
+induction la as [| a']; intros; cbn in Hab |-*. {
+  now injection Hab; clear Hab; intros; subst b lb.
+}
+remember (ord a a') as x eqn:Hx; symmetry in Hx.
+remember (select_first ord (if x then a else a') la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+injection Hab; clear Hab; intros; subst c lb.
+cbn; f_equal.
+now destruct x; apply IHla in Hlc.
+Qed.
+
+Theorem ssort_loop_length : ∀ A ord it (l : list A),
+  length (ssort_loop ord it l) = length l.
+Proof.
+intros.
+revert l.
+induction it; intros; [ easy | cbn ].
+destruct l as [| a]; [ easy | cbn ].
+remember (select_first ord a l) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as (a', la'); cbn; f_equal.
+rewrite IHit.
+now apply select_first_length in Hlb.
+Qed.
+
+Theorem ssort_length : ∀ A ord (l : list A), length (ssort ord l) = length l.
+Proof.
+intros.
+apply ssort_loop_length.
+Qed.
+
+(* bsort and ssort return same *)
+
+Theorem ssort_loop_cons : ∀ A ord it a b (la lb : list A),
+  length la ≤ it
+  → select_first ord a la = (b, lb)
+  → ssort_loop ord it (a :: la) = b :: ssort_loop ord it lb.
+Proof.
+intros * Hit Hab.
+revert a b la lb Hit Hab.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst b lb.
+}
+destruct la as [| a']. {
+  cbn in Hab.
+  injection Hab; clear Hab; intros; subst b lb.
+  now destruct it.
+}
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+cbn in Hab |-*.
+remember (ord a a') as x eqn:Hx; symmetry in Hx.
+remember (select_first ord (if x then a else a') la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+injection Hab; clear Hab; intros; subst c lb.
+f_equal.
+remember (select_first ord (if x then a' else a) lc) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as (d, ld).
+apply IHit; [ | easy ].
+specialize select_first_length as H1.
+specialize (H1 _ ord (if x then a else a') la b lc Hlc).
+now rewrite H1.
+Qed.
+
+Theorem eq_ssort_loop_nil : ∀ A ord it (l : list A),
+  ssort_loop ord it l = [] → l = [].
+Proof.
+intros * Hit.
+revert l Hit.
+induction it; intros; [ easy | ].
+cbn in Hit.
+destruct l as [| a la]; [ easy | exfalso ].
+now destruct (select_first ord a la).
+Qed.
+
+Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
+  it = length l
+  → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
+Proof.
+intros; subst it.
+revert ls.
+induction l as [| a]; intros; [ now rewrite app_nil_r | ].
+cbn; rewrite IHl.
+remember (ls ++ a :: l) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; [ now destruct ls | ].
+remember (select_first ord b lb) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (c, lc).
+destruct ls as [| s]; cbn in Hlb |-*. {
+  injection Hlb; clear Hlb; intros; subst b lb.
+  now apply ssort_loop_cons.
+}
+injection Hlb; clear Hlb; intros; subst s lb.
+remember (ord a b) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  cbn.
+  apply ssort_loop_cons with (it := length (ls ++ a :: l)) in Hlc; [ | easy ].
+  rewrite app_length in Hlc; cbn in Hlc.
+  rewrite Nat.add_succ_r in Hlc.
+  cbn in Hlc.
+  remember (select_first ord b (ls ++ a :: l)) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as (a', la').
+  injection Hlc; clear Hlc; intros Hlc H1; subst a'.
+  destruct lc as [| c']. {
+    apply eq_ssort_loop_nil in Hlc; subst la'.
+    specialize select_first_length as H1.
+    specialize (H1 _ ord b (ls ++ a :: l)).
+    specialize (H1 _ _ Hld).
+    now destruct ls.
+  }
+  remember (select_first ord c' lc) as le eqn:Hle; symmetry in Hle.
+  destruct le as (e, le).
+Search select_first.
+...
+
+Theorem bsort_ssort : ∀ A ord (l : list A), bsort ord l = ssort ord l.
+Proof.
+intros.
+unfold bsort, ssort.
+...
+now apply bsort_loop_ssort_loop.
+...
+
 (* *)
 
 Theorem Permutation_cons_bsort_insert : ∀ A (ord : A → _) a la lb,
@@ -2711,6 +2846,8 @@ Definition transitive A (ord : A → A → bool) :=
 Definition total_order {A} (ord : A → _) := ∀ a b,
   (ord a b || ord b a)%bool = true.
 
+(* bsort is sorted *)
+
 Theorem bsort_insert_is_sorted : ∀ A ord (a : A) lsorted,
   total_order ord
   → sorted ord lsorted = true
@@ -2755,6 +2892,8 @@ intros * Hto *.
 destruct l as [| a]; [ easy | cbn ].
 now apply bsort_loop_is_sorted.
 Qed.
+
+(* *)
 
 Theorem Nat_leb_has_total_order : total_order Nat.leb.
 Proof.
