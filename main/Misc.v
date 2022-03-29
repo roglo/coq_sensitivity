@@ -2877,7 +2877,7 @@ split; [ | easy ].
 now apply Htr with (b := c).
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
   total_order ord
   → it = length (ls ++ l)
@@ -2982,12 +2982,22 @@ remember (select_first ord b l) as lc eqn:Hlc.
 symmetry in Hlc.
 destruct lc as (c, lc).
 injection H1; clear H1; intros; subst c l.
+(*
 cbn in Hla'.
 remember (if ord a b then a else b) as x eqn:Hx.
 symmetry in Hx.
+*)
 destruct la' as [| d]. {
+  cbn in Hla'.
+  remember (if ord a b then a else b) as x eqn:Hx.
   now destruct (select_first ord x (ssort_loop ord it lc)).
 }
+(**)
+remember (select_first ord d la') as le eqn:Hle.
+symmetry in Hle.
+destruct le as (e, le).
+cbn in Hla'.
+...
 remember (ord a b) as y eqn:Hy; symmetry in Hy.
 destruct y; subst x. 2: {
   rewrite Hlc in Hla'.
@@ -2995,6 +3005,8 @@ destruct y; subst x. 2: {
   subst d b la'.
   admit. (* ajouter reflexivité *)
 }
+Print ssort_loop.
+...
 remember (select_first ord a (ssort_loop ord it lc)) as ld eqn:Hld.
 symmetry in Hld.
 destruct ld as (e, le).
