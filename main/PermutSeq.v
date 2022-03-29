@@ -259,26 +259,26 @@ Theorem comp_bsort_rank_r : ∀ ord l,
 Proof.
 intros.
 apply List_eq_iff.
-rewrite comp_length, length_bsort_rank, length_bsort.
+rewrite comp_length, bsort_rank_length, bsort_length.
 split; [ easy | ].
 intros d i.
 destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
   apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite comp_length, length_bsort_rank ].
-  rewrite nth_overflow; [ easy | now rewrite length_bsort ].
+  rewrite nth_overflow; [ | now rewrite comp_length, bsort_rank_length ].
+  rewrite nth_overflow; [ easy | now rewrite bsort_length ].
 }
 rewrite nth_indep with (d' := 0). 2: {
-  now rewrite comp_length, length_bsort_rank.
+  now rewrite comp_length, bsort_rank_length.
 }
 symmetry.
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort ].
+rewrite nth_indep with (d' := 0); [ | now rewrite bsort_length ].
 symmetry.
 unfold "°".
-rewrite (List_map_nth' 0); [ | now rewrite length_bsort_rank ].
+rewrite (List_map_nth' 0); [ | now rewrite bsort_rank_length ].
 specialize (bsort_bsort_rank ord 0 l) as H1.
 do 2 rewrite fold_ff_app; cbn.
 apply (f_equal (λ l, nth i l 0)) in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+rewrite (List_map_nth' 0) in H1; [ | now rewrite bsort_rank_length ].
 do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
@@ -466,7 +466,7 @@ assert
   (H2 : ∀ j, j < length l → ff_app l (ff_app (bsort_rank Nat.leb l) j) = j). {
   intros j Hj.
   specialize (H1 j).
-  rewrite (List_map_nth' 0) in H1; [ | now rewrite length_bsort_rank ].
+  rewrite (List_map_nth' 0) in H1; [ | now rewrite bsort_rank_length ].
   now rewrite seq_nth in H1.
 }
 clear H1.
@@ -530,9 +530,9 @@ specialize (H2 H); clear H.
 destruct Hp as (Ha, Hp).
 specialize (NoDup_bsort_rank Nat.leb l) as H3.
 apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
-  now rewrite length_bsort_rank.
+  now rewrite bsort_rank_length.
 }
-rewrite length_bsort_rank.
+rewrite bsort_rank_length.
 apply Ha, nth_In.
 apply bsort_rank_ub.
 now intros H; subst l.
@@ -1751,7 +1751,7 @@ Theorem bsort_rank_inj : ∀ l,
   → i = j.
 Proof.
 intros * Hp * Hi Hj Hij.
-rewrite <- (length_bsort_rank Nat.leb) in Hi, Hj.
+rewrite <- (bsort_rank_length Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_bsort_rank _ _)) in Hij.
 Qed.
 
@@ -1764,9 +1764,9 @@ subst n.
 split. {
   split. {
     intros i Hi.
-    rewrite length_bsort_rank.
+    rewrite bsort_rank_length.
     apply (In_nth _ _ 0) in Hi.
-    rewrite length_bsort_rank in Hi.
+    rewrite bsort_rank_length in Hi.
     destruct Hi as (ia & Hial & Hia).
     rewrite <- Hia.
     apply bsort_rank_ub.
@@ -1775,7 +1775,7 @@ split. {
     apply NoDup_bsort_rank.
   }
 }
-apply length_bsort_rank.
+apply bsort_rank_length.
 Qed.
 
 Arguments bsort_rank_is_permut {A} ord n%nat [l]%list.
@@ -1805,8 +1805,8 @@ rewrite (List_seq_cut i); subst s. 2: {
   subst i.
   apply in_seq.
   split; [ easy | ].
-  rewrite <- (length_bsort_rank Nat.leb).
-  apply permut_list_ub; [ | rewrite length_bsort_rank, Hln; flia ].
+  rewrite <- (bsort_rank_length Nat.leb).
+  apply permut_list_ub; [ | rewrite bsort_rank_length, Hln; flia ].
   now apply bsort_rank_is_permut_list.
 }
 rewrite Nat.sub_0_r; cbn.
@@ -1820,9 +1820,9 @@ rewrite Hln; cbn.
 assert (Hin : i ≤ n). {
   apply Nat.lt_succ_r.
   rewrite Hi, <- Hln.
-  rewrite <- (length_bsort_rank Nat.leb).
+  rewrite <- (bsort_rank_length Nat.leb).
   apply permut_list_ub; [ apply bsort_rank_is_permut_list | ].
-  now rewrite length_bsort_rank, Hln.
+  now rewrite bsort_rank_length, Hln.
 }
 apply IHn. 2: {
   rewrite map_length, app_length, seq_length, seq_length.

@@ -2159,9 +2159,33 @@ Fixpoint bsort_loop {A} (ord : A → A → bool) lsorted l :=
 
 Definition bsort {A} (ord : A → A → bool) := bsort_loop ord [].
 
+(* sort by selection *)
+
+Fixpoint select_first {A} (ord : A → A → bool) a la :=
+  match la with
+  | [] => (a, [])
+  | b :: lb =>
+      let (c, lc) := select_first ord (if ord a b then a else b) lb in
+      (c, (if ord a b then b else a) :: lc)
+  end.
+
+Fixpoint ssort_loop {A} (ord : A → A → bool) it l :=
+  match it with
+  | 0 => l
+  | S it' =>
+      match l with
+      | [] => []
+      | a :: la =>
+          let (a', la') := select_first ord a la in
+          a' :: ssort_loop ord it' la'
+      end
+  end.
+
+Definition ssort {A} (ord : A → _) l := ssort_loop ord (length l) l.
+
 (* bsort length *)
 
-Theorem length_bsort_insert : ∀ A ord (a : A) lsorted,
+Theorem bsort_insert_length : ∀ A ord (a : A) lsorted,
   length (bsort_insert ord a lsorted) = S (length lsorted).
 Proof.
 intros.
@@ -2171,20 +2195,20 @@ cbn; f_equal.
 apply IHlsorted.
 Qed.
 
-Theorem length_bsort_loop : ∀ A ord (lsorted l : list A),
+Theorem bsort_loop_length : ∀ A ord (lsorted l : list A),
   length (bsort_loop ord lsorted l) = length lsorted + length l.
 Proof.
 intros.
 revert lsorted.
 induction l as [| a]; intros; [ now cbn; rewrite Nat.add_0_r | cbn ].
 rewrite IHl, <- Nat.add_succ_comm; f_equal.
-apply length_bsort_insert.
+apply bsort_insert_length.
 Qed.
 
-Theorem length_bsort : ∀ A ord (l : list A), length (bsort ord l) = length l.
+Theorem bsort_length : ∀ A ord (l : list A), length (bsort ord l) = length l.
 Proof.
 intros.
-apply length_bsort_loop.
+apply bsort_loop_length.
 Qed.
 
 (* *)
@@ -2363,7 +2387,7 @@ Compute (let l := [5;2;2;7;0] in bsort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in bsort_rank Nat.ltb l).
 *)
 
-Theorem length_bsort_rank_insert : ∀ A B ord (f : B → A) ia lrank,
+Theorem bsort_rank_insert_length : ∀ A B ord (f : B → A) ia lrank,
   length (bsort_rank_insert ord f ia lrank) = S (length lrank).
 Proof.
 intros.
@@ -2372,18 +2396,18 @@ destruct (ord (f ia) (f ib)); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
-Theorem length_bsort_rank_loop : ∀ A ord (f : _ → A) lrank l,
+Theorem bsort_rank_loop_length : ∀ A ord (f : _ → A) lrank l,
   length (bsort_rank_loop ord f lrank l) = length lrank + length l.
 Proof.
 intros.
 revert lrank.
 induction l as [| b]; intros; [ easy | cbn ].
 rewrite IHl.
-rewrite length_bsort_rank_insert.
+rewrite bsort_rank_insert_length.
 apply Nat.add_succ_comm.
 Qed.
 
-Theorem length_bsort_rank : ∀ A ord (l : list A),
+Theorem bsort_rank_length : ∀ A ord (l : list A),
   length (bsort_rank ord l) = length l.
 Proof.
 intros.
@@ -2392,7 +2416,7 @@ destruct l as [| d]; [ easy | ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'.
 rename l' into l.
-apply length_bsort_rank_loop.
+apply bsort_rank_loop_length.
 Qed.
 
 Theorem bsort_insert_bsort_rank_insert : ∀ A B ord ia (f : B → A) lrank,
@@ -2419,7 +2443,7 @@ rewrite <- H1.
 rewrite bsort_insert_bsort_rank_insert.
 rewrite IHl; [ easy | ].
 intros i Hi.
-rewrite length_bsort_rank_insert.
+rewrite bsort_rank_insert_length.
 apply Nat.succ_lt_mono in Hi.
 specialize (Hia (S i) Hi) as H2.
 now rewrite <- Nat.add_succ_comm in H2.
@@ -2472,7 +2496,7 @@ induction l as [| b]; intros; [ easy | ].
 cbn - [ nth ] in Hia |-*.
 rewrite bsort_rank_insert_nth_indep with (d' := d'); [ | flia Hia | easy ].
 rewrite <- Nat.add_succ_comm in Hia.
-rewrite IHl; [ easy | now rewrite length_bsort_rank_insert | ].
+rewrite IHl; [ easy | now rewrite bsort_rank_insert_length | ].
 intros i Hi.
 apply in_bsort_rank_insert in Hi.
 destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
@@ -2536,7 +2560,7 @@ Proof.
 intros * Hlz Hil.
 destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
   apply Nat.nlt_ge in Hir.
-  rewrite nth_overflow; [ | now rewrite length_bsort_rank_loop ].
+  rewrite nth_overflow; [ | now rewrite bsort_rank_loop_length ].
   now apply Nat.neq_0_lt_0.
 }
 clear Hlz.
@@ -2550,7 +2574,7 @@ rewrite <- Nat.add_succ_comm in Hir |-*.
 specialize (in_bsort_rank_insert) as H1.
 specialize (H1 A nat ord f (length lrank) lrank).
 remember (bsort_rank_insert ord f (length lrank) lrank) as lr' eqn:Hlr'.
-specialize length_bsort_rank_insert as H2.
+specialize bsort_rank_insert_length as H2.
 specialize (H2 A nat ord f (length lrank) lrank).
 rewrite <- Hlr' in H2.
 rewrite <- H2 in Hir |-*.
@@ -2580,7 +2604,7 @@ Proof.
 intros * Hi.
 apply (In_nth _ _ 0) in Hi.
 destruct Hi as (j & Hjl & Hji).
-rewrite length_bsort_rank in Hjl.
+rewrite bsort_rank_length in Hjl.
 rewrite <- Hji.
 apply bsort_rank_ub.
 now intros H; subst l.
@@ -2624,7 +2648,7 @@ revert lrank Hnd Halt.
 induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 apply NoDup_bsort_rank_insert. 2: {
-  rewrite length_bsort_rank_insert.
+  rewrite bsort_rank_insert_length.
   intros i Hi.
   apply in_bsort_rank_insert in Hi.
   destruct Hi as [Hi| Hi]; [ now rewrite Hi | ].
@@ -2642,7 +2666,7 @@ Theorem NoDup_bsort_rank : ∀ A ord (l : list A), NoDup (bsort_rank ord l).
 Proof.
 intros.
 apply (proj2 (NoDup_nth _ 0)).
-rewrite length_bsort_rank.
+rewrite bsort_rank_length.
 intros i j Hi Hj Hij.
 destruct l as [| d]; [ easy | ].
 unfold bsort_rank in Hij.
@@ -2650,7 +2674,7 @@ specialize (NoDup_bsort_rank_loop d ord (d :: l) (d :: l) (NoDup_nil _)) as H1.
 assert (H : AllLt [] (length ([] : list nat))) by easy.
 specialize (H1 H); clear H.
 specialize (proj1 (NoDup_nth _ 0) H1) as H2.
-rewrite length_bsort_rank_loop in H2.
+rewrite bsort_rank_loop_length in H2.
 rewrite Nat.add_0_l in H2.
 apply (H2 i j Hi Hj Hij).
 Qed.
@@ -2660,7 +2684,7 @@ Theorem eq_bsort_rank_nil : ∀ A (ord : A → _) l,
 Proof.
 intros * Hl.
 apply (f_equal length) in Hl.
-rewrite length_bsort_rank in Hl.
+rewrite bsort_rank_length in Hl.
 now apply length_zero_iff_nil in Hl.
 Qed.
 
@@ -3050,17 +3074,17 @@ Theorem bsort_rank_of_nodup_sorted : ∀ A (ord : A → _),
 Proof.
 intros * Hant Htra * Hnd Hs.
 apply List_eq_iff.
-rewrite length_bsort_rank, seq_length.
+rewrite bsort_rank_length, seq_length.
 split; [ easy | ].
 intros d i.
 destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
   apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite length_bsort_rank ].
+  rewrite nth_overflow; [ | now rewrite bsort_rank_length ].
   rewrite nth_overflow; [ | now rewrite seq_length ].
   easy.
 }
 rewrite seq_nth; [ cbn | easy ].
-rewrite nth_indep with (d' := 0); [ | now rewrite length_bsort_rank ].
+rewrite nth_indep with (d' := 0); [ | now rewrite bsort_rank_length ].
 clear d.
 now apply nth_bsort_rank_of_nodup_sorted.
 Qed.

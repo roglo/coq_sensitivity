@@ -1768,11 +1768,11 @@ Proof.
 intros * Hl.
 exists (ff_app (bsort_rank Nat.leb l) n).
 split. {
-  rewrite <- length_bsort_rank with (ord := Nat.leb).
+  rewrite <- bsort_rank_length with (ord := Nat.leb).
   destruct Hl as (Hp, Hl).
   specialize (bsort_rank_is_permut Nat.leb _ Hl) as Hil.
   apply Hil, nth_In.
-  rewrite length_bsort_rank.
+  rewrite bsort_rank_length.
   now rewrite Hl.
 }
 split. {
@@ -1787,9 +1787,9 @@ apply butn_is_permut; [ easy | | ]. {
   specialize (bsort_rank_is_permut_list Nat.leb l) as H1.
   destruct Hl as (H2, H3).
   destruct H1 as (H4, H5).
-  rewrite length_bsort_rank in H4.
+  rewrite bsort_rank_length in H4.
   apply H4, nth_In.
-  now rewrite length_bsort_rank, H3.
+  now rewrite bsort_rank_length, H3.
 }
 Qed.
 
@@ -2075,14 +2075,14 @@ Theorem collapse_length : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
 unfold collapse.
-now do 2 rewrite length_bsort_rank.
+now do 2 rewrite bsort_rank_length.
 Qed.
 
 Theorem collapse_is_permut : ∀ l, is_permut (length l) (collapse l).
 Proof.
 intros.
 apply bsort_rank_is_permut.
-apply length_bsort_rank.
+apply bsort_rank_length.
 Qed.
 
 Theorem nth_ff_app_bsort_rank : ∀ A d ord (l : list A) i,
@@ -2092,7 +2092,7 @@ Proof.
 intros * Hil.
 rewrite (bsort_bsort_rank _ d).
 rewrite (List_map_nth' 0); [ easy | ].
-now rewrite length_bsort_rank.
+now rewrite bsort_rank_length.
 Qed.
 
 Theorem sorted_rel : ∀ A (d : A) ord l,
@@ -2150,15 +2150,15 @@ remember (bsort_rank Nat.leb la) as lb eqn:Hlb.
 apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
   now apply bsort_rank_is_permut.
 } {
-  now rewrite Hlb, length_bsort_rank.
+  now rewrite Hlb, bsort_rank_length.
 } {
-  rewrite Hlb, length_bsort_rank.
+  rewrite Hlb, bsort_rank_length.
   now apply bsort_rank_is_permut.
 }
 subst lb.
 rewrite comp_bsort_rank_r.
 rewrite permut_comp_bsort_rank_l; [ | apply bsort_rank_is_permut_list ].
-rewrite length_bsort_rank; symmetry.
+rewrite bsort_rank_length; symmetry.
 now apply permut_bsort_leb.
 Qed.
 
@@ -2198,7 +2198,7 @@ rewrite permut_bsort_permut in Hc1; [ | now destruct Hr | ]. 2: {
   rewrite Hi'.
   destruct Hc as ((Hca, Hcn), Hcl).
   rewrite Hcl in Hca.
-  rewrite Hlr, length_bsort_rank.
+  rewrite Hlr, bsort_rank_length.
   apply Hca, nth_In.
   now rewrite Hcl.
 }
@@ -2214,7 +2214,7 @@ rewrite permut_bsort_permut in Hc1; [ | now destruct Hr | ]. 2: {
   rewrite Hj'.
   destruct Hc as ((Hca, Hcn), Hcl).
   rewrite Hcl in Hca.
-  rewrite Hlr, length_bsort_rank.
+  rewrite Hlr, bsort_rank_length.
   apply Hca, nth_In.
   now rewrite Hcl.
 }
@@ -2242,7 +2242,7 @@ rewrite (bsort_bsort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
 specialize (H1 _ 0 _ _ Nat_leb_trans Hsl).
-rewrite map_length, Hlr, length_bsort_rank in H1.
+rewrite map_length, Hlr, bsort_rank_length in H1.
 specialize (H1 i' j' Hi'l Hj'l Hc1).
 apply Nat.leb_le in H1.
 rewrite <- Hlr in H1.
@@ -2541,7 +2541,7 @@ rewrite <- (permut_comp_assoc n); cycle 1. {
 }
 rewrite (permut_comp_assoc n) with (f := lb); cycle 1. {
   destruct Hb as ((Hba, Hbn), Hbl).
-  now rewrite length_bsort_rank.
+  now rewrite bsort_rank_length.
 } {
   now apply bsort_rank_is_permut.
 }
@@ -2577,9 +2577,9 @@ split. {
   destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
-    rewrite <- length_bsort_rank with (ord := Nat.leb).
+    rewrite <- bsort_rank_length with (ord := Nat.leb).
     apply bsort_rank_is_permut_list, nth_In.
-    rewrite length_bsort_rank; cbn.
+    rewrite bsort_rank_length; cbn.
     apply in_butn in Hj.
     flia Hlz.
   }
@@ -2649,7 +2649,7 @@ rewrite (permut_bsort_rank_comp (length lb)); [ | easy | easy | ]. 2: {
 rewrite (permut_bsort_rank_comp (length lb)); [ easy | | | ]. {
   apply NoDup_bsort_rank.
 } {
-  apply length_bsort_rank.
+  apply bsort_rank_length.
 } {
   now apply bsort_rank_is_permut.
 }
@@ -2722,9 +2722,9 @@ split. {
     }
     destruct H as (Hra, Hrn).
     apply (NoDup_nat _ Hrn) in H1; [ easy | | ]. {
-      now rewrite length_bsort_rank.
+      now rewrite bsort_rank_length.
     } {
-      now rewrite length_bsort_rank.
+      now rewrite bsort_rank_length.
     }
   }
 Qed.

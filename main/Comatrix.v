@@ -882,12 +882,12 @@ rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
   destruct H1 as (H1 & H2).
   apply -> Nat.succ_le_mono.
-  rewrite length_bsort_rank, Hσl in H1.
+  rewrite bsort_rank_length, Hσl in H1.
   specialize (H1 k).
   assert (H : k ∈ bsort_rank Nat.leb σ). {
     rewrite Hk.
     apply nth_In.
-    now rewrite length_bsort_rank, Hσl.
+    now rewrite bsort_rank_length, Hσl.
   }
   specialize (H1 H); clear H.
   flia Hksn H1.
@@ -940,10 +940,10 @@ erewrite rngl_product_eq_compat in IHn. 2: {
     assert (H : k ∈ bsort_rank Nat.leb σ). {
       rewrite Hk; unfold ff_app.
       apply nth_In.
-      now rewrite length_bsort_rank, Hσl.
+      now rewrite bsort_rank_length, Hσl.
     }
     specialize (H1 H); clear H.
-    rewrite length_bsort_rank, Hσl in H1.
+    rewrite bsort_rank_length, Hσl in H1.
     flia H1 Hi.
   }
   unfold ff_app at 1.
@@ -978,31 +978,31 @@ rewrite rngl_product_split with (j := k). 2: {
   split; [ flia | ].
   rewrite Hk.
   destruct H1 as (H1, H2).
-  rewrite length_bsort_rank, Hσl in H1.
+  rewrite bsort_rank_length, Hσl in H1.
   apply Nat.lt_le_incl.
   apply H1, nth_In.
-  now rewrite length_bsort_rank, Hσl.
+  now rewrite bsort_rank_length, Hσl.
 }
 do 2 rewrite <- rngl_mul_assoc.
 f_equal.
 rewrite rngl_product_split_last. 2: {
   rewrite Nat.add_1_r, Hk.
   destruct H1 as (H1, H2).
-  rewrite length_bsort_rank, Hσl in H1.
+  rewrite bsort_rank_length, Hσl in H1.
   apply Nat.lt_succ_r.
   apply H1, nth_In.
-  now rewrite length_bsort_rank, Hσl.
+  now rewrite bsort_rank_length, Hσl.
 }
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (ff_app σ i)).
 rewrite rngl_product_split_first. 2: {
   rewrite Nat.add_1_r.
   destruct H1 as (H1, H2).
-  rewrite length_bsort_rank, Hσl in H1.
+  rewrite bsort_rank_length, Hσl in H1.
   specialize (H1 (S k)).
   assert (H : S k ∈ bsort_rank Nat.leb σ). {
     rewrite Hk.
     apply nth_In.
-    now rewrite length_bsort_rank, Hσl.
+    now rewrite bsort_rank_length, Hσl.
   }
   specialize (H1 H); clear H.
   flia Hksn H1.
@@ -1034,12 +1034,12 @@ assert (Hkn : S (k + 1) ≤ n). {
   rewrite Nat.add_1_r.
   destruct H1 as (H1, H2).
   apply Nat.le_succ_l.
-  rewrite length_bsort_rank, Hσl in H1.
+  rewrite bsort_rank_length, Hσl in H1.
   specialize (H1 (S k)).
   assert (H : S k ∈ bsort_rank Nat.leb σ). {
     rewrite Hk.
     apply nth_In.
-    now rewrite length_bsort_rank, Hσl.
+    now rewrite bsort_rank_length, Hσl.
   }
   specialize (H1 H); clear H.
   rewrite <- Hk in H7.
@@ -1282,7 +1282,7 @@ Proof.
 intros * Hpl1 Hpl2 Hill.
 assert (Hll : length l1 = length l2). {
   apply List_eq_iff in Hill.
-  now do 2 rewrite length_bsort_rank in Hill.
+  now do 2 rewrite bsort_rank_length in Hill.
 }
 apply (f_equal (comp_list l1)) in Hill.
 (**)
@@ -1291,7 +1291,7 @@ rewrite permut_bsort_leb in Hill; [ | easy ].
 apply (f_equal (λ l, comp_list l l2)) in Hill.
 rewrite comp_1_l in Hill; [ | now rewrite Hll; destruct Hpl2 ].
 rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy ]. 2: {
-  apply length_bsort_rank.
+  apply bsort_rank_length.
 }
 rewrite permut_comp_bsort_rank_l in Hill; [ | easy ].
 now rewrite comp_1_r in Hill.
@@ -1345,7 +1345,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   assert (Hσν : ν ° σ = μ). {
     rewrite Hν.
     assert (H : length (bsort_rank Nat.leb σ) = n). {
-      rewrite length_bsort_rank; apply Hσ.
+      rewrite bsort_rank_length; apply Hσ.
     }
     rewrite <- (permut_comp_assoc _ H Hσ); clear H.
     rewrite permut_comp_bsort_rank_l; [ | now destruct Hσ ].
@@ -1358,7 +1358,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
       (ε (μ ° bsort_rank Nat.leb σ) * ε σ)%F. 2: {
     destruct Hσ.
     rewrite <- sign_comp; [ easy | easy | ].
-    now rewrite comp_length, length_bsort_rank.
+    now rewrite comp_length, bsort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
   rewrite ε_square; [ | now destruct Hif | now destruct Hσ ].
@@ -1423,7 +1423,7 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold "°".
       unfold ff_app.
       rewrite (List_map_nth' 0). 2: {
-        rewrite length_bsort_rank.
+        rewrite bsort_rank_length.
         destruct Hσ as (H1, H2); rewrite H2.
         flia Hi.
       }
@@ -1445,7 +1445,7 @@ split. {
   split. {
     unfold "°"; cbn.
     rewrite map_length.
-    rewrite length_bsort_rank.
+    rewrite bsort_rank_length.
     now destruct Hσ.
   } {
     apply (comp_is_permut_list n). {
@@ -1531,7 +1531,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   assert (Hσν : ν ° μ = σ). {
     rewrite Hν.
     assert (H : length (bsort_rank Nat.leb μ) = n). {
-      rewrite length_bsort_rank.
+      rewrite bsort_rank_length.
       apply Hpμ.
     }
     rewrite <- (permut_comp_assoc _ H); clear H; [ | apply Hpμ ].
@@ -1545,7 +1545,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
       (ε (σ ° bsort_rank Nat.leb μ) * ε μ)%F. 2: {
     destruct Hif.
     rewrite <- sign_comp; [ easy | easy | ].
-    rewrite comp_length, length_bsort_rank.
+    rewrite comp_length, bsort_rank_length.
     now destruct Hpμ.
   }
   destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
@@ -1625,7 +1625,7 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold "°".
       unfold ff_app.
       rewrite (List_map_nth' 0). 2: {
-        rewrite length_bsort_rank.
+        rewrite bsort_rank_length.
         rewrite length_canon_sym_gr_list.
         flia Hi.
       }
@@ -1647,7 +1647,7 @@ split. {
   split. {
     unfold "°"; cbn.
     rewrite map_length.
-    rewrite length_bsort_rank.
+    rewrite bsort_rank_length.
     apply length_canon_sym_gr_list.
   } {
     apply (comp_is_permut_list n); [ easy | ].
@@ -1676,7 +1676,7 @@ split. {
         apply permut_list_ub; [ | easy ].
         apply bsort_rank_is_permut_list.
       }
-      rewrite length_bsort_rank.
+      rewrite bsort_rank_length.
       rewrite length_canon_sym_gr_list.
       now destruct Hσ as (_, Hσl); rewrite Hσl.
     }
@@ -1693,7 +1693,7 @@ split. {
         apply permut_list_ub; [ | easy ].
         apply bsort_rank_is_permut_list.
       }
-      rewrite length_bsort_rank.
+      rewrite bsort_rank_length.
       rewrite length_canon_sym_gr_list.
       now destruct Hσ as (_, Hσl); rewrite Hσl.
     }
@@ -1719,11 +1719,11 @@ split. {
   rewrite (permut_bsort_rank_comp n); [ | | | easy ]; cycle 1. {
     apply NoDup_bsort_rank.
   } {
-    rewrite length_bsort_rank.
+    rewrite bsort_rank_length.
     now destruct Hl.
   }
   rewrite (permut_comp_assoc n); cycle 1. {
-    rewrite length_bsort_rank.
+    rewrite bsort_rank_length.
     now destruct Hσ.
   } {
     do 2 apply bsort_rank_is_permut.
@@ -1733,7 +1733,7 @@ split. {
   rewrite comp_1_l. 2: {
     intros i Hi.
     apply in_bsort_rank_lt in Hi.
-    rewrite length_bsort_rank in Hi.
+    rewrite bsort_rank_length in Hi.
     destruct Hσ, Hl; congruence.
   }
   rewrite permut_bsort_rank_involutive; [ | now destruct Hl ].
