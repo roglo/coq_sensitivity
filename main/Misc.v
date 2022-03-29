@@ -2852,6 +2852,7 @@ Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
   → sorted ord ls = true
   → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
 Proof.
+(*
 intros * Htot Hit Hs.
 revert ls l Hit Hs.
 induction it; intros; cbn. {
@@ -2889,19 +2890,101 @@ destruct l as [| a]. {
   symmetry in Hle.
   destruct le as (e, le).
 ...
+*)
 intros * Htot Hit Hs; subst it.
 (**)
 Compute (
   let ls := [4;5;6] in
   let l := [1;2;3] in
   let ord := Nat.leb in
-  bsort_loop ord ls l = ssort_loop ord (length l) (ls ++ l)
+  bsort_loop ord ls l = ssort_loop ord (length (ls ++ l)) (ls ++ l)
 ).
 (**)
 revert ls Hs.
 induction l as [| a]; intros. {
   cbn; rewrite app_nil_r.
 Search ssort_loop.
+Print ssort_loop.
+Theorem ssorted_loop_sorted : ∀ A ord it (l : list A),
+  length l ≤ it
+  → sorted ord l = true
+  → ssort_loop ord it l = l.
+Proof.
+intros * Hit Hs.
+revert l Hit Hs.
+induction it; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+destruct l as [| a]; [ easy | cbn ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (select_first ord a l) as la' eqn:Hla'.
+symmetry in Hla'.
+destruct la' as (a', la').
+Theorem select_first_sorted : ∀ A ord (a b : A) la lb,
+  sorted ord (a :: la) = true
+  → select_first ord a la = (b, lb)
+  → a = b.
+Proof.
+intros * Hs Hss.
+revert a b lb Hs Hss.
+induction la as [| c]; intros. {
+  cbn in Hss.
+  now injection Hss; intros; subst b.
+}
+remember (c :: la) as l; cbn in Hs; subst l.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (H1, H2).
+cbn in Hss.
+rewrite H1 in Hss.
+remember (select_first ord a la) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as (d, ld).
+injection Hss; clear Hss; intros; subst d lb.
+rename ld into lb.
+Search sorted.
+...
+assert (Hab : a = b). {
+  specialize ssort_loop_cons as H3.
+  specialize (H3 _ ord (length (c :: la))).
+  specialize (H3 a b la lb).
+  assert (H : length la ≤ length (c :: la)) by now cbn; flia.
+  specialize (H3 H); clear H.
+  specialize (H3 Hld).
+  cbn in H3.
+  rewrite Hld in H3.
+  injection H3; clear H3; intros H3.
+...
+specialize (IHla _ b ld H2) as H3.
+apply IHla in Hld. 2: {
+...
+apply select_first_sorted in Hla'; [ | easy ].
+destruct Hla'; subst a' la'.
+f_equal.
+apply IHit; [ easy | ].
+Search (sorted _ (_ :: _)).
+apply sorted_cons in Hs.
+...
+
+Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
+  sorted ord l = true
+  → ssort_loop ord (length l) l = l.
+Proof.
+intros * Hs.
+induction l as [| a]; [ easy | cbn ].
+remember (select_first ord a l) as la' eqn:Hla'.
+symmetry in Hla'.
+destruct la' as (a', la').
+specialize ssort_loop_cons as H1.
+specialize (H1 _ ord (length l) a a' l la' (le_refl _) Hla').
+rewrite <- H1; clear H1.
+destruct l as [| b]; [ easy | ].
+cbn in Hla' |-*.
+remember (if ord a b then a else b) as x eqn:Hx.
+symmetry in Hx.
+remember (select_first ord x l) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+injection Hla'; clear Hla'; intros; subst a' la'.
 ...
 induction l as [| a]; intros; [ now rewrite app_nil_r | ].
 cbn; rewrite IHl; [ | now apply bsort_insert_is_sorted ].
