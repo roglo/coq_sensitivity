@@ -2845,6 +2845,38 @@ destruct l as [| a la]; [ easy | exfalso ].
 now destruct (select_first ord a la).
 Qed.
 
+Theorem select_first_sorted : ∀ A ord,
+  transitive ord → ∀ (a b : A) la lb,
+  sorted ord (a :: la) = true
+  → select_first ord a la = (b, lb)
+  → a = b.
+Proof.
+intros * Htr * Hs Hss.
+revert a b lb Hs Hss.
+induction la as [| c]; intros. {
+  cbn in Hss.
+  now injection Hss; intros; subst b.
+}
+remember (c :: la) as l; cbn in Hs; subst l.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (H1, H2).
+cbn in Hss.
+rewrite H1 in Hss.
+remember (select_first ord a la) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as (d, ld).
+injection Hss; clear Hss; intros; subst d lb.
+rename ld into lb.
+apply IHla with (lb := lb); [ | easy ].
+cbn in H2 |-*.
+destruct la as [| d]; [ easy | ].
+apply Bool.andb_true_iff in H2.
+apply Bool.andb_true_iff.
+destruct H2 as (H2, H3).
+split; [ | easy ].
+now apply Htr with (b := c).
+Qed.
+
 (* to be completed
 Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
   total_order ord
@@ -2905,12 +2937,14 @@ induction l as [| a]; intros. {
   cbn; rewrite app_nil_r.
 Search ssort_loop.
 Print ssort_loop.
-Theorem ssorted_loop_sorted : ∀ A ord it (l : list A),
+Theorem ssorted_loop_sorted : ∀ A ord,
+  transitive ord →
+  ∀ it (l : list A),
   length l ≤ it
   → sorted ord l = true
   → ssort_loop ord it l = l.
 Proof.
-intros * Hit Hs.
+intros * Htr * Hit Hs.
 revert l Hit Hs.
 induction it; intros. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
@@ -2920,30 +2954,18 @@ cbn in Hit; apply Nat.succ_le_mono in Hit.
 remember (select_first ord a l) as la' eqn:Hla'.
 symmetry in Hla'.
 destruct la' as (a', la').
-Theorem select_first_sorted : ∀ A ord (a b : A) la lb,
-  sorted ord (a :: la) = true
-  → select_first ord a la = (b, lb)
-  → a = b.
-Proof.
-intros * Hs Hss.
-revert a b lb Hs Hss.
-induction la as [| c]; intros. {
-  cbn in Hss.
-  now injection Hss; intros; subst b.
+assert (Hab : a = a'). {
+  now apply select_first_sorted in Hla'.
 }
-remember (c :: la) as l; cbn in Hs; subst l.
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (H1, H2).
-cbn in Hss.
-rewrite H1 in Hss.
-remember (select_first ord a la) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as (d, ld).
-injection Hss; clear Hss; intros; subst d lb.
-rename ld into lb.
-Search sorted.
+subst a'; f_equal.
+specialize (IHit l Hit) as H1.
+assert (H : sorted ord l = true). {
+  cbn in Hs.
+  destruct l as [| b]; [ easy | ].
+  now apply Bool.andb_true_iff in Hs.
+}
+specialize (H1 H); clear H.
 ...
-assert (Hab : a = b). {
   specialize ssort_loop_cons as H3.
   specialize (H3 _ ord (length (c :: la))).
   specialize (H3 a b la lb).
