@@ -2923,59 +2923,18 @@ Theorem bsort_loop_ssort_loop : ∀ A ord,
   → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
 Proof.
 intros * Htr Htot * Hit Hs.
-(*
-revert ls l Hit Hs.
-induction it; intros; cbn. {
-  symmetry in Hit.
-  apply length_zero_iff_nil in Hit.
-  apply app_eq_nil in Hit.
-  now destruct Hit; subst ls l.
-}
-destruct l as [| a]. {
-  cbn; rewrite app_nil_r in Hit |-*.
-  destruct ls as [| s]; [ easy | ].
-  cbn in Hit.
-  apply Nat.succ_inj in Hit.
-  remember (select_first ord s ls) as la' eqn:Hla'.
-  symmetry in Hla'.
-  destruct la' as (a', la').
-  cbn in Hs.
-  destruct ls as [| b]. {
-    cbn in Hla'.
-    injection Hla'; clear Hla'; intros; subst a' la'; cbn.
-    now subst it.
-  }
-  cbn in Hla'.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hs, Hbs).
-  rewrite Hs in Hla'.
-  remember (select_first ord s ls) as d eqn:Hd.
-  symmetry in Hd.
-  destruct d as (d, ld).
-  injection Hla'; clear Hla'; intros; subst d la'.
-  enough (H : ∀ x, x ∈ s :: ls → ord a' x = true).
-...
-  rewrite Hit; cbn.
-  remember (select_first ord b ld) as le eqn:Hle.
-  symmetry in Hle.
-  destruct le as (e, le).
-...
-*)
 subst it.
-(*
-Compute (
-  let ls := [4;5;6] in
-  let l := [1;2;3] in
-  let ord := Nat.leb in
-  bsort_loop ord ls l = ssort_loop ord (length (ls ++ l)) (ls ++ l)
-).
-*)
 revert ls Hs.
 induction l as [| a]; intros. {
   cbn; rewrite app_nil_r.
-  enough (H : ssort ord ls = ls) by easy.
-  now apply sorted_ssort.
+  now symmetry; apply sorted_ssort.
 }
+cbn.
+rewrite IHl; [ | now apply bsort_insert_is_sorted ].
+do 2 rewrite app_length.
+rewrite bsort_insert_length.
+rewrite List_length_cons, <- Nat.add_succ_comm.
+clear IHl.
 ...
 
 Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
