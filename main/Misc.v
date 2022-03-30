@@ -2849,13 +2849,13 @@ Theorem select_first_sorted : ∀ A ord,
   transitive ord → ∀ (a b : A) la lb,
   sorted ord (a :: la) = true
   → select_first ord a la = (b, lb)
-  → a = b.
+  → a = b ∧ la = lb.
 Proof.
 intros * Htr * Hs Hss.
 revert a b lb Hs Hss.
 induction la as [| c]; intros. {
   cbn in Hss.
-  now injection Hss; intros; subst b.
+  now injection Hss; intros.
 }
 remember (c :: la) as l; cbn in Hs; subst l.
 apply Bool.andb_true_iff in Hs.
@@ -2867,7 +2867,10 @@ symmetry in Hld.
 destruct ld as (d, ld).
 injection Hss; clear Hss; intros; subst d lb.
 rename ld into lb.
-apply IHla with (lb := lb); [ | easy ].
+enough (H : a = b ∧ la = lb). {
+  split; [ easy | now f_equal ].
+}
+apply IHla; [ | easy ].
 cbn in H2 |-*.
 destruct la as [| d]; [ easy | ].
 apply Bool.andb_true_iff in H2.
@@ -2877,15 +2880,50 @@ split; [ | easy ].
 now apply Htr with (b := c).
 Qed.
 
+Theorem sorted_ssort_loop : ∀ A (ord : A → _),
+  transitive ord →
+  ∀ it l,
+  length l ≤ it
+  → sorted ord l = true
+  → ssort_loop ord it l = l.
+Proof.
+intros * Htr * Hit Hs.
+revert l Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct l as [| a la]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (select_first ord a la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as (b, lb).
+specialize (select_first_sorted Htr _ _ Hs Hlb) as H1.
+destruct H1; subst b lb.
+f_equal.
+apply IHit; [ easy | ].
+cbn in Hs.
+destruct la as [| b]; [ easy | ].
+now apply Bool.andb_true_iff in Hs.
+Qed.
+
+Theorem sorted_ssort : ∀ A (ord : A → _),
+  transitive ord → ∀ l,
+  sorted ord l = true
+  → ssort ord l = l.
+Proof.
+intros * Htr * Hs.
+unfold ssort.
+now apply sorted_ssort_loop.
+Qed.
+
 (* to be completed
-Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
-  total_order ord
-  → it = length (ls ++ l)
+Theorem bsort_loop_ssort_loop : ∀ A ord,
+  transitive ord →
+  total_order ord → ∀ (ls l : list A) it,
+  it = length (ls ++ l)
   → sorted ord ls = true
   → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
 Proof.
+intros * Htr Htot * Hit Hs.
 (*
-intros * Htot Hit Hs.
 revert ls l Hit Hs.
 induction it; intros; cbn. {
   symmetry in Hit.
@@ -2923,171 +2961,21 @@ destruct l as [| a]. {
   destruct le as (e, le).
 ...
 *)
-intros * Htot Hit Hs; subst it.
-(**)
+subst it.
+(*
 Compute (
   let ls := [4;5;6] in
   let l := [1;2;3] in
   let ord := Nat.leb in
   bsort_loop ord ls l = ssort_loop ord (length (ls ++ l)) (ls ++ l)
 ).
-(**)
+*)
 revert ls Hs.
 induction l as [| a]; intros. {
   cbn; rewrite app_nil_r.
-Search ssort_loop.
-Print ssort_loop.
-Theorem ssorted_loop_sorted : ∀ A ord,
-  transitive ord →
-  ∀ it (l : list A),
-  length l ≤ it
-  → sorted ord l = true
-  → ssort_loop ord it l = l.
-Proof.
-intros * Htr * Hit Hs.
-revert l Hit Hs.
-induction it; intros. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  enough (H : ssort ord ls = ls) by easy.
+  now apply sorted_ssort.
 }
-destruct l as [| a]; [ easy | cbn ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-remember (select_first ord a l) as la' eqn:Hla'.
-symmetry in Hla'.
-destruct la' as (a', la').
-assert (Hab : a = a'). {
-  now apply select_first_sorted in Hla'.
-}
-subst a'; f_equal.
-specialize (IHit l Hit) as H1.
-assert (H : sorted ord l = true). {
-  cbn in Hs.
-  destruct l as [| b]; [ easy | ].
-  now apply Bool.andb_true_iff in Hs.
-}
-specialize (H1 H); clear H.
-clear - Hit Hla' H1.
-(**)
-rewrite <- H1; clear H1.
-revert a l la' Hit Hla'.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
-  cbn in Hla'.
-  now injection Hla'; clear Hla'; intros; subst la'.
-}
-destruct l as [| b]. {
-  cbn in Hla'.
-  now injection Hla'; clear Hla'; intros; subst la'.
-}
-destruct la' as [| c]. {
-  exfalso.
-  cbn in Hla'.
-  remember (if ord a b then a else b) as x eqn:Hx.
-  symmetry in Hx.
-  remember (select_first ord x l) as lc eqn:Hlc.
-  symmetry in Hlc.
-  now destruct lc.
-}
-cbn in Hla'.
-remember (if ord a b then a else b) as x eqn:Hx.
-symmetry in Hx.
-remember (select_first ord x l) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as (d, ld).
-injection Hla'; clear Hla'; intros H1 H2 H3; subst d c ld.
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-remember (ord a b) as y eqn:Hy.
-symmetry in Hy.
-destruct y; subst x. 2: {
-  rewrite Hlc.
-  remember (select_first ord a la') as ld eqn:Hld.
-  symmetry in Hld.
-  destruct ld as (d, ld).
-  specialize ssort_loop_cons as H1.
-  specialize (H1 _ ord it _ _ _ _ Hit Hlc).
-  specialize ssort_loop_cons as H2.
-  enough (Hit' : length la' ≤ it).
-  specialize (H2 _ ord it _ _ _ _ Hit' Hld).
-...
-  rewrite <- H1, <- H2.
-  destruct it; cbn. {
-    apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
-    apply Nat.le_0_r, length_zero_iff_nil in Hit'; subst la'.
-    easy.
-  }
-...
-  specialize (IHit b l la' Hit Hlc) as H1.
-...
-revert a l la' Hit Hla' H1.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
-  cbn in Hla'.
-  now injection Hla'; clear Hla'; intros; subst la'.
-}
-cbn in H1.
-destruct l as [| b]. {
-  cbn in Hla'.
-  now injection Hla'; clear Hla'; intros; subst la'.
-}
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-remember (select_first ord b l) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as (c, lc).
-injection H1; clear H1; intros; subst c l.
-(*
-cbn in Hla'.
-remember (if ord a b then a else b) as x eqn:Hx.
-symmetry in Hx.
-*)
-destruct la' as [| d]. {
-  cbn in Hla'.
-  remember (if ord a b then a else b) as x eqn:Hx.
-  now destruct (select_first ord x (ssort_loop ord it lc)).
-}
-(**)
-remember (select_first ord d la') as le eqn:Hle.
-symmetry in Hle.
-destruct le as (e, le).
-cbn in Hla'.
-...
-remember (ord a b) as y eqn:Hy; symmetry in Hy.
-destruct y; subst x. 2: {
-  rewrite Hlc in Hla'.
-  injection Hla'; clear Hla'; intros H1 H2 H3.
-  subst d b la'.
-  admit. (* ajouter reflexivité *)
-}
-Print ssort_loop.
-...
-remember (select_first ord a (ssort_loop ord it lc)) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as (e, le).
-injection Hla'; clear Hla'; intros H1 H2 H3.
-subst d e le.
-remember (select_first ord b la') as le eqn:Hle.
-symmetry in Hle.
-destruct le as (e, le).
-specialize (IHit _ _ _ Hit Hld) as H1.
-(* ouais, bon, là, je pars en couille, là *)
-...
-  specialize ssort_loop_cons as H3.
-  specialize (H3 _ ord (length (c :: la))).
-  specialize (H3 a b la lb).
-  assert (H : length la ≤ length (c :: la)) by now cbn; flia.
-  specialize (H3 H); clear H.
-  specialize (H3 Hld).
-  cbn in H3.
-  rewrite Hld in H3.
-  injection H3; clear H3; intros H3.
-...
-specialize (IHla _ b ld H2) as H3.
-apply IHla in Hld. 2: {
-...
-apply select_first_sorted in Hla'; [ | easy ].
-destruct Hla'; subst a' la'.
-f_equal.
-apply IHit; [ easy | ].
-Search (sorted _ (_ :: _)).
-apply sorted_cons in Hs.
 ...
 
 Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
