@@ -2919,7 +2919,6 @@ Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
 Proof.
-(*
 intros * Hab.
 remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
 remember (select_first ord a lb) as ld eqn:Hld; symmetry in Hld.
@@ -2928,7 +2927,6 @@ destruct ld as (d, ld).
 move c before a; move d before c.
 move ld before lc.
 ...
-*)
 (*
 intros * Hab.
 revert a.
