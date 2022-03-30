@@ -2914,6 +2914,82 @@ unfold ssort.
 now apply sorted_ssort_loop.
 Qed.
 
+Theorem select_first_if : ∀ A (ord : A → _),
+  reflexive ord →
+  transitive ord →
+  total_order ord →
+  ∀ a b la lb,
+  select_first ord a la = (b, lb)
+  → (∀ c, c ∈ a :: la → ord b c = true) ∧
+    (∀ c, c ∈ lb → ord b c = true) ∧
+    Permutation (a :: la) (b :: lb).
+Proof.
+intros * Hrefl Htr Htot * Hab.
+revert a b lb Hab.
+induction la as [| c]; intros. {
+  cbn in Hab.
+  injection Hab; clear Hab; intros; subst b lb.
+  split; [ | easy ].
+  intros c Hc.
+  destruct Hc as [Hc| Hc]; [ | easy ].
+  subst c; apply Hrefl.
+}
+cbn in Hab.
+remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
+remember (select_first ord x la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+injection Hab; clear Hab; intros; subst d lb.
+move c after b; move x before c.
+move ld before la.
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+specialize (IHla x b ld Hld) as H1.
+destruct H1 as (H1 & H2 & H3).
+split. {
+  intros d Hd.
+  destruct Hd as [Hd| [Hd| Hd]]. {
+    subst d.
+    destruct ac; subst x. {
+      now specialize (H1 a (or_introl eq_refl)).
+    }
+    specialize (H1 c (or_introl eq_refl)) as H4.
+    apply Htr with (b := c); [ easy | ].
+    specialize (Htot a c) as H5.
+    now rewrite Hac in H5; cbn in H5.
+  } {
+    subst d.
+    destruct ac; subst x; [ | now apply H1; left ].
+    apply Htr with (b := a); [ | easy ].
+    now apply H1; left.
+  } {
+    now apply H1; right.
+  }
+}
+split. {
+  intros d Hd.
+  destruct ac; subst x. {
+    destruct Hd as [Hd| Hd]; [ | now apply H2 ].
+    subst d.
+    apply Htr with (b := a); [ | easy ].
+    now apply H1; left.
+  } {
+    destruct Hd as [Hd| Hd]; [ | now apply H2 ].
+    subst d.
+    apply Htr with (b := c); [ now apply H1; left | ].
+    specialize (Htot a c) as H5.
+    now rewrite Hac in H5.
+  }
+}
+destruct ac; subst x. {
+  etransitivity; [ apply perm_swap | symmetry ].
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+} {
+  symmetry.
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+}
+Qed.
+
 (* to be completed
 Theorem select_first_iff : ∀ A (ord : A → _),
   reflexive ord →
@@ -2926,40 +3002,24 @@ Theorem select_first_iff : ∀ A (ord : A → _),
     Permutation (a :: la) (b :: lb).
 Proof.
 intros * Hrefl Htr Htot *.
-split. {
-  intros Hab.
-  revert a b lb Hab.
-  induction la as [| c]; intros. {
-    cbn in Hab.
-    injection Hab; clear Hab; intros; subst b lb.
-    split; [ | easy ].
-    intros c Hc.
-    destruct Hc as [Hc| Hc]; [ | easy ].
-    subst c; apply Hrefl.
-  }
-  cbn in Hab.
-  remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
-  remember (select_first ord x la) as ld eqn:Hld; symmetry in Hld.
-  destruct ld as (d, ld).
-  injection Hab; clear Hab; intros; subst d lb.
-  move c after b; move x before c.
-  move ld before la.
-  split. {
-    intros d Hd.
-    destruct Hd as [Hd| [Hd| Hd]]. {
-      subst d.
-      specialize (IHla x b ld Hld) as H1.
-      destruct H1 as (H1 & H2 & H3).
-      remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-      destruct ac; subst x. {
-        now specialize (H1 a (or_introl eq_refl)).
-      }
-      specialize (H1 c (or_introl eq_refl)) as H4.
-      apply Htr with (b := c); [ easy | ].
-      specialize (Htot a c) as H5.
-      now rewrite Hac in H5; cbn in H5.
-    } {
-      subst d.
+split; [ now apply select_first_if | ].
+intros (H1 & H2 & H3).
+revert a b lb H1 H2 H3.
+induction la as [| c]; intros; cbn. {
+  apply Permutation_length_1_inv in H3.
+  now injection H3; clear H3; intros; subst b lb.
+}
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+remember (select_first ord (if ac then a else c) la) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as (d, ld).
+specialize (H1 a (or_introl eq_refl)) as Hba.
+specialize (H1 c (or_intror (or_introl eq_refl))) as Hbc.
+specialize (select_first_if Hrefl Htr Htot _ _ Hld) as H4.
+destruct H4 as (H4 & H5 & H6).
+destruct ac. {
+  inversion H3. {
+    subst.
 ...
 
 Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
