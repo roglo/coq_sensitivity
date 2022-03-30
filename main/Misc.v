@@ -2877,7 +2877,7 @@ split; [ | easy ].
 now apply Htr with (b := c).
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem bsort_loop_ssort_loop : ∀ A ord (ls l : list A) it,
   total_order ord
   → it = length (ls ++ l)
@@ -2966,6 +2966,57 @@ assert (H : sorted ord l = true). {
 }
 specialize (H1 H); clear H.
 clear - Hit Hla' H1.
+(**)
+rewrite <- H1; clear H1.
+revert a l la' Hit Hla'.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  cbn in Hla'.
+  now injection Hla'; clear Hla'; intros; subst la'.
+}
+destruct l as [| b]. {
+  cbn in Hla'.
+  now injection Hla'; clear Hla'; intros; subst la'.
+}
+destruct la' as [| c]. {
+  exfalso.
+  cbn in Hla'.
+  remember (if ord a b then a else b) as x eqn:Hx.
+  symmetry in Hx.
+  remember (select_first ord x l) as lc eqn:Hlc.
+  symmetry in Hlc.
+  now destruct lc.
+}
+cbn in Hla'.
+remember (if ord a b then a else b) as x eqn:Hx.
+symmetry in Hx.
+remember (select_first ord x l) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (d, ld).
+injection Hla'; clear Hla'; intros H1 H2 H3; subst d c ld.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (ord a b) as y eqn:Hy.
+symmetry in Hy.
+destruct y; subst x. 2: {
+  rewrite Hlc.
+  remember (select_first ord a la') as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as (d, ld).
+  specialize ssort_loop_cons as H1.
+  specialize (H1 _ ord it _ _ _ _ Hit Hlc).
+  specialize ssort_loop_cons as H2.
+  enough (Hit' : length la' ≤ it).
+  specialize (H2 _ ord it _ _ _ _ Hit' Hld).
+...
+  rewrite <- H1, <- H2.
+  destruct it; cbn. {
+    apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+    apply Nat.le_0_r, length_zero_iff_nil in Hit'; subst la'.
+    easy.
+  }
+...
+  specialize (IHit b l la' Hit Hlc) as H1.
+...
 revert a l la' Hit Hla' H1.
 induction it; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
