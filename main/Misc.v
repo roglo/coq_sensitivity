@@ -2915,6 +2915,32 @@ now apply sorted_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
+  Permutation la lb
+  → select_first ord a la = select_first ord a lb.
+Proof.
+intros * Hab.
+revert a lb Hab.
+induction la as [| c]; intros; cbn. {
+  now apply Permutation_nil in Hab; subst lb.
+}
+destruct lb as [| d]. {
+  now apply Permutation_sym, Permutation_nil in Hab.
+}
+cbn.
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+remember (ord a d) as ad eqn:Had; symmetry in Had.
+move ad before ac.
+remember (select_first ord (if ac then a else c) la) as x eqn:Hx.
+remember (select_first ord (if ad then a else d) lb) as y eqn:Hy.
+symmetry in Hx, Hy.
+destruct x as (a', la').
+destruct y as (b', lb').
+move b' before a'; move lb' before la'.
+apply ssort_loop_cons with (it := length la) in Hx; [ | easy ].
+apply ssort_loop_cons with (it := length lb) in Hy; [ | easy ].
+...
+
 Theorem Permutation_ssort_loop : ∀ A (ord : A → _) it la lb,
   length la = length lb
   → length la ≤ it
@@ -2935,6 +2961,32 @@ destruct la as [| a]. {
 destruct lb as [| b]; [ easy | ].
 cbn in Hlab; apply Nat.succ_inj in Hlab.
 cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (select_first ord a la) as la' eqn:Hla'.
+symmetry in Hla'.
+destruct la' as (a', la').
+remember (select_first ord b lb) as lb' eqn:Hlb'.
+symmetry in Hlb'.
+destruct lb' as (b', lb').
+move b' before a'; move lb' before la'.
+inversion Hab; subst. {
+  rename H0 into Hpab.
+...
+  specialize (Permutation_select_first ord b Hpab) as H1.
+  rewrite H1, Hlb' in Hla'.
+  now injection Hla'; intros; subst b' lb'.
+}
+...
+  apply ssort_loop_cons with (it := it) in Hla'; [ | flia Hit ].
+  apply ssort_loop_cons with (it := it) in Hlb'; [ | flia Hlab Hit ].
+  rewrite <- Hla', <- Hlb'.
+  destruct it. {
+    cbn; f_equal.
+...
+  destruct la as [| a]. {
+    now apply Permutation_nil in Hpab; subst lb.
+  }
+  apply IHit.
+  apply IHit.
 ...
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
