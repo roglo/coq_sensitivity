@@ -2915,6 +2915,28 @@ now apply sorted_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem Permutation_ssort_loop : ∀ A (ord : A → _) it la lb,
+  length la = length lb
+  → length la ≤ it
+  → Permutation la lb
+  → ssort_loop ord it la = ssort_loop ord it lb.
+Proof.
+intros * Hlab Hit Hab.
+revert la lb Hlab Hit Hab.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
+  symmetry in Hlab.
+  now apply length_zero_iff_nil in Hlab; subst lb.
+}
+destruct la as [| a]. {
+  symmetry in Hlab.
+  now apply length_zero_iff_nil in Hlab; subst lb.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab; apply Nat.succ_inj in Hlab.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+...
+
 Theorem bsort_loop_ssort_loop : ∀ A ord,
   transitive ord →
   total_order ord → ∀ (ls l : list A) it,
@@ -2935,6 +2957,24 @@ do 2 rewrite app_length.
 rewrite bsort_insert_length.
 rewrite List_length_cons, <- Nat.add_succ_comm.
 clear IHl.
+...
+apply Permutation_ssort_loop. {
+  do 2 rewrite app_length.
+  rewrite bsort_insert_length.
+  now rewrite Nat.add_succ_comm.
+} {
+  now rewrite app_length, bsort_insert_length.
+}
+apply Permutation_sym.
+transitivity (a :: ls ++ l). 2: {
+  rewrite app_comm_cons.
+  apply Permutation_app; [ | easy ].
+  now apply Permutation_cons_bsort_insert.
+}
+rewrite app_comm_cons.
+rewrite List_app_cons, app_assoc.
+apply Permutation_app; [ | easy ].
+apply Permutation_app_comm.
 ...
 
 Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
