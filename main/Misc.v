@@ -2919,6 +2919,74 @@ Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
 Proof.
+(*
+intros * Hab.
+remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
+remember (select_first ord a lb) as ld eqn:Hld; symmetry in Hld.
+destruct lc as (c, lc).
+destruct ld as (d, ld).
+move c before a; move d before c.
+move ld before lc.
+...
+*)
+(*
+intros * Hab.
+revert a.
+induction Hab; intros; [ easy | | | ]. {
+  rename l into la.
+  rename l' into lb.
+  rename x into b.
+  cbn.
+  remember (if ord a b then a else b) as x eqn:Hx.
+  remember (select_first ord x la) as lc eqn:Hlc.
+  remember (select_first ord x lb) as ld eqn:Hld.
+  symmetry in Hx, Hlc, Hld.
+  destruct lc as (c, lc).
+  destruct ld as (d, ld).
+  move d before c; move ld before lc.
+  enough (H : (c, lc) = (d, ld)). {
+    now injection H; clear H; intros; subst d ld.
+  }
+  now rewrite IHHab, Hld in Hlc.
+} {
+  remember (x :: l) as xl eqn:Hxl.
+  remember (y :: l) as yl eqn:Hyl.
+  cbn; subst.
+  remember (if ord a x then a else x) as u eqn:Hu.
+  remember (if ord a y then a else y) as v eqn:Hv.
+  symmetry in Hu, Hv.
+  move v before u.
+  remember (select_first ord u (y :: l)) as ld eqn:Hld.
+  remember (select_first ord v (x :: l)) as le eqn:Hle.
+  destruct ld as (d, ld).
+  destruct le as (e, le).
+  move d before a; move e before d.
+  move le before ld.
+  symmetry in Hld, Hle.
+  remember (ord a x) as ax eqn:Hax; symmetry in Hax.
+  remember (ord a y) as ay eqn:Hay; symmetry in Hay.
+  move ay before ax; move Hv before Hu.
+  move Hay before Hax.
+  destruct ax; subst u. {
+    destruct ay; subst v. {
+      cbn in Hld, Hle.
+      rewrite Hax in Hle.
+      rewrite Hay in Hld.
+      remember (select_first ord a l) as lb eqn:Hlb.
+      symmetry in Hlb.
+      destruct lb as (b, lb).
+      injection Hld; clear Hld; intros; subst d ld.
+      injection Hle; clear Hle; intros; subst e le.
+      enough (H : x = y) by now subst y.
+...
+Theorem glop :
+  select_first ord a la = select_first ord b lb
+  → Permutation (a :: la) (b :: lb)
+...
+  remember (ord a b) as x eqn:Hx; symmetry in Hx.
+  remember (if x then a else b)
+...
+*)
 intros * Hab.
 revert a lb Hab.
 induction la as [| c]; intros; cbn. {
@@ -2939,6 +3007,8 @@ destruct y as (b', lb').
 move b' before a'; move lb' before la'.
 apply ssort_loop_cons with (it := length la) in Hx; [ | easy ].
 apply ssort_loop_cons with (it := length lb) in Hy; [ | easy ].
+destruct ac. {
+  destruct ad. {
 ...
 
 Theorem Permutation_ssort_loop : ∀ A (ord : A → _) it la lb,
