@@ -2915,6 +2915,53 @@ now apply sorted_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem select_first_iff : ∀ A (ord : A → _),
+  reflexive ord →
+  transitive ord →
+  total_order ord →
+  ∀ a b la lb,
+  select_first ord a la = (b, lb)
+  ↔ (∀ c, c ∈ a :: la → ord b c = true) ∧
+    (∀ c, c ∈ lb → ord b c = true) ∧
+    Permutation (a :: la) (b :: lb).
+Proof.
+intros * Hrefl Htr Htot *.
+split. {
+  intros Hab.
+  revert a b lb Hab.
+  induction la as [| c]; intros. {
+    cbn in Hab.
+    injection Hab; clear Hab; intros; subst b lb.
+    split; [ | easy ].
+    intros c Hc.
+    destruct Hc as [Hc| Hc]; [ | easy ].
+    subst c; apply Hrefl.
+  }
+  cbn in Hab.
+  remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
+  remember (select_first ord x la) as ld eqn:Hld; symmetry in Hld.
+  destruct ld as (d, ld).
+  injection Hab; clear Hab; intros; subst d lb.
+  move c after b; move x before c.
+  move ld before la.
+  split. {
+    intros d Hd.
+    destruct Hd as [Hd| [Hd| Hd]]. {
+      subst d.
+      specialize (IHla x b ld Hld) as H1.
+      destruct H1 as (H1 & H2 & H3).
+      remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+      destruct ac; subst x. {
+        now specialize (H1 a (or_introl eq_refl)).
+      }
+      specialize (H1 c (or_introl eq_refl)) as H4.
+      apply Htr with (b := c); [ easy | ].
+      specialize (Htot a c) as H5.
+      now rewrite Hac in H5; cbn in H5.
+    } {
+      subst d.
+...
+
 Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
