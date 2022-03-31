@@ -2991,18 +2991,27 @@ destruct ac; subst x. {
 Qed.
 
 (* to be completed
-Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
+Theorem Permutation_select_first : ∀ A (ord : A → _),
+  reflexive ord →
+  transitive ord →
+  total_order ord →
+  ∀ a la lb,
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
 Proof.
-intros * Hab.
+intros * Hrefl Htr Htot * Hab.
 remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
 remember (select_first ord a lb) as ld eqn:Hld; symmetry in Hld.
 destruct lc as (c, lc).
 destruct ld as (d, ld).
 move c before a; move d before c.
 move ld before lc.
-specialize select_first_if as H1.
+specialize (select_first_if Hrefl Htr Htot) as H1.
+specialize (H1 _ _ _ _ Hlc) as Hc1.
+destruct Hc1 as (Hc1 & Hc2 & Hc3).
+specialize (H1 _ _ _ _ Hld) as Hd1.
+destruct Hd1 as (Hd1 & Hd2 & Hd3).
+clear H1.
 ...
 (*
 intros * Hab.
