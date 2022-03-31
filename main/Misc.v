@@ -2923,17 +2923,44 @@ Theorem select_first_if : ∀ A (ord : A → _),
   select_first ord a la = (b, lb)
   → (∀ c, c ∈ a :: la → ord b c = true) ∧
     (∀ c, c ∈ lb → ord b c = true) ∧
-    Permutation (a :: la) (b :: lb).
+    (∃ l1 l2, a :: la = l1 ++ b :: l2 ∧ lb = l1 ++ l2).
 Proof.
 intros * Hrefl Htr Htot * Hab.
+Print select_first.
+Compute (
+  let ord := Nat.leb in
+  let a := 7 in
+  let la := [8;22;2;5] in
+  let b := 2 in
+  let lb := [8;22;7;5] in
+  let l1 := [7;8;22] in
+  let l2 := [5] in
+(
+  select_first ord a la
+,
+42,
+a :: la
+,
+l1 ++ b :: l2
+,
+42,
+lb
+,
+l1 ++ l2
+)
+).
+(* oui, donc, c'est faux, ça *)
+...
 revert a b lb Hab.
 induction la as [| c]; intros. {
   cbn in Hab.
   injection Hab; clear Hab; intros; subst b lb.
-  split; [ | easy ].
-  intros c Hc.
-  destruct Hc as [Hc| Hc]; [ | easy ].
-  subst c; apply Hrefl.
+  split. {
+    intros c Hc.
+    destruct Hc as [Hc| Hc]; [ | easy ].
+    subst c; apply Hrefl.
+  }
+  split; [ easy | now exists [], [] ].
 }
 cbn in Hab.
 remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
@@ -2980,7 +3007,12 @@ split. {
     now rewrite Hac in H5.
   }
 }
+destruct H3 as (l1 & l2 & Hlla & Hllb).
+subst ld.
 destruct ac; subst x. {
+  destruct l1 as [| a1]. {
+    cbn in Hlla |-*.
+...
   etransitivity; [ apply perm_swap | symmetry ].
   etransitivity; [ apply perm_swap | symmetry ].
   now apply perm_skip.
