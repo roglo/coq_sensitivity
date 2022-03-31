@@ -2914,7 +2914,6 @@ unfold ssort.
 now apply sorted_ssort_loop.
 Qed.
 
-(* to be completed
 Theorem select_first_if : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -2923,44 +2922,17 @@ Theorem select_first_if : ∀ A (ord : A → _),
   select_first ord a la = (b, lb)
   → (∀ c, c ∈ a :: la → ord b c = true) ∧
     (∀ c, c ∈ lb → ord b c = true) ∧
-    (∃ l1 l2, a :: la = l1 ++ b :: l2 ∧ lb = l1 ++ l2).
+    Permutation (a :: la) (b :: lb).
 Proof.
 intros * Hrefl Htr Htot * Hab.
-Print select_first.
-Compute (
-  let ord := Nat.leb in
-  let a := 7 in
-  let la := [8;22;2;5] in
-  let b := 2 in
-  let lb := [8;22;7;5] in
-  let l1 := [7;8;22] in
-  let l2 := [5] in
-(
-  select_first ord a la
-,
-42,
-a :: la
-,
-l1 ++ b :: l2
-,
-42,
-lb
-,
-l1 ++ l2
-)
-).
-(* oui, donc, c'est faux, ça *)
-...
 revert a b lb Hab.
 induction la as [| c]; intros. {
   cbn in Hab.
   injection Hab; clear Hab; intros; subst b lb.
-  split. {
-    intros c Hc.
-    destruct Hc as [Hc| Hc]; [ | easy ].
-    subst c; apply Hrefl.
-  }
-  split; [ easy | now exists [], [] ].
+  split; [ | easy ].
+  intros c Hc.
+  destruct Hc as [Hc| Hc]; [ | easy ].
+  subst c; apply Hrefl.
 }
 cbn in Hab.
 remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
@@ -3007,12 +2979,7 @@ split. {
     now rewrite Hac in H5.
   }
 }
-destruct H3 as (l1 & l2 & Hlla & Hllb).
-subst ld.
 destruct ac; subst x. {
-  destruct l1 as [| a1]. {
-    cbn in Hlla |-*.
-...
   etransitivity; [ apply perm_swap | symmetry ].
   etransitivity; [ apply perm_swap | symmetry ].
   now apply perm_skip.
@@ -3023,38 +2990,7 @@ destruct ac; subst x. {
 }
 Qed.
 
-Theorem select_first_iff : ∀ A (ord : A → _),
-  reflexive ord →
-  transitive ord →
-  total_order ord →
-  ∀ a b la lb,
-  select_first ord a la = (b, lb)
-  ↔ (∀ c, c ∈ a :: la → ord b c = true) ∧
-    (∀ c, c ∈ lb → ord b c = true) ∧
-    Permutation (a :: la) (b :: lb).
-Proof.
-intros * Hrefl Htr Htot *.
-split; [ now apply select_first_if | ].
-intros (H1 & H2 & H3).
-revert a b lb H1 H2 H3.
-induction la as [| c]; intros; cbn. {
-  apply Permutation_length_1_inv in H3.
-  now injection H3; clear H3; intros; subst b lb.
-}
-remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-remember (select_first ord (if ac then a else c) la) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as (d, ld).
-specialize (H1 a (or_introl eq_refl)) as Hba.
-specialize (H1 c (or_intror (or_introl eq_refl))) as Hbc.
-specialize (select_first_if Hrefl Htr Htot _ _ Hld) as H4.
-destruct H4 as (H4 & H5 & H6).
-destruct ac. {
-  inversion H3. {
-    subst.
-    clear Hac Hba.
-...
-
+(* to be completed
 Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
@@ -3066,6 +3002,7 @@ destruct lc as (c, lc).
 destruct ld as (d, ld).
 move c before a; move d before c.
 move ld before lc.
+specialize select_first_if as H1.
 ...
 (*
 intros * Hab.
