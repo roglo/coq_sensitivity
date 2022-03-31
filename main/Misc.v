@@ -3000,12 +3000,29 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   → select_first ord a la = select_first ord a lb.
 Proof.
 intros * Hrefl Htr Htot * Hab.
+revert a.
+induction Hab; intros; [ easy | | | ]. {
+  now cbn; rewrite IHHab.
+} {
+  cbn.
+  remember (ord a x) as ax eqn:Hax; symmetry in Hax.
+  remember (ord a y) as ay eqn:Hay; symmetry in Hay.
+  destruct ax. {
+    destruct ay. {
+      rewrite Hax, Hay.
+      remember (select_first ord a l) as lb eqn:Hlb.
+      symmetry in Hlb.
+      destruct lb as (b, lb).
+      f_equal.
+...
+intros * Hrefl Htr Htot * Hab.
 remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
 remember (select_first ord a lb) as ld eqn:Hld; symmetry in Hld.
 destruct lc as (c, lc).
 destruct ld as (d, ld).
 move c before a; move d before c.
 move ld before lc.
+...
 specialize (select_first_if Hrefl Htr Htot) as H1.
 specialize (H1 _ _ _ _ Hlc) as Hc1.
 destruct Hc1 as (Hc1 & Hc2 & Hc3).
