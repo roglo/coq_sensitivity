@@ -2914,6 +2914,7 @@ unfold ssort.
 now apply sorted_ssort_loop.
 Qed.
 
+(* to be completed
 Theorem select_first_if : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -2990,7 +2991,6 @@ destruct ac; subst x. {
 }
 Qed.
 
-(* to be completed
 Theorem select_first_iff : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -3020,6 +3020,7 @@ destruct H4 as (H4 & H5 & H6).
 destruct ac. {
   inversion H3. {
     subst.
+    clear Hac Hba.
 ...
 
 Theorem Permutation_select_first : ∀ A (ord : A → _) a la lb,
