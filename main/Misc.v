@@ -2990,7 +2990,7 @@ destruct ac; subst x. {
 }
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem Permutation_select_first : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
