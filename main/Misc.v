@@ -2990,7 +2990,7 @@ destruct ac; subst x. {
 }
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem Permutation_select_first : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -2999,6 +2999,7 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   Permutation la lb
   → select_first ord a la = select_first ord a lb.
 Proof.
+(*
 intros * Hrefl Htr Htot * Hab.
 revert a.
 induction Hab; intros; [ easy | | | ]. {
@@ -3030,7 +3031,6 @@ specialize (H1 _ _ _ _ Hld) as Hd1.
 destruct Hd1 as (Hd1 & Hd2 & Hd3).
 clear H1.
 ...
-(*
 intros * Hab.
 revert a.
 induction Hab; intros; [ easy | | | ]. {
@@ -3088,18 +3088,41 @@ Theorem glop :
   remember (if x then a else b)
 ...
 *)
-intros * Hab.
+intros * Hrefl Htr Htot * Hab.
 revert a lb Hab.
 induction la as [| c]; intros; cbn. {
   now apply Permutation_nil in Hab; subst lb.
 }
-destruct lb as [| d]. {
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  remember (select_first ord a la) as ld eqn:Hld; symmetry in Hld.
+  destruct ld as (d, ld).
+  symmetry.
+  revert a c d la ld IHla Hab Hac Hld.
+  induction lb as [| b]; intros. {
+    apply Permutation_sym in Hab.
+    now apply Permutation_nil_cons in Hab.
+  }
+  cbn.
+  rename Hab into Hpab.
+  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    remember (select_first ord a lb) as le eqn:Hle; symmetry in Hle.
+    destruct le as (e, le).
+    f_equal. {
+...
+revert a c la IHla Hab.
+induction lb as [| d]; intros. {
   now apply Permutation_sym, Permutation_nil in Hab.
 }
 cbn.
 remember (ord a c) as ac eqn:Hac; symmetry in Hac.
 remember (ord a d) as ad eqn:Had; symmetry in Had.
 move ad before ac.
+destruct ac. {
+  destruct ad. {
+    rewrite IHlb.
+...
 remember (select_first ord (if ac then a else c) la) as x eqn:Hx.
 remember (select_first ord (if ad then a else d) lb) as y eqn:Hy.
 symmetry in Hx, Hy.
