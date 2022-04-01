@@ -3185,6 +3185,20 @@ inversion Hab; subst. {
     now rewrite Hab, Hba in H1.
   }
 } {
+  rename l' into l.
+  rename H into Haal.
+  rename H0 into Hlbb.
+...
+  specialize (IHit la lb Hlab Hit) as H1.
+  specialize (Permutation_select_first Hrefl Hant Htr Htot) as H2.
+...
+  specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
+  destruct H1 as (H1, H2); subst b'; f_equal.
+  apply IHit; [ | | easy ]. {
+    apply select_first_length in Hla', Hlb'; congruence.
+  } {
+    apply select_first_length in Hla', Hlb'; congruence.
+  }
 ...
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
