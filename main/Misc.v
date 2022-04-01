@@ -3155,6 +3155,36 @@ inversion Hab; subst. {
     apply select_first_length in Hla', Hlb'; congruence.
   }
 } {
+  cbn in Hla', Hlb'.
+  rename Hab into Hpab.
+  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  remember (if ab then a else b) as abab eqn:Habab.
+  remember (if ba then b else a) as baba eqn:Hbaba.
+  remember (select_first ord abab l) as lc eqn:Hlc.
+  remember (select_first ord baba l) as ld eqn:Hld.
+  symmetry in Hlc, Hld.
+  destruct lc as (c, lc).
+  destruct ld as (d, ld).
+  injection Hla'; clear Hla'; intros; subst c la'.
+  injection Hlb'; clear Hlb'; intros; subst d lb'.
+  destruct ab; subst abab. {
+    destruct ba; subst baba. {
+      specialize (Hant _ _ Hab Hba) as H1; subst b.
+      rewrite Hlc in Hld.
+      now injection Hld; intros; subst b' ld.
+    }
+    rewrite Hlc in Hld.
+    now injection Hld; intros; subst b' ld.
+  } {
+    destruct ba; subst baba. {
+      rewrite Hlc in Hld.
+      now injection Hld; intros; subst b' ld.
+    }
+    specialize (Htot a b) as H1.
+    now rewrite Hab, Hba in H1.
+  }
+} {
 ...
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
