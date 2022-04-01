@@ -2999,7 +2999,7 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   Permutation la lb
   → select_first ord a la = (a', la')
   → select_first ord a lb = (b', lb')
-  → a' = b'.
+  → a' = b' ∧ Permutation la' lb'.
 Proof.
 intros * Hrefl Hant Htr Htot * Hab Ha Hb.
 revert a a' b' la' lb' Ha Hb.
@@ -3019,7 +3019,9 @@ induction Hab; intros. {
   destruct le as (e, le).
   injection Ha; clear Ha; intros; subst d la'.
   injection Hb; clear Hb; intros; subst e lb'.
-  now apply IHHab with (a := y) (la' := ld) (lb' := le).
+  specialize (IHHab _ _ _ _ _ Hld Hle) as H1.
+  split; [ easy | ].
+  now apply Permutation_cons.
 } {
   cbn in Ha, Hb.
   remember (if ord a y then a else y) as u eqn:Hu.
@@ -3043,10 +3045,16 @@ induction Hab; intros. {
     destruct ay; subst u. {
       rewrite Hax in Hux; subst ux.
       rewrite Hay in Hvy; subst vy.
-      congruence.
+      rewrite Hld in Hle.
+      injection Hle; intros; subst e le.
+      split; [ easy | apply perm_swap ].
     }
     rewrite Hay in Hvy; subst vy.
-    destruct ux; [ congruence | ].
+    destruct ux. {
+      rewrite Hld in Hle.
+      injection Hle; intros; subst e le.
+      split; [ easy | apply perm_swap ].
+    }
     specialize (Htot y x) as H1.
     rewrite Hux in H1; cbn in H1.
     specialize (Htot a y) as H2.
@@ -3054,11 +3062,16 @@ induction Hab; intros. {
     specialize (Htr x y a H1 H2) as H3.
     apply (Hant _ _ Hax) in H3; subst x.
     apply (Hant _ _ H1) in H2; subst y.
-    congruence.
+    rewrite Hld in Hle.
+    now injection Hle; intros; subst e le.
   } {
     destruct ay; subst u. {
       rewrite Hax in Hux; subst ux.
-      destruct vy; [ congruence | ].
+      destruct vy. {
+        rewrite Hld in Hle.
+        injection Hle; intros; subst e le.
+        split; [ easy | apply perm_swap ].
+      }
       specialize (Htot x y) as H1.
       rewrite Hvy in H1; cbn in H1.
       specialize (Htot a x) as H2.
@@ -3066,14 +3079,22 @@ induction Hab; intros. {
       specialize (Htr y x a H1 H2) as H3.
       apply (Hant _ _ Hay) in H3; subst y.
       apply (Hant _ _ H1) in H2; subst x.
-      congruence.
+      rewrite Hld in Hle.
+      now injection Hle; intros; subst e le.
     }
     destruct ux. {
-      destruct vy; [ | congruence ].
-      specialize (Hant _ _ Hux Hvy) as H1; subst y.
-      congruence.
+      destruct vy. {
+        specialize (Hant _ _ Hux Hvy) as H1; subst y.
+        rewrite Hld in Hle.
+        now injection Hle; intros; subst e le.
+      }
+      rewrite Hld in Hle.
+      now injection Hle; intros; subst e le.
     }
-    destruct vy; [ congruence | ].
+    destruct vy. {
+      rewrite Hld in Hle.
+      now injection Hle; intros; subst e le.
+    }
     specialize (Htot x y) as H1.
     now rewrite Hux, Hvy in H1.
   }
@@ -3081,11 +3102,12 @@ induction Hab; intros. {
   remember (select_first ord a l') as lc eqn:Hlc.
   symmetry in Hlc.
   destruct lc as (c, lc).
-  transitivity c. {
-    now apply (IHHab1 a _ _ la' lc).
-  } {
-    now apply (IHHab2 a _ _ lc lb').
-  }
+  specialize (IHHab1 _ _ _ _ _ Ha Hlc) as H1.
+  specialize (IHHab2 _ _ _ _ _ Hlc Hb) as H2.
+  destruct H2 as (H3, H4).
+  destruct H1 as (H1, H2).
+  split; [ congruence | ].
+  now transitivity lc.
 }
 Qed.
 
@@ -3125,14 +3147,14 @@ move b' before a'; move lb' before la'.
 inversion Hab; subst. {
   rename H0 into Hpab.
   specialize (Permutation_select_first Hrefl Hant Htr Htot) as H1.
-  rewrite (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
-  f_equal.
-  apply IHit. {
+  specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
+  destruct H1 as (H1, H2); subst b'; f_equal.
+  apply IHit; [ | | easy ]. {
     apply select_first_length in Hla', Hlb'; congruence.
   } {
     apply select_first_length in Hla', Hlb'; congruence.
   }
-Inspect 1.
+} {
 ...
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
