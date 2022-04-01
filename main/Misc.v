@@ -2995,9 +2995,11 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
   total_order ord →
-  ∀ a la lb,
+  ∀ a a' b' la lb la' lb',
   Permutation la lb
-  → select_first ord a la = select_first ord a lb.
+  → select_first ord a la = (a', la')
+  → select_first ord a lb = (b', lb')
+  → a' = b' ∧ Permutation la' lb'.
 Proof.
 (*
 intros * Hrefl Htr Htot * Hab.
@@ -3088,22 +3090,37 @@ Theorem glop :
   remember (if x then a else b)
 ...
 *)
-intros * Hrefl Htr Htot * Hab.
-Print select_first.
-Compute (
-  let ord := Nat.leb in
-  let a := 3 in
-  let la := [2;5] in
-  let lb := [5;2] in
-  select_first ord a la = select_first ord a lb
-).
-(* ah ouais, chuis con, c'est faux *)
-...
-revert a lb Hab.
+intros * Hrefl Htr Htot * Hab Ha Hb.
+revert a a' b' lb la' lb' Hab Ha Hb.
 induction la as [| c]; intros; cbn. {
-  now apply Permutation_nil in Hab; subst lb.
+  apply Permutation_nil in Hab; subst lb.
+  cbn in Ha, Hb.
+  injection Ha; intros; subst a' la'.
+  injection Hb; intros; subst b' lb'.
+  easy.
 }
+destruct lb as [| d]. {
+  apply Permutation_sym in Hab.
+  now apply Permutation_nil in Hab.
+}
+cbn in Ha, Hb.
 remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+remember (ord a d) as ad eqn:Had; symmetry in Had.
+move ad before ac; move Had before Hac.
+remember (select_first ord (if ac then a else c) la) as lu eqn:Hlu.
+remember (select_first ord (if ad then a else d) lb) as lv eqn:Hlv.
+symmetry in Hlu, Hlv.
+destruct lu as (u, lu).
+destruct lv as (v, lv).
+move u before d; move v before u.
+move lu before lb'; move lv before lu.
+injection Ha; clear Ha; intros; subst u la'.
+injection Hb; clear Hb; intros; subst v lb'.
+destruct ac. {
+  destruct ad. {
+    specialize (IHla a a' b') as H1.
+    specialize (H1 lb lu lv).
+...
 destruct ac. {
   remember (select_first ord a la) as ld eqn:Hld; symmetry in Hld.
   destruct ld as (d, ld).
@@ -3179,6 +3196,8 @@ destruct lb' as (b', lb').
 move b' before a'; move lb' before la'.
 inversion Hab; subst. {
   rename H0 into Hpab.
+  f_equal. 2: {
+    apply IHit.
 ...
   specialize (Permutation_select_first ord b Hpab) as H1.
   rewrite H1, Hlb' in Hla'.
