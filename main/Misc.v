@@ -3090,13 +3090,18 @@ induction Hab; intros. {
 Qed.
 
 (* to be completed
-Theorem Permutation_ssort_loop : ∀ A (ord : A → _) it la lb,
+Theorem Permutation_ssort_loop : ∀ A (ord : A → _),
+  reflexive ord →
+  antisymmetric ord →
+  transitive ord →
+  total_order ord →
+  ∀ it la lb,
   length la = length lb
   → length la ≤ it
   → Permutation la lb
   → ssort_loop ord it la = ssort_loop ord it lb.
 Proof.
-intros * Hlab Hit Hab.
+intros * Hrefl Hant Htr Htot * Hlab Hit Hab.
 revert la lb Hlab Hit Hab.
 induction it; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
@@ -3119,24 +3124,9 @@ destruct lb' as (b', lb').
 move b' before a'; move lb' before la'.
 inversion Hab; subst. {
   rename H0 into Hpab.
-  f_equal. 2: {
-    apply IHit.
-...
-  specialize (Permutation_select_first ord b Hpab) as H1.
-  rewrite H1, Hlb' in Hla'.
-  now injection Hla'; intros; subst b' lb'.
-}
-...
-  apply ssort_loop_cons with (it := it) in Hla'; [ | flia Hit ].
-  apply ssort_loop_cons with (it := it) in Hlb'; [ | flia Hlab Hit ].
-  rewrite <- Hla', <- Hlb'.
-  destruct it. {
-    cbn; f_equal.
-...
-  destruct la as [| a]. {
-    now apply Permutation_nil in Hpab; subst lb.
-  }
-  apply IHit.
+  specialize (Permutation_select_first Hrefl Hant Htr Htot) as H1.
+  rewrite (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
+  f_equal.
   apply IHit.
 ...
 
