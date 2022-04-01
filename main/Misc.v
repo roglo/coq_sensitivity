@@ -2993,6 +2993,7 @@ Qed.
 (* to be completed
 Theorem Permutation_select_first : ∀ A (ord : A → _),
   reflexive ord →
+  antisymmetric ord →
   transitive ord →
   total_order ord →
   ∀ a a' b' la lb la' lb',
@@ -3001,7 +3002,7 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   → select_first ord a lb = (b', lb')
   → a' = b'.
 Proof.
-intros * Hrefl Htr Htot * Hab Ha Hb.
+intros * Hrefl Hant Htr Htot * Hab Ha Hb.
 revert a a' b' la' lb' Ha Hb.
 induction Hab; intros. {
   cbn in Ha, Hb.
@@ -3043,14 +3044,41 @@ induction Hab; intros. {
     destruct ay; subst u. {
       rewrite Hax in Hux; subst ux.
       rewrite Hay in Hvy; subst vy.
-...
-  destruct ax. {
-    destruct ay. {
-      rewrite Hax, Hay.
-      remember (select_first ord a l) as lb eqn:Hlb.
-      symmetry in Hlb.
-      destruct lb as (b, lb).
-      f_equal.
+      congruence.
+    }
+    rewrite Hay in Hvy; subst vy.
+    destruct ux; [ congruence | ].
+    specialize (Htot y x) as H1.
+    rewrite Hux in H1; cbn in H1.
+    specialize (Htot a y) as H2.
+    rewrite Hay in H2; cbn in H2.
+    specialize (Htr x y a H1 H2) as H3.
+    apply (Hant _ _ Hax) in H3; subst x.
+    apply (Hant _ _ H1) in H2; subst y.
+    congruence.
+  } {
+    destruct ay; subst u. {
+      rewrite Hax in Hux; subst ux.
+      destruct vy; [ congruence | ].
+      specialize (Htot x y) as H1.
+      rewrite Hvy in H1; cbn in H1.
+      specialize (Htot a x) as H2.
+      rewrite Hax in H2; cbn in H2.
+      specialize (Htr y x a H1 H2) as H3.
+      apply (Hant _ _ Hay) in H3; subst y.
+      apply (Hant _ _ H1) in H2; subst x.
+      congruence.
+    }
+    destruct ux. {
+      destruct vy; [ | congruence ].
+      specialize (Hant _ _ Hux Hvy) as H1; subst y.
+      congruence.
+    }
+    destruct vy; [ congruence | ].
+    specialize (Htot x y) as H1.
+    now rewrite Hux, Hvy in H1.
+  }
+} {
 ...
 intros * Hrefl Htr Htot * Hab.
 remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
