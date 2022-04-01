@@ -3127,7 +3127,12 @@ inversion Hab; subst. {
   specialize (Permutation_select_first Hrefl Hant Htr Htot) as H1.
   rewrite (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
   f_equal.
-  apply IHit.
+  apply IHit. {
+    apply select_first_length in Hla', Hlb'; congruence.
+  } {
+    apply select_first_length in Hla', Hlb'; congruence.
+  }
+Inspect 1.
 ...
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
