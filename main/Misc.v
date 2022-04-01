@@ -3190,10 +3190,16 @@ inversion Hab; subst. {
   rename H0 into Hlbb.
   specialize (select_first_length ord a la Hla') as H1.
   specialize (select_first_length ord b lb Hlb') as H2.
+  f_equal. 2: {
+    apply IHit; [ congruence | congruence | ].
+...
   rewrite IHit with (lb := lb'); [ | congruence | congruence | ]. 2: {
+...
     remember (select_first ord a lb) as lc eqn:Hlc; symmetry in Hlc.
     destruct lc as (c, lc).
     specialize (Permutation_select_first Hrefl Hant Htr Htot) as H3.
+    transitivity lc. {
+      eapply H3; [ | apply Hla' | apply Hlc ].
 ...
 (* ah oui mais ça c'est faux *)
     enough (Hac : Permutation la lb).
