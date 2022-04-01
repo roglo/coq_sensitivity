@@ -3089,6 +3089,16 @@ Theorem glop :
 ...
 *)
 intros * Hrefl Htr Htot * Hab.
+Print select_first.
+Compute (
+  let ord := Nat.leb in
+  let a := 3 in
+  let la := [2;5] in
+  let lb := [5;2] in
+  select_first ord a la = select_first ord a lb
+).
+(* ah ouais, chuis con, c'est faux *)
+...
 revert a lb Hab.
 induction la as [| c]; intros; cbn. {
   now apply Permutation_nil in Hab; subst lb.
@@ -3098,6 +3108,11 @@ destruct ac. {
   remember (select_first ord a la) as ld eqn:Hld; symmetry in Hld.
   destruct ld as (d, ld).
   symmetry.
+  destruct lb as [| b]. {
+    apply Permutation_sym in Hab.
+    now apply Permutation_nil_cons in Hab.
+  }
+...
   revert a c d la ld IHla Hab Hac Hld.
   induction lb as [| b]; intros. {
     apply Permutation_sym in Hab.
