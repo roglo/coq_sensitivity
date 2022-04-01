@@ -2990,7 +2990,6 @@ destruct ac; subst x. {
 }
 Qed.
 
-(* to be completed
 Theorem Permutation_select_first : ∀ A (ord : A → _),
   reflexive ord →
   antisymmetric ord →
@@ -3079,155 +3078,18 @@ induction Hab; intros. {
     now rewrite Hux, Hvy in H1.
   }
 } {
-...
-intros * Hrefl Htr Htot * Hab.
-remember (select_first ord a la) as lc eqn:Hlc; symmetry in Hlc.
-remember (select_first ord a lb) as ld eqn:Hld; symmetry in Hld.
-destruct lc as (c, lc).
-destruct ld as (d, ld).
-move c before a; move d before c.
-move ld before lc.
-...
-specialize (select_first_if Hrefl Htr Htot) as H1.
-specialize (H1 _ _ _ _ Hlc) as Hc1.
-destruct Hc1 as (Hc1 & Hc2 & Hc3).
-specialize (H1 _ _ _ _ Hld) as Hd1.
-destruct Hd1 as (Hd1 & Hd2 & Hd3).
-clear H1.
-...
-intros * Hab.
-revert a.
-induction Hab; intros; [ easy | | | ]. {
-  rename l into la.
-  rename l' into lb.
-  rename x into b.
-  cbn.
-  remember (if ord a b then a else b) as x eqn:Hx.
-  remember (select_first ord x la) as lc eqn:Hlc.
-  remember (select_first ord x lb) as ld eqn:Hld.
-  symmetry in Hx, Hlc, Hld.
+  remember (select_first ord a l') as lc eqn:Hlc.
+  symmetry in Hlc.
   destruct lc as (c, lc).
-  destruct ld as (d, ld).
-  move d before c; move ld before lc.
-  enough (H : (c, lc) = (d, ld)). {
-    now injection H; clear H; intros; subst d ld.
+  transitivity c. {
+    now apply (IHHab1 a _ _ la' lc).
+  } {
+    now apply (IHHab2 a _ _ lc lb').
   }
-  now rewrite IHHab, Hld in Hlc.
-} {
-  remember (x :: l) as xl eqn:Hxl.
-  remember (y :: l) as yl eqn:Hyl.
-  cbn; subst.
-  remember (if ord a x then a else x) as u eqn:Hu.
-  remember (if ord a y then a else y) as v eqn:Hv.
-  symmetry in Hu, Hv.
-  move v before u.
-  remember (select_first ord u (y :: l)) as ld eqn:Hld.
-  remember (select_first ord v (x :: l)) as le eqn:Hle.
-  destruct ld as (d, ld).
-  destruct le as (e, le).
-  move d before a; move e before d.
-  move le before ld.
-  symmetry in Hld, Hle.
-  remember (ord a x) as ax eqn:Hax; symmetry in Hax.
-  remember (ord a y) as ay eqn:Hay; symmetry in Hay.
-  move ay before ax; move Hv before Hu.
-  move Hay before Hax.
-  destruct ax; subst u. {
-    destruct ay; subst v. {
-      cbn in Hld, Hle.
-      rewrite Hax in Hle.
-      rewrite Hay in Hld.
-      remember (select_first ord a l) as lb eqn:Hlb.
-      symmetry in Hlb.
-      destruct lb as (b, lb).
-      injection Hld; clear Hld; intros; subst d ld.
-      injection Hle; clear Hle; intros; subst e le.
-      enough (H : x = y) by now subst y.
-...
-Theorem glop :
-  select_first ord a la = select_first ord b lb
-  → Permutation (a :: la) (b :: lb)
-...
-  remember (ord a b) as x eqn:Hx; symmetry in Hx.
-  remember (if x then a else b)
-...
-intros * Hrefl Htr Htot * Hab Ha Hb.
-revert a a' b' lb la' lb' Hab Ha Hb.
-induction la as [| c]; intros; cbn. {
-  apply Permutation_nil in Hab; subst lb.
-  cbn in Ha, Hb.
-  injection Ha; intros; subst a' la'.
-  injection Hb; intros; subst b' lb'.
-  easy.
 }
-destruct lb as [| d]. {
-  apply Permutation_sym in Hab.
-  now apply Permutation_nil in Hab.
-}
-cbn in Ha, Hb.
-remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-remember (ord a d) as ad eqn:Had; symmetry in Had.
-move ad before ac; move Had before Hac.
-remember (select_first ord (if ac then a else c) la) as lu eqn:Hlu.
-remember (select_first ord (if ad then a else d) lb) as lv eqn:Hlv.
-symmetry in Hlu, Hlv.
-destruct lu as (u, lu).
-destruct lv as (v, lv).
-move u before d; move v before u.
-move lu before lb'; move lv before lu.
-injection Ha; clear Ha; intros; subst u la'.
-injection Hb; clear Hb; intros; subst v lb'.
-destruct ac. {
-  destruct ad. {
-    specialize (IHla a a' b') as H1.
-    specialize (H1 lb lu lv).
-...
-destruct ac. {
-  remember (select_first ord a la) as ld eqn:Hld; symmetry in Hld.
-  destruct ld as (d, ld).
-  symmetry.
-  destruct lb as [| b]. {
-    apply Permutation_sym in Hab.
-    now apply Permutation_nil_cons in Hab.
-  }
-...
-  revert a c d la ld IHla Hab Hac Hld.
-  induction lb as [| b]; intros. {
-    apply Permutation_sym in Hab.
-    now apply Permutation_nil_cons in Hab.
-  }
-  cbn.
-  rename Hab into Hpab.
-  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    remember (select_first ord a lb) as le eqn:Hle; symmetry in Hle.
-    destruct le as (e, le).
-    f_equal. {
-...
-revert a c la IHla Hab.
-induction lb as [| d]; intros. {
-  now apply Permutation_sym, Permutation_nil in Hab.
-}
-cbn.
-remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-remember (ord a d) as ad eqn:Had; symmetry in Had.
-move ad before ac.
-destruct ac. {
-  destruct ad. {
-    rewrite IHlb.
-...
-remember (select_first ord (if ac then a else c) la) as x eqn:Hx.
-remember (select_first ord (if ad then a else d) lb) as y eqn:Hy.
-symmetry in Hx, Hy.
-destruct x as (a', la').
-destruct y as (b', lb').
-move b' before a'; move lb' before la'.
-apply ssort_loop_cons with (it := length la) in Hx; [ | easy ].
-apply ssort_loop_cons with (it := length lb) in Hy; [ | easy ].
-destruct ac. {
-  destruct ad. {
-...
+Qed.
 
+(* to be completed
 Theorem Permutation_ssort_loop : ∀ A (ord : A → _) it la lb,
   length la = length lb
   → length la ≤ it
