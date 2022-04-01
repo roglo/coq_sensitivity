@@ -2999,17 +2999,51 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   Permutation la lb
   → select_first ord a la = (a', la')
   → select_first ord a lb = (b', lb')
-  → a' = b' ∧ Permutation la' lb'.
+  → a' = b'.
 Proof.
-(*
-intros * Hrefl Htr Htot * Hab.
-revert a.
-induction Hab; intros; [ easy | | | ]. {
-  now cbn; rewrite IHHab.
+intros * Hrefl Htr Htot * Hab Ha Hb.
+revert a a' b' la' lb' Ha Hb.
+induction Hab; intros. {
+  cbn in Ha, Hb.
+  injection Ha; intros; subst a' la'.
+  injection Hb; intros; subst b' lb'.
+  easy.
 } {
-  cbn.
+  cbn in Ha, Hb.
   remember (ord a x) as ax eqn:Hax; symmetry in Hax.
-  remember (ord a y) as ay eqn:Hay; symmetry in Hay.
+  remember (if ax then a else x) as y eqn:Hy.
+  remember (select_first ord y l) as ld eqn:Hld.
+  remember (select_first ord y l') as le eqn:Hle.
+  symmetry in Hld, Hle.
+  destruct ld as (d, ld).
+  destruct le as (e, le).
+  injection Ha; clear Ha; intros; subst d la'.
+  injection Hb; clear Hb; intros; subst e lb'.
+  now apply IHHab with (a := y) (la' := ld) (lb' := le).
+} {
+  cbn in Ha, Hb.
+  remember (if ord a y then a else y) as u eqn:Hu.
+  remember (if ord a x then a else x) as v eqn:Hv.
+  remember (ord u x) as ux eqn:Hux.
+  remember (ord v y) as vy eqn:Hvy.
+  remember (ord a x) as ax eqn:Hax.
+  remember (ord a y) as ay eqn:Hay.
+  symmetry in Hux, Hvy, Hax, Hay.
+  move a before y; move a' before a; move b' before a'.
+  move u before b'; move v before u.
+  move ax after ay; move ux before ay; move vy before ux.
+  remember (select_first ord (if ux then u else x) l) as ld eqn:Hld.
+  remember (select_first ord (if vy then v else y) l) as le eqn:Hle.
+  symmetry in Hld, Hle.
+  destruct ld as (d, ld).
+  destruct le as (e, le).
+  injection Ha; clear Ha; intros; subst a' la'.
+  injection Hb; clear Hb; intros; subst b' lb'.
+  destruct ax; subst v. {
+    destruct ay; subst u. {
+      rewrite Hax in Hux; subst ux.
+      rewrite Hay in Hvy; subst vy.
+...
   destruct ax. {
     destruct ay. {
       rewrite Hax, Hay.
@@ -3089,7 +3123,6 @@ Theorem glop :
   remember (ord a b) as x eqn:Hx; symmetry in Hx.
   remember (if x then a else b)
 ...
-*)
 intros * Hrefl Htr Htot * Hab Ha Hb.
 revert a a' b' lb la' lb' Hab Ha Hb.
 induction la as [| c]; intros; cbn. {
