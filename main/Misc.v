@@ -3277,10 +3277,40 @@ now apply bsort_loop_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem ssort_loop_is_sorted : ∀ A (ord : A → _) l len,
+  length l ≤ len
+  → sorted ord (ssort_loop ord len l) = true.
+Proof.
+intros * Hlen.
+revert l Hlen.
+induction len; intros; cbn. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
+}
+destruct l as [| a la]; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+remember (select_first ord a la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as (b, lb); cbn.
+remember (ssort_loop ord len lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ easy | ].
+apply Bool.andb_true_iff.
+split. 2: {
+  rewrite <- Hlc.
+  apply IHlen.
+  apply select_first_length in Hlb.
+  congruence.
+}
+apply Bool.not_false_iff_true.
+intros Hbc.
+...
+
 Theorem ssort_is_sorted : ∀ A (ord : A → _) l,
   sorted ord (ssort ord l) = true.
 Proof.
 intros.
+unfold ssort.
+...
 destruct l as [| a]; [ easy | cbn ].
 remember (select_first ord a l) as lb eqn:Hlb.
 symmetry in Hlb.
