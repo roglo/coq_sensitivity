@@ -3264,6 +3264,18 @@ apply Permutation_app; [ | easy ].
 apply Permutation_app_comm.
 Qed.
 
+Theorem bsort_ssort : ∀ (A : Type) (ord : A → A → bool),
+  reflexive ord →
+  antisymmetric ord →
+  transitive ord →
+  total_order ord →
+  ∀ (l : list A),
+  bsort ord l = ssort ord l.
+Proof.
+intros * Href Hant Htr Htot *.
+now apply bsort_loop_ssort_loop.
+Qed.
+
 (* to be completed
 Theorem ssorted_loop_sorted : ∀ A (ord : A → _),
   reflexive ord →
