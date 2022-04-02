@@ -3277,11 +3277,13 @@ now apply bsort_loop_ssort_loop.
 Qed.
 
 (* to be completed
-Theorem ssort_loop_is_sorted : ∀ A (ord : A → _) l len,
+Theorem ssort_loop_is_sorted : ∀ A (ord : A → _),
+  total_order ord →
+  ∀ l len,
   length l ≤ len
   → sorted ord (ssort_loop ord len l) = true.
 Proof.
-intros * Hlen.
+intros * Htot * Hlen.
 revert l Hlen.
 induction len; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
@@ -3303,6 +3305,8 @@ split. 2: {
 }
 apply Bool.not_false_iff_true.
 intros Hbc.
+specialize (Htot b c) as Hcb.
+rewrite Hbc in Hcb; cbn in Hcb; clear Hbc.
 ...
 
 Theorem ssort_is_sorted : ∀ A (ord : A → _) l,
