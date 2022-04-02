@@ -3265,10 +3265,21 @@ apply Permutation_app_comm.
 Qed.
 
 (* to be completed
-Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
+Theorem ssorted_loop_sorted : ∀ A (ord : A → _),
+  reflexive ord →
+  antisymmetric ord →
+  transitive ord →
+  total_order ord →
+  ∀ l,
   sorted ord l = true
   → ssort_loop ord (length l) l = l.
 Proof.
+intros * Href Hant Htr Htot * Hs.
+specialize (bsort_loop_ssort_loop Href Hant Htr Htot) as H1.
+specialize (H1 [] l _ eq_refl eq_refl).
+cbn in H1; rewrite <- H1.
+Check bsort_loop_is_sorted.
+...
 intros * Hs.
 induction l as [| a]; [ easy | cbn ].
 remember (select_first ord a l) as la' eqn:Hla'.
