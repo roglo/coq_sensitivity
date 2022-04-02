@@ -2914,6 +2914,36 @@ unfold ssort.
 now apply sorted_ssort_loop.
 Qed.
 
+Theorem select_first_Permutation : ∀ A (ord : A → _) a b la lb,
+  select_first ord a la = (b, lb)
+  → Permutation (a :: la) (b :: lb).
+Proof.
+intros * Hab.
+revert a b lb Hab.
+induction la as [| c]; intros. {
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst b lb.
+}
+cbn in Hab.
+remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
+remember (select_first ord x la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+injection Hab; clear Hab; intros; subst d lb.
+move c after b; move x before c.
+move ld before la.
+remember (ord a c) as ac eqn:Hac; symmetry in Hac.
+specialize (IHla x b ld Hld) as H1.
+destruct ac; subst x. {
+  etransitivity; [ apply perm_swap | symmetry ].
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+} {
+  symmetry.
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+}
+Qed.
+
 Theorem select_first_if : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -3276,6 +3306,36 @@ intros * Href Hant Htr Htot *.
 now apply bsort_loop_ssort_loop.
 Qed.
 
+Theorem ssort_loop_Permutation : ∀ A (ord : A → _) la lb len,
+  length la ≤ len
+  → ssort_loop ord len la = lb
+  → Permutation la lb.
+Proof.
+intros * Hlen Hs.
+revert la lb Hlen Hs.
+induction len; intros. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
+  now cbn in Hs; subst lb.
+}
+cbn in Hs.
+destruct la as [| a]; [ now subst lb | ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+remember (select_first ord a la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+destruct lb as [| b]; [ easy | ].
+injection Hs; clear Hs; intros Hs H; subst c.
+specialize (IHlen lc lb) as H1.
+assert (H : length lc ≤ len). {
+  apply select_first_length in Hlc.
+  congruence.
+}
+specialize (H1 H Hs); clear H.
+apply (select_first_Permutation ord) in Hlc.
+transitivity (b :: lc); [ easy | ].
+now constructor.
+Qed.
+
 (* to be completed
 Theorem ssort_loop_is_sorted : ∀ A (ord : A → _),
   total_order ord →
@@ -3306,7 +3366,11 @@ split. 2: {
 apply Bool.not_false_iff_true.
 intros Hbc.
 specialize (Htot b c) as Hcb.
-rewrite Hbc in Hcb; cbn in Hcb; clear Hbc.
+rewrite Hbc in Hcb; cbn in Hcb.
+apply ssort_loop_Permutation in Hlc. 2: {
+  apply select_first_length in Hlb.
+  congruence.
+}
 ...
 
 Theorem ssort_is_sorted : ∀ A (ord : A → _) l,
