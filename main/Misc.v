@@ -2924,7 +2924,7 @@ Theorem select_first_if : ∀ A (ord : A → _),
     (∀ c, c ∈ lb → ord b c = true) ∧
     Permutation (a :: la) (b :: lb).
 Proof.
-intros * Hrefl Htr Htot * Hab.
+intros * Href Htr Htot * Hab.
 revert a b lb Hab.
 induction la as [| c]; intros. {
   cbn in Hab.
@@ -2932,7 +2932,7 @@ induction la as [| c]; intros. {
   split; [ | easy ].
   intros c Hc.
   destruct Hc as [Hc| Hc]; [ | easy ].
-  subst c; apply Hrefl.
+  subst c; apply Href.
 }
 cbn in Hab.
 remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
@@ -3001,7 +3001,7 @@ Theorem Permutation_select_first : ∀ A (ord : A → _),
   → select_first ord a lb = (b', lb')
   → a' = b' ∧ Permutation la' lb'.
 Proof.
-intros * Hrefl Hant Htr Htot * Hab Ha Hb.
+intros * Href Hant Htr Htot * Hab Ha Hb.
 revert a a' b' la' lb' Ha Hb.
 induction Hab; intros. {
   cbn in Ha, Hb.
@@ -3111,7 +3111,6 @@ induction Hab; intros. {
 }
 Qed.
 
-(* to be completed
 Theorem Permutation_ssort_loop : ∀ A (ord : A → _),
   reflexive ord →
   antisymmetric ord →
@@ -3123,7 +3122,7 @@ Theorem Permutation_ssort_loop : ∀ A (ord : A → _),
   → Permutation la lb
   → ssort_loop ord it la = ssort_loop ord it lb.
 Proof.
-intros * Hrefl Hant Htr Htot * Hlab Hit Hab.
+intros * Href Hant Htr Htot * Hlab Hit Hab.
 revert la lb Hlab Hit Hab.
 induction it; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
@@ -3146,7 +3145,7 @@ destruct lb' as (b', lb').
 move b' before a'; move lb' before la'.
 inversion Hab; subst. {
   rename H0 into Hpab.
-  specialize (Permutation_select_first Hrefl Hant Htr Htot) as H1.
+  specialize (Permutation_select_first Href Hant Htr Htot) as H1.
   specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
   destruct H1 as (H1, H2); subst b'; f_equal.
   apply IHit; [ | | easy ]. {
@@ -3190,41 +3189,51 @@ inversion Hab; subst. {
   rename H0 into Hlbb.
   specialize (select_first_length ord a la Hla') as H1.
   specialize (select_first_length ord b lb Hlb') as H2.
-  f_equal. 2: {
-    apply IHit; [ congruence | congruence | ].
-...
-  rewrite IHit with (lb := lb'); [ | congruence | congruence | ]. 2: {
-...
-    remember (select_first ord a lb) as lc eqn:Hlc; symmetry in Hlc.
-    destruct lc as (c, lc).
-    specialize (Permutation_select_first Hrefl Hant Htr Htot) as H3.
-    transitivity lc. {
-      eapply H3; [ | apply Hla' | apply Hlc ].
-...
-(* ah oui mais ça c'est faux *)
-    enough (Hac : Permutation la lb).
-    specialize (H3 a a' c la lb la' lc Hac Hla' Hlc).
-...
-  specialize (Permutation_select_first Hrefl Hant Htr Htot) as H1.
-  specialize (IHit la lb Hlab Hit) as H1.
-...
-  specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
-  destruct H1 as (H1, H2); subst b'; f_equal.
-  apply IHit; [ | | easy ]. {
-    apply select_first_length in Hla', Hlb'; congruence.
-  } {
-    apply select_first_length in Hla', Hlb'; congruence.
+  assert (Hab' : a' = b'). {
+    apply (select_first_if Href Htr Htot) in Hla', Hlb'.
+    destruct Hla' as (Hla1 & Hla2 & Hla3).
+    destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
+    specialize (Hla1 b') as H3.
+    assert (H : b' ∈ a :: la). {
+      apply perm_trans with (l := a :: la) in Hlb3; [ | easy ].
+      apply Permutation_sym in Hlb3.
+      specialize (Permutation_in b' Hlb3 (or_introl eq_refl)) as H4.
+      easy.
+    }
+    specialize (H3 H); clear H.
+    specialize (Hlb1 a') as H4.
+    assert (H : a' ∈ b :: lb). {
+      apply perm_trans with (l := b :: lb) in Hla3; [ | easy ].
+      apply Permutation_sym in Hla3.
+      specialize (Permutation_in a' Hla3 (or_introl eq_refl)) as H5.
+      easy.
+    }
+    specialize (H4 H); clear H.
+    now apply Hant.
   }
-...
+  subst b'; f_equal.
+  apply IHit; [ congruence | congruence | ].
+  apply (select_first_if Href Htr Htot) in Hla', Hlb'.
+  destruct Hla' as (Hla1 & Hla2 & Hla3).
+  destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
+  apply Permutation_trans with (l := a' :: la') in Hab; [ | easy ].
+  apply Permutation_sym in Hab, Hlb3.
+  apply Permutation_trans with (l := a' :: lb') in Hab; [ | easy ].
+  now apply Permutation_cons_inv, Permutation_sym in Hab.
+}
+Qed.
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
+  reflexive ord →
+  antisymmetric ord →
   transitive ord →
-  total_order ord → ∀ (ls l : list A) it,
+  total_order ord →
+  ∀ (ls l : list A) it,
   it = length (ls ++ l)
   → sorted ord ls = true
   → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
 Proof.
-intros * Htr Htot * Hit Hs.
+intros * Href Hant Htr Htot * Hit Hs.
 subst it.
 revert ls Hs.
 induction l as [| a]; intros. {
@@ -3236,9 +3245,7 @@ rewrite IHl; [ | now apply bsort_insert_is_sorted ].
 do 2 rewrite app_length.
 rewrite bsort_insert_length.
 rewrite List_length_cons, <- Nat.add_succ_comm.
-clear IHl.
-...
-apply Permutation_ssort_loop. {
+apply (Permutation_ssort_loop Href Hant Htr Htot). {
   do 2 rewrite app_length.
   rewrite bsort_insert_length.
   now rewrite Nat.add_succ_comm.
@@ -3255,8 +3262,9 @@ rewrite app_comm_cons.
 rewrite List_app_cons, app_assoc.
 apply Permutation_app; [ | easy ].
 apply Permutation_app_comm.
-...
+Qed.
 
+(* to be completed
 Theorem ssorted_loop_sorted : ∀ A ord (l : list A),
   sorted ord l = true
   → ssort_loop ord (length l) l = l.
