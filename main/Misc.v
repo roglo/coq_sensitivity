@@ -3277,6 +3277,16 @@ now apply bsort_loop_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem ssort_is_sorted : ∀ A (ord : A → _) l,
+  sorted ord (ssort ord l) = true.
+Proof.
+intros.
+destruct l as [| a]; [ easy | cbn ].
+remember (select_first ord a l) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as (b, lb).
+...
+
 Theorem ssorted_loop_sorted : ∀ A (ord : A → _),
   reflexive ord →
   antisymmetric ord →
