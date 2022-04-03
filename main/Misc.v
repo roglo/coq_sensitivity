@@ -2954,7 +2954,7 @@ Theorem select_first_ord : ∀ A (ord : A → _),
   → ∀ c, c ∈ lb → ord b c = true.
 Proof.
 intros * Href Htr Htot * Hab c Hc.
-clear Href Htr Htot.
+clear (*Href Htr*) Htot.
 revert a b c lb Hab Hc.
 induction la as [| d]; intros. {
   cbn in Hab.
@@ -2975,6 +2975,17 @@ destruct ad; subst x. {
     now apply IHla with (a := a) (lb := le).
   }
   subst d.
+  apply Htr with (b := a); [ | easy ].
+  destruct la as [| a']. {
+    cbn in Hld.
+    injection Hld; clear Hld; intros; subst b le.
+    apply Href.
+  }
+  cbn in Hld.
+  remember (select_first ord (if ord a a' then a else a') la) as lf eqn:Hlf.
+  destruct lf as (f, lf).
+  injection Hld; clear Hld; intros; subst f le.
+  symmetry in Hlf.
 ...
   apply IHla with (a := a) (lb := le).
 
