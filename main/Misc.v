@@ -2944,6 +2944,63 @@ destruct ac; subst x. {
 }
 Qed.
 
+(*
+Theorem select_first_ord : ∀ A (ord : A → _),
+  reflexive ord →
+  transitive ord →
+  total_order ord →
+  ∀ a b la lb,
+  select_first ord a la = (b, lb)
+  → ∀ c, c ∈ lb → ord b c = true.
+Proof.
+intros * Href Htr Htot * Hab c Hc.
+clear Href Htr Htot.
+revert a b c lb Hab Hc.
+induction la as [| d]; intros. {
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst b lb.
+}
+cbn in Hab.
+remember (if ord a d then a else d) as x eqn:Hx; symmetry in Hx.
+remember (select_first ord x la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (e, le).
+injection Hab; clear Hab; intros; subst e lb.
+remember (ord a d) as ad eqn:Had; symmetry in Had.
+(*
+specialize (IHla x b d le Hld) as H1.
+destruct H1 as (H1 & H2 & H3).
+*)
+destruct ad; subst x. {
+  destruct Hc as [Hc| Hc]. 2: {
+    now apply IHla with (a := a) (lb := le).
+  }
+  subst d.
+  apply IHla with (c := a) in Hld.
+...
+  apply IHla with (a := a) (lb := le).
+
+    apply Htr with (b := a); [ | easy ].
+    now apply H1; left.
+  } {
+    destruct Hd as [Hd| Hd]; [ | now apply H2 ].
+    subst d.
+    apply Htr with (b := c); [ now apply H1; left | ].
+    specialize (Htot a c) as H5.
+    now rewrite Hac in H5.
+  }
+}
+destruct ac; subst x. {
+  etransitivity; [ apply perm_swap | symmetry ].
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+} {
+  symmetry.
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+}
+Qed.
+*)
+
 Theorem select_first_if : ∀ A (ord : A → _),
   reflexive ord →
   transitive ord →
@@ -3371,6 +3428,17 @@ apply ssort_loop_Permutation in Hlc. 2: {
   apply select_first_length in Hlb.
   congruence.
 }
+apply select_first_if in Hlb.
+destruct Hlb as (_ & H2 & _).
+...
+specialize (H2 c).
+assert (H : c ∈ lb). {
+  apply Permutation_sym in Hlc.
+  apply Permutation_in with (l := c :: lc); [ easy | now left ].
+}
+specialize (H2 H); clear H.
+now rewrite H2 in Hbc.
+Search (Permutation _ _ → _).
 ...
 
 Theorem ssort_is_sorted : ∀ A (ord : A → _) l,
