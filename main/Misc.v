@@ -2975,7 +2975,6 @@ destruct ad; subst x. {
     now apply IHla with (a := a) (lb := le).
   }
   subst d.
-  apply IHla with (c := a) in Hld.
 ...
   apply IHla with (a := a) (lb := le).
 
