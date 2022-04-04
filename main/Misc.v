@@ -2827,6 +2827,7 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
     destruct lc as [| c]; [ now destruct ls | ].
     apply Bool.andb_true_iff in Hs.
     destruct Hs as (Hbc, Hs).
+...
     cbn in Hs.
     destruct lc as [| d]. {
       destruct ls; [ | now destruct ls ].
