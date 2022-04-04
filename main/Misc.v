@@ -2213,8 +2213,9 @@ Fixpoint bbsort_loop {A} (rel : A → A → bool) it l :=
       end
   end.
 
-(* bbsort also answers the number of transpositions *)
-Definition bbsort {A} (rel : A → _) l := bbsort_loop rel (length l) l.
+Definition bbsort_and_nb_transp {A} (rel : A → _) l := bbsort_loop rel (length l) l.
+
+Definition bbsort {A} (rel : A → _) l := fst (bbsort_loop rel (length l) l).
 
 (* bsort length *)
 
@@ -3722,7 +3723,70 @@ intros * Hant Htr Htot *.
 now apply bsort_loop_ssort_loop.
 Qed.
 
-(**)
+(* to be completed
+Theorem sorted_bbsort_loop : ∀ A (rel : A → _),
+  ∀ it l,
+  sorted rel l = true
+  → length l ≤ it
+  → fst (bbsort_loop rel it l) = l.
+Proof.
+intros * Hs Hit.
+rename l into la.
+revert la Hs Hit.
+induction it; intros; [ easy | cbn ].
+remember (bbsort_swap rel (length la) la) as bs eqn:Hbs.
+symmetry in Hbs.
+destruct bs as (lb, exch).
+Print bbsort_swap.
+Print bbsort_loop.
+...
+  bbsort_swap rel it la =
+    match la with
+    | [] => ([], 0)
+    | [a] => ([a], 0)
+    | a :: b :: l' =>
+        if rel a b then ...
+...
+destruct la as [| a]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct exch. {
+  cbn.
+  destruct lb as [| b]. {
+    exfalso.
+    cbn in Hbs.
+    destruct la as [| a']; [ easy | ].
+    remember (bbsort_swap _ _ _) as lb eqn:Hlb.
+    destruct lb as (b, lb).
+    now destruct (rel a a').
+  }
+  assert (H : a = b). {
+    cbn in Hbs.
+    destruct la as [| a']. {
+      now injection Hbs; clear Hbs; intros; subst b lb.
+    }
+...
+cbn in Hs.
+destruct l as [| b]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+specialize (IHit _ Hs Hit) as H1.
+rewrite Hab.
+rewrite List_length_cons.
+...
+
+Theorem sorted_bbsort : ∀ A (rel : A → _),
+  ∀ l,
+  sorted rel l = true
+  → bbsort rel l = l.
+Proof.
+intros * Hs.
+unfold bbsort.
+...
+now apply sorted_bbsort_loop.
+Qed.
+*)
+
+(* *)
 
 Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
 Proof.
