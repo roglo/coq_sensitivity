@@ -2886,7 +2886,109 @@ destruct l as [| a]; [ easy | cbn ].
 now apply bsort_loop_is_sorted.
 Qed.
 
+Theorem sorted_trans : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a b la,
+  sorted rel (a :: la ++ [b]) = true →
+  rel a b = true.
+Proof.
+intros * Htra * Hs.
+revert a b Hs.
+induction la as [| c]; intros. {
+  cbn in Hs.
+  now apply Bool.andb_true_iff in Hs.
+}
+remember (c :: la) as lb; cbn in Hs; subst lb.
+rewrite <- app_comm_cons in Hs.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hac, Hs).
+specialize (IHla _ _ Hs) as H1.
+now apply Htra with (b := c).
+Qed.
+
+Theorem sorted_repeat : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ a la,
+  sorted rel (a :: la ++ [a]) = true
+  → la = repeat a (length la).
+Proof.
+intros * Hant Htra * Hs.
+revert a Hs.
+induction la as [| b]; intros; [ easy | cbn ].
+remember (b :: la) as lb; cbn in Hs; subst lb.
+rewrite <- app_comm_cons in Hs.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+specialize (sorted_trans Htra _ _ _ Hs) as Hba.
+specialize (Hant a b Hab Hba) as H1; subst b.
+f_equal.
+now apply IHla.
+Qed.
+
 (* to be completed
+Theorem sorted_bsort_insert_r : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ a la,
+  sorted rel (la ++ [a]) = true
+  → bsort_insert rel a la = la ++ [a].
+Proof.
+intros * Hant Htra * Hla.
+revert a Hla.
+induction la as [| b] using rev_ind; intros; [ easy | cbn ].
+apply sorted_app in Hla.
+destruct Hla as (Hla & _ & Htrr).
+specialize (Htrr Htra).
+specialize (IHla _ Hla) as H1.
+destruct la as [| c]; cbn. {
+  clear Hla H1.
+  specialize (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
+  rename Htrr into Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  apply Hant in Hba.
+  now rewrite (Hba Hab).
+}
+specialize (Htrr c a (or_introl eq_refl) (or_introl eq_refl)) as Hca.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  apply Hant in Hca.
+  specialize (Hca Hac); subst c.
+  f_equal.
+  cbn in H1.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. {
+    injection H1; clear H1; intros H1 H2; subst b.
+    rewrite <- H1; cbn.
+    now f_equal.
+  }
+  injection H1; clear H1; intros H1.
+  apply Bool.not_true_iff_false in Hba.
+  exfalso; apply Hba.
+  apply Htrr; [ | now left ].
+  now apply in_or_app; right; left.
+}
+f_equal.
+cbn in H1.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc. {
+  injection H1; clear H1; intros H1 H2; subst c.
+  rewrite <- H1; cbn.
+  rewrite Hac.
+  f_equal.
+  rewrite <- app_comm_cons in Hla.
+  specialize (sorted_repeat Hant Htra b la Hla) as Har.
+  rewrite Har.
+  remember (length la) as len eqn:Hlen; symmetry in Hlen.
+  clear - Hac.
+  induction len; [ easy | cbn ].
+  rewrite Hac.
+  f_equal; apply IHlen.
+}
+injection H1; clear H1; intros H1.
+...
+
 Theorem sorted_bsort_loop : ∀ A (rel : A → _) ls l,
   sorted rel (ls ++ l) = true
   → bsort_loop rel ls l = ls ++ l.
@@ -2895,79 +2997,17 @@ intros * Hs.
 revert ls Hs.
 induction l as [| a]; intros; cbn; [ now rewrite app_nil_r | ].
 assert (H : bsort_insert rel a ls = ls ++ [a]). {
-  enough (Hant : antisymmetric rel).
-  enough (Htra : transitive rel).
   clear IHl.
   assert (H : sorted rel (ls ++ [a]) = true). {
     rewrite List_app_cons, app_assoc in Hs.
     now apply sorted_app in Hs.
   }
   clear l Hs; rename H into Hs.
-(**)
-  revert a Hs.
-  induction ls as [| b] using rev_ind; intros; [ easy | cbn ].
-  apply sorted_app in Hs.
-  destruct Hs as (Hs & _ & Htrr).
-  specialize (Htrr Htra).
-  specialize (IHls _ Hs) as H1.
-  destruct ls as [| c]; cbn. {
-    clear Hs H1.
-    specialize (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
-    rename Htrr into Hba.
-    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab; [ | easy ].
-    apply Hant in Hba.
-    now rewrite (Hba Hab).
-  }
-  specialize (Htrr c a (or_introl eq_refl) (or_introl eq_refl)) as Hca.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac. {
-    apply Hant in Hca.
-    specialize (Hca Hac); subst c.
-    f_equal.
-    cbn in H1.
-    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-    destruct ba. {
-      injection H1; clear H1; intros H1 H2; subst b.
-      rewrite <- H1; cbn.
-      now f_equal.
-    }
-    injection H1; clear H1; intros H1.
-    apply Bool.not_true_iff_false in Hba.
-    exfalso; apply Hba.
-    apply Htrr; [ | now left ].
-    now apply in_or_app; right; left.
-  }
-  f_equal.
-  cbn in H1.
-  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-  destruct bc. {
-    injection H1; clear H1; intros H1 H2; subst c.
-    rewrite <- H1; cbn.
-    rewrite Hac.
-    f_equal.
 ...
-    cbn in Hs.
-    rewrite <- H1 in Hs.
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (_, Hs).
+  apply sorted_bsort_insert_r.
 ...
-    remember (a :: l) as l'; cbn in Hs; subst l'.
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hba, Hs).
-    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab; [ | easy ].
-    apply Hant in Hba.
-    now rewrite (Hba Hab).
-  }
-  cbn in H1.
-  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct bc. {
-    injection H1; clear H1; intros H1 H2; subst c.
-    destruct ac. {
-      cbn in Hs.
-...
+  enough (Hant : antisymmetric rel).
+  enough (Htra : transitive rel).
   revert a Hs.
   induction ls as [| b]; intros; [ easy | cbn ].
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
@@ -2991,6 +3031,31 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
   destruct Hs as (Hbc, Hs).
   rewrite <- Hlc in Hs.
   specialize (IHls _ Hs) as H1.
+  rewrite Hlc in Hs; cbn in Hs.
+  destruct lc as [| d]. {
+    destruct ls; [ | now destruct ls ].
+    cbn in Hlc.
+    injection Hlc; clear Hlc; intros; subst c.
+    apply Hant in Hbc.
+    now rewrite (Hbc Hab).
+  }
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hcd & Hs).
+  cbn in Hs.
+  destruct lc as [| e]. {
+    destruct ls as [| e]; [ easy | ].
+    destruct ls; [ | now destruct ls ].
+    cbn in Hlc.
+    injection Hlc; clear Hlc; intros; subst d e.
+    unfold transitive in Htra.
+    specialize (Htra a b c Hab Hbc) as H2.
+    specialize (Hant a c H2 Hcd) as H3.
+    subst c.
+    specialize (Hant a b Hab Hbc) as H3.
+    now subst b.
+  }
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hde & Hs).
 ...
   cbn in Hs.
   destruct ab. {
