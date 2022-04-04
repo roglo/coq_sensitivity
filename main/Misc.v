@@ -3737,9 +3737,48 @@ induction it; intros. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
 cbn.
-...
 remember (bsort_swap rel (length l) l) as lb eqn:Hlb.
 symmetry in Hlb.
+destruct lb as [lb| ]. 2: {
+  clear - Hlb.
+  remember (length l) as it eqn:H.
+  assert (Hit : length l ≤ it) by flia H.
+  clear - Hit Hlb.
+  revert l Hit Hlb.
+  induction it; intros. {
+    now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  }
+  cbn in Hlb.
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]; [ easy | ].
+  remember (b :: l) as l'; cbn in Hit; subst l'.
+  apply Nat.succ_le_mono in Hit.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    specialize (IHit _ Hit) as H1.
+    remember (b :: l) as l'; cbn; subst l'.
+    apply Bool.andb_true_iff.
+    split; [ easy | ].
+    apply H1.
+    now destruct (bsort_swap rel it (b :: l)).
+  }
+  now destruct (bsort_swap rel it (a :: l)).
+}
+Print bsort_swap.
+Theorem glop : ∀ A (rel : A → _) it la lb,
+  length la ≤ it
+  → bsort_swap rel it la = Some lb
+  → ∃ a1 a2, rel a2 a1 = true ∧
+    (∃ l1 l2, la = l1 ++ [a1; a2] ++ l2) ∧
+    (∃ l1 l2, lb = l1 ++ [a2; a1] ++ l2).
+...
+specialize (glop rel) as H1.
+specialize (H1 (length l) l lb (le_refl _) Hlb).
+destruct H1 as (a & b & Haa & Ha & Hb).
+destruct Ha as (la1 & la2 & Ha).
+destruct Hb as (lb1 & lb2 & Hb).
+apply IHit.
+...
 destruct lb as [lb| ]. {
   destruct l as [| a]; [ easy | ].
   cbn in Hit; apply Nat.succ_le_mono in Hit.
