@@ -3723,6 +3723,23 @@ Qed.
 
 (* *)
 
+(* to be completed
+Theorem bbsort_loop_is_sorted : ∀ A (rel : A → _),
+  ∀ it l,
+  length l ≤ it
+  → sorted rel (bbsort_loop rel it l) = true.
+...
+
+Theorem bbsort_is_sorted : ∀ A (rel : A → _),
+  ∀ l, sorted rel (bbsort rel l) = true.
+Proof.
+intros.
+unfold bbsort.
+...
+now apply bbsort_loop_is_sorted.
+Qed.
+*)
+
 Theorem bsort_loop_ssort_loop : ∀ A rel,
   antisymmetric rel →
   transitive rel →
