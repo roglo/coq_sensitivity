@@ -2819,10 +2819,53 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
   enough (Htra : transitive rel).
   clear IHl.
   revert a l Hs.
-  induction ls as [| b]; intros; [ easy | cbn ].
+(*
+  induction ls as [| b] using rev_ind; intros; [ easy | cbn ].
+  rewrite <- app_assoc in Hs.
   cbn in Hs.
+  specialize (IHls _ _ Hs) as H1.
+  destruct ls as [| c]; cbn. {
+    remember (a :: l) as l'; cbn in Hs; subst l'.
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hba, Hs).
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ | easy ].
+    apply Hant in Hba.
+    now rewrite (Hba Hab).
+  }
+  cbn in H1.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct bc. {
+    injection H1; clear H1; intros H1 H2; subst c.
+    destruct ac. {
+      cbn in Hs.
+*)
+  induction ls as [| b]; intros; [ easy | cbn ].
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. 2: {
+    f_equal.
+    cbn in Hs.
+    remember (ls ++ a :: l) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| c]; [ now destruct ls | ].
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hbc, Hs).
+    eapply IHls with (l := l).
+    now rewrite Hlc.
+  }
+  cbn in Hs.
+  remember (ls ++ a :: l) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [| c]; [ now destruct ls | ].
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  rewrite <- Hlc in Hs.
+  specialize (IHls _ _ Hs) as H1.
+...
+  cbn in Hs.
   destruct ab. {
+...
     remember (ls ++ a :: l) as lc eqn:Hlc; symmetry in Hlc.
     destruct lc as [| c]; [ now destruct ls | ].
     apply Bool.andb_true_iff in Hs.
