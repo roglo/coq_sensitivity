@@ -3728,6 +3728,19 @@ Theorem bbsort_loop_is_sorted : ∀ A (rel : A → _),
   ∀ it l,
   length l ≤ it
   → sorted rel (bbsort_loop rel it l) = true.
+Proof.
+intros * Hit.
+revert l Hit.
+induction it; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+cbn.
+remember (bbsort_swap rel (length l) l) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [lb| ]. {
+  specialize (sorted_bbsort_swap rel) as H1.
+  rewrite sorted_bbsort_swap in Hlb; [ easy | ].
+  (* ouais non, c'est pas ça... *)
 ...
 
 Theorem bbsort_is_sorted : ∀ A (rel : A → _),
