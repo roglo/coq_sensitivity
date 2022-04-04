@@ -2187,35 +2187,46 @@ Definition ssort {A} (rel : A → _) l := ssort_loop rel (length l) l.
 
 Fixpoint bbsort_swap {A} (rel : A → A → bool) it l :=
   match it with
-  | 0 => (l, 0)
+  | 0 => None
   | S it' =>
       match l with
-      | [] | [_] => (l, 0)
+      | [] | [_] => None
       | a :: b :: l' =>
-          let (l'', exch) :=
+          match
             bbsort_swap rel it' ((if rel a b then b else a) :: l')
-          in
-          if rel a b then (a :: l'', exch)
-          else (b :: l'', S exch)
+          with
+          | Some l'' => Some (if rel a b then a :: l'' else (b :: l''))
+          | None => if rel a b then None else Some (b :: a :: l')
+          end
       end
   end.
 
 Fixpoint bbsort_loop {A} (rel : A → A → bool) it l :=
   match it with
-  | 0 => (l, 0)
+  | 0 => l
   | S it' =>
-      let (l', exch) := bbsort_swap rel (length l) l in
-      match exch with
-      | 0 => (l', 0)
-      | S _ =>
-          let (l'', exch'') := bbsort_loop rel it' l' in
-          (l'', exch + exch'')
+      match bbsort_swap rel (length l) l with
+      | Some l' => bbsort_loop rel it' l'
+      | None => l
       end
   end.
 
-Definition bbsort_and_nb_transp {A} (rel : A → _) l := bbsort_loop rel (length l) l.
+Definition bbsort {A} (rel : A → _) l := bbsort_loop rel (length l) l.
 
-Definition bbsort {A} (rel : A → _) l := fst (bbsort_loop rel (length l) l).
+(*
+Compute (bbsort Nat.leb [7;5;3;22;8]).
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+Compute (map (λ l, bbsort Nat.leb l) (canon_sym_gr_list_list 4)).
+*)
 
 (* bsort length *)
 
@@ -3625,6 +3636,39 @@ specialize (H2 H); clear H.
 now rewrite H2 in Hbc.
 Qed.
 
+Theorem sorted_bbsort_swap : ∀ A (rel : A → _),
+  ∀ it la,
+  sorted rel la = true
+  → bbsort_swap rel it la = None.
+Proof.
+intros * Hs.
+revert la Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| a]; [ easy | ].
+destruct la as [| b]; [ easy | ].
+remember (b :: la) as lb; cbn in Hs; subst lb.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+rewrite Hab.
+now rewrite IHit.
+Qed.
+
+Theorem sorted_bbsort_loop : ∀ A (rel : A → _),
+  ∀ it l,
+  sorted rel l = true
+  → length l ≤ it
+  → bbsort_loop rel it l = l.
+Proof.
+intros * Hs Hit.
+rename l into la.
+revert la Hs Hit.
+induction it; intros; [ easy | cbn ].
+remember (bbsort_swap rel (length la) la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [lb| ]; [ | easy ].
+now rewrite sorted_bbsort_swap in Hlb.
+Qed.
+
 (* *)
 
 Theorem sorted_bsort : ∀ A (rel : A → _),
@@ -3646,6 +3690,15 @@ Proof.
 intros * Htr * Hs.
 unfold ssort.
 now apply sorted_ssort_loop.
+Qed.
+
+Theorem sorted_bbsort : ∀ A (rel : A → _),
+  ∀ l,
+  sorted rel l = true
+  → bbsort rel l = l.
+Proof.
+intros * Hs.
+now apply sorted_bbsort_loop.
 Qed.
 
 (* *)
@@ -3722,69 +3775,6 @@ Proof.
 intros * Hant Htr Htot *.
 now apply bsort_loop_ssort_loop.
 Qed.
-
-(* to be completed
-Theorem sorted_bbsort_loop : ∀ A (rel : A → _),
-  ∀ it l,
-  sorted rel l = true
-  → length l ≤ it
-  → fst (bbsort_loop rel it l) = l.
-Proof.
-intros * Hs Hit.
-rename l into la.
-revert la Hs Hit.
-induction it; intros; [ easy | cbn ].
-remember (bbsort_swap rel (length la) la) as bs eqn:Hbs.
-symmetry in Hbs.
-destruct bs as (lb, exch).
-Print bbsort_swap.
-Print bbsort_loop.
-...
-  bbsort_swap rel it la =
-    match la with
-    | [] => ([], 0)
-    | [a] => ([a], 0)
-    | a :: b :: l' =>
-        if rel a b then ...
-...
-destruct la as [| a]; [ easy | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-destruct exch. {
-  cbn.
-  destruct lb as [| b]. {
-    exfalso.
-    cbn in Hbs.
-    destruct la as [| a']; [ easy | ].
-    remember (bbsort_swap _ _ _) as lb eqn:Hlb.
-    destruct lb as (b, lb).
-    now destruct (rel a a').
-  }
-  assert (H : a = b). {
-    cbn in Hbs.
-    destruct la as [| a']. {
-      now injection Hbs; clear Hbs; intros; subst b lb.
-    }
-...
-cbn in Hs.
-destruct l as [| b]; [ easy | ].
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (Hab, Hs).
-specialize (IHit _ Hs Hit) as H1.
-rewrite Hab.
-rewrite List_length_cons.
-...
-
-Theorem sorted_bbsort : ∀ A (rel : A → _),
-  ∀ l,
-  sorted rel l = true
-  → bbsort rel l = l.
-Proof.
-intros * Hs.
-unfold bbsort.
-...
-now apply sorted_bbsort_loop.
-Qed.
-*)
 
 (* *)
 
