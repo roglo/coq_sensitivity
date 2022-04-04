@@ -3737,10 +3737,29 @@ induction it; intros. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
 cbn.
+...
 remember (bsort_swap rel (length l) l) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]. {
-  specialize (sorted_bsort_swap rel) as H1.
+  destruct l as [| a]; [ easy | ].
+  cbn in Hit; apply Nat.succ_le_mono in Hit.
+  cbn in Hlb.
+  destruct l as [| b]; [ easy | ].
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    remember (bsort_swap rel (length (b :: l)) (b :: l)) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [lc| ]; [ | easy ].
+    injection Hlb; clear Hlb; intros; subst lb.
+    apply IHit.
+...
+  remember ((if rel a b then b else a) :: l) as l' eqn:Hl'.
+  cbn in Hlb; subst l'.
+...
+  apply IHit.
+...
+Print bsort_swap.
+...
   rewrite sorted_bsort_swap in Hlb; [ easy | ].
   (* ouais non, c'est pas ça... *)
 ...
