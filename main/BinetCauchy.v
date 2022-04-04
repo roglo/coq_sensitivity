@@ -820,7 +820,7 @@ Qed.
 Theorem sorted_bsort_insert : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ a ls l,
   sorted ord (ls ++ a :: l) = true
   → sorted ord (bsort_insert ord a ls) = true.
@@ -871,7 +871,7 @@ Qed.
 Theorem sorted_bsort_loop : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ ls l,
   sorted ord (ls ++ l) = true
   → bsort_loop ord ls l = ls ++ l.
@@ -947,7 +947,7 @@ Qed.
 Theorem sorted_bsort : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ l,
   sorted ord l = true
   → bsort ord l = l.
@@ -4653,7 +4653,7 @@ apply sorted_bsort; [ | | | easy ]. {
 } {
   apply Nat_leb_trans.
 } {
-  apply Nat_leb_has_total_order.
+  apply Nat_leb_is_total_relation.
 }
 Qed.
 

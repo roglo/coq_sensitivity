@@ -2747,13 +2747,22 @@ Definition antisymmetric A (ord : A → A → bool) :=
 Definition transitive A (ord : A → A → bool) :=
   ∀ a b c, ord a b = true → ord b c = true → ord a c = true.
 
-Definition total_order {A} (ord : A → _) := ∀ a b,
+Definition total_relation {A} (ord : A → _) := ∀ a b,
   (ord a b || ord b a)%bool = true.
+
+Theorem total_relation_is_reflexive : ∀ A (ord : A → _),
+  total_relation ord → reflexive ord.
+Proof.
+intros * Htot a.
+specialize (Htot a a) as H1.
+apply Bool.orb_true_iff in H1.
+now destruct H1.
+Qed.
 
 (* bsort is sorted *)
 
 Theorem bsort_insert_is_sorted : ∀ A ord (a : A) lsorted,
-  total_order ord
+  total_relation ord
   → sorted ord lsorted = true
   → sorted ord (bsort_insert ord a lsorted) = true.
 Proof.
@@ -2778,7 +2787,7 @@ destruct ab. {
 Qed.
 
 Theorem bsort_loop_is_sorted : ∀ A ord (lsorted l : list A),
-  total_order ord
+  total_relation ord
   → sorted ord lsorted = true
   → sorted ord (bsort_loop ord lsorted l) = true.
 Proof.
@@ -2789,7 +2798,7 @@ now apply IHl, bsort_insert_is_sorted.
 Qed.
 
 Theorem bsort_is_sorted : ∀ A (ord : A → _),
-  total_order ord
+  total_relation ord
   → ∀ l, sorted ord (bsort ord l) = true.
 Proof.
 intros * Hto *.
@@ -3011,16 +3020,15 @@ destruct ac; subst x. {
 Qed.
 
 Theorem select_first_if : ∀ A (ord : A → _),
-  reflexive ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ a b la lb,
   select_first ord a la = (b, lb)
   → (∀ c, c ∈ a :: la → ord b c = true) ∧
     (∀ c, c ∈ lb → ord b c = true) ∧
     Permutation (a :: la) (b :: lb).
 Proof.
-intros * Href Htr Htot * Hab.
+intros * Htr Htot * Hab.
 revert a b lb Hab.
 induction la as [| c]; intros. {
   cbn in Hab.
@@ -3028,7 +3036,9 @@ induction la as [| c]; intros. {
   split; [ | easy ].
   intros c Hc.
   destruct Hc as [Hc| Hc]; [ | easy ].
-  subst c; apply Href.
+  subst c.
+  apply total_relation_is_reflexive in Htot.
+  apply Htot.
 }
 cbn in Hab.
 remember (if ord a c then a else c) as x eqn:Hx; symmetry in Hx.
@@ -3087,17 +3097,16 @@ destruct ac; subst x. {
 Qed.
 
 Theorem Permutation_select_first : ∀ A (ord : A → _),
-  reflexive ord →
   antisymmetric ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ a a' b' la lb la' lb',
   Permutation la lb
   → select_first ord a la = (a', la')
   → select_first ord a lb = (b', lb')
   → a' = b' ∧ Permutation la' lb'.
 Proof.
-intros * Href Hant Htr Htot * Hab Ha Hb.
+intros * Hant Htr Htot * Hab Ha Hb.
 revert a a' b' la' lb' Ha Hb.
 induction Hab; intros. {
   cbn in Ha, Hb.
@@ -3208,17 +3217,16 @@ induction Hab; intros. {
 Qed.
 
 Theorem Permutation_ssort_loop : ∀ A (ord : A → _),
-  reflexive ord →
   antisymmetric ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ it la lb,
   length la = length lb
   → length la ≤ it
   → Permutation la lb
   → ssort_loop ord it la = ssort_loop ord it lb.
 Proof.
-intros * Href Hant Htr Htot * Hlab Hit Hab.
+intros * Hant Htr Htot * Hlab Hit Hab.
 revert la lb Hlab Hit Hab.
 induction it; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
@@ -3241,7 +3249,7 @@ destruct lb' as (b', lb').
 move b' before a'; move lb' before la'.
 inversion Hab; subst. {
   rename H0 into Hpab.
-  specialize (Permutation_select_first Href Hant Htr Htot) as H1.
+  specialize (Permutation_select_first Hant Htr Htot) as H1.
   specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
   destruct H1 as (H1, H2); subst b'; f_equal.
   apply IHit; [ | | easy ]. {
@@ -3286,7 +3294,7 @@ inversion Hab; subst. {
   specialize (select_first_length ord a la Hla') as H1.
   specialize (select_first_length ord b lb Hlb') as H2.
   assert (Hab' : a' = b'). {
-    apply (select_first_if Href Htr Htot) in Hla', Hlb'.
+    apply (select_first_if Htr Htot) in Hla', Hlb'.
     destruct Hla' as (Hla1 & Hla2 & Hla3).
     destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
     specialize (Hla1 b') as H3.
@@ -3309,7 +3317,7 @@ inversion Hab; subst. {
   }
   subst b'; f_equal.
   apply IHit; [ congruence | congruence | ].
-  apply (select_first_if Href Htr Htot) in Hla', Hlb'.
+  apply (select_first_if Htr Htot) in Hla', Hlb'.
   destruct Hla' as (Hla1 & Hla2 & Hla3).
   destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
   apply Permutation_trans with (l := a' :: la') in Hab; [ | easy ].
@@ -3320,16 +3328,15 @@ inversion Hab; subst. {
 Qed.
 
 Theorem bsort_loop_ssort_loop : ∀ A ord,
-  reflexive ord →
   antisymmetric ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ (ls l : list A) it,
   it = length (ls ++ l)
   → sorted ord ls = true
   → bsort_loop ord ls l = ssort_loop ord it (ls ++ l).
 Proof.
-intros * Href Hant Htr Htot * Hit Hs.
+intros * Hant Htr Htot * Hit Hs.
 subst it.
 revert ls Hs.
 induction l as [| a]; intros. {
@@ -3341,7 +3348,7 @@ rewrite IHl; [ | now apply bsort_insert_is_sorted ].
 do 2 rewrite app_length.
 rewrite bsort_insert_length.
 rewrite List_length_cons, <- Nat.add_succ_comm.
-apply (Permutation_ssort_loop Href Hant Htr Htot). {
+apply (Permutation_ssort_loop Hant Htr Htot). {
   do 2 rewrite app_length.
   rewrite bsort_insert_length.
   now rewrite Nat.add_succ_comm.
@@ -3361,14 +3368,13 @@ apply Permutation_app_comm.
 Qed.
 
 Theorem bsort_ssort : ∀ (A : Type) (ord : A → A → bool),
-  reflexive ord →
   antisymmetric ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ (l : list A),
   bsort ord l = ssort ord l.
 Proof.
-intros * Href Hant Htr Htot *.
+intros * Hant Htr Htot *.
 now apply bsort_loop_ssort_loop.
 Qed.
 
@@ -3403,14 +3409,13 @@ now constructor.
 Qed.
 
 Theorem ssort_loop_is_sorted : ∀ A (ord : A → _),
-  reflexive ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ l len,
   length l ≤ len
   → sorted ord (ssort_loop ord len l) = true.
 Proof.
-intros * Href Htr Htot * Hlen.
+intros * Htr Htot * Hlen.
 revert l Hlen.
 induction len; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
@@ -3438,7 +3443,7 @@ apply ssort_loop_Permutation in Hlc. 2: {
   apply select_first_length in Hlb.
   congruence.
 }
-apply (select_first_if Href Htr Htot) in Hlb.
+apply (select_first_if Htr Htot) in Hlb.
 destruct Hlb as (_ & H2 & _).
 specialize (H2 c).
 assert (H : c ∈ lb). {
@@ -3452,22 +3457,20 @@ Qed.
 (* interesting that
    - for the result of bsort to be sorted, we just need ord to be a total
      order, but
-   - for the result of ssort to be sorted, we also need it to be reflexive and
-     transitive.
+   - for the result of ssort to be sorted, we also need it to be transitive.
 *)
 Theorem ssort_is_sorted : ∀ A (ord : A → _),
-  reflexive ord →
   transitive ord →
-  total_order ord →
+  total_relation ord →
   ∀ l, sorted ord (ssort ord l) = true.
 Proof.
-intros * Href Htr Htot *.
+intros * Htr Htot *.
 now apply ssort_loop_is_sorted.
 Qed.
 
 (* *)
 
-Theorem Nat_leb_has_total_order : total_order Nat.leb.
+Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
 Proof.
 intros i j.
 apply Bool.orb_true_iff.

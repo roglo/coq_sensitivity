@@ -430,7 +430,7 @@ Theorem permut_bsort_leb : ∀ l,
   → bsort Nat.leb l = seq 0 (length l).
 Proof.
 intros * Hp.
-specialize (bsort_is_sorted Nat_leb_has_total_order l) as Hbs.
+specialize (bsort_is_sorted Nat_leb_is_total_relation l) as Hbs.
 specialize (Permutation_bsort Nat.leb l) as Hps.
 remember (bsort Nat.leb l) as l'; clear Heql'.
 specialize (Permutation_permut) as Hpl'.

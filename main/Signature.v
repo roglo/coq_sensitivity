@@ -2237,7 +2237,7 @@ assert (Hj'l : j' < length l). {
 }
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
 rewrite nth_ff_app_bsort_rank in Hc2; [ | easy ].
-specialize (bsort_is_sorted Nat_leb_has_total_order l) as Hsl.
+specialize (bsort_is_sorted Nat_leb_is_total_relation l) as Hsl.
 rewrite (bsort_bsort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
@@ -2334,7 +2334,7 @@ Qed.
 Theorem bsort_insert_insert_sym : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ a b l,
   bsort_insert ord a (bsort_insert ord b l) =
   bsort_insert ord b (bsort_insert ord a l).
@@ -2389,7 +2389,7 @@ Qed.
 Theorem bsort_loop_insert_middle : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ ls la lb a,
   bsort_loop ord ls (la ++ a :: lb) =
   bsort_loop ord (bsort_insert ord a ls) (la ++ lb).
@@ -2404,7 +2404,7 @@ Qed.
 Theorem Permutation_bsort_loop : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ la lb lsorted a,
   Permutation la lb
   → bsort_loop ord lsorted la = bsort_loop ord lsorted lb
@@ -2446,7 +2446,7 @@ Qed.
 Theorem Permutation_bsort : ∀ A (ord : A → _),
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ la lb,
   Permutation la lb
   → bsort ord la = bsort ord lb.
@@ -2471,7 +2471,7 @@ Qed.
 Theorem permut_bsort : ∀ ord,
   antisymmetric ord
   → transitive ord
-  → total_order ord
+  → total_relation ord
   → ∀ n l p q,
   is_permut n p
   → is_permut n q
@@ -2497,7 +2497,7 @@ intros * Hp.
 symmetry.
 rewrite <- (comp_1_r (length l) eq_refl) at 1.
 specialize (permut_bsort Nat_leb_antisym Nat_leb_trans) as H1.
-specialize (H1 Nat_leb_has_total_order).
+specialize (H1 Nat_leb_is_total_relation).
 apply (H1 (length l)); [ | easy ].
 apply seq_is_permut.
 Qed.
