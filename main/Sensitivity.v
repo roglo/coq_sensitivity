@@ -261,13 +261,13 @@ Fixpoint list_list_nat_le lla llb :=
   end.
 
 Definition all_partitions n :=
-  bsort list_list_nat_le
+  isort list_list_nat_le
     (nodup (list_eq_dec (list_eq_dec Nat.eq_dec))
-       (map (bsort list_nat_le)
+       (map (isort list_nat_le)
           (map (filter (λ s, negb (is_nil s))) (pre_partitions n)))).
 
-Compute (map (bsort list_nat_le) (pre_partitions 4)).
-Compute (nodup (list_eq_dec (list_eq_dec Nat.eq_dec)) (map (bsort list_nat_le) (pre_partitions 4))).
+Compute (map (isort list_nat_le) (pre_partitions 4)).
+Compute (nodup (list_eq_dec (list_eq_dec Nat.eq_dec)) (map (isort list_nat_le) (pre_partitions 4))).
 Compute (all_partitions 4).
 
 (* Local block sensitivity *)
