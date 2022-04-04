@@ -1768,7 +1768,7 @@ Proof.
 intros * Hl.
 exists (ff_app (bsort_rank Nat.leb l) n).
 split. {
-  rewrite <- bsort_rank_length with (ord := Nat.leb).
+  rewrite <- (bsort_rank_length Nat.leb).
   destruct Hl as (Hp, Hl).
   specialize (bsort_rank_is_permut Nat.leb _ Hl) as Hil.
   apply Hil, nth_In.
@@ -2577,7 +2577,7 @@ split. {
   destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
     exfalso; apply Hila; clear Hila.
     rewrite Hi.
-    rewrite <- bsort_rank_length with (ord := Nat.leb).
+    rewrite <- (bsort_rank_length Nat.leb).
     apply bsort_rank_is_permut_list, nth_In.
     rewrite bsort_rank_length; cbn.
     apply in_butn in Hj.
