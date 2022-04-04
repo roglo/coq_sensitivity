@@ -2939,6 +2939,11 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
     now apply in_or_app; right; left.
   }
   f_equal.
+  cbn in H1.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc. {
+    injection H1; clear H1; intros H1 H2; subst c.
+    cbn in Hs.
 ...
     remember (a :: l) as l'; cbn in Hs; subst l'.
     apply Bool.andb_true_iff in Hs.
