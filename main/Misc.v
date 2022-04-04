@@ -3765,6 +3765,7 @@ destruct lb as [lb| ]. 2: {
   now destruct (bsort_swap rel it (a :: l)).
 }
 Print bsort_swap.
+...
 Theorem glop : ∀ A (rel : A → _) it la lb,
   length la ≤ it
   → bsort_swap rel it la = Some lb
