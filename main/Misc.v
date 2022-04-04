@@ -2183,9 +2183,9 @@ Fixpoint ssort_loop {A} (rel : A → A → bool) it l :=
 
 Definition ssort {A} (rel : A → _) l := ssort_loop rel (length l) l.
 
-(* bisort: bubble sort *)
+(* bsort: bubble sort *)
 
-Fixpoint bisort_swap {A} (rel : A → A → bool) it l :=
+Fixpoint bsort_swap {A} (rel : A → A → bool) it l :=
   match it with
   | 0 => None
   | S it' =>
@@ -2193,7 +2193,7 @@ Fixpoint bisort_swap {A} (rel : A → A → bool) it l :=
       | [] | [_] => None
       | a :: b :: l' =>
           match
-            bisort_swap rel it' ((if rel a b then b else a) :: l')
+            bsort_swap rel it' ((if rel a b then b else a) :: l')
           with
           | Some l'' => Some (if rel a b then a :: l'' else (b :: l''))
           | None => if rel a b then None else Some (b :: a :: l')
@@ -2201,20 +2201,20 @@ Fixpoint bisort_swap {A} (rel : A → A → bool) it l :=
       end
   end.
 
-Fixpoint bisort_loop {A} (rel : A → A → bool) it l :=
+Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
   match it with
   | 0 => l
   | S it' =>
-      match bisort_swap rel (length l) l with
-      | Some l' => bisort_loop rel it' l'
+      match bsort_swap rel (length l) l with
+      | Some l' => bsort_loop rel it' l'
       | None => l
       end
   end.
 
-Definition bisort {A} (rel : A → _) l := bisort_loop rel (length l) l.
+Definition bsort {A} (rel : A → _) l := bsort_loop rel (length l) l.
 
 (*
-Compute (bisort Nat.leb [7;5;3;22;8]).
+Compute (bsort Nat.leb [7;5;3;22;8]).
 Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
 Fixpoint canon_sym_gr_list n k : list nat :=
   match n with
@@ -2225,7 +2225,7 @@ Fixpoint canon_sym_gr_list n k : list nat :=
   end.
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, bisort Nat.leb l) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 4)).
 *)
 
 (* isort length *)
@@ -3638,10 +3638,10 @@ specialize (H2 H); clear H.
 now rewrite H2 in Hbc.
 Qed.
 
-Theorem sorted_bisort_swap : ∀ A (rel : A → _),
+Theorem sorted_bsort_swap : ∀ A (rel : A → _),
   ∀ it la,
   sorted rel la = true
-  → bisort_swap rel it la = None.
+  → bsort_swap rel it la = None.
 Proof.
 intros * Hs.
 revert la Hs.
@@ -3655,20 +3655,20 @@ rewrite Hab.
 now rewrite IHit.
 Qed.
 
-Theorem sorted_bisort_loop : ∀ A (rel : A → _),
+Theorem sorted_bsort_loop : ∀ A (rel : A → _),
   ∀ it l,
   sorted rel l = true
   → length l ≤ it
-  → bisort_loop rel it l = l.
+  → bsort_loop rel it l = l.
 Proof.
 intros * Hs Hit.
 rename l into la.
 revert la Hs Hit.
 induction it; intros; [ easy | cbn ].
-remember (bisort_swap rel (length la) la) as lb eqn:Hlb.
+remember (bsort_swap rel (length la) la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]; [ | easy ].
-now rewrite sorted_bisort_swap in Hlb.
+now rewrite sorted_bsort_swap in Hlb.
 Qed.
 
 (* *)
@@ -3694,13 +3694,13 @@ unfold ssort.
 now apply sorted_ssort_loop.
 Qed.
 
-Theorem sorted_bisort : ∀ A (rel : A → _),
+Theorem sorted_bsort : ∀ A (rel : A → _),
   ∀ l,
   sorted rel l = true
-  → bisort rel l = l.
+  → bsort rel l = l.
 Proof.
 intros * Hs.
-now apply sorted_bisort_loop.
+now apply sorted_bsort_loop.
 Qed.
 
 (* *)
@@ -3726,10 +3726,10 @@ Qed.
 (* *)
 
 (* to be completed
-Theorem bisort_loop_is_sorted : ∀ A (rel : A → _),
+Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   ∀ it l,
   length l ≤ it
-  → sorted rel (bisort_loop rel it l) = true.
+  → sorted rel (bsort_loop rel it l) = true.
 Proof.
 intros * Hit.
 revert l Hit.
@@ -3737,21 +3737,21 @@ induction it; intros. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
 cbn.
-remember (bisort_swap rel (length l) l) as lb eqn:Hlb.
+remember (bsort_swap rel (length l) l) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]. {
-  specialize (sorted_bisort_swap rel) as H1.
-  rewrite sorted_bisort_swap in Hlb; [ easy | ].
+  specialize (sorted_bsort_swap rel) as H1.
+  rewrite sorted_bsort_swap in Hlb; [ easy | ].
   (* ouais non, c'est pas ça... *)
 ...
 
-Theorem bisort_is_sorted : ∀ A (rel : A → _),
-  ∀ l, sorted rel (bisort rel l) = true.
+Theorem bsort_is_sorted : ∀ A (rel : A → _),
+  ∀ l, sorted rel (bsort rel l) = true.
 Proof.
 intros.
-unfold bisort.
+unfold bsort.
 ...
-now apply bisort_loop_is_sorted.
+now apply bsort_loop_is_sorted.
 Qed.
 *)
 
