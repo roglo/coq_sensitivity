@@ -2919,6 +2919,26 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
     apply Hant in Hba.
     now rewrite (Hba Hab).
   }
+  specialize (Htrr c a (or_introl eq_refl) (or_introl eq_refl)) as Hca.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
+    apply Hant in Hca.
+    specialize (Hca Hac); subst c.
+    f_equal.
+    cbn in H1.
+    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba. {
+      injection H1; clear H1; intros H1 H2; subst b.
+      rewrite <- H1; cbn.
+      now f_equal.
+    }
+    injection H1; clear H1; intros H1.
+    apply Bool.not_true_iff_false in Hba.
+    exfalso; apply Hba.
+    apply Htrr; [ | now left ].
+    now apply in_or_app; right; left.
+  }
+  f_equal.
 ...
     remember (a :: l) as l'; cbn in Hs; subst l'.
     apply Bool.andb_true_iff in Hs.
