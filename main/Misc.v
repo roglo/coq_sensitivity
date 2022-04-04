@@ -3105,8 +3105,6 @@ apply IHl.
 now rewrite <- app_assoc.
 Qed.
 
-(* bsort and ssort return same *)
-
 Theorem ssort_loop_cons : ∀ A rel it a b (la lb : list A),
   length la ≤ it
   → select_first rel a la = (b, lb)
@@ -3710,6 +3708,8 @@ rewrite List_app_cons, app_assoc.
 apply Permutation_app; [ | easy ].
 apply Permutation_app_comm.
 Qed.
+
+(* bsort and ssort return same *)
 
 Theorem bsort_ssort : ∀ (A : Type) (rel : A → A → bool),
   antisymmetric rel →
