@@ -3765,19 +3765,28 @@ destruct lb as [lb| ]. 2: {
   now destruct (bsort_swap rel it (a :: l)).
 }
 Print bsort_swap.
-...
 Theorem glop : ∀ A (rel : A → _) it la lb,
   length la ≤ it
   → bsort_swap rel it la = Some lb
-  → ∃ a1 a2, rel a2 a1 = true ∧
-    (∃ l1 l2, la = l1 ++ [a1; a2] ++ l2) ∧
-    (∃ l1 l2, lb = l1 ++ [a2; a1] ++ l2).
+  → ∃ lab a b la1 lb1 , rel a b = false ∧
+    la = lab ++ a :: b :: la1 ∧
+    lb = lab ++ b :: a :: lb1 ∧
+    Permutation la1 lb1.
 ...
 specialize (glop rel) as H1.
 specialize (H1 (length l) l lb (le_refl _) Hlb).
-destruct H1 as (a & b & Haa & Ha & Hb).
-destruct Ha as (la1 & la2 & Ha).
-destruct Hb as (lb1 & lb2 & Hb).
+destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hla1 & Hlb1 & Hlab).
+subst l lb.
+rewrite app_length in Hit, Hlb; cbn in Hit, Hlb.
+do 2 rewrite Nat.add_succ_r in Hit, Hlb.
+apply Nat.succ_le_mono in Hit.
+remember (S (length lab + length la1)) as len eqn:Hlen.
+cbn in Hlb.
+remember (lab ++ a :: b :: la1) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| d]; [ easy | ].
+destruct lc as [| e]; [ easy | ].
+...
 apply IHit.
 ...
 destruct lb as [lb| ]. {
