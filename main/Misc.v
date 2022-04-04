@@ -2141,7 +2141,7 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
-(* bsort *)
+(* bsort: sort by insertion *)
 
 Fixpoint bsort_insert {A} (rel : A → A → bool) a lsorted :=
   match lsorted with
@@ -2159,7 +2159,7 @@ Fixpoint bsort_loop {A} (rel : A → A → bool) lsorted l :=
 
 Definition bsort {A} (rel : A → A → bool) := bsort_loop rel [].
 
-(* sort by selection *)
+(* ssort: sort by selection *)
 
 Fixpoint select_first {A} (rel : A → A → bool) a la :=
   match la with
@@ -2182,6 +2182,39 @@ Fixpoint ssort_loop {A} (rel : A → A → bool) it l :=
   end.
 
 Definition ssort {A} (rel : A → _) l := ssort_loop rel (length l) l.
+
+(* bbsort: bubble sort *)
+
+Fixpoint bbsort_swap {A} (rel : A → A → bool) it l :=
+  match it with
+  | 0 => (l, 0)
+  | S it' =>
+      match l with
+      | [] | [_] => (l, 0)
+      | a :: b :: l' =>
+          let (l'', exch) :=
+            bbsort_swap rel it' ((if rel a b then b else a) :: l')
+          in
+          if rel a b then (a :: l'', exch)
+          else (b :: l'', S exch)
+      end
+  end.
+
+Fixpoint bbsort_loop {A} (rel : A → A → bool) it l :=
+  match it with
+  | 0 => (l, 0)
+  | S it' =>
+      let (l', exch) := bbsort_swap rel (length l) l in
+      match exch with
+      | 0 => (l', 0)
+      | S _ =>
+          let (l'', exch'') := bbsort_loop rel it' l' in
+          (l'', exch + exch'')
+      end
+  end.
+
+(* bbsort also answers the number of transpositions *)
+Definition bbsort {A} (rel : A → _) l := bbsort_loop rel (length l) l.
 
 (* bsort length *)
 
@@ -2877,15 +2910,6 @@ induction l as [| a]; intros; [ easy | cbn ].
 now apply IHl, bsort_insert_is_sorted.
 Qed.
 
-Theorem bsort_is_sorted : ∀ A (rel : A → _),
-  total_relation rel
-  → ∀ l, sorted rel (bsort rel l) = true.
-Proof.
-intros * Hto *.
-destruct l as [| a]; [ easy | cbn ].
-now apply bsort_loop_is_sorted.
-Qed.
-
 Theorem sorted_trans : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la,
@@ -2926,7 +2950,64 @@ f_equal.
 now apply IHla.
 Qed.
 
-(* to be completed
+Theorem cons_app_repeat : ∀ A (a : A) la,
+  a :: la = la ++ [a]
+  → la = repeat a (length la).
+Proof.
+intros * Hla.
+induction la as [| b]; intros; [ easy | cbn ].
+cbn in Hla.
+injection Hla; clear Hla; intros Hla H1; subst b.
+f_equal.
+now apply IHla.
+Qed.
+
+Theorem bsort_insert_trans_r : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ a b la,
+  rel a b = true
+  → bsort_insert rel a la = la ++ [a]
+  → bsort_insert rel b (la ++ [a]) = la ++ [a; b].
+Proof.
+intros * Hant Htra * Hab Hs.
+induction la as [| c]; cbn. {
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  now rewrite (Hant a b Hab Hba).
+}
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc. {
+  cbn in Hs.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
+    injection Hs; clear Hs; intros Hs H1; subst c.
+    specialize (Hant a b Hab Hbc) as H1; subst b.
+    f_equal.
+    now rewrite app_comm_cons, Hs, <- app_assoc.
+  }
+  specialize (Htra a b c Hab Hbc) as H1.
+  congruence.
+}
+f_equal.
+apply IHla.
+cbn in Hs.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac; [ | now injection Hs ].
+injection Hs; clear Hs; intros Hs H1; subst c.
+apply cons_app_repeat in Hs.
+rewrite Hs.
+remember (length la) as len eqn:Hlen.
+clear - Hant Htra.
+induction len; [ easy | cbn ].
+destruct (rel a a). {
+  f_equal.
+  apply repeat_cons.
+}
+f_equal.
+apply IHlen.
+Qed.
+
 Theorem sorted_bsort_insert_r : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -2987,13 +3068,24 @@ destruct bc. {
   f_equal; apply IHlen.
 }
 injection H1; clear H1; intros H1.
-...
+rewrite <- app_assoc; cbn.
+specialize (Htrr b a) as Hba.
+assert (H : b ∈ c :: la ++ [b]). {
+  rewrite app_comm_cons.
+  now apply in_or_app; right; left.
+}
+specialize (Hba H (or_introl eq_refl)); clear H.
+now apply bsort_insert_trans_r.
+Qed.
 
-Theorem sorted_bsort_loop : ∀ A (rel : A → _) ls l,
+Theorem sorted_bsort_loop : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ ls l,
   sorted rel (ls ++ l) = true
   → bsort_loop rel ls l = ls ++ l.
 Proof.
-intros * Hs.
+intros * Hant Htra * Hs.
 revert ls Hs.
 induction l as [| a]; intros; cbn; [ now rewrite app_nil_r | ].
 assert (H : bsort_insert rel a ls = ls ++ [a]). {
@@ -3003,112 +3095,15 @@ assert (H : bsort_insert rel a ls = ls ++ [a]). {
     now apply sorted_app in Hs.
   }
   clear l Hs; rename H into Hs.
-...
-  apply sorted_bsort_insert_r.
-...
-  enough (Hant : antisymmetric rel).
-  enough (Htra : transitive rel).
-  revert a Hs.
-  induction ls as [| b]; intros; [ easy | cbn ].
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. 2: {
-    f_equal.
-    cbn in Hs.
-    remember (ls ++ [a]) as lc eqn:Hlc.
-    symmetry in Hlc.
-    destruct lc as [| c]; [ now destruct ls | ].
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hbc, Hs).
-    rewrite <- Hlc.
-    apply IHls.
-    now rewrite Hlc.
-  }
-  cbn in Hs.
-  remember (ls ++ [a]) as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as [| c]; [ now destruct ls | ].
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbc, Hs).
-  rewrite <- Hlc in Hs.
-  specialize (IHls _ Hs) as H1.
-  rewrite Hlc in Hs; cbn in Hs.
-  destruct lc as [| d]. {
-    destruct ls; [ | now destruct ls ].
-    cbn in Hlc.
-    injection Hlc; clear Hlc; intros; subst c.
-    apply Hant in Hbc.
-    now rewrite (Hbc Hab).
-  }
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hcd & Hs).
-  cbn in Hs.
-  destruct lc as [| e]. {
-    destruct ls as [| e]; [ easy | ].
-    destruct ls; [ | now destruct ls ].
-    cbn in Hlc.
-    injection Hlc; clear Hlc; intros; subst d e.
-    unfold transitive in Htra.
-    specialize (Htra a b c Hab Hbc) as H2.
-    specialize (Hant a c H2 Hcd) as H3.
-    subst c.
-    specialize (Hant a b Hab Hbc) as H3.
-    now subst b.
-  }
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hde & Hs).
-...
-  cbn in Hs.
-  destruct ab. {
-...
-    remember (ls ++ a :: l) as lc eqn:Hlc; symmetry in Hlc.
-    destruct lc as [| c]; [ now destruct ls | ].
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hbc, Hs).
-...
-    cbn in Hs.
-    destruct lc as [| d]. {
-      destruct ls; [ | now destruct ls ].
-      cbn in Hlc.
-      injection Hlc; clear Hlc; intros; subst c l.
-      apply Hant in Hbc.
-      now rewrite (Hbc Hab).
-    }
-    apply Bool.andb_true_iff in Hs.
-    destruct Hs as (Hcd, Hs).
-    cbn in Hs.
-    destruct lc as [| e]. {
-...
-    specialize (Htra a b c Hab Hbc) as H1.
-...
-destruct ls as [| b]; [ apply (IHl [a] Hs) | ].
-rewrite List_app_cons, app_assoc in Hs.
-specialize (IHl _ Hs) as H1.
-cbn in Hs, H1 |-*.
-remember ((ls ++ [a]) ++ l) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]; [ now destruct ls | ].
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (Hbc, Hs).
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-...
-rewrite List_app_cons, app_assoc in Hs.
-specialize (IHl _ Hs) as H1.
-...
-
-Theorem sorted_bsort : ∀ A (rel : A → _),
-  ∀ l,
-  sorted rel l = true
-  → bsort rel l = l.
-Proof.
-intros * Hs.
-unfold bsort.
-...
-now apply sorted_bsort_loop.
-...
+  now apply sorted_bsort_insert_r.
+}
+rewrite H.
+symmetry.
+rewrite List_app_cons, app_assoc.
+symmetry.
+apply IHl.
+now rewrite <- app_assoc.
 Qed.
-
-...
-*)
 
 (* bsort and ssort return same *)
 
@@ -3215,16 +3210,6 @@ apply IHit; [ easy | ].
 cbn in Hs.
 destruct la as [| b]; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
-Qed.
-
-Theorem sorted_ssort : ∀ A (rel : A → _),
-  transitive rel → ∀ l,
-  sorted rel l = true
-  → ssort rel l = l.
-Proof.
-intros * Htr * Hs.
-unfold ssort.
-now apply sorted_ssort_loop.
 Qed.
 
 Theorem select_first_Permutation : ∀ A (rel : A → _) a b la lb,
@@ -3565,57 +3550,6 @@ inversion Hab; subst. {
 }
 Qed.
 
-Theorem bsort_loop_ssort_loop : ∀ A rel,
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ (ls l : list A) it,
-  it = length (ls ++ l)
-  → sorted rel ls = true
-  → bsort_loop rel ls l = ssort_loop rel it (ls ++ l).
-Proof.
-intros * Hant Htr Htot * Hit Hs.
-subst it.
-revert ls Hs.
-induction l as [| a]; intros. {
-  cbn; rewrite app_nil_r.
-  now symmetry; apply sorted_ssort.
-}
-cbn.
-rewrite IHl; [ | now apply bsort_insert_is_sorted ].
-do 2 rewrite app_length.
-rewrite bsort_insert_length.
-rewrite List_length_cons, <- Nat.add_succ_comm.
-apply (Permutation_ssort_loop Hant Htr Htot). {
-  do 2 rewrite app_length.
-  rewrite bsort_insert_length.
-  now rewrite Nat.add_succ_comm.
-} {
-  now rewrite app_length, bsort_insert_length.
-}
-apply Permutation_sym.
-transitivity (a :: ls ++ l). 2: {
-  rewrite app_comm_cons.
-  apply Permutation_app; [ | easy ].
-  now apply Permutation_cons_bsort_insert.
-}
-rewrite app_comm_cons.
-rewrite List_app_cons, app_assoc.
-apply Permutation_app; [ | easy ].
-apply Permutation_app_comm.
-Qed.
-
-Theorem bsort_ssort : ∀ (A : Type) (rel : A → A → bool),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ (l : list A),
-  bsort rel l = ssort rel l.
-Proof.
-intros * Hant Htr Htot *.
-now apply bsort_loop_ssort_loop.
-Qed.
-
 Theorem ssort_loop_Permutation : ∀ A (rel : A → _) la lb len,
   length la ≤ len
   → ssort_loop rel len la = lb
@@ -3692,11 +3626,40 @@ specialize (H2 H); clear H.
 now rewrite H2 in Hbc.
 Qed.
 
-(* interesting that
-   - for the result of bsort to be sorted, we just need rel to be a total
-     order, but
-   - for the result of ssort to be sorted, we also need it to be transitive.
-*)
+(* *)
+
+Theorem sorted_bsort : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ l,
+  sorted rel l = true
+  → bsort rel l = l.
+Proof.
+intros * Hant Htra * Hs.
+now apply sorted_bsort_loop.
+Qed.
+
+Theorem sorted_ssort : ∀ A (rel : A → _),
+  transitive rel → ∀ l,
+  sorted rel l = true
+  → ssort rel l = l.
+Proof.
+intros * Htr * Hs.
+unfold ssort.
+now apply sorted_ssort_loop.
+Qed.
+
+(* *)
+
+Theorem bsort_is_sorted : ∀ A (rel : A → _),
+  total_relation rel
+  → ∀ l, sorted rel (bsort rel l) = true.
+Proof.
+intros * Hto *.
+destruct l as [| a]; [ easy | cbn ].
+now apply bsort_loop_is_sorted.
+Qed.
+
 Theorem ssort_is_sorted : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
@@ -3707,6 +3670,59 @@ now apply ssort_loop_is_sorted.
 Qed.
 
 (* *)
+
+Theorem bsort_loop_ssort_loop : ∀ A rel,
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ (ls l : list A) it,
+  it = length (ls ++ l)
+  → sorted rel ls = true
+  → bsort_loop rel ls l = ssort_loop rel it (ls ++ l).
+Proof.
+intros * Hant Htr Htot * Hit Hs.
+subst it.
+revert ls Hs.
+induction l as [| a]; intros. {
+  cbn; rewrite app_nil_r.
+  now symmetry; apply sorted_ssort.
+}
+cbn.
+rewrite IHl; [ | now apply bsort_insert_is_sorted ].
+do 2 rewrite app_length.
+rewrite bsort_insert_length.
+rewrite List_length_cons, <- Nat.add_succ_comm.
+apply (Permutation_ssort_loop Hant Htr Htot). {
+  do 2 rewrite app_length.
+  rewrite bsort_insert_length.
+  now rewrite Nat.add_succ_comm.
+} {
+  now rewrite app_length, bsort_insert_length.
+}
+apply Permutation_sym.
+transitivity (a :: ls ++ l). 2: {
+  rewrite app_comm_cons.
+  apply Permutation_app; [ | easy ].
+  now apply Permutation_cons_bsort_insert.
+}
+rewrite app_comm_cons.
+rewrite List_app_cons, app_assoc.
+apply Permutation_app; [ | easy ].
+apply Permutation_app_comm.
+Qed.
+
+Theorem bsort_ssort : ∀ (A : Type) (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ (l : list A),
+  bsort rel l = ssort rel l.
+Proof.
+intros * Hant Htr Htot *.
+now apply bsort_loop_ssort_loop.
+Qed.
+
+(**)
 
 Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
 Proof.
