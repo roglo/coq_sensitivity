@@ -4033,10 +4033,9 @@ destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
 specialize (Htot a b) as Hba.
 rewrite Hab in Hba; cbn in Hba.
 move Hba before Hab.
-...
-Check bsort_swap_Some.
-...
+(*
 rewrite Hlb1.
+*)
 remember (lab ++ [b]) as lb2 eqn:Hlb2.
 specialize (IHit lb2) as H1.
 assert (H : length lb2 * length lb2 ≤ it). {
@@ -4078,8 +4077,8 @@ assert (H : length lb2 * length lb2 ≤ it). {
 }
 specialize (H2 H); clear H.
 subst lb2.
-specialize (Htot a b) as Hba.
-rewrite Hab in Hba; cbn in Hba.
+move Hba at bottom.
+rewrite Hlb1.
 ...
 apply sorted_bsort_loop_app; try easy.
 ...
