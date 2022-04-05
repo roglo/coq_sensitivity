@@ -3770,7 +3770,7 @@ Qed.
 
 (* *)
 
-Theorem bsort_swap_rel_Some : ∀ A (rel : A → _) it la lb,
+Theorem bsort_swap_Some : ∀ A (rel : A → _) it la lb,
   length la ≤ it
   → bsort_swap rel it la = Some lb
   → length la = length lb ∧
@@ -3825,13 +3825,14 @@ Qed.
 (* to be completed
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   transitive rel →
+  total_relation rel →
   ∀ a b la lb it,
   sorted rel (bsort_loop rel it (la ++ [a])) = true
   → sorted rel (bsort_loop rel it (b :: lb)) = true
   → rel a b = true
   → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
 Proof.
-intros * Htra * Hsa Hsb Hab.
+intros * Htra Htot * Hsa Hsb Hab.
 revert a b la lb Hsa Hsb Hab.
 induction it; intros; cbn. {
   remember (b :: lb) as l.
@@ -3864,6 +3865,37 @@ induction it; intros; cbn. {
   apply (Htra _ b); [ easy | ].
   now apply (sorted_extends Htra _ _ Hsb).
 }
+remember (b :: lb) as lc; cbn in Hsa, Hsb; subst lc.
+rewrite app_length; cbn.
+rewrite Nat.add_comm; cbn.
+remember (la ++ a :: b :: lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ easy | ].
+destruct lc as [| d]; [ easy | ].
+remember (rel c d) as cd eqn:Hcd.
+symmetry in Hcd.
+destruct cd. {
+  destruct lc as [| e]; [ now cbn; rewrite Hcd | ].
+  remember (rel d e) as de eqn:Hde.
+  symmetry in Hde.
+  destruct de. {
+    remember (bsort_swap rel (length lb + length la) (e :: lc)) as lf eqn:Hlf.
+    symmetry in Hlf.
+    destruct lf as [lf| ]. {
+      apply bsort_swap_Some in Hlf. 2: {
+        cbn.
+        apply (f_equal length) in Hlc.
+        rewrite app_length in Hlc.
+        cbn in Hlc; flia Hlc.
+      }
+      destruct Hlf as (Hlen & lab & f & g & la1 & lb1 & Hfg & Hsf & He & Hf & Hpab).
+      subst lf.
+      do 2 rewrite app_comm_cons.
+      apply IHit. 3: {
+        specialize (Htot f g) as Hgf.
+        now rewrite Hfg in Hgf.
+      } 2: {
+(* quel bordel ! *)
 ...
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
@@ -3907,7 +3939,7 @@ destruct lb as [lb| ]. 2: {
   }
   now destruct (bsort_swap rel it (a :: l)).
 }
-specialize (bsort_swap_rel_Some rel) as H1.
+specialize (bsort_swap_Some rel) as H1.
 specialize (H1 (length l) l lb (le_refl _) Hlb).
 destruct H1 as (Hll, H1).
 destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
