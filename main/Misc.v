@@ -2822,12 +2822,13 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-Theorem sorted_extends : ∀ A rel (a : A) l,
-  transitive rel
-  → sorted rel (a :: l) = true
+Theorem sorted_extends : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a l,
+  sorted rel (a :: l) = true
   → ∀ b, b ∈ l → rel a b = true.
 Proof.
-intros * Htrans Hsort b Hb.
+intros * Htra * Hsort b Hb.
 induction l as [| c]; [ easy | ].
 apply sorted_cons_cons_true_iff in Hsort.
 destruct Hsort as (Hac, Hsort).
@@ -2837,7 +2838,7 @@ destruct l as [| d]; [ easy | ].
 apply sorted_cons_cons_true_iff in Hsort.
 apply sorted_cons_cons_true_iff.
 destruct Hsort as (Hcd, Hsort).
-split; [ now apply Htrans with (b := c) | easy ].
+split; [ now apply Htra with (b := c) | easy ].
 Qed.
 
 Theorem sorted_app : ∀ A rel (la lb : list A),
@@ -2882,6 +2883,50 @@ split. {
   cbn - [ sorted ] in Hab.
   apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
   now apply in_or_app; right.
+}
+Qed.
+
+Theorem sorted_app_iff : ∀ A rel,
+  transitive rel →
+  ∀ (la lb : list A),
+  sorted rel (la ++ lb) = true
+  ↔ sorted rel la = true ∧ sorted rel lb = true ∧
+    (∀ a b, a ∈ la → b ∈ lb → rel a b = true).
+Proof.
+intros * Htra *.
+split. {
+  intros Hab.
+  apply sorted_app in Hab.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros a b Ha Hb.
+  now apply Hab.
+} {
+  intros (Ha & Hb & Hab).
+  revert lb Hb Hab.
+  induction la as [| a] using rev_ind; intros; [ easy | cbn ].
+  rewrite <- app_assoc; cbn.
+  apply IHla. {
+    now apply sorted_app in Ha.
+  } {
+    cbn.
+    destruct lb as [| b]; [ easy | ].
+    rewrite Hab; cycle 1. {
+      now apply in_or_app; right; left.
+    } {
+      now left.
+    }
+    now rewrite Hb.
+  }
+  intros a' b' Ha' Hb'.
+  destruct Hb' as [Hb'| Hb']. {
+    apply sorted_app in Ha.
+    subst b'.
+    apply Ha; [ easy | easy | now left ].
+  } {
+    apply Hab; [ | easy ].
+    now apply in_or_app; left.
+  }
 }
 Qed.
 
@@ -3779,11 +3824,46 @@ Qed.
 
 (* to be completed
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
+  transitive rel →
   ∀ a b la lb it,
   sorted rel (bsort_loop rel it (la ++ [a])) = true
   → sorted rel (bsort_loop rel it (b :: lb)) = true
   → rel a b = true
   → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
+Proof.
+intros * Htra * Hsa Hsb Hab.
+revert a b la lb Hsa Hsb Hab.
+induction it; intros; cbn. {
+  remember (b :: lb) as l.
+  cbn in Hsa, Hsb; subst l.
+  do 2 rewrite List_app_cons.
+  rewrite app_assoc.
+  apply (sorted_app_iff Htra).
+  split; [ easy | ].
+  split; [ easy | ].
+  intros c d Hc Hd.
+  apply in_app_or in Hc, Hd.
+  destruct Hc as [Hc| Hc]. {
+    apply (sorted_app_iff Htra) in Hsa.
+    destruct Hsa as (Hsa & _ & Hba).
+    destruct Hd as [Hd| Hd]. {
+      destruct Hd; [ subst d | easy ].
+      apply (Htra _ a); [ | easy ].
+      apply Hba; [ easy | now left ].
+    }
+    apply (Htra _ b). {
+      apply (Htra _ a); [ | easy ].
+      apply Hba; [ easy | now left ].
+    }
+    now apply (sorted_extends Htra _ _ Hsb).
+  }
+  destruct Hc; [ subst c | easy ].
+  destruct Hd as [Hd| Hd]. {
+    destruct Hd; [ now subst d | easy ].
+  }
+  apply (Htra _ b); [ easy | ].
+  now apply (sorted_extends Htra _ _ Hsb).
+}
 ...
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
@@ -3983,50 +4063,6 @@ intros a b c Hab Hbc.
 apply Nat.ltb_lt in Hab, Hbc.
 apply Nat.ltb_lt.
 now transitivity b.
-Qed.
-
-Theorem sorted_app_iff : ∀ A rel,
-  transitive rel
-  → ∀ (la lb : list A),
-  sorted rel (la ++ lb) = true
-  ↔ sorted rel la = true ∧ sorted rel lb = true ∧
-    (∀ a b, a ∈ la → b ∈ lb → rel a b = true).
-Proof.
-intros * Htra *.
-split. {
-  intros Hab.
-  apply sorted_app in Hab.
-  split; [ easy | ].
-  split; [ easy | ].
-  intros a b Ha Hb.
-  now apply Hab.
-} {
-  intros (Ha & Hb & Hab).
-  revert lb Hb Hab.
-  induction la as [| a] using rev_ind; intros; [ easy | cbn ].
-  rewrite <- app_assoc; cbn.
-  apply IHla. {
-    now apply sorted_app in Ha.
-  } {
-    cbn.
-    destruct lb as [| b]; [ easy | ].
-    rewrite Hab; cycle 1. {
-      now apply in_or_app; right; left.
-    } {
-      now left.
-    }
-    now rewrite Hb.
-  }
-  intros a' b' Ha' Hb'.
-  destruct Hb' as [Hb'| Hb']. {
-    apply sorted_app in Ha.
-    subst b'.
-    apply Ha; [ easy | easy | now left ].
-  } {
-    apply Hab; [ | easy ].
-    now apply in_or_app; left.
-  }
-}
 Qed.
 
 Theorem sorted_middle : ∀ A rel (a b : A) la lb lc,

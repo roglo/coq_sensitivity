@@ -280,10 +280,8 @@ destruct l as [| b]; [ cbn in Hil; flia Hil | ].
 apply sorted_cons_cons_true_iff in Hsort.
 destruct Hsort as (Hab & Hs).
 apply Nat.ltb_lt in Hab.
-specialize (@sorted_extends _ Nat.ltb b l) as H1.
 destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
-specialize (H1 Nat_ltb_trans).
-specialize (H1 Hs a).
+specialize (sorted_extends Nat_ltb_trans b l Hs a) as H1.
 cbn in Hil.
 apply Nat.succ_lt_mono in Hil.
 assert (H : a ∈ l) by now subst a; apply nth_In.
@@ -663,9 +661,7 @@ clear - H1.
 induction l as [| a]; [ constructor | ].
 constructor. {
   intros Hal.
-  specialize sorted_extends as H2.
-  specialize (H2 _ Nat.ltb a l Nat_ltb_trans H1).
-  specialize (H2 a Hal).
+  specialize (sorted_extends Nat_ltb_trans a l H1 a Hal) as H2.
   now rewrite Nat.ltb_irrefl in H2.
 }
 apply IHl.
