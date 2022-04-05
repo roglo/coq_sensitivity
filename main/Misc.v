@@ -3838,7 +3838,7 @@ destruct lc; [ easy | clear Hs ].
 now rewrite (IHla eq_refl).
 Qed.
 
-(* to be completed
+(*
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
@@ -4001,7 +4001,9 @@ apply IHit; cycle 2. {
 }
 ...
 *)
+*)
 
+(* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
