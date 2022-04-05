@@ -3798,7 +3798,8 @@ destruct ab. 2: {
 injection Hs; clear Hs; intros; subst lb.
 specialize (IHla lc eq_refl) as H1.
 destruct H1 as (Hll & Hns & H1).
-destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hs & Hbla & Hlcl & Hab1).
+destruct H1 as (lab & c & d & la1 & la2 & Hcd & H1).
+destruct H1 as (Hsc & Hbla & Hlcl & Hab1).
 cbn in Hll.
 do 3 rewrite List_length_cons.
 rewrite Hll.
@@ -3811,15 +3812,18 @@ split. {
 exists (a :: lab), c, d, la1, la2.
 rewrite Hbla, Hlcl.
 split; [ easy | ].
-split; [ cbn | easy ].
-destruct lab as [| e]. {
-  cbn in Hbla |-*.
-  injection Hbla; clear Hbla; intros Hbla H; subst c.
-  now rewrite Hab.
+split. {
+  cbn.
+  destruct lab as [| e]. {
+    cbn in Hbla |-*.
+    injection Hbla; clear Hbla; intros Hbla H; subst c.
+    now rewrite Hab.
+  }
+  cbn in Hbla.
+  injection Hbla; clear Hbla; intros Hbla H; subst e.
+  now rewrite Hsc; cbn; rewrite Hab.
 }
-cbn in Hbla.
-injection Hbla; clear Hbla; intros Hbla H; subst e.
-now rewrite Hs; cbn; rewrite Hab.
+easy.
 Qed.
 
 Theorem bsort_swap_None : ∀ A (rel : A → _) la,
@@ -4026,6 +4030,41 @@ specialize (bsort_swap_Some rel) as H1.
 specialize (H1 la lb Hlb).
 destruct H1 as (Hll & Hns & H1).
 destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
+specialize (Htot a b) as Hba.
+rewrite Hab in Hba; cbn in Hba.
+move Hba before Hab.
+...
+assert (H : sorted rel (lab ++ [b]) = true). {
+  rewrite Hlb1 in Hlb.
+  clear - Hs Hba Hlb.
+  revert a b lb1 lab Hlb Hba Hs.
+  induction la as [| c]; intros; [ easy | ].
+  cbn in Hlb.
+  destruct la as [| d]; [ easy | ].
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  destruct cd. {
+    remember (bsort_swap rel (d :: la)) as le eqn:Hle; symmetry in Hle.
+    destruct le as [le| ]. {
+      injection Hlb; clear Hlb; intros Hlb.
+      clear Hlb.
+      induction lab as [| e]; [ easy | ].
+      assert (H : sorted rel (lab ++ [a]) = true). {
+        cbn - [ sorted ] in Hs.
+        now apply sorted_cons in Hs.
+      }
+      specialize (IHlab H); clear H.
+      cbn in Hs |-*.
+      destruct lab as [| f]. {
+        cbn in Hs |-*.
+        rewrite Bool.andb_true_r in Hs |-*.
+...
+      cbn in Hlb.
+      injection Hlb; clear Hlb; intros Hlb H1; subst e.
+...
+      eapply IHla with (a := a); [ | easy | easy ].
+      f_equal.
+...
+Check bsort_swap_Some.
 ...
 rewrite Hlb1.
 remember (lab ++ [b]) as lb2 eqn:Hlb2.
