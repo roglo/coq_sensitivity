@@ -3887,9 +3887,9 @@ induction it; intros. {
   apply Hsa; [ easy | now left ].
 }
 cbn in Hsa, Hsb |-*.
-remember (bsort_swap rel (length la) la) as lc eqn:Hlc.
-remember (bsort_swap rel (length lb) lb) as ld eqn:Hld.
-remember (bsort_swap rel (length (la ++ lb)) (la ++ lb)) as le eqn:Hle.
+remember (bsort_swap rel la) as lc eqn:Hlc.
+remember (bsort_swap rel lb) as ld eqn:Hld.
+remember (bsort_swap rel (la ++ lb)) as le eqn:Hle.
 symmetry in Hlc, Hld, Hle.
 destruct le as [le| ]; [ | now apply bsort_swap_None in Hle ].
 apply bsort_swap_Some in Hle.
@@ -3899,6 +3899,8 @@ rewrite Hle.
 apply IHit; cycle 2. {
   cbn.
   destruct lab as [| a] using rev_ind. {
+    clear Hsf; exfalso.
+    cbn in He, Hle.
 ...
   remember (b :: lb) as l.
   cbn in Hsa, Hsb; subst l.
