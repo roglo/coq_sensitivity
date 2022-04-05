@@ -4034,36 +4034,6 @@ specialize (Htot a b) as Hba.
 rewrite Hab in Hba; cbn in Hba.
 move Hba before Hab.
 ...
-assert (H : sorted rel (lab ++ [b]) = true). {
-  rewrite Hlb1 in Hlb.
-  clear - Hs Hba Hlb.
-  revert a b lb1 lab Hlb Hba Hs.
-  induction la as [| c]; intros; [ easy | ].
-  cbn in Hlb.
-  destruct la as [| d]; [ easy | ].
-  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
-  destruct cd. {
-    remember (bsort_swap rel (d :: la)) as le eqn:Hle; symmetry in Hle.
-    destruct le as [le| ]. {
-      injection Hlb; clear Hlb; intros Hlb.
-      clear Hlb.
-      induction lab as [| e]; [ easy | ].
-      assert (H : sorted rel (lab ++ [a]) = true). {
-        cbn - [ sorted ] in Hs.
-        now apply sorted_cons in Hs.
-      }
-      specialize (IHlab H); clear H.
-      cbn in Hs |-*.
-      destruct lab as [| f]. {
-        cbn in Hs |-*.
-        rewrite Bool.andb_true_r in Hs |-*.
-...
-      cbn in Hlb.
-      injection Hlb; clear Hlb; intros Hlb H1; subst e.
-...
-      eapply IHla with (a := a); [ | easy | easy ].
-      f_equal.
-...
 Check bsort_swap_Some.
 ...
 rewrite Hlb1.
