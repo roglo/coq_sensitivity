@@ -4033,9 +4033,7 @@ destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
 specialize (Htot a b) as Hba.
 rewrite Hab in Hba; cbn in Hba.
 move Hba before Hab.
-(*
-rewrite Hlb1.
-*)
+...
 remember (lab ++ [b]) as lb2 eqn:Hlb2.
 specialize (IHit lb2) as H1.
 assert (H : length lb2 * length lb2 ≤ it). {
