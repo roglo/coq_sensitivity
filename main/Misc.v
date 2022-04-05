@@ -3840,12 +3840,24 @@ Qed.
 
 (* to be completed
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a b la lb it,
+  sorted rel (bsort_loop rel it (la ++ [a])) = true
+  → sorted rel (bsort_loop rel it (b :: lb)) = true
+  → rel a b = true
+  → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
+Proof.
+intros * Htra * Hsa Hsb Hab.
+...
+
+(*
+Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   reflexive rel →
   transitive rel →
-  ∀ d la lb it,
+  ∀ def la lb it,
   sorted rel (bsort_loop rel it la) = true
   → sorted rel (bsort_loop rel it lb) = true
-  → rel (last la d) (hd d lb) = true
+  → rel (last la def) (hd def lb) = true
   → sorted rel (bsort_loop rel it (la ++ lb)) = true.
 Proof.
 intros * Href Htra * Hsa Hsb Hab.
@@ -3896,11 +3908,18 @@ apply bsort_swap_Some in Hle.
 destruct Hle as (Hlen & Hns & Hle).
 destruct Hle as (lab & f & g & la1 & lb1 & Hfg & Hsf & He & Hle & Hpab).
 rewrite Hle.
+destruct lc as [lc| ]. {
+  destruct ld as [ld| ]. {
+    specialize (IHit _ _ Hsa Hsb) as H1.
+...
 apply IHit; cycle 2. {
   cbn.
   destruct lab as [| a] using rev_ind. {
     clear Hsf; exfalso.
     cbn in He, Hle.
+    destruct lc as [lc| ]. {
+      destruct ld as [ld| ]. {
+        specialize (IHit _ _ Hsa Hsb) as H1.
 ...
   remember (b :: lb) as l.
   cbn in Hsa, Hsb; subst l.
@@ -3933,6 +3952,7 @@ apply IHit; cycle 2. {
   now apply (sorted_extends Htra _ _ Hsb).
 }
 ...
+*)
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
@@ -4000,7 +4020,7 @@ subst lb2.
 specialize (Htot a b) as Hba.
 rewrite Hab in Hba; cbn in Hba.
 ...
-now apply sorted_bsort_loop_app.
+apply sorted_bsort_loop_app; try easy.
 ...
 
 Theorem bsort_is_sorted : ∀ A (rel : A → _),
