@@ -3841,13 +3841,61 @@ Qed.
 (* to be completed
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   transitive rel →
+  total_relation rel →
   ∀ a b la lb it,
   sorted rel (bsort_loop rel it (la ++ [a])) = true
   → sorted rel (bsort_loop rel it (b :: lb)) = true
   → rel a b = true
   → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
 Proof.
-intros * Htra * Hsa Hsb Hab.
+intros * Htra Htot * Hsa Hsb Hab.
+revert a b la lb Hsa Hsb Hab.
+induction it; intros. {
+  remember (b :: lb) as lc.
+  cbn in Hsa, Hsb |-*; subst lc.
+  rewrite List_app_cons, app_assoc.
+  apply (sorted_app_iff Htra).
+  split; [ easy | ].
+  split; [ easy | ].
+  intros c d Hc Hd.
+  apply in_app_or in Hc.
+  destruct Hc as [Hc| Hc]. {
+    apply (Htra _ a). {
+      apply (sorted_app_iff Htra) in Hsa.
+      apply Hsa; [ easy | now left ].
+    }
+    destruct Hd as [Hd| Hd]; [ now subst d | ].
+    apply (Htra _ b); [ easy | ].
+    now apply (sorted_extends Htra) with (l := lb).
+  }
+  destruct Hc as [Hc| Hc]; [ subst c | easy ].
+  destruct Hd as [Hd| Hd]; [ now subst d | ].
+  apply (Htra _ b); [ easy | ].
+  now apply (sorted_extends Htra) with (l := lb).
+}
+remember (b :: lb) as lc.
+cbn in Hsa, Hsb |-*; subst lc.
+remember (bsort_swap rel (la ++ [a])) as lc eqn:Hlc.
+remember (bsort_swap rel (b :: lb)) as ld eqn:Hld.
+remember (bsort_swap rel (la ++ a :: b :: lb)) as le eqn:Hle.
+symmetry in Hlc, Hld, Hle.
+destruct lc as [lc| ]. {
+  destruct ld as [ld| ]. {
+    destruct le as [le| ]. {
+(*
+      apply bsort_swap_Some in Hlc.
+      destruct Hlc as (Hlac & Hcsaa & Hlc).
+      destruct Hlc as (clab & ca & cb & cla1 & clb1 & Hlc).
+      destruct Hlc as (Hcab & Hsc & Hclaa & Hclc & Hcpab).
+*)
+      apply bsort_swap_Some in Hle.
+      destruct Hle as (Hlae & Hesaa & Hle).
+      destruct Hle as (elab & ea & eb & ela1 & elb1 & Hle).
+      destruct Hle as (Heab & Hse & Helaa & Helc & Hepab).
+      rewrite Helc.
+      specialize (Htot ea eb) as Heba.
+      rewrite Heab in Heba; cbn in Heba.
+      apply IHit; [ | | easy ]. {
 ...
 
 (*
