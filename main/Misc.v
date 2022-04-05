@@ -3735,6 +3735,9 @@ Theorem bsort_swap_rel_Some : ∀ A (rel : A → _) it la lb,
     Permutation la1 lb1.
 Proof.
 intros * Hit Hs.
+Compute (bsort_swap Nat.leb 40 [3;7;2;5]).
+...
+intros * Hit Hs.
 revert la lb Hit Hs.
 induction it; intros; [ easy | ].
 cbn in Hs.
