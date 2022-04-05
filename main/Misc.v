@@ -3771,8 +3771,7 @@ Qed.
 (* *)
 
 Theorem bsort_swap_Some : ∀ A (rel : A → _) it la lb,
-  length la ≤ it
-  → bsort_swap rel it la = Some lb
+  bsort_swap rel it la = Some lb
   → length la = length lb ∧
     ∃ lab a b la1 lb1 , rel a b = false ∧
     sorted rel (lab ++ [a]) = true ∧
@@ -3780,12 +3779,11 @@ Theorem bsort_swap_Some : ∀ A (rel : A → _) it la lb,
     lb = lab ++ b :: a :: lb1 ∧
     Permutation la1 lb1.
 Proof.
-intros * Hit Hs.
-revert la lb Hit Hs.
+intros * Hs.
+revert la lb Hs.
 induction it; intros; [ easy | ].
 cbn in Hs.
 destruct la as [| a]; [ easy | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
 destruct la as [| b]; [ easy | ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (bsort_swap rel it _) as lc eqn:Hlc.
@@ -3802,7 +3800,7 @@ destruct ab. 2: {
   now exists [], a, b, la, la.
 }
 injection Hs; clear Hs; intros; subst lb.
-specialize (IHit (b :: la) lc Hit Hlc) as H1.
+specialize (IHit (b :: la) lc (*Hit*) Hlc) as H1.
 destruct H1 as (Hll & H1).
 destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hs & Hbla & Hlcl & Hab1).
 cbn in Hll |-*.
@@ -3822,6 +3820,30 @@ injection Hbla; clear Hbla; intros Hbla H; subst e.
 now rewrite Hs; cbn; rewrite Hab.
 Qed.
 
+Theorem bsort_swap_None : ∀ A (rel : A → _) it la,
+  length la ≤ it
+  → bsort_swap rel it la = None
+  → sorted rel la = true.
+Proof.
+intros * Hit Hs.
+revert la Hit Hs.
+induction it; intros; cbn. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
+}
+cbn in Hs.
+destruct la as [| a]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+remember (bsort_swap rel it (b :: la)) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc; [ easy | clear Hs ].
+specialize (IHit _ Hit Hlc) as H1.
+remember (b :: la) as lc; cbn; subst lc.
+now rewrite Hab, H1.
+Qed.
+
 (* to be completed
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   transitive rel →
@@ -3834,7 +3856,8 @@ Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
 Proof.
 intros * Htra Htot * Hsa Hsb Hab.
 revert a b la lb Hsa Hsb Hab.
-induction it; intros; cbn. {
+induction it; intros. {
+  cbn.
   remember (b :: lb) as l.
   cbn in Hsa, Hsb; subst l.
   do 2 rewrite List_app_cons.
@@ -3865,6 +3888,23 @@ induction it; intros; cbn. {
   apply (Htra _ b); [ easy | ].
   now apply (sorted_extends Htra _ _ Hsb).
 }
+(**)
+remember (la ++ a :: b :: lb) as lc eqn:Hlc; cbn.
+remember (bsort_swap rel (length lc) lc) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [ld| ]; [ | now apply bsort_swap_None in Hld ].
+...
+apply bsort_swap_Some in Hld.
+destruct Hld as (Hlen & lab & f & g & la1 & lb1 & Hfg & Hsf & He & Hld & Hpab).
+...
+rewrite Hld.
+apply IHit; cycle 2. {
+  specialize (Htot f g) as H1.
+  now rewrite Hfg in H1.
+} {
+...
+apply sorted_bsort_swap in Hld.
+...
 remember (b :: lb) as lc; cbn in Hsa, Hsb; subst lc.
 rewrite app_length; cbn.
 rewrite Nat.add_comm; cbn.
