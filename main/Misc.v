@@ -2192,12 +2192,13 @@ Fixpoint bsort_swap {A} (rel : A → A → bool) it l :=
       match l with
       | [] | [_] => None
       | a :: b :: l' =>
-          match
-            bsort_swap rel it' ((if rel a b then b else a) :: l')
-          with
-          | Some l'' => Some (if rel a b then a :: l'' else (b :: l''))
-          | None => if rel a b then None else Some (b :: a :: l')
-          end
+          if rel a b then
+            match bsort_swap rel it' (b :: l') with
+            | Some l'' => Some (a :: l'')
+            | None => None
+            end
+          else
+            Some (b :: a :: l')
       end
   end.
 
@@ -2211,7 +2212,7 @@ Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
       end
   end.
 
-Definition bsort {A} (rel : A → _) l := bsort_loop rel (length l) l.
+Definition bsort {A} (rel : A → _) l := bsort_loop rel (length l * length l) l.
 
 (*
 Compute (bsort Nat.leb [7;5;3;22;8]).
@@ -2225,7 +2226,7 @@ Fixpoint canon_sym_gr_list n k : list nat :=
   end.
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 6)).
 *)
 
 (* isort length *)
@@ -3658,12 +3659,11 @@ Qed.
 Theorem sorted_bsort_loop : ∀ A (rel : A → _),
   ∀ it l,
   sorted rel l = true
-  → length l ≤ it
   → bsort_loop rel it l = l.
 Proof.
-intros * Hs Hit.
+intros * Hs.
 rename l into la.
-revert la Hs Hit.
+revert la Hs.
 induction it; intros; [ easy | cbn ].
 remember (bsort_swap rel (length la) la) as lb eqn:Hlb.
 symmetry in Hlb.
@@ -3725,18 +3725,16 @@ Qed.
 
 (* *)
 
-(* to be completed
 Theorem bsort_swap_rel_Some : ∀ A (rel : A → _) it la lb,
   length la ≤ it
   → bsort_swap rel it la = Some lb
-  → ∃ lab a b la1 lb1 , rel a b = false ∧
+  → length la = length lb ∧
+    ∃ lab a b la1 lb1 , rel a b = false ∧
+    sorted rel (lab ++ [a]) = true ∧
     la = lab ++ a :: b :: la1 ∧
     lb = lab ++ b :: a :: lb1 ∧
     Permutation la1 lb1.
 Proof.
-intros * Hit Hs.
-Compute (bsort_swap Nat.leb 40 [3;7;2;5]).
-...
 intros * Hit Hs.
 revert la lb Hit Hs.
 induction it; intros; [ easy | ].
@@ -3750,64 +3748,56 @@ symmetry in Hlc.
 destruct lc as [lc| ]. 2: {
   destruct ab; [ easy | ].
   injection Hs; clear Hs; intros; subst lb.
+  split; [ easy | ].
+  now exists [], a, b, la, la.
+}
+destruct ab. 2: {
+  injection Hs; clear Hs; intros; subst lb.
+  split; [ easy | ].
   now exists [], a, b, la, la.
 }
 injection Hs; clear Hs; intros; subst lb.
-remember (if ab then b else a) as x eqn:Hx.
-destruct ab; subst x. {
-  specialize (IHit (b :: la) lc Hit Hlc) as H1.
-  destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
-  rewrite Hbla, Hlcl.
-  now exists (a :: lab), c, d, la1, la2.
+specialize (IHit (b :: la) lc Hit Hlc) as H1.
+destruct H1 as (Hll & H1).
+destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hs & Hbla & Hlcl & Hab1).
+cbn in Hll |-*.
+rewrite Hll.
+split; [ easy | ].
+exists (a :: lab), c, d, la1, la2.
+rewrite Hbla, Hlcl.
+split; [ easy | ].
+split; [ cbn | easy ].
+destruct lab as [| e]. {
+  cbn in Hbla |-*.
+  injection Hbla; clear Hbla; intros Hbla H; subst c.
+  now rewrite Hab.
 }
-destruct it; [ easy | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-cbn in Hlc.
-destruct la as [| c]; [ easy | ].
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-remember (bsort_swap rel it _) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as [ld| ]. 2: {
-  destruct ac; [ easy | ].
-  injection Hlc; clear Hlc; intros; subst lc.
-  exists [], a, b.
-Print bsort_swap.
-(* en fait, c'est faux *)
-...
-  exists [], a, c, (c :: la), la.
-...
-remember (if ac then c else a) as x eqn:Hx.
-destruct ac; subst x. {
-...
-destruct ab. {
-  specialize (IHit (b :: la) lc Hit Hlc) as H1.
-  destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
-  rewrite Hbla, Hlcl.
-  now exists (a :: lab), c, d, la1, la2.
-}
-specialize (IHit (a :: la) lc Hit Hlc) as H1.
-destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
-...
-destruct ab. {
-  destruct it; [ easy | ].
-  apply Nat.succ_le_mono in Hit.
-  remember (bsort_swap rel (it (c :: la))
+cbn in Hbla.
+injection Hbla; clear Hbla; intros Hbla H; subst e.
+now rewrite Hs; cbn; rewrite Hab.
+Qed.
 
-  cbn in Hs.
-  destruct la as [| c]; [ easy | ].
-  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-  destruct bc. {
+(* to be completed
+Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
+  ∀ a b la lb it,
+  sorted rel (bsort_loop rel it (la ++ [a])) = true
+  → sorted rel (bsort_loop rel it (b :: lb)) = true
+  → rel a b = true
+  → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
 ...
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
+  total_relation rel →
   ∀ it l,
-  length l ≤ it
+  length l * length l ≤ it
   → sorted rel (bsort_loop rel it l) = true.
 Proof.
-intros * Hit.
+intros * Htot * Hit.
 revert l Hit.
 induction it; intros. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  apply Nat.le_0_r, Nat.eq_mul_0 in Hit.
+  assert (H : length l = 0) by now destruct Hit.
+  now apply length_zero_iff_nil in H; subst l.
 }
 cbn.
 remember (bsort_swap rel (length l) l) as lb eqn:Hlb.
@@ -3837,45 +3827,56 @@ destruct lb as [lb| ]. 2: {
   }
   now destruct (bsort_swap rel it (a :: l)).
 }
-...
 specialize (bsort_swap_rel_Some rel) as H1.
 specialize (H1 (length l) l lb (le_refl _) Hlb).
-destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hla1 & Hlb1 & Hlab).
-subst l lb.
-rewrite app_length in Hit, Hlb; cbn in Hit, Hlb.
-do 2 rewrite Nat.add_succ_r in Hit, Hlb.
-apply Nat.succ_le_mono in Hit.
-remember (S (length lab + length la1)) as len eqn:Hlen.
-cbn in Hlb.
-remember (lab ++ a :: b :: la1) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [| d]; [ easy | ].
-destruct lc as [| e]; [ easy | ].
+destruct H1 as (Hll, H1).
+destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
+rewrite Hlb1.
+remember (lab ++ [b]) as lb2 eqn:Hlb2.
+specialize (IHit lb2) as H1.
+assert (H : length lb2 * length lb2 ≤ it). {
+  subst lb2.
+  rewrite Hla1 in Hit.
+  move Hit at bottom.
+  rewrite app_length in Hit.
+  cbn in Hit |-*.
+  assert (H : length la1 = length lb1). {
+    apply (f_equal length) in Hla1, Hlb1.
+    rewrite app_length in Hla1, Hlb1.
+    rewrite  Hll in Hla1.
+    cbn in Hla1, Hlb1.
+    flia Hla1 Hlb1.
+  }
+  rewrite H in Hit.
+  rewrite app_length; cbn.
+  flia Hit.
+}
+specialize (H1 H); clear H.
+subst lb2.
+remember (a :: lb1) as lb2 eqn:Hlb2.
+specialize (IHit lb2) as H2.
+assert (H : length lb2 * length lb2 ≤ it). {
+  subst lb2.
+  rewrite Hla1 in Hit.
+  move Hit at bottom.
+  rewrite app_length in Hit.
+  cbn in Hit |-*.
+  assert (H : length la1 = length lb1). {
+    apply (f_equal length) in Hla1, Hlb1.
+    rewrite app_length in Hla1, Hlb1.
+    rewrite  Hll in Hla1.
+    cbn in Hla1, Hlb1.
+    flia Hla1 Hlb1.
+  }
+  rewrite H in Hit.
+  flia Hit.
+}
+specialize (H2 H); clear H.
+subst lb2.
+specialize (Htot a b) as Hba.
+rewrite Hab in Hba; cbn in Hba.
 ...
-apply IHit.
-...
-destruct lb as [lb| ]. {
-  destruct l as [| a]; [ easy | ].
-  cbn in Hit; apply Nat.succ_le_mono in Hit.
-  cbn in Hlb.
-  destruct l as [| b]; [ easy | ].
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    remember (bsort_swap rel (length (b :: l)) (b :: l)) as lc eqn:Hlc.
-    symmetry in Hlc.
-    destruct lc as [lc| ]; [ | easy ].
-    injection Hlb; clear Hlb; intros; subst lb.
-    apply IHit.
-...
-  remember ((if rel a b then b else a) :: l) as l' eqn:Hl'.
-  cbn in Hlb; subst l'.
-...
-  apply IHit.
-...
-Print bsort_swap.
-...
-  rewrite sorted_bsort_swap in Hlb; [ easy | ].
-  (* ouais non, c'est pas ça... *)
+now apply sorted_bsort_loop_app.
 ...
 
 Theorem bsort_is_sorted : ∀ A (rel : A → _),
