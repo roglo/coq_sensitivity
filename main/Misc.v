@@ -3726,6 +3726,76 @@ Qed.
 (* *)
 
 (* to be completed
+Theorem bsort_swap_rel_Some : ∀ A (rel : A → _) it la lb,
+  length la ≤ it
+  → bsort_swap rel it la = Some lb
+  → ∃ lab a b la1 lb1 , rel a b = false ∧
+    la = lab ++ a :: b :: la1 ∧
+    lb = lab ++ b :: a :: lb1 ∧
+    Permutation la1 lb1.
+Proof.
+intros * Hit Hs.
+revert la lb Hit Hs.
+induction it; intros; [ easy | ].
+cbn in Hs.
+destruct la as [| a]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+remember (bsort_swap rel it _) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [lc| ]. 2: {
+  destruct ab; [ easy | ].
+  injection Hs; clear Hs; intros; subst lb.
+  now exists [], a, b, la, la.
+}
+injection Hs; clear Hs; intros; subst lb.
+remember (if ab then b else a) as x eqn:Hx.
+destruct ab; subst x. {
+  specialize (IHit (b :: la) lc Hit Hlc) as H1.
+  destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
+  rewrite Hbla, Hlcl.
+  now exists (a :: lab), c, d, la1, la2.
+}
+destruct it; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+cbn in Hlc.
+destruct la as [| c]; [ easy | ].
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+remember (bsort_swap rel it _) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [ld| ]. 2: {
+  destruct ac; [ easy | ].
+  injection Hlc; clear Hlc; intros; subst lc.
+  exists [], a, b.
+Print bsort_swap.
+(* en fait, c'est faux *)
+...
+  exists [], a, c, (c :: la), la.
+...
+remember (if ac then c else a) as x eqn:Hx.
+destruct ac; subst x. {
+...
+destruct ab. {
+  specialize (IHit (b :: la) lc Hit Hlc) as H1.
+  destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
+  rewrite Hbla, Hlcl.
+  now exists (a :: lab), c, d, la1, la2.
+}
+specialize (IHit (a :: la) lc Hit Hlc) as H1.
+destruct H1 as (lab & c & d & la1 & la2 & Hcd & Hbla & Hlcl & Hab1).
+...
+destruct ab. {
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  remember (bsort_swap rel (it (c :: la))
+
+  cbn in Hs.
+  destruct la as [| c]; [ easy | ].
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc. {
+...
+
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   ∀ it l,
   length l ≤ it
@@ -3764,16 +3834,8 @@ destruct lb as [lb| ]. 2: {
   }
   now destruct (bsort_swap rel it (a :: l)).
 }
-Print bsort_swap.
-Theorem glop : ∀ A (rel : A → _) it la lb,
-  length la ≤ it
-  → bsort_swap rel it la = Some lb
-  → ∃ lab a b la1 lb1 , rel a b = false ∧
-    la = lab ++ a :: b :: la1 ∧
-    lb = lab ++ b :: a :: lb1 ∧
-    Permutation la1 lb1.
 ...
-specialize (glop rel) as H1.
+specialize (bsort_swap_rel_Some rel) as H1.
 specialize (H1 (length l) l lb (le_refl _) Hlb).
 destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hla1 & Hlb1 & Hlab).
 subst l lb.
