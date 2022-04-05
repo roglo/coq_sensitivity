@@ -3855,6 +3855,7 @@ now rewrite Hab, H1.
 Qed.
 
 (* to be completed
+(* je suis pas sûr de ça... *)
 Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
@@ -3898,7 +3899,7 @@ induction it; intros. {
   apply (Htra _ b); [ easy | ].
   now apply (sorted_extends Htra _ _ Hsb).
 }
-(**)
+...
 remember (la ++ a :: b :: lb) as lc eqn:Hlc; cbn.
 remember (bsort_swap rel (length lc) lc) as ld eqn:Hld.
 symmetry in Hld.
@@ -3906,7 +3907,6 @@ destruct ld as [ld| ]; [ | now apply bsort_swap_None in Hld ].
 apply bsort_swap_Some in Hld.
 destruct Hld as (Hlen & Hns & Hld).
 destruct Hld as (lab & f & g & la1 & lb1 & Hfg & Hsf & He & Hld & Hpab).
-...
 exfalso.
 rewrite Hlc in He.
 cbn in Hsa.
