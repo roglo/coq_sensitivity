@@ -4011,20 +4011,22 @@ Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   → sorted rel (bsort_loop rel it l) = true.
 Proof.
 intros * Htot * Hit.
-revert l Hit.
+rename l into la.
+revert la Hit.
 induction it; intros. {
   apply Nat.le_0_r, Nat.eq_mul_0 in Hit.
-  assert (H : length l = 0) by now destruct Hit.
-  now apply length_zero_iff_nil in H; subst l.
+  assert (H : length la = 0) by now destruct Hit.
+  now apply length_zero_iff_nil in H; subst la.
 }
 cbn.
-remember (bsort_swap rel l) as lb eqn:Hlb.
+remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
 specialize (bsort_swap_Some rel) as H1.
-specialize (H1 l lb Hlb).
+specialize (H1 la lb Hlb).
 destruct H1 as (Hll & Hns & H1).
 destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
+...
 rewrite Hlb1.
 remember (lab ++ [b]) as lb2 eqn:Hlb2.
 specialize (IHit lb2) as H1.
