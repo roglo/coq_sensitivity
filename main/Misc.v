@@ -4026,6 +4026,17 @@ cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+(**)
+destruct la as [| a]; [ easy | ].
+destruct la as [| b]; [ easy | ].
+remember (b :: la) as lc; cbn in Hlb; subst lc.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (bsort_swap rel (b :: la)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [lc| ]; [ | easy ].
+  injection Hlb; clear Hlb; intros; subst lb.
+...
 specialize (bsort_swap_Some rel) as H1.
 specialize (H1 la lb Hlb).
 destruct H1 as (Hll & Hns & H1).
