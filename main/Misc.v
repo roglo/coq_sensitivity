@@ -4058,42 +4058,51 @@ destruct ab. {
   remember (bsort_swap rel (a :: ld)) as lb eqn:Hlb.
   symmetry in Hlb.
   destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
-  specialize (IHit b lc ld) as H1.
-  assert (H : S (length lc) * S (length lc) ≤ S it). {
-    apply bsort_swap_Some in Hlb.
-    destruct Hlb as (H2 & Hlb).
-    apply bsort_swap_Some in Hld.
-    destruct Hld as (H3 & Hld).
-    rewrite H3 in Hit.
-    cbn in H3; rewrite H3.
-    flia Hit.
-  }
-  specialize (H1 H Hld); clear H.
-  move lb before ld.
   rewrite List_length_cons in Hit.
+  specialize (IHit b lc ld) as H1.
+  replace (S (length lc)) with (length ld) in Hit, H1. 2: {
+    now apply bsort_swap_Some in Hld.
+  }
+  assert (H : length ld * length ld ≤ S it) by flia Hit.
+  specialize (H1 H Hld); clear H.
+  move lb after lc.
 ...
-revert a lc lb Hit Hlb H1.
-induction it; intros; cbn. {
-  destruct lc as [| c]; [ easy | ].
-  cbn in Hit; flia Hit.
 }
-cbn in H1, Hlb.
-remember (bsort_swap rel lc) as ld eqn:Hld.
+injection Hlb; clear Hlb; intros; subst lb.
+remember (bsort_swap rel (b :: a :: lc)) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+remember (a :: lc) as ld; cbn in Hlb; subst ld.
+specialize (Htot a b) as Hba.
+rewrite Hab in Hba;cbn in Hba.
+rewrite Hba in Hlb.
+remember (bsort_swap rel (a :: lc)) as ld eqn:Hld.
 symmetry in Hld.
-destruct ld as [ld| ]. 2: {
-  destruct lc as [| c]; [ easy | ].
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac; [ easy | ].
-  injection Hlb; clear Hlb; intros; subst lb.
-  remember (a :: lc) as l; cbn; subst l.
-  specialize (Htot a c) as Hca.
-  rewrite Hac in Hca; cbn in Hca.
-  rewrite Hca.
+destruct ld as [ld| ]; [ | now apply bsort_swap_None ].
+injection Hlb; clear Hlb; intros; subst lb.
+rewrite List_length_cons in Hit.
+specialize (IHit a lc ld) as H1.
+replace (S (length lc)) with (length ld) in Hit, H1. 2: {
+  now apply bsort_swap_Some in Hld.
+}
+assert (H : length ld * length ld ≤ S it) by flia Hit.
+specialize (H1 H Hld); clear H.
 ...
-destruct lc as [| c]; [ easy | ].
-destruct ac. {
-symmetry in Hld.
-destruct ld as [ld| ]. {
+  Hit : S (length ld) * S (length ld) ≤ S (S it)
+  Hab : rel a b = true
+  Hld : bsort_swap rel (b :: lc) = Some ld
+  Hlb : bsort_swap rel (a :: ld) = Some lb
+  H1 : sorted rel (bsort_loop rel it ld) = true
+  ============================
+  sorted rel (bsort_loop rel it lb) = true
+...
+  Hit : S (length ld) * S (length ld) ≤ S (S it)
+  Hab : rel a b = false
+  Hld : bsort_swap rel (a :: lc) = Some ld
+  Hba : rel b a = true
+  H1 : sorted rel (bsort_loop rel it ld) = true
+  ============================
+  sorted rel (bsort_loop rel it (b :: ld)) = true
 ...
 destruct it. {
   cbn in H1, Hlb |-*.
