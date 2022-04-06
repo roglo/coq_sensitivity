@@ -4026,119 +4026,21 @@ cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
-(**)
 destruct la as [| a]; [ easy | ].
 destruct la as [| b]; [ easy | ].
-remember (b :: la) as lc; cbn in Hlb; subst lc.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (bsort_swap rel (b :: la)) as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as [lc| ]; [ | easy ].
-  injection Hlb; clear Hlb; intros; subst lb.
-...
-specialize (bsort_swap_Some rel) as H1.
-specialize (H1 la lb Hlb).
-destruct H1 as (Hll & Hns & H1).
-destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
-specialize (Htot a b) as Hba.
-rewrite Hab in Hba; cbn in Hba.
-move Hba before Hab.
-destruct lab as [| c]. {
-  cbn in Hla1, Hlb1; clear Hs.
-  specialize (IHit (a :: lb1)) as H1.
-  assert (H : length (a :: lb1) * length (a :: lb1) ≤ it). {
-    rewrite Hla1 in Hit; cbn in Hit |-*.
-    replace (length lb1) with (length la1); [ flia Hit | ].
-    apply (f_equal length) in Hla1, Hlb1.
-    cbn in Hla1, Hlb1.
-    congruence.
-  }
-  specialize (H1 H); clear H.
-  rewrite Hlb1.
-  clear - Hba H1.
-  revert a b lb1 Hba H1.
-  induction it; intros. {
-    remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
-    now rewrite Hba, H1.
-  }
-  remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
-  rewrite Hba.
-  remember (bsort_swap rel (a :: lb1)) as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as [lc| ]. {
-    destruct lc as [| c]; [ now destruct it | ].
-    apply IHit; [ | easy ].
-    specialize (bsort_swap_Some rel) as H2.
-    specialize (H2 _ _ Hlc).
-    destruct H2 as (Hll2 & Hns2 & H2).
-    destruct H2 as (lab & a2 & b2 & la2 & lb2 & Hab2 & H2).
-    destruct H2 as (Hs & Hla2 & Hlb2 & Hlab2).
-(* putain mais ça m'énerve, ça marche pas *)
-...
-  remember (a :: lb1) as lc eqn:Hlc.
-  destruct it. {
-    cbn in H1 |-*.
-    rewrite Hlb1; cbn.
-    rewrite H1, Hlc; cbn.
-    now rewrite Hba.
-  }
-  remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
-  rewrite Hba.
-  remember (bsort_swap rel (a :: lb1)) as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as [lc| ]. {
-    specialize (bsort_swap_Some rel) as H2.
-    specialize (H2 _ _ Hlc).
-    destruct H2 as (Hll2 & Hns2 & H2).
-    destruct H2 as (lab & a2 & b2 & la2 & lb2 & Hab2 & H2).
-    destruct H2 as (Hs & Hla2 & Hlb2 & Hlab2).
-...
-remember (lab ++ [b]) as lb2 eqn:Hlb2.
-specialize (IHit lb2) as H1.
-assert (H : length lb2 * length lb2 ≤ it). {
-  subst lb2.
-  rewrite Hla1 in Hit.
-  move Hit at bottom.
-  rewrite app_length in Hit.
-  cbn in Hit |-*.
-  assert (H : length la1 = length lb1). {
-    apply (f_equal length) in Hla1, Hlb1.
-    rewrite app_length in Hla1, Hlb1.
-    rewrite  Hll in Hla1.
-    cbn in Hla1, Hlb1.
-    flia Hla1 Hlb1.
-  }
-  rewrite H in Hit.
-  rewrite app_length; cbn.
-  flia Hit.
+specialize (IHit (b :: la)) as H1.
+assert (H : length (b :: la) * length (b :: la) ≤ it). {
+  specialize (bsort_swap_Some rel) as H2.
+  specialize (H2 _ _ Hlb).
+  destruct H2 as (Hll & Hns & H2).
+  rewrite Hll in Hit.
+  rewrite List_length_cons in Hll.
+  flia Hit Hll.
 }
 specialize (H1 H); clear H.
-subst lb2.
-remember (a :: lb1) as lb2 eqn:Hlb2.
-specialize (IHit lb2) as H2.
-assert (H : length lb2 * length lb2 ≤ it). {
-  subst lb2.
-  rewrite Hla1 in Hit.
-  move Hit at bottom.
-  rewrite app_length in Hit.
-  cbn in Hit |-*.
-  assert (H : length la1 = length lb1). {
-    apply (f_equal length) in Hla1, Hlb1.
-    rewrite app_length in Hla1, Hlb1.
-    rewrite  Hll in Hla1.
-    cbn in Hla1, Hlb1.
-    flia Hla1 Hlb1.
-  }
-  rewrite H in Hit.
-  flia Hit.
-}
-specialize (H2 H); clear H.
-subst lb2.
-move Hba at bottom.
-rewrite Hlb1.
-...
-apply sorted_bsort_loop_app; try easy.
+remember (b :: la) as l.
+cbn - [ "*" ] in Hit; subst l.
+remember (b :: la) as lc eqn:Hlc.
 ...
 
 Theorem bsort_is_sorted : ∀ A (rel : A → _),
