@@ -4040,7 +4040,43 @@ assert (H : length (b :: la) * length (b :: la) ≤ it). {
 specialize (H1 H); clear H.
 remember (b :: la) as l.
 cbn - [ "*" ] in Hit; subst l.
-remember (b :: la) as lc eqn:Hlc.
+...
+destruct it. {
+  cbn in H1, Hlb |-*.
+  destruct la as [| c]. {
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ easy | ].
+    injection Hlb; clear Hlb; intros; subst lb; cbn.
+    specialize (Htot a b) as Hba.
+    rewrite Hab in Hba; cbn in Hba.
+    now rewrite Hba.
+  }
+  apply Bool.andb_true_iff in H1.
+  destruct H1 as (Hbc, H1).
+  rewrite Hbc in Hlb.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    remember (bsort_swap rel (c :: la)) as ld eqn:Hld.
+    symmetry in Hld.
+    destruct ld as [ld| ]; [ | easy ].
+    injection Hlb; clear Hlb; intros; subst lb.
+    assert (H : ld = c :: la). {
+      apply bsort_swap_Some in Hld.
+      destruct Hld as (Hll & Hr & Hld).
+      now rewrite H1 in Hr.
+    }
+    rewrite <- H in H1; cbn.
+    rewrite Hab; cbn.
+    rewrite H, Hbc.
+    now rewrite <- H, H1.
+  } {
+    injection Hlb; clear Hlb; intros; subst lb.
+    cbn.
+    specialize (Htot a b) as Hba.
+    rewrite Hab in Hba; cbn in Hba.
+    rewrite Hba; cbn.
+    cbn in H1; rewrite H1.
+    destruct la as [| d]. {
 ...
 
 Theorem bsort_is_sorted : ∀ A (rel : A → _),
