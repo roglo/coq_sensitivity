@@ -4087,6 +4087,7 @@ replace (S (length lc)) with (length ld) in Hit, H1. 2: {
 }
 assert (H : length ld * length ld ≤ S it) by flia Hit.
 specialize (H1 H Hld); clear H.
+move Hba before Hab.
 ...
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = true
@@ -4098,8 +4099,8 @@ specialize (H1 H Hld); clear H.
 ...
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = false
-  Hld : bsort_swap rel (a :: lc) = Some ld
   Hba : rel b a = true
+  Hld : bsort_swap rel (a :: lc) = Some ld
   H1 : sorted rel (bsort_loop rel it ld) = true
   ============================
   sorted rel (bsort_loop rel it (b :: ld)) = true
