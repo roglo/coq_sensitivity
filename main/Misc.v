@@ -4041,6 +4041,35 @@ specialize (H1 H); clear H.
 remember (b :: la) as lc.
 cbn - [ "*" ] in Hit.
 clear b la Heqlc IHit.
+clear H1.
+revert a lc lb Hit Hlb.
+induction it; intros; cbn. {
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hit; flia Hit.
+}
+cbn in Hlb.
+destruct lc as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (bsort_swap rel (b :: lc)) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [ld| ]; [ | easy ].
+  injection Hlb; clear Hlb; intros; subst lb.
+  remember (bsort_swap rel (a :: ld)) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+  specialize (IHit b lc ld) as H1.
+  assert (H : S (length lc) * S (length lc) ≤ S it). {
+    apply bsort_swap_Some in Hlb.
+    destruct Hlb as (H2 & Hlb).
+    apply bsort_swap_Some in Hld.
+    destruct Hld as (H3 & Hld).
+    rewrite H3 in Hit.
+    cbn in H3; rewrite H3.
+    flia Hit.
+  }
+  specialize (H1 H Hld); clear H.
+  move lb before ld.
 ...
 revert a lc lb Hit Hlb H1.
 induction it; intros; cbn. {
