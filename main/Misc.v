@@ -4033,6 +4033,55 @@ destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hs & Hla1 & Hlb1 & Hlab).
 specialize (Htot a b) as Hba.
 rewrite Hab in Hba; cbn in Hba.
 move Hba before Hab.
+destruct lab as [| c]. {
+  cbn in Hla1, Hlb1; clear Hs.
+  specialize (IHit (a :: lb1)) as H1.
+  assert (H : length (a :: lb1) * length (a :: lb1) ≤ it). {
+    rewrite Hla1 in Hit; cbn in Hit |-*.
+    replace (length lb1) with (length la1); [ flia Hit | ].
+    apply (f_equal length) in Hla1, Hlb1.
+    cbn in Hla1, Hlb1.
+    congruence.
+  }
+  specialize (H1 H); clear H.
+  rewrite Hlb1.
+  clear - Hba H1.
+  revert a b lb1 Hba H1.
+  induction it; intros. {
+    remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
+    now rewrite Hba, H1.
+  }
+  remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
+  rewrite Hba.
+  remember (bsort_swap rel (a :: lb1)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [lc| ]. {
+    destruct lc as [| c]; [ now destruct it | ].
+    apply IHit; [ | easy ].
+    specialize (bsort_swap_Some rel) as H2.
+    specialize (H2 _ _ Hlc).
+    destruct H2 as (Hll2 & Hns2 & H2).
+    destruct H2 as (lab & a2 & b2 & la2 & lb2 & Hab2 & H2).
+    destruct H2 as (Hs & Hla2 & Hlb2 & Hlab2).
+(* putain mais ça m'énerve, ça marche pas *)
+...
+  remember (a :: lb1) as lc eqn:Hlc.
+  destruct it. {
+    cbn in H1 |-*.
+    rewrite Hlb1; cbn.
+    rewrite H1, Hlc; cbn.
+    now rewrite Hba.
+  }
+  remember (a :: lb1) as lc; cbn in H1 |-*; subst lc.
+  rewrite Hba.
+  remember (bsort_swap rel (a :: lb1)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [lc| ]. {
+    specialize (bsort_swap_Some rel) as H2.
+    specialize (H2 _ _ Hlc).
+    destruct H2 as (Hll2 & Hns2 & H2).
+    destruct H2 as (lab & a2 & b2 & la2 & lb2 & Hab2 & H2).
+    destruct H2 as (Hs & Hla2 & Hlb2 & Hlab2).
 ...
 remember (lab ++ [b]) as lb2 eqn:Hlb2.
 specialize (IHit lb2) as H1.
