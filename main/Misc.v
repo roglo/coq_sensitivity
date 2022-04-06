@@ -4038,8 +4038,32 @@ assert (H : length (b :: la) * length (b :: la) ≤ it). {
   flia Hit Hll.
 }
 specialize (H1 H); clear H.
-remember (b :: la) as l.
-cbn - [ "*" ] in Hit; subst l.
+remember (b :: la) as lc.
+cbn - [ "*" ] in Hit.
+clear b la Heqlc IHit.
+...
+revert a lc lb Hit Hlb H1.
+induction it; intros; cbn. {
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hit; flia Hit.
+}
+cbn in H1, Hlb.
+remember (bsort_swap rel lc) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [ld| ]. 2: {
+  destruct lc as [| c]; [ easy | ].
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac; [ easy | ].
+  injection Hlb; clear Hlb; intros; subst lb.
+  remember (a :: lc) as l; cbn; subst l.
+  specialize (Htot a c) as Hca.
+  rewrite Hac in Hca; cbn in Hca.
+  rewrite Hca.
+...
+destruct lc as [| c]; [ easy | ].
+destruct ac. {
+symmetry in Hld.
+destruct ld as [ld| ]. {
 ...
 destruct it. {
   cbn in H1, Hlb |-*.
