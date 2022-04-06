@@ -4070,6 +4070,7 @@ destruct ab. {
   }
   specialize (H1 H Hld); clear H.
   move lb before ld.
+  rewrite List_length_cons in Hit.
 ...
 revert a lc lb Hit Hlb H1.
 induction it; intros; cbn. {
