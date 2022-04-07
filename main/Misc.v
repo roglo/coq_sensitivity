@@ -3888,6 +3888,22 @@ destruct ab. {
   destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
   rewrite List_length_cons in Hit.
   move lb after lc.
+  cbn in Hlb.
+(*2*)
+  destruct ld as [| c]; [ easy | ].
+  move c before b.
+  rewrite List_length_cons in Hit.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  move Hac before Hab.
+  destruct ac. {
+    remember (bsort_swap rel (c :: ld)) as le eqn:Hle; symmetry in Hle.
+    destruct le as [le| ]; [ | easy ].
+    injection Hlb; clear Hlb; intros; subst lb.
+    move le before ld.
+    replace (S (length ld)) with (length le) in Hit. 2: {
+      now apply bsort_swap_Some in Hle.
+    }
+(*3*)
 ...
 }
 injection Hlb; clear Hlb; intros; subst lb.
@@ -3912,13 +3928,21 @@ move Hba before Hab.
   Hlb : bsort_swap rel (a :: lc) = Some lb
   ============================
   sorted rel (bsort_loop rel it lb) = true
-...
+... 2
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = true
   Hld : bsort_swap rel (b :: lc) = Some ld
   Hlb : bsort_swap rel (a :: ld) = Some lb
   ============================
   sorted rel (bsort_loop rel it lb) = true
+... 3
+  Hit : S (length le) * S (length le) ≤ S (S it)
+  Hab : rel a b = true
+  Hac : rel a c = true
+  Hld : bsort_swap rel (b :: lc) = Some (c :: ld)
+  Hle : bsort_swap rel (c :: ld) = Some le
+  ============================
+  sorted rel (bsort_loop rel it (a :: le)) = true
 ...
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = false
