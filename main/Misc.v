@@ -3864,7 +3864,7 @@ destruct la as [| a]; [ easy | ].
 destruct la as [| b]; [ easy | ].
 remember (b :: la) as lc.
 cbn - [ "*" ] in Hit.
-clear b la Heqlc (*IHit*).
+clear b la Heqlc.
 move lb after lc.
 replace (S (length lc)) with (length lb) in Hit. 2: {
   now apply bsort_swap_Some in Hlb.
@@ -3904,6 +3904,22 @@ destruct ab. {
       now apply bsort_swap_Some in Hle.
     }
 (*3*)
+    admit.
+  }
+  injection Hlb; clear Hlb; intros; subst lb.
+  cbn in Hld.
+  destruct lc as [| d]; [ easy | ].
+  remember (rel b d) as bd eqn:Hbd; symmetry in Hbd.
+  destruct bd. {
+    remember (bsort_swap rel (d :: lc)) as le eqn:Hle.
+    symmetry in Hle.
+    destruct le as [le| ]; [ | easy ].
+    injection Hld; clear Hld; intros; subst c le.
+    now rewrite Hab in Hac.
+  }
+  injection Hld; clear Hld; intros; subst c ld.
+  rewrite List_length_cons in Hit.
+  (*4*)
 ...
 }
 injection Hlb; clear Hlb; intros; subst lb.
@@ -3943,6 +3959,13 @@ move Hba before Hab.
   Hle : bsort_swap rel (c :: ld) = Some le
   ============================
   sorted rel (bsort_loop rel it (a :: le)) = true
+...
+  Hit : S (S (S (length lc))) * S (S (S (length lc))) ≤ S (S it)
+  Hab : rel a b = true
+  Hac : rel a d = false
+  Hbd : rel b d = false
+  ============================
+  sorted rel (bsort_loop rel it (d :: a :: b :: lc)) = true
 ...
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = false
