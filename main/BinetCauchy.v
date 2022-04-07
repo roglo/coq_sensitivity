@@ -2716,7 +2716,14 @@ destruct (Nat.eq_dec k a) as [Hka| Hka]. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i b) as [Hib| Hib]. {
     subst b.
-    apply IHit in Hp.
+    apply IHit in Hp; cycle 1. {
+      now rewrite seq_S, <- app_assoc.
+    } {
+      cbn in Hit.
+      rewrite Nat.eqb_refl in Hit.
+      now apply Nat.succ_le_mono in Hit.
+    }
+    destruct it; [ easy | ].
 ...
   specialize (IHit la (S k) l) as H1.
   cbn in Hit.
