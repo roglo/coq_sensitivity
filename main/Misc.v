@@ -4041,6 +4041,8 @@ specialize (H1 H); clear H.
 remember (b :: la) as lc.
 cbn - [ "*" ] in Hit.
 clear b la Heqlc IHit.
+move lb after lc.
+(**)
 clear H1.
 revert a lc lb Hit Hlb.
 induction it; intros; cbn. {
@@ -4088,6 +4090,12 @@ replace (S (length lc)) with (length ld) in Hit, H1. 2: {
 assert (H : length ld * length ld ≤ S it) by flia Hit.
 specialize (H1 H Hld); clear H.
 move Hba before Hab.
+...
+  Hit : S (length lc) * S (length lc) ≤ S it
+  Hlb : bsort_swap rel (a :: lc) = Some lb
+  H1 : sorted rel (bsort_loop rel it lc) = true
+  ============================
+  sorted rel (bsort_loop rel it lb) = true
 ...
   Hit : S (length ld) * S (length ld) ≤ S (S it)
   Hab : rel a b = true
