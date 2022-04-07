@@ -3917,7 +3917,7 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
-(* to be completed
+(* to be completed *)
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -3946,25 +3946,27 @@ replace (S (length ld)) with (length (lb ++ lc)) in Hit. 2: {
 }
 (**)
 destruct it; intros; cbn. {
-...
-  destruct lb as [| b]; [ easy | ].
-  destruct lb as [| c]; [ easy | ].
+  destruct (lb ++ lc) as [| c lbc]; [ easy | ].
+  destruct lbc as [| d]; [ easy | ].
   cbn in Hit; flia Hit.
 }
 cbn in Hlb.
-destruct lc as [| b]; [ easy | ].
+destruct ld as [| b]; [ easy | ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
-  remember (bsort_swap rel (b :: lc)) as ld eqn:Hld.
-  symmetry in Hld.
-  destruct ld as [ld| ]; [ | easy ].
-  injection Hlb; clear Hlb; intros; subst lb.
-  remember (bsort_swap rel (a :: ld)) as lb eqn:Hlb.
+  remember (bsort_swap rel (b :: ld)) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [(la, le)| ]; [ | easy ].
+  injection Hlb; clear Hlb; intros; subst lb le.
+  cbn - [ bsort_swap ].
+  remember (bsort_swap rel (a :: la ++ lc)) as lb eqn:Hlb.
   symmetry in Hlb.
-  destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+  destruct lb as [(lb, le)| ]; [ | now apply bsort_swap_None ].
+  rewrite <- app_comm_cons in Hit.
   rewrite List_length_cons in Hit.
-  move lb after lc.
+  move lb before la; move le before ld.
   cbn in Hlb.
+...
 (*2*)
   destruct ld as [| c]; [ easy | ].
   move c before b.
