@@ -3842,7 +3842,7 @@ destruct lc; [ easy | clear Hs ].
 now rewrite (IHla eq_refl).
 Qed.
 
-(* to be completed
+(*
 Theorem sorted_sorted_bsort_loop : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la lb,
@@ -3915,7 +3915,9 @@ induction la as [| a]; intros; cbn. {
   specialize (H1 lb lc Hlc).
   destruct H1 as (Hlen & Hs & H1).
 ...
+*)
 
+(* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
