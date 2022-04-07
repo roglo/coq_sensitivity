@@ -3917,7 +3917,7 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
-(* to be completed *)
+(* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -3958,6 +3958,12 @@ destruct ab. {
   symmetry in Hla.
   destruct la as [(la, le)| ]; [ | easy ].
   injection Hlb; clear Hlb; intros; subst lb le.
+(**)
+  specialize (bsort_swap_Some rel) as H1.
+  specialize (H1 _ _ _ Hla).
+  destruct H1 as (Hlen & Hs & H1).
+  destruct H1 as (c & d & la1 & la2 & Hcd & Hsa & Hb & Hc & Hp).
+...
   cbn - [ bsort_swap ].
   remember (bsort_swap rel (a :: la ++ lc)) as lb eqn:Hlb.
   symmetry in Hlb.
