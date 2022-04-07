@@ -3917,7 +3917,7 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
-(* to be completed *)
+(* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
