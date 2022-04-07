@@ -3979,6 +3979,89 @@ destruct ab. {
       now apply bsort_swap_Some in Hle.
     }
 (*3*)
+    clear - Htot Hit.
+...
+    revert a le Hit.
+    induction it; intros. {
+      cbn in Hit.
+      rewrite Nat.mul_comm in Hit; cbn in Hit.
+      destruct le; [ easy | ].
+      cbn in Hit; flia Hit.
+    }
+    remember (a :: le) as lb; cbn; subst lb.
+    remember (bsort_swap rel (a :: le)) as lb eqn:Hlb.
+    symmetry in Hlb.
+    destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+(*
+    move lb after lc.
+*)
+    replace (S (length le)) with (length lb) in Hit. 2: {
+      now apply bsort_swap_Some in Hlb.
+    }
+    destruct lb as [| d]. {
+      cbn in Hlb.
+      destruct le as [| e]; [ easy | ].
+      destruct (rel a e); [ | easy ].
+      now destruct (bsort_swap rel (e :: le)).
+    }
+...
+    destruct it. {
+      cbn.
+      destruct lb as [| d]; [ easy | ].
+      destruct lb as [| e]; [ easy | ].
+      cbn in Hit; flia Hit.
+    }
+    cbn.
+    remember (bsort_swap rel lb) as lf eqn:Hlf.
+    symmetry in Hlf.
+    destruct lf as [lf| ]; [ | now apply bsort_swap_None ].
+    move lf before le.
+    destruct it. {
+      destruct lb as [| d]; [ easy | ].
+      destruct lb as [| e]; [ easy | ].
+      cbn in Hit.
+      rewrite Nat.mul_comm in Hit; cbn in Hit.
+      destruct lb as [| f]; [ | cbn in Hit; flia Hit ].
+      cbn in Hlf.
+      remember (rel d e) as de eqn:Hde; symmetry in Hde.
+      destruct de; [ easy | ].
+      injection Hlf; clear Hlf; intros; subst lf.
+      specialize (Htot d e) as Hed.
+      rewrite Hde in Hed; cbn in Hed |-*.
+      now rewrite Hed.
+    }
+    cbn.
+    remember (bsort_swap rel lf) as lg eqn:Hlg.
+    symmetry in Hlg.
+    destruct lg as [lg| ]; [ | now apply bsort_swap_None ].
+    move lg before lf.
+    destruct it. {
+      destruct lb as [| d]; [ easy | ].
+      destruct lb as [| e]; [ easy | ].
+      cbn in Hit.
+      rewrite Nat.mul_comm in Hit; cbn in Hit.
+      destruct lb as [| f]; [ | cbn in Hit; flia Hit ].
+      cbn in Hlf.
+      remember (rel d e) as de eqn:Hde; symmetry in Hde.
+      destruct de; [ easy | ].
+      injection Hlf; clear Hlf; intros; subst lf.
+      cbn in Hlg.
+      specialize (Htot d e) as Hed.
+      rewrite Hde in Hed; cbn in Hed |-*.
+      now rewrite Hed in Hlg.
+    }
+    cbn.
+...
+    cbn in Hle.
+    destruct ld as [| e]; [ easy | ].
+    remember (rel c e) as ce eqn:Hce.
+    symmetry in Hce.
+    move Hce before Hac.
+    destruct ce. {
+      remember (bsort_swap rel (e :: ld)) as lb eqn:Hlb.
+      symmetry in Hlb.
+      destruct lb as [lb| ]; [ | easy ].
+      injection Hle; clear Hle; intros; subst le.
 ...
     specialize (sorted_sorted_bsort_loop Htot) as H1.
     specialize (H1 it [a] le).
