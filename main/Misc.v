@@ -3843,6 +3843,79 @@ now rewrite (IHla eq_refl).
 Qed.
 
 (* to be completed
+Theorem sorted_sorted_bsort_loop : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ it la lb,
+  length (la ++ lb) * length (la ++ lb) ≤ S (S it)
+  → sorted rel la = true
+  → sorted rel (bsort_loop rel it (la ++ lb)) = true.
+Proof.
+intros * Htot * Hit Hla.
+revert la lb Hit Hla.
+induction it; intros; cbn. {
+  destruct lb as [| a]; [ now rewrite app_nil_r | ].
+  rewrite app_length in Hit; cbn in Hit.
+  rewrite <- Nat.add_succ_comm in Hit; cbn in Hit.
+  rewrite Nat.mul_comm in Hit; cbn in Hit.
+  destruct la; cbn in Hit; [ | flia Hit ].
+  destruct lb; [ easy | ].
+  cbn in Hit; flia Hit.
+}
+remember (bsort_swap rel (la ++ lb)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [lc| ]; [ | now apply bsort_swap_None ].
+destruct lb as [| a]. {
+  rewrite app_nil_r in Hlc.
+  specialize (bsort_swap_Some rel) as H1.
+  specialize (H1 _ _ Hlc).
+  destruct H1 as (Hlen & Hs & H1).
+  now rewrite Hla in Hs.
+}
+specialize (bsort_swap_Some rel) as H1.
+specialize (H1 _ _ Hlc).
+destruct H1 as (Hlen & Hs & H1).
+destruct H1 as (lab & a1 & b1 & la1 & lb1 & Hab & Hsa & H1).
+destruct H1 as (Hlb1 & Hlc1 & Hpab).
+rewrite Hlb1 in Hit, Hlc, Hlen, Hs.
+...
+destruct la as [| a]. {
+  clear Hla; cbn in Hit, Hlc.
+  specialize (bsort_swap_Some rel) as H1.
+  specialize (H1 lb lc Hlc).
+  destruct H1 as (Hlen & Hs & H1).
+  destruct H1 as (lab & a & b & la1 & lb1 & Hab & Hsa & H1).
+  destruct H1 as (Hlb1 & Hlc1 & Hpab).
+...
+intros * Htot * Hit Hla.
+revert it la Hit Hla.
+induction lb as [| b]; intros; cbn. {
+  rewrite app_nil_r in Hit |-*.
+  destruct it; [ easy | cbn ].
+  remember (bsort_swap rel la) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [lc| ]; [ | easy ].
+  specialize (bsort_swap_Some rel) as H1.
+  specialize (H1 la lc Hlc).
+  destruct H1 as (Hlen & Hs & H1).
+...
+intros * Htot * Hit Hla.
+revert it lb Hit Hla.
+induction la as [| a]; intros; cbn. {
+  destruct it. {
+    cbn in Hit; cbn.
+    destruct lb as [| a]; [ easy | cbn ].
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hit; flia Hit.
+  }
+  cbn.
+  remember (bsort_swap rel lb) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [lc| ]; [ | now apply bsort_swap_None ].
+  cbn in Hit.
+  specialize (bsort_swap_Some rel) as H1.
+  specialize (H1 lb lc Hlc).
+  destruct H1 as (Hlen & Hs & H1).
+...
+
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -3904,7 +3977,12 @@ destruct ab. {
       now apply bsort_swap_Some in Hle.
     }
 (*3*)
-    admit.
+...
+    specialize (sorted_sorted_bsort_loop Htot) as H1.
+    specialize (H1 it [a] le).
+    cbn - [ "*" ] in H1.
+    apply (H1 Hit eq_refl).
+...
   }
   injection Hlb; clear Hlb; intros; subst lb.
   cbn in Hld.
@@ -3920,6 +3998,12 @@ destruct ab. {
   injection Hld; clear Hld; intros; subst c ld.
   rewrite List_length_cons in Hit.
   (*4*)
+...
+apply (sorted_sorted_bsort_loop Htot [d; a; b] lc Hit).
+cbn.
+specialize (Htot a d) as Hda.
+rewrite Hac in Hda; cbn in Hda.
+now rewrite Hda, Hab.
 ...
 }
 injection Hlb; clear Hlb; intros; subst lb.
