@@ -2191,11 +2191,11 @@ Fixpoint bsort_swap {A} (rel : A → A → bool) l :=
   | a :: (b :: l'') as l' =>
       if rel a b then
         match bsort_swap rel l' with
-        | Some l''' => Some (a :: l''')
+        | Some (la, l''') => Some (a :: la, l''')
         | None => None
         end
       else
-        Some (b :: a :: l'')
+        Some ([], b :: a :: l'')
   end.
 
 Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
@@ -2203,7 +2203,7 @@ Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
   | 0 => l
   | S it' =>
       match bsort_swap rel l with
-      | Some l' => bsort_loop rel it' l'
+      | Some (la, lb) => bsort_loop rel it' (la ++ lb)
       | None => l
       end
   end.
@@ -3764,14 +3764,14 @@ Qed.
 
 (* *)
 
-Theorem bsort_swap_Some : ∀ A (rel : A → _) la lb,
-  bsort_swap rel la = Some lb
-  → length la = length lb ∧
+Theorem bsort_swap_Some : ∀ A (rel : A → _) la lb lc,
+  bsort_swap rel la = Some (lb, lc)
+  → length la = length (lb ++ lc) ∧
     sorted rel la = false ∧
-    ∃ lab a b la1 lb1 , rel a b = false ∧
-    sorted rel (lab ++ [a]) = true ∧
-    la = lab ++ a :: b :: la1 ∧
-    lb = lab ++ b :: a :: lb1 ∧
+    ∃ a b la1 lb1 , rel a b = false ∧
+    sorted rel (lb ++ [a]) = true ∧
+    la = lb ++ a :: b :: la1 ∧
+    lc = b :: a :: lb1 ∧
     Permutation la1 lb1.
 Proof.
 intros * Hs.
@@ -3780,28 +3780,28 @@ induction la as [| a]; intros; [ easy | ].
 cbn in Hs.
 destruct la as [| b]; [ easy | ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-remember (bsort_swap rel (b :: la)) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [lc| ]. 2: {
+remember (bsort_swap rel (b :: la)) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [(ld, le)| ]. 2: {
   destruct ab; [ easy | ].
-  injection Hs; clear Hs; intros; subst lb.
+  injection Hs; clear Hs; intros; subst lb lc.
   split; [ easy | ].
   split; [ now cbn; rewrite Hab | ].
-  now exists [], a, b, la, la.
+  now exists a, b, la, la.
 }
 destruct ab. 2: {
-  injection Hs; clear Hs; intros; subst lb.
+  injection Hs; clear Hs; intros; subst lb lc.
   split; [ easy | ].
   split; [ now cbn; rewrite Hab | ].
-  now exists [], a, b, la, la.
+  now exists a, b, la, la.
 }
-injection Hs; clear Hs; intros; subst lb.
-specialize (IHla lc eq_refl) as H1.
+injection Hs; clear Hs; intros; subst lb le.
+specialize (IHla ld eq_refl) as H1.
 destruct H1 as (Hll & Hns & H1).
-destruct H1 as (lab & c & d & la1 & la2 & Hcd & H1).
-destruct H1 as (Hsc & Hbla & Hlcl & Hab1).
+destruct H1 as (c & d & la1 & la2 & Hcd & H1).
+destruct H1 as (Hsc & Hbla & Hlc & Hab1).
 cbn in Hll.
-do 3 rewrite List_length_cons.
+do 2 rewrite List_length_cons.
 rewrite Hll.
 split; [ easy | ].
 split. {
@@ -3809,18 +3809,18 @@ split. {
   rewrite Hns.
   apply Bool.andb_false_r.
 }
-exists (a :: lab), c, d, la1, la2.
-rewrite Hbla, Hlcl.
+exists c, d, la1, la2.
+rewrite Hbla.
 split; [ easy | ].
 split. {
   cbn.
-  destruct lab as [| e]. {
+  destruct ld as [| e]. {
     cbn in Hbla |-*.
-    injection Hbla; clear Hbla; intros Hbla H; subst c.
+    injection Hbla; clear Hbla; intros Hbla H; subst c la.
     now rewrite Hab.
   }
   cbn in Hbla.
-  injection Hbla; clear Hbla; intros Hbla H; subst e.
+  injection Hbla; clear Hbla; intros Hbla H; subst e la.
   now rewrite Hsc; cbn; rewrite Hab.
 }
 easy.
@@ -3838,7 +3838,7 @@ remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ | easy ].
 remember (bsort_swap rel (b :: la)) as lc eqn:Hlc.
 symmetry in Hlc.
-destruct lc; [ easy | clear Hs ].
+destruct lc as [(lc, ld)| ]; [ easy | clear Hs ].
 now rewrite (IHla eq_refl).
 Qed.
 
@@ -3934,18 +3934,19 @@ destruct it; intros. {
 cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
-destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
+destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
 destruct la as [| a]; [ easy | ].
 destruct la as [| b]; [ easy | ].
-remember (b :: la) as lc.
+remember (b :: la) as ld.
 cbn - [ "*" ] in Hit.
-clear b la Heqlc.
+clear b la Heqld.
 move lb after lc.
-replace (S (length lc)) with (length lb) in Hit. 2: {
+replace (S (length ld)) with (length (lb ++ lc)) in Hit. 2: {
   now apply bsort_swap_Some in Hlb.
 }
 (**)
 destruct it; intros; cbn. {
+...
   destruct lb as [| b]; [ easy | ].
   destruct lb as [| c]; [ easy | ].
   cbn in Hit; flia Hit.
