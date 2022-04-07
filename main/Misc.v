@@ -3842,171 +3842,6 @@ destruct lc; [ easy | clear Hs ].
 now rewrite (IHla eq_refl).
 Qed.
 
-(*
-Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
-  transitive rel →
-  total_relation rel →
-  ∀ a b la lb it,
-  sorted rel (bsort_loop rel it (la ++ [a])) = true
-  → sorted rel (bsort_loop rel it (b :: lb)) = true
-  → rel a b = true
-  → sorted rel (bsort_loop rel it (la ++ a :: b :: lb)) = true.
-Proof.
-intros * Htra Htot * Hsa Hsb Hab.
-revert a b la lb Hsa Hsb Hab.
-induction it; intros. {
-  remember (b :: lb) as lc.
-  cbn in Hsa, Hsb |-*; subst lc.
-  rewrite List_app_cons, app_assoc.
-  apply (sorted_app_iff Htra).
-  split; [ easy | ].
-  split; [ easy | ].
-  intros c d Hc Hd.
-  apply in_app_or in Hc.
-  destruct Hc as [Hc| Hc]. {
-    apply (Htra _ a). {
-      apply (sorted_app_iff Htra) in Hsa.
-      apply Hsa; [ easy | now left ].
-    }
-    destruct Hd as [Hd| Hd]; [ now subst d | ].
-    apply (Htra _ b); [ easy | ].
-    now apply (sorted_extends Htra) with (l := lb).
-  }
-  destruct Hc as [Hc| Hc]; [ subst c | easy ].
-  destruct Hd as [Hd| Hd]; [ now subst d | ].
-  apply (Htra _ b); [ easy | ].
-  now apply (sorted_extends Htra) with (l := lb).
-}
-remember (b :: lb) as lc.
-cbn in Hsa, Hsb |-*; subst lc.
-remember (bsort_swap rel (la ++ [a])) as lc eqn:Hlc.
-remember (bsort_swap rel (b :: lb)) as ld eqn:Hld.
-remember (bsort_swap rel (la ++ a :: b :: lb)) as le eqn:Hle.
-symmetry in Hlc, Hld, Hle.
-destruct lc as [lc| ]. {
-  destruct ld as [ld| ]. {
-    destruct le as [le| ]. {
-(*
-      apply bsort_swap_Some in Hlc.
-      destruct Hlc as (Hlac & Hcsaa & Hlc).
-      destruct Hlc as (clab & ca & cb & cla1 & clb1 & Hlc).
-      destruct Hlc as (Hcab & Hsc & Hclaa & Hclc & Hcpab).
-*)
-      apply bsort_swap_Some in Hle.
-      destruct Hle as (Hlae & Hesaa & Hle).
-      destruct Hle as (elab & ea & eb & ela1 & elb1 & Hle).
-      destruct Hle as (Heab & Hse & Helaa & Helc & Hepab).
-      rewrite Helc.
-      specialize (Htot ea eb) as Heba.
-      rewrite Heab in Heba; cbn in Heba.
-      apply IHit; [ | | easy ]. {
-...
-
-(*
-Theorem sorted_bsort_loop_app : ∀ A (rel : A → _),
-  reflexive rel →
-  transitive rel →
-  ∀ def la lb it,
-  sorted rel (bsort_loop rel it la) = true
-  → sorted rel (bsort_loop rel it lb) = true
-  → rel (last la def) (hd def lb) = true
-  → sorted rel (bsort_loop rel it (la ++ lb)) = true.
-Proof.
-intros * Href Htra * Hsa Hsb Hab.
-revert la lb Hsa Hsb Hab.
-induction it; intros. {
-  cbn in Hsa, Hsb |-*.
-  apply (sorted_app_iff Htra).
-  split; [ easy | ].
-  split; [ easy | ].
-  intros * Ha Hb.
-  destruct lb as [| b']; [ easy | ].
-  cbn in Hab.
-  destruct Hb as [Hb| Hb]. {
-    subst b'.
-    destruct la as [| a'] using rev_ind; [ easy | ].
-    rewrite last_last in Hab.
-    apply in_app_or in Ha.
-    destruct Ha as [Ha| Ha]. 2: {
-      destruct Ha; [ now subst a' | easy ].
-    }
-    apply (Htra _ a'); [ | easy ].
-    apply (sorted_app_iff Htra) in Hsa.
-    destruct Hsa as (_ & _ & Hsa).
-    apply Hsa; [ easy | now left ].
-  }
-  apply (Htra _ b'). 2: {
-    now apply (sorted_extends Htra) with (l := lb).
-  }
-  destruct la as [| a'] using rev_ind; [ easy | ].
-  rewrite last_last in Hab.
-  apply (Htra _ a'); [ | easy ].
-  apply in_app_or in Ha.
-  destruct Ha as [Ha| Ha]. 2: {
-    destruct Ha; [ subst a' | easy ].
-    apply Href.
-  }
-  apply (sorted_app_iff Htra) in Hsa.
-  destruct Hsa as (_ & _ & Hsa).
-  apply Hsa; [ easy | now left ].
-}
-cbn in Hsa, Hsb |-*.
-remember (bsort_swap rel la) as lc eqn:Hlc.
-remember (bsort_swap rel lb) as ld eqn:Hld.
-remember (bsort_swap rel (la ++ lb)) as le eqn:Hle.
-symmetry in Hlc, Hld, Hle.
-destruct le as [le| ]; [ | now apply bsort_swap_None in Hle ].
-apply bsort_swap_Some in Hle.
-destruct Hle as (Hlen & Hns & Hle).
-destruct Hle as (lab & f & g & la1 & lb1 & Hfg & Hsf & He & Hle & Hpab).
-rewrite Hle.
-destruct lc as [lc| ]. {
-  destruct ld as [ld| ]. {
-    specialize (IHit _ _ Hsa Hsb) as H1.
-...
-apply IHit; cycle 2. {
-  cbn.
-  destruct lab as [| a] using rev_ind. {
-    clear Hsf; exfalso.
-    cbn in He, Hle.
-    destruct lc as [lc| ]. {
-      destruct ld as [ld| ]. {
-        specialize (IHit _ _ Hsa Hsb) as H1.
-...
-  remember (b :: lb) as l.
-  cbn in Hsa, Hsb; subst l.
-  do 2 rewrite List_app_cons.
-  rewrite app_assoc.
-  apply (sorted_app_iff Htra).
-  split; [ easy | ].
-  split; [ easy | ].
-  intros c d Hc Hd.
-  apply in_app_or in Hc, Hd.
-  destruct Hc as [Hc| Hc]. {
-    apply (sorted_app_iff Htra) in Hsa.
-    destruct Hsa as (Hsa & _ & Hba).
-    destruct Hd as [Hd| Hd]. {
-      destruct Hd; [ subst d | easy ].
-      apply (Htra _ a); [ | easy ].
-      apply Hba; [ easy | now left ].
-    }
-    apply (Htra _ b). {
-      apply (Htra _ a); [ | easy ].
-      apply Hba; [ easy | now left ].
-    }
-    now apply (sorted_extends Htra _ _ Hsb).
-  }
-  destruct Hc; [ subst c | easy ].
-  destruct Hd as [Hd| Hd]. {
-    destruct Hd; [ now subst d | easy ].
-  }
-  apply (Htra _ b); [ easy | ].
-  now apply (sorted_extends Htra _ _ Hsb).
-}
-...
-*)
-*)
-
 (* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
@@ -4016,8 +3851,7 @@ Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
 Proof.
 intros * Htot * Hit.
 rename l into la.
-revert la Hit.
-induction it; intros. {
+destruct it; intros. {
   apply Nat.le_0_r, Nat.eq_mul_0 in Hit.
   assert (H : length la = 0) by now destruct Hit.
   now apply length_zero_iff_nil in H; subst la.
@@ -4028,25 +3862,17 @@ symmetry in Hlb.
 destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
 destruct la as [| a]; [ easy | ].
 destruct la as [| b]; [ easy | ].
-specialize (IHit (b :: la)) as H1.
-assert (H : length (b :: la) * length (b :: la) ≤ it). {
-  specialize (bsort_swap_Some rel) as H2.
-  specialize (H2 _ _ Hlb).
-  destruct H2 as (Hll & Hns & H2).
-  rewrite Hll in Hit.
-  rewrite List_length_cons in Hll.
-  flia Hit Hll.
-}
-specialize (H1 H); clear H.
 remember (b :: la) as lc.
 cbn - [ "*" ] in Hit.
-clear b la Heqlc IHit.
+clear b la Heqlc (*IHit*).
 move lb after lc.
+replace (S (length lc)) with (length lb) in Hit. 2: {
+  now apply bsort_swap_Some in Hlb.
+}
 (**)
-clear H1.
-revert a lc lb Hit Hlb.
-induction it; intros; cbn. {
-  destruct lc as [| c]; [ easy | ].
+destruct it; intros; cbn. {
+  destruct lb as [| b]; [ easy | ].
+  destruct lb as [| c]; [ easy | ].
   cbn in Hit; flia Hit.
 }
 cbn in Hlb.
@@ -4061,12 +3887,6 @@ destruct ab. {
   symmetry in Hlb.
   destruct lb as [lb| ]; [ | now apply bsort_swap_None ].
   rewrite List_length_cons in Hit.
-  specialize (IHit b lc ld) as H1.
-  replace (S (length lc)) with (length ld) in Hit, H1. 2: {
-    now apply bsort_swap_Some in Hld.
-  }
-  assert (H : length ld * length ld ≤ S it) by flia Hit.
-  specialize (H1 H Hld); clear H.
   move lb after lc.
 ...
 }
@@ -4082,15 +3902,32 @@ remember (bsort_swap rel (a :: lc)) as ld eqn:Hld.
 symmetry in Hld.
 destruct ld as [ld| ]; [ | now apply bsort_swap_None ].
 injection Hlb; clear Hlb; intros; subst lb.
-rewrite List_length_cons in Hit.
-specialize (IHit a lc ld) as H1.
-replace (S (length lc)) with (length ld) in Hit, H1. 2: {
+do 2 rewrite List_length_cons in Hit.
+replace (S (length lc)) with (length ld) in Hit(*, H1*). 2: {
   now apply bsort_swap_Some in Hld.
 }
-assert (H : length ld * length ld ≤ S it) by flia Hit.
-specialize (H1 H Hld); clear H.
 move Hba before Hab.
 ...
+  Hit : length lb * length lb ≤ S it
+  Hlb : bsort_swap rel (a :: lc) = Some lb
+  ============================
+  sorted rel (bsort_loop rel it lb) = true
+...
+  Hit : S (length ld) * S (length ld) ≤ S (S it)
+  Hab : rel a b = true
+  Hld : bsort_swap rel (b :: lc) = Some ld
+  Hlb : bsort_swap rel (a :: ld) = Some lb
+  ============================
+  sorted rel (bsort_loop rel it lb) = true
+...
+  Hit : S (length ld) * S (length ld) ≤ S (S it)
+  Hab : rel a b = false
+  Hba : rel b a = true
+  Hld : bsort_swap rel (a :: lc) = Some ld
+  ============================
+  sorted rel (bsort_loop rel it (b :: ld)) = true
+...
+(*
   Hit : S (length lc) * S (length lc) ≤ S it
   Hlb : bsort_swap rel (a :: lc) = Some lb
   H1 : sorted rel (bsort_loop rel it lc) = true
@@ -4112,6 +3949,7 @@ move Hba before Hab.
   H1 : sorted rel (bsort_loop rel it ld) = true
   ============================
   sorted rel (bsort_loop rel it (b :: ld)) = true
+*)
 ...
 destruct it. {
   cbn in H1, Hlb |-*.
