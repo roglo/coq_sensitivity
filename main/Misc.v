@@ -3941,7 +3941,6 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
 *)
 
-(* to be completed
 Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
   nb_disorder rel l ≤ length l * length l.
 Proof.
@@ -3958,17 +3957,12 @@ destruct (rel a b); cbn. {
   etransitivity; [ apply IHl | ].
   apply -> Nat.succ_le_mono; flia.
 }
-Search (length (filter _ _)).
-...
+unfold nb_rel in IHl.
+remember (length (filter (rel a) l)) as len eqn:Hlen.
+destruct len; [ flia | flia IHl ].
+Qed.
 
-Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ it l,
-  nb_disorder rel l ≤ it
-  → sorted rel (bsort_loop rel it l) = true.
-Proof.
-...
-
+(* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -3977,6 +3971,26 @@ Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
 Proof.
 intros * Htot * Hit.
 rename l into la.
+apply le_trans with (n := nb_disorder rel la) in Hit. 2: {
+  apply nb_disorder_le_square.
+}
+revert la Hit.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit.
+  destruct la as [| a]; [ easy | ].
+  cbn in Hit.
+  apply Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  cbn.
+  destruct la as [| b]; [ easy | ].
+  cbn in H1, H2.
+  apply Nat.eq_add_0 in H2.
+  destruct H2 as (H2, H3).
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    destruct la as [| c]; [ easy | cbn ].
+    cbn in H2, H3.
+...
 destruct it; intros. {
   apply Nat.le_0_r, Nat.eq_mul_0 in Hit.
   assert (H : length la = 0) by now destruct Hit.
