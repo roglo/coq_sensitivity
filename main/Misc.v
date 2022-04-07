@@ -3917,7 +3917,58 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
+Definition nb_rel A (rel : A → A → _) a l :=
+  length l - length (filter (rel a) l).
+
+Fixpoint nb_disorder A (rel : A → _) l :=
+  match l with
+  | [] => 0
+  | a :: l' => nb_rel rel a l' + nb_disorder rel l'
+  end.
+
+(*
+Compute (nb_disorder Nat.leb [7;5;3;22;8]).
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
+*)
+
 (* to be completed
+Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
+  nb_disorder rel l ≤ length l * length l.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite Nat.mul_comm; cbn.
+rewrite -> Nat.add_assoc.
+rewrite <- Nat.add_succ_l.
+apply Nat.add_le_mono; [ | easy ].
+clear.
+induction l as [| b]; [ easy | cbn ].
+destruct (rel a b); cbn. {
+  unfold nb_rel in IHl.
+  etransitivity; [ apply IHl | ].
+  apply -> Nat.succ_le_mono; flia.
+}
+Search (length (filter _ _)).
+...
+
+Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ it l,
+  nb_disorder rel l ≤ it
+  → sorted rel (bsort_loop rel it l) = true.
+Proof.
+...
+
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
