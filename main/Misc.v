@@ -3917,7 +3917,7 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
-(* to be completed
+(* to be completed *)
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -3963,6 +3963,54 @@ destruct ab. {
   specialize (H1 _ _ _ Hla).
   destruct H1 as (Hlen & Hs & H1).
   destruct H1 as (c & d & la1 & la2 & Hcd & Hsa & Hb & Hc & Hp).
+  subst lc; cbn.
+  destruct la as [| e]. {
+    injection Hb; clear Hb; intros; subst c ld.
+    rewrite app_nil_l.
+    clear Hsa.
+    cbn in Hla; rewrite Hcd in Hla.
+    injection Hla; clear Hla; intros; subst la2.
+    clear Hlen Hp.
+    remember (rel a d) as ad eqn:Had; symmetry in Had.
+    destruct ad. {
+      remember (b :: la1) as lb; cbn; subst lb.
+      specialize (Htot b d) as Hdb.
+      rewrite Hcd in Hdb; cbn in Hdb; rewrite Hdb.
+      remember (bsort_swap rel (b :: la1)) as la eqn:Hla.
+      symmetry in Hla.
+      destruct la as [(la, lb)| ]. {
+        destruct it; [ cbn in Hit; flia Hit | ].
+        do 2 rewrite <- app_comm_cons.
+        remember (d :: la ++ lb) as lc eqn:Hlc.
+        cbn; subst lc.
+        rewrite Had.
+        remember (bsort_swap rel (d :: la ++ lb)) as lc eqn:Hlc.
+        symmetry in Hlc.
+        destruct lc as [(lc, ld)| ]. {
+          destruct it; [ cbn in Hit; flia Hit | cbn ].
+          apply bsort_swap_Some in Hlc.
+          destruct Hlc as (Hlen & Hs1 & Hlc).
+          destruct Hlc as (a1 & b1 & la2 & lb2 & Hlc).
+          destruct Hlc as (Hab1 & Hsc1 & Hdla & Hld & Hp).
+          subst ld.
+          destruct lc as [| c]. {
+            cbn in Hdla.
+            injection Hdla; clear Hdla; intros Hdla H1; subst a1.
+            clear Hsc1.
+...
+      cbn.
+      destruct it; [ cbn in Hit; flia Hit | ].
+      remember (a :: b :: la1) as lb; cbn; subst lb.
+      specialize (Htot a d) as Hda.
+      rewrite Had in Hda; cbn in Hda.
+      rewrite Hda.
+      remember (bsort_swap rel (a :: b :: la1)) as la eqn:Hla.
+      symmetry in Hla.
+      destruct la as [(la, lb)| ].
+...
+      destruct la1 as [| c]. {
+        now cbn; rewrite Had, Hdb.
+      }
 ...
   cbn - [ bsort_swap ].
   remember (bsort_swap rel (a :: la ++ lc)) as lb eqn:Hlb.
