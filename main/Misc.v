@@ -4017,21 +4017,22 @@ apply IHit.
 Qed.
 
 (* to be completed
-Theorem bsort_count_eq : ∀ A (rel : A → _) la,
-  bsort_count rel la = bsort_loop_count rel (bsort_count rel la) la.
-Proof.
-intros.
-unfold bsort_count.
-Search bsort_loop_count.
-...
-
 Theorem bsort_count_rel_false : ∀ A (rel : A → _) a b la lb,
   rel a b = false
   → bsort_count rel (la ++ a :: b :: lb) =
     S (bsort_count rel (la ++ b :: a :: lb)).
 Proof.
 intros * Hab.
-Search bsort_loop_count.
+unfold bsort_count.
+remember (length _) as len eqn:Hlen.
+remember (length _) as len2 in |-*.
+assert (H : len2 = len). {
+  subst.
+  now do 2 rewrite app_length.
+}
+clear Heqlen2; subst len2.
+rewrite app_length in Hlen; cbn in Hlen.
+do 2 rewrite Nat.add_succ_r in Hlen.
 ...
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
