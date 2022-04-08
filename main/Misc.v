@@ -3973,6 +3973,19 @@ apply Nat.le_succ_diag_r.
 Qed.
 
 (* to be completed
+Theorem sorted_l_nb_disorder_app : ∀ A (rel : A → _) la lb,
+  sorted rel la = true
+  → nb_disorder rel (la ++ lb) = nb_disorder rel lb.
+Proof.
+intros * Hs.
+revert lb.
+induction la as [| a]; intros; cbn; [ easy | ].
+cbn in Hs.
+destruct la as [| b]. {
+  cbn.
+Print nb_disorder.
+...
+
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -4013,6 +4026,8 @@ destruct Hlb as (Hlen & Hs & Hlb).
 destruct Hlb as (a & b & la1 & lb1 & Hlb).
 destruct Hlb as (Hab & Hsb & Hla & Hlc & Hp).
 subst la lc.
+...
+rewrite sorted_l_nb_disorder_app in Hit |-*.
 ...
 (*
 rewrite List_app_cons, app_assoc in Hit.
