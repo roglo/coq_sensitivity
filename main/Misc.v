@@ -4004,12 +4004,32 @@ eapply le_trans in Hit. 2: {
 revert la Hit.
 induction it; intros. {
   apply Nat.le_0_r in Hit.
-  destruct la as [| a]; [ easy | ].
+  induction la as [| a]; [ easy | ].
   cbn in Hit |-*.
   apply Nat.eq_add_0 in Hit.
   destruct Hit as (Hra, Hd).
+  specialize (IHla Hd).
+  cbn in IHla.
+  rewrite IHla.
   destruct la as [| b]; [ easy | ].
+  rewrite Bool.andb_true_r.
+  cbn in Hra.
+  remember (rel a b) as ab eqn:Hab.
+  symmetry in Hab.
+  destruct ab; [ easy | exfalso ].
   cbn in Hd.
+  apply Nat.eq_add_0 in Hd.
+  destruct Hd as (Hr, Hd).
+  cbn in IHla.
+  destruct la as [| c]; [ easy | ].
+  apply Bool.andb_true_iff in IHla.
+  destruct IHla as (Hbc, Hs).
+  cbn in Hr.
+  rewrite Hbc in Hr.
+  cbn in Hr.
+  cbn in Hd.
+  cbn in Hs.
+...
   apply Nat.eq_add_0 in Hd.
   destruct Hd as (Hrb, Hd).
   remember (rel a b) as ab eqn:Hab.
