@@ -3989,6 +3989,64 @@ destruct la as [| b]. {
 Print nb_disorder.
 *)
 
+(* to be completed
+Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ it l,
+  length l * length l ≤ it
+  → sorted rel (bsort_loop rel it l) = true.
+Proof.
+intros * Htot * Hit.
+rename l into la.
+eapply le_trans in Hit. 2: {
+  apply (nb_disorder_le_square rel).
+}
+revert la Hit.
+induction it; intros. {
+  apply Nat.le_0_r in Hit.
+  destruct la as [| a]; [ easy | ].
+  cbn in Hit |-*.
+  apply Nat.eq_add_0 in Hit.
+  destruct Hit as (Hra, Hd).
+  destruct la as [| b]; [ easy | ].
+  cbn in Hd.
+  apply Nat.eq_add_0 in Hd.
+  destruct Hd as (Hrb, Hd).
+  remember (rel a b) as ab eqn:Hab.
+  symmetry in Hab.
+  destruct ab. 2: {
+    exfalso.
+    cbn in Hra, Hrb, Hd.
+    rewrite Hab in Hra.
+    remember (length (filter (rel a) la)) as len eqn:Hlen.
+    symmetry in Hlen.
+    destruct len; [ easy | ].
+    apply Nat.sub_0_le in Hra.
+    destruct la as [| c]; [ easy | ].
+    cbn in Hd.
+    apply Nat.eq_add_0 in Hd.
+    destruct Hd as (Hrc, Hd).
+...
+  destruct ab; [ | easy ].
+  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [(lb, lc)| ]; [ easy | ].
+  rewrite Bool.andb_true_l.
+  now apply bsort_swap_None.
+}
+cbn.
+remember (bsort_swap rel la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hlen & Hs & Hlb).
+destruct Hlb as (a & b & lab & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc).
+subst la lc.
+apply IHit.
+...
+*)
+
 Fixpoint bsort_loop_count {A} (rel : A → A → bool) it l :=
   match it with
   | 0 => 0
