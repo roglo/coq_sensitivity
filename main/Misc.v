@@ -3962,6 +3962,16 @@ remember (length (filter (rel a) l)) as len eqn:Hlen.
 destruct len; [ flia | flia IHl ].
 Qed.
 
+Theorem List_filter_length_lt : ∀ A (f : A → _) l,
+  length (filter f l) ≤ length l.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct (f a); cbn; [ now apply -> Nat.succ_le_mono | ].
+transitivity (length l); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
+
 (* to be completed
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
@@ -3977,13 +3987,73 @@ apply le_trans with (n := nb_disorder rel la) in Hit. 2: {
 revert la Hit.
 induction it; intros; cbn. {
   apply Nat.le_0_r in Hit.
-  destruct la as [| a]; [ easy | ].
+  induction la as [| a]; [ easy | ].
   cbn in Hit.
   apply Nat.eq_add_0 in Hit.
-  destruct Hit as (H1, H2).
-  cbn.
+  destruct Hit as (H1, H2); cbn.
+  rewrite IHla; [ | easy ].
   destruct la as [| b]; [ easy | ].
   cbn in H1, H2.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ easy | exfalso ].
+  remember (length (filter (rel a) la)) as len eqn:Hlen.
+  symmetry in Hlen.
+  destruct len; [ easy | ].
+  apply Nat.sub_0_le in H1.
+  specialize (List_filter_length_lt (rel a) la) as H3.
+  rewrite Hlen in H3.
+  flia H1 H3.
+}
+remember (bsort_swap rel la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
+apply IHit.
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hlen & Hs & Hlb).
+destruct Hlb as (a & b & la1 & lb1 & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc & Hp).
+subst la lc.
+...
+(*
+rewrite List_app_cons, app_assoc in Hit.
+Print nb_disorder.
+*)
+Theorem nb_disorder_app : ∀ A (rel : A → _) la lb,
+  nb_disorder rel (la ++ lb) =
+    nb_disorder rel la + nb_disorder rel lb +
+    iter_list la (λ c a, c + nb_rel rel a lb) 0.
+...
+rewrite nb_disorder_app in Hit |-*.
+subst lc.
+Search iter_list.
+erewrite iter_list_eq_compat. 2: {
+  intros c Hc.
+..
+  cbn.
+  remember (rel c a) as ca eqn:Hca.
+  symmetry in Hca.
+  destruct ca. {
+    remember (rel c b
+...
+Theorem le_nb_disorder_app : ∀ A (rel : A → _) la lb,
+  nb_disorder rel la + nb_disorder rel lb ≤ nb_disorder rel (la ++ lb).
+...
+assert (H1 : nb_disorder rel lb + nb_disorder rel (a :: b :: la1) ≤ S it). {
+  etransitivity; [ | apply Hit ].
+  apply le_nb_disorder_app.
+}
+cbn - [ nb_rel ] in H1.
+remember (nb_rel rel a (b :: la1)) as n eqn:Hn.
+symmetry in Hn.
+cbn in Hn.
+rewrite Hab in Hn.
+...
+  apply Nat.eq_add_0 in H2.
+  destruct H2 as (H2, H3).
+  unfold nb_rel in H2.
+  rewrite H2 in H1.
+    destruct la as [| c]; [ easy | cbn ].
+    cbn in H2, H3.
   apply Nat.eq_add_0 in H2.
   destruct H2 as (H2, H3).
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
