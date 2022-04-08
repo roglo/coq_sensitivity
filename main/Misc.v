@@ -4024,15 +4024,34 @@ Theorem bsort_count_rel_false : ∀ A (rel : A → _) a b la lb,
 Proof.
 intros * Hab.
 unfold bsort_count.
-remember (length _) as len eqn:Hlen.
+remember (length _) as it eqn:Hit.
 remember (length _) as len2 in |-*.
-assert (H : len2 = len). {
+assert (H : len2 = it). {
   subst.
   now do 2 rewrite app_length.
 }
 clear Heqlen2; subst len2.
-rewrite app_length in Hlen; cbn in Hlen.
-do 2 rewrite Nat.add_succ_r in Hlen.
+rewrite app_length in Hit; cbn in Hit.
+do 2 rewrite Nat.add_succ_r in Hit.
+symmetry in Hit.
+assert (H : S (S (length la + length lb)) ≤ it) by now subst it.
+clear Hit; rename H into Hit.
+revert a b la lb Hab Hit.
+induction it; intros; [ easy | cbn ].
+remember (bsort_swap rel (la ++ b :: a :: lb)) as lc eqn:Hlc.
+remember (bsort_swap rel (la ++ a :: b :: lb)) as ld eqn:Hld.
+symmetry in Hlc, Hld.
+destruct ld as [(ld1, ld2)| ]. 2: {
+  apply bsort_swap_None in Hld.
+  apply sorted_app in Hld.
+  destruct Hld as (_ & H1 & _).
+  cbn in H1.
+  now rewrite Hab in H1.
+}
+destruct lc as [(lc1, lc2)| ]; [ | flia ].
+apply -> Nat.succ_lt_mono.
+apply Nat.succ_le_mono in Hit.
+...
 remember (len * len) as it eqn:Hit.
 assert (H : it ≠ 0). {
   intros H; subst it.
