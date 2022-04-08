@@ -4017,11 +4017,36 @@ apply IHit.
 Qed.
 
 (* to be completed
-Theorem bsort_count_rel_false : ∀ A (rel : A → _) a b la lb,
+Theorem bsort_count_rel_false : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ a b la lb,
   rel a b = false
   → bsort_count rel (la ++ b :: a :: lb) <
     bsort_count rel (la ++ a :: b :: lb).
 Proof.
+intros * Htot * Hab.
+induction la as [| c]; intros. {
+  remember (a :: lb) as lc.
+  remember (b :: lb) as ld.
+  cbn.
+  subst lc ld.
+  rewrite Hab.
+  specialize (Htot a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  rewrite Hba.
+  remember (bsort_swap rel (a :: lb)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [(lc1, lc2)| ]; [ | flia ].
+  apply -> Nat.succ_lt_mono.
+  rewrite app_nil_l.
+  do 2 rewrite List_length_cons.
+  remember (S (length lb) + S (length lb) * (S (S (length lb)))) as it.
+  rename Heqit into Hit; cbn.
+  apply bsort_swap_Some in Hlc.
+  destruct Hlc as (Hclen & Hcs & Hlc).
+  destruct Hlc as (ac & bc & labc & Hlc).
+  destruct Hlc as (Habc & Hsc & H1c & H2c).
+...
 intros * Hab.
 unfold bsort_count.
 remember (length _) as it eqn:Hit.
@@ -4070,6 +4095,7 @@ move Hds before Hcs.
 move Hsd before Hsc.
 subst lc2 ld2.
 clear Hclen Hdlen.
+specialize (IHit ac bc lc1 labc Habc) as H1.
 ...
 remember (len * len) as it eqn:Hit.
 assert (H : it ≠ 0). {
