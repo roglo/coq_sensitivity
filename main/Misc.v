@@ -3916,7 +3916,7 @@ induction la as [| a]; intros; cbn. {
 ...
 *)
 
-(*
+(**)
 Definition nb_rel A (rel : A → A → _) a l :=
   length l - length (filter (rel a) l).
 
@@ -3925,7 +3925,7 @@ Fixpoint nb_disorder A (rel : A → _) l :=
   | [] => 0
   | a :: l' => nb_rel rel a l' + nb_disorder rel l'
   end.
-*)
+(**)
 
 (*
 Compute (nb_disorder Nat.leb [7;5;3;22;8]).
@@ -3942,7 +3942,7 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
 *)
 
-(*
+(**)
 Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
   nb_disorder rel l ≤ length l * length l.
 Proof.
@@ -3973,7 +3973,6 @@ destruct (f a); cbn; [ now apply -> Nat.succ_le_mono | ].
 transitivity (length l); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
-*)
 
 (*
 Theorem sorted_l_nb_disorder_app : ∀ A (rel : A → _) la lb,
@@ -3981,13 +3980,13 @@ Theorem sorted_l_nb_disorder_app : ∀ A (rel : A → _) la lb,
   → nb_disorder rel (la ++ lb) = nb_disorder rel lb.
 Proof.
 intros * Hs.
+Print nb_disorder.
 revert lb.
 induction la as [| a]; intros; cbn; [ easy | ].
 cbn in Hs.
 destruct la as [| b]. {
   cbn.
 Print nb_disorder.
-...
 *)
 
 Fixpoint bsort_loop_count {A} (rel : A → A → bool) it l :=
