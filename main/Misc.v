@@ -4017,6 +4017,23 @@ apply IHit.
 Qed.
 
 (* to be completed
+Theorem bsort_count_eq : ∀ A (rel : A → _) la,
+  bsort_count rel la = bsort_loop_count rel (bsort_count rel la) la.
+Proof.
+intros.
+unfold bsort_count.
+Search bsort_loop_count.
+...
+
+Theorem bsort_count_rel_false : ∀ A (rel : A → _) a b la lb,
+  rel a b = false
+  → bsort_count rel (la ++ a :: b :: lb) =
+    S (bsort_count rel (la ++ b :: a :: lb)).
+Proof.
+intros * Hab.
+Search bsort_loop_count.
+...
+
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
@@ -4029,7 +4046,7 @@ apply le_trans with (n := bsort_count rel la) in Hit. 2: {
   apply bsort_loop_count_le.
 }
 revert la Hit.
-induction it; intros; cbn. {
+induction it; intros. {
   apply Nat.le_0_r in Hit.
   destruct la as [| a]; [ easy | ].
   cbn in Hit |-*.
@@ -4043,9 +4060,20 @@ induction it; intros; cbn. {
   rewrite Bool.andb_true_l.
   now apply bsort_swap_None.
 }
+cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hlen & Hs & Hlb).
+destruct Hlb as (a & b & lab & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc).
+subst la lc.
+...
+rewrite bsort_count_rel_false in Hit; [ | easy ].
+apply Nat.succ_le_mono in Hit.
+apply (IHit _ Hit).
+...
 apply IHit.
 apply bsort_swap_Some in Hlb.
 destruct Hlb as (Hlen & Hs & Hlb).
