@@ -4051,6 +4051,25 @@ destruct ld as [(ld1, ld2)| ]. 2: {
 destruct lc as [(lc1, lc2)| ]; [ | flia ].
 apply -> Nat.succ_lt_mono.
 apply Nat.succ_le_mono in Hit.
+apply bsort_swap_Some in Hlc, Hld.
+destruct Hlc as (Hclen & Hcs & Hlc).
+destruct Hld as (Hdlen & Hds & Hld).
+destruct Hlc as (ac & bc & labc & Hlc).
+destruct Hld as (ad & bd & labd & Hld).
+destruct Hlc as (Habc & Hsc & H1c & H2c).
+destruct Hld as (Habd & Hsd & H1d & H2d).
+move ac before b; move bc before ac.
+move ad before bc; move bd before ad.
+move lc1 before lb; move lc2 before lc1.
+move ld1 before lc2; move ld2 before ld1.
+move Habc before Hab; move Habd before Habc.
+move labc before ld2.
+move labd before labc.
+move Hdlen before Hclen.
+move Hds before Hcs.
+move Hsd before Hsc.
+subst lc2 ld2.
+clear Hclen Hdlen.
 ...
 remember (len * len) as it eqn:Hit.
 assert (H : it ≠ 0). {
