@@ -4034,6 +4034,7 @@ clear Heqlen2; subst len2.
 rewrite app_length in Hlen; cbn in Hlen.
 do 2 rewrite Nat.add_succ_r in Hlen.
 remember (len * len) as it eqn:Hit.
+...
 assert (H : it ≠ 0). {
   intros H; subst it.
   subst len; easy.
@@ -4043,6 +4044,33 @@ rename H into Hit.
 revert a b la lb Hab.
 induction it; intros; [ easy | clear Hit ].
 cbn.
+(**)
+enough (Htot : total_relation rel).
+clear IHit.
+revert it a b lb Hab.
+induction la as [| c]; intros. {
+  specialize (Htot a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  remember (b :: lb) as lc.
+  remember (a :: lb) as ld.
+  cbn; subst lc ld.
+  rewrite Hab, Hba.
+  f_equal.
+  rewrite app_nil_l.
+  remember (bsort_swap rel (a :: lb)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [(lc, ld)| ]. 2: {
+    apply bsort_swap_None in Hlc.
+    destruct it; [ easy | ].
+    remember (a :: lb) as lc; cbn.
+    subst lc.
+    rewrite Hba.
+    apply sorted_bsort_swap in Hlc.
+    now rewrite Hlc.
+  }
+  cbn.
+  destruct it. {
+...
 remember (bsort_swap rel (la ++ a :: b :: lb)) as lc eqn:Hlc.
 remember (bsort_swap rel (la ++ b :: a :: lb)) as ld eqn:Hld.
 symmetry in Hlc, Hld.
