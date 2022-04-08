@@ -4033,6 +4033,73 @@ assert (H : len2 = len). {
 clear Heqlen2; subst len2.
 rewrite app_length in Hlen; cbn in Hlen.
 do 2 rewrite Nat.add_succ_r in Hlen.
+remember (len * len) as it eqn:Hit.
+assert (H : it ≠ 0). {
+  intros H; subst it.
+  subst len; easy.
+}
+clear len Hlen Hit.
+rename H into Hit.
+revert a b la lb Hab.
+induction it; intros; [ easy | clear Hit ].
+cbn.
+remember (bsort_swap rel (la ++ a :: b :: lb)) as lc eqn:Hlc.
+remember (bsort_swap rel (la ++ b :: a :: lb)) as ld eqn:Hld.
+symmetry in Hlc, Hld.
+destruct lc as [(lc1, lc2)| ]. 2: {
+  apply bsort_swap_None in Hlc.
+  exfalso; clear - Hab Hlc.
+  revert a b lb Hab Hlc.
+  induction la as [| c]; intros. {
+    cbn in Hlc.
+    now rewrite Hab in Hlc.
+  }
+  cbn in Hlc.
+  remember (la ++ a :: b :: lb) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [| d]; [ now destruct la | ].
+  apply Bool.andb_true_iff in Hlc.
+  destruct Hlc as (Hcd & Hlc).
+  specialize (IHla a b lb Hab) as H1.
+  rewrite Hld in H1.
+  easy.
+}
+f_equal.
+destruct ld as [(ld1, ld2)| ]. 2: {
+  apply bsort_swap_None in Hld.
+  apply bsort_swap_Some in Hlc.
+  destruct Hlc as (Hlen & Hsa & Hlc).
+  destruct Hlc as (c & d & lab & Hlc).
+  destruct Hlc as (Hcd & Hsc & Hla & Hlc).
+  subst lc2.
+...
+  clear - Hab Hlc Hld.
+  exfalso; clear - Hab Hld.
+  revert a b lb Hab Hlc.
+  induction la as [| c]; intros. {
+    cbn in Hlc.
+    now rewrite Hab in Hlc.
+  }
+  cbn in Hlc.
+  remember (la ++ a :: b :: lb) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [| d]; [ now destruct la | ].
+  apply Bool.andb_true_iff in Hlc.
+  destruct Hlc as (Hcd & Hlc).
+  specialize (IHla a b lb Hab) as H1.
+  rewrite Hld in H1.
+  easy.
+}
+...
+  destruct la as [| d]. {
+    cbn in Hlc.
+    rewrite Hab in Hlc; cbn in Hlc.
+    now rewrite Bool.andb_false_r in Hlc.
+  }
+  cbn in Hlc.
+  apply Bool.andb_true_iff in Hlc.
+  destruct Hlc as (Hcd & Hlc).
+
 ...
 
 Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
@@ -4070,6 +4137,7 @@ destruct Hlb as (Hlen & Hs & Hlb).
 destruct Hlb as (a & b & lab & Hlb).
 destruct Hlb as (Hab & Hsb & Hla & Hlc).
 subst la lc.
+apply IHit.
 ...
 rewrite bsort_count_rel_false in Hit; [ | easy ].
 apply Nat.succ_le_mono in Hit.
