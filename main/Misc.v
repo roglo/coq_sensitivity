@@ -4046,6 +4046,71 @@ induction la as [| c]; intros. {
   destruct Hlc as (Hclen & Hcs & Hlc).
   destruct Hlc as (ac & bc & labc & Hlc).
   destruct Hlc as (Habc & Hsc & H1c & H2c).
+  destruct it; intros; [ easy | ].
+  rewrite Nat.add_succ_l in Hit.
+  apply Nat.succ_inj in Hit.
+  remember (a :: lb) as lc; cbn; subst lc.
+  rewrite Hba.
+  remember (lc1 ++ lc2) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [| c]. {
+    apply app_eq_nil in Hlc.
+    now rewrite H2c in Hlc.
+  }
+  rename bc into bc1.
+  remember (rel b c) as bc eqn:Hbc.
+  symmetry in Hbc.
+  destruct bc. {
+    remember (bsort_swap rel (c :: lc)) as ld eqn:Hld.
+    remember (bsort_swap rel (a :: lb)) as le eqn:Hle.
+    symmetry in Hld, Hle.
+    destruct le as [(le1, le2)| ]. 2: {
+      apply bsort_swap_None in Hle.
+      now rewrite Hcs in Hle.
+    }
+    destruct ld as [(ld1, ld2)| ]; [ | easy ].
+    apply -> Nat.succ_lt_mono.
+    apply bsort_swap_Some in Hld.
+    destruct Hld as (Hdlen & Hds & Hld).
+    destruct Hld as (ad & bd & labd & Hld).
+    destruct Hld as (Habd & Hsd & H1d & H2d).
+    cbn.
+Theorem bsort_loop_count_cons_lt : ∀ A (rel : A → _) a la lb it,
+  bsort_loop_count rel it la < bsort_loop_count rel it lb
+  → bsort_loop_count rel it (a :: la) <
+    bsort_loop_count rel it (a :: lb).
+Proof.
+intros * Hlt.
+revert a la lb Hlt.
+induction it; intros; [ easy | ].
+remember (a :: la) as lc.
+remember (a :: lb) as ld.
+cbn; subst lc ld.
+cbn in Hlt.
+remember (bsort_swap rel (a :: la)) as lc eqn:Hlc.
+remember (bsort_swap rel (a :: lb)) as ld eqn:Hld.
+symmetry in Hlc, Hld.
+destruct lc as [(lc1, lc2)| ]. 2: {
+  apply bsort_swap_None in Hlc.
+  destruct ld as [(ld1, ld2)| ]; [ easy | exfalso ].
+  apply bsort_swap_None in Hld.
+  remember (bsort_swap rel la) as le eqn:Hle.
+  remember (bsort_swap rel lb) as lf eqn:Hlf.
+  symmetry in Hle, Hlf.
+  destruct lf as [(lf1, lf2)| ]; [ | easy ].
+  destruct le as [(le1, le2)| ]. {
+    apply Nat.succ_lt_mono in Hlt.
+    specialize (IHit a (le1 ++ le2) (lf1 ++ lf2) Hlt) as H1.
+    apply bsort_swap_Some in Hle.
+    destruct Hle as (Helen & Hes & Hle).
+    destruct Hle as (ae & be & labe & Hle).
+    destruct Hle as (Habe & Hse & H1e & H2e).
+    apply bsort_swap_Some in Hlf.
+    destruct Hlf as (Hflen & Hfs & Hlf).
+    destruct Hlf as (af & bf & labf & Hlf).
+    destruct Hlf as (Habf & Hsf & H1f & H2f).
+    subst le2 lf2.
+    subst la lb.
 ...
 intros * Hab.
 unfold bsort_count.
