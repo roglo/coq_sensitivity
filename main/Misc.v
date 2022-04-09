@@ -4110,8 +4110,19 @@ assert (H : length (l21 ++ l22) = len). {
   now rewrite Hlen in H2.
 }
 specialize (H4 H); clear H.
-clear Hp1 Hp2.
 specialize (IHlen l Hlen) as H5.
+apply List_eq_iff.
+split. {
+  rewrite Hp'1, Hp'2.
+  apply Permutation_length in Hp1, Hp2.
+  congruence.
+}
+intros d i.
+rewrite Hp'1, Hp'2.
+destruct (Nat.eq_dec i (length l11)) as [Hi11| Hi11]. {
+  subst i.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
 ...
 *)
 
