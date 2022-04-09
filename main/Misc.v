@@ -4082,6 +4082,10 @@ induction len; intros. {
   congruence.
 }
 (**)
+destruct l as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+...
+(**)
 remember (s1 rel l) as l1 eqn:Hl1.
 remember (s2 rel l) as l2 eqn:Hl2.
 symmetry in Hl1, Hl2.
