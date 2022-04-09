@@ -3989,6 +3989,34 @@ Theorem bsort_swap_nb_disorder : ∀ A (rel : A → _),
   → nb_disorder rel (lb ++ lc) ≤ it.
 Proof.
 intros * Hbs Hnd.
+revert lb lc it Hbs Hnd.
+induction la as [| a]; intros; [ easy | ].
+cbn in Hbs, Hnd.
+destruct la as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (bsort_swap rel (b :: la)) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [(ld1, ld2)| ]; [ | easy ].
+  injection Hbs; clear Hbs; intros; subst lb ld2.
+  rename ld1 into lb.
+  remember (it - nb_nrel rel a (b :: la)) as it' eqn:Hit'.
+  specialize (IHla lb lc it' eq_refl) as H1.
+  assert (H : nb_disorder rel (b :: la) ≤ S it'). {
+    rewrite Hit'; flia Hnd.
+  }
+  specialize (H1 H); clear H.
+  cbn in Hit'; rewrite Hab, Nat.add_0_l in Hit'.
+  subst it'; cbn.
+  enough (H : nb_nrel rel a la = nb_nrel rel a (lb ++ lc)).
+  rewrite H in H1.
+  enough (H' : nb_nrel rel a (lb ++ lc) ≤ it).
+  flia H1 H'.
+...
+  specialize (bsort_swap_Some _ _ Hld) as H2.
+  destruct H2 as (Hsf & a' & b' & lab & H2).
+  destruct H2 as (Hab' & Hst & Hla & Hlc).
+  subst lc.
 ...
 
 Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
