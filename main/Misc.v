@@ -3989,17 +3989,13 @@ Print nb_disorder.
 *)
 
 (* to be completed
-Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
+Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
-  ∀ it l,
-  length l * length l ≤ it
-  → sorted rel (bsort_loop rel it l) = true.
+  ∀ it la,
+  nb_disorder rel la ≤ it
+  → sorted rel (bsort_loop rel it la) = true.
 Proof.
 intros * Htot * Hit.
-rename l into la.
-eapply le_trans in Hit. 2: {
-  apply (nb_disorder_le_square rel).
-}
 revert la Hit.
 induction it; intros. {
   apply Nat.le_0_r in Hit.
@@ -4026,7 +4022,6 @@ destruct Hlb as (Hlen & Hs & Hlb).
 destruct Hlb as (a & b & lab & Hlb).
 destruct Hlb as (Hab & Hsb & Hla & Hlc).
 subst la lc.
-...
 apply IHit.
 clear - Htot Hit Hab.
 revert a b lab Hit Hab.
@@ -4057,6 +4052,21 @@ assert
     symmetry in Hca.
     destruct ca. {
       cbn.
+...
+
+Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ it l,
+  length l * length l ≤ it
+  → sorted rel (bsort_loop rel it l) = true.
+Proof.
+intros * Htot * Hit.
+rename l into la.
+eapply le_trans in Hit. 2: {
+  apply (nb_disorder_le_square rel).
+}
+...
+now apply bsort_loop_is_sorted_nb_disorder.
 ...
 *)
 
