@@ -4017,6 +4017,31 @@ cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
+(**)
+apply IHit.
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hlen & Hs & Hlb).
+destruct Hlb as (a & b & lab & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc).
+subst la lc.
+clear - Htot Hit Hab.
+revert a b lab Hit Hab.
+induction lb as [| c]; intros. {
+  cbn in Hit |-*.
+  rewrite Hab in Hit.
+  specialize (Htot a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  rewrite Hba.
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
+  rewrite Nat.add_0_l.
+  rewrite Nat.add_assoc in Hit |-*.
+  now rewrite (Nat.add_comm (nb_nrel rel b lab)).
+}
+cbn in Hit |-*.
+assert (H : nb_disorder rel (lb ++ a :: b :: lab) ≤ S it) by flia Hit.
+specialize (IHlb _ _ _ H Hab) as H1; clear H.
+...
 apply bsort_swap_Some in Hlb.
 destruct Hlb as (Hlen & Hs & Hlb).
 destruct Hlb as (a & b & lab & Hlb).
