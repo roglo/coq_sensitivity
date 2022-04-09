@@ -4081,6 +4081,51 @@ induction len; intros. {
   apply Permutation_sym, Permutation_nil in H1, H2.
   congruence.
 }
+(**)
+remember (s1 rel l) as l1 eqn:Hl1.
+remember (s2 rel l) as l2 eqn:Hl2.
+symmetry in Hl1, Hl2.
+destruct l1 as [| a1]. {
+  specialize (Hps1 l) as Hp1.
+  destruct Hp1 as (Hp1, _).
+  rewrite Hl1 in Hp1.
+  now apply Permutation_nil in Hp1; subst l.
+}
+destruct l2 as [| a2]. {
+  specialize (Hps2 l) as Hp2.
+  destruct Hp2 as (Hp2, _).
+  rewrite Hl2 in Hp2.
+  now apply Permutation_nil in Hp2; subst l.
+}
+move a2 before a1; move l2 before l1.
+destruct l as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+specialize (IHlen l Hlen) as H12.
+specialize (Hps1 (a :: l)) as Hp1.
+specialize (Hps2 (a :: l)) as Hp2.
+destruct Hp1 as (Hp1, Hs1).
+destruct Hp2 as (Hp2, Hs2).
+move Hp2 before Hp1.
+rewrite Hl1 in Hp1, Hs1.
+rewrite Hl2 in Hp2, Hs2.
+assert (Hpp : Permutation (a1 :: l1) (a2 :: l2)). {
+  transitivity (a :: l); [ easy | ].
+  now apply Permutation_sym.
+}
+cbn in Hs1, Hs2.
+destruct l1 as [| b1]. {
+  apply Permutation_length_1_inv in Hpp.
+  now injection Hpp; clear Hpp; intros; subst a2 l2.
+}
+destruct l2 as [| b2]. {
+  apply Permutation_sym in Hpp.
+  now apply Permutation_length_1_inv in Hpp.
+}
+apply Bool.andb_true_iff in Hs1, Hs2.
+destruct Hs1 as (Hab1, Hs1).
+destruct Hs2 as (Hab2, Hs2).
+move Hab2 before Hab1.
+...
 destruct l as [| a]; [ easy | ].
 cbn in Hlen.
 apply Nat.succ_inj in Hlen.
