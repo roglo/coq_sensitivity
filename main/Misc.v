@@ -4095,6 +4095,11 @@ rewrite Hp'1 in Hs1.
 rewrite Hp'2 in Hs2.
 move Hs1 before Hs2.
 rewrite Hp'1, Hp'2.
+rewrite Hp'1 in Hp1.
+rewrite Hp'2 in Hp2.
+specialize (Permutation_app_inv l11 l12 [] l a Hp1) as H1.
+specialize (Permutation_app_inv l21 l22 [] l a Hp2) as H2.
+rewrite app_nil_l in H1, H2.
 ...
 apply IHlen; try easy.
 (* ah, trou du cul *)
