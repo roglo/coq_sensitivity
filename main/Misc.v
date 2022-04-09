@@ -4065,13 +4065,27 @@ Qed.
 (* to be completed
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
   ∀ (s1 s2 : _ → list A → _),
-  (∀ l, sorted rel (s1 rel l) = true)
-  → (∀ l, sorted rel (s2 rel l) = true)
+  (∀ l, Permutation (s1 rel l) l ∧ sorted rel (s1 rel l) = true)
+  → (∀ l, Permutation (s2 rel l) l ∧ sorted rel (s2 rel l) = true)
   → ∀ l, s1 rel l = s2 rel l.
 Proof.
 intros * Hs1 Hs2 l.
 specialize (Hs1 l).
 specialize (Hs2 l).
+destruct Hs1 as (Hp1, Hs1).
+destruct Hs2 as (Hp2, Hs2).
+move Hp2 before Hp1.
+induction l as [| a]; cbn. {
+  apply Permutation_sym in Hp1, Hp2.
+  apply Permutation_nil in Hp1, Hp2.
+  congruence.
+}
+apply Permutation_vs_cons_inv in Hp1, Hp2.
+destruct Hp1 as (l11 & l12 & Hp1).
+destruct Hp2 as (l21 & l22 & Hp2).
+move Hp1 before Hp2.
+rewrite Hp1 in Hs1.
+rewrite Hp2 in Hs2.
 ...
 *)
 
