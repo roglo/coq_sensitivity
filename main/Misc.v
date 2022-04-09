@@ -4031,13 +4031,22 @@ destruct ab. {
   }
   rewrite H in H1.
   assert (H' : nb_nrel rel a (lb ++ lc) ≤ it). {
-...
+    rewrite <- H.
+    cbn - [ nb_disorder ] in Hnd.
+    rewrite Hab, Nat.add_0_l in Hnd.
+    assert (H' : nb_disorder rel (b :: la) ≠ 0). {
+      specialize (bsort_swap_Some _ _ Hld) as H2.
+      destruct H2 as (Hsf & a' & b' & lab & H2).
+      destruct H2 as (Hab' & Hst & Hla & Hlc).
+      rewrite Hla.
+      clear - Hab'.
+      induction lb as [| a]; cbn; [ now rewrite Hab' | ].
+      flia IHlb.
+    }
+    flia Hnd H'.
+  }
   flia H1 H'.
-...
-  specialize (bsort_swap_Some _ _ Hld) as H2.
-  destruct H2 as (Hsf & a' & b' & lab & H2).
-  destruct H2 as (Hab' & Hst & Hla & Hlc).
-  subst lc.
+}
 ...
 
 Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
