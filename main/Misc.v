@@ -4110,6 +4110,8 @@ assert (H : length (l21 ++ l22) = len). {
   now rewrite Hlen in H2.
 }
 specialize (H4 H); clear H.
+clear Hp1 Hp2.
+specialize (IHlen l Hlen) as H5.
 ...
 *)
 
