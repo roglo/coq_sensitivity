@@ -3917,13 +3917,16 @@ induction la as [| a]; intros; cbn. {
 *)
 
 (**)
-Definition nb_rel A (rel : A → A → _) a l :=
-  length l - length (filter (rel a) l).
+Fixpoint nb_nrel A (rel : A → A → bool) a l :=
+  match l with
+  | [] => 0
+  | b :: l' => (if rel a b then 0 else 1) + nb_nrel rel a l'
+  end.
 
 Fixpoint nb_disorder A (rel : A → _) l :=
   match l with
   | [] => 0
-  | a :: l' => nb_rel rel a l' + nb_disorder rel l'
+  | a :: l' => nb_nrel rel a l' + nb_disorder rel l'
   end.
 (**)
 
@@ -3940,6 +3943,7 @@ Fixpoint canon_sym_gr_list n k : list nat :=
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
 Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
+Compute (map (λ l, list_eqb Nat.eqb (bsort_loop Nat.leb (nb_disorder Nat.leb l(* - 1*)) l) (seq 0 5)) (canon_sym_gr_list_list 5)).
 *)
 
 (**)
@@ -3954,16 +3958,10 @@ rewrite <- Nat.add_succ_l.
 apply Nat.add_le_mono; [ | easy ].
 clear.
 induction l as [| b]; [ easy | cbn ].
-destruct (rel a b); cbn. {
-  unfold nb_rel in IHl.
-  etransitivity; [ apply IHl | ].
-  apply -> Nat.succ_le_mono; flia.
-}
-unfold nb_rel in IHl.
-remember (length (filter (rel a) l)) as len eqn:Hlen.
-destruct len; [ flia | flia IHl ].
+destruct (rel a b); cbn; flia IHl.
 Qed.
 
+(*
 Theorem List_filter_length_lt : ∀ A (f : A → _) l,
   length (filter f l) ≤ length l.
 Proof.
@@ -3973,6 +3971,7 @@ destruct (f a); cbn; [ now apply -> Nat.succ_le_mono | ].
 transitivity (length l); [ easy | ].
 apply Nat.le_succ_diag_r.
 Qed.
+*)
 
 (*
 Theorem sorted_l_nb_disorder_app : ∀ A (rel : A → _) la lb,
@@ -4016,43 +4015,7 @@ induction it; intros. {
   cbn in Hra.
   remember (rel a b) as ab eqn:Hab.
   symmetry in Hab.
-  destruct ab; [ easy | exfalso ].
-  cbn in Hd.
-  apply Nat.eq_add_0 in Hd.
-  destruct Hd as (Hr, Hd).
-  cbn in IHla.
-  destruct la as [| c]; [ easy | ].
-  apply Bool.andb_true_iff in IHla.
-  destruct IHla as (Hbc, Hs).
-  cbn in Hr.
-  rewrite Hbc in Hr.
-  cbn in Hr.
-  cbn in Hd.
-  cbn in Hs.
-...
-  apply Nat.eq_add_0 in Hd.
-  destruct Hd as (Hrb, Hd).
-  remember (rel a b) as ab eqn:Hab.
-  symmetry in Hab.
-  destruct ab. 2: {
-    exfalso.
-    cbn in Hra, Hrb, Hd.
-    rewrite Hab in Hra.
-    remember (length (filter (rel a) la)) as len eqn:Hlen.
-    symmetry in Hlen.
-    destruct len; [ easy | ].
-    apply Nat.sub_0_le in Hra.
-    destruct la as [| c]; [ easy | ].
-    cbn in Hd.
-    apply Nat.eq_add_0 in Hd.
-    destruct Hd as (Hrc, Hd).
-...
-  destruct ab; [ | easy ].
-  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
-  symmetry in Hlb.
-  destruct lb as [(lb, lc)| ]; [ easy | ].
-  rewrite Bool.andb_true_l.
-  now apply bsort_swap_None.
+  now destruct ab.
 }
 cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
@@ -4063,7 +4026,37 @@ destruct Hlb as (Hlen & Hs & Hlb).
 destruct Hlb as (a & b & lab & Hlb).
 destruct Hlb as (Hab & Hsb & Hla & Hlc).
 subst la lc.
+...
 apply IHit.
+clear - Htot Hit Hab.
+revert a b lab Hit Hab.
+induction lb as [| c]; intros. {
+  cbn in Hit |-*.
+  rewrite Hab in Hit.
+  specialize (Htot a b) as Hba.
+  rewrite Hab in Hba; cbn in Hba.
+  rewrite Hba.
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
+  rewrite Nat.add_0_l.
+  rewrite Nat.add_assoc in Hit |-*.
+  now rewrite (Nat.add_comm (nb_nrel rel b lab)).
+}
+cbn in Hit |-*.
+assert (H : nb_disorder rel (lb ++ a :: b :: lab) ≤ S it) by flia Hit.
+specialize (IHlb _ _ _ H Hab) as H1; clear H.
+...
+assert
+  (H :
+   nb_nrel rel c (lb ++ a :: b :: lab) =
+   S (nb_nrel rel c (lb ++ b :: a :: lab))). {
+  clear - Hab H1.
+  revert a b lab Hab H1.
+  induction lb as [| d]; intros; cbn. {
+    remember (rel c a) as ca eqn:Hca.
+    symmetry in Hca.
+    destruct ca. {
+      cbn.
 ...
 *)
 
