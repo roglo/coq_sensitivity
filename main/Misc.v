@@ -4008,9 +4008,30 @@ destruct ab. {
   specialize (H1 H); clear H.
   cbn in Hit'; rewrite Hab, Nat.add_0_l in Hit'.
   subst it'; cbn.
-  enough (H : nb_nrel rel a la = nb_nrel rel a (lb ++ lc)).
+  assert (H : nb_nrel rel a la = nb_nrel rel a (lb ++ lc)). {
+    specialize (bsort_swap_Some _ _ Hld) as H2.
+    destruct H2 as (Hsf & a' & b' & lab & H2).
+    destruct H2 as (Hab' & Hst & Hla & Hlc).
+    subst lc.
+    destruct lb as [| c]. {
+      cbn in Hla |-*.
+      injection Hla; clear Hla; intros; subst a' la.
+      now cbn; rewrite Hab.
+    }
+    cbn in Hla.
+    injection Hla; intros; subst c la.
+    cbn; rewrite Hab; cbn.
+    clear.
+    induction lb as [| b]; cbn. {
+      do 2 rewrite Nat.add_assoc.
+      f_equal.
+      apply Nat.add_comm.
+    }
+    f_equal; apply IHlb.
+  }
   rewrite H in H1.
-  enough (H' : nb_nrel rel a (lb ++ lc) ≤ it).
+  assert (H' : nb_nrel rel a (lb ++ lc) ≤ it). {
+...
   flia H1 H'.
 ...
   specialize (bsort_swap_Some _ _ Hld) as H2.
