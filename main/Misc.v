@@ -3766,8 +3766,7 @@ Qed.
 
 Theorem bsort_swap_Some : ∀ A (rel : A → _) la lb lc,
   bsort_swap rel la = Some (lb, lc)
-  → length la = length (lb ++ lc) ∧
-    sorted rel la = false ∧
+  → sorted rel la = false ∧
     ∃ a b lab , rel a b = false ∧
     sorted rel (lb ++ [a]) = true ∧
     la = lb ++ a :: b :: lab ∧
@@ -3784,25 +3783,19 @@ symmetry in Hld.
 destruct ld as [(ld, le)| ]. 2: {
   destruct ab; [ easy | ].
   injection Hs; clear Hs; intros; subst lb lc.
-  split; [ easy | ].
   split; [ now cbn; rewrite Hab | ].
   now exists a, b, la.
 }
 destruct ab. 2: {
   injection Hs; clear Hs; intros; subst lb lc.
-  split; [ easy | ].
   split; [ now cbn; rewrite Hab | ].
   now exists a, b, la.
 }
 injection Hs; clear Hs; intros; subst lb le.
 specialize (IHla ld eq_refl) as H1.
-destruct H1 as (Hll & Hns & H1).
+destruct H1 as (Hns & H1).
 destruct H1 as (c & d & lab & Hcd & H1).
 destruct H1 as (Hsc & Hbla & Hlc).
-cbn in Hll.
-do 2 rewrite List_length_cons.
-rewrite Hll.
-split; [ easy | ].
 split. {
   remember (b :: la) as lb eqn:Hlb; cbn; subst lb.
   rewrite Hns.
@@ -4017,7 +4010,24 @@ cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
-(**)
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hs & Hlb).
+destruct Hlb as (a & b & lab & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc).
+subst la lc.
+...
+(*
+clear IHit.
+revert la lb lc Hit Hlb.
+induction it; intros; cbn. {
+  apply Nat.le_1_r in Hit.
+*)
+apply IHit with (la := lb ++ lc); [ | easy ].
+destruct Hlb as (Hlen & Hs & Hlb).
+destruct Hlb as (a & b & lab & Hlb).
+destruct Hlb as (Hab & Hsb & Hla & Hlc).
+subst la lc.
+...
 apply IHit.
 apply bsort_swap_Some in Hlb.
 destruct Hlb as (Hlen & Hs & Hlb).
