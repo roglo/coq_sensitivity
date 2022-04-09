@@ -4062,6 +4062,19 @@ intros * Hant Htr Htot *.
 now apply isort_loop_ssort_loop.
 Qed.
 
+(* to be completed
+Theorem sorted_unique : ∀ A (rel : A → A → bool),
+  ∀ (s1 s2 : _ → list A → _),
+  (∀ l, sorted rel (s1 rel l) = true)
+  → (∀ l, sorted rel (s2 rel l) = true)
+  → ∀ l, s1 rel l = s2 rel l.
+Proof.
+intros * Hs1 Hs2 l.
+specialize (Hs1 l).
+specialize (Hs2 l).
+...
+*)
+
 (* *)
 
 Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
