@@ -4069,11 +4069,58 @@ Theorem sorted_unique : ∀ A (rel : A → A → bool),
   → (∀ l, Permutation (s2 rel l) l ∧ sorted rel (s2 rel l) = true)
   → ∀ l, s1 rel l = s2 rel l.
 Proof.
-intros * Hs1 Hs2 l.
-specialize (Hs1 l).
-specialize (Hs2 l).
-destruct Hs1 as (Hp1, Hs1).
-destruct Hs2 as (Hp2, Hs2).
+intros * Hps1 Hps2 l.
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert l Hlen.
+induction len; intros. {
+  apply length_zero_iff_nil in Hlen; subst l.
+  specialize (Hps1 []) as H1.
+  specialize (Hps2 []) as H2.
+  destruct H1 as (H1, _).
+  destruct H2 as (H2, _).
+  apply Permutation_sym, Permutation_nil in H1, H2.
+  congruence.
+}
+destruct l as [| a]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+specialize (Hps1 (a :: l)) as H1.
+specialize (Hps2 (a :: l)) as H2.
+destruct H1 as (Hp1, Hs1).
+destruct H2 as (Hp2, Hs2).
+move Hp2 before Hp1.
+specialize (Permutation_vs_cons_inv Hp1) as Hp'1.
+specialize (Permutation_vs_cons_inv Hp2) as Hp'2.
+destruct Hp'1 as (l11 & l12 & Hp'1).
+destruct Hp'2 as (l21 & l22 & Hp'2).
+rewrite Hp'1 in Hp1.
+rewrite Hp'2 in Hp2.
+specialize (Permutation_app_inv l11 l12 [] l a Hp1) as H1.
+specialize (Permutation_app_inv l21 l22 [] l a Hp2) as H2.
+rewrite app_nil_l in H1, H2.
+specialize (IHlen (l11 ++ l12)) as H3.
+assert (H : length (l11 ++ l12) = len). {
+  apply Permutation_length in H1.
+  now rewrite Hlen in H1.
+}
+specialize (H3 H); clear H.
+specialize (IHlen (l21 ++ l22)) as H4.
+assert (H : length (l21 ++ l22) = len). {
+  apply Permutation_length in H2.
+  now rewrite Hlen in H2.
+}
+specialize (H4 H); clear H.
+...
+  apply (f_equal length ) in Hp'1.
+  rewrite app_length in Hp'1; cbn in Hp'1.
+  rewrite Nat.add_succ_r in Hp'1.
+  rewrite <- app_length in Hp'1.
+...
+intros * Hps1 Hps2 l.
+specialize (Hps1 l) as H1.
+specialize (Hps2 l) as H2.
+destruct H1 as (Hp1, Hs1).
+destruct H2 as (Hp2, Hs2).
 move Hp2 before Hp1.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
 revert l Hp1 Hp2 Hs1 Hs2 Hlen.
@@ -4100,6 +4147,7 @@ rewrite Hp'2 in Hp2.
 specialize (Permutation_app_inv l11 l12 [] l a Hp1) as H1.
 specialize (Permutation_app_inv l21 l22 [] l a Hp2) as H2.
 rewrite app_nil_l in H1, H2.
+clear Hp1 Hp2.
 ...
 apply IHlen; try easy.
 (* ah, trou du cul *)
