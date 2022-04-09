@@ -3982,6 +3982,15 @@ Print nb_disorder.
 *)
 
 (* to be completed
+Theorem bsort_swap_nb_disorder : ∀ A (rel : A → _),
+  ∀ la lb lc it,
+  bsort_swap rel la = Some (lb, lc)
+  → nb_disorder rel la ≤ S it
+  → nb_disorder rel (lb ++ lc) ≤ it.
+Proof.
+intros * Hbs Hnd.
+...
+
 Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la,
@@ -4010,6 +4019,10 @@ cbn.
 remember (bsort_swap rel la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as [(lb, lc)| ]; [ | now apply bsort_swap_None ].
+apply IHit.
+...
+now apply (bsort_swap_nb_disorder rel la).
+...
 apply bsort_swap_Some in Hlb.
 destruct Hlb as (Hs & Hlb).
 destruct Hlb as (a & b & lab & Hlb).
