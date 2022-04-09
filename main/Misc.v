@@ -4084,16 +4084,18 @@ induction len; intros. {
   congruence.
 }
 destruct l as [| a]; [ easy | ].
-(*
-apply Permutation_vs_cons_inv in Hp1, Hp2.
-destruct Hp1 as (l11 & l12 & Hp1).
-destruct Hp2 as (l21 & l22 & Hp2).
-move Hp1 before Hp2.
-rewrite Hp1 in Hs1.
-rewrite Hp2 in Hs2.
-*)
 cbn in Hlen.
 apply Nat.succ_inj in Hlen.
+specialize (Permutation_vs_cons_inv Hp1) as Hp'1.
+specialize (Permutation_vs_cons_inv Hp2) as Hp'2.
+destruct Hp'1 as (l11 & l12 & Hp'1).
+destruct Hp'2 as (l21 & l22 & Hp'2).
+move Hp'1 before Hp'2.
+rewrite Hp'1 in Hs1.
+rewrite Hp'2 in Hs2.
+move Hs1 before Hs2.
+rewrite Hp'1, Hp'2.
+...
 apply IHlen; try easy.
 (* ah, trou du cul *)
 ...
