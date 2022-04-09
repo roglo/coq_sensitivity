@@ -4075,17 +4075,27 @@ specialize (Hs2 l).
 destruct Hs1 as (Hp1, Hs1).
 destruct Hs2 as (Hp2, Hs2).
 move Hp2 before Hp1.
-induction l as [| a]; cbn. {
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert l Hp1 Hp2 Hs1 Hs2 Hlen.
+induction len; intros. {
+  apply length_zero_iff_nil in Hlen; subst l.
   apply Permutation_sym in Hp1, Hp2.
   apply Permutation_nil in Hp1, Hp2.
   congruence.
 }
+destruct l as [| a]; [ easy | ].
+(*
 apply Permutation_vs_cons_inv in Hp1, Hp2.
 destruct Hp1 as (l11 & l12 & Hp1).
 destruct Hp2 as (l21 & l22 & Hp2).
 move Hp1 before Hp2.
 rewrite Hp1 in Hs1.
 rewrite Hp2 in Hs2.
+*)
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+apply IHlen; try easy.
+(* ah, trou du cul *)
 ...
 *)
 
