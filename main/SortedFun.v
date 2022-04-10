@@ -31,6 +31,8 @@ apply Bool.orb_true_iff in H1.
 now destruct H1.
 Qed.
 
+(* algorithm to compute if a list is sorted *)
+
 Fixpoint sorted {A} (rel : A → A → bool) l :=
   match l with
   | [] => true
