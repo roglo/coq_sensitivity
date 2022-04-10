@@ -4063,6 +4063,23 @@ now apply isort_loop_ssort_loop.
 Qed.
 
 (* to be completed
+Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
+  ∀ la lb,
+  Permutation la lb
+  → sorted rel la = true
+  → sorted rel lb = true
+  → la = lb.
+Proof.
+intros * Hpab Hsa Hsb.
+revert lb Hpab Hsb.
+induction la as [| a]; intros. {
+  now apply Permutation_nil in Hpab.
+}
+destruct lb as [| b]. {
+  now apply Permutation_sym, Permutation_nil in Hpab.
+}
+...
+
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
   ∀ (s1 s2 : list A → _),
   (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l) = true)
@@ -4070,6 +4087,13 @@ Theorem sorted_unique : ∀ A (rel : A → A → bool),
   → ∀ l, s1 l = s2 l.
 Proof.
 intros * Hps1 Hps2 l.
+...
+apply (permutted_sorted_unique rel); [ | apply Hps1 | apply Hps2 ].
+specialize (Hps1 l) as H1.
+specialize (Hps2 l) as H2.
+transitivity l; [ easy | ].
+now apply Permutation_sym.
+...
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
 revert l Hlen.
 induction len; intros. {
