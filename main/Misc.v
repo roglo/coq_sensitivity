@@ -4063,6 +4063,32 @@ now apply isort_loop_ssort_loop.
 Qed.
 
 (* to be completed
+(* counterexample of permutted_sorted_unique below *)
+Inductive t := a : t | b : t | c : t.
+Definition t_leb (x y : t) :=
+  match (x, y) with
+  | (a, b) => true
+  | (b, c) => true
+  | (c, a) => true
+  | _ => false
+  end.
+Theorem antisymmetric_t : antisymmetric t_leb.
+Proof.
+intros x y Hxy Hyx.
+destruct x, y; try easy.
+Qed.
+Definition la := [a; b; c].
+Definition lb := [c; a; b].
+Theorem Permutation_a_b_b_a : Permutation la lb.
+Proof.
+apply perm_trans with (l' := [a; c; b]); [ constructor; constructor | ].
+constructor.
+Qed.
+Theorem sorted_a_b_c : sorted t_leb la = true.
+Proof. easy. Qed.
+Theorem sorted_c_a_b : sorted t_leb lb = true.
+Proof. easy. Qed.
+...
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
   antisymmetric rel →
   ∀ la lb,
@@ -4072,6 +4098,7 @@ Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
   → la = lb.
 Proof.
 intros * Hant * Hpab Hsa Hsb.
+...
 induction Hpab; [ easy | | | ]. {
   assert (H1 : sorted rel l = true) by now apply sorted_cons in Hsa.
   assert (H2 : sorted rel l' = true) by now apply sorted_cons in Hsb.
