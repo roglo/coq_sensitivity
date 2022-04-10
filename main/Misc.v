@@ -4168,6 +4168,34 @@ apply (sorted_unique Href Hant Htra). {
 }
 Qed.
 
+(* isort and bsort return same *)
+
+(* to be completed
+Theorem isort_bsort : ∀ (A : Type) (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, isort rel l = bsort rel l.
+Proof.
+intros * Hant Htra Htot *.
+specialize (total_relation_is_reflexive Htot) as Href.
+apply (sorted_unique Href Hant Htra). {
+  clear l.
+  intros l.
+  split; [ | now apply isort_is_sorted ].
+  apply Permutation_sym, Permutation_isort.
+} {
+  clear l.
+  intros l.
+  split; [ | now apply bsort_is_sorted ].
+  apply Permutation_sym.
+...
+Search (Permutation _ (bsort _ _)).
+  apply Permutation_bsort.
+}
+Qed.
+*)
+
 (* *)
 
 Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
