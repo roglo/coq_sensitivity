@@ -31,7 +31,7 @@ apply Bool.orb_true_iff in H1.
 now destruct H1.
 Qed.
 
-(* algorithm to compute if a list is sorted *)
+(* compute if a list is sorted *)
 
 Fixpoint sorted {A} (rel : A → A → bool) l :=
   match l with
@@ -511,14 +511,6 @@ destruct x. {
   }
   apply Permutation_app_comm.
 }
-Qed.
-
-Theorem Permutation_isort : ∀ A (rel : A → _) l, Permutation l (isort rel l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-specialize Permutation_isort_loop as H1.
-apply (H1 _ rel [a] l).
 Qed.
 
 (* in isort *)
@@ -1071,14 +1063,6 @@ specialize (H1 H Hs); clear H.
 apply (select_first_Permutation rel) in Hlc.
 transitivity (b :: lc); [ easy | ].
 now constructor.
-Qed.
-
-Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
-Proof.
-intros.
-induction l as [| a]; [ easy | ].
-specialize (ssort_loop_Permutation rel) as H1.
-now apply H1 with (len := length (a :: l)).
 Qed.
 
 (* isort is sorted *)
@@ -1649,32 +1633,6 @@ eapply le_trans in Hit. 2: {
 now apply bsort_loop_is_sorted_nb_disorder.
 Qed.
 
-Theorem Permutation_bsort : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ l, Permutation l (bsort rel l).
-Proof.
-intros * Htot *.
-rename l into la.
-rewrite (bsort_bsort_loop_nb_disorder Htot).
-remember (nb_disorder rel la) as it eqn:H.
-assert (Hit : nb_disorder rel la ≤ it) by flia H.
-clear H.
-revert la Hit.
-induction it; intros; [ easy | cbn ].
-remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [lb| ]; [ | easy ].
-specialize (bsort_swap_nb_disorder Htot) as H1.
-specialize (H1 _ _ _ Hlb Hit).
-specialize (IHit _ H1) as H2.
-transitivity lb; [ | easy ].
-apply bsort_swap_Some in Hlb.
-destruct Hlb as (Hs & c & d & lc & ld & Hlb).
-destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
-subst la lb.
-apply Permutation_app_head.
-constructor.
-Qed.
-
 (* unicity of sorting algorithm *)
 
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
@@ -1953,6 +1911,55 @@ Proof.
 intros * Htot *.
 unfold bsort.
 now apply bsort_loop_is_sorted.
+Qed.
+
+(* *)
+
+Theorem Permutation_isort : ∀ A (rel : A → _) l, Permutation l (isort rel l).
+Proof.
+intros.
+destruct l as [| a]; [ easy | cbn ].
+specialize Permutation_isort_loop as H1.
+apply (H1 _ rel [a] l).
+Qed.
+
+Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
+Proof.
+intros.
+destruct l as [| a]; [ easy | ].
+specialize (ssort_loop_Permutation rel) as H1.
+now apply H1 with (len := length (a :: l)).
+Qed.
+
+Theorem Permutation_bsort : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ l, Permutation l (bsort rel l).
+Proof.
+intros * Htot *.
+rename l into la.
+rewrite (bsort_bsort_loop_nb_disorder Htot).
+remember (nb_disorder rel la) as it eqn:H.
+assert (Hit : nb_disorder rel la ≤ it) by flia H.
+clear H.
+(*
+Check ssort_loop_Permutation.
+Check Permutation_isort_loop.
+...
+*)
+revert la Hit.
+induction it; intros; [ easy | cbn ].
+remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [lb| ]; [ | easy ].
+specialize (bsort_swap_nb_disorder Htot) as H1.
+specialize (H1 _ _ _ Hlb Hit).
+specialize (IHit _ H1) as H2.
+transitivity lb; [ | easy ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+subst la lb.
+apply Permutation_app_head.
+constructor.
 Qed.
 
 (* isort and ssort return same *)
