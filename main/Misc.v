@@ -3698,6 +3698,14 @@ transitivity (b :: lc); [ easy | ].
 now constructor.
 Qed.
 
+Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
+Proof.
+intros.
+induction l as [| a]; [ easy | ].
+specialize (ssort_loop_Permutation rel) as H1.
+now apply H1 with (len := length (a :: l)).
+Qed.
+
 Theorem ssort_loop_is_sorted : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
@@ -4071,60 +4079,7 @@ unfold bsort.
 now apply bsort_loop_is_sorted.
 Qed.
 
-(* *)
-
-Theorem isort_loop_ssort_loop : ∀ A rel,
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ (ls l : list A) it,
-  it = length (ls ++ l)
-  → sorted rel ls = true
-  → isort_loop rel ls l = ssort_loop rel it (ls ++ l).
-Proof.
-intros * Hant Htr Htot * Hit Hs.
-subst it.
-revert ls Hs.
-induction l as [| a]; intros. {
-  cbn; rewrite app_nil_r.
-  now symmetry; apply sorted_ssort.
-}
-cbn.
-rewrite IHl; [ | now apply isort_insert_is_sorted ].
-do 2 rewrite app_length.
-rewrite isort_insert_length.
-rewrite List_length_cons, <- Nat.add_succ_comm.
-apply (Permutation_ssort_loop Hant Htr Htot). {
-  do 2 rewrite app_length.
-  rewrite isort_insert_length.
-  now rewrite Nat.add_succ_comm.
-} {
-  now rewrite app_length, isort_insert_length.
-}
-apply Permutation_sym.
-transitivity (a :: ls ++ l). 2: {
-  rewrite app_comm_cons.
-  apply Permutation_app; [ | easy ].
-  now apply Permutation_cons_isort_insert.
-}
-rewrite app_comm_cons.
-rewrite List_app_cons, app_assoc.
-apply Permutation_app; [ | easy ].
-apply Permutation_app_comm.
-Qed.
-
-(* isort and ssort return same *)
-
-Theorem isort_ssort : ∀ (A : Type) (rel : A → A → bool),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ (l : list A),
-  isort rel l = ssort rel l.
-Proof.
-intros * Hant Htr Htot *.
-now apply isort_loop_ssort_loop.
-Qed.
+(* unicity of sorting algorithm *)
 
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
   reflexive rel →
@@ -4173,125 +4128,45 @@ apply IHla; [ | easy | ]. {
 }
 Qed.
 
-(* to be completed
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
+  reflexive rel →
+  antisymmetric rel →
+  transitive rel →
   ∀ (s1 s2 : list A → _),
   (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l) = true)
   → (∀ l, Permutation (s2 l) l ∧ sorted rel (s2 l) = true)
   → ∀ l, s1 l = s2 l.
 Proof.
-intros * Hps1 Hps2 l.
-...
-apply (permutted_sorted_unique rel); [ | apply Hps1 | apply Hps2 ].
+intros * Href Hant Htra * Hps1 Hps2 l.
+apply (permutted_sorted_unique Href Hant Htra); [ | apply Hps1 | apply Hps2 ].
 specialize (Hps1 l) as H1.
 specialize (Hps2 l) as H2.
 transitivity l; [ easy | ].
 now apply Permutation_sym.
-...
-remember (length l) as len eqn:Hlen; symmetry in Hlen.
-revert l Hlen.
-induction len; intros. {
-  apply length_zero_iff_nil in Hlen; subst l.
-  specialize (Hps1 []) as H1.
-  specialize (Hps2 []) as H2.
-  destruct H1 as (H1, _).
-  destruct H2 as (H2, _).
-  apply Permutation_sym, Permutation_nil in H1, H2.
-  congruence.
+Qed.
+
+(* isort and ssort return same *)
+
+Theorem isort_ssort : ∀ (A : Type) (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, isort rel l = ssort rel l.
+Proof.
+intros * Hant Htra Htot *.
+specialize (total_relation_is_reflexive Htot) as Href.
+apply (sorted_unique Href Hant Htra). {
+  clear l.
+  intros l.
+  split; [ | now apply isort_is_sorted ].
+  apply Permutation_sym, Permutation_isort.
+} {
+  clear l.
+  intros l.
+  split; [ | now apply ssort_is_sorted ].
+  apply Permutation_sym, Permutation_ssort.
 }
-(*
-destruct l as [| a]; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-...
-*)
-remember (s1 l) as l1 eqn:Hl1.
-remember (s2 l) as l2 eqn:Hl2.
-symmetry in Hl1, Hl2.
-destruct l1 as [| a1]. {
-  specialize (Hps1 l) as Hp1.
-  destruct Hp1 as (Hp1, _).
-  rewrite Hl1 in Hp1.
-  now apply Permutation_nil in Hp1; subst l.
-}
-destruct l2 as [| a2]. {
-  specialize (Hps2 l) as Hp2.
-  destruct Hp2 as (Hp2, _).
-  rewrite Hl2 in Hp2.
-  now apply Permutation_nil in Hp2; subst l.
-}
-move a2 before a1; move l2 before l1.
-destruct l as [| a]; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-specialize (IHlen l Hlen) as H12.
-specialize (Hps1 (a :: l)) as Hp1.
-specialize (Hps2 (a :: l)) as Hp2.
-destruct Hp1 as (Hp1, Hs1).
-destruct Hp2 as (Hp2, Hs2).
-move Hp2 before Hp1.
-rewrite Hl1 in Hp1, Hs1.
-rewrite Hl2 in Hp2, Hs2.
-assert (Hpp : Permutation (a1 :: l1) (a2 :: l2)). {
-  transitivity (a :: l); [ easy | ].
-  now apply Permutation_sym.
-}
-cbn in Hs1, Hs2.
-destruct l1 as [| b1]. {
-  apply Permutation_length_1_inv in Hpp.
-  now injection Hpp; clear Hpp; intros; subst a2 l2.
-}
-destruct l2 as [| b2]. {
-  apply Permutation_sym in Hpp.
-  now apply Permutation_length_1_inv in Hpp.
-}
-apply Bool.andb_true_iff in Hs1, Hs2.
-destruct Hs1 as (Hab1, Hs1).
-destruct Hs2 as (Hab2, Hs2).
-move Hab2 before Hab1.
-...
-destruct l as [| a]; [ easy | ].
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-specialize (Hps1 (a :: l)) as H1.
-specialize (Hps2 (a :: l)) as H2.
-destruct H1 as (Hp1, Hs1).
-destruct H2 as (Hp2, Hs2).
-move Hp2 before Hp1.
-specialize (Permutation_vs_cons_inv Hp1) as Hp'1.
-specialize (Permutation_vs_cons_inv Hp2) as Hp'2.
-destruct Hp'1 as (l11 & l12 & Hp'1).
-destruct Hp'2 as (l21 & l22 & Hp'2).
-rewrite Hp'1 in Hp1.
-rewrite Hp'2 in Hp2.
-specialize (Permutation_app_inv l11 l12 [] l a Hp1) as H1.
-specialize (Permutation_app_inv l21 l22 [] l a Hp2) as H2.
-rewrite app_nil_l in H1, H2.
-specialize (IHlen (l11 ++ l12)) as H3.
-assert (H : length (l11 ++ l12) = len). {
-  apply Permutation_length in H1.
-  now rewrite Hlen in H1.
-}
-specialize (H3 H); clear H.
-specialize (IHlen (l21 ++ l22)) as H4.
-assert (H : length (l21 ++ l22) = len). {
-  apply Permutation_length in H2.
-  now rewrite Hlen in H2.
-}
-specialize (H4 H); clear H.
-specialize (IHlen l Hlen) as H5.
-apply List_eq_iff.
-split. {
-  rewrite Hp'1, Hp'2.
-  apply Permutation_length in Hp1, Hp2.
-  congruence.
-}
-intros d i.
-rewrite Hp'1, Hp'2.
-destruct (Nat.eq_dec i (length l11)) as [Hi11| Hi11]. {
-  subst i.
-  rewrite app_nth2; [ | now unfold ge ].
-  rewrite Nat.sub_diag; cbn.
-...
-*)
+Qed.
 
 (* *)
 
