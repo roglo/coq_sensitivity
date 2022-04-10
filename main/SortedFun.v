@@ -186,50 +186,6 @@ split. {
 }
 Qed.
 
-Theorem sorted_app_iff : ∀ A rel,
-  transitive rel →
-  ∀ (la lb : list A),
-  sorted rel (la ++ lb) = true
-  ↔ sorted rel la = true ∧ sorted rel lb = true ∧
-    (∀ a b, a ∈ la → b ∈ lb → rel a b = true).
-Proof.
-intros * Htra *.
-split. {
-  intros Hab.
-  apply sorted_app in Hab.
-  split; [ easy | ].
-  split; [ easy | ].
-  intros a b Ha Hb.
-  now apply Hab.
-} {
-  intros (Ha & Hb & Hab).
-  revert lb Hb Hab.
-  induction la as [| a] using rev_ind; intros; [ easy | cbn ].
-  rewrite <- app_assoc; cbn.
-  apply IHla. {
-    now apply sorted_app in Ha.
-  } {
-    cbn.
-    destruct lb as [| b]; [ easy | ].
-    rewrite Hab; cycle 1. {
-      now apply in_or_app; right; left.
-    } {
-      now left.
-    }
-    now rewrite Hb.
-  }
-  intros a' b' Ha' Hb'.
-  destruct Hb' as [Hb'| Hb']. {
-    apply sorted_app in Ha.
-    subst b'.
-    apply Ha; [ easy | easy | now left ].
-  } {
-    apply Hab; [ | easy ].
-    now apply in_or_app; left.
-  }
-}
-Qed.
-
 Theorem sorted_trans : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la,
@@ -400,25 +356,6 @@ destruct lc as (c, lc).
 injection Hab; clear Hab; intros; subst c lb.
 cbn; f_equal.
 now destruct x; apply IHla in Hlc.
-Qed.
-
-Theorem ssort_loop_length : ∀ A rel it (l : list A),
-  length (ssort_loop rel it l) = length l.
-Proof.
-intros.
-revert l.
-induction it; intros; [ easy | cbn ].
-destruct l as [| a]; [ easy | cbn ].
-remember (select_first rel a l) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as (a', la'); cbn; f_equal.
-rewrite IHit.
-now apply select_first_length in Hlb.
-Qed.
-
-Theorem ssort_length : ∀ A rel (l : list A), length (ssort rel l) = length l.
-Proof.
-intros.
-apply ssort_loop_length.
 Qed.
 
 (* *)
@@ -649,52 +586,6 @@ destruct (rel a a). {
 }
 f_equal.
 apply IHlen.
-Qed.
-
-Theorem ssort_loop_cons : ∀ A rel it a b (la lb : list A),
-  length la ≤ it
-  → select_first rel a la = (b, lb)
-  → ssort_loop rel it (a :: la) = b :: ssort_loop rel it lb.
-Proof.
-intros * Hit Hab.
-revert a b la lb Hit Hab.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
-  cbn in Hab.
-  now injection Hab; clear Hab; intros; subst b lb.
-}
-destruct la as [| a']. {
-  cbn in Hab.
-  injection Hab; clear Hab; intros; subst b lb.
-  now destruct it.
-}
-cbn in Hit.
-apply Nat.succ_le_mono in Hit.
-cbn in Hab |-*.
-remember (rel a a') as x eqn:Hx; symmetry in Hx.
-remember (select_first rel (if x then a else a') la) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as (c, lc).
-injection Hab; clear Hab; intros; subst c lb.
-f_equal.
-remember (select_first rel (if x then a' else a) lc) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as (d, ld).
-apply IHit; [ | easy ].
-specialize select_first_length as H1.
-specialize (H1 _ rel (if x then a else a') la b lc Hlc).
-now rewrite H1.
-Qed.
-
-Theorem eq_ssort_loop_nil : ∀ A rel it (l : list A),
-  ssort_loop rel it l = [] → l = [].
-Proof.
-intros * Hit.
-revert l Hit.
-induction it; intros; [ easy | ].
-cbn in Hit.
-destruct l as [| a la]; [ easy | exfalso ].
-now destruct (select_first rel a la).
 Qed.
 
 Theorem select_first_Permutation : ∀ A (rel : A → _) a b la lb,
