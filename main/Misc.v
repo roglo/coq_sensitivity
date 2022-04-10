@@ -2771,14 +2771,7 @@ Qed.
 
 (* end isort_rank *)
 
-(* sorted *)
-
-Fixpoint sorted {A} (rel : A → A → bool) l :=
-  match l with
-  | [] => true
-  | [a] => true
-  | a :: (b :: _) as la => (rel a b && sorted rel la)%bool
-  end.
+(* relation properties *)
 
 Definition reflexive A (rel : A → A → bool) :=
   ∀ a, rel a a = true.
@@ -2801,13 +2794,26 @@ apply Bool.orb_true_iff in H1.
 now destruct H1.
 Qed.
 
-Theorem sorted_cons_cons_true_iff : ∀ A (rel : A → A -> bool) a b l,
-  sorted rel (a :: b :: l) = true
-  ↔ rel a b = true ∧ sorted rel (b :: l) = true.
-Proof.
-intros.
-apply Bool.andb_true_iff.
-Qed.
+(* sorted *)
+
+Fixpoint sorted {A} (rel : A → A → bool) l :=
+  match l with
+  | [] => true
+  | [a] => true
+  | a :: (b :: _) as la => (rel a b && sorted rel la)%bool
+  end.
+
+Fixpoint all_sorted A (rel : A → A → bool) a l :=
+  match l with
+  | [] => true
+  | b :: l' => (rel a b && all_sorted rel a l')%bool
+  end.
+
+Fixpoint strongly_sorted A (rel : A → A → bool) l :=
+  match l with
+  | [] => true
+  | a :: l' => (all_sorted rel a l' && strongly_sorted rel l')%bool
+  end.
 
 Theorem sorted_cons : ∀ A (rel : A → _) a la,
   sorted rel (a :: la) = true → sorted rel la = true.
@@ -2816,6 +2822,64 @@ intros * Hs.
 cbn in Hs.
 destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
+Qed.
+
+Theorem sorted_strongly_sorted_iff : ∀ A (rel : A → A → bool),
+  transitive rel →
+  ∀ l, sorted rel l = true ↔ strongly_sorted rel l = true.
+Proof.
+intros * Htra *.
+split; intros Hs. {
+  induction l as [| a]; [ easy | cbn ].
+  rewrite IHl; [ | now apply sorted_cons in Hs ].
+  rewrite Bool.andb_true_r.
+  clear IHl.
+  induction l as [| b]; [ easy | cbn ].
+  remember (b :: l) as lb; cbn in Hs; subst lb.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hab, Hs).
+  rewrite Hab; cbn.
+  apply IHl; cbn in Hs |-*.
+  destruct l as [| c]; [ easy | ].
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  now rewrite (Htra a b c Hab Hbc).
+} {
+  induction l as [| a]; [ easy | ].
+  cbn in Hs.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Ha, Hs).
+  specialize (IHl Hs); cbn.
+  destruct l as [| b]; [ easy | ].
+  cbn in Ha.
+  apply Bool.andb_true_iff in Ha.
+  destruct Ha as (Hab, Ha).
+  now rewrite Hab, IHl.
+}
+Qed.
+
+Theorem all_sorted_forall : ∀ A (rel : A → _) a l,
+  all_sorted rel a l = true
+  → ∀ b, b ∈ l → rel a b = true.
+Proof.
+intros * Hsal * Hb.
+induction l as [| c]; [ easy | ].
+destruct Hb as [Hb| Hb]. {
+  subst c.
+  cbn in Hsal.
+  now apply Bool.andb_true_iff in Hsal.
+}
+apply IHl; [ | easy ].
+cbn in Hsal.
+now apply Bool.andb_true_iff in Hsal.
+Qed.
+
+Theorem sorted_cons_cons_true_iff : ∀ A (rel : A → A -> bool) a b l,
+  sorted rel (a :: b :: l) = true
+  ↔ rel a b = true ∧ sorted rel (b :: l) = true.
+Proof.
+intros.
+apply Bool.andb_true_iff.
 Qed.
 
 Theorem sorted_extends : ∀ A (rel : A → _),
@@ -4062,66 +4126,54 @@ intros * Hant Htr Htot *.
 now apply isort_loop_ssort_loop.
 Qed.
 
-(* to be completed
-(* counterexample of permutted_sorted_unique below *)
-Inductive t := a : t | b : t | c : t.
-Definition t_leb (x y : t) :=
-  match (x, y) with
-  | (a, b) => true
-  | (b, c) => true
-  | (c, a) => true
-  | _ => false
-  end.
-Theorem antisymmetric_t : antisymmetric t_leb.
-Proof.
-intros x y Hxy Hyx.
-destruct x, y; try easy.
-Qed.
-Definition la := [a; b; c].
-Definition lb := [c; a; b].
-Theorem Permutation_a_b_b_a : Permutation la lb.
-Proof.
-apply perm_trans with (l' := [a; c; b]); [ constructor; constructor | ].
-constructor.
-Qed.
-Theorem sorted_a_b_c : sorted t_leb la = true.
-Proof. easy. Qed.
-Theorem sorted_c_a_b : sorted t_leb lb = true.
-Proof. easy. Qed.
-...
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
+  reflexive rel →
   antisymmetric rel →
+  transitive rel →
   ∀ la lb,
   Permutation la lb
   → sorted rel la = true
   → sorted rel lb = true
   → la = lb.
 Proof.
-intros * Hant * Hpab Hsa Hsb.
-...
-induction Hpab; [ easy | | | ]. {
-  assert (H1 : sorted rel l = true) by now apply sorted_cons in Hsa.
-  assert (H2 : sorted rel l' = true) by now apply sorted_cons in Hsb.
-  now specialize (IHHpab H1 H2); subst l'.
-} {
-  remember (x :: l) as l1.
-  remember (y :: l) as l2.
-  cbn in Hsa, Hsb; subst l1 l2.
-  apply Bool.andb_true_iff in Hsa, Hsb.
-  destruct Hsa as (Hra, _).
-  destruct Hsb as (Hrb, _).
-  now specialize (Hant y x Hra Hrb) as H1; subst y.
-} {
-  remember (sorted rel l') as b eqn:Hb.
-  symmetry in Hb.
-  destruct b. {
-    specialize (IHHpab1 Hsa eq_refl).
-    specialize (IHHpab2 eq_refl Hsb).
-    congruence.
+intros * Hrefl Hant Htra * Hpab Hsa Hsb.
+revert lb Hpab Hsb.
+induction la as [| a]; intros; [ now apply Permutation_nil in Hpab | ].
+destruct lb as [| b]; intros. {
+  now apply Permutation_sym, Permutation_nil in Hpab.
+}
+move b before a; move lb before la; move Hsb before Hsa.
+apply (sorted_strongly_sorted_iff Htra) in Hsa, Hsb.
+cbn in Hsa, Hsb.
+apply Bool.andb_true_iff in Hsa, Hsb.
+destruct Hsa as (Hla, Hsa).
+destruct Hsb as (Hlb, Hsb).
+move Hlb before Hla.
+assert (Hab : a = b). {
+  apply Hant. {
+    apply all_sorted_forall with (l := a :: la). 2: {
+      apply Permutation_in with (l := b :: lb); [ | now left ].
+      now apply Permutation_sym.
+    }
+    now cbn; rewrite Hrefl, Hla.
+  } {
+    apply all_sorted_forall with (l := b :: lb). 2: {
+      apply Permutation_in with (l := a :: la); [ | now left ].
+      easy.
+    }
+    now cbn; rewrite Hrefl, Hlb.
   }
-  clear IHHpab1 IHHpab2.
-...
+}
+subst b; f_equal.
+apply Permutation_cons_inv in Hpab.
+apply IHla; [ | easy | ]. {
+  now apply (sorted_strongly_sorted_iff Htra).
+} {
+  now apply (sorted_strongly_sorted_iff Htra).
+}
+Qed.
 
+(* to be completed
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
   ∀ (s1 s2 : list A → _),
   (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l) = true)
