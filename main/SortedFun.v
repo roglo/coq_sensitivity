@@ -804,264 +804,28 @@ destruct ac; subst x. {
 }
 Qed.
 
-Theorem Permutation_select_first : ∀ A (rel : A → _),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ a a' b' la lb la' lb',
-  Permutation la lb
-  → select_first rel a la = (a', la')
-  → select_first rel a lb = (b', lb')
-  → a' = b' ∧ Permutation la' lb'.
-Proof.
-intros * Hant Htr Htot * Hab Ha Hb.
-revert a a' b' la' lb' Ha Hb.
-induction Hab; intros. {
-  cbn in Ha, Hb.
-  injection Ha; intros; subst a' la'.
-  injection Hb; intros; subst b' lb'.
-  easy.
-} {
-  cbn in Ha, Hb.
-  remember (rel a x) as ax eqn:Hax; symmetry in Hax.
-  remember (if ax then a else x) as y eqn:Hy.
-  remember (select_first rel y l) as ld eqn:Hld.
-  remember (select_first rel y l') as le eqn:Hle.
-  symmetry in Hld, Hle.
-  destruct ld as (d, ld).
-  destruct le as (e, le).
-  injection Ha; clear Ha; intros; subst d la'.
-  injection Hb; clear Hb; intros; subst e lb'.
-  specialize (IHHab _ _ _ _ _ Hld Hle) as H1.
-  split; [ easy | ].
-  now apply Permutation_cons.
-} {
-  cbn in Ha, Hb.
-  remember (if rel a y then a else y) as u eqn:Hu.
-  remember (if rel a x then a else x) as v eqn:Hv.
-  remember (rel u x) as ux eqn:Hux.
-  remember (rel v y) as vy eqn:Hvy.
-  remember (rel a x) as ax eqn:Hax.
-  remember (rel a y) as ay eqn:Hay.
-  symmetry in Hux, Hvy, Hax, Hay.
-  move a before y; move a' before a; move b' before a'.
-  move u before b'; move v before u.
-  move ax after ay; move ux before ay; move vy before ux.
-  remember (select_first rel (if ux then u else x) l) as ld eqn:Hld.
-  remember (select_first rel (if vy then v else y) l) as le eqn:Hle.
-  symmetry in Hld, Hle.
-  destruct ld as (d, ld).
-  destruct le as (e, le).
-  injection Ha; clear Ha; intros; subst a' la'.
-  injection Hb; clear Hb; intros; subst b' lb'.
-  destruct ax; subst v. {
-    destruct ay; subst u. {
-      rewrite Hax in Hux; subst ux.
-      rewrite Hay in Hvy; subst vy.
-      rewrite Hld in Hle.
-      injection Hle; intros; subst e le.
-      split; [ easy | apply perm_swap ].
-    }
-    rewrite Hay in Hvy; subst vy.
-    destruct ux. {
-      rewrite Hld in Hle.
-      injection Hle; intros; subst e le.
-      split; [ easy | apply perm_swap ].
-    }
-    specialize (Htot y x) as H1.
-    rewrite Hux in H1; cbn in H1.
-    specialize (Htot a y) as H2.
-    rewrite Hay in H2; cbn in H2.
-    specialize (Htr x y a H1 H2) as H3.
-    apply (Hant _ _ Hax) in H3; subst x.
-    apply (Hant _ _ H1) in H2; subst y.
-    rewrite Hld in Hle.
-    now injection Hle; intros; subst e le.
-  } {
-    destruct ay; subst u. {
-      rewrite Hax in Hux; subst ux.
-      destruct vy. {
-        rewrite Hld in Hle.
-        injection Hle; intros; subst e le.
-        split; [ easy | apply perm_swap ].
-      }
-      specialize (Htot x y) as H1.
-      rewrite Hvy in H1; cbn in H1.
-      specialize (Htot a x) as H2.
-      rewrite Hax in H2; cbn in H2.
-      specialize (Htr y x a H1 H2) as H3.
-      apply (Hant _ _ Hay) in H3; subst y.
-      apply (Hant _ _ H1) in H2; subst x.
-      rewrite Hld in Hle.
-      now injection Hle; intros; subst e le.
-    }
-    destruct ux. {
-      destruct vy. {
-        specialize (Hant _ _ Hux Hvy) as H1; subst y.
-        rewrite Hld in Hle.
-        now injection Hle; intros; subst e le.
-      }
-      rewrite Hld in Hle.
-      now injection Hle; intros; subst e le.
-    }
-    destruct vy. {
-      rewrite Hld in Hle.
-      now injection Hle; intros; subst e le.
-    }
-    specialize (Htot x y) as H1.
-    now rewrite Hux, Hvy in H1.
-  }
-} {
-  remember (select_first rel a l') as lc eqn:Hlc.
-  symmetry in Hlc.
-  destruct lc as (c, lc).
-  specialize (IHHab1 _ _ _ _ _ Ha Hlc) as H1.
-  specialize (IHHab2 _ _ _ _ _ Hlc Hb) as H2.
-  destruct H2 as (H3, H4).
-  destruct H1 as (H1, H2).
-  split; [ congruence | ].
-  now transitivity lc.
-}
-Qed.
-
-Theorem Permutation_ssort_loop : ∀ A (rel : A → _),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ it la lb,
-  length la = length lb
-  → length la ≤ it
-  → Permutation la lb
-  → ssort_loop rel it la = ssort_loop rel it lb.
-Proof.
-intros * Hant Htr Htot * Hlab Hit Hab.
-revert la lb Hlab Hit Hab.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
-  symmetry in Hlab.
-  now apply length_zero_iff_nil in Hlab; subst lb.
-}
-destruct la as [| a]. {
-  symmetry in Hlab.
-  now apply length_zero_iff_nil in Hlab; subst lb.
-}
-destruct lb as [| b]; [ easy | ].
-cbn in Hlab; apply Nat.succ_inj in Hlab.
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-remember (select_first rel a la) as la' eqn:Hla'.
-symmetry in Hla'.
-destruct la' as (a', la').
-remember (select_first rel b lb) as lb' eqn:Hlb'.
-symmetry in Hlb'.
-destruct lb' as (b', lb').
-move b' before a'; move lb' before la'.
-inversion Hab; subst. {
-  rename H0 into Hpab.
-  specialize (Permutation_select_first Hant Htr Htot) as H1.
-  specialize (H1 _ _ _ _ _ _ _ Hpab Hla' Hlb').
-  destruct H1 as (H1, H2); subst b'; f_equal.
-  apply IHit; [ | | easy ]. {
-    apply select_first_length in Hla', Hlb'; congruence.
-  } {
-    apply select_first_length in Hla', Hlb'; congruence.
-  }
-} {
-  cbn in Hla', Hlb'.
-  rename Hab into Hpab.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  remember (if ab then a else b) as abab eqn:Habab.
-  remember (if ba then b else a) as baba eqn:Hbaba.
-  remember (select_first rel abab l) as lc eqn:Hlc.
-  remember (select_first rel baba l) as ld eqn:Hld.
-  symmetry in Hlc, Hld.
-  destruct lc as (c, lc).
-  destruct ld as (d, ld).
-  injection Hla'; clear Hla'; intros; subst c la'.
-  injection Hlb'; clear Hlb'; intros; subst d lb'.
-  destruct ab; subst abab. {
-    destruct ba; subst baba. {
-      specialize (Hant _ _ Hab Hba) as H1; subst b.
-      rewrite Hlc in Hld.
-      now injection Hld; intros; subst b' ld.
-    }
-    rewrite Hlc in Hld.
-    now injection Hld; intros; subst b' ld.
-  } {
-    destruct ba; subst baba. {
-      rewrite Hlc in Hld.
-      now injection Hld; intros; subst b' ld.
-    }
-    specialize (Htot a b) as H1.
-    now rewrite Hab, Hba in H1.
-  }
-} {
-  rename l' into l.
-  rename H into Haal.
-  rename H0 into Hlbb.
-  specialize (select_first_length rel a la Hla') as H1.
-  specialize (select_first_length rel b lb Hlb') as H2.
-  assert (Hab' : a' = b'). {
-    apply (select_first_if Htr Htot) in Hla', Hlb'.
-    destruct Hla' as (Hla1 & Hla2 & Hla3).
-    destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
-    specialize (Hla1 b') as H3.
-    assert (H : b' ∈ a :: la). {
-      apply perm_trans with (l := a :: la) in Hlb3; [ | easy ].
-      apply Permutation_sym in Hlb3.
-      specialize (Permutation_in b' Hlb3 (or_introl eq_refl)) as H4.
-      easy.
-    }
-    specialize (H3 H); clear H.
-    specialize (Hlb1 a') as H4.
-    assert (H : a' ∈ b :: lb). {
-      apply perm_trans with (l := b :: lb) in Hla3; [ | easy ].
-      apply Permutation_sym in Hla3.
-      specialize (Permutation_in a' Hla3 (or_introl eq_refl)) as H5.
-      easy.
-    }
-    specialize (H4 H); clear H.
-    now apply Hant.
-  }
-  subst b'; f_equal.
-  apply IHit; [ congruence | congruence | ].
-  apply (select_first_if Htr Htot) in Hla', Hlb'.
-  destruct Hla' as (Hla1 & Hla2 & Hla3).
-  destruct Hlb' as (Hlb1 & Hlb2 & Hlb3).
-  apply Permutation_trans with (l := a' :: la') in Hab; [ | easy ].
-  apply Permutation_sym in Hab, Hlb3.
-  apply Permutation_trans with (l := a' :: lb') in Hab; [ | easy ].
-  now apply Permutation_cons_inv, Permutation_sym in Hab.
-}
-Qed.
-
-Theorem ssort_loop_Permutation : ∀ A (rel : A → _) la lb len,
+Theorem Permutation_ssort_loop : ∀ A (rel : A → _) la len,
   length la ≤ len
-  → ssort_loop rel len la = lb
-  → Permutation la lb.
+  → Permutation la (ssort_loop rel len la).
 Proof.
-intros * Hlen Hs.
-revert la lb Hlen Hs.
+intros * Hlen.
+revert la Hlen.
 induction len; intros. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
-  now cbn in Hs; subst lb.
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
 }
-cbn in Hs.
-destruct la as [| a]; [ now subst lb | ].
-cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+destruct la as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen; cbn.
 remember (select_first rel a la) as lc eqn:Hlc.
 symmetry in Hlc.
 destruct lc as (c, lc).
-destruct lb as [| b]; [ easy | ].
-injection Hs; clear Hs; intros Hs H; subst c.
-specialize (IHlen lc lb) as H1.
+specialize (IHlen lc) as H1.
 assert (H : length lc ≤ len). {
   apply select_first_length in Hlc.
   congruence.
 }
-specialize (H1 H Hs); clear H.
+specialize (H1 H); clear H.
 apply (select_first_Permutation rel) in Hlc.
-transitivity (b :: lc); [ easy | ].
+transitivity (c :: lc); [ easy | ].
 now constructor.
 Qed.
 
@@ -1292,15 +1056,18 @@ apply Bool.not_false_iff_true.
 intros Hbc.
 specialize (Htot b c) as Hcb.
 rewrite Hbc in Hcb; cbn in Hcb.
-apply ssort_loop_Permutation in Hlc. 2: {
+specialize (Permutation_ssort_loop rel lb) as H1.
+assert (H : length lb ≤ len). {
   apply select_first_length in Hlb.
   congruence.
 }
+specialize (H1 _ H); clear H.
 apply (select_first_if Htr Htot) in Hlb.
 destruct Hlb as (_ & H2 & _).
 specialize (H2 c).
 assert (H : c ∈ lb). {
-  apply Permutation_sym in Hlc.
+  rewrite Hlc in H1.
+  apply Permutation_sym in H1.
   apply Permutation_in with (l := c :: lc); [ easy | now left ].
 }
 specialize (H2 H); clear H.
@@ -1474,6 +1241,7 @@ destruct ab. {
     rewrite Hit'; flia Hnd.
   }
   specialize (H1 H); clear H.
+  cbn in Hit'.
   cbn in Hit'; rewrite Hab, Nat.add_0_l in Hit'.
   subst it'; cbn.
   assert (H : nb_nrel rel a la = nb_nrel rel a lc). {
@@ -1852,6 +1620,29 @@ clear d.
 now apply nth_isort_rank_of_nodup_sorted.
 Qed.
 
+Theorem Permutation_bsort_loop : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ la it,
+  nb_disorder rel la ≤ it
+  → Permutation la (bsort_loop rel it la).
+Proof.
+intros * Htot * Hit.
+revert la Hit.
+induction it; intros; [ easy | cbn ].
+remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [lb| ]; [ | easy ].
+specialize (bsort_swap_nb_disorder Htot) as H1.
+specialize (H1 _ _ _ Hlb Hit).
+specialize (IHit _ H1) as H2.
+transitivity lb; [ | easy ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+subst la lb.
+apply Permutation_app_head.
+constructor.
+Qed.
+
 (* *)
 
 Theorem sorted_isort : ∀ A (rel : A → _),
@@ -1927,7 +1718,7 @@ Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l)
 Proof.
 intros.
 destruct l as [| a]; [ easy | ].
-specialize (ssort_loop_Permutation rel) as H1.
+specialize (Permutation_ssort_loop rel) as H1.
 now apply H1 with (len := length (a :: l)).
 Qed.
 
@@ -1941,25 +1732,7 @@ rewrite (bsort_bsort_loop_nb_disorder Htot).
 remember (nb_disorder rel la) as it eqn:H.
 assert (Hit : nb_disorder rel la ≤ it) by flia H.
 clear H.
-(*
-Check ssort_loop_Permutation.
-Check Permutation_isort_loop.
-...
-*)
-revert la Hit.
-induction it; intros; [ easy | cbn ].
-remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [lb| ]; [ | easy ].
-specialize (bsort_swap_nb_disorder Htot) as H1.
-specialize (H1 _ _ _ Hlb Hit).
-specialize (IHit _ H1) as H2.
-transitivity lb; [ | easy ].
-apply bsort_swap_Some in Hlb.
-destruct Hlb as (Hs & c & d & lc & ld & Hlb).
-destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
-subst la lb.
-apply Permutation_app_head.
-constructor.
+now apply Permutation_bsort_loop.
 Qed.
 
 (* isort and ssort return same *)
