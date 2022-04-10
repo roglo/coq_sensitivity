@@ -2463,48 +2463,6 @@ f_equal.
 now apply IHla.
 Qed.
 
-Fixpoint nb_nrel A (rel : A → A → bool) a l :=
-  match l with
-  | [] => 0
-  | b :: l' => (if rel a b then 0 else 1) + nb_nrel rel a l'
-  end.
-
-Fixpoint nb_disorder A (rel : A → _) l :=
-  match l with
-  | [] => 0
-  | a :: l' => nb_nrel rel a l' + nb_disorder rel l'
-  end.
-
-(*
-Compute (nb_disorder Nat.leb [7;5;3;22;8]).
-Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
-Fixpoint canon_sym_gr_list n k : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end.
-Definition canon_sym_gr_list_list n : list (list nat) :=
-  map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
-Compute (map (λ l, list_eqb Nat.eqb (bsort_loop Nat.leb (nb_disorder Nat.leb l(* - 1*)) l) (seq 0 5)) (canon_sym_gr_list_list 5)).
-*)
-
-Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
-  nb_disorder rel l ≤ length l * length l.
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-rewrite Nat.mul_comm; cbn.
-rewrite -> Nat.add_assoc.
-rewrite <- Nat.add_succ_l.
-apply Nat.add_le_mono; [ | easy ].
-clear.
-induction l as [| b]; [ easy | cbn ].
-destruct (rel a b); cbn; flia IHl.
-Qed.
-
 (* *)
 
 Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
