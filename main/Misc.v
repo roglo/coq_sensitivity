@@ -3975,7 +3975,6 @@ rewrite (Nat.add_comm (nb_nrel rel b la)).
 now rewrite <- Nat.add_assoc.
 Qed.
 
-(* to be completed *)
 Theorem bsort_loop_enough_iter : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l it1 it2,
@@ -4143,6 +4142,32 @@ unfold bsort.
 now apply bsort_loop_is_sorted.
 Qed.
 
+Theorem Permutation_bsort : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ l, Permutation l (bsort rel l).
+Proof.
+intros * Htot *.
+rename l into la.
+rewrite (bsort_bsort_loop_nb_disorder Htot).
+remember (nb_disorder rel la) as it eqn:H.
+assert (Hit : nb_disorder rel la ≤ it) by flia H.
+clear H.
+revert la Hit.
+induction it; intros; [ easy | cbn ].
+remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [lb| ]; [ | easy ].
+specialize (bsort_swap_nb_disorder Htot) as H1.
+specialize (H1 _ _ _ Hlb Hit).
+specialize (IHit _ H1) as H2.
+transitivity lb; [ | easy ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+subst la lb.
+apply Permutation_app_head.
+constructor.
+Qed.
+
 (* unicity of sorting algorithm *)
 
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
@@ -4220,64 +4245,57 @@ Proof.
 intros * Hant Htra Htot *.
 specialize (total_relation_is_reflexive Htot) as Href.
 apply (sorted_unique Href Hant Htra). {
-  clear l.
-  intros l.
+  clear l; intros l.
   split; [ | now apply isort_is_sorted ].
   apply Permutation_sym, Permutation_isort.
 } {
-  clear l.
-  intros l.
+  clear l; intros l.
   split; [ | now apply ssort_is_sorted ].
   apply Permutation_sym, Permutation_ssort.
 }
 Qed.
 
-(* isort and bsort return same *)
+(* ssort and bsort return same *)
 
-(* to be completed
-Theorem Permutation_bsort : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ l, Permutation l (bsort rel l).
-Proof.
-intros * Htot *.
-rename l into la.
-rewrite (bsort_bsort_loop_nb_disorder Htot).
-induction la as [| a]; [ easy | cbn ].
-...
-destruct la as [| b]; [ easy | ].
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
-  symmetry in Hlb.
-  destruct lb as [lb| ]; [ | now constructor ].
-  rewrite List_length_cons.
-...
-
-Theorem isort_bsort : ∀ (A : Type) (rel : A → A → bool),
+Theorem ssort_bsort : ∀ (A : Type) (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-  ∀ l, isort rel l = bsort rel l.
+  ∀ l, ssort rel l = bsort rel l.
 Proof.
 intros * Hant Htra Htot *.
 specialize (total_relation_is_reflexive Htot) as Href.
 apply (sorted_unique Href Hant Htra). {
-  clear l.
-  intros l.
-  split; [ | now apply isort_is_sorted ].
-  apply Permutation_sym, Permutation_isort.
+  clear l; intros l.
+  split; [ | now apply ssort_is_sorted ].
+  now apply Permutation_sym, Permutation_ssort.
 } {
-  clear l.
-  intros l.
+  clear l; intros l.
   split; [ | now apply bsort_is_sorted ].
-  apply Permutation_sym.
-Search bsort.
-...
-Search (Permutation _ (bsort _ _)).
-  apply Permutation_bsort.
+  now apply Permutation_sym, Permutation_bsort.
 }
 Qed.
-*)
+
+(* bsort and isort return same *)
+
+Theorem bsort_isort : ∀ (A : Type) (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, bsort rel l = isort rel l.
+Proof.
+intros * Hant Htra Htot *.
+specialize (total_relation_is_reflexive Htot) as Href.
+apply (sorted_unique Href Hant Htra). {
+  clear l; intros l.
+  split; [ | now apply bsort_is_sorted ].
+  now apply Permutation_sym, Permutation_bsort.
+} {
+  clear l; intros l.
+  split; [ | now apply isort_is_sorted ].
+  apply Permutation_sym, Permutation_isort.
+}
+Qed.
 
 (* *)
 
