@@ -3972,6 +3972,27 @@ rewrite (Nat.add_comm (nb_nrel rel b la)).
 now rewrite <- Nat.add_assoc.
 Qed.
 
+(* to be completed
+Theorem bsort_bsort_loop_nb_disorder : ∀ A (rel : A → _),
+  ∀ l,
+  bsort rel l = bsort_loop rel (nb_disorder rel l) l.
+Proof.
+intros.
+rename l into la.
+unfold bsort.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct la as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [lb| ]. 2: {
+    apply bsort_swap_None in Hlb.
+    cbn; rewrite Hab; cbn.
+...
+*)
+
 Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la,
@@ -4175,6 +4196,9 @@ Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l)
 Proof.
 intros.
 rename l into la.
+unfold bsort.
+Search bsort_loop.
+...
 induction la as [| a]; [ easy | cbn ].
 destruct la as [| b]; [ easy | ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
