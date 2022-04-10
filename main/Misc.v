@@ -4085,12 +4085,14 @@ induction Hpab; [ easy | | | ]. {
   destruct Hsb as (Hrb, _).
   now specialize (Hant y x Hra Hrb) as H1; subst y.
 } {
-...
-  enough (H : sorted rel l' = true). {
-    specialize (IHHpab1 Hsa H).
-    specialize (IHHpab2 H Hsb).
+  remember (sorted rel l') as b eqn:Hb.
+  symmetry in Hb.
+  destruct b. {
+    specialize (IHHpab1 Hsa eq_refl).
+    specialize (IHHpab2 eq_refl Hsb).
     congruence.
   }
+  clear IHHpab1 IHHpab2.
 ...
 
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
