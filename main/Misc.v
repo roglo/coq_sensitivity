@@ -2824,38 +2824,41 @@ destruct la as [| a']; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
 Qed.
 
-Theorem sorted_strongly_sorted_iff : ∀ A (rel : A → A → bool),
+Theorem sorted_strongly_sorted : ∀ A (rel : A → A → bool),
   transitive rel →
-  ∀ l, sorted rel l = true ↔ strongly_sorted rel l = true.
+  ∀ l, sorted rel l = true → strongly_sorted rel l = true.
 Proof.
-intros * Htra *.
-split; intros Hs. {
-  induction l as [| a]; [ easy | cbn ].
-  rewrite IHl; [ | now apply sorted_cons in Hs ].
-  rewrite Bool.andb_true_r.
-  clear IHl.
-  induction l as [| b]; [ easy | cbn ].
-  remember (b :: l) as lb; cbn in Hs; subst lb.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hab, Hs).
-  rewrite Hab; cbn.
-  apply IHl; cbn in Hs |-*.
-  destruct l as [| c]; [ easy | ].
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbc, Hs).
-  now rewrite (Htra a b c Hab Hbc).
-} {
-  induction l as [| a]; [ easy | ].
-  cbn in Hs.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Ha, Hs).
-  specialize (IHl Hs); cbn.
-  destruct l as [| b]; [ easy | ].
-  cbn in Ha.
-  apply Bool.andb_true_iff in Ha.
-  destruct Ha as (Hab, Ha).
-  now rewrite Hab, IHl.
-}
+intros * Htra * Hs.
+induction l as [| a]; [ easy | cbn ].
+rewrite IHl; [ | now apply sorted_cons in Hs ].
+rewrite Bool.andb_true_r.
+clear IHl.
+induction l as [| b]; [ easy | cbn ].
+remember (b :: l) as lb; cbn in Hs; subst lb.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+rewrite Hab; cbn.
+apply IHl; cbn in Hs |-*.
+destruct l as [| c]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hbc, Hs).
+now rewrite (Htra a b c Hab Hbc).
+Qed.
+
+Theorem strongly_sorted_sorted : ∀ A (rel : A → A → bool),
+  ∀ l, strongly_sorted rel l = true → sorted rel l = true.
+Proof.
+intros * Hs.
+induction l as [| a]; [ easy | ].
+cbn in Hs.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Ha, Hs).
+specialize (IHl Hs); cbn.
+destruct l as [| b]; [ easy | ].
+cbn in Ha.
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hab, Ha).
+now rewrite Hab, IHl.
 Qed.
 
 Theorem all_sorted_forall : ∀ A (rel : A → _) a l,
@@ -4159,7 +4162,7 @@ destruct lb as [| b]; intros. {
   now apply Permutation_sym, Permutation_nil in Hpab.
 }
 move b before a; move lb before la; move Hsb before Hsa.
-apply (sorted_strongly_sorted_iff Htra) in Hsa, Hsb.
+apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
 cbn in Hsa, Hsb.
 apply Bool.andb_true_iff in Hsa, Hsb.
 destruct Hsa as (Hla, Hsa).
@@ -4183,9 +4186,9 @@ assert (Hab : a = b). {
 subst b; f_equal.
 apply Permutation_cons_inv in Hpab.
 apply IHla; [ | easy | ]. {
-  now apply (sorted_strongly_sorted_iff Htra).
+  now apply strongly_sorted_sorted.
 } {
-  now apply (sorted_strongly_sorted_iff Htra).
+  now apply strongly_sorted_sorted.
 }
 Qed.
 
