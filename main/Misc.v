@@ -4171,6 +4171,20 @@ Qed.
 (* isort and bsort return same *)
 
 (* to be completed
+Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
+Proof.
+intros.
+rename l into la.
+induction la as [| a]; [ easy | cbn ].
+destruct la as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [lb| ]; [ | now constructor ].
+  rewrite List_length_cons.
+...
+
 Theorem isort_bsort : ∀ (A : Type) (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
@@ -4189,6 +4203,7 @@ apply (sorted_unique Href Hant Htra). {
   intros l.
   split; [ | now apply bsort_is_sorted ].
   apply Permutation_sym.
+Search bsort.
 ...
 Search (Permutation _ (bsort _ _)).
   apply Permutation_bsort.
