@@ -2428,29 +2428,6 @@ Qed.
 
 (* end isort_rank *)
 
-(* relation properties *)
-
-Definition reflexive A (rel : A → A → bool) :=
-  ∀ a, rel a a = true.
-
-Definition antisymmetric A (rel : A → A → bool) :=
-  ∀ a b, rel a b = true → rel b a = true → a = b.
-
-Definition transitive A (rel : A → A → bool) :=
-  ∀ a b c, rel a b = true → rel b c = true → rel a c = true.
-
-Definition total_relation {A} (rel : A → _) := ∀ a b,
-  (rel a b || rel b a)%bool = true.
-
-Theorem total_relation_is_reflexive : ∀ A (rel : A → _),
-  total_relation rel → reflexive rel.
-Proof.
-intros * Htot a.
-specialize (Htot a a) as H1.
-apply Bool.orb_true_iff in H1.
-now destruct H1.
-Qed.
-
 Theorem cons_app_repeat : ∀ A (a : A) la,
   a :: la = la ++ [a]
   → la = repeat a (length la).
@@ -2461,49 +2438,6 @@ cbn in Hla.
 injection Hla; clear Hla; intros Hla H1; subst b.
 f_equal.
 now apply IHla.
-Qed.
-
-(* *)
-
-Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
-Proof.
-intros i j.
-apply Bool.orb_true_iff.
-destruct (le_dec i j) as [Hij| Hij]. {
-  now apply Nat.leb_le in Hij; rewrite Hij; left.
-} {
-  apply Nat.nle_gt, Nat.lt_le_incl in Hij.
-  now apply Nat.leb_le in Hij; rewrite Hij; right.
-}
-Qed.
-
-Theorem Nat_leb_refl : reflexive Nat.leb.
-Proof.
-intros a.
-apply Nat.leb_refl.
-Qed.
-
-Theorem Nat_leb_antisym : antisymmetric Nat.leb.
-Proof.
-intros a b Hab Hba.
-apply Nat.leb_le in Hab, Hba.
-now apply le_antisym.
-Qed.
-
-Theorem Nat_leb_trans : transitive Nat.leb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.leb_le in Hab, Hbc.
-apply Nat.leb_le.
-now transitivity b.
-Qed.
-
-Theorem Nat_ltb_trans : transitive Nat.ltb.
-Proof.
-intros a b c Hab Hbc.
-apply Nat.ltb_lt in Hab, Hbc.
-apply Nat.ltb_lt.
-now transitivity b.
 Qed.
 
 Theorem nth_isort_rank_insert_of_sorted :
