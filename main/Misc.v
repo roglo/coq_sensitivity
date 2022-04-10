@@ -4064,10 +4064,10 @@ Qed.
 
 (* to be completed
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
-  ∀ (s1 s2 : _ → list A → _),
-  (∀ l, Permutation (s1 rel l) l ∧ sorted rel (s1 rel l) = true)
-  → (∀ l, Permutation (s2 rel l) l ∧ sorted rel (s2 rel l) = true)
-  → ∀ l, s1 rel l = s2 rel l.
+  ∀ (s1 s2 : list A → _),
+  (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l) = true)
+  → (∀ l, Permutation (s2 l) l ∧ sorted rel (s2 l) = true)
+  → ∀ l, s1 l = s2 l.
 Proof.
 intros * Hps1 Hps2 l.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
@@ -4081,13 +4081,13 @@ induction len; intros. {
   apply Permutation_sym, Permutation_nil in H1, H2.
   congruence.
 }
-(**)
+(*
 destruct l as [| a]; [ easy | ].
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 ...
-(**)
-remember (s1 rel l) as l1 eqn:Hl1.
-remember (s2 rel l) as l2 eqn:Hl2.
+*)
+remember (s1 l) as l1 eqn:Hl1.
+remember (s2 l) as l2 eqn:Hl2.
 symmetry in Hl1, Hl2.
 destruct l1 as [| a1]. {
   specialize (Hps1 l) as Hp1.
