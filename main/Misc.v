@@ -3973,6 +3973,50 @@ now rewrite <- Nat.add_assoc.
 Qed.
 
 (* to be completed
+Theorem bsort_loop_enough_iter : ∀ A (rel : A → _),
+  ∀ l it1 it2,
+  nb_disorder rel l ≤ it1
+  → nb_disorder rel l ≤ it2
+  → bsort_loop rel it1 l = bsort_loop rel it2 l.
+Proof.
+intros * Hit1 Hit2.
+rename l into la.
+revert la it2 Hit1 Hit2.
+induction it1; intros; cbn. {
+  apply Nat.le_0_r in Hit1.
+  revert it2 Hit2.
+  induction la as [| a]; intros; [ now destruct it2 | cbn ].
+  cbn in Hit1.
+  apply Nat.eq_add_0 in Hit1.
+  destruct Hit1 as (Hr, Hd).
+  specialize (IHla Hd).
+  destruct it2; [ easy | cbn ].
+  destruct la as [| b]; [ easy | ].
+  cbn in Hr, Hd.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ cbn in Hr | easy ].
+  remember (bsort_swap rel (b :: la)) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [lb| ]; [ | easy ].
+  destruct it2. {
+    cbn.
+    f_equal.
+    apply bsort_swap_Some in Hlb.
+    destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+    destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+    rewrite Hbla, Hlbc.
+...
+enough (Htot : total_relation rel).
+Inspect 1.
+specialize (bsort_swap_nb_disorder Htot) as H1.
+specialize (H1 _ _ it2 Hlb).
+...
+  apply bsort_swap_Some in Hlb.
+  destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+  destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+Inspect 1.
+...
+
 Theorem bsort_bsort_loop_nb_disorder : ∀ A (rel : A → _),
   ∀ l,
   bsort rel l = bsort_loop rel (nb_disorder rel l) l.
