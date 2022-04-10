@@ -4064,20 +4064,33 @@ Qed.
 
 (* to be completed
 Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
+  antisymmetric rel →
   ∀ la lb,
   Permutation la lb
   → sorted rel la = true
   → sorted rel lb = true
   → la = lb.
 Proof.
-intros * Hpab Hsa Hsb.
-revert lb Hpab Hsb.
-induction la as [| a]; intros. {
-  now apply Permutation_nil in Hpab.
-}
-destruct lb as [| b]. {
-  now apply Permutation_sym, Permutation_nil in Hpab.
-}
+intros * Hant * Hpab Hsa Hsb.
+induction Hpab; [ easy | | | ]. {
+  assert (H1 : sorted rel l = true) by now apply sorted_cons in Hsa.
+  assert (H2 : sorted rel l' = true) by now apply sorted_cons in Hsb.
+  now specialize (IHHpab H1 H2); subst l'.
+} {
+  remember (x :: l) as l1.
+  remember (y :: l) as l2.
+  cbn in Hsa, Hsb; subst l1 l2.
+  apply Bool.andb_true_iff in Hsa, Hsb.
+  destruct Hsa as (Hra, _).
+  destruct Hsb as (Hrb, _).
+  now specialize (Hant y x Hra Hrb) as H1; subst y.
+} {
+...
+  enough (H : sorted rel l' = true). {
+    specialize (IHHpab1 Hsa H).
+    specialize (IHHpab2 H Hsb).
+    congruence.
+  }
 ...
 
 Theorem sorted_unique : ∀ A (rel : A → A → bool),
