@@ -310,6 +310,108 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 5)).
 *)
 
+(* merge sort *)
+
+Fixpoint merge_loop {A} (rel : A → A → bool) it la lb :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la, lb with
+      | [], _ => lb
+      | _, [] => la
+      | a :: la', b :: lb' =>
+          if rel a b then a :: merge_loop rel it' la' lb
+          else b :: merge_loop rel it' la lb'
+      end
+  end.
+
+Definition merge {A} (rel : A → A → bool) la lb :=
+  merge_loop rel (length la + length lb) la lb.
+
+Fixpoint split {A} (la : list A) :=
+  match la with
+  | [] | [_] => (la, [])
+  | a :: b :: lb =>
+      let (l1, l2) := split lb in
+      (a :: l1, b :: l2)
+  end.
+
+Fixpoint split2 {A} (la : list A) :=
+  match la with
+  | [] | [_] => ([], la)
+  | a :: b :: lb =>
+      let (l1, l2) := split2 lb in
+      (a :: l1, b :: l2)
+  end.
+
+Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
+  match it with
+  | 0 => la
+  | S it' =>
+      let (l1, l2) := split la in
+      msort_loop rel it' (merge rel l1 l2)
+  end.
+
+Definition msort {A} (rel : A → _) la :=
+  msort_loop rel (length la) la.
+
+Fixpoint msort_loop2 {A} (rel : A → A → bool) it la :=
+  match it with
+  | 0 => la
+  | S it' =>
+      let (l1, l2) := split2 la in
+      msort_loop2 rel it' (merge rel l1 l2)
+  end.
+
+Definition msort2 {A} (rel : A → _) la :=
+  msort_loop2 rel (length la) la.
+
+(* je comprends pas très bien pourquoi msort marche mais pas msort2
+Compute (msort Nat.leb [7;5;3;22;8]).
+Compute (msort2 Nat.leb [7;5;3;22;8]).
+Compute (split [7;5;3;22;8]).
+Compute (merge Nat.leb [7;3;8][5;22]).
+(* [5; 7; 3; 8; 22] *)
+Compute (split2 [7;5;3;22;8]).
+Compute (merge Nat.leb [7;3][5;22;8]).
+(* [5; 7; 3; 22; 8] *)
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+Print Nat.leb.
+Fixpoint Nat_geb (n m : nat) {struct n} : bool :=
+  match n with
+  | 0 => false
+  | S n' => match m with
+            | 0 => true
+            | S m' => Nat_geb n' m'
+            end
+  end.
+
+Compute (map (λ l, msort Nat.leb l) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, msort2 Nat.leb l) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, msort Nat_geb l) (canon_sym_gr_list_list 3)).
+Compute (map (λ l, msort2 Nat_geb l) (canon_sym_gr_list_list 3)).
+*)
+
+(* to be completed
+Theorem sorted_msort : ∀ A (rel : A → _),
+  ∀ l,
+  sorted rel l = true
+  → msort rel l = l.
+Proof.
+intros * Hs.
+...
+Qed.
+*)
+
 (* isort length *)
 
 Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
