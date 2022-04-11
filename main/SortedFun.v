@@ -401,6 +401,31 @@ Compute (map (λ l, msort Nat_geb l) (canon_sym_gr_list_list 3)).
 Compute (map (λ l, msort2 Nat_geb l) (canon_sym_gr_list_list 3)).
 *)
 
+Theorem split_nil_l : ∀ A (la lb : list A),
+  split la = ([], lb) → la = [] ∧ lb = [].
+Proof.
+intros * Hab.
+destruct la as [| a]; cbn in Hab |-*. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+exfalso.
+destruct la as [| b]; [ easy | ].
+now destruct (split la).
+Qed.
+
+Theorem split_nil_r : ∀ A (la lb : list A),
+  split la = (lb, []) → la = lb ∧ length la ≤ 1.
+Proof.
+intros * Hab.
+destruct la as [| a]; cbn in Hab |-*. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+destruct la as [| b]. {
+  now injection Hab; clear Hab; intros; subst lb.
+}
+now destruct (split la).
+Qed.
+
 (* to be completed
 Theorem sorted_msort : ∀ A (rel : A → _),
   ∀ l,
@@ -408,6 +433,72 @@ Theorem sorted_msort : ∀ A (rel : A → _),
   → msort rel l = l.
 Proof.
 intros * Hs.
+unfold msort.
+Theorem sorted_msort_loop : ∀ A (rel : A → _),
+  ∀ l it,
+  length l ≤ it
+  → sorted rel l = true
+  → msort_loop rel it l = l.
+Proof.
+intros * Hit Hs.
+revert l Hit Hs.
+induction it; intros; [ easy | cbn ].
+remember (split l) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (la, lb).
+destruct l as [| a]. {
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  now clear; induction it.
+}
+cbn in Hll.
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  now clear; induction it.
+}
+remember (split l) as ll2 eqn:Hll2.
+symmetry in Hll2.
+destruct ll2 as (la2, lb2).
+injection Hll; clear Hll; intros; subst la lb.
+rename la2 into la.
+rename lb2 into lb; cbn.
+remember (rel a b) as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit; cbn.
+  rewrite Nat.add_succ_r; cbn.
+  destruct la as [| c]. {
+    apply split_nil_l in Hll2.
+    destruct Hll2; subst l lb; cbn.
+    rewrite Hab.
+    clear - Hab.
+    induction it; [ easy | cbn ].
+    now rewrite Hab.
+  }
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    cbn.
+    destruct la as [| d]. {
+      cbn.
+      destruct lb as [| e]. {
+        apply split_nil_r in Hll2.
+        destruct Hll2 as (H1, _); subst l.
+        cbn in Hs.
+        rewrite Hab in Hs; cbn in Hs.
+        rewrite Bool.andb_true_r in Hs; cbn.
+        rename Hs into Hbc.
+        remember (rel a c) as ac eqn:Hac.
+        symmetry in Hac.
+        destruct ac. {
+          rewrite Hbc.
+          clear IHit Hit.
+          induction it; [ easy | cbn ].
+          rewrite Hab, Hcb.
+          destruct it; cbn in IHit |-*. {
+(* si antisymétrique alors b = c *)
 ...
 Qed.
 *)
