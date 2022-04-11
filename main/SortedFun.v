@@ -310,6 +310,62 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
 Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 5)).
 *)
 
+(* merge sort *)
+
+Fixpoint merge_loop {A} (rel : A → A → bool) it la lb :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la, lb with
+      | [], _ => lb
+      | _, [] => la
+      | a :: la', b :: lb' =>
+          if rel a b then a :: merge_loop rel it' la' lb
+          else b :: merge_loop rel it' la lb'
+      end
+  end.
+
+Definition merge {A} (rel : A → A → bool) la lb :=
+  merge_loop rel (length la + length lb) la lb.
+
+Fixpoint merge_list_to_stack {A} (rel : A → _) stack l :=
+  match stack with
+  | [] => [Some l]
+  | None :: stack' => Some l :: stack'
+  | Some l' :: stack' =>
+      None :: merge_list_to_stack rel stack' (merge rel l' l)
+  end.
+
+Fixpoint merge_stack {A} (rel : A → _) stack :=
+  match stack with
+  | [] => []
+  | None :: stack' => merge_stack rel stack'
+  | Some l :: stack' => merge rel l (merge_stack rel stack')
+  end.
+
+Fixpoint iter_merge {A} (rel : A → _) stack l :=
+  match l with
+  | [] => merge_stack rel stack
+  | a :: l' => iter_merge rel (merge_list_to_stack rel stack [a]) l'
+  end.
+
+Definition msort {A} (rel : A → A → bool) := iter_merge rel [].
+
+(*
+Compute (msort Nat.leb [7;5;3;22;8]).
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+Compute (map (λ l, msort Nat.leb l) (canon_sym_gr_list_list 5)).
+*)
+
 (* isort length *)
 
 Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
@@ -1542,7 +1598,8 @@ now apply sorted_isort_loop.
 Qed.
 
 Theorem sorted_ssort : ∀ A (rel : A → _),
-  transitive rel → ∀ l,
+  transitive rel →
+  ∀ l,
   sorted rel l = true
   → ssort rel l = l.
 Proof.
@@ -1559,6 +1616,62 @@ Proof.
 intros * Hs.
 now apply sorted_bsort_loop.
 Qed.
+
+(* to be completed
+Theorem sorted_msort : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ l,
+  sorted rel l = true
+  → msort rel l = l.
+Proof.
+intros * Hant Htra * Hs.
+unfold msort.
+induction l as [| a]; [ easy | cbn ].
+assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
+specialize (IHl H); clear H.
+destruct l as [| b]; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; cbn. {
+  cbn in IHl |-*.
+  destruct l as [| c]; [ easy | cbn ].
+  cbn in IHl.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; cbn. {
+    destruct l as [| d]. {
+      cbn.
+      remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+      destruct ca. {
+        specialize (Htra a b c Hab Hbc) as Hac.
+        specialize (Hant a c Hac Hca) as H1; subst c.
+        now specialize (Hant a b Hab Hbc) as H1; subst b.
+      }
+      remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+      destruct cb; [ | easy ].
+      now specialize (Hant b c Hbc Hcb) as H1; subst c.
+    }
+    cbn.
+    remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+    destruct cd; cbn. {
+      rewrite (Htra a b c Hab Hbc), Hbc.
+...
+Print iter_merge.
+Theorem sorted_iter_merge : ∀ A (rel : A → _),
+  ∀ stack l,
+  sorted rel l = true
+  → iter_merge rel stack l = l.
+Proof.
+intros * Hs.
+Print iter_merge.
+revert stack.
+induction l as [| a]; intros; cbn. {
+  induction stack as [| ol]; [ easy | cbn ].
+  destruct ol as [la| ]; [ | easy ].
+  rewrite IHstack.
+  destruct la as [| a]; [ easy | cbn ].
+...
+Qed.
+*)
 
 (* *)
 
