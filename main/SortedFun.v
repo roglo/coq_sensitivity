@@ -1512,23 +1512,17 @@ now apply nth_isort_rank_of_nodup_sorted.
 Qed.
 
 Theorem Permutation_bsort_loop : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ la it,
-  nb_disorder rel la ≤ it
-  → Permutation la (bsort_loop rel it la).
+  ∀ la it, Permutation la (bsort_loop rel it la).
 Proof.
-intros * Htot * Hit.
-revert la Hit.
+intros.
+revert la.
 induction it; intros; [ easy | cbn ].
 remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [lb| ]; [ | easy ].
-specialize (bsort_swap_nb_disorder Htot) as H1.
-specialize (H1 _ _ _ Hlb Hit).
-specialize (IHit _ H1) as H2.
-transitivity lb; [ | easy ].
 apply bsort_swap_Some in Hlb.
 destruct Hlb as (Hs & c & d & lc & ld & Hlb).
 destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+transitivity lb; [ | apply IHit ].
 subst la lb.
 apply Permutation_app_head.
 constructor.
@@ -1613,16 +1607,9 @@ specialize (Permutation_ssort_loop rel) as H1.
 now apply H1 with (len := length (a :: l)).
 Qed.
 
-Theorem Permutation_bsort : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ l, Permutation l (bsort rel l).
+Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
 Proof.
-intros * Htot *.
-rename l into la.
-rewrite (bsort_bsort_loop_nb_disorder Htot).
-remember (nb_disorder rel la) as it eqn:H.
-assert (Hit : nb_disorder rel la ≤ it) by flia H.
-clear H.
+intros.
 now apply Permutation_bsort_loop.
 Qed.
 
