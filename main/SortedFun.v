@@ -507,33 +507,82 @@ Qed.
 
 (* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
-  ∀ l it,
   antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l it,
   length l ≤ it
   → sorted rel l = true
   → msort_loop rel it l = l.
 Proof.
-intros * Hant * Hit Hs.
+intros * Hant Htra Htot * Hit Hs.
 revert l Hit Hs.
 induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it; [ easy | cbn ].
 remember (split l) as ll eqn:Hll.
 symmetry in Hll.
 destruct ll as (la, lb).
-(**)
 destruct (Nat.eq_dec (length l) (S it)) as [Hit1| Hit1]. {
-  destruct la as [| a]. {
-    apply split_nil_l in Hll.
-    now destruct Hll; subst l lb.
-  }
-  destruct lb as [| b]. {
-    apply split_nil_r in Hll.
-    destruct Hll as (H1, Hll); subst l.
-    cbn in Hll, Hit1.
-    destruct la; [ | cbn in Hll; flia Hll ].
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]. {
+    cbn in Hll.
+    injection Hll; clear Hll; intros; subst la lb.
     cbn in Hit1.
-    now apply Nat.succ_inj in Hit1; subst it.
+    now apply Nat.succ_inj in Hit1; subst it; cbn.
   }
+  cbn in Hit1.
+  apply Nat.succ_inj in Hit1.
+  clear Hit.
+  cbn in Hll.
+  remember (split l) as ll eqn:Hll1; symmetry in Hll1.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb.
+  remember (b :: l) as lc; cbn in Hs; subst lc.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hab, Hs).
+  cbn in Hs.
+  destruct l as [| c]. {
+    injection Hll1; clear Hll1; intros; subst la lb.
+    subst it; cbn.
+    rewrite Hab; cbn.
+    now rewrite Hab; cbn.
+  }
+  cbn in Hit1.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  cbn in Hs.
+  destruct l as [| d]. {
+    clear Hs.
+    cbn in Hll1.
+    injection Hll1; clear Hll1; intros; subst la lb.
+    cbn in Hit1; subst it; cbn.
+    specialize (Htra a b c Hab Hbc) as Hac.
+    rewrite Hac; cbn.
+    rewrite Hac; cbn.
+    rewrite Hab; cbn.
+    remember (rel c b) as cb eqn:Hcb.
+    symmetry in Hcb.
+    destruct cb. {
+      specialize (Hant b c Hbc Hcb) as H1.
+      subst c; cbn.
+      rewrite Hab; cbn.
+      rewrite Hab; cbn.
+      rewrite Hbc; cbn.
+      rewrite Hab; cbn.
+      now rewrite Hbc.
+    }
+    cbn.
+    rewrite Hac; cbn.
+    rewrite Hab; cbn.
+    rewrite Hcb; cbn.
+    now rewrite Hab, Hcb; cbn.
+  }
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hcd, Hs).
+...
+    destruct it; [ easy | cbn ].
+    apply Nat.succ_inj
 ...
 rewrite IHit with (l := la); [ | easy | | ]; cycle 1. {
   specialize (split_length _ Hll) as H1.
