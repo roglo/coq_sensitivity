@@ -481,7 +481,6 @@ destruct ab. {
   }
   remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
   destruct cb. {
-    cbn.
     destruct la as [| d]. {
       cbn.
       destruct lb as [| e]. {
@@ -526,6 +525,49 @@ destruct ab. {
       induction it; [ easy | cbn ].
       now rewrite Hab, Hbd.
     }
+...
+    cbn in Hs.
+    rewrite Hab in Hs; cbn in Hs.
+    remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
+    destruct db. {
+      cbn.
+      destruct la as [| e]; cbn. {
+        remember (split lb) as lc eqn:Hlc; symmetry in Hlc.
+        destruct lc as (ld, le); cbn.
+        rewrite Hab.
+        remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+        destruct ac. {
+          remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+          destruct dc. {
+            destruct it. {
+              now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+            }
+            cbn.
+            rewrite Nat.add_succ_r; cbn.
+            destruct ld as [| e]. {
+              apply split_nil_l in Hlc.
+              destruct Hlc; subst lb le; cbn.
+              apply split_nil_r in Hll2.
+              destruct Hll2 as (H1, H2); subst l.
+              cbn in H2; flia H2.
+            }
+            remember (rel e c) as ec eqn:Hec; symmetry in Hec.
+            destruct ec. {
+              cbn.
+              destruct ld as [| f]. {
+                cbn.
+                destruct le as [| g]. {
+                  apply split_nil_r in Hlc.
+                  destruct Hlc as (H1, _); subst lb.
+                  cbn.
+                  rewrite Hac, Hec.
+                  remember (rel a d) as ad eqn:Had.
+                  symmetry in Had.
+                  destruct ad. {
+                    remember (rel e d) as ed eqn:Hed; symmetry in Hed.
+                    destruct ed. {
+                      destruct it. {
+                        cbn.
 ...
 Qed.
 *)
