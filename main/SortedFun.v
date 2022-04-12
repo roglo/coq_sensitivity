@@ -427,13 +427,6 @@ now destruct (split la).
 Qed.
 
 (* to be completed
-Theorem sorted_msort : ∀ A (rel : A → _),
-  ∀ l,
-  sorted rel l = true
-  → msort rel l = l.
-Proof.
-intros * Hs.
-unfold msort.
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
   antisymmetric rel →
@@ -569,7 +562,16 @@ destruct ab. {
                       destruct it. {
                         cbn.
 ...
-Qed.
+
+Theorem sorted_msort : ∀ A (rel : A → _),
+  ∀ l,
+  sorted rel l = true
+  → msort rel l = l.
+Proof.
+intros * Hs.
+unfold msort.
+...
+apply sorted_msort_loop; [ | easy | easy ].
 *)
 
 (* isort length *)
