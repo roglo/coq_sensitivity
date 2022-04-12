@@ -454,6 +454,32 @@ Theorem split_length : ∀ A la (lb lc : list A),
   → length la = length lb + length lc.
 Proof.
 intros * Hs.
+remember (length lb + length lc) as len eqn:Hlen.
+symmetry in Hlen.
+revert la lb lc Hs Hlen.
+induction len; intros; cbn. {
+  apply Nat.eq_add_0 in Hlen.
+  destruct Hlen as (Hb, Hc).
+  apply length_zero_iff_nil in Hb, Hc.
+  subst lb lc.
+  apply split_nil_l in Hs.
+  now destruct Hs as (Ha, _); subst la.
+}
+destruct la as [| a]. {
+  now injection Hs; clear Hs; intros; subst lb lc.
+}
+cbn; f_equal.
+cbn in Hs.
+destruct la as [| b]. {
+  injection Hs; clear Hs; intros; subst lb lc.
+  now cbn in Hlen; apply Nat.succ_inj in Hlen.
+}
+remember (split la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (ld, le).
+injection Hs; clear Hs; intros; subst lb lc.
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+rewrite Nat.add_succ_r in Hlen.
 ...
 intros * Hs.
 remember (length la) as alen eqn:Halen; symmetry in Halen.
