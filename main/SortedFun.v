@@ -436,11 +436,12 @@ intros * Hs.
 unfold msort.
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
+  antisymmetric rel →
   length l ≤ it
   → sorted rel l = true
   → msort_loop rel it l = l.
 Proof.
-intros * Hit Hs.
+intros * Hant * Hit Hs.
 revert l Hit Hs.
 induction it; intros; [ easy | cbn ].
 remember (split l) as ll eqn:Hll.
@@ -490,15 +491,41 @@ destruct ab. {
         rewrite Hab in Hs; cbn in Hs.
         rewrite Bool.andb_true_r in Hs; cbn.
         rename Hs into Hbc.
-        remember (rel a c) as ac eqn:Hac.
-        symmetry in Hac.
-        destruct ac. {
-          rewrite Hbc.
-          clear IHit Hit.
-          induction it; [ easy | cbn ].
-          rewrite Hab, Hcb.
-          destruct it; cbn in IHit |-*. {
-(* si antisymétrique alors b = c *)
+        rewrite Hbc.
+        specialize (Hant c b Hcb Hbc) as H1; subst c.
+        rewrite Hab.
+        clear IHit Hit.
+        induction it; [ easy | cbn ].
+        now rewrite Hab, Hcb.
+      }
+      remember (split lb) as la eqn:Hla; symmetry in Hla.
+      destruct la as (la, lc).
+      cbn in Hs.
+      rewrite Hab, Bool.andb_true_l in Hs.
+      destruct l as [| d]; [ easy | ].
+      apply Bool.andb_true_iff in Hs.
+      destruct Hs as (Hbd, Hs).
+      destruct it; [ easy | ].
+      cbn in Hll2, Hs |-*.
+      destruct l as [| f]; [ easy | ].
+      apply Bool.andb_true_iff in Hs.
+      destruct Hs as (Hdf & Hs).
+      cbn in Hs.
+      remember (split l) as ll eqn:Hll; symmetry in Hll.
+      destruct ll as (ld, le).
+      injection Hll2; clear Hll2; intros; subst d ld f le.
+      rewrite Hbd.
+      specialize (Hant b c Hbd Hcb) as H1; subst c.
+      rewrite Hab; cbn.
+      apply split_nil_l in Hll.
+      destruct Hll; subst l lb.
+      cbn in Hla.
+      injection Hla; clear Hla; intros; subst la lc; cbn.
+      rewrite Hab, Hbd.
+      clear IHit Hit.
+      induction it; [ easy | cbn ].
+      now rewrite Hab, Hbd.
+    }
 ...
 Qed.
 *)
