@@ -489,7 +489,23 @@ do 2 rewrite IHit.
 now symmetry; apply split_length.
 Qed.
 
-(* to be completed *)
+Theorem msort_loop_nil : ∀ A (rel : A → _) it,
+  msort_loop rel it [] = [].
+Proof.
+intros.
+induction it; [ easy | cbn ].
+now rewrite IHit; cbn.
+Qed.
+
+Theorem msort_loop_single : ∀ A (rel : A → _) it a,
+  msort_loop rel it [a] = [a].
+Proof.
+intros.
+induction it; [ easy | cbn ].
+now rewrite IHit, msort_loop_nil.
+Qed.
+
+(* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
   antisymmetric rel →
@@ -497,6 +513,90 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → sorted rel l = true
   → msort_loop rel it l = l.
 Proof.
+intros * Hant * Hit Hs.
+revert l Hit Hs.
+induction it as (it, IHit) using lt_wf_rec; intros.
+destruct it; [ easy | cbn ].
+remember (split l) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (la, lb).
+(**)
+destruct (Nat.eq_dec (length l) (S it)) as [Hit1| Hit1]. {
+  destruct la as [| a]. {
+    apply split_nil_l in Hll.
+    now destruct Hll; subst l lb.
+  }
+  destruct lb as [| b]. {
+    apply split_nil_r in Hll.
+    destruct Hll as (H1, Hll); subst l.
+    cbn in Hll, Hit1.
+    destruct la; [ | cbn in Hll; flia Hll ].
+    cbn in Hit1.
+    now apply Nat.succ_inj in Hit1; subst it.
+  }
+...
+rewrite IHit with (l := la); [ | easy | | ]; cycle 1. {
+  specialize (split_length _ Hll) as H1.
+  rewrite H1 in Hit.
+  destruct lb as [| b]. {
+    apply split_nil_r in Hll.
+    destruct Hll as (Hla, Hll); subst l.
+    destruct la as [| a]; [ easy | ].
+    destruct la; [ | cbn in Hll; flia Hll ].
+    cbn.
+    cbn in Hit.
+    destruct it.
+...
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb.
+  rewrite msort_loop_nil; cbn.
+  apply msort_loop_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb.
+  rewrite msort_loop_nil; cbn.
+  destruct it; [ easy | cbn ].
+  rewrite msort_loop_length.
+  rewrite merge_length.
+  rewrite app_length.
+  do 2 rewrite msort_loop_length; cbn.
+  rewrite msort_loop_nil, msort_loop_single; cbn.
+  rewrite msort_loop_single; cbn.
+  rewrite msort_loop_single, msort_loop_nil; cbn.
+  apply msort_loop_single.
+}
+cbn in Hll.
+remember (split l) as ll eqn:Hll2; symmetry in Hll2.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb; cbn.
+cbn in Hit.
+rewrite <- Nat.succ_le_mono in Hit.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+rewrite IHit; [ | easy | | ]; cycle 1. {
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length; cbn.
+  apply -> Nat.succ_le_mono.
+  rewrite Nat.add_succ_r.
+  rewrite <- split_length with (la := l); [ | easy ].
+...
+rewrite IHit; [ | easy | | ]; cycle 1. {
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length.
+  cbn in Hll.
+  remember (split l) as ll eqn:Hll2; symmetry in Hll2.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  cbn in Hit.
+  rewrite Nat.add_succ_r.
+  rewrite <- split_length with (la := l); [ | easy ].
+  cbn in Hit.
+...
+rewrite IHit; [ | easy | | ]; cycle 1. {
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length.
+  rewrite <- split_length with (la := l); [ | easy ].
+...
 intros * Hant * Hit Hs.
 revert l Hit Hs.
 induction it; intros; [ easy | cbn ].
