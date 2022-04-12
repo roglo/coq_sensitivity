@@ -489,7 +489,7 @@ do 2 rewrite IHit.
 now symmetry; apply split_length.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
   antisymmetric rel →
@@ -504,6 +504,9 @@ remember (split l) as ll eqn:Hll.
 symmetry in Hll.
 destruct ll as (la, lb).
 (**)
+specialize split_length as H1.
+specialize (H1 _ _ _ _ Hll).
+...
 rewrite IHit; cycle 1. {
   rewrite merge_length, app_length.
   do 2 rewrite msort_loop_length.
