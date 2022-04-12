@@ -474,6 +474,21 @@ apply (IHlen len) in Hll; [ easy | | easy ].
 now transitivity (S len).
 Qed.
 
+Theorem msort_loop_length : ∀ A (rel : A → _) it la,
+  length (msort_loop rel it la) = length la.
+Proof.
+intros.
+revert la.
+induction it; intros; [ easy | cbn ].
+remember (split la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lb, lc).
+rewrite IHit.
+rewrite merge_length.
+rewrite app_length.
+do 2 rewrite IHit.
+now symmetry; apply split_length.
+Qed.
+
 (* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
@@ -488,25 +503,12 @@ induction it; intros; [ easy | cbn ].
 remember (split l) as ll eqn:Hll.
 symmetry in Hll.
 destruct ll as (la, lb).
-(* *)
+(**)
 rewrite IHit; cycle 1. {
   rewrite merge_length, app_length.
-Theorem msort_loop_length : ∀ A (rel : A → _) it la,
-  length (msort_loop rel it la) = length la.
-Proof.
-intros.
-revert la.
-induction it; intros; [ easy | cbn ].
-remember (split la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lb, lc).
-rewrite IHit.
-rewrite merge_length.
-rewrite app_length.
-do 2 rewrite IHit.
+  do 2 rewrite msort_loop_length.
 ...
-now symmetry; apply split_length.
-...
-  rewrite msort_loop_length.
+  rewrite <- split_length with (la := l); [ | easy ].
 ...
 destruct l as [| a]. {
   cbn in Hll.
