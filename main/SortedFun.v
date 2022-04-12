@@ -545,12 +545,23 @@ destruct lb as [| b]. {
   apply split_nil_r in Hsp.
   now destruct Hsp as (H1, Hsp); subst l.
 }
+cbn in Hll; apply Nat.succ_le_mono in Hll.
+rewrite Nat.add_succ_r in Hll.
 apply split_cons_cons in Hsp.
 destruct Hsp as (l' & Hl' & Hsp); subst l.
 rename l' into l.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   f_equal.
+  destruct it; [ easy | cbn ].
+  apply Nat.succ_le_mono in Hll.
+  specialize (IHit it) as H1.
+  assert (H : it < S (S it)) by now transitivity (S it).
+  specialize (H1 H); clear H.
+  specialize (H1 _ _ l Hll).
+  assert (H : sorted rel l = true) by now do 2 apply sorted_cons in Hs.
+  specialize (H1 H Hl'); clear H.
+...
   apply IHit; [ easy | | | ]. {
     cbn in Hll |-*; flia Hll.
   } {
