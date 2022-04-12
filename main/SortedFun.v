@@ -521,13 +521,14 @@ Qed.
 
 (* to be completed
 Theorem sorted_merge_loop : ∀ A (rel : A → _),
+  antisymmetric rel →
   ∀ la lb l it,
   length la + length lb ≤ it
   → sorted rel l = true
   → split l = (la, lb)
   → merge_loop rel it la lb = l.
 Proof.
-intros * Hll Hs Hsp.
+intros * Hant * Hll Hs Hsp.
 revert la lb l Hll Hs Hsp.
 induction it as (it, IHit) using lt_wf_rec; intros; cbn.
 destruct it. {
@@ -545,11 +546,12 @@ destruct lb as [| b]. {
   apply split_nil_r in Hsp.
   now destruct Hsp as (H1, Hsp); subst l.
 }
+move b before a.
 cbn in Hll; apply Nat.succ_le_mono in Hll.
 rewrite Nat.add_succ_r in Hll.
 apply split_cons_cons in Hsp.
 destruct Hsp as (l' & Hl' & Hsp); subst l.
-rename l' into l.
+rename l' into l; move l before lb.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   f_equal.
@@ -561,18 +563,53 @@ destruct ab. {
   specialize (H1 _ _ l Hll).
   assert (H : sorted rel l = true) by now do 2 apply sorted_cons in Hs.
   specialize (H1 H Hl'); clear H.
-...
-  apply IHit; [ easy | | | ]. {
-    cbn in Hll |-*; flia Hll.
-  } {
-    remember (b :: l) as l'; cbn in Hs; subst l'.
-    now apply Bool.andb_true_iff in Hs.
-  } {
-    cbn.
-    destruct l as [| c]. {
-      cbn in Hl'.
-      injection Hl'; intros; subst la lb.
-(* trou du cul *)
+  destruct la as [| c]. {
+    f_equal.
+    apply split_nil_l in Hl'.
+    now destruct Hl'; subst l lb.
+  }
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. 2: {
+    f_equal.
+    apply IHit; [ now transitivity (S it) | easy | | easy ].
+    now do 2 apply sorted_cons in Hs.
+  }
+  destruct lb as [| d]. {
+    apply split_nil_r in Hl'.
+    destruct Hl' as (H, Hlen); subst l.
+    destruct la; [ | cbn in Hlen; flia Hlen ].
+    cbn in Hs.
+    rewrite Hab in Hs.
+    remember (rel b c) as bc eqn:Hbc.
+    symmetry in Hbc.
+    destruct bc; [ | easy ].
+    specialize (Hant b c Hbc Hcb) as H2; subst c.
+    now destruct it.
+  }
+  move d before c.
+  apply split_cons_cons in Hl'.
+  destruct Hl' as (l' & Hl' & Hl); subst l.
+  rename l' into l.
+  cbn in Hs.
+  rewrite Hab in Hs.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ | easy ].
+  specialize (Hant b c Hbc Hcb) as H2; subst c.
+  clear Hcb.
+  f_equal; cbn in Hs.
+  destruct it; [ now cbn in Hll | ].
+  cbn in H1 |-*.
+  destruct la as [| c]. {
+    f_equal; f_equal.
+    remember (rel b d) as bd eqn:Hbd; symmetry in Hbd.
+    destruct bd. {
+      injection H1; clear H1; intros H1.
+      destruct it; [ easy | cbn in H1 ].
+      now injection H1; clear H1; intros.
+    }
+    injection H1; clear H1; intros H1 H2; subst d.
+    now rewrite Hbd in Hbc.
+  }
 ...
 
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
