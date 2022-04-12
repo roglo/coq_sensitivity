@@ -448,140 +448,33 @@ apply merge_loop_length.
 now rewrite app_length.
 Qed.
 
-(* to be completed
 Theorem split_length : ∀ A la (lb lc : list A),
   split la = (lb, lc)
   → length la = length lb + length lc.
 Proof.
 intros * Hs.
-destruct la as [| a]; intros. {
-  now injection Hs; clear Hs; intros; subst lb lc.
-}
-cbn in Hs |-*.
-destruct la as [| b]. {
-  now injection Hs; clear Hs; intros; subst lb lc.
-}
-remember (split la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (ld, le).
-injection Hs; clear Hs; intros; subst lb lc.
-cbn; f_equal.
-rewrite Nat.add_succ_r; f_equal.
-rename ld into lb; rename le into lc.
-(* et là, j'ai l'air d'un con *)
-...
-intros * Hs.
-remember (length lb + length lc) as len eqn:Hlen.
-symmetry in Hlen.
+remember (length la) as len eqn:Hlen; symmetry in Hlen |-*.
 revert la lb lc Hs Hlen.
-induction len; intros; cbn. {
-  apply Nat.eq_add_0 in Hlen.
-  destruct Hlen as (Hb, Hc).
-  apply length_zero_iff_nil in Hb, Hc.
-  subst lb lc.
-  apply split_nil_l in Hs.
-  now destruct Hs as (Ha, _); subst la.
-}
+induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct la as [| a]. {
   now injection Hs; clear Hs; intros; subst lb lc.
 }
-cbn; f_equal.
-cbn in Hs.
 destruct la as [| b]. {
-  injection Hs; clear Hs; intros; subst lb lc.
-  now cbn in Hlen; apply Nat.succ_inj in Hlen.
-}
-remember (split la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (ld, le).
-injection Hs; clear Hs; intros; subst lb lc.
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-rewrite Nat.add_succ_r in Hlen.
-...
-intros * Hs.
-remember (length la) as alen eqn:Halen; symmetry in Halen.
-remember (length lb) as blen eqn:Hblen; symmetry in Hblen.
-remember (length lc) as clen eqn:Hclen; symmetry in Hclen.
-revert la lb lc blen clen Hs Halen Hblen Hclen.
-induction alen; intros; cbn. {
-  apply length_zero_iff_nil in Halen; subst la.
-  cbn in Hs.
-  now injection Hs; intros; subst lb lc blen clen.
-}
-destruct la as [| a]; [ easy | ].
-cbn in Halen; apply Nat.succ_inj in Halen.
-cbn in Hs.
-destruct la as [| b]. {
-  now injection Hs; clear Hs; intros; subst lb lc alen blen clen.
-}
-remember (split la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (ld, le).
-injection Hs; clear Hs; intros; subst lb lc.
-cbn in Halen, Hblen, Hclen.
-destruct blen; [ easy | ].
-destruct clen; [ easy | ].
-cbn; f_equal; rewrite Nat.add_succ_r.
-apply Nat.succ_inj in Hblen, Hclen.
-destruct alen; [ easy | ].
-apply Nat.succ_inj in Halen.
-f_equal.
-...
-specialize (IHalen la ld le) as H1.
-specialize (H1 (blen - 1) (clen - 1) Hll).
-...
-intros * Hs.
-remember (length la) as len eqn:Hlen.
-symmetry in Hlen |-*.
-revert la lb lc Hs Hlen.
-induction len; intros; cbn. {
-  apply length_zero_iff_nil in Hlen; subst la.
-  cbn in Hs.
   now injection Hs; clear Hs; intros; subst lb lc.
 }
-destruct la as [| a]; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-cbn in Hs.
-destruct la as [| b]. {
-  now injection Hs; intros; subst lb lc len.
-}
+cbn in Hs, Hlen.
 remember (split la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (ld, le).
 injection Hs; clear Hs; intros; subst lb lc.
-rewrite List_length_cons, Nat.add_succ_l; f_equal.
-destruct ld as [| c]. {
-  apply split_nil_l in Hll.
-  now destruct Hll; subst la le.
-}
-...
-induction la as [| a]; intros; cbn. {
-  now injection Hs; intros; subst lb lc.
-}
-destruct la as [| b]. {
-  now injection Hs; intros; subst lb lc.
-}
-remember (b :: la) as lf; cbn in Hs.
-subst lf.
-remember (split la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (ld, le).
-injection Hs; clear Hs; intros; subst lb lc.
-cbn; rewrite Nat.add_succ_r; f_equal; f_equal.
-...
-assert (H : split (b :: la) = (b :: ld, le) ∨ split (b :: la) = (b :: le, ld)). {
-  cbn.
-  destruct la as [| c]. {
-    cbn in Hll.
-    now injection Hll; intros; subst ld le; left.
-  }
-  cbn in Hll.
-  destruct la as [| d]. {
-    now injection Hll; intros; subst ld le; right.
-  }
-  cbn.
-  remember (split la) as ll eqn:Hll2; symmetry in Hll2.
-  destruct ll as (lf, lg).
-  injection Hll; clear Hll; intros; subst ld le.
-  cbn.
-...
+destruct len; [ easy | ].
+destruct len; [ easy | cbn ].
+rewrite Nat.add_succ_r; f_equal; f_equal.
+do 2 apply Nat.succ_inj in Hlen.
+apply (IHlen len) in Hll; [ easy | | easy ].
+now transitivity (S len).
+Qed.
 
+(* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   ∀ l it,
   antisymmetric rel →
