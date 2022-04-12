@@ -516,6 +516,12 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → msort_loop rel it l = l.
 Proof.
 intros * Hant Htra Htot * Hit Hs.
+destruct it; [ easy | cbn ].
+remember (split l) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (la, lb).
+...
+intros * Hant Htra Htot * Hit Hs.
 revert l Hit Hs.
 induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it; [ easy | cbn ].
