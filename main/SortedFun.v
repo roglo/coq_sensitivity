@@ -362,9 +362,9 @@ Fixpoint msort_loop2 {A} (rel : A → A → bool) it la :=
   | 0 => la
   | S it' =>
       let (l1, l2) := split2 la in
-      let l3 := msort_loop rel it' l1 in
-      let l4 := msort_loop rel it' l2 in
-      msort_loop rel it' (merge rel l3 l4)
+      let l3 := msort_loop2 rel it' l1 in
+      let l4 := msort_loop2 rel it' l2 in
+      msort_loop2 rel it' (merge rel l3 l4)
   end.
 
 Definition msort2 {A} (rel : A → _) la :=
@@ -454,6 +454,39 @@ Theorem split_length : ∀ A la (lb lc : list A),
   → length la = length lb + length lc.
 Proof.
 intros * Hs.
+...
+intros * Hs.
+remember (length la) as alen eqn:Halen; symmetry in Halen.
+remember (length lb) as blen eqn:Hblen; symmetry in Hblen.
+remember (length lc) as clen eqn:Hclen; symmetry in Hclen.
+revert la lb lc blen clen Hs Halen Hblen Hclen.
+induction alen; intros; cbn. {
+  apply length_zero_iff_nil in Halen; subst la.
+  cbn in Hs.
+  now injection Hs; intros; subst lb lc blen clen.
+}
+destruct la as [| a]; [ easy | ].
+cbn in Halen; apply Nat.succ_inj in Halen.
+cbn in Hs.
+destruct la as [| b]. {
+  now injection Hs; clear Hs; intros; subst lb lc alen blen clen.
+}
+remember (split la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (ld, le).
+injection Hs; clear Hs; intros; subst lb lc.
+cbn in Halen, Hblen, Hclen.
+destruct blen; [ easy | ].
+destruct clen; [ easy | ].
+cbn; f_equal; rewrite Nat.add_succ_r.
+apply Nat.succ_inj in Hblen, Hclen.
+destruct alen; [ easy | ].
+apply Nat.succ_inj in Halen.
+f_equal.
+...
+specialize (IHalen la ld le) as H1.
+specialize (H1 (blen - 1) (clen - 1) Hll).
+...
+intros * Hs.
 remember (length la) as len eqn:Hlen.
 symmetry in Hlen |-*.
 revert la lb lc Hs Hlen.
@@ -472,13 +505,11 @@ remember (split la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (ld, le).
 injection Hs; clear Hs; intros; subst lb lc.
 rewrite List_length_cons, Nat.add_succ_l; f_equal.
-apply IHlen with (la := b :: la); [ | easy ].
-cbn.
-destruct la as [| c]. {
-  injection Hll; clear Hll; intros; subst ld le len.
-(* ah bin non *)
+destruct ld as [| c]. {
+  apply split_nil_l in Hll.
+  now destruct Hll; subst la le.
+}
 ...
-
 induction la as [| a]; intros; cbn. {
   now injection Hs; intros; subst lb lc.
 }
