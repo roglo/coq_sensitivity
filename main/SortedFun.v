@@ -454,7 +454,31 @@ Theorem split_length : ∀ A la (lb lc : list A),
   → length la = length lb + length lc.
 Proof.
 intros * Hs.
-revert lb lc Hs.
+remember (length la) as len eqn:Hlen.
+symmetry in Hlen |-*.
+revert la lb lc Hs Hlen.
+induction len; intros; cbn. {
+  apply length_zero_iff_nil in Hlen; subst la.
+  cbn in Hs.
+  now injection Hs; clear Hs; intros; subst lb lc.
+}
+destruct la as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+cbn in Hs.
+destruct la as [| b]. {
+  now injection Hs; intros; subst lb lc len.
+}
+remember (split la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (ld, le).
+injection Hs; clear Hs; intros; subst lb lc.
+rewrite List_length_cons, Nat.add_succ_l; f_equal.
+apply IHlen with (la := b :: la); [ | easy ].
+cbn.
+destruct la as [| c]. {
+  injection Hll; clear Hll; intros; subst ld le len.
+(* ah bin non *)
+...
+
 induction la as [| a]; intros; cbn. {
   now injection Hs; intros; subst lb lc.
 }
@@ -467,6 +491,22 @@ remember (split la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (ld, le).
 injection Hs; clear Hs; intros; subst lb lc.
 cbn; rewrite Nat.add_succ_r; f_equal; f_equal.
+...
+assert (H : split (b :: la) = (b :: ld, le) ∨ split (b :: la) = (b :: le, ld)). {
+  cbn.
+  destruct la as [| c]. {
+    cbn in Hll.
+    now injection Hll; intros; subst ld le; left.
+  }
+  cbn in Hll.
+  destruct la as [| d]. {
+    now injection Hll; intros; subst ld le; right.
+  }
+  cbn.
+  remember (split la) as ll eqn:Hll2; symmetry in Hll2.
+  destruct ll as (lf, lg).
+  injection Hll; clear Hll; intros; subst ld le.
+  cbn.
 ...
 
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
