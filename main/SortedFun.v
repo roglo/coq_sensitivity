@@ -553,11 +553,47 @@ rewrite Nat.add_succ_r in Hll.
 apply split_cons_cons in Hsp.
 destruct Hsp as (l' & Hl' & Hsp); subst l.
 rename l' into l; move l before lb.
+remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   f_equal.
-  destruct it; [ easy | cbn ].
+  clear a Hab.
+  rewrite Bool.andb_true_l in Hs.
+  destruct it; [ easy | ].
   apply Nat.succ_le_mono in Hll.
+  specialize (IHit (S it)) as H1.
+  specialize (H1 (Nat.lt_succ_diag_r _)).
+  specialize (H1 la lb).
+  assert (H : length la + length lb ≤ S it). {
+    transitivity it; [ easy | apply Nat.le_succ_diag_r ].
+  }
+  specialize (H1 l H); clear H.
+  assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
+  specialize (H1 H Hl'); clear H.
+  cbn in H1 |-*.
+  destruct la as [| a]; [ now subst l | ].
+  destruct lb as [| c]. {
+    apply split_nil_r in Hl'.
+    destruct Hl' as (_, Hl).
+    cbn in Hs.
+    subst l.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. 2: {
+      f_equal.
+      now destruct it.
+    }
+    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba; [ | easy ].
+    rewrite Bool.andb_true_l in Hs.
+    specialize (Hant a b Hab Hba) as H; subst b.
+    f_equal; clear Hab; rename Hba into Haa.
+    destruct la; [ | cbn in Hl; flia Hl ].
+    now destruct it.
+  }
+  apply split_cons_cons in Hl'.
+  destruct Hl' as (l' & Hsab & Hl); subst l.
+  rename l' into l.
+...
   specialize (IHit it) as H1.
   assert (H : it < S (S it)) by now transitivity (S it).
   specialize (H1 H); clear H.
