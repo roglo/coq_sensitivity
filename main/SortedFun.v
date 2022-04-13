@@ -538,6 +538,100 @@ destruct it. {
   apply length_zero_iff_nil in Ha, Hb; subst la lb.
   now apply split_nil_l in Hsp.
 }
+(**)
+destruct l as [| a]. {
+  now injection Hsp; intros; subst la lb.
+}
+cbn in Hsp.
+destruct l as [| b]. {
+  now injection Hsp; intros; subst la lb.
+}
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hsp; clear Hsp; intros; subst la lb; cbn.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (b :: l) as l'; cbn in Hs; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ f_equal | easy ].
+rewrite Bool.andb_true_l in Hs.
+destruct it; [ cbn in Hll; flia Hll | ].
+destruct l as [| c]. {
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  cbn in Hs.
+  rewrite Bool.andb_true_r in Hs.
+  rename Hs into Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    specialize (Hant b c Hbc Hcb) as H; subst c.
+    clear Hbc; rename Hcb into Hbb.
+    destruct it; [ cbn in Hll; flia Hll | easy ].
+  }
+  f_equal.
+  destruct it; [ cbn in Hll; flia Hll | easy ].
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+cbn.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (c :: d :: l) as l'; cbn in Hs; subst l'.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. 2: {
+  f_equal.
+  apply IHit; [ flia | cbn in Hll |-*; flia Hll | easy | cbn ].
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+specialize (Hant b c Hbc Hcb) as H; subst c.
+rename Hbc into Hbb; clear Hcb.
+f_equal.
+specialize (IHit (S it) (Nat.lt_succ_diag_r _)) as H1.
+specialize (H1 la lb l).
+assert (H : length la + length lb ≤ S it). {
+  cbn in Hll; flia Hll.
+}
+specialize (H1 H); clear H.
+assert (H : sorted rel l = true) by now do 2 apply sorted_cons in Hs.
+specialize (H1 H Hla); clear H.
+cbn in H1.
+destruct it; [ cbn in Hll; flia Hll | cbn ].
+destruct la as [| c]; [ now subst l | ].
+destruct lb as [| e]. {
+  subst l.
+  apply split_nil_r in Hla.
+  destruct la; [ | cbn in Hla; flia Hla ].
+  clear Hla; cbn in Hs.
+  rewrite Bool.andb_true_r in Hs.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbd, Hdc).
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    specialize (Htra b d c Hbd Hdc) as Hbc.
+    specialize (Hant b c Hbc Hcb) as H; subst c.
+    f_equal.
+    specialize (Hant b d Hbd Hdc) as H; subst d.
+    destruct it; [ cbn in Hll; flia Hll | easy ].
+  }
+  f_equal.
+  destruct it; [ cbn in Hll; flia Hll | cbn ].
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  destruct cd. {
+    specialize (Hant c d Hcd Hdc) as H; subst d.
+    f_equal.
+    destruct it; [ cbn in Hll |-*; flia Hll | easy ].
+  }
+  f_equal.
+  destruct it; [ cbn in Hll |-*; flia Hll | easy ].
+}
+...
 cbn.
 destruct la as [| a]. {
   apply split_nil_l in Hsp.
@@ -566,6 +660,7 @@ destruct ab. {
   specialize (H1 l H); clear H.
   assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
   specialize (H1 H Hl'); clear H.
+...
 (**)
   subst l.
   destruct it; [ easy | ].
