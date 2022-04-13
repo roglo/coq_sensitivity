@@ -593,6 +593,28 @@ destruct ab. {
   apply split_cons_cons in Hl'.
   destruct Hl' as (l' & Hsab & Hl); subst l.
   rename l' into l.
+  remember (rel a b) as ab eqn:Hab.
+  symmetry in Hab.
+  destruct ab. {
+    remember (a :: c :: l) as l'; cbn in Hs; subst l'.
+    remember (rel b a) as ba eqn:Hba.
+    symmetry in Hba.
+    destruct ba; [ | easy ].
+    rewrite Bool.andb_true_l in Hs.
+    specialize (Hant a b Hab Hba) as H; subst b.
+    clear Hab; rename Hba into Haa.
+    f_equal.
+    remember (c :: l) as l'; cbn in Hs; subst l'.
+    remember (rel a c) as ac eqn:Hac.
+    symmetry in Hac.
+    destruct ac; [ | easy ].
+    rewrite Bool.andb_true_l in Hs.
+    injection H1; clear H1; intros H1.
+    destruct it; [ easy | ].
+    cbn in H1 |-*.
+    destruct la as [| b]. {
+      now injection H1; clear H1; intros; subst l.
+    }
 ...
   specialize (IHit it) as H1.
   assert (H : it < S (S it)) by now transitivity (S it).
