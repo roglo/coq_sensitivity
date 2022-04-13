@@ -566,6 +566,7 @@ destruct ab. {
   specialize (H1 l H); clear H.
   assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
   specialize (H1 H Hl'); clear H.
+...
 (**)
 clear IHit.
 revert b la lb l Hll Hs Hl' H1.
