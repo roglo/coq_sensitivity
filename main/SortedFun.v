@@ -631,6 +631,24 @@ destruct lb as [| e]. {
   f_equal.
   destruct it; [ cbn in Hll |-*; flia Hll | easy ].
 }
+apply split_cons_cons in Hla.
+destruct Hla as (l' & Hs' & Hl').
+subst l; rename l' into l.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+  remember (c :: e :: l) as l'; cbn in Hs; subst l'.
+  remember (rel b d) as bd eqn:Hbd; symmetry in Hbd.
+  destruct bd; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+  destruct dc; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  specialize (Htra b d c Hbd Hdc) as Hbc.
+  specialize (Hant b c Hbc Hcb) as H; subst c.
+  f_equal.
+  specialize (Hant b d Hbd Hdc) as H; subst d.
+  clear Hbc Hcb Hdc Hbd.
+  destruct it; [ cbn in Hll |-*; flia Hll | ].
 ...
 cbn.
 destruct la as [| a]. {
