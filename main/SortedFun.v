@@ -566,29 +566,83 @@ destruct ab. {
   specialize (H1 l H); clear H.
   assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
   specialize (H1 H Hl'); clear H.
-...
 (**)
-clear IHit.
-revert b la lb l Hll Hs Hl' H1.
-induction it; intros; [ easy | ].
-clear Hl'.
+  subst l.
 ...
+  clear - Hant Htra Hll Hs Hl' H1.
+  revert b la lb l Hll Hs Hl' H1.
+  induction it; intros; [ easy | ].
   apply Nat.succ_le_mono in Hll.
   cbn in H1 |-*.
   destruct la as [| a]; [ now subst l | ].
   destruct lb as [| c]. {
     cbn in Hs.
     subst l.
+    apply Bool.andb_true_iff in Hs.
+    destruct Hs as (Hba, Hs).
     remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab. 2: {
-      f_equal.
-      now destruct it.
-    }
-    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-    destruct ba; [ | easy ].
-    rewrite Bool.andb_true_l in Hs.
+    destruct ab; [ | now f_equal; destruct it ].
     specialize (Hant a b Hab Hba) as H; subst b.
     f_equal; clear Hab; rename Hba into Haa.
+    apply split_nil_r in Hl'.
+    destruct Hl' as (_, Hla).
+    destruct la as [| b]; [ | cbn in Hla; flia Hla ].
+    now destruct it.
+  }
+  apply split_cons_cons in Hl'.
+  destruct Hl' as (l' & Hl' & H); subst l.
+  rename l' into l.
+  remember (c :: l) as l'; cbn in Hs; subst l'.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac; [ | easy ].
+  injection H1; clear H1; intros H1.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. 2: {
+    f_equal.
+...
+    do 2 rewrite Bool.andb_true_l in Hs.
+    destruct it; [ easy | cbn ].
+    rewrite Hac; f_equal.
+    cbn in H1.
+    destruct la as [| d]. {
+      injection H1; clear H1; intros; subst l.
+      apply split_nil_l in Hl'.
+      destruct Hl' as (Hl', _); subst lb.
+      destruct it; [ | easy ].
+      cbn in Hll; flia Hll.
+    }
+    remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+    destruct dc. {
+      injection H1; clear H1; intros H1 H; subst d.
+      rename Hdc into Hcc.
+      destruct it; [ cbn in Hll; flia Hll | ].
+      cbn; rewrite Hcc.
+      f_equal.
+      cbn in H1.
+      destruct la as [| d]. {
+        subst l.
+        destruct it; [ cbn in Hll; flia Hll | easy ].
+      }
+      remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+      destruct dc. {
+        destruct it; [ cbn in Hll; flia Hll | ].
+        cbn.
+        rewrite Hdc.
+        subst l; f_equal.
+...
+    specialize (Hant a b Hab Hba) as H; subst b.
+    f_equal.
+    clear Hab; rename Hba into Haa.
+    do 2 rewrite Bool.andb_true_l in Hs.
+    apply IHit; [ | | | easy ]. 3: {
+      destruct l as [| b]. {
+        cbn in Hl'.
+        injection Hl'; clear Hl'; intros; subst la lb.
+        destruct it; [ easy | ].
+        cbn in H1 |-*.
+...
 destruct la as [| b]; [ now destruct it | ].
 destruct it; [ easy | ].
 (*1*)
