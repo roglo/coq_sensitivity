@@ -568,6 +568,10 @@ destruct ab. {
   specialize (H1 H Hl'); clear H.
 (**)
   subst l.
+  destruct it; [ easy | ].
+  cbn in Hs |-*.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| c]. {
 ...
   clear - Hant Htra Hll Hs Hl' H1.
   revert b la lb l Hll Hs Hl' H1.
