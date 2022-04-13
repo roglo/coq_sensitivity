@@ -559,17 +559,17 @@ destruct ab. {
   f_equal.
   clear a Hab.
   rewrite Bool.andb_true_l in Hs.
-  destruct it; [ easy | ].
-  apply Nat.succ_le_mono in Hll.
-  specialize (IHit (S it)) as H1.
+  specialize (IHit it) as H1.
   specialize (H1 (Nat.lt_succ_diag_r _)).
   specialize (H1 la lb).
-  assert (H : length la + length lb ≤ S it). {
-    transitivity it; [ easy | apply Nat.le_succ_diag_r ].
-  }
+  assert (H : length la + length lb ≤ it) by flia Hll.
   specialize (H1 l H); clear H.
   assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
   specialize (H1 H Hl'); clear H.
+...
+(*1*)
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hll.
   cbn in H1 |-*.
   destruct la as [| a]; [ now subst l | ].
   destruct lb as [| c]. {
@@ -610,6 +610,14 @@ destruct ab. {
     destruct ac; [ | easy ].
     rewrite Bool.andb_true_l in Hs.
     injection H1; clear H1; intros H1.
+...
+  Hll : S (length la + length lb) ≤ it
+  Hs : sorted rel (b :: l) = true
+  Hl' : split l = (la, lb)
+  H1 : merge_loop rel it la lb = l
+  ============================
+  merge_loop rel it la (b :: lb) = b :: l
+...
     destruct it; [ easy | ].
     cbn in H1 |-*.
     destruct la as [| b]. {
