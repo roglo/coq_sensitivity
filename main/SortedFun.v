@@ -572,6 +572,72 @@ destruct ab. {
   cbn in Hs |-*.
   destruct la as [| a]; [ easy | ].
   destruct lb as [| c]. {
+    apply split_nil_r in Hl'.
+    destruct Hl' as (Hm1, Hm2).
+    rewrite merge_loop_length in Hm2. 2: {
+      cbn in Hll |-*.
+      rewrite app_nil_r.
+      rewrite Nat.add_0_r in Hll.
+      flia Hll.
+    }
+    rewrite app_nil_r in Hm2.
+    cbn in Hm2.
+    destruct la; [ clear Hm2 | cbn in Hm2; flia Hm2 ].
+    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba; [ | easy ].
+    clear Hs.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. {
+      specialize (Hant a b Hab Hba) as H; subst b.
+      rename Hba into Haa; clear Hab.
+      destruct it; [ | easy ].
+      cbn in Hll; flia Hll.
+    }
+    f_equal.
+    destruct it; [ exfalso | easy ].
+    cbn in Hll; flia Hll.
+  }
+  apply split_cons_cons in Hl'.
+  destruct Hl' as (l' & Hs' & Hl').
+  cbn in Hl'.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
+    injection Hl'; clear Hl'; intros Hl'.
+    remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba; [ | easy ].
+    rewrite Bool.andb_true_l in Hs.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. {
+      specialize (Hant a b Hab Hba) as H; subst b.
+      clear Hab; rename Hba into Haa.
+      f_equal.
+      destruct it; [ cbn in Hll; flia Hll | ].
+      cbn.
+      destruct la as [| b]; [ easy | ].
+      cbn in Hl', Hs.
+      remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+      destruct bc. {
+        injection Hl'; clear Hl'; intros Hl' H; subst c.
+        rename Hac into Hab; rename Hbc into Hbb.
+        rewrite Hab, Bool.andb_true_l in Hs.
+        remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+        destruct ba. {
+          specialize (Hant a b Hab Hba) as H; subst b.
+          f_equal.
+          clear Hab Hba Hbb.
+          set (l := a :: merge_loop rel it la (a :: lb)).
+          rewrite IHit with (l := l); [ easy | flia | | easy | ]. {
+            cbn in Hll |-*; flia Hll.
+          } {
+            unfold l.
+            cbn; rewrite Hl'.
+            destruct l' as [| b]; [ easy | ].
+            cbn in Hs'.
+            destruct l' as [| c]. {
+              exfalso; clear Hs.
+              injection Hs'; clear Hs'; intros; subst a la lb.
+              destruct it; [ easy | clear Hl' ].
+(* mon cul *)
 ...
   clear - Hant Htra Hll Hs Hl' H1.
   revert b la lb l Hll Hs Hl' H1.
