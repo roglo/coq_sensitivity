@@ -654,7 +654,6 @@ cbn.
 rewrite Hab.
 rewrite Nat.add_succ_r.
 rewrite <- split_length with (la := l); [ | easy ].
-...
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
   clear IHit Hit.
@@ -689,6 +688,7 @@ destruct l as [| d]. {
   destruct cb; [ | easy ].
   now rewrite (Hant b c Hbc Hcb) in IHit |-*.
 }
+remember (length (c :: d :: l)) as x; cbn; subst x.
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
@@ -697,12 +697,15 @@ rename lc into la; rename ld into lb; rename Hlc into Hla.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.
 remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct bc; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
 remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct cb. {
   specialize (Hant b c Hbc Hcb) as H; subst c.
   clear Hcb; rename Hbc into Hbb.
-  rewrite Bool.andb_true_l in Hs.
+  remember (b :: d :: lb) as x.
+  remember (d :: l) as y.
   cbn - [ merge_loop ].
+  subst x y.
 ...
   rewrite IHit; [ | easy | | ]; cycle 1. {
     cbn.
