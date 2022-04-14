@@ -1063,6 +1063,56 @@ rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   cbn; flia Hit Hla.
 } {
   clear - Hant Htra Htot Hs Hla.
+  remember (length l) as len eqn:Hlen; symmetry in Hlen.
+  revert a b l la lb Hs Hla Hlen.
+  induction len as (len, IHlen) using lt_wf_rec; intros.
+  destruct len. {
+    apply length_zero_iff_nil in Hlen; subst l.
+    now injection Hla; clear Hla; intros; subst la lb.
+  }
+  destruct l as [| c]; [ easy | ].
+  cbn in Hlen; apply Nat.succ_inj in Hlen.
+  destruct len. {
+    apply length_zero_iff_nil in Hlen; subst l.
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs |-*.
+    rewrite (Htra a b c); [ easy | | ]. {
+      now destruct (rel a b).
+    } {
+      destruct (rel b c); [ easy | ].
+      now rewrite Bool.andb_false_r in Hs.
+    }
+  }
+  specialize (IHlen len) as H1.
+  assert (H : len < S (S len)) by now transitivity (S len).
+  specialize (H1 H); clear H.
+...
+  revert a b la lb Hs Hla.
+  induction l as [| c]; intros. {
+    now injection Hla; clear Hla; intros; subst la lb.
+  }
+...
+  cbn in Hs |-*.
+  destruct la as [| c]; [ easy | ].
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  destruct l as [| d]. {
+    now injection Hla; clear Hla; intros.
+  }
+  cbn in Hla.
+  destruct l as [| e]. {
+    injection Hla; clear Hla; intros; subst la lb d.
+    remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc; [ | easy ].
+    now rewrite (Htra a b c Hab Hbc).
+  }
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  injection Hla; clear Hla; intros; subst d lc lb.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ | easy ].
+  rewrite (Htra a b c Hab Hbc).
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
