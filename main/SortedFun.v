@@ -505,6 +505,16 @@ induction it; [ easy | cbn ].
 now rewrite IHit, msort_loop_nil.
 Qed.
 
+Theorem msort_loop_pair : ∀ A (rel : A → _) it a b,
+  rel a b = true
+  → msort_loop rel it [a; b] = [a; b].
+Proof.
+intros * Hab.
+induction it; [ easy | cbn ].
+do 2 rewrite msort_loop_single; cbn.
+now rewrite Hab.
+Qed.
+
 Theorem split_cons_cons : ∀ A (l la lb : list A) a b,
   split l = (a :: la, b :: lb)
   → ∃ l', split l' = (la, lb) ∧ l = a :: b :: l'.
@@ -665,26 +675,14 @@ destruct l as [| d]. {
     rename c into b; rename Hac into Hab.
     induction it; [ easy | cbn ].
     rewrite msort_loop_single.
-    replace (msort_loop rel it [a; b]) with [a; b]. 2: {
-      clear IHit.
-      induction it; [ easy | cbn ].
-      do 2 rewrite msort_loop_single; cbn.
-      now rewrite Hab.
-    }
-    cbn.
+    rewrite msort_loop_pair; [ cbn | easy ].
     rewrite Hab.
     now destruct (rel b b).
   }
   clear IHit Hit Hcb.
   induction it; [ easy | cbn ].
   rewrite msort_loop_single.
-  replace (msort_loop rel it [a; c]) with [a; c]. 2: {
-    clear IHit.
-    induction it; [ easy | cbn ].
-    do 2 rewrite msort_loop_single; cbn.
-    now rewrite (Htra a b c Hab Hbc).
-  }
-  cbn.
+  rewrite msort_loop_pair; [ cbn | apply (Htra a b c Hab Hbc) ].
   rewrite Hab.
   remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
   destruct cb; [ | easy ].
@@ -702,8 +700,37 @@ remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct cb. {
   specialize (Hant b c Hbc Hcb) as H; subst c.
   clear Hcb; rename Hbc into Hbb.
-...
-  remember (d :: l) as l'; cbn; subst l'.
+  cbn.
+  rename d into c.
+  destruct l as [| d]. {
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs; rewrite Bool.andb_true_r in Hs.
+    rename Hs into Hbc.
+    clear IHit Hit Hbb.
+    revert a b c Hab Hbc.
+    induction it; intros; [ easy | cbn ].
+    rewrite msort_loop_pair; [ | easy ].
+    rewrite msort_loop_pair; [ cbn | easy ].
+    rewrite Hab, Hbc.
+    now destruct (rel b b); apply IHit.
+  }
+  destruct l as [| e]. {
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs.
+    remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+    remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+    destruct bc; [ | easy ].
+    destruct cd; [ | easy ].
+    remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
+    remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+    destruct db. {
+      specialize (Htra b c d Hbc Hcd) as Hbd.
+      specialize (Hant d b Hdb Hbd) as H; subst d.
+      specialize (Hant c b Hcd Hbc) as H; subst c.
+      clear - Hab.
+      induction it; [ easy | cbn ].
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
