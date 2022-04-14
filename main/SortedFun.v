@@ -1051,6 +1051,7 @@ destruct l as [| b]. {
   apply msort_loop_single.
 }
 cbn in Hit; apply Nat.succ_le_mono in Hit.
+...
 (*
 cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
@@ -1059,8 +1060,27 @@ injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
 remember (split (a :: la)) as lc eqn:Hlc.
 *)
-revert a b l la lb Hit Hs Hll.
-induction it; intros; [ easy | cbn ].
+Theorem glop : ∀ A (rel : A → _) a b l la lb it ita itb,
+  S (length l) ≤ it
+  → sorted rel (a :: b :: l) = true
+  → split (a :: b :: l) = (la, lb)
+  → msort_loop rel it
+      (merge rel (msort_loop rel ita la) (msort_loop rel itb lb)) =
+      a :: b :: l.
+Proof.
+intros * Hit Hs Hll.
+clear Hit.
+revert a b l la lb ita itb Hs Hll.
+induction it; intros. {
+  cbn in Hll.
+  remember (split l) as ll eqn:Hll'.
+  symmetry in Hll'.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename Hll' into Hll.
+  cbn.
+...
+; [ easy | cbn ].
 cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
@@ -1069,11 +1089,7 @@ rename lc into la; rename ld into lb; rename Hlc into Hla.
 destruct l as [| c]. {
   cbn in Hla.
   injection Hla; clear Hla; intros; subst la lb; cbn.
-  rewrite msort_loop_nil; cbn.
-  do 2 rewrite msort_loop_single.
-  do 2 rewrite msort_loop_length.
-  do 2 rewrite merge_length; cbn.
-  do 2 rewrite msort_loop_single.
+  do 2 rewrite msort_loop_single; cbn.
   cbn in Hs.
   rewrite Bool.andb_true_r in Hs.
   rename Hs into Hab.
@@ -1085,6 +1101,24 @@ destruct l as [| c]. {
   do 2 rewrite msort_loop_single; cbn.
   now rewrite Hab; cbn.
 }
+destruct l as [| d]. {
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  cbn in Hs.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ clear Hs | easy ].
+  remember (split (merge rel _ _)) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as (lc, ld).
+...
+  rewrite msort_loop_nil; cbn.
+  do 2 rewrite msort_loop_single.
+  do 2 rewrite msort_loop_length.
+  do 2 rewrite merge_length; cbn.
+  rewrite msort_loop_single; cbn.
+  rewrite (Htra a b c Hab Hbc).
+  destruct it; [ cbn in Hit; flia Hit | cbn ].
 ...
 intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
