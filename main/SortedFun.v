@@ -524,7 +524,7 @@ Theorem sorted_cons_cons_split : ∀ A (rel : A → _),
   ∀ a b la lb l,
   sorted rel (a :: b :: l) = true
   → split l = (la, lb)
-  → sorted rel (a :: la) = true.
+  → sorted rel (a :: la) = true ∧ sorted rel (b :: lb) = true.
 Proof.
 intros * Htra * Hs Hla.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
@@ -557,9 +557,10 @@ rename lc into la; rename ld into lb; rename Hlc into Hla.
 specialize (IHlen len) as H1.
 assert (H : len < S (S len)) by now transitivity (S len).
 specialize (H1 H); clear H.
-specialize (H1 a b l la lb).
+specialize (H1 a b l la lb) as H2.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.
-remember (c :: la) as l'; cbn; subst l'.
+remember (c :: la) as l'.
+remember (d :: lb) as l''; cbn; subst l' l''.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct ab; [ rewrite Bool.andb_true_l in Hs | easy ].
@@ -578,10 +579,14 @@ assert (H : sorted rel (a :: b :: l) = true). {
   specialize (Htra b c d Hbc Hcd) as Hbd.
   apply (Htra b d e Hbd Hde).
 }
-specialize (H1 H Hla Hlen); clear H.
-specialize (IHlen len) as H2.
-assert (H : len < S (S len)) by now transitivity (S len).
-apply (H2 H c d l la lb Hs Hla Hlen).
+specialize (H2 H Hla Hlen); clear H.
+specialize (H1 c d l la lb Hs Hla Hlen) as H3.
+split; [ easy | ].
+destruct H3 as (H3, H4); rewrite H4, Bool.andb_true_r.
+remember (d :: l) as l'; cbn in Hs; subst l'.
+remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+destruct cd; [ | easy ].
+apply (Htra b c d Hbc Hcd).
 Qed.
 
 (* to be completed
@@ -629,12 +634,15 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
   cbn; flia Hit Hla.
 } {
   clear - Hant Htra Htot Hs Hla.
-(* faut faire la même chose avec b :: lb *)
-...
-  specialize (sorted_cons_cons_split Htra _ _ _ Hs Hla) as H1.
-...
   apply (sorted_cons_cons_split Htra _ _ _ Hs Hla).
 }
+cbn.
+remember (b :: l) as l'; cbn in Hs; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+rewrite Nat.add_succ_r.
+rewrite <- split_length with (la := l); [ | easy ].
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
