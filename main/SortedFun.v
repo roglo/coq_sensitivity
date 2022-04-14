@@ -1036,6 +1036,8 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → msort_loop rel it l = l.
 Proof.
 intros * Hant Htra Htot * Hit Hs.
+revert l Hit Hs.
+induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it; [ easy | cbn ].
 remember (split l) as ll eqn:Hll.
 symmetry in Hll.
@@ -1051,13 +1053,80 @@ destruct l as [| b]. {
   apply msort_loop_single.
 }
 cbn in Hit; apply Nat.succ_le_mono in Hit.
+cbn in Hll.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
+  apply split_length in Hla.
+  cbn; flia Hit Hla.
+} {
+  clear - Hant Htra Htot Hs Hla.
+  revert a b la lb Hs Hla.
+  induction l as [| c]; intros. {
+    now injection Hla; clear Hla; intros; subst la lb.
+  }
+(*
+  remember (b :: c :: l) as l'; cbn in Hs; subst l'.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hab, Hs).
+  specialize (IHl b c (c :: la) lb Hs) as H1.
+*)
+  destruct l as [| d]. {
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs |-*.
+    rewrite (Htra a b c); [ easy | | ]. {
+      now destruct (rel a b).
+    } {
+      destruct (rel b c); [ easy | ].
+      now rewrite Bool.andb_false_r in Hs.
+    }
+  }
+  cbn in Hla.
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  injection Hla; clear Hla; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename Hlc into Hla.
+...
+  remember (c :: la) as l'; cbn; subst l'.
+  apply Bool.andb_true_iff.
+  split. 2: {
+    eapply IHl.
+...
+  remember (d :: l) as l'; cbn in Hs; subst l'.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hab, Hs).
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs).
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hcd, Hs).
+  rewrite (Htra a b c Hab Hbc).
+  rewrite Bool.andb_true_l.
+  destruct l as [| e]. {
+    now injection Hla; clear Hla; intros; subst la lb.
+  }
+  destruct l as [| f]. {
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs |-*.
+    rewrite Bool.andb_true_r in Hs |-*.
+    now rewrite (Htra c d e Hcd Hs).
+  }
+  cbn in Hla.
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  injection Hla; clear Hla; intros; subst la lb.
+...
+  remember (b :: l) as l'; cbn in Hs; subst l'.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
 ...
 (*
 cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
-rename lc into la; rename ld into lb; rename Hlc into Hla.
 remember (split (a :: la)) as lc eqn:Hlc.
 *)
 Theorem glop : ∀ A (rel : A → _) a b l la lb it ita itb,
