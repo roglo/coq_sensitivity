@@ -1026,6 +1026,14 @@ cbn in H1.
 ...
 *)
 
+Theorem sorted_cons_cons_split : ∀ A (rel : A → _) a b la lb l,
+  sorted rel (a :: b :: l) = true
+  → split l = (la, lb)
+  → sorted rel (a :: la) = true.
+Proof.
+intros * Hso Hsp.
+...
+
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -1063,6 +1071,9 @@ rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   cbn; flia Hit Hla.
 } {
   clear - Hant Htra Htot Hs Hla.
+...
+  apply (sorted_cons_cons_split rel _ _ _ Hs Hla).
+...
   remember (length l) as len eqn:Hlen; symmetry in Hlen.
   revert a b l la lb Hs Hla Hlen.
   induction len as (len, IHlen) using lt_wf_rec; intros.
