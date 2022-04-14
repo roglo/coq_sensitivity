@@ -520,6 +520,7 @@ now exists l.
 Qed.
 
 (* to be completed
+(*
 Theorem sorted_merge_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -1023,6 +1024,7 @@ cbn in H1.
     remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
     destruct cb. {
 ...
+*)
 
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
@@ -1033,6 +1035,31 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → sorted rel l = true
   → msort_loop rel it l = l.
 Proof.
+intros * Hant Htra Htot * Hit Hs.
+destruct it; [ easy | cbn ].
+remember (split l) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as (la, lb).
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  rewrite msort_loop_nil; cbn.
+  apply msort_loop_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  rewrite msort_loop_single, msort_loop_nil; cbn.
+  apply msort_loop_single.
+}
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+(*
+cbn in Hll.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+*)
+(* faire un lemme qui différencie les 3 it *)
+...
 intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
 remember (split l) as ll eqn:Hll.
