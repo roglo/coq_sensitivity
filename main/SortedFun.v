@@ -591,8 +591,10 @@ destruct cb. 2: {
   now injection Hla; clear Hla; intros; subst la lb.
 }
 specialize (Hant b c Hbc Hcb) as H; subst c.
+rename d into c.
 rename Hbc into Hbb; clear Hcb.
 f_equal.
+(*
 specialize (IHit (S it) (Nat.lt_succ_diag_r _)) as H1.
 specialize (H1 la lb l).
 assert (H : length la + length lb ≤ S it). {
@@ -602,28 +604,32 @@ specialize (H1 H); clear H.
 assert (H : sorted rel l = true) by now do 2 apply sorted_cons in Hs.
 specialize (H1 H Hla); clear H.
 cbn in H1.
+*)
 destruct it; [ cbn in Hll; flia Hll | cbn ].
-destruct la as [| c]; [ now subst l | ].
+destruct la as [| d]. {
+  apply split_nil_l in Hla.
+  now destruct Hla; subst l lb.
+}
 destruct lb as [| e]. {
-  subst l.
   apply split_nil_r in Hla.
+  destruct Hla as (H, Hla); subst l.
   destruct la; [ | cbn in Hla; flia Hla ].
   clear Hla; cbn in Hs.
   rewrite Bool.andb_true_r in Hs.
   apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbd, Hdc).
-  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-  destruct cb. {
-    specialize (Htra b d c Hbd Hdc) as Hbc.
-    specialize (Hant b c Hbc Hcb) as H; subst c.
+  destruct Hs as (Hbc, Hcd).
+  specialize (Htra b c d Hbc Hcd) as Hbd.
+  remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
+  destruct db. {
+    specialize (Hant b d Hbd Hdb) as H; subst d.
     f_equal.
-    specialize (Hant b d Hbd Hdc) as H; subst d.
+    specialize (Hant b c Hbc Hcd) as H; subst c.
     destruct it; [ cbn in Hll; flia Hll | easy ].
   }
   f_equal.
   destruct it; [ cbn in Hll; flia Hll | cbn ].
-  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
-  destruct cd. {
+  remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+  destruct dc. {
     specialize (Hant c d Hcd Hdc) as H; subst d.
     f_equal.
     destruct it; [ cbn in Hll |-*; flia Hll | easy ].
@@ -634,6 +640,7 @@ destruct lb as [| e]. {
 apply split_cons_cons in Hla.
 destruct Hla as (l' & Hs' & Hl').
 subst l; rename l' into l.
+...
 remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct cb. {
   remember (c :: e :: l) as l'; cbn in Hs; subst l'.
