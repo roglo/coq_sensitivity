@@ -1063,6 +1063,7 @@ rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   cbn; flia Hit Hla.
 } {
   clear - Hant Htra Htot Hs Hla.
+...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
     now injection Hla; clear Hla; intros; subst la lb.
