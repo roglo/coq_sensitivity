@@ -700,7 +700,15 @@ remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct cb. {
   specialize (Hant b c Hbc Hcb) as H; subst c.
   clear Hcb; rename Hbc into Hbb.
-  cbn.
+  rewrite Bool.andb_true_l in Hs.
+  cbn - [ merge_loop ].
+...
+  rewrite IHit; [ | easy | | ]; cycle 1. {
+    cbn.
+    destruct la; cbn.
+    apply split_nil_l in Hla.
+    destruct Hla; subst l lb; cbn in Hit |-*.
+...
   rename d into c.
   destruct l as [| d]. {
     cbn in Hla.
