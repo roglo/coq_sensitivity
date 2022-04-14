@@ -643,6 +643,31 @@ destruct ab; [ | easy ].
 rewrite Bool.andb_true_l in Hs.
 rewrite Nat.add_succ_r.
 rewrite <- split_length with (la := l); [ | easy ].
+cbn.
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  clear IHit Hit.
+  induction it; [ easy | cbn ].
+  do 2 rewrite msort_loop_single; cbn.
+  now rewrite Hab.
+}
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  rewrite Bool.andb_true_r in Hs.
+  rename Hs into Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    rewrite (Hant b c Hbc Hcb).
+    clear IHit Hit.
+    specialize (Htra a b c Hab Hbc) as Hac.
+    clear b Hab Hbc Hcb.
+    rename c into b; rename Hac into Hab.
+...
+    revert a b Hab.
+    induction it; intros; [ easy | cbn ].
+    rewrite msort_loop_single.
+    destruct it; [ now cbn; rewrite Hab; destruct (rel b b) | ].
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
