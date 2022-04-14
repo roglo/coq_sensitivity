@@ -646,14 +646,15 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
   clear - Hant Htra Htot Hs Hla.
   apply (sorted_cons_cons_split Htra _ _ _ Hs Hla).
 }
-...
-cbn.
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ | easy ].
 rewrite Bool.andb_true_l in Hs.
+cbn.
+rewrite Hab.
 rewrite Nat.add_succ_r.
 rewrite <- split_length with (la := l); [ | easy ].
+...
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
   clear IHit Hit.
