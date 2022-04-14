@@ -1026,12 +1026,73 @@ cbn in H1.
 ...
 *)
 
-Theorem sorted_cons_cons_split : ∀ A (rel : A → _) a b la lb l,
+Theorem sorted_cons_cons_split : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a b la lb l,
   sorted rel (a :: b :: l) = true
   → split l = (la, lb)
   → sorted rel (a :: la) = true.
 Proof.
-intros * Hso Hsp.
+intros * Htra * Hs Hla.
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert a b l la lb Hs Hla Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len. {
+  apply length_zero_iff_nil in Hlen; subst l.
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+destruct l as [| c]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+destruct len. {
+  apply length_zero_iff_nil in Hlen; subst l.
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  rewrite (Htra a b c); [ easy | | ]. {
+    now destruct (rel a b).
+  } {
+    destruct (rel b c); [ easy | ].
+    now rewrite Bool.andb_false_r in Hs.
+  }
+}
+destruct l as [| d]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+specialize (IHlen len) as H1.
+assert (H : len < S (S len)) by now transitivity (S len).
+specialize (H1 H); clear H.
+specialize (H1 a b l la lb).
+remember (c :: d :: l) as l'; cbn in Hs; subst l'.
+remember (c :: la) as l'; cbn; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct ab; [ rewrite Bool.andb_true_l in Hs | easy ].
+destruct bc; [ rewrite Bool.andb_true_l in Hs | easy ].
+rewrite (Htra a b c Hab Hbc), Bool.andb_true_l.
+assert (H : sorted rel (a :: b :: l) = true). {
+  remember (b :: l) as l'; cbn; subst l'.
+  rewrite Hab, Bool.andb_true_l; cbn.
+  destruct l as [| e]; [ easy | ].
+  remember (e :: l) as l'; cbn in Hs; subst l'.
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  remember (rel d e) as de eqn:Hde; symmetry in Hde.
+  destruct cd; [ rewrite Bool.andb_true_l in Hs | easy ].
+  destruct de; [ rewrite Bool.andb_true_l in Hs | easy ].
+  rewrite Hs, Bool.andb_true_r.
+  specialize (Htra b c d Hbc Hcd) as Hbd.
+  apply (Htra b d e Hbd Hde).
+}
+specialize (H1 H Hla Hlen); clear H.
+...
+cbn in H1 |-*.
+...
+destruct la as [| e]; [ easy | ].
+apply Bool.andb_true_iff in H1.
+destruct H1 as (Hae, H1).
+rewrite H1, Bool.andb_true_r.
 ...
 
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
@@ -1073,30 +1134,6 @@ rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   clear - Hant Htra Htot Hs Hla.
 ...
   apply (sorted_cons_cons_split rel _ _ _ Hs Hla).
-...
-  remember (length l) as len eqn:Hlen; symmetry in Hlen.
-  revert a b l la lb Hs Hla Hlen.
-  induction len as (len, IHlen) using lt_wf_rec; intros.
-  destruct len. {
-    apply length_zero_iff_nil in Hlen; subst l.
-    now injection Hla; clear Hla; intros; subst la lb.
-  }
-  destruct l as [| c]; [ easy | ].
-  cbn in Hlen; apply Nat.succ_inj in Hlen.
-  destruct len. {
-    apply length_zero_iff_nil in Hlen; subst l.
-    injection Hla; clear Hla; intros; subst la lb.
-    cbn in Hs |-*.
-    rewrite (Htra a b c); [ easy | | ]. {
-      now destruct (rel a b).
-    } {
-      destruct (rel b c); [ easy | ].
-      now rewrite Bool.andb_false_r in Hs.
-    }
-  }
-  specialize (IHlen len) as H1.
-  assert (H : len < S (S len)) by now transitivity (S len).
-  specialize (H1 H); clear H.
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
