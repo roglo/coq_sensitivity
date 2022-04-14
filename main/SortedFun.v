@@ -663,11 +663,47 @@ destruct l as [| d]. {
     specialize (Htra a b c Hab Hbc) as Hac.
     clear b Hab Hbc Hcb.
     rename c into b; rename Hac into Hab.
-...
-    revert a b Hab.
-    induction it; intros; [ easy | cbn ].
+    induction it; [ easy | cbn ].
     rewrite msort_loop_single.
-    destruct it; [ now cbn; rewrite Hab; destruct (rel b b) | ].
+    replace (msort_loop rel it [a; b]) with [a; b]. 2: {
+      clear IHit.
+      induction it; [ easy | cbn ].
+      do 2 rewrite msort_loop_single; cbn.
+      now rewrite Hab.
+    }
+    cbn.
+    rewrite Hab.
+    now destruct (rel b b).
+  }
+  clear IHit Hit Hcb.
+  induction it; [ easy | cbn ].
+  rewrite msort_loop_single.
+  replace (msort_loop rel it [a; c]) with [a; c]. 2: {
+    clear IHit.
+    induction it; [ easy | cbn ].
+    do 2 rewrite msort_loop_single; cbn.
+    now rewrite (Htra a b c Hab Hbc).
+  }
+  cbn.
+  rewrite Hab.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb; [ | easy ].
+  now rewrite (Hant b c Hbc Hcb) in IHit |-*.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (c :: d :: l) as l'; cbn in Hs; subst l'.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc; [ | easy ].
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+  specialize (Hant b c Hbc Hcb) as H; subst c.
+  clear Hcb; rename Hbc into Hbb.
+...
+  remember (d :: l) as l'; cbn; subst l'.
 ...
   revert a b la lb Hs Hla.
   induction l as [| c]; intros. {
