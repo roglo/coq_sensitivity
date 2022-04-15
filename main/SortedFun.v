@@ -753,9 +753,32 @@ Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
   → merge rel (a :: la) (b :: lb) = a :: b :: merge rel la lb.
 Proof.
 intros * Hant * Hs Hla.
+unfold merge.
+do 2 rewrite List_cons_length.
+rewrite Nat.add_succ_r, Nat.add_succ_l.
+rewrite <- split_length with (la := l); [ | easy ].
+remember (length l)  as it eqn:H.
+assert (Hit : length l ≤ it) by flia H; clear H.
+revert l la lb a b Hit Hs Hla.
+induction it as (it, IHit) using lt_wf_rec; intros.
+...
+intros * Hant * Hs Hla.
 remember (length l)  as len eqn:Hlen; symmetry in Hlen.
 revert l la lb a b Hlen Hs Hla.
 induction len as (len, IHlen) using lt_wf_rec; intros.
+(**)
+destruct len. {
+  apply length_zero_iff_nil in Hlen; subst l.
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  now destruct (rel a b).
+}
+destruct l as [| c]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+specialize (IHlen len (Nat.lt_succ_diag_r _) (c :: l) la lb) as H1.
+Print merge.
+Print merge_loop.
+...
 cbn.
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
