@@ -693,7 +693,62 @@ remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
-rewrite List_cons_length.
+do 2 rewrite List_cons_length.
+remember (S (S (S (length l)))) as it1 eqn:H.
+assert (Hit1 : S (S (S (length l))) ≤ it1) by now rewrite H.
+move it1 before it; move Hit1 before Hit.
+clear H; cbn in Hit.
+destruct it; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
+remember (merge_loop rel it1 (c :: la) (b :: d :: lb)) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| e]. {
+  destruct it1; [ easy | ].
+  cbn in Hlc.
+  now destruct (rel c b).
+}
+remember (split lc) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (ld, le).
+...
+rewrite IHit with (l := a :: ld); [ | flia | | ]; cycle 1. {
+  cbn.
+  apply (f_equal length) in Hlc.
+  rewrite merge_loop_length in Hlc. 2: {
+    rewrite app_length; cbn.
+    do 2 rewrite Nat.add_succ_r.
+    now rewrite <- split_length with (la := l).
+  }
+  rewrite app_length in Hlc; cbn in Hlc.
+  do 2 rewrite Nat.add_succ_r in Hlc.
+  apply Nat.succ_inj in Hlc.
+  rewrite <- split_length with (la := l) in Hlc; [ | easy ].
+  apply split_length in Hld.
+  rewrite Hlc in Hit.
+...
+  rewrite Hld in H.
+...
+  rewrite app_length in Hlc; cbn in Hlc.
+  do 2 rewrite Nat.add_succ_r in Hlc.
+  apply Nat.succ_inj in Hlc.
+  rewrite <- split_length with (la := l) in Hlc; [ | easy ].
+  rewrite <- Hlc.
+...
+rewrite IHit; [ | flia | | ]; cycle 1. {
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length; cbn.
+  rewrite Nat.add_succ_r.
+  rewrite <- split_length with (la := lc); [ | easy ].
+  apply (f_equal length) in Hlc.
+  rewrite merge_loop_length in Hlc. 2: {
+    rewrite app_length; cbn.
+    do 2 rewrite Nat.add_succ_r.
+    now rewrite <- split_length with (la := l).
+  }
+  rewrite app_length in Hlc; cbn in Hlc.
+  do 2 rewrite Nat.add_succ_r in Hlc.
+  apply Nat.succ_inj in Hlc.
+  rewrite <- split_length with (la := l) in Hlc; [ | easy ].
+  rewrite <- Hlc.
 ...
 remember (length (c :: d :: l)) as x; cbn; subst x.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.
