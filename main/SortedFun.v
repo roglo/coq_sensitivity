@@ -654,7 +654,6 @@ cbn.
 rewrite Hab.
 rewrite Nat.add_succ_r.
 rewrite <- split_length with (la := l); [ | easy ].
-...
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
   clear IHit Hit.
@@ -689,12 +688,14 @@ destruct l as [| d]. {
   destruct cb; [ | easy ].
   now rewrite (Hant b c Hbc Hcb) in IHit |-*.
 }
-remember (length (c :: d :: l)) as x; cbn; subst x.
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
+rewrite List_length_cons.
+...
+remember (length (c :: d :: l)) as x; cbn; subst x.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.
 remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct bc; [ | easy ].
