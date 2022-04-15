@@ -333,7 +333,7 @@ destruct Ha as [Ha| Ha]; [ now subst b | ].
 now apply IHl.
 Qed.
 
-Theorem List_length_cons : ∀ A (a : A) la, length (a :: la) = S (length la).
+Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
 Theorem List_length_fold_right : ∀ A B (f : B → list A → list A) la lb,
@@ -1180,7 +1180,7 @@ Proof.
 intros * Hkla.
 unfold replace_at.
 rewrite app_length, firstn_length.
-rewrite List_length_cons, skipn_length.
+rewrite List_cons_length, skipn_length.
 flia Hkla.
 Qed.
 
@@ -1447,7 +1447,7 @@ Proof.
 intros.
 revert i.
 induction l as [| j]; intros; [ apply skipn_nil | ].
-rewrite List_length_cons.
+rewrite List_cons_length.
 destruct i. {
   rewrite Nat.sub_0_r.
   cbn - [ nth ]; f_equal.

@@ -693,7 +693,7 @@ remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
-rewrite List_length_cons.
+rewrite List_cons_length.
 ...
 remember (length (c :: d :: l)) as x; cbn; subst x.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.

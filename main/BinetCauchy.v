@@ -1799,7 +1799,7 @@ rewrite if_eqb_eq_dec in Hit |-*.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j.
   rewrite List_app_cons, app_assoc, <- seq_S.
-  rewrite List_length_cons, <- Nat.add_succ_comm.
+  rewrite List_cons_length, <- Nat.add_succ_comm.
   apply IHit; [ now rewrite seq_S, <- app_assoc | easy ].
 } {
   remember (list_swap_elem 0 (j :: l) 0 (j - i)) as la eqn:Hla.
@@ -1839,7 +1839,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (IHit la i Hpa) as H1.
   assert (H : length la + nb_nfit i la ≤ it). {
-    rewrite Hla, list_swap_elem_length, List_length_cons.
+    rewrite Hla, list_swap_elem_length, List_cons_length.
     rewrite Nat.add_succ_comm.
     etransitivity; [ | apply Hit ].
     apply Nat.add_le_mono_l.
@@ -1906,7 +1906,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (H1 H); clear H.
   clear IHit.
   set (g := λ l t, l ° swap (length l) (fst t) (snd t)) in H1 |-*.
-  rewrite List_length_cons.
+  rewrite List_cons_length.
   replace (length la) with (S (length l)) in H1. 2: {
     rewrite Hla.
     now rewrite list_swap_elem_length.
@@ -1928,7 +1928,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   unfold list_swap_elem.
   rewrite map_map.
   rewrite seq_length.
-  rewrite List_length_cons.
+  rewrite List_cons_length.
   rewrite List_seq_cut with (i := i). 2: {
     apply in_seq.
     split; [ easy | ].
@@ -2938,7 +2938,7 @@ Search (nb_nfit (_ ° _)).
   unfold transp_list in Hla |-*.
   rewrite comp_length, swap_length.
   destruct l as [| a]; [ easy | ].
-  rewrite List_length_cons in Hla.
+  rewrite List_cons_length in Hla.
   rewrite Nat.add_succ_l in Hla.
   cbn - [ list_swap_elem "=?" ] in Hla.
   do 2 rewrite if_eqb_eq_dec in Hla.
@@ -3400,7 +3400,7 @@ induction ll as [| la]; intros. {
   unfold transp_list; cbn.
   now unfold iter_seq, iter_list.
 }
-rewrite List_length_cons, seq_S.
+rewrite List_cons_length, seq_S.
 cbn - [ nth ].
 rewrite map_app.
 ...

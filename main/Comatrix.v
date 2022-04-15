@@ -1073,7 +1073,7 @@ Proof.
 intros n f i (Hs, Hf) Hi Hx.
 specialize (List_rank_None 0 _ _ Hx) as H1; cbn.
 specialize (pigeonhole_list n (i :: f)) as H2.
-rewrite List_length_cons in H2.
+rewrite List_cons_length in H2.
 assert (H : n < S (length f)) by now rewrite Hf.
 specialize (H2 H); clear H.
 assert (H : ∀ x, x ∈ i :: f → x < n). {

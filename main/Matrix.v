@@ -479,7 +479,7 @@ rewrite app_length.
 rewrite firstn_length.
 rewrite <- List_hd_nth_0.
 rewrite fold_mat_ncols.
-rewrite List_length_cons.
+rewrite List_cons_length.
 rewrite skipn_length.
 rewrite fold_mat_ncols.
 flia Hkc.

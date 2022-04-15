@@ -56,7 +56,7 @@ Proof.
 intros * eq_dec * Hxl.
 revert x Hxl.
 induction l as [| y]; intros; [ easy | ].
-rewrite List_length_cons.
+rewrite List_cons_length.
 destruct Hxl as [Hxl| Hxl]. {
   subst y.
   exists 0.
