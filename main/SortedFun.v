@@ -654,6 +654,7 @@ cbn.
 rewrite Hab.
 rewrite Nat.add_succ_r.
 rewrite <- split_length with (la := l); [ | easy ].
+...
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
   clear IHit Hit.
