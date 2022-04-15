@@ -613,9 +613,16 @@ Theorem sorted_merge_cons_r : ∀ A (rel : A → _),
   → merge rel la (b :: lb) = b :: merge rel la lb.
 Proof.
 intros * Hant Htra * Hs Hll.
-unfold merge; cbn.
-rewrite Nat.add_succ_r; cbn.
-destruct l as [| a]. {
+remember (length l) as len eqn:Hlen.
+symmetry in Hlen.
+revert l la lb b Hs Hll Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+...
+intros * Hant Htra * Hs Hll.
+revert la lb b Hs Hll.
+induction l as [| a]; intros. {
+  unfold merge; cbn.
+  rewrite Nat.add_succ_r; cbn.
   cbn in Hll.
   now injection Hll; clear Hll; intros; subst la lb.
 }
@@ -632,7 +639,9 @@ cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb.
 remember (a :: c :: l) as l'; cbn in Hs; subst l'.
+cbn.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (rel b a) as ba eqn:Hba; symmetry in Hba.
 destruct ba; [ | easy ].
@@ -641,7 +650,7 @@ destruct ab. {
   specialize (Hant a b Hab Hba) as H; subst b.
   f_equal.
   rename Hba into Haa; clear Hab.
-  cbn.
+...
   remember (c :: l) as l'; cbn in Hs; subst l'.
   remember (rel a c) as ac eqn:Hac; symmetry in Hac.
   destruct ac; [ | easy ].
