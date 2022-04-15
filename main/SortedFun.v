@@ -600,6 +600,54 @@ apply (Htra b c d Hbc Hcd).
 Qed.
 
 (* to be completed
+Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
+  antisymmetric rel →
+  ∀ l la lb a b,
+  sorted rel (a :: b :: l) = true
+  → split l = (la, lb)
+  → merge rel (a :: la) (b :: lb) = a :: b :: merge rel la lb.
+Proof.
+intros * Hant * Hs Hla.
+remember (b :: l) as l'; cbn in Hs; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+cbn; rewrite Hab.
+f_equal.
+rewrite Nat.add_succ_r.
+rewrite <- split_length with (la := l); [ cbn | easy ].
+destruct l as [| c]. {
+  cbn in Hla.
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+cbn in Hla.
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ clear Hs | easy ].
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb; [ | easy ].
+  now specialize (Hant c b Hcb Hbc) as H; subst c.
+}
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn in Hs.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+  specialize (Hant c b Hcb Hbc) as H; subst c.
+  ...
+  destruct la as [| c]. {
+    apply split_nil_l in Hla.
+    now destruct Hla; subst lb.
+  }
+...
+
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -649,44 +697,10 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
 (**)
 clear IHit.
 replace (merge rel (a :: la) (b :: lb)) with (a :: b :: merge rel la lb). 2: {
-  remember (b :: l) as l'; cbn in Hs; subst l'.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  rewrite Bool.andb_true_l in Hs.
-  cbn; rewrite Hab.
-  f_equal.
-  rewrite Nat.add_succ_r.
-  rewrite <- split_length with (la := l); [ cbn | easy ].
-  destruct l as [| c]. {
-    cbn in Hla.
-    now injection Hla; clear Hla; intros; subst la lb.
-  }
-  cbn in Hla.
-  destruct l as [| d]. {
-    injection Hla; clear Hla; intros; subst la lb.
-    cbn in Hs.
-    remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-    destruct bc; [ clear Hs | easy ].
-    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-    destruct cb; [ | easy ].
-    now specialize (Hant c b Hcb Hbc) as H; subst c.
-  }
-  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as (lc, ld).
-  injection Hla; clear Hla; intros; subst la lb.
-  rename lc into la; rename ld into lb; rename Hlc into Hla.
-  cbn in Hs.
-  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-  destruct bc; [ | easy ].
-  rewrite Bool.andb_true_l in Hs.
-  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-  destruct cb. {
-    specialize (Hant c b Hcb Hbc) as H; subst c.
+  clear it Hit.
 ...
-  destruct la as [| c]. {
-    apply split_nil_l in Hla.
-    now destruct Hla; subst lb.
-  }
+  symmetry.
+  now apply (sorted_merge_cons_cons rel l).
 ...
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
