@@ -756,6 +756,7 @@ intros * Hant * Hs Hla.
 unfold merge.
 Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
   antisymmetric rel →
+  transitive rel →
   ∀ it l la lb a b,
   length l ≤ it
   → sorted rel (a :: b :: l) = true
@@ -763,6 +764,92 @@ Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
   → merge_loop rel (S (S it)) (a :: la) (b :: lb) =
     a :: b :: merge_loop rel it la lb.
 Proof.
+intros * Hant Htra * Hit Hs Hla.
+remember (b :: l) as l'; cbn in Hs |-*; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+f_equal.
+rewrite Bool.andb_true_l in Hs.
+clear a Hab.
+destruct la as [| a]. {
+  apply split_nil_l in Hla.
+  destruct Hla; subst lb.
+  now destruct it.
+}
+move b before a.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+destruct it. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+destruct l as [| c]; [ easy | ].
+destruct l as [| d]. {
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst c la lb.
+  cbn in Hs.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  now rewrite (Hant a b Hab Hba).
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb c.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (a :: d :: l) as l'; cbn in Hs; subst l'.
+remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+destruct ba; [ | easy ].
+specialize (Hant a b Hab Hba) as H; subst b.
+clear Hab; rename Hba into Haa.
+move a after d.
+rename d into b.
+rewrite Bool.andb_true_l in Hs.
+f_equal; cbn.
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  cbn in Hit.
+  destruct it; [ flia Hit | easy ].
+}
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs.
+  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l, Bool.andb_true_r in Hs.
+  rename Hs into Hbc.
+  specialize (Htra a b c Hab Hbc) as Hac.
+  destruct ca; [ | easy ].
+  specialize (Hant a c Hac Hca) as H; subst c.
+  clear Hac Hca.
+  f_equal.
+  destruct it; [ easy | cbn ].
+  rewrite Hab.
+  destruct it; [ | easy ].
+  cbn in Hit; flia Hit.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (c :: d :: l) as l'; cbn in Hs; subst l'.
+remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hbc, Hs).
+specialize (Htra a b c Hab Hbc) as Hac.
+destruct ca; [ | easy ].
+specialize (Hant a c Hac Hca) as H; subst c.
+clear Hac Hca.
+f_equal.
+rename d into c.
+...
 intros * Hant * Hit Hs Hla.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
 revert l la lb a b len Hlen Hit Hs Hla.
