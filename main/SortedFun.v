@@ -761,6 +761,68 @@ remember (length l)  as it eqn:H.
 assert (Hit : length l ≤ it) by flia H; clear H.
 revert l la lb a b Hit Hs Hla.
 induction it as (it, IHit) using lt_wf_rec; intros.
+cbn in Hs |-*.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  now destruct it.
+}
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  f_equal.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct bc; [ clear Hs | easy ].
+  destruct cb; [ | easy ].
+  specialize (Hant b c Hbc Hcb) as H; subst c.
+  clear Hbc; rename Hcb into Hbb.
+  now destruct it.
+}
+f_equal.
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct bc; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+destruct cb. {
+  specialize (Hant c b Hcb Hbc) as H; subst c.
+  rename Hbc into Hbb.
+  f_equal; clear Hcb.
+  destruct it; [ easy | ].
+  cbn in Hit; apply Nat.succ_le_mono in Hit.
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit it) as H1.
+  assert (H : it < S (S it)) by now transitivity (S it).
+  specialize (H1 H l la lb b d Hit Hs Hla); clear H.
+  cbn in H1 |-*.
+  cbn in Hs.
+  remember (rel b d) as bd eqn:Hbd; symmetry in Hbd.
+  destruct bd; [ | easy ].
+  injection H1; clear H1; intros H1.
+  destruct la as [| c]; [ easy | ].
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  destruct cd. {
+    injection H1; clear H1; intros H1 H; subst d.
+    rename Hbd into Hbc; rename Hcd into Hcc.
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb. {
+      specialize (Hant b c Hbc Hcb) as H; subst c.
+      clear Hcb Hcc Hbc.
+      f_equal.
+      destruct la as [| c]. {
+        f_equal.
+        destruct it; [ | easy ].
+        now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+      }
+      remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+      destruct cb. {
 ...
 intros * Hant * Hs Hla.
 remember (length l)  as len eqn:Hlen; symmetry in Hlen.
