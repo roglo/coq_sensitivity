@@ -646,6 +646,48 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
   clear - Hant Htra Htot Hs Hla.
   apply (sorted_cons_cons_split Htra _ _ _ Hs Hla).
 }
+(**)
+clear IHit.
+replace (merge rel (a :: la) (b :: lb)) with (a :: b :: merge rel la lb). 2: {
+  remember (b :: l) as l'; cbn in Hs; subst l'.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  cbn; rewrite Hab.
+  f_equal.
+  rewrite Nat.add_succ_r.
+  rewrite <- split_length with (la := l); [ cbn | easy ].
+  destruct l as [| c]. {
+    cbn in Hla.
+    now injection Hla; clear Hla; intros; subst la lb.
+  }
+  cbn in Hla.
+  destruct l as [| d]. {
+    injection Hla; clear Hla; intros; subst la lb.
+    cbn in Hs.
+    remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc; [ clear Hs | easy ].
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb; [ | easy ].
+    now specialize (Hant c b Hcb Hbc) as H; subst c.
+  }
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  injection Hla; clear Hla; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename Hlc into Hla.
+  cbn in Hs.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    specialize (Hant c b Hcb Hbc) as H; subst c.
+...
+  destruct la as [| c]. {
+    apply split_nil_l in Hla.
+    now destruct Hla; subst lb.
+  }
+...
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ | easy ].
@@ -688,12 +730,11 @@ destruct l as [| d]. {
   destruct cb; [ | easy ].
   now rewrite (Hant b c Hbc Hcb) in IHit |-*.
 }
+do 2 rewrite List_cons_length.
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
-rename lc into la; rename ld into lb; rename Hlc into Hla.
-do 2 rewrite List_cons_length.
 remember (S (S (S (length l)))) as it1 eqn:H.
 assert (Hit1 : S (S (S (length l))) ≤ it1) by now rewrite H.
 move it1 before it; move Hit1 before Hit.
@@ -710,7 +751,7 @@ destruct lc as [| e]. {
 remember (split lc) as ld eqn:Hld; symmetry in Hld.
 destruct ld as (ld, le).
 ...
-rewrite IHit with (l := a :: ld); [ | flia | | ]; cycle 1. {
+rewrite IHit with (l := e :: le); [ | flia | | ]; cycle 1. {
   cbn.
   apply (f_equal length) in Hlc.
   rewrite merge_loop_length in Hlc. 2: {
