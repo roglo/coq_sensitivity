@@ -764,6 +764,48 @@ Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
     a :: b :: merge_loop rel it la lb.
 Proof.
 intros * Hant * Hit Hs Hla.
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert l la lb a b len Hlen Hit Hs Hla.
+induction it as (it, IHit) using lt_wf_rec; intros.
+destruct it. {
+  cbn in Hs |-*.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  f_equal.
+  apply Nat.le_0_r in Hit; subst len.
+  apply length_zero_iff_nil in Hit; subst l.
+  now injection Hla; intros; subst la lb.
+}
+destruct it. {
+  apply Nat.le_1_r in Hit.
+  destruct Hit as [Hit| Hit]. {
+    subst len.
+    apply length_zero_iff_nil in Hit; subst l.
+    injection Hla; intros; subst la lb.
+    cbn in Hs |-*.
+    now destruct (rel a b).
+  }
+  destruct l as [| c]; [ now subst len | ].
+  subst len.
+  destruct l; [ clear Hit | easy ].
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  destruct (rel a b); [ | easy ].
+  f_equal.
+  cbn in Hs.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct bc; [ | easy ].
+  destruct cb; [ | easy ].
+  now rewrite (Hant b c Hbc Hcb).
+}
+specialize (IHit it) as H1.
+assert (H : it < S (S it)) by now transitivity (S it).
+specialize (H1 H); clear H.
+...
+intros * Hant * Hit Hs Hla.
 revert l la lb a b Hit Hs Hla.
 induction it; intros; cbn. {
   cbn in Hs.
