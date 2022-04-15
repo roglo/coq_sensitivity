@@ -754,6 +754,110 @@ Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
 Proof.
 intros * Hant * Hs Hla.
 unfold merge.
+Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
+  antisymmetric rel →
+  ∀ it l la lb a b,
+  length l ≤ it
+  → sorted rel (a :: b :: l) = true
+  → split l = (la, lb)
+  → merge_loop rel (S (S it)) (a :: la) (b :: lb) =
+    a :: b :: merge_loop rel it la lb.
+Proof.
+intros * Hant * Hit Hs Hla.
+revert l la lb a b Hit Hs Hla.
+induction it; intros; cbn. {
+  cbn in Hs.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  f_equal.
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+  now injection Hla; intros; subst la lb.
+}
+cbn in Hs.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+f_equal.
+destruct l as [| c]. {
+  now injection Hla; intros; subst la lb.
+}
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct bc; [ | easy ].
+  destruct cb; [ | easy ].
+  now specialize (Hant b c Hbc Hcb) as H; subst c.
+}
+cbn in Hit.
+destruct (Nat.eq_dec (S (length l)) it) as [Hli| Hli]. 2: {
+  cbn in Hla.
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  injection Hla; clear Hla; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename Hlc into Hla.
+  specialize (IHit l la lb c d) as H1.
+  assert (H : length l ≤ it) by flia Hit Hli.
+  specialize (H1 H); clear H.
+  assert (H : sorted rel (c :: d :: l) = true) by admit.
+  specialize (H1 H Hla); clear H.
+  cbn in H1, Hs.
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  destruct cd; [ | now rewrite Bool.andb_false_r in Hs ].
+  injection H1; clear H1; intros H1.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct bc; [ | easy ].
+  destruct cb. {
+    specialize (Hant b c Hbc Hcb) as H; subst c.
+    f_equal.
+...
+  specialize (IHit l (c :: la) (d :: lb) b c) as H1.
+  assert (H : length l ≤ it) by flia Hit Hli.
+  specialize (H1 H); clear H.
+  assert (H : sorted rel (b :: c :: l) = true) by admit.
+  specialize (H1 H); clear H.
+  assert (H : split l = (c :: la, d :: lb)). {
+    cbn in Hla.
+    remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+    destruct lc as (lc, ld).
+    injection Hla; clear Hla; intros; subst la lb.
+...
+intros * Hant * Hs Hla.
+revert la lb a b Hs Hla.
+induction l as [| c]; intros; cbn. {
+  injection Hla; intros; subst la lb; cbn.
+  cbn in Hs.
+  now destruct (rel a b).
+}
+remember (b :: c :: l) as l'; cbn in Hs; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+rewrite Bool.andb_true_l in Hs.
+f_equal.
+specialize (fold_merge rel la (b :: lb)) as H1.
+rewrite List_cons_length in H1.
+rewrite H1; clear H1.
+clear a Hab.
+destruct l as [| a]. {
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct bc; [ | easy ].
+  destruct cb; [ | easy ].
+  now specialize (Hant b c Hbc Hcb) as H; subst c.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+...
+intros * Hant * Hs Hla.
+unfold merge.
 do 2 rewrite List_cons_length.
 rewrite Nat.add_succ_r, Nat.add_succ_l.
 rewrite <- split_length with (la := l); [ | easy ].
