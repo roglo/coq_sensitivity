@@ -625,9 +625,6 @@ destruct la as [| a]. {
 move b before a.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ | easy ].
-destruct it. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
-}
 destruct l as [| c]; [ easy | ].
 destruct l as [| d]. {
   cbn in Hla.
@@ -635,7 +632,8 @@ destruct l as [| d]. {
   cbn in Hs.
   remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ba; [ | easy ].
-  now rewrite (Hant a b Hab Hba).
+  rewrite (Hant a b Hab Hba).
+  now destruct it.
 }
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
@@ -648,12 +646,16 @@ destruct ba; [ | easy ].
 specialize (Hant a b Hab Hba) as H; subst b.
 clear Hab; rename Hba into Haa.
 move a after d.
-rename d into b.
 rewrite Bool.andb_true_l in Hs.
-f_equal; cbn.
+f_equal.
+rename d into b.
+(*1*)
+destruct it. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit.
+}
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
-  cbn in Hs.
+  cbn in Hs |-*.
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ | easy ].
   cbn in Hit.
@@ -661,7 +663,7 @@ destruct l as [| c]. {
 }
 destruct l as [| d]. {
   injection Hla; clear Hla; intros; subst la lb.
-  cbn in Hs.
+  cbn in Hs |-*.
   remember (rel c a) as ca eqn:Hca; symmetry in Hca.
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ | easy ].
@@ -677,7 +679,7 @@ destruct l as [| d]. {
   destruct it; [ | easy ].
   cbn in Hit; flia Hit.
 }
-cbn in Hla.
+cbn in Hla |-*.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
@@ -698,6 +700,7 @@ specialize (Hant a b Hab Hba) as H; subst b.
 clear Hab Hba.
 f_equal.
 rename d into b.
+(*2*)
 destruct it; [ easy | cbn ].
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
@@ -745,6 +748,7 @@ specialize (Hant a b Hab Hba) as H; subst b.
 clear Hab Hba.
 f_equal.
 rename d into b.
+(*3*)
 destruct it; [ easy | cbn ].
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
@@ -791,6 +795,36 @@ rename Hbc into Hba.
 specialize (Hant a b Hab Hba) as H; subst b.
 clear Hab Hba.
 f_equal.
+rename d into b.
+(*4*)
+...
+  Hit : length (a :: b :: l) ≤ it
+  Haa : rel a a = true
+  Hs : sorted rel (a :: b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge_loop rel it la (a :: b :: lb) = merge_loop rel it (a :: la) (b :: lb)
+...
+  Hit : length (a :: a :: a :: b :: l) ≤ S it
+  Haa : rel a a = true
+  Hs : sorted rel (a :: b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge_loop rel it la (a :: a :: b :: lb) = merge_loop rel it (a :: la) (a :: b :: lb)
+...
+  Hit : length (a :: a :: a :: a :: a :: b :: l) ≤ S (S it)
+  Haa : rel a a = true
+  Hs : sorted rel (a :: b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge_loop rel it la (a :: a :: a :: b :: lb) = merge_loop rel it (a :: la) (a :: a :: b :: lb)
+...
+  Hit : length (a :: a :: a :: a :: a :: a :: a :: b :: l) ≤ S (S (S it))
+  Haa : rel a a = true
+  Hs : sorted rel (a :: b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge_loop rel it la (a :: a :: a :: a :: b :: lb) = merge_loop rel it (a :: la) (a :: a :: a :: b :: lb)
 ...
 
 Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
