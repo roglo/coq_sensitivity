@@ -753,44 +753,41 @@ Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
     a :: b :: merge_loop rel it la lb.
 Proof.
 intros * Hant Htra * Hit Hs Hla.
-remember (b :: l) as l'; cbn in Hs |-*; subst l'.
+remember (S it) as sit; cbn; subst sit.
+remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ | easy ].
-f_equal.
+destruct ab; [ f_equal | easy ].
 rewrite Bool.andb_true_l in Hs.
-clear a Hab.
-destruct la as [| a]. {
-  apply split_nil_l in Hla.
-  destruct Hla; subst lb.
+clear a Hab; rename b into a.
+destruct l as [| b]. {
+  injection Hla; clear Hla; intros; subst la lb.
   now destruct it.
 }
-move b before a.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ | easy ].
-destruct l as [| c]; [ easy | ].
-destruct l as [| d]. {
-  cbn in Hla.
-  injection Hla; clear Hla; intros; subst c la lb.
-  cbn in Hs.
+move b after a.
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs |-*.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ab; [ | easy ].
   destruct ba; [ | easy ].
-  rewrite (Hant a b Hab Hba).
+  clear Hs.
+  specialize (Hant a b Hab Hba) as H; subst b.
   now destruct it.
 }
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
-injection Hla; clear Hla; intros; subst la lb c.
-rename lc into la; rename ld into lb; rename Hlc into Hla.
-remember (a :: d :: l) as l'; cbn in Hs; subst l'.
+injection Hla; clear Hla; intros; subst la lb.
+move c after b; cbn.
+remember (c :: l) as l'; cbn in Hs; subst l'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+destruct ab; [ | easy ].
 destruct ba; [ | easy ].
 specialize (Hant a b Hab Hba) as H; subst b.
-clear Hab; rename Hba into Haa.
-move a after d.
-rewrite Bool.andb_true_l in Hs.
+clear Hba; rename Hab into Haa.
 f_equal.
-rename d into b.
 specialize (sorted_merge_loop_cons_cons_aux Hant Htra 0) as H1.
 now apply (H1 it l).
 Qed.
