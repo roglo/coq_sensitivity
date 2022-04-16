@@ -614,16 +614,22 @@ Proof.
 intros * Hant Htra * Hit Haa Hs Hla.
 revert n l la lb a b Hit Haa Hs Hla.
 induction it; intros; [ easy | ].
+(*
 destruct it. {
   rewrite app_length, repeat_length in Hit; cbn in Hit.
   flia Hit.
 }
+*)
+rewrite app_length, repeat_length in Hit; cbn in Hit.
+rewrite <- Nat.add_assoc in Hit.
+apply Nat.add_le_mono_l in Hit.
+rewrite Nat.add_comm in Hit; cbn in Hit.
+apply <- Nat.succ_le_mono in Hit.
+rewrite Nat.add_comm in Hit.
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
-  destruct n; cbn. {
-    cbn in Hs.
-    now destruct (rel a b).
-  }
+  destruct it; [ flia Hit | ].
+  destruct n; cbn; [ now cbn in Hs; destruct (rel a b) | ].
   rewrite Haa.
   f_equal; clear.
   induction n; [ easy | cbn ].
@@ -642,22 +648,20 @@ destruct l as [| d]. {
     destruct ca; [ | easy ].
     specialize (Htra a b c Hab Hbc) as Hac.
     specialize (Hant a c Hac Hca) as H; subst c.
+    destruct it; [ easy | cbn ].
     f_equal; rewrite Hab.
     destruct it; [ | easy ].
-    rewrite app_length, repeat_length in Hit.
     cbn in Hit; flia Hit.
   }
   cbn.
   rewrite Haa.
+  destruct it; [ easy | cbn ].
   remember (rel c a) as ca eqn:Hca; symmetry in Hca.
   destruct ca. {
     specialize (Htra a b c Hab Hbc) as Hac.
     specialize (Hant a c Hac Hca) as H; subst c.
     f_equal; f_equal.
-    destruct it. {
-      rewrite app_length, repeat_length in Hit.
-      cbn in Hit; flia Hit.
-    }
+    destruct it; [ flia Hit | ].
     cbn; clear.
     induction n; [ easy | cbn ].
     now rewrite IHn.
@@ -675,7 +679,7 @@ remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
-remember (S it) as sit; cbn; subst sit.
+cbn.
 destruct n. {
   cbn in Hs |-*.
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
@@ -688,6 +692,7 @@ destruct n. {
   specialize (Htra a b c Hab Hbc) as Hac.
   specialize (Hant a c Hac Hca) as H; subst c.
   clear Hac Hca.
+  destruct it; [ easy | cbn ].
   f_equal; rewrite Hab.
   destruct l as [| c]. {
     injection Hla; clear Hla; intros; subst la lb.
@@ -762,6 +767,19 @@ destruct n. {
   injection Hla; clear Hla; intros; subst la lb.
   rename lg into la; rename lh into lb; rename Hlg into Hla.
   rename e into b; rename f into d.
+  cbn in Hs.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ab; [ | easy ].
+  destruct bc; [ | easy ].
+  destruct cd; [ | easy ].
+  destruct ca. {
+    specialize (Htra a b c Hab Hbc) as Hac.
+    specialize (Hant a c Hac Hca) as H; subst c.
+    clear Hac Hca.
+    f_equal.
 ...
   remember (rel c a) as ca eqn:Hca; symmetry in Hca.
   destruct ca; [ | easy ].
