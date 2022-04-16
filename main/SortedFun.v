@@ -842,6 +842,7 @@ remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
+(*1*)
 rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   apply split_length in Hla.
   cbn; flia Hit Hla.
@@ -861,6 +862,17 @@ destruct it; [ easy | cbn ].
 apply Nat.succ_le_mono in Hit.
 remember (split (merge rel la lb)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
+(*2*)
+...
+  ============================
+  msort_loop rel it
+    (merge rel (msort_loop rel it (a :: la)) (msort_loop rel it (b :: lb))) =
+  a :: b :: l
+...
+  ============================
+  msort_loop rel it
+    (merge rel (msort_loop rel it (a :: lc)) (msort_loop rel it (b :: ld))) =
+  a :: b :: l
 ...
 rewrite IHit with (l := b :: ld); [ | flia | | ]; cycle 1. {
   cbn.
