@@ -859,13 +859,8 @@ destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
 (*
-destruct it. {
-  remember (b :: l) as l'; cbn in Hs |-*; subst l'.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  rewrite Bool.andb_true_l in Hs.
-  f_equal.
-Search merge_loop.
+destruct it; [ easy | ].
+...
 *)
 (*1*)
 rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
