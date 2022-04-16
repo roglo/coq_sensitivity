@@ -599,7 +599,7 @@ destruct cd; [ | easy ].
 apply (Htra b c d Hbc Hcd).
 Qed.
 
-Theorem sorted_merge_loop_cons_cons_aux : ∀ A (rel : A → _),
+Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ n it l la lb a b,
@@ -742,6 +742,23 @@ destruct ca. {
 }
 Qed.
 
+Theorem sorted_merge_loop_cons_cons_r : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+   ∀ it l la lb a b,
+   S (S (length l)) ≤ it
+   → rel a a = true
+   → sorted rel (a :: b :: l) = true
+   → split l = (la, lb)
+   → merge_loop rel it la (a :: b :: lb) =
+     merge_loop rel it (a :: la) (b :: lb).
+Proof.
+intros * Hant Htra * Hit Haa Hs Hll.
+specialize (sorted_merge_loop_cons_cons_r_aux Hant Htra 0) as H1.
+cbn - [ sorted ] in H1.
+now apply (H1 it l).
+Qed.
+
 Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -788,8 +805,7 @@ destruct ba; [ | easy ].
 specialize (Hant a b Hab Hba) as H; subst b.
 clear Hba; rename Hab into Haa.
 f_equal.
-specialize (sorted_merge_loop_cons_cons_aux Hant Htra 0) as H1.
-now apply (H1 it l).
+now apply sorted_merge_loop_cons_cons_r with (l := l).
 Qed.
 
 Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
@@ -842,6 +858,14 @@ remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
+(*
+destruct it. {
+  remember (b :: l) as l'; cbn in Hs |-*; subst l'.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite Bool.andb_true_l in Hs.
+  f_equal.
+*)
 (*1*)
 rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
   apply split_length in Hla.
