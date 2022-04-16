@@ -865,6 +865,7 @@ destruct it. {
   destruct ab; [ | easy ].
   rewrite Bool.andb_true_l in Hs.
   f_equal.
+Search merge_loop.
 *)
 (*1*)
 rewrite IHit with (l := a :: la); [ | easy | | ]; cycle 1. {
