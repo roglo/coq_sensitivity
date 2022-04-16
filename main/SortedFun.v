@@ -836,6 +836,39 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → msort_loop rel it l = l.
 Proof.
 intros * Hant Htra Htot * Hit Hs.
+destruct it; [ easy | cbn ].
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+Theorem glop : ∀ A (rel : A → _),
+  ∀ l la lb it it1 it2,
+  length l ≤ S it
+  → length l ≤ S it1
+  → length l ≤ S it2
+  → sorted rel l = true
+  → split l = (la, lb)
+  → msort_loop rel it
+      (merge rel (msort_loop rel it1 la) (msort_loop rel it2 lb)) = l.
+Proof.
+intros * Hit Hit1 Hit2 Hs Hla.
+revert l la lb it1 it2 Hit Hit1 Hit2 Hs Hla.
+induction it; intros; cbn. {
+  destruct l as [| a]. {
+    injection Hla; intros; subst la lb; cbn.
+    now do 2 rewrite msort_loop_nil.
+  }
+  destruct l; [ | now cbn in Hit; flia Hit ].
+  injection Hla; intros; subst la lb; cbn.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+remember (msort_loop rel it1 la) as lc eqn:Hlc; symmetry in Hlc.
+remember (msort_loop rel it2 lb) as ld eqn:Hld; symmetry in Hld.
+move lc before lb; move ld before lc.
+remember (split (merge rel lc ld)) as le eqn:Hle; symmetry in Hle.
+destruct le as (le, lf).
+...
+apply glop.
+...
+intros * Hant Htra Htot * Hit Hs.
 revert l Hit Hs.
 induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it; [ easy | cbn ].
