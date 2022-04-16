@@ -862,6 +862,20 @@ apply Nat.succ_le_mono in Hit.
 remember (split (merge rel la lb)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 ...
+rewrite IHit with (l := b :: ld); [ | flia | | ]; cycle 1. {
+  cbn.
+(* non *)
+...
+rewrite IHit with (l := a :: lc); [ | flia | | ]; cycle 1. {
+  cbn.
+(* que dalle *)
+...
+rewrite IHit; [ | flia | | ]; cycle 1. {
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length.
+  cbn.
+(* mes couilles *)
+...
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ | easy ].
