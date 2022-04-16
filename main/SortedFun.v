@@ -839,6 +839,32 @@ intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
 remember (split l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
+destruct it. {
+  cbn.
+  rewrite <- split_length with (la := l); [ | easy ].
+  destruct l as [| c]; [ easy | ].
+  destruct l; [ | cbn in Hit; flia Hit ].
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+cbn.
+remember (split la) as la1 eqn:Hla1; symmetry in Hla1.
+destruct la1 as (la1, la2).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+remember (split lb) as lb1 eqn:Hlb1; symmetry in Hlb1.
+destruct lb1 as (lb1, lb2).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la); [ | easy ].
+rewrite <- split_length with (la := lb); [ | easy ].
+rewrite <- split_length with (la := l); [ | easy ].
+move la1 before lb; move la2 before la1.
+move lb1 before la2; move lb2 before lb1.
+destruct it. {
+  cbn.
+  rewrite <- split_length with (la := la); [ | easy ].
+  rewrite <- split_length with (la := lb); [ | easy ].
+...
 Theorem glop : ∀ A (rel : A → _),
   ∀ l la lb it it1 it2,
   length l ≤ S it
@@ -866,6 +892,10 @@ move lc before lb; move ld before lc.
 remember (split (merge rel lc ld)) as le eqn:Hle; symmetry in Hle.
 destruct le as (le, lf).
 ...
+specialize (IHit (merge rel lc ld) le lf it it) as H1.
+rewrite merge_length, app_length in H1.
+rewrite <- split_length with (la := la) in H1.
+... continuing sorted_msort_loop ...
 apply glop.
 ...
 intros * Hant Htra Htot * Hit Hs.
