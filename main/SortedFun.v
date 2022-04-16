@@ -860,6 +860,10 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
   apply (sorted_cons_cons_split Htra _ _ _ Hs Hla).
 }
 rewrite (sorted_merge_cons_cons Hant Htra l _ _ Hs Hla).
+destruct it; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
+remember (split (merge rel la lb)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
 ...
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
