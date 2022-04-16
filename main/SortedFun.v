@@ -859,7 +859,6 @@ rewrite IHit with (l := b :: lb); [ | easy | | ]; cycle 1. {
   clear - Hant Htra Htot Hs Hla.
   apply (sorted_cons_cons_split Htra _ _ _ Hs Hla).
 }
-clear IHit.
 rewrite (sorted_merge_cons_cons Hant Htra l _ _ Hs Hla).
 ...
 remember (b :: l) as l'; cbn in Hs; subst l'.
