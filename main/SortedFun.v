@@ -864,6 +864,21 @@ destruct it. {
   cbn.
   rewrite <- split_length with (la := la); [ | easy ].
   rewrite <- split_length with (la := lb); [ | easy ].
+  destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+  destruct l as [| b]. {
+    injection Hla; clear Hla; intros; subst la lb.
+    injection Hla1; clear Hla1; intros; subst la1 la2.
+    injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+    easy.
+  }
+  destruct l; [ | cbn in Hit; flia Hit ].
+  injection Hla; clear Hla; intros; subst la lb.
+  injection Hla1; clear Hla1; intros; subst la1 la2.
+  injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+  cbn in Hs |-*.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ now cbn; rewrite Hab| easy ].
+}
 ...
 Theorem glop : ∀ A (rel : A → _),
   ∀ l la lb it it1 it2,
