@@ -879,6 +879,104 @@ destruct it. {
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ now cbn; rewrite Hab| easy ].
 }
+cbn.
+remember (split la1) as la11 eqn:Hla11; symmetry in Hla11.
+destruct la11 as (la11, la12).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+remember (split la2) as la21 eqn:Hla21; symmetry in Hla21.
+destruct la21 as (la21, la22).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la1); [ | easy ].
+rewrite <- split_length with (la := la2); [ | easy ].
+rewrite <- split_length with (la := la); [ | easy ].
+move la11 before lb2; move la12 before la11.
+move la21 before la11; move la22 before la21.
+remember (split lb1) as lb11 eqn:Hlb11; symmetry in Hlb11.
+destruct lb11 as (lb11, lb12).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+remember (split lb2) as lb21 eqn:Hlb21; symmetry in Hlb21.
+destruct lb21 as (lb21, lb22).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := lb1); [ | easy ].
+rewrite <- split_length with (la := lb2); [ | easy ].
+rewrite <- split_length with (la := lb); [ | easy ].
+move lb11 before la12; move lb12 before lb11.
+move lb21 before lb11; move lb22 before lb21.
+destruct it. {
+  cbn.
+  rewrite <- split_length with (la := la1); [ | easy ].
+  rewrite <- split_length with (la := la2); [ | easy ].
+  rewrite <- split_length with (la := lb1); [ | easy ].
+  rewrite <- split_length with (la := lb2); [ | easy ].
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]. {
+    cbn.
+    injection Hla; clear Hla; intros; subst la lb.
+    injection Hla1; clear Hla1; intros; subst la1 la2.
+    injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+    injection Hla11; clear Hla11; intros; subst la11 la12.
+    injection Hla21; clear Hla21; intros; subst la21 la22.
+    injection Hlb11; clear Hlb11; intros; subst lb11 lb12.
+    injection Hlb21; clear Hlb21; intros; subst lb21 lb22.
+    easy.
+  }
+  destruct l as [| c]. {
+    cbn.
+    injection Hla; clear Hla; intros; subst la lb.
+    injection Hla1; clear Hla1; intros; subst la1 la2.
+    injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+    injection Hla11; clear Hla11; intros; subst la11 la12.
+    injection Hla21; clear Hla21; intros; subst la21 la22.
+    injection Hlb11; clear Hlb11; intros; subst lb11 lb12.
+    injection Hlb21; clear Hlb21; intros; subst lb21 lb22.
+    cbn in Hs |-*.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ cbn | easy ].
+    rewrite Hab; cbn.
+    now rewrite Hab.
+  }
+  destruct l; [ | cbn in Hit; flia Hit ].
+  injection Hla; clear Hla; intros; subst la lb.
+  injection Hla1; clear Hla1; intros; subst la1 la2.
+  injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+  injection Hla11; clear Hla11; intros; subst la11 la12.
+  injection Hla21; clear Hla21; intros; subst la21 la22.
+  injection Hlb11; clear Hlb11; intros; subst lb11 lb12.
+  injection Hlb21; clear Hlb21; intros; subst lb21 lb22.
+  cbn in Hs |-*.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct ab; [ | easy ].
+  destruct bc; [ | easy ].
+  clear Hs.
+  specialize (Htra a b c Hab Hbc) as Hac.
+  rewrite Hac; cbn.
+  rewrite Hac; cbn.
+  rewrite Hab; cbn.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    specialize (Hant b c Hbc Hcb) as H; subst c.
+    clear Hbc Hac; rename Hcb into Hbb; cbn.
+    rewrite Hab; cbn.
+    rewrite Hab; cbn.
+    rewrite Hbb; cbn.
+    rewrite Hab; cbn.
+    rewrite Hbb; cbn.
+    easy.
+  }
+  cbn.
+  rewrite Hac; cbn.
+  rewrite Hab; cbn.
+  rewrite Hcb; cbn.
+  rewrite Hab; cbn.
+  rewrite Hcb; cbn.
+  easy.
+}
+cbn.
 ...
 Theorem glop : ∀ A (rel : A → _),
   ∀ l la lb it it1 it2,
