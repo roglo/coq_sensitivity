@@ -737,10 +737,32 @@ destruct n. {
   }
   destruct l as [| f]. {
     injection Hla; clear Hla; intros; subst la lb.
-...
+    remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+    destruct ca; [ | easy ].
+    cbn in Hs.
+    remember (rel a e) as ae eqn:Hae; symmetry in Hae.
+    remember (rel e c) as ec eqn:Hec; symmetry in Hec.
+    destruct ae; [ | easy ].
+    destruct ec; [ | easy ].
+    specialize (Htra a e c Hae Hec) as Hac.
+    specialize (Hant a c Hac Hca) as H; subst c.
+    clear Hac Hca.
+    f_equal.
+    destruct it; [ easy | cbn ].
+    rewrite Hab.
     destruct it; [ | easy ].
     cbn in Hit; flia Hit.
   }
+  specialize (Hant a b Hab Hbc) as H; subst b.
+  specialize (Hant a d Had Hdc) as H; subst d.
+  clear Hab Had Hdc Hbc.
+  cbn in Hla, Hit.
+  remember (split l) as lg eqn:Hlg; symmetry in Hlg.
+  destruct lg as (lg, lh).
+  injection Hla; clear Hla; intros; subst la lb.
+  rename lg into la; rename lh into lb; rename Hlg into Hla.
+  rename e into b; rename f into d.
+...
   remember (rel c a) as ca eqn:Hca; symmetry in Hca.
   destruct ca; [ | easy ].
   specialize (Hant a d Had Hdc) as H; subst d.
