@@ -820,39 +820,47 @@ destruct ab. {
   remember (merge_loop rel it la (b :: lb)) as lc eqn:Hlc.
   symmetry in Hlc.
   destruct lc as [| c]; [ easy | ].
+  rewrite List_cons_length, Nat.add_succ_l in Hit.
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit la (b :: lb) Hit) as H1.
+  assert (H : sorted rel la = true) by now apply sorted_cons in Hla.
+  specialize (H1 H Hlb); clear H.
+  rewrite Hlc in H1.
+  rewrite H1, Bool.andb_true_r.
   destruct it; [ easy | ].
   cbn in Hlc.
   destruct la as [| d]. {
-    injection Hlc; clear Hlc; intros; subst c lc.
-    now rewrite Hab, Hlb.
+    now injection Hlc; clear Hlc; intros; subst c lc.
   }
   remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
   destruct db. {
-    injection Hlc; clear Hlc; intros H1 H2; subst d.
+    injection Hlc; clear Hlc; intros H2 H3; subst d.
     rename Hdb into Hcb.
-    remember (c :: la) as l'; cbn in Hla; subst l'.
-    apply Bool.andb_true_iff in Hla.
-    destruct Hla as (Hac, Hla).
-    rewrite Hac, Bool.andb_true_l.
-    rewrite List_cons_length in Hit.
-    cbn - [ length ] in Hit.
-    apply Nat.succ_le_mono in Hit.
-    specialize (IHit _ _ Hit Hla Hlb) as H2.
-    cbn in H2; rewrite Hcb in H2.
-    now rewrite <- H1.
+    cbn in Hla.
+    now destruct (rel a c).
   }
-  injection Hlc; clear Hlc; intros H1 H2; subst c.
-  rewrite Hab, Bool.andb_true_l.
-  remember (d :: la) as l'; cbn in Hla; subst l'.
-  apply Bool.andb_true_iff in Hla.
-  destruct Hla as (Had, Hla).
-  rewrite List_cons_length in Hit.
-  cbn - [ length ] in Hit.
-  apply Nat.succ_le_mono in Hit.
-  specialize (IHit _ _ Hit Hla Hlb) as H2.
-  cbn in H2; rewrite Hdb in H2.
-  now rewrite <- H1.
+  now injection Hlc; clear Hlc; intros H2 H3; subst c.
 }
+cbn.
+remember (merge_loop rel it (a :: la) lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ easy | ].
+rewrite Nat.add_comm in Hit.
+rewrite List_cons_length in Hit.
+rewrite Nat.add_comm in Hit.
+rewrite Nat.add_succ_r in Hit.
+apply Nat.succ_le_mono in Hit.
+specialize (IHit (a :: la) lb Hit) as H1.
+assert (H : sorted rel lb = true) by now apply sorted_cons in Hlb.
+specialize (H1 Hla H); clear H.
+rewrite Hlc in H1.
+rewrite H1, Bool.andb_true_r.
+destruct it; [ easy | ].
+cbn in Hlc.
+destruct lb as [| d]. {
+  injection Hlc; clear Hlc; intros; subst c lc.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ easy | ].
 ...
 
 Theorem merge_sorted : ∀ A (rel : A → _),
