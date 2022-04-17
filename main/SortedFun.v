@@ -336,14 +336,6 @@ Fixpoint split {A} (la : list A) :=
       (a :: l1, b :: l2)
   end.
 
-Fixpoint split2 {A} (la : list A) :=
-  match la with
-  | [] | [_] => ([], la)
-  | a :: b :: lb =>
-      let (l1, l2) := split2 lb in
-      (a :: l1, b :: l2)
-  end.
-
 Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
   match it with
   | 0 => la
@@ -351,28 +343,14 @@ Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
       let (l1, l2) := split la in
       let l3 := msort_loop rel it' l1 in
       let l4 := msort_loop rel it' l2 in
-      msort_loop rel it' (merge rel l3 l4)
+      merge rel l3 l4
   end.
 
 Definition msort {A} (rel : A → _) la :=
   msort_loop rel (length la) la.
 
-Fixpoint msort_loop2 {A} (rel : A → A → bool) it la :=
-  match it with
-  | 0 => la
-  | S it' =>
-      let (l1, l2) := split2 la in
-      let l3 := msort_loop2 rel it' l1 in
-      let l4 := msort_loop2 rel it' l2 in
-      msort_loop2 rel it' (merge rel l3 l4)
-  end.
-
-Definition msort2 {A} (rel : A → _) la :=
-  msort_loop2 rel (length la) la.
-
 (*
 Compute (msort Nat.leb [7;5;3;22;8]).
-Compute (msort2 Nat.leb [7;5;3;22;8]).
 Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
 Fixpoint canon_sym_gr_list n k : list nat :=
   match n with
@@ -383,8 +361,7 @@ Fixpoint canon_sym_gr_list n k : list nat :=
   end.
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, msort Nat.leb l) (canon_sym_gr_list_list 4)).
-Compute (map (λ l, msort2 Nat.leb l) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, msort Nat.leb l) (canon_sym_gr_list_list 5)).
 *)
 
 Theorem split_nil_l : ∀ A (la lb : list A),
@@ -482,7 +459,6 @@ revert la.
 induction it; intros; [ easy | cbn ].
 remember (split la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (lb, lc).
-rewrite IHit.
 rewrite merge_length.
 rewrite app_length.
 do 2 rewrite IHit.
@@ -826,6 +802,75 @@ now rewrite Hla.
 Qed.
 
 (* to be completed
+Theorem merge_loop_sorted : ∀ A (rel : A → _),
+  ∀ it la lb,
+  length la + length lb ≤ it
+  → sorted rel la = true
+  → sorted rel lb = true
+  → sorted rel (merge_loop rel it la lb) = true.
+Proof.
+intros * Hit Hla Hlb.
+revert la lb Hit Hla Hlb.
+induction it; intros; [ easy | cbn ].
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  cbn.
+  remember (merge_loop rel it la (b :: lb)) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as [| c]; [ easy | ].
+...
+
+Theorem merge_sorted : ∀ A (rel : A → _),
+  ∀ la lb,
+  sorted rel la = true
+  → sorted rel lb = true
+  → sorted rel (merge rel la lb) = true.
+Proof.
+intros * Hla Hlb.
+unfold merge.
+...
+
+Theorem msort_loop_sorted : ∀ A (rel : A → _),
+  ∀ l it,
+  length l ≤ it
+  → sorted rel (msort_loop rel it l) = true.
+Proof.
+intros * Hit.
+revert l Hit.
+induction it; intros; cbn. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+...
+apply merge_sorted.
+apply IHit.
+(* mouais... sauf que ça marche pas vraiment... *)
+...
+destruct l as [| a]. {
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  now rewrite msort_loop_nil.
+}
+destruct l as [| b]. {
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+apply merge_sorted.
+apply IHit.
+cbn in Hit.
+apply split_length in Hla.
+cbn in Hla.
+...
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+Search (sorted _ (merge _ _ _) = true).
+...
+
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -849,11 +894,11 @@ destruct it. {
 cbn.
 remember (split la) as la1 eqn:Hla1; symmetry in Hla1.
 destruct la1 as (la1, la2).
-rewrite msort_loop_length, merge_length, app_length.
+rewrite merge_length, app_length.
 do 2 rewrite msort_loop_length.
 remember (split lb) as lb1 eqn:Hlb1; symmetry in Hlb1.
 destruct lb1 as (lb1, lb2).
-rewrite msort_loop_length, merge_length, app_length.
+rewrite merge_length, app_length.
 do 2 rewrite msort_loop_length.
 rewrite <- split_length with (la := la); [ | easy ].
 rewrite <- split_length with (la := lb); [ | easy ].
@@ -877,8 +922,9 @@ destruct it. {
   injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
   cbn in Hs |-*.
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ now cbn; rewrite Hab| easy ].
+  now destruct ab.
 }
+...
 cbn.
 remember (split la1) as la11 eqn:Hla11; symmetry in Hla11.
 destruct la11 as (la11, la12).
@@ -1042,9 +1088,27 @@ destruct it. {
   rewrite <- split_length with (la := lb12); [ | easy ].
   rewrite <- split_length with (la := lb21); [ | easy ].
   rewrite <- split_length with (la := lb22); [ | easy ].
-...
   destruct l as [| a]; [ easy | ].
   destruct l as [| b]. {
+    cbn.
+    injection Hla; clear Hla; intros; subst la lb.
+    injection Hla1; clear Hla1; intros; subst la1 la2.
+    injection Hlb1; clear Hlb1; intros; subst lb1 lb2.
+    injection Hla11; clear Hla11; intros; subst la11 la12.
+    injection Hla21; clear Hla21; intros; subst la21 la22.
+    injection Hlb11; clear Hlb11; intros; subst lb11 lb12.
+    injection Hlb21; clear Hlb21; intros; subst lb21 lb22.
+    injection Hla111; clear Hla111; intros; subst la111 la112.
+    injection Hla121; clear Hla121; intros; subst la121 la122.
+    injection Hla211; clear Hla211; intros; subst la211 la212.
+    injection Hla221; clear Hla221; intros; subst la221 la222.
+    injection Hlb111; clear Hlb111; intros; subst lb111 lb112.
+    injection Hlb121; clear Hlb121; intros; subst lb121 lb122.
+    injection Hlb211; clear Hlb211; intros; subst lb211 lb212.
+    injection Hlb221; clear Hlb221; intros; subst lb221 lb222.
+    easy.
+  }
+  destruct l as [| c]. {
     cbn.
 ...
 Theorem glop : ∀ A (rel : A → _),
