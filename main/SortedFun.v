@@ -820,6 +820,15 @@ destruct ab. {
   remember (merge_loop rel it la (b :: lb)) as lc eqn:Hlc.
   symmetry in Hlc.
   destruct lc as [| c]; [ easy | ].
+  destruct it; [ easy | ].
+  cbn in Hlc.
+  destruct la as [| d]. {
+    injection Hlc; clear Hlc; intros; subst c lc.
+    now rewrite Hab, Hlb.
+  }
+  remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
+  destruct db. {
+    injection Hlc; clear Hlc; intros H1 H2; subst d.
 ...
 
 Theorem merge_sorted : ∀ A (rel : A → _),
