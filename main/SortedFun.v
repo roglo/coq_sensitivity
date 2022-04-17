@@ -933,6 +933,41 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   → msort_loop rel it l = l.
 Proof.
 intros * Hant Htra Htot * Hit Hs.
+revert l Hit Hs.
+induction it; intros; [ easy | cbn ].
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+destruct l as [| a]; intros. {
+  injection Hla; intros; subst la lb.
+  now rewrite msort_loop_nil.
+}
+destruct l as [| b]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+rewrite IHit; cycle 1. {
+  apply split_length in Hla.
+  cbn; flia Hit Hla.
+} {
+  now apply sorted_cons_cons_split with (la := la) (lb := lb) in Hs.
+}
+rewrite IHit; cycle 1. {
+  apply split_length in Hla.
+  cbn; flia Hit Hla.
+} {
+  now apply sorted_cons_cons_split with (la := la) (lb := lb) in Hs.
+}
+rewrite sorted_merge_cons_cons with (l := l); [ | easy | easy | easy | easy ].
+f_equal; f_equal.
+...
+intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
 remember (split l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
