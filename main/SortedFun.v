@@ -977,6 +977,75 @@ destruct it. {
   easy.
 }
 cbn.
+remember (split la11) as la111 eqn:Hla111; symmetry in Hla111.
+destruct la111 as (la111, la112).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la11); [ | easy ].
+move la111 before lb12; move la112 before la111.
+remember (split la12) as la121 eqn:Hla121; symmetry in Hla121.
+destruct la121 as (la121, la122).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la12); [ | easy ].
+move la121 before la111; move la122 before la121.
+rewrite <- split_length with (la := la1); [ | easy ].
+(**)
+remember (split la21) as la211 eqn:Hla211; symmetry in Hla211.
+destruct la211 as (la211, la212).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la21); [ | easy ].
+move la211 before lb12; move la212 before la211.
+remember (split la22) as la221 eqn:Hla221; symmetry in Hla221.
+destruct la221 as (la221, la222).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := la22); [ | easy ].
+move la221 before la211; move la222 before la221.
+rewrite <- split_length with (la := la2); [ | easy ].
+(**)
+remember (split lb11) as lb111 eqn:Hlb111; symmetry in Hlb111.
+destruct lb111 as (lb111, lb112).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := lb11); [ | easy ].
+move lb111 before la112; move lb112 before lb111.
+remember (split lb12) as lb121 eqn:Hlb121; symmetry in Hlb121.
+destruct lb121 as (lb121, lb122).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := lb12); [ | easy ].
+move lb121 before lb111; move lb122 before lb121.
+rewrite <- split_length with (la := lb1); [ | easy ].
+(**)
+remember (split lb21) as lb211 eqn:Hlb211; symmetry in Hlb211.
+destruct lb211 as (lb211, lb212).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := lb21); [ | easy ].
+move lb211 before lb112; move lb212 before lb211.
+remember (split lb22) as lb221 eqn:Hlb221; symmetry in Hlb221.
+destruct lb221 as (lb221, lb222).
+rewrite msort_loop_length, merge_length, app_length.
+do 2 rewrite msort_loop_length.
+rewrite <- split_length with (la := lb22); [ | easy ].
+move lb221 before lb211; move lb222 before lb221.
+rewrite <- split_length with (la := lb2); [ | easy ].
+destruct it. {
+  cbn.
+  rewrite <- split_length with (la := la11); [ | easy ].
+  rewrite <- split_length with (la := la12); [ | easy ].
+  rewrite <- split_length with (la := la21); [ | easy ].
+  rewrite <- split_length with (la := la22); [ | easy ].
+  rewrite <- split_length with (la := lb11); [ | easy ].
+  rewrite <- split_length with (la := lb12); [ | easy ].
+  rewrite <- split_length with (la := lb21); [ | easy ].
+  rewrite <- split_length with (la := lb22); [ | easy ].
+...
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]. {
+    cbn.
 ...
 Theorem glop : ∀ A (rel : A → _),
   ∀ l la lb it it1 it2,
