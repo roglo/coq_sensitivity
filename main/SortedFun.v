@@ -801,7 +801,7 @@ apply split_length in Hla.
 now rewrite Hla.
 Qed.
 
-Theorem merge_loop_sorted : ∀ A (rel : A → _),
+Theorem merge_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la lb,
   length la + length lb ≤ it
@@ -875,7 +875,7 @@ cbn in Hlb.
 now destruct (rel b c).
 Qed.
 
-Theorem merge_sorted : ∀ A (rel : A → _),
+Theorem merge_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ la lb,
   sorted rel la = true
@@ -884,11 +884,10 @@ Theorem merge_sorted : ∀ A (rel : A → _),
 Proof.
 intros * Htot * Hla Hlb.
 unfold merge.
-now apply merge_loop_sorted.
+now apply merge_loop_is_sorted.
 Qed.
 
-(* to be completed
-Theorem msort_loop_sorted : ∀ A (rel : A → _),
+Theorem msort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l it,
   length l ≤ it
@@ -901,11 +900,6 @@ induction it; intros; cbn. {
 }
 remember (split l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
-apply merge_sorted; [ easy | | ].
-apply IHit.
-Print msort_loop.
-(* mouais... sauf que ça marche pas vraiment... *)
-...
 destruct l as [| a]. {
   injection Hla; clear Hla; intros; subst la lb; cbn.
   now rewrite msort_loop_nil.
@@ -914,20 +908,21 @@ destruct l as [| b]. {
   injection Hla; clear Hla; intros; subst la lb; cbn.
   now rewrite msort_loop_single, msort_loop_nil.
 }
-apply merge_sorted.
-apply IHit.
-cbn in Hit.
-apply split_length in Hla.
-cbn in Hla.
-...
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
-rename lc into la; rename ld into lb; rename Hlc into Hla.
-Search (sorted _ (merge _ _ _) = true).
-...
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+apply split_length in Hlc.
+apply merge_is_sorted; [ easy | | ]. {
+  apply IHit; cbn; flia Hit Hlc.
+} {
+  apply IHit; cbn; flia Hit Hlc.
+}
+Qed.
 
+(* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -3148,8 +3143,15 @@ Theorem bsort_is_sorted : ∀ A (rel : A → _),
   ∀ l, sorted rel (bsort rel l) = true.
 Proof.
 intros * Htot *.
-unfold bsort.
 now apply bsort_loop_is_sorted.
+Qed.
+
+Theorem msort_is_sorted : ∀ A (rel : A → _),
+  total_relation rel →
+  ∀ l, sorted rel (msort rel l) = true.
+Proof.
+intros * Htot *.
+now apply msort_loop_is_sorted.
 Qed.
 
 (* *)
