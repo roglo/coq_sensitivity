@@ -889,20 +889,21 @@ Qed.
 
 (* to be completed
 Theorem msort_loop_sorted : ∀ A (rel : A → _),
+  total_relation rel →
   ∀ l it,
   length l ≤ it
   → sorted rel (msort_loop rel it l) = true.
 Proof.
-intros * Hit.
+intros * Htot * Hit.
 revert l Hit.
 induction it; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
 remember (split l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
-...
-apply merge_sorted.
+apply merge_sorted; [ easy | | ].
 apply IHit.
+Print msort_loop.
 (* mouais... sauf que ça marche pas vraiment... *)
 ...
 destruct l as [| a]. {
