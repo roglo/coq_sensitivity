@@ -937,7 +937,7 @@ revert l Hit Hs.
 induction it; intros; [ easy | cbn ].
 remember (split l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
-destruct l as [| a]; intros. {
+destruct l as [| a]. {
   injection Hla; intros; subst la lb.
   now rewrite msort_loop_nil.
 }
@@ -966,6 +966,37 @@ rewrite IHit; cycle 1. {
 }
 rewrite sorted_merge_cons_cons with (l := l); [ | easy | easy | easy | easy ].
 f_equal; f_equal.
+(**)
+do 2 apply sorted_cons in Hs.
+clear it a b IHit Hit.
+move Hs before Hla.
+unfold merge.
+remember (length la + length lb) as it eqn:H.
+assert (Hit : length la + length lb ≤ it) by now rewrite H.
+clear H.
+revert l la lb Hs Hla Hit.
+induction it; intros. {
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (Ha, Hb).
+  apply length_zero_iff_nil in Ha, Hb.
+  subst la lb; cbn.
+  now apply split_nil_l in Hla.
+}
+destruct l as [| a]. {
+  now injection Hla; intros; subst la lb.
+}
+destruct l as [| b]. {
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+remember (b :: l) as l'; cbn in Hs; subst l'.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+cbn; rewrite Hab; f_equal.
 ...
 intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
