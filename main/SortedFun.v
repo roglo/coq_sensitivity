@@ -801,15 +801,15 @@ apply split_length in Hla.
 now rewrite Hla.
 Qed.
 
-(* to be completed
 Theorem merge_loop_sorted : ∀ A (rel : A → _),
+  total_relation rel →
   ∀ it la lb,
   length la + length lb ≤ it
   → sorted rel la = true
   → sorted rel lb = true
   → sorted rel (merge_loop rel it la lb) = true.
 Proof.
-intros * Hit Hla Hlb.
+intros * Htot * Hit Hla Hlb.
 revert la lb Hit Hla Hlb.
 induction it; intros; [ easy | cbn ].
 destruct la as [| a]; [ easy | ].
@@ -861,18 +861,33 @@ destruct lb as [| d]. {
   injection Hlc; clear Hlc; intros; subst c lc.
   remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ba; [ easy | ].
-...
+  specialize (Htot a b) as H.
+  now rewrite Hab, Hba in H.
+}
+remember (rel a d) as ad eqn:Had; symmetry in Had.
+destruct ad. {
+  injection Hlc; clear Hlc; intros Hlc H; subst c.
+  specialize (Htot a b) as H2.
+  now rewrite Hab in H2; cbn in H2.
+}
+injection Hlc; clear Hlc; intros Hlc H; subst d.
+cbn in Hlb.
+now destruct (rel b c).
+Qed.
 
 Theorem merge_sorted : ∀ A (rel : A → _),
+  total_relation rel →
   ∀ la lb,
   sorted rel la = true
   → sorted rel lb = true
   → sorted rel (merge rel la lb) = true.
 Proof.
-intros * Hla Hlb.
+intros * Htot * Hla Hlb.
 unfold merge.
-...
+now apply merge_loop_sorted.
+Qed.
 
+(* to be completed
 Theorem msort_loop_sorted : ∀ A (rel : A → _),
   ∀ l it,
   length l ≤ it
