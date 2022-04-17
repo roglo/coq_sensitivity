@@ -829,6 +829,30 @@ destruct ab. {
   remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
   destruct db. {
     injection Hlc; clear Hlc; intros H1 H2; subst d.
+    rename Hdb into Hcb.
+    remember (c :: la) as l'; cbn in Hla; subst l'.
+    apply Bool.andb_true_iff in Hla.
+    destruct Hla as (Hac, Hla).
+    rewrite Hac, Bool.andb_true_l.
+    rewrite List_cons_length in Hit.
+    cbn - [ length ] in Hit.
+    apply Nat.succ_le_mono in Hit.
+    specialize (IHit _ _ Hit Hla Hlb) as H2.
+    cbn in H2; rewrite Hcb in H2.
+    now rewrite <- H1.
+  }
+  injection Hlc; clear Hlc; intros H1 H2; subst c.
+  rewrite Hab, Bool.andb_true_l.
+  remember (d :: la) as l'; cbn in Hla; subst l'.
+  apply Bool.andb_true_iff in Hla.
+  destruct Hla as (Had, Hla).
+  rewrite List_cons_length in Hit.
+  cbn - [ length ] in Hit.
+  apply Nat.succ_le_mono in Hit.
+  specialize (IHit _ _ Hit Hla Hlb) as H2.
+  cbn in H2; rewrite Hdb in H2.
+  now rewrite <- H1.
+}
 ...
 
 Theorem merge_sorted : ∀ A (rel : A → _),
