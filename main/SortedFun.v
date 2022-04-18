@@ -2440,6 +2440,14 @@ intros.
 now apply Permutation_bsort_loop.
 Qed.
 
+(* to be completed
+Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
+Proof.
+intros.
+...
+Qed.
+*)
+
 (* isort and ssort return same *)
 
 Theorem isort_ssort : ∀ (A : Type) (rel : A → A → bool),
