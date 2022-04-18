@@ -946,48 +946,44 @@ Proof. easy. Qed.
 (* to be completed
 Theorem sorted_merge_loop : ∀ A (rel : A → _),
   antisymmetric rel →
+  transitive rel →
   ∀ it l la lb,
   length l ≤ it
   → sorted rel l = true
   → split l = (la, lb)
   → merge_loop rel it la lb = l.
 Proof.
-intros * Hant * Hit Hs Hll.
-remember (length l) as len eqn:Hlen; symmetry in Hlen.
-revert it l la lb Hlen Hit Hs Hll.
-induction len as (len, IHlen) using lt_wf_rec; intros.
+intros * Hant Htra * Hit Hs Hll.
 destruct l as [| a]. {
   injection Hll; intros; subst la lb; cbn.
   now destruct it.
 }
 destruct l as [| b]. {
   injection Hll; intros; subst la lb; cbn.
-  destruct it; [ | easy ].
-  apply Nat.le_0_r in Hit.
-  now subst len.
+  now destruct it.
 }
 cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hll.
-destruct it; [ now apply Nat.le_0_r in Hit; subst len | ].
+destruct it; [ cbn in Hit; flia Hit | ].
 cbn.
 remember (b :: l) as l'; cbn in Hs; subst l'.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
 rewrite Hab; f_equal.
-cbn in Hlen.
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
 clear a Hab.
 rename b into a.
 destruct l as [| b]. {
   injection Hll; clear Hll; intros; subst la lb.
-  destruct it; [ | easy ].
-  flia Hlen Hit.
+  destruct it; [ flia Hit | easy ].
 }
 destruct l as [| c]. {
   injection Hll; clear Hll; intros; subst la lb.
-  destruct it; [ flia Hlen Hit | cbn ].
+  destruct it; [ flia Hit | cbn ].
   cbn in Hs.
   rewrite Bool.andb_true_r in Hs.
   rename Hs into Hab.
@@ -996,19 +992,18 @@ destruct l as [| c]. {
     specialize (Hant a b Hab Hba) as H; subst b.
     rename Hba into Haa; clear Hab.
     f_equal.
-    destruct it; [ | easy ].
-    cbn in Hlen; flia Hlen Hit.
+    destruct it; [ cbn in Hit; flia Hit | easy ].
   }
   f_equal.
-  destruct it; [ | easy ].
-  cbn in Hlen; flia Hlen Hit.
+  destruct it; [ cbn in Hit; flia Hit | easy ].
 }
 cbn in Hll.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hll.
-destruct it; [ cbn in Hlen; flia Hlen Hit | ].
+destruct it; [ flia Hit | ].
+apply Nat.succ_le_mono in Hit; cbn in Hit.
 cbn.
 remember (c :: l) as l'; cbn in Hs; subst l'.
 rewrite Bool.andb_true_iff in Hs; destruct Hs as (Hab, Hs).
@@ -1018,6 +1013,26 @@ destruct ba. {
   specialize (Hant a b Hab Hba) as H; subst b.
   rename Hab into Haa; clear Hba.
   f_equal.
+  rename c into b; rename Hbc into Hab.
+  rewrite sorted_merge_loop_cons_cons_r with (l := l); try easy. 2: {
+    remember (b :: l) as l'; cbn; subst l'.
+    now rewrite Hab, Hs.
+  }
+  replace it with (S (S (it - 2))) by flia Hit.
+  rewrite sorted_merge_loop_cons_cons with (l := l); try easy; cycle 1. {
+    flia Hit.
+  } {
+    remember (b :: l) as l'; cbn; subst l'.
+    now rewrite Hab, Hs.
+  }
+  f_equal; f_equal.
+  remember (it - 2) as it' eqn:H.
+  assert (Hit' : length l ≤ it') by flia Hit H.
+  move Hit' before Hit.
+  clear it Hit H; rename it' into it; rename Hit' into Hit.
+  clear a Hab Haa.
+  apply sorted_cons in Hs.
+  clear b.
 ...
 apply IHlen with (m := len - 1); try easy. {
   cbn in Hlen; flia Hlen.
@@ -1026,7 +1041,6 @@ apply IHlen with (m := len - 1); try easy. {
 } {
   cbn in Hit; flia Hit.
 }
-
 ...
 destruct it; [ now apply Nat.le_0_r in Hit; subst len | ].
 cbn.
