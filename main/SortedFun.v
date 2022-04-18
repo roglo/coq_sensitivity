@@ -505,7 +505,7 @@ injection Hs; clear Hs; intros; subst lc ld c d.
 now exists l.
 Qed.
 
-Theorem sorted_cons_cons_split : ∀ A (rel : A → _),
+Theorem sorted_cons_cons_split' : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la lb l,
   sorted rel (a :: b :: l) = true
@@ -573,6 +573,23 @@ remember (d :: l) as l'; cbn in Hs; subst l'.
 remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
 destruct cd; [ | easy ].
 apply (Htra b c d Hbc Hcd).
+Qed.
+
+Theorem sorted_split : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ la lb l,
+  sorted rel l = true
+  → split l = (la, lb)
+  → sorted rel la = true ∧ sorted rel lb = true.
+Proof.
+intros * Htra * Hs Hla.
+destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+destruct l as [| b]; [ now injection Hla; intros; subst la lb | ].
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+now apply sorted_cons_cons_split' with (l := l).
 Qed.
 
 Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
