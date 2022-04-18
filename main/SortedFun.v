@@ -997,6 +997,49 @@ remember (b :: l) as l'; cbn in Hs; subst l'.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
 cbn; rewrite Hab; f_equal.
+specialize (IHit l la lb) as H1.
+assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
+specialize (H1 H Hla); clear H.
+assert (H : length la + length lb ≤ it). {
+  cbn in Hit; flia Hit.
+}
+specialize (H1 H); clear H.
+destruct it; [ cbn in Hit; flia Hit | ].
+cbn.
+destruct l as [| c]. {
+  now injection Hla; clear Hla; intros; subst la lb.
+}
+destruct l as [| d]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  cbn in Hs.
+  rewrite Bool.andb_true_r in Hs.
+  rename Hs into Hbc.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    specialize (Hant b c Hbc Hcb) as H; subst c.
+    destruct it; [ cbn in Hit; flia Hit | easy ].
+  }
+  destruct it; [ cbn in Hit; flia Hit | easy ].
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn in H1.
+remember (d :: l) as l'; cbn in Hs; subst l'.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+destruct bc; [ | easy ].
+destruct cd; [ | easy ].
+injection H1; clear H1; intros H1.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+  specialize (Hant b c Hbc Hcb) as H; subst c.
+  rename Hbc into Hbb; clear Hcb.
+  f_equal.
+  destruct it; [ easy | ].
+(* ouais, tout ça c'est nul, ça va pas du tout *)
 ...
 intros * Hant Htra Htot * Hit Hs.
 destruct it; [ easy | cbn ].
