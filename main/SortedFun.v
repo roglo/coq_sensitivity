@@ -943,7 +943,7 @@ Theorem fold_merge : ∀ A (rel : A → _) la lb,
   merge_loop rel (length la + length lb) la lb = merge rel la lb.
 Proof. easy. Qed.
 
-(* to be completed
+(* to be simplified *)
 Theorem sorted_merge_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -954,6 +954,11 @@ Theorem sorted_merge_loop : ∀ A (rel : A → _),
   → merge_loop rel it la lb = l.
 Proof.
 intros * Hant Htra * Hit Hs Hll.
+remember (length l) as len eqn:Hlen.
+symmetry in Hlen.
+rewrite <- Hlen in Hit.
+revert it l la lb Hlen Hit Hs Hll.
+induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct l as [| a]. {
   injection Hll; intros; subst la lb; cbn.
   now destruct it.
@@ -975,6 +980,7 @@ destruct Hs as (Hab, Hs).
 rewrite Hab; f_equal.
 cbn in Hit.
 apply Nat.succ_le_mono in Hit.
+cbn in Hlen.
 clear a Hab.
 rename b into a.
 destruct l as [| b]. {
@@ -1030,23 +1036,27 @@ destruct ba. {
   assert (Hit' : length l ≤ it') by flia Hit H.
   move Hit' before Hit.
   clear it Hit H; rename it' into it; rename Hit' into Hit.
+  cbn in Hlen.
   clear a Hab Haa.
   apply sorted_cons in Hs.
   clear b.
-...
-apply IHlen with (m := len - 1); try easy. {
-  cbn in Hlen; flia Hlen.
-} {
-  cbn in Hlen |-*; flia Hlen.
-} {
-  cbn in Hit; flia Hit.
+  apply IHlen with (m := len - 4); try easy; flia Hlen.
 }
-...
-destruct it; [ now apply Nat.le_0_r in Hit; subst len | ].
+f_equal.
+cbn in Hlen.
+apply IHlen with (m := len - 2); try easy; try flia Hlen. {
+  cbn; flia Hlen.
+} {
+  remember (c :: l) as l'; cbn; subst l'.
+  now rewrite Hbc, Hs.
+}
 cbn.
-remember (b :: l) as l'; cbn in Hs; subst l'.
-...
+now rewrite Hll.
+Qed.
 
+Inspect 1.
+
+(* to be completed
 Theorem sorted_merge : ∀ A (rel : A → _),
   ∀ l la lb,
   sorted rel l = true
