@@ -2449,6 +2449,54 @@ revert l la lb lc ld Hit Hll Hac Hbd.
 induction it; intros. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
+destruct l as [| a]. {
+  injection Hll; intros; subst la lb.
+  now apply Permutation_nil in Hac, Hbd; subst lc ld.
+}
+destruct l as [| b]. {
+  injection Hll; intros; subst la lb.
+  apply Permutation_length_1_inv in Hac; subst lc.
+  now apply Permutation_nil in Hbd; subst ld.
+}
+cbn in Hll.
+remember (split l) as le eqn:H; symmetry in H.
+destruct le as (le, lf).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename H into Hll.
+destruct l as [| c]. {
+  injection Hll; intros; subst le lf.
+  apply Permutation_length_1_inv in Hac, Hbd; subst la lb; cbn.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    destruct it; [ cbn in Hit; flia Hit | easy ].
+  }
+  destruct it; [ cbn in Hit; flia Hit | constructor ].
+}
+destruct l as [| d]. {
+  injection Hll; clear Hll; intros; subst le lf.
+  apply Permutation_length_1_inv in Hbd; subst lb.
+  apply Permutation_length_2_inv in Hac.
+  destruct Hac as [Hac| Hac]; subst la; cbn. {
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. {
+      destruct it; [ cbn in Hit; flia Hit | ].
+      constructor; cbn.
+      remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+      destruct cb. {
+        destruct it; [ cbn in Hit; flia Hit | constructor ].
+      }
+      constructor.
+      destruct it; [ cbn in Hit; flia Hit | easy ].
+    }
+    destruct it; [ cbn in Hit; flia Hit | constructor ].
+  }
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    destruct it; [ cbn in Hit; flia Hit | cbn ].
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. {
+      destruct it; [ cbn in Hit; flia Hit | cbn ].
+      apply perm_trans with (l' := [b; a; c]); [ constructor | ].
 ...
 
 Theorem Permutation_merge : ∀ A (rel : A → _) l la lb lc ld,
@@ -2469,15 +2517,6 @@ destruct l as [| a]. {
   injection Hs; intros; subst la lb.
   now apply Permutation_nil in Hac, Hbd; subst lc ld.
 }
-destruct l as [| b]. {
-  injection Hs; intros; subst la lb.
-  apply Permutation_length_1_inv in Hac; subst lc.
-  now apply Permutation_nil in Hbd; subst ld.
-}
-cbn in Hs.
-remember (split l) as le eqn:Hll; symmetry in Hll.
-destruct le as (le, lf).
-injection Hs; clear Hs; intros; subst la lb.
 ...
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
