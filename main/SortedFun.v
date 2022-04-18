@@ -975,7 +975,11 @@ clear a b.
 (**)
 clear it IHit Hit.
 move Hs before Hla.
-destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+(* 111 *)
+revert la lb Hla.
+induction l as [| a]; intros; [ now injection Hla; intros; subst la lb | ].
+assert (H : sorted rel l = true) by now apply sorted_cons in Hs.
+specialize (IHl H); clear H.
 destruct l as [| b]; [ now injection Hla; intros; subst la lb | ].
 cbn in Hla.
 remember (split l) as lc eqn:Hlc; symmetry in Hlc.
@@ -1022,6 +1026,34 @@ destruct ab. {
   specialize (fold_merge rel la (a :: b :: lb)) as H1.
   cbn in H1; rewrite H1; clear H1.
 (*2*)
+  unfold merge.
+  rewrite sorted_merge_loop_cons_cons_r with (l := l); try easy; cycle 1. {
+    cbn.
+    apply split_length in Hla.
+    flia Hla.
+  } {
+    remember (b :: l) as l'; cbn; subst l'.
+    now rewrite Hab, Hs.
+  }
+  do 2 rewrite List_cons_length, Nat.add_succ_r.
+  rewrite sorted_merge_loop_cons_cons with (l := l); try easy; cycle 1. {
+    now apply split_length in Hla; rewrite Hla.
+  } {
+    remember (b :: l) as l'; cbn; subst l'.
+    now rewrite Hab, Hs.
+  }
+  f_equal; f_equal.
+  rewrite fold_merge.
+  apply sorted_cons in Hs.
+...
+  clear a b Haa Hab.
+  move Hs before Hla.
+(* 222 *)
+...
+  Hs : sorted rel l = true
+  Hla : split l = (la, lb)
+  ============================
+  merge rel la lb = l
 ...
   Hs : sorted rel (b :: l) = true
   Hla : split l = (la, lb)
