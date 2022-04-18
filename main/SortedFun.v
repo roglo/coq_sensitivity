@@ -2437,9 +2437,52 @@ apply Permutation_bsort_loop.
 Qed.
 
 (* to be completed
+Theorem Permutation_merge : ∀ A (rel : A → _) l la lb lc ld,
+  split l = (la, lb)
+  → Permutation la lc
+  → Permutation lb ld
+  → Permutation l (merge rel lc ld).
+Proof.
+intros * Hs Hac Hbd.
+unfold merge.
+...
+
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
 Proof.
 intros.
+unfold msort.
+Theorem Permutation_msort_loop : ∀ A (rel : A → _) it l,
+  length l ≤ it
+  → Permutation l (msort_loop rel it l).
+Proof.
+intros * Hit.
+revert l Hit.
+induction it; intros; [ easy | cbn ].
+remember (split l) as la eqn:Hll; symmetry in Hll.
+destruct la as (la, lb).
+destruct l as [| a]. {
+  injection Hll; intros; subst la lb.
+  now rewrite msort_loop_nil.
+}
+destruct l as [| b]. {
+  injection Hll; intros; subst la lb.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+cbn in Hll.
+remember (split l) as lc eqn:Hll'; symmetry in Hll'.
+destruct lc as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hll' into Hll.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+...
+apply (Permutation_merge rel) with (la := a :: la) (lb := b :: lb); cycle 1. {
+  apply split_length in Hll.
+  apply IHit; cbn; flia Hit Hll.
+} {
+  apply split_length in Hll.
+  apply IHit; cbn; flia Hit Hll.
+}
+now cbn; rewrite Hll.
 ...
 Qed.
 *)
