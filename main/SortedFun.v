@@ -2531,7 +2531,35 @@ destruct ab. {
   specialize (H1 H it); clear H.
   specialize (H1 l la lb Hlen Hit Hll).
   cbn.
-(* mouais... *)
+  destruct l as [| c]. {
+    now injection Hll; intros; subst la lb.
+  }
+  destruct l as [| d]. {
+    injection Hll; intros; subst la lb.
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb; [ | now destruct it ].
+    destruct it; [ | constructor ].
+    now apply Permutation_sym, Permutation_nil in H1.
+  }
+  cbn in Hll.
+  remember (split l) as ll eqn:H; symmetry in H.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename H into Hll.
+  cbn in Hit.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    destruct it; [ easy | ].
+    apply Nat.succ_le_mono in Hit.
+    apply perm_trans with (l' := c :: b :: d :: l); [ constructor | ].
+    constructor.
+    cbn in H1.
+... ça, c'est pas bon, ci-dessous
+    apply (IHlen len).
+...
+  destruct cb; [ now destruct it | ].
+    destruct it; [ | constructor ].
+    now apply Permutation_sym, Permutation_nil in H1.
 ...
 
 Theorem Permutation_merge : ∀ A (rel : A → _) l la lb,
