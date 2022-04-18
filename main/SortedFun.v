@@ -922,6 +922,10 @@ apply merge_is_sorted; [ easy | | ]. {
 }
 Qed.
 
+Theorem fold_merge : ∀ A (rel : A → _) la lb,
+  merge_loop rel (length la + length lb) la lb = merge rel la lb.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
@@ -966,10 +970,92 @@ rewrite IHit; cycle 1. {
 }
 rewrite sorted_merge_cons_cons with (l := l); [ | easy | easy | easy | easy ].
 f_equal; f_equal.
-(**)
 do 2 apply sorted_cons in Hs.
-clear it a b IHit Hit.
+clear a b.
+(**)
+clear it IHit Hit.
 move Hs before Hla.
+destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+destruct l as [| b]; [ now injection Hla; intros; subst la lb | ].
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn.
+remember (b :: l) as l'; cbn in Hs; subst l'.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+rewrite Hab; f_equal.
+specialize (fold_merge rel la (b :: lb)) as H1.
+cbn in H1; rewrite H1; clear H1.
+clear a Hab.
+(*1*)
+destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  cbn in Hs.
+  rewrite Bool.andb_true_r in Hs.
+  rename Hs into Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  now specialize (Hant a b Hab Hba) as H; subst b.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn.
+remember (c :: l) as l'; cbn in Hs; subst l'.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hba, Hs).
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hac, Hs).
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  specialize (Hant a b Hab Hba) as H; subst b.
+  rename c into b.
+  rename Hba into Haa; clear Hab.
+  rename Hac into Hab.
+  f_equal.
+  specialize (fold_merge rel la (a :: b :: lb)) as H1.
+  cbn in H1; rewrite H1; clear H1.
+(*2*)
+...
+  Hs : sorted rel (b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge rel la (b :: lb) = b :: l
+...
+  Haa : rel a a = true
+  Hab : rel a b = true
+  Hs : sorted rel (b :: l) = true
+  Hla : split l = (la, lb)
+  ============================
+  merge rel la (a :: b :: lb) = a :: b :: l
+...
+rewrite Hab; f_equal.
+specialize (fold_merge rel la (b :: lb)) as H1.
+cbn in H1; rewrite H1; clear H1.
+clear a Hab.
+destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
+destruct l as [| c]. {
+  injection Hla; clear Hla; intros; subst la lb; cbn.
+  cbn in Hs.
+  rewrite Bool.andb_true_r in Hs.
+  rename Hs into Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  now specialize (Hant a b Hab Hba) as H; subst b.
+}
+cbn in Hla.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hlc into Hla.
+cbn.
+...
 unfold merge.
 remember (length la + length lb) as it eqn:H.
 assert (Hit : length la + length lb ≤ it) by now rewrite H.
