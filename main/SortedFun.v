@@ -2445,6 +2445,22 @@ Theorem Permutation_merge : ∀ A (rel : A → _) l la lb lc ld,
 Proof.
 intros * Hs Hac Hbd.
 unfold merge.
+rewrite <- (Permutation_length Hac).
+rewrite <- (Permutation_length Hbd).
+rewrite <- (split_length l Hs).
+destruct l as [| a]. {
+  injection Hs; intros; subst la lb.
+  now apply Permutation_nil in Hac, Hbd; subst lc ld.
+}
+destruct l as [| b]. {
+  injection Hs; intros; subst la lb.
+  apply Permutation_length_1_inv in Hac; subst lc.
+  now apply Permutation_nil in Hbd; subst ld.
+}
+cbn in Hs.
+remember (split l) as le eqn:Hll; symmetry in Hll.
+destruct le as (le, lf).
+injection Hs; clear Hs; intros; subst la lb.
 ...
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
