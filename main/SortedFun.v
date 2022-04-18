@@ -389,6 +389,35 @@ destruct la as [| b]. {
 now destruct (split la).
 Qed.
 
+Fixpoint split_inv {A} (la lb : list A) :=
+  match la, lb with
+  | _, [] => la
+  | [], _ => lb
+  | a :: la, b :: lb => a :: b :: split_inv la lb
+  end.
+
+Theorem split_split_inv : ∀ A (la lb : list A),
+  (length la = length lb ∨ length la = S (length lb))
+  → split (split_inv la lb) = (la, lb).
+Proof.
+intros * Hlen.
+revert lb Hlen.
+induction la as [| a]; intros. {
+  destruct Hlen as [Hlen| Hlen]; [ | easy ].
+  now destruct lb.
+}
+cbn.
+destruct lb as [| b]. {
+  destruct Hlen as [Hlen| Hlen]; [ easy | ].
+  cbn in Hlen; apply Nat.succ_inj in Hlen.
+  now apply length_zero_iff_nil in Hlen; subst la; cbn.
+}
+cbn.
+rewrite (IHla lb); [ easy | ].
+cbn in Hlen.
+now destruct Hlen as [H| H]; [ left | right ]; now apply Nat.succ_inj in H.
+Qed.
+
 Theorem merge_loop_length : ∀ A (rel : A → _) la lb it,
   length (la ++ lb) ≤ it
   → length (merge_loop rel it la lb) = length (la ++ lb).
@@ -449,6 +478,36 @@ rewrite Nat.add_succ_r; f_equal; f_equal.
 do 2 apply Nat.succ_inj in Hlen.
 apply (IHlen len) in Hll; [ easy | | easy ].
 now transitivity (S len).
+Qed.
+
+Theorem split_lengths : ∀ A (l la lb : list A),
+  split l = (la, lb)
+  → length la = length lb ∨ length la = S (length lb).
+Proof.
+intros * Hll.
+remember (length l) as len eqn:Hlen.
+revert l la lb Hlen Hll.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct l as [| a]; intros; cbn. {
+  now injection Hll; intros; subst la lb; left.
+}
+destruct l as [| b]; intros; cbn. {
+  now injection Hll; intros; subst la lb; right.
+}
+cbn in Hll.
+remember (split l) as ll eqn:H; symmetry in H.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename H into Hll.
+destruct len; [ easy | ].
+destruct len; [ easy | ].
+cbn in Hlen |-*.
+do 2 apply Nat.succ_inj in Hlen.
+specialize (IHlen len) as H1.
+assert (H : len < S (S len)) by now transitivity (S len).
+specialize (H1 H); clear H.
+specialize (H1 l la lb Hlen Hll).
+now destruct H1 as [H1| H1]; rewrite H1; [ left | right ].
 Qed.
 
 Theorem msort_loop_length : ∀ A (rel : A → _) it la,
@@ -2436,7 +2495,7 @@ intros.
 apply Permutation_bsort_loop.
 Qed.
 
-(* to be completed
+(*
 Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb lc ld,
   length l ≤ it
   → split l = (la, lb)
@@ -2498,25 +2557,15 @@ destruct l as [| d]. {
       destruct it; [ cbn in Hit; flia Hit | cbn ].
       apply perm_trans with (l' := [b; a; c]); [ constructor | ].
 ...
+*)
 
-Theorem Permutation_merge : ∀ A (rel : A → _) l la lb lc ld,
+(* to be completed
+Theorem Permutation_merge : ∀ A (rel : A → _) l la lb,
   split l = (la, lb)
-  → Permutation la lc
-  → Permutation lb ld
-  → Permutation l (merge rel lc ld).
+  → Permutation l (merge rel la lb).
 Proof.
-intros * Hs Hac Hbd.
+intros * Hll.
 unfold merge.
-rewrite <- (Permutation_length Hac).
-rewrite <- (Permutation_length Hbd).
-rewrite <- (split_length l Hs).
-...
-now apply (@Permutation_merge_loop _ rel (length l) l la lb).
-...
-destruct l as [| a]. {
-  injection Hs; intros; subst la lb.
-  now apply Permutation_nil in Hac, Hbd; subst lc ld.
-}
 ...
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
@@ -2546,6 +2595,22 @@ destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hll' into Hll.
 cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (msort_loop rel it (a :: la)) as lc eqn:Hlc.
+remember (msort_loop rel it (b :: lb)) as ld eqn:Hld.
+...
+destruct l as [| a]. {
+  injection Hs; intros; subst la lb.
+  now apply Permutation_nil in Hac, Hbd; subst lc ld.
+}
+...
+transitivity (split_inv lc ld). 2: {
+  apply Permutation_merge.
+  apply split_split_inv.
+  subst lc ld.
+  do 2 rewrite msort_loop_length; cbn; f_equal.
+  apply split_lengths in Hll.
+  now destruct Hll as [Hll| Hll]; rewrite Hll; [ left | right ].
+}
 ...
 apply (Permutation_merge rel) with (la := a :: la) (lb := b :: lb); cycle 1. {
   apply split_length in Hll.
