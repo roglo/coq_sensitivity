@@ -2495,77 +2495,54 @@ intros.
 apply Permutation_bsort_loop.
 Qed.
 
-(*
-Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb lc ld,
+(* to be completed
+Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb,
   length l ≤ it
   → split l = (la, lb)
-  → Permutation la lc
-  → Permutation lb ld
-  → Permutation l (merge_loop rel it lc ld).
+  → Permutation l (merge_loop rel it la lb).
 Proof.
-intros * Hit Hll Hac Hbd.
-revert l la lb lc ld Hit Hll Hac Hbd.
-induction it; intros. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
-}
+intros * Hit Hll.
+remember (length l) as len eqn:Hlen.
+rewrite Hlen in Hit.
+revert it l la lb Hlen Hit Hll.
+induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct l as [| a]. {
-  injection Hll; intros; subst la lb.
-  now apply Permutation_nil in Hac, Hbd; subst lc ld.
+  now injection Hll; intros; subst la lb; destruct it.
 }
 destruct l as [| b]. {
-  injection Hll; intros; subst la lb.
-  apply Permutation_length_1_inv in Hac; subst lc.
-  now apply Permutation_nil in Hbd; subst ld.
+  now injection Hll; intros; subst la lb; destruct it.
 }
 cbn in Hll.
-remember (split l) as le eqn:H; symmetry in H.
-destruct le as (le, lf).
+remember (split l) as ll eqn:H; symmetry in H.
+destruct ll as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename H into Hll.
-destruct l as [| c]. {
-  injection Hll; intros; subst le lf.
-  apply Permutation_length_1_inv in Hac, Hbd; subst la lb; cbn.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    destruct it; [ cbn in Hit; flia Hit | easy ].
-  }
-  destruct it; [ cbn in Hit; flia Hit | constructor ].
-}
-destruct l as [| d]. {
-  injection Hll; clear Hll; intros; subst le lf.
-  apply Permutation_length_1_inv in Hbd; subst lb.
-  apply Permutation_length_2_inv in Hac.
-  destruct Hac as [Hac| Hac]; subst la; cbn. {
-    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab. {
-      destruct it; [ cbn in Hit; flia Hit | ].
-      constructor; cbn.
-      remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-      destruct cb. {
-        destruct it; [ cbn in Hit; flia Hit | constructor ].
-      }
-      constructor.
-      destruct it; [ cbn in Hit; flia Hit | easy ].
-    }
-    destruct it; [ cbn in Hit; flia Hit | constructor ].
-  }
-  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-  destruct cb. {
-    destruct it; [ cbn in Hit; flia Hit | cbn ].
-    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab. {
-      destruct it; [ cbn in Hit; flia Hit | cbn ].
-      apply perm_trans with (l' := [b; a; c]); [ constructor | ].
+cbn in Hit.
+destruct it; [ easy | apply Nat.succ_le_mono in Hit ].
+destruct it; [ easy | apply Nat.succ_le_mono in Hit ].
+remember (S it) as it'; cbn; subst it'.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  constructor; cbn in Hlen.
+  destruct len; [ easy | apply Nat.succ_inj in Hlen ].
+  destruct len; [ easy | apply Nat.succ_inj in Hlen ].
+  specialize (IHlen len) as H1.
+  assert (H : len < S (S len)) by now transitivity (S len).
+  specialize (H1 H it); clear H.
+  specialize (H1 l la lb Hlen Hit Hll).
+  cbn.
+(* mouais... *)
 ...
-*)
 
-(* to be completed
 Theorem Permutation_merge : ∀ A (rel : A → _) l la lb,
   split l = (la, lb)
   → Permutation l (merge rel la lb).
 Proof.
 intros * Hll.
 unfold merge.
+rewrite <- (split_length l); [ | easy ].
+...
+now apply Permutation_merge_loop.
 ...
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
