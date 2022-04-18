@@ -2421,23 +2421,19 @@ Qed.
 Theorem Permutation_isort : ∀ A (rel : A → _) l, Permutation l (isort rel l).
 Proof.
 intros.
-destruct l as [| a]; [ easy | cbn ].
-specialize Permutation_isort_loop as H1.
-apply (H1 _ rel [a] l).
+apply (Permutation_isort_loop rel [] l).
 Qed.
 
 Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
 Proof.
 intros.
-destruct l as [| a]; [ easy | ].
-specialize (Permutation_ssort_loop rel) as H1.
-now apply H1 with (len := length (a :: l)).
+now apply Permutation_ssort_loop.
 Qed.
 
 Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
 Proof.
 intros.
-now apply Permutation_bsort_loop.
+apply Permutation_bsort_loop.
 Qed.
 
 (* to be completed
