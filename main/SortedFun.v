@@ -2437,6 +2437,20 @@ apply Permutation_bsort_loop.
 Qed.
 
 (* to be completed
+Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb lc ld,
+  length l ≤ it
+  → split l = (la, lb)
+  → Permutation la lc
+  → Permutation lb ld
+  → Permutation l (merge_loop rel it lc ld).
+Proof.
+intros * Hit Hll Hac Hbd.
+revert l la lb lc ld Hit Hll Hac Hbd.
+induction it; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+...
+
 Theorem Permutation_merge : ∀ A (rel : A → _) l la lb lc ld,
   split l = (la, lb)
   → Permutation la lc
@@ -2448,6 +2462,9 @@ unfold merge.
 rewrite <- (Permutation_length Hac).
 rewrite <- (Permutation_length Hbd).
 rewrite <- (split_length l Hs).
+...
+now apply (@Permutation_merge_loop _ rel (length l) l la lb).
+...
 destruct l as [| a]. {
   injection Hs; intros; subst la lb.
   now apply Permutation_nil in Hac, Hbd; subst lc ld.
