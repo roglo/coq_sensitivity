@@ -1,9 +1,7 @@
 (* Testing if a list is a permutation of another one *)
 
-(*
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
-*)
 
 Require Import Utf8 Arith Permutation.
 
@@ -60,6 +58,29 @@ split; [ easy | ].
 now cbn; f_equal.
 Qed.
 
+Theorem extract_None : ∀ A (f : A → _) l,
+  extract f l = None → l = [] ∨ ∀ a, a ∈ l → f a = false.
+Proof.
+intros * He.
+induction l as [| a]; [ now left | right ].
+intros b Hb.
+cbn in He.
+assert (H : extract f l = None). {
+  destruct (f a); [ easy | ].
+  remember (extract f l) as lxl eqn:Hlxl; symmetry in Hlxl.
+  now destruct lxl as [((bef, x), aft)| ].
+}
+specialize (IHl H); clear H.
+destruct IHl as [Hl| Hf]. {
+  subst l.
+  destruct Hb as [Hb| Hb]; [ subst b | easy ].
+  now destruct (f a).
+}
+destruct Hb as [Hb| Hb]; [ | now apply Hf ].
+subst b.
+now destruct (f a).
+Qed.
+
 (* to be completed
 Theorem Permutation_permutation : ∀ A (eqb : A → _) la lb,
   equality eqb →
@@ -82,8 +103,15 @@ split. {
     apply Permutation_cons_app_inv with (a := a).
     now rewrite <- Hlb.
   }
-Print extract.
-Theorem extract_None : ∀ A (f : A → _) l,
-  extract f l = None → l = [] ∨ ∀ a, a ∈ l => f a = false.
+  apply extract_None in Hlxl.
+  destruct Hlxl as [Hlb| Hla]. {
+    subst lb.
+    apply Permutation_sym in Hpab.
+    now apply Permutation_nil_cons in Hpab.
+  }
+  specialize (Permutation_in a Hpab (or_introl eq_refl)) as H.
+  specialize (Hla a H); clear H.
+  now rewrite (equality_refl Heqb) in Hla.
+} {
 ...
 *)
