@@ -1243,6 +1243,14 @@ apply perm_skip.
 now apply IHlb.
 Qed.
 
+Theorem in_isort_insert_id : ∀ A (rel : A → _) a l,
+  a ∈ isort_insert rel a l.
+Proof.
+intros.
+induction l as [| b]; [ now left | cbn ].
+now destruct (rel a b); [ left | right ].
+Qed.
+
 (* to be completed
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -1250,22 +1258,19 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
-(*
 intros * Heqb * Hab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (extract_None_iff _ _ Hlxl a) as H1.
-  specialize (equality_refl Heqb a) as H2.
-  apply Bool.not_false_iff_true in H2.
-  exfalso; apply H2, H1.
-  clear.
-  induction lb as [| b]; [ now left | cbn ].
-  now destruct (rel a b); [ left | right ].
+  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
+  specialize (in_isort_insert_id rel a lb) as H.
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
 }
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
+...
 replace (bef ++ aft) with lb; [ easy | ].
 clear Hab Hbef la.
 revert a bef aft Hli.
@@ -1294,7 +1299,6 @@ destruct ab. 2: {
     specialize (IHlb a aft Hli) as H1.
     rewrite <- H1.
 ...
-*)
 intros * Heqb * Hab.
 revert a lb Hab.
 induction la as [| b]; intros; cbn in Hab |-*. {

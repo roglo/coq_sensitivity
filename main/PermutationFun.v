@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Permutation.
+Require Import Utf8 Arith.
 
 Import List List.ListNotations.
 Require Import Misc.
@@ -100,6 +100,65 @@ split. {
   now apply Hf; right.
 }
 Qed.
+
+Theorem permutation_in : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  is_permutation eqb la lb = true →
+  ∀ a, a ∈ la → a ∈ lb.
+Proof.
+intros * Heqb * Hab * Hla.
+revert a lb Hab Hla.
+induction la as [| b]; intros; [ easy | cbn ].
+cbn in Hab.
+remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x lb.
+destruct Hla as [Hla| Hla]. {
+  now subst b; apply in_or_app; right; left.
+}
+assert (Ha : a ∈ bef ++ aft) by now apply IHla.
+apply in_app_or in Ha.
+apply in_or_app.
+now destruct Ha; [ left | right; right ].
+Qed.
+
+(* to be completed
+Theorem permutation_trans : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc,
+  is_permutation eqb la lb = true
+  → is_permutation eqb lb lc = true
+  → is_permutation eqb la lc = true.
+Proof.
+intros * Heqb * Hab Hbc.
+revert lb lc Hab Hbc.
+induction la as [| a]; intros; cbn. {
+  now cbn in Hab, Hbc; destruct lb.
+}
+cbn in Hab.
+remember (extract (eqb a) lc) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft) | ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hlb).
+  apply Heqb in H; subst x.
+  specialize (permutation_in Heqb lb lc Hbc) as H2.
+  specialize (H2 a) as H3.
+  assert (H : a ∈ lb) by now subst lb; apply in_or_app; right; left.
+  specialize (H3 H); clear H.
+  specialize (H1 _ H3) as H4.
+  now rewrite (equality_refl Heqb) in H4.
+}
+...
+*)
+
+Require Import Permutation.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),
   equality eqb →
