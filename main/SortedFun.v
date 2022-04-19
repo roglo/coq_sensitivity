@@ -1,4 +1,4 @@
-(* Sorted by relation functions *)
+(* Sorting algorithms : bubble, selection, insertion, merge *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
