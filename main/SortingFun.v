@@ -1250,6 +1250,52 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
+(*
+intros * Heqb * Hab.
+cbn.
+remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (extract_None _ _ Hlxl a) as H1.
+  specialize (equality_refl Heqb a) as H2.
+  apply Bool.not_false_iff_true in H2.
+  exfalso; apply H2, H1.
+  clear.
+  induction lb as [| b]; [ now left | cbn ].
+  now destruct (rel a b); [ left | right ].
+}
+apply extract_Some in Hlxl.
+destruct Hlxl as (Hbef & H & Hli).
+apply Heqb in H; subst x.
+replace (bef ++ aft) with lb; [ easy | ].
+clear Hab Hbef la.
+revert a bef aft Hli.
+induction lb as [| b]; intros; cbn. {
+  cbn in Hli.
+  symmetry in Hli.
+  apply app_eq_unit in Hli.
+  destruct Hli as [(H1, H2)| ]; [ | easy ].
+  now injection H2; clear H2; intros; subst bef aft.
+}
+cbn in Hli.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. 2: {
+  destruct bef as [| c]. {
+    cbn in Hli |-*.
+    injection Hli; clear Hli; intros Hli H; subst b.
+    clear IHlb.
+    clear Hab.
+    revert a aft Hli.
+    induction lb as [| c]; intros; [ easy | ].
+    cbn in Hli.
+    remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+    destruct ac; [ easy | ].
+    destruct aft as [| b]; [ easy | ].
+    injection Hli; clear Hli; intros Hli H; subst c.
+    specialize (IHlb a aft Hli) as H1.
+    rewrite <- H1.
+...
+*)
 intros * Heqb * Hab.
 revert a lb Hab.
 induction la as [| b]; intros; cbn in Hab |-*. {
@@ -1272,6 +1318,8 @@ destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+specialize (IHla a _ Hab) as H1.
+...
 apply extract_Some in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
 apply Heqb in H; subst x.
@@ -1279,9 +1327,14 @@ remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef'', x), aft'')| ]. 2: {
   specialize (extract_None _ _ Hlxl) as H1.
-  assert (H : eqb b b = false). {
-    apply H1.
-    subst lb.
+  assert (Ha : a ∉ bef). {
+    intros Ha.
+    specialize (Hbef _ Ha) as H2.
+    now rewrite (equality_refl Heqb) in H2.
+  }
+...
+  remember (eqb b a) as eba eqn:Heba; symmetry in Heba.
+  destruct eba. {
 ...
   specialize (equality_refl Heqb a) as H2.
   apply Bool.not_false_iff_true in H2.
@@ -1322,13 +1375,14 @@ destruct lxl as [((bef', x), aft')| ]. {
 ...
 *)
 
-Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
+Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
 intros * Heqb * Hab.
+Inspect 1.
 apply Permutation_permutation in Hab; [ | easy ].
 apply Permutation_permutation; [ easy | ].
 now apply Permutation_cons_isort_insert.
