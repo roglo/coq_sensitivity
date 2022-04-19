@@ -1318,7 +1318,12 @@ destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]; [ | easy ].
-specialize (IHla a _ Hab) as H1.
+apply extract_Some in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+assert (H : is_permutation eqb (b :: la) (bef' ++ b :: aft') = true). {
+Check Permutation_cons_app.
 ...
 apply extract_Some in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
@@ -1382,7 +1387,6 @@ Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
 intros * Heqb * Hab.
-Inspect 1.
 apply Permutation_permutation in Hab; [ | easy ].
 apply Permutation_permutation; [ easy | ].
 now apply Permutation_cons_isort_insert.
