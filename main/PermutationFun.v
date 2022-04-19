@@ -126,6 +126,51 @@ now destruct Ha; [ left | right; right ].
 Qed.
 
 (* to be completed
+Theorem permutation_app_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc ld a,
+  is_permutation eqb (la ++ a :: lb) (lc ++ a :: ld) = true
+  → is_permutation eqb (la ++ lb) (lc ++ ld) = true.
+Proof.
+intros * Heqb * Hp.
+revert lb lc ld a Hp.
+induction la as [| b]; intros; cbn in Hp |-*. {
+  remember (extract (eqb a) (lc ++ a :: ld)) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hlb).
+  apply Heqb in H; subst x.
+Search (_ ++ _  = _ ++ _ ).
+  apply app_eq_app in Hlb.
+  destruct Hlb as (l & Hlb).
+  destruct Hlb as [(Hlc, Hbef') | Hlb]. {
+    subst lc.
+    clear Hbef.
+    revert a bef aft lb ld Hbef' Hp.
+    induction l as [| b]; intros. {
+      cbn in Hbef'.
+      injection Hbef'; clear Hbef'; intros; subst aft.
+      now rewrite app_nil_r.
+    }
+    cbn in Hbef'.
+    injection Hbef'; clear Hbef'; intros Hbef' H; subst b.
+    subst aft.
+    rewrite List_app_cons.
+    rewrite app_assoc.
+...
+    apply IHl with (a := a) (aft := ld).
+...
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft) | ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hlb).
+  specialize (permutation_in Heqb lb lc Hbc) as H2.
+  specialize (H2 a) as H3.
+...
+
 Theorem permutation_trans : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc,
@@ -155,6 +200,18 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (H1 _ H3) as H4.
   now rewrite (equality_refl Heqb) in H4.
 }
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb').
+apply Heqb in H; subst x.
+subst lb lc.
+apply IHla with (lb := bef' ++ aft'); [ easy | ].
+...
+now apply permutation_app_inv in Hbc.
 ...
 *)
 
