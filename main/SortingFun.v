@@ -1322,8 +1322,10 @@ apply extract_Some in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
 apply Heqb in H; subst x.
 subst lb.
-assert (H : is_permutation eqb (b :: la) (bef' ++ b :: aft') = true). {
+...
+enough (H : is_permutation eqb (b :: la) (bef' ++ b :: aft') = true).
 Check Permutation_cons_app.
+cbn in H.
 ...
 apply extract_Some in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
