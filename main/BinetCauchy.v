@@ -15,7 +15,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith Permutation.
 Import List List.ListNotations Init.Nat.
 
-Require Import Misc SortedFun RingLike IterAdd IterMul IterAnd Pigeonhole.
+Require Import Misc SortingFun RingLike IterAdd IterMul IterAnd Pigeonhole.
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.

@@ -7,7 +7,7 @@ Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
 Require Import Permutation.
 
-Require Import Misc SortedFun.
+Require Import Misc SortingFun.
 Require Import IterAnd.
 Require Import Pigeonhole.
 

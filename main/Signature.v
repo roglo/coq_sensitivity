@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc SortedFun RingLike.
+Require Import Misc SortingFun RingLike.
 Require Import IterMul.
 Require Import PermutSeq.
 
