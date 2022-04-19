@@ -1256,7 +1256,7 @@ cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (extract_None _ _ Hlxl a) as H1.
+  specialize (extract_None_iff _ _ Hlxl a) as H1.
   specialize (equality_refl Heqb a) as H2.
   apply Bool.not_false_iff_true in H2.
   exfalso; apply H2, H1.
@@ -1264,7 +1264,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   induction lb as [| b]; [ now left | cbn ].
   now destruct (rel a b); [ left | right ].
 }
-apply extract_Some in Hlxl.
+apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 replace (bef ++ aft) with lb; [ easy | ].
@@ -1305,7 +1305,7 @@ induction la as [| b]; intros; cbn in Hab |-*. {
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (extract_None _ _ Hlxl a) as H1.
+  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
   specialize (equality_refl Heqb a) as H2.
   apply Bool.not_false_iff_true in H2.
   exfalso; apply H2, H1.
@@ -1313,12 +1313,12 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   induction lb as [| b]; [ now left | cbn ].
   now destruct (rel a b); [ left | right ].
 }
-apply extract_Some in Hlxl.
+apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]; [ | easy ].
-apply extract_Some in Hlxl.
+apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
 apply Heqb in H; subst x.
 subst lb.
@@ -1327,13 +1327,13 @@ enough (H : is_permutation eqb (b :: la) (bef' ++ b :: aft') = true).
 Check Permutation_cons_app.
 cbn in H.
 ...
-apply extract_Some in Hlxl.
+apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef' & H & Hlb).
 apply Heqb in H; subst x.
 remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef'', x), aft'')| ]. 2: {
-  specialize (extract_None _ _ Hlxl) as H1.
+  specialize (extract_None_iff _ _ Hlxl) as H1.
   assert (Ha : a ∉ bef). {
     intros Ha.
     specialize (Hbef _ Ha) as H2.
@@ -1355,13 +1355,13 @@ specialize (IHla b _ Hab) as H2; cbn in H2.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]. {
-  apply extract_Some in Hlxl.
+  apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef' & H & Hli).
   apply Heqb in H; subst x.
   remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
   symmetry in Hlxl.
   destruct lxl as [((bef'', x), aft'')| ]. {
-    apply extract_Some in Hlxl.
+    apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef'' & H & Hli').
     apply Heqb in H; subst x.
     move bef' before bef; move bef'' before bef'.
