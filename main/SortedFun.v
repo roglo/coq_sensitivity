@@ -2501,6 +2501,8 @@ Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb,
   → Permutation l (merge_loop rel it la lb).
 Proof.
 intros * Hit Hll.
+...
+intros * Hit Hll.
 destruct it. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
