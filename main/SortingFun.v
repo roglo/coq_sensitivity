@@ -1251,8 +1251,7 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
 (*
-intros * Heqb * Hab.
-cbn.
+intros * Heqb * Hab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
