@@ -38,45 +38,67 @@ intros * Heqb *.
 now apply Heqb.
 Qed.
 
-Theorem extract_Some : ∀ A (f : A → _) l a bef aft,
+Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
   extract f l = Some (bef, a, aft)
-  → (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
+  ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
 Proof.
-intros * He.
-revert a bef aft He.
-induction l as [| b]; intros; [ easy | cbn ].
-cbn in He.
-remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-destruct fb. {
-  now injection He; clear He; intros; subst bef b aft.
-}
-remember (extract f l) as lal eqn:Hlal; symmetry in Hlal.
-destruct lal as [((bef', x), aft') | ]; [ | easy ].
-injection He; clear He; intros; subst bef x aft'.
-rename bef' into bef.
-specialize (IHl _ _ _ eq_refl) as H1.
-destruct H1 as (H1 & H2 & H3).
+intros.
 split. {
-  intros c Hc.
-  destruct Hc as [Hc| Hc]; [ now subst c | ].
-  now apply H1.
+  intros He.
+  revert a bef aft He.
+  induction l as [| b]; intros; [ easy | cbn ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb. {
+    now injection He; clear He; intros; subst bef b aft.
+  }
+  remember (extract f l) as lal eqn:Hlal; symmetry in Hlal.
+  destruct lal as [((bef', x), aft') | ]; [ | easy ].
+  injection He; clear He; intros; subst bef x aft'.
+  rename bef' into bef.
+  specialize (IHl _ _ _ eq_refl) as H1.
+  destruct H1 as (H1 & H2 & H3).
+  split. {
+    intros c Hc.
+    destruct Hc as [Hc| Hc]; [ now subst c | ].
+    now apply H1.
+  }
+  split; [ easy | ].
+  now cbn; f_equal.
+} {
+  intros He.
+  destruct He as (Hbef & Hf & Hl).
+  subst l.
+  revert a aft Hf.
+  induction bef as [| b]; intros; cbn; [ now rewrite Hf | ].
+  rewrite Hbef; [ | now left ].
+  rewrite IHbef; [ easy | | easy ].
+  now intros c Hc; apply Hbef; right.
 }
-split; [ easy | ].
-now cbn; f_equal.
 Qed.
 
-Theorem extract_None : ∀ A (f : A → _) l,
-  extract f l = None → ∀ a, a ∈ l → f a = false.
+Theorem extract_None_iff : ∀ A (f : A → _) l,
+  extract f l = None ↔ ∀ a, a ∈ l → f a = false.
 Proof.
-intros * He * Ha.
-revert a Ha.
-induction l as [| b]; intros; [ easy | ].
-cbn in He.
-remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-destruct fb; [ easy | ].
-destruct Ha as [Ha| Ha]; [ now subst b | ].
-apply IHl; [ | easy ].
-now destruct (extract f l) as [((bef, x), aft)| ].
+intros.
+split. {
+  intros He * Ha.
+  revert a Ha.
+  induction l as [| b]; intros; [ easy | ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb; [ easy | ].
+  destruct Ha as [Ha| Ha]; [ now subst b | ].
+  apply IHl; [ | easy ].
+  now destruct (extract f l) as [((bef, x), aft)| ].
+} {
+  intros Hf.
+  induction l as [| a]; [ easy | cbn ].
+  rewrite Hf; [ | now left ].
+  rewrite IHl; [ easy | ].
+  intros c Hc.
+  now apply Hf; right.
+}
 Qed.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),
@@ -94,7 +116,7 @@ split. {
   }
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft) | ]. {
-    apply extract_Some in Hlxl.
+    apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & Hax & Hlb).
     apply Heqb in Hax; subst x.
     apply IHla.
@@ -102,7 +124,7 @@ split. {
     now rewrite <- Hlb.
   }
   specialize (Permutation_in a Hpab (or_introl eq_refl)) as H.
-  specialize (extract_None _ _ Hlxl a H) as Hla; clear H.
+  specialize (proj1 (extract_None_iff _ _) Hlxl a H) as Hla; clear H.
   now rewrite (equality_refl Heqb) in Hla.
 } {
   intros Hpab.
@@ -110,7 +132,7 @@ split. {
   induction la as [| a]; intros; cbn in Hpab; [ now destruct lb | ].
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft) | ]; [ | easy ].
-  apply extract_Some in Hlxl.
+  apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & Hax & Hlb).
   apply Heqb in Hax; subst x.
   subst lb.
