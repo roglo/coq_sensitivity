@@ -2597,12 +2597,42 @@ destruct ab. {
       destruct l as [| d]. {
         now injection Hll; intros; subst la lb; destruct it.
       }
+      cbn in Hit.
       destruct l as [| e]. {
         injection Hll; intros; clear Hll; subst la lb.
         remember (rel d a) as da eqn:Hda; symmetry in Hda.
         destruct da. {
-...
+          destruct it; [ easy | cbn ].
+          apply Permutation_sym.
+          transitivity [a; d; b; c]; constructor.
+          transitivity [b; d; c]; constructor.
+          constructor.
+        }
+        destruct it; [ easy | ].
+        apply Nat.succ_le_mono in Hit.
+        constructor; cbn.
+        remember (rel d b) as db eqn:Hdb; symmetry in Hdb.
+        destruct db. {
+          destruct it; [ easy | cbn ].
+          apply Nat.succ_le_mono in Hit.
+          apply Permutation_sym.
+          transitivity [b; d; c]; constructor.
+          constructor.
+        }
+        constructor.
+        destruct it; [ easy | cbn ].
+        apply Nat.succ_le_mono in Hit.
+        remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
+        destruct dc; [ | now destruct it ].
+        destruct it; [ easy | constructor ].
       }
+      cbn in Hit, Hll.
+      remember (split l) as ll eqn:H; symmetry in H.
+      destruct ll as (lc, ld).
+      injection Hll; clear Hll; intros; subst la lb.
+      rename lc into la; rename ld into lb; rename H into Hll; cbn.
+      remember (rel d a) as da eqn:Hda; symmetry in Hda.
+      destruct da. {
 ...
   destruct l as [| c]; [ now injection Hll; intros; subst la lb | ].
   destruct l as [| d]. {
