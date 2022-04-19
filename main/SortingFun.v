@@ -1273,8 +1273,22 @@ apply Heqb in H; subst x.
 remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]; [ | easy ].
 apply extract_Some in Hlxl.
-destruct Hlxl as (Hbef' & H & Hlb').
+destruct Hlxl as (Hbef' & H & Hlb).
 apply Heqb in H; subst x.
+remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef'', x), aft'')| ]. 2: {
+  specialize (extract_None _ _ Hlxl) as H1.
+  assert (H : eqb b b = false). {
+    apply H1.
+    subst lb.
+...
+  specialize (equality_refl Heqb a) as H2.
+  apply Bool.not_false_iff_true in H2.
+  exfalso; apply H2, H1.
+  clear.
+  induction lb as [| b]; [ now left | cbn ].
+  now destruct (rel a b); [ left | right ].
 ...
 specialize (IHla a _ Hab) as H1; cbn in H1.
 specialize (IHla b _ Hab) as H2; cbn in H2.
