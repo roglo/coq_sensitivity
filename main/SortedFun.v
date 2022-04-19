@@ -1127,7 +1127,6 @@ apply split_length in Hll.
 now rewrite Hll.
 Qed.
 
-(* to be completed *)
 Theorem sorted_msort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
@@ -2569,6 +2568,7 @@ destruct ab. {
     }
     cbn in Hll.
     destruct it; [ cbn in Hit; flia Hit | ].
+    cbn in Hit; apply Nat.succ_le_mono in Hit.
     remember (split l) as ll eqn:H; symmetry in H.
     destruct ll as (lc, ld).
     injection Hll; clear Hll; intros; subst la lb.
@@ -2586,6 +2586,23 @@ destruct ab. {
         constructor.
       }
       constructor.
+      clear c Hca.
+      rename d into c.
+      destruct it; [ easy | cbn ].
+      apply Nat.succ_le_mono in Hit.
+      remember (split l) as ll eqn:H; symmetry in H.
+      destruct ll as (lc, ld).
+      injection Hll; clear Hll; intros; subst la lb.
+      rename lc into la; rename ld into lb; rename H into Hll; cbn.
+      destruct l as [| d]. {
+        now injection Hll; intros; subst la lb; destruct it.
+      }
+      destruct l as [| e]. {
+        injection Hll; intros; clear Hll; subst la lb.
+        remember (rel d a) as da eqn:Hda; symmetry in Hda.
+        destruct da. {
+...
+      }
 ...
   destruct l as [| c]; [ now injection Hll; intros; subst la lb | ].
   destruct l as [| d]. {
