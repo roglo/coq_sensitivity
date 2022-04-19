@@ -81,13 +81,13 @@ subst b.
 now destruct (f a).
 Qed.
 
-(* to be completed
-Theorem Permutation_permutation : ∀ A (eqb : A → _) la lb,
+Theorem Permutation_permutation : ∀ A (eqb : A → _),
   equality eqb →
+  ∀ la lb,
   Permutation la lb
   ↔ is_permutation eqb la lb = true.
 Proof.
-intros * Heqb.
+intros * Heqb *.
 split. {
   intros Hpab.
   revert lb Hpab.
@@ -113,5 +113,16 @@ split. {
   specialize (Hla a H); clear H.
   now rewrite (equality_refl Heqb) in Hla.
 } {
-...
-*)
+  intros Hpab.
+  revert lb Hpab.
+  induction la as [| a]; intros; cbn in Hpab; [ now destruct lb | ].
+  remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft) | ]; [ | easy ].
+  apply extract_Some in Hlxl.
+  destruct Hlxl as (Hax, Hlb).
+  apply Heqb in Hax; subst x.
+  subst lb.
+  apply Permutation_cons_app.
+  now apply IHla.
+}
+Qed.

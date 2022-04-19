@@ -6,7 +6,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
-Require Import Misc.
+Require Import Misc PermutationFun.
 
 (* relation properties *)
 
@@ -1241,6 +1241,18 @@ apply Permutation_cons_app with (a := a) in Hab.
 eapply Permutation_trans; [ apply Hab | cbn ].
 apply perm_skip.
 now apply IHlb.
+Qed.
+
+Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a la lb,
+  is_permutation eqb la lb = true
+  → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
+Proof.
+intros * Heqb * Hab.
+apply Permutation_permutation in Hab; [ | easy ].
+apply Permutation_permutation; [ easy | ].
+now apply Permutation_cons_isort_insert.
 Qed.
 
 Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
