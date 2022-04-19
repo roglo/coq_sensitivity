@@ -2575,6 +2575,17 @@ destruct ab. {
     rename lc into la; rename ld into lb; rename H into Hll; cbn.
     remember (rel c a) as ca eqn:Hca; symmetry in Hca.
     destruct ca. {
+      transitivity (c :: a :: b :: d :: l). {
+        replace (a :: b :: c :: d :: l) with ([a; b; c] ++ (d :: l))
+          by easy.
+        replace (c :: a :: b :: d :: l) with ([c; a; b] ++ (d :: l))
+          by easy.
+        apply Permutation_app_tail.
+        apply Permutation_sym.
+        transitivity [a; c; b]; constructor.
+        constructor.
+      }
+      constructor.
 ...
   destruct l as [| c]; [ now injection Hll; intros; subst la lb | ].
   destruct l as [| d]. {
