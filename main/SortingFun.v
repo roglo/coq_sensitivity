@@ -1243,6 +1243,7 @@ apply perm_skip.
 now apply IHlb.
 Qed.
 
+(* to be completed
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
@@ -1250,10 +1251,41 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
 intros * Heqb * Hab.
+revert a lb Hab.
+induction la as [| b]; intros; cbn in Hab |-*. {
+  destruct lb; [ cbn | easy ].
+  now rewrite (equality_refl Heqb).
+}
+remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some in Hlxl.
+destruct Hlxl as (H, Hlb).
+apply Heqb in H; subst x.
+specialize (IHla a _ Hab) as H1; cbn in H1.
+specialize (IHla b _ Hab) as H2; cbn in H2.
+remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]. {
+  apply extract_Some in Hlxl.
+  destruct Hlxl as (H, Hli).
+  apply Heqb in H; subst x.
+  remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef'', x), aft'')| ]. {
+    apply extract_Some in Hlxl.
+    destruct Hlxl as (H, Hli').
+    apply Heqb in H; subst x.
+...
+    specialize (IHla a _ Hab) as H1.
+    remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
+    symmetry in Hlxl.
+...
+intros * Heqb * Hab.
 apply Permutation_permutation in Hab; [ | easy ].
 apply Permutation_permutation; [ easy | ].
 now apply Permutation_cons_isort_insert.
 Qed.
+*)
 
 Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
   Permutation la lb
