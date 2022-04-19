@@ -2519,6 +2519,62 @@ destruct ab. {
   constructor.
   destruct it; [ easy | ].
   apply Nat.succ_le_mono in Hit.
+  clear a Hab.
+(**)
+  destruct l as [| a]; [ now injection Hll; intros; subst la lb | ].
+  destruct l as [| c]. {
+    injection Hll; clear Hll; intros; subst la lb; cbn.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab. {
+      destruct it; [ easy | constructor ].
+    }
+    constructor.
+    destruct it; [ easy | now constructor ].
+  }
+  cbn in Hll.
+  remember (split l) as ll eqn:H; symmetry in H.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename H into Hll; cbn.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    transitivity (a :: b :: c :: l); [ constructor | ].
+    constructor.
+    cbn in Hit.
+    clear a Hab.
+    rename b into a; rename c into b.
+    destruct l as [| c]. {
+      injection Hll; intros; subst la lb.
+      destruct it; [ cbn in Hit; flia Hit | easy ].
+    }
+    destruct l as [| d]. {
+      injection Hll; clear Hll; intros; subst la lb; cbn.
+      destruct it; [ easy | cbn ].
+      apply Nat.succ_le_mono in Hit.
+      remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+      destruct ca. {
+        destruct it; [ easy | cbn ].
+        apply Permutation_sym.
+        transitivity [a; c; b]; constructor; constructor.
+      }
+      constructor.
+      destruct it; [ easy | cbn ].
+      apply Nat.succ_le_mono in Hit.
+      remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+      destruct cb. {
+        destruct it; [ cbn in Hit; flia Hit | constructor ].
+      }
+      constructor.
+      destruct it; [ cbn in Hit; flia Hit | now constructor ].
+    }
+    cbn in Hll.
+    destruct it; [ cbn in Hit; flia Hit | ].
+    remember (split l) as ll eqn:H; symmetry in H.
+    destruct ll as (lc, ld).
+    injection Hll; clear Hll; intros; subst la lb.
+    rename lc into la; rename ld into lb; rename H into Hll; cbn.
+    remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+    destruct ca. {
 ...
   destruct l as [| c]; [ now injection Hll; intros; subst la lb | ].
   destruct l as [| d]. {
