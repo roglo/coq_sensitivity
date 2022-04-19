@@ -8,9 +8,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith Permutation.
 
 Import List List.ListNotations.
-(*
 Require Import Misc.
-*)
 
 Fixpoint extract {A} (f : A → bool) l :=
   match l with
@@ -84,5 +82,8 @@ split. {
     apply Permutation_cons_app_inv with (a := a).
     now rewrite <- Hlb.
   }
+Print extract.
+Theorem extract_None : ∀ A (f : A → _) l,
+  extract f l = None → l = [] ∨ ∀ a, a ∈ l => f a = false.
 ...
 *)
