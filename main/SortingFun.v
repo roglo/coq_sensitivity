@@ -1256,36 +1256,69 @@ induction la as [| b]; intros; cbn in Hab |-*. {
   destruct lb; [ cbn | easy ].
   now rewrite (equality_refl Heqb).
 }
-remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (extract_None _ _ Hlxl a) as H1.
+  specialize (equality_refl Heqb a) as H2.
+  apply Bool.not_false_iff_true in H2.
+  exfalso; apply H2, H1.
+  clear.
+  induction lb as [| b]; [ now left | cbn ].
+  now destruct (rel a b); [ left | right ].
+}
 apply extract_Some in Hlxl.
-destruct Hlxl as (H, Hlb).
+destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
+remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+apply extract_Some in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb').
+apply Heqb in H; subst x.
+...
 specialize (IHla a _ Hab) as H1; cbn in H1.
 specialize (IHla b _ Hab) as H2; cbn in H2.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef', x), aft')| ]. {
   apply extract_Some in Hlxl.
-  destruct Hlxl as (H, Hli).
+  destruct Hlxl as (Hbef' & H & Hli).
   apply Heqb in H; subst x.
   remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
   symmetry in Hlxl.
   destruct lxl as [((bef'', x), aft'')| ]. {
     apply extract_Some in Hlxl.
-    destruct Hlxl as (H, Hli').
+    destruct Hlxl as (Hbef'' & H & Hli').
     apply Heqb in H; subst x.
+    move bef' before bef; move bef'' before bef'.
+    move aft' before aft; move aft'' before aft'.
+    move Hbef' before Hbef; move Hbef'' before Hbef'.
+    subst lb.
+    assert (Hb : b ∈ bef' ++ aft'). {
+      rewrite Hli'.
+      now apply in_or_app; right; left.
+    }
+    apply in_app_or in Hb.
+    destruct Hb as [Hb| Hb]. {
+      specialize (Hbef' b Hb) as H3.
 ...
     specialize (IHla a _ Hab) as H1.
     remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
     symmetry in Hlxl.
 ...
+*)
+
+Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a la lb,
+  is_permutation eqb la lb = true
+  → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
+Proof.
 intros * Heqb * Hab.
 apply Permutation_permutation in Hab; [ | easy ].
 apply Permutation_permutation; [ easy | ].
 now apply Permutation_cons_isort_insert.
 Qed.
-*)
 
 Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
   Permutation la lb
