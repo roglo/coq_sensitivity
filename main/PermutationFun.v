@@ -39,7 +39,8 @@ now apply Heqb.
 Qed.
 
 Theorem extract_Some : ∀ A (f : A → _) l a bef aft,
-  extract f l = Some (bef, a, aft) → f a = true ∧ l = bef ++ a :: aft.
+  extract f l = Some (bef, a, aft)
+  → (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
 Proof.
 intros * He.
 revert a bef aft He.
@@ -54,31 +55,28 @@ destruct lal as [((bef', x), aft') | ]; [ | easy ].
 injection He; clear He; intros; subst bef x aft'.
 rename bef' into bef.
 specialize (IHl _ _ _ eq_refl) as H1.
+destruct H1 as (H1 & H2 & H3).
+split. {
+  intros c Hc.
+  destruct Hc as [Hc| Hc]; [ now subst c | ].
+  now apply H1.
+}
 split; [ easy | ].
 now cbn; f_equal.
 Qed.
 
 Theorem extract_None : ∀ A (f : A → _) l,
-  extract f l = None → l = [] ∨ ∀ a, a ∈ l → f a = false.
+  extract f l = None → ∀ a, a ∈ l → f a = false.
 Proof.
-intros * He.
-induction l as [| a]; [ now left | right ].
-intros b Hb.
+intros * He * Ha.
+revert a Ha.
+induction l as [| b]; intros; [ easy | ].
 cbn in He.
-assert (H : extract f l = None). {
-  destruct (f a); [ easy | ].
-  remember (extract f l) as lxl eqn:Hlxl; symmetry in Hlxl.
-  now destruct lxl as [((bef, x), aft)| ].
-}
-specialize (IHl H); clear H.
-destruct IHl as [Hl| Hf]. {
-  subst l.
-  destruct Hb as [Hb| Hb]; [ subst b | easy ].
-  now destruct (f a).
-}
-destruct Hb as [Hb| Hb]; [ | now apply Hf ].
-subst b.
-now destruct (f a).
+remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+destruct fb; [ easy | ].
+destruct Ha as [Ha| Ha]; [ now subst b | ].
+apply IHl; [ | easy ].
+now destruct (extract f l) as [((bef, x), aft)| ].
 Qed.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),
@@ -97,20 +95,14 @@ split. {
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft) | ]. {
     apply extract_Some in Hlxl.
-    destruct Hlxl as (Hax, Hlb).
+    destruct Hlxl as (Hbef & Hax & Hlb).
     apply Heqb in Hax; subst x.
     apply IHla.
     apply Permutation_cons_app_inv with (a := a).
     now rewrite <- Hlb.
   }
-  apply extract_None in Hlxl.
-  destruct Hlxl as [Hlb| Hla]. {
-    subst lb.
-    apply Permutation_sym in Hpab.
-    now apply Permutation_nil_cons in Hpab.
-  }
   specialize (Permutation_in a Hpab (or_introl eq_refl)) as H.
-  specialize (Hla a H); clear H.
+  specialize (extract_None _ _ Hlxl a H) as Hla; clear H.
   now rewrite (equality_refl Heqb) in Hla.
 } {
   intros Hpab.
@@ -119,7 +111,7 @@ split. {
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft) | ]; [ | easy ].
   apply extract_Some in Hlxl.
-  destruct Hlxl as (Hax, Hlb).
+  destruct Hlxl as (Hbef & Hax & Hlb).
   apply Heqb in Hax; subst x.
   subst lb.
   apply Permutation_cons_app.
