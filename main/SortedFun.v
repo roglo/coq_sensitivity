@@ -2502,6 +2502,45 @@ Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb,
   → Permutation l (merge_loop rel it la lb).
 Proof.
 intros * Hit Hll.
+destruct it. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
+}
+destruct l as [| a]; [ now injection Hll; intros; subst la lb | ].
+destruct l as [| b]; [ now injection Hll; intros; subst la lb | ].
+cbn in Hll.
+remember (split l) as ll eqn:H; symmetry in H.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename H into Hll.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+cbn.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  constructor.
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+...
+  destruct l as [| c]; [ now injection Hll; intros; subst la lb | ].
+  destruct l as [| d]. {
+    injection Hll; clear Hll; intros; subst la lb; cbn.
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb. {
+      destruct it; [ easy | constructor ].
+    }
+    constructor.
+    destruct it; [ easy | now constructor ].
+  }
+  cbn in Hll.
+  remember (split l) as ll eqn:H; symmetry in H.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename H into Hll; cbn.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    transitivity (c :: b :: d :: l); [ constructor | ].
+    constructor.
+...
+intros * Hit Hll.
 revert l la lb Hit Hll.
 induction it as (it, IHit) using lt_wf_rec; intros.
 destruct it. {
