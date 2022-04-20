@@ -1258,11 +1258,6 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
-intros * Heqb * Hab.
-apply (permutation_trans Heqb) with (lb := a :: lb). {
-  now cbn; rewrite (equality_refl Heqb).
-}
-...
 intros * Heqb * Hab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
@@ -1279,8 +1274,8 @@ apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
 clear la Hab.
 rename lb into la.
 revert a bef aft Hbef Hli.
-induction la as [| b]; intros; cbn. {
-  cbn in Hli.
+induction la as [| b]; intros. {
+  cbn in Hli |-*.
   destruct bef as [| b]. {
     now injection Hli; clear Hli; intros; subst aft.
   }
@@ -1291,6 +1286,33 @@ induction la as [| b]; intros; cbn. {
 cbn in Hli.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
+(*
+  clear - Hli Hbef Heqb.
+*)
+  specialize (in_elt b [a] la) as H1.
+  cbn - [ In ] in H1.
+  rewrite Hli in H1.
+  apply in_app_or in H1.
+  destruct H1 as [H1| H1]. {
+    specialize (Hbef _ H1) as Heab.
+    destruct bef as [| c]; [ easy | ].
+    cbn in Hli.
+    injection Hli; clear Hli; intros Hli H; subst c.
+    specialize (Hbef a (or_introl eq_refl)) as H2.
+    now rewrite (equality_refl Heqb) in H2.
+  }
+...
+  assert (Hba : b ∈ aft). {
+    specialize (in_elt b [a] la) as H1.
+    cbn - [ In ] in H1.
+    rewrite Hli in H1.
+    apply in_app_or in H1.
+    destruct H1 as [H1| H1]. {
+      specialize (Hbef _ H1) as H2.
+    rewrite List_app_cons, app_assoc in H1.
+    rewrite <- Hli in H1.
+...
+  cbn.
   remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef', x), aft')| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
@@ -1318,6 +1340,7 @@ destruct ab. {
     specialize (H2 H); clear H.
     now rewrite (equality_refl Heqb) in H2.
   }
+...
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef' & H & Hli').
   apply Heqb in H; subst x.
