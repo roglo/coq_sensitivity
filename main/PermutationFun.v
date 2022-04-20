@@ -125,7 +125,6 @@ apply in_or_app.
 now destruct Ha; [ left | right; right ].
 Qed.
 
-(* to be completed
 Theorem permutation_app_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc ld a,
@@ -318,9 +317,42 @@ destruct Hlb as [(H1, H3)| (H1, H3)]. 2: {
 }
 subst lc.
 move H2 before H3.
-...
-apply IHla with (a := a).
-...
+destruct l as [| c]. {
+  cbn in H2.
+  injection H2; clear H2; intros; subst b aft.
+  now exfalso; apply Hala; left.
+}
+cbn in H2.
+injection H2; clear H2; intros H2 H; subst c ld.
+destruct l' as [| c]. {
+  cbn in H3.
+  rewrite app_nil_r in Hp, Hbef, Halc.
+  destruct l as [| c]. {
+    cbn in H3.
+    injection H3; clear H3; intros; subst aft'.
+    rewrite <- app_assoc in Hp; cbn in Hp.
+    apply IHla with (a := a); [ easy | | easy ].
+    now intros H; apply Hala; right.
+  }
+  cbn in H3.
+  injection H3; clear H3; intros H3 H; subst c aft'.
+  specialize (Hbef b) as H1.
+  assert (H : b ∈ bef ++ a :: b :: l). {
+    now apply in_or_app; right; right; left.
+  }
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+cbn in H3.
+injection H3; clear H3; intros H3 H; subst c.
+specialize (Hbef b) as H1.
+assert (H : b ∈ (bef ++ b :: l') ++ a :: l). {
+  apply in_or_app; left.
+  now apply in_or_app; right; left.
+}
+specialize (H1 H); clear H.
+now rewrite (equality_refl Heqb) in H1.
+Qed.
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
   equality eqb →
@@ -371,10 +403,8 @@ assert (Hanb' : a ∉ bef'). {
 }
 clear Hbef Hbef'.
 clear la IHla Hab.
-...
 now apply permutation_app_inv in Hbc.
-...
-*)
+Qed.
 
 Require Import Permutation.
 
