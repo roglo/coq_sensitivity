@@ -1270,8 +1270,9 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
+apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
+clear Hab Hbef.
 ...
-replace (bef ++ aft) with lb; [ easy | ].
 clear Hab Hbef la.
 revert a bef aft Hli.
 induction lb as [| b]; intros; cbn. {
@@ -2654,8 +2655,6 @@ Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb,
   → split l = (la, lb)
   → Permutation l (merge_loop rel it la lb).
 Proof.
-intros * Hit Hll.
-...
 intros * Hit Hll.
 destruct it. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
