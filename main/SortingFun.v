@@ -1269,11 +1269,61 @@ induction lb as [| b]; intros. {
 cbn.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now cbn; rewrite (equality_refl Heqb) | ].
+remember (extract (eqb a) (b :: isort_insert rel a lb)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
+  clear Hlxl.
+  assert (H : a ∈ b :: isort_insert rel a lb). {
+    right; apply in_isort_insert_id.
+  }
+  specialize (H1 H); clear H.
+  now rewrite equality_refl in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hli).
+apply Heqb in H; subst x.
+destruct bef as [| c]. {
+  cbn in Hli.
+  injection Hli; clear Hli; intros Hli H; subst b aft; cbn.
+  eapply (permutation_trans Heqb); [ apply Hpab | ].
+  apply IHlb.
+  now apply permutation_refl.
+}
+cbn in Hli.
+injection Hli; clear Hli; intros Hli H; subst c.
+eapply (permutation_trans Heqb); [ apply Hpab | ].
+rewrite <- app_comm_cons.
+apply (permutation_skip Heqb).
+...
 replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply (permutation_cons_app Heqb) with (a := a) in Hpab.
 ...
-apply permutation_cons_app with (a := a) in Hpab.
+apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
+clear la Hab.
+rename lb into la.
+revert a bef aft Hbef Hli.
+induction la as [| b]; intros. {
+  cbn in Hli |-*.
+  destruct bef as [| b]. {
+    now injection Hli; clear Hli; intros; subst aft.
+  }
+  cbn in Hli.
+  injection Hli; clear Hli; intros Hli H; subst b.
+  now destruct bef.
+}
+cbn in Hli.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
 ...
-apply Permutation_cons_app with (a := a) in Hab.
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply (permutation_cons_app Heqb) with (a := a) in Hpab.
+cbn in Hpab.
+
+...
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply (permutation_cons_app Heqb) with (a := a) in Hpab.
+...
 eapply Permutation_trans; [ apply Hab | cbn ].
 apply perm_skip.
 now apply IHlb.
