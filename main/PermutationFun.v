@@ -247,6 +247,21 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   now rewrite <- app_assoc.
 }
 subst bef.
+remember (extract (eqb b) (lc ++ ld)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft')| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 b).
+  assert (H : b ∈ lc ++ ld). {
+    apply in_or_app; right.
+    specialize (in_elt b l aft) as H3.
+    rewrite <- H2 in H3.
+    destruct H3 as [H3| H3]; [ subst b | easy ].
+    now exfalso; apply Hala; left.
+  }
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
 ...
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
