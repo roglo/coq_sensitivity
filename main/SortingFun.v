@@ -1271,7 +1271,48 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
-clear Hab Hbef.
+clear la Hab.
+rename lb into la.
+revert a bef aft Hbef Hli.
+induction la as [| b]; intros; cbn. {
+  cbn in Hli.
+  destruct bef as [| b]. {
+    now injection Hli; clear Hli; intros; subst aft.
+  }
+  cbn in Hli.
+  injection Hli; clear Hli; intros Hli H; subst b.
+  now destruct bef.
+}
+cbn in Hli.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef', x), aft')| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
+    specialize (H1 b) as H2.
+    assert (H : b ∈ bef ++ aft). {
+      specialize (in_elt b [a] la) as H3.
+      cbn - [ In ] in H3.
+      rewrite Hli in H3.
+      apply in_app_or in H3.
+      apply in_or_app.
+      destruct H3 as [H3| H3]; [ now left | ].
+      destruct H3 as [H3| H3]; [ | now right ].
+      subst b.
+      clear - Heqb Hli.
+      revert aft la Hli.
+      induction bef as [| b]; intros; cbn. {
+        right; cbn in Hli.
+        injection Hli; clear Hli; intros Hli; subst aft.
+        now left.
+      }
+      cbn in Hli.
+      injection Hli; clear Hli; intros Hli H; subst b.
+      now left; left.
+    }
+    specialize (H2 H); clear H.
+    now rewrite (equality_refl Heqb) in H2.
+  }
 ...
 clear Hab Hbef la.
 revert a bef aft Hli.
