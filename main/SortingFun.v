@@ -1258,6 +1258,11 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
+intros * Heqb * Hab.
+apply (permutation_trans Heqb) with (lb := a :: lb). {
+  now cbn; rewrite (equality_refl Heqb).
+}
+...
 intros * Heqb * Hab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
@@ -1313,6 +1318,13 @@ destruct ab. {
     specialize (H2 H); clear H.
     now rewrite (equality_refl Heqb) in H2.
   }
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Hli').
+  apply Heqb in H; subst x.
+  move Hli before Hli'.
+  destruct bef as [| c]. {
+    cbn in Hli, Hli'; subst aft.
+    injection Hli; clear Hli; intros Hli.
 ...
 clear Hab Hbef la.
 revert a bef aft Hli.
