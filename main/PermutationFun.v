@@ -167,6 +167,51 @@ induction la as [| b]; intros; cbn in Hp |-*. {
   specialize (H1 H); clear H.
   now rewrite (equality_refl Heqb) in H1.
 }
+remember (extract (eqb b) (lc ++ a :: ld)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+apply app_eq_app in Hlb.
+destruct Hlb as (l & Hlb).
+destruct Hlb as [(H1, H2)| (H1, H2)]. {
+  subst lc.
+  destruct l as [| c]; cbn in H2. {
+    injection H2; clear H2; intros; subst aft b.
+    now exfalso; apply Hala; left.
+  }
+  injection H2; clear H2; intros H2 H; subst c aft.
+  rewrite <- app_assoc.
+  remember (extract (eqb b) (bef ++ (b :: l) ++ ld)) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef', x), aft')| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    specialize (H1 b).
+    assert (H : b ∈ bef ++ (b :: l) ++ ld). {
+      now apply in_or_app; right; left.
+    }
+    specialize (H1 H); clear H.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Hlb).
+  apply Heqb in H; subst x.
+  apply app_eq_app in Hlb.
+  destruct Hlb as (l' & Hlb).
+  destruct Hlb as [(H1, H2)| (H1, H2)]. {
+    subst bef.
+...
+    apply IHla with (a := a); cycle 1. {
+      now intros H; apply Hala; right.
+    } {
+      intros H; apply Halc, in_or_app; left.
+      now apply in_or_app; left.
+    }
+    destruct l' as [| c]. {
+      cbn in H2.
+      injection H2; clear H2; intros; subst aft'.
+      rewrite app_nil_r in Hbef, Halc, Hp.
 ...
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
