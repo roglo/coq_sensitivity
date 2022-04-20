@@ -561,6 +561,41 @@ Theorem permutation_cons_append : ∀ A (eqb : A → _),
   equality eqb →
   ∀ l x, is_permutation eqb (x :: l) (l ++ [x]) = true.
 Proof.
+intros * Heqb *.
+revert x.
+induction l as [| y]; intros; [ now apply permutation_refl | ].
+cbn.
+remember (eqb x y) as xy eqn:Hxy; symmetry in Hxy.
+destruct xy. {
+  cbn; apply Heqb in Hxy; subst y.
+  remember (extract (eqb x) (l ++ [x])) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef', y), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    specialize (H1 x).
+    assert (H : x ∈ l ++ [x]) by now apply in_or_app; right; left.
+    specialize (H1 H); clear H.
+    now rewrite equality_refl in H1.
+  }
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hlb).
+  apply Heqb in H; subst x.
+  apply app_eq_app in Hlb.
+  destruct Hlb as (l' & Hlb).
+  destruct Hlb as [(H1, H2)| (H1, H2)]. {
+    subst l.
+    apply (permutation_app_head Heqb).
+Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
+  ∀ l l1 l2,
+  is_permutation eqb (l ++ l1) (l ++ l2) = true
+  → is_permutation eqb l1 l2 = true.
+...
+    apply permutation_app_inv_l with (l := [y]).
+    cbn - [ is_permutation ].
+    rewrite H2.
+...
+    apply permutation_app_inv_l with (l := bef' ++ [y]).
+...
 intros * Heqb *; cbn.
 remember (extract (eqb x) (l ++ [x])) as lxl eqn:Hlxl.
 symmetry in Hlxl.
@@ -579,7 +614,18 @@ destruct Hlb as (l' & Hlb).
 destruct Hlb as [(H1, H2)| (H1, H2)]. {
   subst l.
   apply (permutation_app_head Heqb).
-  clear bef' Hbef.
+Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
+  ∀ l l1 l2,
+  is_permutation eqb (l ++ l1) (l ++ l2) = true
+  → is_permutation eqb l1 l2 = true.
+...
+  apply permutation_app_inv_l with (l := [y]).
+  cbn - [ is_permutation ].
+  rewrite H2.
+...
+Require Import Permutation.
+Search Permutation.
+...
   revert y aft H2.
   induction l' as [| x]; intros; cbn. {
     cbn in H2.
