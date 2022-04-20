@@ -453,6 +453,58 @@ clear la IHla Hab.
 now apply permutation_app_inv in Hbc.
 Qed.
 
+(* to be completed
+Theorem permutation_app : ∀ A (eqb : A → _),
+  ∀ l m l' m',
+  is_permutation eqb l l' = true
+  → is_permutation eqb m m' = true
+  → is_permutation eqb (l ++ m) (l' ++ m') = true.
+...
+
+Theorem permutation_cons_app : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l l1 l2 a,
+  is_permutation eqb l (l1 ++ l2) = true
+  → is_permutation eqb (a :: l) (l1 ++ a :: l2) = true.
+Proof.
+intros * Heqb * H12; cbn.
+remember (extract (eqb a) (l1 ++ a :: l2)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  specialize (H1 a).
+  rewrite (equality_refl Heqb) in H1.
+  symmetry; apply H1.
+  now apply in_or_app; right; left.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+apply app_eq_app in Hlb.
+destruct Hlb as (l' & Hlb).
+destruct Hlb as [(H1, H2)| (H1, H2)]. {
+  subst l1.
+  destruct l' as [| b]; cbn in H2. {
+    rewrite app_nil_r in H12.
+    now injection H2; clear H2; intros; subst aft.
+  }
+  injection H2; clear H2; intros H2 H; subst b aft.
+  remember ((bef ++ a :: l') ++ l2) as lb eqn:Hlb.
+  apply (permutation_trans Heqb) with (lb := lb); [ easy | subst lb ].
+  rewrite <- app_assoc.
+...
+  apply permutation_app; [ | ].
+...
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb').
+apply Heqb in H; subst x.
+subst lb lc.
+...
+*)
+
 Require Import Permutation.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),

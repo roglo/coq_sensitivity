@@ -1228,17 +1228,17 @@ Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
   Permutation la lb
   → Permutation (a :: la) (isort_insert rel a lb).
 Proof.
-intros * Hab.
-revert a la Hab.
+intros * Hpab.
+revert a la Hpab.
 induction lb as [| b]; intros; cbn. {
-  apply Permutation_sym in Hab.
-  now apply Permutation_nil in Hab; subst la.
+  apply Permutation_sym in Hpab.
+  now apply Permutation_nil in Hpab; subst la.
 }
-remember (rel a b) as x eqn:Hx; symmetry in Hx.
-destruct x; [ now constructor | ].
-replace (b :: lb) with ([b] ++ lb) in Hab by easy.
-apply Permutation_cons_app with (a := a) in Hab.
-eapply Permutation_trans; [ apply Hab | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now constructor | ].
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply Permutation_cons_app with (a := a) in Hpab.
+eapply Permutation_trans; [ apply Hpab | cbn ].
 apply perm_skip.
 now apply IHlb.
 Qed.
@@ -1258,11 +1258,25 @@ Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
-intros * Heqb * Hab.
-revert a la Hab.
+intros * Heqb * Hpab.
+revert a la Hpab.
 induction lb as [| b]; intros. {
+  apply (permutation_sym Heqb) in Hpab.
+  cbn in Hpab.
+  destruct la; [ cbn | easy ].
+  now rewrite (equality_refl Heqb).
+}
+cbn.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now cbn; rewrite (equality_refl Heqb) | ].
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
 ...
-  apply permutation_sym in Hab.
+apply permutation_cons_app with (a := a) in Hpab.
+...
+apply Permutation_cons_app with (a := a) in Hab.
+eapply Permutation_trans; [ apply Hab | cbn ].
+apply perm_skip.
+now apply IHlb.
 ...
 intros * Heqb * Hab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
