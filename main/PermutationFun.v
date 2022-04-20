@@ -455,10 +455,29 @@ Qed.
 
 (* to be completed
 Theorem permutation_app : ∀ A (eqb : A → _),
+  equality eqb →
   ∀ l m l' m',
   is_permutation eqb l l' = true
   → is_permutation eqb m m' = true
   → is_permutation eqb (l ++ m) (l' ++ m') = true.
+Proof.
+intros * Heqb * Hll' Hmm'.
+revert l' m m' Hll' Hmm'.
+induction l as [| a]; intros; [ now destruct l' | cbn ].
+remember (extract (eqb a) (l' ++ m')) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
+  specialize (permutation_in Heqb _ _ Hll') as H2.
+  specialize (proj1 (H2 a) (or_introl eq_refl)) as H3.
+  specialize (H1 a).
+  rewrite (equality_refl Heqb) in H1.
+  symmetry; apply H1.
+  now apply in_or_app; left.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb').
+apply Heqb in H; subst x.
+cbn in Hll'.
 ...
 
 Theorem permutation_cons_app : ∀ A (eqb : A → _),
