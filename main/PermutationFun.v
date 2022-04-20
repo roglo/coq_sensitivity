@@ -778,7 +778,6 @@ specialize (Hbef' y (or_introl eq_refl)).
 now rewrite equality_refl in Hbef'.
 Qed.
 
-(* to be completed
 Theorem permutation_cons_app : ∀ A (eqb : A → _),
   equality eqb →
   ∀ l l1 l2 a,
@@ -817,15 +816,17 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   replace (a :: l') with ([a] ++ l') by easy.
   now apply permutation_app_comm.
 }
-...
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef', x), aft')| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef' & H & Hlb').
-apply Heqb in H; subst x.
-subst lb lc.
-...
-*)
+destruct l' as [| b]. {
+  cbn in H2; rewrite app_nil_r in H1.
+  now injection H2; clear H2; intros; subst bef aft.
+}
+cbn in H2.
+injection H2; clear H2; intros H2 H; subst b.
+specialize (Hbef a).
+assert (H : a ∈ bef) by now rewrite H1; apply in_or_app; right; left.
+specialize (Hbef H).
+now rewrite equality_refl in Hbef.
+Qed.
 
 Require Import Permutation.
 
