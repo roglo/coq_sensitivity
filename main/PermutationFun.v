@@ -374,6 +374,33 @@ specialize (H1 H); clear H.
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
+Theorem permutation_sym : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  is_permutation eqb la lb = true → is_permutation eqb lb la = true.
+Proof.
+intros * Heqb * Hab.
+revert la Hab.
+induction lb as [| b]; intros; [ now destruct la | cbn ].
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
+  specialize (permutation_in Heqb _ _ Hab) as H2.
+  specialize (proj2 (H2 b) (or_introl eq_refl)) as H3.
+  specialize (H1 _ H3).
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H1 & H2 & H3).
+apply Heqb in H2; subst x.
+subst la.
+apply IHlb.
+replace lb with ([] ++ lb) by easy.
+apply permutation_app_inv with (a := b); [ easy | | easy | easy ].
+intros H; specialize (H1 _ H).
+now rewrite (equality_refl Heqb) in H1.
+Qed.
+
 Theorem permutation_trans : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc,

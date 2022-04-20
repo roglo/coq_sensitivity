@@ -1252,29 +1252,6 @@ now destruct (rel a b); [ left | right ].
 Qed.
 
 (* to be completed
-Theorem permutation_sym : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb,
-  is_permutation eqb la lb = true → is_permutation eqb lb la = true.
-Proof.
-intros * Heqb * Hab.
-revert la Hab.
-induction lb as [| b]; intros; [ now destruct la | cbn ].
-remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
-  specialize (permutation_in Heqb _ _ Hab) as H2.
-Check Permutation_in.
-Search (Permutation _ _ → _ → _ ∈ _).
-...
-intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros; [ now destruct lb | ].
-cbn in Hab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-...
-
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
