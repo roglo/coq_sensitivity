@@ -566,21 +566,24 @@ intros * Heqb * Hpab; cbn.
 now rewrite (equality_refl Heqb).
 Qed.
 
-(* to be completed
 Theorem permutation_app_comm : ∀ A (eqb : A → _),
   equality eqb →
   ∀ l l', is_permutation eqb (l ++ l') (l' ++ l) = true.
 Proof.
 intros * Heqb *.
-remember (length l) as len eqn:Hlen; symmetry in Hlen.
+remember (length (l ++ l')) as len eqn:Hlen; symmetry in Hlen.
 revert l l' Hlen.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct len. {
-  apply length_zero_iff_nil in Hlen; subst l.
+  apply length_zero_iff_nil in Hlen.
+  apply app_eq_nil in Hlen.
+  destruct Hlen; subst l l'.
+  now apply permutation_refl.
+}
+destruct l as [| a]. {
   rewrite app_nil_r.
   now apply permutation_refl.
 }
-destruct l as [| a]; [ easy | ].
 cbn in Hlen; apply Nat.succ_inj in Hlen; cbn.
 remember (extract (eqb a) (l' ++ a :: l)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
@@ -595,7 +598,7 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Heqb in H; subst x.
 eapply (permutation_trans Heqb). {
-  apply IHlen with (m := length l); [ | easy ].
+  apply IHlen with (m := length (l ++ l')); [ | easy ].
   now rewrite Hlen.
 }
 apply app_eq_app in Hlb.
@@ -613,66 +616,56 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   destruct l as [| b]. {
     rewrite app_nil_r, H2.
     replace (a :: l'') with ([a] ++ l'') by easy.
-...
-    apply IHlen with (m := 0).
+    apply IHlen with (m := (length ([a] ++ l''))); [ | easy ].
     subst len; cbn.
-  rewrite H2, List_app_cons, app_assoc.
-  apply (permutation_app_tail Heqb).
-  replace (a :: l'') with ([a] ++ l'') by easy.
-  apply IHlen with (m := 1); [ | easy ].
-  rewrite <- Hlen.
-  apply -> Nat.succ_lt_mono.
-...
-  eapply (permutation_trans Heqb); [ | apply IHl ].
-  apply (permutation_sym Heqb).
-  eapply (permutation_trans Heqb); [ apply IHl | ].
-  apply (permutation_sym Heqb).
-  eapply (permutation_trans Heqb); [ | apply IHl ].
-...
-
-  apply IHlen with (m := length l'); [ | easy ].
-    rewrite <- Hlen, H1.
-    rewrite app_length; cbn; flia.
+    apply -> Nat.succ_lt_mono.
+    rewrite H1; cbn.
+    rewrite app_length; cbn.
+    flia.
   }
-  destruct l'; [ | now destruct l' ].
+  rewrite H2, List_app_cons, app_assoc.
+  apply (permutation_sym Heqb).
+  do 2 rewrite List_app_cons, app_assoc.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_app_tail Heqb).
+  apply IHlen with (m := length (l'' ++ [a])); [ | easy ].
+  rewrite <- Hlen, H1;cbn.
+  do 3 rewrite app_length; cbn.
+  flia.
+}
+destruct l'' as [| x]. {
   cbn in H2.
-  rewrite app_nil_r in H1.
-  injection H2; clear H2; intros; subst l aft.
-  rewrite app_nil_r.
+  injection H2; clear H2; intros; subst aft.
+  rewrite app_nil_r in H1; subst bef.
   now apply permutation_refl.
 }
-...
-
-apply (permutation_app_inv Heqb) with (a := a). {
-  intros H.
-  specialize (Hbef _ H).
-  now rewrite equality_refl in Hbef.
-...
-  intros H.
-  specialize (Hbef _ H).
-  now rewrite equality_refl in Hbef.
-} {
-  intros
-3: {
-  rewrite Hlb.
-  apply (permutation_refl Heqb).
-}
-...
-remember (extract (eqb y) ((y :: bef) ++ aft)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef', z), aft')| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (H1 y).
-  assert (H : y ∈ (y :: bef) ++ aft) by now left.
-  specialize (H1 H); clear H.
-  now rewrite equality_refl in H1.
-...
+cbn in H2.
+injection H2; clear H2; intros H2 H; subst x.
+rewrite H1, H2.
+rewrite List_app_cons.
+do 2 rewrite app_assoc.
+apply (permutation_app_tail Heqb).
+rewrite <- app_assoc.
+apply (permutation_app_head Heqb).
+apply IHlen with (m := length (l'' ++ [a])); [ | easy ].
+rewrite <- Hlen, H2.
+do 3 rewrite app_length; cbn; flia.
+Qed.
 
 Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
+  equality eqb →
   ∀ l l1 l2,
   is_permutation eqb (l ++ l1) (l ++ l2) = true
   → is_permutation eqb l1 l2 = true.
-Admitted.
+Proof.
+intros * Heqb * H12.
+revert l1 l2 H12.
+induction l as [| a]; intros; [ easy | ].
+cbn in H12.
+rewrite (equality_refl Heqb) in H12.
+rewrite app_nil_l in H12.
+now apply IHl.
+Qed.
 
 Theorem permutation_app_inv_r : ∀ A (eqb : A → _),
   equality eqb →
@@ -681,15 +674,11 @@ Theorem permutation_app_inv_r : ∀ A (eqb : A → _),
   → is_permutation eqb l1 l2 = true.
 Proof.
 intros * Heqb * Hll.
-apply permutation_app_inv_l with (l := l).
-Search (is_permutation _ (_ ++ _)).
-Require Import Permutation.
-Search (Permutation (_ ++ _)).
-...
+apply (permutation_app_inv_l Heqb) with (l := l).
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
 eapply (permutation_trans Heqb); [ apply Hll | ].
 now apply permutation_app_comm.
-...
+Qed.
 
 Theorem permutation_cons_append : ∀ A (eqb : A → _),
   equality eqb →
@@ -772,8 +761,7 @@ destruct bef' as [| z]. {
   cbn in Hlb'.
   injection Hlb'; clear Hlb'; intros Hlb'; subst aft'.
   cbn.
-...
-  apply permutation_app_inv_r with (l := [x]).
+  apply (permutation_app_inv_r Heqb) with (l := [x]).
   rewrite Hlb.
   rewrite <- app_assoc.
   apply (permutation_app_head Heqb).
@@ -784,181 +772,13 @@ destruct bef' as [| z]. {
   rewrite Nat.add_1_r, Nat.add_succ_r in Hlb.
   rewrite Hlb; flia.
 }
-...
-    apply permutation_app_inv_l with (l := [y]).
-    cbn - [ is_permutation ].
-    eapply (permutation_trans Heqb); [ apply IHl | ].
-    apply (permutation_sym Heqb).
-    eapply (permutation_trans Heqb); [ | apply IHl ].
-    apply (permutation_skip Heqb).
-    rewrite H1.
-    apply (permutation_app_head Heqb).
-...
-  apply app_eq_app in Hlb.
-  destruct Hlb as (l' & Hlb).
-...
-intros * Heqb *.
-revert x.
-induction l as [| y]; intros; [ now apply permutation_refl | ].
-cbn.
-remember (eqb x y) as xy eqn:Hxy; symmetry in Hxy.
-destruct xy. {
-  cbn; apply Heqb in Hxy; subst y.
-  remember (extract (eqb x) (l ++ [x])) as lxl eqn:Hlxl.
-  symmetry in Hlxl.
-  destruct lxl as [((bef', y), aft)| ]. 2: {
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-    specialize (H1 x).
-    assert (H : x ∈ l ++ [x]) by now apply in_or_app; right; left.
-    specialize (H1 H); clear H.
-    now rewrite equality_refl in H1.
-  }
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & H & Hlb).
-  apply Heqb in H; subst x.
-  apply app_eq_app in Hlb.
-  destruct Hlb as (l' & Hlb).
-  destruct Hlb as [(H1, H2)| (H1, H2)]. {
-    rewrite H1.
-    apply (permutation_app_head Heqb).
-    destruct l' as [| x]. {
-      cbn in H2.
-      now injection H2; clear H2; intros; subst aft.
-    }
-    cbn in H2.
-    injection H2; clear H2; intros H2 H; subst y aft.
-...
-Require Import Permutation.
-Search (Permutation (_ :: _) (_ :: _)).
-    cbn.
-    rewrite
-    apply permutation_
-...
-    apply permutation_app_inv_l with (l := bef' ++ [y]).
-...
-intros * Heqb *; cbn.
-remember (extract (eqb x) (l ++ [x])) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef', y), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (H1 x).
-  assert (H : x ∈ l ++ [x]) by now apply in_or_app; right; left.
-  specialize (H1 H); clear H.
-  now rewrite equality_refl in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x.
-apply app_eq_app in Hlb.
-destruct Hlb as (l' & Hlb).
-destruct Hlb as [(H1, H2)| (H1, H2)]. {
-  subst l.
-  apply (permutation_app_head Heqb).
-Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
-  ∀ l l1 l2,
-  is_permutation eqb (l ++ l1) (l ++ l2) = true
-  → is_permutation eqb l1 l2 = true.
-...
-  apply permutation_app_inv_l with (l := [y]).
-  cbn - [ is_permutation ].
-  rewrite H2.
-...
-Require Import Permutation.
-Search Permutation.
-...
-  revert y aft H2.
-  induction l' as [| x]; intros; cbn. {
-    cbn in H2.
-    now injection H2; clear H2; intros; subst aft.
-  }
-  cbn in H2.
-  injection H2; clear H2; intros H2 H; subst y aft.
-  remember (extract (eqb x) (l' ++ [x])) as lxl eqn:Hlxl.
-  symmetry in Hlxl.
-  destruct lxl as [((bef, y), aft)| ]. 2: {
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-    specialize (H1 x).
-    assert (H : x ∈ l' ++ [x]) by now apply in_or_app; right; left.
-    specialize (H1 H); clear H.
-    now rewrite equality_refl in H1.
-  }
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & H & Hlb).
-  apply Heqb in H; subst x.
-  apply app_eq_app in Hlb.
-  destruct Hlb as (l'' & Hlb).
-  destruct Hlb as [(H1, H2)| (H1, H2)]. {
-    subst l'.
-    apply (permutation_app_head Heqb).
-    destruct l'' as [| x]. {
-      cbn in H2.
-      now injection H2; clear H2; intros; subst aft.
-    }
-    injection H2; clear H2; intros H2 H; subst y aft.
-...
-  eapply IHl'.
-    destruct l' as [| b]. {
-      cbn in H2 |-*.
-      now injection H2; clear H2; intros; subst aft.
-    }
-    cbn in H2.
-    injection H2; clear H2; intros H2 H; subst b aft.
-...
-intros * Heqb *.
-revert l.
-induction l' as [| a]; intros; cbn. {
-  rewrite app_nil_r.
-  now apply permutation_refl.
-}
-rewrite List_app_cons.
-replace (a :: l' ++ l) with ([a] ++ l' ++ l) by easy.
-...
+cbn in Hlb'.
+injection Hlb'; clear Hlb'; intros Hlb' H; subst z.
+specialize (Hbef' y (or_introl eq_refl)).
+now rewrite equality_refl in Hbef'.
+Qed.
 
-Theorem permutation_app_comm : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ l l', is_permutation eqb (l ++ l') (l' ++ l) = true.
-Proof.
-intros * Heqb *.
-revert l'.
-induction l as [| a]; intros. {
-  rewrite app_nil_r.
-  now apply permutation_refl.
-}
-cbn.
-remember (extract (eqb a) (l' ++ a :: l)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (H1 a).
-  assert (H : a ∈ l' ++ a :: l) by now apply in_or_app; right; left.
-  specialize (H1 H); clear H.
-  now rewrite equality_refl in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x.
-apply app_eq_app in Hlb.
-destruct Hlb as (l'' & Hlb).
-destruct Hlb as [(H1, H2)| (H1, H2)]. {
-  subst l'.
-  destruct l'' as [| b]; cbn in H2. {
-    rewrite app_nil_r.
-    injection H2; clear H2; intros; subst aft.
-    apply IHl.
-  }
-  injection H2; clear H2; intros H2 H; subst b aft.
-  do 2 rewrite List_app_cons.
-  do 4 rewrite app_assoc.
-  do 2 rewrite <- app_assoc.
-  eapply (permutation_trans Heqb); [ apply IHl | ].
-  do 4 rewrite <- app_assoc.
-  apply (permutation_app_head Heqb).
-  do 2 rewrite app_assoc.
-  apply (permutation_app_tail Heqb).
-...
-  apply permutation_cons_append.
-...
-
+(* to be completed
 Theorem permutation_cons_app : ∀ A (eqb : A → _),
   equality eqb →
   ∀ l l1 l2 a,
@@ -995,8 +815,7 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   rewrite List_app_cons, app_assoc.
   apply (permutation_app_tail Heqb).
   replace (a :: l') with ([a] ++ l') by easy.
-...
-  apply permutation_app_comm.
+  now apply permutation_app_comm.
 }
 ...
 remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
