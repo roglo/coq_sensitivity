@@ -262,6 +262,64 @@ destruct lxl as [((bef, x), aft')| ]. 2: {
   specialize (H1 H); clear H.
   now rewrite (equality_refl Heqb) in H1.
 }
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb).
+apply Heqb in H; subst x.
+apply app_eq_app in Hlb.
+destruct Hlb as (l' & Hlb).
+destruct Hlb as [(H1, H3)| (H1, H3)]. 2: {
+  subst bef ld.
+  rewrite app_comm_cons in H2.
+  apply app_eq_app in H2.
+  destruct H2 as (l'' & H2).
+  destruct H2 as [(H2, H4)| (H2, H4)]. {
+    destruct l'' as [| c]. {
+      rewrite app_nil_r in H2; subst l; cbn in H4.
+      injection H4; clear H4; intros; subst aft'.
+      rewrite <- app_assoc.
+      apply IHla with (a := a); [ | | easy ]. 2: {
+        now intros H; apply Hala; right.
+      }
+      now rewrite app_comm_cons, app_assoc.
+    }
+    cbn in H4.
+    injection H4; clear H4; intros H4 H; subst c aft.
+    specialize (Hbef' b) as H1.
+    assert (H : b ∈ lc ++ l'). {
+      apply in_or_app; right.
+      specialize (in_elt b l l'') as H3.
+      rewrite <- H2 in H3.
+      destruct H3 as [H3| H3]; [ subst b | easy ].
+      now exfalso; apply Hala; left.
+    }
+    specialize (H1 H); clear H.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  subst l.
+  destruct l'' as [| c]. {
+    rewrite app_nil_r in Hp.
+    cbn in H4.
+    injection H4; clear H4; intros; subst aft'.
+    rewrite <- app_assoc.
+    apply IHla with (a := a); [ | | easy ]. 2: {
+      now intros H; apply Hala; right.
+    }
+    now rewrite app_comm_cons, app_assoc.
+  }
+  cbn in H4.
+  injection H4; clear H4; intros H4 H; subst c aft'.
+  specialize (Hbef b) as H1.
+  assert (H : b ∈ lc ++ (a :: l') ++ b :: l''). {
+    apply in_or_app; right.
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+subst lc.
+move H2 before H3.
+...
+apply IHla with (a := a).
 ...
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
