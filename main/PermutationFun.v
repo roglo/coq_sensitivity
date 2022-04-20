@@ -201,17 +201,52 @@ destruct Hlb as [(H1, H2)| (H1, H2)]. {
   destruct Hlb as (l' & Hlb).
   destruct Hlb as [(H1, H2)| (H1, H2)]. {
     subst bef.
-...
+    destruct l' as [| c]; cbn in H2. 2: {
+      injection H2; clear H2; intros H2 H; subst c aft'.
+      specialize (Hbef b) as H1.
+      assert (H : b ∈ bef' ++ b :: l'). {
+        now apply in_or_app; right; left.
+      }
+      specialize (H1 H); clear H.
+      now rewrite (equality_refl Heqb) in H1.
+    }
+    injection H2; clear H2; intros; subst aft'.
+    rewrite app_nil_r in Hp, Halc.
+    rewrite app_assoc.
     apply IHla with (a := a); cycle 1. {
       now intros H; apply Hala; right.
     } {
-      intros H; apply Halc, in_or_app; left.
-      now apply in_or_app; left.
+      intros H; apply Halc.
+      apply in_app_or in H.
+      apply in_or_app.
+      now destruct H as [H| H]; [ left | right; right ].
     }
-    destruct l' as [| c]. {
-      cbn in H2.
-      injection H2; clear H2; intros; subst aft'.
-      rewrite app_nil_r in Hbef, Halc, Hp.
+    now rewrite <- app_assoc.
+  }
+  subst bef'.
+  destruct l' as [| c]; cbn in H2. 2: {
+    injection H2; clear H2; intros H2 H; subst c.
+    specialize (Hbef' b) as H1.
+    assert (H : b ∈ bef ++ b :: l'). {
+      now apply in_or_app; right; left.
+    }
+    specialize (H1 H); clear H.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  injection H2; clear H2; intros H2; subst aft'.
+  rewrite app_nil_r in Hbef' |-*.
+  rewrite app_assoc.
+  apply IHla with (a := a); cycle 1. {
+    now intros H; apply Hala; right.
+  } {
+    intros H; apply Halc.
+    apply in_app_or in H.
+    apply in_or_app.
+    now destruct H as [H| H]; [ left | right; right ].
+  }
+  now rewrite <- app_assoc.
+}
+subst bef.
 ...
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
