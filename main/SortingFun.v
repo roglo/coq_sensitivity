@@ -2570,18 +2570,6 @@ apply perm_skip.
 now apply IHlb.
 Qed.
 
-Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ a la lb,
-  permutation eqb la lb
-  → permutation eqb (a :: la) (isort_insert rel a lb).
-Proof.
-intros * Heqb * Hab.
-apply Permutation_permutation in Hab; [ | easy ].
-apply Permutation_permutation; [ easy | ].
-now apply Permutation_cons_isort_insert.
-Qed.
-
 Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
   Permutation la lb
   → Permutation (isort_insert rel c la) (isort_insert rel c lb).
