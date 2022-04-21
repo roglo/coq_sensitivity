@@ -1319,6 +1319,51 @@ apply (permutation_cons_isort_insert rel Heqb).
 now apply permutation_refl.
 Qed.
 
+Theorem permutation_isort_loop_sorted : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb lc,
+  permutation eqb la lb
+  → permutation eqb (isort_loop rel la lc) (isort_loop rel lb lc).
+Proof.
+intros * Heqb * Hp.
+revert la lb Hp.
+induction lc as [| c]; intros; [ easy | cbn ].
+apply IHlc.
+now apply permutation_isort_insert_sorted.
+Qed.
+
+Theorem permutation_isort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ la lb, permutation eqb (la ++ lb) (isort_loop rel la lb).
+Proof.
+intros.
+revert la.
+induction lb as [| b]; intros. {
+  rewrite app_nil_r.
+  now apply permutation_refl.
+}
+specialize (IHlb (la ++ [b])) as H1.
+rewrite <- app_assoc in H1; cbn in H1.
+eapply (permutation_trans Heqb); [ apply H1 | cbn ].
+clear IHlb H1.
+revert lb b.
+induction la as [| a]; intros; [ now apply permutation_refl | cbn ].
+remember (rel b a) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply (permutation_isort_loop_sorted _ Heqb).
+  rewrite app_comm_cons.
+  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
+  now apply permutation_app_comm.
+} {
+  apply (permutation_isort_loop_sorted _ Heqb).
+  apply (permutation_skip Heqb).
+  eapply (permutation_trans Heqb). 2: {
+    apply (permutation_cons_isort_insert _ Heqb).
+    now apply permutation_refl.
+  }
+  now apply permutation_app_comm.
+}
+Qed.
+
 Require Import Permutation.
 
 Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
