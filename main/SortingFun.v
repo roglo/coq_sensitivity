@@ -1305,7 +1305,6 @@ intros c Hc.
 now apply Hbef; right.
 Qed.
 
-(* to be completed
 Theorem permutation_isort_insert_sorted : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb c,
@@ -1313,17 +1312,13 @@ Theorem permutation_isort_insert_sorted : ∀ A (eqb rel : A → _),
   → is_permutation eqb (isort_insert rel c la) (isort_insert rel c lb) = true.
 Proof.
 intros * Heqb * Hp.
-revert c lb Hp.
-induction la as [| a]; intros. {
-  destruct lb; [ cbn | easy ].
-  now rewrite equality_refl.
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_cons_isort_insert rel Heqb), Hp.
 }
-cbn.
-remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-destruct ca; [ now apply (permutation_cons_isort_insert rel Heqb) | ].
-cbn in Hp |-*.
-...
-*)
+apply (permutation_sym Heqb).
+apply (permutation_cons_isort_insert rel Heqb).
+now apply permutation_refl.
+Qed.
 
 Require Import Permutation.
 
