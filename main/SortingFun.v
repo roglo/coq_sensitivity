@@ -1513,7 +1513,6 @@ Qed.
 
 (* *)
 
-(* to be completed
 Theorem select_first_permutation :
   ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ a b la lb,
@@ -1548,30 +1547,32 @@ destruct ac. {
     apply Heqb in Heac; subst c; cbn.
     apply (IHla _ _ _ Hlc).
   }
+  specialize (IHla _ _ _ Hlc) as H1.
+  apply permutation_cons_l_iff in H1.
+  cbn in H1; rewrite Hab in H1.
   remember (extract (eqb a) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]. 2: {
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-Search select_first.
-...
-remember (if rel a c then a else c) as ac eqn:Hac; symmetry in Hac.
-remember (select_first rel ac la) as ld eqn:Hld; symmetry in Hld.
-destruct ld as (d, ld).
-injection Hab; clear Hab; intros; subst d lb.
-move c after b; move x before c.
-move ld before la.
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-specialize (IHla x b ld Hld) as H1.
-destruct ac; subst x. {
-  etransitivity; [ apply perm_swap | symmetry ].
-  etransitivity; [ apply perm_swap | symmetry ].
-  now apply perm_skip.
-} {
-  symmetry.
-  etransitivity; [ apply perm_swap | symmetry ].
-  now apply perm_skip.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (H2 & H & H3).
+  apply Heqb in H; subst x.
+  cbn in H1 |-*.
+  apply permutation_cons_l_iff; cbn.
+  rewrite (equality_refl Heqb).
+  remember (eqb c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb; [ now apply Heqb in Hcb; subst c | easy ].
 }
+remember (select_first rel c la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (d, ld).
+injection Hab; clear Hab; intros; subst d lb; cbn.
+apply permutation_cons_l_iff; cbn.
+remember (eqb a b) as ab eqn:Heab; symmetry in Heab.
+destruct ab. {
+  apply Heqb in Heab; subst b; cbn.
+  now apply IHla.
+}
+rewrite (equality_refl Heqb); cbn.
+now apply IHla.
 Qed.
-*)
 
 (* *)
 
