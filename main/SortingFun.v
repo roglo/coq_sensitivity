@@ -1574,6 +1574,32 @@ rewrite (equality_refl Heqb); cbn.
 now apply IHla.
 Qed.
 
+Theorem permutation_ssort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ la len,
+  length la ≤ len
+  → permutation eqb la (ssort_loop rel len la).
+Proof.
+intros * Heqb * Hlen.
+revert la Hlen.
+induction len; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
+}
+destruct la as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen; cbn.
+remember (select_first rel a la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+specialize (IHlen lc) as H1.
+assert (H : length lc ≤ len). {
+  apply select_first_length in Hlc.
+  congruence.
+}
+specialize (H1 H); clear H.
+apply (select_first_permutation rel Heqb) in Hlc.
+apply (permutation_trans Heqb) with (lb := c :: lc); [ easy | ].
+now apply permutation_skip.
+Qed.
+
 (* *)
 
 Require Import Permutation.
