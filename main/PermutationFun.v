@@ -32,6 +32,50 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 
+Definition permutation A (eqb : A → _) la lb :=
+  is_permutation eqb la lb = true.
+
+Theorem fold_permutation : ∀ A (eqb : A → _) la lb,
+  permutation eqb la lb
+  → is_permutation eqb la lb = true.
+Proof.
+intros * Hpab.
+apply Hpab.
+Qed.
+
+Require Import Relations.
+
+(*
+(* allows to use "reflexivity" (or "easy"), "symmetry" and "transitivity"
+   on goals eqb x y = true, without having to add "apply Heqb" before *)
+Section a.
+
+Context {A : Type}.
+Context {eqb : A → A → bool}.
+Context {Heqb : equality eqb}.
+
+Definition eqp a b := eqb a b = true.
+
+Theorem eqp_refl : reflexive _ eqp.
+Proof. now intros x; apply Heqb. Qed.
+
+Theorem eqp_sym : symmetric _ eqp.
+Proof. now intros x y Hxy; apply Heqb in Hxy; apply Heqb; symmetry. Qed.
+
+Theorem eqp_trans : transitive _ eqp.
+Proof.
+intros x y z Hxy Hyz.
+apply Heqb in Hxy, Hyz; apply Heqb.
+now transitivity y.
+Qed.
+
+Add Parametric Relation : A eqp
+ reflexivity proved by eqp_refl
+ symmetry proved by eqp_sym
+ transitivity proved by eqp_trans
+ as eqp_rel.
+*)
+
 Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
   extract f l = Some (bef, a, aft)
   ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
@@ -467,23 +511,17 @@ Qed.
 (* *)
 
 (*
+(* allows to use "reflexivity" (or "easy"), "symmetry" and "transitivity"
+   on goals "is_permutation eqb la lb = true", instead of applying
+   "permutation_refl", "permutation_sym" and "permutation_trans".
+*)
 Section a.
 
 Context {A : Type}.
 Context {eqb : A → A → bool}.
 Context {Heqb : equality eqb}.
 
-Definition permutation la lb := is_permutation eqb la lb = true.
-
-Theorem fold_permutation : ∀ la lb,
-  permutation la lb
-  → is_permutation eqb la lb = true.
-Proof.
-intros * Hpab.
-apply Hpab.
-Qed.
-
-Add Parametric Relation : (list A) permutation
+Add Parametric Relation : (list A) (permutation eqb)
  reflexivity proved by (permutation_refl Heqb)
  symmetry proved by (permutation_sym Heqb)
  transitivity proved by (permutation_trans Heqb)
