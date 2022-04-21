@@ -1364,6 +1364,17 @@ destruct x. {
 }
 Qed.
 
+(* *)
+
+Theorem permutation_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ l, permutation eqb l (isort rel l).
+Proof.
+intros.
+apply (permutation_isort_loop rel Heqb [] l).
+Qed.
+
+(* *)
+
 Require Import Permutation.
 
 Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
