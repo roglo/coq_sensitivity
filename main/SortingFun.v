@@ -1600,6 +1600,134 @@ apply (permutation_trans Heqb) with (lb := c :: lc); [ easy | ].
 now apply permutation_skip.
 Qed.
 
+Theorem select_first_if : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ a b la lb,
+  select_first rel a la = (b, lb)
+  → (∀ c, c ∈ a :: la → rel b c = true) ∧
+    (∀ c, c ∈ lb → rel b c = true).
+Proof.
+intros * Htr Htot * Hab.
+revert a b lb Hab.
+induction la as [| c]; intros. {
+  cbn in Hab.
+  injection Hab; clear Hab; intros; subst b lb.
+  split; [ | easy ].
+  intros c Hc.
+  destruct Hc as [Hc| Hc]; [ | easy ].
+  subst c.
+  apply total_relation_is_reflexive in Htot.
+  apply Htot.
+}
+cbn in Hab.
+remember (if rel a c then a else c) as x eqn:Hx; symmetry in Hx.
+remember (select_first rel x la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+injection Hab; clear Hab; intros; subst d lb.
+move c after b; move x before c.
+move ld before la.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+specialize (IHla x b ld Hld) as H1.
+destruct H1 as (H1 & H2).
+split. {
+  intros d Hd.
+  destruct Hd as [Hd| [Hd| Hd]]. {
+    subst d.
+    destruct ac; subst x. {
+      now specialize (H1 a (or_introl eq_refl)).
+    }
+    specialize (H1 c (or_introl eq_refl)) as H4.
+    apply Htr with (b := c); [ easy | ].
+    specialize (Htot a c) as H5.
+    now rewrite Hac in H5; cbn in H5.
+  } {
+    subst d.
+    destruct ac; subst x; [ | now apply H1; left ].
+    apply Htr with (b := a); [ | easy ].
+    now apply H1; left.
+  } {
+    now apply H1; right.
+  }
+}
+intros d Hd.
+destruct ac; subst x. {
+  destruct Hd as [Hd| Hd]; [ | now apply H2 ].
+  subst d.
+  apply Htr with (b := a); [ | easy ].
+  now apply H1; left.
+} {
+  destruct Hd as [Hd| Hd]; [ | now apply H2 ].
+  subst d.
+  apply Htr with (b := c); [ now apply H1; left | ].
+  specialize (Htot a c) as H5.
+  now rewrite Hac in H5.
+}
+Qed.
+
+(* to be completed
+Theorem ssort_loop_is_sorted : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ l len,
+  length l ≤ len
+  → sorted rel (ssort_loop rel len l) = true.
+Proof.
+intros * Htr Htot * Hlen.
+revert l Hlen.
+induction len; intros; cbn. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
+}
+destruct l as [| a la]; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+remember (select_first rel a la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as (b, lb); cbn.
+remember (ssort_loop rel len lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ easy | ].
+apply Bool.andb_true_iff.
+split. 2: {
+  rewrite <- Hlc.
+  apply IHlen.
+  apply select_first_length in Hlb.
+  congruence.
+}
+apply Bool.not_false_iff_true.
+intros Hbc.
+specialize (Htot b c) as Hcb.
+rewrite Hbc in Hcb; cbn in Hcb.
+apply (select_first_if Htr Htot) in Hlb.
+destruct Hlb as (H1 & H2).
+specialize (H2 c).
+assert (H : c ∈ lb). {
+Search ssort_loop.
+...
+  rewrite Hlc in H1.
+  apply Permutation_sym in H1.
+  apply Permutation_in with (l := c :: lc); [ easy | now left ].
+}
+...
+specialize (permutation_ssort_loop rel lb) as H1.
+assert (H : length lb ≤ len). {
+  apply select_first_length in Hlb.
+  congruence.
+}
+specialize (H1 _ H); clear H.
+apply (select_first_if Htr Htot) in Hlb.
+destruct Hlb as (_ & H2 & _).
+specialize (H2 c).
+assert (H : c ∈ lb). {
+  rewrite Hlc in H1.
+  apply Permutation_sym in H1.
+  apply Permutation_in with (l := c :: lc); [ easy | now left ].
+}
+specialize (H2 H); clear H.
+now rewrite H2 in Hbc.
+Qed.
+...
+*)
+
 (* *)
 
 Require Import Permutation.
@@ -1725,83 +1853,6 @@ move c after b; move x before c.
 move ld before la.
 remember (rel a c) as ac eqn:Hac; symmetry in Hac.
 specialize (IHla x b ld Hld) as H1.
-destruct ac; subst x. {
-  etransitivity; [ apply perm_swap | symmetry ].
-  etransitivity; [ apply perm_swap | symmetry ].
-  now apply perm_skip.
-} {
-  symmetry.
-  etransitivity; [ apply perm_swap | symmetry ].
-  now apply perm_skip.
-}
-Qed.
-
-Theorem select_first_if : ∀ A (rel : A → _),
-  transitive rel →
-  total_relation rel →
-  ∀ a b la lb,
-  select_first rel a la = (b, lb)
-  → (∀ c, c ∈ a :: la → rel b c = true) ∧
-    (∀ c, c ∈ lb → rel b c = true) ∧
-    Permutation (a :: la) (b :: lb).
-Proof.
-intros * Htr Htot * Hab.
-revert a b lb Hab.
-induction la as [| c]; intros. {
-  cbn in Hab.
-  injection Hab; clear Hab; intros; subst b lb.
-  split; [ | easy ].
-  intros c Hc.
-  destruct Hc as [Hc| Hc]; [ | easy ].
-  subst c.
-  apply total_relation_is_reflexive in Htot.
-  apply Htot.
-}
-cbn in Hab.
-remember (if rel a c then a else c) as x eqn:Hx; symmetry in Hx.
-remember (select_first rel x la) as ld eqn:Hld; symmetry in Hld.
-destruct ld as (d, ld).
-injection Hab; clear Hab; intros; subst d lb.
-move c after b; move x before c.
-move ld before la.
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-specialize (IHla x b ld Hld) as H1.
-destruct H1 as (H1 & H2 & H3).
-split. {
-  intros d Hd.
-  destruct Hd as [Hd| [Hd| Hd]]. {
-    subst d.
-    destruct ac; subst x. {
-      now specialize (H1 a (or_introl eq_refl)).
-    }
-    specialize (H1 c (or_introl eq_refl)) as H4.
-    apply Htr with (b := c); [ easy | ].
-    specialize (Htot a c) as H5.
-    now rewrite Hac in H5; cbn in H5.
-  } {
-    subst d.
-    destruct ac; subst x; [ | now apply H1; left ].
-    apply Htr with (b := a); [ | easy ].
-    now apply H1; left.
-  } {
-    now apply H1; right.
-  }
-}
-split. {
-  intros d Hd.
-  destruct ac; subst x. {
-    destruct Hd as [Hd| Hd]; [ | now apply H2 ].
-    subst d.
-    apply Htr with (b := a); [ | easy ].
-    now apply H1; left.
-  } {
-    destruct Hd as [Hd| Hd]; [ | now apply H2 ].
-    subst d.
-    apply Htr with (b := c); [ now apply H1; left | ].
-    specialize (Htot a c) as H5.
-    now rewrite Hac in H5.
-  }
-}
 destruct ac; subst x. {
   etransitivity; [ apply perm_swap | symmetry ].
   etransitivity; [ apply perm_swap | symmetry ].
@@ -2072,7 +2123,7 @@ assert (H : length lb ≤ len). {
 }
 specialize (H1 _ H); clear H.
 apply (select_first_if Htr Htot) in Hlb.
-destruct Hlb as (_ & H2 & _).
+destruct Hlb as (_ & H2).
 specialize (H2 c).
 assert (H : c ∈ lb). {
   rewrite Hlc in H1.
