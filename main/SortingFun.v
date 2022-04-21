@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Permutation.
+Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc PermutationFun.
@@ -1224,6 +1224,8 @@ Qed.
 
 (* *)
 
+Require Import Permutation.
+
 Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
   Permutation la lb
   → Permutation (a :: la) (isort_insert rel a lb).
@@ -1251,84 +1253,13 @@ induction l as [| b]; [ now left | cbn ].
 now destruct (rel a b); [ left | right ].
 Qed.
 
-(* to be completed
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
   is_permutation eqb la lb = true
   → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
 Proof.
-intros * Heqb * Hpab.
-revert a la Hpab.
-induction lb as [| b]; intros. {
-  apply (permutation_sym Heqb) in Hpab.
-  cbn in Hpab.
-  destruct la; [ cbn | easy ].
-  now rewrite (equality_refl Heqb).
-}
-cbn.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now cbn; rewrite (equality_refl Heqb) | ].
-remember (extract (eqb a) (b :: isort_insert rel a lb)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
-  clear Hlxl.
-  assert (H : a ∈ b :: isort_insert rel a lb). {
-    right; apply in_isort_insert_id.
-  }
-  specialize (H1 H); clear H.
-  now rewrite equality_refl in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hli).
-apply Heqb in H; subst x.
-destruct bef as [| c]. {
-  cbn in Hli.
-  injection Hli; clear Hli; intros Hli H; subst b aft; cbn.
-  eapply (permutation_trans Heqb); [ apply Hpab | ].
-  apply IHlb.
-  now apply permutation_refl.
-}
-cbn in Hli.
-injection Hli; clear Hli; intros Hli H; subst c.
-eapply (permutation_trans Heqb); [ apply Hpab | ].
-rewrite <- app_comm_cons.
-apply (permutation_skip Heqb).
-...
-replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
-apply (permutation_cons_app Heqb) with (a := a) in Hpab.
-...
-apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
-clear la Hab.
-rename lb into la.
-revert a bef aft Hbef Hli.
-induction la as [| b]; intros. {
-  cbn in Hli |-*.
-  destruct bef as [| b]. {
-    now injection Hli; clear Hli; intros; subst aft.
-  }
-  cbn in Hli.
-  injection Hli; clear Hli; intros Hli H; subst b.
-  now destruct bef.
-}
-cbn in Hli.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-...
-replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
-apply (permutation_cons_app Heqb) with (a := a) in Hpab.
-cbn in Hpab.
-
-...
-replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
-apply (permutation_cons_app Heqb) with (a := a) in Hpab.
-...
-eapply Permutation_trans; [ apply Hab | cbn ].
-apply perm_skip.
-now apply IHlb.
-...
-intros * Heqb * Hab; cbn.
+intros * Heqb * Hpab; cbn.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
@@ -1341,9 +1272,9 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hli).
 apply Heqb in H; subst x.
 apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
-clear la Hab.
+clear la Hpab.
 rename lb into la.
-revert a bef aft Hbef Hli.
+revert bef aft Hbef Hli.
 induction la as [| b]; intros. {
   cbn in Hli |-*.
   destruct bef as [| b]. {
@@ -1356,181 +1287,44 @@ induction la as [| b]; intros. {
 cbn in Hli.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
-(*
-  clear - Hli Hbef Heqb.
-*)
-  specialize (in_elt b [a] la) as H1.
-  cbn - [ In ] in H1.
-  rewrite Hli in H1.
-  apply in_app_or in H1.
-  destruct H1 as [H1| H1]. {
-    specialize (Hbef _ H1) as Heab.
-    destruct bef as [| c]; [ easy | ].
-    cbn in Hli.
-    injection Hli; clear Hli; intros Hli H; subst c.
-    specialize (Hbef a (or_introl eq_refl)) as H2.
-    now rewrite (equality_refl Heqb) in H2.
-  }
-...
-  assert (Hba : b ∈ aft). {
-    specialize (in_elt b [a] la) as H1.
-    cbn - [ In ] in H1.
-    rewrite Hli in H1.
-    apply in_app_or in H1.
-    destruct H1 as [H1| H1]. {
-      specialize (Hbef _ H1) as H2.
-    rewrite List_app_cons, app_assoc in H1.
-    rewrite <- Hli in H1.
-...
-  cbn.
-  remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef', x), aft')| ]. 2: {
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
-    specialize (H1 b) as H2.
-    assert (H : b ∈ bef ++ aft). {
-      specialize (in_elt b [a] la) as H3.
-      cbn - [ In ] in H3.
-      rewrite Hli in H3.
-      apply in_app_or in H3.
-      apply in_or_app.
-      destruct H3 as [H3| H3]; [ now left | ].
-      destruct H3 as [H3| H3]; [ | now right ].
-      subst b.
-      clear - Heqb Hli.
-      revert aft la Hli.
-      induction bef as [| b]; intros; cbn. {
-        right; cbn in Hli.
-        injection Hli; clear Hli; intros Hli; subst aft.
-        now left.
-      }
-      cbn in Hli.
-      injection Hli; clear Hli; intros Hli H; subst b.
-      now left; left.
-    }
-    specialize (H2 H); clear H.
-    now rewrite (equality_refl Heqb) in H2.
-  }
-...
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef' & H & Hli').
-  apply Heqb in H; subst x.
-  move Hli before Hli'.
   destruct bef as [| c]. {
-    cbn in Hli, Hli'; subst aft.
-    injection Hli; clear Hli; intros Hli.
-...
-clear Hab Hbef la.
-revert a bef aft Hli.
-induction lb as [| b]; intros; cbn. {
+    cbn in Hli.
+    injection Hli; clear Hli; intros; subst aft; cbn.
+    rewrite (equality_refl Heqb).
+    now apply permutation_refl.
+  }
   cbn in Hli.
-  symmetry in Hli.
-  apply app_eq_unit in Hli.
-  destruct Hli as [(H1, H2)| ]; [ | easy ].
-  now injection H2; clear H2; intros; subst bef aft.
+  injection Hli; clear Hli; intros Hli H; subst c.
+  specialize (Hbef a (or_introl eq_refl)).
+  now rewrite equality_refl in Hbef.
 }
-cbn in Hli.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. 2: {
-  destruct bef as [| c]. {
-    cbn in Hli |-*.
-    injection Hli; clear Hli; intros Hli H; subst b.
-    clear IHlb.
-    clear Hab.
-    revert a aft Hli.
-    induction lb as [| c]; intros; [ easy | ].
-    cbn in Hli.
-    remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-    destruct ac; [ easy | ].
-    destruct aft as [| b]; [ easy | ].
-    injection Hli; clear Hli; intros Hli H; subst c.
-    specialize (IHlb a aft Hli) as H1.
-    rewrite <- H1.
-...
-intros * Heqb * Hab.
-revert a lb Hab.
-induction la as [| b]; intros; cbn in Hab |-*. {
-  destruct lb; [ cbn | easy ].
-  now rewrite (equality_refl Heqb).
-}
-remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
-  specialize (equality_refl Heqb a) as H2.
-  apply Bool.not_false_iff_true in H2.
-  exfalso; apply H2, H1.
-  clear.
-  induction lb as [| b]; [ now left | cbn ].
-  now destruct (rel a b); [ left | right ].
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hli).
-apply Heqb in H; subst x.
-remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef', x), aft')| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef' & H & Hlb).
-apply Heqb in H; subst x.
-subst lb.
-...
-enough (H : is_permutation eqb (b :: la) (bef' ++ b :: aft') = true).
-Check Permutation_cons_app.
-cbn in H.
-...
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef' & H & Hlb).
-apply Heqb in H; subst x.
-remember (extract (eqb b) (bef ++ aft)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef'', x), aft'')| ]. 2: {
-  specialize (extract_None_iff _ _ Hlxl) as H1.
-  assert (Ha : a ∉ bef). {
-    intros Ha.
-    specialize (Hbef _ Ha) as H2.
-    now rewrite (equality_refl Heqb) in H2.
+destruct bef as [| c]. {
+  cbn in Hli.
+  injection Hli; clear Hli; intros Hli H; subst b aft.
+  cbn.
+  remember (extract (eqb a) (isort_insert rel a la)) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    clear Hlxl.
+    specialize (H1 a).
+    assert (H : a ∈ isort_insert rel a la) by apply in_isort_insert_id.
+    specialize (H1 H); clear H.
+    now rewrite equality_refl in H1.
   }
-...
-  remember (eqb b a) as eba eqn:Heba; symmetry in Heba.
-  destruct eba. {
-...
-  specialize (equality_refl Heqb a) as H2.
-  apply Bool.not_false_iff_true in H2.
-  exfalso; apply H2, H1.
-  clear.
-  induction lb as [| b]; [ now left | cbn ].
-  now destruct (rel a b); [ left | right ].
-...
-specialize (IHla a _ Hab) as H1; cbn in H1.
-specialize (IHla b _ Hab) as H2; cbn in H2.
-remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef', x), aft')| ]. {
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef' & H & Hli).
   apply Heqb in H; subst x.
-  remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
-  symmetry in Hlxl.
-  destruct lxl as [((bef'', x), aft'')| ]. {
-    apply extract_Some_iff in Hlxl.
-    destruct Hlxl as (Hbef'' & H & Hli').
-    apply Heqb in H; subst x.
-    move bef' before bef; move bef'' before bef'.
-    move aft' before aft; move aft'' before aft'.
-    move Hbef' before Hbef; move Hbef'' before Hbef'.
-    subst lb.
-    assert (Hb : b ∈ bef' ++ aft'). {
-      rewrite Hli'.
-      now apply in_or_app; right; left.
-    }
-    apply in_app_or in Hb.
-    destruct Hb as [Hb| Hb]. {
-      specialize (Hbef' b Hb) as H3.
-...
-    specialize (IHla a _ Hab) as H1.
-    remember (extract (eqb b) (bef' ++ aft')) as lxl eqn:Hlxl.
-    symmetry in Hlxl.
-...
-*)
+  now apply IHla.
+}
+cbn in Hli.
+injection Hli; clear Hli; intros Hli H; subst c.
+rewrite <- app_comm_cons.
+apply (permutation_skip Heqb).
+apply IHla; [ | easy ].
+intros c Hc.
+now apply Hbef; right.
+Qed.
 
 Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
   equality eqb →
