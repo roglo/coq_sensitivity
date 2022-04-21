@@ -32,12 +32,6 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 
-Theorem equality_refl {A} (eqb : A → _) : equality eqb → ∀ a, eqb a a = true.
-Proof.
-intros * Heqb *.
-now apply Heqb.
-Qed.
-
 Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
   extract f l = Some (bef, a, aft)
   ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
@@ -99,6 +93,12 @@ split. {
   intros c Hc.
   now apply Hf; right.
 }
+Qed.
+
+Theorem equality_refl {A} (eqb : A → _) : equality eqb → ∀ a, eqb a a = true.
+Proof.
+intros * Heqb *.
+now apply Heqb.
 Qed.
 
 Theorem permutation_in : ∀ A (eqb : A → _),
@@ -374,6 +374,17 @@ specialize (H1 H); clear H.
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
+(* *)
+
+Theorem permutation_refl : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l, is_permutation eqb l l = true.
+Proof.
+intros * Heqb *.
+induction l as [| a]; [ easy | cbn ].
+now rewrite (equality_refl Heqb).
+Qed.
+
 Theorem permutation_sym : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -453,14 +464,31 @@ clear la IHla Hab.
 now apply permutation_app_inv in Hbc.
 Qed.
 
-Theorem permutation_refl : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ l, is_permutation eqb l l = true.
+(* *)
+
+(*
+Section a.
+
+Context {A : Type}.
+Context {eqb : A → A → bool}.
+Context {Heqb : equality eqb}.
+
+Definition permutation la lb := is_permutation eqb la lb = true.
+
+Theorem fold_permutation : ∀ la lb,
+  permutation la lb
+  → is_permutation eqb la lb = true.
 Proof.
-intros * Heqb *.
-induction l as [| a]; [ easy | cbn ].
-now rewrite (equality_refl Heqb).
+intros * Hpab.
+apply Hpab.
 Qed.
+
+Add Parametric Relation : (list A) permutation
+ reflexivity proved by (permutation_refl Heqb)
+ symmetry proved by (permutation_sym Heqb)
+ transitivity proved by (permutation_trans Heqb)
+ as permutation_rel.
+*)
 
 Theorem permutation_app_head : ∀ A (eqb : A → _),
   equality eqb →
@@ -680,9 +708,12 @@ eapply (permutation_trans Heqb); [ apply Hll | ].
 now apply permutation_app_comm.
 Qed.
 
+(**)
+
 Theorem permutation_cons_append : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ l x, is_permutation eqb (x :: l) (l ++ [x]) = true.
+  ∀ l x,
+  is_permutation eqb (x :: l) (l ++ [x]) = true.
 Proof.
 intros * Heqb *.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
