@@ -1373,112 +1373,6 @@ intros.
 apply (permutation_isort_loop rel Heqb [] l).
 Qed.
 
-(* *)
-
-Require Import Permutation.
-
-Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
-  Permutation la lb
-  → Permutation (a :: la) (isort_insert rel a lb).
-Proof.
-intros * Hpab.
-revert a la Hpab.
-induction lb as [| b]; intros; cbn. {
-  apply Permutation_sym in Hpab.
-  now apply Permutation_nil in Hpab; subst la.
-}
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now constructor | ].
-replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
-apply Permutation_cons_app with (a := a) in Hpab.
-eapply Permutation_trans; [ apply Hpab | cbn ].
-apply perm_skip.
-now apply IHlb.
-Qed.
-
-Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ a la lb,
-  permutation eqb la lb
-  → permutation eqb (a :: la) (isort_insert rel a lb).
-Proof.
-intros * Heqb * Hab.
-apply Permutation_permutation in Hab; [ | easy ].
-apply Permutation_permutation; [ easy | ].
-now apply Permutation_cons_isort_insert.
-Qed.
-
-Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
-  Permutation la lb
-  → Permutation (isort_insert rel c la) (isort_insert rel c lb).
-Proof.
-intros * Hp.
-revert la Hp.
-induction lb as [| b]; intros; cbn. {
-  now apply Permutation_sym, Permutation_nil in Hp; subst la; cbn.
-}
-remember (rel c b) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Permutation_sym.
-  apply Permutation_cons_isort_insert.
-  now apply Permutation_sym.
-} {
-  apply Permutation_sym.
-  eapply Permutation_trans. 2: {
-    apply Permutation_cons_isort_insert.
-    apply Permutation_sym.
-    apply Hp.
-  }
-  replace (c :: b :: lb) with ([c] ++ b :: lb) by easy.
-  eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
-  constructor.
-  apply Permutation_sym.
-  eapply Permutation_trans; [ | apply IHlb; easy ].
-  now apply Permutation_cons_isort_insert.
-}
-Qed.
-
-Theorem Permutation_isort_loop_sorted : ∀ A (rel : A → _) la lb lc,
-  Permutation la lb
-  → Permutation (isort_loop rel la lc) (isort_loop rel lb lc).
-Proof.
-intros * Hp.
-revert la lb Hp.
-induction lc as [| c]; intros; [ easy | cbn ].
-apply IHlc.
-now apply Permutation_isort_insert_sorted.
-Qed.
-
-Theorem Permutation_isort_loop : ∀ A (rel : A → _) la lb,
-  Permutation (la ++ lb) (isort_loop rel la lb).
-Proof.
-intros.
-revert la.
-induction lb as [| b]; intros; [ now rewrite app_nil_r | ].
-specialize (IHlb (la ++ [b])) as H1.
-rewrite <- app_assoc in H1; cbn in H1.
-eapply Permutation_trans; [ apply H1 | ].
-cbn.
-clear IHlb H1.
-revert lb b.
-induction la as [| a]; intros; [ easy | ].
-cbn.
-remember (rel b a) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply Permutation_isort_loop_sorted.
-  rewrite app_comm_cons.
-  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
-  apply Permutation_app_comm.
-} {
-  apply Permutation_isort_loop_sorted.
-  constructor.
-  eapply Permutation_trans. 2: {
-    now apply Permutation_cons_isort_insert.
-  }
-  apply Permutation_app_comm.
-}
-Qed.
-
 (* in isort *)
 
 Theorem in_isort_insert : ∀ A (rel : A → A → bool) a b lsorted,
@@ -1615,6 +1509,174 @@ destruct (rel a a). {
 }
 f_equal.
 apply IHlen.
+Qed.
+
+(* *)
+
+(* to be completed
+Theorem select_first_permutation :
+  ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ a b la lb,
+  select_first rel a la = (b, lb)
+  → permutation eqb (a :: la) (b :: lb).
+Proof.
+intros * Heqb * Hab.
+revert a b lb Hab.
+induction la as [| c]; intros. {
+  cbn in Hab.
+  injection Hab; clear Hab; intros; subst b lb.
+  now apply permutation_refl.
+}
+cbn in Hab.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (d, ld).
+  injection Hab; clear Hab; intros; subst d lb.
+  move c after b; move ld before la.
+  apply permutation_cons_l_iff; cbn.
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Heqb in Hab; subst b; cbn.
+    specialize (IHla _ _ _ Hlc) as H1.
+    apply permutation_cons_l_iff in H1; cbn in H1.
+    rewrite (equality_refl Heqb) in H1; cbn in H1.
+    now apply (permutation_skip Heqb).
+  }
+  remember (eqb a c) as eac eqn:Heac; symmetry in Heac.
+  destruct eac. {
+    apply Heqb in Heac; subst c; cbn.
+    apply (IHla _ _ _ Hlc).
+  }
+  remember (extract (eqb a) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+Search select_first.
+...
+remember (if rel a c then a else c) as ac eqn:Hac; symmetry in Hac.
+remember (select_first rel ac la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+injection Hab; clear Hab; intros; subst d lb.
+move c after b; move x before c.
+move ld before la.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+specialize (IHla x b ld Hld) as H1.
+destruct ac; subst x. {
+  etransitivity; [ apply perm_swap | symmetry ].
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+} {
+  symmetry.
+  etransitivity; [ apply perm_swap | symmetry ].
+  now apply perm_skip.
+}
+Qed.
+*)
+
+(* *)
+
+Require Import Permutation.
+
+Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
+  Permutation la lb
+  → Permutation (a :: la) (isort_insert rel a lb).
+Proof.
+intros * Hpab.
+revert a la Hpab.
+induction lb as [| b]; intros; cbn. {
+  apply Permutation_sym in Hpab.
+  now apply Permutation_nil in Hpab; subst la.
+}
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now constructor | ].
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply Permutation_cons_app with (a := a) in Hpab.
+eapply Permutation_trans; [ apply Hpab | cbn ].
+apply perm_skip.
+now apply IHlb.
+Qed.
+
+Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a la lb,
+  permutation eqb la lb
+  → permutation eqb (a :: la) (isort_insert rel a lb).
+Proof.
+intros * Heqb * Hab.
+apply Permutation_permutation in Hab; [ | easy ].
+apply Permutation_permutation; [ easy | ].
+now apply Permutation_cons_isort_insert.
+Qed.
+
+Theorem Permutation_isort_insert_sorted : ∀ A (rel : A → _) la lb c,
+  Permutation la lb
+  → Permutation (isort_insert rel c la) (isort_insert rel c lb).
+Proof.
+intros * Hp.
+revert la Hp.
+induction lb as [| b]; intros; cbn. {
+  now apply Permutation_sym, Permutation_nil in Hp; subst la; cbn.
+}
+remember (rel c b) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Permutation_sym.
+  apply Permutation_cons_isort_insert.
+  now apply Permutation_sym.
+} {
+  apply Permutation_sym.
+  eapply Permutation_trans. 2: {
+    apply Permutation_cons_isort_insert.
+    apply Permutation_sym.
+    apply Hp.
+  }
+  replace (c :: b :: lb) with ([c] ++ b :: lb) by easy.
+  eapply Permutation_trans; [ | now apply Permutation_cons_app ]; cbn.
+  constructor.
+  apply Permutation_sym.
+  eapply Permutation_trans; [ | apply IHlb; easy ].
+  now apply Permutation_cons_isort_insert.
+}
+Qed.
+
+Theorem Permutation_isort_loop_sorted : ∀ A (rel : A → _) la lb lc,
+  Permutation la lb
+  → Permutation (isort_loop rel la lc) (isort_loop rel lb lc).
+Proof.
+intros * Hp.
+revert la lb Hp.
+induction lc as [| c]; intros; [ easy | cbn ].
+apply IHlc.
+now apply Permutation_isort_insert_sorted.
+Qed.
+
+Theorem Permutation_isort_loop : ∀ A (rel : A → _) la lb,
+  Permutation (la ++ lb) (isort_loop rel la lb).
+Proof.
+intros.
+revert la.
+induction lb as [| b]; intros; [ now rewrite app_nil_r | ].
+specialize (IHlb (la ++ [b])) as H1.
+rewrite <- app_assoc in H1; cbn in H1.
+eapply Permutation_trans; [ apply H1 | ].
+cbn.
+clear IHlb H1.
+revert lb b.
+induction la as [| a]; intros; [ easy | ].
+cbn.
+remember (rel b a) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Permutation_isort_loop_sorted.
+  rewrite app_comm_cons.
+  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
+  apply Permutation_app_comm.
+} {
+  apply Permutation_isort_loop_sorted.
+  constructor.
+  eapply Permutation_trans. 2: {
+    now apply Permutation_cons_isort_insert.
+  }
+  apply Permutation_app_comm.
+}
 Qed.
 
 Theorem select_first_Permutation : ∀ A (rel : A → _) a b la lb,
