@@ -2530,13 +2530,21 @@ intros.
 now apply permutation_ssort_loop.
 Qed.
 
-(* to be completed *)
 Theorem permutation_bsort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (bsort rel l).
 Proof.
 intros.
 now apply permutation_bsort_loop.
 Qed.
+
+(* to be completed
+Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ l, permutation eqb l (msort rel l).
+Proof.
+intros.
+unfold msort.
+...
+*)
 
 (* *)
 
