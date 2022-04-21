@@ -1665,7 +1665,48 @@ destruct ac; subst x. {
 }
 Qed.
 
-(* to be completed
+Theorem select_first_in : ∀ A (rel : A → _),
+  ∀ a b la lb,
+  select_first rel a la = (b, lb)
+  → b ∈ a :: la.
+Proof.
+intros * Hs.
+revert a b lb Hs.
+induction la as [| c]; intros; cbn in Hs. {
+  now injection Hs; intros; subst b lb; left.
+}
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  remember (select_first rel a la) as lc eqn:Hlc.
+  symmetry in Hlc.
+  destruct lc as (d, ld).
+  injection Hs; clear Hs; intros; subst d lb.
+  specialize (IHla _ _ _ Hlc).
+  now destruct IHla as [H1| H1]; [ left | right; right ].
+}
+remember (select_first rel c la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (d, ld).
+injection Hs; clear Hs; intros; subst d lb.
+right.
+apply (IHla _ _ _ Hlc).
+Qed.
+
+Theorem ssort_loop_in : ∀ A (rel : A → _) it b la lb,
+  ssort_loop rel it la = b :: lb
+  → b ∈ la.
+Proof.
+intros * Hs.
+revert b la lb Hs.
+induction it; intros; cbn in Hs; [ now subst la; left | ].
+destruct la as [| a]; [ easy | ].
+remember (select_first rel a la) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as (c, lc).
+injection Hs; clear Hs; intros Hs H; subst c.
+now apply select_first_in in Hlc.
+Qed.
+
 Theorem ssort_loop_is_sorted : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
@@ -1700,33 +1741,10 @@ rewrite Hbc in Hcb; cbn in Hcb.
 apply (select_first_if Htr Htot) in Hlb.
 destruct Hlb as (H1 & H2).
 specialize (H2 c).
-assert (H : c ∈ lb). {
-Search ssort_loop.
-...
-  rewrite Hlc in H1.
-  apply Permutation_sym in H1.
-  apply Permutation_in with (l := c :: lc); [ easy | now left ].
-}
-...
-specialize (permutation_ssort_loop rel lb) as H1.
-assert (H : length lb ≤ len). {
-  apply select_first_length in Hlb.
-  congruence.
-}
-specialize (H1 _ H); clear H.
-apply (select_first_if Htr Htot) in Hlb.
-destruct Hlb as (_ & H2 & _).
-specialize (H2 c).
-assert (H : c ∈ lb). {
-  rewrite Hlc in H1.
-  apply Permutation_sym in H1.
-  apply Permutation_in with (l := c :: lc); [ easy | now left ].
-}
+assert (H : c ∈ lb) by now apply ssort_loop_in in Hlc.
 specialize (H2 H); clear H.
 now rewrite H2 in Hbc.
 Qed.
-...
-*)
 
 (* *)
 
@@ -2083,55 +2101,6 @@ apply IHit; [ easy | ].
 cbn in Hs.
 destruct la as [| b]; [ easy | ].
 now apply Bool.andb_true_iff in Hs.
-Qed.
-
-Theorem ssort_loop_is_sorted : ∀ A (rel : A → _),
-  transitive rel →
-  total_relation rel →
-  ∀ l len,
-  length l ≤ len
-  → sorted rel (ssort_loop rel len l) = true.
-Proof.
-intros * Htr Htot * Hlen.
-revert l Hlen.
-induction len; intros; cbn. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
-}
-destruct l as [| a la]; [ easy | cbn ].
-cbn in Hlen; apply Nat.succ_le_mono in Hlen.
-remember (select_first rel a la) as lb eqn:Hlb.
-symmetry in Hlb.
-destruct lb as (b, lb); cbn.
-remember (ssort_loop rel len lb) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [| c]; [ easy | ].
-apply Bool.andb_true_iff.
-split. 2: {
-  rewrite <- Hlc.
-  apply IHlen.
-  apply select_first_length in Hlb.
-  congruence.
-}
-apply Bool.not_false_iff_true.
-intros Hbc.
-specialize (Htot b c) as Hcb.
-rewrite Hbc in Hcb; cbn in Hcb.
-specialize (Permutation_ssort_loop rel lb) as H1.
-assert (H : length lb ≤ len). {
-  apply select_first_length in Hlb.
-  congruence.
-}
-specialize (H1 _ H); clear H.
-apply (select_first_if Htr Htot) in Hlb.
-destruct Hlb as (_ & H2).
-specialize (H2 c).
-assert (H : c ∈ lb). {
-  rewrite Hlc in H1.
-  apply Permutation_sym in H1.
-  apply Permutation_in with (l := c :: lc); [ easy | now left ].
-}
-specialize (H2 H); clear H.
-now rewrite H2 in Hbc.
 Qed.
 
 Theorem sorted_bsort_swap : ∀ A (rel : A → _),
