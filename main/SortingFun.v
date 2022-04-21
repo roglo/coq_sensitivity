@@ -1224,27 +1224,6 @@ Qed.
 
 (* *)
 
-Require Import Permutation.
-
-Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
-  Permutation la lb
-  → Permutation (a :: la) (isort_insert rel a lb).
-Proof.
-intros * Hpab.
-revert a la Hpab.
-induction lb as [| b]; intros; cbn. {
-  apply Permutation_sym in Hpab.
-  now apply Permutation_nil in Hpab; subst la.
-}
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now constructor | ].
-replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
-apply Permutation_cons_app with (a := a) in Hpab.
-eapply Permutation_trans; [ apply Hpab | cbn ].
-apply perm_skip.
-now apply IHlb.
-Qed.
-
 Theorem in_isort_insert_id : ∀ A (rel : A → _) a l,
   a ∈ isort_insert rel a l.
 Proof.
@@ -1324,6 +1303,47 @@ apply (permutation_skip Heqb).
 apply IHla; [ | easy ].
 intros c Hc.
 now apply Hbef; right.
+Qed.
+
+(* to be completed
+Theorem permutation_isort_insert_sorted : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb c,
+  is_permutation eqb la lb = true
+  → is_permutation eqb (isort_insert rel c la) (isort_insert rel c lb) = true.
+Proof.
+intros * Heqb * Hp.
+revert c lb Hp.
+induction la as [| a]; intros. {
+  destruct lb; [ cbn | easy ].
+  now rewrite equality_refl.
+}
+cbn.
+remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+destruct ca; [ now apply (permutation_cons_isort_insert rel Heqb) | ].
+cbn in Hp |-*.
+...
+*)
+
+Require Import Permutation.
+
+Theorem Permutation_cons_isort_insert : ∀ A (rel : A → _) a la lb,
+  Permutation la lb
+  → Permutation (a :: la) (isort_insert rel a lb).
+Proof.
+intros * Hpab.
+revert a la Hpab.
+induction lb as [| b]; intros; cbn. {
+  apply Permutation_sym in Hpab.
+  now apply Permutation_nil in Hpab; subst la.
+}
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now constructor | ].
+replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
+apply Permutation_cons_app with (a := a) in Hpab.
+eapply Permutation_trans; [ apply Hpab | cbn ].
+apply perm_skip.
+now apply IHlb.
 Qed.
 
 Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
