@@ -634,15 +634,34 @@ apply (permutation_trans Heqb) with (lb := l ++ m'). {
 now apply permutation_app_tail.
 Qed.
 
+(* theorems equivalent to Permutation type *)
+
+Theorem permutation_nil : ∀ A (eqb : A → _), permutation eqb [] [].
+Proof. easy. Qed.
+
 Theorem permutation_skip : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ a la lb,
-  permutation eqb la lb → permutation eqb (a :: la) (a :: lb).
+  ∀ a la lb, permutation eqb la lb → permutation eqb (a :: la) (a :: lb).
 Proof.
 intros * Heqb * Hpab; cbn.
 apply permutation_cons_l_iff; cbn.
 now rewrite (equality_refl Heqb).
 Qed.
+
+Theorem permutation_swap : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a b la, permutation eqb (b :: a :: la) (a :: b :: la).
+Proof.
+intros * Heqb *.
+apply permutation_cons_l_iff; cbn.
+rewrite (equality_refl Heqb).
+remember (eqb b a) as ba eqn:Hba; symmetry in Hba.
+destruct ba; [ | now apply permutation_refl ].
+apply Heqb in Hba; subst b.
+now apply permutation_refl.
+Qed.
+
+(* *)
 
 Theorem permutation_app_comm : ∀ A (eqb : A → _),
   equality eqb →
