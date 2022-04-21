@@ -1235,10 +1235,10 @@ Qed.
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
-  is_permutation eqb la lb = true
-  → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
+  permutation eqb la lb → permutation eqb (a :: la) (isort_insert rel a lb).
 Proof.
 intros * Heqb * Hpab; cbn.
+apply permutation_cons_l_iff.
 remember (extract (eqb a) (isort_insert rel a lb)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
@@ -1269,7 +1269,6 @@ destruct ab. {
   destruct bef as [| c]. {
     cbn in Hli.
     injection Hli; clear Hli; intros; subst aft; cbn.
-    rewrite (equality_refl Heqb).
     now apply permutation_refl.
   }
   cbn in Hli.
@@ -1280,7 +1279,7 @@ destruct ab. {
 destruct bef as [| c]. {
   cbn in Hli.
   injection Hli; clear Hli; intros Hli H; subst b aft.
-  cbn.
+  apply permutation_cons_l_iff; cbn.
   remember (extract (eqb a) (isort_insert rel a la)) as lxl eqn:Hlxl.
   symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]. 2: {
@@ -1308,8 +1307,8 @@ Qed.
 Theorem permutation_isort_insert_sorted : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb c,
-  is_permutation eqb la lb = true
-  → is_permutation eqb (isort_insert rel c la) (isort_insert rel c lb) = true.
+  permutation eqb la lb
+  → permutation eqb (isort_insert rel c la) (isort_insert rel c lb).
 Proof.
 intros * Heqb * Hp.
 eapply (permutation_trans Heqb). 2: {
@@ -1344,8 +1343,8 @@ Qed.
 Theorem permutation_cons_isort_insert' : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
-  is_permutation eqb la lb = true
-  → is_permutation eqb (a :: la) (isort_insert rel a lb) = true.
+  permutation eqb la lb
+  → permutation eqb (a :: la) (isort_insert rel a lb).
 Proof.
 intros * Heqb * Hab.
 apply Permutation_permutation in Hab; [ | easy ].
