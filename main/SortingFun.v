@@ -1364,15 +1364,6 @@ destruct x. {
 }
 Qed.
 
-(* *)
-
-Theorem permutation_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
-  ∀ l, permutation eqb l (isort rel l).
-Proof.
-intros.
-apply (permutation_isort_loop rel Heqb [] l).
-Qed.
-
 (* in isort *)
 
 Theorem in_isort_insert : ∀ A (rel : A → A → bool) a b lsorted,
@@ -2269,6 +2260,25 @@ eapply le_trans in Hit. 2: {
 now apply bsort_loop_is_sorted_nb_disorder.
 Qed.
 
+Theorem permutation_bsort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ la it, permutation eqb la (bsort_loop rel it la).
+Proof.
+intros.
+revert la.
+induction it; intros; [ now apply permutation_refl | cbn ].
+remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [lb| ]; [ | now apply permutation_refl ].
+apply bsort_swap_Some in Hlb.
+destruct Hlb as (Hs & c & d & lc & ld & Hlb).
+destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
+apply (permutation_trans Heqb) with (lb := lb); [ | apply IHit ].
+subst la lb.
+apply (permutation_app_head Heqb).
+apply (permutation_swap Heqb).
+Qed.
+
+(* *)
+
 Theorem sorted_middle : ∀ A rel (a b : A) la lb lc,
   transitive rel
   → sorted rel (la ++ a :: lb ++ b :: lc) = true
@@ -2502,6 +2512,30 @@ Theorem msort_is_sorted : ∀ A (rel : A → _),
 Proof.
 intros * Htot *.
 now apply msort_loop_is_sorted.
+Qed.
+
+(* *)
+
+Theorem permutation_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ l, permutation eqb l (isort rel l).
+Proof.
+intros.
+apply (permutation_isort_loop rel Heqb [] l).
+Qed.
+
+Theorem permutation_ssort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ l, permutation eqb l (ssort rel l).
+Proof.
+intros.
+now apply permutation_ssort_loop.
+Qed.
+
+(* to be completed *)
+Theorem permutation_bsort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ l, permutation eqb l (bsort rel l).
+Proof.
+intros.
+now apply permutation_bsort_loop.
 Qed.
 
 (* *)
