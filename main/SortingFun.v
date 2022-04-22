@@ -2796,11 +2796,43 @@ apply (permutation_trans Heqb) with (lb := l'). 2: {
   now rewrite Hlc, Hld.
 }
 subst l' lc ld.
+...
 apply (permutation_trans Heqb) with (lb := la ++ lb). {
   now apply split_permutation.
 }
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
+destruct it. {
+  cbn.
+  apply Nat.le_1_r in Hit.
+  destruct Hit as [Hit| Hit]. {
+    apply Nat.eq_add_0 in Hit.
+    destruct Hit as (H1, H2).
+    apply length_zero_iff_nil in H1, H2; subst la lb; cbn.
+    apply permutation_nil.
+  }
+  apply Nat.eq_add_1 in Hit.
+  destruct Hit as [(H1, H2)| (H1, H2)]. {
+    apply length_zero_iff_nil in H2; subst lb.
+    rewrite app_nil_r.
+    destruct la as [| a]; [ easy | cbn ].
+    apply (permutation_refl Heqb).
+  } {
+    apply length_zero_iff_nil in H1; subst la; cbn.
+    destruct lb as [| b]; [ easy | cbn ].
+    apply (permutation_refl Heqb).
+  }
+}
+cbn.
+remember (split la) as lla eqn:Hlla; symmetry in Hlla.
+destruct lla as (lc, ld).
+remember (split lb) as llb eqn:Hllb; symmetry in Hllb.
+destruct llb as (le, lf).
+...
+  ============================
+  permutation eqb (la ++ lb)
+    (split_inv (merge rel (msort_loop rel it lc) (msort_loop rel it ld))
+       (merge rel (msort_loop rel it le) (msort_loop rel it lf)))
 ...
 destruct l as [| a]. {
   injection Hla; clear Hla; intros; subst la lb; cbn.
