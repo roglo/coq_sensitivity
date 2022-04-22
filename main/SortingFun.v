@@ -2648,6 +2648,67 @@ Theorem permutation_merge_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb)
   → permutation eqb l (merge_loop rel it la lb).
 Proof.
 intros * Heqb * Hit Hll.
+rewrite app_length in Hit.
+revert l la lb Hit Hll.
+induction it as (it, IHit) using lt_wf_rec; intros.
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  destruct it; apply permutation_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  destruct it; [ easy | ].
+  now apply permutation_refl.
+}
+cbn in Hll.
+remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hll' into Hll.
+apply permutation_cons_l_iff.
+destruct it; [ easy | ].
+cbn in Hit |-*; rewrite Nat.add_succ_r in Hit.
+apply Nat.succ_le_mono in Hit.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  cbn.
+  rewrite (equality_refl Heqb); cbn.
+  destruct it; [ easy | cbn ].
+  apply Nat.succ_le_mono in Hit.
+  destruct l as [| c]. {
+    injection Hll; clear Hll; intros; subst la lb; cbn.
+    now apply permutation_refl.
+  }
+  destruct l as [| d]. {
+    injection Hll; clear Hll; intros; subst la lb; cbn.
+    destruct it; [ easy | ].
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb; [ now apply permutation_swap | cbn ].
+    apply (permutation_refl Heqb).
+  }
+  cbn in Hll.
+  remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  rename lc into la; rename ld into lb; rename Hll' into Hll.
+  apply permutation_cons_l_iff.
+  destruct it; [ easy | ].
+  cbn in Hit |-*; rewrite Nat.add_succ_r in Hit.
+  apply Nat.succ_le_mono in Hit.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    cbn.
+    remember (eqb b c) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc. {
+      apply Heqb in Hbc; subst c; cbn.
+      destruct it; [ easy | ].
+      apply Nat.succ_le_mono in Hit.
+      specialize (IHit it) as H1.
+      assert (H : it < S (S (S (S it)))) by flia.
+      specialize (H1 H _ _ _ Hit Hll); clear H.
+      apply permutation_cons_l_iff; cbn.
+...
+intros * Heqb * Hit Hll.
 remember (length (la ++ lb)) as len eqn:Hlen; symmetry in Hlen.
 rewrite <- Hlen in Hit.
 revert it l la lb Hlen Hit Hll.
