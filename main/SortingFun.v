@@ -2674,6 +2674,30 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (H1 H); clear H.
   now rewrite equality_refl in H1.
 }
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H1 & H & H2).
+apply Heqb in H; subst x.
+destruct l as [| b]. {
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst la lb.
+  rewrite msort_loop_single, msort_loop_nil in H2.
+  cbn in H2.
+  destruct bef as [| b]. {
+    injection H2; clear H2; intros; subst aft.
+    apply permutation_nil.
+  }
+  cbn in H2.
+  injection H2; clear H2; intros H2 H; subst b.
+  now destruct bef.
+}
+cbn in Hla.
+remember (split l) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+injection Hla; clear Hla; intros; subst la lb.
+rename lc into la; rename ld into lb.
+apply permutation_cons_l_iff.
+cbn in H2.
+Search (msort_loop _ _ (_ :: _)).
 ...
 
 Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
