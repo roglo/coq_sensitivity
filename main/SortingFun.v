@@ -2648,6 +2648,99 @@ Theorem permutation_merge_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb)
   → permutation eqb l (merge_loop rel it la lb).
 Proof.
 intros * Heqb * Hit Hll.
+remember (length (la ++ lb)) as len eqn:Hlen; symmetry in Hlen.
+rewrite <- Hlen in Hit.
+revert it l la lb Hlen Hit Hll.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct it. {
+  rewrite app_length in Hit.
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  apply length_zero_iff_nil in H1, H2; subst la lb.
+  apply split_nil_l in Hll.
+  destruct Hll; subst l; cbn.
+  apply permutation_nil.
+}
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  apply permutation_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  now apply permutation_refl.
+}
+cbn in Hll.
+remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+cbn in Hlen, Hit.
+apply Nat.succ_le_mono in Hit.
+rewrite app_length in Hlen, Hit; cbn in Hlen, Hit.
+rewrite Nat.add_succ_r in Hlen, Hit.
+rewrite <- app_length in Hlen, Hit.
+rename lc into la; rename ld into lb; rename Hll' into Hll.
+(**)
+destruct len; [ easy | ].
+destruct len; [ easy | ].
+do 2 apply Nat.succ_inj in Hlen.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+specialize (IHlen len) as H1.
+assert (H : len < S (S len)) by now transitivity (S len).
+specialize (H1 H it l la lb Hlen Hit Hll); clear H.
+cbn.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply (permutation_skip Heqb).
+  apply permutation_cons_l_iff.
+  destruct l as [| c]. {
+    injection Hll; clear Hll; intros; subst la lb; cbn.
+    rewrite (equality_refl Heqb).
+    apply permutation_nil.
+  }
+  destruct l as [| d]. {
+    injection Hll; clear Hll; intros; subst la lb.
+    remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb. {
+      cbn.
+      remember (eqb b c) as bc eqn:Hbc; symmetry in Hbc.
+      destruct bc. {
+        apply Heqb in Hbc; subst c; cbn.
+        now destruct it.
+      }
+      destruct it; [ easy | cbn ].
+      rewrite (equality_refl Heqb), app_nil_r.
+      apply (permutation_refl Heqb).
+    }
+    cbn.
+    rewrite (equality_refl Heqb); cbn.
+    destruct it; [ easy | cbn ].
+    apply (permutation_refl Heqb).
+  }
+  cbn in Hll.
+  remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+  destruct ll as (lc, ld).
+  injection Hll; clear Hll; intros; subst la lb.
+  cbn in Hlen, Hit.
+  rewrite app_length in Hlen, Hit; cbn in Hlen, Hit.
+  rewrite Nat.add_succ_r in Hlen, Hit.
+  rewrite <- app_length in Hlen, Hit.
+  rename lc into la; rename ld into lb; rename Hll' into Hll.
+  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+  destruct cb. {
+    cbn.
+    remember (eqb b c) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc. {
+      apply Heqb in Hbc; subst c; cbn.
+      eapply (permutation_trans Heqb); [ apply H1 | ].
+      destruct it; [ apply permutation_nil | ].
+      remember (d :: lb) as lc; cbn.
+(* pfff... chais pas *)
+Theorem glop :
+  split l = (lc, ld)
+  permutation eqb (la ++ l) (merge_loop rel it lc (la ++ ld)).
+...
+intros * Heqb * Hit Hll.
 revert l la lb Hit Hll.
 induction it; intros. {
   rewrite app_length in Hit.
