@@ -2643,10 +2643,13 @@ Qed.
 (* to be completed
 Theorem permutation_merge_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l la lb,
-  length (la ++ lb) ≤ it
+  length la + length lb ≤ it
   → split l = (la, lb)
   → permutation eqb l (merge_loop rel it la lb).
 Proof.
+intros * Heqb * Hit Hll.
+Print merge_loop.
+...
 intros * Heqb * Hit Hll.
 rewrite app_length in Hit.
 revert l la lb Hit Hll.
