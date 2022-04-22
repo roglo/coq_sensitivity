@@ -2626,6 +2626,20 @@ apply in_or_app.
 now destruct H; [ left | right; right ].
 Qed.
 
+Theorem in_msort_loop : ∀ A (rel : A → _) it a la,
+  a ∈ la → a ∈ msort_loop rel it la.
+Proof.
+intros * Ha.
+revert la Ha.
+induction it; intros; [ easy | cbn ].
+remember (split la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lb, lc).
+apply in_merge.
+specialize (split_in _ Hll a Ha) as H2.
+apply in_app_or in H2; apply in_or_app.
+now destruct H2 as [H2| H2]; [ left | right ]; apply IHit.
+Qed.
+
 (* to be completed
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
@@ -2655,8 +2669,11 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     apply in_merge.
     specialize (split_in _ Hla a (or_introl eq_refl)) as H2.
     apply in_app_or in H2; apply in_or_app.
-    destruct H2 as [H2| H2]; [ left | right ]. {
-Search (_ ∈ msort_loop _ _ _).
+    now destruct H2; [ left | right ]; apply in_msort_loop.
+  }
+  specialize (H1 H); clear H.
+  now rewrite equality_refl in H1.
+}
 ...
 
 Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
