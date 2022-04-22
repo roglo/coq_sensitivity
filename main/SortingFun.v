@@ -2537,7 +2537,80 @@ intros.
 now apply permutation_bsort_loop.
 Qed.
 
+Theorem in_merge_loop : ∀ A (rel : A → _) it a la lb,
+  length (la ++ lb) ≤ it
+  → a ∈ la ++ lb
+  → a ∈ merge_loop rel it la lb.
+Proof.
+intros * Hit Hll.
+revert a la lb Hit Hll.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit.
+  apply app_eq_nil in Hit.
+  now destruct Hit; subst la lb.
+}
+destruct la as [| a']; [ easy | ].
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+destruct lb as [| b]. {
+  destruct Hll as [Hll| Hll]; [ now left | right ].
+  now rewrite app_nil_r in Hll.
+}
+remember (rel a' b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  destruct Hll as [Hll| Hll]; [ now subst a'; left | right ].
+  now apply IHit.
+}
+apply in_app_or in Hll.
+rewrite app_length in Hit; cbn in Hit.
+rewrite Nat.add_succ_r in Hit.
+destruct Hll as [Hll| Hll]. {
+  right.
+  apply IHit; [ now rewrite app_length | ].
+  now apply in_or_app; left.
+}
+destruct Hll as [Hll| Hll]; [ now subst b; left | right ].
+apply IHit; [ now rewrite app_length | ].
+now apply in_or_app; right.
+Qed.
+
+Theorem in_merge : ∀ A (rel : A → _) a la lb,
+  a ∈ la ++ lb → a ∈ merge rel la lb.
+Proof.
+intros * Hll.
+apply in_merge_loop; [ | easy ].
+now rewrite app_length.
+Qed.
+
 (* to be completed
+Theorem split_in : ∀ A (l la lb : list A),
+  split l = (la, lb) → ∀ a, a ∈ l → a ∈ la ++ lb.
+Proof.
+intros * Hs * Ha.
+revert a la lb Hs Ha.
+induction l as [| b]; intros; [ easy | ].
+destruct Ha as [Ha| Ha]. {
+  subst b.
+  destruct l as [| c]. {
+    injection Hs; clear Hs; intros; subst la lb.
+    rewrite app_nil_r.
+    now left.
+  }
+  cbn in Hs.
+  remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as (lc, ld).
+  now injection Hs; clear Hs; intros; subst la lb; left.
+}
+destruct l as [| c]; [ easy | ].
+cbn in Hs.
+remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (lc, ld).
+injection Hs; clear Hs; intros; subst la lb.
+destruct Ha as [Ha| Ha]; [ now apply in_or_app; subst c; right; left | ].
+cbn; right.
+apply IHl.
+...
+
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
@@ -2563,7 +2636,9 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   clear Hlxl.
   specialize (H1 a).
   assert (H : a ∈ merge rel (msort_loop rel it la) (msort_loop rel it lb)). {
-Search (_ ∈ merge _ _ _).
+    apply in_merge.
+...
+    specialize (split_in _ Hla a (or_introl eq_refl)) as H2.
 ...
 
 Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
