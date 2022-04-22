@@ -2658,7 +2658,16 @@ destruct it. {
   now apply permutation_refl.
 }
 destruct la as [| a]; [ now apply permutation_refl | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit; cbn.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+specialize (IHit it (Nat.lt_succ_diag_r _)) as H1.
+specialize (H1 la (a :: lb) lc Hit).
+apply (permutation_trans Heqb) with (lb := la ++ (a :: lb) ++ lc). 2: {
+  eapply (permutation_trans Heqb); [ now apply (IHit it) | ].
+(* ouais, chais pas, faut voir *)
+...
+  ============================
+  permutation eqb ((a :: lb) ++ merge_loop rel it la lc) (lb ++ merge_loop rel (S it) (a :: la) lc)
+...
 apply permutation_cons_l_iff.
 destruct lb as [| b]. {
   cbn.
