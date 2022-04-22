@@ -2641,9 +2641,84 @@ now destruct H2 as [H2| H2]; [ left | right ]; apply IHit.
 Qed.
 
 (* to be completed
+Theorem permutation_merge_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ it l la lb,
+  length (la ++ lb) ≤ it
+  → split l = (la, lb)
+  → permutation eqb l (merge_loop rel it la lb).
+Proof.
+intros * Heqb * Hit Hll.
+revert l la lb Hit Hll.
+induction it; intros. {
+  rewrite app_length in Hit.
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  apply length_zero_iff_nil in H1, H2; subst la lb.
+  apply split_nil_l in Hll.
+  destruct Hll; subst l; cbn.
+  apply permutation_nil.
+}
+destruct l as [| a]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  apply permutation_nil.
+}
+destruct l as [| b]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
+  now apply permutation_refl.
+}
+cbn in Hll.
+remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+destruct ll as (lc, ld).
+injection Hll; clear Hll; intros; subst la lb.
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+rename lc into la; rename ld into lb; rename Hll' into Hll; cbn.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply (permutation_skip Heqb).
+  apply permutation_cons_l_iff.
+...
+
+Theorem permutation_merge : ∀ A (eqb rel : A → _) l la lb,
+  split l = (la, lb)
+  → permutation eqb l (merge rel la lb).
+Proof.
+intros * Hll.
+...
+apply permutation_merge_loop; [ | easy ].
+now rewrite app_length.
+...
+
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
+intros * Heqb * Hit.
+destruct it; intros. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l; cbn.
+  apply permutation_nil.
+}
+cbn.
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+...
+remember (msort_loop rel it la) as lc eqn:Hlc.
+remember (msort_loop rel it lb) as ld eqn:Hld.
+remember (split_inv lc ld) as l' eqn:Hl'.
+apply (permutation_trans Heqb) with (lb := l'). 2: {
+  apply permutation_merge.
+  subst l'.
+  rewrite split_split_inv; [ easy | ].
+  apply split_lengths in Hla.
+  apply (f_equal length) in Hlc, Hld.
+  rewrite msort_loop_length in Hlc, Hld.
+  now rewrite Hlc, Hld.
+}
+subst l' lc ld.
+...
+remember (split_inv (msort_loop rel it la) (msort_loop rel it lb)) as l' eqn:Hl'.
+eapply (permutation_trans Heqb); [ | apply permutation_merge ].
+eapply (permutation_trans Heqb); [ apply permutation_merge, Hla | ].
+...
 intros * Heqb * Hit.
 revert l Hit.
 induction it; intros. {
