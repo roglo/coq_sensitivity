@@ -2640,7 +2640,6 @@ apply in_app_or in H2; apply in_or_app.
 now destruct H2 as [H2| H2]; [ left | right ]; apply IHit.
 Qed.
 
-(* to be completed
 Theorem permutation_merge_loop_aux :
   ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it la lb lc,
@@ -2659,91 +2658,49 @@ destruct it. {
 }
 destruct la as [| a]; [ now apply permutation_refl | ].
 cbn in Hit; apply Nat.succ_le_mono in Hit.
-specialize (IHit it (Nat.lt_succ_diag_r _)) as H1.
-specialize (H1 la (a :: lb) lc Hit).
-apply (permutation_trans Heqb) with (lb := la ++ (a :: lb) ++ lc). 2: {
-  eapply (permutation_trans Heqb); [ now apply (IHit it) | ].
-(* ouais, chais pas, faut voir *)
-...
-  ============================
-  permutation eqb ((a :: lb) ++ merge_loop rel it la lc) (lb ++ merge_loop rel (S it) (a :: la) lc)
-...
-apply permutation_cons_l_iff.
-destruct lb as [| b]. {
-  cbn.
-  destruct lc as [| c]. {
-    cbn.
-    rewrite (equality_refl Heqb).
-    rewrite app_nil_r.
-    now apply permutation_refl.
-  }
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac; cbn. {
-    rewrite (equality_refl Heqb); cbn.
-    specialize (IHit it (Nat.lt_succ_diag_r _)) as H1.
-    apply (H1 la [] (c :: lc) Hit).
-  }
-  remember (eqb a c) as ac eqn:Heac; symmetry in Heac.
-  destruct ac. {
-    apply Heqb in Heac; subst c.
-    specialize (IHit it (Nat.lt_succ_diag_r _)) as H1.
-    specialize (H1 (a :: la) [] lc).
-    cbn in Hit; rewrite Nat.add_succ_r in Hit.
-    specialize (H1 Hit).
-    cbn in H1 |-*.
-    apply (permutation_trans Heqb) with (lb := a :: la ++ lc); [ | easy ].
-    replace (a :: la ++ lc) with ([a] ++ la ++ lc) by easy.
-    replace (a :: lc) with ([a] ++ lc) by easy.
-    do 2 rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
+cbn.
+destruct lc as [| b]. {
+  rewrite app_nil_r.
+  rewrite app_comm_cons.
+  apply (permutation_app_comm Heqb).
+}
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  eapply (permutation_trans Heqb). 2: {
     apply (permutation_app_comm Heqb).
   }
-  cbn in Hit; rewrite Nat.add_succ_r in Hit.
-  destruct it; [ easy | ].
-  apply Nat.succ_le_mono in Hit.
   cbn.
-  destruct lc as [| b]. {
-    cbn.
-    rewrite (equality_refl Heqb).
-    apply (permutation_app_comm Heqb).
+  apply (permutation_skip Heqb).
+  eapply (permutation_trans Heqb). {
+    apply IHit; [ | apply Hit ]; easy.
   }
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; cbn. {
-    rewrite (equality_refl Heqb).
-    specialize (IHit it) as H1.
-    assert (H : it < S (S it)) by now transitivity (S it).
-    specialize (H1 H); clear H.
-    now apply (H1 la [c] (b :: lc) Hit).
-  }
-  remember (eqb a b) as ab eqn:Heab; symmetry in Heab.
-  destruct ab. {
-    apply Heqb in Heab; subst b.
-    apply (permutation_trans Heqb) with (lb := a :: la ++ c :: lc). 2: {
-      cbn in Hit; rewrite Nat.add_succ_r in Hit.
-      specialize (IHit it) as H1.
-      assert (H : it < S (S it)) by now transitivity (S it).
-      apply (H1 H (a :: la) [c] lc Hit).
-    }
-    replace (c :: a :: lc) with ([c; a] ++ lc) by easy.
-    replace (a :: la ++ c :: lc) with ([a] ++ la ++ [c] ++ lc) by easy.
-    do 3 rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    apply (permutation_trans Heqb) with (lb := la ++ [a; c]). {
-      apply (permutation_app_head Heqb).
-      apply (permutation_swap Heqb).
-    }
-    replace (la ++ [a; c]) with (la ++ [a] ++ [c]) by easy.
-    rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    apply (permutation_app_comm Heqb).
-  }
-  cbn in Hit.
-  rewrite Nat.add_succ_r in Hit.
-  destruct it; [ easy | ].
-  apply Nat.succ_le_mono in Hit.
-  cbn.
-(* mouais, j'ai des doutes, là, quand même *)
-...
+  apply (permutation_app_comm Heqb).
+}
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+replace (a :: la ++ lb ++ b :: lc) with ([a] ++ la ++ lb ++ b :: lc) by easy.
+do 2 rewrite app_assoc.
+eapply (permutation_trans Heqb). {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+apply (permutation_skip Heqb).
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+rewrite List_app_cons.
+eapply (permutation_trans Heqb). {
+  apply (permutation_app_comm Heqb).
+}
+cbn.
+do 2 rewrite app_comm_cons.
+rewrite <- app_assoc.
+cbn in Hit.
+rewrite Nat.add_succ_r in Hit.
+now apply IHit.
+Qed.
 
 Theorem permutation_merge_loop :
   ∀ A (eqb rel : A → _) (Heqb : equality eqb),
@@ -2752,146 +2709,10 @@ Theorem permutation_merge_loop :
   → permutation eqb (la ++ lb) (merge_loop rel it la lb).
 Proof.
 intros * Heqb * Hit.
-...
 apply (permutation_merge_loop_aux rel Heqb la [] lb Hit).
-...
-intros * Heqb * Hit.
-revert la lb Hit.
-induction it as (it, IHit) using lt_wf_rec; intros.
-destruct it. {
-  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
-  destruct Hit as (H1, H2).
-  apply length_zero_iff_nil in H1, H2; subst la lb.
-  apply permutation_nil.
-}
-destruct la as [| a]; [ now apply permutation_refl | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit; cbn.
-apply permutation_cons_l_iff.
-destruct lb as [| b]. {
-  rewrite Nat.add_0_r in Hit; cbn.
-  rewrite (equality_refl Heqb), app_nil_r.
-  now apply permutation_refl.
-}
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; cbn. {
-  rewrite (equality_refl Heqb); cbn.
-(*3*)
-  now apply IHit.
-}
-remember (eqb a b) as ab eqn:Heab; symmetry in Heab.
-destruct ab. {
-  apply Heqb in Heab; subst b.
-  apply (permutation_trans Heqb) with (lb := (a :: la) ++ lb). 2: {
-    apply IHit; [ easy | cbn in Hit |-* ].
-    now rewrite Nat.add_succ_r in Hit.
-  }
-  rewrite List_app_cons, app_assoc.
-  apply (permutation_app Heqb); [ | now apply permutation_refl ].
-  replace (a :: la) with ([a] ++ la) by easy.
-  now apply permutation_app_comm.
-}
-cbn in Hit; rewrite Nat.add_succ_r in Hit.
-destruct it; [ easy | ].
-apply Nat.succ_le_mono in Hit; cbn.
-destruct lb as [| c]. {
-  cbn.
-  rewrite (equality_refl Heqb).
-  now apply permutation_app_comm.
-}
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-destruct ac; cbn. {
-  rewrite (equality_refl Heqb).
-(*2*)
-  cbn.
-  apply (permutation_trans Heqb) with (lb := b :: la ++ c :: lb). {
-    rewrite app_comm_cons.
-    do 3 rewrite List_app_cons.
-    replace (b :: la) with ([b] ++ la) by easy.
-    do 3 rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    apply (permutation_app_tail Heqb).
-    apply (permutation_app_comm Heqb).
-  }
-  apply (permutation_skip Heqb).
-  apply IHit; [ now transitivity (S it) | easy ].
-}
-remember (eqb a c) as ac eqn:Heac; symmetry in Heac.
-destruct ac. {
-  apply Heqb in Heac; subst c; cbn.
-  apply (permutation_trans Heqb) with (lb := b :: a :: la ++ lb). {
-    replace (a :: lb) with ([a] ++ lb) by easy.
-    do 3 rewrite app_comm_cons.
-    rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    replace (b :: a :: la) with ([b; a] ++ la) by easy.
-    apply (permutation_app_comm Heqb).
-  }
-  apply (permutation_skip Heqb).
-  rewrite app_comm_cons.
-  apply IHit; [ now transitivity (S it) | ].
-  now cbn in Hit; rewrite Nat.add_succ_r in Hit.
-}
-cbn in Hit; rewrite Nat.add_succ_r in Hit.
-destruct it; [ easy | ].
-apply Nat.succ_le_mono in Hit; cbn.
-destruct lb as [| d]. {
-  cbn.
-  rewrite (equality_refl Heqb).
-  apply (permutation_app_comm Heqb).
-}
-remember (rel a d) as ad eqn:Had; symmetry in Had.
-destruct ad. {
-  cbn.
-  rewrite (equality_refl Heqb).
-(*1*)
-  replace (b :: c :: d :: lb) with ([b; c] ++ (d :: lb)) by easy.
-  apply (permutation_trans Heqb) with (lb := ([b; c] ++ la) ++ (d :: lb)). {
-    rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    apply (permutation_app_comm Heqb).
-  }
-  rewrite <- app_assoc.
-  apply (permutation_app_head Heqb).
-  apply IHit; [ flia | easy ].
-}
-cbn.
-remember (eqb a d) as ad eqn:Head; symmetry in Head.
-destruct ad. {
-  apply Heqb in Head; subst d.
-  replace (b :: c :: a :: lb) with ([b; c] ++ (a :: lb)) by easy.
-  apply (permutation_trans Heqb) with (lb := [b; c] ++ (a :: la) ++ lb). 2: {
-    apply (permutation_app_head Heqb).
-    cbn in Hit; rewrite Nat.add_succ_r in Hit.
-    apply IHit; [ flia | easy ].
-  }
-  rewrite List_app_cons.
-  do 3 rewrite app_assoc.
-  apply (permutation_app_tail Heqb).
-  rewrite <- app_assoc; cbn.
-  replace (b :: c :: a :: la) with ([b; c; a] ++ la) by easy.
-  apply (permutation_app_comm Heqb).
-}
-cbn in Hit; rewrite Nat.add_succ_r in Hit.
-destruct it; [ easy | ].
-apply Nat.succ_le_mono in Hit; cbn.
-destruct lb as [| e]. {
-  cbn.
-  rewrite (equality_refl Heqb).
-  apply (permutation_app_comm Heqb).
-}
-remember (rel a e) as ae eqn:Hae; symmetry in Hae.
-destruct ae. {
-  cbn.
-  rewrite (equality_refl Heqb).
-...
-  permutation eqb (la ++ b :: lb) (merge_loop rel it la (b :: lb))
-  permutation eqb (la ++ b :: c :: lb) ([b] ++ merge_loop rel it la (c :: lb))
-  permutation eqb (la ++ b :: c :: d :: lb) ([b; c] ++ merge_loop rel it la (d :: lb))
-  permutation eqb (la ++ b :: c :: d :: e :: lb) ([b; c; d] ++ merge_loop rel it la (e :: lb))
-...
-(* etc. *)
-...
+Qed.
 
+(* to be completed
 Theorem permutation_split_merge_loop :
   ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l la lb,
@@ -2900,7 +2721,6 @@ Theorem permutation_split_merge_loop :
   → permutation eqb l (merge_loop rel it la lb).
 Proof.
 intros * Heqb * Hit Hll.
-...
 eapply (permutation_trans Heqb); [ | now apply permutation_merge_loop ].
 ...
 intros * Heqb * Hit Hll.
