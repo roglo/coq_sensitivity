@@ -2603,12 +2603,13 @@ destruct Ha as [Ha| Ha]. {
 }
 destruct l as [| c]; [ easy | ].
 cbn in Hs.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as (lc, ld).
+remember (split l) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
 injection Hs; clear Hs; intros; subst la lb.
-destruct Ha as [Ha| Ha]; [ now apply in_or_app; subst c; right; left | ].
-cbn; right.
-apply IHl.
+rename lc into la; rename ld into lb.
+destruct Ha as [Ha| Ha]. {
+  now subst c; apply in_or_app; right; left.
+}
 ...
 
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
