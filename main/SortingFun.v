@@ -2538,11 +2538,41 @@ now apply permutation_bsort_loop.
 Qed.
 
 (* to be completed
+Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
+Proof.
+intros * Heqb * Hit.
+revert l Hit.
+induction it; intros. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l; cbn.
+  apply permutation_nil.
+}
+cbn.
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+destruct l as [| a]. {
+  injection Hla; clear Hla; intros; subst la lb.
+  rewrite msort_loop_nil; cbn.
+  apply permutation_nil.
+}
+apply permutation_cons_l_iff.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+remember (extract (eqb a) (merge rel _ _)) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  specialize (H1 a).
+  assert (H : a ∈ merge rel (msort_loop rel it la) (msort_loop rel it lb)). {
+Search (_ ∈ merge _ _ _).
+...
+
 Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (msort rel l).
 Proof.
 intros.
 unfold msort.
+...
+now apply permutation_msort_loop.
 ...
 *)
 
