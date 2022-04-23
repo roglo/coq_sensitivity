@@ -2830,11 +2830,31 @@ move afta before befa; move befb before befa; move aftb before befb.
 move xb before xa.
 move Hlxlb before Hlxla.
 apply extract_Some_iff in Hlxla, Hlxlb.
-destruct Hlxla as (H1 & H & H2).
+destruct Hlxla as (H1 & H & H3).
 apply Heqb in H; subst xa.
-destruct Hlxlb as (H3 & H & H4).
+destruct Hlxlb as (H2 & H & H4).
 apply Heqb in H; subst xb.
 subst lc ld.
+remember (extract (eqb a) (split_inv (befa ++ a :: afta) (befb ++ b :: aftb)))
+  as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H3.
+  specialize (H3 a).
+  assert (H : a ∈ split_inv (befa ++ a :: afta) (befb ++ b :: aftb)). {
+    clear H1 Hac Hlxl H3.
+    remember (befb ++ b :: aftb) as lc; clear Heqlc.
+    revert lc.
+    induction befa as [| c]; intros; [ now destruct lc; left | cbn ].
+    destruct lc as [| d]; [ | right; right; apply IHbefa ].
+    now right; apply in_or_app; right; left.
+  }
+  specialize (H3 H); clear H.
+  now rewrite (equality_refl Heqb) in H3.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H3 & H & H4).
+apply Heqb in H; subst x.
 ...
 remember (extract (eqb a) (split_inv lc ld)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
