@@ -2807,7 +2807,13 @@ Theorem permutation_split_inv_split_inv :
 Proof.
 intros * Heqb * Hac
 ...
+*)
 
+Theorem split_inv_cons_cons : ∀ A (a b : A) la lb,
+  split_inv (a :: la) (b :: lb) = a :: b :: split_inv la lb.
+Proof. easy. Qed.
+
+(* to be completed
 Theorem permutation_split_inv_split_inv :
   ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ la lb lc ld,
@@ -2864,6 +2870,26 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (H3 & H & H4).
 apply Heqb in H; subst x.
+rewrite <- app_nil_l with (l := b :: split_inv la lb).
+apply (permutation_app_inv Heqb) with (a := a); [ easy | | ]. {
+  intros H.
+  specialize (H3 a H).
+  now rewrite (equality_refl Heqb) in H3.
+}
+rewrite <- H4; cbn.
+...
+rewrite <- split_inv_cons_cons.
+apply IHla.
+...
+permutation_app_inv:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ (la lb lc ld : list A) (a : A),
+        a ∉ la
+        → a ∉ lc
+          → permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
+            → permutation eqb (la ++ lb) (lc ++ ld)
+...
 apply permutation_cons_l_iff.
 ...
 remember (extract (eqb a) (split_inv lc ld)) as lxl eqn:Hlxl.
@@ -2879,9 +2905,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
       specialize (proj1 (extract_None_iff _ _) Hlxlb) as H3.
       clear Hlxlb.
 ...
-*)
 
-(* to be completed
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
@@ -2911,7 +2935,6 @@ apply (permutation_trans Heqb) with (lb := la ++ lb). {
 }
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
-...
 apply (permutation_trans Heqb) with (lb := split_inv la lb). {
   now apply permutation_app_split_inv.
 }
