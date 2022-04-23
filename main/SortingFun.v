@@ -2802,6 +2802,13 @@ apply (permutation_trans Heqb) with (lb := la ++ lb). {
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
 ...
+apply (permutation_trans Heqb) with (lb := split_inv la lb). 2: {
+  destruct it; [ apply (permutation_refl Heqb) | cbn ].
+  remember (split la) as lla eqn:Hlla; symmetry in Hlla.
+  destruct lla as (lc, ld).
+  remember (split lb) as llb eqn:Hllb; symmetry in Hllb.
+  destruct llb as (le, lf).
+...
 destruct it. {
   cbn.
   apply Nat.le_1_r in Hit.
