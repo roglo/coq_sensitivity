@@ -2795,6 +2795,9 @@ apply (permutation_skip Heqb).
 apply IHla.
 Qed.
 
+Theorem split_inv_nil_r : ∀ A (la : list A), split_inv la [] = la.
+Proof. now intros; destruct la. Qed.
+
 (* to be completed
 Theorem permutation_split_inv_split_inv : ∀ A (eqb : A → _),
   ∀ la lb lc ld,
@@ -2805,10 +2808,15 @@ Proof.
 intros * Hac Hbd.
 revert lb lc ld Hac Hbd.
 induction la as [| a]; intros; cbn. {
-Search (permutation _ []).
-Require Import Permutation.
-Search (Permutation []).
-  apply permutation_nil_l in Hac.
+  apply permutation_nil in Hac; subst lc; cbn.
+  destruct lb as [| b]; [ | now destruct ld ].
+  apply permutation_nil in Hbd; subst ld.
+  apply permutation_nil_nil.
+}
+destruct lb as [| b]. {
+  apply permutation_nil in Hbd; subst ld.
+  now rewrite split_inv_nil_r.
+}
 ...
 
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
