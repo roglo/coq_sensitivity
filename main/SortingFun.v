@@ -2817,6 +2817,36 @@ destruct lb as [| b]. {
   apply permutation_nil in Hbd; subst ld.
   now rewrite split_inv_nil_r.
 }
+move b before a.
+move lb before la; move lc before lb; move ld before lc.
+apply permutation_cons_l_iff in Hac, Hbd.
+apply permutation_cons_l_iff.
+remember (extract (eqb a) lc) as lxla eqn:Hlxla; symmetry in Hlxla.
+destruct lxla as [((befa, xa), afta)| ]; [ | easy ].
+remember (extract (eqb b) ld) as lxlb eqn:Hlxlb; symmetry in Hlxlb.
+destruct lxlb as [((befb, xb), aftb)| ]; [ | easy ].
+move afta before befa; move befb before befa; move aftb before befb.
+move xb before xa.
+move Hlxlb before Hlxla.
+apply extract_Some_iff in Hlxla, Hlxlb.
+destruct Hlxla as (H1 & H2 & H3).
+destruct Hlxlb as (H4 & H5 & H6).
+subst lc ld.
+(* probab' qu'il faut que j'ajoute "equality eqb" pour identifier
+   "a" et "xa", ainsi que "b" et "cb" *)
+...
+remember (extract (eqb a) (split_inv lc ld)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  remember (extract (eqb b) ld) as lxlb eqn:Hlxlb; symmetry in Hlxlb.
+  destruct lxla as [((befa, xa), afta)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxla) as H2.
+    clear Hlxla.
+    destruct lxlb as [((befb, xb), aftb)| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxlb) as H3.
+      clear Hlxlb.
 ...
 
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
