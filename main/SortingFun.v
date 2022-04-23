@@ -2796,12 +2796,12 @@ apply (permutation_trans Heqb) with (lb := l'). 2: {
   now rewrite Hlc, Hld.
 }
 subst l' lc ld.
-...
 apply (permutation_trans Heqb) with (lb := la ++ lb). {
   now apply split_permutation.
 }
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
+...
 destruct it. {
   cbn.
   apply Nat.le_1_r in Hit.
