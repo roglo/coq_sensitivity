@@ -2723,7 +2723,7 @@ revert l la lb Hlen Hll.
 induction len as (len, IHlen) using lt_wf_rec; intros.
 destruct l as [| a]. {
   injection Hll; clear Hll; intros; subst la lb.
-  apply permutation_nil.
+  apply permutation_nil_nil.
 }
 destruct l as [| b]. {
   injection Hll; clear Hll; intros; subst la lb.
@@ -2771,7 +2771,46 @@ intros * Heqb * Hll.
 now apply permutation_split_merge_loop.
 Qed.
 
+Theorem permutation_app_split_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ la lb, permutation eqb (la ++ lb) (split_inv la lb).
+Proof.
+intros * Heqb *.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  destruct lb as [| b]; [ apply permutation_nil_nil | ].
+  apply (permutation_refl Heqb).
+}
+destruct lb as [| b]. {
+  rewrite app_nil_r.
+  apply (permutation_refl Heqb).
+}
+apply (permutation_skip Heqb).
+apply (permutation_trans Heqb) with (lb := (b :: (la ++ lb))). {
+  rewrite List_app_cons, app_assoc, app_comm_cons.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_sym Heqb).
+  apply (permutation_cons_append Heqb).
+}
+apply (permutation_skip Heqb).
+apply IHla.
+Qed.
+
 (* to be completed
+Theorem permutation_split_inv_split_inv : ∀ A (eqb : A → _),
+  ∀ la lb lc ld,
+  permutation eqb la lc
+  → permutation eqb lb ld
+  → permutation eqb (split_inv la lb) (split_inv lc ld).
+Proof.
+intros * Hac Hbd.
+revert lb lc ld Hac Hbd.
+induction la as [| a]; intros; cbn. {
+Search (permutation _ []).
+Require Import Permutation.
+Search (Permutation []).
+  apply permutation_nil_l in Hac.
+...
+
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
@@ -2801,6 +2840,11 @@ apply (permutation_trans Heqb) with (lb := la ++ lb). {
 }
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
+apply (permutation_trans Heqb) with (lb := split_inv la lb). {
+  now apply permutation_app_split_inv.
+}
+...
+apply permutation_split_inv_split_inv.
 ...
 apply (permutation_trans Heqb) with (lb := split_inv la lb). 2: {
   destruct it; [ apply (permutation_refl Heqb) | cbn ].
@@ -2808,6 +2852,10 @@ apply (permutation_trans Heqb) with (lb := split_inv la lb). 2: {
   destruct lla as (lc, ld).
   remember (split lb) as llb eqn:Hllb; symmetry in Hllb.
   destruct llb as (le, lf).
+  destruct it. {
+    cbn.
+    rewrite <- (split_length _ Hlla).
+    rewrite <- (split_length _ Hllb).
 ...
 destruct it. {
   cbn.

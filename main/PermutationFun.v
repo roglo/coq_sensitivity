@@ -634,9 +634,13 @@ apply (permutation_trans Heqb) with (lb := l ++ m'). {
 now apply permutation_app_tail.
 Qed.
 
+Theorem permutation_nil : ∀ A (eqb : A → _) l,
+  permutation eqb [] l → l = [].
+Proof. now intros; destruct l. Qed.
+
 (* theorems equivalent to Permutation type *)
 
-Theorem permutation_nil : ∀ A (eqb : A → _), permutation eqb [] [].
+Theorem permutation_nil_nil : ∀ A (eqb : A → _), permutation eqb [] [].
 Proof. easy. Qed.
 
 Theorem permutation_skip : ∀ A (eqb : A → _),
