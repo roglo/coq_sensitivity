@@ -2799,13 +2799,14 @@ Theorem split_inv_nil_r : ∀ A (la : list A), split_inv la [] = la.
 Proof. now intros; destruct la. Qed.
 
 (* to be completed
-Theorem permutation_split_inv_split_inv : ∀ A (eqb : A → _),
+Theorem permutation_split_inv_split_inv :
+  ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ la lb lc ld,
   permutation eqb la lc
   → permutation eqb lb ld
   → permutation eqb (split_inv la lb) (split_inv lc ld).
 Proof.
-intros * Hac Hbd.
+intros * Heqb * Hac Hbd.
 revert lb lc ld Hac Hbd.
 induction la as [| a]; intros; cbn. {
   apply permutation_nil in Hac; subst lc; cbn.
@@ -2829,11 +2830,11 @@ move afta before befa; move befb before befa; move aftb before befb.
 move xb before xa.
 move Hlxlb before Hlxla.
 apply extract_Some_iff in Hlxla, Hlxlb.
-destruct Hlxla as (H1 & H2 & H3).
-destruct Hlxlb as (H4 & H5 & H6).
+destruct Hlxla as (H1 & H & H2).
+apply Heqb in H; subst xa.
+destruct Hlxlb as (H3 & H & H4).
+apply Heqb in H; subst xb.
 subst lc ld.
-(* probab' qu'il faut que j'ajoute "equality eqb" pour identifier
-   "a" et "xa", ainsi que "b" et "cb" *)
 ...
 remember (extract (eqb a) (split_inv lc ld)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
