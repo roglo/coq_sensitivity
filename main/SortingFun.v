@@ -2798,7 +2798,16 @@ Qed.
 Theorem split_inv_nil_r : ∀ A (la : list A), split_inv la [] = la.
 Proof. now intros; destruct la. Qed.
 
-(* to be completed
+(*
+Theorem permutation_split_inv_split_inv :
+  ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ la lb lc,
+  permutation eqb la lb
+  → permutation eqb (split_inv la lb) lc.
+Proof.
+intros * Heqb * Hac
+...
+
 Theorem permutation_split_inv_split_inv :
   ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ la lb lc ld,
@@ -2855,6 +2864,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (H3 & H & H4).
 apply Heqb in H; subst x.
+apply permutation_cons_l_iff.
 ...
 remember (extract (eqb a) (split_inv lc ld)) as lxl eqn:Hlxl.
 symmetry in Hlxl.
@@ -2869,14 +2879,16 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
       specialize (proj1 (extract_None_iff _ _) Hlxlb) as H3.
       clear Hlxlb.
 ...
+*)
 
+(* to be completed
 Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
 intros * Heqb * Hit.
 destruct it; intros. {
   apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l; cbn.
-  apply permutation_nil.
+  apply permutation_nil_nil.
 }
 cbn.
 remember (split l) as la eqn:Hla; symmetry in Hla.
@@ -2899,6 +2911,7 @@ apply (permutation_trans Heqb) with (lb := la ++ lb). {
 }
 rewrite split_length with (lb := la) (lc := lb) in Hit; [ | easy ].
 clear l Hla.
+...
 apply (permutation_trans Heqb) with (lb := split_inv la lb). {
   now apply permutation_app_split_inv.
 }
