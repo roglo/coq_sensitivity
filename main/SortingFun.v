@@ -2936,6 +2936,7 @@ apply (permutation_trans Heqb) with (lb := l'). 2: {
   now rewrite Hlc, Hld.
 }
 subst l' lc ld.
+...
 apply (permutation_trans Heqb) with (lb := la ++ lb). {
   now apply split_permutation.
 }
@@ -2961,6 +2962,7 @@ injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb.
 cbn in Hit; rewrite Nat.add_succ_r in Hit.
 apply Nat.succ_le_mono in Hit.
+...
 destruct it; [ easy | ].
 apply Nat.succ_le_mono in Hit; cbn.
 destruct l as [| c]. {
