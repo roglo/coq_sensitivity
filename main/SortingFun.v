@@ -2417,7 +2417,10 @@ destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
 eapply (permutation_trans Heqb); [ | now apply permutation_app_split_inv ].
-specialize (permutation_app_inv Heqb) as H1.
+specialize (permutation_app_inv Heqb [] la lc1 lc2 a) as H1.
+assert (H : a ∉ []) by easy.
+specialize (H1 H); clear H.
+...
 specialize (permutation_app_inv Heqb [] la lc1 lc2 a Hac) as H1.
 specialize (Permutation_app_inv [] lb ld1 ld2 b Hbd) as H2.
 cbn in H1, H2; clear Hac Hbd.
