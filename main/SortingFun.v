@@ -2912,6 +2912,41 @@ Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb)
   ∀ it l, length l ≤ it → permutation eqb l (msort_loop rel it l).
 Proof.
 intros * Heqb * Hit.
+destruct it. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l; cbn.
+  apply permutation_nil_nil.
+}
+cbn.
+remember (split l) as la eqn:Hla; symmetry in Hla.
+destruct la as (la, lb).
+(**)
+Check permutation_merge.
+...
+remember (msort_loop rel it la) as lc eqn:Hlc.
+remember (msort_loop rel it lb) as ld eqn:Hld.
+remember (split_inv lc ld) as l' eqn:Hl'.
+apply (permutation_trans Heqb) with (lb := l'). 2: {
+  apply (permutation_merge rel Heqb).
+  subst l'.
+  rewrite split_split_inv; [ easy | ].
+  apply split_lengths in Hla.
+  apply (f_equal length) in Hlc, Hld.
+  rewrite msort_loop_length in Hlc, Hld.
+  now rewrite Hlc, Hld.
+}
+subst l' lc ld.
+...
+  Hit : length l ≤ S it
+  Hla : split l = (la, lb)
+  ============================
+  permutation eqb l (merge rel (msort_loop rel it la) (msort_loop rel it lb))
+...
+  Hit : length l ≤ S it
+  Hla : split l = (la, lb)
+  ============================
+  permutation eqb l (split_inv (msort_loop rel it la) (msort_loop rel it lb))
+...
+intros * Heqb * Hit.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
 rewrite <- Hlen in Hit.
 revert l it Hlen Hit.
