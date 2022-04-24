@@ -3150,14 +3150,25 @@ destruct lb as [| b]. {
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
 (* voir si on peut pas faire pareil avec permutatin_split_inv_split inv *)
-destruct lc as [| c]; cbn. {
-  apply Permutation_sym in Hac.
-  now apply Permutation_nil_cons in Hac.
+Search (Permutation (_ :: _)).
+Theorem Permutation_cons_in : ∀ A (a : A) l1 l2,
+  Permutation (a :: l1) l2 → a ∈ l2.
+Proof.
+intros * Ha.
+revert a l1 Ha.
+induction l2 as [| b]; intros. {
+  apply Permutation_sym in Ha.
+  now apply Permutation_nil_cons in Ha.
 }
-destruct ld as [| d]; cbn. {
-  apply Permutation_sym in Hbd.
-  now apply Permutation_nil_cons in Hbd.
-}
+Search (Permutation (_ :: _) (_ :: _)).
+(* il faut peut-être que l'égalité soit décidable ???
+   c'est la m., ça.
+   parce que avec "permutation eqb", il n'y a pas de problème, ça
+   l'est par construction *)
+...
+specialize (Permutation_cons_in Hac) as Halc.
+Check permutation_cons_in.
+Check Permutation_cons_in.
 Check permutation_cons_l_iff.
 ...
 apply permutation_cons_l_iff in Hac, Hbd.
