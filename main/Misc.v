@@ -336,6 +336,9 @@ Qed.
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
+Theorem List_cons_is_app : ∀ A (a : A) la, a :: la = [a] ++ la.
+Proof. easy. Qed.
+
 Theorem List_length_fold_right : ∀ A B (f : B → list A → list A) la lb,
   (∀ b l, length (f b l) = length l)
   → length (fold_right f la lb) = length la.

@@ -1351,7 +1351,7 @@ remember (rel b a) as x eqn:Hx; symmetry in Hx.
 destruct x. {
   apply (permutation_isort_loop_sorted _ Heqb).
   rewrite app_comm_cons.
-  replace (b :: a :: la) with ([b] ++ (a :: la)) by easy.
+  rewrite (List_cons_is_app b (a :: la)).
   now apply permutation_app_comm.
 } {
   apply (permutation_isort_loop_sorted _ Heqb).
@@ -2285,8 +2285,8 @@ Theorem sorted_middle : ∀ A rel (a b : A) la lb lc,
   → rel a b = true.
 Proof.
 intros * Htrans Hsort.
-replace (la ++ a :: lb ++ b :: lc) with (la ++ [a] ++ lb ++ [b] ++ lc)
-  in Hsort by easy.
+rewrite (List_cons_is_app a) in Hsort.
+rewrite (List_cons_is_app b) in Hsort.
 rewrite app_assoc in Hsort.
 apply sorted_app in Hsort.
 destruct Hsort as (Hla & Hsort & H1).
@@ -2680,7 +2680,7 @@ eapply (permutation_trans Heqb). 2: {
   apply (permutation_app_comm Heqb).
 }
 cbn.
-replace (a :: la ++ lb ++ b :: lc) with ([a] ++ la ++ lb ++ b :: lc) by easy.
+rewrite List_cons_is_app.
 do 2 rewrite app_assoc.
 eapply (permutation_trans Heqb). {
   apply (permutation_app_comm Heqb).
@@ -2963,41 +2963,48 @@ cbn in Hit; rewrite Nat.add_succ_r in Hit.
 apply Nat.succ_le_mono in Hit.
 destruct it; [ easy | ].
 apply Nat.succ_le_mono in Hit; cbn.
-destruct la as [| c]. {
-  apply split_nil_l in Hll.
-  destruct Hll; subst l lb; cbn.
+destruct l as [| c]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
   rewrite msort_loop_single, msort_loop_nil.
   rewrite msort_loop_single; cbn.
   apply (permutation_refl Heqb).
 }
-remember (split la) as ll eqn:Hll'; symmetry in Hll'.
-destruct ll as (lc, ld).
-destruct lb as [| d]. {
-  apply split_nil_r in Hll.
-  destruct Hll as (H, H1); subst l.
-  cbn in H1.
-  apply Nat.succ_le_mono in H1.
-  destruct la; [ | easy ].
-  cbn in Hll'.
-  injection Hll'; clear Hll'; intros; subst lc ld; cbn.
+destruct l as [| d]. {
+  injection Hll; clear Hll; intros; subst la lb; cbn.
   do 3 rewrite msort_loop_single.
-  rewrite msort_loop_nil;cbn.
+  rewrite msort_loop_nil; cbn.
   remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac. {
-    cbn.
-    apply (permutation_refl Heqb).
-  }
-  cbn.
-(* ah, tiens, ça marche pas ! *)
-...
-  rewrite msort_loop_single, msort_loop_nil.
-  rewrite msort_loop_single; cbn.
-  apply (permutation_refl Heqb).
+  destruct ac; [ apply (permutation_refl Heqb) | cbn ].
+  rewrite List_cons_is_app.
+  eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
+  apply (permutation_swap Heqb).
 }
-remember (split la) as ll eqn:Hll'; symmetry in Hll'.
+cbn in Hll.
+remember (split l) as ll eqn:Hll'; symmetry in Hll'.
 destruct ll as (lc, ld).
-..
+injection Hll; clear Hll; intros; subst la lb.
+rename lc into la; rename ld into lb; rename Hll' into Hll.
+remember (split la) as ll eqn:Hlla; symmetry in Hlla.
+destruct ll as (la1, la2).
+remember (split lb) as ll eqn:Hllb; symmetry in Hllb.
+destruct ll as (lb1, lb2).
+rewrite <- split_inv_cons_cons.
 apply (permutation_split_inv_split_inv Heqb). {
+  destruct it; [ easy | cbn ].
+  destruct la1 as [| a1]. {
+    apply split_nil_l in Hlla.
+    destruct Hlla; subst la la2; cbn.
+    do 2 rewrite msort_loop_single.
+    rewrite msort_loop_nil; cbn.
+    destruct (rel a c); [ now apply permutation_refl | ].
+    now apply permutation_swap.
+  }
+(* c'est désespérant. J'y arriverai jamais *)
+...
+      cbn.
+      do 2 rewrite merge_length, app_length.
+      rewrite m
+...
   apply IHlen with (m := len).
 (* ouais mais non, mais ça marche pas, ça *)
 ...
@@ -3381,6 +3388,7 @@ induction lb as [| b]; intros; cbn. {
 }
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now constructor | ].
+...
 replace (b :: lb) with ([b] ++ lb) in Hpab by easy.
 apply Permutation_cons_app with (a := a) in Hpab.
 eapply Permutation_trans; [ apply Hpab | cbn ].
