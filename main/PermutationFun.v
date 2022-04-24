@@ -135,6 +135,20 @@ intros * Heqb *.
 now apply Heqb.
 Qed.
 
+Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
+  { a ∈ la } + { a ∉ la }.
+Proof.
+intros.
+induction la as [| b]; [ now right | ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
+destruct IHla as [H1| H1]; [ now left; right | right ].
+intros H2; apply H1; clear H1.
+destruct H2 as [H2| H2]; [ | easy ].
+subst b.
+now rewrite (equality_refl Heqb) in Hab.
+Qed.
+
 Theorem permutation_cons_l_iff : ∀ A (eqb : A → _) a la lb,
   permutation eqb (a :: la) lb
   ↔ match extract (eqb a) lb with
@@ -426,6 +440,27 @@ assert (H : b ∈ (bef ++ b :: l') ++ a :: l). {
 specialize (H1 H); clear H.
 now rewrite (equality_refl Heqb) in H1.
 Qed.
+
+(* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
+   que "a ∉ la" et que "a ∉ lc" *)
+(*
+Theorem permutation_app_inv' : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc ld a,
+  permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
+  → permutation eqb (la ++ lb) (lc ++ ld).
+Proof.
+intros * Heqb * Hp.
+destruct (equality_in_dec Heqb a la) as [H1| H1]. 2: {
+  destruct (equality_in_dec Heqb a lc) as [H2| H2]. 2: {
+    now apply permutation_app_inv with (a := a).
+  }
+  apply in_split in H2.
+  destruct H2 as (l1 & l2 & H); subst lc.
+...
+}
+...
+*)
 
 (* *)
 
