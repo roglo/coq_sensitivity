@@ -3149,6 +3149,16 @@ destruct lb as [| b]. {
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
+(* voir si on peut pas faire pareil avec permutatin_split_inv_split inv *)
+destruct lc as [| c]; cbn. {
+  apply Permutation_sym in Hac.
+  now apply Permutation_nil_cons in Hac.
+}
+destruct ld as [| d]; cbn. {
+  apply Permutation_sym in Hbd.
+  now apply Permutation_nil_cons in Hbd.
+}
+Check permutation_cons_l_iff.
 ...
 apply permutation_cons_l_iff in Hac, Hbd.
 apply permutation_cons_l_iff.
