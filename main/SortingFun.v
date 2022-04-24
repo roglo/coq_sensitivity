@@ -2984,7 +2984,7 @@ intros.
 apply Permutation_bsort_loop.
 Qed.
 
-(* to be completed
+(*
 Theorem Permutation_merge_loop : ∀ A (rel : A → _) it l la lb,
   length l ≤ it
   → split l = (la, lb)
@@ -3257,7 +3257,9 @@ rewrite <- (split_length l); [ | easy ].
 ...
 now apply Permutation_merge_loop.
 ...
+*)
 
+(* to be completed
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
 Proof.
 intros.
