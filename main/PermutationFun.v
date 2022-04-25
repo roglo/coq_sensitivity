@@ -715,6 +715,11 @@ induction lc as [| c]; intros. {
   injection Hd; clear Hd; intros; subst ld.
   apply permutation_nil_nil.
 }
+apply permutation_cons_l_iff.
+remember (extract (eqb c) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  apply permutation_cons_l_iff in Hc.
 ...
 
 (* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
