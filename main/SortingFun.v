@@ -2980,6 +2980,8 @@ transitivity l; [ easy | ].
 now apply Permutation_sym.
 Qed.
 
+(* *)
+
 Theorem Permutation_bsort_loop : ∀ A (rel : A → _),
   ∀ la it, Permutation la (bsort_loop rel it la).
 Proof.
@@ -2997,23 +2999,7 @@ apply Permutation_app_head.
 constructor.
 Qed.
 
-Theorem Permutation_isort : ∀ A (rel : A → _) l, Permutation l (isort rel l).
-Proof.
-intros.
-apply (Permutation_isort_loop rel [] l).
-Qed.
-
-Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
-Proof.
-intros.
-now apply Permutation_ssort_loop.
-Qed.
-
-Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
-Proof.
-intros.
-apply Permutation_bsort_loop.
-Qed.
+(* *)
 
 Theorem Permutation_merge_loop_aux : ∀ A (rel : A → _) it la lb lc,
   length la + length lc ≤ it
@@ -3212,7 +3198,6 @@ apply Permutation_sym.
 now apply IHla.
 Qed.
 
-(* to be completed
 Theorem Permutation_msort_loop : ∀ A (rel : A → _) it l,
   Permutation l (msort_loop rel it l).
 Proof.
@@ -3240,63 +3225,34 @@ apply Permutation_trans with (l' := la ++ lb). {
 apply Permutation_trans with (l' := split_inv la lb). {
   now apply Permutation_app_split_inv.
 }
-apply Permutation_split_inv_split_inv.
-...
-intros * Hit.
-revert l Hit.
-induction it; intros; [ easy | cbn ].
-remember (split l) as la eqn:Hll; symmetry in Hll.
-destruct la as (la, lb).
-destruct l as [| a]. {
-  injection Hll; intros; subst la lb.
-  now rewrite msort_loop_nil.
-}
-destruct l as [| b]. {
-  injection Hll; intros; subst la lb.
-  now rewrite msort_loop_single, msort_loop_nil.
-}
-cbn in Hll.
-remember (split l) as lc eqn:Hll'; symmetry in Hll'.
-destruct lc as (lc, ld).
-injection Hll; clear Hll; intros; subst la lb.
-rename lc into la; rename ld into lb; rename Hll' into Hll.
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-Search (permutation _ _ (merge _ _ _)).
-...
-remember (msort_loop rel it (a :: la)) as lc eqn:Hlc.
-remember (msort_loop rel it (b :: lb)) as ld eqn:Hld.
-...
-destruct l as [| a]. {
-  injection Hs; intros; subst la lb.
-  now apply Permutation_nil in Hac, Hbd; subst lc ld.
-}
-...
-transitivity (split_inv lc ld). 2: {
-  apply Permutation_merge.
-  apply split_split_inv.
-  subst lc ld.
-  do 2 rewrite msort_loop_length; cbn; f_equal.
-  apply split_lengths in Hll.
-  now destruct Hll as [Hll| Hll]; rewrite Hll; [ left | right ].
-}
-...
-apply (Permutation_merge rel) with (la := a :: la) (lb := b :: lb); cycle 1. {
-  apply split_length in Hll.
-  apply IHit; cbn; flia Hit Hll.
-} {
-  apply split_length in Hll.
-  apply IHit; cbn; flia Hit Hll.
-}
-now cbn; rewrite Hll.
-...
+apply Permutation_split_inv_split_inv; apply IHit.
+Qed.
+
+(* *)
+
+Theorem Permutation_isort : ∀ A (rel : A → _) l, Permutation l (isort rel l).
+Proof.
+intros.
+apply (Permutation_isort_loop rel [] l).
+Qed.
+
+Theorem Permutation_ssort : ∀ A (rel : A → _) l, Permutation l (ssort rel l).
+Proof.
+intros.
+now apply Permutation_ssort_loop.
+Qed.
+
+Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
+Proof.
+intros.
+apply Permutation_bsort_loop.
 Qed.
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
 Proof.
 intros.
-unfold msort.
-...
-*)
+apply Permutation_msort_loop.
+Qed.
 
 (* isort and ssort return same *)
 
@@ -3361,6 +3317,7 @@ apply (sorted_unique Href Hant Htra). {
 }
 Qed.
 
+(* *)
 
 (* isort_rank: like isort but return the rank of what have been
    sorted; its result, when applied to the initial list as an
