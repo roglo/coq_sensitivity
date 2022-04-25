@@ -3765,21 +3765,33 @@ Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 Check determinant_alternating.
 Theorem glop : ∀ (M : matrix T) kl,
-  kl ≠ []
+  length kl < mat_nrows M
   → mat_select_rows kl M =
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * Hkl.
 unfold iter_list.
-induction kl as [| k]; [ easy | clear Hkl ].
+revert M Hkl.
+induction kl as [| k]; intros. {
+  cbn.
+  unfold mat_select_rows.
+  cbn.
+...
+induction kl as [| k]; intros; [ easy | ].
 unfold transp_list.
 rewrite List_cons_length.
 rewrite Nat.add_succ_l.
 cbn.
 destruct k. {
   cbn.
-(* transp_list, c'est merdique ; essayer une autre définition ? *)
-Search transp_list.
+  destruct kl as [| k1]. {
+    apply Nat.lt_1_r in Hkl.
+    unfold mat_nrows in Hkl.
+    apply length_zero_iff_nil in Hkl.
+    cbn; unfold mat_select_rows; cbn.
+    destruct M as (ll); cbn in Hkl |-*.
+    subst ll; f_equal.
+    cbn.
 ...
 rewrite glop with (n := m); [ | easy ].
 unfold iter_list.
