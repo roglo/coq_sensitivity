@@ -3749,6 +3749,7 @@ Check fold_det.
 ...
 *)
 
+(* to be completed
 (* kl is not necessarily in order *)
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
@@ -3763,13 +3764,22 @@ Theorem det_with_rows : in_charac_0_field →
 Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 Check determinant_alternating.
-...
-Theorem glop : ∀ (M : matrix T) n kl,
-  length kl = n
+Theorem glop : ∀ (M : matrix T) kl,
+  kl ≠ []
   → mat_select_rows kl M =
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * Hkl.
+unfold iter_list.
+induction kl as [| k]; [ easy | clear Hkl ].
+unfold transp_list.
+rewrite List_cons_length.
+rewrite Nat.add_succ_l.
+cbn.
+destruct k. {
+  cbn.
+(* transp_list, c'est merdique ; essayer une autre définition ? *)
+Search transp_list.
 ...
 rewrite glop with (n := m); [ | easy ].
 unfold iter_list.
@@ -4692,7 +4702,6 @@ Restart.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
 Show.
 ...
-*)
 ...
 erewrite rngl_summation_change_var.
 rewrite Nat.sub_0_r.
@@ -4786,6 +4795,7 @@ symmetry; symmetry.
 (* interesting property, even if, perhaps, not useful here *)
 assert (sub_lists_of_seq_0_n m m = [seq 0 m]).
 ...
+*)
 
 (*
 Abort.
@@ -4800,7 +4810,6 @@ Compute (let B := mk_mat [[3;4];[2;6];[1;3]] in let A := mk_mat [[1;6;7];[1;3;1]
 Compute (sub_lists_of_seq_0_n 3 3).
 ...
 *)
-
 
 (* other attempts to prove det(AB)=det(A)det(B) *)
 
@@ -4827,7 +4836,6 @@ trouvé sur le web
 Check determinant_multilinear.
 Check determinant_alternating.
 ...
-*)
 
 (* very interesting, too, contains several proofs of det(AB)=det(A)det(B)
 https://proofwiki.org/wiki/Determinant_of_Matrix_Product
@@ -4861,6 +4869,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite Hra, Hrb; cbn.
   symmetry; apply rngl_mul_1_l.
 }
+...
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
 rewrite det_is_det_by_canon_permut; [ | easy | easy ].
@@ -5113,3 +5122,6 @@ unfold determinant; cbn.
 rewrite List_map_seq_length.
 Print determinant_loop.
 ...
+*)
+
+End a.
