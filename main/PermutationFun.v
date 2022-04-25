@@ -441,27 +441,6 @@ specialize (H1 H); clear H.
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
-(* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
-   que "a ∉ la" et que "a ∉ lc" *)
-(*
-Theorem permutation_app_inv' : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb lc ld a,
-  permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
-  → permutation eqb (la ++ lb) (lc ++ ld).
-Proof.
-intros * Heqb * Hp.
-destruct (equality_in_dec Heqb a la) as [H1| H1]. 2: {
-  destruct (equality_in_dec Heqb a lc) as [H2| H2]. 2: {
-    now apply permutation_app_inv with (a := a).
-  }
-  apply in_split in H2.
-  destruct H2 as (l1 & l2 & H); subst lc.
-...
-}
-...
-*)
-
 (* *)
 
 Theorem permutation_refl : ∀ A (eqb : A → _),
@@ -699,6 +678,72 @@ destruct ba; [ | now apply permutation_refl ].
 apply Heqb in Hba; subst b.
 now apply permutation_refl.
 Qed.
+
+Theorem permutation_length_1_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ a l, permutation eqb [a] l → l = [a].
+Proof.
+intros * Heqb * Ha.
+apply permutation_cons_l_iff in Ha.
+remember (extract (eqb a) l) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hll.
+destruct Hll as (H1 & H & H2).
+apply permutation_nil in Ha.
+apply app_eq_nil in Ha.
+destruct Ha; subst bef aft; cbn in H2; subst l.
+f_equal; symmetry.
+now apply Heqb.
+Qed.
+
+(* to be completed
+Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ a la lb,
+  permutation eqb la lb
+  → ∀ lc ld,
+  permutation eqb (a :: lc) la
+  → permutation eqb (a :: ld) lb
+  → permutation eqb lc ld.
+Proof.
+intros * Heqb * Hab * Hc Hd.
+revert la lb Hab Hc Hd.
+revert ld.
+induction lc as [| c]; intros. {
+  apply (permutation_length_1_inv Heqb) in Hc; subst la.
+  apply (permutation_length_1_inv Heqb) in Hab; subst lb.
+  apply (permutation_sym Heqb) in Hd.
+  apply (permutation_length_1_inv Heqb) in Hd.
+  injection Hd; clear Hd; intros; subst ld.
+  apply permutation_nil_nil.
+}
+...
+
+(* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
+   que "a ∉ la" et que "a ∉ lc" *)
+(* *)
+Theorem permutation_app_inv' : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc ld a,
+  permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
+  → permutation eqb (la ++ lb) (lc ++ ld).
+Proof.
+intros * Heqb * Hp.
+specialize permutation_add_inv as H1.
+specialize (H1 _ eqb a _ _ Hp).
+Require Import Permutation.
+Check Permutation_Add_inv.
+Search Add.
+...
+intros * Heqb * Hp.
+destruct (equality_in_dec Heqb a la) as [H1| H1]. 2: {
+  destruct (equality_in_dec Heqb a lc) as [H2| H2]. 2: {
+    now apply permutation_app_inv with (a := a).
+  }
+  apply in_split in H2.
+  destruct H2 as (l1 & l2 & H); subst lc.
+...
+}
+...
+*)
 
 (* *)
 
