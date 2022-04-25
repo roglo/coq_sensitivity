@@ -3759,6 +3759,8 @@ Theorem det_with_rows : ∀ m n (A : matrix T) kl,
   → kl ∈ sub_lists_of_seq_0_n n m
   → det (mat_select_rows kl A) =
        (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+Proof.
+intros * Hcma Hra Hca Hmz Hks.
 ...
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
