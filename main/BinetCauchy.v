@@ -3764,6 +3764,20 @@ Proof.
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 Check determinant_alternating.
 ...
+Locate "Comp".
+Theorem glop : ∀ (M : matrix T) n kl,
+  length kl = n
+  → mat_select_rows kl M =
+      iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
+Proof.
+intros.
+...
+rewrite glop with (n := m); [ | easy ].
+Search transp_list.
+Search (det (iter_list _ _ _)).
+unfold iter_list.
+Search (det (fold_left _ _ _)).
+...
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 (*
 Abort.
