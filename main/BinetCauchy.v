@@ -2667,6 +2667,7 @@ rewrite Nat.sub_0_r in H1.
 now destruct H1 as (H1 & H2 & H3).
 Qed.
 
+(*
 Theorem eq_transp_loop_cons' : ∀ it i j k p l,
   is_permut_list (seq 0 k ++ p)
 (*
@@ -2824,6 +2825,7 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
+(*
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
   → fold_right (λ t l, l ° swap (length l) (fst t) (snd t)) (seq 0 (length l))
@@ -3111,9 +3113,9 @@ specialize permut_eq_iter_list_transp_loop as H1.
 specialize (H1 l (length l + nb_nfit 0 l) 0).
 apply (H1 Hp (le_refl _)).
 ...
+*)
 
-Locate "Comp".
-
+(*
 Theorem permut_eq_iter_list_transp' : ∀ l,
   is_permut_list l
   → iter_list (rev (transp_list l))
@@ -3134,7 +3136,9 @@ unfold iter_list.
 rewrite <- fold_left_rev_right.
 rewrite rev_involutive.
 ...
+*)
 
+(*
 Theorem collapse_iter_list_transp : ∀ l,
   collapse l =
   iter_list (transp_list (collapse l))
@@ -3185,9 +3189,10 @@ map (λ p,
   collapse p =
   iter_list (transp_list p) (λ l t, swap (length p) (fst t) (snd t) ° l)
     (seq 0 (length p))) (canon_sym_gr_list_list 4)).
-*)
 ...
+*)
 
+(*
 Theorem map_iter_list_transp_list : ∀ A (d : A) l p,
   is_permut (length l) p
   → map (λ i, nth i l d) p =
@@ -3229,7 +3234,9 @@ Compute (let l := [3;7;8] in let p := [2;0;1] in let d := 0 in
 ...
      = ([2; 0; 1], [(0, 1); (1, 2)])
 ...
+*)
 
+(*
 Theorem list_list_select_rows_with_permut_transp : ∀ n ll p,
   (length (hd [] ll) = 0 → n = 0)
   → (∀ l, l ∈ ll → length l = n)
@@ -3263,7 +3270,6 @@ assert (list_list_select_rows p ll = map (λ i, nth i ll []) p). {
   now apply Hpp.
 }
 easy.
-*)
 ...
 revert ll p Hcr Hc Hr Hp.
 induction n; intros. {
@@ -3404,7 +3410,9 @@ rewrite List_cons_length, seq_S.
 cbn - [ nth ].
 rewrite map_app.
 ...
+*)
 
+(*
 Theorem mat_select_rows_with_permut_transp : ∀ n (M : matrix T) p,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -3642,7 +3650,9 @@ rewrite (surm_of_subm (mat_select_rows p M) i n).
 rewrite H1.
 unfold surm.
 ...
+*)
 
+(*
 Theorem glop : in_charac_0_field →
   ∀ n A p,
   is_square_matrix A = true
@@ -3737,6 +3747,7 @@ About rngl_sub_move_0_r.
 ...
 Check fold_det.
 ...
+*)
 
 (* kl is not necessarily in order *)
 Theorem det_with_rows : in_charac_0_field →
