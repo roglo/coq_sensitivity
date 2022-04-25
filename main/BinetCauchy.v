@@ -3762,6 +3762,11 @@ Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A.
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
+remember (sub_lists_of_seq_0_n n m) as ll eqn:Hll.
+specialize sub_lists_of_seq_0_n_prop as H1.
+specialize (H1 n m ll Hll).
+destruct H1 as (Hls & Hinj & Hsurj).
+(* ouais, chais pas *)
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
