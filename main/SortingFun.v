@@ -2481,11 +2481,7 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (H3 & H & H4).
 apply Heqb in H; subst x.
 rewrite <- app_nil_l with (l := b :: split_inv la lb).
-apply (permutation_app_inv Heqb) with (a := a); [ easy | | ]. {
-  intros H.
-  specialize (H3 a H).
-  now rewrite (equality_refl Heqb) in H3.
-}
+apply (permutation_app_inv Heqb) with (a := a).
 rewrite <- H4; cbn.
 eapply (permutation_trans Heqb). 2: {
   apply (permutation_app_split_inv Heqb).

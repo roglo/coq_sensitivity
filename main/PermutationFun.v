@@ -207,7 +207,7 @@ split. {
 }
 Qed.
 
-Theorem permutation_app_inv : ∀ A (eqb : A → _),
+Theorem permutation_app_inv_aux : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc ld a,
   a ∉ la
@@ -475,7 +475,7 @@ apply Heqb in H2; subst x.
 subst la.
 apply IHlb.
 replace lb with ([] ++ lb) by easy.
-apply permutation_app_inv with (a := b); [ easy | | easy | easy ].
+apply permutation_app_inv_aux with (a := b); [ easy | | easy | easy ].
 intros H; specialize (H1 _ H).
 now rewrite (equality_refl Heqb) in H1.
 Qed.
@@ -530,7 +530,7 @@ assert (Hanb' : a ∉ bef'). {
 }
 clear Hbef Hbef'.
 clear la IHla Hab.
-now apply permutation_app_inv in Hbc.
+now apply permutation_app_inv_aux in Hbc.
 Qed.
 
 (* *)
@@ -695,68 +695,6 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
-Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
-  ∀ a la lb,
-  permutation eqb la lb
-  → ∀ lc ld,
-  permutation eqb (a :: lc) la
-  → permutation eqb (a :: ld) lb
-  → permutation eqb lc ld.
-Proof.
-intros * Heqb * Hab * Hc Hd.
-apply permutation_cons_l_iff in Hc, Hd.
-remember (extract (eqb a) la) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((befa, x), afta)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (H1 & H & H3).
-apply Heqb in H; subst x la.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (H2 & H & H4).
-apply Heqb in H; subst x lb.
-move H2 before H1.
-apply (permutation_app_inv Heqb) in Hab; cycle 1. {
-  intros H; specialize (H1 _ H).
-  now rewrite (equality_refl Heqb) in H1.
-} {
-  intros H; specialize (H2 _ H).
-  now rewrite (equality_refl Heqb) in H2.
-}
-apply (permutation_trans Heqb) with (lb := befa ++ afta); [ easy | ].
-apply (permutation_trans Heqb) with (lb := befb ++ aftb); [ easy | ].
-now apply (permutation_sym Heqb).
-Qed.
-
-(* to be completed
-(* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
-   que "a ∉ la" et que "a ∉ lc" *)
-(* *)
-Theorem permutation_app_inv' : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb lc ld a,
-  permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
-  → permutation eqb (la ++ lb) (lc ++ ld).
-Proof.
-intros * Heqb * Hp.
-specialize permutation_add_inv as H1.
-specialize (H1 _ eqb a _ _ Hp).
-Require Import Permutation.
-Check Permutation_Add_inv.
-Search Add.
-...
-intros * Heqb * Hp.
-destruct (equality_in_dec Heqb a la) as [H1| H1]. 2: {
-  destruct (equality_in_dec Heqb a lc) as [H2| H2]. 2: {
-    now apply permutation_app_inv with (a := a).
-  }
-  apply in_split in H2.
-  destruct H2 as (l1 & l2 & H); subst lc.
-...
-}
-...
-*)
-
 (* *)
 
 Theorem permutation_app_comm : ∀ A (eqb : A → _),
@@ -844,6 +782,62 @@ apply (permutation_app_head Heqb).
 apply IHlen with (m := length (l'' ++ [a])); [ | easy ].
 rewrite <- Hlen, H2.
 do 3 rewrite app_length; cbn; flia.
+Qed.
+
+Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ a la lb,
+  permutation eqb la lb
+  → ∀ lc ld,
+  permutation eqb (a :: lc) la
+  → permutation eqb (a :: ld) lb
+  → permutation eqb lc ld.
+Proof.
+intros * Heqb * Hab * Hc Hd.
+apply permutation_cons_l_iff in Hc, Hd.
+remember (extract (eqb a) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H1 & H & H3).
+apply Heqb in H; subst x la.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H2 & H & H4).
+apply Heqb in H; subst x lb.
+move H2 before H1.
+apply (permutation_app_inv_aux Heqb) in Hab; cycle 1. {
+  intros H; specialize (H1 _ H).
+  now rewrite (equality_refl Heqb) in H1.
+} {
+  intros H; specialize (H2 _ H).
+  now rewrite (equality_refl Heqb) in H2.
+}
+apply (permutation_trans Heqb) with (lb := befa ++ afta); [ easy | ].
+apply (permutation_trans Heqb) with (lb := befb ++ aftb); [ easy | ].
+now apply (permutation_sym Heqb).
+Qed.
+
+Theorem permutation_app_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc ld a,
+  permutation eqb (la ++ a :: lb) (lc ++ a :: ld)
+  → permutation eqb (la ++ lb) (lc ++ ld).
+Proof.
+intros * Heqb * Hp.
+specialize (permutation_add_inv Heqb) as H1.
+apply (H1 a _ _ Hp (la ++ lb) (lc ++ ld)). {
+  rewrite (List_cons_is_app a).
+  rewrite (List_cons_is_app _ lb).
+  do 2 rewrite app_assoc.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_app_comm Heqb).
+} {
+  rewrite (List_cons_is_app a).
+  rewrite (List_cons_is_app _ ld).
+  do 2 rewrite app_assoc.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_app_comm Heqb).
+}
 Qed.
 
 Theorem permutation_app_inv_l : ∀ A (eqb : A → _),
