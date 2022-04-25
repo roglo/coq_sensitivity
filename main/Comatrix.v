@@ -7,7 +7,7 @@ Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
-Require Import Matrix PermutSeq Signature.
+Require Import SortingFun Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
 

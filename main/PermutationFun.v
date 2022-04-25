@@ -695,7 +695,6 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
-(* to be completed
 Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ a la lb,
   permutation eqb la lb
@@ -717,25 +716,19 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (H2 & H & H4).
 apply Heqb in H; subst x lb.
 move H2 before H1.
-...
-intros * Heqb * Hab * Hc Hd.
-revert la lb Hab Hc Hd.
-revert ld.
-induction lc as [| c]; intros. {
-  apply (permutation_length_1_inv Heqb) in Hc; subst la.
-  apply (permutation_length_1_inv Heqb) in Hab; subst lb.
-  apply (permutation_sym Heqb) in Hd.
-  apply (permutation_length_1_inv Heqb) in Hd.
-  injection Hd; clear Hd; intros; subst ld.
-  apply permutation_nil_nil.
+apply (permutation_app_inv Heqb) in Hab; cycle 1. {
+  intros H; specialize (H1 _ H).
+  now rewrite (equality_refl Heqb) in H1.
+} {
+  intros H; specialize (H2 _ H).
+  now rewrite (equality_refl Heqb) in H2.
 }
-apply permutation_cons_l_iff.
-remember (extract (eqb c) ld) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  apply permutation_cons_l_iff in Hc.
-...
+apply (permutation_trans Heqb) with (lb := befa ++ afta); [ easy | ].
+apply (permutation_trans Heqb) with (lb := befb ++ aftb); [ easy | ].
+now apply (permutation_sym Heqb).
+Qed.
 
+(* to be completed
 (* j'aimerais bien faire cette version-ci où il n'est pas obligatoire
    que "a ∉ la" et que "a ∉ lc" *)
 (* *)
