@@ -3770,6 +3770,22 @@ Theorem glop : ∀ (M : matrix T) kl,
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) M.
 Proof.
 intros * (Hklz, Hkl).
+Compute (
+let kl := [2;0;1] in
+let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+mat_select_rows kl M =
+  iter_list (rev (transp_list kl)) (λ M t, mat_swap_rows (fst t) (snd t) M) M).
+Compute (
+let kl := [2;0;1] in
+let M := mk_mat [[1;2;3];[4;5;6];[7;8;9];[10;11;12]] in
+mat_select_rows kl M =
+  iter_list (rev (transp_list kl)) (λ M t, mat_swap_rows (fst t) (snd t) M) M).
+Compute (
+let kl := [2;0;1] in
+let M := mk_mat [[1;2;3];[4;5;6];[7;8;9];[10;11;12]] in
+mat_select_rows kl M).
+...
+intros * (Hklz, Hkl).
 unfold iter_list.
 revert M Hkl.
 induction kl as [| k]; intros; [ easy | clear Hklz; cbn ].
