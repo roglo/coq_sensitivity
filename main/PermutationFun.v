@@ -705,6 +705,20 @@ Theorem permutation_add_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
   → permutation eqb lc ld.
 Proof.
 intros * Heqb * Hab * Hc Hd.
+apply permutation_cons_l_iff in Hc, Hd.
+remember (extract (eqb a) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H1 & H & H3).
+apply Heqb in H; subst x la.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (H2 & H & H4).
+apply Heqb in H; subst x lb.
+move H2 before H1.
+...
+intros * Heqb * Hab * Hc Hd.
 revert la lb Hab Hc Hd.
 revert ld.
 induction lc as [| c]; intros. {
