@@ -3749,7 +3749,7 @@ Check fold_det.
 ...
 *)
 
-(* to be completed
+(*
 (* kl is not necessarily in order *)
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
@@ -4609,7 +4609,9 @@ Qed.
 ...
 
 Arguments det_with_rows Hif (m n)%nat _ [kl]%list.
+*)
 
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -4661,6 +4663,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
 rewrite det_is_det_by_canon_permut; try now destruct Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros s Hs.
+...
   rewrite (det_with_rows Hif m n B Hbr Hbc Hcb); cycle 1. {
     now apply (sub_list_of_seq_0_n_has_no_dup n m).
   } {
