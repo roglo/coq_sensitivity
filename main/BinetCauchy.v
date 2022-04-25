@@ -3751,6 +3751,19 @@ Check fold_det.
 
 (* to be completed
 (* kl is not necessarily in order *)
+Search mat_select_rows.
+Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
+  is_correct_matrix A = true
+  → mat_nrows A = n
+  → mat_ncols A = m
+  → m ≠ 0
+  → kl ∈ sub_lists_of_seq_0_n n m
+  → mat_select_rows kl A =
+      iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A.
+Proof.
+intros * Hcma Hra Hca Hmz Hks.
+...
+
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
   is_correct_matrix A = true
   → mat_nrows A = n
@@ -3761,6 +3774,9 @@ Theorem det_with_rows : ∀ m n (A : matrix T) kl,
        (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
+Check determinant_alternating.
+...
+rewrite (mat_select_rows_transp A kl Hcma Hra Hca Hmz Hks).
 ...
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
