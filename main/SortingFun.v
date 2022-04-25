@@ -2409,7 +2409,6 @@ destruct lb as [| b]. {
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
-(*
 specialize (proj1 (permutation_in Heqb Hac a) (or_introl eq_refl)) as Hc.
 specialize (proj1 (permutation_in Heqb Hbd b) (or_introl eq_refl)) as Hd.
 apply in_split in Hc, Hd.
@@ -2417,100 +2416,26 @@ destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
 eapply (permutation_trans Heqb); [ | now apply permutation_app_split_inv ].
-specialize (permutation_app_inv Heqb [] la lc1 lc2 a) as H1.
-assert (H : a ∉ []) by easy.
-specialize (H1 H); clear H.
-...
 specialize (permutation_app_inv Heqb [] la lc1 lc2 a Hac) as H1.
-specialize (Permutation_app_inv [] lb ld1 ld2 b Hbd) as H2.
+specialize (permutation_app_inv Heqb [] lb ld1 ld2 b Hbd) as H2.
 cbn in H1, H2; clear Hac Hbd.
-apply Permutation_sym.
+apply (permutation_sym Heqb).
 rewrite (List_cons_is_app a).
 rewrite (List_cons_is_app b).
 rewrite <- app_assoc.
-eapply Permutation_trans; [ apply Permutation_app_comm | cbn ].
-apply perm_skip.
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
+apply (permutation_skip Heqb).
 rewrite (List_cons_is_app b).
 do 3 rewrite <- app_assoc.
 rewrite app_assoc.
-eapply Permutation_trans; [ apply Permutation_app_comm | cbn ].
-apply perm_skip.
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
+apply (permutation_skip Heqb).
 rewrite <- app_assoc.
-eapply Permutation_trans; [ apply Permutation_app_comm | ].
+eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
 do 2 rewrite <- app_assoc.
 rewrite app_assoc.
-eapply Permutation_trans; [ apply Permutation_app_split_inv | ].
-apply Permutation_sym.
-now apply IHla.
-Qed.
-...
-*)
-apply permutation_cons_l_iff in Hac, Hbd.
-apply permutation_cons_l_iff.
-remember (extract (eqb a) lc) as lxla eqn:Hlxla; symmetry in Hlxla.
-destruct lxla as [((befa, xa), afta)| ]; [ | easy ].
-remember (extract (eqb b) ld) as lxlb eqn:Hlxlb; symmetry in Hlxlb.
-destruct lxlb as [((befb, xb), aftb)| ]; [ | easy ].
-move afta before befa; move befb before befa; move aftb before befb.
-move xb before xa.
-move Hlxlb before Hlxla.
-apply extract_Some_iff in Hlxla, Hlxlb.
-destruct Hlxla as (H1 & H & H3).
-apply Heqb in H; subst xa.
-destruct Hlxlb as (H2 & H & H4).
-apply Heqb in H; subst xb.
-subst lc ld.
-remember (extract (eqb a) (split_inv (befa ++ a :: afta) (befb ++ b :: aftb)))
-  as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H3.
-  specialize (H3 a).
-  assert (H : a ∈ split_inv (befa ++ a :: afta) (befb ++ b :: aftb)). {
-    clear H1 Hac Hlxl H3.
-    remember (befb ++ b :: aftb) as lc; clear Heqlc.
-    revert lc.
-    induction befa as [| c]; intros; [ now destruct lc; left | cbn ].
-    destruct lc as [| d]; [ | right; right; apply IHbefa ].
-    now right; apply in_or_app; right; left.
-  }
-  specialize (H3 H); clear H.
-  now rewrite (equality_refl Heqb) in H3.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (H3 & H & H4).
-apply Heqb in H; subst x.
-rewrite <- app_nil_l with (l := b :: split_inv la lb).
-apply (permutation_app_inv Heqb) with (a := a).
-rewrite <- H4; cbn.
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_split_inv Heqb).
-}
-do 2 rewrite List_app_cons.
-do 2 rewrite <- app_assoc.
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_comm Heqb).
-}
-cbn; apply (permutation_skip Heqb).
-rewrite List_app_cons.
-do 3 rewrite <- app_assoc.
-rewrite app_assoc.
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_comm Heqb).
-}
-cbn; apply (permutation_skip Heqb).
-rewrite app_assoc.
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_comm Heqb).
-}
-rewrite <- app_assoc, app_assoc.
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_comm Heqb).
-}
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_sym Heqb).
-  apply (permutation_app_split_inv Heqb).
-}
+eapply (permutation_trans Heqb); [ now apply permutation_app_split_inv | ].
+apply (permutation_sym Heqb).
 now apply IHla.
 Qed.
 
@@ -3166,8 +3091,6 @@ destruct lb as [| b]. {
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
-(* voir si on peut pas faire pareil pour permutatin_split_inv_split inv *)
-(* pour éviter d'avoir à utiliser permutation_cons_l_iff *)
 specialize (Permutation_in a Hac (or_introl eq_refl)) as Hc.
 specialize (Permutation_in b Hbd (or_introl eq_refl)) as Hd.
 apply in_split in Hc, Hd.
