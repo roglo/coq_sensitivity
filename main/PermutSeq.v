@@ -1,4 +1,4 @@
-(* permutations of sequences of natural numbers between 1 and n *)
+(* permutations of sequences of natural numbers between 0 and n-1 *)
 
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
