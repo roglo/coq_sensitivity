@@ -847,6 +847,7 @@ Fixpoint transp_loop it i (p : list nat) :=
       end
   end.
 
+(* works only if p is a permutation of {0..n-1} *)
 Definition transp_list p := transp_loop (length p + nb_nfit 0 p) 0 p.
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
@@ -3748,40 +3749,20 @@ Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
   → m ≠ 0
   → kl ∈ sub_lists_of_seq_0_n n m
   → mat_select_rows kl A =
-      iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A.
+      mat_select_rows (isort Nat.leb kl)
+        (iter_list (transp_list (collapse kl))
+           (λ M t, mat_swap_rows (fst t) (snd t) M) A).
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
-(**)
 (*
-Abort.
-End a.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-*)
 Compute (
-  let A := mk_mat [[0]; [1]] in
-  let kl := [0]%nat in
+  let A := mk_mat [[3]; [7]] in
+  let kl := [1]%nat in
   mat_select_rows kl A =
-    iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A).
-(* ah oui mais donc c'est faux, ça *)
+    mat_select_rows (isort Nat.leb kl)
+      (iter_list (transp_list (collapse kl))
+         (λ M t, mat_swap_rows (fst t) (snd t) M) A)).
 ...
-Compute (
-  let A := mk_mat [[0]; [1]] in
-  let kl := [0]%nat in
-  mat_select_rows kl A).
-Compute (
-  mat_select_rows [0] (mk_mat [[3]; [4]])).
-Print list_list_select_rows.
-...
-Compute (
-  let kl := [0] in
-  sub_lists_of_seq_0_n 2 1).
-Compute (
-  let A := mk_mat [[0]; [1]] in
-  let n := mat_nrows A in
-  let m := mat_ncols A in
-  sub_lists_of_seq_0_n n m).
 specialize (sub_lists_of_seq_0_n_length m n) as Hlen.
 specialize (sub_list_firstn_nat_length n m _ Hks) as Hm.
 remember (sub_lists_of_seq_0_n n m) as ll eqn:Hll.
@@ -3821,6 +3802,8 @@ Compute (
   sub_lists_of_seq_0_n 2 1).
 (* c'est bizarre... *)
 ...
+*)
+...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
   is_correct_matrix A = true
@@ -3835,6 +3818,7 @@ intros * Hcma Hra Hca Hmz Hks.
 Check determinant_alternating.
 ...
 rewrite (mat_select_rows_transp A kl Hcma Hra Hca Hmz Hks).
+remember (iter_list _ _ _) as B eqn:HB.
 ...
 Theorem det_with_rows : in_charac_0_field →
   ∀ m n A kl,
