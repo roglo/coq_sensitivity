@@ -3764,6 +3764,36 @@ Compute (
          (λ M t, mat_swap_rows (fst t) (snd t) M) A)).
 ...
 *)
+destruct (Nat.eq_dec (mat_nrows A) 0) as [Hrz| Hrz]. {
+  rewrite Hrz in Hra; subst n.
+  generalize Hcma; intros H.
+  apply is_scm_mat_iff in H.
+  destruct H as (Hcra, Hcla).
+  destruct A as (ll); cbn.
+  cbn in Hrz.
+  apply length_zero_iff_nil in Hrz; subst ll.
+  now cbn in Hca; subst m.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+destruct (Nat.eq_dec (mat_nrows A) 1) as [Hr1| Hr1]. {
+  rewrite Hr1 in Hra; subst n.
+  generalize Hcma; intros H.
+  apply is_scm_mat_iff in H.
+  destruct H as (Hcra, Hcla).
+  destruct A as (ll); cbn.
+  cbn in Hr1.
+  destruct ll as [| la]; [ easy | ].
+  destruct ll; [ | easy ].
+  cbn in Hca.
+  clear Hrz Hr1.
+  cbn in Hks.
+  destruct m; [ easy | cbn ].
+  cbn in Hks.
+  destruct m; [ | easy ].
+  cbn in Hks.
+  destruct Hks as [Hks| Hks]; [ subst kl | easy ].
+  now unfold iter_list; cbn.
+}
 remember (iter_list _ _ _) as B eqn:HB.
 specialize (sub_lists_of_seq_0_n_length m n) as Hlen.
 specialize (sub_list_firstn_nat_length n m _ Hks) as Hm.
@@ -3777,6 +3807,8 @@ destruct kl as [| k2]. {
 }
 cbn.
 rewrite if_leb_le_dec.
+unfold collapse in HB; cbn in HB.
+rewrite if_leb_le_dec in HB.
 destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
   unfold mat_select_rows; cbn.
   f_equal.
@@ -3785,22 +3817,69 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
     cbn in Hm |-*; move Hm at top; subst m; clear Hmz.
     do 2 rewrite fold_mat_ncols.
     rewrite Hca.
+    assert (Hcba : mat_ncols B = mat_ncols A). {
+      rewrite HB.
+      unfold iter_list; cbn.
+      generalize Hcma; intros H.
+      apply is_scm_mat_iff in H.
+      destruct H as (Hcra, Hcla).
+      apply mat_swap_rows_ncols; [ easy | easy | flia Hrz Hr1 ].
+    }
+    rewrite Hca in Hcba.
+    rewrite Hcba.
     f_equal; [ | f_equal ]. {
-      replace (mat_ncols B) with (mat_ncols A). 2: {
-        rewrite HB.
-        unfold iter_list; cbn.
-Theorem mat_ncols_fold_left : ∀ A (M : matrix T) (f : _ → A → _) l,
-  (∀ M t, is_correct_matrix M = true → mat_ncols (f M t) = mat_ncols M)
-  → mat_ncols (fold_left f l M) = mat_ncols M.
-Proof.
-intros * Hc.
-destruct M as (ll).
-induction ll as [| la]; cbn. {
-...
-symmetry; apply mat_ncols_fold_left.
-intros * Hcm.
-apply mat_swap_rows_ncols; [ easy | | ]. {
-(* mouais... faut voir... *)
+      cbn.
+      subst B; unfold iter_list; cbn.
+      unfold list_swap_elem; cbn.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length, fold_mat_nrows, Hra.
+        apply (le_lt_trans _ k); [ easy | ].
+        apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
+          now rewrite <- Hll.
+        }
+        now left.
+      }
+      rewrite seq_nth. 2: {
+        rewrite fold_mat_nrows, Hra.
+        apply (le_lt_trans _ k); [ easy | ].
+        apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
+          now rewrite <- Hll.
+        }
+        now left.
+      }
+      cbn.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec k2 0) as [Hk2z| Hk2z]. {
+        subst k2.
+        destruct k. 2: {
+          destruct k; [ easy | exfalso ].
+          specialize sub_lists_of_seq_0_n_are_sorted as H1.
+          now specialize (H1 n 2 ll Hll _ Hks).
+        }
+        exfalso.
+        specialize sub_lists_of_seq_0_n_are_sorted as H1.
+        now specialize (H1 n 2 ll Hll _ Hks).
+      }
+      destruct (Nat.eq_dec k2 1) as [Hk21| Hk21]. {
+        subst k2.
+        destruct k; [ easy | exfalso ].
+        destruct k. {
+          specialize sub_lists_of_seq_0_n_are_sorted as H1.
+          now specialize (H1 n 2 ll Hll _ Hks).
+        }
+        specialize sub_lists_of_seq_0_n_are_sorted as H1.
+        now specialize (H1 n 2 ll Hll _ Hks).
+      }
+      destruct k2; [ easy | clear Hk2z ].
+      destruct k2; [ easy | clear Hk21 ].
+      specialize sub_lists_of_seq_0_n_are_sorted as H1.
+      specialize (H1 n 2 ll Hll _ Hks).
+      cbn in H1.
+      apply Nat.leb_gt in Hk2k.
+      now rewrite Hk2k in H1.
+    }
+    cbn.
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
