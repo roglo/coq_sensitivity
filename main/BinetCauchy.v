@@ -68,6 +68,16 @@ Fixpoint binomial n k :=
      end
   end.
 
+Theorem binomial_0_r : ∀ n, binomial n 0 = 1.
+Proof. now intros; induction n. Qed.
+
+Theorem binomial_1_r : ∀ n, binomial n 1 = n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+now rewrite IHn, binomial_0_r.
+Qed.
+
 Theorem binomial_out : ∀ n k, n < k → binomial n k = 0.
 Proof.
 intros * Hnk.
@@ -3771,6 +3781,7 @@ destruct H1 as (Hls & Hinj & Hsurj).
 destruct kl as [| k]; [ now rewrite <- Hm in Hmz | ].
 destruct kl as [| k2]. {
   cbn in Hm; move Hm at top; subst m.
+  rewrite binomial_1_r in Hlen.
   clear Hmz; cbn.
   destruct k. {
     apply is_scm_mat_iff in Hcma.
@@ -3785,7 +3796,6 @@ destruct kl as [| k2]. {
       cbn in Hra, Hca.
       rewrite Hca in Hcla.
       subst n.
-      cbn in Hlen.
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
