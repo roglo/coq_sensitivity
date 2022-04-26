@@ -4828,6 +4828,8 @@ assert (Hab : is_square_matrix (A * B) = true). {
 }
 (*1*)
 rewrite det_is_det_by_canon_permut; try now destruct Hif.
+unfold det'.
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros s Hs.
 ...
