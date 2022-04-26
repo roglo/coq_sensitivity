@@ -3740,8 +3740,11 @@ Check fold_det.
 ...
 *)
 
-(* to be completed
 (* kl is not necessarily in order *)
+(* ah oui mais non, si kl fait partie des sub_lists_of_seq_0_n,
+   il est forcément dans l'ordre ! *)
+(* c'est pourri, mon truc *)
+(*
 Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
   is_correct_matrix A = true
   → mat_nrows A = n
@@ -3754,6 +3757,12 @@ Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
            (λ M t, mat_swap_rows (fst t) (snd t) M) A).
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
+Compute (
+  let n := 5 in
+  let m := 2 in
+  sub_lists_of_seq_0_n n m
+).
+...
 (*
 Compute (
   let A := mk_mat [[3]; [7]] in
@@ -3891,7 +3900,9 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
   }
   cbn.
 ...
+*)
 
+(*
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
   is_correct_matrix A = true
   → mat_nrows A = n
@@ -4765,7 +4776,9 @@ Qed.
 ...
 
 Arguments det_with_rows Hif (m n)%nat _ [kl]%list.
+*)
 
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
