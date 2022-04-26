@@ -3761,7 +3761,6 @@ Check fold_det.
 
 (* to be completed
 (* kl is not necessarily in order *)
-Search mat_select_rows.
 Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
   is_correct_matrix A = true
   → mat_nrows A = n
@@ -3772,6 +3771,16 @@ Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A.
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
+(*
+Compute (
+  let A := mk_mat [[0]; [1]] in
+  let kl := [0] in
+  mat_select_rows kl A =
+    iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A).
+Compute (
+  let kl := [0] in
+  sub_lists_of_seq_0_n 2 1).
+*)
 specialize (sub_lists_of_seq_0_n_length m n) as Hlen.
 specialize (sub_list_firstn_nat_length n m _ Hks) as Hm.
 remember (sub_lists_of_seq_0_n n m) as ll eqn:Hll.
@@ -3791,11 +3800,25 @@ destruct kl as [| k2]. {
     cbn in Hcra, Hcla, Hra, Hca.
     destruct lla as [| la]; [ easy | cbn ].
     destruct lla as [| la2]. 2: {
-      exfalso; clear Hcra.
+      exfalso.
       cbn - [ In ] in Hcla.
-      cbn in Hra, Hca.
+      cbn in Hra, Hca, Hcra.
       rewrite Hca in Hcla.
       subst n.
+      destruct lla as [| lb]. {
+        cbn in Hll.
+        clear Hks Hlen.
+        clear la2 Hcla.
+        clear la Hca Hcra.
+Compute (
+  let A := mk_mat [[0]; [1]] in
+  let kl := [0] in
+  mat_select_rows kl A =
+    iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A).
+Compute (
+  let kl := [0] in
+  sub_lists_of_seq_0_n 2 1).
+(* c'est bizarre... *)
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
