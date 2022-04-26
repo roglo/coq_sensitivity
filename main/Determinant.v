@@ -539,6 +539,52 @@ rewrite map_length.
 now rewrite seq_length.
 Qed.
 
+Theorem mat_swap_rows_ncols : ∀ (M : matrix T),
+  is_correct_matrix M = true
+  → ∀ p q, p < mat_nrows M → q < mat_nrows M →
+  mat_ncols (mat_swap_rows p q M) = mat_ncols M.
+Proof.
+intros * Hcm * Hp Hq.
+generalize Hcm; intros H.
+apply is_scm_mat_iff in H.
+destruct H as (Hcr, Hc).
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  destruct M as (ll); cbn in Hrz.
+  now apply length_zero_iff_nil in Hrz; subst ll.
+}
+apply Nat.neq_0_lt_0 in Hrz.
+unfold mat_swap_rows; cbn.
+unfold list_swap_elem.
+unfold mat_ncols; cbn.
+do 2 rewrite List_hd_nth_0.
+rewrite fold_corr_mat_ncols; [ | easy | easy ].
+destruct M as (ll); cbn.
+destruct ll as [| la]; [ easy | cbn ].
+unfold transposition.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec 0 p) as [Hpz| Hpz]. {
+  subst p.
+  destruct q; [ easy | ].
+  cbn in Hq.
+  cbn - [ In ] in Hcr, Hc.
+  apply Hc.
+  right.
+  apply Nat.succ_lt_mono in Hq.
+  now apply nth_In.
+}
+destruct (Nat.eq_dec 0 q) as [Hqz| Hqz]. {
+  subst q.
+  destruct p; [ easy | ].
+  cbn - [ In ] in Hcr, Hc.
+  apply Hc.
+  right.
+  cbn in Hp.
+  apply Nat.succ_lt_mono in Hp.
+  now apply nth_In.
+}
+easy.
+Qed.
+
 Theorem nth_transposition_canon_sym_gr_list_inj : ∀ n k p q i j,
   k < n!
   → p < n

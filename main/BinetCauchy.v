@@ -3763,46 +3763,44 @@ Compute (
       (iter_list (transp_list (collapse kl))
          (λ M t, mat_swap_rows (fst t) (snd t) M) A)).
 ...
+*)
+remember (iter_list _ _ _) as B eqn:HB.
 specialize (sub_lists_of_seq_0_n_length m n) as Hlen.
 specialize (sub_list_firstn_nat_length n m _ Hks) as Hm.
 remember (sub_lists_of_seq_0_n n m) as ll eqn:Hll.
 specialize sub_lists_of_seq_0_n_prop as H1.
 specialize (H1 n m ll Hll).
 destruct H1 as (Hls & Hinj & Hsurj).
-destruct kl as [| k]; [ now rewrite <- Hm in Hmz | ].
+destruct kl as [| k]; [ now rewrite <- Hm in Hmz | cbn ].
 destruct kl as [| k2]. {
-  cbn in Hm; move Hm at top; subst m.
-  rewrite binomial_1_r in Hlen.
-  clear Hmz; cbn.
-  destruct k. {
-    apply is_scm_mat_iff in Hcma.
-    destruct Hcma as (Hcra, Hcla).
-    unfold mat_select_rows, iter_list; cbn.
-    destruct A as (lla); f_equal; cbn.
-    cbn in Hcra, Hcla, Hra, Hca.
-    destruct lla as [| la]; [ easy | cbn ].
-    destruct lla as [| la2]. 2: {
-      exfalso.
-      cbn - [ In ] in Hcla.
-      cbn in Hra, Hca, Hcra.
-      rewrite Hca in Hcla.
-      subst n.
-      destruct lla as [| lb]. {
-        cbn in Hll.
-        clear Hks Hlen.
-        clear la2 Hcla.
-        clear la Hca Hcra.
-Compute (
-  let A := mk_mat [[0]; [1]] in
-  let kl := [0] in
-  mat_select_rows kl A =
-    iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A).
-Compute (
-  let kl := [0] in
-  sub_lists_of_seq_0_n 2 1).
-(* c'est bizarre... *)
+  now unfold iter_list in HB; cbn in HB; subst B.
+}
+cbn.
+rewrite if_leb_le_dec.
+destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
+  unfold mat_select_rows; cbn.
+  f_equal.
+  unfold list_list_select_rows.
+  destruct kl as [| k3]. {
+    cbn in Hm |-*; move Hm at top; subst m; clear Hmz.
+    do 2 rewrite fold_mat_ncols.
+    rewrite Hca.
+    f_equal; [ | f_equal ]. {
+      replace (mat_ncols B) with (mat_ncols A). 2: {
+        rewrite HB.
+        unfold iter_list; cbn.
+Theorem mat_ncols_fold_left : ∀ A (M : matrix T) (f : _ → A → _) l,
+  (∀ M t, is_correct_matrix M = true → mat_ncols (f M t) = mat_ncols M)
+  → mat_ncols (fold_left f l M) = mat_ncols M.
+Proof.
+intros * Hc.
+destruct M as (ll).
+induction ll as [| la]; cbn. {
 ...
-*)
+symmetry; apply mat_ncols_fold_left.
+intros * Hcm.
+apply mat_swap_rows_ncols; [ easy | | ]. {
+(* mouais... faut voir... *)
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
