@@ -517,7 +517,7 @@ Context (rp : ring_like_prop T).
 (* submatrix with list rows jl *)
 (**)
 Definition list_list_select_rows jl ll :=
-  map (λ i, map (λ j, nth j (nth i ll []) 0%F) (seq 0 (length ll))) jl.
+  map (λ i, map (λ j, nth j (nth i ll []) 0%F) (seq 0 (length (hd [] ll)))) jl.
 Definition mat_select_rows jl M :=
   mk_mat (list_list_select_rows jl (mat_list_list M)).
 
@@ -759,15 +759,11 @@ Qed.
 
 Theorem mat_select_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
-(*
   → mat_ncols A = length kl
-*)
-  → mat_nrows A = length kl
-(**)
   → (∀ k, k ∈ kl → k < mat_nrows A)
   → is_square_matrix (mat_select_rows kl A) = true.
 Proof.
-intros * Ha Hra Hkc.
+intros * Ha Hca Hkc.
 destruct (Nat.eq_dec (length kl) 0) as [Hnz| Hnz]. {
   apply length_zero_iff_nil in Hnz; subst kl.
   now cbn; rewrite iter_list_empty.
@@ -780,27 +776,10 @@ split. {
   unfold mat_ncols; cbn.
   intros Hc.
   destruct kl as [| k]; [ easy | exfalso ].
-(*
-  rewrite Hcla in Hc. 2: {
-    apply nth_In.
-    rewrite fold_mat_nrows.
-    now apply Hkc; left.
-  }
-  congruence.
-*)
-(*
-  clear Hnz; cbn in Hc.
-  rewrite List_map_seq_length in Hc.
-  rewrite Hcra in Hkc; [ | easy ].
-  now specialize (Hkc k (or_introl eq_refl)).
-*)
   clear Hnz; cbn in Hc.
   rewrite List_map_seq_length in Hc.
   specialize (Hkc k (or_introl eq_refl)).
-  rewrite Hcra in Hkc; [ easy | ].
-  rewrite fold_mat_nrows in Hc.
-  now rewrite Hc in Hkc.
-(**)
+  now rewrite Hcra in Hkc.
 } {
   intros l Hl.
   rewrite mat_select_rows_nrows.
@@ -808,30 +787,15 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
-(*
-  rewrite Hcla; [ easy | ].
-  apply nth_In; rewrite fold_mat_nrows.
-  now apply Hkc.
-*)
-(*
-  now rewrite List_map_seq_length.
-*)
-  now rewrite List_map_seq_length, fold_mat_nrows.
-(**)
+  now rewrite List_map_seq_length, fold_mat_ncols.
 }
 Qed.
-
-(**)
 
 Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   ∀ p q A jl,
   is_correct_matrix A = true
   → (∀ k, k ∈ jl → k < mat_nrows A)
-(*
   → mat_ncols A = length jl
-*)
-  → mat_nrows A = length jl
-(**)
   → p < length jl
   → q < length jl
   → p ≠ q
@@ -973,6 +937,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem mat_select_rows_butn_subm : ∀ (M : matrix T) p i k n,
   is_square_matrix M = true
   → NoDup p
@@ -990,6 +955,7 @@ unfold list_list_select_rows.
 rewrite <- map_butn, map_map.
 apply map_ext_in.
 intros j Hj.
+...
 destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   apply Nat.nlt_ge in Hjn.
   rewrite nth_overflow. 2: {
@@ -997,11 +963,16 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
     rewrite Nat.leb_refl; cbn.
     rewrite Nat.sub_0_r; flia Hjn.
   }
+...
   rewrite nth_overflow by now rewrite Hr.
+(**)
+rewrite <- map_butn.
+(*
   rewrite map_length, butn_length, Hr.
   cbn - [ nth seq ]; rewrite Nat.leb_refl.
   cbn - [ nth seq ]; rewrite Nat.sub_0_r.
   rewrite <- map_butn.
+*)
   rewrite (@List_map_const_is_repeat _ _ 0%F). 2: {
     intros; apply List_nth_nil.
   }
@@ -1012,7 +983,15 @@ destruct (lt_dec j (S n)) as [Hjn| Hjn]. 2: {
   rewrite butn_length.
   do 2 rewrite seq_length.
   f_equal.
-  apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+specialize (square_matrix_ncols _ Hsm) as Hc.
+cbn in Hc.
+rewrite Hr in Hc.
+unfold mat_ncols in Hc.
+cbn in Hc.
+rewrite Hc.
+apply Nat.lt_succ_r, Nat.ltb_lt in Hk.
+rewrite Hk; cbn.
+...
   now rewrite Hk, Nat_sub_succ_1.
 }
 destruct (Nat.eq_dec j n) as [Hjn'| Hjn']. {
@@ -1099,6 +1078,7 @@ intros u v.
 rewrite Nat.add_0_l, Nat.add_0_r.
 now rewrite nth_butn.
 Qed.
+*)
 
 Theorem fold_left_mk_mat : ∀ A (M : matrix T) (f : _ → A → _) l,
   fold_left (λ M a, mk_mat (f (mat_list_list M) a)) l M =
@@ -3771,16 +3751,37 @@ Theorem mat_select_rows_transp : ∀ m n (A : matrix T) kl,
       iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A.
 Proof.
 intros * Hcma Hra Hca Hmz Hks.
+(**)
 (*
+Abort.
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+*)
 Compute (
   let A := mk_mat [[0]; [1]] in
-  let kl := [0] in
+  let kl := [0]%nat in
   mat_select_rows kl A =
     iter_list (transp_list kl) (λ M t, mat_swap_rows (fst t) (snd t) M) A).
+(* ah oui mais donc c'est faux, ça *)
+...
+Compute (
+  let A := mk_mat [[0]; [1]] in
+  let kl := [0]%nat in
+  mat_select_rows kl A).
+Compute (
+  mat_select_rows [0] (mk_mat [[3]; [4]])).
+Print list_list_select_rows.
+...
 Compute (
   let kl := [0] in
   sub_lists_of_seq_0_n 2 1).
-*)
+Compute (
+  let A := mk_mat [[0]; [1]] in
+  let n := mat_nrows A in
+  let m := mat_ncols A in
+  sub_lists_of_seq_0_n n m).
 specialize (sub_lists_of_seq_0_n_length m n) as Hlen.
 specialize (sub_list_firstn_nat_length n m _ Hks) as Hm.
 remember (sub_lists_of_seq_0_n n m) as ll eqn:Hll.
