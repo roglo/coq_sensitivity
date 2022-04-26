@@ -3813,6 +3813,16 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
   unfold mat_select_rows; cbn.
   f_equal.
   unfold list_list_select_rows.
+  assert (Hkn : k < n). {
+    apply (le_lt_trans _ k); [ easy | ].
+    apply sub_lists_of_seq_0_n_lt with (k := m) (t := k :: k2 :: kl). {
+      now rewrite <- Hll.
+    }
+    now left.
+  }
+  assert (Hk2n : k2 < n) by now apply (le_lt_trans _ k).
+  specialize sub_lists_of_seq_0_n_are_sorted as H1.
+  specialize (H1 n m ll Hll _ Hks).
   destruct kl as [| k3]. {
     cbn in Hm |-*; move Hm at top; subst m; clear Hmz.
     do 2 rewrite fold_mat_ncols.
@@ -3827,16 +3837,6 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
     }
     rewrite Hca in Hcba.
     rewrite Hcba.
-    assert (Hkn : k < n). {
-      apply (le_lt_trans _ k); [ easy | ].
-      apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
-        now rewrite <- Hll.
-      }
-      now left.
-    }
-    assert (Hk2n : k2 < n) by now apply (le_lt_trans _ k).
-    specialize sub_lists_of_seq_0_n_are_sorted as H1.
-    specialize (H1 n 2 ll Hll _ Hks).
     f_equal; [ | f_equal ]. {
       cbn.
       subst B; unfold iter_list; cbn.
@@ -3889,6 +3889,7 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
     apply Nat.leb_gt in Hk2k.
     now rewrite Hk2k in H1.
   }
+  cbn.
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
