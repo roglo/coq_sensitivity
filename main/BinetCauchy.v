@@ -3827,59 +3827,68 @@ destruct (le_dec k2 k) as [Hk2k| Hk2k]. {
     }
     rewrite Hca in Hcba.
     rewrite Hcba.
+    assert (Hkn : k < n). {
+      apply (le_lt_trans _ k); [ easy | ].
+      apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
+        now rewrite <- Hll.
+      }
+      now left.
+    }
+    assert (Hk2n : k2 < n) by now apply (le_lt_trans _ k).
+    specialize sub_lists_of_seq_0_n_are_sorted as H1.
+    specialize (H1 n 2 ll Hll _ Hks).
     f_equal; [ | f_equal ]. {
       cbn.
       subst B; unfold iter_list; cbn.
       unfold list_swap_elem; cbn.
       rewrite (List_map_nth' 0). 2: {
-        rewrite seq_length, fold_mat_nrows, Hra.
-        apply (le_lt_trans _ k); [ easy | ].
-        apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
-          now rewrite <- Hll.
-        }
-        now left.
+        now rewrite seq_length, fold_mat_nrows, Hra.
       }
-      rewrite seq_nth. 2: {
-        rewrite fold_mat_nrows, Hra.
-        apply (le_lt_trans _ k); [ easy | ].
-        apply sub_lists_of_seq_0_n_lt with (k := 2) (t := [k; k2]). {
-          now rewrite <- Hll.
-        }
-        now left.
-      }
-      cbn.
+      rewrite seq_nth; [ cbn | now rewrite fold_mat_nrows, Hra ].
       unfold transposition.
       do 2 rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec k2 0) as [Hk2z| Hk2z]. {
         subst k2.
-        destruct k. 2: {
-          destruct k; [ easy | exfalso ].
-          specialize sub_lists_of_seq_0_n_are_sorted as H1.
-          now specialize (H1 n 2 ll Hll _ Hks).
-        }
-        exfalso.
-        specialize sub_lists_of_seq_0_n_are_sorted as H1.
-        now specialize (H1 n 2 ll Hll _ Hks).
+        destruct k; [ easy | now destruct k ].
       }
       destruct (Nat.eq_dec k2 1) as [Hk21| Hk21]. {
         subst k2.
-        destruct k; [ easy | exfalso ].
-        destruct k. {
-          specialize sub_lists_of_seq_0_n_are_sorted as H1.
-          now specialize (H1 n 2 ll Hll _ Hks).
-        }
-        specialize sub_lists_of_seq_0_n_are_sorted as H1.
-        now specialize (H1 n 2 ll Hll _ Hks).
+        destruct k; [ easy | now destruct k ].
       }
       destruct k2; [ easy | clear Hk2z ].
       destruct k2; [ easy | clear Hk21 ].
-      specialize sub_lists_of_seq_0_n_are_sorted as H1.
-      specialize (H1 n 2 ll Hll _ Hks).
       cbn in H1.
       apply Nat.leb_gt in Hk2k.
       now rewrite Hk2k in H1.
     }
     cbn.
+    subst B; unfold iter_list; cbn.
+    unfold list_swap_elem; cbn.
+    rewrite (List_map_nth' 0). 2: {
+      now rewrite seq_length, fold_mat_nrows, Hra.
+    }
+    rewrite seq_nth; [ cbn | now rewrite fold_mat_nrows, Hra ].
+    unfold transposition.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
+      now subst k; destruct k2.
+    }
+    destruct (Nat.eq_dec k 1) as [Hk1| Hk1]. {
+      subst k.
+      destruct k2; [ easy | ].
+      destruct k2; [ easy | flia Hk2k ].
+    }
+    cbn.
+    destruct k; [ easy | clear Hkz ].
+    destruct k; [ easy | clear Hk1 ].
+    destruct k2; [ easy | ].
+    destruct k2; [ easy | ].
+    destruct k2; [ easy | ].
+    cbn in H1.
+    do 2 apply Nat.succ_le_mono in Hk2k.
+    apply Nat.leb_gt in Hk2k.
+    now rewrite Hk2k in H1.
+  }
 ...
 
 Theorem det_with_rows : ∀ m n (A : matrix T) kl,
