@@ -138,6 +138,14 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 unfold det'.
 rewrite <- Hn.
+Compute (let n := 4 in
+map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n))).
+Compute (let n := 4 in
+filter snd (
+map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n)))).
+Theorem to_radix_canon_sym_gr_list : ∀ n k i,
+  i = some_function_to_be_found k
+  → canon_sym_gr_list n k = to_radix n (n ^ n - S i).
 ...
 *)
 
