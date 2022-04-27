@@ -36,13 +36,12 @@ n-1  | ......|    |. .....|   |.. ....|   |... ...|
 *)
 
 Fixpoint determinant_loop n (M : matrix T) :=
-  (match n with
-   | 0 => λ _, 1%F
-   | S n' =>
-       λ M' : matrix T,
-       ∑ (j = 0, n'),
-       minus_one_pow j * mat_el M' 0 j * determinant_loop n' (subm 0 j M')
-   end) M.
+  match n with
+  | 0 => 1%F
+  | S n' =>
+      ∑ (j = 0, n'),
+      minus_one_pow j * mat_el M 0 j * determinant_loop n' (subm 0 j M)
+  end.
 
 Definition det M := determinant_loop (mat_nrows M) M.
 Arguments det M%M.
