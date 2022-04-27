@@ -4892,30 +4892,6 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ det Nat.pow "mod" "/" ].
 Check rngl_product_summation_distr.
-Theorem glop : ∀ n m f,
-  n ≠ 0
-  → m ≠ 0
-  → m ≤ n
-  → ∏ (i = 0, n - 1), (∑ (j = 0, m - 1), f i j) =
-    ∑ (l ∈ sub_lists_of_seq_0_n n m), ∏ (k = 0, m - 1), f (ff_app l k) k.
-Proof.
-intros * Hnz Hmz Hmn.
-(* chais même pas si c'est vrai *)
-Abort.
-Abort.
-End a.
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (
-  let M := mk_mat [[3;2;5];[7;1;2];[3;3;8];[8;2;1]] in
-  let f := mat_el M in
-  let n := mat_nrows M in
-  let m := mat_ncols M in
-  ∏ (i = 0, n - 1), (∑ (j = 0, m - 1), f i j) =
-    ∑ (l ∈ sub_lists_of_seq_0_n n m), ∏ (k = 0, m - 1), f (ff_app l k) k
-).
-(* formule vachement géniale mais complètement fausse *)
 ...
   rewrite (det_with_rows B s Hcb Hbr Hbc Hmz Hs).
 ...
