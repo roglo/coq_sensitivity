@@ -164,9 +164,31 @@ map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n 
 Compute (let n := 4 in
 filter snd (
 map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n)))).
+Fixpoint to_radix_inv_loop n k i :=
+  match i with
+  | 0 => 0
+  | S i' =>
+      if list_eqb Nat.eqb (canon_sym_gr_list n k) (to_radix n i') then i'
+      else to_radix_inv_loop n k i'
+  end.
+Definition to_radix_inv n k := to_radix_inv_loop n k (n ^ n).
 Theorem to_radix_canon_sym_gr_list : ∀ n k i,
-  i = some_function_to_be_found k
-  → canon_sym_gr_list n k = to_radix n (n ^ n - S i).
+  k < n!
+  → i = to_radix_inv n k
+  → canon_sym_gr_list n k = to_radix n i.
+Proof.
+intros * Hkn Hi.
+subst i.
+unfold to_radix.
+unfold to_radix_inv.
+revert k Hkn.
+induction n; intros; [ easy | ].
+cbn - [ "mod" "/" ].
+...
+Compute (let n := 4 in let k := 24 in
+  canon_sym_gr_list n k = to_radix n (to_radix_inv n k)).
+Compute (to_radix_inv 4 3, canon_s).
+Compute (to_radix 4 120).
 ...
 *)
 
