@@ -4869,25 +4869,23 @@ erewrite rngl_summation_eq_compat. 2: {
     split; [ easy | flia Hmz ].
   }
   rewrite Nat.sub_diag.
-  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
-  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat_sub_succ_1.
-  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
-  rewrite Nat_sub_succ_1.
-  erewrite rngl_summation_eq_compat. 2: {
+  erewrite rngl_product_eq_compat. 2: {
     intros j (_, Hj).
-    erewrite rngl_product_eq_compat. 2: {
+    erewrite rngl_summation_eq_compat. 2: {
       intros k (_, Hk).
       now rewrite Nat.add_comm, Nat.add_sub.
     }
     easy.
   }
+  cbn - [ det ].
+  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+  rewrite Nat_sub_succ_1.
   easy.
 }
 cbn - [ det Nat.pow "mod" "/" ].
-...
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros s Hs.
 ...
   rewrite (det_with_rows B s Hcb Hbr Hbc Hmz Hs).
 ...
