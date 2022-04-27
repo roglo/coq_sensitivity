@@ -431,6 +431,8 @@ assert (Hkn : k < n ^ n). {
   specialize (Nat.pow_nonzero n n H) as Hnz.
   flia Hk Hnz.
 }
+(*
+(* bin non, c'est pas surjectif ! [0;0;0;0] n'a pas de 1 *)
 Check canon_sym_gr_surjective.
 Theorem to_radix_surjective : ∀ n k j,
   k < n ^ n
@@ -439,7 +441,6 @@ Theorem to_radix_surjective : ∀ n k j,
 Proof.
 intros * Hkn Hjn.
 Print canon_sym_gr_inv_list.
-Definition to_radix_inv_list n k :=
 ...
 exists (ff_app (to_radix_inv_list n k) j).
 split; [ now apply canon_sym_gr_inv_list_ub | ].
@@ -450,6 +451,9 @@ specialize (canon_sym_gr_surjective Hkn Hi) as Hp.
 destruct Hp as (p & Hp & Hpp).
 rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
 rewrite rngl_product_split_last; [ | flia ].
+*)
+(* du coup, ça va pas *)
+...
 erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   replace (j - 1 - 1) with (j - 2) by flia.
