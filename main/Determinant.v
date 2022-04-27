@@ -84,7 +84,64 @@ Definition det' (M : matrix T) :=
 
 Arguments det' M%M.
 
-(* Proof that first 2 definitions of determinants are equal *)
+(* third def (experimental) *)
+
+(* this definition appears in Sensitivity.v; perhaps it should be in Misc.v *)
+Fixpoint to_radix_loop it n i :=
+  match it with
+  | 0 => []
+  | S it' => i mod n :: to_radix_loop it' n (i / n)
+  end.
+
+Definition to_radix n i := to_radix_loop n n i.
+
+Definition det'' (M : matrix T) :=
+  let n := mat_nrows M in
+  ∑ (k = 0, n ^ n - 1),
+    ε (to_radix n k) *
+    ∏ (i = 1, n), mat_el M (i - 1) (ff_app (to_radix n k) (i - 1)).
+
+(*
+End a.
+Arguments det {T ro} M%M.
+Arguments det' {T ro} M%M.
+Arguments det'' {T ro} M%M.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
+*)
+(* det and det' are equal *)
+
+(* to be completed
+Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
+Proof.
+intros.
+(*
+Compute (let n := 4 in map (to_radix n) (seq 0 (n ^ n))).
+Print is_permut_list_bool.
+Compute (let n := 4 in filter is_permut_list_bool (map (@rev nat) (map (to_radix n) (seq 0 (n ^ n))))).
+Print canon_sym_gr_list.
+*)
+unfold det''.
+remember (mat_nrows M) as n eqn:Hn.
+rewrite rngl_summation_rtl.
+rewrite Nat.add_0_r.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite <- Nat.sub_add_distr.
+  now rewrite Nat.add_1_l.
+}
+cbn.
+unfold det'.
+rewrite <- Hn.
+...
+*)
+
+(* det and det' are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
