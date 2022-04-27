@@ -138,6 +138,13 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 unfold det'.
 rewrite <- Hn.
+(*
+  ============================
+  ∑ (k = 0, n! - 1),
+  ε (canon_sym_gr_list n k) * ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)) =
+  ∑ (i = 0, n ^ n - 1),
+  ε (to_radix n (n ^ n - S i)) * ∏ (i0 = 1, n), mat_el M (i0 - 1) (ff_app (to_radix n (n ^ n - S i)) (i0 - 1))
+*)
 Compute (let n := 4 in
 map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n))).
 Compute (let n := 4 in
