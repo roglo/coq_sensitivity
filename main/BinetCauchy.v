@@ -4883,6 +4883,11 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat_sub_succ_1.
   rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
   rewrite Nat_sub_succ_1.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    rewrite rngl_product_mul_distr; [ | now destruct Hif ].
+    easy.
+  }
   easy.
 }
 cbn - [ det Nat.pow "mod" "/" ].
