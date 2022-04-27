@@ -4807,6 +4807,13 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   rewrite rngl_summation_list_only_one; cbn.
   symmetry; apply rngl_mul_1_l.
 }
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  apply is_scm_mat_iff in Hca.
+  destruct Hca as (Hcra, Hcla).
+  specialize (Hcra Hac) as H1.
+  now rewrite Har in H1.
+}
 assert (Hab : is_square_matrix (A * B) = true). {
   apply is_scm_mat_iff.
   split. {
@@ -4856,6 +4863,28 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i (_, Hi).
+  rewrite rngl_product_shift with (s := 1). 2: {
+    split; [ easy | flia Hmz ].
+  }
+  rewrite Nat.sub_diag.
+  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+  rewrite Nat_sub_succ_1.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j (_, Hj).
+    erewrite rngl_product_eq_compat. 2: {
+      intros k (_, Hk).
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ det Nat.pow "mod" "/" ].
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros s Hs.
