@@ -76,14 +76,15 @@ Proof. easy. Qed.
    permutations *)
 (* known as "Leibniz formula" *)
 
-Definition det' n (M : matrix T) :=
+Definition det' (M : matrix T) :=
+  let n := mat_nrows M in
   ∑ (k = 0, fact n - 1),
     ε (canon_sym_gr_list n k) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)).
 
-Arguments det' n%nat M%M.
+Arguments det' M%M.
 
-(* Proof that both definitions of determinants are equal *)
+(* Proof that first 2 definitions of determinants are equal *)
 
 Theorem det_is_det_by_canon_permut :
   rngl_is_comm = true →
@@ -92,7 +93,7 @@ Theorem det_is_det_by_canon_permut :
   rngl_has_1_neq_0 = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → det M = det' (mat_nrows M) M.
+  → det M = det' M.
 Proof.
 intros Hic Hop Hin H10 * Hm.
 unfold det'.
@@ -930,10 +931,10 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
   }
 }
 rewrite det_is_det_by_canon_permut; try now destruct Hif.
-rewrite Hr.
 unfold det'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
+rewrite Hr.
 apply rngl_summation_eq_compat.
 intros k Hk.
 assert (Hkn : k < n!). {
@@ -1180,7 +1181,7 @@ Qed.
 End a.
 
 Arguments det {T ro} M%M.
-Arguments det' {T}%type {ro} n%nat M%M.
+Arguments det' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
