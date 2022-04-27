@@ -276,6 +276,42 @@ Qed.
 
 (* multilinearity *)
 
+(* to be completed
+Theorem determinant_multilinear_glop :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ n (M : matrix T) i a b U V,
+  is_square_matrix M = true
+  → mat_nrows M = n
+  → vect_size U = n
+  → vect_size V = n
+  → i < n
+  → det'' (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * det'' (mat_repl_vect i M U) +
+        b * det'' (mat_repl_vect i M V))%F.
+Proof.
+intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
+unfold det''.
+remember (a × U + b × V)%V as UV eqn:HUV.
+assert (Hvm : vect_size UV = mat_nrows M). {
+  rewrite Hr, HUV; cbn.
+  rewrite map2_length.
+  do 2 rewrite map_length.
+  do 2 rewrite fold_vect_size.
+  rewrite Hu, Hv.
+  apply Nat.min_id.
+}
+rewrite mat_repl_vect_nrows; [ | easy ].
+rewrite mat_repl_vect_nrows; [ | congruence ].
+rewrite mat_repl_vect_nrows; [ | congruence ].
+rewrite Hr.
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | now left ].
+...
+*)
+
 Theorem determinant_multilinear :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -318,23 +354,19 @@ assert (Hvm : vect_size UV = mat_nrows M). {
   rewrite Hu, Hv.
   apply Nat.min_id.
 }
+rewrite mat_repl_vect_nrows; [ | easy ].
+rewrite mat_repl_vect_nrows; [ | congruence ].
+rewrite mat_repl_vect_nrows; [ | congruence ].
+rewrite Hr.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
     eapply le_lt_trans; [ apply Hk | ].
-    rewrite mat_repl_vect_nrows; [ | easy ].
-    rewrite Hr.
     apply Nat.sub_lt; [ | flia ].
     apply Nat.neq_0_lt_0, fact_neq_0.
   }
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite HUV in Hj; cbn in Hj.
-    do 2 rewrite map2_length in Hj.
-    do 2 rewrite map_length in Hj.
-    do 2 rewrite fold_vect_size in Hj.
-    rewrite fold_mat_nrows, Hr, Hu, Hv in Hj.
-    do 2 rewrite Nat.min_id in Hj.
     rewrite mat_el_repl_vect; cycle 1. {
       now apply squ_mat_is_corr.
     } {
@@ -348,17 +380,13 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite Hr; flia Hj.
     } {
       unfold ff_app.
-      rewrite Hcn.
-      rewrite mat_repl_vect_nrows; [ | easy ].
-      rewrite Hr.
+      rewrite Hcn, Hr.
       apply canon_sym_gr_list_ub; [ easy | flia Hj ].
     } {
       now rewrite Hcn, Hr.
     }
     unfold vect_el, ff_app.
     cbn - [ Nat.eq_dec ].
-    rewrite map2_length, fold_mat_nrows, fold_vect_size.
-    rewrite Hvm, Hr, Nat.min_id.
     easy.
   }
   easy.
@@ -370,8 +398,6 @@ rewrite rngl_mul_summation_distr_l; [ | now left ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  rewrite map2_length, fold_mat_nrows, fold_vect_size in Hk |-*.
-  rewrite Hr, Hu, Nat.min_id in Hk |-*.
   assert (Hkn : k < fact n). {
     specialize (fact_neq_0 n) as Hnz.
     flia Hk Hnz.
@@ -397,8 +423,6 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-do 3 rewrite map2_length, fold_mat_nrows, fold_vect_size.
-rewrite Hvm, Hr, Hu, Hv, Nat.min_id.
 rewrite rngl_add_comm.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
