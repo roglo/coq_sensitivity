@@ -115,9 +115,6 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 *)
 
-Theorem to_radix_ub : ∀ n k i, n ≠ 0 → ff_app (to_radix n k) i < n.
-Proof.
-intros * Hnz.
 Theorem to_radix_loop_ub : ∀ it n k i,
   n ≠ 0 → ff_app (to_radix_loop it n k) i < n.
 Proof.
@@ -127,6 +124,10 @@ induction it; intros; [ destruct i; cbn; flia Hnz | cbn ].
 destruct i; [ now apply Nat.mod_upper_bound | ].
 now apply IHit.
 Qed.
+
+Theorem to_radix_ub : ∀ n k i, n ≠ 0 → ff_app (to_radix n k) i < n.
+Proof.
+intros * Hnz.
 now apply to_radix_loop_ub.
 Qed.
 
