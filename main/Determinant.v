@@ -193,8 +193,42 @@ Fixpoint div_div la m i :=
   | S i' => div_div la m i' / m
   end.
 
+Theorem mod_mod_to_radix_inv : ∀ l j d,
+  (∀ i, i ∈ l → i < j + d)
+  → length l = d
+  → mod_mod (to_radix_inv (j + d) l) (j + d) d = l.
+Proof.
+intros * Hl Hlen.
+revert d j Hl Hlen.
+induction l as [| b]; intros; [ now cbn in Hlen; subst d | ].
+cbn.
+destruct d; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+rewrite <- Nat.add_succ_comm.
+remember ((S j + d) * to_radix_inv (S j + d) l) as x.
+cbn - [ "mod" "/" ].
+subst x.
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+  apply Nat.mod_small.
+  rewrite <- Nat.add_succ_r.
+  now apply Hl; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
+rewrite Nat.div_small. 2: {
+  rewrite <- Nat.add_succ_r.
+  now apply Hl; left.
+}
+rewrite Nat.add_0_l.
+rewrite <- Nat.add_succ_l.
+apply IHl; [ | easy ].
+intros i Hi.
+rewrite Nat.add_succ_comm.
+now apply Hl; right.
+Qed.
+
 (* to be completed
-Theorem mod_mod_to_radix_inv : ∀ it l d,
+Theorem mod_mod_to_radix_inv' : ∀ it l d,
   d ≤ it
   → length l = d
   → (∀ i, i ∈ l → i < d)
@@ -235,26 +269,30 @@ apply Nat.succ_le_mono in Hit.
 destruct (Nat.eq_dec d it) as [Hdi| Hdi]. {
   subst it; cbn.
   rewrite Nat.sub_diag; cbn; rewrite app_nil_r.
+  cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+  clear Hit.
+  specialize mod_mod_to_radix_inv as H1.
+  rewrite (H1 l 1); [ easy | | easy ].
+  intros i Hi.
+  now apply Hl; right.
+}
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+specialize mod_mod_to_radix_inv as H1.
+specialize (H1 l 1 d).
+(* ah mais non ; mais peut-être avec le lemme précédent avec it ? *)
+..
+rewrite IHit; [ | flia Hit Hdi | | ].
+...
 (*
 Compute (
-let l := [3;1;0;0] in
+let l := [4;2;4;4] in
 let d := length l in
 mod_mod (to_radix_inv (S d) l) (S d) d = l
 ).
 *)
-  cbn in Hlen.
-  clear IHit Hit.
-  apply Nat.succ_inj in Hlen.
-...
-  revert d a Hl Hlen.
-  induction l as [| b]; intros; [ now cbn in Hlen; subst d | ].
-  remember (S d) as d'; cbn; subst d'.
-  remember (S d * to_radix_inv (S d) l) as x.
-  destruct d; [ easy | ].
-  cbn in Hlen; apply Nat.succ_inj in Hlen.
-  cbn - [ "mod" "/" ].
-  f_equal. {
-
+  clear IHit.
 ...
 induction d; intros; cbn - [ "mod" "/" ]. {
   now apply length_zero_iff_nil in Hlen; subst l.
