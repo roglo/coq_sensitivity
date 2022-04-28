@@ -1404,7 +1404,7 @@ split. {
 }
 Qed.
 
-Theorem permut_in_canon_sym_gr_of_its_rank : ∀ n l,
+Theorem canon_sym_gr_list_canon_sym_gr_list_inv : ∀ n l,
   is_permut n l
   → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l.
 Proof.
@@ -1569,7 +1569,7 @@ destruct (le_dec _ _) as [H1| H1]; [ | easy ].
 destruct (lt_dec _ _) as [H2| H2]; [ easy | flia H1 H2 ].
 Qed.
 
-Theorem canon_sym_gr_inv_of_canon_sym_gr : ∀ n k,
+Theorem canon_sym_gr_list_inv_canon_sym_gr_list : ∀ n k,
   k < n!
   → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k.
 Proof.
@@ -1684,7 +1684,7 @@ assert
   }
   rewrite seq_nth; [ | now apply canon_sym_gr_list_inv_ub ].
   rewrite Nat.add_0_l.
-  rewrite permut_in_canon_sym_gr_of_its_rank; [ | easy ].
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv; [ | easy ].
   now apply sym_gr_inv_list_el with (n := n).
 }
 exists p.
@@ -1713,7 +1713,7 @@ assert
   } {
     now apply canon_sym_gr_list_is_permut.
   }
-  now apply canon_sym_gr_inv_of_canon_sym_gr.
+  now apply canon_sym_gr_list_inv_canon_sym_gr_list.
 }
 exists p.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
@@ -1747,8 +1747,8 @@ Theorem canon_sym_gr_list_inj : ∀ n i j,
 Proof.
 intros * Hi Hj Hij.
 apply (f_equal (@canon_sym_gr_list_inv n)) in Hij.
-rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
-rewrite canon_sym_gr_inv_of_canon_sym_gr in Hij; [ | easy ].
+rewrite canon_sym_gr_list_inv_canon_sym_gr_list in Hij; [ | easy ].
+rewrite canon_sym_gr_list_inv_canon_sym_gr_list in Hij; [ | easy ].
 easy.
 Qed.
 
@@ -1761,8 +1761,8 @@ Theorem rank_of_permut_in_canon_gr_list_inj : ∀ n la lb,
 Proof.
 intros * (Hla, Han) (Hlb, Hbn) Hrr.
 apply (f_equal (canon_sym_gr_list n)) in Hrr.
-rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
-rewrite permut_in_canon_sym_gr_of_its_rank in Hrr; [ | easy ].
+rewrite canon_sym_gr_list_canon_sym_gr_list_inv in Hrr; [ | easy ].
+rewrite canon_sym_gr_list_canon_sym_gr_list_inv in Hrr; [ | easy ].
 easy.
 Qed.
 

@@ -154,6 +154,80 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 unfold det'.
 rewrite <- Hn.
+specialize (fact_neq_0 n) as Hnz.
+erewrite rngl_summation_change_var. 2: {
+  intros i Hi.
+  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
+  flia Hi Hnz.
+}
+rewrite Nat.sub_0_r.
+replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+replace (map _ _) with (canon_sym_gr_list_list n) by easy.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj); subst i.
+    apply in_seq in Hj.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  easy.
+}
+cbn.
+symmetry.
+Check canon_sym_gr_list_inv_canon_sym_gr_list.
+...
+Theorem to_radix_list_inv_to_radix_list : ∀ n k,
+  k < n ^ n → to_radix_list_inv n (to_radix_list n k) = k.
+  ...
+erewrite rngl_summation_change_var. 2: {
+  intros i Hi.
+...
+  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
+  flia Hi Hnz.
+}
+rewrite Nat.sub_0_r.
+replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+replace (map _ _) with (canon_sym_gr_list_list n) by easy.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj); subst i.
+    apply in_seq in Hj.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  easy.
+}
+cbn.
+symmetry.
+...
+Search canon_sym_gr_list.
+canon_sym_gr_list_inv_canon_sym_gr_list: ∀ n k : nat, k < n! → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k
+Check canon_sym_gr_list_canon_sym_gr_list_inv.
+...
+  apply canon_sym_gr_list_canon_sym_gr_list_inv.
+
+rewrite rngl_summation_change_var with
+  (g := canon_sym_gr_list_inv n) (h0 := h).
+set (g := canon_sym_gr_list_inv n).
+set (h := canon_sym_gr_list n).
+rewrite rngl_summation_change_var with (g0 := g) (h0 := h).
+Search canon_sym_gr_list.
+
+canon_sym_gr_list_canon_sym_gr_list_inv:
+  ∀ (n : nat) (l : list nat), is_permut n l → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l
+Check canon_sym_gr_list_list.
+Print canon_sym_gr_list_list.
+Print canon_sym_gr_list.
+Check rngl_summation_change_var.
+Check rn
+set (h := canon_sym_gr_list_list).
+erewrite rngl_summation_change_var with (g := canon_sym_gr_list_list).
 ...
 (*
   ============================
@@ -1179,7 +1253,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   do 2 rewrite length_canon_sym_gr_list.
   erewrite map_ext_in. 2: {
     intros i Hi; apply in_seq in Hi.
-    rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+    rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
 (* lemme à faire ? *)
       split; [ | now rewrite map_length, seq_length ].
       split. {
@@ -1210,7 +1284,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     easy.
   }
   rewrite <- List_map_nth_seq'; [ | now rewrite length_canon_sym_gr_list ].
-  now apply canon_sym_gr_inv_of_canon_sym_gr.
+  now apply canon_sym_gr_list_inv_canon_sym_gr_list.
 }
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
@@ -1271,7 +1345,7 @@ assert (Hkn : k < n!). {
 }
 assert (Hc : canon_sym_gr_list n k = f (g k)). {
   unfold g, f.
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     apply list_swap_elem_is_permut; [ easy | easy | ].
     now apply canon_sym_gr_list_is_permut.
   }

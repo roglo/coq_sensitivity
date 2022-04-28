@@ -1133,7 +1133,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
     specialize (fact_neq_0 n) as H.
     flia Hi H.
   }
-  apply canon_sym_gr_inv_of_canon_sym_gr.
+  apply canon_sym_gr_list_inv_canon_sym_gr_list.
   specialize (fact_neq_0 n) as H.
   flia Hi H.
 }
@@ -1146,7 +1146,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   destruct Hi as (j & Hji & Hj).
   apply in_seq in Hj.
   unfold g.
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     split. {
       apply Hsg; rewrite <- Hji.
       now apply (sym_gr_inv_lt _ Hnz).
@@ -1488,7 +1488,7 @@ split. {
   destruct Hl as (Hl1, Hl2).
   destruct Hσ as (Hσ1, Hσ2).
   exists (canon_sym_gr_list_inv n (l ° σ)).
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     now apply map_ff_app_permut_permut_is_permut.
   }
   split. {
@@ -1711,7 +1711,7 @@ split. {
   intros l Hl.
   apply in_map_iff.
   exists (canon_sym_gr_list_inv n (isort_rank Nat.leb l ° σ)).
-  rewrite permut_in_canon_sym_gr_of_its_rank. 2: {
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     apply comp_is_permut; [ | easy ].
     apply isort_rank_is_permut.
     now destruct Hl.
