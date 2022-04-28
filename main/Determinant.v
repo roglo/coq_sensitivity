@@ -222,13 +222,144 @@ Theorem to_radix_inv_to_radix_loop : ∀ it n k,
   n ≤ it → k < n ^ n → to_radix_inv n (to_radix_loop it n k) = k.
 Proof.
 intros * Hit Hkn.
-rewrite <- firstn_to_radix_loop.
-xrevert n k Hit Hkn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn in Hkn |-*.
+  apply Nat.lt_1_r in Hkn; subst k.
+  now destruct it.
+}
+Compute (
+  let n := 3 in
+  let it := n + 4 in
+  map (λ i, to_radix_inv n (to_radix_loop it n i)) (seq 0 (n ^ n))
+).
+destruct it. {
+  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
+  now apply Nat.lt_1_r in Hkn; subst k.
+}
+cbn.
+specialize (Nat.div_mod k n Hnz) as H1.
+symmetry; rewrite H1, Nat.add_comm at 1.
+f_equal; f_equal; symmetry.
+...
+destruct it. {
+  cbn.
+  rewrite Nat.mul_0_r, Nat.add_0_r.
+  apply Nat.le_1_r in Hit.
+  destruct Hit as [Hit| Hit]; subst n; [ easy | ].
+  cbn in Hkn.
+  now apply Nat.lt_1_r in Hkn; subst k.
+}
+cbn.
+destruct it. {
+  cbn.
+  rewrite Nat.mul_0_r, Nat.add_0_r.
+  symmetry; rewrite Nat.add_comm.
+  destruct n. {
+    cbn in Hkn.
+    now apply Nat.lt_1_r in Hkn; subst k.
+  }
+  destruct n. {
+    cbn in Hkn.
+    now apply Nat.lt_1_r in Hkn; subst k.
+  }
+  destruct n; [ | flia Hit ].
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | flia Hkn ].
+}
+cbn.
+...
+Theorem to_radix_loop_enough_iter : ∀ it1 it2 n k,
+  n ≤ it1
+  → n ≤ it2
+  → to_radix_loop it1 n k = to_radix_loop it2 n k.
+Admitted.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn in Hkn |-*.
+  apply Nat.lt_1_r in Hkn; subst k.
+  now destruct it.
+}
+revert n k Hit Hkn Hnz.
+induction it; intros; cbn; [ flia Hit Hnz | ].
+destruct n; [ easy | clear Hnz ].
+cbn - [ "mod" "/" ].
+rewrite to_radix_loop_enough_iter with (it2 := S it).
+...
+...
+rewrite to_radix_loop_enough_iter with (it2 := S it); [ | easy | flia Hit ].
+cbn.
+specialize (Nat.div_mod k n Hnz) as H1.
+symmetry.
+rewrite H1, Nat.add_comm at 1.
+f_equal.
+f_equal.
+symmetry.
+...
+revert n k Hit Hkn.
 induction it; intros. {
   apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
   now apply Nat.lt_1_r in Hkn.
 }
 cbn.
+destruct (Nat.eq_dec n (S it)) as [Hni| Hni]. {
+  subst n; clear Hit.
+  rewrite to_radix_loop_enough_iter with (it2 := S it).
+...
+specialize (Nat.div_mod k n) as H1.
+Compute (
+  let n := 3 in
+  let it := 5 in
+  map (λ i, to_radix_inv n (firstn it (to_radix_loop it n i))) (seq 0 (n ^ n))
+).
+...
+destruct it. {
+  cbn.
+  rewrite Nat.mul_0_r, Nat.add_0_r.
+  apply Nat.le_1_r in Hit.
+  destruct Hit as [Hit| Hit]; subst n; [ easy | ].
+  cbn in Hkn.
+  now apply Nat.lt_1_r in Hkn; subst k.
+}
+cbn.
+destruct it. {
+  cbn.
+  rewrite Nat.mul_0_r, Nat.add_0_r.
+  symmetry; rewrite Nat.add_comm.
+  destruct n. {
+    cbn in Hkn.
+    now apply Nat.lt_1_r in Hkn; subst k.
+  }
+  destruct n. {
+    cbn in Hkn.
+    now apply Nat.lt_1_r in Hkn; subst k.
+  }
+  destruct n; [ | flia Hit ].
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | flia Hkn ].
+}
+cbn.
+...
+intros * Hit Hkn.
+...
+Theorem to_radix_inv_to_radix_loop : ∀ it n k,
+  n ≤ it → k < n ^ n → to_radix_inv n (to_radix_loop it n k) = k.
+Proof.
+intros * Hit Hkn.
+rewrite <- firstn_to_radix_loop.
+revert n k Hit Hkn.
+induction it; intros. {
+  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
+  now apply Nat.lt_1_r in Hkn.
+}
+cbn.
+
+Inspect 3.
+...
 rewrite IHit.
 ...
 specialize (@to_radix_inv_to_radix_loop n n k) as H1.
