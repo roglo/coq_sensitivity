@@ -86,7 +86,8 @@ Arguments det' M%M.
 
 (* third def (experimental) *)
 
-(* this definition appears in Sensitivity.v; perhaps it should be in Misc.v *)
+(* this definition also appears in Sensitivity.v; perhaps it should be
+   in Misc.v *)
 Fixpoint to_radix_loop it n i :=
   match it with
   | 0 => []
@@ -153,6 +154,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 unfold det'.
 rewrite <- Hn.
+...
 (*
   ============================
   ∑ (k = 0, n! - 1),
