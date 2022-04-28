@@ -181,7 +181,100 @@ rewrite to_radix_inv_to_radix_loop.
 now apply Nat.mod_small.
 Qed.
 
+Fixpoint mod_mod la m i :=
+  match i with
+  | 0 => []
+  | S i' => la mod m :: mod_mod (la / m) m i'
+  end.
+
+Fixpoint div_div la m i :=
+  match i with
+  | 0 => la
+  | S i' => div_div la m i' / m
+  end.
+
 (* to be completed
+Theorem mod_mod_to_radix_inv : ∀ it l d,
+  d ≤ it
+  → length l = d
+  → (∀ i, i ∈ l → i < d)
+  → mod_mod (to_radix_inv d l) d it = l ++ repeat 0 (it - d).
+Proof.
+intros * Hit Hlen Hl.
+(*
+Compute (
+let l := [3;1;0;0] in
+let d := length l in
+let it := d + 3 in
+mod_mod (to_radix_inv d l) d it = l ++ repeat 0 (it - d)
+).
+*)
+revert d l Hit Hlen Hl.
+induction it; intros. {
+  apply Nat.le_0_r in Hit; subst d.
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+destruct d. {
+  apply length_zero_iff_nil in Hlen; subst l; cbn.
+  f_equal.
+  clear IHit Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+destruct l as [| a]; [ easy | ].
+rewrite Nat.sub_succ.
+remember (S d) as d'; cbn; subst d'.
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+  apply Nat.mod_small.
+  now apply Hl; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
+rewrite Nat.div_small; [ | now apply Hl; left ].
+cbn - [ "mod" "/" ].
+apply Nat.succ_le_mono in Hit.
+destruct (Nat.eq_dec d it) as [Hdi| Hdi]. {
+  subst it; cbn.
+  rewrite Nat.sub_diag; cbn; rewrite app_nil_r.
+(*
+Compute (
+let l := [3;1;0;0] in
+let d := length l in
+mod_mod (to_radix_inv (S d) l) (S d) d = l
+).
+*)
+  cbn in Hlen.
+  clear IHit Hit.
+  apply Nat.succ_inj in Hlen.
+...
+  revert d a Hl Hlen.
+  induction l as [| b]; intros; [ now cbn in Hlen; subst d | ].
+  remember (S d) as d'; cbn; subst d'.
+  remember (S d * to_radix_inv (S d) l) as x.
+  destruct d; [ easy | ].
+  cbn in Hlen; apply Nat.succ_inj in Hlen.
+  cbn - [ "mod" "/" ].
+  f_equal. {
+
+...
+induction d; intros; cbn - [ "mod" "/" ]. {
+  now apply length_zero_iff_nil in Hlen; subst l.
+  }
+  destruct l as [| a]; [ easy | ].
+  f_equal. {
+    remember (S d) as d'; cbn; subst d'.
+    rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+    apply Nat.mod_small.
+    now apply Hl; left.
+  }
+  remember (S d) as d'; cbn; subst d'.
+  rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
+  rewrite Nat.div_small; [ | now apply Hl; left ].
+  rewrite Nat.add_0_l.
+...
+  rewrite IHd.
+Print to_radix_inv.
+...
+
 Theorem to_radix_to_radix_inv : ∀ n l,
   length l = n
   → (∀ i, i ∈ l → i < n)
@@ -273,16 +366,6 @@ apply Nat.succ_le_mono in Hit.
 cbn - [ "mod" "/" ].
 remember 3 as d.
 replace (S (S (S n))) with (n + d) in Hlen, Hl |-* by flia Heqd.
-Fixpoint mod_mod la m i :=
-  match i with
-  | 0 => []
-  | S i' => la mod m :: mod_mod (la / m) m i'
-  end.
-Fixpoint div_div la m i :=
-  match i with
-  | 0 => la
-  | S i' => div_div la m i' / m
-  end.
 remember (to_radix_inv (n + d) l) as la eqn:Hla.
 remember (n + d) as m eqn:Hm.
 rewrite List_cons_is_app.
@@ -310,24 +393,10 @@ induction it; intros; cbn. {
   apply Nat.le_0_r in Hit; subst n; cbn.
   do 2 rewrite app_nil_r.
   cbn in Hlen, Hl.
-  revert l Hlen Hl.
-  induction d; intros; cbn - [ "mod" "/" ]. {
-    now apply length_zero_iff_nil in Hlen; subst l.
-  }
-  destruct l as [| a]; [ easy | ].
-  f_equal. {
-    remember (S d) as d'; cbn; subst d'.
-    rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
-    apply Nat.mod_small.
-    now apply Hl; left.
-  }
-  remember (S d) as d'; cbn; subst d'.
-  rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
-  rewrite Nat.div_small; [ | now apply Hl; left ].
-  rewrite Nat.add_0_l.
+Print mod_mod.
 ...
-  rewrite IHd.
-Print to_radix_inv.
+rewrite mod_mod_to_radix_inv.
+...
 ...
 now apply glop.
 ...
