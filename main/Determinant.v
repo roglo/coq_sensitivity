@@ -227,6 +227,25 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply Nat.lt_1_r in Hkn; subst k.
   now destruct it.
 }
+revert n k Hnz Hit Hkn.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
+  now apply Nat.lt_1_r in Hkn; subst k.
+}
+specialize (Nat.div_mod k n Hnz) as H1.
+symmetry; rewrite H1, Nat.add_comm at 1.
+f_equal; f_equal; symmetry.
+...
+apply IHit.
+...
+Print to_radix_inv.
+Print to_radix_loop.
+...
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn in Hkn |-*.
+  apply Nat.lt_1_r in Hkn; subst k.
+  now destruct it.
+}
 Compute (
   let n := 3 in
   let it := n + 4 in
