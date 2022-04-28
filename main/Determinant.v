@@ -196,25 +196,6 @@ Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
 Proof.
 intros * Hit Hlen Hl.
-remember (it - n) as d eqn:Hd.
-replace it with (d + n) in * by flia Hd Hit.
-clear it Hit Hd.
-revert n d Hlen Hl.
-induction l as [| a]; intros; cbn. {
-  cbn in Hlen; subst n.
-  rewrite Nat.add_0_r.
-  clear Hl.
-  induction d; [ easy | now cbn; f_equal ].
-}
-destruct n; [ easy | ].
-rewrite Nat.add_succ_r.
-cbn - [ to_radix_inv "mod" "/" ].
-...
-revert n l Hlen Hl.
-induction d; intros; cbn. {
-  rewrite app_nil_r.
-...
-
 destruct it. {
   apply Nat.le_0_r in Hit; subst n.
   now apply length_zero_iff_nil in Hlen; subst l.
@@ -292,7 +273,6 @@ apply Nat.succ_le_mono in Hit.
 cbn - [ "mod" "/" ].
 remember 3 as d.
 replace (S (S (S n))) with (n + d) in Hlen, Hl |-* by flia Heqd.
-clear Heqd.
 Fixpoint mod_mod la m i :=
   match i with
   | 0 => []
@@ -303,6 +283,59 @@ Fixpoint div_div la m i :=
   | 0 => la
   | S i' => div_div la m i' / m
   end.
+remember (to_radix_inv (n + d) l) as la eqn:Hla.
+remember (n + d) as m eqn:Hm.
+rewrite List_cons_is_app.
+rewrite (List_cons_is_app ((la / m) mod m)).
+rewrite (List_cons_is_app ((la / m / m) mod m)).
+do 2 rewrite app_assoc.
+remember (([la mod m] ++ [(la / m) mod m]) ++ [(la / m / m) mod m]) as x eqn:Hx.
+cbn in Hx; subst x.
+replace [la mod m; (la / m) mod m; (la / m / m) mod m] with (mod_mod la m d). 2: {
+  now subst d.
+}
+replace (la / m / m/ m) with (div_div la m d) by now subst d.
+clear Heqd; subst m la.
+Theorem glop : ∀ it n l d,
+  n ≤ it
+  → (∀ i, i ∈ l → i < n + d)
+  → length l = n + d
+  → mod_mod (to_radix_inv (n + d) l) (n + d) d ++
+    to_radix_loop it (n + d) (div_div (to_radix_inv (n + d) l) (n + d) d) =
+    l ++ repeat 0 (it - n).
+Proof.
+intros * Hit Hl Hlen.
+revert n l d Hit Hl Hlen.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit; subst n; cbn.
+  do 2 rewrite app_nil_r.
+  cbn in Hlen, Hl.
+  revert l Hlen Hl.
+  induction d; intros; cbn - [ "mod" "/" ]. {
+    now apply length_zero_iff_nil in Hlen; subst l.
+  }
+Print to_radix_inv.
+...
+now apply glop.
+...
+remember (it - n) as d eqn:Hd.
+replace it with (d + n) in * by flia Hd Hit.
+clear it Hit Hd.
+revert n d Hlen Hl.
+induction l as [| a]; intros; cbn. {
+  cbn in Hlen; subst n.
+  rewrite Nat.add_0_r.
+  clear Hl.
+  induction d; [ easy | now cbn; f_equal ].
+}
+destruct n; [ easy | ].
+rewrite Nat.add_succ_r.
+cbn - [ to_radix_inv "mod" "/" ].
+...
+revert n l Hlen Hl.
+induction d; intros; cbn. {
+  rewrite app_nil_r.
+...
 remember (to_radix_inv (S (S (S n))) l) as la eqn:Hla.
 remember (S (S (S n))) as m eqn:Hm.
 remember (mod_mod la m 3) as lb eqn:Hb.
