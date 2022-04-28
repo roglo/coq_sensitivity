@@ -150,7 +150,189 @@ unfold to_radix.
 apply firstn_to_radix_loop.
 Qed.
 
+Fixpoint to_radix_inv n l :=
+  match l with
+  | [] => 0
+  | d :: l' => d + n * to_radix_inv n l'
+  end.
+
+Theorem to_radix_inv_to_radix_loop : ∀ it n k,
+  to_radix_inv n (to_radix_loop it n k) = k mod (n ^ it).
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct it; [ easy | apply Nat.add_0_r ].
+}
+revert n k Hnz.
+induction it; intros; [ easy | cbn ].
+rewrite IHit; [ | easy ].
+symmetry.
+apply Nat.mod_mul_r; [ easy | ].
+now apply Nat.pow_nonzero.
+Qed.
+
+Theorem to_radix_inv_to_radix : ∀ n k,
+  k < n ^ n → to_radix_inv n (to_radix n k) = k.
+Proof.
+intros * Hkn.
+unfold to_radix.
+rewrite to_radix_inv_to_radix_loop.
+now apply Nat.mod_small.
+Qed.
+
 (* to be completed
+Theorem to_radix_to_radix_inv : ∀ n l,
+  length l = n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix n (to_radix_inv n l) = l.
+Proof.
+intros * Hlen Hl.
+Theorem to_radix_loop_to_radix_inv : ∀ it n l,
+  n ≤ it
+  → length l = n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
+Proof.
+intros * Hit Hlen Hl.
+destruct it. {
+  apply Nat.le_0_r in Hit; subst n.
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+cbn.
+destruct n. {
+  apply length_zero_iff_nil in Hlen; subst l; cbn.
+  f_equal; clear Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+apply Nat.succ_le_mono in Hit.
+destruct it. {
+  cbn - [ "mod" "/" ].
+  destruct n; [ cbn | easy ].
+  rewrite app_nil_r.
+  destruct l as [| a]; [ easy | ].
+  destruct l; [ | easy ].
+  specialize (Hl a (or_introl eq_refl)).
+  now apply Nat.lt_1_r in Hl; subst a.
+}
+destruct n. {
+  rewrite Nat.mod_1_r, Nat.sub_0_r.
+  cbn - [ "mod" "/" ].
+  do 2 rewrite Nat.div_1_r.
+  destruct l as [| a]; [ easy | ].
+  destruct l; [ | easy ].
+  specialize (Hl a (or_introl eq_refl)).
+  apply Nat.lt_1_r in Hl; subst a; cbn.
+  f_equal; f_equal; clear Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+apply Nat.succ_le_mono in Hit.
+cbn - [ "mod" "/" ].
+destruct it. {
+  cbn - [ "mod" "/" ].
+  rewrite app_nil_r.
+  apply Nat.le_0_r in Hit; subst n.
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]; [ easy | ].
+  destruct l; [ | easy ].
+  cbn - [ "mod" "/" ].
+  do 2 rewrite Nat.add_0_r.
+  replace (b + b) with (2 * b) by now cbn; rewrite Nat.add_0_r.
+  rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+  rewrite Nat.mod_small; [ | now apply Hl; left ].
+  f_equal.
+  rewrite Nat.div_add; [ | easy ].
+  rewrite Nat.div_small; [ | now apply Hl; left ].
+  rewrite Nat.mod_small; [ | now apply Hl; right; left ].
+  easy.
+}
+destruct n. {
+  rewrite Nat.sub_0_r.
+  cbn - [ "mod" "/" ].
+  destruct l as [| a]; [ easy | ].
+  destruct l as [| b]; [ easy | ].
+  destruct l; [ | easy ].
+  cbn - [ "mod" "/" ].
+  do 2 rewrite Nat.add_0_r.
+  replace (b + b) with (2 * b) by now cbn; rewrite Nat.add_0_r.
+  rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+  rewrite Nat.mod_small; [ | now apply Hl; left ].
+  f_equal.
+  rewrite Nat.div_add; [ | easy ].
+  rewrite Nat.div_small; [ | now apply Hl; left ].
+  rewrite Nat.mod_small; [ | now apply Hl; right; left ].
+  f_equal.
+  rewrite Nat.div_small; [ | now apply Hl; right; left ].
+  f_equal.
+  rewrite Nat.div_small; [ | easy ].
+  clear Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+apply Nat.succ_le_mono in Hit.
+cbn - [ "mod" "/" ].
+...
+unfold to_radix.
+destruct n. {
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+cbn - [ "mod" "/" ].
+destruct n. {
+  cbn.
+...
+Theorem to_radix_loop_to_radix_inv : ∀ it n l,
+  n ≤ it
+  → length l = n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
+Proof.
+intros * Hit Hlen Hl.
+(*
+Compute (
+  let l := [0;2;1] in
+  let n := length l in
+  let it := n + 4 in
+  to_radix_loop it n (to_radix_inv n l) = (l ++ repeat 0 (it - n))).
+*)
+revert n l Hit Hlen Hl.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit; subst n.
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+destruct n. {
+  apply length_zero_iff_nil in Hlen; subst l; cbn.
+  f_equal.
+  clear Hit IHit.
+  induction it; [ easy | cbn ].
+  now rewrite IHit.
+}
+...
+Theorem to_radix_loop_to_radix_inv : ∀ it n l,
+  n ≤ it
+  → length l = n
+  → (∀ i, i ∈ l → i < n)
+  → firstn n (to_radix_loop it n (to_radix_inv n l)) = l.
+Proof.
+intros * Hit Hlen Hl.
+(*
+Compute (
+  let l := [0;2;1] in
+  let n := length l in
+  let it := n + 4 in
+  firstn n (to_radix_loop it n (to_radix_inv n l)) = l).
+*)
+revert n l Hit Hlen Hl.
+induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit; subst n.
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+destruct n. {
+  now apply length_zero_iff_nil in Hlen; subst l.
+}
+rewrite firstn_cons.
+...
+now apply to_radix_loop_to_radix_inv.
+...
+
 Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros.
@@ -162,6 +344,7 @@ Print canon_sym_gr_list.
 *)
 unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
+(*
 rewrite rngl_summation_rtl.
 rewrite Nat.add_0_r.
 erewrite rngl_summation_eq_compat. 2: {
@@ -170,17 +353,22 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite Nat.add_1_l.
 }
 cbn.
+*)
 unfold det'.
 rewrite <- Hn.
-specialize (fact_neq_0 n) as Hnz.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  now move Hnz at top; subst n.
+}
+specialize (fact_neq_0 n) as Hfnz.
+specialize (Nat.pow_nonzero n n Hnz) as Hpnz.
 erewrite rngl_summation_change_var. 2: {
   intros i Hi.
   apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
-  flia Hi Hnz.
+  flia Hi Hfnz.
 }
 rewrite Nat.sub_0_r.
 replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite <- Nat.sub_succ_l; [ | flia Hfnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 replace (map _ _) with (canon_sym_gr_list_list n) by easy.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -195,305 +383,20 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn.
 symmetry.
-Check canon_sym_gr_list_inv_canon_sym_gr_list.
-Print canon_sym_gr_list_inv.
-Search to_radix.
-Fixpoint to_radix_inv n l :=
-  match l with
-  | [] => 0
-  | d :: l' => d + n * to_radix_inv n l'
-  end.
-(*
-Compute (
-  let n := 3 in
-  map (to_radix n) (seq 0 (n ^ n))
-).
-Compute (
-  let n := 3 in
-  map (λ i, to_radix_inv n (to_radix n i)) (seq 0 (n ^ n))
-).
-*)
-Theorem to_radix_inv_to_radix : ∀ n k,
-  k < n ^ n → to_radix_inv n (to_radix n k) = k.
-Proof.
-intros * Hkn.
-unfold to_radix.
-Theorem to_radix_inv_to_radix_loop : ∀ it n k,
-  n ≤ it → k < n ^ n → to_radix_inv n (to_radix_loop it n k) = k.
-Proof.
-intros * Hit Hkn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn in Hkn |-*.
-  apply Nat.lt_1_r in Hkn; subst k.
-  now destruct it.
-}
-revert n k Hnz Hit Hkn.
-induction it; intros; cbn. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-specialize (Nat.div_mod k n Hnz) as H1.
-symmetry; rewrite H1, Nat.add_comm at 1.
-f_equal; f_equal; symmetry.
-...
-apply IHit.
-...
-Print to_radix_inv.
-Print to_radix_loop.
-...
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn in Hkn |-*.
-  apply Nat.lt_1_r in Hkn; subst k.
-  now destruct it.
-}
-Compute (
-  let n := 3 in
-  let it := n + 4 in
-  map (λ i, to_radix_inv n (to_radix_loop it n i)) (seq 0 (n ^ n))
-).
-destruct it. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-cbn.
-specialize (Nat.div_mod k n Hnz) as H1.
-symmetry; rewrite H1, Nat.add_comm at 1.
-f_equal; f_equal; symmetry.
-...
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  apply Nat.le_1_r in Hit.
-  destruct Hit as [Hit| Hit]; subst n; [ easy | ].
-  cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-cbn.
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  symmetry; rewrite Nat.add_comm.
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n; [ | flia Hit ].
-  cbn in Hkn.
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | flia Hkn ].
-}
-cbn.
-...
-Theorem to_radix_loop_enough_iter : ∀ it1 it2 n k,
-  n ≤ it1
-  → n ≤ it2
-  → to_radix_loop it1 n k = to_radix_loop it2 n k.
-Admitted.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn in Hkn |-*.
-  apply Nat.lt_1_r in Hkn; subst k.
-  now destruct it.
-}
-revert n k Hit Hkn Hnz.
-induction it; intros; cbn; [ flia Hit Hnz | ].
-destruct n; [ easy | clear Hnz ].
-cbn - [ "mod" "/" ].
-rewrite to_radix_loop_enough_iter with (it2 := S it).
-...
-...
-rewrite to_radix_loop_enough_iter with (it2 := S it); [ | easy | flia Hit ].
-cbn.
-specialize (Nat.div_mod k n Hnz) as H1.
-symmetry.
-rewrite H1, Nat.add_comm at 1.
-f_equal.
-f_equal.
-symmetry.
-...
-revert n k Hit Hkn.
-induction it; intros. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn.
-}
-cbn.
-destruct (Nat.eq_dec n (S it)) as [Hni| Hni]. {
-  subst n; clear Hit.
-  rewrite to_radix_loop_enough_iter with (it2 := S it).
-...
-specialize (Nat.div_mod k n) as H1.
-Compute (
-  let n := 3 in
-  let it := 5 in
-  map (λ i, to_radix_inv n (firstn it (to_radix_loop it n i))) (seq 0 (n ^ n))
-).
-...
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  apply Nat.le_1_r in Hit.
-  destruct Hit as [Hit| Hit]; subst n; [ easy | ].
-  cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-cbn.
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  symmetry; rewrite Nat.add_comm.
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n; [ | flia Hit ].
-  cbn in Hkn.
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | flia Hkn ].
-}
-cbn.
-...
-intros * Hit Hkn.
-...
-Theorem to_radix_inv_to_radix_loop : ∀ it n k,
-  n ≤ it → k < n ^ n → to_radix_inv n (to_radix_loop it n k) = k.
-Proof.
-intros * Hit Hkn.
-rewrite <- firstn_to_radix_loop.
-revert n k Hit Hkn.
-induction it; intros. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn.
-}
-cbn.
-
-Inspect 3.
-...
-rewrite IHit.
-...
-specialize (@to_radix_inv_to_radix_loop n n k) as H1.
-specialize (H1 (le_refl _) Hkn).
-now rewrite firstn_to_radix_loop in H1.
-...
-unfold to_radix.
-...
-induction n; [ easy | ].
-cbn - [ "mod" "/" ].
-f_equal.
-...
-destruct it. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn.
-}
-cbn.
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  apply Nat.le_1_r in Hit.
-  destruct Hit as [Hit| Hit]; subst n; [ easy | ].
-  cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-cbn.
-destruct it. {
-  cbn.
-  rewrite Nat.mul_0_r, Nat.add_0_r.
-  symmetry; rewrite Nat.add_comm.
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n. {
-    cbn in Hkn.
-    now apply Nat.lt_1_r in Hkn; subst k.
-  }
-  destruct n; [ | flia Hit ].
-  cbn in Hkn.
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | ].
-  destruct k; [ easy | flia Hkn ].
-}
-cbn.
-Print canon_sym_gr_list_inv.
-Print to_radix_inv.
-Print canon_sym_gr_list.
-Print to_radix.
-Compute (to_radix_loop 4 4 14).
-Compute (to_radix_loop 5 4 14).
-Print to_radix_loop.
-...
-  rewrite Nat.div_mod with (y := k).
-...
-Theorem to_radix_loop_enough_iter : ∀ it1 it2 n k,
-  n ≤ it1
-  → n ≤ it2
-  → to_radix_loop it1 n k = to_radix_loop it2 n k.
-Admitted.
-rewrite to_radix_loop_enough_iter with (it2 := S it); [ | easy | flia Hit ].
-cbn.
-revert k n Hit Hkn.
-induction it; intros. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn.
-}
-Print to_radix_loop.
-rewrite to_radix_loop_enough_iter with (it2 := S (S it)); [ | easy | flia Hit ].
-remember (S it) as s; cbn; subst s.
-
-rewrite IHit.
-rewrite IHit.
-...
-rewrite IHit.
-
-destruct n. {
-  cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-apply Nat.succ_le_mono in Hit.
-cbn - [ "mod" "/" ].
-rewrite IHit.
-...
-intros * Hit Hkn.
-revert k n Hit Hkn.
-induction it as (it, IHit) using lt_wf_rec; intros.
-destruct it. {
-  apply Nat.le_0_r in Hit; subst n; cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn.
-}
-destruct n. {
-  cbn in Hkn.
-  now apply Nat.lt_1_r in Hkn; subst k.
-}
-apply Nat.succ_le_mono in Hit.
-cbn - [ "mod" "/" ].
-rewrite IHit.
-...
-now apply to_radix_inv_to_radix_loop.
-...
 erewrite rngl_summation_change_var. 2: {
   intros i Hi.
-...
-  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
-  flia Hi Hnz.
+  apply to_radix_inv_to_radix with (n := n).
+  flia Hi Hpnz.
 }
 rewrite Nat.sub_0_r.
-replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+replace (λ i, to_radix n i) with (to_radix n) by easy.
+rewrite <- Nat.sub_succ_l; [ | flia Hpnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
-replace (map _ _) with (canon_sym_gr_list_list n) by easy.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
+...
+  rewrite to_radix_to_radix_inv.
+...
   rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     apply in_map_iff in Hi.
     destruct Hi as (j & Hji & Hj); subst i.

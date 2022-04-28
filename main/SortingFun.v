@@ -328,11 +328,11 @@ Fixpoint merge_loop {A} (rel : A → A → bool) it la lb :=
 Definition merge {A} (rel : A → A → bool) la lb :=
   merge_loop rel (length la + length lb) la lb.
 
-Fixpoint split {A} (la : list A) :=
+Fixpoint split_list {A} (la : list A) :=
   match la with
   | [] | [_] => (la, [])
   | a :: b :: lb =>
-      let (l1, l2) := split lb in
+      let (l1, l2) := split_list lb in
       (a :: l1, b :: l2)
   end.
 
@@ -340,7 +340,7 @@ Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
   match it with
   | 0 => la
   | S it' =>
-      let (l1, l2) := split la in
+      let (l1, l2) := split_list la in
       let l3 := msort_loop rel it' l1 in
       let l4 := msort_loop rel it' l2 in
       merge rel l3 l4
@@ -398,8 +398,8 @@ Compute (let l := [5;2;2;7;0] in isort_rank Nat.ltb l).
 
 (* *)
 
-Theorem split_nil_l : ∀ A (la lb : list A),
-  split la = ([], lb) → la = [] ∧ lb = [].
+Theorem split_list_nil_l : ∀ A (la lb : list A),
+  split_list la = ([], lb) → la = [] ∧ lb = [].
 Proof.
 intros * Hab.
 destruct la as [| a]; cbn in Hab |-*. {
@@ -407,11 +407,11 @@ destruct la as [| a]; cbn in Hab |-*. {
 }
 exfalso.
 destruct la as [| b]; [ easy | ].
-now destruct (split la).
+now destruct (split_list la).
 Qed.
 
-Theorem split_nil_r : ∀ A (la lb : list A),
-  split la = (lb, []) → la = lb ∧ length la ≤ 1.
+Theorem split_list_nil_r : ∀ A (la lb : list A),
+  split_list la = (lb, []) → la = lb ∧ length la ≤ 1.
 Proof.
 intros * Hab.
 destruct la as [| a]; cbn in Hab |-*. {
@@ -420,19 +420,19 @@ destruct la as [| a]; cbn in Hab |-*. {
 destruct la as [| b]. {
   now injection Hab; clear Hab; intros; subst lb.
 }
-now destruct (split la).
+now destruct (split_list la).
 Qed.
 
-Fixpoint split_inv {A} (la lb : list A) :=
+Fixpoint split_list_inv {A} (la lb : list A) :=
   match la, lb with
   | _, [] => la
   | [], _ => lb
-  | a :: la', b :: lb' => a :: b :: split_inv la' lb'
+  | a :: la', b :: lb' => a :: b :: split_list_inv la' lb'
   end.
 
-Theorem split_split_inv : ∀ A (la lb : list A),
+Theorem split_list_split_list_inv : ∀ A (la lb : list A),
   (length la = length lb ∨ length la = S (length lb))
-  → split (split_inv la lb) = (la, lb).
+  → split_list (split_list_inv la lb) = (la, lb).
 Proof.
 intros * Hlen.
 revert lb Hlen.
@@ -488,8 +488,8 @@ apply merge_loop_length.
 now rewrite app_length.
 Qed.
 
-Theorem split_length : ∀ A la (lb lc : list A),
-  split la = (lb, lc)
+Theorem split_list_length : ∀ A la (lb lc : list A),
+  split_list la = (lb, lc)
   → length la = length lb + length lc.
 Proof.
 intros * Hs.
@@ -503,7 +503,7 @@ destruct la as [| b]. {
   now injection Hs; clear Hs; intros; subst lb lc.
 }
 cbn in Hs, Hlen.
-remember (split la) as ll eqn:Hll; symmetry in Hll.
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (ld, le).
 injection Hs; clear Hs; intros; subst lb lc.
 destruct len; [ easy | ].
@@ -514,8 +514,8 @@ apply (IHlen len) in Hll; [ easy | | easy ].
 now transitivity (S len).
 Qed.
 
-Theorem split_lengths : ∀ A (l la lb : list A),
-  split l = (la, lb)
+Theorem split_list_lengths : ∀ A (l la lb : list A),
+  split_list l = (la, lb)
   → length la = length lb ∨ length la = S (length lb).
 Proof.
 intros * Hll.
@@ -529,7 +529,7 @@ destruct l as [| b]; intros; cbn. {
   now injection Hll; intros; subst la lb; right.
 }
 cbn in Hll.
-remember (split l) as ll eqn:H; symmetry in H.
+remember (split_list l) as ll eqn:H; symmetry in H.
 destruct ll as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename H into Hll.
@@ -550,12 +550,12 @@ Proof.
 intros.
 revert la.
 induction it; intros; [ easy | cbn ].
-remember (split la) as ll eqn:Hll; symmetry in Hll.
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (lb, lc).
 rewrite merge_length.
 rewrite app_length.
 do 2 rewrite IHit.
-now symmetry; apply split_length.
+now symmetry; apply split_list_length.
 Qed.
 
 Theorem msort_loop_nil : ∀ A (rel : A → _) it,
@@ -584,25 +584,25 @@ do 2 rewrite msort_loop_single; cbn.
 now rewrite Hab.
 Qed.
 
-Theorem split_cons_cons : ∀ A (l la lb : list A) a b,
-  split l = (a :: la, b :: lb)
-  → ∃ l', split l' = (la, lb) ∧ l = a :: b :: l'.
+Theorem split_list_cons_cons : ∀ A (l la lb : list A) a b,
+  split_list l = (a :: la, b :: lb)
+  → ∃ l', split_list l' = (la, lb) ∧ l = a :: b :: l'.
 Proof.
 intros * Hs.
 destruct l as [| c]; [ easy | ].
 destruct l as [| d]; [ easy | ].
 cbn in Hs.
-remember (split l) as l' eqn:Hl'; symmetry in Hl'.
+remember (split_list l) as l' eqn:Hl'; symmetry in Hl'.
 destruct l' as (lc, ld).
 injection Hs; clear Hs; intros; subst lc ld c d.
 now exists l.
 Qed.
 
-Theorem sorted_cons_cons_split' : ∀ A (rel : A → _),
+Theorem sorted_cons_cons_split_list' : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la lb l,
   sorted rel (a :: b :: l) = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → sorted rel (a :: la) = true ∧ sorted rel (b :: lb) = true.
 Proof.
 intros * Htra * Hs Hla.
@@ -629,7 +629,7 @@ destruct len. {
 destruct l as [| d]; [ easy | ].
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
@@ -668,21 +668,21 @@ destruct cd; [ | easy ].
 apply (Htra b c d Hbc Hcd).
 Qed.
 
-Theorem sorted_split : ∀ A (rel : A → _),
+Theorem sorted_split_list : ∀ A (rel : A → _),
   transitive rel →
   ∀ la lb l,
   sorted rel l = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → sorted rel la = true ∧ sorted rel lb = true.
 Proof.
 intros * Htra * Hs Hla.
 destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
 destruct l as [| b]; [ now injection Hla; intros; subst la lb | ].
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
-now apply sorted_cons_cons_split' with (l := l).
+now apply sorted_cons_cons_split_list' with (l := l).
 Qed.
 
 Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
@@ -692,7 +692,7 @@ Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
   length (repeat a (n + n) ++ a :: b :: l) ≤ n + it
   → rel a a = true
   → sorted rel (a :: b :: l) = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → merge_loop rel it la (repeat a n ++ a :: b :: lb) =
     merge_loop rel it (a :: la) (repeat a n ++ b :: lb).
 Proof.
@@ -762,7 +762,7 @@ destruct l as [| d]. {
   f_equal; apply IHn.
 }
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla; cbn.
@@ -835,7 +835,7 @@ Theorem sorted_merge_loop_cons_cons_r : ∀ A (rel : A → _),
    S (S (length l)) ≤ it
    → rel a a = true
    → sorted rel (a :: b :: l) = true
-   → split l = (la, lb)
+   → split_list l = (la, lb)
    → merge_loop rel it la (a :: b :: lb) =
      merge_loop rel it (a :: la) (b :: lb).
 Proof.
@@ -851,7 +851,7 @@ Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
   ∀ it l la lb a b,
   length l ≤ it
   → sorted rel (a :: b :: l) = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → merge_loop rel (S (S it)) (a :: la) (b :: lb) =
     a :: b :: merge_loop rel it la lb.
 Proof.
@@ -879,7 +879,7 @@ destruct l as [| c]. {
   now destruct it.
 }
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 move c after b; cbn.
@@ -899,7 +899,7 @@ Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
   transitive rel →
   ∀ l la lb a b,
   sorted rel (a :: b :: l) = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → merge rel (a :: la) (b :: lb) = a :: b :: merge rel la lb.
 Proof.
 intros * Hant Htra * Hs Hla.
@@ -907,7 +907,7 @@ unfold merge.
 do 2 rewrite List_cons_length.
 rewrite Nat.add_succ_r, Nat.add_succ_l.
 apply (sorted_merge_loop_cons_cons Hant Htra l); [ | easy | easy ].
-apply split_length in Hla.
+apply split_list_length in Hla.
 now rewrite Hla.
 Qed.
 
@@ -1008,7 +1008,7 @@ revert l Hit.
 induction it; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hit; subst l.
 }
-remember (split l) as la eqn:Hla; symmetry in Hla.
+remember (split_list l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
 destruct l as [| a]. {
   injection Hla; clear Hla; intros; subst la lb; cbn.
@@ -1019,12 +1019,12 @@ destruct l as [| b]. {
   now rewrite msort_loop_single, msort_loop_nil.
 }
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 cbn in Hit.
 apply Nat.succ_le_mono in Hit.
-apply split_length in Hlc.
+apply split_list_length in Hlc.
 apply merge_is_sorted; [ easy | | ]. {
   apply IHit; cbn; flia Hit Hlc.
 } {
@@ -1042,7 +1042,7 @@ Theorem sorted_merge_loop : ∀ A (rel : A → _),
   ∀ it l la lb,
   length l ≤ it
   → sorted rel l = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → merge_loop rel it la lb = l.
 Proof.
 intros * Hant Htra * Hit Hs Hll.
@@ -1060,7 +1060,7 @@ destruct l as [| b]. {
   now destruct it.
 }
 cbn in Hll.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hll.
@@ -1096,7 +1096,7 @@ destruct l as [| c]. {
   destruct it; [ cbn in Hit; flia Hit | easy ].
 }
 cbn in Hll.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hll.
@@ -1151,13 +1151,13 @@ Theorem sorted_merge : ∀ A (rel : A → _),
   transitive rel →
   ∀ l la lb,
   sorted rel l = true
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → merge rel la lb = l.
 Proof.
 intros * Hant Htra * Hs Hll.
 unfold merge.
 apply (sorted_merge_loop Hant Htra); [ | easy | easy ].
-apply split_length in Hll.
+apply split_list_length in Hll.
 now rewrite Hll.
 Qed.
 
@@ -1173,7 +1173,7 @@ Proof.
 intros * Hant Htra Htot * Hit Hs.
 revert l Hit Hs.
 induction it; intros; [ easy | cbn ].
-remember (split l) as la eqn:Hla; symmetry in Hla.
+remember (split_list l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
 destruct l as [| a]. {
   injection Hla; intros; subst la lb.
@@ -1184,23 +1184,23 @@ destruct l as [| b]. {
   now rewrite msort_loop_single, msort_loop_nil.
 }
 cbn in Hla.
-remember (split l) as lc eqn:Hlc; symmetry in Hlc.
+remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla.
 cbn in Hit.
 apply Nat.succ_le_mono in Hit.
 rewrite IHit; cycle 1. {
-  apply split_length in Hla.
+  apply split_list_length in Hla.
   cbn; flia Hit Hla.
 } {
-  now apply sorted_cons_cons_split' with (la := la) (lb := lb) in Hs.
+  now apply sorted_cons_cons_split_list' with (la := la) (lb := lb) in Hs.
 }
 rewrite IHit; cycle 1. {
-  apply split_length in Hla.
+  apply split_list_length in Hla.
   cbn; flia Hit Hla.
 } {
-  now apply sorted_cons_cons_split' with (la := la) (lb := lb) in Hs.
+  now apply sorted_cons_cons_split_list' with (la := la) (lb := lb) in Hs.
 }
 rewrite sorted_merge_cons_cons with (l := l); [ | easy | easy | easy | easy ].
 f_equal; f_equal.
@@ -2336,9 +2336,9 @@ intros * Heqb * Hit.
 apply (permutation_merge_loop_aux rel Heqb la [] lb Hit).
 Qed.
 
-Theorem split_permutation : ∀ A (eqb : A → _) (Heqb : equality eqb),
+Theorem split_list_permutation : ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ l la lb,
-  split l = (la, lb)
+  split_list l = (la, lb)
   → permutation eqb l (la ++ lb).
 Proof.
 intros * Heqb * Hll.
@@ -2358,7 +2358,7 @@ destruct len; [ easy | ].
 destruct len; [ easy | ].
 cbn in Hlen, Hll.
 do 2 apply Nat.succ_inj in Hlen.
-remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+remember (split_list l) as ll eqn:Hll'; symmetry in Hll'.
 destruct ll as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb; cbn.
 apply (permutation_skip Heqb).
@@ -2374,29 +2374,29 @@ apply (IHlen len); [ | easy | easy ].
 now transitivity (S len).
 Qed.
 
-Theorem permutation_split_merge_loop :
+Theorem permutation_split_list_merge_loop :
   ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l la lb,
   length la + length lb ≤ it
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → permutation eqb l (merge_loop rel it la lb).
 Proof.
 intros * Heqb * Hit Hll.
 eapply (permutation_trans Heqb); [ | now apply permutation_merge_loop ].
-now apply split_permutation.
+now apply split_list_permutation.
 Qed.
 
 Theorem permutation_merge : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l la lb,
-  split l = (la, lb)
+  split_list l = (la, lb)
   → permutation eqb l (merge rel la lb).
 Proof.
 intros * Heqb * Hll.
-now apply permutation_split_merge_loop.
+now apply permutation_split_list_merge_loop.
 Qed.
 
-Theorem permutation_app_split_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
-  ∀ la lb, permutation eqb (la ++ lb) (split_inv la lb).
+Theorem permutation_app_split_list_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ la lb, permutation eqb (la ++ lb) (split_list_inv la lb).
 Proof.
 intros * Heqb *.
 revert lb.
@@ -2419,15 +2419,15 @@ apply (permutation_skip Heqb).
 apply IHla.
 Qed.
 
-Theorem split_inv_nil_r : ∀ A (la : list A), split_inv la [] = la.
+Theorem split_list_inv_nil_r : ∀ A (la : list A), split_list_inv la [] = la.
 Proof. now intros; destruct la. Qed.
 
-Theorem permutation_split_inv_split_inv :
+Theorem permutation_split_list_inv_split_list_inv :
   ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ la lb lc ld,
   permutation eqb la lc
   → permutation eqb lb ld
-  → permutation eqb (split_inv la lb) (split_inv lc ld).
+  → permutation eqb (split_list_inv la lb) (split_list_inv lc ld).
 Proof.
 intros * Heqb * Hac Hbd.
 revert lb lc ld Hac Hbd.
@@ -2439,7 +2439,7 @@ induction la as [| a]; intros; cbn. {
 }
 destruct lb as [| b]. {
   apply permutation_nil in Hbd; subst ld.
-  now rewrite split_inv_nil_r.
+  now rewrite split_list_inv_nil_r.
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
@@ -2449,7 +2449,7 @@ apply in_split in Hc, Hd.
 destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
-eapply (permutation_trans Heqb); [ | now apply permutation_app_split_inv ].
+eapply (permutation_trans Heqb); [ | now apply permutation_app_split_list_inv ].
 specialize (permutation_app_inv Heqb [] la lc1 lc2 a Hac) as H1.
 specialize (permutation_app_inv Heqb [] lb ld1 ld2 b Hbd) as H2.
 cbn in H1, H2; clear Hac Hbd.
@@ -2468,7 +2468,7 @@ rewrite <- app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
 do 2 rewrite <- app_assoc.
 rewrite app_assoc.
-eapply (permutation_trans Heqb); [ now apply permutation_app_split_inv | ].
+eapply (permutation_trans Heqb); [ now apply permutation_app_split_list_inv | ].
 apply (permutation_sym Heqb).
 now apply IHla.
 Qed.
@@ -2479,28 +2479,28 @@ Proof.
 intros * Heqb *.
 revert l.
 induction it; intros; [ now apply permutation_refl | cbn ].
-remember (split l) as la eqn:Hla; symmetry in Hla.
+remember (split_list l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
 remember (msort_loop rel it la) as lc eqn:Hlc.
 remember (msort_loop rel it lb) as ld eqn:Hld.
-remember (split_inv lc ld) as l' eqn:Hl'.
+remember (split_list_inv lc ld) as l' eqn:Hl'.
 apply (permutation_trans Heqb) with (lb := l'). 2: {
   apply (permutation_merge rel Heqb).
   subst l'.
-  rewrite split_split_inv; [ easy | ].
-  apply split_lengths in Hla.
+  rewrite split_list_split_list_inv; [ easy | ].
+  apply split_list_lengths in Hla.
   apply (f_equal length) in Hlc, Hld.
   rewrite msort_loop_length in Hlc, Hld.
   now rewrite Hlc, Hld.
 }
 subst l' lc ld.
 apply (permutation_trans Heqb) with (lb := la ++ lb). {
-  now apply split_permutation.
+  now apply split_list_permutation.
 }
-apply (permutation_trans Heqb) with (lb := split_inv la lb). {
-  now apply permutation_app_split_inv.
+apply (permutation_trans Heqb) with (lb := split_list_inv la lb). {
+  now apply permutation_app_split_list_inv.
 }
-apply (permutation_split_inv_split_inv Heqb); apply IHit.
+apply (permutation_split_list_inv_split_list_inv Heqb); apply IHit.
 Qed.
 
 (* *)
@@ -3435,8 +3435,8 @@ intros * Hit.
 apply (Permutation_merge_loop_aux rel la [] lb Hit).
 Qed.
 
-Theorem split_Permutation : ∀ A (l la lb : list A),
-  split l = (la, lb)
+Theorem split_list_Permutation : ∀ A (l la lb : list A),
+  split_list l = (la, lb)
   → Permutation l (la ++ lb).
 Proof.
 intros * Hll.
@@ -3456,7 +3456,7 @@ destruct len; [ easy | ].
 destruct len; [ easy | ].
 cbn in Hlen, Hll.
 do 2 apply Nat.succ_inj in Hlen.
-remember (split l) as ll eqn:Hll'; symmetry in Hll'.
+remember (split_list l) as ll eqn:Hll'; symmetry in Hll'.
 destruct ll as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb; cbn.
 apply perm_skip.
@@ -3472,27 +3472,27 @@ apply (IHlen len); [ | easy | easy ].
 now transitivity (S len).
 Qed.
 
-Theorem Permutation_split_merge_loop :
+Theorem Permutation_split_list_merge_loop :
   ∀ A (rel : A → _) it l la lb,
   length la + length lb ≤ it
-  → split l = (la, lb)
+  → split_list l = (la, lb)
   → Permutation l (merge_loop rel it la lb).
 Proof.
 intros * Hit Hll.
 eapply Permutation_trans; [ | now apply Permutation_merge_loop ].
-now apply split_Permutation.
+now apply split_list_Permutation.
 Qed.
 
 Theorem Permutation_merge : ∀ A (rel : A → _) l la lb,
-  split l = (la, lb)
+  split_list l = (la, lb)
   → Permutation l (merge rel la lb).
 Proof.
 intros * Hll.
-now apply Permutation_split_merge_loop.
+now apply Permutation_split_list_merge_loop.
 Qed.
 
-Theorem Permutation_app_split_inv : ∀ A (la lb : list A),
-  Permutation (la ++ lb) (split_inv la lb).
+Theorem Permutation_app_split_list_inv : ∀ A (la lb : list A),
+  Permutation (la ++ lb) (split_list_inv la lb).
 Proof.
 intros.
 revert lb.
@@ -3515,10 +3515,10 @@ apply perm_skip.
 apply IHla.
 Qed.
 
-Theorem Permutation_split_inv_split_inv : ∀ A (la lb lc ld : list A),
+Theorem Permutation_split_list_inv_split_list_inv : ∀ A (la lb lc ld : list A),
   Permutation la lc
   → Permutation lb ld
-  → Permutation (split_inv la lb) (split_inv lc ld).
+  → Permutation (split_list_inv la lb) (split_list_inv lc ld).
 Proof.
 intros * Hac Hbd.
 revert lb lc ld Hac Hbd.
@@ -3530,7 +3530,7 @@ induction la as [| a]; intros; cbn. {
 }
 destruct lb as [| b]. {
   apply Permutation_nil in Hbd; subst ld.
-  now rewrite split_inv_nil_r.
+  now rewrite split_list_inv_nil_r.
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
@@ -3540,7 +3540,7 @@ apply in_split in Hc, Hd.
 destruct Hc as (lc1 & lc2 & Hc).
 destruct Hd as (ld1 & ld2 & Hd).
 subst lc ld.
-eapply Permutation_trans; [ | apply Permutation_app_split_inv ].
+eapply Permutation_trans; [ | apply Permutation_app_split_list_inv ].
 specialize (Permutation_app_inv [] la lc1 lc2 a Hac) as H1.
 specialize (Permutation_app_inv [] lb ld1 ld2 b Hbd) as H2.
 cbn in H1, H2; clear Hac Hbd.
@@ -3559,7 +3559,7 @@ rewrite <- app_assoc.
 eapply Permutation_trans; [ apply Permutation_app_comm | ].
 do 2 rewrite <- app_assoc.
 rewrite app_assoc.
-eapply Permutation_trans; [ apply Permutation_app_split_inv | ].
+eapply Permutation_trans; [ apply Permutation_app_split_list_inv | ].
 apply Permutation_sym.
 now apply IHla.
 Qed.
@@ -3570,28 +3570,28 @@ Proof.
 intros.
 revert l.
 induction it; intros; [ easy | cbn ].
-remember (split l) as la eqn:Hla; symmetry in Hla.
+remember (split_list l) as la eqn:Hla; symmetry in Hla.
 destruct la as (la, lb).
 remember (msort_loop rel it la) as lc eqn:Hlc.
 remember (msort_loop rel it lb) as ld eqn:Hld.
-remember (split_inv lc ld) as l' eqn:Hl'.
+remember (split_list_inv lc ld) as l' eqn:Hl'.
 apply Permutation_trans with (l' := l'). 2: {
   apply Permutation_merge.
   subst l'.
-  rewrite split_split_inv; [ easy | ].
-  apply split_lengths in Hla.
+  rewrite split_list_split_list_inv; [ easy | ].
+  apply split_list_lengths in Hla.
   apply (f_equal length) in Hlc, Hld.
   rewrite msort_loop_length in Hlc, Hld.
   now rewrite Hlc, Hld.
 }
 subst l' lc ld.
 apply Permutation_trans with (l' := la ++ lb). {
-  now apply split_Permutation.
+  now apply split_list_Permutation.
 }
-apply Permutation_trans with (l' := split_inv la lb). {
-  now apply Permutation_app_split_inv.
+apply Permutation_trans with (l' := split_list_inv la lb). {
+  now apply Permutation_app_split_list_inv.
 }
-apply Permutation_split_inv_split_inv; apply IHit.
+apply Permutation_split_list_inv_split_list_inv; apply IHit.
 Qed.
 
 (* *)
