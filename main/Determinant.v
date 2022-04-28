@@ -317,10 +317,14 @@ induction it; intros; cbn. {
   destruct l as [| a]; [ easy | ].
   f_equal. {
     remember (S d) as d'; cbn; subst d'.
-    rewrite Nat.mod_small. 2: {
-      cbn in Hlen.
-      apply Hl.
-      apply Nat.succ_inj in Hlen.
+    rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+    apply Nat.mod_small.
+    now apply Hl; left.
+  }
+  remember (S d) as d'; cbn; subst d'.
+  rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
+  rewrite Nat.div_small; [ | now apply Hl; left ].
+  rewrite Nat.add_0_l.
 ...
   rewrite IHd.
 Print to_radix_inv.
