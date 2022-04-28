@@ -270,6 +270,41 @@ destruct n. {
 }
 apply Nat.succ_le_mono in Hit.
 cbn - [ "mod" "/" ].
+remember (to_radix_inv (S (S (S n))) l) as la eqn:Hla.
+remember (S (S (S n))) as m eqn:Hm.
+Fixpoint mod_mod la m i :=
+  match i with
+  | 0 => []
+  | S i' => la mod m :: mod_mod (la / m) m i'
+  end.
+Fixpoint div_div la m i :=
+  match i with
+  | 0 => la
+  | S i' => div_div la m i' / m
+  end.
+remember (mod_mod la m 3) as lb eqn:Hb.
+cbn in Hb.
+Theorem mod_mod_radix_loop_div_div_radix_inv : ∀ it n l m i,
+  mod_mod (to_radix_inv m l) (i + n) i ++
+  to_radix_loop it m (div_div (to_radix_inv m l) m i) =
+  l ++ repeat 0 (it - n).
+Proof.
+intros.
+revert n l m i.
+induction it; intros; cbn. {
+  do 2 rewrite app_nil_r.
+  revert n l m.
+  induction i; intros; cbn - [ "mod" "/" ]. 2: {
+...
+specialize (mod_mod_radix_loop_div_div_radix_inv it n l m 3) as H1.
+cbn - [ "mod" "/" ] in H1.
+rewrite <- Hla in H1.
+rewrite <- Hm in H1.
+apply H1.
+...
+rewrite List_cons_is_app.
+rewrite (List_cons_is_app ((la / m) mod m)).
+rewrite (List_cons_is_app ((la / m / m) mod m)).
 ...
 unfold to_radix.
 destruct n. {
