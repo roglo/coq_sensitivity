@@ -188,6 +188,7 @@ Theorem to_radix_to_radix_inv : ∀ n l,
   → to_radix n (to_radix_inv n l) = l.
 Proof.
 intros * Hlen Hl.
+unfold to_radix.
 Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   n ≤ it
   → length l = n
@@ -195,6 +196,25 @@ Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
 Proof.
 intros * Hit Hlen Hl.
+remember (it - n) as d eqn:Hd.
+replace it with (d + n) in * by flia Hd Hit.
+clear it Hit Hd.
+revert n d Hlen Hl.
+induction l as [| a]; intros; cbn. {
+  cbn in Hlen; subst n.
+  rewrite Nat.add_0_r.
+  clear Hl.
+  induction d; [ easy | now cbn; f_equal ].
+}
+destruct n; [ easy | ].
+rewrite Nat.add_succ_r.
+cbn - [ to_radix_inv "mod" "/" ].
+...
+revert n l Hlen Hl.
+induction d; intros; cbn. {
+  rewrite app_nil_r.
+...
+
 destruct it. {
   apply Nat.le_0_r in Hit; subst n.
   now apply length_zero_iff_nil in Hlen; subst l.
