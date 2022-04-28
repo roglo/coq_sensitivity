@@ -314,6 +314,15 @@ induction it; intros; cbn. {
   induction d; intros; cbn - [ "mod" "/" ]. {
     now apply length_zero_iff_nil in Hlen; subst l.
   }
+  destruct l as [| a]; [ easy | ].
+  f_equal. {
+    remember (S d) as d'; cbn; subst d'.
+    rewrite Nat.mod_small. 2: {
+      cbn in Hlen.
+      apply Hl.
+      apply Nat.succ_inj in Hlen.
+...
+  rewrite IHd.
 Print to_radix_inv.
 ...
 now apply glop.
