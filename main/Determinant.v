@@ -270,8 +270,9 @@ destruct n. {
 }
 apply Nat.succ_le_mono in Hit.
 cbn - [ "mod" "/" ].
-remember (to_radix_inv (S (S (S n))) l) as la eqn:Hla.
-remember (S (S (S n))) as m eqn:Hm.
+remember 3 as d.
+replace (S (S (S n))) with (n + d) in Hlen, Hl |-* by flia Heqd.
+clear Heqd.
 Fixpoint mod_mod la m i :=
   match i with
   | 0 => []
@@ -282,19 +283,30 @@ Fixpoint div_div la m i :=
   | 0 => la
   | S i' => div_div la m i' / m
   end.
+remember (to_radix_inv (S (S (S n))) l) as la eqn:Hla.
+remember (S (S (S n))) as m eqn:Hm.
 remember (mod_mod la m 3) as lb eqn:Hb.
 cbn in Hb.
-Theorem mod_mod_radix_loop_div_div_radix_inv : ∀ it n l m i,
-  mod_mod (to_radix_inv m l) (i + n) i ++
-  to_radix_loop it m (div_div (to_radix_inv m l) m i) =
-  l ++ repeat 0 (it - n).
+Theorem mod_mod_radix_loop_div_div_radix_inv : ∀ it n l d,
+  n ≤ it
+  → length l = n + d
+  → mod_mod (to_radix_inv (d + n) l) (d + n) d ++
+    to_radix_loop it (d + n) (div_div (to_radix_inv (d + n) l) (d + n) d) =
+    l ++ repeat 0 (it - n).
 Proof.
-intros.
-revert n l m i.
+intros * Hit Hlen.
+revert n l d Hit Hlen.
 induction it; intros; cbn. {
+  apply Nat.le_0_r in Hit; subst n; cbn.
   do 2 rewrite app_nil_r.
-  revert n l m.
-  induction i; intros; cbn - [ "mod" "/" ]. 2: {
+  rewrite Nat.add_0_r.
+  cbn in Hlen.
+  revert l Hlen.
+  induction d; intros; cbn - [ "mod" "/" ]. {
+    now apply length_zero_iff_nil in Hlen; subst l.
+  }
+  destruct l as [| a]; [ easy | ].
+  cbn - [ "mod" "/" ].
 ...
 specialize (mod_mod_radix_loop_div_div_radix_inv it n l m 3) as H1.
 cbn - [ "mod" "/" ] in H1.
