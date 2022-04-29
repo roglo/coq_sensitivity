@@ -338,13 +338,35 @@ unfold to_radix.
 destruct l as [| a]. 2: {
   cbn.
 Print to_radix_loop.
-Theorem to_radix_loop_add : ∀ n a l it,
-  length l < it
-  → a < n
+Theorem to_radix_loop_add : ∀ n a b it,
+  a < n
+  → b mod n = 0
+  → to_radix_loop it n (a + b) = a :: to_radix_loop it n (b / n).
+Proof.
+intros * Hit Hbn.
+revert n a b Hit Hbn.
+induction it; intros; cbn. 2: {
+  f_equal. {
+    rewrite <- Nat.add_mod_idemp_r; [ | flia Hit ].
+    rewrite Hbn, Nat.add_0_r.
+    now apply Nat.mod_small.
+  }
+  rewrite <- IHit; cycle 1. {
+    apply Nat.mod_upper_bound; flia Hit.
+  } {
+    apply Nat.mod_divides in Hbn; [ | flia Hit ].
+    destruct Hbn as (c & Hbc); subst b.
+    rewrite Nat.mul_comm, Nat.div_mul; [ | flia Hit ].
+...
+  rewrite Nat.mul_comm, Nat.div_add; [ | flia Hit ].
+...
   → to_radix_loop it n (a + n * to_radix_inv n l) = a :: l.
 Proof.
 intros * Hit Han.
 revert n a l it Hit Han.
+induction l as [| b]; intros. 2: {
+  cbn.
+...
 induction l as [| b]; intros. {
   cbn.
   rewrite Nat.mul_0_r, Nat.add_0_r.
