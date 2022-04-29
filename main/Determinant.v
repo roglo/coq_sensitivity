@@ -295,35 +295,19 @@ rewrite <- Nat.sub_succ_l; [ | flia Hpnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  apply in_map_iff in Hl.
-  destruct Hl as (j & Hjl & Hj).
-  rewrite <- Hjl at 1.
   rewrite to_radix_to_radix_inv; cycle 1. {
-    apply to_radix_length.
-  } {
-    intros i Hi.
-    apply (In_nth _ _ 0) in Hi.
-    destruct Hi as (k & Hkj & Hk).
-    now subst i; apply to_radix_ub.
-  }
-  rewrite to_radix_to_radix_inv; cycle 1. {
+    apply in_map_iff in Hl.
+    destruct Hl as (j & Hjl & Hj).
     rewrite <- Hjl.
     apply to_radix_length.
   } {
     intros i Hi.
+    apply in_map_iff in Hl.
+    destruct Hl as (j & Hjl & Hj).
+    rewrite <- Hjl in Hi.
     apply (In_nth _ _ 0) in Hi.
     destruct Hi as (k & Hkj & Hk).
-    subst i l.
-    now apply to_radix_ub.
-  }
-...
-  easy.
-...
-  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj); subst i.
-    apply in_seq in Hj.
-    now apply canon_sym_gr_list_is_permut.
+    now subst i; apply to_radix_ub.
   }
   easy.
 }
