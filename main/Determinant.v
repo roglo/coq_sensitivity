@@ -292,8 +292,11 @@ let it := d in
 mod_mod (to_radix_inv (S d) l) (S d) it = l ++ repeat 0 (it - d)
 ).
 *)
-...
-rewrite IHit; [ | flia Hit Hdi | | ].
+clear IHit.
+revert d a l Hl Hlen Hit.
+induction it; intros; [ easy | ].
+remember (S d) as d'; cbn - [ "mod" "/" ]; subst d'.
+Print mod_mod.
 ...
 (*
 Compute (
