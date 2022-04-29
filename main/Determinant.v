@@ -226,7 +226,7 @@ rewrite Nat.add_succ_comm.
 now apply Hl; right.
 Qed.
 
-(* to be completed
+(*
 Theorem mod_mod_to_radix_inv' : ∀ it l d,
   d ≤ it
   → length l = d
@@ -325,7 +325,9 @@ induction d; intros; cbn - [ "mod" "/" ]. {
   rewrite IHd.
 Print to_radix_inv.
 ...
+*)
 
+(* to be completed
 Theorem to_radix_to_radix_inv : ∀ n l,
   length l = n
   → (∀ i, i ∈ l → i < n)
