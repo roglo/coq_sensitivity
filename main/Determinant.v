@@ -96,6 +96,8 @@ Fixpoint to_radix_loop it n i :=
 
 Definition to_radix n i := to_radix_loop n n i.
 
+Definition to_radix_list n := map (to_radix n) (seq 0 (n ^ n)).
+
 Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, n ^ n - 1),
@@ -245,16 +247,6 @@ Print canon_sym_gr_list.
 *)
 unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
-(*
-rewrite rngl_summation_rtl.
-rewrite Nat.add_0_r.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite <- Nat.sub_add_distr.
-  now rewrite Nat.add_1_l.
-}
-cbn.
-*)
 unfold det'.
 rewrite <- Hn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -312,6 +304,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+replace (map _ _) with (to_radix_list n) by easy.
 symmetry.
 ...
 Search canon_sym_gr_list.
