@@ -335,6 +335,26 @@ Theorem to_radix_to_radix_inv : ∀ n l,
 Proof.
 intros * Hlen Hl.
 unfold to_radix.
+destruct l as [| a]. 2: {
+  cbn.
+Print to_radix_loop.
+Theorem to_radix_loop_add : ∀ n a l it,
+  length l < it
+  → a < n
+  → to_radix_loop it n (a + n * to_radix_inv n l) = a :: l.
+Proof.
+intros * Hit Han.
+revert n a l it Hit Han.
+induction l as [| b]; intros. {
+  cbn.
+  rewrite Nat.mul_0_r, Nat.add_0_r.
+  destruct it; cbn; [ easy | ].
+  rewrite Nat.mod_small; [ f_equal | easy ].
+  destruct it; [ easy | cbn ].
+  rewrite Nat.div_small; [ | easy ].
+  rewrite Nat.mod_0_l; [ | flia Han ].
+  rewrite Nat.div_0_l; [ | flia Han ].
+...
 destruct n. 2: {
   cbn - [ "mod" "/" ].
   destruct n. 2: {
