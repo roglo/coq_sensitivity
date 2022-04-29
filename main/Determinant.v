@@ -218,6 +218,21 @@ specialize (H1 Hlen Hl (le_refl _)).
 now rewrite Nat.sub_diag, app_nil_r in H1.
 Qed.
 
+Theorem to_radix_loop_length : ∀ n l it,
+  length (to_radix_loop it n l) = it.
+Proof.
+intros.
+revert n l.
+induction it; intros; cbn; [ easy | f_equal; apply IHit ].
+Qed.
+
+Theorem to_radix_length : ∀ n l, length (to_radix n l) = n.
+Proof.
+intros.
+unfold to_radix.
+apply to_radix_loop_length.
+Qed.
+
 (* to be completed
 Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
 Proof.
@@ -279,9 +294,30 @@ replace (λ i, to_radix n i) with (to_radix n) by easy.
 rewrite <- Nat.sub_succ_l; [ | flia Hpnz ].
 rewrite Nat.sub_succ, Nat.sub_0_r.
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (j & Hjl & Hj).
+  rewrite <- Hjl at 1.
+  rewrite to_radix_to_radix_inv; cycle 1. {
+    apply to_radix_length.
+  } {
+    intros i Hi.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (k & Hkj & Hk).
+    now subst i; apply to_radix_ub.
+  }
+  rewrite to_radix_to_radix_inv; cycle 1. {
+    rewrite <- Hjl.
+    apply to_radix_length.
+  } {
+    intros i Hi.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (k & Hkj & Hk).
+    subst i l.
+    now apply to_radix_ub.
+  }
 ...
-  rewrite to_radix_to_radix_inv.
+  easy.
 ...
   rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
     apply in_map_iff in Hi.
