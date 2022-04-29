@@ -342,6 +342,60 @@ Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
 Proof.
 intros * Hit Hlen Hl.
+Compute (
+  let l := [0;2;1] in
+  let n := length l in
+  let it := n + 4 in
+  to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n)
+).
+Print to_radix_loop.
+Compute (to_radix_inv 10 [3;7;5] / 10 ^ 1).
+Print to_radix_loop.
+Theorem to_radix_loop_to_radix_inv : ∀ it n l k,
+  n ≤ it
+  → length l = n
+  → k ≤ n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix_loop it n (to_radix_inv n l / n ^ k) =
+    skipn k l ++ repeat 0 (it + k - n).
+Proof.
+intros * Hit Hlen Hk Hl.
+(*
+Compute (
+  let l := [0;2;1] in
+  let n := length l in
+  let it := n in
+  let k := n in
+  to_radix_loop it n (to_radix_inv n l / n ^ k) = skipn k l ++ repeat 0 (it + k - n)
+).
+*)
+revert n l k Hit Hlen Hk Hl.
+induction it; intros. {
+  cbn.
+  apply Nat.le_0_r in Hit; subst n.
+  apply Nat.le_0_r in Hk; subst k.
+  now apply length_zero_iff_nil in Hlen; subst l; cbn.
+}
+cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply length_zero_iff_nil in Hnz; subst l.
+  apply Nat.le_0_r in Hk; subst k; cbn.
+  f_equal; rewrite Nat.add_0_r.
+  clear IHit Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+rewrite Nat.div_div; [ | | easy ]. 2: {
+  now apply Nat.pow_nonzero.
+}
+replace (n ^ k * n) with (n ^ S k) by now cbn; apply Nat.mul_comm.
+rewrite IHit.
+
+...
+destruct n; [ easy | clear Hnz ].
+rewrite IHit.
+...
+intros * Hit Hlen Hl.
 revert it n Hit Hlen Hl.
 induction l as [| a]; intros. {
   subst n; cbn.
