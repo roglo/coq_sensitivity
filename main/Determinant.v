@@ -352,7 +352,7 @@ induction l as [| a]; intros. {
 cbn.
 destruct n; [ easy | ].
 destruct it; [ easy | ].
-cbn - [ "*" "mod" "/" ].  
+cbn - [ "*" "mod" "/" ].
 f_equal. {
   rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
   now apply Nat.mod_small, Hl; left.
