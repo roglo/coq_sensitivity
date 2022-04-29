@@ -335,6 +335,20 @@ Theorem to_radix_to_radix_inv : ∀ n l,
 Proof.
 intros * Hlen Hl.
 unfold to_radix.
+destruct n. 2: {
+  cbn - [ "mod" "/" ].
+  destruct n. 2: {
+    cbn - [ "mod" "/" ].
+    destruct n. 2: {
+      cbn - [ "mod" "/" ].
+      remember 3 as d.
+      replace (S (S (S n))) with (d + n) by now subst d.
+      rewrite Nat.div_div.
+      rewrite Nat.div_div.
+Search (_ ^ _ = _ * _).
+rewrite <- Nat.pow_2_r.
+rewrite Nat.mul_comm, <- Nat.pow_succ_r'.
+...
 Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   n ≤ it
   → length l = n
