@@ -2838,22 +2838,22 @@ destruct b. {
   apply Nat.leb_le in Hni.
   rewrite nth_overflow; [ easy | ].
   rewrite map_length.
-  now rewrite length_canon_sym_gr_list.
+  now rewrite canon_sym_gr_list_length.
 }
 apply Bool.andb_false_iff in Hb.
 destruct Hb as [Hb| Hb]. {
   apply Nat.ltb_ge in Hb.
   destruct (lt_dec i n) as [Hin| Hin]. {
-    rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+    rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
     now rewrite Hσ'.
   } {
     apply Nat.nlt_ge in Hin.
     rewrite nth_overflow. 2: {
-      now rewrite map_length, length_canon_sym_gr_list.
+      now rewrite map_length, canon_sym_gr_list_length.
     }
     unfold succ_when_ge, ff_app.
     rewrite Hσ'.
-    rewrite nth_overflow; [ | now rewrite length_canon_sym_gr_list ].
+    rewrite nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
     unfold Nat.b2n; rewrite if_leb_le_dec.
     destruct (le_dec (k / n!) 0) as [H1| H1]; [ | easy ].
     apply Nat.le_0_r in H1.
@@ -2862,7 +2862,7 @@ destruct Hb as [Hb| Hb]. {
   }
 } {
   apply Nat.leb_gt in Hb.
-  rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+  rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
   now rewrite Hσ'.
 }
 Qed.
@@ -2881,7 +2881,7 @@ Theorem ε_of_sym_gr_permut_succ :
 Proof.
 intros Hic Hop Hin H10 * Hkn.
 unfold ε at 1.
-rewrite length_canon_sym_gr_list.
+rewrite canon_sym_gr_list_length.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold ε.
   subst n; cbn.
@@ -3045,7 +3045,7 @@ f_equal. {
   now rewrite rngl_mul_1_l.
 }
 unfold ε.
-rewrite length_canon_sym_gr_list.
+rewrite canon_sym_gr_list_length.
 rewrite (rngl_product_shift 1). 2: {
   split; [ easy | flia Hnz ].
 }

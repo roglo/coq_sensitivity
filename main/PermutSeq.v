@@ -948,7 +948,7 @@ Fixpoint canon_sym_gr_inv_elem n k (j : nat) :=
 Definition canon_sym_gr_inv_list n k : list nat :=
   map (canon_sym_gr_inv_elem n k) (seq 0 n).
 
-Theorem length_canon_sym_gr_list : ∀ k n,
+Theorem canon_sym_gr_list_length : ∀ k n,
   length (canon_sym_gr_list n k) = n.
 Proof.
 intros.
@@ -971,7 +971,7 @@ destruct i. {
   now rewrite Nat.mul_succ_r, Nat.add_comm, Nat.mul_comm.
 }
 apply Nat.succ_lt_mono in Hi.
-rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
 unfold succ_when_ge.
 rewrite <- Nat.add_1_r.
 apply Nat.add_lt_le_mono; [ | apply Nat_b2n_upper_bound ].
@@ -1040,7 +1040,7 @@ destruct i. {
   now rewrite Nat.ltb_irrefl.
 }
 apply Nat.succ_lt_mono in Hi.
-rewrite (List_map_nth' 0); [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
 unfold succ_when_ge.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
@@ -1106,7 +1106,7 @@ destruct i. {
   destruct (lt_dec 0 (k / n!)) as [Hzkn| Hzkn]. {
     unfold succ_when_ge.
     rewrite (List_map_nth' 0). 2: {
-      rewrite length_canon_sym_gr_list.
+      rewrite canon_sym_gr_list_length.
       now apply canon_sym_gr_inv_elem_ub.
     }
     rewrite IHn; [ | easy | easy ].
@@ -1131,7 +1131,7 @@ destruct (lt_dec (S i) (k / n!)) as [Hsikn| Hsikn]. {
     flia Hsikn Hkns.
   }
   rewrite (List_map_nth' 0). 2: {
-    rewrite length_canon_sym_gr_list.
+    rewrite canon_sym_gr_list_length.
     apply canon_sym_gr_inv_elem_ub; [ easy | flia Hi Hsin ].
   }
   rewrite IHn; [ | flia Hi Hsin | easy ].
@@ -1144,7 +1144,7 @@ apply Nat.nlt_ge in Hsikn.
 destruct (lt_dec (k / n!) (S i)) as [Hknsi| Hknsi]; [ | flia Hsikn Hknsi ].
 rewrite Nat_sub_succ_1.
 rewrite (List_map_nth' 0).  2: {
-  rewrite length_canon_sym_gr_list.
+  rewrite canon_sym_gr_list_length.
   now apply canon_sym_gr_inv_elem_ub.
 }
 rewrite IHn; [ | easy | easy ].
@@ -1201,8 +1201,8 @@ assert (H : S k < S n) by flia Hk.
 specialize (H1 H); clear H.
 cbn - [ fact ] in H1.
 rewrite Hijd in H1.
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
-rewrite (List_map_nth' 0) in H1; [ | now rewrite length_canon_sym_gr_list ].
+rewrite (List_map_nth' 0) in H1; [ | now rewrite canon_sym_gr_list_length ].
+rewrite (List_map_nth' 0) in H1; [ | now rewrite canon_sym_gr_list_length ].
 unfold succ_when_ge, Nat.b2n in H1.
 do 2 rewrite if_leb_le_dec in H1.
 destruct (le_dec (j / n!) _) as [H2| H2]. {
@@ -1505,16 +1505,16 @@ Proof.
 intros * Hkn.
 split. {
   intros i Hi.
-  rewrite length_canon_sym_gr_list.
+  rewrite canon_sym_gr_list_length.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (j & Hj & Hji).
-  rewrite length_canon_sym_gr_list in Hj.
+  rewrite canon_sym_gr_list_length in Hj.
   rewrite <- Hji.
   now apply canon_sym_gr_list_ub.
 } {
   apply nat_NoDup.
   intros * Hi Hj Hij.
-  rewrite length_canon_sym_gr_list in Hi, Hj.
+  rewrite canon_sym_gr_list_length in Hi, Hj.
   now apply nth_canon_sym_gr_list_inj1 in Hij.
 }
 Qed.
@@ -1525,7 +1525,7 @@ Theorem canon_sym_gr_list_is_permut : ∀ n k,
 Proof.
 intros * Hkn.
 split; [ now apply canon_sym_gr_list_is_permut_list | ].
-apply length_canon_sym_gr_list.
+apply canon_sym_gr_list_length.
 Qed.
 
 Theorem canon_sym_gr_sub_canon_permut_list : ∀ n k,

@@ -11,6 +11,8 @@ Require Import Misc RingLike IterAdd IterMul.
 Require Import MyVector Matrix PermutSeq Signature.
 Import matrix_Notations.
 
+Notation "E ⊂ F" := (∀ a, a ∈ E → a ∈ F) (at level 70).
+
 Section a.
 
 Context {T : Type}.
@@ -306,6 +308,58 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 replace (map _ _) with (to_radix_list n) by easy.
 symmetry.
+assert (H : canon_sym_gr_list_list n ⊂ to_radix_list n). {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  apply in_map_iff.
+  destruct Hl as (i & Hil & Hi).
+  subst l.
+  apply in_seq in Hi; cbn in Hi.
+  destruct Hi as (_, Hi).
+  exists (to_radix_inv n (canon_sym_gr_list n i)).
+  rewrite to_radix_to_radix_inv; cycle 1. {
+    apply canon_sym_gr_list_length.
+  } {
+    intros j Hj.
+    apply (In_nth _ _ 0) in Hj.
+    rewrite canon_sym_gr_list_length in Hj.
+    destruct Hj as (k & Hkn & Hj).
+    subst j.
+    now apply canon_sym_gr_list_ub.
+  }
+  split; [ easy | ].
+  apply in_seq.
+  split; [ easy | cbn ].
+Search (to_radix_inv _ _ < _).
+Search to_radix_inv.
+Print to_radix_inv.
+Theorem to_radix_inv_ub : ∀ n l,
+  n ≠ 0
+  → length l ≤ n
+  → (∀ i, i < n → ff_app l i < n)
+  → to_radix_inv n l < n ^ n.
+Proof.
+intros * Hnz Hlen Hl.
+induction l as [| a]; cbn. {
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+cbn in Hlen.
+assert (H : length l ≤ n) by flia Hlen.
+specialize (IHl H); clear H.
+...
+destruct n; [ easy | clear Hnz ].
+cbn - [ "*" ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen.
+...
+eapply lt_le_trans. {
+  apply Nat.add_lt_mono. {
+    specialize (Hl 0 (Nat.lt_0_succ _)).
+    cbn in Hl.
+    apply Hl.
+  }
+  apply Nat.mul_lt_mono. 2: {
+    apply IHl; [ easy | | ].
 ...
 Search canon_sym_gr_list.
 canon_sym_gr_list_inv_canon_sym_gr_list: ∀ n k : nat, k < n! → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k
@@ -457,7 +511,7 @@ f_equal. {
   unfold mat_el.
   unfold ff_app.
   cbn - [ subm fact ].
-  rewrite (List_map_nth' 0); [ | rewrite length_canon_sym_gr_list; flia Hi Hnz ].
+  rewrite (List_map_nth' 0); [ | rewrite canon_sym_gr_list_length; flia Hi Hnz ].
   cbn - [ butn ].
   rewrite (List_map_nth' []). 2: {
     apply is_scm_mat_iff in Hm.
@@ -1242,9 +1296,9 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold list_swap_elem.
       unfold ff_app.
       rewrite (List_map_nth' 0). 2: {
-        now rewrite seq_length, length_canon_sym_gr_list.
+        now rewrite seq_length, canon_sym_gr_list_length.
       }
-      rewrite seq_nth; [ easy | now rewrite length_canon_sym_gr_list ].
+      rewrite seq_nth; [ easy | now rewrite canon_sym_gr_list_length ].
     }
     fold (f k).
     easy.
@@ -1263,17 +1317,17 @@ erewrite rngl_summation_eq_compat. 2: {
   replace (canon_sym_gr_list n k) with
      (map (λ i, ff_app (f k) (transposition p q i)) (seq 0 n)). 2: {
     rewrite List_map_nth_seq with (d := 0).
-    rewrite length_canon_sym_gr_list.
+    rewrite canon_sym_gr_list_length.
     apply map_ext_in.
     intros i Hi; cbn.
     apply in_seq in Hi.
     unfold ff_app, f, list_swap_elem.
     rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length, length_canon_sym_gr_list.
+      rewrite seq_length, canon_sym_gr_list_length.
       now apply transposition_lt.
     }
     rewrite seq_nth. 2: {
-      rewrite length_canon_sym_gr_list.
+      rewrite canon_sym_gr_list_length.
       now apply transposition_lt.
     }
     rewrite Nat.add_0_l.
@@ -1290,7 +1344,7 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold f.
       rewrite list_swap_elem_length.
       symmetry.
-      apply length_canon_sym_gr_list.
+      apply canon_sym_gr_list_length.
     }
     split. {
       intros i Hi.
@@ -1351,7 +1405,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
   }
   unfold g, f.
   unfold list_swap_elem.
-  do 2 rewrite length_canon_sym_gr_list.
+  do 2 rewrite canon_sym_gr_list_length.
   erewrite map_ext_in. 2: {
     intros i Hi; apply in_seq in Hi.
     rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
@@ -1384,7 +1438,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite transposition_involutive.
     easy.
   }
-  rewrite <- List_map_nth_seq'; [ | now rewrite length_canon_sym_gr_list ].
+  rewrite <- List_map_nth_seq'; [ | now rewrite canon_sym_gr_list_length ].
   now apply canon_sym_gr_list_inv_canon_sym_gr_list.
 }
 rewrite Nat.sub_0_r.
@@ -1422,7 +1476,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     }
 (* lemme à faire ? *)
     unfold list_swap_elem in Hij.
-    do 2 rewrite length_canon_sym_gr_list in Hij.
+    do 2 rewrite canon_sym_gr_list_length in Hij.
     apply nth_canon_sym_gr_list_inj2 with (n := n); [ easy | easy | ].
     intros k Hkn.
     apply ext_in_map with (a := transposition p q k) in Hij. 2: {
@@ -1451,9 +1505,9 @@ assert (Hc : canon_sym_gr_list n k = f (g k)). {
     now apply canon_sym_gr_list_is_permut.
   }
   rewrite list_swap_elem_involutive; [ easy | | ]. {
-    now rewrite length_canon_sym_gr_list.
+    now rewrite canon_sym_gr_list_length.
   } {
-    now rewrite length_canon_sym_gr_list.
+    now rewrite canon_sym_gr_list_length.
   }
 }
 f_equal; [ now rewrite Hc | ].
