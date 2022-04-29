@@ -342,6 +342,29 @@ Theorem to_radix_loop_to_radix_inv : ∀ it n l,
   → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it - n).
 Proof.
 intros * Hit Hlen Hl.
+revert it n Hit Hlen Hl.
+induction l as [| a]; intros. {
+  subst n; cbn.
+  rewrite Nat.sub_0_r.
+  clear Hit.
+  induction it; [ easy | now cbn; f_equal ].
+}
+cbn.
+destruct n; [ easy | ].
+destruct it; [ easy | ].
+cbn - [ "*" "mod" "/" ].  
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | easy ].
+  now apply Nat.mod_small, Hl; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | easy ].
+rewrite Nat.div_small; [ | now apply Hl; left ].
+rewrite Nat.add_0_l.
+cbn in Hlen.
+apply Nat.succ_le_mono in Hit.
+apply Nat.succ_inj in Hlen.
+...
+intros * Hit Hlen Hl.
 destruct it. {
   apply Nat.le_0_r in Hit; subst n.
   now apply length_zero_iff_nil in Hlen; subst l.
