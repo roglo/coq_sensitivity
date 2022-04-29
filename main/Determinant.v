@@ -201,8 +201,7 @@ Proof.
 intros * Hl Hlen.
 revert d j Hl Hlen.
 induction l as [| b]; intros; [ now cbn in Hlen; subst d | ].
-cbn.
-destruct d; [ easy | ].
+destruct d; [ easy | cbn ].
 cbn in Hlen; apply Nat.succ_inj in Hlen.
 rewrite <- Nat.add_succ_comm.
 remember ((S j + d) * to_radix_inv (S j + d) l) as x.
@@ -282,7 +281,7 @@ apply Nat.succ_inj in Hlen.
 specialize mod_mod_to_radix_inv as H1.
 specialize (H1 l 1 d).
 (* ah mais non ; mais peut-être avec le lemme précédent avec it ? *)
-..
+...
 rewrite IHit; [ | flia Hit Hdi | | ].
 ...
 (*
