@@ -278,9 +278,20 @@ destruct (Nat.eq_dec d it) as [Hdi| Hdi]. {
 }
 cbn in Hlen.
 apply Nat.succ_inj in Hlen.
+(*
 specialize mod_mod_to_radix_inv as H1.
 specialize (H1 l 1 d).
-(* ah mais non ; mais peut-être avec le lemme précédent avec it ? *)
+*)
+assert (H : d < it) by flia Hit Hdi.
+clear Hit Hdi; rename H into Hit.
+(*
+Compute (
+let l := [3;1;0;0] in
+let d := length l in
+let it := d in
+mod_mod (to_radix_inv (S d) l) (S d) it = l ++ repeat 0 (it - d)
+).
+*)
 ...
 rewrite IHit; [ | flia Hit Hdi | | ].
 ...
