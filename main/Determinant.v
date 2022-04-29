@@ -327,7 +327,7 @@ Print to_radix_inv.
 ...
 *)
 
-(* to be completed *)
+(* to be completed
 Theorem to_radix_to_radix_inv : ∀ n l,
   length l = n
   → (∀ i, i ∈ l → i < n)
@@ -362,7 +362,7 @@ rewrite Nat.add_0_l.
 destruct l as [| b]. {
   cbn - [ "-" ].
   clear Hit.
-  induction it; cbn - [ "-" ]; [ now destruct n | ].
+  induction it; cbn - [ "-" ]; [ now subst n | ].
   rewrite Nat.div_small; [ | flia Hlen ].
   rewrite <- Hlen, Nat.sub_succ; cbn.
   f_equal.
@@ -370,10 +370,35 @@ destruct l as [| b]. {
   induction it; cbn; [ easy | now cbn; f_equal ].
 }
 cbn - [ "-" ].
-...
-  destruct n; [ easy | ].
-  apply Nat.succ_inj in Hlen.
-  apply Nat.succ_le_mono in Hit.
+destruct it; [ cbn in Hlen; flia Hlen Hit | ].
+cbn - [ "-" ].
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | now subst n ].
+  now apply Nat.mod_small, Hl; right; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
+rewrite Nat.div_small; [ | now apply Hl; right; left ].
+rewrite Nat.add_0_l.
+destruct l as [| c]. {
+  cbn - [ "-" ].
+  clear Hit.
+  induction it; cbn - [ "-" ]; [ now subst n | ].
+  rewrite Nat.div_small; [ | flia Hlen ].
+  rewrite <- Hlen, Nat.sub_succ; cbn.
+  f_equal.
+  clear IHit.
+  induction it; cbn; [ easy | now cbn; f_equal ].
+}
+cbn - [ "-" ].
+destruct it; [ cbn in Hlen; flia Hlen Hit | ].
+cbn - [ "-" ].
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | now subst n ].
+  now apply Nat.mod_small, Hl; right; right; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
+rewrite Nat.div_small; [ | now apply Hl; right; right; left ].
+rewrite Nat.add_0_l.
 ...
 Print to_radix_loop.
 Theorem to_radix_loop_add : ∀ n a b it,
