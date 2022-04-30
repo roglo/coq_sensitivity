@@ -1,5 +1,5 @@
-BinetCauchy.vio: BinetCauchy.v Misc.vio SortingFun.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio MyVector.vio
-BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo SortingFun.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo MyVector.vo
+BinetCauchy.vio: BinetCauchy.v Misc.vio SortingFun.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
+BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo SortingFun.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio SortingFun.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo SortingFun.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
@@ -10,8 +10,8 @@ IterAnd.vio: IterAnd.v Misc.vio
 IterAnd.vo IterAnd.glob IterAnd.v.beautified IterAnd.required_vo: IterAnd.v Misc.vo
 IterMul.vio: IterMul.v Misc.vio RingLike.vio IterAdd.vio
 IterMul.vo IterMul.glob IterMul.v.beautified IterMul.required_vo: IterMul.v Misc.vo RingLike.vo IterAdd.vo
-Lemma_2_1.vio: Lemma_2_1.v Misc.vio MyVector.vio Matrix.vio Determinant.vio Comatrix.vio RingLike.vio IterAdd.vio PermutSeq.vio Signature.vio
-Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo MyVector.vo Matrix.vo Determinant.vo Comatrix.vo RingLike.vo IterAdd.vo PermutSeq.vo Signature.vo
+Lemma_2_1.vio: Lemma_2_1.v Misc.vio MyVector.vio Matrix.vio Determinant.vio Comatrix.vio RingLike.vio IterAdd.vio
+Lemma_2_1.vo Lemma_2_1.glob Lemma_2_1.v.beautified Lemma_2_1.required_vo: Lemma_2_1.v Misc.vo MyVector.vo Matrix.vo Determinant.vo Comatrix.vo RingLike.vo IterAdd.vo
 Lemma_2_2.vio: Lemma_2_2.v Misc.vio RingLike.vio MyVector.vio Matrix.vio IterAdd.vio
 Lemma_2_2.vo Lemma_2_2.glob Lemma_2_2.v.beautified Lemma_2_2.required_vo: Lemma_2_2.v Misc.vo RingLike.vo MyVector.vo Matrix.vo IterAdd.vo
 Matrix.vio: Matrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio MyVector.vio Signature.vio
@@ -28,8 +28,8 @@ Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
 RingLike.vio: RingLike.v 
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
-Sensitivity.vio: Sensitivity.v Misc.vio
-Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo
+Sensitivity.vio: Sensitivity.v Misc.vio SortingFun.vio IterAdd.vio
+Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo
 Signature.vio: Signature.v Misc.vio SortingFun.vio RingLike.vio IterMul.vio PermutSeq.vio
 Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo SortingFun.vo RingLike.vo IterMul.vo PermutSeq.vo
 SortingFun.vio: SortingFun.v Misc.vio PermutationFun.vio

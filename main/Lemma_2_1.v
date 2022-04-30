@@ -861,6 +861,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
+(* to be completed
 Theorem diagonalized_matrix_prop : in_charac_0_field →
   ∀ n (M : matrix T) ev eV D U,
   is_symm_mat M
@@ -940,6 +941,7 @@ unfold eigenvalues_and_norm_vectors in Hvv.
   rewrite List_map_seq_length.
   cb
 ...
+*)
 
 Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
 Proof.
@@ -958,6 +960,7 @@ Qed.
 (* https://en.wikipedia.org/wiki/Normal_matrix *)
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 
+(* to be completed
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   rngl_has_1_neq_0 = true →
   ∀ n (M : matrix T) D U eV x y ev,
@@ -1064,7 +1067,9 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
     rewrite Nat.min_id, Hsy in H.
-    rewrite rngl_summation_shift; [ | now apply Nat.neq_0_lt_0 ].
+    rewrite (rngl_summation_shift 1). 2: {
+      split; [ easy | now apply Nat.neq_0_lt_0 ].
+    }
     erewrite rngl_summation_eq_compat. 2: {
       intros i Hi.
       rewrite Nat.add_comm, Nat.add_sub.
@@ -1221,12 +1226,14 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
 Proof.
 intros * Hsy Hev Hmin Hmax.
 ...
+*)
 
 (* The Rayleigh quotient reaches its minimum value μ_min (the smallest
    eigenvalue of M) when x is v_min (the corresponding eigenvector).
    Similarly, R (M,x) ≤ μ_max and R (M,v_max) = μ_max *)
 
-Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
+(* to be completed
+Theorem glop : ∀ n (M : matrix T) x sev μ_min μ_max,
   eigenvalues M sev
   → Sorted rngl_le sev
   → μ_min = hd 0%F sev
@@ -1235,13 +1242,15 @@ Theorem glop : ∀ n (M : matrix n n T) x sev μ_min μ_max,
 Proof.
 intros * Hev Hsev Hmin Hmax.
 ...
+*)
 
 (* min-max theorem, or variational theorem, or Courant–Fischer–Weyl min-max principle *)
 
 (* Lemma 2.1 *)
 
+(* to be completed
 Theorem lemma_2_1 :
-  ∀ n m l (A : matrix n n T) (B : matrix (n - length l) (n - length l) T)
+  ∀ n m l (A : matrix T) (B : matrix (n - length l) (n - length l) T)
     seva sevb,
   m = n - length l
   → m < n
@@ -1256,5 +1265,6 @@ Theorem lemma_2_1 :
 Proof.
 intros * Hm Hmn Hisa Hb Heva Hevb Hsa Hsb * Him.
 ...
+*)
 
 End a.

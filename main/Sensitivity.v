@@ -8,7 +8,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Init.Nat.
-Require Import Misc.
+Require Import Misc SortingFun IterAdd.
 
 (* adjacent vertices of a cube graph in any dimension;
    a vertex is represented by a natural number. *)
@@ -26,7 +26,9 @@ Fixpoint are_adj_vert_loop it a b :=
 Definition are_adjacent_vertices a b :=
   are_adj_vert_loop (max a b) a b.
 
+(*
 Compute (let n := 3 in map (λ a, (a, filter (are_adjacent_vertices a) (seq 0 (2^n)))) (seq 0 (2^n))).
+*)
 
 (* subgraph of the n-dimensional cube graph *)
 
@@ -42,7 +44,9 @@ Definition edges vl :=
         else l) l vl)
     [] (nodup Nat.eq_dec vl).
 
+(*
 Compute (edges [1; 2; 7; 4]).
+*)
 
 Definition sg_edges sg := edges (sg_vert sg).
 
@@ -55,8 +59,10 @@ Definition full_cube := mksg cube_vert.
 
 Definition number_of_edges sg := length (sg_edges sg).
 Definition number_of_vertices sg := length (sg_vert sg).
+(*
 Compute (number_of_edges full_cube).
 Compute (number_of_vertices full_cube).
+*)
 
 (* degree of a vertex = number of edges adjacents to the vertex *)
 
@@ -72,11 +78,13 @@ Definition vΔ vl :=
   let el := edges vl in
   fold_left (λ m v, max m (vdeg el v)) vl 0.
 
+(*
 Compute (vΔ [0; 1; 0]).
 Compute (edges [0; 1; 0]).
 
 Compute (vΔ [0; 1; 2; 4; 0]).
 Compute (vdeg (edges [0; 1; 2; 4]) 0).
+*)
 
 Definition Δ sg := vΔ (sg_vert sg).
 
@@ -149,7 +157,9 @@ Fixpoint count_in_radix n start len :=
 Definition count_upto_n_to_n n :=
   map (@rev nat) (count_in_radix n (repeat 0 n) (n ^ n)).
 
+(*
 Compute (count_upto_n_to_n 3).
+*)
 
 Definition cons_nth {A} i (a : A) ll :=
   firstn i ll ++  (a :: nth i ll []) :: skipn (i + 1) ll.
@@ -233,7 +243,9 @@ Definition dispatch n i := dispatch_list (rev (to_radix n i)).
 
 Definition pre_partitions n := map (dispatch n) (seq 0 (n ^ n)).
 
+(*
 Compute (let l := [3; 2; 1; 1] in dispatch_list l).
+*)
 
 (* *)
 
@@ -266,9 +278,11 @@ Definition all_partitions n :=
        (map (isort list_nat_le)
           (map (filter (λ s, negb (is_nil s))) (pre_partitions n)))).
 
+(*
 Compute (map (isort list_nat_le) (pre_partitions 4)).
 Compute (nodup (list_eq_dec (list_eq_dec Nat.eq_dec)) (map (isort list_nat_le) (pre_partitions 4))).
 Compute (all_partitions 4).
+*)
 
 (* Local block sensitivity *)
 
@@ -308,12 +322,14 @@ Definition locate_list ll :=
 Definition locate ll :=
   fold_left (λ a i, a * length ll + i) (locate_list ll) 0.
 
+(*
 Compute (locate [[2]; []; [0; 1]]).
 Compute (dispatch 3 24).
 Compute (locate [[]; [0; 2]; [1]]).
 Compute (dispatch 3 16).
 Compute (dispatch 4 23).
 Compute (locate [[0]; [1; 2]; []; [3]]).
+*)
 
 Definition sub_list {A} (l : list A) start len :=
   firstn len (skipn start l).
@@ -345,11 +361,13 @@ apply Hl1.
 now right.
 Qed.
 
+(*
 Compute (let ll := [[1; 2]; []; [0]] in locate_list ll).
 Compute (let l := [2; 0; 0] in dispatch_list l).
 
 Compute (locate_list (dispatch_list [2; 0; 0])).
 Compute (locate_list (dispatch_list [1; 2; 0])).
+*)
 
 (* return the rank (from 0) in the pre-partition i where we j is found
    (j < n) *)
@@ -538,7 +556,7 @@ split. {
     now apply nth_In.
   }
   unfold dispatch_list.
-  rewrite List_map_nth_in with (a := 0). 2: {
+  rewrite (List_map_nth' 0). 2: {
     rewrite seq_length.
     apply Hl.
     now apply nth_In.
@@ -889,7 +907,9 @@ assert
 now apply H.
 Qed.
 
+(*
 Compute (let n := 4 in let i := 255 in locate (dispatch n i)).
+*)
 
 Theorem locate_dispatch : ∀ n i, i < n ^ n → locate (dispatch n i) = i.
 Proof.
@@ -939,8 +959,10 @@ Definition pre_partition_in n j k i :=
   (i + n ^ n - k * n ^ (n - j - 1)) mod (n ^ (n - j)) <? n ^ (n - j - 1).
 
 (* example: all pre-partitions that have the j in k-th set *)
+(*
 Compute (let n := 3 in let j := 1 in let k := 2 in map (λ i, (i, dispatch n i))
 (filter (pre_partition_in n j k) (seq 0 (n ^ n)))).
+*)
 
 Theorem nth_find_all_loop_app : ∀ A f (l1 l2 : list A) i,
   nth_find_all_loop f (l1 ++ l2) i =
@@ -967,7 +989,18 @@ Theorem fold_left_mul_add_mod : ∀ n j l,
   fold_left (λ a i, a * n + i) l j mod n = last (j :: l) 0 mod n.
 Proof.
 intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  cbn - [ last ].
+  erewrite List_fold_left_ext_in. 2: {
+    intros * Hb.
+    now rewrite Nat.mul_0_r, Nat.add_0_l.
+  }
+  revert j.
+  induction l as [| i]; intros; [ easy | ].
+  remember (i :: l) as l'; cbn; subst l'.
+  apply IHl.
+}
 revert n j Hnz.
 induction l as [| b]; intros; [ easy | ].
 cbn - [ last ].
@@ -1303,8 +1336,9 @@ rewrite <- loc_length_loc_bl_sens_list; f_equal.
 apply IHl.
 Qed.
 
+(* to be completed
 Theorem Nat_pow_from_sum : ∀ a n, a * n ≠ 0 →
-  n ^ a = (n - 1) * (Σ (i = 0, a - 1), n ^ i) + 1.
+  n ^ a = (n - 1) * (nat_∑ (i = 0, a - 1), n ^ i) + 1.
 Proof.
 intros * Hanz.
 destruct a; [ easy | ].
@@ -1314,8 +1348,14 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 clear Hanz.
 revert n Hnz.
-induction a; intros; [ cbn; flia Hnz | ].
-rewrite summation_split_last; [ | flia | flia ].
+induction a; intros. {
+  unfold iter_seq, iter_list; cbn.
+  do 2 rewrite Nat.mul_1_r.
+  symmetry; apply Nat.sub_add.
+  now apply Nat.neq_0_lt_0.
+}
+...
+rewrite rngl_summation_split_last; [ | flia | flia ].
 replace (S a - 1) with a by flia.
 rewrite Nat.mul_add_distr_l, Nat.add_shuffle0.
 rewrite <- IHa; [ | easy ].
@@ -1326,9 +1366,9 @@ Qed.
 
 Theorem fold_left_horner_eval_sum : ∀ k n a x,
   fold_left (λ acc i : nat, acc * x + a (n + k - i))
-    (seq (S k) n) (Σ (i = 0, k), a (n + i) * x ^ i) =
+    (seq (S k) n) (nat_∑ (i = 0, k), a (n + i) * x ^ i) =
   fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
-    (seq (S k) n) (Σ (i = 0, k), a (n + i) * x ^ (n + i)).
+    (seq (S k) n) (nat_∑ (i = 0, k), a (n + i) * x ^ (n + i)).
 Proof.
 intros.
 revert k.
@@ -1338,7 +1378,8 @@ replace (n + S k) with (S n + k) in IHn by flia.
 replace (seq (S k) (S n)) with (S k :: seq (S (S k)) n) by easy.
 cbn - [ "-" "+" ].
 replace (S n + k - S k) with n by flia.
-rewrite summation_split_first in IHn; [ | flia ].
+...
+rewrite rngl_summation_split_first in IHn; [ | flia ].
 rewrite Nat.pow_0_r, Nat.add_0_r, Nat.mul_1_r in IHn.
 rewrite (Nat.add_comm (a n)) in IHn.
 rewrite summation_succ_succ in IHn.
@@ -1364,10 +1405,11 @@ Qed.
 
 Theorem horner_is_eval_polyn : ∀ n a x,
   fold_left (λ acc i, acc * x + a (n - i)) (seq 0 (S n)) 0 =
-  Σ (i = 0, n), a i * x ^ i.
+  nat_∑ (i = 0, n), a i * x ^ i.
 Proof.
 intros.
-rewrite summation_rtl.
+...
+rewrite rngl_summation_rtl.
 rewrite Nat.add_0_r; cbn.
 rewrite Nat.sub_0_r.
 specialize (fold_left_horner_eval_sum 0 n a x) as H1.
@@ -1377,9 +1419,10 @@ Qed.
 
 Theorem horner_is_eval_polyn2 : ∀ n a x,
   fold_left (λ acc i, acc * x + a i) (seq 0 (S n)) 0 =
-  Σ (i = 0, n), a (n - i) * x ^ i.
+  nat_∑ (i = 0, n), a (n - i) * x ^ i.
 Proof.
 intros.
+...
 specialize (horner_is_eval_polyn n (λ i, a (n - i)) x) as H1.
 cbn - [ "-" fold_left seq ] in H1.
 rewrite <- H1.
@@ -1434,6 +1477,7 @@ assert
   }
   rewrite Hlr.
   cbn - [ last "mod" ].
+...
   rewrite app_comm_cons, List_last_app.
   rewrite Nat.mod_small. 2: {
     apply Hil; rewrite Hlr; cbn.
@@ -1615,8 +1659,7 @@ etransitivity. {
   apply x_bs_ge_s.
 }
 Qed.
-
-...
+*)
 
 (* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
     the same set of rows and columns from A.
@@ -1628,10 +1671,9 @@ Qed.
               λ_i ≥ µ_i ≥ λ_{i+n-m}."
 *)
 
-...
-
 (* testing... *)
 
+(*
 Compute (Δ full_cube, Nat.sqrt 3).
 Compute (2 ^ (3 - 1) + 1).
 
@@ -1689,11 +1731,14 @@ Compute (map (λ i, vΔ [0; 1; 2; 4; i]) (seq 0 8)).
 Compute (map (λ i, vΔ [0; 1; 6; 7; i]) (seq 0 8)).
 Compute (vΔ [0; 1; 6; 7]).
 Compute (edges [0; 1; 2; 4]).
+*)
 
 (* The theorem *)
 
-Theorem sensitivity : ∀ sg n,
+(* to be completed
+Theorem sensitivity_th : ∀ sg n,
   number_of_vertices sg = 2 ^ (n - 1) + 1
   → Δ sg ≥ Nat.sqrt n.
 Proof.
 ...
+*)
