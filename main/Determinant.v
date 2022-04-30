@@ -342,6 +342,9 @@ intros * Hnz Hl.
 revert n Hnz Hl.
 induction l as [| a]; intros; cbn; [ easy | ].
 destruct n; [ easy | clear Hnz ].
+cbn.
+specialize (Hl 0 (Nat.lt_0_succ _)) as H1.
+cbn in H1.
 ...
 Theorem to_radix_inv_ub : ∀ n l,
   n ≠ 0
