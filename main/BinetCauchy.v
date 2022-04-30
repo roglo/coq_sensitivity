@@ -3575,7 +3575,6 @@ rewrite mat_select_rows_butn_subm in H2;
 } {
 ...
 (*
-Abort.
 End a.
 
 Section a.
@@ -4008,7 +4007,6 @@ Search (det (fold_left _ _ _)).
 ...
 intros Hif * Hra Hca Ha Hnkl Hklm Hkn.
 (*
-Abort.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
@@ -4394,7 +4392,6 @@ assert (H : i < m!) by flia Hi Hfmz.
 clear Hi Hfmz; rename H into Hi.
 unfold g, p.
 Check mk_mat.
-Abort.
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
@@ -5073,7 +5070,6 @@ assert (sub_lists_of_seq_0_n m m = [seq 0 m]).
 *)
 
 (*
-Abort.
 End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
