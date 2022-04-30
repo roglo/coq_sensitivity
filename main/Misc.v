@@ -168,6 +168,23 @@ rewrite Nat.add_comm.
 now apply Nat.mod_add.
 Qed.
 
+Theorem Nat_lt_lt_add_mul : ∀ a b c n, a < b → c < n → c + n * a < n * b.
+Proof.
+intros * Hab Hcn.
+revert a b c Hab Hcn.
+induction n; intros; [ easy | cbn ].
+destruct c. {
+  cbn.
+  apply Nat.add_lt_le_mono; [ easy | ].
+  now apply Nat.mul_le_mono_l, Nat.lt_le_incl.
+}
+apply Nat.succ_lt_mono in Hcn.
+specialize (IHn a b c Hab Hcn).
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm.
+apply Nat.add_lt_le_mono; [ easy | ].
+apply IHn.
+Qed.
+
 Theorem Nat_fact_succ : ∀ n, fact (S n) = S n * fact n.
 Proof. easy. Qed.
 

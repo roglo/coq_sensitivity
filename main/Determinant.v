@@ -237,6 +237,27 @@ unfold to_radix.
 apply to_radix_loop_length.
 Qed.
 
+Theorem to_radix_inv_ub : ∀ n l,
+  n ≠ 0
+  → (∀ i, i < length l → ff_app l i < n)
+  → to_radix_inv n l < n ^ length l.
+Proof.
+intros * Hnz Hl.
+revert n Hnz Hl.
+induction l as [| a]; intros; cbn; [ easy | ].
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (IHl n Hnz) as H2.
+assert (H : ∀ i, i < length l → ff_app l i < n). {
+  intros i Hi.
+  apply (Hl (S i)); cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+specialize (H2 H); clear H.
+now apply Nat_lt_lt_add_mul.
+Qed.
+
 (* to be completed
 Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
 Proof.
@@ -308,7 +329,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 replace (map _ _) with (to_radix_list n) by easy.
 symmetry.
-assert (H : canon_sym_gr_list_list n ⊂ to_radix_list n). {
+assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
@@ -330,140 +351,13 @@ assert (H : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   split; [ easy | ].
   apply in_seq.
   split; [ easy | cbn ].
-Search (to_radix_inv _ _ < _).
-Search to_radix_inv.
-Print to_radix_inv.
-Theorem to_radix_inv_ub : ∀ n l,
-  n ≠ 0
-  → (∀ i, i < length l → ff_app l i < n)
-  → to_radix_inv n l < n ^ length l.
-Proof.
-intros * Hnz Hl.
-revert n Hnz Hl.
-induction l as [| a]; intros; cbn; [ easy | ].
-apply Nat.neq_0_lt_0 in Hnz.
-specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
-apply Nat.neq_0_lt_0 in Hnz.
-specialize (IHl n Hnz) as H2.
-assert (H : ∀ i, i < length l → ff_app l i < n). {
-  intros i Hi.
-  apply (Hl (S i)); cbn.
-  now apply -> Nat.succ_lt_mono.
+  specialize to_radix_inv_ub as H1.
+  specialize (H1 n (canon_sym_gr_list n i) Hnz).
+  rewrite canon_sym_gr_list_length in H1.
+  apply H1.
+  intros j Hj.
+  now apply canon_sym_gr_list_ub.
 }
-specialize (H2 H); clear H.
-specialize (IHl (S n) (Nat.neq_succ_0 _)) as H3.
-assert (H : ∀ i, i < length l → ff_app l i < S n). {
-  intros i Hi.
-  specialize (Hl (S i)) as H4; cbn in H4.
-  assert (H : S i < S (length l)). {
-    now apply -> Nat.succ_lt_mono.
-  }
-  specialize (H4 H); clear H.
-  unfold ff_app; flia H4.
-}
-specialize (H3 H); clear H.
-...
-Theorem to_radix_inv_ub : ∀ n l,
-  n ≠ 0
-  → length l ≤ n
-  → (∀ i, i < n → ff_app l i < n)
-  → to_radix_inv n l < n ^ n.
-Proof.
-intros * Hnz Hlen Hl.
-destruct l as [| a]; cbn. {
-  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-}
-cbn in Hlen.
-destruct n; [ easy | ].
-apply Nat.succ_le_mono in Hlen.
-remember (S n * to_radix_inv (S n) l) as x; cbn; subst x.
-...
-intros * Hnz Hlen Hl.
-revert n Hnz Hlen Hl.
-induction l as [| a]; intros; cbn. {
-  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
-}
-destruct n; [ easy | clear Hnz ].
-cbn in Hlen.
-apply Nat.succ_le_mono in Hlen.
-cbn.
-assert (H : length l ≤ n) by flia Hlen.
-specialize (IHl H); clear H.
-...
-destruct n; [ easy | clear Hnz ].
-cbn - [ "*" ].
-cbn in Hlen.
-apply Nat.succ_inj in Hlen.
-...
-eapply lt_le_trans. {
-  apply Nat.add_lt_mono. {
-    specialize (Hl 0 (Nat.lt_0_succ _)).
-    cbn in Hl.
-    apply Hl.
-  }
-  apply Nat.mul_lt_mono. 2: {
-    apply IHl; [ easy | | ].
-...
-Search canon_sym_gr_list.
-canon_sym_gr_list_inv_canon_sym_gr_list: ∀ n k : nat, k < n! → canon_sym_gr_list_inv n (canon_sym_gr_list n k) = k
-Check canon_sym_gr_list_canon_sym_gr_list_inv.
-...
-  apply canon_sym_gr_list_canon_sym_gr_list_inv.
-
-rewrite rngl_summation_change_var with
-  (g := canon_sym_gr_list_inv n) (h0 := h).
-set (g := canon_sym_gr_list_inv n).
-set (h := canon_sym_gr_list n).
-rewrite rngl_summation_change_var with (g0 := g) (h0 := h).
-Search canon_sym_gr_list.
-
-canon_sym_gr_list_canon_sym_gr_list_inv:
-  ∀ (n : nat) (l : list nat), is_permut n l → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l
-Check canon_sym_gr_list_list.
-Print canon_sym_gr_list_list.
-Print canon_sym_gr_list.
-Check rngl_summation_change_var.
-Check rn
-set (h := canon_sym_gr_list_list).
-erewrite rngl_summation_change_var with (g := canon_sym_gr_list_list).
-...
-(*
-  ============================
-  ∑ (k = 0, n! - 1),
-  ε (canon_sym_gr_list n k) * ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)) =
-  ∑ (i = 0, n ^ n - 1),
-  ε (to_radix n (n ^ n - S i)) * ∏ (i0 = 1, n), mat_el M (i0 - 1) (ff_app (to_radix n (n ^ n - S i)) (i0 - 1))
-*)
-Compute (let n := 4 in
-map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n))).
-Compute (let n := 4 in
-filter snd (
-map (λ i, let l := rev (to_radix n i) in (i, is_permut_list_bool l)) (seq 0 (n ^ n)))).
-Fixpoint to_radix_inv_loop n k i :=
-  match i with
-  | 0 => 0
-  | S i' =>
-      if list_eqb Nat.eqb (canon_sym_gr_list n k) (to_radix n i') then i'
-      else to_radix_inv_loop n k i'
-  end.
-Definition to_radix_inv n k := to_radix_inv_loop n k (n ^ n).
-Theorem to_radix_canon_sym_gr_list : ∀ n k i,
-  k < n!
-  → i = to_radix_inv n k
-  → canon_sym_gr_list n k = to_radix n i.
-Proof.
-intros * Hkn Hi.
-subst i.
-unfold to_radix.
-unfold to_radix_inv.
-revert k Hkn.
-induction n; intros; [ easy | ].
-cbn - [ "mod" "/" ].
-...
-Compute (let n := 4 in let k := 24 in
-  canon_sym_gr_list n k = to_radix n (to_radix_inv n k)).
-Compute (to_radix_inv 4 3, canon_s).
-Compute (to_radix 4 120).
 ...
 *)
 

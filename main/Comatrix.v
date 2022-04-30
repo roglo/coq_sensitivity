@@ -1572,7 +1572,7 @@ erewrite rngl_summation_eq_compat. 2: {
       (h := ff_app (canon_sym_gr_list n i)). 2: {
     intros j (_, Hj).
     apply permut_isort_permut. 2: {
-      rewrite length_canon_sym_gr_list; flia Hj Hnz.
+      rewrite canon_sym_gr_list_length; flia Hj Hnz.
     }
     apply canon_sym_gr_list_is_permut.
     specialize (fact_neq_0 n) as H.
@@ -1593,7 +1593,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     rewrite <- Hkj.
     apply permut_list_ub; [ apply Hc | ].
-    now rewrite length_canon_sym_gr_list.
+    now rewrite canon_sym_gr_list_length.
   }
   cbn.
   destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
@@ -1626,7 +1626,7 @@ erewrite rngl_summation_eq_compat. 2: {
       unfold ff_app.
       rewrite (List_map_nth' 0). 2: {
         rewrite isort_rank_length.
-        rewrite length_canon_sym_gr_list.
+        rewrite canon_sym_gr_list_length.
         flia Hi.
       }
       easy.
@@ -1648,7 +1648,7 @@ split. {
     unfold "°"; cbn.
     rewrite map_length.
     rewrite isort_rank_length.
-    apply length_canon_sym_gr_list.
+    apply canon_sym_gr_list_length.
   } {
     apply (comp_is_permut_list n); [ easy | ].
     apply isort_rank_is_permut.
@@ -1677,7 +1677,7 @@ split. {
         apply isort_rank_is_permut_list.
       }
       rewrite isort_rank_length.
-      rewrite length_canon_sym_gr_list.
+      rewrite canon_sym_gr_list_length.
       now destruct Hσ as (_, Hσl); rewrite Hσl.
     }
     easy.
@@ -1694,7 +1694,7 @@ split. {
         apply isort_rank_is_permut_list.
       }
       rewrite isort_rank_length.
-      rewrite length_canon_sym_gr_list.
+      rewrite canon_sym_gr_list_length.
       now destruct Hσ as (_, Hσl); rewrite Hσl.
     }
     easy.
