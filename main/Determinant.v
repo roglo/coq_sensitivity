@@ -217,10 +217,18 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
-Theorem glop : ∀ A eqb E F (f : A → T),
+Theorem rngl_summation_incl : ∀ A (eqb : A → _) E F,
   E ⊂ F
-  → ∑ (e ∈ E), f e =
-    (∑ (e ∈ F), f e + ∑ (e ∈ set_minus eqb E F), f e)%F.
+  → ∀ f,
+    ∑ (e ∈ F), f e =
+    (∑ (e ∈ E), f e + ∑ (e ∈ set_minus eqb F E), f e)%F.
+Proof.
+intros * HEF *.
+...
+rewrite (rngl_summation_incl (list_eqb Nat.eqb) _ _ Hincl).
+symmetry.
+rewrite <- rngl_add_0_r.
+f_equal.
 ...
 *)
 
