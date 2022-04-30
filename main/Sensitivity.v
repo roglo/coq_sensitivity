@@ -1578,7 +1578,6 @@ intros i Hi.
 apply Nat.mul_le_mono_r; flia.
 Qed.
 
-(* to be completed
 Theorem x_bs_ge_s : ∀ n f x,
   local_block_sensitivity n f x ≥ local_sensitivity n f x.
 Proof.
@@ -1621,7 +1620,7 @@ assert (Hjll : nth j ll [] = map (λ i, [i]) (seq 0 n)). {
     rewrite Hj.
     apply fold_left_mul_seq_lt.
   }
-  rewrite (List_map_nth_in _ 0) by now rewrite seq_length.
+  rewrite (List_map_nth' 0) by now rewrite seq_length.
   rewrite seq_nth; [ cbn | easy ].
   unfold dispatch.
   rewrite Hj.
@@ -1678,7 +1677,6 @@ etransitivity. {
   apply x_bs_ge_s.
 }
 Qed.
-*)
 
 (* "Given a n×n matrix A, a principal submatrix of A is obtained by deleting
     the same set of rows and columns from A.
