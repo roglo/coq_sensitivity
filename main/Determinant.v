@@ -13,6 +13,15 @@ Import matrix_Notations.
 
 Notation "E ⊂ F" := (∀ a, a ∈ E → a ∈ F) (at level 70).
 
+Fixpoint in_fun {A} (eqb : A → A → bool) a l :=
+  match l with
+  | [] => false
+  | b :: l' => if eqb a b then true else in_fun eqb a l'
+  end.
+
+Definition set_minus {A} (eqb : A → _) E F :=
+  filter (λ e, negb (in_fun eqb e F)) E.
+
 Section a.
 
 Context {T : Type}.
@@ -208,6 +217,10 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
+Theorem glop : ∀ A eqb E F (f : A → T),
+  E ⊂ F
+  → ∑ (e ∈ E), f e =
+    (∑ (e ∈ F), f e + ∑ (e ∈ set_minus eqb E F), f e)%F.
 ...
 *)
 
