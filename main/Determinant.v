@@ -11,16 +11,18 @@ Require Import Misc RingLike IterAdd IterMul.
 Require Import MyVector Matrix PermutSeq Signature.
 Import matrix_Notations.
 
-Notation "E ⊂ F" := (∀ a, a ∈ E → a ∈ F) (at level 70).
-
 Fixpoint in_fun {A} (eqb : A → A → bool) a l :=
   match l with
   | [] => false
   | b :: l' => if eqb a b then true else in_fun eqb a l'
   end.
 
+Definition set_incl {A} (E F : list A) :=
+  ∀ a, a ∈ E → a ∈ F.
 Definition set_minus {A} (eqb : A → _) E F :=
   filter (λ e, negb (in_fun eqb e F)) E.
+
+Notation "E ⊂ F" := (set_incl E F) (at level 70).
 
 Section a.
 
@@ -217,13 +219,24 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
-Theorem rngl_summation_incl : ∀ A (eqb : A → _) E F,
+Require Import PermutationFun.
+Theorem rngl_summation_incl : ∀ A (eqb : A → _) (Heqb : equality eqb) E F,
   E ⊂ F
   → ∀ f,
     ∑ (e ∈ F), f e =
     (∑ (e ∈ E), f e + ∑ (e ∈ set_minus eqb F E), f e)%F.
 Proof.
-intros * HEF *.
+intros * Heqb * HEF *.
+rewrite <- rngl_summation_list_app.
+apply rngl_summation_list_permut.
+apply (Permutation_permutation Heqb).
+unfold set_incl in HEF.
+destruct F as [| b lb]. {
+  cbn; rewrite app_nil_r.
+  destruct E as [| a la]; [ apply permutation_nil_nil | ].
+  now specialize (HEF a (or_introl eq_refl)).
+}
+cbn.
 ...
 rewrite (rngl_summation_incl (list_eqb Nat.eqb) _ _ Hincl).
 symmetry.
