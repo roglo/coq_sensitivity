@@ -741,6 +741,42 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
+Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
+  fold_left (λ c i, c + f i) l a =
+  a + fold_left (λ c i, c + f i) l 0.
+Proof.
+intros.
+revert a.
+induction l as [| x l]; intros; [ symmetry; apply Nat.add_0_r | cbn ].
+rewrite IHl; symmetry; rewrite IHl.
+apply Nat.add_assoc.
+Qed.
+
+Theorem nat_summation_le_compat: ∀ b e g h,
+  (∀ i, b ≤ i ≤ e → g i ≤ h i)
+  → nat_∑ (i = b, e), g i ≤ nat_∑ (i = b, e), h i.
+Proof.
+intros * Hgh.
+unfold iter_seq.
+remember (S e - b) as n eqn:Hn.
+remember 0 as a eqn:Ha; clear Ha.
+revert a b Hn Hgh.
+induction n as [| n IHn]; intros; [ easy | cbn ].
+unfold iter_list.
+cbn.
+rewrite fold_left_add_fun_from_0.
+rewrite <- Nat.add_assoc.
+remember (a + _) as x.
+rewrite fold_left_add_fun_from_0.
+subst x.
+rewrite <- Nat.add_assoc.
+apply Nat.add_le_mono_l.
+apply Nat.add_le_mono; [ apply Hgh; flia Hn | ].
+apply IHn; [ flia Hn | ].
+intros i Hbie.
+apply Hgh; flia Hbie.
+Qed.
+
 End a.
 
 Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.

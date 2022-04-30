@@ -1559,8 +1559,8 @@ rewrite Nat_pow_from_sum. 2: {
 }
 rewrite Nat.add_1_r.
 apply Nat.lt_succ_r.
-...
-rewrite mul_summation_distr_l.
+unfold iter_seq.
+rewrite mul_iter_list_distr_l; [ | apply Nat.mul_add_distr_l ].
 cbn - [ seq ].
 specialize (horner_is_eval_polyn (n - 1)) as H2.
 specialize (H2 (λ i, n - 1 - i) n).
@@ -1573,7 +1573,8 @@ rewrite List_fold_left_ext_in with (g := λ acc i, acc * n + i) in H2. 2: {
 replace (S (n - 1)) with n in H2 at 1 by flia Hnz.
 replace (S (n - 1)) with (S (n - 1) - 0) by flia Hnz.
 rewrite H2.
-apply summation_le_compat.
+...
+apply rngl_summation_le_compat.
 intros i Hi.
 apply Nat.mul_le_mono_r; flia.
 Qed.
