@@ -1546,7 +1546,6 @@ replace n with (length l). 2: {
 apply firstn_all.
 Qed.
 
-(* to be completed
 Theorem fold_left_mul_seq_lt : ∀ n,
   fold_left (λ a i, a * n + i) (seq 0 n) 0 < n ^ n.
 Proof.
@@ -1573,12 +1572,13 @@ rewrite List_fold_left_ext_in with (g := λ acc i, acc * n + i) in H2. 2: {
 replace (S (n - 1)) with n in H2 at 1 by flia Hnz.
 replace (S (n - 1)) with (S (n - 1) - 0) by flia Hnz.
 rewrite H2.
-...
-apply rngl_summation_le_compat.
+rewrite Nat.mul_0_r, fold_iter_seq.
+apply nat_summation_le_compat.
 intros i Hi.
 apply Nat.mul_le_mono_r; flia.
 Qed.
 
+(* to be completed
 Theorem x_bs_ge_s : ∀ n f x,
   local_block_sensitivity n f x ≥ local_sensitivity n f x.
 Proof.
