@@ -2197,6 +2197,159 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
+(* conversion natural into radix n as a list of digits; i must be
+   less than n^n; always return n digits; e.g. radix 10 37 =
+   7; 3; 0 ... (eight 0s) *)
+
+Fixpoint to_radix_loop it n i :=
+  match it with
+  | 0 => []
+  | S it' => i mod n :: to_radix_loop it' n (i / n)
+  end.
+
+Definition to_radix n i := to_radix_loop n n i.
+
+Definition to_radix_list n := map (to_radix n) (seq 0 (n ^ n)).
+
+Fixpoint to_radix_inv n l :=
+  match l with
+  | [] => 0
+  | d :: l' => d + n * to_radix_inv n l'
+  end.
+
+Theorem to_radix_loop_ub : ∀ it n k i,
+  n ≠ 0 → nth i (to_radix_loop it n k) 0 < n.
+Proof.
+intros * Hnz.
+revert n k i Hnz.
+induction it; intros; [ destruct i; cbn; flia Hnz | cbn ].
+destruct i; [ now apply Nat.mod_upper_bound | ].
+now apply IHit.
+Qed.
+
+Theorem to_radix_ub : ∀ n k i, n ≠ 0 → nth i (to_radix n k) 0 < n.
+Proof.
+intros * Hnz.
+now apply to_radix_loop_ub.
+Qed.
+
+Theorem to_radix_inv_to_radix_loop : ∀ it n k,
+  to_radix_inv n (to_radix_loop it n k) = k mod (n ^ it).
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct it; [ easy | apply Nat.add_0_r ].
+}
+revert n k Hnz.
+induction it; intros; [ easy | cbn ].
+rewrite IHit; [ | easy ].
+symmetry.
+apply Nat.mod_mul_r; [ easy | ].
+now apply Nat.pow_nonzero.
+Qed.
+
+Theorem to_radix_loop_to_radix_inv : ∀ l d n it,
+  length l + d = n
+  → (∀ i, i ∈ l → i < n)
+  → n ≤ it + d
+  → to_radix_loop it n (to_radix_inv n l) = l ++ repeat 0 (it + d - n).
+Proof.
+intros * Hlen Hl Hit.
+revert d n it Hlen Hl Hit.
+induction l as [| a]; intros. {
+  cbn - [ "-" ].
+  cbn in Hlen; subst d.
+  clear Hl Hit.
+  rewrite Nat.add_sub.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n; cbn.
+    induction it; cbn; [ easy | now cbn; f_equal ].
+  }
+  induction it; [ easy | cbn ].
+  rewrite Nat.mod_small; [ | flia Hnz ].
+  rewrite Nat.div_small; [ | flia Hnz ].
+  now f_equal.
+}
+cbn - [ "-" ].
+destruct it; [ cbn in Hlen; flia Hlen Hit | ].
+cbn - [ "-" ].
+f_equal. {
+  rewrite Nat.mul_comm, Nat.mod_add; [ | now subst n ].
+  now apply Nat.mod_small, Hl; left.
+}
+rewrite Nat.mul_comm, Nat.div_add; [ | now subst n ].
+rewrite Nat.div_small; [ | now apply Hl; left ].
+rewrite Nat.add_0_l.
+cbn in Hlen, Hit.
+rewrite <- Nat.add_succ_r in Hlen, Hit |-*.
+apply IHl; [ easy | | easy ].
+intros i Hi.
+now apply Hl; right.
+Qed.
+
+(* *)
+
+Theorem to_radix_inv_to_radix : ∀ n k,
+  k < n ^ n → to_radix_inv n (to_radix n k) = k.
+Proof.
+intros * Hkn.
+unfold to_radix.
+rewrite to_radix_inv_to_radix_loop.
+now apply Nat.mod_small.
+Qed.
+
+Theorem to_radix_to_radix_inv : ∀ n l,
+  length l = n
+  → (∀ i, i ∈ l → i < n)
+  → to_radix n (to_radix_inv n l) = l.
+Proof.
+intros * Hlen Hl.
+unfold to_radix.
+specialize to_radix_loop_to_radix_inv as H1.
+specialize (H1 l 0 n n).
+do 2 rewrite Nat.add_0_r in H1.
+specialize (H1 Hlen Hl (le_refl _)).
+now rewrite Nat.sub_diag, app_nil_r in H1.
+Qed.
+
+Theorem to_radix_loop_length : ∀ n l it, length (to_radix_loop it n l) = it.
+Proof.
+intros.
+revert n l.
+induction it; intros; cbn; [ easy | f_equal; apply IHit ].
+Qed.
+
+Theorem to_radix_length : ∀ n l, length (to_radix n l) = n.
+Proof.
+intros.
+unfold to_radix.
+apply to_radix_loop_length.
+Qed.
+
+Theorem to_radix_inv_ub : ∀ n l,
+  n ≠ 0
+  → (∀ i, i < length l → nth i l 0 < n)
+  → to_radix_inv n l < n ^ length l.
+Proof.
+intros * Hnz Hl.
+revert n Hnz Hl.
+induction l as [| a]; intros; cbn; [ easy | ].
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
+apply Nat.neq_0_lt_0 in Hnz.
+specialize (IHl n Hnz) as H2.
+assert (H : ∀ i, i < length l → nth i l 0 < n). {
+  intros i Hi.
+  apply (Hl (S i)); cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+specialize (H2 H); clear H.
+now apply Nat_lt_lt_add_mul.
+Qed.
+
+(* *)
+
 Theorem cons_app_repeat : ∀ A (a : A) la,
   a :: la = la ++ [a]
   → la = repeat a (length la).

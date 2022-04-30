@@ -170,18 +170,6 @@ Definition is_nil {A} (l : list A) :=
   | _ => false
   end.
 
-(* conversion natural into radix n as a list of digits; i must be
-   less than n^n; always return n digits; e.g. radix 10 37 =
-   7; 3; 0 ... (eight 0s) *)
-
-Fixpoint to_radix_loop it n i :=
-  match it with
-  | 0 => []
-  | S it' => i mod n :: to_radix_loop it' n (i / n)
-  end.
-
-Definition to_radix n i := to_radix_loop n n i.
-
 (**)
 
 Fixpoint nth_find_all_loop {A} (f : A → bool) l i :=
@@ -854,14 +842,6 @@ specialize (in_nth_find_all_loop_eqb_if l 0 Ha) as H1.
 now rewrite Nat.add_0_r in H1.
 Qed.
 
-Theorem to_radix_loop_length : ∀ it n i, length (to_radix_loop it n i) = it.
-Proof.
-intros.
-revert n i.
-induction it; intros; [ easy | cbn ].
-now rewrite IHit.
-Qed.
-
 Theorem in_to_radix_loop : ∀ it n i a,
   n ≠ 0
   → a ∈ to_radix_loop it n i
@@ -1455,13 +1435,11 @@ rewrite Nat.sub_0_r; cbn.
 now rewrite Nat.sub_0_r.
 Qed.
 
-(* to be completed
 Theorem horner_is_eval_polyn2 : ∀ n a x,
   fold_left (λ acc i, acc * x + a i) (seq 0 (S n)) 0 =
   nat_∑ (i = 0, n), a (n - i) * x ^ i.
 Proof.
 intros.
-...
 specialize (horner_is_eval_polyn n (λ i, a (n - i)) x) as H1.
 cbn - [ "-" fold_left seq ] in H1.
 rewrite <- H1.
@@ -1516,8 +1494,7 @@ assert
   }
   rewrite Hlr.
   cbn - [ last "mod" ].
-...
-  rewrite app_comm_cons, List_last_app.
+  rewrite app_comm_cons, last_last.
   rewrite Nat.mod_small. 2: {
     apply Hil; rewrite Hlr; cbn.
     now apply in_or_app; right; left.
@@ -1569,6 +1546,7 @@ replace n with (length l). 2: {
 apply firstn_all.
 Qed.
 
+(* to be completed
 Theorem fold_left_mul_seq_lt : ∀ n,
   fold_left (λ a i, a * n + i) (seq 0 n) 0 < n ^ n.
 Proof.
@@ -1581,6 +1559,7 @@ rewrite Nat_pow_from_sum. 2: {
 }
 rewrite Nat.add_1_r.
 apply Nat.lt_succ_r.
+...
 rewrite mul_summation_distr_l.
 cbn - [ seq ].
 specialize (horner_is_eval_polyn (n - 1)) as H2.
