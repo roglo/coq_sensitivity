@@ -335,18 +335,33 @@ Search to_radix_inv.
 Print to_radix_inv.
 Theorem to_radix_inv_ub : ∀ n l,
   n ≠ 0
-  → (∀ i, i < n → ff_app l i < n)
+  → (∀ i, i < length l → ff_app l i < n)
   → to_radix_inv n l < n ^ length l.
 Proof.
 intros * Hnz Hl.
 revert n Hnz Hl.
 induction l as [| a]; intros; cbn; [ easy | ].
 apply Nat.neq_0_lt_0 in Hnz.
-specialize (Hl 0 Hnz) as H1; cbn in H1.
+specialize (Hl 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
 apply Nat.neq_0_lt_0 in Hnz.
-...
-destruct n; [ easy | clear Hnz ].
-cbn.
+specialize (IHl n Hnz) as H2.
+assert (H : ∀ i, i < length l → ff_app l i < n). {
+  intros i Hi.
+  apply (Hl (S i)); cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+specialize (H2 H); clear H.
+specialize (IHl (S n) (Nat.neq_succ_0 _)) as H3.
+assert (H : ∀ i, i < length l → ff_app l i < S n). {
+  intros i Hi.
+  specialize (Hl (S i)) as H4; cbn in H4.
+  assert (H : S i < S (length l)). {
+    now apply -> Nat.succ_lt_mono.
+  }
+  specialize (H4 H); clear H.
+  unfold ff_app; flia H4.
+}
+specialize (H3 H); clear H.
 ...
 Theorem to_radix_inv_ub : ∀ n l,
   n ≠ 0
