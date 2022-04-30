@@ -1336,7 +1336,6 @@ rewrite <- loc_length_loc_bl_sens_list; f_equal.
 apply IHl.
 Qed.
 
-(* to be completed
 Theorem Nat_pow_from_sum : ∀ a n, a * n ≠ 0 →
   n ^ a = (n - 1) * (nat_∑ (i = 0, a - 1), n ^ i) + 1.
 Proof.
@@ -1354,10 +1353,18 @@ induction a; intros. {
   symmetry; apply Nat.sub_add.
   now apply Nat.neq_0_lt_0.
 }
-...
-rewrite rngl_summation_split_last; [ | flia | flia ].
-replace (S a - 1) with a by flia.
+rewrite iter_seq_split_last; [ | easy ].
+rewrite (iter_shift 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag.
+rewrite Nat_sub_succ_1.
 rewrite Nat.mul_add_distr_l, Nat.add_shuffle0.
+erewrite iter_seq_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
 rewrite <- IHa; [ | easy ].
 replace (n ^ S a) with (1 * n ^ S a) at 1 by flia.
 rewrite <- Nat.mul_add_distr_r.
@@ -1378,24 +1385,42 @@ replace (n + S k) with (S n + k) in IHn by flia.
 replace (seq (S k) (S n)) with (S k :: seq (S (S k)) n) by easy.
 cbn - [ "-" "+" ].
 replace (S n + k - S k) with n by flia.
-...
-rewrite rngl_summation_split_first in IHn; [ | flia ].
+rewrite iter_seq_split_first in IHn; [ | easy | | | easy ]; cycle 1. {
+  apply Nat.add_0_r.
+} {
+  apply Nat.add_assoc.
+}
 rewrite Nat.pow_0_r, Nat.add_0_r, Nat.mul_1_r in IHn.
 rewrite (Nat.add_comm (a n)) in IHn.
-rewrite summation_succ_succ in IHn.
-rewrite summation_eq_compat with (h := λ i, a (S n + i) * x ^ i * x)
+rewrite iter_seq_succ_succ in IHn.
+rewrite iter_seq_eq_compat with (h := λ i, a (S n + i) * x ^ i * x)
   in IHn. 2: {
   intros i Hi.
   rewrite Nat.add_succ_comm.
   now cbn; rewrite Nat.mul_assoc, Nat.mul_shuffle0.
 }
-rewrite <- mul_summation_distr_r in IHn.
+remember (nat_∑ (i = 0, k), a (S n + i) * x ^ i * x) as y.
+unfold iter_seq in Heqy.
+rewrite Nat.sub_0_r in Heqy.
+specialize mul_iter_list_distr_r as H1.
+specialize (H1 nat nat x (seq 0 (S k))).
+specialize (H1 (λ i, a (S n + i) * x ^ i)).
+specialize (H1 Nat.add Nat.mul 0).
+cbn - [ seq "+" ] in H1.
+rewrite <- H1 in Heqy. 2: {
+  intros; apply Nat.mul_add_distr_r.
+}
+subst y; clear H1.
 symmetry in IHn; symmetry.
-rewrite summation_split_first in IHn; [ | flia ].
+rewrite iter_seq_split_first in IHn; [ | easy | | | easy ]; cycle 1. {
+  apply Nat.add_0_r.
+} {
+  apply Nat.add_assoc.
+}
 rewrite Nat.add_0_r in IHn.
 rewrite (Nat.add_comm (a n * x ^ n)) in IHn.
-rewrite summation_succ_succ in IHn.
-rewrite summation_eq_compat with (h := λ i, a (S n + i) * x ^ (S n + i))
+rewrite iter_seq_succ_succ in IHn.
+rewrite iter_seq_eq_compat with (h := λ i, a (S n + i) * x ^ (S n + i))
   in IHn. 2: {
   intros i Hi.
   now rewrite Nat.add_succ_comm.
@@ -1403,6 +1428,7 @@ rewrite summation_eq_compat with (h := λ i, a (S n + i) * x ^ (S n + i))
 apply IHn.
 Qed.
 
+(* to be completed
 Theorem horner_is_eval_polyn : ∀ n a x,
   fold_left (λ acc i, acc * x + a (n - i)) (seq 0 (S n)) 0 =
   nat_∑ (i = 0, n), a i * x ^ i.

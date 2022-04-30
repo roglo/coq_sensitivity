@@ -286,6 +286,22 @@ f_equal.
 apply mul_add_distr_l.
 Qed.
 
+Theorem mul_iter_list_distr_r : ∀ A B a (la : list B) f
+    (add mul : A → A → A) d
+    (mul_add_distr_r : ∀ y z, mul (add y z) a = add (mul y a) (mul z a)),
+  mul (iter_list la (λ c i, add c (f i)) d) a =
+  iter_list la (λ c i, add c (mul (f i) a)) (mul d a).
+Proof.
+intros.
+clear Hom.
+unfold iter_list.
+revert d.
+induction la as [| a1]; intros; [ easy | cbn ].
+rewrite IHla.
+f_equal.
+apply mul_add_distr_r.
+Qed.
+
 Theorem rngl_mul_summation_list_distr_l : ∀ A a (la : list A) f,
   (a * (∑ (i ∈ la), f i) = ∑ (i ∈ la), a * f i)%F.
 Proof.
