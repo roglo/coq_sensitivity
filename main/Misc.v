@@ -1884,6 +1884,42 @@ rewrite <- IHlen.
 now rewrite inv_op_distr.
 Qed.
 
+Theorem iter_seq_rtl : ∀ T d op b k f
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_comm : ∀ a b, op a b = op b a)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_seq b k (λ (c : T) (i : nat), op c (f i)) d =
+  iter_seq b k (λ (c : T) (i : nat), op c (f (k + b - i))) d.
+Proof.
+intros.
+destruct (le_dec (S k) b) as [Hkb| Hkb]. {
+  unfold iter_seq.
+  now replace (S k - b) with 0 by flia Hkb.
+}
+apply Nat.nle_gt in Hkb.
+apply -> Nat.lt_succ_r in Hkb.
+unfold iter_seq, iter_list.
+remember (S k - b) as len eqn:Hlen.
+replace k with (b + len - 1) by flia Hkb Hlen.
+clear Hlen Hkb.
+revert b.
+induction len; intros; [ easy | ].
+rewrite seq_S at 1; cbn.
+rewrite fold_left_app; cbn.
+symmetry.
+rewrite fold_left_op_fun_from_d with (d := d); [ | easy | easy | easy ].
+rewrite op_comm.
+f_equal; [ | rewrite op_d_l; f_equal; flia ].
+rewrite IHlen.
+rewrite <- seq_shift.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros j c Hj.
+apply in_seq in Hj.
+f_equal; f_equal; flia.
+Qed.
+
 (* *)
 
 Theorem fold_left_max_from_0 : ∀ A a l (f : A → _),

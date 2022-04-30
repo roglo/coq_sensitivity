@@ -242,32 +242,15 @@ Theorem rngl_summation_rtl : ∀ g b k,
   (∑ (i = b, k), g i = ∑ (i = b, k), g (k + b - i)%nat)%F.
 Proof.
 intros g b k.
-destruct (le_dec (S k) b) as [Hkb| Hkb]. {
-  unfold iter_seq.
-  cbn - [ "-" ].
-  now replace (S k - b) with 0 by flia Hkb.
+apply iter_seq_rtl. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_comm.
+} {
+  apply rngl_add_assoc.
 }
-apply Nat.nle_gt in Hkb.
-apply -> Nat.lt_succ_r in Hkb.
-unfold iter_seq, iter_list.
-remember (S k - b) as len eqn:Hlen.
-replace k with (b + len - 1) by flia Hkb Hlen.
-clear Hlen Hkb.
-revert b.
-induction len; intros; [ easy | ].
-rewrite seq_S at 1; cbn.
-rewrite fold_left_app; cbn.
-symmetry.
-rewrite fold_left_rngl_add_fun_from_0.
-rewrite rngl_add_comm.
-f_equal; [ | rewrite rngl_add_0_l; f_equal; flia ].
-rewrite IHlen.
-rewrite <- seq_shift.
-rewrite List_fold_left_map.
-apply List_fold_left_ext_in.
-intros j c Hj.
-apply in_seq in Hj.
-f_equal; f_equal; flia.
 Qed.
 
 Theorem mul_iter_list_distr_l : ∀ A B a (la : list B) f
