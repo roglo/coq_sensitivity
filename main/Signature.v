@@ -3142,7 +3142,7 @@ Qed.
 Theorem not_permut_list_ε_0 :
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
-  ∀ σ, ¬ is_permut_list σ → ε σ = 0%F.
+  ∀ σ, ¬ is_permut_list (collapse σ) → ε σ = 0%F.
 Proof.
 intros Hop Hde * Hσ.
 unfold is_permut_list in Hσ.
