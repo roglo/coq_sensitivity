@@ -3138,7 +3138,8 @@ split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
-(* to be completed
+(* faux :
+collapse_is_permut: ∀ l : list nat, is_permut (length l) (collapse l)
 Theorem not_permut_list_ε_0 :
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
@@ -3146,7 +3147,17 @@ Theorem not_permut_list_ε_0 :
 Proof.
 intros Hop Hde * Hσ.
 unfold is_permut_list in Hσ.
+Theorem ε_collapse_neq_0 : ∀ p, ε (collapse p) ≠ 0%F.
+Search collapse.
+...
+specialize (ε_collapse_neq_0 σ) as H1.
 destruct (rngl_eq_dec Hde (ε (collapse σ)) 0%F) as [Hez| Hez]. {
+Search (ε (collapse _)).
+About ε_collapse_ε.
+...
+  unfold ε in Hez |-*.
+  rewrite collapse_length in Hez.
+  rewrite <- Hez.
 Search (ε (collapse _)).
 Check ε_when_dup.
 ...
@@ -3181,7 +3192,9 @@ apply (ε_when_dup Hop Hde).
 intros Hnd; apply Hσ; clear Hσ.
 unfold is_permut_list.
 ...
+*)
 
+(* to be completed
 Theorem ε_1_opp_1 :
   rngl_has_opp = true →
   ∀ σ, is_permut_list σ ↔ ε σ = 1%F ∨ ε σ = (-1)%F.
@@ -3210,6 +3223,7 @@ split. {
   flia Hi Hj Hb Hij.
 } {
   intros Hσ.
+  unfold is_permut_list.
 Check ε_when_dup.
 ...
 Qed.
