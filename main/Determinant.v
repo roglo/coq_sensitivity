@@ -11,16 +11,16 @@ Require Import Misc RingLike IterAdd IterMul PermutationFun.
 Require Import MyVector Matrix PermutSeq Signature.
 Import matrix_Notations.
 
-Fixpoint in_fun {A} (eqb : A → A → bool) a l :=
+Fixpoint member {A} (eqb : A → A → bool) a l :=
   match l with
   | [] => false
-  | b :: l' => if eqb a b then true else in_fun eqb a l'
+  | b :: l' => if eqb a b then true else member eqb a l'
   end.
 
 Definition set_incl {A} (E F : list A) :=
   ∀ a, a ∈ E → a ∈ F.
 Definition set_minus {A} (eqb : A → _) E F :=
-  filter (λ e, negb (in_fun eqb e F)) E.
+  filter (λ e, negb (member eqb e F)) E.
 
 Notation "E ⊂ F" := (set_incl E F) (at level 70).
 
@@ -119,7 +119,7 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 *)
 
-(* to be completed
+(*
 Theorem rngl_summation_incl : ∀ A (eqb : A → _) (Heqb : equality eqb) E F,
   E ⊂ F
   → ∀ f,
@@ -139,7 +139,9 @@ destruct F as [| b lb]. {
 }
 cbn.
 ...
+*)
 
+(* to be completed
 Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros.
@@ -239,6 +241,18 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
+assert (H :
+  ∑ (l ∈ to_radix_list n),
+  ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1)) =
+  ∑ (l ∈ to_radix_list n),
+  if member (list_eqb Nat.eqb) l (canon_sym_gr_list_list n) then
+    ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1))
+  else 0). {
+  apply rngl_summation_list_eq_compat.
+  intros l Hl.
+  remember (member _ _ _) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ easy | ].
+  assert (H : ε l = 0%F). {
 ...
 rewrite (rngl_summation_incl (list_eqb Nat.eqb) _ _ Hincl).
 symmetry.
