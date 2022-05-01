@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike IterAdd IterMul.
+Require Import Misc RingLike IterAdd IterMul PermutationFun.
 Require Import MyVector Matrix PermutSeq Signature.
 Import matrix_Notations.
 
@@ -120,6 +120,26 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 *)
 
 (* to be completed
+Theorem rngl_summation_incl : ∀ A (eqb : A → _) (Heqb : equality eqb) E F,
+  E ⊂ F
+  → ∀ f,
+    ∑ (e ∈ F), f e =
+    (∑ (e ∈ E), f e + ∑ (e ∈ set_minus eqb F E), f e)%F.
+Proof.
+intros * Heqb * HEF *.
+rewrite <- rngl_summation_list_app.
+apply rngl_summation_list_permut.
+apply (Permutation_permutation Heqb).
+unfold set_incl in HEF.
+...
+destruct F as [| b lb]. {
+  cbn; rewrite app_nil_r.
+  destruct E as [| a la]; [ apply permutation_nil_nil | ].
+  now specialize (HEF a (or_introl eq_refl)).
+}
+cbn.
+...
+
 Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros.
@@ -219,24 +239,6 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
-Require Import PermutationFun.
-Theorem rngl_summation_incl : ∀ A (eqb : A → _) (Heqb : equality eqb) E F,
-  E ⊂ F
-  → ∀ f,
-    ∑ (e ∈ F), f e =
-    (∑ (e ∈ E), f e + ∑ (e ∈ set_minus eqb F E), f e)%F.
-Proof.
-intros * Heqb * HEF *.
-rewrite <- rngl_summation_list_app.
-apply rngl_summation_list_permut.
-apply (Permutation_permutation Heqb).
-unfold set_incl in HEF.
-destruct F as [| b lb]. {
-  cbn; rewrite app_nil_r.
-  destruct E as [| a la]; [ apply permutation_nil_nil | ].
-  now specialize (HEF a (or_introl eq_refl)).
-}
-cbn.
 ...
 rewrite (rngl_summation_incl (list_eqb Nat.eqb) _ _ Hincl).
 symmetry.
