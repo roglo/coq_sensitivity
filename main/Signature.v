@@ -3146,14 +3146,21 @@ Theorem not_permut_list_ε_0 :
 Proof.
 intros Hop Hde * Hσ.
 unfold is_permut_list in Hσ.
-destruct (rngl_eq_dec Hde (ε σ) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+destruct (rngl_eq_dec Hde (ε (collapse σ)) 0%F) as [Hez| Hez]. {
+Search (ε (collapse _)).
+Check ε_when_dup.
+...
+; [ easy | exfalso ].
 apply Hσ; clear Hσ.
 split. 2: {
-  assert (H : {NoDup σ} + {¬ NoDup σ}). {
+  assert (H : {NoDup (collapse σ)} + {¬ NoDup (collapse σ)}). {
     apply ListDec.NoDup_dec, Nat.eq_dec.
   }
-  destruct H as [H| H]; [ easy | ].
-  now specialize (ε_when_dup Hop Hde H) as H1.
+  destruct H as [H| H]; [ easy | exfalso ].
+  specialize (ε_when_dup Hop Hde H) as H1.
+...
+Search (ε (collapse _)).
+...
 }
 unfold AllLt.
 intros i Hi.
