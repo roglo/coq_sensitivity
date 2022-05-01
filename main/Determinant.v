@@ -253,11 +253,11 @@ assert (H :
   remember (member _ _ _) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | ].
   assert (H : ε l = 0%F). {
-...
-rewrite (rngl_summation_incl (list_eqb Nat.eqb) _ _ Hincl).
-symmetry.
-rewrite <- rngl_add_0_r.
-f_equal.
+Check ε_1_opp_1.
+About ε_1_opp_1.
+Search ε.
+Search canon_sym_gr_list.
+  specialize ε_1_opp_1 as H1.
 ...
 *)
 

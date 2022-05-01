@@ -2729,14 +2729,15 @@ split. {
   }
 Qed.
 
-Theorem ε_when_dup : in_charac_0_field →
+Theorem ε_when_dup :
+  rngl_has_opp = true →
+  rngl_has_dec_eq = true →
   ∀ la,
   ¬ NoDup la
   → ε la = 0%F.
 Proof.
-intros Hif * Haa.
+intros Hop Hde * Haa.
 symmetry.
-destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
 destruct (rngl_eq_dec Hde (ε la) 0%F) as [Hez| Hez]; [ easy | exfalso ].
 apply Haa; clear Haa.
 apply nat_NoDup.
@@ -2788,8 +2789,10 @@ Theorem sign_comp : in_charac_0_field →
 Proof.
 intros Hif * Hbp.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
-  rewrite (ε_when_dup Hif Haa).
-  rewrite (ε_when_dup Hif). 2: {
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | easy ].
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
     intros H; apply Haa; clear Haa.
     now apply NoDup_comp_iff in H.
   }
@@ -3134,6 +3137,77 @@ exists (ff_app (canon_sym_gr_inv_list n k) j).
 split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
+
+(* to be completed
+Theorem not_permut_list_ε_0 :
+  rngl_has_opp = true →
+  rngl_has_dec_eq = true →
+  ∀ σ, ¬ is_permut_list σ → ε σ = 0%F.
+Proof.
+intros Hop Hde * Hσ.
+unfold is_permut_list in Hσ.
+destruct (rngl_eq_dec Hde (ε σ) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+apply Hσ; clear Hσ.
+split. 2: {
+  assert (H : {NoDup σ} + {¬ NoDup σ}). {
+    apply ListDec.NoDup_dec, Nat.eq_dec.
+  }
+  destruct H as [H| H]; [ easy | ].
+  now specialize (ε_when_dup Hop Hde H) as H1.
+}
+unfold AllLt.
+intros i Hi.
+Print ε.
+...
+Search (¬ (_ ∧ _)).
+apply Decidable.not_and in Hσ. 2: {
+  unfold AllLt.
+Search (Decidable.decidable (∀ _, _)).
+  unfold Decidable.decidable.
+Search
+...
+intros Hop Hde * Hσ.
+...
+Check ε_when_dup.
+...
+apply (ε_when_dup Hop Hde).
+intros Hnd; apply Hσ; clear Hσ.
+unfold is_permut_list.
+...
+
+Theorem ε_1_opp_1 :
+  rngl_has_opp = true →
+  ∀ σ, is_permut_list σ ↔ ε σ = 1%F ∨ ε σ = (-1)%F.
+Proof.
+intros Hop *.
+split. {
+  intros Hσ.
+  unfold ε.
+  destruct (le_dec (length σ) 1) as [Hn1| Hn1]. {
+    replace (length σ - 1) with 0 by flia Hn1.
+    now do 2 rewrite rngl_product_only_one; cbn; left.
+  }
+  apply rngl_product_1_opp_1; [ easy | ].
+  intros i Hi.
+  apply rngl_product_1_opp_1; [ easy | ].
+  intros j Hj.
+  unfold sign_diff.
+  rewrite if_ltb_lt_dec.
+  remember (ff_app σ j ?= ff_app σ i) as b eqn:Hb.
+  symmetry in Hb.
+  destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
+  destruct b; [ | now right | now left ].
+  apply Nat.compare_eq_iff in Hb.
+  destruct Hσ as (Hσa, Hσn).
+  apply (NoDup_nat _ Hσn) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
+  flia Hi Hj Hb Hij.
+} {
+  intros Hσ.
+Check ε_when_dup.
+...
+Qed.
+...
+*)
 
 Theorem ε_1_opp_1 :
   rngl_has_opp = true →
