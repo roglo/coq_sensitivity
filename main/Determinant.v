@@ -253,8 +253,15 @@ assert (H :
   remember (member _ _ _) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | ].
   assert (H : ε l = 0%F). {
-Check ε_1_opp_1.
-About ε_1_opp_1.
+    apply ε_when_dup; cycle 2.
+    intros Hnd.
+    clear - Hb Hnd.
+...
+Check in_dec.
+...
+Check NoDup_ε_1_opp_1.
+About ε_1_opp_1_NoDup.
+
 Search ε.
 Search canon_sym_gr_list.
   specialize ε_1_opp_1 as H1.

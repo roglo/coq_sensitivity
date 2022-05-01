@@ -3138,75 +3138,7 @@ split; [ now apply canon_sym_gr_inv_list_ub | ].
 now apply canon_sym_gr_sym_gr_inv.
 Qed.
 
-(* to be completed
-Theorem ε_1_opp_1 :
-  rngl_has_opp = true →
-  ∀ σ, NoDup σ ↔ ε σ = 1%F ∨ ε σ = (-1)%F.
-Proof.
-intros Hop *.
-split. {
-  intros Hσ.
-  unfold ε.
-  destruct (le_dec (length σ) 1) as [Hn1| Hn1]. {
-    replace (length σ - 1) with 0 by flia Hn1.
-    now do 2 rewrite rngl_product_only_one; cbn; left.
-  }
-  apply rngl_product_1_opp_1; [ easy | ].
-  intros i Hi.
-  apply rngl_product_1_opp_1; [ easy | ].
-  intros j Hj.
-  unfold sign_diff.
-  rewrite if_ltb_lt_dec.
-  remember (ff_app σ j ?= ff_app σ i) as b eqn:Hb.
-  symmetry in Hb.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
-  destruct b; [ | now right | now left ].
-  apply Nat.compare_eq_iff in Hb.
-  apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
-  flia Hi Hj Hb Hij.
-} {
-  intros Hσ.
-Check ε_when_dup.
-...
-Qed.
-...
-*)
-
-(* to be completed
-Theorem not_NoDup_imp_exists_same : ∀ A d (l : list A),
-  ¬ NoDup l → ∃ i j, i < j < length l ∧ nth i l d = nth j l d.
-Proof.
-intros * Hnd.
-...
-
-Theorem ε_0 :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ σ, ¬ NoDup σ → ε σ = 0%F.
-Proof.
-intros Hop * Hnd.
-...
-apply (not_NoDup_imp_exists_same 0) in Hnd.
-destruct Hnd as (u & v & (Huv & Hvl) & Huvn).
-unfold ε.
-rewrite rngl_product_split3 with (j := u); [ | flia Huv Hvl ].
-rewrite rngl_product_split3 with (j := v) (k := length σ - 1). 2: {
-  split; [ easy | flia Huv Hvl ].
-}
-apply Nat.ltb_lt in Huv; rewrite Huv.
-remember (sign_diff (ff_app σ v) (ff_app σ u)) as x eqn:Hx.
-unfold sign_diff in Hx.
-unfold ff_app in Hx.
-rewrite Huvn, Nat.compare_refl in Hx; subst x.
-rewrite rngl_mul_0_r; [ | easy ].
-rewrite rngl_mul_0_l; [ | easy ].
-rewrite rngl_mul_0_r; [ | easy ].
-rewrite rngl_mul_0_l; [ | easy ].
-easy.
-Qed.
-...
-*)
-
-Theorem ε_1_opp_1 :
+Theorem NoDup_ε_1_opp_1 :
   rngl_has_opp = true →
   ∀ σ, NoDup σ → ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
@@ -3231,12 +3163,32 @@ apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
 flia Hi Hj Hb Hij.
 Qed.
 
-Theorem ε_square :
+Theorem ε_1_opp_1_NoDup :
+  rngl_has_opp = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_dec_eq = true →
+  ∀ σ, ε σ = 1%F ∨ ε σ = (-1)%F → NoDup σ.
+Proof.
+intros Hop H10 Hde * Hσ.
+destruct (ListDec.NoDup_dec Nat.eq_dec σ) as [H1| H1]; [ easy | ].
+exfalso.
+apply ε_when_dup in H1; [ | easy | easy ].
+rewrite H1 in Hσ.
+destruct Hσ as [Hσ| Hσ]; symmetry in Hσ. {
+  now apply rngl_1_neq_0 in Hσ.
+} {
+  rewrite <- rngl_opp_0 in Hσ; [ | easy ].
+  apply rngl_opp_inj in Hσ; [ | easy ].
+  now apply rngl_1_neq_0 in Hσ.
+}
+Qed.
+
+Theorem NoDup_ε_square :
   rngl_has_opp = true →
   ∀ σ, NoDup σ → (ε σ * ε σ = 1)%F.
 Proof.
 intros Hop * Hσ.
-specialize (ε_1_opp_1) as H1.
+specialize (NoDup_ε_1_opp_1) as H1.
 specialize (H1 Hop σ Hσ).
 destruct H1 as [H1| H1]; rewrite H1. {
   apply rngl_mul_1_l.
@@ -3260,8 +3212,9 @@ Arguments rngl_product_change_list {T ro rp} _ [A]%type [la lb]%list.
 Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments sign_comp {T}%type {ro rp} _ [la lb]%list.
 Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
-Arguments ε_1_opp_1 {T}%type {ro rp} _  [σ].
-Arguments ε_square {T}%type {ro rp} _ [σ].
+Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].
+Arguments NoDup_ε_square {T}%type {ro rp} _ [σ].
+Arguments ε_when_dup {T ro rp} Hop Hde [la]%list.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
