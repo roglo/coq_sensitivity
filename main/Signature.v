@@ -3172,6 +3172,40 @@ Qed.
 ...
 *)
 
+(* to be completed
+Theorem not_NoDup_imp_exists_same : ∀ A d (l : list A),
+  ¬ NoDup l → ∃ i j, i < j < length l ∧ nth i l d = nth j l d.
+Proof.
+intros * Hnd.
+...
+
+Theorem ε_0 :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ σ, ¬ NoDup σ → ε σ = 0%F.
+Proof.
+intros Hop * Hnd.
+...
+apply (not_NoDup_imp_exists_same 0) in Hnd.
+destruct Hnd as (u & v & (Huv & Hvl) & Huvn).
+unfold ε.
+rewrite rngl_product_split3 with (j := u); [ | flia Huv Hvl ].
+rewrite rngl_product_split3 with (j := v) (k := length σ - 1). 2: {
+  split; [ easy | flia Huv Hvl ].
+}
+apply Nat.ltb_lt in Huv; rewrite Huv.
+remember (sign_diff (ff_app σ v) (ff_app σ u)) as x eqn:Hx.
+unfold sign_diff in Hx.
+unfold ff_app in Hx.
+rewrite Huvn, Nat.compare_refl in Hx; subst x.
+rewrite rngl_mul_0_r; [ | easy ].
+rewrite rngl_mul_0_l; [ | easy ].
+rewrite rngl_mul_0_r; [ | easy ].
+rewrite rngl_mul_0_l; [ | easy ].
+easy.
+Qed.
+...
+*)
+
 Theorem ε_1_opp_1 :
   rngl_has_opp = true →
   ∀ σ, NoDup σ → ε σ = 1%F ∨ ε σ = (-1)%F.
