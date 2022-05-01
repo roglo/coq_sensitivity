@@ -3197,7 +3197,7 @@ unfold is_permut_list.
 (* to be completed
 Theorem ε_1_opp_1 :
   rngl_has_opp = true →
-  ∀ σ, is_permut_list σ ↔ ε σ = 1%F ∨ ε σ = (-1)%F.
+  ∀ σ, NoDup σ ↔ ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
 intros Hop *.
 split. {
@@ -3218,12 +3218,10 @@ split. {
   destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
   destruct b; [ | now right | now left ].
   apply Nat.compare_eq_iff in Hb.
-  destruct Hσ as (Hσa, Hσn).
-  apply (NoDup_nat _ Hσn) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
+  apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
   flia Hi Hj Hb Hij.
 } {
   intros Hσ.
-  unfold is_permut_list.
 Check ε_when_dup.
 ...
 Qed.
@@ -3232,7 +3230,7 @@ Qed.
 
 Theorem ε_1_opp_1 :
   rngl_has_opp = true →
-  ∀ σ, is_permut_list σ → ε σ = 1%F ∨ ε σ = (-1)%F.
+  ∀ σ, NoDup σ → ε σ = 1%F ∨ ε σ = (-1)%F.
 Proof.
 intros Hop * Hσ.
 unfold ε.
@@ -3251,14 +3249,13 @@ symmetry in Hb.
 destruct (lt_dec i j) as [Hij| Hij]; [ | now left ].
 destruct b; [ | now right | now left ].
 apply Nat.compare_eq_iff in Hb.
-destruct Hσ as (Hσa, Hσn).
-apply (NoDup_nat _ Hσn) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
+apply (NoDup_nat _ Hσ) in Hb; [ | flia Hj Hn1 | flia Hi Hn1 ].
 flia Hi Hj Hb Hij.
 Qed.
 
 Theorem ε_square :
   rngl_has_opp = true →
-  ∀ σ, is_permut_list σ → (ε σ * ε σ = 1)%F.
+  ∀ σ, NoDup σ → (ε σ * ε σ = 1)%F.
 Proof.
 intros Hop * Hσ.
 specialize (ε_1_opp_1) as H1.

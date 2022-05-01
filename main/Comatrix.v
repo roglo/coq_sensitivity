@@ -1361,7 +1361,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     now rewrite comp_length, isort_rank_length.
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
-  rewrite ε_square; [ | now destruct Hif | now destruct Hσ ].
+  rewrite ε_square; [ | now destruct Hif | now destruct Hσ as ((_, H), _) ].
   rewrite rngl_mul_1_r.
   easy.
 }
@@ -1551,7 +1551,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
-  rewrite ε_square; [ | easy | now destruct Hpμ ].
+  rewrite ε_square; [ | easy | now destruct Hpμ as ((_, H), _) ].
   rewrite rngl_mul_1_l.
   easy.
 }
