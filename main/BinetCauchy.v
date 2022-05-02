@@ -2294,6 +2294,58 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
+(* to be completed, if any
+(* perhaps, this attempt of a proof does not require the
+   Binet Cauchy formula! by using det'' as a definition *)
+(* not sure *)
+Theorem det_mul : in_charac_0_field →
+  ∀ n A B,
+  is_square_matrix A = true
+  → is_square_matrix B = true
+  → mat_nrows A = n
+  → mat_nrows B = n
+  → det (A * B) = (det A * det B)%F.
+Proof.
+intros Hif * Hsa Hsb Hra Hrb.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in Hra, Hrb.
+  apply length_zero_iff_nil in Hra; subst lla.
+  apply length_zero_iff_nil in Hrb; subst llb; cbn.
+  symmetry; apply rngl_mul_1_l.
+}
+assert (Hab : is_square_matrix (A * B) = true). {
+  apply is_scm_mat_iff.
+  rewrite mat_mul_ncols; [ | congruence ].
+  rewrite mat_mul_nrows.
+  rewrite square_matrix_ncols; [ | easy ].
+  rewrite Hra, Hrb.
+  split; [ easy | ].
+  intros l Hl.
+  apply In_nth with (d := []) in Hl.
+  destruct Hl as (p & Hp & Hl).
+  rewrite <- Hl; cbn.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite seq_length.
+    cbn in Hp.
+    now rewrite List_map_seq_length in Hp.
+  }
+  rewrite List_map_seq_length.
+  now rewrite square_matrix_ncols.
+}
+rewrite det_is_det_by_canon_permut; try now destruct Hif.
+rewrite det_is_det_by_canon_permut; try now destruct Hif.
+rewrite det_is_det_by_canon_permut; try now destruct Hif.
+rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+unfold det''.
+rewrite mat_mul_nrows, Hra, Hrb.
+...
+*)
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
