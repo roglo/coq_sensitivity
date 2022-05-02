@@ -142,7 +142,6 @@ cbn.
 *)
 
 (* to be completed
-Check ListDec.In_dec.
 Theorem rngl_summation_incl : ∀ A eqd la lb (f : A → T),
   la ⊂ lb
   → ∑ (a ∈ la), f a =
