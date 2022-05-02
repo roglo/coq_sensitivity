@@ -119,36 +119,15 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 *)
 
-(*
-Theorem rngl_summation_incl : ∀ A (eqb : A → _) (Heqb : equality eqb) E F,
-  E ⊂ F
-  → ∀ f,
-    ∑ (e ∈ F), f e =
-    (∑ (e ∈ E), f e + ∑ (e ∈ set_minus eqb F E), f e)%F.
-Proof.
-intros * Heqb * HEF *.
-rewrite <- rngl_summation_list_app.
-apply rngl_summation_list_permut.
-apply (Permutation_permutation Heqb).
-unfold set_incl in HEF.
-...
-destruct F as [| b lb]. {
-  cbn; rewrite app_nil_r.
-  destruct E as [| a la]; [ apply permutation_nil_nil | ].
-  now specialize (HEF a (or_introl eq_refl)).
-}
-cbn.
-...
-*)
-
 (* to be completed
 Theorem rngl_summation_list_incl : ∀ A eqd la lb (f : A → T),
-  la ⊂ lb
+  NoDup la
+  → la ⊂ lb
   → ∑ (a ∈ la), f a =
     ∑ (a ∈ lb), if ListDec.In_dec eqd a la then f a else 0.
 Proof.
-intros * Hlab.
-revert lb Hlab.
+intros * Hnd Hlab.
+revert lb Hnd Hlab.
 induction la as [| a]; intros. {
   cbn.
   rewrite rngl_summation_list_empty; [ | easy ].
@@ -156,7 +135,10 @@ induction la as [| a]; intros. {
   now apply all_0_rngl_summation_list_0.
 }
 rewrite rngl_summation_list_cons.
-rewrite IHla with (lb := lb). 2: {
+specialize (NoDup_remove [] la a Hnd) as H1.
+cbn in H1.
+destruct H1 as (Hnd1, Hala).
+rewrite IHla with (lb := lb); [ | easy | ]. 2: {
   intros i j.
   unfold set_incl in Hlab.
   now apply Hlab; right.
