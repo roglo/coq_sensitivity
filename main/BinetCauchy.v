@@ -2294,10 +2294,13 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
-(* to be completed, if any
+(*
 (* perhaps, this attempt of a proof does not require the
    Binet Cauchy formula! by using det'' as a definition *)
 (* not sure *)
+(* bon, apparemment, sur papier, ça ne marche pas avec des matrices 2x2
+   il y a des termes avec ε=0 qui apparaissent et, inversement des termes
+   qui s'annulent *)
 Theorem det_mul : in_charac_0_field →
   ∀ n A B,
   is_square_matrix A = true
@@ -2307,6 +2310,8 @@ Theorem det_mul : in_charac_0_field →
   → det (A * B) = (det A * det B)%F.
 Proof.
 intros Hif * Hsa Hsb Hra Hrb.
+Print det''.
+Compute (to_radix_list 2).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   destruct A as (lla).
@@ -2497,35 +2502,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-...
-unfold det'.
-rewrite mat_mul_nrows, Har.
-unfold "*"%M at 1.
-rewrite Har, Hbc.
-cbn - [ det ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    specialize (fact_neq_0 m) as Hm.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      apply canon_sym_gr_list_ub; [ flia Hi Hm | flia Hj ].
-    }
-    unfold ff_app.
-    rewrite seq_nth; [ | flia Hj ].
-    rewrite seq_nth. 2: {
-      apply canon_sym_gr_list_ub; [ flia Hi Hm | flia Hj ].
-    }
-    rewrite Nat.add_0_l.
-    unfold mat_mul_el.
-    rewrite Hac, Nat.add_0_l.
-    easy.
-  }
-  easy.
-}
-cbn - [ det ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite rngl_product_shift with (s := 1). 2: {
@@ -2540,7 +2516,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     easy.
   }
-  cbn - [ det ].
+  cbn.
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1.
@@ -2553,8 +2529,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ det Nat.pow "mod" "/" ].
-Check rngl_product_summation_distr.
+cbn - [ det ].
 ...
   rewrite (det_with_rows B s Hcb Hbr Hbc Hmz Hs).
 ...
