@@ -2504,6 +2504,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ det ].
 Search (∏ (_ = _, _), (∑ (_ = _, _), _) = _).
 (*
+rngl_product_summation_distr:
           ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
           ∑ (k = 0, S n ^ S m - 1), ∏ (i = 0, m), f i ((k / S n ^ (m - i)) mod S n)
 *)
@@ -2530,6 +2531,13 @@ Compute (
 (* "to_radix_loop u r i", c'est les u derniers chiffres du nombre i en base r *)
 Compute (to_radix_loop 6 2 24).
 Print to_radix_loop.
+Theorem rngl_product_summation_distr' :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ (m n : nat) (f : nat → nat → T),
+  ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
+  ∑ (k = 0, S n ^ S m - 1), ∏ (i = 0, m),
+  f i (ff_app (to_radix_loop (S m) (S n) k) (m - i)).
+(* boh, chais pas si ça sert à quelque chose... *)
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
