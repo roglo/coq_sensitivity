@@ -142,12 +142,25 @@ cbn.
 *)
 
 (* to be completed
-Theorem rngl_summation_incl : ∀ A eqd la lb (f : A → T),
+Theorem rngl_summation_list_incl : ∀ A eqd la lb (f : A → T),
   la ⊂ lb
   → ∑ (a ∈ la), f a =
     ∑ (a ∈ lb), if ListDec.In_dec eqd a la then f a else 0.
 Proof.
 intros * Hlab.
+revert lb Hlab.
+induction la as [| a]; intros. {
+  cbn.
+  rewrite rngl_summation_list_empty; [ | easy ].
+  symmetry.
+  now apply all_0_rngl_summation_list_0.
+}
+rewrite rngl_summation_list_cons.
+rewrite IHla with (lb := lb). 2: {
+  intros i j.
+  unfold set_incl in Hlab.
+  now apply Hlab; right.
+}
 ...
 
 Theorem det''_is_det' :
@@ -295,7 +308,7 @@ assert (H :
 }
 rewrite H.
 ...
-apply rngl_summation_incl.
+apply rngl_summation_list_incl.
 ...
 Search (_ ∈ canon_sym_gr_list_list _).
 Search canon_sym_gr_list_list.
