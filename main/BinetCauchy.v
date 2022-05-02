@@ -2343,6 +2343,31 @@ rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
 rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
 unfold det''.
 rewrite mat_mul_nrows, Hra, Hrb.
+unfold "*"%M at 1.
+cbn - [ det ].
+rewrite square_matrix_ncols; [ | easy ].
+rewrite Hra, Hrb.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      now apply to_radix_ub.
+    }
+    unfold ff_app.
+    rewrite seq_nth; [ | flia Hj ].
+    rewrite seq_nth; [ | now apply to_radix_ub ].
+    do 2 rewrite Nat.add_0_l.
+    unfold mat_mul_el.
+    rewrite square_matrix_ncols; [ | easy ].
+    rewrite Hra.
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
 ...
 *)
 
