@@ -2502,6 +2502,34 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+Search (∏ (_ = _, _), (∑ (_ = _, _), _) = _).
+(*
+          ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
+          ∑ (k = 0, S n ^ S m - 1), ∏ (i = 0, m), f i ((k / S n ^ (m - i)) mod S n)
+*)
+Print to_radix_list.
+Compute (let n := 3 in let m := 2 in map (to_radix n) (seq 0 (m ^ n))).
+Compute (let n := 3 in let m := 2 in let k := 2 in map (λ i, ((k / S n) ^ (m - i)) mod S n) (seq 0 m)).
+Compute (
+let n := 1 in let m := 2 in
+map (λ i, map (λ j, (i, j)) (seq 0 (S n))) (seq 0 (S m))
+).
+Compute (
+let n := 1 in let m := 2 in
+map (λ k, map (λ i, (i, (k / S n ^ (m - i)) mod S n)) (seq 0 (S m))) (seq 0 (S n ^ S m))
+).
+Compute (
+let n := 1 in let m := 2 in
+map (λ k, map (λ i, (i, ff_app (to_radix_loop (S m) (S n) k) (m - i))) (seq 0 (S m))) (seq 0 (S n ^ S m))
+).
+Compute (
+  let n := 4 in let m := 2 in
+  map (to_radix_loop (S m) (S n)) (seq 0 (S n ^ S m))
+).
+(* j'affiche tous les nombres de 0 à (n+1)^(m+1)-1 en base n+1 *)
+(* "to_radix_loop u r i", c'est les u derniers chiffres du nombre i en base r *)
+Compute (to_radix_loop 6 2 24).
+Print to_radix_loop.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).

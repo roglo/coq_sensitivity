@@ -2197,24 +2197,24 @@ induction Hl; intros; [ easy | | | ]. {
 }
 Qed.
 
-(* conversion natural into radix n as a list of digits; i must be
-   less than n^n; always return n digits; e.g. radix 10 37 =
-   7; 3; 0 ... (eight 0s) *)
-
-Fixpoint to_radix_loop it n i :=
+(* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
+Fixpoint to_radix_loop it r i :=
   match it with
   | 0 => []
-  | S it' => i mod n :: to_radix_loop it' n (i / n)
+  | S it' => i mod r :: to_radix_loop it' r (i / r)
   end.
 
-Definition to_radix n i := to_radix_loop n n i.
+(* conversion natural into radix r as a list of digits; i must be
+   less than r^r; always return r digits; e.g. radix 10 37 =
+   7; 3; 0 ... (eight 0s) *)
+Definition to_radix r i := to_radix_loop r r i.
 
-Definition to_radix_list n := map (to_radix n) (seq 0 (n ^ n)).
+Definition to_radix_list r := map (to_radix r) (seq 0 (r ^ r)).
 
-Fixpoint to_radix_inv n l :=
+Fixpoint to_radix_inv r l :=
   match l with
   | [] => 0
-  | d :: l' => d + n * to_radix_inv n l'
+  | d :: l' => d + r * to_radix_inv r l'
   end.
 
 Theorem to_radix_loop_ub : ∀ it n k i,
