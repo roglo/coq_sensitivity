@@ -103,6 +103,8 @@ Definition det'' (M : matrix T) :=
     ε (to_radix n k) *
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (to_radix n k) (i - 1)).
 
+Arguments det'' M%M.
+
 (*
 End a.
 Arguments det {T ro} M%M.
@@ -1656,7 +1658,9 @@ End a.
 
 Arguments det {T ro} M%M.
 Arguments det' {T}%type {ro} M%M.
+Arguments det'' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
+Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.

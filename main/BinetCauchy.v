@@ -4832,6 +4832,35 @@ assert (Hab : is_square_matrix (A * B) = true). {
 }
 (*1*)
 rewrite det_is_det_by_canon_permut; try now destruct Hif.
+(**)
+rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+unfold det''.
+rewrite mat_mul_nrows, Har.
+unfold "*"%M at 1.
+rewrite Har, Hbc.
+cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    specialize (fact_neq_0 m) as Hm.
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      now apply to_radix_ub.
+    }
+    unfold ff_app.
+    rewrite seq_nth; [ | flia Hj ].
+    rewrite seq_nth; [ | now apply to_radix_ub ].
+    do 2 rewrite Nat.add_0_l.
+    unfold mat_mul_el.
+    rewrite Hac.
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+...
 unfold det'.
 rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
