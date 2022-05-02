@@ -142,6 +142,15 @@ cbn.
 *)
 
 (* to be completed
+Check ListDec.In_dec.
+Theorem rngl_summation_incl : ∀ A eqd la lb (f : A → T),
+  la ⊂ lb
+  → ∑ (a ∈ la), f a =
+    ∑ (a ∈ lb), if ListDec.In_dec eqd a la then f a else 0.
+Proof.
+intros * Hlab.
+...
+
 Theorem det''_is_det' :
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
@@ -286,6 +295,8 @@ assert (H :
   now apply rngl_mul_0_l; left.
 }
 rewrite H.
+...
+apply rngl_summation_incl.
 ...
 Search (_ ∈ canon_sym_gr_list_list _).
 Search canon_sym_gr_list_list.
