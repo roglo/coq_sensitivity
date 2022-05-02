@@ -2569,6 +2569,40 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+    rewrite <- rngl_mul_assoc.
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+rewrite rngl_summation_summation_exch'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+  easy.
+}
+cbn - [ det ].
+...
+Search (∑ (_ = _, _), ∑ (_ = _, _), _).
+rngl_summation_summation_exch:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (g : nat → nat → T) (k : nat),
+        ∑ (j = 0, k), (∑ (i = 0, j), g i j) =
+        ∑ (i = 0, k), (∑ (j = i, k), g i j)
+rngl_summation_summation_exch':
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (g : nat → nat → T) (k l : nat),
+        ∑ (j = 0, k), (∑ (i = 0, l), g i j) =
+        ∑ (i = 0, l), (∑ (j = 0, k), g i j)
 ...
   rewrite (det_with_rows B s Hcb Hbr Hbc Hmz Hs).
 ...
