@@ -2502,6 +2502,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+(*
 Search (∏ (_ = _, _), (∑ (_ = _, _), _) = _).
 (*
 rngl_product_summation_distr:
@@ -2539,6 +2540,7 @@ Theorem rngl_product_summation_distr' :
   f i (ff_app (to_radix_loop (S m) (S n) k) (m - i)).
 (* boh, chais pas si ça sert à quelque chose... *)
 ...
+*)
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite rngl_product_shift with (s := 1). 2: {
