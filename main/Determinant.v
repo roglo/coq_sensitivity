@@ -142,9 +142,12 @@ cbn.
 *)
 
 (* to be completed
-Theorem det''_is_det' : ∀ (M : matrix T), det' M = det'' M.
+Theorem det''_is_det' :
+  rngl_has_opp = true →
+  rngl_has_dec_eq = true →
+  ∀ (M : matrix T), det' M = det'' M.
 Proof.
-intros.
+intros Hop Hde *.
 (*
 Compute (let n := 4 in map (to_radix n) (seq 0 (n ^ n))).
 Print is_permut_list_bool.
@@ -245,6 +248,52 @@ assert (H :
   ∑ (l ∈ to_radix_list n),
   ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1)) =
   ∑ (l ∈ to_radix_list n),
+  if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
+    ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1))
+  else 0). {
+  apply rngl_summation_list_eq_compat.
+  intros l Hl.
+  destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
+  assert (H : ε l = 0%F). {
+    apply ε_when_dup; [ easy | easy | ].
+    intros Hnd.
+    apply H1; clear H1.
+    apply in_map_iff.
+    apply in_map_iff in Hl.
+    destruct Hl as (i & Hil & Hi).
+    exists (canon_sym_gr_list_inv n l).
+    assert (Hp : is_permut n l). {
+      unfold is_permut.
+      split; [ split | ]; [ | easy | ]. 2: {
+        rewrite <- Hil.
+        apply to_radix_length.
+      }
+      intros j Hj.
+      rewrite <- Hil in Hj |-*.
+      apply (In_nth _ _ 0) in Hj.
+      destruct Hj as (k & Hki & Hij).
+      rewrite to_radix_length.
+      subst j.
+      now apply to_radix_ub.
+    }
+    split; [ now apply canon_sym_gr_list_canon_sym_gr_list_inv | ].
+    apply in_seq.
+    split; [ easy | ].
+    rewrite Nat.add_0_l.
+    now apply canon_sym_gr_list_inv_ub.
+  }
+  rewrite H.
+  now apply rngl_mul_0_l; left.
+}
+rewrite H.
+...
+Search (_ ∈ canon_sym_gr_list_list _).
+Search canon_sym_gr_list_list.
+...
+assert (H :
+  ∑ (l ∈ to_radix_list n),
+  ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1)) =
+  ∑ (l ∈ to_radix_list n),
   if member (list_eqb Nat.eqb) l (canon_sym_gr_list_list n) then
     ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1))
   else 0). {
@@ -256,12 +305,12 @@ assert (H :
     apply ε_when_dup; cycle 2.
     intros Hnd.
     clear - Hb Hnd.
+Check in_dec.
 ...
 Check in_dec.
 ...
 Check NoDup_ε_1_opp_1.
 About ε_1_opp_1_NoDup.
-
 Search ε.
 Search canon_sym_gr_list.
   specialize ε_1_opp_1 as H1.
