@@ -2502,6 +2502,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite rngl_product_shift with (s := 1). 2: {
