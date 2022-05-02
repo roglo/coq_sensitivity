@@ -2381,7 +2381,34 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ det ].
+cbn.
+rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+  easy.
+}
+cbn.
+symmetry.
+apply rngl_summation_eq_compat.
+intros i (_, Hi).
+rewrite <- rngl_mul_assoc; f_equal.
+rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+...
+apply rngl_summation_eq_compat.
+intros j (_, Hj).
+symmetry.
+rewrite (rngl_product_shift 1); [ | flia Hnz ].
+rewrite Nat.sub_diag.
+...
+rewrite rngl_mul_assoc.
+rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+rewrite (rngl_product_shift 1 1); [ | flia Hnz ].
+rewrite Nat.sub_diag.
+rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
+...
+Search ((∏ (_ = _, _), _) * ∏ (_ = _, _), _)%F.
 ...
 *)
 
