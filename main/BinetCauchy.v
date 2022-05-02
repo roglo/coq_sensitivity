@@ -2365,6 +2365,20 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite Hra.
     easy.
   }
+  cbn.
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
+  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+  rewrite Nat_sub_succ_1.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    erewrite rngl_product_eq_compat. 2: {
+      intros k Hk.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    easy.
+  }
   easy.
 }
 cbn - [ det ].
