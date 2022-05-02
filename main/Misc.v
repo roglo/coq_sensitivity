@@ -2348,6 +2348,19 @@ specialize (H2 H); clear H.
 now apply Nat_lt_lt_add_mul.
 Qed.
 
+Theorem to_radix_inj : ∀ n i j,
+  i < n ^ n
+  → j < n ^ n
+  → to_radix n i = to_radix n j
+  → i = j.
+Proof.
+intros * Hi Hj Hij.
+apply (f_equal (to_radix_inv n)) in Hij.
+rewrite to_radix_inv_to_radix in Hij; [ | easy ].
+rewrite to_radix_inv_to_radix in Hij; [ | easy ].
+easy.
+Qed.
+
 (* *)
 
 Theorem cons_app_repeat : ∀ A (a : A) la,

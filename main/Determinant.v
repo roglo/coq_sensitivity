@@ -17,12 +17,10 @@ Fixpoint member {A} (eqb : A → A → bool) a l :=
   | b :: l' => if eqb a b then true else member eqb a l'
   end.
 
-Definition set_incl {A} (E F : list A) :=
-  ∀ a, a ∈ E → a ∈ F.
 Definition set_minus {A} (eqb : A → _) E F :=
   filter (λ e, negb (member eqb e F)) E.
 
-Notation "E ⊂ F" := (set_incl E F) (at level 70).
+Notation "E ⊂ F" := (incl E F) (at level 70).
 
 Section a.
 
@@ -119,44 +117,195 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 *)
 
-(* to be completed
 Theorem rngl_summation_list_incl : ∀ A eqd la lb (f : A → T),
   NoDup la
+  → NoDup lb
   → la ⊂ lb
   → ∑ (a ∈ la), f a =
     ∑ (a ∈ lb), if ListDec.In_dec eqd a la then f a else 0.
 Proof.
-intros * Hnd Hlab.
-revert lb Hnd Hlab.
-induction la as [| a]; intros. {
+intros * Hnda Hndb Hlab.
+induction la as [| a]. {
   cbn.
   rewrite rngl_summation_list_empty; [ | easy ].
   symmetry.
   now apply all_0_rngl_summation_list_0.
 }
 rewrite rngl_summation_list_cons.
-specialize (NoDup_remove [] la a Hnd) as H1.
+specialize (NoDup_remove [] la a Hnda) as H1.
 cbn in H1.
 destruct H1 as (Hnd1, Hala).
-rewrite IHla with (lb := lb); [ | easy | ]. 2: {
-  intros i j.
-  unfold set_incl in Hlab.
-  now apply Hlab; right.
+specialize (IHla Hnd1).
+rewrite IHla; [ | now intros i Hi; apply Hlab; right ].
+assert (Ha : a ∈ lb) by now apply Hlab; left.
+apply In_split in Ha.
+destruct Ha as (lb1 & lb2 & Hlb); rewrite Hlb.
+do 2 rewrite rngl_summation_list_app.
+do 2 rewrite rngl_summation_list_cons.
+destruct (ListDec.In_dec eqd a la) as [H| H]; [ easy | clear H ].
+rewrite rngl_add_0_l.
+destruct (ListDec.In_dec eqd a (a :: la)) as [H| H]; [ clear H | ]. 2: {
+  now exfalso; apply H; left.
 }
-...
+symmetry; rewrite rngl_add_comm, rngl_add_assoc.
+rewrite rngl_add_add_swap.
+f_equal; [ f_equal | ]. {
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  destruct (ListDec.In_dec eqd i (a :: la)) as [H1| H1]. {
+    destruct (ListDec.In_dec eqd i la) as [H| H]; [ easy | ].
+    destruct H1 as [H1| H1]; [ clear H | easy ].
+    subst i.
+    rewrite Hlb in Hndb.
+    apply NoDup_remove_2 in Hndb.
+    exfalso; apply Hndb.
+    now apply in_or_app; left.
+  }
+  destruct (ListDec.In_dec eqd i la) as [H2| H2]; [ | easy ].
+  now exfalso; apply H1; right.
+} {
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  destruct (ListDec.In_dec eqd i (a :: la)) as [H1| H1]. {
+    destruct (ListDec.In_dec eqd i la) as [H| H]; [ easy | ].
+    destruct H1 as [H1| H1]; [ clear H | easy ].
+    subst i.
+    rewrite Hlb in Hndb.
+    apply NoDup_remove_2 in Hndb.
+    exfalso; apply Hndb.
+    now apply in_or_app; right.
+  }
+  destruct (ListDec.In_dec eqd i la) as [H2| H2]; [ | easy ].
+  now exfalso; apply H1; right.
+}
+Qed.
 
-Theorem det''_is_det' :
+(* det and det' are equal *)
+
+Theorem det_is_det_by_canon_permut :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → det M = det' M.
+Proof.
+intros Hic Hop Hin H10 * Hm.
+unfold det'.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+unfold det.
+rewrite Hr.
+revert M Hm Hr.
+induction n; intros. {
+  cbn.
+  rewrite rngl_summation_only_one.
+  unfold ε, iter_seq, iter_list; cbn.
+  now do 3 rewrite rngl_mul_1_l.
+}
+rewrite determinant_succ.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_product_only_one; cbn.
+  unfold ε.
+  do 2 rewrite rngl_product_only_one; cbn.
+  now rewrite rngl_mul_1_r.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite IHn; cycle 1. {
+    apply is_squ_mat_subm; [ now rewrite Hr | rewrite Hr; flia Hi | easy ].
+  } {
+    rewrite mat_nrows_subm, Hr; cbn.
+    apply Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ canon_sym_gr_list fact nth ].
+clear IHn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  easy.
+}
+cbn - [ canon_sym_gr_list fact nth ].
+rewrite rngl_summation_summation_distr.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat_sub_succ_1.
+rewrite <- Nat_fact_succ.
+apply rngl_summation_eq_compat.
+intros k Hk.
+(* elimination of "mat_el M 0 (k / (n!)" *)
+symmetry.
+rewrite rngl_product_split_first; [ | flia ].
+rewrite Nat.sub_diag.
+cbn [ canon_sym_gr_list nth ].
+remember (mat_el M 0 _) as x eqn:Hx.
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(* elimination done *)
+(* separation factors "∏" and "ε" *)
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal. {
+  (* equality of the two "∏" *)
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite (rngl_product_shift 2 2); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite Nat.sub_succ.
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  rewrite Nat.add_comm, Nat.add_sub.
+  replace (2 + i - 1) with (S i) by flia.
+  unfold mat_el.
+  unfold ff_app.
+  cbn - [ subm fact ].
+  rewrite (List_map_nth' 0); [ | rewrite canon_sym_gr_list_length; flia Hi Hnz ].
+  cbn - [ butn ].
+  rewrite (List_map_nth' []). 2: {
+    apply is_scm_mat_iff in Hm.
+    destruct Hm as (Hcr & Hc).
+    rewrite butn_length, fold_mat_nrows, Hr.
+    cbn; flia Hi Hnz.
+  }
+  unfold succ_when_ge, Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (k / n!) _) as [H1| H1]. {
+    rewrite nth_butn_before; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite (Nat.add_1_r i).
+  } {
+    apply Nat.nle_gt in H1.
+    rewrite Nat.add_0_r.
+    rewrite nth_butn_after; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite Nat.add_1_r.
+  }
+  (* end proof equality of the two "∏" *)
+}
+(* equality of the two "ε" *)
+symmetry.
+apply ε_of_sym_gr_permut_succ; try easy.
+apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
+apply Nat.sub_lt; [ | easy ].
+apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
+Qed.
+
+(* det' and det'' are equal *)
+
+Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_dec_eq = true →
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop Hde *.
-(*
-Compute (let n := 4 in map (to_radix n) (seq 0 (n ^ n))).
-Print is_permut_list_bool.
-Compute (let n := 4 in filter is_permut_list_bool (map (@rev nat) (map (to_radix n) (seq 0 (n ^ n))))).
-Print canon_sym_gr_list.
-*)
 unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
@@ -289,160 +438,30 @@ assert (H :
   now apply rngl_mul_0_l; left.
 }
 rewrite H.
-...
-apply rngl_summation_list_incl.
-...
-Search (_ ∈ canon_sym_gr_list_list _).
-Search canon_sym_gr_list_list.
-...
-assert (H :
-  ∑ (l ∈ to_radix_list n),
-  ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1)) =
-  ∑ (l ∈ to_radix_list n),
-  if member (list_eqb Nat.eqb) l (canon_sym_gr_list_list n) then
-    ε l * ∏ (j = 1, n), mat_el M (j - 1) (ff_app l (j - 1))
-  else 0). {
-  apply rngl_summation_list_eq_compat.
-  intros l Hl.
-  remember (member _ _ _) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ easy | ].
-  assert (H : ε l = 0%F). {
-    apply ε_when_dup; cycle 2.
-    intros Hnd.
-    clear - Hb Hnd.
-Check in_dec.
-...
-Check in_dec.
-...
-Check NoDup_ε_1_opp_1.
-About ε_1_opp_1_NoDup.
-Search ε.
-Search canon_sym_gr_list.
-  specialize ε_1_opp_1 as H1.
-...
-*)
-
-(* det and det' are equal *)
-
-Theorem det_is_det_by_canon_permut :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  ∀ (M : matrix T),
-  is_square_matrix M = true
-  → det M = det' M.
-Proof.
-intros Hic Hop Hin H10 * Hm.
-unfold det'.
-remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-unfold det.
-rewrite Hr.
-revert M Hm Hr.
-induction n; intros. {
-  cbn.
-  rewrite rngl_summation_only_one.
-  unfold ε, iter_seq, iter_list; cbn.
-  now do 3 rewrite rngl_mul_1_l.
+apply rngl_summation_list_incl; [ | | easy ]. {
+  unfold canon_sym_gr_list_list.
+  apply (NoDup_map_iff 0).
+  rewrite seq_length.
+  intros * Hi Hj Hij.
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  cbn in Hij.
+  now apply (canon_sym_gr_list_inj n).
+} {
+  unfold to_radix_list.
+  apply (NoDup_map_iff 0).
+  rewrite seq_length.
+  intros * Hi Hj Hij.
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  cbn in Hij.
+  now apply (to_radix_inj n).
 }
-rewrite determinant_succ.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n; cbn.
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_product_only_one; cbn.
-  unfold ε.
-  do 2 rewrite rngl_product_only_one; cbn.
-  now rewrite rngl_mul_1_r.
-}
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite IHn; cycle 1. {
-    apply is_squ_mat_subm; [ now rewrite Hr | rewrite Hr; flia Hi | easy ].
-  } {
-    rewrite mat_nrows_subm, Hr; cbn.
-    apply Nat.sub_0_r.
-  }
-  easy.
-}
-cbn - [ canon_sym_gr_list fact nth ].
-clear IHn.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | now left ].
-  easy.
-}
-cbn - [ canon_sym_gr_list fact nth ].
-rewrite rngl_summation_summation_distr.
-rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
-rewrite Nat_sub_succ_1.
-rewrite <- Nat_fact_succ.
-apply rngl_summation_eq_compat.
-intros k Hk.
-(* elimination of "mat_el M 0 (k / (n!)" *)
-symmetry.
-rewrite rngl_product_split_first; [ | flia ].
-rewrite Nat.sub_diag.
-cbn [ canon_sym_gr_list nth ].
-remember (mat_el M 0 _) as x eqn:Hx.
-rewrite rngl_mul_comm; [ | easy ].
-symmetry.
-rewrite <- rngl_mul_assoc.
-rewrite rngl_mul_comm; [ | easy ].
-do 3 rewrite <- rngl_mul_assoc.
-f_equal.
-(* elimination done *)
-(* separation factors "∏" and "ε" *)
-rewrite rngl_mul_comm; [ | easy ].
-rewrite <- rngl_mul_assoc.
-f_equal. {
-  (* equality of the two "∏" *)
-  rewrite (rngl_product_shift 1); [ | flia Hnz ].
-  rewrite Nat.sub_diag.
-  rewrite (rngl_product_shift 2 2); [ | flia Hnz ].
-  rewrite Nat.sub_diag.
-  rewrite Nat.sub_succ.
-  apply rngl_product_eq_compat.
-  intros i Hi.
-  rewrite Nat.add_comm, Nat.add_sub.
-  replace (2 + i - 1) with (S i) by flia.
-  unfold mat_el.
-  unfold ff_app.
-  cbn - [ subm fact ].
-  rewrite (List_map_nth' 0); [ | rewrite canon_sym_gr_list_length; flia Hi Hnz ].
-  cbn - [ butn ].
-  rewrite (List_map_nth' []). 2: {
-    apply is_scm_mat_iff in Hm.
-    destruct Hm as (Hcr & Hc).
-    rewrite butn_length, fold_mat_nrows, Hr.
-    cbn; flia Hi Hnz.
-  }
-  unfold succ_when_ge, Nat.b2n.
-  rewrite if_leb_le_dec.
-  destruct (le_dec (k / n!) _) as [H1| H1]. {
-    rewrite nth_butn_before; [ | easy ].
-    rewrite nth_butn_before; [ | easy ].
-    now rewrite (Nat.add_1_r i).
-  } {
-    apply Nat.nle_gt in H1.
-    rewrite Nat.add_0_r.
-    rewrite nth_butn_after; [ | easy ].
-    rewrite nth_butn_before; [ | easy ].
-    now rewrite Nat.add_1_r.
-  }
-  (* end proof equality of the two "∏" *)
-}
-(* equality of the two "ε" *)
-symmetry.
-apply ε_of_sym_gr_permut_succ; try easy.
-apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
-apply Nat.sub_lt; [ | easy ].
-apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
 (* multilinearity *)
 
-(* to be completed
+(* to be completed if not too complicated
 Theorem determinant_multilinear_glop :
   rngl_is_comm = true →
   rngl_has_opp = true →
