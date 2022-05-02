@@ -2589,6 +2589,20 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    erewrite rngl_product_eq_compat. 2: {
+      intros k Hk.
+      now rewrite fold_ff_app.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+Print det''.
 ...
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 rngl_summation_summation_exch:
