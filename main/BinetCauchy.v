@@ -2636,6 +2636,53 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  remember (mat_select_rows (rev (to_radix_loop m n i)) B) as B' eqn:HB'.
+  replace (∑ (i0 = 0, m ^ m - 1), _) with (det'' B'). 2: {
+    unfold det''.
+    rewrite HB'.
+    rewrite mat_select_rows_nrows.
+    rewrite rev_length.
+    rewrite to_radix_loop_length.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
+    f_equal.
+    rewrite (rngl_product_shift 1); [ | flia Hmz ].
+    rewrite Nat.sub_diag.
+    apply rngl_product_eq_compat.
+    intros k Hk.
+    rewrite Nat.add_comm, Nat.add_sub.
+    unfold mat_select_rows.
+    unfold list_list_select_rows.
+    cbn.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite rev_length, to_radix_loop_length.
+      flia Hk Hmz.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      rewrite fold_mat_ncols, Hbc.
+      unfold ff_app.
+      now apply to_radix_ub.
+    }
+    rewrite fold_mat_ncols, Hbc.
+    rewrite seq_nth; [ | now apply to_radix_ub ].
+    rewrite Nat.add_0_l.
+    rewrite fold_mat_el.
+    f_equal.
+    unfold ff_app.
+    rewrite rev_nth. 2: {
+      rewrite to_radix_loop_length; flia Hk Hmz.
+    }
+    now rewrite to_radix_loop_length.
+  }
+  subst B'.
+  easy.
+}
+cbn - [ det ].
+Print sub_lists_of_seq_0_n.
+Compute (sub_lists_of_seq_0_n 5 3).
 ...
 Compute (
 let r := 3 in let m := 4 in
