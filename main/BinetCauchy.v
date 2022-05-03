@@ -2681,6 +2681,22 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite <- Nat.sub_add_distr.
+    rewrite div_pow_mod_to_radix_loop; [ | flia Hj Hmz | ]. 2: {
+      specialize (Nat.pow_nonzero n m Hnz) as H1.
+      flia Hi H1.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+Print det''.
+...
 Print sub_lists_of_seq_0_n.
 Compute (sub_lists_of_seq_0_n 5 3).
 ...
