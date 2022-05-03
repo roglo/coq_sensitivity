@@ -2603,6 +2603,31 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ det ].
 Print det''.
+Print to_radix_loop.
+Theorem glop : ∀ r m i k,
+  i < m
+  → k < r ^ m
+  → (k / r ^ (m - S i)) mod r = ff_app (to_radix_loop m r k) (m - S i).
+Proof.
+intros * Him Hkrm.
+revert r i k Him Hkrm.
+induction m; intros; [ easy | ].
+destruct i. {
+  cbn; rewrite Nat.sub_0_r.
+  destruct m. {
+    cbn - [ "/" ].
+    now rewrite Nat.div_1_r.
+  }
+  rewrite fold_ff_app.
+...
+Compute (
+let n := 1 in let m := 2 in
+map (λ k, map (λ i, (i, (k / S n ^ (m - i)) mod S n)) (seq 0 (S m))) (seq 0 (S n ^ S m))
+).
+Compute (
+let n := 1 in let m := 2 in
+map (λ k, map (λ i, (i, ff_app (to_radix_loop (S m) (S n) k) (m - i))) (seq 0 (S m))) (seq 0 (S n ^ S m))
+).
 ...
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 rngl_summation_summation_exch:
