@@ -2417,6 +2417,34 @@ Search ((∏ (_ = _, _), _) * ∏ (_ = _, _), _)%F.
 ...
 *)
 
+Theorem div_pow_mod_to_radix_loop : ∀ r m i k,
+  i < m
+  → k < r ^ m
+  → (k / r ^ (m - S i)) mod r = ff_app (to_radix_loop m r k) (m - S i).
+Proof.
+intros * Him Hkrm.
+destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
+  subst r.
+  rewrite Nat.pow_0_l in Hkrm; [ easy | flia Him ].
+}
+remember (m - S i) as n eqn:Hn.
+replace m with (S (n + i)) in Hkrm |-* by flia Hn Him.
+clear m Him Hn.
+revert k Hkrm.
+induction n; intros. {
+  cbn - [ "/" ].
+  now rewrite Nat.div_1_r.
+}
+remember (S n + i) as m; cbn; subst m.
+rewrite fold_ff_app.
+rewrite Nat.add_succ_l.
+rewrite <- IHn. {
+  rewrite Nat.div_div; [ easy | easy | ].
+  now apply Nat.pow_nonzero.
+}
+now apply Nat.div_lt_upper_bound.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -2595,31 +2623,28 @@ erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     erewrite rngl_product_eq_compat. 2: {
       intros k Hk.
-      now rewrite fold_ff_app.
+      rewrite fold_ff_app.
+      rewrite <- Nat.sub_add_distr.
+      rewrite div_pow_mod_to_radix_loop; [ | flia Hk Hmz | ]. 2: {
+        specialize (Nat.pow_nonzero n m Hnz) as H1.
+        flia Hi H1.
+      }
+      easy.
     }
     easy.
   }
   easy.
 }
 cbn - [ det ].
-Print det''.
-Print to_radix_loop.
-Theorem glop : ∀ r m i k,
-  i < m
-  → k < r ^ m
-  → (k / r ^ (m - S i)) mod r = ff_app (to_radix_loop m r k) (m - S i).
-Proof.
-intros * Him Hkrm.
-revert r i k Him Hkrm.
-induction m; intros; [ easy | ].
-destruct i. {
-  cbn; rewrite Nat.sub_0_r.
-  destruct m. {
-    cbn - [ "/" ].
-    now rewrite Nat.div_1_r.
-  }
-  rewrite fold_ff_app.
 ...
+Compute (
+let r := 3 in let m := 4 in
+map (λ i,
+map (λ k,
+  (k / r ^ (m - S i)) mod r = ff_app (to_radix_loop m r k) (m - S i))
+(seq 0 (r ^ m)))
+  (seq 0 m)
+).
 Compute (
 let n := 1 in let m := 2 in
 map (λ k, map (λ i, (i, (k / S n ^ (m - i)) mod S n)) (seq 0 (S m))) (seq 0 (S n ^ S m))
