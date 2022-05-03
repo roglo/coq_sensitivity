@@ -2695,7 +2695,6 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-Print det''.
 ...
 Print sub_lists_of_seq_0_n.
 Compute (sub_lists_of_seq_0_n 5 3).
