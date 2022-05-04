@@ -2695,6 +2695,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+About Permutation_isort.
 Print mat_select_rows.
 Theorem glop : ∀ A kl,
   det'' (mat_select_rows kl A) = det'' (mat_select_rows (isort Nat.leb kl) A).
@@ -2702,10 +2703,41 @@ Admitted.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite glop.
+Search isort.
+...
+Search (isort _ (rev _)).
+  easy.
+}
+cbn - [ det ].
+Theorem glip : ∀ m n i,
+  isort Nat.leb (rev (to_radix_loop m n i)) ∈ sub_lists_of_seq_0_n n m.
+Admitted.
+...
 Require Import PermutationFun.
 Search isort.
-Check Permutation_isort.
-Check permutation_isort.
+Theorem glip : ∀ (A : Type) (eqb rel : A → A → bool),
+  equality eqb →
+  ∀ la lb, permutation eqb la lb → isort rel la = isort rel lb.
+Proof.
+intros * Heqb * Hab.
+...
+Search (_ → permutation _ _ _).
+Theorem glup : ∀ (A : Type) (eqb rel : A → A → bool),
+  equality eqb →
+  ∀ l, permutation eqb l (isort rel l).
+Proof.
+intros * Heqb *.
+...
+Permutation_isort
+     : ∀ (A : Type) (ord : A → A → bool),
+         antisymmetric ord
+         → transitive ord
+           → total_relation ord
+             → ∀ la lb : list A,
+                 Permutation la lb → isort ord la = isort ord lb
+permutation_isort
+     : ∀ (A : Type) (eqb rel : A → A → bool),
+         equality eqb → ∀ l : list A, permutation eqb l (isort rel l)
 ...
   easy.
 }
