@@ -2685,20 +2685,58 @@ Qed.
 
 (* to be completed
 Theorem permutation_isort' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  total_relation rel →
   ∀ la lb,
   permutation eqb la lb
   → isort rel la = isort rel lb.
 Proof.
-intros * Heqb * Hab.
+intros * Heqb Htot * Hab.
 unfold isort.
 Print isort_loop.
 Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   total_relation rel →
-  ∀ la lb ls,
-  sorted rel ls = true
-  → permutation eqb la lb
-  → isort_loop rel ls la = isort_loop rel ls lb.
+  ∀ la lb lsa lsb,
+  sorted rel lsa = true
+  → sorted rel lsb = true
+  → permutation eqb (lsa ++ la) (lsb ++ lb)
+  → isort_loop rel lsa la = isort_loop rel lsb lb.
 Proof.
+intros * Heqb Htot * Hsa Hsb Hpab.
+revert lsa lsb lb Hsa Hsb Hpab.
+induction la as [| a]; intros; cbn. {
+  rewrite app_nil_r in Hpab.
+  destruct lb as [| b]; intros. {
+    rewrite app_nil_r in Hpab; cbn.
+Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
+  (Heqb : equality eqb),
+  ∀ la lb,
+  sorted rel la = true
+  → sorted rel lb = true
+  → permutation eqb la lb
+  → la = lb.
+Proof.
+intros * Heqb * Hsa Hsb Hpab.
+revert lb Hsb Hpab.
+induction la as [| a]; intros; [ now apply permutation_nil in Hpab | ].
+specialize sorted_cons as H.
+specialize (H _ rel a la Hsa).
+specialize (IHla H); clear H.
+destruct lb as [| b]. {
+  apply (permutation_sym Heqb) in Hpab.
+  now apply permutation_nil in Hpab.
+}
+Search (permutation _ (_ :: _) (_ :: _)).
+... return to permutation_isort_loop'
+now apply sorted_sorted_permutation with (eqb := eqb) (rel := rel).
+...
+Search (sorted _ _ = true → sorted _ _ = true → _).
+Search (permutation _ _ _ → _).
+  now apply permutation_nil in Hpab; subst lb.
+}
+
+... return to permutation_isort'
+apply (permutation_isort_loop' Heqb Htot).
+...
 intros * Heqb Htot * Hs Hpab.
 revert ls lb Hs Hpab.
 induction la as [| a]; intros; cbn. {
