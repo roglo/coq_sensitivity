@@ -2720,11 +2720,22 @@ cbn in Hpab.
 rewrite Hab in Hpab.
 remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hli).
+destruct Hlxl as (Hbefa & H & Hlb).
 apply Heqb in H; subst x.
 subst lb.
+apply (permutation_sym Heqb) in Hpab.
+cbn in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefb & H & Hlb).
+apply Heqb in H; subst x.
+subst la.
+apply (permutation_sym Heqb) in Hpab.
 Search (isort_loop _ (isort_insert _ _ _)).
 Search (isort_loop _ _ _ = isort_loop _ _ _).
 ...
