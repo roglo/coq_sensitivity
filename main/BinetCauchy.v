@@ -2695,6 +2695,22 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+Print mat_select_rows.
+Theorem glop : ∀ A kl,
+  det'' (mat_select_rows kl A) = det'' (mat_select_rows (isort Nat.leb kl) A).
+Admitted.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite glop.
+Require Import PermutationFun.
+Search isort.
+Check Permutation_isort.
+Check permutation_isort.
+...
+  easy.
+}
+cbn - [ det ].
+rewrite glop.
 ...
 Print sub_lists_of_seq_0_n.
 Compute (sub_lists_of_seq_0_n 5 3).
