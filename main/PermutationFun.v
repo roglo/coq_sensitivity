@@ -162,6 +162,15 @@ remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 now destruct lxl as [((bef, x), aft)| ].
 Qed.
 
+Theorem permutation_cons_inv : ∀ A eqb la lb (a : A) (Heqb : equality eqb),
+  permutation eqb (a :: la) (a :: lb) → permutation eqb la lb.
+Proof.
+intros * Heqb * Hpab.
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+now rewrite (equality_refl Heqb) in Hpab.
+Qed.
+
 Theorem permutation_in : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -480,6 +489,10 @@ intros H; specialize (H1 _ H).
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
+Theorem permutation_nil : ∀ A (eqb : A → _) l,
+  permutation eqb [] l → l = [].
+Proof. now intros; destruct l. Qed.
+
 Theorem permutation_trans : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc,
@@ -647,10 +660,6 @@ apply (permutation_trans Heqb) with (lb := l ++ m'). {
 }
 now apply permutation_app_tail.
 Qed.
-
-Theorem permutation_nil : ∀ A (eqb : A → _) l,
-  permutation eqb [] l → l = [].
-Proof. now intros; destruct l. Qed.
 
 (* theorems equivalent to Permutation type *)
 

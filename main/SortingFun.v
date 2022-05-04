@@ -2683,6 +2683,109 @@ Qed.
 
 (* *)
 
+(* to be completed
+Theorem permutation_isort' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  ∀ la lb,
+  permutation eqb la lb
+  → isort rel la = isort rel lb.
+Proof.
+intros * Heqb * Hab.
+unfold isort.
+Print isort_loop.
+Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  total_relation rel →
+  ∀ la lb ls,
+  sorted rel ls = true
+  → permutation eqb la lb
+  → isort_loop rel ls la = isort_loop rel ls lb.
+Proof.
+intros * Heqb Htot * Hs Hpab.
+revert ls lb Hs Hpab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil in Hpab; subst lb.
+}
+destruct lb as [| b]; cbn. {
+  apply permutation_sym in Hpab; [ | easy ].
+  now apply permutation_nil in Hpab.
+}
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+  apply (permutation_cons_inv Heqb) in Hpab.
+  apply IHla; [ | easy ].
+  now apply (isort_insert_is_sorted Htot).
+}
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+rewrite Hab in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hli).
+apply Heqb in H; subst x.
+subst lb.
+Search (isort_loop _ (isort_insert _ _ _)).
+Search (isort_loop _ _ _ = isort_loop _ _ _).
+...
+Search (isort_loop _ _ (_ ++ _)).
+apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
+clear la Hpab.
+rename lb into la.
+revert bef aft Hbef Hli.
+induction la as [| b]; intros. {
+destruct Hlxl as (Hbef
+...
+... return to permutation_isort_loop'
+apply permutation_cons_inv in Hpab.
+apply permutation
+...
+  apply (equality_ Heqb) in Hab; subst b.
+Search (permutation _ (_ :: _) (_ :: _)).
+Print isort_insert.
+... return to permutation_isort'
+apply (permutation_isort_loop' _ Heqb).
+...
+revert lb Hab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil in Hab; subst lb.
+}
+apply permutation_cons_l_iff in Hab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hli).
+apply Heqb in H; subst x.
+subst lb.
+Search (isort_loop _ _ (_ ++ _)).
+apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
+clear la Hpab.
+rename lb into la.
+revert bef aft Hbef Hli.
+induction la as [| b]; intros. {
+destruct Hlxl as (Hbef
+...
+intros * Hab.
+induction Hab as [| a la lb | a b la | ]; [ easy | | | congruence ]. {
+  now apply Permutation_isort_loop'.
+} {
+  cbn.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ab, ba; [ | easy | easy | ]. {
+    specialize (Hant _ _ Hab Hba).
+    now subst b.
+  } {
+    specialize (Htot a b).
+    now rewrite Hab, Hba in Htot.
+  }
+}
+Qed.
+*)
+
+(* *)
+
 Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
@@ -3649,19 +3752,19 @@ apply Permutation_trans with (l' := split_list_inv la lb). {
 apply Permutation_split_list_inv_split_list_inv; apply IHit.
 Qed.
 
-Theorem isort_insert_insert_sym : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → total_relation ord
+Theorem isort_insert_insert_sym : ∀ A (rel : A → _),
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
   → ∀ a b l,
-  isort_insert ord a (isort_insert ord b l) =
-  isort_insert ord b (isort_insert ord a l).
+  isort_insert rel a (isort_insert rel b l) =
+  isort_insert rel b (isort_insert rel a l).
 Proof.
 intros * Hant Htr Htot *.
 revert a b.
 induction l as [| c]; intros; cbn. {
-  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ab, ba; [ | easy | easy | ]. {
     specialize (Hant _ _ Hab Hba).
     now subst b.
@@ -3670,11 +3773,11 @@ induction l as [| c]; intros; cbn. {
     now rewrite Hab, Hba in Htot.
   }
 }
-remember (ord a c) as ac eqn:Hac; symmetry in Hac.
-remember (ord b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct ac, bc; cbn. {
-  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ab, ba. {
     now rewrite (Hant a b Hab Hba).
   } {
@@ -3687,7 +3790,7 @@ destruct ac, bc; cbn. {
   }
 } {
   rewrite Hac.
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ba. {
     now rewrite (Htr b a c Hba Hac) in Hbc.
   } {
@@ -3695,7 +3798,7 @@ destruct ac, bc; cbn. {
   }
 } {
   rewrite Hbc, Hac.
-  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ | easy ].
   now rewrite (Htr _ _ _ Hab Hbc) in Hac.
 } {
@@ -3704,13 +3807,13 @@ destruct ac, bc; cbn. {
 }
 Qed.
 
-Theorem isort_loop_insert_middle : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → total_relation ord
+Theorem isort_loop_insert_middle : ∀ A (rel : A → _),
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
   → ∀ ls la lb a,
-  isort_loop ord ls (la ++ a :: lb) =
-  isort_loop ord (isort_insert ord a ls) (la ++ lb).
+  isort_loop rel ls (la ++ a :: lb) =
+  isort_loop rel (isort_insert rel a ls) (la ++ lb).
 Proof.
 intros * Hant Htr Hto *.
 revert a ls lb.
@@ -3719,15 +3822,15 @@ rewrite IHla.
 now rewrite isort_insert_insert_sym.
 Qed.
 
-Theorem Permutation_isort_loop' : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → total_relation ord
+Theorem Permutation_isort_loop' : ∀ A (rel : A → _),
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
   → ∀ la lb lsorted a,
   Permutation la lb
-  → isort_loop ord lsorted la = isort_loop ord lsorted lb
-  → isort_loop ord (isort_insert ord a lsorted) la =
-    isort_loop ord (isort_insert ord a lsorted) lb.
+  → isort_loop rel lsorted la = isort_loop rel lsorted lb
+  → isort_loop rel (isort_insert rel a lsorted) la =
+    isort_loop rel (isort_insert rel a lsorted) lb.
 Proof.
 intros * Hant Htr Hto * Hab Hsab.
 remember (length la) as n eqn:Hn; symmetry in Hn.
@@ -3748,9 +3851,9 @@ destruct H1 as (lb1 & lb2 & Hlb).
 subst lb.
 apply Permutation_cons_app_inv in Hab.
 cbn in Hsab |-*.
-remember (isort_insert ord b lsorted) as ls eqn:Hls.
+remember (isort_insert rel b lsorted) as ls eqn:Hls.
 specialize (IHn _ _ ls a Hab) as H1.
-assert (H : isort_loop ord ls la = isort_loop ord ls (lb1 ++ lb2)). {
+assert (H : isort_loop rel ls la = isort_loop rel ls (lb1 ++ lb2)). {
   rewrite Hsab, Hls.
   now apply isort_loop_insert_middle.
 }
@@ -3789,21 +3892,21 @@ Qed.
 
 (* *)
 
-Theorem Permutation_isort' : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → total_relation ord
+Theorem Permutation_isort' : ∀ A (rel : A → _),
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
   → ∀ la lb,
   Permutation la lb
-  → isort ord la = isort ord lb.
+  → isort rel la = isort rel lb.
 Proof.
 intros * Hant Htr Htot * Hab.
 induction Hab as [| a la lb | a b la | ]; [ easy | | | congruence ]. {
   now apply Permutation_isort_loop'.
 } {
   cbn.
-  remember (ord a b) as ab eqn:Hab; symmetry in Hab.
-  remember (ord b a) as ba eqn:Hba; symmetry in Hba.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ab, ba; [ | easy | easy | ]. {
     specialize (Hant _ _ Hab Hba).
     now subst b.
@@ -3814,22 +3917,22 @@ induction Hab as [| a la lb | a b la | ]; [ easy | | | congruence ]. {
 }
 Qed.
 
-Theorem Permutation_isort_iff : ∀ A (ord : A → _),
-  antisymmetric ord
-  → transitive ord
-  → total_relation ord
+Theorem Permutation_isort_iff : ∀ A (rel : A → _),
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
   → ∀ la lb,
   Permutation la lb
-  ↔ isort ord la = isort ord lb.
+  ↔ isort rel la = isort rel lb.
 Proof.
 intros * Hant Htr Htot *.
 split. {
   now apply Permutation_isort'.
 }
 intros Hab.
-specialize (Permutation_isort ord la) as H1.
-specialize (Permutation_isort ord lb) as H2.
-apply Permutation_trans with (l' := isort ord la); [ easy | ].
+specialize (Permutation_isort rel la) as H1.
+specialize (Permutation_isort rel lb) as H2.
+apply Permutation_trans with (l' := isort rel la); [ easy | ].
 rewrite Hab.
 now apply Permutation_sym.
 Qed.

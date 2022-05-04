@@ -2704,6 +2704,8 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite glop.
 Search isort.
+Search (isort _ _ = isort _ _).
+Search (_  ↔ isort _ _ = isort _ _).
 ...
 Search (isort _ (rev _)).
   easy.
