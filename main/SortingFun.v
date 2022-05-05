@@ -2786,6 +2786,61 @@ Qed.
 
 (* *)
 
+Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, sorted rel l ↔ isort rel l = l.
+Proof.
+intros * Hant Htra Htot *.
+split; [ now apply sorted_isort | ].
+intros Hs.
+specialize (isort_is_sorted) as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+Theorem sorted_ssort_iff : ∀ A (rel : A → A → bool),
+  transitive rel →
+  total_relation rel →
+  ∀ l, sorted rel l ↔ ssort rel l = l.
+Proof.
+intros * Htra Htot *.
+split; [ now apply sorted_ssort | ].
+intros Hs.
+specialize (ssort_is_sorted) as H1.
+specialize (H1 _ rel Htra Htot l).
+now rewrite Hs in H1.
+Qed.
+
+Theorem sorted_bsort_iff : ∀ A (rel : A → A → bool),
+  total_relation rel →
+  ∀ l, sorted rel l ↔ bsort rel l = l.
+Proof.
+intros * Htot *.
+split; [ now apply sorted_bsort | ].
+intros Hs.
+specialize (bsort_is_sorted) as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+Theorem sorted_msort_iff : ∀ A (rel : A → A → bool),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ l, sorted rel l ↔ msort rel l = l.
+Proof.
+intros * Hant Htra Htot *.
+split; [ now apply sorted_msort | ].
+intros Hs.
+specialize (msort_is_sorted) as H1.
+specialize (H1 _ rel Htot l).
+now rewrite Hs in H1.
+Qed.
+
+(* *)
+
 Theorem permutation_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (isort rel l).
 Proof.
@@ -2846,61 +2901,6 @@ specialize (permutation_isort rel Heqb lb) as H2.
 apply (permutation_trans Heqb) with (lb := isort rel la); [ easy | ].
 rewrite Hab.
 now apply permutation_sym.
-Qed.
-
-(* *)
-
-Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ l, sorted rel l ↔ isort rel l = l.
-Proof.
-intros * Hant Htra Htot *.
-split; [ now apply sorted_isort | ].
-intros Hs.
-specialize (isort_is_sorted) as H1.
-specialize (H1 _ rel Htot l).
-now rewrite Hs in H1.
-Qed.
-
-Theorem sorted_ssort_iff : ∀ A (rel : A → A → bool),
-  transitive rel →
-  total_relation rel →
-  ∀ l, sorted rel l ↔ ssort rel l = l.
-Proof.
-intros * Htra Htot *.
-split; [ now apply sorted_ssort | ].
-intros Hs.
-specialize (ssort_is_sorted) as H1.
-specialize (H1 _ rel Htra Htot l).
-now rewrite Hs in H1.
-Qed.
-
-Theorem sorted_bsort_iff : ∀ A (rel : A → A → bool),
-  total_relation rel →
-  ∀ l, sorted rel l ↔ bsort rel l = l.
-Proof.
-intros * Htot *.
-split; [ now apply sorted_bsort | ].
-intros Hs.
-specialize (bsort_is_sorted) as H1.
-specialize (H1 _ rel Htot l).
-now rewrite Hs in H1.
-Qed.
-
-Theorem sorted_msort_iff : ∀ A (rel : A → A → bool),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ l, sorted rel l ↔ msort rel l = l.
-Proof.
-intros * Hant Htra Htot *.
-split; [ now apply sorted_msort | ].
-intros Hs.
-specialize (msort_is_sorted) as H1.
-specialize (H1 _ rel Htot l).
-now rewrite Hs in H1.
 Qed.
 
 (* *)
