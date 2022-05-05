@@ -373,7 +373,7 @@ Qed.
 
 Theorem sorted_permut : ∀ l,
   is_permut_list l
-  → sorted Nat.leb l = true
+  → is_sorted Nat.leb l = true
   → l = seq 0 (length l).
 Proof.
 intros * Hl Hs.

@@ -281,7 +281,7 @@ rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
 Theorem sorted_hd_no_dup : ∀ a i l,
-  sorted Nat.ltb (a :: l) = true
+  is_sorted Nat.ltb (a :: l) = true
   → i < length l
   → a = nth i l 0
   → False.
@@ -302,7 +302,7 @@ flia Hab H1.
 Qed.
 
 Theorem nth_of_rank_of_sub_list_of_seq_0_n : ∀ n k t,
-  sorted Nat.ltb t = true
+  is_sorted Nat.ltb t = true
   → length t = k
   → (∀ i, i ∈ t → i < n)
   → nth (rank_of_sub_list_of_seq_0_n n k t) (sub_lists_of_seq_0_n n k) [] = t.
@@ -597,7 +597,7 @@ Qed.
 
 Theorem sub_lists_of_seq_0_n_are_sorted : ∀ n k ll,
   ll = sub_lists_of_seq_0_n n k
-  → ∀ l, l ∈ ll → sorted Nat.ltb l = true.
+  → ∀ l, l ∈ ll → is_sorted Nat.ltb l = true.
 Proof.
 intros * Hll * Hl.
 subst ll.
@@ -624,7 +624,7 @@ destruct l as [| b]. {
   rewrite Bool.andb_true_r.
   now apply Nat.ltb_lt, H1; left.
 }
-cbn - [ sorted ] in IHl |-*.
+cbn - [ is_sorted ] in IHl |-*.
 apply sorted_cons_cons_true_iff in IHn.
 apply sorted_cons_cons_true_iff.
 destruct IHn as (Hab, Hbl).
@@ -690,7 +690,7 @@ Qed.
 
 Theorem sub_lists_of_seq_0_n_prop : ∀ n k ll,
   ll = sub_lists_of_seq_0_n n k
-  → (∀ l, l ∈ ll → sorted Nat.ltb l = true) ∧
+  → (∀ l, l ∈ ll → is_sorted Nat.ltb l = true) ∧
     (∀ i j, i < length ll → j < length ll →
      nth i ll [] = nth j ll [] → i = j) ∧
     (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
