@@ -2892,15 +2892,15 @@ Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
+*)
   total_relation rel →
- *)
   ∀ la lb,
   permutation eqb la lb
   → bsort rel la = bsort rel lb.
 Proof.
-intros (** Heqb Hant Htra Htot*) * Hab.
-unfold bsort.
-Print bsort_loop.
+intros * (*Heqb Hant Htra*) Htot * Hab.
+rewrite (bsort_bsort_loop_nb_disorder Htot).
+rewrite (bsort_bsort_loop_nb_disorder Htot).
 Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
 (*
   equality eqb →
@@ -2909,12 +2909,26 @@ Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
   total_relation rel →
 *)
   ∀ la lb ita itb,
-  length la * length la ≤ ita
-  → length lb * length lb ≤ itb
+  nb_disorder rel la ≤ ita
+  → nb_disorder rel lb ≤ itb
   → permutation eqb la lb
   → bsort_loop rel ita la = bsort_loop rel itb lb.
 Proof.
 intros * (*Heqb Hant Htra Htot * *) Hita Hitb Hpab.
+revert la lb itb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r in Hita.
+Print nb_disorder.
+...
+  destruct la as [| a]. {
+    apply permutation_nil in Hpab; subst lb.
+    now destruct itb.
+  }
+  cbn in Hita.
+  apply Nat.eq_add_0 in Hita.
+  destruct Hita as (Hra, Hda).
+Print nb_nrel.
+...
 ... return to permutation_bsort'
 now apply (@permutation_bsort_loop' _ eqb rel).
 Qed.
