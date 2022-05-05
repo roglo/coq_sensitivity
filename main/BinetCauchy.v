@@ -625,7 +625,7 @@ destruct l as [| b]. {
   rewrite Bool.andb_true_r.
   now apply Nat.ltb_lt, H1; left.
 }
-cbn - [ is_sorted ] in IHl |-*.
+cbn in IHl |-*.
 apply sorted_cons_cons_true_iff in IHn.
 apply sorted_cons_cons_true_iff.
 destruct IHn as (Hab, Hbl).

@@ -799,8 +799,7 @@ destruct n. {
   rename d into b; rename Hcd into Hab.
   f_equal.
   specialize (IHit 1 l la lb a b) as H1.
-  cbn in Hit.
-  cbn - [ merge_loop is_sorted ] in H1.
+  cbn in Hit, H1.
   assert (H : S (S (S (length l))) ≤ it) by flia Hit.
   specialize (H1 H Haa); clear H.
   assert (H : sorted rel (a :: b :: l)). {
@@ -858,7 +857,6 @@ Theorem sorted_merge_loop_cons_cons_r : ∀ A (rel : A → _),
 Proof.
 intros * Hant Htra * Hit Haa Hs Hll.
 specialize (sorted_merge_loop_cons_cons_r_aux Hant Htra 0) as H1.
-cbn - [ is_sorted ] in H1.
 now apply (H1 it l).
 Qed.
 
