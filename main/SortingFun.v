@@ -2703,6 +2703,24 @@ apply (permutation_cons_isort_insert _ Heqb).
 now apply permutation_refl.
 Qed.
 
+Theorem nb_disorder_0_sorted : ∀ A (rel : A → _),
+  ∀ l,
+  nb_disorder rel l = 0
+  → sorted rel l.
+Proof.
+intros * Hd.
+induction l as [| a la]; [ easy | ].
+cbn in Hd.
+apply Nat.eq_add_0 in Hd.
+destruct Hd as (Hr, Hd).
+specialize (IHla Hd).
+unfold sorted in IHla |-*; cbn.
+destruct la as [| b]; [ easy | ].
+rewrite IHla, Bool.andb_true_r.
+cbn in Hr.
+now destruct (rel a b).
+Qed.
+
 (* *)
 
 Theorem sorted_isort : ∀ A (rel : A → _),
@@ -2902,23 +2920,57 @@ intros * (*Heqb Hant Htra*) Htot * Hab.
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
-(*
   equality eqb →
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-*)
   ∀ la lb ita itb,
   nb_disorder rel la ≤ ita
   → nb_disorder rel lb ≤ itb
   → permutation eqb la lb
   → bsort_loop rel ita la = bsort_loop rel itb lb.
 Proof.
-intros * (*Heqb Hant Htra Htot * *) Hita Hitb Hpab.
+intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
 revert la lb itb Hita Hitb Hpab.
 induction ita; intros; cbn. {
   apply Nat.le_0_r in Hita.
-Print nb_disorder.
+  apply nb_disorder_0_sorted in Hita.
+  revert la lb Hita Hitb Hpab.
+  induction itb; intros. {
+    apply Nat.le_0_r in Hitb.
+    apply nb_disorder_0_sorted in Hitb.
+    now apply (sorted_sorted_permutation Heqb Hant Htra).
+  }
+  cbn.
+  remember (bsort_swap rel lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [lc| ]. 2: {
+    apply bsort_swap_None in Hlc.
+    now apply (sorted_sorted_permutation Heqb Hant Htra).
+  }
+  apply bsort_swap_Some in Hlc.
+  destruct Hlc as (Hsb & a & b & ld & le & Hab & Hsde & Hlb & Hlc).
+  subst lb lc.
+  apply IHitb; [ easy | | ]. 2: {
+    eapply (permutation_trans Heqb); [ apply Hpab | ].
+    apply (permutation_app_head Heqb).
+    now apply permutation_swap.
+  }
+  eapply (bsort_swap_nb_disorder Htot); [ | apply Hitb ].
+clear - Htot Hab Hsde.
+Search (bsort_swap _ _ = Some _).
+...
+revert a b le Hab Hsde.
+  induction ld as [| d]; intros; cbn; [ now rewrite Hab | ].
+  unfold sorted in Hsde.
+  destruct ld as [| e]; cbn in Hsde |-*. {
+    rewrite Hab; cbn in Hsde.
+    now rewrite Bool.andb_true_r in Hsde; rewrite Hsde.
+  }
+  apply Bool.andb_true_iff in Hsde.
+  destruct Hsde as (Hde & Hsde); rewrite Hde.
+...
+Search bsort_swap.
+Print bsort_swap.
 ...
   destruct la as [| a]. {
     apply permutation_nil in Hpab; subst lb.
