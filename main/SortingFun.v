@@ -2659,7 +2659,8 @@ subst b.
 now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
-Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _),
+  equality eqb →
   antisymmetric rel →
   transitive rel →
   total_relation rel →
@@ -2871,7 +2872,8 @@ Qed.
 
 (* *)
 
-Theorem permutation_isort' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permutation_isort' : ∀ A (eqb rel : A → _),
+  equality eqb →
   antisymmetric rel →
   transitive rel →
   total_relation rel →
@@ -2883,6 +2885,42 @@ intros * Heqb Hant Htra Htot * Hab.
 unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
+
+(* to be completed
+Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
+(*
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+ *)
+  ∀ la lb,
+  permutation eqb la lb
+  → bsort rel la = bsort rel lb.
+Proof.
+intros (** Heqb Hant Htra Htot*) * Hab.
+unfold bsort.
+Print bsort_loop.
+Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
+(*
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ la lb ita itb,
+  length la * length la ≤ ita
+  → length lb * length lb ≤ itb
+  → permutation eqb la lb
+  → bsort_loop rel ita la = bsort_loop rel itb lb.
+Proof.
+intros * (*Heqb Hant Htra Htot * *) Hita Hitb Hpab.
+... return to permutation_bsort'
+now apply (@permutation_bsort_loop' _ eqb rel).
+Qed.
+*)
+
+(* *)
 
 Theorem permutation_isort_iff : ∀ A (eqb rel : A → _),
   equality eqb →
