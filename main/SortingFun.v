@@ -2505,18 +2505,19 @@ Qed.
 
 (* *)
 
-Theorem sorted_middle : ∀ A rel (a b : A) la lb lc,
-  transitive rel
-  → sorted rel (la ++ a :: lb ++ b :: lc) = true
+Theorem sorted_middle : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a b la lb lc,
+  sorted rel (la ++ a :: lb ++ b :: lc) = true
   → rel a b = true.
 Proof.
-intros * Htrans Hsort.
+intros * Htra * Hsort.
 rewrite (List_cons_is_app a) in Hsort.
 rewrite (List_cons_is_app b) in Hsort.
 rewrite app_assoc in Hsort.
 apply sorted_app in Hsort.
 destruct Hsort as (Hla & Hsort & H1).
-specialize (H1 Htrans).
+specialize (H1 Htra).
 apply H1; [ now apply in_or_app; right; left | ].
 apply in_or_app; right.
 now apply in_or_app; left; left.
@@ -2567,6 +2568,105 @@ destruct Hs as (Hab, Hs).
 split; [ | now apply IHl ].
 apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
+Qed.
+
+Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
+  (Heqb : equality eqb),
+  antisymmetric rel →
+  transitive rel →
+  ∀ la lb,
+  sorted rel la = true
+  → sorted rel lb = true
+  → permutation eqb la lb
+  → la = lb.
+Proof.
+intros * Heqb Hant Htra * Hsa Hsb Hpab.
+revert lb Hsb Hpab.
+induction la as [| a]; intros; [ now apply permutation_nil in Hpab | ].
+specialize sorted_cons as H.
+specialize (H _ rel a la Hsa).
+specialize (IHla H); clear H.
+destruct lb as [| b]. {
+  apply (permutation_sym Heqb) in Hpab.
+  now apply permutation_nil in Hpab.
+}
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b; f_equal.
+  apply IHla; [ | easy ].
+  now apply sorted_cons in Hsb.
+}
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefa & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+apply (permutation_sym Heqb) in Hpab.
+cbn in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefb & H & Hlb).
+apply Heqb in H; subst x.
+subst la.
+move Hab at bottom.
+move Hsa at bottom.
+move Hsb at bottom.
+specialize sorted_middle as H1.
+specialize (H1 _ rel Htra _ _ [] _ _ Hsa) as H2.
+specialize (H1 _ rel Htra _ _ [] _ _ Hsb) as H3.
+specialize (Hant _ _ H2 H3) as H4.
+subst b.
+now rewrite (equality_refl Heqb) in Hab.
+Qed.
+
+Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb lsa lsb,
+  sorted rel lsa = true
+  → sorted rel lsb = true
+  → permutation eqb (lsa ++ la) (lsb ++ lb)
+  → isort_loop rel lsa la = isort_loop rel lsb lb.
+Proof.
+intros * Heqb Hant Htra Htot * Hsa Hsb Hpab.
+revert lsa lsb lb Hsa Hsb Hpab.
+induction la as [| a]; intros; cbn. {
+  rewrite app_nil_r in Hpab.
+  revert lsa lsb Hsa Hsb Hpab.
+  induction lb as [| b]; intros. {
+    rewrite app_nil_r in Hpab; cbn.
+    now apply (sorted_sorted_permutation Heqb Hant Htra).
+  }
+  cbn.
+  apply IHlb; [ easy | now apply isort_insert_is_sorted | ].
+  apply (permutation_trans Heqb) with (lb := lsb ++ b :: lb); [ easy | ].
+  rewrite List_cons_is_app, app_assoc.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_trans Heqb) with (lb := b :: lsb). {
+    apply (permutation_sym Heqb).
+    apply (permutation_cons_append Heqb).
+  }
+  apply (permutation_cons_isort_insert _ Heqb).
+  now apply permutation_refl.
+}
+apply IHla; [ now apply isort_insert_is_sorted | easy | ].
+apply (permutation_trans Heqb) with (lb := lsa ++ a :: la); [ | easy ].
+rewrite List_cons_is_app, app_assoc.
+apply (permutation_app_tail Heqb).
+apply (permutation_trans Heqb) with (lb := a :: lsa). 2: {
+  apply (permutation_cons_append Heqb).
+}
+apply (permutation_sym Heqb).
+apply (permutation_cons_isort_insert _ Heqb).
+now apply permutation_refl.
 Qed.
 
 (* *)
@@ -2683,155 +2783,37 @@ Qed.
 
 (* *)
 
-(* to be completed
 Theorem permutation_isort' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+  antisymmetric rel →
+  transitive rel →
   total_relation rel →
   ∀ la lb,
   permutation eqb la lb
   → isort rel la = isort rel lb.
 Proof.
-intros * Heqb Htot * Hab.
+intros * Heqb Hant Htra Htot * Hab.
 unfold isort.
-Print isort_loop.
-Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
-  total_relation rel →
-  ∀ la lb lsa lsb,
-  sorted rel lsa = true
-  → sorted rel lsb = true
-  → permutation eqb (lsa ++ la) (lsb ++ lb)
-  → isort_loop rel lsa la = isort_loop rel lsb lb.
-Proof.
-intros * Heqb Htot * Hsa Hsb Hpab.
-revert lsa lsb lb Hsa Hsb Hpab.
-induction la as [| a]; intros; cbn. {
-  rewrite app_nil_r in Hpab.
-  destruct lb as [| b]; intros. {
-    rewrite app_nil_r in Hpab; cbn.
-Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
-  (Heqb : equality eqb),
-  ∀ la lb,
-  sorted rel la = true
-  → sorted rel lb = true
-  → permutation eqb la lb
-  → la = lb.
-Proof.
-intros * Heqb * Hsa Hsb Hpab.
-revert lb Hsb Hpab.
-induction la as [| a]; intros; [ now apply permutation_nil in Hpab | ].
-specialize sorted_cons as H.
-specialize (H _ rel a la Hsa).
-specialize (IHla H); clear H.
-destruct lb as [| b]. {
-  apply (permutation_sym Heqb) in Hpab.
-  now apply permutation_nil in Hpab.
-}
-Search (permutation _ (_ :: _) (_ :: _)).
-... return to permutation_isort_loop'
-now apply sorted_sorted_permutation with (eqb := eqb) (rel := rel).
-...
-Search (sorted _ _ = true → sorted _ _ = true → _).
-Search (permutation _ _ _ → _).
-  now apply permutation_nil in Hpab; subst lb.
-}
-
-... return to permutation_isort'
-apply (permutation_isort_loop' Heqb Htot).
-...
-intros * Heqb Htot * Hs Hpab.
-revert ls lb Hs Hpab.
-induction la as [| a]; intros; cbn. {
-  now apply permutation_nil in Hpab; subst lb.
-}
-destruct lb as [| b]; cbn. {
-  apply permutation_sym in Hpab; [ | easy ].
-  now apply permutation_nil in Hpab.
-}
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply Heqb in Hab; subst b.
-  apply (permutation_cons_inv Heqb) in Hpab.
-  apply IHla; [ | easy ].
-  now apply (isort_insert_is_sorted Htot).
-}
-apply permutation_cons_l_iff in Hpab.
-cbn in Hpab.
-rewrite Hab in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((befa, x), afta)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbefa & H & Hlb).
-apply Heqb in H; subst x.
-subst lb.
-apply (permutation_sym Heqb) in Hpab.
-cbn in Hpab.
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb b) la) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbefb & H & Hlb).
-apply Heqb in H; subst x.
-subst la.
-apply (permutation_sym Heqb) in Hpab.
-Search (isort_loop _ (isort_insert _ _ _)).
-Search (isort_loop _ _ _ = isort_loop _ _ _).
-...
-Search (isort_loop _ _ (_ ++ _)).
-apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
-clear la Hpab.
-rename lb into la.
-revert bef aft Hbef Hli.
-induction la as [| b]; intros. {
-destruct Hlxl as (Hbef
-...
-... return to permutation_isort_loop'
-apply permutation_cons_inv in Hpab.
-apply permutation
-...
-  apply (equality_ Heqb) in Hab; subst b.
-Search (permutation _ (_ :: _) (_ :: _)).
-Print isort_insert.
-... return to permutation_isort'
-apply (permutation_isort_loop' _ Heqb).
-...
-revert lb Hab.
-induction la as [| a]; intros; cbn. {
-  now apply permutation_nil in Hab; subst lb.
-}
-apply permutation_cons_l_iff in Hab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hli).
-apply Heqb in H; subst x.
-subst lb.
-Search (isort_loop _ _ (_ ++ _)).
-apply (permutation_trans Heqb) with (lb := lb); [ easy | ].
-clear la Hpab.
-rename lb into la.
-revert bef aft Hbef Hli.
-induction la as [| b]; intros. {
-destruct Hlxl as (Hbef
-...
-intros * Hab.
-induction Hab as [| a la lb | a b la | ]; [ easy | | | congruence ]. {
-  now apply Permutation_isort_loop'.
-} {
-  cbn.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ab, ba; [ | easy | easy | ]. {
-    specialize (Hant _ _ Hab Hba).
-    now subst b.
-  } {
-    specialize (Htot a b).
-    now rewrite Hab, Hba in Htot.
-  }
-}
+now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
-*)
+
+Theorem permutation_isort_iff : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel
+  → transitive rel
+  → total_relation rel
+  → ∀ la lb,
+  permutation eqb la lb
+  ↔ isort rel la = isort rel lb.
+Proof.
+intros * Heqb Hant Htr Htot *.
+split; [ now apply permutation_isort' | ].
+intros Hab.
+specialize (permutation_isort rel Heqb la) as H1.
+specialize (permutation_isort rel Heqb lb) as H2.
+apply (permutation_trans Heqb) with (lb := isort rel la); [ easy | ].
+rewrite Hab.
+now apply permutation_sym.
+Qed.
 
 (* *)
 
@@ -3975,9 +3957,7 @@ Theorem Permutation_isort_iff : ∀ A (rel : A → _),
   ↔ isort rel la = isort rel lb.
 Proof.
 intros * Hant Htr Htot *.
-split. {
-  now apply Permutation_isort'.
-}
+split; [ now apply Permutation_isort' | ].
 intros Hab.
 specialize (Permutation_isort rel la) as H1.
 specialize (Permutation_isort rel lb) as H2.
