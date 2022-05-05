@@ -52,8 +52,13 @@ Fixpoint is_strongly_sorted A (rel : A → A → bool) l :=
   | a :: l' => (all_sorted rel a l' && is_strongly_sorted rel l')%bool
   end.
 
+Definition sorted A (rel : A → _) l :=
+  is_sorted rel l = true.
+Definition strongly_sorted A (rel : A → _) l :=
+  is_strongly_sorted rel l = true.
+
 Theorem sorted_cons : ∀ A (rel : A → _) a la,
-  is_sorted rel (a :: la) = true → is_sorted rel la = true.
+  sorted rel (a :: la) → sorted rel la.
 Proof.
 intros * Hs.
 cbn in Hs.
@@ -63,9 +68,11 @@ Qed.
 
 Theorem sorted_strongly_sorted : ∀ A (rel : A → A → bool),
   transitive rel →
-  ∀ l, is_sorted rel l = true → is_strongly_sorted rel l = true.
+  ∀ l, sorted rel l → strongly_sorted rel l.
 Proof.
 intros * Htra * Hs.
+unfold sorted in Hs.
+unfold strongly_sorted.
 induction l as [| a]; [ easy | cbn ].
 rewrite IHl; [ | now apply sorted_cons in Hs ].
 rewrite Bool.andb_true_r.
@@ -83,9 +90,10 @@ now rewrite (Htra a b c Hab Hbc).
 Qed.
 
 Theorem strongly_sorted_sorted : ∀ A (rel : A → A → bool),
-  ∀ l, is_strongly_sorted rel l = true → is_sorted rel l = true.
+  ∀ l, strongly_sorted rel l → sorted rel l.
 Proof.
 intros * Hs.
+unfold strongly_sorted in Hs; unfold sorted.
 induction l as [| a]; [ easy | ].
 cbn in Hs.
 apply Bool.andb_true_iff in Hs.
@@ -115,8 +123,8 @@ now apply Bool.andb_true_iff in Hsal.
 Qed.
 
 Theorem sorted_cons_cons_true_iff : ∀ A (rel : A → A -> bool) a b l,
-  is_sorted rel (a :: b :: l) = true
-  ↔ rel a b = true ∧ is_sorted rel (b :: l) = true.
+  sorted rel (a :: b :: l)
+  ↔ rel a b = true ∧ sorted rel (b :: l).
 Proof.
 intros.
 apply Bool.andb_true_iff.
@@ -125,7 +133,7 @@ Qed.
 Theorem sorted_extends : ∀ A (rel : A → _),
   transitive rel →
   ∀ a l,
-  is_sorted rel (a :: l) = true
+  sorted rel (a :: l)
   → ∀ b, b ∈ l → rel a b = true.
 Proof.
 intros * Htra * Hsort b Hb.
@@ -142,8 +150,8 @@ split; [ now apply Htra with (b := c) | easy ].
 Qed.
 
 Theorem sorted_app : ∀ A rel (la lb : list A),
-  is_sorted rel (la ++ lb) = true
-  → is_sorted rel la = true ∧ is_sorted rel lb = true ∧
+  sorted rel (la ++ lb)
+  → sorted rel la ∧ sorted rel lb ∧
     (transitive rel → ∀ a b, a ∈ la → b ∈ lb → rel a b = true).
 Proof.
 intros * Hab.
@@ -151,7 +159,7 @@ split. {
   revert lb Hab.
   induction la as [| a1]; intros; [ easy | ].
   destruct la as [| a2]; [ easy | ].
-  cbn - [ is_sorted ] in Hab |-*.
+  cbn in Hab.
   apply sorted_cons_cons_true_iff in Hab.
   apply sorted_cons_cons_true_iff.
   destruct Hab as (Haa & Hab).
@@ -166,7 +174,7 @@ split. {
     destruct lb as [| b1]; [ easy | ].
     now apply Bool.andb_true_iff in Hab.
   }
-  cbn - [ is_sorted ] in Hab.
+  cbn in Hab.
   apply sorted_cons_cons_true_iff in Hab.
   destruct Hab as (Haa & Hab).
   now apply IHla.
@@ -176,11 +184,11 @@ split. {
   induction la as [| a1]; intros; [ easy | ].
   destruct Ha as [Ha| Ha]. 2: {
     apply (IHla a lb); [ easy | | easy ].
-    cbn - [ is_sorted ] in Hab.
+    cbn in Hab.
     now apply sorted_cons in Hab.
   }
   subst a1.
-  cbn - [ is_sorted ] in Hab.
+  cbn in Hab.
   apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
   now apply in_or_app; right.
 }
@@ -189,7 +197,7 @@ Qed.
 Theorem sorted_trans : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la,
-  is_sorted rel (a :: la ++ [b]) = true →
+  sorted rel (a :: la ++ [b]) →
   rel a b = true.
 Proof.
 intros * Htra * Hs.
@@ -210,7 +218,7 @@ Theorem sorted_repeat : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ a la,
-  is_sorted rel (a :: la ++ [a]) = true
+  sorted rel (a :: la ++ [a])
   → la = repeat a (length la).
 Proof.
 intros * Hant Htra * Hs.
@@ -220,7 +228,7 @@ remember (b :: la) as lb; cbn in Hs; subst lb.
 rewrite <- app_comm_cons in Hs.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
-specialize (sorted_trans Htra _ _ _ Hs) as Hba.
+specialize (sorted_trans Htra _ _ Hs) as Hba.
 specialize (Hant a b Hab Hba) as H1; subst b.
 f_equal.
 now apply IHla.
@@ -601,9 +609,9 @@ Qed.
 Theorem sorted_cons_cons_split_list' : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la lb l,
-  is_sorted rel (a :: b :: l) = true
+  sorted rel (a :: b :: l)
   → split_list l = (la, lb)
-  → is_sorted rel (a :: la) = true ∧ is_sorted rel (b :: lb) = true.
+  → sorted rel (a :: la) ∧ sorted rel (b :: lb).
 Proof.
 intros * Htra * Hs Hla.
 remember (length l) as len eqn:Hlen; symmetry in Hlen.
@@ -618,6 +626,7 @@ cbn in Hlen; apply Nat.succ_inj in Hlen.
 destruct len. {
   apply length_zero_iff_nil in Hlen; subst l.
   injection Hla; clear Hla; intros; subst la lb.
+  unfold sorted in Hs |-*.
   cbn in Hs |-*.
   rewrite (Htra a b c); [ easy | | ]. {
     now destruct (rel a b).
@@ -640,13 +649,15 @@ specialize (H1 a b l la lb) as H2.
 remember (c :: d :: l) as l'; cbn in Hs; subst l'.
 remember (c :: la) as l'.
 remember (d :: lb) as l''; cbn; subst l' l''.
+unfold sorted in Hs |-*; cbn in Hs |-*.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct ab; [ rewrite Bool.andb_true_l in Hs | easy ].
 destruct bc; [ rewrite Bool.andb_true_l in Hs | easy ].
 rewrite (Htra a b c Hab Hbc), Bool.andb_true_l.
-assert (H : is_sorted rel (a :: b :: l) = true). {
+assert (H : sorted rel (a :: b :: l)). {
   remember (b :: l) as l'; cbn; subst l'.
+  unfold sorted; cbn.
   rewrite Hab, Bool.andb_true_l; cbn.
   destruct l as [| e]; [ easy | ].
   remember (e :: l) as l'; cbn in Hs; subst l'.
@@ -671,9 +682,9 @@ Qed.
 Theorem sorted_split_list : ∀ A (rel : A → _),
   transitive rel →
   ∀ la lb l,
-  is_sorted rel l = true
+  sorted rel l
   → split_list l = (la, lb)
-  → is_sorted rel la = true ∧ is_sorted rel lb = true.
+  → sorted rel la ∧ sorted rel lb.
 Proof.
 intros * Htra * Hs Hla.
 destruct l as [| a]; [ now injection Hla; intros; subst la lb | ].
@@ -691,7 +702,7 @@ Theorem sorted_merge_loop_cons_cons_r_aux : ∀ A (rel : A → _),
   ∀ n it l la lb a b,
   length (repeat a (n + n) ++ a :: b :: l) ≤ n + it
   → rel a a = true
-  → is_sorted rel (a :: b :: l) = true
+  → sorted rel (a :: b :: l)
   → split_list l = (la, lb)
   → merge_loop rel it la (repeat a n ++ a :: b :: lb) =
     merge_loop rel it (a :: la) (repeat a n ++ b :: lb).
@@ -705,6 +716,7 @@ revert n l la lb a b Hit Haa Hs Hla.
 induction it; intros; [ easy | ].
 destruct l as [| c]. {
   injection Hla; clear Hla; intros; subst la lb.
+  unfold sorted in Hs.
   cbn in Hs; rewrite Bool.andb_true_r in Hs.
   rename Hs into Hab.
   destruct n; cbn. {
@@ -719,6 +731,7 @@ destruct l as [| c]. {
 }
 destruct l as [| d]. {
   injection Hla; clear Hla; intros; subst la lb.
+  unfold sorted in Hs.
   cbn in Hs |-*.
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
@@ -767,6 +780,7 @@ destruct lc as (lc, ld).
 injection Hla; clear Hla; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hla; cbn.
 remember (d :: l) as l'; cbn in Hs; subst l'.
+unfold sorted in Hs; cbn in Hs.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
@@ -789,7 +803,8 @@ destruct n. {
   cbn - [ merge_loop is_sorted ] in H1.
   assert (H : S (S (S (length l))) ≤ it) by flia Hit.
   specialize (H1 H Haa); clear H.
-  assert (H : is_sorted rel (a :: b :: l) = true). {
+  assert (H : sorted rel (a :: b :: l)). {
+    unfold sorted; cbn.
     remember (b :: l) as l'; cbn; subst l'.
     now rewrite Hab, Hs.
   }
@@ -812,12 +827,14 @@ destruct ca. {
   cbn in Hit.
   apply IHit with (l := l); [ flia Hit | easy | | easy ].
   remember (d :: l) as l'; cbn; subst l'.
+  unfold sorted; cbn.
   now rewrite Hcd, Hs.
 } {
   f_equal.
   rewrite IHit with (l := c :: d :: l); [ | flia Hit | easy | | ]; cycle 1. {
+    unfold sorted.
     remember (d :: l) as l'; cbn; subst l'.
-    now rewrite Hab, Hbc, Hcd, Hs.
+    now rewrite Hab, Hbc, Hcd.
   } {
     now cbn; rewrite Hla.
   }
@@ -834,7 +851,7 @@ Theorem sorted_merge_loop_cons_cons_r : ∀ A (rel : A → _),
    ∀ it l la lb a b,
    S (S (length l)) ≤ it
    → rel a a = true
-   → is_sorted rel (a :: b :: l) = true
+   → sorted rel (a :: b :: l)
    → split_list l = (la, lb)
    → merge_loop rel it la (a :: b :: lb) =
      merge_loop rel it (a :: la) (b :: lb).
@@ -850,13 +867,14 @@ Theorem sorted_merge_loop_cons_cons : ∀ A (rel : A → _),
   transitive rel →
   ∀ it l la lb a b,
   length l ≤ it
-  → is_sorted rel (a :: b :: l) = true
+  → sorted rel (a :: b :: l)
   → split_list l = (la, lb)
   → merge_loop rel (S (S it)) (a :: la) (b :: lb) =
     a :: b :: merge_loop rel it la lb.
 Proof.
 intros * Hant Htra * Hit Hs Hla.
 remember (S it) as sit; cbn; subst sit.
+unfold sorted in Hs.
 remember (b :: l) as l'; cbn in Hs; subst l'.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ f_equal | easy ].
@@ -898,7 +916,7 @@ Theorem sorted_merge_cons_cons : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ l la lb a b,
-  is_sorted rel (a :: b :: l) = true
+  sorted rel (a :: b :: l)
   → split_list l = (la, lb)
   → merge rel (a :: la) (b :: lb) = a :: b :: merge rel la lb.
 Proof.
@@ -906,18 +924,20 @@ intros * Hant Htra * Hs Hla.
 unfold merge.
 do 2 rewrite List_cons_length.
 rewrite Nat.add_succ_r, Nat.add_succ_l.
-apply (sorted_merge_loop_cons_cons Hant Htra l); [ | easy | easy ].
-apply split_list_length in Hla.
-now rewrite Hla.
+assert (H : length l ≤ length la + length lb). {
+  apply split_list_length in Hla.
+  now rewrite Hla.
+}
+now apply (sorted_merge_loop_cons_cons Hant Htra H).
 Qed.
 
 Theorem merge_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la lb,
   length la + length lb ≤ it
-  → is_sorted rel la = true
-  → is_sorted rel lb = true
-  → is_sorted rel (merge_loop rel it la lb) = true.
+  → sorted rel la
+  → sorted rel lb
+  → sorted rel (merge_loop rel it la lb).
 Proof.
 intros * Htot * Hit Hla Hlb.
 revert la lb Hit Hla Hlb.
@@ -933,9 +953,11 @@ destruct ab. {
   rewrite List_cons_length, Nat.add_succ_l in Hit.
   apply Nat.succ_le_mono in Hit.
   specialize (IHit la (b :: lb) Hit) as H1.
-  assert (H : is_sorted rel la = true) by now apply sorted_cons in Hla.
+  assert (H : sorted rel la) by now apply sorted_cons in Hla.
   specialize (H1 H Hlb); clear H.
   rewrite Hlc in H1.
+  unfold sorted in H1 |-*.
+  cbn in H1 |-*.
   rewrite H1, Bool.andb_true_r.
   destruct it; [ easy | ].
   cbn in Hlc.
@@ -947,6 +969,7 @@ destruct ab. {
     injection Hlc; clear Hlc; intros H2 H3; subst d.
     rename Hdb into Hcb.
     cbn in Hla.
+    unfold sorted in Hla; cbn in Hla.
     now destruct (rel a c).
   }
   now injection Hlc; clear Hlc; intros H2 H3; subst c.
@@ -961,9 +984,10 @@ rewrite Nat.add_comm in Hit.
 rewrite Nat.add_succ_r in Hit.
 apply Nat.succ_le_mono in Hit.
 specialize (IHit (a :: la) lb Hit) as H1.
-assert (H : is_sorted rel lb = true) by now apply sorted_cons in Hlb.
+assert (H : sorted rel lb) by now apply sorted_cons in Hlb.
 specialize (H1 Hla H); clear H.
 rewrite Hlc in H1.
+unfold sorted in H1 |-*; cbn in H1 |-*.
 rewrite H1, Bool.andb_true_r.
 destruct it; [ easy | ].
 cbn in Hlc.
@@ -982,15 +1006,16 @@ destruct ad. {
 }
 injection Hlc; clear Hlc; intros Hlc H; subst d.
 cbn in Hlb.
+unfold sorted in Hlb; cbn in Hlb.
 now destruct (rel b c).
 Qed.
 
 Theorem merge_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ la lb,
-  is_sorted rel la = true
-  → is_sorted rel lb = true
-  → is_sorted rel (merge rel la lb) = true.
+  sorted rel la
+  → sorted rel lb
+  → sorted rel (merge rel la lb).
 Proof.
 intros * Htot * Hla Hlb.
 unfold merge.
@@ -1001,7 +1026,7 @@ Theorem msort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l it,
   length l ≤ it
-  → is_sorted rel (msort_loop rel it l) = true.
+  → sorted rel (msort_loop rel it l).
 Proof.
 intros * Htot * Hit.
 revert l Hit.
@@ -1041,7 +1066,7 @@ Theorem sorted_merge_loop : ∀ A (rel : A → _),
   transitive rel →
   ∀ it l la lb,
   length l ≤ it
-  → is_sorted rel l = true
+  → sorted rel l
   → split_list l = (la, lb)
   → merge_loop rel it la lb = l.
 Proof.
@@ -1066,6 +1091,7 @@ injection Hll; clear Hll; intros; subst la lb.
 rename lc into la; rename ld into lb; rename Hlc into Hll.
 destruct it; [ cbn in Hit; flia Hit | ].
 cbn.
+unfold sorted in Hs.
 remember (b :: l) as l'; cbn in Hs; subst l'.
 apply Bool.andb_true_iff in Hs.
 destruct Hs as (Hab, Hs).
@@ -1114,6 +1140,7 @@ destruct ba. {
   rename c into b; rename Hbc into Hab.
   rewrite sorted_merge_loop_cons_cons_r with (l := l); try easy. 2: {
     remember (b :: l) as l'; cbn; subst l'.
+    unfold sorted; cbn in Hs |-*.
     now rewrite Hab, Hs.
   }
   replace it with (S (S (it - 2))) by flia Hit.
@@ -1121,6 +1148,7 @@ destruct ba. {
     flia Hit.
   } {
     remember (b :: l) as l'; cbn; subst l'.
+    unfold sorted; cbn in Hs |-*.
     now rewrite Hab, Hs.
   }
   f_equal; f_equal.
@@ -1140,6 +1168,7 @@ apply IHlen with (m := len - 2); try easy; try flia Hlen. {
   cbn; flia Hlen.
 } {
   remember (c :: l) as l'; cbn; subst l'.
+  unfold sorted; cbn in Hs |-*.
   now rewrite Hbc, Hs.
 }
 cbn.
@@ -1150,7 +1179,7 @@ Theorem sorted_merge : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ l la lb,
-  is_sorted rel l = true
+  sorted rel l
   → split_list l = (la, lb)
   → merge rel la lb = l.
 Proof.
@@ -1167,7 +1196,7 @@ Theorem sorted_msort_loop : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l it,
   length l ≤ it
-  → is_sorted rel l = true
+  → sorted rel l
   → msort_loop rel it l = l.
 Proof.
 intros * Hant Htra Htot * Hit Hs.
@@ -1689,9 +1718,10 @@ Theorem ssort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l len,
   length l ≤ len
-  → is_sorted rel (ssort_loop rel len l) = true.
+  → sorted rel (ssort_loop rel len l).
 Proof.
 intros * Htr Htot * Hlen.
+unfold sorted.
 revert l Hlen.
 induction len; intros; cbn. {
   now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst l.
@@ -1728,10 +1758,11 @@ Qed.
 Theorem isort_insert_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ a lsorted,
-  is_sorted rel lsorted = true
-  → is_sorted rel (isort_insert rel a lsorted) = true.
+  sorted rel lsorted
+  → sorted rel (isort_insert rel a lsorted).
 Proof.
 intros * Hto * Hs.
+unfold sorted in Hs |-*.
 induction lsorted as [| b]; [ easy | cbn ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
@@ -1754,8 +1785,8 @@ Qed.
 Theorem isort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ lsorted l,
-  is_sorted rel lsorted = true
-  → is_sorted rel (isort_loop rel lsorted l) = true.
+  sorted rel lsorted
+  → sorted rel (isort_loop rel lsorted l).
 Proof.
 intros * Hto * Hs.
 revert lsorted Hs.
@@ -1767,7 +1798,7 @@ Theorem sorted_isort_insert_r : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ a la,
-  is_sorted rel (la ++ [a]) = true
+  sorted rel (la ++ [a])
   → isort_insert rel a la = la ++ [a].
 Proof.
 intros * Hant Htra * Hla.
@@ -1814,7 +1845,7 @@ destruct bc. {
   rewrite Hac.
   f_equal.
   rewrite <- app_comm_cons in Hla.
-  specialize (sorted_repeat Hant Htra b la Hla) as Har.
+  specialize (sorted_repeat Hant Htra _ Hla) as Har.
   rewrite Har.
   remember (length la) as len eqn:Hlen; symmetry in Hlen.
   clear - Hac.
@@ -1837,7 +1868,7 @@ Theorem sorted_isort_loop : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ ls l,
-  is_sorted rel (ls ++ l) = true
+  sorted rel (ls ++ l)
   → isort_loop rel ls l = ls ++ l.
 Proof.
 intros * Hant Htra * Hs.
@@ -1845,7 +1876,7 @@ revert ls Hs.
 induction l as [| a]; intros; cbn; [ now rewrite app_nil_r | ].
 assert (H : isort_insert rel a ls = ls ++ [a]). {
   clear IHl.
-  assert (H : is_sorted rel (ls ++ [a]) = true). {
+  assert (H : sorted rel (ls ++ [a])). {
     rewrite List_app_cons, app_assoc in Hs.
     now apply sorted_app in Hs.
   }
@@ -1862,7 +1893,7 @@ Qed.
 
 Theorem select_first_sorted : ∀ A rel,
   transitive rel → ∀ (a b : A) la lb,
-  is_sorted rel (a :: la) = true
+  sorted rel (a :: la)
   → select_first rel a la = (b, lb)
   → a = b ∧ la = lb.
 Proof.
@@ -1899,7 +1930,7 @@ Theorem sorted_ssort_loop : ∀ A (rel : A → _),
   transitive rel →
   ∀ it l,
   length l ≤ it
-  → is_sorted rel l = true
+  → sorted rel l
   → ssort_loop rel it l = l.
 Proof.
 intros * Htr * Hit Hs.
@@ -1910,7 +1941,7 @@ cbn in Hit; apply Nat.succ_le_mono in Hit.
 remember (select_first rel a la) as lb eqn:Hlb.
 symmetry in Hlb.
 destruct lb as (b, lb).
-specialize (select_first_sorted Htr _ _ Hs Hlb) as H1.
+specialize (select_first_sorted Htr Hs Hlb) as H1.
 destruct H1; subst b lb.
 f_equal.
 apply IHit; [ easy | ].
@@ -1921,7 +1952,7 @@ Qed.
 
 Theorem sorted_bsort_swap : ∀ A (rel : A → _),
   ∀ la,
-  is_sorted rel la = true
+  sorted rel la
   → bsort_swap rel la = None.
 Proof.
 intros * Hs.
@@ -1936,7 +1967,7 @@ Qed.
 
 Theorem sorted_bsort_loop : ∀ A (rel : A → _),
   ∀ it l,
-  is_sorted rel l = true
+  sorted rel l
   → bsort_loop rel it l = l.
 Proof.
 intros * Hs.
@@ -1951,7 +1982,7 @@ Qed.
 
 Theorem bsort_swap_None : ∀ A (rel : A → _) la,
   bsort_swap rel la = None
-  → is_sorted rel la = true.
+  → sorted rel la.
 Proof.
 intros * Hs.
 induction la as [| a]; [ easy | cbn ].
@@ -1962,14 +1993,15 @@ destruct ab; [ | easy ].
 remember (bsort_swap rel (b :: la)) as lc eqn:Hlc.
 symmetry in Hlc.
 destruct lc as [lc| ]; [ easy | clear Hs ].
-now rewrite (IHla eq_refl).
+unfold sorted in IHla |-*; cbn in IHla |-*.
+now rewrite (IHla eq_refl), Hab.
 Qed.
 
 Theorem bsort_swap_Some : ∀ A (rel : A → _) la lb,
   bsort_swap rel la = Some lb
   → is_sorted rel la = false ∧
     ∃ a b lc ld, rel a b = false ∧
-    is_sorted rel (lc ++ [a]) = true ∧
+    sorted rel (lc ++ [a]) ∧
     la = lc ++ a :: b :: ld ∧
     lb = lc ++ b :: a :: ld.
 Proof.
@@ -2009,10 +2041,12 @@ split. {
   destruct lc as [| e]. {
     cbn in Hlc |-*.
     injection Hlc; clear Hlc; intros Hlc H; subst c la.
+    unfold sorted; cbn.
     now rewrite Hab.
   }
   cbn in Hlc.
   injection Hlc; clear Hlc; intros Hlc H; subst e.
+  unfold sorted in Hbla |-*.
   cbn in Hbla |-*.
   now rewrite Hab, Hbla.
 }
@@ -2204,7 +2238,7 @@ Theorem bsort_loop_is_sorted_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la,
   nb_disorder rel la ≤ it
-  → is_sorted rel (bsort_loop rel it la) = true.
+  → sorted rel (bsort_loop rel it la).
 Proof.
 intros * Htot * Hit.
 revert la Hit.
@@ -2216,6 +2250,7 @@ induction it; intros. {
   destruct Hit as (Hra, Hd).
   specialize (IHla Hd).
   cbn in IHla.
+  unfold sorted in IHla |-*; cbn in IHla |-*.
   rewrite IHla.
   destruct la as [| b]; [ easy | ].
   rewrite Bool.andb_true_r.
@@ -2236,7 +2271,7 @@ Theorem bsort_loop_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it l,
   length l * length l ≤ it
-  → is_sorted rel (bsort_loop rel it l) = true.
+  → sorted rel (bsort_loop rel it l).
 Proof.
 intros * Htot * Hit.
 rename l into la.
@@ -2508,7 +2543,7 @@ Qed.
 Theorem sorted_middle : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la lb lc,
-  is_sorted rel (la ++ a :: lb ++ b :: lc) = true
+  sorted rel (la ++ a :: lb ++ b :: lc)
   → rel a b = true.
 Proof.
 intros * Htra * Hsort.
@@ -2525,7 +2560,7 @@ Qed.
 
 Theorem sorted_any : ∀ A (rel : A → A → bool) i j d l,
   transitive rel
-  → is_sorted rel l = true
+  → sorted rel l
   → i < j
   → j < length l
   → rel (nth i l d) (nth j l d) = true.
@@ -2556,7 +2591,7 @@ now apply sorted_middle in Hsort.
 Qed.
 
 Theorem sorted_ltb_leb_incl : ∀ l,
-  is_sorted Nat.ltb l = true → is_sorted Nat.leb l = true.
+  sorted Nat.ltb l → sorted Nat.leb l.
 Proof.
 intros * Hs.
 induction l as [| a]; [ easy | ].
@@ -2575,8 +2610,8 @@ Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
   antisymmetric rel →
   transitive rel →
   ∀ la lb,
-  is_sorted rel la = true
-  → is_sorted rel lb = true
+  sorted rel la
+  → sorted rel lb
   → permutation eqb la lb
   → la = lb.
 Proof.
@@ -2631,8 +2666,8 @@ Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _) (Heqb : equality eqb
   transitive rel →
   total_relation rel →
   ∀ la lb lsa lsb,
-  is_sorted rel lsa = true
-  → is_sorted rel lsb = true
+  sorted rel lsa
+  → sorted rel lsb
   → permutation eqb (lsa ++ la) (lsb ++ lb)
   → isort_loop rel lsa la = isort_loop rel lsb lb.
 Proof.
@@ -2675,7 +2710,7 @@ Theorem sorted_isort : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
   ∀ l,
-  is_sorted rel l = true
+  sorted rel l
   → isort rel l = l.
 Proof.
 intros * Hant Htra * Hs.
@@ -2685,7 +2720,7 @@ Qed.
 Theorem sorted_ssort : ∀ A (rel : A → _),
   transitive rel →
   ∀ l,
-  is_sorted rel l = true
+  sorted rel l
   → ssort rel l = l.
 Proof.
 intros * Htr * Hs.
@@ -2695,7 +2730,7 @@ Qed.
 
 Theorem sorted_bsort : ∀ A (rel : A → _),
   ∀ l,
-  is_sorted rel l = true
+  sorted rel l
   → bsort rel l = l.
 Proof.
 intros * Hs.
@@ -2707,7 +2742,7 @@ Theorem sorted_msort : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
   ∀ l,
-  is_sorted rel l = true
+  sorted rel l
   → msort rel l = l.
 Proof.
 intros * Hant Htra Htot * Hs.
@@ -2719,7 +2754,7 @@ Qed.
 
 Theorem isort_is_sorted : ∀ A (rel : A → _),
   total_relation rel
-  → ∀ l, is_sorted rel (isort rel l) = true.
+  → ∀ l, sorted rel (isort rel l).
 Proof.
 intros * Hto *.
 destruct l as [| a]; [ easy | cbn ].
@@ -2729,7 +2764,7 @@ Qed.
 Theorem ssort_is_sorted : ∀ A (rel : A → _),
   transitive rel →
   total_relation rel →
-  ∀ l, is_sorted rel (ssort rel l) = true.
+  ∀ l, sorted rel (ssort rel l).
 Proof.
 intros * Htr Htot *.
 now apply ssort_loop_is_sorted.
@@ -2737,7 +2772,7 @@ Qed.
 
 Theorem bsort_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
-  ∀ l, is_sorted rel (bsort rel l) = true.
+  ∀ l, sorted rel (bsort rel l).
 Proof.
 intros * Htot *.
 now apply bsort_loop_is_sorted.
@@ -2745,7 +2780,7 @@ Qed.
 
 Theorem msort_is_sorted : ∀ A (rel : A → _),
   total_relation rel →
-  ∀ l, is_sorted rel (msort rel l) = true.
+  ∀ l, sorted rel (msort rel l).
 Proof.
 intros * Htot *.
 now apply msort_loop_is_sorted.
@@ -2821,7 +2856,7 @@ Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-  ∀ l, is_sorted rel l = true ↔ isort rel l = l.
+  ∀ l, sorted rel l ↔ isort rel l = l.
 Proof.
 intros * Hant Htra Htot *.
 split; [ now apply sorted_isort | ].
@@ -2834,7 +2869,7 @@ Qed.
 Theorem sorted_ssort_iff : ∀ A (rel : A → A → bool),
   transitive rel →
   total_relation rel →
-  ∀ l, is_sorted rel l = true ↔ ssort rel l = l.
+  ∀ l, sorted rel l ↔ ssort rel l = l.
 Proof.
 intros * Htra Htot *.
 split; [ now apply sorted_ssort | ].
@@ -2846,7 +2881,7 @@ Qed.
 
 Theorem sorted_bsort_iff : ∀ A (rel : A → A → bool),
   total_relation rel →
-  ∀ l, is_sorted rel l = true ↔ bsort rel l = l.
+  ∀ l, sorted rel l ↔ bsort rel l = l.
 Proof.
 intros * Htot *.
 split; [ now apply sorted_bsort | ].
@@ -2860,7 +2895,7 @@ Theorem sorted_msort_iff : ∀ A (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-  ∀ l, is_sorted rel l = true ↔ msort rel l = l.
+  ∀ l, sorted rel l ↔ msort rel l = l.
 Proof.
 intros * Hant Htra Htot *.
 split; [ now apply sorted_msort | ].
@@ -3218,7 +3253,7 @@ Theorem nth_isort_rank_loop_of_nodup_sorted : ∀ A d (rel : A → _),
   → transitive rel
   → ∀ l_ini n l i,
   NoDup l_ini
-  → is_sorted rel l_ini = true
+  → sorted rel l_ini
   → n + length l = length l_ini
   → i < length l_ini
   → nth i (isort_rank_loop rel (λ j, nth j l_ini d) (seq 0 n) l) 0 = i.
@@ -3264,7 +3299,7 @@ Theorem nth_isort_rank_of_nodup_sorted : ∀ A (rel : A → _),
   → transitive rel
   → ∀ l i,
   NoDup l
-  → is_sorted rel l = true
+  → sorted rel l
   → i < length l
   → nth i (isort_rank rel l) 0 = i.
 Proof.
@@ -3302,7 +3337,7 @@ Theorem isort_rank_of_nodup_sorted : ∀ A (rel : A → _),
   → transitive rel
   → ∀ l,
   NoDup l
-  → is_sorted rel l = true
+  → sorted rel l
   → isort_rank rel l = seq 0 (length l).
 Proof.
 intros * Hant Htra * Hnd Hs.
@@ -3479,8 +3514,8 @@ Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
   transitive rel →
   ∀ la lb,
   Permutation la lb
-  → is_sorted rel la = true
-  → is_sorted rel lb = true
+  → sorted rel la
+  → sorted rel lb
   → la = lb.
 Proof.
 intros * Hrefl Hant Htra * Hpab Hsa Hsb.
@@ -3525,8 +3560,8 @@ Theorem sorted_unique : ∀ A (rel : A → A → bool),
   antisymmetric rel →
   transitive rel →
   ∀ (s1 s2 : list A → _),
-  (∀ l, Permutation (s1 l) l ∧ is_sorted rel (s1 l) = true)
-  → (∀ l, Permutation (s2 l) l ∧ is_sorted rel (s2 l) = true)
+  (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l))
+  → (∀ l, Permutation (s2 l) l ∧ sorted rel (s2 l))
   → ∀ l, s1 l = s2 l.
 Proof.
 intros * Href Hant Htra * Hps1 Hps2 l.

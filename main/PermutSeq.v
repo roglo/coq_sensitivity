@@ -373,7 +373,7 @@ Qed.
 
 Theorem sorted_permut : ∀ l,
   is_permut_list l
-  → is_sorted Nat.leb l = true
+  → sorted Nat.leb l
   → l = seq 0 (length l).
 Proof.
 intros * Hl Hs.
@@ -390,7 +390,7 @@ assert (Hal : a = length l). {
   specialize (H3 H); clear H.
   assert (H4 : ∀ c, c ∈ l → c ≤ a). {
     intros c Hc.
-    specialize (sorted_app _ _ _ Hs) as H4.
+    specialize (sorted_app _ _ Hs) as H4.
     destruct H4 as (_ & _ & H4).
     specialize (H4 Nat_leb_trans c a Hc (or_introl eq_refl)).
     now apply Nat.leb_le in H4.
@@ -442,7 +442,7 @@ assert (Hal : a = length l). {
   easy.
 }
 rewrite Hal; f_equal.
-apply IHl; [ | apply (sorted_app Nat.leb l [a] Hs) ].
+apply IHl; [ | apply (sorted_app l [a] Hs) ].
 subst a.
 now apply is_permut_list_app_max.
 Qed.

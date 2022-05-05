@@ -2096,7 +2096,7 @@ now rewrite isort_rank_length.
 Qed.
 
 Theorem sorted_rel : ∀ A (d : A) ord l,
-  is_sorted ord l = true
+  sorted ord l
   → ∀ i, S i < length l
   → ord (nth i l d) (nth (S i) l d) = true.
 Proof.
@@ -2114,7 +2114,7 @@ Qed.
 
 Theorem sorted_strongly_sorted : ∀ A (d : A) ord l,
   transitive ord
-  → is_sorted ord l = true
+  → sorted ord l
   → ∀ i j,
     i < length l
     → j < length l
