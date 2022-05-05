@@ -15,7 +15,8 @@ Set Implicit Arguments.
 Require Import Utf8 Arith Permutation.
 Import List List.ListNotations Init.Nat.
 
-Require Import Misc SortingFun RingLike IterAdd IterMul IterAnd Pigeonhole.
+Require Import Misc PermutationFun SortingFun RingLike.
+Require Import IterAdd IterMul IterAnd Pigeonhole.
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
@@ -2703,8 +2704,11 @@ Admitted.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite glop.
-Search isort.
-Search (isort _ _ = isort _ _).
+  rewrite (permutation_isort' Nat.eqb_eq) with (lb := to_radix_loop m n i).
+Search (equality Nat.eqb).
+Check Nat_eqb_equality.
+Search (transitive).
+About Nat_ltb_trans.
 Search (_  ↔ isort _ _ = isort _ _).
 ...
 Search (isort _ (rev _)).

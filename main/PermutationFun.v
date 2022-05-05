@@ -1006,6 +1006,12 @@ specialize (Hbef H).
 now rewrite equality_refl in Hbef.
 Qed.
 
+Theorem Nat_eqb_equality : equality Nat.eqb.
+Proof.
+intros a b.
+apply Nat.eqb_eq.
+Qed.
+
 Require Import Permutation.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),
