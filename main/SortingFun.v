@@ -2052,6 +2052,51 @@ rewrite Hlc, Hle.
 easy.
 Qed.
 
+(* to be completed
+Theorem bsort_swap_Some_iff : ∀ A (rel : A → _) la lb,
+  bsort_swap rel la = Some lb
+  ↔ is_sorted rel la = false ∧
+    ∃ a b lc ld, rel a b = false ∧
+    sorted rel (lc ++ [a]) ∧
+    la = lc ++ a :: b :: ld ∧
+    lb = lc ++ b :: a :: ld.
+Proof.
+intros.
+split; [ apply bsort_swap_Some | ].
+intros (Hsa & a & b & lc & ld & Hab & Hsc & Hla & Hlb).
+subst la lb.
+destruct lc as [| c]; [ now cbn; rewrite Hab | ].
+destruct lc as [| d]. {
+  cbn; rewrite Hab.
+  unfold sorted in Hsc; cbn in Hsc.
+  now rewrite Bool.andb_true_r in Hsc; rewrite Hsc.
+}
+cbn in Hsc.
+unfold sorted in Hsc.
+remember (d :: lc ++ [a]) as l; cbn in Hsc; subst l.
+apply Bool.andb_true_iff in Hsc.
+destruct Hsc as (Hcd & Hsc).
+cbn - [ bsort_swap ].
+remember (d :: lc ++ a :: b :: ld) as l; cbn; subst l.
+rewrite Hcd.
+destruct lc as [| e]. {
+  cbn in Hsc; rewrite Bool.andb_true_r in Hsc.
+  do 2 rewrite app_nil_l.
+  remember (a :: b :: ld) as l; cbn; subst l.
+  rewrite Hsc.
+  remember (b :: ld) as l; cbn; subst l.
+  now rewrite Hab.
+}
+cbn - [ is_sorted ] in Hsc.
+cbn - [ bsort_swap ].
+remember (e :: lc ++ [a]) as l; cbn in Hsc; subst l.
+apply Bool.andb_true_iff in Hsc.
+destruct Hsc as (Hde, Hsc).
+remember (e :: lc ++ a :: b :: ld) as l; cbn; subst l.
+rewrite Hde.
+...
+*)
+
 Fixpoint nb_nrel A (rel : A → A → bool) a l :=
   match l with
   | [] => 0
@@ -2957,7 +3002,76 @@ induction ita; intros; cbn. {
   }
   eapply (bsort_swap_nb_disorder Htot); [ | apply Hitb ].
 clear - Htot Hab Hsde.
+(*
+  destruct ld as [| d]; intros; cbn; [ now rewrite Hab | ].
+  unfold sorted in Hsde.
+  destruct ld as [| e]; cbn in Hsde |-*. {
+    rewrite Hab; cbn in Hsde.
+    now rewrite Bool.andb_true_r in Hsde; rewrite Hsde.
+  }
+  apply Bool.andb_true_iff in Hsde.
+  destruct Hsde as (Hde & Hsde); rewrite Hde.
+  destruct ld as [| f]. {
+    cbn in Hsde |-*.
+    rewrite Bool.andb_true_r in Hsde.
+    now rewrite Hsde, Hab.
+  }
+  cbn in Hsde |-*.
+  apply Bool.andb_true_iff in Hsde.
+  destruct Hsde as (Hef, Hsde).
+  rewrite Hef.
+  destruct ld as [| g]; cbn in Hsde |-*. {
+    now rewrite Bool.andb_true_r in Hsde; rewrite Hsde, Hab.
+  }
+  apply Bool.andb_true_iff in Hsde.
+  destruct Hsde as (Hfg, Hsde).
+  rewrite Hfg.
+*)
+(* ouais, bon... *)
 Search (bsort_swap _ _ = Some _).
+Print bsort_swap.
+...
+Theorem sorted_not_sorted_bsort_swap_app : ∀ A (rel : A → _),
+  ∀ la lb,
+  sorted rel la
+  → ¬ sorted rel lb
+  → bsort_swap rel (la ++ lb) =
+    match bsort_swap rel lb with
+    | Some lc => Some (la ++ lc)
+    | None => None
+    end.
+Proof.
+intros * Hsa Hsb.
+unfold sorted in Hsb.
+apply Bool.not_true_is_false in Hsb.
+destruct la as [| a]. {
+  clear Hsa; cbn.
+  induction lb as [| a]; [ easy | cbn ].
+  destruct lb as [| b]; [ easy | ].
+  remember (b :: lb) as l; cbn in Hsb; subst l.
+  apply Bool.andb_false_iff in Hsb.
+  destruct Hsb as [Hab| Hsb]; [ now rewrite Hab | ].
+  specialize (IHlb Hsb).
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite IHlb; cbn.
+  destruct lb as [| c]; [ easy | cbn ].
+  remember (c :: lb) as l; cbn in Hsb; subst l.
+  apply Bool.andb_false_iff in Hsb.
+  destruct Hsb as [Hbc| Hsb]; [ now rewrite Hbc | ].
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct bc; [ | easy ].
+(* bon, ça marche pas, ce théorème, là *)
+... return to permutation_bsort_loop'.
+rewrite sorted_not_sorted_bsort_swap_app; cycle 1. {
+  now apply sorted_app in Hsde.
+} {
+  intros H.
+  unfold sorted in H; cbn in H.
+  now rewrite Hab in H.
+}
+cbn.
+now rewrite Hab.
 ...
 revert a b le Hab Hsde.
   induction ld as [| d]; intros; cbn; [ now rewrite Hab | ].
