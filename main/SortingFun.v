@@ -3090,6 +3090,14 @@ induction la as [| a']; intros. {
   cbn in Hsb.
   now injection Hsb.
 }
+cbn in Hsa.
+remember (rel a a') as aa' eqn:Haa'; symmetry in Haa'.
+destruct aa'. {
+  remember (select_first rel a la) as le eqn:Hle; symmetry in Hle.
+  destruct le as (e, le).
+  injection Hsa; clear Hsa; intros; subst e lc.
+...
+  eapply IHla; [ | apply Hle | apply Hsb ].
 ...
 ... return to permutation_ssort_loop'
   apply (permutation_select_first_select_first rel Hpab Hlc Hld).
