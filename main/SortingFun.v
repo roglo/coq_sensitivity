@@ -2518,13 +2518,13 @@ Proof.
 intros * Heqb * Hac Hbd.
 revert lb lc ld Hac Hbd.
 induction la as [| a]; intros; cbn. {
-  apply permutation_nil in Hac; subst lc; cbn.
+  apply permutation_nil_l in Hac; subst lc; cbn.
   destruct lb as [| b]; [ | now destruct ld ].
-  apply permutation_nil in Hbd; subst ld.
+  apply permutation_nil_l in Hbd; subst ld.
   apply permutation_nil_nil.
 }
 destruct lb as [| b]. {
-  apply permutation_nil in Hbd; subst ld.
+  apply permutation_nil_l in Hbd; subst ld.
   now rewrite split_list_inv_nil_r.
 }
 move b before a.
@@ -2668,14 +2668,11 @@ Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
 Proof.
 intros * Heqb Hant Htra * Hsa Hsb Hpab.
 revert lb Hsb Hpab.
-induction la as [| a]; intros; [ now apply permutation_nil in Hpab | ].
+induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
 specialize sorted_cons as H.
 specialize (H _ rel a la Hsa).
 specialize (IHla H); clear H.
-destruct lb as [| b]. {
-  apply (permutation_sym Heqb) in Hpab.
-  now apply permutation_nil in Hpab.
-}
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 apply permutation_cons_l_iff in Hpab.
 cbn in Hpab.
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
@@ -3042,6 +3039,35 @@ Theorem permutation_ssort' : ∀ A (eqb rel : A → _),
   → ssort rel la = ssort rel lb.
 Proof.
 intros (* * Heqb Hant Htra Htot *) * Hab.
+unfold ssort.
+Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
+  ∀ ita itb la lb,
+  length la ≤ ita
+  → length lb ≤ itb
+  → permutation eqb la lb
+  → ssort_loop rel ita la = ssort_loop rel itb lb.
+Proof.
+intros * Hita Hitb Hpab.
+revert itb la lb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  apply permutation_nil in Hpab; subst lb.
+  now destruct itb.
+}
+destruct la as [| a]. {
+  apply permutation_nil in Hpab; subst lb.
+  now destruct itb.
+}
+remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (c, lc).
+cbn in Hita; apply Nat.succ_le_mono in Hita.
+destruct itb. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
+Search (permutation _ []).
+...
+Search select_first.
+... return to permutation_ssort'.
+now apply (@permutation_ssort_loop' _ eqb rel).
 ...
 *)
 

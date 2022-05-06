@@ -489,8 +489,12 @@ intros H; specialize (H1 _ H).
 now rewrite (equality_refl Heqb) in H1.
 Qed.
 
-Theorem permutation_nil : ∀ A (eqb : A → _) l,
+Theorem permutation_nil_l : ∀ A (eqb : A → _) l,
   permutation eqb [] l → l = [].
+Proof. now intros; destruct l. Qed.
+
+Theorem permutation_nil_r : ∀ A (eqb : A → _) l,
+  permutation eqb l [] → l = [].
 Proof. now intros; destruct l. Qed.
 
 Theorem permutation_trans : ∀ A (eqb : A → _),
@@ -697,7 +701,7 @@ remember (extract (eqb a) l) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hll.
 destruct Hll as (H1 & H & H2).
-apply permutation_nil in Ha.
+apply permutation_nil_l in Ha.
 apply app_eq_nil in Ha.
 destruct Ha; subst bef aft; cbn in H2; subst l.
 f_equal; symmetry.
