@@ -162,7 +162,9 @@ remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 now destruct lxl as [((bef, x), aft)| ].
 Qed.
 
-Theorem permutation_cons_inv : ∀ A eqb la lb (a : A) (Heqb : equality eqb),
+Theorem permutation_cons_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb a,
   permutation eqb (a :: la) (a :: lb) → permutation eqb la lb.
 Proof.
 intros * Heqb * Hpab.

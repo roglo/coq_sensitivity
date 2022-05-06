@@ -2877,6 +2877,56 @@ specialize (H2 H); clear H.
 now specialize (Hant _ _ H1 H2) as H3.
 Qed.
 
+Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ ita itb la lb,
+  length la ≤ ita
+  → length lb ≤ itb
+  → permutation eqb la lb
+  → ssort_loop rel ita la = ssort_loop rel itb lb.
+Proof.
+intros * Heqb Hant Htot Htra * Hita Hitb Hpab.
+revert itb la lb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  apply permutation_nil_l in Hpab; subst lb.
+  now destruct itb.
+}
+destruct la as [| a]. {
+  apply permutation_nil_l in Hpab; subst lb.
+  now destruct itb.
+}
+remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as (c, lc).
+cbn in Hita; apply Nat.succ_le_mono in Hita.
+destruct itb. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
+  now apply permutation_nil_r in Hpab.
+}
+cbn.
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+cbn in Hitb; apply Nat.succ_le_mono in Hitb.
+remember (select_first rel b lb) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+specialize (permutation_select_first_select_first Heqb Hant Htot Htra) as H1.
+specialize (H1 _ _ _ _ _ _ _ _ Hpab Hlc Hld).
+subst d.
+f_equal.
+apply IHita. {
+  apply select_first_length in Hlc; congruence.
+} {
+  apply select_first_length in Hld; congruence.
+}
+apply (select_first_permutation rel Heqb) in Hlc, Hld.
+apply (permutation_cons_inv Heqb) with (a := c).
+apply (permutation_sym Heqb) in Hlc.
+apply (permutation_trans Heqb) with (lb := a :: la); [ easy | ].
+now apply (permutation_trans Heqb) with (lb := b :: lb).
+Qed.
+
 (* main *)
 
 Theorem sorted_isort : ∀ A (rel : A → _),
@@ -3060,70 +3110,19 @@ unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
 
-(* to be completed
 Theorem permutation_ssort' : ∀ A (eqb rel : A → _),
-(*
   equality eqb →
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-*)
   ∀ la lb,
   permutation eqb la lb
   → ssort rel la = ssort rel lb.
 Proof.
-intros (* * Heqb Hant Htra Htot *) * Hab.
+intros * Heqb Hant Htra Htot * Hab.
 unfold ssort.
-Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ ita itb la lb,
-  length la ≤ ita
-  → length lb ≤ itb
-  → permutation eqb la lb
-  → ssort_loop rel ita la = ssort_loop rel itb lb.
-Proof.
-intros * Heqb Hant Htot Htra * Hita Hitb Hpab.
-revert itb la lb Hita Hitb Hpab.
-induction ita; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  now destruct itb.
-}
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb.
-  now destruct itb.
-}
-remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as (c, lc).
-cbn in Hita; apply Nat.succ_le_mono in Hita.
-destruct itb. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
-  now apply permutation_nil_r in Hpab.
-}
-cbn.
-destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
-cbn in Hitb; apply Nat.succ_le_mono in Hitb.
-remember (select_first rel b lb) as ld eqn:Hld; symmetry in Hld.
-destruct ld as (d, ld).
-specialize (permutation_select_first_select_first Heqb Hant Htot Htra) as H1.
-specialize (H1 _ _ _ _ _ _ _ _ Hpab Hlc Hld).
-subst d.
-f_equal.
-apply IHita. {
-  apply select_first_length in Hlc; congruence.
-} {
-  apply select_first_length in Hld; congruence.
-}
-...
-apply (select_first_permutation rel Heqb) in Hlc, Hld.
-...
-... return to permutation_ssort'.
-now apply (@permutation_ssort_loop' _ eqb rel).
-...
-*)
+now apply (permutation_ssort_loop' Heqb Hant Htra Htot).
+Qed.
 
 Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -3139,6 +3138,22 @@ rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 now apply (permutation_bsort_loop' Heqb Hant Htra Htot).
 Qed.
+
+(* to be completed
+Theorem permutation_merge' : ∀ A (eqb rel : A → _),
+(*
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ la lb,
+  permutation eqb la lb
+  → msort rel la = msort rel lb.
+Proof.
+intros (* * Heqb Hant Htra Htot *) * Hab.
+Search msort.
+*)
 
 (* *)
 
