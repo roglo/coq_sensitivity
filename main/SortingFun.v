@@ -3014,6 +3014,16 @@ induction ita; intros. {
   now exists a, b, ld, le.
 }
 cbn.
+destruct itb; intros. {
+  apply Nat.le_0_r in Hitb.
+  apply nb_disorder_0_sorted in Hitb.
+  cbn.
+  remember (bsort_swap rel la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [lc| ]. {
+    apply bsort_swap_Some_iff in Hlc.
+    destruct Hlc as (Hs & c & d & ld & le & Hlc).
+    destruct Hlc as (Hcd & Hrc & Hbla & Hlbc).
+    subst la lc.
 ...
 ... return to permutation_bsort'
 now apply (@permutation_bsort_loop' _ eqb rel).
