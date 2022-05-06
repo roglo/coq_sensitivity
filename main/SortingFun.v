@@ -2843,6 +2843,40 @@ apply (permutation_sym Heqb).
 now apply (@bsort_swap_Some_permutation _ eqb rel).
 Qed.
 
+Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ a b c d la lb lc ld,
+  permutation eqb (a :: la) (b :: lb)
+  → select_first rel a la = (c, lc)
+  → select_first rel b lb = (d, ld)
+  → c = d.
+Proof.
+intros * Heqb Hant Htra Htot * Hpab Hsa Hsb.
+generalize Hsa; intros H.
+apply (select_first_if Htra Htot) in H.
+destruct H as (Hca, Hcc).
+generalize Hsb; intros H.
+apply (select_first_if Htra Htot) in H.
+destruct H as (Hdb, Hdd).
+specialize (Hca d) as H1.
+specialize (Hdb c) as H2.
+assert (H : d ∈ a :: la). {
+  apply (permutation_sym Heqb) in Hpab.
+  apply (permutation_in Heqb) with (la := b :: lb); [ easy | ].
+  now apply select_first_in in Hsb.
+}
+specialize (H1 H); clear H.
+assert (H : c ∈ b :: lb). {
+  apply (permutation_in Heqb) with (la := a :: la); [ easy | ].
+  now apply select_first_in in Hsa.
+}
+specialize (H2 H); clear H.
+now specialize (Hant _ _ H1 H2) as H3.
+Qed.
+
 (* main *)
 
 Theorem sorted_isort : ∀ A (rel : A → _),
@@ -3042,13 +3076,16 @@ intros (* * Heqb Hant Htra Htot *) * Hab.
 unfold ssort.
 Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
   equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
   ∀ ita itb la lb,
   length la ≤ ita
   → length lb ≤ itb
   → permutation eqb la lb
   → ssort_loop rel ita la = ssort_loop rel itb lb.
 Proof.
-intros * Heqb * Hita Hitb Hpab.
+intros * Heqb Hant Htot Htra * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
 induction ita; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
@@ -3071,51 +3108,17 @@ destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 cbn in Hitb; apply Nat.succ_le_mono in Hitb.
 remember (select_first rel b lb) as ld eqn:Hld; symmetry in Hld.
 destruct ld as (d, ld).
-assert (H : c = d). {
-Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ a b c d la lb lc ld,
-  permutation eqb (a :: la) (b :: lb)
-  → select_first rel a la = (c, lc)
-  → select_first rel b lb = (d, ld)
-  → c = d.
-Proof.
-intros * Heqb * Hpab Hsa Hsb.
-revert a b c d lb lc ld Hpab Hsa Hsb.
-induction la as [| a']; intros. {
-  cbn in Hsa.
-  injection Hsa; clear Hsa; intros; subst c lc.
-  apply (permutation_length_1_inv Heqb) in Hpab.
-  injection Hpab; clear Hpab; intros; subst b lb.
-  cbn in Hsb.
-  now injection Hsb.
-}
-cbn in Hsa.
-remember (rel a a') as aa' eqn:Haa'; symmetry in Haa'.
-destruct aa'. {
-  remember (select_first rel a la) as le eqn:Hle; symmetry in Hle.
-  destruct le as (e, le).
-  injection Hsa; clear Hsa; intros; subst e lc.
-...
-  eapply IHla; [ | apply Hle | apply Hsb ].
-...
-... return to permutation_ssort_loop'
-  apply (permutation_select_first_select_first rel Hpab Hlc Hld).
-}
-eapply (@permutation_select_first_select_first _ eqb rel). {
-  apply Hpab.
+specialize (permutation_select_first_select_first Heqb Hant Htot Htra) as H1.
+specialize (H1 _ _ _ _ _ _ _ _ Hpab Hlc Hld).
+subst d.
+f_equal.
+apply IHita. {
+  apply select_first_length in Hlc; congruence.
 } {
-  apply Hlc.
+  apply select_first_length in Hld; congruence.
 }
-apply (@permutation_select_first_select_first _ eqb rel a b c d la lb lc ld).
 ...
-f_equal. 2: {
-  apply IHita. {
-    apply select_first_length in Hlc; congruence.
-  } {
-    apply select_first_length in Hld; congruence.
-  }
-  apply (select_first_permutation rel Heqb) in Hlc, Hld.
+apply (select_first_permutation rel Heqb) in Hlc, Hld.
 ...
 ... return to permutation_ssort'.
 now apply (@permutation_ssort_loop' _ eqb rel).
