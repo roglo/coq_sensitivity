@@ -3029,6 +3029,22 @@ unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
 
+(* to be completed
+Theorem permutation_ssort' : ∀ A (eqb rel : A → _),
+(*
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ la lb,
+  permutation eqb la lb
+  → ssort rel la = ssort rel lb.
+Proof.
+intros (* * Heqb Hant Htra Htot *) * Hab.
+...
+*)
+
 Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
