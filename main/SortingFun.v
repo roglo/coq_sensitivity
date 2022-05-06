@@ -3041,21 +3041,22 @@ Proof.
 intros (* * Heqb Hant Htra Htot *) * Hab.
 unfold ssort.
 Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
+  equality eqb →
   ∀ ita itb la lb,
   length la ≤ ita
   → length lb ≤ itb
   → permutation eqb la lb
   → ssort_loop rel ita la = ssort_loop rel itb lb.
 Proof.
-intros * Hita Hitb Hpab.
+intros * Heqb * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
 induction ita; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil in Hpab; subst lb.
+  apply permutation_nil_l in Hpab; subst lb.
   now destruct itb.
 }
 destruct la as [| a]. {
-  apply permutation_nil in Hpab; subst lb.
+  apply permutation_nil_l in Hpab; subst lb.
   now destruct itb.
 }
 remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
@@ -3063,9 +3064,51 @@ destruct lc as (c, lc).
 cbn in Hita; apply Nat.succ_le_mono in Hita.
 destruct itb. {
   apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
-Search (permutation _ []).
+  now apply permutation_nil_r in Hpab.
+}
+cbn.
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+cbn in Hitb; apply Nat.succ_le_mono in Hitb.
+remember (select_first rel b lb) as ld eqn:Hld; symmetry in Hld.
+destruct ld as (d, ld).
+assert (H : c = d). {
+Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a b c d la lb lc ld,
+  permutation eqb (a :: la) (b :: lb)
+  → select_first rel a la = (c, lc)
+  → select_first rel b lb = (d, ld)
+  → c = d.
+Proof.
+intros * Heqb * Hpab Hsa Hsb.
+revert a b c d lb lc ld Hpab Hsa Hsb.
+induction la as [| a']; intros. {
+  cbn in Hsa.
+  injection Hsa; clear Hsa; intros; subst c lc.
+  apply (permutation_length_1_inv Heqb) in Hpab.
+  injection Hpab; clear Hpab; intros; subst b lb.
+  cbn in Hsb.
+  now injection Hsb.
+}
 ...
-Search select_first.
+... return to permutation_ssort_loop'
+  apply (permutation_select_first_select_first rel Hpab Hlc Hld).
+}
+eapply (@permutation_select_first_select_first _ eqb rel). {
+  apply Hpab.
+} {
+  apply Hlc.
+}
+apply (@permutation_select_first_select_first _ eqb rel a b c d la lb lc ld).
+...
+f_equal. 2: {
+  apply IHita. {
+    apply select_first_length in Hlc; congruence.
+  } {
+    apply select_first_length in Hld; congruence.
+  }
+  apply (select_first_permutation rel Heqb) in Hlc, Hld.
+...
 ... return to permutation_ssort'.
 now apply (@permutation_ssort_loop' _ eqb rel).
 ...

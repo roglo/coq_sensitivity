@@ -692,6 +692,17 @@ apply Heqb in Hba; subst b.
 now apply permutation_refl.
 Qed.
 
+Theorem permutation_length_1 : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a b,
+  permutation eqb [a] [b] → a = b.
+Proof.
+intros * Heqb * Hpab.
+unfold permutation in Hpab; cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply Heqb in Hab | easy ].
+Qed.
+
 Theorem permutation_length_1_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ a l, permutation eqb [a] l → l = [a].
 Proof.
