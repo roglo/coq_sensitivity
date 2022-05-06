@@ -2774,7 +2774,79 @@ cbn in Hr.
 now destruct (rel a b).
 Qed.
 
-(* *)
+Theorem bsort_swap_Some_permutation : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  bsort_swap rel la = Some lb
+  → permutation eqb la lb.
+Proof.
+intros * Heqb * Hs.
+apply bsort_swap_Some_iff in Hs.
+destruct Hs as (Hns & a & b & lc & ld & Hab & Hs & Hla & Hlb).
+subst la lb.
+apply (permutation_app_head Heqb).
+apply (permutation_swap Heqb).
+Qed.
+
+Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb ita itb,
+  nb_disorder rel la ≤ ita
+  → nb_disorder rel lb ≤ itb
+  → permutation eqb la lb
+  → bsort_loop rel ita la = bsort_loop rel itb lb.
+Proof.
+intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
+revert la lb itb Hita Hitb Hpab.
+induction ita; intros. {
+  apply Nat.le_0_r in Hita.
+  apply nb_disorder_0_sorted in Hita.
+  revert la lb Hita Hitb Hpab.
+  induction itb; intros. {
+    apply Nat.le_0_r in Hitb.
+    apply nb_disorder_0_sorted in Hitb.
+    now apply (sorted_sorted_permutation Heqb Hant Htra).
+  }
+  cbn.
+  remember (bsort_swap rel lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [lc| ]. 2: {
+    apply bsort_swap_None in Hlc.
+    now apply (sorted_sorted_permutation Heqb Hant Htra).
+  }
+  apply bsort_swap_Some in Hlc.
+  destruct Hlc as (Hsb & a & b & ld & le & Hab & Hsde & Hlb & Hlc).
+  subst lb lc.
+  apply IHitb; [ easy | | ]. 2: {
+    eapply (permutation_trans Heqb); [ apply Hpab | ].
+    apply (permutation_app_head Heqb).
+    now apply permutation_swap.
+  }
+  eapply (bsort_swap_nb_disorder Htot); [ | apply Hitb ].
+  apply bsort_swap_Some_iff.
+  split; [ easy | ].
+  now exists a, b, ld, le.
+}
+cbn.
+remember (bsort_swap rel la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [lc| ]. 2: {
+  apply bsort_swap_None in Hlc.
+  apply (sorted_sorted_permutation Heqb Hant Htra); [ easy | | ]. {
+    now apply (bsort_loop_is_sorted_nb_disorder Htot).
+  }
+  apply (permutation_trans Heqb) with (lb := lb);  [ easy | ].
+  now apply permutation_bsort_loop.
+}
+apply bsort_swap_nb_disorder with (lb := lc) in Hita; [ | easy | easy ].
+apply IHita; [ easy | easy | ].
+apply (permutation_trans Heqb) with (lb := la); [ | easy ].
+apply (permutation_sym Heqb).
+now apply (@bsort_swap_Some_permutation _ eqb rel).
+Qed.
+
+(* main *)
 
 Theorem sorted_isort : ∀ A (rel : A → _),
   antisymmetric rel →
@@ -2957,78 +3029,20 @@ unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
 
-(* to be completed
 Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
-(*
   equality eqb →
   antisymmetric rel →
   transitive rel →
-*)
   total_relation rel →
   ∀ la lb,
   permutation eqb la lb
   → bsort rel la = bsort rel lb.
 Proof.
-intros * (*Heqb Hant Htra*) Htot * Hab.
+intros * Heqb Hant Htra Htot * Hab.
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
-Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ la lb ita itb,
-  nb_disorder rel la ≤ ita
-  → nb_disorder rel lb ≤ itb
-  → permutation eqb la lb
-  → bsort_loop rel ita la = bsort_loop rel itb lb.
-Proof.
-intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
-revert la lb itb Hita Hitb Hpab.
-induction ita; intros. {
-  apply Nat.le_0_r in Hita.
-  apply nb_disorder_0_sorted in Hita.
-  revert la lb Hita Hitb Hpab.
-  induction itb; intros. {
-    apply Nat.le_0_r in Hitb.
-    apply nb_disorder_0_sorted in Hitb.
-    now apply (sorted_sorted_permutation Heqb Hant Htra).
-  }
-  cbn.
-  remember (bsort_swap rel lb) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [lc| ]. 2: {
-    apply bsort_swap_None in Hlc.
-    now apply (sorted_sorted_permutation Heqb Hant Htra).
-  }
-  apply bsort_swap_Some in Hlc.
-  destruct Hlc as (Hsb & a & b & ld & le & Hab & Hsde & Hlb & Hlc).
-  subst lb lc.
-  apply IHitb; [ easy | | ]. 2: {
-    eapply (permutation_trans Heqb); [ apply Hpab | ].
-    apply (permutation_app_head Heqb).
-    now apply permutation_swap.
-  }
-  eapply (bsort_swap_nb_disorder Htot); [ | apply Hitb ].
-  apply bsort_swap_Some_iff.
-  split; [ easy | ].
-  now exists a, b, ld, le.
-}
-cbn.
-destruct itb; intros. {
-  apply Nat.le_0_r in Hitb.
-  apply nb_disorder_0_sorted in Hitb.
-  cbn.
-  remember (bsort_swap rel la) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [lc| ]. {
-    apply bsort_swap_Some_iff in Hlc.
-    destruct Hlc as (Hs & c & d & ld & le & Hlc).
-    destruct Hlc as (Hcd & Hrc & Hbla & Hlbc).
-    subst la lc.
-...
-... return to permutation_bsort'
-now apply (@permutation_bsort_loop' _ eqb rel).
+now apply (permutation_bsort_loop' Heqb Hant Htra Htot).
 Qed.
-*)
 
 (* *)
 
