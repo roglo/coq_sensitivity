@@ -3105,7 +3105,7 @@ Theorem permutation_isort' : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → isort rel la = isort rel lb.
 Proof.
-intros * Heqb Hant Htra Htot * Hab.
+intros * Heqb Hant Htra Htot * Hpab.
 unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
@@ -3119,7 +3119,7 @@ Theorem permutation_ssort' : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → ssort rel la = ssort rel lb.
 Proof.
-intros * Heqb Hant Htra Htot * Hab.
+intros * Heqb Hant Htra Htot * Hpab.
 unfold ssort.
 now apply (permutation_ssort_loop' Heqb Hant Htra Htot).
 Qed.
@@ -3133,14 +3133,14 @@ Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → bsort rel la = bsort rel lb.
 Proof.
-intros * Heqb Hant Htra Htot * Hab.
+intros * Heqb Hant Htra Htot * Hpab.
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 now apply (permutation_bsort_loop' Heqb Hant Htra Htot).
 Qed.
 
 (* to be completed
-Theorem permutation_merge' : ∀ A (eqb rel : A → _),
+Theorem permutation_msort' : ∀ A (eqb rel : A → _),
 (*
   equality eqb →
   antisymmetric rel →
@@ -3151,8 +3151,76 @@ Theorem permutation_merge' : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → msort rel la = msort rel lb.
 Proof.
-intros (* * Heqb Hant Htra Htot *) * Hab.
-Search msort.
+intros (* * Heqb Hant Htra Htot *) * Hpab.
+unfold msort.
+Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
+  equality eqb →
+(*
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ ita itb la lb,
+  length la ≤ ita
+  → length lb ≤ itb
+  → permutation eqb la lb
+  → msort_loop rel ita la = msort_loop rel itb lb.
+Proof.
+intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+replace (length lb) with (length la) in Hitb. 2: {
+Theorem permutation_length : ∀ A (eqb : A → _),
+  ∀ la lb, permutation eqb la lb → length la = length lb.
+Proof.
+intros * Hpab.
+revert lb Hpab.
+induction la as [| a]; intros. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+destruct lb as [| b]; intros. {
+  now apply permutation_nil_r in Hpab.
+}
+cbn; f_equal.
+(* pas gagné mais bon, pas impossible *)
+...
+... return to permutation_msort_loop'
+  now apply (@permutation_length _ eqb).
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+...
+intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+revert itb la lb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  apply permutation_nil_l in Hpab; subst lb.
+  clear Hitb.
+  induction itb; [ easy | cbn ].
+  now rewrite <- IHitb.
+}
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+destruct la as [| a]. {
+  apply permutation_nil_l in Hpab; subst lb; cbn.
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_nil.
+}
+cbn in Hita |-*.
+apply Nat.succ_le_mono in Hita.
+destruct la as [| a']. {
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst lc ld.
+  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
+  rewrite msort_loop_single, msort_loop_nil; cbn.
+  clear Hitb.
+  induction itb; [ easy | cbn ].
+  now rewrite <- IHitb, msort_loop_nil.
+}
+cbn in Hll.
+remember (split_list la) as ll' eqn:H; symmetry in H.
+destruct ll' as (le, lf).
+injection Hll; clear Hll; intros; subst lc ld.
+rename le into lc; rename lf into ld; rename H into Hll.
+cbn.
+...
 *)
 
 (* *)
