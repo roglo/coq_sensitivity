@@ -3167,6 +3167,11 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+(* l'ennui, c'est que les "msort_loop" vont partir dans des "split"
+   complètement différents entre "la" et "lb". Bonjour pour unifier
+   ça ! *)
+...
+intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 revert ita itb lb Hita Hitb Hpab.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb; cbn.
