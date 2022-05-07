@@ -3168,7 +3168,8 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
-induction ita; intros; cbn. {
+induction ita as (ita, IHita) using lt_wf_rec; intros.
+destruct ita; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
   apply permutation_nil_l in Hpab; subst lb.
   clear Hitb.
@@ -3211,8 +3212,23 @@ destruct ll as (lg, lh).
 rewrite merge_length, app_length.
 do 2 rewrite msort_loop_length.
 do 3 rewrite <- app_length.
+rewrite <- app_assoc.
+replace (length (le ++ lf ++ lg ++ lh)) with (length (a :: a' :: la)). 2: {
+  apply split_list_length in Hll, Hll1, Hll2.
+  cbn in Hll1, Hll2 |-*.
+  do 3 rewrite app_length.
+  rewrite Nat.add_assoc.
+  rewrite Hll.
+  rewrite <- Nat.add_succ_l, <- Nat.add_succ_r.
+  now rewrite Hll1, Hll2.
+}
+(* remplacer
+    (merge rel (msort_loop rel ita le) (msort_loop rel ita lf))
+   par
+     msort rel (a :: lc)
+   ?
+ *)
 ...
-(*
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 (* l'ennui, c'est que les "msort_loop" vont partir dans des "split"
    complètement différents entre "la" et "lb". Bonjour pour unifier
@@ -3324,8 +3340,6 @@ destruct ll' as (le, lf).
 injection Hll; clear Hll; intros; subst lc ld.
 rename le into lc; rename lf into ld; rename H into Hll.
 cbn in Hlen.
-...
-*)
 ...
 *)
 
