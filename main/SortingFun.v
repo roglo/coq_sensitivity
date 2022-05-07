@@ -3169,6 +3169,7 @@ Proof.
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
+move itb before ita.
 destruct ita; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
   apply permutation_nil_l in Hpab; subst lb.
@@ -3200,15 +3201,18 @@ remember (split_list la) as ll' eqn:H; symmetry in H.
 destruct ll' as (le, lf).
 injection Hll; clear Hll; intros; subst lc ld.
 rename le into lc; rename lf into ld; rename H into Hll.
+move lc before lb; move ld before lc.
 destruct ita; [ easy | ].
 apply Nat.succ_le_mono in Hita.
 remember (a :: lc) as lac; remember (a' :: ld) as lad; cbn; subst lac lad.
 remember (split_list (a :: lc)) as ll eqn:Hll1; symmetry in Hll1.
 destruct ll as (le, lf).
+move le before ld; move lf before le.
 rewrite merge_length, app_length.
 do 2 rewrite msort_loop_length.
 remember (split_list (a' :: ld)) as ll eqn:Hll2; symmetry in Hll2.
 destruct ll as (lg, lh).
+move lg before lf; move lh before lg.
 rewrite merge_length, app_length.
 do 2 rewrite msort_loop_length.
 do 3 rewrite <- app_length.
@@ -3222,12 +3226,82 @@ replace (length (le ++ lf ++ lg ++ lh)) with (length (a :: a' :: la)). 2: {
   rewrite <- Nat.add_succ_l, <- Nat.add_succ_r.
   now rewrite Hll1, Hll2.
 }
-(* remplacer
-    (merge rel (msort_loop rel ita le) (msort_loop rel ita lf))
-   par
-     msort rel (a :: lc)
-   ?
- *)
+remember (merge rel (msort_loop rel ita le) (msort_loop rel ita lf)) as la1.
+remember (merge rel (msort_loop rel ita lg) (msort_loop rel ita lh)) as la2.
+remember (split_list_inv la1 la2) as l1.
+move la2 before la1; move l1 before la2.
+...
+rewrite sorted_merge_loop with (l := l1). 6: {
+  subst l1.
+  apply split_list_split_list_inv.
+  subst la1 la2.
+  do 2 rewrite merge_length.
+  do 2 rewrite app_length.
+  do 4 rewrite msort_loop_length.
+  apply split_list_length in Hll1, Hll2.
+  rewrite <- Hll1, <- Hll2; cbn.
+  apply split_list_lengths in Hll.
+  destruct Hll as [Hll| Hll]. {
+    now left; rewrite Hll.
+  } {
+    now right; rewrite Hll.
+  }
+} 5: {
+  subst l1.
+...
+  subst l1 la1 la2.
+Search (split_list_inv (merge _ _ _)).
+Search split_list_inv.
+...
+  do 3 rewrite app_length.
+  rewrite Nat.add_assoc.
+  rewrite <- Hll1, <- Hll2; cbn.
+  rewrite Nat.add_succ_r, <- Hll.
+...
+assert (H : ita < S (S ita)) by flia.
+rewrite <- (IHita ita H _ (le ++ lf ++ lg ++ lh) lb); clear H; cycle 1. {
+  apply split_list_length in Hll, Hll1, Hll2.
+  do 3 rewrite app_length.
+  rewrite Nat.add_assoc.
+  rewrite <- Hll1, <- Hll2; cbn.
+  rewrite Nat.add_succ_r, <- Hll.
+(* chiasse ; ah bin non ça marche pas *)
+(* j'ai donc pas assez d'itérations *)
+Search split_list.
+...
+sorted_merge_loop:
+  ∀ (A : Type) (rel : A → A → bool),
+    antisymmetric rel
+    → transitive rel
+      → ∀ (it : nat) (l la lb : list A),
+          length l ≤ it
+          → sorted rel l
+            → split_list l = (la, lb) → merge_loop rel it la lb = l
+...
+replace (merge rel (msort_loop rel ita le) (msort_loop rel ita lf)) with
+  (msort rel (a :: lc)). 2: {
+  cbn.
+  destruct lc as [| c]. {
+    cbn in Hll1.
+    injection Hll1; clear Hll1; intros; subst le lf; cbn.
+    now rewrite msort_loop_single, msort_loop_nil.
+  }
+  cbn in Hll1.
+  remember (split_list lc) as ll eqn:Hll3; symmetry in Hll3.
+  destruct ll as (li, lj).
+  injection Hll1; clear Hll1; intros; subst le lf.
+  rename li into le; rename lj into lf.
+  remember (a :: le) as l1; remember (c :: lf) as l2; cbn; subst l1 l2.
+  remember (split_list (a :: le)).
+  symmetry in Heqp.
+  destruct p.
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length.
+  remember (split_list (c :: lf)).
+  symmetry in Heqp0.
+  destruct p.
+  rewrite merge_length, app_length.
+  do 2 rewrite msort_loop_length.
 ...
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 (* l'ennui, c'est que les "msort_loop" vont partir dans des "split"
