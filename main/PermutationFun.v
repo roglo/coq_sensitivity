@@ -33,6 +33,10 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 Definition permutation A (eqb : A → _) la lb := is_permutation eqb la lb = true.
 
+Theorem fold_permutation : ∀ A (eqb : A → _) la lb,
+  is_permutation eqb la lb = true → permutation eqb la lb.
+Proof. easy. Qed.
+
 (*
 Require Import Relations.
 
@@ -692,6 +696,27 @@ remember (eqb b a) as ba eqn:Hba; symmetry in Hba.
 destruct ba; [ | now apply permutation_refl ].
 apply Heqb in Hba; subst b.
 now apply permutation_refl.
+Qed.
+
+Theorem permutation_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb, permutation eqb la lb → length la = length lb.
+Proof.
+intros * Heqb * Hpab.
+unfold permutation in Hpab.
+revert lb Hpab.
+induction la as [| a]; intros. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+cbn in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb); subst lb.
+apply Heqb in H; subst x.
+rewrite app_length; cbn.
+rewrite Nat.add_succ_r, <- app_length; f_equal.
+now apply IHla.
 Qed.
 
 Theorem permutation_length_1 : ∀ A (eqb : A → _),
