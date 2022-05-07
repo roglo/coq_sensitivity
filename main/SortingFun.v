@@ -3179,6 +3179,20 @@ destruct ita; cbn. {
 }
 remember (split_list la) as ll eqn:Hll; symmetry in Hll.
 destruct ll as (lc, ld).
+(**)
+destruct itb; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
+  apply permutation_nil_r in Hpab; subst la.
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst lc ld.
+  now rewrite msort_loop_nil.
+}
+rename Hll into Hlla.
+remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
+destruct ll as (le, lf).
+move lc before lb; move ld before lc.
+move le before ld; move lf before le.
+...
 destruct la as [| a]. {
   apply permutation_nil_l in Hpab; subst lb; cbn.
   cbn in Hll.
