@@ -3167,6 +3167,53 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+revert itb la lb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  apply permutation_nil_l in Hpab; subst lb.
+  clear Hitb.
+  induction itb; [ easy | cbn ].
+  now rewrite <- IHitb.
+}
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+destruct la as [| a]. {
+  apply permutation_nil_l in Hpab; subst lb; cbn.
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_nil.
+}
+cbn in Hita |-*.
+apply Nat.succ_le_mono in Hita.
+destruct la as [| a']. {
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst lc ld.
+  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
+  rewrite msort_loop_single, msort_loop_nil; cbn.
+  clear Hitb.
+  induction itb; [ easy | cbn ].
+  now rewrite <- IHitb, msort_loop_nil.
+}
+cbn in Hita, Hll.
+remember (split_list la) as ll' eqn:H; symmetry in H.
+destruct ll' as (le, lf).
+injection Hll; clear Hll; intros; subst lc ld.
+rename le into lc; rename lf into ld; rename H into Hll.
+destruct ita; [ easy | ].
+apply Nat.succ_le_mono in Hita.
+remember (a :: lc) as lac; remember (a' :: ld) as lad; cbn; subst lac lad.
+remember (split_list (a :: lc)) as ll eqn:Hll1; symmetry in Hll1.
+destruct ll as (le, lf).
+rewrite merge_length, app_length.
+do 2 rewrite msort_loop_length.
+remember (split_list (a' :: ld)) as ll eqn:Hll2; symmetry in Hll2.
+destruct ll as (lg, lh).
+rewrite merge_length, app_length.
+do 2 rewrite msort_loop_length.
+do 3 rewrite <- app_length.
+...
+(*
+intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
 (* l'ennui, c'est que les "msort_loop" vont partir dans des "split"
    complètement différents entre "la" et "lb". Bonjour pour unifier
    ça ! *)
@@ -3194,7 +3241,24 @@ rewrite <- app_length in Hitb.
 remember (a :: la) as l; cbn; subst l.
 remember (split_list (a :: la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as (lc, ld).
-(* tout dépend en fait de la parité du bef ; c'est la merde *)
+Theorem msort_loop_app : ∀ A (rel : A → _),
+  ∀ it la lb,
+  length (la ++ lb) ≤ it
+  → msort_loop rel it (la ++ lb) = msort_loop rel it (lb ++ la).
+Proof.
+intros * Hit.
+revert la lb Hit.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil, app_eq_nil in Hit.
+  now destruct Hit; subst la lb.
+}
+remember (split_list (la ++ lb)) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+remember (split_list (lb ++ la)) as ll eqn:Hll'; symmetry in Hll'.
+destruct ll as (le, lf).
+(* mouais... c'est la merde *)
+...
+rewrite msort_loop_app.
 ...
 destruct la as [| a']. {
   cbn in Hlc.
@@ -3261,40 +3325,7 @@ injection Hll; clear Hll; intros; subst lc ld.
 rename le into lc; rename lf into ld; rename H into Hll.
 cbn in Hlen.
 ...
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
-revert itb la lb Hita Hitb Hpab.
-induction ita; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  clear Hitb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb.
-}
-remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lc, ld).
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb; cbn.
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  now do 2 rewrite msort_loop_nil.
-}
-cbn in Hita |-*.
-apply Nat.succ_le_mono in Hita.
-destruct la as [| a']. {
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
-  rewrite msort_loop_single, msort_loop_nil; cbn.
-  clear Hitb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb, msort_loop_nil.
-}
-cbn in Hll.
-remember (split_list la) as ll' eqn:H; symmetry in H.
-destruct ll' as (le, lf).
-injection Hll; clear Hll; intros; subst lc ld.
-rename le into lc; rename lf into ld; rename H into Hll.
-cbn.
+*)
 ...
 *)
 
