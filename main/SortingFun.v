@@ -3158,22 +3158,28 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
 (*
   antisymmetric rel →
   transitive rel →
-  total_relation rel →
 *)
+  total_relation rel →
   ∀ ita itb la lb,
   length la ≤ ita
   → length lb ≤ itb
   → permutation eqb la lb
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
 move itb before ita.
+assert (Hsa : sorted rel (msort_loop rel ita la)). {
+  now apply (msort_loop_is_sorted Htot).
+}
+assert (Hsb : sorted rel (msort_loop rel itb lb)). {
+  now apply (msort_loop_is_sorted Htot).
+}
 destruct ita; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
   apply permutation_nil_l in Hpab; subst lb.
-  clear Hitb.
+  clear Hitb Hsb.
   induction itb; [ easy | cbn ].
   now rewrite <- IHitb.
 }
@@ -3192,6 +3198,9 @@ remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
 destruct ll as (le, lf).
 move lc before lb; move ld before lc.
 move le before ld; move lf before le.
+cbn in Hsa, Hsb.
+rewrite Hlla in Hsa.
+rewrite Hllb in Hsb.
 ...
 destruct la as [| a]. {
   apply permutation_nil_l in Hpab; subst lb; cbn.
