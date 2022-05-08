@@ -1365,7 +1365,7 @@ intros c Hc.
 now apply Hbef; right.
 Qed.
 
-Theorem permutation_isort_insert_sorted : ∀ A (eqb rel : A → _),
+Theorem permuted_isort_insert_sorted : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb c,
   permutation eqb la lb
@@ -1380,7 +1380,7 @@ apply (permutation_cons_isort_insert rel Heqb).
 now apply permutation_refl.
 Qed.
 
-Theorem permutation_isort_loop_sorted : ∀ A (eqb rel : A → _),
+Theorem permuted_isort_loop_sorted : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb lc,
   permutation eqb la lb
@@ -1390,10 +1390,10 @@ intros * Heqb * Hp.
 revert la lb Hp.
 induction lc as [| c]; intros; [ easy | cbn ].
 apply IHlc.
-now apply permutation_isort_insert_sorted.
+now apply permuted_isort_insert_sorted.
 Qed.
 
-Theorem permutation_isort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_isort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ la lb, permutation eqb (la ++ lb) (isort_loop rel la lb).
 Proof.
 intros.
@@ -1410,12 +1410,12 @@ revert lb b.
 induction la as [| a]; intros; [ now apply permutation_refl | cbn ].
 remember (rel b a) as x eqn:Hx; symmetry in Hx.
 destruct x. {
-  apply (permutation_isort_loop_sorted _ Heqb).
+  apply (permuted_isort_loop_sorted _ Heqb).
   rewrite app_comm_cons.
   rewrite (List_cons_is_app b (a :: la)).
   now apply permutation_app_comm.
 } {
-  apply (permutation_isort_loop_sorted _ Heqb).
+  apply (permuted_isort_loop_sorted _ Heqb).
   apply (permutation_skip Heqb).
   eapply (permutation_trans Heqb). 2: {
     apply (permutation_cons_isort_insert _ Heqb).
@@ -1578,7 +1578,7 @@ rewrite (equality_refl Heqb); cbn.
 now apply IHla.
 Qed.
 
-Theorem permutation_ssort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_ssort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ la len,
   length la ≤ len
   → permutation eqb la (ssort_loop rel len la).
@@ -2332,7 +2332,7 @@ eapply le_trans in Hit. 2: {
 now apply bsort_loop_is_sorted_nb_disorder.
 Qed.
 
-Theorem permutation_bsort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_bsort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ la it, permutation eqb la (bsort_loop rel it la).
 Proof.
 intros.
@@ -2559,7 +2559,7 @@ apply (permutation_sym Heqb).
 now apply IHla.
 Qed.
 
-Theorem permutation_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_msort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ it l, permutation eqb l (msort_loop rel it l).
 Proof.
 intros * Heqb *.
@@ -2834,7 +2834,7 @@ destruct lc as [lc| ]. 2: {
     now apply (bsort_loop_is_sorted_nb_disorder Htot).
   }
   apply (permutation_trans Heqb) with (lb := lb);  [ easy | ].
-  now apply permutation_bsort_loop.
+  now apply permuted_bsort_loop.
 }
 apply bsort_swap_nb_disorder with (lb := lc) in Hita; [ | easy | easy ].
 apply IHita; [ easy | easy | ].
@@ -3066,32 +3066,32 @@ Qed.
 
 (* *)
 
-Theorem permutation_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (isort rel l).
 Proof.
 intros.
-apply (permutation_isort_loop rel Heqb [] l).
+apply (permuted_isort_loop rel Heqb [] l).
 Qed.
 
-Theorem permutation_ssort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_ssort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (ssort rel l).
 Proof.
 intros.
-now apply permutation_ssort_loop.
+now apply permuted_ssort_loop.
 Qed.
 
-Theorem permutation_bsort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_bsort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (bsort rel l).
 Proof.
 intros.
-now apply permutation_bsort_loop.
+now apply permuted_bsort_loop.
 Qed.
 
-Theorem permutation_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
+Theorem permuted_msort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (msort rel l).
 Proof.
 intros.
-now apply permutation_msort_loop.
+now apply permuted_msort_loop.
 Qed.
 
 (* *)
@@ -3167,6 +3167,8 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
+Search (permutation _ _ (msort _ _)).
+...
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
 move itb before ita.
@@ -3477,7 +3479,7 @@ cbn in Hlen.
 
 (* *)
 
-Theorem permutation_isort_iff : ∀ A (eqb rel : A → _),
+Theorem permuted_isort_iff : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel
   → transitive rel
@@ -3489,8 +3491,8 @@ Proof.
 intros * Heqb Hant Htr Htot *.
 split; [ now apply permutation_isort' | ].
 intros Hab.
-specialize (permutation_isort rel Heqb la) as H1.
-specialize (permutation_isort rel Heqb lb) as H2.
+specialize (permuted_isort rel Heqb la) as H1.
+specialize (permuted_isort rel Heqb lb) as H2.
 apply (permutation_trans Heqb) with (lb := isort rel la); [ easy | ].
 rewrite Hab.
 now apply permutation_sym.
