@@ -677,54 +677,6 @@ apply Heqb in Hba; subst b.
 now apply permutation_refl.
 Qed.
 
-Theorem permutation_length : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb, permutation eqb la lb → length la = length lb.
-Proof.
-intros * Heqb * Hpab.
-unfold permutation in Hpab.
-revert lb Hpab.
-induction la as [| a]; intros. {
-  now apply permutation_nil_l in Hpab; subst lb.
-}
-cbn in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb); subst lb.
-apply Heqb in H; subst x.
-rewrite app_length; cbn.
-rewrite Nat.add_succ_r, <- app_length; f_equal.
-now apply IHla.
-Qed.
-
-Theorem permutation_length_1 : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ a b,
-  permutation eqb [a] [b] → a = b.
-Proof.
-intros * Heqb * Hpab.
-unfold permutation in Hpab; cbn in Hpab.
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now apply Heqb in Hab | easy ].
-Qed.
-
-Theorem permutation_length_1_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
-  ∀ a l, permutation eqb [a] l → l = [a].
-Proof.
-intros * Heqb * Ha.
-apply permutation_cons_l_iff in Ha.
-remember (extract (eqb a) l) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hll.
-destruct Hll as (H1 & H & H2).
-apply permutation_nil_l in Ha.
-apply app_eq_nil in Ha.
-destruct Ha; subst bef aft; cbn in H2; subst l.
-f_equal; symmetry.
-now apply Heqb.
-Qed.
-
 (* *)
 
 Theorem permutation_iff : ∀ A (eqb : A → _),
@@ -750,13 +702,14 @@ split. {
     now apply (permutation_cons_inv Heqb) in Hpab.
   }
   destruct la as [| a']. {
-    apply (permutation_length_1_inv Heqb) in Hpab.
-    injection Hpab; clear Hpab; intros; subst b lb.
-    now rewrite (equality_refl Heqb) in Hab.
+    unfold permutation in Hpab; cbn in Hpab.
+    rewrite Hab in Hpab.
+    remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+    now destruct lxl as [((bef, x), aft)| ].
   }
   destruct lb as [| b']. {
-    apply (permutation_sym Heqb) in Hpab.
-    now apply (permutation_length_1_inv Heqb) in Hpab.
+    unfold permutation in Hpab; cbn in Hpab.
+    now rewrite Hab in Hpab.
   }
   remember (eqb a b') as ab' eqn:Hab'; symmetry in Hab'.
   destruct ab'. {
@@ -803,6 +756,56 @@ split. {
     now apply (permutation_trans Heqb) with (lb := lc).
   }
 }
+Qed.
+
+(* *)
+
+Theorem permutation_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb, permutation eqb la lb → length la = length lb.
+Proof.
+intros * Heqb * Hpab.
+unfold permutation in Hpab.
+revert lb Hpab.
+induction la as [| a]; intros. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+cbn in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb); subst lb.
+apply Heqb in H; subst x.
+rewrite app_length; cbn.
+rewrite Nat.add_succ_r, <- app_length; f_equal.
+now apply IHla.
+Qed.
+
+Theorem permutation_length_1 : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a b,
+  permutation eqb [a] [b] → a = b.
+Proof.
+intros * Heqb * Hpab.
+unfold permutation in Hpab; cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply Heqb in Hab | easy ].
+Qed.
+
+Theorem permutation_length_1_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ a l, permutation eqb [a] l → l = [a].
+Proof.
+intros * Heqb * Ha.
+apply permutation_cons_l_iff in Ha.
+remember (extract (eqb a) l) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hll.
+destruct Hll as (H1 & H & H2).
+apply permutation_nil_l in Ha.
+apply app_eq_nil in Ha.
+destruct Ha; subst bef aft; cbn in H2; subst l.
+f_equal; symmetry.
+now apply Heqb.
 Qed.
 
 (* *)
