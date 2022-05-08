@@ -727,6 +727,86 @@ Qed.
 
 (* *)
 
+Theorem permutation_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb ↔
+    (la = [] ∧ lb = []) ∨
+    (∃ a lc ld, la = a :: lc ∧ lb = a :: ld ∧ permutation eqb lc ld) ∨
+    (∃ a b lc, la = a :: b :: lc ∧ lb = b :: a :: lc) ∨
+    (∃ lc, permutation eqb la lc ∧ permutation eqb lc lb).
+Proof.
+intros * Heqb *.
+split. {
+  intros Hpab.
+  destruct la as [| a]; [ left | right ]. {
+    now apply permutation_nil_l in Hpab; subst lb.
+  }
+  destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ left | right ]. {
+    apply Heqb in Hab; subst b.
+    exists a, la, lb.
+    now apply (permutation_cons_inv Heqb) in Hpab.
+  }
+  destruct la as [| a']. {
+    apply (permutation_length_1_inv Heqb) in Hpab.
+    injection Hpab; clear Hpab; intros; subst b lb.
+    now rewrite (equality_refl Heqb) in Hab.
+  }
+  destruct lb as [| b']. {
+    apply (permutation_sym Heqb) in Hpab.
+    now apply (permutation_length_1_inv Heqb) in Hpab.
+  }
+  remember (eqb a b') as ab' eqn:Hab'; symmetry in Hab'.
+  destruct ab'. {
+    apply Heqb in Hab'; subst b'.
+    remember (eqb b a') as ba' eqn:Hba'; symmetry in Hba'.
+    destruct ba'. {
+      apply Heqb in Hba'; subst a'.
+      apply (permutation_trans Heqb) with (la := b :: a :: la) in Hpab. 2: {
+        apply (permutation_swap Heqb).
+      }
+      do 2 apply (permutation_cons_inv Heqb) in Hpab.
+      remember (list_eqb eqb la lb) as x eqn:Hx; symmetry in Hx.
+      destruct x; [ left | ]. {
+        apply (list_eqb_eq Heqb) in Hx; subst lb.
+        now exists a, b, la.
+      }
+      right.
+      exists (a :: b :: la).
+      split; [ apply (permutation_refl Heqb) | ].
+      apply (permutation_trans Heqb) with (lb := a :: b :: lb). {
+        now do 2 apply (permutation_skip Heqb).
+      }
+      apply (permutation_swap Heqb).
+    }
+    right.
+    exists (a :: a' :: la).
+    split; [ apply (permutation_refl Heqb) | easy ].
+  }
+  right.
+  exists (a :: a' :: la).
+  split; [ apply (permutation_refl Heqb) | easy ].
+} {
+  intros [Hnil | [Hskip | [Hswap| Htrans]]]. {
+    destruct Hnil; subst la lb.
+    apply permutation_nil_nil.
+  } {
+    destruct Hskip as (a & lc & ld & Hla & Hlb & Hpab); subst la lb.
+    now apply (permutation_skip Heqb).
+  } {
+    destruct Hswap as (a & b & lc & Hla & Hlb); subst la lb.
+    apply (permutation_swap Heqb).
+  } {
+    destruct Htrans as (lc & Hac & Hcb).
+    now apply (permutation_trans Heqb) with (lb := lc).
+  }
+}
+Qed.
+
+(* *)
+
 Theorem permutation_app_comm : ∀ A (eqb : A → _),
   equality eqb →
   ∀ l l', permutation eqb (l ++ l') (l' ++ l).

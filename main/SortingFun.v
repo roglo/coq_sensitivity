@@ -3141,8 +3141,8 @@ Qed.
 
 (* to be completed
 Theorem permutation_msort' : ∀ A (eqb rel : A → _),
-(*
   equality eqb →
+(*
   antisymmetric rel →
   transitive rel →
   total_relation rel →
@@ -3151,6 +3151,41 @@ Theorem permutation_msort' : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → msort rel la = msort rel lb.
 Proof.
+(*
+intros * Heqb (* Hant Htra Htot *) * Hpab.
+apply (permutation_iff Heqb) in Hpab.
+destruct Hpab as [Hnil | [Hskip | [Hswap| Htrans]]]. {
+  now destruct Hnil; subst la lb.
+} {
+  destruct Hskip as (a & lc & ld & Hla & Hlb & Hpab); subst la lb.
+  rename lc into la; rename ld into lb.
+  cbn.
+  destruct la as [| a']. {
+    now apply permutation_nil_l in Hpab; subst lb.
+  }
+  destruct lb as [| b']. {
+    now apply permutation_nil_r in Hpab.
+  }
+  remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
+  destruct ll as (laa, lab).
+  remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
+  destruct ll as (lba, lbb).
+  remember (a :: laa) as laaa; remember (a :: lba) as laba.
+  remember (a' ::lab) as laab; remember (b' :: lbb) as lbbb.
+  cbn; subst.
+(* ouais... trop de cas, c'est trop merdique *)
+...
+    now apply (permutation_skip Heqb).
+  } {
+    destruct Hswap as (a & b & lc & Hla & Hlb); subst la lb.
+    apply (permutation_swap Heqb).
+  } {
+    destruct Htrans as (lc & Hac & Hcb).
+    now apply (permutation_trans Heqb) with (lb := lc).
+  }
+  destruct Hnil
+...
+*)
 intros (* * Heqb Hant Htra Htot *) * Hpab.
 unfold msort.
 Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
@@ -3167,50 +3202,6 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
-Theorem permutation_iff : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb,
-  permutation eqb la lb ↔
-    (la = [] ∧ lb = []) ∨
-    (∃ a lc ld, la = a :: lc ∧ lb = a :: ld ∧ permutation eqb lc ld) ∨
-    (∃ a b lc, la = a :: b :: lc ∧ lb = b :: a :: lc) ∨
-    (∃ lc, permutation eqb la lc ∧ permutation eqb lc lb).
-Proof.
-intros * Heqb *.
-split. {
-  intros Hpab.
-  destruct la as [| a]; [ left | right ]. {
-    now apply permutation_nil_l in Hpab; subst lb.
-  }
-  destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
-  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ left | right ]. {
-    apply Heqb in Hab; subst b.
-    exists a, la, lb.
-    now apply (permutation_cons_inv Heqb) in Hpab.
-  }
-  destruct la as [| a']. {
-    apply (permutation_length_1_inv Heqb) in Hpab.
-    injection Hpab; clear Hpab; intros; subst b lb.
-    now rewrite (equality_refl Heqb) in Hab.
-  }
-  destruct lb as [| b']. {
-    apply (permutation_sym Heqb) in Hpab.
-    now apply (permutation_length_1_inv Heqb) in Hpab.
-  }
-  remember (eqb a b') as ab' eqn:Hab'; symmetry in Hab'.
-  destruct ab'. {
-    apply Heqb in Hab'; subst b'.
-    remember (eqb b a') as ba' eqn:Hba'; symmetry in Hba'.
-    destruct ba'. {
-      apply Heqb in Hba'; subst a'.
-      apply (permutation_trans Heqb) with (la := b :: a :: la) in Hpab. 2: {
-        apply (permutation_swap Heqb).
-      }
-      do 2 apply (permutation_cons_inv Heqb) in Hpab.
-      remember (list_eqb eqb la lb) as x eqn:Hx; symmetry in Hx.
-      destruct x. {
-About list_eqb.
 ...
 apply list_eqb_eq in Hx
         exists a, b, ...
