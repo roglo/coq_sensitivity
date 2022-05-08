@@ -1240,6 +1240,36 @@ Qed.
 
 (* end repeat_apply *)
 
+(* equality *)
+
+Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
+
+Theorem equality_refl {A} (eqb : A → _) : equality eqb → ∀ a, eqb a a = true.
+Proof.
+intros * Heqb *.
+now apply Heqb.
+Qed.
+
+Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
+  { a ∈ la } + { a ∉ la }.
+Proof.
+intros.
+induction la as [| b]; [ now right | ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
+destruct IHla as [H1| H1]; [ now left; right | right ].
+intros H2; apply H1; clear H1.
+destruct H2 as [H2| H2]; [ | easy ].
+subst b.
+now rewrite (equality_refl Heqb) in Hab.
+Qed.
+
+Theorem Nat_eqb_equality : equality Nat.eqb.
+Proof.
+intros a b.
+apply Nat.eqb_eq.
+Qed.
+
 (* list_eqb *)
 
 Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
@@ -1256,23 +1286,27 @@ Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
       end
   end.
 
-Theorem list_eqb_eq : ∀ la lb, list_eqb Nat.eqb la lb = true → la = lb.
+Theorem list_eqb_eq : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb, list_eqb eqb la lb = true → la = lb.
 Proof.
-intros * Hab.
-revert lb Hab.
+intros * Heqb * Hlab.
+revert lb Hlab.
 induction la as [| a]; intros; [ now destruct lb | cbn ].
-destruct lb as [| b]; [ easy | cbn in Hab ].
-rewrite if_eqb_eq_dec in Hab.
-destruct (Nat.eq_dec a b) as [H1| H1]; [ | easy ].
-destruct H1; f_equal.
+destruct lb as [| b]; [ easy | cbn in Hlab ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+apply Heqb in Hab; subst b; f_equal.
 now apply IHla.
 Qed.
 
-Theorem list_eqb_neq : ∀ la lb, list_eqb Nat.eqb la lb = false → la ≠ lb.
+Theorem list_eqb_neq : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb, list_eqb eqb la lb = false → la ≠ lb.
 Proof.
-intros * Hab H; subst lb.
+intros * Heqb * Hab H; subst lb.
 induction la as [| a]; [ easy | cbn in Hab ].
-rewrite Nat.eqb_refl in Hab.
+rewrite (equality_refl Heqb) in Hab.
 congruence.
 Qed.
 

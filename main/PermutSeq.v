@@ -776,11 +776,11 @@ symmetry in Hx, Hy.
 destruct x as [x| ]. {
   apply (List_rank_Some []) in Hx.
   destruct Hx as (Hxs & Hbefx & Hx).
-  apply list_eqb_eq in Hx.
+  apply (list_eqb_eq Nat_eqb_equality) in Hx.
   destruct y as [y| ]. {
     apply (List_rank_Some []) in Hy.
     destruct Hy as (Hys & Hbefy & Hy).
-    apply list_eqb_eq in Hy.
+    apply (list_eqb_eq Nat_eqb_equality) in Hy.
     congruence.
   }
   specialize (List_rank_None [] _ _ Hy) as H1; cbn.
@@ -789,7 +789,7 @@ destruct x as [x| ]. {
   apply In_nth with (d := []) in H2.
   destruct H2 as (k & Hk & Hkb).
   specialize (H1 k Hk).
-  apply list_eqb_neq in H1.
+  apply (list_eqb_neq Nat_eqb_equality) in H1.
   now symmetry in Hkb.
 }
 specialize (List_rank_None [] _ _ Hx) as H1; cbn.
@@ -798,7 +798,7 @@ specialize (Hsg_surj la Hna) as H2.
 apply In_nth with (d := []) in H2.
 destruct H2 as (k & Hk & Hka).
 specialize (H1 k Hk).
-apply list_eqb_neq in H1.
+apply (list_eqb_neq Nat_eqb_equality) in H1.
 now symmetry in Hka.
 Qed.
 
@@ -859,14 +859,14 @@ remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   apply List_rank_Some with (d := []) in Hi.
   destruct Hi as (His & Hji & Hi).
-  now apply list_eqb_eq in Hi.
+  now apply (list_eqb_eq Nat_eqb_equality) in Hi.
 }
 assert (H : l ∉ sg). {
   intros H.
   apply In_nth with (d := []) in H.
   destruct H as (j & Hj & Hjv).
   specialize (List_rank_None [] _ _ Hi Hj) as H.
-  apply list_eqb_neq in H.
+  apply (list_eqb_neq Nat_eqb_equality) in H.
   now symmetry in Hjv.
 }
 exfalso; apply H; clear H.
@@ -885,7 +885,7 @@ remember (List_rank _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
   apply List_rank_Some with (d := []) in Hj.
   destruct Hj as (His & Hji & Hj).
-  apply list_eqb_eq in Hj.
+  apply (list_eqb_eq Nat_eqb_equality) in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   assert (Hjs : j < length sg). {
     destruct (lt_dec j (length sg)) as [Hjs| Hjs]; [ easy | exfalso ].
@@ -898,7 +898,7 @@ destruct j as [j| ]. {
   now apply Hinj.
 }
 specialize (List_rank_None [] _ _ Hj Hi) as H1.
-now apply list_eqb_neq in H1.
+now apply (list_eqb_neq Nat_eqb_equality) in H1.
 Qed.
 
 Theorem length_of_empty_sym_gr : ∀ sg,

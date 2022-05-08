@@ -30,7 +30,6 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
       end
   end.
 
-Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 Definition permutation A (eqb : A → _) la lb := is_permutation eqb la lb = true.
 
 Theorem fold_permutation : ∀ A (eqb : A → _) la lb,
@@ -131,26 +130,6 @@ split. {
   intros c Hc.
   now apply Hf; right.
 }
-Qed.
-
-Theorem equality_refl {A} (eqb : A → _) : equality eqb → ∀ a, eqb a a = true.
-Proof.
-intros * Heqb *.
-now apply Heqb.
-Qed.
-
-Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
-  { a ∈ la } + { a ∉ la }.
-Proof.
-intros.
-induction la as [| b]; [ now right | ].
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now apply Heqb in Hab; subst b; left; left | ].
-destruct IHla as [H1| H1]; [ now left; right | right ].
-intros H2; apply H1; clear H1.
-destruct H2 as [H2| H2]; [ | easy ].
-subst b.
-now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
 Theorem permutation_cons_l_iff : ∀ A (eqb : A → _) a la lb,
@@ -1046,12 +1025,6 @@ specialize (Hbef a).
 assert (H : a ∈ bef) by now rewrite H1; apply in_or_app; right; left.
 specialize (Hbef H).
 now rewrite equality_refl in Hbef.
-Qed.
-
-Theorem Nat_eqb_equality : equality Nat.eqb.
-Proof.
-intros a b.
-apply Nat.eqb_eq.
 Qed.
 
 Require Import Permutation.

@@ -3167,7 +3167,63 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
-Search (permutation _ _ (msort _ _)).
+Theorem permutation_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb ↔
+    (la = [] ∧ lb = []) ∨
+    (∃ a lc ld, la = a :: lc ∧ lb = a :: ld ∧ permutation eqb lc ld) ∨
+    (∃ a b lc, la = a :: b :: lc ∧ lb = b :: a :: lc) ∨
+    (∃ lc, permutation eqb la lc ∧ permutation eqb lc lb).
+Proof.
+intros * Heqb *.
+split. {
+  intros Hpab.
+  destruct la as [| a]; [ left | right ]. {
+    now apply permutation_nil_l in Hpab; subst lb.
+  }
+  destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ left | right ]. {
+    apply Heqb in Hab; subst b.
+    exists a, la, lb.
+    now apply (permutation_cons_inv Heqb) in Hpab.
+  }
+  destruct la as [| a']. {
+    apply (permutation_length_1_inv Heqb) in Hpab.
+    injection Hpab; clear Hpab; intros; subst b lb.
+    now rewrite (equality_refl Heqb) in Hab.
+  }
+  destruct lb as [| b']. {
+    apply (permutation_sym Heqb) in Hpab.
+    now apply (permutation_length_1_inv Heqb) in Hpab.
+  }
+  remember (eqb a b') as ab' eqn:Hab'; symmetry in Hab'.
+  destruct ab'. {
+    apply Heqb in Hab'; subst b'.
+    remember (eqb b a') as ba' eqn:Hba'; symmetry in Hba'.
+    destruct ba'. {
+      apply Heqb in Hba'; subst a'.
+      apply (permutation_trans Heqb) with (la := b :: a :: la) in Hpab. 2: {
+        apply (permutation_swap Heqb).
+      }
+      do 2 apply (permutation_cons_inv Heqb) in Hpab.
+      remember (list_eqb eqb la lb) as x eqn:Hx; symmetry in Hx.
+      destruct x. {
+About list_eqb.
+...
+apply list_eqb_eq in Hx
+        exists a, b, ...
+...
+  unfold permutation in Hpab.
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract (eqb a) (b :: lb)) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & Hx & Hlb).
+...
+Search (permutation _ (_ :: _) (_ :: _)).
+Print is_permutation.
 ...
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
