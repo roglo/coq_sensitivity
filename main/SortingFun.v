@@ -3201,6 +3201,28 @@ move le before ld; move lf before le.
 cbn in Hsa, Hsb.
 rewrite Hlla in Hsa.
 rewrite Hllb in Hsb.
+(**)
+clear IHita Hsa Hsb.
+revert itb la lb lc ld le lf Hita Hitb Hpab Hlla Hllb.
+induction ita as (ita, IHita) using lt_wf_rec; intros.
+destruct ita. {
+  cbn.
+  destruct la as [| a]. {
+    apply permutation_nil_l in Hpab; subst lb.
+    injection Hlla; clear Hlla; intros; subst lc ld.
+    injection Hllb; clear Hllb; intros; subst le lf.
+    now rewrite msort_loop_nil.
+  }
+  destruct la; [ clear Hita | cbn in Hita; flia Hita ].
+  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
+  injection Hlla; clear Hlla; intros; subst lc ld.
+  injection Hllb; clear Hllb; intros; subst le lf.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+...
+Theorem glop :
+  (∀ i, nth i la d = nth i lc d ∨ nth i la d = nth i ld d)
+  → merge rel la lb = merge rel lc ld.
 ...
 destruct la as [| a]. {
   apply permutation_nil_l in Hpab; subst lb; cbn.
