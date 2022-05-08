@@ -2237,7 +2237,7 @@ assert (Hj'l : j' < length l). {
 }
 rewrite nth_ff_app_isort_rank in Hc2; [ | easy ].
 rewrite nth_ff_app_isort_rank in Hc2; [ | easy ].
-specialize (isort_is_sorted Nat_leb_is_total_relation l) as Hsl.
+specialize (sorted_isort Nat_leb_is_total_relation l) as Hsl.
 rewrite (isort_isort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
