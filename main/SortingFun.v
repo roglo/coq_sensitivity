@@ -3201,6 +3201,7 @@ move le before ld; move lf before le.
 cbn in Hsa, Hsb.
 rewrite Hlla in Hsa.
 rewrite Hllb in Hsb.
+...
 (**)
 clear IHita Hsa Hsb.
 revert itb la lb lc ld le lf Hita Hitb Hpab Hlla Hllb.
@@ -3219,6 +3220,18 @@ destruct ita. {
   injection Hllb; clear Hllb; intros; subst le lf.
   now rewrite msort_loop_single, msort_loop_nil.
 }
+cbn.
+remember (split_list lc) as ll eqn:Hllc; symmetry in Hllc.
+destruct ll as (lg, lh).
+rewrite merge_length, app_length.
+do 2 rewrite msort_loop_length.
+remember (split_list ld) as ll eqn:Hlld; symmetry in Hlld.
+destruct ll as (li, lj).
+rewrite merge_length, app_length.
+do 2 rewrite msort_loop_length.
+move lg before lf; move lh before lg.
+move li before lh; move lj before li.
+Search (merge_loop _ (merge _ _ _)).
 ...
 Theorem glop :
   (∀ i, nth i la d = nth i lc d ∨ nth i la d = nth i ld d)
