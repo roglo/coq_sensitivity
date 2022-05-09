@@ -794,21 +794,6 @@ Qed.
 
 (* *)
 
-Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=
-  match lb with
-  | [] => []
-  | b :: lb' =>
-      match extract (eqb b) la with
-      | Some ([], _, la2) => transp_loop eqb (S i) la2 lb'
-      | Some (a :: la1, _, la2) =>
-          (i, S (i + length la1)) ::
-          transp_loop eqb (S i) (la1 ++ a :: la2) lb'
-      | None => []
-      end
-  end.
-
-Definition transp_list {A} (eqb : A → _) la lb := transp_loop eqb 0 la lb.
-
 (* which transpositions to do for transforming {0..n-1} into p *)
 Definition nat_transp_list p := transp_list Nat.eqb (seq 0 (length p)) p.
 

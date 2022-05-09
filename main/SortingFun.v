@@ -2927,6 +2927,21 @@ apply (permutation_trans Heqb) with (lb := a :: la); [ easy | ].
 now apply (permutation_trans Heqb) with (lb := b :: lb).
 Qed.
 
+Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=
+  match lb with
+  | [] => []
+  | b :: lb' =>
+      match extract (eqb b) la with
+      | Some ([], _, la2) => transp_loop eqb (S i) la2 lb'
+      | Some (a :: la1, _, la2) =>
+          (i, S (i + length la1)) ::
+          transp_loop eqb (S i) (la1 ++ a :: la2) lb'
+      | None => []
+      end
+  end.
+
+Definition transp_list {A} (eqb : A → _) la lb := transp_loop eqb 0 la lb.
+
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
@@ -3202,6 +3217,7 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
+remember (transp_list eqb la lb) as trl eqn:Htrl.
 ...
 apply list_eqb_eq in Hx
         exists a, b, ...
