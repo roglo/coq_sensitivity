@@ -2940,7 +2940,134 @@ Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=
       end
   end.
 
+(* list of transpositions to be done to "la" to get "lb" *)
 Definition transp_list {A} (eqb : A → _) la lb := transp_loop eqb 0 la lb.
+
+Definition swap {A} i j (la : list A) :=
+  match la with
+  | [] => []
+  | d :: _ =>
+      map (λ k, nth (if k =? j then i else if k =? i then j else k) la d)
+        (seq 0 (length la))
+  end.
+
+Fixpoint apply_transp_list {A} trl (la : list A) :=
+  match trl with
+  | [] => la
+  | (i, j) :: trl' => apply_transp_list trl' (swap i j la)
+  end.
+
+(*
+Compute (let la := [0;2;1] in
+apply_transp_list (transp_list Nat.eqb (seq 0 (length la)) la) la).
+Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
+Fixpoint canon_sym_gr_list n k : list nat :=
+  match n with
+  | 0 => []
+  | S n' =>
+      k / n'! ::
+      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
+  end.
+Definition canon_sym_gr_list_list n : list (list nat) :=
+  map (canon_sym_gr_list n) (seq 0 n!).
+Compute (map (λ la,
+(la,
+apply_transp_list (transp_list Nat.eqb (seq 0 (length la)) la) (seq 0 (length la))))
+ (canon_sym_gr_list_list 4)).
+Compute (map (λ la,
+(
+apply_transp_list (transp_list Nat.eqb la (seq 0 (length la))) la))
+ (canon_sym_gr_list_list 4)).
+*)
+
+Definition shift_transp i trl := map (λ ij, (fst ij + i, snd ij + i)) trl.
+
+Theorem transp_loop_shift : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ i la lb,
+  transp_loop eqb i la lb = shift_transp i (transp_list eqb la lb).
+Proof.
+intros * Heqb *.
+revert i la.
+induction lb as [| b]; intros; [ easy | cbn ].
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hla).
+apply Heqb in Hx; subst x.
+subst la.
+destruct bef as [| a]. {
+  do 2 rewrite IHlb.
+  unfold shift_transp; cbn.
+  rewrite map_map; cbn.
+  apply map_ext_in.
+  intros ij Hij.
+  now do 2 rewrite <- Nat.add_assoc.
+}
+cbn.
+f_equal; [ now rewrite Nat.add_comm | ].
+do 2 rewrite IHlb.
+unfold shift_transp; cbn.
+rewrite map_map; cbn.
+apply map_ext_in.
+intros ij Hij.
+now do 2 rewrite <- Nat.add_assoc.
+Qed.
+
+Theorem swap_length : ∀ A (la : list A) i j,
+  length (swap i j la) = length la.
+Proof.
+intros.
+unfold swap.
+destruct la as [| a]; [ easy | ].
+now rewrite List_map_seq_length.
+Qed.
+
+Theorem apply_transp_list_shift_1_cons : ∀ A (a : A) la trl,
+  (∀ ij, ij ∈ trl → fst ij < length la ∧ snd ij < length la)
+  → apply_transp_list (shift_transp 1 trl) (a :: la) =
+    a :: apply_transp_list trl la.
+Proof.
+intros * Htrl.
+revert a la Htrl.
+induction trl as [| ij]; intros; [ easy | ].
+cbn - [ "=?" shift_transp ].
+destruct ij as (i, j).
+rewrite <- IHtrl; cbn. 2: {
+  intros ij Hij.
+  rewrite swap_length.
+  now apply Htrl; right.
+}
+do 2 rewrite Nat.add_1_r.
+f_equal; f_equal.
+unfold swap.
+destruct la as [| d]; [ easy | ].
+rewrite <- seq_shift.
+rewrite map_map.
+apply map_ext_in.
+intros k Hk; cbn.
+apply in_seq in Hk.
+destruct Hk as (_, Hk); cbn in Hk.
+do 4 rewrite if_eqb_eq_dec.
+specialize (Htrl _ (or_introl eq_refl)) as H1.
+cbn in H1.
+destruct H1 as (Hi, Hj).
+destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+  subst k.
+  destruct i; [ easy | ].
+  apply Nat.succ_lt_mono in Hi.
+  now apply nth_indep.
+}
+destruct (Nat.eq_dec k i) as [Hki| Hki]. {
+  subst k.
+  destruct j; [ easy | ].
+  apply Nat.succ_lt_mono in Hj.
+  now apply nth_indep.
+}
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hk.
+now apply nth_indep.
+Qed.
 
 (* main *)
 
@@ -3218,6 +3345,39 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
 remember (transp_list eqb la lb) as trl eqn:Htrl.
+
+Theorem permutation_transp_list : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → apply_transp_list (transp_list eqb la lb) la = lb.
+Proof.
+intros * Heqb * Hpab.
+revert la Hpab.
+induction lb as [| b]; intros; cbn. {
+  now apply permutation_nil_r in Hpab.
+}
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 b).
+  assert (H : b ∈ la) by now apply (permutation_in Heqb Hpab); left.
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hla).
+apply Heqb in Hx; subst x.
+subst la.
+destruct bef as [| a]; cbn. {
+  rewrite (transp_loop_shift Heqb).
+  rewrite apply_transp_list_shift_1_cons. 2: {
+    intros (i, j) Hij; cbn.
+    unfold transp_list in Hij.
+Print transp_loop.
+...
+  f_equal.
+  apply IHlb.
 ...
 apply list_eqb_eq in Hx
         exists a, b, ...
