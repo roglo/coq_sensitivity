@@ -851,10 +851,15 @@ Compute (map (λ p, (p, transp_list Nat.eqb p (seq 0 (length p)), transp_list' p
 Compute (map (λ p, (p, rev (transp_list Nat.eqb p (seq 0 (length p))), transp_list' p)) (canon_sym_gr_list_list 3)).
 (* ([1; 2; 0], [(1, 2); (0, 2)], [(0, 1); (0, 2)]) *)
 ...
+*)
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, g ° c) (seq 0 n))
+  (iter_list l (λ c i, c ° g) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
+
+(* seems to work; property to prove:
+Compute (map (λ p, (p, Comp (length p) (ij ∈ nat_transp_list p), swap (length p) (fst ij) (snd ij))) (canon_sym_gr_list_list 4)).
+Compute (map (λ p, list_eqb Nat.eqb p (Comp (length p) (ij ∈ nat_transp_list p), swap (length p) (fst ij) (snd ij))) (canon_sym_gr_list_list 5)).
 *)
 
 Theorem swap_id : ∀ n k, swap n k k = seq 0 n.
