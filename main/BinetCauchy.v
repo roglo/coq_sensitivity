@@ -792,13 +792,34 @@ rewrite List_map_seq_length.
 apply seq_length.
 Qed.
 
-Fixpoint first_non_fix_transp i p :=
-  match p with
-  | [] => i
-  | j :: l =>
-      if i =? j then first_non_fix_transp (S i) l
-      else i
+(* *)
+
+Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=
+  match lb with
+  | [] => []
+  | b :: lb' =>
+      match extract (eqb b) la with
+      | Some ([], _, la2) => transp_loop eqb (S i) la2 lb'
+      | Some (a :: la1, _, la2) =>
+          (i, S (i + length la1)) ::
+          transp_loop eqb (S i) (la1 ++ a :: la2) lb'
+      | None => []
+      end
   end.
+
+Definition transp_list {A} (eqb : A → _) la lb := transp_loop eqb 0 la lb.
+
+(* which transpositions to do for transforming {0..n-1} into p *)
+Definition nat_transp_list p := transp_list Nat.eqb (seq 0 (length p)) p.
+
+(*
+Compute (transp_list Nat.eqb [3;2;1] [1;2;3]).
+Print transp_loop.
+Compute (transp_list Nat.eqb [1;2;0] [0;1;2]).
+Compute (map (λ la, (la, seq 0 (length la), transp_list Nat.eqb la (seq 0 (length la)))) (canon_sym_gr_list_list 3)).
+Compute (map (λ lb, (seq 0 (length lb), lb, transp_list Nat.eqb (seq 0 (length lb)) lb)) (canon_sym_gr_list_list 3)).
+Compute (map (λ lb, (seq 0 (length lb), lb, transp_list Nat.eqb (seq 0 (length lb)) lb)) (canon_sym_gr_list_list 4)).
+Compute (map (λ lb, length (transp_list Nat.eqb (seq 0 (length lb)) lb)) (canon_sym_gr_list_list 5)).
 
 Fixpoint nb_nfit i l :=
   match l with
@@ -806,24 +827,35 @@ Fixpoint nb_nfit i l :=
   | j :: l' => (if i =? j then 0 else 1) + nb_nfit (S i) l'
   end.
 
-Fixpoint transp_loop it i (p : list nat) :=
+Fixpoint transp_loop' it i (p : list nat) :=
   match it with
   | 0 => []
   | S it' =>
       match p with
       | [] => []
       | j :: l =>
-          if i =? j then transp_loop it' (S i) l
-          else (i, j) :: transp_loop it' i (list_swap_elem 0 p 0 (j - i))
+          if i =? j then transp_loop' it' (S i) l
+          else (i, j) :: transp_loop' it' i (list_swap_elem 0 p 0 (j - i))
       end
   end.
 
 (* works only if p is a permutation of {0..n-1} *)
-Definition transp_list p := transp_loop (length p + nb_nfit 0 p) 0 p.
+Definition transp_list' p := transp_loop' (length p + nb_nfit 0 p) 0 p.
+
+Compute (map (λ p, (p, nat_transp_list p, transp_list' p)) (canon_sym_gr_list_list 3)).
+(* ([1; 2; 0], [(0, 1); (1, 2)], [(0, 1); (0, 2)]) *)
+Compute (map (λ p, (p, rev (nat_transp_list p), transp_list' p)) (canon_sym_gr_list_list 3)).
+(* ([1; 2; 0], [(1, 2); (0, 1)], [(0, 1); (0, 2)]) *)
+Compute (map (λ p, (p, transp_list Nat.eqb p (seq 0 (length p)), transp_list' p)) (canon_sym_gr_list_list 3)).
+(* ([1; 2; 0], [(0, 2); (1, 2)], [(0, 1); (0, 2)]) *)
+Compute (map (λ p, (p, rev (transp_list Nat.eqb p (seq 0 (length p))), transp_list' p)) (canon_sym_gr_list_list 3)).
+(* ([1; 2; 0], [(1, 2); (0, 2)], [(0, 1); (0, 2)]) *)
+...
 
 Notation "'Comp' n ( i ∈ l ) , g" :=
   (iter_list l (λ c i, g ° c) (seq 0 n))
   (at level 35, i at level 0, l at level 60, n at level 0).
+*)
 
 Theorem swap_id : ∀ n k, swap n k k = seq 0 n.
 Proof.
@@ -920,8 +952,10 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 Qed.
 
+(*
 Theorem transp_loop_nil : ∀ it i, transp_loop it i [] = [].
 Proof. intros; now destruct it. Qed.
+*)
 
 Theorem nth_list_swap_elem : ∀ A (d : A) i j l,
   i < length l
@@ -935,6 +969,7 @@ rewrite seq_nth; [ | easy ].
 now rewrite transposition_2.
 Qed.
 
+(*
 Theorem transp_loop_seq : ∀ it sta len,
   transp_loop it sta (seq sta len) = [].
 Proof.
@@ -1033,6 +1068,7 @@ Proof.
 intros.
 now rewrite <- transp_loop_app_seq_gen.
 Qed.
+*)
 
 Theorem list_swap_elem_id : ∀ A (d : A) l i, list_swap_elem d l i i = l.
 Proof.
@@ -1133,6 +1169,7 @@ apply Hc.
 now right; right.
 Qed.
 
+(*
 Theorem in_transp_loop_bounds : ∀ it k l i j,
   (i, j) ∈ transp_loop it k l
   → k ≤ i < k + length l ∧ j ≤ Max (u ∈ l), u.
@@ -1234,6 +1271,7 @@ specialize (in_transp_loop_bounds) as H1.
 specialize (H1 _ _ _ _ _ Hij).
 now destruct H1 as ((_, H1), H2).
 Qed.
+*)
 
 Theorem app_seq_swap_is_permut_list : ∀ i j l,
   is_permut_list (seq 0 i ++ j :: l)
@@ -1585,6 +1623,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem nb_nfit_app : ∀ i la lb,
   nb_nfit i (la ++ lb) = nb_nfit i la + nb_nfit (i + length la) lb.
 Proof.
@@ -1849,6 +1888,7 @@ specialize permut_eq_iter_list_transp_loop as H1.
 specialize (H1 l (length l + nb_nfit 0 l) 0).
 apply (H1 Hp (le_refl _)).
 Qed.
+*)
 
 Theorem permut_list_max : ∀ l,
   is_permut_list l
@@ -1973,6 +2013,7 @@ apply Nat.succ_lt_mono in Hi.
 now apply IHl.
 Qed.
 
+(*
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
   is_permut_list (seq 0 i ++ p)
   → length p + nb_nfit i p ≤ it1
@@ -2235,6 +2276,7 @@ specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb Hla).
 rewrite Nat.sub_0_r in H1.
 now destruct H1 as (H1 & H2 & H3).
 Qed.
+*)
 
 Theorem list_swap_elem_comp_swap : ∀ l i j,
   i < length l
