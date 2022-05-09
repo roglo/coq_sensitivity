@@ -812,6 +812,51 @@ Definition transp_list {A} (eqb : A → _) la lb := transp_loop eqb 0 la lb.
 (* which transpositions to do for transforming {0..n-1} into p *)
 Definition nat_transp_list p := transp_list Nat.eqb (seq 0 (length p)) p.
 
+(* à voir
+Inductive Member A : A → list A → Prop :=
+  | ext_hd : ∀ a l, Member a (a :: l)
+  | ext_tl : ∀ a b l, a ≠ b → Member a l → Member a (b :: l).
+
+Inductive Transposition A : list A → list A → A → A → Prop :=
+  | transp_1 :
+      ∀ a b c la lb, Transposition la lb b c → Transposition (a :: la) (a :: lb) b c
+  | transp_2 :
+      ∀ a b la lb,
+      a ≠ b
+      → Member b (a :: la)
+      → Member a (b :: lb)
+      → Transposition (a :: la) (b :: lb) a b.
+
+Example transposition_1 : Transposition [1;2;3] [1;3;2] 2 3.
+Proof.
+constructor.
+constructor; [ easy | | ]. {
+  constructor; [ easy | constructor ].
+} {
+  constructor; [ easy | constructor ].
+}
+Qed.
+
+Example transposition_2 : Transposition [1;2;3] [2;1;3] 1 2.
+Proof.
+constructor; [ easy | | ]. {
+  constructor; [ easy | constructor ].
+} {
+  constructor; [ easy | constructor ].
+}
+Qed.
+
+Example transposition_3 : Transposition [1;2;3] [2;3;1] 1 2.
+Proof.
+constructor; [ easy | | ]. {
+  constructor; [ easy | constructor ].
+} {
+  constructor; [ easy | constructor ].
+
+}
+Qed.
+*)
+
 (*
 Compute (transp_list Nat.eqb [3;2;1] [1;2;3]).
 Print transp_loop.
