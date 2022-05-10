@@ -3344,6 +3344,14 @@ destruct bef as [| a]. {
         rewrite <- List_map_nth_seq.
         now apply permutation_refl.
       }
+      remember (nth i aft d) as c eqn:Hc.
+      assert (H : ∃ l1 l2, d :: aft = l1 ++ c :: l2). {
+...
+permutation_cons_app:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ (l l1 l2 : list A) (a : A),
+        permutation eqb l (l1 ++ l2) → permutation eqb (a :: l) (l1 ++ a :: l2)
 ...
     cbn - [ "=?" nth ].
 ...
