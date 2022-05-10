@@ -1055,13 +1055,15 @@ Definition swap {A} i j (la : list A) :=
         (seq 0 (length la))
   end.
 
-Fixpoint apply_transp_list {A} trl (la : list A) :=
-  match trl with
-  | [] => la
-  | (i, j) :: trl' => apply_transp_list trl' (swap i j la)
-  end.
+Definition apply_transp_list {A} trl (la : list A) :=
+  fold_left (λ lb ij, swap (fst ij) (snd ij) lb) trl la.
 
 Definition shift_transp i trl := map (λ ij, (fst ij + i, snd ij + i)) trl.
+
+Theorem fold_apply_transp_list : ∀ A trl (la : list A),
+  fold_left (λ lb ij, swap (fst ij) (snd ij) lb) trl la =
+  apply_transp_list trl la.
+Proof. easy. Qed.
 
 Theorem transp_loop_shift : ∀ A (eqb : A → _),
   equality eqb →
@@ -1114,6 +1116,8 @@ revert a la Htrl.
 induction trl as [| ij]; intros; [ easy | ].
 cbn - [ "=?" shift_transp ].
 destruct ij as (i, j).
+cbn - [ shift_transp ].
+unfold apply_transp_list in IHtrl.
 rewrite <- IHtrl; cbn. 2: {
   intros ij Hij.
   rewrite swap_length.
@@ -1225,6 +1229,7 @@ move H before Hpab; clear Hpab; rename H into Hpab.
 destruct bef as [| a]. {
   cbn.
   rewrite (transp_loop_shift Heqb).
+  rewrite fold_apply_transp_list.
   rewrite apply_transp_list_shift_1_cons. 2: {
     intros (i, j) Hij; cbn.
     unfold transp_list in Hij.
@@ -1270,6 +1275,7 @@ assert (H : permutation eqb (bef ++ a :: aft) lb). {
   now apply permutation_cons_append.
 }
 move H before Hpab; clear Hpab; rename H into Hpab.
+rewrite fold_apply_transp_list.
 rewrite apply_transp_list_shift_1_cons. 2: {
   intros (i, j) Hij; cbn.
   specialize (in_transp_loop_length Heqb) as H1.

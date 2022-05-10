@@ -3300,6 +3300,17 @@ destruct bef as [| a]. {
     now apply permutation_nil_r in Hpab.
   }
 *)
+  specialize (permutation_transp_list Heqb Hpab) as Htab.
+  cbn in Htab.
+  unfold apply_transp_list in Htab.
+  remember (transp_list eqb aft lb) as trl eqn:Htrl; symmetry in Htrl.
+  destruct trl as [| (i, j)]. {
+    cbn in Htab; subst aft.
+...
+Print transp_loop.
+Search (transp_loop _ _ _ _ = []).
+    appl eq_transp_loop_nil in Htrl.
+...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
   → msort_loop rel (S ita) (a :: la) = msort_loop rel (S itb) (a :: lb).
