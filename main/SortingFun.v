@@ -5,6 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Import Init.Nat.
 
 Require Import Misc PermutationFun.
 
@@ -3374,7 +3375,42 @@ destruct bef as [| a]; cbn. {
   rewrite apply_transp_list_shift_1_cons. 2: {
     intros (i, j) Hij; cbn.
     unfold transp_list in Hij.
-Print transp_loop.
+Theorem in_transp_loop_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ i j k la lb,
+  (i, j) ∈ transp_loop eqb k la lb →
+  i < k + min (length la) (length lb) ∧
+  j < k + min (length la) (length lb).
+Proof.
+intros * Heqb * Htab.
+revert i j k la Htab.
+induction lb as [| b]; intros; [ easy | ].
+cbn in Htab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hla); subst la.
+apply Heqb in Hx; subst x.
+destruct bef as [| c]; cbn. {
+  rewrite <- Nat.add_succ_comm.
+  now apply IHlb.
+}
+destruct Htab as [Htab | Htab]. {
+  injection Htab; clear Htab; intros; subst k j.
+  split; [ flia | ].
+  rewrite app_length; cbn.
+  rewrite <- Nat.add_succ_comm, <- Nat.add_succ_l.
+  apply Nat.add_lt_mono_l.
+Search (_ < min _ _).
+Search (_ ≤ min _ _).
+  apply Nat.min_glb_lt_iff.
+  split; [ flia | ].
+...
+specialize (in_transp_loop_length eqb i j 0 aft lb Hij) as H1.
+destruct H1 as (H1, H2).
+split. {
+  now apply Nat.min_glb_lt_iff in H1.
+... return to
 ...
   f_equal.
   apply IHlb.
