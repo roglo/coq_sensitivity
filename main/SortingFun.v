@@ -3070,6 +3070,138 @@ apply Nat.succ_lt_mono in Hk.
 now apply nth_indep.
 Qed.
 
+Theorem in_transp_loop_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ i j k la lb,
+  length la = length lb
+  → (i, j) ∈ transp_loop eqb k la lb →
+    i < k + length la ∧ j < k + length la.
+Proof.
+intros * Heqb * Hlab Htab.
+revert k la Hlab Htab.
+induction lb as [| b]; intros; [ easy | ].
+cbn in Htab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hla); subst la.
+apply Heqb in Hx; subst x.
+rewrite app_length in Hlab; cbn in Hlab.
+rewrite Nat.add_succ_r in Hlab.
+apply Nat.succ_inj in Hlab.
+destruct bef as [| c]; cbn. {
+  rewrite <- Nat.add_succ_comm.
+  now apply IHlb.
+}
+destruct Htab as [Htab | Htab]. {
+  injection Htab; clear Htab; intros; subst k j.
+  split; [ flia | ].
+  rewrite app_length; cbn.
+  rewrite <- Nat.add_succ_comm, <- Nat.add_succ_l.
+  apply Nat.add_lt_mono_l; flia.
+}
+specialize (IHlb (S k) (bef ++ c :: aft)) as H1.
+assert (H : length (bef ++ c :: aft) = length lb). {
+  rewrite app_length; cbn.
+  now rewrite Nat.add_succ_r.
+}
+specialize (H1 H Htab); clear H.
+rewrite app_length in H1 |-*; cbn in H1 |-*.
+now rewrite Nat.add_succ_r.
+Qed.
+
+Theorem permutation_transp_list : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → apply_transp_list (transp_list eqb la lb) la = lb.
+Proof.
+intros * Heqb * Hpab.
+revert la Hpab.
+induction lb as [| b]; intros; cbn. {
+  now apply permutation_nil_r in Hpab.
+}
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 b).
+  assert (H : b ∈ la) by now apply (permutation_in Heqb Hpab); left.
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hla).
+apply Heqb in Hx; subst x.
+subst la.
+assert (H : permutation eqb (bef ++ aft) lb). {
+  apply (permutation_cons_inv Heqb) with (a := b).
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  rewrite (List_cons_is_app b aft), app_assoc.
+  rewrite app_comm_cons.
+  apply (permutation_app_tail Heqb).
+  now apply permutation_cons_append.
+}
+move H before Hpab; clear Hpab; rename H into Hpab.
+destruct bef as [| a]. {
+  cbn.
+  rewrite (transp_loop_shift Heqb).
+  rewrite apply_transp_list_shift_1_cons. 2: {
+    intros (i, j) Hij; cbn.
+    unfold transp_list in Hij.
+    specialize (in_transp_loop_length Heqb) as H1.
+    apply (H1 i j 0 aft lb); [ | easy ].
+    now apply (permutation_length Heqb).
+  }
+  f_equal.
+  now apply IHlb.
+}
+cbn - [ swap ].
+replace (swap _ _ _) with (b :: bef ++ a :: aft). 2: {
+  cbn.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn; f_equal.
+  rewrite <- seq_shift, map_map; cbn.
+  rewrite List_map_nth_seq with (la := bef ++ a :: aft) (d := a).
+  do 2 rewrite app_length.
+  apply map_ext_in.
+  intros i Hi.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
+    rewrite Hib.
+    rewrite app_nth2; [ | now unfold ge ].
+    now rewrite Nat.sub_diag.
+  }
+  destruct (lt_dec i (length bef)) as [Hibl| Hibg]. {
+    rewrite app_nth1; [ | easy ].
+    now rewrite app_nth1.
+  }
+  rewrite app_nth2; [ | flia Hib Hibg ].
+  rewrite app_nth2; [ | flia Hib Hibg ].
+  now replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hibg.
+}
+rewrite (transp_loop_shift Heqb).
+cbn in Hpab.
+assert (H : permutation eqb (bef ++ a :: aft) lb). {
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  rewrite (List_cons_is_app a aft), app_assoc.
+  rewrite app_comm_cons.
+  apply (permutation_app_tail Heqb).
+  apply (permutation_sym Heqb).
+  now apply permutation_cons_append.
+}
+move H before Hpab; clear Hpab; rename H into Hpab.
+rewrite apply_transp_list_shift_1_cons. 2: {
+  intros (i, j) Hij; cbn.
+  specialize (in_transp_loop_length Heqb) as H1.
+  specialize (H1 i j 0 (bef ++ a :: aft) lb).
+  apply (permutation_length Heqb) in Hpab.
+  specialize (H1 Hpab Hij).
+  now rewrite app_length in H1 |-*.
+}
+f_equal.
+apply (IHlb _ Hpab).
+Qed.
+
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
@@ -3345,88 +3477,8 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
-remember (transp_list eqb la lb) as trl eqn:Htrl.
-
-Theorem permutation_transp_list : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb,
-  permutation eqb la lb
-  → apply_transp_list (transp_list eqb la lb) la = lb.
-Proof.
-intros * Heqb * Hpab.
-revert la Hpab.
-induction lb as [| b]; intros; cbn. {
-  now apply permutation_nil_r in Hpab.
-}
-remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (H1 b).
-  assert (H : b ∈ la) by now apply (permutation_in Heqb Hpab); left.
-  specialize (H1 H); clear H.
-  now rewrite (equality_refl Heqb) in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & Hx & Hla).
-apply Heqb in Hx; subst x.
-subst la.
-destruct bef as [| a]; cbn. {
-  rewrite (transp_loop_shift Heqb).
-  rewrite apply_transp_list_shift_1_cons. 2: {
-    intros (i, j) Hij; cbn.
-    unfold transp_list in Hij.
-Theorem in_transp_loop_length : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ i j k la lb,
-  (i, j) ∈ transp_loop eqb k la lb →
-  i < k + min (length la) (length lb) ∧
-  j < k + min (length la) (length lb).
-Proof.
-intros * Heqb * Htab.
-revert i j k la Htab.
-induction lb as [| b]; intros; [ easy | ].
-cbn in Htab.
-remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & Hx & Hla); subst la.
-apply Heqb in Hx; subst x.
-destruct bef as [| c]; cbn. {
-  rewrite <- Nat.add_succ_comm.
-  now apply IHlb.
-}
-destruct Htab as [Htab | Htab]. {
-  injection Htab; clear Htab; intros; subst k j.
-  split; [ flia | ].
-  rewrite app_length; cbn.
-  rewrite <- Nat.add_succ_comm, <- Nat.add_succ_l.
-  apply Nat.add_lt_mono_l.
-Search (_ < min _ _).
-Search (_ ≤ min _ _).
-  apply Nat.min_glb_lt_iff.
-  split; [ flia | ].
-...
-specialize (in_transp_loop_length eqb i j 0 aft lb Hij) as H1.
-destruct H1 as (H1, H2).
-split. {
-  now apply Nat.min_glb_lt_iff in H1.
-... return to
-...
-  f_equal.
-  apply IHlb.
-...
-apply list_eqb_eq in Hx
-        exists a, b, ...
-...
-  unfold permutation in Hpab.
-  apply permutation_cons_l_iff in Hpab.
-  remember (extract (eqb a) (b :: lb)) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & Hx & Hlb).
-...
-Search (permutation _ (_ :: _) (_ :: _)).
-Print is_permutation.
+specialize (permutation_transp_list Heqb Hpab) as H1.
+(* ouais, bof, qu'est-ce qu'on fait avec ça ? *)
 ...
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
