@@ -2968,6 +2968,45 @@ apply IHit in Hlb, Hlc; subst lb lc.
 now apply split_list_nil_l in Hll.
 Qed.
 
+Theorem msort_loop_enough_iter : ∀ A (rel : A → _) la ita itb,
+  length la ≤ ita
+  → length la ≤ itb
+  → msort_loop rel ita la = msort_loop rel itb la.
+Proof.
+intros * Ha Hb.
+revert la itb Ha Hb.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Ha; subst la.
+  symmetry; apply msort_loop_nil.
+}
+destruct itb; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hb; subst la; cbn.
+  now rewrite msort_loop_nil.
+}
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lc, ld).
+destruct la as [| a]. {
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_nil.
+}
+cbn in Ha, Hb.
+apply Nat.succ_le_mono in Ha, Hb.
+destruct la as [| b]. {
+  injection Hll; clear Hll; intros; subst lc ld.
+  now do 2 rewrite msort_loop_single, msort_loop_nil.
+}
+cbn in Ha, Hb.
+cbn in Hll.
+remember (split_list la) as ll eqn:H; symmetry in H.
+destruct ll as (le, lf).
+injection Hll; clear Hll; intros; subst lc ld.
+rename le into lc; rename lf into ld; rename H into Hll.
+apply split_list_length in Hll.
+rewrite IHita with (itb := itb); cbn; [ | flia Ha Hll | flia Hb Hll ].
+rewrite IHita with (itb := itb); cbn; [ | flia Ha Hll | flia Hb Hll ].
+easy.
+Qed.
+
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
@@ -3274,42 +3313,22 @@ assert (H : permutation eqb (bef ++ aft) lb). {
 }
 move H before Hpab; clear Hpab; rename H into Hpab.
 destruct bef as [| a]. {
-  cbn in (*Htab*) |-*.
-(*
-  rewrite (transp_loop_shift Heqb) in Htab.
-  rewrite apply_transp_list_shift_1_cons in Htab. 2: {
-    intros (i, j) Hij; cbn.
-    specialize (in_transp_loop_length Heqb) as H1.
-    apply (H1 i j 0 aft lb); [ | easy ].
-    now apply (permutation_length Heqb) in Hpab.
-  }
-  injection Htab; clear Htab; intros Htab.
-*)
-  cbn in Hita, Hitb.
-  destruct ita; [ easy | ].
-  destruct itb; [ easy | ].
+  cbn in Hita, Hitb |-*.
   clear Hbef.
-  apply Nat.succ_le_mono in Hita, Hitb.
-  specialize (IHlb ita itb aft Hita Hitb Hpab) as H1.
-(*
-  destruct aft as [| a']. {
-    apply permutation_nil_l in Hpab; subst lb.
-    now do 2 rewrite msort_loop_single, msort_loop_nil.
-  }
-  destruct lb as [| b']. {
-    now apply permutation_nil_r in Hpab.
-  }
-*)
   specialize (permutation_transp_list Heqb Hpab) as Htab.
   cbn in Htab.
   unfold apply_transp_list in Htab.
   remember (transp_list eqb aft lb) as trl eqn:Htrl; symmetry in Htrl.
-  destruct trl as [| (i, j)]. {
+  cbn in Hpab.
+  clear IHlb.
+  clear Htrl.
+  revert aft lb b ita itb Hita Hitb Hpab Htab.
+  induction trl as [| (i, j)]; intros. {
     cbn in Htab; subst aft.
-...
-Print transp_loop.
-Search (transp_loop _ _ _ _ = []).
-    appl eq_transp_loop_nil in Htrl.
+    now apply msort_loop_enough_iter.
+  }
+  cbn in Htab.
+  apply IHtrl; [ easy | easy | easy | ].
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
