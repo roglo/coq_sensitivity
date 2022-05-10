@@ -2928,6 +2928,46 @@ apply (permutation_trans Heqb) with (lb := a :: la); [ easy | ].
 now apply (permutation_trans Heqb) with (lb := b :: lb).
 Qed.
 
+Theorem eq_merge_loop_nil : ∀ A (rel : A → _) la lb it,
+  length la + length lb ≤ it
+  → merge_loop rel it la lb = []
+  → la = [] ∧ lb = [].
+Proof.
+intros * Hit Hmab.
+revert la lb Hit Hmab.
+induction it; intros. {
+  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
+  destruct Hit as (H1, H2).
+  now apply length_zero_iff_nil in H1, H2.
+}
+cbn in Hmab.
+destruct la as [| a]; [ easy | exfalso ].
+destruct lb as [| b]; [ easy | ].
+now destruct (rel a b).
+Qed.
+
+Theorem eq_merge_nil : ∀ A (rel : A → _) la lb,
+  merge rel la lb = [] → la = [] ∧ lb = [].
+Proof.
+intros * Hmab.
+now apply eq_merge_loop_nil in Hmab.
+Qed.
+
+Theorem eq_msort_loop_nil : ∀ A (rel : A → _) it la,
+  msort_loop rel it la = [] → la = [].
+Proof.
+intros * Hla.
+revert la Hla.
+induction it; intros; [ easy | ].
+cbn in Hla.
+remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+destruct ll as (lb, lc).
+apply eq_merge_nil in Hla.
+destruct Hla as (Hlb, Hlc).
+apply IHit in Hlb, Hlc; subst lb lc.
+now apply split_list_nil_l in Hll.
+Qed.
+
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
@@ -3203,8 +3243,78 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
-specialize (permutation_transp_list Heqb Hpab) as H1.
-(* ouais, bof, qu'est-ce qu'on fait avec ça ? *)
+(*
+specialize (permutation_transp_list Heqb Hpab) as Htab.
+*)
+revert ita itb la Hita Hitb Hpab (*Htab*).
+induction lb as [| b]; intros; cbn in (*Htab*) |-*. {
+  apply permutation_nil_r in Hpab; subst la.
+  now do 2 rewrite msort_loop_nil.
+}
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl b) as H1.
+  assert (H : b ∈ la). {
+    specialize (permutation_in Heqb Hpab) as H2.
+    now specialize (proj2 (H2 b) (or_introl eq_refl)) as H3.
+  }
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hla); subst la.
+apply Heqb in H; subst x.
+assert (H : permutation eqb (bef ++ aft) lb). {
+  apply (permutation_cons_inv Heqb) with (a := b).
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  rewrite (List_cons_is_app b aft), app_assoc.
+  rewrite app_comm_cons.
+  apply (permutation_app_tail Heqb).
+  now apply permutation_cons_append.
+}
+move H before Hpab; clear Hpab; rename H into Hpab.
+destruct bef as [| a]. {
+  cbn in (*Htab*) |-*.
+(*
+  rewrite (transp_loop_shift Heqb) in Htab.
+  rewrite apply_transp_list_shift_1_cons in Htab. 2: {
+    intros (i, j) Hij; cbn.
+    specialize (in_transp_loop_length Heqb) as H1.
+    apply (H1 i j 0 aft lb); [ | easy ].
+    now apply (permutation_length Heqb) in Hpab.
+  }
+  injection Htab; clear Htab; intros Htab.
+*)
+  cbn in Hita, Hitb.
+  destruct ita; [ easy | ].
+  destruct itb; [ easy | ].
+  clear Hbef.
+  apply Nat.succ_le_mono in Hita, Hitb.
+  specialize (IHlb ita itb aft Hita Hitb Hpab) as H1.
+(*
+  destruct aft as [| a']. {
+    apply permutation_nil_l in Hpab; subst lb.
+    now do 2 rewrite msort_loop_single, msort_loop_nil.
+  }
+  destruct lb as [| b']. {
+    now apply permutation_nil_r in Hpab.
+  }
+*)
+Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
+  msort_loop rel ita la = msort_loop rel itb lb
+  → msort_loop rel (S ita) (a :: la) = msort_loop rel (S itb) (a :: lb).
+Proof.
+intros * Hab; cbn.
+destruct la as [| a']. {
+  rewrite msort_loop_nil in Hab; symmetry in Hab.
+  rewrite msort_loop_single, msort_loop_nil; cbn.
+  apply eq_msort_loop_nil in Hab; subst lb.
+  now rewrite msort_loop_single, msort_loop_nil.
+}
+destruct lb as [| b']. {
+  rewrite msort_loop_nil in Hab.
+  now apply eq_msort_loop_nil in Hab.
+}
 ...
 revert itb la lb Hita Hitb Hpab.
 induction ita as (ita, IHita) using lt_wf_rec; intros.
