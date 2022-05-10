@@ -3328,7 +3328,44 @@ destruct bef as [| a]. {
     now apply msort_loop_enough_iter.
   }
   cbn in Htab.
-  apply IHtrl; [ easy | easy | easy | ].
+  symmetry.
+  erewrite <- IHtrl; [ | | easy | | apply Htab ]; cycle 1. {
+    rewrite swap_length; apply Hita.
+  } {
+    eapply (permutation_trans Heqb); [ | apply Hpab ].
+    clear Hita Hpab Htab.
+    revert i j.
+    induction aft as [| d]; intros; [ apply permutation_nil_nil | ].
+    cbn.
+    rewrite <- seq_shift, map_map; cbn.
+    destruct j. {
+      destruct i. {
+        apply (permutation_skip Heqb).
+        rewrite <- List_map_nth_seq.
+        now apply permutation_refl.
+      }
+...
+    cbn - [ "=?" nth ].
+...
+    cbn - [ "=?" nth seq ].
+    rewrite <- seq_shift, map_map; cbn.
+(*
+    unfold swap.
+    cbn - [ "=?" seq ].
+    rewrite List_cons_length.
+    rewrite seq_S.
+    cbn.
+    rewrite map_app.
+    cbn.
+*)
+    destruct j. {
+      destruct i. {
+        apply (permutation_skip Heqb).
+        rewrite <- List_map_nth_seq.
+        now apply permutation_refl.
+      }
+...
+  }
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
