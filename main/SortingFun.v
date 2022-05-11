@@ -3340,6 +3340,13 @@ destruct bef as [| a]. {
     specialize (Hij _ _ (or_introl eq_refl)).
     clear trl IHtrl lb b ita itb Hitb.
     rename aft into la.
+Theorem permutation_swap_any : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ i j la,
+  i < j < length la
+  → permutation eqb (swap i j la) la.
+Proof.
+intros * Heqb * Hij.
 destruct la as [| d]; [ apply permutation_nil_nil | ].
 unfold swap.
 set (exch := λ i j k, if k =? i then j else if k =? j then i else k).
@@ -3385,6 +3392,10 @@ cbn - [ nth ].
       destruct H as (l1 & l2 & Hda).
       rewrite Hda.
       apply (permutation_cons_app Heqb).
+...
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        unfold exch.
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
