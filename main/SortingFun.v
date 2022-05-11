@@ -3266,7 +3266,7 @@ destruct Hpab as [Hnil | [Hskip | [Hswap| Htrans]]]. {
   destruct Hnil
 ...
 *)
-intros (* * Heqb Hant Htra Htot *) * Hpab.
+intros * Heqb (* Hant Htra Htot *) * Hpab.
 unfold msort.
 Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   equality eqb →
