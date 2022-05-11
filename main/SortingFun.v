@@ -3356,7 +3356,45 @@ Theorem msort_loop_cons_cons : ∀ A (rel : A → _),
   ∀ a la lb it,
   msort_loop rel it la = msort_loop rel it lb
   → msort_loop rel it (a :: la) = msort_loop rel it (a :: lb).
-Admitted.
+Proof.
+intros * Hab.
+destruct it; cbn in Hab |-*; [ now f_equal | ].
+rename a into c.
+remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
+destruct ll as (la1, la2).
+remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
+destruct ll as (lb1, lb2).
+move lb1 before la2; move lb2 before lb1.
+destruct la as [| a]. {
+  injection Hlla; clear Hlla; intros; subst la1 la2.
+  rewrite msort_loop_nil in Hab; cbn in Hab.
+  symmetry in Hab.
+  apply eq_merge_nil in Hab.
+  destruct Hab as (H1, H2).
+  apply eq_msort_loop_nil in H1, H2; subst lb1 lb2.
+  apply split_list_nil_l in Hllb.
+  now destruct Hllb; subst lb.
+}
+destruct lb as [| b]. {
+  injection Hllb; clear Hllb; intros; subst lb1 lb2.
+  rewrite msort_loop_nil in Hab; cbn in Hab.
+  apply eq_merge_nil in Hab.
+  destruct Hab as (H1, H2).
+  apply eq_msort_loop_nil in H1, H2; subst la1 la2.
+  now apply split_list_nil_l in Hlla.
+}
+rename Hlla into Hlala.
+rename Hllb into Hlblb.
+rename la1 into laa1; rename la2 into laa2.
+rename lb1 into lbb1; rename lb2 into lbb2.
+remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
+destruct ll as (la1, la2).
+remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
+destruct ll as (lb1, lb2).
+move b before a.
+move lb2 after laa1; move lb1 after laa1.
+move la2 after laa1; move la1 after laa1.
+move Hllb after Hlala; move Hlla after Hlala.
 ... returning
   apply msort_loop_cons_cons.
 ...
