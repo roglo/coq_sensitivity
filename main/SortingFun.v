@@ -3358,7 +3358,8 @@ Theorem msort_loop_cons_cons : ∀ A (rel : A → _),
   → msort_loop rel it (a :: la) = msort_loop rel it (a :: lb).
 Proof.
 intros * Hab.
-destruct it; cbn in Hab |-*; [ now f_equal | ].
+revert a la lb Hab.
+induction it; intros; cbn in Hab |-*; [ now f_equal | ].
 rename a into c.
 remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
 destruct ll as (la1, la2).
