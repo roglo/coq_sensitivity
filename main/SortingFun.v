@@ -3285,47 +3285,52 @@ intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
 (*
 specialize (permutation_transp_list Heqb Hpab) as Htab.
 *)
-revert ita itb la Hita Hitb Hpab (*Htab*).
-induction lb as [| b]; intros; cbn in (*Htab*) |-*. {
-  apply permutation_nil_r in Hpab; subst la.
+revert ita itb lb Hita Hitb Hpab (*Htab*).
+induction la as [| a]; intros; cbn in (*Htab*) |-*. {
+  apply permutation_nil_l in Hpab; subst lb.
   now do 2 rewrite msort_loop_nil.
 }
-remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl b) as H1.
-  assert (H : b ∈ la). {
+  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
+  assert (H : a ∈ lb). {
     specialize (permutation_in Heqb Hpab) as H2.
-    now specialize (proj2 (H2 b) (or_introl eq_refl)) as H3.
+    now specialize (proj1 (H2 a) (or_introl eq_refl)) as H3.
   }
   specialize (H1 H); clear H.
   now rewrite (equality_refl Heqb) in H1.
 }
 apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hla); subst la.
+destruct Hlxl as (Hbef & H & Hlb); subst lb.
 apply Heqb in H; subst x.
-assert (H : permutation eqb (bef ++ aft) lb). {
-  apply (permutation_cons_inv Heqb) with (a := b).
-  eapply (permutation_trans Heqb); [ | apply Hpab ].
-  rewrite (List_cons_is_app b aft), app_assoc.
+assert (H : permutation eqb la (bef ++ aft)). {
+  apply (permutation_cons_inv Heqb) with (a := a).
+  eapply (permutation_trans Heqb); [ apply Hpab | ].
+  rewrite (List_cons_is_app a aft), app_assoc.
   rewrite app_comm_cons.
   apply (permutation_app_tail Heqb).
+  apply (permutation_sym Heqb).
   now apply permutation_cons_append.
 }
 move H before Hpab; clear Hpab; rename H into Hpab.
-destruct bef as [| a]. {
+destruct bef as [| b]. {
   cbn in Hita, Hitb |-*.
   clear Hbef.
   specialize (permutation_transp_list Heqb Hpab) as Htab.
   cbn in Htab.
   unfold apply_transp_list in Htab.
-  remember (transp_list eqb aft lb) as trl eqn:Htrl; symmetry in Htrl.
+  remember (transp_list eqb la aft) as trl eqn:Htrl; symmetry in Htrl.
+  generalize Htrl; intros H; unfold transp_list in H.
+  rewrite H in Htab; clear H.
   cbn in Hpab.
-  clear IHlb.
-  specialize (in_transp_list_length Heqb aft lb) as Hij.
-  assert (H : length aft = length lb) by now apply permutation_length in Hpab.
+(*
+  clear IHla.
+*)
+  specialize (in_transp_list_length Heqb la aft) as Hij.
+  assert (H : length la = length aft) by now apply permutation_length in Hpab.
   specialize (Hij H); clear H.
   rewrite Htrl in Hij; clear Htrl.
-  revert aft lb b ita itb Hita Hitb Hpab Htab Hij.
+  revert aft la a ita itb Hita Hitb Hpab Htab Hij IHla.
   induction trl as [| (i, j)]; intros. {
     cbn in Htab; subst aft.
     now apply msort_loop_enough_iter.
@@ -3336,22 +3341,35 @@ destruct bef as [| a]. {
   apply (permutation_sym Heqb) in Hpab.
   apply IHtrl; [ easy | easy | easy | | ].
 *)
-  erewrite <- IHtrl; [ | | easy | | apply Htab | ]; cycle 1. {
+  erewrite <- IHtrl; [ | | easy | | apply Htab | | ]; cycle 1. {
     rewrite swap_length; apply Hita.
   } {
     eapply (permutation_trans Heqb); [ | apply Hpab ].
     clear Hita Hpab Htab.
     specialize (Hij _ _ (or_introl eq_refl)).
-    clear trl IHtrl lb b ita itb Hitb.
-    rename aft into la.
+    clear trl IHtrl a ita itb Hitb.
     now apply permutation_swap_any.
   } {
     intros u v Huv.
     rewrite swap_length.
     now apply Hij; right.
+  } {
+    intros ita2 itb2 lb Hita2 Hitb2 Hpsab.
+    rewrite swap_length in Hita2.
+    rewrite <- IHla with (ita := ita2); [ | easy | | ]; cycle 1. {
+      now rewrite swap_length.
+    } {
+      apply (permutation_sym Heqb).
+      apply (permutation_swap_any Heqb).
+      now apply Hij; left.
+    }
+    apply IHla; [ easy | easy | ].
+    eapply (permutation_trans Heqb); [ | apply Hpsab ].
+    apply (permutation_sym Heqb).
+    apply (permutation_swap_any Heqb).
+    now apply Hij; left.
   }
-  symmetry.
-  specialize (Hij _ _ (or_introl eq_refl)).
+  clear IHtrl.
 Theorem msort_loop_cons_cons : ∀ A (rel : A → _),
   ∀ a la lb it,
   msort_loop rel it la = msort_loop rel it lb
@@ -3396,6 +3414,7 @@ move b before a.
 move lb2 after laa1; move lb1 after laa1.
 move la2 after laa1; move la1 after laa1.
 move Hllb after Hlala; move Hlla after Hlala.
+...
 ... returning
   apply msort_loop_cons_cons.
 ...
