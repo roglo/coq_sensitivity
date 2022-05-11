@@ -3270,10 +3270,8 @@ intros * Heqb (* Hant Htra Htot *) * Hpab.
 unfold msort.
 Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   equality eqb →
-(*
   antisymmetric rel →
   transitive rel →
-*)
   total_relation rel →
   ∀ ita itb la lb,
   length la ≤ ita
@@ -3281,7 +3279,7 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → permutation eqb la lb
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
-intros * Heqb (* Hant Htra *) Htot * Hita Hitb Hpab.
+intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
 (*
 specialize (permutation_transp_list Heqb Hpab) as Htab.
 *)
@@ -3290,29 +3288,134 @@ induction la as [| a]; intros; cbn in (*Htab*) |-*. {
   apply permutation_nil_l in Hpab; subst lb.
   now do 2 rewrite msort_loop_nil.
 }
+apply permutation_cons_l_iff in Hpab.
 remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl a) as H1.
-  assert (H : a ∈ lb). {
-    specialize (permutation_in Heqb Hpab) as H2.
-    now specialize (proj1 (H2 a) (or_introl eq_refl)) as H3.
-  }
-  specialize (H1 H); clear H.
-  now rewrite (equality_refl Heqb) in H1.
-}
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb); subst lb.
 apply Heqb in H; subst x.
-assert (H : permutation eqb la (bef ++ aft)). {
-  apply (permutation_cons_inv Heqb) with (a := a).
-  eapply (permutation_trans Heqb); [ apply Hpab | ].
-  rewrite (List_cons_is_app a aft), app_assoc.
-  rewrite app_comm_cons.
-  apply (permutation_app_tail Heqb).
-  apply (permutation_sym Heqb).
-  now apply permutation_cons_append.
-}
-move H before Hpab; clear Hpab; rename H into Hpab.
+(**)
+rewrite app_length in Hitb.
+cbn in Hita, Hitb.
+revert a la ita itb aft IHla Hita Hitb Hbef Hpab.
+induction bef as [| c]; intros. {
+  cbn in Hitb, Hpab |-*; clear Hbef.
+  destruct ita; [ easy | ].
+  cbn.
+  apply Nat.succ_le_mono in Hita.
+  destruct la as [| a2]. {
+    apply permutation_nil_l in Hpab; subst aft.
+    rewrite msort_loop_single, msort_loop_nil.
+    now rewrite msort_loop_single.
+  }
+  cbn in IHla, Hita.
+  remember (split_list la) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as (la1, la2).
+  destruct ita; [ easy | ].
+  apply Nat.succ_le_mono in Hita.
+  cbn.
+  destruct la as [| a3]. {
+    apply (permutation_length_1_inv Heqb) in Hpab; subst aft.
+    injection Hll; clear Hll; intros; subst la1 la2.
+    rewrite msort_loop_nil.
+    do 2 rewrite msort_loop_single; cbn.
+    destruct itb; [ easy | cbn ].
+    now do 2 rewrite msort_loop_single; cbn.
+  }
+  destruct la as [| a4]. {
+    injection Hll; clear Hll; intros; subst la1 la2; cbn.
+    rewrite msort_loop_nil.
+    do 3 rewrite msort_loop_single; cbn.
+    replace (length _) with 2; [ | now destruct (rel a a3) ].
+    destruct itb; [ easy | cbn ].
+    apply Nat.succ_le_mono in Hitb.
+    destruct aft as [| c]. {
+      now apply permutation_nil_r in Hpab.
+    }
+    destruct aft as [| c2]. {
+      apply (permutation_sym Heqb) in Hpab.
+      now apply permutation_length_1_inv in Hpab.
+    }
+    destruct aft. 2: {
+      now apply (permutation_length Heqb) in Hpab; cbn in Hpab.
+    }
+    cbn.
+    rewrite msort_loop_single.
+    destruct itb; [ easy | cbn ].
+    do 2 rewrite msort_loop_single; cbn.
+    replace (length _) with 2; [ | now destruct (rel a c2) ].
+    cbn.
+    unfold permutation in Hpab; cbn in Hpab.
+    remember (eqb a2 c) as a2c eqn:Ha2c; symmetry in Ha2c.
+    destruct a2c. {
+      apply Heqb in Ha2c; subst c; cbn in Hpab.
+      remember (eqb a3 c2) as a3c2 eqn:Ha3c2; symmetry in Ha3c2.
+      destruct a3c2; [ | easy ].
+      apply Heqb in Ha3c2; subst c2; clear Hpab.
+      remember (rel a a3) as aa3 eqn:Haa3; symmetry in Haa3.
+      now destruct aa3.
+    }
+    remember (eqb a2 c2) as a2c2 eqn:Ha2c2; symmetry in Ha2c2.
+    destruct a2c2; [ | easy ].
+    cbn in Hpab.
+    apply Heqb in Ha2c2; subst c2.
+    remember (eqb a3 c) as a3c eqn:Ha3c; symmetry in Ha3c.
+    destruct a3c; [ | easy ].
+    clear Hpab.
+    apply Heqb in Ha3c; subst c.
+    remember (rel a a3) as aa3 eqn:Haa3; symmetry in Haa3.
+    destruct aa3. {
+      remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
+      destruct aa2. {
+        rewrite Haa3; f_equal.
+        remember (rel a3 a2) as a3a2 eqn:Ha3a2; symmetry in Ha3a2.
+        destruct a3a2. {
+          remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
+          destruct a2a3; [ | easy ].
+          now rewrite (Hant _ _ Ha3a2 Ha2a3).
+        }
+        specialize (Htot a3 a2) as Ha2a3.
+        now rewrite Ha3a2 in Ha2a3; cbn in Ha2a3; rewrite Ha2a3.
+      }
+      rewrite Haa3.
+      remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
+      destruct a2a3; [ easy | ].
+      specialize (Htot a a2) as Ha2a.
+      rewrite Haa2 in Ha2a; cbn in Ha2a.
+      specialize (Htot a2 a3) as Ha3a2.
+      rewrite Ha2a3 in Ha3a2; cbn in Ha3a2.
+      now rewrite (Htra a a3 a2 Haa3 Ha3a2) in Haa2.
+    }
+    remember (rel a3 a2) as a3a2 eqn:Ha3a2; symmetry in Ha3a2.
+    destruct a3a2. {
+      remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
+      destruct aa2; [ now rewrite Haa3 | ].
+      remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
+      rewrite Haa3.
+      destruct a2a3; [ | easy ].
+      now rewrite (Hant a2 a3 Ha2a3 Ha3a2).
+    }
+    remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
+    destruct aa2. {
+      rewrite Haa3.
+      specialize (Htot a a3) as Ha3a.
+      rewrite Haa3 in Ha3a; cbn in Ha3a.
+      specialize (Htot a3 a2) as Ha2a3.
+      rewrite Ha3a2 in Ha2a3; cbn in Ha2a3.
+      now rewrite (Htra a a2 a3 Haa2 Ha2a3) in Haa3.
+    }
+    specialize (Htot a3 a2) as Ha2a3.
+    rewrite Ha3a2 in Ha2a3; cbn in Ha2a3.
+    now rewrite Ha2a3, Haa3.
+  }
+  cbn in Hll.
+  remember (split_list la) as ll eqn:H; symmetry in H.
+  destruct ll as (la3, la4).
+  injection Hll; clear Hll; intros; subst la1 la2.
+  rename la3 into la1; rename la4 into la2; rename H into Hll.
+(* c'est un peu infernal ; j'avais pensé faire pas à pas pour voir s'il
+   se dégageait une règle, mais c'est trop long *)
+...
 destruct bef as [| b]. {
   cbn in Hita, Hitb |-*.
   clear Hbef.
