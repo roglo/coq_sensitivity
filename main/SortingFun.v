@@ -3231,41 +3231,6 @@ Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
   permutation eqb la lb
   → msort rel la = msort rel lb.
 Proof.
-(*
-intros * Heqb (* Hant Htra Htot *) * Hpab.
-apply (permutation_iff Heqb) in Hpab.
-destruct Hpab as [Hnil | [Hskip | [Hswap| Htrans]]]. {
-  now destruct Hnil; subst la lb.
-} {
-  destruct Hskip as (a & lc & ld & Hla & Hlb & Hpab); subst la lb.
-  rename lc into la; rename ld into lb.
-  cbn.
-  destruct la as [| a']. {
-    now apply permutation_nil_l in Hpab; subst lb.
-  }
-  destruct lb as [| b']. {
-    now apply permutation_nil_r in Hpab.
-  }
-  remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
-  destruct ll as (laa, lab).
-  remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
-  destruct ll as (lba, lbb).
-  remember (a :: laa) as laaa; remember (a :: lba) as laba.
-  remember (a' ::lab) as laab; remember (b' :: lbb) as lbbb.
-  cbn; subst.
-(* ouais... trop de cas, c'est trop merdique *)
-...
-    now apply (permutation_skip Heqb).
-  } {
-    destruct Hswap as (a & b & lc & Hla & Hlb); subst la lb.
-    apply (permutation_swap Heqb).
-  } {
-    destruct Htrans as (lc & Hac & Hcb).
-    now apply (permutation_trans Heqb) with (lb := lc).
-  }
-  destruct Hnil
-...
-*)
 intros * Heqb (* Hant Htra Htot *) * Hpab.
 unfold msort.
 Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
