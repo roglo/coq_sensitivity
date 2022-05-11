@@ -3245,6 +3245,24 @@ Theorem msort_loop_when_permuted : ∀ A (eqb rel : A → _),
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
 intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
+assert (Hlab : length la = length lb) by now apply permutation_length in Hpab.
+symmetry; rewrite Hlab in Hita.
+rewrite msort_loop_enough_iter with (itb := ita); [ | easy | easy ].
+symmetry; rewrite <- Hlab in Hita, Hitb.
+clear itb Hitb Hlab; rename ita into it.
+revert la lb Hita Hpab.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
+destruct lla as (la1, la2).
+remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
+destruct llb as (lb1, lb2).
+move lb1 before lb; move lb2 before lb1.
+move la1 before lb; move la2 before la1.
+...
+intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
 revert itb la lb Hita Hitb Hpab.
 induction ita; intros; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
@@ -3259,6 +3277,21 @@ destruct la as [| a1]. {
   now do 2 rewrite msort_loop_nil.
 }
 cbn in Hita; apply Nat.succ_le_mono in Hita.
+(*
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a1) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+rewrite app_length in Hitb; cbn in Hitb.
+rewrite Nat.add_succ_r, <- app_length in Hitb.
+symmetry.
+rewrite msort_loop_enough_iter with (itb := S ita).
+rewrite <- IHita with (la := a1 :: la).
+...
+*)
 destruct itb; cbn. {
   apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
   now apply permutation_nil_r in Hpab.
@@ -3273,6 +3306,13 @@ move itb before ita.
 move b1 before a1.
 move la1 before lb; move la2 before la1.
 move lb1 before la1; move lb2 before lb1.
+...
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a1) (b1 :: lb)) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb1).
+apply Heqb in H; subst x.
 ...
 intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
 (*
