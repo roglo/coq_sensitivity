@@ -1366,7 +1366,25 @@ rewrite <- Hl2.
 now replace (i - S len1 - len2) with (S (i - S len1 - S len2)) by flia Hi2.
 Qed.
 
-(* to be completed
+Theorem permutation_transp_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l1 l2 l3 x y,
+  permutation eqb (l1 ++ y :: l2 ++ x :: l3) (l1 ++ x :: l2 ++ y :: l3).
+Proof.
+intros * Heqb *.
+rewrite List_cons_is_app.
+rewrite (List_cons_is_app x).
+rewrite (List_cons_is_app x (l2 ++ _)).
+rewrite (List_cons_is_app y l3).
+apply (permutation_app_head Heqb).
+do 4 rewrite app_assoc.
+apply (permutation_app_tail Heqb).
+eapply (permutation_trans Heqb); [ | apply (permutation_app_comm Heqb) ].
+rewrite <- app_assoc.
+apply (permutation_app_head Heqb).
+apply (permutation_app_comm Heqb).
+Qed.
+
 Theorem permutation_swap_any : ∀ A (eqb : A → _),
   equality eqb →
   ∀ i j la,
@@ -1395,125 +1413,8 @@ assert (H : j = S (length (l1 ++ l2))). {
 }
 rewrite <- Hi, H.
 rewrite swap_d_inside.
-...
-rewrite <- Hx in Hla.
-rewrite Hla in Hij |-*.
-subst la.
-subst la.
-assert (∃ l1 l2, la = l1 ++ x :: l2 ∧ i = length l1). {
-  subst x.
-Search (_ ++ nth _ _ _ :: _).
-...
-  assert (H : x ∈ la) by now subst x; apply nth_In; flia Hij.
-  subst x; rename H into Hx.
-Search (nth _ _ _ ∈ _ → _).
-...
-  apply in_split in H.
-  destruct H as (l1 & l2 & Hla).
-  exists l1, l2; split; [ easy | ].
-...
-  apply (f_equal length) in Hla.
-  rewrite app_length in Hla; cbn in Hla.
-
-}
-destruct H as (l1 & l2 & Hla).
-subst la.
-remember (nth (j - S (length l1)) l2 d) as y eqn:Hy.
-assert (∃ l3 l4, l2 = l3 ++ y :: l4). {
-  assert (H : y ∈ l2). {
-    subst y; apply nth_In.
-    rewrite app_length in Hij; cbn in Hij.
-    rewrite <- Nat.add_succ_comm in Hij.
-Search (_ - _ < _).
-S (length l1) < j
-...
-intros * Heqb * Hij.
-unfold swap.
-destruct la as [| d]; [ apply permutation_nil_nil | ].
-remember (d :: la) as lb eqn:Hlb.
-clear la Hlb; rename lb into la.
-remember (nth i la d) as x eqn:Hx.
-assert (∃ l1 l2, la = l1 ++ x :: l2). {
-  assert (H : x ∈ la) by now subst x; apply nth_In; flia Hij.
-  now apply in_split.
-}
-destruct H as (l1 & l2 & Hla).
-subst la.
-...
-remember (nth (j - S (length l1)) l2 d) as y eqn:Hy.
-assert (∃ l3 l4, l2 = l3 ++ y :: l4). {
-  assert (H : y ∈ l2). {
-    subst y; apply nth_In.
-    rewrite app_length in Hij; cbn in Hij.
-...
-    flia Hij.
-  assert (H : y ∈ l2) by now subst y; apply nth_In.
-assert (∃ l1 l2 l3, la = l1 ++ x :: l2 ++ y :: l3). {
-  assert (H : x ∈ la) by now subst x; apply nth_In; flia Hij.
-  apply in_split in H.
-  destruct H as (l1 & l2 & Hla).
-  rewrite Hla.
-  exists l1.
-  assert (H : y ∈ l2). {
-    enough (H : y ∈ la). {
-      rewrite Hla in H.
-      apply in_app_or in H.
-      destruct H as [H| [H| H]]; [ | | easy ]. {
-        rewrite Hy, Hla in H.
-        rewrite app_nth2 in H. 2: {
-          unfold ge.
-...
-intros * Heqb * Hij.
-destruct la as [| d]; [ apply permutation_nil_nil | ].
-unfold swap.
-set (exch := λ i j k, if k =? i then j else if k =? j then i else k).
-erewrite map_ext_in. 2: {
-  intros k Hk.
-  fold (exch i j k).
-  easy.
-}
-remember (d :: la) as lb; clear la Heqlb; rename lb into la.
-remember (length la) as len eqn:Hlen.
-symmetry in Hlen.
-revert i j la Hij Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len; intros; [ easy | ].
-destruct la as [| a]; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-cbn - [ nth ].
-    rewrite <- seq_shift, map_map; cbn - [ nth ].
-    destruct j; [ easy | ].
-    destruct i. {
-      destruct Hij as (_, Hj); cbn in Hj.
-      apply Nat.succ_lt_mono in Hj.
-      unfold exch at 1.
-      cbn - [ nth exch ].
-      rewrite List_nth_succ_cons.
-      remember (nth j la d) as c eqn:Hc.
-(*
-      erewrite map_ext_in. 2: {
-        intros i Hi.
-        replace (nth _ _ _) with (if i =? j then a else nth i la d). 2: {
-          now destruct (i =? j).
-        }
-        easy.
-      }
-      remember (map _ _) as lb eqn:Hlb.
-*)
-      assert (H : ∃ l1 l2, a :: la = l1 ++ c :: l2). {
-        assert (H : c ∈ la) by now subst c len; apply nth_In.
-        apply in_split in H.
-        destruct H as (l1 & l2 & H); rewrite H.
-        now exists (a :: l1), l2.
-      }
-      destruct H as (l1 & l2 & Hda).
-      rewrite Hda.
-      apply (permutation_cons_app Heqb).
-...
-      erewrite map_ext_in. 2: {
-        intros k Hk.
-        unfold exch.
-*)
+now apply permutation_transp_inside.
+Qed.
 
 (* *)
 
