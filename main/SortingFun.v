@@ -2710,7 +2710,7 @@ subst b.
 now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
-Theorem permutation_isort_loop' : ∀ A (eqb rel : A → _),
+Theorem isort_loop_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -2786,7 +2786,7 @@ apply (permutation_app_head Heqb).
 apply (permutation_swap Heqb).
 Qed.
 
-Theorem permutation_bsort_loop' : ∀ A (eqb rel : A → _),
+Theorem bsort_loop_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -2878,7 +2878,7 @@ specialize (H2 H); clear H.
 now specialize (Hant _ _ H1 H2) as H3.
 Qed.
 
-Theorem permutation_ssort_loop' : ∀ A (eqb rel : A → _),
+Theorem ssort_loop_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3187,7 +3187,7 @@ Theorem isort_when_permuted : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb Hant Htra Htot * Hpab.
 unfold isort.
-now apply (permutation_isort_loop' Heqb Hant Htra Htot).
+now apply (isort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
 Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
@@ -3201,7 +3201,7 @@ Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb Hant Htra Htot * Hpab.
 unfold ssort.
-now apply (permutation_ssort_loop' Heqb Hant Htra Htot).
+now apply (ssort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
 Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
@@ -3216,7 +3216,7 @@ Proof.
 intros * Heqb Hant Htra Htot * Hpab.
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
-now apply (permutation_bsort_loop' Heqb Hant Htra Htot).
+now apply (bsort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
 (* to be completed
