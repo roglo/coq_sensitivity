@@ -1107,7 +1107,7 @@ now rewrite List_map_seq_length.
 Qed.
 
 Theorem apply_transp_list_shift_1_cons : ∀ A (a : A) la trl,
-  (∀ ij, ij ∈ trl → fst ij < length la ∧ snd ij < length la)
+  (∀ ij, ij ∈ trl → fst ij < snd ij < length la)
   → apply_transp_list (shift_transp 1 trl) (a :: la) =
     a :: apply_transp_list trl la.
 Proof.
@@ -1134,20 +1134,17 @@ intros k Hk; cbn.
 apply in_seq in Hk.
 destruct Hk as (_, Hk); cbn in Hk.
 do 4 rewrite if_eqb_eq_dec.
-specialize (Htrl _ (or_introl eq_refl)) as H1.
-cbn in H1.
-destruct H1 as (Hi, Hj).
+specialize (Htrl _ (or_introl eq_refl)) as Hij.
+cbn in Hij.
 destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
   subst k.
   destruct i; [ easy | ].
-  apply Nat.succ_lt_mono in Hi.
-  now apply nth_indep.
+  apply nth_indep; flia Hij.
 }
 destruct (Nat.eq_dec k i) as [Hki| Hki]. {
   subst k.
   destruct j; [ easy | ].
-  apply Nat.succ_lt_mono in Hj.
-  now apply nth_indep.
+  apply nth_indep; flia Hij.
 }
 destruct k; [ easy | ].
 apply Nat.succ_lt_mono in Hk.
@@ -1156,12 +1153,13 @@ Qed.
 
 Theorem in_transp_loop_length : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ i j k la lb,
+  ∀ la lb,
   length la = length lb
-  → (i, j) ∈ transp_loop eqb k la lb →
-    i < k + length la ∧ j < k + length la.
+  → ∀ i j k,
+  (i, j) ∈ transp_loop eqb k la lb
+  → i < j < k + length la.
 Proof.
-intros * Heqb * Hlab Htab.
+intros * Heqb * Hlab * Htab.
 revert k la Hlab Htab.
 induction lb as [| b]; intros; [ easy | ].
 cbn in Htab.
@@ -1192,6 +1190,18 @@ assert (H : length (bef ++ c :: aft) = length lb). {
 specialize (H1 H Htab); clear H.
 rewrite app_length in H1 |-*; cbn in H1 |-*.
 now rewrite Nat.add_succ_r.
+Qed.
+
+Theorem in_transp_list_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  length la = length lb
+  → ∀ i j,
+  (i, j) ∈ transp_list eqb la lb
+  → i < j < length la.
+Proof.
+intros * Heqb * Hlab * Htab.
+apply (in_transp_loop_length Heqb la lb Hlab i j 0 Htab).
 Qed.
 
 Theorem permutation_transp_list : ∀ A (eqb : A → _),
@@ -1232,10 +1242,8 @@ destruct bef as [| a]. {
   rewrite fold_apply_transp_list.
   rewrite apply_transp_list_shift_1_cons. 2: {
     intros (i, j) Hij; cbn.
-    unfold transp_list in Hij.
-    specialize (in_transp_loop_length Heqb) as H1.
-    apply (H1 i j 0 aft lb); [ | easy ].
-    now apply (permutation_length Heqb).
+    apply (permutation_length Heqb) in Hpab.
+    now apply (in_transp_list_length Heqb _ _ Hpab).
   }
   f_equal.
   now apply IHlb.
@@ -1278,11 +1286,8 @@ move H before Hpab; clear Hpab; rename H into Hpab.
 rewrite fold_apply_transp_list.
 rewrite apply_transp_list_shift_1_cons. 2: {
   intros (i, j) Hij; cbn.
-  specialize (in_transp_loop_length Heqb) as H1.
-  specialize (H1 i j 0 (bef ++ a :: aft) lb).
   apply (permutation_length Heqb) in Hpab.
-  specialize (H1 Hpab Hij).
-  now rewrite app_length in H1 |-*.
+  now apply (in_transp_list_length Heqb _ _ Hpab).
 }
 f_equal.
 apply (IHlb _ Hpab).

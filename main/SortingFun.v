@@ -3321,59 +3321,52 @@ destruct bef as [| a]. {
   remember (transp_list eqb aft lb) as trl eqn:Htrl; symmetry in Htrl.
   cbn in Hpab.
   clear IHlb.
-  clear Htrl.
-  revert aft lb b ita itb Hita Hitb Hpab Htab.
+  specialize (in_transp_list_length Heqb aft lb) as Hij.
+  assert (H : length aft = length lb) by now apply permutation_length in Hpab.
+  specialize (Hij H); clear H.
+  rewrite Htrl in Hij; clear Htrl.
+  revert aft lb b ita itb Hita Hitb Hpab Htab Hij.
   induction trl as [| (i, j)]; intros. {
     cbn in Htab; subst aft.
     now apply msort_loop_enough_iter.
   }
   cbn in Htab.
   symmetry.
-  erewrite <- IHtrl; [ | | easy | | apply Htab ]; cycle 1. {
+  erewrite <- IHtrl; [ | | easy | | apply Htab | ]; cycle 1. {
     rewrite swap_length; apply Hita.
   } {
     eapply (permutation_trans Heqb); [ | apply Hpab ].
     clear Hita Hpab Htab.
-    revert i j.
+    specialize (Hij _ _ (or_introl eq_refl)).
+    revert i j Hij.
     induction aft as [| d]; intros; [ apply permutation_nil_nil | ].
-    cbn.
-    rewrite <- seq_shift, map_map; cbn.
-    destruct j. {
-      destruct i. {
-        apply (permutation_skip Heqb).
-        rewrite <- List_map_nth_seq.
-        now apply permutation_refl.
-      }
-      remember (nth i aft d) as c eqn:Hc.
-      assert (H : ∃ l1 l2, d :: aft = l1 ++ c :: l2). {
-...
-permutation_cons_app:
-  ∀ (A : Type) (eqb : A → A → bool),
-    equality eqb
-    → ∀ (l l1 l2 : list A) (a : A),
-        permutation eqb l (l1 ++ l2) → permutation eqb (a :: l) (l1 ++ a :: l2)
-...
-    cbn - [ "=?" nth ].
-...
-    cbn - [ "=?" nth seq ].
-    rewrite <- seq_shift, map_map; cbn.
-(*
     unfold swap.
-    cbn - [ "=?" seq ].
-    rewrite List_cons_length.
-    rewrite seq_S.
-    cbn.
-    rewrite map_app.
-    cbn.
-*)
-    destruct j. {
-      destruct i. {
-        apply (permutation_skip Heqb).
-        rewrite <- List_map_nth_seq.
-        now apply permutation_refl.
+    cbn - [ nth ].
+    rewrite <- seq_shift, map_map; cbn - [ nth ].
+    destruct j; [ easy | ].
+    destruct i. {
+      destruct Hij as (_, Hj); cbn in Hj.
+      apply Nat.succ_lt_mono in Hj.
+      rewrite List_nth_succ_cons.
+      remember (nth j aft d) as c eqn:Hc.
+      erewrite map_ext_in. 2: {
+        intros i Hi.
+        replace (nth _ _ _) with (if i =? j then d else nth i aft d). 2: {
+          now destruct (i =? j).
+        }
+        easy.
       }
-...
-  }
+      remember (map _ _) as la eqn:Hla.
+      assert (H : ∃ l1 l2, d :: aft = l1 ++ c :: l2). {
+        assert (H : c ∈ aft) by now subst c; apply nth_In.
+        apply in_split in H.
+        destruct H as (l1 & l2 & H); rewrite H.
+        now exists (d :: l1), l2.
+      }
+      destruct H as (l1 & l2 & Hda).
+      rewrite Hda.
+      apply (permutation_cons_app Heqb).
+      apply (permutation_sym Heqb).
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
