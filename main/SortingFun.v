@@ -3233,7 +3233,7 @@ Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb (* Hant Htra Htot *) * Hpab.
 unfold msort.
-Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
+Theorem msort_loop_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3244,6 +3244,36 @@ Theorem permutation_msort_loop' : ∀ A (eqb rel : A → _),
   → permutation eqb la lb
   → msort_loop rel ita la = msort_loop rel itb lb.
 Proof.
+intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
+revert itb la lb Hita Hitb Hpab.
+induction ita; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
+  apply permutation_nil_l in Hpab; subst lb.
+  symmetry; apply msort_loop_nil.
+}
+remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
+destruct lla as (la1, la2).
+destruct la as [| a1]. {
+  apply permutation_nil_l in Hpab; subst lb.
+  injection Hlla; clear Hlla; intros; subst la1 la2.
+  now do 2 rewrite msort_loop_nil.
+}
+cbn in Hita; apply Nat.succ_le_mono in Hita.
+destruct itb; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
+  now apply permutation_nil_r in Hpab.
+}
+remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
+destruct llb as (lb1, lb2).
+destruct lb as [| b1]. {
+  now apply permutation_nil_r in Hpab.
+}
+cbn in Hitb; apply Nat.succ_le_mono in Hitb.
+move itb before ita.
+move b1 before a1.
+move la1 before lb; move la2 before la1.
+move lb1 before la1; move lb2 before lb1.
+...
 intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
 (*
 specialize (permutation_transp_list Heqb Hpab) as Htab.
