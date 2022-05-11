@@ -3332,6 +3332,10 @@ destruct bef as [| a]. {
   }
   cbn in Htab.
   symmetry.
+(*
+  apply (permutation_sym Heqb) in Hpab.
+  apply IHtrl; [ easy | easy | easy | | ].
+*)
   erewrite <- IHtrl; [ | | easy | | apply Htab | ]; cycle 1. {
     rewrite swap_length; apply Hita.
   } {
@@ -3340,8 +3344,21 @@ destruct bef as [| a]. {
     specialize (Hij _ _ (or_introl eq_refl)).
     clear trl IHtrl lb b ita itb Hitb.
     rename aft into la.
-...
-    apply permutation_swap_any.
+    now apply permutation_swap_any.
+  } {
+    intros u v Huv.
+    rewrite swap_length.
+    now apply Hij; right.
+  }
+  symmetry.
+  specialize (Hij _ _ (or_introl eq_refl)).
+Theorem msort_loop_cons_cons : ∀ A (rel : A → _),
+  ∀ a la lb it,
+  msort_loop rel it la = msort_loop rel it lb
+  → msort_loop rel it (a :: la) = msort_loop rel it (a :: lb).
+Admitted.
+... returning
+  apply msort_loop_cons_cons.
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
