@@ -3176,7 +3176,7 @@ Qed.
 
 (* *)
 
-Theorem permutation_isort' : ∀ A (eqb rel : A → _),
+Theorem permutation_isort : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3190,7 +3190,19 @@ unfold isort.
 now apply (permutation_isort_loop' Heqb Hant Htra Htot).
 Qed.
 
-Theorem permutation_ssort' : ∀ A (eqb rel : A → _),
+(*
+Check permutation_isort.
+
+sorted_isort
+     : ∀ (A : Type) (rel : A → A → bool),
+         total_relation rel → ∀ l : list A, sorted rel (isort rel l)
+isort_when_sorted
+     : ∀ (A : Type) (rel : A → A → bool),
+         antisymmetric rel
+         → transitive rel → ∀ l : list A, sorted rel l → isort rel l = l
+*)
+
+Theorem permutation_ssort : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3204,7 +3216,7 @@ unfold ssort.
 now apply (permutation_ssort_loop' Heqb Hant Htra Htot).
 Qed.
 
-Theorem permutation_bsort' : ∀ A (eqb rel : A → _),
+Theorem permutation_bsort : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3220,7 +3232,7 @@ now apply (permutation_bsort_loop' Heqb Hant Htra Htot).
 Qed.
 
 (* to be completed
-Theorem permutation_msort' : ∀ A (eqb rel : A → _),
+Theorem permutation_msort : ∀ A (eqb rel : A → _),
   equality eqb →
 (*
   antisymmetric rel →
@@ -3857,7 +3869,7 @@ Theorem permuted_isort_iff : ∀ A (eqb rel : A → _),
   ↔ isort rel la = isort rel lb.
 Proof.
 intros * Heqb Hant Htr Htot *.
-split; [ now apply permutation_isort' | ].
+split; [ now apply permutation_isort | ].
 intros Hab.
 specialize (permuted_isort rel Heqb la) as H1.
 specialize (permuted_isort rel Heqb lb) as H2.
