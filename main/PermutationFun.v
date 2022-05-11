@@ -1295,6 +1295,77 @@ f_equal.
 apply (IHlb _ Hpab).
 Qed.
 
+Theorem swap_d_inside : ∀ A (d : A) l1 l2 l3 x y,
+  swap_d d (length l1) (S (length (l1 ++ l2))) (l1 ++ x :: l2 ++ y :: l3) =
+  l1 ++ y :: l2 ++ x :: l3.
+Proof.
+intros.
+unfold swap_d.
+rewrite List_map_nth_seq with (d := d).
+do 3 rewrite app_length; cbn.
+do 2 rewrite app_length; cbn.
+apply map_ext_in.
+intros i Hi.
+do 2 rewrite if_eqb_eq_dec.
+remember (length l1) as len1 eqn:Hl1.
+remember (length l2) as len2 eqn:Hl2.
+move len2 before len1.
+destruct (lt_dec i len1) as [Hi1| Hi1]. {
+  destruct (Nat.eq_dec i len1) as [H| H]; [ flia Hi1 H | clear H].
+  destruct (Nat.eq_dec i (S (len1 + len2))) as [H| H]; [ flia Hi1 H | ].
+  clear H.
+  rewrite Hl1 in Hi1.
+  rewrite app_nth1; [ now rewrite app_nth1 | easy ].
+}
+apply Nat.nlt_ge in Hi1.
+symmetry.
+rewrite app_nth2; [ | now rewrite Hl1 in Hi1 ].
+destruct (Nat.eq_dec i len1) as [Hi2| Hi2]. {
+  rewrite Hi2, Hl1, Nat.sub_diag; cbn.
+  rewrite Hl1 in Hi1, Hi2.
+  rewrite app_nth2; [ | flia ].
+  rewrite <- Nat.add_succ_r, Nat.add_comm, Nat.add_sub.
+  rewrite List_nth_succ_cons.
+  rewrite app_nth2; [ | now unfold ge; subst len2 ].
+  now rewrite Hl2, Nat.sub_diag, List_nth_0_cons.
+}
+assert (H : len1 < i) by flia Hi1 Hi2; clear Hi1 Hi2; rename H into Hi1.
+replace (i - length l1) with (S (i - S (length l1))) by flia Hl1 Hi1; cbn.
+rewrite <- Hl1.
+symmetry.
+rewrite app_nth2. 2: {
+  destruct (Nat.eq_dec i (S (len1 + len2))) as [H| H]; [ | flia Hl1 Hi1 ].
+  flia Hl1 Hi1.
+}
+destruct (lt_dec i (S (len1 + len2))) as [Hi2| Hi2]. {
+  destruct (Nat.eq_dec i (S (len1 + len2))) as [H| H]; [ flia Hi2 H | ].
+  clear H.
+  rewrite <- Hl1.
+  replace (i - len1) with (S (i - S len1)) by flia Hi1.
+  rewrite List_nth_succ_cons.
+  rewrite app_nth1; [ | rewrite <- Hl2; flia Hi1 Hi2 ].
+  rewrite app_nth1; [ | rewrite <- Hl2; flia Hi1 Hi2 ].
+  easy.
+}
+apply Nat.nlt_ge in Hi2.
+destruct (Nat.eq_dec i (S (len1 + len2))) as [Hi3| Hi3]. {
+  rewrite Hl1, Nat.sub_diag, List_nth_0_cons at 1.
+  rewrite Hi3.
+  rewrite <- Nat.add_succ_l, Nat.add_comm, Nat.add_sub; cbn.
+  rewrite app_nth2; [ | now unfold ge; rewrite Hl2 ].
+  now rewrite Hl2, Nat.sub_diag.
+}
+assert (H : S (len1 + len2) < i) by flia Hi2 Hi3.
+clear Hi2 Hi3; rename H into Hi2.
+rewrite <- Hl1.
+replace (i - len1) with (S (i - S len1)) by flia Hi1.
+rewrite List_nth_succ_cons.
+rewrite app_nth2; [ | rewrite <- Hl2; flia Hi2 ].
+rewrite app_nth2; [ | rewrite <- Hl2; flia Hi2 ].
+rewrite <- Hl2.
+now replace (i - S len1 - len2) with (S (i - S len1 - S len2)) by flia Hi2.
+Qed.
+
 (* to be completed
 Theorem permutation_swap_any : ∀ A (eqb : A → _),
   equality eqb →
@@ -1303,8 +1374,58 @@ Theorem permutation_swap_any : ∀ A (eqb : A → _),
   → permutation eqb (swap i j la) la.
 Proof.
 intros * Heqb * Hij.
-Require Import Permutation.
-Search (Permutation (_ ++ _ :: _)).
+unfold swap.
+destruct la as [| d]; [ apply permutation_nil_nil | ].
+remember (d :: la) as lb eqn:Hlb.
+clear la Hlb; rename lb into la.
+assert (H : i < length la) by flia Hij.
+specialize (nth_split la d H) as H1; clear H.
+destruct H1 as (l1 & l2 & Hla & Hi).
+remember (nth i la d) as x eqn:Hx.
+subst la.
+rewrite app_length in Hij; cbn in Hij.
+assert (H : j - S i < length l2) by flia Hij Hi.
+specialize (nth_split l2 d H) as H1; clear H.
+destruct H1 as (l3 & l4 & Hl2 & Hj).
+remember (nth (j - S i) l2 d) as y eqn:Hy.
+subst l2; rename l3 into l2; rename l4 into l3.
+assert (H : j = S (length (l1 ++ l2))). {
+  rewrite app_length, Hj, Hi.
+  flia Hij.
+}
+rewrite <- Hi, H.
+rewrite swap_d_inside.
+...
+rewrite <- Hx in Hla.
+rewrite Hla in Hij |-*.
+subst la.
+subst la.
+assert (∃ l1 l2, la = l1 ++ x :: l2 ∧ i = length l1). {
+  subst x.
+Search (_ ++ nth _ _ _ :: _).
+...
+  assert (H : x ∈ la) by now subst x; apply nth_In; flia Hij.
+  subst x; rename H into Hx.
+Search (nth _ _ _ ∈ _ → _).
+...
+  apply in_split in H.
+  destruct H as (l1 & l2 & Hla).
+  exists l1, l2; split; [ easy | ].
+...
+  apply (f_equal length) in Hla.
+  rewrite app_length in Hla; cbn in Hla.
+
+}
+destruct H as (l1 & l2 & Hla).
+subst la.
+remember (nth (j - S (length l1)) l2 d) as y eqn:Hy.
+assert (∃ l3 l4, l2 = l3 ++ y :: l4). {
+  assert (H : y ∈ l2). {
+    subst y; apply nth_In.
+    rewrite app_length in Hij; cbn in Hij.
+    rewrite <- Nat.add_succ_comm in Hij.
+Search (_ - _ < _).
+S (length l1) < j
 ...
 intros * Heqb * Hij.
 unfold swap.
