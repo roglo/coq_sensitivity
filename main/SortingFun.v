@@ -3340,62 +3340,8 @@ destruct bef as [| a]. {
     specialize (Hij _ _ (or_introl eq_refl)).
     clear trl IHtrl lb b ita itb Hitb.
     rename aft into la.
-Theorem permutation_swap_any : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ i j la,
-  i < j < length la
-  → permutation eqb (swap i j la) la.
-Proof.
-intros * Heqb * Hij.
-destruct la as [| d]; [ apply permutation_nil_nil | ].
-unfold swap.
-set (exch := λ i j k, if k =? i then j else if k =? j then i else k).
-erewrite map_ext_in. 2: {
-  intros k Hk.
-  fold (exch i j k).
-  easy.
-}
-remember (d :: la) as lb; clear la Heqlb; rename lb into la.
-remember (length la) as len eqn:Hlen.
-symmetry in Hlen.
-revert i j la Hij Hlen.
-induction len as (len, IHlen) using lt_wf_rec; intros.
-destruct len; intros; [ easy | ].
-destruct la as [| a]; [ easy | ].
-cbn in Hlen; apply Nat.succ_inj in Hlen.
-cbn - [ nth ].
-    rewrite <- seq_shift, map_map; cbn - [ nth ].
-    destruct j; [ easy | ].
-    destruct i. {
-      destruct Hij as (_, Hj); cbn in Hj.
-      apply Nat.succ_lt_mono in Hj.
-      unfold exch at 1.
-      cbn - [ nth exch ].
-      rewrite List_nth_succ_cons.
-      remember (nth j la d) as c eqn:Hc.
-(*
-      erewrite map_ext_in. 2: {
-        intros i Hi.
-        replace (nth _ _ _) with (if i =? j then a else nth i la d). 2: {
-          now destruct (i =? j).
-        }
-        easy.
-      }
-      remember (map _ _) as lb eqn:Hlb.
-*)
-      assert (H : ∃ l1 l2, a :: la = l1 ++ c :: l2). {
-        assert (H : c ∈ la) by now subst c len; apply nth_In.
-        apply in_split in H.
-        destruct H as (l1 & l2 & H); rewrite H.
-        now exists (a :: l1), l2.
-      }
-      destruct H as (l1 & l2 & Hda).
-      rewrite Hda.
-      apply (permutation_cons_app Heqb).
 ...
-      erewrite map_ext_in. 2: {
-        intros k Hk.
-        unfold exch.
+    apply permutation_swap_any.
 ...
 Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
   msort_loop rel ita la = msort_loop rel itb lb
