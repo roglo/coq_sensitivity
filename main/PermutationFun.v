@@ -1051,7 +1051,7 @@ Definition swap {A} i j (la : list A) :=
   match la with
   | [] => []
   | d :: _ =>
-      map (λ k, nth (if k =? j then i else if k =? i then j else k) la d)
+      map (λ k, nth (if k =? i then j else if k =? j then i else k) la d)
         (seq 0 (length la))
   end.
 
@@ -1136,14 +1136,14 @@ destruct Hk as (_, Hk); cbn in Hk.
 do 4 rewrite if_eqb_eq_dec.
 specialize (Htrl _ (or_introl eq_refl)) as Hij.
 cbn in Hij.
-destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
-  subst k.
-  destruct i; [ easy | ].
-  apply nth_indep; flia Hij.
-}
 destruct (Nat.eq_dec k i) as [Hki| Hki]. {
   subst k.
   destruct j; [ easy | ].
+  apply nth_indep; flia Hij.
+}
+destruct (Nat.eq_dec k j) as [Hkj| Hkj]. {
+  subst k.
+  destruct i; [ easy | ].
   apply nth_indep; flia Hij.
 }
 destruct k; [ easy | ].
