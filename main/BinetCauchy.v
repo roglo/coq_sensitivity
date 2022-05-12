@@ -2782,12 +2782,10 @@ Admitted.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite glop.
-  rewrite (permutation_isort' Nat.eqb_eq) with (lb := to_radix_loop m n i).
-Search (equality Nat.eqb).
-Check Nat_eqb_equality.
-Search (transitive).
-About Nat_ltb_trans.
-Search (_  ↔ isort _ _ = isort _ _).
+  specialize isort_when_permuted as H1.
+  specialize (H1 _ Nat.eqb Nat.leb Nat_eqb_equality Nat_leb_antisym).
+  specialize (H1 Nat_leb_trans Nat_leb_is_total_relation).
+  rewrite H1 with (lb := to_radix_loop m n i). 2: {
 ...
 Search (isort _ (rev _)).
   easy.
