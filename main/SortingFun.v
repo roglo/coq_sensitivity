@@ -3007,6 +3007,74 @@ rewrite IHita with (itb := itb); cbn; [ | flia Ha Hll | flia Hb Hll ].
 easy.
 Qed.
 
+(* unicity of sorting algorithm *)
+
+Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
+  equality eqb →
+  reflexive rel →
+  antisymmetric rel →
+  transitive rel →
+  ∀ la lb,
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
+  → la = lb.
+Proof.
+intros * Heqb Hrefl Hant Htra * Hpab Hsa Hsb.
+revert lb Hpab Hsb.
+induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
+destruct lb as [| b]; intros; [ now apply permutation_nil_r in Hpab | ].
+move b before a; move lb before la; move Hsb before Hsa.
+apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
+unfold strongly_sorted in Hsa, Hsb.
+cbn in Hsa, Hsb.
+apply Bool.andb_true_iff in Hsa, Hsb.
+destruct Hsa as (Hla, Hsa).
+destruct Hsb as (Hlb, Hsb).
+move Hlb before Hla.
+assert (Hab : a = b). {
+  apply Hant. {
+    apply all_sorted_forall with (l := a :: la). 2: {
+      apply (permutation_in Heqb) with (la := b :: lb); [ | now left ].
+      now apply permutation_sym.
+    }
+    now cbn; rewrite Hrefl, Hla.
+  } {
+    apply all_sorted_forall with (l := b :: lb). 2: {
+      apply (permutation_in Heqb) with (la := a :: la); [ | now left ].
+      easy.
+    }
+    now cbn; rewrite Hrefl, Hlb.
+  }
+}
+subst b; f_equal.
+apply (permutation_cons_inv Heqb) in Hpab.
+apply IHla; [ | easy | ]. {
+  now apply strongly_sorted_sorted.
+} {
+  now apply strongly_sorted_sorted.
+}
+Qed.
+
+Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
+  equality eqb →
+  reflexive rel →
+  antisymmetric rel →
+  transitive rel →
+  ∀ (sort_algo1 sort_algo2 : list A → _),
+  (∀ l, permutation eqb (sort_algo1 l) l ∧ sorted rel (sort_algo1 l))
+  → (∀ l, permutation eqb (sort_algo2 l) l ∧ sorted rel (sort_algo2 l))
+  → ∀ l, sort_algo1 l = sort_algo2 l.
+Proof.
+intros * Heqb Href Hant Htra * Hps1 Hps2 l.
+specialize (permuted_sorted_unique Heqb Href Hant Htra) as H1.
+apply H1; [ clear H1 | apply Hps1 | apply Hps2 ].
+specialize (Hps1 l) as H1.
+specialize (Hps2 l) as H2.
+eapply (permutation_trans Heqb); [ apply H1 | ].
+now apply (permutation_sym Heqb).
+Qed.
+
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
@@ -3204,6 +3272,9 @@ unfold ssort.
 now apply (ssort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
+(* test the proof like msort_when_permuted, using permuted_sorted_unique *)
+(* perhaps bsort_loop_when_permuted would not be required *)
+(* same for ssort and isort *)
 Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
@@ -3219,667 +3290,34 @@ rewrite (bsort_bsort_loop_nb_disorder Htot).
 now apply (bsort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
-(* to be completed
-Theorem msort_loop_same_it_when_permuted : ∀ A (eqb rel : A → _),
-(*
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-*)
-  ∀ it la lb,
-  length la ≤ it
-  → permutation eqb la lb
-  → msort_loop rel it la = msort_loop rel it lb.
-Proof.
-intros (* * Heqb Hant Htra Htot *) * Hit Hpab.
-revert la lb Hit Hpab.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
-  now apply permutation_nil_l in Hpab; subst lb.
-}
-remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
-destruct lla as (la1, la2).
-remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
-destruct llb as (lb1, lb2).
-move lb1 before lb; move lb2 before lb1.
-move la1 before lb; move la2 before la1.
-...
-
-Theorem msort_loop_when_permuted : ∀ A (eqb rel : A → _),
-  equality eqb →
-(*
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-*)
-  ∀ ita itb la lb,
-  length la ≤ ita
-  → length lb ≤ itb
-  → permutation eqb la lb
-  → msort_loop rel ita la = msort_loop rel itb lb.
-Proof.
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
-assert (Hlab : length la = length lb) by now apply permutation_length in Hpab.
-symmetry; rewrite Hlab in Hita.
-rewrite msort_loop_enough_iter with (itb := ita); [ | easy | easy ].
-symmetry; rewrite <- Hlab in Hita, Hitb.
-...
-now apply (@msort_loop_same_it_when_permuted _ eqb).
-...
-
 Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
-(*
   antisymmetric rel →
   transitive rel →
   total_relation rel →
-*)
   ∀ la lb,
   permutation eqb la lb
   → msort rel la = msort rel lb.
 Proof.
-intros * Heqb (* Hant Htra Htot *) * Hpab.
-unfold msort.
-...
-apply (msort_loop_when_permuted Heqb).
-...
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb a1) (b1 :: lb)) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb1).
-apply Heqb in H; subst x.
-...
-intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
-(*
-specialize (permutation_transp_list Heqb Hpab) as Htab.
-*)
-revert ita itb lb Hita Hitb Hpab (*Htab*).
-induction la as [| a]; intros; cbn in (*Htab*) |-*. {
-  apply permutation_nil_l in Hpab; subst lb.
-  now do 2 rewrite msort_loop_nil.
+intros * Heqb Hant Htra Htot * Hpab.
+specialize (sorted_msort Htot la) as Hsa.
+specialize (sorted_msort Htot lb) as Hsb.
+specialize (permuted_msort rel Heqb la) as Hpa.
+specialize (permuted_msort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (msort rel la) (msort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
 }
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb); subst lb.
-apply Heqb in H; subst x.
-(**)
-rewrite app_length in Hitb.
-cbn in Hita, Hitb.
-revert a la ita itb aft IHla Hita Hitb Hbef Hpab.
-induction bef as [| c]; intros. {
-  cbn in Hitb, Hpab |-*; clear Hbef.
-  destruct ita; [ easy | ].
-  cbn.
-  apply Nat.succ_le_mono in Hita.
-  destruct la as [| a2]. {
-    apply permutation_nil_l in Hpab; subst aft.
-    rewrite msort_loop_single, msort_loop_nil.
-    now rewrite msort_loop_single.
-  }
-  cbn in IHla, Hita.
-  remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as (la1, la2).
-  destruct ita; [ easy | ].
-  apply Nat.succ_le_mono in Hita.
-  cbn.
-  destruct la as [| a3]. {
-    apply (permutation_length_1_inv Heqb) in Hpab; subst aft.
-    injection Hll; clear Hll; intros; subst la1 la2.
-    rewrite msort_loop_nil.
-    do 2 rewrite msort_loop_single; cbn.
-    destruct itb; [ easy | cbn ].
-    now do 2 rewrite msort_loop_single; cbn.
-  }
-  destruct la as [| a4]. {
-    injection Hll; clear Hll; intros; subst la1 la2; cbn.
-    rewrite msort_loop_nil.
-    do 3 rewrite msort_loop_single; cbn.
-    replace (length _) with 2; [ | now destruct (rel a a3) ].
-    destruct itb; [ easy | cbn ].
-    apply Nat.succ_le_mono in Hitb.
-    destruct aft as [| c]. {
-      now apply permutation_nil_r in Hpab.
-    }
-    destruct aft as [| c2]. {
-      apply (permutation_sym Heqb) in Hpab.
-      now apply permutation_length_1_inv in Hpab.
-    }
-    destruct aft. 2: {
-      now apply (permutation_length Heqb) in Hpab; cbn in Hpab.
-    }
-    cbn.
-    rewrite msort_loop_single.
-    destruct itb; [ easy | cbn ].
-    do 2 rewrite msort_loop_single; cbn.
-    replace (length _) with 2; [ | now destruct (rel a c2) ].
-    cbn.
-    unfold permutation in Hpab; cbn in Hpab.
-    remember (eqb a2 c) as a2c eqn:Ha2c; symmetry in Ha2c.
-    destruct a2c. {
-      apply Heqb in Ha2c; subst c; cbn in Hpab.
-      remember (eqb a3 c2) as a3c2 eqn:Ha3c2; symmetry in Ha3c2.
-      destruct a3c2; [ | easy ].
-      apply Heqb in Ha3c2; subst c2; clear Hpab.
-      remember (rel a a3) as aa3 eqn:Haa3; symmetry in Haa3.
-      now destruct aa3.
-    }
-    remember (eqb a2 c2) as a2c2 eqn:Ha2c2; symmetry in Ha2c2.
-    destruct a2c2; [ | easy ].
-    cbn in Hpab.
-    apply Heqb in Ha2c2; subst c2.
-    remember (eqb a3 c) as a3c eqn:Ha3c; symmetry in Ha3c.
-    destruct a3c; [ | easy ].
-    clear Hpab.
-    apply Heqb in Ha3c; subst c.
-    remember (rel a a3) as aa3 eqn:Haa3; symmetry in Haa3.
-    destruct aa3. {
-      remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
-      destruct aa2. {
-        rewrite Haa3; f_equal.
-        remember (rel a3 a2) as a3a2 eqn:Ha3a2; symmetry in Ha3a2.
-        destruct a3a2. {
-          remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
-          destruct a2a3; [ | easy ].
-          now rewrite (Hant _ _ Ha3a2 Ha2a3).
-        }
-        specialize (Htot a3 a2) as Ha2a3.
-        now rewrite Ha3a2 in Ha2a3; cbn in Ha2a3; rewrite Ha2a3.
-      }
-      rewrite Haa3.
-      remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
-      destruct a2a3; [ easy | ].
-      specialize (Htot a a2) as Ha2a.
-      rewrite Haa2 in Ha2a; cbn in Ha2a.
-      specialize (Htot a2 a3) as Ha3a2.
-      rewrite Ha2a3 in Ha3a2; cbn in Ha3a2.
-      now rewrite (Htra a a3 a2 Haa3 Ha3a2) in Haa2.
-    }
-    remember (rel a3 a2) as a3a2 eqn:Ha3a2; symmetry in Ha3a2.
-    destruct a3a2. {
-      remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
-      destruct aa2; [ now rewrite Haa3 | ].
-      remember (rel a2 a3) as a2a3 eqn:Ha2a3; symmetry in Ha2a3.
-      rewrite Haa3.
-      destruct a2a3; [ | easy ].
-      now rewrite (Hant a2 a3 Ha2a3 Ha3a2).
-    }
-    remember (rel a a2) as aa2 eqn:Haa2; symmetry in Haa2.
-    destruct aa2. {
-      rewrite Haa3.
-      specialize (Htot a a3) as Ha3a.
-      rewrite Haa3 in Ha3a; cbn in Ha3a.
-      specialize (Htot a3 a2) as Ha2a3.
-      rewrite Ha3a2 in Ha2a3; cbn in Ha2a3.
-      now rewrite (Htra a a2 a3 Haa2 Ha2a3) in Haa3.
-    }
-    specialize (Htot a3 a2) as Ha2a3.
-    rewrite Ha3a2 in Ha2a3; cbn in Ha2a3.
-    now rewrite Ha2a3, Haa3.
-  }
-  cbn in Hll.
-  remember (split_list la) as ll eqn:H; symmetry in H.
-  destruct ll as (la3, la4).
-  injection Hll; clear Hll; intros; subst la1 la2.
-  rename la3 into la1; rename la4 into la2; rename H into Hll.
-(* c'est un peu infernal ; j'avais pensé faire pas à pas pour voir s'il
-   se dégageait une règle, mais c'est trop long *)
-...
-destruct bef as [| b]. {
-  cbn in Hita, Hitb |-*.
-  clear Hbef.
-  specialize (permutation_transp_list Heqb Hpab) as Htab.
-  cbn in Htab.
-  unfold apply_transp_list in Htab.
-  remember (transp_list eqb la aft) as trl eqn:Htrl; symmetry in Htrl.
-  generalize Htrl; intros H; unfold transp_list in H.
-  rewrite H in Htab; clear H.
-  cbn in Hpab.
-(*
-  clear IHla.
-*)
-  specialize (in_transp_list_length Heqb la aft) as Hij.
-  assert (H : length la = length aft) by now apply permutation_length in Hpab.
-  specialize (Hij H); clear H.
-  rewrite Htrl in Hij; clear Htrl.
-  revert aft la a ita itb Hita Hitb Hpab Htab Hij IHla.
-  induction trl as [| (i, j)]; intros. {
-    cbn in Htab; subst aft.
-    now apply msort_loop_enough_iter.
-  }
-  cbn in Htab.
-  symmetry.
-(*
-  apply (permutation_sym Heqb) in Hpab.
-  apply IHtrl; [ easy | easy | easy | | ].
-*)
-  erewrite <- IHtrl; [ | | easy | | apply Htab | | ]; cycle 1. {
-    rewrite swap_length; apply Hita.
-  } {
-    eapply (permutation_trans Heqb); [ | apply Hpab ].
-    clear Hita Hpab Htab.
-    specialize (Hij _ _ (or_introl eq_refl)).
-    clear trl IHtrl a ita itb Hitb.
-    now apply permutation_swap_any.
-  } {
-    intros u v Huv.
-    rewrite swap_length.
-    now apply Hij; right.
-  } {
-    intros ita2 itb2 lb Hita2 Hitb2 Hpsab.
-    rewrite swap_length in Hita2.
-    rewrite <- IHla with (ita := ita2); [ | easy | | ]; cycle 1. {
-      now rewrite swap_length.
-    } {
-      apply (permutation_sym Heqb).
-      apply (permutation_swap_any Heqb).
-      now apply Hij; left.
-    }
-    apply IHla; [ easy | easy | ].
-    eapply (permutation_trans Heqb); [ | apply Hpsab ].
-    apply (permutation_sym Heqb).
-    apply (permutation_swap_any Heqb).
-    now apply Hij; left.
-  }
-  clear IHtrl.
-Theorem msort_loop_cons_cons : ∀ A (rel : A → _),
-  ∀ a la lb it,
-  msort_loop rel it la = msort_loop rel it lb
-  → msort_loop rel it (a :: la) = msort_loop rel it (a :: lb).
-Proof.
-intros * Hab.
-revert a la lb Hab.
-induction it; intros; cbn in Hab |-*; [ now f_equal | ].
-rename a into c.
-remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
-destruct ll as (la1, la2).
-remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
-destruct ll as (lb1, lb2).
-move lb1 before la2; move lb2 before lb1.
-destruct la as [| a]. {
-  injection Hlla; clear Hlla; intros; subst la1 la2.
-  rewrite msort_loop_nil in Hab; cbn in Hab.
-  symmetry in Hab.
-  apply eq_merge_nil in Hab.
-  destruct Hab as (H1, H2).
-  apply eq_msort_loop_nil in H1, H2; subst lb1 lb2.
-  apply split_list_nil_l in Hllb.
-  now destruct Hllb; subst lb.
-}
-destruct lb as [| b]. {
-  injection Hllb; clear Hllb; intros; subst lb1 lb2.
-  rewrite msort_loop_nil in Hab; cbn in Hab.
-  apply eq_merge_nil in Hab.
-  destruct Hab as (H1, H2).
-  apply eq_msort_loop_nil in H1, H2; subst la1 la2.
-  now apply split_list_nil_l in Hlla.
-}
-rename Hlla into Hlala.
-rename Hllb into Hlblb.
-rename la1 into laa1; rename la2 into laa2.
-rename lb1 into lbb1; rename lb2 into lbb2.
-remember (split_list la) as ll eqn:Hlla; symmetry in Hlla.
-destruct ll as (la1, la2).
-remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
-destruct ll as (lb1, lb2).
-move b before a.
-move lb2 after laa1; move lb1 after laa1.
-move la2 after laa1; move la1 after laa1.
-move Hllb after Hlala; move Hlla after Hlala.
-...
-... returning
-  apply msort_loop_cons_cons.
-...
-Theorem msort_loop_cons : ∀ A (rel : A → _) a la lb ita itb,
-  msort_loop rel ita la = msort_loop rel itb lb
-  → msort_loop rel (S ita) (a :: la) = msort_loop rel (S itb) (a :: lb).
-Proof.
-intros * Hab; cbn.
-destruct la as [| a']. {
-  rewrite msort_loop_nil in Hab; symmetry in Hab.
-  rewrite msort_loop_single, msort_loop_nil; cbn.
-  apply eq_msort_loop_nil in Hab; subst lb.
-  now rewrite msort_loop_single, msort_loop_nil.
-}
-destruct lb as [| b']. {
-  rewrite msort_loop_nil in Hab.
-  now apply eq_msort_loop_nil in Hab.
-}
-...
-revert itb la lb Hita Hitb Hpab.
-induction ita as (ita, IHita) using lt_wf_rec; intros.
-move itb before ita.
-assert (Hsa : sorted rel (msort_loop rel ita la)). {
-  now apply (sorted_msort_loop Htot).
-}
-assert (Hsb : sorted rel (msort_loop rel itb lb)). {
-  now apply (sorted_msort_loop Htot).
-}
-destruct ita; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  clear Hitb Hsb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb.
-}
-remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lc, ld).
-(**)
-destruct itb; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
-  apply permutation_nil_r in Hpab; subst la.
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  now rewrite msort_loop_nil.
-}
-rename Hll into Hlla.
-remember (split_list lb) as ll eqn:Hllb; symmetry in Hllb.
-destruct ll as (le, lf).
-move lc before lb; move ld before lc.
-move le before ld; move lf before le.
-cbn in Hsa, Hsb.
-rewrite Hlla in Hsa.
-rewrite Hllb in Hsb.
-...
-(**)
-clear IHita Hsa Hsb.
-revert itb la lb lc ld le lf Hita Hitb Hpab Hlla Hllb.
-induction ita as (ita, IHita) using lt_wf_rec; intros.
-destruct ita. {
-  cbn.
-  destruct la as [| a]. {
-    apply permutation_nil_l in Hpab; subst lb.
-    injection Hlla; clear Hlla; intros; subst lc ld.
-    injection Hllb; clear Hllb; intros; subst le lf.
-    now rewrite msort_loop_nil.
-  }
-  destruct la; [ clear Hita | cbn in Hita; flia Hita ].
-  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
-  injection Hlla; clear Hlla; intros; subst lc ld.
-  injection Hllb; clear Hllb; intros; subst le lf.
-  now rewrite msort_loop_single, msort_loop_nil.
-}
-cbn.
-remember (split_list lc) as ll eqn:Hllc; symmetry in Hllc.
-destruct ll as (lg, lh).
-rewrite merge_length, app_length.
-do 2 rewrite msort_loop_length.
-remember (split_list ld) as ll eqn:Hlld; symmetry in Hlld.
-destruct ll as (li, lj).
-rewrite merge_length, app_length.
-do 2 rewrite msort_loop_length.
-move lg before lf; move lh before lg.
-move li before lh; move lj before li.
-Search (merge_loop _ (merge _ _ _)).
-...
-Theorem glop :
-  (∀ i, nth i la d = nth i lc d ∨ nth i la d = nth i ld d)
-  → merge rel la lb = merge rel lc ld.
-...
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb; cbn.
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  now do 2 rewrite msort_loop_nil.
-}
-cbn in Hita |-*.
-apply Nat.succ_le_mono in Hita.
-destruct la as [| a']. {
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
-  rewrite msort_loop_single, msort_loop_nil; cbn.
-  clear Hitb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb, msort_loop_nil.
-}
-cbn in Hita, Hll.
-remember (split_list la) as ll' eqn:H; symmetry in H.
-destruct ll' as (le, lf).
-injection Hll; clear Hll; intros; subst lc ld.
-rename le into lc; rename lf into ld; rename H into Hll.
-move lc before lb; move ld before lc.
-destruct ita; [ easy | ].
-apply Nat.succ_le_mono in Hita.
-remember (a :: lc) as lac; remember (a' :: ld) as lad; cbn; subst lac lad.
-remember (split_list (a :: lc)) as ll eqn:Hll1; symmetry in Hll1.
-destruct ll as (le, lf).
-move le before ld; move lf before le.
-rewrite merge_length, app_length.
-do 2 rewrite msort_loop_length.
-remember (split_list (a' :: ld)) as ll eqn:Hll2; symmetry in Hll2.
-destruct ll as (lg, lh).
-move lg before lf; move lh before lg.
-rewrite merge_length, app_length.
-do 2 rewrite msort_loop_length.
-do 3 rewrite <- app_length.
-rewrite <- app_assoc.
-replace (length (le ++ lf ++ lg ++ lh)) with (length (a :: a' :: la)). 2: {
-  apply split_list_length in Hll, Hll1, Hll2.
-  cbn in Hll1, Hll2 |-*.
-  do 3 rewrite app_length.
-  rewrite Nat.add_assoc.
-  rewrite Hll.
-  rewrite <- Nat.add_succ_l, <- Nat.add_succ_r.
-  now rewrite Hll1, Hll2.
-}
-remember (merge rel (msort_loop rel ita le) (msort_loop rel ita lf)) as la1.
-remember (merge rel (msort_loop rel ita lg) (msort_loop rel ita lh)) as la2.
-remember (split_list_inv la1 la2) as l1.
-move la2 before la1; move l1 before la2.
-...
-rewrite sorted_merge_loop with (l := l1). 6: {
-  subst l1.
-  apply split_list_split_list_inv.
-  subst la1 la2.
-  do 2 rewrite merge_length.
-  do 2 rewrite app_length.
-  do 4 rewrite msort_loop_length.
-  apply split_list_length in Hll1, Hll2.
-  rewrite <- Hll1, <- Hll2; cbn.
-  apply split_list_lengths in Hll.
-  destruct Hll as [Hll| Hll]. {
-    now left; rewrite Hll.
-  } {
-    now right; rewrite Hll.
-  }
-} 5: {
-  subst l1.
-...
-  subst l1 la1 la2.
-Search (split_list_inv (merge _ _ _)).
-Search split_list_inv.
-...
-  do 3 rewrite app_length.
-  rewrite Nat.add_assoc.
-  rewrite <- Hll1, <- Hll2; cbn.
-  rewrite Nat.add_succ_r, <- Hll.
-...
-assert (H : ita < S (S ita)) by flia.
-rewrite <- (IHita ita H _ (le ++ lf ++ lg ++ lh) lb); clear H; cycle 1. {
-  apply split_list_length in Hll, Hll1, Hll2.
-  do 3 rewrite app_length.
-  rewrite Nat.add_assoc.
-  rewrite <- Hll1, <- Hll2; cbn.
-  rewrite Nat.add_succ_r, <- Hll.
-(* chiasse ; ah bin non ça marche pas *)
-(* j'ai donc pas assez d'itérations *)
-Search split_list.
-...
-sorted_merge_loop:
-  ∀ (A : Type) (rel : A → A → bool),
-    antisymmetric rel
-    → transitive rel
-      → ∀ (it : nat) (l la lb : list A),
-          length l ≤ it
-          → sorted rel l
-            → split_list l = (la, lb) → merge_loop rel it la lb = l
-...
-replace (merge rel (msort_loop rel ita le) (msort_loop rel ita lf)) with
-  (msort rel (a :: lc)). 2: {
-  cbn.
-  destruct lc as [| c]. {
-    cbn in Hll1.
-    injection Hll1; clear Hll1; intros; subst le lf; cbn.
-    now rewrite msort_loop_single, msort_loop_nil.
-  }
-  cbn in Hll1.
-  remember (split_list lc) as ll eqn:Hll3; symmetry in Hll3.
-  destruct ll as (li, lj).
-  injection Hll1; clear Hll1; intros; subst le lf.
-  rename li into le; rename lj into lf.
-  remember (a :: le) as l1; remember (c :: lf) as l2; cbn; subst l1 l2.
-  remember (split_list (a :: le)).
-  symmetry in Heqp.
-  destruct p.
-  rewrite merge_length, app_length.
-  do 2 rewrite msort_loop_length.
-  remember (split_list (c :: lf)).
-  symmetry in Heqp0.
-  destruct p.
-  rewrite merge_length, app_length.
-  do 2 rewrite msort_loop_length.
-...
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
-(* l'ennui, c'est que les "msort_loop" vont partir dans des "split"
-   complètement différents entre "la" et "lb". Bonjour pour unifier
-   ça ! *)
-...
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
-revert ita itb lb Hita Hitb Hpab.
-induction la as [| a]; intros. {
-  apply permutation_nil_l in Hpab; subst lb; cbn.
-  now do 2 rewrite msort_loop_nil.
-}
-unfold permutation in Hpab; cbn in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply fold_permutation in Hpab.
-cbn in Hita.
-destruct ita; [ easy | ].
-apply Nat.succ_le_mono in Hita.
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb); subst lb.
-apply Heqb in H; subst x.
-rewrite app_length in Hitb.
-cbn in Hita, Hitb.
-rewrite Nat.add_succ_r in Hitb.
-rewrite <- app_length in Hitb.
-remember (a :: la) as l; cbn; subst l.
-remember (split_list (a :: la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as (lc, ld).
-Theorem msort_loop_app : ∀ A (rel : A → _),
-  ∀ it la lb,
-  length (la ++ lb) ≤ it
-  → msort_loop rel it (la ++ lb) = msort_loop rel it (lb ++ la).
-Proof.
-intros * Hit.
-revert la lb Hit.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil, app_eq_nil in Hit.
-  now destruct Hit; subst la lb.
-}
-remember (split_list (la ++ lb)) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lc, ld).
-remember (split_list (lb ++ la)) as ll eqn:Hll'; symmetry in Hll'.
-destruct ll as (le, lf).
-(* mouais... c'est la merde *)
-...
-rewrite msort_loop_app.
-...
-destruct la as [| a']. {
-  cbn in Hlc.
-  injection Hlc; clear Hlc; intros; subst lc ld.
-  rewrite msort_loop_single, msort_loop_nil; cbn.
-  apply permutation_nil_l in Hpab.
-  apply app_eq_nil in Hpab.
-  destruct Hpab; subst bef aft.
-  destruct itb; [ easy | cbn ].
-  now rewrite msort_loop_single, msort_loop_nil.
-}
-cbn in Hlc.
-remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (le, lf).
-injection Hlc; clear Hlc; intros; subst lc ld.
-rename le into lc; rename lf into ld.
-destruct itb; [ easy | ].
-apply Nat.succ_le_mono in Hita, Hitb.
-rewrite <- app_length in Hitb.
-cbn.
-remember (split_list (bef ++ a :: aft)) as ll eqn:Hll'; symmetry in Hll'.
-destruct ll as (le, lf).
-...
-intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
-replace (length lb) with (length la) in Hitb. 2: {
-  now apply (permutation_length Heqb).
-}
-remember (length la) as len eqn:Hlen; symmetry in Hlen.
-revert ita itb la lb Hlen Hita Hitb Hpab.
-induction len as (len, IHlen) using lt_wf_rec; intros. {
-destruct ita; cbn. {
-  apply Nat.le_0_r in Hita; subst len.
-  apply length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  clear Hitb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb.
-}
-remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lc, ld).
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb; cbn.
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst lc ld.
-  now do 2 rewrite msort_loop_nil.
-}
-cbn in Hlen |-*.
-destruct len; [ easy | ].
-apply Nat.succ_le_mono in Hita.
-apply Nat.succ_inj in Hlen.
-destruct la as [| a']. {
-  cbn in Hll, Hlen; subst len.
-  injection Hll; clear Hll; intros; subst lc ld.
-  apply (permutation_length_1_inv Heqb) in Hpab; subst lb.
-  rewrite msort_loop_single, msort_loop_nil; cbn.
-  clear Hitb.
-  induction itb; [ easy | cbn ].
-  now rewrite <- IHitb, msort_loop_nil.
-}
-cbn in Hll.
-remember (split_list la) as ll' eqn:H; symmetry in H.
-destruct ll' as (le, lf).
-injection Hll; clear Hll; intros; subst lc ld.
-rename le into lc; rename lf into ld; rename H into Hll.
-cbn in Hlen.
-...
-*)
+remember (msort rel la) as lc.
+remember (msort rel lb) as ld.
+clear la lb Hpab Heqlc Heqld Hpa Hpb.
+rename lc into la; rename ld into lb; move lb before la.
+specialize (total_relation_is_reflexive Htot) as Hrefl.
+now apply (permuted_sorted_unique Heqb Hrefl Hant Htra).
+Qed.
 
 (* *)
-
-(*
-sorted_isort
-     : ∀ (A : Type) (rel : A → A → bool),
-         total_relation rel → ∀ l : list A, sorted rel (isort rel l)
-permuted_isort
-     : ∀ (A : Type) (eqb rel : A → A → bool),
-         equality eqb → ∀ l : list A, permutation eqb l (isort rel l)
-
-isort_when_sorted
-     : ∀ (A : Type) (rel : A → A → bool),
-         antisymmetric rel
-         → transitive rel → ∀ l : list A, sorted rel l → isort rel l = l
-isort_when_permuted
-     : ∀ (A : Type) (eqb rel : A → A → bool),
-         equality eqb
-         → antisymmetric rel
-           → transitive rel
-             → total_relation rel
-               → ∀ la lb : list A,
-                   permutation eqb la lb → isort rel la = isort rel lb
-*)
 
 Theorem permuted_isort_iff : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -4350,74 +3788,6 @@ rewrite seq_nth; [ cbn | easy ].
 rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
 clear d.
 now apply nth_isort_rank_of_nodup_sorted.
-Qed.
-
-(* unicity of sorting algorithm *)
-
-Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
-  equality eqb →
-  reflexive rel →
-  antisymmetric rel →
-  transitive rel →
-  ∀ la lb,
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
-  → la = lb.
-Proof.
-intros * Heqb Hrefl Hant Htra * Hpab Hsa Hsb.
-revert lb Hpab Hsb.
-induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
-destruct lb as [| b]; intros; [ now apply permutation_nil_r in Hpab | ].
-move b before a; move lb before la; move Hsb before Hsa.
-apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
-unfold strongly_sorted in Hsa, Hsb.
-cbn in Hsa, Hsb.
-apply Bool.andb_true_iff in Hsa, Hsb.
-destruct Hsa as (Hla, Hsa).
-destruct Hsb as (Hlb, Hsb).
-move Hlb before Hla.
-assert (Hab : a = b). {
-  apply Hant. {
-    apply all_sorted_forall with (l := a :: la). 2: {
-      apply (permutation_in Heqb) with (la := b :: lb); [ | now left ].
-      now apply permutation_sym.
-    }
-    now cbn; rewrite Hrefl, Hla.
-  } {
-    apply all_sorted_forall with (l := b :: lb). 2: {
-      apply (permutation_in Heqb) with (la := a :: la); [ | now left ].
-      easy.
-    }
-    now cbn; rewrite Hrefl, Hlb.
-  }
-}
-subst b; f_equal.
-apply (permutation_cons_inv Heqb) in Hpab.
-apply IHla; [ | easy | ]. {
-  now apply strongly_sorted_sorted.
-} {
-  now apply strongly_sorted_sorted.
-}
-Qed.
-
-Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
-  equality eqb →
-  reflexive rel →
-  antisymmetric rel →
-  transitive rel →
-  ∀ (sort_algo1 sort_algo2 : list A → _),
-  (∀ l, permutation eqb (sort_algo1 l) l ∧ sorted rel (sort_algo1 l))
-  → (∀ l, permutation eqb (sort_algo2 l) l ∧ sorted rel (sort_algo2 l))
-  → ∀ l, sort_algo1 l = sort_algo2 l.
-Proof.
-intros * Heqb Href Hant Htra * Hps1 Hps2 l.
-specialize (permuted_sorted_unique Heqb Href Hant Htra) as H1.
-apply H1; [ clear H1 | apply Hps1 | apply Hps2 ].
-specialize (Hps1 l) as H1.
-specialize (Hps2 l) as H2.
-eapply (permutation_trans Heqb); [ apply H1 | ].
-now apply (permutation_sym Heqb).
 Qed.
 
 (* *)
