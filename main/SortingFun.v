@@ -4375,6 +4375,57 @@ clear d.
 now apply nth_isort_rank_of_nodup_sorted.
 Qed.
 
+(* unicity of sorting algorithm *)
+
+(* to be completed
+Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
+  reflexive rel →
+  antisymmetric rel →
+  transitive rel →
+  ∀ la lb,
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
+  → la = lb.
+Proof.
+intros * Hrefl Hant Htra * Hpab Hsa Hsb.
+revert lb Hpab Hsb.
+induction la as [| a]; intros; [ now apply Permutation_nil in Hpab | ].
+destruct lb as [| b]; intros. {
+  now apply Permutation_sym, Permutation_nil in Hpab.
+}
+move b before a; move lb before la; move Hsb before Hsa.
+apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
+cbn in Hsa, Hsb.
+apply Bool.andb_true_iff in Hsa, Hsb.
+destruct Hsa as (Hla, Hsa).
+destruct Hsb as (Hlb, Hsb).
+move Hlb before Hla.
+assert (Hab : a = b). {
+  apply Hant. {
+    apply all_sorted_forall with (l := a :: la). 2: {
+      apply Permutation_in with (l := b :: lb); [ | now left ].
+      now apply Permutation_sym.
+    }
+    now cbn; rewrite Hrefl, Hla.
+  } {
+    apply all_sorted_forall with (l := b :: lb). 2: {
+      apply Permutation_in with (l := a :: la); [ | now left ].
+      easy.
+    }
+    now cbn; rewrite Hrefl, Hlb.
+  }
+}
+subst b; f_equal.
+apply Permutation_cons_inv in Hpab.
+apply IHla; [ | easy | ]. {
+  now apply strongly_sorted_sorted.
+} {
+  now apply strongly_sorted_sorted.
+}
+Qed.
+*)
+
 (* *)
 
 Require Import Permutation.
@@ -4526,7 +4577,7 @@ Qed.
 
 (* unicity of sorting algorithm *)
 
-Theorem permutted_sorted_unique : ∀ A (rel : A → A → bool),
+Theorem Permuted_sorted_unique : ∀ A (rel : A → A → bool),
   reflexive rel →
   antisymmetric rel →
   transitive rel →
@@ -4583,7 +4634,7 @@ Theorem sorted_unique : ∀ A (rel : A → A → bool),
   → ∀ l, s1 l = s2 l.
 Proof.
 intros * Href Hant Htra * Hps1 Hps2 l.
-apply (permutted_sorted_unique Href Hant Htra); [ | apply Hps1 | apply Hps2 ].
+apply (Permuted_sorted_unique Href Hant Htra); [ | apply Hps1 | apply Hps2 ].
 specialize (Hps1 l) as H1.
 specialize (Hps2 l) as H2.
 transitivity l; [ easy | ].
