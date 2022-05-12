@@ -4377,8 +4377,8 @@ Qed.
 
 (* unicity of sorting algorithm *)
 
-(* to be completed
 Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
+  equality eqb →
   reflexive rel →
   antisymmetric rel →
   transitive rel →
@@ -4388,14 +4388,13 @@ Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
   → sorted rel lb
   → la = lb.
 Proof.
-intros * Hrefl Hant Htra * Hpab Hsa Hsb.
+intros * Heqb Hrefl Hant Htra * Hpab Hsa Hsb.
 revert lb Hpab Hsb.
-induction la as [| a]; intros; [ now apply Permutation_nil in Hpab | ].
-destruct lb as [| b]; intros. {
-  now apply Permutation_sym, Permutation_nil in Hpab.
-}
+induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
+destruct lb as [| b]; intros; [ now apply permutation_nil_r in Hpab | ].
 move b before a; move lb before la; move Hsb before Hsa.
 apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
+unfold strongly_sorted in Hsa, Hsb.
 cbn in Hsa, Hsb.
 apply Bool.andb_true_iff in Hsa, Hsb.
 destruct Hsa as (Hla, Hsa).
@@ -4404,27 +4403,45 @@ move Hlb before Hla.
 assert (Hab : a = b). {
   apply Hant. {
     apply all_sorted_forall with (l := a :: la). 2: {
-      apply Permutation_in with (l := b :: lb); [ | now left ].
-      now apply Permutation_sym.
+      apply (permutation_in Heqb) with (la := b :: lb); [ | now left ].
+      now apply permutation_sym.
     }
     now cbn; rewrite Hrefl, Hla.
   } {
     apply all_sorted_forall with (l := b :: lb). 2: {
-      apply Permutation_in with (l := a :: la); [ | now left ].
+      apply (permutation_in Heqb) with (la := a :: la); [ | now left ].
       easy.
     }
     now cbn; rewrite Hrefl, Hlb.
   }
 }
 subst b; f_equal.
-apply Permutation_cons_inv in Hpab.
+apply (permutation_cons_inv Heqb) in Hpab.
 apply IHla; [ | easy | ]. {
   now apply strongly_sorted_sorted.
 } {
   now apply strongly_sorted_sorted.
 }
 Qed.
-*)
+
+Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
+  equality eqb →
+  reflexive rel →
+  antisymmetric rel →
+  transitive rel →
+  ∀ (sort_algo1 sort_algo2 : list A → _),
+  (∀ l, permutation eqb (sort_algo1 l) l ∧ sorted rel (sort_algo1 l))
+  → (∀ l, permutation eqb (sort_algo2 l) l ∧ sorted rel (sort_algo2 l))
+  → ∀ l, sort_algo1 l = sort_algo2 l.
+Proof.
+intros * Heqb Href Hant Htra * Hps1 Hps2 l.
+specialize (permuted_sorted_unique Heqb Href Hant Htra) as H1.
+apply H1; [ clear H1 | apply Hps1 | apply Hps2 ].
+specialize (Hps1 l) as H1.
+specialize (Hps2 l) as H2.
+eapply (permutation_trans Heqb); [ apply H1 | ].
+now apply (permutation_sym Heqb).
+Qed.
 
 (* *)
 
@@ -4624,7 +4641,7 @@ apply IHla; [ | easy | ]. {
 }
 Qed.
 
-Theorem sorted_unique : ∀ A (rel : A → A → bool),
+Theorem sorted_unique' : ∀ A (rel : A → A → bool),
   reflexive rel →
   antisymmetric rel →
   transitive rel →
@@ -5080,7 +5097,7 @@ Theorem isort_ssort : ∀ (A : Type) (rel : A → A → bool),
 Proof.
 intros * Hant Htra Htot *.
 specialize (total_relation_is_reflexive Htot) as Href.
-apply (sorted_unique Href Hant Htra). {
+apply (sorted_unique' Href Hant Htra). {
   clear l; intros l.
   split; [ | now apply sorted_isort ].
   apply Permutation_sym, Permutation_isort.
@@ -5101,7 +5118,7 @@ Theorem ssort_bsort : ∀ (A : Type) (rel : A → A → bool),
 Proof.
 intros * Hant Htra Htot *.
 specialize (total_relation_is_reflexive Htot) as Href.
-apply (sorted_unique Href Hant Htra). {
+apply (sorted_unique' Href Hant Htra). {
   clear l; intros l.
   split; [ | now apply sorted_ssort ].
   now apply Permutation_sym, Permutation_ssort.
@@ -5122,7 +5139,7 @@ Theorem bsort_isort : ∀ (A : Type) (rel : A → A → bool),
 Proof.
 intros * Hant Htra Htot *.
 specialize (total_relation_is_reflexive Htot) as Href.
-apply (sorted_unique Href Hant Htra). {
+apply (sorted_unique' Href Hant Htra). {
   clear l; intros l.
   split; [ | now apply sorted_bsort ].
   now apply Permutation_sym, Permutation_bsort.
