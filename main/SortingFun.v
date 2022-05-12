@@ -2597,7 +2597,7 @@ apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
-Theorem sorted_sorted_permutation : ∀ A (eqb rel : A → _)
+Theorem sorted_sorted_permuted : ∀ A (eqb rel : A → _)
   (Heqb : equality eqb),
   antisymmetric rel →
   transitive rel →
@@ -2756,7 +2756,7 @@ Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
   → ∀ l, sort_algo1 l = sort_algo2 l.
 Proof.
 intros * Heqb Href Hant Htra * Hps1 Hps2 l.
-specialize (sorted_sorted_permutation Heqb Hant Htra) as H1.
+specialize (sorted_sorted_permuted Heqb Hant Htra) as H1.
 apply H1; [ apply Hps1 | apply Hps2 | clear H1 ].
 specialize (Hps1 l) as H1.
 specialize (Hps2 l) as H2.
@@ -2952,7 +2952,7 @@ assert (Hsab : permutation eqb (isort rel la) (isort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-now apply (sorted_sorted_permutation Heqb Hant Htra).
+now apply (sorted_sorted_permuted Heqb Hant Htra).
 Qed.
 
 Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
@@ -2974,7 +2974,7 @@ assert (Hsab : permutation eqb (ssort rel la) (ssort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-now apply (sorted_sorted_permutation Heqb Hant Htra).
+now apply (sorted_sorted_permuted Heqb Hant Htra).
 Qed.
 
 Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
@@ -2996,7 +2996,7 @@ assert (Hsab : permutation eqb (bsort rel la) (bsort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-now apply (sorted_sorted_permutation Heqb Hant Htra).
+now apply (sorted_sorted_permuted Heqb Hant Htra).
 Qed.
 
 Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
@@ -3018,7 +3018,7 @@ assert (Hsab : permutation eqb (msort rel la) (msort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-now apply (sorted_sorted_permutation Heqb Hant Htra).
+now apply (sorted_sorted_permuted Heqb Hant Htra).
 Qed.
 
 (* *)
