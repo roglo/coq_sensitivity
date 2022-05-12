@@ -2226,68 +2226,6 @@ rewrite (Nat.add_comm (nb_nrel rel b la)).
 now rewrite <- Nat.add_assoc.
 Qed.
 
-Theorem bsort_loop_enough_iter : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ l it1 it2,
-  nb_disorder rel l ≤ it1
-  → nb_disorder rel l ≤ it2
-  → bsort_loop rel it1 l = bsort_loop rel it2 l.
-Proof.
-intros * Htot * Hit1 Hit2.
-rename l into la.
-revert la it2 Hit1 Hit2.
-induction it1; intros; cbn. {
-  apply Nat.le_0_r in Hit1.
-  clear Hit2.
-  destruct it2; [ easy | cbn ].
-  remember (bsort_swap rel la) as lb eqn:Hlb.
-  symmetry in Hlb.
-  destruct lb as [lb| ]; [ | easy ].
-  apply bsort_swap_Some in Hlb.
-  destruct Hlb as (Hs & c & d & lc & ld & Hlb).
-  destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
-  rewrite Hbla in Hit1.
-  exfalso; clear - Hit1 Hcd.
-  induction lc as [| a]; cbn in Hit1; [ now rewrite Hcd in Hit1 | ].
-  apply IHlc.
-  now apply Nat.eq_add_0 in Hit1.
-}
-destruct it2. {
-  apply Nat.le_0_r in Hit2.
-  clear Hit1.
-  remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [lb| ]; [ | easy ].
-  apply bsort_swap_Some in Hlb.
-  destruct Hlb as (Hs & c & d & lc & ld & Hlb).
-  destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
-  rewrite Hbla in Hit2.
-  exfalso; clear - Hit2 Hcd.
-  induction lc as [| a]; cbn in Hit2; [ now rewrite Hcd in Hit2 | ].
-  apply IHlc.
-  now apply Nat.eq_add_0 in Hit2.
-}
-cbn.
-remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [lb| ]; [ | easy ].
-apply IHit1. {
-  now apply bsort_swap_nb_disorder with (la := la).
-} {
-  now apply bsort_swap_nb_disorder with (la := la).
-}
-Qed.
-
-(*
-Theorem bsort_bsort_loop_nb_disorder : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ l,
-  bsort rel l = bsort_loop rel (nb_disorder rel l) l.
-Proof.
-intros * Htot *.
-apply bsort_loop_enough_iter; [ easy | | easy ].
-apply nb_disorder_le_square.
-Qed.
-*)
-
 Theorem sorted_bsort_loop_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
   ∀ it la,
@@ -2756,26 +2694,6 @@ apply (permutation_cons_isort_insert _ Heqb).
 now apply permutation_refl.
 Qed.
 
-(*
-Theorem nb_disorder_0_sorted : ∀ A (rel : A → _),
-  ∀ l,
-  nb_disorder rel l = 0
-  → sorted rel l.
-Proof.
-intros * Hd.
-induction l as [| a la]; [ easy | ].
-cbn in Hd.
-apply Nat.eq_add_0 in Hd.
-destruct Hd as (Hr, Hd).
-specialize (IHla Hd).
-unfold sorted in IHla |-*; cbn.
-destruct la as [| b]; [ easy | ].
-rewrite IHla, Bool.andb_true_r.
-cbn in Hr.
-now destruct (rel a b).
-Qed.
-*)
-
 Theorem bsort_swap_Some_permutation : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb,
@@ -2789,66 +2707,6 @@ subst la lb.
 apply (permutation_app_head Heqb).
 apply (permutation_swap Heqb).
 Qed.
-
-(*
-Theorem bsort_loop_when_permuted : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ la lb ita itb,
-  nb_disorder rel la ≤ ita
-  → nb_disorder rel lb ≤ itb
-  → permutation eqb la lb
-  → bsort_loop rel ita la = bsort_loop rel itb lb.
-Proof.
-intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
-revert la lb itb Hita Hitb Hpab.
-induction ita; intros. {
-  apply Nat.le_0_r in Hita.
-  apply nb_disorder_0_sorted in Hita.
-  revert la lb Hita Hitb Hpab.
-  induction itb; intros. {
-    apply Nat.le_0_r in Hitb.
-    apply nb_disorder_0_sorted in Hitb.
-    now apply (sorted_sorted_permutation Heqb Hant Htra).
-  }
-  cbn.
-  remember (bsort_swap rel lb) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [lc| ]. 2: {
-    apply bsort_swap_None in Hlc.
-    now apply (sorted_sorted_permutation Heqb Hant Htra).
-  }
-  apply bsort_swap_Some in Hlc.
-  destruct Hlc as (Hsb & a & b & ld & le & Hab & Hsde & Hlb & Hlc).
-  subst lb lc.
-  apply IHitb; [ easy | | ]. 2: {
-    eapply (permutation_trans Heqb); [ apply Hpab | ].
-    apply (permutation_app_head Heqb).
-    now apply permutation_swap.
-  }
-  eapply (bsort_swap_nb_disorder Htot); [ | apply Hitb ].
-  apply bsort_swap_Some_iff.
-  split; [ easy | ].
-  now exists a, b, ld, le.
-}
-cbn.
-remember (bsort_swap rel la) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [lc| ]. 2: {
-  apply bsort_swap_None in Hlc.
-  apply (sorted_sorted_permutation Heqb Hant Htra); [ easy | | ]. {
-    now apply (sorted_bsort_loop_nb_disorder Htot).
-  }
-  apply (permutation_trans Heqb) with (lb := lb);  [ easy | ].
-  now apply permuted_bsort_loop.
-}
-apply bsort_swap_nb_disorder with (lb := lc) in Hita; [ | easy | easy ].
-apply IHita; [ easy | easy | ].
-apply (permutation_trans Heqb) with (lb := la); [ | easy ].
-apply (permutation_sym Heqb).
-now apply (@bsort_swap_Some_permutation _ eqb rel).
-Qed.
-*)
 
 Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -3015,57 +2873,6 @@ Qed.
 
 (* unicity of sorting algorithm *)
 
-(* sorted_sorted_permutation
-Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
-  equality eqb →
-  reflexive rel →
-  antisymmetric rel →
-  transitive rel →
-  ∀ la lb,
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
-  → la = lb.
-Proof.
-intros * Heqb Hrefl Hant Htra * Hpab Hsa Hsb.
-now apply (sorted_sorted_permutation Heqb Hant Htra).
-...
-revert lb Hpab Hsb.
-induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
-destruct lb as [| b]; intros; [ now apply permutation_nil_r in Hpab | ].
-move b before a; move lb before la; move Hsb before Hsa.
-apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
-unfold strongly_sorted in Hsa, Hsb.
-cbn in Hsa, Hsb.
-apply Bool.andb_true_iff in Hsa, Hsb.
-destruct Hsa as (Hla, Hsa).
-destruct Hsb as (Hlb, Hsb).
-move Hlb before Hla.
-assert (Hab : a = b). {
-  apply Hant. {
-    apply all_sorted_forall with (l := a :: la). 2: {
-      apply (permutation_in Heqb) with (la := b :: lb); [ | now left ].
-      now apply permutation_sym.
-    }
-    now cbn; rewrite Hrefl, Hla.
-  } {
-    apply all_sorted_forall with (l := b :: lb). 2: {
-      apply (permutation_in Heqb) with (la := a :: la); [ | now left ].
-      easy.
-    }
-    now cbn; rewrite Hrefl, Hlb.
-  }
-}
-subst b; f_equal.
-apply (permutation_cons_inv Heqb) in Hpab.
-apply IHla; [ | easy | ]. {
-  now apply strongly_sorted_sorted.
-} {
-  now apply strongly_sorted_sorted.
-}
-Qed.
-*)
-
 Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
   equality eqb →
   reflexive rel →
@@ -3078,10 +2885,6 @@ Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
 Proof.
 intros * Heqb Href Hant Htra * Hps1 Hps2 l.
 specialize (sorted_sorted_permutation Heqb Hant Htra) as H1.
-(*
-specialize (permuted_sorted_unique Heqb Href Hant Htra) as H1.
-apply H1; [ clear H1 | apply Hps1 | apply Hps2 ].
-*)
 apply H1; [ apply Hps1 | apply Hps2 | clear H1 ].
 specialize (Hps1 l) as H1.
 specialize (Hps2 l) as H2.
@@ -3308,18 +3111,7 @@ assert (Hsab : permutation eqb (bsort rel la) (bsort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-(*
-specialize (total_relation_is_reflexive Htot) as Hrefl.
-now apply (permuted_sorted_unique Heqb Hrefl Hant Htra).
-*)
 now apply (sorted_sorted_permutation Heqb Hant Htra).
-(*
-...
-intros * Heqb Hant Htra Htot * Hpab.
-rewrite (bsort_bsort_loop_nb_disorder Htot).
-rewrite (bsort_bsort_loop_nb_disorder Htot).
-now apply (bsort_loop_when_permuted Heqb Hant Htra Htot).
-*)
 Qed.
 
 Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
@@ -3342,10 +3134,6 @@ assert (Hsab : permutation eqb (msort rel la) (msort rel lb)). {
   now apply (permutation_sym Heqb).
 }
 now apply (sorted_sorted_permutation Heqb Hant Htra).
-(*
-specialize (total_relation_is_reflexive Htot) as Hrefl.
-now apply (permuted_sorted_unique Heqb Hrefl Hant Htra).
-*)
 Qed.
 
 (* *)
