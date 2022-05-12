@@ -2708,90 +2708,6 @@ apply (permutation_app_head Heqb).
 apply (permutation_swap Heqb).
 Qed.
 
-Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ a b c d la lb lc ld,
-  permutation eqb (a :: la) (b :: lb)
-  → select_first rel a la = (c, lc)
-  → select_first rel b lb = (d, ld)
-  → c = d.
-Proof.
-intros * Heqb Hant Htra Htot * Hpab Hsa Hsb.
-generalize Hsa; intros H.
-apply (select_first_if Htra Htot) in H.
-destruct H as (Hca, Hcc).
-generalize Hsb; intros H.
-apply (select_first_if Htra Htot) in H.
-destruct H as (Hdb, Hdd).
-specialize (Hca d) as H1.
-specialize (Hdb c) as H2.
-assert (H : d ∈ a :: la). {
-  apply (permutation_sym Heqb) in Hpab.
-  apply (permutation_in Heqb) with (la := b :: lb); [ easy | ].
-  now apply select_first_in in Hsb.
-}
-specialize (H1 H); clear H.
-assert (H : c ∈ b :: lb). {
-  apply (permutation_in Heqb) with (la := a :: la); [ easy | ].
-  now apply select_first_in in Hsa.
-}
-specialize (H2 H); clear H.
-now specialize (Hant _ _ H1 H2) as H3.
-Qed.
-
-Theorem ssort_loop_when_permuted : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ ita itb la lb,
-  length la ≤ ita
-  → length lb ≤ itb
-  → permutation eqb la lb
-  → ssort_loop rel ita la = ssort_loop rel itb lb.
-Proof.
-intros * Heqb Hant Htot Htra * Hita Hitb Hpab.
-revert itb la lb Hita Hitb Hpab.
-induction ita; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  now destruct itb.
-}
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb.
-  now destruct itb.
-}
-remember (select_first rel a la) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as (c, lc).
-cbn in Hita; apply Nat.succ_le_mono in Hita.
-destruct itb. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
-  now apply permutation_nil_r in Hpab.
-}
-cbn.
-destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
-cbn in Hitb; apply Nat.succ_le_mono in Hitb.
-remember (select_first rel b lb) as ld eqn:Hld; symmetry in Hld.
-destruct ld as (d, ld).
-specialize (permutation_select_first_select_first Heqb Hant Htot Htra) as H1.
-specialize (H1 _ _ _ _ _ _ _ _ Hpab Hlc Hld).
-subst d.
-f_equal.
-apply IHita. {
-  apply select_first_length in Hlc; congruence.
-} {
-  apply select_first_length in Hld; congruence.
-}
-apply (select_first_permutation rel Heqb) in Hlc, Hld.
-apply (permutation_cons_inv Heqb) with (a := c).
-apply (permutation_sym Heqb) in Hlc.
-apply (permutation_trans Heqb) with (lb := a :: la); [ easy | ].
-now apply (permutation_trans Heqb) with (lb := b :: lb).
-Qed.
-
 Theorem eq_merge_loop_nil : ∀ A (rel : A → _) la lb it,
   length la + length lb ≤ it
   → merge_loop rel it la lb = []
@@ -3075,6 +2991,9 @@ unfold isort.
 now apply (isort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
+(* test the proof like msort_when_permuted, using permuted_sorted_unique *)
+(* perhaps bsort_loop_when_permuted would not be required *)
+(* same for isort *)
 Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
@@ -3085,13 +3004,18 @@ Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
   → ssort rel la = ssort rel lb.
 Proof.
 intros * Heqb Hant Htra Htot * Hpab.
-unfold ssort.
-now apply (ssort_loop_when_permuted Heqb Hant Htra Htot).
+specialize (sorted_ssort Htra Htot la) as Hsa.
+specialize (sorted_ssort Htra Htot lb) as Hsb.
+specialize (permuted_ssort rel Heqb la) as Hpa.
+specialize (permuted_ssort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (ssort rel la) (ssort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permutation Heqb Hant Htra).
 Qed.
 
-(* test the proof like msort_when_permuted, using permuted_sorted_unique *)
-(* perhaps bsort_loop_when_permuted would not be required *)
-(* same for ssort and isort *)
 Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
