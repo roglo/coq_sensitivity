@@ -1029,6 +1029,19 @@ specialize (Hbef H).
 now rewrite equality_refl in Hbef.
 Qed.
 
+Theorem permutation_rev_l : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l, permutation eqb (rev l) l.
+Proof.
+intros * Heqb *.
+induction l as [| a]; [ easy | cbn ].
+eapply (permutation_trans Heqb). {
+  apply (permutation_sym Heqb).
+  apply (permutation_cons_append Heqb).
+}
+now apply (permutation_skip Heqb).
+Qed.
+
 (* transposition list *)
 
 Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=

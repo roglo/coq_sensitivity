@@ -2776,16 +2776,41 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ det ].
 About Permutation_isort.
 Print mat_select_rows.
-Theorem glop : ∀ A kl,
-  det'' (mat_select_rows kl A) = det'' (mat_select_rows (isort Nat.leb kl) A).
-Admitted.
+Theorem det_select_isort_rows : ∀ A kl,
+  det (mat_select_rows kl A) = det (mat_select_rows (isort Nat.leb kl) A).
+Proof.
+intros.
+...
+... return
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite glop.
+  rewrite <- det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+  rewrite <- det_is_det_by_canon_permut; try now destruct Hif. 2: {
+    apply mat_select_rows_is_square; [ easy | | ]. {
+      rewrite rev_length.
+      now rewrite to_radix_loop_length.
+    } {
+      intros k Hk.
+      apply in_rev in Hk.
+      apply (In_nth _ _ 0) in Hk.
+      destruct Hk as (j & Hj & Hjk); subst k.
+      rewrite Hbr.
+      now apply to_radix_loop_ub.
+    }
+  }
+  rewrite det_select_isort_rows.
   specialize isort_when_permuted as H1.
   specialize (H1 _ Nat.eqb Nat.leb Nat_eqb_equality Nat_leb_antisym).
   specialize (H1 Nat_leb_trans Nat_leb_is_total_relation).
   rewrite H1 with (lb := to_radix_loop m n i). 2: {
+    apply (permutation_rev_l Nat_eqb_equality).
+  }
+  easy.
+}
+cbn - [ det ].
+...
+Search (permutation _ (rev _)).
+Search (permutation _ _ (rev _)).
 ...
 Search (isort _ (rev _)).
   easy.
