@@ -2650,50 +2650,6 @@ subst b.
 now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
-Theorem isort_loop_when_permuted : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ la lb lsa lsb,
-  sorted rel lsa
-  → sorted rel lsb
-  → permutation eqb (lsa ++ la) (lsb ++ lb)
-  → isort_loop rel lsa la = isort_loop rel lsb lb.
-Proof.
-intros * Heqb Hant Htra Htot * Hsa Hsb Hpab.
-revert lsa lsb lb Hsa Hsb Hpab.
-induction la as [| a]; intros; cbn. {
-  rewrite app_nil_r in Hpab.
-  revert lsa lsb Hsa Hsb Hpab.
-  induction lb as [| b]; intros. {
-    rewrite app_nil_r in Hpab; cbn.
-    now apply (sorted_sorted_permutation Heqb Hant Htra).
-  }
-  cbn.
-  apply IHlb; [ easy | now apply sorted_isort_insert | ].
-  apply (permutation_trans Heqb) with (lb := lsb ++ b :: lb); [ easy | ].
-  rewrite List_cons_is_app, app_assoc.
-  apply (permutation_app_tail Heqb).
-  apply (permutation_trans Heqb) with (lb := b :: lsb). {
-    apply (permutation_sym Heqb).
-    apply (permutation_cons_append Heqb).
-  }
-  apply (permutation_cons_isort_insert _ Heqb).
-  now apply permutation_refl.
-}
-apply IHla; [ now apply sorted_isort_insert | easy | ].
-apply (permutation_trans Heqb) with (lb := lsa ++ a :: la); [ | easy ].
-rewrite List_cons_is_app, app_assoc.
-apply (permutation_app_tail Heqb).
-apply (permutation_trans Heqb) with (lb := a :: lsa). 2: {
-  apply (permutation_cons_append Heqb).
-}
-apply (permutation_sym Heqb).
-apply (permutation_cons_isort_insert _ Heqb).
-now apply permutation_refl.
-Qed.
-
 Theorem bsort_swap_Some_permutation : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb,
@@ -2987,13 +2943,18 @@ Theorem isort_when_permuted : ∀ A (eqb rel : A → _),
   → isort rel la = isort rel lb.
 Proof.
 intros * Heqb Hant Htra Htot * Hpab.
-unfold isort.
-now apply (isort_loop_when_permuted Heqb Hant Htra Htot).
+specialize (sorted_isort Htot la) as Hsa.
+specialize (sorted_isort Htot lb) as Hsb.
+specialize (permuted_isort rel Heqb la) as Hpa.
+specialize (permuted_isort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (isort rel la) (isort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permutation Heqb Hant Htra).
 Qed.
 
-(* test the proof like msort_when_permuted, using permuted_sorted_unique *)
-(* perhaps bsort_loop_when_permuted would not be required *)
-(* same for isort *)
 Theorem ssort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
