@@ -3220,6 +3220,54 @@ now apply (bsort_loop_when_permuted Heqb Hant Htra Htot).
 Qed.
 
 (* to be completed
+Theorem msort_loop_same_it_when_permuted : ∀ A (eqb rel : A → _),
+(*
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ it la lb,
+  length la ≤ it
+  → permutation eqb la lb
+  → msort_loop rel it la = msort_loop rel it lb.
+Proof.
+intros (* * Heqb Hant Htra Htot *) * Hit Hpab.
+revert la lb Hit Hpab.
+induction it; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit; subst la.
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
+destruct lla as (la1, la2).
+remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
+destruct llb as (lb1, lb2).
+move lb1 before lb; move lb2 before lb1.
+move la1 before lb; move la2 before la1.
+...
+
+Theorem msort_loop_when_permuted : ∀ A (eqb rel : A → _),
+  equality eqb →
+(*
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+*)
+  ∀ ita itb la lb,
+  length la ≤ ita
+  → length lb ≤ itb
+  → permutation eqb la lb
+  → msort_loop rel ita la = msort_loop rel itb lb.
+Proof.
+intros * Heqb (* Hant Htra Htot *) * Hita Hitb Hpab.
+assert (Hlab : length la = length lb) by now apply permutation_length in Hpab.
+symmetry; rewrite Hlab in Hita.
+rewrite msort_loop_enough_iter with (itb := ita); [ | easy | easy ].
+symmetry; rewrite <- Hlab in Hita, Hitb.
+...
+now apply (@msort_loop_same_it_when_permuted _ eqb).
+...
+
 Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
 (*
@@ -3233,79 +3281,8 @@ Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
 Proof.
 intros * Heqb (* Hant Htra Htot *) * Hpab.
 unfold msort.
-Theorem msort_loop_when_permuted : ∀ A (eqb rel : A → _),
-  equality eqb →
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  ∀ ita itb la lb,
-  length la ≤ ita
-  → length lb ≤ itb
-  → permutation eqb la lb
-  → msort_loop rel ita la = msort_loop rel itb lb.
-Proof.
-intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
-assert (Hlab : length la = length lb) by now apply permutation_length in Hpab.
-symmetry; rewrite Hlab in Hita.
-rewrite msort_loop_enough_iter with (itb := ita); [ | easy | easy ].
-symmetry; rewrite <- Hlab in Hita, Hitb.
-clear itb Hitb Hlab; rename ita into it.
-revert la lb Hita Hpab.
-induction it; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  now apply permutation_nil_l in Hpab; subst lb.
-}
-remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
-destruct lla as (la1, la2).
-remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
-destruct llb as (lb1, lb2).
-move lb1 before lb; move lb2 before lb1.
-move la1 before lb; move la2 before la1.
 ...
-intros * Heqb Hant Htra Htot * Hita Hitb Hpab.
-revert itb la lb Hita Hitb Hpab.
-induction ita; intros; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hita; subst la.
-  apply permutation_nil_l in Hpab; subst lb.
-  symmetry; apply msort_loop_nil.
-}
-remember (split_list la) as lla eqn:Hlla; symmetry in Hlla.
-destruct lla as (la1, la2).
-destruct la as [| a1]. {
-  apply permutation_nil_l in Hpab; subst lb.
-  injection Hlla; clear Hlla; intros; subst la1 la2.
-  now do 2 rewrite msort_loop_nil.
-}
-cbn in Hita; apply Nat.succ_le_mono in Hita.
-(*
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb a1) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x.
-subst lb.
-rewrite app_length in Hitb; cbn in Hitb.
-rewrite Nat.add_succ_r, <- app_length in Hitb.
-symmetry.
-rewrite msort_loop_enough_iter with (itb := S ita).
-rewrite <- IHita with (la := a1 :: la).
-...
-*)
-destruct itb; cbn. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hitb; subst lb.
-  now apply permutation_nil_r in Hpab.
-}
-remember (split_list lb) as llb eqn:Hllb; symmetry in Hllb.
-destruct llb as (lb1, lb2).
-destruct lb as [| b1]. {
-  now apply permutation_nil_r in Hpab.
-}
-cbn in Hitb; apply Nat.succ_le_mono in Hitb.
-move itb before ita.
-move b1 before a1.
-move la1 before lb; move la2 before la1.
-move lb1 before la1; move lb2 before lb1.
+apply (msort_loop_when_permuted Heqb).
 ...
 apply permutation_cons_l_iff in Hpab.
 remember (extract (eqb a1) (b1 :: lb)) as lxl eqn:Hlxl; symmetry in Hlxl.
