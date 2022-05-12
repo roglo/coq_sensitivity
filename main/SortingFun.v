@@ -2276,6 +2276,7 @@ apply IHit1. {
 }
 Qed.
 
+(*
 Theorem bsort_bsort_loop_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
   ∀ l,
@@ -2285,6 +2286,7 @@ intros * Htot *.
 apply bsort_loop_enough_iter; [ easy | | easy ].
 apply nb_disorder_le_square.
 Qed.
+*)
 
 Theorem sorted_bsort_loop_nb_disorder : ∀ A (rel : A → _),
   total_relation rel →
@@ -2754,6 +2756,7 @@ apply (permutation_cons_isort_insert _ Heqb).
 now apply permutation_refl.
 Qed.
 
+(*
 Theorem nb_disorder_0_sorted : ∀ A (rel : A → _),
   ∀ l,
   nb_disorder rel l = 0
@@ -2771,6 +2774,7 @@ rewrite IHla, Bool.andb_true_r.
 cbn in Hr.
 now destruct (rel a b).
 Qed.
+*)
 
 Theorem bsort_swap_Some_permutation : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -2786,6 +2790,7 @@ apply (permutation_app_head Heqb).
 apply (permutation_swap Heqb).
 Qed.
 
+(*
 Theorem bsort_loop_when_permuted : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
@@ -2843,6 +2848,7 @@ apply (permutation_trans Heqb) with (lb := la); [ | easy ].
 apply (permutation_sym Heqb).
 now apply (@bsort_swap_Some_permutation _ eqb rel).
 Qed.
+*)
 
 Theorem permutation_select_first_select_first : ∀ A (eqb rel : A → _),
   equality eqb →
@@ -3009,6 +3015,7 @@ Qed.
 
 (* unicity of sorting algorithm *)
 
+(* sorted_sorted_permutation
 Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
   equality eqb →
   reflexive rel →
@@ -3021,6 +3028,8 @@ Theorem permuted_sorted_unique : ∀ A (eqb rel : A → _),
   → la = lb.
 Proof.
 intros * Heqb Hrefl Hant Htra * Hpab Hsa Hsb.
+now apply (sorted_sorted_permutation Heqb Hant Htra).
+...
 revert lb Hpab Hsb.
 induction la as [| a]; intros; [ now apply permutation_nil_l in Hpab | ].
 destruct lb as [| b]; intros; [ now apply permutation_nil_r in Hpab | ].
@@ -3055,6 +3064,7 @@ apply IHla; [ | easy | ]. {
   now apply strongly_sorted_sorted.
 }
 Qed.
+*)
 
 Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
   equality eqb →
@@ -3067,8 +3077,12 @@ Theorem sorted_unique : ∀ A (eqb rel : A → A → bool),
   → ∀ l, sort_algo1 l = sort_algo2 l.
 Proof.
 intros * Heqb Href Hant Htra * Hps1 Hps2 l.
+specialize (sorted_sorted_permutation Heqb Hant Htra) as H1.
+(*
 specialize (permuted_sorted_unique Heqb Href Hant Htra) as H1.
 apply H1; [ clear H1 | apply Hps1 | apply Hps2 ].
+*)
+apply H1; [ apply Hps1 | apply Hps2 | clear H1 ].
 specialize (Hps1 l) as H1.
 specialize (Hps2 l) as H2.
 eapply (permutation_trans Heqb); [ apply H1 | ].
@@ -3285,9 +3299,27 @@ Theorem bsort_when_permuted : ∀ A (eqb rel : A → _),
   → bsort rel la = bsort rel lb.
 Proof.
 intros * Heqb Hant Htra Htot * Hpab.
+specialize (sorted_bsort Htot la) as Hsa.
+specialize (sorted_bsort Htot lb) as Hsb.
+specialize (permuted_bsort rel Heqb la) as Hpa.
+specialize (permuted_bsort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (bsort rel la) (bsort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+(*
+specialize (total_relation_is_reflexive Htot) as Hrefl.
+now apply (permuted_sorted_unique Heqb Hrefl Hant Htra).
+*)
+now apply (sorted_sorted_permutation Heqb Hant Htra).
+(*
+...
+intros * Heqb Hant Htra Htot * Hpab.
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 rewrite (bsort_bsort_loop_nb_disorder Htot).
 now apply (bsort_loop_when_permuted Heqb Hant Htra Htot).
+*)
 Qed.
 
 Theorem msort_when_permuted : ∀ A (eqb rel : A → _),
@@ -3309,12 +3341,11 @@ assert (Hsab : permutation eqb (msort rel la) (msort rel lb)). {
   eapply (permutation_trans Heqb); [ | apply Hpab ].
   now apply (permutation_sym Heqb).
 }
-remember (msort rel la) as lc.
-remember (msort rel lb) as ld.
-clear la lb Hpab Heqlc Heqld Hpa Hpb.
-rename lc into la; rename ld into lb; move lb before la.
+now apply (sorted_sorted_permutation Heqb Hant Htra).
+(*
 specialize (total_relation_is_reflexive Htot) as Hrefl.
 now apply (permuted_sorted_unique Heqb Hrefl Hant Htra).
+*)
 Qed.
 
 (* *)
