@@ -458,6 +458,70 @@ destruct j as [j| ]. 2: {
   assert (H : nth i l' 0 < length l). {
     unfold l.
     rewrite (permutation_assoc_length Heqb); [ | easy ].
+    specialize (permutation_length Heqb Hpab) as Hlab.
+    rewrite Hlab.
+    unfold l'.
+Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb i,
+  length la = length lb
+  → i < length la
+  → nth i (permutation_assoc eqb la lb) 0 < length la.
+Proof.
+intros * Heqb * Hlab Hla.
+unfold permutation_assoc.
+Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lbo i,
+  permutation eqb la (filter_Some lbo)
+  → i < length la
+  → nth i (permutation_assoc_loop eqb la lbo) 0 < length la.
+Proof.
+intros * Heqb * Hlab Hla.
+revert lbo i Hlab Hla.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | now rewrite List_nth_nil ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+cbn in H.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in H; subst b.
+destruct i. {
+  rewrite List_nth_0_cons.
+  apply (f_equal length) in Hlb.
+  rewrite app_length in Hlb; cbn in Hlb.
+  apply (permutation_length Heqb) in Hlab.
+  cbn in Hlab.
+  rewrite Hlab.
+(* ouais bin ça va pas, ça *)
+...
+Search (length (filter_Some _)).
+
+  rewrite Hlab, Hlb.
+}
+rewrite List_nth_succ_cons.
+transitivity (length la); [ | easy ].
+...
+apply IHla.
+...
+  rewrite nth_nil.
+  destruct lb as [| b]; [ easy | ].
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (permutation_in Heqb Hpab) as H2.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ map Some (b :: lb)). {
+    now apply in_map, H2; left.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+... continue
+    apply nth_permutation_assoc_ub.
+    congruence.
+  }
 ...
 intros * Heqb * Hpab.
 revert lb Hpab.
