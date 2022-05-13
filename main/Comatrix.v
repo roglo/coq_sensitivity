@@ -1120,7 +1120,7 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
     ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
+rewrite det_is_det'; try now destruct Hif.
 unfold det'.
 rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
@@ -3036,11 +3036,11 @@ rewrite <- H, HC; clear C HC H.
 symmetry.
 (* lemma, perhaps? *)
 (*1
-rewrite det_is_det_by_canon_permut.
+rewrite det_is_det'.
 erewrite rngl_summation_eq_compat. 2: {
   intros u (_, Hu).
-  rewrite det_is_det_by_canon_permut.
-  rewrite det_is_det_by_canon_permut.
+  rewrite det_is_det'.
+  rewrite det_is_det'.
   do 2 rewrite mat_nrows_subm.
   rewrite Hra, Hrb.
   apply Nat.ltb_lt in Hi; rewrite Hi.

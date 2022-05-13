@@ -195,7 +195,7 @@ Qed.
 
 (* det and det' are equal *)
 
-Theorem det_is_det_by_canon_permut :
+Theorem det_is_det' :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -486,7 +486,7 @@ Theorem det_is_det'' :
 Proof.
 intros Hic Hop Hiv H10 Hde * Hsm.
 rewrite <- det'_is_det''; [ | easy | easy ].
-now apply det_is_det_by_canon_permut.
+now apply det_is_det'.
 Qed.
 
 (* multilinearity *)
@@ -509,17 +509,17 @@ Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+rewrite det_is_det'; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
   rewrite map2_length.
   do 2 rewrite map_length, fold_vect_size.
   rewrite Hu, Hv.
   now rewrite Nat.min_id.
 }
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+rewrite det_is_det'; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | congruence | easy ].
 }
-rewrite det_is_det_by_canon_permut; try easy. 2: {
+rewrite det_is_det'; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | congruence | easy ].
 }
 unfold det'.
@@ -910,7 +910,7 @@ Theorem determinant_alternating : in_charac_0_field →
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-rewrite det_is_det_by_canon_permut; try now destruct Hif. 2: {
+rewrite det_is_det'; try now destruct Hif. 2: {
   rewrite <- Hr in Hp, Hq.
   now apply mat_swap_rows_is_square.
 }
@@ -1205,7 +1205,7 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     now rewrite transposition_involutive in Hij.
   }
 }
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
+rewrite det_is_det'; try now destruct Hif.
 unfold det'.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
@@ -1461,7 +1461,6 @@ Arguments det'' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
-Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
-Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.
+Arguments det_is_det' {T}%type {ro rp} _ M%M.
 Arguments det_is_det'' {T}%type {ro rp} Hic Hop Hiv H10 Hde M%M.
 Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.
