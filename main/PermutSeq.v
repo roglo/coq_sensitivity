@@ -5,6 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
+Import Init.Nat.
 Require Import Permutation.
 
 Require Import Misc PermutationFun SortingFun.
@@ -389,21 +390,74 @@ Compute (map (permutation_fun Nat.eqb [3;2;7;3] [2;3;3;7]) (seq 0 4)).
 *)
 
 Theorem permutation_fun_nth : ∀ A (eqb : A → _) d la lb i,
-  i < length la
+  permutation eqb la lb
+  → i < length la
   → nth i lb d = nth (permutation_fun eqb la lb i) la d.
 Proof.
-intros * Hi.
+intros * Hpab Hi.
 unfold permutation_fun.
-unfold permutation_assoc.
+set (l := permutation_assoc eqb la lb).
 unfold unsome.
-set (l := permutation_assoc_loop eqb la (map Some lb)).
 remember (List_rank (Nat.eqb i) l) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. 2: {
   specialize (List_rank_None 0 (Nat.eqb i) l Hj) as H1.
-  set (l' := permutation_assoc_loop eqb lb (map Some la)).
+  set (l' := permutation_assoc eqb lb la).
   specialize (H1 (nth i l' 0)).
   assert (H : nth i l' 0 < length l). {
-    unfold l'.
+    unfold l.
+Theorem permutation_assoc_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → length (permutation_assoc eqb la lb) = length la.
+Proof.
+intros * Heqb * Hpab.
+unfold permutation_assoc.
+(* mouais... ça devient compliqué... *)
+...
+intros * Heqb * Hpab.
+revert lb Hpab.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  destruct lb as [| b]; [ easy | ].
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (permutation_in Heqb Hpab) as H2.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ map Some (b :: lb)). {
+    now apply in_map, H2; left.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+cbn; f_equal.
+...
+apply IHla.
+Print permutation_assoc_loop.
+...
+Theorem permutation_assoc_loop_length : ∀ A (eqb : A → _) la lbo,
+  length (permutation_assoc_loop eqb la lbo) = length la.
+Proof.
+intros.
+Print permutation_assoc_loop.
+...
+revert lbo.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ lbo) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  destruct lbo as [bo| ]. {
+    cbn in Hlxl.
+...
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 None); cbn in H1.
+...
+  rewrite permutation_assoc_loop_length.
+...
+(*
+Search (nth _ _ _ < length _).
 ...
   specialize (List_rank_None 0 (Nat.eqb i) Hj) as H1.
   apply List_rank_None in Hj.
@@ -421,12 +475,16 @@ revert d lb i Hi.
 induction la as [| a]; intros; [ easy | cbn ].
 ...
 
+*)
+Admitted.
 Show.
   set (f := permutation_fun Nat.eqb la lb).
   set (g := permutation_fun Nat.eqb lb la).
   rewrite <- Hlab in Hi, Hj.
   specialize (H1 (f i) (f j)).
-  assert (H : f i < length la) by admit.
+  assert (H : f i < length la). {
+    unfold f.
+...
   specialize (H1 H); clear H.
   assert (H : f j < length la) by admit.
   specialize (H1 H); clear H.
