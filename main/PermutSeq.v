@@ -306,35 +306,94 @@ do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
-Theorem Permutation_permut : ∀ la lb,
-  Permutation la lb
-  → is_permut_list la
-  → is_permut_list lb.
+(* to be moved to PermutationFun.v *)
+
+Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
+  match (ao, bo) with
+  | (Some a, Some b) => eqb a b
+  | _ => false
+  end.
+
+Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
+  match la with
+  | [] => []
+  | a :: la' =>
+      match extract (λ bo, option_eqb eqb bo (Some a)) lbo with
+      | Some (befo, _, afto) =>
+          length befo :: permutation_assoc_loop eqb la' (befo ++ None :: afto)
+      | None => []
+      end
+  end.
+
+Definition permutation_assoc {A} (eqb : A → _) la lb :=
+  permutation_assoc_loop eqb la (map Some lb).
+
+Definition permutation_fun {A} (eqb : A → _) la lb i :=
+  unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
+
+Fixpoint filter_Some {A} (lao : list (option A)) :=
+  match lao with
+  | [] => []
+  | Some ao :: lao' => ao :: filter_Some lao'
+  | None :: lao' => filter_Some lao'
+  end.
+
+Theorem filter_Some_inside : ∀ A l1 l2 (x : option A),
+  filter_Some (l1 ++ x :: l2) =
+    filter_Some l1 ++
+    match x with
+    | Some a => a :: filter_Some l2
+    | None => filter_Some l2
+    end.
 Proof.
-intros * Hab Ha.
-assert (Hlab : length la = length lb). {
-  now apply Permutation_length.
+intros.
+revert x l2.
+induction l1 as [| yo]; intros; [ easy | ].
+cbn - [ option_eqb ].
+destruct yo; [ | apply IHl1 ].
+cbn; f_equal; apply IHl1.
+Qed.
+
+Theorem permutation_assoc_loop_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lbo,
+  permutation eqb la (filter_Some lbo)
+  → length (permutation_assoc_loop eqb la lbo) = length la.
+Proof.
+intros * Heqb * Hpab.
+revert lbo Hpab.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ lbo). {
+    specialize (permutation_in Heqb) as H2.
+    specialize (proj1 (H2 _ _ Hpab a) (or_introl eq_refl)) as H3.
+    clear - H3.
+    induction lbo as [| bo]; [ easy | cbn in H3 ].
+    destruct bo as [b| ]. {
+      destruct H3 as [H3| H3]; [ now subst b; left | ].
+      now right; apply IHlbo.
+    }
+    now right; apply IHlbo.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
 }
-split. {
-  intros i Hi.
-  rewrite <- Hlab.
-  apply Ha.
-  apply Permutation_in with (l := lb); [ | easy ].
-  now apply Permutation_sym.
-} {
-  apply nat_NoDup.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite <- Hlab in Hi, Hj.
-  destruct Ha as (Hap, Hal).
-  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
-  destruct H1 as (H1 & f & H2 & H3 & H4).
-  rewrite H4 in Hij; [ | easy ].
-  rewrite H4 in Hij; [ | easy ].
-  do 2 rewrite fold_ff_app in Hij.
-  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
-  now apply H3.
-}
+cbn; f_equal.
+apply IHla.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hxa & Hlbo).
+cbn in Hxa.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in Hxa; subst b.
+subst lbo.
+rewrite filter_Some_inside in Hpab |-*.
+apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 
 (* to be completed if required
@@ -361,34 +420,6 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
-Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
-  match (ao, bo) with
-  | (Some a, Some b) => eqb a b
-  | _ => false
-  end.
-
-Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
-  match la with
-  | [] => []
-  | a :: la' =>
-      match extract (λ bo, option_eqb eqb bo (Some a)) lbo with
-      | Some (befo, _, afto) =>
-          length befo :: permutation_assoc_loop eqb la' (befo ++ None :: afto)
-      | None => []
-      end
-  end.
-
-Definition permutation_assoc {A} (eqb : A → _) la lb :=
-  permutation_assoc_loop eqb la (map Some lb).
-
-Definition permutation_fun {A} (eqb : A → _) la lb i :=
-  unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
-
-(*
-Compute (permutation_assoc Nat.eqb [3;2;7;3] [2;3;3;7]).
-Compute (map (permutation_fun Nat.eqb [3;2;7;3] [2;3;3;7]) (seq 0 4)).
-*)
-
 Theorem permutation_fun_nth : ∀ A (eqb : A → _) d la lb i,
   permutation eqb la lb
   → i < length la
@@ -412,8 +443,7 @@ Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   → length (permutation_assoc eqb la lb) = length la.
 Proof.
 intros * Heqb * Hpab.
-unfold permutation_assoc.
-(* mouais... ça devient compliqué... *)
+apply (permutation_assoc_loop_length Heqb).
 ...
 intros * Heqb * Hpab.
 revert lb Hpab.
@@ -555,6 +585,37 @@ About Permutation_nth.
 }
 Qed.
 *)
+
+Theorem Permutation_permut : ∀ la lb,
+  Permutation la lb
+  → is_permut_list la
+  → is_permut_list lb.
+Proof.
+intros * Hab Ha.
+assert (Hlab : length la = length lb). {
+  now apply Permutation_length.
+}
+split. {
+  intros i Hi.
+  rewrite <- Hlab.
+  apply Ha.
+  apply Permutation_in with (l := lb); [ | easy ].
+  now apply Permutation_sym.
+} {
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  rewrite <- Hlab in Hi, Hj.
+  destruct Ha as (Hap, Hal).
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+}
+Qed.
 
 Theorem is_permut_list_app_max : ∀ l,
   is_permut_list (l ++ [length l])
