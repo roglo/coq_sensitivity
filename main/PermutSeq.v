@@ -470,6 +470,7 @@ Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hlab Hla.
 unfold permutation_assoc.
+...
 Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lbo i,
@@ -495,6 +496,7 @@ destruct i. {
   apply (permutation_length Heqb) in Hlab.
   cbn in Hlab.
   rewrite Hlab.
+Search filter_Some.
 (* ouais bin ça va pas, ça *)
 ...
 Search (length (filter_Some _)).
