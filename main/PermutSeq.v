@@ -324,13 +324,13 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
-  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
   rewrite <- Hlab in Hi, Hj.
+  destruct Ha as (Hap, Hal).
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
   destruct H1 as (H1 & f & H2 & H3 & H4).
   rewrite H4 in Hij; [ | easy ].
   rewrite H4 in Hij; [ | easy ].
   do 2 rewrite fold_ff_app in Hij.
-  destruct Ha as (Hap, Hal).
   apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
   now apply H3.
 }
@@ -354,6 +354,9 @@ split. {
   apply (permutation_in Nat_eqb_equality) with (la := lb); [ | easy ].
   now apply (permutation_sym Nat_eqb_equality).
 } {
+  destruct Ha as (Hap, Hal).
+  specialize (NoDup_nat _ Hal) as H1.
+  unfold ff_app in H1.
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
@@ -373,7 +376,6 @@ Permutation_nth
   rewrite H4 in Hij; [ | easy ].
   rewrite H4 in Hij; [ | easy ].
   do 2 rewrite fold_ff_app in Hij.
-  destruct Ha as (Hap, Hal).
   apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
   now apply H3.
 }
