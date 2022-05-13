@@ -360,9 +360,87 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
+Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
+  match (ao, bo) with
+  | (Some a, Some b) => eqb a b
+  | _ => false
+  end.
+
+Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
+  match la with
+  | [] => []
+  | a :: la' =>
+      match extract (λ bo, option_eqb eqb bo (Some a)) lbo with
+      | Some (befo, _, afto) =>
+          length befo :: permutation_assoc_loop eqb la' (befo ++ None :: afto)
+      | None => []
+      end
+  end.
+
+Definition permutation_assoc {A} (eqb : A → _) la lb :=
+  permutation_assoc_loop eqb la (map Some lb).
+
+Definition permutation_fun {A} (eqb : A → _) la lb i :=
+  unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
+
+(*
+Compute (permutation_assoc Nat.eqb [3;2;7;3] [2;3;3;7]).
+Compute (map (permutation_fun Nat.eqb [3;2;7;3] [2;3;3;7]) (seq 0 4)).
+*)
+
+Theorem permutation_fun_nth : ∀ A (eqb : A → _) d la lb i,
+  i < length la
+  → nth i lb d = nth (permutation_fun eqb la lb i) la d.
+Admitted.
+
+Show.
+  set (f := permutation_fun Nat.eqb la lb).
+  set (g := permutation_fun Nat.eqb lb la).
+  rewrite <- Hlab in Hi, Hj.
+  specialize (H1 (f i) (f j)).
+  assert (H : f i < length la) by admit.
+  specialize (H1 H); clear H.
+  assert (H : f j < length la) by admit.
+  specialize (H1 H); clear H.
+  assert (H2 : nth (f i) la 0 = nth i lb 0) by admit.
+  assert (H3 : nth (f j) la 0 = nth j lb 0) by admit.
+  assert (H : nth (f i) la 0 = nth (f j) la 0) by congruence.
+  specialize (H1 H); clear H.
+  apply (f_equal g) in H1.
+Theorem permutation_fun_inv_permutation_fun : ∀ A (eqb : A → _) la lb i,
+  permutation_fun eqb la lb (permutation_fun eqb lb la i) = i.
+Admitted.
+  unfold f, g in H1.
+  rewrite (permutation_fun_inv_permutation_fun Nat.eqb lb la) in H1.
+  rewrite (permutation_fun_inv_permutation_fun Nat.eqb lb la) in H1.
+  easy.
+...
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+...
+  specialize (proj1 (permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+...
+Permutation_nth
+     : ∀ (A : Type) (l l' : list A) (d : A),
+         Permutation l l'
+         ↔ (let n := length l in
+            length l' = n
+            ∧ (∃ f : nat → nat,
+                 FinFun.bFun n f ∧ FinFun.bInjective n f ∧ (∀ x : nat, x < n → nth x l' d = nth (f x) l d)))
+
 (*
   rewrite <- Hlab in Hi, Hj.
-*)
   specialize (permutation_in Nat_eqb_equality Hab) as H2.
   assert (Hib : nth i lb 0 ∈ lb) by now apply nth_In.
   assert (Hjb : nth j lb 0 ∈ lb) by now apply nth_In.
@@ -374,21 +452,13 @@ split. {
   rewrite Hij, <- Hj'j in Hi'i.
   apply H1 in Hi'i; [ | easy | easy ].
 (* oui, non, bon *)
-Search permutation.
-...
-Theorem permutation_nth :
-  permutation eqb la lb
-  →
+Check Permutation_nth.
+Check list_eqb.
+Print list_eqb.
+*)
 ...
 Search permutation.
 About Permutation_nth.
-Permutation_nth
-     : ∀ (A : Type) (l l' : list A) (d : A),
-         Permutation l l'
-         ↔ (let n := length l in
-            length l' = n
-            ∧ (∃ f : nat → nat,
-                 FinFun.bFun n f ∧ FinFun.bInjective n f ∧ (∀ x : nat, x < n → nth x l' d = nth (f x) l d)))
   specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
   destruct H1 as (H1 & f & H2 & H3 & H4).
   rewrite H4 in Hij; [ | easy ].
