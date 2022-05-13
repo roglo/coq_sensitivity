@@ -2781,11 +2781,10 @@ Theorem det_select_isort_rows : ∀ A kl,
 Proof.
 intros.
 ...
-... return
+... returning
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite <- det'_is_det''; [ | now destruct Hif | now destruct Hif ].
-  rewrite <- det_is_det_by_canon_permut; try now destruct Hif. 2: {
+  rewrite <- det_is_det''; try now destruct Hif. 2: {
     apply mat_select_rows_is_square; [ easy | | ]. {
       rewrite rev_length.
       now rewrite to_radix_loop_length.

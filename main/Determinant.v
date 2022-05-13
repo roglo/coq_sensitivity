@@ -461,236 +461,24 @@ apply rngl_summation_list_incl; [ | | easy ]. {
 }
 Qed.
 
-(* multilinearity *)
+(* det' and det'' are equal *)
 
-(* to be completed if not too complicated
-Theorem determinant_multilinear_glop :
+Theorem det_is_det'' :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  ∀ n (M : matrix T) i a b U V,
+  rngl_has_dec_eq = true →
+  ∀ (M : matrix T),
   is_square_matrix M = true
-  → mat_nrows M = n
-  → vect_size U = n
-  → vect_size V = n
-  → i < n
-  → det'' (mat_repl_vect i M (a × U + b × V)%V) =
-       (a * det'' (mat_repl_vect i M U) +
-        b * det'' (mat_repl_vect i M V))%F.
+  → det M = det'' M.
 Proof.
-intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
-specialize (square_matrix_ncols _ Hsm) as Hcn.
-unfold det''.
-remember (a × U + b × V)%V as UV eqn:HUV.
-assert (Hvm : vect_size UV = mat_nrows M). {
-  rewrite Hr, HUV; cbn.
-  rewrite map2_length.
-  do 2 rewrite map_length.
-  do 2 rewrite fold_vect_size.
-  rewrite Hu, Hv.
-  apply Nat.min_id.
-}
-rewrite mat_repl_vect_nrows; [ | easy ].
-rewrite mat_repl_vect_nrows; [ | congruence ].
-rewrite mat_repl_vect_nrows; [ | congruence ].
-rewrite Hr.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n ^ n). {
-    eapply le_lt_trans; [ apply Hk | ].
-    apply Nat.sub_lt; [ | flia ].
-    apply Nat.neq_0_lt_0, Nat.pow_nonzero; flia Hi.
-  }
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_el_repl_vect; cycle 1. {
-      now apply squ_mat_is_corr.
-    } {
-      subst UV; cbn.
-      rewrite map2_length.
-      do 2 rewrite map_length.
-      do 2 rewrite fold_vect_size.
-      rewrite Hu, Hv, Nat.min_id.
-      flia Hj.
-    } {
-      rewrite Hr; flia Hj.
-    } {
-      unfold ff_app.
-      rewrite Hcn, Hr.
-      apply to_radix_ub; flia Hj.
-    } {
-      now rewrite Hcn, Hr.
-    }
-    unfold vect_el, ff_app.
-    cbn - [ Nat.eq_dec ].
-    easy.
-  }
-  easy.
-}
-cbn - [ mat_el ].
-(* put a and b inside the sigma in the rhs *)
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n ^ n). {
-    assert (H : n ≠ 0) by flia Hi.
-    specialize (Nat.pow_nonzero n n H) as Hnz.
-    flia Hk Hnz.
-  }
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic a).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_el_repl_vect; cycle 1. {
-      now apply squ_mat_is_corr.
-    } {
-      rewrite Hu; flia Hj.
-    } {
-      rewrite Hr; flia Hj.
-    } {
-      cbn.
-      rewrite Hcn, Hr.
-      apply to_radix_ub; flia Hj.
-    } {
-      now rewrite Hcn, Hr.
-    }
-    now unfold vect_el, ff_app; cbn.
-  }
-  easy.
-}
-rewrite rngl_add_comm.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  assert (Hkn : k < n ^ n). {
-    assert (H : n ≠ 0) by flia Hi.
-    specialize (Nat.pow_nonzero n n H) as Hnz.
-    flia Hk Hnz.
-  }
-  rewrite rngl_mul_assoc.
-  rewrite (rngl_mul_comm Hic b).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_el_repl_vect; cycle 1. {
-      now apply squ_mat_is_corr.
-    } {
-      rewrite Hv; flia Hj.
-    } {
-      rewrite Hr; flia Hj.
-    } {
-      rewrite Hcn, Hr.
-      apply to_radix_ub; flia Hj.
-    } {
-      now rewrite Hcn, Hr.
-    }
-    now unfold vect_el, ff_app; cbn.
-  }
-  easy.
-}
-rewrite rngl_add_comm.
-(* make one summation *)
-rewrite <- rngl_summation_add_distr.
-apply rngl_summation_eq_compat.
-intros k Hk.
-do 2 rewrite <- rngl_mul_assoc.
-rewrite <- rngl_mul_add_distr_l.
-(* elimination of the ε-s *)
-f_equal.
-(* *)
-assert (Hkn : k < n ^ n). {
-  assert (H : n ≠ 0) by flia Hi.
-  specialize (Nat.pow_nonzero n n H) as Hnz.
-  flia Hk Hnz.
-}
-(*
-(* bin non, c'est pas surjectif ! [0;0;0;0] n'a pas de 1 *)
-Check canon_sym_gr_surjective.
-Theorem to_radix_surjective : ∀ n k j,
-  k < n ^ n
-  → j < n
-  → ∃ i : nat, i < n ∧ ff_app (to_radix n k) i = j.
-Proof.
-intros * Hkn Hjn.
-Print canon_sym_gr_inv_list.
-...
-exists (ff_app (to_radix_inv_list n k) j).
-split; [ now apply canon_sym_gr_inv_list_ub | ].
-now apply canon_sym_gr_sym_gr_inv.
-...
-specialize (to_radix_surjective Hkn Hi) as Hp.
-specialize (canon_sym_gr_surjective Hkn Hi) as Hp.
-destruct Hp as (p & Hp & Hpp).
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-*)
-(* du coup, ça va pas *)
-...
-erewrite rngl_product_eq_compat. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (nth (j - 2) (to_radix n k) 0) i)
-    as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
-rewrite rngl_add_comm.
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (nth (j - 2) (canon_sym_gr_list n k) 0) i)
-    as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
-rewrite rngl_add_comm.
-symmetry.
-rewrite (rngl_product_split (p + 1)); [ | flia Hp ].
-rewrite rngl_product_split_last; [ | flia ].
-erewrite rngl_product_eq_compat. 2: {
-  intros j Hj.
-  replace (j - 1 - 1) with (j - 2) by flia.
-  destruct (Nat.eq_dec (nth (j - 2) (canon_sym_gr_list n k) 0) i)
-    as [Hpj| Hpj]. {
-    exfalso.
-    rewrite <- Hpp in Hpj.
-    apply nth_canon_sym_gr_list_inj1 in Hpj; [ | easy | flia Hp Hj | easy ].
-    flia Hj Hpj.
-  }
-  easy.
-}
-rewrite (rngl_mul_comm Hic (iter_seq _ _ _ _)).
-rewrite Nat.add_sub.
-unfold ff_app in Hpp.
-rewrite Hpp.
-destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
-do 4 rewrite rngl_mul_assoc.
-subst UV.
-cbn - [ mat_el ].
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
-  now rewrite map_length, fold_vect_size, Hu.
-} {
-  now rewrite map_length, fold_vect_size, Hv.
-}
-rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
-rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
-do 2 rewrite fold_vect_el.
-(* elimination of the following term (q) *)
-...
-*)
+intros Hic Hop Hiv H10 Hde * Hsm.
+rewrite <- det'_is_det''; [ | easy | easy ].
+now apply det_is_det_by_canon_permut.
+Qed.
+
+(* multilinearity *)
 
 Theorem determinant_multilinear :
   rngl_is_comm = true →
@@ -1663,4 +1451,6 @@ Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments det_is_det_by_canon_permut {T}%type {ro rp} _ M%M.
+Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.
+Arguments det_is_det'' {T}%type {ro rp} Hic Hop Hiv H10 Hde M%M.
 Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.
