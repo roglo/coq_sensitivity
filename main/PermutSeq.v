@@ -7,7 +7,7 @@ Require Import Utf8 Arith Bool.
 Import List List.ListNotations.
 Require Import Permutation.
 
-Require Import Misc SortingFun.
+Require Import Misc PermutationFun SortingFun.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
@@ -336,6 +336,50 @@ split. {
 }
 Qed.
 
+(* to be completed if required
+   (uses "permutation" instead of "Permutation")
+Theorem permutation_permut : ∀ la lb,
+  permutation Nat.eqb la lb
+  → is_permut_list la
+  → is_permut_list lb.
+Proof.
+intros * Hab Ha.
+assert (Hlab : length la = length lb). {
+  now apply (permutation_length Nat_eqb_equality).
+}
+split. {
+  intros i Hi.
+  rewrite <- Hlab.
+  apply Ha.
+  apply (permutation_in Nat_eqb_equality) with (la := lb); [ | easy ].
+  now apply (permutation_sym Nat_eqb_equality).
+} {
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  rewrite <- Hlab in Hi, Hj.
+...
+Search permutation.
+About Permutation_nth.
+Permutation_nth
+     : ∀ (A : Type) (l l' : list A) (d : A),
+         Permutation l l'
+         ↔ (let n := length l in
+            length l' = n
+            ∧ (∃ f : nat → nat,
+                 FinFun.bFun n f ∧ FinFun.bInjective n f ∧ (∀ x : nat, x < n → nth x l' d = nth (f x) l d)))
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  destruct Ha as (Hap, Hal).
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+}
+Qed.
+*)
+
 Theorem is_permut_list_app_max : ∀ l,
   is_permut_list (l ++ [length l])
   → is_permut_list l.
@@ -453,7 +497,11 @@ Theorem permut_isort_leb : ∀ l,
 Proof.
 intros * Hp.
 specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
+(*
+specialize (permuted_isort Nat.eqb Nat_eqb_equality l) as Hps.
+*)
 specialize (Permutation_isort Nat.leb l) as Hps.
+(**)
 remember (isort Nat.leb l) as l'; clear Heql'.
 specialize (Permutation_permut) as Hpl'.
 specialize (Hpl' l l' Hps Hp).

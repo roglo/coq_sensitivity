@@ -1,5 +1,5 @@
-BinetCauchy.vio: BinetCauchy.v Misc.vio PermutationFun.vio SortingFun.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio MyVector.vio
-BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo PermutationFun.vo SortingFun.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo MyVector.vo
+BinetCauchy.vio: BinetCauchy.v Misc.vio PermutationFun.vio SortingFun.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
+BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo PermutationFun.vo SortingFun.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio SortingFun.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo SortingFun.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
@@ -20,8 +20,8 @@ Misc.vio: Misc.v
 Misc.vo Misc.glob Misc.v.beautified Misc.required_vo: Misc.v 
 MyVector.vio: MyVector.v Misc.vio RingLike.vio IterAdd.vio
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo IterAdd.vo
-PermutSeq.vio: PermutSeq.v Misc.vio SortingFun.vio IterAnd.vio Pigeonhole.vio
-PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo SortingFun.vo IterAnd.vo Pigeonhole.vo
+PermutSeq.vio: PermutSeq.v Misc.vio PermutationFun.vio SortingFun.vio IterAnd.vio Pigeonhole.vio
+PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo PermutationFun.vo SortingFun.vo IterAnd.vo Pigeonhole.vo
 PermutationFun.vio: PermutationFun.v Misc.vio
 PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
