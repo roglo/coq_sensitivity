@@ -396,6 +396,25 @@ rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 
+Theorem filter_Some_map_Some : ∀ A (la : list A),
+  filter_Some (map Some la) = la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+now f_equal.
+Qed.
+
+Theorem permutation_assoc_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → length (permutation_assoc eqb la lb) = length la.
+Proof.
+intros * Heqb * Hpab.
+apply (permutation_assoc_loop_length Heqb).
+now rewrite filter_Some_map_Some.
+Qed.
+
 (* to be completed if required
    (uses "permutation" instead of "Permutation")
 Theorem permutation_permut : ∀ la lb,
@@ -420,12 +439,14 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
-Theorem permutation_fun_nth : ∀ A (eqb : A → _) d la lb i,
+Theorem permutation_fun_nth : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb i,
   permutation eqb la lb
   → i < length la
   → nth i lb d = nth (permutation_fun eqb la lb i) la d.
 Proof.
-intros * Hpab Hi.
+intros * Heqb * Hpab Hi.
 unfold permutation_fun.
 set (l := permutation_assoc eqb la lb).
 unfold unsome.
@@ -436,14 +457,7 @@ destruct j as [j| ]. 2: {
   specialize (H1 (nth i l' 0)).
   assert (H : nth i l' 0 < length l). {
     unfold l.
-Theorem permutation_assoc_length : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb,
-  permutation eqb la lb
-  → length (permutation_assoc eqb la lb) = length la.
-Proof.
-intros * Heqb * Hpab.
-apply (permutation_assoc_loop_length Heqb).
+    rewrite (permutation_assoc_length Heqb); [ | easy ].
 ...
 intros * Heqb * Hpab.
 revert lb Hpab.
