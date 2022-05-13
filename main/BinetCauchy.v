@@ -2776,10 +2776,51 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn - [ det ].
 About Permutation_isort.
 Print mat_select_rows.
-Theorem det_select_isort_rows : ∀ A kl,
-  det (mat_select_rows kl A) = det (mat_select_rows (isort Nat.leb kl) A).
+Theorem det''_select_isort_rows : ∀ A kl,
+  det'' (mat_select_rows kl A) = det'' (mat_select_rows (isort Nat.leb kl) A).
 Proof.
 intros.
+unfold det''.
+do 2 rewrite mat_select_rows_nrows.
+rewrite isort_length.
+set
+  (g := λ i,
+   to_radix_inv (length kl) (isort Nat.leb (to_radix (length kl) i))).
+erewrite rngl_summation_change_var with (g0 := g).
+Print det''.
+(* mmm.... peut-être qu'il faut que je définisse un det'' qui
+   fonctionne par colonnes et non par lignes ; qu'on ait les
+   deux : un det'' par lignes et un det'' par colonnes *)
+...
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold g.
+    rewrite to_radix_to_radix_inv; cycle 1. {
+      now rewrite isort_length, to_radix_length.
+    } {
+      intros k Hk.
+      apply in_isort in Hk.
+      apply (In_nth _ _ 0) in Hk.
+      destruct Hk as (u & Hu & Huk); subst k.
+      apply to_radix_ub; flia Hj.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ mat_el ].
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    unfold mat_el, ff_app; cbn.
+    unfold list_list_select_rows.
+...
+unfold mat_select_rows.
+unfold list_list_select_rows.
+Search (mat_el (mat_select_rows _ _)).
 ...
 ... returning
 erewrite rngl_summation_eq_compat. 2: {
