@@ -360,7 +360,25 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
+(*
   rewrite <- Hlab in Hi, Hj.
+*)
+  specialize (permutation_in Nat_eqb_equality Hab) as H2.
+  assert (Hib : nth i lb 0 ∈ lb) by now apply nth_In.
+  assert (Hjb : nth j lb 0 ∈ lb) by now apply nth_In.
+  apply H2 in Hib, Hjb.
+  apply (In_nth _ _ 0) in Hib.
+  apply (In_nth _ _ 0) in Hjb.
+  destruct Hib as (i' & Hi' & Hi'i).
+  destruct Hjb as (j' & Hj' & Hj'j).
+  rewrite Hij, <- Hj'j in Hi'i.
+  apply H1 in Hi'i; [ | easy | easy ].
+(* oui, non, bon *)
+Search permutation.
+...
+Theorem permutation_nth :
+  permutation eqb la lb
+  →
 ...
 Search permutation.
 About Permutation_nth.
