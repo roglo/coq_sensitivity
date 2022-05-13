@@ -391,7 +391,23 @@ Compute (map (permutation_fun Nat.eqb [3;2;7;3] [2;3;3;7]) (seq 0 4)).
 Theorem permutation_fun_nth : ∀ A (eqb : A → _) d la lb i,
   i < length la
   → nth i lb d = nth (permutation_fun eqb la lb i) la d.
-Admitted.
+Proof.
+intros * Hi.
+unfold permutation_fun.
+unfold permutation_assoc.
+Search (nth (unsome _ _)).
+Search unsome.
+Print unsome.
+...
+Theorem nth_unsome : ∀ A (d : A) la l, nth (unsome 0 l) la d = nth
+Theorem permutation_assoc_loop_nth : ∀ A (eqb : A → _) d la lbo i,
+  i < length la
+  → nth i lb d = nth (unsome 0 (List_rank (Nat.eqb i) (permutation_assoc_loop eqb la lbo))) la d.
+
+
+revert d lb i Hi.
+induction la as [| a]; intros; [ easy | cbn ].
+...
 
 Show.
   set (f := permutation_fun Nat.eqb la lb).
