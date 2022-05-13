@@ -395,6 +395,18 @@ Proof.
 intros * Hi.
 unfold permutation_fun.
 unfold permutation_assoc.
+unfold unsome.
+set (l := permutation_assoc_loop eqb la (map Some lb)).
+remember (List_rank (Nat.eqb i) l) as j eqn:Hj; symmetry in Hj.
+destruct j as [j| ]. 2: {
+  specialize (List_rank_None 0 (Nat.eqb i) l Hj) as H1.
+  set (l' := permutation_assoc_loop eqb lb (map Some la)).
+  specialize (H1 (nth i l' 0)).
+  assert (H : nth i l' 0 < length l). {
+    unfold l'.
+...
+  specialize (List_rank_None 0 (Nat.eqb i) Hj) as H1.
+  apply List_rank_None in Hj.
 Search (nth (unsome _ _)).
 Search unsome.
 Print unsome.
