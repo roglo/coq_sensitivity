@@ -576,6 +576,32 @@ destruct Hlxl as (Hbef & Hx & Hsome).
 cbn in Hx.
 destruct x as [b| ]; [ | easy ].
 apply Heqb in Hx; subst b.
+remember (permutation_assoc_loop eqb lb (Some a :: map Some la)) as l eqn:Hl.
+remember (ff_app l i) as j eqn:Hj; symmetry in Hj.
+destruct j. {
+  apply (f_equal length) in Hsome.
+  rewrite map_length, app_length in Hsome; cbn in Hsome.
+  subst l.
+Theorem glop : ∀ A (eqb : A → _),
+  ∀ d la lb i j,
+  permutation eqb la lb
+  → ff_app (permutation_assoc_loop eqb la (map Some lb)) i = j
+  → nth i la d = nth j lb d.
+Proof.
+intros * Hpab Hij.
+revert d lb i j Hpab Hij.
+induction la as [| a]; intros; cbn. {
+  apply permutation_nil_l in Hpab; subst lb.
+  cbn in Hij.
+  destruct i; [ now subst j | ].
+  now subst j.
+}
+destruct i. {
+  cbn - [ option_eqb ] in Hij.
+...
+apply glop with (d := a) in Hj.
+cbn in Hj.
+injection Hj; clear Hj; intros Hj.
 ...
 Theorem permutation_assoc_loop_permutation_assoc_loop_inv : ∀ A (eqb : A → _),
   equality eqb →
