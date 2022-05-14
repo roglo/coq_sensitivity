@@ -583,12 +583,13 @@ destruct j. {
   rewrite map_length, app_length in Hsome; cbn in Hsome.
   subst l.
 Theorem glop : ∀ A (eqb : A → _),
+  equality eqb →
   ∀ d la lb i j,
   permutation eqb la lb
   → ff_app (permutation_assoc_loop eqb la (map Some lb)) i = j
   → nth i la d = nth j lb d.
 Proof.
-intros * Hpab Hij.
+intros * Heqb * Hpab Hij.
 revert d lb i j Hpab Hij.
 induction la as [| a]; intros; cbn. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -598,6 +599,60 @@ induction la as [| a]; intros; cbn. {
 }
 destruct i. {
   cbn - [ option_eqb ] in Hij.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    specialize (H1 (Some a)).
+    cbn in H1.
+    rewrite (equality_refl Heqb) in H1.
+    assert (H : Some a ∈ map Some lb). {
+      apply in_map_iff.
+      exists a; split; [ easy | ].
+      specialize (proj1 (permutation_in Heqb Hpab a)) as H2.
+      apply (H2 (or_introl eq_refl)).
+    }
+    now specialize (H1 H); clear H.
+  }
+  cbn in Hij; subst j.
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & Hx & Hsome).
+  cbn in Hx.
+  destruct x as [x| ]; [ | easy ].
+  apply Heqb in Hx; subst x.
+  assert (H : nth (length bef) (map Some lb) None = Some a). {
+    rewrite Hsome.
+    rewrite app_nth2; [ | now unfold ge ].
+    now rewrite Nat.sub_diag.
+  }
+  rewrite (List_map_nth' d) in H. 2: {
+    apply (f_equal length) in Hsome.
+    rewrite map_length, app_length in Hsome; cbn in Hsome.
+    flia Hsome.
+  }
+  now injection H; clear H; intros.
+}
+cbn - [ option_eqb ] in Hij.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 (Some a)).
+  cbn in H1.
+  rewrite (equality_refl Heqb) in H1.
+  assert (H : Some a ∈ map Some lb). {
+    apply in_map_iff.
+    exists a; split; [ easy | ].
+    specialize (proj1 (permutation_in Heqb Hpab a)) as H2.
+    apply (H2 (or_introl eq_refl)).
+  }
+  now specialize (H1 H); clear H.
+}
+cbn in Hij; subst j.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hsome).
+cbn in Hx.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in Hx; subst x.
+rewrite fold_ff_app.
 ...
 apply glop with (d := a) in Hj.
 cbn in Hj.
