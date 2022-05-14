@@ -553,6 +553,13 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
+destruct la as [| a]; [ easy | ].
+cbn - [ option_eqb ].
+rewrite fold_ff_app.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
 Theorem permutation_assoc_loop_permutation_assoc_loop_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ lao lbo i,
@@ -577,10 +584,120 @@ cbn in Hpab, Hab.
 cbn - [ option_eqb map ].
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
-  cbn in Hpab.
-  cbn.
-  destruct i; cbn. {
-(* ouais, non, ça a pas l'air d'être bon *)
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 (Some a)).
+  cbn in H1.
+  rewrite (equality_refl Heqb) in H1.
+  assert (H : Some a ∈ map Some (filter_Some lbo)). {
+    apply in_map_iff.
+    exists a; split; [ easy | ].
+    specialize (proj1 (permutation_in Heqb Hpab a)) as H2.
+    apply (H2 (or_introl eq_refl)).
+  }
+  now specialize (H1 H); clear H.
+}
+cbn.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hsome).
+cbn in Hx.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in Hx; subst b.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a) (filter_Some lbo)) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & Hx & Hfil).
+apply Heqb in Hx; subst x.
+rewrite Hfil in Hsome |-*.
+rewrite map_app in Hsome; cbn in Hsome.
+assert (H : map Some bef' = bef). {
+  clear Hfil Hpab.
+  revert bef' Hbef' Hsome.
+  induction bef as [| b]; intros. {
+    destruct bef' as [| b']; [ easy | exfalso ].
+    cbn in Hsome.
+    injection Hsome; clear Hsome; intros Hsome H; subst b'.
+    specialize (Hbef' a (or_introl eq_refl)) as H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hsome.
+  destruct bef' as [| b']. {
+    exfalso.
+    cbn in Hsome.
+    injection Hsome; clear Hsome; intros Hsome H; subst b.
+    specialize (Hbef _ (or_introl eq_refl)) as H1; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hsome |-*.
+  injection Hsome; clear Hsome; intros Hsome H; subst b.
+  f_equal.
+  apply IHbef; [ | | easy ]. {
+    intros bo Hbo.
+    apply (Hbef bo (or_intror Hbo)).
+  } {
+    intros b Hb.
+    now apply Hbef'; right.
+  }
+}
+subst bef.
+rewrite map_length.
+apply app_inv_head in Hsome.
+injection Hsome; clear Hsome; intros; subst aft.
+rename bef' into bef; rename aft' into aft.
+remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
+destruct j. {
+  revert i Hab Hj.
+  induction bef as [| b]; intros. {
+    cbn in Hj.
+    rewrite (equality_refl Heqb) in Hj.
+    cbn in Hj.
+    destruct i; [ easy | exfalso ].
+    rewrite permutation_assoc_loop_cons_None in Hj.
+    rewrite (List_map_nth' 0) in Hj; [ easy | ].
+    rewrite (permutation_assoc_loop_length Heqb). 2: {
+      rewrite filter_Some_map_Some.
+      now apply permutation_sym.
+    }
+    apply Nat.succ_lt_mono in Hab.
+    now rewrite (permutation_length Heqb Hpab) in Hab.
+  }
+  cbn - [ option_eqb ] in Hj.
+  unfold option_eqb in Hj at 1.
+  rewrite Hbef' in Hj; [ | now left ].
+  remember (extract _ _) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef', x), aft')| ]. 2: {
+    clear Hj; cbn.
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    cbn - [ option_eqb ] in H1.
+    specialize (H1 (Some b)) as H2.
+    assert (H : Some b ∈ map Some (filter_Some lao)). {
+      apply in_map_iff.
+      exists b; split; [ easy | ].
+      now apply (permutation_in Heqb Hpab); cbn; left.
+    }
+    specialize (H2 H); clear H; cbn in H2.
+    now rewrite (equality_refl Heqb) in H2.
+  }
+  cbn in Hj.
+  destruct i; [ easy | ].
+  cbn; f_equal.
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef'' & Hx & Hmap).
+  cbn in Hx.
+  destruct x as [x| ]; [ | easy ].
+  apply Heqb in Hx; subst x.
+(* c'est possible que je puisse y arriver ; pas sûr ;
+   en tous cas, c'est compliqué, par cette voie *)
+...
+destruct j. {
+  generalize Hsome; intros H.
+  apply (f_equal length) in H.
+  rewrite map_length, app_length in H; cbn in H.
+  destruct bef as [| b]. {
+    cbn in Hsome, H; clear Hbef.
+    destruct i; [ easy | exfalso ].
 ...
 specialize permutation_assoc_loop_permutation_assoc_loop_inv as H1.
 specialize (H1 _ eqb (map Some la) (map Some lb)).
