@@ -632,27 +632,70 @@ destruct i. {
   now injection H; clear H; intros.
 }
 cbn - [ option_eqb ] in Hij.
+(**)
+apply permutation_cons_l_iff in Hpab.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hsome).
+cbn in Hx.
+apply Heqb in Hx; subst x.
+subst lb.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
   specialize (H1 (Some a)).
   cbn in H1.
   rewrite (equality_refl Heqb) in H1.
-  assert (H : Some a ∈ map Some lb). {
+  assert (H : Some a ∈ map Some (bef ++ a :: aft)). {
     apply in_map_iff.
     exists a; split; [ easy | ].
-    specialize (proj1 (permutation_in Heqb Hpab a)) as H2.
-    apply (H2 (or_introl eq_refl)).
+    now apply in_or_app; right; left.
   }
   now specialize (H1 H); clear H.
 }
 cbn in Hij; subst j.
 apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & Hx & Hsome).
+destruct Hlxl as (Hbef' & Hx & Hsome).
 cbn in Hx.
 destruct x as [x| ]; [ | easy ].
 apply Heqb in Hx; subst x.
-rewrite fold_ff_app.
+rewrite map_app in Hsome; cbn in Hsome.
+assert (H : map Some bef = bef'). {
+  clear Hpab.
+  revert bef Hbef Hsome.
+  induction bef' as [| b']; intros. {
+    destruct bef as [| b]; [ easy | exfalso ].
+    cbn in Hsome.
+    injection Hsome; clear Hsome; intros Hsome H; subst b.
+    specialize (Hbef a (or_introl eq_refl)) as H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hsome.
+  destruct bef as [| b]. {
+    exfalso.
+    cbn in Hsome.
+    injection Hsome; clear Hsome; intros Hsome H; subst b'.
+    specialize (Hbef' _ (or_introl eq_refl)) as H1; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hsome |-*.
+  injection Hsome; clear Hsome; intros Hsome H; subst b'.
+  f_equal.
+  apply IHbef'; [ | | easy ]. {
+    intros bo Hbo.
+    apply (Hbef' bo (or_intror Hbo)).
+  } {
+    intros b' Hb'.
+    now apply Hbef; right.
+  }
+}
+subst bef'.
+apply app_inv_head in Hsome.
+injection Hsome; clear Hsome; intros; subst aft'.
+remember (permutation_assoc_loop _ _ _) as lbo eqn:Hlbo; symmetry in Hlbo.
+destruct (lt_dec (nth i lbo 0) (length bef)) as [Hib| Hib]. {
+  rewrite app_nth1; [ | easy ].
 ...
 apply glop with (d := a) in Hj.
 cbn in Hj.
