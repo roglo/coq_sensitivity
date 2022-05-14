@@ -415,6 +415,78 @@ apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
 
+Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lbo i,
+  permutation eqb la (filter_Some lbo)
+  → i < length la
+  → nth i (permutation_assoc_loop eqb la lbo) 0 < length lbo.
+Proof.
+intros * Heqb * Hpab Hla.
+revert lbo i Hpab Hla.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  rewrite List_nth_nil.
+  destruct lbo; [ | now cbn ].
+  cbn in Hpab.
+  now apply permutation_nil_r in Hpab.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+cbn in H.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in H; subst b.
+destruct i. {
+  rewrite List_nth_0_cons.
+  apply (f_equal length) in Hlb.
+  rewrite app_length in Hlb; cbn in Hlb.
+  rewrite Hlb; flia.
+}
+cbn in Hla; apply Nat.succ_lt_mono in Hla.
+rewrite List_nth_succ_cons.
+replace (length lbo) with (length (bef ++ None :: aft)). 2: {
+  rewrite Hlb.
+  now do 2 rewrite app_length.
+}
+apply IHla; [ | easy ].
+subst lbo.
+rewrite filter_Some_inside in Hpab |-*.
+apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
+Qed.
+
+Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb i,
+  permutation eqb la lb
+  → i < length la
+  → nth i (permutation_assoc eqb la lb) 0 < length la.
+Proof.
+intros * Heqb * Hpab Hla.
+unfold permutation_assoc.
+rewrite (permutation_length Heqb Hpab).
+rewrite <- (map_length Some lb).
+apply (permutation_assoc_loop_ub Heqb); [ | easy ].
+now rewrite filter_Some_map_Some.
+Qed.
+
+Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
+  ∀ la lbo,
+  permutation_assoc_loop eqb la (None :: lbo) =
+  map S (permutation_assoc_loop eqb la lbo).
+Proof.
+intros.
+revert lbo.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+unfold option_eqb at 1.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+cbn; f_equal.
+apply IHla.
+Qed.
+
 (* to be completed if required
    (uses "permutation" instead of "Permutation")
 Theorem permutation_permut : ∀ la lb,
@@ -461,69 +533,76 @@ destruct j as [j| ]. 2: {
     specialize (permutation_length Heqb Hpab) as Hlab.
     rewrite Hlab.
     unfold l'.
-Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb i,
-  length la = length lb
-  → i < length la
-  → nth i (permutation_assoc eqb la lb) 0 < length la.
-Proof.
-intros * Heqb * Hlab Hla.
-unfold permutation_assoc.
-...
-Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lbo i,
-  permutation eqb la (filter_Some lbo)
-  → i < length la
-  → nth i (permutation_assoc_loop eqb la lbo) 0 < length la.
-Proof.
-intros * Heqb * Hlab Hla.
-revert lbo i Hlab Hla.
-induction la as [| a]; intros; [ easy | ].
-cbn - [ option_eqb ].
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | now rewrite List_nth_nil ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-cbn in H.
-destruct x as [b| ]; [ | easy ].
-apply Heqb in H; subst b.
-destruct i. {
-  rewrite List_nth_0_cons.
-  apply (f_equal length) in Hlb.
-  rewrite app_length in Hlb; cbn in Hlb.
-  apply (permutation_length Heqb) in Hlab.
-  cbn in Hlab.
-  rewrite Hlab.
-Search filter_Some.
-(* ouais bin ça va pas, ça *)
-...
-Search (length (filter_Some _)).
-
-  rewrite Hlab, Hlb.
-}
-rewrite List_nth_succ_cons.
-transitivity (length la); [ | easy ].
-...
-apply IHla.
-...
-  rewrite nth_nil.
-  destruct lb as [| b]; [ easy | ].
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (permutation_in Heqb Hpab) as H2.
-  specialize (H1 (Some a)).
-  assert (H : Some a ∈ map Some (b :: lb)). {
-    now apply in_map, H2; left.
+    apply (permutation_sym Heqb) in Hpab.
+    apply (nth_permutation_assoc_ub Heqb); [ easy | congruence ].
   }
   specialize (H1 H); clear H.
-  cbn in H1.
-  now rewrite (equality_refl Heqb) in H1.
-}
-... continue
-    apply nth_permutation_assoc_ub.
-    congruence.
+  apply Nat.eqb_neq in H1.
+  exfalso; apply H1; clear H1.
+  unfold l, l'; symmetry.
+  do 2 rewrite fold_ff_app.
+Search (nth (nth _ (permutation_assoc _ _ _) _)).
+Search (ff_app (permutation_assoc _ _ _) _).
+Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb i,
+  permutation eqb la lb
+  → i < length la
+  → ff_app (permutation_assoc eqb la lb)
+      (ff_app (permutation_assoc eqb lb la) i) = i.
+Proof.
+intros * Heqb * Hpab Hla.
+unfold permutation_assoc.
+Inspect 2.
+Theorem permutation_assoc_loop_permutation_assoc_loop_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ lao lbo i,
+  permutation eqb (filter_Some lao) (filter_Some lbo)
+  → i < length (filter_Some lao)
+  → ff_app (permutation_assoc_loop eqb (filter_Some lao) lbo)
+      (ff_app (permutation_assoc_loop eqb (filter_Some lbo) lao) i) = i.
+Proof.
+intros * Heqb * Hpab Hab.
+revert lbo i Hpab Hab.
+induction lao as [| ao]; intros; [ easy | cbn ].
+destruct ao as [a| ]. 2: {
+  rewrite fold_ff_app.
+  cbn in Hpab, Hab.
+  rewrite permutation_assoc_loop_cons_None.
+  unfold ff_app.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite (permutation_assoc_loop_length Heqb). 2: {
+      now apply (permutation_sym Heqb).
+    }
+    now rewrite <- (permutation_length Heqb Hpab).
   }
+  do 2 rewrite fold_ff_app.
+(* ah bon, bin ça doit être faux, alors *)
+...
+specialize permutation_assoc_loop_permutation_assoc_loop_inv as H1.
+specialize (H1 _ eqb (map Some la) (map Some lb)).
+do 2 rewrite filter_Some_map_Some in H1.
+rewrite map_length in H1.
+now apply H1.
+...
+intros * Heqb * Hlab Hla.
+revert lb i Hlab Hla.
+induction la as [| a]; intros; cbn; [ easy | ].
+destruct lb as [| b]; [ easy | cbn ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+  rewrite (equality_refl Heqb); cbn.
+  destruct i; [ easy | ].
+  rewrite fold_ff_app.
+...
+Search (permutation_assoc _ _ []).
+Theorem permutation_assoc_nil_r : ∀ A (eqb : A → _) la,
+  permutation_assoc eqb la [] = [].
+Proof. now intros; destruct la. Qed.
+rewrite permutation_assoc_nil_r; cbn.
+...
+apply permutation_assoc_permutation_assoc_inv.
 ...
 intros * Heqb * Hpab.
 revert lb Hpab.
