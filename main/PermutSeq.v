@@ -553,14 +553,17 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-Inspect 2.
 Theorem permutation_assoc_loop_permutation_assoc_loop_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ lao lbo i,
   permutation eqb (filter_Some lao) (filter_Some lbo)
   → i < length (filter_Some lao)
-  → ff_app (permutation_assoc_loop eqb (filter_Some lao) lbo)
-      (ff_app (permutation_assoc_loop eqb (filter_Some lbo) lao) i) = i.
+  → ff_app
+      (permutation_assoc_loop eqb (filter_Some lao)
+          (map Some (filter_Some lbo)))
+      (ff_app
+         (permutation_assoc_loop eqb (filter_Some lbo)
+            (map Some (filter_Some lao))) i) = i.
 Proof.
 intros * Heqb * Hpab Hab.
 revert lbo i Hpab Hab.
@@ -568,16 +571,16 @@ induction lao as [| ao]; intros; [ easy | cbn ].
 destruct ao as [a| ]. 2: {
   rewrite fold_ff_app.
   cbn in Hpab, Hab.
-  rewrite permutation_assoc_loop_cons_None.
-  unfold ff_app.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite (permutation_assoc_loop_length Heqb). 2: {
-      now apply (permutation_sym Heqb).
-    }
-    now rewrite <- (permutation_length Heqb Hpab).
-  }
-  do 2 rewrite fold_ff_app.
-(* ah bon, bin ça doit être faux, alors *)
+  now apply IHlao.
+}
+cbn in Hpab, Hab.
+cbn - [ option_eqb map ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  cbn in Hpab.
+  cbn.
+  destruct i; cbn. {
+(* ouais, non, ça a pas l'air d'être bon *)
 ...
 specialize permutation_assoc_loop_permutation_assoc_loop_inv as H1.
 specialize (H1 _ eqb (map Some la) (map Some lb)).
