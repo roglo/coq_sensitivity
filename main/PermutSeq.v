@@ -560,6 +560,23 @@ remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
   cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)) as H2; cbn in H2.
+  assert (H : Some a ∈ map Some lb). {
+    apply in_map_iff.
+    exists a; split; [ easy | ].
+    specialize (proj1 (permutation_in Heqb Hpab a)) as H3.
+    now apply H3; left.
+  }
+  specialize (H2 H); clear H.
+  now rewrite (equality_refl Heqb) in H2.
+}
+cbn.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Hsome).
+cbn in Hx.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in Hx; subst b.
+...
 Theorem permutation_assoc_loop_permutation_assoc_loop_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ lao lbo i,
