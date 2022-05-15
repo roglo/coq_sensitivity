@@ -1577,6 +1577,17 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
+Theorem List_combine_map_r : ∀ A B C (la : list A) (lb : list B) (f : B → C),
+  combine la (map f lb) = map (λ ab, (fst ab, f (snd ab))) (combine la lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal.
+apply IHla.
+Qed.
+
 (* common for summations and products *)
 
 Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
