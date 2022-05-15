@@ -1250,6 +1250,18 @@ intros * Heqb *.
 now apply Heqb.
 Qed.
 
+Theorem equality_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a b : A),
+  { a = b } + { a ≠ b }.
+Proof.
+intros.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now left; apply Heqb in Hab | right ].
+apply Bool.not_true_iff_false in Hab.
+intros H2; apply Hab; clear Hab.
+subst b.
+now apply Heqb.
+Qed.
+
 Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
   { a ∈ la } + { a ∉ la }.
 Proof.
@@ -1268,6 +1280,22 @@ Theorem Nat_eqb_equality : equality Nat.eqb.
 Proof.
 intros a b.
 apply Nat.eqb_eq.
+Qed.
+
+(* *)
+
+Theorem option_eq_dec : ∀ A : Type,
+  (∀ x y : A, {x = y} + {x ≠ y})
+  → (∀ x y : option A, {x = y} + {x ≠ y}).
+Proof.
+intros * Hed *.
+destruct x as [x| ]. {
+  destruct y as [y| ]; [ | now right ].
+  destruct (Hed x y) as [H1| H1]; [ now left; subst y | right ].
+  intros H; apply H1.
+  now injection H.
+}
+destruct y as [y| ]; [ now right | now left ].
 Qed.
 
 (* list_eqb *)
