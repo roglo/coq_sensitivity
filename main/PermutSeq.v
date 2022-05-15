@@ -703,13 +703,15 @@ destruct (lt_dec (nth i lbo 0) (length bef)) as [Hib| Hib]. {
   clear H1.
   apply IHla; [ easy | ].
   rewrite map_app.
-Theorem permutation_assoc_loop_cons_None' : ∀ A (eqb : A → _) la lbo1 lbo2,
-  permutation_assoc_loop eqb la (lbo1 ++ None :: lbo2) =
-  permutation_assoc_loop eqb la lbo1 ++
-  map S (permutation_assoc_loop eqb la lbo2).
+Theorem permutation_assoc_loop_cons_None' : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb1 lb2,
+  permutation_assoc_loop eqb la (map Some lb1 ++ None :: map Some lb2) =
+  permutation_assoc_loop eqb la (map Some lb1) ++
+  map S (permutation_assoc_loop eqb la (map Some lb2)).
 Proof.
-intros.
-revert lbo1 lbo2.
+intros * Heqb *.
+revert lb1 lb2.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ option_eqb ].
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -722,7 +724,115 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H2.
     cbn - [ option_eqb ] in H2.
     clear Hlxl.
-(* bof, chais pas. Est-ce que c'est juste, ce théorème, ou pas ? *)
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]; [ exfalso | easy ].
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Hb2).
+    cbn in H.
+    destruct x as [x| ]; [ | easy ].
+    apply Heqb in H; subst x.
+    specialize (H1 (Some a)).
+    assert (H : Some a ∈ map Some lb1 ++ None :: map Some lb2). {
+      apply in_or_app; right; right.
+      rewrite Hb2.
+      now apply in_or_app; right; left.
+    }
+    specialize (H1 H); clear H; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  exfalso.
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hb1).
+  cbn in H.
+  destruct x as [x| ]; [ | easy ].
+  apply Heqb in H; subst x.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ map Some lb1 ++ None :: map Some lb2). {
+    apply in_or_app; left.
+    rewrite Hb1.
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H; cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hb1).
+cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  clear Hlxl.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef', x), aft')| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H2.
+    cbn - [ option_eqb ] in H2.
+    clear Hlxl; exfalso.
+    specialize (equality_in_dec Heqb) as H3.
+    destruct (H3 a lb1) as [H4| H4]. {
+      specialize (H1 (Some a)).
+      assert (H : Some a ∈ map Some lb1). {
+        apply in_map_iff.
+        now exists a.
+      }
+      specialize (H1 H); cbn in H1.
+      now rewrite (equality_refl Heqb) in H1.
+    }
+    destruct (H3 a lb2) as [H5| H5]. {
+      specialize (H2 (Some a)).
+      assert (H : Some a ∈ map Some lb2). {
+        apply in_map_iff.
+        now exists a.
+      }
+      specialize (H2 H); cbn in H2.
+      now rewrite (equality_refl Heqb) in H2.
+    }
+    assert (H6 : Some a ∉ map Some lb1 ++ None :: map Some lb2). {
+      intros H.
+      apply in_app_or in H.
+      destruct H as [H| [H| H]]; [ | easy | ]. {
+        apply in_map_iff in H.
+        destruct H as (x & Hxa & Hx1).
+        now injection Hxa; clear Hxa; intros; subst x.
+      } {
+        apply in_map_iff in H.
+        destruct H as (x & Hxa & Hx1).
+        now injection Hxa; clear Hxa; intros; subst x.
+      }
+    }
+    rewrite Hb1 in H6; apply H6; clear H6.
+    now apply in_or_app; right; left.
+  }
+  cbn.
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Hb2).
+  cbn in H.
+  destruct x as [x| ]; [ | easy ].
+  apply Heqb in H; subst x.
+  rewrite Hb2 in Hb1.
+(* je trouve que c'est vachement compliqué, mon histoire...
+   je pourrais le finir... encore que c'est pas sûr, et en plus,
+   je ne sais pas si ça servirait...
+   je vais essayer une autre implémentation que j'ai imaginée,
+   en faisant des listes de couple valeur+position au lieu
+   de map Some *)
+...
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Hb2).
+    cbn in H.
+    destruct x as [x| ]; [ | easy ].
+    apply Heqb in H; subst x.
+    specialize (H1 (Some a)).
+    assert (H : Some a ∈ map Some lb1 ++ None :: map Some lb2). {
+      apply in_or_app; right; right.
+      rewrite Hb2.
+      now apply in_or_app; right; left.
+    }
+    specialize (H1 H); clear H; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
 ...
 induction lbo1 as [| bo]; intros; cbn. {
 ...
