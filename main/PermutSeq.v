@@ -703,11 +703,28 @@ destruct (lt_dec (nth i lbo 0) (length bef)) as [Hib| Hib]. {
   clear H1.
   apply IHla; [ easy | ].
   rewrite map_app.
+Theorem permutation_assoc_loop_cons_None' : ∀ A (eqb : A → _) la lbo1 lbo2,
+  permutation_assoc_loop eqb la (lbo1 ++ None :: lbo2) =
+  permutation_assoc_loop eqb la lbo1 ++
+  map S (permutation_assoc_loop eqb la lbo2).
+Proof.
+intros.
+revert lbo1 lbo2.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  clear Hlxl.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H2.
+    cbn - [ option_eqb ] in H2.
+    clear Hlxl.
+(* bof, chais pas. Est-ce que c'est juste, ce théorème, ou pas ? *)
 ...
-Print permutation_assoc_loop.
-Theorem permutation_assoc_loop_cons_Some : ∀ A (eqb : A → _) la lbo a b,
-  permutation_assoc_loop eqb la (Some b :: lbo) =
-  map S (permutation_assoc_loop eqb la lbo).
+induction lbo1 as [| bo]; intros; cbn. {
 ...
 permutation_assoc_loop_cons_None:
   ∀ (A : Type) (eqb : A → A → bool) (la : list A) (lbo : list (option A)),
