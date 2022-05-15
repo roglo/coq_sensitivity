@@ -308,6 +308,61 @@ Qed.
 
 (* to be moved to PermutationFun.v *)
 
+(*
+Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
+  match lb with
+  | [] => []
+  | b :: lb' =>
+      if eqb a b then i :: relation_elem eqb lb' (S i) a
+      else relation_elem eqb lb' (S i) a
+  end.
+
+Definition relation {A} (eqb : A → _) la lb :=
+  map (relation_elem eqb lb 0) la.
+
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(relation eqb la lb)).
+
+Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
+  if existsb (eqb a) excl then
+    match la with
+    | [] => a
+    | b :: lb => first_non_excl eqb excl b lb
+    end
+  else a.
+
+Fixpoint canon_assoc_of_rel_loop {A} (eqb : A → _) excl lla :=
+  match lla with
+  | [] => []
+  | [] :: _ => []
+  | (a :: la) :: lla' =>
+      let b := first_non_excl eqb excl a la in
+      b :: canon_assoc_of_rel_loop eqb (b :: excl) lla'
+  end.
+
+Definition canon_assoc_of_rel {A} (eqb : A → _) :=
+  canon_assoc_of_rel_loop eqb [].
+
+Definition canon_assoc {A} (eqb : A → _) la lb :=
+  canon_assoc_of_rel Nat.eqb (relation eqb la lb).
+
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(canon_assoc eqb la lb)).
+
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(canon_assoc eqb la lb,
+ canon_assoc eqb lb la)).
+*)
+
 Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
   match (ao, bo) with
   | (Some a, Some b) => eqb a b
