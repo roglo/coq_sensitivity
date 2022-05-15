@@ -697,17 +697,13 @@ injection Hsome; clear Hsome; intros; subst aft'.
 remember (permutation_assoc_loop _ _ _) as lbo eqn:Hlbo; symmetry in Hlbo.
 destruct (lt_dec (nth i lbo 0) (length bef)) as [Hib| Hib]. {
   rewrite app_nth1; [ | easy ].
-  clear Hpab.
-  induction bef as [| b]; [ easy | ].
-  remember (nth i lbo 0) as j eqn:Hj; symmetry in Hj.
-  destruct j. {
-    cbn in Hlbo |-*.
-    destruct la as [| a']. {
-      cbn in Hlbo.
-      subst lbo.
-      clear Hj.
+  specialize app_nth1 as H1.
+  specialize (H1 _ bef aft).
+  rewrite <- H1; [ | easy ].
+  clear H1.
+  apply IHla; [ easy | ].
+  rewrite map_app.
 ...
-      cbn in Hlbo.
 Print permutation_assoc_loop.
 Theorem permutation_assoc_loop_cons_Some : ∀ A (eqb : A → _) la lbo a b,
   permutation_assoc_loop eqb la (Some b :: lbo) =
