@@ -1588,6 +1588,21 @@ f_equal.
 apply IHla.
 Qed.
 
+Theorem List_combine_app_app : ∀ A B (la1 la2 : list A) (lb1 lb2 : list B),
+  length la1 = length lb1
+  → combine (la1 ++ la2) (lb1 ++ lb2) = combine la1 lb1 ++ combine la2 lb2.
+Proof.
+intros * Hlab.
+revert la2 lb1 lb2 Hlab.
+induction la1 as [| a1]; intros; cbn. {
+  now symmetry in Hlab; apply length_zero_iff_nil in Hlab; subst lb1.
+}
+destruct lb1 as [| b]; [ easy | ].
+cbn in Hlab; apply Nat.succ_inj in Hlab.
+cbn; f_equal.
+now apply IHla1.
+Qed.
+
 (* common for summations and products *)
 
 Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)

@@ -350,7 +350,6 @@ cbn; f_equal; apply IHl1.
 Qed.
 *)
 
-(* to be completed
 Theorem permutation_assoc_loop_length : ∀ A B (eqb : A → _),
   equality eqb →
   ∀ la (lbi : list (A * B)),
@@ -393,7 +392,6 @@ subst lbi.
 rewrite map_app in Hpab |-*; cbn in Hpab.
 now specialize (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
-*)
 
 (*
 Theorem filter_Some_map_Some : ∀ A (la : list A),
@@ -412,7 +410,6 @@ Theorem permutation_permutation_pair_r : ∀ A (eqb : A → _),
   → permutation eqb la (map fst (f lb)).
 *)
 
-(* to be completed
 Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -454,14 +451,76 @@ destruct lxl as [((bef', x), aft')| ]. 2: {
     destruct i; [ now subst b; left | right ].
     cbn in Hi; apply Nat.succ_lt_mono in Hi.
     rewrite <- seq_shift.
-Search (combine _ (map _ _)).
-...
+    rewrite List_combine_map_r.
+    apply in_map_iff.
+    exists (a, i); split; [ easy | ].
+    now apply IHlb.
+  }
+  specialize (H1 H); clear H.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb').
+apply Heqb in H; subst x.
+subst lb.
+rewrite app_length in Hlb'.
+cbn in Hlb'.
+rewrite List_seq_cut with (i := length bef) in Hlb'. 2: {
+  apply in_seq.
+  split; [ easy | cbn; flia ].
+}
+cbn in Hlb'.
+rewrite Nat.sub_0_r in Hlb'.
+rewrite <- Nat.add_succ_comm, Nat.add_comm, Nat.add_sub in Hlb'.
+rewrite List_combine_app_app in Hlb'; [ | now rewrite seq_length ].
+rewrite map_app in Hlb'.
+cbn in Hlb'.
+apply List_app_eq_app' in Hlb'. 2: {
+  rewrite map_length, combine_length, seq_length, Nat.min_id.
+  clear Hpab.
+  revert bef' Hbef' Hlb'.
+  induction bef as [| b]; intros; cbn. {
+    cbn in Hlb'.
+    destruct bef' as [| b']; [ easy | exfalso ].
+    injection Hlb'; clear Hlb'; intros Hlb' H; subst b'.
+    specialize (Hbef' a (or_introl eq_refl)).
+    now rewrite (equality_refl Heqb) in Hbef'.
+  }
+  cbn in Hlb'.
+  destruct bef' as [| b']; [ exfalso | ]. {
+    injection Hlb'; clear Hlb'; intros Hlb' H; subst b.
+    specialize (Hbef a (or_introl eq_refl)).
+    now rewrite (equality_refl Heqb) in Hbef.
+  }
+  injection Hlb'; clear Hlb'; intros Hlb' H; subst b'.
+  cbn; f_equal.
+  apply IHbef. {
+    now intros c Hc; apply Hbef; right.
+  } {
+    now intros c Hc; apply Hbef'; right.
+  }
+  rewrite <- Hlb'.
+  f_equal; [ | f_equal ]. {
+    rewrite <- seq_shift.
+    rewrite List_combine_map_r.
+    now rewrite map_map.
+  }
+  symmetry; rewrite <- seq_shift.
+  rewrite List_combine_map_r.
+  now rewrite map_map.
+}
+destruct Hlb' as (Hlb' & Haft).
+injection Haft; clear Haft; intros Haft.
+subst bef' aft'.
+rewrite <- seq_shift.
 rewrite List_combine_map_r.
-...
-
-now rewrite filter_Some_map_Some.
+rewrite map_map.
+rewrite <- map_app.
+rewrite <- List_combine_app_app; [ | now rewrite seq_length ].
+rewrite <- seq_app.
+rewrite <- app_length.
+now apply IHla.
 Qed.
-*)
 
 (*
 Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
@@ -504,7 +563,9 @@ subst lbo.
 rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
+*)
 
+(* to be completed
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -515,11 +576,14 @@ Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
 rewrite (permutation_length Heqb Hpab).
+...
 rewrite <- (map_length Some lb).
 apply (permutation_assoc_loop_ub Heqb); [ | easy ].
 now rewrite filter_Some_map_Some.
 Qed.
+*)
 
+(*
 Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
   ∀ la lbo,
   permutation_assoc_loop eqb la (None :: lbo) =
@@ -579,12 +643,12 @@ destruct j as [j| ]. 2: {
   specialize (H1 (nth i l' 0)).
   assert (H : nth i l' 0 < length l). {
     unfold l.
-...
     rewrite (permutation_assoc_length Heqb); [ | easy ].
     specialize (permutation_length Heqb Hpab) as Hlab.
     rewrite Hlab.
     unfold l'.
     apply (permutation_sym Heqb) in Hpab.
+...
     apply (nth_permutation_assoc_ub Heqb); [ easy | congruence ].
   }
   specialize (H1 H); clear H.
