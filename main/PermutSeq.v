@@ -482,7 +482,7 @@ intros lb Hlb.
 now apply Hlla; right.
 Qed.
 
-Theorem relation_elem_neq : ∀ A (eqb : A → _),
+Theorem relation_elem_neq_nil : ∀ A (eqb : A → _),
   equality eqb →
   ∀ a i lb, a ∈ lb → relation_elem eqb lb i a ≠ [].
 Proof.
@@ -532,13 +532,13 @@ subst lb.
 cbn in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   revert Hlc.
-  apply (relation_elem_neq Heqb).
+  apply (relation_elem_neq_nil Heqb).
   now apply in_or_app; right; left.
 }
 apply in_map_iff in Hlc.
 destruct Hlc as (c & Hac & Hc).
 revert Hac.
-apply (relation_elem_neq Heqb).
+apply (relation_elem_neq_nil Heqb).
 apply (permutation_in Heqb Hpab) in Hc.
 apply in_app_or in Hc.
 apply in_or_app.
@@ -765,9 +765,22 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-destruct la as [| a]; [ easy | ].
-cbn - [ option_eqb ].
+revert lb i Hpab Hla.
+induction la as [| a]; intros; [ easy | cbn ].
 rewrite fold_ff_app.
+remember (relation_elem eqb lb 0 a) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  exfalso; revert Hlc.
+  apply (relation_elem_neq_nil Heqb).
+  now apply (permutation_in Heqb Hpab); left.
+}
+cbn.
+remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
+destruct j. {
+Search (first_non_excl).
+Print canon_assoc_of_rel.
+Print canon_assoc_of_rel_loop.
+...
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
