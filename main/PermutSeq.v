@@ -703,6 +703,33 @@ Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
   first_non_excl eqb [] a la = a.
 Proof. now intros; destruct la. Qed.
 
+Theorem relation_elem_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc a c i,
+  (∀ x, x ∈ la → eqb a x = false)
+  → relation_elem eqb (la ++ a :: lb) i a = c :: lc
+  → c = i + length la.
+Proof.
+intros * Heqb * Hla Hlc.
+revert lb lc a c i Hla Hlc.
+induction la as [| b]; intros; cbn in Hlc. {
+  rewrite (equality_refl Heqb) in Hlc.
+  injection Hlc; clear Hlc; intros Hlc H; subst c.
+  symmetry; apply Nat.add_0_r.
+}
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  injection Hlc; clear Hlc; intros Hlc H; subst c.
+  apply Heqb in Hab; subst b.
+  specialize (Hla _ (or_introl eq_refl)).
+  now rewrite (equality_refl Heqb) in Hla.
+}
+cbn; rewrite <- Nat.add_succ_comm.
+apply IHla in Hlc; [ easy | ].
+intros x Hx.
+now apply Hla; right.
+Qed.
+
 (* to be completed if required
    (uses "permutation" instead of "Permutation")
 Theorem permutation_permut : ∀ la lb,
@@ -788,38 +815,23 @@ destruct lc as [| c]. {
   now apply in_or_app; right; left.
 }
 cbn.
-remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
 rewrite first_non_excl_nil_l.
-unfold canon_assoc_of_rel, relation in Hj.
-cbn in Hj.
-Print relation_elem.
-Search relation_elem.
-Theorem relation_elem_inside : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb lc a c i,
-  relation_elem eqb (la ++ a :: lb) i a = c :: lc
-  → c = i + length la.
-Proof.
-intros * Heqb * Hlc.
-revert lb lc a c i Hlc.
-induction la as [| b]; intros; cbn in Hlc. {
-  rewrite (equality_refl Heqb) in Hlc.
-  injection Hlc; clear Hlc; intros Hlc H; subst c.
-  symmetry; apply Nat.add_0_r.
-}
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  injection Hlc; clear Hlc; intros Hlc H; subst c.
-  exfalso.
-  clear b Hab.
-Print relation_elem.
-...
-  apply Heqb in Hab; subst b.
-  cbn; rewrite <- Nat.add_succ_comm.
-...
 generalize Hlc; intros H.
-apply relation_elem_inside in H; cbn in H.
-subst c.
+apply (relation_elem_inside Heqb) in H; [ | easy ].
+cbn in H; subst c.
+remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
+cbn in Hj.
+destruct j. {
+  induction bef as [| b]. {
+    cbn in Hlc, Hj.
+    rewrite (equality_refl Heqb) in Hlc, Hj.
+    injection Hlc; clear Hlc; intros Hlc.
+    destruct i; [ easy | exfalso ].
+    cbn in Hj, Hla, Hpab.
+    apply Nat.succ_lt_mono in Hla.
+    specialize (IHla aft i Hpab Hla) as H1.
+    unfold canon_assoc_of_rel in H1.
+    unfold relation in H1.
 ...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 ...
