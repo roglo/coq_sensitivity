@@ -604,7 +604,62 @@ intros c Hc.
 now apply Hla; right.
 Qed.
 
-(* to be completed
+Theorem nth_canon_assoc_of_rel_loop_ub :
+  ∀ excl lla i len,
+  len ≠ 0
+  → (∀ la, la ∈ lla → ∀ a, a ∈ la → a < len)
+  → i < length lla
+  → nth i (canon_assoc_of_rel_loop eqb excl lla) 0 < len.
+Proof.
+intros * Hlen Hlla Hi.
+revert i len excl Hlen Hi Hlla.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct la as [| a]. {
+  rewrite List_nth_nil; flia Hlen.
+}
+destruct i. {
+  cbn - [ In ] in Hlla |-*; clear Hi.
+  apply first_non_excl_ub.
+  intros b Hb.
+  apply (Hlla (a :: la)); [ now left | easy ].
+}
+cbn in Hi |-*.
+apply Nat.succ_lt_mono in Hi.
+apply IHlla; [ easy | easy | ].
+intros lb Hlb b Hb.
+apply (Hlla lb); [ now right | easy ].
+Qed.
+
+Theorem relation_elem_ub : ∀ A (eqb : A → _),
+  ∀ la c i a,
+  a ∈ relation_elem eqb la i c
+  → a < i + length la.
+Proof.
+intros * Ha.
+revert i a Ha.
+induction la as [| b]; intros; [ easy | ].
+cbn in Ha |-*.
+rewrite <- Nat.add_succ_comm.
+destruct (eqb c b). {
+  destruct Ha as [Ha| Ha]; [ subst a; flia | ].
+  now apply IHla.
+}
+now apply IHla.
+Qed.
+
+Theorem relation_ub : ∀ A (eqb : A → _),
+  ∀ la lb lc,
+  lc ∈ relation eqb la lb
+  → ∀ a, a ∈ lc → a < length lb.
+Proof.
+intros * Hlc * Ha.
+unfold relation in Hlc.
+apply in_map_iff in Hlc.
+destruct Hlc as (c & Hlc & Hc).
+subst lc.
+now apply relation_elem_ub in Ha.
+Qed.
+
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -614,52 +669,19 @@ Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-(*
-rewrite (permutation_length Heqb Hpab).
-*)
 unfold canon_assoc_of_rel.
-Print canon_assoc_of_rel_loop.
-Theorem nth_canon_assoc_of_rel_loop_ub :
-  ∀ excl lla i,
-  (∀ la, la ∈ lla → ∀ a, a ∈ la → a < length lla)
-  → i < length lla
-  → nth i (canon_assoc_of_rel_loop eqb excl lla) 0 < length lla.
-Proof.
-intros * Hlla Hi.
-revert i excl Hi.
-induction lla as [| la]; intros; [ easy | cbn ].
-destruct la as [| a]; [ now rewrite List_nth_nil | ].
-destruct i. {
-  cbn - [ In ] in Hlla |-*; clear Hi.
-  eapply lt_le_trans; [ | apply le_refl ].
-  apply first_non_excl_ub.
-  intros b Hb.
-  apply (Hlla (a :: la)); [ now left | easy ].
-}
-cbn in Hi |-*.
-apply Nat.succ_lt_mono in Hi.
-apply lt_le_trans with (m := length lla); [ | flia ].
-apply IHlla; [ | easy ].
-intros lb Hlb b Hb.
-specialize (Hlla lb (or_intror Hlb) b Hb) as H1.
-cbn in H1.
-...
 rewrite <- (relation_length eqb) with (lb := lb).
-apply nth_canon_assoc_of_rel_loop_ub; [ | now rewrite relation_length ].
+apply nth_canon_assoc_of_rel_loop_ub; [ | | now rewrite relation_length ]. {
+  rewrite relation_length.
+  now destruct la.
+}
 intros lc Hlc a Ha.
 rewrite relation_length.
 rewrite (permutation_length Heqb Hpab).
-Print relation.
-Print relation_elem.
-...
-etransitivity.
-apply first_non_excl_ub.
-...
-rewrite <- (map_length Some lb).
-apply (permutation_assoc_loop_ub Heqb); [ | easy ].
-now rewrite filter_Some_map_Some.
+now apply relation_ub with (a := a) in Hlc.
 Qed.
 
+(*
 Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
   ∀ la lbo,
   permutation_assoc_loop eqb la (None :: lbo) =
