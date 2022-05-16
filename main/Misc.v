@@ -33,7 +33,7 @@ Notation "∃! x .. y , p" :=
 
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 
-Theorem match_id : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
+Theorem Tauto_match_nat_same : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
 
 Theorem List_fold_left_map :

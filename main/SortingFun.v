@@ -3182,7 +3182,7 @@ intros * Hia Hn.
 revert i.
 induction lrank as [| ib]; intros. {
   destruct i; [ easy | cbn ].
-  rewrite match_id; flia Hia.
+  rewrite Tauto_match_nat_same; flia Hia.
 }
 cbn - [ nth ].
 remember (rel (f ia) (f ib)) as x eqn:Hx.

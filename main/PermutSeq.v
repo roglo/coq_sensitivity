@@ -704,7 +704,7 @@ Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
 Proof. now intros; destruct la. Qed.
 
 (* to be completed if required
-   (uses "permutation" instead of "Permutation") *)
+   (uses "permutation" instead of "Permutation")
 Theorem permutation_permut : ∀ la lb,
   permutation Nat.eqb la lb
   → is_permut_list la
@@ -772,16 +772,64 @@ unfold permutation_assoc.
 revert lb i Hpab Hla.
 induction la as [| a]; intros; [ easy | cbn ].
 rewrite fold_ff_app.
-remember (relation_elem eqb lb 0 a) as lc eqn:Hlc; symmetry in Hlc.
+(**)
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+remember (relation_elem eqb (bef ++ a :: aft) 0 a) as lc eqn:Hlc.
+symmetry in Hlc.
 destruct lc as [| c]. {
   exfalso; revert Hlc.
   apply (relation_elem_neq_nil Heqb).
-  now apply (permutation_in Heqb Hpab); left.
+  now apply in_or_app; right; left.
 }
 cbn.
 remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
 rewrite first_non_excl_nil_l.
-destruct j. {
+unfold canon_assoc_of_rel, relation in Hj.
+cbn in Hj.
+Print relation_elem.
+Search relation_elem.
+Theorem relation_elem_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc a c i,
+  relation_elem eqb (la ++ a :: lb) i a = c :: lc
+  → c = i + length la.
+Proof.
+intros * Heqb * Hlc.
+revert lb lc a c i Hlc.
+induction la as [| b]; intros; cbn in Hlc. {
+  rewrite (equality_refl Heqb) in Hlc.
+  injection Hlc; clear Hlc; intros Hlc H; subst c.
+  symmetry; apply Nat.add_0_r.
+}
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  injection Hlc; clear Hlc; intros Hlc H; subst c.
+  exfalso.
+  clear b Hab.
+Print relation_elem.
+...
+  apply Heqb in Hab; subst b.
+  cbn; rewrite <- Nat.add_succ_comm.
+...
+generalize Hlc; intros H.
+apply relation_elem_inside in H; cbn in H.
+subst c.
+...
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+...
+destruct j. 2: {
+  unfold relation in Hj.
+Print canon_assoc_of_rel_loop.
+
+
+Print relation_elem.
+...
 ...
 Search first_non_excl.
 cbn.
