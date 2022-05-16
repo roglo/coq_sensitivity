@@ -1014,6 +1014,7 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
+...
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
