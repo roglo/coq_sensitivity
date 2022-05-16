@@ -699,8 +699,12 @@ apply IHla.
 Qed.
 *)
 
+Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
+  first_non_excl eqb [] a la = a.
+Proof. now intros; destruct la. Qed.
+
 (* to be completed if required
-   (uses "permutation" instead of "Permutation")
+   (uses "permutation" instead of "Permutation") *)
 Theorem permutation_permut : ∀ la lb,
   permutation Nat.eqb la lb
   → is_permut_list la
@@ -776,7 +780,11 @@ destruct lc as [| c]. {
 }
 cbn.
 remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
+rewrite first_non_excl_nil_l.
 destruct j. {
+...
+Search first_non_excl.
+cbn.
 Search (first_non_excl).
 Print canon_assoc_of_rel.
 Print canon_assoc_of_rel_loop.
