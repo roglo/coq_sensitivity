@@ -306,7 +306,266 @@ do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
-(* to be moved to PermutationFun.v *)
+(* *)
+
+Theorem Permutation_permut : ∀ la lb,
+  Permutation la lb
+  → is_permut_list la
+  → is_permut_list lb.
+Proof.
+intros * Hab Ha.
+assert (Hlab : length la = length lb). {
+  now apply Permutation_length.
+}
+split. {
+  intros i Hi.
+  rewrite <- Hlab.
+  apply Ha.
+  apply Permutation_in with (l := lb); [ | easy ].
+  now apply Permutation_sym.
+} {
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  rewrite <- Hlab in Hi, Hj.
+  destruct Ha as (Hap, Hal).
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+}
+Qed.
+
+Theorem is_permut_list_app_max : ∀ l,
+  is_permut_list (l ++ [length l])
+  → is_permut_list l.
+Proof.
+intros * Hp.
+destruct Hp as (Hp, Hl).
+unfold AllLt in Hp.
+rewrite app_length, Nat.add_comm in Hp.
+cbn in Hp.
+split. {
+  intros i Hi.
+  specialize (Hp i) as H1.
+  assert (H : i ∈ l ++ [length l]) by now apply in_or_app; left.
+  specialize (H1 H); clear H.
+  destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
+  clear H1; exfalso.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (j & Hjl & Hji).
+  specialize (NoDup_nat _ Hl) as H1.
+  rewrite app_length, Nat.add_comm in H1; cbn in H1.
+  specialize (H1 j (length l)).
+  assert (H : j < S (length l)) by flia Hjl.
+  specialize (H1 H); clear H.
+  specialize (H1 (Nat.lt_succ_diag_r _)).
+  unfold ff_app in H1.
+  rewrite app_nth1 in H1; [ | easy ].
+  rewrite app_nth2 in H1; [ | now unfold ge ].
+  rewrite Nat.sub_diag, Hji in H1.
+  specialize (H1 Hil).
+  flia Hjl H1.
+} {
+  now apply NoDup_app_remove_r in Hl.
+}
+Qed.
+
+Theorem sorted_permut : ∀ l,
+  is_permut_list l
+  → sorted Nat.leb l
+  → l = seq 0 (length l).
+Proof.
+intros * Hl Hs.
+induction l as [| a] using rev_ind; [ easy | ].
+rewrite app_length; cbn.
+rewrite Nat.add_1_r.
+rewrite seq_S; cbn.
+assert (Hal : a = length l). {
+  destruct Hl as (H1, H2).
+  rewrite app_length, Nat.add_comm in H1; cbn in H1.
+  unfold AllLt in H1.
+  specialize (H1 a) as H3.
+  assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
+  specialize (H3 H); clear H.
+  assert (H4 : ∀ c, c ∈ l → c ≤ a). {
+    intros c Hc.
+    specialize (sorted_app _ _ Hs) as H4.
+    destruct H4 as (_ & _ & H4).
+    specialize (H4 Nat_leb_trans c a Hc (or_introl eq_refl)).
+    now apply Nat.leb_le in H4.
+  }
+  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].
+  assert (H5 : a < length l) by flia H3 Hal; clear H3 Hal.
+  specialize (pigeonhole (length l) a) as H3.
+  specialize (H3 (λ i, nth i l 0)).
+  specialize (H3 H5).
+  cbn in H3.
+  assert (H : ∀ x, x < length l → nth x l 0 < a). {
+    intros x Hx.
+    specialize (H4 (nth x l 0)) as H7.
+    assert (H : nth x l 0 ∈ l) by now apply nth_In.
+    specialize (H7 H); clear H.
+    destruct (Nat.eq_dec (nth x l 0) a) as [Hxa| Hxa]; [ | flia H7 Hxa ].
+    replace a with (nth (length l) (l ++ [a]) 0) in Hxa. 2: {
+      rewrite app_nth2; [ | now unfold ge ].
+      now rewrite Nat.sub_diag.
+    }
+    replace (nth x l 0) with (nth x (l ++ [a]) 0) in Hxa. 2: {
+      now rewrite app_nth1.
+    }
+    apply (NoDup_nat _ H2) in Hxa; cycle 1. {
+      rewrite app_length, Nat.add_comm; cbn.
+      flia Hx.
+    } {
+      now rewrite app_length, Nat.add_comm; cbn.
+    }
+    flia Hx Hxa.
+  }
+  specialize (H3 H); clear H.
+  remember (pigeonhole_fun (length l) (λ i : nat, nth i l 0)) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (x, x').
+  specialize (H3 x x' eq_refl).
+  destruct H3 as (H3 & H6 & H7 & H8).
+  specialize (NoDup_nat _ H2) as H9.
+  specialize (H9 x x').
+  rewrite app_length, Nat.add_comm in H9; cbn in H9.
+  assert (H : x < S (length l)) by flia H3.
+  specialize (H9 H); clear H.
+  assert (H : x' < S (length l)) by flia H6.
+  specialize (H9 H); clear H.
+  unfold ff_app in H9.
+  apply H7, H9.
+  rewrite app_nth1; [ | easy ].
+  rewrite app_nth1; [ | easy ].
+  easy.
+}
+rewrite Hal; f_equal.
+apply IHl; [ | apply (sorted_app l [a] Hs) ].
+subst a.
+now apply is_permut_list_app_max.
+Qed.
+
+Theorem permut_isort_leb : ∀ l,
+  is_permut_list l
+  → isort Nat.leb l = seq 0 (length l).
+Proof.
+intros * Hp.
+specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
+(*
+specialize (permuted_isort Nat.eqb Nat_eqb_equality l) as Hps.
+*)
+specialize (Permutation_isort Nat.leb l) as Hps.
+(**)
+remember (isort Nat.leb l) as l'; clear Heql'.
+specialize (Permutation_permut) as Hpl'.
+specialize (Hpl' l l' Hps Hp).
+move l' before l; move Hpl' before Hp.
+replace (length l) with (length l') by now apply Permutation_length.
+clear l Hp Hps.
+rename l' into l.
+now apply sorted_permut.
+Qed.
+
+Theorem permut_comp_isort_rank_r : ∀ l,
+  is_permut_list l
+  → l ° isort_rank Nat.leb l = seq 0 (length l).
+Proof.
+intros * Hp.
+rewrite comp_isort_rank_r.
+now apply permut_isort_leb.
+Qed.
+
+Theorem permut_isort_permut : ∀ i l,
+  is_permut_list l
+  → i < length l
+  → ff_app (isort_rank Nat.leb l) (ff_app l i) = i.
+Proof.
+intros * Hp Hil.
+specialize (permut_comp_isort_rank_r Hp) as H1.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+specialize (H1 0).
+unfold "°" in H1.
+assert
+  (H2 : ∀ j, j < length l → ff_app l (ff_app (isort_rank Nat.leb l) j) = j). {
+  intros j Hj.
+  specialize (H1 j).
+  rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
+  now rewrite seq_nth in H1.
+}
+clear H1.
+specialize (H2 (ff_app l i)) as H2.
+assert (H : ff_app l i < length l) by now apply Hp, nth_In.
+specialize (H2 H); clear H.
+destruct Hp as (Ha, Hp).
+apply (NoDup_nat _ Hp) in H2; [ easy | | easy ].
+apply isort_rank_ub.
+now intros H; subst l.
+Qed.
+
+Theorem permut_comp_isort_rank_l : ∀ l,
+  is_permut_list l
+  → isort_rank Nat.leb l ° l = seq 0 (length l).
+Proof.
+intros * Hp.
+apply List_eq_iff.
+rewrite comp_length, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite comp_length ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite seq_nth; [ | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
+clear d.
+unfold "°".
+rewrite (List_map_nth' 0); [ | easy ].
+rewrite fold_ff_app; cbn.
+now apply permut_isort_permut.
+Qed.
+
+Theorem permut_permut_isort : ∀ i l,
+  is_permut_list l
+  → i < length l
+  → ff_app l (ff_app (isort_rank Nat.leb l) i) = i.
+Proof.
+intros * Hp Hil.
+specialize (permut_comp_isort_rank_l Hp) as H1.
+apply List_eq_iff in H1.
+destruct H1 as (_, H1).
+specialize (H1 0).
+unfold "°" in H1.
+assert
+  (H2 : ∀ j, j < length l → ff_app (isort_rank Nat.leb l) (ff_app l j) = j). {
+  intros j Hj.
+  specialize (H1 j).
+  rewrite (List_map_nth' 0) in H1; [ | easy ].
+  now rewrite seq_nth in H1.
+}
+clear H1.
+specialize (H2 (ff_app (isort_rank Nat.leb l) i)) as H2.
+assert (H : ff_app (isort_rank Nat.leb l) i < length l). {
+  apply isort_rank_ub.
+  now intros H; subst l.
+}
+specialize (H2 H); clear H.
+destruct Hp as (Ha, Hp).
+specialize (NoDup_isort_rank Nat.leb l) as H3.
+apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
+  now rewrite isort_rank_length.
+}
+rewrite isort_rank_length.
+apply Ha, nth_In.
+apply isort_rank_ub.
+now intros H; subst l.
+Qed.
 
 (**)
 Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
@@ -809,6 +1068,7 @@ let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
 (canon_assoc_of_rel Nat.eqb (relation eqb la lb),
  isort_rank Nat.leb (canon_assoc_of_rel Nat.eqb (relation eqb lb la)))).
+Search isort_rank.
 ...
 let i := 0 in
 
@@ -1466,265 +1726,6 @@ About Permutation_nth.
 }
 Qed.
 *)
-
-Theorem Permutation_permut : ∀ la lb,
-  Permutation la lb
-  → is_permut_list la
-  → is_permut_list lb.
-Proof.
-intros * Hab Ha.
-assert (Hlab : length la = length lb). {
-  now apply Permutation_length.
-}
-split. {
-  intros i Hi.
-  rewrite <- Hlab.
-  apply Ha.
-  apply Permutation_in with (l := lb); [ | easy ].
-  now apply Permutation_sym.
-} {
-  apply nat_NoDup.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite <- Hlab in Hi, Hj.
-  destruct Ha as (Hap, Hal).
-  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
-  destruct H1 as (H1 & f & H2 & H3 & H4).
-  rewrite H4 in Hij; [ | easy ].
-  rewrite H4 in Hij; [ | easy ].
-  do 2 rewrite fold_ff_app in Hij.
-  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
-  now apply H3.
-}
-Qed.
-
-Theorem is_permut_list_app_max : ∀ l,
-  is_permut_list (l ++ [length l])
-  → is_permut_list l.
-Proof.
-intros * Hp.
-destruct Hp as (Hp, Hl).
-unfold AllLt in Hp.
-rewrite app_length, Nat.add_comm in Hp.
-cbn in Hp.
-split. {
-  intros i Hi.
-  specialize (Hp i) as H1.
-  assert (H : i ∈ l ++ [length l]) by now apply in_or_app; left.
-  specialize (H1 H); clear H.
-  destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
-  clear H1; exfalso.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (j & Hjl & Hji).
-  specialize (NoDup_nat _ Hl) as H1.
-  rewrite app_length, Nat.add_comm in H1; cbn in H1.
-  specialize (H1 j (length l)).
-  assert (H : j < S (length l)) by flia Hjl.
-  specialize (H1 H); clear H.
-  specialize (H1 (Nat.lt_succ_diag_r _)).
-  unfold ff_app in H1.
-  rewrite app_nth1 in H1; [ | easy ].
-  rewrite app_nth2 in H1; [ | now unfold ge ].
-  rewrite Nat.sub_diag, Hji in H1.
-  specialize (H1 Hil).
-  flia Hjl H1.
-} {
-  now apply NoDup_app_remove_r in Hl.
-}
-Qed.
-
-Theorem sorted_permut : ∀ l,
-  is_permut_list l
-  → sorted Nat.leb l
-  → l = seq 0 (length l).
-Proof.
-intros * Hl Hs.
-induction l as [| a] using rev_ind; [ easy | ].
-rewrite app_length; cbn.
-rewrite Nat.add_1_r.
-rewrite seq_S; cbn.
-assert (Hal : a = length l). {
-  destruct Hl as (H1, H2).
-  rewrite app_length, Nat.add_comm in H1; cbn in H1.
-  unfold AllLt in H1.
-  specialize (H1 a) as H3.
-  assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
-  specialize (H3 H); clear H.
-  assert (H4 : ∀ c, c ∈ l → c ≤ a). {
-    intros c Hc.
-    specialize (sorted_app _ _ Hs) as H4.
-    destruct H4 as (_ & _ & H4).
-    specialize (H4 Nat_leb_trans c a Hc (or_introl eq_refl)).
-    now apply Nat.leb_le in H4.
-  }
-  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].
-  assert (H5 : a < length l) by flia H3 Hal; clear H3 Hal.
-  specialize (pigeonhole (length l) a) as H3.
-  specialize (H3 (λ i, nth i l 0)).
-  specialize (H3 H5).
-  cbn in H3.
-  assert (H : ∀ x, x < length l → nth x l 0 < a). {
-    intros x Hx.
-    specialize (H4 (nth x l 0)) as H7.
-    assert (H : nth x l 0 ∈ l) by now apply nth_In.
-    specialize (H7 H); clear H.
-    destruct (Nat.eq_dec (nth x l 0) a) as [Hxa| Hxa]; [ | flia H7 Hxa ].
-    replace a with (nth (length l) (l ++ [a]) 0) in Hxa. 2: {
-      rewrite app_nth2; [ | now unfold ge ].
-      now rewrite Nat.sub_diag.
-    }
-    replace (nth x l 0) with (nth x (l ++ [a]) 0) in Hxa. 2: {
-      now rewrite app_nth1.
-    }
-    apply (NoDup_nat _ H2) in Hxa; cycle 1. {
-      rewrite app_length, Nat.add_comm; cbn.
-      flia Hx.
-    } {
-      now rewrite app_length, Nat.add_comm; cbn.
-    }
-    flia Hx Hxa.
-  }
-  specialize (H3 H); clear H.
-  remember (pigeonhole_fun (length l) (λ i : nat, nth i l 0)) as xx eqn:Hxx.
-  symmetry in Hxx.
-  destruct xx as (x, x').
-  specialize (H3 x x' eq_refl).
-  destruct H3 as (H3 & H6 & H7 & H8).
-  specialize (NoDup_nat _ H2) as H9.
-  specialize (H9 x x').
-  rewrite app_length, Nat.add_comm in H9; cbn in H9.
-  assert (H : x < S (length l)) by flia H3.
-  specialize (H9 H); clear H.
-  assert (H : x' < S (length l)) by flia H6.
-  specialize (H9 H); clear H.
-  unfold ff_app in H9.
-  apply H7, H9.
-  rewrite app_nth1; [ | easy ].
-  rewrite app_nth1; [ | easy ].
-  easy.
-}
-rewrite Hal; f_equal.
-apply IHl; [ | apply (sorted_app l [a] Hs) ].
-subst a.
-now apply is_permut_list_app_max.
-Qed.
-
-Theorem permut_isort_leb : ∀ l,
-  is_permut_list l
-  → isort Nat.leb l = seq 0 (length l).
-Proof.
-intros * Hp.
-specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
-(*
-specialize (permuted_isort Nat.eqb Nat_eqb_equality l) as Hps.
-*)
-specialize (Permutation_isort Nat.leb l) as Hps.
-(**)
-remember (isort Nat.leb l) as l'; clear Heql'.
-specialize (Permutation_permut) as Hpl'.
-specialize (Hpl' l l' Hps Hp).
-move l' before l; move Hpl' before Hp.
-replace (length l) with (length l') by now apply Permutation_length.
-clear l Hp Hps.
-rename l' into l.
-now apply sorted_permut.
-Qed.
-
-Theorem permut_comp_isort_rank_r : ∀ l,
-  is_permut_list l
-  → l ° isort_rank Nat.leb l = seq 0 (length l).
-Proof.
-intros * Hp.
-rewrite comp_isort_rank_r.
-now apply permut_isort_leb.
-Qed.
-
-Theorem permut_isort_permut : ∀ i l,
-  is_permut_list l
-  → i < length l
-  → ff_app (isort_rank Nat.leb l) (ff_app l i) = i.
-Proof.
-intros * Hp Hil.
-specialize (permut_comp_isort_rank_r Hp) as H1.
-apply List_eq_iff in H1.
-destruct H1 as (_, H1).
-specialize (H1 0).
-unfold "°" in H1.
-assert
-  (H2 : ∀ j, j < length l → ff_app l (ff_app (isort_rank Nat.leb l) j) = j). {
-  intros j Hj.
-  specialize (H1 j).
-  rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
-  now rewrite seq_nth in H1.
-}
-clear H1.
-specialize (H2 (ff_app l i)) as H2.
-assert (H : ff_app l i < length l) by now apply Hp, nth_In.
-specialize (H2 H); clear H.
-destruct Hp as (Ha, Hp).
-apply (NoDup_nat _ Hp) in H2; [ easy | | easy ].
-apply isort_rank_ub.
-now intros H; subst l.
-Qed.
-
-Theorem permut_comp_isort_rank_l : ∀ l,
-  is_permut_list l
-  → isort_rank Nat.leb l ° l = seq 0 (length l).
-Proof.
-intros * Hp.
-apply List_eq_iff.
-rewrite comp_length, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite comp_length ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite seq_nth; [ | easy ].
-rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
-clear d.
-unfold "°".
-rewrite (List_map_nth' 0); [ | easy ].
-rewrite fold_ff_app; cbn.
-now apply permut_isort_permut.
-Qed.
-
-Theorem permut_permut_isort : ∀ i l,
-  is_permut_list l
-  → i < length l
-  → ff_app l (ff_app (isort_rank Nat.leb l) i) = i.
-Proof.
-intros * Hp Hil.
-specialize (permut_comp_isort_rank_l Hp) as H1.
-apply List_eq_iff in H1.
-destruct H1 as (_, H1).
-specialize (H1 0).
-unfold "°" in H1.
-assert
-  (H2 : ∀ j, j < length l → ff_app (isort_rank Nat.leb l) (ff_app l j) = j). {
-  intros j Hj.
-  specialize (H1 j).
-  rewrite (List_map_nth' 0) in H1; [ | easy ].
-  now rewrite seq_nth in H1.
-}
-clear H1.
-specialize (H2 (ff_app (isort_rank Nat.leb l) i)) as H2.
-assert (H : ff_app (isort_rank Nat.leb l) i < length l). {
-  apply isort_rank_ub.
-  now intros H; subst l.
-}
-specialize (H2 H); clear H.
-destruct Hp as (Ha, Hp).
-specialize (NoDup_isort_rank Nat.leb l) as H3.
-apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
-  now rewrite isort_rank_length.
-}
-rewrite isort_rank_length.
-apply Ha, nth_In.
-apply isort_rank_ub.
-now intros H; subst l.
-Qed.
 
 (* transposition *)
 
