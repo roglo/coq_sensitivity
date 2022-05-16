@@ -568,6 +568,7 @@ now intros H; subst l.
 Qed.
 
 (**)
+
 Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
   match lb with
   | [] => []
@@ -1055,7 +1056,14 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
+Print canon_assoc_of_rel_loop.
 (**)
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(relation eqb la lb, relation eqb lb la)).
+...
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
