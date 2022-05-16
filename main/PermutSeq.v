@@ -796,6 +796,24 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
+(**)
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(canon_assoc_of_rel Nat.eqb (relation eqb la lb),
+ canon_assoc_of_rel Nat.eqb (relation eqb lb la))).
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+(canon_assoc_of_rel Nat.eqb (relation eqb la lb),
+ isort_rank Nat.leb (canon_assoc_of_rel Nat.eqb (relation eqb lb la)))).
+...
+let i := 0 in
+
+nth i (relation eqb la lb) []).
+...
 revert lb i Hpab Hla.
 induction la as [| a]; intros; [ easy | cbn ].
 rewrite fold_ff_app.
