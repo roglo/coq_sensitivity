@@ -308,7 +308,7 @@ Qed.
 
 (* to be moved to PermutationFun.v *)
 
-(*
+(**)
 Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
   match lb with
   | [] => []
@@ -320,17 +320,19 @@ Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
 Definition relation {A} (eqb : A → _) la lb :=
   map (relation_elem eqb lb 0) la.
 
+(*
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
 (relation eqb la lb)).
+*)
 
 Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
   if existsb (eqb a) excl then
     match la with
     | [] => a
-    | b :: lb => first_non_excl eqb excl b lb
+    | a' :: la' => first_non_excl eqb excl a' la'
     end
   else a.
 
@@ -346,23 +348,25 @@ Fixpoint canon_assoc_of_rel_loop {A} (eqb : A → _) excl lla :=
 Definition canon_assoc_of_rel {A} (eqb : A → _) :=
   canon_assoc_of_rel_loop eqb [].
 
-Definition canon_assoc {A} (eqb : A → _) la lb :=
+Definition permutation_assoc {A} (eqb : A → _) la lb :=
   canon_assoc_of_rel Nat.eqb (relation eqb la lb).
 
+(*
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc eqb la lb)).
+(permutation_assoc eqb la lb)).
 
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc eqb la lb,
- canon_assoc eqb lb la)).
+(permutation_assoc eqb la lb,
+ permutation_assoc eqb lb la)).
 *)
 
+(*
 Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
   match (ao, bo) with
   | (Some a, Some b) => eqb a b
@@ -382,10 +386,12 @@ Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
 
 Definition permutation_assoc {A} (eqb : A → _) la lb :=
   permutation_assoc_loop eqb la (map Some lb).
+*)
 
 Definition permutation_fun {A} (eqb : A → _) la lb i :=
   unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
 
+(*
 Fixpoint filter_Some {A} (lao : list (option A)) :=
   match lao with
   | [] => []
@@ -458,6 +464,48 @@ intros.
 induction la as [| a]; [ easy | cbn ].
 now f_equal.
 Qed.
+*)
+
+Theorem canon_assoc_of_rel_loop_length : ∀ lla excl,
+  (∀ la, la ∈ lla → la ≠ [])
+  → length (canon_assoc_of_rel_loop Nat.eqb excl lla) = length lla.
+Proof.
+intros * Hlla.
+revert excl.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct la as [| a]. {
+  now specialize (Hlla _ (or_introl eq_refl)).
+}
+cbn; f_equal.
+apply IHlla.
+intros lb Hlb.
+now apply Hlla; right.
+Qed.
+
+Theorem relation_elem_neq : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a i lb, a ∈ lb → relation_elem eqb lb i a ≠ [].
+Proof.
+intros * Heqb * Ha.
+revert i a Ha.
+induction lb as [| b]; intros; [ easy | cbn ].
+destruct Ha as [Ha| Ha]. {
+  subst b.
+  now rewrite (equality_refl Heqb).
+}
+remember (eqb a b) as ab eqn:Hab.
+destruct ab; [ easy | ].
+now apply IHlb.
+Qed.
+
+Theorem relation_length : ∀ A (eqb : A → _) la lb,
+  length (relation eqb la lb) = length la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+f_equal.
+now rewrite map_length.
+Qed.
 
 Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   equality eqb →
@@ -466,10 +514,38 @@ Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   → length (permutation_assoc eqb la lb) = length la.
 Proof.
 intros * Heqb * Hpab.
-apply (permutation_assoc_loop_length Heqb).
-now rewrite filter_Some_map_Some.
+destruct (Nat.eq_dec (length la) 0) as [Hz| Hz]. {
+  now apply length_zero_iff_nil in Hz; subst la.
+}
+unfold permutation_assoc.
+unfold canon_assoc_of_rel.
+rewrite canon_assoc_of_rel_loop_length; [ apply relation_length | ].
+intros lc Hlc H; subst lc.
+destruct la as [| a]; [ easy | clear Hz ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+cbn in Hlc.
+destruct Hlc as [Hlc| Hlc]. {
+  revert Hlc.
+  apply (relation_elem_neq Heqb).
+  now apply in_or_app; right; left.
+}
+apply in_map_iff in Hlc.
+destruct Hlc as (c & Hac & Hc).
+revert Hac.
+apply (relation_elem_neq Heqb).
+apply (permutation_in Heqb Hpab) in Hc.
+apply in_app_or in Hc.
+apply in_or_app.
+destruct Hc as [Hc| Hc]; [ now left | now right; right ].
 Qed.
 
+(*
 Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lbo i,
@@ -510,7 +586,9 @@ subst lbo.
 rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
+*)
 
+(* to be completed
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -521,6 +599,21 @@ Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
 rewrite (permutation_length Heqb Hpab).
+unfold canon_assoc_of_rel.
+Print canon_assoc_of_rel_loop.
+Theorem nth_canon_assoc_of_rel_loop_ub :
+  ∀ excl lla i,
+  (∀ a, a ∈ excl → a < length lla)
+  → i < length lla
+  → nth i (canon_assoc_of_rel_loop eqb excl lla) 0 < length lla.
+Proof.
+intros * Hexcl Hi.
+revert i excl Hexcl Hi.
+induction lla as [| la]; intros; [ easy | cbn ].
+destruct la as [| a]; [ now rewrite List_nth_nil | ].
+destruct i. {
+  cbn in Hexcl |-*; clear Hi.
+...
 rewrite <- (map_length Some lb).
 apply (permutation_assoc_loop_ub Heqb); [ | easy ].
 now rewrite filter_Some_map_Some.
@@ -541,6 +634,7 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 cbn; f_equal.
 apply IHla.
 Qed.
+*)
 
 (* to be completed if required
    (uses "permutation" instead of "Permutation")
