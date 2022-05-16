@@ -588,6 +588,22 @@ apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 *)
 
+Theorem first_non_excl_ub : ∀ excl a la len,
+  (∀ b, b ∈ a :: la → b < len)
+  → first_non_excl Nat.eqb excl a la < len.
+Proof.
+intros * Hla.
+revert a len Hla.
+induction la as [| b]; intros; cbn. {
+  now rewrite Tauto.if_same; apply Hla; left.
+}
+remember (existsb (Nat.eqb a) excl) as x eqn:Hx; symmetry in Hx.
+destruct x; [ | now apply Hla; left ].
+apply IHla.
+intros c Hc.
+now apply Hla; right.
+Qed.
+
 (* to be completed
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
   equality eqb →
@@ -598,21 +614,46 @@ Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
+(*
 rewrite (permutation_length Heqb Hpab).
+*)
 unfold canon_assoc_of_rel.
 Print canon_assoc_of_rel_loop.
 Theorem nth_canon_assoc_of_rel_loop_ub :
   ∀ excl lla i,
-  (∀ a, a ∈ excl → a < length lla)
+  (∀ la, la ∈ lla → ∀ a, a ∈ la → a < length lla)
   → i < length lla
   → nth i (canon_assoc_of_rel_loop eqb excl lla) 0 < length lla.
 Proof.
-intros * Hexcl Hi.
-revert i excl Hexcl Hi.
+intros * Hlla Hi.
+revert i excl Hi.
 induction lla as [| la]; intros; [ easy | cbn ].
 destruct la as [| a]; [ now rewrite List_nth_nil | ].
 destruct i. {
-  cbn in Hexcl |-*; clear Hi.
+  cbn - [ In ] in Hlla |-*; clear Hi.
+  eapply lt_le_trans; [ | apply le_refl ].
+  apply first_non_excl_ub.
+  intros b Hb.
+  apply (Hlla (a :: la)); [ now left | easy ].
+}
+cbn in Hi |-*.
+apply Nat.succ_lt_mono in Hi.
+apply lt_le_trans with (m := length lla); [ | flia ].
+apply IHlla; [ | easy ].
+intros lb Hlb b Hb.
+specialize (Hlla lb (or_intror Hlb) b Hb) as H1.
+cbn in H1.
+...
+rewrite <- (relation_length eqb) with (lb := lb).
+apply nth_canon_assoc_of_rel_loop_ub; [ | now rewrite relation_length ].
+intros lc Hlc a Ha.
+rewrite relation_length.
+rewrite (permutation_length Heqb Hpab).
+Print relation.
+Print relation_elem.
+...
+etransitivity.
+apply first_non_excl_ub.
 ...
 rewrite <- (map_length Some lb).
 apply (permutation_assoc_loop_ub Heqb); [ | easy ].
