@@ -992,13 +992,14 @@ Qed.
    (permutation_permut uses "permutation" instead of "Permutation")
 Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
   ∀ A (eqb : A → _),
+  equality eqb →
   ∀ la lb i excl,
   is_permut_list
     (map (λ j, j - i)
       (canon_assoc_of_multiv_loop Nat.eqb excl
          (map (multivalued_elem eqb lb i) la))).
 Proof.
-intros.
+intros * Heqb *.
 split. {
   unfold AllLt.
   intros j Hj.
@@ -1013,18 +1014,31 @@ split. {
     exfalso; clear i.
     now destruct la.
   }
+...
   rewrite canon_assoc_of_multiv_loop_length. 2: {
     intros lc Hlc H; subst lc.
-...
     apply in_map_iff in Hlc.
     destruct Hlc as (c & Hlc & Hc).
-    subst lc.
     destruct lb as [| b]; [ easy | ].
-    cbn.
+    cbn in Hlc.
     remember (eqb c b) as cb eqn:Hcb; symmetry in Hcb.
     destruct cb; [ easy | ].
-    clear b.
-    destruct lb as [| b].
+    clear Hbz.
+    destruct lb as [| b2]. {
+      clear Hlc; cbn in Hj.
+      destruct la as [| a]; [ easy | ].
+      cbn in Hj.
+      destruct Hc as [Hc| Hc]. {
+        subst c.
+        now rewrite Hcb in Hj.
+      }
+      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+      destruct ab; [ | easy ].
+      apply Heqb in Hab; subst b.
+      cbn in Hj.
+      destruct Hj as [Hj| Hj]. {
+        clear i k Hj.
+(* mort *)
 ...
 revert lb i excl.
 induction la as [| a]; intros. {
