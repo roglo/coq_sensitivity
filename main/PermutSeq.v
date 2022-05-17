@@ -589,12 +589,12 @@ let eqb := Nat.eqb in
 *)
 
 Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
-  if existsb (eqb a) excl then
-    match la with
-    | [] => a
-    | a' :: la' => first_non_excl eqb excl a' la'
-    end
-  else a.
+  match la with
+  | [] => a
+  | a' :: la' =>
+      if existsb (eqb a) excl then first_non_excl eqb excl a' la'
+      else a
+  end.
 
 Fixpoint canon_assoc_of_rel_loop {A} (eqb : A → _) excl lla :=
   match lla with
@@ -854,9 +854,7 @@ Theorem first_non_excl_ub : ∀ excl a la len,
 Proof.
 intros * Hla.
 revert a len Hla.
-induction la as [| b]; intros; cbn. {
-  now rewrite Tauto.if_same; apply Hla; left.
-}
+induction la as [| b]; intros; [ now apply Hla; left | cbn ].
 remember (existsb (Nat.eqb a) excl) as x eqn:Hx; symmetry in Hx.
 destruct x; [ | now apply Hla; left ].
 apply IHla.
