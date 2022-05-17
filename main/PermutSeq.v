@@ -999,8 +999,35 @@ Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
          (map (multivalued_elem eqb lb i) la))).
 Proof.
 intros.
+split. {
+  unfold AllLt.
+  intros j Hj.
+  rewrite map_length.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hk & Hj).
+  subst j.
+  destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
+    apply length_zero_iff_nil in Hbz; subst lb.
+    cbn in Hj |-*.
+    rewrite List_map_const_is_repeat with (b := []) in Hj; [ | easy ].
+    exfalso; clear i.
+    now destruct la.
+  }
+  rewrite canon_assoc_of_multiv_loop_length. 2: {
+    intros lc Hlc H; subst lc.
+...
+    apply in_map_iff in Hlc.
+    destruct Hlc as (c & Hlc & Hc).
+    subst lc.
+    destruct lb as [| b]; [ easy | ].
+    cbn.
+    remember (eqb c b) as cb eqn:Hcb; symmetry in Hcb.
+    destruct cb; [ easy | ].
+    clear b.
+    destruct lb as [| b].
+...
 revert lb i excl.
-induction la as [| a]; intros; cbn. {
+induction la as [| a]; intros. {
   split; [ easy | apply NoDup_nil ].
 }
 remember (multivalued_elem eqb lb i a) as lc eqn:Hlc.
@@ -1008,7 +1035,6 @@ symmetry in Hlc.
 destruct lc as [| c]. {
   split; [ easy | apply NoDup_nil ].
 }
-cbn.
 ...
 Compute (
 let la := [2;3;5;3;2;1] in
