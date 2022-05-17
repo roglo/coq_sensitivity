@@ -1014,6 +1014,32 @@ split. {
     exfalso; clear i.
     now destruct la.
   }
+  destruct la as [| a]; [ easy | ].
+  cbn in Hj |-*.
+  remember (multivalued_elem eqb lb i a) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hj |-*.
+  move i before a; move c before a; move k before i.
+  destruct Hj as [Hj| Hj]. {
+    destruct la as [| a2]. {
+      cbn.
+      enough (Hki : k ≤ i) by flia Hki.
+      subst k.
+      destruct lb as [| b]; [ easy | clear Hbz ].
+      cbn in Hlc.
+      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+      destruct ab. {
+        injection Hlc; clear Hlc; intros Hlc H; subst c.
+        apply Heqb in Hab; subst b.
+        destruct lc as [| c]; [ easy | cbn ].
+        remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
+        destruct x; [ | easy ].
+        destruct lb as [| b]; [ easy | ].
+        cbn in Hlc.
+        remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+        destruct ab. {
+          injection Hlc; clear Hlc; intros Hlc H; subst c.
+          apply Heqb in Hab; subst b.
 ...
   rewrite canon_assoc_of_multiv_loop_length. 2: {
     intros lc Hlc H; subst lc.
