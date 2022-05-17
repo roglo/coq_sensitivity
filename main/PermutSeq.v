@@ -991,7 +991,57 @@ now apply Hla; right.
 Qed.
 
 (* to be completed if required
-   (uses "permutation" instead of "Permutation")
+   (permutation_permut uses "permutation" instead of "Permutation")
+Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb i,
+  permutation eqb la lb
+  → i < length la
+  → ff_app (permutation_assoc eqb la lb)
+      (ff_app (permutation_assoc eqb lb la) i) = i.
+Proof.
+intros * Heqb * Hpab Hla.
+...
+
+Theorem permutation_fun_nth : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb i,
+  permutation eqb la lb
+  → i < length la
+  → nth i lb d = nth (permutation_fun eqb la lb i) la d.
+Proof.
+intros * Heqb * Hpab Hi.
+unfold permutation_fun.
+set (l := permutation_assoc eqb la lb).
+unfold unsome.
+remember (List_rank (Nat.eqb i) l) as j eqn:Hj; symmetry in Hj.
+destruct j as [j| ]. 2: {
+  specialize (List_rank_None 0 (Nat.eqb i) l Hj) as H1.
+(*
+  subst l.
+  rewrite (permutation_assoc_length Heqb) in H1; [ | easy ].
+  set (l := permutation_assoc eqb la lb) in H1.
+*)
+  set (l' := permutation_assoc eqb lb la).
+  specialize (H1 (nth i l' 0)).
+  assert (H : nth i l' 0 < length l). {
+    unfold l.
+    rewrite (permutation_assoc_length Heqb); [ | easy ].
+    specialize (permutation_length Heqb Hpab) as Hlab.
+    rewrite Hlab.
+    unfold l'.
+    apply (permutation_sym Heqb) in Hpab.
+    apply (nth_permutation_assoc_ub Heqb); [ easy | congruence ].
+  }
+  specialize (H1 H); clear H.
+  apply Nat.eqb_neq in H1.
+  exfalso; apply H1; clear H1.
+  unfold l, l'; symmetry.
+  do 2 rewrite fold_ff_app.
+...
+  now apply permutation_assoc_permutation_assoc_inv.
+...
+
 Theorem permutation_permut : ∀ la lb,
   permutation Nat.eqb la lb
   → is_permut_list la
@@ -1014,15 +1064,11 @@ split. {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
+  rewrite <- Hlab in Hi, Hj.
 ...
-Theorem permutation_fun_nth : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ d la lb i,
-  permutation eqb la lb
-  → i < length la
-  → nth i lb d = nth (permutation_fun eqb la lb i) la d.
-Proof.
-intros * Heqb * Hpab Hi.
+  rewrite (permutation_fun_nth Nat_eqb_equality 0 Hab Hi) in Hij.
+   rewrite (permutation_fun_nth Nat_eqb_equality 0 Hab Hj) in Hij.
+...
 unfold permutation_fun.
 set (l := permutation_assoc eqb la lb).
 unfold unsome.
