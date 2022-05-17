@@ -992,14 +992,13 @@ Qed.
    (permutation_permut uses "permutation" instead of "Permutation")
 Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
   ∀ A (eqb : A → _),
-  equality eqb →
   ∀ la lb i excl,
   is_permut_list
     (map (λ j, j - i)
       (canon_assoc_of_multiv_loop Nat.eqb excl
          (map (multivalued_elem eqb lb i) la))).
 Proof.
-intros * Heqb *.
+intros.
 split. {
   unfold AllLt.
   intros j Hj.
@@ -1030,7 +1029,22 @@ split. {
       remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
       destruct ab. {
         injection Hlc; clear Hlc; intros Hlc H; subst c.
-        apply Heqb in Hab; subst b.
+        clear b Hab.
+(**)
+        subst lc.
+        destruct lb as [| b]; [ easy | cbn ].
+        remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+        destruct ab. {
+          clear b Hab.
+          cbn.
+          remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
+          destruct x; [ | easy ].
+          apply existsb_exists in Hx.
+          destruct Hx as (j & Hi & Hij).
+          apply Nat.eqb_eq in Hij; subst j.
+          destruct lb as [| b]; cbn.
+(* tiens ? c'est faux ! *)
+...
         destruct lc as [| c]; [ easy | cbn ].
         remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
         destruct x; [ | easy ].
