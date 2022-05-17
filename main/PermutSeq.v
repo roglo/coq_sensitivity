@@ -569,23 +569,23 @@ Qed.
 
 (**)
 
-Fixpoint relation_elem {A} (eqb : A → A → bool) lb i a :=
+Fixpoint multivalued_elem {A} (eqb : A → A → bool) lb i a :=
   match lb with
   | [] => []
   | b :: lb' =>
-      if eqb a b then i :: relation_elem eqb lb' (S i) a
-      else relation_elem eqb lb' (S i) a
+      if eqb a b then i :: multivalued_elem eqb lb' (S i) a
+      else multivalued_elem eqb lb' (S i) a
   end.
 
-Definition relation {A} (eqb : A → _) la lb :=
-  map (relation_elem eqb lb 0) la.
+Definition multivalued {A} (eqb : A → _) la lb :=
+  map (multivalued_elem eqb lb 0) la.
 
 (*
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(relation eqb la lb)).
+(multivalued eqb la lb)).
 *)
 
 Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
@@ -609,7 +609,7 @@ Definition canon_assoc_of_rel {A} (eqb : A → _) :=
   canon_assoc_of_rel_loop eqb [].
 
 Definition permutation_assoc {A} (eqb : A → _) la lb :=
-  canon_assoc_of_rel Nat.eqb (relation eqb la lb).
+  canon_assoc_of_rel Nat.eqb (multivalued eqb la lb).
 
 (*
 Compute (
@@ -742,9 +742,9 @@ intros lb Hlb.
 now apply Hlla; right.
 Qed.
 
-Theorem relation_elem_neq_nil : ∀ A (eqb : A → _),
+Theorem multivalued_elem_neq_nil : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ a i lb, a ∈ lb → relation_elem eqb lb i a ≠ [].
+  ∀ a i lb, a ∈ lb → multivalued_elem eqb lb i a ≠ [].
 Proof.
 intros * Heqb * Ha.
 revert i a Ha.
@@ -758,8 +758,8 @@ destruct ab; [ easy | ].
 now apply IHlb.
 Qed.
 
-Theorem relation_length : ∀ A (eqb : A → _) la lb,
-  length (relation eqb la lb) = length la.
+Theorem multivalued_length : ∀ A (eqb : A → _) la lb,
+  length (multivalued eqb la lb) = length la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
@@ -779,7 +779,7 @@ destruct (Nat.eq_dec (length la) 0) as [Hz| Hz]. {
 }
 unfold permutation_assoc.
 unfold canon_assoc_of_rel.
-rewrite canon_assoc_of_rel_loop_length; [ apply relation_length | ].
+rewrite canon_assoc_of_rel_loop_length; [ apply multivalued_length | ].
 intros lc Hlc H; subst lc.
 destruct la as [| a]; [ easy | clear Hz ].
 apply permutation_cons_l_iff in Hpab.
@@ -792,13 +792,13 @@ subst lb.
 cbn in Hlc.
 destruct Hlc as [Hlc| Hlc]. {
   revert Hlc.
-  apply (relation_elem_neq_nil Heqb).
+  apply (multivalued_elem_neq_nil Heqb).
   now apply in_or_app; right; left.
 }
 apply in_map_iff in Hlc.
 destruct Hlc as (c & Hac & Hc).
 revert Hac.
-apply (relation_elem_neq_nil Heqb).
+apply (multivalued_elem_neq_nil Heqb).
 apply (permutation_in Heqb Hpab) in Hc.
 apply in_app_or in Hc.
 apply in_or_app.
@@ -888,9 +888,9 @@ intros lb Hlb b Hb.
 apply (Hlla lb); [ now right | easy ].
 Qed.
 
-Theorem relation_elem_ub : ∀ A (eqb : A → _),
+Theorem multivalued_elem_ub : ∀ A (eqb : A → _),
   ∀ la c i a,
-  a ∈ relation_elem eqb la i c
+  a ∈ multivalued_elem eqb la i c
   → a < i + length la.
 Proof.
 intros * Ha.
@@ -905,17 +905,17 @@ destruct (eqb c b). {
 now apply IHla.
 Qed.
 
-Theorem relation_ub : ∀ A (eqb : A → _),
+Theorem multivalued_ub : ∀ A (eqb : A → _),
   ∀ la lb lc,
-  lc ∈ relation eqb la lb
+  lc ∈ multivalued eqb la lb
   → ∀ a, a ∈ lc → a < length lb.
 Proof.
 intros * Hlc * Ha.
-unfold relation in Hlc.
+unfold multivalued in Hlc.
 apply in_map_iff in Hlc.
 destruct Hlc as (c & Hlc & Hc).
 subst lc.
-now apply relation_elem_ub in Ha.
+now apply multivalued_elem_ub in Ha.
 Qed.
 
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
@@ -928,15 +928,15 @@ Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
 unfold canon_assoc_of_rel.
-rewrite <- (relation_length eqb) with (lb := lb).
-apply nth_canon_assoc_of_rel_loop_ub; [ | | now rewrite relation_length ]. {
-  rewrite relation_length.
+rewrite <- (multivalued_length eqb) with (lb := lb).
+apply nth_canon_assoc_of_rel_loop_ub; [ | | now rewrite multivalued_length ]. {
+  rewrite multivalued_length.
   now destruct la.
 }
 intros lc Hlc a Ha.
-rewrite relation_length.
+rewrite multivalued_length.
 rewrite (permutation_length Heqb Hpab).
-now apply relation_ub with (a := a) in Hlc.
+now apply multivalued_ub with (a := a) in Hlc.
 Qed.
 
 (*
@@ -961,11 +961,11 @@ Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
   first_non_excl eqb [] a la = a.
 Proof. now intros; destruct la. Qed.
 
-Theorem relation_elem_inside : ∀ A (eqb : A → _),
+Theorem multivalued_elem_inside : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb lc a c i,
   (∀ x, x ∈ la → eqb a x = false)
-  → relation_elem eqb (la ++ a :: lb) i a = c :: lc
+  → multivalued_elem eqb (la ++ a :: lb) i a = c :: lc
   → c = i + length la.
 Proof.
 intros * Heqb * Hla Hlc.
@@ -1107,25 +1107,25 @@ Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(relation eqb la lb, relation eqb lb la)).
+(multivalued eqb la lb, multivalued eqb lb la)).
 ...
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc_of_rel Nat.eqb (relation eqb la lb),
- canon_assoc_of_rel Nat.eqb (relation eqb lb la))).
+(canon_assoc_of_rel Nat.eqb (multivalued eqb la lb),
+ canon_assoc_of_rel Nat.eqb (multivalued eqb lb la))).
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc_of_rel Nat.eqb (relation eqb la lb),
- isort_rank Nat.leb (canon_assoc_of_rel Nat.eqb (relation eqb lb la)))).
+(canon_assoc_of_rel Nat.eqb (multivalued eqb la lb),
+ isort_rank Nat.leb (canon_assoc_of_rel Nat.eqb (multivalued eqb lb la)))).
 Search isort_rank.
 ...
 let i := 0 in
 
-nth i (relation eqb la lb) []).
+nth i (multivalued eqb la lb) []).
 ...
 revert lb i Hpab Hla.
 induction la as [| a]; intros; [ easy | cbn ].
@@ -1138,17 +1138,17 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Heqb in H; subst x.
 subst lb.
-remember (relation_elem eqb (bef ++ a :: aft) 0 a) as lc eqn:Hlc.
+remember (multivalued_elem eqb (bef ++ a :: aft) 0 a) as lc eqn:Hlc.
 symmetry in Hlc.
 destruct lc as [| c]. {
   exfalso; revert Hlc.
-  apply (relation_elem_neq_nil Heqb).
+  apply (multivalued_elem_neq_nil Heqb).
   now apply in_or_app; right; left.
 }
 cbn.
 rewrite first_non_excl_nil_l.
 generalize Hlc; intros H.
-apply (relation_elem_inside Heqb) in H; [ | easy ].
+apply (multivalued_elem_inside Heqb) in H; [ | easy ].
 cbn in H; subst c.
 remember (ff_app _ _) as j eqn:Hj; symmetry in Hj.
 cbn in Hj.
@@ -1162,16 +1162,16 @@ destruct j. {
     apply Nat.succ_lt_mono in Hla.
     specialize (IHla aft i Hpab Hla) as H1.
     unfold canon_assoc_of_rel in H1.
-    unfold relation in H1.
+    unfold multivalued in H1.
 ...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 ...
 destruct j. 2: {
-  unfold relation in Hj.
+  unfold multivalued in Hj.
 Print canon_assoc_of_rel_loop.
 
 
-Print relation_elem.
+Print multivalued_elem.
 ...
 ...
 Search first_non_excl.
