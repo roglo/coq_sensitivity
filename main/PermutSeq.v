@@ -1034,6 +1034,9 @@ split. {
         destruct lc as [| c]; [ easy | cbn ].
         remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
         destruct x; [ | easy ].
+        apply existsb_exists in Hx.
+        destruct Hx as (j & Hi & Hij).
+        apply Nat.eqb_eq in Hij; subst j.
         destruct lb as [| b]; [ easy | ].
         cbn in Hlc.
         remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
