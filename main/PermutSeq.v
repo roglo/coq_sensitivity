@@ -596,20 +596,20 @@ Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
       else a
   end.
 
-Fixpoint canon_assoc_of_rel_loop {A} (eqb : A → _) excl lla :=
+Fixpoint canon_assoc_of_multiv_loop {A} (eqb : A → _) excl lla :=
   match lla with
   | [] => []
   | [] :: _ => []
   | (a :: la) :: lla' =>
       let b := first_non_excl eqb excl a la in
-      b :: canon_assoc_of_rel_loop eqb (b :: excl) lla'
+      b :: canon_assoc_of_multiv_loop eqb (b :: excl) lla'
   end.
 
-Definition canon_assoc_of_rel {A} (eqb : A → _) :=
-  canon_assoc_of_rel_loop eqb [].
+Definition canon_assoc_of_multiv {A} (eqb : A → _) :=
+  canon_assoc_of_multiv_loop eqb [].
 
 Definition permutation_assoc {A} (eqb : A → _) la lb :=
-  canon_assoc_of_rel Nat.eqb (multivalued eqb la lb).
+  canon_assoc_of_multiv Nat.eqb (multivalued eqb la lb).
 
 (*
 Compute (
@@ -726,9 +726,9 @@ now f_equal.
 Qed.
 *)
 
-Theorem canon_assoc_of_rel_loop_length : ∀ lla excl,
+Theorem canon_assoc_of_multiv_loop_length : ∀ lla excl,
   (∀ la, la ∈ lla → la ≠ [])
-  → length (canon_assoc_of_rel_loop Nat.eqb excl lla) = length lla.
+  → length (canon_assoc_of_multiv_loop Nat.eqb excl lla) = length lla.
 Proof.
 intros * Hlla.
 revert excl.
@@ -778,8 +778,8 @@ destruct (Nat.eq_dec (length la) 0) as [Hz| Hz]. {
   now apply length_zero_iff_nil in Hz; subst la.
 }
 unfold permutation_assoc.
-unfold canon_assoc_of_rel.
-rewrite canon_assoc_of_rel_loop_length; [ apply multivalued_length | ].
+unfold canon_assoc_of_multiv.
+rewrite canon_assoc_of_multiv_loop_length; [ apply multivalued_length | ].
 intros lc Hlc H; subst lc.
 destruct la as [| a]; [ easy | clear Hz ].
 apply permutation_cons_l_iff in Hpab.
@@ -862,12 +862,12 @@ intros c Hc.
 now apply Hla; right.
 Qed.
 
-Theorem nth_canon_assoc_of_rel_loop_ub :
+Theorem nth_canon_assoc_of_multiv_loop_ub :
   ∀ excl lla i len,
   len ≠ 0
   → (∀ la, la ∈ lla → ∀ a, a ∈ la → a < len)
   → i < length lla
-  → nth i (canon_assoc_of_rel_loop eqb excl lla) 0 < len.
+  → nth i (canon_assoc_of_multiv_loop eqb excl lla) 0 < len.
 Proof.
 intros * Hlen Hlla Hi.
 revert i len excl Hlen Hi Hlla.
@@ -927,9 +927,9 @@ Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-unfold canon_assoc_of_rel.
+unfold canon_assoc_of_multiv.
 rewrite <- (multivalued_length eqb) with (lb := lb).
-apply nth_canon_assoc_of_rel_loop_ub; [ | | now rewrite multivalued_length ]. {
+apply nth_canon_assoc_of_multiv_loop_ub; [ | | now rewrite multivalued_length ]. {
   rewrite multivalued_length.
   now destruct la.
 }
@@ -990,6 +990,54 @@ Qed.
 
 (* to be completed if required
    (permutation_permut uses "permutation" instead of "Permutation")
+Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
+  ∀ A (eqb : A → _),
+  ∀ la lb i excl,
+  is_permut_list
+    (map (λ j, j - i)
+      (canon_assoc_of_multiv_loop Nat.eqb excl
+         (map (multivalued_elem eqb lb i) la))).
+Proof.
+intros.
+revert lb i excl.
+induction la as [| a]; intros; cbn. {
+  split; [ easy | apply NoDup_nil ].
+}
+remember (multivalued_elem eqb lb i a) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]. {
+  split; [ easy | apply NoDup_nil ].
+}
+cbn.
+...
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+let i := 2 in
+let excl := [24] in
+    (map (λ j, j - i)
+      (canon_assoc_of_multiv_loop Nat.eqb excl
+         (map (multivalued_elem eqb lb i) la)))).
+...
+
+Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _) la lb,
+  is_permut_list (permutation_assoc eqb la lb).
+Proof.
+intros.
+unfold permutation_assoc.
+unfold canon_assoc_of_multiv.
+unfold multivalued.
+...
+specialize canon_assoc_of_multiv_loop_map_multiv_is_permut_list as H1.
+specialize (H1 _ eqb la lb 0 []).
+erewrite map_ext_in in H1. 2: {
+  intros j Hj.
+  now rewrite Nat.sub_0_r.
+}
+now rewrite map_id in H1.
+...
+
 Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -999,6 +1047,7 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
       (ff_app (permutation_assoc eqb lb la) i) = i.
 Proof.
 intros * Heqb * Hpab Hla.
+Search is_permut_list.
 ...
 
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
@@ -1101,7 +1150,7 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-Print canon_assoc_of_rel_loop.
+Print canon_assoc_of_multiv_loop.
 (**)
 Compute (
 let la := [2;3;5;3;2;1] in
@@ -1113,14 +1162,14 @@ Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc_of_rel Nat.eqb (multivalued eqb la lb),
- canon_assoc_of_rel Nat.eqb (multivalued eqb lb la))).
+(canon_assoc_of_multiv Nat.eqb (multivalued eqb la lb),
+ canon_assoc_of_multiv Nat.eqb (multivalued eqb lb la))).
 Compute (
 let la := [2;3;5;3;2;1] in
 let lb := [1;5;2;3;2;3] in
 let eqb := Nat.eqb in
-(canon_assoc_of_rel Nat.eqb (multivalued eqb la lb),
- isort_rank Nat.leb (canon_assoc_of_rel Nat.eqb (multivalued eqb lb la)))).
+(canon_assoc_of_multiv Nat.eqb (multivalued eqb la lb),
+ isort_rank Nat.leb (canon_assoc_of_multiv Nat.eqb (multivalued eqb lb la)))).
 Search isort_rank.
 ...
 let i := 0 in
@@ -1161,14 +1210,14 @@ destruct j. {
     cbn in Hj, Hla, Hpab.
     apply Nat.succ_lt_mono in Hla.
     specialize (IHla aft i Hpab Hla) as H1.
-    unfold canon_assoc_of_rel in H1.
+    unfold canon_assoc_of_multiv in H1.
     unfold multivalued in H1.
 ...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 ...
 destruct j. 2: {
   unfold multivalued in Hj.
-Print canon_assoc_of_rel_loop.
+Print canon_assoc_of_multiv_loop.
 
 
 Print multivalued_elem.
@@ -1177,8 +1226,8 @@ Print multivalued_elem.
 Search first_non_excl.
 cbn.
 Search (first_non_excl).
-Print canon_assoc_of_rel.
-Print canon_assoc_of_rel_loop.
+Print canon_assoc_of_multiv.
+Print canon_assoc_of_multiv_loop.
 ...
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
