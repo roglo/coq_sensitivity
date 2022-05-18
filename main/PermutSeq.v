@@ -1059,6 +1059,109 @@ split. {
     rename ld into lc.
     rewrite map_length in Hij.
     clear a Hbef Hlen.
+Print permutation_assoc_loop.
+Theorem glop : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lbo lco i,
+  permutation eqb la (filter_Some lbo ++ filter_Some lco)
+  → i < length la
+  → nth i (permutation_assoc_loop eqb la (lbo ++ None :: lco)) 0 = length lbo
+  → False.
+Proof.
+intros * Heqb * Hpa Hi Hlb.
+revert lbo lco i Hpa Hi Hlb.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ] in Hlb.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  rewrite List_nth_nil in Hlb; symmetry in Hlb.
+  apply length_zero_iff_nil in Hlb; subst lbo.
+  cbn - [ option_eqb ] in Hlxl.
+  unfold option_eqb in Hlxl at 1.
+  cbn in Hpa.
+  remember (extract _ _) as lxl eqn:Hlxl'; symmetry in Hlxl'.
+  destruct lxl as [((bef', x), aft')| ]; [ easy | clear Hlxl ].
+  specialize (proj1 (extract_None_iff _ _) Hlxl') as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ lco). {
+    specialize (permutation_in Heqb Hpa) as H2.
+    specialize (proj1 (H2 a) (or_introl eq_refl)) as H3.
+    clear - H3.
+    induction lco as [| co]; [ easy | ].
+    cbn in H3.
+    destruct co as [c| ]. {
+      destruct H3 as [H3| H3]; [ now left; subst c | ].
+      now right; apply IHlco.
+    }
+    now right; apply IHlco.
+  }
+  specialize (H1 H); clear H; cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlbo).
+cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+destruct i. {
+  cbn in Hlb.
+  now apply List_app_eq_app' in Hlbo.
+}
+cbn in Hlb.
+...
+replace (length lb) with (length (map Some lb)) in Hij.
+apply glop in Hij; [ easy | | easy ].
+now do 2 rewrite filter_Some_map_Some.
+...
+(**)
+    revert lb lc j Hpab Hj Hij.
+    induction la as [| a]; intros; [ easy | cbn ].
+    cbn - [ option_eqb ] in Hij.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+      clear Hlxl; cbn - [ option_eqb ] in H1.
+      rewrite List_nth_nil in Hij.
+      symmetry in Hij.
+      apply length_zero_iff_nil in Hij; subst lb.
+      cbn - [ option_eqb In ] in Hpab, H1.
+      specialize (H1 (Some a)).
+      assert (H : Some a ∈ None :: map Some lc). {
+        right.
+        apply in_map_iff.
+        exists a; split; [ easy | ].
+        specialize (permutation_in Heqb Hpab) as H2.
+        apply (proj1 (H2 a) (or_introl eq_refl)).
+      }
+      specialize (H1 H); clear H.
+      cbn in H1.
+      now rewrite (equality_refl Heqb) in H1.
+    }
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Hlb).
+    cbn in H.
+    destruct x as [x| ]; [ | easy ].
+    apply Heqb in H; subst x.
+    destruct j. {
+      cbn in Hij.
+      apply List_app_eq_app' in Hlb; [ easy | now rewrite map_length ].
+    }
+    cbn in Hij.
+    cbn in Hj; apply Nat.succ_lt_mono in Hj.
+    destruct lb as [| b]. {
+      cbn in Hlb, Hij.
+      destruct bef as [| c]; [ easy | ].
+      cbn in Hlb.
+      injection Hlb; clear Hlb; intros Hlb H; subst c.
+      cbn in Hij.
+      rewrite permutation_assoc_loop_cons_None in Hij.
+      rewrite (List_map_nth' 0) in Hij; [ easy | ].
+      rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+      rewrite filter_Some_app; cbn.
+      rewrite <- filter_Some_app.
+Print permutation_assoc_loop.
+...
     revert j la lc Hpab Hj Hij.
     induction lb as [| b]; intros. {
       cbn in Hpab, Hij.
