@@ -1059,6 +1059,54 @@ split. {
     rename ld into lc.
     rewrite map_length in Hij.
     clear a Hbef Hlen.
+    revert j la lc Hpab Hj Hij.
+    induction lb as [| b]; intros. {
+      cbn in Hpab, Hij.
+      rewrite permutation_assoc_loop_cons_None in Hij.
+      rewrite (List_map_nth' 0) in Hij; [ easy | ].
+      rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+      now rewrite filter_Some_map_Some.
+    }
+    cbn in Hij.
+...
+apply (permutation_sym Heqb) in Hpab.
+cbn in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hla).
+apply Heqb in H; subst x la.
+apply (permutation_sym Heqb) in Hpab.
+destruct j. {
+  destruct bef as [| b']. {
+    cbn in Hij.
+    now rewrite (equality_refl Heqb) in Hij.
+  }
+  cbn - [ option_eqb ] in Hij.
+  unfold option_eqb in Hij at 1.
+  rewrite Hbef in Hij; [ | now left ].
+...
+    destruct la as [| a]; [ easy | ].
+    cbn - [ option_eqb ] in Hij.
+    unfold option_eqb in Hij at 1.
+    remember (eqb b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba. {
+      apply Heqb in Hba; subst b.
+      cbn in Hpab.
+      apply (permutation_cons_inv Heqb) in Hpab.
+      cbn in Hij.
+      destruct j; [ easy | ].
+      cbn in Hj; apply Nat.succ_lt_mono in Hj.
+      rewrite permutation_assoc_loop_cons_None in Hij.
+      rewrite (List_map_nth' 0) in Hij. 2: {
+        rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+        rewrite filter_Some_app; cbn.
+        now do 2 rewrite filter_Some_map_Some.
+      }
+      apply Nat.succ_inj in Hij.
+      now apply IHlb in Hij.
+    }
 ...
 Search (permutation_assoc_loop _ _ (_ ++ _)).
 Print permutation_assoc_loop.
