@@ -1059,21 +1059,31 @@ split. {
     rename ld into lc.
     rewrite map_length in Hij.
     clear a Hbef Hlen.
+Print permutation_assoc_loop.
+...
 Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo i j,
   i < length la
-  → j < length lbo
+  → j < length (filter_Some lbo)
   → nth i (permutation_assoc_loop eqb la lbo) 0 = j
-  → nth j lbo None ≠ None.
+  → nth j (map Some (filter_Some lbo)) None ≠ None.
 Proof.
 intros * Hi Hj Hij.
-Print permutation_assoc_loop.
+...
+apply glop in Hij; [ | easy | ]. 2: {
+  rewrite filter_Some_app; cbn.
+  do 2 rewrite filter_Some_map_Some.
+  rewrite app_length.
+...
+   rewrite map_length, Nat.sub_diag in Hij.
+rewrite app_nth2 in Hij; [ | now rewrite map_length; unfold ge ].
 ...
 revert lbo i j Hi Hj Hij.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ option_eqb ] in Hij.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (
 ...
   rewrite List_nth_nil in Hlb; symmetry in Hlb.
   apply length_zero_iff_nil in Hlb.
