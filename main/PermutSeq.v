@@ -1065,7 +1065,8 @@ Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo lco i,
   permutation eqb la (filter_Some lbo ++ filter_Some lco)
   → i < length la
-  → nth i (permutation_assoc_loop eqb la (lbo ++ None :: lco)) 0 = length lbo
+  → nth i (permutation_assoc_loop eqb la (lbo ++ None :: lco)) 0 =
+     length (filter_Some lbo)
   → False.
 Proof.
 intros * Heqb * Hpa Hi Hlb.
@@ -1075,6 +1076,15 @@ cbn - [ option_eqb ] in Hlb.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   rewrite List_nth_nil in Hlb; symmetry in Hlb.
+  apply length_zero_iff_nil in Hlb.
+...
+rewrite Hlb in Hpa; cbn in Hpa.
+...
+specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+cbn - [ option_eqb ] in H1.
+...
+Print filter_Some.
+Search (filter_Some _ = []).
   apply length_zero_iff_nil in Hlb; subst lbo.
   cbn - [ option_eqb ] in Hlxl.
   unfold option_eqb in Hlxl at 1.
@@ -1110,9 +1120,11 @@ destruct i. {
 }
 cbn in Hlb.
 ...
-replace (length lb) with (length (map Some lb)) in Hij.
-apply glop in Hij; [ easy | | easy ].
-now do 2 rewrite filter_Some_map_Some.
+specialize glop as H1.
+specialize (H1 _ eqb Heqb la (map Some lb) (map Some lc) j).
+do 2 rewrite filter_Some_map_Some in H1.
+specialize (H1 Hpab Hj).
+congruence.
 ...
 (**)
     revert lb lc j Hpab Hj Hij.
