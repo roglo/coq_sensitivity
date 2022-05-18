@@ -990,8 +990,6 @@ split. {
   apply nat_NoDup.
   rewrite Hlen.
   intros * Hi Hj Hij.
-  rewrite fold_permutation_assoc in Hij.
-  unfold permutation_assoc in Hij.
   destruct la as [| a]; [ easy | ].
   cbn - [ option_eqb ] in Hij.
   cbn - [ option_eqb ] in Hlen.
@@ -1011,8 +1009,7 @@ split. {
     cbn in Hj.
     apply Nat.succ_lt_mono in Hj.
     clear Hi.
-    assert (H : ∃ lc, bef = map Some lc). {
-      exists (filter_Some bef).
+    assert (H : bef = map Some (filter_Some bef)). {
       clear - Hlb.
       revert lb Hlb.
       induction bef as [| bo]; intros; [ easy | cbn ].
@@ -1023,17 +1020,19 @@ split. {
       cbn; f_equal.
       now apply (IHbef lb).
     }
-    destruct H as (lc & H); subst bef.
-    assert (H : ∃ ld, aft = map Some ld). {
-      exists (filter_Some aft).
+    rewrite H in Hbef, Hlb, Hlen.
+    rewrite H in Hij at 1.
+    clear H.
+    assert (H : aft = map Some (filter_Some aft)). {
       clear - Hlb.
       rewrite List_cons_is_app, app_assoc in Hlb.
-      replace (map Some lc ++ [Some a]) with (map Some (lc ++ [a]))
+      replace (map Some (filter_Some bef) ++ [Some a]) with
+          (map Some (filter_Some bef ++ [a]))
         in Hlb. 2: {
         now rewrite map_app.
       }
-      remember (lc ++ [a]) as la eqn:Hla.
-      clear a lc Hla.
+      remember (filter_Some bef ++ [a]) as la eqn:Hla.
+      clear a Hla.
       revert lb aft Hlb.
       induction la as [| a]; intros; cbn. {
         cbn in Hlb; subst aft.
@@ -1046,7 +1045,8 @@ split. {
       clear b H.
       now apply (IHla lb).
     }
-    destruct H as (ld & H); subst aft.
+    rewrite H in Hlb, Hlen, Hij.
+    clear H.
     apply (f_equal filter_Some) in Hlb.
     rewrite filter_Some_map_Some in Hlb.
     rewrite filter_Some_app in Hlb; cbn in Hlb.
@@ -1055,9 +1055,6 @@ split. {
     specialize (permutation_app_inv Heqb) as H.
     specialize (H [] _ _ _ _ Hpab).
     cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
-    rename lc into lb.
-    rename ld into lc.
-    rewrite map_length in Hij.
     clear a Hbef Hlen.
 Print permutation_assoc_loop.
 ...
