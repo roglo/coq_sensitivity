@@ -603,6 +603,16 @@ Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
   permutation_assoc_loop eqb la (map Some lb) = permutation_assoc eqb la lb.
 Proof. easy. Qed.
 
+Theorem filter_Some_app : ∀ A (l1 l2 : list (option A)),
+  filter_Some (l1 ++ l2) = filter_Some l1 ++ filter_Some l2.
+Proof.
+intros.
+revert l2.
+induction l1 as [| xo]; intros; [ easy | cbn ].
+destruct xo as [x| ]; [ | apply IHl1 ].
+cbn; f_equal; apply IHl1.
+Qed.
+
 Theorem filter_Some_inside : ∀ A l1 l2 (x : option A),
   filter_Some (l1 ++ x :: l2) =
     filter_Some l1 ++
@@ -760,7 +770,6 @@ now apply multivalued_ub with (a := a) in Hlc.
 Qed.
 *)
 
-(*
 Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
   ∀ la lbo,
   permutation_assoc_loop eqb la (None :: lbo) =
@@ -776,7 +785,6 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 cbn; f_equal.
 apply IHla.
 Qed.
-*)
 
 (*
 Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
@@ -1001,8 +1009,8 @@ split. {
     cbn in Hij.
     symmetry in Hij.
     destruct (lt_eq_lt_dec j (length bef)) as [[Hjb| Hjb]| Hjb]. {
-      clear Hi Hj Hlen Hpab.
-      revert j lb Hlb Hij Hjb.
+      clear Hi Hj Hlen.
+      revert j la lb Hpab Hlb Hij Hjb.
       induction bef as [| bo]; intros; [ easy | ].
       destruct lb as [| b]; [ easy | ].
       cbn in Hlb.
@@ -1034,6 +1042,10 @@ split. {
       destruct ba'. {
         cbn in Hij.
         apply Heqb in Hba'; subst a'.
+        apply (permutation_trans Heqb) with (la := b :: a :: la) in Hpab. 2: {
+          now apply permutation_swap.
+        }
+        apply (permutation_cons_inv Heqb) in Hpab.
         destruct la as [| a']. {
           cbn in Hij.
           now rewrite Tauto_match_nat_same in Hij.
@@ -1055,6 +1067,11 @@ split. {
           apply Nat.succ_inj in Hij.
           now apply List_app_eq_app' in Hbna.
         }
+        rewrite permutation_assoc_loop_cons_None in Hij.
+        rewrite (List_map_nth' 0) in Hij. 2: {
+          rewrite (permutation_assoc_loop_length Heqb). 2: {
+            rewrite filter_Some_inside.
+            rewrite <- filter_Some_app.
 ...
 (* marche pas, il faudrait démontrer que c'est une permut_list :
    ça boucle *)
