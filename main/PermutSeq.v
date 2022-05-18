@@ -992,10 +992,10 @@ Qed.
    (permutation_permut uses "permutation" instead of "Permutation")
 Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
   ∀ A (eqb : A → _),
-  ∀ la lb i excl,
+  ∀ la lb i,
   is_permut_list
     (map (λ j, j - i)
-      (canon_assoc_of_multiv_loop Nat.eqb excl
+      (canon_assoc_of_multiv_loop Nat.eqb []
          (map (multivalued_elem eqb lb i) la))).
 Proof.
 intros.
@@ -1030,20 +1030,33 @@ split. {
       destruct ab. {
         injection Hlc; clear Hlc; intros Hlc H; subst c.
         clear b Hab.
-(**)
         subst lc.
-        destruct lb as [| b]; [ easy | cbn ].
+        remember 1 as k.
+        replace (S i) with (k + i) by flia Heqk.
+        clear Heqk.
+        (* a lemma, perhaps? *)
+        revert i k.
+        induction lb as [| b]; intros; [ easy | cbn ].
         remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-        destruct ab. {
-          clear b Hab.
+        destruct ab; [ easy | ].
+        clear b Hab.
+        rewrite <- Nat.add_succ_l.
+        apply IHlb.
+      }
+      clear b Hab.
+      destruct lb as [| b]; [ easy | ].
+      cbn in Hlc.
+      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+      destruct ab. {
+        clear b Hab.
+        injection Hlc; clear Hlc; intros; subst c lc.
+        remember 1 as k.
+        replace (S i) with (k + i) by flia Heqk.
+        clear Heqk.
+        revert i k.
+        induction lb as [| b]; intros. {
           cbn.
-          remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
-          destruct x; [ | easy ].
-          apply existsb_exists in Hx.
-          destruct Hx as (j & Hi & Hij).
-          apply Nat.eqb_eq in Hij; subst j.
-          destruct lb as [| b]; cbn.
-(* tiens ? c'est faux ! *)
+(* bin c'est faux *)
 ...
         destruct lc as [| c]; [ easy | cbn ].
         remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
