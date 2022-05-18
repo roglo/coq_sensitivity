@@ -569,64 +569,6 @@ Qed.
 
 (**)
 
-Fixpoint multivalued_elem {A} (eqb : A → A → bool) lb i a :=
-  match lb with
-  | [] => []
-  | b :: lb' =>
-      if eqb a b then i :: multivalued_elem eqb lb' (S i) a
-      else multivalued_elem eqb lb' (S i) a
-  end.
-
-Definition multivalued {A} (eqb : A → _) la lb :=
-  map (multivalued_elem eqb lb 0) la.
-
-(*
-Compute (
-let la := [2;3;5;3;2;1] in
-let lb := [1;5;2;3;2;3] in
-let eqb := Nat.eqb in
-(multivalued eqb la lb)).
-*)
-
-Fixpoint first_non_excl {A} (eqb : A → A → _) excl a la :=
-  match la with
-  | [] => a
-  | a' :: la' =>
-      if existsb (eqb a) excl then first_non_excl eqb excl a' la'
-      else a
-  end.
-
-Fixpoint canon_assoc_of_multiv_loop {A} (eqb : A → _) excl lla :=
-  match lla with
-  | [] => []
-  | [] :: _ => []
-  | (a :: la) :: lla' =>
-      let b := first_non_excl eqb excl a la in
-      b :: canon_assoc_of_multiv_loop eqb (b :: excl) lla'
-  end.
-
-Definition canon_assoc_of_multiv {A} (eqb : A → _) :=
-  canon_assoc_of_multiv_loop eqb [].
-
-Definition permutation_assoc {A} (eqb : A → _) la lb :=
-  canon_assoc_of_multiv Nat.eqb (multivalued eqb la lb).
-
-(*
-Compute (
-let la := [2;3;5;3;2;1] in
-let lb := [1;5;2;3;2;3] in
-let eqb := Nat.eqb in
-(permutation_assoc eqb la lb)).
-
-Compute (
-let la := [2;3;5;3;2;1] in
-let lb := [1;5;2;3;2;3] in
-let eqb := Nat.eqb in
-(permutation_assoc eqb la lb,
- permutation_assoc eqb lb la)).
-*)
-
-(*
 Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
   match (ao, bo) with
   | (Some a, Some b) => eqb a b
@@ -646,18 +588,20 @@ Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
 
 Definition permutation_assoc {A} (eqb : A → _) la lb :=
   permutation_assoc_loop eqb la (map Some lb).
-*)
 
 Definition permutation_fun {A} (eqb : A → _) la lb i :=
   unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
 
-(*
 Fixpoint filter_Some {A} (lao : list (option A)) :=
   match lao with
   | [] => []
   | Some ao :: lao' => ao :: filter_Some lao'
   | None :: lao' => filter_Some lao'
   end.
+
+Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
+  permutation_assoc_loop eqb la (map Some lb) = permutation_assoc eqb la lb.
+Proof. easy. Qed.
 
 Theorem filter_Some_inside : ∀ A l1 l2 (x : option A),
   filter_Some (l1 ++ x :: l2) =
@@ -724,49 +668,8 @@ intros.
 induction la as [| a]; [ easy | cbn ].
 now f_equal.
 Qed.
-*)
 
-Theorem canon_assoc_of_multiv_loop_length : ∀ lla excl,
-  (∀ la, la ∈ lla → la ≠ [])
-  → length (canon_assoc_of_multiv_loop Nat.eqb excl lla) = length lla.
-Proof.
-intros * Hlla.
-revert excl.
-induction lla as [| la]; intros; [ easy | cbn ].
-destruct la as [| a]. {
-  now specialize (Hlla _ (or_introl eq_refl)).
-}
-cbn; f_equal.
-apply IHlla.
-intros lb Hlb.
-now apply Hlla; right.
-Qed.
-
-Theorem multivalued_elem_neq_nil : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ a i lb, a ∈ lb → multivalued_elem eqb lb i a ≠ [].
-Proof.
-intros * Heqb * Ha.
-revert i a Ha.
-induction lb as [| b]; intros; [ easy | cbn ].
-destruct Ha as [Ha| Ha]. {
-  subst b.
-  now rewrite (equality_refl Heqb).
-}
-remember (eqb a b) as ab eqn:Hab.
-destruct ab; [ easy | ].
-now apply IHlb.
-Qed.
-
-Theorem multivalued_length : ∀ A (eqb : A → _) la lb,
-  length (multivalued eqb la lb) = length la.
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-f_equal.
-now rewrite map_length.
-Qed.
-
+(*
 Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -774,38 +677,11 @@ Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   → length (permutation_assoc eqb la lb) = length la.
 Proof.
 intros * Heqb * Hpab.
-destruct (Nat.eq_dec (length la) 0) as [Hz| Hz]. {
-  now apply length_zero_iff_nil in Hz; subst la.
-}
-unfold permutation_assoc.
-unfold canon_assoc_of_multiv.
-rewrite canon_assoc_of_multiv_loop_length; [ apply multivalued_length | ].
-intros lc Hlc H; subst lc.
-destruct la as [| a]; [ easy | clear Hz ].
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x.
-subst lb.
-cbn in Hlc.
-destruct Hlc as [Hlc| Hlc]. {
-  revert Hlc.
-  apply (multivalued_elem_neq_nil Heqb).
-  now apply in_or_app; right; left.
-}
-apply in_map_iff in Hlc.
-destruct Hlc as (c & Hac & Hc).
-revert Hac.
-apply (multivalued_elem_neq_nil Heqb).
-apply (permutation_in Heqb Hpab) in Hc.
-apply in_app_or in Hc.
-apply in_or_app.
-destruct Hc as [Hc| Hc]; [ now left | now right; right ].
+apply (permutation_assoc_loop_length Heqb).
+now rewrite filter_Some_map_Some.
 Qed.
+*)
 
-(*
 Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lbo i,
@@ -846,8 +722,8 @@ subst lbo.
 rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
-*)
 
+(*
 Theorem first_non_excl_ub : ∀ excl a la len,
   (∀ b, b ∈ a :: la → b < len)
   → first_non_excl Nat.eqb excl a la < len.
@@ -860,62 +736,6 @@ destruct x; [ | now apply Hla; left ].
 apply IHla.
 intros c Hc.
 now apply Hla; right.
-Qed.
-
-Theorem nth_canon_assoc_of_multiv_loop_ub :
-  ∀ excl lla i len,
-  len ≠ 0
-  → (∀ la, la ∈ lla → ∀ a, a ∈ la → a < len)
-  → i < length lla
-  → nth i (canon_assoc_of_multiv_loop eqb excl lla) 0 < len.
-Proof.
-intros * Hlen Hlla Hi.
-revert i len excl Hlen Hi Hlla.
-induction lla as [| la]; intros; [ easy | cbn ].
-destruct la as [| a]. {
-  rewrite List_nth_nil; flia Hlen.
-}
-destruct i. {
-  cbn - [ In ] in Hlla |-*; clear Hi.
-  apply first_non_excl_ub.
-  intros b Hb.
-  apply (Hlla (a :: la)); [ now left | easy ].
-}
-cbn in Hi |-*.
-apply Nat.succ_lt_mono in Hi.
-apply IHlla; [ easy | easy | ].
-intros lb Hlb b Hb.
-apply (Hlla lb); [ now right | easy ].
-Qed.
-
-Theorem multivalued_elem_ub : ∀ A (eqb : A → _),
-  ∀ la c i a,
-  a ∈ multivalued_elem eqb la i c
-  → a < i + length la.
-Proof.
-intros * Ha.
-revert i a Ha.
-induction la as [| b]; intros; [ easy | ].
-cbn in Ha |-*.
-rewrite <- Nat.add_succ_comm.
-destruct (eqb c b). {
-  destruct Ha as [Ha| Ha]; [ subst a; flia | ].
-  now apply IHla.
-}
-now apply IHla.
-Qed.
-
-Theorem multivalued_ub : ∀ A (eqb : A → _),
-  ∀ la lb lc,
-  lc ∈ multivalued eqb la lb
-  → ∀ a, a ∈ lc → a < length lb.
-Proof.
-intros * Hlc * Ha.
-unfold multivalued in Hlc.
-apply in_map_iff in Hlc.
-destruct Hlc as (c & Hlc & Hc).
-subst lc.
-now apply multivalued_elem_ub in Ha.
 Qed.
 
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
@@ -938,6 +758,7 @@ rewrite multivalued_length.
 rewrite (permutation_length Heqb Hpab).
 now apply multivalued_ub with (a := a) in Hlc.
 Qed.
+*)
 
 (*
 Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
@@ -957,6 +778,7 @@ apply IHla.
 Qed.
 *)
 
+(*
 Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
   first_non_excl eqb [] a la = a.
 Proof. now intros; destruct la. Qed.
@@ -988,8 +810,6 @@ intros x Hx.
 now apply Hla; right.
 Qed.
 
-(* to be completed if required
-   (permutation_permut uses "permutation" instead of "Permutation")
 Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
   ∀ A (eqb : A → _),
   ∀ la lb i,
@@ -1116,24 +936,11 @@ let excl := [24] in
       (canon_assoc_of_multiv_loop Nat.eqb excl
          (map (multivalued_elem eqb lb i) la)))).
 ...
+*)
 
-Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _) la lb,
-  is_permut_list (permutation_assoc eqb la lb).
-Proof.
-intros.
-unfold permutation_assoc.
-unfold canon_assoc_of_multiv.
-unfold multivalued.
-...
-specialize canon_assoc_of_multiv_loop_map_multiv_is_permut_list as H1.
-specialize (H1 _ eqb la lb 0 []).
-erewrite map_ext_in in H1. 2: {
-  intros j Hj.
-  now rewrite Nat.sub_0_r.
-}
-now rewrite map_id in H1.
-...
-
+(* to be completed if required
+   ("permutation_permut" uses "permutation" instead of "Permutation")
+(*
 Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -1143,7 +950,125 @@ Theorem permutation_assoc_permutation_assoc_inv : ∀ A (eqb : A → _),
       (ff_app (permutation_assoc eqb lb la) i) = i.
 Proof.
 intros * Heqb * Hpab Hla.
-Search is_permut_list.
+...
+*)
+
+Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → is_permut_list (permutation_assoc eqb la lb).
+Proof.
+intros * Heqb * Hpab.
+unfold permutation_assoc.
+specialize (permutation_assoc_loop_length Heqb) as Hlen.
+specialize (Hlen la (map Some lb)).
+rewrite filter_Some_map_Some in Hlen.
+specialize (Hlen Hpab).
+split. {
+  intros i Hi.
+  rewrite Hlen.
+  apply (In_nth _ _ 0) in Hi.
+  rewrite Hlen in Hi.
+  destruct Hi as (j & Hj & Hi).
+  subst i.
+  eapply lt_le_trans. {
+    apply (permutation_assoc_loop_ub Heqb); [ | easy ].
+    now rewrite filter_Some_map_Some.
+  }
+  rewrite map_length.
+  now rewrite (permutation_length Heqb Hpab).
+}  {
+  apply nat_NoDup.
+  rewrite Hlen.
+  intros * Hi Hj Hij.
+  rewrite fold_permutation_assoc in Hij.
+  unfold permutation_assoc in Hij.
+  destruct la as [| a]; [ easy | ].
+  cbn - [ option_eqb ] in Hij.
+  cbn - [ option_eqb ] in Hlen.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  cbn in Hlen.
+  apply Nat.succ_inj in Hlen.
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & Hx & Hlb).
+  cbn in Hx.
+  destruct x as [x| ]; [ | easy ].
+  apply Heqb in Hx; subst x.
+  destruct i. {
+    destruct j; [ easy | exfalso ].
+    cbn in Hij.
+    symmetry in Hij.
+    destruct (lt_eq_lt_dec j (length bef)) as [[Hjb| Hjb]| Hjb]. {
+      clear Hi Hj Hlen Hpab.
+      revert j lb Hlb Hij Hjb.
+      induction bef as [| bo]; intros; [ easy | ].
+      destruct lb as [| b]; [ easy | ].
+      cbn in Hlb.
+      injection Hlb; clear Hlb; intros Hlb H; subst bo.
+      cbn in Hjb, Hij.
+      destruct j. {
+        destruct la as [| a']; [ easy | ].
+        cbn - [ option_eqb ] in Hij.
+        unfold option_eqb in Hij at 1.
+        remember (eqb b a') as ba' eqn:Hba'; symmetry in Hba'.
+        destruct ba'; [ easy | ].
+        remember (extract (λ bo, option_eqb eqb bo (Some a')) (bef ++ None :: aft)) as lxl eqn:Hlxl.
+        symmetry in Hlxl.
+        destruct lxl as [((bef', x), aft')| ]; [ | easy ].
+        cbn in Hij.
+        apply Nat.succ_inj in Hij.
+        apply extract_Some_iff in Hlxl.
+        destruct Hlxl as (Hbef' & H & Hbna).
+        cbn in H.
+        destruct x as [x| ]; [ | easy ].
+        apply Heqb in H; subst x.
+        now apply List_app_eq_app' in Hbna.
+      }
+      apply Nat.succ_lt_mono in Hjb.
+      destruct la as [| a']; [ easy | ].
+      cbn - [ option_eqb ] in Hij.
+      unfold option_eqb in Hij at 1.
+      remember (eqb b a') as ba' eqn:Hba'; symmetry in Hba'.
+      destruct ba'. {
+        cbn in Hij.
+        apply Heqb in Hba'; subst a'.
+        destruct la as [| a']. {
+          cbn in Hij.
+          now rewrite Tauto_match_nat_same in Hij.
+        }
+        cbn - [ option_eqb ] in Hij.
+        unfold option_eqb in Hij at 1.
+        remember (extract (λ bo, option_eqb eqb bo (Some a')) (bef ++ None :: aft)) as lxl eqn:Hlxl.
+        symmetry in Hlxl.
+        destruct lxl as [((bef', x), aft')| ]. 2: {
+          now rewrite List_nth_nil in Hij.
+        }
+        apply extract_Some_iff in Hlxl.
+        destruct Hlxl as (Hbef' & H & Hbna).
+        cbn in H.
+        destruct x as [x| ]; [ | easy ].
+        apply Heqb in H; subst x.
+        cbn in Hij.
+        destruct j. {
+          apply Nat.succ_inj in Hij.
+          now apply List_app_eq_app' in Hbna.
+        }
+...
+(* marche pas, il faudrait démontrer que c'est une permut_list :
+   ça boucle *)
+  apply (f_equal (ff_app (permutation_assoc eqb lb la))) in Hij.
+...
+  rewrite (permutation_assoc_permutation_assoc_inv Heqb) in Hij.
+...
+specialize canon_assoc_of_multiv_loop_map_multiv_is_permut_list as H1.
+specialize (H1 _ eqb la lb 0 []).
+erewrite map_ext_in in H1. 2: {
+  intros j Hj.
+  now rewrite Nat.sub_0_r.
+}
+now rewrite map_id in H1.
 ...
 
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
