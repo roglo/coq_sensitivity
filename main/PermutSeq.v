@@ -1008,6 +1008,10 @@ split. {
     destruct j; [ easy | exfalso ].
     cbn in Hij.
     symmetry in Hij.
+    cbn in Hj.
+    apply Nat.succ_lt_mono in Hj.
+    clear Hi.
+...
     destruct (lt_eq_lt_dec j (length bef)) as [[Hjb| Hjb]| Hjb]. {
       clear Hi Hj Hlen.
       revert j la lb Hpab Hlb Hij Hjb.
