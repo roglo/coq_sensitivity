@@ -595,7 +595,7 @@ Definition permutation_fun {A} (eqb : A → _) la lb i :=
 Fixpoint filter_Some {A} (lao : list (option A)) :=
   match lao with
   | [] => []
-  | Some ao :: lao' => ao :: filter_Some lao'
+  | Some a :: lao' => a :: filter_Some lao'
   | None :: lao' => filter_Some lao'
   end.
 
@@ -1330,89 +1330,101 @@ split. {
   }
   rewrite map_length.
   now rewrite (permutation_length Heqb Hpab).
-}  {
+} {
   apply nat_NoDup.
   rewrite Hlen.
   intros * Hi Hj Hij.
-  destruct la as [| a]; [ easy | ].
+clear Hlen.
+  revert lb i j Hpab (*Hlen*) Hi Hj Hij.
+  induction la as [| a]; intros; [ easy | ].
   cbn - [ option_eqb ] in Hij.
+(*
   cbn - [ option_eqb ] in Hlen.
+*)
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (permutation_assoc_loop_length Heqb) as Hlen.
+    specialize (Hlen (a :: la) (map Some lb)).
+    rewrite filter_Some_map_Some in Hlen.
+    specialize (Hlen Hpab).
+    cbn - [ option_eqb ] in Hlen.
+    now rewrite Hlxl in Hlen.
+  }
+(*
   destruct lxl as [((bef, x), aft)| ]; [ | easy ].
   cbn in Hlen.
   apply Nat.succ_inj in Hlen.
+*)
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & Hx & Hlb).
   cbn in Hx.
   destruct x as [x| ]; [ | easy ].
   apply Heqb in Hx; subst x.
+  assert (H : bef = map Some (filter_Some bef)). {
+    clear - Hlb.
+    revert lb Hlb.
+    induction bef as [| bo]; intros; [ easy | cbn ].
+    cbn in Hlb.
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros Hlb H; subst bo.
+    cbn; f_equal.
+    now apply (IHbef lb).
+  }
+  rewrite H in Hbef, Hlb, (*Hlen,*) Hij.
+  rewrite map_length in Hij.
+  clear H.
+  assert (H : aft = map Some (filter_Some aft)). {
+    clear - Hlb.
+    rewrite List_cons_is_app, app_assoc in Hlb.
+    replace (map Some (filter_Some bef) ++ [Some a]) with
+        (map Some (filter_Some bef ++ [a]))
+      in Hlb. 2: {
+      now rewrite map_app.
+    }
+    remember (filter_Some bef ++ [a]) as la eqn:Hla.
+    clear a Hla.
+    revert lb aft Hlb.
+    induction la as [| a]; intros; cbn. {
+      cbn in Hlb; subst aft.
+      symmetry; f_equal; apply filter_Some_map_Some.
+    }
+    cbn in Hlb.
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros Hlb H.
+    clear b H.
+    now apply (IHla lb).
+  }
+  rewrite H in Hlb, (*Hlen,*) Hij.
+  clear H.
+  apply (f_equal filter_Some) in Hlb.
+  rewrite filter_Some_map_Some in Hlb.
+  rewrite filter_Some_app in Hlb; cbn in Hlb.
+  do 2 rewrite filter_Some_map_Some in Hlb.
+  subst lb.
+  remember (filter_Some bef) as lb eqn:Hlb.
+  remember (filter_Some aft) as lc eqn:Hlc.
+  clear bef aft Hlb Hlc.
+  rewrite (permutation_assoc_loop_None_inside Heqb) in Hij.
+  rewrite map_length in Hij.
+  rewrite <- map_app in Hij.
+  specialize (permutation_app_inv Heqb) as H.
+  specialize (H [] _ _ _ _ Hpab).
+  cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
   destruct i. {
     destruct j; [ easy | exfalso ].
-    cbn in Hij.
+    cbn - [ "<?" ] in Hij.
     symmetry in Hij.
     cbn in Hj.
     apply Nat.succ_lt_mono in Hj.
     clear Hi.
-    assert (H : bef = map Some (filter_Some bef)). {
-      clear - Hlb.
-      revert lb Hlb.
-      induction bef as [| bo]; intros; [ easy | cbn ].
-      cbn in Hlb.
-      destruct lb as [| b]; [ easy | ].
-      cbn in Hlb.
-      injection Hlb; clear Hlb; intros Hlb H; subst bo.
-      cbn; f_equal.
-      now apply (IHbef lb).
-    }
-    rewrite H in Hbef, Hlb, Hlen, Hij.
-    rewrite map_length in Hij.
-    clear H.
-    assert (H : aft = map Some (filter_Some aft)). {
-      clear - Hlb.
-      rewrite List_cons_is_app, app_assoc in Hlb.
-      replace (map Some (filter_Some bef) ++ [Some a]) with
-          (map Some (filter_Some bef ++ [a]))
-        in Hlb. 2: {
-        now rewrite map_app.
-      }
-      remember (filter_Some bef ++ [a]) as la eqn:Hla.
-      clear a Hla.
-      revert lb aft Hlb.
-      induction la as [| a]; intros; cbn. {
-        cbn in Hlb; subst aft.
-        symmetry; f_equal; apply filter_Some_map_Some.
-      }
-      cbn in Hlb.
-      destruct lb as [| b]; [ easy | ].
-      cbn in Hlb.
-      injection Hlb; clear Hlb; intros Hlb H.
-      clear b H.
-      now apply (IHla lb).
-    }
-    rewrite H in Hlb, Hlen, Hij.
-    clear H.
-    apply (f_equal filter_Some) in Hlb.
-    rewrite filter_Some_map_Some in Hlb.
-    rewrite filter_Some_app in Hlb; cbn in Hlb.
-    do 2 rewrite filter_Some_map_Some in Hlb.
-    subst lb.
-    specialize (permutation_app_inv Heqb) as H.
-    specialize (H [] _ _ _ _ Hpab).
-    cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
-    clear Hbef Hlen.
-    remember (filter_Some bef) as lb eqn:Hlb.
-    remember (filter_Some aft) as lc eqn:Hlc.
-    clear bef aft Hlb Hlc.
     rename j into i; rename Hj into Hi.
-    rewrite (permutation_assoc_loop_None_inside Heqb) in Hij.
     rewrite (List_map_nth' 0) in Hij. 2: {
       rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
-      rewrite filter_Some_app.
-      now do 2 rewrite filter_Some_map_Some.
+      now rewrite filter_Some_map_Some.
     }
-    rewrite <- map_app in Hij.
     remember (permutation_assoc_loop eqb la (map Some (lb ++ lc))) as ld.
-    rewrite map_length in Hij.
     remember (nth i ld 0) as j eqn:Hj; symmetry in Hj.
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec j (length lb)) as [H| H]; [ flia H Hij | ].
@@ -1420,15 +1432,26 @@ split. {
     flia H Hij.
   }
   cbn in Hi, Hj.
+  apply Nat.succ_lt_mono in Hi.
   rewrite List_nth_succ_cons in Hij.
+  rewrite (List_map_nth' 0) in Hij. 2: {
+    rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+    now rewrite filter_Some_map_Some.
+  }
+...
   destruct j; [ exfalso | ]. {
     cbn in Hij.
+    rewrite (permutation_assoc_loop_None_inside Heqb) in Hij.
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+      rewrite filter_Some_app.
 ...
-Search permutation_assoc_loop.
-Check permutation_assoc_loop_nth_nth.
+      now do 2 rewrite filter_Some_map_Some.
+    }
+...
     specialize (permutation_assoc_loop_nth_nth Heqb a) as H1.
     specialize (H1 la).
-    specialize (H1 (map Some lb ++ None :: map
+    specialize (H1 (map Some lb ++ None :: map Some lc)).
 ...
     apply (permutation_assoc_loop_nth_nth Heqb a) in Hij; [ | | easy ]. 2: {
       rewrite filter_Some_app; cbn.
