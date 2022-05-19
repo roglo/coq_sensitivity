@@ -946,6 +946,18 @@ let excl := [24] in
 ...
 *)
 
+Theorem filter_Some_length_ub : ∀ A (lao : list (option A)),
+  length (filter_Some lao) ≤ length lao.
+Proof.
+intros.
+induction lao as [| ao]; [ easy | cbn ].
+destruct ao as [a| ]. {
+  now cbn; apply -> Nat.succ_le_mono.
+}
+transitivity (length lao); [ easy | ].
+apply Nat.le_succ_diag_r.
+Qed.
+
 (* to be completed if required
    ("permutation_permut" uses "permutation" instead of "Permutation")
 (*
@@ -1090,39 +1102,73 @@ destruct Hlxl as (Hbef & H & Hlb).
 cbn in H.
 destruct x as [x| ]; [ | easy ].
 apply Heqb in H; subst x.
-destruct i. {
-  cbn.
+assert (H : ∃ bef', bef = map Some bef'). {
+  clear - Hlb.
+  revert bef Hlb.
+  induction lb as [| b]; intros; [ now destruct bef | ].
+  cbn in Hlb.
+  destruct bef as [| bo]; [ now exists [] | ].
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros Hlb H; subst bo.
+  specialize (IHlb _ Hlb) as H1.
+  destruct H1 as (bef' & Hbef').
+  subst bef.
+  now exists (b :: bef').
+}
+destruct H as (bef', H); subst bef; rename bef' into bef.
+rewrite map_length in Hij.
+assert (H : ∃ aft', aft = map Some aft'). {
+  clear - Hlb.
+  revert bef Hlb.
+  induction lb as [| b]; intros; [ now destruct bef | ].
+  cbn in Hlb.
+  destruct bef as [| bo]. {
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros Hlb H; subst b.
+    now exists lb.
+  }
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros Hlb H; subst bo.
+  specialize (IHlb _ Hlb) as H1.
+  destruct H1 as (aft' & Haft').
+  subst aft.
+  now exists aft'.
+}
+destruct H as (aft', H); subst aft; rename aft' into aft.
+assert (H : lb = bef ++ a :: aft). {
+  clear - Hlb.
   apply (f_equal filter_Some) in Hlb.
   rewrite filter_Some_app in Hlb; cbn in Hlb.
-  rewrite filter_Some_map_Some in Hlb.
-  subst lb.
-  cbn in Hij; subst j.
-  rewrite app_nth2. 2: {
-    clear; unfold ge.
-    induction bef as [| bo]; [ easy | cbn ].
-    destruct bo as [b| ]; cbn. {
-      now apply -> Nat.succ_le_mono.
-    }
-    transitivity (length bef); [ easy | ].
-    apply Nat.le_succ_diag_r.
+  now do 3 rewrite filter_Some_map_Some in Hlb.
+}
+move H before Hlb; clear Hlb; rename H into Hlb.
+subst lb.
+specialize (permutation_app_inv Heqb) as H.
+specialize (H [] _ _ _ _ Hpab).
+cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
+destruct i. {
+  cbn in Hij |-*; subst j.
+  rewrite app_nth2; [ | now unfold ge ].
+  now rewrite Nat.sub_diag.
+}
+rewrite List_nth_succ_cons in Hij |-*.
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+rewrite app_length in Hj; cbn in Hj.
+rewrite Nat.add_succ_r, <- app_length in Hj.
+destruct j. {
+  clear Hj.
+  destruct bef as [| b]. {
+    cbn in Hij.
+    rewrite permutation_assoc_loop_cons_None in Hij.
+    rewrite (List_map_nth' 0) in Hij; [ easy | ].
+    rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+    now rewrite filter_Some_map_Some.
   }
+  cbn.
+  cbn in Hij.
 ...
-  specialize (H1 bo (or_introl eq_refl)) as H2.
-    cbn in H2.
-    destruct bo as [b| ].
-...
-  rewrite List_nth_nil in Hij; subst j.
-  destruct i. {
-    cbn.
-    destruct lbo as [| bo]; [ easy | cbn ].
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-    cbn - [ option_eqb In ] in H1.
-    specialize (H1 bo (or_introl eq_refl)) as H2.
-    cbn in H2.
-    destruct bo as [b| ].
-Print permutation_assoc_loop.
-...
-apply (glop eqb a) in Hij.
+specialize (IHla d (bef ++ aft) i (S j) Hpab Hi) as H1.
 ...
 Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo i j,
