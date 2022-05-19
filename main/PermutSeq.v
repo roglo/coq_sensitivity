@@ -1220,6 +1220,76 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
 }
 Qed.
 
+Theorem permutation_assoc_loop_nth_nth : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lbo i j,
+  permutation eqb la (filter_Some lbo)
+  → i < length la
+  → nth i (permutation_assoc_loop eqb la lbo) 0 = j
+  → nth i la d = unsome d (nth j lbo None).
+Proof.
+intros * Heqb * Hpab Hi Hij.
+subst j.
+revert d lbo i Hpab Hi.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
+  cbn - [ option_eqb In ] in H1.
+  specialize (proj1 (permutation_in Heqb Hpab a) (or_introl eq_refl)) as H2.
+  assert (H : Some a ∈ lbo). {
+    clear - H2.
+    induction lbo as [| bo]; [ easy | ].
+    cbn in H2.
+    destruct bo as [b| ]. {
+      destruct H2 as [H2| H2]; [ now left; subst b | right ].
+      now apply IHlbo.
+    }
+    now right; apply IHlbo.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+subst lbo.
+rewrite filter_Some_app in Hpab; cbn in Hpab.
+specialize (permutation_app_inv Heqb) as H.
+specialize (H [] _ _ _ _ Hpab).
+cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
+rewrite <- filter_Some_app in Hpab.
+destruct i. {
+  cbn.
+  rewrite app_nth2; [ | now unfold ge ].
+  now rewrite Nat.sub_diag.
+}
+rewrite List_nth_succ_cons.
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+rewrite IHla with (lbo := bef ++ aft); [ | easy | easy ].
+f_equal.
+rewrite (permutation_assoc_loop_None_inside Heqb).
+rewrite (List_map_nth' 0). 2: {
+  now rewrite (permutation_assoc_loop_length Heqb).
+}
+remember (nth i (permutation_assoc_loop _ _ _) 0) as j eqn:Hj.
+symmetry in Hj.
+rewrite if_ltb_lt_dec.
+destruct (lt_dec j (length bef)) as [Hjb| Hjb]. {
+  rewrite app_nth1; [ | easy ].
+  now rewrite app_nth1.
+}
+apply Nat.nlt_ge in Hjb.
+rewrite app_nth2; [ | easy ].
+rewrite app_nth2; [ | flia Hjb ].
+now rewrite Nat.sub_succ_l.
+Qed.
+
 (* to be completed if required
    ("permutation_permut" uses "permutation" instead of "Permutation")
 (*
@@ -1333,101 +1403,16 @@ split. {
     remember (filter_Some bef) as lb eqn:Hlb.
     remember (filter_Some aft) as lc eqn:Hlc.
     clear bef aft Hlb Hlc.
-Theorem glop : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ d la lbo i j,
-  permutation eqb la (filter_Some lbo)
-  → i < length la
-  → nth i (permutation_assoc_loop eqb la lbo) 0 = j
-  → nth i la d = unsome d (nth j lbo None).
-Proof.
-intros * Heqb * Hpab Hi Hij.
-subst j.
-revert d lbo i Hpab Hi.
-induction la as [| a]; intros; [ easy | ].
-cbn - [ option_eqb ].
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
-  cbn - [ option_eqb In ] in H1.
-  specialize (proj1 (permutation_in Heqb Hpab a) (or_introl eq_refl)) as H2.
-  assert (H : Some a ∈ lbo). {
-    clear - H2.
-    induction lbo as [| bo]; [ easy | ].
-    cbn in H2.
-    destruct bo as [b| ]. {
-      destruct H2 as [H2| H2]; [ now left; subst b | right ].
-      now apply IHlbo.
+(**)
+    specialize (permutation_assoc_loop_nth_nth Heqb a) as H1.
+    specialize (H1 la).
+...
+    apply (permutation_assoc_loop_nth_nth Heqb a) in Hij; [ | | easy ]. 2: {
+      rewrite filter_Some_app; cbn.
+      now do 2 rewrite filter_Some_map_Some.
     }
-    now right; apply IHlbo.
-  }
-  specialize (H1 H); clear H.
-  cbn in H1.
-  now rewrite (equality_refl Heqb) in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-cbn in H.
-destruct x as [x| ]; [ | easy ].
-apply Heqb in H; subst x.
-subst lbo.
-rewrite filter_Some_app in Hpab; cbn in Hpab.
-specialize (permutation_app_inv Heqb) as H.
-specialize (H [] _ _ _ _ Hpab).
-cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
-rewrite <- filter_Some_app in Hpab.
-destruct i. {
-  cbn.
-  rewrite app_nth2; [ | now unfold ge ].
-  now rewrite Nat.sub_diag.
-}
-rewrite List_nth_succ_cons.
-cbn in Hi.
-apply Nat.succ_lt_mono in Hi.
-rewrite IHla with (lbo := bef ++ aft); [ | easy | easy ].
-f_equal.
-rewrite (permutation_assoc_loop_None_inside Heqb).
-rewrite (List_map_nth' 0). 2: {
-  now rewrite (permutation_assoc_loop_length Heqb).
-}
-remember (permutation_assoc_loop _ _ _) as lb eqn:Hlb.
-symmetry in Hlb.
-...
-Print permutation_assoc_loop.
-Theorem glip :
-  permutation_assoc_loop eqb la (lb ++ lc) =
-  permutation_assoc_loop eqb
-Search (permutation_assoc_loop _ _ (_ :: _)).
-Search (permutation_assoc_loop _ _ (_ ++ _)).
-...
-rewrite IHla with (lb := bef ++ aft) (j := j).
-...
-specialize (IHla d (bef ++ aft) i j Hpab Hi) as H1.
-specialize (IHla d (bef ++ aft) i (j + length bef) Hpab Hi) as H2.
-...
-rewrite app_length in Hj; cbn in Hj.
-rewrite Nat.add_succ_r, <- app_length in Hj.
-destruct j. {
-  clear Hj.
-  destruct bef as [| b]. {
-    cbn in Hij.
-    rewrite permutation_assoc_loop_cons_None in Hij.
-    rewrite (List_map_nth' 0) in Hij; [ easy | ].
-    rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
-    now rewrite filter_Some_map_Some.
-  }
-  cbn in Hij |-*.
-...
-specialize (IHla d (bef ++ aft) i (S j) Hpab Hi) as H1.
-...
-Theorem glop : ∀ A (eqb : A → _),
-  ∀ la lbo i j,
-  i < length la
-  → j < length (filter_Some lbo)
-  → nth i (permutation_assoc_loop eqb la lbo) 0 = j
-  → nth j (map Some (filter_Some lbo)) None ≠ None.
-Proof.
-intros * Hi Hj Hij.
+    rewrite app_nth2 in Hij; [ | now rewrite map_length; unfold ge ].
+    rewrite map_length, Nat.sub_diag in Hij; cbn in Hij.
 ...
 apply glop in Hij; [ | easy | ]. 2: {
   rewrite filter_Some_app; cbn.
