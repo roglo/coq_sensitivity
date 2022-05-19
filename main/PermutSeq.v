@@ -1056,16 +1056,9 @@ split. {
     specialize (H [] _ _ _ _ Hpab).
     cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
     clear a Hbef Hlen.
-Print permutation_assoc_loop.
-...
-  Hpab : permutation eqb la (filter_Some bef ++ filter_Some aft)
-  Hj : j < length la
-  Hij : nth j
-          (permutation_assoc_loop eqb la
-             (map Some (filter_Some bef) ++ None :: map Some (filter_Some aft)))
-          0 = length (filter_Some bef)
-  ============================
-  False
+    remember (filter_Some bef) as lb eqn:Hlb.
+    remember (filter_Some aft) as lc eqn:Hlc.
+    clear bef aft Hlb Hlc.
 ...
 Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo i j,
