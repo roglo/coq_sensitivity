@@ -1076,12 +1076,11 @@ Theorem glop : ∀ A (eqb : A → _),
   ∀ d la lb i j,
   permutation eqb la lb
   → i < length la
-  → j < length lb
   → nth i (permutation_assoc_loop eqb la (map Some lb)) 0 = j
   → nth i la d = nth j lb d.
 Proof.
-intros * Heqb * Hpab Hi Hj Hij.
-revert d lb i j Hpab Hi Hj Hij.
+intros * Heqb * Hpab Hi Hij.
+revert d lb i j Hpab Hi Hij.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ option_eqb ] in Hij.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -1154,6 +1153,9 @@ destruct i. {
 rewrite List_nth_succ_cons in Hij |-*.
 cbn in Hi.
 apply Nat.succ_lt_mono in Hi.
+...
+specialize (IHla d (bef ++ aft) i j Hpab Hi) as H1.
+...
 rewrite app_length in Hj; cbn in Hj.
 rewrite Nat.add_succ_r, <- app_length in Hj.
 destruct j. {
@@ -1165,8 +1167,7 @@ destruct j. {
     rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
     now rewrite filter_Some_map_Some.
   }
-  cbn.
-  cbn in Hij.
+  cbn in Hij |-*.
 ...
 specialize (IHla d (bef ++ aft) i (S j) Hpab Hi) as H1.
 ...
