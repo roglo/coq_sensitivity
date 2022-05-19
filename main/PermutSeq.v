@@ -1020,8 +1020,8 @@ split. {
       cbn; f_equal.
       now apply (IHbef lb).
     }
-    rewrite H in Hbef, Hlb, Hlen.
-    rewrite H in Hij at 1.
+    rewrite H in Hbef, Hlb, Hlen, Hij.
+    rewrite map_length in Hij.
     clear H.
     assert (H : aft = map Some (filter_Some aft)). {
       clear - Hlb.
@@ -1057,6 +1057,15 @@ split. {
     cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
     clear a Hbef Hlen.
 Print permutation_assoc_loop.
+...
+  Hpab : permutation eqb la (filter_Some bef ++ filter_Some aft)
+  Hj : j < length la
+  Hij : nth j
+          (permutation_assoc_loop eqb la
+             (map Some (filter_Some bef) ++ None :: map Some (filter_Some aft)))
+          0 = length (filter_Some bef)
+  ============================
+  False
 ...
 Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo i j,
