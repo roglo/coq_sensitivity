@@ -1232,7 +1232,198 @@ cbn in H.
 destruct x as [x| ]; [ | easy ].
 apply Heqb in H; subst x.
 move Hlbc before Hlbc'.
+move Hbef before Hbef'.
 f_equal. {
+  rewrite if_ltb_lt_dec.
+  destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
+    apply app_eq_app in Hlbc'.
+    destruct Hlbc' as (ldo & H4).
+    destruct H4 as [(H4, H5)| (H4, H5)]. {
+      subst lbo.
+      rewrite app_length in Hfo.
+      destruct ldo as [| d]; [ cbn in Hfo; flia Hfo | ].
+      cbn in H5; clear Hfo.
+      injection H5; clear H5; intros; subst d aft'.
+      rewrite <- app_assoc in Hlbc.
+      cbn in Hlbc.
+      apply app_eq_app in Hlbc.
+      destruct Hlbc as (lfo & H4).
+      destruct H4 as [(H4, H5)| (H4, H5)]. {
+        subst bef'.
+        rewrite app_length, Nat.add_comm.
+        destruct lfo as [| d]; [ easy | exfalso ].
+        cbn in H5.
+        injection H5; clear H5; intros; subst d aft.
+        specialize (Hbef' (Some a)) as H1.
+        assert (H : Some a ∈ bef ++ Some a :: lfo). {
+          now apply in_or_app; right; left.
+        }
+        specialize (H1 H); clear H; cbn in H1.
+        now rewrite (equality_refl Heqb) in H1.
+      } {
+        subst bef.
+        rewrite app_length, Nat.add_comm.
+        destruct lfo as [| d]; [ easy | exfalso ].
+        cbn in H5.
+        injection H5; clear H5; intros H5 H; subst d.
+        specialize (Hbef (Some a)) as H1.
+        assert (H : Some a ∈ bef' ++ Some a :: lfo). {
+        now apply in_or_app; right; left.
+      }
+        specialize (H1 H); clear H; cbn in H1.
+        now rewrite (equality_refl Heqb) in H1.
+      }
+    } {
+      subst bef' lco.
+      rewrite app_length in Hfo; flia Hfo.
+    }
+  } {
+    apply Nat.nlt_ge in Hfo.
+    apply app_eq_app in Hlbc'.
+    destruct Hlbc' as (ldo & H4).
+    destruct H4 as [(H4, H5)| (H4, H5)]. {
+      subst lbo.
+      rewrite app_length in Hfo.
+      destruct ldo; [ | cbn in Hfo; flia Hfo ].
+      cbn in H5; clear Hfo.
+      subst lco.
+      rewrite app_nil_r in Hlbc.
+      apply app_eq_app in Hlbc.
+      destruct Hlbc as (lfo & H4).
+      destruct H4 as [(H4, H5)| (H4, H5)]. {
+        subst bef'; exfalso.
+        destruct lfo as [| d]; [ easy | ].
+        cbn in H5.
+        injection H5; clear H5; intros; subst d aft.
+        specialize (Hbef' (Some a)) as H1.
+        assert (H : Some a ∈ bef ++ Some a :: lfo). {
+          now apply in_or_app; right; left.
+        }
+        specialize (H1 H); clear H; cbn in H1.
+        now rewrite (equality_refl Heqb) in H1.
+      } {
+        subst bef.
+        rewrite app_length, Nat.add_comm.
+        destruct lfo as [| d]; [ easy | cbn ].
+        destruct lfo as [| d']; [ easy | exfalso ].
+        cbn in H5.
+        injection H5; clear H5; intros; subst d d' aft'.
+        specialize (Hbef (Some a)) as H1.
+        assert (H : Some a ∈ bef' ++ None :: Some a :: lfo). {
+          now apply in_or_app; right; right; left.
+        }
+        specialize (H1 H); clear H; cbn in H1.
+        now rewrite (equality_refl Heqb) in H1.
+      }
+    } {
+      subst bef' lco.
+      clear Hfo.
+      apply app_eq_app in Hlbc.
+      destruct Hlbc as (lfo & H4).
+      destruct H4 as [(H4, H5)| (H4, H5)]. {
+        subst lbo.
+        destruct lfo as [| d]; [ easy | ].
+        cbn in H5.
+        injection H5; clear H5; intros H5 H; subst d.
+        specialize (Hbef' (Some a)) as H1.
+        assert (H : Some a ∈ (bef ++ Some a :: lfo) ++ ldo). {
+          rewrite <- app_assoc.
+          now apply in_or_app; right; left.
+        }
+        specialize (H1 H); clear H; cbn in H1.
+        now rewrite (equality_refl Heqb) in H1.
+      } {
+        subst bef.
+        do 2 rewrite app_length; cbn.
+        rewrite <- Nat.add_succ_r; f_equal.
+        destruct lfo as [| d]; [ easy | cbn ].
+        f_equal.
+        cbn in H5.
+        injection H5; clear H5; intros H5 H; subst d.
+        apply app_eq_app in H5.
+        destruct H5 as (lgo & H5).
+        destruct H5 as [(H4, H5)| (H4, H5)]. {
+          subst ldo.
+          rewrite app_length, Nat.add_comm.
+          destruct lgo as [| d]; [ easy | exfalso ].
+          cbn in H5.
+          injection H5; clear H5; intros; subst d aft.
+          specialize (Hbef' (Some a)) as H1.
+          assert (H : Some a ∈ lbo ++ lfo ++ Some a :: lgo). {
+            rewrite app_assoc.
+            now apply in_or_app; right; left.
+          }
+          specialize (H1 H); clear H; cbn in H1.
+          now rewrite (equality_refl Heqb) in H1.
+        } {
+          subst lfo.
+          rewrite app_length, Nat.add_comm.
+          destruct lgo as [| d]; [ easy | exfalso ].
+          injection H5; clear H5; intros; subst d aft'.
+          specialize (Hbef (Some a)) as H1.
+          assert (H : Some a ∈ lbo ++ None :: ldo ++ Some a :: lgo). {
+            apply in_or_app; right; right.
+            now apply in_or_app; right; left.
+          }
+          specialize (H1 H); clear H; cbn in H1.
+          now rewrite (equality_refl Heqb) in H1.
+        }
+      }
+    }
+  }
+}
+...
+    destruct (Nat.eq_dec (length bef) (length bef')) as [| Hbb]; [ easy | ].
+    exfalso.
+    generalize Hlbc; intros H2.
+    generalize Hlbc'; intros H3.
+    apply (f_equal length) in H2, H3.
+    do 2 rewrite app_length in H2, H3.
+    cbn in H2, H3.
+    do 2 rewrite Nat.add_succ_r in H2.
+    apply Nat.succ_inj in H2.
+(*
+    destruct (lt_dec (length bef) (length bef')) as [H1| H1]. {
+*)
+      apply app_eq_app in Hlbc'.
+      destruct Hlbc' as (ldo & H4).
+      destruct H4 as [(H4, H5)| (H4, H5)]. {
+        subst lbo.
+        rewrite app_length in Hfo.
+        destruct ldo as [| do]; [ cbn in Hfo; flia Hfo | ].
+        cbn in H5; clear Hfo.
+        injection H5; clear H5; intros; subst do aft'.
+...
+      assert (Hal : Some a ∈ lbo). {
+...
+    destruct (lt_eq_lt_dec (length bef) (length bef')) as [[Hbb| Hbb]| Hbb]. {
+(*
+      apply (f_equal length) in Hlbc, Hlbc'.
+      do 2 rewrite app_length in Hlbc, Hlbc'.
+      cbn in Hlbc, Hlbc'.
+      do 2 rewrite Nat.add_succ_r in Hlbc.
+      apply Nat.succ_inj in Hlbc.
+*)
+      assert (Hal : Some a ∈ lbo). {
+        enough (H : Some a ∈ lbo ++ None :: lco). {
+          apply in_app_or in H.
+          destruct H as [H| H]; [ easy | ].
+          destruct H as [H| H]; [ easy | ].
+          apply (f_equal length) in Hlbc'.
+          do 2 rewrite app_length in Hlbc'.
+          cbn in Hlbc'.
+
+        apply app_eq_app in Hlbc'.
+Search (_ ++ _ = _ ++ _).
+...
+      specialize (Hbef' (Some a)) as H1.
+      assert (H : Some a ∈ bef'). {
+...
+    }
+...
+    apply (f_equal length) in Hlbc, Hlbc'.
+    do 2 rewrite app_length in Hlbc, Hlbc'.
+    cbn in Hlbc, Hlbc'.
 ...
 rewrite (glip Heqb).
 ...
