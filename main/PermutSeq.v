@@ -1403,9 +1403,32 @@ split. {
     remember (filter_Some bef) as lb eqn:Hlb.
     remember (filter_Some aft) as lc eqn:Hlc.
     clear bef aft Hlb Hlc.
-(**)
+    rename j into i; rename Hj into Hi.
+    rewrite (permutation_assoc_loop_None_inside Heqb) in Hij.
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
+      rewrite filter_Some_app.
+      now do 2 rewrite filter_Some_map_Some.
+    }
+    rewrite <- map_app in Hij.
+    remember (permutation_assoc_loop eqb la (map Some (lb ++ lc))) as ld.
+    rewrite map_length in Hij.
+    remember (nth i ld 0) as j eqn:Hj; symmetry in Hj.
+    rewrite if_ltb_lt_dec in Hij.
+    destruct (lt_dec j (length lb)) as [H| H]; [ flia H Hij | ].
+    apply Nat.nlt_ge in H.
+    flia H Hij.
+  }
+  cbn in Hi, Hj.
+  rewrite List_nth_succ_cons in Hij.
+  destruct j; [ exfalso | ]. {
+    cbn in Hij.
+...
+Search permutation_assoc_loop.
+Check permutation_assoc_loop_nth_nth.
     specialize (permutation_assoc_loop_nth_nth Heqb a) as H1.
     specialize (H1 la).
+    specialize (H1 (map Some lb ++ None :: map
 ...
     apply (permutation_assoc_loop_nth_nth Heqb a) in Hij; [ | | easy ]. 2: {
       rewrite filter_Some_app; cbn.
