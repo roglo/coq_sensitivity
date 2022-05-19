@@ -1080,9 +1080,10 @@ Theorem glop : ∀ A (eqb : A → _),
   → nth i la d = nth j lb d.
 Proof.
 intros * Heqb * Hpab Hi Hij.
-revert d lb i j Hpab Hi Hij.
+subst j.
+revert d lb i Hpab Hi.
 induction la as [| a]; intros; [ easy | ].
-cbn - [ option_eqb ] in Hij.
+cbn - [ option_eqb ].
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
@@ -1115,7 +1116,7 @@ assert (H : ∃ bef', bef = map Some bef'). {
   now exists (b :: bef').
 }
 destruct H as (bef', H); subst bef; rename bef' into bef.
-rewrite map_length in Hij.
+rewrite map_length.
 assert (H : ∃ aft', aft = map Some aft'). {
   clear - Hlb.
   revert bef Hlb.
@@ -1146,15 +1147,20 @@ specialize (permutation_app_inv Heqb) as H.
 specialize (H [] _ _ _ _ Hpab).
 cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
 destruct i. {
-  cbn in Hij |-*; subst j.
+  cbn.
   rewrite app_nth2; [ | now unfold ge ].
   now rewrite Nat.sub_diag.
 }
-rewrite List_nth_succ_cons in Hij |-*.
+rewrite List_nth_succ_cons.
 cbn in Hi.
 apply Nat.succ_lt_mono in Hi.
+Search (permutation_assoc_loop _ _ (_ :: _)).
+Search (permutation_assoc_loop _ _ (_ ++ _)).
+...
+rewrite IHla with (lb := bef ++ aft) (j := j).
 ...
 specialize (IHla d (bef ++ aft) i j Hpab Hi) as H1.
+specialize (IHla d (bef ++ aft) i (j + length bef) Hpab Hi) as H2.
 ...
 rewrite app_length in Hj; cbn in Hj.
 rewrite Nat.add_succ_r, <- app_length in Hj.
