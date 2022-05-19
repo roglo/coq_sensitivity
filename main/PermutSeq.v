@@ -1055,10 +1055,74 @@ split. {
     specialize (permutation_app_inv Heqb) as H.
     specialize (H [] _ _ _ _ Hpab).
     cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
-    clear a Hbef Hlen.
+    clear Hbef Hlen.
     remember (filter_Some bef) as lb eqn:Hlb.
     remember (filter_Some aft) as lc eqn:Hlc.
     clear bef aft Hlb Hlc.
+Theorem glop : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb i j,
+  permutation eqb la lb
+  → i < length la
+  → j < length lb
+  → nth i (permutation_assoc_loop eqb la (map Some lb)) 0 = j
+  → nth i la d = nth j lb d.
+Proof.
+intros * Heqb * Hpab Hi Hj Hij.
+revert d lb i j Hpab Hi Hj Hij.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ] in Hij.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
+  cbn - [ option_eqb In ] in H1.
+  specialize (proj1 (permutation_in Heqb Hpab a) (or_introl eq_refl)) as H2.
+  assert (H : Some a ∈ map Some lb). {
+    apply in_map_iff.
+    now exists a.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+destruct i. {
+  cbn.
+  apply (f_equal filter_Some) in Hlb.
+  rewrite filter_Some_app in Hlb; cbn in Hlb.
+  rewrite filter_Some_map_Some in Hlb.
+  subst lb.
+  cbn in Hij; subst j.
+  rewrite app_nth2. 2: {
+    clear; unfold ge.
+    induction bef as [| bo]; [ easy | cbn ].
+    destruct bo as [b| ]; cbn. {
+      now apply -> Nat.succ_le_mono.
+    }
+    transitivity (length bef); [ easy | ].
+    apply Nat.le_succ_diag_r.
+  }
+...
+  specialize (H1 bo (or_introl eq_refl)) as H2.
+    cbn in H2.
+    destruct bo as [b| ].
+...
+  rewrite List_nth_nil in Hij; subst j.
+  destruct i. {
+    cbn.
+    destruct lbo as [| bo]; [ easy | cbn ].
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    cbn - [ option_eqb In ] in H1.
+    specialize (H1 bo (or_introl eq_refl)) as H2.
+    cbn in H2.
+    destruct bo as [b| ].
+Print permutation_assoc_loop.
+...
+apply (glop eqb a) in Hij.
 ...
 Theorem glop : ∀ A (eqb : A → _),
   ∀ la lbo i j,
