@@ -710,6 +710,7 @@ split. {
   cbn in Hx.
   destruct x as [x| ]; [ | easy ].
   apply Heqb in Hx; subst x.
+(* piquer ce code et en faire un lemme *)
   assert (H : bef = map Some (filter_Some bef)). {
     clear - Hlb.
     revert lb Hlb.
@@ -893,6 +894,40 @@ now rewrite Nat.sub_succ_l.
 Qed.
 
 (* to be completed
+Theorem permutation_permutation_assoc : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → permutation Nat.eqb (permutation_assoc eqb la lb) (seq 0 (length la)).
+Proof.
+intros * Heqb * Hpab.
+revert lb Hpab.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb seq ].
+remember (extract (λ bo, option_eqb eqb bo (Some a)) (map Some lb)) as lxl.
+rename Heqlxl into Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ map Some lb). {
+    apply in_map_iff.
+    exists a; split; [ easy | ].
+    now apply (permutation_in Heqb Hpab a); left.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+...
+cf le commentaire "piquer ce code et en faire un lemme" ci-dessus
+...
+
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
@@ -909,6 +944,10 @@ destruct jo as [j| ]. 2: {
   exfalso.
   revert Hjo.
   apply List_rank_not_None with (n := length la); [ | easy ].
+  subst l.
+  clear i Hi.
+...
+now apply permutation_permutation_assoc.
 ...
   apply List_rank_not_None' with (n := length la); [ | easy ].
   split; [ | now apply (permutation_assoc_length Heqb) ].
