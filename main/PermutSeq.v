@@ -902,6 +902,13 @@ Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
 Proof. easy. Qed.
 
 (* to be completed
+Theorem permutation_elt : ∀ A (eqb : A → _),
+  ∀ (l1 l2 l1' l2' : list A) (a : A),
+  permutation eqb (l1 ++ l2) (l1' ++ l2')
+  → permutation eqb (l1 ++ a :: l2) (l1' ++ a :: l2').
+Proof.
+...
+
 Theorem permutation_permutation_assoc : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -927,7 +934,9 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   cbn in H1.
   now rewrite (equality_refl Heqb) in H1.
 }
+(*
 rewrite (permutation_assoc_loop_None_inside Heqb).
+*)
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 cbn in H.
@@ -939,6 +948,44 @@ subst lb.
 specialize (permutation_app_inv Heqb [] _ _ _ _ Hpab) as H.
 cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
 specialize (IHla _ Hpab) as H3.
+(**)
+rewrite List_seq_cut with (i := length bef). 2: {
+  apply in_seq; split; [ easy | cbn ].
+  rewrite H1, map_length.
+  apply (permutation_length Heqb) in Hpab.
+  rewrite app_length in Hpab.
+  flia Hpab.
+}
+rewrite Nat.sub_0_r, Nat.add_0_l.
+cbn - [ "<?" ].
+replace (length la - length bef) with (length aft). 2: {
+  rewrite H1, H2.
+  do 2 rewrite map_length.
+  apply (permutation_length Heqb) in Hpab.
+  rewrite app_length in Hpab.
+  flia Hpab.
+}
+remember (length bef) as i eqn:Hi.
+specialize permutation_elt as H4.
+specialize (H4 _ Nat.eqb []).
+specialize (H4 (permutation_assoc_loop eqb la (bef ++ None :: aft))).
+specialize (H4 (seq 0 i)).
+specialize (H4 (seq (S i) (length aft))).
+apply H4; clear H4.
+cbn.
+rewrite <- seq_shift.
+rewrite (permutation_assoc_loop_None_inside Heqb).
+rewrite <- Hi.
+...
+Search (permutation _ (_ ++ _ :: _)).
+Require Import Permutation.
+Search (Permutation (_ ++ _ :: _)).
+Check permutation_elt.
+...
+rewrite List_cons_is_app.
+apply permutation_app.
+specialize (permutation_app_inside) as H1.
+...
 rewrite H1, H2.
 rewrite map_length.
 rewrite <- map_app.
@@ -2588,11 +2635,6 @@ rewrite Nat.sub_0_r; cbn.
 rewrite map_app; cbn.
 rewrite Hi at 2.
 rewrite permut_permut_isort; [ | easy | now rewrite Hln ].
-Theorem permutation_elt : ∀ A (eqb : A → _),
-  ∀ (l1 l2 l1' l2' : list A) (a : A),
-  permutation eqb (l1 ++ l2) (l1' ++ l2')
-  → permutation eqb (l1 ++ a :: l2) (l1' ++ a :: l2').
-Proof.
 ...
 apply Permutation_elt.
 rewrite app_nil_r.
