@@ -1264,7 +1264,49 @@ split. {
 }
 Qed.
 
-(* to be completed
+Theorem List_rank_not_None : ∀ n l i,
+  is_permut n l
+  → i < n
+  → List_rank (Nat.eqb i) l ≠ None.
+Proof.
+intros n f i (Hs, Hf) Hi Hx.
+specialize (List_rank_None 0 _ _ Hx) as H1; cbn.
+specialize (pigeonhole_list n (i :: f)) as H2.
+rewrite List_cons_length in H2.
+assert (H : n < S (length f)) by now rewrite Hf.
+specialize (H2 H); clear H.
+assert (H : ∀ x, x ∈ i :: f → x < n). {
+  intros x [Hxi| Hxf]; [ now subst x | ].
+  now rewrite <- Hf; apply Hs.
+}
+specialize (H2 H); clear H.
+remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize (H2 x x' eq_refl).
+destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
+destruct x. {
+  rewrite List_nth_0_cons in Hxx'if.
+  destruct x'; [ easy | ].
+  apply Nat.succ_lt_mono in Hx'f.
+  cbn in Hxx'if.
+  specialize (H1 x' Hx'f).
+  now apply Nat.eqb_neq in H1.
+}
+rewrite List_nth_succ_cons in Hxx'if.
+destruct x'. {
+  apply Nat.succ_lt_mono in Hxf.
+  cbn in Hxx'if; symmetry in Hxx'if.
+  specialize (H1 x Hxf).
+  now apply Nat.eqb_neq in H1.
+}
+cbn in Hxx'if.
+apply Nat.succ_lt_mono in Hxf, Hx'f.
+destruct Hs as (Ha, Hn).
+apply (NoDup_nat _ Hn) in Hxx'if; [ | easy | easy ].
+now rewrite Hxx'if in Hxx'.
+Qed.
+
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
@@ -1276,62 +1318,34 @@ intros * Heqb * Hpab Hi.
 unfold permutation_fun.
 set (l := permutation_assoc eqb la lb).
 unfold unsome.
-remember (List_rank (Nat.eqb i) l) as j eqn:Hj; symmetry in Hj.
-destruct j as [j| ]. 2: {
-  specialize (List_rank_None 0 (Nat.eqb i) l Hj) as H1.
-(*
-  subst l.
-  rewrite (permutation_assoc_length Heqb) in H1; [ | easy ].
-  set (l := permutation_assoc eqb la lb) in H1.
-*)
-  set (l' := permutation_assoc eqb lb la).
-  specialize (H1 (nth i l' 0)).
-  assert (H : nth i l' 0 < length l). {
-    unfold l.
-    rewrite (permutation_assoc_length Heqb); [ | easy ].
-    specialize (permutation_length Heqb Hpab) as Hlab.
-    rewrite Hlab.
-    unfold l'.
-    apply (permutation_sym Heqb) in Hpab.
-    apply (nth_permutation_assoc_ub Heqb); [ easy | congruence ].
-  }
-  specialize (H1 H); clear H.
-  apply Nat.eqb_neq in H1.
-  exfalso; apply H1; clear H1.
-  unfold l, l'; symmetry.
-  do 2 rewrite fold_ff_app.
-  specialize (perm_assoc_is_permut_list Heqb Hpab) as H.
-  specialize (@permut_isort_permut i _ H) as H1; clear H.
-  rewrite (permutation_assoc_length Heqb) in H1; [ | easy ].
-  specialize (H1 Hi).
-  rewrite (permutation_length Heqb Hpab) in Hi.
-  apply (permutation_sym Heqb) in Hpab.
-  specialize (perm_assoc_is_permut_list Heqb Hpab) as H.
-  specialize (@permut_isort_permut i _ H) as H2; clear H.
-  rewrite (permutation_assoc_length Heqb) in H2; [ | easy ].
-  specialize (H2 Hi).
-  rewrite (permutation_length Heqb Hpab) in Hi.
-  apply (permutation_sym Heqb) in Hpab.
-  fold l in H1 |-*.
-  fold l' in H2 |-*.
-...
-permut_isort_permut:
-  ∀ (i : nat) (l : list nat),
-    is_permut_list l
-    → i < length l → ff_app (isort_rank Nat.leb l) (ff_app l i) = i
-permut_permut_isort:
-  ∀ (i : nat) (l : list nat),
-    is_permut_list l
-    → i < length l → ff_app l (ff_app (isort_rank Nat.leb l) i) = i
-  now apply permutation_assoc_permutation_assoc_inv.
-...
+remember (List_rank (Nat.eqb i) l) as jo eqn:Hjo; symmetry in Hjo.
+destruct jo as [j| ]. 2: {
+  exfalso.
+  revert Hjo.
+  apply List_rank_not_None with (n := length la); [ | easy ].
+  split; [ | now apply (permutation_assoc_length Heqb) ].
+  apply (perm_assoc_is_permut_list Heqb Hpab).
+}
+apply (List_rank_Some 0) in Hjo.
+destruct Hjo as (Hj & Hbef & Hij).
+apply Nat.eqb_eq in Hij.
+symmetry in Hij; unfold l in Hij.
+apply (permutation_assoc_loop_nth_nth Heqb) with (d := d) in Hij; cycle 1. {
+  now rewrite filter_Some_map_Some.
+} {
+  unfold l in Hj.
+  now rewrite permutation_assoc_length in Hj.
+}
+rewrite (List_map_nth' d) in Hij; [ easy | ].
+now rewrite (permutation_length Heqb Hpab) in Hi.
+Qed.
 
 Theorem permutation_permut : ∀ la lb,
   permutation Nat.eqb la lb
   → is_permut_list la
   → is_permut_list lb.
 Proof.
-intros * Hab Ha.
+intros * Hpab Ha.
 assert (Hlab : length la = length lb). {
   now apply (permutation_length Nat_eqb_equality).
 }
@@ -1349,9 +1363,71 @@ split. {
   intros i j Hi Hj Hij.
   unfold ff_app in Hij.
   rewrite <- Hlab in Hi, Hj.
+  rewrite (permutation_fun_nth Nat_eqb_equality 0 Hpab Hi) in Hij.
+  rewrite (permutation_fun_nth Nat_eqb_equality 0 Hpab Hj) in Hij.
+  unfold permutation_fun in Hij.
+  unfold unsome in Hij.
+  remember (List_rank (Nat.eqb i) (permutation_assoc Nat.eqb la lb)) as x eqn:Hx.
+  remember (List_rank (Nat.eqb j) (permutation_assoc Nat.eqb la lb)) as y eqn:Hy.
+  symmetry in Hx, Hy.
+  destruct x as [x| ]. 2: {
+    exfalso; revert Hx.
+    apply List_rank_not_None with (n := length la); [ | easy ].
+    split; [ | now apply (permutation_assoc_length Nat_eqb_equality) ].
+    apply (perm_assoc_is_permut_list Nat_eqb_equality Hpab).
+  }
+  destruct y as [y| ]. 2: {
+    exfalso; revert Hy.
+    apply List_rank_not_None with (n := length la); [ | easy ].
+    split; [ | now apply (permutation_assoc_length Nat_eqb_equality) ].
+    apply (perm_assoc_is_permut_list Nat_eqb_equality Hpab).
+  }
+  apply (List_rank_Some 0) in Hx, Hy.
+  rewrite (permutation_assoc_length Nat_eqb_equality) in Hx; [ | easy ].
+  rewrite (permutation_assoc_length Nat_eqb_equality) in Hy; [ | easy ].
+  destruct Hx as (Hx & Hbx & Hix).
+  destruct Hy as (Hy & Hby & Hiy).
+  apply Nat.eqb_eq in Hix, Hiy.
+  apply H1 in Hij; [ | easy | easy ].
+  subst y.
+  congruence.
+}
+Qed.
+
+(* to be completed
 ...
-  rewrite (permutation_fun_nth Nat_eqb_equality 0 Hab Hi) in Hij.
-   rewrite (permutation_fun_nth Nat_eqb_equality 0 Hab Hj) in Hij.
+    apply List_rank_not_None with (n := length la); [ | easy ].
+    split; [ | now apply (permutation_assoc_length Nat_eqb_equality) ].
+    apply (perm_assoc_is_permut_list Nat_eqb_equality Hpab).
+  }
+...
+    specialize (List_rank_None 0 _ _ Hy) as H2.
+    rewrite (permutation_assoc_length Nat_eqb_equality) in H2; [ | easy ].
+    specialize (H2 x Hx) as H3.
+    rewrite <- Hix in H3.
+    specialize (H2 i Hi) as H4.
+    specialize (H2 j Hj) as H5.
+...
+    specialize (List_rank_None 0 (Nat.eqb i) l Hj) as H1.
+    apply List_rank_None in Hy.
+...
+Search permutation_assoc_loop.
+...
+permutation_assoc_loop_nth_nth:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ (d : A) (la : list A) (lbo : list (option A)) (i j : nat),
+        permutation eqb la (filter_Some lbo)
+        → i < length la → nth i (permutation_assoc_loop eqb la lbo) 0 = j → nth i la d = unsome d (nth j lbo None)
+  apply H1 in Hij; cycle 1. {
+    unfold permutation_fun.
+    remember (List_rank
+
+    eapply List_rank_Some_lt.
+unfold unsome.
+List_rank_Some_lt: ∀ (A : Type) (f : A → bool) (l : list A) (i : nat), List_rank f l = Some i → i < length l
+Search List_rank.
+
 ...
 unfold permutation_fun.
 set (l := permutation_assoc eqb la lb).
