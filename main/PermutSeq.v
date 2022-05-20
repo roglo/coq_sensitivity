@@ -1199,42 +1199,6 @@ subst a.
 now apply is_permut_list_app_max.
 Qed.
 
-(* try to eliminate all uses of "Permutation" by trying to
-   make the same theorems with "permutation" *)
-
-Require Import Permutation.
-
-Theorem Permutation_permut : ∀ la lb,
-  Permutation la lb
-  → is_permut_list la
-  → is_permut_list lb.
-Proof.
-intros * Hab Ha.
-assert (Hlab : length la = length lb). {
-  now apply Permutation_length.
-}
-split. {
-  intros i Hi.
-  rewrite <- Hlab.
-  apply Ha.
-  apply Permutation_in with (l := lb); [ | easy ].
-  now apply Permutation_sym.
-} {
-  apply nat_NoDup.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite <- Hlab in Hi, Hj.
-  destruct Ha as (Hap, Hal).
-  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
-  destruct H1 as (H1 & f & H2 & H3 & H4).
-  rewrite H4 in Hij; [ | easy ].
-  rewrite H4 in Hij; [ | easy ].
-  do 2 rewrite fold_ff_app in Hij.
-  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
-  now apply H3.
-}
-Qed.
-
 (* *)
 
 Theorem permut_isort_leb : ∀ l,
@@ -1243,15 +1207,15 @@ Theorem permut_isort_leb : ∀ l,
 Proof.
 intros * Hp.
 specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
-(*
-specialize (permuted_isort Nat.eqb Nat_eqb_equality l) as Hps.
-*)
-specialize (Permutation_isort Nat.leb l) as Hps.
+specialize (permuted_isort Nat.leb Nat_eqb_equality l) as Hps.
 remember (isort Nat.leb l) as l'; clear Heql'.
-specialize (Permutation_permut) as Hpl'.
+specialize permutation_permut as Hpl'.
 specialize (Hpl' l l' Hps Hp).
 move l' before l; move Hpl' before Hp.
-replace (length l) with (length l') by now apply Permutation_length.
+replace (length l) with (length l'). 2: {
+  apply (permutation_length Nat_eqb_equality).
+  now apply (permutation_sym Nat_eqb_equality).
+}
 clear l Hp Hps.
 rename l' into l.
 now apply sorted_permut.
@@ -2601,6 +2565,11 @@ Proof.
 intros.
 now apply (isort_rank_is_permut _ (length l)).
 Qed.
+
+(* try to eliminate all uses of "Permutation" by trying to
+   make the same theorems with "permutation" *)
+
+Require Import Permutation.
 
 Theorem permut_list_Permutation : ∀ l n,
   is_permut n l
