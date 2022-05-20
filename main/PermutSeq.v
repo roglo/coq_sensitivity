@@ -897,6 +897,10 @@ rewrite app_nth2; [ | flia Hjb ].
 now rewrite Nat.sub_succ_l.
 Qed.
 
+Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
+  permutation_assoc_loop eqb la (map Some lb) = permutation_assoc eqb la lb.
+Proof. easy. Qed.
+
 (* to be completed
 Theorem permutation_permutation_assoc : ∀ A (eqb : A → _),
   equality eqb →
@@ -923,6 +927,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   cbn in H1.
   now rewrite (equality_refl Heqb) in H1.
 }
+rewrite (permutation_assoc_loop_None_inside Heqb).
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 cbn in H.
@@ -930,6 +935,18 @@ destruct x as [x| ]; [ | easy ].
 apply Heqb in H; subst x.
 apply unmap_Some_app_cons in Hlb.
 destruct Hlb as (H1 & H2 & Hlb).
+subst lb.
+specialize (permutation_app_inv Heqb [] _ _ _ _ Hpab) as H.
+cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
+specialize (IHla _ Hpab) as H3.
+rewrite H1, H2.
+rewrite map_length.
+rewrite <- map_app.
+rewrite fold_permutation_assoc.
+remember (filter_Some bef) as lb eqn:Hlb.
+remember (filter_Some aft) as lc eqn:Hlc.
+rewrite H1 in Hbef.
+clear bef aft Hlb Hlc H1 H2.
 ...
 
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
