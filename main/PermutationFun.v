@@ -1431,6 +1431,115 @@ Qed.
 
 (* *)
 
+Definition option_eqb {A} (eqb : A → A → bool) ao bo :=
+  match (ao, bo) with
+  | (Some a, Some b) => eqb a b
+  | _ => false
+  end.
+
+Fixpoint permutation_assoc_loop {A} eqb (la : list A) lbo :=
+  match la with
+  | [] => []
+  | a :: la' =>
+      match extract (λ bo, option_eqb eqb bo (Some a)) lbo with
+      | Some (befo, _, afto) =>
+          length befo :: permutation_assoc_loop eqb la' (befo ++ None :: afto)
+      | None => []
+      end
+  end.
+
+Definition permutation_assoc {A} (eqb : A → _) la lb :=
+  permutation_assoc_loop eqb la (map Some lb).
+
+Definition permutation_fun {A} (eqb : A → _) la lb i :=
+  unsome 0 (List_rank (Nat.eqb i) (permutation_assoc eqb la lb)).
+
+Fixpoint filter_Some {A} (lao : list (option A)) :=
+  match lao with
+  | [] => []
+  | Some a :: lao' => a :: filter_Some lao'
+  | None :: lao' => filter_Some lao'
+  end.
+
+Theorem filter_Some_inside : ∀ A l1 l2 (x : option A),
+  filter_Some (l1 ++ x :: l2) =
+    filter_Some l1 ++
+    match x with
+    | Some a => a :: filter_Some l2
+    | None => filter_Some l2
+    end.
+Proof.
+intros.
+revert x l2.
+induction l1 as [| yo]; intros; [ easy | ].
+cbn - [ option_eqb ].
+destruct yo; [ | apply IHl1 ].
+cbn; f_equal; apply IHl1.
+Qed.
+
+Theorem permutation_assoc_loop_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lbo,
+  permutation eqb la (filter_Some lbo)
+  → length (permutation_assoc_loop eqb la lbo) = length la.
+Proof.
+intros * Heqb * Hpab.
+revert lbo Hpab.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ lbo). {
+    specialize (permutation_in Heqb) as H2.
+    specialize (proj1 (H2 _ _ Hpab a) (or_introl eq_refl)) as H3.
+    clear - H3.
+    induction lbo as [| bo]; [ easy | cbn in H3 ].
+    destruct bo as [b| ]. {
+      destruct H3 as [H3| H3]; [ now subst b; left | ].
+      now right; apply IHlbo.
+    }
+    now right; apply IHlbo.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+cbn; f_equal.
+apply IHla.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hxa & Hlbo).
+cbn in Hxa.
+destruct x as [b| ]; [ | easy ].
+apply Heqb in Hxa; subst b.
+subst lbo.
+rewrite filter_Some_inside in Hpab |-*.
+apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
+Qed.
+
+Theorem filter_Some_map_Some : ∀ A (la : list A),
+  filter_Some (map Some la) = la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+now f_equal.
+Qed.
+
+Theorem permutation_assoc_length : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb
+  → length (permutation_assoc eqb la lb) = length la.
+Proof.
+intros * Heqb * Hpab.
+apply (permutation_assoc_loop_length Heqb).
+now rewrite filter_Some_map_Some.
+Qed.
+
+(* *)
+
 Require Import Permutation.
 
 Theorem Permutation_permutation : ∀ A (eqb : A → _),
