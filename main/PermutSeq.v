@@ -460,7 +460,6 @@ specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
 specialize (permuted_isort Nat.eqb Nat_eqb_equality l) as Hps.
 *)
 specialize (Permutation_isort Nat.leb l) as Hps.
-(**)
 remember (isort Nat.leb l) as l'; clear Heql'.
 specialize (Permutation_permut) as Hpl'.
 specialize (Hpl' l l' Hps Hp).
@@ -679,7 +678,6 @@ induction la as [| a]; [ easy | cbn ].
 now f_equal.
 Qed.
 
-(*
 Theorem permutation_assoc_length : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -690,7 +688,6 @@ intros * Heqb * Hpab.
 apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
-*)
 
 Theorem permutation_assoc_loop_ub : ∀ A (eqb : A → _),
   equality eqb →
@@ -733,21 +730,6 @@ rewrite filter_Some_inside in Hpab |-*.
 apply (permutation_app_inv Heqb [] _ _ _ _ Hpab).
 Qed.
 
-(*
-Theorem first_non_excl_ub : ∀ excl a la len,
-  (∀ b, b ∈ a :: la → b < len)
-  → first_non_excl Nat.eqb excl a la < len.
-Proof.
-intros * Hla.
-revert a len Hla.
-induction la as [| b]; intros; [ now apply Hla; left | cbn ].
-remember (existsb (Nat.eqb a) excl) as x eqn:Hx; symmetry in Hx.
-destruct x; [ | now apply Hla; left ].
-apply IHla.
-intros c Hc.
-now apply Hla; right.
-Qed.
-
 Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb i,
@@ -757,18 +739,11 @@ Theorem nth_permutation_assoc_ub : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb * Hpab Hla.
 unfold permutation_assoc.
-unfold canon_assoc_of_multiv.
-rewrite <- (multivalued_length eqb) with (lb := lb).
-apply nth_canon_assoc_of_multiv_loop_ub; [ | | now rewrite multivalued_length ]. {
-  rewrite multivalued_length.
-  now destruct la.
-}
-intros lc Hlc a Ha.
-rewrite multivalued_length.
 rewrite (permutation_length Heqb Hpab).
-now apply multivalued_ub with (a := a) in Hlc.
+replace (length lb) with (length (map Some lb)) by now rewrite map_length.
+apply (permutation_assoc_loop_ub Heqb); [ | easy ].
+now rewrite filter_Some_map_Some.
 Qed.
-*)
 
 Theorem permutation_assoc_loop_cons_None : ∀ A (eqb : A → _),
   ∀ la lbo,
@@ -785,166 +760,6 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 cbn; f_equal.
 apply IHla.
 Qed.
-
-(*
-Theorem first_non_excl_nil_l : ∀ A (eqb : A → _) a la,
-  first_non_excl eqb [] a la = a.
-Proof. now intros; destruct la. Qed.
-
-Theorem multivalued_elem_inside : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb lc a c i,
-  (∀ x, x ∈ la → eqb a x = false)
-  → multivalued_elem eqb (la ++ a :: lb) i a = c :: lc
-  → c = i + length la.
-Proof.
-intros * Heqb * Hla Hlc.
-revert lb lc a c i Hla Hlc.
-induction la as [| b]; intros; cbn in Hlc. {
-  rewrite (equality_refl Heqb) in Hlc.
-  injection Hlc; clear Hlc; intros Hlc H; subst c.
-  symmetry; apply Nat.add_0_r.
-}
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  injection Hlc; clear Hlc; intros Hlc H; subst c.
-  apply Heqb in Hab; subst b.
-  specialize (Hla _ (or_introl eq_refl)).
-  now rewrite (equality_refl Heqb) in Hla.
-}
-cbn; rewrite <- Nat.add_succ_comm.
-apply IHla in Hlc; [ easy | ].
-intros x Hx.
-now apply Hla; right.
-Qed.
-
-Theorem canon_assoc_of_multiv_loop_map_multiv_is_permut_list :
-  ∀ A (eqb : A → _),
-  ∀ la lb i,
-  is_permut_list
-    (map (λ j, j - i)
-      (canon_assoc_of_multiv_loop Nat.eqb []
-         (map (multivalued_elem eqb lb i) la))).
-Proof.
-intros.
-split. {
-  unfold AllLt.
-  intros j Hj.
-  rewrite map_length.
-  apply in_map_iff in Hj.
-  destruct Hj as (k & Hk & Hj).
-  subst j.
-  destruct (Nat.eq_dec (length lb) 0) as [Hbz| Hbz]. {
-    apply length_zero_iff_nil in Hbz; subst lb.
-    cbn in Hj |-*.
-    rewrite List_map_const_is_repeat with (b := []) in Hj; [ | easy ].
-    exfalso; clear i.
-    now destruct la.
-  }
-  destruct la as [| a]; [ easy | ].
-  cbn in Hj |-*.
-  remember (multivalued_elem eqb lb i a) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| c]; [ easy | ].
-  cbn in Hj |-*.
-  move i before a; move c before a; move k before i.
-  destruct Hj as [Hj| Hj]. {
-    destruct la as [| a2]. {
-      cbn.
-      enough (Hki : k ≤ i) by flia Hki.
-      subst k.
-      destruct lb as [| b]; [ easy | clear Hbz ].
-      cbn in Hlc.
-      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-      destruct ab. {
-        injection Hlc; clear Hlc; intros Hlc H; subst c.
-        clear b Hab.
-        subst lc.
-        remember 1 as k.
-        replace (S i) with (k + i) by flia Heqk.
-        clear Heqk.
-        (* a lemma, perhaps? *)
-        revert i k.
-        induction lb as [| b]; intros; [ easy | cbn ].
-        remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-        destruct ab; [ easy | ].
-        clear b Hab.
-        rewrite <- Nat.add_succ_l.
-        apply IHlb.
-      }
-      clear b Hab.
-      destruct lb as [| b]; [ easy | ].
-      cbn in Hlc.
-      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-      destruct ab. {
-        clear b Hab.
-        injection Hlc; clear Hlc; intros; subst c lc.
-        remember 1 as k.
-        replace (S i) with (k + i) by flia Heqk.
-        clear Heqk.
-        revert i k.
-        induction lb as [| b]; intros. {
-          cbn.
-(* bin c'est faux *)
-...
-        destruct lc as [| c]; [ easy | cbn ].
-        remember (existsb (Nat.eqb i) excl) as x eqn:Hx; symmetry in Hx.
-        destruct x; [ | easy ].
-        apply existsb_exists in Hx.
-        destruct Hx as (j & Hi & Hij).
-        apply Nat.eqb_eq in Hij; subst j.
-        destruct lb as [| b]; [ easy | ].
-        cbn in Hlc.
-        remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-        destruct ab. {
-          injection Hlc; clear Hlc; intros Hlc H; subst c.
-          apply Heqb in Hab; subst b.
-...
-  rewrite canon_assoc_of_multiv_loop_length. 2: {
-    intros lc Hlc H; subst lc.
-    apply in_map_iff in Hlc.
-    destruct Hlc as (c & Hlc & Hc).
-    destruct lb as [| b]; [ easy | ].
-    cbn in Hlc.
-    remember (eqb c b) as cb eqn:Hcb; symmetry in Hcb.
-    destruct cb; [ easy | ].
-    clear Hbz.
-    destruct lb as [| b2]. {
-      clear Hlc; cbn in Hj.
-      destruct la as [| a]; [ easy | ].
-      cbn in Hj.
-      destruct Hc as [Hc| Hc]. {
-        subst c.
-        now rewrite Hcb in Hj.
-      }
-      remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-      destruct ab; [ | easy ].
-      apply Heqb in Hab; subst b.
-      cbn in Hj.
-      destruct Hj as [Hj| Hj]. {
-        clear i k Hj.
-(* mort *)
-...
-revert lb i excl.
-induction la as [| a]; intros. {
-  split; [ easy | apply NoDup_nil ].
-}
-remember (multivalued_elem eqb lb i a) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [| c]. {
-  split; [ easy | apply NoDup_nil ].
-}
-...
-Compute (
-let la := [2;3;5;3;2;1] in
-let lb := [1;5;2;3;2;3] in
-let eqb := Nat.eqb in
-let i := 2 in
-let excl := [24] in
-    (map (λ j, j - i)
-      (canon_assoc_of_multiv_loop Nat.eqb excl
-         (map (multivalued_elem eqb lb i) la)))).
-...
-*)
 
 Theorem filter_Some_length_ub : ∀ A (lao : list (option A)),
   length (filter_Some lao) ≤ length lao.
@@ -1320,7 +1135,7 @@ split. {
   rewrite Hlen.
   intros * Hi Hj Hij.
   clear Hlen.
-  revert lb i j Hpab (*Hlen*) Hi Hj Hij.
+  revert lb i j Hpab Hi Hj Hij.
   induction la as [| a]; intros; [ easy | ].
   cbn - [ option_eqb ] in Hij.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -1348,7 +1163,7 @@ split. {
     cbn; f_equal.
     now apply (IHbef lb).
   }
-  rewrite H in Hbef, Hlb, (*Hlen,*) Hij.
+  rewrite H in Hbef, Hlb, Hij.
   rewrite map_length in Hij.
   clear H.
   assert (H : aft = map Some (filter_Some aft)). {
@@ -1373,7 +1188,7 @@ split. {
     clear b H.
     now apply (IHla lb).
   }
-  rewrite H in Hlb, (*Hlen,*) Hij.
+  rewrite H in Hlb, Hij.
   clear H.
   apply (f_equal filter_Some) in Hlb.
   rewrite filter_Some_map_Some in Hlb.
@@ -1449,7 +1264,7 @@ split. {
 }
 Qed.
 
-(* to be comopleted
+(* to be completed
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
