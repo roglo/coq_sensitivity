@@ -1300,7 +1300,29 @@ destruct j as [j| ]. 2: {
   exfalso; apply H1; clear H1.
   unfold l, l'; symmetry.
   do 2 rewrite fold_ff_app.
+  specialize (perm_assoc_is_permut_list Heqb Hpab) as H.
+  specialize (@permut_isort_permut i _ H) as H1; clear H.
+  rewrite (permutation_assoc_length Heqb) in H1; [ | easy ].
+  specialize (H1 Hi).
+  rewrite (permutation_length Heqb Hpab) in Hi.
+  apply (permutation_sym Heqb) in Hpab.
+  specialize (perm_assoc_is_permut_list Heqb Hpab) as H.
+  specialize (@permut_isort_permut i _ H) as H2; clear H.
+  rewrite (permutation_assoc_length Heqb) in H2; [ | easy ].
+  specialize (H2 Hi).
+  rewrite (permutation_length Heqb Hpab) in Hi.
+  apply (permutation_sym Heqb) in Hpab.
+  fold l in H1 |-*.
+  fold l' in H2 |-*.
 ...
+permut_isort_permut:
+  ∀ (i : nat) (l : list nat),
+    is_permut_list l
+    → i < length l → ff_app (isort_rank Nat.leb l) (ff_app l i) = i
+permut_permut_isort:
+  ∀ (i : nat) (l : list nat),
+    is_permut_list l
+    → i < length l → ff_app l (ff_app (isort_rank Nat.leb l) i) = i
   now apply permutation_assoc_permutation_assoc_inv.
 ...
 
