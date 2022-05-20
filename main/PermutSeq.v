@@ -1088,42 +1088,6 @@ Qed.
 
 (* *)
 
-Require Import Permutation.
-
-(* try to eliminate all uses of "Permutation" by trying to
-   make the same theorems with "permutation" *)
-
-Theorem Permutation_permut : ∀ la lb,
-  Permutation la lb
-  → is_permut_list la
-  → is_permut_list lb.
-Proof.
-intros * Hab Ha.
-assert (Hlab : length la = length lb). {
-  now apply Permutation_length.
-}
-split. {
-  intros i Hi.
-  rewrite <- Hlab.
-  apply Ha.
-  apply Permutation_in with (l := lb); [ | easy ].
-  now apply Permutation_sym.
-} {
-  apply nat_NoDup.
-  intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
-  rewrite <- Hlab in Hi, Hj.
-  destruct Ha as (Hap, Hal).
-  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
-  destruct H1 as (H1 & f & H2 & H3 & H4).
-  rewrite H4 in Hij; [ | easy ].
-  rewrite H4 in Hij; [ | easy ].
-  do 2 rewrite fold_ff_app in Hij.
-  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
-  now apply H3.
-}
-Qed.
-
 Theorem is_permut_list_app_max : ∀ l,
   is_permut_list (l ++ [length l])
   → is_permut_list l.
@@ -1234,6 +1198,44 @@ apply IHl; [ | apply (sorted_app l [a] Hs) ].
 subst a.
 now apply is_permut_list_app_max.
 Qed.
+
+(* try to eliminate all uses of "Permutation" by trying to
+   make the same theorems with "permutation" *)
+
+Require Import Permutation.
+
+Theorem Permutation_permut : ∀ la lb,
+  Permutation la lb
+  → is_permut_list la
+  → is_permut_list lb.
+Proof.
+intros * Hab Ha.
+assert (Hlab : length la = length lb). {
+  now apply Permutation_length.
+}
+split. {
+  intros i Hi.
+  rewrite <- Hlab.
+  apply Ha.
+  apply Permutation_in with (l := lb); [ | easy ].
+  now apply Permutation_sym.
+} {
+  apply nat_NoDup.
+  intros i j Hi Hj Hij.
+  unfold ff_app in Hij.
+  rewrite <- Hlab in Hi, Hj.
+  destruct Ha as (Hap, Hal).
+  specialize (proj1 (Permutation_nth _ _ 0) Hab) as H1.
+  destruct H1 as (H1 & f & H2 & H3 & H4).
+  rewrite H4 in Hij; [ | easy ].
+  rewrite H4 in Hij; [ | easy ].
+  do 2 rewrite fold_ff_app in Hij.
+  apply (NoDup_nat _ Hal) in Hij; [ | now apply H2 | now apply H2 ].
+  now apply H3.
+}
+Qed.
+
+(* *)
 
 Theorem permut_isort_leb : ∀ l,
   is_permut_list l
