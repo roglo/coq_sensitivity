@@ -892,6 +892,7 @@ rewrite app_nth2; [ | flia Hjb ].
 now rewrite Nat.sub_succ_l.
 Qed.
 
+(* to be completed
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
@@ -907,6 +908,45 @@ remember (List_rank (Nat.eqb i) l) as jo eqn:Hjo; symmetry in Hjo.
 destruct jo as [j| ]. 2: {
   exfalso.
   revert Hjo.
+  apply List_rank_not_None with (n := length la); [ | easy ].
+...
+  apply List_rank_not_None' with (n := length la); [ | easy ].
+  split; [ | now apply (permutation_assoc_length Heqb) ].
+  apply (perm_assoc_is_permut_list Heqb Hpab).
+}
+apply (List_rank_Some 0) in Hjo.
+destruct Hjo as (Hj & Hbef & Hij).
+apply Nat.eqb_eq in Hij.
+symmetry in Hij; unfold l in Hij.
+apply (permutation_assoc_loop_nth_nth Heqb) with (d := d) in Hij; cycle 1. {
+  now rewrite filter_Some_map_Some.
+} {
+  unfold l in Hj.
+  now rewrite permutation_assoc_length in Hj.
+}
+rewrite (List_map_nth' d) in Hij; [ easy | ].
+now rewrite (permutation_length Heqb Hpab) in Hi.
+Qed.
+*)
+
+Theorem permutation_fun_nth : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb i,
+  permutation eqb la lb
+  → i < length la
+  → nth i lb d = nth (permutation_fun eqb la lb i) la d.
+Proof.
+intros * Heqb * Hpab Hi.
+unfold permutation_fun.
+set (l := permutation_assoc eqb la lb).
+unfold unsome.
+remember (List_rank (Nat.eqb i) l) as jo eqn:Hjo; symmetry in Hjo.
+destruct jo as [j| ]. 2: {
+  exfalso.
+  revert Hjo.
+(*
+  apply List_rank_not_None with (n := length la); [ | easy ].
+*)
   apply List_rank_not_None' with (n := length la); [ | easy ].
   split; [ | now apply (permutation_assoc_length Heqb) ].
   apply (perm_assoc_is_permut_list Heqb Hpab).

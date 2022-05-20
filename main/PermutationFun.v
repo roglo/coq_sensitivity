@@ -1565,8 +1565,34 @@ unfold List_rank.
 now apply List_rank_loop_eqb_inside.
 Qed.
 
-(* to be completed
-Require Import Pigeonhole.
+Theorem List_rank_loop_extract : ∀ A (la : list A) f i,
+  List_rank_loop i f la =
+  match extract f la with
+  | Some (bef, _, _) => Some (i + length bef)
+  | None => None
+  end.
+Proof.
+intros.
+revert i.
+induction la as [| a]; intros; [ easy | cbn ].
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa; [ now rewrite Nat.add_0_r | ].
+rewrite IHla.
+remember (extract f la) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+now cbn; rewrite Nat.add_succ_r.
+Qed.
+
+Theorem List_rank_extract : ∀ A (la : list A) f,
+  List_rank f la =
+  match extract f la with
+  | Some (bef, _, _) => Some (length bef)
+  | None => None
+  end.
+Proof.
+intros.
+apply List_rank_loop_extract.
+Qed.
 
 Theorem List_rank_not_None : ∀ n l i,
   permutation Nat.eqb l (seq 0 n)
@@ -1574,84 +1600,19 @@ Theorem List_rank_not_None : ∀ n l i,
   → List_rank (Nat.eqb i) l ≠ None.
 Proof.
 intros n f i Hp Hi Hx.
-apply (permutation_sym Nat_eqb_equality) in Hp.
-revert i f Hp Hx Hi.
-induction n; intros; [ easy | ].
-destruct i. {
-  cbn in Hp.
-  apply permutation_cons_l_iff in Hp.
-  remember (extract (Nat.eqb 0) f) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & H & Hf).
-  apply Nat.eqb_eq in H; subst x.
-  subst f.
-  revert Hx.
-  apply List_rank_eqb_inside.
-  apply Nat_eqb_equality.
+rewrite List_rank_extract in Hx.
+remember (extract (Nat.eqb i) f) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ easy | clear Hx ].
+specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+specialize (H1 i).
+assert (H : i ∈ f). {
+  apply (permutation_sym Nat_eqb_equality) in Hp.
+  apply (permutation_in Nat_eqb_equality) with (la := seq 0 n); [ easy | ].
+  now apply in_seq.
 }
-apply Nat.succ_lt_mono in Hi.
-...
-Search (List_rank _ (_ ++ _)).
-  induction bef as [| b]; [ easy | ].
-  cbn - [ List_rank Nat.eqb ] in Hx.
-  destruct b; [ easy | ].
-  cbn - [ "<?" ] in Hx.
-Search (List_rank _ (_ ++ _)).
-...
-  destruct f as [| a la]. {
-    apply permutation_nil_r in Hp.
-    now apply List_seq_eq_nil in Hp.
-  }
-  cbn in Hp.
-...
-intros n f i Hp Hi Hx.
-assert (Hf : length f = n). {
-  rewrite (permutation_length Nat_eqb_equality Hp).
-  now rewrite seq_length.
-}
-specialize (List_rank_None 0 _ _ Hx) as H1; cbn.
-specialize (pigeonhole_list n (i :: f)) as H2.
-rewrite List_cons_length in H2.
-assert (H : n < S (length f)) by now rewrite Hf.
-specialize (H2 H); clear H.
-assert (H : ∀ x, x ∈ i :: f → x < n). {
-  intros x [Hxi| Hxf]; [ now subst x | ].
-  apply (permutation_in Nat_eqb_equality Hp) in Hxf.
-  now apply in_seq in Hxf.
-}
-specialize (H2 H); clear H.
-remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
-symmetry in Hxx.
-destruct xx as (x, x').
-specialize (H2 x x' eq_refl).
-destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
-destruct x. {
-  rewrite List_nth_0_cons in Hxx'if.
-  destruct x'; [ easy | ].
-  apply Nat.succ_lt_mono in Hx'f.
-  cbn in Hxx'if.
-  specialize (H1 x' Hx'f).
-  now apply Nat.eqb_neq in H1.
-}
-rewrite List_nth_succ_cons in Hxx'if.
-destruct x'. {
-  apply Nat.succ_lt_mono in Hxf.
-  cbn in Hxx'if; symmetry in Hxx'if.
-  specialize (H1 x Hxf).
-  now apply Nat.eqb_neq in H1.
-}
-cbn in Hxx'if.
-apply Nat.succ_lt_mono in Hxf, Hx'f.
-(**)
-apply Hxx'; clear Hxx'; f_equal.
-rewrite Hf in Hxf, Hx'f.
-...
-destruct Hs as (Ha, Hn).
-apply (NoDup_nat _ Hn) in Hxx'if; [ | easy | easy ].
-now rewrite Hxx'if in Hxx'.
+specialize (H1 H); clear H.
+now apply Nat.eqb_neq in H1.
 Qed.
-*)
 
 (* *)
 
