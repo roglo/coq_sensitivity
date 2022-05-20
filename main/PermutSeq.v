@@ -2566,6 +2566,140 @@ intros.
 now apply (isort_rank_is_permut _ (length l)).
 Qed.
 
+(* *)
+
+(* to be completed
+Theorem permut_list_permutation : ∀ l n,
+  is_permut n l
+  → permutation Nat.eqb l (seq 0 n).
+Proof.
+intros * (Hp, Hln).
+symmetry.
+revert l Hp Hln.
+induction n; intros. {
+  now apply length_zero_iff_nil in Hln; subst l.
+}
+rewrite seq_S; cbn.
+remember (ff_app (isort_rank Nat.leb l) n) as i eqn:Hi.
+rewrite (List_map_ff_app_seq l).
+remember (seq 0 n) as s eqn:Hs.
+rewrite (List_seq_cut i); subst s. 2: {
+  subst i.
+  apply in_seq.
+  split; [ easy | ].
+  rewrite <- (isort_rank_length Nat.leb).
+  apply permut_list_ub; [ | rewrite isort_rank_length, Hln; flia ].
+  now apply isort_rank_is_permut_list.
+}
+rewrite Nat.sub_0_r; cbn.
+rewrite map_app; cbn.
+rewrite Hi at 2.
+rewrite permut_permut_isort; [ | easy | now rewrite Hln ].
+Theorem permutation_elt : ∀ A (eqb : A → _),
+  ∀ (l1 l2 l1' l2' : list A) (a : A),
+  permutation eqb (l1 ++ l2) (l1' ++ l2')
+  → permutation eqb (l1 ++ a :: l2) (l1' ++ a :: l2').
+Proof.
+...
+apply Permutation_elt.
+rewrite app_nil_r.
+rewrite <- map_app.
+rewrite Hln; cbn.
+assert (Hin : i ≤ n). {
+  apply Nat.lt_succ_r.
+  rewrite Hi, <- Hln.
+  rewrite <- (isort_rank_length Nat.leb).
+  apply permut_list_ub; [ apply isort_rank_is_permut_list | ].
+  now rewrite isort_rank_length, Hln.
+}
+apply IHn. 2: {
+  rewrite map_length, app_length, seq_length, seq_length.
+  rewrite Nat.add_sub_assoc; [ now rewrite Nat.add_comm, Nat.add_sub | easy ].
+}
+assert (Hn : n = nth i l 0). {
+  rewrite Hi; symmetry.
+  apply permut_permut_isort; [ easy | now rewrite Hln ].
+}
+split. {
+  intros j Hj.
+  rewrite map_length, app_length, seq_length, seq_length.
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hkj & Hk).
+  apply in_app_iff in Hk.
+  subst j.
+  assert (Hkn : nth k l 0 < n). {
+    specialize permut_list_ub as H1.
+    specialize (H1 l k Hp).
+    rewrite Hln in H1.
+    assert (H : k < S n). {
+      destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk Hin.
+    }
+    specialize (H1 H); clear H.
+    enough (H : nth k l 0 ≠ n) by flia H H1.
+    intros H; rewrite Hn in H.
+    apply (NoDup_nat _ (proj2 Hp)) in H; [ | | flia Hin Hln ]. 2: {
+      rewrite Hln.
+      destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk Hin.
+    }
+    subst k.
+    destruct Hk as [Hk| Hk]; apply in_seq in Hk; flia Hk.
+  }
+  destruct Hk as [Hk| Hk]; [ now apply in_seq in Hk | ].
+  apply in_seq in Hk.
+  now replace (S i + (n - i)) with (S n) in Hk by flia Hin.
+} {
+  apply nat_NoDup.
+  rewrite map_length, map_app, app_length, seq_length, seq_length.
+  unfold ff_app.
+  replace (i + (n - i)) with n by flia Hin.
+  intros j k Hj Hk Hjk.
+  destruct (lt_dec j i) as [Hji| Hji]. {
+    rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hjk; [ | easy ].
+    destruct (lt_dec k i) as [Hki| Hki]. {
+      rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+      rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hjk; [ | easy ].
+      apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+      easy.
+    }
+    apply Nat.nlt_ge in Hki; exfalso.
+    rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite map_length, seq_length in Hjk.
+    rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
+    rewrite seq_nth in Hjk; [ | flia Hk Hki ].
+    replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
+    apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+    flia Hjk Hji Hki.
+  }
+  apply Nat.nlt_ge in Hji.
+  rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+  rewrite map_length, seq_length in Hjk.
+  rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hj Hji ].
+  rewrite seq_nth in Hjk; [ | flia Hj Hji ].
+  replace (S i + (j - i)) with (S j) in Hjk by flia Hji.
+  destruct (lt_dec k i) as [Hki| Hki]. {
+    rewrite app_nth1 in Hjk; [ | now rewrite map_length, seq_length ].
+    rewrite (List_map_nth' 0) in Hjk; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hjk; [ | easy ].
+    apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+    flia Hjk Hji Hki.
+  }
+  apply Nat.nlt_ge in Hki.
+  rewrite app_nth2 in Hjk; [ | now rewrite map_length, seq_length ].
+  rewrite map_length, seq_length in Hjk.
+  rewrite (List_map_nth' 0) in Hjk; [ | rewrite seq_length; flia Hk Hki ].
+  rewrite seq_nth in Hjk; [ | flia Hk Hki ].
+  replace (S i + (k - i)) with (S k) in Hjk by flia Hki.
+  apply (NoDup_nat _ (proj2 Hp)) in Hjk; [ | flia Hln Hj | flia Hln Hk ].
+  flia Hjk Hji Hki.
+}
+...
+*)
+
 (* try to eliminate all uses of "Permutation" by trying to
    make the same theorems with "permutation" *)
 
