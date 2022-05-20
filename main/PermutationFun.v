@@ -1538,6 +1538,63 @@ apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
 
+(* to be completed
+Require Import Pigeonhole.
+
+Theorem List_rank_not_None : ∀ n l i,
+  permutation Nat.eqb l (seq 0 n)
+  → i < n
+  → List_rank (Nat.eqb i) l ≠ None.
+Proof.
+intros n f i Hp Hi Hx.
+assert (Hf : length f = n). {
+  rewrite (permutation_length Nat_eqb_equality Hp).
+  now rewrite seq_length.
+}
+specialize (List_rank_None 0 _ _ Hx) as H1; cbn.
+specialize (pigeonhole_list n (i :: f)) as H2.
+rewrite List_cons_length in H2.
+assert (H : n < S (length f)) by now rewrite Hf.
+specialize (H2 H); clear H.
+assert (H : ∀ x, x ∈ i :: f → x < n). {
+  intros x [Hxi| Hxf]; [ now subst x | ].
+  apply (permutation_in Nat_eqb_equality Hp) in Hxf.
+  now apply in_seq in Hxf.
+}
+specialize (H2 H); clear H.
+remember (pigeonhole_comp_list (i :: f)) as xx eqn:Hxx.
+symmetry in Hxx.
+destruct xx as (x, x').
+specialize (H2 x x' eq_refl).
+destruct H2 as (Hxf & Hx'f & Hxx' & Hxx'if).
+destruct x. {
+  rewrite List_nth_0_cons in Hxx'if.
+  destruct x'; [ easy | ].
+  apply Nat.succ_lt_mono in Hx'f.
+  cbn in Hxx'if.
+  specialize (H1 x' Hx'f).
+  now apply Nat.eqb_neq in H1.
+}
+rewrite List_nth_succ_cons in Hxx'if.
+destruct x'. {
+  apply Nat.succ_lt_mono in Hxf.
+  cbn in Hxx'if; symmetry in Hxx'if.
+  specialize (H1 x Hxf).
+  now apply Nat.eqb_neq in H1.
+}
+cbn in Hxx'if.
+apply Nat.succ_lt_mono in Hxf, Hx'f.
+(**)
+apply Hxx'; clear Hxx'; f_equal.
+rewrite Hf in Hxf, Hx'f.
+Search permutation.
+...
+destruct Hs as (Ha, Hn).
+apply (NoDup_nat _ Hn) in Hxx'if; [ | easy | easy ].
+now rewrite Hxx'if in Hxx'.
+Qed.
+*)
+
 (* *)
 
 Require Import Permutation.

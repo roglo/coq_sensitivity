@@ -307,7 +307,7 @@ Qed.
 
 (* *)
 
-Theorem List_rank_not_None : ∀ n l i,
+Theorem List_rank_not_None' : ∀ n l i,
   is_permut n l
   → i < n
   → List_rank (Nat.eqb i) l ≠ None.
@@ -907,7 +907,7 @@ remember (List_rank (Nat.eqb i) l) as jo eqn:Hjo; symmetry in Hjo.
 destruct jo as [j| ]. 2: {
   exfalso.
   revert Hjo.
-  apply List_rank_not_None with (n := length la); [ | easy ].
+  apply List_rank_not_None' with (n := length la); [ | easy ].
   split; [ | now apply (permutation_assoc_length Heqb) ].
   apply (perm_assoc_is_permut_list Heqb Hpab).
 }
@@ -957,13 +957,13 @@ split. {
   symmetry in Hx, Hy.
   destruct x as [x| ]. 2: {
     exfalso; revert Hx.
-    apply List_rank_not_None with (n := length la); [ | easy ].
+    apply List_rank_not_None' with (n := length la); [ | easy ].
     split; [ | now apply (permutation_assoc_length Nat_eqb_equality) ].
     apply (perm_assoc_is_permut_list Nat_eqb_equality Hpab).
   }
   destruct y as [y| ]. 2: {
     exfalso; revert Hy.
-    apply List_rank_not_None with (n := length la); [ | easy ].
+    apply List_rank_not_None' with (n := length la); [ | easy ].
     split; [ | now apply (permutation_assoc_length Nat_eqb_equality) ].
     apply (perm_assoc_is_permut_list Nat_eqb_equality Hpab).
   }
