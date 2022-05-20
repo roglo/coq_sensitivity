@@ -1538,6 +1538,33 @@ apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
 
+Theorem List_rank_loop_eqb_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l1 l2 a i,
+  List_rank_loop i (eqb a) (l1 ++ a :: l2) ≠ None.
+Proof.
+intros * Heqb *.
+revert i.
+induction l1 as [| b]; intros. {
+  cbn.
+  now rewrite (equality_refl Heqb).
+}
+cbn.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+apply IHl1.
+Qed.
+
+Theorem List_rank_eqb_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l1 l2 a,
+  List_rank (eqb a) (l1 ++ a :: l2) ≠ None.
+Proof.
+intros * Heqb *.
+unfold List_rank.
+now apply List_rank_loop_eqb_inside.
+Qed.
+
 (* to be completed
 Require Import Pigeonhole.
 
@@ -1559,25 +1586,11 @@ destruct i. {
   destruct Hlxl as (Hbef & H & Hf).
   apply Nat.eqb_eq in H; subst x.
   subst f.
-  clear - Hx.
-Theorem List_rank_inside : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ l1 l2 a,
-  List_rank (eqb a) (l1 ++ a :: l2) ≠ None.
-Proof.
-intros * Heqb *.
-unfold List_rank.
-Print List_rank_loop.
-...
-induction l1 as [| b]; intros. {
-  cbn.
-  now rewrite (equality_refl Heqb).
+  revert Hx.
+  apply List_rank_eqb_inside.
+  apply Nat_eqb_equality.
 }
-cbn.
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ easy | ].
-...
-  now rewrite List_rank_inside in Hx.
+apply Nat.succ_lt_mono in Hi.
 ...
 Search (List_rank _ (_ ++ _)).
   induction bef as [| b]; [ easy | ].
