@@ -663,6 +663,49 @@ destruct (lt_dec (length bef') (length lbo)) as [Hfo| Hfo]. {
 }
 Qed.
 
+Theorem unmap_Some_app_cons : ∀ A (a : A) la lbo lco,
+  map Some la = lbo ++ Some a :: lco
+  → lbo = map Some (filter_Some lbo) ∧
+    lco = map Some (filter_Some lco) ∧
+    la = filter_Some lbo ++ a :: filter_Some lco.
+Proof.
+intros * Hla.
+assert (H : lbo = map Some (filter_Some lbo)). {
+  revert la Hla.
+  induction lbo as [| bo]; intros; [ easy | cbn ].
+  cbn in Hla.
+  destruct la as [| a']; [ easy | ].
+  injection Hla; clear Hla; intros Hla H; subst bo.
+  cbn; f_equal.
+  now apply (IHlbo la).
+}
+rewrite H in Hla |-*; clear H.
+rewrite filter_Some_map_Some.
+assert (H : lco = map Some (filter_Some lco)). {
+  rewrite List_cons_is_app, app_assoc in Hla.
+  replace (map Some (filter_Some lbo) ++ [Some a]) with
+    (map Some (filter_Some lbo ++ [a])) in Hla. 2: {
+    now rewrite map_app.
+  }
+  remember (filter_Some lbo ++ [a]) as lb eqn:Hlb.
+  clear a lbo Hlb.
+  revert la lco Hla.
+  induction lb as [| b]; intros; cbn. {
+    cbn in Hla; subst lco.
+    symmetry; f_equal; apply filter_Some_map_Some.
+  }
+  cbn in Hla.
+  destruct la as [| a]; [ easy | ].
+  injection Hla; clear Hla; intros Hlb H.
+  now apply (IHlb la).
+}
+rewrite H in Hla |-*; clear H.
+apply (f_equal filter_Some) in Hla.
+rewrite filter_Some_map_Some in Hla |-*.
+rewrite filter_Some_app in Hla; cbn in Hla.
+now do 2 rewrite filter_Some_map_Some in Hla.
+Qed.
+
 Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -710,50 +753,11 @@ split. {
   cbn in Hx.
   destruct x as [x| ]; [ | easy ].
   apply Heqb in Hx; subst x.
-(* piquer ce code et en faire un lemme *)
-  assert (H : bef = map Some (filter_Some bef)). {
-    clear - Hlb.
-    revert lb Hlb.
-    induction bef as [| bo]; intros; [ easy | cbn ].
-    cbn in Hlb.
-    destruct lb as [| b]; [ easy | ].
-    cbn in Hlb.
-    injection Hlb; clear Hlb; intros Hlb H; subst bo.
-    cbn; f_equal.
-    now apply (IHbef lb).
-  }
-  rewrite H in Hbef, Hlb, Hij.
-  rewrite map_length in Hij.
-  clear H.
-  assert (H : aft = map Some (filter_Some aft)). {
-    clear - Hlb.
-    rewrite List_cons_is_app, app_assoc in Hlb.
-    replace (map Some (filter_Some bef) ++ [Some a]) with
-        (map Some (filter_Some bef ++ [a]))
-      in Hlb. 2: {
-      now rewrite map_app.
-    }
-    remember (filter_Some bef ++ [a]) as la eqn:Hla.
-    clear a Hla.
-    revert lb aft Hlb.
-    induction la as [| a]; intros; cbn. {
-      cbn in Hlb; subst aft.
-      symmetry; f_equal; apply filter_Some_map_Some.
-    }
-    cbn in Hlb.
-    destruct lb as [| b]; [ easy | ].
-    cbn in Hlb.
-    injection Hlb; clear Hlb; intros Hlb H.
-    clear b H.
-    now apply (IHla lb).
-  }
-  rewrite H in Hlb, Hij.
-  clear H.
-  apply (f_equal filter_Some) in Hlb.
-  rewrite filter_Some_map_Some in Hlb.
-  rewrite filter_Some_app in Hlb; cbn in Hlb.
-  do 2 rewrite filter_Some_map_Some in Hlb.
-  subst lb.
+  apply unmap_Some_app_cons in Hlb.
+  destruct Hlb as (H1 & H2 & H3).
+  rewrite H1 in Hbef, Hij.
+  rewrite H2 in Hij.
+  subst lb; clear H1 H2.
   remember (filter_Some bef) as lb eqn:Hlb.
   remember (filter_Some aft) as lc eqn:Hlc.
   clear bef aft Hlb Hlc.
@@ -924,8 +928,8 @@ destruct Hlxl as (Hbef & H & Hlb).
 cbn in H.
 destruct x as [x| ]; [ | easy ].
 apply Heqb in H; subst x.
-...
-cf le commentaire "piquer ce code et en faire un lemme" ci-dessus
+apply unmap_Some_app_cons in Hlb.
+destruct Hlb as (H1 & H2 & Hlb).
 ...
 
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
