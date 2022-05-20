@@ -2580,9 +2580,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
   }
 }
 (*1*)
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
-(**)
-rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
+rewrite det_is_det''; try now destruct Hif.
 unfold det''.
 rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
@@ -2609,6 +2607,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+...
 (*
 Search (∏ (_ = _, _), (∑ (_ = _, _), _) = _).
 (*
