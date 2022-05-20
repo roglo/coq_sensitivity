@@ -1547,6 +1547,52 @@ Theorem List_rank_not_None : ∀ n l i,
   → List_rank (Nat.eqb i) l ≠ None.
 Proof.
 intros n f i Hp Hi Hx.
+apply (permutation_sym Nat_eqb_equality) in Hp.
+revert i f Hp Hx Hi.
+induction n; intros; [ easy | ].
+destruct i. {
+  cbn in Hp.
+  apply permutation_cons_l_iff in Hp.
+  remember (extract (Nat.eqb 0) f) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hf).
+  apply Nat.eqb_eq in H; subst x.
+  subst f.
+  clear - Hx.
+Theorem List_rank_inside : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l1 l2 a,
+  List_rank (eqb a) (l1 ++ a :: l2) ≠ None.
+Proof.
+intros * Heqb *.
+unfold List_rank.
+Print List_rank_loop.
+...
+induction l1 as [| b]; intros. {
+  cbn.
+  now rewrite (equality_refl Heqb).
+}
+cbn.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+...
+  now rewrite List_rank_inside in Hx.
+...
+Search (List_rank _ (_ ++ _)).
+  induction bef as [| b]; [ easy | ].
+  cbn - [ List_rank Nat.eqb ] in Hx.
+  destruct b; [ easy | ].
+  cbn - [ "<?" ] in Hx.
+Search (List_rank _ (_ ++ _)).
+...
+  destruct f as [| a la]. {
+    apply permutation_nil_r in Hp.
+    now apply List_seq_eq_nil in Hp.
+  }
+  cbn in Hp.
+...
+intros n f i Hp Hi Hx.
 assert (Hf : length f = n). {
   rewrite (permutation_length Nat_eqb_equality Hp).
   now rewrite seq_length.
@@ -1587,7 +1633,6 @@ apply Nat.succ_lt_mono in Hxf, Hx'f.
 (**)
 apply Hxx'; clear Hxx'; f_equal.
 rewrite Hf in Hxf, Hx'f.
-Search permutation.
 ...
 destruct Hs as (Ha, Hn).
 apply (NoDup_nat _ Hn) in Hxx'if; [ | easy | easy ].
