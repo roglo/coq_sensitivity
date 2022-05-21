@@ -959,7 +959,90 @@ replace (length la - length bef) with (length aft). 2: {
   flia Hpab.
 }
 remember (length bef) as i eqn:Hi.
-specialize (permutation_elt Nat_eqb_equality) as H4.
+apply (permutation_elt Nat_eqb_equality []); cbn.
+rewrite (permutation_assoc_loop_None_inside Heqb).
+rewrite <- Hi.
+set (f := λ j, if j <? i then j else S j).
+destruct (Nat.eq_dec (length aft) 0) as [Haz| Haz]. {
+  apply length_zero_iff_nil in Haz; move Haz at top; subst aft.
+  clear H2; cbn in Hpab |-*.
+  rewrite app_nil_r in Hpab.
+  do 2 rewrite app_nil_r.
+  unfold f.
+  rewrite Hi.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j (length bef)) as [Hji| Hji]. 2: {
+      exfalso; apply Hji.
+      apply (In_nth _ _ 0) in Hj.
+      rewrite (permutation_assoc_loop_length Heqb) in Hj; [ | easy ].
+      destruct Hj as (k & Hk & Hkj).
+      rewrite <- Hkj.
+      now apply (permutation_assoc_loop_ub Heqb).
+    }
+    easy.
+  }
+  rewrite map_id.
+  replace (length bef) with (length la). 2: {
+    rewrite (permutation_length Heqb Hpab).
+    now rewrite H1, filter_Some_map_Some, map_length.
+  }
+  rewrite H1.
+  rewrite fold_permutation_assoc.
+  now apply IHla.
+}
+replace (seq 0 i ++ seq (S i) (length aft)) with
+    (map f (seq 0 (i + length aft))). 2: {
+  rewrite List_seq_cut with (i := i). 2: {
+    apply in_seq.
+    split; [ easy | ].
+    flia Haz.
+  }
+  rewrite Nat.sub_0_r, Nat.add_0_l.
+  rewrite map_app.
+  unfold f.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j i) as [Hji| Hji]. 2: {
+      apply in_seq in Hj.
+      now exfalso; apply Hji.
+    }
+    easy.
+  }
+  rewrite map_id; f_equal.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j i) as [Hji| Hji]. {
+      exfalso.
+      apply in_app_or in Hj.
+      destruct Hj as [[Hj| Hj]| Hj]; [ flia Hj Hji | easy | ].
+      apply in_seq in Hj.
+      flia Hj Hji.
+    }
+    easy.
+  }
+  cbn.
+  rewrite seq_shift.
+  destruct aft; [ easy | cbn ].
+  f_equal; f_equal.
+  rewrite Nat.add_succ_r; cbn.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+Search (permutation _ (map _ _) (map _ _)).
+Require Import Permutation.
+Search (Permutation (map _ _) (map _ _)).
+...
+rewrite H1, H2 at 1.
+rewrite <- map_app.
+rewrite fold_permutation_assoc.
+...
+Search (permutation _ _ (map _ _)).
+Require Import Permutation.
+Search (Permutation (map _ _)).
+Search (Permutation _ (map _ _)).
 ...
 specialize (H4 (permutation_assoc_loop eqb la (bef ++ None :: aft))).
 specialize (H4 (seq 0 i)).
