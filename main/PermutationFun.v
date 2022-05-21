@@ -1538,7 +1538,16 @@ apply (permutation_assoc_loop_length Heqb).
 now rewrite filter_Some_map_Some.
 Qed.
 
-(* to be completed
+Theorem permutation_middle : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb a,
+  permutation eqb (a :: la ++ lb) (la ++ a :: lb).
+Proof.
+intros * Heqb *.
+apply (permutation_cons_app Heqb).
+now apply permutation_refl.
+Qed.
+
 Theorem permutation_elt : ∀ A (eqb : A → _),
   equality eqb →
   ∀ (la lb lc ld : list A) (a : A),
@@ -1546,51 +1555,12 @@ Theorem permutation_elt : ∀ A (eqb : A → _),
   → permutation eqb (la ++ a :: lb) (lc ++ a :: ld).
 Proof.
 intros * Heqb * Hpab.
-revert a lb lc ld Hpab.
-induction la as [| a']; intros; cbn. {
-  cbn in Hpab.
-  now apply (permutation_cons_app Heqb).
+eapply (permutation_trans Heqb). {
+  apply (permutation_sym Heqb).
+  apply (permutation_middle Heqb).
 }
-cbn in Hpab.
-apply permutation_cons_l_iff in Hpab.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlcd).
-apply Heqb in H; subst x.
-apply permutation_cons_l_iff.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef', x), aft')| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  specialize (H1 a').
-  assert (H : a' ∈ lc ++ a :: ld). {
-    enough (H : a' ∈ lc ++ ld). {
-      apply in_app_or in H.
-      apply in_or_app; cbn.
-      destruct H as [H| H]; [ now left | now right; right ].
-    }
-    rewrite Hlcd.
-    apply in_or_app; cbn.
-    now right; left.
-  }
-  specialize (H1 H).
-  now rewrite (equality_refl Heqb) in H1.
-}
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef' & H & Hlca).
-apply Heqb in H; subst x.
-move Hlcd before Hlca.
-move Hbef before Hbef'.
-...
-generalize Hpab; intros H1.
-apply IHla with (a := a') in H1.
-rewrite <- Hlcd in H1.
-apply IHla with (a := a) in H1.
-generalize Hpab; intros H2.
-apply IHla with (a := a) in H2.
-eapply (permutation_trans Heqb); [ apply H2 | ].
-...
-*)
+now apply (permutation_cons_app Heqb).
+Qed.
 
 (* *)
 
