@@ -945,7 +945,11 @@ erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
   rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
-    apply permut_list_Permutation.
+    apply (Permutation_permutation Nat_eqb_equality).
+    remember (map _ _) as la eqn:Hla.
+    replace n with (length la) by now rewrite Hla, List_map_seq_length.
+    apply permut_list_permutation.
+    subst la.
     now apply transposition_is_permut.
   }
   easy.
@@ -1163,10 +1167,13 @@ rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
-  apply permut_list_Permutation.
+  apply (Permutation_permutation Nat_eqb_equality).
+  remember (map _ _) as la eqn:Hla.
+  replace n! with (length la) by now rewrite Hla, List_map_seq_length.
+  apply permut_list_permutation.
+  subst la.
 (* lemma to do? *)
   unfold g, f.
-  split; [ | now rewrite map_length, seq_length ].
   split. {
     intros i Hi.
     rewrite map_length, seq_length.
@@ -1178,7 +1185,6 @@ rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
     apply list_swap_elem_is_permut; [ easy | easy | ].
     now apply canon_sym_gr_list_is_permut.
   } {
-(**)
     apply (NoDup_map_iff 0).
     rewrite seq_length.
     intros i j Hi Hj Hij.

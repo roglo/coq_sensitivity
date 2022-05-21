@@ -7,7 +7,7 @@ Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
-Require Import SortingFun Matrix PermutSeq Signature.
+Require Import PermutationFun SortingFun Matrix PermutSeq Signature.
 Require Import Determinant.
 Import matrix_Notations.
 
@@ -1120,10 +1120,13 @@ apply rngl_summation_list_permut.
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
-apply permut_list_Permutation.
+apply (Permutation_permutation Nat_eqb_equality).
+remember (map _ _) as la eqn:Hla.
+replace n! with (length la) by now rewrite Hla, List_map_seq_length.
+apply permut_list_permutation.
+subst la.
 (* lemma to do? *)
 unfold h.
-split; [ | now rewrite map_length, seq_length ].
 split. {
   intros i Hi.
   rewrite map_length, seq_length.
@@ -1186,8 +1189,11 @@ Proof.
 intros Hic * Hσ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
-  apply permut_list_Permutation.
-  now apply map_permut_seq_is_permut.
+  apply (Permutation_permutation Nat_eqb_equality).
+  destruct Hσ as (H1, H2).
+  rewrite <- H2 at 1.
+  rewrite <- List_map_ff_app_seq, <- H2.
+  now apply permut_list_permutation.
 }
 unfold iter_seq.
 rewrite Nat_sub_succ_1.
@@ -1438,9 +1444,13 @@ split. {
     left; apply IHn; flia Hk Hkn.
   }
   apply Permutation_sym.
-  apply permut_list_Permutation.
-  apply isort_rank_is_permut.
-  now destruct Hσ.
+  apply (Permutation_permutation Nat_eqb_equality).
+  replace n with (length (isort_rank Nat.leb σ)). 2: {
+    rewrite isort_rank_length.
+    now destruct Hσ.
+  }
+  apply permut_list_permutation.
+  apply isort_rank_is_permut_list.
 } {
   intros l Hl.
   apply in_map_iff.

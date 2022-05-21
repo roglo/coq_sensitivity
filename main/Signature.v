@@ -9,7 +9,7 @@ Import List List.ListNotations.
 
 Require Import Misc SortingFun RingLike.
 Require Import IterMul.
-Require Import PermutSeq.
+Require Import PermutationFun PermutSeq.
 
 Section a.
 
@@ -773,14 +773,16 @@ cbn - [ "<?" ].
 rewrite rngl_product_list_permut with (l2 := seq 0 (length p)); cycle 1. {
   easy.
 } {
-  now apply permut_list_Permutation.
+  apply (Permutation_permutation Nat_eqb_equality).
+  now apply permut_list_permutation.
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_list with (lb := seq 0 (length p)); cycle 1. {
     easy.
   } {
-    now apply permut_list_Permutation.
+    apply (Permutation_permutation Nat_eqb_equality).
+    now apply permut_list_permutation.
   }
   easy.
 }
@@ -1543,7 +1545,8 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
   erewrite rngl_product_change_list; [ | easy | ]. 2: {
-    now apply permut_list_Permutation.
+    apply (Permutation_permutation Nat_eqb_equality).
+    now apply permut_list_permutation.
   }
   easy.
 }
@@ -1551,7 +1554,8 @@ cbn - [ "<?" ].
 erewrite rngl_product_change_list; [ | easy | ]. 2: {
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
-  now apply permut_list_Permutation.
+  apply (Permutation_permutation Nat_eqb_equality).
+  now apply permut_list_permutation.
 }
 symmetry.
 unfold iter_seq.
@@ -2345,10 +2349,14 @@ apply Permutation_isort'; [ easy | easy | easy | ].
 unfold "°".
 apply Permutation_map.
 transitivity (seq 0 n). {
-  now apply permut_list_Permutation.
+  destruct Hp as (Hp1, Hp2); rewrite <- Hp2.
+  apply (Permutation_permutation Nat_eqb_equality).
+  now apply permut_list_permutation.
 } {
-  apply Permutation_sym.
-  now apply permut_list_Permutation.
+  destruct Hq as (Hq1, Hq2); rewrite <- Hq2.
+  apply (Permutation_permutation Nat_eqb_equality).
+  apply (permutation_sym Nat_eqb_equality).
+  now apply permut_list_permutation.
 }
 Qed.
 
@@ -2850,10 +2858,11 @@ f_equal. {
   }
   cbn - [ "<?" seq ].
   rewrite rngl_product_change_list with (lb := seq 0 n); [ | easy | ]. 2: {
-    apply permut_list_Permutation.
+    apply (Permutation_permutation Nat_eqb_equality).
     destruct Hp'p as (Hp'a, Hp'n).
-    rewrite <- Hp'l at 2.
-    now rewrite <- List_map_ff_app_seq.
+    rewrite <- Hp'l at 1.
+    rewrite <- List_map_ff_app_seq, <- Hp'l.
+    now apply permut_list_permutation.
   }
   rewrite rngl_product_seq_product; [ | easy ].
   rewrite Nat.add_0_l.
