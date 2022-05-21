@@ -959,8 +959,8 @@ replace (length la - length bef) with (length aft). 2: {
   flia Hpab.
 }
 remember (length bef) as i eqn:Hi.
-specialize permutation_elt as H4.
-specialize (H4 _ Nat.eqb []).
+specialize (permutation_elt Nat_eqb_equality) as H4.
+...
 specialize (H4 (permutation_assoc_loop eqb la (bef ++ None :: aft))).
 specialize (H4 (seq 0 i)).
 specialize (H4 (seq (S i) (length aft))).
