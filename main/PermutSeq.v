@@ -379,6 +379,8 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hseq).
 apply Nat.eqb_eq in H; subst x.
+apply (permutation_cons_inv Nat_eqb_equality) with (a := a).
+specialize (IHlen (a :: la)) as H1.
 ...
 rewrite (List_seq_cut a) in Hseq. 2: {
   apply in_seq.
