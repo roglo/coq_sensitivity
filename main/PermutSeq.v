@@ -844,7 +844,8 @@ remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
   cbn - [ option_eqb In ] in H1.
-  specialize (proj1 (permutation_in Heqb Hpab a) (or_introl eq_refl)) as H2.
+  specialize (permutation_in Heqb) as H2.
+  specialize (H2 _ _ a Hpab (or_introl eq_refl)).
   assert (H : Some a ∈ lbo). {
     clear - H2.
     induction lbo as [| bo]; [ easy | ].

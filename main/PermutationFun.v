@@ -406,47 +406,47 @@ Qed.
 
 Theorem permutation_in : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la lb,
-  permutation eqb la lb →
-  (∀ a, a ∈ la ↔ a ∈ lb).
+  ∀ la lb a, permutation eqb la lb → a ∈ la → a ∈ lb.
 Proof.
-intros * Heqb * Hab *.
-split. {
-  intros Hla.
-  revert a lb Hab Hla.
-  induction la as [| b]; intros; [ easy | cbn ].
-  apply permutation_cons_l_iff in Hab.
-  remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & H & Hlb).
-  apply Heqb in H; subst x lb.
-  destruct Hla as [Hla| Hla]. {
-    now subst b; apply in_or_app; right; left.
-  }
-  assert (Ha : a ∈ bef ++ aft) by now apply IHla.
-  apply in_app_or in Ha.
-  apply in_or_app.
-  now destruct Ha; [ left | right; right ].
-} {
-  intros Hlb.
-  revert a lb Hab Hlb.
-  induction la as [| b]; intros; [ now destruct lb | ].
-  apply permutation_cons_l_iff in Hab.
-  remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & H & Hlba).
-  apply Heqb in H; subst x lb.
-  apply in_app_or in Hlb.
-  destruct Hlb as [Hlb| Hlb]. 2: {
-    destruct Hlb as [Hlb| Hlb]; [ now left | right ].
-    apply (IHla a (bef ++ aft) Hab).
-    now apply in_or_app; right.
-  }
-  right; apply (IHla a (bef ++ aft) Hab).
-  now apply in_or_app; left.
+intros * Heqb * Hpab Hla.
+revert a lb Hpab Hla.
+induction la as [| b]; intros; [ easy | ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x lb.
+destruct Hla as [Hla| Hla]. {
+  now subst b; apply in_or_app; right; left.
 }
+assert (Ha : a ∈ bef ++ aft) by now apply IHla.
+apply in_app_or in Ha.
+apply in_or_app.
+now destruct Ha; [ left | right; right ].
+Qed.
+
+Theorem permutation_in_r : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb a, permutation eqb la lb → a ∈ lb → a ∈ la.
+Proof.
+intros * Heqb * Hpab Hlb.
+revert a lb Hpab Hlb.
+induction la as [| b]; intros; [ now destruct lb | ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlba).
+apply Heqb in H; subst x lb.
+apply in_app_or in Hlb.
+destruct Hlb as [Hlb| Hlb]. 2: {
+  destruct Hlb as [Hlb| Hlb]; [ now left | right ].
+  apply (IHla a (bef ++ aft) Hpab).
+  now apply in_or_app; right.
+}
+right; apply (IHla a (bef ++ aft) Hpab).
+now apply in_or_app; left.
 Qed.
 
 Theorem permutation_sym : ∀ A (eqb : A → _),
@@ -460,9 +460,10 @@ apply permutation_cons_l_iff.
 remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1; clear Hlxl.
-  specialize (permutation_in Heqb Hab) as H2.
-  specialize (proj2 (H2 b) (or_introl eq_refl)) as H3.
-  specialize (H1 _ H3).
+  specialize (permutation_in_r Heqb) as H2.
+  specialize (H2 _ _ b Hab).
+  specialize (H2 (or_introl eq_refl)).
+  specialize (H1 _ H2).
   now rewrite (equality_refl Heqb) in H1.
 }
 apply extract_Some_iff in Hlxl.
@@ -506,11 +507,11 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & H & Hlb).
   apply Heqb in H; subst x.
-  specialize (permutation_in Heqb Hbc) as H2.
-  specialize (H2 a) as H3.
+  specialize (permutation_in Heqb) as H2.
+  specialize (H2 _ _ a Hbc).
   assert (H : a ∈ lb) by now subst lb; apply in_or_app; right; left.
-  specialize (proj1 H3 H) as H4; clear H.
-  specialize (H1 _ H4).
+  specialize (H2 H); clear H.
+  specialize (H1 _ H2).
   now rewrite (equality_refl Heqb) in H1.
 }
 apply extract_Some_iff in Hlxl.
@@ -1151,11 +1152,11 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (H1 (Some a)).
   assert (H : Some a ∈ lbo). {
     specialize (permutation_in Heqb) as H2.
-    specialize (proj1 (H2 _ _ Hpab a) (or_introl eq_refl)) as H3.
-    clear - H3.
-    induction lbo as [| bo]; [ easy | cbn in H3 ].
+    specialize (H2 _ _ a Hpab (or_introl eq_refl)).
+    clear - H2.
+    induction lbo as [| bo]; [ easy | cbn in H2 ].
     destruct bo as [b| ]. {
-      destruct H3 as [H3| H3]; [ now subst b; left | ].
+      destruct H2 as [H3| H3]; [ now subst b; left | ].
       now right; apply IHlbo.
     }
     now right; apply IHlbo.
@@ -1379,7 +1380,8 @@ remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
   specialize (H1 b).
-  assert (H : b ∈ la) by now apply (permutation_in Heqb Hpab); left.
+  specialize (permutation_in_r Heqb) as H.
+  specialize (H _ _ b Hpab (or_introl eq_refl)).
   specialize (H1 H); clear H.
   now rewrite (equality_refl Heqb) in H1.
 }
