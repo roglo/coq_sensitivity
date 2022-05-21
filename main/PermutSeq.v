@@ -356,6 +356,65 @@ Theorem permut_list_is_permutation : ∀ la,
   → permutation Nat.eqb la (seq 0 (length la)).
 Proof.
 intros * Hp.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert la Hp Hlen.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+destruct la as [| a]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+apply permutation_cons_l_iff.
+remember (extract (Nat.eqb a) (seq 0 (length (a :: la)))) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 a).
+  assert (H : a ∈ seq 0 (length (a :: la))). {
+    apply in_seq.
+    split; [ easy | now apply Hp; left ].
+  }
+  specialize (H1 H).
+  now apply Nat.eqb_neq in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hseq).
+apply Nat.eqb_eq in H; subst x.
+remember (extract (Nat.eqb a) (seq 0 (S len))) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+cbn - [ seq ] in Hseq.
+rewrite Hlen in Hseq.
+destruct lxl as [((bef', x), aft')| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  specialize (H1 a).
+  assert (H : a ∈ seq 0 (S len)). {
+    rewrite Hseq.
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H.
+  now apply Nat.eqb_neq in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hs).
+apply Nat.eqb_eq in H; subst x.
+...
+rewrite (List_seq_cut a) in Hseq. 2: {
+  apply in_seq.
+  split; [ easy | now apply Hp; left ].
+}
+rewrite Nat.sub_0_r in Hseq.
+cbn in Hseq.
+apply app_eq_app in Hseq.
+destruct Hseq as (lb & Hseq).
+destruct Hseq as [(H1, H2)| (H1, H2)]. {
+  destruct lb as [| b]. {
+    rewrite app_nil_r in H1.
+    injection H2; clear H2; intros H2; subst bef aft.
+    destruct a. {
+      rewrite Nat.sub_0_r; cbn.
+      rewrite <- seq_shift.
+...
+intros * Hp.
 (*
 unfold AllLt in Hs.
 specialize (NoDup_nat _ Hf) as H.
