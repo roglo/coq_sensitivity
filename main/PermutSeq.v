@@ -902,13 +902,6 @@ Theorem fold_permutation_assoc : ∀ A (eqb : A → _) la lb,
 Proof. easy. Qed.
 
 (* to be completed
-Theorem permutation_elt : ∀ A (eqb : A → _),
-  ∀ (l1 l2 l1' l2' : list A) (a : A),
-  permutation eqb (l1 ++ l2) (l1' ++ l2')
-  → permutation eqb (l1 ++ a :: l2) (l1' ++ a :: l2').
-Proof.
-...
-
 Theorem permutation_permutation_assoc : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
