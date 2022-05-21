@@ -268,6 +268,87 @@ destruct x. {
 }
 Qed.
 
+(* to be completed
+Theorem permut_list_surj : ∀ n l,
+  is_permut_list l
+  → n < length l
+  → ∃ i, i < length l ∧ nth i l 0 = n.
+Proof.
+intros * Hp Hn.
+specialize (permut_list_without Hp Hn) as H1.
+Print Decidable.
+Theorem glop : ∀ (P : nat → _) n,
+  (∀ i, Decidable.decidable (P i))
+  → ¬ (∀ i, i < n → ¬ P i)
+  → ∃ i, i < n ∧ P i.
+Proof.
+intros * Hdec Hin.
+induction n; [ now exfalso; apply Hin | ].
+destruct (Hdec n) as [Hn| Hn]; [ now exists n | ].
+exfalso; apply Hin.
+intros i Hi.
+destruct (Nat.eq_dec i n) as [H1| H1]; [ now subst i | ].
+assert (H : i < n) by flia Hi H1.
+clear Hi H1; rename H into Hi.
+intros Hpi.
+assert (H : ¬ (∀ i, i < n → ¬ P i)). {
+  intros H2.
+  now apply (H2 i).
+}
+specialize (IHn H); clear H.
+destruct IHn as (j & Hj & Hpj).
+apply Hin.
+intros k Hk.
+apply Hin.
+intros k Hk.
+...
+destruct n. {
+  exists 0.
+  split; [ easy | ].
+  specialize (Hdec 0) as H1.
+  destruct H1 as [H1| H1]; [ easy | ].
+  exfalso; apply Hin.
+  intros i Hi.
+  now apply Nat.lt_1_r in Hi; subst i.
+}
+apply IHn.
+intros H1.
+apply Hin.
+intros i Hi.
+destruct (Nat.eq_dec i n) as [H2| H2]. 2: {
+  apply H1; flia Hi H2.
+}
+subst i; clear Hi.
+intros H2; apply Hin.
+intros i Hi.
+...
+Search ({_} + {∀ _, _}).
+Search (¬ (∀ _, _)).
+Search (¬ (∃ _, _)).
+...
+apply glop.
+intros H2.
+apply H1.
+intros i Hi.
+specialize (H2 i).
+apply Decidable.not_and in H2; [ | apply dec_lt ].
+now destruct H2.
+...
+intros * Hp Hn.
+revert l Hp Hn.
+induction n; intros; cbn. {
+  destruct l as [| a la]; [ easy | ].
+  exists a.
+  split; [ now apply Hp; left | ].
+  specialize (permut_list_without Hp Hn) as H1.
+revert n Hn.
+induction l as [| a]; intros; [ easy | ].
+specialize (permut_list_without Hp Hn) as H1.
+Search is_permut_list.
+Search (¬ (∀ _, _) ↔ ∃ _, _).
+...
+*)
+
 Theorem comp_length : ∀ la lb,
   length (la ° lb) = length lb.
 Proof.
@@ -313,6 +394,47 @@ Theorem permut_list_is_permutation : ∀ la,
   → permutation Nat.eqb la (seq 0 (length la)).
 Proof.
 intros * (Hs, Hf).
+Check permut_list_without.
+...
+intros * (Hs, Hf).
+unfold AllLt in Hs.
+specialize (NoDup_nat _ Hf) as H.
+clear Hf; rename H into Hnd.
+induction la as [| a]; [ easy | ].
+apply permutation_cons_l_iff.
+remember (extract (Nat.eqb a) (seq 0 (length (a :: la)))) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (H1 a).
+  assert (H : a ∈ seq 0 (length (a :: la))). {
+    apply in_seq.
+    split; [ easy | now apply Hs; left ].
+  }
+  specialize (H1 H).
+  now apply Nat.eqb_neq in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hseq).
+apply Nat.eqb_eq in H; subst x.
+rewrite (List_seq_cut a) in Hseq. 2: {
+  apply in_seq.
+  split; [ easy | now apply Hs; left ].
+}
+rewrite Nat.sub_0_r in Hseq.
+cbn in Hseq.
+apply app_eq_app in Hseq.
+destruct Hseq as (lb & Hseq).
+destruct Hseq as [(H1, H2)| (H1, H2)]. {
+  destruct lb as [| b]. {
+    rewrite app_nil_r in H1.
+    injection H2; clear H2; intros H2; subst bef aft.
+    destruct a. {
+      rewrite Nat.sub_0_r; cbn.
+      rewrite <- seq_shift.
+...
+Search (_ ++ _ = _ ++ _ → _).
+assert (H : bef = seq 0 a).
 ...
 *)
 
