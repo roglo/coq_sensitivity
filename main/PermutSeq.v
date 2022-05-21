@@ -844,14 +844,14 @@ remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl (Some a)) as H1.
   cbn - [ option_eqb In ] in H1.
-  specialize (permutation_in Heqb) as H2.
-  specialize (H2 _ _ a Hpab (or_introl eq_refl)).
+  specialize (permutation_in_iff Heqb) as H2.
+  specialize (proj1 (H2 _ _ Hpab _) (or_introl eq_refl)) as H3.
   assert (H : Some a ∈ lbo). {
-    clear - H2.
+    clear - H3.
     induction lbo as [| bo]; [ easy | ].
-    cbn in H2.
+    cbn in H3.
     destruct bo as [b| ]. {
-      destruct H2 as [H2| H2]; [ now left; subst b | right ].
+      destruct H3 as [H2| H2]; [ now left; subst b | right ].
       now apply IHlbo.
     }
     now right; apply IHlbo.
@@ -1162,7 +1162,7 @@ split. {
   intros i Hi.
   rewrite <- Hlab.
   apply Ha.
-  apply (permutation_in Nat_eqb_equality) with (la := lb); [ | easy ].
+  apply (permutation_in_iff Nat_eqb_equality) with (la := lb); [ | easy ].
   now apply (permutation_sym Nat_eqb_equality).
 } {
   destruct Ha as (Hap, Hal).

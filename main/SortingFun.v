@@ -2470,9 +2470,9 @@ destruct lb as [| b]. {
 }
 move b before a.
 move lb before la; move lc before lb; move ld before lc.
-specialize (permutation_in Heqb) as H1.
-specialize (H1 _ _ a Hac (or_introl eq_refl)) as Hc.
-specialize (H1 _ _ b Hbd (or_introl eq_refl)) as Hd.
+specialize (permutation_in_iff Heqb) as H1.
+specialize (proj1 (H1 _ _ Hac _) (or_introl eq_refl)) as Hc.
+specialize (proj1 (H1 _ _ Hbd _) (or_introl eq_refl)) as Hd.
 clear H1.
 apply in_split in Hc, Hd.
 destruct Hc as (lc1 & lc2 & Hc).
