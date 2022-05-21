@@ -534,7 +534,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
   assert (H : Some a ∈ map Some lb). {
     apply in_map_iff.
     exists a; split; [ easy | ].
-    now apply (permutation_in Heqb Hpab a); left.
+    now apply (permutation_in_iff Heqb Hpab a); left.
   }
   specialize (H1 H); clear H.
   cbn in H1.
@@ -644,9 +644,18 @@ replace (seq 0 i ++ seq (S i) (length aft)) with
   rewrite Nat.add_succ_r; cbn.
   now rewrite Nat.add_comm, Nat.add_sub.
 }
-Search (permutation _ (map _ _) (map _ _)).
-Require Import Permutation.
-Search (Permutation (map _ _) (map _ _)).
+...
+apply permutation_map with (eqba := Nat.eqb).
+replace (i + length aft) with (length la). 2: {
+  rewrite (permutation_length Heqb Hpab).
+  rewrite app_length.
+  rewrite <- (map_length Some (filter_Some _)), <- H1.
+  rewrite <- (map_length Some (filter_Some _)), <- H2.
+  now rewrite Hi.
+}
+rewrite H1, H2, <- map_app.
+rewrite fold_permutation_assoc.
+now apply IHla.
 ...
 rewrite H1, H2 at 1.
 rewrite <- map_app.

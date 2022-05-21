@@ -991,7 +991,30 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
-(**)
+Theorem permutation_map : ∀ A B (eqba : A → _) (eqbb : B → _),
+  equality eqba →
+  equality eqbb →
+  ∀ (f : A → B) (la lb : list A),
+  permutation eqba la lb → permutation eqbb (map f la) (map f lb).
+Proof.
+intros * Heqba Heqbb * Hpab.
+revert lb Hpab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqba a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqba in H; subst x lb.
+rewrite map_app; cbn.
+apply (permutation_cons_app Heqbb).
+rewrite <- map_app.
+now apply IHla.
+Qed.
+
+(* *)
 
 Theorem List_rank_loop_eqb_inside : ∀ A (eqb : A → _),
   equality eqb →
