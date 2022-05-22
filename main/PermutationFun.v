@@ -1805,17 +1805,24 @@ Qed.
 
 (* to be completed
 Theorem permutation_nth : ∀ A (eqb : A → _),
-  ∀ l l' d,
-  permutation eqb l l'
-  ↔ (let n := length l in
-     length l' = n ∧
+  equality eqb →
+  ∀ la lb d,
+  permutation eqb la lb
+  ↔ (let n := length la in
+     length lb = n ∧
      ∃ f : nat → nat,
      FinFun.bFun n f ∧
      FinFun.bInjective n f ∧
-     (∀ x : nat, x < n → nth x l' d = nth (f x) l d)).
+     (∀ x : nat, x < n → nth x lb d = nth (f x) la d)).
 Proof.
-Print FinFun.bFun.
-Print FinFun.bInjective.
+intros * Heqb *.
+split. {
+  intros Hpab *.
+  split. {
+    subst n; symmetry.
+    apply (permutation_length Heqb Hpab).
+  }
+  exists (permutation_fun eqb la lb).
 ...
 *)
 
