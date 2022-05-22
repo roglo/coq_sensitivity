@@ -1878,15 +1878,32 @@ split. {
   intros (Hlab & f & Hbf & Hif & Hn).
   unfold FinFun.bFun in Hbf.
   unfold FinFun.bInjective in Hif.
+  remember (permutation_fun eqb la lb) as g eqn:Hg.
+  unfold permutation_fun in Hg.
+  assert (H : ∀ i, i < length la → g (f i) = i). {
+    intros i Hi; subst g.
+    rewrite List_rank_extract.
+    remember (extract (Nat.eqb (f i)) _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+      clear Hlxl.
+(* ouais, chais pas *)
+...
   revert lb Hlab Hbf Hif Hn.
   induction la as [| a]; intros. {
     now apply length_zero_iff_nil in Hlab; subst lb.
   }
+  cbn - [ nth ] in Hlab, Hbf, Hif, Hn.
   apply permutation_cons_l_iff.
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
     clear Hlxl.
+...
+assert (H : ∃ i, nth i la d = a). {
+Print permutation_fun.
+Search permutation_assoc.
+...
     specialize (Hn 0 (Nat.lt_0_succ _)) as H2.
     destruct (Nat.eq_dec (f 0) 0) as [Hfz| Hfz]. {
       rewrite Hfz in H2; cbn in H2.
@@ -1899,9 +1916,17 @@ split. {
       specialize (H1 H); clear H.
       now rewrite (equality_refl Heqb) in H1.
     }
+cbn - [ nth ] in Hlab, Hbf, Hif, Hn.
+specialize (H1 a) as H3.
+assert (H : ∃ i, a = nth i lb d). {
+assert (H : a ∈ lb). {
+Check nth_In.
+...
     remember (f 0) as fz eqn:Hfnz.
     symmetry in Hfnz.
     destruct fz; [ easy | clear Hfz ].
+    cbn in H2.
+    destruct lb as [| b]; [ easy | ].
     cbn in H2.
 ...
     specialize (Hif 0 (f 0)) as H3.
