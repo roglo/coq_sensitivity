@@ -1803,6 +1803,22 @@ rewrite (List_map_nth' d) in Hij; [ easy | ].
 now rewrite (permutation_length Heqb Hpab) in Hi.
 Qed.
 
+(* to be completed
+Theorem permutation_nth : ∀ A (eqb : A → _),
+  ∀ l l' d,
+  permutation eqb l l'
+  ↔ (let n := length l in
+     length l' = n ∧
+     ∃ f : nat → nat,
+     FinFun.bFun n f ∧
+     FinFun.bInjective n f ∧
+     (∀ x : nat, x < n → nth x l' d = nth (f x) l d)).
+Proof.
+Print FinFun.bFun.
+Print FinFun.bInjective.
+...
+*)
+
 (* transposition list *)
 
 Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=
