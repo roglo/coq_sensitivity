@@ -1823,6 +1823,58 @@ split. {
     apply (permutation_length Heqb Hpab).
   }
   exists (permutation_fun eqb la lb).
+  split. {
+    intros i Hi.
+    unfold permutation_fun, unsome.
+    remember (List_rank _ _) as j eqn:Hj.
+    symmetry in Hj.
+    destruct j as [j| ]; [ | flia Hi ].
+    apply (List_rank_Some 0) in Hj.
+    rewrite (permutation_assoc_length Heqb) in Hj; [ | easy ].
+    now fold n in Hj.
+  }
+  split. {
+    intros i j Hi Hj Hij.
+    unfold permutation_fun, unsome in Hij.
+    do 2 rewrite List_rank_extract in Hij.
+    remember (extract (Nat.eqb i) _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+      specialize (permutation_permutation_assoc Heqb Hpab) as H2.
+      specialize (permutation_in_iff Nat_eqb_equality H2) as H3.
+      specialize (proj2 (H3 i)) as H4.
+      fold n in H4.
+      assert (H : i ∈ seq 0 n) by now apply in_seq.
+      specialize (H4 H); clear H.
+      specialize (H1 _ H4).
+      now apply Nat.eqb_neq in H1.
+    }
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Hp).
+    apply Nat.eqb_eq in H; subst x.
+    remember (extract (Nat.eqb j) _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef', x), aft')| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+      specialize (permutation_permutation_assoc Heqb Hpab) as H2.
+      specialize (permutation_in_iff Nat_eqb_equality H2) as H3.
+      specialize (proj2 (H3 j)) as H4.
+      fold n in H4.
+      assert (H : j ∈ seq 0 n) by now apply in_seq.
+      specialize (H4 H); clear H.
+      specialize (H1 _ H4).
+      now apply Nat.eqb_neq in H1.
+    }
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef' & H & Hp').
+    apply Nat.eqb_eq in H; subst x.
+    rewrite Hp' in Hp.
+    apply List_app_eq_app' in Hp; [ | easy ].
+    destruct Hp as (H1, H2).
+    now injection H2.
+  }
+  intros i Hi.
+  now apply (permutation_fun_nth Heqb).
+} {
 ...
 *)
 
