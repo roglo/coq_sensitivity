@@ -1878,6 +1878,42 @@ split. {
   intros (Hlab & f & Hbf & Hif & Hn).
   unfold FinFun.bFun in Hbf.
   unfold FinFun.bInjective in Hif.
+  revert la Hlab Hbf Hif Hn.
+  induction lb as [| b]; intros. {
+    symmetry in Hlab.
+    now apply length_zero_iff_nil in Hlab; subst la.
+  }
+  cbn - [ nth ] in Hlab, Hbf, Hif, Hn.
+  apply (permutation_sym Heqb).
+  apply permutation_cons_l_iff.
+  remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    clear Hlxl.
+    specialize (Hn 0) as H2.
+    rewrite <- Hlab in H2.
+    specialize (H2 (Nat.lt_0_succ _)).
+    cbn in H2.
+    specialize (H1 b) as H3.
+    assert (H : b ∈ la). {
+      rewrite H2.
+      apply nth_In, Hbf.
+      now rewrite <- Hlab.
+    }
+    specialize (H3 H); clear H.
+    now rewrite (equality_refl Heqb) in H3.
+  }
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hla).
+  apply Heqb in H; subst x la.
+  rewrite app_length in Hlab; cbn in Hlab.
+  rewrite Nat.add_succ_r in Hlab; apply Nat.succ_inj in Hlab.
+  rewrite <- app_length in Hlab.
+  apply (permutation_sym Heqb).
+  apply IHlb; [ easy | | | ]. {
+    intros i Hi.
+    destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+...
   remember (permutation_fun eqb la lb) as g eqn:Hg.
   unfold permutation_fun in Hg.
   assert (H : ∀ i, i < length la → g (f i) = i). {
