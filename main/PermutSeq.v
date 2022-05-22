@@ -31,8 +31,6 @@ Definition is_permut_list_bool l :=
         ((ff_app l (i - 1) ≠? ff_app l (j - 1)) || (i =? j)))).
 
 (* bof, faut voir...
-Require Import PermutationFun.
-
 Definition permut_list l := permutation Nat.eqb l (seq 0 (length l)).
 
 Theorem is_permut_list_bool_permut_list : ∀ l,
