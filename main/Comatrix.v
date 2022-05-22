@@ -1123,7 +1123,7 @@ rewrite Nat_sub_succ_1.
 apply (Permutation_permutation Nat_eqb_equality).
 remember (map _ _) as la eqn:Hla.
 replace n! with (length la) by now rewrite Hla, List_map_seq_length.
-apply permut_list_permutation.
+apply permut_list_permutation_iff.
 subst la.
 (* lemma to do? *)
 unfold h.
@@ -1193,7 +1193,7 @@ rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
   rewrite <- List_map_ff_app_seq, <- H2.
-  now apply permut_list_permutation.
+  now apply permut_list_permutation_iff.
 }
 unfold iter_seq.
 rewrite Nat_sub_succ_1.
@@ -1449,7 +1449,7 @@ split. {
     rewrite isort_rank_length.
     now destruct Hσ.
   }
-  apply permut_list_permutation.
+  apply permut_list_permutation_iff.
   apply isort_rank_is_permut_list.
 } {
   intros l Hl.

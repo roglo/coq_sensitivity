@@ -350,136 +350,133 @@ Qed.
 
 (* *)
 
-Theorem permutation_permut_list : ∀ la,
-  permutation Nat.eqb la (seq 0 (length la))
-  → is_permut_list la.
+Theorem permut_list_permutation_iff : ∀ la,
+  is_permut_list la ↔ permutation Nat.eqb la (seq 0 (length la)).
 Proof.
-intros * Hpab.
-remember (length la) as len eqn:Hlen; symmetry in Hlen.
-revert la Hlen Hpab.
-induction len; intros. {
-  apply length_zero_iff_nil in Hlen; subst la.
-  split; [ easy | constructor ].
-}
-rewrite seq_S in Hpab.
-cbn in Hpab.
-assert (H : permutation Nat.eqb (len :: seq 0 len) la). {
-  eapply (permutation_trans Nat_eqb_equality). 2: {
-    apply (permutation_sym Nat_eqb_equality).
-    apply Hpab.
-  }
-  apply (permutation_cons_append Nat_eqb_equality).
-}
-clear Hpab; rename H into Hpab.
-apply permutation_cons_l_iff in Hpab.
-remember (extract (Nat.eqb len) la) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hla).
-apply Nat.eqb_eq in H; subst x la.
-rewrite app_length in Hlen; cbn in Hlen.
-rewrite Nat.add_succ_r in Hlen; apply Nat.succ_inj in Hlen.
-rewrite <- app_length in Hlen.
-apply (permutation_sym Nat_eqb_equality) in Hpab.
-specialize (IHlen (bef ++ aft) Hlen Hpab) as H1.
-destruct H1 as (H1, H2).
+intros.
 split. {
-  intros i Hi.
-  rewrite app_length; cbn.
-  rewrite Nat.add_succ_r, <- app_length.
-  rewrite Hlen in H1 |-*.
-  destruct (Nat.eq_dec i len) as [Hil| Hil]; [ now subst i | ].
-  assert (H : i ∈ bef ++ aft). {
-    apply in_app_or in Hi.
-    apply in_or_app.
-    destruct Hi as [Hi| Hi]; [ now left | ].
-    destruct Hi as [Hi| Hi]; [ | now right ].
-    now symmetry in Hi.
+  intros Hp.
+  remember (length la) as len eqn:Hlen; symmetry in Hlen.
+  revert la Hp Hlen.
+  induction len; intros. {
+    now apply length_zero_iff_nil in Hlen; subst la.
   }
-  specialize (H1 i H).
-  flia H1 H.
-} {
-  apply NoDup_app_iff.
-  split. {
-    now apply NoDup_app_iff in H2.
-  }
-  split. 2: {
-    intros i Hi.
-    apply NoDup_app_iff in H2.
-    destruct H2 as (H3 & H4 & H5).
-    specialize (H5 _ Hi).
-    intros H.
-    destruct H as [H| H]; [ subst i | easy ].
-    specialize (Hbef _ Hi) as H2.
-    now apply Nat.eqb_neq in H2.
-  }
-  constructor. 2: {
-    now apply NoDup_app_remove_l in H2.
-  }
-  intros H3.
+  specialize permut_list_surj as H1.
+  specialize (H1 len la Hp).
   rewrite Hlen in H1.
-  specialize (H1 len).
-  assert (H : len ∈ bef ++ aft) by now apply in_or_app; right.
-  specialize (H1 H).
-  flia H1.
-}
-Qed.
-
-Theorem permut_list_permutation : ∀ la,
-  is_permut_list la
-  → permutation Nat.eqb la (seq 0 (length la)).
-Proof.
-intros * Hp.
-remember (length la) as len eqn:Hlen; symmetry in Hlen.
-revert la Hp Hlen.
-induction len; intros. {
-  now apply length_zero_iff_nil in Hlen; subst la.
-}
-specialize permut_list_surj as H1.
-specialize (H1 len la Hp).
-rewrite Hlen in H1.
-assert (H : len < S len) by easy.
-specialize (H1 H); clear H.
-destruct H1 as (j & Hj & Hlj).
-specialize (in_split) as H1.
-specialize (H1 _ len la).
-assert (H : len ∈ la). {
-  rewrite <- Hlj.
-  apply nth_In.
-  now rewrite Hlen.
-}
-specialize (H1 H); clear H.
-destruct H1 as (bef & aft & Hla).
-rewrite Hla, seq_S; cbn.
-apply (permutation_elt Nat_eqb_equality).
-rewrite app_nil_r.
-assert (Hba : length (bef ++ aft) = len). {
-  apply (f_equal length) in Hla.
-  rewrite app_length in Hla |-*; cbn in Hla.
-  rewrite Hlen, Nat.add_succ_r in Hla.
-  now apply Nat.succ_inj in Hla.
-}
-apply IHlen; [ | easy ].
-split. {
-  intros k Hk.
-  rewrite Hba.
-  assert (Hkl : k < S len). {
-    rewrite <- Hlen.
-    apply Hp.
-    rewrite Hla.
-    apply in_app_or in Hk.
-    apply in_or_app.
-    destruct Hk as [Hk| Hk]; [ now left | now right; right ].
+  assert (H : len < S len) by easy.
+  specialize (H1 H); clear H.
+  destruct H1 as (j & Hj & Hlj).
+  specialize (in_split) as H1.
+  specialize (H1 _ len la).
+  assert (H : len ∈ la). {
+    rewrite <- Hlj.
+    apply nth_In.
+    now rewrite Hlen.
   }
-  destruct (Nat.eq_dec k len) as [H| H]; [ | flia H Hkl ].
-  subst k; clear Hkl; exfalso.
+  specialize (H1 H); clear H.
+  destruct H1 as (bef & aft & Hla).
+  rewrite Hla, seq_S; cbn.
+  apply (permutation_elt Nat_eqb_equality).
+  rewrite app_nil_r.
+  assert (Hba : length (bef ++ aft) = len). {
+    apply (f_equal length) in Hla.
+    rewrite app_length in Hla |-*; cbn in Hla.
+    rewrite Hlen, Nat.add_succ_r in Hla.
+    now apply Nat.succ_inj in Hla.
+  }
+  apply IHlen; [ | easy ].
+  split. {
+    intros k Hk.
+    rewrite Hba.
+    assert (Hkl : k < S len). {
+      rewrite <- Hlen.
+      apply Hp.
+      rewrite Hla.
+      apply in_app_or in Hk.
+      apply in_or_app.
+      destruct Hk as [Hk| Hk]; [ now left | now right; right ].
+    }
+    destruct (Nat.eq_dec k len) as [H| H]; [ | flia H Hkl ].
+    subst k; clear Hkl; exfalso.
+    rewrite Hla in Hp.
+    destruct Hp as (Ha, Hnd).
+    now apply NoDup_remove_2 in Hnd.
+  }
   rewrite Hla in Hp.
   destruct Hp as (Ha, Hnd).
-  now apply NoDup_remove_2 in Hnd.
+  now apply NoDup_remove_1 in Hnd.
+} {
+  intros Hpab.
+  remember (length la) as len eqn:Hlen; symmetry in Hlen.
+  revert la Hlen Hpab.
+  induction len; intros. {
+    apply length_zero_iff_nil in Hlen; subst la.
+    split; [ easy | constructor ].
+  }
+  rewrite seq_S in Hpab.
+  cbn in Hpab.
+  assert (H : permutation Nat.eqb (len :: seq 0 len) la). {
+    eapply (permutation_trans Nat_eqb_equality). 2: {
+      apply (permutation_sym Nat_eqb_equality).
+      apply Hpab.
+    }
+    apply (permutation_cons_append Nat_eqb_equality).
+  }
+  clear Hpab; rename H into Hpab.
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract (Nat.eqb len) la) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Hla).
+  apply Nat.eqb_eq in H; subst x la.
+  rewrite app_length in Hlen; cbn in Hlen.
+  rewrite Nat.add_succ_r in Hlen; apply Nat.succ_inj in Hlen.
+  rewrite <- app_length in Hlen.
+  apply (permutation_sym Nat_eqb_equality) in Hpab.
+  specialize (IHlen (bef ++ aft) Hlen Hpab) as H1.
+  destruct H1 as (H1, H2).
+  split. {
+    intros i Hi.
+    rewrite app_length; cbn.
+    rewrite Nat.add_succ_r, <- app_length.
+    rewrite Hlen in H1 |-*.
+    destruct (Nat.eq_dec i len) as [Hil| Hil]; [ now subst i | ].
+    assert (H : i ∈ bef ++ aft). {
+      apply in_app_or in Hi.
+      apply in_or_app.
+      destruct Hi as [Hi| Hi]; [ now left | ].
+      destruct Hi as [Hi| Hi]; [ | now right ].
+      now symmetry in Hi.
+    }
+    specialize (H1 i H).
+    flia H1 H.
+  } {
+    apply NoDup_app_iff.
+    split. {
+      now apply NoDup_app_iff in H2.
+    }
+    split. 2: {
+      intros i Hi.
+      apply NoDup_app_iff in H2.
+      destruct H2 as (H3 & H4 & H5).
+      specialize (H5 _ Hi).
+      intros H.
+      destruct H as [H| H]; [ subst i | easy ].
+      specialize (Hbef _ Hi) as H2.
+      now apply Nat.eqb_neq in H2.
+    }
+    constructor. 2: {
+      now apply NoDup_app_remove_l in H2.
+    }
+    intros H3.
+    rewrite Hlen in H1.
+    specialize (H1 len).
+    assert (H : len ∈ bef ++ aft) by now apply in_or_app; right.
+    specialize (H1 H).
+    flia H1.
+  }
 }
-rewrite Hla in Hp.
-destruct Hp as (Ha, Hnd).
-now apply NoDup_remove_1 in Hnd.
 Qed.
 
 Theorem List_rank_not_None' : ∀ n l i,
@@ -490,7 +487,7 @@ Proof.
 intros n f i (Hs, Hf) Hi.
 apply (@List_rank_not_None n); [ | easy ].
 rewrite <- Hf.
-now apply permut_list_permutation.
+now apply permut_list_permutation_iff.
 Qed.
 
 Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _),
@@ -620,8 +617,8 @@ Theorem permutation_permut : ∀ la lb,
   → is_permut_list lb.
 Proof.
 intros * Hpab Ha.
-apply permut_list_permutation in Ha.
-apply permutation_permut_list.
+apply permut_list_permutation_iff in Ha.
+apply permut_list_permutation_iff.
 eapply (permutation_trans Nat_eqb_equality). {
   apply (permutation_sym Nat_eqb_equality), Hpab.
 }

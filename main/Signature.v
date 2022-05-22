@@ -774,7 +774,7 @@ rewrite rngl_product_list_permut with (l2 := seq 0 (length p)); cycle 1. {
   easy.
 } {
   apply (Permutation_permutation Nat_eqb_equality).
-  now apply permut_list_permutation.
+  now apply permut_list_permutation_iff.
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
@@ -782,7 +782,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     easy.
   } {
     apply (Permutation_permutation Nat_eqb_equality).
-    now apply permut_list_permutation.
+    now apply permut_list_permutation_iff.
   }
   easy.
 }
@@ -1546,7 +1546,7 @@ erewrite rngl_product_list_eq_compat. 2: {
   rewrite <- List_map_ff_app_seq.
   erewrite rngl_product_change_list; [ | easy | ]. 2: {
     apply (Permutation_permutation Nat_eqb_equality).
-    now apply permut_list_permutation.
+    now apply permut_list_permutation_iff.
   }
   easy.
 }
@@ -1555,7 +1555,7 @@ erewrite rngl_product_change_list; [ | easy | ]. 2: {
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
   apply (Permutation_permutation Nat_eqb_equality).
-  now apply permut_list_permutation.
+  now apply permut_list_permutation_iff.
 }
 symmetry.
 unfold iter_seq.
@@ -2351,12 +2351,12 @@ apply Permutation_map.
 transitivity (seq 0 n). {
   destruct Hp as (Hp1, Hp2); rewrite <- Hp2.
   apply (Permutation_permutation Nat_eqb_equality).
-  now apply permut_list_permutation.
+  now apply permut_list_permutation_iff.
 } {
   destruct Hq as (Hq1, Hq2); rewrite <- Hq2.
   apply (Permutation_permutation Nat_eqb_equality).
   apply (permutation_sym Nat_eqb_equality).
-  now apply permut_list_permutation.
+  now apply permut_list_permutation_iff.
 }
 Qed.
 
@@ -2862,7 +2862,7 @@ f_equal. {
     destruct Hp'p as (Hp'a, Hp'n).
     rewrite <- Hp'l at 1.
     rewrite <- List_map_ff_app_seq, <- Hp'l.
-    now apply permut_list_permutation.
+    now apply permut_list_permutation_iff.
   }
   rewrite rngl_product_seq_product; [ | easy ].
   rewrite Nat.add_0_l.
