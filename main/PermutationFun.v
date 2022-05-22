@@ -1880,13 +1880,17 @@ split. {
     now apply FinFun.bInjective_bSurjective.
   }
   move Hsf before Hif.
-  unfold FinFun.bFun in Hbf.
+  specialize (FinFun.bSurjective_bBijective Hbf Hsf) as H.
+  destruct H as (g & Hbg & Hfg).
+  move g before f; move Hbg before Hbf.
+  move Hfg before Hsf.
+  unfold FinFun.bFun in Hbf, Hbg.
   unfold FinFun.bInjective in Hif.
   unfold FinFun.bSurjective in Hsf.
   remember (length la) as len eqn:Hlen.
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
-  revert f la lb Hal Hbl Hbf Hsf Hif Hn.
+  revert f g la lb Hal Hbl Hbf Hbg Hsf Hif Hfg Hn.
   induction len; intros. {
     now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
