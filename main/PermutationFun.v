@@ -1875,6 +1875,37 @@ split. {
   intros i Hi.
   now apply (permutation_fun_nth Heqb).
 } {
+  intros (Hlab & f & Hbf & Hif & Hn).
+  unfold FinFun.bFun in Hbf.
+  unfold FinFun.bInjective in Hif.
+  revert lb Hlab Hbf Hif Hn.
+  induction la as [| a]; intros. {
+    now apply length_zero_iff_nil in Hlab; subst lb.
+  }
+  apply permutation_cons_l_iff.
+  remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]. 2: {
+    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+    clear Hlxl.
+    specialize (Hn 0 (Nat.lt_0_succ _)) as H2.
+    destruct (Nat.eq_dec (f 0) 0) as [Hfz| Hfz]. {
+      rewrite Hfz in H2; cbn in H2.
+      specialize (H1 a).
+      assert (H : a ∈ lb). {
+        rewrite <- H2.
+        apply nth_In.
+        now rewrite Hlab; cbn.
+      }
+      specialize (H1 H); clear H.
+      now rewrite (equality_refl Heqb) in H1.
+    }
+    remember (f 0) as fz eqn:Hfnz.
+    symmetry in Hfnz.
+    destruct fz; [ easy | clear Hfz ].
+    cbn in H2.
+...
+    specialize (Hif 0 (f 0)) as H3.
+Search (_ → permutation _ _ _).
 ...
 *)
 
