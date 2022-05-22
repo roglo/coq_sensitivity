@@ -1876,29 +1876,36 @@ split. {
   now apply (permutation_fun_nth Heqb).
 } {
   intros (Hlab & f & Hbf & Hif & Hn).
+  assert (Hsf : FinFun.bSurjective (length la) f). {
+    now apply FinFun.bInjective_bSurjective.
+  }
+  move Hsf before Hif.
   unfold FinFun.bFun in Hbf.
   unfold FinFun.bInjective in Hif.
-  revert la Hlab Hbf Hif Hn.
-  induction lb as [| b]; intros. {
-    symmetry in Hlab.
-    now apply length_zero_iff_nil in Hlab; subst la.
+  unfold FinFun.bSurjective in Hsf.
+  remember (length la) as len eqn:Hlen.
+  symmetry in Hlen.
+  rename Hlen into Hal; rename Hlab into Hbl.
+  revert f la lb Hal Hbl Hbf Hsf Hif Hn.
+  induction len; intros. {
+    now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
-  cbn - [ nth ] in Hlab, Hbf, Hif, Hn.
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hbl; apply Nat.succ_inj in Hbl.
   apply (permutation_sym Heqb).
   apply permutation_cons_l_iff.
   remember (extract (eqb b) la) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
     clear Hlxl.
-    specialize (Hn 0) as H2.
-    rewrite <- Hlab in H2.
-    specialize (H2 (Nat.lt_0_succ _)).
+    specialize (Hn 0 (Nat.lt_0_succ _)) as H2.
     cbn in H2.
     specialize (H1 b) as H3.
     assert (H : b ∈ la). {
       rewrite H2.
-      apply nth_In, Hbf.
-      now rewrite <- Hlab.
+      apply nth_In.
+      rewrite Hal.
+      now apply Hbf.
     }
     specialize (H3 H); clear H.
     now rewrite (equality_refl Heqb) in H3.
@@ -1906,13 +1913,131 @@ split. {
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & H & Hla).
   apply Heqb in H; subst x la.
-  rewrite app_length in Hlab; cbn in Hlab.
-  rewrite Nat.add_succ_r in Hlab; apply Nat.succ_inj in Hlab.
-  rewrite <- app_length in Hlab.
-  apply (permutation_sym Heqb).
-  apply IHlb; [ easy | | | ]. {
+  rewrite app_length in Hal; cbn in Hal.
+  rewrite Nat.add_succ_r in Hal; apply Nat.succ_inj in Hal.
+  rewrite <- app_length in Hal.
+  assert (H : 0 < S len) by easy.
+  specialize (Hn 0 H) as H1.
+  specialize (Hbf 0 H) as H2.
+  clear H; cbn in H1.
+(**)
+...
+  assert (H : ∃ j, j < S len ∧ f j = length bef). {
+    apply Hsf.
+    rewrite <- Hal, app_length; flia.
+  }
+  destruct H as (j & Hj & Hjb).
+  apply IHlen with (f := λ i, f i - 1); [ easy | easy | | | | ]. {
     intros i Hi.
-    destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+    specialize (Hbf i) as H3.
+    assert (H : i < S len) by flia Hi.
+    specialize (H3 H); clear H.
+    destruct (f i); [ flia Hi | ].
+    rewrite Nat_sub_succ_1.
+    now apply Nat.succ_lt_mono in H3.
+  } {
+    intros i Hi.
+    specialize (Hsf (S i)) as H3.
+    apply Nat.succ_lt_mono in Hi.
+    specialize (H3 Hi).
+    destruct H3 as (k & Hk & Hki).
+    exists (k - 1).
+(* c'est n'importe quoi ; bon *)
+...
+    intros i j Hi Hj Hij.
+    remember (f i) as fi eqn:Hfi; symmetry in Hfi.
+    remember (f j) as fj eqn:Hfj; symmetry in Hfj.
+    destruct fi. {
+      destruct fj. {
+        specialize (Hif i j) as H3.
+        assert (H : i < S len) by flia Hi.
+        specialize (H3 H); clear H.
+        assert (H : j < S len) by flia Hj.
+        specialize (H3 H); clear H.
+        apply H3; congruence.
+      }
+      rewrite Nat_sub_succ_1 in Hij; cbn in Hij.
+      subst fj.
+...
+    specialize (Hif i j) as H3.
+    assert (H : i < S len) by flia Hi.
+    specialize (H3 H); clear H.
+    assert (H : j < S len) by flia Hj.
+    specialize (H3 H); clear H.
+    apply H3; clear H3.
+...
+    remember (f i) as fi eqn:Hfi; symmetry in Hfi.
+    remember (f j) as fj eqn:Hfj; symmetry in Hfj.
+    destruct fi. {
+      destruct fj; [ easy | ].
+      rewrite Nat_sub_succ_1 in Hij; cbn in Hij.
+      exfalso; subst fj.
+clear i Hi Hfi j Hj Hfj.
+exfalso; clear n Hij.
+...
+  apply (permutation_sym Heqb).
+  apply IHlen; [ | | easy | easy | ]; cycle 1. {
+    intros i j Hi Hj Hij.
+    apply Hif; [ flia Hi | flia Hj | easy ].
+  } {
+    intros i Hi.
+    destruct (lt_dec (f i) (length bef)) as [Hib| Hib]. {
+      specialize (Hn i) as H3.
+      assert (H : i < S len) by flia Hi.
+      specialize (H3 H); clear H.
+      rewrite app_nth1 in H3; [ | easy ].
+      rewrite app_nth1; [ | easy ].
+      rewrite <- H3.
+...
+  apply IHlen; [ | | easy | easy | ]; cycle 1. {
+    intros i j Hi Hj Hij.
+    apply Hif; [ flia Hi | flia Hj | easy ].
+  } {
+    intros i Hi.
+    destruct (lt_dec (f i) (length bef)) as [Hib| Hib]. {
+      specialize (Hn i) as H3.
+      assert (H : i < S len) by flia Hi.
+      specialize (H3 H); clear H.
+      rewrite app_nth1 in H3; [ | easy ].
+...
+    destruct (Nat.eq_dec (f 0) len) as [Hzl| Hzl]. {
+      rewrite Hzl, <- Hal in H1.
+      rewrite app_nth2 in H1; [ | rewrite app_length; flia ].
+      rewrite app_length, Nat.add_comm, Nat.add_sub in H1.
+...
+    destruct (lt_dec (f (S i)) (length bef)) as [Hib| Hib]. {
+      specialize (Hn (S i)) as H3.
+      assert (H : S i < S len) by flia Hi.
+      specialize (H3 H); clear H.
+      rewrite List_nth_succ_cons in H3.
+      rewrite app_nth1 in H3; [ | easy ].
+...
+...
+      specialize (Hn (S i)) as H3.
+      assert (H : S i < S len) by now apply -> Nat.succ_lt_mono.
+      specialize (H3 H); clear H.
+      rewrite List_nth_succ_cons in H3.
+...
+  apply (permutation_sym Heqb).
+(* quel est le j tel que f j = len ? *)
+enough (Hj : ∃ j, f j = len).
+destruct Hj as (j, Hj).
+  apply IHlen; [ | | easy | easy | ]. {
+    intros i Hi.
+    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+      subst j.
+...
+    assert (H : i < S (length lb)) by flia Hi.
+    specialize (Hn i H) as H3.
+    specialize (Hbf _ H) as H4.
+    destruct (Nat.eq_dec (f i) (length lb)) as [Hib| Hib]; [ | flia H4 Hib ].
+    clear H4 H; exfalso.
+    rewrite Hib, app_nth2 in H3; [ | rewrite Hlab, app_length; flia ].
+    rewrite Hlab, app_length in H3.
+    rewrite Nat.add_comm, Nat.add_sub in H3.
+    specialize (Hif i) as H4.
+    destruct i. {
+      clear H2; rewrite List_nth_0_cons in H3.
 ...
   remember (permutation_fun eqb la lb) as g eqn:Hg.
   unfold permutation_fun in Hg.
