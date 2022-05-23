@@ -2057,10 +2057,19 @@ split. {
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
       destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+        rewrite app_nth1; [ | easy ].
+...
+        apply (f_equal g) in Hfl.
+        rewrite (proj1 (Hfg i His)) in Hfl.
+        subst i.
+...
         specialize (Hn i His) as H1.
         rewrite Hfl in H1.
         rewrite app_nth1 in H1; [ | easy ].
-        rewrite app_nth1; [ | easy ].
+        rewrite H1.
+        destruct len; [ easy | ].
+        cbn.
+        f_equal.
 ...
     rewrite (proj1 H1).
     do 2 rewrite if_eqb_eq_dec.
