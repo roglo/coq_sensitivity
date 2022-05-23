@@ -1890,26 +1890,20 @@ split. {
   remember (length la) as len eqn:Hlen.
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
-(**)
-  specialize (Hn (g 0)) as H2.
-  rewrite <- Hal in H2.
-  clear Hn; rename H2 into Hn.
-  revert f g lb len Hal Hbl Hbf Hbg Hif Hsf Hfg Hn.
-  induction la as [| a]; intros. {
-    rewrite <- Hal in Hbl.
-    now apply length_zero_iff_nil in Hbl; subst lb.
+  revert f g la lb Hal Hbl Hbf Hbg Hif Hsf Hfg Hn.
+  induction len; intros. {
+    now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
+  destruct la as [| a]; [ easy | ].
+  cbn in Hal; apply Nat.succ_inj in Hal.
   apply permutation_cons_l_iff.
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
     clear Hlxl.
-(*
     specialize (Hn (g 0)) as H2.
     rewrite <- Hal in H2.
-*)
-    rename Hn into H2.
-    assert (H : g 0 < length (a :: la)). {
+    assert (H : g 0 < S (length la)). {
       rewrite Hal.
       now apply Hbg; rewrite <- Hal; cbn.
     }
@@ -1933,14 +1927,33 @@ split. {
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & H & Hlb).
   apply Heqb in H; subst x lb.
-  destruct len; [ easy | ].
   rewrite app_length in Hbl; cbn in Hal, Hbl.
   rewrite Nat.add_succ_r in Hbl.
-  apply Nat.succ_inj in Hal, Hbl.
+  apply Nat.succ_inj in Hbl.
   rewrite <- app_length in Hbl.
   set (f' := λ i, f (if f i =? len then len else i)).
   set (g' := λ i, g (if g i =? len then len else i)).
-  eapply (IHla f' g' _ len); [ easy | easy | | | | | | ]. {
+(*
+  set (la' := map (λ i, nth (if f i =? len then f len else i) la d) (seq 0 len)).
+  set (bef' := map (λ i, nth (if g i =? len then g len else i) bef d) (seq 0 (length bef))).
+  set (aft' := map (λ i, nth (if g (i + length bef) =? len then g len else i) aft d) (seq 0 (length aft))).
+*)
+set (la' := la).
+set (bef' := bef).
+set (aft' := aft).
+  apply (permutation_trans Heqb) with (lb := la'). {
+    admit.
+  }
+  apply (permutation_sym Heqb).
+  apply (permutation_trans Heqb) with (lb := bef' ++ aft'). {
+    admit.
+  }
+  apply (permutation_sym Heqb).
+  apply (IHlen f' g'). {
+    admit.
+  } {
+    admit.
+  } {
     intros i Hi.
     unfold f'.
     rewrite if_eqb_eq_dec.
@@ -1990,7 +2003,6 @@ split. {
     apply Hif in Hij; [ easy | flia Hi | flia Hj ].
   } {
     intros i Hi.
-(**)
     unfold f'.
     exists (g' i).
     specialize (Hfg i) as H1.
@@ -2058,6 +2070,19 @@ split. {
     apply (proj2 (Hfg i His)).
   } {
 (**)
+    intros i Hi.
+...
+    assert (His : i < S len) by flia Hi.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
+      destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+        rewrite app_nth1; [ | now rewrite List_map_seq_length ].
+        rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+...
+        rewrite (List_map_nth' 0). 2: {
+          rewrite seq_length.
+...
+(*
     unfold f', g'.
     intros Hg.
     rewrite Hal in Hg.
@@ -2068,6 +2093,7 @@ split. {
 (* ouais, bon, faut que l'appel récursif change la et lb, qui
    colle bien avec f' et g' *)
 ...
+*)
     intros i Hi.
     unfold f'.
     assert (His : i < S len) by flia Hi.
