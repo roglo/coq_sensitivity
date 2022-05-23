@@ -1938,8 +1938,8 @@ split. {
   set (bef' := map (λ i, nth (if g i =? len then g len else i) bef d) (seq 0 (length bef))).
   set (aft' := map (λ i, nth (if g (i + length bef) =? len then g len else i) aft d) (seq 0 (length aft))).
 *)
-set (la' := map (λ i, nth (if g i =? len then g len else i) la d) (seq 0 len)).
-set (bef' := map (λ i, nth (if f i =? len then f len else i) bef d) (seq 0 (length bef))).
+set (la' := map (λ i, if g i =? len then last la d else nth i la d) (seq 0 len)).
+set (bef' := map (λ i, nth (if f i =? len then g len else i) bef d) (seq 0 (length bef))).
 set (aft' := aft).
   apply (permutation_trans Heqb) with (lb := la'). {
     admit.
@@ -2091,9 +2091,18 @@ set (aft' := aft).
         rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
         rewrite seq_nth; [ cbn | easy ].
         rewrite Hfl, Nat.eqb_refl.
-        rewrite <- Hfl at 2.
+        rewrite <- Hfl at 1.
         assert (His : i < S len) by flia Hi.
         rewrite (proj1 (Hfg i His)).
+        specialize (Hn i His) as H1.
+        rewrite app_nth1 in H1; [ | easy ].
+        rewrite Hfl in H1.
+        rewrite List_last_nth, Hal.
+        destruct len; [ easy | ].
+        now rewrite Nat_sub_succ_1.
+      }
+      apply Nat.nlt_ge in Hil.
+...
 specialize (Hn (g (S i))) as H1.
 assert (H : g (S i) < S len). {
   apply Hbg.
