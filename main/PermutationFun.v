@@ -2094,6 +2094,27 @@ set (aft' := aft).
         rewrite <- Hfl at 2.
         assert (His : i < S len) by flia Hi.
         rewrite (proj1 (Hfg i His)).
+specialize (Hn (g (S i))) as H1.
+assert (H : g (S i) < S len). {
+  apply Hbg.
+  now apply -> Nat.succ_lt_mono.
+}
+specialize (H1 H); clear H.
+apply Nat.succ_lt_mono in Hi.
+rewrite (proj2 (Hfg (S i) Hi)) in H1.
+cbn in H1.
+assert (H : nth (f len) bef d = nth i bef' d). {
+  unfold bef'.
+  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite seq_nth; [ cbn | easy ].
+  now rewrite Hfl, Nat.eqb_refl.
+}
+rewrite H; clear H.
+...
+unfold bef'.
+rewrite (List_map_nth' 0).
+rewrite seq_nth; cbn.
+rewrite Hfl, Nat.eqb_refl.
 ...
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
