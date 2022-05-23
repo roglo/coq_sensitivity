@@ -1885,12 +1885,15 @@ split. {
   move g before f; move Hbg before Hbf.
   move Hfg before Hsf.
   unfold FinFun.bFun in Hbf, Hbg.
+  clear Hif Hsf.
+(*
   unfold FinFun.bInjective in Hif.
   unfold FinFun.bSurjective in Hsf.
+*)
   remember (length la) as len eqn:Hlen.
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
-  revert f g la lb Hal Hbl Hbf Hbg Hif Hsf Hfg Hn.
+  revert f g la lb Hal Hbl Hbf Hbg (*Hif Hsf*) Hfg Hn.
   induction len; intros. {
     now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
@@ -1987,82 +1990,34 @@ set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 
     intros i Hi.
     unfold f'.
     rewrite if_eqb_eq_dec.
+    assert (His : i < S len) by flia Hi.
     destruct (Nat.eq_dec (f i) len) as [Hil| Hil]. {
       specialize (Hbf len (Nat.lt_succ_diag_r _)) as H1.
       destruct (Nat.eq_dec (f len) len) as [H2| H2]; [ | flia H1 H2 ].
       rewrite <- Hil in H2 at 2.
-      apply Hif in H2; [ | easy | flia Hi ].
+      apply (f_equal g) in H2.
+      rewrite (proj1 (Hfg len (Nat.lt_succ_diag_r _))) in H2.
+      rewrite (proj1 (Hfg i His)) in H2.
       flia Hi H2.
     }
-    specialize (Hbf i) as H1.
-    assert (H : i < S len) by flia Hi.
-    specialize (H1 H); clear H.
+    specialize (Hbf i His) as H1.
     flia H1 Hil.
   } {
     intros i Hi.
     unfold g'.
     rewrite if_eqb_eq_dec.
+    assert (His : i < S len) by flia Hi.
     destruct (Nat.eq_dec (g i) len) as [Hil| Hil]. {
       specialize (Hbg len (Nat.lt_succ_diag_r _)) as H1.
       destruct (Nat.eq_dec (g len) len) as [H2| H2]; [ | flia H1 H2 ].
       rewrite <- Hil in H2 at 2.
       apply (f_equal f) in H2.
       rewrite (proj2 (Hfg len (Nat.lt_succ_diag_r _))) in H2.
-      assert (H : i < S len) by flia Hi.
-      rewrite (proj2 (Hfg i H) ) in H2.
+      rewrite (proj2 (Hfg i His)) in H2.
       flia Hi H2.
     }
-    specialize (Hbg i) as H1.
-    assert (H : i < S len) by flia Hi.
-    specialize (H1 H); clear H.
+    specialize (Hbg i His) as H1.
     flia Hil H1.
-  } {
-    intros i j Hi Hj Hij.
-    unfold f' in Hij.
-    do 2 rewrite if_eqb_eq_dec in Hij.
-    destruct (Nat.eq_dec (f i) len) as [H1| H1]. {
-      destruct (Nat.eq_dec (f j) len) as [H2| H2]. {
-        rewrite <- H2 in H1.
-        apply Hif in H1; [ easy | flia Hi | flia Hj ].
-      }
-      apply Hif in Hij; [ flia Hj Hij | easy | flia Hj ].
-    }
-    destruct (Nat.eq_dec (f j) len) as [H2| H2]. {
-      apply Hif in Hij; [ flia Hi Hij | flia Hi | easy ].
-    }
-    apply Hif in Hij; [ easy | flia Hi | flia Hj ].
-  } {
-    intros i Hi.
-    unfold f'.
-    exists (g' i).
-    specialize (Hfg i) as H1.
-    assert (H : i < S len) by flia Hi.
-    specialize (H1 H); clear H.
-    unfold g'.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (g i) len) as [Hgl| Hgl]. {
-      specialize (Hfg len (Nat.lt_succ_diag_r _)) as H4.
-      split. {
-        specialize (Hbg len (Nat.lt_succ_diag_r _)) as H2.
-        destruct (Nat.eq_dec (g len) len) as [H3| H3]; [ | flia H3 H2 ].
-        rewrite <- Hgl in H3 at 2.
-        apply (f_equal f) in H3.
-        rewrite (proj2 H1) in H3.
-        rewrite (proj2 H4) in H3.
-        flia Hi H3.
-      }
-      rewrite (proj2 H4).
-      rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-      apply (f_equal f) in Hgl.
-      now rewrite (proj2 H1) in Hgl.
-    }
-    rewrite (proj2 H1).
-    specialize (Hbg i) as H2.
-    assert (H : i < S len) by flia Hi.
-    specialize (H2 H).
-    split; [ flia H2 Hgl | ].
-    destruct (Nat.eq_dec i len) as [Hil| Hil]; [ | apply (proj2 H1) ].
-    flia Hi Hil.
   } {
     intros i Hi.
     unfold f', g'.
@@ -2103,12 +2058,16 @@ set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 
     intros i Hi.
     unfold f'.
     rewrite if_eqb_eq_dec.
+    assert (His : i < S len) by flia Hi.
     destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
       assert (Hl : f len < len). {
         specialize (Hbf len (Nat.lt_succ_diag_r _)) as H1.
         destruct (Nat.eq_dec (f len) len) as [H| H]; [ | flia H1 H ].
         rewrite <- H in Hfl.
-        apply Hif in Hfl; [ flia Hi Hfl | flia Hi | easy ].
+        apply (f_equal g) in Hfl.
+        rewrite (proj1 (Hfg i His)) in Hfl.
+        rewrite (proj1 (Hfg len (Nat.lt_succ_diag_r _))) in Hfl.
+        flia Hi Hfl.
       }
       unfold la'.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -2122,7 +2081,6 @@ set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 
         rewrite seq_nth; [ cbn | easy ].
         rewrite Hfl, Nat.eqb_refl.
         rewrite <- Hfl at 1.
-        assert (His : i < S len) by flia Hi.
         rewrite (proj1 (Hfg i His)).
         specialize (Hn i His) as H1.
         rewrite app_nth1 in H1; [ | easy ].
