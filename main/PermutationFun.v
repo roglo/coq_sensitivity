@@ -1938,8 +1938,8 @@ split. {
   set (bef' := map (λ i, nth (if g i =? len then g len else i) bef d) (seq 0 (length bef))).
   set (aft' := map (λ i, nth (if g (i + length bef) =? len then g len else i) aft d) (seq 0 (length aft))).
 *)
-set (la' := map (λ i, if i =? f len then last la d else nth i la d) (seq 0 len)).
-set (bef' := bef).
+set (la' := map (λ i, nth (if g i =? len then g len else i) la d) (seq 0 len)).
+set (bef' := map (λ i, nth (if f i =? len then f len else i) bef d) (seq 0 (length bef))).
 set (aft' := aft).
   apply (permutation_trans Heqb) with (lb := la'). {
     admit.
@@ -2074,18 +2074,26 @@ set (aft' := aft).
     unfold f'.
     rewrite if_eqb_eq_dec.
     destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
-      unfold la'.
       assert (Hl : f len < len). {
         specialize (Hbf len (Nat.lt_succ_diag_r _)) as H1.
         destruct (Nat.eq_dec (f len) len) as [H| H]; [ | flia H1 H ].
         rewrite <- H in Hfl.
         apply Hif in Hfl; [ flia Hi Hfl | flia Hi | easy ].
       }
+      unfold la'.
       rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | easy ].
-      cbn.
+      rewrite seq_nth; [ cbn | easy ].
+      rewrite (proj1 (Hfg len (Nat.lt_succ_diag_r _))).
       rewrite Nat.eqb_refl.
-(* ouais, faut réfléchir et ça m'emmerde *)
+      unfold bef'.
+      destruct (lt_dec i (length bef)) as [Hil| Hil]. {
+        rewrite app_nth1; [ | now rewrite List_map_seq_length ].
+        rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+        rewrite seq_nth; [ cbn | easy ].
+        rewrite Hfl, Nat.eqb_refl.
+        rewrite <- Hfl at 2.
+        assert (His : i < S len) by flia Hi.
+        rewrite (proj1 (Hfg i His)).
 ...
       rewrite if_eqb_eq_dec.
       destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
