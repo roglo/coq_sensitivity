@@ -2134,22 +2134,15 @@ set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 
       apply Nat.nlt_ge in Hil.
       rewrite app_nth2; [ | now rewrite List_map_seq_length ].
       rewrite List_map_seq_length.
-      unfold aft'.
       destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
         rewrite Hib, Nat.sub_diag.
         unfold aft'.
-        destruct aft as [| b]. {
-          rewrite app_nil_r in Hbl.
-          rewrite Hbl in Hil.
-          now apply Nat.nlt_ge in Hil.
-        }
-easy.
-(*
-        rewrite (List_map_nth' 0); [ | now rewrite seq_length; cbn ].
-        rewrite seq_nth; [ | now cbn ].
-        now rewrite Nat.eqb_refl.
-*)
+        destruct aft as [| b]; [ | easy ].
+        rewrite app_nil_r in Hbl.
+        rewrite Hbl in Hil.
+        now apply Nat.nlt_ge in Hil.
       }
+...
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite app_length in Hbl.
