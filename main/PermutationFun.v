@@ -1891,6 +1891,9 @@ split. {
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
 (**)
+  specialize (Hn (g 0)) as H2.
+  rewrite <- Hal in H2.
+  clear Hn; rename H2 into Hn.
   revert f g lb len Hal Hbl Hbf Hbg Hif Hsf Hfg Hn.
   induction la as [| a]; intros. {
     rewrite <- Hal in Hbl.
@@ -1901,8 +1904,11 @@ split. {
   destruct lxl as [((bef, x), aft)| ]. 2: {
     specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
     clear Hlxl.
+(*
     specialize (Hn (g 0)) as H2.
     rewrite <- Hal in H2.
+*)
+    rename Hn into H2.
     assert (H : g 0 < length (a :: la)). {
       rewrite Hal.
       now apply Hbg; rewrite <- Hal; cbn.
@@ -2051,6 +2057,17 @@ split. {
     destruct (Nat.eq_dec i len) as [H| H]; [ flia Hi H | clear H].
     apply (proj2 (Hfg i His)).
   } {
+(**)
+    unfold f', g'.
+    intros Hg.
+    rewrite Hal in Hg.
+    rewrite if_eqb_eq_dec in Hg |-*.
+    destruct (Nat.eq_dec (g 0) len) as [Hgl| Hgl]. {
+      rewrite (proj2 (Hfg len (Nat.lt_succ_diag_r _))).
+      rewrite Nat.eqb_refl.
+(* ouais, bon, faut que l'appel récursif change la et lb, qui
+   colle bien avec f' et g' *)
+...
     intros i Hi.
     unfold f'.
     assert (His : i < S len) by flia Hi.
