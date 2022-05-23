@@ -1967,7 +1967,7 @@ set
         else nth (i - 1) aft d) (seq 0 (length aft))).
 set (aft' := map (λ i, last la d) (seq 0 (length aft))).
 *)
-set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
+set (aft' := map (λ i, if i =? 1 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
 (*
   H1 : nth (i - length bef) (seq 0 (length aft)) 0 ≠ 0
   ============================
@@ -2095,6 +2095,7 @@ set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 
       destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
         rewrite Hib, Nat.sub_diag.
         unfold aft'.
+...
         destruct aft as [| b]; [ | easy ].
         rewrite app_nil_r in Hbl.
         rewrite Hbl in Hil.
