@@ -1992,12 +1992,12 @@ split. {
     specialize (H1 H); clear H.
     unfold g'.
     do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec (g i) len) as [H| H]. {
+    destruct (Nat.eq_dec (g i) len) as [Hgl| Hgl]. {
       specialize (Hfg len (Nat.lt_succ_diag_r _)) as H4.
       split. {
         specialize (Hbg len (Nat.lt_succ_diag_r _)) as H2.
         destruct (Nat.eq_dec (g len) len) as [H3| H3]; [ | flia H3 H2 ].
-        rewrite <- H in H3 at 2.
+        rewrite <- Hgl in H3 at 2.
         apply (f_equal f) in H3.
         rewrite (proj2 H1) in H3.
         rewrite (proj2 H4) in H3.
@@ -2005,9 +2005,62 @@ split. {
       }
       rewrite (proj2 H4).
       rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-      apply (f_equal f) in H.
-      now rewrite (proj2 H1) in H.
+      apply (f_equal f) in Hgl.
+      now rewrite (proj2 H1) in Hgl.
     }
+    rewrite (proj2 H1).
+    specialize (Hbg i) as H2.
+    assert (H : i < S len) by flia Hi.
+    specialize (H2 H).
+    split; [ flia H2 Hgl | ].
+    destruct (Nat.eq_dec i len) as [Hil| Hil]; [ | apply (proj2 H1) ].
+    flia Hi Hil.
+  } {
+    intros i Hi.
+    unfold f', g'.
+    do 4 rewrite if_eqb_eq_dec.
+    assert (Hls : len < S len) by easy.
+    assert (His : i < S len) by flia Hi.
+    destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
+      rewrite (proj1 (Hfg len Hls)), <- if_eqb_eq_dec, Nat.eqb_refl.
+      destruct (Nat.eq_dec (g i) len) as [Hgl| Hgl]. {
+        rewrite (proj2 (Hfg len Hls)), <- if_eqb_eq_dec, Nat.eqb_refl.
+        apply (f_equal g) in Hfl.
+        apply (f_equal f) in Hgl.
+        rewrite (proj1 (Hfg i His)) in Hfl.
+        rewrite (proj2 (Hfg i His)) in Hgl.
+        easy.
+      }
+      rewrite (proj2 (Hfg i His)).
+      destruct (Nat.eq_dec i len) as [Hil| Hil]; [ flia Hi Hil | ].
+      apply (f_equal g) in Hfl.
+      rewrite (proj1 (Hfg i His)) in Hfl.
+      rewrite (proj2 (Hfg i His)).
+      easy.
+    }
+    rewrite (proj1 (Hfg i His)).
+    destruct (Nat.eq_dec i len) as [H| H]; [ flia Hi H | clear H ].
+    rewrite (proj1 (Hfg i His)); split; [ easy | ].
+    destruct (Nat.eq_dec (g i) len) as [Hgl| Hgl]. {
+      rewrite (proj2 (Hfg len Hls)).
+      rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+      apply (f_equal f) in Hgl.
+      now rewrite (proj2 (Hfg i His)) in Hgl.
+    }
+    rewrite (proj2 (Hfg i His)).
+    destruct (Nat.eq_dec i len) as [H| H]; [ flia Hi H | clear H].
+    apply (proj2 (Hfg i His)).
+  } {
+    intros i Hi.
+    unfold f'.
+    assert (His : i < S len) by flia Hi.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (f i) len) as [Hfl| Hfl]. {
+      destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+        specialize (Hn i His) as H1.
+        rewrite Hfl in H1.
+        rewrite app_nth1 in H1; [ | easy ].
+        rewrite app_nth1; [ | easy ].
 ...
     rewrite (proj1 H1).
     do 2 rewrite if_eqb_eq_dec.
