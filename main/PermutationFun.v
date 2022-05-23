@@ -1940,7 +1940,37 @@ split. {
 *)
 set (la' := map (λ i, if g i =? len then last la d else nth i la d) (seq 0 len)).
 set (bef' := map (λ i, nth (if f i =? len then g len else i) bef d) (seq 0 (length bef))).
-set (aft' := aft).
+(*
+set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
+set
+  (aft' :=
+     map
+       (λ i,
+        if i =? 0 then last la d
+(*
+        else if nth (i - length bef) (seq 0 (length aft)) 0 =? 0 then
+          last la d
+*)
+        else nth i aft d) (seq 0 (length aft))).
+set
+  (aft' :=
+     map
+       (λ i,
+        if i =? 0 then last la d
+(*
+        else if nth (i - length bef) (seq 0 (length aft)) 0 =? 0 then
+          last la d
+*)
+        else nth (i - 1) aft d) (seq 0 (length aft))).
+set (aft' := map (λ i, last la d) (seq 0 (length aft))).
+*)
+set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
+(*
+  H1 : nth (i - length bef) (seq 0 (length aft)) 0 ≠ 0
+  ============================
+  nth (nth (i - length bef) (seq 0 (length aft)) 0 - 1) aft d = last la d
+...
+*)
   apply (permutation_trans Heqb) with (lb := la'). {
     admit.
   }
@@ -2102,6 +2132,57 @@ set (aft' := aft).
         now rewrite Nat_sub_succ_1.
       }
       apply Nat.nlt_ge in Hil.
+      rewrite app_nth2; [ | now rewrite List_map_seq_length ].
+      rewrite List_map_seq_length.
+      unfold aft'.
+      destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
+        rewrite Hib, Nat.sub_diag.
+        unfold aft'.
+        destruct aft as [| b]. {
+          rewrite app_nil_r in Hbl.
+          rewrite Hbl in Hil.
+          now apply Nat.nlt_ge in Hil.
+        }
+easy.
+(*
+        rewrite (List_map_nth' 0); [ | now rewrite seq_length; cbn ].
+        rewrite seq_nth; [ | now cbn ].
+        now rewrite Nat.eqb_refl.
+*)
+      }
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        rewrite app_length in Hbl.
+        flia Hbl Hil Hib Hi.
+      }
+      rewrite seq_nth. 2: {
+        rewrite app_length in Hbl.
+        flia Hbl Hil Hib Hi.
+      }
+      rewrite Nat.add_0_l.
+      replace (i - length bef) with (S (i - S (length bef))) by flia Hil Hib.
+      cbn; rewrite Nat.sub_0_r.
+...
+      rewrite if_eqb_eq_dec.
+
+    }
+unfold bef', aft', la'.
+...
+      rewrite if_eqb_eq_dec.
+      remember (nth (i - length bef) (seq 0 (length aft)) 0) as j eqn:Hj.
+      destruct (Nat.eq_dec j 0) as [H1| H1]; [ easy | ].
+      destruct j; [ easy | ].
+      rewrite Nat_sub_succ_1.
+...
+      rewrite <- Hj.
+subst j.
+      symmetry in Hj.
+      destruct j; [ easy | ].
+      rewrite Nat_sub_succ_1.
+nth (i - length bef) (seq 0 (length aft)) 0  = S j
+Search (_ ↔ _ - _ < _).
+...
+      rewrite (List_map_nth' d).
 ...
 specialize (Hn (g (S i))) as H1.
 assert (H : g (S i) < S len). {
