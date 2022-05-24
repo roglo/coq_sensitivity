@@ -943,8 +943,8 @@ cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hsm.
-  rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
-    apply (Permutation_permutation Nat_eqb_equality).
+  rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+      (l2 := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
     replace n with (length la) by now rewrite Hla, List_map_seq_length.
     apply permut_list_permutation_iff.

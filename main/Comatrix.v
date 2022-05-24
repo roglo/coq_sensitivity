@@ -1189,8 +1189,8 @@ Theorem rngl_product_map_permut :
 Proof.
 intros Hic * Hσ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite rngl_product_list_permut with (l2 := seq 0 n); [ | easy | ]. 2: {
-  apply (Permutation_permutation Nat_eqb_equality).
+rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+    (l2 := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
   rewrite <- List_map_ff_app_seq, <- H2.

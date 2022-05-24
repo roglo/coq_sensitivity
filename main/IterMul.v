@@ -5,7 +5,7 @@ Set Nested Proofs Allowed.
 Require Import Utf8 Arith Permutation.
 Import List List.ListNotations.
 
-Require Import Misc RingLike.
+Require Import Misc RingLike PermutationFun.
 
 Notation "'∏' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%F) 1%F)
@@ -290,7 +290,26 @@ exists i.
 split; [ flia His | easy ].
 Qed.
 
-Theorem rngl_product_list_permut :
+Theorem rngl_product_list_permut : ∀ A (eqb : A → _),
+  equality eqb →
+  rngl_is_comm = true →
+  ∀ (l1 l2 : list A) f,
+  permutation eqb l1 l2
+  → (∏ (i ∈ l1), f i = ∏ (i ∈ l2), f i)%F.
+Proof.
+intros * Heqb Hic * Hl.
+apply (iter_list_permut Heqb); [ | | | | easy ]. {
+  apply rngl_mul_1_l.
+} {
+  apply rngl_mul_1_r.
+} {
+  now apply rngl_mul_comm.
+} {
+  apply rngl_mul_assoc.
+}
+Qed.
+
+Theorem rngl_product_list_permut' :
   rngl_is_comm = true →
   ∀ A (l1 l2 : list A) f,
   Permutation l1 l2
@@ -409,7 +428,7 @@ Theorem rngl_inv_product_list_comm :
 Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | easy ].
-apply rngl_product_list_permut; [ easy | ].
+apply rngl_product_list_permut'; [ easy | ].
 symmetry.
 apply Permutation_rev.
 Qed.
@@ -535,7 +554,7 @@ Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
 Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ _ (b e)%nat f.
 Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list.
 Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type.
-Arguments rngl_product_list_permut {T}%type {ro rp} _ A%type (l1 l2)%list.
+Arguments rngl_product_list_permut {T ro rp} A%type _ _ _ (l1 l2)%list.
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.

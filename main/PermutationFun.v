@@ -894,6 +894,18 @@ eapply (permutation_trans Heqb). {
 now apply (permutation_skip Heqb).
 Qed.
 
+Theorem permutation_rev_r : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ l, permutation eqb l (rev l).
+Proof.
+intros * Heqb *.
+induction l as [| a]; [ easy | cbn ].
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_cons_append Heqb).
+}
+now apply (permutation_skip Heqb).
+Qed.
+
 Theorem permutation_length : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb, permutation eqb la lb → length la = length lb.

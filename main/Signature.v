@@ -391,8 +391,9 @@ rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   now apply Hg.
 }
 subst a.
-erewrite rngl_product_list_permut with (l1 := rev _); [ | easy | ]. 2: {
-  symmetry; apply Permutation_rev.
+erewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+    (l1 := rev _); [ | easy | ]. 2: {
+  apply (permutation_rev_l Nat_eqb_equality).
 }
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
 erewrite rngl_product_list_eq_compat. 2 :{
@@ -403,8 +404,9 @@ erewrite rngl_product_list_eq_compat. 2 :{
     apply in_seq in Hj.
     now apply Hg.
   }
-  erewrite rngl_product_list_permut with (l1 := rev _); [ | easy | ]. 2: {
-    symmetry; apply Permutation_rev.
+  erewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+      (l1 := rev _); [ | easy | ]. 2: {
+    apply (permutation_rev_l Nat_eqb_equality).
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -776,10 +778,10 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite rngl_product_list_permut with (l2 := seq 0 (length p)); cycle 1. {
+rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+    (l2 := seq 0 (length p)); cycle 1. {
   easy.
 } {
-  apply (Permutation_permutation Nat_eqb_equality).
   now apply permut_list_permutation_iff.
 }
 erewrite rngl_product_list_eq_compat. 2: {
