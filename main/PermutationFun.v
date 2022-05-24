@@ -4,6 +4,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
+Import Init.Nat.
 
 Import List List.ListNotations.
 Require Import Misc.
@@ -1886,6 +1887,95 @@ split. {
   move Hfg before Hsf.
   unfold FinFun.bFun in Hbf, Hbg.
   clear Hif Hsf.
+(**)
+  remember (length la) as len eqn:Hlen.
+  symmetry in Hlen.
+  rename Hlen into Hal; rename Hlab into Hbl.
+  revert f g la lb Hal Hbl Hbf Hbg Hfg Hn.
+  induction len; intros. {
+    now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
+  }
+  destruct la as [| a]; [ easy | ].
+  cbn in Hal; apply Nat.succ_inj in Hal.
+  specialize (Hn (g 0)) as H1.
+  assert (Hgb : g 0 < S len) by now apply Hbg.
+  specialize (H1 Hgb).
+  rewrite (proj2 (Hfg 0 (Nat.lt_0_succ _))) in H1; cbn in H1.
+  rewrite <- (firstn_skipn (g 0) lb).
+  replace (skipn (g 0) lb) with (a :: skipn (S (g 0)) lb). 2: {
+    rewrite <- H1.
+    symmetry.
+    apply List_skipn_is_cons.
+    now rewrite Hbl.
+  }
+  apply (permutation_cons_app Heqb).
+  set (f' := λ i, if i <? g 0 then f i - 1 else f (S i) - 1).
+  set (g' := λ i, i + 42).
+  apply (IHlen f' g'); [ easy | | | | | ]. 5: {
+    intros i Hi.
+    assert (His : i < S len) by flia Hi.
+    unfold f'.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i (g 0)) as [Higz| Higz]. {
+      rewrite app_nth1. 2: {
+        rewrite firstn_length, Hbl.
+        apply Nat.min_glb_lt; [ easy | flia Hi ].
+      }
+      specialize (Hn i His) as H2.
+      rewrite <- (firstn_skipn (g 0) lb) in H2.
+      rewrite app_nth1 in H2. 2: {
+        rewrite firstn_length, Hbl.
+        apply Nat.min_glb_lt; [ easy | flia Hi ].
+      }
+      remember (f i) as fi eqn:Hfi.
+      destruct fi. {
+        rewrite Hfi in Higz.
+        rewrite (proj1 (Hfg i His)) in Higz; flia Higz.
+      }
+      now rewrite Nat_sub_succ_1.
+    }
+    apply Nat.nlt_ge in Higz.
+    rewrite app_nth2. 2: {
+      rewrite firstn_length, Hbl; unfold ge.
+      transitivity (g 0); [ | easy ].
+      apply Nat.le_min_l.
+    }
+    rewrite firstn_length, Hbl.
+    rewrite List_nth_skipn.
+    rewrite Nat.min_l; [ | flia Hgb ].
+...
+  specialize (Hn (g 0)) as H1.
+  assert (Hgb : g 0 < len). {
+    apply Hbg.
+
+; [ now apply Hbg; rewrite <- Hal; cbn | ].
+  destruct la as [| a]. {
+    subst len.
+    now apply length_zero_iff_nil in Hbl; subst lb.
+  }
+  specialize (H1 Hgb).
+  rewrite <- Hal in Hgb.
+  rewrite <- Hal in Hfg.
+  rewrite (proj2 (Hfg 0 (Nat.lt_0_succ _))) in H1; cbn in H1.
+  rewrite <- (firstn_skipn (g 0) lb).
+  replace (skipn (g 0) lb) with (a :: skipn (S (g 0)) lb). 2: {
+    rewrite <- H1.
+    symmetry.
+    rewrite Hal, <- Hbl in Hgb.
+    now apply List_skipn_is_cons.
+  }
+  cbn in Hgb.
+  apply (permutation_cons_app Heqb).
+...
+  revert f g la lb Hbf Hbg Hfg Hn H1 Hgb Hal Hbl.
+  induction len; intros; [ easy | ].
+  set (f' := λ i, if i <? g 0 then f i - 1 else f (S i) - 1).
+  set (g' := λ i, i + 42).
+  apply (IHlen f'); try easy.
+...
+  apply (IHlen f' g').
+  apply (IHlen f' g'); [ easy | easy | | | | ]. 4: {
+...
   remember (length la) as len eqn:Hlen.
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
@@ -1895,6 +1985,7 @@ split. {
   }
   destruct la as [| a]; [ easy | ].
   cbn in Hal; apply Nat.succ_inj in Hal.
+...
   apply permutation_cons_l_iff.
   remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]. 2: {
@@ -1952,9 +2043,10 @@ split. {
         now rewrite <- Hfi in H1.
       }
       apply Nat.nlt_ge in Hib.
+      rewrite <- Hfi, List_nth_succ_cons in H1.
+...
       rewrite app_nth2; [ | easy ].
       rewrite app_nth2 in H1; [ | easy ].
-      rewrite <- Hfi, List_nth_succ_cons in H1.
 ...
   remember [a] as la'; clear Heqla'.
   remember [a] as lb'; clear Heqlb'.

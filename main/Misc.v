@@ -877,6 +877,20 @@ rewrite skipn_cons.
 apply IHla.
 Qed.
 
+Theorem List_skipn_is_cons : ∀ A (d : A) la n,
+  n < length la
+  → skipn n la = nth n la d :: skipn (S n) la.
+Proof.
+intros * Hn.
+revert n Hn.
+induction la as [| a]; intros; [ easy | ].
+destruct n; [ easy | ].
+cbn in Hn; apply Nat.succ_lt_mono in Hn.
+rewrite List_nth_succ_cons.
+do 2 rewrite skipn_cons.
+now apply IHla.
+Qed.
+
 Theorem Nat_lt_lt_sum_mul_lt_sum_mul : ∀ a b c d,
   a < b
   → c < d
