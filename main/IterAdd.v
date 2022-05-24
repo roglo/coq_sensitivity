@@ -3,8 +3,9 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith Permutation.
-Require Import Misc RingLike.
 Import List List.ListNotations.
+
+Require Import Misc RingLike PermutationFun.
 
 Notation "'∑' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%F) 0%F)
@@ -609,12 +610,14 @@ unfold iter_list.
 apply fold_left_rngl_add_fun_from_0.
 Qed.
 
-Theorem rngl_summation_list_permut : ∀ A (l1 l2 : list A) f,
-  Permutation l1 l2
+Theorem rngl_summation_list_permut : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ (l1 l2 : list A) f,
+  permutation eqb l1 l2
   → (∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i)%F.
 Proof.
-intros * Hl.
-apply iter_list_permut'; [ | | | | easy ]. {
+intros * Heqb * Hl.
+apply (iter_list_permut Heqb); [ | | | | easy ]. {
   apply rngl_add_0_l.
 } {
   apply rngl_add_0_r.
@@ -791,7 +794,7 @@ Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
-Arguments rngl_summation_list_permut {T}%type {ro rp} A%type (l1 l2)%list.
+Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.

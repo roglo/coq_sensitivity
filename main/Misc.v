@@ -1662,6 +1662,22 @@ rewrite op_d_l.
 apply op_assoc.
 Qed.
 
+Theorem iter_list_op_fun_from_d : ∀ T A d op a l (f : A → _)
+  (op_d_l : ∀ x, op d x = x)
+  (op_d_r : ∀ x, op x d = x)
+  (op_assoc : ∀ a b c, op a (op b c) = op (op a b) c),
+  iter_list l (λ (c : T) (i : A), op c (f i)) a =
+  op a (iter_list l (λ (c : T) (i : A), op c (f i)) d).
+Proof.
+intros.
+unfold iter_list.
+revert a.
+induction l as [| x l]; intros; [ symmetry; apply op_d_r | cbn ].
+rewrite IHl; symmetry; rewrite IHl.
+rewrite op_d_l.
+apply op_assoc.
+Qed.
+
 Theorem iter_list_all_d : ∀ T A d op (l : list A) f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)

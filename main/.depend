@@ -4,8 +4,8 @@ Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhol
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo PermutationFun.vo SortingFun.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio
 Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo PermutationFun.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo
-IterAdd.vio: IterAdd.v Misc.vio RingLike.vio
-IterAdd.vo IterAdd.glob IterAdd.v.beautified IterAdd.required_vo: IterAdd.v Misc.vo RingLike.vo
+IterAdd.vio: IterAdd.v Misc.vio RingLike.vio PermutationFun.vio
+IterAdd.vo IterAdd.glob IterAdd.v.beautified IterAdd.required_vo: IterAdd.v Misc.vo RingLike.vo PermutationFun.vo
 IterAnd.vio: IterAnd.v Misc.vio
 IterAnd.vo IterAnd.glob IterAnd.v.beautified IterAnd.required_vo: IterAnd.v Misc.vo
 IterMul.vio: IterMul.v Misc.vio RingLike.vio IterAdd.vio

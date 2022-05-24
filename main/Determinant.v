@@ -1165,8 +1165,10 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
-rewrite rngl_summation_list_permut with (l2 := seq 0 n!). 2: {
-  apply (Permutation_permutation Nat_eqb_equality).
+rewrite rngl_summation_list_permut with (eqb := Nat.eqb) (l2 := seq 0 n!);
+    cycle 1. {
+  apply Nat_eqb_equality.
+} {
   remember (map _ _) as la eqn:Hla.
   replace n! with (length la) by now rewrite Hla, List_map_seq_length.
   apply permut_list_permutation_iff.

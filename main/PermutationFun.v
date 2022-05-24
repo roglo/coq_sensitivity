@@ -2438,7 +2438,7 @@ rewrite swap_d_inside.
 now apply permutation_transp_inside.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem iter_list_permut : ∀ A (eqb : A → _),
   equality eqb →
   ∀ T (d : T) (op : T → T → T) (l1 l2 : list A) f
@@ -2459,37 +2459,44 @@ destruct n. {
   apply length_zero_iff_nil in H2.
   now subst l1 l2.
 }
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  rewrite iter_list_cons; [ | easy | easy | easy ].
-  f_equal.
-  destruct n. {
-    apply length_zero_iff_nil in H1.
-    apply length_zero_iff_nil in H2.
-    now subst l l'.
-  }
-  now apply IHHl with (n := n).
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  do 4 (rewrite iter_list_cons; [ | easy | easy | easy ]).
-  do 2 rewrite op_assoc.
-  f_equal; apply op_comm.
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite (IHHl1 n); [ | easy | easy ].
-  rewrite (IHHl2 n); [ | easy | easy ].
-  easy.
+(**)
+revert n l2 Hl H1 H2.
+induction l1 as [| a]; intros; [ easy | ].
+apply permutation_cons_l_iff in Hl.
+remember (extract (eqb a) l2) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hl2).
+apply Heqb in H; subst x l2.
+cbn in H1; apply Nat.succ_inj in H1.
+rewrite app_length in H2; cbn in H2.
+rewrite Nat.add_succ_r in H2.
+apply Nat.succ_inj in H2.
+rewrite <- app_length in H2.
+destruct n. {
+  apply length_zero_iff_nil in H1.
+  apply length_zero_iff_nil in H2.
+  apply app_eq_nil in H2.
+  destruct H2.
+  now subst l1 bef aft.
 }
+rewrite iter_list_cons; [ | easy | easy | easy ].
+rewrite List_cons_is_app, app_assoc.
+rewrite iter_list_app.
+rewrite iter_list_app.
+unfold iter_list at 3.
+cbn; symmetry.
+rewrite IHl1 with (n := n) (l2 := bef ++ aft); [ | easy | easy | easy ].
+rewrite iter_list_app.
+rewrite iter_list_op_fun_from_d with (d := d); [ | easy | easy | easy ].
+symmetry.
+rewrite iter_list_op_fun_from_d with (d := d); [ | easy | easy | easy ].
+symmetry.
+rewrite op_comm; symmetry.
+rewrite op_assoc, op_comm.
+f_equal.
+apply op_comm.
 Qed.
-*)
 
 (* *)
 

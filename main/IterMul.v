@@ -3,8 +3,9 @@
 Set Nested Proofs Allowed.
 
 Require Import Utf8 Arith Permutation.
-Require Import Misc RingLike.
 Import List List.ListNotations.
+
+Require Import Misc RingLike.
 
 Notation "'∏' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c * g)%F) 1%F)
