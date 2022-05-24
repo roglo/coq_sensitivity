@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Permutation.
+Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
@@ -1434,7 +1434,7 @@ split. {
   apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
   intros k Hk.
   apply H1.
-  apply Permutation.Permutation_in with (l := seq 0 n). 2: {
+  apply (permutation_in_iff Nat_eqb_equality) with (lb := seq 0 n). 2: {
     clear - Hk.
     induction n; intros; [ easy | ].
     rewrite seq_S; cbn.
@@ -1444,8 +1444,6 @@ split. {
     }
     left; apply IHn; flia Hk Hkn.
   }
-  apply Permutation_sym.
-  apply (Permutation_permutation Nat_eqb_equality).
   replace n with (length (isort_rank Nat.leb σ)). 2: {
     rewrite isort_rank_length.
     now destruct Hσ.
