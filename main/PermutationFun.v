@@ -1941,8 +1941,40 @@ split. {
       apply Nat.le_min_l.
     }
     rewrite firstn_length, Hbl.
-    rewrite List_nth_skipn.
     rewrite Nat.min_l; [ | flia Hgb ].
+    rewrite List_nth_skipn.
+    replace (i - g 0 + S (g 0)) with (S i) by flia Higz.
+    apply Nat.succ_lt_mono in Hi.
+    specialize (Hn (S i) Hi) as H2.
+    rewrite H2.
+    remember (f (S i)) as fsi eqn:Hfsi.
+    destruct fsi; cbn; [ | now rewrite Nat.sub_0_r ].
+    apply (f_equal g) in Hfsi.
+    rewrite (proj1 (Hfg (S i) Hi)) in Hfsi.
+    flia Hfsi Higz.
+  } {
+    rewrite app_length, firstn_length, skipn_length.
+    rewrite Hbl, Nat.min_l; [ cbn | flia Hgb ].
+    rewrite Nat.add_sub_assoc; [ | flia Hgb ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  } {
+    intros i Hi.
+    assert (His : i < S len) by flia Hi.
+    unfold f'.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i (g 0)) as [Higz| Higz]. {
+      specialize (Hbf i His) as H2.
+      remember (f i) as fi eqn:Hfi.
+      destruct fi; [ | rewrite Nat_sub_succ_1; flia H2 ].
+      flia Hi.
+    }
+    apply Nat.succ_lt_mono in Hi.
+    specialize (Hbf (S i) Hi) as H2.
+    apply Nat.nlt_ge in Higz.
+    remember (f (S i)) as fsi eqn:Hfsi.
+    destruct fsi; [ | rewrite Nat_sub_succ_1; flia H2 ].
+    flia Hi.
+  }
 ...
   specialize (Hn (g 0)) as H1.
   assert (Hgb : g 0 < len). {
