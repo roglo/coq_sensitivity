@@ -641,5 +641,7 @@ Qed.
 
 End a.
 
-Arguments rngl_product_summation_distr {T}%type {ro rp} _ (m n)%nat.
+Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
+Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
+Arguments rngl_product_summation_distr {T}%type {ro rp} _ (m n)%nat.
