@@ -1893,7 +1893,6 @@ split. {
   induction len; intros. {
     now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
-...
   destruct la as [| a]; [ easy | ].
   cbn in Hal; apply Nat.succ_inj in Hal.
   apply permutation_cons_l_iff.
@@ -1931,6 +1930,23 @@ split. {
   rewrite Nat.add_succ_r in Hbl.
   apply Nat.succ_inj in Hbl.
   rewrite <- app_length in Hbl.
+(**)
+  remember [a] as la'; clear Heqla'.
+  remember [a] as lb'; clear Heqlb'.
+  remember (λ (i : nat), i) as f'; clear Heqf'.
+  remember (λ (i : nat), i) as g'; clear Heqg'.
+  apply (permutation_trans Heqb) with (lb := la'); [ admit | ].
+  apply (permutation_sym Heqb).
+  apply (permutation_trans Heqb) with (lb := lb'); [ admit | ].
+  apply (permutation_sym Heqb).
+  apply (IHlen f' g'); [ admit | admit | | | | ]; cycle 3. {
+    intros i Hi.
+...
+Compute (
+let la := [2;3;5;3;2;1] in
+let lb := [1;5;2;3;2;3] in
+let eqb := Nat.eqb in
+...
   set (f' := λ i, f (if f i =? len then len else i)).
   set (g' := λ i, g (if g i =? len then len else i)).
 set (la' := map (λ i, if g i =? len then last la d else nth i la d) (seq 0 len)).
