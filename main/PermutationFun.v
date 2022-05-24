@@ -1933,14 +1933,17 @@ split. {
 (**)
   remember [a] as la'; clear Heqla'.
   remember [a] as lb'; clear Heqlb'.
-  remember (λ (i : nat), i) as f'; clear Heqf'.
-  remember (λ (i : nat), i) as g'; clear Heqg'.
+  set (f' := λ i, f (if f i =? len then len else i)).
+  set (g' := λ i, g (if g i =? len then len else i)).
   apply (permutation_trans Heqb) with (lb := la'); [ admit | ].
   apply (permutation_sym Heqb).
   apply (permutation_trans Heqb) with (lb := lb'); [ admit | ].
   apply (permutation_sym Heqb).
   apply (IHlen f' g'); [ admit | admit | | | | ]; cycle 3. {
     intros i Hi.
+    unfold f'.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (f i) len) as [Hfil| Hfil]. {
 ...
 Compute (
 let la := [2;3;5;3;2;1] in
