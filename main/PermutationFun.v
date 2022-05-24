@@ -1886,10 +1886,6 @@ split. {
   move Hfg before Hsf.
   unfold FinFun.bFun in Hbf, Hbg.
   clear Hif Hsf.
-(*
-  unfold FinFun.bInjective in Hif.
-  unfold FinFun.bSurjective in Hsf.
-*)
   remember (length la) as len eqn:Hlen.
   symmetry in Hlen.
   rename Hlen into Hal; rename Hlab into Hbl.
@@ -1897,6 +1893,7 @@ split. {
   induction len; intros. {
     now apply length_zero_iff_nil in Hal, Hbl; subst la lb.
   }
+...
   destruct la as [| a]; [ easy | ].
   cbn in Hal; apply Nat.succ_inj in Hal.
   apply permutation_cons_l_iff.
@@ -1936,44 +1933,9 @@ split. {
   rewrite <- app_length in Hbl.
   set (f' := λ i, f (if f i =? len then len else i)).
   set (g' := λ i, g (if g i =? len then len else i)).
-(*
-  set (la' := map (λ i, nth (if f i =? len then f len else i) la d) (seq 0 len)).
-  set (bef' := map (λ i, nth (if g i =? len then g len else i) bef d) (seq 0 (length bef))).
-  set (aft' := map (λ i, nth (if g (i + length bef) =? len then g len else i) aft d) (seq 0 (length aft))).
-*)
 set (la' := map (λ i, if g i =? len then last la d else nth i la d) (seq 0 len)).
 set (bef' := map (λ i, nth (if f i =? len then g len else i) bef d) (seq 0 (length bef))).
-(*
-set (aft' := map (λ i, if i =? 0 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
-set
-  (aft' :=
-     map
-       (λ i,
-        if i =? 0 then last la d
-(*
-        else if nth (i - length bef) (seq 0 (length aft)) 0 =? 0 then
-          last la d
-*)
-        else nth i aft d) (seq 0 (length aft))).
-set
-  (aft' :=
-     map
-       (λ i,
-        if i =? 0 then last la d
-(*
-        else if nth (i - length bef) (seq 0 (length aft)) 0 =? 0 then
-          last la d
-*)
-        else nth (i - 1) aft d) (seq 0 (length aft))).
-set (aft' := map (λ i, last la d) (seq 0 (length aft))).
-*)
 set (aft' := map (λ i, if i =? 1 then last la d else nth (i - 1) aft d) (seq 0 (length aft))).
-(*
-  H1 : nth (i - length bef) (seq 0 (length aft)) 0 ≠ 0
-  ============================
-  nth (nth (i - length bef) (seq 0 (length aft)) 0 - 1) aft d = last la d
-...
-*)
   apply (permutation_trans Heqb) with (lb := la'). {
     admit.
   }
