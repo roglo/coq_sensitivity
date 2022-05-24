@@ -1931,6 +1931,31 @@ split. {
   apply Nat.succ_inj in Hbl.
   rewrite <- app_length in Hbl.
 (**)
+  set (f' := λ i, if i <? g 0 then f i - 1 else f (S i) - 1).
+  set (g' := λ i, i + 42).
+  apply (IHlen f' g'); [ easy | easy | | | | ]. 4: {
+    intros i Hi.
+    assert (His : i < S len) by flia Hi.
+    unfold f'.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec i (g 0)) as [Higz| Higz]. {
+      remember (f i) as fi eqn:Hfi.
+      destruct fi. {
+        rewrite Hfi in Higz.
+        rewrite (proj1 (Hfg i His)) in Higz; flia Higz.
+      }
+      rewrite Nat_sub_succ_1.
+      specialize (Hn i His) as H1.
+      destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+        rewrite app_nth1; [ | easy ].
+        rewrite app_nth1 in H1; [ | easy ].
+        now rewrite <- Hfi in H1.
+      }
+      apply Nat.nlt_ge in Hib.
+      rewrite app_nth2; [ | easy ].
+      rewrite app_nth2 in H1; [ | easy ].
+      rewrite <- Hfi, List_nth_succ_cons in H1.
+...
   remember [a] as la'; clear Heqla'.
   remember [a] as lb'; clear Heqlb'.
   set (f' := λ i, f (if f i =? len then len else i)).
