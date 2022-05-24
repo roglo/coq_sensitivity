@@ -614,7 +614,7 @@ Theorem rngl_summation_list_permut : ∀ A (l1 l2 : list A) f,
   → (∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i)%F.
 Proof.
 intros * Hl.
-apply iter_list_permut; [ | | | | easy ]. {
+apply iter_list_permut'; [ | | | | easy ]. {
   apply rngl_add_0_l.
 } {
   apply rngl_add_0_r.

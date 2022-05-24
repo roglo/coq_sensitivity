@@ -296,7 +296,7 @@ Theorem rngl_product_list_permut :
   → (∏ (i ∈ l1), f i = ∏ (i ∈ l2), f i)%F.
 Proof.
 intros Hic * Hl.
-apply iter_list_permut; [ | | | | easy ]. {
+apply iter_list_permut'; [ | | | | easy ]. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.

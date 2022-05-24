@@ -2250,7 +2250,7 @@ destruct Hif as [Hif| Hif]; [ now left | right ].
 now apply IHk.
 Qed.
 
-Theorem iter_list_permut : ∀ T A (d : T) (op : T → T → T) (l1 l2 : list A) f
+Theorem iter_list_permut' : ∀ T A (d : T) (op : T → T → T) (l1 l2 : list A) f
   (op_d_l : ∀ x, op d x = x)
   (op_d_r : ∀ x, op x d = x)
   (op_comm : ∀ a b, op a b = op b a)
