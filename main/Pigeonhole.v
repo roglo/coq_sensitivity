@@ -5,7 +5,9 @@
 
 Set Nested Proofs Allowed.
 Require Import Utf8 Arith.
+Require FinFun.
 Import List List.ListNotations.
+
 Require Import Misc.
 
 Fixpoint find_dup f (la : list nat) :=

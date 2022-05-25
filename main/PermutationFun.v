@@ -4,9 +4,10 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
+Require FinFun.
 Import Init.Nat.
-
 Import List List.ListNotations.
+
 Require Import Misc.
 
 Fixpoint extract {A} (f : A → bool) l :=
