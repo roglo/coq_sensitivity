@@ -143,7 +143,6 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
     rngl_has_eqb : bool;
-    rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
     rngl_has_1_neq_0 : bool;
     rngl_is_ordered : bool;
@@ -203,10 +202,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when equality is calculable *)
     rngl_opt_eqb_eq :
       if rngl_has_eqb then ∀ a b : T, (a =? b)%F = true ↔ a = b
-      else not_applicable;
-    (* when equality is decidable *)
-    rngl_opt_eq_dec :
-      if rngl_has_dec_eq then ∀ a b : T, {a = b} + {a ≠ b}
       else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
@@ -365,23 +360,12 @@ split; intros Hab. {
 }
 Qed.
 
-(**)
-Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
-Proof.
-intros Hde *.
-specialize rngl_opt_eq_dec as H.
-rewrite Hde in H.
-apply H.
-Qed.
-
-(*
 Theorem rngl_eq_dec : rngl_has_eqb = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
 intros Heq *.
 remember (rngl_eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now left; apply rngl_eqb_eq | now right; apply rngl_eqb_neq ].
 Qed.
-*)
 
 Theorem rngl_le_dec :
   rngl_has_dec_le = true →

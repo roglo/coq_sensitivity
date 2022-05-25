@@ -2675,6 +2675,7 @@ destruct Hm as (Hr, Hm).
 now apply squ_mat_is_corr.
 Qed.
 
+(*
 Theorem mat_opt_eq_dec :
   if rngl_has_dec_eq then ∀ MA MB : matrix T, {MA = MB} + {MA ≠ MB}
   else not_applicable.
@@ -2700,6 +2701,7 @@ specialize mat_opt_eq_dec as H1.
 rewrite Hde in H1.
 apply H1.
 Qed.
+*)
 
 Theorem mat_add_nrows : ∀ MA MB : matrix T,
   mat_nrows (MA + MB) = min (mat_nrows MA) (mat_nrows MB).

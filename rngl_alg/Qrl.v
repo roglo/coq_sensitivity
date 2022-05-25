@@ -75,7 +75,6 @@ Proof. now split; right. Qed.
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_eqb := true;
-     rngl_has_dec_eq := true;
      rngl_has_dec_le := true;
      rngl_has_1_neq_0 := true;
      rngl_is_ordered := true;
@@ -101,7 +100,6 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Q.eqb_eq;
-     rngl_opt_eq_dec := Q.eq_dec;
      rngl_opt_le_dec := Q.le_dec;
      rngl_opt_integral := NA;
      rngl_characteristic_prop := Q_characteristic_prop;

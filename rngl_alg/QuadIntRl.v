@@ -1075,7 +1075,6 @@ Proof. split; [ now right | now left ]. Qed.
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_eqb := false; (* to be improved, perhaps *)
-     rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := true;
      rngl_is_ordered := false;
@@ -1101,7 +1100,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_quot_l := quad_int_mul_quot_l;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
-     rngl_opt_eq_dec := quad_int_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_characteristic_prop := quad_int_characteristic_prop;

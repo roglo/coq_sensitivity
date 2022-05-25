@@ -689,7 +689,7 @@ Proof. easy. Qed.
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
   is_symm_mat M
@@ -853,7 +853,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
-  destruct (rngl_eq_dec Heq (≺ vi, vj ≻) 0%F) as [Hvvij| Hvvij]; [ easy | ].
+  remember (rngl_eqb (≺ vi, vj ≻) 0%F) as vvij eqn:Hvvij.
+  symmetry in Hvvij.
+  destruct vvij; [ now apply rngl_eqb_eq | ].
+  apply rngl_eqb_neq in Hvvij; [ | easy ].
   exfalso.
   apply rngl_mul_cancel_r in H1; [ | now left | easy ].
   revert H1.
