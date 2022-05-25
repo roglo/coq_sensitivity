@@ -106,6 +106,9 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
   {| sm_mat := - sm_mat M;
      sm_prop := square_matrix_opp_prop M |}.
 
+Definition square_matrix_eqb eqb {n} (A B : square_matrix n T) :=
+  mat_eqb eqb (sm_mat A) (sm_mat B).
+
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
 
 Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
@@ -117,6 +120,7 @@ Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
+     rngl_opt_eqb := None; (* Some (square_matrix_eqb Nat.eqb); *)
      rngl_le := phony_mat_le |}.
 
 Existing Instance mat_ring_like_op.
@@ -680,6 +684,7 @@ Qed.
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
+     rngl_has_eqb := false; (* could be true, sometimes, perhaps? *)
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
@@ -705,6 +710,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := NA;
      rngl_opt_eq_dec := squ_mat_opt_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

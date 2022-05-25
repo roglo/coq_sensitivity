@@ -16,6 +16,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_inv := None;
      rngl_opt_sous := Some Nat.sub;
      rngl_opt_quot := Some Nat.div;
+     rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
 
 Global Existing Instance nat_ring_like_op.
@@ -73,6 +74,7 @@ Proof. now split; left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
+     rngl_has_eqb := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := true;
      rngl_has_1_neq_0 := true;
@@ -98,6 +100,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := Nat_mul_div_l;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := le_dec;
      rngl_opt_integral := Nat_eq_mul_0;
@@ -206,6 +209,8 @@ Definition Zn_inv n (a : Zn n) : Zn n :=
 Definition Zn_div n (a b : Zn n) : Zn n :=
   if is_prime n then Zn_mul n a (Zn_inv n b)
   else a.
+Definition Zn_eqb n (a b : Zn n) : bool :=
+  proj1_sig a =? proj1_sig b.
 Definition Zn_le n (a b : Zn n) : Prop :=
   proj1_sig a ≤ proj1_sig b.
 
@@ -218,6 +223,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
+     rngl_opt_eqb := Some (Zn_eqb n);
      rngl_le := Zn_le n |}.
 
 Global Existing Instance Zn_ring_like_op.
@@ -343,6 +349,22 @@ rewrite Nat.sub_add. 2: {
 now apply Nat.mod_same.
 Qed.
 
+Theorem Zn_eqb_eq : ∀ a b : Zn n, (a =? b)%F = true ↔ a = b.
+Proof.
+intros (a, Ha) (b, Hb); cbn.
+split. {
+  intros Hab.
+  apply Nat.eqb_eq in Hab; subst b.
+  apply eq_exist_uncurried.
+  exists eq_refl.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+} {
+  intros Hab.
+  apply Nat.eqb_eq.
+  now injection Hab.
+}
+Qed.
+
 Theorem Zn_eq_dec : ∀ (a b : Zn n), ({a = b} + {a ≠ b})%F.
 Proof.
 intros (a, Ha) (b, Hb).
@@ -447,6 +469,7 @@ Proof. now split; right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
+     rngl_has_eqb := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := 1 <? n;
@@ -472,6 +495,7 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := Zn_eqb_eq;
      rngl_opt_eq_dec := Zn_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
@@ -509,6 +533,7 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
+     rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
 
 Section a.
@@ -540,6 +565,7 @@ Qed.
 
 Definition lcm_ring_like_prop :=
   {| rngl_is_comm := true;
+     rngl_has_eqb := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := false;
@@ -564,6 +590,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := NA;
+     rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eq_dec := Nat.eq_dec;
      rngl_opt_le_dec := NA;

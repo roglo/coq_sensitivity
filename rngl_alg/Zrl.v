@@ -18,6 +18,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := Some Z.quot;
+     rngl_opt_eqb := Some Z.eqb;
      rngl_le := Z.le |}.
 
 Global Existing Instance Z_ring_like_op.
@@ -85,6 +86,7 @@ Proof. split; [ now right | now left ]. Qed.
 
 Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_is_comm := true;
+     rngl_has_eqb := true;
      rngl_has_dec_eq := true;
      rngl_has_dec_le := true;
      rngl_has_1_neq_0 := true;
@@ -110,6 +112,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := Z_mul_div_l;
      rngl_opt_mul_quot_r := NA;
+     rngl_opt_eqb_eq := Z.eqb_eq;
      rngl_opt_eq_dec := Z.eq_dec;
      rngl_opt_le_dec := Z_le_dec;
      rngl_opt_integral := Z_eq_mul_0;

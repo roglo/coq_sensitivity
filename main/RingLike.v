@@ -19,7 +19,7 @@
    There are many other properties that are implemented here or could be
    implemented :
      - archimedian or not
-     - with decidable equality or not
+     - with calculable equality or not
      - commutative or not
      - with some characteristic
      - finite or infinite
@@ -57,6 +57,7 @@ Class ring_like_op T :=
     rngl_opt_inv : option (T → T);
     rngl_opt_sous : option (T → T → T);
     rngl_opt_quot : option (T → T → T);
+    rngl_opt_eqb : option (T → T → bool);
     rngl_le : T → T → Prop }.
 
 Declare Scope ring_like_scope.
@@ -102,10 +103,17 @@ Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b)
   else if rngl_has_sous then rngl_sous a b
   else rngl_zero.
+
 Definition rngl_div {T} {R : ring_like_op T} a b :=
   if rngl_has_inv then rngl_mul a (rngl_inv b)
   else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
+
+Definition rngl_eqb {T} {R : ring_like_op T} a b :=
+  match rngl_opt_eqb with
+  | Some rngl_eqb => rngl_eqb a b
+  | None => false
+  end.
 
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
@@ -120,6 +128,8 @@ Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
 Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
   ring_like_scope.
 
+Notation "a =? b" := (rngl_eqb a b) (at level 70) : ring_like_scope.
+
 Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
@@ -132,6 +142,7 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_is_comm : bool;
+    rngl_has_eqb : bool;
     rngl_has_dec_eq : bool;
     rngl_has_dec_le : bool;
     rngl_has_1_neq_0 : bool;
@@ -188,6 +199,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_mul_quot_r :
       if (rngl_has_quot && negb rngl_is_comm)%bool then
         ∀ a b, b ≠ 0%F → (a * b / b)%F = a
+      else not_applicable;
+    (* when equality is calculable *)
+    rngl_opt_eqb_eq :
+      if rngl_has_eqb then ∀ a b : T, (a =? b)%F = true ↔ a = b
       else not_applicable;
     (* when equality is decidable *)
     rngl_opt_eq_dec :
@@ -321,6 +336,15 @@ intros H1 *.
 specialize rngl_opt_mul_inv_l as H.
 rewrite H1 in H.
 apply H.
+Qed.
+
+Theorem rngl_eqb_eq :
+  rngl_has_eqb = true →
+  ∀ a b : T, rngl_eqb a b = true ↔ a = b.
+Proof.
+intros Heqb *.
+specialize rngl_opt_eqb_eq as H.
+now rewrite Heqb in H.
 Qed.
 
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.

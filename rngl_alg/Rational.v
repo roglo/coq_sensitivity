@@ -181,6 +181,12 @@ Definition compare x y :=
   | Neg px => match y with Neg py => GQcompare py px | _ => Lt end
   end.
 
+Definition eqb x y :=
+  match compare x y with
+  | Eq => true
+  | _ => false
+  end.
+
 (** * Notations *)
 
 (** Use "Import Q.Notations" to have them. *)
@@ -215,6 +221,7 @@ Notation "‖ x ‖" := (abs x) (at level 60) : Q_scope.
 Notation "x * y" := (mul x y) : Q_scope.
 Notation "x / y" := (div x y) : Q_scope.
 Notation "¹/ x" := (inv x) (at level 35, right associativity) : Q_scope.
+Notation "x =? y" := (eqb x y) : Q_scope.
 
 (* reduced syntax of a computed rational *)
 (* e.g. the rational "-3/4" is displayed 〈-3╱4〉%Q *)
@@ -507,6 +514,46 @@ Proof. intros; now destruct c. Qed.
 
 End Qadd_assoc_lem.
 (* end hide *)
+
+Theorem eqb_eq : ∀ x y, (x =? y)%Q = true ↔ x = y.
+Proof.
+intros.
+unfold "=?"%Q.
+unfold compare.
+destruct x as [| x| x]; [ now destruct y | | ]. {
+  destruct y as [| y| y]; [ easy | | easy ].
+  remember (GQcompare x y) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    now apply GQcompare_eq_iff in Hc; subst y.
+  } {
+    apply GQcompare_lt_iff in Hc.
+    split; intros H; [ easy | ].
+    injection H; clear H; intros; subst y.
+    now apply GQlt_irrefl in Hc.
+  } {
+    apply GQcompare_gt_iff in Hc.
+    split; intros H; [ easy | ].
+    injection H; clear H; intros; subst y.
+    now apply GQlt_irrefl in Hc.
+  }
+} {
+  destruct y as [| y| y]; [ easy | easy | ].
+  remember (GQcompare y x) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    now apply GQcompare_eq_iff in Hc; subst y.
+  } {
+    apply GQcompare_lt_iff in Hc.
+    split; intros H; [ easy | ].
+    injection H; clear H; intros; subst y.
+    now apply GQlt_irrefl in Hc.
+  } {
+    apply GQcompare_gt_iff in Hc.
+    split; intros H; [ easy | ].
+    injection H; clear H; intros; subst y.
+    now apply GQlt_irrefl in Hc.
+  }
+}
+Qed.
 
 Theorem add_comm : ∀ x y, (x + y = y + x)%Q.
 Proof.

@@ -35,6 +35,9 @@ Definition is_square_matrix {T} (M : matrix T) :=
   ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
   (⋀ (l ∈ mat_list_list M), (length l =? mat_nrows M)).
 
+Definition mat_eqb {T} (eqb : T → T → bool) (A B : matrix T) :=
+  list_eqb (list_eqb eqb) (mat_list_list A) (mat_list_list B).
+
 (* is_correct_matrix (a bool) easier to use with Prop *)
 
 Theorem is_scm_mat_iff {T} : ∀ f (M : matrix T),

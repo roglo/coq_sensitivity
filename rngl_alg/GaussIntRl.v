@@ -71,7 +71,8 @@ Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
      rngl_opt_opp := Some gi_opp;
      rngl_opt_inv := None;
      rngl_opt_sous := None;
-      rngl_opt_quot := Some gi_div;
+     rngl_opt_quot := Some gi_div;
+     rngl_opt_eqb := None; (* to be improved, perhaps *)
      rngl_le := phony_gi_le |}.
 
 (*
