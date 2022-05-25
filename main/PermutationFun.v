@@ -1005,15 +1005,71 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
+Theorem NoDup_permutation : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  NoDup la
+  → NoDup lb
+  → (∀ x : A, x ∈ la ↔ x ∈ lb)
+  → permutation eqb la lb.
+Proof.
+intros * Heqb * Hna Hnb Hiab.
+revert lb Hnb Hiab.
+induction Hna as [| a la Ha Hna ]; intros. {
+  destruct lb as [| b]; [ easy | ].
+  now specialize (proj2 (Hiab b) (or_introl eq_refl)).
+}
+apply permutation_cons_l_iff.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  clear Hlxl.
+  specialize (proj1 (Hiab a) (or_introl eq_refl)) as H2.
+  specialize (H1 _ H2).
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x lb.
+apply IHHna. {
+  now apply NoDup_remove_1 in Hnb.
+} {
+  intros i.
+  split; intros Hi. {
+    specialize (proj1 (Hiab i) (or_intror Hi)) as H1.
+    apply in_app_or in H1; apply in_or_app.
+    destruct H1 as [H1| H1]; [ now left | right ].
+    destruct H1 as [H1| H1]; [ | easy ].
+    now subst i.
+  } {
+    specialize (proj2 (Hiab i)) as H1.
+    assert (H : i ∈ bef ++ a :: aft). {
+      apply in_app_or in Hi; apply in_or_app.
+      destruct Hi as [Hi| Hi]; [ now left | now right; right ].
+    }
+    specialize (H1 H); clear H.
+    destruct H1 as [H1| H1]; [ | easy ].
+    subst i.
+    now apply NoDup_remove_2 in Hnb.
+  }
+}
+Qed.
+
 (* to be completed
 Theorem NoDup_permutation_bis : ∀ A (eqb : A → _),
+  equality eqb →
   ∀ la lb,
   NoDup la
   → length lb ≤ length la
   → incl la lb
   → permutation eqb la lb.
 Proof.
-intros * Hnd Hll.
+intros * Heqb * Hnd Hll Hiab.
+apply (NoDup_permutation Heqb); [ easy | | ]. 2: {
+  intros i.
+  specialize (Hiab i).
+  split; [ easy | ].
+  intros Hib.
 ...
 *)
 
