@@ -4,12 +4,10 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Require Import Permutation.
 Import List List.ListNotations.
 
-Require Import Misc SortingFun RingLike.
-Require Import IterMul.
-Require Import PermutationFun PermutSeq.
+Require Import Misc SortingFun PermutationFun RingLike.
+Require Import IterMul PermutSeq.
 
 Section a.
 
@@ -2351,16 +2349,14 @@ Theorem permut_isort : ∀ ord,
   → isort ord (l ° p) = isort ord (l ° q).
 Proof.
 intros * Hant Htr Htot * Hp Hq.
-apply Permutation_isort'; [ easy | easy | easy | ].
+apply (isort_when_permuted Nat_eqb_equality); [ easy | easy | easy | ].
 unfold "°".
-apply Permutation_map.
-transitivity (seq 0 n). {
+apply (permutation_map Nat_eqb_equality Nat_eqb_equality).
+apply (permutation_trans Nat_eqb_equality) with (lb := seq 0 n). {
   destruct Hp as (Hp1, Hp2); rewrite <- Hp2.
-  apply (Permutation_permutation Nat_eqb_equality).
   now apply permut_list_permutation_iff.
 } {
   destruct Hq as (Hq1, Hq2); rewrite <- Hq2.
-  apply (Permutation_permutation Nat_eqb_equality).
   apply (permutation_sym Nat_eqb_equality).
   now apply permut_list_permutation_iff.
 }
