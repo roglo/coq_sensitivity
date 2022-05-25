@@ -812,7 +812,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
-   ((rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq))%bool = true →
+   ((rngl_has_inv || rngl_has_quot) && rngl_has_eqb))%bool = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
 Proof.
 intros Hmo Hdo * Hab.
@@ -821,14 +821,16 @@ destruct rngl_is_integral; [ now apply rngl_integral | ].
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
 cbn in Hdo.
 destruct iv. {
-  remember rngl_has_dec_eq as de eqn:Hde; symmetry in Hde.
+  remember rngl_has_eqb as de eqn:Hde; symmetry in Hde.
   destruct de; [ | easy ].
   cbn; clear rngl_integral.
   assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | ].
+  remember (rngl_eqb a 0%F) as az eqn:Haz; symmetry in Haz.
+  destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
+  apply (rngl_eqb_neq Hde) in Haz.
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
   rewrite rngl_mul_1_l in H.
   now right.
@@ -838,7 +840,9 @@ destruct iv. {
   destruct Hdo as (Hdi, Hde).
   specialize (rngl_opt_mul_quot_l) as H1.
   rewrite Hdi in H1.
-  destruct (rngl_eq_dec Hde a 0%F) as [Haz| Haz]; [ now left | right ].
+  remember (rngl_eqb a 0%F) as az eqn:Haz; symmetry in Haz.
+  destruct az; [ now left; apply (rngl_eqb_eq Hde) | right ].
+  apply (rngl_eqb_neq Hde) in Haz.
   specialize (H1 a b Haz) as H4.
   rewrite Hab in H4.
   rewrite <- H4.
@@ -1386,7 +1390,7 @@ Qed.
 Theorem eq_rngl_add_same_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   (rngl_is_integral ||
-   (rngl_has_inv || rngl_has_quot) && rngl_has_dec_eq)%bool = true →
+   (rngl_has_inv || rngl_has_quot) && rngl_has_eqb)%bool = true →
   rngl_has_1_neq_0 = true →
   rngl_characteristic = 0 →
   ∀ a,
