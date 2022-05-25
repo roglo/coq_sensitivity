@@ -111,7 +111,7 @@ Definition square_matrix_eqb eqb {n} (A B : square_matrix n T) :=
 
 Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
 
-Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
+Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_one := smI n;
      rngl_add := square_matrix_add;
@@ -120,8 +120,27 @@ Canonical Structure mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
-     rngl_opt_eqb := None; (* Some (square_matrix_eqb Nat.eqb); *)
+(*
+     rngl_opt_eqb :=
+       match rngl_opt_eqb with
+       | Some eqb => Some (square_matrix_eqb eqb)
+       | None => None
+       end;
+*)
+     rngl_opt_eqb := None;
+(**)
      rngl_le := phony_mat_le |}.
+
+(**)
+Canonical Structure mat_ring_like_op.
+(*
+says:
+Warning: Projection value has no head constant:
+match rngl_opt_eqb with
+| Some eqb => Some (square_matrix_eqb eqb)
+| None => None
+end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it. [projection-no-head-constant,typechecker]
+*)
 
 Existing Instance mat_ring_like_op.
 
@@ -668,6 +687,19 @@ intros j Hj.
 now apply rngl_mul_0_l; left.
 Qed.
 
+(*
+Theorem squ_mat_opt_eqb_eq {n} : ∀ (a b : square_matrix n T),
+  match @rngl_opt_eqb T ro with
+  | Some eqb => (∀ a b, (a =? b)%F = true ↔ a = b)
+  | None => not_applicable
+  end.
+Proof.
+intros.
+split; intros Hab. {
+  apply (@rngl_eqb_eq (square_matrix n T)).
+...
+*)
+
 Theorem squ_mat_consistent {n} :
   (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
    ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
@@ -684,7 +716,7 @@ Qed.
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
-     rngl_has_eqb := false; (* could be true, sometimes, perhaps? *)
+     rngl_has_eqb := false; (* true? *)
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
