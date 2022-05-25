@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Psatz Sorted Decidable.
+Require Import Utf8 Arith Psatz.
 Import List List.ListNotations Init.Nat.
 Arguments length {A}.
 
