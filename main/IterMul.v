@@ -2,7 +2,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith Permutation.
+Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc RingLike PermutationFun.
@@ -309,24 +309,6 @@ apply (iter_list_permut Heqb); [ | | | | easy ]. {
 }
 Qed.
 
-Theorem rngl_product_list_permut' :
-  rngl_is_comm = true →
-  ∀ A (l1 l2 : list A) f,
-  Permutation l1 l2
-  → (∏ (i ∈ l1), f i = ∏ (i ∈ l2), f i)%F.
-Proof.
-intros Hic * Hl.
-apply iter_list_permut'; [ | | | | easy ]. {
-  apply rngl_mul_1_l.
-} {
-  apply rngl_mul_1_r.
-} {
-  now apply rngl_mul_comm.
-} {
-  apply rngl_mul_assoc.
-}
-Qed.
-
 Theorem rngl_inv_product_list :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_has_inv = true →
@@ -416,21 +398,21 @@ f_equal; f_equal; f_equal.
 flia.
 Qed.
 
-Theorem rngl_inv_product_list_comm :
+Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
+  equality eqb →
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
-  ∀ A (l : list A) f,
+  ∀ (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
   → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ l), (( f i)⁻¹))%F.
 Proof.
-intros Hom Hic Hin H10 Hit * Hnz.
+intros * Heqb Hom Hic Hin H10 Hit * Hnz.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | easy ].
-apply rngl_product_list_permut'; [ easy | ].
-symmetry.
-apply Permutation_rev.
+apply (rngl_product_list_permut _ _ Heqb Hic).
+now apply permutation_rev_l.
 Qed.
 
 Theorem rngl_inv_product_comm :
@@ -444,7 +426,7 @@ Theorem rngl_inv_product_comm :
   → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f i)⁻¹))%F.
 Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
-apply rngl_inv_product_list_comm; try easy.
+apply (rngl_inv_product_list_comm _ _ Nat.eqb_eq); try easy.
 intros i Hi.
 apply in_seq in Hi.
 apply Hnz; flia Hi.
