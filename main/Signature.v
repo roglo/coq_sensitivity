@@ -343,18 +343,20 @@ Theorem rngl_product_product_div_eq_1 :
   rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ n f g,
   (∀ i j, i < n → j < n → g i j ≠ 0%F)
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), (f i j / g i j)))%F = 1%F
   → (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), f i j))%F =
     (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n), g i j))%F.
 Proof.
-intros Hom Hic Hid Hin H10 Hde * Hg Hs.
+intros Hom Hic Hid Hin H10 Heq * Hg Hs.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 remember (∏ (i ∈ _), _)%F as a eqn:Ha in |-*.
 remember (∏ (i ∈ _), _)%F as b eqn:Hb in |-*.
-destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
+remember (rngl_eqb b 0%F) as bz eqn:Hbz; symmetry in Hbz.
+destruct bz. {
+  apply (rngl_eqb_eq Heq) in Hbz.
   rewrite Hbz in Hb |-*; clear Hbz; subst a; symmetry in Hb.
   apply rngl_product_list_integral in Hb; [ | easy | easy | easy ].
   destruct Hb as (i & His & Hb).
@@ -366,6 +368,7 @@ destruct (rngl_eq_dec Hde b 0%F) as [Hbz| Hbz]. {
   apply in_seq in Hjs.
   now apply Hg.
 }
+apply (rngl_eqb_neq Heq) in Hbz.
 apply rngl_mul_cancel_r with (c := (b⁻¹)%F); [ now left | | ]. {
   intros Hbiz.
   apply (f_equal (rngl_mul b)) in Hbiz.
@@ -666,7 +669,7 @@ Theorem product_product_if_permut :
   rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ n σ f,
   is_permut n σ
   → (∀ i j, f i j = f j i)
@@ -676,7 +679,7 @@ Theorem product_product_if_permut :
     (∏ (i ∈ seq 0 n), (∏ (j ∈ seq 0 n),
         if i <? j then f i j else 1))%F.
 Proof.
-intros Hom Hic Hid Hin H10 Hed * (Hp, Hn) Hfij Hfijnz.
+intros Hom Hic Hid Hin H10 Heq * (Hp, Hn) Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
   intros i j Hi Hj.
   rewrite if_ltb_lt_dec.
@@ -1484,7 +1487,7 @@ Theorem signature_comp_fun_changement_of_variable :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_is_comm = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
@@ -1505,7 +1508,7 @@ Theorem signature_comp_fun_changement_of_variable :
          rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
-intros Hop Hin Hic Hde H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
+intros Hop Hin Hic Heq H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
 rewrite rngl_product_change_var with
     (g := ff_app (isort_rank Nat.leb g)) (h := ff_app g). 2: {
@@ -2604,14 +2607,16 @@ Qed.
 
 Theorem ε_when_dup :
   rngl_has_opp = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ la,
   ¬ NoDup la
   → ε la = 0%F.
 Proof.
-intros Hop Hde * Haa.
+intros Hop Heq * Haa.
 symmetry.
-destruct (rngl_eq_dec Hde (ε la) 0%F) as [Hez| Hez]; [ easy | exfalso ].
+remember (rngl_eqb (ε la) 0%F) as ez eqn:Hez; symmetry in Hez.
+destruct ez; [ now apply rngl_eqb_eq in Hez | exfalso ].
+apply (rngl_eqb_neq Heq) in Hez.
 apply Haa; clear Haa.
 apply nat_NoDup.
 intros i j Hi Hj Hij.
@@ -3040,10 +3045,10 @@ Qed.
 Theorem ε_1_opp_1_NoDup :
   rngl_has_opp = true →
   rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ σ, ε σ = 1%F ∨ ε σ = (-1)%F → NoDup σ.
 Proof.
-intros Hop H10 Hde * Hσ.
+intros Hop H10 Heq * Hσ.
 destruct (ListDec.NoDup_dec Nat.eq_dec σ) as [H1| H1]; [ easy | ].
 exfalso.
 apply ε_when_dup in H1; [ | easy | easy ].

@@ -314,10 +314,10 @@ Qed.
 
 Theorem det'_is_det'' :
   rngl_has_opp = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
-intros Hop Hde *.
+intros Hop Heq *.
 unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
@@ -478,12 +478,12 @@ Theorem det_is_det'' :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det'' M.
 Proof.
-intros Hic Hop Hiv H10 Hde * Hsm.
+intros Hic Hop Hiv H10 Heq * Hsm.
 rewrite <- det'_is_det''; [ | easy | easy ].
 now apply det_is_det'.
 Qed.

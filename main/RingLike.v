@@ -347,6 +347,24 @@ specialize rngl_opt_eqb_eq as H.
 now rewrite Heqb in H.
 Qed.
 
+Theorem rngl_eqb_neq :
+  rngl_has_eqb = true →
+  ∀ a b : T, rngl_eqb a b = false ↔ a ≠ b.
+Proof.
+intros Heqb *.
+split; intros Hab. {
+  intros H.
+  apply (rngl_eqb_eq Heqb) in H.
+  congruence.
+} {
+  remember (a =? b)%F as x eqn:Hx.
+  symmetry in Hx.
+  destruct x; [ | easy ].
+  exfalso; apply Hab.
+  now apply rngl_eqb_eq.
+}
+Qed.
+
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
 intros Hde *.
@@ -1393,7 +1411,7 @@ Definition in_charac_0_field :=
   rngl_has_inv = true ∧
   rngl_has_1_neq_0 = true ∧
   rngl_is_integral = true ∧
-  rngl_has_dec_eq = true ∧
+  rngl_has_eqb = true ∧
   rngl_characteristic = 0.
 
 End a.
