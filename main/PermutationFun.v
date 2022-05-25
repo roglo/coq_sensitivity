@@ -2450,7 +2450,6 @@ rewrite swap_d_inside.
 now apply permutation_transp_inside.
 Qed.
 
-(* to be completed *)
 Theorem iter_list_permut : ∀ A (eqb : A → _),
   equality eqb →
   ∀ T (d : T) (op : T → T → T) (l1 l2 : list A) f
