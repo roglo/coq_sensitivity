@@ -1290,12 +1290,6 @@ subst b.
 now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
-Theorem Nat_eqb_equality : equality Nat.eqb.
-Proof.
-intros a b.
-apply Nat.eqb_eq.
-Qed.
-
 (* *)
 
 Theorem option_eq_dec : ∀ A : Type,

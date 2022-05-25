@@ -389,9 +389,9 @@ rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   now apply Hg.
 }
 subst a.
-erewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+erewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
     (l1 := rev _); [ | easy | ]. 2: {
-  apply (permutation_rev_l Nat_eqb_equality).
+  apply (permutation_rev_l Nat.eqb_eq).
 }
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
 erewrite rngl_product_list_eq_compat. 2 :{
@@ -402,9 +402,9 @@ erewrite rngl_product_list_eq_compat. 2 :{
     apply in_seq in Hj.
     now apply Hg.
   }
-  erewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+  erewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
       (l1 := rev _); [ | easy | ]. 2: {
-    apply (permutation_rev_l Nat_eqb_equality).
+    apply (permutation_rev_l Nat.eqb_eq).
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -776,7 +776,7 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+rewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
     (l2 := seq 0 (length p)); cycle 1. {
   easy.
 } {
@@ -784,7 +784,7 @@ rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  rewrite (rngl_product_change_list Nat_eqb_equality) with
+  rewrite (rngl_product_change_list Nat.eqb_eq) with
     (lb := seq 0 (length p)); cycle 1. {
     easy.
   } {
@@ -1550,13 +1550,13 @@ erewrite rngl_product_list_eq_compat. 2: {
   intros j Hj.
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
-  erewrite (rngl_product_change_list Nat_eqb_equality); [ | easy | ]. 2: {
+  erewrite (rngl_product_change_list Nat.eqb_eq); [ | easy | ]. 2: {
     now apply permut_list_permutation_iff.
   }
   easy.
 }
 cbn - [ "<?" ].
-erewrite (rngl_product_change_list Nat_eqb_equality); [ | easy | ]. 2: {
+erewrite (rngl_product_change_list Nat.eqb_eq); [ | easy | ]. 2: {
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
   now apply permut_list_permutation_iff.
@@ -2349,15 +2349,15 @@ Theorem permut_isort : ∀ ord,
   → isort ord (l ° p) = isort ord (l ° q).
 Proof.
 intros * Hant Htr Htot * Hp Hq.
-apply (isort_when_permuted Nat_eqb_equality); [ easy | easy | easy | ].
+apply (isort_when_permuted Nat.eqb_eq); [ easy | easy | easy | ].
 unfold "°".
-apply (permutation_map Nat_eqb_equality Nat_eqb_equality).
-apply (permutation_trans Nat_eqb_equality) with (lb := seq 0 n). {
+apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
   destruct Hp as (Hp1, Hp2); rewrite <- Hp2.
   now apply permut_list_permutation_iff.
 } {
   destruct Hq as (Hq1, Hq2); rewrite <- Hq2.
-  apply (permutation_sym Nat_eqb_equality).
+  apply (permutation_sym Nat.eqb_eq).
   now apply permut_list_permutation_iff.
 }
 Qed.
@@ -2859,7 +2859,7 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" seq ].
-  rewrite (rngl_product_change_list Nat_eqb_equality) with
+  rewrite (rngl_product_change_list Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     destruct Hp'p as (Hp'a, Hp'n).
     rewrite <- Hp'l at 1.

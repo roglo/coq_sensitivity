@@ -204,7 +204,7 @@ split. {
   specialize (H1 H); clear H.
   destruct H1 as (bef & aft & Hla).
   rewrite Hla, seq_S; cbn.
-  apply (permutation_elt Nat_eqb_equality).
+  apply (permutation_elt Nat.eqb_eq).
   rewrite app_nil_r.
   assert (Hba : length (bef ++ aft) = len). {
     apply (f_equal length) in Hla.
@@ -244,11 +244,11 @@ split. {
   rewrite seq_S in Hpab.
   cbn in Hpab.
   assert (H : permutation Nat.eqb (len :: seq 0 len) la). {
-    eapply (permutation_trans Nat_eqb_equality). 2: {
-      apply (permutation_sym Nat_eqb_equality).
+    eapply (permutation_trans Nat.eqb_eq). 2: {
+      apply (permutation_sym Nat.eqb_eq).
       apply Hpab.
     }
-    apply (permutation_cons_append Nat_eqb_equality).
+    apply (permutation_cons_append Nat.eqb_eq).
   }
   clear Hpab; rename H into Hpab.
   apply permutation_cons_l_iff in Hpab.
@@ -260,7 +260,7 @@ split. {
   rewrite app_length in Hlen; cbn in Hlen.
   rewrite Nat.add_succ_r in Hlen; apply Nat.succ_inj in Hlen.
   rewrite <- app_length in Hlen.
-  apply (permutation_sym Nat_eqb_equality) in Hpab.
+  apply (permutation_sym Nat.eqb_eq) in Hpab.
   specialize (IHlen (bef ++ aft) Hlen Hpab) as H1.
   destruct H1 as (H1, H2).
   split. {
@@ -643,10 +643,10 @@ Proof.
 intros * Hpab Ha.
 apply permut_list_permutation_iff in Ha.
 apply permut_list_permutation_iff.
-eapply (permutation_trans Nat_eqb_equality). {
-  apply (permutation_sym Nat_eqb_equality), Hpab.
+eapply (permutation_trans Nat.eqb_eq). {
+  apply (permutation_sym Nat.eqb_eq), Hpab.
 }
-now rewrite (permutation_length Nat_eqb_equality Hpab) in Ha.
+now rewrite (permutation_length Nat.eqb_eq Hpab) in Ha.
 Qed.
 
 (* *)
@@ -770,14 +770,14 @@ Theorem permut_isort_leb : ∀ l,
 Proof.
 intros * Hp.
 specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
-specialize (permuted_isort Nat.leb Nat_eqb_equality l) as Hps.
+specialize (permuted_isort Nat.leb Nat.eqb_eq l) as Hps.
 remember (isort Nat.leb l) as l'; clear Heql'.
 specialize permutation_permut as Hpl'.
 specialize (Hpl' l l' Hps Hp).
 move l' before l; move Hpl' before Hp.
 replace (length l) with (length l'). 2: {
-  apply (permutation_length Nat_eqb_equality).
-  now apply (permutation_sym Nat_eqb_equality).
+  apply (permutation_length Nat.eqb_eq).
+  now apply (permutation_sym Nat.eqb_eq).
 }
 clear l Hp Hps.
 rename l' into l.
@@ -1096,11 +1096,11 @@ symmetry in Hx, Hy.
 destruct x as [x| ]. {
   apply (List_rank_Some []) in Hx.
   destruct Hx as (Hxs & Hbefx & Hx).
-  apply (list_eqb_eq Nat_eqb_equality) in Hx.
+  apply (list_eqb_eq Nat.eqb_eq) in Hx.
   destruct y as [y| ]. {
     apply (List_rank_Some []) in Hy.
     destruct Hy as (Hys & Hbefy & Hy).
-    apply (list_eqb_eq Nat_eqb_equality) in Hy.
+    apply (list_eqb_eq Nat.eqb_eq) in Hy.
     congruence.
   }
   specialize (List_rank_None [] _ _ Hy) as H1; cbn.
@@ -1109,7 +1109,7 @@ destruct x as [x| ]. {
   apply In_nth with (d := []) in H2.
   destruct H2 as (k & Hk & Hkb).
   specialize (H1 k Hk).
-  apply (list_eqb_neq Nat_eqb_equality) in H1.
+  apply (list_eqb_neq Nat.eqb_eq) in H1.
   now symmetry in Hkb.
 }
 specialize (List_rank_None [] _ _ Hx) as H1; cbn.
@@ -1118,7 +1118,7 @@ specialize (Hsg_surj la Hna) as H2.
 apply In_nth with (d := []) in H2.
 destruct H2 as (k & Hk & Hka).
 specialize (H1 k Hk).
-apply (list_eqb_neq Nat_eqb_equality) in H1.
+apply (list_eqb_neq Nat.eqb_eq) in H1.
 now symmetry in Hka.
 Qed.
 
@@ -1179,14 +1179,14 @@ remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   apply List_rank_Some with (d := []) in Hi.
   destruct Hi as (His & Hji & Hi).
-  now apply (list_eqb_eq Nat_eqb_equality) in Hi.
+  now apply (list_eqb_eq Nat.eqb_eq) in Hi.
 }
 assert (H : l ∉ sg). {
   intros H.
   apply In_nth with (d := []) in H.
   destruct H as (j & Hj & Hjv).
   specialize (List_rank_None [] _ _ Hi Hj) as H.
-  apply (list_eqb_neq Nat_eqb_equality) in H.
+  apply (list_eqb_neq Nat.eqb_eq) in H.
   now symmetry in Hjv.
 }
 exfalso; apply H; clear H.
@@ -1205,7 +1205,7 @@ remember (List_rank _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
   apply List_rank_Some with (d := []) in Hj.
   destruct Hj as (His & Hji & Hj).
-  apply (list_eqb_eq Nat_eqb_equality) in Hj.
+  apply (list_eqb_eq Nat.eqb_eq) in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   assert (Hjs : j < length sg). {
     destruct (lt_dec j (length sg)) as [Hjs| Hjs]; [ easy | exfalso ].
@@ -1218,7 +1218,7 @@ destruct j as [j| ]. {
   now apply Hinj.
 }
 specialize (List_rank_None [] _ _ Hj Hi) as H1.
-now apply (list_eqb_neq Nat_eqb_equality) in H1.
+now apply (list_eqb_neq Nat.eqb_eq) in H1.
 Qed.
 
 Theorem length_of_empty_sym_gr : ∀ sg,

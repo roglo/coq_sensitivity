@@ -1097,7 +1097,7 @@ destruct lxl as [((bef, x), aft)| ]; [ easy | clear Hx ].
 specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
 specialize (H1 i).
 assert (H : i ∈ f). {
-  apply (permutation_in_iff Nat_eqb_equality Hp).
+  apply (permutation_in_iff Nat.eqb_eq Hp).
   now apply in_seq.
 }
 specialize (H1 H); clear H.
@@ -1697,7 +1697,7 @@ replace (length la - length bef) with (length aft). 2: {
   flia Hpab.
 }
 remember (length bef) as i eqn:Hi.
-apply (permutation_elt Nat_eqb_equality []); cbn.
+apply (permutation_elt Nat.eqb_eq []); cbn.
 rewrite (permutation_assoc_loop_None_inside Heqb).
 rewrite <- Hi.
 set (f := λ j, if j <? i then j else S j).
@@ -1769,7 +1769,7 @@ replace (seq 0 i ++ seq (S i) (length aft)) with
   rewrite Nat.add_succ_r; cbn.
   now rewrite Nat.add_comm, Nat.add_sub.
 }
-apply (permutation_map Nat_eqb_equality Nat_eqb_equality).
+apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
 replace (i + length aft) with (length la). 2: {
   rewrite (permutation_length Heqb Hpab).
   rewrite app_length.
@@ -1853,7 +1853,7 @@ split. {
     destruct lxl as [((bef, x), aft)| ]. 2: {
       specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
       specialize (permutation_permutation_assoc Heqb Hpab) as H2.
-      specialize (permutation_in_iff Nat_eqb_equality H2) as H3.
+      specialize (permutation_in_iff Nat.eqb_eq H2) as H3.
       specialize (proj2 (H3 i)) as H4.
       fold n in H4.
       assert (H : i ∈ seq 0 n) by now apply in_seq.
@@ -1868,7 +1868,7 @@ split. {
     destruct lxl as [((bef', x), aft')| ]. 2: {
       specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
       specialize (permutation_permutation_assoc Heqb Hpab) as H2.
-      specialize (permutation_in_iff Nat_eqb_equality H2) as H3.
+      specialize (permutation_in_iff Nat.eqb_eq H2) as H3.
       specialize (proj2 (H3 j)) as H4.
       fold n in H4.
       assert (H : j ∈ seq 0 n) by now apply in_seq.

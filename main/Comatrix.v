@@ -1116,9 +1116,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-apply rngl_summation_list_permut with (eqb := Nat.eqb). {
-  apply Nat_eqb_equality.
-}
+apply (rngl_summation_list_permut _ _ Nat.eqb_eq).
 rewrite Nat.sub_0_r.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
@@ -1189,7 +1187,7 @@ Theorem rngl_product_map_permut :
 Proof.
 intros Hic * Hσ.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite (rngl_product_list_permut _ _ Nat_eqb_equality) with
+rewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
     (l2 := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
@@ -1434,7 +1432,7 @@ split. {
   apply (nth_canon_sym_gr_list_inj2 n); [ easy | easy | ].
   intros k Hk.
   apply H1.
-  apply (permutation_in_iff Nat_eqb_equality) with (lb := seq 0 n). 2: {
+  apply (permutation_in_iff Nat.eqb_eq) with (lb := seq 0 n). 2: {
     clear - Hk.
     induction n; intros; [ easy | ].
     rewrite seq_S; cbn.
