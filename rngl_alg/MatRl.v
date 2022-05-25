@@ -120,20 +120,19 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_opt_inv := None;
      rngl_opt_sous := None;
      rngl_opt_quot := None;
-(*
+(**)
      rngl_opt_eqb :=
        match rngl_opt_eqb with
        | Some eqb => Some (square_matrix_eqb eqb)
        | None => None
        end;
-*)
+(*
      rngl_opt_eqb := None;
-(**)
+*)
      rngl_le := phony_mat_le |}.
 
-(**)
-Canonical Structure mat_ring_like_op.
 (*
+Canonical Structure mat_ring_like_op.
 says:
 Warning: Projection value has no head constant:
 match rngl_opt_eqb with
@@ -687,15 +686,26 @@ intros j Hj.
 now apply rngl_mul_0_l; left.
 Qed.
 
-(*
-Theorem squ_mat_opt_eqb_eq {n} : ∀ (a b : square_matrix n T),
-  match @rngl_opt_eqb T ro with
-  | Some eqb => (∀ a b, (a =? b)%F = true ↔ a = b)
-  | None => not_applicable
-  end.
+(* to be completed
+Theorem squ_mat_opt_eqb_eq {n} :
+  if rngl_has_eqb then ∀ a b : square_matrix n T, (a =? b)%F = true ↔ a = b
+  else not_applicable.
 Proof.
-intros.
+remember rngl_has_eqb as heq eqn:Heq.
+symmetry in Heq.
+destruct heq; [ | easy ].
+intros A B.
 split; intros Hab. {
+  apply square_matrix_eq.
+  specialize (@rngl_eqb_eq T ro rp Heq) as H1.
+  apply (mat_eqb_eq H1).
+  unfold "=?"%F in Hab.
+  remember rngl_opt_eqb as c eqn:Hc; symmetry in Hc.
+  destruct c as [eqb| ]; [ | easy ].
+...
+  Check mat_eqb_eq.
+...
+  apply rngl_eqb_eq.
   apply (@rngl_eqb_eq (square_matrix n T)).
 ...
 *)
@@ -716,7 +726,7 @@ Qed.
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
-     rngl_has_eqb := false; (* true? *)
+     rngl_has_eqb := false; (* rngl_has_eqb to be completed *)
      rngl_has_dec_eq := @rngl_has_dec_eq T ro rp;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
@@ -742,7 +752,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_quot_l := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := NA;
+     rngl_opt_eqb_eq := NA; (* squ_mat_opt_eqb_eq to be completed *)
      rngl_opt_eq_dec := squ_mat_opt_eq_dec;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;

@@ -21,6 +21,11 @@ Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth j (nth i (mat_list_list M) []) 0%F.
 
+(* *)
+
+Definition mat_eqb {T} (eqb : T → T → bool) (A B : matrix T) :=
+  list_eqb (list_eqb eqb) (mat_list_list A) (mat_list_list B).
+
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
 
@@ -35,8 +40,41 @@ Definition is_square_matrix {T} (M : matrix T) :=
   ((mat_ncols M ≠? 0) || (mat_nrows M =? 0)) &&
   (⋀ (l ∈ mat_list_list M), (length l =? mat_nrows M)).
 
-Definition mat_eqb {T} (eqb : T → T → bool) (A B : matrix T) :=
-  list_eqb (list_eqb eqb) (mat_list_list A) (mat_list_list B).
+(* mat_eqb is an equality *)
+
+Theorem mat_eqb_eq : ∀ T (eqb : T → T → bool),
+  equality eqb →
+  ∀ (A B : matrix T),
+  mat_eqb eqb A B = true ↔ A = B.
+Proof.
+intros * Heqb *.
+split; intros Hab. {
+  unfold mat_eqb in Hab.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in Hab; f_equal.
+  specialize (list_eqb_eq) as H1.
+  specialize (H1 (list T) (list_eqb eqb)).
+  apply H1; [ | easy ].
+  intros la lb.
+  specialize (list_eqb_eq Heqb la lb) as H2.
+  split; [ apply H2 | ].
+  intros; subst lb.
+  clear - Heqb.
+  induction la as [| a]; [ easy | cbn ].
+  now rewrite (equality_refl Heqb).
+} {
+  subst B.
+  destruct A as (ll); cbn.
+  induction ll as [| la]; [ easy | cbn ].
+  remember (list_eqb eqb la la) as b eqn:Hb; symmetry in Hb.
+  destruct b; [ easy | ].
+  exfalso; apply Bool.not_true_iff_false in Hb; apply Hb.
+  clear - Heqb.
+  induction la as [| a]; [ easy | cbn ].
+  now rewrite (equality_refl Heqb).
+}
+Qed.
 
 (* is_correct_matrix (a bool) easier to use with Prop *)
 
