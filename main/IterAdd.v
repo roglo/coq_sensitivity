@@ -2,7 +2,7 @@
 
 Set Nested Proofs Allowed.
 
-Require Import Utf8 Arith Permutation.
+Require Import Utf8 Arith.
 Import List List.ListNotations.
 
 Require Import Misc RingLike PermutationFun.
@@ -698,52 +698,6 @@ rewrite Hgh; [ easy | ].
 flia Hi.
 Qed.
 
-Theorem rngl_summation_permut : ∀ n l1 l2,
-  Permutation l1 l2
-  → length l1 = n
-  → length l2 = n
-  → ∑ (i = 0, n - 1), nth i l1 0 = ∑ (i = 0, n - 1), nth i l2 0.
-Proof.
-intros * Hl H1 H2.
-destruct n. {
-  apply length_zero_iff_nil in H1.
-  apply length_zero_iff_nil in H2.
-  now subst l1 l2.
-}
-rewrite Nat_sub_succ_1.
-revert n H1 H2.
-induction Hl; intros; [ easy | | | ]. {
-  cbn in H1, H2.
-  apply Nat.succ_inj in H1.
-  apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy ].
-  rewrite rngl_summation_split_first; [ symmetry | easy ].
-  destruct n; [ easy | ].
-  do 2 rewrite rngl_summation_succ_succ.
-  now rewrite IHHl.
-} {
-  destruct n; [ easy | ].
-  cbn in H1, H2.
-  do 2 apply Nat.succ_inj in H1.
-  do 2 apply Nat.succ_inj in H2.
-  rewrite rngl_summation_split_first; [ symmetry | easy ].
-  rewrite rngl_summation_split_first; [ symmetry | easy ].
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
-  rewrite rngl_summation_split_first; [ symmetry | flia ].
-  do 2 rewrite rngl_add_assoc.
-  do 2 rewrite rngl_summation_succ_succ.
-  f_equal; [ apply rngl_add_comm | ].
-  apply rngl_summation_eq_compat.
-  intros i Hi; cbn.
-  destruct i; [ flia Hi | easy ].
-} {
-  specialize (Permutation_length Hl2) as H3.
-  rewrite H2 in H3.
-  rewrite IHHl1; [ | easy | easy ].
-  now rewrite IHHl2.
-}
-Qed.
-
 Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
   fold_left (λ c i, c + f i) l a =
   a + fold_left (λ c i, c + f i) l 0.
@@ -799,7 +753,6 @@ Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_map_seq {T ro rp} A%type (start len)%nat.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
-Arguments rngl_summation_permut {T}%type {ro rp} n%nat (l1 l2)%list.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
 Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
 Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
