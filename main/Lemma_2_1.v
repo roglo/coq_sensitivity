@@ -15,7 +15,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import Init.Nat List List.ListNotations.
-Require Import Permutation Sorted.
+Require Import Sorted.
 
 Require Import Misc MyVector Matrix Determinant Comatrix.
 Require Import RingLike.
