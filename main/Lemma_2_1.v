@@ -98,7 +98,7 @@ Qed.
 Definition in_ordered_field :=
   rngl_is_comm = true ∧
   rngl_has_opp = true ∧
-  rngl_has_dec_eq = true ∧
+  rngl_has_eqb = true ∧
   rngl_has_dec_le = true ∧
   rngl_is_integral = true ∧
   rngl_has_inv = true ∧
@@ -204,8 +204,8 @@ Theorem RQ_mul_scal_prop :
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
-destruct Hof as (Hic & Hop & Hed & Hld & Hdo & Hin & Hor).
-destruct (vect_eq_dec Hed V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
+destruct Hof as (Hic & Hop & Heq & Hld & Hdo & Hin & Hor).
+destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
   subst V; cbn.
   now apply Rayleigh_quotient_mul_scal_l_zero; left.
 }

@@ -365,6 +365,7 @@ split; intros Hab. {
 }
 Qed.
 
+(**)
 Theorem rngl_eq_dec : rngl_has_dec_eq = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
 intros Hde *.
@@ -372,6 +373,15 @@ specialize rngl_opt_eq_dec as H.
 rewrite Hde in H.
 apply H.
 Qed.
+
+(*
+Theorem rngl_eq_dec : rngl_has_eqb = true → ∀ a b : T, {a = b} + {a ≠ b}.
+Proof.
+intros Heq *.
+remember (rngl_eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now left; apply rngl_eqb_eq | now right; apply rngl_eqb_neq ].
+Qed.
+*)
 
 Theorem rngl_le_dec :
   rngl_has_dec_le = true →

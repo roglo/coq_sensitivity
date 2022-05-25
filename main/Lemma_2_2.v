@@ -1526,7 +1526,7 @@ Theorem An_eigen_equation_for_sqrt_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ n μ, (μ * μ)%F = rngl_of_nat n →
   match n with
   | 0 => ∀ V, vect_size V = 1 → (mA 0 • V = μ × V)%V
@@ -1537,12 +1537,14 @@ Theorem An_eigen_equation_for_sqrt_n :
       → (mA (S n') • V = μ × V)%V
   end.
 Proof.
-intros Hic Hro Hin Hde * Hμ.
+intros Hic Hro Hin Heq * Hμ.
 destruct n. {
   intros V Hv.
   cbn in Hμ, V |-*.
   assert (H : μ = 0%F). {
-    destruct (rngl_eq_dec Hde μ 0%F) as [Hμz| Hμz]; [ easy | ].
+    remember (rngl_eqb μ 0%F) as μz eqn:Hμz; symmetry in Hμz.
+    destruct μz; [ now apply rngl_eqb_eq | ].
+    apply rngl_eqb_neq in Hμz; [ | easy ].
     apply (f_equal (rngl_mul (μ⁻¹)%F)) in Hμ.
     rewrite rngl_mul_0_r in Hμ; [ | now left ].
     rewrite rngl_mul_assoc in Hμ.
@@ -1716,7 +1718,7 @@ Qed.
 Theorem A_n_eigenvalue_squared_is_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n μ (V : vector T),
   vect_size V = 2 ^ n
@@ -1724,7 +1726,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros Hic Hro Hed Hin * Hvs Hvr Hav.
+intros Hic Hro Heq Hin * Hvs Hvr Hav.
 specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
 specialize (mA_is_correct n) as Hac.
 specialize (mI_is_correct_matrix (2 ^ n)) as Hicm.
@@ -1759,7 +1761,7 @@ Definition is_eigenvector_of_An n μ (V : vector T) :=
 Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ n μ,

@@ -157,18 +157,20 @@ Qed.
 
 Theorem vect_mul_scal_reg_r :
   rngl_has_inv = true ∨ rngl_has_quot = true →
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ (V : vector T) a b,
   V ≠ vect_zero (vect_size V)
   → (a × V = b × V)%V
   → a = b.
 Proof.
-intros Hii Hde * Hvz Hab.
-unfold vect_mul_scal_l in Hab.
-injection Hab; clear Hab; intros Hab.
-specialize (ext_in_map Hab) as H1.
+intros Hii Heq * Hvz Habv.
+unfold vect_mul_scal_l in Habv.
+injection Habv; clear Habv; intros Habv.
+specialize (ext_in_map Habv) as H1.
 cbn in H1.
-destruct (rngl_eq_dec Hde a b) as [Haeb| Haeb]; [ easy | ].
+remember (rngl_eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ now apply rngl_eqb_eq | ].
+apply (rngl_eqb_neq Heq) in Hab.
 exfalso; apply Hvz; clear Hvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
 intros i Hi; cbn.
@@ -176,7 +178,9 @@ rewrite nth_repeat.
 specialize (H1 (nth i (vect_list V) 0%F)) as H2.
 assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
 specialize (H2 H); clear H.
-destruct (rngl_eq_dec Hde (vect_el V i) 0%F) as [Hvi| Hvi]; [ easy | ].
+remember (rngl_eqb (vect_el V i) 0%F) as vz eqn:Hvz; symmetry in Hvz.
+destruct vz; [ now apply rngl_eqb_eq | ].
+apply (rngl_eqb_neq Heq) in Hvz.
 now apply rngl_mul_cancel_r in H2.
 Qed.
 
@@ -225,17 +229,27 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem vect_eq_dec :
-  rngl_has_dec_eq = true →
+  rngl_has_eqb = true →
   ∀ (U V : vector T), {U = V} + {U ≠ V}.
 Proof.
-intros Hde *.
+intros Heq *.
 destruct U as (lu).
 destruct V as (lv).
-destruct (list_eq_dec (rngl_eq_dec Hde) lu lv) as [Huv| Huv]. {
-  now left; subst.
+remember (list_eqb rngl_eqb lu lv) as uv eqn:Huv.
+symmetry in Huv.
+destruct uv. {
+  left; f_equal.
+  apply list_eqb_eq in Huv; [ easy | ].
+  unfold equality.
+  apply (rngl_eqb_eq Heq).
 } {
-  right; intros H; apply Huv; clear Huv.
-  now injection H.
+  right; f_equal.
+  apply list_eqb_neq in Huv. {
+    intros H; apply Huv; clear Huv.
+    now injection H.
+  }
+  unfold equality.
+  apply (rngl_eqb_eq Heq).
 }
 Qed.
 
