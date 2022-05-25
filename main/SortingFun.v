@@ -3502,72 +3502,6 @@ Require Import Permutation.
 
 (* *)
 
-Theorem Permutation_merge_loop_aux : ∀ A (rel : A → _) it la lb lc,
-  length la + length lc ≤ it
-  → Permutation (la ++ lb ++ lc) (lb ++ merge_loop rel it la lc).
-Proof.
-intros * Hit.
-revert la lb lc Hit.
-induction it as (it, IHit) using lt_wf_rec; intros.
-destruct it. {
-  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
-  destruct Hit as (H1, H2).
-  apply length_zero_iff_nil in H1, H2; subst la lc.
-  now cbn; rewrite app_nil_r.
-}
-destruct la as [| a]; [ easy | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit; cbn.
-destruct lc as [| b]. {
-  rewrite app_nil_r.
-  rewrite app_comm_cons.
-  apply Permutation_app_comm.
-}
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  eapply Permutation_trans. 2: {
-    apply Permutation_app_comm.
-  }
-  cbn.
-  apply perm_skip.
-  eapply Permutation_trans. {
-    apply IHit; [ | apply Hit ]; easy.
-  }
-  apply Permutation_app_comm.
-}
-eapply Permutation_trans. 2: {
-  apply Permutation_app_comm.
-}
-cbn.
-rewrite List_cons_is_app.
-do 2 rewrite app_assoc.
-eapply Permutation_trans. {
-  apply Permutation_app_comm.
-}
-cbn.
-apply perm_skip.
-eapply Permutation_trans. 2: {
-  apply Permutation_app_comm.
-}
-rewrite List_app_cons.
-eapply Permutation_trans. {
-  apply Permutation_app_comm.
-}
-cbn.
-do 2 rewrite app_comm_cons.
-rewrite <- app_assoc.
-cbn in Hit.
-rewrite Nat.add_succ_r in Hit.
-now apply IHit.
-Qed.
-
-Theorem Permutation_merge_loop : ∀ A (rel : A → _) it la lb,
-  length la + length lb ≤ it
-  → Permutation (la ++ lb) (merge_loop rel it la lb).
-Proof.
-intros * Hit.
-apply (Permutation_merge_loop_aux rel la [] lb Hit).
-Qed.
-
 Theorem split_list_Permutation : ∀ A (l la lb : list A),
   split_list l = (la, lb)
   → Permutation l (la ++ lb).
@@ -3603,25 +3537,6 @@ eapply Permutation_trans. 2: {
 }
 apply (IHlen len); [ | easy | easy ].
 now transitivity (S len).
-Qed.
-
-Theorem Permutation_split_list_merge_loop :
-  ∀ A (rel : A → _) it l la lb,
-  length la + length lb ≤ it
-  → split_list l = (la, lb)
-  → Permutation l (merge_loop rel it la lb).
-Proof.
-intros * Hit Hll.
-eapply Permutation_trans; [ | now apply Permutation_merge_loop ].
-now apply split_list_Permutation.
-Qed.
-
-Theorem Permutation_merge : ∀ A (rel : A → _) l la lb,
-  split_list l = (la, lb)
-  → Permutation l (merge rel la lb).
-Proof.
-intros * Hll.
-now apply Permutation_split_list_merge_loop.
 Qed.
 
 Theorem Permutation_app_split_list_inv : ∀ A (la lb : list A),
@@ -3695,36 +3610,6 @@ rewrite app_assoc.
 eapply Permutation_trans; [ apply Permutation_app_split_list_inv | ].
 apply Permutation_sym.
 now apply IHla.
-Qed.
-
-Theorem Permutation_msort_loop : ∀ A (rel : A → _) it l,
-  Permutation l (msort_loop rel it l).
-Proof.
-intros.
-revert l.
-induction it; intros; [ easy | cbn ].
-remember (split_list l) as la eqn:Hla; symmetry in Hla.
-destruct la as (la, lb).
-remember (msort_loop rel it la) as lc eqn:Hlc.
-remember (msort_loop rel it lb) as ld eqn:Hld.
-remember (split_list_inv lc ld) as l' eqn:Hl'.
-apply Permutation_trans with (l' := l'). 2: {
-  apply Permutation_merge.
-  subst l'.
-  rewrite split_list_split_list_inv; [ easy | ].
-  apply split_list_lengths in Hla.
-  apply (f_equal length) in Hlc, Hld.
-  rewrite msort_loop_length in Hlc, Hld.
-  now rewrite Hlc, Hld.
-}
-subst l' lc ld.
-apply Permutation_trans with (l' := la ++ lb). {
-  now apply split_list_Permutation.
-}
-apply Permutation_trans with (l' := split_list_inv la lb). {
-  now apply Permutation_app_split_list_inv.
-}
-apply Permutation_split_list_inv_split_list_inv; apply IHit.
 Qed.
 
 Theorem isort_insert_insert_sym : ∀ A (rel : A → _),
@@ -3837,14 +3722,6 @@ subst ls.
 rewrite isort_insert_insert_sym in H1; [ | easy | easy | easy ].
 rewrite H1.
 now rewrite isort_loop_insert_middle.
-Qed.
-
-(* *)
-
-Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
-Proof.
-intros.
-apply Permutation_msort_loop.
 Qed.
 
 (* *)
