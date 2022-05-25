@@ -1,5 +1,5 @@
-FermatLittle.vio: FermatLittle.v ../main/Misc.vio Misc.vio
-FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo Misc.vo
+FermatLittle.vio: FermatLittle.v ../main/Misc.vio ../main/PermutationFun.vio Misc.vio
+FermatLittle.vo FermatLittle.glob FermatLittle.v.beautified FermatLittle.required_vo: FermatLittle.v ../main/Misc.vo ../main/PermutationFun.vo Misc.vo
 GQ.vio: GQ.v ../main/Misc.vio PQ.vio Nat_ggcd.vio
 GQ.vo GQ.glob GQ.v.beautified GQ.required_vo: GQ.v ../main/Misc.vo PQ.vo Nat_ggcd.vo
 GaussIntRl.vio: GaussIntRl.v ../main/RingLike.vio

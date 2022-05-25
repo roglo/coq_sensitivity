@@ -1005,6 +1005,18 @@ f_equal; symmetry.
 now apply Heqb.
 Qed.
 
+(* to be completed
+Theorem NoDup_permutation_bis : ∀ A (eqb : A → _),
+  ∀ la lb,
+  NoDup la
+  → length lb ≤ length la
+  → incl la lb
+  → permutation eqb la lb.
+Proof.
+intros * Hnd Hll.
+...
+*)
+
 Theorem permutation_map : ∀ A B (eqba : A → _) (eqbb : B → _),
   equality eqba →
   equality eqbb →
