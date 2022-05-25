@@ -3498,8 +3498,6 @@ Qed.
 
 (* *)
 
-Require Import Permutation.
-
 Theorem isort_insert_insert_sym : ∀ A (rel : A → _),
   antisymmetric rel
   → transitive rel
@@ -3568,75 +3566,6 @@ revert a ls lb.
 induction la as [| b]; intros; [ easy | cbn ].
 rewrite IHla.
 now rewrite isort_insert_insert_sym.
-Qed.
-
-Theorem Permutation_isort_loop' : ∀ A (rel : A → _),
-  antisymmetric rel
-  → transitive rel
-  → total_relation rel
-  → ∀ la lb lsorted a,
-  Permutation la lb
-  → isort_loop rel lsorted la = isort_loop rel lsorted lb
-  → isort_loop rel (isort_insert rel a lsorted) la =
-    isort_loop rel (isort_insert rel a lsorted) lb.
-Proof.
-intros * Hant Htr Hto * Hab Hsab.
-remember (length la) as n eqn:Hn; symmetry in Hn.
-revert la lb lsorted a Hab Hsab Hn.
-induction n; intros; cbn. {
-  apply length_zero_iff_nil in Hn; subst la.
-  apply Permutation_nil in Hab; subst lb.
-  easy.
-}
-destruct la as [| b]; [ easy | ].
-move b after a.
-cbn in Hn.
-apply Nat.succ_inj in Hn.
-specialize Permutation_in as H1.
-specialize (H1 _ (b :: la) lb b Hab (or_introl eq_refl)).
-apply in_split in H1.
-destruct H1 as (lb1 & lb2 & Hlb).
-subst lb.
-apply Permutation_cons_app_inv in Hab.
-cbn in Hsab |-*.
-remember (isort_insert rel b lsorted) as ls eqn:Hls.
-specialize (IHn _ _ ls a Hab) as H1.
-assert (H : isort_loop rel ls la = isort_loop rel ls (lb1 ++ lb2)). {
-  rewrite Hsab, Hls.
-  now apply isort_loop_insert_middle.
-}
-specialize (H1 H Hn); clear H.
-subst ls.
-rewrite isort_insert_insert_sym in H1; [ | easy | easy | easy ].
-rewrite H1.
-now rewrite isort_loop_insert_middle.
-Qed.
-
-(* *)
-
-Theorem Permutation_isort' : ∀ A (rel : A → _),
-  antisymmetric rel
-  → transitive rel
-  → total_relation rel
-  → ∀ la lb,
-  Permutation la lb
-  → isort rel la = isort rel lb.
-Proof.
-intros * Hant Htr Htot * Hab.
-induction Hab as [| a la lb | a b la | ]; [ easy | | | congruence ]. {
-  now apply Permutation_isort_loop'.
-} {
-  cbn.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ab, ba; [ | easy | easy | ]. {
-    specialize (Hant _ _ Hab Hba).
-    now subst b.
-  } {
-    specialize (Htot a b).
-    now rewrite Hab, Hba in Htot.
-  }
-}
 Qed.
 
 (* isort and ssort return same *)
