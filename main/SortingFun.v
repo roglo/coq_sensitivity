@@ -3500,91 +3500,6 @@ Qed.
 
 Require Import Permutation.
 
-(* unicity of sorting algorithm *)
-
-Theorem Permuted_sorted_unique : ∀ A (rel : A → A → bool),
-  reflexive rel →
-  antisymmetric rel →
-  transitive rel →
-  ∀ la lb,
-  Permutation la lb
-  → sorted rel la
-  → sorted rel lb
-  → la = lb.
-Proof.
-intros * Hrefl Hant Htra * Hpab Hsa Hsb.
-revert lb Hpab Hsb.
-induction la as [| a]; intros; [ now apply Permutation_nil in Hpab | ].
-destruct lb as [| b]; intros. {
-  now apply Permutation_sym, Permutation_nil in Hpab.
-}
-move b before a; move lb before la; move Hsb before Hsa.
-apply (sorted_strongly_sorted Htra) in Hsa, Hsb.
-cbn in Hsa, Hsb.
-apply Bool.andb_true_iff in Hsa, Hsb.
-destruct Hsa as (Hla, Hsa).
-destruct Hsb as (Hlb, Hsb).
-move Hlb before Hla.
-assert (Hab : a = b). {
-  apply Hant. {
-    apply all_sorted_forall with (l := a :: la). 2: {
-      apply Permutation_in with (l := b :: lb); [ | now left ].
-      now apply Permutation_sym.
-    }
-    now cbn; rewrite Hrefl, Hla.
-  } {
-    apply all_sorted_forall with (l := b :: lb). 2: {
-      apply Permutation_in with (l := a :: la); [ | now left ].
-      easy.
-    }
-    now cbn; rewrite Hrefl, Hlb.
-  }
-}
-subst b; f_equal.
-apply Permutation_cons_inv in Hpab.
-apply IHla; [ | easy | ]. {
-  now apply strongly_sorted_sorted.
-} {
-  now apply strongly_sorted_sorted.
-}
-Qed.
-
-Theorem sorted_unique' : ∀ A (rel : A → A → bool),
-  reflexive rel →
-  antisymmetric rel →
-  transitive rel →
-  ∀ (s1 s2 : list A → _),
-  (∀ l, Permutation (s1 l) l ∧ sorted rel (s1 l))
-  → (∀ l, Permutation (s2 l) l ∧ sorted rel (s2 l))
-  → ∀ l, s1 l = s2 l.
-Proof.
-intros * Href Hant Htra * Hps1 Hps2 l.
-apply (Permuted_sorted_unique Href Hant Htra); [ | apply Hps1 | apply Hps2 ].
-specialize (Hps1 l) as H1.
-specialize (Hps2 l) as H2.
-transitivity l; [ easy | ].
-now apply Permutation_sym.
-Qed.
-
-(* *)
-
-Theorem Permutation_bsort_loop : ∀ A (rel : A → _),
-  ∀ la it, Permutation la (bsort_loop rel it la).
-Proof.
-intros.
-revert la.
-induction it; intros; [ easy | cbn ].
-remember (bsort_swap rel la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [lb| ]; [ | easy ].
-apply bsort_swap_Some in Hlb.
-destruct Hlb as (Hs & c & d & lc & ld & Hlb).
-destruct Hlb as (Hcd & Hrc & Hbla & Hlbc).
-transitivity lb; [ | apply IHit ].
-subst la lb.
-apply Permutation_app_head.
-constructor.
-Qed.
-
 (* *)
 
 Theorem Permutation_merge_loop_aux : ∀ A (rel : A → _) it la lb lc,
@@ -3925,12 +3840,6 @@ now rewrite isort_loop_insert_middle.
 Qed.
 
 (* *)
-
-Theorem Permutation_bsort : ∀ A (rel : A → _) l, Permutation l (bsort rel l).
-Proof.
-intros.
-apply Permutation_bsort_loop.
-Qed.
 
 Theorem Permutation_msort : ∀ A (rel : A → _) l, Permutation l (msort rel l).
 Proof.
