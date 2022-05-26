@@ -2524,7 +2524,7 @@ rewrite <- IHn. {
 now apply Nat.div_lt_upper_bound.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
