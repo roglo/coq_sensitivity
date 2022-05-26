@@ -1,7 +1,7 @@
 (* Fermat's little theorem *)
 
 Set Nested Proofs Allowed.
-Require Import Utf8 Arith SetoidList Permutation.
+Require Import Utf8 Arith SetoidList.
 Require Import Main.Misc Main.PermutationFun Misc.
 Import List ListNotations.
 
@@ -184,9 +184,9 @@ specialize (smaller_than_prime_all_different_multiples p Hp a Hap) as H1.
 assert (Hpz : p ≠ 0) by now intros H; rewrite H in Hp.
 assert
   (Hperm :
-     Permutation (map (λ i, (i * a) mod p) (seq 1 (p - 1)))
+     permutation Nat.eqb (map (λ i, (i * a) mod p) (seq 1 (p - 1)))
        (seq 1 (p - 1))). {
-  apply NoDup_Permutation_bis; cycle 1. {
+  apply (NoDup_permutation_bis Nat.eqb_eq); cycle 1. {
     now rewrite map_length, seq_length.
   } {
     intros i Hi.
@@ -245,7 +245,7 @@ remember (λ i : nat, (i * a) mod p) as f eqn:Hf.
 remember (fold_left Nat.mul (map f (seq 1 (p - 1))) 1) as x eqn:Hx.
 assert (Hx1 : x mod p = fact (p - 1) mod p). {
   subst x.
-  erewrite Permutation_fold_mul; [ | apply Hperm ].
+  erewrite permutation_fold_mul; [ | apply Hperm ].
   f_equal.
   clear.
   (* lemma perhaps? *)

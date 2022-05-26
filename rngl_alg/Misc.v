@@ -3,8 +3,8 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith Permutation.
-Require Import Main.Misc.
+Require Import Utf8 Arith.
+Require Import Main.Misc Main.PermutationFun.
 Import List.
 
 (* (a ^ b) mod c defined like that so that we can use "Compute"
@@ -324,15 +324,24 @@ induction b; intros.
  now rewrite Nat.sub_succ.
 Qed.
 
-Theorem Permutation_fold_mul : ∀ l1 l2 a,
-  Permutation l1 l2 → fold_left Nat.mul l1 a = fold_left Nat.mul l2 a.
+Theorem permutation_fold_mul : ∀ la lb d,
+  permutation Nat.eqb la lb → fold_left Nat.mul la d = fold_left Nat.mul lb d.
 Proof.
-intros * Hperm.
-induction Hperm using Permutation_ind; [ easy | | | ]. {
-  cbn; do 2 rewrite <- List_fold_left_mul_assoc.
-  now rewrite IHHperm.
-} {
-  now cbn; rewrite Nat.mul_shuffle0.
+intros * Hpab.
+revert d lb Hpab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hpab; subst lb.
 }
-etransitivity; [ apply IHHperm1 | apply IHHperm2 ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract (Nat.eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x.
+subst lb.
+rewrite IHla with (lb := bef ++ aft); [ | easy ].
+symmetry.
+rewrite fold_left_app; cbn.
+rewrite List_fold_left_mul_assoc.
+now rewrite fold_left_app.
 Qed.
