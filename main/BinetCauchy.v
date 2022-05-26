@@ -2880,7 +2880,7 @@ Permutation_isort
          → transitive ord
            → total_relation ord
              → ∀ la lb : list A,
-                 Permutation la lb → isort ord la = isort ord lb
+                 permutation la lb → isort ord la = isort ord lb
 permutation_isort
      : ∀ (A : Type) (eqb rel : A → A → bool),
          equality eqb → ∀ l : list A, permutation eqb l (isort rel l)
