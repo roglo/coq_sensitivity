@@ -2524,7 +2524,7 @@ rewrite <- IHn. {
 now apply Nat.div_lt_upper_bound.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -2607,46 +2607,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-...
-(*
-Search (∏ (_ = _, _), (∑ (_ = _, _), _) = _).
-(*
-rngl_product_summation_distr:
-          ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
-          ∑ (k = 0, S n ^ S m - 1), ∏ (i = 0, m), f i ((k / S n ^ (m - i)) mod S n)
-*)
-Print to_radix_list.
-Compute (let n := 3 in let m := 2 in map (to_radix n) (seq 0 (m ^ n))).
-Compute (let n := 3 in let m := 2 in let k := 2 in map (λ i, ((k / S n) ^ (m - i)) mod S n) (seq 0 m)).
-Compute (
-let n := 1 in let m := 2 in
-map (λ i, map (λ j, (i, j)) (seq 0 (S n))) (seq 0 (S m))
-).
-Compute (
-let n := 1 in let m := 2 in
-map (λ k, map (λ i, (i, (k / S n ^ (m - i)) mod S n)) (seq 0 (S m))) (seq 0 (S n ^ S m))
-).
-Compute (
-let n := 1 in let m := 2 in
-map (λ k, map (λ i, (i, ff_app (to_radix_loop (S m) (S n) k) (m - i))) (seq 0 (S m))) (seq 0 (S n ^ S m))
-).
-Compute (
-  let n := 4 in let m := 2 in
-  map (to_radix_loop (S m) (S n)) (seq 0 (S n ^ S m))
-).
-(* j'affiche tous les nombres de 0 à (n+1)^(m+1)-1 en base n+1 *)
-(* "to_radix_loop u r i", c'est les u derniers chiffres du nombre i en base r *)
-Compute (to_radix_loop 6 2 24).
-Print to_radix_loop.
-Theorem rngl_product_summation_distr' :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ (m n : nat) (f : nat → nat → T),
-  ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
-  ∑ (k = 0, S n ^ S m - 1), ∏ (i = 0, m),
-  f i (ff_app (to_radix_loop (S m) (S n) k) (m - i)).
-(* boh, chais pas si ça sert à quelque chose... *)
-...
-*)
+(**)
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
   rewrite rngl_product_shift with (s := 1). 2: {
@@ -2695,6 +2656,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+(**)
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_summation_eq_compat. 2: {
@@ -2773,6 +2735,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+(* det(AB)=Σ(1≤k₁..≤k_m≤n)a_₁k₁..a_mk_m * det(B_k₁..km) *)
+...
 About Permutation_isort.
 Print mat_select_rows.
 Theorem det''_select_isort_rows : ∀ A kl,
