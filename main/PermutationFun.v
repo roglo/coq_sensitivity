@@ -1055,7 +1055,6 @@ apply IHHna. {
 }
 Qed.
 
-(* to be completed
 Theorem NoDup_permutation_bis : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,
@@ -1064,14 +1063,14 @@ Theorem NoDup_permutation_bis : ∀ A (eqb : A → _),
   → incl la lb
   → permutation eqb la lb.
 Proof.
-intros * Heqb * Hnd Hll Hiab.
-apply (NoDup_permutation Heqb); [ easy | | ]. 2: {
-  intros i.
-  specialize (Hiab i).
-  split; [ easy | ].
-  intros Hib.
-...
-*)
+intros * Heqb * Hnda Hll Hiab.
+specialize NoDup_incl_NoDup as Hndb.
+specialize (Hndb _ la lb Hnda Hll Hiab).
+apply (NoDup_permutation Heqb); [ easy | easy | ].
+intros i.
+split; [ apply Hiab | ].
+now apply NoDup_length_incl.
+Qed.
 
 Theorem permutation_map : ∀ A B (eqba : A → _) (eqbb : B → _),
   equality eqba →
