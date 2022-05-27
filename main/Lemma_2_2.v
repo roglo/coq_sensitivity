@@ -346,10 +346,12 @@ unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite mA_nrows.
 rewrite map_map.
+rewrite <- seq_shift with (len := 2 ^ n), map_map.
 apply map_ext_in.
 intros i Hi.
 rewrite mA_ncols.
 rewrite map_map.
+rewrite <- seq_shift, map_map.
 apply map_ext_in.
 intros k Hk.
 move k before i.
@@ -363,25 +365,24 @@ revert i k Hi Hk.
 induction n; intros. {
   apply Nat.lt_1_r in Hi, Hk; subst i k; cbn.
   rewrite rngl_summation_only_one.
+  rewrite Nat.sub_diag.
   rewrite rngl_mul_0_l; [ | now left ].
   rewrite rngl_mul_0_l; [ easy | now left ].
 }
-rewrite (rngl_summation_split (2 ^ n - 1)). 2: {
-  split; [ easy | ].
+rewrite (rngl_summation_split (2 ^ n)). 2: {
+  split; [ flia | ].
   apply -> Nat.succ_le_mono.
-  apply Nat.sub_le_mono_r.
   apply Nat.pow_le_mono_r; [ easy | flia ].
-}
-rewrite Nat.sub_add. 2: {
-  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
 }
 cbn - [ Nat.pow ].
 rewrite rngl_add_comm.
 rewrite app_nil_r.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
+  assert (Hj' : 2 ^ n ≤ j - 1 ≤ 2 ^ S n - 1) by flia Hj.
+  do 2 rewrite Nat.sub_0_r.
   unfold fold_app_in_list, iter_list; cbn.
-  rewrite app_nth2 with (n := j). 2: {
+  rewrite app_nth2 with (n := j - 1). 2: {
     rewrite length_app_in_list.
     rewrite map_length, seq_length.
     now rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
@@ -410,6 +411,7 @@ cbn - [ "^" ].
 destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
+    assert (Hj' : 2 ^ n ≤ j - 1 ≤ 2 ^ S n - 1) by flia Hj.
     rewrite app_nth1. 2: {
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
@@ -444,10 +446,12 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   }
   cbn - [ "^" ].
   rewrite rngl_add_comm.
+  do 2 rewrite Nat.sub_0_r.
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
+    assert (Hj' : j - 1 ≤ 2 ^ n - 1) by flia Hj.
     unfold fold_app_in_list, iter_list; cbn.
-    rewrite app_nth1 with (n := j). 2: {
+    rewrite app_nth1 with (n := j - 1). 2: {
       rewrite length_app_in_list.
       rewrite map_length, seq_length.
       rewrite fold_mat_nrows, mA_nrows, Nat.max_id.
@@ -496,6 +500,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite rngl_add_comm.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
+      assert (Hj' : j - 1 ≤ 2 ^ n - 1) by flia Hj.
+      rewrite <- Nat.sub_succ_l; [ | easy ].
+      rewrite Nat_sub_succ_1.
       rewrite app_nth1. 2: {
         rewrite fold_corr_mat_ncols; cycle 2. {
           rewrite mA_nrows.
@@ -506,6 +513,8 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         apply mA_is_correct.
       }
       rewrite fold_mat_el.
+      rewrite <- Nat.sub_succ_l; [ | easy ].
+      rewrite Nat_sub_succ_1.
       easy.
     }
     rewrite rngl_add_comm.
@@ -513,17 +522,17 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite rngl_mul_add_distr_r, rngl_mul_1_l.
     f_equal.
     rewrite (rngl_summation_shift (2 ^ n)). 2: {
-      split; [ easy | ].
+      split; [ flia | ].
       cbn; rewrite Nat.add_0_r.
-      rewrite <- Nat.add_sub_assoc; [ flia | ].
+      apply Nat.add_le_mono_l.
       now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
     }
-    rewrite Nat.sub_diag.
+    rewrite Nat.add_comm, Nat.add_sub.
     cbn; rewrite Nat.add_0_r.
-    rewrite Nat_sub_sub_swap.
     rewrite Nat.add_sub.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
+      rewrite Nat_sub_sub_swap.
       now rewrite Nat.add_comm, Nat.add_sub.
     }
     cbn.
@@ -533,27 +542,25 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       intros j Hj.
       unfold δ.
       do 2 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+      destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]. {
+        destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]. {
           rewrite Hij, Hjk in Hik; flia Hik.
         }
         now apply rngl_mul_0_r; left.
       } {
-        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
-          now apply rngl_mul_0_l; left.
-        }
         now apply rngl_mul_0_l; left.
       }
     } {
       subst k.
       rewrite δ_diag.
-      rewrite (rngl_summation_split3 i); [ | split; flia Hin ].
+      rewrite (rngl_summation_split3 (S i)); [ | split; flia Hin ].
       rewrite all_0_rngl_summation_0. 2: {
         intros j Hj.
         rewrite δ_ndiag; [ | flia Hj ].
         now apply rngl_mul_0_l; left.
       }
       rewrite rngl_add_0_l.
+      rewrite Nat_sub_succ_1.
       rewrite δ_diag, rngl_mul_1_l.
       rewrite all_0_rngl_summation_0. 2: {
         intros j Hj.
@@ -567,15 +574,12 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       intros j Hj.
       unfold δ.
       do 2 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+      destruct (Nat.eq_dec i (j - 1)) as [Hij| Hij]. {
+        destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]. {
           rewrite Hij, Hjk in Hik; flia Hik.
         }
         now apply rngl_mul_0_r; left.
       } {
-        destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
-          now apply rngl_mul_0_l; left.
-        }
         now apply rngl_mul_0_l; left.
       }
     }
@@ -594,6 +598,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
           apply mA_is_correct.
         } {
           rewrite mA_nrows.
+...
           now apply le_pow_succ_sub_1_lt.
         }
         rewrite mA_ncols.

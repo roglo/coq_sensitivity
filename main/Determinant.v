@@ -781,6 +781,7 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
+(* TODO: start at 1 instead of 0 *)
 Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_swap_elem [] (mat_list_list M) i1 i2).
 
@@ -810,8 +811,8 @@ split. {
   apply nth_In; rewrite fold_mat_nrows; rewrite Hr.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec 0 p); [ easy | ].
-  destruct (Nat.eq_dec 0 q); [ easy | ].
+  destruct (Nat.eq_dec 0 p); [ now subst p | ].
+  destruct (Nat.eq_dec 0 q); [ now subst q | ].
   flia Hp.
 } {
   intros la Hla.
@@ -987,13 +988,13 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
-...
-    replace (mat_el _ _ _) with
-      (mat_el M i
-         (ff_app (canon_sym_gr_list n k) (transposition p q i))). 2: {
+    replace (mat_el' _ _ _) with
+      (mat_el' M (i + 1)
+         (ff_app (canon_sym_gr_list n k) (transposition p q i) + 1)). 2: {
       unfold ff_app; cbn.
-      unfold mat_el; f_equal.
+      unfold mat_el'; f_equal.
       unfold list_swap_elem.
+      do 2 rewrite Nat.add_sub.
       rewrite (List_map_nth' 0). 2: {
         rewrite seq_length.
         rewrite fold_mat_nrows, Hr.
@@ -1271,9 +1272,9 @@ Theorem determinant_same_rows : in_charac_0_field →
   ∀ (M : matrix T) p q,
   is_square_matrix M = true
   → p ≠ q
-  → p < mat_nrows M
-  → q < mat_nrows M
-  → (∀ j, mat_el M p j = mat_el M q j)
+  → 1 ≤ p ≤ mat_nrows M
+  → 1 ≤ q ≤ mat_nrows M
+  → (∀ j, 1 ≤ j → mat_el' M p j = mat_el' M q j)
   → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
@@ -1281,7 +1282,17 @@ remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : det M = (- det M)%F). {
   rewrite <- Hr in Hpn, Hqn.
-  rewrite <- determinant_alternating with (p := p) (q := q); try easy.
+  rewrite <- determinant_alternating with (p := p - 1) (q := q - 1); cycle 1. {
+    easy.
+  } {
+    flia Hpq Hpn Hqn.
+  } {
+    flia Hpn.
+  } {
+    flia Hqn.
+  } {
+    easy.
+  }
   f_equal.
   destruct M as (ll); cbn in *.
   unfold mat_swap_rows; cbn; f_equal.
@@ -1290,7 +1301,7 @@ assert (HM : det M = (- det M)%F). {
   intros i Hi; apply in_seq in Hi.
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
     subst i.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
@@ -1298,12 +1309,14 @@ assert (HM : det M = (- det M)%F). {
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
     rewrite Hsm; [ | now apply nth_In ].
-    rewrite Hsm; [ | now apply nth_In ].
+    rewrite Hsm; [ | apply nth_In; flia Hqn ].
     apply map_ext_in.
     intros j Hj.
-    apply Hjpq.
+    specialize (Hjpq (S j)).
+    rewrite Nat_sub_succ_1 in Hjpq.
+    apply Hjpq; flia.
   }
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+  destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
     subst i.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
     rewrite List_map_nth_seq with (d := 0%F); symmetry.
@@ -1311,10 +1324,12 @@ assert (HM : det M = (- det M)%F). {
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
     rewrite Hsm; [ | now apply nth_In ].
-    rewrite Hsm; [ | now apply nth_In ].
+    rewrite Hsm; [ | apply nth_In; flia Hpn ].
     apply map_ext_in.
     intros j Hj.
-    symmetry; apply Hjpq.
+    specialize (Hjpq (S j)).
+    rewrite Nat_sub_succ_1 in Hjpq.
+    symmetry; apply Hjpq; flia.
   }
   easy.
 }
@@ -1351,9 +1366,9 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
     (map
        (λ i,
         map
-          (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
-          (seq 0 n))
-       (seq 0 n)).
+          (λ j, if Nat.eq_dec i k then (s * mat_el' M i j)%F else mat_el' M i j)
+          (seq 1 n))
+       (seq 1 n)).
 
 (* If we multiply a row (column) of A by a number, the determinant of
    A will be multiplied by the same number. *)
@@ -1379,9 +1394,9 @@ Theorem det_add_row_row : ∀ n (A B C : matrix T),
   → is_square_matrix A = true
   → is_square_matrix B = true
   → is_square_matrix C = true
-  → (∀ j, mat_el A 0 j = (mat_el B 0 j + mat_el C 0 j)%F)
-  → (∀ i j, i ≠ 0 → mat_el B i j = mat_el A i j)
-  → (∀ i j, i ≠ 0 → mat_el C i j = mat_el A i j)
+  → (∀ j, mat_el' A 1 j = (mat_el' B 1 j + mat_el' C 1 j)%F)
+  → (∀ i j, i ≠ 1 → mat_el' B i j = mat_el' A i j)
+  → (∀ i j, i ≠ 1 → mat_el' C i j = mat_el' A i j)
   → det A = (det B + det C)%F.
 Proof.
 intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.
@@ -1427,10 +1442,12 @@ assert (Hab : ∀ j, subm 0 j A = subm 0 j B). {
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
-  now symmetry; apply Hb.
+  specialize (Hb (S u) (S v)).
+  do 2 rewrite Nat_sub_succ_1 in Hb.
+  symmetry; apply Hb; intros H; apply Huz.
+  now apply Nat.succ_inj in H.
 }
 assert (Hac : ∀ j, subm 0 j A = subm 0 j C). {
-  intros.
   intros.
   destruct A as (lla).
   destruct C as (llc).
@@ -1467,7 +1484,10 @@ assert (Hac : ∀ j, subm 0 j A = subm 0 j C). {
   apply map_ext_in.
   intros v Hv.
   apply in_seq in Hv.
-  now symmetry; apply Hc.
+  specialize (Hc (S u) (S v)).
+  do 2 rewrite Nat_sub_succ_1 in Hc.
+  symmetry; apply Hc; intros H; apply Huz.
+  now apply Nat.succ_inj in H.
 }
 unfold det; rewrite Hra, Hrb, Hrc.
 cbn.
