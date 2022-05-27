@@ -1256,8 +1256,8 @@ f_equal. {
     rewrite length_app_in_list.
     do 2 rewrite fold_mat_nrows.
     rewrite Hr1, Hr2, Nat.max_id.
-...
-    rewrite Nat.add_comm, Nat.add_sub.
+    rewrite Nat.add_comm.
+    rewrite <- Nat.sub_add_distr, Nat.add_sub.
     rewrite nth_map3_app; cycle 1. {
       now rewrite fold_mat_nrows, Hr3.
     } {
@@ -1266,7 +1266,7 @@ f_equal. {
     easy.
   }
   cbn.
-  rewrite (rngl_summation_split (n - 1)); [ | flia ].
+  rewrite (rngl_summation_split n); [ | flia ].
   f_equal. {
     unfold mat_mul_el.
     rewrite Hc3.
@@ -1283,17 +1283,21 @@ f_equal. {
       rewrite Hc3; flia Hj Hnz.
     }
     rewrite fold_mat_el.
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    rewrite Nat_sub_succ_1.
     f_equal.
     rewrite app_nth1. 2: {
       rewrite fold_mat_nrows, Hr5.
       flia Hj Hnz.
     }
-    apply fold_mat_el.
+    rewrite fold_mat_el.
+    apply in_seq in Hk.
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    now do 2 rewrite Nat_sub_succ_1.
   } {
-    rewrite Nat.sub_add; [ | easy ].
-    rewrite (rngl_summation_shift n); [ | flia ].
-    rewrite Nat.sub_diag.
-    rewrite Nat_sub_sub_swap, Nat.add_sub.
+    rewrite (rngl_summation_shift n); [ | flia Hnz ].
+    rewrite Nat.add_comm, Nat.add_sub, Nat.add_sub.
     unfold mat_mul_el; rewrite Hc4.
     apply rngl_summation_eq_compat.
     intros j Hj.
@@ -1304,7 +1308,7 @@ f_equal. {
       } {
         now rewrite Hr3.
       }
-      rewrite Hc3; flia.
+      rewrite Hc3; flia Hj.
     }
     rewrite fold_corr_mat_ncols; cycle 1. {
       apply is_scm_mat_iff.
@@ -1312,18 +1316,19 @@ f_equal. {
     } {
       now rewrite Hr3.
     }
-    rewrite Hc3, Nat.add_comm, Nat.add_sub.
+    rewrite Hc3, Nat_sub_sub_swap.
+    rewrite Nat.add_comm, Nat.add_sub.
     rewrite fold_mat_el.
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    rewrite Nat_sub_succ_1.
     rewrite app_nth2. 2: {
-      rewrite fold_mat_nrows, Hr5; flia.
+      rewrite fold_mat_nrows, Hr5; flia Hj.
     }
-    rewrite fold_mat_nrows, Hr5.
-    now rewrite Nat.add_sub, fold_mat_el, seq_nth.
+    rewrite fold_mat_nrows, Hr5, Nat_sub_sub_swap.
+    now rewrite Nat.add_sub, seq_nth.
   }
 }
 Qed.
-
-...
 
 Definition base_vector_1 dim :=
   mk_vect (1%F :: repeat 0%F (dim - 1)).
@@ -1602,11 +1607,12 @@ destruct n. {
   apply vector_eq; [ | cbn; rewrite map_length; easy ].
   intros i Hi.
   cbn in Hi.
-  apply Nat.lt_1_r in Hi; subst i; cbn.
+  replace i with 1 by flia Hi.
   unfold vect_dot_mul; cbn.
   destruct V as (la); cbn.
   destruct la as [| a]; [ easy | ].
-  destruct la; [ | easy ].
+  destruct la; [ cbn | easy ].
+  unfold vect_dot_mul; cbn.
   unfold iter_list; cbn.
   rewrite rngl_add_0_l, rngl_mul_0_l; [ easy | now left ].
 }
