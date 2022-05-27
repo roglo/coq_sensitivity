@@ -522,8 +522,8 @@ Definition list_list_select_rows jl ll :=
 Definition mat_select_rows jl M :=
   mk_mat (list_list_select_rows jl (mat_list_list M)).
 
-Definition mat_select_rows' (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 0 (mat_ncols M))) jl).
+Definition mat_select_rows'' (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ i, map (λ j, mat_el' M i j) (seq 1 (mat_ncols M))) jl).
 
 (*
 End a.
@@ -538,8 +538,8 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_selec
 *)
 
 (* submatrix with list cols jl *)
-Definition mat_select_cols (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ i, map (λ j, mat_el M i j) jl) (seq 0 (mat_nrows M))).
+Definition mat_select_cols'' (jl : list nat) (M : matrix T) :=
+  mk_mat (map (λ i, map (λ j, mat_el' M i j) jl) (seq 1 (mat_nrows M))).
 
 Definition mat_select_cols' (jl : list nat) (M : matrix T) :=
   ((mat_select_rows jl M⁺)⁺)%M.
@@ -548,7 +548,7 @@ End a.
 
 Arguments list_list_select_rows {T ro} jl%list ll%list.
 Arguments mat_select_rows {T ro} jl%list M%M.
-Arguments mat_select_cols {T ro} jl%list M%M.
+Arguments mat_select_cols'' {T ro} jl%list M%M.
 
 Section a.
 
