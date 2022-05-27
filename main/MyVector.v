@@ -19,11 +19,11 @@ Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
 
-Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
-  nth i (vect_list V) 0%F.
+Definition vect_el' {T} {ro : ring_like_op T} (V : vector T) i :=
+  nth (i - 1) (vect_list V) 0%F.
 
 Theorem vector_eq : ∀ T {ro : ring_like_op T} (U V : vector T),
-  (∀ i, i < vect_size U → vect_el U i = vect_el V i)
+  (∀ i, 1 ≤ i ≤ vect_size U → vect_el' U i = vect_el' V i)
   → vect_size U = vect_size V
   → U = V.
 Proof.
@@ -37,7 +37,10 @@ rewrite <- Huv.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
-now apply Heq.
+specialize (Heq (S i)).
+rewrite Nat_sub_succ_1 in Heq.
+apply Heq.
+split; [ now apply -> Nat.succ_le_mono | easy ].
 Qed.
 
 Section a.
@@ -47,8 +50,12 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
 Theorem fold_vect_el : ∀ (V : vector T) i,
-  nth i (vect_list V) 0%F = vect_el V i.
-Proof. easy. Qed.
+  nth i (vect_list V) 0%F = vect_el' V (S i).
+Proof.
+intros.
+unfold vect_el'.
+now rewrite Nat_sub_succ_1.
+Qed.
 
 Definition vect_zero n : vector T := mk_vect (repeat 0%F n).
 
@@ -72,8 +79,8 @@ Definition vect_mul_scal_l s (V : vector T) :=
 Definition vect_dot_mul (U V : vector T) :=
   ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 Definition vect_dot_mul' (U V : vector T) :=
-  ∑ (i = 0, min (vect_size U) (vect_size V) - 1),
-  vect_el U i * vect_el V i.
+  ∑ (i = 1, min (vect_size U) (vect_size V)),
+  vect_el' U i * vect_el' V i.
 
 Theorem vect_dot_mul_dot_mul' :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -87,17 +94,17 @@ destruct V as (lv).
 cbn.
 revert lv.
 induction lu as [| a]; intros. {
-  cbn; rewrite rngl_summation_only_one.
-  unfold iter_list; cbn.
-  now symmetry; apply rngl_mul_0_l.
+  now cbn; rewrite rngl_summation_empty.
 }
 destruct lv as [| b]. {
-  cbn; rewrite rngl_summation_only_one.
-  unfold iter_list; cbn.
-  now symmetry; apply rngl_mul_0_r.
+  now cbn; rewrite rngl_summation_empty.
 }
 cbn - [ nth ].
-rewrite Nat.sub_0_r.
+rewrite rngl_summation_shift with (s := 1). 2: {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+rewrite Nat.sub_diag, Nat_sub_succ_1.
 rewrite rngl_summation_split_first; [ | easy ].
 do 2 rewrite List_nth_0_cons.
 rewrite rngl_summation_list_cons.
@@ -115,14 +122,9 @@ destruct (Nat.eq_dec (length lv) 0) as [Hvz| Hvz]. {
   rewrite rngl_summation_empty; [ | easy ].
   now rewrite map2_nil_r; unfold iter_list.
 }
-rewrite (rngl_summation_shift 1). 2: {
-  split; [ easy | ].
-  destruct (length lu); [ easy | ].
-  destruct (length lv); [ easy | ].
-  now cbn; apply -> Nat.succ_le_mono.
-}
 erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
+  intros i Hi.
+  rewrite <- Nat.add_sub_assoc; [ | easy ].
   now do 2 rewrite List_nth_succ_cons.
 }
 apply IHlu.
@@ -140,7 +142,7 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
-Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_el' {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
@@ -175,10 +177,15 @@ exfalso; apply Hvz; clear Hvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
 intros i Hi; cbn.
 rewrite nth_repeat.
-specialize (H1 (nth i (vect_list V) 0%F)) as H2.
-assert (H : nth i (vect_list V) 0%F ∈ vect_list V) by now apply nth_In.
+specialize (H1 (vect_el' V i)) as H2.
+assert (H : vect_el' V i ∈ vect_list V). {
+  unfold vect_el'.
+  apply nth_In.
+  rewrite fold_vect_size.
+  now apply Nat_1_le_sub_lt.
+}
 specialize (H2 H); clear H.
-remember (rngl_eqb (vect_el V i) 0%F) as vz eqn:Hvz; symmetry in Hvz.
+remember (rngl_eqb (vect_el' V i) 0%F) as vz eqn:Hvz; symmetry in Hvz.
 destruct vz; [ now apply rngl_eqb_eq | ].
 apply (rngl_eqb_neq Heq) in Hvz.
 now apply rngl_mul_cancel_r in H2.
@@ -270,7 +277,7 @@ Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
-Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_el' {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.
 Arguments vect_squ_norm {T}%type {ro} V%V.
 Arguments vector_eq {T}%type {ro} (U V)%V.

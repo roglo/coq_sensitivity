@@ -160,6 +160,14 @@ Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 Theorem Nat_succ_sub_succ_r : ∀ a b, b < a → a - b = S (a - S b).
 Proof. intros * Hba; flia Hba. Qed.
 
+Theorem Nat_1_le_sub_lt : ∀ i j, 1 ≤ i ≤ j → i - 1 < j.
+Proof.
+intros * Hij.
+destruct i; [ easy | ].
+rewrite Nat_sub_succ_1.
+apply Hij.
+Qed.
+
 Theorem Nat_mod_add_l_mul_r : ∀ a b c,
   b ≠ 0 → (c * b + a) mod b = a mod b.
 Proof.

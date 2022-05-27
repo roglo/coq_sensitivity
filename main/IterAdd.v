@@ -379,18 +379,31 @@ intros i Hi.
 now rewrite Nat_sub_succ_1.
 Qed.
 
-Theorem rngl_summation_summation_exch' : ∀ g k l,
-  (∑ (j = 0, k), (∑ (i = 0, l), g i j) =
-   ∑ (i = 0, l), ∑ (j = 0, k), g i j)%F.
+Theorem rngl_summation_summation_exch' : ∀ g b c k l,
+  (∑ (j = b, k), (∑ (i = c, l), g i j) =
+   ∑ (i = c, l), ∑ (j = b, k), g i j)%F.
 Proof.
 intros.
 revert l.
 induction k; intros. {
-  unfold iter_seq, iter_list.
-  cbn; do 3 rewrite rngl_add_0_l.
-  apply List_fold_left_ext_in.
-  intros i c Hi.
-  now rewrite rngl_add_0_l.
+  destruct b. {
+    rewrite rngl_summation_only_one.
+    apply rngl_summation_eq_compat.
+    intros i Hi.
+    now rewrite rngl_summation_only_one.
+  }
+  rewrite rngl_summation_empty; [ | easy ].
+  erewrite all_0_rngl_summation_0; [ easy | ].
+  intros i Hi.
+  now apply rngl_summation_empty.
+}
+destruct (le_dec b (S k)) as [Hbk| Hbk]. 2: {
+  apply Nat.nle_gt in Hbk.
+  rewrite rngl_summation_empty; [ | easy ].
+  symmetry.
+  apply all_0_rngl_summation_0.
+  intros i Hi.
+  now apply rngl_summation_empty.
 }
 rewrite rngl_summation_split_last; [ | easy ].
 rewrite rngl_summation_succ_succ.
@@ -759,5 +772,5 @@ Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
 Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.
 Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
-Arguments rngl_summation_summation_exch' {T}%type {ro rp} _ (k l)%nat.
+Arguments rngl_summation_summation_exch' {T}%type {ro rp} _ (b c k l)%nat.
 Arguments rngl_summation_ub_mul_distr {T}%type {ro rp} (a b)%nat.
