@@ -2045,7 +2045,7 @@ rewrite nth_overflow; [ easy | ].
 rewrite fold_mat_nrows; flia Hjz Hjr.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem mat_transp_mul :
   rngl_is_comm = true →
   ∀ (MA : matrix T) (MB : matrix T),
@@ -2110,13 +2110,12 @@ apply matrix_eq; cycle 1. {
 }
 intros i j Hi Hj.
 rewrite mat_transp_nrows in Hi.
-...
-rewrite mat_transp_el; [ | now apply mat_mul_is_corr ].
+rewrite mat_transp_el; [ | now apply mat_mul_is_corr | flia Hi | flia Hj ].
 rewrite mat_mul_ncols in Hi; [ | easy ].
 rewrite mat_mul_ncols in Hj; [ | rewrite mat_transp_nrows; flia Hi ].
 rewrite mat_transp_ncols in Hj.
 rewrite if_eqb_eq_dec in Hj.
-destruct (Nat.eq_dec (mat_ncols MA) 0) as [H1| H1]; [ easy | ].
+destruct (Nat.eq_dec (mat_ncols MA) 0) as [H1| H1]; [ flia Hj | ].
 rewrite mat_el_mul; cycle 1. {
   now rewrite mat_mul_nrows.
 } {
@@ -2135,18 +2134,31 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mat_ncols MB) 0) as [H2| H2]; [ flia Hi H2 | ].
 rewrite <- Hcarb; symmetry.
 erewrite rngl_summation_eq_compat. 2: {
-  intros k (_, Hk).
+  intros k Hk.
   rewrite rngl_mul_comm; [ | easy ].
-  rewrite mat_transp_el; [ | easy ].
-  rewrite mat_transp_el; [ | easy ].
+  rewrite mat_transp_el; [ | easy | flia Hk | flia Hj ].
   easy.
 }
+cbn - [ mat_el' ].
+apply rngl_summation_eq_compat.
+intros k Hk.
+f_equal.
+unfold mat_transp; cbn.
+unfold mat_el'.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length ]. 2: {
+  rewrite <- Hcarb; flia Hk.
+}
+rewrite seq_nth; [ | flia Hi ].
+rewrite seq_nth; [ | flia Hk Hcarb ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm, Nat.add_sub.
 easy.
 Qed.
-*)
 
 (* matrix without row i and column j *)
 
+(* TODO: to be shifted to start at 1 like mat_el' *)
 Definition subm i j (M : matrix T) :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
 
@@ -2962,9 +2974,7 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-(*
-Arguments mat_el {T}%type {ro} M%M (i j)%nat.
-*)
+Arguments mat_el' {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add {T}%type {ro} (MA MB)%M.
 Arguments mat_add_0_l {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.

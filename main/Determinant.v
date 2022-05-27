@@ -54,8 +54,8 @@ Fixpoint determinant_loop n (M : matrix T) :=
   match n with
   | 0 => 1%F
   | S n' =>
-      ∑ (j = 0, n'),
-      minus_one_pow j * mat_el M 0 j * determinant_loop n' (subm 0 j M)
+      ∑ (j = 1, n),
+      minus_one_pow (S j) * mat_el' M 1 j * determinant_loop n' (subm 0 (j - 1) M)
   end.
 
 Definition det M := determinant_loop (mat_nrows M) M.
@@ -81,7 +81,7 @@ Definition det' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, fact n - 1),
     ε (canon_sym_gr_list n k) *
-    ∏ (i = 1, n), mat_el M (i - 1) (ff_app (canon_sym_gr_list n k) (i - 1)).
+    ∏ (i = 1, n), mat_el' M i (ff_app (canon_sym_gr_list n k) (i - 1) + 1).
 
 Arguments det' M%M.
 
@@ -96,7 +96,7 @@ Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, n ^ n - 1),
     ε (to_radix n k) *
-    ∏ (i = 1, n), mat_el M (i - 1) (ff_app (to_radix n k) (i - 1)).
+    ∏ (i = 1, n), mat_el' M i (ff_app (to_radix n k) (i - 1) + 1).
 
 Arguments det'' M%M.
 
@@ -111,8 +111,8 @@ Proof. easy. Qed.
 
 Theorem determinant_succ : ∀ n (M : matrix T),
   determinant_loop (S n) M =
-     ∑ (j = 0, n),
-     minus_one_pow j * mat_el M 0 j * determinant_loop n (subm 0 j M).
+     ∑ (j = 1, S n),
+     minus_one_pow (S j) * mat_el' M 1 j * determinant_loop n (subm 0 (j - 1) M).
 Proof. easy. Qed.
 
 (*
@@ -212,6 +212,7 @@ revert M Hm Hr.
 induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
+  rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
   unfold ε, iter_seq, iter_list; cbn.
   now do 3 rewrite rngl_mul_1_l.
 }
@@ -221,7 +222,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_summation_only_one; cbn.
   rewrite rngl_product_only_one; cbn.
-  unfold ε.
+  unfold ε; cbn.
   do 2 rewrite rngl_product_only_one; cbn.
   now rewrite rngl_mul_1_r.
 }
@@ -243,6 +244,8 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ canon_sym_gr_list fact nth ].
+Check rngl_summation_summation_distr.
+...
 rewrite rngl_summation_summation_distr.
 rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
