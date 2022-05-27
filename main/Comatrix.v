@@ -148,14 +148,14 @@ now do 2 rewrite mat_swap_same_rows.
 Qed.
 
 Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
-  q < mat_nrows M
-  → mat_el (mat_swap_rows p q M) q j = mat_el M p j.
+  1 ≤ q ≤ mat_nrows M
+  → mat_el' (mat_swap_rows (p - 1) (q - 1) M) q j = mat_el' M p j.
 Proof.
 intros * Hql; cbn.
 destruct M as (ll); cbn in Hql |-*.
 f_equal; clear j.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hql ].
+rewrite seq_nth; [ | flia Hql ].
 rewrite Nat.add_0_l.
 now rewrite transposition_2.
 Qed.
@@ -651,6 +651,8 @@ apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
 Qed.
 
 (* Laplace formulas *)
+
+...
 
 Theorem laplace_formula_on_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
