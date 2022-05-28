@@ -1093,8 +1093,6 @@ intros i Hi.
 rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
-...
-
 Theorem det_by_any_sym_gr : in_charac_0_field →
   ∀ n (M : matrix T) (sg : list (list nat)),
   n ≠ 0
@@ -1104,7 +1102,7 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
   → det M =
     ∑ (k = 0, n! - 1),
     ε (nth k sg []) *
-    ∏ (i = 1, n), mat_el M (i - 1) (ff_app (nth k sg []) (i - 1)).
+    ∏ (i = 1, n), mat_el' M i (ff_app (nth k sg []) (i - 1) + 1).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
 rewrite det_is_det'; try now destruct Hif.
@@ -1312,6 +1310,8 @@ split. {
   now rewrite <- Hi, map_length, seq_length.
 }
 Qed.
+
+...
 
 Theorem det_any_permut_l : in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
