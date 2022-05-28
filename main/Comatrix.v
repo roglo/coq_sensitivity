@@ -2858,17 +2858,40 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   cbn - [ det ].
   replace (length ll) with (mat_nrows M) in Hi, Hj, Hcl |-* by now rewrite HM.
   apply Nat.neq_sym in Hij.
-Check determinant_with_bad_row.
-...
-  apply determinant_with_bad_row; [ easy | | easy | easy | easy ].
-  apply is_scm_mat_iff; cbn.
-  split; [ easy | ].
-  intros l Hl; rewrite HM in Hl; cbn in Hl.
-  now apply Hcl.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    now rewrite Nat_sub_succ_1.
+  }
+  cbn - [ det ].
+  specialize (determinant_with_bad_row Hif) as H1.
+  specialize (H1 (S j) (S i) M).
+  assert (H : is_square_matrix M = true). {
+    apply is_scm_mat_iff; cbn.
+    split; [ easy | ].
+    intros l Hl; rewrite HM in Hl; cbn in Hl.
+    now apply Hcl.
+  }
+  specialize (H1 H); clear H.
+  assert (H : 1 ≤ S j ≤ mat_nrows M) by flia Hj.
+  specialize (H1 H); clear H.
+  assert (H : 1 ≤ S i ≤ mat_nrows M) by flia Hi.
+  specialize (H1 H); clear H.
+  assert (H : S j ≠ S i) by flia Hij.
+  specialize (H1 H); clear H.
+  erewrite rngl_summation_eq_compat in H1. 2: {
+    intros k Hk.
+    rewrite Nat_sub_succ_1.
+    rewrite Nat.add_succ_l.
+    replace (j + k) with (S (j + (k - 1))) by flia Hk.
+    rewrite minus_one_pow_succ; [ | now destruct Hif ].
+    rewrite minus_one_pow_succ; [ | now destruct Hif ].
+    rewrite rngl_opp_involutive; [ | now destruct Hif ].
+    easy.
+  }
+  easy.
 }
 Qed.
-
-...
 
 Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   ∀ (M : matrix T),
@@ -2905,6 +2928,7 @@ cbn in Hsm.
 destruct Hsm as (Hcr, Hcl).
 unfold mat_ncols at 2.
 rewrite Hcl; [ | now apply List_hd_in ].
+...
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 unfold mat_ncols.
@@ -3048,6 +3072,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   easy.
 }
 Qed.
+
+...
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 
