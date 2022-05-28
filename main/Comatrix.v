@@ -1875,21 +1875,34 @@ rewrite (List_map_hd 0); [ | now rewrite seq_length ].
 do 4 rewrite map_length.
 do 2 rewrite seq_length.
 rewrite fold_mat_ncols.
-...
+do 2 rewrite seq_length.
+symmetry.
+do 2 rewrite <- seq_shift.
+rewrite map_map.
+symmetry.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
+do 2 rewrite map_map.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 destruct Hj as (_, Hj); cbn in Hj.
 move j before i.
+do 2 rewrite Nat_sub_succ_1.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite seq_nth; [ | easy ].
 do 2 rewrite Nat.add_0_l.
 rewrite Nat.add_comm; f_equal; symmetry.
-rewrite fold_mat_transp.
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  now rewrite seq_shift.
+}
+specialize (@fold_mat_transp T ro M) as H1.
+rewrite <- seq_shift with (len := mat_ncols M) in H1.
+rewrite map_map in H1.
+rewrite H1.
 rewrite <- determinant_transpose; [ | easy | ]. 2: {
   rewrite square_matrix_ncols in Hi; [ | easy ].
   now apply is_squ_mat_subm.
@@ -1945,7 +1958,7 @@ apply matrix_eq; cycle 1. {
   now destruct (Nat.eq_dec (mat_nrows M - 1) 0).
 }
 intros u v Hu Hv.
-rewrite mat_transp_el; [ | now apply subm_is_corr_mat ].
+rewrite mat_transp_el; [ | now apply subm_is_corr_mat | flia Hu | flia Hv ].
 unfold mat_transp; cbn.
 rewrite (List_map_nth' []). 2: {
   rewrite butn_length.
@@ -1958,7 +1971,14 @@ rewrite (List_map_nth' []). 2: {
   rewrite mat_transp_ncols in Hv.
   apply Nat.neq_0_lt_0 in Hcz.
   apply Nat.eqb_neq in Hcz; rewrite Hcz in Hv.
-  now apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
+  enough (H : v < mat_nrows M). {
+    destruct v; [ easy | ].
+    destruct (mat_nrows M); [ easy | ].
+    do 2 rewrite Nat_sub_succ_1.
+    now apply Nat.succ_lt_mono in H.
+  }
+  apply Nat.ltb_lt in Hj; rewrite Hj in Hv.
+  cbn in Hv; flia Hv.
 }
 rewrite (List_map_nth' []). 2: {
   rewrite butn_length.
@@ -1969,7 +1989,14 @@ rewrite (List_map_nth' []). 2: {
   rewrite mat_ncols_subm in Hu; [ | easy ].
   replace (mat_nrows M) with (S (S (mat_nrows M - 2))) in Hu by
     flia Hj Hcr Hc1.
-  now apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
+  enough (H : u < mat_ncols M). {
+    destruct u; [ easy | ].
+    destruct (mat_ncols M); [ easy | ].
+    do 2 rewrite Nat_sub_succ_1.
+    now apply Nat.succ_lt_mono in H.
+  }
+  apply Nat.ltb_lt in Hi; rewrite Hi in Hu.
+  cbn in Hu; flia Hu.
 }
 do 4 rewrite nth_butn.
 rewrite mat_transp_nrows in Hu.
@@ -1986,21 +2013,25 @@ cbn in Hu, Hv.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec i u); flia Hu.
+  destruct (le_dec i (u - 1)); flia Hu.
 }
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec j v); flia Hv.
+  destruct (le_dec j (v - 1)); flia Hv.
 }
 rewrite seq_nth. 2: {
   unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec j v); flia Hv.
+  destruct (le_dec j (v - 1)); flia Hv.
 }
 rewrite seq_nth. 2: {
   unfold Nat.b2n; rewrite if_leb_le_dec.
-  destruct (le_dec i u); flia Hu.
+  destruct (le_dec i (u - 1)); flia Hu.
 }
+unfold mat_el'.
+symmetry.
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite (Nat.add_comm 1 (v - 1 + _)), Nat.add_sub.
 easy.
 Qed.
 
@@ -2032,6 +2063,7 @@ rewrite (List_map_hd 0). 2: {
   now apply Nat.neq_0_lt_0.
 }
 rewrite List_map_seq_length.
+...
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
