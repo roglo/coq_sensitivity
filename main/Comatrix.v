@@ -685,9 +685,7 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   f_equal; f_equal. {
     destruct j; [ easy | ].
     rewrite Nat_sub_succ_1.
-    rewrite minus_one_pow_succ; [ | easy ].
-    rewrite minus_one_pow_succ; [ | easy ].
-    now symmetry; apply rngl_opp_involutive.
+    now symmetry; apply minus_one_pow_succ_succ.
   }
   rewrite butn_length, fold_mat_nrows.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
@@ -755,16 +753,9 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rewrite <- rngl_opp_summation; [ | now destruct Hif ].
-(*
-do 2 rewrite <- determinant_succ.
-*)
 subst M'.
 rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
 f_equal.
-(*
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat_sub_succ_1.
-*)
 rewrite fold_det.
 assert (H1 : 0 ≠ p - 1) by flia Hlin Hi1.
 assert (H2 : p - 1 < mat_nrows M) by flia Hlin.
@@ -783,9 +774,7 @@ intros i Hi.
 f_equal; f_equal.
 destruct i; [ easy | ].
 rewrite Nat_sub_succ_1.
-rewrite minus_one_pow_succ; [ | now destruct Hif ].
-rewrite minus_one_pow_succ; [ | now destruct Hif ].
-now symmetry; apply rngl_opp_involutive; destruct Hif.
+now symmetry; apply minus_one_pow_succ_succ; destruct Hif.
 Qed.
 
 Theorem rngl_product_seq_permut :
@@ -2884,9 +2873,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat_sub_succ_1.
     rewrite Nat.add_succ_l.
     replace (j + k) with (S (j + (k - 1))) by flia Hk.
-    rewrite minus_one_pow_succ; [ | now destruct Hif ].
-    rewrite minus_one_pow_succ; [ | now destruct Hif ].
-    rewrite rngl_opp_involutive; [ | now destruct Hif ].
+    rewrite minus_one_pow_succ_succ; [ | now destruct Hif ].
     easy.
   }
   easy.
@@ -3081,12 +3068,23 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     rewrite Nat.add_comm.
     easy.
   }
-...
+  cbn - [ det ] in H1.
+  erewrite rngl_summation_eq_compat in H1. 2: {
+    intros k Hk.
+    replace (k + S i) with (S (S (k - 1 + i))) by flia Hk.
+    rewrite minus_one_pow_succ_succ; [ | now destruct Hif ].
+    rewrite Nat.sub_0_r.
+    easy.
+  }
+  cbn - [ det ] in H1.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros k Hk.
+    rewrite <- Nat.sub_succ_l; [ | easy ].
+    now rewrite Nat_sub_succ_1.
+  }
   easy.
 }
 Qed.
-
-...
 
 Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 

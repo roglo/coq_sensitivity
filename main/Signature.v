@@ -81,6 +81,16 @@ rewrite Hk in H1.
 flia H1.
 Qed.
 
+Theorem minus_one_pow_succ_succ :
+  rngl_has_opp = true →
+  ∀ i, minus_one_pow (S (S i)) = minus_one_pow i.
+Proof.
+intros Hop *.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+now apply rngl_opp_involutive.
+Qed.
+
 Theorem minus_one_pow_add_r :
   rngl_has_opp = true →
   ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%F.
@@ -3098,3 +3108,4 @@ Arguments ε_when_dup {T ro rp} Hop Hde [la]%list.
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
+Arguments minus_one_pow_succ_succ {T}%type {ro rp} _ i%nat.
