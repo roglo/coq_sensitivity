@@ -2600,8 +2600,7 @@ f_equal. {
 }
 rewrite List_skipn_seq; [ | flia Hic Hic1 ].
 rewrite <- Nat.sub_add_distr.
-...
-rewrite Nat.add_0_l, <- seq_shift, map_map.
+rewrite <- seq_shift, <- seq_shift, map_map.
 apply map_ext_in.
 intros u Hu; apply in_seq in Hu.
 destruct Hu as (Hiu, Hu).
@@ -2609,6 +2608,7 @@ rewrite Nat.sub_add_distr in Hu.
 rewrite Nat.add_sub_assoc in Hu; [ | flia Hic Hic1 ].
 rewrite <- map_butn.
 unfold butn at 1.
+...
 rewrite List_firstn_seq.
 rewrite Nat.min_l; [ | flia Hjr ].
 destruct (Nat.eq_dec j (mat_nrows M - 1)) as [Hjr1| Hjr1]. {
