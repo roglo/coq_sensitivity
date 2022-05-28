@@ -463,8 +463,31 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite (rngl_summation_split j); [ | flia Hj ].
-rewrite rngl_summation_split_last; [ | flia Hj ].
+rewrite (rngl_summation_split (j - 1)); [ | flia Hj ].
+rewrite Nat.sub_add; [ | easy ].
+destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
+  subst j; rewrite Nat.sub_diag.
+  rewrite rngl_summation_empty; [ | easy ].
+  rewrite rngl_add_0_l.
+  rewrite rngl_summation_split_first; [ | easy ].
+  rewrite all_0_rngl_summation_0. 2: {
+    intros k Hk.
+    replace (mat_el' D k 1) with 0%F. 2: {
+      rewrite Hmd; cbn.
+      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
+      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+      rewrite seq_nth; [ | flia Hk ].
+      rewrite seq_nth; [ | easy ].
+      cbn.
+      destruct k; [ easy | ].
+      destruct k; [ flia Hk | easy ].
+    }
+    now apply rngl_mul_0_r.
+  }
+  rewrite rngl_add_0_r.
+...
+}
+rewrite rngl_summation_split_last; [ | flia Hj Hj1 ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite Hmo; cbn.
