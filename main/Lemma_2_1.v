@@ -281,12 +281,22 @@ Definition mat_with_diag n d :=
 
 (* matrix with columns given as list of vectors *)
 
-...
-
 Definition mat_with_vect n Vl :=
   mk_mat
     (map (λ i, map (λ j, vect_el' (nth j Vl (vect_zero n)) i) (seq 0 n))
        (seq 1 n)).
+
+(*
+End a.
+Arguments mat_with_diag {T ro} n%nat d%list.
+Arguments mat_with_vect {T ro} n%nat Vl%list.
+Require Import RnglAlg.Nrl.
+Compute (mat_with_diag 3 [7;1;2]).
+Compute (
+let Vl := [mk_vect [1;2;3]; mk_vect [4;5;6]; mk_vect [7;8;9]] in
+mat_with_vect 3 Vl
+).
+*)
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix U (the columns of which
@@ -467,6 +477,17 @@ replace (mat_ncols U) with (mat_ncols M). 2: {
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
   now rewrite List_map_seq_length.
 }
+(**)
+rewrite square_matrix_ncols; [ | easy ].
+rewrite Hrn.
+rewrite <- Nat.sub_succ_l; [ | easy ].
+rewrite <- Nat.sub_succ_l; [ | easy ].
+do 2 rewrite Nat_sub_succ_1.
+destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
+  subst j.
+  rewrite rngl_summation_empty; [ | flia ].
+  rewrite rngl_add_0_r.
+...
 rewrite rngl_summation_split_last. 2: {
   rewrite square_matrix_ncols; [ | easy ].
   rewrite Hrn.
