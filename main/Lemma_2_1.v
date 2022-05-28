@@ -392,67 +392,73 @@ intros i j Hi Hj.
 unfold mat_ncols, mat_with_diag in Hj; cbn in Hj.
 rewrite (List_map_hd 0) in Hj; [ | now rewrite seq_length ].
 rewrite List_map_seq_length in Hj.
-...
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   rewrite Hmo; unfold mat_ncols; cbn.
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hj.
 }
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   rewrite Hmo; cbn.
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hi.
 }
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   unfold mat_ncols; cbn.
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hj.
 }
-rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | flia Hi ].
 rewrite seq_nth. 2: {
   rewrite Hmo; unfold mat_ncols; cbn.
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hj.
 }
 rewrite seq_nth. 2: {
   rewrite Hmo; cbn.
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hi.
 }
 rewrite seq_nth. 2: {
   unfold mat_ncols, mat_with_diag; cbn.
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
+  rewrite List_map_seq_length; flia Hj.
 }
 cbn.
 rewrite <- Hmd.
 unfold mat_mul_el.
 symmetry.
-rewrite (rngl_summation_split j). 2: {
-  split; [ easy | ].
+rewrite (rngl_summation_split (j - 1)). 2: {
+  split; [ flia Hj | ].
   rewrite square_matrix_ncols; [ | easy ].
   rewrite Hmo; cbn.
   rewrite List_map_seq_length.
   apply -> Nat.succ_le_mono; flia Hj.
 }
-rewrite rngl_summation_split_last; [ | easy ].
+rewrite Nat.sub_add; [ | easy ].
+...
+(*
+rewrite rngl_summation_split_last; [ | flia Hj ].
+*)
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite Hmo; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
   rewrite seq_nth; [ | flia Hk Hj ].
-  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hi ].
   cbn.
   rewrite Hmd; cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
   rewrite seq_nth; [ | flia Hk Hj ].
-  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hj ].
   cbn; rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (k - 1) j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  do 2 rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite Nat_sub_succ_1.
+  destruct (Nat.eq_dec (k - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hkj | ].
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_l.
@@ -463,17 +469,27 @@ replace (mat_ncols U) with (mat_ncols M). 2: {
   rewrite (List_map_hd 0); [ | now rewrite seq_length ].
   now rewrite List_map_seq_length.
 }
+rewrite rngl_summation_split_last. 2: {
+  rewrite square_matrix_ncols; [ | easy ].
+  now rewrite Hrn.
+}
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite square_matrix_ncols in Hk; [ | easy ].
   rewrite Hrn in Hk.
   rewrite Hmd; cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
   rewrite seq_nth; [ | flia Hk Hj ].
-  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hj ].
   cbn; rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec k j) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite Nat_sub_succ_1.
+  destruct (Nat.eq_dec (k - 1 - 1) (j - 1)) as [Hkj| Hkj]. {
+    flia Hj Hk Hkj.
+...
+  destruct (Nat.eq_dec (k - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hj | ].
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_r.
