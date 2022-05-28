@@ -2465,35 +2465,53 @@ destruct (Nat.eq_dec i (mat_ncols M - 1)) as [Hic1| Hic1]. {
       apply Nat.ltb_lt in Hjr; flia Hv Hjr.
     }
     rewrite nth_butn.
-...
-    apply Nat.leb_gt in Hu; rewrite Hu, Nat.add_0_r.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (mat_ncols M - 1) (u - 1)) as [H| H]; [ flia Hu H | ].
+    clear H.
+    rewrite Nat.add_0_r.
     rewrite nth_butn.
-    apply Nat.leb_gt in Hv; rewrite Hv, Nat.add_0_r.
-    easy.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec j (v - 1)) as [H| H]; [ flia Hv H | ].
+    clear H.
+    now rewrite Nat.add_0_r.
   } {
     rewrite List_skipn_seq; [ | flia Hjr Hjr1 ].
     rewrite <- Nat.sub_add_distr.
-    rewrite Nat.add_0_l, <- seq_shift, map_map.
+    rewrite <- seq_shift, map_map.
     apply map_ext_in.
     intros v Hv; apply in_seq in Hv.
     destruct Hv as (Hjv, Hv).
     rewrite Nat.sub_add_distr in Hv.
     rewrite Nat.add_sub_assoc in Hv; [ | flia Hjr Hjr1 ].
-    rewrite Nat.add_comm, Nat.add_sub in Hv.
     rewrite (List_map_nth' []). 2: {
       rewrite butn_length, fold_mat_nrows.
-      now apply Nat.ltb_lt in Hjr; rewrite Hjr.
+      unfold Nat.b2n.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec j (mat_nrows M)) as [H| H]; [ flia H Hv Hjv | ].
+      clear H.
+      rewrite Nat.sub_0_r; flia Hv Hjv.
     }
     rewrite nth_butn.
-    apply Nat.leb_gt in Hu; rewrite Hu, Nat.add_0_r.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec (mat_ncols M - 1) (u - 1)) as [H| H]; [ flia Hu H | ].
+    clear H.
+    rewrite Nat.add_0_r.
     rewrite nth_butn.
-    apply Nat.leb_le in Hjv; rewrite Hjv, Nat.add_1_r.
-    easy.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec j (v - 1)) as [H| H]; [ | flia Hv Hjv H ].
+    rewrite Nat.sub_add; [ | flia Hjv ].
+    unfold mat_el'.
+    now rewrite Nat_sub_succ_1.
   }
 }
 replace (mat_ncols M - 1) with (i + (mat_ncols M - 1 - i)) at 1. 2: {
   flia Hic Hic1.
 }
+...
 rewrite seq_app, Nat.add_0_l.
 do 2 rewrite map_app.
 f_equal. {
