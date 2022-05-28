@@ -440,14 +440,15 @@ rewrite seq_nth. 2: {
 cbn.
 rewrite <- Hmd.
 unfold mat_mul_el.
-symmetry.
-rewrite (rngl_summation_split j). 2: {
-  split; [ flia Hj | ].
-  rewrite square_matrix_ncols; [ | easy ].
+rewrite square_matrix_ncols; [ | easy ].
+rewrite square_matrix_ncols; [ | easy ].
+rewrite Hrn.
+replace (mat_nrows U) with n. 2: {
   rewrite Hmo; cbn.
-  rewrite List_map_seq_length.
-  apply -> Nat.succ_le_mono; flia Hj.
+  now rewrite List_map_seq_length.
 }
+symmetry.
+rewrite (rngl_summation_split j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia Hj ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
@@ -470,16 +471,7 @@ rewrite all_0_rngl_summation_0. 2: {
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_l.
-replace (mat_ncols U) with (mat_ncols M). 2: {
-  rewrite square_matrix_ncols; [ | easy ].
-  rewrite Hrn.
-  rewrite Hmo; unfold mat_ncols; cbn.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
-}
 (**)
-rewrite square_matrix_ncols; [ | easy ].
-rewrite Hrn.
 rewrite <- Nat.sub_succ_l; [ | easy ].
 rewrite <- Nat.sub_succ_l; [ | easy ].
 do 2 rewrite Nat_sub_succ_1.
