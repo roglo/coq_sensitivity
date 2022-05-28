@@ -30,7 +30,8 @@ Context (rp : ring_like_prop T).
 
 Definition is_symm_mat (A : matrix T) :=
   is_square_matrix A = true ∧
-  ∀ i j, i < mat_nrows A → j < mat_nrows A → mat_el A i j = mat_el A j i.
+  ∀ i j, 1 ≤ i ≤ mat_nrows A → 1 ≤ j ≤ mat_nrows A →
+  mat_el' A i j = mat_el' A j i.
 
 Definition princ_subm_1 (A : matrix T) k := subm k k A.
 
@@ -111,7 +112,6 @@ Theorem eq_vect_squ_0 :
   rngl_is_ordered = true →
   ∀ v, ≺ v, v ≻ = 0%F → v = vect_zero (vect_size v).
 Proof.
-(**)
 intros Hop Hed Hdo Hor * Hvvz.
 unfold vect_dot_mul in Hvvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
@@ -120,7 +120,7 @@ destruct v as (la).
 cbn in Hvvz, Hi |-*.
 rewrite nth_repeat.
 revert i Hi.
-induction la as [| a]; intros; [ easy | ].
+induction la as [| a]; intros; [ cbn in Hi; flia Hi | ].
 cbn in Hvvz, Hi.
 rewrite rngl_summation_list_cons in Hvvz.
 apply rngl_eq_add_0 in Hvvz; [ | easy | | ]; cycle 1. {
@@ -147,9 +147,17 @@ destruct i. {
   }
   now destruct Haz.
 }
+rewrite Nat_sub_succ_1.
+destruct i. {
+  apply rngl_integral in Haz; [ | now left | ]. 2: {
+    now apply Bool.orb_true_iff; left.
+  }
+  now destruct Haz.
+}
 cbn.
-apply Nat.succ_lt_mono in Hi.
-now apply IHla.
+replace i with (S i - 1) by flia Hi.
+apply IHla.
+flia Hi.
 Qed.
 
 Theorem Rayleigh_quotient_mul_scal_l_zero :
@@ -275,8 +283,8 @@ Definition mat_with_diag n d :=
 
 Definition mat_with_vect n Vl :=
   mk_mat
-    (map (λ i, map (λ j, vect_el (nth j Vl (vect_zero n)) i) (seq 0 n))
-       (seq 0 n)).
+    (map (λ i, map (λ j, vect_el' (nth j Vl (vect_zero n)) i) (seq 0 n))
+       (seq 1 n)).
 
 (* In the real case, the symmetric matrix M is diagonalisable in the
    sense that there exists an orthogonal matrix U (the columns of which
@@ -384,6 +392,7 @@ intros i j Hi Hj.
 unfold mat_ncols, mat_with_diag in Hj; cbn in Hj.
 rewrite (List_map_hd 0) in Hj; [ | now rewrite seq_length ].
 rewrite List_map_seq_length in Hj.
+...
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
