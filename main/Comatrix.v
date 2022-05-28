@@ -148,8 +148,8 @@ now do 2 rewrite mat_swap_same_rows.
 Qed.
 
 Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
-  1 ≤ q ≤ mat_nrows M
-  → mat_el' (mat_swap_rows (p - 1) (q - 1) M) q j = mat_el' M p j.
+  q < mat_nrows M
+  → mat_el' (mat_swap_rows p q M) (S q) j = mat_el' M (S p) j.
 Proof.
 intros * Hql; cbn.
 destruct M as (ll); cbn in Hql |-*.
@@ -157,6 +157,7 @@ f_equal; clear j.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hql ].
 rewrite seq_nth; [ | flia Hql ].
 rewrite Nat.add_0_l.
+do 2 rewrite Nat.sub_0_r.
 now rewrite transposition_2.
 Qed.
 
@@ -2063,18 +2064,20 @@ rewrite (List_map_hd 0). 2: {
   now apply Nat.neq_0_lt_0.
 }
 rewrite List_map_seq_length.
-...
+rewrite <- seq_shift, map_map.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 destruct Hi as (_, Hi); cbn in Hi.
 erewrite map_ext_in. 2: {
   intros j Hj; apply in_seq in Hj.
-  destruct Hj as (_, Hj); cbn in Hj.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  cbn in Hj.
+  rewrite Nat_sub_succ_1.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length ].
+  rewrite seq_shift.
+  rewrite seq_nth; [ | flia Hj ].
   rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | easy ].
-  now cbn.
+  now do 2 rewrite Nat.add_comm, Nat.add_sub.
 }
 destruct ll as [| l]; [ easy | ].
 unfold mat_ncols in Hcz; cbn in Hcz.
@@ -2083,6 +2086,10 @@ rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%F) at 1.
 apply is_scm_mat_iff in Hcm.
 unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
 destruct Hcm as (_, Hcl).
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  now intros; rewrite Nat_sub_succ_1.
+}
 symmetry.
 rewrite Hcl; [ easy | ].
 now apply nth_In.
@@ -2091,17 +2098,19 @@ Qed.
 Theorem laplace_formula_on_cols : in_charac_0_field →
   ∀ (M : matrix T) j,
   is_square_matrix M = true
-  → j < mat_ncols M
-  → det M = ∑ (i = 0, mat_nrows M - 1), mat_el M i j * mat_el (com M) i j.
+  → 1 ≤ j ≤ mat_ncols M
+  → det M = ∑ (i = 1, mat_nrows M), mat_el' M i j * mat_el' (com M) i j.
 Proof.
-intros Hif * Hsm Hljn.
+intros Hif * Hsm Hj.
 rewrite <- determinant_transpose; [ | easy | easy ].
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite <- mat_transp_el; [ | now apply squ_mat_is_corr ].
+  rewrite <- mat_transp_el; [ | | flia Hj | flia Hi ]. 2: {
+    now apply squ_mat_is_corr.
+  }
   easy.
 }
-cbn - [ det mat_el ].
+cbn - [ det mat_el' ].
 specialize (@laplace_formula_on_rows Hif (M⁺)%M j) as H1.
 assert (H : is_square_matrix M⁺ = true) by now apply mat_transp_is_square.
 specialize (H1 H); clear H.
@@ -2109,9 +2118,9 @@ rewrite mat_transp_nrows in H1.
 rewrite mat_transp_ncols in H1.
 rewrite if_eqb_eq_dec in H1.
 destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
-  now rewrite Hcz in Hljn.
+  rewrite Hcz in Hj; flia Hj.
 }
-specialize (H1 Hljn).
+specialize (H1 Hj).
 rewrite H1.
 apply rngl_summation_eq_compat.
 intros i Hi.
@@ -2119,7 +2128,7 @@ f_equal.
 symmetry.
 rewrite comatrix_transpose; [ | easy | easy ].
 symmetry.
-apply mat_transp_el.
+apply mat_transp_el; [ | flia Hj | flia Hi ].
 apply comatrix_is_correct.
 now apply squ_mat_is_corr.
 Qed.
@@ -2147,58 +2156,67 @@ determinant_with_bad_row
 Theorem determinant_with_row : in_charac_0_field →
   ∀ i (M : matrix T),
   is_square_matrix M = true
-  → i < mat_nrows M
+  → 1 ≤ i ≤ mat_nrows M
   → det M =
-    ∑ (j = 0, mat_nrows M - 1),
-    minus_one_pow (i + j) * mat_el M i j * det (subm i j M).
+    ∑ (j = 1, mat_nrows M),
+    minus_one_pow (i + j) * mat_el' M i j * det (subm (i - 1) (j - 1) M).
 Proof.
 intros Hif * Hsm Hir.
-destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+assert (Hop : rngl_has_opp = true) by now destruct Hif.
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   subst i; cbn - [ det ].
   unfold det.
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
     rewrite mat_nrows_subm.
-    apply Nat.ltb_lt in Hir; rewrite Hir.
     easy.
   }
   cbn.
   replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hir.
+  rewrite determinant_succ.
   now cbn; rewrite Nat.sub_0_r.
 }
-apply rngl_opp_inj; [ now destruct Hif | ].
-apply Nat.neq_sym in Hiz.
-rewrite <- (determinant_alternating Hif M Hiz); [ | flia Hir | easy | easy ].
+assert (Hiz : i - 1 ≠ 0) by flia Hi1 Hir.
+apply rngl_opp_inj; [ easy | ].
+rewrite <- (determinant_alternating Hif M Hiz); [ | | | easy ]; cycle 1. {
+  flia Hir.
+} {
+  flia Hir.
+}
 unfold det at 1.
 rewrite mat_swap_rows_nrows.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
-rewrite determinant_succ at 1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite mat_swap_rows_comm.
-  rewrite mat_el_mat_swap_rows; [ | flia Hir ].
-  easy.
-}
-rewrite rngl_opp_summation; [ | now destruct Hif ].
+rewrite determinant_succ.
+rewrite <- Nat.sub_succ_l; [ | flia Hir ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_opp_summation; [ | easy ].
 apply rngl_summation_eq_compat.
 intros j Hj.
 rewrite <- rngl_mul_assoc; symmetry.
-rewrite <- rngl_mul_opp_r; [ | now destruct Hif ].
+rewrite <- rngl_mul_opp_r; [ | easy ].
 rewrite (Nat.add_comm i j).
-rewrite minus_one_pow_add_r; [ | now destruct Hif ].
+rewrite minus_one_pow_add_r; [ | easy ].
+rewrite rngl_mul_opp_r; [ | easy ].
+rewrite <- rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_l; [ | easy ].
+rewrite <- rngl_mul_opp_l; [ | easy ].
 do 2 rewrite <- rngl_mul_assoc.
+rewrite minus_one_pow_succ; [ | easy ].
 f_equal.
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite <- rngl_mul_assoc.
+rewrite mat_el_mat_swap_rows; [ | flia Hj ].
+rewrite <- Nat.sub_succ_l; [ | easy ].
+rewrite Nat_sub_succ_1.
 f_equal.
-rewrite rngl_mul_opp_l, <- rngl_mul_opp_r; cycle 1. {
-  now destruct Hif.
-} {
-  now destruct Hif.
-}
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 symmetry.
 rewrite mat_swap_rows_comm.
+replace (minus_one_pow i) with (- minus_one_pow (i - 1))%F. 2: {
+  destruct i; [ easy | cbn ].
+  rewrite Nat.sub_0_r.
+  now rewrite minus_one_pow_succ.
+}
 rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; cycle 1. {
   flia Hir Hiz.
 } {
@@ -2214,11 +2232,11 @@ Qed.
 Theorem determinant_with_bad_row : in_charac_0_field →
   ∀ i k (M : matrix T),
   is_square_matrix M = true
-  → i < mat_nrows M
-  → k < mat_nrows M
+  → 1 ≤ i ≤ mat_nrows M
+  → 1 ≤ k ≤ mat_nrows M
   → i ≠ k
-  → ∑ (j = 0, mat_nrows M - 1),
-    minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%F.
+  → ∑ (j = 1, mat_nrows M),
+    minus_one_pow (i + j) * mat_el' M k j * det (subm (i - 1) (j - 1) M) = 0%F.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
 specialize (square_matrix_ncols _ Hsm) as Hc.
@@ -2226,9 +2244,9 @@ remember
   (mk_mat
      (map
         (λ p,
-         map (λ q, mat_el M (if p =? i then k else p) q)
-           (seq 0 (mat_ncols M)))
-        (seq 0 (mat_nrows M))))
+         map (λ q, mat_el' M (if p =? i then k else p) q)
+           (seq 1 (mat_ncols M)))
+        (seq 1 (mat_nrows M))))
   as A eqn:HA.
 assert (Hasm : is_square_matrix A = true). {
   subst A.
@@ -2256,14 +2274,16 @@ assert (H1 : det A = 0%F). {
     now rewrite Hira.
   }
   intros j; subst A; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hir ].
   symmetry.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hkr ].
   f_equal.
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
-  rewrite seq_nth; [ | easy ].
-  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hkr ].
+  rewrite seq_nth; [ | flia Hir ].
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
   cbn; rewrite Nat.eqb_refl.
   apply Nat.neq_sym, Nat.eqb_neq in Hik.
   now rewrite Hik.
@@ -2278,10 +2298,12 @@ intros j Hj.
 do 2 rewrite <- rngl_mul_assoc.
 f_equal; f_equal. {
   rewrite HA; cbn.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hir ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hir ].
-  rewrite seq_nth; [ | easy ].
+  rewrite seq_nth; [ | flia Hir ].
   rewrite seq_nth; [ | rewrite Hc; flia Hj Hir ].
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
   now rewrite Nat.eqb_refl.
 }
 (* oops... complicated from now! doing a lemma, perhaps? *)
@@ -2290,13 +2312,18 @@ do 2 rewrite map_length.
 do 2 rewrite butn_length.
 do 2 rewrite fold_mat_nrows.
 rewrite Hira.
+(*
 apply Nat.ltb_lt in Hir; rewrite Hir; cbn.
+*)
 f_equal; f_equal; f_equal.
 rewrite HA; cbn.
 destruct M as (ll); cbn in Hir, Hj |-*.
 unfold mat_ncols; cbn.
+(*
 apply Nat.ltb_lt in Hir.
+*)
 remember (seq 0 (length (hd [] ll))) as x eqn:Hx.
+...
 rewrite List_seq_cut with (i := i); [ subst x | now apply in_seq ].
 rewrite Nat.sub_0_r, Nat.add_0_l.
 do 2 rewrite map_app; cbn.
@@ -2360,6 +2387,8 @@ f_equal. {
   apply Hcl, nth_In; flia Hu.
 }
 Qed.
+
+...
 
 Theorem mat_transp_subm : ∀ M i j,
   is_correct_matrix M = true
