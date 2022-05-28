@@ -447,7 +447,22 @@ replace (mat_nrows U) with n. 2: {
   rewrite Hmo; cbn.
   now rewrite List_map_seq_length.
 }
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  do 2 rewrite Nat_sub_succ_1.
+  easy.
+}
 symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  do 2 rewrite Nat_sub_succ_1.
+  easy.
+}
+cbn.
 rewrite (rngl_summation_split j); [ | flia Hj ].
 rewrite rngl_summation_split_last; [ | flia Hj ].
 rewrite all_0_rngl_summation_0. 2: {
@@ -464,7 +479,6 @@ rewrite all_0_rngl_summation_0. 2: {
   rewrite seq_nth; [ | flia Hk Hj ].
   rewrite seq_nth; [ | flia Hj ].
   cbn; rewrite if_eqb_eq_dec.
-  do 2 rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
   destruct (Nat.eq_dec (k - 1 - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hkj | ].
@@ -472,9 +486,6 @@ rewrite all_0_rngl_summation_0. 2: {
 }
 rewrite rngl_add_0_l.
 (**)
-rewrite <- Nat.sub_succ_l; [ | easy ].
-rewrite <- Nat.sub_succ_l; [ | easy ].
-do 2 rewrite Nat_sub_succ_1.
 destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
   subst j.
   rewrite rngl_summation_empty; [ | flia ].
