@@ -2580,18 +2580,27 @@ f_equal. {
     rewrite Nat.sub_add in Hv; [ | flia Hjr ].
     rewrite (List_map_nth' []). 2: {
       rewrite butn_length, fold_mat_nrows.
-...
-      now apply Nat.ltb_lt in Hjr; rewrite Hjr.
+      apply Nat.ltb_lt in Hjr; rewrite Hjr.
+      cbn; flia Hv Hr1.
     }
     rewrite nth_butn.
-    apply Nat.leb_gt in Hu; rewrite Hu, Nat.add_0_r.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec i (u - 1)) as [H| H]; [ flia Hu H | ].
+    clear H.
+    rewrite Nat.add_0_r.
     rewrite nth_butn.
-    apply Nat.leb_le in Hjv; rewrite Hjv, Nat.add_1_r.
-    easy.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+    destruct (le_dec j (v - 1)) as [H| H]; [ | flia H Hjv ].
+    rewrite Nat.sub_add; [ | flia Hjv ].
+    unfold mat_el'.
+    now rewrite Nat_sub_succ_1.
   }
 }
 rewrite List_skipn_seq; [ | flia Hic Hic1 ].
 rewrite <- Nat.sub_add_distr.
+...
 rewrite Nat.add_0_l, <- seq_shift, map_map.
 apply map_ext_in.
 intros u Hu; apply in_seq in Hu.
