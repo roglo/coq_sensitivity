@@ -281,6 +281,8 @@ Definition mat_with_diag n d :=
 
 (* matrix with columns given as list of vectors *)
 
+...
+
 Definition mat_with_vect n Vl :=
   mk_mat
     (map (λ i, map (λ j, vect_el' (nth j Vl (vect_zero n)) i) (seq 0 n))
@@ -429,18 +431,14 @@ cbn.
 rewrite <- Hmd.
 unfold mat_mul_el.
 symmetry.
-rewrite (rngl_summation_split (j - 1)). 2: {
+rewrite (rngl_summation_split j). 2: {
   split; [ flia Hj | ].
   rewrite square_matrix_ncols; [ | easy ].
   rewrite Hmo; cbn.
   rewrite List_map_seq_length.
   apply -> Nat.succ_le_mono; flia Hj.
 }
-rewrite Nat.sub_add; [ | easy ].
-...
-(*
 rewrite rngl_summation_split_last; [ | flia Hj ].
-*)
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite Hmo; cbn.
@@ -458,7 +456,7 @@ rewrite all_0_rngl_summation_0. 2: {
   do 2 rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
-  destruct (Nat.eq_dec (k - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hkj | ].
+  destruct (Nat.eq_dec (k - 1 - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hkj | ].
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_l.
@@ -471,8 +469,11 @@ replace (mat_ncols U) with (mat_ncols M). 2: {
 }
 rewrite rngl_summation_split_last. 2: {
   rewrite square_matrix_ncols; [ | easy ].
+  rewrite Hrn.
+...
   now rewrite Hrn.
 }
+*)
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite square_matrix_ncols in Hk; [ | easy ].
