@@ -2894,39 +2894,38 @@ destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
 apply map2_length.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
   is_correct_matrix MA = true
   → is_correct_matrix MB = true
-  → i < mat_nrows MA
-  → i < mat_nrows MB
-  → j < mat_ncols MA
-  → j < mat_ncols MB
-  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
+  → 1 ≤ i ≤ mat_nrows MA
+  → 1 ≤ i ≤ mat_nrows MB
+  → 1 ≤ j ≤ mat_ncols MA
+  → 1 ≤ j ≤ mat_ncols MB
+  → mat_el' (MA + MB) i j = (mat_el' MA i j + mat_el' MB i j)%F.
 Proof.
 intros * Ha Hb Hia Hib Hja Hjb.
 unfold "+"%M; cbn.
 rewrite map2_nth with (a := []) (b := []); cycle 1. {
-  now rewrite fold_mat_nrows.
+  rewrite fold_mat_nrows; flia Hia.
 } {
-  now rewrite fold_mat_nrows.
+  rewrite fold_mat_nrows; flia Hib.
 }
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   apply is_scm_mat_iff in Ha.
   destruct Ha as (Hcra & Hca).
-  rewrite Hca; [ easy | ].
+  rewrite Hca; [ flia Hja | ].
   apply nth_In.
-  now rewrite fold_mat_nrows.
+  rewrite fold_mat_nrows; flia Hia.
 } {
   apply is_scm_mat_iff in Hb.
   destruct Hb as (Hcrb & Hcb).
-  rewrite Hcb; [ easy | ].
+  rewrite Hcb; [ flia Hjb | ].
   apply nth_In.
-  now rewrite fold_mat_nrows.
+  rewrite fold_mat_nrows; flia Hib.
 }
 easy.
 Qed.
-*)
 
 Theorem List_repeat_as_map : ∀ A (a : A) n,
   repeat a n = map (λ _, a) (seq 0 n).

@@ -183,16 +183,18 @@ now rewrite mat_mul_scal_1_l, IHm.
 Qed.
 
 Theorem mat_el_of_nat_diag {n} : ∀ m i,
-  i < n
-  → mat_el
+  1 ≤ i ≤ n
+  → mat_el'
       (sm_mat
          (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)) i i =
     rngl_of_nat m.
 (*
-  ∀ m i : nat, i < n → mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+  ∀ m i : nat, 1 ≤ i ≤ n →
+  mat_el' (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
 *)
 Proof.
 intros * Hin.
+assert (Hi' : i - 1 < n) by flia Hin.
 rewrite sm_mat_of_nat; [ | now left ].
 cbn.
 rewrite map_map.
@@ -233,7 +235,7 @@ split. {
   rewrite Hc in Hlla; cbn in Hlla.
   exfalso; clear lla Hc.
   destruct i; [ easy | clear Hiz ].
-  cbn - [ mat_el ] in Hlla.
+  cbn - [ mat_el' ] in Hlla.
   apply Nat.neq_0_lt_0 in Hnz.
   rewrite mat_el_add in Hlla; cycle 1. {
     apply mI_is_correct_matrix.
@@ -601,7 +603,7 @@ specialize (H1 T ro rp).
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   intros i Hi.
-  apply (f_equal (λ M, mat_el (sm_mat M) 0 0)) in Hi.
+  apply (f_equal (λ M, mat_el' (sm_mat M) 1 1)) in Hi.
   cbn in Hi.
   rewrite List_nth_repeat in Hi.
   destruct (lt_dec 0 n) as [H| H]; [ clear H | flia Hnz H ].
@@ -627,7 +629,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (rngl_of_nat i)) 0 0) with
+  replace (mat_el' (sm_mat (rngl_of_nat i)) 1 1) with
     (@rngl_of_nat T ro i) in Hi. 2: {
     symmetry.
     clear Hi.
@@ -638,7 +640,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
       rewrite List_nth_repeat.
       now destruct (lt_dec 0 n).
     }
-    cbn - [ mat_el ].
+    cbn - [ mat_el' ].
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {

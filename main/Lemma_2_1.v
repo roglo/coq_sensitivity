@@ -872,8 +872,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (H1 H); clear H.
   (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
-...
-  specialize (Hvv i (nth i ev 0%F) vi Hi eq_refl Hvi) as H2.
+  specialize (Hvv (i - 1) _ vi Hi' eq_refl Hvi) as H2.
   rewrite H2 in H1.
   clear H2.
   replace (M⁺)%M with M in H1. 2: {
@@ -882,17 +881,23 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     destruct M as (ll); cbn in Hr, Hsy |-*; f_equal.
     rewrite (List_map_nth_seq ll []) at 1.
     rewrite Hr.
+    rewrite <- seq_shift, map_map.
     apply map_ext_in.
-    intros i' Hi'; apply in_seq in Hi'.
-    rewrite (List_map_nth_seq (nth i' ll []) 0%F) at 1.
+    intros k Hk; apply in_seq in Hk.
+    rewrite Nat_sub_succ_1.
+    rewrite (List_map_nth_seq (nth k ll []) 0%F) at 1.
     apply is_scm_mat_iff in Hsm; cbn in Hsm.
     destruct Hsm as (Hcr, Hcl).
     rewrite Hcl; [ rewrite Hr | now apply nth_In; rewrite Hr ].
+    rewrite map_map.
     apply map_ext_in.
-    intros j' Hj'; apply in_seq in Hj'.
-    now apply Hsy; rewrite Hr.
+    intros l Hl; apply in_seq in Hl.
+    rewrite Nat_sub_succ_1.
+    specialize (Hsy (S k) (S l)).
+    do 2 rewrite Nat_sub_succ_1 in Hsy.
+    apply Hsy; rewrite Hr; [ flia Hk | flia Hl ].
   }
-  specialize (Hvv j (nth j ev 0%F) vj Hj eq_refl Hvj) as H2.
+  specialize (Hvv (j - 1) _ vj Hj' eq_refl Hvj) as H2.
   rewrite H2 in H1.
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
@@ -904,11 +909,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   exfalso.
   apply rngl_mul_cancel_r in H1; [ | now left | easy ].
   revert H1.
-  now apply Hall_diff.
+  apply Hall_diff; [ easy | easy | flia Hij Hi Hj ].
 }
 Qed.
-
-...
 
 (* to be completed
 Theorem diagonalized_matrix_prop : in_charac_0_field →
