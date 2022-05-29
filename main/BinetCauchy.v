@@ -2773,17 +2773,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ mat_el ].
+cbn - [ mat_el' ].
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    unfold mat_el, ff_app; cbn.
+    unfold mat_el', ff_app; cbn.
     unfold list_list_select_rows.
 ...
 unfold mat_select_rows.
 unfold list_list_select_rows.
-Search (mat_el (mat_select_rows _ _)).
+Search (mat_el' (mat_select_rows _ _)).
 ...
 ... returning
 erewrite rngl_summation_eq_compat. 2: {
@@ -2953,7 +2953,7 @@ remember (canon_sym_gr_list m) as σ eqn:Hσ.
   ∑ (k = 0, m! - 1),
   ε m (σ k) *
   ∏ (i = 0, m - 1),
-    (∑ (j = 0, n - 1), mat_el A i j * mat_el B j (ff_app (σ k) i)) =
+    (∑ (j = 0, n - 1), mat_el' A i j * mat_el' B j (ff_app (σ k) i)) =
 
   ∑ (k = 0, m! - 1),
   ε m (σ k) *
@@ -2992,11 +2992,11 @@ erewrite map_ext_in. 2: {
   easy.
 }
 (* k-th col of AB is
-     ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j
+     ∑ (j = 0, n - 1), mat_el' B j k * mat_el' A i j
  *)
 (* i.e.
-     let As j := mat_el A i j in
-     ∑ (j = 0, n - 1), mat_el B j k * As j
+     let As j := mat_el' A i j in
+     ∑ (j = 0, n - 1), mat_el' B j k * As j
  *)
 unfold det'.
 cbn - [ det ].
@@ -3037,7 +3037,7 @@ Print mat_repl_vect.
 map2 (replace_at k) (mat_list_list M) (vect_list V) =
 map
   (λ i : nat,
-   map (λ k : nat, ∑ (j = 0, n - 1), mat_el B j k * mat_el A i j)
+   map (λ k : nat, ∑ (j = 0, n - 1), mat_el' B j k * mat_el' A i j)
      (seq 0 m))
   (seq 0 m)
 
@@ -3237,8 +3237,8 @@ destruct n. {
   rewrite rngl_mul_1_l.
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
   rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  remember (mat_el A) as a eqn:Ha.
-  remember (mat_el B) as b eqn:Hb.
+  remember (mat_el' A) as a eqn:Ha.
+  remember (mat_el' B) as b eqn:Hb.
   move b before a.
 (**)
   ring_simplify.

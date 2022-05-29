@@ -252,7 +252,7 @@ rewrite Nat_sub_succ_1.
 rewrite <- Nat_fact_succ.
 apply rngl_summation_eq_compat.
 intros k Hk.
-(* elimination of "mat_el M 0 (k / (n!)" <- comment to review *)
+(* elimination of "mat_el' M 1 (1 + k / (n!)" *)
 symmetry.
 rewrite rngl_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
