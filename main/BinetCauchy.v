@@ -2821,7 +2821,6 @@ Search (isort _ (rev _)).
 cbn - [ det ].
 Theorem glip : ∀ m n i,
   isort Nat.leb (rev (to_radix_loop m n i)) ∈ sub_lists_of_seq_0_n n m.
-Admitted.
 ...
 Require Import PermutationFun.
 Search isort.

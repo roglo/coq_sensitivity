@@ -3236,10 +3236,7 @@ erewrite rngl_summation_eq_compat. 2: {
   assert (H : u < n) by flia Hu Hj.
   apply Nat.ltb_lt in H; rewrite H.
   now cbn.
-  admit.
-  admit.
-  admit.
-  admit.
+...
 }
 cbn.
 rewrite map_length.
