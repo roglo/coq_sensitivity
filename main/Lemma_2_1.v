@@ -576,8 +576,6 @@ replace (vect_size W) with n. 2: {
 now rewrite Nat.min_id.
 Qed.
 
-...
-
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -613,7 +611,7 @@ destruct V as (lv); cbn.
 cbn in Hur, Hvr, Hrz.
 rewrite map_map.
 erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
+  intros i Hi.
   rewrite (List_map_nth' []). 2: {
    apply Nat.min_glb_lt_iff with (m := length lv).
    rewrite Hvr, Nat.min_id.
@@ -623,7 +621,7 @@ erewrite rngl_summation_eq_compat. 2: {
   unfold vect_dot_mul'; cbn.
   apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
-  rewrite (Hcl (nth i ll [])). 2: {
+  rewrite (Hcl (nth (i - 1) ll [])). 2: {
     cbn; apply nth_In; flia Hi Hrz.
   }
   cbn; rewrite Hur, Nat.min_id.
@@ -633,9 +631,9 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 rewrite rngl_summation_summation_exch'.
 apply rngl_summation_eq_compat.
-intros i (_, Hi).
+intros i Hi.
 erewrite rngl_summation_eq_compat. 2: {
-  intros j (_, Hj).
+  intros j Hj.
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite rngl_mul_comm; [ | easy ].
   easy.
@@ -649,11 +647,13 @@ unfold vect_dot_mul'; cbn.
 rewrite List_map_seq_length.
 rewrite Hvr, Nat.min_id.
 eapply rngl_summation_eq_compat.
-intros j (_, Hj).
+intros j Hj.
 f_equal.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hrz ].
 rewrite seq_nth; [ | flia Hi Hrz ].
 rewrite seq_nth; [ | flia Hj Hrz ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm, Nat.add_sub.
 easy.
 Qed.
 
@@ -705,20 +705,21 @@ now rewrite List_map_seq_length.
 Qed.
 
 Theorem mat_with_vect_el : ∀ n lv i j,
-  i < n
-  → j < n
-  → mat_el (mat_with_vect n lv) i j = vect_el (nth j lv (vect_zero n)) i.
+  1 ≤ i ≤ n
+  → 1 ≤ j ≤ n
+  → mat_el' (mat_with_vect n lv) i j = vect_el' (nth (j - 1) lv (vect_zero n)) i.
 Proof.
 intros * Hin Hjn; cbn.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | easy ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hjn ].
+rewrite seq_nth; [ | flia Hjn ].
+rewrite seq_nth; [ | flia Hin ].
+rewrite Nat.add_0_l, Nat.add_comm, Nat.sub_add; [ | easy ].
 easy.
 Qed.
 
 Theorem fold_vect_dot_mul' : ∀ U V,
-  ∑ (i = 0, min (vect_size U) (vect_size V) - 1), vect_el U i * vect_el V i =
+  ∑ (i = 1, min (vect_size U) (vect_size V)), vect_el' U i * vect_el' V i =
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
@@ -778,6 +779,7 @@ apply Nat.eqb_neq in Hnz; rewrite Hnz.
 rewrite mat_with_vect_nrows.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
+...
   rewrite mat_transp_el; [ | apply mat_with_vect_is_corr ].
   rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
   rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
@@ -901,6 +903,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   now apply Hall_diff.
 }
 Qed.
+
+...
 
 (* to be completed
 Theorem diagonalized_matrix_prop : in_charac_0_field →
