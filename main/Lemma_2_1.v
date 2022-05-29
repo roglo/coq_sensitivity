@@ -765,6 +765,8 @@ rewrite mat_transp_nrows.
 rewrite mat_with_vect_ncols.
 rewrite mI_ncols.
 intros * Hi Hj.
+assert (Hi' : i - 1 < n) by flia Hi.
+assert (Hj' : j - 1 < n) by flia Hj.
 rewrite mat_el_mul; cycle 1. {
   now rewrite mat_mul_nrows, mat_transp_nrows, mat_with_vect_ncols.
 } {
@@ -779,10 +781,11 @@ apply Nat.eqb_neq in Hnz; rewrite Hnz.
 rewrite mat_with_vect_nrows.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-...
-  rewrite mat_transp_el; [ | apply mat_with_vect_is_corr ].
-  rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
-  rewrite mat_with_vect_el; [ | flia Hk Hi | easy ].
+  rewrite mat_transp_el; [ | | flia Hi | flia Hk ]. 2: {
+    apply mat_with_vect_is_corr.
+  }
+  rewrite mat_with_vect_el; [ | easy | easy ].
+  rewrite mat_with_vect_el; [ | easy | easy ].
   easy.
 }
 cbn.
@@ -791,65 +794,65 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite seq_nth; [ | easy ].
 cbn.
-remember (nth i eV (vect_zero n)) as vi eqn:Hvi.
-remember (nth j eV (vect_zero n)) as vj eqn:Hvj.
+remember (nth (i - 1) eV (vect_zero n)) as vi eqn:Hvi.
+remember (nth (j - 1) eV (vect_zero n)) as vj eqn:Hvj.
 move vj before vi.
 destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; clear Hj.
   rewrite δ_diag.
   destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
-  specialize (Hall_norm_1 i Hi) as H1.
+  specialize (Hall_norm_1 (i - 1) Hi') as H1.
   unfold vect_squ_norm in H1.
   rewrite <- Hvi in H1.
   rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
   unfold vect_dot_mul' in H1.
   rewrite Nat.min_id in H1.
-  destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
-    apply Nat.nlt_ge in Hie.
+  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
+    apply Nat.nle_gt in Hie.
     rewrite <- H1.
-    rewrite nth_overflow in Hvi; [ subst vi | easy ].
+    rewrite nth_overflow in Hvi; [ subst vi | flia Hie ].
     unfold vect_zero; cbn.
     rewrite repeat_length.
     apply rngl_summation_eq_compat.
     intros j Hj.
     f_equal.
     rewrite Hvj; cbn.
-    unfold vect_el; cbn.
+    unfold vect_el'; cbn.
     rewrite List_nth_repeat.
     rewrite <- if_ltb_lt_dec.
     rewrite Tauto.if_same.
-    rewrite nth_overflow with (n := i); [ | easy ].
+    rewrite nth_overflow with (n := i - 1); [ | flia Hie ].
     now cbn; rewrite nth_repeat.
   }
   rewrite Hev in H1. 2: {
     rewrite Hvi.
-    now apply nth_In.
+    apply nth_In; flia Hi Hie.
   }
   now rewrite Hvj, <- Hvi.
 } {
-  rewrite δ_ndiag; [ | easy ].
+  rewrite δ_ndiag; [ | flia Hij Hi Hj ].
   destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
-  destruct (lt_dec i (length eV)) as [Hie| Hie]. 2: {
-    apply Nat.nlt_ge in Hie.
+  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
+    apply Nat.nle_gt in Hie.
     apply all_0_rngl_summation_0.
     intros k Hk.
     rewrite Hvi.
-    rewrite nth_overflow; [ cbn | easy ].
+    rewrite nth_overflow; [ cbn | flia Hie ].
     rewrite nth_repeat.
     now apply rngl_mul_0_l.
   }
-  destruct (lt_dec j (length eV)) as [Hje| Hje]. 2: {
-    apply Nat.nlt_ge in Hje.
+  destruct (le_dec j (length eV)) as [Hje| Hje]. 2: {
+    apply Nat.nle_gt in Hje.
     apply all_0_rngl_summation_0.
     intros k Hk.
     rewrite Hvj.
-    rewrite nth_overflow; [ cbn | easy ].
+    rewrite nth_overflow; [ cbn | flia Hje ].
     rewrite nth_repeat.
     now apply rngl_mul_0_r.
   }
   replace n with (min (vect_size vi) (vect_size vj)). 2: {
-    rewrite Hev; [ | now rewrite Hvi; apply nth_In ].
-    rewrite Hev; [ | now rewrite Hvj; apply nth_In ].
+    rewrite Hev; [ | rewrite Hvi; apply nth_In; flia Hie Hi ].
+    rewrite Hev; [ | rewrite Hvj; apply nth_In; flia Hje Hj ].
     apply Nat.min_id.
   }
   rewrite fold_vect_dot_mul'.
@@ -860,15 +863,16 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite Hr in H1.
   assert (H : vect_size vi = n). {
     rewrite Hvi, Hev; [ easy | ].
-    now apply nth_In.
+    apply nth_In; flia Hie Hi.
   }
   specialize (H1 H); clear H.
   assert (H : vect_size vj = n). {
     rewrite Hvj, Hev; [ easy | ].
-    now apply nth_In.
+    apply nth_In; flia Hje Hj.
   }
   specialize (H1 H); clear H.
   (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
+...
   specialize (Hvv i (nth i ev 0%F) vi Hi eq_refl Hvi) as H2.
   rewrite H2 in H1.
   clear H2.
