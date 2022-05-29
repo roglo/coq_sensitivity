@@ -18,7 +18,7 @@ Record matrix T := mk_mat
 
 Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
 Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
-Definition mat_el' {T} {ro : ring_like_op T} (M : matrix T) i j :=
+Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
   nth (j - 1) (nth (i - 1) (mat_list_list M) []) 0%F.
 
 (* *)
@@ -186,7 +186,7 @@ Qed.
 
 Theorem matrix_eq : ∀ T (ro : ring_like_op T) MA MB,
   (∀ i j, 1 ≤ i ≤ mat_nrows MA → 1 ≤ j ≤ mat_ncols MB →
-   mat_el' MA i j = mat_el' MB i j)
+   mat_el MA i j = mat_el MB i j)
   → is_correct_matrix MA = true
   → is_correct_matrix MB = true
   → mat_nrows MA = mat_nrows MB
@@ -279,10 +279,10 @@ Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
 Proof. easy. Qed.
 
 Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
-  nth j (nth i (mat_list_list M) []) 0%F = mat_el' M (S i) (S j).
+  nth j (nth i (mat_list_list M) []) 0%F = mat_el M (S i) (S j).
 Proof.
 intros.
-unfold mat_el'.
+unfold mat_el.
 now do 2 rewrite Nat_sub_succ_1.
 Qed.
 
@@ -396,7 +396,7 @@ Definition mat_add (MA MB : matrix T) : matrix T :=
 (* multiplication *)
 
 Definition mat_mul_el MA MB i k :=
-   ∑ (j = 1, mat_ncols MA), mat_el' MA i j * mat_el' MB j k.
+   ∑ (j = 1, mat_ncols MA), mat_el MA i j * mat_el MB j k.
 
 Definition mat_mul (MA MB : matrix T) : matrix T :=
   mk_mat
@@ -439,8 +439,8 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → 1 ≤ i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_ncols M
   → 1 ≤ k ≤ mat_ncols M
-  → mat_el' (mat_repl_vect' k M V) i j =
-    if Nat.eq_dec j k then vect_el' V i else mat_el' M i j.
+  → mat_el (mat_repl_vect' k M V) i j =
+    if Nat.eq_dec j k then vect_el' V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -633,7 +633,7 @@ Arguments mat_mul_scal_l {T ro} s%F M%M.
 Arguments mat_list_list [T]%type m%M.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
-Arguments mat_el' {T}%type {ro} M%M (i j)%nat.
+Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_opp {T}%type {ro}.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mI {T ro} n%nat.
@@ -849,10 +849,10 @@ Theorem mat_el_mI_ndiag : ∀ n i j,
   1 ≤ i
   → 1 ≤ j
   → i ≠ j
-  → mat_el' (mI n) i j = 0%F.
+  → mat_el (mI n) i j = 0%F.
 Proof.
 intros * Hi Hj Hij.
-unfold mat_el', mI; cbn.
+unfold mat_el, mI; cbn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
   rewrite Tauto_match_nat_same.
@@ -884,10 +884,10 @@ rewrite List_map_seq_length.
 flia Hin.
 Qed.
 
-Theorem mat_el_mI_diag : ∀ n i, 1 ≤ i ≤ n → mat_el' (mI n) i i = 1%F.
+Theorem mat_el_mI_diag : ∀ n i, 1 ≤ i ≤ n → mat_el (mI n) i i = 1%F.
 Proof.
 intros * Hin.
-unfold mat_el', mI; cbn.
+unfold mat_el, mI; cbn.
 rewrite List_map_nth' with (a := 0). 2: {
   now rewrite seq_length; apply Nat_1_le_sub_lt.
 }
@@ -922,8 +922,8 @@ Qed.
 Theorem mat_el_mul : ∀ MA MB i j,
   1 ≤ i ≤ mat_nrows (MA * MB)
   → 1 ≤ j ≤ mat_ncols (MA * MB)
-  → mat_el' (MA * MB) i j =
-    ∑ (k = 1, mat_ncols MA), mat_el' MA i k * mat_el' MB k j.
+  → mat_el (MA * MB) i j =
+    ∑ (k = 1, mat_ncols MA), mat_el MA i k * mat_el MB k j.
 Proof.
 intros * Hir Hjc; cbn.
 rewrite mat_mul_nrows in Hir.
@@ -1034,9 +1034,9 @@ apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el.
 unfold mat_ncols at 1.
-cbn - [ mat_el' ].
+cbn - [ mat_el ].
 destruct ll as [| lb]; [ easy | ].
-cbn - [ mat_el' ].
+cbn - [ mat_el ].
 rewrite (HM lb (or_introl eq_refl)).
 (* rather use more modern rngl_summation_split3... *)
 rewrite rngl_summation_split with (j0 := S j). 2: {
@@ -1597,10 +1597,10 @@ Theorem mat_vect_mul_assoc_as_sums :
   ∀ (A : matrix T) (B : matrix T) (V : vector T) i,
   1 ≤ i ≤ mat_nrows A
   → ∑ (j = 1, mat_ncols A),
-       mat_el' A i j *
-       (∑ (k = 1, vect_size V), mat_el' B j k * vect_el' V k) =
+       mat_el A i j *
+       (∑ (k = 1, vect_size V), mat_el B j k * vect_el' V k) =
      ∑ (j = 1, vect_size V),
-       (∑ (k = 1, mat_ncols A), mat_el' A i k * mat_el' B k j) *
+       (∑ (k = 1, mat_ncols A), mat_el A i k * mat_el B k j) *
         vect_el' V j.
 Proof.
 intros * Hi.
@@ -1897,14 +1897,14 @@ Qed.
 
 Definition mat_transp (M : matrix T) : matrix T :=
   mk_mat
-    (map (λ j, map (λ i, mat_el' M i j) (seq 1 (mat_nrows M)))
+    (map (λ j, map (λ i, mat_el M i j) (seq 1 (mat_nrows M)))
        (seq 1 (mat_ncols M))).
 
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
 
 Theorem fold_mat_transp : ∀ M,
   mk_mat
-    (map (λ j, map (λ i, mat_el' M i j) (seq 1 (mat_nrows M)))
+    (map (λ j, map (λ i, mat_el M i j) (seq 1 (mat_nrows M)))
        (seq 1 (mat_ncols M))) =
   mat_transp M.
 Proof. easy. Qed.
@@ -2003,10 +2003,10 @@ Theorem mat_transp_el : ∀ M i j,
   is_correct_matrix M = true
   → i ≠ 0
   → j ≠ 0
-  → mat_el' M⁺ i j = mat_el' M j i.
+  → mat_el M⁺ i j = mat_el M j i.
 Proof.
 intros * Hcm Hiz Hjz.
-unfold mat_el'; cbn.
+unfold mat_el; cbn.
 destruct (le_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
   apply Nat.nle_gt in Hic.
   rewrite nth_overflow. 2: {
@@ -2030,7 +2030,7 @@ destruct (le_dec i (mat_ncols M)) as [Hic| Hic]. 2: {
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hiz Hic ].
 destruct (le_dec j (mat_nrows M)) as [Hjr| Hjr]. {
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hjz Hjr ].
-  unfold mat_el'.
+  unfold mat_el.
   rewrite seq_nth; [ cbn | flia Hiz Hic ].
   rewrite seq_nth; [ cbn | flia Hjz Hjr ].
   do 2 rewrite Nat.sub_0_r.
@@ -2139,12 +2139,12 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite mat_transp_el; [ | easy | flia Hk | flia Hj ].
   easy.
 }
-cbn - [ mat_el' ].
+cbn - [ mat_el ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 f_equal.
 unfold mat_transp; cbn.
-unfold mat_el'.
+unfold mat_el.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
 rewrite (List_map_nth' 0); [ | rewrite seq_length ]. 2: {
   rewrite <- Hcarb; flia Hk.
@@ -2158,7 +2158,7 @@ Qed.
 
 (* matrix without row i and column j *)
 
-(* TODO: to be shifted to start at 1 like mat_el' *)
+(* TODO: to be shifted to start at 1 like mat_el *)
 Definition subm i j (M : matrix T) :=
   mk_mat (map (butn j) (butn i (mat_list_list M))).
 
@@ -2902,7 +2902,7 @@ Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
   → 1 ≤ i ≤ mat_nrows MB
   → 1 ≤ j ≤ mat_ncols MA
   → 1 ≤ j ≤ mat_ncols MB
-  → mat_el' (MA + MB) i j = (mat_el' MA i j + mat_el' MB i j)%F.
+  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
 Proof.
 intros * Ha Hb Hia Hib Hja Hjb.
 unfold "+"%M; cbn.
@@ -2973,7 +2973,7 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments mat_el' {T}%type {ro} M%M (i j)%nat.
+Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_add {T}%type {ro} (MA MB)%M.
 Arguments mat_add_0_l {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.

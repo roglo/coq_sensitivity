@@ -55,7 +55,7 @@ Fixpoint determinant_loop n (M : matrix T) :=
   | 0 => 1%F
   | S n' =>
       ∑ (j = 1, n),
-      minus_one_pow (S j) * mat_el' M 1 j * determinant_loop n' (subm 0 (j - 1) M)
+      minus_one_pow (S j) * mat_el M 1 j * determinant_loop n' (subm 0 (j - 1) M)
   end.
 
 Definition det M := determinant_loop (mat_nrows M) M.
@@ -81,7 +81,7 @@ Definition det' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, fact n - 1),
     ε (canon_sym_gr_list n k) *
-    ∏ (i = 1, n), mat_el' M i (ff_app (canon_sym_gr_list n k) (i - 1) + 1).
+    ∏ (i = 1, n), mat_el M i (ff_app (canon_sym_gr_list n k) (i - 1) + 1).
 
 Arguments det' M%M.
 
@@ -96,7 +96,7 @@ Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, n ^ n - 1),
     ε (to_radix n k) *
-    ∏ (i = 1, n), mat_el' M i (ff_app (to_radix n k) (i - 1) + 1).
+    ∏ (i = 1, n), mat_el M i (ff_app (to_radix n k) (i - 1) + 1).
 
 Arguments det'' M%M.
 
@@ -112,7 +112,7 @@ Proof. easy. Qed.
 Theorem determinant_succ : ∀ n (M : matrix T),
   determinant_loop (S n) M =
      ∑ (j = 1, S n),
-     minus_one_pow (S j) * mat_el' M 1 j * determinant_loop n (subm 0 (j - 1) M).
+     minus_one_pow (S j) * mat_el M 1 j * determinant_loop n (subm 0 (j - 1) M).
 Proof. easy. Qed.
 
 (*
@@ -252,13 +252,13 @@ rewrite Nat_sub_succ_1.
 rewrite <- Nat_fact_succ.
 apply rngl_summation_eq_compat.
 intros k Hk.
-(* elimination of "mat_el' M 1 (1 + k / (n!)" *)
+(* elimination of "mat_el M 1 (1 + k / (n!)" *)
 symmetry.
 rewrite rngl_product_split_first; [ | flia ].
 rewrite Nat.sub_diag.
 rewrite Nat.add_1_r.
 cbn - [ canon_sym_gr_list nth ].
-remember (mat_el' M 1 _) as x eqn:Hx.
+remember (mat_el M 1 _) as x eqn:Hx.
 rewrite rngl_mul_comm; [ | easy ].
 symmetry.
 rewrite <- rngl_mul_assoc.
@@ -280,7 +280,7 @@ f_equal. {
   intros i Hi.
   rewrite Nat.add_comm, Nat.add_sub.
   rewrite Nat.sub_0_r.
-  unfold mat_el'.
+  unfold mat_el.
   do 3 rewrite Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
   unfold ff_app.
@@ -419,10 +419,10 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
 }
 assert (H :
   ∑ (l ∈ to_radix_list n),
-  ε l * ∏ (j = 1, n), mat_el' M j (ff_app l (j - 1) + 1) =
+  ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
   ∑ (l ∈ to_radix_list n),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
-    ε l * ∏ (j = 1, n), mat_el' M j (ff_app l (j - 1) + 1)
+    ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
   else 0). {
   apply rngl_summation_list_eq_compat.
   intros l Hl.
@@ -580,7 +580,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ mat_el' ].
+cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
 rewrite rngl_mul_summation_distr_l; [ | now left ].
 rewrite rngl_mul_summation_distr_l; [ | now left ].
@@ -716,7 +716,7 @@ rewrite Hpp.
 destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 subst UV.
-cbn - [ mat_el' ].
+cbn - [ mat_el ].
 rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
   now rewrite map_length, fold_vect_size, Hu.
 } {
@@ -732,7 +732,7 @@ rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 (* elimination of the following term (q) *)
 remember
   (∏ (i0 = 2, p + 1),
-   mat_el' M (i0 - 1) (nth (i0 - 2) (canon_sym_gr_list n k) O + 1))
+   mat_el M (i0 - 1) (nth (i0 - 2) (canon_sym_gr_list n k) O + 1))
   as q eqn:Hq.
 rewrite (rngl_mul_mul_swap Hic _ _ q).
 do 3 rewrite (rngl_mul_comm Hic _ q).
@@ -988,11 +988,11 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros i Hi.
-    replace (mat_el' _ _ _) with
-      (mat_el' M (i + 1)
+    replace (mat_el _ _ _) with
+      (mat_el M (i + 1)
          (ff_app (canon_sym_gr_list n k) (transposition p q i) + 1)). 2: {
       unfold ff_app; cbn.
-      unfold mat_el'; f_equal.
+      unfold mat_el; f_equal.
       unfold list_swap_elem.
       do 2 rewrite Nat.add_sub.
       rewrite (List_map_nth' 0). 2: {
@@ -1274,7 +1274,7 @@ Theorem determinant_same_rows : in_charac_0_field →
   → p ≠ q
   → 1 ≤ p ≤ mat_nrows M
   → 1 ≤ q ≤ mat_nrows M
-  → (∀ j, 1 ≤ j → mat_el' M p j = mat_el' M q j)
+  → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
@@ -1366,7 +1366,7 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
     (map
        (λ i,
         map
-          (λ j, if Nat.eq_dec i k then (s * mat_el' M i j)%F else mat_el' M i j)
+          (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
           (seq 1 n))
        (seq 1 n)).
 
@@ -1394,9 +1394,9 @@ Theorem det_add_row_row : ∀ n (A B C : matrix T),
   → is_square_matrix A = true
   → is_square_matrix B = true
   → is_square_matrix C = true
-  → (∀ j, mat_el' A 1 j = (mat_el' B 1 j + mat_el' C 1 j)%F)
-  → (∀ i j, i ≠ 1 → mat_el' B i j = mat_el' A i j)
-  → (∀ i j, i ≠ 1 → mat_el' C i j = mat_el' A i j)
+  → (∀ j, mat_el A 1 j = (mat_el B 1 j + mat_el C 1 j)%F)
+  → (∀ i j, i ≠ 1 → mat_el B i j = mat_el A i j)
+  → (∀ i j, i ≠ 1 → mat_el C i j = mat_el A i j)
   → det A = (det B + det C)%F.
 Proof.
 intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.

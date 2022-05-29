@@ -31,7 +31,7 @@ Context (rp : ring_like_prop T).
 Definition is_symm_mat (A : matrix T) :=
   is_square_matrix A = true ∧
   ∀ i j, 1 ≤ i ≤ mat_nrows A → 1 ≤ j ≤ mat_nrows A →
-  mat_el' A i j = mat_el' A j i.
+  mat_el A i j = mat_el A j i.
 
 Definition princ_subm_1 (A : matrix T) k := subm k k A.
 
@@ -546,7 +546,7 @@ rewrite fold_vect_el in H1.
 rewrite rngl_mul_comm in H1; [ | easy ].
 cbn in H1.
 rewrite <- H1.
-unfold mat_el'.
+unfold mat_el.
 remember (nth (i - 1) (mat_list_list M) []) as l eqn:Hl.
 erewrite rngl_summation_eq_compat. 2: {
   intros u Hu.
@@ -707,7 +707,7 @@ Qed.
 Theorem mat_with_vect_el : ∀ n lv i j,
   1 ≤ i ≤ n
   → 1 ≤ j ≤ n
-  → mat_el' (mat_with_vect n lv) i j = vect_el' (nth (j - 1) lv (vect_zero n)) i.
+  → mat_el (mat_with_vect n lv) i j = vect_el' (nth (j - 1) lv (vect_zero n)) i.
 Proof.
 intros * Hin Hjn; cbn.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
