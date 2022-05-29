@@ -2632,7 +2632,7 @@ split. {
 Qed.
 (**)
 
-(* to be completed
+(* to be completed *)
 Theorem subm'_is_corr_mat : ∀ (A : matrix T) i j,
   mat_ncols A ≠ 1
   → is_correct_matrix A = true
@@ -2653,69 +2653,34 @@ split. {
   flia Hc1 H Hj.
 } {
   intros l Hl.
-...
-  destruct (le_dec (mat_nrows A) 1) as [H1r| H1r]. {
-    apply Nat.le_1_r in H1r.
-    destruct H1r as [H1r| H1r]. {
-      unfold mat_nrows in H1r.
-      apply length_zero_iff_nil in H1r.
-      unfold subm in Hl; cbn in Hl.
-      rewrite H1r in Hl.
-      now rewrite butn_nil in Hl.
-    }
-    unfold mat_nrows in H1r.
-    destruct A as (ll); cbn in *.
-    destruct ll as [| la]; [ easy | ].
-    destruct ll; [ clear H1r | easy ].
-    cbn in Hc1.
-    unfold subm, mat_ncols; cbn.
-    destruct i; [ easy | cbn ].
-    rewrite butn_cons in Hl.
-    cbn in Hl.
-    destruct Hl as [Hl| Hl]; [ now subst l | ].
-    now rewrite butn_nil in Hl.
+  rewrite mat_ncols_subm'; [ | easy | easy | easy ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hr1| Hr1]. {
+    destruct A as (ll).
+    cbn - [ butn ] in *.
+    destruct ll as [| lb]; [ easy | ].
+    destruct ll; [ | easy ].
+    cbn in Hi.
+    now replace i with 1 in Hl by flia Hi.
   }
-  apply Nat.nle_gt in H1r.
-  unfold subm in Hl; cbn in Hl.
+  move Hr1 after Hc1.
+  cbn in Hl.
   apply in_map_iff in Hl.
   destruct Hl as (la & Hl & Hla).
   subst l.
+  rewrite butn_length.
+  unfold Nat.b2n.
+  rewrite if_ltb_lt_dec.
   apply is_scm_mat_iff in Ha.
-  destruct Ha as (Hcr, Hc).
-  specialize (in_butn _ _ _ Hla) as H.
-  specialize (Hc _ H) as H1; clear H.
-  destruct (lt_dec j (mat_ncols A)) as [Hjc| Hjc]. {
-    rewrite mat_ncols_subm; [ | now apply is_scm_mat_iff ].
-    replace (mat_nrows A) with (S (S (mat_nrows A - 2))) by flia H1r.
-    now rewrite butn_length, H1.
-  }
-  apply Nat.nlt_ge in Hjc.
-  unfold butn.
-  rewrite app_length.
-  rewrite firstn_length, skipn_length.
-  rewrite H1.
-  rewrite Nat.min_r; [ | easy ].
-  rewrite (proj2 (Nat.sub_0_le (mat_ncols A) (S j))); [ | flia Hjc ].
-  rewrite Nat.add_0_r.
-  unfold mat_ncols; cbn.
-  symmetry.
-  rewrite Hc; [ easy | ].
-  rewrite map_butn_out. 2: {
-    intros lb Hlb.
-    rewrite Hc; [ easy | ].
-    now apply in_butn in Hlb.
-  }
-  rewrite List_hd_nth_0.
-  destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-    rewrite nth_butn_before; [ cbn | flia Hiz ].
-    now apply nth_In.
-  } {
-    rewrite nth_butn_after; [ cbn | flia Hiz ].
-    apply nth_In; rewrite fold_mat_nrows; flia H1r.
-  }
+  destruct Ha as (_, Hcl).
+  apply in_butn in Hla.
+  specialize (Hcl _ Hla).
+  destruct (lt_dec _ _) as [Hja| Hja]; [ now rewrite Hcl | ].
+  rewrite Nat.nlt_ge in Hja.
+  rewrite Hcl in Hja.
+  flia Hj Hja.
 }
 Qed.
-*)
 
 Theorem mat_mul_scal_1_l : ∀ (M : matrix T), (1 × M = M)%M.
 Proof.
