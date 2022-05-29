@@ -59,11 +59,77 @@ now rewrite transposition_comm.
 Qed.
 
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
-  p < q
-  → q < r
+  r ≤ mat_nrows M
+  → 1 ≤ j ≤ mat_ncols M
+  → p < q < r
   → subm' r j (mat_swap_rows p q M) = mat_swap_rows p q (subm' r j M).
 Proof.
-intros * Hpq Hq.
+intros * Hr Hj (Hpq, Hq).
+unfold subm'.
+unfold mat_swap_rows.
+f_equal; cbn.
+rewrite map_length.
+rewrite butn_length.
+destruct M as (ll); cbn - [ "<?" ].
+rewrite map_butn, map_map.
+rewrite <- map_butn.
+unfold mat_ncols in Hj.
+cbn in Hr, Hj.
+rewrite map_butn_seq.
+apply map_ext_in.
+intros i Hi.
+rewrite Nat.add_0_l.
+rewrite map_butn.
+rewrite nth_butn.
+apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn - [ "<?" ] in Hi.
+unfold Nat.b2n in Hi |-*.
+rewrite if_ltb_lt_dec in Hi.
+destruct (lt_dec (r - 1) (length ll)) as [H| H]; [ | flia Hr H Hq ].
+clear H.
+do 2 rewrite if_leb_le_dec.
+destruct (le_dec (r - 1) (transposition p q i)) as [H1| H1]. 2: {
+  rewrite Nat.add_0_r.
+  rewrite (List_map_nth' []). 2: {
+    apply transposition_lt; [ flia Hpq Hq Hr | flia Hq Hr | flia Hi ].
+  }
+  apply Nat.nle_gt in H1.
+  destruct (le_dec (r - 1) i) as [H2| H2]. {
+    unfold transposition.
+    do 4 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (i + 1) p) as [Hi1p| Hi1p]. {
+      flia Hi1p H2 Hq Hpq.
+    }
+    destruct (Nat.eq_dec (i + 1) q) as [Hi1q| Hi1q]. {
+      flia Hi1q H2 Hq.
+    }
+    destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+      subst i.
+      flia Hpq Hq H2.
+    }
+    destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+      subst i.
+      rewrite transposition_2 in H1.
+...
+      flia Hpq Hq Hip Hi1q Hi1p H2 Hi H1 Hr.
+    }
+...
+  apply Nat.nle_gt in H1.
+  unfold transposition in H1 |-*.
+...
+
+...
+rewrite (List_map_nth' []). 2: {
+  unfold Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec _ _) as [H1| H1]. 2: {
+    rewrite Nat.add_0_r.
+    apply transposition_lt; [ flia Hpq Hq Hr | flia Hq Hr | flia Hi ].
+  }
+  specialize transposition_lt as H2.
+  specialize (H2 p q i (length ll)).
+...
+intros * Hr Hj (Hpq, Hq).
 destruct M as (ll); cbn.
 unfold subm', mat_swap_rows; cbn; f_equal.
 rewrite map_length.
@@ -90,6 +156,13 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
       unfold Nat.b2n in Hi, Hqrl.
       rewrite if_ltb_lt_dec in Hi, Hqrl.
       destruct (lt_dec _ _) as [Hrl| Hrl]. {
+cbn in Hr, Hj.
+unfold mat_ncols in Hj; cbn in Hj.
+destruct ll as [| la]; [ easy | ].
+cbn in Hr, Hj, Hrl, Hi, Hqrl.
+rewrite Nat.sub_0_r in Hi, Hqrl.
+flia Hr Hj Hpq Hq Hrl Hi Hqrl.
+...
 ...
         flia Hpq Hq Hrl Hi Hqrl.
       now rewrite nth_butn_after.
