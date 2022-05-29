@@ -2190,6 +2190,57 @@ Qed.
 (* to be completed
 Theorem mat_ncols_subm' : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
+  → 1 ≤ i ≤ mat_nrows M
+  → 1 ≤ j ≤ mat_ncols M
+  → mat_ncols (subm' i j M) = mat_ncols M - 1.
+Proof.
+intros * Hcm Hi Hj.
+unfold subm'.
+destruct i; [ easy | ].
+destruct j; [ easy | ].
+do 2 rewrite Nat_sub_succ_1.
+destruct Hi as (_, Hi).
+destruct Hj as (_, Hj).
+destruct M as (ll); cbn in Hi, Hj.
+unfold mat_ncols in Hj |-*; cbn in Hj |-*.
+destruct ll as [| l1]; [ easy | ].
+cbn in Hi, Hj.
+apply Nat.succ_le_mono in Hi; cbn.
+destruct l1 as [| a1]; [ easy | ].
+cbn in Hj.
+apply Nat.succ_le_mono in Hj.
+cbn; rewrite Nat.sub_0_r.
+(* ouais, en fait, j'en ai marre *)
+...
+intros * Hcm Hi Hj.
+apply is_scm_mat_iff in Hcm.
+cbn - [ In ] in Hcm.
+destruct Hcm as (H1, H2).
+destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+  subst i; cbn.
+  destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+    destruct M as (ll); cbn in Hrz.
+    now apply length_zero_iff_nil in Hrz; subst ll.
+  }
+  destruct (Nat.eq_dec j 0) as [Hjz| Hjz]. {
+    subst j.
+    unfold subm'; cbn - [ butn ].
+    destruct M as (ll).
+    destruct ll as [| l]; [ easy | clear Hrz; cbn ].
+    destruct ll as [| l2]; [ easy | ].
+    destruct l2 as [| a]; [ easy | ].
+    cbn - [ In ] in H1, H2 |-*.
+    destruct l as [| b]; [ now specialize (H1 eq_refl) | ].
+    clear H1.
+    specialize (H2 _ (or_intror (or_introl eq_refl))).
+    cbn in H2.
+...
+  destruct j. {
+    cbn.
+    destruct ll as [| l2]; cbn.
+...
+Theorem mat_ncols_subm' : ∀ (M : matrix T) i j,
+  is_correct_matrix M = true
   → mat_ncols (subm' i j M) =
    match mat_nrows M with
    | 0 => 0
