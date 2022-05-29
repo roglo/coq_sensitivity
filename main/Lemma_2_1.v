@@ -463,31 +463,11 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite (rngl_summation_split (j - 1)); [ | flia Hj ].
-rewrite Nat.sub_add; [ | easy ].
-destruct (Nat.eq_dec j 1) as [Hj1| Hj1]. {
-  subst j; rewrite Nat.sub_diag.
-  rewrite rngl_summation_empty; [ | easy ].
-  rewrite rngl_add_0_l.
-  rewrite rngl_summation_split_first; [ | easy ].
-  rewrite all_0_rngl_summation_0. 2: {
-    intros k Hk.
-    replace (mat_el' D k 1) with 0%F. 2: {
-      rewrite Hmd; cbn.
-      rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk ].
-      rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-      rewrite seq_nth; [ | flia Hk ].
-      rewrite seq_nth; [ | easy ].
-      cbn.
-      destruct k; [ easy | ].
-      destruct k; [ flia Hk | easy ].
-    }
-    now apply rngl_mul_0_r.
-  }
-  rewrite rngl_add_0_r.
-...
+rewrite (rngl_summation_split j). 2: {
+  split; [ flia Hj | ].
+  now apply -> Nat.succ_le_mono.
 }
-rewrite rngl_summation_split_last; [ | flia Hj Hj1 ].
+rewrite rngl_summation_split_last; [ | flia Hj ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite Hmo; cbn.
@@ -508,62 +488,40 @@ rewrite all_0_rngl_summation_0. 2: {
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_l.
-(**)
-destruct (Nat.eq_dec j n) as [Hjn| Hjn]. {
-  subst j.
-  rewrite rngl_summation_empty; [ | flia ].
-  rewrite rngl_add_0_r.
-...
-rewrite rngl_summation_split_last. 2: {
-  rewrite square_matrix_ncols; [ | easy ].
-  rewrite Hrn.
-...
-  now rewrite Hrn.
-}
-*)
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
-  rewrite square_matrix_ncols in Hk; [ | easy ].
-  rewrite Hrn in Hk.
   rewrite Hmd; cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hk Hj ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
   rewrite seq_nth; [ | flia Hk Hj ].
   rewrite seq_nth; [ | flia Hj ].
   cbn; rewrite if_eqb_eq_dec.
-  rewrite Nat.sub_0_r.
-  rewrite <- Nat.sub_succ_l; [ | easy ].
-  rewrite Nat_sub_succ_1.
-  destruct (Nat.eq_dec (k - 1 - 1) (j - 1)) as [Hkj| Hkj]. {
-    flia Hj Hk Hkj.
-...
-  destruct (Nat.eq_dec (k - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hj | ].
+  destruct (Nat.eq_dec (k - 1) (j - 1)) as [Hkj| Hkj]; [ flia Hk Hj Hkj | ].
   now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_r.
 rewrite Hmd; cbn - [ iter_seq ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ cbn | easy ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite seq_nth; [ cbn | flia Hj ].
 rewrite Nat.eqb_refl.
 rewrite Hmo.
 cbn - [ iter_seq ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | easy ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite seq_nth; [ | flia Hj ].
+rewrite seq_nth; [ | flia Hi ].
 cbn - [ iter_seq ].
 erewrite rngl_summation_eq_compat. 2: {
-  intros u (_, Hu).
-  rewrite square_matrix_ncols in Hu; [ | easy ].
-  rewrite Hrn in Hu.
+  intros u Hu.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hnz ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite seq_nth; [ | flia Hj ].
   rewrite seq_nth; [ | flia Hu Hnz ].
   now cbn.
 }
 cbn.
+...
 specialize (Hvv j (nth j ev 0%F) (nth j eV (vect_zero n))) as H1.
 specialize (H1 Hj eq_refl eq_refl).
 remember (nth j ev 0%F) as μ eqn:Hμ.
