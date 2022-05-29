@@ -2045,7 +2045,6 @@ rewrite nth_overflow; [ easy | ].
 rewrite fold_mat_nrows; flia Hjz Hjr.
 Qed.
 
-(* to be completed *)
 Theorem mat_transp_mul :
   rngl_is_comm = true →
   ∀ (MA : matrix T) (MB : matrix T),
@@ -3078,7 +3077,6 @@ destruct llb as [| lb]; cbn; [ symmetry; apply Nat.min_r; flia | ].
 apply map2_length.
 Qed.
 
-(* to be completed *)
 Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
   is_correct_matrix MA = true
   → is_correct_matrix MB = true
