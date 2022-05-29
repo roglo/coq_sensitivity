@@ -21,9 +21,9 @@ Definition com (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
-       map (λ j, (minus_one_pow (i + j) * det (subm i j M))%F)
-         (seq 0 (mat_ncols M)))
-      (seq 0 (mat_nrows M))).
+       map (λ j, (minus_one_pow (i + j) * det (subm' i j M))%F)
+         (seq 1 (mat_ncols M)))
+      (seq 1 (mat_nrows M))).
 
 Arguments com M%M.
 
@@ -61,11 +61,11 @@ Qed.
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
   p < q
   → q < r
-  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
+  → subm' r j (mat_swap_rows p q M) = mat_swap_rows p q (subm' r j M).
 Proof.
 intros * Hpq Hq.
 destruct M as (ll); cbn.
-unfold subm, mat_swap_rows; cbn; f_equal.
+unfold subm', mat_swap_rows; cbn; f_equal.
 rewrite map_length.
 rewrite butn_length.
 rewrite <- map_butn, map_map.
@@ -76,14 +76,22 @@ intros i Hi; apply in_seq in Hi.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
 destruct Hi as (_, Hi).
-destruct (le_dec r i) as [Hir| Hir]. 2: {
+destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   apply Nat.nle_gt in Hir.
   rewrite Nat.add_0_r.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i; clear Hir.
     rewrite transposition_1.
-    destruct (lt_dec q (length (butn r ll))) as [Hqrl| Hqrl]. {
+    destruct (lt_dec q (length (butn (r - 1) ll))) as [Hqrl| Hqrl]. {
       rewrite (List_map_nth' []); [ | easy ].
+      rewrite nth_butn_after; [ easy | ].
+      rewrite butn_length in Hqrl.
+      rewrite Nat.add_0_l in Hi.
+      unfold Nat.b2n in Hi, Hqrl.
+      rewrite if_ltb_lt_dec in Hi, Hqrl.
+      destruct (lt_dec _ _) as [Hrl| Hrl]. {
+...
+        flia Hpq Hq Hrl Hi Hqrl.
       now rewrite nth_butn_after.
     }
     apply Nat.nlt_ge in Hqrl.
@@ -133,6 +141,8 @@ rewrite if_ltb_lt_dec in Hi.
 destruct (lt_dec r (length ll)) as [Hrl| Hrl]; [ flia Hi Hir | ].
 flia Hrl Hi Hir.
 Qed.
+
+...
 
 Theorem subm_mat_swap_rows_lt : ∀ (M : matrix T) p q r j,
   p < r
