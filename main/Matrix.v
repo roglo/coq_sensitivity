@@ -2777,7 +2777,248 @@ destruct (lt_dec k (length (hd [] lla))) as [H| H]; [ | flia Hkm H ].
 now apply rngl_mul_0_r; left.
 Qed.
 
-(* *)
+Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
+
+Theorem subm_transp : in_charac_0_field →
+  ∀ i j (M : matrix T),
+  is_square_matrix M = true
+  → 1 ≤ i ≤ mat_ncols M
+  → 1 ≤ j ≤ mat_nrows M
+  → ((subm' j i M)⁺ = subm' i j M⁺)%M.
+Proof.
+intros Hif * Hsm Hi Hj.
+specialize (square_matrix_ncols _ Hsm) as Hcr.
+destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
+  rewrite Hc1 in Hi.
+  rewrite Hc1 in Hcr; symmetry in Hcr.
+  rewrite Hcr in Hj.
+  replace i with 1 by flia Hi.
+  replace j with 1 by flia Hj.
+  clear i j Hi Hj.
+  destruct M as (ll).
+  unfold mat_ncols in Hc1.
+  cbn in Hc1, Hcr.
+  destruct ll as [| l]; [ easy | ].
+  destruct ll; [ | easy ].
+  cbn in Hc1.
+  unfold subm', mat_transp; cbn.
+  destruct l as [| a]; [ easy | ].
+  now destruct l.
+}
+assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
+assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
+assert (Hit : 1 ≤ i ≤ mat_nrows M⁺) by now rewrite mat_transp_nrows.
+assert (Hjt : 1 ≤ j ≤ mat_ncols M⁺). {
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ | easy ].
+  flia H Hi.
+}
+apply matrix_eq; cycle 1. {
+  now apply mat_transp_is_corr, subm_is_corr_mat.
+} {
+  apply subm_is_corr_mat; [ | easy | easy | easy ].
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  rewrite Hcr in Hc1.
+  now destruct (Nat.eq_dec (mat_ncols M) 0).
+} {
+  rewrite mat_transp_nrows.
+  rewrite mat_nrows_subm.
+  rewrite mat_ncols_subm; [ | easy | easy | easy ].
+  generalize Hc1; intros H.
+  rewrite Hcr in H.
+  apply Nat.eqb_neq in H; rewrite H; clear H.
+  rewrite mat_transp_nrows; cbn.
+  generalize Hi; intros (_, H).
+  now apply Nat.leb_le in H; rewrite H.
+} {
+  rewrite mat_transp_ncols.
+  rewrite mat_ncols_subm; [ | easy | easy | easy ].
+  generalize Hc1; intros H.
+  rewrite Hcr in H.
+  apply Nat.eqb_neq in H; rewrite H; clear H.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M - 1) 0) as [H| H]; [ flia Hi H Hc1 | ].
+  clear H.
+  rewrite mat_ncols_subm; [ | easy | easy | easy ].
+  rewrite mat_transp_nrows.
+  generalize Hc1; intros H.
+  apply Nat.eqb_neq in H; rewrite H; clear H.
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hi H Hc1 | ].
+  clear H.
+  rewrite mat_nrows_subm.
+  generalize Hj; intros (_, H).
+  now apply Nat.leb_le in H; rewrite H.
+}
+intros u v Hu Hv.
+rewrite mat_transp_el; [ | now apply subm_is_corr_mat | flia Hu | flia Hv ].
+unfold mat_transp; cbn.
+rewrite (List_map_nth' []). 2: {
+  rewrite butn_length.
+  rewrite fold_mat_nrows.
+  rewrite mat_ncols_subm in Hv; [ | easy | easy | easy ].
+  rewrite mat_transp_nrows in Hv.
+  rewrite mat_transp_ncols in Hv.
+  enough (H : v < mat_nrows M). {
+    destruct v; [ easy | ].
+    destruct (mat_nrows M); [ easy | ].
+    rewrite Nat_sub_succ_1.
+    apply Nat.succ_lt_mono in H.
+    unfold Nat.b2n.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec (j - 1) (S n)); flia H.
+  }
+  generalize Hc1; intros H.
+  apply Nat.eqb_neq in H; rewrite H in Hv; clear H.
+  rewrite if_eqb_eq_dec in Hv.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [H| H]; [ flia Hi H | ].
+  flia Hv.
+}
+rewrite (List_map_nth' []). 2: {
+  rewrite butn_length.
+  rewrite List_map_seq_length.
+  rewrite mat_transp_nrows in Hu.
+  rewrite mat_ncols_subm in Hu; [ | easy | easy | easy ].
+  enough (H : u < mat_ncols M). {
+    destruct u; [ easy | ].
+    destruct (mat_ncols M); [ easy | ].
+    rewrite Nat_sub_succ_1.
+    apply Nat.succ_lt_mono in H.
+    unfold Nat.b2n.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec (i - 1) (S n)); flia H.
+  }
+  generalize Hc1; intros H.
+  rewrite Hcr in H.
+  apply Nat.eqb_neq in H; rewrite H in Hu; clear H.
+  flia Hu.
+}
+do 4 rewrite nth_butn.
+rewrite mat_transp_nrows in Hu.
+rewrite mat_ncols_subm in Hu; [ | easy | easy | easy ].
+rewrite mat_ncols_subm in Hv; [ | easy | easy | easy ].
+rewrite mat_transp_nrows in Hv.
+rewrite mat_transp_ncols in Hv.
+assert (H : (mat_nrows M =? 1) = false) by (apply Nat.eqb_neq; congruence).
+rewrite H in Hu; clear H.
+assert (H : (mat_ncols M =? 1) = false) by now apply Nat.eqb_neq.
+rewrite H in Hv; clear H.
+assert (H : (mat_ncols M =? 0) = false) by (apply Nat.eqb_neq; flia Hi).
+rewrite H in Hv; clear H.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec (i - 1) (u - 1)); flia Hu.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec (j - 1) (v - 1)); flia Hv.
+}
+rewrite seq_nth. 2: {
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec (j - 1) (v - 1)); flia Hv.
+}
+rewrite seq_nth. 2: {
+  unfold Nat.b2n; rewrite if_leb_le_dec.
+  destruct (le_dec (i - 1) (u - 1)); flia Hu.
+}
+unfold mat_el.
+rewrite Nat.add_assoc, (Nat.add_comm 1 (u - 1)).
+rewrite Nat.sub_add; [ | easy ].
+rewrite Nat.add_sub_swap; [ | easy ].
+f_equal.
+rewrite Nat.add_assoc, (Nat.add_comm 1 (v - 1)).
+rewrite Nat.sub_add; [ | easy ].
+rewrite Nat.add_sub_swap; [ | easy ].
+easy.
+Qed.
+
+Theorem mat_transp_is_square : ∀ M,
+  is_square_matrix M = true
+  → is_square_matrix M⁺ = true.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols _ Hsm) as Hc.
+apply is_scm_mat_iff in Hsm.
+apply is_scm_mat_iff.
+destruct Hsm as (Hcr & Hcl).
+cbn; rewrite List_map_seq_length.
+split. {
+  intros Hct.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ easy | ].
+  rewrite mat_transp_ncols in Hct.
+  apply Nat.eqb_neq in Hcz; rewrite Hcz in Hct.
+  congruence.
+} {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Hi & Hic).
+  now rewrite <- Hi, map_length, seq_length.
+}
+Qed.
+
+Theorem mat_transp_involutive : ∀ M,
+  is_correct_matrix M = true
+  → (M⁺⁺)%M = M.
+Proof.
+intros * Hcm.
+destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]. {
+  destruct M as (ll); cbn.
+  unfold mat_ncols in Hcz; cbn in Hcz.
+  apply length_zero_iff_nil in Hcz.
+  destruct ll as [| l]; [ easy | ].
+  cbn in Hcz; subst l; cbn.
+  unfold mat_transp, mat_ncols; cbn; f_equal.
+  apply is_scm_mat_iff in Hcm.
+  unfold mat_ncols in Hcm; cbn in Hcm.
+  destruct Hcm as (Hcr, _).
+  now specialize (Hcr eq_refl).
+}
+destruct M as (ll); cbn.
+unfold mat_transp, mat_ncols; cbn; f_equal.
+rewrite (List_map_nth_seq ll []) at 2.
+rewrite List_map_seq_length.
+rewrite (List_map_hd 0). 2: {
+  rewrite seq_length.
+  unfold mat_ncols in Hcz.
+  cbn in Hcz.
+  now apply Nat.neq_0_lt_0.
+}
+rewrite List_map_seq_length.
+rewrite <- seq_shift, map_map.
+apply map_ext_in.
+intros i Hi; apply in_seq in Hi.
+destruct Hi as (_, Hi); cbn in Hi.
+erewrite map_ext_in. 2: {
+  intros j Hj; apply in_seq in Hj.
+  cbn in Hj.
+  rewrite Nat_sub_succ_1.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length ].
+  rewrite seq_shift.
+  rewrite seq_nth; [ | flia Hj ].
+  rewrite seq_nth; [ | easy ].
+  now do 2 rewrite Nat.add_comm, Nat.add_sub.
+}
+destruct ll as [| l]; [ easy | ].
+unfold mat_ncols in Hcz; cbn in Hcz.
+cbn - [ nth ].
+rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%F) at 1.
+apply is_scm_mat_iff in Hcm.
+unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
+destruct Hcm as (_, Hcl).
+rewrite <- seq_shift, map_map.
+erewrite map_ext_in. 2: {
+  now intros; rewrite Nat_sub_succ_1.
+}
+symmetry.
+rewrite Hcl; [ easy | ].
+now apply nth_In.
+Qed.
 
 End a.
 
@@ -2819,11 +3060,13 @@ Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
 Arguments mat_sub {T ro} MA%M MB%M.
 Arguments mat_transp {T ro} M%M.
+Arguments mat_transp_is_square {T ro} M%M.
 Arguments mat_transp_nrows {T}%type {ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm' {T} i%nat j%nat M%M.
+Arguments subm_transp {T ro rp} _ [i j]%nat.
 Arguments mat_vect_mul_0_r {T}%type {ro rp} Hop [m n]%nat M%M.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.
