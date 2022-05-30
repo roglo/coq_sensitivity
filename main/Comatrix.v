@@ -965,12 +965,12 @@ with "M k j") returns 0. It is what I call a "bad determinant formula".
 determinant_with_row
   ∀ (i n : nat) (M : matrix (S n) (S n) T),
   i ≤ n
-  → ∑ (j = 0, n), minus_one_pow (i + j) * M i j * det (subm M i j) = det M
+  → ∑ (j = 1, n), minus_one_pow (i + j) * M i j * det (subm' M i j) = det M
 
 determinant_with_bad_row
   ∀ (i k n : nat) (M : matrix (S n) (S n) T),
   i ≤ n → k ≤ n → i ≠ k
-  → ∑ (j = 0, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
+  → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm' M i j) = 0%F
 *)
 
 Theorem determinant_with_row : in_charac_0_field →
@@ -1740,8 +1740,6 @@ apply Nat.ltb_lt in Hi.
 cbn.
 Print det'.
 ...
-  ============================
-  det' (n - 1) (subm (A * B) i j) = ∑ (i0 = 0, n - 1), det' (n - 1) (subm A i i0) * det' (n - 1) (subm B i0 j)
 1*)
 cbn.
 rewrite map_length.
@@ -1764,11 +1762,6 @@ erewrite rngl_summation_eq_compat. 2: {
   now cbn.
 }
 cbn.
-(*
-  ============================
-  determinant_loop (n - 1) (subm (A * B) i j) =
-  ∑ (i0 = 0, n - 1), determinant_loop (n - 1) (subm A i i0) * determinant_loop (n - 1) (subm B i0 j)
-*)
 ...
 j'abandonne parce que ce théorème essaie de prouver com(A*B)=com(A)*com(B) dans
 le but lointain de prouver det(A*B)=det(A)*det(B), sauf que com fait déjà
