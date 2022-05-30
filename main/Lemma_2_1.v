@@ -33,18 +33,18 @@ Definition is_symm_mat (A : matrix T) :=
   ∀ i j, 1 ≤ i ≤ mat_nrows A → 1 ≤ j ≤ mat_nrows A →
   mat_el A i j = mat_el A j i.
 
-Definition princ_subm_1 (A : matrix T) k := subm k k A.
+Definition princ_subm_1 (A : matrix T) k := subm' (S k) (S k) A.
 
 Fixpoint mat_princ_subm (A : matrix T) l : matrix T :=
   match l with
   | [] => A
-  | i :: l' => mat_princ_subm (subm i i A) l'
+  | i :: l' => mat_princ_subm (subm' (S i) (S i) A) l'
   end.
 
-Theorem subm_z : ∀ i j, subm i j (mk_mat []) = mZ 0 0.
+Theorem subm_z : ∀ i j, subm' i j (mk_mat []) = mZ 0 0.
 Proof.
 intros.
-unfold subm, mZ; cbn.
+unfold subm', mZ; cbn.
 now rewrite butn_nil.
 Qed.
 
