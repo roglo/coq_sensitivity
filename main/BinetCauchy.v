@@ -2628,16 +2628,6 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
   do 2 rewrite Nat_sub_succ_1.
-...
-  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat_sub_succ_1.
-  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
-  rewrite Nat_sub_succ_1.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j (_, Hj).
-    rewrite rngl_product_mul_distr; [ | now destruct Hif ].
-    easy.
-  }
   easy.
 }
 cbn - [ det ].
@@ -2647,8 +2637,10 @@ erewrite rngl_summation_eq_compat. 2: {
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     rewrite rngl_mul_comm; [ | now destruct Hif ].
+(*
     rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
     rewrite <- rngl_mul_assoc.
+*)
     easy.
   }
   easy.
@@ -2657,6 +2649,7 @@ cbn - [ det ].
 rewrite rngl_summation_summation_exch'.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
+...
   rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
   easy.
 }
