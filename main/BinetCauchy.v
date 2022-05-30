@@ -767,10 +767,10 @@ Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   is_correct_matrix A = true
   → (∀ k, k ∈ jl → k < mat_nrows A)
   → mat_ncols A = length jl
-  → p < length jl
-  → q < length jl
+  → 1 ≤ p ≤ length jl
+  → 1 ≤ q ≤ length jl
   → p ≠ q
-  → det (mat_swap_rows p q (mat_select_rows jl A)) =
+  → det (mat_swap_rows' p q (mat_select_rows jl A)) =
     (- det (mat_select_rows jl A))%F.
 Proof.
 intros Hif * Hcm Hro Hco Hp Hq Hpq.

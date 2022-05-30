@@ -29,30 +29,25 @@ Definition com (M : matrix T) : matrix T :=
 Arguments com M%M.
 
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
-  mat_swap_rows i i M = M.
+  mat_swap_rows' i i M = M.
 Proof.
 intros.
 destruct M as (ll); cbn.
-unfold mat_swap_rows; f_equal.
+unfold mat_swap_rows'; f_equal.
 cbn - [ list_swap_elem ].
 rewrite (List_map_nth_seq ll (nth i ll [])) at 2.
 unfold list_swap_elem.
 apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
-unfold transposition.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec j i) as [Hji| Hji]. {
-  subst j.
-  now apply nth_indep.
-}
+rewrite transposition_id.
 now apply nth_indep.
 Qed.
 
 Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
-  mat_swap_rows p q M = mat_swap_rows q p M.
+  mat_swap_rows' p q M = mat_swap_rows' q p M.
 Proof.
 intros.
-unfold mat_swap_rows; f_equal; cbn.
+unfold mat_swap_rows'; f_equal; cbn.
 unfold list_swap_elem.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
@@ -60,12 +55,12 @@ now rewrite transposition_comm.
 Qed.
 
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
-  p < q < r - 1
-  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
+  p < q < r
+  → subm r j (mat_swap_rows' p q M) = mat_swap_rows' p q (subm r j M).
 Proof.
 intros * (Hpq, Hq).
 destruct M as (ll); cbn.
-unfold subm, mat_swap_rows; cbn; f_equal.
+unfold subm, mat_swap_rows'; cbn; f_equal.
 rewrite map_length.
 rewrite butn_length.
 rewrite <- map_butn, map_map.
@@ -79,31 +74,31 @@ destruct Hi as (_, Hi).
 destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   apply Nat.nle_gt in Hir.
   rewrite Nat.add_0_r.
-  destruct (Nat.eq_dec i p) as [Hip| Hip]. {
+  destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
     subst i; clear Hir.
     rewrite transposition_1.
-    destruct (lt_dec q (length (butn (r - 1) ll))) as [Hqrl| Hqrl]. {
+    destruct (lt_dec (q - 1) (length (butn (r - 1) ll))) as [Hqrl| Hqrl]. {
       rewrite (List_map_nth' []); [ | easy ].
-      now rewrite nth_butn_after.
+      rewrite nth_butn_after; [ easy | flia Hpq Hq ].
     }
     apply Nat.nlt_ge in Hqrl.
     symmetry.
     rewrite nth_overflow; [ | now rewrite map_length ].
     rewrite butn_length in Hqrl.
-    destruct (le_dec (length ll) q) as [Hlq| Hlq]. {
-      rewrite nth_overflow with (n := q); [ | easy ].
+    destruct (le_dec (length ll) (q - 1)) as [Hlq| Hlq]. {
+      rewrite nth_overflow; [ | easy ].
       now rewrite butn_nil.
     }
     apply Nat.nle_gt in Hlq.
     unfold Nat.b2n in Hi, Hqrl.
     rewrite if_ltb_lt_dec in Hi, Hqrl.
     destruct (lt_dec (r - 1) (length ll)) as [Hrl| Hrl]; [ | flia Hqrl Hlq ].
-    flia Hq Hrl Hqrl Hlq.
+    flia Hq Hrl Hi Hqrl.
   }
-  destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
+  destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
     subst i; clear Hir.
     rewrite transposition_2.
-    destruct (lt_dec p (length (butn (r - 1) ll))) as [Hprl| Hprl]. {
+    destruct (lt_dec (p - 1) (length (butn (r - 1) ll))) as [Hprl| Hprl]. {
       rewrite (List_map_nth' []); [ | easy ].
       rewrite nth_butn_after; [ easy | flia Hpq Hq ].
     }
@@ -113,18 +108,18 @@ destruct (le_dec (r - 1) i) as [Hir| Hir]. 2: {
   }
   unfold transposition.
   do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec i p) as [H| H]; [ easy | clear H ].
-  destruct (Nat.eq_dec i q) as [H| H]; [ easy | clear H ].
+  destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ easy | clear H ].
+  destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ easy | clear H ].
   rewrite map_butn.
   rewrite nth_butn_after; [ | easy ].
   rewrite (List_map_nth' []); [ easy | flia Hi ].
 }
 unfold transposition.
 do 4 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec i p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
-destruct (Nat.eq_dec i q) as [H| H]; [ flia Hq Hir H | clear H ].
-destruct (Nat.eq_dec (i + 1) p) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
-destruct (Nat.eq_dec (i + 1) q) as [H| H]; [ flia Hq Hir H | clear H ].
+destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec i (q - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec (i + 1) (p - 1)) as [H| H]; [ flia Hpq Hq Hir H | clear H ].
+destruct (Nat.eq_dec (i + 1) (q - 1)) as [H| H]; [ flia Hq Hir H | clear H ].
 rewrite map_butn.
 rewrite nth_butn_before; [ | easy ].
 rewrite (List_map_nth' []); [ easy | ].
@@ -135,9 +130,9 @@ flia Hrl Hi Hir.
 Qed.
 
 Theorem subm_mat_swap_rows_lt : ∀ (M : matrix T) p q r j,
-  p < r - 1
-  → q < r - 1
-  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
+  p < r
+  → q < r
+  → subm r j (mat_swap_rows' p q M) = mat_swap_rows' p q (subm r j M).
 Proof.
 intros * Hp Hq.
 destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply subm_mat_swap_rows_lt_lt | ].
@@ -148,8 +143,8 @@ now do 2 rewrite mat_swap_same_rows.
 Qed.
 
 Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
-  q < mat_nrows M
-  → mat_el (mat_swap_rows p q M) (S q) j = mat_el M (S p) j.
+  1 ≤ q ≤ mat_nrows M
+  → mat_el (mat_swap_rows' p q M) q j = mat_el M p j.
 Proof.
 intros * Hql; cbn.
 destruct M as (ll); cbn in Hql |-*.
@@ -157,7 +152,6 @@ f_equal; clear j.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hql ].
 rewrite seq_nth; [ | flia Hql ].
 rewrite Nat.add_0_l.
-do 2 rewrite Nat.sub_0_r.
 now rewrite transposition_2.
 Qed.
 
@@ -178,7 +172,7 @@ apply IHlen.
 Qed.
 
 Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q f g,
-  mat_nrows (fold_left (λ M' k, mat_swap_rows (f k) (g k) M') (seq p q) M) =
+  mat_nrows (fold_left (λ M' k, mat_swap_rows' (f k) (g k) M') (seq p q) M) =
   mat_nrows M.
 Proof.
 intros.
@@ -426,9 +420,9 @@ Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   1 ≤ p ≤ mat_nrows M
-  → subm 1 q (mat_swap_rows 0 (p - 1) M) =
+  → subm 1 q (mat_swap_rows' 1 p M) =
     subm p q
-      (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 2)) M).
+      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M') (seq 0 (p - 2)) M).
 Proof.
 intros * Hp.
 destruct M as (ll); cbn in Hp |-*.
@@ -458,6 +452,14 @@ rewrite (List_map_nth' 0). 2: {
 }
 rewrite nth_butn_before; [ | flia ].
 rewrite seq_nth; [ cbn | flia Hi ].
+erewrite List_fold_left_ext_in. 2: {
+  intros j ll' Hj.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    now rewrite Nat.add_sub, Nat.add_succ_r, Nat_sub_succ_1.
+  }
+  easy.
+}
 destruct (le_dec (p - 1) i) as [Hpi| Hpi]. 2: {
   apply Nat.nle_gt in Hpi.
   rewrite nth_butn_after; [ | easy ].
@@ -498,13 +500,14 @@ Qed.
 Theorem subm_fold_left_lt : ∀ (M : matrix T) i j m,
   m < i - 1
   → subm i j
-      (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
+      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
          (seq 0 m) M) =
     fold_left
-      (λ M' k, mat_swap_rows k (k + 1) M')
+      (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
       (seq 0 m) (subm i j M).
 Proof.
 intros * Hmi.
+...
 revert i Hmi.
 induction m; intros; [ easy | ].
 rewrite seq_S; cbn.
