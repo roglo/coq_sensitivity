@@ -538,7 +538,7 @@ Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_selec
 *)
 
 (* submatrix with list cols jl *)
-Definition mat_select_cols'' (jl : list nat) (M : matrix T) :=
+Definition mat_select_cols (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ i, map (λ j, mat_el M i j) jl) (seq 1 (mat_nrows M))).
 
 Definition mat_select_cols' (jl : list nat) (M : matrix T) :=
@@ -548,7 +548,7 @@ End a.
 
 Arguments list_list_select_rows {T ro} jl%list ll%list.
 Arguments mat_select_rows {T ro} jl%list M%M.
-Arguments mat_select_cols'' {T ro} jl%list M%M.
+Arguments mat_select_cols {T ro} jl%list M%M.
 
 Section a.
 
@@ -2590,6 +2590,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
+    rewrite Nat.add_sub.
     specialize (fact_neq_0 m) as Hm.
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
     rewrite (List_map_nth' 0). 2: {
@@ -2599,7 +2600,7 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold ff_app.
     rewrite seq_nth; [ | flia Hj ].
     rewrite seq_nth; [ | now apply to_radix_ub ].
-    do 2 rewrite Nat.add_0_l.
+    rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
     unfold mat_mul_el.
     rewrite Hac.
     easy.
@@ -2623,6 +2624,8 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn.
+Check rngl_product_summation_distr.
+...
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1.
