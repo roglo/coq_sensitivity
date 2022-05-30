@@ -2779,31 +2779,37 @@ Qed.
 
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.
 
-Theorem subm_transp : in_charac_0_field →
+Theorem mat_subm_transp :
   ∀ i j (M : matrix T),
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M
   → 1 ≤ j ≤ mat_nrows M
   → ((subm' j i M)⁺ = subm' i j M⁺)%M.
 Proof.
-intros Hif * Hsm Hi Hj.
+intros * Hsm Hi Hj.
 specialize (square_matrix_ncols _ Hsm) as Hcr.
 destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   rewrite Hc1 in Hi.
-  rewrite Hc1 in Hcr; symmetry in Hcr.
-  rewrite Hcr in Hj.
+  rewrite <- Hcr, Hc1 in Hj.
   replace i with 1 by flia Hi.
   replace j with 1 by flia Hj.
   clear i j Hi Hj.
-  destruct M as (ll).
-  unfold mat_ncols in Hc1.
-  cbn in Hc1, Hcr.
+  unfold subm', mat_transp.
+  rewrite Nat.sub_diag.
+  cbn - [ butn ].
+  f_equal.
+  rewrite map_length.
+  rewrite butn_length.
+  rewrite fold_mat_nrows, <- Hcr, Hc1.
+  cbn - [ butn ].
+  destruct M as (ll); cbn.
   destruct ll as [| l]; [ easy | ].
-  destruct ll; [ | easy ].
   cbn in Hc1.
-  unfold subm', mat_transp; cbn.
+  destruct ll as [| l']; [ easy | ].
+  cbn.
   destruct l as [| a]; [ easy | ].
-  now destruct l.
+  destruct l; [ | easy ].
+  cbn in Hcr; flia Hcr.
 }
 assert (Hcm : is_correct_matrix M = true) by now apply squ_mat_is_corr.
 assert (Hcmt : is_correct_matrix M⁺ = true) by now apply mat_transp_is_corr.
@@ -2815,7 +2821,7 @@ assert (Hjt : 1 ≤ j ≤ mat_ncols M⁺). {
   flia H Hi.
 }
 apply matrix_eq; cycle 1. {
-  now apply mat_transp_is_corr, subm_is_corr_mat.
+  apply mat_transp_is_corr, subm_is_corr_mat; try easy.
 } {
   apply subm_is_corr_mat; [ | easy | easy | easy ].
   rewrite mat_transp_ncols.
@@ -3066,7 +3072,7 @@ Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm' {T} i%nat j%nat M%M.
-Arguments subm_transp {T ro rp} _ [i j]%nat.
+Arguments mat_subm_transp {T ro} [i j]%nat.
 Arguments mat_vect_mul_0_r {T}%type {ro rp} Hop [m n]%nat M%M.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
 Arguments δ {T}%type {ro} (i j)%nat.

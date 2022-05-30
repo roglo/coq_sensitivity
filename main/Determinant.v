@@ -2474,7 +2474,7 @@ rewrite <- determinant_transpose; [ | easy | ]. 2: {
   rewrite square_matrix_ncols in Hi; [ | easy ].
   now apply is_squ_mat_subm.
 }
-now rewrite subm_transp.
+now rewrite mat_subm_transp.
 Qed.
 
 End a.
