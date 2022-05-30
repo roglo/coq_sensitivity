@@ -732,13 +732,20 @@ remember (S (m - b)) as len eqn:Hlen; symmetry in Hlen.
 remember (S (n - c)) as len' eqn:Hlen'; symmetry in Hlen'.
 replace m with (b + len - 1) by flia Hlen Hmb.
 clear m n Hmb Hcn Hlen Hlen'.
+rewrite fold_iter_seq.
 revert b c len'.
 induction len; intros. {
   rewrite rngl_product_list_empty; [ | easy ].
   rewrite Nat.pow_0_r; cbn.
-  rewrite rngl_summation_list_only_one.
+  rewrite rngl_summation_only_one.
   now rewrite rngl_product_list_empty.
 }
+rewrite seq_S; cbn - [ "^" "-" ].
+rewrite rngl_product_list_app; [ | easy ].
+rewrite IHlen.
+rewrite rngl_product_list_only_one; [ | easy ].
+rewrite rngl_mul_summation_distr_r; [ | easy ].
+rewrite Nat.pow_succ_r; [ | easy ].
 ...
   destruct b. {
     rewrite rngl_product_only_one.
