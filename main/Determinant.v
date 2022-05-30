@@ -103,7 +103,7 @@ Arguments det'' M%M.
 
 (* *)
 
-Theorem fold_det_ : ∀ M, determinant_loop (mat_nrows M) M = det M.
+Theorem fold_det : ∀ M, determinant_loop (mat_nrows M) M = det M.
 Proof. easy. Qed.
 
 Theorem determinant_zero : ∀ (M : matrix T),
