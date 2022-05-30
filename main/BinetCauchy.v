@@ -2624,9 +2624,11 @@ erewrite rngl_summation_eq_compat. 2: {
     easy.
   }
   cbn.
-Check rngl_product_summation_distr.
-...
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+  do 2 rewrite Nat_sub_succ_1.
+...
   rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
   rewrite Nat_sub_succ_1.
   rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
