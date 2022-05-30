@@ -422,7 +422,8 @@ Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   1 ≤ p ≤ mat_nrows M
   → subm 1 q (mat_swap_rows' 1 p M) =
     subm p q
-      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M') (seq 0 (p - 2)) M).
+      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
+         (seq 0 (p - 2)) M).
 Proof.
 intros * Hp.
 destruct M as (ll); cbn in Hp |-*.
@@ -507,7 +508,6 @@ Theorem subm_fold_left_lt : ∀ (M : matrix T) i j m,
       (seq 0 m) (subm i j M).
 Proof.
 intros * Hmi.
-...
 revert i Hmi.
 induction m; intros; [ easy | ].
 rewrite seq_S; cbn.
@@ -520,7 +520,7 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
   → is_square_matrix M = true
-  → det (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 i) M) =
+  → det (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M') (seq 0 i) M) =
     (minus_one_pow i * det M)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
@@ -534,7 +534,7 @@ rewrite fold_left_app; cbn - [ det ].
 rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {
-  now rewrite mat_nrows_fold_left_swap, Hr, Nat.add_1_r.
+  rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {
   specialize (square_matrix_ncols _ Hsm) as Hc1.
   apply is_scm_mat_iff.
@@ -547,6 +547,14 @@ rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
     unfold mat_ncols in Hc'.
     rewrite fold_left_mat_fold_left_list_list in Hc'.
     cbn in Hc'.
+    erewrite List_fold_left_ext_in in Hc'. 2: {
+      intros j ll' Hj.
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        now rewrite Nat.add_sub, Nat.add_succ_r, Nat_sub_succ_1.
+      }
+      easy.
+    }
     apply length_zero_iff_nil in Hc'.
     rewrite List_hd_nth_0 in Hc'.
     rewrite nth_fold_left_map_transp in Hc'.
@@ -598,6 +606,14 @@ rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   apply In_nth with (d := []) in Hla.
   rewrite length_fold_left_map_transp, fold_mat_nrows in Hla.
   destruct Hla as (j & Hj & Hla).
+  erewrite List_fold_left_ext_in in Hla. 2: {
+    intros k ll' Hk.
+    erewrite map_ext_in. 2: {
+      intros l Hl.
+      now rewrite Nat.add_sub, Nat.add_succ_r, Nat_sub_succ_1.
+    }
+    easy.
+  }
   rewrite nth_fold_left_map_transp in Hla.
   rewrite fold_mat_nrows in Hla.
   rewrite Nat.add_0_l in Hla.
@@ -637,7 +653,7 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   is_square_matrix M = true
   → 1 < i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_nrows M
-  → det (subm 1 j (mat_swap_rows 0 (i - 1) M)) =
+  → det (subm 1 j (mat_swap_rows' 1 i M)) =
     (minus_one_pow i * det (subm i j M))%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
@@ -721,7 +737,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rename i into p.
-remember (mat_swap_rows 0 (p - 1) M) as M'.
+remember (mat_swap_rows' 1 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite map_length, butn_length, fold_mat_nrows.
@@ -745,8 +761,8 @@ erewrite rngl_summation_eq_compat. 2: {
   clear H1.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
-  replace (mat_el M p j) with (mat_el (mat_swap_rows 0 (p - 1) M) 0 j). 2: {
-    unfold mat_swap_rows.
+  replace (mat_el M p j) with (mat_el (mat_swap_rows' 1 p M) 0 j). 2: {
+    unfold mat_swap_rows'.
     cbn; unfold list_swap_elem.
     rewrite fold_mat_nrows.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
@@ -761,7 +777,7 @@ cbn.
 subst M'.
 rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
 rewrite fold_det.
-assert (H1 : 0 ≠ p - 1) by flia Hlin Hi1.
+assert (H1 : 1 ≠ p) by flia Hlin Hi1.
 assert (H2 : p - 1 < mat_nrows M) by flia Hlin.
 apply Nat.neq_0_lt_0 in Hnz.
 rewrite <- (determinant_alternating Hif M H1); [ | easy | easy | easy ].
@@ -999,13 +1015,8 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   rewrite determinant_succ.
   now cbn; rewrite Nat.sub_0_r.
 }
-assert (Hiz : i - 1 ≠ 0) by flia Hi1 Hir.
 apply rngl_opp_inj; [ easy | ].
-rewrite <- (determinant_alternating Hif M Hiz); [ | | | easy ]; cycle 1. {
-  flia Hir.
-} {
-  flia Hir.
-}
+rewrite <- (determinant_alternating Hif M Hi1); [ | easy | flia Hir | easy ].
 unfold det at 1.
 rewrite mat_swap_rows_nrows.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) at 1 by flia Hir.
@@ -1029,13 +1040,11 @@ f_equal.
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite <- rngl_mul_assoc.
 rewrite mat_el_mat_swap_rows; [ | flia Hj ].
-rewrite <- Nat.sub_succ_l; [ | easy ].
-rewrite Nat_sub_succ_1.
 f_equal.
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 symmetry.
 rewrite mat_swap_rows_comm.
-rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; [ | flia Hir Hiz ].
+rewrite <- determinant_subm_mat_swap_rows_0_i; try easy; [ | flia Hir Hi1 ].
 unfold det.
 rewrite mat_nrows_subm.
 rewrite mat_swap_rows_nrows.
