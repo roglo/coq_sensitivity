@@ -22,7 +22,7 @@ Definition com (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
-       map (λ j, (minus_one_pow (i + j) * det (subm' i j M))%F)
+       map (λ j, (minus_one_pow (i + j) * det (subm i j M))%F)
          (seq 1 (mat_ncols M)))
       (seq 1 (mat_nrows M))).
 
@@ -61,11 +61,11 @@ Qed.
 
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
   p < q < r - 1
-  → subm' r j (mat_swap_rows p q M) = mat_swap_rows p q (subm' r j M).
+  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
 Proof.
 intros * (Hpq, Hq).
 destruct M as (ll); cbn.
-unfold subm', mat_swap_rows; cbn; f_equal.
+unfold subm, mat_swap_rows; cbn; f_equal.
 rewrite map_length.
 rewrite butn_length.
 rewrite <- map_butn, map_map.
@@ -137,7 +137,7 @@ Qed.
 Theorem subm_mat_swap_rows_lt : ∀ (M : matrix T) p q r j,
   p < r - 1
   → q < r - 1
-  → subm' r j (mat_swap_rows p q M) = mat_swap_rows p q (subm' r j M).
+  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
 Proof.
 intros * Hp Hq.
 destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply subm_mat_swap_rows_lt_lt | ].
@@ -426,13 +426,13 @@ Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   1 ≤ p ≤ mat_nrows M
-  → subm' 1 q (mat_swap_rows 0 (p - 1) M) =
-    subm' p q
+  → subm 1 q (mat_swap_rows 0 (p - 1) M) =
+    subm p q
       (fold_left (λ M' k, mat_swap_rows k (k + 1) M') (seq 0 (p - 2)) M).
 Proof.
 intros * Hp.
 destruct M as (ll); cbn in Hp |-*.
-unfold subm'; f_equal.
+unfold subm; f_equal.
 cbn - [ butn ].
 f_equal; clear q.
 rewrite fold_left_mat_fold_left_list_list.
@@ -497,12 +497,12 @@ Qed.
 
 Theorem subm_fold_left_lt : ∀ (M : matrix T) i j m,
   m < i - 1
-  → subm' i j
+  → subm i j
       (fold_left (λ M' k, mat_swap_rows k (k + 1) M')
          (seq 0 m) M) =
     fold_left
       (λ M' k, mat_swap_rows k (k + 1) M')
-      (seq 0 m) (subm' i j M).
+      (seq 0 m) (subm i j M).
 Proof.
 intros * Hmi.
 revert i Hmi.
@@ -634,8 +634,8 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   is_square_matrix M = true
   → 1 < i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_nrows M
-  → det (subm' 1 j (mat_swap_rows 0 (i - 1) M)) =
-    (minus_one_pow i * det (subm' i j M))%F.
+  → det (subm 1 j (mat_swap_rows 0 (i - 1) M)) =
+    (minus_one_pow i * det (subm i j M))%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ. 2: {
@@ -965,12 +965,12 @@ with "M k j") returns 0. It is what I call a "bad determinant formula".
 determinant_with_row
   ∀ (i n : nat) (M : matrix (S n) (S n) T),
   i ≤ n
-  → ∑ (j = 1, n), minus_one_pow (i + j) * M i j * det (subm' M i j) = det M
+  → ∑ (j = 1, n), minus_one_pow (i + j) * M i j * det (subm M i j) = det M
 
 determinant_with_bad_row
   ∀ (i k n : nat) (M : matrix (S n) (S n) T),
   i ≤ n → k ≤ n → i ≠ k
-  → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm' M i j) = 0%F
+  → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
 *)
 
 Theorem determinant_with_row : in_charac_0_field →
@@ -979,7 +979,7 @@ Theorem determinant_with_row : in_charac_0_field →
   → 1 ≤ i ≤ mat_nrows M
   → det M =
     ∑ (j = 1, mat_nrows M),
-    minus_one_pow (i + j) * mat_el M i j * det (subm' i j M).
+    minus_one_pow (i + j) * mat_el M i j * det (subm i j M).
 Proof.
 intros Hif * Hsm Hir.
 assert (Hop : rngl_has_opp = true) by now destruct Hif.
@@ -1047,7 +1047,7 @@ Theorem determinant_with_bad_row : in_charac_0_field →
   → 1 ≤ k ≤ mat_nrows M
   → i ≠ k
   → ∑ (j = 1, mat_nrows M),
-    minus_one_pow (i + j) * mat_el M k j * det (subm' i j M) = 0%F.
+    minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%F.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
 specialize (square_matrix_ncols _ Hsm) as Hc.
@@ -1118,7 +1118,7 @@ f_equal; f_equal. {
   now rewrite Nat.eqb_refl.
 }
 (* oops... complicated from now! doing a lemma, perhaps? *)
-unfold subm'; cbn.
+unfold subm; cbn.
 do 2 rewrite map_length.
 do 2 rewrite butn_length.
 do 2 rewrite fold_mat_nrows.

@@ -57,7 +57,7 @@ Fixpoint determinant_loop n (M : matrix T) :=
   | S n' =>
       ∑ (j = 1, n),
       minus_one_pow (S j) * mat_el M 1 j *
-      determinant_loop n' (subm' 1 j M)
+      determinant_loop n' (subm 1 j M)
   end.
 
 Definition det M := determinant_loop (mat_nrows M) M.
@@ -115,7 +115,7 @@ Theorem determinant_succ : ∀ n (M : matrix T),
   determinant_loop (S n) M =
      ∑ (j = 1, S n),
      minus_one_pow (S j) * mat_el M 1 j *
-     determinant_loop n (subm' 1 j M).
+     determinant_loop n (subm 1 j M).
 Proof. easy. Qed.
 
 (*
@@ -287,7 +287,7 @@ f_equal. {
   do 3 rewrite Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
   unfold ff_app.
-  cbn - [ subm' fact ].
+  cbn - [ subm fact ].
   rewrite (List_map_nth' 0). 2: {
     rewrite canon_sym_gr_list_length; flia Hi Hnz.
   }
@@ -1411,12 +1411,12 @@ specialize (square_matrix_ncols _ Hsmb) as Hcb.
 rewrite Hra in Hca.
 rewrite Hrb in Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
-assert (Hab : ∀ j, subm' 1 j A = subm' 1 j B). {
+assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
   intros.
   destruct A as (lla).
   destruct B as (llb).
   cbn in *.
-  unfold subm'; f_equal.
+  unfold subm; f_equal.
   cbn - [ butn ].
   rewrite (List_map_nth_seq lla []).
   rewrite (List_map_nth_seq llb []).
@@ -1453,12 +1453,12 @@ assert (Hab : ∀ j, subm' 1 j A = subm' 1 j B). {
   symmetry; apply Hb; intros H; apply Huz.
   now apply Nat.succ_inj in H.
 }
-assert (Hac : ∀ j, subm' 1 j A = subm' 1 j C). {
+assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
   intros.
   destruct A as (lla).
   destruct C as (llc).
   cbn in *.
-  unfold subm'; f_equal.
+  unfold subm; f_equal.
   cbn - [ butn ].
   rewrite (List_map_nth_seq lla []).
   rewrite (List_map_nth_seq llc []).
@@ -2467,7 +2467,7 @@ Theorem det_subm_transp : in_charac_0_field →
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M
   → 1 ≤ j ≤ mat_nrows M
-  → det (subm' j i M) = det (subm' i j M⁺).
+  → det (subm j i M) = det (subm i j M⁺).
 Proof.
 intros Hif * Hsm Hi Hj.
 rewrite <- determinant_transpose; [ | easy | ]. 2: {

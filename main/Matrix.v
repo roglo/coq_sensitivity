@@ -2157,13 +2157,13 @@ Qed.
 
 (* matrix without row i and column j *)
 
-Definition subm' i j (M : matrix T) :=
+Definition subm i j (M : matrix T) :=
   mk_mat (map (butn (j - 1)) (butn (i - 1) (mat_list_list M))).
 
 (* combinations of submatrix and other operations *)
 
 Theorem mat_nrows_subm : ∀ (M : matrix T) i j,
-  mat_nrows (subm' i j M) = mat_nrows M - Nat.b2n (i <=? mat_nrows M).
+  mat_nrows (subm i j M) = mat_nrows M - Nat.b2n (i <=? mat_nrows M).
 Proof.
 intros.
 destruct M as (ll); cbn - [ "<?" ].
@@ -2180,7 +2180,7 @@ Theorem mat_ncols_subm : ∀ (M : matrix T) i j,
   is_correct_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_ncols M
-  → mat_ncols (subm' i j M) = if mat_nrows M =? 1 then 0 else mat_ncols M - 1.
+  → mat_ncols (subm i j M) = if mat_nrows M =? 1 then 0 else mat_ncols M - 1.
 Proof.
 intros * Hcm Hi Hj.
 destruct M as (ll); cbn in Hi, Hj.
@@ -2223,7 +2223,7 @@ Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
   1 ≤ i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_nrows M
   → is_square_matrix M = true
-  → is_square_matrix (subm' i j M) = true.
+  → is_square_matrix (subm i j M) = true.
 Proof.
 intros * Hi Hj Hm.
 apply is_scm_mat_iff.
@@ -2282,7 +2282,7 @@ Theorem subm_is_corr_mat : ∀ (A : matrix T) i j,
   → is_correct_matrix A = true
   → 1 ≤ i ≤ mat_nrows A
   → 1 ≤ j ≤ mat_ncols A
-  → is_correct_matrix (subm' i j A) = true.
+  → is_correct_matrix (subm i j A) = true.
 Proof.
 intros * Hc1 Ha Hi Hj.
 apply is_scm_mat_iff.
@@ -2784,7 +2784,7 @@ Theorem mat_subm_transp :
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_ncols M
   → 1 ≤ j ≤ mat_nrows M
-  → ((subm' j i M)⁺ = subm' i j M⁺)%M.
+  → ((subm j i M)⁺ = subm i j M⁺)%M.
 Proof.
 intros * Hsm Hi Hj.
 specialize (square_matrix_ncols _ Hsm) as Hcr.
@@ -2794,7 +2794,7 @@ destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   replace i with 1 by flia Hi.
   replace j with 1 by flia Hj.
   clear i j Hi Hj.
-  unfold subm', mat_transp.
+  unfold subm, mat_transp.
   rewrite Nat.sub_diag.
   cbn - [ butn ].
   f_equal.
@@ -3071,7 +3071,7 @@ Arguments mat_transp_nrows {T}%type {ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
 Arguments minus_one_pow {T ro}.
-Arguments subm' {T} i%nat j%nat M%M.
+Arguments subm {T} i%nat j%nat M%M.
 Arguments mat_subm_transp {T ro} [i j]%nat.
 Arguments mat_vect_mul_0_r {T}%type {ro rp} Hop [m n]%nat M%M.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
