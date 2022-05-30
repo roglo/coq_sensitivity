@@ -787,14 +787,14 @@ do 2 rewrite rngl_mul_assoc.
 now rewrite <- rngl_mul_add_distr_r.
 Qed.
 
-Definition mat_swap_rows' i1 i2 (M : matrix T) :=
+Definition mat_swap_rows i1 i2 (M : matrix T) :=
   mk_mat (list_swap_elem [] (mat_list_list M) (i1 - 1) (i2 - 1)).
 
 Theorem mat_swap_rows_is_square : ∀ (M : matrix T) p q,
   1 ≤ p ≤ mat_nrows M
   → 1 ≤ q ≤ mat_nrows M
   → is_square_matrix M = true
-  → is_square_matrix (mat_swap_rows' p q M) = true.
+  → is_square_matrix (mat_swap_rows p q M) = true.
 Proof.
 intros * Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr.
@@ -806,7 +806,7 @@ apply is_scm_mat_iff.
 destruct Hsm as (Hcr & Hc).
 cbn; unfold list_swap_elem.
 rewrite List_map_seq_length.
-unfold mat_swap_rows', list_swap_elem; cbn.
+unfold mat_swap_rows, list_swap_elem; cbn.
 split. {
   unfold mat_ncols; cbn.
   rewrite fold_mat_nrows; rewrite Hr.
@@ -835,10 +835,10 @@ split. {
 Qed.
 
 Theorem mat_swap_rows_nrows : ∀ (M : matrix T) p q,
-  mat_nrows (mat_swap_rows' p q M) = mat_nrows M.
+  mat_nrows (mat_swap_rows p q M) = mat_nrows M.
 Proof.
 intros.
-unfold mat_swap_rows'; cbn.
+unfold mat_swap_rows; cbn.
 unfold list_swap_elem.
 rewrite map_length.
 now rewrite seq_length.
@@ -847,7 +847,7 @@ Qed.
 Theorem mat_swap_rows_ncols : ∀ (M : matrix T),
   is_correct_matrix M = true
   → ∀ p q, 1 ≤ p ≤ mat_nrows M → 1 ≤ q ≤ mat_nrows M →
-  mat_ncols (mat_swap_rows' p q M) = mat_ncols M.
+  mat_ncols (mat_swap_rows p q M) = mat_ncols M.
 Proof.
 intros * Hcm * Hp Hq.
 generalize Hcm; intros H.
@@ -858,7 +858,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   now apply length_zero_iff_nil in Hrz; subst ll.
 }
 apply Nat.neq_0_lt_0 in Hrz.
-unfold mat_swap_rows'; cbn.
+unfold mat_swap_rows; cbn.
 unfold list_swap_elem.
 unfold mat_ncols; cbn.
 do 2 rewrite List_hd_nth_0.
@@ -932,7 +932,7 @@ Theorem determinant_alternating : in_charac_0_field →
   → 1 ≤ p ≤ mat_nrows M
   → 1 ≤ q ≤ mat_nrows M
   → is_square_matrix M = true
-  → det (mat_swap_rows' p q M) = (- det M)%F.
+  → det (mat_swap_rows p q M) = (- det M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -953,7 +953,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ mat_swap_rows' ].
+cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   rewrite rngl_product_change_var with
@@ -967,7 +967,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite Nat_sub_succ_1.
   easy.
 }
-cbn - [ mat_swap_rows' ].
+cbn - [ mat_swap_rows ].
 assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
@@ -983,7 +983,7 @@ erewrite rngl_summation_eq_compat. 2: {
   }
   easy.
 }
-cbn - [ mat_swap_rows' ].
+cbn - [ mat_swap_rows ].
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
   assert (Hkn : k < n!). {
@@ -1298,7 +1298,7 @@ assert (HM : det M = (- det M)%F). {
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
   destruct M as (ll); cbn in *.
-  unfold mat_swap_rows'; cbn; f_equal.
+  unfold mat_swap_rows; cbn; f_equal.
   rewrite (List_map_nth_seq ll) with (d := []) at 1.
   apply map_ext_in.
   intros i Hi; apply in_seq in Hi.

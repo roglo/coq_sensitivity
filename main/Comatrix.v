@@ -29,11 +29,11 @@ Definition com (M : matrix T) : matrix T :=
 Arguments com M%M.
 
 Theorem mat_swap_same_rows : ∀ (M : matrix T) i,
-  mat_swap_rows' i i M = M.
+  mat_swap_rows i i M = M.
 Proof.
 intros.
 destruct M as (ll); cbn.
-unfold mat_swap_rows'; f_equal.
+unfold mat_swap_rows; f_equal.
 cbn - [ list_swap_elem ].
 rewrite (List_map_nth_seq ll (nth i ll [])) at 2.
 unfold list_swap_elem.
@@ -44,10 +44,10 @@ now apply nth_indep.
 Qed.
 
 Theorem mat_swap_rows_comm : ∀ (M : matrix T) p q,
-  mat_swap_rows' p q M = mat_swap_rows' q p M.
+  mat_swap_rows p q M = mat_swap_rows q p M.
 Proof.
 intros.
-unfold mat_swap_rows'; f_equal; cbn.
+unfold mat_swap_rows; f_equal; cbn.
 unfold list_swap_elem.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
@@ -56,11 +56,11 @@ Qed.
 
 Theorem subm_mat_swap_rows_lt_lt : ∀ (M : matrix T) p q r j,
   p < q < r
-  → subm r j (mat_swap_rows' p q M) = mat_swap_rows' p q (subm r j M).
+  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
 Proof.
 intros * (Hpq, Hq).
 destruct M as (ll); cbn.
-unfold subm, mat_swap_rows'; cbn; f_equal.
+unfold subm, mat_swap_rows; cbn; f_equal.
 rewrite map_length.
 rewrite butn_length.
 rewrite <- map_butn, map_map.
@@ -132,7 +132,7 @@ Qed.
 Theorem subm_mat_swap_rows_lt : ∀ (M : matrix T) p q r j,
   p < r
   → q < r
-  → subm r j (mat_swap_rows' p q M) = mat_swap_rows' p q (subm r j M).
+  → subm r j (mat_swap_rows p q M) = mat_swap_rows p q (subm r j M).
 Proof.
 intros * Hp Hq.
 destruct (lt_dec p q) as [Hpq| Hpq]; [ now apply subm_mat_swap_rows_lt_lt | ].
@@ -144,7 +144,7 @@ Qed.
 
 Theorem mat_el_mat_swap_rows : ∀ (M : matrix T) p q j,
   1 ≤ q ≤ mat_nrows M
-  → mat_el (mat_swap_rows' p q M) q j = mat_el M p j.
+  → mat_el (mat_swap_rows p q M) q j = mat_el M p j.
 Proof.
 intros * Hql; cbn.
 destruct M as (ll); cbn in Hql |-*.
@@ -172,7 +172,7 @@ apply IHlen.
 Qed.
 
 Theorem mat_nrows_fold_left_swap : ∀ (M : matrix T) p q f g,
-  mat_nrows (fold_left (λ M' k, mat_swap_rows' (f k) (g k) M') (seq p q) M) =
+  mat_nrows (fold_left (λ M' k, mat_swap_rows (f k) (g k) M') (seq p q) M) =
   mat_nrows M.
 Proof.
 intros.
@@ -420,9 +420,9 @@ Qed.
 
 Theorem subm_mat_swap_rows_circ : ∀ (M : matrix T) p q,
   1 ≤ p ≤ mat_nrows M
-  → subm 1 q (mat_swap_rows' 1 p M) =
+  → subm 1 q (mat_swap_rows 1 p M) =
     subm p q
-      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
+      (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M')
          (seq 0 (p - 2)) M).
 Proof.
 intros * Hp.
@@ -501,10 +501,10 @@ Qed.
 Theorem subm_fold_left_lt : ∀ (M : matrix T) i j m,
   m < i - 1
   → subm i j
-      (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
+      (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M')
          (seq 0 m) M) =
     fold_left
-      (λ M' k, mat_swap_rows' (k + 1) (k + 2) M')
+      (λ M' k, mat_swap_rows (k + 1) (k + 2) M')
       (seq 0 m) (subm i j M).
 Proof.
 intros * Hmi.
@@ -520,7 +520,7 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
   → is_square_matrix M = true
-  → det (fold_left (λ M' k, mat_swap_rows' (k + 1) (k + 2) M') (seq 0 i) M) =
+  → det (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M') (seq 0 i) M) =
     (minus_one_pow i * det M)%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
@@ -653,7 +653,7 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   is_square_matrix M = true
   → 1 < i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_nrows M
-  → det (subm 1 j (mat_swap_rows' 1 i M)) =
+  → det (subm 1 j (mat_swap_rows 1 i M)) =
     (minus_one_pow i * det (subm i j M))%F.
 Proof.
 intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
@@ -737,7 +737,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rename i into p.
-remember (mat_swap_rows' 1 p M) as M'.
+remember (mat_swap_rows 1 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite map_length, butn_length, fold_mat_nrows.
@@ -761,8 +761,8 @@ erewrite rngl_summation_eq_compat. 2: {
   clear H1.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
-  replace (mat_el M p j) with (mat_el (mat_swap_rows' 1 p M) 0 j). 2: {
-    unfold mat_swap_rows'.
+  replace (mat_el M p j) with (mat_el (mat_swap_rows 1 p M) 0 j). 2: {
+    unfold mat_swap_rows.
     cbn; unfold list_swap_elem.
     rewrite fold_mat_nrows.
     rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
