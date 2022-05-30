@@ -655,49 +655,10 @@ Theorem rngl_product_summation_distr' :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ b c m n f,
   ∏ (i = b, m), (∑ (j = c, n), f i j) =
-  ∑ (k = 1, S (n - c) ^ S (m - b)),
-  ∏ (i = b, m),
-  f i (c + ((k - 1) / (S n - c) ^ (m - i)) mod (S n - c))%nat.
-(*
   ∑ (k = 1, (S n - c) ^ (S m - b)),
   ∏ (i = b, m),
-  f i (c + ((k - 1) / ((S n - c) ^ (m - i + b)) mod (S n - c)))%nat.
-...
-  ∏ (i = 0, m), (∑ (j = 0, n), f i j) =
-  ∑ (k = 0, S n ^ S m - 1),
-  ∏ (i = 0, m), f i (k / (S n ^ (m - i)) mod S n).
-*)
+  f i (c + ((k - 1) / (S n - c) ^ (m - i)) mod (S n - c))%nat.
 Proof.
-intros Hos *.
-rewrite (rngl_product_shift _ b).
-rewrite Nat.sub_diag.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  rewrite (rngl_summation_shift c).
-  rewrite Nat.sub_diag.
-  easy.
-  admit.
-}
-cbn - [ "-" ].
-rewrite rngl_product_summation_distr.
-rewrite rngl_summation_rshift.
-rewrite <- Nat.sub_succ_l.
-rewrite Nat_sub_succ_1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite (rngl_product_rshift _ b).
-  rewrite Nat.add_0_r, Nat.add_comm, Nat.sub_add.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-    replace (m - b - (j - b)) with (m - j) by flia Hj.
-    easy.
-  }
-  easy.
-  admit.
-}
-cbn - [ "-" "/" "mod" "^" ].
-...
 intros Hos *.
 destruct (Nat.eq_dec (S m - b) 0) as [Hmb| Hmb]. {
   rewrite Hmb.
@@ -739,6 +700,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ "-" ].
+(*
 rewrite rngl_product_summation_distr; [ | easy ].
 symmetry.
 rewrite (rngl_summation_shift 1). 2: {
@@ -759,15 +721,25 @@ intros j (_, Hj).
 f_equal; f_equal.
 rewrite Nat.add_comm, Nat.add_sub.
 rewrite Nat.sub_add_distr.
-symmetry.
-f_equal.
-f_equal.
-f_equal.
-rewrite Nat_sub_sub_swap.
-rewrite Nat.sub_add; [ |  flia Hj Hmb ].
+easy.
 ...
-revert n b c.
-induction m; intros. {
+*)
+unfold iter_seq.
+do 2 rewrite Nat.sub_0_r.
+replace (S m - b) with (S (m - b)) by flia Hmb.
+replace (S n - c) with (S (n - c)) by flia Hcn.
+remember (S (m - b)) as len eqn:Hlen; symmetry in Hlen.
+remember (S (n - c)) as len' eqn:Hlen'; symmetry in Hlen'.
+replace m with (b + len - 1) by flia Hlen Hmb.
+clear m n Hmb Hcn Hlen Hlen'.
+revert b c len'.
+induction len; intros. {
+  rewrite rngl_product_list_empty; [ | easy ].
+  rewrite Nat.pow_0_r; cbn.
+  rewrite rngl_summation_list_only_one.
+  now rewrite rngl_product_list_empty.
+}
+...
   destruct b. {
     rewrite rngl_product_only_one.
     rewrite Nat.sub_0_r.
