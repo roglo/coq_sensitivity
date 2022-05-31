@@ -266,8 +266,6 @@ Theorem all_comb_loop_length : ∀ A (ll : list (list A)) it,
   → length (all_comb_loop it ll) = nat_∏ (l ∈ ll), length l.
 Proof.
 intros * Hll Hit.
-Print all_comb_loop.
-...
 revert ll Hll Hit.
 induction it; intros; [ easy | cbn ].
 destruct ll as [| l1]; [ easy | clear Hll ].
@@ -282,6 +280,16 @@ destruct l1 as [| a]. {
   }
 }
 rewrite List_cons_length in Hit.
+(**)
+destruct ll as [| l2]. {
+  unfold iter_list; cbn.
+  now rewrite Nat.add_0_r, map_length.
+}
+rewrite app_length, map_length.
+rewrite IHit; [ | easy | ]. 2: {
+  cbn in Hit |-*.
+  flia Hit.
+}
 rewrite iter_list_cons; cycle 1. {
   apply Nat.mul_1_l.
 } {
@@ -289,22 +297,46 @@ rewrite iter_list_cons; cycle 1. {
 } {
   apply Nat.mul_assoc.
 }
-destruct ll as [| l2]. {
-  unfold iter_list; cbn.
-  now rewrite Nat.mul_1_r, map_length.
+cbn.
+rewrite iter_list_cons; cycle 1. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
 }
-rewrite app_length, map_length, List_cons_length.
-rewrite IHit; [ | easy | ]. 2: {
-  cbn in Hit |-*.
-  flia Hit.
+cbn.
+rewrite iter_list_cons; cycle 1. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
 }
 cbn.
 f_equal.
-rewrite IHit; [ | easy | ]. 2: {
-  cbn in Hit |-*.
-...
-  flia Hit.
+rewrite <- iter_list_cons; cycle 1. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
 }
+rewrite <- iter_list_cons; cycle 1. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
+}
+rewrite List_cons_length in Hit.
+replace (S (S (length ll))) with (length (l1 :: l2 :: ll)) in Hit by easy.
+destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
+  apply IHit; [ easy | ].
+  flia Hit H1.
+}
+do 2 rewrite List_cons_length in H1.
+rewrite <- H1.
 ...
 *)
 
