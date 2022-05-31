@@ -276,11 +276,37 @@ destruct it; [ easy | now destruct la ].
 Qed.
 
 (* to be completed
+Theorem square_all_comb_loop_length : ∀ A (ll : list (list A)) n it,
+  length ll ≠ 0
+  → n = length ll
+  → (∀ l, l ∈ ll → length l = n)
+  → n ^ 2 - n + 1 ≤ it
+  → length (all_comb_loop it ll) = n ^ n.
+Proof.
+intros * Hl Hn Hnl Hit.
+subst n.
+revert ll Hl Hit Hnl.
+induction it; intros. {
+  now apply Nat.le_0_r in Hit; rewrite Nat.add_comm in Hit.
+}
+cbn.
+destruct ll as [| l1]; [ easy | clear Hl ].
+destruct l1 as [| a1]. {
+  now specialize (Hnl _ (or_introl eq_refl)).
+}
+destruct ll as [| l2]. {
+  destruct l1 as [| a2]; [ easy | exfalso ].
+  now specialize (Hnl _ (or_introl eq_refl)).
+}
+rewrite app_length, map_length.
+...
+
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
 intros.
 unfold all_comb.
 Print all_comb_loop.
+...
 Theorem all_comb_loop_length : ∀ A (ll : list (list A)) it,
   ll ≠ []
   → length ll ^ 2 < it
