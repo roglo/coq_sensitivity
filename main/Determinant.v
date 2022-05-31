@@ -254,6 +254,20 @@ f_equal; [ f_equal | ]. {
 }
 Qed.
 
+Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)) it,
+  [] ∈ ll → all_comb_loop it ll = [].
+Proof.
+intros * Hll.
+revert ll Hll.
+induction it; intros; [ easy | cbn ].
+destruct ll as [| la]; [ easy | ].
+destruct Hll as [Hll| Hll]; [ now subst la | ].
+destruct la as [| a]; [ easy | ].
+destruct ll as [| lb]; [ easy | ].
+rewrite IHit; [ cbn | easy ].
+now apply IHit; right.
+Qed.
+
 (* to be completed
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
@@ -297,6 +311,21 @@ destruct l1 as [| a]. {
   now rewrite nat_product_list_cons.
 }
 rewrite app_length, map_length.
+rewrite nat_product_list_cons.
+rewrite List_cons_length.
+rewrite <- IHit; [ | easy | ]. 2: {
+  cbn in Hit |-*; flia Hit.
+}
+cbn.
+destruct l2 as [| b]. {
+  cbn; rewrite Nat.mul_0_r.
+  destruct it; [ easy | cbn ].
+  destruct ll as [| l2]. {
+    destruct l1 as [| b]; [ easy | ].
+    rewrite app_length, map_length.
+    rewrite all_comb_loop_with_nil; [ cbn | now left ].
+    rewrite all_comb_loop_with_nil; [ easy | now right; left ].
+  }
 ...
 destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
   apply IHit; [ easy | ].
