@@ -270,14 +270,7 @@ revert ll Hll Hit.
 induction it; intros; [ easy | cbn ].
 destruct ll as [| l1]; [ easy | clear Hll ].
 destruct l1 as [| a]. {
-  cbn.
-  rewrite iter_list_cons; [ easy | | | ]. {
-    apply Nat.mul_1_l.
-  } {
-    apply Nat.mul_1_r.
-  } {
-    apply Nat.mul_assoc.
-  }
+  now rewrite nat_product_list_cons.
 }
 rewrite List_cons_length in Hit.
 (**)
@@ -290,47 +283,21 @@ rewrite IHit; [ | easy | ]. 2: {
   cbn in Hit |-*.
   flia Hit.
 }
-rewrite iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-cbn.
-rewrite iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-cbn.
-rewrite iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-cbn.
+rewrite nat_product_list_cons.
+rewrite nat_product_list_cons; cbn.
+rewrite nat_product_list_cons; cbn.
+clear a.
 f_equal.
-rewrite <- iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-rewrite <- iter_list_cons; cycle 1. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
-rewrite List_cons_length in Hit.
+rewrite <- nat_product_list_cons.
+rewrite <- nat_product_list_cons.
+cbn - [ "^" ] in Hit.
 replace (S (S (length ll))) with (length (l1 :: l2 :: ll)) in Hit by easy.
+destruct it; [ cbn in Hit; flia Hit | cbn ].
+destruct l1 as [| a]. {
+  now rewrite nat_product_list_cons.
+}
+rewrite app_length, map_length.
+...
 destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
   apply IHit; [ easy | ].
   flia Hit H1.

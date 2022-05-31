@@ -740,6 +740,19 @@ clear - rp Hos.
 now apply rngl_product_summation_distr_from_0.
 Qed.
 
+Theorem nat_product_list_cons : ∀ A a la (f : A → nat),
+  nat_∏ (i ∈ a :: la), f i = f a * nat_∏ (i ∈ la), f i.
+Proof.
+intros.
+apply iter_list_cons. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
+}
+Qed.
+
 End a.
 
 Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
