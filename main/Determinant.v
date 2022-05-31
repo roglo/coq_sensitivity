@@ -154,32 +154,6 @@ Proof. easy. Qed.
 
 (*
 End a.
-Compute (all_comb_loop 500 [[2;3];[5;7;2];[8;3];[7;2]]).
-Compute (length (all_comb_loop 0 [[]])).
-Compute (length (all_comb_loop 1 [[1]])).
-Compute (length (all_comb_loop 2 [[1];[2]])).
-Compute (length (all_comb_loop 3 [[1];[2];[3]])).
-Compute (length (all_comb_loop 1 [[1;2]])).
-(**)
-Compute (length (all_comb_loop 3 [[1;2];[3]])).
-Compute (length (all_comb_loop 2 [[1];[2;3]])).
-Print all_comb_loop.
-(**)
-Compute (length (all_comb_loop 4 [[1;2];[3];[4]])).
-Compute (length (all_comb_loop 4 [[1];[2;3];[4]])).
-Compute (length (all_comb_loop 3 [[1];[2];[3;4]])).
-Print all_comb_loop.
-(**)
-Compute (length (all_comb_loop 5 [[1;2];[3];[4];[5]])).
-Compute (length (all_comb_loop 5 [[1];[2;3];[4];[5]])).
-Compute (length (all_comb_loop 5 [[1];[2];[3;4];[5]])).
-Compute (length (all_comb_loop 4 [[1];[2];[3];[4;5]])).
-Print all_comb_loop.
-(**)
-Compute (length (all_comb_loop 4 [[1;2;3];[4]])).
-Compute (length (all_comb_loop 3 [[1;2];[3;4]])).
-Compute (length (all_comb_loop 2 [[1];[2;3;4]])).
-(**)
 Compute (length (all_comb_loop 5 [[1;2;3;4];[5]])).
 Compute (length (all_comb_loop 4 [[1;2;3];[4;5]])).
 Compute (length (all_comb_loop 3 [[1;2];[3;4;5]])).
