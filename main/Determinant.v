@@ -155,6 +155,41 @@ Proof. easy. Qed.
 (*
 End a.
 Compute (all_comb_loop 500 [[2;3];[5;7;2];[8;3];[7;2]]).
+Compute (length (all_comb_loop 0 [[]])).
+Compute (length (all_comb_loop 1 [[1]])).
+Compute (length (all_comb_loop 2 [[1];[2]])).
+Compute (length (all_comb_loop 3 [[1];[2];[3]])).
+Compute (length (all_comb_loop 1 [[1;2]])).
+(**)
+Compute (length (all_comb_loop 3 [[1;2];[3]])).
+Compute (length (all_comb_loop 2 [[1];[2;3]])).
+Print all_comb_loop.
+(**)
+Compute (length (all_comb_loop 4 [[1;2];[3];[4]])).
+Compute (length (all_comb_loop 4 [[1];[2;3];[4]])).
+Compute (length (all_comb_loop 3 [[1];[2];[3;4]])).
+Print all_comb_loop.
+(**)
+Compute (length (all_comb_loop 5 [[1;2];[3];[4];[5]])).
+Compute (length (all_comb_loop 5 [[1];[2;3];[4];[5]])).
+Compute (length (all_comb_loop 5 [[1];[2];[3;4];[5]])).
+Compute (length (all_comb_loop 4 [[1];[2];[3];[4;5]])).
+Print all_comb_loop.
+(**)
+Compute (length (all_comb_loop 4 [[1;2;3];[4]])).
+Compute (length (all_comb_loop 3 [[1;2];[3;4]])).
+Compute (length (all_comb_loop 2 [[1];[2;3;4]])).
+(**)
+Compute (length (all_comb_loop 5 [[1;2;3;4];[5]])).
+Compute (length (all_comb_loop 4 [[1;2;3];[4;5]])).
+Compute (length (all_comb_loop 3 [[1;2];[3;4;5]])).
+Compute (length (all_comb_loop 2 [[1];[2;3;4;5]])).
+Print all_comb_loop.
+...
+Compute (length (all_comb_loop 4 [[1;2];[3];[4]])).
+Compute (length (all_comb_loop 4 [[1];[2;3];[4]])).
+Compute (length (all_comb_loop 3 [[1];[2];[3;4]])).
+...
 Compute (length (all_comb_loop 8 [[2;3];[5;7;2];[8;3];[7;2]])).
 Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
 Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
@@ -257,6 +292,8 @@ Theorem all_comb_loop_length : ∀ A (ll : list (list A)) it,
   → length (all_comb_loop it ll) = nat_∏ (l ∈ ll), length l.
 Proof.
 intros * Hll Hit.
+Print all_comb_loop.
+...
 revert ll Hll Hit.
 induction it; intros; [ easy | cbn ].
 destruct ll as [| l1]; [ easy | clear Hll ].
