@@ -5,6 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
+Require Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul.
 Require Import PermutationFun SortingFun.
@@ -101,6 +102,34 @@ Definition det'' (M : matrix T) :=
     ∏ (i = 1, n), mat_el M i (ff_app (to_radix n k) (i - 1) + 1).
 
 Arguments det'' M%M.
+
+(*
+[[a;b;c];[d;e;f];[g;h;i]]
+a et toutes les combinaisons de [[d;e;f];[g;h;i]] ++
+b et toutes les combinaisons de [[d;e;f];[g;h;i]] ++
+c et toutes les combinaisons de [[d;e;f];[g;h;i]]
+*)
+
+Fixpoint all_comb_loop {A} it (ll : list (list A)) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match ll with
+      | [x :: l] => map (λ y, [y]) (x :: l)
+      | (x :: l) :: ll' =>
+          map (λ l, x :: l) (all_comb_loop it' ll') ++
+          all_comb_loop it' (l :: ll')
+      | _ => []
+      end
+  end.
+
+Definition all_comb n :=
+  all_comb_loop (n^2 - n + 1) (repeat (seq 1 n) n).
+
+(*
+Compute (all_comb 3).
+Print all_comb.
+*)
 
 (* *)
 
