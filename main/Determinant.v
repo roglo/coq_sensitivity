@@ -268,6 +268,13 @@ rewrite IHit; [ cbn | easy ].
 now apply IHit; right.
 Qed.
 
+Theorem all_comb_loop_only_one : ∀ A (la : list A) it,
+  it ≠ 0 → all_comb_loop it [la] = map (λ i, [i]) la.
+Proof.
+intros * Hit.
+destruct it; [ easy | now destruct la ].
+Qed.
+
 (* to be completed
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
@@ -326,6 +333,17 @@ destruct l2 as [| b]. {
     rewrite all_comb_loop_with_nil; [ cbn | now left ].
     rewrite all_comb_loop_with_nil; [ easy | now right; left ].
   }
+  destruct l1 as [| b]; [ easy | ].
+  rewrite app_length, map_length.
+  rewrite all_comb_loop_with_nil; [ cbn | now left ].
+  rewrite all_comb_loop_with_nil; [ easy | now right; left ].
+}
+destruct ll as [| la]. {
+  cbn.
+  rewrite map_length.
+...
+  rewrite all_comb_loop_only_one, map_length; cbn.
+  f_equal.
 ...
 destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
   apply IHit; [ easy | ].
