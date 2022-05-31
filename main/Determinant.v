@@ -345,6 +345,9 @@ destruct ll as [| la]. {
   rewrite all_comb_loop_only_one; [ | easy ].
   rewrite map_length.
   rewrite List_cons_length, <- Nat.add_succ_l; f_equal.
+  cbn.
+  destruct l1 as [| c]; [ easy | ].
+  rewrite app_length, map_length.
 ...
 destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
   apply IHit; [ easy | ].
