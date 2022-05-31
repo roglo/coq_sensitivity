@@ -300,6 +300,28 @@ destruct ll as [| l2]. {
 }
 rewrite app_length, map_length.
 ...
+rewrite IHit; [ | easy | | ]; cycle 1. {
+  cbn in Hit |-*; flia Hit.
+} {
+  intros l Hl; cbn.
+  destruct Hl as [Hl| Hl]. 2: {
+    specialize (Hnl _ (or_intror (or_intror Hl))) as H1.
+    cbn in H1.
+...
+    subst l2.
+    specialize (Hnl _ (or_intror (or_introl eq_refl))) as H1.
+    cbn in H1.
+    specialize (Hnl _ (or_introl eq_refl)) as H2.
+    cbn in H2.
+    apply Nat.succ_inj in H2.
+    rewrite <- H2 in H1.
+    rewrite H1; f_equal.
+...
+  specialize (Hnl _ (or_introl eq_refl)).
+  cbn in Hnl.
+  apply Nat.succ_inj in Hnl.
+  cbn.
+...
 
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
