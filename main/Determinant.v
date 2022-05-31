@@ -132,6 +132,13 @@ Compute (all_comb_loop 11 (repeat (seq 0 10) 2)).
 Print all_comb.
 *)
 
+Definition det''' (M : matrix T) :=
+  let n := mat_nrows M in
+  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i (ff_app l (i - 1) + 1).
+
+(* vérifier que det''' donne le même résultat que det''
+   à quelques queues de vache près *)
+
 (* *)
 
 Theorem fold_det : ∀ M, determinant_loop (mat_nrows M) M = det M.
