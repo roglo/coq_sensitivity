@@ -128,6 +128,7 @@ Definition all_comb n :=
 
 (*
 Compute (all_comb 3).
+Compute (all_comb_loop 11 (repeat (seq 0 10) 2)).
 Print all_comb.
 *)
 
