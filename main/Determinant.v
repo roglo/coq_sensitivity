@@ -134,10 +134,7 @@ Print all_comb.
 
 Definition det''' (M : matrix T) :=
   let n := mat_nrows M in
-  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i (ff_app l (i - 1) + 1).
-
-(* vérifier que det''' donne le même résultat que det''
-   à quelques queues de vache près *)
+  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i (ff_app l (i - 1)).
 
 (* *)
 
@@ -157,9 +154,16 @@ Proof. easy. Qed.
 
 (*
 End a.
+Compute (all_comb_loop 500 [[2;3];[5;7;2];[8;3];[7;2]]).
+Compute (length (all_comb_loop 8 [[2;3];[5;7;2];[8;3];[7;2]])).
+Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
+Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (all_comb_loop 12 [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (all_comb_loop 10 [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
 Arguments det'' {T ro} M%M.
+Arguments det''' {T ro} M%M.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
@@ -167,6 +171,15 @@ Open Scope Q_scope.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det''' M).
+Compute (let M := mk_mat [] in det M).
+Compute (let M := mk_mat [] in det' M).
+Compute (let M := mk_mat [] in det'' M).
+Compute (let M := mk_mat [] in det''' M).
+Compute (let M := mk_mat [[3]] in det M).
+Compute (let M := mk_mat [[3]] in det' M).
+Compute (let M := mk_mat [[3]] in det'' M).
+Compute (let M := mk_mat [[3]] in det''' M).
 *)
 
 Theorem rngl_summation_list_incl : ∀ A eqd la lb (f : A → T),
@@ -231,6 +244,58 @@ f_equal; [ f_equal | ]. {
   now exfalso; apply H1; right.
 }
 Qed.
+
+(* to be completed
+Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
+Proof.
+intros.
+unfold all_comb.
+Print all_comb_loop.
+Theorem all_comb_loop_length : ∀ A (ll : list (list A)) it,
+  ll ≠ []
+  → length ll ^ 2 < it
+  → length (all_comb_loop it ll) = nat_∏ (l ∈ ll), length l.
+Proof.
+intros * Hll Hit.
+revert ll Hll Hit.
+induction it; intros; [ easy | cbn ].
+destruct ll as [| l1]; [ easy | clear Hll ].
+destruct l1 as [| a]. {
+  cbn.
+  rewrite iter_list_cons; [ easy | | | ]. {
+    apply Nat.mul_1_l.
+  } {
+    apply Nat.mul_1_r.
+  } {
+    apply Nat.mul_assoc.
+  }
+}
+rewrite List_cons_length in Hit.
+rewrite iter_list_cons; cycle 1. {
+  apply Nat.mul_1_l.
+} {
+  apply Nat.mul_1_r.
+} {
+  apply Nat.mul_assoc.
+}
+destruct ll as [| l2]. {
+  unfold iter_list; cbn.
+  now rewrite Nat.mul_1_r, map_length.
+}
+rewrite app_length, map_length, List_cons_length.
+rewrite IHit; [ | easy | ]. 2: {
+  cbn in Hit |-*.
+  flia Hit.
+}
+cbn.
+f_equal.
+rewrite IHit; [ | easy | ]. 2: {
+  cbn in Hit |-*.
+...
+  flia Hit.
+}
+...
+*)
 
 (* det and det' are equal *)
 
@@ -539,6 +604,28 @@ intros Hic Hop Hiv H10 Heq * Hsm.
 rewrite <- det'_is_det''; [ | easy | easy ].
 now apply det_is_det'.
 Qed.
+
+(* det'' and det''' are equal *)
+
+(* to be completed
+Theorem det''_is_det''' :
+  ∀ (M : matrix T), mat_nrows M ≠ 0 → det'' M = det''' M.
+Proof.
+intros * Hrz.
+unfold det'', det'''.
+unfold iter_seq at 1.
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l. 2: {
+  now apply Nat.neq_0_lt_0, Nat.pow_nonzero.
+}
+rewrite Nat_sub_succ_1.
+remember (mat_nrows M) as n eqn:Hn.
+rewrite (List_map_nth_seq (all_comb n) []).
+...
+rewrite all_comb_length.
+rewrite <- rngl_summation_list_change_var.
+...
+*)
 
 (* multilinearity *)
 

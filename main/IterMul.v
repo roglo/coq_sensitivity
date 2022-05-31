@@ -19,6 +19,10 @@ Notation "'nat_∏' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, c * g) 1)
   (at level 35, i at level 0, b at level 60, e at level 60).
 
+Notation "'nat_∏' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c * g) 1)
+  (at level 35, i at level 0, l at level 60).
+
 Section a.
 
 Context {T : Type}.
