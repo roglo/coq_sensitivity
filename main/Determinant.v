@@ -236,90 +236,6 @@ f_equal; [ f_equal | ]. {
 }
 Qed.
 
-(*
-Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)) it,
-  [] ∈ ll → all_comb_loop it ll = [].
-Proof.
-intros * Hll.
-revert ll Hll.
-induction it; intros; [ easy | cbn ].
-destruct ll as [| la]; [ easy | ].
-destruct Hll as [Hll| Hll]; [ now subst la | ].
-destruct la as [| a]; [ easy | ].
-destruct ll as [| lb]; [ easy | ].
-rewrite IHit; [ cbn | easy ].
-now apply IHit; right.
-Qed.
-
-Theorem all_comb_loop_only_one : ∀ A (la : list A) it,
-  it ≠ 0 → all_comb_loop it [la] = map (λ i, [i]) la.
-Proof.
-intros * Hit.
-destruct it; [ easy | now destruct la ].
-Qed.
-*)
-
-(*
-Theorem square_all_comb_loop_length : ∀ A (ll : list (list A)) n it,
-  length ll ≠ 0
-  → n = length ll
-  → length (hd ll []) ≤ n
-  → (∀ l, l ∈ tl ll → length l = n)
-  → n ^ 2 - n + 1 ≤ it
-  → length (all_comb_loop it ll) = length (hd ll []) * (n - 1) ^ n.
-Proof.
-intros * Hl Hn Hhd Htl Hit.
-revert n ll Hn Hl Hit Hhd Htl.
-induction it; intros. {
-  now apply Nat.le_0_r in Hit; rewrite Nat.add_comm in Hit.
-}
-destruct ll as [| l1]; [ easy | clear Hl; cbn ].
-destruct l1 as [| a1]. {
-  cbn in Hn, Hhd, Htl |-*.
-Print all_comb_loop.
-...
-  now specialize (Hnl _ (or_introl eq_refl)).
-}
-destruct ll as [| l2]. {
-  destruct l1 as [| a2]; [ easy | exfalso ].
-  now specialize (Hnl _ (or_introl eq_refl)).
-}
-rewrite app_length, map_length.
-...
-rewrite IHit; [ | easy | | ]; cycle 1. {
-  cbn in Hit |-*; flia Hit.
-} {
-  intros l Hl; cbn.
-  destruct Hl as [Hl| Hl]. 2: {
-    specialize (Hnl _ (or_intror (or_intror Hl))) as H1.
-    cbn in H1.
-...
-    subst l2.
-    specialize (Hnl _ (or_intror (or_introl eq_refl))) as H1.
-    cbn in H1.
-    specialize (Hnl _ (or_introl eq_refl)) as H2.
-    cbn in H2.
-    apply Nat.succ_inj in H2.
-    rewrite <- H2 in H1.
-    rewrite H1; f_equal.
-...
-  specialize (Hnl _ (or_introl eq_refl)).
-  cbn in Hnl.
-  apply Nat.succ_inj in Hnl.
-  cbn.
-...
-*)
-
-Theorem List_concat_length : ∀ A (ll : list (list A)),
-  length (concat ll) = nat_∑ (l ∈ ll), length l.
-Proof.
-intros.
-induction ll as [| l1]; [ now rewrite iter_list_empty | cbn ].
-rewrite app_length.
-rewrite nat_summation_list_cons.
-now rewrite IHll.
-Qed.
-
 Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
   length (flat_map f l) = nat_∑ (a ∈ l), length (f a).
 Proof.
@@ -330,12 +246,6 @@ rewrite nat_summation_list_cons.
 now f_equal.
 Qed.
 
-
-(* to be completed
-Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
-Proof.
-intros.
-unfold all_comb.
 Theorem all_comb_loop_length : ∀ A (ll : list (list A)),
   ll ≠ []
   → length (all_comb_loop ll) = nat_∏ (l ∈ ll), length l.
@@ -356,96 +266,38 @@ erewrite iter_list_eq_compat. 2: {
   rewrite map_length.
   now rewrite IHll.
 }
-...
-rewrite List_concat_length.
-Check List_concat_length.
-...
-Print concat.
-Search concat.
-Search (length (concat _)).
-rewrite <- flat_map_concat_map.
-...
-cbn - [ all_comb_loop ].
-...
-destruct l1 as [| a]. {
-  rewrite nat_product_list_cons; cbn.
-  rewrite all_comb_loop_with_nil; [ easy | now left ].
-}
-destruct it. {
-  cbn.
-Print all_comb_loop.
-...
-intros * Hll Hit.
-revert ll Hll Hit.
-induction it; intros; [ easy | cbn ].
-destruct ll as [| l1]; [ easy | clear Hll ].
-destruct l1 as [| a]. {
-  now rewrite nat_product_list_cons.
-}
-rewrite List_cons_length in Hit.
-(**)
-destruct ll as [| l2]. {
-  unfold iter_list; cbn.
-  now rewrite Nat.add_0_r, map_length.
-}
-rewrite app_length, map_length.
-rewrite IHit; [ | easy | ]. 2: {
-  cbn in Hit |-*.
-  flia Hit.
-}
-rewrite nat_product_list_cons.
-rewrite nat_product_list_cons; cbn.
-rewrite nat_product_list_cons; cbn.
-clear a.
-f_equal.
-rewrite <- nat_product_list_cons.
-rewrite <- nat_product_list_cons.
-cbn - [ "^" ] in Hit.
-replace (S (S (length ll))) with (length (l1 :: l2 :: ll)) in Hit by easy.
-destruct it; [ cbn in Hit; flia Hit | cbn ].
-destruct l1 as [| a]. {
-  now rewrite nat_product_list_cons.
-}
-rewrite app_length, map_length.
-rewrite nat_product_list_cons.
-rewrite List_cons_length.
-rewrite <- IHit; [ | easy | ]. 2: {
-  cbn in Hit |-*; flia Hit.
-}
 cbn.
-destruct l2 as [| b]. {
-  cbn; rewrite Nat.mul_0_r.
-  destruct it; [ easy | cbn ].
-  destruct ll as [| l2]. {
-    destruct l1 as [| b]; [ easy | ].
-    rewrite app_length, map_length.
-    rewrite all_comb_loop_with_nil; [ cbn | now left ].
-    rewrite all_comb_loop_with_nil; [ easy | now right; left ].
-  }
-  destruct l1 as [| b]; [ easy | ].
-  rewrite app_length, map_length.
-  rewrite all_comb_loop_with_nil; [ cbn | now left ].
-  rewrite all_comb_loop_with_nil; [ easy | now right; left ].
+remember (nat_∏ (i ∈ l2 :: ll), length i) as x eqn:Hx.
+induction l1 as [| a]; [ easy | cbn ].
+rewrite nat_summation_list_cons.
+now rewrite IHl1.
+Qed.
+
+Theorem nat_product_same_length : ∀ A (ll : list (list A)) n,
+  (∀ l, l ∈ ll → length l = n)
+  → nat_∏ (l ∈ ll), length l = n ^ length ll.
+Proof.
+intros * Hll.
+induction ll as [| l]; [ now rewrite iter_list_empty | ].
+rewrite nat_product_list_cons; cbn.
+rewrite Hll; [ f_equal | now left ].
+apply IHll.
+intros l1 Hl1.
+now apply Hll; right.
+Qed.
+
+Theorem all_comb_length : ∀ n, n ≠ 0 → length (all_comb n) = n ^ n.
+Proof.
+intros * Hnz.
+unfold all_comb.
+rewrite all_comb_loop_length; [ | now destruct n ].
+rewrite nat_product_same_length with (n := n). 2: {
+  intros l Hl.
+  apply repeat_spec in Hl; subst l.
+  apply seq_length.
 }
-destruct ll as [| la]. {
-  cbn.
-  rewrite map_length.
-  destruct it; [ cbn in Hit; flia Hit | ].
-  rewrite all_comb_loop_only_one; [ | easy ].
-  rewrite map_length.
-  rewrite List_cons_length, <- Nat.add_succ_l; f_equal.
-  cbn.
-  destruct l1 as [| c]; [ easy | ].
-  rewrite app_length, map_length.
-...
-destruct (Nat.eq_dec (length (l1 :: l2 :: ll) ^ 2) it) as [H1| H1]. 2: {
-  apply IHit; [ easy | ].
-  flia Hit H1.
-}
-do 2 rewrite List_cons_length in H1.
-rewrite <- H1.
-...
-*)
+f_equal; apply repeat_length.
+Qed.
 
 (* det and det' are equal *)
 
@@ -771,9 +623,10 @@ rewrite <- Nat.sub_succ_l. 2: {
 rewrite Nat_sub_succ_1.
 remember (mat_nrows M) as n eqn:Hn.
 rewrite (List_map_nth_seq (all_comb n) []).
-...
-rewrite all_comb_length.
+rewrite all_comb_length; [ | easy ].
 rewrite <- rngl_summation_list_change_var.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
 ...
 *)
 
