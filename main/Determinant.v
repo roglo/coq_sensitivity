@@ -743,6 +743,21 @@ rewrite all_comb_inv_loop_app; cbn.
 rewrite rev_length, Nat.mul_0_r, Nat.add_0_r.
 rewrite Nat.add_comm.
 rewrite <- List_nth_skipn.
+Print all_comb_loop.
+cbn in Hlen.
+Print all_comb_loop.
+Compute (
+let n := 3 in
+let i := 0 in
+skipn (i * n ^ (n - 1)) (all_comb_loop (repeat (seq 1 n) n)) =
+all_comb_loop (seq (i + 1) (n - i) :: (repeat (seq 1 n) (n - 1)))
+).
+Theorem skipn_all_comb_loop : ∀ i n,
+  skipn (i * n ^ (n - 1)) (all_comb_loop (repeat (seq 1 n) n)) =
+  all_comb_loop (seq (i + 1) (n - i) :: (repeat (seq 1 n) (n - 1))).
+...
+replace (length l) with (n - 1) by flia Hlen.
+rewrite skipn_all_comb_loop.
 ...
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
