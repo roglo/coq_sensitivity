@@ -607,9 +607,173 @@ rewrite <- det'_is_det''; [ | easy | easy ].
 now apply det_is_det'.
 Qed.
 
-(* det'' and det''' are equal *)
+(* det' and det''' are equal; attempt *)
 
 (* to be completed
+Theorem det'_is_det''' :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ (M : matrix T), det' M = det''' M.
+Proof.
+intros Hop Heq *.
+unfold det'''.
+remember (mat_nrows M) as n eqn:Hn.
+unfold det'.
+rewrite <- Hn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  now move Hnz at top; subst n.
+}
+specialize (fact_neq_0 n) as Hfnz.
+specialize (Nat.pow_nonzero n n Hnz) as Hpnz.
+erewrite rngl_summation_change_var. 2: {
+  intros i Hi.
+  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
+  flia Hi Hfnz.
+}
+rewrite Nat.sub_0_r.
+replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
+rewrite <- Nat.sub_succ_l; [ | flia Hfnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+replace (map _ _) with (canon_sym_gr_list_list n) by easy.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj); subst i.
+    apply in_seq in Hj.
+    now apply canon_sym_gr_list_is_permut.
+  }
+  easy.
+}
+cbn.
+symmetry.
+erewrite rngl_summation_change_var. 2: {
+  intros i Hi.
+  apply to_radix_inv_to_radix with (n := n).
+  flia Hi Hpnz.
+}
+rewrite Nat.sub_0_r.
+replace (λ i, to_radix n i) with (to_radix n) by easy.
+rewrite <- Nat.sub_succ_l; [ | flia Hpnz ].
+rewrite Nat.sub_succ, Nat.sub_0_r.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  rewrite to_radix_to_radix_inv; cycle 1. {
+    apply in_map_iff in Hl.
+    destruct Hl as (j & Hjl & Hj).
+    rewrite <- Hjl.
+    apply to_radix_length.
+  } {
+    intros i Hi.
+    apply in_map_iff in Hl.
+    destruct Hl as (j & Hjl & Hj).
+    rewrite <- Hjl in Hi.
+    apply (In_nth _ _ 0) in Hi.
+    destruct Hi as (k & Hkj & Hk).
+    now subst i; apply to_radix_ub.
+  }
+  easy.
+}
+cbn.
+replace (map _ _) with (to_radix_list n) by easy.
+symmetry.
+assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  apply in_map_iff.
+  destruct Hl as (i & Hil & Hi).
+  subst l.
+  apply in_seq in Hi; cbn in Hi.
+  destruct Hi as (_, Hi).
+  exists (to_radix_inv n (canon_sym_gr_list n i)).
+  rewrite to_radix_to_radix_inv; cycle 1. {
+    apply canon_sym_gr_list_length.
+  } {
+    intros j Hj.
+    apply (In_nth _ _ 0) in Hj.
+    rewrite canon_sym_gr_list_length in Hj.
+    destruct Hj as (k & Hkn & Hj).
+    subst j.
+    now apply canon_sym_gr_list_ub.
+  }
+  split; [ easy | ].
+  apply in_seq.
+  split; [ easy | cbn ].
+  specialize to_radix_inv_ub as H1.
+  specialize (H1 n (canon_sym_gr_list n i) Hnz).
+  rewrite canon_sym_gr_list_length in H1.
+  apply H1.
+  intros j Hj.
+  now apply canon_sym_gr_list_ub.
+}
+assert (H :
+  ∑ (l ∈ to_radix_list n),
+  ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
+  ∑ (l ∈ to_radix_list n),
+  if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
+    ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
+  else 0). {
+  apply rngl_summation_list_eq_compat.
+  intros l Hl.
+  destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
+  assert (H : ε l = 0%F). {
+    apply ε_when_dup; [ easy | easy | ].
+    intros Hnd.
+    apply H1; clear H1.
+    apply in_map_iff.
+    apply in_map_iff in Hl.
+    destruct Hl as (i & Hil & Hi).
+    exists (canon_sym_gr_list_inv n l).
+    assert (Hp : is_permut n l). {
+      unfold is_permut.
+      split; [ split | ]; [ | easy | ]. 2: {
+        rewrite <- Hil.
+        apply to_radix_length.
+      }
+      intros j Hj.
+      rewrite <- Hil in Hj |-*.
+      apply (In_nth _ _ 0) in Hj.
+      destruct Hj as (k & Hki & Hij).
+      rewrite to_radix_length.
+      subst j.
+      now apply to_radix_ub.
+    }
+    split; [ now apply canon_sym_gr_list_canon_sym_gr_list_inv | ].
+    apply in_seq.
+    split; [ easy | ].
+    rewrite Nat.add_0_l.
+    now apply canon_sym_gr_list_inv_ub.
+  }
+  rewrite H.
+  now apply rngl_mul_0_l; left.
+}
+rewrite H.
+apply rngl_summation_list_incl; [ | | easy ]. {
+  unfold canon_sym_gr_list_list.
+  apply (NoDup_map_iff 0).
+  rewrite seq_length.
+  intros * Hi Hj Hij.
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  cbn in Hij.
+  now apply (canon_sym_gr_list_inj n).
+} {
+  unfold to_radix_list.
+  apply (NoDup_map_iff 0).
+  rewrite seq_length.
+  intros * Hi Hj Hij.
+  rewrite seq_nth in Hij; [ | easy ].
+  rewrite seq_nth in Hij; [ | easy ].
+  cbn in Hij.
+  now apply (to_radix_inj n).
+}
+Qed.
+...
+*)
+
+(* det'' and det''' are equal *)
+
+(* to be completed, if required
 Theorem det''_is_det''' :
   ∀ (M : matrix T), mat_nrows M ≠ 0 → det'' M = det''' M.
 Proof.
@@ -630,7 +794,7 @@ intros i Hi.
 f_equal. {
   apply in_seq in Hi.
   destruct Hi as (_, Hi); cbn in Hi.
-Abort.
+...
 (*
   unfold to_radix, all_comb.
 ...
@@ -644,13 +808,20 @@ Compute (
 Compute (
   let n := 3%nat in
   map (λ i, to_radix n i) (seq 0 (n ^ n))).
-...
 Compute (
   let n := 3%nat in
   let i := 5%nat in
   to_radix n i = nth i (all_comb n) []).
-...
 Open Scope Z_scope.
+Compute (
+  let n := 3%nat in
+  map (λ i, rngl_eqb (ε (to_radix n i)) (- ε (nth i (all_comb n) []))) (seq 0 (n ^ n))
+).
+Compute (
+  let n := 4%nat in
+  map (λ i, rngl_eqb (ε (to_radix n i)) (ε (nth i (all_comb n) []))) (seq 0 (n ^ n))
+).
+...
 Compute (
   let n := 3%nat in
   let i := 5%nat in
