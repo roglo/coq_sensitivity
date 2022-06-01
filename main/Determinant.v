@@ -298,6 +298,31 @@ rewrite nat_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
+Fixpoint all_comb_inv_loop r l : nat :=
+  match l with
+  | [] => 0
+  | d :: l' => pred d + r * all_comb_inv_loop r l'
+  end.
+
+Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
+
+Theorem all_comb_inv_loop_app : ∀ r la lb,
+  all_comb_inv_loop r (la ++ lb) =
+  all_comb_inv_loop r lb * r ^ length la + all_comb_inv_loop r la.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ now rewrite Nat.mul_1_r, Nat.add_0_r | ].
+cbn.
+rewrite IHla.
+rewrite Nat.mul_add_distr_l.
+rewrite Nat.add_comm, Nat.add_shuffle0.
+rewrite Nat.add_assoc; f_equal; f_equal.
+rewrite Nat.mul_comm, Nat.mul_shuffle0.
+rewrite Nat.mul_assoc.
+easy.
+Qed.
+
 (* det and det' are equal *)
 
 Theorem det_is_det' :
@@ -689,6 +714,11 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
   subst l.
   apply in_seq in Hi; cbn in Hi.
   destruct Hi as (_, Hi).
+...
+  Hi : i < n!
+  ============================
+  ∃ x : nat, to_radix n x = canon_sym_gr_list n i ∧ x ∈ seq 0 (n ^ n)
+...
   exists (to_radix_inv n (canon_sym_gr_list n i)).
 ...
 *)
@@ -699,23 +729,28 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   destruct Hl as (i & Hil & Hi).
   subst l.
   apply in_seq in Hi; cbn in Hi.
-  destruct Hi as (_, Hi).
-Print all_comb.
-Print to_radix_inv.
-Fixpoint all_comb_inv_loop r l : nat :=
-  match l with
-  | [] => 0
-  | d :: l' => pred d + r * all_comb_inv_loop r l'
-  end.
-Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
-Compute (let n := 3 in map (all_comb_inv n) (all_comb n)).
-Fixpoint all_comb_inv_loop' c r l : nat :=
-  match l with
-  | [] => c
-  | d :: l' => all_comb_inv_loop' (c * r + pred d) r l'
-  end.
-Compute (let n := 3 in map (all_comb_inv_loop' 0 n) (all_comb n)).
-Print to_radix_inv.
+Theorem all_comb_all_comb_inv : ∀ n l,
+  length l = n
+  → (∀ i, i ∈ l → 1 ≤ i ≤ n)
+  → nth (all_comb_inv n l) (all_comb n) [] = l.
+Proof.
+intros * Hlen Hl.
+unfold all_comb.
+unfold all_comb_inv.
+revert n Hlen Hl.
+induction l as [| a]; intros; [ now subst n | cbn ].
+rewrite all_comb_inv_loop_app; cbn.
+rewrite rev_length, Nat.mul_0_r, Nat.add_0_r.
+...
+specialize to_radix_loop_to_radix_inv as H1.
+specialize (H1 l 0 n n).
+do 2 rewrite Nat.add_0_r in H1.
+specialize (H1 Hlen Hl (le_refl _)).
+now rewrite Nat.sub_diag, app_nil_r in H1.
+Qed.
+...
+rewrite all_comb_all_comb_inv.
+rewrite map_map.
 ...
   exists (all_comb_inv n (canon_sym_gr_list n i)).
 ...
