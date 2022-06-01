@@ -611,11 +611,9 @@ Qed.
 
 (* to be completed
 Theorem det'_is_det''' :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det''' M.
 Proof.
-intros Hop Heq * Hnz.
+intros * Hnz.
 unfold det'''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
@@ -677,8 +675,24 @@ cbn.
 replace (map _ _) with (to_radix_list n) by easy.
 symmetry.
 *)
-assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
+(*
+assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  apply in_map_iff.
 ...
+  Hl : ∃ x : nat, canon_sym_gr_list n x = l ∧ x ∈ seq 0 n!
+  ============================
+  ∃ x : nat, to_radix n x = l ∧ x ∈ seq 0 (n ^ n)
+...
+  destruct Hl as (i & Hil & Hi).
+  subst l.
+  apply in_seq in Hi; cbn in Hi.
+  destruct Hi as (_, Hi).
+  exists (to_radix_inv n (canon_sym_gr_list n i)).
+...
+*)
+assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
@@ -686,6 +700,25 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   subst l.
   apply in_seq in Hi; cbn in Hi.
   destruct Hi as (_, Hi).
+Print all_comb.
+Print to_radix_inv.
+Fixpoint all_comb_inv_loop r l : nat :=
+  match l with
+  | [] => 0
+  | d :: l' => pred d + r * all_comb_inv_loop r l'
+  end.
+Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
+Compute (let n := 3 in map (all_comb_inv n) (all_comb n)).
+Fixpoint all_comb_inv_loop' c r l : nat :=
+  match l with
+  | [] => c
+  | d :: l' => all_comb_inv_loop' (c * r + pred d) r l'
+  end.
+Compute (let n := 3 in map (all_comb_inv_loop' 0 n) (all_comb n)).
+Print to_radix_inv.
+...
+  exists (all_comb_inv n (canon_sym_gr_list n i)).
+...
   exists (to_radix_inv n (canon_sym_gr_list n i)).
   rewrite to_radix_to_radix_inv; cycle 1. {
     apply canon_sym_gr_list_length.
