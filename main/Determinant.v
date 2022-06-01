@@ -310,6 +310,16 @@ rewrite IHit; [ | easy | | ]; cycle 1. {
 ...
 *)
 
+Theorem List_concat_length : ∀ A (ll : list (list A)),
+  length (concat ll) = nat_∑ (l ∈ ll), length l.
+Proof.
+intros.
+induction ll as [| l1]; [ now rewrite iter_list_empty | cbn ].
+rewrite app_length.
+rewrite nat_summation_list_cons.
+now rewrite IHll.
+Qed.
+
 (* to be completed
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
@@ -320,7 +330,22 @@ Theorem all_comb_loop_length : ∀ A (ll : list (list A)),
   → length (all_comb_loop ll) = nat_∏ (l ∈ ll), length l.
 Proof.
 intros * Hll.
-destruct ll as [| l1]; [ easy | clear Hll ].
+revert Hll.
+induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
+destruct ll as [| l2]. {
+  rewrite map_length.
+  rewrite nat_product_list_cons.
+  now unfold iter_list; cbn; rewrite Nat.mul_1_r.
+}
+rewrite nat_product_list_cons.
+rewrite List_concat_length.
+...
+Print concat.
+Search concat.
+Search (length (concat _)).
+rewrite <- flat_map_concat_map.
+...
+cbn - [ all_comb_loop ].
 ...
 destruct l1 as [| a]. {
   rewrite nat_product_list_cons; cbn.

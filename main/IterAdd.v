@@ -16,8 +16,12 @@ Notation "'∑' ( i ∈ l ) , g" :=
   (at level 45, i at level 0, l at level 60).
 
 Notation "'nat_∑' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, (c + g)) 0)
+  (iter_seq b e (λ c i, c + g) 0)
   (at level 45, i at level 0, b at level 60, e at level 60).
+
+Notation "'nat_∑' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c + g) 0)
+  (at level 45, i at level 0, l at level 60).
 
 Section a.
 
@@ -745,6 +749,19 @@ apply Nat.add_le_mono; [ apply Hgh; flia Hn | ].
 apply IHn; [ flia Hn | ].
 intros i Hbie.
 apply Hgh; flia Hbie.
+Qed.
+
+Theorem nat_summation_list_cons : ∀ A a la (f : A → nat),
+  nat_∑ (i ∈ a :: la), f i = f a + nat_∑ (i ∈ la), f i.
+Proof.
+intros.
+apply iter_list_cons. {
+  apply Nat.add_0_l.
+} {
+  apply Nat.add_0_r.
+} {
+  apply Nat.add_assoc.
+}
 Qed.
 
 End a.
