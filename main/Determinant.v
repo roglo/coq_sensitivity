@@ -110,26 +110,18 @@ b et toutes les combinaisons de [[d;e;f];[g;h;i]] ++
 c et toutes les combinaisons de [[d;e;f];[g;h;i]]
 *)
 
-Fixpoint all_comb_loop {A} it (ll : list (list A)) :=
-  match it with
-  | 0 => []
-  | S it' =>
-      match ll with
-      | [x :: l] => map (λ y, [y]) (x :: l)
-      | (x :: l) :: ll' =>
-          map (λ l, x :: l) (all_comb_loop it' ll') ++
-          all_comb_loop it' (l :: ll')
-      | _ => []
-      end
+Fixpoint all_comb_loop {A} (ll : list (list A)) :=
+  match ll with
+  | [l] => map (λ y, [y]) l
+  | l :: ll' => concat (map (λ a, map (λ l, a :: l) (all_comb_loop ll')) l)
+  | _ => []
   end.
 
-Definition all_comb n :=
-  all_comb_loop (n^2 - n + 1) (repeat (seq 1 n) n).
+Definition all_comb n := all_comb_loop (repeat (seq 1 n) n).
 
 (*
 Compute (all_comb 3).
-Compute (all_comb_loop 11 (repeat (seq 0 10) 2)).
-Print all_comb.
+Compute (all_comb_loop (repeat (seq 0 10) 2)).
 *)
 
 Definition det''' (M : matrix T) :=
@@ -154,21 +146,11 @@ Proof. easy. Qed.
 
 (*
 End a.
-Compute (length (all_comb_loop 5 [[1;2;3;4];[5]])).
-Compute (length (all_comb_loop 4 [[1;2;3];[4;5]])).
-Compute (length (all_comb_loop 3 [[1;2];[3;4;5]])).
-Compute (length (all_comb_loop 2 [[1];[2;3;4;5]])).
-Print all_comb_loop.
-...
-Compute (length (all_comb_loop 4 [[1;2];[3];[4]])).
-Compute (length (all_comb_loop 4 [[1];[2;3];[4]])).
-Compute (length (all_comb_loop 3 [[1];[2];[3;4]])).
-...
-Compute (length (all_comb_loop 8 [[2;3];[5;7;2];[8;3];[7;2]])).
-Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
-Compute (length (all_comb_loop 13 [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (all_comb_loop 12 [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (all_comb_loop 10 [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (all_comb_loop [[2;3];[5;7;2];[8;3];[7;2]])).
+Compute (length (all_comb_loop [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
+Compute (length (all_comb_loop [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (all_comb_loop [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (all_comb_loop [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
 Arguments det'' {T ro} M%M.
@@ -254,6 +236,7 @@ f_equal; [ f_equal | ]. {
 }
 Qed.
 
+(*
 Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)) it,
   [] ∈ ll → all_comb_loop it ll = [].
 Proof.
@@ -274,24 +257,27 @@ Proof.
 intros * Hit.
 destruct it; [ easy | now destruct la ].
 Qed.
+*)
 
-(* to be completed
+(*
 Theorem square_all_comb_loop_length : ∀ A (ll : list (list A)) n it,
   length ll ≠ 0
   → n = length ll
-  → (∀ l, l ∈ ll → length l = n)
+  → length (hd ll []) ≤ n
+  → (∀ l, l ∈ tl ll → length l = n)
   → n ^ 2 - n + 1 ≤ it
-  → length (all_comb_loop it ll) = n ^ n.
+  → length (all_comb_loop it ll) = length (hd ll []) * (n - 1) ^ n.
 Proof.
-intros * Hl Hn Hnl Hit.
-subst n.
-revert ll Hl Hit Hnl.
+intros * Hl Hn Hhd Htl Hit.
+revert n ll Hn Hl Hit Hhd Htl.
 induction it; intros. {
   now apply Nat.le_0_r in Hit; rewrite Nat.add_comm in Hit.
 }
-cbn.
-destruct ll as [| l1]; [ easy | clear Hl ].
+destruct ll as [| l1]; [ easy | clear Hl; cbn ].
 destruct l1 as [| a1]. {
+  cbn in Hn, Hhd, Htl |-*.
+Print all_comb_loop.
+...
   now specialize (Hnl _ (or_introl eq_refl)).
 }
 destruct ll as [| l2]. {
@@ -322,18 +308,28 @@ rewrite IHit; [ | easy | | ]; cycle 1. {
   apply Nat.succ_inj in Hnl.
   cbn.
 ...
+*)
 
+(* to be completed
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
 intros.
 unfold all_comb.
+Theorem all_comb_loop_length : ∀ A (ll : list (list A)),
+  ll ≠ []
+  → length (all_comb_loop ll) = nat_∏ (l ∈ ll), length l.
+Proof.
+intros * Hll.
+destruct ll as [| l1]; [ easy | clear Hll ].
+...
+destruct l1 as [| a]. {
+  rewrite nat_product_list_cons; cbn.
+  rewrite all_comb_loop_with_nil; [ easy | now left ].
+}
+destruct it. {
+  cbn.
 Print all_comb_loop.
 ...
-Theorem all_comb_loop_length : ∀ A (ll : list (list A)) it,
-  ll ≠ []
-  → length ll ^ 2 < it
-  → length (all_comb_loop it ll) = nat_∏ (l ∈ ll), length l.
-Proof.
 intros * Hll Hit.
 revert ll Hll Hit.
 induction it; intros; [ easy | cbn ].
