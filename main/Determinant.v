@@ -320,6 +320,17 @@ rewrite nat_summation_list_cons.
 now rewrite IHll.
 Qed.
 
+Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
+  length (flat_map f l) = nat_∑ (a ∈ l), length (f a).
+Proof.
+intros.
+induction l as [| a]; [ now rewrite iter_list_empty | cbn ].
+rewrite app_length.
+rewrite nat_summation_list_cons.
+now f_equal.
+Qed.
+
+
 (* to be completed
 Theorem all_comb_length : ∀ n, length (all_comb n) = n ^ n.
 Proof.
@@ -338,7 +349,16 @@ destruct ll as [| l2]. {
   now unfold iter_list; cbn; rewrite Nat.mul_1_r.
 }
 rewrite nat_product_list_cons.
+rewrite <- flat_map_concat_map.
+rewrite List_flat_map_length.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite map_length.
+  now rewrite IHll.
+}
+...
 rewrite List_concat_length.
+Check List_concat_length.
 ...
 Print concat.
 Search concat.
