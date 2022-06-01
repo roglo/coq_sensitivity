@@ -741,6 +741,8 @@ revert n Hlen Hl.
 induction l as [| a]; intros; [ now subst n | cbn ].
 rewrite all_comb_inv_loop_app; cbn.
 rewrite rev_length, Nat.mul_0_r, Nat.add_0_r.
+rewrite Nat.add_comm.
+rewrite <- List_nth_skipn.
 ...
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
