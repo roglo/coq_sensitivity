@@ -5,7 +5,7 @@ Set Implicit Arguments.
 
 Require Import Utf8 Arith.
 Import List List.ListNotations.
-Require Init.Nat.
+Import Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul.
 Require Import PermutationFun SortingFun.
@@ -643,9 +643,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-symmetry.
-unfold all_comb.
+(*
 ...
+symmetry.
 erewrite rngl_summation_change_var. 2: {
   intros i Hi.
   apply to_radix_inv_to_radix with (n := n).
@@ -676,7 +676,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 replace (map _ _) with (to_radix_list n) by easy.
 symmetry.
-assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
+*)
+assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
+...
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
