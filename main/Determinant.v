@@ -113,7 +113,7 @@ c et toutes les combinaisons de [[d;e;f];[g;h;i]]
 Fixpoint all_comb_loop {A} (ll : list (list A)) :=
   match ll with
   | [l] => map (λ y, [y]) l
-  | l :: ll' => concat (map (λ a, map (λ l, a :: l) (all_comb_loop ll')) l)
+  | l :: ll' => flat_map (λ a, map (cons a) (all_comb_loop ll')) l
   | _ => []
   end.
 
@@ -259,7 +259,6 @@ destruct ll as [| l2]. {
   now unfold iter_list; cbn; rewrite Nat.mul_1_r.
 }
 rewrite nat_product_list_cons.
-rewrite <- flat_map_concat_map.
 rewrite List_flat_map_length.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
