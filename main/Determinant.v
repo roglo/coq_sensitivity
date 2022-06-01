@@ -748,16 +748,55 @@ cbn in Hlen.
 Print all_comb_loop.
 Compute (
 let n := 3 in
-let i := 0 in
-skipn (i * n ^ (n - 1)) (all_comb_loop (repeat (seq 1 n) n)) =
-all_comb_loop (seq (i + 1) (n - i) :: (repeat (seq 1 n) (n - 1)))
+let i := 1 in
+let ll := repeat (seq 1 n) n in
+skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
+all_comb_loop (skipn i (hd [] ll) :: tl ll)
 ).
-Theorem skipn_all_comb_loop : ∀ i n,
-  skipn (i * n ^ (n - 1)) (all_comb_loop (repeat (seq 1 n) n)) =
-  all_comb_loop (seq (i + 1) (n - i) :: (repeat (seq 1 n) (n - 1))).
+Theorem skipn_all_comb_loop : ∀ A i n (ll : list (list A)),
+  n = length ll
+  → skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
+    all_comb_loop (skipn i (hd [] ll) :: tl ll).
+Proof.
+intros * Hn.
+subst n.
+destruct ll as [| l1]. {
+  now do 2 rewrite skipn_nil.
+}
+cbn.
+rewrite Nat.sub_0_r.
+destruct ll as [| l2]. {
+  rewrite skipn_map; cbn.
+  now rewrite Nat.mul_1_r.
+}
+cbn - [ "^" all_comb_loop ].
+set (f := λ a : A, map (cons a) (all_comb_loop (l2 :: ll))).
+...
+Search (skipn _ (flat_map _ _)).
+rewrite flat_map_concat_map.
+Search (skipn _ (concat _ )).
+Search skip
+...
+intros * Hn.
+revert n Hn.
+induction ll as [| l1]; intros. {
+  now subst n; do 2 rewrite skipn_nil.
+}
+cbn.
+destruct ll as [| l2]. {
+  rewrite skipn_map; cbn.
+  now rewrite Nat.mul_1_r.
+}
+...
+revert n Hn.
+induction ll as [| l1]; intros. {
+  subst n; cbn.
+  now do 2 rewrite skipn_nil.
+}
+cbn.
 ...
 replace (length l) with (n - 1) by flia Hlen.
-rewrite skipn_all_comb_loop.
+rewrite skipn_all_comb_loop; [ | now rewrite repeat_length ].
 ...
 specialize to_radix_loop_to_radix_inv as H1.
 specialize (H1 l 0 n n).
