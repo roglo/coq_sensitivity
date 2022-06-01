@@ -1415,6 +1415,9 @@ intros i lb Hi; apply in_seq in Hi.
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem List_eq_repeat_nil : ∀ A (l : list A) n, repeat l n = [] → n = 0.
+Proof. now intros; destruct n. Qed.
+
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
 Proof.
 intros * Hl.

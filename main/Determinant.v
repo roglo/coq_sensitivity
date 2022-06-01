@@ -112,9 +112,9 @@ c et toutes les combinaisons de [[d;e;f];[g;h;i]]
 
 Fixpoint all_comb_loop {A} (ll : list (list A)) :=
   match ll with
+  | [] => []
   | [l] => map (λ y, [y]) l
   | l :: ll' => flat_map (λ a, map (cons a) (all_comb_loop ll')) l
-  | _ => []
   end.
 
 Definition all_comb n := all_comb_loop (repeat (seq 1 n) n).
@@ -321,6 +321,23 @@ rewrite Nat.add_assoc; f_equal; f_equal.
 rewrite Nat.mul_comm, Nat.mul_shuffle0.
 rewrite Nat.mul_assoc.
 easy.
+Qed.
+
+Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)),
+  [] ∈ ll → all_comb_loop ll = [].
+Proof.
+intros * Hll.
+induction ll as [| l1]; [ easy | cbn ].
+destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
+specialize (IHll Hll).
+destruct ll as [| l2]; [ easy | ].
+rewrite IHll; cbn.
+rewrite flat_map_concat_map; cbn.
+apply concat_nil_Forall.
+apply Forall_forall.
+intros ll' Hll'.
+apply in_map_iff in Hll'.
+now destruct Hll' as (a & Hll' & Hal1).
 Qed.
 
 (* det and det' are equal *)
@@ -753,24 +770,63 @@ let ll := repeat (seq 1 n) n in
 skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
 all_comb_loop (skipn i (hd [] ll) :: tl ll)
 ).
-Theorem skipn_all_comb_loop : ∀ A i n (ll : list (list A)),
-  n = length ll
+Theorem skipn_all_comb_loop : ∀ i n ll,
+  ll = repeat (seq 1 n) n
   → skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
     all_comb_loop (skipn i (hd [] ll) :: tl ll).
 Proof.
-intros * Hn.
-subst n.
+intros * Hll.
+subst ll.
+destruct n; [ now do 2 rewrite skipn_nil | ].
+rewrite Nat_sub_succ_1.
+cbn - [ Nat.pow all_comb_loop seq ].
+destruct (le_dec i (S n)) as [Hisn| Hisn]. 2: {
+  apply Nat.nle_gt in Hisn.
+  rewrite skipn_all2. 2: {
+    rewrite all_comb_loop_length; [ | easy ].
+    rewrite nat_product_list_cons.
+    rewrite seq_length.
+    apply Nat.mul_le_mono; [ now apply Nat.lt_le_incl | ].
+    rewrite nat_product_same_length with (n := S n). 2: {
+      intros l Hl.
+      apply (In_nth _ _ []) in Hl.
+      rewrite repeat_length in Hl.
+      destruct Hl as (m & Hmn & Hl); subst l.
+      rewrite List_nth_repeat.
+      rewrite <- if_ltb_lt_dec.
+      generalize Hmn; intros H.
+      apply Nat.ltb_lt in H; rewrite H; clear H.
+      now rewrite seq_length.
+    }
+    now rewrite repeat_length.
+  }
+  rewrite skipn_all2; [ | now rewrite seq_length; apply Nat.lt_le_incl ].
+  rewrite all_comb_loop_with_nil; [ easy | now left ].
+}
+cbn - [ seq ].
+remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l1]. {
+  apply List_eq_repeat_nil in Hll; subst n; cbn.
+  rewrite Nat.mul_1_r.
+  destruct i; [ easy | now destruct i ].
+}
+...
+Search (skipn _ (seq _ _)).
+rewrite List_skipn_seq.
+...
 destruct ll as [| l1]. {
   now do 2 rewrite skipn_nil.
 }
 cbn.
 rewrite Nat.sub_0_r.
+Print all_comb_loop.
 destruct ll as [| l2]. {
   rewrite skipn_map; cbn.
   now rewrite Nat.mul_1_r.
 }
 cbn - [ "^" all_comb_loop ].
 set (f := λ a : A, map (cons a) (all_comb_loop (l2 :: ll))).
+do 2 rewrite flat_map_concat_map.
 ...
 Search (skipn _ (flat_map _ _)).
 rewrite flat_map_concat_map.
