@@ -608,21 +608,19 @@ now apply det_is_det'.
 Qed.
 
 (* det' and det''' are equal; attempt *)
+(* my aim is to remove det'' and rename det''' into det'' *)
 
 (* to be completed
 Theorem det'_is_det''' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
-  ∀ (M : matrix T), det' M = det''' M.
+  ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det''' M.
 Proof.
-intros Hop Heq *.
+intros Hop Heq * Hnz.
 unfold det'''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
 rewrite <- Hn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  now move Hnz at top; subst n.
-}
 specialize (fact_neq_0 n) as Hfnz.
 specialize (Nat.pow_nonzero n n Hnz) as Hpnz.
 erewrite rngl_summation_change_var. 2: {
@@ -647,6 +645,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn.
 symmetry.
+unfold all_comb.
+...
 erewrite rngl_summation_change_var. 2: {
   intros i Hi.
   apply to_radix_inv_to_radix with (n := n).

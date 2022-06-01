@@ -54,6 +54,13 @@ Theorem fold_ε : ∀ p,
   ε p.
 Proof. easy. Qed.
 
+Theorem ε_nil : ε [] = 1%F.
+Proof.
+unfold ε; cbn.
+rewrite rngl_product_only_one.
+now rewrite rngl_product_only_one.
+Qed.
+
 Theorem minus_one_pow_succ :
   rngl_has_opp = true →
   ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.
@@ -3092,6 +3099,7 @@ End a.
 Arguments ε {T}%type {ro}.
 Arguments sign_diff {T}%type {ro} (u v)%nat.
 
+Arguments ε_nil {T ro rp}.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
 Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
