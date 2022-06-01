@@ -627,6 +627,60 @@ rewrite all_comb_length; [ | easy ].
 rewrite <- rngl_summation_list_change_var.
 apply rngl_summation_list_eq_compat.
 intros i Hi.
+f_equal. {
+  apply in_seq in Hi.
+  destruct Hi as (_, Hi); cbn in Hi.
+Abort.
+(*
+  unfold to_radix, all_comb.
+...
+*)
+End a.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let n := 3%nat in
+  all_comb n).
+Compute (
+  let n := 3%nat in
+  map (λ i, to_radix n i) (seq 0 (n ^ n))).
+...
+Compute (
+  let n := 3%nat in
+  let i := 5%nat in
+  to_radix n i = nth i (all_comb n) []).
+...
+Open Scope Z_scope.
+Compute (
+  let n := 3%nat in
+  let i := 5%nat in
+  ε (to_radix n i) = ε (nth i (all_comb n) [])).
+...
+Compute (
+  let n := 3%nat in
+  let i := 5%nat in
+(
+     ((to_radix_loop n n i)),
+     ((nth i (all_comb_loop (repeat (seq 1 n) n)) [])))
+).
+Compute (
+  let n := 3%nat in
+  let i := 5%nat in
+(
+     (ε (to_radix_loop n n i)),
+     (ε (nth i (all_comb_loop (repeat (seq 1 n) n)) [])))
+).
+...
+Compute (
+  let n := 3%nat in
+  map
+    (λ i,
+(
+     (ε (to_radix_loop n n i)),
+     (ε (nth i (all_comb_loop (repeat (seq 1 n) n)) [])))
+)
+    (seq 0 (n ^ n))
+).
 ...
 *)
 
