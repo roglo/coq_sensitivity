@@ -377,7 +377,6 @@ destruct ll as [| l1]. {
 apply repeat_eq_cons in Hll.
 destruct Hll as (Hl1 & Hll).
 apply in_flat_map.
-...
 exists a.
 split. {
   apply in_seq.
@@ -395,7 +394,7 @@ split. {
     apply Nat.eq_pred_0 in Hll.
     destruct Hll as [Hll| Hll]. {
       apply length_zero_iff_nil in Hll; subst l.
-      cbn in Hl1; subst l1; cbn.
+      cbn in Hl1; subst l1; cbn - [ In ].
 ...
 *)
 
