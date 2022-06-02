@@ -373,13 +373,21 @@ destruct ll as [| l1]. {
   replace a with 1 by flia Hln.
   now left.
 }
-...
 apply repeat_eq_cons in Hll.
 destruct Hll as (Hl1 & Hll).
-subst l1.
 apply in_flat_map.
+exists a.
+split. {
+  apply in_seq.
+  specialize (Hln a (or_introl eq_refl)).
+  cbn in Hln.
+  split; [ easy | cbn ].
+  now apply -> Nat.succ_le_mono.
+} {
+  apply in_map_iff.
+  exists l.
+  split; [ easy | ].
 ...
-
 *)
 
 (* det and det' are equal *)
