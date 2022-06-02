@@ -2449,6 +2449,25 @@ f_equal.
 now apply IHla.
 Qed.
 
+(* the coq theorem "repeat_eq_cons" misses the conclusion
+   that n ≠ 0 *)
+Theorem List_repeat_eq_cons_iff : ∀ A (x y : A) n l,
+  repeat x n = y :: l ↔ n ≠ 0 ∧ x = y ∧ repeat x (pred n) = l.
+Proof.
+intros.
+split. {
+  intros Hxy.
+  destruct n; [ easy | ].
+  split; [ easy | ].
+  now apply repeat_eq_cons.
+} {
+  intros (Hnz & Hxy & Hr); subst y l.
+  now destruct n.
+}
+Qed.
+
+(* *)
+
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true

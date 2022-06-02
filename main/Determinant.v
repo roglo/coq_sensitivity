@@ -374,8 +374,8 @@ destruct ll as [| l1]. {
   replace a with 1 by flia Hln.
   now left.
 }
-apply repeat_eq_cons in Hll.
-destruct Hll as (Hl1 & Hll).
+apply List_repeat_eq_cons_iff in Hll.
+destruct Hll as (Hlz & Hl1 & Hll).
 apply in_flat_map.
 exists a.
 split. {
@@ -392,9 +392,19 @@ split. {
   destruct ll as [| l2]. {
     apply List_eq_repeat_nil in Hll.
     apply Nat.eq_pred_0 in Hll.
-    destruct Hll as [Hll| Hll]. {
-      apply length_zero_iff_nil in Hll; subst l.
-      cbn in Hl1; subst l1; cbn - [ In ].
+    destruct Hll as [Hll| Hll]; [ easy | ].
+    destruct l as [| b]; [ easy | ].
+    destruct l; [ | easy ].
+    subst l1; cbn - [ In ].
+    specialize (IHl Hlz).
+    cbn - [ In ] in IHl.
+    specialize (Hln b (or_intror (or_introl eq_refl))).
+    cbn in Hln.
+    destruct b; [ easy | ].
+    destruct b; [ now left | ].
+    destruct b; [ now right; left | ].
+    flia Hln.
+  }
 ...
 *)
 
