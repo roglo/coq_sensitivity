@@ -767,6 +767,7 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   rewrite map_id.
   split; [ easy | ].
   clear Hn Hfnz Hpnz.
+...
   unfold all_comb.
   revert i Hi.
   induction n; intros; [ easy | clear Hnz ].
