@@ -298,6 +298,7 @@ rewrite nat_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
+(*
 Fixpoint all_comb_inv_loop r l : nat :=
   match l with
   | [] => 0
@@ -305,13 +306,23 @@ Fixpoint all_comb_inv_loop r l : nat :=
   end.
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
+*)
 
+Fixpoint all_comb_inv_loop c r l : nat :=
+  match l with
+  | [] => c
+  | d :: l' => all_comb_inv_loop (c * r + pred d) r l'
+  end.
+
+Definition all_comb_inv := all_comb_inv_loop 0.
+
+(*
 Theorem all_comb_inv_loop_app : ∀ r la lb,
   all_comb_inv_loop r (la ++ lb) =
-  all_comb_inv_loop r lb * r ^ length la + all_comb_inv_loop r la.
+  all_comb_inv_loop r lb * r ^ length la + all_comb_inv_loop c r la.
 Proof.
 intros.
-revert lb.
+revert c lb.
 induction la as [| a]; intros; [ now rewrite Nat.mul_1_r, Nat.add_0_r | ].
 cbn.
 rewrite IHla.
@@ -322,6 +333,7 @@ rewrite Nat.mul_comm, Nat.mul_shuffle0.
 rewrite Nat.mul_assoc.
 easy.
 Qed.
+*)
 
 Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)),
   [] ∈ ll → all_comb_loop ll = [].
@@ -745,12 +757,38 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   apply in_map_iff.
   destruct Hl as (i & Hil & Hi).
   subst l.
-  apply in_seq in Hi; cbn in Hi.
+  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+  exists (map S (canon_sym_gr_list n i)).
+  rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    now rewrite Nat.pred_succ.
+  }
+  rewrite map_id.
+  split; [ easy | ].
+  clear Hn Hfnz Hpnz.
+  unfold all_comb.
+  revert i Hi.
+  induction n; intros; [ easy | clear Hnz ].
+  cbn - [ repeat seq ].
+  rewrite map_map.
+...
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    unfold succ_when_ge.
+    unfold Nat.b2n.
+    rewrite if_leb_le_dec.
+...
 Theorem all_comb_all_comb_inv : ∀ n l,
   length l = n
   → (∀ i, i ∈ l → 1 ≤ i ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = l.
 Proof.
+intros * Hlen Hl.
+Check all_comb_inv.
+Compute (
+  map (λ
+...
 intros * Hlen Hl.
 unfold all_comb.
 unfold all_comb_inv.
@@ -760,9 +798,10 @@ rewrite all_comb_inv_loop_app; cbn.
 rewrite rev_length, Nat.mul_0_r, Nat.add_0_r.
 rewrite Nat.add_comm.
 rewrite <- List_nth_skipn.
-Print all_comb_loop.
 cbn in Hlen.
-Print all_comb_loop.
+Print all_comb_inv.
+Print all_comb_inv_loop.
+...
 Compute (
 let n := 3 in
 let i := 1 in
