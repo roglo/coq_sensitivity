@@ -388,6 +388,15 @@ split. {
   apply in_map_iff.
   exists l.
   split; [ easy | ].
+  specialize (IHl Hlz).
+(*
+  subst l1 ll.
+  replace (_ :: repeat _ _) with
+    (repeat (seq 1 (S (length l))) (length l)). 2: {
+    now destruct (length l).
+  }
+...
+*)
   cbn.
   destruct ll as [| l2]. {
     apply List_eq_repeat_nil in Hll.
@@ -396,7 +405,6 @@ split. {
     destruct l as [| b]; [ easy | ].
     destruct l; [ | easy ].
     subst l1; cbn - [ In ].
-    specialize (IHl Hlz).
     cbn - [ In ] in IHl.
     specialize (Hln b (or_intror (or_introl eq_refl))).
     cbn in Hln.
@@ -405,6 +413,11 @@ split. {
     destruct b; [ now right; left | ].
     flia Hln.
   }
+  apply List_repeat_eq_cons_iff in Hll.
+  destruct Hll as (Hl12 & Hl13 & Hll).
+  rewrite Hl1 in Hl13; subst l2.
+  destruct l as [| b]; [ easy | clear Hlz ].
+  destruct l as [| c]; [ easy | clear Hl12 ].
 ...
 *)
 
