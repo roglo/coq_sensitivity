@@ -352,6 +352,20 @@ apply in_map_iff in Hll'.
 now destruct Hll' as (a & Hll' & Hal1).
 Qed.
 
+(* to be completed
+Theorem in_all_comb : ∀ n l,
+  n ≠ 0
+  → length l = n
+  → (∀ i, i ∈ l → 1 ≤ i ≤ n)
+  → l ∈ all_comb n.
+Proof.
+intros * Hnz Hn Hln.
+subst n.
+induction l as [| a]; [ easy | clear Hnz ].
+cbn - [ repeat seq ].
+...
+*)
+
 (* det and det' are equal *)
 
 Theorem det_is_det' :
@@ -767,6 +781,21 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   rewrite map_id.
   split; [ easy | ].
   clear Hn Hfnz Hpnz.
+Print canon_sym_gr_list.
+...
+apply in_all_comb.
+rewrite map_length.
+apply canon_sym_gr_list_length.
+intros j Hj.
+apply in_map_iff in Hj.
+destruct Hj as (k & Hkj & Hk).
+subst j.
+split; [ flia | ].
+apply Nat.le_succ_l.
+apply (In_nth _ _ 0) in Hk.
+destruct Hk as (j & Hj & Hjk).
+rewrite canon_sym_gr_list_length in Hj; subst k.
+now apply canon_sym_gr_list_ub.
 ...
   unfold all_comb.
   revert i Hi.
