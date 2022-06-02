@@ -105,9 +105,9 @@ Arguments det'' M%M.
 
 (*
 [[a;b;c];[d;e;f];[g;h;i]]
-a et toutes les combinaisons de [[d;e;f];[g;h;i]] ++
-b et toutes les combinaisons de [[d;e;f];[g;h;i]] ++
-c et toutes les combinaisons de [[d;e;f];[g;h;i]]
+a and all combinations of [[d;e;f];[g;h;i]] ++
+b and all combinations of [[d;e;f];[g;h;i]] ++
+c and all combinations of [[d;e;f];[g;h;i]]
 *)
 
 Fixpoint all_comb_loop {A} (ll : list (list A)) :=
