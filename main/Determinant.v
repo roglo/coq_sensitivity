@@ -360,13 +360,14 @@ Theorem in_all_comb : ∀ n l,
   → l ∈ all_comb n.
 Proof.
 intros * Hnz Hn Hln.
+unfold all_comb.
 subst n.
 induction l as [| a]; [ easy | clear Hnz ].
 cbn - [ repeat seq ].
 cbn - [ seq ].
-remember (repeat _ _) as ll eqn:Hll; symmetry in Hll.
+remember (repeat (seq 1 (S _)) _) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l1]. {
-  cbn.
+  cbn - [ In ].
   apply List_eq_repeat_nil in Hll.
   apply length_zero_iff_nil in Hll; subst l.
   specialize (Hln a (or_introl eq_refl)); cbn in Hln.
@@ -387,6 +388,13 @@ split. {
   apply in_map_iff.
   exists l.
   split; [ easy | ].
+  cbn.
+  destruct ll as [| l2]. {
+    apply List_eq_repeat_nil in Hll.
+    apply Nat.eq_pred_0 in Hll.
+    destruct Hll as [Hll| Hll]. {
+      apply length_zero_iff_nil in Hll; subst l.
+      cbn in Hl1; subst l1; cbn.
 ...
 *)
 
