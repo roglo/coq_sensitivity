@@ -727,9 +727,11 @@ Qed.
 
 (* to be completed
 Theorem det'_is_det''' :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
   ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det''' M.
 Proof.
-intros * Hnz.
+intros Hop Heq * Hnz.
 unfold det'''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
@@ -786,6 +788,7 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   rewrite canon_sym_gr_list_length in Hj; subst k.
   now apply canon_sym_gr_list_ub.
 }
+(*
 ...
   unfold all_comb.
   revert i Hi.
@@ -954,10 +957,11 @@ rewrite map_map.
   intros j Hj.
   now apply canon_sym_gr_list_ub.
 }
+*)
 assert (H :
-  ∑ (l ∈ to_radix_list n),
+  ∑ (l ∈ all_comb n),
   ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
-  ∑ (l ∈ to_radix_list n),
+  ∑ (l ∈ all_comb n),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
     ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
   else 0). {
@@ -969,6 +973,7 @@ assert (H :
     intros Hnd.
     apply H1; clear H1.
     apply in_map_iff.
+...
     apply in_map_iff in Hl.
     destruct Hl as (i & Hil & Hi).
     exists (canon_sym_gr_list_inv n l).
