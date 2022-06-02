@@ -766,46 +766,53 @@ Print all_comb_loop.
 Compute (
 let n := 3 in
 let i := 1 in
-let ll := repeat (seq 1 n) n in
+let k := 7 in
+(*
+let ll := repeat (seq k n) n in
+let ll := repeat [19;2;5] n in
+*)
+let ll := [[19;2;5]; [1;2;7]; [21;31;42]] in
+(**)
 skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
 all_comb_loop (skipn i (hd [] ll) :: tl ll)
 ).
-Theorem skipn_all_comb_loop : ∀ i n ll,
-  ll = repeat (seq 1 n) n
+Theorem skipn_all_comb_loop : ∀ A i n (ll : list (list A)),
+  length ll = n
+  → (∀ l, l ∈ ll → length l = n)
   → skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
     all_comb_loop (skipn i (hd [] ll) :: tl ll).
 Proof.
-intros * Hll.
-subst ll.
-destruct n; [ now do 2 rewrite skipn_nil | ].
+intros * Hlln Hln.
+revert i ll Hlln Hln.
+induction n; intros. {
+  apply length_zero_iff_nil in Hlln; subst ll.
+  now do 2 rewrite skipn_nil.
+}
 rewrite Nat_sub_succ_1.
-cbn - [ Nat.pow all_comb_loop seq ].
+destruct ll as [| l]; [ easy | ].
+cbn in Hlln.
+apply Nat.succ_inj in Hlln.
 destruct (le_dec i (S n)) as [Hisn| Hisn]. 2: {
   apply Nat.nle_gt in Hisn.
+  cbn - [ all_comb_loop ].
   rewrite skipn_all2. 2: {
     rewrite all_comb_loop_length; [ | easy ].
     rewrite nat_product_list_cons.
-    rewrite seq_length.
+    rewrite Hln; [ | now left ].
     apply Nat.mul_le_mono; [ now apply Nat.lt_le_incl | ].
     rewrite nat_product_same_length with (n := S n). 2: {
-      intros l Hl.
-      apply (In_nth _ _ []) in Hl.
-      rewrite repeat_length in Hl.
-      destruct Hl as (m & Hmn & Hl); subst l.
-      rewrite List_nth_repeat.
-      rewrite <- if_ltb_lt_dec.
-      generalize Hmn; intros H.
-      apply Nat.ltb_lt in H; rewrite H; clear H.
-      now rewrite seq_length.
+      intros l1 Hl1.
+      now apply Hln; right.
     }
-    now rewrite repeat_length.
+    now rewrite Hlln.
   }
-  rewrite skipn_all2; [ | now rewrite seq_length; apply Nat.lt_le_incl ].
+  rewrite skipn_all2. 2: {
+    rewrite Hln; [ now apply Nat.lt_le_incl | now left ].
+  }
   rewrite all_comb_loop_with_nil; [ easy | now left ].
 }
-cbn - [ seq ].
-remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l1]. {
+cbn - [ all_comb_loop ].
+...
   apply List_eq_repeat_nil in Hll; subst n; cbn.
   rewrite Nat.mul_1_r.
   destruct i; [ easy | now destruct i ].
