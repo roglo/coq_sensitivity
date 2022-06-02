@@ -810,6 +810,7 @@ destruct ll as [| l1]. {
   rewrite Nat.mul_1_r.
   destruct i; [ easy | now destruct i ].
 }
+set (f := λ a, map (cons a) (all_comb_loop (l1 :: ll))).
 ...
 Search (skipn _ (seq _ _)).
 rewrite List_skipn_seq.
