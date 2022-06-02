@@ -363,7 +363,23 @@ intros * Hnz Hn Hln.
 subst n.
 induction l as [| a]; [ easy | clear Hnz ].
 cbn - [ repeat seq ].
+cbn - [ seq ].
+remember (repeat _ _) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l1]. {
+  cbn.
+  apply List_eq_repeat_nil in Hll.
+  apply length_zero_iff_nil in Hll; subst l.
+  specialize (Hln a (or_introl eq_refl)); cbn in Hln.
+  replace a with 1 by flia Hln.
+  now left.
+}
 ...
+apply repeat_eq_cons in Hll.
+destruct Hll as (Hl1 & Hll).
+subst l1.
+apply in_flat_map.
+...
+
 *)
 
 (* det and det' are equal *)
