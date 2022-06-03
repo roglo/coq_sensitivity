@@ -967,6 +967,38 @@ replace (l :: ll) with (repeat (seq 1 m) n). 2: {
   cbn - [ seq ].
   now cbn - [ seq ].
 }
+(**)
+...
+remember (repeat (seq 1 m) n) as ll1 eqn:H1.
+destruct m; [ constructor | ].
+rewrite seq_S; subst ll1.
+cbn - [ seq ].
+rewrite flat_map_app.
+cbn - [ seq ].
+rewrite app_nil_r.
+apply NoDup_app_iff.
+split. {
+  ============================
+  NoDup (flat_map (λ a : nat, map (cons a) (all_comb_loop (repeat (seq 1 (S m)) n))) (seq 1 m))
+...
+rewrite flat_map_concat_map.
+destruct m; [ constructor | ].
+rewrite seq_S.
+rewrite map_app.
+rewrite concat_app.
+cbn.
+apply NoDup_app_iff.
+split. {
+...
+Theorem NoDup_concat ∀ A (ll : list (list A)),
+  NoDup (concat ll)
+  ↔
+Search (NoDup (flat_map _ _)).
+Search (NoDup (concat (map _ _))).
+Search (NoDup (concat _)).
+Print flat_map.
+Search flat_map.
+Search concat.
 ...
 rewrite flat_map_concat_map.
 remember (all_comb_loop (repeat (seq 1 m) n)) as ll' eqn:Hll'.
