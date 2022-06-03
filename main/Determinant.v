@@ -439,6 +439,25 @@ intros.
 now apply in_all_comb_loop_iff.
 Qed.
 
+(* to be moved to Signature.v *)
+Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
+Proof.
+intros.
+unfold ε.
+rewrite map_length.
+apply rngl_product_eq_compat.
+intros i (_, Hi).
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+unfold sign_diff.
+unfold ff_app.
+rewrite (List_map_nth' 0); [ | flia Hj Hij ].
+rewrite (List_map_nth' 0); [ | flia Hj Hij ].
+easy.
+Qed.
+
 (* det and det' are equal *)
 
 Theorem det_is_det' :
@@ -830,29 +849,12 @@ replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
   }
   apply map_id.
 }
-Search (∑ (_ ∈ map _ _), _).
-...
+rewrite <- map_map.
 rewrite <- rngl_summation_list_change_var.
-...
-specialize rngl_summation_list_change_var as H1.
-specialize (H1 nat nat).
- with (f := pred) (g := S).
-replace (all_comb n) with (map S (map pred (all_comb n))) in Hnd. 2: {
-Check rngl_summation_list_change_var.
-rewrite rngl_summation_list_change_var with (f := pred) (g := S).
-...
-erewrite rngl_summation_list_change_var. 2: {
-  intros i Hi.
-  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
-  flia Hi Hfnz.
-}
-...
-(* il faut faire ∑ (l ∈ map pred (all comb n)),
-   peut-être en faisant un changement de variable *)
-assert (H :
-  ∑ (l ∈ all_comb n),
+assert (H1 :
+  ∑ (l ∈ map (map pred) (all_comb n)),
   ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
-  ∑ (l ∈ all_comb n),
+  ∑ (l ∈ map (map pred) (all_comb n)),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
     ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
   else 0). {
@@ -863,27 +865,15 @@ assert (H :
     apply ε_when_dup; [ easy | easy | ].
     intros Hnd.
     apply H1; clear H1.
-...
     apply in_map_iff.
+    apply in_map_iff in Hl.
+    destruct Hl as (l1 & H & Hl); subst l; rename l1 into l.
     apply in_all_comb_iff in Hl.
     destruct Hl as (_ & Hln & Hin).
-    exists (canon_sym_gr_list_inv n l).
+    exists (canon_sym_gr_list_inv n (map pred l)).
     assert (Hp : is_permut n (map pred l)). {
       unfold is_permut.
-      split; [ split | ]; [ | | now rewrite map_length ]. 2: {
-        replace l with (map S (map pred l)) in Hnd. 2: {
-          rewrite map_map.
-          erewrite map_ext_in. 2: {
-            intros i Hi.
-            rewrite Nat.succ_pred_pos. 2: {
-              specialize (Hin _ Hi); flia Hin.
-            }
-            easy.
-          }
-          apply map_id.
-        }
-        now apply NoDup_map_inv in Hnd.
-      }
+      split; [ split | ]; [ | easy | now rewrite map_length ].
       intros j Hj.
       rewrite map_length, Hln.
       apply in_map_iff in Hj.
@@ -891,10 +881,6 @@ assert (H :
       specialize (Hin _ Ha).
       flia Hin.
     }
-    split. {
-...
-      apply canon_sym_gr_list_canon_sym_gr_list_inv.
-...
     split; [ now apply canon_sym_gr_list_canon_sym_gr_list_inv | ].
     apply in_seq.
     split; [ easy | ].
@@ -904,7 +890,30 @@ assert (H :
   rewrite H.
   now apply rngl_mul_0_l; left.
 }
-rewrite H.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  rewrite ε_map_S.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    unfold ff_app.
+    rewrite (List_map_nth' 0). 2: {
+      apply in_map_iff in Hl.
+      destruct Hl as (l1 & H & Hl); subst l.
+      rename l1 into l.
+      rewrite map_length.
+      apply in_all_comb_iff in Hl.
+      destruct Hl as (_ & Hln & Hin).
+      rewrite Hln; flia Hi.
+    }
+    rewrite <- Nat.add_1_r.
+    rewrite fold_ff_app.
+    easy.
+  }
+  easy.
+}
+cbn.
+rewrite H1.
+symmetry.
 apply rngl_summation_list_incl; [ | | easy ]. {
   unfold canon_sym_gr_list_list.
   apply (NoDup_map_iff 0).
@@ -915,14 +924,53 @@ apply rngl_summation_list_incl; [ | | easy ]. {
   cbn in Hij.
   now apply (canon_sym_gr_list_inj n).
 } {
-  unfold to_radix_list.
-  apply (NoDup_map_iff 0).
-  rewrite seq_length.
-  intros * Hi Hj Hij.
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  cbn in Hij.
-  now apply (to_radix_inj n).
+  apply NoDup_map_inv with (f := map S).
+  rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros l Hl.
+    rewrite map_map.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      apply in_all_comb_iff in Hl.
+      destruct Hl as (_ & _ & Hl).
+      specialize (Hl i Hi).
+      rewrite Nat.succ_pred_pos; [ | flia Hl ].
+      easy.
+    }
+    now rewrite map_id.
+  }
+  rewrite map_id.
+Search (NoDup (all_comb _)).
+Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
+Proof.
+intros n.
+unfold all_comb.
+Theorem NoDup_all_comb_loop : ∀ m n,
+  NoDup (all_comb_loop (repeat (seq 1 m) n)).
+Proof.
+intros.
+revert m.
+induction n; intros; [ constructor | ].
+cbn - [ seq ].
+remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l]. {
+  apply List_eq_repeat_nil in Hll; subst n.
+  apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+  intros i j Hij.
+  now injection Hij.
+}
+apply List_repeat_eq_cons_iff in Hll.
+destruct Hll as (Hnz & Hl & Hll).
+replace (l :: ll) with (repeat (seq 1 m) n). 2: {
+  subst l ll.
+  destruct n; [ easy | ].
+  cbn - [ seq ].
+  now cbn - [ seq ].
+}
+...
+rewrite flat_map_concat_map.
+remember (all_comb_loop (repeat (seq 1 m) n)) as ll' eqn:Hll'.
+...
 }
 Qed.
 ...
