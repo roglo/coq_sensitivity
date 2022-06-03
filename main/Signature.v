@@ -61,6 +61,24 @@ rewrite rngl_product_only_one.
 now rewrite rngl_product_only_one.
 Qed.
 
+Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
+Proof.
+intros.
+unfold ε.
+rewrite map_length.
+apply rngl_product_eq_compat.
+intros i (_, Hi).
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+unfold sign_diff.
+unfold ff_app.
+rewrite (List_map_nth' 0); [ | flia Hj Hij ].
+rewrite (List_map_nth' 0); [ | flia Hj Hij ].
+easy.
+Qed.
+
 Theorem minus_one_pow_succ :
   rngl_has_opp = true →
   ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%F.

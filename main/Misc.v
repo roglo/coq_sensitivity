@@ -2271,6 +2271,58 @@ destruct Hif as [Hif| Hif]; [ now left | right ].
 now apply IHk.
 Qed.
 
+Theorem NoDup_concat_if : ∀ A (ll : list (list A)),
+  (∀ l, l ∈ ll → NoDup l)
+  → (∀ i j, i ≠ j → ∀ a, a ∈ nth i ll [] → a ∉ nth j ll [])
+  → NoDup (concat ll).
+Proof.
+intros * Hnd Hll.
+induction ll as [| l]; [ constructor | cbn ].
+apply NoDup_app_iff.
+split; [ now apply Hnd; left | ].
+split. {
+  apply IHll. {
+    intros l1 Hl1.
+    now apply Hnd; right.
+  }
+  intros i j Hij a Ha.
+  specialize (Hll (S i) (S j)).
+  apply Hll; [ now intros H; injection H | easy ].
+}
+clear - Hnd Hll.
+intros i Hi Hll'.
+revert i l Hnd Hi Hll Hll'.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hll'.
+apply in_app_or in Hll'.
+destruct Hll' as [Hll'| Hll']. 2: {
+  apply IHll with (i := i) (l := l); [ | easy | | easy ]. {
+    intros l2 Hl2.
+    apply Hnd.
+    destruct Hl2 as [Hl2| Hl2]; [ now left | now right; right ].
+  }
+  intros u v Huv a Ha.
+  destruct u. {
+    cbn in Ha.
+    destruct v; [ easy | cbn ].
+    specialize (Hll 0 (S (S v))) as H1.
+    assert (H : 0 ≠ S (S v)) by easy.
+    now specialize (H1 H a Ha).
+  }
+  cbn in Ha.
+  destruct v. {
+    specialize (Hll (S (S u)) 0) as H1.
+    assert (H : S (S u) ≠ 0) by easy.
+    now specialize (H1 H a Ha).
+  }
+  cbn.
+  apply Nat.succ_inj_wd_neg in Huv.
+  specialize (Hll _ _ Huv).
+  now apply Hll.
+}
+now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
+Qed.
+
 (* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
 Fixpoint to_radix_loop it r i :=
   match it with

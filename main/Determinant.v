@@ -439,55 +439,67 @@ intros.
 now apply in_all_comb_loop_iff.
 Qed.
 
-(* to be moved to Signature.v *)
-Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
+Theorem NoDup_all_comb_loop : ∀ m n,
+  NoDup (all_comb_loop (repeat (seq 1 m) n)).
 Proof.
 intros.
-unfold ε.
-rewrite map_length.
-apply rngl_product_eq_compat.
-intros i (_, Hi).
-apply rngl_product_eq_compat.
-intros j (_, Hj).
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-unfold sign_diff.
-unfold ff_app.
-rewrite (List_map_nth' 0); [ | flia Hj Hij ].
-rewrite (List_map_nth' 0); [ | flia Hj Hij ].
-easy.
+revert m.
+induction n; intros; [ constructor | cbn ].
+remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l]. {
+  apply List_eq_repeat_nil in Hll; subst n.
+  apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+  intros i j Hij.
+  now injection Hij.
+}
+apply List_repeat_eq_cons_iff in Hll.
+destruct Hll as (Hnz & Hl & Hll).
+replace (l :: ll) with (repeat (seq 1 m) n). 2: {
+  subst l ll.
+  destruct n; [ easy | ].
+  cbn - [ seq ].
+  now cbn - [ seq ].
+}
+clear l ll Hl Hll.
+specialize (IHn m) as H1.
+remember (all_comb_loop (repeat (seq 1 m) n)) as ll eqn:Hll.
+rewrite flat_map_concat_map.
+apply NoDup_concat_if. {
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (i & Hl & Hi); subst l.
+  apply FinFun.Injective_map_NoDup; [ | easy ].
+  intros j k Hjk.
+  now injection Hjk.
+}
+intros i j Hij a Ha.
+destruct (lt_dec i m) as [Him| Him]. 2: {
+  apply Nat.nlt_ge in Him.
+  rewrite nth_overflow in Ha; [ easy | now rewrite List_map_seq_length ].
+}
+rewrite (List_map_nth' 0) in Ha; [ | now rewrite seq_length ].
+destruct (lt_dec j m) as [Hjm| Hjm]. 2: {
+  apply Nat.nlt_ge in Hjm.
+  rewrite nth_overflow; [ easy | now rewrite List_map_seq_length ].
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+intros Hb.
+apply in_map_iff in Ha.
+apply in_map_iff in Hb.
+destruct Ha as (u & H & Ha); subst a.
+destruct Hb as (v & H & Hb).
+injection H; clear H; intros H Hji; subst v.
+rewrite seq_nth in Hji; [ | easy ].
+rewrite seq_nth in Hji; [ | easy ].
+now apply Nat.succ_inj in Hji; symmetry in Hji.
 Qed.
 
-(* to be completed
-Theorem NoDup_concat_if : ∀ A (ll : list (list A)),
-  (∀ l, l ∈ ll → NoDup l)
-  → (∀ i j, i ≠ j → ∀ a, a ∈ nth i ll [] → a ∉ nth j ll [])
-  → NoDup (concat ll).
+Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
 Proof.
-intros * Hnd Hll.
-induction ll as [| l]; [ constructor | cbn ].
-apply NoDup_app_iff.
-split; [ now apply Hnd; left | ].
-split. {
-  apply IHll. {
-    intros l1 Hl1.
-    now apply Hnd; right.
-  }
-  intros i j Hij a Ha.
-  specialize (Hll (S i) (S j)).
-  apply Hll; [ now intros H; injection H | easy ].
-}
-intros i Hi.
-specialize (Hnd _ (or_introl eq_refl)) as H1.
-intros Hil.
-apply in_concat in Hil.
-destruct Hil as (l1 & Hl1 & Hil).
-specialize (Hnd _ (or_intror Hl1)) as H2.
-move l1 before l.
-move H2 before H1.
-move Hil before Hi.
-...
-*)
+intros n.
+unfold all_comb.
+apply NoDup_all_comb_loop.
+Qed.
 
 (* det and det' are equal *)
 
@@ -797,10 +809,9 @@ rewrite <- det'_is_det''; [ | easy | easy ].
 now apply det_is_det'.
 Qed.
 
-(* det' and det''' are equal; attempt *)
+(* det' and det''' are equal *)
 (* my aim is to remove det'' and rename det''' into det'' *)
 
-(* to be completed
 Theorem det'_is_det''' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -971,76 +982,9 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     now rewrite map_id.
   }
   rewrite map_id.
-Search (NoDup (all_comb _)).
-Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
-Proof.
-intros n.
-unfold all_comb.
-Theorem NoDup_all_comb_loop : ∀ m n,
-  NoDup (all_comb_loop (repeat (seq 1 m) n)).
-Proof.
-intros.
-revert m.
-induction n; intros; [ constructor | cbn ].
-remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l]. {
-  apply List_eq_repeat_nil in Hll; subst n.
-  apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
-  intros i j Hij.
-  now injection Hij.
-}
-apply List_repeat_eq_cons_iff in Hll.
-destruct Hll as (Hnz & Hl & Hll).
-replace (l :: ll) with (repeat (seq 1 m) n). 2: {
-  subst l ll.
-  destruct n; [ easy | ].
-  cbn - [ seq ].
-  now cbn - [ seq ].
-}
-clear l ll Hl Hll.
-specialize (IHn m) as H1.
-remember (all_comb_loop (repeat (seq 1 m) n)) as ll eqn:Hll.
-rewrite flat_map_concat_map.
-(*
-remember (repeat (seq 1 m) n) as ll1 eqn:H1.
-destruct m; [ constructor | ].
-rewrite seq_S; subst ll1.
-cbn - [ seq ].
-rewrite flat_map_app.
-cbn - [ seq ].
-rewrite app_nil_r.
-apply NoDup_app_iff.
-split. {
-  ============================
-  NoDup (flat_map (λ a : nat, map (cons a) (all_comb_loop (repeat (seq 1 (S m)) n))) (seq 1 m))
-...
-rewrite flat_map_concat_map.
-destruct m; [ constructor | ].
-rewrite seq_S.
-rewrite map_app.
-rewrite concat_app.
-cbn.
-apply NoDup_app_iff.
-split. {
-...
-NoDup_app_iff: ∀ (A : Type) (l l' : list A), NoDup (l ++ l') ↔ NoDup l ∧ NoDup l' ∧ (∀ a : A, a ∈ l → a ∉ l')
-*)
-...
-apply NoDup_concat_if.
-Search (NoDup (flat_map _ _)).
-Search (NoDup (concat (map _ _))).
-Search (NoDup (concat _)).
-Print flat_map.
-Search flat_map.
-Search concat.
-...
-rewrite flat_map_concat_map.
-remember (all_comb_loop (repeat (seq 1 m) n)) as ll' eqn:Hll'.
-...
+  apply NoDup_all_comb.
 }
 Qed.
-...
-*)
 
 (* det'' and det''' are equal *)
 
