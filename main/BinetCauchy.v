@@ -2586,36 +2586,46 @@ rewrite det'_is_det'''; try now destruct Hif. 2: {
 }
 unfold det'''.
 rewrite mat_mul_nrows, Har.
-...
-(*1*)
-rewrite det_is_det''; try now destruct Hif.
-unfold det''.
-rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
 rewrite Har, Hbc.
 cbn - [ det ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
   erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite Nat.add_sub.
+    intros i Hi.
     specialize (fact_neq_0 m) as Hm.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply to_radix_ub.
-    }
-    unfold ff_app.
-    rewrite seq_nth; [ | flia Hj ].
-    rewrite seq_nth; [ | now apply to_radix_ub ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+    rewrite seq_nth; [ | flia Hi ].
     rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-    unfold mat_mul_el.
-    rewrite Hac.
+    assert (Him : ff_app l (i - 1) - 1 < m). {
+      apply in_all_comb_iff in Hl.
+      destruct Hl as (_ & Hlm & Hl).
+      unfold ff_app.
+      assert (H : nth (i - 1) l 0 ∈ l). {
+        apply nth_In.
+        rewrite Hlm; flia Hi.
+      }
+      specialize (Hl _ H); clear H.
+      flia Hl.
+    }
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_comm, Nat.sub_add. 2: {
+      apply in_all_comb_iff in Hl.
+      destruct Hl as (_ & Hlm & Hl).
+      unfold ff_app.
+      assert (H : nth (i - 1) l 0 ∈ l). {
+        apply nth_In.
+        rewrite Hlm; flia Hi.
+      }
+      now specialize (Hl _ H); clear H.
+    }
     easy.
   }
   easy.
 }
 cbn - [ det ].
+...
 (**)
 erewrite rngl_summation_eq_compat. 2: {
   intros i (_, Hi).
