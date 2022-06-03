@@ -2579,6 +2579,14 @@ assert (Hab : is_square_matrix (A * B) = true). {
     now rewrite List_map_seq_length.
   }
 }
+(**)
+rewrite det_is_det'; try now destruct Hif.
+rewrite det'_is_det'''; try now destruct Hif. 2: {
+  now rewrite mat_mul_nrows, Har.
+}
+unfold det'''.
+rewrite mat_mul_nrows, Har.
+...
 (*1*)
 rewrite det_is_det''; try now destruct Hif.
 unfold det''.
