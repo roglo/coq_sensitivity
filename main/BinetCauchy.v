@@ -2625,31 +2625,37 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-...
-(**)
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+(*
   rewrite rngl_product_shift with (s := 1). 2: {
     split; [ easy | flia Hmz ].
   }
   rewrite Nat.sub_diag.
   erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
+    intros j Hj.
+    unfold mat_mul_el.
+    rewrite Hac.
     erewrite rngl_summation_eq_compat. 2: {
-      intros k (_, Hk).
+      intros k Hk.
       now rewrite Nat.add_comm, Nat.add_sub.
     }
     easy.
   }
   cbn.
+*)
+  unfold mat_mul_el.
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
+  rewrite Hac.
+(*
   rewrite Nat.sub_0_r.
   rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
+*)
   do 2 rewrite Nat_sub_succ_1.
   easy.
 }
 cbn - [ det ].
-erewrite rngl_summation_eq_compat. 2: {
+erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
   erewrite rngl_summation_eq_compat. 2: {
@@ -2664,6 +2670,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+...
 rewrite rngl_summation_summation_exch'.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
