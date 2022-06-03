@@ -458,6 +458,37 @@ rewrite (List_map_nth' 0); [ | flia Hj Hij ].
 easy.
 Qed.
 
+(* to be completed
+Theorem NoDup_concat_if : ∀ A (ll : list (list A)),
+  (∀ l, l ∈ ll → NoDup l)
+  → (∀ i j, i ≠ j → ∀ a, a ∈ nth i ll [] → a ∉ nth j ll [])
+  → NoDup (concat ll).
+Proof.
+intros * Hnd Hll.
+induction ll as [| l]; [ constructor | cbn ].
+apply NoDup_app_iff.
+split; [ now apply Hnd; left | ].
+split. {
+  apply IHll. {
+    intros l1 Hl1.
+    now apply Hnd; right.
+  }
+  intros i j Hij a Ha.
+  specialize (Hll (S i) (S j)).
+  apply Hll; [ now intros H; injection H | easy ].
+}
+intros i Hi.
+specialize (Hnd _ (or_introl eq_refl)) as H1.
+intros Hil.
+apply in_concat in Hil.
+destruct Hil as (l1 & Hl1 & Hil).
+specialize (Hnd _ (or_intror Hl1)) as H2.
+move l1 before l.
+move H2 before H1.
+move Hil before Hi.
+...
+*)
+
 (* det and det' are equal *)
 
 Theorem det_is_det' :
@@ -950,8 +981,7 @@ Theorem NoDup_all_comb_loop : ∀ m n,
 Proof.
 intros.
 revert m.
-induction n; intros; [ constructor | ].
-cbn - [ seq ].
+induction n; intros; [ constructor | cbn ].
 remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l]. {
   apply List_eq_repeat_nil in Hll; subst n.
@@ -967,8 +997,11 @@ replace (l :: ll) with (repeat (seq 1 m) n). 2: {
   cbn - [ seq ].
   now cbn - [ seq ].
 }
-(**)
-...
+clear l ll Hl Hll.
+specialize (IHn m) as H1.
+remember (all_comb_loop (repeat (seq 1 m) n)) as ll eqn:Hll.
+rewrite flat_map_concat_map.
+(*
 remember (repeat (seq 1 m) n) as ll1 eqn:H1.
 destruct m; [ constructor | ].
 rewrite seq_S; subst ll1.
@@ -990,9 +1023,10 @@ cbn.
 apply NoDup_app_iff.
 split. {
 ...
-Theorem NoDup_concat ∀ A (ll : list (list A)),
-  NoDup (concat ll)
-  ↔
+NoDup_app_iff: ∀ (A : Type) (l l' : list A), NoDup (l ++ l') ↔ NoDup l ∧ NoDup l' ∧ (∀ a : A, a ∈ l → a ∉ l')
+*)
+...
+apply NoDup_concat_if.
 Search (NoDup (flat_map _ _)).
 Search (NoDup (concat (map _ _))).
 Search (NoDup (concat _)).
