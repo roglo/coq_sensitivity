@@ -776,6 +776,7 @@ Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro rp} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
+Arguments rngl_summation_list_change_var {T ro} (_ _)%type.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.

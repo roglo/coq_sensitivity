@@ -813,176 +813,39 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   rewrite canon_sym_gr_list_length in Hj; subst k.
   now apply canon_sym_gr_list_ub.
 }
-(*
-...
-  unfold all_comb.
-  revert i Hi.
-  induction n; intros; [ easy | clear Hnz ].
-  cbn - [ repeat seq ].
-  rewrite map_map.
-...
+symmetry.
+replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
   erewrite map_ext_in. 2: {
-    intros j Hj.
-    unfold succ_when_ge.
-    unfold Nat.b2n.
-    rewrite if_leb_le_dec.
-...
-Theorem all_comb_all_comb_inv : ∀ n l,
-  length l = n
-  → (∀ i, i ∈ l → 1 ≤ i ≤ n)
-  → nth (all_comb_inv n l) (all_comb n) [] = l.
-Proof.
-intros * Hlen Hl.
-Check all_comb_inv.
-Compute (
-  map (λ
-...
-intros * Hlen Hl.
-unfold all_comb.
-unfold all_comb_inv.
-revert n Hlen Hl.
-induction l as [| a]; intros; [ now subst n | cbn ].
-rewrite all_comb_inv_loop_app; cbn.
-rewrite rev_length, Nat.mul_0_r, Nat.add_0_r.
-rewrite Nat.add_comm.
-rewrite <- List_nth_skipn.
-cbn in Hlen.
-Print all_comb_inv.
-Print all_comb_inv_loop.
-...
-Compute (
-let n := 3 in
-let i := 1 in
-let k := 7 in
-(*
-let ll := repeat (seq k n) n in
-let ll := repeat [19;2;5] n in
-*)
-let ll := [[19;2;5]; [1;2;7]; [21;31;42]] in
-(**)
-skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
-all_comb_loop (skipn i (hd [] ll) :: tl ll)
-).
-Theorem skipn_all_comb_loop : ∀ A i n (ll : list (list A)),
-  length ll = n
-  → (∀ l, l ∈ ll → length l = n)
-  → skipn (i * n ^ (n - 1)) (all_comb_loop ll) =
-    all_comb_loop (skipn i (hd [] ll) :: tl ll).
-Proof.
-intros * Hlln Hln.
-revert i ll Hlln Hln.
-induction n; intros. {
-  apply length_zero_iff_nil in Hlln; subst ll.
-  now do 2 rewrite skipn_nil.
-}
-rewrite Nat_sub_succ_1.
-destruct ll as [| l]; [ easy | ].
-cbn in Hlln.
-apply Nat.succ_inj in Hlln.
-destruct (le_dec i (S n)) as [Hisn| Hisn]. 2: {
-  apply Nat.nle_gt in Hisn.
-  cbn - [ all_comb_loop ].
-  rewrite skipn_all2. 2: {
-    rewrite all_comb_loop_length; [ | easy ].
-    rewrite nat_product_list_cons.
-    rewrite Hln; [ | now left ].
-    apply Nat.mul_le_mono; [ now apply Nat.lt_le_incl | ].
-    rewrite nat_product_same_length with (n := S n). 2: {
-      intros l1 Hl1.
-      now apply Hln; right.
+    intros l Hl.
+    rewrite map_map.
+    apply in_all_comb_iff in Hl.
+    destruct Hl as (_ & _ & Hl).
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      specialize (Hl i Hi).
+      rewrite Nat.succ_pred_pos; [ | flia Hl ].
+      easy.
     }
-    now rewrite Hlln.
+    now rewrite map_id.
   }
-  rewrite skipn_all2. 2: {
-    rewrite Hln; [ now apply Nat.lt_le_incl | now left ].
-  }
-  rewrite all_comb_loop_with_nil; [ easy | now left ].
+  apply map_id.
 }
-cbn - [ all_comb_loop ].
+Search (∑ (_ ∈ map _ _), _).
 ...
-  apply List_eq_repeat_nil in Hll; subst n; cbn.
-  rewrite Nat.mul_1_r.
-  destruct i; [ easy | now destruct i ].
+rewrite <- rngl_summation_list_change_var.
+...
+specialize rngl_summation_list_change_var as H1.
+specialize (H1 nat nat).
+ with (f := pred) (g := S).
+replace (all_comb n) with (map S (map pred (all_comb n))) in Hnd. 2: {
+Check rngl_summation_list_change_var.
+rewrite rngl_summation_list_change_var with (f := pred) (g := S).
+...
+erewrite rngl_summation_list_change_var. 2: {
+  intros i Hi.
+  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
+  flia Hi Hfnz.
 }
-set (f := λ a, map (cons a) (all_comb_loop (l1 :: ll))).
-...
-Search (skipn _ (seq _ _)).
-rewrite List_skipn_seq.
-...
-destruct ll as [| l1]. {
-  now do 2 rewrite skipn_nil.
-}
-cbn.
-rewrite Nat.sub_0_r.
-Print all_comb_loop.
-destruct ll as [| l2]. {
-  rewrite skipn_map; cbn.
-  now rewrite Nat.mul_1_r.
-}
-cbn - [ "^" all_comb_loop ].
-set (f := λ a : A, map (cons a) (all_comb_loop (l2 :: ll))).
-do 2 rewrite flat_map_concat_map.
-...
-Search (skipn _ (flat_map _ _)).
-rewrite flat_map_concat_map.
-Search (skipn _ (concat _ )).
-Search skip
-...
-intros * Hn.
-revert n Hn.
-induction ll as [| l1]; intros. {
-  now subst n; do 2 rewrite skipn_nil.
-}
-cbn.
-destruct ll as [| l2]. {
-  rewrite skipn_map; cbn.
-  now rewrite Nat.mul_1_r.
-}
-...
-revert n Hn.
-induction ll as [| l1]; intros. {
-  subst n; cbn.
-  now do 2 rewrite skipn_nil.
-}
-cbn.
-...
-replace (length l) with (n - 1) by flia Hlen.
-rewrite skipn_all_comb_loop; [ | now rewrite repeat_length ].
-...
-specialize to_radix_loop_to_radix_inv as H1.
-specialize (H1 l 0 n n).
-do 2 rewrite Nat.add_0_r in H1.
-specialize (H1 Hlen Hl (le_refl _)).
-now rewrite Nat.sub_diag, app_nil_r in H1.
-Qed.
-...
-rewrite all_comb_all_comb_inv.
-rewrite map_map.
-...
-  exists (all_comb_inv n (canon_sym_gr_list n i)).
-...
-  exists (to_radix_inv n (canon_sym_gr_list n i)).
-  rewrite to_radix_to_radix_inv; cycle 1. {
-    apply canon_sym_gr_list_length.
-  } {
-    intros j Hj.
-    apply (In_nth _ _ 0) in Hj.
-    rewrite canon_sym_gr_list_length in Hj.
-    destruct Hj as (k & Hkn & Hj).
-    subst j.
-    now apply canon_sym_gr_list_ub.
-  }
-  split; [ easy | ].
-  apply in_seq.
-  split; [ easy | cbn ].
-  specialize to_radix_inv_ub as H1.
-  specialize (H1 n (canon_sym_gr_list n i) Hnz).
-  rewrite canon_sym_gr_list_length in H1.
-  apply H1.
-  intros j Hj.
-  now apply canon_sym_gr_list_ub.
-}
-*)
 ...
 (* il faut faire ∑ (l ∈ map pred (all comb n)),
    peut-être en faisant un changement de variable *)
