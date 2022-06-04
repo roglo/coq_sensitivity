@@ -2396,6 +2396,18 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
+(**)
+rewrite flat_map_concat_map.
+rewrite rngl_summation_list_concat.
+rewrite <- rngl_summation_list_change_var.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite <- rngl_summation_list_change_var.
+}
+cbn - [ ff_app list_prodn ].
+rewrite rngl_summation_summation_list_swap.
+Search (∑ (_ ∈ list_prodn _), _).
+...
 destruct m; [ easy | ].
 rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_product_shift 1); [ | flia ].
@@ -2439,6 +2451,14 @@ destruct ll as [| l1]. {
     now rewrite rngl_mul_1_l.
   }
   symmetry.
+  rewrite <- rngl_summation_list_change_var.
+(*
+  rewrite rngl_summation_seq_summation.
+*)
+  rewrite flat_map_concat_map.
+About rngl_summation_list_concat.
+  rewrite rngl_summation_list_concat.
+  rewrite <- rngl_summation_list_change_var.
 ...
 (*
 End a.

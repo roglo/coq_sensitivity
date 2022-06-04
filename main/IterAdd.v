@@ -370,6 +370,20 @@ unfold iter_list.
 apply fold_left_rngl_add_fun_from_0.
 Qed.
 
+Theorem rngl_summation_list_concat : ∀ A (ll : list (list A)) (f : A → T),
+  ∑ (a ∈ concat ll), f a = ∑ (l ∈ ll), ∑ (a ∈ l), f a.
+Proof.
+intros.
+induction ll as [| l]; cbn. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  now rewrite rngl_summation_list_empty.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_summation_list_cons.
+f_equal.
+apply IHll.
+Qed.
+
 Theorem rngl_summation_summation_list_swap : ∀ A B la lb (f : A → B → T),
   ∑ (a ∈ la), (∑ (b ∈ lb), f a b) =
   ∑ (b ∈ lb), (∑ (a ∈ la), f a b).
@@ -748,6 +762,7 @@ Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_change_var {T ro} (_ _)%type.
+Arguments rngl_summation_list_concat {T ro rp} A%type ll%list.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
