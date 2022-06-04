@@ -2414,6 +2414,31 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite fold_iter_seq.
 }
 cbn - [ list_prodn repeat seq ].
+remember (list_prodn (repeat (seq 1 n) (S m))) as ll' eqn:Hll'.
+rewrite Hll in Hll'; cbn in Hll'.
+destruct ll as [| l1]. {
+  cbn in Hll.
+  injection Hll; clear Hll; intros Hll H; subst l.
+  apply List_eq_repeat_nil in Hll; subst m.
+  subst ll'; cbn.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    erewrite rngl_summation_eq_compat. 2: {
+      intros j Hj.
+      rewrite rngl_product_only_one.
+      now rewrite Nat.sub_diag.
+    }
+    cbn.
+    rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+    easy.
+  }
+  symmetry.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    unfold iter_seq, iter_list; cbn.
+    now rewrite rngl_mul_1_l.
+  }
+  symmetry.
 ...
 (*
 End a.
