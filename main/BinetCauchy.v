@@ -2374,13 +2374,15 @@ now rewrite seq_nth.
 Qed.
 
 (* to be completed
-Theorem rngl_product_summation_distr_prodn : ∀ m n (f : nat → nat → T),
+Theorem rngl_product_summation_distr_prodn :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
     ∑ (l ∈ list_prodn (repeat (seq 1 n) m)),
       ∏ (i = 1, m), f i (ff_app l (i - 1)).
 Proof.
-intros * Hmz.
+intros Hop * Hmz.
 revert n.
 induction m; intros; [ easy | clear Hmz; cbn ].
 remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
@@ -2404,14 +2406,14 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 cbn - [ list_prodn ].
-remember (∑ (j = 1, n), f (S (S m)) j) as b eqn:Hb.
 rewrite IHm; [ | easy ].
-...
-cbn.
-rewrite flat_map_concat_map.
-...
-remember (list_prodn (repeat _ _)) as ll' eqn:Hll'.
-cbn; subst ll'.
+unfold iter_seq at 2.
+rewrite rngl_summation_list_mul_summation_list; [ | easy ].
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite fold_iter_seq.
+}
+cbn - [ list_prodn repeat seq ].
 ...
 (*
 End a.

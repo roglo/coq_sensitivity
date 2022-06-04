@@ -153,10 +153,6 @@ apply iter_seq_split3; [ | | | easy ]. {
 } {
   apply rngl_add_assoc.
 }
-(*
-rewrite rngl_summation_split with (j := j); [ | flia Hj ].
-now rewrite rngl_summation_split_last.
-*)
 Qed.
 
 Theorem rngl_summation_eq_compat : ∀ g h b k,
@@ -641,27 +637,29 @@ f_equal; f_equal.
 flia Hlen.
 Qed.
 
+Theorem rngl_summation_list_mul_summation_list :
+  ∀ A B li lj (f : A → T) (g : B → T),
+  ((∑ (i ∈ li), f i) * (∑ (j ∈ lj), g j))%F =
+  ∑ (i ∈ li), (∑ (j ∈ lj), f i * g j).
+Proof.
+intros.
+induction li as [| ai]. {
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  now apply rngl_mul_0_l.
+}
+do 2 rewrite rngl_summation_list_cons.
+rewrite rngl_mul_add_distr_r.
+rewrite IHli.
+now rewrite rngl_mul_summation_list_distr_l.
+Qed.
+
 Theorem rngl_summation_mul_summation : ∀ bi bj ei ej f g,
   ((∑ (i = bi, ei), f i) * (∑ (j = bj, ej), g j))%F =
   ∑ (i = bi, ei), (∑ (j = bj, ej), f i * g j).
 Proof.
 intros.
-unfold iter_seq.
-remember (S ei - bi) as leni eqn:Hi.
-remember (S ej - bj) as lenj eqn:Hj.
-clear ei ej Hi Hj.
-(* lemma for summation_list to do *)
-induction leni. {
-  rewrite rngl_summation_list_empty; [ symmetry | easy ].
-  rewrite rngl_summation_list_empty; [ symmetry | easy ].
-  now apply rngl_mul_0_l.
-}
-rewrite seq_S.
-do 2 rewrite rngl_summation_list_app.
-do 2 rewrite rngl_summation_list_only_one.
-rewrite rngl_mul_add_distr_r.
-rewrite IHleni; f_equal.
-now apply rngl_mul_summation_list_distr_l.
+apply rngl_summation_list_mul_summation_list.
 Qed.
 
 Theorem rngl_summation_list_change_var :
@@ -751,6 +749,7 @@ Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_change_var {T ro} (_ _)%type.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
+Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
