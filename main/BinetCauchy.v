@@ -2406,8 +2406,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ ff_app list_prodn ].
 rewrite rngl_summation_summation_list_swap.
-Search (∑ (_ ∈ list_prodn _), _).
-...
 destruct m; [ easy | ].
 rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_product_shift 1); [ | flia ].
@@ -2417,14 +2415,34 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite Nat.add_comm, Nat.add_sub.
   easy.
 }
-cbn - [ list_prodn ].
+cbn - [ ff_app list_prodn ].
 rewrite IHm; [ | easy ].
+rewrite Hll.
 unfold iter_seq at 2.
 rewrite rngl_summation_list_mul_summation_list; [ | easy ].
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
   now rewrite fold_iter_seq.
 }
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+destruct n. {
+  rewrite rngl_summation_empty; [ | easy ].
+  now rewrite rngl_summation_list_empty.
+}
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+apply rngl_summation_eq_compat.
+intros j Hj.
+symmetry.
+rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal. 2: {
+  cbn.
+...
+apply rngl_product_eq_compat.
+...
 cbn - [ list_prodn repeat seq ].
 remember (list_prodn (repeat (seq 1 n) (S m))) as ll' eqn:Hll'.
 rewrite Hll in Hll'; cbn in Hll'.
