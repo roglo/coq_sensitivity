@@ -2587,7 +2587,8 @@ rewrite det'_is_det'''; try now destruct Hif. 2: {
 unfold det'''.
 rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
-rewrite Har, Hbc.
+unfold mat_mul_el.
+rewrite Har, Hac, Hbc.
 cbn - [ det ].
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -2625,38 +2626,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+(*
+  ∑ (i ∈ all_comb m),
+  ε i *
+  ∏ (j = 1, m), (∑ (k = 1, n), mat_el A j k * mat_el B k (ff_app i (j - 1)))
+*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
-(*
-  rewrite rngl_product_shift with (s := 1). 2: {
-    split; [ easy | flia Hmz ].
-  }
-  rewrite Nat.sub_diag.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    unfold mat_mul_el.
-    rewrite Hac.
-    erewrite rngl_summation_eq_compat. 2: {
-      intros k Hk.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    easy.
-  }
-  cbn.
-*)
-  unfold mat_mul_el.
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
-  rewrite Hac.
-(*
-  rewrite Nat.sub_0_r.
-  rewrite <- Nat.sub_succ_l; [ | flia Hmz ].
-*)
   do 2 rewrite Nat_sub_succ_1.
-  easy.
-}
-cbn - [ det ].
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
   erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
@@ -2669,6 +2647,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+...
 unfold iter_seq at 1.
 rewrite rngl_summation_summation_list_swap.
 rewrite fold_iter_seq.
