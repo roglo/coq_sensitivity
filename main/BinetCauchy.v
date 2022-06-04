@@ -2525,6 +2525,17 @@ now apply Nat.div_lt_upper_bound.
 Qed.
 
 (* to be completed
+Theorem rngl_product_summation_distr_comb : ∀ m n (f : nat → nat → T),
+  m ≠ 0
+  → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
+    ∑ (l ∈ all_comb_loop (repeat (seq 1 n) m)),
+      ∏ (i = 1, m), f i (S (ff_app l (i - 1))).
+Proof.
+intros * Hmz.
+revert n.
+induction m; intros; [ easy | clear Hmz; cbn ].
+...
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -2632,7 +2643,19 @@ cbn - [ det ].
   ∏ (j = 1, m), (∑ (k = 1, n), mat_el A j k * mat_el B k (ff_app i (j - 1)))
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
+  intros l Hl.
+Print all_comb.
+Print all_comb_loop.
+Check @rngl_product_summation_distr.
+  rewrite rngl_product_summation_distr_comb; [ | easy ].
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_product_mul_distr; [ | now destruct Hif ].
+    easy.
+  }
+  cbn.
+(* ouais, non, il faut que le "i" disparaisse dans le premier produit *)
+...
   rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
   do 2 rewrite Nat_sub_succ_1.
   rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
@@ -2647,6 +2670,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+Check rngl_product_summation_distr.
 ...
 unfold iter_seq at 1.
 rewrite rngl_summation_summation_list_swap.
