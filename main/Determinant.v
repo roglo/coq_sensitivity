@@ -95,20 +95,6 @@ Arguments det' M%M.
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-(*
-[[a;b;c];[d;e;f];[g;h;i]]
-a and all combinations of [[d;e;f];[g;h;i]] ++
-b and all combinations of [[d;e;f];[g;h;i]] ++
-c and all combinations of [[d;e;f];[g;h;i]]
-*)
-
-Fixpoint list_prodn {A} (ll : list (list A)) :=
-  match ll with
-  | [] => []
-  | [l] => map (λ y, [y]) l
-  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
-  end.
-
 Definition all_comb n := list_prodn (repeat (seq 1 n) n).
 
 (*
@@ -116,7 +102,7 @@ Compute (all_comb 3).
 Compute (list_prodn (repeat (seq 0 10) 2)).
 *)
 
-Definition det''' (M : matrix T) :=
+Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i (ff_app l (i - 1)).
 
@@ -145,20 +131,20 @@ Compute (length (list_prodn [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
 Compute (length (list_prodn [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
-Arguments det''' {T ro} M%M.
+Arguments det'' {T ro} M%M.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det''' M).
+Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 Compute (let M := mk_mat [] in det M).
 Compute (let M := mk_mat [] in det' M).
-Compute (let M := mk_mat [] in det''' M).
+Compute (let M := mk_mat [] in det'' M).
 Compute (let M := mk_mat [[3]] in det M).
 Compute (let M := mk_mat [[3]] in det' M).
-Compute (let M := mk_mat [[3]] in det''' M).
+Compute (let M := mk_mat [[3]] in det'' M).
 *)
 
 Theorem rngl_summation_list_incl : ∀ A eqd la lb (f : A → T),
@@ -619,15 +605,15 @@ apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
-(* det' and det''' are equal *)
+(* det' and det'' are equal *)
 
-Theorem det'_is_det''' :
+Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
-  ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det''' M.
+  ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det'' M.
 Proof.
 intros Hop Heq * Hnz.
-unfold det'''.
+unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
 rewrite <- Hn.
@@ -2770,11 +2756,11 @@ End a.
 
 Arguments det {T ro} M%M.
 Arguments det' {T}%type {ro} M%M.
-Arguments det''' {T}%type {ro} M%M.
+Arguments det'' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
-Arguments det'_is_det''' {T ro rp} _ _ M%M.
+Arguments det'_is_det'' {T ro rp} _ _ M%M.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.

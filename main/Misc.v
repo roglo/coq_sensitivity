@@ -1363,6 +1363,17 @@ Definition pair_eqb {A B} (eqb : A → B → _) ab cd :=
 
 (* end pair_eqb *)
 
+(* list_prodn: like list_prod with any number of lists *)
+
+Fixpoint list_prodn {A} (ll : list (list A)) :=
+  match ll with
+  | [] => []
+  | [l] => map (λ y, [y]) l
+  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
+  end.
+
+(* end list_prodn *)
+
 Definition unsome A (d : A) o :=
   match o with
   | Some x => x

@@ -2426,7 +2426,6 @@ Compute (
     ∏ (i = 1, m), f i (ff_app l (i - 1))
 ).
 *)
-...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -2484,10 +2483,10 @@ assert (Hab : is_square_matrix (A * B) = true). {
 }
 (**)
 rewrite det_is_det'; try now destruct Hif.
-rewrite det'_is_det'''; try now destruct Hif. 2: {
+rewrite det'_is_det''; try now destruct Hif. 2: {
   now rewrite mat_mul_nrows, Har.
 }
-unfold det'''.
+unfold det''.
 rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
 unfold mat_mul_el.
