@@ -2538,18 +2538,13 @@ remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l]. {
   apply List_eq_repeat_nil in Hll; subst m.
   rewrite rngl_product_only_one.
-Search (∑ (_ ∈ map _ _), _).
-Check rngl_summation_map_seq.
-Check rngl_summation_list_change_var.
-rngl_summation_map_seq
-     : ∀ (A : Type) (start len : nat) (f : A → T) (g : nat → A),
-         ∑ (i ∈ map g (seq start len)), f i = ∑ (i ∈ seq start len), f (g i)
-rngl_summation_list_change_var
-     : ∀ (A B : Type) (f : A → B) (g : B → T) (l : list A),
-         ∑ (i ∈ l), g (f i) = ∑ (j ∈ map f l), g j
-...
-  rewrite rngl_summation_map_seq.
   rewrite <- rngl_summation_list_change_var.
+  unfold iter_seq at 1.
+  rewrite Nat_sub_succ_1.
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  now rewrite rngl_product_only_one.
+}
 ...
 (*
 End a.
