@@ -2670,8 +2670,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-...
-rewrite rngl_summation_summation_exch'.
+unfold iter_seq at 1.
+rewrite rngl_summation_summation_list_swap.
+rewrite fold_iter_seq.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
