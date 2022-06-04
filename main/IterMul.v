@@ -591,9 +591,14 @@ induction m; intros. {
   }
   easy.
 }
-rewrite rngl_product_split with (j := m); [ | flia ].
-rewrite Nat.add_1_r.
-rewrite rngl_product_only_one.
+rewrite rngl_product_split_last; [ | easy ].
+rewrite (rngl_product_shift _ 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ "^" "/" "mod" "-" ].
 rewrite IHm.
 rewrite rngl_summation_mul_summation; [ | easy ].
 symmetry.

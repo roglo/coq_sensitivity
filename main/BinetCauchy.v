@@ -2405,10 +2405,10 @@ erewrite rngl_product_eq_compat. 2: {
 }
 cbn - [ list_prodn ].
 remember (∑ (j = 1, n), f (S (S m)) j) as b eqn:Hb.
+rewrite IHm; [ | easy ].
+...
 cbn.
 rewrite flat_map_concat_map.
-...
-rewrite IHm; [ | easy ].
 ...
 remember (list_prodn (repeat _ _)) as ll' eqn:Hll'.
 cbn; subst ll'.
