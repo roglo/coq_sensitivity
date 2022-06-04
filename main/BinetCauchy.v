@@ -2421,11 +2421,21 @@ rewrite Hll.
 unfold iter_seq at 2.
 rewrite rngl_summation_list_mul_summation_list; [ | easy ].
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
+  intros l1 Hl1.
   now rewrite fold_iter_seq.
 }
+symmetry.
+destruct n; [ easy | ].
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l1 Hl1.
+  rewrite rngl_summation_seq_summation; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+symmetry.
+...
 apply rngl_summation_list_eq_compat.
-intros i Hi.
+intros l1 Hl1.
 destruct n. {
   rewrite rngl_summation_empty; [ | easy ].
   now rewrite rngl_summation_list_empty.
@@ -2433,8 +2443,35 @@ destruct n. {
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
 apply rngl_summation_eq_compat.
-intros j Hj.
+intros i Hi.
 symmetry.
+...
+Theorem rngl_product_rtl:
+  rngl_is_comm = true →
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T
+    → ∀ (g : nat → T) (b k : nat),
+        ∏ (i = b, k), g i = ∏ (i = b, k), g (k + b - i)%nat.
+...
+rewrite rngl_product_rtl.
+erewrite rngl_product_eq_compat. 2: {
+  intros j Hj.
+  replace (S (S m) + 1 - j - 1) with (S (S m) - j) by flia.
+  easy.
+}
+cbn - [ "-" ff_app ].
+rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal. 2: {
+  cbn; rewrite Nat.sub_diag.
+...
+rewrite (rngl_product_split (nth m l1 0)).
+rewrite rngl_mul_comm.
+rewrite rngl_product_split_first.
+rewrite Nat.add_sub.
+...
+(**)
 rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_product_shift 1); [ | flia ].
 do 2 rewrite Nat_sub_succ_1.
