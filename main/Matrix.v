@@ -1242,7 +1242,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 symmetry.
-apply rngl_summation_summation_exch'.
+apply rngl_summation_summation_list_swap.
 Qed.
 
 (* left distributivity of multiplication over addition *)
@@ -1615,7 +1615,9 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 symmetry.
 cbn.
-rewrite rngl_summation_summation_exch'.
+unfold iter_seq at 1 2.
+rewrite rngl_summation_summation_list_swap.
+rewrite fold_iter_seq.
 apply rngl_summation_eq_compat.
 intros j Hj.
 apply rngl_summation_eq_compat.

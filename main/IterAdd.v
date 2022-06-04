@@ -196,6 +196,21 @@ intros * Hkb.
 now apply iter_seq_empty.
 Qed.
 
+Theorem rngl_summation_list_add_distr :
+  ∀ A g h (l : list A),
+  (∑ (i ∈ l), (g i + h i) =
+  (∑ (i ∈ l), g i) + ∑ (i ∈ l), h i)%F.
+Proof.
+intros Hic *.
+apply iter_list_distr. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_comm.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
 Theorem rngl_summation_add_distr : ∀ g h b k,
   (∑ (i = b, k), (g i + h i) =
    ∑ (i = b, k), g i + ∑ (i = b, k), h i)%F.
@@ -328,13 +343,59 @@ unfold iter_list; cbn.
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_summation_only_one : ∀ g n, (∑ (i = n, n), g i = g n)%F.
+Theorem rngl_summation_only_one : ∀ g n, ∑ (i = n, n), g i = g n.
 Proof.
 intros g n.
 unfold iter_seq.
 rewrite Nat.sub_succ_l; [ idtac | reflexivity ].
 rewrite Nat.sub_diag; simpl.
 apply rngl_add_0_l.
+Qed.
+
+Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
+  (∑ (i ∈ a :: la), f i = f a + ∑ (i ∈ la), f i)%F.
+Proof.
+intros.
+apply iter_list_cons. {
+  apply rngl_add_0_l.
+} {
+  apply rngl_add_0_r.
+} {
+  apply rngl_add_assoc.
+}
+Qed.
+
+Theorem rngl_summation_list_app : ∀ A (la lb : list A) f,
+  ∑ (i ∈ la ++ lb), f i = (∑ (i ∈ la), f i + ∑ (i ∈ lb), f i)%F.
+Proof.
+intros.
+rewrite iter_list_app.
+unfold iter_list.
+apply fold_left_rngl_add_fun_from_0.
+Qed.
+
+Theorem rngl_summation_summation_list_swap : ∀ A B la lb (f : A → B → T),
+  ∑ (a ∈ la), (∑ (b ∈ lb), f a b) =
+  ∑ (b ∈ lb), (∑ (a ∈ la), f a b).
+Proof.
+intros.
+induction la as [| a]. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros b Hb.
+    now rewrite rngl_summation_list_empty.
+  }
+  now rewrite all_0_rngl_summation_list_0.
+}
+rewrite rngl_summation_list_cons.
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros b Hb.
+  now rewrite rngl_summation_list_cons.
+}
+cbn.
+rewrite rngl_summation_list_add_distr.
+now f_equal.
 Qed.
 
 Theorem rngl_summation_summation_exch : ∀ g k,
@@ -381,59 +442,6 @@ f_equal.
 apply rngl_summation_eq_compat.
 intros i Hi.
 now rewrite Nat_sub_succ_1.
-Qed.
-
-Theorem rngl_summation_summation_exch' : ∀ g b c k l,
-  (∑ (j = b, k), (∑ (i = c, l), g i j) =
-   ∑ (i = c, l), ∑ (j = b, k), g i j)%F.
-Proof.
-intros.
-revert l.
-induction k; intros. {
-  destruct b. {
-    rewrite rngl_summation_only_one.
-    apply rngl_summation_eq_compat.
-    intros i Hi.
-    now rewrite rngl_summation_only_one.
-  }
-  rewrite rngl_summation_empty; [ | easy ].
-  erewrite all_0_rngl_summation_0; [ easy | ].
-  intros i Hi.
-  now apply rngl_summation_empty.
-}
-destruct (le_dec b (S k)) as [Hbk| Hbk]. 2: {
-  apply Nat.nle_gt in Hbk.
-  rewrite rngl_summation_empty; [ | easy ].
-  symmetry.
-  apply all_0_rngl_summation_0.
-  intros i Hi.
-  now apply rngl_summation_empty.
-}
-rewrite rngl_summation_split_last; [ | easy ].
-rewrite rngl_summation_succ_succ.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    now rewrite Nat_sub_succ_1.
-  }
-  easy.
-}
-cbn.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_summation_split_last; [ | easy ].
-  rewrite rngl_summation_succ_succ.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    now rewrite Nat_sub_succ_1.
-  }
-  easy.
-}
-cbn.
-rewrite IHk.
-apply rngl_summation_add_distr.
 Qed.
 
 Theorem fold_left_add_seq_add : ∀ b len i g,
@@ -605,28 +613,6 @@ f_equal. {
 }
 Qed.
 
-Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
-  (∑ (i ∈ a :: la), f i = f a + ∑ (i ∈ la), f i)%F.
-Proof.
-intros.
-apply iter_list_cons. {
-  apply rngl_add_0_l.
-} {
-  apply rngl_add_0_r.
-} {
-  apply rngl_add_assoc.
-}
-Qed.
-
-Theorem rngl_summation_list_app : ∀ A (la lb : list A) f,
-  ∑ (i ∈ la ++ lb), f i = (∑ (i ∈ la), f i + ∑ (i ∈ lb), f i)%F.
-Proof.
-intros.
-rewrite iter_list_app.
-unfold iter_list.
-apply fold_left_rngl_add_fun_from_0.
-Qed.
-
 Theorem rngl_summation_list_permut : ∀ A (eqb : A → _),
   equality eqb →
   ∀ (l1 l2 : list A) f,
@@ -790,5 +776,5 @@ Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
 Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.
 Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
-Arguments rngl_summation_summation_exch' {T}%type {ro rp} _ (b c k l)%nat.
+Arguments rngl_summation_summation_list_swap {T ro rp} (_ _)%type (_ _)%list.
 Arguments rngl_summation_ub_mul_distr {T}%type {ro rp} (a b)%nat.

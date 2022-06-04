@@ -629,9 +629,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite rngl_summation_summation_exch'.
+unfold iter_seq at 1 2.
+rewrite rngl_summation_summation_list_swap.
+rewrite fold_iter_seq.
 apply rngl_summation_eq_compat.
 intros i Hi.
+rewrite fold_iter_seq.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite rngl_mul_mul_swap; [ | easy ].
