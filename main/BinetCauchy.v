@@ -2373,162 +2373,11 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
-(*
-(* perhaps, this attempt of a proof does not require the
-   Binet Cauchy formula! by using det'' as a definition *)
-(* not sure *)
-(* bon, apparemment, sur papier, ça ne marche pas avec des matrices 2x2
-   il y a des termes avec ε=0 qui apparaissent et, inversement des termes
-   qui s'annulent *)
-Theorem det_mul : in_charac_0_field →
-  ∀ n A B,
-  is_square_matrix A = true
-  → is_square_matrix B = true
-  → mat_nrows A = n
-  → mat_nrows B = n
-  → det (A * B) = (det A * det B)%F.
-Proof.
-intros Hif * Hsa Hsb Hra Hrb.
-Print det''.
-Compute (to_radix_list 2).
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  destruct A as (lla).
-  destruct B as (llb).
-  cbn in Hra, Hrb.
-  apply length_zero_iff_nil in Hra; subst lla.
-  apply length_zero_iff_nil in Hrb; subst llb; cbn.
-  symmetry; apply rngl_mul_1_l.
-}
-assert (Hab : is_square_matrix (A * B) = true). {
-  apply is_scm_mat_iff.
-  rewrite mat_mul_ncols; [ | congruence ].
-  rewrite mat_mul_nrows.
-  rewrite square_matrix_ncols; [ | easy ].
-  rewrite Hra, Hrb.
-  split; [ easy | ].
-  intros l Hl.
-  apply In_nth with (d := []) in Hl.
-  destruct Hl as (p & Hp & Hl).
-  rewrite <- Hl; cbn.
-  rewrite (List_map_nth' 0). 2: {
-    rewrite seq_length.
-    cbn in Hp.
-    now rewrite List_map_seq_length in Hp.
-  }
-  rewrite List_map_seq_length.
-  now rewrite square_matrix_ncols.
-}
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
-rewrite det_is_det_by_canon_permut; try now destruct Hif.
-rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
-rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
-rewrite det'_is_det''; [ | now destruct Hif | now destruct Hif ].
-unfold det''.
-rewrite mat_mul_nrows, Hra, Hrb.
-unfold "*"%M at 1.
-cbn - [ det ].
-rewrite square_matrix_ncols; [ | easy ].
-rewrite Hra, Hrb.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-    rewrite (List_map_nth' 0). 2: {
-      rewrite seq_length.
-      now apply to_radix_ub.
-    }
-    unfold ff_app.
-    rewrite seq_nth; [ | flia Hj ].
-    rewrite seq_nth; [ | now apply to_radix_ub ].
-    do 2 rewrite Nat.add_0_l.
-    unfold mat_mul_el.
-    rewrite square_matrix_ncols; [ | easy ].
-    rewrite Hra.
-    easy.
-  }
-  cbn.
-  rewrite (rngl_product_shift 1); [ | flia Hnz ].
-  rewrite Nat.sub_diag.
-  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
-  rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-  rewrite Nat_sub_succ_1.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    erewrite rngl_product_eq_compat. 2: {
-      intros k Hk.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    easy.
-  }
-  easy.
-}
-cbn.
-rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-  easy.
-}
-cbn.
-symmetry.
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-rewrite <- rngl_mul_assoc; f_equal.
-rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-...
-apply rngl_summation_eq_compat.
-intros j (_, Hj).
-symmetry.
-rewrite (rngl_product_shift 1); [ | flia Hnz ].
-rewrite Nat.sub_diag.
-...
-rewrite rngl_mul_assoc.
-rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
-rewrite (rngl_product_shift 1 1); [ | flia Hnz ].
-rewrite Nat.sub_diag.
-rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
-...
-Search ((∏ (_ = _, _), _) * ∏ (_ = _, _), _)%F.
-...
-*)
-
-Theorem div_pow_mod_to_radix_loop : ∀ r m i k,
-  i < m
-  → k < r ^ m
-  → (k / r ^ (m - S i)) mod r = ff_app (to_radix_loop m r k) (m - S i).
-Proof.
-intros * Him Hkrm.
-destruct (Nat.eq_dec r 0) as [Hrz| Hrz]. {
-  subst r.
-  rewrite Nat.pow_0_l in Hkrm; [ easy | flia Him ].
-}
-remember (m - S i) as n eqn:Hn.
-replace m with (S (n + i)) in Hkrm |-* by flia Hn Him.
-clear m Him Hn.
-revert k Hkrm.
-induction n; intros. {
-  cbn - [ "/" ].
-  now rewrite Nat.div_1_r.
-}
-remember (S n + i) as m; cbn; subst m.
-rewrite fold_ff_app.
-rewrite Nat.add_succ_l.
-rewrite <- IHn. {
-  rewrite Nat.div_div; [ easy | easy | ].
-  now apply Nat.pow_nonzero.
-}
-now apply Nat.div_lt_upper_bound.
-Qed.
-
 (* to be completed
-Theorem rngl_product_summation_distr_comb : ∀ m n (f : nat → nat → T),
+Theorem rngl_product_summation_distr_prodn : ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-    ∑ (l ∈ all_comb_loop (repeat (seq 1 n) m)),
+    ∑ (l ∈ list_prodn (repeat (seq 1 n) m)),
       ∏ (i = 1, m), f i (ff_app l (i - 1)).
 Proof.
 intros * Hmz.
@@ -2554,14 +2403,14 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite Nat.add_comm, Nat.add_sub.
   easy.
 }
-cbn - [ all_comb_loop ].
+cbn - [ list_prodn ].
 remember (∑ (j = 1, n), f (S (S m)) j) as b eqn:Hb.
 cbn.
 rewrite flat_map_concat_map.
 ...
 rewrite IHm; [ | easy ].
 ...
-remember (all_comb_loop (repeat _ _)) as ll' eqn:Hll'.
+remember (list_prodn (repeat _ _)) as ll' eqn:Hll'.
 cbn; subst ll'.
 ...
 (*
@@ -2573,7 +2422,7 @@ Compute (
   let m := mat_nrows M in
   let n := mat_ncols M in
   ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-  ∑ (l ∈ all_comb_loop (repeat (seq 1 n) m)),
+  ∑ (l ∈ list_prodn (repeat (seq 1 n) m)),
     ∏ (i = 1, m), f i (ff_app l (i - 1))
 ).
 *)
@@ -2688,9 +2537,9 @@ cbn - [ det ].
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
 Print all_comb.
-Print all_comb_loop.
+Print list_prodn.
 Check @rngl_product_summation_distr.
-  rewrite rngl_product_summation_distr_comb; [ | easy ].
+  rewrite rngl_product_summation_distr_prodn; [ | easy ].
   erewrite rngl_summation_list_eq_compat. 2: {
     intros i Hi.
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].

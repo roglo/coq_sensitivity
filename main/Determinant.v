@@ -95,14 +95,6 @@ Arguments det' M%M.
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-Definition det'' (M : matrix T) :=
-  let n := mat_nrows M in
-  ∑ (k = 0, n ^ n - 1),
-    ε (to_radix n k) *
-    ∏ (i = 1, n), mat_el M i (ff_app (to_radix n k) (i - 1) + 1).
-
-Arguments det'' M%M.
-
 (*
 [[a;b;c];[d;e;f];[g;h;i]]
 a and all combinations of [[d;e;f];[g;h;i]] ++
@@ -110,18 +102,18 @@ b and all combinations of [[d;e;f];[g;h;i]] ++
 c and all combinations of [[d;e;f];[g;h;i]]
 *)
 
-Fixpoint all_comb_loop {A} (ll : list (list A)) :=
+Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => []
   | [l] => map (λ y, [y]) l
-  | l :: ll' => flat_map (λ a, map (cons a) (all_comb_loop ll')) l
+  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
   end.
 
-Definition all_comb n := all_comb_loop (repeat (seq 1 n) n).
+Definition all_comb n := list_prodn (repeat (seq 1 n) n).
 
 (*
 Compute (all_comb 3).
-Compute (all_comb_loop (repeat (seq 0 10) 2)).
+Compute (list_prodn (repeat (seq 0 10) 2)).
 *)
 
 Definition det''' (M : matrix T) :=
@@ -146,14 +138,13 @@ Proof. easy. Qed.
 
 (*
 End a.
-Compute (length (all_comb_loop [[2;3];[5;7;2];[8;3];[7;2]])).
-Compute (length (all_comb_loop [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
-Compute (length (all_comb_loop [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (all_comb_loop [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (all_comb_loop [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (list_prodn [[2;3];[5;7;2];[8;3];[7;2]])).
+Compute (length (list_prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
+Compute (length (list_prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (list_prodn [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (list_prodn [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
-Arguments det'' {T ro} M%M.
 Arguments det''' {T ro} M%M.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
@@ -161,15 +152,12 @@ Import Q.Notations.
 Open Scope Q_scope.
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det' M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det'' M).
 Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in det''' M).
 Compute (let M := mk_mat [] in det M).
 Compute (let M := mk_mat [] in det' M).
-Compute (let M := mk_mat [] in det'' M).
 Compute (let M := mk_mat [] in det''' M).
 Compute (let M := mk_mat [[3]] in det M).
 Compute (let M := mk_mat [[3]] in det' M).
-Compute (let M := mk_mat [[3]] in det'' M).
 Compute (let M := mk_mat [[3]] in det''' M).
 *)
 
@@ -246,9 +234,9 @@ rewrite nat_summation_list_cons.
 now f_equal.
 Qed.
 
-Theorem all_comb_loop_length : ∀ A (ll : list (list A)),
+Theorem list_prodn_length : ∀ A (ll : list (list A)),
   ll ≠ []
-  → length (all_comb_loop ll) = nat_∏ (l ∈ ll), length l.
+  → length (list_prodn ll) = nat_∏ (l ∈ ll), length l.
 Proof.
 intros * Hll.
 revert Hll.
@@ -289,7 +277,7 @@ Theorem all_comb_length : ∀ n, n ≠ 0 → length (all_comb n) = n ^ n.
 Proof.
 intros * Hnz.
 unfold all_comb.
-rewrite all_comb_loop_length; [ | now destruct n ].
+rewrite list_prodn_length; [ | now destruct n ].
 rewrite nat_product_same_length with (n := n). 2: {
   intros l Hl.
   apply repeat_spec in Hl; subst l.
@@ -335,8 +323,8 @@ easy.
 Qed.
 *)
 
-Theorem all_comb_loop_with_nil : ∀ A (ll : list (list A)),
-  [] ∈ ll → all_comb_loop ll = [].
+Theorem list_prodn_with_nil : ∀ A (ll : list (list A)),
+  [] ∈ ll → list_prodn ll = [].
 Proof.
 intros * Hll.
 induction ll as [| l1]; [ easy | cbn ].
@@ -352,9 +340,9 @@ apply in_map_iff in Hll'.
 now destruct Hll' as (a & Hll' & Hal1).
 Qed.
 
-Theorem in_all_comb_loop_iff : ∀ m n l,
+Theorem in_list_prodn_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
-  ↔ l ∈ all_comb_loop (repeat (seq 1 m) n).
+  ↔ l ∈ list_prodn (repeat (seq 1 m) n).
 Proof.
 intros.
 split. {
@@ -436,11 +424,11 @@ Theorem in_all_comb_iff : ∀ n l,
   ↔ l ∈ all_comb n.
 Proof.
 intros.
-now apply in_all_comb_loop_iff.
+now apply in_list_prodn_iff.
 Qed.
 
-Theorem NoDup_all_comb_loop : ∀ m n,
-  NoDup (all_comb_loop (repeat (seq 1 m) n)).
+Theorem NoDup_list_prodn_repeat : ∀ m n,
+  NoDup (list_prodn (repeat (seq 1 m) n)).
 Proof.
 intros.
 revert m.
@@ -462,7 +450,7 @@ replace (l :: ll) with (repeat (seq 1 m) n). 2: {
 }
 clear l ll Hl Hll.
 specialize (IHn m) as H1.
-remember (all_comb_loop (repeat (seq 1 m) n)) as ll eqn:Hll.
+remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
 rewrite flat_map_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
@@ -498,7 +486,7 @@ Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
 Proof.
 intros n.
 unfold all_comb.
-apply NoDup_all_comb_loop.
+apply NoDup_list_prodn_repeat.
 Qed.
 
 (* det and det' are equal *)
@@ -631,186 +619,7 @@ apply Nat.sub_lt; [ | easy ].
 apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
 Qed.
 
-(* det' and det'' are equal *)
-
-Theorem det'_is_det'' :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
-  ∀ (M : matrix T), det' M = det'' M.
-Proof.
-intros Hop Heq *.
-unfold det''.
-remember (mat_nrows M) as n eqn:Hn.
-unfold det'.
-rewrite <- Hn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  now move Hnz at top; subst n.
-}
-specialize (fact_neq_0 n) as Hfnz.
-specialize (Nat.pow_nonzero n n Hnz) as Hpnz.
-erewrite rngl_summation_change_var. 2: {
-  intros i Hi.
-  apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
-  flia Hi Hfnz.
-}
-rewrite Nat.sub_0_r.
-replace (λ i, canon_sym_gr_list n i) with (canon_sym_gr_list n) by easy.
-rewrite <- Nat.sub_succ_l; [ | flia Hfnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-replace (map _ _) with (canon_sym_gr_list_list n) by easy.
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros i Hi.
-  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
-    apply in_map_iff in Hi.
-    destruct Hi as (j & Hji & Hj); subst i.
-    apply in_seq in Hj.
-    now apply canon_sym_gr_list_is_permut.
-  }
-  easy.
-}
-cbn.
-symmetry.
-erewrite rngl_summation_change_var. 2: {
-  intros i Hi.
-  apply to_radix_inv_to_radix with (n := n).
-  flia Hi Hpnz.
-}
-rewrite Nat.sub_0_r.
-replace (λ i, to_radix n i) with (to_radix n) by easy.
-rewrite <- Nat.sub_succ_l; [ | flia Hpnz ].
-rewrite Nat.sub_succ, Nat.sub_0_r.
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros l Hl.
-  rewrite to_radix_to_radix_inv; cycle 1. {
-    apply in_map_iff in Hl.
-    destruct Hl as (j & Hjl & Hj).
-    rewrite <- Hjl.
-    apply to_radix_length.
-  } {
-    intros i Hi.
-    apply in_map_iff in Hl.
-    destruct Hl as (j & Hjl & Hj).
-    rewrite <- Hjl in Hi.
-    apply (In_nth _ _ 0) in Hi.
-    destruct Hi as (k & Hkj & Hk).
-    now subst i; apply to_radix_ub.
-  }
-  easy.
-}
-cbn.
-replace (map _ _) with (to_radix_list n) by easy.
-symmetry.
-assert (Hincl : canon_sym_gr_list_list n ⊂ to_radix_list n). {
-  intros l Hl.
-  apply in_map_iff in Hl.
-  apply in_map_iff.
-  destruct Hl as (i & Hil & Hi).
-  subst l.
-  apply in_seq in Hi; cbn in Hi.
-  destruct Hi as (_, Hi).
-  exists (to_radix_inv n (canon_sym_gr_list n i)).
-  rewrite to_radix_to_radix_inv; cycle 1. {
-    apply canon_sym_gr_list_length.
-  } {
-    intros j Hj.
-    apply (In_nth _ _ 0) in Hj.
-    rewrite canon_sym_gr_list_length in Hj.
-    destruct Hj as (k & Hkn & Hj).
-    subst j.
-    now apply canon_sym_gr_list_ub.
-  }
-  split; [ easy | ].
-  apply in_seq.
-  split; [ easy | cbn ].
-  specialize to_radix_inv_ub as H1.
-  specialize (H1 n (canon_sym_gr_list n i) Hnz).
-  rewrite canon_sym_gr_list_length in H1.
-  apply H1.
-  intros j Hj.
-  now apply canon_sym_gr_list_ub.
-}
-assert (H :
-  ∑ (l ∈ to_radix_list n),
-  ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
-  ∑ (l ∈ to_radix_list n),
-  if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
-    ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
-  else 0). {
-  apply rngl_summation_list_eq_compat.
-  intros l Hl.
-  destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
-  assert (H : ε l = 0%F). {
-    apply ε_when_dup; [ easy | easy | ].
-    intros Hnd.
-    apply H1; clear H1.
-    apply in_map_iff.
-    apply in_map_iff in Hl.
-    destruct Hl as (i & Hil & Hi).
-    exists (canon_sym_gr_list_inv n l).
-    assert (Hp : is_permut n l). {
-      unfold is_permut.
-      split; [ split | ]; [ | easy | ]. 2: {
-        rewrite <- Hil.
-        apply to_radix_length.
-      }
-      intros j Hj.
-      rewrite <- Hil in Hj |-*.
-      apply (In_nth _ _ 0) in Hj.
-      destruct Hj as (k & Hki & Hij).
-      rewrite to_radix_length.
-      subst j.
-      now apply to_radix_ub.
-    }
-    split; [ now apply canon_sym_gr_list_canon_sym_gr_list_inv | ].
-    apply in_seq.
-    split; [ easy | ].
-    rewrite Nat.add_0_l.
-    now apply canon_sym_gr_list_inv_ub.
-  }
-  rewrite H.
-  now apply rngl_mul_0_l; left.
-}
-rewrite H.
-apply rngl_summation_list_incl; [ | | easy ]. {
-  unfold canon_sym_gr_list_list.
-  apply (NoDup_map_iff 0).
-  rewrite seq_length.
-  intros * Hi Hj Hij.
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  cbn in Hij.
-  now apply (canon_sym_gr_list_inj n).
-} {
-  unfold to_radix_list.
-  apply (NoDup_map_iff 0).
-  rewrite seq_length.
-  intros * Hi Hj Hij.
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  cbn in Hij.
-  now apply (to_radix_inj n).
-}
-Qed.
-
-(* det' and det'' are equal *)
-
-Theorem det_is_det'' :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
-  rngl_has_eqb = true →
-  ∀ (M : matrix T),
-  is_square_matrix M = true
-  → det M = det'' M.
-Proof.
-intros Hic Hop Hiv H10 Heq * Hsm.
-rewrite <- det'_is_det''; [ | easy | easy ].
-now apply det_is_det'.
-Qed.
-
 (* det' and det''' are equal *)
-(* my aim is to remove det'' and rename det''' into det'' *)
 
 Theorem det'_is_det''' :
   rngl_has_opp = true →
@@ -2961,14 +2770,11 @@ End a.
 
 Arguments det {T ro} M%M.
 Arguments det' {T}%type {ro} M%M.
-Arguments det'' {T}%type {ro} M%M.
 Arguments det''' {T}%type {ro} M%M.
 Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
-Arguments det_is_det'' {T}%type {ro rp} Hic Hop Hiv H10 Hde M%M.
-Arguments det'_is_det'' {T}%type {ro rp} Hop Hde M%M.
 Arguments det'_is_det''' {T ro rp} _ _ M%M.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
