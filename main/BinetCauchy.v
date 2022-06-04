@@ -2534,6 +2534,25 @@ Proof.
 intros * Hmz.
 revert n.
 induction m; intros; [ easy | clear Hmz; cbn ].
+remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l]. {
+Print mat_el.
+Abort.
+End a.
+Require Import RnglAlg.Nrl.
+Compute (
+  let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
+  let f := mat_el M in
+  let m := mat_nrows M in
+  let n := mat_ncols M - 1 in
+(*
+  map (λ i, map (λ j, f i j) (seq 1 n)) (seq 1 m)
+*)
+  ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
+  ∑ (l ∈ all_comb_loop (repeat (seq 1 n) m)),
+    ∏ (i = 1, m), f i (S (ff_app l (i - 1)))
+).
+(* donc c'est pas bon *)
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
