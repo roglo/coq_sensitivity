@@ -2389,7 +2389,7 @@ remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l]. {
   apply List_eq_repeat_nil in Hll; subst m.
   rewrite rngl_product_only_one.
-  rewrite <- rngl_summation_list_change_var.
+  rewrite rngl_summation_list_map.
   unfold iter_seq at 1.
   rewrite Nat_sub_succ_1.
   apply rngl_summation_list_eq_compat.
@@ -2399,10 +2399,10 @@ destruct ll as [| l]. {
 (**)
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
-  now rewrite <- rngl_summation_list_change_var.
+  now rewrite rngl_summation_list_map.
 }
 cbn - [ ff_app list_prodn ].
 rewrite rngl_summation_summation_list_swap.

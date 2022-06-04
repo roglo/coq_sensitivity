@@ -687,7 +687,7 @@ replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
   apply map_id.
 }
 rewrite <- map_map.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 assert (H1 :
   ∑ (l ∈ map (map pred) (all_comb n)),
   ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
@@ -2281,7 +2281,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn.
 unfold canon_sym_gr_list_list.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {
@@ -2498,7 +2498,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn.
 unfold canon_sym_gr_list_list.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
 rewrite Nat.add_0_l.
 erewrite rngl_summation_eq_compat. 2: {

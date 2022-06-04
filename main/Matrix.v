@@ -1666,7 +1666,7 @@ rewrite fold_vect_size.
 symmetry.
 rewrite <- Hcarb.
 rewrite map2_diag.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation. 2: {
   intros H; apply Harc in H.
   now rewrite H in Hi.
@@ -1698,7 +1698,7 @@ erewrite rngl_summation_eq_compat. 2: {
   rewrite fold_vect_size.
   rewrite Hcbv.
   rewrite map2_diag.
-  rewrite <- rngl_summation_list_change_var.
+  rewrite rngl_summation_list_map.
   rewrite rngl_summation_seq_summation. 2: {
     intros H; rewrite <- Hcbv in H.
     apply Hbrc in H.
@@ -1719,7 +1719,7 @@ rewrite map2_map_l.
 rewrite <- seq_shift.
 rewrite map2_map_l.
 rewrite map2_diag.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation. 2: {
   intros H; rewrite <- Hcbv in H.
   apply Hbrc in H.
@@ -1811,7 +1811,7 @@ rewrite Ha. 2: {
 rewrite map2_map2_seq_r with (d := 0%F).
 rewrite fold_vect_size, Hcav.
 rewrite map2_diag.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation. 2: {
   rewrite <- Hcav; intros H.
   apply Harc in H.
@@ -1827,7 +1827,7 @@ rewrite Ha. 2: {
 rewrite map2_map2_seq_r with (d := 0%F).
 rewrite fold_vect_size, Hcav.
 rewrite map2_diag.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation. 2: {
   rewrite <- Hcav; intros H.
   apply Harc in H.
@@ -1880,7 +1880,7 @@ rewrite Ha. 2: {
 }
 rewrite Hcav.
 do 2 rewrite map2_diag.
-do 2 rewrite <- rngl_summation_list_change_var.
+do 2 rewrite rngl_summation_list_map.
 assert (Hvz : vect_size V ≠ 0). {
   intros H; rewrite <- Hcav in H.
   apply Harc in H.

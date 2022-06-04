@@ -676,9 +676,9 @@ intros.
 apply rngl_summation_list_mul_summation_list.
 Qed.
 
-Theorem rngl_summation_list_change_var :
+Theorem rngl_summation_list_map :
   ∀ A B (f : A → B) (g : B → _) l,
-  ∑ (i ∈ l), g (f i) = ∑ (j ∈ map f l), g j.
+  ∑ (j ∈ map f l), g j = ∑ (i ∈ l), g (f i).
 Proof.
 intros.
 unfold iter_list.
@@ -691,7 +691,7 @@ Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   → ∑ (i = b, e), f i = ∑ (i ∈ map h (seq b (S e - b))), f (g i).
 Proof.
 intros * Hgh.
-rewrite <- rngl_summation_list_change_var.
+rewrite rngl_summation_list_map.
 rewrite fold_iter_seq.
 apply rngl_summation_list_eq_compat.
 intros i Hi.
@@ -761,9 +761,9 @@ Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
-Arguments rngl_summation_list_change_var {T ro} (_ _)%type.
 Arguments rngl_summation_list_concat {T ro rp} A%type ll%list.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
+Arguments rngl_summation_list_map {T ro} (_ _)%type.
 Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.
