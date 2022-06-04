@@ -2545,6 +2545,24 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
+destruct m; [ easy | ].
+rewrite rngl_product_split_last; [ | now apply -> Nat.succ_le_mono ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
+}
+cbn - [ all_comb_loop ].
+remember (∑ (j = 1, n), f (S (S m)) j) as b eqn:Hb.
+cbn.
+rewrite flat_map_concat_map.
+...
+rewrite IHm; [ | easy ].
+...
+remember (all_comb_loop (repeat _ _)) as ll' eqn:Hll'.
+cbn; subst ll'.
 ...
 (*
 End a.
