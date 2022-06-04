@@ -2543,16 +2543,18 @@ Require Import RnglAlg.Nrl.
 Compute (
   let M := mk_mat [[1;2;3];[4;5;6];[7;8;9]] in
   let f := mat_el M in
-  let m := mat_nrows M in
-  let n := mat_ncols M in
+  let m := (*mat_nrows M*)2 in
+  let n := (*mat_ncols M*)2 in
 (*
   all_comb_loop (repeat (seq 1 n) m)).
 *)
 (*
-  map (λ i, map (λ j, f i j) (seq 1 n)) (seq 1 m)
+  map (λ i, map (λ j, f i j) (seq 1 n)) (seq 1 m)).
 *)
   ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
   ∑ (l ∈ all_comb_loop (repeat (seq 1 n) m)),
+    ∏ (i = 1, m), f i (S (ff_app l (i - 1)))
+...
     ∏ (i = 1, m), f i (S (ff_app l (i - 1)))
 ).
 (* donc c'est pas bon *)
