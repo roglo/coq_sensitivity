@@ -2486,7 +2486,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
     now destruct Hif; left.
   }
   erewrite rngl_summation_list_eq_compat. 2: {
-    intros i Hi.
+    intros l1 Hl1.
+    erewrite rngl_product_eq_compat. 2: {
+      intros i Hi.
+      now rewrite fold_ff_app.
+    }
+    cbn.
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     easy.
   }
