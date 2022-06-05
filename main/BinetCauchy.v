@@ -2482,15 +2482,9 @@ cbn - [ det ].
   (∑ (l ∈ all_comb m),
    ε l * ∏ (i = 1, m), mat_el B (ff_app k (i - 1)) (ff_app l (i - 1)))
 *)
-(* next step: prove that
-    (∑ (l ∈ all_comb m),
-     ε l * ∏ (i = 1, m), mat_el B (ff_app k (i - 1)) (ff_app l (i - 1)))
-   is equal to
-     det (B_{k1..km})
-*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  replace (∑ (i ∈ all_comb m), ε i * ∏ (_ = _, _), _) with
+  replace (∑ (i ∈ all_comb m), ε i * ∏ (j = _, _), _) with
     (det (mat_select_rows l B)). 2: {
     generalize Hl; intros H.
     apply in_list_prodn_iff in H.
@@ -2501,6 +2495,40 @@ erewrite rngl_summation_list_eq_compat. 2: {
       intros j Hj.
       now apply Hln.
     }
+    rewrite det'_is_det''; try now destruct Hif. 2: {
+      rewrite mat_select_rows_nrows; congruence.
+    }
+    unfold det''.
+    rewrite mat_select_rows_nrows, Hlm.
+    apply rngl_summation_list_eq_compat.
+    intros l1 Hl1.
+    f_equal.
+    apply rngl_product_eq_compat.
+    intros i Hi.
+    unfold mat_select_rows, mat_el; cbn.
+    rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
+    assert (H1 : ff_app l1 (i - 1) - 1 < m). {
+      unfold ff_app.
+      apply in_list_prodn_iff in Hl1.
+      destruct Hl1 as (_ & Hl1m & Hl1).
+      specialize (Hl1 (nth (i - 1) l1 0)).
+      assert (H : nth (i - 1) l1 0 ∈ l1). {
+        apply nth_In; rewrite Hl1m; flia Hi.
+      }
+      specialize (Hl1 H); clear H.
+      flia Hl1.
+    }
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length, Hbc ].
+    rewrite seq_nth; [ | now rewrite Hbc ].
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+cbn - [ det ].
+(*
+  ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
+  ∏ (j = 1, m), mat_el A j (ff_app k (j - 1)) * det (mat_select_rows k B)
+*)
 ...
   remember (det'' (mat_select_rows l B)) as d eqn:H.
   generalize H; intros Hd.
