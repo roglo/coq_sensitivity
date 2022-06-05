@@ -15,14 +15,6 @@ Notation "'∏' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c * g)%F) 1%F)
   (at level 35, i at level 0, l at level 60).
 
-Notation "'nat_∏' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, c * g) 1)
-  (at level 35, i at level 0, b at level 60, e at level 60).
-
-Notation "'nat_∏' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c * g) 1)
-  (at level 35, i at level 0, l at level 60).
-
 Section a.
 
 Context {T : Type}.
@@ -624,21 +616,6 @@ rewrite Nat.add_comm, Nat.add_sub.
 destruct k; [ easy | ].
 rewrite List_nth_succ_cons.
 now rewrite Nat_sub_succ_1.
-Qed.
-
-(* *)
-
-Theorem nat_product_list_cons : ∀ A a la (f : A → nat),
-  nat_∏ (i ∈ a :: la), f i = f a * nat_∏ (i ∈ la), f i.
-Proof.
-intros.
-apply iter_list_cons. {
-  apply Nat.mul_1_l.
-} {
-  apply Nat.mul_1_r.
-} {
-  apply Nat.mul_assoc.
-}
 Qed.
 
 End a.

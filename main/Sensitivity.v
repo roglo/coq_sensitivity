@@ -9,6 +9,7 @@ Require Import Utf8 Arith.
 Import List List.ListNotations.
 Require Import Init.Nat.
 Require Import Misc SortingFun IterAdd.
+Require Import NatRingLike.
 
 (* adjacent vertices of a cube graph in any dimension;
    a vertex is represented by a natural number. *)
@@ -1317,7 +1318,7 @@ apply IHl.
 Qed.
 
 Theorem Nat_pow_from_sum : ∀ a n, a * n ≠ 0 →
-  n ^ a = (n - 1) * (nat_∑ (i = 0, a - 1), n ^ i) + 1.
+  n ^ a = (n - 1) * (∑ (i = 0, a - 1), n ^ i) + 1.
 Proof.
 intros * Hanz.
 destruct a; [ easy | ].
@@ -1353,9 +1354,9 @@ Qed.
 
 Theorem fold_left_horner_eval_sum : ∀ k n a x,
   fold_left (λ acc i : nat, acc * x + a (n + k - i))
-    (seq (S k) n) (nat_∑ (i = 0, k), a (n + i) * x ^ i) =
+    (seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ i) =
   fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
-    (seq (S k) n) (nat_∑ (i = 0, k), a (n + i) * x ^ (n + i)).
+    (seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ (n + i)).
 Proof.
 intros.
 revert k.
@@ -1379,7 +1380,7 @@ rewrite iter_seq_eq_compat with (h := λ i, a (S n + i) * x ^ i * x)
   rewrite Nat.add_succ_comm.
   now cbn; rewrite Nat.mul_assoc, Nat.mul_shuffle0.
 }
-remember (nat_∑ (i = 0, k), a (S n + i) * x ^ i * x) as y.
+remember (∑ (i = 0, k), a (S n + i) * x ^ i * x) as y.
 unfold iter_seq in Heqy.
 rewrite Nat.sub_0_r in Heqy.
 specialize mul_iter_list_distr_r as H1.
@@ -1387,6 +1388,7 @@ specialize (H1 nat nat x (seq 0 (S k))).
 specialize (H1 (λ i, a (S n + i) * x ^ i)).
 specialize (H1 Nat.add Nat.mul 0).
 cbn - [ seq "+" ] in H1.
+cbn - [ seq "+" ] in Heqy.
 rewrite <- H1 in Heqy. 2: {
   intros; apply Nat.mul_add_distr_r.
 }
@@ -1410,7 +1412,7 @@ Qed.
 
 Theorem horner_is_eval_polyn : ∀ n a x,
   fold_left (λ acc i, acc * x + a (n - i)) (seq 0 (S n)) 0 =
-  nat_∑ (i = 0, n), a i * x ^ i.
+  ∑ (i = 0, n), a i * x ^ i.
 Proof.
 intros.
 rewrite iter_seq_rtl; cycle 1. {
@@ -1437,12 +1439,14 @@ Qed.
 
 Theorem horner_is_eval_polyn2 : ∀ n a x,
   fold_left (λ acc i, acc * x + a i) (seq 0 (S n)) 0 =
-  nat_∑ (i = 0, n), a (n - i) * x ^ i.
+  ∑ (i = 0, n), a (n - i) * x ^ i.
 Proof.
 intros.
 specialize (horner_is_eval_polyn n (λ i, a (n - i)) x) as H1.
 cbn - [ "-" fold_left seq ] in H1.
-rewrite <- H1.
+cbn.
+rewrite <- H1; cbn.
+rewrite Nat.sub_0_r, Nat.sub_diag.
 apply List_fold_left_ext_in.
 intros b c Hb; f_equal; f_equal.
 apply in_seq in Hb.
@@ -1573,7 +1577,10 @@ replace (S (n - 1)) with n in H2 at 1 by flia Hnz.
 replace (S (n - 1)) with (S (n - 1) - 0) by flia Hnz.
 rewrite H2.
 rewrite Nat.mul_0_r, fold_iter_seq.
-apply nat_summation_le_compat.
+specialize @rngl_summation_le_compat as H1.
+specialize (H1 nat).
+specialize (H1 nat_ring_like_op nat_ring_like_prop).
+apply (H1 eq_refl).
 intros i Hi.
 apply Nat.mul_le_mono_r; flia.
 Qed.

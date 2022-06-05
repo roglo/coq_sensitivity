@@ -10,6 +10,7 @@ Import Init.Nat.
 Require Import Misc RingLike IterAdd IterMul.
 Require Import PermutationFun SortingFun.
 Require Import MyVector Matrix PermutSeq Signature.
+Require Import NatRingLike.
 Import matrix_Notations.
 
 Fixpoint member {A} (eqb : A → A → bool) a l :=
@@ -211,28 +212,28 @@ f_equal; [ f_equal | ]. {
 Qed.
 
 Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
-  length (flat_map f l) = nat_∑ (a ∈ l), length (f a).
+  length (flat_map f l) = ∑ (a ∈ l), length (f a).
 Proof.
 intros.
 induction l as [| a]; [ now rewrite iter_list_empty | cbn ].
 rewrite app_length.
-rewrite nat_summation_list_cons.
-now f_equal.
+rewrite rngl_summation_list_cons.
+now cbn; f_equal.
 Qed.
 
 Theorem list_prodn_length : ∀ A (ll : list (list A)),
   ll ≠ []
-  → length (list_prodn ll) = nat_∏ (l ∈ ll), length l.
+  → length (list_prodn ll) = ∏ (l ∈ ll), length l.
 Proof.
 intros * Hll.
 revert Hll.
 induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
 destruct ll as [| l2]. {
   rewrite map_length.
-  rewrite nat_product_list_cons.
+  rewrite rngl_product_list_cons.
   now unfold iter_list; cbn; rewrite Nat.mul_1_r.
 }
-rewrite nat_product_list_cons.
+rewrite rngl_product_list_cons.
 rewrite List_flat_map_length.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
@@ -240,19 +241,19 @@ erewrite iter_list_eq_compat. 2: {
   now rewrite IHll.
 }
 cbn.
-remember (nat_∏ (i ∈ l2 :: ll), length i) as x eqn:Hx.
+remember (∏ (i ∈ l2 :: ll), length i) as x eqn:Hx.
 induction l1 as [| a]; [ easy | cbn ].
-rewrite nat_summation_list_cons.
-now rewrite IHl1.
+rewrite rngl_summation_list_cons.
+now cbn; rewrite IHl1.
 Qed.
 
 Theorem nat_product_same_length : ∀ A (ll : list (list A)) n,
   (∀ l, l ∈ ll → length l = n)
-  → nat_∏ (l ∈ ll), length l = n ^ length ll.
+  → ∏ (l ∈ ll), length l = n ^ length ll.
 Proof.
 intros * Hll.
 induction ll as [| l]; [ now rewrite iter_list_empty | ].
-rewrite nat_product_list_cons; cbn.
+rewrite rngl_product_list_cons; cbn.
 rewrite Hll; [ f_equal | now left ].
 apply IHll.
 intros l1 Hl1.
@@ -272,16 +273,6 @@ rewrite nat_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
-(*
-Fixpoint all_comb_inv_loop r l : nat :=
-  match l with
-  | [] => 0
-  | d :: l' => pred d + r * all_comb_inv_loop r l'
-  end.
-
-Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
-*)
-
 Fixpoint all_comb_inv_loop c r l : nat :=
   match l with
   | [] => c
@@ -289,25 +280,6 @@ Fixpoint all_comb_inv_loop c r l : nat :=
   end.
 
 Definition all_comb_inv := all_comb_inv_loop 0.
-
-(*
-Theorem all_comb_inv_loop_app : ∀ r la lb,
-  all_comb_inv_loop r (la ++ lb) =
-  all_comb_inv_loop r lb * r ^ length la + all_comb_inv_loop c r la.
-Proof.
-intros.
-revert c lb.
-induction la as [| a]; intros; [ now rewrite Nat.mul_1_r, Nat.add_0_r | ].
-cbn.
-rewrite IHla.
-rewrite Nat.mul_add_distr_l.
-rewrite Nat.add_comm, Nat.add_shuffle0.
-rewrite Nat.add_assoc; f_equal; f_equal.
-rewrite Nat.mul_comm, Nat.mul_shuffle0.
-rewrite Nat.mul_assoc.
-easy.
-Qed.
-*)
 
 Theorem list_prodn_with_nil : ∀ A (ll : list (list A)),
   [] ∈ ll → list_prodn ll = [].

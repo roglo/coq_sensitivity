@@ -15,14 +15,6 @@ Notation "'∑' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, l at level 60).
 
-Notation "'nat_∑' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, c + g) 0)
-  (at level 45, i at level 0, b at level 60, e at level 60).
-
-Notation "'nat_∑' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c + g) 0)
-  (at level 45, i at level 0, l at level 60).
-
 Section a.
 
 Context {T : Type}.
@@ -654,42 +646,27 @@ rewrite IHl; symmetry; rewrite IHl.
 apply Nat.add_assoc.
 Qed.
 
-Theorem nat_summation_le_compat: ∀ b e g h,
-  (∀ i, b ≤ i ≤ e → g i ≤ h i)
-  → nat_∑ (i = b, e), g i ≤ nat_∑ (i = b, e), h i.
+Theorem rngl_summation_le_compat :
+  rngl_is_ordered = true →
+  ∀ b e g h,
+  (∀ i, b ≤ i ≤ e → (g i ≤ h i)%F)
+  → (∑ (i = b, e), g i ≤ ∑ (i = b, e), h i)%F.
 Proof.
-intros * Hgh.
+intros Hor * Hgh.
 unfold iter_seq.
 remember (S e - b) as n eqn:Hn.
-remember 0 as a eqn:Ha; clear Ha.
-revert a b Hn Hgh.
-induction n as [| n IHn]; intros; [ easy | cbn ].
-unfold iter_list.
-cbn.
-rewrite fold_left_add_fun_from_0.
-rewrite <- Nat.add_assoc.
-remember (a + _) as x.
-rewrite fold_left_add_fun_from_0.
+revert b Hn Hgh.
+induction n as [| n IHn]; intros; [ now apply rngl_le_refl | ].
+unfold iter_list; cbn.
+do 2 rewrite rngl_add_0_l.
+rewrite fold_left_rngl_add_fun_from_0.
+remember (g b + _)%F as x.
+rewrite fold_left_rngl_add_fun_from_0.
 subst x.
-rewrite <- Nat.add_assoc.
-apply Nat.add_le_mono_l.
-apply Nat.add_le_mono; [ apply Hgh; flia Hn | ].
+apply rngl_add_le_compat; [ easy | apply Hgh; flia Hn | ].
 apply IHn; [ flia Hn | ].
 intros i Hbie.
 apply Hgh; flia Hbie.
-Qed.
-
-Theorem nat_summation_list_cons : ∀ A a la (f : A → nat),
-  nat_∑ (i ∈ a :: la), f i = f a + nat_∑ (i ∈ la), f i.
-Proof.
-intros.
-apply iter_list_cons. {
-  apply Nat.add_0_l.
-} {
-  apply Nat.add_0_r.
-} {
-  apply Nat.add_assoc.
-}
 Qed.
 
 End a.
