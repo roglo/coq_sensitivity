@@ -2527,6 +2527,29 @@ cbn - [ det ].
    is equal to
      det (B_{k1..km})
 *)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  remember (det'' (mat_select_rows l B)) as d eqn:H.
+  generalize H; intros Hd.
+  unfold det'' in Hd.
+  subst d.
+  rewrite mat_select_rows_nrows in Hd.
+  generalize Hl; intros H.
+  apply in_list_prodn_iff in H.
+  destruct H as (_ & Hlm & Hln).
+  rewrite Hlm in Hd.
+  erewrite rngl_summation_list_eq_compat in Hd. 2: {
+    intros l1 Hl1.
+    erewrite rngl_product_eq_compat. 2: {
+      intros i Hi.
+      unfold mat_select_rows; cbn.
+      unfold ff_app.
+Check fold_mat_el.
+Search (list_list_select_rows).
+...
+  specialize list_prodn_length as H1.
+  specialize (H1 _ (list_prodn (repeat (seq 1 n) m))).
+  specialize (list_prodn_length _ (list_prodn (repeat (seq 1 n) m))) as H1.
 ...
 unfold iter_seq at 1.
 rewrite rngl_summation_summation_list_swap.
