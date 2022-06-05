@@ -2573,8 +2573,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det ].
 (*
-  ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
-  ∏ (j = 1, m), mat_el A j (ff_app k (j - 1)) * det (mat_select_rows k B)
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+  ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) * det (mat_select_rows kl B)
 *)
 (*
 Compute (
@@ -2582,9 +2582,17 @@ let m := 3 in
 let n := 4 in
 sub_lists_of_seq_0_n n m
 ).
+Compute (
+let m := 3 in
+let n := 4 in
 list_prodn (repeat (seq 1 n) m)
 ).
 *)
+(* I must prove that
+     det (mat_select_rows kl B) = ε(kl) det (mat_select_rows jl B)
+   where jl is kl ordered
+*)
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
   replace (∏ (i = 1, m), mat_el A i (ff_app k (i - 1))) with
