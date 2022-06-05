@@ -745,6 +745,64 @@ clear - rp Hos.
 now apply rngl_product_summation_distr_from_0.
 Qed.
 
+Theorem rngl_product_summation_distr_prodn :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ m n (f : nat → nat → T),
+  m ≠ 0
+  → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
+    ∑ (l ∈ list_prodn (repeat (seq 1 n) m)),
+      ∏ (i = 1, m), f i (nth (i - 1) l 0%nat).
+Proof.
+intros Hop * Hmz.
+revert n f.
+induction m; intros; [ easy | clear Hmz; cbn ].
+remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l]. {
+  apply List_eq_repeat_nil in Hll; subst m.
+  rewrite rngl_product_only_one.
+  rewrite rngl_summation_list_map.
+  unfold iter_seq at 1.
+  rewrite Nat_sub_succ_1.
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  now rewrite rngl_product_only_one.
+}
+rewrite flat_map_concat_map.
+rewrite rngl_summation_list_concat.
+rewrite rngl_summation_list_map.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_summation_list_map.
+}
+cbn - [ list_prodn nth ].
+destruct m; [ easy | ].
+specialize (IHm (Nat.neq_succ_0 _)).
+rewrite rngl_product_split_first; [ | now apply -> Nat.succ_le_mono ].
+rewrite (rngl_product_shift _ 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+rewrite IHm.
+rewrite Hll.
+unfold iter_seq at 1.
+rewrite rngl_summation_list_mul_summation_list; [ | easy ].
+rewrite Nat_sub_succ_1.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+apply rngl_summation_list_eq_compat.
+intros j Hj.
+symmetry.
+rewrite rngl_product_split_first; [ | flia ].
+rewrite List_nth_0_cons.
+f_equal.
+rewrite (rngl_product_shift _ 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+apply rngl_product_eq_compat.
+intros k Hk.
+rewrite Nat.add_comm, Nat.add_sub.
+destruct k; [ easy | ].
+rewrite List_nth_succ_cons.
+now rewrite Nat_sub_succ_1.
+Qed.
+
 Theorem nat_product_list_cons : ∀ A a la (f : A → nat),
   nat_∏ (i ∈ a :: la), f i = f a * nat_∏ (i ∈ la), f i.
 Proof.
@@ -762,5 +820,6 @@ End a.
 
 Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
-Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
+Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_product_summation_distr {T ro rp} _ (b c m n)%F.
+Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
