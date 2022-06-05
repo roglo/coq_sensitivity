@@ -516,37 +516,15 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (* submatrix with list rows jl *)
-(**)
-Definition list_list_select_rows jl ll :=
-  map (λ i, map (λ j, nth j (nth i ll []) 0%F) (seq 0 (length (hd [] ll)))) jl.
-Definition mat_select_rows jl M :=
-  mk_mat (list_list_select_rows jl (mat_list_list M)).
-
-Definition mat_select_rows'' (jl : list nat) (M : matrix T) :=
+Definition mat_select_rows (jl : list nat) (M : matrix T) :=
   mk_mat (map (λ i, map (λ j, mat_el M i j) (seq 1 (mat_ncols M))) jl).
-
-(*
-End a.
-Require Import RnglAlg.Nrl.
-Print mat_select_rows.
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows _ [0;2;3] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows' _ [0;2;3] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1]] in mat_select_rows _ [0;2;3] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1]] in mat_select_rows' _ [0;2;3] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows _ [2;1] M).
-Compute (let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]] in mat_select_rows' _ [2;1] M).
-*)
 
 (* submatrix with list cols jl *)
 Definition mat_select_cols (jl : list nat) (M : matrix T) :=
-  mk_mat (map (λ i, map (λ j, mat_el M i j) jl) (seq 1 (mat_nrows M))).
-
-Definition mat_select_cols' (jl : list nat) (M : matrix T) :=
   ((mat_select_rows jl M⁺)⁺)%M.
 
 End a.
 
-Arguments list_list_select_rows {T ro} jl%list ll%list.
 Arguments mat_select_rows {T ro} jl%list M%M.
 Arguments mat_select_cols {T ro} jl%list M%M.
 
@@ -555,21 +533,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-
-(*
-Require Import RnglAlg.Nrl.
-Print mat_select_cols.
-About mat_select_cols.
-Arguments mat_select_cols {T}%type {ro} jl%list M%M.
-Arguments mat_select_cols' {T}%type {ro} jl%list M%M.
-Compute (let jl := [0;2;3] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_select_cols jl M = mat_select_cols' jl M).
-Compute (let jl := [] in let M := mk_mat [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1];[8;7;6;5]] in mat_select_cols jl M = mat_select_cols' jl M).
-(* conclusion: la première version se comporte mal si jl=[] ; faut-il donc
-   préférer absolument la version avec la transposée ? sachant que bon,
-   faudra se la taper dans les preuves, en double exemplaire, ici, en
-   plus ? *)
-...
-*)
 
 Theorem sub_lists_of_seq_0_n_1_r : ∀ n,
   sub_lists_of_seq_0_n n 1 = map (λ i, [i]) (seq 0 n).
@@ -723,15 +686,14 @@ Qed.
 Theorem mat_select_rows_nrows : ∀ (A : matrix T) kl,
   mat_nrows (mat_select_rows kl A) = length kl.
 Proof.
-intros.
-cbn; unfold list_list_select_rows.
-now rewrite map_length.
+intros; cbn.
+apply map_length.
 Qed.
 
 Theorem mat_select_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
   → mat_ncols A = length kl
-  → (∀ k, k ∈ kl → k < mat_nrows A)
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
   → is_square_matrix (mat_select_rows kl A) = true.
 Proof.
 intros * Ha Hca Hkc.
@@ -749,8 +711,7 @@ split. {
   destruct kl as [| k]; [ easy | exfalso ].
   clear Hnz; cbn in Hc.
   rewrite List_map_seq_length in Hc.
-  specialize (Hkc k (or_introl eq_refl)).
-  now rewrite Hcra in Hkc.
+  now rewrite Hca in Hc.
 } {
   intros l Hl.
   rewrite mat_select_rows_nrows.
@@ -758,14 +719,14 @@ split. {
   apply in_map_iff in Hl.
   destruct Hl as (a & Hal & Ha).
   subst l.
-  now rewrite List_map_seq_length, fold_mat_ncols.
+  now rewrite List_map_seq_length.
 }
 Qed.
 
 Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   ∀ p q A jl,
   is_correct_matrix A = true
-  → (∀ k, k ∈ jl → k < mat_nrows A)
+  → (∀ k, k ∈ jl → 1 ≤ k ≤ mat_nrows A)
   → mat_ncols A = length jl
   → 1 ≤ p ≤ length jl
   → 1 ≤ q ≤ length jl
@@ -2529,6 +2490,18 @@ cbn - [ det ].
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
+  replace (∑ (i ∈ all_comb m), ε i * ∏ (_ = _, _), _) with
+    (det (mat_select_rows l B)). 2: {
+    generalize Hl; intros H.
+    apply in_list_prodn_iff in H.
+    destruct H as (_ & Hlm & Hln).
+    rewrite det_is_det'; try now destruct Hif. 2: {
+      apply mat_select_rows_is_square; [ easy | congruence | ].
+      rewrite Hbr.
+      intros j Hj.
+      now apply Hln.
+    }
+...
   remember (det'' (mat_select_rows l B)) as d eqn:H.
   generalize H; intros Hd.
   unfold det'' in Hd.
