@@ -690,6 +690,34 @@ intros; cbn.
 apply map_length.
 Qed.
 
+(* to be completed
+Theorem mat_select_rows_ncols : ∀ (A : matrix T) kl,
+  is_correct_matrix A = true
+  → mat_ncols (mat_select_rows kl A) = mat_ncols A.
+Proof.
+intros * Hcm; cbn.
+apply is_scm_mat_iff in Hcm.
+destruct Hcm as (Hcr, Hc).
+...
+unfold mat_ncols in Hcr, Hc |-*.
+destruct A as (ll); cbn in Hcr, Hc |-*.
+rewrite Hc; [ easy | ].
+rewrite (List_map_hd 0).
+unfold mat_ncols; cbn.
+Check List_map_nth_seq.
+Search (map _ (
+...
+unfold mat_select_rows, mat_ncols; cbn.
+...
+destruct A as (ll).
+destruct ll as [| l]; [ now destruct kl | ].
+cbn - [ nth ].
+destruct l as [| a]; [ now destruct kl | ].
+cbn - [ nth ].
+rewrite map_length.
+Qed.
+*)
+
 Theorem mat_select_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -720,6 +748,32 @@ split. {
   destruct Hl as (a & Hal & Ha).
   subst l.
   now rewrite List_map_seq_length.
+}
+Qed.
+
+Theorem mat_select_cols_is_square : ∀ kl (A : matrix T),
+  is_correct_matrix A = true
+  → mat_nrows A = length kl
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_ncols A)
+  → is_square_matrix (mat_select_cols kl A) = true.
+Proof.
+intros * Ha Hca Hkc.
+destruct (Nat.eq_dec (mat_ncols A) 0) as [Hcz| Hcz]. {
+  apply is_scm_mat_iff in Ha.
+  destruct Ha as (Hcr & Hc).
+  rewrite Hcr in Hca; [ | easy ].
+  symmetry in Hca; apply length_zero_iff_nil in Hca; subst kl.
+  now cbn; rewrite iter_list_empty.
+}
+unfold mat_select_cols.
+apply mat_transp_is_square.
+apply mat_select_rows_is_square. {
+  now apply mat_transp_is_corr.
+} {
+  rewrite mat_transp_ncols.
+  now apply Nat.eqb_neq in Hcz; rewrite Hcz.
+} {
+  now rewrite mat_transp_nrows.
 }
 Qed.
 
@@ -2529,6 +2583,23 @@ cbn - [ det ].
   ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
   ∏ (j = 1, m), mat_el A j (ff_app k (j - 1)) * det (mat_select_rows k B)
 *)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros k Hk.
+  replace (∏ (i = 1, m), mat_el A i (ff_app k (i - 1))) with
+    (det (mat_select_cols k A)). 2: {
+    rewrite det_is_det'; try now destruct Hif. 2: {
+      apply in_list_prodn_iff in Hk.
+      destruct Hk as (_ & Hkm & Hk).
+      apply mat_select_cols_is_square; [ easy | congruence | ].
+      now rewrite Hac.
+    }
+    rewrite det'_is_det''; try now destruct Hif. 2: {
+      unfold mat_select_cols.
+      rewrite mat_transp_nrows.
+...
+      rewrite mat_select_rows_ncols.
+    }
+    unfold det''.
 ...
   remember (det'' (mat_select_rows l B)) as d eqn:H.
   generalize H; intros Hd.
