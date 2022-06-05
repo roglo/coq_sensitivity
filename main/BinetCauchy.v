@@ -2576,6 +2576,15 @@ cbn - [ det ].
   ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
   ∏ (j = 1, m), mat_el A j (ff_app k (j - 1)) * det (mat_select_rows k B)
 *)
+(*
+Compute (
+let m := 3 in
+let n := 4 in
+sub_lists_of_seq_0_n n m
+).
+list_prodn (repeat (seq 1 n) m)
+).
+*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros k Hk.
   replace (∏ (i = 1, m), mat_el A i (ff_app k (i - 1))) with
