@@ -2496,30 +2496,37 @@ erewrite rngl_summation_list_eq_compat. 2: {
     easy.
   }
   cbn.
-...
   rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  easy.
+}
+cbn - [ det ].
+rewrite rngl_summation_summation_list_swap.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros l1 Hl1.
-    rewrite rngl_mul_assoc.
-...
-    easy.
-  }
-  cbn.
-...
-  rewrite rngl_summation_mul_summation.
-  rewrite <- rngl_summation_mul_summation; [ | now destruct Hif; left ].
-...
-    replace (ε l * _)%F with (ε l * ∏ (i = 1, m), mat_el A i (ff_app l1 (
     rewrite rngl_mul_comm; [ | now destruct Hif ].
-    rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
     rewrite <- rngl_mul_assoc.
     easy.
   }
+  cbn.
+  rewrite <- rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
   easy.
 }
 cbn - [ det ].
-Check rngl_product_summation_distr.
+(*
+  ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
+  ∏ (i = 1, m), mat_el A i (ff_app k (i - 1)) *
+  (∑ (l ∈ all_comb m),
+   ε l * ∏ (i = 1, m), mat_el B (ff_app k (i - 1)) (ff_app l (i - 1)))
+*)
+(* next step: prove that
+    (∑ (l ∈ all_comb m),
+     ε l * ∏ (i = 1, m), mat_el B (ff_app k (i - 1)) (ff_app l (i - 1)))
+   is equal to
+     det (B_{k1..km})
+*)
 ...
 unfold iter_seq at 1.
 rewrite rngl_summation_summation_list_swap.
