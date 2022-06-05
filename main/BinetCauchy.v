@@ -2476,9 +2476,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det ].
 (*
-  ∑ (i ∈ all_comb m),
-  ε i *
-  ∏ (j = 1, m), (∑ (k = 1, n), mat_el A j k * mat_el B k (ff_app i (j - 1)))
+  ∑ (l ∈ all_comb m),
+  ε l *
+  ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j (ff_app l (i - 1)))
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
