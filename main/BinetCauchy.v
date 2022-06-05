@@ -2496,13 +2496,20 @@ erewrite rngl_summation_list_eq_compat. 2: {
     easy.
   }
   cbn.
-(* ouais, non, il faut que le "i" disparaisse dans le premier produit *)
 ...
-  rewrite rngl_product_summation_distr; [ | now destruct Hif; left ].
-  do 2 rewrite Nat_sub_succ_1.
-  rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
+  rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros l1 Hl1.
+    rewrite rngl_mul_assoc.
+...
+    easy.
+  }
+  cbn.
+...
+  rewrite rngl_summation_mul_summation.
+  rewrite <- rngl_summation_mul_summation; [ | now destruct Hif; left ].
+...
+    replace (ε l * _)%F with (ε l * ∏ (i = 1, m), mat_el A i (ff_app l1 (
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
