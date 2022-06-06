@@ -2638,10 +2638,27 @@ Compute (
   ∏ (i0 = 1, m), mat_el A i0 (ff_app i (i0 - 1)) *
   ε i * det (mat_select_rows (isort Nat.leb i) B) =
 *)
+(*
+  (if is_sorted Nat.leb i then
+  det (mat_select_cols i A) else 0%Z) *
+  det (mat_select_rows i B) =
+*)
+(*
+  det (mat_select_cols i A) *
+  (if is_sorted Nat.leb i then
+   det (mat_select_rows i B) else 0%Z) =
+*)
+(*
   (if is_sorted Nat.leb i then
   det (mat_select_cols i A) else 0%Z) *
   (if is_sorted Nat.leb i then
    det (mat_select_rows i B) else 0%Z) =
+*)
+(*
+  (if is_sorted Nat.leb i then
+     det (mat_select_cols i A) * det (mat_select_rows i B)
+   else 0) =
+*)
 (* non
   det (mat_select_cols (isort Nat.leb i) A) *
    det (mat_select_rows (isort Nat.leb i) B) =
