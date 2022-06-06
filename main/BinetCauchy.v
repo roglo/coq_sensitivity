@@ -2382,11 +2382,43 @@ now rewrite seq_nth.
 Qed.
 
 (* to be completed
-Theorem det_isort_rows : ∀ A kl,
-  det (mat_select_rows kl A) =
-    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+Theorem det_isort_rows : in_charac_0_field →
+  ∀ A kl,
+  is_correct_matrix A = true
+  → mat_ncols A = length kl
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
+  → det (mat_select_rows kl A) =
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
-intros.
+intros Hif * Hcm Hac Hkl.
+destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
+  apply length_zero_iff_nil in Hkz; subst kl.
+  cbn; rewrite ε_nil; symmetry.
+  apply rngl_mul_1_l.
+}
+rewrite det_is_det'; try now destruct Hif. 2: {
+  now apply mat_select_rows_is_square.
+}
+rewrite det'_is_det''; try now destruct Hif. 2: {
+  now rewrite mat_select_rows_nrows.
+}
+rewrite det_is_det'; try now destruct Hif. 2: {
+  apply mat_select_rows_is_square; [ easy | | ]. {
+    now rewrite isort_length.
+  } {
+    intros k Hk.
+    apply Hkl.
+    now apply in_isort in Hk.
+  }
+}
+rewrite det'_is_det''; try now destruct Hif. 2: {
+  rewrite mat_select_rows_nrows.
+  now rewrite isort_length.
+}
+unfold det''.
+do 2 rewrite mat_select_rows_nrows.
+rewrite isort_length.
+...
 (*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
@@ -2399,7 +2431,7 @@ Compute (
     (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
 ).
 *)
-Abort.
+...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
