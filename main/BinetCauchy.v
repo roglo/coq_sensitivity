@@ -2398,8 +2398,8 @@ Compute (
   det (mat_select_rows kl A) =
     (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
 ).
-...
 *)
+Abort.
 
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -2634,11 +2634,18 @@ Compute (
   let A := mk_mat [[-1;2;-3];[4;5;-6]]%Z in
   let B := mk_mat [[7;8];[9;10];[11;12]]%Z in
   ∑ (i ∈ list_prodn (repeat (seq 1 n) m)),
-(
+(*
+  ∏ (i0 = 1, m), mat_el A i0 (ff_app i (i0 - 1)) *
+  ε i * det (mat_select_rows (isort Nat.leb i) B) =
+*)
   (if is_sorted Nat.leb i then
   det (mat_select_cols i A) else 0%Z) *
   (if is_sorted Nat.leb i then
-   det (mat_select_rows i B) else 0%Z)) =
+   det (mat_select_rows i B) else 0%Z) =
+(* non
+  det (mat_select_cols (isort Nat.leb i) A) *
+   det (mat_select_rows (isort Nat.leb i) B) =
+*)
   ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
   det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
