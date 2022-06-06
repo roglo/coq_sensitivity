@@ -2666,6 +2666,7 @@ Compute (
   ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
   det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
+(*
  map (map S) (sub_lists_of_seq_0_n n m)).
 list_prodn (repeat (seq 1 n) m)).
 let i := [3;3] in
@@ -2675,6 +2676,7 @@ let i := [3;3] in
   ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
   det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
+*)
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.

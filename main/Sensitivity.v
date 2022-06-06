@@ -1415,26 +1415,15 @@ Theorem horner_is_eval_polyn : ∀ n a x,
   ∑ (i = 0, n), a i * x ^ i.
 Proof.
 intros.
-rewrite iter_seq_rtl; cycle 1. {
-  apply Nat.add_0_l.
-} {
-  apply Nat.add_0_r.
-} {
-  apply Nat.add_comm.
-} {
-  apply Nat.add_assoc.
-}
-rewrite Nat.add_0_r; cbn.
-rewrite Nat.sub_0_r.
+rewrite rngl_summation_rtl.
+rewrite Nat.add_0_r.
 specialize (fold_left_horner_eval_sum 0 n a x) as H1.
 rewrite Nat.add_0_r in H1.
-unfold iter_seq, iter_list in H1.
-cbn in H1.
-rewrite Nat.add_0_r, Nat.mul_1_r in H1.
-rewrite H1.
+do 2 rewrite rngl_summation_only_one, Nat.add_0_r in H1.
+rewrite Nat.pow_0_r, Nat.mul_1_r in H1; cbn.
+rewrite Nat.sub_0_r, H1.
 unfold iter_seq, iter_list.
-rewrite Nat.sub_0_r; cbn.
-now rewrite Nat.sub_0_r.
+now cbn; rewrite Nat.sub_0_r.
 Qed.
 
 Theorem horner_is_eval_polyn2 : ∀ n a x,
