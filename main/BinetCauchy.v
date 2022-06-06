@@ -2384,12 +2384,22 @@ Qed.
 (* to be completed
 Theorem det_isort_rows : ∀ A kl,
   det (mat_select_rows kl A) =
-    (ε kl * det (mat_select_rows (isort Nat.eqb kl) A))%F.
+    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros.
-Require Import MyVector.
-Search (_ * det _)%F.
+(*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let m := 2 in
+  let n := 3 in
+  let A := mk_mat [[1;2];[3;4];[5;6]]%Z in
+  let kl := [3;2] in
+  det (mat_select_rows kl A) =
+    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
+).
 ...
+*)
 
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -2400,10 +2410,25 @@ Theorem cauchy_binet_formula : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → det (A * B) =
-     ∑ (jl ∈ sub_lists_of_seq_0_n n m),
+     ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
+(*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let m := 2 in
+  let n := 3 in
+map (map S) (sub_lists_of_seq_0_n n m)).
+  let A := mk_mat [[1;2;3];[4;5;6]]%Z in
+  let B := mk_mat [[7;8];[9;10];[11;12]]%Z in
+     det (A * B) =
+     ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
+     det (mat_select_cols jl A) * det (mat_select_rows jl B)
+).
+...
+*)
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   move Hmz at top; subst m.
   apply is_scm_mat_iff in Hcb.
@@ -2599,13 +2624,39 @@ list_prodn (repeat (seq 1 n) m)
 *)
 (* I must prove that
      det (mat_select_rows kl B) = ε(kl) det (mat_select_rows jl B)
-   where jl is kl ordered
+   where jl is ordered kl
 *)
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let m := 2 in
+  let n := 3 in
+  let A := mk_mat [[-1;2;-3];[4;5;-6]]%Z in
+  let B := mk_mat [[7;8];[9;10];[11;12]]%Z in
+  ∑ (i ∈ list_prodn (repeat (seq 1 n) m)),
+(
+  (if is_sorted Nat.leb i then
+  det (mat_select_cols i A) else 0%Z) *
+  (if is_sorted Nat.leb i then
+   det (mat_select_rows i B) else 0%Z)) =
+  ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
+  det (mat_select_cols jl A) * det (mat_select_rows jl B)
+).
+ map (map S) (sub_lists_of_seq_0_n n m)).
+list_prodn (repeat (seq 1 n) m)).
+let i := [3;3] in
+ det (mat_select_rows i B)).
+  ∑ (i ∈ list_prodn (repeat (seq 1 n) m)),
+  ∏ (i0 = 1, m), mat_el A i0 (ff_app i (i0 - 1)) * det (mat_select_rows i B) =
+  ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)),
+  det (mat_select_cols jl A) * det (mat_select_rows jl B)
+).
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
 (**)
   replace (det (mat_select_rows kl B)) with
-    (ε kl * det (mat_select_rows (isort Nat.eqb kl) B))%F. 2: {
+    (ε kl * det (mat_select_rows (isort Nat.leb kl) B))%F. 2: {
 ...
     symmetry; apply det_isort_rows.
 ...
