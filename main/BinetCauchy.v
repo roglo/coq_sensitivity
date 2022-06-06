@@ -2382,6 +2382,15 @@ now rewrite seq_nth.
 Qed.
 
 (* to be completed
+Theorem det_isort_rows : ∀ A kl,
+  det (mat_select_rows kl A) =
+    (ε kl * det (mat_select_rows (isort Nat.eqb kl) A))%F.
+Proof.
+intros.
+Require Import MyVector.
+Search (_ * det _)%F.
+...
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -2592,9 +2601,25 @@ list_prodn (repeat (seq 1 n) m)
      det (mat_select_rows kl B) = ε(kl) det (mat_select_rows jl B)
    where jl is kl ordered
 *)
-...
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros k Hk.
+  intros kl Hkl.
+(**)
+  replace (det (mat_select_rows kl B)) with
+    (ε kl * det (mat_select_rows (isort Nat.eqb kl) B))%F. 2: {
+...
+    symmetry; apply det_isort_rows.
+...
+  }
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+  replace (ε kl * ∏ (i = 1, m), mat_el A i (ff_app kl (i - 1)))%F with
+    (det (mat_select_cols (isort Nat.eqb kl) A)). 2: {
+...
+  }
+  easy.
+}
+cbn - [ det ].
+...
   replace (∏ (i = 1, m), mat_el A i (ff_app k (i - 1))) with
     (det (mat_select_cols k A)). 2: {
     rewrite det_is_det'; try now destruct Hif. 2: {
