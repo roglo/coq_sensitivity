@@ -2436,8 +2436,9 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 symmetry.
 remember (length kl) as n eqn:Hn.
 symmetry.
-set (g := isort_rank Nat.leb).
-erewrite rngl_summation_list_change_var with (g0 := g).
+...
+rewrite isort_isort_rank with (d := 0).
+erewrite rngl_summation_list_change_var with (h := isort_rank Nat.leb).
 (* truc comme ça... *)
 ...
 rewrite rngl_summation_list_map.
