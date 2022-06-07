@@ -2391,9 +2391,9 @@ Theorem det_isort_rows : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl.
+(*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
-(*
 Compute (
   let A := mk_mat [[1;2;3];[4;5;6];[-7;8;9];[10;-11;12]]%Z in
   let kl := [1;4;3] in
@@ -2436,16 +2436,19 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 symmetry.
 remember (length kl) as n eqn:Hn.
 ...
+isort_isort_rank:
+  ∀ (A : Type) (rel : A → A → bool) (d : A) (l : list A),
+    isort rel l = map (λ i : nat, nth i l d) (isort_rank rel l)
 (*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
-  let m := 2 in
-  let n := 3 in
-  let A := mk_mat [[1;2];[3;4];[5;6]]%Z in
-  let kl := [3;2] in
-  det (mat_select_rows kl A) =
-    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
+  let A := mk_mat [[1;2;3];[4;5;6];[-7;8;9];[10;-11;12]]%Z in
+  let kl := [1;4;3] in
+  let n := length kl in
+  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app l (i - 1)) =
+  ∑ (i ∈ all_comb n),
+  ε kl * ε i * ∏ (i0 = 1, n), mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))
 ).
 *)
 ...
