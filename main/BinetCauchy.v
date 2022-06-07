@@ -2391,6 +2391,16 @@ Theorem det_isort_rows : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+(*
+Compute (
+  let A := mk_mat [[1;2;3];[4;5;6];[-7;8;9];[10;-11;12]]%Z in
+  let kl := [1;4;3] in
+  det (mat_select_rows kl A) =
+    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
+).
+*)
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -2424,6 +2434,7 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite rngl_mul_assoc.
 }
 symmetry.
+remember (length kl) as n eqn:Hn.
 ...
 (*
 Require Import RnglAlg.Zrl.
