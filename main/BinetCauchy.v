@@ -2435,6 +2435,12 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 }
 symmetry.
 remember (length kl) as n eqn:Hn.
+symmetry.
+set (g := isort_rank Nat.leb).
+erewrite rngl_summation_list_change_var with (g0 := g).
+(* truc comme ça... *)
+...
+rewrite rngl_summation_list_map.
 ...
 isort_isort_rank:
   ∀ (A : Type) (rel : A → A → bool) (d : A) (l : list A),

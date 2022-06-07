@@ -621,17 +621,26 @@ rewrite List_fold_left_map.
 now apply rngl_summation_list_eq_compat.
 Qed.
 
+Theorem rngl_summation_list_change_var : ∀ A B (l : list A) f g (h : _ → B),
+  (∀ i, i ∈ l → g (h i) = i)
+  → ∑ (i ∈ l), f i = ∑ (i ∈ map h l), f (g i).
+Proof.
+intros * Hgh.
+rewrite rngl_summation_list_map.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+now rewrite Hgh.
+Qed.
+
 Theorem rngl_summation_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
   → ∑ (i = b, e), f i = ∑ (i ∈ map h (seq b (S e - b))), f (g i).
 Proof.
 intros * Hgh.
-rewrite rngl_summation_list_map.
-rewrite fold_iter_seq.
-apply rngl_summation_list_eq_compat.
+apply rngl_summation_list_change_var.
 intros i Hi.
 apply in_seq in Hi.
-rewrite Hgh; [ easy | ].
+apply Hgh.
 flia Hi.
 Qed.
 
@@ -681,6 +690,7 @@ Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
+Arguments rngl_summation_list_change_var {T ro} (A B)%type l%list.
 Arguments rngl_summation_list_concat {T ro rp} A%type ll%list.
 Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_map {T ro} (_ _)%type.
