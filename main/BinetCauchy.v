@@ -2435,7 +2435,16 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 }
 symmetry.
 remember (length kl) as n eqn:Hn.
-symmetry.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let A := mk_mat [[1;2];[3;-4];[-5;6]]%Z in
+  let kl := [3;1] in
+  let n := length kl in
+  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app l (i - 1)) =
+  ∑ (i ∈ all_comb n),
+  ε kl * ε i * ∏ (i0 = 1, n), mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))
+).
 ...
 rewrite isort_isort_rank with (d := 0).
 erewrite rngl_summation_list_change_var with (h := isort_rank Nat.leb).
