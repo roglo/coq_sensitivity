@@ -2437,6 +2437,18 @@ symmetry.
 remember (length kl) as n eqn:Hn.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
+Open Scope Z_scope.
+Compute (
+  let A := mk_mat [[1;2];[3;-4];[-5;6]]%Z in
+  let kl := [3;1]%nat in
+  let n := length kl in
+(
+  map (λ l, (ε l, map (λ i, mat_el (mat_select_rows kl A) i (ff_app l (i - 1))) (seq 1 n))) (all_comb n) =
+  map (λ i,
+  (ε i, map (λ i0, mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))) (seq 1 n))) (all_comb n)
+)%F
+).
+...
 Compute (
   let A := mk_mat [[1;2];[3;-4];[-5;6]]%Z in
   let kl := [3;1] in
