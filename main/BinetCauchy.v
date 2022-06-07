@@ -2418,6 +2418,12 @@ rewrite det'_is_det''; try now destruct Hif. 2: {
 unfold det''.
 do 2 rewrite mat_select_rows_nrows.
 rewrite isort_length.
+rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+symmetry; erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  now rewrite rngl_mul_assoc.
+}
+symmetry.
 ...
 (*
 Require Import RnglAlg.Zrl.
