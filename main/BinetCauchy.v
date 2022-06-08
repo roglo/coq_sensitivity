@@ -2485,6 +2485,20 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   apply permutation_nth with (d := []); [ easy | ].
   rewrite map_length, all_comb_length; [ | easy ].
   split; [ easy | ].
+  exists (λ i, all_comb_inv i (g1 (nth i (all_comb n) []))).
+  split; [ | split ]. 3: {
+    intros i Hi.
+    unfold g1, h1.
+    rewrite (List_map_nth' []).
+    erewrite map_ext_in. 2: {
+      intros j Hj.
+      replace (...
+(* ouais, en fait, j'en sais rien, je fais ça au pif *)
+...
+Compute (all_comb_inv 3 [1;1;3]).
+Check map_map.
+Check all_comb_inv.
+Check (λ i, g1 (nth i (all_comb n) [])).
 ...
 apply rngl_summation_list_eq_compat.
 intros l Hl.
