@@ -2447,22 +2447,39 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
       apply in_isort_rank_lt in Hi.
       now rewrite isort_rank_length in Hi.
     }
-    easy.
+Search (nth _ (isort_rank _ _)).
+rewrite nth_isort_rank_of_nodup_sorted.
+...
   }
-  unfold collapse at 2.
-  remember (isort_rank Nat.leb kl) as l' eqn:Hl'.
-Search (map _  (isort_rank _ _)).
+...
+Search (map (λ _, nth _ _ _)).
+rewrite nth_nth_nth_map.
+...
   specialize (isort_isort_rank Nat.leb 0) as H1.
 ...
-  specialize (H1 (map (λ i, nth i (isort_rank Nat.leb (collapse kl)) 0) l)).
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    rewrite H1.
+    unfold collapse.
+    rewrite fold_collapse.
+    easy.
+  }
+
+...
+  unfold collapse at 2.
+  remember (isort_rank Nat.leb kl) as l' eqn:Hl'.
+...
+  specialize (H1 (map (λ i, nth i l 0) (isort_rank Nat.leb kl))).
   symmetry in H1.
   erewrite map_ext_in in H1. 2: {
     intros i Hi.
-    rewrite (List_map_nth' 0).
+    rewrite (List_map_nth' 0). 2: {
+      apply in_isort_rank_lt in Hi.
+      now rewrite map_length in Hi.
+    }
     easy.
-    apply in_isort_rank_lt in Hi.
-    now rewrite map_length in Hi.
   }
+  rewrite <- Hl' in H1.
 ...
   rewrite collapse_idemp in H1.
 ...
