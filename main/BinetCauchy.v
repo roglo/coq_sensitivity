@@ -2437,7 +2437,7 @@ symmetry.
 remember (length kl) as n eqn:Hn.
 set (g1 := λ l, map (λ j, nth j l 0) (collapse kl)).
 set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
-erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
+assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   intros l Hl.
   unfold g1, h1.
   erewrite map_ext_in. 2: {
@@ -2472,16 +2472,33 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   rewrite Hjl.
   apply isort_rank_is_permut_list.
 }
-rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
-    with (l2 := all_comb n); cycle 1. {
+erewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
+assert (Heql : equality (list_eqb Nat.eqb)). {
   intros la lb.
   apply list_eqb_eq_iff.
   unfold equality.
   apply Nat.eqb_eq.
-} {
+}
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. 2: {
+  apply permutation_nth with (d := []); [ easy | ].
+  rewrite map_length, all_comb_length; [ | easy ].
+  split; [ easy | ].
+...
+nth (f x) (map h1 (all_comb n)) []) = h1 (nth (f x) (all_comb n) [])
+Check List_map_nth'.
+...
+Compute (
+  let kl := [5;1;2] in
+  let h1 := λ l : list nat, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let n := length kl in
+  map h1 (all_comb n)
+).
+...
   clear - Hn.
   symmetry in Hn.
   subst h1.
+...
   revert kl Hn.
   induction n; intros; [ easy | ].
   cbn - [ seq ].
@@ -2493,6 +2510,11 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     move Hll at top; subst n.
     now apply length_zero_iff_nil in Hn; subst kl.
   }
+...
+Search (permutation _ (flat_map _ _)).
+Search (permutation _ (concat _)).
+rewrite flat_map_concat_map.
+Search (map (concat _)).
 ...
 Check permutation_swap.
   ∀ (A : Type) (eqb rel : A → A → bool), equality eqb → ∀ l : list A, permutation eqb l (isort rel l)
