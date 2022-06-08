@@ -2435,9 +2435,49 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 }
 symmetry.
 remember (length kl) as n eqn:Hn.
+set (g1 := λ l, map (λ j, nth j l 0) (collapse kl)).
+(* g1 a l'air bon, d'après des tests ci-dessous, mais h1, faut voir *)
+...
+set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
+  intros l Hl.
+  unfold g1, h1.
+  unfold collapse.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' 0).
+  easy.
+}
+  specialize (isort_isort_rank Nat.leb 0) as H1.
+  specialize (H1 (map (λ j, nth j l 0)) (isort_rank Nat.leb kl)).
+Search (map _ (isort_rank _ _)).
+rewrite <- isort_isort_rank.
+...
+Check isort_isort_rank.
+Compute (isort_rank Nat.leb [4;3;1]).
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
+Compute (
+  let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
+  let kl := [1;4;3]%nat in
+  let n := length kl in
+  let f := filter (λ x, negb (Z.eqb (fst x) 0)) in
+  let g1 := λ l, map (λ j, nth j l 0%nat) (collapse kl) in
+(
+  (f (map (λ l, (ε (g1 l), map (λ i, mat_el (mat_select_rows kl A) i (ff_app (g1 l) (i - 1))) (seq 1 n))) (all_comb n))) =
+  f (map (λ i,
+  (ε kl * ε i, map (λ i0, mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))) (seq 1 n))) (all_comb n))
+)%F
+).
+...
+(
+  (f (map (λ l, (ε l, map (λ i, mat_el (mat_select_rows kl A) i (ff_app (map (λ j, nth j l 0) (isort_rank Nat.leb kl)) (i - 1))) (seq 1 n))) (all_comb n))) =
+  f (map (λ i,
+  (ε i, map (λ i0, mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))) (seq 1 n))) (all_comb n))
+)%F
+).
+...
 Compute (
   let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
   let kl := [1;4;3]%nat in
