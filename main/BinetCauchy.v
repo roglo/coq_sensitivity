@@ -2479,13 +2479,48 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
+(**)
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. 2: {
   apply permutation_nth with (d := []); [ easy | ].
   rewrite map_length, all_comb_length; [ | easy ].
   split; [ easy | ].
 ...
+apply rngl_summation_list_eq_compat.
+intros l Hl.
+f_equal.
+unfold g1.
+Search (ε (map _ _)).
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (
+  let kl := [5;1;2]%nat in
+  let l := [1;3;2]%nat in
+map (λ l,
+  ε (map (λ j : nat, nth j l 0%nat) (collapse kl)) = (ε kl * ε l)%F)
+  (all_comb 3)
+).
+...
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. 2: {
+  apply permutation_nth with (d := []); [ easy | ].
+  rewrite map_length, all_comb_length; [ | easy ].
+  split; [ easy | ].
+Compute (
+  let kl := [5;1;2] in
+  let h1 := λ l : list nat, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let n := length kl in
+  map h1 (all_comb n)
+).
+...
+  exists (λ i, nth i (map g1 (all_comb n)) []).
+...
 nth (f x) (map h1 (all_comb n)) []) = h1 (nth (f x) (all_comb n) [])
+...
+nth x (all_comb n) [] =
+map (λ j, nth j (nth (f x) (all_comb n) []) 0) (isort_rank Nat.leb kl)
+...
 Check List_map_nth'.
 ...
 Compute (
