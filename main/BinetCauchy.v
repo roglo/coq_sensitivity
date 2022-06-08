@@ -2382,10 +2382,32 @@ now rewrite seq_nth.
 Qed.
 
 (* to be completed
-Theorem all_comb_inv_ub : ∀ n l,
-  all_comb_inv n l < n ^ length l.
+Theorem all_comb_inv_loop_ub : ∀ c n l,
+  n ≠ 0
+  → (∀ i, i < length l → nth i l 0 < n)
+  → all_comb_inv_loop c n l < c * n + n ^ length l.
 Proof.
-intros.
+intros * Hnz Hnl.
+revert c n Hnz Hnl.
+induction l as [| a]; intros; cbn. {
+  destruct n; [ easy | flia ].
+}
+(* mouais, bon, chuis pas sûr... *)
+...
+
+Theorem all_comb_inv_ub : ∀ n l,
+  (∀ i, i < length l → nth i l 0 < n)
+  → all_comb_inv n l < n ^ length l.
+Proof.
+intros * Hnl.
+Print all_comb_inv_loop.
+...
+now specialize (all_comb_inv_loop_ub 0 l Hnl) as H1.
+unfold all_comb_inv.
+revert n Hnl.
+induction l as [| a]; intros; cbn; [ easy | ].
+...
+Check to_radix_inv_ub.
 Print to_radix_inv.
 Compute (
   map (λ l,
