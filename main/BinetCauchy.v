@@ -2436,20 +2436,38 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 symmetry.
 remember (length kl) as n eqn:Hn.
 set (g1 := λ l, map (λ j, nth j l 0) (collapse kl)).
-(* g1 a l'air bon, d'après des tests ci-dessous, mais h1, faut voir *)
-...
-set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb (collapse kl))).
 erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   intros l Hl.
   unfold g1, h1.
-  unfold collapse.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite (List_map_nth' 0).
-  easy.
-}
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite isort_rank_length, collapse_length.
+      apply in_isort_rank_lt in Hi.
+      now rewrite isort_rank_length in Hi.
+    }
+    easy.
+  }
+  unfold collapse at 2.
+  remember (isort_rank Nat.leb kl) as l' eqn:Hl'.
+Search (map _  (isort_rank _ _)).
   specialize (isort_isort_rank Nat.leb 0) as H1.
-  specialize (H1 (map (λ j, nth j l 0)) (isort_rank Nat.leb kl)).
+...
+  specialize (H1 (map (λ i, nth i (isort_rank Nat.leb (collapse kl)) 0) l)).
+  symmetry in H1.
+  erewrite map_ext_in in H1. 2: {
+    intros i Hi.
+    rewrite (List_map_nth' 0).
+    easy.
+    apply in_isort_rank_lt in Hi.
+    now rewrite map_length in Hi.
+  }
+...
+  rewrite collapse_idemp in H1.
+...
+  rewrite <- H1.
+
 Search (map _ (isort_rank _ _)).
 rewrite <- isort_isort_rank.
 ...
