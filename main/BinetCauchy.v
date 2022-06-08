@@ -2439,8 +2439,20 @@ Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
 Compute (
-  let A := mk_mat [[11;12];[21;22];[31;32]]%Z in
-  let kl := [2;1]%nat in
+  let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
+  let kl := [1;4;3]%nat in
+  let n := length kl in
+  let f := filter (λ x, negb (Z.eqb (fst x) 0)) in
+(
+  (f (map (λ l, (ε l, map (λ i, mat_el (mat_select_rows kl A) i (ff_app l (i - 1))) (seq 1 n))) (all_comb n))) =
+  f (map (λ i,
+  (ε i, map (λ i0, mat_el (mat_select_rows (isort Nat.leb kl) A) i0 (ff_app i (i0 - 1))) (seq 1 n))) (all_comb n))
+)%F
+).
+...
+Compute (
+  let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
+  let kl := [1;4;3]%nat in
   let n := length kl in
 (
   map (λ l, (ε l, map (λ i, mat_el (mat_select_rows kl A) i (ff_app l (i - 1))) (seq 1 n))) (all_comb n) =
