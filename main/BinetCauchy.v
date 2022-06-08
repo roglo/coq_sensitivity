@@ -2382,6 +2382,34 @@ now rewrite seq_nth.
 Qed.
 
 (* to be completed
+Theorem all_comb_inv_ub : ∀ n l,
+  all_comb_inv n l < n ^ length l.
+Proof.
+intros.
+Print to_radix_inv.
+Compute (
+  map (λ l,
+  (to_radix_inv 3 (map pred (rev l)), all_comb_inv 3 l)
+  ) (all_comb 3)
+).
+...
+all_comb_inv = all_comb_inv_loop 0
+
+all_comb_inv_loop =
+fix all_comb_inv_loop (c r : nat) (l : list nat) {struct l} : nat :=
+  match l with
+  | [] => c
+  | d :: l' => all_comb_inv_loop (c * r + pred d) r l'
+  end
+
+to_radix_inv =
+fix to_radix_inv (r : nat) (l : list nat) {struct l} : nat :=
+  match l with
+  | [] => 0
+  | d :: l' => d + r * to_radix_inv r l'
+  end
+...
+
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
   is_correct_matrix A = true
@@ -2485,6 +2513,35 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   apply permutation_nth with (d := []); [ easy | ].
   rewrite map_length, all_comb_length; [ | easy ].
   split; [ easy | ].
+  exists (λ i, all_comb_inv n (g1 (nth i (all_comb n) []))).
+  split; [ | split ]. 3: {
+    intros i Hi.
+    unfold g1.
+    rewrite (List_map_nth' []). 2: {
+      rewrite all_comb_length; [ | easy ].
+Search (_ < _ ^ _).
+Check to_radix_inv_ub.
+Print all_comb_inv.
+Print all_comb_inv_loop.
+...
+eapply lt_le_trans.
+apply all_comb_inv_ub.
+now rewrite map_length, collapse_length, Hn.
+...
+    erewrite map_ext_in. 2: {
+      intros j Hj.
+...
+Compute (
+  let n := 3 in
+  let kl := [1;4;3] in
+  let g1 := λ l, map (λ j : nat, nth j l 0) (collapse kl) in
+  let h1 := λ l, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let f := λ i, all_comb_inv n (g1 (nth i (all_comb n) [])) in
+  map (λ x,
+  nth x (all_comb n) [] = nth (f x) (map h1 (all_comb n)) [])
+  (seq 0 (n ^ n))
+).
+...
   exists (λ i, all_comb_inv i (g1 (nth i (all_comb n) []))).
   split; [ | split ]. 3: {
     intros i Hi.
