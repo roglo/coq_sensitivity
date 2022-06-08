@@ -2436,26 +2436,47 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 symmetry.
 remember (length kl) as n eqn:Hn.
 set (g1 := λ l, map (λ j, nth j l 0) (collapse kl)).
-set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb (collapse kl))).
+set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   intros l Hl.
   unfold g1, h1.
   erewrite map_ext_in. 2: {
     intros i Hi.
     rewrite (List_map_nth' 0). 2: {
-      rewrite isort_rank_length, collapse_length.
-      apply in_isort_rank_lt in Hi.
-      now rewrite isort_rank_length in Hi.
+      now apply in_isort_rank_lt in Hi.
     }
-Search (nth _ (isort_rank _ _)).
-rewrite nth_isort_rank_of_nodup_sorted.
-...
+    easy.
   }
+...
+Search (ff_app (isort_rank _ _ _)).
+Search (nth _ (isort_rank _ _ _)).
+Check fold_comp_list.
+Search isort_rank.
+rewrite fold_comp_list.
+    do 2 rewrite fold_ff_app.
+permut_permut_isort:
+  ∀ (i : nat) (l : list nat),
+    is_permut_list l
+    → i < length l → ff_app l (ff_app (isort_rank Nat.leb l) i) = i
+...
+Check isort_isort_rank.
+..
+    unfold ff_app at 1.
+    specialize nth_ff_app_isort_rank as H1.
+    specialize (H1 _ 0 Nat.leb).
+...
+nth_ff_app_isort_rank:
+  ∀ (A : Type) (d : A) (ord : A → A → bool) (l : list A) (i : nat),
+    i < length l
+    → nth (ff_app (isort_rank ord l) i) l d = nth i (isort ord l) d
+...
+    easy.
+  }
+  specialize (isort_isort_rank Nat.leb 0) as H1.
 ...
 Search (map (λ _, nth _ _ _)).
 rewrite nth_nth_nth_map.
 ...
-  specialize (isort_isort_rank Nat.leb 0) as H1.
 ...
   erewrite map_ext_in. 2: {
     intros i Hi.
@@ -2464,7 +2485,6 @@ rewrite nth_nth_nth_map.
     rewrite fold_collapse.
     easy.
   }
-
 ...
   unfold collapse at 2.
   remember (isort_rank Nat.leb kl) as l' eqn:Hl'.
