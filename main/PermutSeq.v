@@ -1096,11 +1096,11 @@ symmetry in Hx, Hy.
 destruct x as [x| ]. {
   apply (List_rank_Some []) in Hx.
   destruct Hx as (Hxs & Hbefx & Hx).
-  apply (list_eqb_eq Nat.eqb_eq) in Hx.
+  apply (list_eqb_eq_iff Nat.eqb_eq) in Hx.
   destruct y as [y| ]. {
     apply (List_rank_Some []) in Hy.
     destruct Hy as (Hys & Hbefy & Hy).
-    apply (list_eqb_eq Nat.eqb_eq) in Hy.
+    apply (list_eqb_eq_iff Nat.eqb_eq) in Hy.
     congruence.
   }
   specialize (List_rank_None [] _ _ Hy) as H1; cbn.
@@ -1179,7 +1179,7 @@ remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
 destruct i as [i| ]. {
   apply List_rank_Some with (d := []) in Hi.
   destruct Hi as (His & Hji & Hi).
-  now apply (list_eqb_eq Nat.eqb_eq) in Hi.
+  now apply (list_eqb_eq_iff Nat.eqb_eq) in Hi.
 }
 assert (H : l ∉ sg). {
   intros H.
@@ -1205,7 +1205,7 @@ remember (List_rank _ _) as j eqn:Hj; symmetry in Hj.
 destruct j as [j| ]. {
   apply List_rank_Some with (d := []) in Hj.
   destruct Hj as (His & Hji & Hj).
-  apply (list_eqb_eq Nat.eqb_eq) in Hj.
+  apply (list_eqb_eq_iff Nat.eqb_eq) in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
   assert (Hjs : j < length sg). {
     destruct (lt_dec j (length sg)) as [Hjs| Hjs]; [ easy | exfalso ].

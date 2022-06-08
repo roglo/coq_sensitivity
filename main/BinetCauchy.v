@@ -2447,69 +2447,62 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     }
     easy.
   }
-...
-Search (ff_app (isort_rank _ _ _)).
-Search (nth _ (isort_rank _ _ _)).
-Check fold_comp_list.
-Search isort_rank.
-rewrite fold_comp_list.
-    do 2 rewrite fold_ff_app.
-permut_permut_isort:
-  ∀ (i : nat) (l : list nat),
-    is_permut_list l
-    → i < length l → ff_app l (ff_app (isort_rank Nat.leb l) i) = i
-...
-Check isort_isort_rank.
-..
-    unfold ff_app at 1.
-    specialize nth_ff_app_isort_rank as H1.
-    specialize (H1 _ 0 Nat.leb).
-...
-nth_ff_app_isort_rank:
-  ∀ (A : Type) (d : A) (ord : A → A → bool) (l : list A) (i : nat),
-    i < length l
-    → nth (ff_app (isort_rank ord l) i) l d = nth i (isort ord l) d
-...
-    easy.
+  unfold collapse.
+  remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
+  rewrite List_map_nth_seq with (d := 0); symmetry.
+  rewrite List_map_nth_seq with (d := 0); symmetry.
+  rewrite map_length, isort_rank_length.
+  replace (length jl) with n. 2: {
+    now rewrite Hjl, isort_rank_length.
   }
-  specialize (isort_isort_rank Nat.leb 0) as H1.
-...
-Search (map (λ _, nth _ _ _)).
-rewrite nth_nth_nth_map.
-...
-...
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    rewrite H1.
-    unfold collapse.
-    rewrite fold_collapse.
-    easy.
+  replace (length l) with n. 2: {
+    now apply in_all_comb_iff in Hl.
+  }
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite isort_rank_length, Hjl.
+    now rewrite isort_rank_length, <- Hn.
+  }
+  do 3 rewrite fold_ff_app.
+  rewrite permut_permut_isort; [ easy | | ]. 2: {
+    now rewrite Hjl, isort_rank_length, <- Hn.
+  }
+  rewrite Hjl.
+  apply isort_rank_is_permut_list.
+}
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); cycle 1. {
+  intros la lb.
+  apply list_eqb_eq_iff.
+  unfold equality.
+  apply Nat.eqb_eq.
+} {
+  clear - Hn.
+  symmetry in Hn.
+  subst h1.
+  revert kl Hn.
+  induction n; intros; [ easy | ].
+  cbn - [ seq ].
+  remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as [| l]. {
+    destruct kl as [| k]; [ easy | ].
+    cbn in Hn; apply Nat.succ_inj in Hn.
+    apply List_eq_repeat_nil in Hll.
+    move Hll at top; subst n.
+    now apply length_zero_iff_nil in Hn; subst kl.
   }
 ...
-  unfold collapse at 2.
-  remember (isort_rank Nat.leb kl) as l' eqn:Hl'.
+Check permutation_swap.
+  ∀ (A : Type) (eqb rel : A → A → bool), equality eqb → ∀ l : list A, permutation eqb l (isort rel l)
 ...
-  specialize (H1 (map (λ i, nth i l 0) (isort_rank Nat.leb kl))).
-  symmetry in H1.
-  erewrite map_ext_in in H1. 2: {
-    intros i Hi.
-    rewrite (List_map_nth' 0). 2: {
-      apply in_isort_rank_lt in Hi.
-      now rewrite map_length in Hi.
-    }
-    easy.
-  }
-  rewrite <- Hl' in H1.
-...
-  rewrite collapse_idemp in H1.
-...
-  rewrite <- H1.
-
-Search (map _ (isort_rank _ _)).
-rewrite <- isort_isort_rank.
-...
-Check isort_isort_rank.
-Compute (isort_rank Nat.leb [4;3;1]).
+Compute (
+  let kl := [5;1;2] in
+  let h1 := λ l : list nat, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let n := length kl in
+  map h1 (all_comb n)
+).
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.

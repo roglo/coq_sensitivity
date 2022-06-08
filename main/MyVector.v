@@ -246,7 +246,7 @@ remember (list_eqb rngl_eqb lu lv) as uv eqn:Huv.
 symmetry in Huv.
 destruct uv. {
   left; f_equal.
-  apply list_eqb_eq in Huv; [ easy | ].
+  apply list_eqb_eq_iff in Huv; [ easy | ].
   unfold equality.
   apply (rngl_eqb_eq Heq).
 } {

@@ -1330,18 +1330,24 @@ Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
       end
   end.
 
-Theorem list_eqb_eq : ∀ A (eqb : A → _),
+Theorem list_eqb_eq_iff : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la lb, list_eqb eqb la lb = true → la = lb.
+  ∀ la lb, list_eqb eqb la lb = true ↔ la = lb.
 Proof.
-intros * Heqb * Hlab.
-revert lb Hlab.
-induction la as [| a]; intros; [ now destruct lb | cbn ].
-destruct lb as [| b]; [ easy | cbn in Hlab ].
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ | easy ].
-apply Heqb in Hab; subst b; f_equal.
-now apply IHla.
+intros * Heqb *.
+split; intros Hlab. {
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | cbn ].
+  destruct lb as [| b]; [ easy | cbn in Hlab ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  apply Heqb in Hab; subst b; f_equal.
+  now apply IHla.
+} {
+  subst lb.
+  induction la as [| a]; [ easy | cbn ].
+  now rewrite (equality_refl Heqb).
+}
 Qed.
 
 Theorem list_eqb_neq : ∀ A (eqb : A → _),
