@@ -2698,11 +2698,80 @@ Theorem list_prodn_elem_ub : ∀ ll n i j,
   → nth i (nth j (list_prodn ll) []) 0 ≤ n.
 Proof.
 intros * Hll.
+destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
+  apply Nat.nlt_ge in Hjll.
+  rewrite (nth_overflow (list_prodn ll)); [ | easy ].
+  now rewrite List_nth_nil.
+}
+destruct (lt_dec i (length ll)) as [Hill| Hill]. 2: {
+  apply Nat.nlt_ge in Hill.
+  rewrite nth_overflow; [ easy | ].
+  etransitivity; [ | apply Hill ].
+Theorem nth_prodn_length : ∀ A (ll : list (list A)) i,
+  i < length (list_prodn ll)
+  → length (nth i (list_prodn ll) []) = length ll.
+Proof.
+intros * Hll.
+revert i Hll.
+induction ll as [| l1]; intros; cbn. {
+  now rewrite Tauto_match_nat_same.
+}
+destruct ll as [| l2]. {
+  cbn in Hll; rewrite map_length in Hll.
+  destruct l1 as [| d]; [ easy | ].
+  now rewrite (List_map_nth' d).
+}
+...
+  now rewrite nth_prodn_length.
+...
+Theorem nth_nth_prodn : ∀ A (d : A) ll i j,
+  ll ≠ []
+  → (∀ l, l ∈ ll → l ≠ [])
+  → nth i (nth j (list_prodn ll) []) d ∈ nth i ll [].
+Proof.
+intros * Hll Hl.
+revert i j.
+induction ll as [| l1]; intros; [ easy | cbn ].
+destruct ll as [| l2]. {
+  destruct i. {
+    destruct (lt_dec j (length l1)) as [Hjll| Hjll]. 2: {
+      apply Nat.nlt_ge in Hjll.
+      rewrite (nth_overflow (map _ _)); [ | now rewrite map_length ].
+...
+    rewrite (List_map_nth' d).
+...
+specialize (nth_nth_prodn 0 ll i j) as H1.
+destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
+  apply Nat.nlt_ge in Hjll.
+  rewrite (nth_overflow (list_prodn ll)); [ | easy ].
+  now rewrite List_nth_nil.
+}
+destruct (lt_dec i (length ll)) as [Hill| Hill]. 2: {
+  apply Nat.nlt_ge in Hill.
+  rewrite nth_overflow; [ easy | ].
+Search (length (nth _ (list_prodn _) _)).
+...
+apply Hll with (l := nth i ll []); [ | easy ].
+apply nth_In.
+...
+  destruct (lt_dec j (length (list_prodn (l1 :: ll)))) as [Hjll| Hjll]. 2: {
+    apply Nat.nlt_ge in Hjll.
+    now rewrite nth_overflow.
+  }
+...
+intros * Hll.
 revert n i j Hll.
 induction ll as [| l1]; intros; [ now destruct j, i | ].
 destruct (lt_dec i (S (length ll))) as [Hill| Hill]. 2: {
   apply Nat.nlt_ge in Hill.
   rewrite nth_overflow; [ easy | ].
+  destruct (lt_dec j (length (list_prodn (l1 :: ll)))) as [Hjll| Hjll]. 2: {
+    apply Nat.nlt_ge in Hjll.
+    now rewrite nth_overflow.
+  }
+Search (length (nth _ _ _)).
+...
+  rewrite list_prodn_length in Hjll; [ | easy ].
 ...
   rewrite nth_list_prodn_same_length with (n := length l1). {
     easy.
