@@ -2420,7 +2420,98 @@ intros * Hnz Hnl.
 now apply all_comb_inv_loop_ub.
 Qed.
 
+Theorem nth_concat_same_length : ∀ A m n (lll : list (list (list A))) i,
+  (∀ ll, ll ∈ lll → length ll = m)
+  → (∀ ll, ll ∈ lll → ∀ l, l ∈ ll → length l = n)
+  → i < length lll * m
+  → length (nth i (concat lll) []) = n.
+Proof.
+intros * Hlll Hll Hi.
+revert i Hi.
+induction lll as [| ll1]; intros; [ easy | cbn ].
+destruct (lt_dec i (length ll1)) as [Hill| Hill]. {
+  rewrite app_nth1; [ | easy ].
+  apply Hll with (ll := ll1); [ now left | ].
+  now apply nth_In.
+}
+apply Nat.nlt_ge in Hill.
+rewrite app_nth2; [ | easy ].
+apply IHlll. {
+  intros ll2 Hll2.
+  now apply Hlll; right.
+} {
+  intros ll2 Hll2 l Hl.
+  apply Hll with (ll := ll2); [ now right | easy ].
+} {
+  cbn in Hi.
+  rewrite Hlll; [ | now left ].
+  rewrite Hlll in Hill; [ | now left ].
+  flia Hi Hill.
+}
+Qed.
+
 (* to be completed
+Theorem nth_list_prodn_same_length : ∀ A n (ll : list (list A)) i,
+  (∀ l, l ∈ ll → length l = n)
+  → i < n ^ length ll
+  → length (nth i (list_prodn ll) []) = length ll.
+Proof.
+intros * Hll Hi.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct ll as [| l]; [ now destruct i | ].
+  now rewrite Nat.pow_0_l in Hi.
+}
+revert n i Hnz Hi Hll.
+induction ll as [| l]; intros; [ now destruct i | cbn ].
+destruct ll as [| l1]. {
+  cbn.
+  specialize (Hll _ (or_introl eq_refl)).
+  subst n.
+  rewrite Nat.pow_1_r in Hi.
+  clear Hnz.
+  revert i Hi.
+  induction l as [| a]; intros; [ easy | cbn ].
+  destruct i; [ easy | ].
+  cbn in Hi; apply Nat.succ_lt_mono in Hi.
+  now apply IHl.
+}
+rewrite flat_map_concat_map.
+apply nth_concat_same_length with (m := n). {
+  intros ll1 Hll1.
+  apply in_map_iff in Hll1.
+  destruct Hll1 as (a & Hll1 & Ha).
+  subst ll1.
+  rewrite map_length.
+...
+destruct lll as [| ll2]. {
+  specialize (Hlll _ (or_introl eq_refl)).
+  rewrite Hlll in Hill |-*.
+  cbn.
+  destruct n; [ easy | cbn in Hi ].
+  exfalso.
+...
+  exfalso.
+  rewrite Hlll in Hill.
+  rewrite Nat.mul_comm in Hi.
+  destruct m; [ easy | ].
+  cbn in Hi, Hill.
+  destruct n; [ easy | cbn in Hi ].
+  destruct n. {
+    cbn in Hi.
+    rewrite Nat.mul_1_r in Hi.
+    flia Hi Hill.
+  }
+  cbn in Hi.
+  rewrite Nat.mul_comm in Hi; cbn in Hi.
+  flia Hi Hill.
+
+apply IHlll.
+...
+apply nth_concat_same_length. 2: {
+  rewrite map_length.
+...
+
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
   is_correct_matrix A = true
@@ -2558,6 +2649,16 @@ destruct ll as [| l]. {
 *)
 intros * Hi.
 unfold all_comb.
+...
+rewrite nth_list_prodn_same_length with (n := n). {
+  now rewrite repeat_length.
+} {
+  intros l Hl.
+  apply repeat_spec in Hl.
+  rewrite Hl; apply seq_length.
+} {
+  now rewrite repeat_length.
+}
 ...
 Theorem nth_list_prodn_length : ∀ A (ll : list (list A)) i,
   i < ∏ (l ∈ ll), length l
