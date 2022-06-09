@@ -2676,20 +2676,64 @@ Compute (
         rewrite map_length, collapse_length, <- Hn.
         intros j Hj.
         rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
-...
-Theorem glop : ∀ i j n,
-  n ≠ 0 → nth i (nth j (all_comb n) []) 0 < n.
+Theorem all_comb_elem_ub : ∀ i j n,
+  nth i (nth j (all_comb n) []) 0 ≤ n.
 Proof.
-intros * Hnz.
+intros.
+unfold all_comb.
+Search list_prodn.
+Theorem list_prodn_elem_ub : ∀ ll n i j,
+  (∀ l, l ∈ ll → ∀ a, a ∈ l → a ≤ n)
+  → nth i (nth j (list_prodn ll) []) 0 ≤ n.
+Proof.
+intros * Hll.
+destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
+  apply Nat.nlt_ge in Hjll.
+  rewrite (nth_overflow (list_prodn ll)); [ | easy ].
+  now rewrite List_nth_nil.
+}
+remember (nth j (list_prodn ll) []) as l eqn:Hl.
+assert (H1 : l ∈ list_prodn ll). {
+  rewrite Hl.
+  now apply nth_In.
+}
+subst l.
+apply in_list_prodn in H1. 2: {
+  intros l1 Hl1.
+  clear Hjll.
+  revert j l1 H1 Hl1.
+  induction ll as [| l2]; intros; [ easy | ].
+  destruct Hl1 as [Hl1| Hl1]. {
+    subst l2.
+...
+    cbn in H1, Hl.
+    destruct ll as [| l3]. {
+      apply in_map_iff in H1.
+      destruct H1 as (k & H & Hk); subst l.
+      now intros H; subst l1.
+    }
+...
+apply list_prodn_elem_ub.
+...
+intros.
 revert i j.
+induction n; intros; [ now destruct j, i | ].
+cbn - [ seq ].
+...
+    rewrite Tauto_match_nat_same.
 induction n; intros; [ easy | clear Hnz ].
 cbn - [ seq ].
 remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l1]. {
   apply List_eq_repeat_nil in Hll; subst n; cbn.
-  destruct j; cbn. {
-    destruct i; [ | now destruct i ].
-Compute (all_comb 2).
+  destruct j. {
+    destruct i; [ easy | now destruct i ].
+  }
+  rewrite Tauto_match_nat_same.
+  now rewrite List_nth_nil.
+}
+rewrite flat_map_concat_map.
+Search (nth _ (concat _)).
 ...
         assert (H : nth i (all_comb n) [] ∈ all_comb n). {
           apply nth_In.
