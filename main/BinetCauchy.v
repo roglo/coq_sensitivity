@@ -2538,14 +2538,58 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
         assert (H : nth i (all_comb n) [] ∈ all_comb n). {
           apply in_all_comb_iff.
           split; [ easy | ].
-Theorem nth_all_comb_length : ∀ n i d,
-  length (nth i (all_comb n) d) = n.
+Theorem nth_all_comb_length : ∀ n i,
+  i < n ^ n
+  → length (nth i (all_comb n) []) = n.
 Proof.
-intros.
+intros * Hi.
 unfold all_comb.
 Search list_prodn.
-Theorem nth_list_prodn_length :
-  length (nth i (list_prodn ll) d) =
+Theorem nth_list_prodn_length : ∀ A (ll : list (list A)) i,
+  i < ∏ (l ∈ ll), length l
+  → length (nth i (list_prodn ll) []) = length ll.
+Proof.
+intros * Hi.
+revert i Hi.
+induction ll as [| l]; intros. {
+  rewrite iter_list_empty in Hi; [ | easy ].
+  now apply Nat.lt_1_r in Hi; subst i.
+}
+cbn.
+destruct ll as [| l1]. {
+  cbn.
+  rewrite rngl_product_list_only_one in Hi.
+  clear IHll.
+  revert i Hi.
+  induction l as [| a]; intros; [ easy | cbn ].
+  destruct i; [ easy | ].
+  cbn in Hi; apply Nat.succ_lt_mono in Hi.
+  now apply IHl.
+}
+...
+rewrite flat_map_concat_map.
+Search (nth _ (concat _)).
+cbn - [ list_prodn ].
+Search (nth _ (flat_map _ _)).
+...
+rewrite nth_list_prodn_length. 2: {
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros l Hl.
+    apply repeat_spec in Hl.
+    rewrite Hl at 1.
+    rewrite seq_length.
+    easy.
+  }
+  cbn.
+...
+  eapply lt_le_trans; [ apply Hi | ].
+  clear Hi.
+  induction n; [ easy | ].
+  unfold iter_list.
+cbn.
+  cbn - [ iter_list ].
+    apply in_repeat in Hl.
+apply repeat_length.
 ...
 Search all_comb.
 Check In_nth.
