@@ -2450,7 +2450,31 @@ apply IHlll. {
 }
 Qed.
 
-(* to be completed
+Theorem in_list_prodn : ∀ A (ll : list (list A)) l,
+  (∀ l, l ∈ ll → l ≠ [])
+  → l ∈ list_prodn ll
+  → length l = length ll.
+Proof.
+intros * Hlz Hl.
+revert l Hl.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hl.
+destruct ll as [| l2]. {
+  apply in_map_iff in Hl.
+  destruct Hl as (a & Hla & Ha).
+  now subst l.
+}
+cbn.
+apply in_flat_map in Hl.
+destruct Hl as (a & Hl1 & Ha).
+apply in_map_iff in Ha.
+destruct Ha as (l3 & Hl & Hl3).
+subst l; cbn; f_equal.
+apply IHll; [ | easy ].
+intros l4 Hl4.
+now apply Hlz; right.
+Qed.
+
 Theorem nth_list_prodn_same_length : ∀ A n (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l = n)
   → i < n ^ length ll
@@ -2477,41 +2501,54 @@ destruct ll as [| l1]. {
   now apply IHl.
 }
 rewrite flat_map_concat_map.
-apply nth_concat_same_length with (m := n). {
+apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   intros ll1 Hll1.
   apply in_map_iff in Hll1.
   destruct Hll1 as (a & Hll1 & Ha).
   subst ll1.
   rewrite map_length.
-...
-destruct lll as [| ll2]. {
-  specialize (Hlll _ (or_introl eq_refl)).
-  rewrite Hlll in Hill |-*.
-  cbn.
-  destruct n; [ easy | cbn in Hi ].
-  exfalso.
-...
-  exfalso.
-  rewrite Hlll in Hill.
-  rewrite Nat.mul_comm in Hi.
-  destruct m; [ easy | ].
-  cbn in Hi, Hill.
-  destruct n; [ easy | cbn in Hi ].
-  destruct n. {
-    cbn in Hi.
-    rewrite Nat.mul_1_r in Hi.
-    flia Hi Hill.
-  }
-  cbn in Hi.
-  rewrite Nat.mul_comm in Hi; cbn in Hi.
-  flia Hi Hill.
-
-apply IHlll.
-...
-apply nth_concat_same_length. 2: {
+  rewrite list_prodn_length; [ | easy ].
+  apply nat_product_same_length.
+  intros l2 Hl2.
+  now apply Hll; right.
+} {
+  intros ll1 Hll1 l2 Hl2.
+  apply in_map_iff in Hll1.
+  destruct Hll1 as (a & Hll1 & Ha).
+  subst ll1.
+  apply in_map_iff in Hl2.
+  destruct Hl2 as (l3 & Hl3 & Hl2).
+  subst l2; cbn; f_equal.
+  apply in_list_prodn in Hl2; [ easy | ].
+  intros l4 Hl4.
+  specialize (Hll _ (or_intror Hl4)).
+  destruct l4; [ | easy ].
+  now symmetry in Hll.
+} {
   rewrite map_length.
-...
+  rewrite Hll; [ | now left ].
+  now rewrite <- Nat.pow_succ_r'.
+}
+Qed.
 
+Theorem nth_all_comb_length : ∀ n i,
+  i < n ^ n
+  → length (nth i (all_comb n) []) = n.
+Proof.
+intros * Hi.
+unfold all_comb.
+rewrite nth_list_prodn_same_length with (n := n). {
+  apply repeat_length.
+} {
+  intros l Hl.
+  apply repeat_spec in Hl; subst l.
+  apply seq_length.
+} {
+  now rewrite repeat_length.
+}
+Qed.
+
+(* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
   is_correct_matrix A = true
@@ -2627,28 +2664,19 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
         intros j Hj.
         rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
         assert (H : nth i (all_comb n) [] ∈ all_comb n). {
-          apply in_all_comb_iff.
-          split; [ easy | ].
-Theorem nth_all_comb_length : ∀ n i,
-  i < n ^ n
-  → length (nth i (all_comb n) []) = n.
-Proof.
-(*
-intros * Hi.
-unfold all_comb.
-revert i Hi.
-induction n; intros; [ now destruct i | ].
-rewrite seq_S; cbn.
-rewrite <- seq_S.
-remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l]. {
-  apply List_eq_repeat_nil in Hll; subst n.
-  now apply Nat.lt_1_r in Hi; subst i.
-}
+          apply nth_In.
+          now rewrite all_comb_length.
+        }
 ...
-*)
-intros * Hi.
-unfold all_comb.
+        apply in_all_comb_iff in H.
+        destruct H as (_ & Hnc & Hcn).
+        specialize (Hcn (nth j (collapse kl) 0)) as H1.
+...
+        specialize (Hgh _ H).
+        unfold g1, h1 in Hgh.
+        rewrite <- Hgh.
+        rewrite (List_map_nth' 0).
+        rewrite (List_map_nth' 0).
 ...
 rewrite nth_list_prodn_same_length with (n := n). {
   now rewrite repeat_length.
