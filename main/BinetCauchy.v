@@ -2548,6 +2548,17 @@ rewrite nth_list_prodn_same_length with (n := n). {
 }
 Qed.
 
+(* to be moved to Misc.v *)
+Theorem list_all_nth_prop : ∀ A (P : A → Prop) l d,
+  (∀ x, x ∈ l → P x)
+  → ∀ i, i < length l → P (nth i l d).
+Proof.
+intros * HP.
+intros i Hi.
+apply HP.
+now apply nth_In.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2689,6 +2700,37 @@ Proof.
 intros * Hll.
 revert n i j Hll.
 induction ll as [| l1]; intros; [ now destruct j, i | ].
+destruct (lt_dec i (S (length ll))) as [Hill| Hill]. 2: {
+  apply Nat.nlt_ge in Hill.
+  rewrite nth_overflow; [ easy | ].
+...
+  rewrite nth_list_prodn_same_length with (n := length l1). {
+    easy.
+  } {
+    intros l Hl.
+    destruct Hl as [Hl| Hl]; [ now subst l | ].
+...
+apply list_all_nth_prop. 2: {
+...
+  rewrite nth_list_prodn_same_length with (n := length l1). {
+    cbn.
+...
+intros a Ha.
+destruct j. {
+  apply Hll with (l := l1); [ now left | ].
+  cbn in Ha.
+  destruct ll as [| l2]. {
+    rewrite (List_map_nth' 0) in Ha.
+    destruct Ha as [Ha| Ha]; [ subst a | easy ].
+    apply nth_In.
+...
+apply (In_nth _ _ 0) in Ha.
+destruct Ha as (k & Hkl & H).
+subst a.
+
+Search (_ ∈ _ → ∃ _, _).
+
+Search (_ → _ (nth _ _ _)).
 cbn.
 destruct ll as [| l2]. {
   destruct (lt_dec j (length l1)) as [Hjl1| Hjl1]. 2: {
