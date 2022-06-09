@@ -2558,7 +2558,7 @@ destruct ll as [| l]. {
 *)
 intros * Hi.
 unfold all_comb.
-Search list_prodn.
+...
 Theorem nth_list_prodn_length : ∀ A (ll : list (list A)) i,
   i < ∏ (l ∈ ll), length l
   → length (nth i (list_prodn ll) []) = length ll.
@@ -2581,6 +2581,16 @@ destruct ll as [| l1]. {
   now apply IHl.
 }
 rewrite flat_map_concat_map.
+Theorem length_nth_concat_same_length : ∀ A n i (lll : list (list (list A))),
+  (∀ ll, ll ∈ lll → ∀ l, l ∈ ll → length l = n)
+  → i < n ^ n
+  → length (nth i (concat lll) []) = n.
+...
+rewrite (@length_nth_concat_same_length _ (length (l :: l1 :: ll))).
+easy.
+2: {
+Search (∏ (_ ∈ _), _ = _ ^ _).
+rewrite nat_product_same_length with (n := length (l :: l1 :: ll)) in Hi; [ easy | ].
 ...
 Fixpoint nth_concat {A} i (ll : list (list A)) d :=
   match ll with
