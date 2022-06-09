@@ -2687,6 +2687,39 @@ Theorem list_prodn_elem_ub : ∀ ll n i j,
   → nth i (nth j (list_prodn ll) []) 0 ≤ n.
 Proof.
 intros * Hll.
+revert n i j Hll.
+induction ll as [| l1]; intros; [ now destruct j, i | ].
+cbn.
+destruct ll as [| l2]. {
+  destruct (lt_dec j (length l1)) as [Hjl1| Hjl1]. 2: {
+    apply Nat.nlt_ge in Hjl1.
+    rewrite (nth_overflow (map _ _)); [ | now rewrite map_length ].
+    now rewrite List_nth_nil.
+  }
+  rewrite (List_map_nth' 0); [ | easy ].
+  destruct i. {
+    cbn.
+    apply Hll with (l := l1); [ now left | ].
+    now apply nth_In.
+  }
+  now cbn; rewrite Tauto_match_nat_same.
+}
+destruct i. {
+  destruct l1 as [| a1]. {
+    now cbn; rewrite Tauto_match_nat_same.
+  }
+  apply Hll with (l := a1 :: l1); [ now left | ].
+  rewrite flat_map_concat_map.
+  cbn - [ In list_prodn ].
+  destruct (lt_dec j (length (list_prodn (l2 :: ll)))) as [Hjll| Hjll]. {
+    rewrite app_nth1; [ | now rewrite map_length ].
+    rewrite (List_map_nth' []); [ now left | easy ].
+  }
+  apply Nat.nlt_ge in Hjll.
+  rewrite app_nth2; [ | now rewrite map_length ].
+  rewrite map_length.
+...
+intros * Hll.
 destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
   apply Nat.nlt_ge in Hjll.
   rewrite (nth_overflow (list_prodn ll)); [ | easy ].
