@@ -2542,6 +2542,20 @@ Theorem nth_all_comb_length : ∀ n i,
   i < n ^ n
   → length (nth i (all_comb n) []) = n.
 Proof.
+(*
+intros * Hi.
+unfold all_comb.
+revert i Hi.
+induction n; intros; [ now destruct i | ].
+rewrite seq_S; cbn.
+rewrite <- seq_S.
+remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l]. {
+  apply List_eq_repeat_nil in Hll; subst n.
+  now apply Nat.lt_1_r in Hi; subst i.
+}
+...
+*)
 intros * Hi.
 unfold all_comb.
 Search list_prodn.
@@ -2566,6 +2580,22 @@ destruct ll as [| l1]. {
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
   now apply IHl.
 }
+rewrite flat_map_concat_map.
+...
+Fixpoint nth_concat {A} i (ll : list (list A)) d :=
+  match ll with
+  | [] => d
+  | l :: ll' =>
+      if i <? length l then nth i l d
+      else nth_concat (i - length l) ll' d
+  end.
+Check @nth_concat.
+Theorem nth_concat_nth_concat : ∀ A (d : A) i ll,
+  nth i (concat ll) d = nth_concat i ll d.
+...
+rewrite nth_concat_nth_concat.
+...
+Search (nth _ (concat _)).
 ...
 rewrite flat_map_concat_map.
 Search (nth _ (concat _)).
