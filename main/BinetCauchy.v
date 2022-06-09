@@ -2381,57 +2381,46 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
-(* to be completed
 Theorem all_comb_inv_loop_ub : ∀ c n l,
   n ≠ 0
   → (∀ i, i < length l → nth i l 0 < n)
-  → all_comb_inv_loop c n l < c * n + n ^ length l.
+  → all_comb_inv_loop c n l < c * n ^ length l + n ^ length l.
 Proof.
 intros * Hnz Hnl.
 revert c n Hnz Hnl.
 induction l as [| a]; intros; cbn. {
   destruct n; [ easy | flia ].
 }
-(* mouais, bon, chuis pas sûr... *)
-...
+eapply lt_le_trans. {
+  apply IHl; [ easy | ].
+  intros i Hi.
+  apply (Hnl (S i)); cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+rewrite Nat.mul_add_distr_r.
+rewrite Nat.mul_assoc.
+rewrite <- Nat.add_assoc.
+apply Nat.add_le_mono_l.
+remember (pred a * n ^ length l) as x.
+remember (n * n ^ length l) as y.
+replace (n ^ length l) with (1 * n ^ length l) by apply Nat.mul_1_l.
+subst x y.
+rewrite <- Nat.mul_add_distr_r.
+apply Nat.mul_le_mono_r.
+specialize (Hnl 0 (Nat.lt_0_succ _)); cbn in Hnl.
+flia Hnl.
+Qed.
 
 Theorem all_comb_inv_ub : ∀ n l,
-  (∀ i, i < length l → nth i l 0 < n)
+  n ≠ 0
+  → (∀ i, i < length l → nth i l 0 < n)
   → all_comb_inv n l < n ^ length l.
 Proof.
-intros * Hnl.
-Print all_comb_inv_loop.
-...
-now specialize (all_comb_inv_loop_ub 0 l Hnl) as H1.
-unfold all_comb_inv.
-revert n Hnl.
-induction l as [| a]; intros; cbn; [ easy | ].
-...
-Check to_radix_inv_ub.
-Print to_radix_inv.
-Compute (
-  map (λ l,
-  (to_radix_inv 3 (map pred (rev l)), all_comb_inv 3 l)
-  ) (all_comb 3)
-).
-...
-all_comb_inv = all_comb_inv_loop 0
+intros * Hnz Hnl.
+now apply all_comb_inv_loop_ub.
+Qed.
 
-all_comb_inv_loop =
-fix all_comb_inv_loop (c r : nat) (l : list nat) {struct l} : nat :=
-  match l with
-  | [] => c
-  | d :: l' => all_comb_inv_loop (c * r + pred d) r l'
-  end
-
-to_radix_inv =
-fix to_radix_inv (r : nat) (l : list nat) {struct l} : nat :=
-  match l with
-  | [] => 0
-  | d :: l' => d + r * to_radix_inv r l'
-  end
-...
-
+(* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
   is_correct_matrix A = true
@@ -2541,14 +2530,26 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     unfold g1.
     rewrite (List_map_nth' []). 2: {
       rewrite all_comb_length; [ | easy ].
-Search (_ < _ ^ _).
-Check to_radix_inv_ub.
-Print all_comb_inv.
-Print all_comb_inv_loop.
+      eapply lt_le_trans. {
+        apply all_comb_inv_ub; [ easy | ].
+        rewrite map_length, collapse_length, <- Hn.
+        intros j Hj.
+        rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
+        assert (H : nth i (all_comb n) [] ∈ all_comb n). {
+          apply in_all_comb_iff.
+          split; [ easy | ].
+Theorem nth_all_comb_length : ∀ n i d,
+  length (nth i (all_comb n) d) = n.
+Proof.
+intros.
+unfold all_comb.
+Search list_prodn.
+Theorem nth_list_prodn_length :
+  length (nth i (list_prodn ll) d) =
 ...
-eapply lt_le_trans.
-apply all_comb_inv_ub.
-now rewrite map_length, collapse_length, Hn.
+Search all_comb.
+Check In_nth.
+Check nth_In.
 ...
     erewrite map_ext_in. 2: {
       intros j Hj.
