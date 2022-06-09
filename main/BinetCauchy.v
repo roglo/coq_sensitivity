@@ -2383,7 +2383,7 @@ Qed.
 
 Theorem all_comb_inv_loop_ub : ∀ c n l,
   n ≠ 0
-  → (∀ i, i < length l → nth i l 0 < n)
+  → (∀ i, i < length l → nth i l 0 ≤ n)
   → all_comb_inv_loop c n l < c * n ^ length l + n ^ length l.
 Proof.
 intros * Hnz Hnl.
@@ -2408,12 +2408,12 @@ subst x y.
 rewrite <- Nat.mul_add_distr_r.
 apply Nat.mul_le_mono_r.
 specialize (Hnl 0 (Nat.lt_0_succ _)); cbn in Hnl.
-flia Hnl.
+flia Hnl Hnz.
 Qed.
 
 Theorem all_comb_inv_ub : ∀ n l,
   n ≠ 0
-  → (∀ i, i < length l → nth i l 0 < n)
+  → (∀ i, i < length l → nth i l 0 ≤ n)
   → all_comb_inv n l < n ^ length l.
 Proof.
 intros * Hnz Hnl.
@@ -2652,6 +2652,19 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   apply permutation_nth with (d := []); [ easy | ].
   rewrite map_length, all_comb_length; [ | easy ].
   split; [ easy | ].
+(*
+Compute (
+  let n := 3 in
+  let kl := [1;4;3] in
+  let g1 := λ l, map (λ j : nat, nth j l 0) (collapse kl) in
+  let h1 := λ l, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let f := λ i, all_comb_inv n (g1 (nth i (all_comb n) [])) in
+  map (λ x,
+  nth x (all_comb n) [] = nth (f x) (map h1 (all_comb n)) [])
+  (seq 0 (n ^ n))
+).
+...
+*)
   exists (λ i, all_comb_inv n (g1 (nth i (all_comb n) []))).
   split; [ | split ]. 3: {
     intros i Hi.
@@ -2663,14 +2676,36 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
         rewrite map_length, collapse_length, <- Hn.
         intros j Hj.
         rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
+...
+Theorem glop : ∀ i j n,
+  n ≠ 0 → nth i (nth j (all_comb n) []) 0 < n.
+Proof.
+intros * Hnz.
+revert i j.
+induction n; intros; [ easy | clear Hnz ].
+cbn - [ seq ].
+remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l1]. {
+  apply List_eq_repeat_nil in Hll; subst n; cbn.
+  destruct j; cbn. {
+    destruct i; [ | now destruct i ].
+Compute (all_comb 2).
+...
         assert (H : nth i (all_comb n) [] ∈ all_comb n). {
           apply nth_In.
           now rewrite all_comb_length.
         }
-...
         apply in_all_comb_iff in H.
         destruct H as (_ & Hnc & Hcn).
+        remember (nth i (all_comb n) []) as l eqn:Hl.
         specialize (Hcn (nth j (collapse kl) 0)) as H1.
+...
+        remember (nth j (collapse kl) 0) as k eqn:Hk.
+        rewrite <- Hnc.
+Check In_nth.
+...
+        specialize (Hcn (nth j (collapse kl) 0)) as H1.
+        assert (H : k ∈ l).
 ...
         specialize (Hgh _ H).
         unfold g1, h1 in Hgh.
