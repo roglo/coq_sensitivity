@@ -2699,19 +2699,9 @@ assert (H1 : l ∈ list_prodn ll). {
 }
 subst l.
 apply in_list_prodn in H1. 2: {
-  intros l1 Hl1.
-  clear Hjll.
-  revert j l1 H1 Hl1.
-  induction ll as [| l2]; intros; [ easy | ].
-  destruct Hl1 as [Hl1| Hl1]. {
-    subst l2.
-...
-    cbn in H1, Hl.
-    destruct ll as [| l3]. {
-      apply in_map_iff in H1.
-      destruct H1 as (k & H & Hk); subst l.
-      now intros H; subst l1.
-    }
+  intros l1 Hl1 H; subst l1.
+  now rewrite list_prodn_with_nil in H1.
+}
 ...
 apply list_prodn_elem_ub.
 ...
