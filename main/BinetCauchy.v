@@ -2723,6 +2723,7 @@ destruct ll as [| l2]. {
   now rewrite (List_map_nth' d).
 }
 destruct i. {
+...
   rewrite flat_map_concat_map.
   destruct l1 as [| a1]. {
     now specialize (Hlz _ (or_introl eq_refl)).
@@ -2748,6 +2749,31 @@ destruct i. {
     destruct Hl as [Hl| Hl]; [ now subst l | ].
     now apply Hlz; right; right.
   }
+  remember (list_prodn (l2 :: ll)) as ll' eqn:Hll'.
+  symmetry in Hll'.
+  destruct ll' as [| l3]. {
+    exfalso.
+    cbn in Hll'.
+    destruct ll. {
+      destruct l2; [ | easy ].
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    cbn in Hll'.
+    destruct ll as [| l3]. {
+      destruct l2. {
+        now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+      }
+      cbn in Hll'.
+      apply app_eq_nil in Hll'.
+      destruct Hll' as (H1, H2).
+      destruct l; [ | easy ].
+      now specialize (Hlz _ (or_intror (or_intror (or_introl eq_refl)))).
+    }
+    rewrite flat_map_concat_map in Hll'.
+    apply concat_nil_Forall in Hll'.
+    specialize (proj1 (Forall_forall _ _) Hll') as H1.
+    cbn - [ list_prodn ] in H1.
+...
   clear - Hlz.
   induction ll as [| l3]. {
     cbn.
