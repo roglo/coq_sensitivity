@@ -2748,12 +2748,25 @@ destruct i. {
     destruct Hl as [Hl| Hl]; [ now subst l | ].
     now apply Hlz; right; right.
   }
-  cbn.
-  destruct ll as [| l3]. {
+  clear - Hlz.
+  induction ll as [| l3]. {
     cbn.
     destruct l2 as [| a2]; [ | easy ].
     now specialize (Hlz _ (or_intror (or_introl eq_refl))).
   }
+...
+  remember (l3 :: ll) as ll'; cbn; subst ll'.
+  induction ll as [| l4]. {
+    cbn.
+    destruct l2 as [| a2]; cbn. {
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    rewrite map_app.
+    rewrite app_nth1. 2: {
+      rewrite map_length, map_length, map_length.
+      destruct l3 as [| a3]; [ | now cbn ].
+      now specialize (Hlz _ (or_intror (or_intror (or_introl eq_refl)))).
+    }
 ...
     induction ll as [| l3]; intros; rewrite map_length. {
       rewrite map_length.
