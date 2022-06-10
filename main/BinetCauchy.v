@@ -2752,6 +2752,15 @@ destruct i. {
     apply concat_nil_Forall in H1.
     specialize (proj1 (Forall_forall _ _) H1) as H2.
     cbn - [ list_prodn ] in H2.
+    clear H1.
+...
+    destruct l2 as [| a2]. {
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    specialize (H2 [a2 :: hd [] (list_prodn (l3 :: ll))]).
+    assert (H : [a2 :: hd [] (list_prodn (l3 :: ll))] ∈ map (λ a : A, map (cons a) (list_prodn (l3 :: ll))) (a2 :: l2)). {
+      apply in_map_iff.
+      cbn.
 ...
     destruct l3 as [| a3]. {
       now specialize (Hlz _ (or_intror (or_intror (or_introl eq_refl)))).
