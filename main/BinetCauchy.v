@@ -2709,9 +2709,10 @@ destruct (lt_dec i (length ll)) as [Hill| Hill]. 2: {
   etransitivity; [ | apply Hill ].
 Theorem nth_prodn_length : ∀ A (ll : list (list A)) i,
   i < length (list_prodn ll)
+  → (∀ l, l ∈ ll → l ≠ [])
   → length (nth i (list_prodn ll) []) = length ll.
 Proof.
-intros * Hll.
+intros * Hll Hlz.
 revert i Hll.
 induction ll as [| l1]; intros; cbn. {
   now rewrite Tauto_match_nat_same.
@@ -2721,6 +2722,57 @@ destruct ll as [| l2]. {
   destruct l1 as [| d]; [ easy | ].
   now rewrite (List_map_nth' d).
 }
+destruct i. {
+  rewrite flat_map_concat_map.
+  destruct l1 as [| a1]. {
+    now specialize (Hlz _ (or_introl eq_refl)).
+  }
+  cbn - [ list_prodn ].
+  rewrite app_nth1. 2: {
+    clear - Hlz.
+    rewrite map_length.
+    rewrite list_prodn_length; [ | easy ].
+    remember (l2 :: ll) as ll'.
+    clear ll l2 Heqll'; rename ll' into ll.
+    induction ll as [| l2]. {
+      now rewrite rngl_product_list_empty; cbn.
+    }
+    rewrite rngl_product_list_cons.
+    replace 0 with (0 * 0) by easy.
+    apply Nat.mul_lt_mono. {
+      specialize (Hlz _ (or_intror (or_introl eq_refl))).
+      now destruct l2; cbn.
+    }
+    apply IHll.
+    intros l Hl.
+    destruct Hl as [Hl| Hl]; [ now subst l | ].
+    now apply Hlz; right; right.
+  }
+  cbn.
+  destruct ll as [| l3]. {
+    cbn.
+    destruct l2 as [| a2]; [ | easy ].
+    now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+  }
+...
+    induction ll as [| l3]; intros; rewrite map_length. {
+      rewrite map_length.
+      destruct l2 as [| a2]; [ | now cbn ].
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    cbn.
+    destruct ll as [| l4]. {
+      destruct l2 as [| a2]; cbn. {
+        now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+      }
+      rewrite app_length.
+...
+    rewrite flat_map_concat_map.
+Compute (list_prodn [[]; []]).
+...
+  Search (nth _ (concat _)).
+  Search (hd _ (concat _)).
+  Search (hd (concat _)).
 ...
   now rewrite nth_prodn_length.
 ...
