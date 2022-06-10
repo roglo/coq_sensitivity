@@ -2559,6 +2559,18 @@ apply HP.
 now apply nth_In.
 Qed.
 
+(* to be moved to Misc.v *)
+Theorem List_hd_concat : ∀ A (d : A) ll,
+  hd [] ll ≠ []
+  → hd d (concat ll) = hd d (hd [] ll).
+Proof.
+intros * Hll.
+destruct ll as [| l]; [ easy | cbn ].
+rewrite List_app_hd1; [ easy | ].
+cbn in Hll.
+destruct l as [| a]; [ easy | now cbn ].
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2723,8 +2735,44 @@ destruct ll as [| l2]. {
   now rewrite (List_map_nth' d).
 }
 destruct i. {
-...
   rewrite flat_map_concat_map.
+  rewrite <- List_hd_nth_0.
+  rewrite List_hd_concat. 2: {
+    cbn.
+    destruct l1 as [| a1]; cbn. {
+      now specialize (Hlz _ (or_introl eq_refl)).
+    }
+    destruct ll as [| l3]. {
+      destruct l2; [ | easy ].
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    intros H1.
+    apply map_eq_nil in H1.
+    rewrite flat_map_concat_map in H1.
+    apply concat_nil_Forall in H1.
+    specialize (proj1 (Forall_forall _ _) H1) as H2.
+    cbn - [ list_prodn ] in H2.
+...
+    destruct l3 as [| a3]. {
+      now specialize (Hlz _ (or_intror (or_intror (or_introl eq_refl)))).
+    }
+...
+    destruct ll as [| l4]. {
+      cbn in H2.
+...
+      erewrite map_ext_in in H2. 2: {
+        intros i Hi.
+        now rewrite map_map.
+      }
+      specialize (H2
+...
+    erewrite map_ext_in in H2. 2: {
+      intros i Hi.
+      cbn.
+      detruct
+...
+    specialize (H1 (a3
+...
   destruct l1 as [| a1]. {
     now specialize (Hlz _ (or_introl eq_refl)).
   }
