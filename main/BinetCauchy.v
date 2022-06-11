@@ -2769,15 +2769,26 @@ destruct i. {
     cbn in H2.
     now specialize (H2 _ (or_introl eq_refl)).
   }
-  cbn.
   destruct l1 as [| a1]. {
     now specialize (Hlz _ (or_introl eq_refl)).
   }
+  rewrite List_map_hd with (a := a1); [ | now cbn ].
+  rewrite List_map_hd with (a := []). 2: {
+    rewrite list_prodn_length; [ | easy ].
+    rewrite rngl_product_list_cons.
+...
+  }
+  cbn - [ list_prodn ].
+  f_equal.
+...
+  cbn.
   cbn.
   destruct ll as [| l3]. {
     destruct l2 as [| a2]; [ | easy ].
     now specialize (Hlz _ (or_intror (or_introl eq_refl))).
   }
+  rewrite List_map_hd with (a := []). 2: {
+
 ...
   specialize (H1 (a1 :: l3)).
 ...
