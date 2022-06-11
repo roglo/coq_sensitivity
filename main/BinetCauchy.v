@@ -2743,6 +2743,7 @@ destruct (lt_dec i (length ll)) as [Hill| Hill]. 2: {
   apply Nat.nlt_ge in Hill.
   rewrite nth_overflow; [ easy | ].
   etransitivity; [ | apply Hill ].
+...
 Theorem nth_prodn_length : ∀ A (ll : list (list A)) i,
   i < length (list_prodn ll)
   → (∀ l, l ∈ ll → l ≠ [])
