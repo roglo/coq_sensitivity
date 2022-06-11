@@ -2847,6 +2847,17 @@ rewrite List_nth_succ_concat. 2: {
   intros l Hl.
   now apply Hlz; right.
 }
+destruct l1 as [| a1]. {
+  now specialize (Hlz _ (or_introl eq_refl)).
+}
+rewrite (List_map_hd a1); [ | now cbn ].
+cbn - [ list_prodn ] in Hll |-*.
+rewrite app_nth1. 2: {
+rewrite list_prodn_length in Hll; [ | easy ].
+...
+Search (tl (map _ _ )).
+rewrite (List_map_hd _ _ []).
+Search (flat_map _ _ = flat_map _ _).
 ...
   destruct l2 as [| a2]. {
     now specialize (Hlz _ (or_intror (or_introl eq_refl))).
