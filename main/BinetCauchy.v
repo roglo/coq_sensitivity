@@ -2571,6 +2571,31 @@ cbn in Hll.
 destruct l as [| a]; [ easy | now cbn ].
 Qed.
 
+(* to be moved to Misc.v *)
+Theorem List_nth_succ_concat : ∀ A (d : A) ll i,
+  (∀ l, l ∈ ll → l ≠ [])
+  → nth (S i) (concat ll) d = nth i (concat (tl (hd [] ll) :: tl ll)) d.
+Proof.
+intros * Hll.
+revert i.
+induction ll as [| l]; intros; cbn. {
+  now rewrite Tauto_match_nat_same.
+}
+destruct (lt_dec (S i) (length l)) as [Hil| Hil]. {
+  rewrite app_nth1; [ | easy ].
+  destruct l as [| a]; [ easy | cbn in Hil |-* ].
+  apply Nat.succ_lt_mono in Hil.
+  now rewrite app_nth1.
+}
+apply Nat.nlt_ge in Hil.
+rewrite app_nth2; [ | easy ].
+destruct l as [| a]. {
+  now specialize (Hll _ (or_introl eq_refl)).
+}
+cbn in Hil; apply Nat.succ_le_mono in Hil.
+now rewrite app_nth2.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2733,6 +2758,36 @@ destruct ll as [| l2]. {
   destruct l1 as [| d]; [ easy | ].
   now rewrite (List_map_nth' d).
 }
+assert
+  (Hm : ∀ A (a1 : A) l2 l3 ll,
+     (∀ l, l ∈ l2 :: l3 :: ll → l ≠ [])
+     → map (cons a1)
+         (flat_map (λ a, map (cons a) (list_prodn (l3 :: ll))) l2) ≠ []). {
+  clear.
+  intros * Hlz H1.
+  apply map_eq_nil in H1.
+  rewrite flat_map_concat_map in H1.
+  apply concat_nil_Forall in H1.
+  specialize (proj1 (Forall_forall _ _) H1) as H2.
+  cbn - [ list_prodn ] in H2.
+  clear H1.
+  destruct l2 as [| a2]. {
+    now specialize (Hlz _ (or_introl eq_refl)).
+  }
+  remember (list_prodn (l3 :: ll)) as ll' eqn:Hll'.
+  symmetry in Hll'.
+  destruct ll' as [| l4]. {
+    apply eq_list_prodn_nil_iff in Hll'.
+    destruct Hll' as [H1| H1]; [ easy | ].
+    destruct H1 as [H1| H1]. {
+      subst l3.
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    now specialize (Hlz _ (or_intror (or_intror H1))).
+  }
+  cbn in H2.
+  now specialize (H2 _ (or_introl eq_refl)).
+}
 destruct i. {
   rewrite flat_map_concat_map.
   rewrite <- List_hd_nth_0.
@@ -2745,14 +2800,66 @@ destruct i. {
       destruct l2; [ | easy ].
       now specialize (Hlz _ (or_intror (or_introl eq_refl))).
     }
-    intros H1.
-    apply map_eq_nil in H1.
-    rewrite flat_map_concat_map in H1.
-    apply concat_nil_Forall in H1.
-    specialize (proj1 (Forall_forall _ _) H1) as H2.
-    cbn - [ list_prodn ] in H2.
-    clear H1.
-    destruct l2 as [| a2]. {
+    apply Hm.
+    intros l Hl.
+    now apply Hlz; right.
+  }
+  destruct l1 as [| a1]. {
+    now specialize (Hlz _ (or_introl eq_refl)).
+  }
+  rewrite List_map_hd with (a := a1); [ | now cbn ].
+  assert (H2 : 0 < length (list_prodn (l2 :: ll))). {
+    rewrite list_prodn_length; [ | easy ].
+    clear IHll Hll.
+    remember (l2 :: ll) as x eqn:Hx.
+    clear - Hlz; rename x into ll.
+    induction ll as [| l2]. {
+      now rewrite rngl_product_list_empty; cbn.
+    }
+    rewrite rngl_product_list_cons.
+    apply Nat.lt_0_mul'.
+    split. {
+      destruct l2; [ | now cbn ].
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    apply IHll.
+    intros l Hl.
+    apply Hlz.
+    destruct Hl as [Hl| H]; [ now left | now right; right ].
+  }
+  rewrite List_map_hd with (a := []); [ | easy ].
+  cbn - [ list_prodn ]; f_equal.
+  rewrite List_hd_nth_0.
+  rewrite IHll; [ easy | | easy ].
+  intros l Hl.
+  now apply Hlz; right.
+}
+rewrite flat_map_concat_map.
+rewrite List_nth_succ_concat. 2: {
+  intros ll' Hll'.
+  apply in_map_iff in Hll'.
+  destruct Hll' as (a & Hll' & Ha); subst ll'; cbn.
+  destruct ll as [| l3]. {
+    destruct l2 as [| a2]; [ | easy ].
+    now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+  }
+  apply Hm.
+  intros l Hl.
+  now apply Hlz; right.
+}
+...
+  destruct l2 as [| a2]. {
+    now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+  }
+  intros H1.
+  apply map_eq_nil in H1.
+  rewrite flat_map_concat_map in H1.
+  apply concat_nil_Forall in H1.
+  specialize (proj1 (Forall_forall _ _) H1) as H2.
+  cbn - [ list_prodn ] in H2.
+  clear H1.
+...
+  destruct l2 as [| a2]. {
       now specialize (Hlz _ (or_intror (or_introl eq_refl))).
     }
     remember (list_prodn (l3 :: ll)) as ll' eqn:Hll'.
@@ -2768,18 +2875,12 @@ destruct i. {
     }
     cbn in H2.
     now specialize (H2 _ (or_introl eq_refl)).
-  }
-  destruct l1 as [| a1]. {
-    now specialize (Hlz _ (or_introl eq_refl)).
-  }
-  rewrite List_map_hd with (a := a1); [ | now cbn ].
-  rewrite List_map_hd with (a := []). 2: {
-    rewrite list_prodn_length; [ | easy ].
-    rewrite rngl_product_list_cons.
+Search (concat _ = []).
 ...
-  }
-  cbn - [ list_prodn ].
-  f_equal.
+rewrite <- List_hd_nth_0.
+  rewrite List_hd_concat. 2: {
+    cbn.
+    destruct l1 as [| a1]; cbn. {
 ...
   cbn.
   cbn.
@@ -2788,7 +2889,6 @@ destruct i. {
     now specialize (Hlz _ (or_intror (or_introl eq_refl))).
   }
   rewrite List_map_hd with (a := []). 2: {
-
 ...
   specialize (H1 (a1 :: l3)).
 ...
