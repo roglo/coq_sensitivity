@@ -2704,7 +2704,6 @@ Theorem all_comb_elem_ub : ∀ i j n,
 Proof.
 intros.
 unfold all_comb.
-Search list_prodn.
 Theorem list_prodn_elem_ub : ∀ ll n i j,
   (∀ l, l ∈ ll → ∀ a, a ∈ l → a ≤ n)
   → nth i (nth j (list_prodn ll) []) 0 ≤ n.
@@ -2757,31 +2756,32 @@ destruct i. {
       now specialize (Hlz _ (or_intror (or_introl eq_refl))).
     }
     remember (list_prodn (l3 :: ll)) as ll' eqn:Hll'.
-(*
     symmetry in Hll'.
     destruct ll' as [| l4]. {
-      cbn in Hll'.
-      destruct ll as [| l4]. {
-        cbn in Hll'.
-Search (list_prodn _ = []).
-*)
-Theorem list_prodn_with_nil_iff : ∀ A (ll : list (list A)),
-  list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
-Proof.
-intros.
-split. {
-  intros Hll.
-  induction ll as [| l1]; [ now left | right ].
-  cbn in Hll.
-  destruct ll as [| l2]. {
-    destruct l1 as [| a1]; [ now left | easy ].
+      apply eq_list_prodn_nil_iff in Hll'.
+      destruct Hll' as [H1| H1]; [ easy | ].
+      destruct H1 as [H1| H1]. {
+        subst l3.
+        now specialize (Hlz _ (or_intror (or_intror (or_introl eq_refl)))).
+      }
+      now specialize (Hlz _ (or_intror (or_intror (or_intror H1)))).
+    }
+    cbn in H2.
+    now specialize (H2 _ (or_introl eq_refl)).
   }
-  rewrite flat_map_concat_map in Hll.
-  apply concat_nil_Forall in Hll.
-  specialize (proj1 (Forall_forall _ _) Hll) as H1.
-  cbn - [ list_prodn ] in H1.
+  cbn.
+  destruct l1 as [| a1]. {
+    now specialize (Hlz _ (or_introl eq_refl)).
+  }
+  cbn.
+  destruct ll as [| l3]. {
+    destruct l2 as [| a2]; [ | easy ].
+    now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+  }
+...
+  specialize (H1 (a1 :: l3)).
+...
   destruct l2 as [| a2]; [ now right; left | ].
-  destruct l1 as [| a1]; [ now left | right; right ].
   cbn - [ In list_prodn ] in H1.
 ...
     assert (H3 : ∀ x, map (cons a2) (list_prodn (l3 :: ll)) = x → x = []). {

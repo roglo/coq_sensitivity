@@ -281,23 +281,6 @@ Fixpoint all_comb_inv_loop c r l : nat :=
 
 Definition all_comb_inv := all_comb_inv_loop 0.
 
-Theorem list_prodn_with_nil : ∀ A (ll : list (list A)),
-  [] ∈ ll → list_prodn ll = [].
-Proof.
-intros * Hll.
-induction ll as [| l1]; [ easy | cbn ].
-destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
-specialize (IHll Hll).
-destruct ll as [| l2]; [ easy | ].
-rewrite IHll; cbn.
-rewrite flat_map_concat_map; cbn.
-apply concat_nil_Forall.
-apply Forall_forall.
-intros ll' Hll'.
-apply in_map_iff in Hll'.
-now destruct Hll' as (a & Hll' & Hal1).
-Qed.
-
 Theorem in_list_prodn_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
