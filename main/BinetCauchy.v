@@ -2753,10 +2753,52 @@ destruct i. {
     specialize (proj1 (Forall_forall _ _) H1) as H2.
     cbn - [ list_prodn ] in H2.
     clear H1.
-...
     destruct l2 as [| a2]. {
       now specialize (Hlz _ (or_intror (or_introl eq_refl))).
     }
+    remember (list_prodn (l3 :: ll)) as ll' eqn:Hll'.
+(*
+    symmetry in Hll'.
+    destruct ll' as [| l4]. {
+      cbn in Hll'.
+      destruct ll as [| l4]. {
+        cbn in Hll'.
+Search (list_prodn _ = []).
+*)
+Theorem list_prodn_with_nil_iff : ∀ A (ll : list (list A)),
+  list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
+Proof.
+intros.
+split. {
+  intros Hll.
+  induction ll as [| l1]; [ now left | right ].
+  cbn in Hll.
+  destruct ll as [| l2]. {
+    destruct l1 as [| a1]; [ now left | easy ].
+  }
+  rewrite flat_map_concat_map in Hll.
+  apply concat_nil_Forall in Hll.
+  specialize (proj1 (Forall_forall _ _) Hll) as H1.
+  cbn - [ list_prodn ] in H1.
+  destruct l2 as [| a2]; [ now right; left | ].
+  destruct l1 as [| a1]; [ now left | right; right ].
+  cbn - [ In list_prodn ] in H1.
+...
+    assert (H3 : ∀ x, map (cons a2) (list_prodn (l3 :: ll)) = x → x = []). {
+      intros.
+...
+      apply in_map_iff in H.
+      now specialize (H2 _ H).
+    }
+...
+    assert
+      (H3 : ∀ x,
+       (∃ y, map (cons y) (list_prodn (l3 :: ll)) = x ∧ y ∈ a2 :: l2) → x = []). {
+      intros.
+      apply in_map_iff in H.
+      now specialize (H2 _ H).
+    }
+...
     specialize (H2 [a2 :: hd [] (list_prodn (l3 :: ll))]).
     assert (H : [a2 :: hd [] (list_prodn (l3 :: ll))] ∈ map (λ a : A, map (cons a) (list_prodn (l3 :: ll))) (a2 :: l2)). {
       apply in_map_iff.
