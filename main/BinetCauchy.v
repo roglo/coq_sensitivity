@@ -2729,10 +2729,59 @@ Theorem all_comb_elem_ub : ∀ i j n,
 Proof.
 intros.
 unfold all_comb.
+(* bon je vais essayer autre chose mais si ça marche pas, je
+   reviens à celui-là
+Theorem list_prodn_elem_in : ∀ ll i j,
+  i < length (nth j (list_prodn ll) [])
+  → j < length (list_prodn ll)
+  → nth i (nth j (list_prodn ll) []) 0 ∈ concat ll.
+Proof.
+intros * Hi Hj.
+revert i j Hi Hj.
+induction ll as [| l1]; intros; [ easy | cbn ].
+...
+*)
 Theorem list_prodn_elem_ub : ∀ ll n i j,
   (∀ l, l ∈ ll → ∀ a, a ∈ l → a ≤ n)
   → nth i (nth j (list_prodn ll) []) 0 ≤ n.
 Proof.
+intros * Hll.
+remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+revert n i j ll Hll Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len. {
+  apply length_zero_iff_nil in Hlen; subst ll; cbn.
+  now rewrite Tauto_match_nat_same, List_nth_nil.
+}
+destruct ll as [| l1]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen; cbn.
+destruct ll as [| l2]. {
+  destruct l1 as [| a1]. {
+    now cbn; rewrite Tauto_match_nat_same, List_nth_nil.
+  }
+  cbn.
+  destruct j. {
+    destruct i. {
+      cbn; apply Hll with (l := a1 :: l1); [ now left | ].
+      now left.
+    }
+    now cbn; rewrite Tauto_match_nat_same.
+  }
+  destruct (lt_dec j (length l1)) as [Hjl| Hjl]. 2: {
+    apply Nat.nlt_ge in Hjl.
+    rewrite (nth_overflow (map _ _)); [ | now rewrite map_length ].
+    now rewrite List_nth_nil.
+  }
+  rewrite (List_map_nth' 0); [ | easy ].
+  destruct i. {
+    cbn.
+    apply Hll with (l := a1 :: l1); [ now left | ].
+    now right; apply nth_In.
+  }
+  now cbn; rewrite Tauto_match_nat_same.
+}
+...
 intros * Hll.
 destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
   apply Nat.nlt_ge in Hjll.
