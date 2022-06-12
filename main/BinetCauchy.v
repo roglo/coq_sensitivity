@@ -2781,6 +2781,30 @@ destruct ll as [| l2]. {
   }
   now cbn; rewrite Tauto_match_nat_same.
 }
+destruct i. {
+  rewrite flat_map_concat_map.
+  induction j. {
+    clear Hll Hlen.
+    destruct l1 as [| a1]; [ easy | ].
+    destruct l2 as [| a2]. {
+      cbn.
+      destruct ll as [| l3]; cbn. {
+        induction l1 as [| a2]; [ easy | cbn ].
+        apply IHl1.
+      }
+      induction l1 as [| a2]; [ easy | cbn ].
+      apply IHl1.
+    }
+    cbn - [ list_prodn ].
+...
+    destruct ll as [| l3]. {
+      destruct l2; [ | easy ].
+      now specialize (Hlz _ (or_intror (or_introl eq_refl))).
+    }
+    apply Hm.
+    intros l Hl.
+    now apply Hlz; right.
+  }
 ...
 intros * Hll.
 destruct (lt_dec j (length (list_prodn ll))) as [Hjll| Hjll]. 2: {
