@@ -2757,6 +2757,13 @@ Compute (
       }
       now rewrite map_length, collapse_length, <- Hn.
     }
+    unfold h1.
+    erewrite map_ext_in. 2: {
+      intros j Hj.
+unfold all_comb_inv.
+Print all_comb_inv_loop.
+Search all_comb_inv.
+Search (map _ (isort_rank _ _)).
 ...
 (*
 Theorem list_prodn_elem_in : ∀ ll i j,
