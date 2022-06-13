@@ -2679,11 +2679,12 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 }
 symmetry.
 remember (length kl) as n eqn:Hn.
-set (g1 := λ l, map (λ j, nth j l 0) (collapse kl)).
-set (h1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+set (g1 := f1 (isort_rank Nat.leb kl)).
+set (h1 := f1 kl).
 assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   intros l Hl.
-  unfold g1, h1.
+  unfold g1, h1, f1.
   erewrite map_ext_in. 2: {
     intros i Hi.
     rewrite (List_map_nth' 0). 2: {
@@ -2749,18 +2750,20 @@ Compute (
     eapply lt_le_trans. {
       apply all_comb_inv_ub; [ easy | ].
       intros j Hj.
-      unfold g1 in Hj.
+      unfold g1, f1 in Hj |-*.
+      rewrite fold_collapse in Hj |-*.
       rewrite map_length, collapse_length, <- Hn in Hj.
-      unfold g1.
       rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
       apply all_comb_elem_ub.
     }
     apply Nat.pow_le_mono_r; [ easy | ].
-    unfold g1.
+    unfold g1, f1.
+    rewrite fold_collapse.
     now rewrite map_length, collapse_length, <- Hn.
   } 2: {
     intros i Hi.
-    unfold g1.
+    unfold g1, f1.
+    rewrite fold_collapse.
     rewrite (List_map_nth' []). 2: {
       rewrite all_comb_length; [ | easy ].
       eapply lt_le_trans. {
@@ -2772,7 +2775,9 @@ Compute (
       }
       now rewrite map_length, collapse_length, <- Hn.
     }
-    fold (g1 (nth i (all_comb n) [])).
+    unfold collapse.
+    fold (f1 (isort_rank Nat.leb kl) (nth i (all_comb n) [])).
+    fold g1.
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
 ...
