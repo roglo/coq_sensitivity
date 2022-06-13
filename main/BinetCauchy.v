@@ -2758,44 +2758,7 @@ Compute (
     apply Nat.pow_le_mono_r; [ easy | ].
     unfold g1.
     now rewrite map_length, collapse_length, <- Hn.
-  } {
-    intros i j Hi Hj Hij.
-Search all_comb_inv.
-Theorem all_comb_inv_inj : ∀ n la lb,
-  all_comb_inv n la = all_comb_inv n lb
-  → la = lb.
-Proof.
-intros * Hij.
-Print all_comb_inv.
-...
-apply (f_equal (all_comb n)) in Hij.
-...
-intros * Hij.
-unfold all_comb_inv in Hij.
-Theorem all_comb_inv_loop_inj : ∀ c n la lb,
-  length la = length lb
-  → (∀ i, i < length la → nth i la 0 ≤ n)
-  → (∀ i, i < length lb → nth i lb 0 ≤ n)
-  → all_comb_inv_loop c n la = all_comb_inv_loop c n lb
-  → la = lb.
-Proof.
-intros * Hlab Hla Hlb Hab.
-revert c lb Hlab Hlb Hab.
-induction la as [| a]; intros. {
-  cbn in Hlab; symmetry in Hlab.
-  now apply length_zero_iff_nil in Hlab; subst lb.
-}
-destruct lb as [| b]; [ easy | ].
-cbn in Hlab.
-apply Nat.succ_inj in Hlab.
-cbn in Hab.
-assert (Heab : a = b). {
-Print all_comb_inv_loop.
-Search to_radix.
-...
-apply all_comb_inv_inj in Hij.
-...
-  split; [ | split ]. 3: {
+  } 2: {
     intros i Hi.
     unfold g1.
     rewrite (List_map_nth' []). 2: {
@@ -2809,7 +2772,9 @@ apply all_comb_inv_inj in Hij.
       }
       now rewrite map_length, collapse_length, <- Hn.
     }
-    unfold h1.
+    fold (g1 (nth i (all_comb n) [])).
+    remember (nth i (all_comb n) []) as l eqn:Hl.
+    symmetry.
 ...
     erewrite map_ext_in. 2: {
       intros j Hj.
