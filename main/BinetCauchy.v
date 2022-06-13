@@ -2450,7 +2450,7 @@ apply IHlll. {
 }
 Qed.
 
-Theorem in_list_prodn : ∀ A (ll : list (list A)) l,
+Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
   (∀ l, l ∈ ll → l ≠ [])
   → l ∈ list_prodn ll
   → length l = length ll.
@@ -2519,7 +2519,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   apply in_map_iff in Hl2.
   destruct Hl2 as (l3 & Hl3 & Hl2).
   subst l2; cbn; f_equal.
-  apply in_list_prodn in Hl2; [ easy | ].
+  apply in_list_prodn_length in Hl2; [ easy | ].
   intros l4 Hl4.
   specialize (Hll _ (or_intror Hl4)).
   destruct l4; [ | easy ].
@@ -2594,6 +2594,35 @@ destruct l as [| a]. {
 }
 cbn in Hil; apply Nat.succ_le_mono in Hil.
 now rewrite app_nth2.
+Qed.
+
+Theorem all_comb_elem_ub : ∀ i j n,
+  nth i (nth j (all_comb n) []) 0 ≤ n.
+Proof.
+intros.
+unfold all_comb.
+remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
+destruct (lt_dec j (length ll)) as [Hjll| Hjll]. 2: {
+  apply Nat.nlt_ge in Hjll.
+  rewrite (nth_overflow ll); [ | easy ].
+  now rewrite List_nth_nil.
+}
+assert (H1 : nth j ll [] ∈ ll) by now apply nth_In.
+rewrite Hll in H1.
+apply in_list_prodn_repeat_iff in H1.
+rewrite <- Hll in H1.
+destruct H1 as (Hnz & Hn & Hln).
+specialize (Hln (nth i (nth j ll []) 0)).
+destruct (lt_dec i n) as [Hin| Hin]. 2: {
+  apply Nat.nlt_ge in Hin.
+  rewrite nth_overflow; [ easy | ].
+  now rewrite Hn.
+}
+assert (H : nth i (nth j ll []) 0 ∈ nth j ll []). {
+  apply nth_In.
+  now rewrite Hn.
+}
+now specialize (Hln H).
 Qed.
 
 (* to be completed
@@ -2724,11 +2753,12 @@ Compute (
         rewrite map_length, collapse_length, <- Hn.
         intros j Hj.
         rewrite (List_map_nth' 0); [ | now rewrite collapse_length, <- Hn ].
-Theorem all_comb_elem_ub : ∀ i j n,
-  nth i (nth j (all_comb n) []) 0 ≤ n.
-Proof.
-intros.
-unfold all_comb.
+        apply all_comb_elem_ub.
+      }
+      now rewrite map_length, collapse_length, <- Hn.
+    }
+...
+(*
 Theorem list_prodn_elem_in : ∀ ll i j,
   i < length (nth j (list_prodn ll) [])
   → j < length (list_prodn ll)
@@ -2743,9 +2773,9 @@ destruct len. {
 }
 destruct ll as [| l1]; [ easy | ].
 cbn in Hlen.
-apply Nat.succ_inj in Hlen; cbn.
+apply Nat.succ_inj in Hlen; cbn - [ concat ].
 destruct ll as [| l2]. {
-  rewrite app_nil_r.
+  cbn; rewrite app_nil_r.
   cbn in Hi, Hj.
   rewrite map_length in Hj.
   rewrite (List_map_nth' 0) in Hi; [ | easy ].
@@ -2762,6 +2792,42 @@ destruct ll as [| l2]. {
   rewrite (List_map_nth' 0); [ | easy ].
   cbn - [ In ].
   now right; apply nth_In.
+}
+destruct i. {
+...
+*)
+...
+Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
+  i < length ll
+  → l ∈ list_prodn ll
+  → nth i l d ∈ nth i ll [].
+Proof.
+intros * Hi Hll.
+revert l i Hi Hll.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hll |-*.
+destruct i. {
+  destruct ll as [| l2]. {
+    apply in_map_iff in Hll.
+    now destruct Hll as (a & H & Ha); subst l.
+  }
+  apply in_flat_map in Hll.
+  destruct Hll as (a & Hl1 & Hl).
+  apply in_map_iff in Hl.
+  now destruct Hl as (l3 & H & Hl3); subst l.
+}
+cbn in Hi; apply Nat.succ_lt_mono in Hi.
+destruct ll as [| l2]; [ easy | ].
+apply in_flat_map in Hll.
+destruct Hll as (a & Ha & Hl).
+apply in_map_iff in Hl.
+destruct Hl as (l3 & H & Hl3); subst l.
+rewrite List_nth_succ_cons.
+now apply IHll.
+Qed.
+...
+apply (nth_in_list_prodn 0) with (i := i) in H1. 2: {
+  now rewrite repeat_length.
 }
 ...
 Theorem list_prodn_elem_ub : ∀ ll n i j,
@@ -3258,7 +3324,7 @@ assert (H1 : l ∈ list_prodn ll). {
   now apply nth_In.
 }
 subst l.
-apply in_list_prodn in H1. 2: {
+apply in_list_prodn_length in H1. 2: {
   intros l1 Hl1 H; subst l1.
   now rewrite list_prodn_with_nil in H1.
 }
@@ -3741,7 +3807,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   replace (∑ (i ∈ all_comb m), ε i * ∏ (j = _, _), _) with
     (det (mat_select_rows l B)). 2: {
     generalize Hl; intros H.
-    apply in_list_prodn_iff in H.
+    apply in_list_prodn_repeat_iff in H.
     destruct H as (_ & Hlm & Hln).
     rewrite det_is_det'; try now destruct Hif. 2: {
       apply mat_select_rows_is_square; [ easy | congruence | ].
@@ -3763,7 +3829,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
     assert (H1 : ff_app l1 (i - 1) - 1 < m). {
       unfold ff_app.
-      apply in_list_prodn_iff in Hl1.
+      apply in_list_prodn_repeat_iff in Hl1.
       destruct Hl1 as (_ & Hl1m & Hl1).
       specialize (Hl1 (nth (i - 1) l1 0)).
       assert (H : nth (i - 1) l1 0 ∈ l1). {
@@ -3873,7 +3939,7 @@ cbn - [ det ].
   replace (∏ (i = 1, m), mat_el A i (ff_app k (i - 1))) with
     (det (mat_select_cols k A)). 2: {
     rewrite det_is_det'; try now destruct Hif. 2: {
-      apply in_list_prodn_iff in Hk.
+      apply in_list_prodn_repeat_iff in Hk.
       destruct Hk as (_ & Hkm & Hk).
       apply mat_select_cols_is_square; [ easy | congruence | ].
       now rewrite Hac.
@@ -3882,7 +3948,7 @@ cbn - [ det ].
       unfold mat_select_cols.
       rewrite mat_transp_nrows.
       rewrite mat_select_rows_ncols. 2: {
-        apply in_list_prodn_iff in Hk.
+        apply in_list_prodn_repeat_iff in Hk.
         destruct Hk as (_ & Hkm & Hk).
         now intros H; subst k; symmetry in Hkm.
       }
@@ -3892,7 +3958,7 @@ cbn - [ det ].
     }
     unfold det''.
     rewrite mat_select_cols_nrows; [ | | now rewrite Hac ]. 2: {
-      apply in_list_prodn_iff in Hk.
+      apply in_list_prodn_repeat_iff in Hk.
       destruct Hk as (_ & Hkm & Hk).
       now intros H; subst k; symmetry in Hkm.
     }

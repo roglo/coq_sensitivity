@@ -281,7 +281,7 @@ Fixpoint all_comb_inv_loop c r l : nat :=
 
 Definition all_comb_inv := all_comb_inv_loop 0.
 
-Theorem in_list_prodn_iff : ∀ m n l,
+Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
 Proof.
@@ -365,7 +365,7 @@ Theorem in_all_comb_iff : ∀ n l,
   ↔ l ∈ all_comb n.
 Proof.
 intros.
-now apply in_list_prodn_iff.
+now apply in_list_prodn_repeat_iff.
 Qed.
 
 Theorem NoDup_list_prodn_repeat : ∀ m n,
@@ -2719,3 +2719,4 @@ Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
+
