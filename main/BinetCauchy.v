@@ -2729,18 +2729,41 @@ Theorem all_comb_elem_ub : ∀ i j n,
 Proof.
 intros.
 unfold all_comb.
-(* bon je vais essayer autre chose mais si ça marche pas, je
-   reviens à celui-là
 Theorem list_prodn_elem_in : ∀ ll i j,
   i < length (nth j (list_prodn ll) [])
   → j < length (list_prodn ll)
   → nth i (nth j (list_prodn ll) []) 0 ∈ concat ll.
 Proof.
 intros * Hi Hj.
-revert i j Hi Hj.
-induction ll as [| l1]; intros; [ easy | cbn ].
+remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+revert i j ll Hi Hj Hlen.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len. {
+  now apply length_zero_iff_nil in Hlen; subst ll; cbn.
+}
+destruct ll as [| l1]; [ easy | ].
+cbn in Hlen.
+apply Nat.succ_inj in Hlen; cbn.
+destruct ll as [| l2]. {
+  rewrite app_nil_r.
+  cbn in Hi, Hj.
+  rewrite map_length in Hj.
+  rewrite (List_map_nth' 0) in Hi; [ | easy ].
+  destruct l1 as [| a1]; [ easy | ].
+  cbn - [ In ].
+  destruct j. {
+    destruct i; [ now left | ].
+    cbn in Hi.
+    now apply Nat.succ_lt_mono in Hi.
+  }
+  cbn in Hi, Hj.
+  apply Nat.succ_lt_mono in Hj.
+  apply Nat.lt_1_r in Hi; subst i.
+  rewrite (List_map_nth' 0); [ | easy ].
+  cbn - [ In ].
+  now right; apply nth_In.
+}
 ...
-*)
 Theorem list_prodn_elem_ub : ∀ ll n i j,
   (∀ l, l ∈ ll → ∀ a, a ∈ l → a ≤ n)
   → nth i (nth j (list_prodn ll) []) 0 ≤ n.
@@ -2781,6 +2804,13 @@ destruct ll as [| l2]. {
   }
   now cbn; rewrite Tauto_match_nat_same.
 }
+(**)
+clear Hlen.
+revert l1 l2 ll n i j Hll.
+induction ll as [| l3]; intros. {
+  cbn.
+Search flat_map.
+...
 destruct i. {
   rewrite flat_map_concat_map.
   induction j. {
