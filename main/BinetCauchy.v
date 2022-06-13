@@ -2625,6 +2625,35 @@ assert (H : nth i (nth j ll []) 0 ∈ nth j ll []). {
 now specialize (Hln H).
 Qed.
 
+Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
+  i < length ll
+  → l ∈ list_prodn ll
+  → nth i l d ∈ nth i ll [].
+Proof.
+intros * Hi Hll.
+revert l i Hi Hll.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hll |-*.
+destruct i. {
+  destruct ll as [| l2]. {
+    apply in_map_iff in Hll.
+    now destruct Hll as (a & H & Ha); subst l.
+  }
+  apply in_flat_map in Hll.
+  destruct Hll as (a & Hl1 & Hl).
+  apply in_map_iff in Hl.
+  now destruct Hl as (l3 & H & Hl3); subst l.
+}
+cbn in Hi; apply Nat.succ_lt_mono in Hi.
+destruct ll as [| l2]; [ easy | ].
+apply in_flat_map in Hll.
+destruct Hll as (a & Ha & Hl).
+apply in_map_iff in Hl.
+destruct Hl as (l3 & H & Hl3); subst l.
+rewrite List_nth_succ_cons.
+now apply IHll.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2781,14 +2810,29 @@ Compute (
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
     unfold h1, g1.
-Theorem glop : ∀ i n, all_comb_inv n (nth i (all_comb n) []) = i.
+Theorem glop : ∀ i n,
+  i < n ^ n
+  → all_comb_inv n (nth i (all_comb n) []) = i.
 Proof.
-intros.
+intros * Hin.
+unfold all_comb.
+revert i Hin.
+induction n; intros. {
+  rewrite Nat.pow_0_r in Hin; cbn.
+  now apply Nat.lt_1_r in Hin; subst i.
+}
+cbn - [ seq ].
+remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l1]. {
+  apply List_eq_repeat_nil in Hll; subst n; cbn.
+  now apply Nat.lt_1_r in Hin; subst i.
+}
+cbn - [ seq ].
+...
 Compute (
   let n := 4 in
-  map (λ i, all_comb_inv n (nth i (all_comb n) [])) (seq 0 (n ^ n))
+  map (λ i, all_comb_inv n (nth i (all_comb n) [])) (seq 0 (n ^ n + 2))
 ).
-Admitted.
 ...
 rewrite glop.
 ...
@@ -2859,35 +2903,6 @@ destruct ll as [| l2]. {
 destruct i. {
 ...
 *)
-...
-Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
-  i < length ll
-  → l ∈ list_prodn ll
-  → nth i l d ∈ nth i ll [].
-Proof.
-intros * Hi Hll.
-revert l i Hi Hll.
-induction ll as [| l1]; intros; [ easy | ].
-cbn in Hll |-*.
-destruct i. {
-  destruct ll as [| l2]. {
-    apply in_map_iff in Hll.
-    now destruct Hll as (a & H & Ha); subst l.
-  }
-  apply in_flat_map in Hll.
-  destruct Hll as (a & Hl1 & Hl).
-  apply in_map_iff in Hl.
-  now destruct Hl as (l3 & H & Hl3); subst l.
-}
-cbn in Hi; apply Nat.succ_lt_mono in Hi.
-destruct ll as [| l2]; [ easy | ].
-apply in_flat_map in Hll.
-destruct Hll as (a & Ha & Hl).
-apply in_map_iff in Hl.
-destruct Hl as (l3 & H & Hl3); subst l.
-rewrite List_nth_succ_cons.
-now apply IHll.
-Qed.
 ...
 apply (nth_in_list_prodn 0) with (i := i) in H1. 2: {
   now rewrite repeat_length.
