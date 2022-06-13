@@ -273,10 +273,10 @@ rewrite nat_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
-Fixpoint all_comb_inv_loop c r l : nat :=
+Fixpoint all_comb_inv_loop c n l : nat :=
   match l with
   | [] => c
-  | d :: l' => all_comb_inv_loop (c * r + pred d) r l'
+  | d :: l' => all_comb_inv_loop (c * n + pred d) n l'
   end.
 
 Definition all_comb_inv := all_comb_inv_loop 0.

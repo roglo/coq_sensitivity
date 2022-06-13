@@ -2780,6 +2780,17 @@ Compute (
     fold g1.
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
+    unfold h1, g1.
+Theorem glop : ∀ i n, all_comb_inv n (nth i (all_comb n) []) = i.
+Proof.
+intros.
+Compute (
+  let n := 4 in
+  map (λ i, all_comb_inv n (nth i (all_comb n) [])) (seq 0 (n ^ n))
+).
+Admitted.
+...
+rewrite glop.
 ...
 Compute (
   let kl := [4;1;3] in
