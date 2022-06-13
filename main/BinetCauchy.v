@@ -2781,6 +2781,27 @@ Compute (
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
 ...
+Compute (
+  let kl := [4;1;3] in
+  let n := length kl in
+  let f1 := λ kl l, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let g1 := f1 (isort_rank Nat.leb kl) in
+  let h1 := f1 kl in
+  map (λ i,
+    let l := nth i (all_comb n) [] in
+    all_comb_inv n (g1 l)) (seq 0 (n ^ n))
+).
+Compute (
+  let n := 3 in
+  let kl := [1;4;3] in
+  let f1 := λ kl l, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
+  let g1 := f1 (isort_rank Nat.leb kl) in
+  let h1 := f1 kl in
+  map (λ i,
+    let l := nth i (all_comb n) [] in
+    h1 (nth (all_comb_inv n (g1 l)) (all_comb n) []) = l) (seq 0 (n ^ n))
+).
+......
     erewrite map_ext_in. 2: {
       intros j Hj.
 unfold all_comb_inv.
