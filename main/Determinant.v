@@ -273,6 +273,15 @@ rewrite nat_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
+Fixpoint all_comb_inv_loop n l :=
+  match l with
+  | [] => 0
+  | d :: l' => pred d + n * all_comb_inv_loop n l'
+  end.
+
+Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
+
+(*
 Fixpoint all_comb_inv_loop c n l : nat :=
   match l with
   | [] => c
@@ -280,6 +289,7 @@ Fixpoint all_comb_inv_loop c n l : nat :=
   end.
 
 Definition all_comb_inv := all_comb_inv_loop 0.
+*)
 
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
