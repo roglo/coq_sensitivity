@@ -2576,54 +2576,6 @@ rewrite nth_list_prodn_same_length with (n := n). {
 }
 Qed.
 
-(* to be moved to Misc.v *)
-Theorem list_all_nth_prop : ∀ A (P : A → Prop) l d,
-  (∀ x, x ∈ l → P x)
-  → ∀ i, i < length l → P (nth i l d).
-Proof.
-intros * HP.
-intros i Hi.
-apply HP.
-now apply nth_In.
-Qed.
-
-(* to be moved to Misc.v *)
-Theorem List_hd_concat : ∀ A (d : A) ll,
-  hd [] ll ≠ []
-  → hd d (concat ll) = hd d (hd [] ll).
-Proof.
-intros * Hll.
-destruct ll as [| l]; [ easy | cbn ].
-rewrite List_app_hd1; [ easy | ].
-cbn in Hll.
-destruct l as [| a]; [ easy | now cbn ].
-Qed.
-
-(* to be moved to Misc.v *)
-Theorem List_nth_succ_concat : ∀ A (d : A) ll i,
-  (∀ l, l ∈ ll → l ≠ [])
-  → nth (S i) (concat ll) d = nth i (concat (tl (hd [] ll) :: tl ll)) d.
-Proof.
-intros * Hll.
-revert i.
-induction ll as [| l]; intros; cbn. {
-  now rewrite Tauto_match_nat_same.
-}
-destruct (lt_dec (S i) (length l)) as [Hil| Hil]. {
-  rewrite app_nth1; [ | easy ].
-  destruct l as [| a]; [ easy | cbn in Hil |-* ].
-  apply Nat.succ_lt_mono in Hil.
-  now rewrite app_nth1.
-}
-apply Nat.nlt_ge in Hil.
-rewrite app_nth2; [ | easy ].
-destruct l as [| a]. {
-  now specialize (Hll _ (or_introl eq_refl)).
-}
-cbn in Hil; apply Nat.succ_le_mono in Hil.
-now rewrite app_nth2.
-Qed.
-
 Theorem all_comb_elem_ub : ∀ i j n,
   nth i (nth j (all_comb n) []) 0 ≤ n.
 Proof.
@@ -2680,6 +2632,16 @@ apply in_map_iff in Hl.
 destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
+Qed.
+
+Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
+  ∑ (_ ∈ l), a = length l * a.
+Proof.
+intros.
+induction l as [| b]; [ easy | ].
+rewrite rngl_summation_list_cons.
+cbn - [ rngl_add rngl_zero ].
+now rewrite IHl.
 Qed.
 
 (* to be completed
@@ -2856,6 +2818,53 @@ destruct ll as [| l1]. {
   now apply Nat.lt_1_r in Hin; subst i.
 }
 cbn - [ seq ].
+rewrite List_rev_nth.
+rewrite (List_map_nth' []). 2: {
+  rewrite List_flat_map_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros j Hj.
+    now rewrite map_length.
+  }
+  cbn - [ seq rngl_add rngl_zero ].
+  rewrite nat_summation_list_all_same.
+  rewrite seq_length.
+  destruct ll as [| l2]. {
+    rewrite map_length.
+    destruct n; [ easy | ].
+    remember (seq 1 (S (S n))) as s eqn:Hs.
+    cbn in Hll.
+    injection Hll; clear Hll; intros Hr H.
+    subst l1 s.
+    apply List_eq_repeat_nil in Hr; subst n.
+    now rewrite seq_length.
+  }
+  rewrite List_flat_map_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros j Hj.
+    now rewrite map_length, list_prodn_length.
+  }
+  remember (S n) as sn.
+  cbn - [ rngl_add rngl_zero rngl_mul rngl_one ].
+  rewrite nat_summation_list_all_same.
+  subst sn.
+  generalize Hll; intros H.
+  apply (f_equal length) in H.
+  cbn in H; rewrite repeat_length in H.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros l Hl.
+    replace (length l) with (S (S (S (length ll)))). 2: {
+      destruct n; [ easy | ].
+      cbn - [ seq ] in Hll.
+      destruct n; [ easy | ].
+      cbn - [ seq ] in Hll.
+      injection Hll; clear Hll; intros Hll H2 H1.
+      destruct Hl as [Hl| Hl]. {
+        subst l l2.
+        now cbn; rewrite seq_length, H.
+      }
+...
+Search (rev (flat_map _ _)).
+Search (rev (concat _)).
 ...
 Compute (
   let n := 4 in

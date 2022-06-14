@@ -1485,6 +1485,26 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
+Theorem List_rev_nth : ∀ A (ll : list (list A)) i,
+  rev (nth i ll []) = nth i (map (@rev A) ll) [].
+Proof.
+intros.
+revert i.
+induction ll as [| l]; intros; cbn - [ nth ]; [ now rewrite List_nth_nil | ].
+destruct i; [ easy | cbn ].
+apply IHll.
+Qed.
+
+Theorem list_all_nth_prop : ∀ A (P : A → Prop) l d,
+  (∀ x, x ∈ l → P x)
+  → ∀ i, i < length l → P (nth i l d).
+Proof.
+intros * HP.
+intros i Hi.
+apply HP.
+now apply nth_In.
+Qed.
+
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
   map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
 Proof.
@@ -2381,6 +2401,41 @@ destruct Hll' as [Hll'| Hll']. 2: {
   now apply Hll.
 }
 now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
+Qed.
+
+Theorem List_hd_concat : ∀ A (d : A) ll,
+  hd [] ll ≠ []
+  → hd d (concat ll) = hd d (hd [] ll).
+Proof.
+intros * Hll.
+destruct ll as [| l]; [ easy | cbn ].
+rewrite List_app_hd1; [ easy | ].
+cbn in Hll.
+destruct l as [| a]; [ easy | now cbn ].
+Qed.
+
+Theorem List_nth_succ_concat : ∀ A (d : A) ll i,
+  (∀ l, l ∈ ll → l ≠ [])
+  → nth (S i) (concat ll) d = nth i (concat (tl (hd [] ll) :: tl ll)) d.
+Proof.
+intros * Hll.
+revert i.
+induction ll as [| l]; intros; cbn. {
+  now rewrite Tauto_match_nat_same.
+}
+destruct (lt_dec (S i) (length l)) as [Hil| Hil]. {
+  rewrite app_nth1; [ | easy ].
+  destruct l as [| a]; [ easy | cbn in Hil |-* ].
+  apply Nat.succ_lt_mono in Hil.
+  now rewrite app_nth1.
+}
+apply Nat.nlt_ge in Hil.
+rewrite app_nth2; [ | easy ].
+destruct l as [| a]. {
+  now specialize (Hll _ (or_introl eq_refl)).
+}
+cbn in Hil; apply Nat.succ_le_mono in Hil.
+now rewrite app_nth2.
 Qed.
 
 (* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
