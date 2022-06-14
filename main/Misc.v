@@ -1369,55 +1369,68 @@ Definition pair_eqb {A B} (eqb : A → B → _) ab cd :=
 
 (* end pair_eqb *)
 
+Theorem eq_list_prod_nil_iff : ∀ A B (la : list A) (lb : list B),
+  list_prod la lb = [] ↔ la = [] ∨ lb = [].
+Proof.
+intros.
+split; intros Hab. {
+  destruct la as [| a]; [ now left | right ].
+  now destruct lb.
+} {
+  destruct Hab as [Hab| Hab]; [ now subst la | subst lb ].
+  now induction la.
+}
+Qed.
+
 (* list_prodn: like list_prod with any number of lists *)
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => []
   | [l] => map (λ y, [y]) l
+  | l :: ll' => map (uncurry cons) (list_prod l (list_prodn ll'))
+  end.
+
+(*
+Fixpoint list_prodn {A} (ll : list (list A)) :=
+  match ll with
+  | [] => []
+  | [l] => map (λ y, [y]) l
   | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
   end.
-}
+*)
+
+Theorem List_map_eq_nil_iff : ∀ A B (f : A → B) l,
+  map f l = [] ↔ l = [].
+Proof. now intros; destruct l. Qed.
 
 Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
   list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
 Proof.
 intros.
-split. {
-  intros Hll.
+split; intros Hll. {
   induction ll as [| l1]; [ now left | right ].
   cbn in Hll.
   destruct ll as [| l2]. {
     destruct l1 as [| a1]; [ now left | easy ].
   }
-  rewrite flat_map_concat_map in Hll.
-  apply concat_nil_Forall in Hll.
-  specialize (proj1 (Forall_forall _ _) Hll) as H1.
-  clear Hll.
-  cbn - [ list_prodn ] in H1.
-  remember (list_prodn (l2 :: ll)) as ll' eqn:Hll'.
-  symmetry in Hll'.
-  destruct ll' as [| l3]. {
-    specialize (IHll eq_refl).
-    destruct IHll as [H2| H2]; [ easy | ].
-    now right.
-  }
-  destruct l1 as [| a1]; [ now left | right; right ].
-  now specialize (H1 _ (or_introl eq_refl)).
-} {
-  intros Hll.
-  destruct Hll as [Hll| Hll]; [ now subst ll | ].
-  induction ll as [| l1]; [ easy | cbn ].
-  destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
+  apply map_eq_nil in Hll.
+  apply eq_list_prod_nil_iff in Hll.
+  destruct Hll as [Hll| Hll]; [ now left | ].
   specialize (IHll Hll).
-  destruct ll as [| l2]; [ easy | ].
-  rewrite IHll; cbn.
-  rewrite flat_map_concat_map; cbn.
-  apply concat_nil_Forall.
-  apply Forall_forall.
-  intros ll' Hll'.
-  apply in_map_iff in Hll'.
-  now destruct Hll' as (a & Hll' & Hal1).
+  destruct IHll as [H1| H1]; [ easy | now right ].
+} {
+  destruct Hll as [Hll| Hll]; [ now subst ll | ].
+  induction ll as [| l]; [ easy | cbn ].
+  destruct Hll as [Hll| Hll]. {
+    subst l; cbn.
+    now destruct ll; cbn.
+  }
+  specialize (IHll Hll).
+  destruct ll as [| l1]; [ easy | ].
+  rewrite IHll.
+  apply List_map_eq_nil_iff.
+  now induction l.
 }
 Qed.
 

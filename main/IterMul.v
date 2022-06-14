@@ -560,6 +560,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(* to be completed
 Theorem rngl_product_summation_distr_prodn :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ m n (f : nat → nat → T),
@@ -582,6 +583,46 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
+(**)
+rewrite rngl_summation_list_map.
+cbn.
+destruct ll as [| l1]. {
+  destruct m; [ easy | ].
+  specialize (IHm (Nat.neq_succ_0 _)).
+  destruct m; [ | easy ].
+  injection Hll; clear Hll; intros; subst l.
+  replace (list_prod (seq 1 n) (map (λ y, [y]) (seq 1 n))) with
+    (map (λ i, (i, [i])) (seq 1 n)). 2: {
+    induction n; [ easy | cbn ].
+    f_equal.
+...
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_seq_summation.
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite rngl_product_split_last.
+rewrite (rngl_product_shift _ 1).
+rewrite Nat_sub_succ_1.
+rewrite Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ uncurry ].
+rewrite IHm.
+destruct m. {
+  cbn in Hll.
+  injection Hll; clear Hll; intros; subst l.
+  cbn - [ uncurry ].
+  rewrite rngl_summation_list_map.
+  rewrite rngl_summation_seq_summation.
+  rewrite Nat.add_comm, Nat.add_sub.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_product_only_one.
+    now rewrite Nat.sub_diag; cbn.
+  }
+  symmetry.
+...
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
@@ -617,6 +658,7 @@ destruct k; [ easy | ].
 rewrite List_nth_succ_cons.
 now rewrite Nat_sub_succ_1.
 Qed.
+*)
 
 End a.
 
@@ -624,4 +666,6 @@ Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_list_only_one {T ro rp} A%type.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
+(*
 Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
+*)
