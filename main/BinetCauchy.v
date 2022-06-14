@@ -2635,12 +2635,23 @@ now apply IHll.
 Qed.
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
-  ∑ (_ ∈ l), a = length l * a.
+  ∑ (_ ∈ l), a = a * length l.
 Proof.
 intros.
 induction l as [| b]; [ easy | ].
 rewrite rngl_summation_list_cons.
 cbn - [ rngl_add rngl_zero ].
+rewrite IHl.
+now rewrite Nat.mul_succ_r, Nat.add_comm.
+Qed.
+
+Theorem nat_product_list_all_same : ∀ A (l : list A) a,
+  ∏ (_ ∈ l), a = a ^ length l.
+Proof.
+intros.
+induction l as [| b]; [ easy | ].
+rewrite rngl_product_list_cons.
+cbn - [ rngl_mul rngl_one ].
 now rewrite IHl.
 Qed.
 
@@ -2818,6 +2829,22 @@ destruct ll as [| l1]. {
   now apply Nat.lt_1_r in Hin; subst i.
 }
 cbn - [ seq ].
+(**)
+destruct ll as [| l2]. {
+  destruct n; [ easy | ].
+  remember (seq 1 (S (S n))) as s.
+  cbn in Hll.
+  injection Hll; clear Hll; intros Hll Hl1; subst s.
+  destruct n; [ | easy ].
+  subst l1; cbn.
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  destruct i; [ easy | ].
+  cbn in Hin; flia Hin.
+}
+(* chais pas quoi foutre avec mon flat_map de merde ; fait chier, tiens. *)
+...
 rewrite List_rev_nth.
 rewrite (List_map_nth' []). 2: {
   rewrite List_flat_map_length.
@@ -2847,9 +2874,9 @@ rewrite (List_map_nth' []). 2: {
   cbn - [ rngl_add rngl_zero rngl_mul rngl_one ].
   rewrite nat_summation_list_all_same.
   subst sn.
-  generalize Hll; intros H.
-  apply (f_equal length) in H.
-  cbn in H; rewrite repeat_length in H.
+  generalize Hll; intros Hn.
+  apply (f_equal length) in Hn.
+  cbn in Hn; rewrite repeat_length in Hn.
   erewrite rngl_product_list_eq_compat. 2: {
     intros l Hl.
     replace (length l) with (S (S (S (length ll)))). 2: {
@@ -2860,8 +2887,41 @@ rewrite (List_map_nth' []). 2: {
       injection Hll; clear Hll; intros Hll H2 H1.
       destruct Hl as [Hl| Hl]. {
         subst l l2.
-        now cbn; rewrite seq_length, H.
+        now cbn; rewrite seq_length, Hn.
       }
+      rewrite <- Hll in Hl.
+      apply repeat_spec in Hl.
+      rewrite Hl, <- Hn.
+      now cbn; rewrite seq_length.
+    }
+    easy.
+  }
+  cbn - [ "*" rngl_mul rngl_one ].
+  replace (length l1) with (S n). 2: {
+    destruct n; [ easy | ].
+    cbn - [ seq ] in Hll.
+    injection Hll; clear Hll; intros Hll Hl1.
+    rewrite <- Hl1.
+    now cbn; rewrite seq_length.
+  }
+  rewrite nat_product_list_all_same.
+  rewrite <- Hn.
+  replace (length (l2 :: ll)) with (n - 1). 2: {
+    destruct n; [ easy | ].
+    cbn - [ seq ] in Hll.
+    injection Hll; clear Hll; intros Hll Hl1.
+    rewrite <- Hll.
+    rewrite repeat_length.
+    now rewrite Nat_sub_succ_1.
+  }
+  destruct n; [ easy | ].
+  rewrite Nat_sub_succ_1.
+  rewrite Nat.mul_comm, Nat.mul_assoc.
+  rewrite <- Nat.pow_succ_r'.
+  rewrite Nat.mul_comm.
+  now rewrite <- Nat.pow_succ_r'.
+}
+rewrite List_rev_nth.
 ...
 Search (rev (flat_map _ _)).
 Search (rev (concat _)).
