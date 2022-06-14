@@ -1382,6 +1382,19 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem list_prod_nil_r : ∀ A B (la : list A),
+  list_prod la ([] : list B) = [].
+Proof. now intros; induction la. Qed.
+
+Theorem list_prod_app_l : ∀ A C (la lb : list A) (lc : list C),
+  list_prod (la ++ lb) lc = list_prod la lc ++ list_prod lb lc.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+rewrite IHla.
+apply app_assoc.
+Qed.
+
 (* list_prodn: like list_prod with any number of lists *)
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=

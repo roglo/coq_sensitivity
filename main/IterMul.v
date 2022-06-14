@@ -547,6 +547,7 @@ Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
 Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list.
+Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
 Arguments rngl_product_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
@@ -584,17 +585,46 @@ destruct ll as [| l]. {
   now rewrite rngl_product_only_one.
 }
 (**)
+destruct m; [ easy | ].
+specialize (IHm (Nat.neq_succ_0 _)).
+(*
 rewrite rngl_summation_list_map.
-cbn.
+*)
+cbn in Hll.
+injection Hll; clear Hll; intros Hll H; subst l.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+cbn - [ list_prodn ].
+rewrite IHm.
+cbn - [ list_prodn ].
+rewrite Hll.
+unfold iter_seq at 2.
+rewrite Nat_sub_succ_1.
+rewrite rngl_summation_list_mul_summation_list; [ | easy ].
 destruct ll as [| l1]. {
-  destruct m; [ easy | ].
-  specialize (IHm (Nat.neq_succ_0 _)).
-  destruct m; [ | easy ].
-  injection Hll; clear Hll; intros; subst l.
-  replace (list_prod (seq 1 n) (map (λ y, [y]) (seq 1 n))) with
-    (map (λ i, (i, [i])) (seq 1 n)). 2: {
-    induction n; [ easy | cbn ].
-    f_equal.
+  destruct m; [ cbn | easy ].
+  clear Hll.
+  do 2 rewrite rngl_summation_list_map.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    rewrite rngl_product_only_one.
+    now rewrite Nat.sub_diag; cbn.
+  }
+  cbn.
+  rewrite rngl_summation_list_prod.
+  apply rngl_summation_list_eq_compat.
+  intros i Hi.
+  rewrite rngl_summation_list_map.
+  apply rngl_summation_list_eq_compat.
+  intros j Hj.
+  unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_mul_1_l.
+}
 ...
 rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation.

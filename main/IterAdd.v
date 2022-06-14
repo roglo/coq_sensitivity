@@ -621,6 +621,20 @@ rewrite List_fold_left_map.
 now apply rngl_summation_list_eq_compat.
 Qed.
 
+Theorem rngl_summation_list_prod : ∀ A B (la : list A) (lb : list B) f,
+  ∑ (ab ∈ list_prod la lb), f ab = ∑ (a ∈ la), ∑ (b ∈ lb), f (a, b).
+Proof.
+intros.
+induction la as [| a]; cbn. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  now symmetry; apply rngl_summation_list_empty.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_list_cons.
+now rewrite IHla.
+Qed.
+
 Theorem rngl_summation_list_change_var : ∀ A B (l : list A) f g (h : _ → B),
   (∀ i, i ∈ l → g (h i) = i)
   → ∑ (i ∈ l), f i = ∑ (i ∈ map h l), f (g i).
@@ -697,6 +711,7 @@ Arguments rngl_summation_list_map {T ro} (_ _)%type.
 Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.
+Arguments rngl_summation_list_prod {T ro rp} (A B)%type (la lb)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
