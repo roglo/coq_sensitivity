@@ -1374,10 +1374,12 @@ Definition pair_eqb {A B} (eqba : A → A → bool) (eqbb : B → B → bool) ab
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => []
-  | [l] => map (λ y, [y]) l
-  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
+  | l :: ll' =>
+      match ll' with
+      | [] => map (λ y, [y]) l
+      | _ :: _ => flat_map (λ a, map (cons a) (list_prodn ll')) l
+      end
   end.
-}
 
 Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
   list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
