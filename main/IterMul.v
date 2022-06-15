@@ -570,9 +570,7 @@ Theorem permutation_list_prodn_app_comm : ∀ A (eqb : A → _),
 Proof.
 intros * Heqb *.
 assert (Heqbl : equality (list_eqb eqb)). {
-...
-  intros la lb.
-  now apply list_eqb_eq.
+  now apply -> equality_list_eqb.
 }
 revert llb.
 induction lla as [| la]; intros. {
@@ -585,8 +583,12 @@ destruct lla as [| la']. {
   destruct llb as [| lb]; [ apply (permutation_refl Heqbl) | cbn ].
   destruct llb as [| lb']. {
     cbn.
-Print pair_eqb.
-    eapply permutation_map.
+    apply permutation_map with (eqba := pair_eqb eqb (list_eqb eqb)). {
+      now apply equality_pair_eqb.
+    } {
+      easy.
+    }
+...
 Check ((list_prod la (map (λ y : A, [y]) lb))).
 Check pair_eqb_eq_iff.
 ...
