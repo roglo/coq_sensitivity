@@ -2177,17 +2177,41 @@ Notation "'App' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ++ g) [])
   (at level 45, i at level 0, l at level 60).
 
+Theorem App_list_cons : ∀ A B (a : A) la (f : A → list B),
+  App (i ∈ a :: la), f i = f a ++ App (i ∈ la), f i.
+Proof.
+intros.
+apply iter_list_cons; [ easy | apply app_nil_r | ].
+apply app_assoc.
+Qed.
+
+Theorem App_list_all_nil : ∀ A B l (f : A → list B),
+  (∀ a, a ∈ l → f a = [])
+  → App (a ∈ l), f a = [].
+Proof.
+intros * Hl.
+apply iter_list_all_d; [ easy | apply app_nil_r | | easy ].
+apply app_assoc.
+Qed.
+
 Theorem App_eq_nil : ∀ A B (l : list A) (f : A → list B),
   App (a ∈ l), f a = [] → ∀ a, a ∈ l → f a = [].
 Proof.
 intros * Happ * Hl.
 induction l as [| b]; [ easy | ].
-rewrite iter_list_cons in Happ; [ | easy | apply app_nil_r | ]. 2: {
-  apply app_assoc.
-}
+rewrite App_list_cons in Happ.
 apply app_eq_nil in Happ.
 destruct Hl as [Hl| Hl]; [ now subst a | ].
 now apply IHl.
+Qed.
+
+Theorem App_concat_map : ∀ A B (l : list A) (f : A → list B),
+  App (a ∈ l), f a = concat (map f l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite App_list_cons.
+now rewrite IHl.
 Qed.
 
 (* list_prodn: cartesian product of several lists *)
@@ -2238,8 +2262,7 @@ split. {
   specialize (IHll Hll).
   destruct ll as [| l2]; [ easy | ].
   rewrite IHll; cbn.
-  apply iter_list_all_d; [ easy | apply app_nil_r | | easy ].
-  apply app_assoc.
+  now apply App_list_all_nil.
 }
 Qed.
 
