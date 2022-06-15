@@ -1432,7 +1432,7 @@ Qed.
 
 (* end pair_eqb *)
 
-(* list_prodn: like list_prod with any number of lists *)
+(* list_prodn: cartesian product of several lists *)
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
