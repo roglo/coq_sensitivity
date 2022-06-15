@@ -2404,36 +2404,6 @@ intros.
 apply squ_mat_is_corr, mI_is_square_matrix.
 Qed.
 
-(* to be completed
-Theorem mI_transp_idemp : ∀ n, ((mI n)⁺)%M = mI n.
-Proof.
-intros.
-apply matrix_eq; cycle 1. {
-  apply mat_transp_is_corr.
-  apply mI_is_correct_matrix.
-} {
-  apply mI_is_correct_matrix.
-} {
-  rewrite mat_transp_nrows.
-  now rewrite mI_nrows, mI_ncols.
-} {
-  rewrite mat_transp_ncols.
-  rewrite mI_nrows, mI_ncols.
-  now destruct n.
-}
-rewrite mat_transp_nrows, mI_ncols.
-intros * Hi Hj.
-rewrite mat_transp_el; [ | apply mI_is_correct_matrix ].
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  now subst i; destruct (Nat.eq_dec j j).
-} {
-  rewrite mat_el_mI_ndiag; [ | now apply Nat.neq_sym ].
-  rewrite mat_el_mI_ndiag; [ | easy ].
-  easy.
-}
-Qed.
-*)
-
 Theorem mZ_is_correct_matrix : ∀ m n,
   n ≠ 0
   → is_correct_matrix (mZ m n) = true.

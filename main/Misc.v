@@ -1360,12 +1360,75 @@ rewrite (equality_refl Heqb) in Hab.
 congruence.
 Qed.
 
+Theorem equality_list_eqb : ∀ A (eqb : A → _),
+  equality eqb ↔ equality (list_eqb eqb).
+Proof.
+intros.
+split. {
+  intros Heqb la lb.
+  now apply list_eqb_eq.
+} {
+  intros Heqb a b.
+  unfold equality in Heqb.
+  split. {
+    intros Hab.
+    specialize (Heqb [a] [b]).
+    cbn in Heqb.
+    rewrite Hab in Heqb.
+    specialize (proj1 Heqb eq_refl) as H1.
+    now injection H1.
+  } {
+    intros Hab; subst b.
+    specialize (Heqb [a] [a]).
+    cbn in Heqb.
+    specialize (proj2 Heqb eq_refl) as H1.
+    now destruct (eqb a a).
+  }
+}
+Qed.
+
 (* end list_eqb *)
 
 (* pair_eqb *)
 
 Definition pair_eqb {A B} (eqba : A → A → bool) (eqbb : B → B → bool) ab cd :=
   (eqba (fst ab) (fst cd) && eqbb (snd ab) (snd cd))%bool.
+
+Theorem pair_eqb_eq : ∀ A B (eqba : A → _) (eqbb : B → _),
+  equality eqba →
+  equality eqbb →
+  ∀ a b, pair_eqb eqba eqbb a b = true ↔ a = b.
+Proof.
+intros * Heqba Heqbb *.
+split; intros Hab. {
+  unfold pair_eqb in Hab.
+  destruct a as (a1, a2).
+  destruct b as (b1, b2).
+  cbn in Hab.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Ha, Hb).
+  apply Heqba in Ha.
+  apply Heqbb in Hb.
+  congruence.
+} {
+  subst b.
+  unfold pair_eqb.
+  destruct a as (a1, a2); cbn.
+  apply Bool.andb_true_iff.
+  split. {
+    apply (equality_refl Heqba).
+  } {
+    apply (equality_refl Heqbb).
+  }
+}
+Qed.
+
+Theorem equality_pair_eqb : ∀ A B (eqba : A → _) (eqbb : B → _),
+  equality eqba → equality eqbb → equality (pair_eqb eqba eqbb).
+Proof.
+intros * Heqba Heqbb ab1 ab2.
+now apply pair_eqb_eq.
+Qed.
 
 (* end pair_eqb *)
 

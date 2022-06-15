@@ -2750,7 +2750,7 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
 erewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 assert (Heql : equality (list_eqb Nat.eqb)). {
   intros la lb.
-  apply list_eqb_eq_iff.
+  apply -> equality_list_eqb.
   unfold equality.
   apply Nat.eqb_eq.
 }
