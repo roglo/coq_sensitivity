@@ -1405,11 +1405,11 @@ Fixpoint list_prodn {A} (ll : list (list A)) :=
   end.
 
 (*
-Fixpoint list_prodn {A} (ll : list (list A)) :=
+Fixpoint old_list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => []
   | [l] => map (λ y, [y]) l
-  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
+  | l :: ll' => flat_map (λ a, map (cons a) (old_list_prodn ll')) l
   end.
 *)
 

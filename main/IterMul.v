@@ -625,6 +625,108 @@ destruct ll as [| l1]. {
   unfold iter_seq, iter_list; cbn.
   now rewrite rngl_mul_1_l.
 }
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_list_prod.
+unfold uncurry.
+rewrite rngl_summation_summation_list_swap.
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros l2 Hl.
+    rewrite rngl_product_split_last; [ | flia ].
+    rewrite (rngl_product_shift 1); [ | flia ].
+    do 2 rewrite Nat_sub_succ_1.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      now rewrite Nat.add_comm, Nat.add_sub.
+    }
+    now rewrite List_nth_succ_cons.
+  }
+  easy.
+}
+cbn - [ list_prodn nth ].
+...
+symmetry.
+rewrite rngl_summation_summation_list_swap.
+...
+apply rngl_summation_list_eq_compat.
+intros l2 Hl2.
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+...
+rewrite rngl_summation_rtl.
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite rngl_product_split_last; [ | flia ].
+f_equal. 2: {
+  cbn.
+...
+(**)
+symmetry.
+rewrite rngl_summation_summation_list_swap.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+apply in_seq in Hi.
+apply rngl_summation_list_eq_compat.
+intros l2 Hl2.
+symmetry.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal. 2: {
+  cbn.
+...
+  ============================
+  f (S (S m)) (nth m l2 0) = f (S (S m)) i
+...
+rewrite rngl_summation_summation_list_swap.
+apply rngl_summation_list_eq_compat.
+intros l2 Hl2.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+apply in_seq in Hi.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal. 2: {
+  cbn.
+...
+  ============================
+  f (S (S m)) (nth m l2 0) = f (S (S m)) i
+...
+intros i Hi.
+apply rngl_summation_list_eq_compat.
+intros l2 Hl2.
+symmetry.
+apply in_seq in Hi.
+rewrite rngl_product_split_last; [ | flia ].
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal.
+apply rngl_product_eq_compat.
+intros j Hj.
+rewrite Nat.add_comm, Nat.add_sub.
+cbn - [ nth ].
+...
+rewrite rngl_product_split3 with (j := S (S m)); [ | ].
+rewrite rngl_mul_mul_swap.
+f_
+f_equal. 2: {
+  cbn - [ nth ].
+  cbn.
+
+  cbn - [ "-" ].
+...
+rewrite (rngl_product_shift 1); [ | flia ].
+do 2 rewrite Nat_sub_succ_1.
+f_equal. 2: {
+  cbn.
 ...
 rewrite rngl_summation_list_map.
 rewrite rngl_summation_seq_summation.
