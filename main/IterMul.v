@@ -634,6 +634,29 @@ rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
 symmetry.
+(*
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros l2 Hl.
+    rewrite rngl_product_split_first; [ | flia ].
+    rewrite Nat.sub_diag, List_nth_0_cons.
+    rewrite (rngl_product_shift 1); [ | flia ].
+    do 2 rewrite Nat_sub_succ_1.
+    erewrite rngl_product_eq_compat. 2: {
+      intros j Hj.
+      rewrite <- Nat.add_sub_assoc; [ | easy ].
+      rewrite List_nth_succ_cons.
+      rewrite Nat.add_1_l.
+      easy.
+    }
+    easy.
+  }
+  easy.
+}
+cbn - [ list_prodn nth ].
+...
+*)
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_summation_list_eq_compat. 2: {
