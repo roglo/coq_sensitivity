@@ -581,7 +581,6 @@ Qed.
 
 (* det' and det'' are equal *)
 
-(* to be completed
 Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -630,7 +629,6 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   }
   rewrite map_id.
   split; [ easy | ].
-...
   apply in_all_comb_iff.
   split; [ easy | ].
   split; [ now rewrite map_length, canon_sym_gr_list_length | ].
@@ -756,7 +754,6 @@ apply rngl_summation_list_incl; [ | | easy ]. {
   apply NoDup_all_comb.
 }
 Qed.
-*)
 
 (* multilinearity *)
 
@@ -2739,8 +2736,6 @@ Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
-(* to be completed
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
-*)
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
 
