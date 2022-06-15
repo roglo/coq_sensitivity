@@ -592,6 +592,7 @@ rewrite rngl_summation_list_map.
 *)
 cbn in Hll.
 injection Hll; clear Hll; intros Hll H; subst l.
+
 rewrite rngl_product_split_last; [ | flia ].
 rewrite (rngl_product_shift 1); [ | flia ].
 do 2 rewrite Nat_sub_succ_1.
@@ -606,17 +607,19 @@ rewrite Hll.
 unfold iter_seq at 2.
 rewrite Nat_sub_succ_1.
 rewrite rngl_summation_list_mul_summation_list; [ | easy ].
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_list_prod.
+unfold uncurry.
 destruct ll as [| l1]. {
   destruct m; [ cbn | easy ].
   clear Hll.
-  do 2 rewrite rngl_summation_list_map.
+  rewrite rngl_summation_list_map.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros i Hi.
     rewrite rngl_product_only_one.
     now rewrite Nat.sub_diag; cbn.
   }
   cbn.
-  rewrite rngl_summation_list_prod.
   apply rngl_summation_list_eq_compat.
   intros i Hi.
   rewrite rngl_summation_list_map.
@@ -625,11 +628,8 @@ destruct ll as [| l1]. {
   unfold iter_seq, iter_list; cbn.
   now rewrite rngl_mul_1_l.
 }
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite rngl_summation_list_map.
-rewrite rngl_summation_list_prod.
-unfold uncurry.
 rewrite rngl_summation_summation_list_swap.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite rngl_summation_seq_summation; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
