@@ -2828,6 +2828,7 @@ destruct ll as [| l1]. {
   apply List_eq_repeat_nil in Hll; subst n; cbn.
   now apply Nat.lt_1_r in Hin; subst i.
 }
+...
 cbn - [ seq ].
 (**)
 destruct ll as [| l2]. {
@@ -2843,6 +2844,11 @@ destruct ll as [| l2]. {
   destruct i; [ easy | ].
   cbn in Hin; flia Hin.
 }
+Print list_prodn.
+remember (@list_prodn nat (repeat (seq 1 (S n)) (S n))) as y.
+cbn - [ seq ] in Heqy.
+...
+
 (* chais pas quoi foutre avec mon flat_map de merde ; fait chier, tiens. *)
 ...
 rewrite List_rev_nth.
