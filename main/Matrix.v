@@ -53,11 +53,11 @@ split; intros Hab. {
   destruct A as (lla).
   destruct B as (llb).
   cbn in Hab; f_equal.
-  specialize list_eqb_eq_iff as H1.
+  specialize list_eqb_eq as H1.
   specialize (H1 (list T) (list_eqb eqb)).
   apply H1; [ | easy ].
   intros la lb.
-  specialize (list_eqb_eq_iff Heqb la lb) as H2.
+  specialize (list_eqb_eq Heqb la lb) as H2.
   split; [ apply H2 | ].
   intros; subst lb.
   clear - Heqb.

@@ -562,6 +562,52 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 (* to be completed
+Theorem permutation_list_prodn_app_comm : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ lla llb,
+  permutation (list_eqb eqb)
+    (list_prodn (lla ++ llb)) (list_prodn (llb ++ lla)).
+Proof.
+intros * Heqb *.
+assert (Heqbl : equality (list_eqb eqb)). {
+...
+  intros la lb.
+  now apply list_eqb_eq.
+}
+revert llb.
+induction lla as [| la]; intros. {
+  rewrite app_nil_r.
+  apply (permutation_refl Heqbl).
+}
+cbn.
+destruct lla as [| la']. {
+  cbn.
+  destruct llb as [| lb]; [ apply (permutation_refl Heqbl) | cbn ].
+  destruct llb as [| lb']. {
+    cbn.
+Print pair_eqb.
+    eapply permutation_map.
+Check ((list_prod la (map (λ y : A, [y]) lb))).
+Check pair_eqb_eq_iff.
+...
+    apply (permutation_map (list_eqb_eq_iff (pair_eqb_eq_iff Heqb))).
+Check permutation_map.
+Check (permutation_map Heqb).
+...
+remember (lla ++ llb) as llc eqn:Hllc.
+symmetry in Hllc.
+destruct llc as [| lc]. {
+  apply app_eq_nil in Hllc.
+  destruct Hllc; subst lla llb; cbn.
+  apply (permutation_refl Heqb).
+}
+Search list_prod.
+...
+rewrite List_cons_is_app, app_assoc.
+eapply (permutation_trans Heqb); [ | apply IHlla ].
+rewrite <- List_cons_is_app.
+...
+
 Theorem rngl_product_summation_distr_prodn :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ m n (f : nat → nat → T),
@@ -673,6 +719,25 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ list_prodn nth ].
+rewrite <- Hll.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb)); cycle 1. {
+    intros la lb.
+    apply list_eqb_eq_iff.
+    intros j k.
+    apply Nat.eqb_eq.
+  } {
+    rewrite List_cons_is_app.
+Search (list_prodn (_ ++ _)).
+...
+    apply permutation_list_prodn_app_comm.
+  }
+  easy.
+}
+cbn - [ list_prodn nth ].
+Print list_prodn.
+(* chais pas si ça m'avance à grand chose, mais bon *)
 ...
 symmetry.
 rewrite rngl_summation_summation_list_swap.
