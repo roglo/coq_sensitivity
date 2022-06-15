@@ -221,6 +221,15 @@ rewrite rngl_summation_list_cons.
 now rewrite IHl.
 Qed.
 
+Theorem in_App_list : ∀ A B (f : A → list B) l y,
+  y ∈ App (i ∈ l), f i ↔ (∃ x : A, x ∈ l ∧ y ∈ f x).
+Proof.
+intros.
+rewrite App_concat_map.
+rewrite <- flat_map_concat_map.
+apply in_flat_map.
+Qed.
+
 Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
   length (flat_map f l) = ∑ (a ∈ l), length (f a).
 Proof.
@@ -291,7 +300,6 @@ Fixpoint all_comb_inv_loop n l :=
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
 
-(* to be completed
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
@@ -320,8 +328,7 @@ split. {
   }
   apply List_repeat_eq_cons_iff in Hll.
   destruct Hll as (Hlz & Hl1 & Hll).
-...
-  apply in_flat_map.
+  apply in_App_list.
   exists a.
   split. {
     apply in_seq.
@@ -358,7 +365,7 @@ split. {
     destruct Hi as [Hi| Hi]; [ subst a | easy ].
     apply in_seq in Ha; flia Ha.
   }
-  apply in_flat_map in Hl.
+  apply in_App_list in Hl.
   destruct Hl as (a & Ha & Hl).
   apply in_map_iff in Hl.
   destruct Hl as (l2 & Hl & Hl2); subst l.
@@ -404,8 +411,7 @@ replace (l :: ll) with (repeat (seq 1 m) n). 2: {
 clear l ll Hl Hll.
 specialize (IHn m) as H1.
 remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
-...
-rewrite flat_map_concat_map.
+rewrite App_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
   apply in_map_iff in Hl.
@@ -442,7 +448,6 @@ intros n.
 unfold all_comb.
 apply NoDup_list_prodn_repeat.
 Qed.
-*)
 
 (* det and det' are equal *)
 
