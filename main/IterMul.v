@@ -547,7 +547,6 @@ Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
 Arguments rngl_product_integral {T}%type {ro rp} _ _ _ (b e)%nat f%function.
 Arguments rngl_product_list_integral {T}%type {ro rp} _ _ _ A%type l%list.
-Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_product_split_first {T}%type {ro rp} (b k)%nat g%function.
 Arguments rngl_product_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_product_1_opp_1 {T}%type {ro rp} _ (b e)%nat (f g)%function.
@@ -560,55 +559,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-
-(* to be completed
-Theorem permutation_list_prodn_app_comm : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ lla llb,
-  permutation (list_eqb eqb)
-    (list_prodn (lla ++ llb)) (list_prodn (llb ++ lla)).
-Proof.
-intros * Heqb *.
-assert (Heqbl : equality (list_eqb eqb)). {
-  now apply -> equality_list_eqb.
-}
-revert llb.
-induction lla as [| la]; intros. {
-  rewrite app_nil_r.
-  apply (permutation_refl Heqbl).
-}
-cbn.
-destruct lla as [| la']. {
-  cbn.
-  destruct llb as [| lb]; [ apply (permutation_refl Heqbl) | cbn ].
-  destruct llb as [| lb']. {
-    cbn.
-    apply permutation_map with (eqba := pair_eqb eqb (list_eqb eqb)). {
-      now apply equality_pair_eqb.
-    } {
-      easy.
-    }
-...
-Check ((list_prod la (map (λ y : A, [y]) lb))).
-Check pair_eqb_eq_iff.
-...
-    apply (permutation_map (list_eqb_eq_iff (pair_eqb_eq_iff Heqb))).
-Check permutation_map.
-Check (permutation_map Heqb).
-...
-remember (lla ++ llb) as llc eqn:Hllc.
-symmetry in Hllc.
-destruct llc as [| lc]. {
-  apply app_eq_nil in Hllc.
-  destruct Hllc; subst lla llb; cbn.
-  apply (permutation_refl Heqb).
-}
-Search list_prod.
-...
-rewrite List_cons_is_app, app_assoc.
-eapply (permutation_trans Heqb); [ | apply IHlla ].
-rewrite <- List_cons_is_app.
-...
 
 Theorem rngl_product_summation_distr_prodn :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -632,219 +582,6 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
-(**)
-destruct m; [ easy | ].
-specialize (IHm (Nat.neq_succ_0 _)).
-(*
-rewrite rngl_summation_list_map.
-*)
-cbn in Hll.
-injection Hll; clear Hll; intros Hll H; subst l.
-
-rewrite rngl_product_split_last; [ | flia ].
-rewrite (rngl_product_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ list_prodn ].
-rewrite IHm.
-cbn - [ list_prodn ].
-rewrite Hll.
-unfold iter_seq at 2.
-rewrite Nat_sub_succ_1.
-rewrite rngl_summation_list_mul_summation_list; [ | easy ].
-rewrite rngl_summation_list_map.
-rewrite rngl_summation_list_prod.
-unfold uncurry.
-destruct ll as [| l1]. {
-  destruct m; [ cbn | easy ].
-  clear Hll.
-  rewrite rngl_summation_list_map.
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros i Hi.
-    rewrite rngl_product_only_one.
-    now rewrite Nat.sub_diag; cbn.
-  }
-  cbn.
-  apply rngl_summation_list_eq_compat.
-  intros i Hi.
-  rewrite rngl_summation_list_map.
-  apply rngl_summation_list_eq_compat.
-  intros j Hj.
-  unfold iter_seq, iter_list; cbn.
-  now rewrite rngl_mul_1_l.
-}
-rewrite rngl_summation_summation_list_swap.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-rewrite rngl_summation_seq_summation; [ | easy ].
-rewrite rngl_summation_seq_summation; [ | easy ].
-rewrite Nat.add_comm, Nat.add_sub.
-symmetry.
-(*
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros l2 Hl.
-    rewrite rngl_product_split_first; [ | flia ].
-    rewrite Nat.sub_diag, List_nth_0_cons.
-    rewrite (rngl_product_shift 1); [ | flia ].
-    do 2 rewrite Nat_sub_succ_1.
-    erewrite rngl_product_eq_compat. 2: {
-      intros j Hj.
-      rewrite <- Nat.add_sub_assoc; [ | easy ].
-      rewrite List_nth_succ_cons.
-      rewrite Nat.add_1_l.
-      easy.
-    }
-    easy.
-  }
-  easy.
-}
-cbn - [ list_prodn nth ].
-...
-*)
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite rngl_summation_list_eq_compat. 2: {
-    intros l2 Hl.
-    rewrite rngl_product_split_last; [ | flia ].
-    rewrite (rngl_product_shift 1); [ | flia ].
-    do 2 rewrite Nat_sub_succ_1.
-    erewrite rngl_product_eq_compat. 2: {
-      intros j Hj.
-      now rewrite Nat.add_comm, Nat.add_sub.
-    }
-    now rewrite List_nth_succ_cons.
-  }
-  easy.
-}
-cbn - [ list_prodn nth ].
-rewrite <- Hll.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb)); cycle 1. {
-    intros la lb.
-    apply list_eqb_eq_iff.
-    intros j k.
-    apply Nat.eqb_eq.
-  } {
-    rewrite List_cons_is_app.
-Search (list_prodn (_ ++ _)).
-...
-    apply permutation_list_prodn_app_comm.
-  }
-  easy.
-}
-cbn - [ list_prodn nth ].
-Print list_prodn.
-(* chais pas si ça m'avance à grand chose, mais bon *)
-...
-symmetry.
-rewrite rngl_summation_summation_list_swap.
-...
-apply rngl_summation_list_eq_compat.
-intros l2 Hl2.
-rewrite rngl_summation_seq_summation; [ | easy ].
-rewrite rngl_summation_seq_summation; [ | easy ].
-rewrite Nat.add_comm, Nat.add_sub.
-...
-rewrite rngl_summation_rtl.
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite rngl_product_split_last; [ | flia ].
-f_equal. 2: {
-  cbn.
-...
-(**)
-symmetry.
-rewrite rngl_summation_summation_list_swap.
-apply rngl_summation_list_eq_compat.
-intros i Hi.
-apply in_seq in Hi.
-apply rngl_summation_list_eq_compat.
-intros l2 Hl2.
-symmetry.
-rewrite rngl_product_split_last; [ | flia ].
-rewrite (rngl_product_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-f_equal. 2: {
-  cbn.
-...
-  ============================
-  f (S (S m)) (nth m l2 0) = f (S (S m)) i
-...
-rewrite rngl_summation_summation_list_swap.
-apply rngl_summation_list_eq_compat.
-intros l2 Hl2.
-apply rngl_summation_list_eq_compat.
-intros i Hi.
-apply in_seq in Hi.
-rewrite rngl_product_split_last; [ | flia ].
-rewrite (rngl_product_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-f_equal. 2: {
-  cbn.
-...
-  ============================
-  f (S (S m)) (nth m l2 0) = f (S (S m)) i
-...
-intros i Hi.
-apply rngl_summation_list_eq_compat.
-intros l2 Hl2.
-symmetry.
-apply in_seq in Hi.
-rewrite rngl_product_split_last; [ | flia ].
-rewrite (rngl_product_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-f_equal.
-apply rngl_product_eq_compat.
-intros j Hj.
-rewrite Nat.add_comm, Nat.add_sub.
-cbn - [ nth ].
-...
-rewrite rngl_product_split3 with (j := S (S m)); [ | ].
-rewrite rngl_mul_mul_swap.
-f_
-f_equal. 2: {
-  cbn - [ nth ].
-  cbn.
-
-  cbn - [ "-" ].
-...
-rewrite (rngl_product_shift 1); [ | flia ].
-do 2 rewrite Nat_sub_succ_1.
-f_equal. 2: {
-  cbn.
-...
-rewrite rngl_summation_list_map.
-rewrite rngl_summation_seq_summation.
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite rngl_product_split_last.
-rewrite (rngl_product_shift _ 1).
-rewrite Nat_sub_succ_1.
-rewrite Nat_sub_succ_1.
-erewrite rngl_product_eq_compat. 2: {
-  intros i Hi.
-  now rewrite Nat.add_comm, Nat.add_sub.
-}
-cbn - [ uncurry ].
-rewrite IHm.
-destruct m. {
-  cbn in Hll.
-  injection Hll; clear Hll; intros; subst l.
-  cbn - [ uncurry ].
-  rewrite rngl_summation_list_map.
-  rewrite rngl_summation_seq_summation.
-  rewrite Nat.add_comm, Nat.add_sub.
-  erewrite rngl_summation_eq_compat. 2: {
-    intros i Hi.
-    rewrite rngl_product_only_one.
-    now rewrite Nat.sub_diag; cbn.
-  }
-  symmetry.
-...
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
@@ -880,7 +617,6 @@ destruct k; [ easy | ].
 rewrite List_nth_succ_cons.
 now rewrite Nat_sub_succ_1.
 Qed.
-*)
 
 End a.
 
@@ -888,6 +624,4 @@ Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_list_only_one {T ro rp} A%type.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
-(*
 Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
-*)
