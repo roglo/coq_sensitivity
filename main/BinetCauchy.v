@@ -2478,7 +2478,6 @@ apply IHlll. {
 }
 Qed.
 
-(* to be completed
 Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
   (∀ l, l ∈ ll → l ≠ [])
   → l ∈ list_prodn ll
@@ -2494,8 +2493,7 @@ destruct ll as [| l2]. {
   now subst l.
 }
 cbn.
-...
-apply in_flat_map in Hl.
+apply in_App_list in Hl.
 destruct Hl as (a & Hl1 & Ha).
 apply in_map_iff in Ha.
 destruct Ha as (l3 & Hl & Hl3).
@@ -2530,8 +2528,7 @@ destruct ll as [| l1]. {
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
   now apply IHl.
 }
-...
-rewrite flat_map_concat_map.
+rewrite App_list_concat_map.
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   intros ll1 Hll1.
   apply in_map_iff in Hll1.
@@ -2539,7 +2536,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   subst ll1.
   rewrite map_length.
   rewrite list_prodn_length; [ | easy ].
-  apply nat_product_same_length.
+  apply rngl_product_same_length.
   intros l2 Hl2.
   now apply Hll; right.
 } {
@@ -2622,22 +2619,20 @@ destruct i. {
     apply in_map_iff in Hll.
     now destruct Hll as (a & H & Ha); subst l.
   }
-...
-  apply in_flat_map in Hll.
+  apply in_App_list in Hll.
   destruct Hll as (a & Hl1 & Hl).
   apply in_map_iff in Hl.
   now destruct Hl as (l3 & H & Hl3); subst l.
 }
 cbn in Hi; apply Nat.succ_lt_mono in Hi.
 destruct ll as [| l2]; [ easy | ].
-apply in_flat_map in Hll.
+apply in_App_list in Hll.
 destruct Hll as (a & Ha & Hl).
 apply in_map_iff in Hl.
 destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
-*)
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
   ∑ (_ ∈ l), a = a * length l.

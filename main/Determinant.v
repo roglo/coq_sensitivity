@@ -221,15 +221,6 @@ rewrite rngl_summation_list_cons.
 now rewrite IHl.
 Qed.
 
-Theorem in_App_list : ∀ A B (f : A → list B) l y,
-  y ∈ App (i ∈ l), f i ↔ (∃ x : A, x ∈ l ∧ y ∈ f x).
-Proof.
-intros.
-rewrite App_concat_map.
-rewrite <- flat_map_concat_map.
-apply in_flat_map.
-Qed.
-
 Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
   length (flat_map f l) = ∑ (a ∈ l), length (f a).
 Proof.
@@ -411,7 +402,7 @@ replace (l :: ll) with (repeat (seq 1 m) n). 2: {
 clear l ll Hl Hll.
 specialize (IHn m) as H1.
 remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
-rewrite App_concat_map.
+rewrite App_list_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
   apply in_map_iff in Hl.

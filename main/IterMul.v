@@ -582,7 +582,7 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
-rewrite App_concat_map.
+rewrite App_list_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {

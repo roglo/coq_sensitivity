@@ -2194,7 +2194,7 @@ apply iter_list_all_d; [ easy | apply app_nil_r | | easy ].
 apply app_assoc.
 Qed.
 
-Theorem App_eq_nil : ∀ A B (l : list A) (f : A → list B),
+Theorem App_list_eq_nil : ∀ A B (l : list A) (f : A → list B),
   App (a ∈ l), f a = [] → ∀ a, a ∈ l → f a = [].
 Proof.
 intros * Happ * Hl.
@@ -2205,13 +2205,22 @@ destruct Hl as [Hl| Hl]; [ now subst a | ].
 now apply IHl.
 Qed.
 
-Theorem App_concat_map : ∀ A B (l : list A) (f : A → list B),
+Theorem App_list_concat_map : ∀ A B (l : list A) (f : A → list B),
   App (a ∈ l), f a = concat (map f l).
 Proof.
 intros.
 induction l as [| a]; [ easy | cbn ].
 rewrite App_list_cons.
 now rewrite IHl.
+Qed.
+
+Theorem in_App_list : ∀ A B (f : A → list B) l y,
+  y ∈ App (i ∈ l), f i ↔ (∃ x : A, x ∈ l ∧ y ∈ f x).
+Proof.
+intros.
+rewrite App_list_concat_map.
+rewrite <- flat_map_concat_map.
+apply in_flat_map.
 Qed.
 
 (* list_prodn: cartesian product of several lists *)
@@ -2247,7 +2256,7 @@ split. {
   destruct ll as [| l2]. {
     destruct l1 as [| a1]; [ now left | easy ].
   }
-  specialize (App_eq_nil _ _ Hll) as H1.
+  specialize (App_list_eq_nil _ _ Hll) as H1.
   cbn - [ list_prodn ] in H1.
   destruct l1 as [| a]; [ now left | right ].
   specialize (H1 _ (or_introl eq_refl)).
