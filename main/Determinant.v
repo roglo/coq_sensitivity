@@ -270,20 +270,18 @@ intros l1 Hl1.
 now apply Hll; right.
 Qed.
 
-(* to be completed
 Theorem all_comb_length : ∀ n, n ≠ 0 → length (all_comb n) = n ^ n.
 Proof.
 intros * Hnz.
 unfold all_comb.
 rewrite list_prodn_length; [ | now destruct n ].
-rewrite nat_product_same_length with (n := n). 2: {
+rewrite rngl_product_same_length with (n := n). 2: {
   intros l Hl.
   apply repeat_spec in Hl; subst l.
   apply seq_length.
 }
 f_equal; apply repeat_length.
 Qed.
-*)
 
 Fixpoint all_comb_inv_loop n l :=
   match l with
@@ -292,16 +290,6 @@ Fixpoint all_comb_inv_loop n l :=
   end.
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
-
-(*
-Fixpoint all_comb_inv_loop c n l : nat :=
-  match l with
-  | [] => c
-  | d :: l' => all_comb_inv_loop (c * n + pred d) n l'
-  end.
-
-Definition all_comb_inv := all_comb_inv_loop 0.
-*)
 
 (* to be completed
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
