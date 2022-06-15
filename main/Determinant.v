@@ -211,6 +211,16 @@ f_equal; [ f_equal | ]. {
 }
 Qed.
 
+Theorem App_list_length : ∀ A B l (f : A → list B),
+  length (App (a ∈ l), f a) = ∑ (a ∈ l), length (f a).
+Proof.
+intros.
+induction l as [| a]; [ easy | ].
+rewrite App_list_cons, app_length.
+rewrite rngl_summation_list_cons.
+now rewrite IHl.
+Qed.
+
 Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
   length (flat_map f l) = ∑ (a ∈ l), length (f a).
 Proof.
@@ -221,7 +231,6 @@ rewrite rngl_summation_list_cons.
 now cbn; f_equal.
 Qed.
 
-(* to be completed
 Theorem list_prodn_length : ∀ A (ll : list (list A)),
   ll ≠ []
   → length (list_prodn ll) = ∏ (l ∈ ll), length l.
@@ -235,8 +244,7 @@ destruct ll as [| l2]. {
   now unfold iter_list; cbn; rewrite Nat.mul_1_r.
 }
 rewrite rngl_product_list_cons.
-...
-rewrite List_flat_map_length.
+rewrite App_list_length.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
   rewrite map_length.
@@ -248,9 +256,8 @@ induction l1 as [| a]; [ easy | cbn ].
 rewrite rngl_summation_list_cons.
 now cbn; rewrite IHl1.
 Qed.
-*)
 
-Theorem nat_product_same_length : ∀ A (ll : list (list A)) n,
+Theorem rngl_product_same_length : ∀ A (ll : list (list A)) n,
   (∀ l, l ∈ ll → length l = n)
   → ∏ (l ∈ ll), length l = n ^ length ll.
 Proof.
@@ -296,7 +303,7 @@ Fixpoint all_comb_inv_loop c n l : nat :=
 Definition all_comb_inv := all_comb_inv_loop 0.
 *)
 
-(* to be comopleted
+(* to be completed
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
