@@ -2811,7 +2811,6 @@ Compute (
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
     unfold h1, g1.
-...
 Theorem glop : ∀ i n,
   i < n ^ n
   → all_comb_inv n (nth i (all_comb n) []) = i.
@@ -2824,13 +2823,16 @@ induction n; intros. {
   now apply Nat.lt_1_r in Hin; subst i.
 }
 cbn - [ seq ].
+rewrite fold_iter_seq'.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (1 + S n) 0) as [H| H]; [ easy | clear H ].
+rewrite Nat.add_comm, Nat.add_sub.
 remember (repeat (seq 1 (S n)) n) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l1]. {
   apply List_eq_repeat_nil in Hll; subst n; cbn.
   now apply Nat.lt_1_r in Hin; subst i.
 }
-...
-cbn - [ seq ].
+cbn.
 (**)
 destruct ll as [| l2]. {
   destruct n; [ easy | ].
@@ -2845,12 +2847,8 @@ destruct ll as [| l2]. {
   destruct i; [ easy | ].
   cbn in Hin; flia Hin.
 }
-Print list_prodn.
 remember (@list_prodn nat (repeat (seq 1 (S n)) (S n))) as y.
 cbn - [ seq ] in Heqy.
-...
-
-(* chais pas quoi foutre avec mon flat_map de merde ; fait chier, tiens. *)
 ...
 rewrite List_rev_nth.
 rewrite (List_map_nth' []). 2: {

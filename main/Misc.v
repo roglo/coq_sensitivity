@@ -81,6 +81,30 @@ Theorem fold_iter_seq : ∀ A b e f (d : A),
   iter_list (seq b (S e - b)) f d = iter_seq b e f d.
 Proof. easy. Qed.
 
+Theorem fold_iter_seq' : ∀ A b len f (d : A),
+  iter_list (seq b len) f d =
+    if b + len =? 0 then d
+    else iter_seq b (b + len - 1) f d.
+Proof.
+intros.
+unfold iter_seq.
+f_equal; f_equal.
+remember (b + len =? 0) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Nat.eqb_eq in Hx.
+  now apply Nat.eq_add_0 in Hx; destruct Hx; subst b len.
+}
+apply Nat.eqb_neq in Hx.
+destruct len. {
+  rewrite Nat.add_0_r in Hx.
+  destruct b; [ easy | cbn ].
+  now rewrite Nat.add_sub, Nat.sub_diag.
+}
+rewrite Nat.sub_succ_l; [ cbn | flia ].
+f_equal; f_equal; f_equal.
+flia.
+Qed.
+
 Theorem List_seq_shift' : ∀ len sta,
   map (Nat.add sta) (seq 0 len) = seq sta len.
 Proof.
@@ -2172,6 +2196,11 @@ apply iter_list_cons. {
 Qed.
 
 (* App : a notation for iterating concatenation of a list of lists *)
+
+
+Notation "'App' ( i = b , e ) , g" :=
+  (iter_seq b e (λ c i, c ++ g) [])
+  (at level 45, i at level 0, b at level 60, e at level 60).
 
 Notation "'App' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, c ++ g) [])
