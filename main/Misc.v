@@ -1434,6 +1434,20 @@ Qed.
 
 (* list_prodn: cartesian product of several lists *)
 
+Notation "'App' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ++ g) [])
+  (at level 45, i at level 0, l at level 60).
+
+Fixpoint list_prodn' {A} (ll : list (list A)) :=
+  match ll with
+  | [] => []
+  | l :: ll' =>
+      match ll' with
+      | [] => map (λ y, [y]) l
+      | _ :: _ => App (a ∈ l), map (cons a) (list_prodn' ll')
+      end
+  end.
+
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => []
