@@ -560,6 +560,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(* to be completed
 Theorem rngl_product_summation_distr_prodn :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ m n (f : nat → nat → T),
@@ -582,6 +583,7 @@ destruct ll as [| l]. {
   intros i Hi.
   now rewrite rngl_product_only_one.
 }
+...
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
@@ -617,6 +619,7 @@ destruct k; [ easy | ].
 rewrite List_nth_succ_cons.
 now rewrite Nat_sub_succ_1.
 Qed.
+*)
 
 End a.
 
@@ -624,4 +627,6 @@ Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_list_only_one {T ro rp} A%type.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
+(* to be completed
 Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
+*)

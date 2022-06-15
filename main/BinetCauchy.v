@@ -2478,6 +2478,7 @@ apply IHlll. {
 }
 Qed.
 
+(* to be completed
 Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
   (∀ l, l ∈ ll → l ≠ [])
   → l ∈ list_prodn ll
@@ -2493,6 +2494,7 @@ destruct ll as [| l2]. {
   now subst l.
 }
 cbn.
+...
 apply in_flat_map in Hl.
 destruct Hl as (a & Hl1 & Ha).
 apply in_map_iff in Ha.
@@ -2528,6 +2530,7 @@ destruct ll as [| l1]. {
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
   now apply IHl.
 }
+...
 rewrite flat_map_concat_map.
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   intros ll1 Hll1.
@@ -2619,6 +2622,7 @@ destruct i. {
     apply in_map_iff in Hll.
     now destruct Hll as (a & H & Ha); subst l.
   }
+...
   apply in_flat_map in Hll.
   destruct Hll as (a & Hl1 & Hl).
   apply in_map_iff in Hl.
@@ -2633,6 +2637,7 @@ destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
+*)
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
   ∑ (_ ∈ l), a = a * length l.

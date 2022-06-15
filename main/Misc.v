@@ -33,7 +33,8 @@ Notation "∃! x .. y , p" :=
 
 Notation "x ≠? y" := (negb (Nat.eqb x y)) (at level 70) : nat_scope.
 
-Theorem Tauto_match_nat_same : ∀ A a (b : A), match a with 0 => b | S _ => b end = b.
+Theorem Tauto_match_nat_same : ∀ A a (b : A),
+  match a with 0 => b | S _ => b end = b.
 Proof. now intros; destruct a. Qed.
 
 Theorem List_fold_left_map :
@@ -1432,76 +1433,6 @@ Qed.
 
 (* end pair_eqb *)
 
-(* list_prodn: cartesian product of several lists *)
-
-Notation "'App' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, c ++ g) [])
-  (at level 45, i at level 0, l at level 60).
-
-Fixpoint list_prodn' {A} (ll : list (list A)) :=
-  match ll with
-  | [] => []
-  | l :: ll' =>
-      match ll' with
-      | [] => map (λ y, [y]) l
-      | _ :: _ => App (a ∈ l), map (cons a) (list_prodn' ll')
-      end
-  end.
-
-Fixpoint list_prodn {A} (ll : list (list A)) :=
-  match ll with
-  | [] => []
-  | l :: ll' =>
-      match ll' with
-      | [] => map (λ y, [y]) l
-      | _ :: _ => flat_map (λ a, map (cons a) (list_prodn ll')) l
-      end
-  end.
-
-Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
-  list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
-Proof.
-intros.
-split. {
-  intros Hll.
-  induction ll as [| l1]; [ now left | right ].
-  cbn in Hll.
-  destruct ll as [| l2]. {
-    destruct l1 as [| a1]; [ now left | easy ].
-  }
-  rewrite flat_map_concat_map in Hll.
-  apply concat_nil_Forall in Hll.
-  specialize (proj1 (Forall_forall _ _) Hll) as H1.
-  clear Hll.
-  cbn - [ list_prodn ] in H1.
-  remember (list_prodn (l2 :: ll)) as ll' eqn:Hll'.
-  symmetry in Hll'.
-  destruct ll' as [| l3]. {
-    specialize (IHll eq_refl).
-    destruct IHll as [H2| H2]; [ easy | ].
-    now right.
-  }
-  destruct l1 as [| a1]; [ now left | right; right ].
-  now specialize (H1 _ (or_introl eq_refl)).
-} {
-  intros Hll.
-  destruct Hll as [Hll| Hll]; [ now subst ll | ].
-  induction ll as [| l1]; [ easy | cbn ].
-  destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
-  specialize (IHll Hll).
-  destruct ll as [| l2]; [ easy | ].
-  rewrite IHll; cbn.
-  rewrite flat_map_concat_map; cbn.
-  apply concat_nil_Forall.
-  apply Forall_forall.
-  intros ll' Hll'.
-  apply in_map_iff in Hll'.
-  now destruct Hll' as (a & Hll' & Hal1).
-}
-Qed.
-
-(* end list_prodn *)
-
 Definition unsome A (d : A) o :=
   match o with
   | Some x => x
@@ -2240,7 +2171,79 @@ apply iter_list_cons. {
 }
 Qed.
 
-(* *)
+(* App : a notation for iterating concatenation of a list of lists *)
+
+Notation "'App' ( i ∈ l ) , g" :=
+  (iter_list l (λ c i, c ++ g) [])
+  (at level 45, i at level 0, l at level 60).
+
+Theorem App_eq_nil : ∀ A B (l : list A) (f : A → list B),
+  App (a ∈ l), f a = [] → ∀ a, a ∈ l → f a = [].
+Proof.
+intros * Happ * Hl.
+induction l as [| b]; [ easy | ].
+rewrite iter_list_cons in Happ; [ | easy | apply app_nil_r | ]. 2: {
+  apply app_assoc.
+}
+apply app_eq_nil in Happ.
+destruct Hl as [Hl| Hl]; [ now subst a | ].
+now apply IHl.
+Qed.
+
+(* list_prodn: cartesian product of several lists *)
+
+Fixpoint list_prodn {A} (ll : list (list A)) :=
+  match ll with
+  | [] => []
+  | l :: ll' =>
+      match ll' with
+      | [] => map (λ y, [y]) l
+      | _ :: _ => App (a ∈ l), map (cons a) (list_prodn ll')
+      end
+  end.
+
+Fixpoint old_list_prodn {A} (ll : list (list A)) :=
+  match ll with
+  | [] => []
+  | l :: ll' =>
+      match ll' with
+      | [] => map (λ y, [y]) l
+      | _ :: _ => flat_map (λ a, map (cons a) (old_list_prodn ll')) l
+      end
+  end.
+
+Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
+  list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
+Proof.
+intros.
+split. {
+  intros Hll.
+  induction ll as [| l1]; [ now left | right ].
+  cbn in Hll.
+  destruct ll as [| l2]. {
+    destruct l1 as [| a1]; [ now left | easy ].
+  }
+  specialize (App_eq_nil _ _ Hll) as H1.
+  cbn - [ list_prodn ] in H1.
+  destruct l1 as [| a]; [ now left | right ].
+  specialize (H1 _ (or_introl eq_refl)).
+  apply map_eq_nil in H1.
+  specialize (IHll H1).
+  now destruct IHll.
+} {
+  intros Hll.
+  destruct Hll as [Hll| Hll]; [ now subst ll | ].
+  induction ll as [| l1]; [ easy | cbn ].
+  destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
+  specialize (IHll Hll).
+  destruct ll as [| l2]; [ easy | ].
+  rewrite IHll; cbn.
+  apply iter_list_all_d; [ easy | apply app_nil_r | | easy ].
+  apply app_assoc.
+}
+Qed.
+
+(* end list_prodn *)
 
 Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).
 Proof.
