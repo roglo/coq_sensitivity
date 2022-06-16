@@ -2863,6 +2863,11 @@ Compute (
     }
     subst x.
     f_equal.
+    unfold g1, f1.
+    rewrite fold_collapse.
+    remember (collapse kl) as jl eqn:Hjl.
+    specialize (collapse_is_permut kl) as H1.
+    rewrite <- Hjl, <- Hn in H1.
 ...
     unfold h1, g1.
     unfold f1 at 2.
