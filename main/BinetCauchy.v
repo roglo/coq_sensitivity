@@ -2533,6 +2533,7 @@ destruct ll as [| l1]. {
 }
 *)
 cbn.
+...
 rewrite App_list_concat_map.
 ...
 apply nth_concat_same_length with (m := n ^ length ll). {
