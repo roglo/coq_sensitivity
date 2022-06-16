@@ -2808,11 +2808,12 @@ Compute (
     unfold collapse.
     fold (f1 (isort_rank Nat.leb kl) (nth i (all_comb n) [])).
     fold g1.
+...
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
     unfold h1, g1.
-unfold f1 at 2.
-rewrite fold_collapse.
+    unfold f1 at 2.
+    rewrite fold_collapse.
 ...
 Theorem glop : ∀ i n,
   i < n ^ n
