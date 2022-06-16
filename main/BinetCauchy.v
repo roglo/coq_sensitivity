@@ -2532,13 +2532,24 @@ destruct ll as [| l1]. {
   now apply IHl.
 }
 *)
+cbn.
 rewrite App_list_concat_map.
+...
+apply nth_concat_same_length with (m := n ^ length ll). {
+(*
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
+*)
   intros ll1 Hll1.
   apply in_map_iff in Hll1.
   destruct Hll1 as (a & Hll1 & Ha).
   subst ll1.
   rewrite map_length.
+  rewrite list_prodn_length. 2: {
+    intros H; subst ll.
+    specialize (Hll _ (or_introl eq_refl)).
+    cbn in Hi; rewrite Nat.mul_1_r in Hi.
+    cbn in IHll.
+...
   rewrite list_prodn_length; [ | easy ].
   apply rngl_product_same_length.
   intros l2 Hl2.
