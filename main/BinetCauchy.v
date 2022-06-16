@@ -2478,7 +2478,6 @@ apply IHlll. {
 }
 Qed.
 
-(* to be completed
 Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
   (∀ l, l ∈ ll → l ≠ [])
   → l ∈ list_prodn ll
@@ -2486,14 +2485,11 @@ Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
 Proof.
 intros * Hlz Hl.
 revert l Hl.
-induction ll as [| l1]; intros; [ easy | ].
-cbn in Hl.
-destruct ll as [| l2]. {
-  apply in_map_iff in Hl.
-  destruct Hl as (a & Hla & Ha).
-  now subst l.
+induction ll as [| l1]; intros. {
+  cbn in Hl.
+  destruct Hl as [Hl| Hl]; [ now subst l | easy ].
 }
-cbn.
+cbn in Hl.
 apply in_App_list in Hl.
 destruct Hl as (a & Hl1 & Ha).
 apply in_map_iff in Ha.
@@ -2504,6 +2500,7 @@ intros l4 Hl4.
 now apply Hlz; right.
 Qed.
 
+(* to be completed
 Theorem nth_list_prodn_same_length : ∀ A n (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l = n)
   → i < n ^ length ll
@@ -2512,12 +2509,16 @@ Proof.
 intros * Hll Hi.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
-...
-  destruct ll as [| l]; [ now destruct i | ].
+  destruct ll as [| l]. {
+    now apply Nat.lt_1_r in Hi; subst i.
+  }
   now rewrite Nat.pow_0_l in Hi.
 }
 revert n i Hnz Hi Hll.
-induction ll as [| l]; intros; [ now destruct i | cbn ].
+induction ll as [| l]; intros. {
+  destruct i; [ easy | now destruct i ].
+}
+(*
 destruct ll as [| l1]. {
   cbn.
   specialize (Hll _ (or_introl eq_refl)).
@@ -2530,6 +2531,7 @@ destruct ll as [| l1]. {
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
   now apply IHl.
 }
+*)
 rewrite App_list_concat_map.
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   intros ll1 Hll1.
@@ -2560,6 +2562,8 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   now rewrite <- Nat.pow_succ_r'.
 }
 Qed.
+
+...
 
 Theorem nth_all_comb_length : ∀ n i,
   i < n ^ n
