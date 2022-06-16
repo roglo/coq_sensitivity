@@ -294,46 +294,18 @@ Fixpoint all_comb_inv_loop n l :=
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
 
-(* to be completed
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
+  n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
 Proof.
 intros.
 split. {
-  intros (Hnz & Hn & Hm).
+  intros [(Hnz, H1)| (Hnz & Hn & Hm)]; [ now subst n l; left | ].
   subst n.
   revert m Hm.
-  induction l as [| a]; intros; [ easy | clear Hnz ].
-(*
-  cbn - [ seq ].
-*)
-  cbn.
+  induction l as [| a]; intros; [ easy | clear Hnz; cbn ].
   apply in_App_list.
-(*
-...
-  remember (repeat (seq 1 m) _) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l1]. {
-    apply List_eq_repeat_nil in Hll.
-    apply length_zero_iff_nil in Hll; subst l.
-    specialize (Hm a (or_introl eq_refl)); cbn in Hm.
-    induction m; [ flia Hm | ].
-    rewrite seq_S.
-(**)
-cbn.
-...
-    rewrite map_app.
-    apply in_or_app.
-    destruct (Nat.eq_dec a (S m)) as [Ham| Ham]. {
-      now right; subst a; cbn; left.
-    }
-    left; apply IHm.
-    flia Hm Ham.
-  }
-  apply List_repeat_eq_cons_iff in Hll.
-  destruct Hll as (Hlz & Hl1 & Hll).
-  apply in_App_list.
-*)
   exists a.
   split. {
     apply in_seq.
@@ -344,56 +316,58 @@ cbn.
     apply in_map_iff.
     exists l.
     split; [ easy | ].
-remember (repeat (seq 1 m) (length l)) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l1]. {
-  apply List_eq_repeat_nil in Hll.
-  apply length_zero_iff_nil in Hll; subst l.
-  now left.
-}
-cbn.
-...
-    specialize (IHl Hlz).
-    subst l1 ll.
-    replace (_ :: repeat _ _) with
-        (repeat (seq 1 m) (length l)). 2: {
-      now destruct (length l).
+    remember (repeat (seq 1 m) (length l)) as ll eqn:Hll; symmetry in Hll.
+    destruct ll as [| l1]. {
+      apply List_eq_repeat_nil in Hll.
+      apply length_zero_iff_nil in Hll; subst l.
+      now left.
     }
-    apply IHl.
-    intros i Hi.
-    now apply Hm; right.
+    cbn.
+    destruct l as [| b]; [ easy | ].
+    cbn in Hll.
+    injection Hll; clear Hll; intros Hll H; subst l1.
+    destruct m. {
+      specialize (Hm _ (or_introl eq_refl)); flia Hm.
+    }
+    specialize (IHl (Nat.neq_succ_0 _)).
+    specialize (IHl (S m)) as H1.
+    assert (H : ∀ i, i ∈ b :: l → 1 ≤ i ≤ S m). {
+      intros i Hi.
+      now apply Hm; right.
+    }
+    specialize (H1 H); clear H.
+    cbn - [ seq ] in H1.
+    now rewrite Hll in H1.
   }
 } {
   intros Hl.
   revert m l Hl.
-  induction n; intros; [ easy | ].
+  induction n; intros; [ now left; destruct Hl | right ].
   split; [ easy | ].
   cbn in Hl.
-  remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| l1]. {
-    apply List_eq_repeat_nil in Hll; subst n.
-    apply in_map_iff in Hl.
-    destruct Hl as (a & Hl & Ha); subst l.
-    split; [ easy | ].
-    intros i Hi.
-    destruct Hi as [Hi| Hi]; [ subst a | easy ].
-    apply in_seq in Ha; flia Ha.
-  }
   apply in_App_list in Hl.
   destruct Hl as (a & Ha & Hl).
   apply in_map_iff in Hl.
   destruct Hl as (l2 & Hl & Hl2); subst l.
-  rewrite <- Hll in Hl2.
+  apply in_seq in Ha.
   apply IHn in Hl2.
+  destruct Hl2 as [(Hnz, Hl2)| Hl2]. {
+    subst n l2.
+    split; [ easy | ].
+    intros i Hi.
+    destruct Hi as [Hi| Hi]; [ subst i | easy ].
+    flia Ha.
+  }
   destruct Hl2 as (Hnz & Hl2 & Hm).
   split; [ now cbn; f_equal | ].
   intros j Hj.
   destruct Hj as [Hj| Hj]; [ subst j | now apply Hm ].
-  apply in_seq in Ha; flia Ha.
+  flia Ha.
 }
 Qed.
-...
 
 Theorem in_all_comb_iff : ∀ n l,
+  n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i, i ∈ l → 1 ≤ i ≤ n)
   ↔ l ∈ all_comb n.
 Proof.
@@ -401,6 +375,7 @@ intros.
 now apply in_list_prodn_repeat_iff.
 Qed.
 
+(* to be completed
 Theorem NoDup_list_prodn_repeat : ∀ m n,
   NoDup (list_prodn (repeat (seq 1 m) n)).
 Proof.
