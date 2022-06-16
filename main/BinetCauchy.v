@@ -2847,8 +2847,6 @@ destruct ll as [| l2]. {
   destruct i; [ easy | ].
   cbn in Hin; flia Hin.
 }
-remember (@list_prodn nat (repeat (seq 1 (S n)) (S n))) as y.
-cbn - [ seq ] in Heqy.
 ...
 rewrite List_rev_nth.
 rewrite (List_map_nth' []). 2: {
