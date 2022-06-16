@@ -2811,6 +2811,9 @@ Compute (
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
     unfold h1, g1.
+unfold f1 at 2.
+rewrite fold_collapse.
+...
 Theorem glop : ∀ i n,
   i < n ^ n
   → all_comb_inv n (nth i (all_comb n) []) = i.
