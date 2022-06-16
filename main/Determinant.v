@@ -375,30 +375,15 @@ intros.
 now apply in_list_prodn_repeat_iff.
 Qed.
 
-(* to be completed
 Theorem NoDup_list_prodn_repeat : ∀ m n,
   NoDup (list_prodn (repeat (seq 1 m) n)).
 Proof.
 intros.
 revert m.
-induction n; intros; [ constructor | cbn ].
-...
-remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l]. {
-  apply List_eq_repeat_nil in Hll; subst n.
-  apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
-  intros i j Hij.
-  now injection Hij.
+induction n; intros. {
+  constructor; [ easy | constructor ].
 }
-apply List_repeat_eq_cons_iff in Hll.
-destruct Hll as (Hnz & Hl & Hll).
-replace (l :: ll) with (repeat (seq 1 m) n). 2: {
-  subst l ll.
-  destruct n; [ easy | ].
-  cbn - [ seq ].
-  now cbn - [ seq ].
-}
-clear l ll Hl Hll.
+cbn.
 specialize (IHn m) as H1.
 remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
 rewrite App_list_concat_map.
@@ -438,7 +423,6 @@ intros n.
 unfold all_comb.
 apply NoDup_list_prodn_repeat.
 Qed.
-*)
 
 (* det and det' are equal *)
 
