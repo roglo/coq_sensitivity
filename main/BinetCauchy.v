@@ -2562,14 +2562,12 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
 }
 Qed.
 
-(* to be completed
 Theorem nth_all_comb_length : ∀ n i,
   i < n ^ n
   → length (nth i (all_comb n) []) = n.
 Proof.
 intros * Hi.
 unfold all_comb.
-...
 rewrite nth_list_prodn_same_length with (n := n). {
   apply repeat_length.
 } {
@@ -2586,7 +2584,6 @@ Theorem all_comb_elem_ub : ∀ i j n,
 Proof.
 intros.
 unfold all_comb.
-...
 remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
 destruct (lt_dec j (length ll)) as [Hjll| Hjll]. 2: {
   apply Nat.nlt_ge in Hjll.
@@ -2597,6 +2594,10 @@ assert (H1 : nth j ll [] ∈ ll) by now apply nth_In.
 rewrite Hll in H1.
 apply in_list_prodn_repeat_iff in H1.
 rewrite <- Hll in H1.
+destruct H1 as [(H1, H2)| H1]. {
+  rewrite H1, H2.
+  now rewrite List_nth_nil.
+}
 destruct H1 as (Hnz & Hn & Hln).
 specialize (Hln (nth i (nth j ll []) 0)).
 destruct (lt_dec i n) as [Hin| Hin]. 2: {
@@ -2622,9 +2623,10 @@ induction ll as [| l1]; intros; [ easy | ].
 cbn in Hll |-*.
 destruct i. {
   destruct ll as [| l2]. {
-...
-    apply in_map_iff in Hll.
-    now destruct Hll as (a & H & Ha); subst l.
+    apply in_App_list in Hll.
+    destruct Hll as (a & Ha & Hla).
+    apply in_map_iff in Hla.
+    now destruct Hla as (l2 & H & Hl2); subst l.
   }
   apply in_App_list in Hll.
   destruct Hll as (a & Hl1 & Hl).
@@ -2640,7 +2642,6 @@ destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
-*)
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
   ∑ (_ ∈ l), a = a * length l.
