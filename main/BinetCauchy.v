@@ -2757,6 +2757,41 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   rewrite Hjl.
   apply isort_rank_is_permut_list.
 }
+assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
+  intros l Hl.
+  unfold g1, h1, f1.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    rewrite (List_map_nth' 0). 2: {
+      apply in_isort_rank_lt in Hi.
+      now do 2 rewrite isort_rank_length.
+    }
+    easy.
+  }
+  remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
+  rewrite List_map_nth_seq with (d := 0); symmetry.
+  rewrite List_map_nth_seq with (d := 0); symmetry.
+  rewrite map_length.
+  replace (length jl) with n. 2: {
+    now rewrite Hjl, isort_rank_length.
+  }
+  replace (length l) with n. 2: {
+    apply in_all_comb_iff in Hl.
+    now destruct Hl.
+  }
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  rewrite (List_map_nth' 0). 2: {
+    now rewrite Hjl, isort_rank_length, <- Hn.
+  }
+  do 3 rewrite fold_ff_app.
+  rewrite permut_isort_permut; [ easy | | ]. 2: {
+    now rewrite Hjl, isort_rank_length, <- Hn.
+  }
+  rewrite Hjl.
+  apply isort_rank_is_permut_list.
+}
 erewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 assert (Heql : equality (list_eqb Nat.eqb)). {
   intros la lb.
@@ -2818,9 +2853,17 @@ Compute (
     unfold collapse.
     fold (f1 (isort_rank Nat.leb kl) (nth i (all_comb n) [])).
     fold g1.
-...
     remember (nth i (all_comb n) []) as l eqn:Hl.
     symmetry.
+    remember (all_comb_inv n (g1 l)) as x.
+    rewrite <- Hhg. 2: {
+      rewrite Hl.
+      apply nth_In.
+      now rewrite all_comb_length.
+    }
+    subst x.
+    f_equal.
+...
     unfold h1, g1.
     unfold f1 at 2.
     rewrite fold_collapse.
