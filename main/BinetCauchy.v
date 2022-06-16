@@ -2740,7 +2740,8 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
     now rewrite Hjl, isort_rank_length.
   }
   replace (length l) with n. 2: {
-    now apply in_all_comb_iff in Hl.
+    apply in_all_comb_iff in Hl.
+    now destruct Hl.
   }
   apply map_ext_in.
   intros i Hi.
