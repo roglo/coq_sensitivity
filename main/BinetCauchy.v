@@ -2500,7 +2500,6 @@ intros l4 Hl4.
 now apply Hlz; right.
 Qed.
 
-(* to be completed
 Theorem nth_list_prodn_same_length : ∀ A n (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l = n)
   → i < n ^ length ll
@@ -2518,7 +2517,6 @@ revert n i Hnz Hi Hll.
 induction ll as [| l]; intros. {
   destruct i; [ easy | now destruct i ].
 }
-(*
 destruct ll as [| l1]. {
   cbn.
   specialize (Hll _ (or_introl eq_refl)).
@@ -2527,30 +2525,19 @@ destruct ll as [| l1]. {
   clear Hnz.
   revert i Hi.
   induction l as [| a]; intros; [ easy | cbn ].
-  destruct i; [ easy | ].
+  destruct i; [ now rewrite App_list_cons | ].
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
+  rewrite App_list_cons; cbn.
   now apply IHl.
 }
-*)
-cbn.
-...
+remember (l1 :: ll) as ll'; cbn; subst ll'.
 rewrite App_list_concat_map.
-...
-apply nth_concat_same_length with (m := n ^ length ll). {
-(*
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
-*)
   intros ll1 Hll1.
   apply in_map_iff in Hll1.
   destruct Hll1 as (a & Hll1 & Ha).
   subst ll1.
   rewrite map_length.
-  rewrite list_prodn_length. 2: {
-    intros H; subst ll.
-    specialize (Hll _ (or_introl eq_refl)).
-    cbn in Hi; rewrite Nat.mul_1_r in Hi.
-    cbn in IHll.
-...
   rewrite list_prodn_length; [ | easy ].
   apply rngl_product_same_length.
   intros l2 Hl2.
@@ -2575,8 +2562,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
 }
 Qed.
 
-...
-
+(* to be completed
 Theorem nth_all_comb_length : ∀ n i,
   i < n ^ n
   → length (nth i (all_comb n) []) = n.
