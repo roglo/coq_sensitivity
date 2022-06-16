@@ -556,7 +556,6 @@ Qed.
 
 (* det' and det'' are equal *)
 
-(* to be completed
 Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -605,8 +604,8 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   }
   rewrite map_id.
   split; [ easy | ].
-...
   apply in_all_comb_iff.
+  right.
   split; [ easy | ].
   split; [ now rewrite map_length, canon_sym_gr_list_length | ].
   intros j Hj.
@@ -626,6 +625,7 @@ replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
     intros l Hl.
     rewrite map_map.
     apply in_all_comb_iff in Hl.
+    destruct Hl as [Hl| Hl]; [ now exfalso | ].
     destruct Hl as (_ & _ & Hl).
     erewrite map_ext_in. 2: {
       intros i Hi.
@@ -657,6 +657,7 @@ assert (H1 :
     apply in_map_iff in Hl.
     destruct Hl as (l1 & H & Hl); subst l; rename l1 into l.
     apply in_all_comb_iff in Hl.
+    destruct Hl as [Hl| Hl]; [ easy | ].
     destruct Hl as (_ & Hln & Hin).
     exists (canon_sym_gr_list_inv n (map pred l)).
     assert (Hp : is_permut n (map pred l)). {
@@ -690,6 +691,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rename l1 into l.
       rewrite map_length.
       apply in_all_comb_iff in Hl.
+      destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hln & Hin).
       rewrite Hln; flia Hi.
     }
@@ -720,6 +722,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     erewrite map_ext_in. 2: {
       intros i Hi.
       apply in_all_comb_iff in Hl.
+      destruct Hl as [Hl| Hl]; [ now exfalso | ].
       destruct Hl as (_ & _ & Hl).
       specialize (Hl i Hi).
       rewrite Nat.succ_pred_pos; [ | flia Hl ].
@@ -731,7 +734,6 @@ apply rngl_summation_list_incl; [ | | easy ]. {
   apply NoDup_all_comb.
 }
 Qed.
-*)
 
 (* multilinearity *)
 
@@ -2714,8 +2716,6 @@ Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
-(* to be completed
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
-*)
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
 
