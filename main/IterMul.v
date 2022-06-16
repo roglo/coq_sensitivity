@@ -572,16 +572,6 @@ intros Hop * Hmz.
 revert n f.
 induction m; intros; [ easy | clear Hmz; cbn ].
 remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
-destruct ll as [| l]. {
-  apply List_eq_repeat_nil in Hll; subst m.
-  rewrite rngl_product_only_one.
-  rewrite rngl_summation_list_map.
-  unfold iter_seq at 1.
-  rewrite Nat_sub_succ_1.
-  apply rngl_summation_list_eq_compat.
-  intros i Hi.
-  now rewrite rngl_product_only_one.
-}
 rewrite App_list_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
@@ -589,8 +579,18 @@ erewrite rngl_summation_list_eq_compat. 2: {
   intros i Hi.
   now rewrite rngl_summation_list_map.
 }
-cbn - [ list_prodn nth ].
-destruct m; [ easy | ].
+cbn - [ nth ].
+destruct m. {
+  cbn in Hll; subst ll.
+  rewrite rngl_product_only_one.
+  rewrite fold_iter_seq'.
+  cbn - [ nth ].
+  rewrite Nat.sub_0_r.
+  apply rngl_summation_eq_compat.
+  intros i Hi.
+  rewrite rngl_summation_list_only_one.
+  now rewrite rngl_product_only_one, Nat.sub_diag.
+}
 specialize (IHm (Nat.neq_succ_0 _)).
 rewrite rngl_product_split_first; [ | now apply -> Nat.succ_le_mono ].
 rewrite (rngl_product_shift _ 1); [ | flia ].
@@ -603,7 +603,7 @@ rewrite Nat_sub_succ_1.
 apply rngl_summation_list_eq_compat.
 intros i Hi.
 apply rngl_summation_list_eq_compat.
-intros j Hj.
+intros l Hl.
 symmetry.
 rewrite rngl_product_split_first; [ | flia ].
 rewrite List_nth_0_cons.

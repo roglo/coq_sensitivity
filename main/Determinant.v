@@ -238,23 +238,26 @@ Proof.
 intros * Hll.
 revert Hll.
 induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
-destruct ll as [| l2]. {
-  rewrite map_length.
-  rewrite rngl_product_list_cons.
-  now unfold iter_list; cbn; rewrite Nat.mul_1_r.
-}
 rewrite rngl_product_list_cons.
 rewrite App_list_length.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
-  rewrite map_length.
-  now rewrite IHll.
+  now rewrite map_length.
 }
-cbn.
+cbn - [ rngl_zero rngl_add rngl_one rngl_mul ].
+destruct ll as [| l2]. {
+  rewrite rngl_product_list_empty; [ | easy ].
+  rewrite rngl_mul_1_r.
+  cbn - [ rngl_zero rngl_add ].
+  induction l1 as [| a]; [ easy | ].
+  rewrite rngl_summation_list_cons.
+  now rewrite IHl1.
+}
+rewrite IHll; [ | easy ].
 remember (∏ (i ∈ l2 :: ll), length i) as x eqn:Hx.
-induction l1 as [| a]; [ easy | cbn ].
+induction l1 as [| a]; [ easy | ].
 rewrite rngl_summation_list_cons.
-now cbn; rewrite IHl1.
+now rewrite IHl1.
 Qed.
 
 Theorem rngl_product_same_length : ∀ A (ll : list (list A)) n,
@@ -291,6 +294,7 @@ Fixpoint all_comb_inv_loop n l :=
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
 
+(* to be completed
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
   ↔ l ∈ list_prodn (repeat (seq 1 m) n).
@@ -301,7 +305,13 @@ split. {
   subst n.
   revert m Hm.
   induction l as [| a]; intros; [ easy | clear Hnz ].
+(*
   cbn - [ seq ].
+*)
+  cbn.
+  apply in_App_list.
+(*
+...
   remember (repeat (seq 1 m) _) as ll eqn:Hll; symmetry in Hll.
   destruct ll as [| l1]. {
     apply List_eq_repeat_nil in Hll.
@@ -309,6 +319,9 @@ split. {
     specialize (Hm a (or_introl eq_refl)); cbn in Hm.
     induction m; [ flia Hm | ].
     rewrite seq_S.
+(**)
+cbn.
+...
     rewrite map_app.
     apply in_or_app.
     destruct (Nat.eq_dec a (S m)) as [Ham| Ham]. {
@@ -320,6 +333,7 @@ split. {
   apply List_repeat_eq_cons_iff in Hll.
   destruct Hll as (Hlz & Hl1 & Hll).
   apply in_App_list.
+*)
   exists a.
   split. {
     apply in_seq.
@@ -330,6 +344,14 @@ split. {
     apply in_map_iff.
     exists l.
     split; [ easy | ].
+remember (repeat (seq 1 m) (length l)) as ll eqn:Hll; symmetry in Hll.
+destruct ll as [| l1]. {
+  apply List_eq_repeat_nil in Hll.
+  apply length_zero_iff_nil in Hll; subst l.
+  now left.
+}
+cbn.
+...
     specialize (IHl Hlz).
     subst l1 ll.
     replace (_ :: repeat _ _) with
@@ -369,6 +391,7 @@ split. {
   apply in_seq in Ha; flia Ha.
 }
 Qed.
+...
 
 Theorem in_all_comb_iff : ∀ n l,
   n ≠ 0 ∧ length l = n ∧ (∀ i, i ∈ l → 1 ≤ i ≤ n)
@@ -384,6 +407,7 @@ Proof.
 intros.
 revert m.
 induction n; intros; [ constructor | cbn ].
+...
 remember (repeat (seq 1 m) n) as ll eqn:Hll; symmetry in Hll.
 destruct ll as [| l]. {
   apply List_eq_repeat_nil in Hll; subst n.
@@ -439,6 +463,7 @@ intros n.
 unfold all_comb.
 apply NoDup_list_prodn_repeat.
 Qed.
+*)
 
 (* det and det' are equal *)
 
@@ -572,6 +597,7 @@ Qed.
 
 (* det' and det'' are equal *)
 
+(* to be completed
 Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -620,6 +646,7 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   }
   rewrite map_id.
   split; [ easy | ].
+...
   apply in_all_comb_iff.
   split; [ easy | ].
   split; [ now rewrite map_length, canon_sym_gr_list_length | ].
@@ -745,6 +772,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
   apply NoDup_all_comb.
 }
 Qed.
+*)
 
 (* multilinearity *)
 
@@ -2727,6 +2755,8 @@ Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ M%M.
+(* to be completed
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
+*)
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
 

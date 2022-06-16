@@ -2256,49 +2256,29 @@ Qed.
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
-  | [] => []
-  | l :: ll' =>
-      match ll' with
-      | [] => map (λ y, [y]) l
-      | _ :: _ => App (a ∈ l), map (cons a) (list_prodn ll')
-      end
-  end.
-
-Fixpoint old_list_prodn {A} (ll : list (list A)) :=
-  match ll with
-  | [] => []
-  | l :: ll' =>
-      match ll' with
-      | [] => map (λ y, [y]) l
-      | _ :: _ => flat_map (λ a, map (cons a) (old_list_prodn ll')) l
-      end
+  | [] => [[]]
+  | l :: ll' => App (a ∈ l), map (cons a) (list_prodn ll')
   end.
 
 Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
-  list_prodn ll = [] ↔ ll = [] ∨ [] ∈ ll.
+  list_prodn ll = [] ↔ [] ∈ ll.
 Proof.
 intros.
 split. {
   intros Hll.
-  induction ll as [| l1]; [ now left | right ].
+  induction ll as [| l1]; [ easy | ].
   cbn in Hll.
-  destruct ll as [| l2]. {
-    destruct l1 as [| a1]; [ now left | easy ].
-  }
   specialize (App_list_eq_nil _ _ Hll) as H1.
-  cbn - [ list_prodn ] in H1.
+  cbn in H1.
   destruct l1 as [| a]; [ now left | right ].
   specialize (H1 _ (or_introl eq_refl)).
   apply map_eq_nil in H1.
-  specialize (IHll H1).
-  now destruct IHll.
+  now apply IHll.
 } {
   intros Hll.
-  destruct Hll as [Hll| Hll]; [ now subst ll | ].
   induction ll as [| l1]; [ easy | cbn ].
-  destruct Hll as [Hll| Hll]; [ now subst l1; destruct ll | ].
+  destruct Hll as [Hll| Hll]; [ now subst l1 | ].
   specialize (IHll Hll).
-  destruct ll as [| l2]; [ easy | ].
   rewrite IHll; cbn.
   now apply App_list_all_nil.
 }

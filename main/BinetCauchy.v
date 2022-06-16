@@ -2478,6 +2478,7 @@ apply IHlll. {
 }
 Qed.
 
+(* to be completed
 Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
   (∀ l, l ∈ ll → l ≠ [])
   → l ∈ list_prodn ll
@@ -2511,6 +2512,7 @@ Proof.
 intros * Hll Hi.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n.
+...
   destruct ll as [| l]; [ now destruct i | ].
   now rewrite Nat.pow_0_l in Hi.
 }
@@ -2565,6 +2567,7 @@ Theorem nth_all_comb_length : ∀ n i,
 Proof.
 intros * Hi.
 unfold all_comb.
+...
 rewrite nth_list_prodn_same_length with (n := n). {
   apply repeat_length.
 } {
@@ -2581,6 +2584,7 @@ Theorem all_comb_elem_ub : ∀ i j n,
 Proof.
 intros.
 unfold all_comb.
+...
 remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
 destruct (lt_dec j (length ll)) as [Hjll| Hjll]. 2: {
   apply Nat.nlt_ge in Hjll.
@@ -2616,6 +2620,7 @@ induction ll as [| l1]; intros; [ easy | ].
 cbn in Hll |-*.
 destruct i. {
   destruct ll as [| l2]. {
+...
     apply in_map_iff in Hll.
     now destruct Hll as (a & H & Ha); subst l.
   }
@@ -2633,6 +2638,7 @@ destruct Hl as (l3 & H & Hl3); subst l.
 rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
+*)
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
   ∑ (_ ∈ l), a = a * length l.
