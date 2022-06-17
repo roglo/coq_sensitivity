@@ -2920,12 +2920,24 @@ assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
 move H before Hln; clear Hln; rename H into Hln.
 revert n Hln Hnl.
 induction l as [| a]; intros; [ now subst n | ].
-cbn.
+destruct n; [ easy | ].
+cbn - [ all_comb_inv_loop seq ].
+...
+Theorem all_comb_S : ∀ n, all_comb (S n) = seq 1 n :: all_comb n.
+Proof.
+intros.
+cbn - [ seq ].
+cbn - [ all_comb all_comb_inv_loop seq ].
+...
+rewrite IHl.
 ...
 Compute (
   let l := [1;1;2;1;2] in
-  let n := 4 in
+  let n := 2 in
+  all_comb_inv n l
+(*
   nth (all_comb_inv n l) (all_comb n) [] = l
+*)
 ).
 ...
 subst n.
