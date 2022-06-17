@@ -2381,37 +2381,9 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
-(*
-Theorem all_comb_inv_loop_ub : ∀ c n l,
-  n ≠ 0
-  → (∀ i, i < length l → nth i l 0 ≤ n)
-  → all_comb_inv_loop c n l < c * n ^ length l + n ^ length l.
-Proof.
-intros * Hnz Hnl.
-revert c n Hnz Hnl.
-induction l as [| a]; intros; cbn. {
-  destruct n; [ easy | flia ].
-}
-eapply lt_le_trans. {
-  apply IHl; [ easy | ].
-  intros i Hi.
-  apply (Hnl (S i)); cbn.
-  now apply -> Nat.succ_lt_mono.
-}
-rewrite Nat.mul_add_distr_r.
-rewrite Nat.mul_assoc.
-rewrite <- Nat.add_assoc.
-apply Nat.add_le_mono_l.
-remember (pred a * n ^ length l) as x.
-remember (n * n ^ length l) as y.
-replace (n ^ length l) with (1 * n ^ length l) by apply Nat.mul_1_l.
-subst x y.
-rewrite <- Nat.mul_add_distr_r.
-apply Nat.mul_le_mono_r.
-specialize (Hnl 0 (Nat.lt_0_succ _)); cbn in Hnl.
-flia Hnl Hnz.
-Qed.
-*)
+Theorem all_comb_inv_loop_cons : ∀ n a l,
+  all_comb_inv_loop n (a :: l) = pred a + n * all_comb_inv_loop n l.
+Proof. easy. Qed.
 
 Theorem all_comb_inv_loop_ub : ∀ n l,
   n ≠ 0
@@ -2921,7 +2893,15 @@ move H before Hln; clear Hln; rename H into Hln.
 revert n Hln Hnl.
 induction l as [| a]; intros; [ now subst n | ].
 destruct n; [ easy | ].
+rewrite all_comb_inv_loop_cons.
+(*
+rewrite Nat.add_comm.
+*)
+rewrite <- List_nth_skipn.
+Print list_prodn.
+...
 cbn - [ all_comb_inv_loop seq ].
+Print all_comb_inv_loop.
 ...
 Theorem all_comb_S : ∀ n, all_comb (S n) = seq 1 n :: all_comb n.
 Proof.
