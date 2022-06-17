@@ -2612,6 +2612,26 @@ assert (H : nth i (nth j ll []) 0 ∈ nth j ll []). {
 now specialize (Hln H).
 Qed.
 
+(* to be completed
+Theorem all_comb_elem_bounds : ∀ i j n,
+  1 ≤ nth i (nth j (all_comb n) []) 0 ≤ n.
+Proof.
+intros.
+split; [ | apply all_comb_elem_ub ].
+unfold all_comb.
+remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
+symmetry in Hll.
+destruct ll as [| l1]. {
+  exfalso.
+  apply eq_list_prodn_nil_iff in Hll.
+  destruct n; [ easy | ].
+  now apply repeat_spec in Hll.
+}
+Search (list_prodn _ = _ :: _).
+apply list_prodn_cons_iff in Hll.
+...
+*)
+
 Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
   i < length ll
   → l ∈ list_prodn ll
@@ -2868,6 +2888,31 @@ Compute (
     remember (collapse kl) as jl eqn:Hjl.
     specialize (collapse_is_permut kl) as H1.
     rewrite <- Hjl, <- Hn in H1.
+    remember (map (λ j, nth j l 0) jl) as l1 eqn:Hl1.
+    assert (Hln : length l1 = n). {
+      now rewrite Hl1, map_length, Hjl, collapse_length.
+    }
+Theorem nth_all_comb_inv_all_comb : ∀ n l,
+  n = length l
+  → (∀ a, a ∈ l → 1 ≤ a ≤ n)
+  → nth (all_comb_inv n l) (all_comb n) [] = l.
+Proof.
+intros * Hnl.
+Compute (
+  let l := [4;4;3;4] in
+  let n := length l in
+  nth (all_comb_inv n l) (all_comb n) [] = l
+).
+...
+    apply nth_all_comb_inv_all_comb; [ easy | ].
+    intros a Ha.
+    rewrite Hl1 in Ha.
+    apply in_map_iff in Ha.
+    destruct Ha as (j & Hja & Hj); subst a.
+    rewrite Hl.
+    split; [ | apply all_comb_elem_ub ].
+Search all_comb.
+About all_comb_elem_ub.
 ...
     unfold h1, g1.
     unfold f1 at 2.
