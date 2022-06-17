@@ -2613,11 +2613,50 @@ now specialize (Hln H).
 Qed.
 
 (* to be completed
-Theorem all_comb_elem_bounds : ∀ i j n,
-  1 ≤ nth i (nth j (all_comb n) []) 0 ≤ n.
+Theorem all_comb_elem_lb : ∀ i j n,
+  i < n
+  → j < n ^ n
+  → 1 ≤ nth i (nth j (all_comb n) []) 0.
 Proof.
-intros.
-split; [ | apply all_comb_elem_ub ].
+intros * Hin Hjn.
+unfold all_comb.
+remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
+...
+assert (H : nth j ll [] ∈ ll). {
+  apply nth_In.
+  remember (nth j ll []) as l eqn:Hl.
+(*
+  rewrite Hll.
+  rewrite list_prodn_length; [ | now destruct n ].
+*)
+  symmetry in Hl.
+  generalize Hl; intros H.
+  apply (f_equal length) in H.
+  rewrite Hll in H.
+  rewrite nth_list_prodn_same_length with (n := n) in H.
+  rewrite repeat_length in H.
+...
+  rewrite Hll.
+  rewrite list_prodn_length; [ | now destruct n ].
+...
+remember (nth j (list_prodn (repeat (seq 1 n) n)) []) as l eqn:Hl.
+symmetry in Hl.
+generalize Hl; intros H.
+apply (f_equal length) in H.
+rewrite nth_list_prodn_same_length with (n := n) in H.
+rewrite repeat_length in H.
+Search list_prodn.
+in_list_prodn_repeat_iff:
+  ∀ (m n : nat) (l : list nat),
+    n = 0 ∧ l = [] ∨ n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m) ↔ l ∈ list_prodn (repeat (seq 1 m) n)
+...
+destruct l as [| a]; [ now subst n | ].
+destruct i. {
+  subst n; cbn in Hl |-*.
+  subst n; cbn - [ list_prodn repeat seq ] in Hl |-*.
+
+...
+intros * Hin Hjn.
 unfold all_comb.
 remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
 symmetry in Hll.
@@ -2627,6 +2666,7 @@ destruct ll as [| l1]. {
   destruct n; [ easy | ].
   now apply repeat_spec in Hll.
 }
+
 Search (list_prodn _ = _ :: _).
 apply list_prodn_cons_iff in Hll.
 ...
