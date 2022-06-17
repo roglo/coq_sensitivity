@@ -1519,6 +1519,13 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
+Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
+Proof.
+intros * Hab.
+apply (f_equal (@rev A)) in Hab.
+now do 2 rewrite rev_involutive in Hab.
+Qed.
+
 Theorem List_rev_nth : ∀ A (ll : list (list A)) i,
   rev (nth i ll []) = nth i (map (@rev A) ll) [].
 Proof.

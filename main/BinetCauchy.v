@@ -2907,6 +2907,52 @@ Theorem nth_all_comb_inv_all_comb : ∀ n l,
   → nth (all_comb_inv n l) (all_comb n) [] = l.
 Proof.
 intros * Hnl Hln.
+unfold all_comb_inv.
+remember (rev l) as l' eqn:Hl'.
+rewrite <- (rev_involutive l') in Hl'.
+apply List_rev_inj in Hl'; subst l; rename l' into l.
+rewrite rev_length in Hnl.
+assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
+  intros * Ha.
+  apply Hln.
+  now apply -> in_rev.
+}
+move H before Hln; clear Hln; rename H into Hln.
+revert n Hln Hnl.
+induction l as [| a]; intros; [ now subst n | ].
+cbn.
+...
+Compute (
+  let l := [1;1;2;1;2] in
+  let n := 4 in
+  nth (all_comb_inv n l) (all_comb n) [] = l
+).
+...
+subst n.
+induction l as [| a]; [ easy | ].
+cbn - [ seq ].
+Print all_comb_inv_loop.
+...
+intros * Hnl Hln.
+revert l Hnl Hln.
+induction n; intros; cbn - [ seq ]. {
+  now apply length_zero_iff_nil in Hnl; subst l.
+}
+Print all_comb_inv_loop.
+intros * Hnl Hln.
+symmetry in Hnl.
+unfold all_comb_inv.
+revert l Hnl Hln.
+induction n; intros; cbn - [ seq ]. {
+  now apply length_zero_iff_nil in Hnl; subst l.
+}
+Print all_comb_inv_loop.
+...
+Compute (
+  let l := [1;1;2;4;2] in
+  let n := length l in
+  nth (all_comb_inv n l) (all_comb n) [] = l
+).
 ...
     apply nth_all_comb_inv_all_comb; [ easy | ].
     intros a Ha.
