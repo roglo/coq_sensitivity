@@ -2612,7 +2612,6 @@ assert (H : nth i (nth j ll []) 0 ∈ nth j ll []). {
 now specialize (Hln H).
 Qed.
 
-(* to be completed
 Theorem all_comb_elem_lb : ∀ i j n,
   i < n
   → j < n ^ n
@@ -2621,56 +2620,26 @@ Proof.
 intros * Hin Hjn.
 unfold all_comb.
 remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
-...
-assert (H : nth j ll [] ∈ ll). {
+assert (Hj : nth j ll [] ∈ ll). {
   apply nth_In.
-  remember (nth j ll []) as l eqn:Hl.
-(*
   rewrite Hll.
   rewrite list_prodn_length; [ | now destruct n ].
-*)
-  symmetry in Hl.
-  generalize Hl; intros H.
-  apply (f_equal length) in H.
-  rewrite Hll in H.
-  rewrite nth_list_prodn_same_length with (n := n) in H.
-  rewrite repeat_length in H.
-...
-  rewrite Hll.
-  rewrite list_prodn_length; [ | now destruct n ].
-...
-remember (nth j (list_prodn (repeat (seq 1 n) n)) []) as l eqn:Hl.
-symmetry in Hl.
-generalize Hl; intros H.
-apply (f_equal length) in H.
-rewrite nth_list_prodn_same_length with (n := n) in H.
-rewrite repeat_length in H.
-Search list_prodn.
-in_list_prodn_repeat_iff:
-  ∀ (m n : nat) (l : list nat),
-    n = 0 ∧ l = [] ∨ n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m) ↔ l ∈ list_prodn (repeat (seq 1 m) n)
-...
-destruct l as [| a]; [ now subst n | ].
-destruct i. {
-  subst n; cbn in Hl |-*.
-  subst n; cbn - [ list_prodn repeat seq ] in Hl |-*.
-
-...
-intros * Hin Hjn.
-unfold all_comb.
-remember (list_prodn (repeat (seq 1 n) n)) as ll eqn:Hll.
-symmetry in Hll.
-destruct ll as [| l1]. {
-  exfalso.
-  apply eq_list_prodn_nil_iff in Hll.
-  destruct n; [ easy | ].
-  now apply repeat_spec in Hll.
+  rewrite rngl_product_same_length with (n := n). 2: {
+    intros l Hl.
+    apply repeat_spec in Hl; subst l.
+    apply seq_length.
+  }
+  now rewrite repeat_length.
 }
-
-Search (list_prodn _ = _ :: _).
-apply list_prodn_cons_iff in Hll.
-...
-*)
+rewrite Hll in Hj.
+apply in_list_prodn_repeat_iff in Hj.
+rewrite <- Hll in Hj.
+destruct Hj as [(H1, H2)| Hj]; [ now subst n | ].
+destruct Hj as (H1 & H2 & H3).
+apply H3.
+apply nth_In.
+now rewrite H2.
+Qed.
 
 Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
   i < length ll
