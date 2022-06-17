@@ -2906,12 +2906,7 @@ Theorem nth_all_comb_inv_all_comb : ∀ n l,
   → (∀ a, a ∈ l → 1 ≤ a ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = l.
 Proof.
-intros * Hnl.
-Compute (
-  let l := [4;4;3;4] in
-  let n := length l in
-  nth (all_comb_inv n l) (all_comb n) [] = l
-).
+intros * Hnl Hln.
 ...
     apply nth_all_comb_inv_all_comb; [ easy | ].
     intros a Ha.
@@ -2920,8 +2915,7 @@ Compute (
     destruct Ha as (j & Hja & Hj); subst a.
     rewrite Hl.
     split; [ | apply all_comb_elem_ub ].
-Search all_comb.
-About all_comb_elem_ub.
+    apply all_comb_elem_lb; [ | easy ].
 ...
     unfold h1, g1.
     unfold f1 at 2.
