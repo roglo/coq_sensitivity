@@ -2899,6 +2899,13 @@ rewrite <- List_nth_skipn.
 cbn - [ seq "*" ].
 rewrite iter_list_seq; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
+Print all_comb.
+Theorem fold_all_comb : ∀ n,
+  list_prodn (repeat (seq 1 n) n) = all_comb n.
+Proof. easy. Qed.
+Print list_prodn.
+Search (list_prodn (_ ++ _)).
+Search (list_prodn (repeat _ _)).
 ...
 rewrite rngl_App_seq_App.
 rewrite App_list_seq
