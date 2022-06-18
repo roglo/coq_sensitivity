@@ -2934,6 +2934,13 @@ Theorem skipn_list_prodn_repeat : ∀ n l,
       (list_prodn (repeat (seq 1 (S n)) (S n))).
 Proof.
 intros * Hnl Hln.
+Search (skipn (_ + _)).
+rewrite <- List_skipn_skipn.
+remember (skipn (S n * _) _) as ll eqn:Hll.
+rewrite <- (firstn_skipn (S n) ll) at 1.
+f_equal.
+...
+intros * Hnl Hln.
 cbn - [ seq "*" ].
 ...
 rewrite skipn_list_prodn_repeat; [ | easy | ].
