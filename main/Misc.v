@@ -1771,7 +1771,18 @@ cbn; f_equal.
 now apply IHla1.
 Qed.
 
-(* common for summations and products *)
+(* common for all iterators *)
+
+Theorem iter_list_seq : ∀ T d (op : T → T → T) b len f,
+  len ≠ 0
+  → iter_list (seq b len) (λ c i, op c (f i)) d =
+    iter_seq b (b + len - 1) (λ c i, op c (f i)) d.
+Proof.
+intros * Hlen.
+unfold iter_seq.
+f_equal; f_equal.
+flia Hlen.
+Qed.
 
 Theorem fold_left_op_fun_from_d : ∀ T A d op a l (f : A → _)
   (op_d_l : ∀ x, op d x = x)

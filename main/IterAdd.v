@@ -581,9 +581,7 @@ Theorem rngl_summation_seq_summation : ∀ b len f,
   → (∑ (i ∈ seq b len), f i = ∑ (i = b, b + len - 1), f i)%F.
 Proof.
 intros * Hlen.
-unfold iter_seq.
-f_equal; f_equal.
-flia Hlen.
+now apply iter_list_seq.
 Qed.
 
 Theorem rngl_summation_list_mul_summation_list :

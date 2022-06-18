@@ -461,9 +461,7 @@ Theorem rngl_product_seq_product : ∀ b len f,
   → (∏ (i ∈ seq b len), f i = ∏ (i = b, b + len - 1), f i)%F.
 Proof.
 intros * Hlen.
-unfold iter_seq.
-f_equal; f_equal.
-flia Hlen.
+now apply iter_list_seq.
 Qed.
 
 Theorem rngl_product_1_opp_1 :

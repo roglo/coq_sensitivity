@@ -2894,10 +2894,21 @@ revert n Hln Hnl.
 induction l as [| a]; intros; [ now subst n | ].
 destruct n; [ easy | ].
 rewrite all_comb_inv_loop_cons.
-(*
 rewrite Nat.add_comm.
-*)
 rewrite <- List_nth_skipn.
+cbn - [ seq "*" ].
+rewrite iter_list_seq; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+...
+rewrite rngl_App_seq_App.
+rewrite App_list_seq
+...
+Compute (all_comb 2).
+Compute (all_comb 3).
+Compute (
+  let n := 2 in
+all_comb (S n) = App (i = 1, n), map (cons i) (all_comb n)
+).
 Print list_prodn.
 ...
 cbn - [ all_comb_inv_loop seq ].
