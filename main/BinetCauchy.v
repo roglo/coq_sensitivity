@@ -2934,6 +2934,7 @@ Theorem skipn_list_prodn_repeat : ∀ n l,
       (list_prodn (repeat (seq 1 (S n)) (S n))).
 Proof.
 intros * Hnl Hln.
+cbn - [ seq "*" ].
 ...
 rewrite skipn_list_prodn_repeat; [ | easy | ].
 rewrite app_nth1.
