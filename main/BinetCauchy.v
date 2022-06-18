@@ -2924,23 +2924,29 @@ skipn (S n * all_comb_inv_loop (S n) l)
   (list_prodn (repeat (seq 1 (S n)) (S n))
 ))) = repeat (rev l) (S n)
 ).
-(*
-Theorem glop : ∀ n l,
+Theorem skipn_list_prodn_repeat : ∀ n l,
   n = length l
-  → (∀ a, a ∈ l → 1 ≤ a ≤ n)
-  → ∀ a, 1 ≤ a ≤ n →
-    nth (pred a)
-      (firstn (S n)
-         (skipn (S n * all_comb_inv_loop (S n) l)
-            (list_prodn (repeat (seq 1 (S n)) (S n))))) [] =
-    rev l.
-*)
+  → (∀ b, b ∈ l → 1 ≤ b ≤ S n)
+  → skipn (S n * all_comb_inv_loop (S n) l)
+      (list_prodn (repeat (seq 1 (S n)) (S n))) =
+    map (λ a, rev l ++ [a]) (seq 1 (S n)) ++
+    skipn (S n + S n * all_comb_inv_loop (S n) l)
+      (list_prodn (repeat (seq 1 (S n)) (S n))).
+Proof.
+intros * Hnl Hln.
+...
+rewrite skipn_list_prodn_repeat; [ | easy | ].
+rewrite app_nth1.
+rewrite (List_map_nth' 0).
+rewrite seq_nth.
 Compute (
   let l := [3;2] in
   let n := length l in
   skipn (S n * all_comb_inv_loop (S n) l)
     (list_prodn (repeat (seq 1 (S n)) (S n))) =
-  map (λ a, rev l ++ [a]) (seq 1 (S n))
+  map (λ a, rev l ++ [a]) (seq 1 (S n)) ++
+  skipn (S n + S n * all_comb_inv_loop (S n) l)
+    (list_prodn (repeat (seq 1 (S n)) (S n)))
 (*
  ++
   skipn (S (S n) * all_comb_inv_loop (S n) l)
