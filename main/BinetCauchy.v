@@ -2941,6 +2941,11 @@ Compute (
   skipn (S n * all_comb_inv_loop (S n) l)
     (list_prodn (repeat (seq 1 (S n)) (S n))) =
   map (λ a, rev l ++ [a]) (seq 1 (S n))
+(*
+ ++
+  skipn (S (S n) * all_comb_inv_loop (S n) l)
+    (list_prodn (repeat (seq 1 (S n)) (S n)))
+*)
 ).
 ...
 Compute (
