@@ -2890,16 +2890,91 @@ assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
   now apply -> in_rev.
 }
 move H before Hln; clear Hln; rename H into Hln.
+unfold all_comb.
 revert n Hln Hnl.
 induction l as [| a]; intros; [ now subst n | ].
 destruct n; [ easy | ].
 rewrite all_comb_inv_loop_cons.
+cbn in Hnl; apply Nat.succ_inj in Hnl.
+(*
 rewrite Nat.add_comm.
+*)
 rewrite <- List_nth_skipn.
+Compute (
+  let n := 2 in
+let a := 2 in
+let l := [3;1] in
+skipn (pred a)
+  (list_prodn (repeat (seq 1 (S n)) (S n))
+)
+).
+Compute (
+  let n := 2 in
+let l := [2;1] in
+skipn (S n * all_comb_inv_loop (S n) l)
+  (list_prodn (repeat (seq 1 (S n)) (S n))
+)
+).
+Compute (
+let l := [2;1;3] in
+  let n := length l in
+map (λ l, firstn n l) (
+firstn (S n) (
+skipn (S n * all_comb_inv_loop (S n) l)
+  (list_prodn (repeat (seq 1 (S n)) (S n))
+))) = repeat (rev l) (S n)
+).
+(*
+Theorem glop : ∀ n l,
+  n = length l
+  → (∀ a, a ∈ l → 1 ≤ a ≤ n)
+  → ∀ a, 1 ≤ a ≤ n →
+    nth (pred a)
+      (firstn (S n)
+         (skipn (S n * all_comb_inv_loop (S n) l)
+            (list_prodn (repeat (seq 1 (S n)) (S n))))) [] =
+    rev l.
+*)
+Compute (
+  let l := [3;2] in
+  let n := length l in
+  skipn (S n * all_comb_inv_loop (S n) l)
+    (list_prodn (repeat (seq 1 (S n)) (S n))) =
+  map (λ a, rev l ++ [a]) (seq 1 (S n))
+).
+...
+Compute (
+  let n := 2 in
+  let l := [3;2] in
+  let a := 1 in
+  map (firstn n)
+      (firstn (S n)
+         (skipn (S n * all_comb_inv_loop (S n) l)
+            (list_prodn (repeat (seq 1 (S n)) (S n)))))
+).
+...
+Compute (
+  let n := 2 in
+let l := [3;1] in
+map (λ l, firstn n l) (
+firstn (S n) (
+skipn (S n * all_comb_inv_loop (S n) l)
+  (list_prodn (repeat (seq 1 (S n)) (S n))
+)))
+).
+...
+Compute (
+  let n := 2 in
+let l := [3;1] in
+  (list_prodn (repeat (seq 1 (S n)) (S n))
+)
+).
+...
 cbn - [ seq "*" ].
 rewrite iter_list_seq; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
-Print all_comb.
+...
+Print list_prodn.
 Theorem fold_all_comb : ∀ n,
   list_prodn (repeat (seq 1 n) n) = all_comb n.
 Proof. easy. Qed.
