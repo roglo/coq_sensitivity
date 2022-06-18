@@ -2939,6 +2939,9 @@ rewrite <- List_skipn_skipn.
 remember (skipn (S n * _) _) as ll eqn:Hll.
 rewrite <- (firstn_skipn (S n) ll) at 1.
 f_equal.
+subst ll.
+remember (S n * all_comb_inv_loop (S n) l) as u eqn:Hu.
+rewrite firstn_skipn_comm.
 ...
 intros * Hnl Hln.
 cbn - [ seq "*" ].
