@@ -2925,6 +2925,14 @@ Compute (
   skipn (pred 2) (list_prodn (repeat (seq 1 n) n))
 ).
 Compute (
+  let n := 2 in
+  map
+    (λ k,
+     firstn n (skipn (S n * k)
+       (list_prodn (repeat (seq 1 (S n)) (S n))))) (seq 1 (S n ^ S n))
+).
+...
+Compute (
   let a := 2 in
   let n := 3 in
   map (λ k,
