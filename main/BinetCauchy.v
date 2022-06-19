@@ -2920,6 +2920,15 @@ cbn in Hnl; apply Nat.succ_inj in Hnl.
 rewrite Nat.add_comm.
 *)
 rewrite <- List_nth_skipn.
+clear IHl.
+revert a n Hln Hnl.
+induction l as [| b]; intros. {
+  cbn in Hnl; subst n; cbn.
+  specialize (Hln _ (or_introl eq_refl)).
+  now replace a with 1 by flia Hln.
+}
+cbn - [ seq "*" ].
+...
 Compute (
   let n := 3 in
   skipn (pred 2) (list_prodn (repeat (seq 1 n) n))
