@@ -2943,6 +2943,14 @@ subst ll.
 remember (S n * all_comb_inv_loop (S n) l) as u eqn:Hu.
 rewrite firstn_skipn_comm.
 ...
+Compute (
+  let l := [3;2] in
+  let n := length l in
+  let u := S n * all_comb_inv_loop (S n) l in
+  skipn u (firstn (u + S n) (list_prodn (repeat (seq 1 (S n)) (S n)))) =
+  map (λ a : nat, rev l ++ [a]) (seq 1 (S n))
+).
+...
 intros * Hnl Hln.
 cbn - [ seq "*" ].
 ...
