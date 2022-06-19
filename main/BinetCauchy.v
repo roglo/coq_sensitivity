@@ -2916,11 +2916,21 @@ induction l as [| a]; intros; [ now subst n | ].
 destruct n; [ easy | ].
 rewrite all_comb_inv_loop_cons.
 cbn in Hnl; apply Nat.succ_inj in Hnl.
+(*
 rewrite Nat.add_comm.
+*)
 rewrite <- List_nth_skipn.
 Compute (
   let n := 3 in
   skipn (pred 2) (list_prodn (repeat (seq 1 n) n))
+).
+Compute (
+  let a := 2 in
+  let n := 3 in
+  map (λ k,
+  nth (pred a)
+    (skipn (S n * k)
+       (list_prodn (repeat (seq 1 (S n)) (S n)))) []) (seq 1 (n ^ n))
 ).
 ...
 Compute (
