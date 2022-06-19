@@ -2884,7 +2884,7 @@ all_comb_inv_loop =
 fix all_comb_inv_loop (n : nat) (l : list nat) {struct l} : nat :=
   match l with
   | [] => 0
-  | d :: l' => pred d + n * all_comb_inv_loop n l'
+  | a :: l' => pred a + n * all_comb_inv_loop n l'
   end
 with l = rev initial_l
 ...

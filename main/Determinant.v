@@ -289,7 +289,7 @@ Qed.
 Fixpoint all_comb_inv_loop n l :=
   match l with
   | [] => 0
-  | d :: l' => pred d + n * all_comb_inv_loop n l'
+  | a :: l' => pred a + n * all_comb_inv_loop n l'
   end.
 
 Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
