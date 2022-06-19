@@ -2878,6 +2878,7 @@ Theorem nth_all_comb_inv_all_comb : ∀ n l,
   → (∀ a, a ∈ l → 1 ≤ a ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = l.
 Proof.
+(*
 intros * Hnl Hln.
 ...
 all_comb_inv_loop =
@@ -2896,6 +2897,7 @@ fix list_prodn (A : Type) (ll : list (list A)) {struct ll} : list (list A) :=
   end
 with ll = repeat (seq 1 n) n
 ...
+*)
 intros * Hnl Hln.
 unfold all_comb_inv.
 remember (rev l) as l' eqn:Hl'.
@@ -2914,10 +2916,13 @@ induction l as [| a]; intros; [ now subst n | ].
 destruct n; [ easy | ].
 rewrite all_comb_inv_loop_cons.
 cbn in Hnl; apply Nat.succ_inj in Hnl.
-(*
 rewrite Nat.add_comm.
-*)
 rewrite <- List_nth_skipn.
+Compute (
+  let n := 3 in
+  skipn (pred 2) (list_prodn (repeat (seq 1 n) n))
+).
+...
 Compute (
   let n := 2 in
 let a := 2 in
