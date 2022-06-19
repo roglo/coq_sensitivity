@@ -2879,6 +2879,24 @@ Theorem nth_all_comb_inv_all_comb : ∀ n l,
   → nth (all_comb_inv n l) (all_comb n) [] = l.
 Proof.
 intros * Hnl Hln.
+...
+all_comb_inv_loop =
+fix all_comb_inv_loop (n : nat) (l : list nat) {struct l} : nat :=
+  match l with
+  | [] => 0
+  | d :: l' => pred d + n * all_comb_inv_loop n l'
+  end
+with l = rev initial_l
+...
+list_prodn =
+fix list_prodn (A : Type) (ll : list (list A)) {struct ll} : list (list A) :=
+  match ll with
+  | [] => [[]]
+  | l :: ll' => App (a ∈ l), map (cons a) (list_prodn A ll')
+  end
+with ll = repeat (seq 1 n) n
+...
+intros * Hnl Hln.
 unfold all_comb_inv.
 remember (rev l) as l' eqn:Hl'.
 rewrite <- (rev_involutive l') in Hl'.
