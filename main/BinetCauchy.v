@@ -2928,8 +2928,19 @@ destruct n; [ easy | ].
 rewrite all_comb_inv_loop_cons.
 *)
 cbn in Hnl; apply Nat.succ_inj in Hnl.
+rewrite <- Hnl.
 rewrite Nat.add_comm.
 rewrite <- List_nth_skipn.
+cbn - [ seq ].
+rewrite iter_list_seq; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+...
+Compute (
+  let a := 3 in
+  let n := 2 in
+  skipn (pred a * S n ^ n) (list_prodn (repeat (seq 1 (S n)) (S n)))
+= App (i = a, S n), map (λ l, i :: l) (list_prodn (repeat (seq 1 (S n)) n))
+).
 ...
 clear IHl.
 revert a n Hln Hnl.
