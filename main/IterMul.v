@@ -525,10 +525,7 @@ Qed.
 Theorem rngl_product_only_one : ∀ g n, (∏ (i = n, n), g i = g n)%F.
 Proof.
 intros g n.
-unfold iter_seq.
-rewrite Nat.sub_succ_l; [ idtac | reflexivity ].
-rewrite Nat.sub_diag; simpl.
-apply rngl_mul_1_l.
+apply iter_seq_only_one, rngl_mul_1_l.
 Qed.
 
 End a.

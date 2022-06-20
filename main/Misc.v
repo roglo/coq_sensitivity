@@ -2071,6 +2071,17 @@ unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
+Theorem iter_seq_only_one : ∀ T d (op : T → T → T) g n
+  (op_d_l : ∀ x, op d x = x),
+  iter_seq n n (λ c i, op c (g i)) d = g n.
+Proof.
+intros * op_d_l.
+unfold iter_seq, iter_list.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite Nat.sub_diag.
+apply op_d_l.
+Qed.
+
 Theorem iter_list_distr : ∀ T A d op g h (l : list A)
   (op_d_l : ∀ x, op d x = x)
   (op_comm : ∀ a b, op a b = op b a)
@@ -2293,6 +2304,12 @@ rewrite fold_left_op_fun_from_d with (d := []); [ easy | easy | | ]. {
 } {
   apply app_assoc.
 }
+Qed.
+
+Theorem App_only_one : ∀ A (g : _ → list A) n, App (i = n, n), g i = g n.
+Proof.
+intros.
+now apply iter_seq_only_one.
 Qed.
 
 (* list_prodn: cartesian product of several lists *)

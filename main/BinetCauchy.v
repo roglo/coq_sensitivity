@@ -2901,6 +2901,30 @@ induction l as [| a]; intros. {
     split; [ | easy ].
     now apply Nat.pow_nonzero.
   }
+  rewrite iter_list_seq; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  destruct n; [ easy | ].
+  rewrite App_split with (j := 1); [ | flia ].
+  rewrite App_only_one.
+  assert (Hzl : 0 < length (list_prodn (repeat (seq 1 (S (S n))) (S n)))). {
+    rewrite list_prodn_length; [ | now destruct n ].
+    erewrite rngl_product_list_eq_compat. 2: {
+      intros l Hl.
+      apply repeat_spec in Hl.
+      rewrite Hl at 1.
+      rewrite seq_length.
+      easy.
+    }
+    cbn - [ rngl_one rngl_mul seq ].
+    rewrite nat_product_list_all_same.
+    cbn - [ Nat.pow ].
+    rewrite repeat_length.
+    apply Nat.neq_0_lt_0.
+    now apply Nat.pow_nonzero.
+  }
+  rewrite app_nth1; [ | now rewrite map_length ].
+  rewrite (List_map_nth' []); [ | easy ].
+  f_equal.
 ...
   rewrite iter_list_seq; [ | easy ].
   rewrite App_split with (j := n - 1); [ | flia Hnz ].

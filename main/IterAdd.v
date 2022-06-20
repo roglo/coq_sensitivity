@@ -334,10 +334,7 @@ Qed.
 Theorem rngl_summation_only_one : ∀ g n, ∑ (i = n, n), g i = g n.
 Proof.
 intros g n.
-unfold iter_seq.
-rewrite Nat.sub_succ_l; [ idtac | reflexivity ].
-rewrite Nat.sub_diag; simpl.
-apply rngl_add_0_l.
+apply iter_seq_only_one, rngl_add_0_l.
 Qed.
 
 Theorem rngl_summation_list_cons : ∀ A (a : A) la f,
