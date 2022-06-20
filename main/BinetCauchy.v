@@ -2683,16 +2683,6 @@ Theorem det_isort_rows : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl.
-(*
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Compute (
-  let A := mk_mat [[1;2;3];[4;5;6];[-7;8;9];[10;-11;12]]%Z in
-  let kl := [1;4;3] in
-  det (mat_select_rows kl A) =
-    (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F
-).
-*)
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -2808,25 +2798,11 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-(**)
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. 2: {
   apply permutation_nth with (d := []); [ easy | ].
   rewrite map_length, all_comb_length; [ | easy ].
   split; [ easy | ].
-(*
-Compute (
-  let n := 3 in
-  let kl := [1;4;3] in
-  let g1 := λ l, map (λ j : nat, nth j l 0) (collapse kl) in
-  let h1 := λ l, map (λ j : nat, nth j l 0) (isort_rank Nat.leb kl) in
-  let f := λ i, all_comb_inv n (g1 (nth i (all_comb n) [])) in
-  map (λ x,
-  nth x (all_comb n) [] = nth (f x) (map h1 (all_comb n)) [])
-  (seq 0 (n ^ n))
-).
-...
-*)
   exists (λ i, all_comb_inv n (g1 (nth i (all_comb n) []))).
   split; [ | split ]. {
     unfold FinFun.bFun.
@@ -2885,47 +2861,7 @@ Theorem nth_all_comb_inv_all_comb : ∀ n l,
   (∀ a, a ∈ l → 1 ≤ a ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l.
 Proof.
-(*
-intros * Hnl Hln.
-...
-all_comb_inv_loop =
-fix all_comb_inv_loop (n : nat) (l : list nat) {struct l} : nat :=
-  match l with
-  | [] => 0
-  | a :: l' => pred a + n * all_comb_inv_loop n l'
-  end
-with l = rev initial_l
-...
-list_prodn =
-fix list_prodn (A : Type) (ll : list (list A)) {struct ll} : list (list A) :=
-  match ll with
-  | [] => [[]]
-  | l :: ll' => App (a ∈ l), map (cons a) (list_prodn A ll')
-  end
-with ll = repeat (seq 1 n) n
-...
-*)
 intros * Hln.
-(*
-Compute (
-  let l := [5;1;3] in
-  let n := 6 in
-  nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l
-).
-*)
-(*
-unfold all_comb_inv.
-remember (rev l) as l' eqn:Hl'.
-rewrite <- (rev_involutive l') in Hl'.
-apply List_rev_inj in Hl'; subst l; rename l' into l.
-rewrite rev_length in Hnl.
-assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
-  intros * Ha.
-  apply Hln.
-  now apply -> in_rev.
-}
-move H before Hln; clear Hln; rename H into Hln.
-*)
 unfold all_comb.
 revert n Hln.
 induction l as [| a]; intros. {
@@ -2933,14 +2869,9 @@ induction l as [| a]; intros. {
   clear Hln.
   induction n; [ easy | ].
   cbn - [ seq ].
-(*
-  IHn : nth 0 (list_prodn (repeat (seq 1 n) n)) [] = repeat 1 n
-  ============================
-  nth 0 (App (a ∈ seq 1 (S n)), map (cons a) (list_prodn (repeat (seq 1 (S n)) n))) [] = 1 :: repeat 1 n
-*)
-  rewrite seq_S.
-  rewrite App_list_app; cbn.
-  unfold iter_list at 2; cbn.
+  rewrite seq_S at 1.
+  rewrite App_list_app; cbn - [ seq ].
+  unfold iter_list at 2; cbn - [ seq ].
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
     subst n; cbn.
     now rewrite iter_list_empty.
@@ -2951,7 +2882,6 @@ induction l as [| a]; intros. {
       intros i Hi.
       rewrite map_length.
       rewrite list_prodn_length; [ | now destruct n ].
-      replace (seq 1 n ++ [S n]) with (seq 1 (S n)) by now rewrite seq_S.
       erewrite rngl_product_list_eq_compat. 2: {
         intros l Hl.
         apply repeat_spec in Hl.
