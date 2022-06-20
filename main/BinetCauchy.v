@@ -2996,6 +2996,11 @@ rewrite seq_length, Nat_sub_succ_1.
 rewrite Nat.mul_comm, Nat.sub_diag.
 rewrite skipn_O.
 ...
+specialize (IHl (S n)) as H1.
+cbn - [ seq ] in H1.
+...
+unfold iter_seq.
+...
 Compute (
   let a := 3 in
   let n := 2 in
