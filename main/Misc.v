@@ -2282,6 +2282,19 @@ apply iter_seq_split; [ easy | | | easy ]. {
 }
 Qed.
 
+Theorem App_list_app : ∀ A B (la lb : list A) (f : A → list B),
+  App (i ∈ la ++ lb), f i = App (i ∈ la), f i ++ App (i ∈ lb), f i.
+Proof.
+intros.
+rewrite iter_list_app.
+unfold iter_list.
+rewrite fold_left_op_fun_from_d with (d := []); [ easy | easy | | ]. {
+  apply app_nil_r.
+} {
+  apply app_assoc.
+}
+Qed.
+
 (* list_prodn: cartesian product of several lists *)
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=

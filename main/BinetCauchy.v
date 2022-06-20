@@ -2882,9 +2882,8 @@ Compute (
       now rewrite Hl1, map_length, Hjl, collapse_length.
     }
 Theorem nth_all_comb_inv_all_comb : ∀ n l,
-  n = length l
-  → (∀ a, a ∈ l → 1 ≤ a ≤ n)
-  → nth (all_comb_inv n l) (all_comb n) [] = l.
+  (∀ a, a ∈ l → 1 ≤ a ≤ n)
+  → nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l.
 Proof.
 (*
 intros * Hnl Hln.
@@ -2906,7 +2905,14 @@ fix list_prodn (A : Type) (ll : list (list A)) {struct ll} : list (list A) :=
 with ll = repeat (seq 1 n) n
 ...
 *)
-intros * Hnl Hln.
+intros * Hln.
+(*
+Compute (
+  let l := [5;1;3] in
+  let n := 6 in
+  nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l
+).
+*)
 (*
 unfold all_comb_inv.
 remember (rev l) as l' eqn:Hl'.
@@ -2921,8 +2927,74 @@ assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
 move H before Hln; clear Hln; rename H into Hln.
 *)
 unfold all_comb.
-revert n Hln Hnl.
-induction l as [| a]; intros; [ now subst n | cbn ].
+revert n Hln.
+induction l as [| a]; intros. {
+  cbn; rewrite Nat.sub_0_r, app_nil_r; cbn.
+  clear Hln.
+  induction n; [ easy | ].
+  cbn - [ seq ].
+(*
+  IHn : nth 0 (list_prodn (repeat (seq 1 n) n)) [] = repeat 1 n
+  ============================
+  nth 0 (App (a ∈ seq 1 (S n)), map (cons a) (list_prodn (repeat (seq 1 (S n)) n))) [] = 1 :: repeat 1 n
+*)
+  rewrite seq_S.
+  rewrite App_list_app; cbn.
+  unfold iter_list at 2; cbn.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n; cbn.
+    now rewrite iter_list_empty.
+  }
+  rewrite app_nth1. 2: {
+    rewrite App_list_length.
+    erewrite rngl_summation_list_eq_compat. 2: {
+      intros i Hi.
+      rewrite map_length.
+      rewrite list_prodn_length; [ | now destruct n ].
+      replace (seq 1 n ++ [S n]) with (seq 1 (S n)) by now rewrite seq_S.
+      erewrite rngl_product_list_eq_compat. 2: {
+        intros l Hl.
+        apply repeat_spec in Hl.
+        rewrite Hl at 1.
+        rewrite seq_length.
+        easy.
+      }
+      cbn - [ rngl_one rngl_mul seq ].
+      rewrite nat_product_list_all_same.
+      now rewrite repeat_length.
+    }
+    cbn - [ rngl_zero rngl_add ].
+    rewrite nat_summation_list_all_same.
+    rewrite seq_length.
+    apply Nat.neq_0_lt_0.
+    apply Nat.neq_mul_0.
+    split; [ | easy ].
+    now apply Nat.pow_nonzero.
+  }
+...
+  rewrite iter_list_seq; [ | easy ].
+  rewrite App_split with (j := n - 1); [ | flia Hnz ].
+  rewrite Nat.sub_add; [ | flia Hnz ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  unfold iter_seq at 2.
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  unfold iter_list at 1; cbn.
+  destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
+    subst n.
+    rewrite iter_seq_empty; [ | easy ].
+    now unfold iter_list.
+  }
+  rewrite app_nth1.
+...
+  rewrite iter_list_only_one.
+  rewrite App_only_one.
+  rewrite App_split.
+...
+}
+rewrite List_map_nil.
+...
+; [ now subst n | cbn ].
 destruct n; [ easy | ].
 (*
 rewrite all_comb_inv_loop_cons.
