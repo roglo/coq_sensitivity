@@ -2934,6 +2934,38 @@ rewrite <- List_nth_skipn.
 cbn - [ seq ].
 rewrite iter_list_seq; [ | easy ].
 rewrite Nat.add_comm, Nat.add_sub.
+specialize (Hln _ (or_introl eq_refl)) as Ha.
+rewrite App_split with (j := pred a); [ | flia Ha ].
+rewrite skipn_app.
+rewrite skipn_all2. 2: {
+  unfold iter_seq.
+  rewrite App_list_length.
+  rewrite fold_iter_seq.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    rewrite map_length.
+    rewrite list_prodn_length. 2: {
+      destruct n; [ flia Ha Hi | easy ].
+    }
+    erewrite rngl_product_list_eq_compat. 2: {
+      intros l1 Hl1.
+      replace (length l1) with (S n). 2: {
+        apply repeat_spec in Hl1; subst l1.
+        now rewrite seq_length.
+      }
+      easy.
+    }
+    cbn - [ rngl_one rngl_mul seq ].
+    rewrite nat_product_list_all_same.
+    now rewrite repeat_length.
+  }
+  cbn - [ rngl_zero rngl_add ].
+  unfold iter_seq.
+  rewrite nat_summation_list_all_same.
+  rewrite Nat_sub_succ_1.
+  rewrite seq_length.
+  now rewrite Nat.mul_comm.
+}
 ...
 Compute (
   let a := 3 in

@@ -2270,6 +2270,18 @@ rewrite <- flat_map_concat_map.
 apply in_flat_map.
 Qed.
 
+Theorem App_split : ∀ A j (g : nat → list A) b k,
+  b ≤ S j ≤ S k
+  → App (i = b, k), g i = App (i = b, j), g i ++ App (i = j+1, k), g i.
+Proof.
+intros * Hbjk.
+apply iter_seq_split; [ easy | | | easy ]. {
+  apply app_nil_r.
+} {
+  apply app_assoc.
+}
+Qed.
+
 (* list_prodn: cartesian product of several lists *)
 
 Fixpoint list_prodn {A} (ll : list (list A)) :=
