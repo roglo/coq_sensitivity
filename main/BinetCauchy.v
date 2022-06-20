@@ -2673,6 +2673,84 @@ cbn - [ rngl_mul rngl_one ].
 now rewrite IHl.
 Qed.
 
+Theorem nth_list_prod_repeat : ∀ m n,
+  n ≤ m
+  → nth 0 (list_prodn (repeat (seq 1 m) n)) [] = repeat 1 n.
+Proof.
+intros * Hnm.
+revert m Hnm.
+induction n; intros; [ easy | ].
+cbn - [ seq ].
+destruct m; [ easy | ].
+apply Nat.succ_le_mono in Hnm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn - [ seq ].
+  clear Hnm.
+  induction m; [ easy | ].
+  rewrite seq_S.
+  cbn - [ seq ].
+  rewrite App_list_app.
+  rewrite app_nth1; [ easy | ].
+  rewrite App_list_length.
+  cbn - [ rngl_zero rngl_add seq ].
+  rewrite nat_summation_list_all_same, seq_length.
+  now cbn.
+}
+rewrite seq_S at 1.
+rewrite App_list_app; cbn - [ seq ].
+unfold iter_list at 2; cbn - [ seq ].
+rewrite app_nth1. 2: {
+  rewrite App_list_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros i Hi.
+    rewrite map_length.
+    rewrite list_prodn_length; [ | now destruct n ].
+    erewrite rngl_product_list_eq_compat. 2: {
+      intros l Hl.
+      apply repeat_spec in Hl.
+      rewrite Hl at 1.
+      rewrite seq_length.
+      easy.
+    }
+    cbn - [ rngl_one rngl_mul seq ].
+    rewrite nat_product_list_all_same.
+    now rewrite repeat_length.
+  }
+  cbn - [ rngl_zero rngl_add ].
+  rewrite nat_summation_list_all_same.
+  rewrite seq_length.
+  apply Nat.neq_0_lt_0.
+  apply Nat.neq_mul_0.
+  split; [ | flia Hnm Hnz ].
+  now apply Nat.pow_nonzero.
+}
+rewrite iter_list_seq; [ | flia Hnm Hnz ].
+rewrite Nat.add_comm, Nat.add_sub.
+destruct m; [ flia Hnm Hnz | ].
+rewrite App_split with (j := 1); [ | flia ].
+rewrite App_only_one.
+assert (Hzl : 0 < length (list_prodn (repeat (seq 1 (S (S m))) n))). {
+  rewrite list_prodn_length; [ | now destruct n ].
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros l Hl.
+    apply repeat_spec in Hl.
+    rewrite Hl at 1.
+    rewrite seq_length.
+    easy.
+  }
+  cbn - [ rngl_one rngl_mul seq ].
+  rewrite nat_product_list_all_same.
+  cbn - [ Nat.pow ].
+  rewrite repeat_length.
+  apply Nat.neq_0_lt_0.
+  now apply Nat.pow_nonzero.
+}
+rewrite app_nth1; [ | now rewrite map_length ].
+rewrite (List_map_nth' []); [ | easy ].
+f_equal.
+apply IHn; flia Hnm.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2867,88 +2945,9 @@ revert n Hln.
 induction l as [| a]; intros. {
   cbn; rewrite Nat.sub_0_r, app_nil_r; cbn.
   clear Hln.
-  induction n; [ easy | ].
-  cbn - [ seq ].
-  rewrite seq_S at 1.
-  rewrite App_list_app; cbn - [ seq ].
-  unfold iter_list at 2; cbn - [ seq ].
-  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-    subst n; cbn.
-    now rewrite iter_list_empty.
-  }
-  rewrite app_nth1. 2: {
-    rewrite App_list_length.
-    erewrite rngl_summation_list_eq_compat. 2: {
-      intros i Hi.
-      rewrite map_length.
-      rewrite list_prodn_length; [ | now destruct n ].
-      erewrite rngl_product_list_eq_compat. 2: {
-        intros l Hl.
-        apply repeat_spec in Hl.
-        rewrite Hl at 1.
-        rewrite seq_length.
-        easy.
-      }
-      cbn - [ rngl_one rngl_mul seq ].
-      rewrite nat_product_list_all_same.
-      now rewrite repeat_length.
-    }
-    cbn - [ rngl_zero rngl_add ].
-    rewrite nat_summation_list_all_same.
-    rewrite seq_length.
-    apply Nat.neq_0_lt_0.
-    apply Nat.neq_mul_0.
-    split; [ | easy ].
-    now apply Nat.pow_nonzero.
-  }
-  rewrite iter_list_seq; [ | easy ].
-  rewrite Nat.add_comm, Nat.add_sub.
-  destruct n; [ easy | ].
-  rewrite App_split with (j := 1); [ | flia ].
-  rewrite App_only_one.
-  assert (Hzl : 0 < length (list_prodn (repeat (seq 1 (S (S n))) (S n)))). {
-    rewrite list_prodn_length; [ | now destruct n ].
-    erewrite rngl_product_list_eq_compat. 2: {
-      intros l Hl.
-      apply repeat_spec in Hl.
-      rewrite Hl at 1.
-      rewrite seq_length.
-      easy.
-    }
-    cbn - [ rngl_one rngl_mul seq ].
-    rewrite nat_product_list_all_same.
-    cbn - [ Nat.pow ].
-    rewrite repeat_length.
-    apply Nat.neq_0_lt_0.
-    now apply Nat.pow_nonzero.
-  }
-  rewrite app_nth1; [ | now rewrite map_length ].
-  rewrite (List_map_nth' []); [ | easy ].
-  f_equal.
-...
-  rewrite iter_list_seq; [ | easy ].
-  rewrite App_split with (j := n - 1); [ | flia Hnz ].
-  rewrite Nat.sub_add; [ | flia Hnz ].
-  rewrite Nat.add_comm, Nat.add_sub.
-  unfold iter_seq at 2.
-  rewrite Nat.sub_succ_l; [ | easy ].
-  rewrite Nat.sub_diag.
-  unfold iter_list at 1; cbn.
-  destruct (Nat.eq_dec n 1) as [Hn1| Hn1]. {
-    subst n.
-    rewrite iter_seq_empty; [ | easy ].
-    now unfold iter_list.
-  }
-  rewrite app_nth1.
-...
-  rewrite iter_list_only_one.
-  rewrite App_only_one.
-  rewrite App_split.
-...
+  now apply nth_list_prod_repeat.
 }
-rewrite List_map_nil.
 ...
-; [ now subst n | cbn ].
 destruct n; [ easy | ].
 (*
 rewrite all_comb_inv_loop_cons.
