@@ -2966,6 +2966,35 @@ rewrite skipn_all2. 2: {
   rewrite seq_length.
   now rewrite Nat.mul_comm.
 }
+rewrite app_nil_l.
+replace (pred a + 1) with a by flia Ha.
+unfold iter_seq at 1.
+rewrite App_list_length.
+rewrite fold_iter_seq.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite map_length.
+  rewrite list_prodn_length. 2: {
+    destruct n; [ flia Ha Hi | easy ].
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros l1 Hl1.
+    replace (length l1) with (S n). 2: {
+      apply repeat_spec in Hl1; subst l1.
+      now rewrite seq_length.
+    }
+    easy.
+  }
+  cbn - [ rngl_one rngl_mul seq ].
+  rewrite nat_product_list_all_same.
+  now rewrite repeat_length.
+}
+cbn - [ rngl_zero rngl_add seq ].
+unfold iter_seq at 1.
+rewrite nat_summation_list_all_same.
+rewrite seq_length, Nat_sub_succ_1.
+rewrite Nat.mul_comm, Nat.sub_diag.
+rewrite skipn_O.
 ...
 Compute (
   let a := 3 in
