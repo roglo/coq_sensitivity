@@ -286,13 +286,26 @@ rewrite rngl_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
-Fixpoint all_comb_inv_loop n l :=
+Fixpoint all_comb_inv n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a + n * all_comb_inv_loop n l'
+  | a :: l' => pred a * n ^ length l' + all_comb_inv n l'
   end.
 
-Definition all_comb_inv n l := all_comb_inv_loop n (rev l).
+Fixpoint old_all_comb_inv_loop n l :=
+  match l with
+  | [] => 0
+  | a :: l' => pred a + n * old_all_comb_inv_loop n l'
+  end.
+
+Definition old_all_comb_inv n l := old_all_comb_inv_loop n (rev l).
+
+(*
+Compute (
+  let n := 3 in
+  map (λ l, (all_comb_inv n l, old_all_comb_inv n l)) (all_comb n)
+).
+*)
 
 Theorem in_list_prodn_repeat_iff : ∀ m n l,
   n = 0 ∧ l = [] ∨

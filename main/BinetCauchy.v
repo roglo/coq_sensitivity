@@ -2381,6 +2381,7 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 now rewrite seq_nth.
 Qed.
 
+(*
 Theorem all_comb_inv_loop_cons : ∀ n a l,
   all_comb_inv_loop n (a :: l) = pred a + n * all_comb_inv_loop n l.
 Proof. easy. Qed.
@@ -2403,6 +2404,7 @@ specialize (Hnl (S i)).
 assert (H : S i < length (a :: l)) by now cbn; flia Hi.
 now specialize (Hnl H).
 Qed.
+*)
 
 Theorem all_comb_inv_ub : ∀ n l,
   n ≠ 0
@@ -2410,14 +2412,20 @@ Theorem all_comb_inv_ub : ∀ n l,
   → all_comb_inv n l < n ^ length l.
 Proof.
 intros * Hnz Hnl.
-unfold all_comb_inv.
-rewrite <- rev_length.
-apply all_comb_inv_loop_ub; [ easy | ].
+induction l as [| a]; cbn; [ easy | ].
+rewrite Nat.add_comm.
+rewrite Nat.mul_comm.
+rewrite (Nat.mul_comm n).
+apply Nat_lt_lt_add_mul. {
+  specialize (Hnl 0 (Nat.lt_0_succ _)).
+  cbn in Hnl.
+  flia Hnz Hnl.
+}
+apply IHl.
 intros i Hi.
-rewrite rev_length in Hi.
-rewrite rev_nth; [ | easy ].
-apply Hnl.
-flia Hi.
+specialize (Hnl (S i)).
+assert (H : S i < length (a :: l)) by now cbn; flia Hi.
+now specialize (Hnl H).
 Qed.
 
 Theorem nth_concat_same_length : ∀ A m n (lll : list (list (list A))) i,
@@ -2899,6 +2907,7 @@ with ll = repeat (seq 1 n) n
 ...
 *)
 intros * Hnl Hln.
+(*
 unfold all_comb_inv.
 remember (rev l) as l' eqn:Hl'.
 rewrite <- (rev_involutive l') in Hl'.
@@ -2910,16 +2919,18 @@ assert (H : ∀ a, a ∈ l → 1 ≤ a ≤ n). {
   now apply -> in_rev.
 }
 move H before Hln; clear Hln; rename H into Hln.
+*)
 unfold all_comb.
 revert n Hln Hnl.
-induction l as [| a]; intros; [ now subst n | ].
+induction l as [| a]; intros; [ now subst n | cbn ].
 destruct n; [ easy | ].
-rewrite all_comb_inv_loop_cons.
-cbn in Hnl; apply Nat.succ_inj in Hnl.
 (*
-rewrite Nat.add_comm.
+rewrite all_comb_inv_loop_cons.
 *)
+cbn in Hnl; apply Nat.succ_inj in Hnl.
+rewrite Nat.add_comm.
 rewrite <- List_nth_skipn.
+...
 clear IHl.
 revert a n Hln Hnl.
 induction l as [| b]; intros. {
