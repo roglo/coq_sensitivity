@@ -2947,6 +2947,17 @@ induction l as [| a]; intros. {
   clear Hln.
   now apply nth_list_prod_repeat.
 }
+cbn.
+rewrite Nat.add_comm.
+rewrite <- List_nth_skipn.
+Search (skipn _ (list_prodn _)).
+Inspect 1.
+Compute (
+  let a := 2 in
+  let l := [1;3] in
+  let n := 3 in
+  skipn (pred a * n ^ length l) (list_prodn (repeat (seq 1 n) n))
+).
 ...
 destruct n; [ easy | ].
 (*
