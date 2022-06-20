@@ -2996,6 +2996,18 @@ rewrite seq_length, Nat_sub_succ_1.
 rewrite Nat.mul_comm, Nat.sub_diag.
 rewrite skipn_O.
 ...
+clear IHl.
+clear Ha.
+revert a n Hln Hnl.
+induction l as [| b]; intros. {
+  cbn in Hnl; subst n; cbn.
+  specialize (Hln _ (or_introl eq_refl)).
+  destruct Hln as (H1, H2).
+  apply Nat.le_antisymm in H1; [ subst a | easy ].
+  now unfold iter_seq, iter_list; cbn.
+}
+cbn - [ seq ].
+...
 specialize (IHl (S n)) as H1.
 cbn - [ seq ] in H1.
 ...
