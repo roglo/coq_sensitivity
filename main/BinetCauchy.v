@@ -2954,11 +2954,19 @@ Search (skipn _ (list_prodn _)).
 Inspect 1.
 Compute (
   let a := 2 in
-  let l := [8;8;8] in
-  let n := 4 in
-  skipn (pred a * n ^ length l) (list_prodn (repeat (seq 1 n) n))
-= map (λ l1, repeat 1 (n - S (length l)) ++ l1) (map (cons a) (list_prodn (repeat (seq 1 n) (length l))))
+  let m := 1 in
+  let n := 3 in
+  skipn (pred a * n ^ m) (list_prodn (repeat (seq 1 n) n)) =
+  map (λ l1, repeat 1 (n - S m) ++ l1)
+    (map (cons a) (list_prodn (repeat (seq 1 n) m)))
 ).
+...
+Theorem glop : ∀ a m n,
+  skipn (pred a * n ^ m) (list_prodn (repeat (seq 1 n) n)) =
+  map (λ l1, repeat 1 (n - S m) ++ l1)
+    (map (cons a) (list_prodn (repeat (seq 1 n) m))).
+...
+rewrite glop.
 ...
 destruct n; [ easy | ].
 (*
