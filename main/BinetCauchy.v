@@ -2953,12 +2953,13 @@ rewrite <- List_nth_skipn.
 Search (skipn _ (list_prodn _)).
 Inspect 1.
 Compute (
-  let a := 2 in
+  let a := 3 in
   let m := 1 in
   let n := 3 in
   skipn (pred a * n ^ m) (list_prodn (repeat (seq 1 n) n)) =
-  map (λ l1, repeat 1 (n - S m) ++ l1)
-    (map (cons a) (list_prodn (repeat (seq 1 n) m)))
+  App (b = a, n),
+    map (λ l1, repeat 1 (n - S m) ++ b :: l1)
+      (list_prodn (repeat (seq 1 n) m))
 ).
 ...
 Theorem glop : ∀ a m n,
