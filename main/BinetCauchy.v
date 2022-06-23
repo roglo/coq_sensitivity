@@ -2935,8 +2935,8 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     assert (Hln : length l1 = n). {
       now rewrite Hl1, map_length, Hjl, collapse_length.
     }
-(**)
 unfold all_comb.
+...
 Print list_prodn.
 Search list_prodn.
 (*
