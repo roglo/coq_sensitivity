@@ -2961,6 +2961,30 @@ Compute (
     map (λ l1, repeat 1 (n - S m) ++ b :: l1)
       (list_prodn (repeat (seq 1 n) m))
 ).
+Compute (
+  let n := 3 in
+  let m := 2 in
+  let p := 2 in
+  list_prodn (repeat (seq 1 n) (m + p)) =
+  map (λ ll, fst ll ++ snd ll)
+    (list_prod
+       (list_prodn (repeat (seq 1 n) m))
+       (list_prodn (repeat (seq 1 n) p)))
+).
+Print list_prod.
+Search (map _ (list_prod _ _)).
+Search (nth _ (list_prod _ _)).
+...
+  map (λ ll, concat ll)
+    (list_prodn
+      [list_prodn (repeat (seq 1 n) m); list_prodn (repeat (seq 1 n) p)])
+).
+Search (map _ (list_prodn _)).
+...
+Theorem glop : ∀ m n p,
+  list_prodn (repeat (seq 1 n) (m + p)) =
+  list_prodn
+    [list_prodn (repeat (seq 1 n) m); list_prodn (repeat (seq 1 n) p)].
 ...
 Theorem glop : ∀ a m n,
   skipn (pred a * n ^ m) (list_prodn (repeat (seq 1 n) n)) =
