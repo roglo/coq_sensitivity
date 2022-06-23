@@ -2985,6 +2985,13 @@ induction n; intros; cbn. {
   rewrite app_nil_r, map_map; cbn.
   symmetry; apply map_id.
 }
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite IHn.
+  rewrite map_map.
+  easy.
+}
+cbn.
 ...
 Print list_prod.
 Search combine.
