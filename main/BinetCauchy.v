@@ -2971,9 +2971,14 @@ Compute (
        (list_prodn (repeat (seq 1 n) m))
        (list_prodn (repeat (seq 1 n) p)))
 ).
+...
 Print list_prod.
-Search (map _ (list_prod _ _)).
-Search (nth _ (list_prod _ _)).
+Search combine.
+Search split.
+Print split.
+Print combine.
+Print map2.
+Search (list (_ * _)).
 ...
   map (λ ll, concat ll)
     (list_prodn
