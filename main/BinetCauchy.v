@@ -2971,6 +2971,20 @@ Compute (
        (list_prodn (repeat (seq 1 n) m))
        (list_prodn (repeat (seq 1 n) p)))
 ).
+(* juste pour le sport, chais pas vraiment si ça sera utile *)
+Theorem list_prod_repeat_add : ∀ m n p,
+  list_prodn (repeat (seq 1 m) (n + p)) =
+  map (λ ll, fst ll ++ snd ll)
+    (list_prod
+       (list_prodn (repeat (seq 1 m) n))
+       (list_prodn (repeat (seq 1 m) p))).
+Proof.
+intros.
+revert m p.
+induction n; intros; cbn. {
+  rewrite app_nil_r, map_map; cbn.
+  symmetry; apply map_id.
+}
 ...
 Print list_prod.
 Search combine.
