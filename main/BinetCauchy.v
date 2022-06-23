@@ -2673,7 +2673,7 @@ cbn - [ rngl_mul rngl_one ].
 now rewrite IHl.
 Qed.
 
-Theorem nth_list_prod_repeat : ∀ m n,
+Theorem nth_0_list_prodn_repeat : ∀ m n,
   n ≤ m
   → nth 0 (list_prodn (repeat (seq 1 m) n)) [] = repeat 1 n.
 Proof.
@@ -2935,6 +2935,22 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     assert (Hln : length l1 = n). {
       now rewrite Hl1, map_length, Hjl, collapse_length.
     }
+(**)
+unfold all_comb.
+Print list_prodn.
+Search list_prodn.
+(*
+Fixpoint nth_list_prodn A i (ll : list (list A)) d :=
+  match ll with
+  | [] => d
+  | l :: ll' =>
+      if lt_dec i (length l) then nth i l d
+      else nth_list_prodn (i - length l) ll' d
+  end.
+Theorem nth_list_prodn_fun : ∀ A (d : A) i ll,
+  nth i (list_prodn ll) [] = nth_list_prodn i (list_prodn ll) [].
+...
+*)
 Theorem nth_all_comb_inv_all_comb : ∀ n l,
   (∀ a, a ∈ l → 1 ≤ a ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l.
@@ -2945,7 +2961,7 @@ revert n Hln.
 induction l as [| a]; intros. {
   cbn; rewrite Nat.sub_0_r, app_nil_r; cbn.
   clear Hln.
-  now apply nth_list_prod_repeat.
+  now apply nth_0_list_prodn_repeat.
 }
 cbn.
 rewrite Nat.add_comm.
@@ -2991,7 +3007,7 @@ rewrite seq_S; cbn.
 Theorem glop : ∀ A n (la lb : list A),
   repeat (la ++ lb) n = map2 (λ a b, a ++ b) (repeat la n) (repeat lb n).
 Proof.
-Admitted.
+...
 rewrite glop.
 Search map2.
 ...
