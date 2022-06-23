@@ -2751,6 +2751,30 @@ f_equal.
 apply IHn; flia Hnm.
 Qed.
 
+Fixpoint nth_concat A i (ll : list (list A)) d :=
+  match ll with
+  | [] => d
+  | l :: ll' =>
+      if lt_dec i (length l) then nth i l d
+      else nth_concat (i - length l) ll' d
+  end.
+
+Theorem nth_concat_fun : ∀ A i ll (d : A),
+  nth i (concat ll) d = nth_concat i ll d.
+Proof.
+intros.
+revert i.
+induction ll as [| l]; intros; cbn. {
+  now rewrite Tauto_match_nat_same.
+}
+destruct (lt_dec i (length l)) as [Hil| Hil]. {
+  now rewrite app_nth1.
+}
+apply Nat.nlt_ge in Hil.
+rewrite app_nth2; [ | easy ].
+apply IHll.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2935,22 +2959,20 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     assert (Hln : length l1 = n). {
       now rewrite Hl1, map_length, Hjl, collapse_length.
     }
-unfold all_comb.
+    unfold all_comb.
+    destruct n; [ easy | ].
+    cbn - [ seq ].
+    rewrite App_list_concat_map.
+    rewrite nth_concat_fun.
+rewrite seq_S.
+rewrite map_app.
+cbn.
+Theorem concat_app_nth1 : ∀ A i la lb (d : A),
+  i < ∑ (l ∈ la), length la
+  → nth_concat i (la ++ lb) d = nth_concat i la d.
 ...
-Print list_prodn.
-Search list_prodn.
-(*
-Fixpoint nth_list_prodn A i (ll : list (list A)) d :=
-  match ll with
-  | [] => d
-  | l :: ll' =>
-      if lt_dec i (length l) then nth i l d
-      else nth_list_prodn (i - length l) ll' d
-  end.
-Theorem nth_list_prodn_fun : ∀ A (d : A) i ll,
-  nth i (list_prodn ll) [] = nth_list_prodn i (list_prodn ll) [].
+rewrite concat_app_nth1.
 ...
-*)
 Theorem nth_all_comb_inv_all_comb : ∀ n l,
   (∀ a, a ∈ l → 1 ≤ a ≤ n)
   → nth (all_comb_inv n l) (all_comb n) [] = repeat 1 (n - length l) ++ l.
