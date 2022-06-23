@@ -2980,6 +2980,22 @@ Theorem list_prod_repeat_add : ∀ m n p,
        (list_prodn (repeat (seq 1 m) p))).
 Proof.
 intros.
+revert n p.
+induction m; intros. {
+  destruct n; [ cbn | easy ].
+  rewrite app_nil_r, map_map; cbn.
+  symmetry; apply map_id.
+}
+rewrite seq_S; cbn.
+...
+Theorem glop : ∀ A n (la lb : list A),
+  repeat (la ++ lb) n = map2 (λ a b, a ++ b) (repeat la n) (repeat lb n).
+Proof.
+Admitted.
+rewrite glop.
+Search map2.
+...
+intros.
 revert m p.
 induction n; intros; cbn. {
   rewrite app_nil_r, map_map; cbn.
