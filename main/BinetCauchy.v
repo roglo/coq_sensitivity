@@ -3009,6 +3009,7 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
       }
 ...
       rewrite <- nth_concat_fun.
+...
       rewrite <- App_list_concat_map.
       rewrite fold_iter_seq'.
       cbn - [ seq ].
