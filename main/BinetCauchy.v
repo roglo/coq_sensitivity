@@ -2775,6 +2775,23 @@ rewrite app_nth2; [ | easy ].
 apply IHll.
 Qed.
 
+Theorem concat_app_nth1 : ∀ A i lla llb (d : A),
+  i < ∑ (l ∈ lla), length l
+  → nth_concat i (lla ++ llb) d = nth_concat i lla d.
+Proof.
+intros * Hil.
+revert i llb Hil.
+induction lla as [| la]; intros; cbn. {
+  now rewrite rngl_summation_list_empty in Hil.
+}
+destruct (lt_dec i (length la)) as [Hila| Hila]; [ easy | ].
+apply Nat.nlt_ge in Hila.
+apply IHlla.
+rewrite rngl_summation_list_cons in Hil.
+cbn in Hil |-*.
+flia Hil Hila.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2964,14 +2981,46 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     cbn - [ seq ].
     rewrite App_list_concat_map.
     rewrite nth_concat_fun.
-rewrite seq_S.
-rewrite map_app.
-cbn.
-Theorem concat_app_nth1 : ∀ A i la lb (d : A),
-  i < ∑ (l ∈ la), length la
-  → nth_concat i (la ++ lb) d = nth_concat i la d.
+    rewrite seq_S at 1.
+    rewrite map_app.
+    cbn - [ seq ].
+    destruct (lt_dec (all_comb_inv (S n) l1) (S n ^ n * n)) as [Hnl| Hnl]. {
+      rewrite concat_app_nth1. 2: {
+        rewrite rngl_summation_list_map.
+        erewrite rngl_summation_list_eq_compat. 2: {
+          intros j Hj.
+          rewrite map_length.
+          rewrite list_prodn_length; [ | now destruct n ].
+          erewrite rngl_product_list_eq_compat. 2: {
+            intros la Hla.
+            apply repeat_spec in Hla.
+            replace (length la) with (S n). 2: {
+              subst la; symmetry; apply seq_length.
+            }
+            easy.
+          }
+          cbn - [ rngl_one rngl_mul seq ].
+          rewrite nat_product_list_all_same.
+          now rewrite repeat_length.
+        }
+        cbn - [ rngl_zero rngl_add ].
+        rewrite nat_summation_list_all_same.
+        now rewrite seq_length.
+      }
 ...
-rewrite concat_app_nth1.
+      rewrite <- nth_concat_fun.
+      rewrite <- App_list_concat_map.
+      rewrite fold_iter_seq'.
+      cbn - [ seq ].
+      rewrite Nat.sub_0_r.
+(* bon, ouais, chais pas, faut voir *)
+...
+Theorem concat_app_nth2 : ∀ A i la lb (d : A),
+  ∑ (l ∈ la), length l ≤ i
+  → nth_concat i (la ++ lb) d = nth_concat (i - length la) lb d.
+...
+specialize (@all_comb_inv_ub (S n) l1 (Nat.neq_succ_0 _)) as H2.
+rewrite Hln in H2.
 ...
 Theorem nth_all_comb_inv_all_comb : ∀ n l,
   (∀ a, a ∈ l → 1 ≤ a ≤ n)
