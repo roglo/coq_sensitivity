@@ -13,12 +13,6 @@ Require Import MyVector Matrix PermutSeq Signature.
 Require Import NatRingLike.
 Import matrix_Notations.
 
-Fixpoint member {A} (eqb : A → A → bool) a l :=
-  match l with
-  | [] => false
-  | b :: l' => if eqb a b then true else member eqb a l'
-  end.
-
 Definition set_minus {A} (eqb : A → _) E F :=
   filter (λ e, negb (member eqb e F)) E.
 
