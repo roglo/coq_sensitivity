@@ -2842,15 +2842,25 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-(*
+(**)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros la Hla.
+  remember (all_diff Nat.eqb la) as adl eqn:Hadl.
+  symmetry in Hadl.
+  destruct adl. 2: {
+(* ah oui mais non, faut pas imposer cette hypothèse, sinon le ?h
+   ne va pas unifier *)
+...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
+(*
     specialize (sign_comp Hif) as H1.
     specialize (H1 kl la).
+*)
 (* trouver "g" tel que
      ε (g la) = ε kl * ε la
 *)
@@ -2869,7 +2879,7 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     f_equal.
 ...
-*)
+(**)
 set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 set (g1 := f1 (isort_rank Nat.leb kl)).
 set (h1 := f1 kl).
