@@ -2917,6 +2917,32 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
+(**)
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. {
+  apply rngl_summation_list_eq_compat.
+  intros la Hla.
+  f_equal. {
+    unfold g1, f1.
+    rewrite fold_collapse.
+    specialize (sign_comp Hif) as H1.
+    specialize (H1 la (collapse kl)).
+    assert (H : is_permut (length la) (collapse kl)). {
+      apply in_all_comb_iff in Hla.
+      destruct Hla as [Hla| Hla]; [ easy | ].
+      destruct Hla as (_ & Hnc & Hcn).
+      rewrite Hnc, Hn.
+      apply collapse_is_permut.
+    }
+    specialize (H1 H); clear H.
+    unfold "°" at 1 in H1.
+    unfold ff_app in H1.
+    rewrite H1.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    f_equal.
+    apply ε_collapse_ε.
+(* marche pas ! *)
+...
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. 2: {
   apply permutation_nth with (d := []); [ easy | ].
