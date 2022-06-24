@@ -2845,11 +2845,64 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 (**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
-  remember (all_diff Nat.eqb la) as adl eqn:Hadl.
-  symmetry in Hadl.
-  destruct adl. 2: {
-(* ah oui mais non, faut pas imposer cette hypothèse, sinon le ?h
-   ne va pas unifier *)
+  replace (ε la) with (if all_diff Nat.eqb la then ε la else 0%F). 2: {
+    remember (all_diff _ _) as adl eqn:Hadl.
+    symmetry in Hadl.
+    destruct adl; [ easy | symmetry ].
+    unfold ε.
+    generalize Hla; intros H.
+    apply in_all_comb_iff in H.
+    destruct H as [H| H]; [ easy | ].
+    destruct H as (_ & Hnc & Hcn).
+    rewrite Hnc.
+Theorem all_diff_false_iff : ∀ A (eqb : A → _) la,
+  all_diff eqb la = false ↔
+  ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
+...
+apply all_diff_false_iff in Hadl.
+destruct Hadl as (l1 & l2 & l3 & a & Hadl).
+rewrite rngl_product_split3 with (j := length l1). 2: {
+  split; [ easy | ].
+  apply (f_equal length) in Hadl.
+  rewrite app_length in Hadl.
+  cbn in Hadl.
+  flia Hadl Hnc.
+}
+rewrite <- rngl_mul_assoc, rngl_mul_comm; [ | now destruct Hif ].
+rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
+  split; [ easy | ].
+  apply (f_equal length) in Hadl.
+  rewrite List_cons_is_app in Hadl.
+  rewrite (List_cons_is_app _ l3) in Hadl.
+  do 2 rewrite app_assoc in Hadl.
+  rewrite app_length in Hadl.
+  rewrite <- app_assoc in Hadl.
+  cbn in Hadl.
+  flia Hadl Hnc.
+}
+remember (if length l1 <? length (l1 ++ a :: l2) then _ else _) as x eqn:Hx.
+rewrite if_ltb_lt_dec in Hx.
+destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
+  exfalso; apply H.
+  rewrite app_length; cbn; flia.
+}
+clear H.
+unfold ff_app in Hx.
+rewrite Hadl in Hx.
+rewrite app_length in Hx.
+rewrite app_nth2 in Hx; [ | cbn; flia ].
+rewrite Nat.add_comm, Nat.add_sub in Hx.
+rewrite app_nth2 in Hx; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hx; cbn in Hx.
+rewrite app_nth2 in Hx; [ | now unfold ge ].
+rewrite Nat.sub_diag in Hx; cbn in Hx.
+rewrite sign_diff_id in Hx; subst x.
+rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
+rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+easy.
+}
 ...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
