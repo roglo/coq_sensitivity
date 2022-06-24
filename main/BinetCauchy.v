@@ -2971,6 +2971,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now subst x.
 }
 symmetry.
+(*
 ...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
@@ -2988,8 +2989,6 @@ set (h1 := f1 kl).
 set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 set (g1 := f1 (isort_rank Nat.leb kl)).
 set (h1 := f1 kl).
-
-...
 (*
     specialize (sign_comp Hif) as H1.
     specialize (H1 kl la).
@@ -3009,7 +3008,7 @@ set (h1 := f1 kl).
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     f_equal.
 ...
-(**)
+*)
 set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 set (g1 := f1 (isort_rank Nat.leb kl)).
 set (h1 := f1 kl).
@@ -3085,11 +3084,11 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
   apply isort_rank_is_permut_list.
 }
 erewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
-(*
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
+...
   f_equal. {
     unfold g1, f1.
     rewrite fold_collapse.
@@ -3112,7 +3111,6 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     apply ε_collapse_ε.
 (* marche pas ! *)
 ...
-*)
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. 2: {
   apply permutation_nth with (d := []); [ easy | ].
