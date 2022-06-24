@@ -1463,6 +1463,26 @@ Definition unsome A (d : A) o :=
   | None => d
   end.
 
+(* member: a computable "In" *)
+
+Fixpoint member A (eqb : A → A → bool) a la :=
+  match la with
+  | [] => false
+  | b :: lb => if eqb a b then true else member eqb a lb
+  end.
+
+(* end member *)
+
+(* all_diff: a computable "NoDup" *)
+
+Fixpoint all_diff A (eqb : A → A → bool) la :=
+  match la with
+  | [] => true
+  | a :: la' => if member eqb a la' then false else all_diff eqb la'
+  end.
+
+(* end all_diff *)
+
 Theorem NoDup_app_comm {A} : ∀ l l' : list A,
   NoDup (l ++ l') → NoDup (l' ++ l).
 Proof.
