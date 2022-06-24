@@ -1471,6 +1471,35 @@ Fixpoint member A (eqb : A → A → bool) a la :=
   | b :: lb => if eqb a b then true else member eqb a lb
   end.
 
+Theorem member_true_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
+Proof.
+intros * Heqb *.
+split. {
+  intros Hma.
+  induction la as [| b]; [ easy | cbn in Hma ].
+  remember (member eqb a la) as mal eqn:Hmal; symmetry in Hmal.
+  destruct mal. {
+    specialize (IHla eq_refl).
+    destruct IHla as (l1 & l2 & Hla).
+    subst la.
+    now exists (b :: l1), l2.
+  }
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  apply Heqb in Hab; subst b.
+  now exists [], la.
+} {
+  intros (l1 & l2 & Hla).
+  subst la.
+  induction l1 as [| b]; cbn. {
+    now rewrite (equality_refl Heqb).
+  }
+  now destruct (eqb a b).
+}
+Qed.
+
 (* end member *)
 
 (* all_diff: a computable "NoDup" *)

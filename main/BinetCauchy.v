@@ -2855,11 +2855,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hnc & Hcn).
     rewrite Hnc.
-Theorem all_diff_false_iff : ∀ A (eqb : A → _) la,
-  all_diff eqb la = false ↔
+Theorem all_diff_false_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la, all_diff eqb la = false ↔
   ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
 Proof.
-intros.
+intros * Heqb *.
 split. {
   intros Had.
   induction la as [| a]; [ easy | cbn in Had ].
@@ -2871,6 +2872,16 @@ split. {
     now subst la.
   }
   clear Had.
+  apply member_true_iff in Hmal; [ | easy ].
+  destruct Hmal as (l1 & l2 & Hla); subst la.
+  now exists [], l1, l2, a.
+} {
+  intros (l1 & l2 & l3 & a & Hla); subst la.
+  induction l1 as [| b]; cbn.
+...
+  destruct Hmal as (l
+  exists [].
+...
 ...
   remember (all_diff eqb la) as dla eqn:Hdla; symmetry in Hdla.
   destruct dla. {
