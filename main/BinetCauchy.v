@@ -2855,97 +2855,53 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hnc & Hcn).
     rewrite Hnc.
-Theorem all_diff_false_iff : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la, all_diff eqb la = false ↔
-  ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
-Proof.
-intros * Heqb *.
-split. {
-  intros Had.
-  induction la as [| a]; [ easy | cbn in Had ].
-  remember (member eqb a la) as mal eqn:Hmal; symmetry in Hmal.
-  destruct mal. 2: {
-    specialize (IHla Had).
-    destruct IHla as (l1 & l2 & l3 & b & Hlb).
-    exists (a :: l1), l2, l3, b.
-    now subst la.
+    apply (all_diff_false_iff Nat.eqb_eq) in Hadl.
+    destruct Hadl as (l1 & l2 & l3 & a & Hadl).
+    rewrite rngl_product_split3 with (j := length l1). 2: {
+      split; [ easy | ].
+      apply (f_equal length) in Hadl.
+      rewrite app_length in Hadl.
+      cbn in Hadl.
+      flia Hadl Hnc.
+    }
+    rewrite <- rngl_mul_assoc, rngl_mul_comm; [ | now destruct Hif ].
+    rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
+      split; [ easy | ].
+      apply (f_equal length) in Hadl.
+      rewrite List_cons_is_app in Hadl.
+      rewrite (List_cons_is_app _ l3) in Hadl.
+      do 2 rewrite app_assoc in Hadl.
+      rewrite app_length in Hadl.
+      rewrite <- app_assoc in Hadl.
+      cbn in Hadl.
+      flia Hadl Hnc.
+    }
+    remember (if length l1 <? length (l1 ++ _) then _ else _) as x eqn:Hx.
+    rewrite if_ltb_lt_dec in Hx.
+    destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
+      exfalso; apply H.
+      rewrite app_length; cbn; flia.
+    }
+    clear H.
+    unfold ff_app in Hx.
+    rewrite Hadl in Hx.
+    rewrite app_length in Hx.
+    rewrite app_nth2 in Hx; [ | cbn; flia ].
+    rewrite Nat.add_comm, Nat.add_sub in Hx.
+    rewrite app_nth2 in Hx; [ | now unfold ge ].
+    rewrite Nat.sub_diag in Hx; cbn in Hx.
+    rewrite app_nth2 in Hx; [ | now unfold ge ].
+    rewrite Nat.sub_diag in Hx; cbn in Hx.
+    rewrite sign_diff_id in Hx; subst x.
+    rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    easy.
   }
-  clear Had.
-  apply member_true_iff in Hmal; [ | easy ].
-  destruct Hmal as (l1 & l2 & Hla); subst la.
-  now exists [], l1, l2, a.
-} {
-  intros (l1 & l2 & l3 & a & Hla); subst la.
-  induction l1 as [| b]; cbn.
-...
-  destruct Hmal as (l
-  exists [].
-...
-...
-  remember (all_diff eqb la) as dla eqn:Hdla; symmetry in Hdla.
-  destruct dla. {
-...
-Theorem member_imp_not_all_diff : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ a la, member eqb a la = true → all_diff eqb (a :: la) = false.
-Proof.
-intros * Heqb * Hmem.
-revert a Hmem.
-induction la as [| b]; intros; [ easy | ].
-cbn in Hmem |-*.
-remember (member eqb b la) as mbl eqn:Hmbl; symmetry in Hmbl.
-destruct mbl; [ easy | ].
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply Heqb in Hab; subst b.
-...
-  apply (IHla b).
-...
-apply all_diff_false_iff in Hadl.
-destruct Hadl as (l1 & l2 & l3 & a & Hadl).
-rewrite rngl_product_split3 with (j := length l1). 2: {
-  split; [ easy | ].
-  apply (f_equal length) in Hadl.
-  rewrite app_length in Hadl.
-  cbn in Hadl.
-  flia Hadl Hnc.
+  easy.
 }
-rewrite <- rngl_mul_assoc, rngl_mul_comm; [ | now destruct Hif ].
-rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
-  split; [ easy | ].
-  apply (f_equal length) in Hadl.
-  rewrite List_cons_is_app in Hadl.
-  rewrite (List_cons_is_app _ l3) in Hadl.
-  do 2 rewrite app_assoc in Hadl.
-  rewrite app_length in Hadl.
-  rewrite <- app_assoc in Hadl.
-  cbn in Hadl.
-  flia Hadl Hnc.
-}
-remember (if length l1 <? length (l1 ++ a :: l2) then _ else _) as x eqn:Hx.
-rewrite if_ltb_lt_dec in Hx.
-destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
-  exfalso; apply H.
-  rewrite app_length; cbn; flia.
-}
-clear H.
-unfold ff_app in Hx.
-rewrite Hadl in Hx.
-rewrite app_length in Hx.
-rewrite app_nth2 in Hx; [ | cbn; flia ].
-rewrite Nat.add_comm, Nat.add_sub in Hx.
-rewrite app_nth2 in Hx; [ | now unfold ge ].
-rewrite Nat.sub_diag in Hx; cbn in Hx.
-rewrite app_nth2 in Hx; [ | now unfold ge ].
-rewrite Nat.sub_diag in Hx; cbn in Hx.
-rewrite sign_diff_id in Hx; subst x.
-rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
-rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
-rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
-rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
-easy.
-}
+symmetry; symmetry.
 ...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))

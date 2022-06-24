@@ -1500,6 +1500,35 @@ split. {
 }
 Qed.
 
+Theorem member_false_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la, member eqb a la = false ↔ ∀ b, b ∈ la → a ≠ b.
+Proof.
+intros * Heqb *.
+split. {
+  intros Hma * Hb Hab; subst b.
+  induction la as [| b]; [ easy | ].
+  cbn in Hma.
+  destruct Hb as [Hb| Hb]. {
+    subst b.
+    now rewrite (equality_refl Heqb) in Hma.
+  }
+  apply IHla; [ | easy ].
+  now destruct (eqb a b).
+} {
+  intros Hla.
+  induction la as [| b]; [ easy | cbn ].
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Heqb in Hab; subst b.
+    now specialize (Hla _ (or_introl eq_refl)).
+  }
+  apply IHla.
+  intros c Hc.
+  now apply Hla; right.
+}
+Qed.
+
 (* end member *)
 
 (* all_diff: a computable "NoDup" *)
@@ -1509,6 +1538,40 @@ Fixpoint all_diff A (eqb : A → A → bool) la :=
   | [] => true
   | a :: la' => if member eqb a la' then false else all_diff eqb la'
   end.
+
+Theorem all_diff_false_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la, all_diff eqb la = false ↔
+  ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
+Proof.
+intros * Heqb *.
+split. {
+  intros Had.
+  induction la as [| a]; [ easy | cbn in Had ].
+  remember (member eqb a la) as mal eqn:Hmal; symmetry in Hmal.
+  destruct mal. 2: {
+    specialize (IHla Had).
+    destruct IHla as (l1 & l2 & l3 & b & Hlb).
+    exists (a :: l1), l2, l3, b.
+    now subst la.
+  }
+  clear Had.
+  apply member_true_iff in Hmal; [ | easy ].
+  destruct Hmal as (l1 & l2 & Hla); subst la.
+  now exists [], l1, l2, a.
+} {
+  intros (l1 & l2 & l3 & a & Hla); subst la.
+  induction l1 as [| b]; cbn. {
+    remember (member eqb a (l2 ++ a :: l3)) as mal eqn:Hmal; symmetry in Hmal.
+    destruct mal; [ easy | ].
+    specialize (proj1 (member_false_iff Heqb _ _) Hmal a) as H1.
+    assert (H : a ∈ l2 ++ a :: l3) by now apply in_or_app; right; left.
+    now specialize (H1 H).
+  }
+  remember (member eqb b _) as mbl eqn:Hmbl; symmetry in Hmbl.
+  now destruct mbl.
+}
+Qed.
 
 (* end all_diff *)
 
