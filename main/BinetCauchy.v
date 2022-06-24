@@ -2865,10 +2865,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
       cbn in Hadl.
       flia Hadl Hnc.
     }
-    rewrite <- rngl_mul_assoc, rngl_mul_comm; [ | now destruct Hif ].
+    do 2 rewrite <- rngl_mul_assoc.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
     rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
+      split; [ easy | ].
       rewrite app_length; cbn.
-      split; [ flia | ].
       apply (f_equal length) in Hadl.
       rewrite List_cons_is_app in Hadl.
       rewrite (List_cons_is_app _ l3) in Hadl.
@@ -2879,7 +2880,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite app_length in Hadl; cbn in Hadl.
       flia Hadl Hnc.
     }
-...
     remember (if length l1 <? length (l1 ++ _) then _ else _) as x eqn:Hx.
     rewrite if_ltb_lt_dec in Hx.
     destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
@@ -2903,9 +2903,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
     easy.
   }
-  easy.
+  now subst x.
 }
-symmetry; symmetry.
+cbn - [ mat_el ].
 ...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
