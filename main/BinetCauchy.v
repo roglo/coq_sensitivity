@@ -2906,6 +2906,71 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now subst x.
 }
 cbn - [ mat_el ].
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros la Hla.
+  remember (ε kl * _ * _)%F as x eqn:Hx.
+  replace x with (if all_diff Nat.eqb la then x else 0%F). 2: {
+    remember (all_diff Nat.eqb la) as adl eqn:Hadl.
+    symmetry in Hadl.
+    destruct adl; [ easy | symmetry ].
+    rewrite <- rngl_mul_assoc, rngl_mul_comm in Hx; [ | now destruct Hif ].
+    subst x; unfold ε.
+    generalize Hla; intros H.
+    apply in_all_comb_iff in H.
+    destruct H as [H| H]; [ easy | ].
+    destruct H as (_ & Hnc & Hcn).
+    rewrite Hnc.
+    apply (all_diff_false_iff Nat.eqb_eq) in Hadl.
+    destruct Hadl as (l1 & l2 & l3 & a & Hadl).
+    rewrite rngl_product_split3 with (j := length l1). 2: {
+      split; [ easy | ].
+      apply (f_equal length) in Hadl.
+      rewrite app_length in Hadl.
+      cbn in Hadl.
+      flia Hadl Hnc.
+    }
+    do 3 rewrite <- rngl_mul_assoc.
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
+      split; [ easy | ].
+      rewrite app_length; cbn.
+      apply (f_equal length) in Hadl.
+      rewrite List_cons_is_app in Hadl.
+      rewrite (List_cons_is_app _ l3) in Hadl.
+      do 2 rewrite app_assoc in Hadl.
+      rewrite app_length in Hadl.
+      rewrite <- app_assoc in Hadl.
+      cbn in Hadl.
+      rewrite app_length in Hadl; cbn in Hadl.
+      flia Hadl Hnc.
+    }
+    remember (if length l1 <? length (l1 ++ _) then _ else _) as x eqn:Hx.
+    rewrite if_ltb_lt_dec in Hx.
+    destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
+      exfalso; apply H.
+      rewrite app_length; cbn; flia.
+    }
+    clear H.
+    unfold ff_app in Hx.
+    rewrite Hadl in Hx.
+    rewrite app_length in Hx.
+    rewrite app_nth2 in Hx; [ | cbn; flia ].
+    rewrite Nat.add_comm, Nat.add_sub in Hx.
+    rewrite app_nth2 in Hx; [ | now unfold ge ].
+    rewrite Nat.sub_diag in Hx; cbn in Hx.
+    rewrite app_nth2 in Hx; [ | now unfold ge ].
+    rewrite Nat.sub_diag in Hx; cbn in Hx.
+    rewrite sign_diff_id in Hx; subst x.
+    rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+    easy.
+  }
+  now subst x.
+}
+symmetry.
 ...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
@@ -2913,12 +2978,21 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
+(* trouver "g" tel que
+     ε (g la) = ε kl * ε la
+*)
+set (g1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+...
+set (h1 := f1 kl).
+...
+set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
+set (g1 := f1 (isort_rank Nat.leb kl)).
+set (h1 := f1 kl).
+
+...
 (*
     specialize (sign_comp Hif) as H1.
     specialize (H1 kl la).
-*)
-(* trouver "g" tel que
-     ε (g la) = ε kl * ε la
 *)
 ...
     assert (H : is_permut (length la) (collapse kl)). {
