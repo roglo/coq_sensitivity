@@ -2845,11 +2845,12 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 (**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
-  replace (ε la) with (if all_diff Nat.eqb la then ε la else 0%F). 2: {
-    remember (all_diff _ _) as adl eqn:Hadl.
+  remember (ε la * _)%F as x eqn:Hx.
+  replace x with (if all_diff Nat.eqb la then x else 0%F). 2: {
+    remember (all_diff Nat.eqb la) as adl eqn:Hadl.
     symmetry in Hadl.
     destruct adl; [ easy | symmetry ].
-    unfold ε.
+    subst x; unfold ε.
     generalize Hla; intros H.
     apply in_all_comb_iff in H.
     destruct H as [H| H]; [ easy | ].
@@ -2866,7 +2867,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
     }
     rewrite <- rngl_mul_assoc, rngl_mul_comm; [ | now destruct Hif ].
     rewrite rngl_product_split3 with (j := length (l1 ++ a :: l2)). 2: {
-      split; [ easy | ].
+      rewrite app_length; cbn.
+      split; [ flia | ].
       apply (f_equal length) in Hadl.
       rewrite List_cons_is_app in Hadl.
       rewrite (List_cons_is_app _ l3) in Hadl.
@@ -2874,8 +2876,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite app_length in Hadl.
       rewrite <- app_assoc in Hadl.
       cbn in Hadl.
+      rewrite app_length in Hadl; cbn in Hadl.
       flia Hadl Hnc.
     }
+...
     remember (if length l1 <? length (l1 ++ _) then _ else _) as x eqn:Hx.
     rewrite if_ltb_lt_dec in Hx.
     destruct (lt_dec (length l1) (length (l1 ++ a :: l2))) as [H| H]. 2: {
