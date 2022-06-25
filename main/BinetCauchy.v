@@ -3088,10 +3088,56 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [H1| H1]. {
+(*
+  replace (all_diff Nat.eqb (g1 la)) with true. 2: {
+    symmetry.
+    apply (all_diff_NoDup Nat.eqb_eq).
+    unfold g1, f1.
+    rewrite fold_collapse.
 ...
-apply all_diff_NoDup in H1.
+  replace (all_diff Nat.eqb (g1 la)) with true.
+Print bool_dec.
+*)
+  assert (Hpla : is_permut (length la) (collapse kl)). {
+    apply in_all_comb_iff in Hla.
+    destruct Hla as [Hla| Hla]; [ easy | ].
+    destruct Hla as (_ & Hnc & Hcn).
+    rewrite Hnc, Hn.
+    apply collapse_is_permut.
+  }
+  unfold g1 at 1, f1.
+  rewrite fold_collapse at 1.
+  erewrite map_ext_in by now intros; rewrite fold_ff_app.
+  rewrite fold_comp_list.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H1| H1]. 2: {
+    apply (all_diff_false_iff Nat.eqb_eq) in H1.
+    destruct H1 as (l1 & l2 & l3 & a & Hgla).
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [H2| H2]; [ | easy ].
+    apply (all_diff_NoDup Nat.eqb_eq) in H2.
+    apply NoDup_comp_iff with (lb := collapse kl) in H2; [ | easy ].
+    rewrite Hgla in H2.
+    apply NoDup_remove in H2.
+    destruct H2 as (_, H2); exfalso; apply H2.
+    apply in_or_app; right.
+    now apply in_or_app; right; left.
+  }
+  apply (all_diff_NoDup Nat.eqb_eq) in H1.
+  apply NoDup_comp_iff in H1; [ | easy ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H2| H2]. 2: {
+    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+    now rewrite H1 in H2.
+  }
+  f_equal. {
+(*
+...
+    apply (all_diff_false_iff Nat.eqb_eq) in H2.
+    apply NoDup_comp_iff with (lb := collapse kl) in H2. 2: {
+...
+    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+Search ε.
 unfold g1, f1 in H1.
 Search (NoDup (map _ _)).
 apply NoDup_map_inv in H1.
@@ -3104,25 +3150,21 @@ apply NoDup_map_inv in H1.
     apply all_diff_true_iff in H1.
 ...
   f_equal. {
+*)
     unfold g1, f1.
     rewrite fold_collapse.
-    specialize (sign_comp Hif) as H1.
-    specialize (H1 la (collapse kl)).
-    assert (H : is_permut (length la) (collapse kl)). {
-      apply in_all_comb_iff in Hla.
-      destruct Hla as [Hla| Hla]; [ easy | ].
-      destruct Hla as (_ & Hnc & Hcn).
-      rewrite Hnc, Hn.
-      apply collapse_is_permut.
-    }
-    specialize (H1 H); clear H.
-    unfold "°" at 1 in H1.
-    unfold ff_app in H1.
-    rewrite H1.
+    erewrite map_ext_in by now intros; rewrite fold_ff_app.
+    rewrite fold_comp_list.
+...
+    specialize (sign_comp Hif) as H3.
+    specialize (H3 kl).
+...
+    specialize (H3 la (collapse kl) Hpla).
+    erewrite map_ext_in by now intros; rewrite fold_ff_app.
+    rewrite fold_comp_list.
+    rewrite H3.
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     f_equal.
-...
-    apply ε_collapse_ε.
 (* marche pas ! *)
 ...
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
