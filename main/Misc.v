@@ -1552,9 +1552,9 @@ Fixpoint member A (eqb : A → A → bool) a la :=
   | b :: lb => if eqb a b then true else member eqb a lb
   end.
 
- Theorem member_true_iff : ∀ A (eqb : A → _),
-   equality eqb →
-   ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
+Theorem member_true_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
 Proof.
 intros * Heqb *.
 split. {

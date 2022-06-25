@@ -3090,6 +3090,21 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   intros la Hla.
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H1| H1]. {
+Theorem all_diff_true_iff : ∀ A (eqb : A → _),
+(*
+  equality eqb →
+*)
+  ∀ la, all_diff eqb la = true ↔ NoDup la.
+Proof.
+...
+apply all_diff_true_iff in H1.
+unfold g1, f1 in H1.
+Search (NoDup (map _ _)).
+apply NoDup_map_inv in H1.
+...
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H2| H2]. {
+    apply all_diff_true_iff in H2.
 ...
 (* à faire *)
     apply all_diff_true_iff in H1.
