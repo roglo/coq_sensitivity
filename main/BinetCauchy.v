@@ -3088,14 +3088,11 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
-Check if_ltb_lt_dec.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H1| H1]. {
 ...
-Theorem if_all_diff_dec : ∀ A (eqb : A → _),
-  { all_diff eqb la = true } + { all_diff eqb la
-
-Theorem if_all_diff : ∀ A (eqb : A → _) la a b,
-  if all_diff eqb la then a else b =
-  if all_diff_dec eqb la then a else b.
+(* à faire *)
+    apply all_diff_true_iff in H1.
 ...
   f_equal. {
     unfold g1, f1.
