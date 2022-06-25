@@ -1620,17 +1620,32 @@ Fixpoint all_diff A (eqb : A → A → bool) la :=
   | a :: la' => if member eqb a la' then false else all_diff eqb la'
   end.
 
-(*
-Theorem all_diff_true_iff : ∀ A (eqb : A → _),
-(*
+Theorem all_diff_NoDup : ∀ A (eqb : A → _),
   equality eqb →
-*)
-  ∀ la, all_diff eqb la = true ↔
-  ∀ l1 l2 l3 a b, la = l1 ++ a :: l2 ++ b :: l3 → a ≠ b.
+  ∀ la, all_diff eqb la = true ↔ NoDup la.
 Proof.
 intros * Heqb *.
-...
-*)
+split; intros Hla. {
+  induction la as [| a]; [ constructor | ].
+  apply NoDup_cons_iff.
+  cbn in Hla.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec (member eqb a la)) as [Hal| Hal]; [ easy | ].
+  split; [ | now apply IHla ].
+  intros H.
+  now specialize (proj1 (member_false_iff Heqb _ _) Hal a H).
+} {
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  apply NoDup_cons_iff in Hla.
+  destruct (bool_dec (member eqb a la)) as [Hal| Hal]; [ | now apply IHla ].
+  apply (member_true_iff Heqb) in Hal.
+  destruct Hla as (Hala & Hnd).
+  destruct Hal as (l1 & l2 & H); subst la.
+  exfalso; apply Hala.
+  now apply in_or_app; right; left.
+}
+Qed.
 
 Theorem all_diff_false_iff : ∀ A (eqb : A → _),
   equality eqb →
