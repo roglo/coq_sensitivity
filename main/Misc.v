@@ -829,52 +829,34 @@ intros.
 now destruct (bool_dec b); subst b.
 Qed.
 
-(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
   (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
 Proof.
 intros.
-remember (i =? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.eqb_eq in Hij.
-  now destruct (Nat.eq_dec i j).
-} {
-  apply Nat.eqb_neq in Hij.
-  now destruct (Nat.eq_dec i j).
+destruct (Nat.eq_dec i j) as [H1| H1]. {
+  now apply Nat.eqb_eq in H1; rewrite H1.
 }
+now apply Nat.eqb_neq in H1; rewrite H1.
 Qed.
 
-(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
   (if i <? j then a else b) = (if lt_dec i j then a else b).
 Proof.
 intros.
-remember (i <? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.ltb_lt in Hij.
-  now destruct (lt_dec i j).
-} {
-  apply Nat.ltb_nlt in Hij.
-  now destruct (lt_dec i j).
+destruct (lt_dec i j) as [H1| H1]. {
+  now apply Nat.ltb_lt in H1; rewrite H1.
 }
+now apply Nat.ltb_nlt in H1; rewrite H1.
 Qed.
 
-(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_leb_le_dec : ∀ A i j (a b : A),
   (if i <=? j then a else b) = (if le_dec i j then a else b).
 Proof.
 intros.
-remember (i <=? j) as ij eqn:Hij.
-symmetry in Hij.
-destruct ij. {
-  apply Nat.leb_le in Hij.
-  now destruct (le_dec i j).
-} {
-  apply Nat.leb_nle in Hij.
-  now destruct (le_dec i j).
+destruct (le_dec i j) as [H1| H1]. {
+  now apply Nat.leb_le in H1; rewrite H1.
 }
+now apply Nat.leb_nle in H1; rewrite H1.
 Qed.
 
 Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
