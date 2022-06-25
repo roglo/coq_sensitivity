@@ -3012,6 +3012,7 @@ set (h1 := f1 kl).
 set (f1 := λ kl l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 set (g1 := f1 (isort_rank Nat.leb kl)).
 set (h1 := f1 kl).
+...
 assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   intros l Hl.
   unfold g1, h1, f1.
