@@ -815,6 +815,21 @@ Qed.
 
 (* conversions if ...? into if ..._dec *)
 
+Theorem bool_dec : ∀ b, { b = true } + { b = false }.
+Proof.
+intros.
+now destruct b; [ left | right ].
+Qed.
+
+Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
+  (if b then x else y) =
+  if bool_dec b then x else y.
+Proof.
+intros.
+now destruct (bool_dec b); subst b.
+Qed.
+
+(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
   (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
 Proof.
@@ -830,6 +845,7 @@ destruct ij. {
 }
 Qed.
 
+(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
   (if i <? j then a else b) = (if lt_dec i j then a else b).
 Proof.
@@ -845,6 +861,7 @@ destruct ij. {
 }
 Qed.
 
+(* to be removed; rather use the most general "if_bool_if_dec" *)
 Theorem if_leb_le_dec : ∀ A i j (a b : A),
   (if i <=? j then a else b) = (if le_dec i j then a else b).
 Proof.
@@ -982,11 +999,12 @@ Theorem butn_length : ∀ A n (l : list A),
   length (butn n l) = length l - Nat.b2n (n <? length l).
 Proof.
 intros.
-unfold Nat.b2n; rewrite if_ltb_lt_dec.
-destruct (lt_dec n (length l)) as [Hnl| Hnl]. 2: {
-  apply Nat.nlt_ge in Hnl; rewrite Nat.sub_0_r.
+unfold Nat.b2n; rewrite if_bool_if_dec.
+destruct (bool_dec (n <? length l)) as [Hnl| Hnl]. 2: {
+  apply Nat.ltb_ge in Hnl; rewrite Nat.sub_0_r.
   now rewrite butn_out.
 }
+apply Nat.ltb_lt in Hnl.
 revert n Hnl.
 induction l as [| a]; intros; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
@@ -1100,8 +1118,9 @@ destruct n. {
   now apply Nat.leb_le in H; rewrite H.
 }
 unfold Nat.b2n.
-rewrite if_ltb_lt_dec.
-destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
+rewrite if_bool_if_dec.
+destruct (bool_dec (S n <? S len)) as [Hn| Hn]. {
+  apply Nat.ltb_lt in Hn.
   cbn - [ butn ].
   rewrite Nat.sub_0_r, butn_cons; cbn.
   apply Nat.succ_lt_mono in Hn.
@@ -1120,7 +1139,7 @@ destruct (lt_dec (S n) (S len)) as [Hn| Hn]. {
   intros i Hi.
   now rewrite (Nat.add_succ_r sta).
 } {
-  apply Nat.nlt_ge in Hn.
+  apply Nat.ltb_ge in Hn.
   rewrite Nat.sub_0_r.
   rewrite butn_out; [ | now rewrite seq_length ].
   apply map_ext_in.
