@@ -1464,6 +1464,86 @@ Definition unsome A (d : A) o :=
   | None => d
   end.
 
+(* extract: like "find" but returning all details:
+   - what is before
+   - the value found
+   - what is after *)
+
+Fixpoint extract {A} (f : A → bool) l :=
+  match l with
+  | [] => None
+  | a :: la =>
+      if f a then Some ([], a, la)
+      else
+        match extract f la with
+        | None => None
+        | Some (bef, b, aft) => Some (a :: bef, b, aft)
+        end
+  end.
+
+Theorem extract_Some_iff : ∀ A (f : A → _) l a bef aft,
+  extract f l = Some (bef, a, aft)
+  ↔ (∀ x, x ∈ bef → f x = false) ∧ f a = true ∧ l = bef ++ a :: aft.
+Proof.
+intros.
+split. {
+  intros He.
+  revert a bef aft He.
+  induction l as [| b]; intros; [ easy | cbn ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb. {
+    now injection He; clear He; intros; subst bef b aft.
+  }
+  remember (extract f l) as lal eqn:Hlal; symmetry in Hlal.
+  destruct lal as [((bef', x), aft') | ]; [ | easy ].
+  injection He; clear He; intros; subst bef x aft'.
+  rename bef' into bef.
+  specialize (IHl _ _ _ eq_refl) as H1.
+  destruct H1 as (H1 & H2 & H3).
+  split. {
+    intros c Hc.
+    destruct Hc as [Hc| Hc]; [ now subst c | ].
+    now apply H1.
+  }
+  split; [ easy | ].
+  now cbn; f_equal.
+} {
+  intros He.
+  destruct He as (Hbef & Hf & Hl).
+  subst l.
+  revert a aft Hf.
+  induction bef as [| b]; intros; cbn; [ now rewrite Hf | ].
+  rewrite Hbef; [ | now left ].
+  rewrite IHbef; [ easy | | easy ].
+  now intros c Hc; apply Hbef; right.
+}
+Qed.
+
+Theorem extract_None_iff : ∀ A (f : A → _) l,
+  extract f l = None ↔ ∀ a, a ∈ l → f a = false.
+Proof.
+intros.
+split. {
+  intros He * Ha.
+  revert a Ha.
+  induction l as [| b]; intros; [ easy | ].
+  cbn in He.
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb; [ easy | ].
+  destruct Ha as [Ha| Ha]; [ now subst b | ].
+  apply IHl; [ | easy ].
+  now destruct (extract f l) as [((bef, x), aft)| ].
+} {
+  intros Hf.
+  induction l as [| a]; [ easy | cbn ].
+  rewrite Hf; [ | now left ].
+  rewrite IHl; [ easy | ].
+  intros c Hc.
+  now apply Hf; right.
+}
+Qed.
+
 (* member: a computable "In" *)
 
 Fixpoint member A (eqb : A → A → bool) a la :=
@@ -1472,9 +1552,9 @@ Fixpoint member A (eqb : A → A → bool) a la :=
   | b :: lb => if eqb a b then true else member eqb a lb
   end.
 
-Theorem member_true_iff : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
+ Theorem member_true_iff : ∀ A (eqb : A → _),
+   equality eqb →
+   ∀ a la, member eqb a la = true ↔ ∃ l1 l2, la = l1 ++ a :: l2.
 Proof.
 intros * Heqb *.
 split. {
@@ -1539,6 +1619,18 @@ Fixpoint all_diff A (eqb : A → A → bool) la :=
   | [] => true
   | a :: la' => if member eqb a la' then false else all_diff eqb la'
   end.
+
+(*
+Theorem all_diff_true_iff : ∀ A (eqb : A → _),
+(*
+  equality eqb →
+*)
+  ∀ la, all_diff eqb la = true ↔
+  ∀ l1 l2 l3 a b, la = l1 ++ a :: l2 ++ b :: l3 → a ≠ b.
+Proof.
+intros * Heqb *.
+...
+*)
 
 Theorem all_diff_false_iff : ∀ A (eqb : A → _),
   equality eqb →
