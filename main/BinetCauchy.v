@@ -2869,6 +2869,9 @@ let
      kl ° isort_rank Nat.leb l
    else kl
 in
+g1 [1;5;3]
+).
+...
 let
    h1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
