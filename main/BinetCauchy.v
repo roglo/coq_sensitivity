@@ -2871,18 +2871,41 @@ let
 in
 g1 [1;5;3]
 ).
-...
+(*
+= [7;4;2]
+*)
+Compute (
+let kl := [7;2;4] in
 let
-   h1 := λ l,
+   u1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
-     kl ° collapse l
+     collapse l
    else kl
 in
-  g1 (h1 [1;5;3])
+  u1 [7;4;2]
 (*
   h1 (g1 [1;5;3])
 *)
 ).
+u1 [7;4;2]...
+...
+u1 (kl (isort_rank Nat.leb l) i) = i
+...
+Compute (
+let kl := [7;2;4] in
+let
+   u1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     l ° isort_rank Nat.leb kl
+   else kl
+in
+  u1 [7;4;2]
+(*
+  h1 (g1 [1;5;3])
+*)
+).
+h1 ° kl ° isort_rank Nat.leb l
+...
 (* ah non, zut, c'est pas ça *)
 ...
 (* cette définition marche pour l telle que is_permut_list l
