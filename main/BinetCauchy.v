@@ -2971,20 +2971,65 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now subst x.
 }
 cbn - [ mat_el ].
-(**)
+symmetry.
+(* trouver "g" tel que
+     ε (g la) = ε kl * ε la
+*)
+set (g1 := λ l, map (λ j, nth j kl 0) (isort_rank Nat.leb l)).
+set (h1 := λ l, map (λ j, nth j kl 0) (collapse l)).
+erewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | ].
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. {
+  apply rngl_summation_list_eq_compat.
+  intros la Hla.
+  unfold g1.
+  erewrite map_ext_in by now intros; rewrite fold_ff_app.
+  rewrite fold_comp_list.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H1| H1]. 2: {
+    apply (all_diff_false_iff Nat.eqb_eq) in H1.
+    destruct H1 as (l1 & l2 & l3 & a & Hgla).
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [H2| H2]; [ | easy ].
+    apply (all_diff_NoDup Nat.eqb_eq) in H2.
+(* - "isort_rank Nat.leb la" n'a pas de duplications, par construction
+     de isort_rank.
+   - donc, d'après Hgla, c'est kl qui a des duplications
+   - donc ε kl = 0
+   cqfd
+*)
+(*
+...
+    apply NoDup_comp_iff with (lb := collapse kl) in H2; [ | ].
+    rewrite Hgla in H2.
+    apply NoDup_remove in H2.
+    destruct H2 as (_, H2); exfalso; apply H2.
+    apply in_or_app; right.
+    now apply in_or_app; right; left.
+*)
+    admit.
+  }
+  apply (all_diff_NoDup Nat.eqb_eq) in H1.
+  apply NoDup_comp_iff in H1; [ | ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H2| H2]. 2: {
+    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+(* aïe aïe aïe, j'ai peur que ça ne marche pas, ça *)
+(* kl n'a pas de duplications, par H1
+   isort_rank Nat.leb la non plus, par propriété de isort_rank
+   donc ε (l'un ° l'autre) ≠ 0
+*)
+...
+    now rewrite H1 in H2.
+  }
+  f_equal. {
+...
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
-...
-(* trouver "g" tel que
-     ε kl * ε (?g la) = ε la
-   sachant que la est une permutation de 1..n
-*)
-...
-set (g1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 ...
 set (h1 := f1 kl).
 ...
