@@ -2970,7 +2970,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   now subst x.
 }
-symmetry.
+cbn - [ mat_el ].
 (**)
 erewrite rngl_summation_list_change_var.
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
@@ -2980,8 +2980,10 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   f_equal. {
 ...
 (* trouver "g" tel que
-     ε (g la) = ε kl * ε la
+     ε kl * ε (?g la) = ε la
+   sachant que la est une permutation de 1..n
 *)
+...
 set (g1 := λ l, map (λ j, nth j l 0) (isort_rank Nat.leb kl)).
 ...
 set (h1 := f1 kl).
