@@ -2843,6 +2843,33 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   apply Nat.eqb_eq.
 }
 (**)
+erewrite rngl_summation_list_change_var; [ | ].
+set
+  (g1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then kl ° l else kl).
+Search isort_rank.
+Check permut_comp_isort_rank_l.
+Check permut_comp_isort_rank_r.
+...
+inv l ° l = seq 0 (length l)
+Definition inv l :=
+  isort_rank Nat.leb l
+...
+Check comp_isort_rank_r.
+Search (_ ° _).
+
+set
+  (h1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     l⁻¹ ° kl⁻¹
+   else kl).
+...
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. {
+  apply rngl_summation_list_eq_compat.
+  intros la Hla.
+Search (ε (_ ° _)).
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   remember (ε la * _)%F as x eqn:Hx.
@@ -3007,7 +3034,7 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     apply in_or_app; right.
     now apply in_or_app; right; left.
 *)
-    admit.
+    aadmit.
   }
   apply (all_diff_NoDup Nat.eqb_eq) in H1.
   apply NoDup_comp_iff in H1; [ | ].
