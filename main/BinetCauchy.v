@@ -2846,10 +2846,41 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 erewrite rngl_summation_list_change_var; [ | ].
 set
   (g1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then kl ° l else kl).
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     kl ° isort_rank Nat.leb l
+   else kl).
+set
+  (h1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     kl ° collapse l
+   else kl).
 Search isort_rank.
 Check permut_comp_isort_rank_l.
 Check permut_comp_isort_rank_r.
+Compute (
+  let kl := [7;2;4] in
+  kl ° isort_rank Nat.leb [1;5;3]
+).
+Compute (
+let kl := [7;2;4] in
+let
+  g1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     kl ° isort_rank Nat.leb l
+   else kl
+in
+let
+   h1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     kl ° collapse l
+   else kl
+in
+  g1 (h1 [1;5;3])
+(*
+  h1 (g1 [1;5;3])
+*)
+).
+(* ah non, zut, c'est pas ça *)
 ...
 (* cette définition marche pour l telle que is_permut_list l
    mais on en veut une pour simplement NoDup l (↔ all_diff l) *)
