@@ -2851,6 +2851,12 @@ Search isort_rank.
 Check permut_comp_isort_rank_l.
 Check permut_comp_isort_rank_r.
 ...
+(* cette définition marche pour l telle que is_permut_list l
+   mais on en veut une pour simplement NoDup l (↔ all_diff l) *)
+Definition inv l :=
+  isort_rank Nat.leb l.
+...
+si is_permut_list l,
 inv l ° l = seq 0 (length l)
 Definition inv l :=
   isort_rank Nat.leb l
