@@ -2844,16 +2844,35 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 }
 (**)
 erewrite rngl_summation_list_change_var; [ | ].
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. {
 set
   (g1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
      kl ° isort_rank Nat.leb l
    else kl).
+Search isort_rank.
+Search (ε (collapse _)).
+...
+Compute (
+let kl := [7;2;4] in
+let
+  g1 := λ l,
+   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+     kl ° isort_rank Nat.leb l
+   else l
+in
+g1 [1;5;3]
+).
+(*
+= [7;4;2]
+*)
+...
 set
   (h1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
      kl ° collapse l
-   else kl).
+   else l).
 Search isort_rank.
 Check permut_comp_isort_rank_l.
 Check permut_comp_isort_rank_r.
@@ -2861,19 +2880,6 @@ Compute (
   let kl := [7;2;4] in
   kl ° isort_rank Nat.leb [1;5;3]
 ).
-Compute (
-let kl := [7;2;4] in
-let
-  g1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
-     kl ° isort_rank Nat.leb l
-   else kl
-in
-g1 [1;5;3]
-).
-(*
-= [7;4;2]
-*)
 Compute (
 let kl := [7;2;4] in
 let
@@ -2920,7 +2926,6 @@ Definition inv l :=
 ...
 Check comp_isort_rank_r.
 Search (_ ° _).
-
 set
   (h1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
