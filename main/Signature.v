@@ -2590,6 +2590,14 @@ Theorem NoDup_comp_if : ∀ la lb,
 Proof.
 intros * Hlab Hab.
 specialize (NoDup_map_inv _ _ Hab) as Hb.
+apply nat_NoDup.
+intros i j Hi Hj Hij.
+specialize (NoDup_collapse Hab) as Hcab.
+specialize (NoDup_collapse Hb) as Hcb.
+Search (collapse (_ ° _)).
+...
+intros * Hlab Hab.
+specialize (NoDup_map_inv _ _ Hab) as Hb.
 specialize (NoDup_collapse Hab) as Hcab.
 specialize (NoDup_collapse Hb) as Hcb.
 specialize (NoDup_nat _ Hab) as Hdab.
