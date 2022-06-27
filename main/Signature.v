@@ -2566,6 +2566,65 @@ rewrite (permut_isort_rank_comp (length lb)); [ easy | | | ]. {
 }
 Qed.
 
+(* to be completed
+Theorem NoDup_comp_if : ∀ la lb,
+  NoDup (la ° lb)
+  → NoDup la.
+Proof.
+intros * Hab.
+apply nat_NoDup.
+specialize (NoDup_nat _ Hab) as H1.
+intros i j Hi Hj Hij.
+rewrite comp_length in H1.
+...
+destruct Hbp as (Hbp, Hbl).
+    rewrite <- Hbl in Hi, Hj.
+    remember (ff_app (isort_rank Nat.leb lb) i) as i' eqn:Hi'.
+    remember (ff_app (isort_rank Nat.leb lb) j) as j' eqn:Hj'.
+    specialize (H1 i' j').
+    assert (H : i' < length lb). {
+      rewrite Hi'; unfold ff_app.
+      apply isort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : j' < length lb). {
+      rewrite Hj'; unfold ff_app.
+      apply isort_rank_ub.
+      now intros H; rewrite H in Hi.
+    }
+    specialize (H1 H); clear H.
+    assert (H : ff_app (la ° lb) i' = ff_app (la ° lb) j'). {
+      rewrite Hi', Hj'.
+      unfold "°", ff_app.
+      rewrite (List_map_nth' 0). 2: {
+        apply isort_rank_ub.
+        now intros H; subst lb.
+      }
+      rewrite (List_map_nth' 0). 2: {
+        apply isort_rank_ub.
+        now intros H; subst lb.
+      }
+      do 6 rewrite fold_ff_app.
+      rewrite permut_permut_isort; [ | now destruct Hbp | easy ].
+      rewrite permut_permut_isort; [ | now destruct Hbp | easy ].
+      easy.
+    }
+    specialize (H1 H); clear H.
+    rewrite Hi', Hj' in H1.
+    assert (H : is_permut_list (isort_rank Nat.leb lb)). {
+      now apply isort_rank_is_permut_list.
+    }
+    destruct H as (Hra, Hrn).
+    apply (NoDup_nat _ Hrn) in H1; [ easy | | ]. {
+      now rewrite isort_rank_length.
+    } {
+      now rewrite isort_rank_length.
+    }
+  }
+Qed.
+*)
+
 Theorem NoDup_comp_iff : ∀ la lb,
   is_permut (length la) lb
   → NoDup la
@@ -2694,6 +2753,44 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
   easy.
 }
 Qed.
+
+(* to be completed
+Theorem NoDup_sign_comp : in_charac_0_field →
+  ∀ la lb,
+  NoDup lb
+  → ε (la ° lb) = (ε la * ε lb)%F.
+Proof.
+intros Hif * Hbnd.
+destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | easy ].
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+    intros H; apply Haa; clear Haa.
+...
+    apply NoDup_comp_iff in H.
+    now apply NoDup_comp_iff in H.
+  }
+  symmetry.
+  now apply rngl_mul_0_l; destruct Hif; left.
+} {
+  rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
+  rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
+  symmetry.
+  rewrite <- ε_collapse_ε; [ | easy ].
+  symmetry.
+  apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
+    apply collapse_is_permut.
+  }
+  destruct Hif as (Hop & Hic & Hin & H10 & Hit & Hde & Hch).
+  rewrite signature_comp_fun_expand_2_1; try easy.
+  rewrite signature_comp_fun_expand_2_2; try easy.
+  apply signature_comp_fun_changement_of_variable; try easy.
+  apply collapse_is_permut.
+}
+Qed.
+...
+*)
 
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,

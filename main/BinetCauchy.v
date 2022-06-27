@@ -2853,6 +2853,8 @@ set
    else kl).
 Search isort_rank.
 Search (ε (collapse _)).
+Search (ε (_ ° _)).
+About sign_comp.
 ...
 Compute (
 let kl := [7;2;4] in
