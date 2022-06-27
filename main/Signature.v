@@ -2594,7 +2594,20 @@ apply nat_NoDup.
 intros i j Hi Hj Hij.
 specialize (NoDup_collapse Hab) as Hcab.
 specialize (NoDup_collapse Hb) as Hcb.
-Search (collapse (_ ° _)).
+Check collapse_comp.
+(* lb ne peut pas avoir plusieurs valeurs qui débordent "length la",
+   sinon "la ° lb" contiendrait des duplications (de valeur 0) ;
+   mais c'est à prouver (pour le vérifier).
+     S'il n'en a aucune, alors "is_permut_list lb" est vrai.
+     S'il en contient une, en j, alors "(la ° lb) j = 0", mais les
+   autres valeurs de lb sont bien "< length la".
+ *)
+...
+assert (is_permut_list lb). {
+  split; [ | easy ].
+  intros k Hk.
+...
+  specialize (proj1 (NoDup_map_iff 0 _ (ff_app la)) Hab) as Hdab'.
 ...
 intros * Hlab Hab.
 specialize (NoDup_map_inv _ _ Hab) as Hb.
