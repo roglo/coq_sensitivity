@@ -2572,20 +2572,27 @@ Theorem NoDup_comp_if : ∀ la lb,
   → NoDup la.
 Proof.
 intros * Hab.
+specialize (NoDup_map_inv _ _ Hab) as Hb.
+unfold "°" in Hab.
+Search (NoDup (map _ _)).
+...
+intros * Hab.
 apply nat_NoDup.
 specialize (NoDup_nat _ Hab) as H1.
 intros i j Hi Hj Hij.
 rewrite comp_length in H1.
+remember (ff_app (isort_rank Nat.leb lb) i) as i' eqn:Hi'.
+remember (ff_app (isort_rank Nat.leb lb) j) as j' eqn:Hj'.
+specialize (H1 i' j').
+assert (H : i' < length lb). {
+  rewrite Hi'; unfold ff_app.
+  apply isort_rank_ub.
+  intros H; subst lb.
+  cbn in Hi', Hj'.
+  rewrite Tauto_match_nat_same in Hi', Hj'; subst i' j'.
 ...
-destruct Hbp as (Hbp, Hbl).
-    rewrite <- Hbl in Hi, Hj.
-    remember (ff_app (isort_rank Nat.leb lb) i) as i' eqn:Hi'.
-    remember (ff_app (isort_rank Nat.leb lb) j) as j' eqn:Hj'.
-    specialize (H1 i' j').
-    assert (H : i' < length lb). {
-      rewrite Hi'; unfold ff_app.
-      apply isort_rank_ub.
-      now intros H; rewrite H in Hi.
+
+  now intros H; rewrite H in Hi.
     }
     specialize (H1 H); clear H.
     assert (H : j' < length lb). {
