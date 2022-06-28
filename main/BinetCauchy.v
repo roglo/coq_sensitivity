@@ -2802,9 +2802,11 @@ Theorem det_isort_rows : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl.
-remember (all_diff Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
+remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
 destruct adk. 2: {
-  apply (all_diff_false_iff Nat.eqb_eq) in Hadk.
+About no_dup.
+...
+  apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
   destruct Hadk as (l1 & l2 & l3 & a & Ha).
   rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
     intros H.
@@ -2917,7 +2919,7 @@ h1 (g1 [1;5;3])
 ...
 set
   (g1 := λ l,
-   if all_diff Nat.eqb l then kl ° isort_rank Nat.leb l else kl).
+   if no_dup Nat.eqb l then kl ° isort_rank Nat.leb l else kl).
 Search isort_rank.
 Search (ε (collapse _)).
 Search (ε (_ ° _)).
@@ -2926,7 +2928,7 @@ Compute (
 let kl := [7;2;4] in
 let
   g1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+   if (no_dup Nat.eqb kl && no_dup Nat.eqb l)%bool then
      collapse kl ° isort_rank Nat.leb l
    else l
 in
@@ -2939,7 +2941,7 @@ g1 [1;5;3]
 ...
 set
   (h1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+   if (no_dup Nat.eqb kl && no_dup Nat.eqb l)%bool then
      kl ° collapse l
    else l).
 Search isort_rank.
@@ -2953,7 +2955,7 @@ Compute (
 let kl := [7;2;4] in
 let
    u1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+   if (no_dup Nat.eqb kl && no_dup Nat.eqb l)%bool then
      collapse l
    else kl
 in
@@ -2970,7 +2972,7 @@ Compute (
 let kl := [7;2;4] in
 let
    u1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+   if (no_dup Nat.eqb kl && no_dup Nat.eqb l)%bool then
      l ° isort_rank Nat.leb kl
    else kl
 in
@@ -2984,7 +2986,7 @@ h1 ° kl ° isort_rank Nat.leb l
 (* ah non, zut, c'est pas ça *)
 ...
 (* cette définition marche pour l telle que is_permut_list l
-   mais on en veut une pour simplement NoDup l (↔ all_diff l) *)
+   mais on en veut une pour simplement NoDup l (↔ no_dup l) *)
 Definition inv l :=
   isort_rank Nat.leb l.
 ...
@@ -2997,7 +2999,7 @@ Check comp_isort_rank_r.
 Search (_ ° _).
 set
   (h1 := λ l,
-   if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
+   if (no_dup Nat.eqb kl && no_dup Nat.eqb l)%bool then
      l⁻¹ ° kl⁻¹
    else kl).
 ...
@@ -3010,8 +3012,8 @@ Search (ε (_ ° _)).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   remember (ε la * _)%F as x eqn:Hx.
-  replace x with (if all_diff Nat.eqb la then x else 0%F). 2: {
-    remember (all_diff Nat.eqb la) as adl eqn:Hadl.
+  replace x with (if no_dup Nat.eqb la then x else 0%F). 2: {
+    remember (no_dup Nat.eqb la) as adl eqn:Hadl.
     symmetry in Hadl.
     destruct adl; [ easy | symmetry ].
     subst x; unfold ε.
@@ -3020,7 +3022,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hnc & Hcn).
     rewrite Hnc.
-    apply (all_diff_false_iff Nat.eqb_eq) in Hadl.
+    apply (no_dup_false_iff Nat.eqb_eq) in Hadl.
     destruct Hadl as (l1 & l2 & l3 & a & Hadl).
     rewrite rngl_product_split3 with (j := length l1). 2: {
       split; [ easy | ].
@@ -3074,8 +3076,8 @@ symmetry.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   remember (ε kl * _ * _)%F as x eqn:Hx.
-  replace x with (if all_diff Nat.eqb la then x else 0%F). 2: {
-    remember (all_diff Nat.eqb la) as adl eqn:Hadl.
+  replace x with (if no_dup Nat.eqb la then x else 0%F). 2: {
+    remember (no_dup Nat.eqb la) as adl eqn:Hadl.
     symmetry in Hadl.
     destruct adl; [ easy | symmetry ].
     rewrite <- rngl_mul_assoc, rngl_mul_comm in Hx; [ | now destruct Hif ].
@@ -3085,7 +3087,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hnc & Hcn).
     rewrite Hnc.
-    apply (all_diff_false_iff Nat.eqb_eq) in Hadl.
+    apply (no_dup_false_iff Nat.eqb_eq) in Hadl.
     destruct Hadl as (l1 & l2 & l3 & a & Hadl).
     rewrite rngl_product_split3 with (j := length l1). 2: {
       split; [ easy | ].
@@ -3151,11 +3153,11 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   rewrite fold_comp_list.
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H1| H1]. 2: {
-    apply (all_diff_false_iff Nat.eqb_eq) in H1.
+    apply (no_dup_false_iff Nat.eqb_eq) in H1.
     destruct H1 as (l1 & l2 & l3 & a & Hgla).
     rewrite if_bool_if_dec.
     destruct (bool_dec _) as [H2| H2]; [ | easy ].
-    apply (all_diff_NoDup Nat.eqb_eq) in H2.
+    apply (no_dup_NoDup Nat.eqb_eq) in H2.
 (* - "isort_rank Nat.leb la" n'a pas de duplications, par construction
      de isort_rank.
    - donc, d'après Hgla, c'est kl qui a des duplications
@@ -3173,11 +3175,11 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
 *)
     aadmit.
   }
-  apply (all_diff_NoDup Nat.eqb_eq) in H1.
+  apply (no_dup_NoDup Nat.eqb_eq) in H1.
   apply NoDup_comp_iff in H1; [ | ].
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H2| H2]. 2: {
-    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+    apply (no_dup_NoDup Nat.eqb_eq) in H1.
 (* aïe aïe aïe, j'ai peur que ça ne marche pas, ça *)
 (* kl n'a pas de duplications, par H1
    isort_rank Nat.leb la non plus, par propriété de isort_rank
@@ -3299,13 +3301,13 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
   apply rngl_summation_list_eq_compat.
   intros la Hla.
 (*
-  replace (all_diff Nat.eqb (g1 la)) with true. 2: {
+  replace (no_dup Nat.eqb (g1 la)) with true. 2: {
     symmetry.
-    apply (all_diff_NoDup Nat.eqb_eq).
+    apply (no_dup_NoDup Nat.eqb_eq).
     unfold g1, f1.
     rewrite fold_collapse.
 ...
-  replace (all_diff Nat.eqb (g1 la)) with true.
+  replace (no_dup Nat.eqb (g1 la)) with true.
 Print bool_dec.
 *)
   assert (Hpla : is_permut (length la) (collapse kl)). {
@@ -3321,11 +3323,11 @@ Print bool_dec.
   rewrite fold_comp_list.
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H1| H1]. 2: {
-    apply (all_diff_false_iff Nat.eqb_eq) in H1.
+    apply (no_dup_false_iff Nat.eqb_eq) in H1.
     destruct H1 as (l1 & l2 & l3 & a & Hgla).
     rewrite if_bool_if_dec.
     destruct (bool_dec _) as [H2| H2]; [ | easy ].
-    apply (all_diff_NoDup Nat.eqb_eq) in H2.
+    apply (no_dup_NoDup Nat.eqb_eq) in H2.
     apply NoDup_comp_iff with (lb := collapse kl) in H2; [ | easy ].
     rewrite Hgla in H2.
     apply NoDup_remove in H2.
@@ -3333,20 +3335,20 @@ Print bool_dec.
     apply in_or_app; right.
     now apply in_or_app; right; left.
   }
-  apply (all_diff_NoDup Nat.eqb_eq) in H1.
+  apply (no_dup_NoDup Nat.eqb_eq) in H1.
   apply NoDup_comp_iff in H1; [ | easy ].
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H2| H2]. 2: {
-    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+    apply (no_dup_NoDup Nat.eqb_eq) in H1.
     now rewrite H1 in H2.
   }
   f_equal. {
 (*
 ...
-    apply (all_diff_false_iff Nat.eqb_eq) in H2.
+    apply (no_dup_false_iff Nat.eqb_eq) in H2.
     apply NoDup_comp_iff with (lb := collapse kl) in H2. 2: {
 ...
-    apply (all_diff_NoDup Nat.eqb_eq) in H1.
+    apply (no_dup_NoDup Nat.eqb_eq) in H1.
 Search ε.
 unfold g1, f1 in H1.
 Search (NoDup (map _ _)).
@@ -3354,10 +3356,10 @@ apply NoDup_map_inv in H1.
 ...
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H2| H2]. {
-    apply all_diff_true_iff in H2.
+    apply no_dup_true_iff in H2.
 ...
 (* à faire *)
-    apply all_diff_true_iff in H1.
+    apply no_dup_true_iff in H1.
 ...
   f_equal. {
 *)

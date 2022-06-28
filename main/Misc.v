@@ -1612,17 +1612,17 @@ Qed.
 
 (* end member *)
 
-(* all_diff: a computable "NoDup" *)
+(* no_dup: a computable "NoDup" *)
 
-Fixpoint all_diff A (eqb : A → A → bool) la :=
+Fixpoint no_dup A (eqb : A → A → bool) la :=
   match la with
   | [] => true
-  | a :: la' => if member eqb a la' then false else all_diff eqb la'
+  | a :: la' => if member eqb a la' then false else no_dup eqb la'
   end.
 
-Theorem all_diff_NoDup : ∀ A (eqb : A → _),
+Theorem no_dup_NoDup : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la, all_diff eqb la = true ↔ NoDup la.
+  ∀ la, no_dup eqb la = true ↔ NoDup la.
 Proof.
 intros * Heqb *.
 split; intros Hla. {
@@ -1647,9 +1647,9 @@ split; intros Hla. {
 }
 Qed.
 
-Theorem all_diff_false_iff : ∀ A (eqb : A → _),
+Theorem no_dup_false_iff : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la, all_diff eqb la = false ↔
+  ∀ la, no_dup eqb la = false ↔
   ∃ l1 l2 l3 a, la = l1 ++ a :: l2 ++ a :: l3.
 Proof.
 intros * Heqb *.
@@ -1681,7 +1681,7 @@ split. {
 }
 Qed.
 
-(* end all_diff *)
+(* end no_dup *)
 
 Theorem NoDup_app_comm {A} : ∀ l l' : list A,
   NoDup (l ++ l') → NoDup (l' ++ l).
