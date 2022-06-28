@@ -3012,7 +3012,7 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
 }
 Qed.
 
-(* to be completed
+(* to be completed if good but not sure
 Theorem NoDup_sign_comp : in_charac_0_field →
   ∀ la lb,
   NoDup lb
