@@ -2846,6 +2846,7 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 erewrite rngl_summation_list_change_var; [ | ].
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
+...
 set
   (g1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
