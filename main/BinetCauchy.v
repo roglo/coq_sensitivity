@@ -2950,6 +2950,22 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
   }
+(* ça a l'air bon
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+Compute (
+  let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
+  let kl := [4;1;3]%nat in
+  let n := length kl in
+  let g1 := λ l, l ° collapse kl in
+map (λ la,
+  ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
+  ∏ (i = 1, n),
+  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
+) (all_comb n)
+).
+*)
   apply rngl_product_eq_compat.
   intros i Hi.
   unfold g1.
