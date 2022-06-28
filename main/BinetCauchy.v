@@ -2792,6 +2792,75 @@ cbn in Hil |-*.
 flia Hil Hila.
 Qed.
 
+Theorem det_isort_rows_with_dup : in_charac_0_field →
+  ∀ A kl,
+  is_correct_matrix A = true
+  → mat_ncols A = length kl
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
+  → no_dup Nat.eqb kl = false
+  → det (mat_select_rows kl A) =
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+Proof.
+intros Hif * Hcm Hac Hkl Hadk.
+apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
+destruct Hadk as (l1 & l2 & l3 & a & Ha).
+rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+  intros H.
+  rewrite Ha in H.
+  apply NoDup_remove_2 in H.
+  apply H; clear H.
+  apply in_or_app; right.
+  now apply in_or_app; right; left.
+}
+rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+set (p1 := S (length l1)).
+set (q1 := S (length (l1 ++ a :: l2))).
+apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
+  unfold p1, q1.
+  rewrite app_length; cbn; flia.
+} {
+  rewrite Ha.
+  unfold p1.
+  split; [ flia | ].
+  rewrite mat_select_rows_nrows.
+  rewrite app_length; cbn; flia.
+} {
+  rewrite Ha.
+  unfold q1.
+  split; [ flia | ].
+  rewrite mat_select_rows_nrows.
+  rewrite app_length; cbn.
+  rewrite app_length; cbn.
+  rewrite app_length; cbn; flia.
+} {
+  intros i Hi.
+  unfold p1, q1.
+  unfold mat_el; cbn.
+  f_equal.
+  rewrite (List_map_nth' 0). 2: {
+    rewrite Ha.
+    rewrite app_length; cbn; flia.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    rewrite Ha.
+    rewrite app_length; cbn.
+    rewrite app_length; cbn.
+    rewrite app_length; cbn; flia.
+  }
+  apply map_ext_in.
+  intros j Hj.
+  do 2 rewrite Nat.sub_0_r.
+  rewrite Ha.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
+  rewrite app_nth2; [ | rewrite app_length; flia ].
+  rewrite app_length, Nat.add_comm, Nat.add_sub; cbn.
+  rewrite app_nth2; [ | now unfold ge ].
+  now rewrite Nat.sub_diag.
+}
+now apply mat_select_rows_is_square.
+Qed.
+
 (* to be completed
 Theorem det_isort_rows : in_charac_0_field →
   ∀ A kl,
@@ -2803,67 +2872,7 @@ Theorem det_isort_rows : in_charac_0_field →
 Proof.
 intros Hif * Hcm Hac Hkl.
 remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
-destruct adk. 2: {
-About no_dup.
-...
-  apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
-  destruct Hadk as (l1 & l2 & l3 & a & Ha).
-  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
-    intros H.
-    rewrite Ha in H.
-    apply NoDup_remove_2 in H.
-    apply H; clear H.
-    apply in_or_app; right.
-    now apply in_or_app; right; left.
-  }
-  rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
-  set (p1 := S (length l1)).
-  set (q1 := S (length (l1 ++ a :: l2))).
-  apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
-    unfold p1, q1.
-    rewrite app_length; cbn; flia.
-  } {
-    rewrite Ha.
-    unfold p1.
-    split; [ flia | ].
-    rewrite mat_select_rows_nrows.
-    rewrite app_length; cbn; flia.
-  } {
-    rewrite Ha.
-    unfold q1.
-    split; [ flia | ].
-    rewrite mat_select_rows_nrows.
-    rewrite app_length; cbn.
-    rewrite app_length; cbn.
-    rewrite app_length; cbn; flia.
-  } {
-    intros i Hi.
-    unfold p1, q1.
-    unfold mat_el; cbn.
-    f_equal.
-    rewrite (List_map_nth' 0). 2: {
-      rewrite Ha.
-      rewrite app_length; cbn; flia.
-    }
-    rewrite (List_map_nth' 0). 2: {
-      rewrite Ha.
-      rewrite app_length; cbn.
-      rewrite app_length; cbn.
-      rewrite app_length; cbn; flia.
-    }
-    apply map_ext_in.
-    intros j Hj.
-    do 2 rewrite Nat.sub_0_r.
-    rewrite Ha.
-    rewrite app_nth2; [ | now unfold ge ].
-    rewrite Nat.sub_diag; cbn.
-    rewrite app_nth2; [ | rewrite app_length; flia ].
-    rewrite app_length, Nat.add_comm, Nat.add_sub; cbn.
-    rewrite app_nth2; [ | now unfold ge ].
-    now rewrite Nat.sub_diag.
-  }
-  now apply mat_select_rows_is_square.
-}
+destruct adk; [ | now apply det_isort_rows_with_dup ].
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -2905,11 +2914,12 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   apply Nat.eqb_eq.
 }
 (**)
-erewrite rngl_summation_list_change_var; [ | ].
-rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
-    with (l2 := all_comb n); [ | easy | ]. {
 set (g1 := λ l, l ° collapse kl).
 set (h1 := λ l, l ° isort_rank Nat.leb kl).
+rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | ].
+rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
+    with (l2 := all_comb n); [ | easy | ]. {
+...
 Compute (
 let kl := [7;2;4] in
 let g1 := λ l, l ° collapse kl in
