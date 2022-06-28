@@ -2770,6 +2770,7 @@ destruct Hpab as [Hb| Ha]. {
   apply NoDup_comp_iff in Hab; [ easy | ].
   now rewrite Hlab.
 }
+clear Ha. (* *)
 specialize (NoDup_map_inv _ _ Hab) as Hb.
 apply nat_NoDup.
 intros i j Hi Hj Hij.
@@ -2779,11 +2780,6 @@ destruct (Nat.eq_dec (ff_app lb i) (ff_app lb j)) as [Hbij| Hbij]. {
   rewrite Hlab in Hi, Hj.
   now apply Hndb.
 }
-...
-Require Import Pigeonhole.
-specialize pigeonhole_list as H1.
-specialize (H1 (length lb) la).
-...
 destruct (lt_dec (nth i lb 0) (length la)) as [Hilb| Hilb]. 2: {
   apply Nat.nlt_ge in Hilb.
   rewrite Hlab in Hi, Hj.
@@ -2796,6 +2792,14 @@ destruct (lt_dec (nth i lb 0) (length la)) as [Hilb| Hilb]. 2: {
     rewrite nth_overflow in H1; [ | easy ].
     apply (H1 eq_refl).
   }
+  destruct (Nat.eq_dec (ff_app la (nth j lb 0)) 0) as [Hjz| Hjz]. {
+    now apply H1.
+  }
+  clear H1.
+...
+Require Import Pigeonhole.
+specialize pigeonhole_list as H1.
+specialize (H1 (length lb - 1) la).
 ...
 specialize (NoDup_collapse Hab) as Hcab.
 specialize (NoDup_collapse Hb) as Hcb.
