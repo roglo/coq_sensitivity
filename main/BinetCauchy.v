@@ -2846,7 +2846,6 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 erewrite rngl_summation_list_change_var; [ | ].
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
-...
 set
   (g1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
@@ -2856,17 +2855,17 @@ Search isort_rank.
 Search (ε (collapse _)).
 Search (ε (_ ° _)).
 About sign_comp.
-...
 Compute (
 let kl := [7;2;4] in
 let
   g1 := λ l,
    if (all_diff Nat.eqb kl && all_diff Nat.eqb l)%bool then
-     kl ° isort_rank Nat.leb l
+     collapse kl ° isort_rank Nat.leb l
    else l
 in
 g1 [1;5;3]
 ).
+...
 (*
 = [7;4;2]
 *)
