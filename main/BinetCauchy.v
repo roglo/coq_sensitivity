@@ -2950,6 +2950,12 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
   }
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  unfold g1.
+  unfold "°".
+  unfold ff_app.
+  rewrite (List_map_nth' 0).
 ...
 Compute (
 let kl := [7;2;4] in
