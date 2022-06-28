@@ -2780,6 +2780,12 @@ destruct (Nat.eq_dec (ff_app lb i) (ff_app lb j)) as [Hbij| Hbij]. {
   rewrite Hlab in Hi, Hj.
   now apply Hndb.
 }
+...
+destruct (Nat.eq_dec (ff_app lb i) 0) as [Hilz| Hilz]. {
+  destruct (Nat.eq_dec (ff_app lb j) 0) as [Hjlz| Hjlz]. {
+    congruence.
+  }
+...
 destruct (lt_dec (nth i lb 0) (length la)) as [Hilb| Hilb]. 2: {
   apply Nat.nlt_ge in Hilb.
   rewrite Hlab in Hi, Hj.
