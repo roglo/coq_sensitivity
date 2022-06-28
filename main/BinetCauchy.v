@@ -2916,9 +2916,40 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
 (**)
 set (g1 := λ l, l ° collapse kl).
 set (h1 := λ l, l ° isort_rank Nat.leb kl).
-rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | ].
+assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
+  intros l Hl.
+  unfold g1, h1.
+  rewrite <- (permut_comp_assoc n); cycle 1. {
+    now rewrite isort_rank_length.
+  } {
+    rewrite Hn.
+    apply collapse_is_permut.
+  }
+  rewrite permut_comp_isort_rank_r; [ | apply isort_rank_is_permut_list ].
+  rewrite isort_rank_length, <- Hn.
+  apply comp_1_r.
+  apply in_all_comb_iff in Hl.
+  now destruct Hl.
+}
+rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
+  apply rngl_summation_list_eq_compat.
+  intros la Hla.
+  f_equal. {
+    unfold g1.
+    rewrite (sign_comp Hif). 2: {
+      apply in_all_comb_iff in Hla.
+      destruct Hla as [Hla| Hla]; [ easy | ].
+      destruct Hla as (_ & Hnc & Hcn).
+      rewrite Hnc, Hn.
+      apply collapse_is_permut.
+    }
+    rewrite rngl_mul_comm; [ | now destruct Hif ].
+    f_equal.
+    apply ε_collapse_ε.
+    now apply (no_dup_NoDup Nat.eqb_eq).
+  }
 ...
 Compute (
 let kl := [7;2;4] in
