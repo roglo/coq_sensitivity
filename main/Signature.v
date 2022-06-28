@@ -2758,7 +2758,7 @@ split. {
 }
 Qed.
 
-(* to be completed
+(* to be completed mais semble faux; faut que je voye
 Theorem NoDup_comp_if : ∀ la lb,
   length la = length lb
   → is_permut_list lb ∨ (∀ a, a ∈ la → a ≠ 0)
