@@ -3127,6 +3127,14 @@ map (λ la,
     now subst kl.
   }
 }
+apply NoDup_permutation. {
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+} {
+  apply (NoDup_map_iff []).
+  rewrite all_comb_length; [ | easy ].
+  intros i j Hi Hj Hij.
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
