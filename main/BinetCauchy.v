@@ -3068,14 +3068,101 @@ map (λ la,
     easy.
   }
   rewrite Nat_sub_succ_1.
+  apply (permutation_cons_inv Nat.eqb_eq) with (a := 0).
+  rewrite cons_seq.
+  apply (NoDup_permutation Nat.eqb_eq). {
+    set (f := λ i, if i =? 0 then 0 else h2 i).
+    replace (0 :: map h2 (seq 1 n)) with (map f (seq 0 (S n))). 2: {
+      unfold f, h2; cbn.
+      f_equal.
+      apply map_ext_in.
+      intros i Hi.
+      apply in_seq in Hi.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | easy ].
+    }
+    apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+    unfold f; intros i j Hij.
+    destruct i; [ now destruct j | ].
+    destruct j; [ easy | cbn in Hij ].
+    f_equal.
+    unfold h2 in Hij.
+    do 2 rewrite Nat_sub_succ_1 in Hij.
+    apply Nat.succ_inj in Hij.
+Check isort_rank_inj.
+...
+    apply isort_rank_inj in Hij; [ easy | | | ]. {
+      apply isort_rank_is_permut_list.
+    } {
+      rewrite isort_rank_length, <- Hn.
+...
+    cbn in Hij.
+      destruct j; [ easy | easy ].
+      unfold h2 in Hij.
+      rewrite Nat_sub_succ_1 in Hij.
+...
+      unfold h2; cbn.
+      f_equal.
+      unfold f
+
+    specialize FinFun.Injective_map_NoDup as H1.
+    specialize (H1 nat nat (λ i, if Nat.eq_dec i 0 then 0 else h2 (i - 1))).
+    specialize (H1 (seq 0 (S n))).
+    cbn in H1.
+
+    apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+...
+  apply (permutation_sym Nat.eqb_eq).
+  eapply (permutation_trans Nat.eqb_eq). {
+    apply permutation_cons_app with (l1 :=
+Search permutation.
+permutation_cons_app:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ (l l1 l2 : list A) (a : A), permutation eqb l (l1 ++ l2) → permutation eqb (a :: l) (l1 ++ a :: l2)
+...
+  rewrite cons_seq.
+Search (_ :: map _ _).
+Check map_cons.
+replace 0 with (h2 0).
+rewrite <- map_cons.
   apply (NoDup_permutation Nat.eqb_eq). {
     unfold h2.
+...
+Require Import Permutation.
+apply (Permutation_permutation Nat.eqb_eq).
+specialize nat_bijection_Permutation as H1.
+apply H1.
+Search (Permutation (map _ _)).
+About nat_bijection_Permutation.
+...
+nat_bijection_Permutation:
+  ∀ (n : nat) (f : nat → nat), FinFun.bFun n f → FinFun.Injective f → let l := seq 0 n in Permutation (map f l) l
+Search (permutation _ _ (map _ _)).
+Search (permutation _ (map _ _)).
+...
+  apply (NoDup_permutation Nat.eqb_eq). {
+    unfold h2.
+(*
+    apply NoDup_map_inv with (f := pred).
+    rewrite map_map.
+    erewrite map_ext_in. 2: {
+      intros i Hi.
+      now rewrite Nat.pred_succ.
+    }
+*)
+...
+    apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+    intros i j Hij.
+    apply Nat.succ_inj in Hij.
+Search (NoDup (map _ _)).
+...
+Search NoDup.
 (* mais "seq 1 n" n'est pas une FinFun, car ça ne commence pas à 0 *)
 ...
     apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
     intros i j Hij.
     apply Nat.succ_inj in Hij.
-
 Search (NoDup (map _ _)).
 ...
     unfold h2.
