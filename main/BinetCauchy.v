@@ -3012,8 +3012,17 @@ map (λ la,
 ).
 *)
   set (g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1))).
-  set (h2 := λ i, i + 42).
-  rewrite rngl_product_change_var with (g := g2) (h := h2); [ | ].
+  set (h2 := λ i, S (ff_app (collapse kl) (i - 1))).
+  assert (Hgh2 : ∀ i, 1 ≤ i ≤ n → g2 (h2 i) = i). {
+    intros i Hi.
+    unfold g2, h2.
+    rewrite Nat_sub_succ_1.
+    rewrite permut_permut_isort; [ flia Hi | | ]. {
+      apply isort_rank_is_permut_list.
+    }
+    rewrite isort_rank_length, <- Hn; flia Hi.
+  }
+  rewrite rngl_product_change_var with (g := g2) (h := h2); [ | easy ].
   rewrite (rngl_product_list_permut _ _ Nat.eqb_eq)
       with (l2 := seq 1 n); [ | now destruct Hif | ]. {
     rewrite rngl_product_seq_product; [ | easy ].
@@ -3058,6 +3067,41 @@ map (λ la,
     }
     easy.
   }
+  rewrite Nat_sub_succ_1.
+  apply (NoDup_permutation Nat.eqb_eq). {
+    unfold h2.
+(* mais "seq 1 n" n'est pas une FinFun, car ça ne commence pas à 0 *)
+...
+    apply FinFun.Injective_map_NoDup; [ | apply seq_NoDup ].
+    intros i j Hij.
+    apply Nat.succ_inj in Hij.
+
+Search (NoDup (map _ _)).
+...
+    unfold h2.
+    intros i j Hij.
+    apply Nat.succ_inj in Hij.
+    destruct i. {
+      cbn in Hij.
+      destruct j; [ easy | ].
+      rewrite Nat_sub_succ_1 in Hij.
+...
+    apply isort_rank_inj in Hij.
+Search (ff_app (collapse _)).
+collapse_keeps_order:
+  ∀ (l : list nat) (i j : nat),
+    NoDup l
+    → i < length l → j < length l → (ff_app (collapse l) i ?= ff_app (collapse l) j) = (ff_app l i ?= ff_app l j)
+earch (NoDup (map _ _)).
+Search permutation.
+Check permut_list_permutation_iff.
+...
+Search (permutation _ _ (seq _ _)).
+rewrite Hn.
+eapply (permutation_trans Nat.eqb_eq). 2: {
+Search (permutation _ _ (seq _ _)).
+eapply permut_list_permutation_iff.
+Search (permutation _ (map _ _)).
 ...
 Compute (
 let kl := [7;2;4] in
