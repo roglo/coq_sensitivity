@@ -3135,6 +3135,50 @@ apply NoDup_permutation. {
   apply (NoDup_map_iff []).
   rewrite all_comb_length; [ | easy ].
   intros i j Hi Hj Hij.
+  unfold h1 in Hij.
+  unfold "°" in Hij.
+(*
+eapply isort_rank_inj.
+Search (length _ = _ ^ _).
+apply isort_rank_inj with (l := all_comb n).
+...
+*)
+  specialize (ext_in_map Hij) as H1.
+  assert
+    (H : ∀ k, k < n →
+     ff_app (nth i (all_comb n) []) k = ff_app (nth j (all_comb n) []) k). {
+    intros k Hk.
+    apply H1.
+Search isort_rank.
+About in_isort_rank_lt.
+Search is_permut.
+Search (_ < _ ↔ _ ∈ _).
+...
+Search isort_rank.
+isort_rank_inj:
+  ∀ l : list nat,
+    is_permut_list l
+    → ∀ i j : nat,
+        i < length l
+        → j < length l
+          → nth i (isort_rank Nat.leb l) 0 = nth j (isort_rank Nat.leb l) 0
+            → i = j
+isort_isort_rank:
+  ∀ (A : Type) (rel : A → A → bool) (d : A) (l : list A),
+    isort rel l = map (λ i : nat, nth i l d) (isort_rank rel l)
+Search (_ ∈ isort_rank _ _).
+    apply in_isort_rank_iff.
+
+Search (nth _ (list_prodn _)).
+
+unfold all_comb in H1.
+
+Search (list_prodn _ = list_prodn _).
+
+...
+  assert (H : nth i (all_comb n) [] = nth j (all_comb n) []). {
+unfold all_comb.
+Search list_prodn.
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →
