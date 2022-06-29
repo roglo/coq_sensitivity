@@ -3149,32 +3149,18 @@ apply isort_rank_inj with (l := all_comb n).
      ff_app (nth i (all_comb n) []) k = ff_app (nth j (all_comb n) []) k). {
     intros k Hk.
     apply H1.
-Search isort_rank.
-About in_isort_rank_lt.
-Search is_permut.
-Search (_ < _ ↔ _ ∈ _).
-...
-Search isort_rank.
-isort_rank_inj:
-  ∀ l : list nat,
-    is_permut_list l
-    → ∀ i j : nat,
-        i < length l
-        → j < length l
-          → nth i (isort_rank Nat.leb l) 0 = nth j (isort_rank Nat.leb l) 0
-            → i = j
-isort_isort_rank:
-  ∀ (A : Type) (rel : A → A → bool) (d : A) (l : list A),
-    isort rel l = map (λ i : nat, nth i l d) (isort_rank rel l)
-Search (_ ∈ isort_rank _ _).
-    apply in_isort_rank_iff.
-
-Search (nth _ (list_prodn _)).
-
-unfold all_comb in H1.
-
-Search (list_prodn _ = list_prodn _).
-
+    apply (permutation_in_iff Nat.eqb_eq) with (la := seq 0 n). 2: {
+      now apply in_seq.
+    }
+    apply (permutation_sym Nat.eqb_eq).
+    eapply (permutation_trans Nat.eqb_eq). {
+      apply permut_list_permutation_iff.
+      apply isort_rank_is_permut_list.
+    }
+    rewrite isort_rank_length, <- Hn.
+    apply (permutation_refl Nat.eqb_eq).
+  }
+  clear H1; rename H into H1.
 ...
   assert (H : nth i (all_comb n) [] = nth j (all_comb n) []). {
 unfold all_comb.
