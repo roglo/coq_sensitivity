@@ -3161,10 +3161,11 @@ apply isort_rank_inj with (l := all_comb n).
     apply (permutation_refl Nat.eqb_eq).
   }
   clear H1; rename H into H1.
-...
-  assert (H : nth i (all_comb n) [] = nth j (all_comb n) []). {
-unfold all_comb.
-Search list_prodn.
+  specialize (all_comb_inj Hkz Hi Hj) as H2.
+  apply H2.
+  remember (nth i (all_comb n) []) as la eqn:Hla.
+  remember (nth j (all_comb n) []) as lb eqn:Hlb.
+  move lb before la.
 ...
 
 Theorem cauchy_binet_formula : in_charac_0_field →

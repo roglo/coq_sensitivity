@@ -431,6 +431,23 @@ unfold all_comb.
 apply NoDup_list_prodn_repeat.
 Qed.
 
+Theorem all_comb_inj : ∀ n i j,
+  n ≠ 0
+  → i < n ^ n
+  → j < n ^ n
+  → nth i (all_comb n) [] = nth j (all_comb n) []
+  → i = j.
+Proof.
+intros * Hnz Hi Hj Hij.
+apply (NoDup_nth (all_comb n) []); [ | | | easy ]. {
+  apply NoDup_all_comb.
+} {
+  now rewrite all_comb_length.
+} {
+  now rewrite all_comb_length.
+}
+Qed.
+
 (* det and det' are equal *)
 
 Theorem det_is_det' :
