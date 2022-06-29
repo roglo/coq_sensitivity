@@ -3043,16 +3043,21 @@ map (λ la,
     unfold mat_el.
     f_equal.
     rewrite Nat_sub_succ_1.
-...
-remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
-Search (ff_app (isort_rank _ _)).
-Search (ff_app (collapse _)).
-Check nth_ff_app_isort_rank.
-...
-    rewrite nth_ff_app_isort_rank.
-Search (ff_app (isort_rank _ _)).
-    unfold ff_app.
-    Search (nth _ (isort_rank _ _)).
+    cbn.
+    rewrite (List_map_nth' 0). 2: {
+      apply isort_rank_ub.
+      now intros H; rewrite H in Hn.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      rewrite map_length, isort_rank_length, <- Hn.
+      flia Hi.
+    }
+    rewrite (List_map_nth' 0). 2: {
+      rewrite isort_rank_length, <- Hn.
+      flia Hi.
+    }
+    easy.
+  }
 ...
 Compute (
 let kl := [7;2;4] in
