@@ -3042,6 +3042,7 @@ map (λ la,
     unfold "°".
     unfold mat_el.
     f_equal.
+    rewrite Nat_sub_succ_1.
 ...
 remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
 Search (ff_app (isort_rank _ _)).
