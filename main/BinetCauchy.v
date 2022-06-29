@@ -3038,6 +3038,10 @@ map (λ la,
       rewrite isort_rank_length, <- Hn.
       flia Hi.
     }
+    rewrite <- comp_isort_rank_r.
+    unfold "°".
+    unfold mat_el.
+    f_equal.
 ...
 remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
 Search (ff_app (isort_rank _ _)).
