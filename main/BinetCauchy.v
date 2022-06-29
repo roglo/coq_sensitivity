@@ -3017,9 +3017,31 @@ map (λ la,
     unfold g1.
     unfold "°".
     unfold ff_app.
-    rewrite (List_map_nth' 0).
     unfold g2.
     rewrite Nat_sub_succ_1.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite collapse_length.
+      apply isort_rank_ub.
+      now intros H; rewrite H in Hn.
+    }
+    do 3 rewrite fold_ff_app.
+    unfold collapse.
+    rewrite permut_isort_permut; cycle 1. {
+      apply isort_rank_is_permut_list.
+    } {
+      rewrite isort_rank_length, <- Hn.
+      flia Hi.
+    }
+...
+remember (isort_rank Nat.leb kl) as jl eqn:Hjl.
+Search (ff_app (isort_rank _ _)).
+Search (ff_app (collapse _)).
+Check nth_ff_app_isort_rank.
+...
+    rewrite nth_ff_app_isort_rank.
+Search (ff_app (isort_rank _ _)).
+    unfold ff_app.
+    Search (nth _ (isort_rank _ _)).
 ...
 Compute (
 let kl := [7;2;4] in
