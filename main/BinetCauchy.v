@@ -2873,6 +2873,16 @@ Proof.
 intros Hif * Hcm Hac Hkl.
 remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
 destruct adk; [ | now apply det_isort_rows_with_dup ].
+Theorem det_isort_rows_no_dup : in_charac_0_field →
+  ∀ A kl,
+  is_correct_matrix A = true
+  → mat_ncols A = length kl
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
+  → no_dup Nat.eqb kl = true
+  → det (mat_select_rows kl A) =
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+Proof.
+intros Hif * Hcm Hac Hkl Hadk.
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -2975,7 +2985,11 @@ map (λ la,
 ) (all_comb n)
 ).
 *)
-(* encore un changement de variable à faire *)
+  set (g2 := λ i, ff_app (collapse kl) i).
+  set (h2 := λ i, ff_app (isort_rank Nat.leb kl) i).
+  rewrite rngl_product_change_var with (g := g2) (h := h2).
+  rewrite (rngl_product_list_permut _ _ Nat.eqb_eq)
+    with (l2 := seq 1 n); [ | now destruct Hif | ]. {
 ...
   apply rngl_product_eq_compat.
   intros i Hi.
