@@ -2968,12 +2968,18 @@ Compute (
   let A := mk_mat [[11;-12;13];[21;22;23];[31;32;33];[41;42;-43]]%Z in
   let kl := [1;4;3]%nat in
   let n := length kl in
+(*
   let g1 := λ l, l ° collapse kl in
   let g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1)) in
+*)
 map (λ la,
   map (λ i,
+  mat_el (mat_select_rows kl A) (S (ff_app (isort_rank Nat.leb kl) (i - 1))) (ff_app la (i - 1)) =
+  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
+(*
   mat_el (mat_select_rows kl A) (g2 i) (ff_app (g1 la) (g2 i - 1)) =
   mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
+*)
   ) (seq 1 n)
 ) (all_comb n)
 ).
