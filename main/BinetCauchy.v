@@ -2966,10 +2966,30 @@ Require Import ZArith.
 Open Scope Z_scope.
 Compute (
   let A := mk_mat [[11;-12;13];[21;22;23];[31;32;33];[41;42;-43]]%Z in
-  let kl := [4;1;3]%nat in
+  let kl := [1;4;3]%nat in
   let n := length kl in
   let g1 := λ l, l ° collapse kl in
-(* ah ok, mais c'est pas dans le même ordre
+  let g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1)) in
+map (λ la,
+  map (λ i,
+  mat_el (mat_select_rows kl A) (g2 i) (ff_app (g1 la) (g2 i - 1)) =
+  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
+  ) (seq 1 n)
+) (all_comb n)
+).
+...
+(*
+  let g2 := λ la i, ff_app (isort_rank Nat.leb kl) i in
+map (λ la,
+  map (λ i,
+  mat_el (mat_select_rows (isort Nat.leb kl) A) (g2 la i) (ff_app la (g2 la i - 1)) =
+  mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)))
+  (seq 1 n)
+) (all_comb n)
+).
+...
+*)
+(* ah ok, mais c'est pas dans le même ordre *)
 map (λ la,
   map (λ i,
     mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
@@ -2977,7 +2997,7 @@ map (λ la,
   (seq 1 n)
 ) (all_comb n)
 ).
-*)
+...
 map (λ la,
   ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
   ∏ (i = 1, n),
@@ -2985,18 +3005,21 @@ map (λ la,
 ) (all_comb n)
 ).
 *)
-  set (g2 := λ i, ff_app (collapse kl) i).
-  set (h2 := λ i, ff_app (isort_rank Nat.leb kl) i).
-  rewrite rngl_product_change_var with (g := g2) (h := h2).
+  set (g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1))).
+  set (h2 := λ i, i + 42).
+  rewrite rngl_product_change_var with (g := g2) (h := h2); [ | ].
   rewrite (rngl_product_list_permut _ _ Nat.eqb_eq)
-    with (l2 := seq 1 n); [ | now destruct Hif | ]. {
-...
-  apply rngl_product_eq_compat.
-  intros i Hi.
-  unfold g1.
-  unfold "°".
-  unfold ff_app.
-  rewrite (List_map_nth' 0).
+      with (l2 := seq 1 n); [ | now destruct Hif | ]. {
+    rewrite rngl_product_seq_product; [ | easy ].
+    rewrite Nat.add_comm, Nat.add_sub.
+    apply rngl_product_eq_compat.
+    intros i Hi.
+    unfold g1.
+    unfold "°".
+    unfold ff_app.
+    rewrite (List_map_nth' 0).
+    unfold g2.
+    rewrite Nat_sub_succ_1.
 ...
 Compute (
 let kl := [7;2;4] in
