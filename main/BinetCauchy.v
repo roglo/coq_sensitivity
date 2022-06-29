@@ -2955,10 +2955,19 @@ Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Open Scope Z_scope.
 Compute (
-  let A := mk_mat [[11;12;13];[21;22;23];[31;32;33];[41;42;43]]%Z in
+  let A := mk_mat [[11;-12;13];[21;22;23];[31;32;33];[41;42;-43]]%Z in
   let kl := [4;1;3]%nat in
   let n := length kl in
   let g1 := λ l, l ° collapse kl in
+(* ah ok, mais c'est pas dans le même ordre
+map (λ la,
+  map (λ i,
+    mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
+    mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1)))
+  (seq 1 n)
+) (all_comb n)
+).
+*)
 map (λ la,
   ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
   ∏ (i = 1, n),
@@ -2966,6 +2975,8 @@ map (λ la,
 ) (all_comb n)
 ).
 *)
+(* encore un changement de variable à faire *)
+...
   apply rngl_product_eq_compat.
   intros i Hi.
   unfold g1.
