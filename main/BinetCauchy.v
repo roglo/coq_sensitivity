@@ -3451,6 +3451,33 @@ cbn - [ det ].
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
 Inspect 1.
+Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
+   ∀ m n f,
+   ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)), f jl =
+   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl.
+Proof.
+intros * Hif *.
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros kl Hkl.
+  replace (ε kl * f kl)%F with
+      (if no_dup Nat.eqb kl then ε kl * f kl else 0)%F. 2: {
+    rewrite if_bool_if_dec.
+    destruct (bool_dec (no_dup Nat.eqb kl)) as [Hdkl| Hdkl]; [ easy | ].
+    rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+      intros H.
+      apply (no_dup_NoDup Nat.eqb_eq) in H.
+      congruence.
+    }
+    now symmetry; apply rngl_mul_0_l; destruct Hif; left.
+  }
+  easy.
+}
+cbn.
+...
+rewrite rngl_summation_sub_lists_prodn.
+...
+rewrite H.
 ...
 (*
 Compute (
