@@ -3474,10 +3474,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+rewrite rngl_summation_list_map.
+Print sub_lists_of_seq_0_n.
+(* ou alors, bon, je laisse tombet et je mets "list_prodn" dans l'énoncé du
+   théorème cauchy_binet_formula à la place de "sub_lists_of_seq_0_n" ; c'est
+   possible, après tout, je fais ce que je veux ; d'ailleurs, il y a plus de
+   lemmes avec "list_prodn" qu'avec "sub_lists_of_seq_0_n".
+ *)
 ...
+... retour au théorème cauchy_binet_formula
 rewrite rngl_summation_sub_lists_prodn.
-...
-rewrite H.
 ...
 (*
 Compute (
