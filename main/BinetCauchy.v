@@ -3454,9 +3454,14 @@ Inspect 1.
 Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    ∀ m n f,
    ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)), f jl =
+   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+   if is_sorted Nat.ltb kl then f kl else 0%F.
+(*
    ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl.
+*)
 Proof.
 intros * Hif *.
+...
 symmetry.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
