@@ -2861,18 +2861,6 @@ apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
 now apply mat_select_rows_is_square.
 Qed.
 
-(* to be completed
-Theorem det_isort_rows : in_charac_0_field →
-  ∀ A kl,
-  is_correct_matrix A = true
-  → mat_ncols A = length kl
-  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
-  → det (mat_select_rows kl A) =
-      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
-Proof.
-intros Hif * Hcm Hac Hkl.
-remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
-destruct adk; [ | now apply det_isort_rows_with_dup ].
 Theorem det_isort_rows_no_dup : in_charac_0_field →
   ∀ A kl,
   is_correct_matrix A = true
@@ -2941,6 +2929,22 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   apply in_all_comb_iff in Hl.
   now destruct Hl.
 }
+assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
+  intros l Hl.
+  unfold g1, h1.
+  rewrite <- (permut_comp_assoc n); cycle 1. {
+    now rewrite collapse_length.
+  } {
+    rewrite Hn.
+    now apply isort_rank_is_permut.
+  }
+  unfold collapse.
+  rewrite permut_comp_isort_rank_l; [ | apply isort_rank_is_permut_list ].
+  rewrite isort_rank_length, <- Hn.
+  apply comp_1_r.
+  apply in_all_comb_iff in Hl.
+  now destruct Hl.
+}
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     with (l2 := all_comb n); [ | easy | ]. {
@@ -2960,57 +2964,6 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
   }
-(* ça a l'air bon
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Open Scope Z_scope.
-Compute (
-  let A := mk_mat [[11;-12;13];[21;22;23];[31;32;33];[41;42;-43]]%Z in
-  let kl := [1;4;3]%nat in
-  let n := length kl in
-(*
-  let g1 := λ l, l ° collapse kl in
-  let g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1)) in
-*)
-map (λ la,
-  map (λ i,
-  mat_el (mat_select_rows kl A) (S (ff_app (isort_rank Nat.leb kl) (i - 1))) (ff_app la (i - 1)) =
-  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
-(*
-  mat_el (mat_select_rows kl A) (g2 i) (ff_app (g1 la) (g2 i - 1)) =
-  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
-*)
-  ) (seq 1 n)
-) (all_comb n)
-).
-...
-(*
-  let g2 := λ la i, ff_app (isort_rank Nat.leb kl) i in
-map (λ la,
-  map (λ i,
-  mat_el (mat_select_rows (isort Nat.leb kl) A) (g2 la i) (ff_app la (g2 la i - 1)) =
-  mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)))
-  (seq 1 n)
-) (all_comb n)
-).
-...
-*)
-(* ah ok, mais c'est pas dans le même ordre *)
-map (λ la,
-  map (λ i,
-    mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
-    mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1)))
-  (seq 1 n)
-) (all_comb n)
-).
-...
-map (λ la,
-  ∏ (i = 1, n), mat_el (mat_select_rows kl A) i (ff_app (g1 la) (i - 1)) =
-  ∏ (i = 1, n),
-  mat_el (mat_select_rows (isort Nat.leb kl) A) i (ff_app la (i - 1))
-) (all_comb n)
-).
-*)
   set (g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1))).
   set (h2 := λ i, S (ff_app (collapse kl) (i - 1))).
   assert (Hgh2 : ∀ i, 1 ≤ i ≤ n → g2 (h2 i) = i). {
@@ -3137,12 +3090,6 @@ apply NoDup_permutation. {
   intros i j Hi Hj Hij.
   unfold h1 in Hij.
   unfold "°" in Hij.
-(*
-eapply isort_rank_inj.
-Search (length _ = _ ^ _).
-apply isort_rank_inj with (l := all_comb n).
-...
-*)
   specialize (ext_in_map Hij) as H1.
   assert
     (H : ∀ k, k < n →
@@ -3166,8 +3113,101 @@ apply isort_rank_inj with (l := all_comb n).
   remember (nth i (all_comb n) []) as la eqn:Hla.
   remember (nth j (all_comb n) []) as lb eqn:Hlb.
   move lb before la.
-...
+  apply List_eq_iff.
+  split. {
+    rewrite Hla, Hlb.
+    rewrite nth_all_comb_length; [ | easy ].
+    now rewrite nth_all_comb_length.
+  }
+  intros d k.
+  destruct (lt_dec k n) as [Hkn| Hkn]. 2: {
+    apply Nat.nlt_ge in Hkn.
+    rewrite nth_overflow. 2: {
+      rewrite Hla.
+      now rewrite nth_all_comb_length.
+    }
+    rewrite nth_overflow. 2: {
+      rewrite Hlb.
+      now rewrite nth_all_comb_length.
+    }
+    easy.
+  }
+  rewrite nth_indep with (d' := 0). 2: {
+    rewrite Hla.
+    now rewrite nth_all_comb_length.
+  }
+  symmetry.
+  rewrite nth_indep with (d' := 0). 2: {
+    rewrite Hlb.
+    now rewrite nth_all_comb_length.
+  }
+  symmetry.
+  now apply H1.
+} {
+  apply NoDup_all_comb.
+}
+intros la.
+split; intros Hla. {
+  apply in_map_iff in Hla.
+  destruct Hla as (lb & Hla & Hlb); subst la.
+  apply in_all_comb_iff in Hlb.
+  destruct Hlb as [Hlb| Hlb]; [ easy | ].
+  destruct Hlb as (_ & Hlb & Hlbn).
+  unfold h1, "°"; cbn.
+  apply in_all_comb_iff; right.
+  split; [ easy | ].
+  rewrite map_length, isort_rank_length.
+  split; [ easy | ].
+  intros i Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hi & Hj); subst i.
+  apply Hlbn, nth_In.
+  apply in_isort_rank_lt in Hj.
+  congruence.
+} {
+  apply in_all_comb_iff in Hla.
+  destruct Hla as [Hla| Hla]; [ easy | ].
+  destruct Hla as (_ & Hlan & Hla).
+  apply in_map_iff.
+  exists (g1 la).
+  split. {
+    now apply Hhg, in_all_comb_iff; right.
+  }
+  apply in_all_comb_iff; right.
+  split; [ easy | ].
+  split. {
+    unfold g1.
+    now rewrite comp_length, collapse_length.
+  }
+  intros i Hi.
+  unfold g1, "°" in Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hi & Hj); subst i.
+  apply Hla, nth_In.
+  apply in_isort_rank_lt in Hj.
+  rewrite isort_rank_length in Hj.
+  congruence.
+}
+Qed.
 
+Theorem det_isort_rows : in_charac_0_field →
+  ∀ A kl,
+  is_correct_matrix A = true
+  → mat_ncols A = length kl
+  → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
+  → det (mat_select_rows kl A) =
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+Proof.
+intros Hif * Hcm Hac Hkl.
+remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
+destruct adk. {
+  now apply det_isort_rows_no_dup.
+} {
+  now apply det_isort_rows_with_dup.
+}
+Qed.
+
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3258,6 +3298,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
     assert (Him : ff_app l (i - 1) - 1 < m). {
       apply in_all_comb_iff in Hl.
+      destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hlm & Hl).
       unfold ff_app.
       assert (H : nth (i - 1) l 0 ∈ l). {
@@ -3271,6 +3312,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite seq_nth; [ | easy ].
     rewrite Nat.add_comm, Nat.sub_add. 2: {
       apply in_all_comb_iff in Hl.
+      destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hlm & Hl).
       unfold ff_app.
       assert (H : nth (i - 1) l 0 ∈ l). {
@@ -3336,6 +3378,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     (det (mat_select_rows l B)). 2: {
     generalize Hl; intros H.
     apply in_list_prodn_repeat_iff in H.
+    destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hlm & Hln).
     rewrite det_is_det'; try now destruct Hif. 2: {
       apply mat_select_rows_is_square; [ easy | congruence | ].
@@ -3358,6 +3401,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     assert (H1 : ff_app l1 (i - 1) - 1 < m). {
       unfold ff_app.
       apply in_list_prodn_repeat_iff in Hl1.
+      destruct Hl1 as [Hl1| Hl1]; [ easy | ].
       destruct Hl1 as (_ & Hl1m & Hl1).
       specialize (Hl1 (nth (i - 1) l1 0)).
       assert (H : nth (i - 1) l1 0 ∈ l1). {
@@ -3444,6 +3488,7 @@ let i := [3;3] in
   det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
 *)
+Inspect 1.
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
