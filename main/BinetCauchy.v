@@ -3447,10 +3447,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 (*
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
-  ε kl *
-  ∏ (j = 1, m),
-  mat_el A j (ff_app kl (j - 1)) * det (mat_select_rows (isort Nat.leb kl) B)
+  ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
+  det (mat_select_rows (isort Nat.leb kl) B)
 *)
+Inspect 1.
 ...
 (*
 Compute (
