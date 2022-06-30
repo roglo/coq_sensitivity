@@ -3421,6 +3421,37 @@ cbn - [ det ].
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
   ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) * det (mat_select_rows kl B)
 *)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros la Hla.
+  rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
+    apply in_list_prodn_length in Hla. 2: {
+      intros lb Hlb.
+      apply repeat_spec in Hlb; subst lb.
+      now destruct n.
+    }
+    rewrite repeat_length in Hla.
+    congruence.
+  } {
+    intros k Hk.
+    apply in_list_prodn_repeat_iff in Hla.
+    destruct Hla as [| Hla]; [ easy | ].
+    destruct Hla as (_ & Hlam & Hla).
+    rewrite Hbr.
+    now apply Hla.
+  }
+  rewrite rngl_mul_assoc.
+  assert (H : rngl_is_comm = true) by now destruct Hif.
+  rewrite (rngl_mul_comm H _ (ε la)); clear H.
+  easy.
+}
+cbn - [ det ].
+(*
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+  ε kl *
+  ∏ (j = 1, m),
+  mat_el A j (ff_app kl (j - 1)) * det (mat_select_rows (isort Nat.leb kl) B)
+*)
+...
 (*
 Compute (
 let m := 3 in
@@ -3488,7 +3519,6 @@ let i := [3;3] in
   det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
 *)
-Inspect 1.
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
