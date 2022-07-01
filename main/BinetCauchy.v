@@ -3456,17 +3456,15 @@ Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)), f jl =
    ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
    if is_sorted Nat.ltb kl then f kl else 0%F.
-(*
-   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl.
-*)
 Proof.
 intros * Hif *.
+...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
-let n := 4 in
 let m := 3 in
-  let A := mk_mat [[-1;2;-3;4];[4;5;-6;7];[-2;-6;7;8];[9;10;11;12]]%Z in
+let n := 4 in
+  let A := mk_mat [[-1;2;-3;4];[4;5;-6;7];[-2;-6;-7;-8]]%Z in
 let f := λ l, ∏ (j = 1, m), mat_el A j (ff_app l (j - 1)) in
   ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)), f jl =
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
@@ -3495,7 +3493,7 @@ rewrite rngl_summation_list_map.
 Print sub_lists_of_seq_0_n.
 ...
 ... retour au théorème cauchy_binet_formula
-rewrite rngl_summation_sub_lists_prodn.
+rewrite (rngl_summation_sub_lists_prodn Hif).
 ...
 (*
 Compute (
