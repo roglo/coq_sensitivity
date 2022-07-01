@@ -3478,6 +3478,10 @@ destruct m. {
 rewrite map_app.
 rewrite rngl_summation_list_app.
 rewrite IHn.
+Compute (
+let m := 3 in
+let n := 4 in
+list_prodn (repeat (seq 1 n) m)).
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
