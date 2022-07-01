@@ -3458,6 +3458,26 @@ Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    if is_sorted Nat.ltb kl then f kl else 0%F.
 Proof.
 intros * Hif *.
+revert m.
+induction n; intros. {
+  cbn.
+  destruct m; cbn. {
+    rewrite rngl_summation_list_only_one.
+    now rewrite rngl_summation_list_only_one.
+  }
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite iter_list_empty; [ easy | ].
+  now rewrite iter_list_empty.
+}
+cbn - [ seq ].
+destruct m. {
+  cbn.
+  rewrite rngl_summation_list_only_one.
+  now rewrite rngl_summation_list_only_one.
+}
+rewrite map_app.
+rewrite rngl_summation_list_app.
+rewrite IHn.
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
