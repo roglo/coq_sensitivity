@@ -3478,10 +3478,17 @@ destruct m. {
 rewrite map_app.
 rewrite rngl_summation_list_app.
 rewrite IHn.
+rewrite map_map.
+cbn - [ list_prodn repeat seq ].
+...
 Compute (
-let m := 3 in
-let n := 4 in
-list_prodn (repeat (seq 1 n) m)).
+let m := 2 in
+let n := 3 in
+list_prodn (repeat (seq 1 n) (S m))).
+...
+tous ceux qui contiennent des S n, on les filtre
+de [1; 1; 1] à [3; 3; 3]
+de [1; 1; 1] à [4; 4; 4]
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
