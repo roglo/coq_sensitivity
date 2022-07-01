@@ -3480,6 +3480,36 @@ rewrite rngl_summation_list_app.
 rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
+Search (list_prodn (_ ++ _)).
+Search filter.
+Search partition.
+Theorem partition_permutation : ∀ A (eqb : A → _) p p1 p2 f,
+  partition f p = (p1, p2)
+  → permutation eqb p (p1 ++ p2).
+Admitted.
+remember (list_prodn (repeat (seq 1 (S n)) (S m))) as ll eqn:Hll.
+Check List_rank.
+remember
+  (partition
+     (λ l,
+      match List_rank (Nat.eqb (S n)) l with
+      | Some i => i <? m
+      | None => false
+      end) ll) as x eqn:Hx.
+Compute (
+let m := 2 in
+let n := 3 in
+   partition
+     (λ l,
+      match List_rank (Nat.eqb (S n)) l with
+      | Some i => i <? m
+      | None => false
+      end) (list_prodn (repeat (seq 1 (S n)) (S m)))
+).
+(* mouais, bon, c'est pas vraiment ça ;
+   mais l'idée, c'est de séparer les listes qui n'ont pas de S m, ou qui
+   ont un S m à la fin : ce sont les seules qui ont une chance d'être
+   triées et donc de ne pas renvoyer 0 *)
 ...
 Compute (
 let m := 2 in
