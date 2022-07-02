@@ -3295,12 +3295,11 @@ apply Nat.eqb_eq in Hni; subst i.
 cbn in Hi; flia Hi.
 Qed.
 
-Definition filter_prodn_highest n m :=
-  filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m)).
-
 Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
-  permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
-    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m).
+  permutation (list_eqb Nat.eqb)
+    (list_prodn (repeat (seq 1 (S n)) m))
+    (list_prodn (repeat (seq 1 n) m) ++
+     filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m))).
 Proof.
 intros.
 assert (Hel : equality (list_eqb Nat.eqb)). {
@@ -3312,7 +3311,6 @@ eapply (permutation_trans Hel). {
   apply permutation_filter_app_filter with (f := λ l, member Nat.eqb (S n) l).
   easy.
 }
-unfold filter_prodn_highest.
 eapply (permutation_trans Hel). {
   apply (permutation_app_comm Hel).
 }
@@ -3564,7 +3562,6 @@ cbn - [ det ].
   ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
-Inspect 1.
 Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    ∀ m n f,
    ∑ (jl ∈ map (map S) (sub_lists_of_seq_0_n n m)), f jl =
@@ -3595,72 +3592,25 @@ rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
 symmetry.
-(*
-Inspect 1.
-Check permutation_prodn_succ_app_prodn_filter.
-... return to theorem rngl_summation_sub_lists_prodn
-...
-Search (permutation _ _ _ → _ = _).
-Compute (
-let n := 3 in
-let m := 3 in
-(filter (λ x : list nat, negb (member Nat.eqb (S n) x))
-   (list_prodn (repeat (seq 1 (S n)) m)),
- list_prodn (repeat (seq 1 n) m))
-).
-...
-Compute (
-let n := 3 in
-let m := 3 in
-    (filter (λ x : list nat, negb (member Nat.eqb (S n) x)) (list_prodn (repeat (seq 1 (S n)) m)),
-    (list_prodn (repeat (seq 1 n) m)))
-).
-...
-intros.
-unfold filter_prodn_highest.
-destruct m; [ easy | ].
-destruct m. {
-  destruct n; [ now unfold iter_list | ].
-  destruct n; [ now unfold iter_list | ].
-  destruct n; [ now unfold iter_list | ].
-  destruct n; [ now unfold iter_list | ].
-  destruct n; [ now unfold iter_list | ].
-  destruct n; [ now unfold iter_list | ].
-...
-Compute (
-let n := 3 in
-let m := 3 in
-  (list_prodn (repeat (seq 1 (S n)) m),
-   list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
-).
-Compute (
-map (λ n, map (λ m,
-  is_permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
-    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
-) (seq 0 4)) (seq 0 4)
-).
-Compute (
-map (λ n, map (λ m,
-  (list_prodn (repeat (seq 1 (S n)) m),
-   list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
-) (seq 0 4)) (seq 0 4)
-).
-...
-... return to theorem rngl_summation_sub_lists_prodn
-*)
-set
-  (l21 :=
-     list_prodn (repeat (seq 1 n) (S m)) ++ filter_prodn_highest n (S m)).
 assert (Hel : equality (list_eqb Nat.eqb)). {
   apply -> equality_list_eqb.
   unfold equality.
   apply Nat.eqb_eq.
 }
-rewrite (rngl_summation_list_permut _ _ Hel _ l21). 2: {
-  unfold l21.
+erewrite (rngl_summation_list_permut _ _ Hel). 2: {
   apply permutation_prodn_succ_app_prodn_filter.
 }
-erewrite rngl_summation_list_permut. 2: {
+rewrite rngl_summation_list_app.
+f_equal.
+(* à gauche, il faut éliminer tous ceux qui ne se terminent pas par S n *)
+(* est-ce qu'on ne pourrait pas intégrer le "is_sorted" dans le "filter" ? *)
+...
+Compute (
+let n := 3 in
+let m := 2 in
+filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m))) =
+map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m)
+).
 ...
   apply
 erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
