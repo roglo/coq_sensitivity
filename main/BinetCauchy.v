@@ -3207,6 +3207,22 @@ destruct adk. {
 }
 Qed.
 
+Theorem permutation_filter_app_filter : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ f la, permutation eqb la (filter f la ++ filter (λ x, negb (f x)) la).
+Proof.
+intros * Heqb *.
+induction la as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (f a)) as [Hfa| Hfa]. {
+  rewrite Hfa; cbn.
+  apply (permutation_skip Heqb), IHla.
+} {
+  rewrite Hfa; cbn.
+  apply (permutation_cons_app Heqb), IHla.
+}
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -3488,10 +3504,35 @@ Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
     (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m).
 Proof.
 intros.
+assert (Hel : equality (list_eqb Nat.eqb)). {
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+eapply (permutation_trans Hel). {
+  apply permutation_filter_app_filter with (f := λ l, member Nat.eqb (S n) l).
+  easy.
+}
+unfold filter_prodn_highest.
+eapply (permutation_trans Hel). {
+  apply (permutation_app_comm Hel).
+}
+apply (permutation_app_tail Hel).
+revert n.
+induction m; intros; [ easy | ].
+cbn - [ seq ].
+...
+Compute (
+let n := 3 in
+let m := 3 in
+    (filter (λ x : list nat, negb (member Nat.eqb (S n) x)) (list_prodn (repeat (seq 1 (S n)) m)),
+    (list_prodn (repeat (seq 1 n) m)))
+).
+...
+intros.
 unfold filter_prodn_highest.
 destruct m; [ easy | ].
 destruct m. {
-  destruct n; [ now unfold iter_list | ].
   destruct n; [ now unfold iter_list | ].
   destruct n; [ now unfold iter_list | ].
   destruct n; [ now unfold iter_list | ].
