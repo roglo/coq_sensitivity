@@ -3480,14 +3480,6 @@ rewrite rngl_summation_list_app.
 rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
-Search (list_prodn (_ ++ _)).
-Search filter.
-Search partition.
-(*
-Theorem partition_permutation : ∀ A (eqb : A → _) p p1 p2 f,
-  partition f p = (p1, p2)
-  → permutation eqb p (p1 ++ p2).
-*)
 remember (list_prodn (repeat (seq 1 (S n)) (S m))) as ll eqn:Hll.
 Check List_rank.
 remember
@@ -3500,8 +3492,21 @@ remember
 Compute (
 let m := 2 in
 let n := 3 in
+   partition (member Nat.eqb (S n))
+     (list_prodn (repeat (seq 1 (S n)) (S m)))
+).
+Theorem glop : ∀ m n p1 p2,
+  partition (member Nat.eqb (S n))
+    (list_prodn (repeat (seq 1 (S n)) m)) = (p1, p2)
+  → p2 = list_prodn (repeat (seq 1 n) m).
+...
+(*
+Theorem partition_permutation : ∀ A (eqb : A → _) p p1 p2 f,
+  partition f p = (p1, p2)
+  → permutation eqb p (p1 ++ p2).
+*)
+...
    partition
-     (λ l,
       match List_rank (Nat.eqb (S n)) l with
       | Some i => i <? m
       | None => false
