@@ -3480,6 +3480,69 @@ rewrite rngl_summation_list_app.
 rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
+symmetry.
+Definition filter_prodn_highest n m :=
+  filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m)).
+Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
+  permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
+    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m).
+Proof.
+intros.
+unfold filter_prodn_highest.
+destruct m; [ easy | ].
+destruct m. {
+  cbn - [ seq ].
+  destruct n. {
+    cbn.
+    rewrite iter_list_only_one; [ | easy ].
+    rewrite iter_list_empty; [ | easy ].
+    easy.
+  }
+  destruct n. {
+    cbn.
+    rewrite iter_list_only_one; [ cbn | easy ].
+...
+Compute (
+let n := 3 in
+let m := 3 in
+  (list_prodn (repeat (seq 1 (S n)) m),
+   list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
+).
+Compute (
+map (λ n, map (λ m,
+  is_permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
+    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
+) (seq 0 4)) (seq 0 4)
+).
+Compute (
+map (λ n, map (λ m,
+  (list_prodn (repeat (seq 1 (S n)) m),
+   list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m)
+) (seq 0 4)) (seq 0 4)
+).
+...
+... return to theorem rngl_summation_sub_lists_prodn
+set
+  (l21 :=
+     list_prodn (repeat (seq 1 n) (S m)) ++ filter_prodn_highest n (S m)).
+assert (Hel : equality (list_eqb Nat.eqb)). {
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+rewrite (rngl_summation_list_permut _ _ Hel _ l21). 2: {
+  unfold l21.
+  apply permutation_prodn_succ_app_prodn_filter.
+...
+erewrite rngl_summation_list_permut. 2: {
+  apply
+erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
+Search permutation.
+rewrite rngl_summation_list_change_var.
+
+replace (list_prodn (repeat (seq 1 (S n)) (S m))) with
+  (list_prodn (repeat (seq 1 n) (S m)) ++
+...
 remember (list_prodn (repeat (seq 1 (S n)) (S m))) as ll eqn:Hll.
 Check List_rank.
 remember

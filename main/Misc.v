@@ -2291,15 +2291,24 @@ unfold iter_seq.
 now replace (S k - b) with 0 by flia Hkb.
 Qed.
 
+Theorem iter_list_only_one : ∀ T A d (op : T → T → T) (g : A → T) a
+  (op_d_l : ∀ x, op d x = x),
+  iter_list [a] (λ c i, op c (g i)) d = g a.
+Proof.
+intros * op_d_l.
+unfold iter_list; cbn.
+apply op_d_l.
+Qed.
+
 Theorem iter_seq_only_one : ∀ T d (op : T → T → T) g n
   (op_d_l : ∀ x, op d x = x),
   iter_seq n n (λ c i, op c (g i)) d = g n.
 Proof.
 intros * op_d_l.
-unfold iter_seq, iter_list.
+unfold iter_seq.
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite Nat.sub_diag.
-apply op_d_l.
+now apply iter_list_only_one.
 Qed.
 
 Theorem iter_list_distr : ∀ T A d op g h (l : list A)
