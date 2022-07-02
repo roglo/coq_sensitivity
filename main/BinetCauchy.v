@@ -3223,6 +3223,104 @@ destruct (bool_dec (f a)) as [Hfa| Hfa]. {
 }
 Qed.
 
+Theorem List_filter_map : ∀ A B (f : B → bool) (g : A → B) (l : list A),
+  filter f (map g l) =
+  map g (filter (λ a, f (g a)) l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (f( g a))) as [H1| H1]. {
+  rewrite H1.
+  cbn; f_equal.
+  apply IHl.
+} {
+  rewrite H1.
+  apply IHl.
+}
+Qed.
+
+Theorem filter_negb_member_prodn_succ : ∀ m n,
+ filter (λ x, negb (member Nat.eqb (S n) x))
+   (list_prodn (repeat (seq 1 (S n)) m)) =
+ list_prodn (repeat (seq 1 n) m).
+Proof.
+intros.
+revert n.
+induction m; intros; [ easy | ].
+cbn - [ seq ].
+rewrite App_list_concat_map.
+rewrite <- concat_filter_map.
+rewrite App_list_concat_map.
+rewrite map_map.
+do 2 rewrite <- App_list_concat_map.
+symmetry.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- IHm.
+  easy.
+}
+cbn - [ seq ].
+symmetry.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite List_filter_map.
+  easy.
+}
+cbn - [ member seq ].
+rewrite seq_S at 1.
+rewrite iter_list_app.
+unfold iter_list at 1.
+cbn - [ member seq ].
+rewrite <- app_nil_r.
+f_equal. 2: {
+  erewrite filter_ext. 2: {
+    intros la; cbn.
+    now rewrite Nat.eqb_refl; cbn.
+  }
+  remember (list_prodn _) as l; clear.
+  now induction l.
+}
+apply iter_list_eq_compat.
+intros i Hi; apply in_seq in Hi.
+f_equal.
+apply filter_ext.
+intros la.
+f_equal.
+cbn.
+destruct i; [ easy | ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (n =? i)) as [Hni| Hni]; [ | easy ].
+apply Nat.eqb_eq in Hni; subst i.
+cbn in Hi; flia Hi.
+Qed.
+
+Definition filter_prodn_highest n m :=
+  filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m)).
+
+Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
+  permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
+    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m).
+Proof.
+intros.
+assert (Hel : equality (list_eqb Nat.eqb)). {
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+eapply (permutation_trans Hel). {
+  apply permutation_filter_app_filter with (f := λ l, member Nat.eqb (S n) l).
+  easy.
+}
+unfold filter_prodn_highest.
+eapply (permutation_trans Hel). {
+  apply (permutation_app_comm Hel).
+}
+apply (permutation_app_tail Hel).
+rewrite filter_negb_member_prodn_succ.
+apply (permutation_refl Hel).
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -3497,82 +3595,10 @@ rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
 symmetry.
-Definition filter_prodn_highest n m :=
-  filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m)).
-Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
-  permutation (list_eqb Nat.eqb) (list_prodn (repeat (seq 1 (S n)) m))
-    (list_prodn (repeat (seq 1 n) m) ++ filter_prodn_highest n m).
-Proof.
-intros.
-assert (Hel : equality (list_eqb Nat.eqb)). {
-  apply -> equality_list_eqb.
-  unfold equality.
-  apply Nat.eqb_eq.
-}
-eapply (permutation_trans Hel). {
-  apply permutation_filter_app_filter with (f := λ l, member Nat.eqb (S n) l).
-  easy.
-}
-unfold filter_prodn_highest.
-eapply (permutation_trans Hel). {
-  apply (permutation_app_comm Hel).
-}
-apply (permutation_app_tail Hel).
-Theorem filter_negb_member_prodn_succ : ∀ m n,
- filter (λ x, negb (member Nat.eqb (S n) x))
-   (list_prodn (repeat (seq 1 (S n)) m)) =
- list_prodn (repeat (seq 1 n) m).
-Proof.
-intros.
-revert n.
-induction m; intros; [ easy | ].
-cbn - [ seq ].
-rewrite App_list_concat_map.
-rewrite <- concat_filter_map.
-rewrite App_list_concat_map.
-rewrite map_map.
-do 2 rewrite <- App_list_concat_map.
-symmetry.
-erewrite iter_list_eq_compat. 2: {
-  intros i Hi.
-  rewrite <- IHm.
-Theorem List_filter_map : ∀ A B (f : B → bool) (g : A → B) (l : list A),
-  filter f (map g l) =
-  map g (filter (λ a, f (g a)) l).
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-rewrite if_bool_if_dec.
-destruct (bool_dec (f( g a))) as [H1| H1]. {
-  rewrite H1.
-  cbn; f_equal.
-  apply IHl.
-} {
-  rewrite H1.
-  apply IHl.
-}
-Qed.
-  easy.
-}
-cbn - [ seq ].
-rewrite seq_S.
-symmetry.
-erewrite iter_list_eq_compat. 2: {
-  intros i Hi.
-  rewrite List_filter_map.
-  easy.
-}
-cbn - [ member seq ].
-rewrite iter_list_app.
-unfold iter_list at 1.
-cbn - [ member seq ].
-rewrite <- app_nil_r.
-...
-f_equal.
-...
-... rewturn to permutation_prodn_succ_app_prodn_filter
-rewrite filter_negb_member_prodn_succ.
-apply (permutation_refl Hel).
+(*
+Inspect 1.
+Check permutation_prodn_succ_app_prodn_filter.
+... return to theorem rngl_summation_sub_lists_prodn
 ...
 Search (permutation _ _ _ → _ = _).
 Compute (
@@ -3621,6 +3647,7 @@ map (λ n, map (λ m,
 ).
 ...
 ... return to theorem rngl_summation_sub_lists_prodn
+*)
 set
   (l21 :=
      list_prodn (repeat (seq 1 n) (S m)) ++ filter_prodn_highest n (S m)).
@@ -3632,8 +3659,9 @@ assert (Hel : equality (list_eqb Nat.eqb)). {
 rewrite (rngl_summation_list_permut _ _ Hel _ l21). 2: {
   unfold l21.
   apply permutation_prodn_succ_app_prodn_filter.
-...
+}
 erewrite rngl_summation_list_permut. 2: {
+...
   apply
 erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
 Search permutation.
