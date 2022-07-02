@@ -3518,6 +3518,26 @@ eapply (permutation_trans Hel). {
   apply (permutation_app_comm Hel).
 }
 apply (permutation_app_tail Hel).
+Theorem filter_negb_member_prodn_succ : ∀ m n,
+ filter (λ x, negb (member Nat.eqb (S n) x))
+   (list_prodn (repeat (seq 1 (S n)) m)) =
+ list_prodn (repeat (seq 1 n) m).
+Proof.
+intros.
+...
+... rewturn to permutation_prodn_succ_app_prodn_filter
+rewrite filter_negb_member_prodn_succ.
+apply (permutation_refl Hel).
+...
+Search (permutation _ _ _ → _ = _).
+Compute (
+let n := 3 in
+let m := 3 in
+(filter (λ x : list nat, negb (member Nat.eqb (S n) x))
+   (list_prodn (repeat (seq 1 (S n)) m)),
+ list_prodn (repeat (seq 1 n) m))
+).
+...
 revert n.
 induction m; intros; [ easy | ].
 cbn - [ seq ].
