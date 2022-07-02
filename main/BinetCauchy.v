@@ -3524,6 +3524,51 @@ Theorem filter_negb_member_prodn_succ : ∀ m n,
  list_prodn (repeat (seq 1 n) m).
 Proof.
 intros.
+revert n.
+induction m; intros; [ easy | ].
+cbn - [ seq ].
+rewrite App_list_concat_map.
+rewrite <- concat_filter_map.
+rewrite App_list_concat_map.
+rewrite map_map.
+do 2 rewrite <- App_list_concat_map.
+symmetry.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- IHm.
+Theorem List_filter_map : ∀ A B (f : B → bool) (g : A → B) (l : list A),
+  filter f (map g l) =
+  map g (filter (λ a, f (g a)) l).
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (f( g a))) as [H1| H1]. {
+  rewrite H1.
+  cbn; f_equal.
+  apply IHl.
+} {
+  rewrite H1.
+  apply IHl.
+}
+Qed.
+  easy.
+}
+cbn - [ seq ].
+rewrite seq_S.
+symmetry.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  rewrite List_filter_map.
+  easy.
+}
+cbn - [ member seq ].
+rewrite iter_list_app.
+unfold iter_list at 1.
+cbn - [ member seq ].
+rewrite <- app_nil_r.
+...
+f_equal.
 ...
 ... rewturn to permutation_prodn_succ_app_prodn_filter
 rewrite filter_negb_member_prodn_succ.
@@ -3537,10 +3582,6 @@ let m := 3 in
    (list_prodn (repeat (seq 1 (S n)) m)),
  list_prodn (repeat (seq 1 n) m))
 ).
-...
-revert n.
-induction m; intros; [ easy | ].
-cbn - [ seq ].
 ...
 Compute (
 let n := 3 in
