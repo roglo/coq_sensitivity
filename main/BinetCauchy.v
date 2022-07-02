@@ -3491,16 +3491,13 @@ intros.
 unfold filter_prodn_highest.
 destruct m; [ easy | ].
 destruct m. {
-  cbn - [ seq ].
-  destruct n. {
-    cbn.
-    rewrite iter_list_only_one; [ | easy ].
-    rewrite iter_list_empty; [ | easy ].
-    easy.
-  }
-  destruct n. {
-    cbn.
-    rewrite iter_list_only_one; [ cbn | easy ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
+  destruct n; [ now unfold iter_list | ].
 ...
 Compute (
 let n := 3 in
