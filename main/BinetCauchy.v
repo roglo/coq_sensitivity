@@ -3603,11 +3603,13 @@ erewrite (rngl_summation_list_permut _ _ Hel). 2: {
 rewrite rngl_summation_list_app.
 f_equal.
 (* à gauche, il faut éliminer tous ceux qui ne se terminent pas par S n *)
-(* est-ce qu'on ne pourrait pas intégrer le "is_sorted" dans le "filter" ? *)
+(* mais c'est pas suffisant *)
 ...
 Compute (
 let n := 3 in
 let m := 2 in
+filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m)))
+).
 filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m))) =
 map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m)
 ).
