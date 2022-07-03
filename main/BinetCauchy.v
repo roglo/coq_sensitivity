@@ -3308,7 +3308,7 @@ assert (Hel : equality (list_eqb Nat.eqb)). {
   apply Nat.eqb_eq.
 }
 eapply (permutation_trans Hel). {
-  apply permutation_filter_app_filter with (f := λ l, member Nat.eqb (S n) l).
+  apply permutation_filter_app_filter with (f := member Nat.eqb (S n)).
   easy.
 }
 eapply (permutation_trans Hel). {
@@ -3602,14 +3602,50 @@ erewrite (rngl_summation_list_permut _ _ Hel). 2: {
 }
 rewrite rngl_summation_list_app.
 f_equal.
-(* à gauche, il faut éliminer tous ceux qui ne se terminent pas par S n *)
-(* mais c'est pas suffisant *)
-...
+erewrite (rngl_summation_list_permut _ _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb Nat.eqb) ll
+      (filter (is_sorted Nat.ltb) ll ++
+       filter (λ l, negb (is_sorted Nat.ltb l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  apply filter_In in Hl.
+  destruct Hl as (Hl, Hsl).
+  now rewrite Hsl.
+}
+remember (∑ (l ∈ _), _) as x.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros l Hl.
+  apply filter_In in Hl.
+  destruct Hl as (Hl, Hsl).
+  apply Bool.negb_true_iff in Hsl.
+  now rewrite Hsl.
+}
+rewrite rngl_add_0_r.
+subst x.
+Search (filter _ (filter _ _)).
 Compute (
-let n := 3 in
+let n := 4 in
 let m := 2 in
+  (filter (is_sorted Nat.ltb)
+    (filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m)))),
+  map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m))).
+...
 filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m)))
 ).
+Search filter.
+...
+permutation_filter_app_filter:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ (f : A → bool) (la : list A),
+        permutation eqb la (filter f la ++ filter (λ x : A, negb (f x)) la)
+...
 filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m))) =
 map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m)
 ).
