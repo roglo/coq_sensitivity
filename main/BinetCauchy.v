@@ -35,6 +35,18 @@ Fixpoint sub_lists_of_seq_0_n (n k : nat) : list (list nat) :=
       end
   end.
 
+(* j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
+   l'ordre canonique
+Compute (sub_lists_of_seq_0_n 4 2).
+Compute (sub_lists_of_seq_0_n 4 1).
+Print list_prodn.
+...
+Compute (map (λ l, l) (sub_lists_of_seq_0_n 4 1)).
+Compute (sub_lists_of_seq_0_n 3 2 ++ map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
+Compute (sub_lists_of_seq_0_n 3 2, map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
+...
+*)
+
 Fixpoint rank_of_sub_list_of_seq_0_n n k (t : list nat) : nat :=
   match k with
   | 0 => 0
@@ -3638,6 +3650,8 @@ let m := 2 in
       (list_prodn (repeat (seq 1 (S n)) (S m))) =
   map (λ l : list nat, map S (l ++ [n])) (sub_lists_of_seq_0_n n m)
 ).
+(* j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
+   l'ordre canonique *)
 ...
 erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
 Search permutation.
