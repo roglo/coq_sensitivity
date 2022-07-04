@@ -3618,7 +3618,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   destruct Hl as (Hl, Hsl).
   now rewrite Hsl.
 }
-remember (∑ (l ∈ _), _) as x.
+remember (∑ (jl ∈ _), _) as x.
 rewrite all_0_rngl_summation_list_0. 2: {
   intros l Hl.
   apply filter_In in Hl.
@@ -3628,6 +3628,8 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_r.
 subst x.
+remember (∑ (jl ∈ map (λ l, _) _), _) as x; subst x.
+...
 Search (filter _ (filter _ _)).
 Compute (
 let n := 4 in
