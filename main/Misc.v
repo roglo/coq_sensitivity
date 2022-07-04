@@ -1357,8 +1357,7 @@ Qed.
 
 (* *)
 
-(* to be completed
-Fixpoint list_compare A (compare : A → A → comparison) la lb :=
+Fixpoint list_compare {A} (compare : A → A → comparison) la lb :=
   match la with
   | [] =>
       match lb with
@@ -1377,10 +1376,11 @@ Fixpoint list_compare A (compare : A → A → comparison) la lb :=
       end
   end.
 
-Definition comparer {A} (compare : A → _) := ∀ a b, compare a b = Eq ↔ a = b.
+Definition comparator {A} (compare : A → _) :=
+  ∀ a b, compare a b = Eq ↔ a = b.
 
 Theorem list_compare_eq_iff : ∀ A (compare : A → _),
-  comparer compare →
+  comparator compare →
   ∀ la lb, list_compare compare la lb = Eq ↔ la = lb.
 Proof.
 intros * Hcomp *.
@@ -1390,18 +1390,39 @@ split; intros Hlab. {
   destruct lb as [| b]; [ easy | cbn in Hlab ].
   remember (compare a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ | easy | easy ].
-Check Nat.compare_eq_iff.
-Print equality.
-Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
-...
-  apply Heqb in Hab; subst b; f_equal.
+  apply Hcomp in Hab.
+  subst b; f_equal.
   now apply IHla.
-...
-Search (_ = Lt ↔ _ < _).
-Check Nat.compare_eq_iff.
-...
-About nat_compare_Lt_lt.
-Check Nat.compare_lt.
+} {
+  subst lb.
+  induction la as [| a]; [ easy | cbn ].
+  unfold comparator in Hcomp.
+  now rewrite (proj2 (Hcomp a a) eq_refl).
+}
+Qed.
+
+(* to be completed
+Theorem list_compare_lt_iff : ∀ A (compare : A → _),
+  comparator compare →
+  ∀ la lb, list_compare compare la lb = Lt ↔ la < lb.
+Proof.
+intros * Hcomp *.
+split; intros Hlab. {
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | cbn ].
+  destruct lb as [| b]; [ easy | cbn in Hlab ].
+  remember (compare a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy | easy ].
+  apply Hcomp in Hab.
+  subst b; f_equal.
+  now apply IHla.
+} {
+  subst lb.
+  induction la as [| a]; [ easy | cbn ].
+  unfold comparator in Hcomp.
+  now rewrite (proj2 (Hcomp a a) eq_refl).
+}
+Qed.
 ...
 *)
 

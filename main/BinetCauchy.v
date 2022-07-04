@@ -35,16 +35,30 @@ Fixpoint sub_lists_of_seq_0_n (n k : nat) : list (list nat) :=
       end
   end.
 
-(* j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
+(* to be completed
+(*
+   j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
    l'ordre canonique
+*)
 Compute (sub_lists_of_seq_0_n 4 2).
+Definition compare_eqb a b :=
+  match a with
+  | Eq => match b with Eq => true | _ => false end
+  | Lt => match b with Lt => true | _ => false end
+  | Gt => match b with Gt => true | _ => false end
+  end.
+Definition list_nat_ltb a b :=
+  compare_eqb (list_compare Nat.compare a b) Lt.
+Compute (isort list_nat_ltb (sub_lists_of_seq_0_n 4 2)).
+
+Compute (sub_lists_of_seq_0_n 4 2).
+Compute (sub_lists_of_seq_0_n 3 2).
+Compute (map (map S) (sub_lists_of_seq_0_n 3 2)).
+...
      = [[0; 1]; [0; 2]; [1; 2]; [0; 3]; [1; 3]; [2; 3]]
+     = [[0; 1]; [0; 2]; [1; 2]]
+     = [[1; 2]; [1; 3]; [2; 3]]
 ...
-Compute (isort (list_ltb Nat.ltb) (sub_lists_of_seq_0_n 4 2)).
-Compute (sub_lists_of_seq_0_n 4 1).
-Print list_prodn.
-...
-Compute (map (λ l, l) (sub_lists_of_seq_0_n 4 1)).
 Compute (sub_lists_of_seq_0_n 3 2 ++ map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
 Compute (sub_lists_of_seq_0_n 3 2, map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
 ...
