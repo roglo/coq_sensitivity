@@ -3631,29 +3631,14 @@ subst x.
 remember (∑ (jl ∈ map (λ l, _) _), _) as x; subst x.
 rewrite List_filter_filter.
 remember (filter (λ l, _) _) as x; subst x.
-...
 Compute (
 let n := 4 in
 let m := 2 in
-  (filter (is_sorted Nat.ltb)
-    (filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m)))),
-  map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m))).
-...
-filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m)))
-).
-Search filter.
-...
-permutation_filter_app_filter:
-  ∀ (A : Type) (eqb : A → A → bool),
-    equality eqb
-    → ∀ (f : A → bool) (la : list A),
-        permutation eqb la (filter f la ++ filter (λ x : A, negb (f x)) la)
-...
-filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) (S m))) =
-map (λ x : list nat, map S (x ++ [n])) (sub_lists_of_seq_0_n n m)
+  filter (λ l : list nat, (is_sorted Nat.ltb l && member Nat.eqb (S n) l)%bool)
+      (list_prodn (repeat (seq 1 (S n)) (S m))) =
+  map (λ l : list nat, map S (l ++ [n])) (sub_lists_of_seq_0_n n m)
 ).
 ...
-  apply
 erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
 Search permutation.
 rewrite rngl_summation_list_change_var.
