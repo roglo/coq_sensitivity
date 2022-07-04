@@ -1355,6 +1355,56 @@ destruct x as [x| ]. {
 destruct y as [y| ]; [ now right | now left ].
 Qed.
 
+(* *)
+
+(* to be completed
+Fixpoint list_compare A (compare : A → A → comparison) la lb :=
+  match la with
+  | [] =>
+      match lb with
+      | [] => Eq
+      | b :: lb' => Lt
+      end
+  | a :: la' =>
+      match lb with
+      | [] => Gt
+      | b :: lb' =>
+          match compare a b with
+          | Eq => list_compare compare la' lb'
+          | Lt => Lt
+          | Gt => Gt
+          end
+      end
+  end.
+
+Definition comparer {A} (compare : A → _) := ∀ a b, compare a b = Eq ↔ a = b.
+
+Theorem list_compare_eq_iff : ∀ A (compare : A → _),
+  comparer compare →
+  ∀ la lb, list_compare compare la lb = Eq ↔ la = lb.
+Proof.
+intros * Hcomp *.
+split; intros Hlab. {
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | cbn ].
+  destruct lb as [| b]; [ easy | cbn in Hlab ].
+  remember (compare a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy | easy ].
+Check Nat.compare_eq_iff.
+Print equality.
+Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
+...
+  apply Heqb in Hab; subst b; f_equal.
+  now apply IHla.
+...
+Search (_ = Lt ↔ _ < _).
+Check Nat.compare_eq_iff.
+...
+About nat_compare_Lt_lt.
+Check Nat.compare_lt.
+...
+*)
+
 (* list_eqb *)
 
 Fixpoint list_eqb A (eqb : A → A → bool) la lb :=

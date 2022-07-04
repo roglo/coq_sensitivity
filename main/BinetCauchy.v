@@ -38,6 +38,9 @@ Fixpoint sub_lists_of_seq_0_n (n k : nat) : list (list nat) :=
 (* j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
    l'ordre canonique
 Compute (sub_lists_of_seq_0_n 4 2).
+     = [[0; 1]; [0; 2]; [1; 2]; [0; 3]; [1; 3]; [2; 3]]
+...
+Compute (isort (list_ltb Nat.ltb) (sub_lists_of_seq_0_n 4 2)).
 Compute (sub_lists_of_seq_0_n 4 1).
 Print list_prodn.
 ...
