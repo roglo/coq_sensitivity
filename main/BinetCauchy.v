@@ -3629,8 +3629,9 @@ rewrite all_0_rngl_summation_list_0. 2: {
 rewrite rngl_add_0_r.
 subst x.
 remember (∑ (jl ∈ map (λ l, _) _), _) as x; subst x.
+rewrite List_filter_filter.
+remember (filter (λ l, _) _) as x; subst x.
 ...
-Search (filter _ (filter _ _)).
 Compute (
 let n := 4 in
 let m := 2 in

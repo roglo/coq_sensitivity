@@ -169,6 +169,52 @@ etransitivity; [ apply IHl | ].
 apply Nat.le_max_r.
 Qed.
 
+(* conversions if ...? into if ..._dec *)
+
+Theorem bool_dec : ∀ b, { b = true } + { b = false }.
+Proof.
+intros.
+now destruct b; [ left | right ].
+Qed.
+
+Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
+  (if b then x else y) =
+  if bool_dec b then x else y.
+Proof.
+intros.
+now destruct (bool_dec b); subst b.
+Qed.
+
+Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
+  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
+Proof.
+intros.
+destruct (Nat.eq_dec i j) as [H1| H1]. {
+  now apply Nat.eqb_eq in H1; rewrite H1.
+}
+now apply Nat.eqb_neq in H1; rewrite H1.
+Qed.
+
+Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
+  (if i <? j then a else b) = (if lt_dec i j then a else b).
+Proof.
+intros.
+destruct (lt_dec i j) as [H1| H1]. {
+  now apply Nat.ltb_lt in H1; rewrite H1.
+}
+now apply Nat.ltb_nlt in H1; rewrite H1.
+Qed.
+
+Theorem if_leb_le_dec : ∀ A i j (a b : A),
+  (if i <=? j then a else b) = (if le_dec i j then a else b).
+Proof.
+intros.
+destruct (le_dec i j) as [H1| H1]. {
+  now apply Nat.leb_le in H1; rewrite H1.
+}
+now apply Nat.leb_nle in H1; rewrite H1.
+Qed.
+
 (* *)
 
 Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
@@ -381,6 +427,21 @@ remember (f b) as c eqn:Hc; symmetry in Hc.
 destruct c; [ easy | ].
 destruct Ha as [Ha| Ha]; [ now subst b | ].
 now apply IHl.
+Qed.
+
+Theorem List_filter_filter : ∀ A (f g : A → bool) l,
+  filter f (filter g l) = filter (λ x, (f x && g x)%bool) l.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (g a)) as [Hga| Hga]; rewrite Hga. 2: {
+  now rewrite Bool.andb_false_r.
+}
+rewrite Bool.andb_true_r; cbn.
+rewrite if_bool_if_dec.
+destruct (bool_dec (f a)) as [Hfa| Hfa]; rewrite Hfa; [ | easy ].
+now f_equal.
 Qed.
 
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
@@ -812,52 +873,6 @@ destruct n as [n| ]; cbn. {
 Qed.
 
 (* end List_rank *)
-
-(* conversions if ...? into if ..._dec *)
-
-Theorem bool_dec : ∀ b, { b = true } + { b = false }.
-Proof.
-intros.
-now destruct b; [ left | right ].
-Qed.
-
-Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
-  (if b then x else y) =
-  if bool_dec b then x else y.
-Proof.
-intros.
-now destruct (bool_dec b); subst b.
-Qed.
-
-Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
-  (if i =? j then a else b) = (if Nat.eq_dec i j then a else b).
-Proof.
-intros.
-destruct (Nat.eq_dec i j) as [H1| H1]. {
-  now apply Nat.eqb_eq in H1; rewrite H1.
-}
-now apply Nat.eqb_neq in H1; rewrite H1.
-Qed.
-
-Theorem if_ltb_lt_dec : ∀ A i j (a b : A),
-  (if i <? j then a else b) = (if lt_dec i j then a else b).
-Proof.
-intros.
-destruct (lt_dec i j) as [H1| H1]. {
-  now apply Nat.ltb_lt in H1; rewrite H1.
-}
-now apply Nat.ltb_nlt in H1; rewrite H1.
-Qed.
-
-Theorem if_leb_le_dec : ∀ A i j (a b : A),
-  (if i <=? j then a else b) = (if le_dec i j then a else b).
-Proof.
-intros.
-destruct (le_dec i j) as [H1| H1]. {
-  now apply Nat.leb_le in H1; rewrite H1.
-}
-now apply Nat.leb_nle in H1; rewrite H1.
-Qed.
 
 Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
 Proof.
