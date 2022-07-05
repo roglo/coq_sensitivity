@@ -369,6 +369,23 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
     cbn in Hx', Hxxt.
     apply Nat.succ_lt_mono in Hx'.
 About sorted_hd_no_dup.
+Search sorted.
+Theorem sorted_nat_lt_no_dup : ∀ l,
+  sorted Nat.ltb l
+  → NoDup l.
+...
+apply sorted_nat_lt_no_dup in Hs.
+cbn in Hs.
+apply NoDup_app_iff in Hs.
+destruct Hs as (_ & _ & Hs).
+specialize (Hs a).
+assert (H : a ∈ rev t). {
+  rewrite Hxxt.
+  apply -> in_rev.
+  now apply nth_In.
+}
+specialize (Hs H).
+now apply Hs; left.
 ...
     apply (@sorted_hd_no_dup a x' t).
 ...
