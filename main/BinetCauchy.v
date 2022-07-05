@@ -526,6 +526,7 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
       now subst i; rewrite List_hd_nth_0 in Hln.
     }
+...
     specialize (sorted_any Nat_ltb_trans Hs) as H1.
     rewrite rev_length in H1.
 ...
