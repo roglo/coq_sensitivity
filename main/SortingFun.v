@@ -2571,14 +2571,15 @@ apply in_or_app; right.
 now apply in_or_app; left; left.
 Qed.
 
-Theorem sorted_any : ∀ A (rel : A → A → bool) i j d l,
-  transitive rel
-  → sorted rel l
-  → i < j
+Theorem sorted_any : ∀ A (rel : A → A → bool),
+  transitive rel →
+  ∀ l, sorted rel l →
+  ∀ i j d,
+  i < j
   → j < length l
   → rel (nth i l d) (nth j l d) = true.
 Proof.
-intros * Htrans Hsort Hij Hj.
+intros * Htrans * Hsort * Hij Hj.
 assert (Hi : i < length l) by now transitivity j.
 specialize nth_split as H1.
 specialize (H1 A i l d Hi).

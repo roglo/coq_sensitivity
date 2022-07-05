@@ -464,47 +464,32 @@ destruct (lt_dec (rank_of_sub_list_of_seq_0_n n (S k) t) (binomial n (S k)))
   subst i; exfalso; clear H1.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (m & Hmt & Hmn).
-(**)
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    now subst m; rewrite List_hd_nth_0 in Hln.
+  }
   assert (Hmtl : nth m t 0 < hd 0 t). {
     rewrite List_hd_nth_0.
-...
-    specialize (@sorted_any _ Nat.ltb (length t - m) (length t - 1) 0 (rev t)) as H1.
-    specialize (H1 Nat_ltb_trans Hs).
-    assert (H : length t - m < length t - 1). {
-      destruct (le_dec m 1) as [Hmt1| Hmt1]. {
-        destruct m. {
-...
-        flia Hmt Hmt1.
-...
-    specialize (H1 Nat_ltb_trans Hs).
-    assert (H : length t - m < length t - 1). {
-      destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
-        exfalso; clear Hmt H1; subst m.
-(*
-...
-  assert (Hmtl : nth m t 0 < last t 0). {
-    rewrite List_last_nth.
-    specialize (@sorted_any _ Nat.ltb m (length t - 1) 0 (rev t)) as H1.
-    specialize (H1 Nat_ltb_trans Hs).
-*)
-    assert (H : m < length t - 1). {
-      destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
-        exfalso; clear Hmt H1; subst m.
-...
-        now rewrite List_last_nth in Hln.
-      }
-      flia Hmt Hmt1.
-    }
+    specialize (sorted_any Nat_ltb_trans Hs) as H1.
+    specialize (H1 (length t - S m) (length t - 1) 0).
+    assert (H : length t - S m < length t - 1) by flia Hmz Hmt.
     specialize (H1 H); clear H.
+    rewrite rev_length in H1.
     assert (H : length t - 1 < length t) by flia Hmt.
     specialize (H1 H); clear H.
+    rewrite rev_nth in H1; [ | flia Hmt ].
+    rewrite rev_nth in H1; [ | flia Hmt ].
+    rewrite <- Nat.sub_succ_l in H1; [ | easy ].
+    rewrite <- Nat.sub_succ_l in H1; [ | flia Hmt ].
+    do 2 rewrite Nat.sub_succ in H1.
+    replace (length t - (length t - m)) with m in H1 by flia Hmt.
+    rewrite Nat.sub_0_r, Nat.sub_diag in H1.
     now apply Nat.ltb_lt in H1.
   }
   rewrite Hmn in Hmtl.
   apply Nat.nle_gt in Hmtl; apply Hmtl; clear Hmtl.
   apply Nat.lt_succ_r.
   apply Hlt.
-  rewrite List_last_nth.
+  rewrite List_hd_nth_0.
   apply nth_In.
   flia Hmt.
 }
@@ -522,7 +507,7 @@ rewrite (List_map_nth' []). 2: {
   specialize (rank_of_sub_list_of_seq_0_n_ub t H) as H1; clear H.
   flia Hrb H1.
 }
-exfalso. (* since last t ≠ m *)
+exfalso.
 destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
   subst k; clear Hrb Hkn.
   specialize (pigeonhole_list) as H1.
@@ -538,18 +523,26 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     exfalso; clear IHn H1.
     apply (In_nth _ _ 0) in Hx.
     destruct Hx as (i & Hi & Hin).
-    specialize (sorted_any) as H1.
-    specialize (H1 nat Nat.ltb i (length t - 1) 0 t Nat_ltb_trans Hs).
-    assert (H : i < length t - 1). {
-      destruct (Nat.eq_dec i (length t - 1)) as [Hit| Hit]. {
-        rewrite Hit in Hin.
-        now rewrite <- List_last_nth in Hin.
-      }
-      flia Hi Hit.
+    destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+      now subst i; rewrite List_hd_nth_0 in Hln.
     }
+    specialize (sorted_any Nat_ltb_trans Hs) as H1.
+    rewrite rev_length in H1.
+...
+    specialize (H1 0 (length t - 1) 0).
+    assert (H : 0 < length t - 1) by flia Hi Hiz.
     specialize (H1 H); clear H.
     assert (H : length t - 1 < length t) by flia Hi.
     specialize (H1 H); clear H.
+    rewrite rev_nth in H1; [ | flia Hi ].
+    rewrite rev_nth in H1; [ | flia Hi ].
+    rewrite <- Nat.sub_succ_l in H1; [ | flia Hi ].
+    rewrite Nat_sub_succ_1, Nat.sub_diag in H1.
+    apply Nat.ltb_lt in H1.
+    specialize (Hlt (nth (length t - 1) t 0)).
+    assert (H : nth (length t - 1) t 0 ∈ t) by (apply nth_In; flia Hi).
+    specialize (Hlt H); clear H.
+...
     rewrite Hin in H1.
     rewrite <- List_last_nth in H1.
     apply Nat.ltb_lt in H1.
