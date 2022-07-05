@@ -642,6 +642,7 @@ destruct Hl as [Hl| Hl]; [ now apply IHn in Hl | ].
 apply in_map_iff in Hl.
 destruct Hl as (l' & Hl'n & Hl); subst l.
 rename l' into l.
+...
 specialize (sub_lists_of_seq_0_n_lt _ _ _ Hl) as H1.
 specialize (IHn _ _ Hl).
 clear k Hl.
@@ -654,6 +655,14 @@ destruct l as [| b]. {
   now apply Nat.ltb_lt, H1; left.
 }
 cbn in IHl |-*.
+cbn in IHn.
+rewrite <- app_assoc in IHn; cbn in IHn.
+do 2 rewrite <- app_assoc; cbn.
+Check sorted_cons_cons_true_iff.
+Search (sorted _ (_ ++ _)).
+...
+Search (sorted _ (_ ++ _)).
+apply sorted_app_iff.
 ...
 apply sorted_cons_cons_true_iff in IHn.
 apply sorted_cons_cons_true_iff.
