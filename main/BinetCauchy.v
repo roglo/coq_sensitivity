@@ -308,30 +308,6 @@ rewrite Nat.eqb_refl.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
-(*
-Theorem sorted_hd_no_dup : ∀ a i l,
-  sorted Nat.ltb (a :: l)
-  → i < length l
-  → a = nth i l 0
-  → False.
-Proof.
-intros * Hsort Hil Ha.
-destruct l as [| b]; [ cbn in Hil; flia Hil | ].
-apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hab & Hs).
-apply Nat.ltb_lt in Hab.
-destruct i; [ cbn in Ha; flia Hab Ha | cbn in Ha ].
-specialize (sorted_extends Nat_ltb_trans Hs a) as H1.
-cbn in Hil.
-apply Nat.succ_lt_mono in Hil.
-assert (H : a ∈ l) by now subst a; apply nth_In.
-specialize (H1 H).
-apply Nat.ltb_lt in H1.
-flia Hab H1.
-Qed.
-*)
-
-(* to be completed
 Theorem nth_of_rank_of_sub_list_of_seq_0_n : ∀ n k t,
   sorted Nat.ltb (rev t)
   → length t = k
@@ -339,15 +315,6 @@ Theorem nth_of_rank_of_sub_list_of_seq_0_n : ∀ n k t,
   → nth (rank_of_sub_list_of_seq_0_n n k t) (sub_lists_of_seq_0_n n k) [] = t.
 Proof.
 intros * Hs Htk Hlt.
-(*
-Compute (
-  let n := 4 in
-  let k := 2 in
-map (λ t,
-  nth (rank_of_sub_list_of_seq_0_n n k t) (sub_lists_of_seq_0_n n k) [] = t)
-(sub_lists_of_seq_0_n n k)
-).
-*)
 destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   apply Nat.nle_gt in Hkn.
   rewrite rank_of_sub_list_of_seq_0_n_out; [ | easy ].
@@ -564,27 +531,48 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     cbn in Hx'.
     apply Nat.succ_lt_mono in Hx'.
     cbn in Hxxt.
-...
-    now apply (@sorted_hd_no_dup a x' t).
+    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
+    cbn in Hs.
+    apply NoDup_app_iff in Hs.
+    destruct Hs as (Hnd & _ & Hs).
+    specialize (Hs a).
+    assert (H : a ∈ rev t). {
+      rewrite Hxxt.
+      apply -> in_rev.
+      now apply nth_In.
+    }
+    specialize (Hs H).
+    now apply Hs; left.
   }
   cbn in Hx.
   apply Nat.succ_lt_mono in Hx.
   destruct x'. {
     exfalso.
     cbn in Hxxt; symmetry in Hxxt.
-    now apply (@sorted_hd_no_dup a x t).
+    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
+    cbn in Hs.
+    apply NoDup_app_iff in Hs.
+    destruct Hs as (Hnd & _ & Hs).
+    specialize (Hs a).
+    assert (H : a ∈ rev t). {
+      rewrite Hxxt.
+      apply -> in_rev.
+      now apply nth_In.
+    }
+    specialize (Hs H).
+    now apply Hs; left.
   }
   cbn in Hx', Hxxt.
   apply Nat.succ_lt_mono in Hx'.
   f_equal.
   apply IHt; [ | easy | easy | easy ].
-  now apply sorted_cons in Hs.
+  cbn in Hs.
+  now apply sorted_app in Hs.
 }
 apply Nat.nlt_ge in Hrb; apply Hrb.
 apply rank_of_sub_list_of_seq_0_n_ub.
 flia Hkn Hkn'.
 Qed.
-*)
 
 Section a.
 
