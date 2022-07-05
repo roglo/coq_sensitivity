@@ -14,6 +14,9 @@ Require Import Misc PermutationFun.
 Definition reflexive A (rel : A → A → bool) :=
   ∀ a, rel a a = true.
 
+Definition irreflexive A (rel : A → A → bool) :=
+  ∀ a, rel a a = false.
+
 Definition antisymmetric A (rel : A → A → bool) :=
   ∀ a b, rel a b = true → rel b a = true → a = b.
 
@@ -148,6 +151,22 @@ apply sorted_cons_cons_true_iff in Hsort.
 apply sorted_cons_cons_true_iff.
 destruct Hsort as (Hcd, Hsort).
 split; [ now apply Htra with (b := c) | easy ].
+Qed.
+
+Theorem sorted_lt_NoDup : ∀ A (ltb : A → A → bool),
+  irreflexive ltb →
+  transitive ltb →
+  ∀ l, sorted ltb l → NoDup l.
+Proof.
+intros * Hirr Htra * Hsort.
+induction l as [| a]; [ constructor | ].
+constructor. 2: {
+  apply IHl.
+  now apply sorted_cons in Hsort.
+}
+intros Ha.
+specialize (sorted_extends Htra Hsort _ Ha) as H1.
+now rewrite Hirr in H1.
 Qed.
 
 Theorem sorted_app : ∀ A rel (la lb : list A),

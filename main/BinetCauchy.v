@@ -308,6 +308,7 @@ rewrite Nat.eqb_refl.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
+(*
 Theorem sorted_hd_no_dup : ∀ a i l,
   sorted Nat.ltb (a :: l)
   → i < length l
@@ -328,6 +329,7 @@ specialize (H1 H).
 apply Nat.ltb_lt in H1.
 flia Hab H1.
 Qed.
+*)
 
 (* to be completed
 Theorem nth_of_rank_of_sub_list_of_seq_0_n : ∀ n k t,
@@ -364,46 +366,50 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   clear - Hs Hx Hx' Hxxt.
   revert x x' Hx Hx' Hxxt.
   induction t as [| a]; intros; [ easy | ].
+  assert (H : sorted Nat.ltb (rev t)). {
+    cbn in Hs.
+    now apply sorted_app in Hs.
+  }
+  specialize (IHt H); clear H.
   destruct x. {
     destruct x'; [ easy | exfalso ].
     cbn in Hx', Hxxt.
     apply Nat.succ_lt_mono in Hx'.
-About sorted_hd_no_dup.
-Search sorted.
-Theorem sorted_nat_lt_no_dup : ∀ l,
-  sorted Nat.ltb l
-  → NoDup l.
-...
-apply sorted_nat_lt_no_dup in Hs.
-cbn in Hs.
-apply NoDup_app_iff in Hs.
-destruct Hs as (_ & _ & Hs).
-specialize (Hs a).
-assert (H : a ∈ rev t). {
-  rewrite Hxxt.
-  apply -> in_rev.
-  now apply nth_In.
-}
-specialize (Hs H).
-now apply Hs; left.
-...
-    apply (@sorted_hd_no_dup a x' t).
-...
-    now apply (@sorted_hd_no_dup a x' t).
+    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
+    cbn in Hs.
+    apply NoDup_app_iff in Hs.
+    destruct Hs as (Hnd & _ & Hs).
+    specialize (Hs a).
+    assert (H : a ∈ rev t). {
+      rewrite Hxxt.
+      apply -> in_rev.
+      now apply nth_In.
+    }
+    specialize (Hs H).
+    now apply Hs; left.
   }
   cbn in Hx.
   apply Nat.succ_lt_mono in Hx.
   destruct x'. {
     exfalso.
     cbn in Hxxt; symmetry in Hxxt.
-    now apply (@sorted_hd_no_dup a x t).
+    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
+    cbn in Hs.
+    apply NoDup_app_iff in Hs.
+    destruct Hs as (Hnd & _ & Hs).
+    specialize (Hs a).
+    assert (H : a ∈ rev t). {
+      rewrite Hxxt.
+      apply -> in_rev.
+      now apply nth_In.
+    }
+    specialize (Hs H).
+    now apply Hs; left.
   }
   cbn in Hx', Hxxt.
   apply Nat.succ_lt_mono in Hx'.
   f_equal.
-  apply IHt; [ | easy | easy | easy ].
-  destruct t as [| b]; [ easy | ].
-  now apply sorted_cons_cons_true_iff in Hs.
+  now apply IHt.
 }
 revert k t Hs Htk Hlt Hkn.
 induction n; intros. {
@@ -431,16 +437,14 @@ destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
   apply Nat.succ_inj in Htk.
   f_equal.
   apply IHn; [ | easy | | easy ]. {
-    now apply sorted_cons in Hs.
+    cbn in Hs.
+    now apply sorted_app in Hs.
   }
   intros i Hi.
-Search (sorted _ (_ :: _)).
-specialize (sorted_extends Nat_ltb_trans) as H1.
-specialize (H1 n t Hs i Hi).
-apply Nat.ltb_lt in H1.
-...
+  cbn in Hs.
   apply sorted_app in Hs.
   destruct Hs as (Ht & _ & Hs).
+  apply in_rev in Hi.
   specialize (Hs Nat_ltb_trans i n Hi (or_introl eq_refl)).
   now apply Nat.ltb_lt in Hs.
 }
@@ -460,13 +464,33 @@ destruct (lt_dec (rank_of_sub_list_of_seq_0_n n (S k) t) (binomial n (S k)))
   subst i; exfalso; clear H1.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (m & Hmt & Hmn).
+(**)
+  assert (Hmtl : nth m t 0 < hd 0 t). {
+    rewrite List_hd_nth_0.
+...
+    specialize (@sorted_any _ Nat.ltb (length t - m) (length t - 1) 0 (rev t)) as H1.
+    specialize (H1 Nat_ltb_trans Hs).
+    assert (H : length t - m < length t - 1). {
+      destruct (le_dec m 1) as [Hmt1| Hmt1]. {
+        destruct m. {
+...
+        flia Hmt Hmt1.
+...
+    specialize (H1 Nat_ltb_trans Hs).
+    assert (H : length t - m < length t - 1). {
+      destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
+        exfalso; clear Hmt H1; subst m.
+(*
+...
   assert (Hmtl : nth m t 0 < last t 0). {
     rewrite List_last_nth.
-    specialize (@sorted_any _ Nat.ltb m (length t - 1) 0 t) as H1.
+    specialize (@sorted_any _ Nat.ltb m (length t - 1) 0 (rev t)) as H1.
     specialize (H1 Nat_ltb_trans Hs).
+*)
     assert (H : m < length t - 1). {
       destruct (Nat.eq_dec m (length t - 1)) as [Hmt1| Hmt1]. {
         exfalso; clear Hmt H1; subst m.
+...
         now rewrite List_last_nth in Hln.
       }
       flia Hmt Hmt1.
