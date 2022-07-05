@@ -526,30 +526,24 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
       now subst i; rewrite List_hd_nth_0 in Hln.
     }
-...
     specialize (sorted_any Nat_ltb_trans Hs) as H1.
     rewrite rev_length in H1.
-...
-    specialize (H1 0 (length t - 1) 0).
-    assert (H : 0 < length t - 1) by flia Hi Hiz.
+    specialize (H1 (length t - S i) (length t - 1) 0).
+    assert (H : length t - S i < length t - 1) by flia Hi Hiz.
     specialize (H1 H); clear H.
     assert (H : length t - 1 < length t) by flia Hi.
     specialize (H1 H); clear H.
     rewrite rev_nth in H1; [ | flia Hi ].
     rewrite rev_nth in H1; [ | flia Hi ].
     rewrite <- Nat.sub_succ_l in H1; [ | flia Hi ].
+    rewrite Nat.sub_succ in H1.
+    rewrite <- Nat.sub_succ_l in H1; [ | flia Hi ].
     rewrite Nat_sub_succ_1, Nat.sub_diag in H1.
-    apply Nat.ltb_lt in H1.
-    specialize (Hlt (nth (length t - 1) t 0)).
-    assert (H : nth (length t - 1) t 0 ∈ t) by (apply nth_In; flia Hi).
-    specialize (Hlt H); clear H.
-...
+    replace (length t - (length t - i)) with i in H1 by flia Hi.
     rewrite Hin in H1.
-    rewrite <- List_last_nth in H1.
     apply Nat.ltb_lt in H1.
-    specialize (Hlt (last t 0)).
-    assert (H : last t 0 ∈ t). {
-      rewrite List_last_nth.
+    specialize (Hlt (nth 0 t 0)).
+    assert (H : nth 0 t 0 ∈ t). {
       apply nth_In; flia Hi.
     }
     specialize (Hlt H); clear H.
@@ -570,6 +564,7 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     cbn in Hx'.
     apply Nat.succ_lt_mono in Hx'.
     cbn in Hxxt.
+...
     now apply (@sorted_hd_no_dup a x' t).
   }
   cbn in Hx.
