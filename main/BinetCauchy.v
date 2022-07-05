@@ -23,20 +23,22 @@ Import matrix_Notations.
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
-Fixpoint sub_lists_of_seq_0_n (n k : nat) : list (list nat) :=
+Fixpoint slszn (m n k : nat) : list (list nat) :=
   match k with
   | 0 => [[]]
   | S k' =>
       match n with
       | 0 => []
       | S n' =>
-          sub_lists_of_seq_0_n n' k ++
-          map (λ l, n' :: l) (sub_lists_of_seq_0_n n' k')
+          map (λ l, m - n :: l) (slszn m n' k') ++
+          slszn m n' k
       end
   end.
 
+Definition sub_lists_of_seq_0_n (n k : nat) := slszn n n k.
+
 (*
-Compute (sub_lists_of_seq_0_n 4 2).
+Compute (sub_lists_of_seq_0_n 5 2).
 Definition compare_eqb a b :=
   match a with
   | Eq => match b with Eq => true | _ => false end
@@ -53,16 +55,12 @@ Compute (isort list_nat_ltb (sub_lists_of_seq_0_n 5 3)).
 Compute (sub_lists_of_seq_0_n 4 2).
 Compute (sub_lists_of_seq_0_n 3 2).
 Compute (map (map S) (sub_lists_of_seq_0_n 3 2)).
-...
-     = [[0; 1]; [0; 2]; [1; 2]; [0; 3]; [1; 3]; [2; 3]]
-     = [[0; 1]; [0; 2]; [1; 2]]
-     = [[1; 2]; [1; 3]; [2; 3]]
-...
 Compute (sub_lists_of_seq_0_n 3 2 ++ map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
 Compute (sub_lists_of_seq_0_n 3 2, map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 1)).
 ...
 *)
 
+(* to be completed
 Fixpoint rank_of_sub_list_of_seq_0_n n k (t : list nat) : nat :=
   match k with
   | 0 => 0
@@ -77,6 +75,7 @@ Fixpoint rank_of_sub_list_of_seq_0_n n k (t : list nat) : nat :=
             rank_of_sub_list_of_seq_0_n n' k t
       end
   end.
+*)
 
 (*
 Compute (let n := 5 in map (λ i, let l := sub_lists_of_seq_0_n n i in length l) (seq 0 (n + 3))).
@@ -129,20 +128,26 @@ Qed.
 
 (* end borrowed code *)
 
-Theorem sub_lists_of_seq_0_n_length : ∀ k n,
-  length (sub_lists_of_seq_0_n n k) = binomial n k.
+Theorem slszn_length : ∀ m n k,
+  length (slszn m n k) = binomial n k.
 Proof.
 intros.
 revert k.
 induction n; intros; [ now destruct k | ].
 destruct k; [ easy | cbn ].
 rewrite app_length, map_length.
-rewrite IHn, IHn.
-apply Nat.add_comm.
+now rewrite IHn, IHn.
 Qed.
 
-Theorem sub_list_firstn_nat_length : ∀ n k t,
-  t ∈ sub_lists_of_seq_0_n n k → length t = k.
+Theorem sub_lists_of_seq_0_n_length : ∀ k n,
+  length (sub_lists_of_seq_0_n n k) = binomial n k.
+Proof.
+intros.
+apply slszn_length.
+Qed.
+
+Theorem in_slszn_length : ∀ m n k t,
+  t ∈ slszn m n k → length t = k.
 Proof.
 intros * Ht.
 revert t k Ht.
@@ -156,7 +161,7 @@ destruct k. {
 }
 cbn in Ht.
 apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]; [ now apply IHn | ].
+destruct Ht as [Ht| Ht]; [ | now apply IHn ].
 apply in_map_iff in Ht.
 destruct Ht as (l & Hln & Hl).
 rewrite <- Hln.
@@ -164,13 +169,18 @@ cbn; f_equal.
 now apply IHn.
 Qed.
 
+Theorem in_sub_lists_of_seq_0_n_length : ∀ n k t,
+  t ∈ sub_lists_of_seq_0_n n k → length t = k.
+Proof.
+intros * Ht.
+now apply in_slszn_length in Ht.
+Qed.
+
 (* *)
 
-Theorem sub_lists_of_seq_0_n_lt : ∀ n k t,
-  t ∈ sub_lists_of_seq_0_n n k
-  → ∀ a, a ∈ t → a < n.
+Theorem slszn_lt : ∀ m n k t, m ≠ 0 → t ∈ slszn m n k → ∀ a, a ∈ t → a < m.
 Proof.
-intros * Ht a Hat.
+intros * Hmz Ht a Hat.
 revert k t Ht Hat.
 induction n; intros. {
   destruct k; [ cbn in Ht | easy ].
@@ -180,16 +190,22 @@ destruct k; cbn in Ht. {
   destruct Ht; [ now subst t | easy ].
 }
 apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]. {
-  specialize (IHn _ _ Ht Hat).
-  now apply Nat.lt_lt_succ_r.
-}
+destruct Ht as [Ht| Ht]; [ | apply (IHn (S k) t Ht Hat) ].
 apply in_map_iff in Ht.
 destruct Ht as (l & Hln & Hl); subst t.
-(**)
-destruct Hat as [Hat| Hat]; [ now subst a | ].
-apply Nat.lt_lt_succ_r.
+destruct Hat as [Hat| Hat]; [ subst a; flia Hmz | ].
 now apply (IHn k l).
+Qed.
+
+Theorem sub_lists_of_seq_0_n_lt : ∀ n k t,
+  t ∈ sub_lists_of_seq_0_n n k
+  → ∀ a, a ∈ t → a < n.
+Proof.
+intros * Ht a Hat.
+apply slszn_lt with (a := a) in Ht; [ easy | | easy ].
+intros H; subst n; cbn in Ht.
+destruct k; [ | easy ].
+destruct Ht as [Ht| Ht]; [ now subst t | easy ].
 Qed.
 
 (* *)
@@ -197,9 +213,9 @@ Qed.
 Theorem sub_lists_of_seq_0_n_0_r : ∀ n, sub_lists_of_seq_0_n n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
-Theorem sub_lists_of_seq_0_n_out : ∀ n k,
+Theorem slszn_out : ∀ m n k,
   n < k
-  → sub_lists_of_seq_0_n n k = [].
+  → slszn m n k = [].
 Proof.
 intros * Hnk.
 revert k Hnk.
@@ -207,9 +223,19 @@ induction n; intros; cbn; [ now destruct k | ].
 destruct k; [ easy | ].
 apply Nat.succ_lt_mono in Hnk.
 rewrite IHn; [ | flia Hnk ].
-now rewrite IHn.
+apply IHn.
+now apply Nat.lt_lt_succ_r.
 Qed.
 
+Theorem sub_lists_of_seq_0_n_out : ∀ n k,
+  n < k
+  → sub_lists_of_seq_0_n n k = [].
+Proof.
+intros * Hnk.
+now apply slszn_out.
+Qed.
+
+(* to be completed
 Theorem rank_of_sub_list_of_seq_0_n_out : ∀ n k t,
   n < k
   → rank_of_sub_list_of_seq_0_n n k t = 0.
@@ -263,11 +289,14 @@ Theorem rank_of_sub_list_of_seq_0_n_of_nth : ∀ n k i,
   → rank_of_sub_list_of_seq_0_n n k (nth i (sub_lists_of_seq_0_n n k) []) = i.
 Proof.
 intros * Hi.
+unfold sub_lists_of_seq_0_n.
+...
+intros * Hi.
 revert k i Hi.
 induction n; intros. {
   destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
 }
-cbn.
+cbn - [ sub_lists_of_seq_0_n ].
 rewrite sub_lists_of_seq_0_n_length.
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
 cbn in Hi.
@@ -573,6 +602,7 @@ apply Nat.nlt_ge in Hrb; apply Hrb.
 apply rank_of_sub_list_of_seq_0_n_ub.
 flia Hkn Hkn'.
 Qed.
+*)
 
 Section a.
 
@@ -599,6 +629,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(* to be completed
 Theorem sub_lists_of_seq_0_n_1_r : ∀ n,
   sub_lists_of_seq_0_n n 1 = map (λ i, [i]) (seq 0 n).
 Proof.
@@ -621,6 +652,7 @@ destruct Ht as [Ht| Ht]; [ easy | ].
 apply in_map_iff in Ht.
 now destruct Ht as (x & Hx & Hxn).
 Qed.
+*)
 
 (* to be completed
 Theorem sub_lists_of_seq_0_n_are_sorted : ∀ n k ll,
@@ -690,7 +722,6 @@ constructor. {
 apply IHl.
 now apply sorted_cons in H1.
 Qed.
-*)
 
 Theorem sub_lists_of_seq_0_n_is_inj : ∀ n k ll,
   ll = sub_lists_of_seq_0_n n k
@@ -707,7 +738,6 @@ specialize (H2 n k j Hj).
 congruence.
 Qed.
 
-(* to be completed
 Theorem sub_lists_of_seq_0_n_is_surj : ∀ n k ll,
   ll = sub_lists_of_seq_0_n n k
   → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
