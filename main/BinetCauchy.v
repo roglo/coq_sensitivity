@@ -35,11 +35,7 @@ Fixpoint sub_lists_of_seq_0_n (n k : nat) : list (list nat) :=
       end
   end.
 
-(* to be completed
 (*
-   j'aimerais un sub_lists_of_seq_0_n qui construise les listes dans
-   l'ordre canonique
-*)
 Compute (sub_lists_of_seq_0_n 4 2).
 Definition compare_eqb a b :=
   match a with
