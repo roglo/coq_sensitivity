@@ -211,26 +211,33 @@ intros * Hnk.
 now apply sls1n_out.
 Qed.
 
-(* to be completed
+Theorem rank_of_rsls1n_out : ∀ m n k t,
+  n < k → rsls1n m n k t = 0.
+Proof.
+intros * Hnk.
+revert t k Hnk.
+induction n; intros; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+cbn - [ "-" ].
+destruct t as [| a]; [ easy | ].
+rewrite sls1n_length.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]; [ now apply IHn | ].
+rewrite binomial_out; [ | easy ].
+apply IHn.
+now apply Nat.lt_lt_succ_r.
+Qed.
+
 Theorem rank_of_sub_list_of_seq_1_n_out : ∀ n k t,
   n < k
   → rank_of_sub_list_of_seq_1_n n k t = 0.
 Proof.
 intros * Hnk.
-revert t k Hnk.
-induction n; intros; cbn; [ now destruct k | ].
-destruct k; [ easy | ].
-apply Nat.succ_lt_mono in Hnk.
-rewrite sub_lists_of_seq_1_n_length.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (hd 0 t) n) as [Htn| Htn]. {
-  rewrite IHn; [ | easy ].
-  rewrite Nat.add_0_r.
-  rewrite binomial_out; [ easy | flia Hnk ].
-}
-apply IHn; flia Hnk.
+now apply rank_of_rsls1n_out.
 Qed.
 
+(* to be completed
 Theorem rank_of_sub_list_of_seq_1_n_ub : ∀ n k t,
   k ≤ n
   → rank_of_sub_list_of_seq_1_n n k t < binomial n k.
