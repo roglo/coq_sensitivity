@@ -279,6 +279,29 @@ intros.
 apply rank_of_rsls1n_ub.
 Qed.
 
+Theorem eq_nth_sls1n_nil : ∀ m n k i,
+  i < length (sls1n m n k)
+  → nth i (sls1n m n k) [] = []
+  → k = 0.
+Proof.
+intros * Hil His.
+rewrite sls1n_length in Hil.
+destruct k; [ easy | exfalso ].
+revert m k i Hil His.
+induction n; intros; cbn in His, Hil; [ easy | ].
+destruct (lt_dec i (binomial n k)) as [Hib| Hib]. {
+  rewrite app_nth1 in His; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []) in His; [ easy | ].
+  now rewrite sls1n_length.
+} {
+  apply Nat.nlt_ge in Hib.
+  rewrite app_nth2 in His; [ | now rewrite map_length, sls1n_length ].
+  rewrite map_length, sls1n_length in His.
+  apply IHn in His; [ easy | ].
+  flia Hil Hib.
+}
+Qed.
+
 (* to be completed
 Theorem rank_of_sub_lists_of_seq_1_n_of_nth : ∀ n k i,
   i < binomial n k
@@ -326,39 +349,68 @@ remember (nth j (sls1n m n (S k)) []) as t eqn:Ht.
 subst j.
 symmetry in Ht.
 destruct t as [| a]. {
-  destruct n. {
-    cbn in Hi.
-    destruct k; [ | easy ].
-    now apply Nat.lt_1_r in Hi.
+  apply eq_nth_sls1n_nil in Ht; [ easy | ].
+  rewrite sls1n_length; flia Hi Hik.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
+  subst a.
+  destruct n; cbn in Ht. {
+    now rewrite Tauto_match_nat_same in Ht.
   }
-  cbn in Ht.
   destruct k. {
-    cbn in Hi, Hik.
-    rewrite binomial_0_r, binomial_1_r in Hi.
-...
-    destruct (lt_dec 1 i) as [Hi2| Hi2]. 2: {
-      apply Nat.nlt_ge in Hi2.
-      apply Nat.le_antisymm in Hik; [ subst i | easy ].
-      cbn in Ht.
+    rewrite binomial_0_r, binomial_1_r in Hi; cbn in Hi |-*.
+    clear Hik IHn.
+    destruct i; [ easy | exfalso ].
+    apply Nat.succ_lt_mono in Hi.
+    rewrite Nat_sub_succ_1 in Ht.
+    revert m n Hi Hnm Ht.
+    induction i; intros. {
       rewrite app_nth1 in Ht. 2: {
         now rewrite map_length, sls1n_length, binomial_0_r.
       }
-      rewrite (List_map_nth' []) in Ht; [ easy | ].
-      now rewrite sls1n_length, binomial_0_r.
+      rewrite (List_map_nth' []) in Ht. 2: {
+        now rewrite sls1n_length, binomial_0_r.
+      }
+      injection Ht; clear Ht; intros Ht H.
+      flia H Hnm.
     }
+    apply Nat.succ_lt_mono in Hi.
     rewrite app_nth2 in Ht. 2: {
-      rewrite map_length, sls1n_length, binomial_0_r.
-      flia Hi2.
+      rewrite map_length, sls1n_length.
+      rewrite binomial_0_r.
+      now apply -> Nat.succ_le_mono.
     }
     rewrite map_length, sls1n_length, binomial_0_r in Ht.
+    rewrite Nat_sub_succ_1 in Ht.
+    destruct n; [ easy | ].
     cbn in Ht.
-    destruct n; [ flia Hi Hi2 | ].
+    destruct m; [ easy | ].
+    apply Nat.succ_le_mono in Hnm.
     cbn in Ht.
-    rewrite app_nth2 in Ht. 2: {
-      rewrite map_length, sls1n_length, binomial_0_r.
+(* bon, c'est peut-être faux, mon truc *)
 ...
-      flia Hi2.
+    specialize (IHi m n Hi Hnm).
+    rewrite Ht in IHi.
+...
+    destruct i. {
+      rewrite app_nth1 in Ht. 2: {
+        now rewrite map_length, sls1n_length, binomial_0_r.
+      }
+      rewrite (List_map_nth' []) in Ht. 2: {
+        now rewrite sls1n_length, binomial_0_r.
+      }
+      injection Ht; clear Ht; intros Ht H.
+      flia H Hnm.
     }
+...
+specialize (IHn m (S k) (i - binomial n k)) as H1.
+assert (H : i - binomial n k < binomial n (S k)) by flia Hi Hik.
+specialize (H1 H); clear H.
+assert (H : n ≤ m) by flia Hnm.
+specialize (H1 H); clear H.
+rewrite H1 in H1.
+(* tautologie in Ht *)
 ...
 remember (sls1n m n (S k)) as x eqn:Hx.
 cbn in Hx.
