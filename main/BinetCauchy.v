@@ -68,8 +68,8 @@ Fixpoint rslszn m n k (t : list nat) : nat :=
       match n with
       | 0 => 0
       | S n' =>
-          if hd 0 t =? m - n then
-            rslszn m n' k' (tl t) +
+          if hd 0 t =? 0 then
+            rslszn m n' k' (map pred (tl t)) +
             length (slszn m n' k)
           else
             rslszn m n' k t
