@@ -240,33 +240,50 @@ Qed.
 (* to be completed
 Theorem rank_of_sub_list_of_seq_1_n_ub : ∀ n k t,
   k ≤ n
+  → t ∈ sub_lists_of_seq_1_n n k
   → rank_of_sub_list_of_seq_1_n n k t < binomial n k.
 Proof.
-intros * Hkn.
-unfold rank_of_sub_list_of_seq_1_n.
+intros * Hkn Ht.
 Theorem rank_of_rsls1n_ub : ∀ m n k t,
   k ≤ n
+  → t ∈ sls1n m n k
   → rsls1n m n k t < binomial n k.
 Proof.
-intros * Hkn.
-revert k t Hkn.
+intros * Hkn Ht.
+revert k t Hkn Ht.
 induction n; intros. {
   now apply Nat.le_0_r in Hkn; subst k; cbn.
 }
 destruct k; cbn; [ easy | ].
 apply Nat.succ_le_mono in Hkn.
 destruct t as [| a]. {
-  apply Nat.add_pos_l.
-  apply Nat.neq_0_lt_0.
-...
+  apply Nat.add_pos_l, Nat.neq_0_lt_0.
+  clear IHn Ht.
+  revert k Hkn.
+  induction n; intros; cbn; [ now destruct k | ].
+  destruct k; [ easy | ].
+  apply Nat.succ_le_mono in Hkn.
+  specialize (IHn k Hkn).
+  now intros H; apply Nat.eq_add_0 in H.
+}
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
-  rewrite sub_lists_of_seq_1_n_length, Nat.add_comm.
-  apply Nat.add_lt_mono_r.
-  now apply IHn.
+destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
+  cbn in Ht.
+... oh puis zut
+  specialize (IHn _ (a :: t) Hkn).
+  specialize (IHn _ t Hkn).
+...
+  apply Nat.lt_lt_add_r.
 } {
+  rewrite sls1n_length.
+  apply Nat.add_lt_mono_l.
   destruct (Nat.eq_dec k n) as [Hk| Hk]. {
     subst k.
+    rewrite rank_of_rsls1n_out; [ | easy ].
+...
+Search rsls1n.
+...
+    rewrite rsls1n_out; [ | easy ].
     rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
     now rewrite binomial_diag.
   }
