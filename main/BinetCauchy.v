@@ -51,10 +51,10 @@ Fixpoint rsls1n (m : nat) n k (t : list nat) : nat :=
       end
   end.
 
-Definition rank_of_sub_list_of_seq_1_n n k t := rsls1n (S n) n k t.
+Definition rank_of_sub_lists_of_seq_1_n n k t := rsls1n (S n) n k t.
 
 (*
-Compute (let '(n,k) := (7,5) in let ll := sub_lists_of_seq_1_n n k in map (rank_of_sub_list_of_seq_1_n n k) ll).
+Compute (let '(n,k) := (7,5) in let ll := sub_lists_of_seq_1_n n k in map (rank_of_sub_lists_of_seq_1_n n k) ll).
 *)
 
 (* binomial *)
@@ -229,101 +229,115 @@ apply IHn.
 now apply Nat.lt_lt_succ_r.
 Qed.
 
-Theorem rank_of_sub_list_of_seq_1_n_out : ∀ n k t,
+Theorem rank_of_sub_lists_of_seq_1_n_out : ∀ n k t,
   n < k
-  → rank_of_sub_list_of_seq_1_n n k t = 0.
+  → rank_of_sub_lists_of_seq_1_n n k t = 0.
 Proof.
 intros * Hnk.
 now apply rank_of_rsls1n_out.
 Qed.
 
-(* to be completed
-Theorem rank_of_sub_list_of_seq_1_n_ub : ∀ n k t,
-  k ≤ n
-  → t ∈ sub_lists_of_seq_1_n n k
-  → rank_of_sub_list_of_seq_1_n n k t < binomial n k.
-Proof.
-intros * Hkn Ht.
 Theorem rank_of_rsls1n_ub : ∀ m n k t,
-  k ≤ n
-  → t ∈ sls1n m n k
-  → rsls1n m n k t < binomial n k.
+  rsls1n m n k t ≤ binomial n k.
 Proof.
-intros * Hkn Ht.
-revert k t Hkn Ht.
-induction n; intros. {
-  now apply Nat.le_0_r in Hkn; subst k; cbn.
-}
+intros.
+revert k t.
+induction n; intros; [ now destruct k | ].
 destruct k; cbn; [ easy | ].
-apply Nat.succ_le_mono in Hkn.
-destruct t as [| a]. {
-  apply Nat.add_pos_l, Nat.neq_0_lt_0.
-  clear IHn Ht.
-  revert k Hkn.
-  induction n; intros; cbn; [ now destruct k | ].
-  destruct k; [ easy | ].
-  apply Nat.succ_le_mono in Hkn.
-  specialize (IHn k Hkn).
-  now intros H; apply Nat.eq_add_0 in H.
-}
+destruct t as [| a]; [ easy | ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
-  cbn in Ht.
-... oh puis zut
-  specialize (IHn _ (a :: t) Hkn).
-  specialize (IHn _ t Hkn).
-...
-  apply Nat.lt_lt_add_r.
+  rewrite <- (Nat.add_0_r (rsls1n _ _ _ _)).
+  apply Nat.add_le_mono; [ | easy ].
+  apply IHn.
 } {
   rewrite sls1n_length.
-  apply Nat.add_lt_mono_l.
-  destruct (Nat.eq_dec k n) as [Hk| Hk]. {
-    subst k.
-    rewrite rank_of_rsls1n_out; [ | easy ].
-...
-Search rsls1n.
-...
-    rewrite rsls1n_out; [ | easy ].
-    rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
-    now rewrite binomial_diag.
-  }
-  transitivity (binomial n (S k)); [ apply IHn; flia Hkn Hk | ].
-  apply Nat.lt_add_pos_l.
-  specialize (IHn k [] Hkn).
-  flia IHn.
-}
-...
-intros * Hkn.
-revert k t Hkn.
-induction n; intros. {
-  now apply Nat.le_0_r in Hkn; subst k; cbn.
-}
-destruct k; cbn; [ easy | ].
-apply Nat.succ_le_mono in Hkn.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
-  rewrite sub_lists_of_seq_1_n_length, Nat.add_comm.
-  apply Nat.add_lt_mono_r.
-  now apply IHn.
-} {
-  destruct (Nat.eq_dec k n) as [Hk| Hk]. {
-    subst k.
-    rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
-    now rewrite binomial_diag.
-  }
-  transitivity (binomial n (S k)); [ apply IHn; flia Hkn Hk | ].
-  apply Nat.lt_add_pos_l.
-  specialize (IHn k [] Hkn).
-  flia IHn.
+  apply Nat.add_le_mono_l, IHn.
 }
 Qed.
 
-Theorem rank_of_sub_list_of_seq_1_n_of_nth : ∀ n k i,
+Theorem rank_of_sub_lists_of_seq_1_n_ub : ∀ n k t,
+  rank_of_sub_lists_of_seq_1_n n k t ≤ binomial n k.
+Proof.
+intros.
+apply rank_of_rsls1n_ub.
+Qed.
+
+(* to be completed
+Theorem rank_of_sub_lists_of_seq_1_n_of_nth : ∀ n k i,
   i < binomial n k
-  → rank_of_sub_list_of_seq_1_n n k (nth i (sub_lists_of_seq_1_n n k) []) = i.
+  → rank_of_sub_lists_of_seq_1_n n k (nth i (sub_lists_of_seq_1_n n k) []) = i.
 Proof.
 intros * Hi.
+Compute (
+  let n := 9 in
+  let k := 5 in
+  map (λ i,
+    Nat.eqb (rank_of_sub_lists_of_seq_1_n n k (nth i (sub_lists_of_seq_1_n n k) [])) i
+  ) (seq 0 (binomial n k))
+).
 unfold sub_lists_of_seq_1_n.
+unfold rank_of_sub_lists_of_seq_1_n.
+Theorem rsls1n_of_nth : ∀ m n k i,
+  i < binomial n k
+  → n ≤ m
+  → rsls1n m n k (nth i (sls1n m n k) []) = i.
+Proof.
+intros * Hi Hnm.
+revert k i Hi.
+induction n; intros. {
+  destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
+}
+cbn - [ sls1n ].
+destruct k; [ now apply Nat.lt_1_r in Hi | ].
+rewrite sls1n_length.
+cbn in Hi.
+...
+destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ n) as [Hlz| Hlz]; [ | now apply IHn ].
+  exfalso.
+  specialize (sub_lists_of_seq_1_n_lt n (S k)) as H1.
+  remember (sub_lists_of_seq_1_n n (S k)) as ll eqn:Hll.
+  specialize (H1 (nth i ll [])).
+  assert (H : nth i ll [] ∈ ll). {
+    now apply nth_In; rewrite Hll, sub_lists_of_seq_1_n_length.
+  }
+  specialize (H1 H); clear H.
+  specialize (H1 n).
+  assert (H : n ∈ nth i ll []). {
+    rewrite <- Hlz.
+    rewrite List_hd_nth_0.
+    apply nth_In.
+    rewrite Hll.
+    rewrite (sub_list_firstn_nat_length n (S k)); [ flia | ].
+    apply nth_In.
+    now rewrite sub_lists_of_seq_1_n_length.
+  }
+  specialize (H1 H).
+  now apply Nat.lt_irrefl in H1.
+}
+apply Nat.nlt_ge in Hik.
+rewrite app_nth2; [ | now rewrite sub_lists_of_seq_1_n_length ].
+rewrite sub_lists_of_seq_1_n_length.
+remember (i - binomial n (S k)) as j eqn:Hj.
+rewrite (List_map_nth' []). 2: {
+  rewrite sub_lists_of_seq_1_n_length; flia Hi Hik Hj.
+}
+cbn.
+rewrite Nat.eqb_refl.
+rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
+...
+Compute (
+  let n := 9 in
+  let k := 5 in
+  let m1 := 10 in
+  let m2 := 9 in
+  map (λ i,
+    Nat.eqb (rsls1n m1 n k (nth i (sls1n m2 n k) [])) i
+  ) (seq 0 (binomial n k))
+).
 ...
 intros * Hi.
 revert k i Hi.
@@ -371,16 +385,16 @@ rewrite Nat.eqb_refl.
 rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 Qed.
 
-Theorem nth_of_rank_of_sub_list_of_seq_1_n : ∀ n k t,
+Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
   sorted Nat.ltb (rev t)
   → length t = k
   → (∀ i, i ∈ t → i < n)
-  → nth (rank_of_sub_list_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
+  → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
 Proof.
 intros * Hs Htk Hlt.
 destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   apply Nat.nle_gt in Hkn.
-  rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
+  rewrite rank_of_sub_lists_of_seq_1_n_out; [ | easy ].
   rewrite sub_lists_of_seq_1_n_out; [ | easy ].
   cbn; symmetry.
   specialize (pigeonhole_list) as H1.
@@ -459,7 +473,7 @@ destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
   rewrite Nat.add_comm, Nat.add_sub.
   rewrite (List_map_nth' []). 2: {
     rewrite sub_lists_of_seq_1_n_length.
-    now apply rank_of_sub_list_of_seq_1_n_ub.
+    now apply rank_of_sub_lists_of_seq_1_n_ub.
   }
   destruct t as [| a]; [ easy | ].
   cbn in Hln; subst a.
@@ -478,12 +492,12 @@ destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
   specialize (Hs Nat_ltb_trans i n Hi (or_introl eq_refl)).
   now apply Nat.ltb_lt in Hs.
 }
-destruct (lt_dec (rank_of_sub_list_of_seq_1_n n (S k) t) (binomial n (S k)))
+destruct (lt_dec (rank_of_sub_lists_of_seq_1_n n (S k) t) (binomial n (S k)))
     as [Hrb| Hrb]. {
   rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
   destruct (Nat.eq_dec n k) as [Hnk| Hnk]. {
     subst k.
-    rewrite rank_of_sub_list_of_seq_1_n_out in Hrb; [ cbn in Hrb | easy ].
+    rewrite rank_of_sub_lists_of_seq_1_n_out in Hrb; [ cbn in Hrb | easy ].
     now rewrite binomial_out in Hrb.
   }
   apply IHn; [ easy | easy | | flia Hkn Hnk ].
@@ -530,11 +544,11 @@ rewrite (List_map_nth' []). 2: {
   rewrite sub_lists_of_seq_1_n_length.
   destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
     subst k.
-    rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
+    rewrite rank_of_sub_lists_of_seq_1_n_out; [ | easy ].
     now rewrite binomial_diag.
   }
   assert (H : S k ≤ n) by flia Hkn Hkn'.
-  specialize (rank_of_sub_list_of_seq_1_n_ub t H) as H1; clear H.
+  specialize (rank_of_sub_lists_of_seq_1_n_ub t H) as H1; clear H.
   flia Hrb H1.
 }
 exfalso.
@@ -633,7 +647,7 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
   now apply sorted_app in Hs.
 }
 apply Nat.nlt_ge in Hrb; apply Hrb.
-apply rank_of_sub_list_of_seq_1_n_ub.
+apply rank_of_sub_lists_of_seq_1_n_ub.
 flia Hkn Hkn'.
 Qed.
 *)
@@ -765,9 +779,9 @@ Proof.
 intros * Hll * Hi Hj Hij.
 rewrite Hll in Hi, Hj.
 rewrite sub_lists_of_seq_1_n_length in Hi, Hj.
-specialize rank_of_sub_list_of_seq_1_n_of_nth as H1.
+specialize rank_of_sub_lists_of_seq_1_n_of_nth as H1.
 specialize (H1 n k i Hi).
-specialize rank_of_sub_list_of_seq_1_n_of_nth as H2.
+specialize rank_of_sub_lists_of_seq_1_n_of_nth as H2.
 specialize (H2 n k j Hj).
 congruence.
 Qed.
@@ -778,7 +792,7 @@ Theorem sub_lists_of_seq_1_n_is_surj : ∀ n k ll,
 Proof.
 intros * Hll * Hl.
 specialize (sub_lists_of_seq_1_n_are_sorted n k Hll l Hl) as Hsort.
-specialize nth_of_rank_of_sub_list_of_seq_1_n as H1.
+specialize nth_of_rank_of_sub_lists_of_seq_1_n as H1.
 specialize (H1 n k l Hsort).
 assert (H : length l = k). {
   apply (sub_list_firstn_nat_length n).
@@ -786,7 +800,7 @@ assert (H : length l = k). {
 }
 specialize (H1 H); clear H.
 rewrite <- Hll in H1.
-exists (rank_of_sub_list_of_seq_1_n n k l).
+exists (rank_of_sub_lists_of_seq_1_n n k l).
 apply H1.
 intros i Hi.
 apply (sub_lists_of_seq_1_n_lt _ k l); [ | easy ].
