@@ -69,16 +69,23 @@ Fixpoint rslszn m n k (t : list nat) : nat :=
       | 0 => 0
       | S n' =>
           if hd 0 t =? m - n then
-            length (sub_lists_of_seq_0_n n' k) +
-            rslszn m n' k' (tl t)
+            rslszn m n' k' (tl t) +
+            length (slszn m n' k)
           else
-            rslszn m n' k t + 42
+            rslszn m n' k t
       end
   end.
 
-Print slszn.
-
 Definition rank_of_sub_list_of_seq_0_n n k t := rslszn n n k t.
+
+Print slszn.
+Compute (slszn 5 5 3).
+
+Compute (slszn 5 4 2).
+
+Compute (let '(n,k) := (5,3) in let ll := sub_lists_of_seq_0_n n k in rank_of_sub_list_of_seq_0_n n k [0;1;2]).
+
+Compute (let '(n,k) := (5,3) in let ll := sub_lists_of_seq_0_n n k in map (λ i, (i, rank_of_sub_list_of_seq_0_n n k (nth i ll []))) (seq 0 (length ll))).
 *)
 
 (*
