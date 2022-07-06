@@ -243,6 +243,40 @@ Theorem rank_of_sub_list_of_seq_1_n_ub : ∀ n k t,
   → rank_of_sub_list_of_seq_1_n n k t < binomial n k.
 Proof.
 intros * Hkn.
+unfold rank_of_sub_list_of_seq_1_n.
+Theorem rank_of_rsls1n_ub : ∀ m n k t,
+  k ≤ n
+  → rsls1n m n k t < binomial n k.
+Proof.
+intros * Hkn.
+revert k t Hkn.
+induction n; intros. {
+  now apply Nat.le_0_r in Hkn; subst k; cbn.
+}
+destruct k; cbn; [ easy | ].
+apply Nat.succ_le_mono in Hkn.
+destruct t as [| a]. {
+  apply Nat.add_pos_l.
+  apply Nat.neq_0_lt_0.
+...
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
+  rewrite sub_lists_of_seq_1_n_length, Nat.add_comm.
+  apply Nat.add_lt_mono_r.
+  now apply IHn.
+} {
+  destruct (Nat.eq_dec k n) as [Hk| Hk]. {
+    subst k.
+    rewrite rank_of_sub_list_of_seq_1_n_out; [ | easy ].
+    now rewrite binomial_diag.
+  }
+  transitivity (binomial n (S k)); [ apply IHn; flia Hkn Hk | ].
+  apply Nat.lt_add_pos_l.
+  specialize (IHn k [] Hkn).
+  flia IHn.
+}
+...
+intros * Hkn.
 revert k t Hkn.
 induction n; intros. {
   now apply Nat.le_0_r in Hkn; subst k; cbn.
