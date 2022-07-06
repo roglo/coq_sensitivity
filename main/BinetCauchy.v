@@ -278,50 +278,64 @@ Compute (
 ).
 unfold sub_lists_of_seq_1_n.
 unfold rank_of_sub_lists_of_seq_1_n.
+revert k i Hi.
+induction n; intros. {
+  destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
+}
+cbn - [ sls1n "-" ].
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite Nat.sub_diag.
+destruct k; [ now apply Nat.lt_1_r in Hi | ].
+rewrite sls1n_length.
+cbn in Hi.
+cbn - [ "-" ].
+destruct (lt_dec i (binomial n k)) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  rewrite Nat.eqb_refl.
+...
+  apply IHn; [ easy | flia Hnm ].
+}
+apply Nat.nlt_ge in Hik.
+rewrite app_nth2; rewrite map_length, sls1n_length; [ | easy ].
+remember (i - binomial n k) as j eqn:Hj.
+remember (nth j (sls1n m n (S k)) []) as t eqn:Ht.
+symmetry in Ht.
+destruct t as [| a]. {
+  destruct n. {
+    cbn in Ht.
+...
 Theorem rsls1n_of_nth : ∀ m n k i,
   i < binomial n k
   → n ≤ m
   → rsls1n m n k (nth i (sls1n m n k) []) = i.
 Proof.
 intros * Hi Hnm.
-revert k i Hi.
+revert m k i Hi Hnm.
 induction n; intros. {
   destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
 }
 cbn - [ sls1n ].
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
 rewrite sls1n_length.
-cbn in Hi.
-...
-destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
-  rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ n) as [Hlz| Hlz]; [ | now apply IHn ].
-  exfalso.
-  specialize (sub_lists_of_seq_1_n_lt n (S k)) as H1.
-  remember (sub_lists_of_seq_1_n n (S k)) as ll eqn:Hll.
-  specialize (H1 (nth i ll [])).
-  assert (H : nth i ll [] ∈ ll). {
-    now apply nth_In; rewrite Hll, sub_lists_of_seq_1_n_length.
-  }
-  specialize (H1 H); clear H.
-  specialize (H1 n).
-  assert (H : n ∈ nth i ll []). {
-    rewrite <- Hlz.
-    rewrite List_hd_nth_0.
-    apply nth_In.
-    rewrite Hll.
-    rewrite (sub_list_firstn_nat_length n (S k)); [ flia | ].
-    apply nth_In.
-    now rewrite sub_lists_of_seq_1_n_length.
-  }
-  specialize (H1 H).
-  now apply Nat.lt_irrefl in H1.
+cbn in Hi |-*.
+destruct (lt_dec i (binomial n k)) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
+  rewrite Nat.eqb_refl.
+  apply IHn; [ easy | flia Hnm ].
 }
 apply Nat.nlt_ge in Hik.
-rewrite app_nth2; [ | now rewrite sub_lists_of_seq_1_n_length ].
-rewrite sub_lists_of_seq_1_n_length.
-remember (i - binomial n (S k)) as j eqn:Hj.
+rewrite app_nth2; rewrite map_length, sls1n_length; [ | easy ].
+remember (i - binomial n k) as j eqn:Hj.
+remember (nth j (sls1n m n (S k)) []) as t eqn:Ht.
+symmetry in Ht.
+destruct t as [| a]. {
+  destruct n. {
+    cbn in Ht.
+...
 rewrite (List_map_nth' []). 2: {
   rewrite sub_lists_of_seq_1_n_length; flia Hi Hik Hj.
 }
