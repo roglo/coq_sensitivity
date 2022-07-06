@@ -61,20 +61,24 @@ Compute (sub_lists_of_seq_0_n 3 2, map (λ l, l ++ [3]) (sub_lists_of_seq_0_n 3 
 *)
 
 (* to be completed
-Fixpoint rank_of_sub_list_of_seq_0_n n k (t : list nat) : nat :=
+Fixpoint rslszn m n k (t : list nat) : nat :=
   match k with
   | 0 => 0
   | S k' =>
       match n with
       | 0 => 0
       | S n' =>
-          if hd 0 t =? n' then
+          if hd 0 t =? m - n then
             length (sub_lists_of_seq_0_n n' k) +
-            rank_of_sub_list_of_seq_0_n n' k' (tl t)
+            rslszn m n' k' (tl t)
           else
-            rank_of_sub_list_of_seq_0_n n' k t
+            rslszn m n' k t + 42
       end
   end.
+
+Print slszn.
+
+Definition rank_of_sub_list_of_seq_0_n n k t := rslszn n n k t.
 *)
 
 (*
