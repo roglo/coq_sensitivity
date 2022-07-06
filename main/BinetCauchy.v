@@ -29,69 +29,32 @@ Fixpoint sls1n (m n k : nat) : list (list nat) :=
   | S k' =>
       match n with
       | 0 => []
-      | S n' =>
-          map (λ l, m - n :: l) (sls1n m n' k') ++
-          sls1n m n' k
+      | S n' => map (λ l, m - n :: l) (sls1n m n' k') ++ sls1n m n' k
       end
   end.
 
 Definition sub_lists_of_seq_1_n (n k : nat) := sls1n (S n) n k.
 
-(*
-Compute (sub_lists_of_seq_1_n 5 3).
-Definition compare_eqb a b :=
-  match a with
-  | Eq => match b with Eq => true | _ => false end
-  | Lt => match b with Lt => true | _ => false end
-  | Gt => match b with Gt => true | _ => false end
-  end.
-Definition list_nat_ltb a b :=
-  compare_eqb (list_compare Nat.compare a b) Lt.
-Compute (isort list_nat_ltb (sub_lists_of_seq_1_n 4 2)).
-Compute (sub_lists_of_seq_1_n 4 2).
-Compute (sub_lists_of_seq_1_n 5 3).
-Compute (isort list_nat_ltb (sub_lists_of_seq_1_n 5 3)).
-
-Compute (sub_lists_of_seq_1_n 4 2).
-Compute (sub_lists_of_seq_1_n 3 2).
-Compute (map (map S) (sub_lists_of_seq_1_n 3 2)).
-Compute (sub_lists_of_seq_1_n 3 2 ++ map (λ l, l ++ [3]) (sub_lists_of_seq_1_n 3 1)).
-Compute (sub_lists_of_seq_1_n 3 2, map (λ l, l ++ [3]) (sub_lists_of_seq_1_n 3 1)).
-...
-*)
-
-(* to be completed
-Fixpoint rslszn m n k (t : list nat) : nat :=
+Fixpoint rsls1n (m : nat) n k (t : list nat) : nat :=
   match k with
   | 0 => 0
   | S k' =>
       match n with
       | 0 => 0
       | S n' =>
-          if hd 0 t =? 0 then
-            rslszn m n' k' (map pred (tl t)) +
-            length (slszn m n' k)
-          else
-            rslszn m n' k t
+          match t with
+          | [] => 0
+          | a :: t' =>
+              if a =? m - n then rsls1n m n' k' t'
+              else length (sls1n m n' k') + rsls1n m n' k t
+          end
       end
   end.
 
-Definition rank_of_sub_list_of_seq_1_n n k t := rslszn n n k t.
-
-Print slszn.
-Compute (slszn 5 5 3).
-
-Compute (slszn 5 4 2).
-
-Compute (let '(n,k) := (5,3) in let ll := sub_lists_of_seq_1_n n k in rank_of_sub_list_of_seq_1_n n k [0;1;2]).
-
-Compute (let '(n,k) := (5,3) in let ll := sub_lists_of_seq_1_n n k in map (λ i, (i, rank_of_sub_list_of_seq_1_n n k (nth i ll []))) (seq 0 (length ll))).
-*)
+Definition rank_of_sub_list_of_seq_1_n n k t := rsls1n (S n) n k t.
 
 (*
-Compute (let n := 5 in map (λ i, let l := sub_lists_of_seq_1_n n i in length l) (seq 0 (n + 3))).
-Compute (let n := 5 in map (λ i, let l := sub_lists_of_seq_1_n n i in (length l, l)) (seq 0 (n + 3))).
-Compute (let '(n,k) := (5,3) in let ll := sub_lists_of_seq_1_n n k in map (λ i, (i, rank_of_sub_list_of_seq_1_n n k (nth i ll []))) (seq 0 (length ll))).
+Compute (let '(n,k) := (7,5) in let ll := sub_lists_of_seq_1_n n k in map (rank_of_sub_list_of_seq_1_n n k) ll).
 *)
 
 (* binomial *)
