@@ -318,9 +318,10 @@ Compute (
 Compute (
   let n := 9 in
   let k := 5 in
-  let m := 9 in
+  let m1 := 9 in
+  let m2 := 9 in
   map (λ i,
-  Nat.eqb (rsls1n m n k (nth i (sls1n m n k) [])) i) (seq 0 (binomial n k))
+  Nat.eqb (rsls1n m1 n k (nth i (sls1n m2 n k) [])) i) (seq 0 (binomial n k))
 ).
 Theorem rsls1n_of_nth : ∀ m n k i,
   i < binomial n k
@@ -364,8 +365,8 @@ destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
     destruct i; [ easy | exfalso ].
     apply Nat.succ_lt_mono in Hi.
     rewrite Nat_sub_succ_1 in Ht.
-    revert m n Hi Hnm Ht.
-    induction i; intros. {
+(*1*)
+    destruct i; intros. {
       rewrite app_nth1 in Ht. 2: {
         now rewrite map_length, sls1n_length, binomial_0_r.
       }
@@ -388,11 +389,7 @@ destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
     destruct m; [ easy | ].
     apply Nat.succ_le_mono in Hnm.
     cbn in Ht.
-(* bon, c'est peut-être faux, mon truc *)
-...
-    specialize (IHi m n Hi Hnm).
-    rewrite Ht in IHi.
-...
+(*2*)
     destruct i. {
       rewrite app_nth1 in Ht. 2: {
         now rewrite map_length, sls1n_length, binomial_0_r.
@@ -402,6 +399,55 @@ destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
       }
       injection Ht; clear Ht; intros Ht H.
       flia H Hnm.
+    }
+    apply Nat.succ_lt_mono in Hi.
+    rewrite app_nth2 in Ht. 2: {
+      rewrite map_length, sls1n_length.
+      rewrite binomial_0_r.
+      now apply -> Nat.succ_le_mono.
+    }
+    rewrite map_length, sls1n_length, binomial_0_r in Ht.
+    rewrite Nat_sub_succ_1 in Ht.
+    destruct n; [ easy | ].
+    cbn in Ht.
+    destruct m; [ easy | ].
+    apply Nat.succ_le_mono in Hnm.
+    cbn in Ht.
+(*3*)
+    destruct i. {
+      rewrite app_nth1 in Ht. 2: {
+        now rewrite map_length, sls1n_length, binomial_0_r.
+      }
+      rewrite (List_map_nth' []) in Ht. 2: {
+        now rewrite sls1n_length, binomial_0_r.
+      }
+      injection Ht; clear Ht; intros Ht H.
+      destruct n; flia H Hnm.
+    }
+    apply Nat.succ_lt_mono in Hi.
+    rewrite app_nth2 in Ht. 2: {
+      rewrite map_length, sls1n_length.
+      rewrite binomial_0_r.
+      now apply -> Nat.succ_le_mono.
+    }
+    rewrite map_length, sls1n_length, binomial_0_r in Ht.
+    rewrite Nat_sub_succ_1 in Ht.
+    destruct n; [ easy | ].
+    cbn in Ht.
+    destruct m; [ easy | ].
+    apply Nat.succ_le_mono in Hnm.
+    cbn in Ht.
+(*4*)
+    destruct i. {
+      rewrite app_nth1 in Ht. 2: {
+        now rewrite map_length, sls1n_length, binomial_0_r.
+      }
+      rewrite (List_map_nth' []) in Ht. 2: {
+        now rewrite sls1n_length, binomial_0_r.
+      }
+      injection Ht; clear Ht; intros Ht H.
+      destruct n; [ flia H Hnm | ].
+      destruct n; flia H Hnm.
     }
 ...
 specialize (IHn m (S k) (i - binomial n k)) as H1.
