@@ -108,17 +108,24 @@ Definition rank_of_sub_lists_of_seq_1_n n k t := rsls1n n k (map_sub_succ n t).
 Compute (let '(n,k) := (7,5) in let ll := sub_lists_of_seq_1_n n k in map (rank_of_sub_lists_of_seq_1_n n k) ll).
 *)
 
+Theorem sls1n_length : ∀ n k,
+  length (sls1n n k) = binomial n k.
+Proof.
+intros.
+revert k.
+induction n; intros; [ now destruct k | ].
+destruct k; [ easy | cbn ].
+rewrite app_length, map_length.
+now rewrite IHn, IHn.
+Qed.
+
 Theorem sub_lists_of_seq_1_n_length : ∀ k n,
   length (sub_lists_of_seq_1_n n k) = binomial n k.
 Proof.
 intros.
 unfold sub_lists_of_seq_1_n.
 rewrite map_length.
-revert k.
-induction n; intros; [ now destruct k | ].
-destruct k; [ easy | cbn ].
-rewrite app_length, map_length.
-now rewrite IHn, IHn.
+apply sls1n_length.
 Qed.
 
 Theorem in_sub_lists_of_seq_1_n_length : ∀ n k t,
@@ -152,7 +159,32 @@ Qed.
 
 (* *)
 
-Theorem sub_lists_of_seq_1_n_lt : ∀ n k t,
+Theorem sls1n_bounds : ∀ n k t,
+  t ∈ sls1n n k
+  → ∀ a, a ∈ t → 1 ≤ a ≤ n.
+Proof.
+intros * Ht * Hat.
+revert k t Ht Hat.
+induction n; intros. {
+  destruct k; [ cbn in Ht | easy ].
+  destruct Ht; [ now subst t | easy ].
+}
+destruct k; cbn in Ht. {
+  destruct Ht; [ now subst t | easy ].
+}
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. 2: {
+  specialize (IHn (S k) t Ht Hat).
+  split; [ easy | flia IHn ].
+}
+apply in_map_iff in Ht.
+destruct Ht as (l & Hln & Hl); subst t.
+destruct Hat as [Hat| Hat]; [ subst a; flia | ].
+specialize (IHn k l Hl Hat) as H1.
+split; [ easy | flia H1 ].
+Qed.
+
+Theorem sub_lists_of_seq_1_n_bounds : ∀ n k t,
   t ∈ sub_lists_of_seq_1_n n k
   → ∀ a, a ∈ t → 1 ≤ a ≤ n.
 Proof.
@@ -165,23 +197,8 @@ unfold map_sub_succ in Hat.
 apply in_map_iff in Hat.
 destruct Hat as (b & H & Hat); subst a.
 rename b into a.
-revert k t Ht Hat.
-induction n; intros. {
-  destruct k; [ cbn in Ht | easy ].
-  destruct Ht; [ now subst t | easy ].
-}
-destruct k; cbn in Ht. {
-  destruct Ht; [ now subst t | easy ].
-}
-apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]. 2: {
-  specialize (IHn (S k) t Ht Hat).
-  flia IHn.
-}
-apply in_map_iff in Ht.
-destruct Ht as (l & Hln & Hl); subst t.
-destruct Hat as [Hat| Hat]; [ subst a; flia | ].
-specialize (IHn k l Hl Hat) as H1; flia H1.
+enough (H : 1 ≤ a ≤ n) by flia H.
+apply (sls1n_bounds n k t Ht _ Hat).
 Qed.
 
 (* *)
@@ -290,28 +307,60 @@ Compute (
 ).
 unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
 unfold map_sub_succ.
-rewrite (List_map_nth' []).
+rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
 rewrite map_map.
 erewrite map_ext_in. 2: {
   intros a Ha.
-Search (_ ∈ nth _ _ []).
-  replace (S n - (S n - a)) with a by flia.
-...
+  remember (nth i (sls1n n k) []) as t eqn:Ht.
+  specialize (sls1n_bounds n k t) as H1.
+  assert (H : t ∈ sls1n n k). {
+    now subst t; apply nth_In; rewrite sls1n_length.
+  }
+  specialize (H1 H _ Ha); clear H.
+  now replace (S n - (S n - a)) with a by flia H1.
+}
+rewrite map_id.
 Theorem rsls1n_of_nth : ∀ n k i,
-  i < length (sls1n n k)
+  i < binomial n k
   → rsls1n n k (nth i (sls1n n k) []) = i.
 Proof.
 intros * Hi.
+rewrite <- sls1n_length in Hi.
 revert k i Hi.
 induction n; intros. {
   destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
 }
 cbn - [ sls1n ].
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
-(**)
 remember (nth i (sls1n (S n) (S k)) []) as t eqn:Ht.
 symmetry in Ht.
 destruct t as [| a]; [ now apply eq_nth_sls1n_nil in Ht | ].
+...
+destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ n) as [Hlz| Hlz]; [ | now apply IHn ].
+  exfalso.
+  specialize (sub_lists_of_seq_1_n_lt n (S k)) as H1.
+  remember (sub_lists_of_seq_1_n n (S k)) as ll eqn:Hll.
+  specialize (H1 (nth i ll [])).
+  assert (H : nth i ll [] ∈ ll). {
+    now apply nth_In; rewrite Hll, sub_lists_of_seq_1_n_length.
+  }
+  specialize (H1 H); clear H.
+  specialize (H1 n).
+  assert (H : n ∈ nth i ll []). {
+    rewrite <- Hlz.
+    rewrite List_hd_nth_0.
+    apply nth_In.
+    rewrite Hll.
+    rewrite (sub_list_firstn_nat_length n (S k)); [ flia | ].
+    apply nth_In.
+    now rewrite sub_lists_of_seq_1_n_length.
+  }
+  specialize (H1 H).
+  now apply Nat.lt_irrefl in H1.
+}
 ...
 destruct t as [| a]. 2: {
   rewrite if_eqb_eq_dec.
