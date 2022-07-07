@@ -356,18 +356,6 @@ rewrite map_id.
 now apply rsls1n_of_nth_sls1n.
 Qed.
 
-(* to be completed
-Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
-  sorted Nat.ltb (rev t)
-  → length t = k
-  → (∀ i, i ∈ t → i < n)
-  → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
-Proof.
-intros * Hs Htk Hlt.
-unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
-unfold map_sub_succ.
-rewrite (List_map_nth' []). 2: {
-  rewrite sls1n_length.
 Theorem rsls1n_ub : ∀ n k t,
   t ∈ sls1n n k
   → rsls1n n k t < binomial n k.
@@ -400,6 +388,26 @@ destruct t as [| a]. {
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
   subst a.
+  specialize (sls1n_bounds n _ _ Ht _ (or_introl eq_refl)) as H1.
+  flia H1.
+}
+apply Nat.add_lt_mono_l.
+now apply IHn.
+Qed.
+
+(* to be completed
+Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
+  sorted Nat.ltb (rev t)
+  → length t = k
+  → (∀ i, i ∈ t → i < n)
+  → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
+Proof.
+intros * Hs Htk Hlt.
+unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
+unfold map_sub_succ.
+rewrite (List_map_nth' []). 2: {
+  rewrite sls1n_length.
+  apply rsls1n_ub.
 ...
 intros.
 revert k.
