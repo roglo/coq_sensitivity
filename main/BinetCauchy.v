@@ -350,57 +350,38 @@ destruct (Nat.eq_dec a (S n)) as [Ham| Ham]. {
     apply Nat.succ_lt_mono in Hi.
     rewrite Nat_sub_succ_1 in Ht.
     clear IHn Hi.
-(*1*)
-    destruct i; intros. {
-      rewrite app_nth1 in Ht. 2: {
-        now rewrite map_length; destruct n; cbn.
+    assert
+      (H : ∀ m,
+       ¬ nth i (map (λ l, S n :: l) (sls1n n 0) ++ sls1n n 1) [] =
+       2 + m + n :: t). {
+      clear Ht.
+      intros m Ht.
+      revert n m Ht.
+      induction i; intros. {
+        rewrite app_nth1 in Ht. 2: {
+          now rewrite map_length; destruct n; cbn.
+        }
+        rewrite (List_map_nth' []) in Ht; [ | now destruct n; cbn ].
+        injection Ht; clear Ht; intros Ht H.
+        flia H.
       }
-      rewrite (List_map_nth' []) in Ht; [ | now destruct n; cbn ].
-      injection Ht; clear Ht; intros Ht H.
-      flia H.
-    }
-    rewrite app_nth2 in Ht. 2: {
-      rewrite map_length; destruct n; cbn; flia.
-    }
-    rewrite map_length in Ht.
-    destruct n; cbn in Ht. {
-      now rewrite Tauto_match_nat_same in Ht.
-    }
-    rewrite Nat.sub_0_r in Ht.
-(*2*)
-    destruct i; intros. {
-      rewrite app_nth1 in Ht. 2: {
-        now rewrite map_length; destruct n; cbn.
+      rewrite app_nth2 in Ht. 2: {
+        rewrite map_length; destruct n; cbn; flia.
       }
-      rewrite (List_map_nth' []) in Ht; [ | now destruct n; cbn ].
-      injection Ht; clear Ht; intros Ht H.
-      flia H.
-    }
-    rewrite app_nth2 in Ht. 2: {
-      rewrite map_length; destruct n; cbn; flia.
-    }
-    rewrite map_length in Ht.
-    destruct n; cbn in Ht. {
-      now rewrite Tauto_match_nat_same in Ht.
-    }
-    rewrite Nat.sub_0_r in Ht.
-(*3*)
-    destruct i; intros. {
-      rewrite app_nth1 in Ht. 2: {
-        now rewrite map_length; destruct n; cbn.
+      rewrite map_length in Ht.
+      destruct n; cbn in Ht. {
+        now rewrite Tauto_match_nat_same in Ht.
       }
-      rewrite (List_map_nth' []) in Ht; [ | now destruct n; cbn ].
-      injection Ht; clear Ht; intros Ht H.
-      flia H.
+      rewrite Nat.sub_0_r in Ht.
+      rewrite Nat.add_succ_r in Ht.
+      now apply IHi with (n := n) (m := S m).
     }
-    rewrite app_nth2 in Ht. 2: {
-      rewrite map_length; destruct n; cbn; flia.
-    }
-    rewrite map_length in Ht.
-    destruct n; cbn in Ht. {
-      now rewrite Tauto_match_nat_same in Ht.
-    }
-    rewrite Nat.sub_0_r in Ht.
+    now apply (H 0).
+  }
+  cbn in Hi.
+  do 2 rewrite app_length in Hi.
+  do 2 rewrite map_length in Hi.
+  rewrite app_length, map_length in Ht.
 ...
 specialize (IHn m (S k) (i - binomial n k)) as H1.
 assert (H : i - binomial n k < binomial n (S k)) by flia Hi Hik.
