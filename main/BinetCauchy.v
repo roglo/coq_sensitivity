@@ -364,6 +364,55 @@ Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
   → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
 Proof.
 intros * Hs Htk Hlt.
+unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
+unfold map_sub_succ.
+rewrite (List_map_nth' []). 2: {
+  rewrite sls1n_length.
+Theorem rsls1n_ub : ∀ n k t,
+  t ∈ sls1n n k
+  → rsls1n n k t < binomial n k.
+Proof.
+intros * Ht.
+revert k t Ht.
+induction n; intros; [ now cbn; destruct k | ].
+cbn in Ht |-*.
+destruct k; [ easy | cbn ].
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. {
+  apply in_map_iff in Ht.
+  destruct Ht as (t' & H & Ht); subst t.
+  rename t' into t.
+  rewrite Nat.eqb_refl.
+  apply Nat.lt_lt_add_r.
+  now apply IHn.
+}
+destruct t as [| a]. {
+  destruct n; [ easy | ].
+  cbn in Ht.
+  apply in_app_iff in Ht.
+  destruct Ht as [Ht| Ht]. {
+...
+intros.
+revert k.
+induction n; intros; cbn. {
+  rewrite Tauto_match_nat_same.
+...
+rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  remember (nth i (sls1n n k) []) as t eqn:Ht.
+  specialize (sls1n_bounds n k t) as H1.
+  assert (H : t ∈ sls1n n k). {
+    now subst t; apply nth_In; rewrite sls1n_length.
+  }
+  specialize (H1 H _ Ha); clear H.
+  now replace (S n - (S n - a)) with a by flia H1.
+}
+rewrite map_id.
+now apply rsls1n_of_nth_sls1n.
+...
+intros * Hs Htk Hlt.
 destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   apply Nat.nle_gt in Hkn.
   rewrite rank_of_sub_lists_of_seq_1_n_out; [ | easy ].
