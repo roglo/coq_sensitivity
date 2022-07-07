@@ -325,42 +325,49 @@ Theorem rsls1n_of_nth : ∀ n k i,
   → rsls1n n k (nth i (sls1n n k) []) = i.
 Proof.
 intros * Hi.
-rewrite <- sls1n_length in Hi.
 revert k i Hi.
 induction n; intros. {
   destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
 }
-cbn - [ sls1n ].
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
-remember (nth i (sls1n (S n) (S k)) []) as t eqn:Ht.
-symmetry in Ht.
-destruct t as [| a]; [ now apply eq_nth_sls1n_nil in Ht | ].
+cbn in Hi |-*.
+destruct (lt_dec i (binomial n k)) as [Hik| Hik]. {
+  rewrite app_nth1; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
+  rewrite Nat.eqb_refl.
+  now apply IHn.
+}
+apply Nat.nlt_ge in Hik.
+rewrite app_nth2; rewrite map_length, sls1n_length; [ | easy ].
+remember (i - binomial n k) as j eqn:Hj.
+remember (nth j (sls1n n (S k)) []) as t eqn:Ht; symmetry in Ht.
+destruct t as [| a]. {
+  apply eq_nth_sls1n_nil in Ht; [ easy | ].
+  subst j; rewrite sls1n_length.
+  flia Hi Hik.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. 2: {
+  rewrite <- Ht, Hj.
+  rewrite IHn; [ | flia Hi Hik ].
+  rewrite Nat.add_sub_assoc; [ | easy ].
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+subst a.
 ...
-destruct (lt_dec i (binomial n (S k))) as [Hik| Hik]. {
-  rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ n) as [Hlz| Hlz]; [ | now apply IHn ].
-  exfalso.
-  specialize (sub_lists_of_seq_1_n_lt n (S k)) as H1.
-  remember (sub_lists_of_seq_1_n n (S k)) as ll eqn:Hll.
-  specialize (H1 (nth i ll [])).
-  assert (H : nth i ll [] ∈ ll). {
-    now apply nth_In; rewrite Hll, sub_lists_of_seq_1_n_length.
-  }
-  specialize (H1 H); clear H.
-  specialize (H1 n).
-  assert (H : n ∈ nth i ll []). {
-    rewrite <- Hlz.
-    rewrite List_hd_nth_0.
-    apply nth_In.
-    rewrite Hll.
-    rewrite (sub_list_firstn_nat_length n (S k)); [ flia | ].
+Theorem sub_list_firstn_nat_length : ∀ n k t,
+  t ∈ sub_lists_of_seq_0_n n k → length t = k.
+...
+Check sub_list_firstn_nat_length.
     apply nth_In.
     now rewrite sub_lists_of_seq_1_n_length.
-  }
-  specialize (H1 H).
-  now apply Nat.lt_irrefl in H1.
+...
+rewrite (List_map_nth' []). 2: {
+  rewrite sub_lists_of_seq_1_n_length; flia Hi Hik Hj.
 }
+cbn.
+rewrite Nat.eqb_refl.
+rewrite IHn; [ flia Hj Hik | flia Hi Hik Hj ].
 ...
 destruct t as [| a]. 2: {
   rewrite if_eqb_eq_dec.
