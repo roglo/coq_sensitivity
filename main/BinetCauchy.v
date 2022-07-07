@@ -299,6 +299,15 @@ induction n; intros. {
 }
 cbn - [ sls1n ].
 destruct k; [ now apply Nat.lt_1_r in Hi | ].
+(**)
+remember (nth i (sls1n (S n) (S k)) []) as t eqn:Ht.
+symmetry in Ht.
+destruct t as [| a]; [ now apply eq_nth_sls1n_nil in Ht | ].
+...
+destruct t as [| a]. 2: {
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. 2: {
+...
 cbn in Hi |-*.
 rewrite app_length, map_length in Hi.
 destruct (lt_dec i (length (sls1n n k))) as [Hik| Hik]. {
@@ -378,9 +387,7 @@ destruct (Nat.eq_dec a (S n)) as [Ham| Ham]. {
     }
     now apply (H 0).
   }
-  cbn in Hi.
-  do 2 rewrite app_length in Hi.
-  do 2 rewrite map_length in Hi.
+  rewrite app_length, map_length in Hik.
   rewrite app_length, map_length in Ht.
 ...
 specialize (IHn m (S k) (i - binomial n k)) as H1.
