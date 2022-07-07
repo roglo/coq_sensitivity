@@ -355,6 +355,18 @@ destruct t as [| a]. {
 }
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec a (m - S n)) as [Ham| Ham]. {
+(*
+2: {
+  cbn.
+  destruct n. {
+    cbn in Hi.
+    destruct k; [ | easy ].
+    now apply Nat.lt_1_r in Hi; subst i.
+  }
+  cbn - [ binomial ] in Ht; cbn.
+  destruct k.
+...
+*)
   subst a.
   destruct n; cbn in Ht. {
     now rewrite Tauto_match_nat_same in Ht.
