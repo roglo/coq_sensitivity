@@ -288,6 +288,15 @@ Compute (
   map (λ i,
   Nat.eqb (rsls1n n k (nth i (sls1n n k) [])) i) (seq 0 (binomial n k))
 ).
+unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
+unfold map_sub_succ.
+rewrite (List_map_nth' []).
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+Search (_ ∈ nth _ _ []).
+  replace (S n - (S n - a)) with a by flia.
+...
 Theorem rsls1n_of_nth : ∀ n k i,
   i < length (sls1n n k)
   → rsls1n n k (nth i (sls1n n k) []) = i.
