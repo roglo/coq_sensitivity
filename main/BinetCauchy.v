@@ -387,10 +387,19 @@ destruct Ht as [Ht| Ht]. {
   now apply IHn.
 }
 destruct t as [| a]. {
-  destruct n; [ easy | ].
+  exfalso; clear IHn.
+  induction n; [ easy | ].
   cbn in Ht.
   apply in_app_iff in Ht.
   destruct Ht as [Ht| Ht]. {
+    apply in_map_iff in Ht.
+    now destruct Ht as (t & H & _).
+  }
+  congruence.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
+  subst a.
 ...
 intros.
 revert k.
