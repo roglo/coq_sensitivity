@@ -417,7 +417,7 @@ rewrite (List_map_nth' []). 2: {
   rewrite sls1n_length.
   apply rsls1n_ub.
   remember (map (Nat.sub (S n)) t) as t' eqn:Ht'.
-  assert (H : ∀ i, i ∈ t' → 1 ≤ i ≤ n). {
+  assert (Hlt' : ∀ i, i ∈ t' → 1 ≤ i ≤ n). {
     intros i Hi.
     subst t'.
     apply in_map_iff in Hi.
@@ -425,17 +425,45 @@ rewrite (List_map_nth' []). 2: {
     specialize (Hlt j Hj).
     flia Hlt.
   }
-  move H before Hlt; clear Hlt; rename H into Hlt.
+  move t' before t; move Hlt' before Hlt.
   assert (H : sorted Nat.ltb (rev t')). {
     rewrite Ht'.
     rewrite <- map_rev.
-    clear - Hs.
+    clear - Hs Hlt.
     induction t as [| a]; [ easy | ].
     cbn - [ "-" ].
     rewrite map_app; cbn - [ "-" ].
-About sorted_app.
-...
-Search sorted.
+    apply (sorted_app_iff Nat_ltb_trans).
+    split. {
+      apply IHt. 2: {
+        intros i Hi.
+        now apply Hlt; right.
+      }
+      now apply sorted_cons in Hs.
+    }
+    split; [ easy | ].
+    intros b c Hb Hc.
+    apply Nat.ltb_lt.
+    destruct Hc; [ subst c | easy ].
+    apply in_map_iff in Hb.
+    destruct Hb as (c & H & Hc); subst b.
+    apply in_rev in Hc.
+    assert (Hcn : c ≤ S n). {
+      specialize (Hlt _ (or_intror Hc)).
+      flia Hlt.
+    }
+    enough (H : a < c) by flia Hcn H.
+    apply Nat.ltb_lt.
+    now apply (sorted_extends Nat_ltb_trans Hs).
+  }
+  move H before Hs; clear Hs; rename H into Hs.
+  clear Hlt; rename Hlt' into Hlt.
+  assert (H : length t' = k). {
+    now rewrite Ht', map_length.
+  }
+  move H before Htk; clear Htk; rename H into Htk.
+  clear t Ht'; rename t' into t.
+Search (_ ∈ sls1n _ _).
 ...
 intros.
 revert k.
@@ -478,6 +506,7 @@ destruct (le_dec k n) as [Hkn| Hkn]. 2: {
   induction t as [| a]; intros; [ easy | ].
   assert (H : sorted Nat.ltb (rev t)). {
     cbn in Hs.
+...
     now apply sorted_app in Hs.
   }
   specialize (IHt H); clear H.
@@ -549,10 +578,12 @@ destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
   f_equal.
   apply IHn; [ | easy | | easy ]. {
     cbn in Hs.
+...
     now apply sorted_app in Hs.
   }
   intros i Hi.
   cbn in Hs.
+...
   apply sorted_app in Hs.
   destruct Hs as (Ht & _ & Hs).
   apply in_rev in Hi.
@@ -711,6 +742,7 @@ destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
   f_equal.
   apply IHt; [ | easy | easy | easy ].
   cbn in Hs.
+...
   now apply sorted_app in Hs.
 }
 apply Nat.nlt_ge in Hrb; apply Hrb.
