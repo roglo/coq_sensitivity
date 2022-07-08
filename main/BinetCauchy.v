@@ -919,7 +919,6 @@ specialize (H2 n k j Hj).
 congruence.
 Qed.
 
-(* to be completed
 Theorem sub_lists_of_seq_1_n_is_surj : ∀ n k ll,
   ll = sub_lists_of_seq_1_n n k
   → (∀ l, l ∈ ll → ∃ i, nth i ll [] = l).
@@ -929,7 +928,7 @@ specialize (sub_lists_of_seq_1_n_are_sorted n k Hll l Hl) as Hsort.
 specialize nth_of_rank_of_sub_lists_of_seq_1_n as H1.
 specialize (H1 n k l Hsort).
 assert (H : length l = k). {
-  apply (sub_list_firstn_nat_length n).
+  apply (in_sub_lists_of_seq_1_n_length n).
   now rewrite <- Hll.
 }
 specialize (H1 H); clear H.
@@ -937,10 +936,11 @@ rewrite <- Hll in H1.
 exists (rank_of_sub_lists_of_seq_1_n n k l).
 apply H1.
 intros i Hi.
-apply (sub_lists_of_seq_1_n_lt _ k l); [ | easy ].
+apply (sub_lists_of_seq_1_n_bounds _ k l); [ | easy ].
 now rewrite <- Hll.
 Qed.
 
+(* to be completed
 Theorem sub_lists_of_seq_1_n_prop : ∀ n k ll,
   ll = sub_lists_of_seq_1_n n k
   → (∀ l, l ∈ ll → sorted Nat.ltb l) ∧
