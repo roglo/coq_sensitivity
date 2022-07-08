@@ -469,6 +469,8 @@ apply Nat.ltb_lt in Ht.
 flia Ht H1 H2.
 Qed.
 
+(* y a de la répétition, là-dedans, et en plus avec in_sls1n ;
+   ça me plaît pas trop *)
 Theorem nth_rsls1n_sls1n : ∀ n k t,
   sorted Nat.ltb (rev t)
   → length t = k
