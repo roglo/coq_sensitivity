@@ -395,7 +395,7 @@ apply Nat.add_lt_mono_l.
 now apply IHn.
 Qed.
 
-Theorem in_sls1n : ∀ n k t,
+Theorem sls1n_in : ∀ n k t,
   sorted Nat.ltb (rev t)
   → length t = k
   → (∀ i, i ∈ t → 1 ≤ i ≤ n)
@@ -469,143 +469,61 @@ apply Nat.ltb_lt in Ht.
 flia Ht H1 H2.
 Qed.
 
-(* to be completed
-Theorem in_sls1n_iff : ∀ n k t,
+Theorem in_sls1n : ∀ n k t,
   k ≠ 0
   → t ∈ sls1n n k
-    ↔ sorted Nat.ltb (rev t) ∧ length t = k ∧ (∀ i, i ∈ t → 1 ≤ i ≤ n).
+  → sorted Nat.ltb (rev t) ∧ length t = k ∧ (∀ i, i ∈ t → 1 ≤ i ≤ n).
 Proof.
-intros * Hkz.
-split. 2: {
-  intros (Hs & Htk & Hbnd).
-  now apply in_sls1n.
-} {
-  intros Ht.
-  destruct k; [ easy | clear Hkz ].
-  split. {
-    revert k Ht.
-    induction n; intros; [ easy | ].
-    cbn in Ht.
-    apply in_app_iff in Ht.
-    destruct Ht as [Ht| Ht]; [ | now apply (IHn k) ].
-    apply in_map_iff in Ht.
-    destruct Ht as (t' & H & Ht); subst t.
-    rename t' into t.
-    destruct n. {
-      cbn in Ht |-*.
-      destruct k; [ | easy ].
-      destruct Ht; [ now subst t | easy ].
-    }
-    destruct k. {
-      cbn in Ht.
-      destruct Ht; [ now subst t | easy ].
-    }
-    cbn in Ht.
-    apply in_app_iff in Ht.
-    destruct Ht as [Ht| Ht]. 2: {
-      apply (IHn (S k)).
-...
-    apply in_map_iff in Ht.
-    destruct Ht as (t' & H & Ht); subst t.
-    rename t' into t.
-    destruct n. {
-      cbn in Ht |-*.
-      destruct k; [ | easy ].
-      destruct Ht; [ now subst t | easy ].
-    }
-    destruct k. {
-      cbn in Ht.
-      destruct Ht; [ now subst t | easy ].
-    }
-    cbn in Ht.
-...
-    apply (IHn k).
-    destruct n. {
-      cbn.
-      cbn in Ht.
-      destruct k; [ | easy ].
-      destruct Ht; [ subst t | easy ].
-      cbn.
-...
-    destruct n. {
-      cbn in Ht.
-...
-    clear IHn.
-    revert k Ht.
-    induction n; intros. {
-      cbn in Ht.
-      destruct k; [ | easy ].
-      destruct Ht; [ subst t | easy ].
-      cbn.
-...
-intros * Hs Htk Hbnd.
-revert k t Hs Htk Hbnd.
-induction n; intros; cbn. {
-  destruct k. {
-    apply length_zero_iff_nil in Htk; subst t.
-    now left.
-  }
-  destruct t as [| a]; [ easy | ].
-  specialize (Hbnd _ (or_introl eq_refl)).
-  flia Hbnd.
-}
-destruct k. {
-  apply length_zero_iff_nil in Htk; subst t.
-  now left.
-}
-destruct t as [| a]; [ easy | cbn in Htk ].
-apply Nat.succ_inj in Htk.
-apply in_app_iff.
-destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
-  subst a; left.
-  apply in_map_iff.
-  exists t.
+intros * Hkz Ht.
+destruct k; [ easy | clear Hkz ].
+revert k t Ht.
+induction n; intros; [ easy | ].
+cbn in Ht.
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. 2: {
+  specialize (IHn k t Ht).
   split; [ easy | ].
-  apply IHn; [ | easy | ]. 2: {
-    intros i Hi.
-    specialize (Hbnd _ (or_intror Hi)).
+  split; [ easy | ].
+  intros i Hi.
+  destruct IHn as (_ & _ & IHn).
+  specialize (IHn _ Hi).
+  flia IHn.
+}
+apply in_map_iff in Ht.
+destruct Ht as (t' & H & Ht); subst t.
+rename t' into t; cbn.
+destruct k. {
+  destruct n. {
+    destruct Ht; [ subst t | easy ].
     split; [ easy | ].
-    destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ | flia Hbnd Hisn ].
-    subst i; exfalso; clear Hbnd.
-    cbn in Hs.
-    apply (sorted_app_iff Nat_ltb_trans) in Hs.
-    destruct Hs as (Hs & _ & Ht).
-    destruct t as [| a]; [ easy | ].
-    specialize (Ht a (S n)).
-    assert (H : a ∈ rev (a :: t)) by now apply -> in_rev; left.
-    specialize (Ht H (or_introl eq_refl)); clear H.
-    apply Nat.ltb_lt in Ht.
-    destruct Hi as [Hi| Hi]; [ now subst a; apply Nat.lt_irrefl in Ht | ].
-    cbn in Hs.
-    apply (sorted_app_iff Nat_ltb_trans) in Hs.
-    destruct Hs as (Hs & _ & Ht').
-    apply in_rev in Hi.
-    specialize (Ht' (S n) a Hi (or_introl eq_refl)).
-    apply Nat.ltb_lt in Ht'.
-    flia Ht Ht'.
+    split; [ easy | ].
+    intros i Hi.
+    destruct Hi; [ now subst i | easy ].
   }
-  cbn in Hs.
-  now apply (sorted_app_iff Nat_ltb_trans) in Hs.
+  cbn in Ht.
+  destruct Ht; [ subst t | easy ].
+  split; [ easy | ].
+  split; [ easy | ].
+  intros i Hi.
+  destruct Hi; [ subst i; flia | easy ].
 }
-right.
-apply IHn; [ easy | now cbn; f_equal | ].
+specialize (IHn _ _ Ht).
+destruct IHn as (Hs & Htk & Htb).
+split. {
+  apply (sorted_app_iff Nat_ltb_trans).
+  split; [ easy | ].
+  split; [ easy | ].
+  intros a b Ha Hb.
+  destruct Hb; [ subst b | easy ].
+  apply Nat.ltb_lt.
+  apply in_rev in Ha.
+  apply sls1n_bounds with (a := a) in Ht; [ flia Ht | easy ].
+}
+split; [ now f_equal | ].
 intros i Hi.
-destruct Hi as [Hi| Hi]. {
-  subst i.
-  specialize (Hbnd a (or_introl eq_refl)).
-  flia Hbnd Hasn.
-}
-specialize (Hbnd a (or_introl eq_refl)) as H1.
-specialize (Hbnd _ (or_intror Hi)) as H2.
-cbn in Hs.
-apply (sorted_app_iff Nat_ltb_trans) in Hs.
-destruct Hs as (Hs & _ & Ht).
-apply in_rev in Hi.
-specialize (Ht i a Hi (or_introl eq_refl)).
-apply Nat.ltb_lt in Ht.
-flia Ht H1 H2.
+destruct Hi as [Hi| Hi]; [ subst i; flia | ].
+specialize (Htb _ Hi); flia Htb.
 Qed.
-*)
 
 Theorem nth_rsls1n_sls1n : ∀ n k t,
   sorted Nat.ltb (rev t)
@@ -632,7 +550,7 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
   subst a.
   assert (Ht : t ∈ sls1n n k). {
-    apply in_sls1n; [ | easy | ]. {
+    apply sls1n_in; [ | easy | ]. {
       cbn in Hs.
       now apply (sorted_app_iff Nat_ltb_trans) in Hs.
     }
@@ -781,7 +699,7 @@ rewrite (List_map_nth' []). 2: {
   }
   move H before Htk; clear Htk; rename H into Htk.
   clear t Ht'; rename t' into t.
-  now apply in_sls1n.
+  now apply sls1n_in.
 }
 rewrite <- map_sub_involutive with (n := S n). 2: {
   intros a Ha.
@@ -928,7 +846,10 @@ unfold sub_lists_of_seq_1_n in Hl.
 apply in_map_iff in Hl.
 destruct Hl as (t & H & Ht).
 subst l.
+...
+Print sls1n.
 unfold map_sub_succ.
+apply in_sls1n in Ht.
 Search (_ ∈ sls1n _ _).
 About in_sls1n.
 ...
