@@ -762,19 +762,22 @@ rewrite seq_nth; [ | flia Hi ].
 flia Hi.
 Qed.
 
-(* to be completed
 Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
   k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
 Proof.
 intros * Hkz Ht Htz; subst t.
+unfold sub_lists_of_seq_1_n in Ht.
+apply in_map_iff in Ht.
+destruct Ht as (t & Hnt & Ht).
+unfold map_sub_succ in Hnt.
+apply map_eq_nil in Hnt; subst t.
 destruct k; [ easy | clear Hkz ].
 induction n; [ easy | cbn in Ht ].
 apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]; [ easy | ].
+destruct Ht as [Ht| Ht]; [ | easy ].
 apply in_map_iff in Ht.
 now destruct Ht as (x & Hx & Hxn).
 Qed.
-*)
 
 (* to be completed
 Theorem sub_lists_of_seq_1_n_are_sorted : ∀ n k ll,
