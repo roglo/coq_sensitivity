@@ -726,18 +726,25 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-(* to be completed
+Theorem sls1n_0_r : ∀ n, sls1n n 0 = [[]].
+Proof. now intros; destruct n. Qed.
+
+Theorem sls1n_1_r : ∀ n, sls1n n 1 = rev (map (λ i, [i]) (seq 1 n)).
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite seq_S.
+cbn; rewrite sls1n_0_r; cbn.
+rewrite map_app; cbn.
+rewrite rev_unit.
+now f_equal.
+Qed.
+
 Theorem sub_lists_of_seq_1_n_1_r : ∀ n,
   sub_lists_of_seq_1_n n 1 = map (λ i, [i]) (seq 1 n).
 Proof.
 intros.
 unfold sub_lists_of_seq_1_n.
-Print sls1n.
-Compute (sls1n 3 1).
-Theorem sls1n_1_r : ∀ n, sls1n n 1 = rev (map (λ i, [i]) (seq 1 n)).
-Proof.
-intros.
-... return
 rewrite sls1n_1_r.
 rewrite map_rev.
 rewrite map_map.
@@ -753,46 +760,9 @@ f_equal.
 rewrite rev_nth; rewrite seq_length; [ | easy ].
 rewrite seq_nth; [ | flia Hi ].
 flia Hi.
-...
-erewrite map_ext_in. 2: {
-  intros a Ha.
-  now cbn - [ "-" ].
-}
-rewrite <- rev_involutive.
-f_equal.
-rewrite <- map_rev.
-apply List_map_fun with (d := 0).
-Search (map _ _ = _).
-...
-Check map_sub_involutive.
-rewrite <- map_sub_involutive with (n := n) (t := map (λ i, [i]) (seq 1 n)). 2: {
-  intros a Ha.
-  specialize (Hlt _ Ha).
-  flia Hlt.
-}
-...
-rewrite sls1n_in
-
-induction n; [ easy | ].
-rewrite seq_S; cbn.
-rewrite map_app; cbn.
-rewrite map_map.
-rewrite map_app.
-f_equal. {
-  erewrite map_ext_in. 2: {
-    intros t Ht.
-    unfold map_sub_succ.
-    cbn - [ "-" ].
-    rewrite Nat.sub_succ_l; [ | easy ].
-    now rewrite Nat.sub_diag.
-  }
-  cbn - [ "-" ].
-...
-f_equal.
-rewrite <- IHn; f_equal.
-now rewrite sub_lists_of_seq_1_n_0_r.
 Qed.
 
+(* to be completed
 Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
   k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
 Proof.
