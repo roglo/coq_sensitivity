@@ -539,7 +539,49 @@ rewrite (List_map_nth' []). 2: {
   clear t Ht'; rename t' into t.
   now apply in_sls1n.
 }
-Search (nth _ (sls1n _ _)).
+remember (nth _ _ _) as t' eqn:Ht'; symmetry in Ht'.
+destruct t' as [| a]. {
+  apply eq_nth_sls1n_nil in Ht'. 2: {
+    rewrite sls1n_length.
+    apply rsls1n_ub.
+    apply in_sls1n; [ | now rewrite map_length | ]. 2: {
+      intros i Hi.
+      apply in_map_iff in Hi.
+      destruct Hi as (j & H & Hj); subst i.
+      specialize (Hlt _ Hj).
+      flia Hlt.
+    }
+    rewrite <- map_rev.
+    clear Htk Ht'.
+    induction t as [| a]; [ easy | ].
+    cbn - [ "-" ].
+    rewrite map_app.
+    cbn - [ "-" ].
+    apply (sorted_app_iff Nat_ltb_trans).
+    split. {
+      apply sorted_cons in Hs.
+      apply IHt; [ easy | ].
+      now intros i Hi; apply Hlt; right.
+    }
+    split; [ easy | ].
+    intros b c Hb Hc.
+    destruct Hc; [ subst c | easy ].
+    apply Nat.ltb_lt.
+    apply in_map_iff in Hb.
+    destruct Hb as (c & H & Hc); subst b.
+    apply in_rev in Hc.
+    assert (Hcn : c ≤ S n). {
+      specialize (Hlt _ (or_intror Hc)).
+      flia Hlt.
+    }
+    enough (H : a < c) by flia Hcn H.
+    apply Nat.ltb_lt.
+    now apply (sorted_extends Nat_ltb_trans Hs).
+  }
+  subst k.
+  now apply length_zero_iff_nil in Ht'; subst t.
+}
+cbn - [ "-" ].
 ...
 intros.
 revert k.
