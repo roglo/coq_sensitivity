@@ -3885,9 +3885,11 @@ Proof.
 intros * Hif *.
 unfold sub_lists_of_seq_1_n.
 (**)
+(*
 rewrite rngl_summation_list_map.
 remember (∑ (jl ∈ _), _) as x; subst x.
-revert k.
+*)
+revert f k.
 induction n; intros. {
   cbn.
   destruct k; cbn. {
@@ -3904,8 +3906,23 @@ destruct k. {
   rewrite rngl_summation_list_only_one.
   now rewrite rngl_summation_list_only_one.
 }
+rewrite map_app.
+rewrite map_map.
 rewrite rngl_summation_list_app.
+erewrite map_ext_in. 2: {
+  intros jl Hjl.
+  unfold map_sub_succ.
+(* oh pis zut *)
+...
 rewrite rngl_summation_list_map.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  cbn - [ "-" ].
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  easy.
+}
+cbn - [ list_prodn repeat seq ].
 ...
 erewrite map_ext_in. 2: {
   intros t Ht.
