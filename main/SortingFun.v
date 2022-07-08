@@ -169,48 +169,71 @@ specialize (sorted_extends Htra Hsort _ Ha) as H1.
 now rewrite Hirr in H1.
 Qed.
 
-Theorem sorted_app : ∀ A rel (la lb : list A),
-  sorted rel (la ++ lb)
-  → sorted rel la ∧ sorted rel lb ∧
-    (transitive rel → ∀ a b, a ∈ la → b ∈ lb → rel a b = true).
+Theorem sorted_app_iff : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ la lb,
+  sorted rel (la ++ lb) ↔
+  sorted rel la ∧ sorted rel lb ∧ (∀ a b, a ∈ la → b ∈ lb → rel a b = true).
 Proof.
-intros * Hab.
+intros * Htra *.
 split. {
-  revert lb Hab.
-  induction la as [| a1]; intros; [ easy | ].
-  destruct la as [| a2]; [ easy | ].
-  cbn in Hab.
-  apply sorted_cons_cons_true_iff in Hab.
-  apply sorted_cons_cons_true_iff.
-  destruct Hab as (Haa & Hab).
-  split; [ easy | ].
-  now apply (IHla lb).
-}
-split. {
-  revert lb Hab.
-  induction la as [| a1]; intros; [ easy | ].
-  destruct la as [| a2]. {
+  intros Hab.
+  split. {
+    revert lb Hab.
+    induction la as [| a1]; intros; [ easy | ].
+    destruct la as [| a2]; [ easy | ].
     cbn in Hab.
-    destruct lb as [| b1]; [ easy | ].
-    now apply Bool.andb_true_iff in Hab.
+    apply sorted_cons_cons_true_iff in Hab.
+    apply sorted_cons_cons_true_iff.
+    destruct Hab as (Haa & Hab).
+    split; [ easy | ].
+    now apply (IHla lb).
   }
-  cbn in Hab.
-  apply sorted_cons_cons_true_iff in Hab.
-  destruct Hab as (Haa & Hab).
-  now apply IHla.
+  split. {
+    revert lb Hab.
+    induction la as [| a1]; intros; [ easy | ].
+    destruct la as [| a2]. {
+      cbn in Hab.
+      destruct lb as [| b1]; [ easy | ].
+      now apply Bool.andb_true_iff in Hab.
+    }
+    cbn in Hab.
+    apply sorted_cons_cons_true_iff in Hab.
+    destruct Hab as (Haa & Hab).
+    now apply IHla.
+  } {
+    intros * Ha Hb.
+    revert a lb Ha Hab Hb.
+    induction la as [| a1]; intros; [ easy | ].
+    destruct Ha as [Ha| Ha]. 2: {
+      apply (IHla a lb); [ easy | | easy ].
+      cbn in Hab.
+      now apply sorted_cons in Hab.
+    }
+    subst a1.
+    cbn in Hab.
+    apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
+    now apply in_or_app; right.
+  }
 } {
-  intros Htrans * Ha Hb.
-  revert a lb Ha Hab Hb.
+  intros (Hla & Hlb & Hab).
+  revert lb Hlb Hab.
   induction la as [| a1]; intros; [ easy | ].
-  destruct Ha as [Ha| Ha]. 2: {
-    apply (IHla a lb); [ easy | | easy ].
-    cbn in Hab.
-    now apply sorted_cons in Hab.
+  assert (H : sorted rel la) by now apply sorted_cons in Hla.
+  specialize (IHla H); clear H.
+  destruct la as [| a2]; intros; cbn. {
+    unfold sorted; cbn.
+    destruct lb as [| b]; [ easy | ].
+    apply Bool.andb_true_iff.
+    split; [ | easy ].
+    now apply Hab; left.
   }
-  subst a1.
-  cbn in Hab.
-  apply sorted_extends with (l := la ++ lb); [ easy | easy | ].
-  now apply in_or_app; right.
+  apply sorted_cons_cons_true_iff in Hla.
+  apply sorted_cons_cons_true_iff.
+  split; [ easy | ].
+  apply IHla; [ easy | ].
+  intros * Ha Hb.
+  apply Hab; [ now right | easy ].
 }
 Qed.
 
@@ -1822,9 +1845,8 @@ Proof.
 intros * Hant Htra * Hla.
 revert a Hla.
 induction la as [| b] using rev_ind; intros; [ easy | cbn ].
-apply sorted_app in Hla.
+apply (sorted_app_iff Htra) in Hla.
 destruct Hla as (Hla & _ & Htrr).
-specialize (Htrr Htra).
 specialize (IHla _ Hla) as H1.
 destruct la as [| c]; cbn. {
   clear Hla H1.
@@ -1896,7 +1918,7 @@ assert (H : isort_insert rel a ls = ls ++ [a]). {
   clear IHl.
   assert (H : sorted rel (ls ++ [a])). {
     rewrite List_app_cons, app_assoc in Hs.
-    now apply sorted_app in Hs.
+    now apply (sorted_app_iff Htra) in Hs.
   }
   clear l Hs; rename H into Hs.
   now apply isort_insert_r_when_sorted.
@@ -2563,9 +2585,8 @@ intros * Htra * Hsort.
 rewrite (List_cons_is_app a) in Hsort.
 rewrite (List_cons_is_app b) in Hsort.
 rewrite app_assoc in Hsort.
-apply sorted_app in Hsort.
+apply (sorted_app_iff Htra) in Hsort.
 destruct Hsort as (Hla & Hsort & H1).
-specialize (H1 Htra).
 apply H1; [ now apply in_or_app; right; left | ].
 apply in_or_app; right.
 now apply in_or_app; left; left.

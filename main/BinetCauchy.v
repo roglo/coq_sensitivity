@@ -397,17 +397,45 @@ Qed.
 
 (* to be completed
 Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
-  sorted Nat.ltb (rev t)
+  sorted Nat.ltb t
   → length t = k
-  → (∀ i, i ∈ t → i < n)
+  → (∀ i, i ∈ t → 1 ≤ i ≤ n)
   → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
 Proof.
 intros * Hs Htk Hlt.
+(*
+Compute (
+  let n := 5 in
+  let k := 3 in
+let t := [1;1;4] in
+nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t
+).
+*)
 unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
 unfold map_sub_succ.
 rewrite (List_map_nth' []). 2: {
   rewrite sls1n_length.
   apply rsls1n_ub.
+  remember (map (Nat.sub (S n)) t) as t' eqn:Ht'.
+  assert (H : ∀ i, i ∈ t' → 1 ≤ i ≤ n). {
+    intros i Hi.
+    subst t'.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & H & Hj); subst i.
+    specialize (Hlt j Hj).
+    flia Hlt.
+  }
+  move H before Hlt; clear Hlt; rename H into Hlt.
+  assert (H : sorted Nat.ltb (rev t')). {
+    rewrite Ht'.
+    rewrite <- map_rev.
+    clear - Hs.
+    induction t as [| a]; [ easy | ].
+    cbn - [ "-" ].
+    rewrite map_app; cbn - [ "-" ].
+About sorted_app.
+...
+Search sorted.
 ...
 intros.
 revert k.

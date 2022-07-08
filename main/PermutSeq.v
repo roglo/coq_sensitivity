@@ -705,9 +705,9 @@ assert (Hal : a = length l). {
   specialize (H3 H); clear H.
   assert (H4 : ∀ c, c ∈ l → c ≤ a). {
     intros c Hc.
-    specialize (sorted_app _ _ Hs) as H4.
+    specialize (proj1 (sorted_app_iff Nat_leb_trans _ _) Hs) as H4.
     destruct H4 as (_ & _ & H4).
-    specialize (H4 Nat_leb_trans c a Hc (or_introl eq_refl)).
+    specialize (H4 c a Hc (or_introl eq_refl)).
     now apply Nat.leb_le in H4.
   }
   destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].
@@ -757,7 +757,7 @@ assert (Hal : a = length l). {
   easy.
 }
 rewrite Hal; f_equal.
-apply IHl; [ | apply (sorted_app l [a] Hs) ].
+apply IHl; [ | now apply (sorted_app_iff Nat_leb_trans) in Hs ].
 subst a.
 now apply is_permut_list_app_max.
 Qed.
