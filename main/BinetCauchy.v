@@ -3644,7 +3644,7 @@ Theorem cauchy_binet_formula : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → det (A * B) =
-     ∑ (jl ∈ map (map S) (sub_lists_of_seq_1_n n m)),
+     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
@@ -3654,11 +3654,10 @@ Require Import ZArith.
 Compute (
   let m := 2 in
   let n := 3 in
-map (map S) (sub_lists_of_seq_1_n n m)).
   let A := mk_mat [[1;2;3];[4;5;6]]%Z in
-  let B := mk_mat [[7;8];[9;10];[11;12]]%Z in
+  let B := mk_mat [[7;8];[9;-10];[11;12]]%Z in
      det (A * B) =
-     ∑ (jl ∈ map (map S) (sub_lists_of_seq_1_n n m)),
+     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
      det (mat_select_cols jl A) * det (mat_select_rows jl B)
 ).
 ...
@@ -3878,16 +3877,20 @@ cbn - [ det ].
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
 Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
-   ∀ m n f,
-   ∑ (jl ∈ map (map S) (sub_lists_of_seq_1_n n m)), f jl =
-   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+   ∀ n k f,
+   ∑ (jl ∈ sub_lists_of_seq_1_n n k), f jl =
+   ∑ (kl ∈ list_prodn (repeat (seq 1 n) k)),
    if is_sorted Nat.ltb kl then f kl else 0%F.
 Proof.
 intros * Hif *.
-revert m.
+unfold sub_lists_of_seq_1_n.
+(**)
+rewrite rngl_summation_list_map.
+remember (∑ (jl ∈ _), _) as x; subst x.
+revert k.
 induction n; intros. {
   cbn.
-  destruct m; cbn. {
+  destruct k; cbn. {
     rewrite rngl_summation_list_only_one.
     now rewrite rngl_summation_list_only_one.
   }
@@ -3896,13 +3899,22 @@ induction n; intros. {
   now rewrite iter_list_empty.
 }
 cbn - [ seq ].
-destruct m. {
+destruct k. {
   cbn.
   rewrite rngl_summation_list_only_one.
   now rewrite rngl_summation_list_only_one.
 }
-rewrite map_app.
 rewrite rngl_summation_list_app.
+rewrite rngl_summation_list_map.
+...
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  unfold map_sub_succ.
+  cbn - [ "-" ].
+  rewrite Nat.sub_succ_l; [ | easy ].
+  now rewrite Nat.sub_diag.
+}
+...
 rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
