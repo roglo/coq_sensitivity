@@ -856,7 +856,9 @@ destruct Hl as (t & H & Ht).
 subst l.
 apply in_sls1n_iff in Ht.
 destruct Ht as [(H1,H2) | Ht]; [ now subst k t | ].
-destruct Ht as (Hs & Htk & Ht)
+destruct Ht as (Hs & Htk & Ht).
+unfold map_sub_succ.
+Search (sorted _ (map _ _)).
 ...
 Print sls1n.
 unfold map_sub_succ.
