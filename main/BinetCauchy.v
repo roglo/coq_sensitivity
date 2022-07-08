@@ -469,22 +469,128 @@ apply Nat.ltb_lt in Ht.
 flia Ht H1 H2.
 Qed.
 
-(* to be completed
+Theorem nth_rsls1n_sls1n : ∀ n k t,
+  sorted Nat.ltb (rev t)
+  → length t = k
+  → (∀ i, i ∈ t → 1 ≤ i ≤ n)
+  → nth (rsls1n n k t) (sls1n n k) [] = t.
+Proof.
+intros * Hs Htk Hbnd.
+revert k t Hs Htk Hbnd.
+induction n; intros; cbn. {
+  destruct k. {
+    now apply length_zero_iff_nil in Htk; subst t.
+  }
+  destruct t as [| a]; [ easy | exfalso ].
+  specialize (Hbnd _ (or_introl eq_refl)).
+  flia Hbnd.
+}
+destruct k. {
+  now apply length_zero_iff_nil in Htk; subst t.
+}
+destruct t as [| a]; [ easy | cbn in Htk ].
+apply Nat.succ_inj in Htk.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
+  subst a.
+  assert (Ht : t ∈ sls1n n k). {
+    apply in_sls1n; [ | easy | ]. {
+      cbn in Hs.
+      now apply (sorted_app_iff Nat_ltb_trans) in Hs.
+    }
+    intros i Hi.
+    specialize (Hbnd _ (or_intror Hi)) as H2.
+    cbn in Hs.
+    apply (sorted_app_iff Nat_ltb_trans) in Hs.
+    destruct Hs as (Hs & _ & Ht).
+    apply in_rev in Hi.
+    specialize (Ht i _ Hi (or_introl eq_refl)).
+    apply Nat.ltb_lt in Ht.
+    flia Ht H2.
+  }
+  rewrite app_nth1. 2: {
+    rewrite map_length, sls1n_length.
+    now apply rsls1n_ub.
+  }
+  rewrite (List_map_nth' []). 2: {
+    rewrite sls1n_length.
+    now apply rsls1n_ub.
+  }
+  f_equal.
+  clear Ht.
+  apply IHn; [ | easy | ]. 2: {
+    intros i Hi.
+    specialize (Hbnd _ (or_intror Hi)).
+    split; [ easy | ].
+    destruct (Nat.eq_dec i (S n)) as [Hisn| Hisn]; [ | flia Hbnd Hisn ].
+    subst i; exfalso; clear Hbnd.
+    cbn in Hs.
+    apply (sorted_app_iff Nat_ltb_trans) in Hs.
+    destruct Hs as (Hs & _ & Ht).
+    destruct t as [| a]; [ easy | ].
+    specialize (Ht a (S n)).
+    assert (H : a ∈ rev (a :: t)) by now apply -> in_rev; left.
+    specialize (Ht H (or_introl eq_refl)); clear H.
+    apply Nat.ltb_lt in Ht.
+    destruct Hi as [Hi| Hi]; [ now subst a; apply Nat.lt_irrefl in Ht | ].
+    cbn in Hs.
+    apply (sorted_app_iff Nat_ltb_trans) in Hs.
+    destruct Hs as (Hs & _ & Ht').
+    apply in_rev in Hi.
+    specialize (Ht' (S n) a Hi (or_introl eq_refl)).
+    apply Nat.ltb_lt in Ht'.
+    flia Ht Ht'.
+  }
+  cbn in Hs.
+  now apply (sorted_app_iff Nat_ltb_trans) in Hs.
+}
+rewrite app_nth2. 2: {
+  rewrite map_length, sls1n_length; flia.
+}
+rewrite map_length, sls1n_length.
+rewrite Nat.add_comm, Nat.add_sub.
+apply IHn; [ easy | now cbn; f_equal | ].
+intros i Hi.
+destruct Hi as [Hi| Hi]. {
+  subst i.
+  specialize (Hbnd a (or_introl eq_refl)).
+  flia Hbnd Hasn.
+}
+specialize (Hbnd a (or_introl eq_refl)) as H1.
+specialize (Hbnd _ (or_intror Hi)) as H2.
+cbn in Hs.
+apply (sorted_app_iff Nat_ltb_trans) in Hs.
+destruct Hs as (Hs & _ & Ht).
+apply in_rev in Hi.
+specialize (Ht i a Hi (or_introl eq_refl)).
+apply Nat.ltb_lt in Ht.
+flia Ht H1 H2.
+Qed.
+
+Theorem map_sub_involutive : ∀ n t,
+  (∀ a, a ∈ t → a ≤ n)
+  → map (Nat.sub n) (map (Nat.sub n) t) = t.
+Proof.
+intros * Ht.
+induction t as [| a]; [ easy | cbn ].
+replace (n - (n - a)) with a. 2: {
+  specialize (Ht _ (or_introl eq_refl)).
+  flia Ht.
+}
+f_equal.
+apply IHt.
+intros b Hb.
+now apply Ht; right.
+Qed.
+
 Theorem nth_of_rank_of_sub_lists_of_seq_1_n : ∀ n k t,
   sorted Nat.ltb t
   → length t = k
   → (∀ i, i ∈ t → 1 ≤ i ≤ n)
-  → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t.
+  → nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] =
+    t.
 Proof.
 intros * Hs Htk Hlt.
-(*
-Compute (
-  let n := 5 in
-  let k := 3 in
-let t := [1;1;4] in
-nth (rank_of_sub_lists_of_seq_1_n n k t) (sub_lists_of_seq_1_n n k) [] = t
-).
-*)
 unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
 unfold map_sub_succ.
 rewrite (List_map_nth' []). 2: {
@@ -539,335 +645,61 @@ rewrite (List_map_nth' []). 2: {
   clear t Ht'; rename t' into t.
   now apply in_sls1n.
 }
-remember (nth _ _ _) as t' eqn:Ht'; symmetry in Ht'.
-destruct t' as [| a]. {
-  apply eq_nth_sls1n_nil in Ht'. 2: {
-    rewrite sls1n_length.
-    apply rsls1n_ub.
-    apply in_sls1n; [ | now rewrite map_length | ]. 2: {
-      intros i Hi.
-      apply in_map_iff in Hi.
-      destruct Hi as (j & H & Hj); subst i.
-      specialize (Hlt _ Hj).
-      flia Hlt.
-    }
-    rewrite <- map_rev.
-    clear Htk Ht'.
-    induction t as [| a]; [ easy | ].
-    cbn - [ "-" ].
-    rewrite map_app.
-    cbn - [ "-" ].
-    apply (sorted_app_iff Nat_ltb_trans).
-    split. {
-      apply sorted_cons in Hs.
-      apply IHt; [ easy | ].
-      now intros i Hi; apply Hlt; right.
-    }
-    split; [ easy | ].
-    intros b c Hb Hc.
-    destruct Hc; [ subst c | easy ].
-    apply Nat.ltb_lt.
-    apply in_map_iff in Hb.
-    destruct Hb as (c & H & Hc); subst b.
-    apply in_rev in Hc.
-    assert (Hcn : c ≤ S n). {
-      specialize (Hlt _ (or_intror Hc)).
-      flia Hlt.
-    }
-    enough (H : a < c) by flia Hcn H.
-    apply Nat.ltb_lt.
-    now apply (sorted_extends Nat_ltb_trans Hs).
-  }
-  subst k.
-  now apply length_zero_iff_nil in Ht'; subst t.
-}
-cbn - [ "-" ].
-...
-intros.
-revert k.
-induction n; intros; cbn. {
-  rewrite Tauto_match_nat_same.
-...
-rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
-rewrite map_map.
-erewrite map_ext_in. 2: {
+rewrite <- map_sub_involutive with (n := S n). 2: {
   intros a Ha.
-  remember (nth i (sls1n n k) []) as t eqn:Ht.
-  specialize (sls1n_bounds n k t) as H1.
-  assert (H : t ∈ sls1n n k). {
-    now subst t; apply nth_In; rewrite sls1n_length.
-  }
-  specialize (H1 H _ Ha); clear H.
-  now replace (S n - (S n - a)) with a by flia H1.
+  specialize (Hlt _ Ha).
+  flia Hlt.
 }
-rewrite map_id.
-now apply rsls1n_of_nth_sls1n.
-...
-intros * Hs Htk Hlt.
-destruct (le_dec k n) as [Hkn| Hkn]. 2: {
-  apply Nat.nle_gt in Hkn.
-  rewrite rank_of_sub_lists_of_seq_1_n_out; [ | easy ].
-  rewrite sub_lists_of_seq_1_n_out; [ | easy ].
-  cbn; symmetry.
-  specialize (pigeonhole_list) as H1.
-  specialize (H1 n t).
-  rewrite <- Htk in Hkn.
-  specialize (H1 Hkn Hlt).
-  remember (pigeonhole_comp_list t) as xx eqn:Hxx.
-  symmetry in Hxx.
-  destruct xx as (x, x').
-  specialize (H1 x x' eq_refl).
-  destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
-  exfalso; apply Hxx'; clear Hxx'.
-  clear - Hs Hx Hx' Hxxt.
-  revert x x' Hx Hx' Hxxt.
-  induction t as [| a]; intros; [ easy | ].
-  assert (H : sorted Nat.ltb (rev t)). {
-    cbn in Hs.
-...
-    now apply sorted_app in Hs.
-  }
-  specialize (IHt H); clear H.
-  destruct x. {
-    destruct x'; [ easy | exfalso ].
-    cbn in Hx', Hxxt.
-    apply Nat.succ_lt_mono in Hx'.
-    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
-    cbn in Hs.
-    apply NoDup_app_iff in Hs.
-    destruct Hs as (Hnd & _ & Hs).
-    specialize (Hs a).
-    assert (H : a ∈ rev t). {
-      rewrite Hxxt.
-      apply -> in_rev.
-      now apply nth_In.
-    }
-    specialize (Hs H).
-    now apply Hs; left.
-  }
-  cbn in Hx.
-  apply Nat.succ_lt_mono in Hx.
-  destruct x'. {
-    exfalso.
-    cbn in Hxxt; symmetry in Hxxt.
-    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
-    cbn in Hs.
-    apply NoDup_app_iff in Hs.
-    destruct Hs as (Hnd & _ & Hs).
-    specialize (Hs a).
-    assert (H : a ∈ rev t). {
-      rewrite Hxxt.
-      apply -> in_rev.
-      now apply nth_In.
-    }
-    specialize (Hs H).
-    now apply Hs; left.
-  }
-  cbn in Hx', Hxxt.
-  apply Nat.succ_lt_mono in Hx'.
-  f_equal.
-  now apply IHt.
-}
-revert k t Hs Htk Hlt Hkn.
-induction n; intros. {
-  apply Nat.le_0_r in Hkn; subst k.
-  now apply length_zero_iff_nil in Hkn; subst t.
-}
-destruct k. {
-  now apply length_zero_iff_nil in Htk; subst t.
-}
-apply Nat.succ_le_mono in Hkn.
-cbn.
-...
-rewrite sub_lists_of_seq_1_n_length.
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (hd 0 t) n) as [Hln| Hln]. {
-  rewrite app_nth2; [ | rewrite sub_lists_of_seq_1_n_length; flia ].
-  rewrite sub_lists_of_seq_1_n_length.
-  rewrite Nat.add_comm, Nat.add_sub.
-  rewrite (List_map_nth' []). 2: {
-    rewrite sub_lists_of_seq_1_n_length.
-    now apply rank_of_sub_lists_of_seq_1_n_ub.
-  }
-  destruct t as [| a]; [ easy | ].
-  cbn in Hln; subst a.
-  cbn in Htk |-*.
-  apply Nat.succ_inj in Htk.
-  f_equal.
-  apply IHn; [ | easy | | easy ]. {
-    cbn in Hs.
-...
-    now apply sorted_app in Hs.
-  }
+f_equal.
+remember (map (Nat.sub (S n)) t) as t' eqn:Ht'.
+assert (Hlt' : ∀ i, i ∈ t' → 1 ≤ i ≤ n). {
   intros i Hi.
-  cbn in Hs.
-...
-  apply sorted_app in Hs.
-  destruct Hs as (Ht & _ & Hs).
-  apply in_rev in Hi.
-  specialize (Hs Nat_ltb_trans i n Hi (or_introl eq_refl)).
-  now apply Nat.ltb_lt in Hs.
+  subst t'.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & H & Hj); subst i.
+  specialize (Hlt j Hj).
+  flia Hlt.
 }
-destruct (lt_dec (rank_of_sub_lists_of_seq_1_n n (S k) t) (binomial n (S k)))
-    as [Hrb| Hrb]. {
-  rewrite app_nth1; [ | now rewrite sub_lists_of_seq_1_n_length ].
-  destruct (Nat.eq_dec n k) as [Hnk| Hnk]. {
-    subst k.
-    rewrite rank_of_sub_lists_of_seq_1_n_out in Hrb; [ cbn in Hrb | easy ].
-    now rewrite binomial_out in Hrb.
+move t' before t; move Hlt' before Hlt.
+assert (H : sorted Nat.ltb (rev t')). {
+  rewrite Ht'.
+  rewrite <- map_rev.
+  clear - Hs Hlt.
+  induction t as [| a]; [ easy | ].
+  cbn - [ "-" ].
+  rewrite map_app; cbn - [ "-" ].
+  apply (sorted_app_iff Nat_ltb_trans).
+  split. {
+    apply IHt. 2: {
+      intros i Hi.
+      now apply Hlt; right.
+    }
+    now apply sorted_cons in Hs.
   }
-  apply IHn; [ easy | easy | | flia Hkn Hnk ].
-  intros i Hi.
-  clear - Hs Hlt Hln Hi.
-  specialize (Hlt i Hi) as H1.
-  destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
-  subst i; exfalso; clear H1.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (m & Hmt & Hmn).
-  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-    now subst m; rewrite List_hd_nth_0 in Hln.
+  split; [ easy | ].
+  intros b c Hb Hc.
+  apply Nat.ltb_lt.
+  destruct Hc; [ subst c | easy ].
+  apply in_map_iff in Hb.
+  destruct Hb as (c & H & Hc); subst b.
+  apply in_rev in Hc.
+  assert (Hcn : c ≤ S n). {
+    specialize (Hlt _ (or_intror Hc)).
+    flia Hlt.
   }
-  assert (Hmtl : nth m t 0 < hd 0 t). {
-    rewrite List_hd_nth_0.
-    specialize (sorted_any Nat_ltb_trans Hs) as H1.
-    specialize (H1 (length t - S m) (length t - 1) 0).
-    assert (H : length t - S m < length t - 1) by flia Hmz Hmt.
-    specialize (H1 H); clear H.
-    rewrite rev_length in H1.
-    assert (H : length t - 1 < length t) by flia Hmt.
-    specialize (H1 H); clear H.
-    rewrite rev_nth in H1; [ | flia Hmt ].
-    rewrite rev_nth in H1; [ | flia Hmt ].
-    rewrite <- Nat.sub_succ_l in H1; [ | easy ].
-    rewrite <- Nat.sub_succ_l in H1; [ | flia Hmt ].
-    do 2 rewrite Nat.sub_succ in H1.
-    replace (length t - (length t - m)) with m in H1 by flia Hmt.
-    rewrite Nat.sub_0_r, Nat.sub_diag in H1.
-    now apply Nat.ltb_lt in H1.
-  }
-  rewrite Hmn in Hmtl.
-  apply Nat.nle_gt in Hmtl; apply Hmtl; clear Hmtl.
-  apply Nat.lt_succ_r.
-  apply Hlt.
-  rewrite List_hd_nth_0.
-  apply nth_In.
-  flia Hmt.
+  enough (H : a < c) by flia Hcn H.
+  apply Nat.ltb_lt.
+  now apply (sorted_extends Nat_ltb_trans Hs).
 }
-apply Nat.nlt_ge in Hrb.
-rewrite app_nth2; [ | now rewrite sub_lists_of_seq_1_n_length ].
-rewrite sub_lists_of_seq_1_n_length.
-rewrite (List_map_nth' []). 2: {
-  rewrite sub_lists_of_seq_1_n_length.
-  destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
-    subst k.
-    rewrite rank_of_sub_lists_of_seq_1_n_out; [ | easy ].
-    now rewrite binomial_diag.
-  }
-  assert (H : S k ≤ n) by flia Hkn Hkn'.
-  specialize (rank_of_sub_lists_of_seq_1_n_ub t H) as H1; clear H.
-  flia Hrb H1.
+move H before Hs; clear Hs; rename H into Hs.
+clear Hlt; rename Hlt' into Hlt.
+assert (H : length t' = k). {
+  now rewrite Ht', map_length.
 }
-exfalso.
-destruct (Nat.eq_dec k n) as [Hkn'| Hkn']. {
-  subst k; clear Hrb Hkn.
-  specialize (pigeonhole_list) as H1.
-  specialize (H1 n t).
-  assert (H : n < length t) by flia Htk.
-  specialize (H1 H); clear H.
-  assert (H : ∀ x, x ∈ t → x < n). {
-    intros x Hx.
-    specialize (Hlt x Hx) as H2.
-    destruct (Nat.eq_dec x n) as [Hxn| Hxn]; [ | flia H2 Hxn ].
-    subst x.
-    clear H2.
-    exfalso; clear IHn H1.
-    apply (In_nth _ _ 0) in Hx.
-    destruct Hx as (i & Hi & Hin).
-    destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
-      now subst i; rewrite List_hd_nth_0 in Hln.
-    }
-    specialize (sorted_any Nat_ltb_trans Hs) as H1.
-    rewrite rev_length in H1.
-    specialize (H1 (length t - S i) (length t - 1) 0).
-    assert (H : length t - S i < length t - 1) by flia Hi Hiz.
-    specialize (H1 H); clear H.
-    assert (H : length t - 1 < length t) by flia Hi.
-    specialize (H1 H); clear H.
-    rewrite rev_nth in H1; [ | flia Hi ].
-    rewrite rev_nth in H1; [ | flia Hi ].
-    rewrite <- Nat.sub_succ_l in H1; [ | flia Hi ].
-    rewrite Nat.sub_succ in H1.
-    rewrite <- Nat.sub_succ_l in H1; [ | flia Hi ].
-    rewrite Nat_sub_succ_1, Nat.sub_diag in H1.
-    replace (length t - (length t - i)) with i in H1 by flia Hi.
-    rewrite Hin in H1.
-    apply Nat.ltb_lt in H1.
-    specialize (Hlt (nth 0 t 0)).
-    assert (H : nth 0 t 0 ∈ t). {
-      apply nth_In; flia Hi.
-    }
-    specialize (Hlt H); clear H.
-    flia Hlt H1.
-  }
-  specialize (H1 H); clear H.
-  remember (pigeonhole_comp_list t) as xx eqn:Hxx.
-  symmetry in Hxx.
-  destruct xx as (x, x').
-  specialize (H1 x x' eq_refl).
-  destruct H1 as (Hx & Hx' & Hxx' & Hxxt).
-  exfalso; apply Hxx'; clear Hxx'.
-  clear - Hs Hx Hx' Hxxt.
-  revert x x' Hx Hx' Hxxt.
-  induction t as [| a]; intros; [ easy | ].
-  destruct x. {
-    destruct x'; [ easy | exfalso ].
-    cbn in Hx'.
-    apply Nat.succ_lt_mono in Hx'.
-    cbn in Hxxt.
-    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
-    cbn in Hs.
-    apply NoDup_app_iff in Hs.
-    destruct Hs as (Hnd & _ & Hs).
-    specialize (Hs a).
-    assert (H : a ∈ rev t). {
-      rewrite Hxxt.
-      apply -> in_rev.
-      now apply nth_In.
-    }
-    specialize (Hs H).
-    now apply Hs; left.
-  }
-  cbn in Hx.
-  apply Nat.succ_lt_mono in Hx.
-  destruct x'. {
-    exfalso.
-    cbn in Hxxt; symmetry in Hxxt.
-    apply (sorted_lt_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hs.
-    cbn in Hs.
-    apply NoDup_app_iff in Hs.
-    destruct Hs as (Hnd & _ & Hs).
-    specialize (Hs a).
-    assert (H : a ∈ rev t). {
-      rewrite Hxxt.
-      apply -> in_rev.
-      now apply nth_In.
-    }
-    specialize (Hs H).
-    now apply Hs; left.
-  }
-  cbn in Hx', Hxxt.
-  apply Nat.succ_lt_mono in Hx'.
-  f_equal.
-  apply IHt; [ | easy | easy | easy ].
-  cbn in Hs.
-...
-  now apply sorted_app in Hs.
-}
-apply Nat.nlt_ge in Hrb; apply Hrb.
-apply rank_of_sub_lists_of_seq_1_n_ub.
-flia Hkn Hkn'.
+move H before Htk; clear Htk; rename H into Htk.
+clear t Ht'; rename t' into t.
+now apply nth_rsls1n_sls1n.
 Qed.
-*)
 
 Section a.
 
