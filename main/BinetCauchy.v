@@ -940,7 +940,6 @@ apply (sub_lists_of_seq_1_n_bounds _ k l); [ | easy ].
 now rewrite <- Hll.
 Qed.
 
-(* to be completed
 Theorem sub_lists_of_seq_1_n_prop : ∀ n k ll,
   ll = sub_lists_of_seq_1_n n k
   → (∀ l, l ∈ ll → sorted Nat.ltb l) ∧
@@ -960,11 +959,13 @@ split. {
 }
 Qed.
 
+(* to be completed
 Theorem sub_lists_of_seq_1_n_diag : ∀ n, sub_lists_of_seq_1_n n n = [seq 0 n].
 Proof.
 intros.
 induction n; [ easy | ].
 rewrite seq_S; cbn.
+...
 rewrite sub_lists_of_seq_1_n_out; [ | easy ].
 now rewrite IHn.
 Qed.
