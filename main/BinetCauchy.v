@@ -804,6 +804,28 @@ rewrite rev_unit.
 now f_equal.
 Qed.
 
+Theorem sls1n_lt : ∀ n k, n < k → sls1n n k = [].
+Proof.
+intros * Hnk.
+revert k Hnk.
+induction n; intros; cbn; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ cbn | easy ].
+apply IHn; flia Hnk.
+Qed.
+
+Theorem sls1n_diag : ∀ n, sls1n n n = [rev (seq 1 n)].
+Proof.
+intros.
+induction n; [ easy | ].
+rewrite seq_S.
+cbn; rewrite IHn; cbn.
+rewrite rev_app_distr.
+f_equal.
+now apply sls1n_lt.
+Qed.
+
 Theorem sub_lists_of_seq_1_n_1_r : ∀ n,
   sub_lists_of_seq_1_n n 1 = map (λ i, [i]) (seq 1 n).
 Proof.
@@ -825,6 +847,76 @@ rewrite rev_nth; rewrite seq_length; [ | easy ].
 rewrite seq_nth; [ | flia Hi ].
 flia Hi.
 Qed.
+
+(* to be completed
+Theorem sub_lists_of_seq_1_n_diag : ∀ n,
+  sub_lists_of_seq_1_n n n = [seq 1 n].
+Proof.
+intros.
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag; cbn; f_equal.
+unfold map_sub_succ.
+rewrite map_rev.
+Check List_map_fun.
+...
+enough (H : sls1n n n = [rev (seq 1 n)]). {
+  rewrite H; cbn; f_equal.
+  unfold map_sub_succ.
+  clear H.
+  rewrite map_rev.
+  rewrite <- rev_involutive; f_equal.
+Search (map _ (seq _ _)).
+...
+sls1n_1_r: ∀ n : nat, sls1n n 1 = rev (map (λ i : nat, [i]) (seq 1 n))
+...
+  induction n; [ easy | ].
+  rewrite seq_S at 1.
+  rewrite rev_app_distr.
+  cbn - [ seq "-" ].
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  cbn - [ "-" ].
+  f_equal.
+...
+  rewrite map_rev.
+...
+
+ by now rewrite H.
+revert k Hnk.
+induction n; intros; cbn; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | flia Hnk ].
+apply IHn.
+now apply Nat.lt_lt_succ_r.
+...
+induction n; [ easy | ].
+rewrite seq_S; cbn.
+rewrite map_app.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  unfold map_sub_succ.
+  cbn - [ "-" ].
+  rewrite Nat.sub_succ_l; [ | easy ].
+  rewrite Nat.sub_diag.
+  easy.
+}
+...
+enough (H : sls1n n n = []) by now rewrite H.
+revert k Hnk.
+induction n; intros; cbn; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk.
+rewrite IHn; [ | flia Hnk ].
+apply IHn.
+now apply Nat.lt_lt_succ_r.
+Check sub_lists_of_seq_1_n_out.
+...
+rewrite sub_lists_of_seq_1_n_out; [ | easy ].
+now rewrite IHn.
+Qed.
+*)
 
 Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
   k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
@@ -958,18 +1050,6 @@ split. {
   now apply (sub_lists_of_seq_1_n_is_surj n k).
 }
 Qed.
-
-(* to be completed
-Theorem sub_lists_of_seq_1_n_diag : ∀ n, sub_lists_of_seq_1_n n n = [seq 0 n].
-Proof.
-intros.
-induction n; [ easy | ].
-rewrite seq_S; cbn.
-...
-rewrite sub_lists_of_seq_1_n_out; [ | easy ].
-now rewrite IHn.
-Qed.
-*)
 
 (* https://fr.wikipedia.org/wiki/Formule_de_Binet-Cauchy *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
