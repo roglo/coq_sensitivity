@@ -330,48 +330,6 @@ destruct (lt_dec a b) as [Hab1| Hab1]. {
 }
 Qed.
 
-Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
-  (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%F.
-Proof.
-intros * Hgh.
-unfold iter_seq, iter_list.
-rewrite List_fold_left_map.
-apply List_fold_left_ext_in.
-intros i c Hi.
-f_equal; f_equal; symmetry.
-apply Hgh.
-apply in_seq in Hi.
-flia Hi.
-Qed.
-
-Theorem rngl_product_change_list : ∀ A (eqb : A → _),
-  equality eqb →
-  rngl_is_comm = true →
-  ∀ la lb f,
-  permutation eqb la lb
-  → (∏ (i ∈ la), f i = ∏ (i ∈ lb), f i)%F.
-Proof.
-intros * Heqb Hic * Hpab.
-revert lb Hpab.
-induction la as [| a]; intros. {
-  now apply permutation_nil_l in Hpab; subst lb.
-}
-apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x lb.
-rewrite rngl_product_list_app.
-do 2 rewrite rngl_product_list_cons.
-rewrite (rngl_mul_comm Hic (∏ (i ∈ bef), f i)).
-rewrite <- rngl_mul_assoc; f_equal.
-rewrite (rngl_mul_comm Hic).
-rewrite <- rngl_product_list_app.
-now apply IHla.
-Qed.
-
 Theorem rngl_product_product_div_eq_1 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
@@ -427,8 +385,8 @@ rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | ]. 2: {
   now apply Hg.
 }
 subst a.
-erewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
-    (l1 := rev _); [ | easy | ]. 2: {
+erewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+    (la := rev _); [ | easy | ]. 2: {
   apply (permutation_rev_l Nat.eqb_eq).
 }
 rewrite <- rngl_product_list_mul_distr; [ | easy ].
@@ -440,8 +398,8 @@ erewrite rngl_product_list_eq_compat. 2 :{
     apply in_seq in Hj.
     now apply Hg.
   }
-  erewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
-      (l1 := rev _); [ | easy | ]. 2: {
+  erewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+      (la := rev _); [ | easy | ]. 2: {
     apply (permutation_rev_l Nat.eqb_eq).
   }
   rewrite <- rngl_product_list_mul_distr; [ | easy ].
@@ -814,15 +772,15 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ "<?" ].
-rewrite (rngl_product_list_permut _ _ Nat.eqb_eq) with
-    (l2 := seq 0 (length p)); cycle 1. {
+rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+    (lb := seq 0 (length p)); cycle 1. {
   easy.
 } {
   now apply permut_list_permutation_iff.
 }
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
-  rewrite (rngl_product_change_list Nat.eqb_eq) with
+  rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
     (lb := seq 0 (length p)); cycle 1. {
     easy.
   } {
@@ -1545,8 +1503,9 @@ Theorem signature_comp_fun_changement_of_variable :
 Proof.
 intros Hop Hin Hic Heq H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
+rename g into g1.
 rewrite rngl_product_change_var with
-    (g := ff_app (isort_rank Nat.leb g)) (h := ff_app g). 2: {
+    (g := ff_app (isort_rank Nat.leb g1)) (h := ff_app g1). 2: {
   intros i Hi.
   apply permut_isort_permut; [ easy | rewrite Hn2; flia Hi Hnz ].
 }
@@ -1555,7 +1514,7 @@ rewrite Nat_sub_succ_1, Nat.sub_0_r.
 erewrite rngl_product_list_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_product_change_var with
-      (g := ff_app (isort_rank Nat.leb g)) (h := ff_app g). 2: {
+      (g := ff_app (isort_rank Nat.leb g1)) (h := ff_app g1). 2: {
     intros j Hj.
     apply permut_isort_permut; [ easy | rewrite Hn2; flia Hj Hnz ].
   }
@@ -1588,13 +1547,13 @@ erewrite rngl_product_list_eq_compat. 2: {
   intros j Hj.
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
-  erewrite (rngl_product_change_list Nat.eqb_eq); [ | easy | ]. 2: {
+  erewrite (rngl_product_list_permut _ Nat.eqb_eq); [ | easy | ]. 2: {
     now apply permut_list_permutation_iff.
   }
   easy.
 }
 cbn - [ "<?" ].
-erewrite (rngl_product_change_list Nat.eqb_eq); [ | easy | ]. 2: {
+erewrite (rngl_product_list_permut _ Nat.eqb_eq); [ | easy | ]. 2: {
   rewrite <- Hn2 at 1.
   rewrite <- List_map_ff_app_seq.
   now apply permut_list_permutation_iff.
@@ -3017,7 +2976,7 @@ f_equal. {
     easy.
   }
   cbn - [ "<?" seq ].
-  rewrite (rngl_product_change_list Nat.eqb_eq) with
+  rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     destruct Hp'p as (Hp'a, Hp'n).
     rewrite <- Hp'l at 1.
@@ -3241,8 +3200,6 @@ Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
 Arguments comp_is_permut_list n%nat [σ₁ σ₂]%list.
 Arguments map_ff_app_is_permut_list n%nat [la lb]%list.
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
-Arguments rngl_product_change_list {T ro rp} [A]%type _ _ _ [la lb]%list.
-Arguments rngl_product_change_var {T ro} A%type [b e]%nat.
 Arguments sign_comp {T}%type {ro rp} _ [la lb]%list.
 Arguments transposition_signature {T}%type {ro rp} _ _ (n p q)%nat.
 Arguments NoDup_ε_1_opp_1 {T}%type {ro rp} _  [σ].

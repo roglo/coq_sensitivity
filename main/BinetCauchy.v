@@ -3301,8 +3301,8 @@ rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
     rewrite isort_rank_length, <- Hn; flia Hi.
   }
   rewrite rngl_product_change_var with (g := g2) (h := h2); [ | easy ].
-  rewrite (rngl_product_list_permut _ _ Nat.eqb_eq)
-      with (l2 := seq 1 n); [ | now destruct Hif | ]. {
+  rewrite (rngl_product_list_permut _ Nat.eqb_eq)
+      with (lb := seq 1 n); [ | now destruct Hif | ]. {
     rewrite rngl_product_seq_product; [ | easy ].
     rewrite Nat.add_comm, Nat.add_sub.
     apply rngl_product_eq_compat.
@@ -3884,9 +3884,33 @@ Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
 Proof.
 intros * Hif *.
 unfold sub_lists_of_seq_1_n.
-(**)
 rewrite rngl_summation_list_map.
 remember (∑ (jl ∈ _), _) as x; subst x.
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+Search (∏ (_ ∈ _), _ = ∏ (_ ∈ _), _).
+About rngl_product_change_list.
+set (h1 := λ l : list nat, rev l).
+erewrite rngl_summation_list_change_var.
+erewrite rngl_summation_list_change_var with (h := h1).
+Compute (
+let n := 4 in
+let k := 3 in
+(map (λ l, rev l) (rev (sls1n n k)), filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
+).
+...
+(*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+let n := 4 in
+let k := 3 in
+  let A := mk_mat [[-1;2;-3;4];[4;5;-6;7];[-2;-6;-7;8]]%Z in
+let f := λ l, ∏ (j = 1, k), mat_el A j (ff_app l (j - 1)) in
+   ∑ (jl ∈ sub_lists_of_seq_1_n n k), f jl =
+   ∑ (kl ∈ list_prodn (repeat (seq 1 n) k)),
+   if is_sorted Nat.ltb kl then f kl else 0%F
+).
+*)
 ...
 revert f k.
 induction n; intros. {
@@ -3981,8 +4005,6 @@ let m := 2 in
       (list_prodn (repeat (seq 1 (S n)) (S m))) =
   map (λ l : list nat, map S (l ++ [n])) (sub_lists_of_seq_1_n n m)
 ).
-(* j'aimerais un sub_lists_of_seq_1_n qui construise les listes dans
-   l'ordre canonique *)
 ...
 erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
 Search permutation.

@@ -1,4 +1,4 @@
-(* products on a ring-like (semiring, ring, field) *)
+ (* products on a ring-like (semiring, ring, field) *)
 
 Set Nested Proofs Allowed.
 
@@ -298,9 +298,9 @@ Qed.
 Theorem rngl_product_list_permut : ∀ A (eqb : A → _),
   equality eqb →
   rngl_is_comm = true →
-  ∀ (l1 l2 : list A) f,
-  permutation eqb l1 l2
-  → (∏ (i ∈ l1), f i = ∏ (i ∈ l2), f i)%F.
+  ∀ (la lb : list A) f,
+  permutation eqb la lb
+  → ∏ (i ∈ la), f i = ∏ (i ∈ lb), f i.
 Proof.
 intros * Heqb Hic * Hl.
 apply (iter_list_permut Heqb); [ | | | | easy ]. {
@@ -312,6 +312,21 @@ apply (iter_list_permut Heqb); [ | | | | easy ]. {
 } {
   apply rngl_mul_assoc.
 }
+Qed.
+
+Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
+  (∀ i, b ≤ i ≤ e → g (h i) = i)
+  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%F.
+Proof.
+intros * Hgh.
+unfold iter_seq, iter_list.
+rewrite List_fold_left_map.
+apply List_fold_left_ext_in.
+intros i c Hi.
+f_equal; f_equal; symmetry.
+apply Hgh.
+apply in_seq in Hi.
+flia Hi.
 Qed.
 
 Theorem rngl_inv_product_list :
@@ -536,7 +551,7 @@ Arguments rngl_inv_product {T}%type {ro rp} _ _ _ _ (b e)%nat f.
 Arguments rngl_inv_product_comm {T}%type {ro rp} _ _ _ _ _ (b e)%nat f.
 Arguments rngl_inv_product_list {T}%type {ro rp} _ _ _ _ {A}%type l%list.
 Arguments rngl_product_list_mul_distr {T}%type {ro rp} _ A%type.
-Arguments rngl_product_list_permut {T ro rp} A%type _ _ _ (l1 l2)%list.
+Arguments rngl_product_list_permut {T ro rp} A%type _ _ _ (la lb)%list.
 Arguments rngl_product_mul_distr {T}%type {ro rp} _ (g h)%function (b k)%nat.
 Arguments rngl_product_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_product_succ_succ {T}%type {ro} (b k)%nat g%function.
@@ -615,8 +630,10 @@ Qed.
 
 End a.
 
+Arguments rngl_product_change_var {T ro} [A]%type [b e]%nat.
 Arguments rngl_product_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_list_only_one {T ro rp} A%type.
+Arguments rngl_product_list_permut {T ro rp} [A]%type _ _ _ [la lb]%list.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
