@@ -557,9 +557,9 @@ Qed.
 
 Theorem rngl_summation_list_permut : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ (l1 l2 : list A) f,
-  permutation eqb l1 l2
-  → (∑ (i ∈ l1), f i = ∑ (i ∈ l2), f i)%F.
+  ∀ (la lb : list A) f,
+  permutation eqb la lb
+  → (∑ (i ∈ la), f i = ∑ (i ∈ lb), f i)%F.
 Proof.
 intros * Heqb * Hl.
 apply (iter_list_permut Heqb); [ | | | | easy ]. {
@@ -691,7 +691,7 @@ Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
 Arguments rngl_summation_list_map {T ro} (_ _)%type.
 Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
-Arguments rngl_summation_list_permut {T ro rp} A%type _ _ (l1 l2)%list.
+Arguments rngl_summation_list_permut {T ro rp} [A]%type _ _ (la lb)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.

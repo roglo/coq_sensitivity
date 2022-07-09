@@ -3226,7 +3226,6 @@ assert (Heql : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-(**)
 set (g1 := λ l, l ° collapse kl).
 set (h1 := λ l, l ° isort_rank Nat.leb kl).
 assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
@@ -3261,8 +3260,8 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
   now destruct Hl.
 }
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
-rewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb))
-    with (l2 := all_comb n); [ | easy | ]. {
+rewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
+    with (lb := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
@@ -3885,17 +3884,26 @@ Proof.
 intros * Hif *.
 unfold sub_lists_of_seq_1_n.
 rewrite rngl_summation_list_map.
+assert (Heql : equality (list_eqb Nat.eqb)). {
+  intros la lb.
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+set (revn := λ l : list nat, rev l).
+erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
+  with (lb := rev (sls1n n k)); [ | easy | now apply permutation_rev_r ].
+erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
+  unfold rev; intros; apply rev_involutive.
+}
 remember (∑ (jl ∈ _), _) as x; subst x.
-Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
-Search (∏ (_ ∈ _), _ = ∏ (_ ∈ _), _).
-About rngl_product_change_list.
-set (h1 := λ l : list nat, rev l).
-erewrite rngl_summation_list_change_var.
-erewrite rngl_summation_list_change_var with (h := h1).
+...
 Compute (
 let n := 4 in
 let k := 3 in
-(map (λ l, rev l) (rev (sls1n n k)), filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
+let g1 := λ l : list nat, rev l in
+(map g1 (rev (sls1n n k)),
+ filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
 ).
 ...
 (*
