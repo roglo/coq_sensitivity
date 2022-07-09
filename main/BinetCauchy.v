@@ -3897,6 +3897,7 @@ erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
   unfold rev; intros; apply rev_involutive.
 }
 remember (∑ (jl ∈ _), _) as x; subst x.
+(*
 ...
 Compute (
 let n := 4 in
@@ -3920,6 +3921,7 @@ let f := λ l, ∏ (j = 1, k), mat_el A j (ff_app l (j - 1)) in
 ).
 *)
 ...
+*)
 revert f k.
 induction n; intros. {
   cbn.
@@ -3937,13 +3939,11 @@ destruct k. {
   rewrite rngl_summation_list_only_one.
   now rewrite rngl_summation_list_only_one.
 }
+rewrite rev_app_distr.
 rewrite map_app.
-rewrite map_map.
 rewrite rngl_summation_list_app.
-erewrite map_ext_in. 2: {
-  intros jl Hjl.
-  unfold map_sub_succ.
-(* oh pis zut *)
+remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (jl ∈ map revn (rev (map _ _))), _) as x; subst x.
 ...
 rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {
