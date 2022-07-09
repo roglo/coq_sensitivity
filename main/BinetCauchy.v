@@ -3899,7 +3899,7 @@ let k := 3 in
  filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
 ).
 symmetry.
-set (f := λ l, (is_sorted Nat.ltb l || no_dup Nat.eqb l)%bool).
+set (f := no_dup Nat.eqb).
 erewrite (rngl_summation_list_permut _ Heql). 2: {
   assert (H : ∀ ll,
     permutation (list_eqb Nat.eqb) ll
@@ -3914,19 +3914,19 @@ rewrite all_0_rngl_summation_list_0. 2: {
   intros kl Hkl.
   apply filter_In in Hkl.
   destruct Hkl as (Hkl, Hsl).
-  apply Bool.negb_true_iff in Hsl.
   unfold f in Hsl.
-  apply Bool.orb_false_iff in Hsl.
+  apply Bool.negb_true_iff in Hsl.
   rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
     intros H.
     apply (no_dup_NoDup Nat.eqb_eq) in H.
-    destruct Hsl; congruence.
+    congruence.
   }
   rewrite <- rngl_mul_assoc.
   now apply rngl_mul_0_l; destruct Hif; left.
 }
 rewrite rngl_add_0_l.
 remember (∑ (jl ∈ _), _) as x; subst x.
+(*
 Compute (
 let n := 4 in
 let m := 3 in
@@ -3934,7 +3934,8 @@ let m := 3 in
   filter f (list_prodn (repeat (seq 1 n) m)),
   map revn (rev (sls1n n m)))
 ).
-(* ah putain de merde, ça marche pas, putain, je me suis gourré dans ces no_dup/sorted *)
+*)
+(* maintenant il faut trier les pas sorted et les sorted *)
 ...
 Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    ∀ n k f,
