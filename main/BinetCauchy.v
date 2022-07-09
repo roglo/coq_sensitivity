@@ -3885,10 +3885,9 @@ Proof.
 intros * Hif *.
 unfold sub_lists_of_seq_1_n.
 (**)
-(*
 rewrite rngl_summation_list_map.
 remember (∑ (jl ∈ _), _) as x; subst x.
-*)
+...
 revert f k.
 induction n; intros. {
   cbn.
