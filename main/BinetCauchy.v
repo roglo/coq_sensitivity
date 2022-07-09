@@ -3875,6 +3875,67 @@ cbn - [ det ].
   ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
+remember (∑ (kl ∈ _), _) as x; subst x.
+symmetry.
+unfold sub_lists_of_seq_1_n.
+rewrite rngl_summation_list_map.
+assert (Heql : equality (list_eqb Nat.eqb)). {
+  intros la lb.
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+set (revn := λ l : list nat, rev l).
+erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
+  with (lb := rev (sls1n n m)); [ | easy | now apply permutation_rev_r ].
+erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
+  unfold rev; intros; apply rev_involutive.
+}
+remember (∑ (jl ∈ _), _) as x; subst x.
+Compute (
+let n := 4 in
+let k := 3 in
+(map revn (rev (sls1n n k)),
+ filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
+).
+symmetry.
+set (f := λ l, (is_sorted Nat.ltb l || no_dup Nat.eqb l)%bool).
+erewrite (rngl_summation_list_permut _ Heql). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb Nat.eqb) ll
+      (filter f ll ++ filter (λ l, negb (f l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_add_comm.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros kl Hkl.
+  apply filter_In in Hkl.
+  destruct Hkl as (Hkl, Hsl).
+  apply Bool.negb_true_iff in Hsl.
+  unfold f in Hsl.
+  apply Bool.orb_false_iff in Hsl.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+    intros H.
+    apply (no_dup_NoDup Nat.eqb_eq) in H.
+    destruct Hsl; congruence.
+  }
+  rewrite <- rngl_mul_assoc.
+  now apply rngl_mul_0_l; destruct Hif; left.
+}
+rewrite rngl_add_0_l.
+remember (∑ (jl ∈ _), _) as x; subst x.
+Compute (
+let n := 4 in
+let m := 3 in
+(
+  filter f (list_prodn (repeat (seq 1 n) m)),
+  map revn (rev (sls1n n m)))
+).
+(* ah putain de merde, ça marche pas, putain, je me suis gourré dans ces no_dup/sorted *)
+...
 Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
    ∀ n k f,
    ∑ (jl ∈ sub_lists_of_seq_1_n n k), f jl =
