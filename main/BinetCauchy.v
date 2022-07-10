@@ -3935,31 +3935,69 @@ let m := 3 in
   map revn (rev (sls1n n m)))
 ).
 *)
-(* maintenant il faut trier les pas sorted et les sorted *)
-...
-Theorem rngl_summation_sub_lists_prodn : in_charac_0_field →
-   ∀ n k f,
-   ∑ (jl ∈ sub_lists_of_seq_1_n n k), f jl =
-   ∑ (kl ∈ list_prodn (repeat (seq 1 n) k)),
-   if is_sorted Nat.ltb kl then f kl else 0%F.
-Proof.
-intros * Hif *.
-unfold sub_lists_of_seq_1_n.
-rewrite rngl_summation_list_map.
-assert (Heql : equality (list_eqb Nat.eqb)). {
-  intros la lb.
-  apply -> equality_list_eqb.
-  unfold equality.
-  apply Nat.eqb_eq.
+set (g := is_sorted Nat.ltb).
+erewrite (rngl_summation_list_permut _ Heql). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb Nat.eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
 }
-set (revn := λ l : list nat, rev l).
-erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
-  with (lb := rev (sls1n n k)); [ | easy | now apply permutation_rev_r ].
-erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
-  unfold rev; intros; apply rev_involutive.
+rewrite rngl_summation_list_app.
+rewrite List_filter_filter.
+rewrite List_filter_filter.
+erewrite filter_ext. 2: {
+  intros t.
+  replace (g t && f t)%bool with (g t). 2: {
+    remember (g t) as gt eqn:Hgt; symmetry in Hgt.
+    destruct gt; [ cbn; symmetry | easy ].
+    unfold g in Hgt; unfold f.
+    assert (H : sorted Nat.ltb t) by easy.
+    clear Hgt; rename H into Hgt.
+    apply (no_dup_NoDup Nat.eqb_eq).
+    apply sorted_lt_NoDup in Hgt; [ easy | | apply Nat_ltb_trans ].
+    unfold irreflexive.
+    apply Nat.ltb_irrefl.
+  }
+  easy.
+}
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros t Ht.
+  rewrite isort_when_sorted; cycle 1. {
+    apply Nat_leb_antisym.
+  } {
+    apply Nat_leb_trans.
+  } {
+    apply filter_In in Ht.
+    now apply sorted_ltb_leb_incl.
+  }
+  easy.
 }
 remember (∑ (jl ∈ _), _) as x; subst x.
 (*
+Compute (
+let n := 4 in
+let m := 3 in
+(
+  filter g (list_prodn (repeat (seq 1 n) m)),
+  map revn (rev (sls1n n m)))
+).
+*)
+rewrite rngl_add_comm.
+remember (∑ (kl ∈ _), _) as x eqn:Hx.
+assert (H : x = 0%F). {
+  subst x.
+  (* kl not sorted and no dup *)
+(**)
+Compute (
+let n := 4 in
+let m := 3 in
+ filter (λ x : list nat, (negb (g x) && f x)%bool)
+      (list_prodn (repeat (seq 1 n) m))
+).
+(**)
+(* pas clair que ça vaille 0, ça *)
 ...
 Compute (
 let n := 4 in
@@ -3983,7 +4021,6 @@ let f := λ l, ∏ (j = 1, k), mat_el A j (ff_app l (j - 1)) in
 ).
 *)
 ...
-*)
 revert f k.
 induction n; intros. {
   cbn.
