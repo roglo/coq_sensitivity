@@ -3926,7 +3926,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (jl ∈ _), _) as x; subst x.
-(*
+(**)
 Compute (
 let n := 4 in
 let m := 3 in
@@ -3934,7 +3934,11 @@ let m := 3 in
   filter f (list_prodn (repeat (seq 1 n) m)),
   map revn (rev (sls1n n m)))
 ).
-*)
+(* ça pourrait être sympa d'ajouter le filtre "is_sorted Nat.ltb" car,
+   dans ce cas, il y aurait les mêmes listes parcourues par le ∑ sauf
+   que... ça ne marche pas : la liste restante (not (is_sorted Nat.ltb))
+   ne vaut pas 0 *)
+...
 set (g := is_sorted Nat.ltb).
 erewrite (rngl_summation_list_permut _ Heql). 2: {
   assert (H : ∀ ll,
