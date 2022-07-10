@@ -3925,7 +3925,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   now apply rngl_mul_0_l; destruct Hif; left.
 }
 rewrite rngl_add_0_l.
-remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (kl ∈ _), _) as x; subst x.
 (**)
 Compute (
 let n := 4 in
