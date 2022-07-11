@@ -3633,7 +3633,7 @@ rewrite filter_negb_member_prodn_succ.
 apply (permutation_refl Hel).
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3931,6 +3931,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x.
+...
 set (h1 := isort Nat.leb).
 erewrite rngl_summation_list_change_var with (h := h1).
 ...
