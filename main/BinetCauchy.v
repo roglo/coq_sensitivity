@@ -3870,21 +3870,24 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+remember (∑ (kl ∈ _), _) as x; subst x.
 (*
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
   ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
-remember (∑ (kl ∈ _), _) as x; subst x.
+(*
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite rngl_summation_list_map.
-assert (Heql : equality (list_eqb Nat.eqb)). {
+*)
+assert (Hel : equality (list_eqb Nat.eqb)). {
   intros la lb.
   apply -> equality_list_eqb.
   unfold equality.
   apply Nat.eqb_eq.
 }
+(*
 set (revn := λ l : list nat, rev l).
 erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
   with (lb := rev (sls1n n m)); [ | easy | now apply permutation_rev_r ].
@@ -3899,8 +3902,9 @@ let k := 3 in
  filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
 ).
 symmetry.
-set (f := no_dup Nat.eqb).
-erewrite (rngl_summation_list_permut _ Heql). 2: {
+*)
+set (f := is_sorted Nat.leb).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
     permutation (list_eqb Nat.eqb) ll
       (filter f ll ++ filter (λ l, negb (f l)) ll)). {
@@ -3909,6 +3913,70 @@ erewrite (rngl_summation_list_permut _ Heql). 2: {
   apply H.
 }
 rewrite rngl_summation_list_app.
+remember (∑ (jl ∈ _), _) as x; subst x.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  replace (isort Nat.leb jl) with jl. 2: {
+    apply filter_In in Hjl.
+    destruct Hjl as (Hjk, Hsl).
+    unfold f in Hsl.
+    symmetry.
+    apply isort_when_sorted; [ | | easy ]. {
+      apply Nat_leb_antisym.
+    } {
+      apply Nat_leb_trans.
+    }
+  }
+  easy.
+}
+remember (∑ (jl ∈ _), _) as x; subst x.
+Compute (
+  let n := 5 in
+  let m := 3 in
+filter f (list_prodn (repeat (seq 1 n) m))
+).
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite <- mat_transp_el; [ | easy | | flia Hi ]. 2: {
+      unfold ff_app.
+      apply filter_In in Hjl.
+      destruct Hjl as (Hjk, Hsl).
+      apply in_list_prodn_repeat_iff in Hjk.
+      destruct Hjk as [Hjk| Hjk]; [ easy | ].
+      destruct Hjk as (_ & Hjlm & Hjl).
+      specialize (Hjl (nth (i - 1) jl 0)).
+      assert (H : nth (i - 1) jl 0 ∈ jl). {
+        apply nth_In; rewrite Hjlm; flia Hi.
+      }
+      specialize (Hjl H); clear H.
+      flia Hjl.
+    }
+Search mat_select_rows.
+Print mat_select_rows.
+replace (mat_el A⁺ (ff_app jl (i - 1)) i) with
+  (mat_el (mat_select_rows jl A⁺) i i). 2: {
+  (* bizarre ce "i i" *)
+  unfold mat_select_rows.
+...
+  (* et puis là, c'est la merde *)
+  cbn - [ map ].
+  rewrite fold_ff_app.
+...
+    easy.
+  }
+  cbn - [ det mat_el ].
+Search mat_select_rows.
+Print mat_select_cols.
+Print mat_select_rows.
+...
+Check det_isort_rows.
+Search (_ ⁺)%M.
+mat_transp_el:
+  ∀ (T : Type) (ro : ring_like_op T) (M : matrix T) (i j : nat),
+    is_correct_matrix M = true → i ≠ 0 → j ≠ 0 → mat_el M⁺ i j = mat_el M j i
+...
 rewrite rngl_add_comm.
 rewrite all_0_rngl_summation_list_0. 2: {
   intros kl Hkl.
@@ -3916,6 +3984,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   destruct Hkl as (Hkl, Hsl).
   unfold f in Hsl.
   apply Bool.negb_true_iff in Hsl.
+...
   rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
     intros H.
     apply (no_dup_NoDup Nat.eqb_eq) in H.
