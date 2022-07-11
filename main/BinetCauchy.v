@@ -3937,6 +3937,7 @@ filter f (list_prodn (repeat (seq 1 n) m))
 ).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros jl Hjl.
+...
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite <- mat_transp_el; [ | easy | | flia Hi ]. 2: {
