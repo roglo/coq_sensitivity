@@ -3904,7 +3904,42 @@ let k := 3 in
 symmetry.
 *)
 (**)
-Print det''.
+set (f := no_dup Nat.eqb).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb Nat.eqb) ll
+      (filter f ll ++ filter (λ l, negb (f l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_add_comm.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros kl Hkl.
+  apply filter_In in Hkl.
+  destruct Hkl as (Hkl, Hsl).
+  unfold f in Hsl.
+  apply Bool.negb_true_iff in Hsl.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+    intros H.
+    apply (no_dup_NoDup Nat.eqb_eq) in H.
+    congruence.
+  }
+  rewrite <- rngl_mul_assoc.
+  now apply rngl_mul_0_l; destruct Hif; left.
+}
+rewrite rngl_add_0_l.
+remember (∑ (kl ∈ _), _) as x; subst x.
+set (g1 := map pred). (* equivalent to collapse, here *)
+set (h1 := isort_rank Nat.leb).
+rewrite rngl_summation_list_change_var with (g := g1) (h := h1).
+(* euh, non, faut voir... *)
+...
+ 2: {
+  intros kl Hkl.
+  unfold g1, h1.
+  unfold collapse.
 ...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
