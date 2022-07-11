@@ -3931,9 +3931,16 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x.
+set (h1 := isort Nat.leb).
+erewrite rngl_summation_list_change_var with (h := h1).
+...
 set (g1 := map pred). (* equivalent to collapse, here *)
-set (h1 := isort_rank Nat.leb).
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1).
+Compute (
+  let kl := [1;4;7] in
+  collapse kl
+).
+
 (* euh, non, faut voir... *)
 ...
  2: {
