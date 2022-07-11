@@ -3903,6 +3903,40 @@ let k := 3 in
 ).
 symmetry.
 *)
+(**)
+Print det''.
+...
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros kl Hkl.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite <- mat_transp_el; [ | easy | | flia Hi ]. 2: {
+      unfold ff_app.
+      apply in_list_prodn_repeat_iff in Hkl.
+      destruct Hkl as [Hkl| Hkl]; [ easy | ].
+      destruct Hkl as (_ & Hklm & Hkl).
+      specialize (Hkl (nth (i - 1) kl 0)).
+      assert (H : nth (i - 1) kl 0 ∈ kl). {
+        apply nth_In; rewrite Hklm; flia Hi.
+      }
+      specialize (Hkl H); clear H.
+      flia Hkl.
+    }
+    easy.
+  }
+  cbn - [ det mat_el ].
+  remember (∏ (j = _, _), _) as x; subst x.
+  easy.
+}
+cbn - [ det mat_el ].
+remember (∑ (kl ∈ _), _) as x; subst x.
+...
+Print mat_select_rows.
+Check det_isort_rows.
+Print det''.
+...
+mat_el A (ff_app kl i) j = mat_el (mat_select_rows kl A) i j.
+...
 set (f := is_sorted Nat.leb).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
