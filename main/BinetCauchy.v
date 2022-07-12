@@ -3946,20 +3946,6 @@ subst f.
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
 ...
-set (h1 := isort Nat.leb).
-erewrite rngl_summation_list_change_var with (h := h1).
-(* oui, mais le tri est une opération non inversible *)
-(* je ne peux donc pas définir g *)
-...
-set (g1 := map pred). (* equivalent to collapse, here *)
-rewrite rngl_summation_list_change_var with (g := g1) (h := h1).
-Compute (
-  let kl := [1;4;7] in
-  collapse kl
-).
-
-(* euh, non, faut voir... *)
-...
  2: {
   intros kl Hkl.
   unfold g1, h1.
