@@ -250,19 +250,19 @@ Fixpoint list_nat_le la lb :=
       end
   end.
 
-Fixpoint list_list_nat_le lla llb :=
+Fixpoint list_list_nat_leb lla llb :=
   match (lla, llb) with
   | ([], _) => true
   | (_, []) => false
   | (la :: lla', lb :: llb') =>
       if list_nat_le la lb then
-        if list_nat_le lb la then list_list_nat_le lla' llb'
+        if list_nat_le lb la then list_list_nat_leb lla' llb'
         else true
       else false
   end.
 
 Definition all_partitions n :=
-  isort list_list_nat_le
+  isort list_list_nat_leb
     (nodup (list_eq_dec (list_eq_dec Nat.eq_dec))
        (map (isort list_nat_le)
           (map (filter (λ s, negb (is_nil s))) (pre_partitions n)))).
