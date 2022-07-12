@@ -3928,12 +3928,14 @@ rewrite all_0_rngl_summation_list_0. 2: {
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (* regrouper par les m! listes dont la valeur triée est la même *)
-Check list_nat_le.
 Compute (
   let n := 5 in
   let m := 3 in
 (
-isort (List_leb Nat.leb) (filter f (list_prodn (repeat (seq 1 n) m))),
+(*
+isort (list_leb Nat.leb) (map (isort Nat.leb) ((filter f (list_prodn (repeat (seq 1 n) m))))),
+*)
+ map (isort Nat.leb) ((filter f (list_prodn (repeat (seq 1 n) m)))),
 sub_lists_of_seq_1_n n m
 )
 ).

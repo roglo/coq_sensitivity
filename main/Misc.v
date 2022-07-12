@@ -1502,6 +1502,20 @@ Qed.
 
 (* end list_eqb *)
 
+(* list_eqb *)
+
+Fixpoint list_leb A (leb : A → A → bool) la lb :=
+  match la with
+  | [] => true
+  | a :: la' =>
+      match lb with
+      | [] => false
+      | b :: lb' => if leb a b then list_leb leb la' lb' else false
+      end
+  end.
+
+(* end list_leb *)
+
 (* pair_eqb *)
 
 Definition pair_eqb {A B} (eqba : A → A → bool) (eqbb : B → B → bool) ab cd :=
