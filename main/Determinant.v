@@ -79,7 +79,7 @@ Definition det' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (k = 0, fact n - 1),
     ε (canon_sym_gr_list n k) *
-    ∏ (i = 1, n), mat_el M i (ff_app (canon_sym_gr_list n k) (i - 1) + 1).
+    ∏ (i = 1, n), mat_el M i ((canon_sym_gr_list n k).(i) + 1).
 
 Arguments det' M%M.
 
@@ -539,7 +539,6 @@ f_equal. {
   unfold mat_el.
   do 3 rewrite Nat.add_sub.
   replace (2 + i - 1) with (S i) by flia.
-  unfold ff_app.
   cbn - [ subm fact ].
   rewrite (List_map_nth' 0). 2: {
     rewrite canon_sym_gr_list_length; flia Hi Hnz.
@@ -665,10 +664,10 @@ rewrite <- map_map.
 rewrite rngl_summation_list_map.
 assert (H1 :
   ∑ (l ∈ map (map pred) (all_comb n)),
-  ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1) =
+  ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1) =
   ∑ (l ∈ map (map pred) (all_comb n)),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
-    ε l * ∏ (j = 1, n), mat_el M j (ff_app l (j - 1) + 1)
+    ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1)
   else 0). {
   apply rngl_summation_list_eq_compat.
   intros l Hl.
@@ -720,7 +719,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite Hln; flia Hi.
     }
     rewrite <- Nat.add_1_r.
-    rewrite fold_ff_app.
     easy.
   }
   easy.
@@ -828,7 +826,6 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       rewrite Hr; flia Hj.
     } {
-      unfold ff_app.
       rewrite Hcn, Hr.
       rewrite Nat.add_1_r.
       split; [ flia | ].
@@ -871,7 +868,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn, Hr.
     }
-    now unfold vect_el', ff_app; cbn.
+    now unfold vect_el'; cbn.
   }
   easy.
 }
@@ -899,7 +896,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn, Hr.
     }
-    now unfold vect_el', ff_app; cbn.
+    now unfold vect_el'; cbn.
   }
   easy.
 }
