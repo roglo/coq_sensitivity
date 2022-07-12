@@ -51,8 +51,7 @@ Definition is_permut_list l := AllLt l (length l) ∧ NoDup l.
 Definition is_permut_list_bool l :=
   (⋀ (a ∈ l), (a <? length l)) &&
   (⋀ (i = 1, length l),
-     (⋀ (j = 1, length l),
-        ((ff_app l (i - 1) ≠? ff_app l (j - 1)) || (i =? j)))).
+     (⋀ (j = 1, length l), ((l.(i) ≠? l.(j)) || (i =? j)))).
 
 (* bof, faut voir...
 Definition permut_list l := permutation Nat.eqb l (seq 0 (length l)).
