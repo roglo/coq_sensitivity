@@ -99,7 +99,7 @@ Compute (list_prodn (repeat (seq 0 10) 2)).
 
 Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
-  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i (ff_app l (i - 1)).
+  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
 (* *)
 

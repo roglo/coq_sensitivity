@@ -3721,12 +3721,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
     rewrite seq_nth; [ | flia Hi ].
     rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-    assert (Him : ff_app l (i - 1) - 1 < m). {
+    assert (Him : l.(i) - 1 < m). {
       apply in_all_comb_iff in Hl.
       destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hlm & Hl).
-      unfold ff_app.
-      assert (H : nth (i - 1) l 0 ∈ l). {
+      assert (H : l.(i) ∈ l). {
         apply nth_In.
         rewrite Hlm; flia Hi.
       }
@@ -3751,10 +3750,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (*
   ∑ (l ∈ all_comb m),
   ε l *
-  ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j (ff_app l (i - 1)))
+  ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j kl.(i))
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -3763,11 +3763,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   erewrite rngl_summation_list_eq_compat. 2: {
     intros l1 Hl1.
-    erewrite rngl_product_eq_compat. 2: {
-      intros i Hi.
-      now rewrite fold_ff_app.
-    }
-    cbn.
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     easy.
   }
@@ -3778,7 +3773,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 rewrite rngl_summation_summation_list_swap.
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros l Hl.
+  intros kl Hkl.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros l1 Hl1.
     rewrite rngl_mul_comm; [ | now destruct Hif ].
@@ -3788,14 +3783,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   cbn.
   rewrite <- rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  remember (∑ (l ∈ _), _) as x eqn:Hx; subst x. (* renaming *)
   easy.
 }
 cbn - [ det ].
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (*
-  ∑ (k ∈ list_prodn (repeat (seq 1 n) m)),
-  ∏ (i = 1, m), mat_el A i (ff_app k (i - 1)) *
-  (∑ (l ∈ all_comb m),
-   ε l * ∏ (i = 1, m), mat_el B (ff_app k (i - 1)) (ff_app l (i - 1)))
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+  ∏ (i = 1, m), mat_el A i kl.(i) *
+  (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -3823,8 +3819,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     intros i Hi.
     unfold mat_select_rows, mat_el; cbn.
     rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
-    assert (H1 : ff_app l1 (i - 1) - 1 < m). {
-      unfold ff_app.
+    assert (H1 : l1.(i) - 1 < m). {
       apply in_list_prodn_repeat_iff in Hl1.
       destruct Hl1 as [Hl1| Hl1]; [ easy | ].
       destruct Hl1 as (_ & Hl1m & Hl1).
@@ -3842,9 +3837,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (*
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
-  ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) * det (mat_select_rows kl B)
+  ∏ (i = 1, m), mat_el A i kl.(i) * det (mat_select_rows kl B) =
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
@@ -3873,8 +3869,8 @@ cbn - [ det ].
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (*
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
-  ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
-  det (mat_select_rows (isort Nat.leb kl) B)
+  ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+  det (mat_select_rows (isort Nat.leb kl) B) =
 *)
 (*
 symmetry.
@@ -3931,6 +3927,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
+...
 set (h1 := isort Nat.leb).
 erewrite rngl_summation_list_change_var with (h := h1).
 (* oui, mais le tri est une opération non inversible *)

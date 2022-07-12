@@ -17,6 +17,7 @@ Tactic Notation "flia" hyp_list(Hs) := clear - Hs; lia.
 Notation "n !" := (fact n) (at level 1, format "n !").
 Notation "x '∈' l" := (List.In x l) (at level 70).
 Notation "x '∉' l" := (¬ List.In x l) (at level 70).
+Notation "l .( i )" := (nth (i - 1) l 0) (at level 1, format "l .( i )").
 
 Notation "x ≤ y ≤ z" := (x <= y ∧ y <= z)%nat (at level 70, y at next level) :
                           nat_scope.
