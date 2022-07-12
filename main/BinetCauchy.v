@@ -3870,7 +3870,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
-remember (∑ (kl ∈ _), _) as x; subst x.
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (*
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
   ε kl * ∏ (j = 1, m), mat_el A j (ff_app kl (j - 1)) *
@@ -3894,7 +3894,7 @@ erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
 erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
   unfold rev; intros; apply rev_involutive.
 }
-remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
 Compute (
 let n := 4 in
 let k := 3 in
@@ -3930,7 +3930,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   now apply rngl_mul_0_l; destruct Hif; left.
 }
 rewrite rngl_add_0_l.
-remember (∑ (kl ∈ _), _) as x; subst x.
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 ...
 set (h1 := isort Nat.leb).
 erewrite rngl_summation_list_change_var with (h := h1).
@@ -3968,11 +3968,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
     easy.
   }
   cbn - [ det mat_el ].
-  remember (∏ (j = _, _), _) as x; subst x.
+  remember (∏ (j = _, _), _) as x; subst x. (* renaming *)
   easy.
 }
 cbn - [ det mat_el ].
-remember (∑ (kl ∈ _), _) as x; subst x.
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 ...
 Print mat_select_rows.
 Check det_isort_rows.
@@ -3990,7 +3990,7 @@ erewrite (rngl_summation_list_permut _ Hel). 2: {
   apply H.
 }
 rewrite rngl_summation_list_app.
-remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros jl Hjl.
   replace (isort Nat.leb jl) with jl. 2: {
@@ -4006,7 +4006,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
-remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
 Compute (
   let n := 5 in
   let m := 3 in
@@ -4072,7 +4072,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
   now apply rngl_mul_0_l; destruct Hif; left.
 }
 rewrite rngl_add_0_l.
-remember (∑ (kl ∈ _), _) as x; subst x.
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 (**)
 Compute (
 let n := 4 in
@@ -4125,7 +4125,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   easy.
 }
-remember (∑ (jl ∈ _), _) as x; subst x.
+remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
 (*
 Compute (
 let n := 4 in
@@ -4192,8 +4192,8 @@ destruct k. {
 rewrite rev_app_distr.
 rewrite map_app.
 rewrite rngl_summation_list_app.
-remember (∑ (jl ∈ _), _) as x; subst x.
-remember (∑ (jl ∈ map revn (rev (map _ _))), _) as x; subst x.
+remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
+remember (∑ (jl ∈ map revn (rev (map _ _))), _) as x; subst x. (* renaming *)
 ...
 rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -4253,9 +4253,9 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_r.
 subst x.
-remember (∑ (jl ∈ map (λ l, _) _), _) as x; subst x.
+remember (∑ (jl ∈ map (λ l, _) _), _) as x; subst x. (* renaming *)
 rewrite List_filter_filter.
-remember (filter (λ l, _) _) as x; subst x.
+remember (filter (λ l, _) _) as x; subst x. (* renaming *)
 Compute (
 let n := 4 in
 let m := 2 in
