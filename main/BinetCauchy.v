@@ -3931,9 +3931,10 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
-...
 set (h1 := isort Nat.leb).
 erewrite rngl_summation_list_change_var with (h := h1).
+(* oui, mais le tri est une opération non inversible *)
+(* je ne peux donc pas définir g *)
 ...
 set (g1 := map pred). (* equivalent to collapse, here *)
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1).
