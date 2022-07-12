@@ -3939,6 +3939,12 @@ isort (list_leb Nat.leb) (map (isort Nat.leb) ((filter f (list_prodn (repeat (se
 sub_lists_of_seq_1_n n m
 )
 ).
+subst f.
+(*
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+  ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+  det (mat_select_rows (isort Nat.leb kl) B)
+*)
 ...
 set (h1 := isort Nat.leb).
 erewrite rngl_summation_list_change_var with (h := h1).
