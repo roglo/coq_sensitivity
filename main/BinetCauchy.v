@@ -3942,12 +3942,49 @@ Proof.
    the present theorem to continue the proof *)
 (* perhaps do a more general proof *)
 intros.
-Theorem rngl_summation_list_all_permut : ∀ A (d : A) lla llb f,
+Theorem rngl_summation_list_all_permut : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ (d : A) lla llb f,
   (∀ la, la ∈ lla → ∃ lb, lb ∈ llb ∧ la ∈ all_permut d lb)
   → (∀ lb, lb ∈ llb → ∀ la, la ∈ all_permut d lb → la ∈ lla)
   → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut d b), f la.
 Proof.
-intros * Ha Hb.
+intros * Heqb * Ha Hb.
+revert lla Ha Hb.
+induction llb as [| lb]; intros. {
+  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  destruct lla as [| la]; [ now apply rngl_summation_list_empty | ].
+  specialize (Ha _ (or_introl eq_refl)).
+  now destruct Ha as (lb & Ha & _).
+}
+rewrite rngl_summation_list_cons.
+assert (Hel : equality (list_eqb eqb)). {
+  clear - Heqb; intros la lb.
+  now apply -> equality_list_eqb.
+}
+set (g := λ la, member (list_eqb eqb) la (all_permut d lb)).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+f_equal. {
+  unfold g.
+  remember (∑ (la ∈ _), _) as x in |-*; subst x.
+Compute (
+  let lb := [1;2;3] in
+  let d := 0 in
+  let eqb := Nat.eqb in
+  all_permut d lb
+).
+(* ouais bon, fait chier *)
+(* mais faut que j'insiste *)
+...
+intros * Heqb * Ha Hb.
 revert llb Ha Hb.
 induction lla as [| la]; intros. {
   rewrite rngl_summation_list_empty; [ | easy ].
@@ -3974,6 +4011,23 @@ destruct llb as [| lb]. {
   now destruct Ha as (lb & Ha & _).
 }
 rewrite rngl_summation_list_cons.
+assert (Hel : equality (list_eqb eqb)). {
+  clear - Heqb; intros la lb.
+  now apply -> equality_list_eqb.
+}
+set (g := λ la, member (list_eqb eqb) la (all_permut d lb)).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+(* peut-être bon ; là, je vais essayer une induction sur llb, plutôt ; si elle
+   marche pas, je peux retourner ici *)
+...
 rewrite (IHlla llb).
 f_equal.
 (* ouais, bin non, mais c'est normal : j'ai consommé un seul dans lla et
