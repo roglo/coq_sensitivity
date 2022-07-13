@@ -3977,8 +3977,8 @@ f_equal. {
   remember (∑ (la ∈ _), _) as x in |-*; subst x.
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
-  clear - Hel Hb.
-  revert lb Hb.
+  clear - Hel Ha Hb.
+  revert lb Ha Hb.
   induction lla as [| la]; intros. {
     cbn.
     specialize (Hb lb).
@@ -4001,18 +4001,64 @@ f_equal. {
   rewrite if_bool_if_dec.
   destruct (bool_dec (member _ _ _)) as [H1| H1]. 2: {
     specialize (proj1 (member_false_iff Hel _ _) H1) as H2.
-    apply IHlla.
-    intros lc Hlc.
-    specialize (Hb lc Hlc).
-    destruct Hb as [Hb| Hb]; [ | easy ].
-    subst lc.
-    now specialize (H2 _ Hlc).
+    apply IHlla. {
+      intros lc Hlc.
+      specialize (Ha _ (or_intror Hlc)).
+      destruct Ha as (ld & Hld & Hld').
+      destruct Hld as [Hld| Hld]. {
+        subst ld.
+        exists lb.
+        split; [ now left | easy ].
+      } {
+        exists ld.
+        split; [ now right | easy ].
+      }
+    } {
+      intros lc Hlc.
+      specialize (H2 _ Hlc).
+      specialize (Hb lc Hlc).
+      now destruct Hb.
+    }
   }
   apply (member_true_iff Hel) in H1.
   destruct H1 as (l1 & l2 & H1).
   rewrite H1.
   apply (permutation_cons_app Hel).
-(* craignos, mais bon, faut encore réfléchir, mon gars *)
+  rewrite <- H1.
+(**)
+  eapply (permutation_trans Hel); [ apply IHlla | ]. 3: {
+    rewrite H1.
+    (* bin non, ça marche pas *)
+...
+  eapply (permutation_trans Hel). {
+    apply IHlla. {
+      intros lc Hlc.
+      specialize (Ha _ (or_intror Hlc)).
+      destruct Ha as (ld & Hld & Hld').
+      destruct Hld as [Hld| Hld]. {
+        subst ld.
+        exists lb.
+        split; [ now left | easy ].
+      } {
+        exists ld.
+        split; [ now right | easy ].
+      }
+    } {
+      intros lc Hlc.
+      specialize (Hb lc Hlc) as H2.
+      destruct H2 as [H2| H2]; [ subst lc | easy ].
+...
+      subst lc.
+      specialize (Ha la (or_introl eq_refl)).
+      specialize (H2 _ Hlc).
+      now destruct Hb.
+    }
+...
+    } {
+      intros lc Hlc.
+      specialize (Hb _ Hlc).
+      destruct Hb as [Hb| Hb]; [ | easy ].
+      subst lc.
 ...
 intros * Heqb * Ha Hb.
 revert llb Ha Hb.
