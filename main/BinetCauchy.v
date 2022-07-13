@@ -3978,6 +3978,8 @@ f_equal. {
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
   clear - Hel Ha Hb.
+(**)
+...
   revert lb Ha Hb.
   induction lla as [| la]; intros. {
     cbn.
