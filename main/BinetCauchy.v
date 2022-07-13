@@ -3977,13 +3977,9 @@ f_equal. {
   remember (∑ (la ∈ _), _) as x in |-*; subst x.
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
-Compute (
-  let lb := [1;2;3] in
-  let d := 0 in
-  let eqb := Nat.eqb in
-  all_permut d lb
-).
-  induction lla as [| la]. {
+  clear - Hel Hb.
+  revert lb Hb.
+  induction lla as [| la]; intros. {
     cbn.
     specialize (Hb lb).
     assert (H : lb ∈ all_permut d lb). {
@@ -4001,6 +3997,22 @@ Compute (
     }
     now specialize (Hb H).
   }
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec (member _ _ _)) as [H1| H1]. 2: {
+    specialize (proj1 (member_false_iff Hel _ _) H1) as H2.
+    apply IHlla.
+    intros lc Hlc.
+    specialize (Hb lc Hlc).
+    destruct Hb as [Hb| Hb]; [ | easy ].
+    subst lc.
+    now specialize (H2 _ Hlc).
+  }
+  apply (member_true_iff Hel) in H1.
+  destruct H1 as (l1 & l2 & H1).
+  rewrite H1.
+  apply (permutation_cons_app Hel).
+(* craignos, mais bon, faut encore réfléchir, mon gars *)
 ...
 intros * Heqb * Ha Hb.
 revert llb Ha Hb.
