@@ -3977,6 +3977,13 @@ f_equal. {
   remember (∑ (la ∈ _), _) as x in |-*; subst x.
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
+Compute (
+  let lb := [1;2;3] in
+  let d := 0 in
+  let eqb := Nat.eqb in
+  all_permut d lb
+).
+(* oui, bin oui, ça devrait être bon ! *)
 ...
 intros * Heqb * Ha Hb.
 revert llb Ha Hb.
