@@ -1281,6 +1281,19 @@ f_equal; rewrite map_length.
 apply IHn.
 Qed.
 
+Theorem canon_sym_gr_list_0_r : ∀ n, canon_sym_gr_list n 0 = seq 0 n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite Nat.div_0_l; [ | apply fact_neq_0 ].
+rewrite Nat.mod_0_l; [ | apply fact_neq_0 ].
+f_equal; rewrite IHn.
+unfold succ_when_ge; cbn.
+rewrite <- seq_shift.
+apply map_ext_in.
+intros; apply Nat.add_1_r.
+Qed.
+
 Theorem canon_sym_gr_list_ub : ∀ n k i,
   k < n!
   → i < n

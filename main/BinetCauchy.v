@@ -3952,8 +3952,22 @@ revert llb Hb.
 induction lla as [| la]; intros. {
   rewrite rngl_summation_list_empty; [ | easy ].
   destruct llb as [| lb]; [ now rewrite rngl_summation_list_empty | ].
-  specialize (Hb _ (or_introl eq_refl)).
-  destruct lb as [| b].
+  specialize (Hb _ (or_introl eq_refl) lb).
+  assert (H : lb ∈ all_permut d lb). {
+    unfold all_permut.
+    apply in_map_iff.
+    exists (seq 0 (length lb)).
+    split; [ symmetry; apply List_map_nth_seq | ].
+    unfold canon_sym_gr_list_list.
+    apply in_map_iff.
+    exists 0.
+    split; [ apply canon_sym_gr_list_0_r | ].
+    apply in_seq.
+    split; [ easy | ].
+    apply Nat.neq_0_lt_0, fact_neq_0.
+  }
+  now specialize (Hb H).
+}
 ...
 ... return
 apply (rngl_summation_list_all_permut 0).
