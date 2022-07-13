@@ -3942,24 +3942,21 @@ Proof.
    the present theorem to continue the proof *)
 (* perhaps do a more general proof *)
 intros.
-unfold sub_lists_of_seq_1_n.
-revert m.
-induction n; intros. {
-  destruct m; cbn. {
-    rewrite rngl_summation_list_only_one.
-    rewrite rngl_summation_list_only_one; cbn.
-    now rewrite rngl_summation_list_only_one.
-  }
-  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
-  rewrite iter_list_empty with (A := nat); [ cbn | easy ].
-  now apply rngl_summation_list_empty.
-}
-Print all_permut.
-Theorem glop : ∀ (f : _ → T) (lla llb : list (list nat)),
-  (∀ la, la ∈ lla → ∃ lb, la ∈ all_permut 0 lb)
-  → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut 0 b), f la.
+Theorem rngl_summation_list_all_permut : ∀ A (d : A) lla llb f,
+  (∀ la, la ∈ lla → ∃ lb, la ∈ all_permut d lb)
+  → (∀ lb, lb ∈ llb → ∀ la, la ∈ all_permut d lb → la ∈ lla)
+  → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut d b), f la.
+Proof.
+intros * Ha Hb.
+revert llb Hb.
+induction lla as [| la]; intros. {
+  rewrite rngl_summation_list_empty; [ | easy ].
+  destruct llb as [| lb]; [ now rewrite rngl_summation_list_empty | ].
+  specialize (Hb _ (or_introl eq_refl)).
+  destruct lb as [| b].
 ...
-erewrite glop.
+... return
+apply (rngl_summation_list_all_permut 0).
 ...
 ... return
 rewrite rngl_summation_filter_no_dup_list_prodn.
