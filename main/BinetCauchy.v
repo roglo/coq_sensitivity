@@ -3978,9 +3978,9 @@ f_equal. {
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
   clear - Hel Ha Hb.
-(**)
-  apply (permutation_trans Hel) with (lb := lla).
-(* chais pas si c'est bon, ça... *)
+...
+apply (NoDup_permutation Hel).
+Check NoDup_permutation_bis.
 ...
   revert lb Ha Hb.
   induction lla as [| la]; intros. {
