@@ -3975,14 +3975,8 @@ rewrite rngl_summation_list_app.
 f_equal. {
   unfold g.
   remember (∑ (la ∈ _), _) as x in |-*; subst x.
-Compute (
-  let lb := [1;2;3] in
-  let d := 0 in
-  let eqb := Nat.eqb in
-  all_permut d lb
-).
-(* ouais bon, fait chier *)
-(* mais faut que j'insiste *)
+  specialize (Hb _ (or_introl eq_refl)).
+  apply (rngl_summation_list_permut _ Hel).
 ...
 intros * Heqb * Ha Hb.
 revert llb Ha Hb.
