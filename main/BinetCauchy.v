@@ -3968,6 +3968,16 @@ induction lla as [| la]; intros. {
   }
   now specialize (Hb H).
 }
+assert (H : ∀ la, la ∈ lla → ∃ lb, la ∈ all_permut d lb). {
+  intros lc Hlc.
+  now apply Ha; right.
+}
+specialize (IHlla H); clear H.
+rewrite rngl_summation_list_cons.
+destruct llb as [| lb]. {
+  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
+...
+rewrite IHlla with (llb := llb).
 ...
 ... return
 apply (rngl_summation_list_all_permut 0).
