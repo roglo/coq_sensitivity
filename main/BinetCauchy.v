@@ -3941,7 +3941,27 @@ Proof.
 (* try to start the proof and, if it goes well, separate it from
    the present theorem to continue the proof *)
 (* perhaps do a more general proof *)
+intros.
+unfold sub_lists_of_seq_1_n.
+revert m.
+induction n; intros. {
+  destruct m; cbn. {
+    rewrite rngl_summation_list_only_one.
+    rewrite rngl_summation_list_only_one; cbn.
+    now rewrite rngl_summation_list_only_one.
+  }
+  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  rewrite iter_list_empty with (A := nat); [ cbn | easy ].
+  now apply rngl_summation_list_empty.
+}
+Print all_permut.
+Theorem glop : ∀ (f : _ → T) (lla llb : list (list nat)),
+  (∀ la, la ∈ lla → ∃ lb, la ∈ all_permut 0 lb)
+  → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut 0 b), f la.
 ...
+erewrite glop.
+...
+... return
 rewrite rngl_summation_filter_no_dup_list_prodn.
 ...
 (* to see, to do afterwards... *)
