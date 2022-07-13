@@ -3957,6 +3957,13 @@ induction llb as [| lb]; intros. {
   specialize (Ha _ (or_introl eq_refl)).
   now destruct Ha as (lb & Ha & _).
 }
+destruct lb as [| b]. {
+  rewrite rngl_summation_list_cons; cbn.
+  rewrite rngl_summation_list_only_one.
+  rewrite <- IHllb with (lla := lla).
+(* ouais, chais pas ; mais si on traite pas le cas lb = [] ici,
+   ça merde plus loin *)
+...
 rewrite rngl_summation_list_cons.
 assert (Hel : equality (list_eqb eqb)). {
   clear - Heqb; intros la lb.
@@ -3983,7 +3990,10 @@ Compute (
   let eqb := Nat.eqb in
   all_permut d lb
 ).
-(* oui, bin oui, ça devrait être bon ! *)
+  induction lla as [| la]. {
+    cbn.
+    destruct lb as [| b]. {
+      cbn.
 ...
 intros * Heqb * Ha Hb.
 revert llb Ha Hb.
