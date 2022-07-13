@@ -3927,26 +3927,24 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 rewrite rngl_add_0_l.
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
-(* regrouper par les m! listes dont la valeur triée est la même *)
-Compute (
-  let n := 5 in
-  let m := 3 in
-(
-(*
-isort (list_leb Nat.leb) (map (isort Nat.leb) ((filter f (list_prodn (repeat (seq 1 n) m))))),
-*)
- map (isort Nat.leb) ((filter f (list_prodn (repeat (seq 1 n) m)))),
-sub_lists_of_seq_1_n n m
-)
-).
 subst f.
 (*
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
   ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
-Print det'.
 (* possible steps to do, for the left handed side *)
+Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl.
+Proof.
+(* try to start the proof and, if it goes well, separate it from
+   the present theorem to continue the proof *)
+(* perhaps do a more general proof *)
+...
+rewrite rngl_summation_filter_no_dup_list_prodn.
+...
+(* to see, to do afterwards... *)
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
@@ -3975,6 +3973,9 @@ Compute (
  sub_lists_of_seq_1_n n m
 )
 ).
+*)
+...
+(*
 Locate "⊂".
 Print incl.
 sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m

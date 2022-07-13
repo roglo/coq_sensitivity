@@ -451,9 +451,13 @@ Fixpoint canon_sym_gr_list n k : list nat :=
       map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
   end.
 
-(* all canonic permutations *)
+(* all canonic permutations of "seq 0 n" *)
 Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
+
+(* all permutations of a list of anything *)
+Definition all_permut {A} d (l : list A) : list (list A) :=
+  map (λ p, map (λ i, nth i l d) p) (canon_sym_gr_list_list (length l)).
 
 Definition is_sym_gr_list n (ll : list (list nat)) :=
   (∀ i, i < length ll →
