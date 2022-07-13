@@ -3943,12 +3943,12 @@ Proof.
 (* perhaps do a more general proof *)
 intros.
 Theorem rngl_summation_list_all_permut : ∀ A (d : A) lla llb f,
-  (∀ la, la ∈ lla → ∃ lb, la ∈ all_permut d lb)
+  (∀ la, la ∈ lla → ∃ lb, lb ∈ llb ∧ la ∈ all_permut d lb)
   → (∀ lb, lb ∈ llb → ∀ la, la ∈ all_permut d lb → la ∈ lla)
   → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut d b), f la.
 Proof.
 intros * Ha Hb.
-revert llb Hb.
+revert llb Ha Hb.
 induction lla as [| la]; intros. {
   rewrite rngl_summation_list_empty; [ | easy ].
   destruct llb as [| lb]; [ now rewrite rngl_summation_list_empty | ].
@@ -3968,16 +3968,16 @@ induction lla as [| la]; intros. {
   }
   now specialize (Hb H).
 }
-assert (H : ∀ la, la ∈ lla → ∃ lb, la ∈ all_permut d lb). {
-  intros lc Hlc.
-  now apply Ha; right.
-}
-specialize (IHlla H); clear H.
 rewrite rngl_summation_list_cons.
 destruct llb as [| lb]. {
-  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
-...
-rewrite IHlla with (llb := llb).
+  specialize (Ha _ (or_introl eq_refl)).
+  now destruct Ha as (lb & Ha & _).
+}
+rewrite rngl_summation_list_cons.
+rewrite (IHlla llb).
+f_equal.
+(* ouais, bin non, mais c'est normal : j'ai consommé un seul dans lla et
+   un dans llb, mais llb est censé être associé à plusieurs dans lla *)
 ...
 ... return
 apply (rngl_summation_list_all_permut 0).
