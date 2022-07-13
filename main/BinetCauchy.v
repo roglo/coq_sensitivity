@@ -3945,6 +3945,76 @@ subst f.
   ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
+Print det'.
+(* possible steps to do, for the left handed side *)
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+  if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+    det (mat_select_rows jl B)
+  else 0
+*)
+(*
+  more generally (and without the filter "no_dup Nat.eqb" that I could
+  remove then by removing a part of tactics above)
+*)
+(*
+  ∀ f,
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+     if list_eqb Nat.eqb (isort Nat.leb kl) jl then f kl else 0
+*)
+(*
+Compute (
+  let n := 3 in
+  let m := 2 in
+(
+ list_prodn (repeat (seq 1 n) m),
+ sub_lists_of_seq_1_n n m
+)
+).
+Locate "⊂".
+Print incl.
+sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m
+*)
+(* yet more generally *)
+(*
+  ∀ f lla llb,
+  llb ⊂ lla
+  → ∑ (kl ∈ lla), f kl =
+    ∑ (jl ∈ llb),
+      ∑ (kl ∈ lla),
+       if list_eqb Nat.eqb (isort Nat.leb kl) jl then f kl else 0
+
+-----> ah oui mais non. Faut réfléchir...
+*)
+...
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+  (if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+     ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+   else 0) *
+   det (mat_select_rows jl B)
+*)
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+  (∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+    if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+      ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+    else 0) *
+   det (mat_select_rows jl B)
+) as x eqn:Hx.
+*)
+(* at end, must prove that
+  (∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+    if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+      ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+    else 0)
+  is equal to det (mat_select_cols jl A
+*)
 ...
  2: {
   intros kl Hkl.
