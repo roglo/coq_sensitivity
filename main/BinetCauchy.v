@@ -3953,6 +3953,19 @@ induction m; intros; cbn. {
   do 2 rewrite rngl_summation_list_only_one; cbn.
   now rewrite rngl_summation_list_only_one.
 }
+Search (∑ (_ ∈ _), ∑ (_ ∈ _), _).
+rewrite App_list_concat_map.
+Check rngl_summation_list_concat.
+Search (filter _ (concat _)).
+About concat_filter_map.
+rewrite <- concat_filter_map.
+rewrite rngl_summation_list_concat.
+rewrite map_map.
+remember (∑ (kl ∈ _), _) as x; subst x.
+Search (∑ (_ ∈ map _ _), _).
+rewrite rngl_summation_list_map.
+(* tout ça, c'était juste pour m'amuser, paskeu ça fait pas tellement
+   avancer le schmilblick *)
 ...
 (*
 Compute (
