@@ -3933,7 +3933,16 @@ subst f.
   ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
   det (mat_select_rows (isort Nat.leb kl) B)
 *)
-(* possible steps to do, for the left handed side *)
+(* possible first step to do, for this left handed side *)
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+  if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+    det (mat_select_rows jl B)
+  else 0
+*)
+...
 Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl.
@@ -4165,18 +4174,6 @@ apply (rngl_summation_list_all_permut 0).
 rewrite rngl_summation_filter_no_dup_list_prodn.
 ...
 (* to see, to do afterwards... *)
-(*
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
-  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
-  if list_eqb Nat.eqb (isort Nat.leb kl) jl then
-    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
-    det (mat_select_rows jl B)
-  else 0
-*)
-(*
-  more generally (and without the filter "no_dup Nat.eqb" that I could
-  remove then by removing a part of tactics above)
-*)
 (*
   ∀ f,
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), f kl =
