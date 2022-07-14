@@ -3942,15 +3942,18 @@ subst f.
     det (mat_select_rows jl B)
   else 0
 *)
-...
 Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl.
 Proof.
-(* try to start the proof and, if it goes well, separate it from
-   the present theorem to continue the proof *)
-(* perhaps do a more general proof *)
 intros.
+revert n.
+induction m; intros; cbn. {
+  rewrite sub_lists_of_seq_1_n_0_r.
+  do 2 rewrite rngl_summation_list_only_one; cbn.
+  now rewrite rngl_summation_list_only_one.
+}
+...
 (*
 Compute (
   let n := 5 in
@@ -3970,7 +3973,7 @@ Theorem rngl_summation_list_by_subsets :
   → ∑ (a ∈ la), f a = ∑ (b ∈ lb), ∑ (a ∈ g b), f a.
 Proof.
 intros.
-Admitted.
+...
 eapply rngl_summation_list_by_subsets with (eqb := list_eqb Nat.eqb)
   (g_1 := hd []).
 (* hmmm... c'est compliqué... *)
