@@ -3942,14 +3942,25 @@ Proof.
    the present theorem to continue the proof *)
 (* perhaps do a more general proof *)
 intros.
+(*
+Compute (
+  let n := 5 in
+  let m := 2 in
+  let f := λ l, length l + hd 3 l in
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl
+).
+...
+*)
 Theorem rngl_summation_list_all_permut : ∀ A (eqb : A → _),
   equality eqb →
   ∀ (d : A) lla llb f,
   (∀ la, la ∈ lla → ∃ lb, lb ∈ llb ∧ la ∈ all_permut d lb)
   → (∀ lb, lb ∈ llb → ∀ la, la ∈ all_permut d lb → la ∈ lla)
-  → ∑ (la ∈ lla), f la = ∑ (b ∈ llb), ∑ (la ∈ all_permut d b), f la.
+  → ∑ (la ∈ lla), f la = ∑ (lb ∈ llb), ∑ (la ∈ all_permut d lb), f la.
 Proof.
 intros * Heqb * Ha Hb.
+...  bon, c'est pas clair...
 revert lla Ha Hb.
 induction llb as [| lb]; intros. {
   symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
@@ -3978,6 +3989,16 @@ f_equal. {
   specialize (Hb _ (or_introl eq_refl)).
   apply (rngl_summation_list_permut _ Hel).
   clear - Hel Ha Hb.
+Compute (
+  let d := 0 in
+  let eqb := Nat.eqb in
+  let lb := [1;2;3] in
+  let lla := [[1;2;3]] in
+  permutation (list_eqb eqb)
+    (filter (λ la, member (list_eqb eqb) la (all_permut d lb)) lla)
+    (all_permut d lb)
+).
+(* ouais, c'est compliqué à tester *)
 ...
 apply (NoDup_permutation Hel).
 Check NoDup_permutation_bis.
