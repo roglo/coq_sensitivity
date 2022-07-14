@@ -3947,22 +3947,16 @@ Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl.
 Proof.
 intros.
-revert n.
-induction m; intros; cbn. {
+destruct m; intros; cbn. {
   rewrite sub_lists_of_seq_1_n_0_r.
   do 2 rewrite rngl_summation_list_only_one; cbn.
   now rewrite rngl_summation_list_only_one.
 }
-Search (∑ (_ ∈ _), ∑ (_ ∈ _), _).
 rewrite App_list_concat_map.
-Check rngl_summation_list_concat.
-Search (filter _ (concat _)).
-About concat_filter_map.
 rewrite <- concat_filter_map.
 rewrite rngl_summation_list_concat.
 rewrite map_map.
 remember (∑ (kl ∈ _), _) as x; subst x.
-Search (∑ (_ ∈ map _ _), _).
 rewrite rngl_summation_list_map.
 (* tout ça, c'était juste pour m'amuser, paskeu ça fait pas tellement
    avancer le schmilblick *)
