@@ -3952,6 +3952,30 @@ Compute (
 ).
 ...
 *)
+Theorem rngl_summation_list_by_subsets :
+  ∀ A (eqb : A → _),
+  ∀ B (la : list A) (lb : list B) lla f g g_1,
+  (∀ b, b ∈ lb → g_1 (g b) = b)
+  → (∀ la', la' ∈ lla → g (g_1 la') = la')
+  → permutation eqb la (concat lla)
+  → ∑ (a ∈ la), f a = ∑ (b ∈ lb), ∑ (a ∈ g b), f a.
+Proof.
+intros.
+Admitted.
+eapply rngl_summation_list_by_subsets with (eqb := list_eqb Nat.eqb)
+  (g_1 := hd []).
+(* hmmm... c'est compliqué... *)
+(* compliqué de définir ?lla *)
+...
+Theorem rngl_summation_list_by_subsets :
+  ∀ A B (la : list A) (lb : list B) llb f g f_1,
+  (∀ a, a ∈ la → f_1 (f a) = a)
+  → (∀ lb', lb' ∈ llb → f (f_1 lb') = lb')
+  → ∑ (b ∈ lb), g b = ∑ (a ∈ la), ∑ (b ∈ f a), g b.
+Proof.
+... return
+apply rngl_summation_list_by_subsets.
+...
 Theorem rngl_summation_list_all_permut : ∀ A (eqb : A → _),
   equality eqb →
   ∀ (d : A) lla llb f,
