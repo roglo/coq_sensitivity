@@ -3634,6 +3634,37 @@ apply (permutation_refl Hel).
 Qed.
 
 (* to be completed
+Theorem map_map_map_sub_succ : ∀ m n p,
+  n ≤ p
+  → map (map (λ i, i - (p - n))) (map (map_sub_succ p) (sls1n n (S m))) =
+    flat_map
+      (λ a,
+         filter (is_sorted Nat.ltb)
+           (map (cons a) (list_prodn (repeat (seq 1 n) m))))
+      (seq 1 n).
+Proof.
+intros * Hnp.
+rewrite map_map.
+revert m p Hnp.
+induction n; intros; [ easy | ].
+cbn - [ seq ].
+destruct p; [ easy | ].
+apply Nat.succ_le_mono in Hnp.
+cbn - [ seq ].
+rewrite map_app.
+rewrite map_map.
+Theorem glop : ∀ n p la,
+  map_sub_succ (S p) (S n :: la) =
+  map_sub_succ p (n :: map S la).
+...
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  rewrite glop.
+  easy.
+}
+cbn - [ map_sub_succ seq "-" ].
+...
+
 Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
   sub_lists_of_seq_1_n n (S m) =
   concat
@@ -3644,6 +3675,39 @@ Proof.
 intros.
 rewrite map_map.
 rewrite <- flat_map_concat_map.
+unfold sub_lists_of_seq_1_n.
+...
+rewrite <- map_map_map_sub_succ with (p := n); [ | easy ].
+symmetry.
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    now rewrite Nat.sub_diag, Nat.sub_0_r.
+  }
+  now rewrite map_id.
+}
+now rewrite map_id.
+...
+Compute (
+  let n := 5 in
+  let m := 2 in
+  let p := 7 in
+  map (map (λ i, i - (p - n)))
+  (map (map_sub_succ p) (sls1n n (S m)))
+ =
+  flat_map
+    (λ x : nat,
+       filter (is_sorted Nat.ltb)
+         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
+    (seq 1 n)
+).
+...
+revert m.
+induction n; intros; [ easy | ].
+cbn - [ seq ].
+rewrite map_app.
+cbn - [ seq ].
 Compute (
   let n := 5 in
   let m := 2 in
