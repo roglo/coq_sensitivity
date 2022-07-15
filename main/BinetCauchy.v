@@ -3653,16 +3653,38 @@ apply Nat.succ_le_mono in Hnp.
 cbn - [ seq ].
 rewrite map_app.
 rewrite map_map.
-Theorem glop : ∀ n p la,
-  map_sub_succ (S p) (S n :: la) =
-  map_sub_succ p (n :: map S la).
-...
+Theorem glop : ∀ n la,
+  (∀ a, a ∈ la → a ≤ n)
+  → map_sub_succ (S n) la = map S (map_sub_succ n la).
+Proof.
+intros * Hla.
+induction la as [| a]; [ easy | ].
+cbn - [ "-" ].
+f_equal. {
+  specialize (Hla _ (or_introl eq_refl)).
+  flia Hla.
+}
+apply IHla.
+intros i Hi.
+now apply Hla; right.
+Qed.
+remember (map _ _) as x.
 erewrite map_ext_in. 2: {
   intros t Ht.
-  rewrite glop.
+  rewrite glop. 2: {
+    intros a Ha.
+    apply in_sls1n_iff in Ht.
+    destruct Ht as [| Ht]; [ easy | ].
+    destruct Ht as (Hs & Htm & Ht).
+    specialize (Ht a Ha).
+    flia Ht Hnp.
+  }
+  rewrite map_map.
   easy.
 }
-cbn - [ map_sub_succ seq "-" ].
+subst x.
+...
+rewrite IHn.
 ...
 Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
   sub_lists_of_seq_1_n n (S m) =
