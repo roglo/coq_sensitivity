@@ -3664,7 +3664,6 @@ erewrite map_ext_in. 2: {
 }
 cbn - [ map_sub_succ seq "-" ].
 ...
-
 Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
   sub_lists_of_seq_1_n n (S m) =
   concat
