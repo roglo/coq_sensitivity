@@ -3958,8 +3958,16 @@ rewrite rngl_summation_list_concat.
 rewrite map_map.
 remember (∑ (kl ∈ _), _) as x; subst x.
 rewrite rngl_summation_list_map.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite rngl_summation_list_empty; [ | easy ].
+  now rewrite rngl_summation_list_empty.
+}
+rewrite rngl_summation_seq_summation; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
 (* tout ça, c'était juste pour m'amuser, paskeu ça fait pas tellement
    avancer le schmilblick *)
+Search (∑ (_ ∈ _), ∑ (_ ∈ _), _).
 ...
 (*
 Compute (
