@@ -3943,6 +3943,37 @@ subst f.
   else 0
 *)
 Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
+Proof.
+intros.
+destruct m; intros; cbn. {
+  rewrite sub_lists_of_seq_1_n_0_r.
+  do 2 rewrite rngl_summation_list_only_one; cbn.
+  now rewrite rngl_summation_list_only_one.
+}
+rewrite App_list_concat_map.
+rewrite rngl_summation_list_concat.
+Compute (
+  let n := 4 in
+  let m := 2 in
+  map (λ a : nat, map (cons a) (list_prodn (repeat (seq 1 n) m))) (seq 1 n)
+).
+Compute (
+  let n := 4 in
+  let m := 2 in
+(
+concat (
+map (filter (is_sorted Nat.ltb))
+(
+  map (λ a : nat, map (cons a) (list_prodn (repeat (seq 1 n) m))) (seq 1 n)
+)
+),
+sub_lists_of_seq_1_n n (S m)
+)
+).
+...
+Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), f kl.
 Proof.
@@ -3953,6 +3984,7 @@ destruct m; intros; cbn. {
   now rewrite rngl_summation_list_only_one.
 }
 rewrite App_list_concat_map.
+...
 rewrite <- concat_filter_map.
 rewrite rngl_summation_list_concat.
 rewrite map_map.
@@ -3968,6 +4000,20 @@ rewrite Nat.add_comm, Nat.add_sub.
 (* tout ça, c'était juste pour m'amuser, paskeu ça fait pas tellement
    avancer le schmilblick *)
 Search (∑ (_ ∈ _), ∑ (_ ∈ _), _).
+Check rngl_summation_list_concat.
+(* peut-on exprimer "list_prodn" avec un "concat" ?
+   si oui, alors on pourrait appliquer rngl_summation_list_concat *)
+(* chais pas si ça aiderait, mais bon *)
+(* du coup, faudrait prendre tout list_prodn et donc remettre un ε
+   pour annuler les listes où il y a des duplications *)
+Compute (
+  let n := 5 in
+  let m := 2 in
+  list_prodn (repeat (seq 1 n) m)
+).
+Search list_prodn.
+Print list_prodn.
+Search (App (_ ∈ _), _).
 ...
 (*
 Compute (
