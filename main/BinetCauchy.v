@@ -3634,6 +3634,28 @@ apply (permutation_refl Hel).
 Qed.
 
 (* to be completed
+Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
+  sub_lists_of_seq_1_n n (S m) =
+  concat
+    (map (filter (is_sorted Nat.ltb))
+       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq 1 n) m)))
+          (seq 1 n))).
+Proof.
+intros.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
+Compute (
+  let n := 5 in
+  let m := 2 in
+  sub_lists_of_seq_1_n n (S m) =
+  flat_map
+    (λ x : nat,
+       filter (is_sorted Nat.ltb)
+         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
+    (seq 1 n)
+).
+...
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3947,12 +3969,14 @@ Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
 Proof.
 intros.
-destruct m; intros; cbn. {
+revert n.
+induction m; intros; cbn. {
   rewrite sub_lists_of_seq_1_n_0_r.
   do 2 rewrite rngl_summation_list_only_one; cbn.
   now rewrite rngl_summation_list_only_one.
 }
 rewrite App_list_concat_map.
+(*
 rewrite rngl_summation_list_concat.
 Compute (
   let n := 4 in
@@ -3972,6 +3996,19 @@ map (filter (is_sorted Nat.ltb))
 sub_lists_of_seq_1_n n (S m)
 )
 ).
+*)
+...
+rewrite sub_lists_of_seq_1_n_succ_r.
+rewrite rngl_summation_list_concat.
+rewrite rngl_summation_list_concat.
+Search (∑ (_ ∈ map _ _), _).
+rewrite map_map.
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_list_map.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+rewrite rngl_summation_list_map.
+remember (∑ (kl ∈ _), _) as x; subst x.
 ...
 Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))), f kl =
