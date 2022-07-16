@@ -3633,7 +3633,7 @@ rewrite filter_negb_member_prodn_succ.
 apply (permutation_refl Hel).
 Qed.
 
-(* to be completed
+(*
 Theorem map_map_sub_sls1n : ∀ m n,
   map (map (sub (S n))) (sls1n n (S m)) =
     flat_map
@@ -3662,7 +3662,9 @@ rewrite map_app.
 rewrite map_map.
 cbn - [ "-" ].
 ...
+*)
 
+(*
 Theorem map_map_map_sub_succ : ∀ m n p,
   n ≤ S p
   → map (map (λ i, i + n - p)) (map (map_sub_succ p) (sls1n n (S m))) =
@@ -3829,7 +3831,9 @@ Compute (
     (seq 1 n)
 ).
 ...
+*)
 
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
