@@ -3642,6 +3642,8 @@ Theorem map_map_sub_sls1n : ∀ m n,
            (map (cons a) (list_prodn (repeat (seq 1 n) m)))) (seq 1 n).
 Proof.
 intros.
+Print sls1n.
+...
 (*
 Compute (
   let n := 6 in
