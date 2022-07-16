@@ -3644,6 +3644,22 @@ Theorem map_map_map_sub_succ : ∀ m n p,
       (seq 1 n).
 Proof.
 intros * Hnp.
+(*
+Compute (
+  let n := 5 in
+  let m := 2 in
+  let p := 5 in
+  map (map (λ i, i - (p - n)))
+  (map (map_sub_succ p) (sls1n n (S m)))
+ =
+  flat_map
+    (λ x : nat,
+       filter (is_sorted Nat.ltb)
+         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
+    (seq 1 n)
+).
+...
+*)
 rewrite map_map.
 revert m p Hnp.
 induction n; intros; [ easy | ].
@@ -3654,7 +3670,7 @@ cbn - [ seq ].
 rewrite map_app.
 rewrite map_map.
 Theorem glop : ∀ n la,
-  (∀ a, a ∈ la → a ≤ n)
+  (∀ a, a ∈ la → a ≤ S n)
   → map_sub_succ (S n) la = map S (map_sub_succ n la).
 Proof.
 intros * Hla.
@@ -3683,6 +3699,23 @@ erewrite map_ext_in. 2: {
   easy.
 }
 subst x.
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  rewrite glop. 2: {
+    intros a Ha.
+    apply in_sls1n_iff in Ht.
+    destruct Ha as [Ha| Ha]. {
+      subst a.
+      now apply -> Nat.succ_le_mono.
+    }
+    destruct Ht as [(H1, H2)| Ht]; [ now subst t | ].
+    destruct Ht as (Hs & Htm & Ht).
+    specialize (Ht a Ha).
+    flia Ht Hnp.
+  }
+  rewrite map_map.
+  easy.
+}
 ...
 rewrite IHn.
 ...
