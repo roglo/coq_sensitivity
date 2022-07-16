@@ -3635,8 +3635,8 @@ Qed.
 
 (* to be completed
 Theorem map_map_map_sub_succ : ∀ m n p,
-  n ≤ p
-  → map (map (λ i, i - (p - n))) (map (map_sub_succ p) (sls1n n (S m))) =
+  n ≤ S p
+  → map (map (λ i, i + n - p)) (map (map_sub_succ p) (sls1n n (S m))) =
     flat_map
       (λ a,
          filter (is_sorted Nat.ltb)
@@ -3646,10 +3646,10 @@ Proof.
 intros * Hnp.
 (*
 Compute (
-  let n := 5 in
+  let n := 6 in
   let m := 2 in
   let p := 5 in
-  map (map (λ i, i - (p - n)))
+  map (map (λ i, i + n - p))
   (map (map_sub_succ p) (sls1n n (S m)))
  =
   flat_map
@@ -3664,8 +3664,14 @@ rewrite map_map.
 revert m p Hnp.
 induction n; intros; [ easy | ].
 cbn - [ seq ].
-destruct p; [ easy | ].
 apply Nat.succ_le_mono in Hnp.
+...
+destruct p. {
+  apply Nat.le_0_r in Hnp; subst n.
+...
+  unfold map_sub_succ.
+...
+destruct p; [ easy | ].
 cbn - [ seq ].
 rewrite map_app.
 rewrite map_map.
