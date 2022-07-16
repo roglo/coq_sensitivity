@@ -3634,6 +3634,35 @@ apply (permutation_refl Hel).
 Qed.
 
 (* to be completed
+Theorem map_map_sub_sls1n : ∀ m n,
+  map (map (sub (S n))) (sls1n n (S m)) =
+    flat_map
+      (λ a,
+         filter (is_sorted Nat.ltb)
+           (map (cons a) (list_prodn (repeat (seq 1 n) m)))) (seq 1 n).
+Proof.
+intros.
+(*
+Compute (
+  let n := 6 in
+  let m := 2 in
+  map (map (sub (S n))) (sls1n n (S m))
+ =
+  flat_map
+    (λ x : nat,
+       filter (is_sorted Nat.ltb)
+         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
+    (seq 1 n)
+).
+*)
+revert m.
+induction n; intros; [ easy | ].
+cbn - [ seq "-" ].
+rewrite map_app.
+rewrite map_map.
+cbn - [ "-" ].
+...
+
 Theorem map_map_map_sub_succ : ∀ m n p,
   n ≤ S p
   → map (map (λ i, i + n - p)) (map (map_sub_succ p) (sls1n n (S m))) =
@@ -3660,6 +3689,27 @@ Compute (
 ).
 ...
 *)
+rewrite map_map.
+unfold map_sub_succ.
+erewrite map_ext_in. 2: {
+  intros t Ht.
+  rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros a Ha.
+    rewrite <- Nat.add_sub_swap. 2: {
+      apply in_sls1n_iff in Ht.
+      destruct Ht as [| (Hs & Htm & Ht)]; [ easy | ].
+      specialize (Ht _ Ha).
+      flia Hnp Ht.
+    }
+    rewrite Nat_sub_sub_swap, Nat.add_comm.
+    rewrite <- Nat.add_sub_assoc; [ | apply Nat.le_succ_diag_r ].
+    rewrite Nat.sub_succ_l; [ | easy ].
+    now rewrite Nat.sub_diag, Nat.add_1_r.
+  }
+  easy.
+}
+...
 rewrite map_map.
 revert m p Hnp.
 induction n; intros; [ easy | ].
