@@ -68,8 +68,6 @@ Qed.
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
-Definition map_sub_succ n := map (Nat.sub (S n)).
-
 Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
   match k with
   | 0 => [[]]
@@ -86,7 +84,7 @@ Definition sub_lists_of_seq_1_n := sls1n 1.
 Compute (let '(n,k) := (5,3) in sub_lists_of_seq_1_n n k).
 *)
 
-Fixpoint rsls1n n k (t : list nat) : nat :=
+Fixpoint rsls1n i n k (t : list nat) : nat :=
   match k with
   | 0 => 0
   | S k' =>
@@ -96,13 +94,13 @@ Fixpoint rsls1n n k (t : list nat) : nat :=
           match t with
           | [] => 0
           | a :: t' =>
-              if a =? n then rsls1n n' k' t'
-              else binomial n' k' + rsls1n n' k t
+              if a =? i then rsls1n (S i) n' k' t'
+              else binomial n' k' + rsls1n (S i) n' k t
           end
       end
   end.
 
-Definition rank_of_sub_lists_of_seq_1_n n k t := rsls1n n k (map_sub_succ n t).
+Definition rank_of_sub_lists_of_seq_1_n := rsls1n 1.
 
 (*
 Compute (let '(n,k) := (7,5) in let ll := sub_lists_of_seq_1_n n k in map (rank_of_sub_lists_of_seq_1_n n k) ll).
@@ -332,46 +330,54 @@ intros * Hnk.
 now apply sls1n_out.
 Qed.
 
+Theorem rsls1n_out : ∀ i n k t,
+  n < k
+  → rsls1n i n k t = 0.
+Proof.
+intros * Hnk.
+revert i t k Hnk.
+induction n; intros; [ now destruct k | ].
+destruct k; [ easy | ].
+apply Nat.succ_lt_mono in Hnk; cbn.
+destruct t as [| a]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a i) as [Hai| Hai]; [ now apply IHn | ].
+rewrite binomial_out; [ | easy ].
+apply IHn.
+now apply Nat.lt_lt_succ_r.
+Qed.
+
 Theorem rank_of_sub_lists_of_seq_1_n_out : ∀ n k t,
   n < k
   → rank_of_sub_lists_of_seq_1_n n k t = 0.
 Proof.
 intros * Hnk.
-unfold rank_of_sub_lists_of_seq_1_n.
-remember (map_sub_succ n t) as t'.
-clear t Heqt'; rename t' into t.
-revert t k Hnk.
+now apply rsls1n_out.
+Qed.
+
+Theorem rsls1n_ub : ∀ i n k t,
+  rsls1n i n k t ≤ binomial n k.
+Proof.
+intros.
+revert i k t.
 induction n; intros; [ now destruct k | ].
-destruct k; [ easy | ].
-apply Nat.succ_lt_mono in Hnk.
-cbn - [ "-" ].
+destruct k; cbn; [ easy | ].
 destruct t as [| a]; [ easy | ].
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec a (S n)) as [Ham| Ham]; [ now apply IHn | ].
-rewrite binomial_out; [ | easy ].
-apply IHn.
-now apply Nat.lt_lt_succ_r.
+destruct (Nat.eq_dec a i) as [Hai| Hai]. {
+  rewrite <- (Nat.add_0_r (rsls1n _ _ _ _)).
+  apply Nat.add_le_mono; [ | easy ].
+  apply IHn.
+} {
+  apply Nat.add_le_mono_l, IHn.
+}
 Qed.
 
 Theorem rank_of_sub_lists_of_seq_1_n_ub : ∀ n k t,
   rank_of_sub_lists_of_seq_1_n n k t ≤ binomial n k.
 Proof.
 intros.
-unfold rank_of_sub_lists_of_seq_1_n.
-remember (map_sub_succ n t) as t'.
-clear t Heqt'; rename t' into t.
-revert k t.
-induction n; intros; [ now destruct k | ].
-destruct k; cbn; [ easy | ].
-destruct t as [| a]; [ easy | ].
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec a (S n)) as [Ham| Ham]. {
-  rewrite <- (Nat.add_0_r (rsls1n _ _ _)).
-  apply Nat.add_le_mono; [ | easy ].
-  apply IHn.
-} {
-  apply Nat.add_le_mono_l, IHn.
-}
+apply rsls1n_ub.
 Qed.
 
 Theorem eq_nth_sls1n_nil : ∀ i n k j,
@@ -396,61 +402,61 @@ destruct (lt_dec j (length (sls1n (S i) n k))) as [Hjb| Hjb]. {
 }
 Qed.
 
-(* to be completed
-Theorem rsls1n_of_nth_sls1n : ∀ n k i,
-  i < binomial n k
-  → rsls1n n k (nth i (sls1n n k) []) = i.
+Theorem rsls1n_of_nth_sls1n : ∀ i n k j,
+  j < binomial n k
+  → rsls1n i n k (nth j (sls1n i n k) []) = j.
 Proof.
-intros * Hi.
-revert k i Hi.
+intros * Hj.
+revert i k j Hj.
 induction n; intros. {
-  destruct k; [ now apply Nat.lt_1_r in Hi | easy ].
+  destruct k; [ now apply Nat.lt_1_r in Hj | easy ].
 }
-destruct k; [ now apply Nat.lt_1_r in Hi | ].
-cbn in Hi |-*.
-destruct (lt_dec i (binomial n k)) as [Hik| Hik]. {
+destruct k; [ now apply Nat.lt_1_r in Hj | ].
+cbn in Hj |-*.
+destruct (lt_dec j (binomial n k)) as [Hjk| Hjk]. {
   rewrite app_nth1; [ | now rewrite map_length, sls1n_length ].
   rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
   rewrite Nat.eqb_refl.
   now apply IHn.
 }
-apply Nat.nlt_ge in Hik.
+apply Nat.nlt_ge in Hjk.
 rewrite app_nth2; rewrite map_length, sls1n_length; [ | easy ].
-remember (i - binomial n k) as j eqn:Hj.
-remember (nth j (sls1n n (S k)) []) as t eqn:Ht; symmetry in Ht.
+remember (j - binomial n k) as m eqn:Hm.
+remember (nth m (sls1n (S i) n (S k)) []) as t eqn:Ht; symmetry in Ht.
 destruct t as [| a]. {
   apply eq_nth_sls1n_nil in Ht; [ easy | ].
-  subst j; rewrite sls1n_length.
-  flia Hi Hik.
+  subst m; rewrite sls1n_length.
+  flia Hj Hjk.
 }
 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. 2: {
-  rewrite <- Ht, Hj.
-  rewrite IHn; [ | flia Hi Hik ].
+destruct (Nat.eq_dec a i) as [Hai| Hai]. 2: {
+  rewrite <- Ht, Hm.
+  rewrite IHn; [ | flia Hj Hjk ].
   rewrite Nat.add_sub_assoc; [ | easy ].
   now rewrite Nat.add_comm, Nat.add_sub.
 }
 subst a.
-specialize (sls1n_bounds n (S k) (S n :: t)) as H1.
+specialize (sls1n_bounds (S i) n (S k) (i :: t)) as H1.
 rewrite <- Ht in H1.
-remember (sls1n n (S k)) as ll eqn:Hll.
-assert (H : nth j ll [] ∈ ll). {
+remember (sls1n (S i) n (S k)) as ll eqn:Hll.
+assert (H : nth m ll [] ∈ ll). {
   apply nth_In; rewrite Hll, sls1n_length.
-  flia Hi Hik Hj.
+  flia Hj Hjk Hm.
 }
-specialize (H1 H (S n)); clear H.
+specialize (H1 H i); clear H.
 rewrite Ht in H1.
 specialize (H1 (or_introl eq_refl)).
 flia H1.
 Qed.
 
+(* to be completed
 Theorem rank_of_sub_lists_of_seq_1_n_of_nth : ∀ n k i,
   i < binomial n k
   → rank_of_sub_lists_of_seq_1_n n k (nth i (sub_lists_of_seq_1_n n k) []) = i.
 Proof.
 intros * Hi.
 unfold rank_of_sub_lists_of_seq_1_n, sub_lists_of_seq_1_n.
-unfold map_sub_succ.
+...
 rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
 rewrite map_map.
 erewrite map_ext_in. 2: {
