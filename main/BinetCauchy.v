@@ -4001,6 +4001,7 @@ f_equal. 2: {
   f_equal.
   clear IHn.
   remember (λ la, _) as x; subst x.
+  apply in_seq in Hj.
 ...
 Compute (
   let n := 5 in
