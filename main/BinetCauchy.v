@@ -280,36 +280,13 @@ split. {
 }
 Qed.
 
-(* to be completed
 Theorem in_sub_lists_of_seq_1_n_length : ∀ n k t,
   t ∈ sub_lists_of_seq_1_n n k → length t = k.
 Proof.
 intros * Ht.
 unfold sub_lists_of_seq_1_n in Ht.
 apply in_sls1n_iff in Ht.
-...
-apply in_map_iff in Ht.
-destruct Ht as (t' & H & Ht); subst t.
-rename t' into t.
-unfold map_sub_succ.
-rewrite map_length.
-revert t k Ht.
-induction n; intros. {
-  cbn in Ht.
-  destruct k; [ | easy ].
-  destruct Ht; [ now subst t | easy ].
-}
-destruct k. {
-  destruct Ht; [ now subst t | easy ].
-}
-cbn in Ht.
-apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]; [ | now apply IHn ].
-apply in_map_iff in Ht.
-destruct Ht as (l & Hln & Hl).
-rewrite <- Hln.
-cbn; f_equal.
-now apply IHn.
+destruct Ht as [(Hk, Ht)| Ht]; [ now subst k t | easy ].
 Qed.
 
 (* *)
@@ -320,17 +297,13 @@ Theorem sub_lists_of_seq_1_n_bounds : ∀ n k t,
 Proof.
 intros * Ht a Hat.
 unfold sub_lists_of_seq_1_n in Ht.
-apply in_map_iff in Ht.
-destruct Ht as (t' & H & Ht); subst t.
-rename t' into t.
-unfold map_sub_succ in Hat.
-apply in_map_iff in Hat.
-destruct Hat as (b & H & Hat); subst a.
-rename b into a.
-enough (H : 1 ≤ a ≤ n) by flia H.
-apply (sls1n_bounds n k t Ht _ Hat).
+apply in_sls1n_iff in Ht.
+destruct Ht as [(Hk, Ht)| Ht]; [ now subst t | ].
+destruct Ht as (Hs & H & Ht); subst k.
+specialize (Ht _ Hat).
+split; [ easy | ].
+now apply Nat.lt_succ_r.
 Qed.
-*)
 
 (* *)
 
