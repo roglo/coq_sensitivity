@@ -2951,6 +2951,17 @@ cbn in Hil; apply Nat.succ_le_mono in Hil.
 now rewrite app_nth2.
 Qed.
 
+Theorem List_flat_map_ext_in : ∀ (A B : Type) (f g : A → list B) (l : list A),
+  (∀ a : A, a ∈ l → f a = g a) → flat_map f l = flat_map g l.
+Proof.
+intros * Hfg.
+induction l as [| a]; intros; [ easy | cbn ].
+f_equal; [ now apply Hfg; left | ].
+apply IHl.
+intros b Hb.
+now apply Hfg; right.
+Qed.
+
 (* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
 Fixpoint to_radix_loop it r i :=
   match it with

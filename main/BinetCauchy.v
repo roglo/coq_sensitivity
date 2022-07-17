@@ -3992,6 +3992,25 @@ rewrite map_map.
 rewrite <- flat_map_concat_map.
 revert i m.
 induction n; intros; [ easy | ].
+cbn.
+rewrite IHn.
+f_equal. 2: {
+  apply List_flat_map_ext_in.
+  intros j Hj.
+  do 2 rewrite List_filter_map.
+  f_equal.
+  clear IHn.
+  remember (λ la, _) as x; subst x.
+...
+Compute (
+  let n := 5 in
+  let m := 3 in
+  let i := 3 in
+  let j := 4 in
+  filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (seq (S i) n) m)) =
+  filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
+).
+...
 rewrite seq_S.
 cbn - [ seq ].
 rewrite flat_map_app.
