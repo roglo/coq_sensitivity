@@ -3991,9 +3991,24 @@ intros.
 rewrite map_map.
 rewrite <- flat_map_concat_map.
 revert i m.
-induction n; intros; [ easy | cbn ].
-...
+induction n; intros; [ easy | ].
+rewrite seq_S.
+cbn - [ seq ].
+rewrite flat_map_app.
+cbn - [ seq ].
+rewrite app_nil_r.
 rewrite IHn.
+...
+Compute (
+  let n := 5 in
+  let m := 3 in
+  let i := 3 in
+  sls1n i n (S m) =
+  concat
+    (map (filter (is_sorted Nat.ltb))
+       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq i n) m)))
+          (seq i n)))
+).
 ...
 Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
   sub_lists_of_seq_1_n n (S m) =
