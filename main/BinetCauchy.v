@@ -4007,6 +4007,10 @@ Compute (
   let m := 3 in
   let i := 3 in
   let j := 4 in
+  (list_prodn (repeat (seq (S i) n) m)) =
+  (list_prodn (repeat (i :: seq (S i) n) m))
+).
+...
   filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (seq (S i) n) m)) =
   filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
 ).
