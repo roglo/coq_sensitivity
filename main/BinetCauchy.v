@@ -622,70 +622,37 @@ f_equal.
 apply IHn.
 Qed.
 
-(* to be completed
-Theorem sls1n_lt : ∀ n k, n < k → sls1n n k = [].
-Proof.
-intros * Hnk.
-revert k Hnk.
-induction n; intros; cbn; [ now destruct k | ].
-destruct k; [ easy | ].
-apply Nat.succ_lt_mono in Hnk.
-rewrite IHn; [ cbn | easy ].
-apply IHn; flia Hnk.
-Qed.
-
-Theorem sls1n_diag : ∀ n, sls1n n n = [rev (seq 1 n)].
+Theorem sls1n_diag : ∀ i n, sls1n i n n = [seq i n].
 Proof.
 intros.
-induction n; [ easy | ].
-rewrite seq_S.
+revert i.
+induction n; intros; [ easy | ].
 cbn; rewrite IHn; cbn.
-rewrite rev_app_distr.
 f_equal.
-now apply sls1n_lt.
+now apply sls1n_out.
 Qed.
 
 Theorem sub_lists_of_seq_1_n_1_r : ∀ n,
   sub_lists_of_seq_1_n n 1 = map (λ i, [i]) (seq 1 n).
 Proof.
 intros.
-unfold sub_lists_of_seq_1_n.
-rewrite sls1n_1_r.
-rewrite map_rev, map_map, <- map_rev.
-apply List_map_fun with (d := 0); [ now rewrite rev_length | ].
-intros i Hi.
-rewrite rev_length, seq_length in Hi.
-rewrite seq_nth; [ | easy ].
-cbn - [ "-" ].
-f_equal.
-rewrite rev_nth; rewrite seq_length; [ | easy ].
-rewrite seq_nth; [ | flia Hi ].
-flia Hi.
+apply sls1n_1_r.
 Qed.
 
 Theorem sub_lists_of_seq_1_n_diag : ∀ n,
   sub_lists_of_seq_1_n n n = [seq 1 n].
 Proof.
 intros.
-unfold sub_lists_of_seq_1_n.
-rewrite sls1n_diag; cbn; f_equal.
-unfold map_sub_succ.
-assert (H : ∀ m, map (Nat.sub (m + n)) (rev (seq 1 n)) = seq m n). {
-  induction n; intros; [ easy | ].
-  rewrite seq_S at 1; cbn.
-  rewrite rev_app_distr; cbn.
-  rewrite Nat.add_sub; f_equal.
-  rewrite <- Nat.add_succ_comm.
-  apply IHn.
-}
-apply (H 1).
+apply sls1n_diag.
 Qed.
 
+(* to be completed
 Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
   k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
 Proof.
 intros * Hkz Ht Htz; subst t.
 unfold sub_lists_of_seq_1_n in Ht.
+...
 apply in_map_iff in Ht.
 destruct Ht as (t & Hnt & Ht).
 unfold map_sub_succ in Hnt.
