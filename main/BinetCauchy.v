@@ -646,25 +646,29 @@ intros.
 apply sls1n_diag.
 Qed.
 
-(* to be completed
-Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
-  k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
+Theorem sls1n_are_correct : ∀ i k n t,
+  k ≠ 0
+  → t ∈ sls1n i n k
+  → t ≠ [].
 Proof.
 intros * Hkz Ht Htz; subst t.
-unfold sub_lists_of_seq_1_n in Ht.
-...
-apply in_map_iff in Ht.
-destruct Ht as (t & Hnt & Ht).
-unfold map_sub_succ in Hnt.
-apply map_eq_nil in Hnt; subst t.
 destruct k; [ easy | clear Hkz ].
-induction n; [ easy | cbn in Ht ].
+revert i Ht.
+induction n; intros; [ easy | cbn in Ht ].
 apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]; [ | easy ].
+destruct Ht as [Ht| Ht]; [ | now apply IHn in Ht ].
 apply in_map_iff in Ht.
 now destruct Ht as (x & Hx & Hxn).
 Qed.
 
+Theorem sub_lists_of_seq_1_n_are_correct : ∀ k n t,
+  k ≠ 0 → t ∈ sub_lists_of_seq_1_n n k → t ≠ [].
+Proof.
+intros * Hkz Ht.
+now apply sls1n_are_correct in Ht.
+Qed.
+
+(* to be completed
 Theorem sub_lists_of_seq_1_n_are_sorted : ∀ n k ll,
   ll = sub_lists_of_seq_1_n n k
   → ∀ l, l ∈ ll → sorted Nat.ltb l.
@@ -672,6 +676,7 @@ Proof.
 intros * Hll * Hl.
 subst ll.
 unfold sub_lists_of_seq_1_n in Hl.
+...
 apply in_map_iff in Hl.
 destruct Hl as (t & H & Ht).
 subst l.
