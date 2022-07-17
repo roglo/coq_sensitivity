@@ -84,6 +84,73 @@ Definition sub_lists_of_seq_1_n := sls1n 1.
 Compute (let '(n,k) := (5,3) in sub_lists_of_seq_1_n n k).
 *)
 
+(*
+Fixpoint rsls1n n k (t : list nat) : nat :=
+  match k with
+  | 0 => 0
+  | S k' =>
+      match n with
+      | 0 => 0
+      | S n' =>
+          match t with
+          | [] => 0
+          | a :: t' =>
+              if a =? n then rsls1n n' k' t'
+              else binomial n' k' + rsls1n n' k t
+          end
+      end
+  end.
+Check member.
+Compute (
+  let n := 6 in
+  let t := [2;3;5] in
+  let k := length t in
+  member (list_eqb Nat.eqb) t (sls1n 7 n k)
+).
+
+  map (λ i, rsls1n n k t < binomial n k) (seq 0 10)
+).
+...
+Theorem rsls1n_ub : ∀ n k t,
+  t ∈ sls1n n k
+  → rsls1n n k t < binomial n k.
+Proof.
+intros * Ht.
+revert k t Ht.
+induction n; intros; [ now cbn; destruct k | ].
+cbn in Ht |-*.
+destruct k; [ easy | cbn ].
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. {
+  apply in_map_iff in Ht.
+  destruct Ht as (t' & H & Ht); subst t.
+  rename t' into t.
+  rewrite Nat.eqb_refl.
+  apply Nat.lt_lt_add_r.
+  now apply IHn.
+}
+destruct t as [| a]. {
+  exfalso; clear IHn.
+  induction n; [ easy | ].
+  cbn in Ht.
+  apply in_app_iff in Ht.
+  destruct Ht as [Ht| Ht]. {
+    apply in_map_iff in Ht.
+    now destruct Ht as (t & H & _).
+  }
+  congruence.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a (S n)) as [Hasn| Hasn]. {
+  subst a.
+  specialize (sls1n_bounds n _ _ Ht _ (or_introl eq_refl)) as H1.
+  flia H1.
+}
+apply Nat.add_lt_mono_l.
+now apply IHn.
+Qed.
+*)
+
 Fixpoint rsls1n i n k (t : list nat) : nat :=
   match k with
   | 0 => 0
@@ -355,6 +422,55 @@ intros * Hnk.
 now apply rsls1n_out.
 Qed.
 
+(*
+Compute (
+  let n := 7 in
+  let i := 1 in
+  let t := [3;5;6] in
+  let k := length t in
+  rsls1n i n k t ≤ binomial n k
+).
+Compute (
+  let n := 6 in
+  let t := [3;4;5] in
+  let k := length t in
+(
+  map
+    (λ i,
+(
+     member (list_eqb Nat.eqb) t (sls1n i n k),
+     rsls1n (S i) n k t < binomial n k
+)
+    ) (seq 0 10)
+)
+).
+*)
+
+(* to be completed
+Theorem rsls1n_ub : ∀ i n k t,
+  t ∈ sls1n i n k
+  → rsls1n i n k t < binomial n k.
+Proof.
+intros * Ht.
+revert i k t Ht.
+induction n; intros; [ now destruct k; cbn | ].
+destruct k; cbn; [ easy | ].
+destruct t as [| a]. {
+  cbn.
+  cbn in Ht.
+...
+destruct t as [| a]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec a i) as [Hai| Hai]. {
+  rewrite <- (Nat.add_0_r (rsls1n _ _ _ _)).
+  apply Nat.add_le_mono; [ | easy ].
+  apply IHn.
+} {
+  apply Nat.add_le_mono_l, IHn.
+}
+Qed.
+*)
+
 Theorem rsls1n_ub : ∀ i n k t,
   rsls1n i n k t ≤ binomial n k.
 Proof.
@@ -505,15 +621,24 @@ Compute (
     flia Ht H2.
   }
 *)
-  rewrite app_nth1. 2: {
-    rewrite map_length, sls1n_length.
+(*
+  destruct (lt_dec (rsls1n (S i) n k t) (binomial n k)) as [Hrb| Hrb]. 2: {
+    apply Nat.nlt_ge in Hrb.
+    rewrite app_nth2; rewrite map_length, sls1n_length; [ | easy ].
+    specialize rsls1n_ub as H1.
+    specialize (H1 (S i) n k t).
+    apply Nat.le_antisymm in H1; [ | easy ].
+    rewrite H1, Nat.sub_diag.
+    destruct n. {
+      cbn.
+      cbn in H1.
+      destruct k; [ easy | ].
+      cbn in Hrb.
+(* bon, ça marche pas *)
 ...
-Check rsls1n_ub.
-    apply rsls1n_ub.
-    now apply rsls1n_ub.
-  }
-  rewrite (List_map_nth' []). 2: {
-    rewrite sls1n_length.
+*)
+...
+    rewrite (List_map_nth' []); [ | now rewrite sls1n_length ].
     now apply rsls1n_ub.
   }
   f_equal.
