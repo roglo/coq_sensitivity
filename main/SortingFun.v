@@ -78,7 +78,10 @@ intros * Htra * Hs.
 unfold sorted in Hs.
 unfold strongly_sorted.
 induction l as [| a]; [ easy | cbn ].
-rewrite IHl; [ | now apply sorted_cons in Hs ].
+rewrite IHl. 2: {
+  destruct l as [| a']; [ easy | ].
+  now apply Bool.andb_true_iff in Hs.
+}
 rewrite Bool.andb_true_r.
 clear IHl.
 induction l as [| b]; [ easy | cbn ].
@@ -124,6 +127,79 @@ destruct Hb as [Hb| Hb]. {
 apply IHl; [ | easy ].
 cbn in Hsal.
 now apply Bool.andb_true_iff in Hsal.
+Qed.
+
+Theorem sorted_cons_iff : ∀ (A : Type) (rel : A → A → bool),
+  transitive rel
+  → ∀ a la,
+      sorted rel (a :: la) ↔
+      sorted rel la ∧ (∀ b, b ∈ la → rel a b = true).
+Proof.
+intros * Htra *.
+split; intros Hla. {
+  split; [ now apply sorted_cons in Hla | ].
+  intros b Hb.
+  apply all_sorted_forall with (l := la); [ | easy ].
+  apply (sorted_strongly_sorted Htra) in Hla.
+  unfold strongly_sorted in Hla; cbn in Hla.
+  now apply Bool.andb_true_iff in Hla.
+} {
+  destruct Hla as (Hs & Hla).
+  unfold sorted; cbn.
+  destruct la as [| b]; [ easy | ].
+  apply Bool.andb_true_iff.
+  split; [ | easy ].
+  now apply Hla; left.
+}
+Qed.
+
+Theorem sorted_rel : ∀ A (d : A) rel l,
+  sorted rel l
+  → ∀ i, S i < length l
+  → rel (nth i l d) (nth (S i) l d) = true.
+Proof.
+intros * Hs i Hi.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn in Hi.
+apply Nat.succ_lt_mono in Hi.
+destruct l as [| b]; [ easy | ].
+remember (b :: l) as l'; cbn in Hs |-*; subst l'.
+apply Bool.andb_true_iff in Hs.
+destruct i; [ easy | ].
+now apply IHl.
+Qed.
+
+Theorem strongly_sorted_if : ∀ A rel,
+  transitive rel
+  → ∀ l,
+  strongly_sorted rel l
+  → ∀ (d : A) i j,
+    i < length l
+    → j < length l
+    → i < j
+    → rel (nth i l d) (nth j l d) = true.
+Proof.
+intros * Htr * Hso * Hi Hj Hij.
+remember (j - i) as n eqn:Hn.
+replace j with (i + n) in * by flia Hn Hij.
+assert (Hnz : n ≠ 0) by flia Hij.
+clear Hi Hij Hn.
+revert i Hj.
+induction n; intros; [ easy | clear Hnz; cbn ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  rewrite Nat.add_1_r in Hj |-*.
+  apply sorted_rel; [ | easy ].
+  now apply strongly_sorted_sorted.
+}
+apply Htr with (b := nth (S i) l d). 2: {
+  rewrite <- Nat.add_succ_comm in Hj.
+  rewrite <- Nat.add_succ_comm.
+  now apply IHn.
+}
+apply sorted_rel; [ | flia Hj ].
+now apply strongly_sorted_sorted.
 Qed.
 
 Theorem sorted_cons_cons_true_iff : ∀ A (rel : A → A -> bool) a b l,

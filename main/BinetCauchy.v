@@ -128,6 +128,31 @@ apply sls1n_length.
 Qed.
 
 (* to be completed
+Theorem sls1n_bounds : ∀ n k t,
+  t ∈ sls1n n k
+  → ∀ a, a ∈ t → 1 ≤ a ≤ n.
+Proof.
+intros * Ht * Hat.
+revert k t Ht Hat.
+induction n; intros. {
+  destruct k; [ cbn in Ht | easy ].
+  destruct Ht; [ now subst t | easy ].
+}
+destruct k; cbn in Ht. {
+  destruct Ht; [ now subst t | easy ].
+}
+apply in_app_iff in Ht.
+destruct Ht as [Ht| Ht]. 2: {
+  specialize (IHn (S k) t Ht Hat).
+  split; [ easy | flia IHn ].
+}
+apply in_map_iff in Ht.
+destruct Ht as (l & Hln & Hl); subst t.
+destruct Hat as [Hat| Hat]; [ subst a; flia | ].
+specialize (IHn k l Hl Hat) as H1.
+split; [ easy | flia H1 ].
+Qed.
+
 Theorem in_sls1n_iff : ∀ i n k t,
   t ∈ sls1n i n k
   ↔ k = 0 ∧ t = [] ∨
@@ -176,22 +201,12 @@ split. {
   specialize (IHn _ _ _ Ht).
   destruct IHn as (Hs & Htk & Htb).
   split. {
-Search (sorted _ (_ :: _)).
-Check sorted_app_iff.
-Theorem sorted_cons_iff : ∀ (A : Type) (rel : A → A → bool),
-  transitive rel
-  → ∀ a la,
-      sorted rel (a :: la) ↔
-      sorted rel la ∧ (∀ b, b ∈ la → rel a b = true).
-Proof.
-intros * Htra *.
-split; intros Hla. {
-  split; [ now apply sorted_cons in Hla | ].
-  intros b Hb.
-...
-    apply sorted_cons.
-    apply (sorted_app_iff Nat_ltb_trans).
+    apply (sorted_cons_iff Nat_ltb_trans).
     split; [ easy | ].
+    intros a Ha.
+    apply Nat.ltb_lt.
+    apply sls1n_bounds with (a := a) in Ht; [ flia Ht | easy ].
+...
     split; [ easy | ].
     intros a b Ha Hb.
     destruct Hb; [ subst b | easy ].
@@ -310,31 +325,6 @@ now apply IHn.
 Qed.
 
 (* *)
-
-Theorem sls1n_bounds : ∀ n k t,
-  t ∈ sls1n n k
-  → ∀ a, a ∈ t → 1 ≤ a ≤ n.
-Proof.
-intros * Ht * Hat.
-revert k t Ht Hat.
-induction n; intros. {
-  destruct k; [ cbn in Ht | easy ].
-  destruct Ht; [ now subst t | easy ].
-}
-destruct k; cbn in Ht. {
-  destruct Ht; [ now subst t | easy ].
-}
-apply in_app_iff in Ht.
-destruct Ht as [Ht| Ht]. 2: {
-  specialize (IHn (S k) t Ht Hat).
-  split; [ easy | flia IHn ].
-}
-apply in_map_iff in Ht.
-destruct Ht as (l & Hln & Hl); subst t.
-destruct Hat as [Hat| Hat]; [ subst a; flia | ].
-specialize (IHn k l Hl Hat) as H1.
-split; [ easy | flia H1 ].
-Qed.
 
 Theorem sub_lists_of_seq_1_n_bounds : ∀ n k t,
   t ∈ sub_lists_of_seq_1_n n k

@@ -2100,52 +2100,6 @@ rewrite (List_map_nth' 0); [ easy | ].
 now rewrite isort_rank_length.
 Qed.
 
-Theorem sorted_rel : ∀ A (d : A) ord l,
-  sorted ord l
-  → ∀ i, S i < length l
-  → ord (nth i l d) (nth (S i) l d) = true.
-Proof.
-intros * Hs i Hi.
-revert i Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-apply Nat.succ_lt_mono in Hi.
-destruct l as [| b]; [ easy | ].
-remember (b :: l) as l'; cbn in Hs |-*; subst l'.
-apply Bool.andb_true_iff in Hs.
-destruct i; [ easy | ].
-now apply IHl.
-Qed.
-
-Theorem sorted_strongly_sorted : ∀ A (d : A) ord l,
-  transitive ord
-  → sorted ord l
-  → ∀ i j,
-    i < length l
-    → j < length l
-    → i < j
-    → ord (nth i l d) (nth j l d) = true.
-Proof.
-intros * Htr Hso * Hi Hj Hij.
-remember (j - i) as n eqn:Hn.
-replace j with (i + n) in * by flia Hn Hij.
-assert (Hnz : n ≠ 0) by flia Hij.
-clear Hi Hij Hn.
-revert i Hj.
-induction n; intros; [ easy | clear Hnz; cbn ].
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  rewrite Nat.add_1_r in Hj |-*.
-  now apply sorted_rel.
-}
-apply Htr with (b := nth (S i) l d). 2: {
-  rewrite <- Nat.add_succ_comm in Hj.
-  rewrite <- Nat.add_succ_comm.
-  now apply IHn.
-}
-apply sorted_rel; [ easy | flia Hj ].
-Qed.
-
 Theorem permut_isort_rank_involutive : ∀ la,
   is_permut_list la
   → isort_rank Nat.leb (isort_rank Nat.leb la) = la.
@@ -2246,11 +2200,14 @@ specialize (sorted_isort Nat_leb_is_total_relation l) as Hsl.
 rewrite (isort_isort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
-specialize (H1 _ 0 _ _ Nat_leb_trans Hsl).
-rewrite map_length, Hlr, isort_rank_length in H1.
-specialize (H1 i' j' Hi'l Hj'l Hc1).
-apply Nat.leb_le in H1.
-rewrite <- Hlr in H1.
+(**)
+specialize (H1 _ _ Nat_leb_trans _ Hsl).
+specialize strongly_sorted_if as H2.
+specialize (H2 _ _ Nat_leb_trans _ H1 0).
+rewrite map_length, Hlr, isort_rank_length in H2.
+specialize (H2 i' j' Hi'l Hj'l Hc1).
+apply Nat.leb_le in H2.
+rewrite <- Hlr in H2.
 rewrite (isort_isort_rank _ 0) in Hc2.
 rewrite <- Hlr in Hc2.
 now apply Nat.nle_gt in Hc2.
