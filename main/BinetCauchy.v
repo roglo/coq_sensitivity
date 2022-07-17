@@ -668,50 +668,22 @@ intros * Hkz Ht.
 now apply sls1n_are_correct in Ht.
 Qed.
 
-(* to be completed
+Theorem sls1n_are_sorted : ∀ i n k la,
+  la ∈ sls1n i n k
+  → sorted Nat.ltb la.
+Proof.
+intros * Hla.
+apply in_sls1n_iff in Hla.
+destruct Hla as [(H1,H2) | Ht]; [ now subst k la | easy ].
+Qed.
+
 Theorem sub_lists_of_seq_1_n_are_sorted : ∀ n k ll,
   ll = sub_lists_of_seq_1_n n k
   → ∀ l, l ∈ ll → sorted Nat.ltb l.
 Proof.
 intros * Hll * Hl.
 subst ll.
-unfold sub_lists_of_seq_1_n in Hl.
-...
-apply in_map_iff in Hl.
-destruct Hl as (t & H & Ht).
-subst l.
-apply in_sls1n_iff in Ht.
-destruct Ht as [(H1,H2) | Ht]; [ now subst k t | ].
-destruct Ht as (Hs & Htk & Ht).
-unfold map_sub_succ.
-revert n k Htk Ht.
-induction t as [| a]; intros; [ easy | ].
-cbn - [ "-" ].
-cbn in Hs.
-apply (sorted_app_iff Nat_ltb_trans) in Hs.
-destruct Hs as (Hs & _ & Ht').
-specialize (IHt Hs).
-rewrite List_cons_is_app. (* faudrait faire un lemme pour cons *)
-apply (sorted_app_iff Nat_ltb_trans).
-split; [ easy | ].
-split. {
-  destruct k; [ easy | ].
-  cbn in Htk; apply Nat.succ_inj in Htk.
-  apply (IHt n k); [ easy | ].
-  now intros i Hi; apply Ht; right.
-}
-intros b c Hb Hc.
-destruct Hb; [ subst b | easy ].
-apply Nat.ltb_lt.
-apply in_map_iff in Hc.
-destruct Hc as (d & H & Hd); subst c.
-assert (Han : a ≤ S n). {
-  specialize (Ht _ (or_introl eq_refl)).
-  flia Ht.
-}
-enough (H : d < a) by flia Han H.
-apply Nat.ltb_lt.
-apply Ht'; [ now apply in_rev in Hd | now left ].
+now apply sls1n_are_sorted in Hl.
 Qed.
 
 Theorem sub_list_of_seq_1_n_has_no_dup :
@@ -785,7 +757,6 @@ split. {
   now apply (sub_lists_of_seq_1_n_is_surj n k).
 }
 Qed.
-*)
 
 Section a.
 
