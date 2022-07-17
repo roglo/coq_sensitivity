@@ -310,15 +310,12 @@ Qed.
 Theorem sub_lists_of_seq_1_n_0_r : ∀ n, sub_lists_of_seq_1_n n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
-(* to be completed
-Theorem sub_lists_of_seq_1_n_out : ∀ n k,
+Theorem sls1n_out : ∀ i n k,
   n < k
-  → sub_lists_of_seq_1_n n k = [].
+  → sls1n i n k = [].
 Proof.
 intros * Hnk.
-unfold sub_lists_of_seq_1_n.
-enough (H : sls1n n k = []) by now rewrite H.
-revert k Hnk.
+revert i k Hnk.
 induction n; intros; cbn; [ now destruct k | ].
 destruct k; [ easy | ].
 apply Nat.succ_lt_mono in Hnk.
@@ -326,7 +323,14 @@ rewrite IHn; [ | flia Hnk ].
 apply IHn.
 now apply Nat.lt_lt_succ_r.
 Qed.
-*)
+
+Theorem sub_lists_of_seq_1_n_out : ∀ n k,
+  n < k
+  → sub_lists_of_seq_1_n n k = [].
+Proof.
+intros * Hnk.
+now apply sls1n_out.
+Qed.
 
 Theorem rank_of_sub_lists_of_seq_1_n_out : ∀ n k t,
   n < k
@@ -370,29 +374,29 @@ destruct (Nat.eq_dec a (S n)) as [Ham| Ham]. {
 }
 Qed.
 
-(* to be completed
-Theorem eq_nth_sls1n_nil : ∀ n k i,
-  i < length (sls1n n k)
-  → nth i (sls1n n k) [] = []
+Theorem eq_nth_sls1n_nil : ∀ i n k j,
+  j < length (sls1n i n k)
+  → nth j (sls1n i n k) [] = []
   → k = 0.
 Proof.
-intros * Hil His.
+intros * Hjl Hjs.
 destruct k; [ easy | exfalso ].
-revert k i Hil His.
-induction n; intros; cbn in His, Hil; [ easy | ].
-destruct (lt_dec i (length (sls1n n k))) as [Hib| Hib]. {
-  rewrite app_nth1 in His; [ | now rewrite map_length ].
-  now rewrite (List_map_nth' []) in His.
+revert k i j Hjl Hjs.
+induction n; intros; cbn in Hjs, Hjl; [ easy | ].
+destruct (lt_dec j (length (sls1n (S i) n k))) as [Hjb| Hjb]. {
+  rewrite app_nth1 in Hjs; [ | now rewrite map_length ].
+  now rewrite (List_map_nth' []) in Hjs.
 } {
-  apply Nat.nlt_ge in Hib.
-  rewrite app_nth2 in His; [ | now rewrite map_length ].
-  rewrite map_length in His.
-  apply IHn in His; [ easy | ].
-  rewrite app_length, map_length in Hil.
-  flia Hil Hib.
+  apply Nat.nlt_ge in Hjb.
+  rewrite app_nth2 in Hjs; [ | now rewrite map_length ].
+  rewrite map_length in Hjs.
+  apply IHn in Hjs; [ easy | ].
+  rewrite app_length, map_length in Hjl.
+  flia Hjl Hjb.
 }
 Qed.
 
+(* to be completed
 Theorem rsls1n_of_nth_sls1n : ∀ n k i,
   i < binomial n k
   → rsls1n n k (nth i (sls1n n k) []) = i.
