@@ -3980,7 +3980,43 @@ sub_lists_of_seq_1_n n (S m)
 )
 ).
 *)
+Theorem sls1n_succ_r : ∀ i m n,
+  sls1n i n (S m) =
+  concat
+    (map (filter (is_sorted Nat.ltb))
+       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq i n) m)))
+          (seq i n))).
+Proof.
+intros.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
+revert i m.
+induction n; intros; [ easy | cbn ].
 ...
+rewrite IHn.
+...
+Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
+  sub_lists_of_seq_1_n n (S m) =
+  concat
+    (map (filter (is_sorted Nat.ltb))
+       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq 1 n) m)))
+          (seq 1 n))).
+Proof.
+intros.
+unfold sub_lists_of_seq_1_n.
+apply sls1n_succ_r.
+...
+Compute (
+  let n := 5 in
+  let m := 3 in
+  let i := 3 in
+  sls1n i n (S m) =
+  concat
+    (map (filter (is_sorted Nat.ltb))
+       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq i n) m)))
+          (seq i n)))
+).
+... return.
 rewrite sub_lists_of_seq_1_n_succ_r.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_concat.
