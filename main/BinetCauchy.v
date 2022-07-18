@@ -4002,16 +4002,34 @@ f_equal. 2: {
   clear IHn.
   remember (λ la, _) as x; subst x.
   apply in_seq in Hj.
+Theorem list_prodn_repeat_cons : ∀ A (a : A) la n,
+  list_prodn (repeat (a :: la) (S n)) =
+  map (cons a) (list_prodn (repeat la n)) ++ list_prodn (repeat la n).
+Proof.
+intros.
+Compute (
+  let a := 17 in
+  let la := [2;5;1] in
+  let n := 2 in
+  list_prodn (repeat (a :: la) (S n)) =
+  map (cons a) (list_prodn (repeat la n)) ++ list_prodn (repeat la n)
+).
+(* ah oui non c'est pas bon putain *)
 ...
+... return
+rewrite list_prodn_repeat_cons.
+rewrite filter_app.
 Compute (
   let n := 4 in
   let m := 2 in
   let i := 2 in
   let j := 3 in
+(*
   (list_prodn (repeat (seq (S i) n) m)) =
   (list_prodn (repeat (i :: seq (S i) n) m))
 ).
 ...
+*)
   filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (seq (S i) n) m)) =
   filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
 ).
