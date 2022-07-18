@@ -4028,7 +4028,6 @@ f_equal. 2: {
   f_equal.
 (* is just returning to the expression before :-( *)
 *)
-...
 Compute (
   let n := 4 in
   let m := 2 in
@@ -4038,6 +4037,18 @@ Compute (
        (map (cons j) (list_prodn (repeat (seq (S i) n) m)))) =
     (filter (λ la : list nat, is_sorted Nat.ltb la)
        (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m))))
+).
+Compute ((repeat (seq 1 2) 3)).
+Compute (list_prodn (repeat (seq 1 2) 3)).
+Compute (
+  let n := 4 in
+  let m := 2 in
+  let i := 10 in
+  let j := 11 in
+  filter (λ la : list nat, is_sorted Nat.ltb la)
+    (map (cons j) (list_prodn (repeat (seq (S i) n) m))) =
+  filter (λ la : list nat, is_sorted Nat.ltb la)
+    (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m)))
 ).
 ...
   filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
