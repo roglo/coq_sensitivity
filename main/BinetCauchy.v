@@ -4004,10 +4004,10 @@ f_equal. 2: {
   apply in_seq in Hj.
 ...
 Compute (
-  let n := 5 in
-  let m := 3 in
-  let i := 3 in
-  let j := 4 in
+  let n := 4 in
+  let m := 2 in
+  let i := 2 in
+  let j := 3 in
   (list_prodn (repeat (seq (S i) n) m)) =
   (list_prodn (repeat (i :: seq (S i) n) m))
 ).
