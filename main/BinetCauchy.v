@@ -3638,6 +3638,23 @@ Compute (
 ...
 *)
 
+Theorem List_filter_is_sorted_cons : ∀ i l,
+  filter (λ la, is_sorted Nat.ltb (i :: la)) l =
+  map (λ la, tl la) (filter (λ la, is_sorted Nat.ltb la) (map (cons i) l)).
+Proof.
+intros.
+revert i.
+induction l as [| la lla]; intros; [ easy | ].
+cbn - [ is_sorted ].
+do 2 rewrite if_bool_if_dec.
+destruct (bool_dec (is_sorted Nat.ltb (i :: la))) as [H1| H1]. {
+  cbn - [ is_sorted ].
+  f_equal.
+  apply IHlla.
+}
+apply IHlla.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -3980,6 +3997,7 @@ sub_lists_of_seq_1_n n (S m)
 )
 ).
 *)
+unfold sub_lists_of_seq_1_n.
 Theorem sls1n_succ_r : ∀ i m n,
   sls1n i n (S m) =
   concat
@@ -4002,6 +4020,35 @@ f_equal. 2: {
   clear IHn.
   remember (λ la, _) as x; subst x.
   apply in_seq in Hj.
+  do 2 rewrite List_filter_is_sorted_cons.
+  f_equal.
+...
+  do 2 rewrite List_filter_map.
+  f_equal.
+(* is just returning to the expression before :-( *)
+...
+Compute (
+  let n := 4 in
+  let m := 2 in
+  let i := 2 in
+  let j := 3 in
+    (filter (λ la : list nat, is_sorted Nat.ltb la)
+       (map (cons j) (list_prodn (repeat (seq (S i) n) m)))) =
+    (filter (λ la : list nat, is_sorted Nat.ltb la)
+       (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m))))
+).
+...
+  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
+    (list_prodn (repeat (seq (S i) n) m)) =
+  (list_prodn (repeat (seq (S i) n) m))
+).
+...
+  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
+    (list_prodn (repeat (seq (S i) n) m)) =
+  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
+    (list_prodn (repeat (i :: seq (S i) n) m))
+).
+...
 Theorem list_prodn_repeat_cons : ∀ A (a : A) la n,
   list_prodn (repeat (a :: la) (S n)) =
   map (cons a) (list_prodn (repeat (a :: la) n)) ++
@@ -4020,16 +4067,6 @@ rewrite App_list_concat_map.
 rewrite <- flat_map_concat_map.
 (* ouais, ça marche pas, mon truc *)
 ...
-Compute (
-  let a := 17 in
-  let la := [2;5] in
-  let n := 2 in
-  list_prodn (repeat (a :: la) (S n)) =
-  map (cons a) (list_prodn (repeat la n)) ++
-  list_prodn (repeat la n)
-).
-(* ah oui non c'est pas bon putain *)
-...
 ... return
 rewrite list_prodn_repeat_cons.
 rewrite filter_app.
@@ -4044,9 +4081,6 @@ Compute (
 ).
 ...
 *)
-  filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (seq (S i) n) m)) =
-  filter (λ a : list nat, is_sorted Nat.ltb (j :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
-).
 ...
 rewrite seq_S.
 cbn - [ seq ].
