@@ -4004,15 +4004,29 @@ f_equal. 2: {
   apply in_seq in Hj.
 Theorem list_prodn_repeat_cons : ∀ A (a : A) la n,
   list_prodn (repeat (a :: la) (S n)) =
-  map (cons a) (list_prodn (repeat la n)) ++ list_prodn (repeat la n).
+  map (cons a) (list_prodn (repeat (a :: la) n)) ++
+  flat_map (λ b : A, map (cons b) (list_prodn (repeat (a :: la) n))) la.
 Proof.
 intros.
+cbn.
+rewrite App_list_concat_map.
+now rewrite <- flat_map_concat_map.
+Qed.
+destruct m; [ easy | ].
+cbn - [ is_sorted seq ].
+rewrite App_list_concat_map.
+rewrite <- flat_map_concat_map.
+rewrite App_list_concat_map.
+rewrite <- flat_map_concat_map.
+(* ouais, ça marche pas, mon truc *)
+...
 Compute (
   let a := 17 in
-  let la := [2;5;1] in
+  let la := [2;5] in
   let n := 2 in
   list_prodn (repeat (a :: la) (S n)) =
-  map (cons a) (list_prodn (repeat la n)) ++ list_prodn (repeat la n)
+  map (cons a) (list_prodn (repeat la n)) ++
+  list_prodn (repeat la n)
 ).
 (* ah oui non c'est pas bon putain *)
 ...
