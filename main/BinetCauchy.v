@@ -4022,10 +4022,12 @@ f_equal. 2: {
   apply in_seq in Hj.
   do 2 rewrite List_filter_is_sorted_cons.
   f_equal.
+(*
 ...
   do 2 rewrite List_filter_map.
   f_equal.
 (* is just returning to the expression before :-( *)
+*)
 ...
 Compute (
   let n := 4 in
