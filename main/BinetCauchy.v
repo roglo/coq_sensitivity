@@ -4102,13 +4102,23 @@ destruct m. {
   destruct (Nat.eq_dec (S i) i) as [H| H]; [ flia H | clear H ].
   now destruct n.
 }
-...
-(*
-...
 revert i m.
-induction n; intros; cbn.
+induction n; intros. {
+  cbn; symmetry.
+  rewrite App_list_concat_map.
+  rewrite <- flat_map_concat_map.
+  cbn - [ is_sorted ].
+  rewrite app_nil_r.
+  rewrite List_filter_map.
+  rewrite (proj2 (List_filter_nil_iff _ _)); [ easy | ].
+  intros la Hla; cbn.
+  now rewrite Nat.eqb_refl, Bool.andb_false_r.
+}
+cbn - [ seq ].
+rewrite App_list_concat_map.
 ...
-*)
+rewrite <- flat_map_concat_map.
+...
 Compute (
   let i := 0(*42*) in
   let n := 4 in
