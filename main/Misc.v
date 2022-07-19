@@ -1877,6 +1877,12 @@ apply HP.
 now apply nth_In.
 Qed.
 
+Theorem List_map_eq_nil_iff : ∀ A B (f : A → B) l, map f l = [] ↔ l = [].
+Proof.
+intros.
+split; [ apply map_eq_nil | now intros; subst l ].
+Qed.
+
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
   map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
 Proof.

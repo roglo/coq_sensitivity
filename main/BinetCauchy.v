@@ -4085,6 +4085,7 @@ f_equal. 2: {
   apply Nat.ltb_lt in Hjlt.
   flia Hj Hjlt.
 }
+clear IHn.
 rewrite List_filter_map.
 f_equal.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
@@ -4096,7 +4097,75 @@ destruct n. {
   rewrite <- flat_map_concat_map.
   cbn - [ is_sorted ].
   rewrite app_nil_r.
-  clear IHn.
+  rewrite List_filter_map.
+  rewrite (proj2 (List_filter_nil_iff _ _)); [ easy | ].
+  intros la Hla; cbn.
+  destruct i; [ easy | ].
+  replace (S i <=? i) with false; [ easy | ].
+  now symmetry; apply Nat.leb_gt.
+}
+(*1*)
+destruct n. {
+  cbn - [ is_sorted ].
+  destruct m. {
+    cbn - [ is_sorted ].
+    rewrite App_list_concat_map; cbn.
+    rewrite Nat.leb_refl; cbn.
+    destruct i; [ easy | ].
+    replace (S i <=? i) with false; [ easy | ].
+    now symmetry; apply Nat.leb_gt.
+  }
+  rewrite app_nil_r.
+  symmetry.
+  rewrite App_list_concat_map.
+  rewrite <- flat_map_concat_map.
+  cbn - [ is_sorted ].
+  rewrite app_nil_r.
+  rewrite filter_app.
+  rewrite List_filter_map.
+  rewrite (proj2 (List_filter_nil_iff _ _)). {
+    rewrite app_nil_l.
+    rewrite App_list_concat_map.
+    rewrite List_filter_map.
+    apply List_map_eq_nil_iff.
+    apply List_filter_nil_iff.
+    intros la Hla; cbn.
+    rewrite Nat.leb_refl.
+    rewrite Bool.andb_true_l.
+    apply in_concat in Hla.
+    destruct Hla as (lla & Ha & Hla).
+    apply in_map_iff in Ha.
+    destruct Ha as (a & H & Ha); subst lla.
+    apply in_map_iff in Hla.
+    destruct Hla as (lb & H & Hlb); subst la.
+    destruct Ha as [Ha| Ha]. {
+      subst a.
+      destruct i; [ easy | ].
+      destruct i; [ easy | ].
+      replace (_ <=? _) with false; [ easy | ].
+      symmetry; apply Nat.leb_gt; flia.
+    }
+    destruct Ha as [Ha| Ha]; [ subst a | easy ].
+    destruct i; [ easy | ].
+    replace (_ <=? _) with false; [ easy | ].
+    now symmetry; apply Nat.leb_gt.
+  }
+  intros la Hla; cbn.
+  destruct i; [ easy | ].
+  replace (S i <=? i) with false; [ easy | ].
+  now symmetry; apply Nat.leb_gt.
+}
+(*2*)
+...
+  ============================
+  sls1n (S i) (S n) (S m) =
+  filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
+    (list_prodn (repeat (seq i (S (S n))) (S m)))
+============================
+  sls1n (S i) (S (S n)) (S m) =
+  filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
+    (list_prodn (repeat (seq i (S (S (S n)))) (S m)))
+...
   induction m; intros. {
     cbn.
     rewrite Bool.andb_true_r.
@@ -4110,13 +4179,23 @@ destruct n. {
   rewrite map_map.
   rewrite <- concat_filter_map.
   rewrite map_map.
+  apply concat_nil_Forall, Forall_forall.
+  intros lla Hlla.
+  apply in_map_iff in Hlla.
+  destruct Hlla as (a & Ha & Hai).
+  destruct Hai; [ subst a | easy ].
+  remember (λ la, _) as x; subst x.
+  rewrite map_map in Ha.
 ...
 Compute (
   let n := 4 in
   let m := 2 in
   let i := 2 in
   let j := 3 in
-  sls1n (S i) n m = filter (λ a : list nat, is_sorted Nat.ltb (i :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
+    (map
+       (λ x : nat,
+          filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
+            (map (cons i) (map (cons x) (list_prodn (repeat [i] m))))) [i])
 ).
 ...
 Theorem list_prodn_repeat_cons : ∀ A (a : A) la n,
