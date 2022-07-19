@@ -4028,6 +4028,7 @@ f_equal. 2: {
   f_equal.
 (* is just returning to the expression before :-( *)
 *)
+(*
 Compute (
   let n := 4 in
   let m := 2 in
@@ -4058,6 +4059,7 @@ Compute (
   filter (λ la, negb (member Nat.eqb sta la))
     (list_prodn (repeat (seq sta (S len)) n))
 ).
+*)
 Theorem list_prodn_repeat_seq_succ_l : ∀ sta len n,
   list_prodn (repeat (seq (S sta) len) n) =
   filter (λ la, negb (member Nat.eqb sta la))
@@ -4078,29 +4080,18 @@ replace
     with ([] : list (list nat)). 2: {
   symmetry.
   clear IHn.
-  revert sta len.
-  induction n; intros; cbn; [ now rewrite Nat.eqb_refl | ].
-  rewrite App_list_concat_map.
-  cbn.
-  rewrite map_app.
-  rewrite filter_app.
-...
-Compute (
-let sta := 2 in
-let len := 4 in
-let n := 2 in
-(
-  map
-    (λ a : nat,
-       map (cons a)
-         (filter (λ la : list nat, negb (member Nat.eqb sta la)) (list_prodn (repeat (seq sta (S len)) n))))
-    (seq (S sta) len)) =
-(
-  map
-    (λ x : nat,
-       filter (λ la : list nat, negb (member Nat.eqb sta la))
-         (map (cons x) (list_prodn (repeat (seq sta (S len)) n)))) (seq sta (S len)))
-).
+  rewrite List_filter_map; cbn.
+  rewrite Nat.eqb_refl; cbn.
+  replace [] with (map (cons sta) []) by easy.
+  f_equal.
+  now apply List_filter_nil_iff.
+}
+cbn.
+f_equal.
+apply map_ext_in.
+intros a Ha.
+rewrite List_filter_map.
+f_equal.
 ... return
 rewrite list_prodn_repeat_seq_succ_l.
 rewrite List_filter_map.

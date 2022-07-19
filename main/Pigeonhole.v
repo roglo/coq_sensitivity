@@ -264,7 +264,7 @@ destruct la as [| x1]. {
   assert (H : ∀ x, x < a → f x < b). {
     intros x Hx.
     destruct (Nat.eq_dec (f x) b) as [Hfxb| Hfxb]. {
-      specialize (List_filter_nil _ _ Hla x) as H1.
+      specialize (proj1 (List_filter_nil_iff _ _) Hla x) as H1.
       assert (H : x ∈ seq 0 (S a)). {
         apply in_seq.
         flia Hx.

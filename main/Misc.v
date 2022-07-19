@@ -418,16 +418,26 @@ subst start; f_equal.
 rewrite <- Hl; apply IHn.
 Qed.
 
-Theorem List_filter_nil {A} : ∀ f (l : list A),
-  filter f l = [] → (∀ a, a ∈ l → f a = false).
+Theorem List_filter_nil_iff {A} : ∀ f (l : list A),
+  filter f l = [] ↔ (∀ a, a ∈ l → f a = false).
 Proof.
-intros * Hf a Ha.
-induction l as [| b l]; [ easy | ].
-cbn in Hf.
-remember (f b) as c eqn:Hc; symmetry in Hc.
-destruct c; [ easy | ].
-destruct Ha as [Ha| Ha]; [ now subst b | ].
-now apply IHl.
+intros.
+split. {
+  intros Hf a Ha.
+  induction l as [| b l]; [ easy | ].
+  cbn in Hf.
+  remember (f b) as c eqn:Hc; symmetry in Hc.
+  destruct c; [ easy | ].
+  destruct Ha as [Ha| Ha]; [ now subst b | ].
+  now apply IHl.
+} {
+  intros Hf.
+  induction l as [| a]; [ easy | cbn ].
+  rewrite Hf; [ | now left ].
+  apply IHl.
+  intros b Hb.
+  now apply Hf; right.
+}
 Qed.
 
 Theorem List_filter_filter : ∀ A (f g : A → bool) l,
