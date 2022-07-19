@@ -3655,6 +3655,47 @@ destruct (bool_dec (is_sorted Nat.ltb (i :: la))) as [H1| H1]. {
 apply IHlla.
 Qed.
 
+Theorem list_prodn_repeat_seq_succ_l : ∀ sta len n,
+  list_prodn (repeat (seq (S sta) len) n) =
+  filter (λ la, negb (member Nat.eqb sta la))
+    (list_prodn (repeat (seq sta (S len)) n)).
+Proof.
+intros.
+revert sta len.
+induction n; intros; [ easy | ].
+cbn.
+do 2 rewrite App_list_concat_map.
+rewrite <- concat_filter_map.
+rewrite map_map.
+rewrite IHn.
+cbn.
+replace
+  (filter (λ la : list nat, negb (member Nat.eqb sta la))
+    (map (cons sta) (list_prodn (repeat (sta :: seq (S sta) len) n))))
+    with ([] : list (list nat)). 2: {
+  symmetry.
+  clear IHn.
+  rewrite List_filter_map; cbn.
+  rewrite Nat.eqb_refl; cbn.
+  replace [] with (map (cons sta) []) by easy.
+  f_equal.
+  now apply List_filter_nil_iff.
+}
+cbn.
+f_equal.
+apply map_ext_in.
+intros a Ha.
+apply in_seq in Ha.
+rewrite List_filter_map.
+f_equal.
+apply filter_ext_in.
+intros la Hla.
+f_equal; cbn.
+rewrite if_bool_if_dec.
+destruct (bool_dec (sta =? a)) as [Hsa| Hsa]; [ | easy ].
+apply Nat.eqb_eq in Hsa; subst a; flia Ha.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4022,109 +4063,60 @@ f_equal. 2: {
   apply in_seq in Hj.
   do 2 rewrite List_filter_is_sorted_cons.
   f_equal.
-(*
-...
-  do 2 rewrite List_filter_map.
+  rewrite list_prodn_repeat_seq_succ_l.
+  rewrite List_filter_map.
+  rewrite List_filter_filter.
+  replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+  remember (list_prodn (repeat (seq i (S n)) m)) as lla eqn:Hlla.
+  rewrite List_filter_map.
   f_equal.
-(* is just returning to the expression before :-( *)
-*)
-(*
+  remember (λ la, _) as x; subst x; symmetry.
+  remember (λ la, _) as x; subst x; symmetry.
+  apply filter_ext_in.
+  intros la Hla.
+  remember (is_sorted Nat.ltb (j :: la)) as s eqn:Hs; symmetry in Hs.
+  destruct s; [ cbn | easy ].
+  apply Bool.negb_true_iff.
+  apply (member_false_iff Nat.eqb_eq).
+  intros a Ha H; subst a.
+  apply (sorted_cons_iff Nat_ltb_trans) in Hs.
+  destruct Hs as (Hs & Hjlt).
+  specialize (Hjlt _ Ha).
+  apply Nat.ltb_lt in Hjlt.
+  flia Hj Hjlt.
+}
+rewrite List_filter_map.
+f_equal.
+replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+destruct m; [ now destruct n | ].
+destruct n. {
+  cbn - [ is_sorted ].
+  symmetry.
+  rewrite App_list_concat_map.
+  rewrite <- flat_map_concat_map.
+  cbn - [ is_sorted ].
+  rewrite app_nil_r.
+  clear IHn.
+  induction m; intros. {
+    cbn.
+    rewrite Bool.andb_true_r.
+    destruct i; [ easy | ].
+    rewrite if_leb_le_dec.
+    destruct (le_dec (S i) i) as [H| H]; [ flia H | easy ].
+  }
+  cbn - [ is_sorted ].
+  rewrite App_list_concat_map.
+  rewrite concat_map.
+  rewrite map_map.
+  rewrite <- concat_filter_map.
+  rewrite map_map.
+...
 Compute (
   let n := 4 in
   let m := 2 in
   let i := 2 in
   let j := 3 in
-    (filter (λ la : list nat, is_sorted Nat.ltb la)
-       (map (cons j) (list_prodn (repeat (seq (S i) n) m)))) =
-    (filter (λ la : list nat, is_sorted Nat.ltb la)
-       (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m))))
-).
-Compute ((repeat (seq 1 2) 3)).
-Compute (list_prodn (repeat (seq 1 2) 3)).
-Compute (
-  let n := 4 in
-  let m := 2 in
-  let i := 10 in
-  let j := 11 in
-  filter (λ la : list nat, is_sorted Nat.ltb la)
-    (map (cons j) (list_prodn (repeat (seq (S i) n) m))) =
-  filter (λ la : list nat, is_sorted Nat.ltb la)
-    (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m)))
-).
-Compute (
-  let n := 2 in
-  let sta := 2 in
-  let len := 5 in
-  list_prodn (repeat (seq (S sta) len) n) =
-  filter (λ la, negb (member Nat.eqb sta la))
-    (list_prodn (repeat (seq sta (S len)) n))
-).
-*)
-Theorem list_prodn_repeat_seq_succ_l : ∀ sta len n,
-  list_prodn (repeat (seq (S sta) len) n) =
-  filter (λ la, negb (member Nat.eqb sta la))
-    (list_prodn (repeat (seq sta (S len)) n)).
-Proof.
-intros.
-revert sta len.
-induction n; intros; [ easy | ].
-cbn.
-do 2 rewrite App_list_concat_map.
-rewrite <- concat_filter_map.
-rewrite map_map.
-rewrite IHn.
-cbn.
-replace
-  (filter (λ la : list nat, negb (member Nat.eqb sta la))
-    (map (cons sta) (list_prodn (repeat (sta :: seq (S sta) len) n))))
-    with ([] : list (list nat)). 2: {
-  symmetry.
-  clear IHn.
-  rewrite List_filter_map; cbn.
-  rewrite Nat.eqb_refl; cbn.
-  replace [] with (map (cons sta) []) by easy.
-  f_equal.
-  now apply List_filter_nil_iff.
-}
-cbn.
-f_equal.
-apply map_ext_in.
-intros a Ha.
-rewrite List_filter_map.
-f_equal.
-... return
-rewrite list_prodn_repeat_seq_succ_l.
-rewrite List_filter_map.
-rewrite List_filter_filter.
-replace (i :: seq (S i) n) with (seq i (S n)) by easy.
-remember (list_prodn (repeat (seq i (S n)) m)) as lla eqn:Hlla.
-rewrite List_filter_map.
-f_equal.
-remember (λ la, _) as x; subst x; symmetry.
-remember (λ la, _) as x; subst x; symmetry.
-apply filter_ext_in.
-intros la Hla.
-remember (is_sorted Nat.ltb (j :: la)) as s eqn:Hs; symmetry in Hs.
-destruct s; [ cbn | easy ].
-apply Bool.negb_true_iff.
-apply (member_false_iff Nat.eqb_eq).
-intros a Ha H; subst a.
-apply (sorted_cons_iff Nat_ltb_trans) in Hs.
-destruct Hs as (Hs & Hjlt).
-specialize (Hjlt _ Ha).
-apply Nat.ltb_lt in Hjlt.
-flia Hj Hjlt.
-}
-...
-  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
-    (list_prodn (repeat (seq (S i) n) m)) =
-  (list_prodn (repeat (seq (S i) n) m))
-).
-...
-  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
-    (list_prodn (repeat (seq (S i) n) m)) =
-  filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
-    (list_prodn (repeat (i :: seq (S i) n) m))
+  sls1n (S i) n m = filter (λ a : list nat, is_sorted Nat.ltb (i :: a)) (list_prodn (repeat (i :: seq (S i) n) m))
 ).
 ...
 Theorem list_prodn_repeat_cons : ∀ A (a : A) la n,
