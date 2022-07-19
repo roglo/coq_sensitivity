@@ -4086,10 +4086,24 @@ f_equal. 2: {
   flia Hj Hjlt.
 }
 clear IHn.
+replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+replace (map (λ l, i :: l)) with (map (cons i)) by easy.
+...
+Compute (
+  let i := 42 in
+  let n := 3 in
+  let m := 2 in
+map (cons i) (sls1n (S i) n m)
+=
+filter (is_sorted Nat.ltb)
+  (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
+).
+...
 rewrite List_filter_map.
 f_equal.
-replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+Print list_prodn.
 (**)
+...
 revert n i.
 induction m; intros; [ now destruct n | ].
 cbn - [ is_sorted ].
