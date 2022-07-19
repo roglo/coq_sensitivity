@@ -4088,11 +4088,47 @@ f_equal. 2: {
 clear IHn.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
 replace (map (λ l, i :: l)) with (map (cons i)) by easy.
+Theorem glop : ∀ i m n,
+  sls1n (S i) n m =
+  filter (λ la, (is_sorted Nat.ltb la && (hd (S i) la ≠? i))%bool)
+    (list_prodn (repeat (seq i (S n)) m)).
+Proof.
+intros.
+destruct m. {
+  destruct i; [ now destruct n | ].
+  remember (S i) as x; cbn; subst x.
+  rewrite Bool.if_negb.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (S i) i) as [H| H]; [ flia H | clear H ].
+  now destruct n.
+}
 ...
+(*
+...
+revert i m.
+induction n; intros; cbn.
+...
+*)
 Compute (
-  let i := 42 in
-  let n := 3 in
-  let m := 2 in
+  let i := 0(*42*) in
+  let n := 4 in
+  let m := 0(*3*) in
+  sls1n (S i) n m =
+  filter (λ la, (is_sorted Nat.ltb la && (hd 0 la ≠? i))%bool)
+    (list_prodn (repeat (seq i (S n)) m))
+).
+Print sls1n.
+...
+  (sls1n (S i) n m) =
+  filter (is_sorted Nat.ltb) (filter (λ la, negb (member Nat.eqb i la)) (list_prodn (repeat (seq i (S n)) m)))
+).
+  map (cons i) (sls1n (S i) n m) =
+  filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
+).
+...
+seq (S i) n).
+sls1n (S i) n m).
+...
 map (cons i) (sls1n (S i) n m)
 =
 filter (is_sorted Nat.ltb)
