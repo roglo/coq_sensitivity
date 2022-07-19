@@ -4089,7 +4089,17 @@ clear IHn.
 rewrite List_filter_map.
 f_equal.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+(**)
+revert n i.
+induction m; intros; [ now destruct n | ].
+cbn - [ is_sorted ].
+rewrite App_list_concat_map.
+rewrite <- flat_map_concat_map.
+cbn - [ is_sorted ].
+...
+... previous proof attempt
 destruct m; [ now destruct n | ].
+(*0*)
 destruct n. {
   cbn - [ is_sorted ].
   symmetry.
@@ -4156,7 +4166,23 @@ destruct n. {
   now symmetry; apply Nat.leb_gt.
 }
 (*2*)
+Theorem glop : ∀ m n k i,
+  sls1n (S i) (k + n) (S m) =
+  filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
+    (list_prodn (repeat (seq i (k + S n)) (S m))).
+Proof.
+intros.
+cbn - [ is_sorted ].
+rewrite App_list_concat_map.
+rewrite <- flat_map_concat_map.
+remember (list_prodn (repeat (seq i (k + S n)) m)) as lla eqn:Hlla.
 ...
+apply (glop m n 2 i).
+...
+  ============================
+  sls1n (S i) n (S m) =
+  filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
+    (list_prodn (repeat (seq i (S n)) (S m)))
   ============================
   sls1n (S i) (S n) (S m) =
   filter (λ a : list nat, is_sorted Nat.ltb (i :: a))
