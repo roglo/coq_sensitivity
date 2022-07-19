@@ -4050,6 +4050,80 @@ Compute (
   filter (λ la : list nat, is_sorted Nat.ltb la)
     (map (cons j) (list_prodn (repeat (i :: seq (S i) n) m)))
 ).
+Compute (
+  let n := 2 in
+  let sta := 2 in
+  let len := 5 in
+  list_prodn (repeat (seq (S sta) len) n) =
+  filter (λ la, negb (member Nat.eqb sta la))
+    (list_prodn (repeat (seq sta (S len)) n))
+).
+Theorem list_prodn_repeat_seq_succ_l : ∀ sta len n,
+  list_prodn (repeat (seq (S sta) len) n) =
+  filter (λ la, negb (member Nat.eqb sta la))
+    (list_prodn (repeat (seq sta (S len)) n)).
+Proof.
+intros.
+revert sta len.
+induction n; intros; [ easy | ].
+cbn.
+do 2 rewrite App_list_concat_map.
+rewrite <- concat_filter_map.
+rewrite map_map.
+rewrite IHn.
+cbn.
+replace
+  (filter (λ la : list nat, negb (member Nat.eqb sta la))
+    (map (cons sta) (list_prodn (repeat (sta :: seq (S sta) len) n))))
+    with ([] : list (list nat)). 2: {
+  symmetry.
+  clear IHn.
+  revert sta len.
+  induction n; intros; cbn; [ now rewrite Nat.eqb_refl | ].
+  rewrite App_list_concat_map.
+  cbn.
+  rewrite map_app.
+  rewrite filter_app.
+...
+Compute (
+let sta := 2 in
+let len := 4 in
+let n := 2 in
+(
+  map
+    (λ a : nat,
+       map (cons a)
+         (filter (λ la : list nat, negb (member Nat.eqb sta la)) (list_prodn (repeat (seq sta (S len)) n))))
+    (seq (S sta) len)) =
+(
+  map
+    (λ x : nat,
+       filter (λ la : list nat, negb (member Nat.eqb sta la))
+         (map (cons x) (list_prodn (repeat (seq sta (S len)) n)))) (seq sta (S len)))
+).
+... return
+rewrite list_prodn_repeat_seq_succ_l.
+rewrite List_filter_map.
+rewrite List_filter_filter.
+replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+remember (list_prodn (repeat (seq i (S n)) m)) as lla eqn:Hlla.
+rewrite List_filter_map.
+f_equal.
+remember (λ la, _) as x; subst x; symmetry.
+remember (λ la, _) as x; subst x; symmetry.
+apply filter_ext_in.
+intros la Hla.
+remember (is_sorted Nat.ltb (j :: la)) as s eqn:Hs; symmetry in Hs.
+destruct s; [ cbn | easy ].
+apply Bool.negb_true_iff.
+apply (member_false_iff Nat.eqb_eq).
+intros a Ha H; subst a.
+apply (sorted_cons_iff Nat_ltb_trans) in Hs.
+destruct Hs as (Hs & Hjlt).
+specialize (Hjlt _ Ha).
+apply Nat.ltb_lt in Hjlt.
+flia Hj Hjlt.
+}
 ...
   filter (λ la : list nat, is_sorted Nat.ltb (j :: la))
     (list_prodn (repeat (seq (S i) n) m)) =
