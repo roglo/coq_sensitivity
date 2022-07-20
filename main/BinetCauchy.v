@@ -4116,8 +4116,15 @@ induction n; intros. {
 }
 cbn - [ seq ].
 rewrite App_list_concat_map.
-...
 rewrite <- flat_map_concat_map.
+Compute (
+  let i := 42 in
+  let n := 3 in
+  let m := 2 in
+list_prodn (repeat (seq i n) (S m)) =
+concat (map (λ j, map (cons j) (list_prodn (repeat (seq i n) m))) (seq i n))
+).
+Print list_prodn.
 ...
 Compute (
   let i := 0(*42*) in
