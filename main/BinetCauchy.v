@@ -2573,7 +2573,7 @@ induction ll as [| l1]; intros. {
   destruct Hl as [Hl| Hl]; [ now subst l | easy ].
 }
 cbn in Hl.
-apply in_App_list in Hl.
+apply in_flat_map in Hl.
 destruct Hl as (a & Hl1 & Ha).
 apply in_map_iff in Ha.
 destruct Ha as (l3 & Hl & Hl3).
@@ -2608,13 +2608,12 @@ destruct ll as [| l1]. {
   clear Hnz.
   revert i Hi.
   induction l as [| a]; intros; [ easy | cbn ].
-  destruct i; [ now rewrite App_list_cons | ].
+  destruct i; [ easy | ].
   cbn in Hi; apply Nat.succ_lt_mono in Hi.
-  rewrite App_list_cons; cbn.
   now apply IHl.
 }
 remember (l1 :: ll) as ll'; cbn; subst ll'.
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   intros ll1 Hll1.
   apply in_map_iff in Hll1.
@@ -2735,19 +2734,19 @@ induction ll as [| l1]; intros; [ easy | ].
 cbn in Hll |-*.
 destruct i. {
   destruct ll as [| l2]. {
-    apply in_App_list in Hll.
+    apply in_flat_map in Hll.
     destruct Hll as (a & Ha & Hla).
     apply in_map_iff in Hla.
     now destruct Hla as (l2 & H & Hl2); subst l.
   }
-  apply in_App_list in Hll.
+  apply in_flat_map in Hll.
   destruct Hll as (a & Hl1 & Hl).
   apply in_map_iff in Hl.
   now destruct Hl as (l3 & H & Hl3); subst l.
 }
 cbn in Hi; apply Nat.succ_lt_mono in Hi.
 destruct ll as [| l2]; [ easy | ].
-apply in_App_list in Hll.
+apply in_flat_map in Hll.
 destruct Hll as (a & Ha & Hl).
 apply in_map_iff in Hl.
 destruct Hl as (l3 & H & Hl3); subst l.
@@ -2792,18 +2791,17 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   induction m; [ easy | ].
   rewrite seq_S.
   cbn - [ seq ].
-  rewrite App_list_app.
+  rewrite flat_map_app.
   rewrite app_nth1; [ easy | ].
-  rewrite App_list_length.
+  rewrite List_flat_map_length.
   cbn - [ rngl_zero rngl_add seq ].
   rewrite nat_summation_list_all_same, seq_length.
   now cbn.
 }
 rewrite seq_S at 1.
-rewrite App_list_app; cbn - [ seq ].
-unfold iter_list at 2; cbn - [ seq ].
+rewrite flat_map_app; cbn - [ seq ].
 rewrite app_nth1. 2: {
-  rewrite App_list_length.
+  rewrite List_flat_map_length.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros i Hi.
     rewrite map_length.
@@ -2827,11 +2825,8 @@ rewrite app_nth1. 2: {
   split; [ | flia Hnm Hnz ].
   now apply Nat.pow_nonzero.
 }
-rewrite iter_list_seq; [ | flia Hnm Hnz ].
-rewrite Nat.add_comm, Nat.add_sub.
 destruct m; [ flia Hnm Hnz | ].
-rewrite App_split with (j := 1); [ | flia ].
-rewrite App_only_one.
+rewrite flat_map_concat_map.
 assert (Hzl : 0 < length (list_prodn (repeat (seq 1 (S (S m))) n))). {
   rewrite list_prodn_length; [ | now destruct n ].
   erewrite rngl_product_list_eq_compat. 2: {
@@ -2848,6 +2843,7 @@ assert (Hzl : 0 < length (list_prodn (repeat (seq 1 (S (S m))) n))). {
   apply Nat.neq_0_lt_0.
   now apply Nat.pow_nonzero.
 }
+remember (seq 1 (S (S m))) as s; cbn; subst s.
 rewrite app_nth1; [ | now rewrite map_length ].
 rewrite (List_map_nth' []); [ | easy ].
 f_equal.
@@ -3351,9 +3347,9 @@ intros.
 revert n.
 induction m; intros; [ easy | ].
 cbn - [ seq ].
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 rewrite <- concat_filter_map.
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 rewrite map_map.
 do 2 rewrite <- App_list_concat_map.
 symmetry.
@@ -3663,8 +3659,8 @@ Proof.
 intros.
 revert sta len.
 induction n; intros; [ easy | ].
-cbn.
-do 2 rewrite App_list_concat_map.
+remember (seq sta (S len)) as s; cbn; subst s.
+do 2 rewrite flat_map_concat_map.
 rewrite <- concat_filter_map.
 rewrite map_map.
 rewrite IHn.

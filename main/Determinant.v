@@ -233,7 +233,7 @@ intros * Hll.
 revert Hll.
 induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
 rewrite rngl_product_list_cons.
-rewrite App_list_length.
+rewrite List_flat_map_length.
 erewrite iter_list_eq_compat. 2: {
   intros i Hi.
   now rewrite map_length.
@@ -312,7 +312,7 @@ split. {
   subst n.
   revert m Hm.
   induction l as [| a]; intros; [ easy | clear Hnz; cbn ].
-  apply in_App_list.
+  apply in_flat_map.
   exists a.
   split. {
     apply in_seq.
@@ -352,7 +352,7 @@ split. {
   induction n; intros; [ now left; destruct Hl | right ].
   split; [ easy | ].
   cbn in Hl.
-  apply in_App_list in Hl.
+  apply in_flat_map in Hl.
   destruct Hl as (a & Ha & Hl).
   apply in_map_iff in Hl.
   destruct Hl as (l2 & Hl & Hl2); subst l.
@@ -393,7 +393,7 @@ induction n; intros. {
 cbn.
 specialize (IHn m) as H1.
 remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
   apply in_map_iff in Hl.

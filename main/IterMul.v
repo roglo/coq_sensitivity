@@ -582,7 +582,7 @@ intros Hop * Hmz.
 revert n f.
 induction m; intros; [ easy | clear Hmz; cbn ].
 remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
 erewrite rngl_summation_list_eq_compat. 2: {

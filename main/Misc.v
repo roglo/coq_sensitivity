@@ -2663,10 +2663,7 @@ Qed.
 Fixpoint list_prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => [[]]
-  | l :: ll' => App (a ∈ l), map (cons a) (list_prodn ll')
-(*
   | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
-*)
   end.
 
 Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
@@ -2677,20 +2674,9 @@ split. {
   intros Hll.
   induction ll as [| l1]; [ easy | ].
   cbn in Hll.
-(*
   rewrite flat_map_concat_map in Hll.
   apply concat_nil_Forall in Hll.
   specialize (proj1 (Forall_forall _ _) Hll) as H1.
-  cbn in H1.
-  destruct l1 as [| a]; [ now left | ].
-...
-  right; apply IHll.
-...
-  rewrite App_list_concat_map in Hll.
-  rewrite <- flat_map_concat_map in Hll.
-Locate "App".
-*)
-  specialize (App_list_eq_nil _ _ Hll) as H1.
   cbn in H1.
   destruct l1 as [| a]; [ now left | right ].
   specialize (H1 _ (or_introl eq_refl)).
@@ -2702,7 +2688,7 @@ Locate "App".
   destruct Hll as [Hll| Hll]; [ now subst l1 | ].
   specialize (IHll Hll).
   rewrite IHll; cbn.
-  now apply App_list_all_nil.
+  now induction l1.
 }
 Qed.
 
