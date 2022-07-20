@@ -4049,6 +4049,11 @@ Proof.
 intros.
 rewrite map_map.
 rewrite <- flat_map_concat_map.
+(*
+  ============================
+  sls1n i n (S m) =
+  flat_map (λ x : nat, filter (is_sorted Nat.ltb) (map (cons x) (list_prodn (repeat (seq i n) m)))) (seq i n)
+*)
 revert i m.
 induction n; intros; [ easy | ].
 cbn.
@@ -4088,6 +4093,11 @@ f_equal. 2: {
 clear IHn.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
 replace (map (λ l, i :: l)) with (map (cons i)) by easy.
+(*
+  ============================
+  map (cons i) (sls1n (S i) n m) =
+  filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
+*)
 ...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
