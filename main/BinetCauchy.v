@@ -4088,6 +4088,7 @@ f_equal. 2: {
 clear IHn.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
 replace (map (λ l, i :: l)) with (map (cons i)) by easy.
+...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
   filter (λ la, (is_sorted Nat.ltb la && (hd (S i) la ≠? i))%bool)
@@ -4102,6 +4103,23 @@ destruct m. {
   destruct (Nat.eq_dec (S i) i) as [H| H]; [ flia H | clear H ].
   now destruct n.
 }
+Theorem glop : ∀ i m n,
+  list_prodn (repeat (seq i n) (S m)) =
+  concat (map (λ j, map (cons j) (list_prodn (repeat (seq i n) m))) (seq i n)).
+Proof.
+intros; cbn.
+now rewrite App_list_concat_map.
+Qed.
+rewrite glop.
+rewrite <- concat_filter_map.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  rewrite List_filter_map.
+  cbn - [ is_sorted seq ].
+  easy.
+}
+...
 revert i m.
 induction n; intros. {
   cbn; symmetry.
