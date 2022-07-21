@@ -4012,7 +4012,7 @@ induction m; intros; cbn. {
   do 2 rewrite rngl_summation_list_only_one; cbn.
   now rewrite rngl_summation_list_only_one.
 }
-rewrite App_list_concat_map.
+rewrite flat_map_concat_map.
 (*
 rewrite rngl_summation_list_concat.
 Compute (
@@ -4094,6 +4094,7 @@ replace (map (λ l, i :: l)) with (map (cons i)) by easy.
   map (cons i) (sls1n (S i) n m) =
   filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
 *)
+Print list_prodn.
 ...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
