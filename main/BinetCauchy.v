@@ -3546,7 +3546,7 @@ unfold all_comb, all_comb'.
 apply list_prodn_prodn_repeat.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3963,6 +3963,7 @@ m,
 )
 ) (seq 0 n)
 ).
+...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
   filter (λ la, (is_sorted Nat.ltb la && (hd (S i) la ≠? i))%bool)
