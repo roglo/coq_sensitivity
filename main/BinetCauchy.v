@@ -4087,12 +4087,15 @@ f_equal. 2: {
   apply in_seq in Hj.
   do 2 rewrite List_filter_is_sorted_cons.
   f_equal.
-...
+  rewrite <- list_prodn_prodn_repeat.
   rewrite list_prodn_repeat_seq_succ_l.
+  rewrite list_prodn_prodn_repeat.
   rewrite List_filter_map.
   rewrite List_filter_filter.
   replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+  rewrite <- list_prodn_prodn_repeat.
   remember (list_prodn (repeat (seq i (S n)) m)) as lla eqn:Hlla.
+  rewrite list_prodn_prodn_repeat in Hlla.
   rewrite List_filter_map.
   f_equal.
   remember (λ la, _) as x; subst x; symmetry.
@@ -4118,6 +4121,8 @@ replace (map (λ l, i :: l)) with (map (cons i)) by easy.
   map (cons i) (sls1n (S i) n m) =
   filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
 *)
+Print prodn_repeat.
+...
 Print list_prodn.
 Compute (
   let i := 0 in
