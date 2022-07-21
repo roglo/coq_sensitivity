@@ -3692,6 +3692,29 @@ destruct (bool_dec (sta =? a)) as [Hsa| Hsa]; [ | easy ].
 apply Nat.eqb_eq in Hsa; subst a; flia Ha.
 Qed.
 
+Fixpoint prodn_repeat {A} (l : list A) n :=
+  match n with
+  | 0 => [[]]
+  | S n' => flat_map (λ a, map (cons a) (prodn_repeat l n')) l
+  end.
+
+Definition all_comb' n := prodn_repeat (seq 1 n) n.
+
+Theorem list_prodn_prodn_repeat : ∀ i m n,
+  list_prodn (repeat (seq i n) m) = prodn_repeat (seq i n) m.
+Proof.
+intros.
+revert n.
+induction m; intros; [ easy | now cbn; rewrite IHm ].
+Qed.
+
+Theorem all_comb_all_comb' : ∀ n, all_comb n = all_comb' n.
+Proof.
+intros.
+unfold all_comb, all_comb'.
+apply list_prodn_prodn_repeat.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4006,6 +4029,7 @@ Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
 Proof.
 intros.
+rewrite list_prodn_prodn_repeat.
 revert n.
 induction m; intros; cbn. {
   rewrite sub_lists_of_seq_1_n_0_r.
@@ -4039,8 +4063,7 @@ Theorem sls1n_succ_r : ∀ i m n,
   sls1n i n (S m) =
   concat
     (map (filter (is_sorted Nat.ltb))
-       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq i n) m)))
-          (seq i n))).
+       (map (λ a : nat, map (cons a) (prodn_repeat (seq i n) m)) (seq i n))).
 Proof.
 intros.
 rewrite map_map.
@@ -4048,7 +4071,7 @@ rewrite <- flat_map_concat_map.
 (*
   ============================
   sls1n i n (S m) =
-  flat_map (λ x : nat, filter (is_sorted Nat.ltb) (map (cons x) (list_prodn (repeat (seq i n) m)))) (seq i n)
+  flat_map (λ x : nat, filter (is_sorted Nat.ltb) (map (cons x) (prodn_repeat (seq i n) m))) (seq i n)
 *)
 revert i m.
 induction n; intros; [ easy | ].
@@ -4064,6 +4087,7 @@ f_equal. 2: {
   apply in_seq in Hj.
   do 2 rewrite List_filter_is_sorted_cons.
   f_equal.
+...
   rewrite list_prodn_repeat_seq_succ_l.
   rewrite List_filter_map.
   rewrite List_filter_filter.
@@ -4106,52 +4130,6 @@ m,
 )
 ) (seq 0 n)
 ).
-Print list_prodn.
-(* il faudrait peut-être un "list_prodn" qui soit spécialisé
-   "repeat (seq 1 n) m" : peut-être que ça lui donnerait des
-   propriétés sympa *)
-...
-[false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
-
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; true; true;
- false; false; false; false; true;
- false; false; false; false; false;
-
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; true;
- false; false; false; false; false;
-
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
-
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false;
- false; false; false; false; false])]
-
-
-[false; false; false; false; false;
- false; false; true; true; true;
- false; false; false; true; true;
- false; false; false; false; true;
- false; false; false; false; false]);
-
-[false; false; false; false;
- false; false; true; true;
- false; false; false; true;
- false; false; false; false])]
 ...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
