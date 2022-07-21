@@ -3465,175 +3465,6 @@ cbn - [ "-" ].
 ...
 *)
 
-(*
-Theorem map_map_map_sub_succ : ∀ m n p,
-  n ≤ S p
-  → map (map (λ i, i + n - p)) (map (map_sub_succ p) (sls1n n (S m))) =
-    flat_map
-      (λ a,
-         filter (is_sorted Nat.ltb)
-           (map (cons a) (list_prodn (repeat (seq 1 n) m))))
-      (seq 1 n).
-Proof.
-intros * Hnp.
-(*
-Compute (
-  let n := 6 in
-  let m := 2 in
-  let p := 5 in
-  map (map (λ i, i + n - p))
-  (map (map_sub_succ p) (sls1n n (S m)))
- =
-  flat_map
-    (λ x : nat,
-       filter (is_sorted Nat.ltb)
-         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
-    (seq 1 n)
-).
-...
-*)
-rewrite map_map.
-unfold map_sub_succ.
-erewrite map_ext_in. 2: {
-  intros t Ht.
-  rewrite map_map.
-  erewrite map_ext_in. 2: {
-    intros a Ha.
-    rewrite <- Nat.add_sub_swap. 2: {
-      apply in_sls1n_iff in Ht.
-      destruct Ht as [| (Hs & Htm & Ht)]; [ easy | ].
-      specialize (Ht _ Ha).
-      flia Hnp Ht.
-    }
-    rewrite Nat_sub_sub_swap, Nat.add_comm.
-    rewrite <- Nat.add_sub_assoc; [ | apply Nat.le_succ_diag_r ].
-    rewrite Nat.sub_succ_l; [ | easy ].
-    now rewrite Nat.sub_diag, Nat.add_1_r.
-  }
-  easy.
-}
-...
-rewrite map_map.
-revert m p Hnp.
-induction n; intros; [ easy | ].
-cbn - [ seq ].
-apply Nat.succ_le_mono in Hnp.
-...
-destruct p. {
-  apply Nat.le_0_r in Hnp; subst n.
-...
-  unfold map_sub_succ.
-...
-destruct p; [ easy | ].
-cbn - [ seq ].
-rewrite map_app.
-rewrite map_map.
-Theorem glop : ∀ n la,
-  (∀ a, a ∈ la → a ≤ S n)
-  → map_sub_succ (S n) la = map S (map_sub_succ n la).
-Proof.
-intros * Hla.
-induction la as [| a]; [ easy | ].
-cbn - [ "-" ].
-f_equal. {
-  specialize (Hla _ (or_introl eq_refl)).
-  flia Hla.
-}
-apply IHla.
-intros i Hi.
-now apply Hla; right.
-Qed.
-remember (map _ _) as x.
-erewrite map_ext_in. 2: {
-  intros t Ht.
-  rewrite glop. 2: {
-    intros a Ha.
-    apply in_sls1n_iff in Ht.
-    destruct Ht as [| Ht]; [ easy | ].
-    destruct Ht as (Hs & Htm & Ht).
-    specialize (Ht a Ha).
-    flia Ht Hnp.
-  }
-  rewrite map_map.
-  easy.
-}
-subst x.
-erewrite map_ext_in. 2: {
-  intros t Ht.
-  rewrite glop. 2: {
-    intros a Ha.
-    apply in_sls1n_iff in Ht.
-    destruct Ha as [Ha| Ha]. {
-      subst a.
-      now apply -> Nat.succ_le_mono.
-    }
-    destruct Ht as [(H1, H2)| Ht]; [ now subst t | ].
-    destruct Ht as (Hs & Htm & Ht).
-    specialize (Ht a Ha).
-    flia Ht Hnp.
-  }
-  rewrite map_map.
-  easy.
-}
-...
-rewrite IHn.
-...
-Theorem sub_lists_of_seq_1_n_succ_r : ∀ m n,
-  sub_lists_of_seq_1_n n (S m) =
-  concat
-    (map (filter (is_sorted Nat.ltb))
-       (map (λ a : nat, map (cons a) (list_prodn (repeat (seq 1 n) m)))
-          (seq 1 n))).
-Proof.
-intros.
-rewrite map_map.
-rewrite <- flat_map_concat_map.
-unfold sub_lists_of_seq_1_n.
-...
-rewrite <- map_map_map_sub_succ with (p := n); [ | easy ].
-symmetry.
-erewrite map_ext_in. 2: {
-  intros t Ht.
-  erewrite map_ext_in. 2: {
-    intros i Hi.
-    now rewrite Nat.sub_diag, Nat.sub_0_r.
-  }
-  now rewrite map_id.
-}
-now rewrite map_id.
-...
-Compute (
-  let n := 5 in
-  let m := 2 in
-  let p := 7 in
-  map (map (λ i, i - (p - n)))
-  (map (map_sub_succ p) (sls1n n (S m)))
- =
-  flat_map
-    (λ x : nat,
-       filter (is_sorted Nat.ltb)
-         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
-    (seq 1 n)
-).
-...
-revert m.
-induction n; intros; [ easy | ].
-cbn - [ seq ].
-rewrite map_app.
-cbn - [ seq ].
-Compute (
-  let n := 5 in
-  let m := 2 in
-  sub_lists_of_seq_1_n n (S m) =
-  flat_map
-    (λ x : nat,
-       filter (is_sorted Nat.ltb)
-         (map (cons x) (list_prodn (repeat (seq 1 n) m))))
-    (seq 1 n)
-).
-...
-*)
-
 Theorem List_filter_is_sorted_cons : ∀ i l,
   filter (λ la, is_sorted Nat.ltb (i :: la)) l =
   map (λ la, tl la) (filter (λ la, is_sorted Nat.ltb la) (map (cons i) l)).
@@ -3715,7 +3546,7 @@ unfold all_comb, all_comb'.
 apply list_prodn_prodn_repeat.
 Qed.
 
-(* to be completed
+(* to be completed *)
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -4119,11 +3950,8 @@ replace (map (λ l, i :: l)) with (map (cons i)) by easy.
 (*
   ============================
   map (cons i) (sls1n (S i) n m) =
-  filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
+  filter (is_sorted Nat.ltb) (map (cons i) (prodn_repeat (seq i (S n)) m))
 *)
-Print prodn_repeat.
-...
-Print list_prodn.
 Compute (
   let i := 0 in
   let n := 2 in
@@ -4135,11 +3963,10 @@ m,
 )
 ) (seq 0 n)
 ).
-...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
   filter (λ la, (is_sorted Nat.ltb la && (hd (S i) la ≠? i))%bool)
-    (list_prodn (repeat (seq i (S n)) m)).
+    (prodn_repeat (seq i (S n)) m).
 Proof.
 intros.
 destruct m. {
@@ -4151,11 +3978,11 @@ destruct m. {
   now destruct n.
 }
 Theorem glop : ∀ i m n,
-  list_prodn (repeat (seq i n) (S m)) =
-  concat (map (λ j, map (cons j) (list_prodn (repeat (seq i n) m))) (seq i n)).
+  prodn_repeat (seq i n) (S m) =
+  concat (map (λ j, map (cons j) (prodn_repeat (seq i n) m)) (seq i n)).
 Proof.
 intros; cbn.
-now rewrite App_list_concat_map.
+now rewrite flat_map_concat_map.
 Qed.
 rewrite glop.
 rewrite <- concat_filter_map.
@@ -4166,21 +3993,15 @@ erewrite map_ext_in. 2: {
   cbn - [ is_sorted seq ].
   easy.
 }
-...
 revert i m.
 induction n; intros. {
   cbn; symmetry.
-  rewrite App_list_concat_map.
-  rewrite <- flat_map_concat_map.
-  cbn - [ is_sorted ].
   rewrite app_nil_r.
-  rewrite List_filter_map.
   rewrite (proj2 (List_filter_nil_iff _ _)); [ easy | ].
   intros la Hla; cbn.
   now rewrite Nat.eqb_refl, Bool.andb_false_r.
 }
 cbn - [ seq ].
-rewrite App_list_concat_map.
 rewrite <- flat_map_concat_map.
 Compute (
   let i := 42 in
@@ -4189,8 +4010,6 @@ Compute (
 list_prodn (repeat (seq i n) (S m)) =
 concat (map (λ j, map (cons j) (list_prodn (repeat (seq i n) m))) (seq i n))
 ).
-Print list_prodn.
-...
 Compute (
   let i := 0(*42*) in
   let n := 4 in
