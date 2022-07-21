@@ -4095,6 +4095,63 @@ replace (map (λ l, i :: l)) with (map (cons i)) by easy.
   filter (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
 *)
 Print list_prodn.
+Compute (
+  let i := 0 in
+  let n := 2 in
+map (λ m,
+(
+m,
+  map (cons i) (sls1n (S i) n m),
+  map (is_sorted Nat.ltb) (map (cons i) (list_prodn (repeat (seq i (S n)) m)))
+)
+) (seq 0 n)
+).
+Print list_prodn.
+(* il faudrait peut-être un "list_prodn" qui soit spécialisé
+   "repeat (seq 1 n) m" : peut-être que ça lui donnerait des
+   propriétés sympa *)
+...
+[false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; true; true;
+ false; false; false; false; true;
+ false; false; false; false; false;
+
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; true;
+ false; false; false; false; false;
+
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false;
+ false; false; false; false; false])]
+
+
+[false; false; false; false; false;
+ false; false; true; true; true;
+ false; false; false; true; true;
+ false; false; false; false; true;
+ false; false; false; false; false]);
+
+[false; false; false; false;
+ false; false; true; true;
+ false; false; false; true;
+ false; false; false; false])]
 ...
 Theorem glop : ∀ i m n,
   sls1n (S i) n m =
