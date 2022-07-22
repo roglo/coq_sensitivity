@@ -3563,10 +3563,6 @@ Fixpoint ecl {A} (eqb : A → _) it la :=
 Definition equiv_classes {A} (eqb : A → _) l := ecl eqb (length l) l.
 
 (* to be completed
-Compute (
-  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
-     (prodn_repeat_seq 1 4 3))
-).
 (* to be proven:
    - that equivalences classes ("concat") are a permutation of the
      initial list (allowing to sum on them)
@@ -3574,6 +3570,23 @@ Compute (
      pair) does not contain dupplications (therefore whose ε is non
      zero), contains all permutations of the representative
 *)
+
+Theorem equiv_classes_are_permutation : ∀ A (eqb : A → _) la,
+  permutation eqb la
+    (flat_map (λ rc, fst rc :: snd rc) (equiv_classes eqb la)).
+Proof.
+intros.
+unfold equiv_classes.
+induction la as [| a]; [ easy | cbn ].
+remember (partition (eqb a) la) as ec eqn:Hec; symmetry in Hec.
+destruct ec as (r, ec); cbn.
+apply permutation_skip.
+...
+
+Compute (
+  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
+     (prodn_repeat_seq 1 4 3))
+).
 ...
 map (λ ec, S (length (snd ec)))
   (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
