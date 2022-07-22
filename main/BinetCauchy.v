@@ -3796,23 +3796,6 @@ assert (Hel : equality (list_eqb Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-(*
-set (revn := λ l : list nat, rev l).
-erewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
-  with (lb := rev (sls1n n m)); [ | easy | now apply permutation_rev_r ].
-erewrite rngl_summation_list_change_var with (g := revn) (h := revn). 2: {
-  unfold rev; intros; apply rev_involutive.
-}
-remember (∑ (jl ∈ _), _) as x; subst x. (* renaming *)
-Compute (
-let n := 4 in
-let k := 3 in
-(map revn (rev (sls1n n k)),
- filter (is_sorted Nat.ltb) (list_prodn (repeat (seq 1 n) k)))
-).
-symmetry.
-*)
-(**)
 set (f := no_dup Nat.eqb).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
@@ -3861,6 +3844,18 @@ Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
 Proof.
 intros.
 rewrite list_prodn_prodn_repeat.
+Check @isort.
+Compute (
+isort (λ la lb,
+  let la1 := isort Nat.leb la in
+  let lb1 := isort Nat.leb lb in
+  if list_eqb Nat.eqb la1 lb1 then list_leb Nat.leb la lb
+  else list_leb Nat.leb la1 lb1
+) (
+  filter (no_dup Nat.eqb) (prodn_repeat_seq 1 4 3)
+)
+).
+...
 revert n.
 induction m; intros; cbn. {
   rewrite sub_lists_of_seq_1_n_0_r.
