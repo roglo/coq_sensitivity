@@ -3546,7 +3546,43 @@ intros.
 apply list_prodn_prodn_repeat.
 Qed.
 
+(* equivalence classes *)
+
+Fixpoint ecl {A} (eqb : A → _) it la :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] => []
+      | a :: la' =>
+          let (ec, rest) := partition (eqb a) la' in
+          (a, ec) :: ecl eqb it' rest
+      end
+  end.
+
+Definition equiv_classes {A} (eqb : A → _) l := ecl eqb (length l) l.
+
 (* to be completed
+Compute (
+  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
+     (prodn_repeat_seq 1 4 3))
+).
+(* to be proven:
+   - that equivalences classes ("concat") are a permutation of the
+     initial list (allowing to sum on them)
+   - that the ones whose representative (the first element of the
+     pair) does not contain dupplications (therefore whose ε is non
+     zero), contains all permutations of the representative
+*)
+...
+map (λ ec, S (length (snd ec)))
+  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
+(filter (no_dup Nat.eqb)
+     (prodn_repeat_seq 1 4 3))
+)
+).
+...
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3855,7 +3891,8 @@ isort (λ la lb,
   filter (no_dup Nat.eqb) (prodn_repeat_seq 1 4 3)
 )
 ).
-Print Module List.
+(* use equivalence classes (equiv_classes) and its properties
+   to sum on them instead of "prodn_repeat_seq 1 n m" *)
 ...
 revert n.
 induction m; intros; cbn. {
