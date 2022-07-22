@@ -2055,6 +2055,29 @@ split. {
 }
 Qed.
 
+Theorem permutation_partition : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ f la lb lc,
+  partition f la = (lb, lc)
+  → permutation eqb la (lb ++ lc).
+Proof.
+intros * Heqb * Hp.
+revert lb lc Hp.
+induction la as [| a]; intros; cbn. {
+  now injection Hp; clear Hp; intros; subst lb lc.
+}
+cbn in Hp.
+remember (partition f la) as pa eqn:Hpa; symmetry in Hpa.
+destruct pa as (ld, le).
+specialize (IHla _ _ eq_refl).
+remember (f a) as b eqn:Hb; symmetry in Hb.
+destruct b; injection Hp; clear Hp; intros; subst lb lc. {
+  now cbn; apply (permutation_skip Heqb).
+} {
+  now apply (permutation_cons_app Heqb).
+}
+Qed.
+
 (* transposition list *)
 
 Fixpoint transp_loop {A} (eqb : A → A → bool) i la lb :=

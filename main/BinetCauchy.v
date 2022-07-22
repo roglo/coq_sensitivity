@@ -3571,16 +3571,21 @@ Definition equiv_classes {A} (eqb : A → _) l := ecl eqb (length l) l.
      zero), contains all permutations of the representative
 *)
 
-Theorem equiv_classes_are_permutation : ∀ A (eqb : A → _) la,
+Theorem equiv_classes_are_permutation : ∀ A (eqb eqv : A → _),
+  equality eqb →
+  ∀ la,
   permutation eqb la
-    (flat_map (λ rc, fst rc :: snd rc) (equiv_classes eqb la)).
+    (flat_map (λ rc, fst rc :: snd rc) (equiv_classes eqv la)).
 Proof.
-intros.
+intros * Heqb *.
 unfold equiv_classes.
 induction la as [| a]; [ easy | cbn ].
-remember (partition (eqb a) la) as ec eqn:Hec; symmetry in Hec.
-destruct ec as (r, ec); cbn.
-apply permutation_skip.
+remember (partition (eqv a) la) as ec eqn:Hec; symmetry in Hec.
+destruct ec as (ec, rest); cbn.
+apply (permutation_skip Heqb).
+specialize (permutation_partition Heqb _ _ Hec) as H1.
+eapply (permutation_trans Heqb); [ apply H1 | ].
+apply (permutation_app Heqb); [ apply (permutation_refl Heqb) | ].
 ...
 
 Compute (
