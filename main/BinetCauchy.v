@@ -3523,26 +3523,26 @@ destruct (bool_dec (sta =? a)) as [Hsa| Hsa]; [ | easy ].
 apply Nat.eqb_eq in Hsa; subst a; flia Ha.
 Qed.
 
-Fixpoint prodn_repeat {A} (l : list A) n :=
+Fixpoint prodn_repeat_seq sta len n :=
   match n with
   | 0 => [[]]
-  | S n' => flat_map (λ a, map (cons a) (prodn_repeat l n')) l
+  | S n' =>
+      flat_map (λ i, map (cons i) (prodn_repeat_seq sta len n')) (seq sta len)
   end.
 
-Definition all_comb' n := prodn_repeat (seq 1 n) n.
+Definition all_comb' n := prodn_repeat_seq 1 n n.
 
-Theorem list_prodn_prodn_repeat : ∀ i m n,
-  list_prodn (repeat (seq i n) m) = prodn_repeat (seq i n) m.
+Theorem list_prodn_prodn_repeat : ∀ sta len n,
+  list_prodn (repeat (seq sta len) n) = prodn_repeat_seq sta len n.
 Proof.
 intros.
-revert n.
-induction m; intros; [ easy | now cbn; rewrite IHm ].
+revert sta len.
+induction n; intros; [ easy | now cbn; rewrite IHn ].
 Qed.
 
 Theorem all_comb_all_comb' : ∀ n, all_comb n = all_comb' n.
 Proof.
 intros.
-unfold all_comb, all_comb'.
 apply list_prodn_prodn_repeat.
 Qed.
 
@@ -3894,7 +3894,7 @@ Theorem sls1n_succ_r : ∀ i m n,
   sls1n i n (S m) =
   concat
     (map (filter (is_sorted Nat.ltb))
-       (map (λ a : nat, map (cons a) (prodn_repeat (seq i n) m)) (seq i n))).
+       (map (λ a : nat, map (cons a) (prodn_repeat_seq i n m)) (seq i n))).
 Proof.
 intros.
 rewrite map_map.
