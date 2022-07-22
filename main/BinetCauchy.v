@@ -3548,19 +3548,19 @@ Qed.
 
 (* equivalence classes *)
 
-Fixpoint ecl {A} (eqb : A → _) it la :=
+Fixpoint ecl {A} (eqv : A → _) it la :=
   match it with
   | 0 => []
   | S it' =>
       match la with
       | [] => []
       | a :: la' =>
-          let (ec, rest) := partition (eqb a) la' in
-          (a, ec) :: ecl eqb it' rest
+          let (ec, rest) := partition (eqv a) la' in
+          (a, ec) :: ecl eqv it' rest
       end
   end.
 
-Definition equiv_classes {A} (eqb : A → _) l := ecl eqb (length l) l.
+Definition equiv_classes {A} (eqv : A → _) l := ecl eqv (length l) l.
 
 (* to be completed
 (* to be proven:
