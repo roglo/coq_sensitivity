@@ -3942,6 +3942,18 @@ rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
 unfold equiv_classes.
 remember (∑ (ec ∈ _), _) as x; subst x.
+Print ecl.
+Theorem ecl_enough_iter : ∀ A (eqv : A → _) it1 it2 la,
+  length la ≤ it1
+  → length la ≤ it2
+  → ecl eqv it1 la = ecl eqv it2 la.
+Proof.
+...
+set (it := length (prodn_repeat_seq 1 n m)).
+rewrite ecl_enough_iter with (it2 := it); [ | easy | ]. 2: {
+  subst it.
+  rewrite <- list_prodn_prodn_repeat.
+  rewrite list_prodn_length.
 ...
 Compute (
 let n := 4 in
