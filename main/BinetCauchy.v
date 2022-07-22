@@ -3855,6 +3855,7 @@ isort (λ la lb,
   filter (no_dup Nat.eqb) (prodn_repeat_seq 1 4 3)
 )
 ).
+Print Module List.
 ...
 revert n.
 induction m; intros; cbn. {
