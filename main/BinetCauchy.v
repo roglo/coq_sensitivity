@@ -3907,12 +3907,15 @@ set (eqv := λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb)).
 erewrite (rngl_summation_list_permut (list_eqb Nat.eqb)); [ | easy | ]. 2: {
   now apply equiv_classes_are_permutation with (eqv := eqv).
 }
+rewrite flat_map_concat_map.
+rewrite rngl_summation_list_concat.
+rewrite rngl_summation_list_map.
 Compute (
 let n := 4 in
 let m := 3 in
 (
-map (isort Nat.leb) (
-  flat_map (λ rc : list nat * list (list nat), fst rc :: snd rc) (equiv_classes eqv (prodn_repeat_seq 1 n m))
+filter (λ ec, no_dup Nat.eqb (fst ec))
+(equiv_classes eqv (prodn_repeat_seq 1 n m)
 ),
   sub_lists_of_seq_1_n n m
 )
