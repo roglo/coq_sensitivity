@@ -3562,14 +3562,33 @@ Fixpoint ecl {A} (eqv : A → _) it la :=
 
 Definition equiv_classes {A} (eqv : A → _) l := ecl eqv (length l) l.
 
-(* to be completed
-(* to be proven:
-   - that equivalences classes ("concat") are a permutation of the
-     initial list (allowing to sum on them)
-   - that the ones whose representative (the first element of the
-     pair) does not contain dupplications (therefore whose ε is non
-     zero), contains all permutations of the representative
-*)
+Theorem ecl_are_permutation : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ eqv la len,
+  length la ≤ len
+  → permutation eqb la (flat_map (λ rc, fst rc :: snd rc) (ecl eqv len la)).
+Proof.
+intros * Heqb * Hlen.
+revert la Hlen.
+induction len; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hlen; subst la.
+}
+destruct la as [| a]; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+remember (partition (eqv a) la) as ec eqn:Hec; symmetry in Hec.
+destruct ec as (ec, rest); cbn.
+apply (permutation_skip Heqb).
+specialize (permutation_partition Heqb _ _ Hec) as H1.
+eapply (permutation_trans Heqb); [ apply H1 | ].
+apply (permutation_app Heqb); [ apply (permutation_refl Heqb) | ].
+apply IHlen.
+apply (permutation_length Heqb) in H1.
+rewrite app_length in H1.
+rewrite H1 in Hlen.
+etransitivity; [ | apply Hlen ].
+rewrite Nat.add_comm.
+apply Nat.le_add_r.
+Qed.
 
 Theorem equiv_classes_are_permutation : ∀ A (eqb eqv : A → _),
   equality eqb →
@@ -3578,29 +3597,10 @@ Theorem equiv_classes_are_permutation : ∀ A (eqb eqv : A → _),
     (flat_map (λ rc, fst rc :: snd rc) (equiv_classes eqv la)).
 Proof.
 intros * Heqb *.
-unfold equiv_classes.
-induction la as [| a]; [ easy | cbn ].
-remember (partition (eqv a) la) as ec eqn:Hec; symmetry in Hec.
-destruct ec as (ec, rest); cbn.
-apply (permutation_skip Heqb).
-specialize (permutation_partition Heqb _ _ Hec) as H1.
-eapply (permutation_trans Heqb); [ apply H1 | ].
-apply (permutation_app Heqb); [ apply (permutation_refl Heqb) | ].
-...
+now apply ecl_are_permutation.
+Qed.
 
-Compute (
-  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
-     (prodn_repeat_seq 1 4 3))
-).
-...
-map (λ ec, S (length (snd ec)))
-  (equiv_classes (λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb))
-(filter (no_dup Nat.eqb)
-     (prodn_repeat_seq 1 4 3))
-)
-).
-...
-
+(* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -3898,6 +3898,26 @@ Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
 Proof.
 intros.
 rewrite list_prodn_prodn_repeat.
+assert (Hel : equality (list_eqb eqb)). {
+  apply -> equality_list_eqb.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+set (eqv := λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb)).
+erewrite (rngl_summation_list_permut (list_eqb Nat.eqb)); [ | easy | ]. 2: {
+  now apply equiv_classes_are_permutation with (eqv := eqv).
+}
+Compute (
+let n := 4 in
+let m := 3 in
+(
+map (isort Nat.leb) (
+  flat_map (λ rc : list nat * list (list nat), fst rc :: snd rc) (equiv_classes eqv (prodn_repeat_seq 1 n m))
+),
+  sub_lists_of_seq_1_n n m
+)
+).
+...
 Check @isort.
 Compute (
 isort (λ la lb,
