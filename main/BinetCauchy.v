@@ -3562,6 +3562,27 @@ Fixpoint ecl {A} (eqv : A → _) it la :=
 
 Definition equiv_classes {A} (eqv : A → _) l := ecl eqv (length l) l.
 
+Theorem ecl_enough_iter : ∀ A (eqv : A → _) it1 it2 la,
+  length la ≤ it1
+  → length la ≤ it2
+  → ecl eqv it1 la = ecl eqv it2 la.
+Proof.
+intros * Hit1 Hit2.
+revert la it2 Hit1 Hit2.
+induction it1; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hit1; subst la.
+  now destruct it2.
+}
+destruct la as [| a]; [ now destruct it2 | ].
+destruct it2; [ easy | ].
+cbn in Hit1, Hit2 |-*.
+apply Nat.succ_le_mono in Hit1, Hit2.
+remember (partition (eqv a) la) as er eqn:Her; symmetry in Her.
+destruct er as (r, ec); f_equal.
+apply partition_length in Her.
+apply IHit1; [ flia Hit1 Her | flia Hit2 Her ].
+Qed.
+
 Theorem ecl_are_permutation : ∀ A (eqb : A → _),
   equality eqb →
   ∀ eqv la len,
@@ -3942,18 +3963,30 @@ rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
 unfold equiv_classes.
 remember (∑ (ec ∈ _), _) as x; subst x.
-Print ecl.
-Theorem ecl_enough_iter : ∀ A (eqv : A → _) it1 it2 la,
-  length la ≤ it1
-  → length la ≤ it2
-  → ecl eqv it1 la = ecl eqv it2 la.
-Proof.
-...
 set (it := length (prodn_repeat_seq 1 n m)).
 rewrite ecl_enough_iter with (it2 := it); [ | easy | ]. 2: {
   subst it.
   rewrite <- list_prodn_prodn_repeat.
-  rewrite list_prodn_length.
+  destruct m; [ easy | ].
+  rewrite list_prodn_length; [ | easy ].
+  etransitivity; [ apply List_filter_length_le | ].
+  now rewrite list_prodn_length.
+}
+subst it.
+rewrite <- list_prodn_prodn_repeat.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  subst m; cbn.
+  rewrite rngl_summation_list_only_one; cbn.
+  rewrite rngl_summation_list_only_one; cbn.
+  destruct n; cbn. {
+    rewrite rngl_summation_list_only_one; cbn.
+    now rewrite rngl_summation_list_only_one.
+  } {
+    rewrite rngl_summation_list_only_one; cbn.
+    now rewrite rngl_summation_list_only_one.
+  }
+}
+rewrite list_prodn_length; [ | now destruct m ].
 ...
 Compute (
 let n := 4 in

@@ -455,6 +455,16 @@ destruct (bool_dec (f a)) as [Hfa| Hfa]; rewrite Hfa; [ | easy ].
 now f_equal.
 Qed.
 
+Theorem List_filter_length_le : ∀ A f (l : list A),
+  length (filter f l) ≤ length l.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct (f a); cbn; [ now apply Nat.succ_le_mono in IHl | ].
+etransitivity; [ apply IHl | ].
+apply Nat.le_succ_diag_r.
+Qed.
+
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
