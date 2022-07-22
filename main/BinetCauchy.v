@@ -3937,10 +3937,12 @@ erewrite (rngl_summation_list_permut (list_eqb Nat.eqb)); [ | easy | ]. 2: {
   now apply equiv_classes_are_permutation with (eqv := eqv).
 }
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
-set (g := λ ec : list nat * list (list nat), no_dup Nat.eqb (fst ec)).
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
+unfold equiv_classes.
+remember (∑ (ec ∈ _), _) as x; subst x.
+...
 Compute (
 let n := 4 in
 let m := 3 in
@@ -3949,6 +3951,7 @@ equiv_classes eqv (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)),
   sub_lists_of_seq_1_n n m
 )
 ).
+...
 set (g := λ ec : list nat * list (list nat), no_dup Nat.eqb (fst ec)).
 erewrite rngl_summation_list_permut.
 Inspect 4.
