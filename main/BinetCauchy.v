@@ -3892,21 +3892,52 @@ subst f.
     det (mat_select_rows jl B)
   else 0
 *)
-Theorem rngl_summation_filter_no_dup_list_prodn : ∀ n m f,
+Theorem rngl_summation_filter_no_dup_list_prodn :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ n m f,
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
 Proof.
-intros.
+intros Hopp Heqb *.
 rewrite list_prodn_prodn_repeat.
 assert (Hel : equality (list_eqb eqb)). {
   apply -> equality_list_eqb.
   unfold equality.
   apply Nat.eqb_eq.
 }
+set (g := no_dup Nat.eqb).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqb eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_add_comm.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros kl Hkl.
+  apply filter_In in Hkl.
+  destruct Hkl as (Hkl, Hsl).
+  unfold g in Hsl.
+  apply Bool.negb_true_iff in Hsl.
+  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+    intros H.
+    apply (no_dup_NoDup Nat.eqb_eq) in H.
+    congruence.
+  }
+  now apply rngl_mul_0_l; left.
+}
+subst g.
+rewrite rngl_add_0_l.
 set (eqv := λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb)).
 erewrite (rngl_summation_list_permut (list_eqb Nat.eqb)); [ | easy | ]. 2: {
   now apply equiv_classes_are_permutation with (eqv := eqv).
 }
+remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
+set (g := λ ec : list nat * list (list nat), no_dup Nat.eqb (fst ec)).
 rewrite flat_map_concat_map.
 rewrite rngl_summation_list_concat.
 rewrite rngl_summation_list_map.
@@ -3914,12 +3945,13 @@ Compute (
 let n := 4 in
 let m := 3 in
 (
-filter (λ ec, no_dup Nat.eqb (fst ec))
-(equiv_classes eqv (prodn_repeat_seq 1 n m)
-),
+equiv_classes eqv (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)),
   sub_lists_of_seq_1_n n m
 )
 ).
+set (g := λ ec : list nat * list (list nat), no_dup Nat.eqb (fst ec)).
+erewrite rngl_summation_list_permut.
+Inspect 4.
 ...
 Check @isort.
 Compute (
