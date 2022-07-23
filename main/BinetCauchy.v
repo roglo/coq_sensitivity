@@ -3987,6 +3987,33 @@ destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   }
 }
 rewrite list_prodn_length; [ | now destruct m ].
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  destruct m; [ easy | clear Hmz; cbn ].
+  symmetry; rewrite rngl_summation_list_empty; [ symmetry | easy ].
+  unfold iter_list; cbn.
+  now induction m.
+}
+erewrite rngl_product_list_eq_compat. 2: {
+  intros la Hla.
+  replace (length la) with n. 2: {
+    apply repeat_spec in Hla; subst la.
+    symmetry; apply seq_length.
+  }
+  easy.
+}
+cbn - [ rngl_one rngl_mul ].
+replace (∏ (l ∈ repeat (seq 1 n) m), n) with (n ^ m). 2: {
+  rewrite nat_product_list_all_same.
+  now rewrite repeat_length.
+}
+...
+Compute (
+  let n := 3 in
+  let m := 4 in
+  (∏ (l ∈ repeat (seq 1 n) m), length l) =
+  (n ^ m)
+).
 ...
 Compute (
 let n := 4 in
@@ -4012,8 +4039,6 @@ isort (λ la lb,
   filter (no_dup Nat.eqb) (prodn_repeat_seq 1 4 3)
 )
 ).
-(* use equivalence classes (equiv_classes) and its properties
-   to sum on them instead of "prodn_repeat_seq 1 n m" *)
 ...
 revert n.
 induction m; intros; cbn. {
