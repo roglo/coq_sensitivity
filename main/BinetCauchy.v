@@ -4070,6 +4070,12 @@ split. {
     subst r'.
     destruct rest as [| b]; [ now destruct it | ].
     destruct it; [ easy | cbn in Hec ].
+    remember (partition (eqb b) rest) as p eqn:Hp'; symmetry in Hp'.
+    destruct p as (r', rest').
+    destruct Hec as [Hec| Hec]. {
+      injection Hec; clear Hec; intros; subst r r'.
+Print ecl.
+Check partition_inv_nil.
 ...
 Search partition.
       apply partition_inv_nil in Hp.
