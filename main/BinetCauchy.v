@@ -4003,10 +4003,13 @@ erewrite rngl_product_list_eq_compat. 2: {
   easy.
 }
 cbn - [ rngl_one rngl_mul ].
-replace (∏ (l ∈ repeat (seq 1 n) m), n) with (n ^ m). 2: {
-  rewrite nat_product_list_all_same.
-  now rewrite repeat_length.
-}
+rewrite nat_product_list_all_same.
+rewrite repeat_length.
+set (g1 := λ l, (l, all_permut 0 l)).
+erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
+  intros (r, ec) Hec; cbn.
+  unfold g1; cbn; f_equal.
+(* bon. À voir... *)
 ...
 Compute (
   let n := 3 in
