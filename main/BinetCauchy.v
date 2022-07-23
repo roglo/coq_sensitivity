@@ -3621,6 +3621,40 @@ intros * Heqb *.
 now apply ecl_are_permutation.
 Qed.
 
+Theorem partition_eqb_nodup : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la lb lc,
+  NoDup (a :: la)
+  → partition (eqb a) la = (lb, lc)
+  → lb ∈ [[]; [a]].
+Proof.
+intros * Heqb * Hnd Hp.
+revert lb lc Hp.
+induction la as [| b]; intros; [ now injection Hp; left | ].
+assert (H : NoDup (a :: la)). {
+  apply NoDup_cons_iff in Hnd.
+  apply NoDup_cons_iff.
+  destruct Hnd as (Hab, Hnd).
+  apply not_in_cons in Hab.
+  split; [ easy | ].
+  now apply NoDup_cons_iff in Hnd.
+}
+specialize (IHla H); clear H.
+cbn in Hp.
+remember (partition (eqb a) la) as q eqn:Hq; symmetry in Hq.
+destruct q as (ld, le).
+specialize (IHla _ _ eq_refl).
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+  apply NoDup_cons_iff in Hnd.
+  destruct Hnd as (H, _).
+  now exfalso; apply H; left.
+} {
+  now injection Hp; clear Hp; intros; subst ld lc.
+}
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4009,7 +4043,53 @@ set (g1 := λ l, (l, all_permut 0 l)).
 erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   intros (r, ec) Hec; cbn.
   unfold g1; cbn; f_equal.
-(* bon. À voir... *)
+Theorem in_nodup_ecl_iff : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ it la r ec,
+  NoDup la
+  → (r, ec) ∈ ecl eqb it la ↔
+    match la with
+    | [] => False
+    | a :: _ => r = a
+    end.
+Proof.
+intros * Heqb * Hnd.
+split. {
+  intros Hec.
+  revert it r ec Hec.
+  induction la as [| a]; intros; [ now destruct it | ].
+  assert (H : NoDup la) by now apply NoDup_cons_iff in Hnd.
+  specialize (IHla H); clear H.
+  destruct it; [ easy | cbn in Hec ].
+  remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
+  destruct p as (r', rest).
+  destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+  generalize Hp; intros Hr'.
+  apply (partition_eqb_nodup Heqb) in Hr'; [ | easy ].
+  destruct Hr' as [Hr'| Hr]. {
+    subst r'.
+    destruct rest as [| b]; [ now destruct it | ].
+    destruct it; [ easy | cbn in Hec ].
+...
+Search partition.
+      apply partition_inv_nil in Hp.
+      subst la.
+      cbn in Hec.
+...
+  destruct n; [ easy | clear Hnz ].
+  destruct m; [ easy | clear Hmz ].
+  cbn - [ Nat.pow seq ] in Hec.
+...
+Compute (
+  let n := 5 in
+  let m := 4 in
+map (λ i,
+let v :=
+  nth i (ecl eqv (n ^ m) (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))) ([], [])
+in
+(v, all_permut 0 (fst v))
+) (seq 0 (binomial n m + 1))
+).
 ...
 Compute (
   let n := 3 in
