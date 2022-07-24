@@ -4063,11 +4063,22 @@ split. {
   destruct la as [| a]; [ easy | ].
   remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
   destruct p as (lb, lc).
+  move lb before la; move lc before lb.
   destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+(**)
+  destruct lc as [| c]; [ now destruct it | ].
+  move lc before lb.
+  destruct it; [ easy | cbn in Hec ].
+  remember (partition (eqb c) lc) as p eqn:Hp'; symmetry in Hp'.
+  destruct p as (ld, le).
+  move ld before lc; move le before ld.
+  destruct Hec as [Hec| Hec]. {
+    injection Hec; clear Hec; intros; subst c ec.
+...
 (**)
   specialize (IHit lc r ec) as H1.
   assert (H : NoDup lc). {
-    admit.
+    _admit.
   }
   specialize (H1 H Hec); clear H.
   destruct lc as [| c]; [ easy | subst c ].
@@ -4075,6 +4086,7 @@ split. {
   apply (partition_eqb_nodup Heqb) in Hr'; [ | easy ].
   destruct Hr' as [Hr'| Hr]. {
     subst lb.
+Print ecl.
 ...
 Compute (
   let la := [2;7;8;3] in
