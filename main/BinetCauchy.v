@@ -4072,6 +4072,7 @@ set (g1 := λ l, (l, all_permut 0 l)).
 erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   intros (r, ec) Hec; cbn.
   unfold g1; cbn; f_equal.
+...
 Theorem in_nodup_ecl_iff : ∀ A (eqb : A → _),
   equality eqb →
   ∀ it la r ec,
@@ -4083,6 +4084,20 @@ Theorem in_nodup_ecl_iff : ∀ A (eqb : A → _),
     end.
 Proof.
 intros * Heqb * Hnd.
+Compute (
+  let la := [2;7;8;3] in
+  let it := 7 in
+  let eqb := Nat.eqb in
+(
+  ecl eqb it la
+,
+    match la with
+    | [] => False
+    | a :: _ => 7 = a
+    end
+)
+).
+...
 split. {
   intros Hec.
 (**)
@@ -4098,8 +4113,24 @@ split. {
   generalize Hec; intros H.
   apply IHit in H; [ | now apply NoDup_cons_iff in Hnd ].
   destruct la as [| b]; [ easy | ].
-  subst b.
-(* donc ça marche pas du tout *)
+  subst r.
+  destruct it; [ easy | ].
+  cbn in Hec.
+  remember (partition (eqb b) la) as p eqn:Hp; symmetry in Hp.
+  destruct p as (lb, lc).
+  rewrite (nodup_partition_eqb Heqb) in Hp; [ | now apply NoDup_cons_iff in Hnd ].
+  injection  Hp; clear Hp; intros; subst lb lc.
+  destruct Hec as [Hec| Hec]. {
+    (* blocked *)
+Print ecl.
+...
+  destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+  generalize Hec; intros H.
+  apply IHit in H; [ | now apply NoDup_cons_iff in Hnd ].
+  destruct la as [| b]; [ easy | ].
+  subst r.
+  destruct it; [ easy | ].
+  cbn in Hec.
 ...
 (**)
   destruct lc as [| c]; [ now destruct it | ].
