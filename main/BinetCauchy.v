@@ -3655,6 +3655,35 @@ destruct ab. {
 }
 Qed.
 
+Theorem nodup_partition_eqb : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la,
+  NoDup (a :: la)
+  → partition (eqb a) la = ([], la).
+Proof.
+intros * Heqb * Hnd.
+revert a Hnd.
+induction la as [| b]; intros; [ easy | cbn ].
+remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+rewrite IHla in Hp. 2: {
+  apply NoDup_cons_iff in Hnd.
+  apply NoDup_cons_iff.
+  destruct Hnd as (Hab & Hnd).
+  split; [ now apply not_in_cons in Hab | ].
+  now apply NoDup_cons_iff in Hnd.
+}
+injection Hp; clear Hp; intros; subst lb lc.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ | easy ].
+exfalso.
+apply Heqb in Hab; subst b.
+apply NoDup_cons_iff in Hnd.
+destruct Hnd as (Hab, Hnd).
+apply Hab; clear Hab.
+now left.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4063,8 +4092,10 @@ split. {
   destruct la as [| a]; [ easy | ].
   remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
   destruct p as (lb, lc).
-  move lb before la; move lc before lb.
+  rewrite (nodup_partition_eqb Heqb) in Hp; [ | easy ].
+  injection  Hp; clear Hp; intros; subst lb lc.
   destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+...
 (**)
   destruct lc as [| c]; [ now destruct it | ].
   move lc before lb.
