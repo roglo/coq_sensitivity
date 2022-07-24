@@ -4056,6 +4056,19 @@ Proof.
 intros * Heqb * Hnd.
 split. {
   intros Hec.
+(**)
+  revert la r ec Hnd Hec.
+  induction it; intros; [ easy | ].
+  cbn in Hec.
+  destruct la as [| a]; [ easy | ].
+  remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
+  destruct p as (lb, lc).
+  destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+...
+  generalize Hp; intros Hr'.
+  apply (partition_eqb_nodup Heqb) in Hr'; [ | easy ].
+  destruct Hr' as [Hr'| Hr]. {
+...
   revert it r ec Hec.
   induction la as [| a]; intros; [ now destruct it | ].
   assert (H : NoDup la) by now apply NoDup_cons_iff in Hnd.
@@ -4075,7 +4088,6 @@ split. {
     destruct Hec as [Hec| Hec]. {
       injection Hec; clear Hec; intros; subst r r'.
 Print ecl.
-Check partition_inv_nil.
 ...
 Search partition.
       apply partition_inv_nil in Hp.
