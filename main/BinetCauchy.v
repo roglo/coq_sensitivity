@@ -4095,6 +4095,10 @@ split. {
   rewrite (nodup_partition_eqb Heqb) in Hp; [ | easy ].
   injection  Hp; clear Hp; intros; subst lb lc.
   destruct Hec as [Hec| Hec]; [ now injection Hec | ].
+  apply IHit in Hec; [ | now apply NoDup_cons_iff in Hnd ].
+  destruct la as [| b]; [ easy | ].
+  subst b.
+(* donc ça marche pas du tout *)
 ...
 (**)
   destruct lc as [| c]; [ now destruct it | ].
