@@ -4064,29 +4064,38 @@ split. {
   remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
   destruct p as (lb, lc).
   destruct Hec as [Hec| Hec]; [ now injection Hec | ].
-...
+(**)
+  specialize (IHit lc r ec) as H1.
+  assert (H : NoDup lc). {
+    admit.
+  }
+  specialize (H1 H Hec); clear H.
+  destruct lc as [| c]; [ easy | subst c ].
   generalize Hp; intros Hr'.
   apply (partition_eqb_nodup Heqb) in Hr'; [ | easy ].
   destruct Hr' as [Hr'| Hr]. {
+    subst lb.
 ...
-  revert it r ec Hec.
-  induction la as [| a]; intros; [ now destruct it | ].
-  assert (H : NoDup la) by now apply NoDup_cons_iff in Hnd.
-  specialize (IHla H); clear H.
-  destruct it; [ easy | cbn in Hec ].
-  remember (partition (eqb a) la) as p eqn:Hp; symmetry in Hp.
-  destruct p as (r', rest).
-  destruct Hec as [Hec| Hec]; [ now injection Hec | ].
-  generalize Hp; intros Hr'.
-  apply (partition_eqb_nodup Heqb) in Hr'; [ | easy ].
-  destruct Hr' as [Hr'| Hr]. {
-    subst r'.
-    destruct rest as [| b]; [ now destruct it | ].
+Compute (
+  let la := [2;7;8;3] in
+  let it := 7 in
+  let eqb := Nat.eqb in
+(
+  ecl eqb it la
+,
+    match la with
+    | [] => False
+    | a :: _ => 5 = a
+    end
+)
+).
+...
+    destruct lc as [| c]; [ now destruct it | ].
     destruct it; [ easy | cbn in Hec ].
-    remember (partition (eqb b) rest) as p eqn:Hp'; symmetry in Hp'.
-    destruct p as (r', rest').
+    remember (partition (eqb c) lc) as p eqn:Hp'; symmetry in Hp'.
+    destruct p as (ld, le).
     destruct Hec as [Hec| Hec]. {
-      injection Hec; clear Hec; intros; subst r r'.
+      injection Hec; clear Hec; intros; subst c ld.
 Print ecl.
 ...
 Search partition.
