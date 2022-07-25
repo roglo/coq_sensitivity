@@ -4072,6 +4072,7 @@ set (g1 := λ l, (l, all_permut 0 l)).
 erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   intros (r, ec) Hec; cbn.
   unfold g1; cbn; f_equal.
+  clear g1.
 ...
 Theorem in_nodup_ecl_iff : ∀ A (eqb : A → _),
   equality eqb →
