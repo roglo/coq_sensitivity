@@ -3684,6 +3684,59 @@ apply Hab; clear Hab.
 now left.
 Qed.
 
+Theorem partition_rel : ∀ A B (rel : A → B → _) a la lb lc,
+  partition (rel a) la = (lb, lc)
+  → (∀ b, b ∈ lb → rel a b = true) ∧
+    (∀ b, b ∈ lc → rel a b = false).
+Proof.
+intros * Hp.
+revert a lb lc Hp.
+induction la as [| c]; intros. {
+  cbn in Hp.
+  now injection Hp; clear Hp; intros; subst lb lc.
+}
+cbn in Hp.
+remember (partition (rel a) la) as p eqn:Hp'; symmetry in Hp'.
+destruct p as (ld, le).
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+apply IHla in Hp'.
+destruct Hp' as (Had, Hae).
+destruct ac. {
+  injection Hp; clear Hp; intros; subst lb le.
+  split. {
+    intros b Hb.
+    destruct Hb as [Hb| Hb]; [ now subst c | now apply Had ].
+  } {
+    intros b Hb.
+    now apply Hae.
+  }
+}
+injection Hp; clear Hp; intros; subst ld lc.
+split; [ easy | ].
+intros b Hb.
+destruct Hb as [Hb| Hb]; [ now subst c | ].
+now apply Hae.
+Qed.
+
+Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
+  (r, ec) ∈ ecl eqv it la
+  → ∀ a, a ∈ ec → eqv r a = true.
+Proof.
+intros * Hecl * Ha.
+revert r a la Hecl Ha.
+induction it; intros; [ easy | cbn in Hecl ].
+destruct la as [| b]; [ easy | ].
+remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+apply partition_rel in Hp.
+destruct Hp as (Hbb, Hbc).
+destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst b ec.
+  now apply Hbb.
+}
+now apply IHit with (la := lc).
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4073,6 +4126,19 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   intros (r, ec) Hec; cbn.
   unfold g1; cbn; f_equal.
   clear g1.
+  rewrite list_prodn_prodn_repeat in Hec.
+  specialize (in_ecl _ _ _ _ _ Hec) as H1.
+Compute (all_permut 0 [3;2;7]).
+...
+Compute (
+  let n := 3 in
+  let m := 3 in
+let ll := prodn_repeat_seq 1 n m in
+filter (is_sorted Nat.ltb)
+ll).
+map (λ t, (t, is_sorted Nat.ltb t))
+(filter (no_dup Nat.eqb) ll)
+).
 ...
 Theorem in_nodup_ecl_iff : ∀ A (eqb : A → _),
   equality eqb →
