@@ -3684,6 +3684,45 @@ apply Hab; clear Hab.
 now left.
 Qed.
 
+Theorem partition_rel_iff : ∀ A B (rel : A → B → _) a la lb lc,
+  partition (rel a) la = (lb, lc)
+  ↔ (∀ b, b ∈ lb → rel a b = true) ∧
+    (∀ b, b ∈ lc → rel a b = false).
+Proof.
+intros.
+split. {
+  intros Hp.
+  revert a lb lc Hp.
+  induction la as [| c]; intros. {
+    cbn in Hp.
+    now injection Hp; clear Hp; intros; subst lb lc.
+  }
+  cbn in Hp.
+  remember (partition (rel a) la) as p eqn:Hp'; symmetry in Hp'.
+  destruct p as (ld, le).
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  apply IHla in Hp'.
+  destruct Hp' as (Had, Hae).
+  destruct ac. {
+    injection Hp; clear Hp; intros; subst lb le.
+    split. {
+      intros b Hb.
+      destruct Hb as [Hb| Hb]; [ now subst c | now apply Had ].
+    } {
+      intros b Hb.
+      now apply Hae.
+    }
+  }
+  injection Hp; clear Hp; intros; subst ld lc.
+  split; [ easy | ].
+  intros b Hb.
+  destruct Hb as [Hb| Hb]; [ now subst c | ].
+  now apply Hae.
+} {
+  intros (H1, H2).
+...
+Qed.
+
 Theorem partition_rel : ∀ A B (rel : A → B → _) a la lb lc,
   partition (rel a) la = (lb, lc)
   → (∀ b, b ∈ lb → rel a b = true) ∧
@@ -3718,10 +3757,70 @@ destruct Hb as [Hb| Hb]; [ now subst c | ].
 now apply Hae.
 Qed.
 
-Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
+Definition equivalence {A} (eqv : A → A → bool) :=
+  (∀ a : A, eqv a a = true).
+
+Theorem in_ecl : ∀ A (eqv : A → _),
+  equivalence eqv →
+  ∀ r ec it la,
   (r, ec) ∈ ecl eqv it la
-  → ∀ a, a ∈ ec → eqv r a = true.
+  → (∀ a, a ∈ ec → eqv r a = true) ∧
+    (∀ a, a ∈ r :: ec → ∃ b, b ∈ la ∧ eqv b a = true).
 Proof.
+intros * Heqv * Hecl.
+revert r la Hecl.
+induction it; intros; [ easy | cbn in Hecl ].
+destruct la as [| b]; [ easy | ].
+remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+destruct Hecl as [Hecl| Hecl]. {
+  apply partition_rel in Hp.
+  destruct Hp as (Hbb, Hbc).
+  injection Hecl; clear Hecl; intros; subst b ec.
+  split; intros a Hla; [ now apply Hbb | ].
+  exists r.
+  split; [ now left | ].
+  destruct Hla as [Hla| Hla]; [ subst a; apply Heqv | ].
+  now apply Hbb.
+}
+split; [ now apply (IHit _ _ Hecl) | ].
+intros a Ha.
+destruct Ha as [Ha| Ha]. {
+  subst r.
+...
+specialize (IHit _ _ Hecl) as H1.
+split; [ easy | ].
+destruct H1 as (H1, H2).
+intros a Ha.
+specialize (H2 _ Ha) as H3.
+destruct H3 as (c & Hc & Hca).
+destruct Ha as [Ha| Ha]. {
+  subst r.
+  specialize (H2 _ (or_introl eq_refl)) as H3.
+  destruct H3 as (d & Hd & Hda).
+  apply partition_rel in Hp.
+  destruct Hp as (Hbb, Hbc).
+  exists b.
+  split; [ now left | ].
+  apply Hbb.
+...
+specialize (Hbc _ Hc) as H3.
+exists b.
+split; [ now left | ].
+...
+destruct Ha as [Ha| Ha]. {
+  subst r.
+...
+apply IHit.
+destruct it; [ easy | cbn ].
+
+  destruct Hla as [Hla| Hla]; [ now subst a; left | ].
+  destruct Hla as [Hla| Hla]; [ now subst a; left | ].
+  specialize (Hbb _ Hla) as H1.
+...
+}
+now apply IHit with (la := lc).
+...
 intros * Hecl * Ha.
 revert r a la Hecl Ha.
 induction it; intros; [ easy | cbn in Hecl ].
