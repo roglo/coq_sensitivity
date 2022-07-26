@@ -4169,7 +4169,18 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   clear g1.
   rewrite list_prodn_prodn_repeat in Hec.
   specialize (in_ecl _ _ _ _ _ Hec) as H1.
-  destruct H1 as (H1 & H2).
+  destruct H1 as (Hr & Hece).
+  apply filter_In in Hr.
+  destruct Hr as (Hr & Hnd).
+  rewrite <- list_prodn_prodn_repeat in Hr.
+  apply in_list_prodn_repeat_iff in Hr.
+  destruct Hr as [(H1, H2)| Hr]; [ easy | ].
+  destruct Hr as (_ & Hrm & Hr).
+  rename r into la.
+  rename ec into lla.
+  remember (∀ lb, _) as x eqn:Hx in Hece; subst x.
+  apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
+  unfold eqv in Hece.
 ...
 Compute (all_permut 0 [3;2;7]).
 ...
