@@ -4181,6 +4181,12 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   remember (∀ lb, _) as x eqn:Hx in Hece; subst x.
   apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
   unfold eqv in Hece.
+  assert (H : ∀ lb, lb ∈ lla → la = isort Nat.leb lb). {
+    intros lb Hlb.
+    specialize (Hece _ Hlb).
+    now apply Hel in Hece.
+  }
+  clear Hece; rename H into Hece.
 ...
 Compute (all_permut 0 [3;2;7]).
 ...
