@@ -3752,112 +3752,31 @@ Qed.
 Definition equivalence {A} (eqv : A → A → bool) :=
   (∀ a : A, eqv a a = true).
 
-(* to be completed
-Theorem in_ecl : ∀ A (eqv : A → _),
-  equivalence eqv →
-  ∀ r ec it la,
+Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
   (r, ec) ∈ ecl eqv it la
-  → (∀ a, a ∈ ec → eqv r a = true) ∧
-    (∀ a, a ∈ r :: ec → ∃ b, b ∈ la ∧ eqv b a = true).
+  → r ∈ la ∧ (∀ a, a ∈ ec → eqv r a = true).
 Proof.
-intros * Heqv * Hecl.
+intros * Hecl.
 revert r la ec Hecl.
 induction it; intros; [ easy | cbn in Hecl ].
 destruct la as [| b]; [ easy | ].
 remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
 destruct p as (lb, lc).
 destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst b ec.
+  split; [ now left | ].
+  intros a Hla.
   apply partition_rel in Hp.
   destruct Hp as (Hbb, Hbc).
-  injection Hecl; clear Hecl; intros; subst b ec.
-  split; intros a Hla; [ now apply Hbb | ].
-  exists r.
-  split; [ now left | ].
-  destruct Hla as [Hla| Hla]; [ subst a; apply Heqv | ].
   now apply Hbb.
 }
-split; [ now apply (IHit _ _ _ Hecl) | ].
-intros a Ha.
-destruct Ha as [Ha| Ha]. {
-  subst r.
-  specialize (IHit _ _ _ Hecl) as H1.
-  destruct H1 as (H1 & H2).
-  specialize (H2 _ (or_introl eq_refl)) as H3.
-  destruct H3 as (c & Hc & Hca).
-  exists c.
-  split; [ | easy ].
-  assert (H : c ∈ lb ++ lc) by now apply in_or_app; right.
-  apply partition_rel in Hp.
-  destruct Hp as (Hbt & Hbf & Heq).
-  now apply Heq in H; right.
-}
-specialize (IHit _ _ _ Hecl) as H1.
-destruct H1 as (H1 & H2).
-specialize (H2 _ (or_introl eq_refl)) as H3.
-destruct H3 as (c & Hc & Hca).
+split; [ | apply (IHit _ _ _ Hecl) ].
 apply partition_rel in Hp.
 destruct Hp as (Hbt & Hbf & Heq).
-exists b.
-split; [ now left | ].
-apply Hbt.
-...
-assert (H : c ∈ lb ++ lc) by now apply in_or_app; right.
-apply Heq in H.
-...
-...
-  now apply Heq in H; right.
-...
-  exists b.
-  split; [ now left | ].
-...
-destruct H3 as (c & Hc & Hca).
-...
-  split; [ easy | ].
-destruct H1 as (H1, H2).
-intros a Ha.
-specialize (H2 _ Ha) as H3.
-destruct H3 as (c & Hc & Hca).
-destruct Ha as [Ha| Ha]. {
-  subst r.
-  specialize (H2 _ (or_introl eq_refl)) as H3.
-  destruct H3 as (d & Hd & Hda).
-  apply partition_rel in Hp.
-  destruct Hp as (Hbb, Hbc).
-  exists b.
-  apply Hbt.
-...
-specialize (Hbc _ Hc) as H3.
-exists b.
-split; [ now left | ].
-...
-destruct Ha as [Ha| Ha]. {
-  subst r.
-...
-apply IHit.
-destruct it; [ easy | cbn ].
-
-  destruct Hla as [Hla| Hla]; [ now subst a; left | ].
-  destruct Hla as [Hla| Hla]; [ now subst a; left | ].
-  specialize (Hbb _ Hla) as H1.
-...
-}
-now apply IHit with (la := lc).
-...
-intros * Hecl * Ha.
-revert r a la Hecl Ha.
-induction it; intros; [ easy | cbn in Hecl ].
-destruct la as [| b]; [ easy | ].
-remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
-destruct p as (lb, lc).
-apply partition_rel in Hp.
-destruct Hp as (Hbb, Hbc).
-destruct Hecl as [Hecl| Hecl]. {
-  injection Hecl; clear Hecl; intros; subst b ec.
-  now apply Hbb.
-}
-now apply IHit with (la := lc).
+right; apply Heq.
+apply in_or_app; right.
+now apply IHit with (ec := ec).
 Qed.
-*)
 
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
@@ -4250,6 +4169,8 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   clear g1.
   rewrite list_prodn_prodn_repeat in Hec.
   specialize (in_ecl _ _ _ _ _ Hec) as H1.
+  destruct H1 as (H1 & H2).
+...
 Compute (all_permut 0 [3;2;7]).
 ...
 Compute (
