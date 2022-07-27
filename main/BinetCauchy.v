@@ -3777,19 +3777,24 @@ destruct Hecl as [Hecl| Hecl]. {
   apply List_partition_filter_iff in Hp.
   destruct Hp as (Hb, Hc).
   rewrite Hb.
-About list_eqv_eq.
-Search (list_eqv _ _ _ = true).
-apply list_eqb_eq.
-...
-  now f_equal.
+  now apply <- (list_eqv_eq eqv r).
 }
 cbn.
 remember (eqv r b) as rb eqn:Hrb; symmetry in Hrb.
 destruct rb. {
-  apply Heqb in Hrb; subst r; f_equal.
+  rewrite Hrb.
+  apply IHit in Hecl.
+  cbn in Hecl.
+  remember (filter (eqv r) lc) as ld eqn:Hld; symmetry in Hld.
+  destruct ld; [ easy | ].
+  remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
+  destruct ra; [ | easy ].
   apply List_partition_filter_iff in Hp.
   destruct Hp as (Hb, Hc).
-  apply IHit in Hecl.
+  rewrite <- Hc in Hld.
+  rewrite List_filter_filter in Hld.
+(* ouais, faut voir, bon *)
+...
   rewrite Hb.
 ...
 split; [ | apply (IHit _ _ _ Hecl) ].

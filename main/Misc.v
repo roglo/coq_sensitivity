@@ -1488,14 +1488,12 @@ Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
       end
   end.
 
-Theorem list_eqv_eq : ∀ A (eqv : A → _),
-  equivalence eqb →
-  ∀ d la lb,
+Theorem list_eqv_eq : ∀ A (eqv : A → _) d la lb,
   list_eqv eqv la lb = true ↔
   length la = length lb ∧
   ∀ i, i < length la → eqv (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb *.
+intros.
 split; intros Hlab. {
   revert lb Hlab.
   induction la as [| a]; intros; [ now destruct lb | cbn ].
