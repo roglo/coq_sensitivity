@@ -3766,6 +3766,62 @@ Theorem in_ecl_eqb : ∀ A (eqv : A → _),
   → list_eqv eqv (r :: ec) (filter (eqv r) la) = true.
 Proof.
 intros * Heqv * Hecl.
+revert r ec it Hecl.
+induction la as [| a]; intros; [ now destruct it | cbn ].
+remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
+destruct ra. {
+  rewrite Hra.
+  destruct it; [ easy | ].
+  cbn in Hecl.
+  remember (partition (eqv a) la) as p eqn:Hp; symmetry in Hp.
+  destruct p as (lb, lc).
+  destruct Hecl as [Hecl| Hecl]. {
+    injection Hecl; clear Hecl; intros; subst r ec; cbn.
+    apply List_partition_filter_iff in Hp.
+    destruct Hp as (Hb, Hc).
+    rewrite Hb.
+    destruct Heqv.
+    now apply <- (list_eqv_eq eqv).
+  }
+  apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  subst lc.
+  exfalso.
+  clear - Heqv Hecl Hra.
+  revert a r ec it Hecl Hra.
+  induction la as [| b]; intros; [ now destruct it | ].
+  cbn in Hecl.
+  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; cbn in Hecl; [ now apply IHla in Hecl | ].
+  destruct it; [ easy | cbn in Hecl ].
+  remember (partition (eqv b) (filter (λ a0 : A, negb (eqv a a0)) la)) as p.
+  rename Heqp into Hp; symmetry in Hp.
+  destruct p as (lb, lc).
+  destruct Hecl as [Hecl| Hecl]. {
+    injection Hecl; clear Hecl; intros; subst r ec.
+    destruct Heqv as (Hrefl & Hsymm & Htran).
+    apply Hsymm in Hra.
+    congruence.
+  }
+  apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  subst lc.
+  rewrite List_filter_filter in Hecl.
+  erewrite filter_ext_in in Hecl. 2: {
+    intros c Hc.
+    now rewrite Bool.andb_comm.
+  }
+  rewrite <- List_filter_filter in Hecl.
+...
+  replace (filter (λ x, negb (eqv b x)) la) with la in Hecl. 2: {
+    symmetry.
+    clear - Hab.
+    induction la as [| c]; [ easy | cbn ].
+    remember (negb (eqv b c)) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc; [ now f_equal | ].
+    apply Bool.negb_false_iff in Hbc.
+...
+intros * Heqv * Hecl.
 revert r la ec Hecl.
 induction it; intros; [ easy | cbn in Hecl ].
 destruct la as [| b]; [ easy | ].
