@@ -465,6 +465,53 @@ etransitivity; [ apply IHl | ].
 apply Nat.le_succ_diag_r.
 Qed.
 
+Theorem List_partition_filter_iff : ∀ A (f : A → _) la lb lc,
+  partition f la = (lb, lc)
+  ↔ filter f la = lb ∧ filter (λ a, negb (f a)) la = lc.
+Proof.
+intros.
+split. {
+  intros * Hp.
+  revert lb lc Hp.
+  induction la as [| a]; intros. {
+    now injection Hp; clear Hp; intros; subst lb lc.
+  }
+  cbn in Hp |-*.
+  remember (partition f la) as q eqn:Hq; symmetry in Hq.
+  destruct q as (ld, le).
+  specialize (IHla _ _ eq_refl).
+  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+  destruct fa; cbn. {
+    injection Hp; clear Hp; intros; subst lb le.
+    split; [ now f_equal | easy ].
+  } {
+    injection Hp; clear Hp; intros; subst ld lc.
+    split; [ easy | now f_equal ].
+  }
+} {
+  intros (Hb, Hc).
+  revert lb lc Hb Hc.
+  induction la as [| a]; intros. {
+    now cbn in Hb, Hc |-*; subst lb lc.
+  }
+  cbn in Hb, Hc |-*.
+  remember (partition f la) as q eqn:Hq; symmetry in Hq.
+  destruct q as (ld, le).
+  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+  destruct fa; cbn in Hc |-*. {
+    destruct lb as [| b]; [ easy | ].
+    injection Hb; clear Hb; intros Hb H; subst b.
+    specialize (IHla _ _ Hb Hc).
+    now injection IHla; clear IHla; intros; subst ld le.
+  } {
+    destruct lc as [| c]; [ easy | ].
+    injection Hc; clear Hc; intros Hc H; subst c.
+    specialize (IHla _ _ Hb Hc).
+    now injection IHla; clear IHla; intros; subst ld le.
+  }
+}
+Qed.
+
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
@@ -1421,31 +1468,6 @@ split; intros Hlab. {
   now rewrite (proj2 (Hcomp a a) eq_refl).
 }
 Qed.
-
-(* to be completed
-Theorem list_compare_lt_iff : ∀ A (compare : A → _),
-  comparator compare →
-  ∀ la lb, list_compare compare la lb = Lt ↔ la < lb.
-Proof.
-intros * Hcomp *.
-split; intros Hlab. {
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn in Hlab ].
-  remember (compare a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy | easy ].
-  apply Hcomp in Hab.
-  subst b; f_equal.
-  now apply IHla.
-} {
-  subst lb.
-  induction la as [| a]; [ easy | cbn ].
-  unfold comparator in Hcomp.
-  now rewrite (proj2 (Hcomp a a) eq_refl).
-}
-Qed.
-...
-*)
 
 (* list_eqb *)
 

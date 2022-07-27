@@ -3621,16 +3621,14 @@ intros * Heqb *.
 now apply ecl_are_permutation.
 Qed.
 
-Theorem partition_eqb_nodup : ∀ A (eqb : A → _),
+Theorem filter_eqb_nodup : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ a la lb lc,
+  ∀ a la,
   NoDup (a :: la)
-  → partition (eqb a) la = (lb, lc)
-  → lb ∈ [[]; [a]].
+  → filter (eqb a) la ∈ [[]; [a]].
 Proof.
-intros * Heqb * Hnd Hp.
-revert lb lc Hp.
-induction la as [| b]; intros; [ now injection Hp; left | ].
+intros * Heqb * Hnd.
+induction la as [| b]; [ now left | ].
 assert (H : NoDup (a :: la)). {
   apply NoDup_cons_iff in Hnd.
   apply NoDup_cons_iff.
@@ -3639,11 +3637,7 @@ assert (H : NoDup (a :: la)). {
   split; [ easy | ].
   now apply NoDup_cons_iff in Hnd.
 }
-specialize (IHla H); clear H.
-cbn in Hp.
-remember (partition (eqb a) la) as q eqn:Hq; symmetry in Hq.
-destruct q as (ld, le).
-specialize (IHla _ _ eq_refl).
+specialize (IHla H); clear H; cbn.
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply Heqb in Hab; subst b.
@@ -3651,8 +3645,23 @@ destruct ab. {
   destruct Hnd as (H, _).
   now exfalso; apply H; left.
 } {
-  now injection Hp; clear Hp; intros; subst ld lc.
+  destruct IHla as [H1| H1]; [ now left | ].
+  destruct H1 as [H1| H1]; [ now right; left | easy ].
 }
+Qed.
+
+Theorem partition_eqb_nodup : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ a la lb lc,
+  NoDup (a :: la)
+  → partition (eqb a) la = (lb, lc)
+  → lb ∈ [[]; [a]].
+Proof.
+intros * Heqb * Hnd Hp.
+apply List_partition_filter_iff in Hp.
+destruct Hp as (Hb, Hc).
+subst lb; clear lc Hc.
+now apply (filter_eqb_nodup Heqb).
 Qed.
 
 Theorem nodup_partition_eqb : ∀ A (eqb : A → _),
@@ -3751,6 +3760,43 @@ Qed.
 
 Definition equivalence {A} (eqv : A → A → bool) :=
   (∀ a : A, eqv a a = true).
+
+(* to be completed
+Theorem in_ecl_eqb : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ r ec it la,
+  (r, ec) ∈ ecl eqb it la
+  → r :: ec = filter (eqb r) la.
+Proof.
+intros * Heqb * Hecl.
+revert r la ec Hecl.
+induction it; intros; [ easy | cbn in Hecl ].
+destruct la as [| b]; [ easy | ].
+remember (partition (eqb b) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst b ec; cbn.
+  rewrite (equality_refl Heqb).
+  apply List_partition_filter_iff in Hp.
+  now f_equal.
+}
+cbn.
+remember (eqb r b) as rb eqn:Hrb; symmetry in Hrb.
+destruct rb. {
+  apply Heqb in Hrb; subst r; f_equal.
+  apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  apply IHit in Hecl.
+  rewrite Hb.
+...
+split; [ | apply (IHit _ _ _ Hecl) ].
+apply partition_rel in Hp.
+destruct Hp as (Hbt & Hbf & Heq).
+right; apply Heq.
+apply in_or_app; right.
+now apply IHit with (ec := ec).
+...
+*)
 
 Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
   (r, ec) ∈ ecl eqv it la
@@ -4187,6 +4233,9 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
     now apply Hel in Hece.
   }
   clear Hece; rename H into Hece.
+  assert (H : length (la :: lla) = m!). {
+Check in_ecl.
+unfold eqv in Hec.
 ...
 Compute (all_permut 0 [3;2;7]).
 ...
