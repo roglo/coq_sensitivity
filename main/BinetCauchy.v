@@ -3758,7 +3758,7 @@ split; intros Hb. {
 }
 Qed.
 
-(* to be completed
+(*
 Theorem in_ecl_eqb : ∀ A (eqv : A → _),
   equivalence eqv →
   ∀ r ec it la,
@@ -4326,8 +4326,7 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   }
   clear Hece; rename H into Hece.
   assert (H : length (la :: lla) = m!). {
-Check in_ecl.
-unfold eqv in Hec.
+    unfold eqv in Hec.
 ...
 Compute (all_permut 0 [3;2;7]).
 ...
