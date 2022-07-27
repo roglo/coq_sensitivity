@@ -3784,6 +3784,7 @@ cbn.
 remember (eqv r b) as rb eqn:Hrb; symmetry in Hrb.
 destruct rb. {
   rewrite Hrb.
+...
   apply IHit in Hecl.
   cbn in Hecl.
   remember (filter (eqv r) lc) as ld eqn:Hld; symmetry in Hld.
@@ -3792,6 +3793,7 @@ destruct rb. {
   destruct ra; [ | easy ].
   apply List_partition_filter_iff in Hp.
   destruct Hp as (Hb, Hc).
+...
   rewrite filter_ext_in with (g := eqv b). 2: {
     intros e He.
     destruct Heqv as (Hrefl & Hsymm & Htran).
@@ -3808,6 +3810,8 @@ destruct rb. {
   rewrite Hb.
   apply (list_eqv_eq _ r).
   split. {
+  ============================
+  length ec = length lb
 ...
     etransitivity. 2: {
       eapply Htran; [ apply Hrb | ].
