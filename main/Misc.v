@@ -1374,7 +1374,9 @@ Qed.
 (* equivalence & equality *)
 
 Definition equivalence {A} (eqv : A → A → bool) :=
-  (∀ a : A, eqv a a = true).
+  (∀ a, eqv a a = true) ∧
+  (∀ a b, eqv a b = true → eqv b a = true) ∧
+  (∀ a b c, eqv a b = true → eqv b c = true → eqv a c = true).
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 

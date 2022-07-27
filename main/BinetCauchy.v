@@ -3773,10 +3773,11 @@ remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
 destruct p as (lb, lc).
 destruct Hecl as [Hecl| Hecl]. {
   injection Hecl; clear Hecl; intros; subst b ec; cbn.
-  rewrite Heqv, Heqv.
+  rewrite (proj1 Heqv), (proj1 Heqv).
   apply List_partition_filter_iff in Hp.
   destruct Hp as (Hb, Hc).
   rewrite Hb.
+  destruct Heqv.
   now apply <- (list_eqv_eq eqv r).
 }
 cbn.
@@ -3791,6 +3792,29 @@ destruct rb. {
   destruct ra; [ | easy ].
   apply List_partition_filter_iff in Hp.
   destruct Hp as (Hb, Hc).
+  rewrite filter_ext_in with (g := eqv b). 2: {
+    intros e He.
+    destruct Heqv as (Hrefl & Hsymm & Htran).
+    remember (eqv b e) as be eqn:Hbe; symmetry in Hbe.
+    destruct be. {
+      eapply Htran; [ apply Hrb | apply Hbe ].
+    }
+    apply Bool.not_true_iff_false in Hbe.
+    apply Bool.not_true_iff_false.
+    intros H; apply Hbe.
+    eapply Htran; [ | apply H ].
+    now apply Hsymm.
+  }
+  rewrite Hb.
+  apply (list_eqv_eq _ r).
+  split. {
+...
+    etransitivity. 2: {
+      eapply Htran; [ apply Hrb | ].
+...
+  erewrite filter_ext_in. 2: {
+    intros e He.
+...
   rewrite <- Hc in Hld.
   rewrite List_filter_filter in Hld.
 (* ouais, faut voir, bon *)
