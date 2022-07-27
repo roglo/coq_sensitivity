@@ -1081,7 +1081,7 @@ Qed.
 (* *)
 
 Definition sym_gr_inv (sg : list (list nat)) σ :=
-  unsome 0 (List_rank (list_eqb Nat.eqb σ) sg).
+  unsome 0 (List_rank (list_eqv Nat.eqb σ) sg).
 
 Theorem sym_gr_inv_inj : ∀ n sg la lb,
   is_sym_gr_list n sg
@@ -1092,8 +1092,8 @@ Theorem sym_gr_inv_inj : ∀ n sg la lb,
 Proof.
 intros * Hsg Hna Hnb Hab.
 unfold sym_gr_inv, unsome in Hab.
-remember (List_rank (list_eqb Nat.eqb la) sg) as x eqn:Hx.
-remember (List_rank (list_eqb Nat.eqb lb) sg) as y eqn:Hy.
+remember (List_rank (list_eqv Nat.eqb la) sg) as x eqn:Hx.
+remember (List_rank (list_eqv Nat.eqb lb) sg) as y eqn:Hy.
 move y before x.
 symmetry in Hx, Hy.
 destruct x as [x| ]. {

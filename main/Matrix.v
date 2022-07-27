@@ -24,7 +24,7 @@ Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
 (* *)
 
 Definition mat_eqb {T} (eqb : T → T → bool) (A B : matrix T) :=
-  list_eqb (list_eqb eqb) (mat_list_list A) (mat_list_list B).
+  list_eqv (list_eqv eqb) (mat_list_list A) (mat_list_list B).
 
 (* correct_matrix: matrix whose list list is made of non
    empty lists (rows) of same length *)
@@ -54,7 +54,7 @@ split; intros Hab. {
   destruct B as (llb).
   cbn in Hab; f_equal.
   specialize list_eqb_eq as H1.
-  specialize (H1 (list T) (list_eqb eqb)).
+  specialize (H1 (list T) (list_eqv eqb)).
   apply H1; [ | easy ].
   intros la lb.
   specialize (list_eqb_eq Heqb la lb) as H2.
@@ -67,7 +67,7 @@ split; intros Hab. {
   subst B.
   destruct A as (ll); cbn.
   induction ll as [| la]; [ easy | cbn ].
-  remember (list_eqb eqb la la) as b eqn:Hb; symmetry in Hb.
+  remember (list_eqv eqb la la) as b eqn:Hb; symmetry in Hb.
   destruct b; [ easy | ].
   exfalso; apply Bool.not_true_iff_false in Hb; apply Hb.
   clear - Heqb.

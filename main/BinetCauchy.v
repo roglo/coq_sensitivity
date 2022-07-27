@@ -3004,9 +3004,9 @@ symmetry; erewrite rngl_summation_list_eq_compat. 2: {
 }
 symmetry.
 remember (length kl) as n eqn:Hn.
-assert (Heql : equality (list_eqb Nat.eqb)). {
+assert (Heql : equality (list_eqv Nat.eqb)). {
   intros la lb.
-  apply -> equality_list_eqb.
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
@@ -3044,7 +3044,7 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
   now destruct Hl.
 }
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
-rewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
+rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     with (lb := all_comb n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
@@ -3179,7 +3179,7 @@ rewrite (rngl_summation_list_permut (list_eqb Nat.eqb))
   }
 }
 apply NoDup_permutation. {
-  apply -> equality_list_eqb.
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 } {
@@ -3394,14 +3394,14 @@ cbn in Hi; flia Hi.
 Qed.
 
 Theorem permutation_prodn_succ_app_prodn_filter : ∀ m n,
-  permutation (list_eqb Nat.eqb)
+  permutation (list_eqv Nat.eqb)
     (list_prodn (repeat (seq 1 (S n)) m))
     (list_prodn (repeat (seq 1 n) m) ++
      filter (member Nat.eqb (S n)) (list_prodn (repeat (seq 1 (S n)) m))).
 Proof.
 intros.
-assert (Hel : equality (list_eqb Nat.eqb)). {
-  apply -> equality_list_eqb.
+assert (Hel : equality (list_eqv Nat.eqb)). {
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
@@ -3758,30 +3758,33 @@ split; intros Hb. {
 }
 Qed.
 
-Definition equivalence {A} (eqv : A → A → bool) :=
-  (∀ a : A, eqv a a = true).
-
 (* to be completed
-Theorem in_ecl_eqb : ∀ A (eqb : A → _),
-  equality eqb →
+Theorem in_ecl_eqb : ∀ A (eqv : A → _),
+  equivalence eqv →
   ∀ r ec it la,
-  (r, ec) ∈ ecl eqb it la
-  → r :: ec = filter (eqb r) la.
+  (r, ec) ∈ ecl eqv it la
+  → list_eqv eqv (r :: ec) (filter (eqv r) la) = true.
 Proof.
-intros * Heqb * Hecl.
+intros * Heqv * Hecl.
 revert r la ec Hecl.
 induction it; intros; [ easy | cbn in Hecl ].
 destruct la as [| b]; [ easy | ].
-remember (partition (eqb b) la) as p eqn:Hp; symmetry in Hp.
+remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
 destruct p as (lb, lc).
 destruct Hecl as [Hecl| Hecl]. {
   injection Hecl; clear Hecl; intros; subst b ec; cbn.
-  rewrite (equality_refl Heqb).
+  rewrite Heqv, Heqv.
   apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  rewrite Hb.
+About list_eqv_eq.
+Search (list_eqv _ _ _ = true).
+apply list_eqb_eq.
+...
   now f_equal.
 }
 cbn.
-remember (eqb r b) as rb eqn:Hrb; symmetry in Hrb.
+remember (eqv r b) as rb eqn:Hrb; symmetry in Hrb.
 destruct rb. {
   apply Heqb in Hrb; subst r; f_equal.
   apply List_partition_filter_iff in Hp.
@@ -4068,16 +4071,16 @@ symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite rngl_summation_list_map.
 *)
-assert (Hel : equality (list_eqb Nat.eqb)). {
+assert (Hel : equality (list_eqv Nat.eqb)). {
   intros la lb.
-  apply -> equality_list_eqb.
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
 set (f := no_dup Nat.eqb).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb Nat.eqb) ll
+    permutation (list_eqv Nat.eqb) ll
       (filter f ll ++ filter (λ l, negb (f l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -4111,7 +4114,7 @@ subst f.
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
-  if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+  if list_eqv Nat.eqb (isort Nat.leb kl) jl then
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows jl B)
   else 0
@@ -4125,15 +4128,15 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
 Proof.
 intros Hopp Heqb *.
 rewrite list_prodn_prodn_repeat.
-assert (Hel : equality (list_eqb eqb)). {
-  apply -> equality_list_eqb.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
 set (g := no_dup Nat.eqb).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb eqb) ll
+    permutation (list_eqv eqb) ll
       (filter g ll ++ filter (λ l, negb (g l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -4156,8 +4159,8 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 subst g.
 rewrite rngl_add_0_l.
-set (eqv := λ la lb, list_eqb Nat.eqb la (isort Nat.leb lb)).
-erewrite (rngl_summation_list_permut (list_eqb Nat.eqb)); [ | easy | ]. 2: {
+set (eqv := λ la lb, list_eqv Nat.eqb la (isort Nat.leb lb)).
+erewrite (rngl_summation_list_permut (list_eqv Nat.eqb)); [ | easy | ]. 2: {
   now apply equiv_classes_are_permutation with (eqv := eqv).
 }
 remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
@@ -4398,7 +4401,7 @@ Compute (
 isort (λ la lb,
   let la1 := isort Nat.leb la in
   let lb1 := isort Nat.leb lb in
-  if list_eqb Nat.eqb la1 lb1 then list_leb Nat.leb la lb
+  if list_eqv Nat.eqb la1 lb1 then list_leb Nat.leb la lb
   else list_leb Nat.leb la1 lb1
 ) (
   filter (no_dup Nat.eqb) (prodn_repeat_seq 1 4 3)
@@ -4867,7 +4870,7 @@ Theorem rngl_summation_list_by_subsets :
 Proof.
 intros.
 ...
-eapply rngl_summation_list_by_subsets with (eqb := list_eqb Nat.eqb)
+eapply rngl_summation_list_by_subsets with (eqb := list_eqv Nat.eqb)
   (g_1 := hd []).
 (* hmmm... c'est compliqué... *)
 (* compliqué de définir ?lla *)
@@ -4898,14 +4901,14 @@ induction llb as [| lb]; intros. {
   now destruct Ha as (lb & Ha & _).
 }
 rewrite rngl_summation_list_cons.
-assert (Hel : equality (list_eqb eqb)). {
+assert (Hel : equality (list_eqv eqb)). {
   clear - Heqb; intros la lb.
-  now apply -> equality_list_eqb.
+  now apply -> equality_list_eqv.
 }
-set (g := λ la, member (list_eqb eqb) la (all_permut d lb)).
+set (g := λ la, member (list_eqv eqb) la (all_permut d lb)).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb eqb) ll
+    permutation (list_eqv eqb) ll
       (filter g ll ++ filter (λ l, negb (g l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -4923,8 +4926,8 @@ Compute (
   let eqb := Nat.eqb in
   let lb := [1;2;3] in
   let lla := [[1;2;3]] in
-  permutation (list_eqb eqb)
-    (filter (λ la, member (list_eqb eqb) la (all_permut d lb)) lla)
+  permutation (list_eqv eqb)
+    (filter (λ la, member (list_eqv eqb) la (all_permut d lb)) lla)
     (all_permut d lb)
 ).
 (* ouais, c'est compliqué à tester *)
@@ -5041,14 +5044,14 @@ destruct llb as [| lb]. {
   now destruct Ha as (lb & Ha & _).
 }
 rewrite rngl_summation_list_cons.
-assert (Hel : equality (list_eqb eqb)). {
+assert (Hel : equality (list_eqv eqb)). {
   clear - Heqb; intros la lb.
-  now apply -> equality_list_eqb.
+  now apply -> equality_list_eqv.
 }
-set (g := λ la, member (list_eqb eqb) la (all_permut d lb)).
+set (g := λ la, member (list_eqv eqb) la (all_permut d lb)).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb eqb) ll
+    permutation (list_eqv eqb) ll
       (filter g ll ++ filter (λ l, negb (g l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -5075,7 +5078,7 @@ rewrite rngl_summation_filter_no_dup_list_prodn.
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
-     if list_eqb Nat.eqb (isort Nat.leb kl) jl then f kl else 0
+     if list_eqv Nat.eqb (isort Nat.leb kl) jl then f kl else 0
 *)
 (*
 Compute (
@@ -5100,7 +5103,7 @@ sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m
   → ∑ (kl ∈ lla), f kl =
     ∑ (jl ∈ llb),
       ∑ (kl ∈ lla),
-       if list_eqb Nat.eqb (isort Nat.leb kl) jl then f kl else 0
+       if list_eqv Nat.eqb (isort Nat.leb kl) jl then f kl else 0
 
 -----> ah oui mais non. Faut réfléchir...
 *)
@@ -5108,7 +5111,7 @@ sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
   ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
-  (if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+  (if list_eqv Nat.eqb (isort Nat.leb kl) jl then
      ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
    else 0) *
    det (mat_select_rows jl B)
@@ -5116,7 +5119,7 @@ sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
   (∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
-    if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+    if list_eqv Nat.eqb (isort Nat.leb kl) jl then
       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
     else 0) *
    det (mat_select_rows jl B)
@@ -5124,7 +5127,7 @@ sub_lists_of_seq_1_n n m ⊂ list_prodn (repeat (seq 1 n) m
 *)
 (* at end, must prove that
   (∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
-    if list_eqb Nat.eqb (isort Nat.leb kl) jl then
+    if list_eqv Nat.eqb (isort Nat.leb kl) jl then
       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
     else 0)
   is equal to det (mat_select_cols jl A
@@ -5169,7 +5172,7 @@ mat_el A (ff_app kl i) j = mat_el (mat_select_rows kl A) i j.
 set (f := is_sorted Nat.leb).
 erewrite (rngl_summation_list_permut _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb Nat.eqb) ll
+    permutation (list_eqv Nat.eqb) ll
       (filter f ll ++ filter (λ l, negb (f l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -5275,7 +5278,7 @@ let m := 3 in
 set (g := is_sorted Nat.ltb).
 erewrite (rngl_summation_list_permut _ Heql). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb Nat.eqb) ll
+    permutation (list_eqv Nat.eqb) ll
       (filter g ll ++ filter (λ l, negb (g l)) ll)). {
     now apply permutation_filter_app_filter.
   }
@@ -5403,8 +5406,8 @@ rewrite IHn.
 rewrite map_map.
 cbn - [ list_prodn repeat seq ].
 symmetry.
-assert (Hel : equality (list_eqb Nat.eqb)). {
-  apply -> equality_list_eqb.
+assert (Hel : equality (list_eqv Nat.eqb)). {
+  apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
@@ -5415,7 +5418,7 @@ rewrite rngl_summation_list_app.
 f_equal.
 erewrite (rngl_summation_list_permut _ _ Hel). 2: {
   assert (H : ∀ ll,
-    permutation (list_eqb Nat.eqb) ll
+    permutation (list_eqv Nat.eqb) ll
       (filter (is_sorted Nat.ltb) ll ++
        filter (λ l, negb (is_sorted Nat.ltb l)) ll)). {
     now apply permutation_filter_app_filter.
@@ -5450,7 +5453,7 @@ let m := 2 in
   map (λ l : list nat, map S (l ++ [n])) (sub_lists_of_seq_1_n n m)
 ).
 ...
-erewrite (rngl_summation_list_permut _ (list_eqb Nat.eqb_eq)).
+erewrite (rngl_summation_list_permut _ (list_eqv Nat.eqb_eq)).
 Search permutation.
 rewrite rngl_summation_list_change_var.
 

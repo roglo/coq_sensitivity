@@ -1371,7 +1371,10 @@ Qed.
 
 (* end repeat_apply *)
 
-(* equality *)
+(* equivalence & equality *)
+
+Definition equivalence {A} (eqv : A → A → bool) :=
+  (∀ a : A, eqv a a = true).
 
 Definition equality {A} (eqb : A → A → bool) := ∀ a b, eqb a b = true ↔ a = b.
 
@@ -1469,9 +1472,9 @@ split; intros Hlab. {
 }
 Qed.
 
-(* list_eqb *)
+(* list_eqv *)
 
-Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
+Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
   match la with
   | [] =>
       match lb with
@@ -1481,13 +1484,55 @@ Fixpoint list_eqb A (eqb : A → A → bool) la lb :=
   | a :: la' =>
       match lb with
       | [] => false
-      | b :: lb' => if eqb a b then list_eqb eqb la' lb' else false
+      | b :: lb' => if eqv a b then list_eqv eqv la' lb' else false
       end
   end.
 
+Theorem list_eqv_eq : ∀ A (eqv : A → _),
+  equivalence eqb →
+  ∀ d la lb,
+  list_eqv eqv la lb = true ↔
+  length la = length lb ∧
+  ∀ i, i < length la → eqv (nth i la d) (nth i lb d) = true.
+Proof.
+intros * Heqb *.
+split; intros Hlab. {
+  revert lb Hlab.
+  induction la as [| a]; intros; [ now destruct lb | cbn ].
+  destruct lb as [| b]; [ easy | cbn in Hlab ].
+  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  specialize (IHla lb Hlab) as H1.
+  destruct H1 as (H1, H2).
+  split; [ now rewrite H1 | ].
+  intros i Hi; cbn.
+  destruct i; [ easy | ].
+  apply Nat.succ_lt_mono in Hi.
+  now apply H2.
+} {
+  destruct Hlab as (Hlab & Heab).
+  revert lb Hlab Heab.
+  induction la as [| a]; intros. {
+    symmetry in Hlab.
+    now apply length_zero_iff_nil in Hlab; subst lb.
+  }
+  destruct lb as [| b]; [ easy | cbn ].
+  cbn in Hlab; apply Nat.succ_inj in Hlab.
+  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply IHla; [ easy | ].
+    intros i Hi.
+    apply (Heab (S i)).
+    now cbn; apply -> Nat.succ_lt_mono.
+  }
+  specialize (Heab 0) as H1; cbn in H1.
+  now rewrite H1 in Hab.
+}
+Qed.
+
 Theorem list_eqb_eq : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la lb, list_eqb eqb la lb = true ↔ la = lb.
+  ∀ la lb, list_eqv eqb la lb = true ↔ la = lb.
 Proof.
 intros * Heqb *.
 split; intros Hlab. {
@@ -1507,7 +1552,7 @@ Qed.
 
 Theorem list_eqb_neq : ∀ A (eqb : A → _),
   equality eqb →
-  ∀ la lb, list_eqb eqb la lb = false → la ≠ lb.
+  ∀ la lb, list_eqv eqb la lb = false → la ≠ lb.
 Proof.
 intros * Heqb * Hab H; subst lb.
 induction la as [| a]; [ easy | cbn in Hab ].
@@ -1515,8 +1560,8 @@ rewrite (equality_refl Heqb) in Hab.
 congruence.
 Qed.
 
-Theorem equality_list_eqb : ∀ A (eqb : A → _),
-  equality eqb ↔ equality (list_eqb eqb).
+Theorem equality_list_eqv : ∀ A (eqb : A → _),
+  equality eqb ↔ equality (list_eqv eqb).
 Proof.
 intros.
 split. {
@@ -1542,9 +1587,9 @@ split. {
 }
 Qed.
 
-(* end list_eqb *)
+(* end list_eqv *)
 
-(* list_eqb *)
+(* list_eqv *)
 
 Fixpoint list_leb A (leb : A → A → bool) la lb :=
   match la with

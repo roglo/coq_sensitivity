@@ -242,7 +242,7 @@ Proof.
 intros Heq *.
 destruct U as (lu).
 destruct V as (lv).
-remember (list_eqb rngl_eqb lu lv) as uv eqn:Huv.
+remember (list_eqv rngl_eqb lu lv) as uv eqn:Huv.
 symmetry in Huv.
 destruct uv. {
   left; f_equal.
