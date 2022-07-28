@@ -4330,6 +4330,33 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   rewrite List_filter_filter in Hllb.
   unfold all_permut.
   rewrite Hrm.
+  unfold canon_sym_gr_list_list.
+  rewrite map_map.
+  remember (λ k, _) as x in |-*; subst x.
+  erewrite filter_ext_in in Hllb. 2: {
+    intros lc Hlc.
+    replace (eqv la lc && no_dup Nat.eqb lc)%bool with (eqv la lc). 2: {
+      symmetry.
+      remember (eqv la lc) as ac eqn:Hac; symmetry in Hac.
+      destruct ac; [ cbn | easy ].
+      apply (no_dup_NoDup Nat.eqb_eq).
+      apply (list_eqb_eq Nat.eqb_eq) in Hac.
+      move Hnd at bottom.
+      clear - Hac Hnd.
+      cbn in Hac.
+      specialize (permuted_isort_iff) as H1.
+      specialize (H1 _ Nat.eqb Nat.leb).
+      specialize (H1 Nat.eqb_eq).
+      specialize (H1 Nat_leb_antisym Nat_leb_trans).
+      specialize (H1 Nat_leb_is_total_relation).
+      apply H1 in Hac.
+      clear H1.
+      apply Permutation.Permutation_NoDup with (l := la); [ | easy ].
+      now apply (Permutation_permutation Nat.eqb_eq) in Hac.
+    }
+    easy.
+  }
+...
 Compute (
 let la := [2;3;4] in
 let n := 5 in
