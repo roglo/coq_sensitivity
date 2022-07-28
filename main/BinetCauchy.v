@@ -4215,7 +4215,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 subst g.
 rewrite rngl_add_0_l.
-set (eqv := λ la lb, list_eqv Nat.eqb la (isort Nat.leb lb)).
+set (eqv := λ la lb, list_eqv Nat.eqb (isort Nat.leb la) (isort Nat.leb lb)).
 erewrite (rngl_summation_list_permut (list_eqv Nat.eqb)); [ | easy | ]. 2: {
   now apply equiv_classes_are_permutation with (eqv := eqv).
 }
@@ -4286,21 +4286,48 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   remember (∀ lb, _) as x eqn:Hx in Hece; subst x.
   apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
   unfold eqv in Hece.
-  assert (H : ∀ lb, lb ∈ lla → la = isort Nat.leb lb). {
+  assert (H : ∀ lb, lb ∈ lla → isort Nat.leb la = isort Nat.leb lb). {
     intros lb Hlb.
     specialize (Hece _ Hlb).
     now apply Hel in Hece.
   }
   clear Hece; rename H into Hece.
-  apply in_ecl_eqb in Hec. 2: {
+  generalize Hec; intros He.
+  apply in_ecl_eqb in He. 2: {
     unfold eqv.
     split. {
       intros lb.
-(* bizarre... *)
-...
       apply (list_eqv_eq _ 0).
-      split; [ now rewrite isort_length | ].
+      rewrite isort_length.
+      split; [ easy | intros; apply Nat.eqb_refl ].
+    }
+    split. {
+      intros lb lc Hbc.
+      apply (list_eqv_eq _ 0).
+      do 2 rewrite isort_length.
+      apply (list_eqb_eq Nat.eqb_eq) in Hbc.
+      split. {
+        apply (f_equal length) in Hbc.
+        now do 2 rewrite isort_length in Hbc.
+      }
       intros i Hi.
+      rewrite Hbc.
+      apply Nat.eqb_refl.
+    }
+    intros lb lc ld Hbc Hcd.
+    apply (list_eqb_eq Nat.eqb_eq) in Hbc, Hcd.
+    rewrite Hbc, Hcd.
+    apply (list_eqv_eq _ 0).
+    rewrite isort_length.
+    split; [ easy | intros; apply Nat.eqb_refl ].
+  }
+  cbn in He.
+  remember (filter _ (filter _ _)) as llb eqn:Hllb.
+  symmetry in Hllb.
+  destruct llb as [| lb]; [ easy | ].
+  remember (eqv la lb) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  rewrite List_filter_filter in Hllb.
 ...
   }
   cbn in Hec.
