@@ -3822,7 +3822,22 @@ destruct ra. {
 remember (filter (eqv r) la) as ld eqn:Hld; symmetry in Hld.
 destruct ld as [| d]. {
   exfalso.
-(**)
+  specialize (proj1 (List_filter_nil_iff _ _) Hld) as H3.
+  apply IHit in Hecl.
+  cbn in Hecl.
+  remember (filter (eqv r) lc) as le eqn:Hle; symmetry in Hle.
+  destruct le as [| e]; [ easy | ].
+  specialize (proj1 (filter_In (eqv r) e lc)) as H4.
+  rewrite Hle in H4.
+  specialize (H4 (or_introl eq_refl)).
+  destruct H4 as (H4, H5).
+  rewrite H5 in Hecl.
+  rewrite H3 in H5; [ easy | ].
+  apply partition_rel in Hp.
+  destruct Hp as (Hp1 & Hp2 & Hp3).
+  apply Hp3.
+  now apply in_or_app; right.
+}
 ...
   apply List_partition_filter_iff in Hp.
 ...
