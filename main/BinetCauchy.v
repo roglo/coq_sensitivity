@@ -3838,6 +3838,35 @@ destruct ld as [| d]. {
   apply Hp3.
   now apply in_or_app; right.
 }
+remember (eqv r d) as rd eqn:Hrd; symmetry in Hrd.
+destruct rd. 2: {
+  exfalso.
+  specialize (filter_In (eqv r) d la) as H4.
+  rewrite Hld in H4.
+  specialize (proj1 H4 (or_introl eq_refl)) as H5.
+  destruct H5; congruence.
+}
+...
+  specialize (proj1 (filter_In (eqv r) d lc)) as H4.
+  assert (H : d ∈ filter (eqv r) lc). {
+    apply List_partition_filter_iff in Hp.
+    destruct Hp as (H1, H2).
+    rewrite <- H2.
+    rewrite List_filter_filter.
+    erewrite filter_ext_in. 2: {
+      intros c Hc.
+      now rewrite Bool.andb_comm.
+    }
+    rewrite <- List_filter_filter.
+    rewrite Hld; cbn.
+    remember (eqv a d) as ad eqn:Had; symmetry in Had.
+    destruct ad; cbn; [ | now left ].
+...
+  apply in_ecl in Hecl.
+...
+  assert (H : d ∈ filter (eqv r) lc). {
+    apply filter_In.
+  destruct H4 as (H4 & H5).
 ...
   apply List_partition_filter_iff in Hp.
 ...
