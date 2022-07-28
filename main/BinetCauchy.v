@@ -3758,7 +3758,33 @@ split; intros Hb. {
 }
 Qed.
 
-(*
+Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
+  (r, ec) ∈ ecl eqv it la
+  → r ∈ la ∧ (∀ a, a ∈ ec → eqv r a = true).
+Proof.
+intros * Hecl.
+revert r la ec Hecl.
+induction it; intros; [ easy | cbn in Hecl ].
+destruct la as [| b]; [ easy | ].
+remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst b ec.
+  split; [ now left | ].
+  intros a Hla.
+  apply partition_rel in Hp.
+  destruct Hp as (Hbb, Hbc).
+  now apply Hbb.
+}
+split; [ | apply (IHit _ _ _ Hecl) ].
+apply partition_rel in Hp.
+destruct Hp as (Hbt & Hbf & Heq).
+right; apply Heq.
+apply in_or_app; right.
+now apply IHit with (ec := ec).
+Qed.
+
+(* to be completed
 Theorem in_ecl_eqb : ∀ A (eqv : A → _),
   equivalence eqv →
   ∀ r ec it la,
@@ -3766,8 +3792,90 @@ Theorem in_ecl_eqb : ∀ A (eqv : A → _),
   → list_eqv eqv (r :: ec) (filter (eqv r) la) = true.
 Proof.
 intros * Heqv * Hecl.
+revert r ec la Hecl.
+induction it; intros; [ easy | ].
+destruct la as [| a]; [ easy | cbn ].
+cbn in Hecl.
+remember (partition (eqv a) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst r ec; cbn.
+  rewrite (proj1 Heqv), (proj1 Heqv).
+  apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  rewrite Hb.
+  apply <- (list_eqv_eq eqv a).
+  split; [ easy | ].
+  intros i Hi.
+  apply (proj1 Heqv).
+}
+remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
+destruct ra. {
+  exfalso.
+  apply partition_rel in Hp.
+  destruct Hp as (H1 & H2 & H3).
+  destruct Heqv as (Hrefl & Hsymm & Htran).
+  apply Hsymm in Hra.
+  rewrite H2 in Hra; [ easy | ].
+  now apply in_ecl in Hecl.
+}
+remember (filter (eqv r) la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]. {
+  exfalso.
+(**)
+...
+  apply List_partition_filter_iff in Hp.
+...
+  apply in_ecl in Hecl.
+  destruct Hecl as (H1, H2).
+...
+  specialize (proj1 (List_filter_nil_iff _ _) Hld) as H3.
+...
+  rewrite H2 in Hra; [ easy | ].
+...
+  apply IHit in Hecl.
+  cbn in Hecl.
+  remember (filter (eqv r) lc) as le eqn:Hle; symmetry in Hle.
+  destruct le as [| e]; [ easy | ].
+  remember (eqv r e) as re eqn:Hre; symmetry in Hre.
+  destruct re; [ | easy ].
+  specialize (proj1 (List_filter_nil_iff _ _) Hld) as H1.
+  rewrite H1 in Hre; [ easy | ].
+...
+  apply List_filter_nil_iff in Hld.
+...
+apply List_partition_filter_iff in Hp.
+...
+intros * Heqv * Hecl.
+(*
+Compute (
+  let la := [3;7;8;1;2] in
+  let it := 32 in
+  let eqv a b := ((a - b <=? 2) && (b - a <=? 2))%bool in
+let r := 3 in
+let ec := [1;2] in
+  list_eqv eqv (r :: ec) (filter (eqv r) la) = true
+).
+  ecl eqv it la
+).
+*)
 revert r ec it Hecl.
 induction la as [| a]; intros; [ now destruct it | cbn ].
+destruct it; [ easy | cbn in Hecl ].
+remember (partition (eqv a) la) as p eqn:Hp; symmetry in Hp.
+destruct p as (lb, lc).
+destruct Hecl as [Hecl| Hecl]. {
+  injection Hecl; clear Hecl; intros; subst r ec; cbn.
+  rewrite (proj1 Heqv), (proj1 Heqv).
+  apply List_partition_filter_iff in Hp.
+  destruct Hp as (Hb, Hc).
+  rewrite Hb.
+  apply <- (list_eqv_eq eqv a).
+  split; [ easy | ].
+  intros i Hi.
+  apply (proj1 Heqv).
+}
+...
 remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
 destruct ra. {
   rewrite Hra.
@@ -3889,32 +3997,6 @@ apply in_or_app; right.
 now apply IHit with (ec := ec).
 ...
 *)
-
-Theorem in_ecl : ∀ A (eqv : A → _) r ec it la,
-  (r, ec) ∈ ecl eqv it la
-  → r ∈ la ∧ (∀ a, a ∈ ec → eqv r a = true).
-Proof.
-intros * Hecl.
-revert r la ec Hecl.
-induction it; intros; [ easy | cbn in Hecl ].
-destruct la as [| b]; [ easy | ].
-remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
-destruct p as (lb, lc).
-destruct Hecl as [Hecl| Hecl]. {
-  injection Hecl; clear Hecl; intros; subst b ec.
-  split; [ now left | ].
-  intros a Hla.
-  apply partition_rel in Hp.
-  destruct Hp as (Hbb, Hbc).
-  now apply Hbb.
-}
-split; [ | apply (IHit _ _ _ Hecl) ].
-apply partition_rel in Hp.
-destruct Hp as (Hbt & Hbf & Heq).
-right; apply Heq.
-apply in_or_app; right.
-now apply IHit with (ec := ec).
-Qed.
 
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
