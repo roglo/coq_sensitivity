@@ -4294,6 +4294,13 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   clear Hece; rename H into Hece.
   apply in_ecl_eqb in Hec. 2: {
     unfold eqv.
+    split. {
+      intros lb.
+(* bizarre... *)
+...
+      apply (list_eqv_eq _ 0).
+      split; [ now rewrite isort_length | ].
+      intros i Hi.
 ...
   }
   cbn in Hec.
