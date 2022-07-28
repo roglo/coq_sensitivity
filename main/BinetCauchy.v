@@ -3784,7 +3784,6 @@ apply in_or_app; right.
 now apply IHit with (ec := ec).
 Qed.
 
-(* to be completed
 Theorem in_ecl_eqb : ∀ A (eqv : A → _),
   equivalence eqv →
   ∀ r ec it la,
@@ -3846,201 +3845,43 @@ destruct rd. 2: {
   specialize (proj1 H4 (or_introl eq_refl)) as H5.
   destruct H5; congruence.
 }
-...
-  specialize (proj1 (filter_In (eqv r) d lc)) as H4.
-  assert (H : d ∈ filter (eqv r) lc). {
-    apply List_partition_filter_iff in Hp.
-    destruct Hp as (H1, H2).
-    rewrite <- H2.
-    rewrite List_filter_filter.
-    erewrite filter_ext_in. 2: {
-      intros c Hc.
-      now rewrite Bool.andb_comm.
-    }
-    rewrite <- List_filter_filter.
-    rewrite Hld; cbn.
-    remember (eqv a d) as ad eqn:Had; symmetry in Had.
-    destruct ad; cbn; [ | now left ].
-...
-  apply in_ecl in Hecl.
-...
-  assert (H : d ∈ filter (eqv r) lc). {
-    apply filter_In.
-  destruct H4 as (H4 & H5).
-...
+assert (H : filter (eqv r) la = filter (eqv r) lc). {
   apply List_partition_filter_iff in Hp.
-...
-  apply in_ecl in Hecl.
-  destruct Hecl as (H1, H2).
-...
-  specialize (proj1 (List_filter_nil_iff _ _) Hld) as H3.
-...
-  rewrite H2 in Hra; [ easy | ].
-...
-  apply IHit in Hecl.
-  cbn in Hecl.
-  remember (filter (eqv r) lc) as le eqn:Hle; symmetry in Hle.
-  destruct le as [| e]; [ easy | ].
-  remember (eqv r e) as re eqn:Hre; symmetry in Hre.
-  destruct re; [ | easy ].
-  specialize (proj1 (List_filter_nil_iff _ _) Hld) as H1.
-  rewrite H1 in Hre; [ easy | ].
-...
-  apply List_filter_nil_iff in Hld.
-...
-apply List_partition_filter_iff in Hp.
-...
-intros * Heqv * Hecl.
-(*
-Compute (
-  let la := [3;7;8;1;2] in
-  let it := 32 in
-  let eqv a b := ((a - b <=? 2) && (b - a <=? 2))%bool in
-let r := 3 in
-let ec := [1;2] in
-  list_eqv eqv (r :: ec) (filter (eqv r) la) = true
-).
-  ecl eqv it la
-).
-*)
-revert r ec it Hecl.
-induction la as [| a]; intros; [ now destruct it | cbn ].
-destruct it; [ easy | cbn in Hecl ].
-remember (partition (eqv a) la) as p eqn:Hp; symmetry in Hp.
-destruct p as (lb, lc).
-destruct Hecl as [Hecl| Hecl]. {
-  injection Hecl; clear Hecl; intros; subst r ec; cbn.
-  rewrite (proj1 Heqv), (proj1 Heqv).
-  apply List_partition_filter_iff in Hp.
-  destruct Hp as (Hb, Hc).
-  rewrite Hb.
-  apply <- (list_eqv_eq eqv a).
-  split; [ easy | ].
-  intros i Hi.
-  apply (proj1 Heqv).
-}
-...
-remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
-destruct ra. {
-  rewrite Hra.
-  destruct it; [ easy | ].
-  cbn in Hecl.
-  remember (partition (eqv a) la) as p eqn:Hp; symmetry in Hp.
-  destruct p as (lb, lc).
-  destruct Hecl as [Hecl| Hecl]. {
-    injection Hecl; clear Hecl; intros; subst r ec; cbn.
-    apply List_partition_filter_iff in Hp.
-    destruct Hp as (Hb, Hc).
-    rewrite Hb.
-    destruct Heqv.
-    now apply <- (list_eqv_eq eqv).
-  }
-  apply List_partition_filter_iff in Hp.
-  destruct Hp as (Hb, Hc).
-  subst lc.
-  exfalso.
-  clear - Heqv Hecl Hra.
-  revert a r ec it Hecl Hra.
-  induction la as [| b]; intros; [ now destruct it | ].
-  cbn in Hecl.
-  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; cbn in Hecl; [ now apply IHla in Hecl | ].
-  destruct it; [ easy | cbn in Hecl ].
-  remember (partition (eqv b) (filter (λ a0 : A, negb (eqv a a0)) la)) as p.
-  rename Heqp into Hp; symmetry in Hp.
-  destruct p as (lb, lc).
-  destruct Hecl as [Hecl| Hecl]. {
-    injection Hecl; clear Hecl; intros; subst r ec.
-    destruct Heqv as (Hrefl & Hsymm & Htran).
-    apply Hsymm in Hra.
-    congruence.
-  }
-  apply List_partition_filter_iff in Hp.
-  destruct Hp as (Hb, Hc).
-  subst lc.
-  rewrite List_filter_filter in Hecl.
-  erewrite filter_ext_in in Hecl. 2: {
+  destruct Hp as (Hp1, Hp2).
+  rewrite <- Hp2.
+  symmetry.
+  rewrite List_filter_filter.
+  erewrite filter_ext_in. 2: {
     intros c Hc.
     now rewrite Bool.andb_comm.
   }
-  rewrite <- List_filter_filter in Hecl.
-...
-  replace (filter (λ x, negb (eqv b x)) la) with la in Hecl. 2: {
-    symmetry.
-    clear - Hab.
-    induction la as [| c]; [ easy | cbn ].
-    remember (negb (eqv b c)) as bc eqn:Hbc; symmetry in Hbc.
-    destruct bc; [ now f_equal | ].
-    apply Bool.negb_false_iff in Hbc.
-...
-intros * Heqv * Hecl.
-revert r la ec Hecl.
-induction it; intros; [ easy | cbn in Hecl ].
-destruct la as [| b]; [ easy | ].
-remember (partition (eqv b) la) as p eqn:Hp; symmetry in Hp.
-destruct p as (lb, lc).
-destruct Hecl as [Hecl| Hecl]. {
-  injection Hecl; clear Hecl; intros; subst b ec; cbn.
-  rewrite (proj1 Heqv), (proj1 Heqv).
-  apply List_partition_filter_iff in Hp.
-  destruct Hp as (Hb, Hc).
-  rewrite Hb.
-  destruct Heqv.
-  now apply <- (list_eqv_eq eqv r).
-}
-cbn.
-remember (eqv r b) as rb eqn:Hrb; symmetry in Hrb.
-destruct rb. {
-  rewrite Hrb.
-...
-  apply IHit in Hecl.
-  cbn in Hecl.
-  remember (filter (eqv r) lc) as ld eqn:Hld; symmetry in Hld.
-  destruct ld; [ easy | ].
-  remember (eqv r a) as ra eqn:Hra; symmetry in Hra.
-  destruct ra; [ | easy ].
-  apply List_partition_filter_iff in Hp.
-  destruct Hp as (Hb, Hc).
-...
-  rewrite filter_ext_in with (g := eqv b). 2: {
-    intros e He.
-    destruct Heqv as (Hrefl & Hsymm & Htran).
-    remember (eqv b e) as be eqn:Hbe; symmetry in Hbe.
-    destruct be. {
-      eapply Htran; [ apply Hrb | apply Hbe ].
-    }
-    apply Bool.not_true_iff_false in Hbe.
-    apply Bool.not_true_iff_false.
-    intros H; apply Hbe.
-    eapply Htran; [ | apply H ].
-    now apply Hsymm.
-  }
-  rewrite Hb.
-  apply (list_eqv_eq _ r).
-  split. {
-  ============================
-  length ec = length lb
-...
-    etransitivity. 2: {
-      eapply Htran; [ apply Hrb | ].
-...
+  rewrite <- List_filter_filter.
   erewrite filter_ext_in. 2: {
-    intros e He.
-...
-  rewrite <- Hc in Hld.
-  rewrite List_filter_filter in Hld.
-(* ouais, faut voir, bon *)
-...
-  rewrite Hb.
-...
-split; [ | apply (IHit _ _ _ Hecl) ].
-apply partition_rel in Hp.
-destruct Hp as (Hbt & Hbf & Heq).
-right; apply Heq.
-apply in_or_app; right.
-now apply IHit with (ec := ec).
-...
-*)
+    intros b Hb.
+    replace (eqv a b) with false. 2: {
+      symmetry.
+      apply filter_In in Hb.
+      destruct Hb as (Hb1, Hb2).
+      apply Bool.not_true_iff_false in Hra.
+      apply Bool.not_true_iff_false.
+      intros H; apply Hra.
+      destruct Heqv as (Hrefl & Hsymm & Htran).
+      apply Hsymm in H.
+      now apply Htran with (b := b).
+    }
+    now cbn.
+  }
+  remember (filter (eqv r) la) as l eqn:Hl.
+  clear.
+  induction l as [| a]; [ easy | cbn ].
+  now f_equal.
+}
+rewrite H in Hld.
+specialize (IHit _ _ _ Hecl) as H1.
+cbn in H1.
+rewrite Hld in H1.
+now rewrite Hrd in H1.
+Qed.
 
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
@@ -4451,9 +4292,13 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
     now apply Hel in Hece.
   }
   clear Hece; rename H into Hece.
+  apply in_ecl_eqb in Hec. 2: {
+    unfold eqv.
+...
+  }
+  cbn in Hec.
 ...
   assert (H : length (la :: lla) = m!). {
-    unfold eqv in Hec.
 ...
 Compute (all_permut 0 [3;2;7]).
 ...
