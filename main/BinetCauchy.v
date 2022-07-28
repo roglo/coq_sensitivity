@@ -4325,6 +4325,7 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
     now apply Hel in Hece.
   }
   clear Hece; rename H into Hece.
+...
   assert (H : length (la :: lla) = m!). {
     unfold eqv in Hec.
 ...
