@@ -4267,7 +4267,7 @@ erewrite rngl_product_list_eq_compat. 2: {
 cbn - [ rngl_one rngl_mul ].
 rewrite nat_product_list_all_same.
 rewrite repeat_length.
-set (g1 := λ l, (l, all_permut 0 l)).
+set (g1 := λ l, (l, tl (all_permut 0 l))).
 erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   intros (r, ec) Hec; cbn.
   unfold g1; cbn; f_equal.
@@ -4328,6 +4328,20 @@ erewrite rngl_summation_list_change_var with (g := g1) (h := fst). 2: {
   remember (eqv la lb) as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ | easy ].
   rewrite List_filter_filter in Hllb.
+  unfold all_permut.
+  rewrite Hrm.
+Compute (
+let la := [2;3;4] in
+let n := 5 in
+let m := length la in
+(*
+ecl eqv (n ^ m) (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))).
+*)
+tl (
+  map (λ p : list nat, map (λ i : nat, nth i la 0) p)
+    (canon_sym_gr_list_list m))
+).
+       ([2; 3; 4], [[2; 4; 3]; [3; 2; 4]; [3; 4; 2]; [4; 2; 3]; [4; 3; 2]]);
 ...
   }
   cbn in Hec.
