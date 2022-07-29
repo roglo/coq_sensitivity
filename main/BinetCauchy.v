@@ -4175,7 +4175,52 @@ Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
     (flat_map (all_permut 0) (sub_lists_of_seq_1_n n m)).
 Proof.
 intros.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+Theorem antisymmetric_list_leb : ∀ A (leb : A → _),
+  antisymmetric leb → antisymmetric (list_leb leb).
+Proof.
+intros * Hant.
+intros la lb Hlab Hlba.
+revert lb Hlab Hlba.
+induction la as [| a]; intros; [ now destruct lb | ].
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab, Hlba.
+remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+destruct ab; [ | easy ].
+destruct ba; [ | easy ].
+rewrite (Hant _ _ Hab Hba); f_equal.
+now apply IHla.
+Qed.
+assert (Htl : transitive (list_leb Nat.leb)). {
+  intros la lb lc Hlab Hlbc.
+  revert lb lc Hlab Hlbc.
+  induction la as [| a]; intros; [ now destruct lb | ].
+  destruct lb as [| b]; [ easy | ].
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hlab, Hlbc |-*.
+  rewrite if_leb_le_dec in Hlab, Hlbc |-*.
+  destruct (le_dec a b) as [Hab| Hab]; [ | easy ].
+  destruct (le_dec b c) as [Hbc| Hbc]; [ | easy ].
+  destruct (le_dec a c) as [Hac| Hac]; [ | flia Hab Hbc Hac ].
+  now apply (IHla lb).
+}
+Search (transitive (list_leb _)).
+apply permuted_isort_iff with (rel := list_leb Nat.leb); try easy. {
+  apply antisymmetric_list_leb, Nat_leb_antisym.
+} {
 ...
+enough
+  (H :
+     isort (list_leb leb)
+       (flat_map (all_permut 0) (sub_lists_of_seq_1_n n m)) =
+     filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)). {
+Search (isort _ _ = _).
+
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 ...
