@@ -4169,6 +4169,16 @@ rewrite all_0_rngl_summation_list_0. 2: {
 subst g.
 rewrite rngl_add_0_l.
 apply (rngl_summation_list_permut _ Hel).
+Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
+  permutation (list_eqv eqb)
+    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
+    (flat_map (all_permut 0) (sub_lists_of_seq_1_n n m)).
+Proof.
+intros.
+...
+... return
+apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
+...
 ...
 Compute (
 let n := 5 in
