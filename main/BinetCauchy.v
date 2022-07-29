@@ -4191,9 +4191,18 @@ assert (Htot : total_relation (list_leb Nat.leb)). {
   apply total_relation_list_leb, Nat_leb_is_total_relation.
 }
 *)
-apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
+apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
+...
+About isort_filter.
+Compute (
+  let leb := ltb in
+  let f := λ a, a <? 5 in
+  let la := [3;3;6;3;6;4] in
+  isort leb (filter f la) = filter f (isort leb la)).
+About isort_filter.
+...
 rewrite isort_filter; cycle 1. {
-  apply antisymmetric_list_leb, Nat_leb_antisym.
+  apply antisymmetric_list_ltb, Nat_leb_antisym.
 } {
   apply transitive_list_leb, Nat_leb_trans.
 } {
@@ -4213,40 +4222,43 @@ apply sorted_app_iff. {
 }
 split. {
   destruct m; cbn; [ easy | ].
-...
-Theorem glop : ∀ A (leb : A → _) ll a,
-  sorted (list_leb leb) ll → sorted (list_leb leb) (map (cons a) ll).
+Theorem glop : ∀ A (ltb : A → _),
+  transitive ltb →
+  ∀ ll a,
+  sorted (list_leb ltb) ll → sorted (list_leb ltb) (map (cons a) ll).
 Proof.
-intros * Hs.
+intros * Htra * Hs.
 induction ll as [| la]; [ easy | cbn ].
-apply sorted_cons_iff in Hs.
+apply sorted_cons_iff in Hs; [ | now apply transitive_list_leb ].
 destruct Hs as (Hs, Hlab).
-apply sorted_cons_iff. 2: {
-  split; [ now apply IHll | ].
-  intros lb Hlb; cbn.
-  destruct lb as [| b]. {
-    clear IHll Hs Hlab.
-    induction ll as [| lb]; [ easy | ].
-    cbn in Hlb.
-    destruct Hlb as [Hlb| Hlb]; [ easy | ].
-    now apply IHll.
-  }
-  remember (leb a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    remember (leb b a) as ba eqn:Hba; symmetry in Hba.
-    destruct ba; [ | easy ].
-    apply Hlab.
-    apply in_map_iff in Hlb.
-    destruct Hlb as (lc & Hll & Hlb).
-    now injection Hll; clear Hll; intros; subst lc.
-  }
-  exfalso.
+apply sorted_cons_iff; [ now apply transitive_list_leb | ].
+split; [ now apply IHll | ].
+intros lb Hlb; cbn.
+destruct lb as [| b]. {
+  clear IHll Hs Hlab.
+  induction ll as [| lb]; [ easy | ].
+  cbn in Hlb.
+  destruct Hlb as [Hlb| Hlb]; [ easy | ].
+  now apply IHll.
+}
+remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  apply Hlab.
   apply in_map_iff in Hlb.
   destruct Hlb as (lc & Hll & Hlb).
-  injection Hll; clear Hll; intros; subst lc b.
-
+  now injection Hll; clear Hll; intros; subst lc.
+}
+exfalso.
+apply in_map_iff in Hlb.
+destruct Hlb as (lc & Hll & Hlb).
+injection Hll; clear Hll; intros; subst lc b.
+About list_leb.
+Compute (list_leb Nat.leb [3;4] [3;5]).
+Compute (list_leb Nat.ltb [3;4] [3;5]).
+...
 destruct Hs as (Hs, Hab).
-
 ...
 apply glop.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.

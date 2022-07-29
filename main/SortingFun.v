@@ -1878,7 +1878,7 @@ Theorem sorted_isort_insert : ∀ A (rel : A → _),
   sorted rel lsorted
   → sorted rel (isort_insert rel a lsorted).
 Proof.
-intros * Hto * Hs.
+intros * Htot * Hs.
 unfold sorted in Hs |-*.
 induction lsorted as [| b]; [ easy | cbn ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
@@ -1886,7 +1886,7 @@ destruct ab. {
   remember (b :: lsorted) as l; cbn; subst l.
   now apply Bool.andb_true_iff.
 } {
-  specialize (Hto a b) as Hba.
+  specialize (Htot a b) as Hba.
   rewrite Hab in Hba; cbn in Hba.
   destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
   remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
@@ -1905,7 +1905,7 @@ Theorem sorted_isort_loop : ∀ A (rel : A → _),
   sorted rel lsorted
   → sorted rel (isort_loop rel lsorted l).
 Proof.
-intros * Hto * Hs.
+intros * Htot * Hs.
 revert lsorted Hs.
 induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.

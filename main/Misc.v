@@ -1589,7 +1589,7 @@ Qed.
 
 (* end list_eqv *)
 
-(* list_eqv *)
+(* list_leb *)
 
 Fixpoint list_leb A (leb : A → A → bool) la lb :=
   match la with
@@ -1605,6 +1605,23 @@ Fixpoint list_leb A (leb : A → A → bool) la lb :=
   end.
 
 (* end list_leb *)
+
+(* list_ltb *)
+
+Fixpoint list_ltb A (ltb : A → A → bool) la lb :=
+  match lb with
+  | [] => false
+  | b :: lb' =>
+      match la with
+      | [] => true
+      | a :: la' =>
+          if ltb a b then true
+          else if ltb b a then false
+          else list_ltb ltb la' lb'
+      end
+  end.
+
+(* end list_ltb *)
 
 (* pair_eqb *)
 
