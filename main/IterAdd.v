@@ -373,6 +373,18 @@ f_equal.
 apply IHll.
 Qed.
 
+Theorem rngl_summation_summation_list_flat_map : ∀ A B la (f : A → list B) g,
+  (∑ (a ∈ la), ∑ (b ∈ f a), g b) = ∑ (b ∈ flat_map f la), g b.
+Proof.
+intros.
+induction la as [| a]; cbn. {
+  now apply rngl_summation_list_empty.
+}
+rewrite rngl_summation_list_cons.
+rewrite rngl_summation_list_app.
+f_equal; apply IHla.
+Qed.
+
 Theorem rngl_summation_summation_list_swap : ∀ A B la lb (f : A → B → T),
   ∑ (a ∈ la), (∑ (b ∈ lb), f a b) =
   ∑ (b ∈ lb), (∑ (a ∈ la), f a b).
@@ -687,7 +699,7 @@ Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
 Arguments rngl_summation_list_app {T}%type {ro rp} A%type (la lb)%list.
 Arguments rngl_summation_list_change_var {T ro} (A B)%type l%list.
 Arguments rngl_summation_list_concat {T ro rp} A%type ll%list.
-Arguments rngl_summation_list_cons {T ro rp} A%type_scope a la%list.
+Arguments rngl_summation_list_cons {T ro rp} A%type a la%list.
 Arguments rngl_summation_list_map {T ro} (_ _)%type.
 Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
@@ -696,9 +708,10 @@ Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
 Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
-Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat_scope.
+Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat.
 Arguments rngl_summation_split {T}%type {ro rp} j%nat g%function (b k)%nat.
 Arguments rngl_summation_split_first {T}%type {ro rp} (b k)%nat.
-Arguments rngl_summation_split3 {T}%type {ro rp} j%nat_scope _ (b k)%nat_scope.
+Arguments rngl_summation_split3 {T}%type {ro rp} j%nat _ (b k)%nat.
 Arguments rngl_summation_summation_distr {T}%type {ro rp} (a b)%nat.
+Arguments rngl_summation_summation_list_flat_map {T ro rp} (A B)%type la%list.
 Arguments rngl_summation_summation_list_swap {T ro rp} (_ _)%type (_ _)%list.
