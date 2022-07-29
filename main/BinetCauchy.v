@@ -3884,50 +3884,6 @@ now rewrite Hrd in H1.
 Qed.
 
 (* to be completed
-Theorem rngl_summation_filter_no_dup_list_prodn :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
-  ∀ n m f,
-  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
-Proof.
-intros Hopp Heqb *.
-rewrite list_prodn_prodn_repeat.
-rewrite rngl_summation_summation_list_flat_map; cbn.
-assert (Hel : equality (list_eqv eqb)). {
-  apply -> equality_list_eqv.
-  unfold equality.
-  apply Nat.eqb_eq.
-}
-set (g := no_dup Nat.eqb).
-erewrite (rngl_summation_list_permut _ Hel). 2: {
-  assert (H : ∀ ll,
-    permutation (list_eqv eqb) ll
-      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
-    now apply permutation_filter_app_filter.
-  }
-  apply H.
-}
-rewrite rngl_summation_list_app.
-rewrite rngl_add_comm.
-rewrite all_0_rngl_summation_list_0. 2: {
-  intros kl Hkl.
-  apply filter_In in Hkl.
-  destruct Hkl as (Hkl, Hsl).
-  unfold g in Hsl.
-  apply Bool.negb_true_iff in Hsl.
-  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
-    intros H.
-    apply (no_dup_NoDup Nat.eqb_eq) in H.
-    congruence.
-  }
-  now apply rngl_mul_0_l; left.
-}
-subst g.
-rewrite rngl_add_0_l.
-apply (rngl_summation_list_permut _ Hel).
-...
-
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -4171,9 +4127,58 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
+Theorem rngl_summation_filter_no_dup_list_prodn :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ n m f,
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
+Proof.
+intros Hopp Heqb *.
+rewrite list_prodn_prodn_repeat.
+rewrite rngl_summation_summation_list_flat_map; cbn.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+set (g := no_dup Nat.eqb).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqv eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_add_comm.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros kl Hkl.
+  apply filter_In in Hkl.
+  destruct Hkl as (Hkl, Hsl).
+  unfold g in Hsl.
+  apply Bool.negb_true_iff in Hsl.
+  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+    intros H.
+    apply (no_dup_NoDup Nat.eqb_eq) in H.
+    congruence.
+  }
+  now apply rngl_mul_0_l; left.
+}
+subst g.
+rewrite rngl_add_0_l.
+apply (rngl_summation_list_permut _ Hel).
 ...
-Inspect 1.
-rewrite rngl_summation_filter_no_dup_list_prodn.
+Compute (
+let n := 5 in
+let m := 3 in
+(filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m) =
+ flat_map (all_permut 0) (sub_lists_of_seq_1_n n m))).
+...
+... return
+rewrite rngl_summation_filter_no_dup_list_prodn;
+  [ | now destruct Hif | now destruct Hif ].
 ...
 *)
 
