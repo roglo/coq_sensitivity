@@ -4201,7 +4201,74 @@ rewrite isort_filter; cycle 1. {
 }
 rewrite <- list_prodn_prodn_repeat.
 Theorem list_prodn_repeat_seq_sorted : ∀ i n m,
-  sorted (list_leb Nat.leb) (list_prodn (repeat (seq i n) m)).
+  sorted (list_leb Nat.ltb) (list_prodn (repeat (seq i n) m)).
+Proof.
+intros.
+revert i n.
+induction m; intros; [ easy | cbn ].
+revert i m IHm.
+induction n; intros; [ easy | cbn ].
+apply sorted_app_iff. {
+  apply transitive_list_leb, Nat_ltb_trans.
+}
+split. {
+  destruct m; cbn; [ easy | ].
+...
+Theorem glop : ∀ A (leb : A → _) ll a,
+  sorted (list_leb leb) ll → sorted (list_leb leb) (map (cons a) ll).
+Proof.
+intros * Hs.
+induction ll as [| la]; [ easy | cbn ].
+apply sorted_cons_iff in Hs.
+destruct Hs as (Hs, Hlab).
+apply sorted_cons_iff. 2: {
+  split; [ now apply IHll | ].
+  intros lb Hlb; cbn.
+  destruct lb as [| b]. {
+    clear IHll Hs Hlab.
+    induction ll as [| lb]; [ easy | ].
+    cbn in Hlb.
+    destruct Hlb as [Hlb| Hlb]; [ easy | ].
+    now apply IHll.
+  }
+  remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+    destruct ba; [ | easy ].
+    apply Hlab.
+    apply in_map_iff in Hlb.
+    destruct Hlb as (lc & Hll & Hlb).
+    now injection Hll; clear Hll; intros; subst lc.
+  }
+  exfalso.
+  apply in_map_iff in Hlb.
+  destruct Hlb as (lc & Hll & Hlb).
+  injection Hll; clear Hll; intros; subst lc b.
+
+destruct Hs as (Hs, Hab).
+
+...
+apply glop.
+replace (i :: seq (S i) n) with (seq i (S n)) by easy.
+apply IHm.
+...
+  remember (map _ _) as ll eqn:Hll; symmetry in Hll.
+  destruct ll as [| la]; [ easy | cbn ].
+...
+  unfold sorted.
+Print is_sorted.
+...
+  apply strongly_sorted_sorted.
+  unfold strongly_sorted.
+Print is_strongly_sorted.
+Search strongly_sorted.
+  apply strongly_sorted_iff.
+...
+rewrite sorted_app.
+
+rewrite flat_map_concat_map.
+Search (sorted _ (flat_map _ _)).
+Search (sorted _ (concat _)).
 ...
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
