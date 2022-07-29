@@ -4180,124 +4180,20 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-apply permuted_isort_iff with (rel := list_leb Nat.leb). {
-  easy.
-} {
+assert (Hant : antisymmetric (list_leb Nat.leb)). {
   apply antisymmetric_list_leb, Nat_leb_antisym.
-} {
+}
+assert (Htra : transitive (list_leb Nat.leb)). {
   apply transitive_list_leb, Nat_leb_trans.
-} {
+}
+assert (Htot : total_relation (list_leb Nat.leb)). {
   apply total_relation_list_leb, Nat_leb_is_total_relation.
 }
-Search (isort _ (filter _ _)).
-Theorem isort_filter : ∀ A (leb : A → _) la f,
-  isort leb (filter f la) = filter f (isort leb la).
-Proof.
-intros.
-(*
-Compute (
-  let leb := Nat.leb in
-  let f := λ a, a <? 7 in
-  let la := [7; 8; 5; 3; 12] in
-  isort leb (filter f la) = filter f (isort leb la)).
-*)
-induction la as [| a]; [ easy | cbn ].
-remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-destruct fa. {
-  cbn.
-Theorem isort_loop_filter : ∀ A (leb : A → _) la lb f,
-  sorted leb la
-  → isort_loop leb (filter f la) (filter f lb) =
-    filter f (isort_loop leb la lb).
-Proof.
-intros * Hs.
-clear Hs.
-revert la.
-induction lb as [| b]; intros; [ easy | cbn ].
-remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-destruct fb. {
-  cbn; rewrite <- IHlb.
-f_equal.
-Theorem isort_insert_filter : ∀ A (leb : A → _),
-  antisymmetric leb →
-  transitive leb →
-  total_relation leb →
-  ∀ la b f,
-  f b = true
-  → sorted leb la
-  → isort_insert leb b (filter f la) = filter f (isort_insert leb b la).
-Proof.
-intros * Hant Htra Htot * Hfb Hs.
-revert b Hfb.
-induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
-assert (H : sorted leb la) by now apply sorted_cons in Hs.
-specialize (IHla H); clear H.
-remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-remember (leb b a) as ba eqn:Hba; symmetry in Hba.
-destruct fa; cbn. {
-  rewrite Hba.
-  destruct ba; cbn; rewrite Hfa; [ now rewrite Hfb | ].
-  now f_equal; apply IHla.
-}
-destruct ba; cbn. {
-  rewrite Hfb, Hfa.
-(*
-  rewrite IHla; [ | easy ].
-*)
-  destruct la as [| a']; [ easy | cbn ].
-  remember (f a') as fa' eqn:Hfa'; symmetry in Hfa'.
-  destruct fa'; cbn. {
-    remember (leb b a') as ba' eqn:Hba'; symmetry in Hba'.
-    destruct ba'; [ easy | cbn ].
-    apply (sorted_cons_iff Htra) in Hs.
-    destruct Hs as (Hs & Ha').
-    specialize (Ha' _ (or_introl eq_refl)).
-    specialize (Htra a' b a) as H1.
-    specialize (Htot b a') as Ha'b.
-    rewrite Hba' in Ha'b; cbn in Ha'b.
-    specialize (H1 Ha'b Hba).
-    move H1 before Ha'.
-    specialize (Hant a a' Ha' H1) as H2; subst a'.
-    congruence.
-  }
-...
-Search (sorted _ (_ :: _)).
-    cbn in Hs.
-...
-    destruct ba'; cbn; [ now rewrite Hfb | ].
-  destruct fa'.{
-...
-rewrite <- isort_loop_filter; [ | easy ].
-now cbn; rewrite Hfa.
-...
-revert la Hs.
-induction lb as [| b]; intros; cbn.
-
-revert lb.
-induction la as [| a]; intros; cbn. {
-  induction lb as [| b]; [ easy | cbn ].
-  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-  destruct fb; cbn. {
-    cbn.
-Search isort_loop.
-...
-apply isort_loop_filter_r.
-...
-  unfold isort_loop.
-cbn.
-...
-rewrite isort_filter.
-Search (isort _ (prodn_repeat_seq _ _ _)).
+apply permuted_isort_iff with (rel := list_leb Nat.leb); try easy.
+rewrite isort_filter; try easy.
 rewrite <- list_prodn_prodn_repeat.
 Search (isort _ (list_prodn _)).
 ...
-enough
-  (H :
-     isort (list_leb leb)
-       (flat_map (all_permut 0) (sub_lists_of_seq_1_n n m)) =
-     filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)). {
-Search (isort _ _ = _).
-
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 ...
