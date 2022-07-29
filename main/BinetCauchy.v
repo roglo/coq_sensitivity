@@ -4205,16 +4205,60 @@ induction la as [| a]; [ easy | cbn ].
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
 destruct fa. {
   cbn.
-...
-Theorem isort_loop_filter_r : ∀ A (leb : A → _) la lb f,
-  isort_loop leb la (filter f lb) = filter f (isort_loop leb la lb).
+Theorem isort_loop_filter : ∀ A (leb : A → _) la lb f,
+  sorted leb la
+  → isort_loop leb (filter f la) (filter f lb) =
+    filter f (isort_loop leb la lb).
 Proof.
-intros.
+intros * Hs.
+clear Hs.
+revert la.
+induction lb as [| b]; intros; [ easy | cbn ].
+remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+destruct fb. {
+  cbn; rewrite <- IHlb.
+f_equal.
+Theorem isort_insert_filter : ∀ A (leb : A → _) la b f,
+  f b = true
+  → isort_insert leb b (filter f la) = filter f (isort_insert leb b la).
+Proof.
+intros * Hfb.
+revert b Hfb.
+induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+destruct fa; cbn. {
+  rewrite Hba.
+  destruct ba; cbn; rewrite Hfa; [ now rewrite Hfb | ].
+  now f_equal; apply IHla.
+}
+destruct ba; cbn. {
+  rewrite Hfb, Hfa.
+(*
+  rewrite IHla; [ | easy ].
+*)
+  destruct la as [| a']; [ easy | cbn ].
+  remember (f a') as fa' eqn:Hfa'; symmetry in Hfa'.
+  destruct fa'; cbn. {
+    remember (leb b a') as ba' eqn:Hba'; symmetry in Hba'.
+    destruct ba'; [ easy | cbn ].
+...
+    destruct ba'; cbn; [ now rewrite Hfb | ].
+  destruct fa'.{
+...
+rewrite <- isort_loop_filter; [ | easy ].
+now cbn; rewrite Hfa.
+...
+revert la Hs.
+induction lb as [| b]; intros; cbn.
+
 revert lb.
 induction la as [| a]; intros; cbn. {
   induction lb as [| b]; [ easy | cbn ].
   remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-  destruct fb; cbn.
+  destruct fb; cbn. {
+    cbn.
+Search isort_loop.
 ...
 apply isort_loop_filter_r.
 ...
