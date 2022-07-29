@@ -4183,6 +4183,13 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
+Search (∑ (_ ∈ _), ∑ (_ ∈ _), _).
+Theorem glop :
+  ∑ (a ∈ la), ∑ (b ∈ f a), g b = ∑ (b ∈ ...
+  ∀ (A : Type) (ll : list (list A)) (f : A → T), ∑ (a ∈ concat ll), f a = ∑ (l ∈ ll), (∑ (a ∈ l), f a)
+Search (∏ (_ ∈ _), ∏ (_ ∈ _), _).
+...
+intros Hopp Heqb *.
 rewrite list_prodn_prodn_repeat.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
