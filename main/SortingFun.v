@@ -1908,7 +1908,8 @@ Proof.
 intros * Hto * Hs.
 revert lsorted Hs.
 induction l as [| a]; intros; [ easy | cbn ].
-now apply IHl, sorted_isort_insert.
+apply IHl.
+now apply sorted_isort_insert.
 Qed.
 
 Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
@@ -3142,18 +3143,13 @@ Qed.
 
 (* *)
 
-Theorem permuted_isort_iff : ∀ A (eqb rel : A → _),
+Theorem permut_if_isort : ∀ A (eqb rel : A → _),
   equality eqb →
-  antisymmetric rel
-  → transitive rel
-  → total_relation rel
-  → ∀ la lb,
-  permutation eqb la lb
-  ↔ isort rel la = isort rel lb.
+  ∀ la lb,
+  isort rel la = isort rel lb
+  → permutation eqb la lb.
 Proof.
-intros * Heqb Hant Htr Htot *.
-split; [ now apply isort_when_permuted | ].
-intros Hab.
+intros * Heqb * Hab.
 specialize (permuted_isort rel Heqb la) as H1.
 specialize (permuted_isort rel Heqb lb) as H2.
 apply (permutation_trans Heqb) with (lb := isort rel la); [ easy | ].
@@ -3194,6 +3190,14 @@ intros a b c Hab Hbc.
 apply Nat.leb_le in Hab, Hbc.
 apply Nat.leb_le.
 now transitivity b.
+Qed.
+
+Theorem Nat_ltb_antisym : antisymmetric Nat.ltb.
+Proof.
+intros a b Hab Hba.
+apply Nat.ltb_lt in Hab, Hba.
+apply (Nat.lt_trans b) in Hab; [ | easy ].
+now apply Nat.lt_irrefl in Hab.
 Qed.
 
 Theorem Nat_ltb_trans : transitive Nat.ltb.

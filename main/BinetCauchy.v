@@ -4180,6 +4180,7 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
+(*
 assert (Hant : antisymmetric (list_leb Nat.leb)). {
   apply antisymmetric_list_leb, Nat_leb_antisym.
 }
@@ -4189,10 +4190,18 @@ assert (Htra : transitive (list_leb Nat.leb)). {
 assert (Htot : total_relation (list_leb Nat.leb)). {
   apply total_relation_list_leb, Nat_leb_is_total_relation.
 }
-apply permuted_isort_iff with (rel := list_leb Nat.leb); try easy.
-rewrite isort_filter; try easy.
+*)
+apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
+rewrite isort_filter; cycle 1. {
+  apply antisymmetric_list_leb, Nat_leb_antisym.
+} {
+  apply transitive_list_leb, Nat_leb_trans.
+} {
+  apply total_relation_list_leb, Nat_leb_is_total_relation.
+}
 rewrite <- list_prodn_prodn_repeat.
-Search (isort _ (list_prodn _)).
+Theorem list_prodn_repeat_seq_sorted : ∀ i n m,
+  sorted (list_leb Nat.leb) (list_prodn (repeat (seq i n) m)).
 ...
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
