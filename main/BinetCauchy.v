@@ -4180,39 +4180,51 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-Theorem antisymmetric_list_leb : ∀ A (leb : A → _),
-  antisymmetric leb → antisymmetric (list_leb leb).
-Proof.
-intros * Hant.
-intros la lb Hlab Hlba.
-revert lb Hlab Hlba.
-induction la as [| a]; intros; [ now destruct lb | ].
-destruct lb as [| b]; [ easy | ].
-cbn in Hlab, Hlba.
-remember (leb a b) as ab eqn:Hab; symmetry in Hab.
-remember (leb b a) as ba eqn:Hba; symmetry in Hba.
-destruct ab; [ | easy ].
-destruct ba; [ | easy ].
-rewrite (Hant _ _ Hab Hba); f_equal.
-now apply IHla.
-Qed.
-assert (Htl : transitive (list_leb Nat.leb)). {
-  intros la lb lc Hlab Hlbc.
-  revert lb lc Hlab Hlbc.
-  induction la as [| a]; intros; [ now destruct lb | ].
-  destruct lb as [| b]; [ easy | ].
-  destruct lc as [| c]; [ easy | ].
-  cbn in Hlab, Hlbc |-*.
-  rewrite if_leb_le_dec in Hlab, Hlbc |-*.
-  destruct (le_dec a b) as [Hab| Hab]; [ | easy ].
-  destruct (le_dec b c) as [Hbc| Hbc]; [ | easy ].
-  destruct (le_dec a c) as [Hac| Hac]; [ | flia Hab Hbc Hac ].
-  now apply (IHla lb).
-}
-Search (transitive (list_leb _)).
-apply permuted_isort_iff with (rel := list_leb Nat.leb); try easy. {
+apply permuted_isort_iff with (rel := list_leb Nat.leb). {
+  easy.
+} {
   apply antisymmetric_list_leb, Nat_leb_antisym.
 } {
+  apply transitive_list_leb, Nat_leb_trans.
+} {
+  apply total_relation_list_leb, Nat_leb_is_total_relation.
+}
+Search (isort _ (filter _ _)).
+Theorem isort_filter : ∀ A (leb : A → _) la f,
+  isort leb (filter f la) = filter f (isort leb la).
+Proof.
+intros.
+(*
+Compute (
+  let leb := Nat.leb in
+  let f := λ a, a <? 7 in
+  let la := [7; 8; 5; 3; 12] in
+  isort leb (filter f la) = filter f (isort leb la)).
+*)
+induction la as [| a]; [ easy | cbn ].
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa. {
+  cbn.
+...
+Theorem isort_loop_filter_r : ∀ A (leb : A → _) la lb f,
+  isort_loop leb la (filter f lb) = filter f (isort_loop leb la lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  induction lb as [| b]; [ easy | cbn ].
+  remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb; cbn.
+...
+apply isort_loop_filter_r.
+...
+  unfold isort_loop.
+cbn.
+...
+rewrite isort_filter.
+Search (isort _ (prodn_repeat_seq _ _ _)).
+rewrite <- list_prodn_prodn_repeat.
+Search (isort _ (list_prodn _)).
 ...
 enough
   (H :

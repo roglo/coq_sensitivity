@@ -1597,7 +1597,10 @@ Fixpoint list_leb A (leb : A → A → bool) la lb :=
   | a :: la' =>
       match lb with
       | [] => false
-      | b :: lb' => if leb a b then list_leb leb la' lb' else false
+      | b :: lb' =>
+          if leb a b then
+            if leb b a then list_leb leb la' lb' else true
+          else false
       end
   end.
 

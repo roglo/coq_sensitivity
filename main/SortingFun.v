@@ -3751,3 +3751,71 @@ apply (sorted_unique Heqb Href Hant Htra). {
   now apply permutation_sym, permuted_isort.
 }
 Qed.
+
+(* *)
+
+Theorem antisymmetric_list_leb : ∀ A (leb : A → _),
+  antisymmetric leb → antisymmetric (list_leb leb).
+Proof.
+intros * Hant.
+intros la lb Hlab Hlba.
+revert lb Hlab Hlba.
+induction la as [| a]; intros; [ now destruct lb | ].
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab, Hlba.
+remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+destruct ab; [ | easy ].
+destruct ba; [ | easy ].
+rewrite (Hant _ _ Hab Hba); f_equal.
+now apply IHla.
+Qed.
+
+Theorem transitive_list_leb : ∀ A (leb : A → _),
+  transitive leb → transitive (list_leb leb).
+Proof.
+intros * Htra.
+intros la lb lc Hlab Hlbc.
+revert lb lc Hlab Hlbc.
+induction la as [| a]; intros; [ now destruct lb | ].
+destruct lb as [| b]; [ easy | ].
+destruct lc as [| c]; [ easy | ].
+cbn in Hlab, Hlbc |-*.
+remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+remember (leb b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (leb c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct ab; [ | easy ].
+destruct bc; [ | easy ].
+rewrite (Htra _ _ _ Hab Hbc).
+destruct ba. {
+  destruct cb. {
+    rewrite (Htra _ _ _ Hcb Hba).
+    now apply (IHla lb).
+  }
+  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca; [ | easy ].
+  now rewrite (Htra c a b Hca Hab) in Hcb.
+} {
+  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca; [ | easy ].
+  destruct cb; [ now rewrite (Htra b c a Hbc Hca) in Hba | ].
+  now rewrite (Htra _ _ _ Hca Hab) in Hcb.
+}
+Qed.
+
+Theorem total_relation_list_leb : ∀ A (leb : A → _),
+  total_relation leb → total_relation (list_leb leb).
+Proof.
+intros * Htot.
+intros la lb.
+revert lb.
+induction la as [| a]; intros; [ easy | ].
+destruct lb as [| b]; [ easy | cbn ].
+specialize (Htot a b).
+remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+destruct ab; [ | now destruct ba ].
+destruct ba; [ | easy ].
+apply IHla.
+Qed.
