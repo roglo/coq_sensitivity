@@ -4218,13 +4218,20 @@ remember (f b) as fb eqn:Hfb; symmetry in Hfb.
 destruct fb. {
   cbn; rewrite <- IHlb.
 f_equal.
-Theorem isort_insert_filter : ∀ A (leb : A → _) la b f,
+Theorem isort_insert_filter : ∀ A (leb : A → _),
+  antisymmetric leb →
+  transitive leb →
+  total_relation leb →
+  ∀ la b f,
   f b = true
+  → sorted leb la
   → isort_insert leb b (filter f la) = filter f (isort_insert leb b la).
 Proof.
-intros * Hfb.
+intros * Hant Htra Htot * Hfb Hs.
 revert b Hfb.
 induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
+assert (H : sorted leb la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
 remember (leb b a) as ba eqn:Hba; symmetry in Hba.
 destruct fa; cbn. {
@@ -4242,6 +4249,20 @@ destruct ba; cbn. {
   destruct fa'; cbn. {
     remember (leb b a') as ba' eqn:Hba'; symmetry in Hba'.
     destruct ba'; [ easy | cbn ].
+    apply (sorted_cons_iff Htra) in Hs.
+    destruct Hs as (Hs & Ha').
+    specialize (Ha' _ (or_introl eq_refl)).
+    specialize (Htra a' b a) as H1.
+    specialize (Htot b a') as Ha'b.
+    rewrite Hba' in Ha'b; cbn in Ha'b.
+    specialize (H1 Ha'b Hba).
+    move H1 before Ha'.
+    specialize (Hant a a' Ha' H1) as H2; subst a'.
+    congruence.
+  }
+...
+Search (sorted _ (_ :: _)).
+    cbn in Hs.
 ...
     destruct ba'; cbn; [ now rewrite Hfb | ].
   destruct fa'.{
