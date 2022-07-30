@@ -4045,3 +4045,108 @@ destruct fa. {
 rewrite <- isort_loop_filter; [ | easy | easy | easy | easy ].
 now cbn; rewrite Hfa.
 Qed.
+
+Theorem sorted_concat_iff : ∀ A (leb : A → _),
+  transitive leb →
+  ∀ ll,
+  sorted leb (concat ll) ↔
+    (∀ l, l ∈ ll → sorted leb l) ∧
+    (∀ i j, i < j < length ll →
+     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → leb a b = true).
+Proof.
+intros * Htra *.
+split. {
+  intros Hs.
+  split. {
+    intros la Hla.
+    induction ll as [| lb]; [ easy | ].
+    cbn in Hs.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hla as [Hla| Hla]; [ now subst lb | ].
+    now apply IHll.
+  }
+  intros i j Hij a b Ha Hb.
+  revert i j a b Hij Ha Hb.
+  induction ll as [| la]; intros; [ easy | ].
+  assert (H : sorted leb (concat ll)). {
+    now cbn in Hs; apply sorted_app_iff in Hs; [ | easy ].
+  }
+  specialize (IHll H); clear H.
+  cbn in Ha, Hb.
+  destruct j; [ easy | ].
+  destruct i. {
+    cbn in Hs.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hs as (Hla & Hs & Hab).
+    apply Hab; [ easy | ].
+    apply in_concat.
+    exists (nth j ll []).
+    split; [ | easy ].
+    apply nth_In.
+    destruct Hij as (_, Hj); cbn in Hj.
+    now apply Nat.succ_lt_mono in Hj.
+  }
+  apply (IHll i j); [ | easy | easy ].
+  destruct Hij as (Hi, Hj); cbn in Hj.
+  now apply Nat.succ_lt_mono in Hi, Hj.
+}
+intros (Hs & Hleb).
+induction ll as [| la]; [ easy | cbn ].
+apply sorted_app_iff; [ easy | ].
+split; [ now apply Hs; left | ].
+split. {
+  apply IHll. {
+    now intros lb Hlb; apply Hs; right.
+  } {
+    intros i j Hij a b Ha Hb.
+    apply (Hleb (S i) (S j)); [ | easy | easy ].
+    now split; apply -> Nat.succ_lt_mono.
+  }
+}
+intros a b Ha Hb.
+apply in_concat in Hb.
+destruct Hb as (lb & Hlb & Hb).
+apply (In_nth _ _ []) in Hlb.
+destruct Hlb as (j & Hjl & Hlb).
+apply (Hleb 0 (S j)); [ | easy | now cbn; rewrite Hlb ].
+split; [ easy | cbn ].
+now apply -> Nat.succ_lt_mono.
+Qed.
+
+Theorem list_prodn_repeat_seq_sorted : ∀ i n m,
+  sorted (list_ltb Nat.ltb) (list_prodn (repeat (seq i n) m)).
+Proof.
+intros.
+revert i n.
+induction m; intros; [ easy | cbn ].
+rewrite flat_map_concat_map.
+specialize Nat_ltb_antisym as Hant.
+specialize Nat_ltb_connected as Hcon.
+specialize Nat_ltb_trans as Htra.
+apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
+rewrite List_map_seq_length.
+split. {
+  intros ll Hll.
+  apply in_map_iff in Hll.
+  destruct Hll as (a & Hll & Ha); subst ll.
+  apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
+}
+intros j k Hjk la lb Ha Hb.
+rewrite (List_map_nth' 0) in Ha; [ | rewrite seq_length; flia Hjk ].
+rewrite (List_map_nth' 0) in Hb; [ | rewrite seq_length; easy ].
+apply in_map_iff in Ha, Hb.
+destruct Ha as (lc & Hc & Hlc).
+destruct Hb as (ld & Hd & Hld).
+move ld before lc.
+subst la lb; cbn.
+rename lc into la; rename ld into lb.
+remember (nth k (seq i n) 0) as a eqn:Ha; symmetry in Ha.
+remember (nth j (seq i n) 0) as b eqn:Hb; symmetry in Hb.
+rewrite seq_nth in Ha; [ | easy ].
+rewrite seq_nth in Hb; [ | flia Hjk ].
+subst a b.
+destruct k; [ easy | ].
+rewrite Nat.add_comm; cbn.
+rewrite if_leb_le_dec.
+destruct (le_dec (i + j) (k + i)) as [H| H]; [ easy | flia Hjk H].
+Qed.

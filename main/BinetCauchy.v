@@ -4193,28 +4193,13 @@ assert (Htot : total_relation (list_leb Nat.leb)). {
 }
 *)
 apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
-About isort_filter.
-Compute (
-  let leb := ltb in
-  let f := λ a, a <? 5 in
-  let la := [3;3;6;3;6;4] in
-  isort leb (filter f la) = filter f (isort leb la)).
-About isort_filter.
-(* no: list_ltb Nat.ltb is not a total relation
-rewrite isort_filter; cycle 1. {
-} {
-  apply transitive_list_leb, Nat_leb_trans.
-} {
-  apply total_relation_list_leb, Nat_leb_is_total_relation.
-}
-rewrite <- list_prodn_prodn_repeat.
-*)
-Theorem list_prodn_repeat_seq_sorted : ∀ i n m,
-  sorted (list_ltb Nat.ltb) (list_prodn (repeat (seq i n) m)).
-Proof.
-intros.
-revert i n.
-induction m; intros; [ easy | cbn ].
+rewrite isort_when_sorted. 4: {
+  rewrite <- list_prodn_prodn_repeat.
+Search (sorted _ (filter _ _)).
+...
+Check list_prodn_repeat_seq_sorted.
+  apply list_prodn_repeat_seq_sorted.
+...
 revert i m IHm.
 induction n; intros; [ easy | cbn ].
 specialize Nat_ltb_antisym as Hant.
@@ -4227,103 +4212,8 @@ split. {
 }
 split. {
   rewrite flat_map_concat_map.
-Theorem sorted_concat_iff : ∀ A (leb : A → _),
-  transitive leb →
-  ∀ ll,
-  sorted leb (concat ll) ↔
-    (∀ l, l ∈ ll → sorted leb l) ∧
-    (∀ i j, i < j < length ll →
-     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → leb a b = true).
-Proof.
+  apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
 ...
-intros * Htra * Hll.
-split. {
-  intros Hs.
-  split. {
-    intros la Hla.
-    clear Hll.
-    induction ll as [| lb]; [ easy | ].
-    cbn in Hs.
-    apply sorted_app_iff in Hs; [ | easy ].
-    destruct Hla as [Hla| Hla]; [ now subst lb | ].
-    now apply IHll.
-  }
-  intros i Hi.
-  revert i Hi.
-  induction ll as [| la]; intros; [ easy | ].
-  assert (H : ∀ l, l ∈ ll → length l ≠ 0) by now intros; apply Hll; right.
-  specialize (IHll H); clear H.
-  assert (H : sorted leb (concat ll)). {
-    now cbn in Hs; apply sorted_app_iff in Hs; [ | easy ].
-  }
-  specialize (IHll H); clear H.
-  cbn in Hi.
-  apply Nat.succ_lt_mono in Hi.
-  destruct (Nat.eq_dec (S i) (length ll)) as [Hil| Hil]. {
-    cbn.
-    destruct i; [ | now apply IHll ].
-    destruct ll as [| lb]; [ easy | ].
-    destruct ll; [ | easy ].
-    cbn in Hs |-*.
-    rewrite app_nil_r in Hs.
-    apply sorted_app_iff in Hs; [ | easy ].
-    destruct Hs as (Hsa & Hsb & Hs).
-    apply Hs. {
-      rewrite List_last_nth; apply nth_In.
-      specialize (Hll _ (or_introl eq_refl)).
-      flia Hll.
-    }
-    apply List_hd_in.
-    specialize (Hll _ (or_intror (or_introl eq_refl))).
-    flia Hll.
-  }
-  assert (H : S i < length ll) by flia Hi Hil.
-  clear Hi Hil; rename H into Hi.
-  destruct i. {
-    destruct ll as [| lb]; [ easy | cbn ].
-    cbn in IHll, Hi.
-    apply Nat.succ_lt_mono in Hi.
-    destruct ll as [| lc]; [ easy | ].
-    cbn in IHll, Hs; clear Hi.
-    apply sorted_app_iff in Hs; [ | easy ].
-    destruct Hs as (Hsa & Hsbc & Hs).
-    apply Hs. {
-      rewrite List_last_nth; apply nth_In.
-      specialize (Hll _ (or_introl eq_refl)).
-      flia Hll.
-    }
-    apply in_or_app; left.
-    apply List_hd_in.
-    specialize (Hll _ (or_intror (or_introl eq_refl))).
-    flia Hll.
-  }
-  apply IHll; flia Hi.
-}
-intros (Hs & Hleb).
-induction ll as [| la]; [ easy | cbn ].
-apply sorted_app_iff; [ easy | ].
-split; [ now apply Hs; left | ].
-split. {
-  apply IHll. {
-    now intros lb Hlb; apply Hll; right.
-  } {
-    now intros lb Hlb; apply Hs; right.
-  }
-  intros i Hi.
-  specialize (Hleb (S i)).
-  apply Hleb; cbn.
-  now apply -> Nat.succ_lt_mono.
-}
-intros a b Ha Hb.
-apply in_concat in Hb.
-destruct Hb as (lb & Hlb & Hb).
-apply (In_nth _ _ b) in Hb.
-destruct Hb as (j & Hjl & Hb).
-enough (H1 : leb a (last la a) = true).
-enough (H2 : leb (last la a) ... = true).
-...
-...
-apply (sorted_concat_iff _ []). {
   intros ll Hll.
   apply in_map_iff in Hll.
   destruct Hll as (a & Hll & Ha); subst ll.
