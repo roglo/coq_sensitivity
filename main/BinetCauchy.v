@@ -4181,102 +4181,24 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-(*
-assert (Hant : antisymmetric (list_leb Nat.leb)). {
-  apply antisymmetric_list_leb, Nat_leb_antisym.
-}
-assert (Htra : transitive (list_leb Nat.leb)). {
-  apply transitive_list_leb, Nat_leb_trans.
-}
-assert (Htot : total_relation (list_leb Nat.leb)). {
-  apply total_relation_list_leb, Nat_leb_is_total_relation.
-}
-*)
 apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
-rewrite isort_when_sorted. 4: {
-  rewrite <- list_prodn_prodn_repeat.
-Search (sorted _ (filter _ _)).
-...
-Check list_prodn_repeat_seq_sorted.
-  apply list_prodn_repeat_seq_sorted.
-...
-revert i m IHm.
-induction n; intros; [ easy | cbn ].
-specialize Nat_ltb_antisym as Hant.
+specialize Nat.ltb_irrefl as Hirr.
 specialize Nat_ltb_connected as Hcon.
+specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_trans as Htra.
-apply sorted_app_iff; [ now apply transitive_list_ltb | ].
-replace (i :: seq (S i) n) with (seq i (S n)) by easy.
-split. {
-  apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
+rewrite isort_when_sorted; cycle 1. {
+  now apply antisymmetric_list_ltb.
+} {
+  now apply transitive_list_ltb.
+} {
+  rewrite <- list_prodn_prodn_repeat.
+  apply sorted_filter; [ now apply transitive_list_ltb | ].
+  apply list_prodn_repeat_seq_sorted.
 }
-split. {
-  rewrite flat_map_concat_map.
-  apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
-...
-  intros ll Hll.
-  apply in_map_iff in Hll.
-  destruct Hll as (a & Hll & Ha); subst ll.
-  rewrite map_length.
-  destruct m; [ easy | ].
-  rewrite list_prodn_length; [ | easy ].
-  intros Hll.
-  apply rngl_product_list_integral in Hll; [ | now right | easy | easy ].
-  destruct Hll as (la & Hla & Hlla).
-  apply length_zero_iff_nil in Hlla; subst la.
-  now apply repeat_spec in Hla.
-}
-...
-Search (∏ (_ ∈ _), _ = 0%F).
-specialize (@rngl_product_list_integral) as H1.
-specialize (H1 nat nat_ring_like_op nat_ring_like_prop).
-Search (ring_like_op nat).
-...
-enough (Hop : rngl_has_opp = true ∨ rngl_has_sous = true).
-enough (Hit : rngl_is_integral = true).
-enough (H10 : rngl_has_1_neq_0 = true).
-specialize (H1 Hop Hit H10).
-specialize (H1 _ (repeat (seq i (S n)) (S m))).
-specialize (H1 (λ l, length l)).
-
-apply rngl_product_list_integral in Hll.
-...
-Compute (
-  let i := 42 in
-  let n := 4 in
-  let m := 3 in
-  list_prodn (repeat (seq i (S n)) m)).
-...
-Search (repeat (_ :: _)).
-rewrite repeat_to_concat.
-Search (list_prodn (concat _)).
-Search (list_prodn (repeat (_ :: _) _)).
-...
-  replace (i :: seq (S i) n) with (seq i (S n)) by easy.
-...
-  apply IHn.
-...
-  remember (map _ _) as ll eqn:Hll; symmetry in Hll.
-  destruct ll as [| la]; [ easy | cbn ].
-...
-  unfold sorted.
-Print is_sorted.
-...
-  apply strongly_sorted_sorted.
-  unfold strongly_sorted.
-Print is_strongly_sorted.
-Search strongly_sorted.
-  apply strongly_sorted_iff.
-...
-rewrite sorted_app.
-
-rewrite flat_map_concat_map.
-Search (sorted _ (flat_map _ _)).
-Search (sorted _ (concat _)).
+symmetry.
 ...
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
-...
 ...
 Compute (
 let n := 5 in

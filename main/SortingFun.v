@@ -4150,3 +4150,24 @@ rewrite Nat.add_comm; cbn.
 rewrite if_leb_le_dec.
 destruct (le_dec (i + j) (k + i)) as [H| H]; [ easy | flia Hjk H].
 Qed.
+
+Theorem sorted_filter : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ l f,
+  sorted rel l → sorted rel (filter f l).
+Proof.
+intros * Htra * Hs.
+induction l as [| a]; [ easy | cbn ].
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa. {
+  apply sorted_cons_iff; [ easy | ].
+  apply sorted_cons_iff in Hs; [ | easy ].
+  destruct Hs as (Hs & Hr).
+  split; [ now apply IHl | ].
+  intros b Hb.
+  apply filter_In in Hb.
+  now apply Hr.
+}
+apply sorted_cons in Hs.
+now apply IHl.
+Qed.
