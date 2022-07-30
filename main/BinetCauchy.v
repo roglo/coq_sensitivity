@@ -19,6 +19,7 @@ Require Import Misc PermutationFun SortingFun RingLike.
 Require Import IterAdd IterMul IterAnd Pigeonhole.
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
+Require Import NatRingLike.
 Import matrix_Notations.
 
 (* binomial *)
@@ -4225,7 +4226,113 @@ split. {
   apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
 }
 split. {
-cbn.
+  rewrite flat_map_concat_map.
+Theorem sorted_concat_iff : ∀ A (leb : A → _),
+  transitive leb →
+  ∀ d ll,
+  (∀ l, l ∈ ll → length l ≠ 0)
+  → sorted leb (concat ll) ↔
+    (∀ l, l ∈ ll → sorted leb l) ∧
+    (∀ i, S i < length ll →
+     leb (last (nth i ll []) d) (hd d (nth (S i) ll [])) = true).
+Proof.
+intros * Htra * Hll.
+split. {
+  intros Hs.
+  split. {
+    intros la Hla.
+    clear Hll.
+    induction ll as [| lb]; [ easy | ].
+    cbn in Hs.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hla as [Hla| Hla]; [ now subst lb | ].
+    now apply IHll.
+  }
+  intros i Hi.
+  revert i Hi.
+  induction ll as [| la]; intros; [ easy | ].
+  assert (H : ∀ l, l ∈ ll → length l ≠ 0) by now intros; apply Hll; right.
+  specialize (IHll H); clear H.
+  assert (H : sorted leb (concat ll)). {
+    now cbn in Hs; apply sorted_app_iff in Hs; [ | easy ].
+  }
+  specialize (IHll H); clear H.
+  cbn in Hi.
+  apply Nat.succ_lt_mono in Hi.
+  destruct (Nat.eq_dec (S i) (length ll)) as [Hil| Hil]. {
+    cbn.
+    destruct i; [ | now apply IHll ].
+    destruct ll as [| lb]; [ easy | ].
+    destruct ll; [ | easy ].
+    cbn in Hs |-*.
+    rewrite app_nil_r in Hs.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hs as (Hsa & Hsb & Hs).
+    apply Hs. {
+      rewrite List_last_nth; apply nth_In.
+      specialize (Hll _ (or_introl eq_refl)).
+      flia Hll.
+    }
+    apply List_hd_in.
+    specialize (Hll _ (or_intror (or_introl eq_refl))).
+    flia Hll.
+  }
+  assert (H : S i < length ll) by flia Hi Hil.
+  clear Hi Hil; rename H into Hi.
+  destruct i. {
+    destruct ll as [| lb]; [ easy | cbn ].
+    cbn in IHll, Hi.
+    apply Nat.succ_lt_mono in Hi.
+    destruct ll as [| lc]; [ easy | ].
+    cbn in IHll, Hs; clear Hi.
+    apply sorted_app_iff in Hs; [ | easy ].
+    destruct Hs as (Hsa & Hsbc & Hs).
+    apply Hs. {
+      rewrite List_last_nth; apply nth_In.
+      specialize (Hll _ (or_introl eq_refl)).
+      flia Hll.
+    }
+    apply in_or_app; left.
+    apply List_hd_in.
+    specialize (Hll _ (or_intror (or_introl eq_refl))).
+    flia Hll.
+  }
+  apply IHll; flia Hi.
+}
+...
+apply (sorted_concat_iff _ []). {
+  intros ll Hll.
+  apply in_map_iff in Hll.
+  destruct Hll as (a & Hll & Ha); subst ll.
+  rewrite map_length.
+  destruct m; [ easy | ].
+  rewrite list_prodn_length; [ | easy ].
+  intros Hll.
+  apply rngl_product_list_integral in Hll; [ | now right | easy | easy ].
+  destruct Hll as (la & Hla & Hlla).
+  apply length_zero_iff_nil in Hlla; subst la.
+  now apply repeat_spec in Hla.
+}
+...
+Search (∏ (_ ∈ _), _ = 0%F).
+specialize (@rngl_product_list_integral) as H1.
+specialize (H1 nat nat_ring_like_op nat_ring_like_prop).
+Search (ring_like_op nat).
+...
+enough (Hop : rngl_has_opp = true ∨ rngl_has_sous = true).
+enough (Hit : rngl_is_integral = true).
+enough (H10 : rngl_has_1_neq_0 = true).
+specialize (H1 Hop Hit H10).
+specialize (H1 _ (repeat (seq i (S n)) (S m))).
+specialize (H1 (λ l, length l)).
+
+apply rngl_product_list_integral in Hll.
+...
+Compute (
+  let i := 42 in
+  let n := 4 in
+  let m := 3 in
+  list_prodn (repeat (seq i (S n)) m)).
 ...
 Search (repeat (_ :: _)).
 rewrite repeat_to_concat.
