@@ -20,6 +20,9 @@ Definition irreflexive A (rel : A → A → bool) :=
 Definition antisymmetric A (rel : A → A → bool) :=
   ∀ a b, rel a b = true → rel b a = true → a = b.
 
+Definition asymmetric A (rel : A → A → bool) :=
+  ∀ a b, rel a b = true → rel b a = false.
+
 Definition transitive A (rel : A → A → bool) :=
   ∀ a b c, rel a b = true → rel b c = true → rel a c = true.
 
@@ -3823,6 +3826,70 @@ destruct ab; [ | now destruct ba ].
 destruct ba; [ | easy ].
 apply IHla.
 Qed.
+
+(* to be completed
+Theorem transitive_list_ltb : ∀ A (ltb : A → _),
+  asymmetric ltb → transitive ltb → transitive (list_ltb ltb).
+Proof.
+intros * Hasy Htra.
+intros la lb lc Hlab Hlbc.
+revert la lb Hlab Hlbc.
+induction lc as [| c]; intros; [ now destruct lb | ].
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+cbn in Hlab, Hlbc |-*.
+remember (ltb a c) as ac eqn:Hac; symmetry in Hac.
+remember (ltb c a) as ca eqn:Hca; symmetry in Hca.
+destruct ac; [ easy | ].
+(*
+...
+Definition glop : A (rel : A → A → bool) :=
+  ∀ a b, rel a b = false → rel b a = false → a = b).
+Definition glip : A (rel : A → A → bool) :=
+  ∀ a b, rel a b = rel b a → a = b).
+...
+*)
+remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
+remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
+remember (ltb b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (ltb c b) as cb eqn:Hcb; symmetry in Hcb.
+move ba before ab; move bc before ba; move cb before bc.
+move ca before cb.
+destruct ab. 2: {
+  destruct ba; [ easy | ].
+  destruct bc. 2: {
+    destruct cb; [ easy | ].
+    destruct ca; [ | now apply (IHlc _ lb) ].
+enough (H : ∀ a b, ltb a b = false → ltb b a = false → a = b).
+...
+enough (H : ∀ a b, (ltb a b && ltb b a)%bool = false → a = b).
+specialize (H a b) as H1.
+rewrite Hab, Hba in H1.
+specialize (H1 eq_refl); subst a.
+specialize (H b c) as H1.
+rewrite Hcb, Hbc in H1.
+specialize (H1 eq_refl); subst c.
+congruence.
+...
+destruct ab; [ | easy ].
+destruct bc; [ | easy ].
+rewrite (Htra _ _ _ Hab Hbc).
+destruct ba. {
+  destruct cb. {
+    rewrite (Htra _ _ _ Hcb Hba).
+    now apply (IHla lb).
+  }
+  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca; [ | easy ].
+  now rewrite (Htra c a b Hca Hab) in Hcb.
+} {
+  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca; [ | easy ].
+  destruct cb; [ now rewrite (Htra b c a Hbc Hca) in Hba | ].
+  now rewrite (Htra _ _ _ Hca Hab) in Hcb.
+}
+Qed.
+*)
 
 (* *)
 

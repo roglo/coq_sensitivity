@@ -4192,7 +4192,6 @@ assert (Htot : total_relation (list_leb Nat.leb)). {
 }
 *)
 apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
-...
 About isort_filter.
 Compute (
   let leb := ltb in
@@ -4200,7 +4199,7 @@ Compute (
   let la := [3;3;6;3;6;4] in
   isort leb (filter f la) = filter f (isort leb la)).
 About isort_filter.
-...
+(* no: list_ltb Nat.ltb is not a total relation
 rewrite isort_filter; cycle 1. {
   apply antisymmetric_list_ltb, Nat_leb_antisym.
 } {
@@ -4209,8 +4208,9 @@ rewrite isort_filter; cycle 1. {
   apply total_relation_list_leb, Nat_leb_is_total_relation.
 }
 rewrite <- list_prodn_prodn_repeat.
+*)
 Theorem list_prodn_repeat_seq_sorted : ∀ i n m,
-  sorted (list_leb Nat.ltb) (list_prodn (repeat (seq i n) m)).
+  sorted (list_ltb Nat.ltb) (list_prodn (repeat (seq i n) m)).
 Proof.
 intros.
 revert i n.
@@ -4218,7 +4218,9 @@ induction m; intros; [ easy | cbn ].
 revert i m IHm.
 induction n; intros; [ easy | cbn ].
 apply sorted_app_iff. {
-  apply transitive_list_leb, Nat_ltb_trans.
+About transitive_list_leb.
+...
+  apply transitive_list_ltb, Nat_ltb_trans.
 }
 split. {
   destruct m; cbn; [ easy | ].
