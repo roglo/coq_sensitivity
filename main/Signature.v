@@ -2196,7 +2196,7 @@ assert (Hj'l : j' < length l). {
 }
 rewrite nth_ff_app_isort_rank in Hc2; [ | easy ].
 rewrite nth_ff_app_isort_rank in Hc2; [ | easy ].
-specialize (sorted_isort Nat_leb_is_total_relation l) as Hsl.
+specialize (sorted_isort Nat_leb_total_relation l) as Hsl.
 rewrite (isort_isort_rank _ 0) in Hsl.
 rewrite <- Hlr in Hsl.
 specialize sorted_strongly_sorted as H1.
@@ -2324,7 +2324,7 @@ intros * Hp.
 symmetry.
 rewrite <- (comp_1_r (length l) eq_refl) at 1.
 specialize (permut_isort Nat_leb_antisym Nat_leb_trans) as H1.
-specialize (H1 Nat_leb_is_total_relation).
+specialize (H1 Nat_leb_total_relation).
 apply (H1 (length l)); [ | easy ].
 apply seq_is_permut.
 Qed.

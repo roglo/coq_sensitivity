@@ -4201,7 +4201,6 @@ Compute (
 About isort_filter.
 (* no: list_ltb Nat.ltb is not a total relation
 rewrite isort_filter; cycle 1. {
-  apply antisymmetric_list_ltb, Nat_leb_antisym.
 } {
   apply transitive_list_leb, Nat_leb_trans.
 } {
@@ -4217,52 +4216,17 @@ revert i n.
 induction m; intros; [ easy | cbn ].
 revert i m IHm.
 induction n; intros; [ easy | cbn ].
-apply sorted_app_iff. {
-About transitive_list_leb.
-...
-  apply transitive_list_ltb, Nat_ltb_trans.
-}
+specialize Nat_ltb_antisym as Hant.
+specialize Nat_ltb_connected as Hcon.
+specialize Nat_ltb_trans as Htra.
+apply sorted_app_iff; [ now apply transitive_list_ltb | ].
 split. {
   destruct m; cbn; [ easy | ].
-Theorem glop : ∀ A (ltb : A → _),
-  transitive ltb →
-  ∀ ll a,
-  sorted (list_leb ltb) ll → sorted (list_leb ltb) (map (cons a) ll).
-Proof.
-intros * Htra * Hs.
-induction ll as [| la]; [ easy | cbn ].
-apply sorted_cons_iff in Hs; [ | now apply transitive_list_leb ].
-destruct Hs as (Hs, Hlab).
-apply sorted_cons_iff; [ now apply transitive_list_leb | ].
-split; [ now apply IHll | ].
-intros lb Hlb; cbn.
-destruct lb as [| b]. {
-  clear IHll Hs Hlab.
-  induction ll as [| lb]; [ easy | ].
-  cbn in Hlb.
-  destruct Hlb as [Hlb| Hlb]; [ easy | ].
-  now apply IHll.
-}
-remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba; [ | easy ].
-  apply Hlab.
-  apply in_map_iff in Hlb.
-  destruct Hlb as (lc & Hll & Hlb).
-  now injection Hll; clear Hll; intros; subst lc.
-}
-exfalso.
-apply in_map_iff in Hlb.
-destruct Hlb as (lc & Hll & Hlb).
-injection Hll; clear Hll; intros; subst lc b.
-About list_leb.
-Compute (list_leb Nat.leb [3;4] [3;5]).
-Compute (list_leb Nat.ltb [3;4] [3;5]).
+  apply sorted_sorted_map_cons; [ easy | easy | easy | ].
+Search (sorted _ (_ ++ _)).
 ...
-destruct Hs as (Hs, Hab).
+  apply sorted_sorted_map_cons; [ easy | easy | easy | ].
 ...
-apply glop.
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
 apply IHm.
 ...

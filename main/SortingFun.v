@@ -20,6 +20,7 @@ Definition irreflexive A (rel : A → A → bool) :=
 Definition antisymmetric A (rel : A → A → bool) :=
   ∀ a b, rel a b = true → rel b a = true → a = b.
 
+(* https://ncatlab.org/nlab/show/connected+relation *)
 Definition connected_relation A (rel : A → A → bool) :=
   ∀ a b, rel a b = false → rel b a = false → a = b.
 
@@ -3162,7 +3163,7 @@ Qed.
 
 (* *)
 
-Theorem Nat_leb_is_total_relation : total_relation Nat.leb.
+Theorem Nat_leb_total_relation : total_relation Nat.leb.
 Proof.
 intros i j.
 apply Bool.orb_true_iff.
@@ -3209,6 +3210,13 @@ intros a b c Hab Hbc.
 apply Nat.ltb_lt in Hab, Hbc.
 apply Nat.ltb_lt.
 now transitivity b.
+Qed.
+
+Theorem Nat_ltb_connected : connected_relation Nat.ltb.
+Proof.
+intros a b Hab Hba.
+apply Nat.ltb_ge in Hab, Hba.
+now apply Nat.le_antisymm.
 Qed.
 
 (* *)
@@ -3827,11 +3835,38 @@ destruct ba; [ | easy ].
 apply IHla.
 Qed.
 
-(* to be completed
-Theorem transitive_list_ltb : ∀ A (ltb : A → _),
-  connected_relation ltb → transitive ltb → transitive (list_ltb ltb).
+Theorem antisymmetric_list_ltb : ∀ A (ltb : A → _),
+  irreflexive ltb
+  → connected_relation ltb
+  → antisymmetric ltb
+  → antisymmetric (list_ltb ltb).
 Proof.
-intros * Hcon Htra.
+intros * Hirr Hcon Hant.
+intros la lb Hlab Hlba.
+revert la Hlab Hlba.
+induction lb as [| b]; intros; [ now destruct la | ].
+destruct la as [| a]; [ easy | ].
+cbn in Hlab, Hlba.
+remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
+remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
+destruct ab. {
+  destruct ba; [ | easy ].
+  specialize (Hant a b Hab Hba) as H1; subst b.
+  now rewrite (Hirr a) in Hab.
+}
+destruct ba; [ easy | ].
+specialize (Hcon a b Hab Hba) as H1; subst b.
+f_equal.
+now apply IHlb.
+Qed.
+
+Theorem transitive_list_ltb : ∀ A (ltb : A → _),
+  antisymmetric ltb
+  → connected_relation ltb
+  → transitive ltb
+  → transitive (list_ltb ltb).
+Proof.
+intros * Hant Hcon Htra.
 intros la lb lc Hlab Hlbc.
 revert la lb Hlab Hlbc.
 induction lc as [| c]; intros; [ now destruct lb | ].
@@ -3860,27 +3895,50 @@ destruct ca. 2: {
   specialize (Hcon _ _ Hac Hca) as H; subst c.
   destruct bc. {
     clear Hlab Hlbc.
-(* si antisymétrique, alors a = b et du coup contradiction entre Hab et Hca *)
-...
-destruct ab; [ | easy ].
-destruct bc; [ | easy ].
-rewrite (Htra _ _ _ Hab Hbc).
-destruct ba. {
-  destruct cb. {
-    rewrite (Htra _ _ _ Hcb Hba).
-    now apply (IHla lb).
+    specialize (Hant a b Hab Hbc) as H1; subst a.
+    congruence.
   }
-  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
-  destruct ca; [ | easy ].
-  now rewrite (Htra c a b Hca Hab) in Hcb.
-} {
-  remember (leb c a) as ca eqn:Hca; symmetry in Hca.
-  destruct ca; [ | easy ].
-  destruct cb; [ now rewrite (Htra b c a Hbc Hca) in Hba | ].
-  now rewrite (Htra _ _ _ Hca Hab) in Hcb.
+  destruct cb; [ easy | congruence ].
 }
+destruct bc. {
+  specialize (Htra a b c Hab Hbc) as H1.
+  congruence.
+}
+destruct cb; [ easy | ].
+specialize (Hcon b c Hbc Hcb) as H1; subst c.
+congruence.
 Qed.
-*)
+
+Theorem sorted_sorted_map_cons : ∀ A (ltb : A → _),
+  antisymmetric ltb →
+  transitive ltb →
+  connected_relation ltb →
+  ∀ ll a,
+  sorted (list_ltb ltb) ll → sorted (list_ltb ltb) (map (cons a) ll).
+Proof.
+intros * Hant Htra Hcon * Hs.
+induction ll as [| la]; [ easy | cbn ].
+apply sorted_cons_iff in Hs; [ | now apply transitive_list_ltb ].
+destruct Hs as (Hs, Hlab).
+apply sorted_cons_iff; [ now apply transitive_list_ltb | ].
+split; [ now apply IHll | ].
+intros lb Hlb; cbn.
+destruct lb as [| b]. {
+  clear IHll Hs Hlab.
+  induction ll as [| lb]; [ easy | ].
+  cbn in Hlb.
+  destruct Hlb as [Hlb| Hlb]; [ easy | ].
+  now apply IHll.
+}
+remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
+apply in_map_iff in Hlb.
+destruct Hlb as (lc & Hll & Hlb).
+injection Hll; clear Hll; intros; subst b lc.
+destruct ba; [ congruence | ].
+now apply Hlab.
+Qed.
 
 (* *)
 

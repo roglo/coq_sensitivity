@@ -772,7 +772,7 @@ Theorem permut_isort_leb : ∀ l,
   → isort Nat.leb l = seq 0 (length l).
 Proof.
 intros * Hp.
-specialize (sorted_isort Nat_leb_is_total_relation l) as Hbs.
+specialize (sorted_isort Nat_leb_total_relation l) as Hbs.
 specialize (permuted_isort Nat.leb Nat.eqb_eq l) as Hps.
 remember (isort Nat.leb l) as l'; clear Heql'.
 specialize permutation_permut as Hpl'.
