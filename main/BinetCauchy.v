@@ -4225,6 +4225,14 @@ split. {
   apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
 }
 split. {
+cbn.
+...
+Search (repeat (_ :: _)).
+rewrite repeat_to_concat.
+Search (list_prodn (concat _)).
+Search (list_prodn (repeat (_ :: _) _)).
+...
+  replace (i :: seq (S i) n) with (seq i (S n)) by easy.
 ...
   apply IHn.
 ...
