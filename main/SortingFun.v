@@ -20,8 +20,8 @@ Definition irreflexive A (rel : A → A → bool) :=
 Definition antisymmetric A (rel : A → A → bool) :=
   ∀ a b, rel a b = true → rel b a = true → a = b.
 
-Definition asymmetric A (rel : A → A → bool) :=
-  ∀ a b, rel a b = true → rel b a = false.
+Definition connected_relation A (rel : A → A → bool) :=
+  ∀ a b, rel a b = false → rel b a = false → a = b.
 
 Definition transitive A (rel : A → A → bool) :=
   ∀ a b c, rel a b = true → rel b c = true → rel a c = true.
@@ -3829,9 +3829,9 @@ Qed.
 
 (* to be completed
 Theorem transitive_list_ltb : ∀ A (ltb : A → _),
-  asymmetric ltb → transitive ltb → transitive (list_ltb ltb).
+  connected_relation ltb → transitive ltb → transitive (list_ltb ltb).
 Proof.
-intros * Hasy Htra.
+intros * Hcon Htra.
 intros la lb lc Hlab Hlbc.
 revert la lb Hlab Hlbc.
 induction lc as [| c]; intros; [ now destruct lb | ].
@@ -3841,14 +3841,6 @@ cbn in Hlab, Hlbc |-*.
 remember (ltb a c) as ac eqn:Hac; symmetry in Hac.
 remember (ltb c a) as ca eqn:Hca; symmetry in Hca.
 destruct ac; [ easy | ].
-(*
-...
-Definition glop : A (rel : A → A → bool) :=
-  ∀ a b, rel a b = false → rel b a = false → a = b).
-Definition glip : A (rel : A → A → bool) :=
-  ∀ a b, rel a b = rel b a → a = b).
-...
-*)
 remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
 remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
 remember (ltb b c) as bc eqn:Hbc; symmetry in Hbc.
@@ -3857,19 +3849,18 @@ move ba before ab; move bc before ba; move cb before bc.
 move ca before cb.
 destruct ab. 2: {
   destruct ba; [ easy | ].
-  destruct bc. 2: {
-    destruct cb; [ easy | ].
-    destruct ca; [ | now apply (IHlc _ lb) ].
-enough (H : ∀ a b, ltb a b = false → ltb b a = false → a = b).
-...
-enough (H : ∀ a b, (ltb a b && ltb b a)%bool = false → a = b).
-specialize (H a b) as H1.
-rewrite Hab, Hba in H1.
-specialize (H1 eq_refl); subst a.
-specialize (H b c) as H1.
-rewrite Hcb, Hbc in H1.
-specialize (H1 eq_refl); subst c.
-congruence.
+  specialize (Hcon _ _ Hab Hba) as H; subst a.
+  destruct bc; [ congruence | ].
+  destruct cb; [ easy | ].
+  destruct ca; [ | now apply (IHlc _ lb) ].
+  specialize (Hcon _ _ Hbc Hcb) as H; subst c.
+  congruence.
+}
+destruct ca. 2: {
+  specialize (Hcon _ _ Hac Hca) as H; subst c.
+  destruct bc. {
+    clear Hlab Hlbc.
+(* si antisymétrique, alors a = b et du coup contradiction entre Hab et Hca *)
 ...
 destruct ab; [ | easy ].
 destruct bc; [ | easy ].
