@@ -4220,15 +4220,13 @@ specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_trans as Htra.
 apply sorted_app_iff; [ now apply transitive_list_ltb | ].
-split. {
-  destruct m; cbn; [ easy | ].
-  apply sorted_sorted_map_cons; [ easy | easy | easy | ].
-Search (sorted _ (_ ++ _)).
-...
-  apply sorted_sorted_map_cons; [ easy | easy | easy | ].
-...
 replace (i :: seq (S i) n) with (seq i (S n)) by easy.
-apply IHm.
+split. {
+  apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
+}
+split. {
+...
+  apply IHn.
 ...
   remember (map _ _) as ll eqn:Hll; symmetry in Hll.
   destruct ll as [| la]; [ easy | cbn ].
