@@ -4299,6 +4299,29 @@ split. {
   }
   apply IHll; flia Hi.
 }
+intros (Hs & Hleb).
+induction ll as [| la]; [ easy | cbn ].
+apply sorted_app_iff; [ easy | ].
+split; [ now apply Hs; left | ].
+split. {
+  apply IHll. {
+    now intros lb Hlb; apply Hll; right.
+  } {
+    now intros lb Hlb; apply Hs; right.
+  }
+  intros i Hi.
+  specialize (Hleb (S i)).
+  apply Hleb; cbn.
+  now apply -> Nat.succ_lt_mono.
+}
+intros a b Ha Hb.
+apply in_concat in Hb.
+destruct Hb as (lb & Hlb & Hb).
+apply (In_nth _ _ b) in Hb.
+destruct Hb as (j & Hjl & Hb).
+enough (H1 : leb a (last la a) = true).
+enough (H2 : leb (last la a) ... = true).
+...
 ...
 apply (sorted_concat_iff _ []). {
   intros ll Hll.
