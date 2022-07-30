@@ -4229,13 +4229,13 @@ split. {
   rewrite flat_map_concat_map.
 Theorem sorted_concat_iff : ∀ A (leb : A → _),
   transitive leb →
-  ∀ d ll,
-  (∀ l, l ∈ ll → length l ≠ 0)
-  → sorted leb (concat ll) ↔
+  ∀ ll,
+  sorted leb (concat ll) ↔
     (∀ l, l ∈ ll → sorted leb l) ∧
-    (∀ i, S i < length ll →
-     leb (last (nth i ll []) d) (hd d (nth (S i) ll [])) = true).
+    (∀ i j, i < j < length ll →
+     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → leb a b = true).
 Proof.
+...
 intros * Htra * Hll.
 split. {
   intros Hs.
