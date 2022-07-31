@@ -4221,7 +4221,7 @@ Proof.
 intros * Hant Htra *.
 revert lb.
 induction la as [| a]; intros; cbn; [ easy | ].
-Admitted.
+...
 Theorem isort_app_comm : ∀ A (rel : A → _) la lb,
   isort rel (la ++ lb) = isort rel (lb ++ la).
 Proof.
@@ -4234,15 +4234,10 @@ rewrite app_assoc.
 remember (la ++ lb) as lc eqn:Hlc.
 clear la lb IHla Hlc.
 rename lc into la.
-Compute (isort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
-(* pas stable *)
-Compute (bsort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
-Compute (ssort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
-...
 revert a.
 induction la as [| b]; intros; [ easy | cbn ].
-remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-destruct ba. {
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
 Search (isort_loop _ (_ :: _)).
 ...
 rewrite isort_app_comm.
