@@ -4133,7 +4133,7 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
   rngl_has_eqb = true →
   ∀ n m f,
   ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut 0 jl), ε kl * f kl.
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
 rewrite list_prodn_prodn_repeat.
@@ -4173,7 +4173,7 @@ apply (rngl_summation_list_permut _ Hel).
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
-    (flat_map (all_permut 0) (sub_lists_of_seq_1_n n m)).
+    (flat_map all_permut (sub_lists_of_seq_1_n n m)).
 Proof.
 intros.
 assert (Hel : equality (list_eqv eqb)). {
@@ -4196,6 +4196,68 @@ rewrite isort_when_sorted; cycle 1. {
   apply list_prodn_repeat_seq_sorted.
 }
 symmetry.
+rewrite <- list_prodn_prodn_repeat.
+unfold sub_lists_of_seq_1_n.
+Theorem isort_all_permut_filter_no_dup : ∀ i n m,
+  isort (list_ltb Nat.ltb) (flat_map all_permut (sls1n i n m)) =
+  filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m)).
+Proof.
+intros.
+revert i m.
+induction n; intros; [ now destruct m | cbn ].
+destruct m; [ easy | cbn ].
+rewrite flat_map_app.
+Search (isort _ (_ ++ _)).
+(*
+Theorem isort_app : ∀ A (rel : A → _) la lb,
+  isort rel (la ++ lb) = isort_loop rel (isort rel la) (isort rel lb).
+*)
+Theorem isort_app : ∀ A (rel : A → _),
+  antisymmetric rel →
+  transitive rel →
+  ∀ la lb,
+  isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
+Proof.
+intros * Hant Htra *.
+revert lb.
+induction la as [| a]; intros; cbn; [ easy | ].
+Admitted.
+Theorem isort_app_comm : ∀ A (rel : A → _) la lb,
+  isort rel (la ++ lb) = isort rel (lb ++ la).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ now rewrite app_nil_r | cbn ].
+rewrite List_app_cons, app_assoc.
+rewrite <- IHla.
+rewrite app_assoc.
+remember (la ++ lb) as lc eqn:Hlc.
+clear la lb IHla Hlc.
+rename lc into la.
+...
+revert a.
+induction la as [| b]; intros; [ easy | cbn ].
+remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+destruct ba. {
+Search (isort_loop _ (_ :: _)).
+...
+rewrite isort_app_comm.
+rewrite isort_app.
+rewrite IHn.
+Print isort_loop.
+...
+rewrite isort_app.
+Compute (
+let n := 4 in
+let m := 2 in
+let i := 10 in
+(sls1n i n m, sls1n i n (S m))).
+
+  isort (list_ltb Nat.ltb) (flat_map all_permut (sls1n i n m)) =
+  filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m))).
+...
+... return
+apply isort_all_permut_filter_no_dup.
 ...
 ... return
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.

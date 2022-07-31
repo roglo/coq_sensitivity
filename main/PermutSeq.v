@@ -18,7 +18,6 @@ Definition comp_list (la lb : list nat) := map (ff_app la) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
-
 (* faut-il remplacer AllLt (perso) par FinFun.bfun (officiel) ?
 Print FinFun.bFun.
 Print AllLt.
@@ -456,8 +455,12 @@ Definition canon_sym_gr_list_list n : list (list nat) :=
   map (canon_sym_gr_list n) (seq 0 n!).
 
 (* all permutations of a list of anything *)
-Definition all_permut {A} d (l : list A) : list (list A) :=
-  map (λ p, map (λ i, nth i l d) p) (canon_sym_gr_list_list (length l)).
+Definition all_permut {A} (l : list A) : list (list A) :=
+  match l with
+  | [] => [[]]
+  | d :: _ =>
+      map (λ p, map (λ i, nth i l d) p) (canon_sym_gr_list_list (length l))
+  end.
 
 Definition is_sym_gr_list n (ll : list (list nat)) :=
   (∀ i, i < length ll →
