@@ -4217,16 +4217,53 @@ Theorem isort_app : ∀ A (rel : A → _),
   isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
 Proof.
 intros * Hant Htra *.
+unfold isort.
+Theorem glop : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ la lb ls1 ls2,
+  sorted rel (ls1 ++ ls2)
+  → isort_loop rel (ls1 ++ ls2) (la ++ lb) =
+    isort_loop rel ls1 (isort_loop rel ls2 la ++ lb).
+Proof.
+intros * Htra * Hss.
+revert ls1 ls2 lb Hss.
+induction la as [| a]; intros; cbn. {
+  revert ls1 ls2 Hss.
+  induction lb as [| b]; intros; cbn. {
+    rewrite app_nil_r.
+    symmetry.
+    now apply isort_loop_when_sorted.
+  }
+Check isort_when_permuted.
+(* ouais, mais relation totale : je veux pas *)
+...
+apply (@glop _ rel la lb [] []).
+...
+intros * Hs.
+revert lb ls Hs.
+induction la as [| a]; intros; cbn. {
+Search (isort _ (_ ++ _)).
+unfold isort.
+...
+Theorem glop : ∀ A (rel : A → _) la lb ls,
+  isort_loop rel ls (la ++ lb) = isort_loop rel ls (isort rel la ++ lb).
+Proof.
+intros.
+revert ls lb.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite IHla.
+...
+intros * Hant Htra *.
 revert lb.
 induction la as [| a]; intros; cbn; [ easy | ].
+...
 Theorem isort_loop_app : ∀ A (rel : A → _),
   transitive rel →
-  total_relation rel →
   ∀ ls la lb,
   sorted rel ls
   → isort_loop rel ls (la ++ lb) = isort rel (isort_loop rel ls la ++ lb).
 Proof.
-intros * Htra Htot * Hs.
+intros * Htra * Hs.
 revert ls lb Hs.
 induction la as [| a]; intros; cbn. {
   revert ls Hs.
@@ -4235,7 +4272,12 @@ induction la as [| a]; intros; cbn. {
     symmetry.
     now apply isort_when_sorted.
   }
+  rewrite IHlb. 2: {
+...
+About sorted_isort_insert.
+  rewrite IHlb; [ | apply sorted_isort_insert; try easy ].
   rewrite IHlb; [ | now apply sorted_isort_insert ].
+...
 Theorem isort_app_comm : ∀ A (rel : A → _) la lb,
   isort rel (la ++ lb) = isort rel (lb ++ la).
 Proof.
