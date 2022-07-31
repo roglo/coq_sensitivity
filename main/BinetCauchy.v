@@ -4252,6 +4252,14 @@ destruct ab. 2: {
   destruct ba. 2: {
     rewrite (Hcon b a Hba Hab).
     clear b Hab Hba.
+    destruct la as [| b]; cbn; [ now destruct (rel a a) | ].
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; cbn.
+Compute (
+  let rel := λ a b, fst a <? fst b in
+  let la := [(1, 2); (1, 3); (1, 4)] in
+  isort rel la).
+(* isort with lt not stable *)
 ...
 destruct ab. {
   destruct la as [| c]; cbn; [ now rewrite Hab | ].
