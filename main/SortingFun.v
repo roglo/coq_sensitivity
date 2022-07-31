@@ -363,8 +363,8 @@ Fixpoint isort_insert {A} (rel : A → A → bool) a lsorted :=
   match lsorted with
   | [] => [a]
   | b :: l =>
-      if rel a b then a :: lsorted
-      else b :: isort_insert rel a l
+      if rel b a then b :: isort_insert rel a l
+      else a :: lsorted
   end.
 
 Fixpoint isort_loop {A} (rel : A → A → bool) lsorted l :=
@@ -503,8 +503,8 @@ Fixpoint isort_rank_insert {A B} (rel : A → A → bool) (f : B → A) ia lrank
   match lrank with
   | [] => [ia]
   | ib :: l =>
-      if rel (f ia) (f ib) then ia :: lrank
-      else ib :: isort_rank_insert rel f ia l
+      if rel (f ib) (f ia) then ib :: isort_rank_insert rel f ia l
+      else ia :: lrank
   end.
 
 Fixpoint isort_rank_loop {A} (rel : A → A → bool) f lrank (l : list A) :=
@@ -1365,7 +1365,7 @@ Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
 Proof.
 intros.
 induction lsorted as [| b]; intros; [ easy | cbn ].
-destruct (rel a b); [ easy | ].
+destruct (rel b a); [ | easy ].
 cbn; f_equal.
 apply IHlsorted.
 Qed.
@@ -1413,7 +1413,7 @@ Theorem in_isort_insert_id : ∀ A (rel : A → _) a l,
 Proof.
 intros.
 induction l as [| b]; [ now left | cbn ].
-now destruct (rel a b); [ left | right ].
+now destruct (rel b a); [ right | left ].
 Qed.
 
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
@@ -1448,8 +1448,8 @@ induction la as [| b]; intros. {
   now destruct bef.
 }
 cbn in Hli.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
+remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+destruct ba. 2: {
   destruct bef as [| c]. {
     cbn in Hli.
     injection Hli; clear Hli; intros; subst aft; cbn.
@@ -1531,19 +1531,19 @@ eapply (permutation_trans Heqb); [ apply H1 | cbn ].
 clear IHlb H1.
 revert lb b.
 induction la as [| a]; intros; [ now apply permutation_refl | cbn ].
-remember (rel b a) as x eqn:Hx; symmetry in Hx.
+remember (rel a b) as x eqn:Hx; symmetry in Hx.
 destruct x. {
-  apply (permuted_isort_loop_sorted _ Heqb).
-  rewrite app_comm_cons.
-  rewrite (List_cons_is_app b (a :: la)).
-  now apply permutation_app_comm.
-} {
   apply (permuted_isort_loop_sorted _ Heqb).
   apply (permutation_skip Heqb).
   eapply (permutation_trans Heqb). 2: {
     apply (permutation_cons_isort_insert _ Heqb).
     now apply permutation_refl.
   }
+  now apply permutation_app_comm.
+} {
+  apply (permuted_isort_loop_sorted _ Heqb).
+  rewrite app_comm_cons.
+  rewrite (List_cons_is_app b (a :: la)).
   now apply permutation_app_comm.
 }
 Qed.
@@ -1561,7 +1561,7 @@ induction lsorted as [| c]; intros. {
   destruct Ha as [Ha| Ha]; [ now left | easy ].
 }
 cbn in Ha.
-destruct (rel b c); [ easy | ].
+destruct (rel c b); [ | easy ].
 cbn in Ha.
 destruct Ha as [Ha| Ha]; [ now right; left | ].
 apply IHlsorted in Ha.
@@ -1593,49 +1593,39 @@ now destruct Ha.
 Qed.
 
 Theorem isort_insert_trans_r : ∀ A (rel : A → _),
-  antisymmetric rel →
   transitive rel →
   ∀ a b la,
   rel a b = true
   → isort_insert rel a la = la ++ [a]
   → isort_insert rel b (la ++ [a]) = la ++ [a; b].
 Proof.
-intros * Hant Htra * Hab Hs.
-induction la as [| c]; cbn. {
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba; [ | easy ].
-  now rewrite (Hant a b Hab Hba).
-}
-remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-destruct bc. {
+intros * Htra * Hab Hs.
+induction la as [| c]; [ now cbn; rewrite Hab | cbn ].
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. 2: {
   cbn in Hs.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac. {
+  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca. 2: {
     injection Hs; clear Hs; intros Hs H1; subst c.
-    specialize (Hant a b Hab Hbc) as H1; subst b.
-    f_equal.
-    now rewrite app_comm_cons, Hs, <- app_assoc.
+    congruence.
   }
-  specialize (Htra a b c Hab Hbc) as H1.
+  specialize (Htra c a b Hca Hab) as H1.
   congruence.
 }
 f_equal.
 apply IHla.
 cbn in Hs.
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-destruct ac; [ | now injection Hs ].
+remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+destruct ca; [ now injection Hs | ].
 injection Hs; clear Hs; intros Hs H1; subst c.
 apply cons_app_repeat in Hs.
 rewrite Hs.
 remember (length la) as len eqn:Hlen.
-clear - Hant Htra.
+clear - Htra.
 induction len; [ easy | cbn ].
-destruct (rel a a). {
-  f_equal.
-  apply repeat_cons.
-}
+destruct (rel a a); [ now f_equal | ].
 f_equal.
-apply IHlen.
+apply repeat_cons.
 Qed.
 
 (* *)
@@ -1885,21 +1875,20 @@ Proof.
 intros * Htot * Hs.
 unfold sorted in Hs |-*.
 induction lsorted as [| b]; [ easy | cbn ].
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  remember (b :: lsorted) as l; cbn; subst l.
-  now apply Bool.andb_true_iff.
-} {
-  specialize (Htot a b) as Hba.
-  rewrite Hab in Hba; cbn in Hba.
+remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+destruct ba. {
   destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
   remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
   apply Bool.andb_true_iff in Hs.
   destruct Hs as (Hbc, Hs).
-  rewrite IHlsorted; [ | easy ].
-  cbn.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac; [ now rewrite Hba | now rewrite Hbc ].
+  rewrite IHlsorted; [ cbn | easy ].
+  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
+  destruct ca; [ now rewrite Hbc | now rewrite Hba ].
+} {
+  remember (b :: lsorted) as l; cbn; subst l.
+  rewrite Hs, Bool.andb_true_r.
+  specialize (Htot b a) as Hab.
+  now rewrite Hba in Hab.
 }
 Qed.
 
@@ -1917,13 +1906,12 @@ now apply sorted_isort_insert.
 Qed.
 
 Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
-  antisymmetric rel →
   transitive rel →
   ∀ a la,
   sorted rel (la ++ [a])
   → isort_insert rel a la = la ++ [a].
 Proof.
-intros * Hant Htra * Hla.
+intros * Htra * Hla.
 revert a Hla.
 induction la as [| b] using rev_ind; intros; [ easy | cbn ].
 apply (sorted_app_iff Htra) in Hla.
@@ -1931,68 +1919,40 @@ destruct Hla as (Hla & _ & Htrr).
 specialize (IHla _ Hla) as H1.
 destruct la as [| c]; cbn. {
   clear Hla H1.
-  specialize (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
-  rename Htrr into Hba.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  apply Hant in Hba.
-  now rewrite (Hba Hab).
+  now rewrite (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
 }
-specialize (Htrr c a (or_introl eq_refl) (or_introl eq_refl)) as Hca.
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-destruct ac. {
-  apply Hant in Hca.
-  specialize (Hca Hac); subst c.
-  f_equal.
-  cbn in H1.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba. {
-    injection H1; clear H1; intros H1 H2; subst b.
-    rewrite <- H1; cbn.
-    now f_equal.
-  }
-  injection H1; clear H1; intros H1.
-  apply Bool.not_true_iff_false in Hba.
-  exfalso; apply Hba.
-  apply Htrr; [ | now left ].
-  now apply in_or_app; right; left.
-}
+rewrite (Htrr c a (or_introl eq_refl) (or_introl eq_refl)).
 f_equal.
 cbn in H1.
-remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-destruct bc. {
-  injection H1; clear H1; intros H1 H2; subst c.
-  rewrite <- H1; cbn.
-  rewrite Hac.
-  f_equal.
-  rewrite <- app_comm_cons in Hla.
-  specialize (sorted_repeat Hant Htra _ Hla) as Har.
-  rewrite Har.
-  remember (length la) as len eqn:Hlen; symmetry in Hlen.
-  clear - Hac.
-  induction len; [ easy | cbn ].
-  rewrite Hac.
-  f_equal; apply IHlen.
+remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
+destruct cb. {
+  injection H1; clear H1; intros H1.
+  rewrite <- app_assoc; cbn.
+  specialize (Htrr b a) as Hba.
+  cbn - [ In ] in Hba.
+  assert (H : b ∈ c :: la ++ [b]). {
+    rewrite app_comm_cons.
+    now apply in_or_app; right; left.
+  }
+  specialize (Hba H (or_introl eq_refl)); clear H.
+  now apply isort_insert_trans_r.
 }
-injection H1; clear H1; intros H1.
-rewrite <- app_assoc; cbn.
-specialize (Htrr b a) as Hba.
-assert (H : b ∈ c :: la ++ [b]). {
-  rewrite app_comm_cons.
-  now apply in_or_app; right; left.
-}
-specialize (Hba H (or_introl eq_refl)); clear H.
-now apply isort_insert_trans_r.
+injection H1; clear H1; intros H1 H2; subst c.
+cbn in Hla.
+rewrite <- H1 in Hla.
+apply sorted_cons_iff in Hla; [ | easy ].
+destruct Hla as (_, Hla).
+specialize (Hla _ (or_introl eq_refl)).
+congruence.
 Qed.
 
 Theorem isort_loop_when_sorted : ∀ A (rel : A → _),
-  antisymmetric rel →
   transitive rel →
   ∀ ls l,
   sorted rel (ls ++ l)
   → isort_loop rel ls l = ls ++ l.
 Proof.
-intros * Hant Htra * Hs.
+intros * Htra * Hs.
 revert ls Hs.
 induction l as [| a]; intros; cbn; [ now rewrite app_nil_r | ].
 assert (H : isort_insert rel a ls = ls ++ [a]). {
@@ -3226,7 +3186,7 @@ Theorem isort_rank_insert_length : ∀ A B rel (f : B → A) ia lrank,
 Proof.
 intros.
 induction lrank as [| ib]; [ easy | cbn ].
-destruct (rel (f ia) (f ib)); [ easy | cbn ].
+destruct (rel (f ib) (f ia)); [ cbn | easy ].
 now rewrite IHlrank.
 Qed.
 
@@ -3265,9 +3225,9 @@ cbn - [ nth ].
 specialize (Hini ib (or_introl eq_refl)) as Hib.
 rewrite (nth_indep _ _ d' Hia).
 rewrite (nth_indep _ _ d' Hib).
-remember (rel (nth ia l_ini d') (nth ib l_ini d')) as x eqn:Hx.
+remember (rel (nth ib l_ini d') (nth ia l_ini d')) as x eqn:Hx.
 symmetry in Hx.
-destruct x; [ easy | ].
+destruct x; [ | easy ].
 f_equal.
 apply IHlrank.
 intros i Hi.
@@ -3282,7 +3242,7 @@ Proof.
 intros * Hil.
 induction lrank as [| ib]; [ easy | ].
 cbn in Hil.
-destruct (rel (f ia) (f ib)); [ easy | ].
+destruct (rel (f ib) (f ia)); [ | easy ].
 destruct Hil as [Hil| Hil]; [ now subst i; right; left | ].
 specialize (IHlrank Hil).
 destruct IHlrank as [Hi| Hi]; [ now subst i; left | now right; right ].
@@ -3319,9 +3279,14 @@ induction lrank as [| ib]; intros. {
   rewrite Tauto_match_nat_same; flia Hia.
 }
 cbn - [ nth ].
-remember (rel (f ia) (f ib)) as x eqn:Hx.
+remember (rel (f ib) (f ia)) as x eqn:Hx.
 symmetry in Hx.
 destruct x. {
+  destruct i; [ now cbn; apply Hn; left | cbn ].
+  apply IHlrank.
+  intros j Hj.
+  now apply Hn; right.
+} {
   destruct i; [ easy | ].
   rewrite List_nth_succ_cons.
   destruct (lt_dec i (length (ib :: lrank))) as [Hii| Hii]. 2: {
@@ -3329,11 +3294,6 @@ destruct x. {
     rewrite nth_overflow; [ flia Hia | easy ].
   }
   now apply Hn, nth_In.
-} {
-  destruct i; [ now cbn; apply Hn; left | cbn ].
-  apply IHlrank.
-  intros j Hj.
-  now apply Hn; right.
 }
 Qed.
 
@@ -3406,7 +3366,7 @@ induction lrank as [| ib]; intros. {
   cbn; constructor; [ easy | constructor ].
 }
 cbn.
-destruct (rel (nth ia l_ini d) (nth ib l_ini d)); [ easy | ].
+destruct (rel (nth ib l_ini d) (nth ia l_ini d)); [ | easy ].
 apply NoDup_cons_iff in Hnd.
 destruct Hnd as (Hia, Hnd).
 apply NoDup_cons_iff in Hnd.
@@ -3480,10 +3440,12 @@ Theorem isort_insert_isort_rank_insert : ∀ A B rel ia (f : B → A) lrank,
 Proof.
 intros.
 induction lrank as [| ib]; [ easy | cbn ].
-destruct (rel (f ia) (f ib)); [ easy | ].
+destruct (rel (f ib) (f ia)); [ | easy ].
 cbn; f_equal.
 apply IHlrank.
 Qed.
+
+...
 
 Theorem nth_isort_rank_insert_of_sorted :
   ∀ A d (rel : A → _) l_ini n ls,
@@ -3492,6 +3454,7 @@ Theorem nth_isort_rank_insert_of_sorted :
 Proof.
 intros * Hls.
 induction ls as [| b]; [ easy | cbn ].
+...
 rewrite Hls; [ | now left ].
 f_equal.
 apply IHls.

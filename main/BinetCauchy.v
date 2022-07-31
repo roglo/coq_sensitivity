@@ -4234,6 +4234,10 @@ rewrite app_assoc.
 remember (la ++ lb) as lc eqn:Hlc.
 clear la lb IHla Hlc.
 rename lc into la.
+Compute (isort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
+(* pas stable *)
+Compute (bsort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
+Compute (ssort (λ a b, fst a <=? fst b) [(1,1);(3,1);(3,2)]).
 ...
 revert a.
 induction la as [| b]; intros; [ easy | cbn ].
