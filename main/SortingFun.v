@@ -2851,13 +2851,12 @@ Qed.
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
-  antisymmetric rel →
   transitive rel →
   ∀ l,
   sorted rel l
   → isort rel l = l.
 Proof.
-intros * Hant Htra * Hs.
+intros * Htra * Hs.
 now apply isort_loop_when_sorted.
 Qed.
 
@@ -2933,12 +2932,11 @@ Qed.
 (* *)
 
 Theorem sorted_isort_iff : ∀ A (rel : A → A → bool),
-  antisymmetric rel →
   transitive rel →
   total_relation rel →
   ∀ l, sorted rel l ↔ isort rel l = l.
 Proof.
-intros * Hant Htra Htot *.
+intros * Htra Htot *.
 split; [ now apply isort_when_sorted | ].
 intros Hs.
 specialize sorted_isort as H1.
@@ -3892,15 +3890,13 @@ Qed.
 (* *)
 
 Theorem isort_insert_filter : ∀ A (leb : A → _),
-  antisymmetric leb →
   transitive leb →
-  total_relation leb →
   ∀ la b f,
   f b = true
   → sorted leb la
   → isort_insert leb b (filter f la) = filter f (isort_insert leb b la).
 Proof.
-intros * Hant Htra Htot * Hfb Hs.
+intros * Htra * Hfb Hs.
 revert b Hfb.
 induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
 assert (H : sorted leb la) by now apply sorted_cons in Hs.
@@ -3922,28 +3918,14 @@ specialize (Ha' _ (or_introl eq_refl)).
 specialize (IHla b Hfb) as H1.
 cbn in H1.
 rewrite Hfa' in H1.
-rewrite H1.
+rewrite H1; clear H1.
 remember (leb a' b) as a'b eqn:Ha'b; symmetry in Ha'b.
-destruct fa'; cbn. {
-  destruct a'b; cbn; [ | now rewrite Hfb, Hfa' ].
-  rewrite Hfa'.
-  specialize (Htot a b) as Hba.
-  rewrite Hab in Hba; cbn in Hba.
-  specialize (Htra a' b a Ha'b Hba) as H2.
-  specialize (Hant a a' Ha' H2) as H3; subst a'.
-  congruence.
-}
-destruct a'b; [ | now cbn; rewrite Hfb, Hfa' ].
-cbn; rewrite Hfa'.
-specialize (Htot a b) as Hba.
-rewrite Hab in Hba; cbn in Hba.
-specialize (Htra a' b a Ha'b Hba) as H2.
-specialize (Hant a a' Ha' H2) as H; subst a'.
+destruct a'b; cbn; [ | now rewrite Hfb, Hfa' ].
+specialize (Htra a a' b Ha' Ha'b) as H1.
 congruence.
 Qed.
 
 Theorem isort_loop_filter : ∀ A (leb : A → _),
-  antisymmetric leb →
   transitive leb →
   total_relation leb →
   ∀ la lb f,
@@ -3951,7 +3933,7 @@ Theorem isort_loop_filter : ∀ A (leb : A → _),
   → isort_loop leb (filter f la) (filter f lb) =
     filter f (isort_loop leb la lb).
 Proof.
-intros * Hant Htra Htot * Hs.
+intros * Htra Htot * Hs.
 revert la Hs.
 induction lb as [| b]; intros; [ easy | cbn ].
 rewrite <- IHlb; [ | now apply sorted_isort_insert ].
@@ -3971,22 +3953,16 @@ now apply sorted_cons in Hs.
 Qed.
 
 Theorem isort_filter : ∀ A (leb : A → _),
-  antisymmetric leb →
   transitive leb →
   total_relation leb →
   ∀ la f,
   isort leb (filter f la) = filter f (isort leb la).
 Proof.
-intros * Hant Htra Htot *.
+intros * Htra Htot *.
 induction la as [| a]; [ easy | cbn ].
+rewrite <- isort_loop_filter; [ | easy | easy | easy ].
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-destruct fa. {
-  cbn.
-  rewrite <- isort_loop_filter; [ | easy | easy | easy | easy ].
-  now cbn; rewrite Hfa.
-}
-rewrite <- isort_loop_filter; [ | easy | easy | easy | easy ].
-now cbn; rewrite Hfa.
+now destruct fa; cbn; rewrite Hfa.
 Qed.
 
 Theorem sorted_concat_iff : ∀ A (leb : A → _),

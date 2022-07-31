@@ -4187,8 +4187,6 @@ specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_trans as Htra.
 rewrite isort_when_sorted; cycle 1. {
-  now apply antisymmetric_list_ltb.
-} {
   now apply transitive_list_ltb.
 } {
   rewrite <- list_prodn_prodn_repeat.
@@ -4221,7 +4219,23 @@ Proof.
 intros * Hant Htra *.
 revert lb.
 induction la as [| a]; intros; cbn; [ easy | ].
-...
+Theorem isort_loop_app : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ ls la lb,
+  sorted rel ls
+  → isort_loop rel ls (la ++ lb) = isort rel (isort_loop rel ls la ++ lb).
+Proof.
+intros * Htra Htot * Hs.
+revert ls lb Hs.
+induction la as [| a]; intros; cbn. {
+  revert ls Hs.
+  induction lb as [| b]; intros; cbn. {
+    rewrite app_nil_r.
+    symmetry.
+    now apply isort_when_sorted.
+  }
+  rewrite IHlb; [ | now apply sorted_isort_insert ].
 Theorem isort_app_comm : ∀ A (rel : A → _) la lb,
   isort rel (la ++ lb) = isort rel (lb ++ la).
 Proof.
@@ -4234,6 +4248,23 @@ rewrite app_assoc.
 remember (la ++ lb) as lc eqn:Hlc.
 clear la lb IHla Hlc.
 rename lc into la.
+Theorem isort_loop_isort_app_comm : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ ls la,
+  sorted rel ls
+  → isort_loop rel ls la = isort rel (la ++ ls).
+Proof.
+intros * Htra Htot * Hs.
+revert ls Hs.
+induction la as [| a]; intros; cbn. {
+  now symmetry; apply isort_when_sorted.
+}
+rewrite IHla; [ | now apply sorted_isort_insert ].
+(* bon, chais pas trop *)
+...
+apply isort_loop_isort_app_comm.
+...
 revert a.
 induction la as [| b]; intros; [ easy | cbn ].
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
