@@ -4213,10 +4213,75 @@ Theorem isort_app : ∀ A (rel : A → _) la lb,
 Theorem isort_app : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
+  connected_relation rel →
   ∀ la lb,
   isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
 Proof.
-intros * Hant Htra *.
+intros * Hant Htra Hcon *.
+(*
+Theorem isort_loop_app : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ ls la lb,
+  sorted rel ls
+  → isort_loop rel ls (la ++ lb) = isort rel (isort_loop rel ls la ++ lb).
+Proof.
+intros * Htra * Hs.
+revert ls lb Hs.
+induction la as [| a]; intros; cbn. {
+  revert ls Hs.
+  induction lb as [| b]; intros; cbn. {
+    rewrite app_nil_r.
+    symmetry.
+    now apply isort_when_sorted.
+  }
+...
+  rewrite IHlb. 2: {
+Search (sorted _ (isort_insert _ _ _)).
+About sorted_isort_insert.
+...
+intros * Hs.
+...
+now apply glop.
+cbn.
+*)
+destruct la as [| a]; [ easy | cbn ].
+destruct la as [| b]; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. 2: {
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba. 2: {
+    rewrite (Hcon b a Hba Hab).
+    clear b Hab Hba.
+...
+destruct ab. {
+  destruct la as [| c]; cbn; [ now rewrite Hab | ].
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+  destruct ac. {
+    destruct bc. {
+      destruct la as [| d]; cbn. {
+        now rewrite Hab; cbn; rewrite Hac, Hbc.
+      }
+      remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
+      destruct cd. {
+        rewrite (Htra b c d Hbc Hcd).
+        rewrite (Htra a c d Hac Hcd).
+        destruct la as [| e]; cbn. {
+          rewrite Hab; cbn; rewrite Hac, Hbc; cbn.
+          rewrite (Htra a c d Hac Hcd).
+          rewrite (Htra b c d Hbc Hcd).
+          now rewrite Hcd.
+        }
+...
+  cbn.
+  destruct ab; cbn; [ now rewrite Hab | ].
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ easy | ].
+  now rewrite (Hcon a b Hab Hba).
+}
+...
+cbn.
+...
 unfold isort.
 Theorem glop : ∀ A (rel : A → _),
   transitive rel →
@@ -4256,23 +4321,6 @@ rewrite IHla.
 intros * Hant Htra *.
 revert lb.
 induction la as [| a]; intros; cbn; [ easy | ].
-...
-Theorem isort_loop_app : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ ls la lb,
-  sorted rel ls
-  → isort_loop rel ls (la ++ lb) = isort rel (isort_loop rel ls la ++ lb).
-Proof.
-intros * Htra * Hs.
-revert ls lb Hs.
-induction la as [| a]; intros; cbn. {
-  revert ls Hs.
-  induction lb as [| b]; intros; cbn. {
-    rewrite app_nil_r.
-    symmetry.
-    now apply isort_when_sorted.
-  }
-  rewrite IHlb. 2: {
 ...
 About sorted_isort_insert.
   rewrite IHlb; [ | apply sorted_isort_insert; try easy ].
