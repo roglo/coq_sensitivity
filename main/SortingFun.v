@@ -3311,37 +3311,17 @@ Qed.
 
 Theorem nth_isort_rank_insert_of_sorted :
   ∀ A d (rel : A → _) l_ini n ls,
-  (∀ i, i ∈ ls → rel (nth i l_ini d) (nth n l_ini d) = true)
+  (∀ i, i ∈ ls → rel (nth n l_ini d) (nth i l_ini d) = false)
   → isort_rank_insert rel (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
 Proof.
 intros * Hls.
 induction ls as [| b]; [ easy | cbn ].
-...
 rewrite Hls; [ | now left ].
 f_equal.
 apply IHls.
 intros j Hj.
 apply Hls.
 now right.
-Qed.
-
-Theorem isort_loop_isort_rank_loop : ∀ A rel d (f : nat → A) lrank l,
-  (∀ i, i < length l → f (length lrank + i) = nth i l d)
-  → isort_loop rel (map f lrank) l = map f (isort_rank_loop rel f lrank l).
-Proof.
-intros * Hia.
-revert lrank Hia.
-induction l as [| a]; intros; [ easy | cbn ].
-specialize (Hia 0 (Nat.lt_0_succ _)) as H1.
-cbn in H1; rewrite Nat.add_0_r in H1.
-rewrite <- H1.
-rewrite isort_insert_isort_rank_insert.
-rewrite IHl; [ easy | ].
-intros i Hi.
-rewrite isort_rank_insert_length.
-apply Nat.succ_lt_mono in Hi.
-specialize (Hia (S i) Hi) as H2.
-now rewrite <- Nat.add_succ_comm in H2.
 Qed.
 
 Theorem nth_isort_rank_loop_of_nodup_sorted : ∀ A d (rel : A → _),
@@ -3368,6 +3348,8 @@ replace (isort_rank_insert _ _ _ _) with (seq 0 (S n)). 2: {
   intros j Hj.
   apply in_seq in Hj.
   destruct Hj as (_, Hj); cbn in Hj.
+Check sorted_any.
+...
   apply sorted_any; [ easy | easy | easy | ].
   rewrite <- Hnl; cbn; flia.
 }
