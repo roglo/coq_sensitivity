@@ -1403,6 +1403,19 @@ induction l as [| b]; [ now left | cbn ].
 now destruct (rel a b); [ left | right ].
 Qed.
 
+Theorem permutation_cons_isort_insert_id : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a la,
+  permutation eqb (a :: la) (isort_insert rel a la).
+Proof.
+intros * Heqb *.
+revert a.
+induction la as [| b]; intros; [ now apply permutation_refl | cbn ].
+destruct (rel a b); [ now apply permutation_refl | ].
+eapply (permutation_trans Heqb); [ now apply permutation_swap | ].
+now apply permutation_skip.
+Qed.
+
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a la lb,
@@ -1440,40 +1453,25 @@ destruct ab. 2: {
   destruct bef as [| c]. {
     cbn in Hli.
     injection Hli; clear Hli; intros; subst aft; cbn; subst b.
-...
-    now apply permutation_refl.
+    clear IHla Hbef Hab.
+    now apply permutation_cons_isort_insert_id.
   }
   cbn in Hli.
   injection Hli; clear Hli; intros Hli H; subst c.
-  specialize (Hbef a (or_introl eq_refl)).
-  now rewrite equality_refl in Hbef.
+  cbn; apply permutation_skip; [ easy | ].
+  apply IHla; [ | easy ].
+  now intros c Hc; apply Hbef; right.
 }
 destruct bef as [| c]. {
   cbn in Hli.
-  injection Hli; clear Hli; intros Hli H; subst b aft.
-  apply permutation_cons_l_iff; cbn.
-  remember (extract (eqb a) (isort_insert rel a la)) as lxl eqn:Hlxl.
-  symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft)| ]. 2: {
-    specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-    clear Hlxl.
-    specialize (H1 a).
-    assert (H : a ∈ isort_insert rel a la) by apply in_isort_insert_id.
-    specialize (H1 H); clear H.
-    now rewrite equality_refl in H1.
-  }
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef' & H & Hli).
-  apply Heqb in H; subst x.
-  now apply IHla.
+  injection Hli; clear Hli; intros; subst aft.
+  now apply permutation_refl.
 }
 cbn in Hli.
-injection Hli; clear Hli; intros Hli H; subst c.
-rewrite <- app_comm_cons.
-apply (permutation_skip Heqb).
-apply IHla; [ | easy ].
-intros c Hc.
-now apply Hbef; right.
+injection Hli; clear Hli; intros Hli H; subst c; cbn.
+rewrite Hli.
+apply permutation_sym; [ easy | ].
+now apply permutation_middle.
 Qed.
 
 Theorem permuted_isort_insert_sorted : ∀ A (eqb rel : A → _),
@@ -1491,51 +1489,6 @@ apply (permutation_cons_isort_insert rel Heqb).
 now apply permutation_refl.
 Qed.
 
-Theorem permuted_isort_loop_sorted : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ la lb lc,
-  permutation eqb la lb
-  → permutation eqb (isort_loop rel la lc) (isort_loop rel lb lc).
-Proof.
-intros * Heqb * Hp.
-revert la lb Hp.
-induction lc as [| c]; intros; [ easy | cbn ].
-apply IHlc.
-now apply permuted_isort_insert_sorted.
-Qed.
-
-Theorem permuted_isort_loop : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
-  ∀ la lb, permutation eqb (la ++ lb) (isort_loop rel la lb).
-Proof.
-intros.
-revert la.
-induction lb as [| b]; intros. {
-  rewrite app_nil_r.
-  now apply permutation_refl.
-}
-specialize (IHlb (la ++ [b])) as H1.
-rewrite <- app_assoc in H1; cbn in H1.
-eapply (permutation_trans Heqb); [ apply H1 | cbn ].
-clear IHlb H1.
-revert lb b.
-induction la as [| a]; intros; [ now apply permutation_refl | cbn ].
-remember (rel a b) as x eqn:Hx; symmetry in Hx.
-destruct x. {
-  apply (permuted_isort_loop_sorted _ Heqb).
-  apply (permutation_skip Heqb).
-  eapply (permutation_trans Heqb). 2: {
-    apply (permutation_cons_isort_insert _ Heqb).
-    now apply permutation_refl.
-  }
-  now apply permutation_app_comm.
-} {
-  apply (permuted_isort_loop_sorted _ Heqb).
-  rewrite app_comm_cons.
-  rewrite (List_cons_is_app b (a :: la)).
-  now apply permutation_app_comm.
-}
-Qed.
-
 (* in isort *)
 
 Theorem in_isort_insert : ∀ A (rel : A → A → bool) a b lsorted,
@@ -1549,35 +1502,20 @@ induction lsorted as [| c]; intros. {
   destruct Ha as [Ha| Ha]; [ now left | easy ].
 }
 cbn in Ha.
-destruct (rel c b); [ | easy ].
-cbn in Ha.
+destruct (rel b c); [ easy | ].
 destruct Ha as [Ha| Ha]; [ now right; left | ].
 apply IHlsorted in Ha.
 destruct Ha as [Ha| Ha]; [ now left | now right; right ].
 Qed.
 
-Theorem in_isort_loop : ∀ A (rel : A → A → bool) a lsorted l,
-  a ∈ isort_loop rel lsorted l
-  → a ∈ lsorted ∨ a ∈ l.
-Proof.
-intros * Ha.
-revert a lsorted Ha.
-induction l as [| b]; intros; [ now left | ].
-cbn in Ha.
-apply IHl in Ha.
-destruct Ha as [Ha| Ha]. {
-  apply in_isort_insert in Ha.
-  destruct Ha as [Ha| Ha]; [ now right; left | now left ].
-} {
-  now right; right.
-}
-Qed.
-
 Theorem in_isort : ∀ A (rel : A → A → bool) a l, a ∈ isort rel l → a ∈ l.
 Proof.
 intros * Ha.
-apply in_isort_loop in Ha.
-now destruct Ha.
+revert a Ha.
+induction l as [| b]; intros; [ easy | ].
+cbn in Ha.
+apply in_isort_insert in Ha.
+destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
 Qed.
 
 Theorem isort_insert_trans_r : ∀ A (rel : A → _),
@@ -1588,6 +1526,7 @@ Theorem isort_insert_trans_r : ∀ A (rel : A → _),
   → isort_insert rel b (la ++ [a]) = la ++ [a; b].
 Proof.
 intros * Htra * Hab Hs.
+...
 induction la as [| c]; [ now cbn; rewrite Hab | cbn ].
 remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct cb. 2: {
