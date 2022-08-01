@@ -1832,79 +1832,6 @@ destruct ab. {
 }
 Qed.
 
-Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
-  antisymmetric rel →
-  transitive rel →
-  ∀ a la,
-  sorted rel (la ++ [a])
-  → isort_insert rel a la = la ++ [a].
-Proof.
-intros * Hant Htra * Hla.
-revert a Hla.
-induction la as [| b] using rev_ind; intros; [ easy | cbn ].
-apply (sorted_app_iff Htra) in Hla.
-destruct Hla as (Hla & _ & Htrr).
-specialize (IHla _ Hla) as H1.
-destruct la as [| c]; cbn. {
-  clear Hla H1 IHla.
-  cbn - [ In ] in Htrr.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  specialize (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
-  now rewrite (Hant a b Hab Htrr).
-}
-...
-rewrite (Htrr c a (or_introl eq_refl) (or_introl eq_refl)).
-f_equal.
-cbn in H1.
-remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-destruct cb. {
-  injection H1; clear H1; intros H1.
-  rewrite <- app_assoc; cbn.
-  specialize (Htrr b a) as Hba.
-  cbn - [ In ] in Hba.
-  assert (H : b ∈ c :: la ++ [b]). {
-    rewrite app_comm_cons.
-    now apply in_or_app; right; left.
-  }
-  specialize (Hba H (or_introl eq_refl)); clear H.
-  now apply isort_insert_trans_r.
-}
-injection H1; clear H1; intros H1 H2; subst c.
-cbn in Hla.
-rewrite <- H1 in Hla.
-apply sorted_cons_iff in Hla; [ | easy ].
-destruct Hla as (_, Hla).
-specialize (Hla _ (or_introl eq_refl)).
-congruence.
-Qed.
-
-Theorem isort_loop_when_sorted : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ ls l,
-  sorted rel (ls ++ l)
-  → isort_loop rel ls l = ls ++ l.
-Proof.
-intros * Htra * Hs.
-revert ls Hs.
-induction l as [| a]; intros; cbn; [ now rewrite app_nil_r | ].
-assert (H : isort_insert rel a ls = ls ++ [a]). {
-  clear IHl.
-  assert (H : sorted rel (ls ++ [a])). {
-    rewrite List_app_cons, app_assoc in Hs.
-    now apply (sorted_app_iff Htra) in Hs.
-  }
-  clear l Hs; rename H into Hs.
-  now apply isort_insert_r_when_sorted.
-}
-rewrite H.
-symmetry.
-rewrite List_app_cons, app_assoc.
-symmetry.
-apply IHl.
-now rewrite <- app_assoc.
-Qed.
-
 Theorem select_first_sorted : ∀ A rel,
   transitive rel → ∀ (a b : A) la lb,
   sorted rel (a :: la)
@@ -2784,13 +2711,18 @@ Qed.
 (* main *)
 
 Theorem isort_when_sorted : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ l,
-  sorted rel l
-  → isort rel l = l.
+  ∀ l, sorted rel l → isort rel l = l.
 Proof.
-intros * Htra * Hs.
-now apply isort_loop_when_sorted.
+intros * Hs.
+induction l as [| a]; [ easy | cbn ].
+assert (H : sorted rel l) by now apply sorted_cons in Hs.
+specialize (IHl H); clear H.
+rewrite IHl; clear IHl.
+unfold sorted in Hs; cbn in Hs.
+destruct l as [| b]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+now cbn; rewrite Hab.
 Qed.
 
 Theorem ssort_when_sorted : ∀ A (rel : A → _),
@@ -2833,8 +2765,8 @@ Theorem sorted_isort : ∀ A (rel : A → _),
   → ∀ l, sorted rel (isort rel l).
 Proof.
 intros * Hto *.
-destruct l as [| a]; [ easy | cbn ].
-now apply sorted_isort_loop.
+induction l as [| a]; [ easy | cbn ].
+now apply sorted_isort_insert.
 Qed.
 
 Theorem sorted_ssort : ∀ A (rel : A → _),
@@ -2922,7 +2854,8 @@ Theorem permuted_isort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
   ∀ l, permutation eqb l (isort rel l).
 Proof.
 intros.
-apply (permuted_isort_loop rel Heqb [] l).
+induction l as [| a]; [ apply (permutation_refl Heqb) | cbn ].
+now apply permutation_cons_isort_insert.
 Qed.
 
 Theorem permuted_ssort : ∀ A (eqb rel : A → _) (Heqb : equality eqb),
@@ -3371,6 +3304,7 @@ Theorem isort_insert_isort_rank_insert : ∀ A B rel ia (f : B → A) lrank,
 Proof.
 intros.
 induction lrank as [| ib]; [ easy | cbn ].
+...
 destruct (rel (f ib) (f ia)); [ | easy ].
 cbn; f_equal.
 apply IHlrank.
