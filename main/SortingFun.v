@@ -45,19 +45,13 @@ Fixpoint is_sorted {A} (rel : A → A → bool) l :=
   match l with
   | [] => true
   | [a] => true
-  | a :: (b :: _) as la =>
-      if rel a b then is_sorted rel la
-      else if rel b a then false
-      else is_sorted rel la
+  | a :: (b :: _) as la => (rel a b && is_sorted rel la)%bool
   end.
 
 Fixpoint all_sorted A (rel : A → A → bool) a l :=
   match l with
   | [] => true
-  | b :: l' =>
-      if rel a b then all_sorted rel a l'
-      else if rel b a then false
-      else all_sorted rel a l'
+  | b :: l' => (rel a b && all_sorted rel a l')%bool
   end.
 
 Fixpoint is_strongly_sorted A (rel : A → A → bool) l :=
@@ -77,47 +71,33 @@ Proof.
 intros * Hs.
 cbn in Hs.
 destruct la as [| a']; [ easy | ].
-unfold sorted in Hs |-*.
-remember (a' :: la) as lb; cbn in Hs; subst lb.
-destruct (rel a a'); [ easy | now destruct (rel a' a) ].
+now apply Bool.andb_true_iff in Hs.
 Qed.
 
 Theorem sorted_strongly_sorted : ∀ A (rel : A → A → bool),
   transitive rel →
-  connected_relation rel →
   ∀ l, sorted rel l → strongly_sorted rel l.
 Proof.
-intros * Htra Hcon * Hs.
+intros * Htra * Hs.
 unfold sorted in Hs.
 unfold strongly_sorted.
 induction l as [| a]; [ easy | cbn ].
 rewrite IHl. 2: {
   destruct l as [| a']; [ easy | ].
-  now apply sorted_cons in Hs.
+  now apply Bool.andb_true_iff in Hs.
 }
 rewrite Bool.andb_true_r.
 clear IHl.
 induction l as [| b]; [ easy | cbn ].
 remember (b :: l) as lb; cbn in Hs; subst lb.
-(**)
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply IHl.
-  cbn in Hs |-*.
-  destruct l as [| c]; [ easy | ].
-  remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-  destruct bc; [ now rewrite (Htra a b c Hab Hbc) | ].
-  remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-  destruct cb; [ easy | ].
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac; [ easy | ].
-  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-  destruct ca; [ now rewrite (Htra c a b Hca Hab) in Hcb | easy ].
-}
-remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-destruct ba; [ easy | ].
-specialize (Hcon a b Hab Hba) as H; subst b.
-now apply IHl.
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hab, Hs).
+rewrite Hab; cbn.
+apply IHl; cbn in Hs |-*.
+destruct l as [| c]; [ easy | ].
+apply Bool.andb_true_iff in Hs.
+destruct Hs as (Hbc, Hs).
+now rewrite (Htra a b c Hab Hbc).
 Qed.
 
 Theorem strongly_sorted_sorted : ∀ A (rel : A → A → bool),
@@ -132,56 +112,55 @@ destruct Hs as (Ha, Hs).
 specialize (IHl Hs); cbn.
 destruct l as [| b]; [ easy | ].
 cbn in Ha.
-destruct (rel a b); [ easy | now destruct (rel b a) ].
+apply Bool.andb_true_iff in Ha.
+destruct Ha as (Hab, Ha).
+now rewrite Hab, IHl.
 Qed.
 
 Theorem all_sorted_forall : ∀ A (rel : A → _) a l,
   all_sorted rel a l = true
-  → ∀ b, b ∈ l → rel a b = true ∨ rel b a = false.
+  → ∀ b, b ∈ l → rel a b = true.
 Proof.
 intros * Hsal * Hb.
 induction l as [| c]; [ easy | ].
 destruct Hb as [Hb| Hb]. {
   subst c.
   cbn in Hsal.
-  destruct (rel a b); [ now left | ].
-  destruct (rel b a); [ easy | now right ].
+  now apply Bool.andb_true_iff in Hsal.
 }
 apply IHl; [ | easy ].
 cbn in Hsal.
-destruct (rel a c); [ easy | now destruct (rel c a) ].
+now apply Bool.andb_true_iff in Hsal.
 Qed.
 
 Theorem sorted_cons_iff : ∀ (A : Type) (rel : A → A → bool),
-  transitive rel →
-  connected_relation rel →
-  ∀ a la,
-    sorted rel (a :: la) ↔
-    sorted rel la ∧ (∀ b, b ∈ la → rel a b = true ∨ rel b a = false).
+  transitive rel
+  → ∀ a la,
+      sorted rel (a :: la) ↔
+      sorted rel la ∧ (∀ b, b ∈ la → rel a b = true).
 Proof.
-intros * Htra Hcon *.
+intros * Htra *.
 split; intros Hla. {
   split; [ now apply sorted_cons in Hla | ].
   intros b Hb.
   apply all_sorted_forall with (l := la); [ | easy ].
-  apply (sorted_strongly_sorted Htra) in Hla; [ | easy ].
+  apply (sorted_strongly_sorted Htra) in Hla.
   unfold strongly_sorted in Hla; cbn in Hla.
   now apply Bool.andb_true_iff in Hla.
 } {
   destruct Hla as (Hs & Hla).
   unfold sorted; cbn.
   destruct la as [| b]; [ easy | ].
-  specialize (Hla b (or_introl eq_refl)).
-  destruct Hla as [Hla| Hla]; rewrite Hla; [ easy | ].
-  now destruct (rel a b).
+  apply Bool.andb_true_iff.
+  split; [ | easy ].
+  now apply Hla; left.
 }
 Qed.
 
 Theorem sorted_rel : ∀ A (d : A) rel l,
   sorted rel l
   → ∀ i, S i < length l
-  → rel (nth i l d) (nth (S i) l d) = true ∨
-    rel (nth (S i) l d) (nth i l d) = false.
+  → rel (nth i l d) (nth (S i) l d) = true.
 Proof.
 intros * Hs i Hi.
 revert i Hi.
@@ -190,27 +169,22 @@ cbn in Hi.
 apply Nat.succ_lt_mono in Hi.
 destruct l as [| b]; [ easy | ].
 remember (b :: l) as l'; cbn in Hs |-*; subst l'.
-destruct i. {
-  cbn; unfold sorted in Hs.
-  remember (b :: l) as l'; cbn in Hs; subst l'.
-  destruct (rel a b); [ now left | ].
-  now destruct (rel b a); right.
-}
-apply IHl; [ | easy ].
-now apply sorted_cons in Hs.
+apply Bool.andb_true_iff in Hs.
+destruct i; [ easy | ].
+now apply IHl.
 Qed.
 
-(*
 Theorem strongly_sorted_if : ∀ A rel,
   transitive rel
   → ∀ l,
   strongly_sorted rel l
   → ∀ (d : A) i j,
-    i < j < length l
-    → rel (nth i l d) (nth j l d) = true ∨
-      rel (nth j l d) (nth i l d) = false.
+    i < length l
+    → j < length l
+    → i < j
+    → rel (nth i l d) (nth j l d) = true.
 Proof.
-intros * Htr * Hso * (Hij, Hj).
+intros * Htr * Hso * Hi Hj Hij.
 remember (j - i) as n eqn:Hn.
 replace j with (i + n) in * by flia Hn Hij.
 assert (Hnz : n ≠ 0) by flia Hij.
@@ -223,18 +197,6 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   apply sorted_rel; [ | easy ].
   now apply strongly_sorted_sorted.
 }
-rewrite <- Nat.add_succ_comm in Hj |-*.
-specialize (IHn Hnz (S i) Hj) as H1.
-destruct H1 as [H1| H1]. {
-  specialize (sorted_rel d) as H2.
-  assert (H : sorted rel l) by now apply strongly_sorted_sorted.
-  specialize (H2 _ _ H i); clear H.
-  assert (H : S i < length l) by flia Hj.
-  specialize (H2 H); clear H.
-  destruct H2 as [H2| H2]; [ left | right ]. {
-    now apply Htr with (b := nth (S i) l d).
-  }
-...
 apply Htr with (b := nth (S i) l d). 2: {
   rewrite <- Nat.add_succ_comm in Hj.
   rewrite <- Nat.add_succ_comm.
@@ -243,81 +205,21 @@ apply Htr with (b := nth (S i) l d). 2: {
 apply sorted_rel; [ | flia Hj ].
 now apply strongly_sorted_sorted.
 Qed.
-*)
 
 Theorem sorted_cons_cons_true_iff : ∀ A (rel : A → A -> bool) a b l,
   sorted rel (a :: b :: l)
-  ↔ (rel a b = true ∨ rel b a = false) ∧ sorted rel (b :: l).
+  ↔ rel a b = true ∧ sorted rel (b :: l).
 Proof.
 intros.
-unfold sorted.
-remember (b :: l) as l'; cbn; subst l'.
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  split; [ | easy ].
-  intros H.
-  split; [ now left | easy ].
-}
-split. {
-  intros H1.
-  destruct (rel b a); [ easy | ].
-  split; [ now right | easy ].
-}
-intros (H1, H2).
-destruct H1 as [H1| H1]; [ easy | now rewrite H1 ].
+apply Bool.andb_true_iff.
 Qed.
 
 Theorem sorted_extends : ∀ A (rel : A → _),
   transitive rel →
   ∀ a l,
   sorted rel (a :: l)
-  → ∀ b, b ∈ l → rel a b = true ∨ rel b a = false.
+  → ∀ b, b ∈ l → rel a b = true.
 Proof.
-intros * Htra * Hsort b Hb.
-revert a b Hsort Hb.
-induction l as [| c]; intros; [ easy | ].
-apply sorted_cons_cons_true_iff in Hsort.
-destruct Hsort as (Hac, Hsort).
-destruct Hb as [Hb| Hb]; [ now subst c | ].
-(**)
-destruct Hac as [Hac| Hca]. {
-  apply IHl; [ | easy ].
-  unfold sorted in Hsort |-*.
-  cbn in Hsort |-*.
-  destruct l as [| d]; [ easy | ].
-  remember (rel a d) as ad eqn:Had; symmetry in Had.
-  remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
-  destruct ad. {
-    destruct cd; [ easy | ].
-    remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
-    now destruct dc.
-  }
-  remember (rel d a) as da eqn:Hda; symmetry in Hda.
-  destruct da. {
-    destruct cd; [ now rewrite (Htra a c d Hac Hcd) in Had | ].
-    now rewrite (Htra d a c Hda Hac) in Hsort.
-  }
-  destruct cd; [ easy | ].
-  remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
-  now destruct dc.
-}
-apply IHl; [ | easy ].
-unfold sorted in Hsort |-*; cbn in Hsort |-*.
-destruct l as [| d]; [ easy | ].
-remember (rel a d) as ad eqn:Had; symmetry in Had.
-remember (rel c d) as cd eqn:Hcd; symmetry in Hcd.
-destruct ad. {
-  destruct cd; [ easy | ].
-  remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
-  now destruct dc.
-}
-remember (rel d a) as da eqn:Hda; symmetry in Hda.
-destruct da. {
-  destruct cd; [ now rewrite (Htra c d a Hcd Hda) in Hca | ].
-  remember (rel d c) as dc eqn:Hdc; symmetry in Hdc.
-  destruct dc; [ easy | ].
-(* mouais, bon, je le sens pas *)
-...
 intros * Htra * Hsort b Hb.
 induction l as [| c]; [ easy | ].
 apply sorted_cons_cons_true_iff in Hsort.
@@ -465,40 +367,13 @@ Fixpoint isort_insert {A} (rel : A → A → bool) a lsorted :=
       else a :: lsorted
   end.
 
-(*
 Fixpoint isort_loop {A} (rel : A → A → bool) lsorted l :=
   match l with
   | [] => lsorted
   | a :: l' => isort_loop rel (isort_insert rel a lsorted) l'
   end.
-*)
 
-Fixpoint isort {A} (rel : A → A → bool) l :=
-  match l with
-  | [] => []
-  | a :: l' =>
-      match isort rel l' with
-      | [] => [a]
-      | b :: l'' =>
-          if rel a b then a :: b :: l''
-          else if rel b a then isort_insert rel a (b :: l'')
-          else a :: b :: l''
-      end
-  end.
-
-Compute (
-  let rel := λ a b, fst a <? fst b in
-  is_sorted rel (
-  isort rel [(1,1);(7,1);(2,1);(3,1);(1,2);(8,1);(4,1)])).
-...
-  isort rel [(1, 2); (1, 1); (2, 1); (3, 1); (4, 1); (7, 1); (8, 1)]).
-  isort rel [(1, 1); (1, 2); (2, 1); (3, 1); (4, 1); (7, 1); (8, 1)]).
-).
-*)
-
-(*
 Definition isort {A} (rel : A → A → bool) := isort_loop rel [].
-*)
 
 (* ssort: sort by selection *)
 
@@ -1495,7 +1370,6 @@ cbn; f_equal.
 apply IHlsorted.
 Qed.
 
-(*
 Theorem isort_loop_length : ∀ A rel (lsorted l : list A),
   length (isort_loop rel lsorted l) = length lsorted + length l.
 Proof.
@@ -1505,21 +1379,11 @@ induction l as [| a]; intros; [ now cbn; rewrite Nat.add_0_r | cbn ].
 rewrite IHl, <- Nat.add_succ_comm; f_equal.
 apply isort_insert_length.
 Qed.
-*)
 
 Theorem isort_length : ∀ A rel (l : list A), length (isort rel l) = length l.
 Proof.
 intros.
-induction l as [| a]; [ easy | cbn ].
-remember (isort rel l) as l' eqn:Hl'; symmetry in Hl'.
-destruct l' as [| b]. {
-  now symmetry in IHl; apply length_zero_iff_nil in IHl; subst l.
-}
-rewrite <- IHl.
-destruct (rel a b); [ easy | ].
-destruct (rel b a); [ cbn | easy ].
-f_equal.
-apply isort_insert_length.
+apply isort_loop_length.
 Qed.
 
 (* ssort length *)
@@ -1639,7 +1503,6 @@ apply (permutation_cons_isort_insert rel Heqb).
 now apply permutation_refl.
 Qed.
 
-(*
 Theorem permuted_isort_loop_sorted : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb lc,
@@ -1684,7 +1547,6 @@ destruct x. {
   now apply permutation_app_comm.
 }
 Qed.
-*)
 
 (* in isort *)
 
@@ -1706,7 +1568,6 @@ apply IHlsorted in Ha.
 destruct Ha as [Ha| Ha]; [ now left | now right; right ].
 Qed.
 
-(*
 Theorem in_isort_loop : ∀ A (rel : A → A → bool) a lsorted l,
   a ∈ isort_loop rel lsorted l
   → a ∈ lsorted ∨ a ∈ l.
@@ -1723,27 +1584,12 @@ destruct Ha as [Ha| Ha]. {
   now right; right.
 }
 Qed.
-*)
 
 Theorem in_isort : ∀ A (rel : A → A → bool) a l, a ∈ isort rel l → a ∈ l.
 Proof.
 intros * Ha.
-revert a Ha.
-induction l as [| b]; intros; [ easy | ].
-cbn in Ha.
-remember (isort rel l) as l' eqn:Hl'; symmetry in Hl'.
-destruct l' as [| c]. {
-  destruct Ha; [ now left | easy ].
-}
-destruct (rel b c). {
-  destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
-}
-destruct (rel c b). {
-  destruct Ha as [Ha| Ha]; [ now right; apply IHl; left | ].
-  apply in_isort_insert in Ha.
-  destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl; right ].
-}
-destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
+apply in_isort_loop in Ha.
+now destruct Ha.
 Qed.
 
 Theorem isort_insert_trans_r : ∀ A (rel : A → _),
@@ -2046,7 +1892,6 @@ destruct ba. {
 }
 Qed.
 
-(*
 Theorem sorted_isort_loop : ∀ A (rel : A → _),
   total_relation rel →
   ∀ lsorted l,
@@ -2059,7 +1904,6 @@ induction l as [| a]; intros; [ easy | cbn ].
 apply IHl.
 now apply sorted_isort_insert.
 Qed.
-*)
 
 Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
   transitive rel →
@@ -2102,7 +1946,6 @@ specialize (Hla _ (or_introl eq_refl)).
 congruence.
 Qed.
 
-(*
 Theorem isort_loop_when_sorted : ∀ A (rel : A → _),
   transitive rel →
   ∀ ls l,
@@ -2128,7 +1971,6 @@ symmetry.
 apply IHl.
 now rewrite <- app_assoc.
 Qed.
-*)
 
 Theorem select_first_sorted : ∀ A rel,
   transitive rel → ∀ (a b : A) la lb,
@@ -3015,16 +2857,7 @@ Theorem isort_when_sorted : ∀ A (rel : A → _),
   → isort rel l = l.
 Proof.
 intros * Htra * Hs.
-induction l as [| a]; [ easy | cbn ].
-remember (isort rel l) as l' eqn:Hl'; symmetry in Hl'.
-rewrite <- IHl; [ | now apply sorted_cons in Hs ].
-rewrite <- IHl in Hs; [ | now apply sorted_cons in Hs ].
-destruct l' as [| b]; [ easy | ].
-remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ easy | ].
-unfold sorted in Hs.
-remember (b :: l') as l''; cbn in Hs; subst l''.
-now rewrite Hab in Hs.
+now apply isort_loop_when_sorted.
 Qed.
 
 Theorem ssort_when_sorted : ∀ A (rel : A → _),
@@ -3066,10 +2899,6 @@ Theorem sorted_isort : ∀ A (rel : A → _),
   total_relation rel
   → ∀ l, sorted rel (isort rel l).
 Proof.
-intros * Htot *.
-induction l as [| a]; [ easy | cbn ].
-remember (isort rel l)
-...
 intros * Hto *.
 destruct l as [| a]; [ easy | cbn ].
 now apply sorted_isort_loop.
