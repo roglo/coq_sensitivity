@@ -1821,46 +1821,15 @@ destruct ab. {
   }
   apply Bool.andb_true_iff in Hs.
   destruct Hs as (Hbc, Hs); cbn.
+  specialize (IHlsorted a Hs) as H1.
+  cbn in H1.
   remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac. {
-    remember (c :: lsorted) as l; cbn; subst l.
-    rewrite Hac, Hs, Bool.andb_true_r.
-    specialize (Htot a b) as Hba.
-    now rewrite Hab in Hba.
-  }
-  rewrite Hbc, Bool.andb_true_l.
-...
-  rewrite Hbc; cbn.
-  remember (isort_insert rel a lsorted) as l eqn:Hl.
-  symmetry in Hl.
-  destruct l as [| d]; [ easy | ].
-...
-  rewrite Hs, Bool.andb_true_r.
-  specialize (Htot b a) as Hab.
-  now rewrite Hba in Hab.
-...
-  destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
-  remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hbc, Hs).
-  rewrite IHlsorted; [ cbn | easy ].
-  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-  destruct ca; [ now rewrite Hbc | now rewrite Hba ].
-} {
+  rewrite H1.
+  destruct ac; [ | now rewrite Hbc ].
+  rewrite Bool.andb_true_r.
+  specialize (Htot a b) as Hba.
+  now rewrite Hab in Hba.
 }
-Qed.
-
-Theorem sorted_isort_loop : ∀ A (rel : A → _),
-  total_relation rel →
-  ∀ lsorted l,
-  sorted rel lsorted
-  → sorted rel (isort_loop rel lsorted l).
-Proof.
-intros * Htot * Hs.
-revert lsorted Hs.
-induction l as [| a]; intros; [ easy | cbn ].
-apply IHl.
-now apply sorted_isort_insert.
 Qed.
 
 Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
@@ -1877,6 +1846,7 @@ destruct Hla as (Hla & _ & Htrr).
 specialize (IHla _ Hla) as H1.
 destruct la as [| c]; cbn. {
   clear Hla H1.
+...
   now rewrite (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
 }
 rewrite (Htrr c a (or_introl eq_refl) (or_introl eq_refl)).
