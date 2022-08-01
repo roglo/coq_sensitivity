@@ -1518,24 +1518,28 @@ apply in_isort_insert in Ha.
 destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
 Qed.
 
+(*
 Theorem isort_insert_trans_r : ∀ A (rel : A → _),
   transitive rel →
   ∀ a b la,
-  rel a b = true
+  rel b a = false
   → isort_insert rel a la = la ++ [a]
   → isort_insert rel b (la ++ [a]) = la ++ [a; b].
 Proof.
-intros * Htra * Hab Hs.
-...
-induction la as [| c]; [ now cbn; rewrite Hab | cbn ].
-remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-destruct cb. 2: {
+intros * Htra * Hba Hs.
+revert a b Hba Hs.
+induction la as [| c]; intros; cbn; [ now rewrite Hba | ].
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc. {
   cbn in Hs.
-  remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-  destruct ca. 2: {
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
     injection Hs; clear Hs; intros Hs H1; subst c.
     congruence.
   }
+  injection Hs; clear Hs; intros Hs.
+  apply IHla with (b := b) in Hs; [ | easy ].
+...
   specialize (Htra c a b Hca Hab) as H1.
   congruence.
 }
@@ -1554,6 +1558,7 @@ destruct (rel a a); [ now f_equal | ].
 f_equal.
 apply repeat_cons.
 Qed.
+*)
 
 (* *)
 
@@ -1801,9 +1806,39 @@ Theorem sorted_isort_insert : ∀ A (rel : A → _),
 Proof.
 intros * Htot * Hs.
 unfold sorted in Hs |-*.
-induction lsorted as [| b]; [ easy | cbn ].
-remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-destruct ba. {
+revert a Hs.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  remember (b :: lsorted) as l; cbn; subst l.
+  now rewrite Hs, Hab.
+} {
+  cbn in Hs |-*.
+  destruct lsorted as [| c]. {
+    cbn; rewrite Bool.andb_true_r.
+    specialize (Htot a b) as Hba.
+    now rewrite Hab in Hba.
+  }
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hbc, Hs); cbn.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
+    remember (c :: lsorted) as l; cbn; subst l.
+    rewrite Hac, Hs, Bool.andb_true_r.
+    specialize (Htot a b) as Hba.
+    now rewrite Hab in Hba.
+  }
+  rewrite Hbc, Bool.andb_true_l.
+...
+  rewrite Hbc; cbn.
+  remember (isort_insert rel a lsorted) as l eqn:Hl.
+  symmetry in Hl.
+  destruct l as [| d]; [ easy | ].
+...
+  rewrite Hs, Bool.andb_true_r.
+  specialize (Htot b a) as Hab.
+  now rewrite Hba in Hab.
+...
   destruct lsorted as [| c]; [ now cbn; rewrite Hba | ].
   remember (c :: lsorted) as l; cbn in Hs |-*; subst l.
   apply Bool.andb_true_iff in Hs.
@@ -1812,10 +1847,6 @@ destruct ba. {
   remember (rel c a) as ca eqn:Hca; symmetry in Hca.
   destruct ca; [ now rewrite Hbc | now rewrite Hba ].
 } {
-  remember (b :: lsorted) as l; cbn; subst l.
-  rewrite Hs, Bool.andb_true_r.
-  specialize (Htot b a) as Hab.
-  now rewrite Hba in Hab.
 }
 Qed.
 
