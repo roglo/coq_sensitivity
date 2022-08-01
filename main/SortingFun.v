@@ -1833,22 +1833,27 @@ destruct ab. {
 Qed.
 
 Theorem isort_insert_r_when_sorted : ∀ A (rel : A → _),
+  antisymmetric rel →
   transitive rel →
   ∀ a la,
   sorted rel (la ++ [a])
   → isort_insert rel a la = la ++ [a].
 Proof.
-intros * Htra * Hla.
+intros * Hant Htra * Hla.
 revert a Hla.
 induction la as [| b] using rev_ind; intros; [ easy | cbn ].
 apply (sorted_app_iff Htra) in Hla.
 destruct Hla as (Hla & _ & Htrr).
 specialize (IHla _ Hla) as H1.
 destruct la as [| c]; cbn. {
-  clear Hla H1.
-...
-  now rewrite (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
+  clear Hla H1 IHla.
+  cbn - [ In ] in Htrr.
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  specialize (Htrr b a (or_introl eq_refl) (or_introl eq_refl)).
+  now rewrite (Hant a b Hab Htrr).
 }
+...
 rewrite (Htrr c a (or_introl eq_refl) (or_introl eq_refl)).
 f_equal.
 cbn in H1.
