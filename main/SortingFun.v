@@ -3324,6 +3324,34 @@ apply Hls.
 now right.
 Qed.
 
+Theorem nth_isort_rank_insert_of_sorted' :
+  ∀ A d (rel : A → _) l_ini n ls,
+  (∀ i, i ∈ ls → rel (nth i l_ini d) (nth n l_ini d) = true)
+  → isort_rank_insert rel (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
+Proof.
+intros * Hls.
+Print isort_rank_insert.
+induction ls as [| b]; [ easy | cbn ].
+(**)
+remember (rel (nth n l_ini d) (nth b l_ini d)) as nb eqn:Hnb; symmetry in Hnb.
+destruct nb. 2: {
+  f_equal.
+  apply IHls.
+  intros i Hi.
+  now apply Hls; right.
+}
+specialize (Hls _ (or_introl eq_refl)) as Hbn.
+Abort. (*
+...
+rewrite Hls; [ | now left ].
+f_equal.
+apply IHls.
+intros j Hj.
+apply Hls.
+now right.
+Qed.
+*)
+
 Theorem nth_isort_rank_loop_of_nodup_sorted : ∀ A d (rel : A → _),
   transitive rel
   → ∀ l_ini n l i,
@@ -3342,6 +3370,9 @@ induction l; intros; cbn. {
 rewrite seq_length.
 replace (isort_rank_insert _ _ _ _) with (seq 0 (S n)). 2: {
   symmetry.
+Check nth_isort_rank_insert_of_sorted.
+Print isort_rank_insert.
+...
   rewrite nth_isort_rank_insert_of_sorted; try easy. {
     symmetry; apply seq_S.
   }
