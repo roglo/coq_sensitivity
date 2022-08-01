@@ -362,18 +362,14 @@ Qed.
 Fixpoint isort_insert {A} (rel : A → A → bool) a lsorted :=
   match lsorted with
   | [] => [a]
-  | b :: l =>
-      if rel b a then b :: isort_insert rel a l
-      else a :: lsorted
+  | b :: l => if rel a b then a :: lsorted else b :: isort_insert rel a l
   end.
 
-Fixpoint isort_loop {A} (rel : A → A → bool) lsorted l :=
+Fixpoint isort {A} (rel : A → A → bool) l :=
   match l with
-  | [] => lsorted
-  | a :: l' => isort_loop rel (isort_insert rel a lsorted) l'
+  | [] => []
+  | a :: l' => isort_insert rel a (isort rel l')
   end.
-
-Definition isort {A} (rel : A → A → bool) := isort_loop rel [].
 
 (* ssort: sort by selection *)
 
@@ -1365,25 +1361,16 @@ Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
 Proof.
 intros.
 induction lsorted as [| b]; intros; [ easy | cbn ].
-destruct (rel b a); [ | easy ].
-cbn; f_equal.
-apply IHlsorted.
-Qed.
-
-Theorem isort_loop_length : ∀ A rel (lsorted l : list A),
-  length (isort_loop rel lsorted l) = length lsorted + length l.
-Proof.
-intros.
-revert lsorted.
-induction l as [| a]; intros; [ now cbn; rewrite Nat.add_0_r | cbn ].
-rewrite IHl, <- Nat.add_succ_comm; f_equal.
-apply isort_insert_length.
+destruct (rel a b); [ easy | ].
+now cbn; f_equal.
 Qed.
 
 Theorem isort_length : ∀ A rel (l : list A), length (isort rel l) = length l.
 Proof.
 intros.
-apply isort_loop_length.
+induction l as [| a]; [ easy | cbn ].
+rewrite <- IHl.
+apply isort_insert_length.
 Qed.
 
 (* ssort length *)
@@ -1413,7 +1400,7 @@ Theorem in_isort_insert_id : ∀ A (rel : A → _) a l,
 Proof.
 intros.
 induction l as [| b]; [ now left | cbn ].
-now destruct (rel b a); [ right | left ].
+now destruct (rel a b); [ left | right ].
 Qed.
 
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
@@ -1448,11 +1435,12 @@ induction la as [| b]; intros. {
   now destruct bef.
 }
 cbn in Hli.
-remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-destruct ba. 2: {
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. 2: {
   destruct bef as [| c]. {
     cbn in Hli.
-    injection Hli; clear Hli; intros; subst aft; cbn.
+    injection Hli; clear Hli; intros; subst aft; cbn; subst b.
+...
     now apply permutation_refl.
   }
   cbn in Hli.
