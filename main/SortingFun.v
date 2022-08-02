@@ -503,24 +503,15 @@ Fixpoint isort_rank_insert {A B} (rel : A → A → bool) (f : B → A) ia lrank
       else ib :: isort_rank_insert rel f ia l
   end.
 
-Fixpoint isort_rank_loop {A} (rel : A → A → bool) f lrank (l : list A) :=
-  match l with
-  | [] => lrank
-  | _ :: l' =>
-      isort_rank_loop rel f (isort_rank_insert rel f (length lrank) lrank) l'
-  end.
-
-Definition isort_rank {A} (rel : A → A → bool) l :=
+Fixpoint isort_rank {A} (rel : A → A → bool) (l : list A) :=
   match l with
   | [] => []
-  | d :: _ => isort_rank_loop rel (λ i, nth i l d) [] l
+  | d :: l' =>
+      isort_rank_insert rel (λ i, nth i l d) 0 (map S (isort_rank rel l'))
   end.
 
-...
-
-Print isort_insert.
-
-(**)
+(*
+Compute (let l := [7;2] in isort_rank Nat.leb l).
 Compute (let l := [2;7;1] in isort_rank Nat.leb l).
 Compute (let l := [5;10;2;7;0] in isort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in isort_rank Nat.leb l).
@@ -3058,27 +3049,14 @@ destruct (rel (f ia) (f ib)); [ easy | cbn ].
 now rewrite IHlrank.
 Qed.
 
-Theorem isort_rank_loop_length : ∀ A rel (f : _ → A) lrank l,
-  length (isort_rank_loop rel f lrank l) = length lrank + length l.
-Proof.
-intros.
-revert lrank.
-induction l as [| b]; intros; [ easy | cbn ].
-rewrite IHl.
-rewrite isort_rank_insert_length.
-apply Nat.add_succ_comm.
-Qed.
-
 Theorem isort_rank_length : ∀ A rel (l : list A),
   length (isort_rank rel l) = length l.
 Proof.
 intros.
-unfold isort_rank.
-destruct l as [| d]; [ easy | ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'.
-rename l' into l.
-apply isort_rank_loop_length.
+induction l as [| d]; [ easy | ].
+cbn - [ nth ].
+rewrite isort_rank_insert_length.
+now rewrite map_length; f_equal.
 Qed.
 
 Theorem isort_rank_insert_nth_indep : ∀ A rel (d d' : A) ia lrank l_ini,
@@ -3116,6 +3094,23 @@ specialize (IHlrank Hil).
 destruct IHlrank as [Hi| Hi]; [ now subst i; left | now right; right ].
 Qed.
 
+Theorem in_isort_rank : ∀ A (rel : A → _) l i,
+  i ∈ isort_rank rel l → i < length l.
+Proof.
+intros * Hi.
+revert i Hi.
+induction l as [| a]; intros; [ easy | ].
+cbn.
+cbn - [ nth ] in Hi.
+apply in_isort_rank_insert in Hi.
+destruct Hi as [Hi| Hi]; [ now subst i | ].
+apply in_map_iff in Hi.
+destruct Hi as (j & Hj & Hi); subst i.
+apply -> Nat.succ_lt_mono.
+now apply IHl.
+Qed.
+
+(*
 Theorem isort_rank_loop_nth_indep : ∀ A rel (d d' : A) lrank l_ini l,
   length lrank + length l ≤ length l_ini
   → (∀ i, i ∈ lrank → i < length l_ini)
@@ -3134,6 +3129,7 @@ apply in_isort_rank_insert in Hi.
 destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
 now apply Hil.
 Qed.
+*)
 
 Theorem isort_rank_insert_ub : ∀ A (rel : A → _) ia lrank f i n,
   ia < n
@@ -3166,63 +3162,18 @@ destruct x. {
 }
 Qed.
 
-Theorem isort_rank_loop_ub : ∀ A (rel : A → _) f lrank l i,
-  length lrank + length l ≠ 0
-  → (∀ i, i ∈ lrank → i < length lrank + length l)
-  → nth i (isort_rank_loop rel f lrank l) 0 <
-    length lrank + length l.
-Proof.
-intros * Hlz Hil.
-destruct (lt_dec i (length lrank + length l)) as [Hir| Hir]. 2: {
-  apply Nat.nlt_ge in Hir.
-  rewrite nth_overflow; [ | now rewrite isort_rank_loop_length ].
-  now apply Nat.neq_0_lt_0.
-}
-clear Hlz.
-revert lrank Hil Hir.
-induction l as [| b]; intros. {
-  rewrite Nat.add_0_r in Hir.
-  now apply Hil, nth_In.
-}
-cbn in Hir |-*.
-rewrite <- Nat.add_succ_comm in Hir |-*.
-specialize (in_isort_rank_insert) as H1.
-specialize (H1 A nat rel f (length lrank) lrank).
-remember (isort_rank_insert rel f (length lrank) lrank) as lr' eqn:Hlr'.
-specialize isort_rank_insert_length as H2.
-specialize (H2 A nat rel f (length lrank) lrank).
-rewrite <- Hlr' in H2.
-rewrite <- H2 in Hir |-*.
-apply IHl; [ | easy ].
-intros j Hj.
-rewrite H2, Nat.add_succ_comm.
-rewrite Hlr' in Hj.
-apply in_isort_rank_insert in Hj.
-destruct Hj as [Hj| Hj]; [ subst j; flia | ].
-now apply Hil.
-Qed.
-
 Theorem isort_rank_ub : ∀ A rel (l : list A) i,
   l ≠ [] → nth i (isort_rank rel l) 0 < length l.
 Proof.
 intros * Hlz.
 destruct l as [| ia]; [ easy | clear Hlz ].
 cbn - [ nth ].
-apply isort_rank_loop_ub; [ easy | ].
+apply isort_rank_insert_ub; [ easy | ].
 intros j Hj.
-destruct Hj; [ now subst j; cbn | easy ].
-Qed.
-
-Theorem in_isort_rank_lt : ∀ A (rel : A → _) l i,
-  i ∈ isort_rank rel l → i < length l.
-Proof.
-intros * Hi.
-apply (In_nth _ _ 0) in Hi.
-destruct Hi as (j & Hjl & Hji).
-rewrite isort_rank_length in Hjl.
-rewrite <- Hji.
-apply isort_rank_ub.
-now intros H; subst l.
+apply in_map_iff in Hj.
+destruct Hj as (k & Hk & Hj); subst j.
+apply -> Nat.succ_lt_mono.
+now apply in_isort_rank in Hj.
 Qed.
 
 Theorem NoDup_isort_rank_insert : ∀ A (d : A) rel l_ini ia lrank,
@@ -3253,45 +3204,19 @@ subst ib; apply Hia.
 now left.
 Qed.
 
-Theorem NoDup_isort_rank_loop : ∀ A d rel l_ini (l : list A) lrank,
-  NoDup lrank
-  → AllLt lrank (length lrank)
-  → NoDup (isort_rank_loop rel (λ k, nth k l_ini d) lrank l).
-Proof.
-intros * Hnd Halt.
-revert lrank Hnd Halt.
-induction l as [| a]; intros; [ easy | cbn ].
-apply IHl.
-apply NoDup_isort_rank_insert. 2: {
-  rewrite isort_rank_insert_length.
-  intros i Hi.
-  apply in_isort_rank_insert in Hi.
-  destruct Hi as [Hi| Hi]; [ now rewrite Hi | ].
-  specialize (Halt _ Hi) as H1.
-  flia H1.
-}
-apply NoDup_cons_iff.
-split; [ | easy ].
-intros H.
-specialize (Halt _ H) as H1.
-now apply Nat.lt_irrefl in H1.
-Qed.
-
 Theorem NoDup_isort_rank : ∀ A rel (l : list A), NoDup (isort_rank rel l).
 Proof.
 intros.
-apply (proj2 (NoDup_nth _ 0)).
-rewrite isort_rank_length.
-intros i j Hi Hj Hij.
-destruct l as [| d]; [ easy | ].
-unfold isort_rank in Hij.
-specialize (NoDup_isort_rank_loop d rel (d :: l) (d :: l) (NoDup_nil _)) as H1.
-assert (H : AllLt [] (length ([] : list nat))) by easy.
-specialize (H1 H); clear H.
-specialize (proj1 (NoDup_nth _ 0) H1) as H2.
-rewrite isort_rank_loop_length in H2.
-rewrite Nat.add_0_l in H2.
-apply (H2 i j Hi Hj Hij).
+induction l as [| d]; [ constructor | ].
+cbn - [ nth ].
+apply NoDup_isort_rank_insert.
+constructor. {
+  intros H; apply in_map_iff in H.
+  now destruct H as (i & Hi & H).
+}
+apply FinFun.Injective_map_NoDup; [ | easy ].
+intros i j Hij.
+now apply Nat.succ_inj in Hij.
 Qed.
 
 Theorem eq_isort_rank_nil : ∀ A (rel : A → _) l,
@@ -3324,6 +3249,7 @@ Compute (
   let l := [(3,1);(1,1);(7,1);(1,2);(8,1);(2,1)] in
   let d := (0, 0) in
   isort rel l = map (λ i, nth i l d) (isort_rank rel l)).
+...
 Print isort_rank_loop.
 ...
 induction l as [| d' l]; [ easy | ].
