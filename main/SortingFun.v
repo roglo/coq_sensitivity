@@ -516,7 +516,11 @@ Definition isort_rank {A} (rel : A → A → bool) l :=
   | d :: _ => isort_rank_loop rel (λ i, nth i l d) [] l
   end.
 
-(*
+...
+
+Print isort_insert.
+
+(**)
 Compute (let l := [2;7;1] in isort_rank Nat.leb l).
 Compute (let l := [5;10;2;7;0] in isort_rank Nat.leb l).
 Compute (let l := [5;2;2;7;0] in isort_rank Nat.leb l).
@@ -3309,114 +3313,38 @@ destruct (rel (f ia) (f ib)); [ easy | ].
 now cbn; f_equal.
 Qed.
 
-Theorem nth_isort_rank_insert_of_sorted :
-  ∀ A d (rel : A → _) l_ini n ls,
-  (∀ i, i ∈ ls → rel (nth n l_ini d) (nth i l_ini d) = false)
-  → isort_rank_insert rel (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
-Proof.
-intros * Hls.
-induction ls as [| b]; [ easy | cbn ].
-rewrite Hls; [ | now left ].
-f_equal.
-apply IHls.
-intros j Hj.
-apply Hls.
-now right.
-Qed.
-
-Theorem nth_isort_rank_insert_of_sorted' :
-  ∀ A d (rel : A → _) l_ini n ls,
-  (∀ i, i ∈ ls → rel (nth i l_ini d) (nth n l_ini d) = true)
-  → isort_rank_insert rel (λ j : nat, nth j l_ini d) n ls = ls ++ [n].
-Proof.
-intros * Hls.
-Print isort_rank_insert.
-induction ls as [| b]; [ easy | cbn ].
-(**)
-remember (rel (nth n l_ini d) (nth b l_ini d)) as nb eqn:Hnb; symmetry in Hnb.
-destruct nb. 2: {
-  f_equal.
-  apply IHls.
-  intros i Hi.
-  now apply Hls; right.
-}
-specialize (Hls _ (or_introl eq_refl)) as Hbn.
-Abort. (*
-...
-rewrite Hls; [ | now left ].
-f_equal.
-apply IHls.
-intros j Hj.
-apply Hls.
-now right.
-Qed.
-*)
-
-Theorem nth_isort_rank_loop_of_nodup_sorted : ∀ A d (rel : A → _),
-  transitive rel
-  → ∀ l_ini n l i,
-  NoDup l_ini
-  → sorted rel l_ini
-  → n + length l = length l_ini
-  → i < length l_ini
-  → nth i (isort_rank_loop rel (λ j, nth j l_ini d) (seq 0 n) l) 0 = i.
-Proof.
-intros * Htra * Hndi Hsi Hnl Hil.
-revert n Hnl.
-induction l; intros; cbn. {
-  rewrite seq_nth; [ easy | ].
-  now rewrite Nat.add_0_r in Hnl; subst n.
-}
-rewrite seq_length.
-replace (isort_rank_insert _ _ _ _) with (seq 0 (S n)). 2: {
-  symmetry.
-Check nth_isort_rank_insert_of_sorted.
-Print isort_rank_insert.
-...
-  rewrite nth_isort_rank_insert_of_sorted; try easy. {
-    symmetry; apply seq_S.
-  }
-  intros j Hj.
-  apply in_seq in Hj.
-  destruct Hj as (_, Hj); cbn in Hj.
-Check sorted_any.
-...
-  apply sorted_any; [ easy | easy | easy | ].
-  rewrite <- Hnl; cbn; flia.
-}
-cbn in Hnl.
-rewrite <- Nat.add_succ_comm in Hnl.
-now apply IHl.
-Qed.
-*)
-
-Theorem nth_isort_rank_of_nodup_sorted : ∀ A (rel : A → _),
-  transitive rel
-  → ∀ l i,
-  NoDup l
-  → sorted rel l
-  → i < length l
-  → nth i (isort_rank rel l) 0 = i.
-Proof.
-intros * Htra * Hnd Hs Hil.
-destruct l as [| d]; [ easy | ].
-cbn - [ isort_rank_loop nth ].
-remember (d :: l) as l' eqn:Hl'.
-clear l Hl'; rename l' into l.
-replace [] with (seq 0 0) by easy.
-...
-now apply nth_isort_rank_loop_of_nodup_sorted.
-Qed.
-
 (* *)
 
 Theorem isort_isort_rank : ∀ A (rel : A → A → bool) (d : A) l,
   isort rel l = map (λ i, nth i l d) (isort_rank rel l).
 Proof.
 intros.
-destruct l as [| d' l]; [ easy | ].
+Compute (
+  let rel := λ a b, fst a <=? fst b in
+  let l := [(3,1);(1,1);(7,1);(1,2);(8,1);(2,1)] in
+  let d := (0, 0) in
+  isort rel l = map (λ i, nth i l d) (isort_rank rel l)).
+Print isort_rank_loop.
+...
+induction l as [| d' l]; [ easy | ].
 cbn - [ nth ].
+Check isort_insert_isort_rank_insert.
+...
+set (f := λ i, nth i (d' :: l) d).
+replace d' with (f 0) by easy.
+rewrite IHl.
+...
+replace d' with (f 0). 2: {
+  unfold f.
+Print isort_rank_loop.
+...
+set (f := λ i, (nth i (d' :: l) d)).
+replace d' with ((λ i, (nth i (d' :: l) d)) 0) by easy.
+Check isort_insert_isort_rank_insert.
+rewrite isort_insert_isort_rank_insert.
+...
 replace [d'] with (map (λ i, nth i (d' :: l) d) [0]) by easy.
+...
 rewrite isort_loop_isort_rank_loop with (d := d').
 cbn - [ nth ].
 f_equal. 2: {
@@ -3426,31 +3354,6 @@ f_equal. 2: {
 apply isort_rank_loop_nth_indep; [ easy | ].
 intros i Hi.
 destruct Hi as [Hi| Hi]; [ subst i; cbn; easy | easy ].
-Qed.
-
-Theorem isort_rank_of_nodup_sorted : ∀ A (rel : A → _),
-  antisymmetric rel
-  → transitive rel
-  → ∀ l,
-  NoDup l
-  → sorted rel l
-  → isort_rank rel l = seq 0 (length l).
-Proof.
-intros * Hant Htra * Hnd Hs.
-apply List_eq_iff.
-rewrite isort_rank_length, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length l)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite isort_rank_length ].
-  rewrite nth_overflow; [ | now rewrite seq_length ].
-  easy.
-}
-rewrite seq_nth; [ cbn | easy ].
-rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
-clear d.
-now apply nth_isort_rank_of_nodup_sorted.
 Qed.
 
 (* *)
