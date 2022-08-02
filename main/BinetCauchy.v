@@ -4253,19 +4253,53 @@ Theorem isort_app : ∀ A (rel : A → _) la lb,
 Theorem isort_app : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →
+  total_relation rel →
   connected_relation rel →
   ∀ la lb,
   isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
 Proof.
 (*
-intros * Hant Htra Hcon *.
+intros * Hant Htra Htot *.
 revert la.
-induction lb as [| b]; intros; cbn.
+induction lb as [| b]; intros; cbn. {
+  do 2 rewrite app_nil_r.
+  symmetry.
+  apply isort_when_sorted.
+  now apply sorted_isort.
+}
+rewrite List_app_cons, app_assoc.
+rewrite IHlb.
+symmetry; rewrite List_app_cons.
+rewrite app_assoc.
+rewrite IHlb.
+symmetry.
+...
+Compute (
+  let rel := λ a b, fst a <=? fst b in
+  let la := [(1, 2); (1, 3); (1, 4)] in
+  let lb := [(2, 1); (7, 1); (1, 1); (5, 1)] in
+  isort rel (la ++ lb) = isort rel (isort rel la ++ lb)).
+...
+Compute (
+  let rel := λ a b, fst a <? fst b in
+  let la := [(1, 2); (1, 3); (1, 4)] in
+  is_sorted rel (isort rel la)).
+...
 2: {
 rewrite List_app_cons, app_assoc.
 rewrite IHlb.
 ...
 *)
+intros * Hant Htra Htot Hcon *.
+Check isort_when_permuted.
+...
+destruct la as [| a]; [ easy | cbn ].
+rewrite isort_insert_isort; [ | easy | easy ].
+destruct la as [| b]; [ easy | cbn ].
+destruct la as [| c]. {
+  cbn.
+Check isort_insert_isort.
+...
 intros * Hant Htra Hcon *.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
@@ -4275,9 +4309,9 @@ induction lb as [| b]; intros; cbn. {
   do 2 rewrite app_nil_r.
   now apply isort_insert_isort.
 }
+rewrite isort_insert_isort; [ | easy | easy ].
+rewrite isort_insert_isort; [ | easy | easy ].
 ...
-rewrite isort_insert_isort; [ | easy | easy ].
-rewrite isort_insert_isort; [ | easy | easy ].
 rewrite List_app_cons, app_assoc; symmetry.
 rewrite List_app_cons, app_assoc; symmetry.
 f_equal.
