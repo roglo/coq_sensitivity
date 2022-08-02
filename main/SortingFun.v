@@ -3244,42 +3244,19 @@ Theorem isort_isort_rank : ∀ A (rel : A → A → bool) (d : A) l,
   isort rel l = map (λ i, nth i l d) (isort_rank rel l).
 Proof.
 intros.
-Compute (
-  let rel := λ a b, fst a <=? fst b in
-  let l := [(3,1);(1,1);(7,1);(1,2);(8,1);(2,1)] in
-  let d := (0, 0) in
-  isort rel l = map (λ i, nth i l d) (isort_rank rel l)).
-...
-Print isort_rank_loop.
-...
 induction l as [| d' l]; [ easy | ].
 cbn - [ nth ].
-Check isort_insert_isort_rank_insert.
-...
-set (f := λ i, nth i (d' :: l) d).
-replace d' with (f 0) by easy.
 rewrite IHl.
-...
-replace d' with (f 0). 2: {
-  unfold f.
-Print isort_rank_loop.
-...
-set (f := λ i, (nth i (d' :: l) d)).
-replace d' with ((λ i, (nth i (d' :: l) d)) 0) by easy.
-Check isort_insert_isort_rank_insert.
-rewrite isort_insert_isort_rank_insert.
-...
-replace [d'] with (map (λ i, nth i (d' :: l) d) [0]) by easy.
-...
-rewrite isort_loop_isort_rank_loop with (d := d').
-cbn - [ nth ].
-f_equal. 2: {
-  intros i Hi; cbn.
-  now apply nth_indep.
+rewrite isort_rank_insert_nth_indep with (d' := d); [ | now cbn | ]. 2: {
+  intros i Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hj & Hi); subst i.
+  cbn; apply -> Nat.succ_lt_mono.
+  now apply in_isort_rank in Hi.
 }
-apply isort_rank_loop_nth_indep; [ easy | ].
-intros i Hi.
-destruct Hi as [Hi| Hi]; [ subst i; cbn; easy | easy ].
+rewrite <- isort_insert_isort_rank_insert.
+rewrite List_nth_0_cons.
+now rewrite map_map.
 Qed.
 
 (* *)
@@ -3308,6 +3285,7 @@ induction l as [| c]; intros; cbn. {
 remember (rel c a) as ca eqn:Hca; symmetry in Hca.
 remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
 destruct ca, cb; cbn. {
+...
   rewrite Hca, Hcb.
   now rewrite IHl.
 } {
