@@ -4186,9 +4186,7 @@ specialize Nat.ltb_irrefl as Hirr.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_trans as Htra.
-rewrite isort_when_sorted; cycle 1. {
-  now apply transitive_list_ltb.
-} {
+rewrite isort_when_sorted. 2: {
   rewrite <- list_prodn_prodn_repeat.
   apply sorted_filter; [ now apply transitive_list_ltb | ].
   apply list_prodn_repeat_seq_sorted.
@@ -4244,8 +4242,13 @@ intros * Hs.
 now apply glop.
 cbn.
 *)
-destruct la as [| a]; [ easy | cbn ].
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite IHla.
+Search (isort_insert _ _ (_ ++ _)).
+...
 destruct la as [| b]; [ easy | cbn ].
+...
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. 2: {
   remember (rel b a) as ba eqn:Hba; symmetry in Hba.
@@ -4255,6 +4258,7 @@ destruct ab. 2: {
     destruct la as [| b]; cbn; [ now destruct (rel a a) | ].
     remember (rel a b) as ab eqn:Hab; symmetry in Hab.
     destruct ab; cbn.
+...
 Compute (
   let rel := λ a b, fst a <? fst b in
   let la := [(1, 2); (1, 3); (1, 4)] in
