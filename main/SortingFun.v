@@ -3068,27 +3068,6 @@ apply -> Nat.succ_lt_mono.
 now apply IHl.
 Qed.
 
-(*
-Theorem isort_rank_loop_nth_indep : ∀ A rel (d d' : A) lrank l_ini l,
-  length lrank + length l ≤ length l_ini
-  → (∀ i, i ∈ lrank → i < length l_ini)
-  → isort_rank_loop rel (λ i, nth i l_ini d) lrank l =
-    isort_rank_loop rel (λ i, nth i l_ini d') lrank l.
-Proof.
-intros * Hia Hil.
-revert lrank Hia Hil.
-induction l as [| b]; intros; [ easy | ].
-cbn - [ nth ] in Hia |-*.
-rewrite isort_rank_insert_nth_indep with (d' := d'); [ | flia Hia | easy ].
-rewrite <- Nat.add_succ_comm in Hia.
-rewrite IHl; [ easy | now rewrite isort_rank_insert_length | ].
-intros i Hi.
-apply in_isort_rank_insert in Hi.
-destruct Hi as [Hi| Hi]; [ subst i; flia Hia | ].
-now apply Hil.
-Qed.
-*)
-
 Theorem isort_rank_insert_ub : ∀ A (rel : A → _) ia lrank f i n,
   ia < n
   → (∀ i, i ∈ lrank → i < n)
@@ -3506,64 +3485,55 @@ Qed.
 
 (* *)
 
-Theorem isort_insert_filter : ∀ A (leb : A → _),
+Theorem filter_isort_insert : ∀ A (leb : A → _),
   transitive leb →
   ∀ la b f,
-  f b = true
-  → sorted leb la
-  → isort_insert leb b (filter f la) = filter f (isort_insert leb b la).
+  sorted leb la
+  → filter f (isort_insert leb b la) =
+      if f b then isort_insert leb b (filter f la)
+      else filter f la.
 Proof.
-intros * Htra * Hfb Hs.
-revert b Hfb.
-induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
+intros * Htra * Hs.
+revert b.
+induction la as [| a]; intros; cbn; [ easy | ].
 assert (H : sorted leb la) by now apply sorted_cons in Hs.
 specialize (IHla H); clear H.
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
 remember (leb b a) as ba eqn:Hba; symmetry in Hba.
 destruct fa; cbn. {
   rewrite Hba.
-  destruct ba; cbn; rewrite Hfa; [ now rewrite Hfb | ].
-  now f_equal; apply IHla.
+  destruct ba; cbn; rewrite Hfa; [ easy | ].
+  rewrite IHla.
+  now destruct (f b).
 }
 destruct ba; cbn; rewrite Hfa; [ | now apply IHla ].
-rewrite Hfb.
-rewrite IHla; [ | easy ].
-destruct la as [| a']; cbn; [ now rewrite Hfb | ].
-apply (sorted_cons_iff Htra) in Hs.
-destruct Hs as (Hs & Haa').
-specialize (Haa' _ (or_introl eq_refl)).
-rewrite (Htra b a a' Hba Haa'); cbn.
-now rewrite Hfb.
-Qed.
-
-(*
-Theorem isort_loop_filter : ∀ A (leb : A → _),
-  transitive leb →
-  total_relation leb →
-  ∀ la lb f,
-  sorted leb la
-  → isort_loop leb (filter f la) (filter f lb) =
-    filter f (isort_loop leb la lb).
-Proof.
-intros * Htra Htot * Hs.
-revert la Hs.
-induction lb as [| b]; intros; [ easy | cbn ].
-rewrite <- IHlb; [ | now apply sorted_isort_insert ].
 remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-destruct fb; cbn; f_equal; [ now apply isort_insert_filter | ].
-induction la as [| a]; cbn; [ now rewrite Hfb | ].
-remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-remember (leb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; cbn; [ | now rewrite Hfb, Hfa ].
-rewrite Hfa.
-destruct fa. {
-  f_equal; apply IHla.
-  now apply sorted_cons in Hs.
+destruct fb; [ | easy ].
+specialize (IHla b) as H1.
+rewrite Hfb in H1.
+rewrite <- H1; clear H1 IHla Hfa.
+revert b Hba Hfb.
+induction la as [| c]; intros; cbn; [ now rewrite Hfb | ].
+remember (f c) as fc eqn:Hfc; symmetry in Hfc.
+remember (leb b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct fc. {
+  destruct bc; cbn; rewrite Hfc; [ now rewrite Hfb | ].
+  unfold sorted in Hs.
+  remember (c :: la) as lb; cbn in Hs; subst lb.
+  apply Bool.andb_true_iff in Hs.
+  destruct Hs as (Hac, Hs).
+  now rewrite (Htra b a c Hba Hac) in Hbc.
 }
-apply IHla.
-now apply sorted_cons in Hs.
+destruct bc; cbn; rewrite Hfc; [ now rewrite Hfb | ].
+apply IHla; [ | easy | easy ].
+apply sorted_cons_iff in Hs; [ | easy ].
+apply sorted_cons_iff; [ easy | ].
+destruct Hs as (Hs & Hac).
+apply sorted_cons_iff in Hs; [ | easy ].
+split; [ easy | ].
+intros d Hd.
+now apply Hac; right.
 Qed.
-*)
 
 Theorem isort_filter : ∀ A (leb : A → _),
   transitive leb →
@@ -3573,10 +3543,10 @@ Theorem isort_filter : ∀ A (leb : A → _),
 Proof.
 intros * Htra Htot *.
 induction la as [| a]; [ easy | cbn ].
-...
-rewrite <- isort_loop_filter; [ | easy | easy | easy ].
+rewrite filter_isort_insert; [ | easy | now apply sorted_isort ].
+rewrite <- IHla.
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-now destruct fa; cbn; rewrite Hfa.
+now destruct fa.
 Qed.
 
 Theorem sorted_concat_iff : ∀ A (leb : A → _),

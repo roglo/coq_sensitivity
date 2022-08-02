@@ -3261,7 +3261,7 @@ split; intros Hla. {
   apply in_map_iff in Hi.
   destruct Hi as (j & Hi & Hj); subst i.
   apply Hlbn, nth_In.
-  apply in_isort_rank_lt in Hj.
+  apply in_isort_rank in Hj.
   congruence.
 } {
   apply in_all_comb_iff in Hla.
@@ -3283,7 +3283,7 @@ split; intros Hla. {
   apply in_map_iff in Hi.
   destruct Hi as (j & Hi & Hj); subst i.
   apply Hla, nth_In.
-  apply in_isort_rank_lt in Hj.
+  apply in_isort_rank in Hj.
   rewrite isort_rank_length in Hj.
   congruence.
 }

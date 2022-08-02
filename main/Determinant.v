@@ -2649,7 +2649,7 @@ split. {
   rewrite permut_comp_isort_rank_r; [ | now destruct Hσ ].
   rewrite comp_1_l. 2: {
     intros i Hi.
-    apply in_isort_rank_lt in Hi.
+    apply in_isort_rank in Hi.
     rewrite isort_rank_length in Hi.
     destruct Hσ, Hl; congruence.
   }
