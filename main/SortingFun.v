@@ -3227,7 +3227,7 @@ Theorem isort_insert_insert_sym : ∀ A (rel : A → _),
   isort_insert rel a (isort_insert rel b l) =
   isort_insert rel b (isort_insert rel a l).
 Proof.
-intros * Hant Htr Htot *.
+intros * Hant Htra Htot *.
 revert a b.
 induction l as [| c]; intros; cbn. {
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
@@ -3240,34 +3240,9 @@ induction l as [| c]; intros; cbn. {
     now rewrite Hab, Hba in Htot.
   }
 }
-remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-remember (rel c b) as cb eqn:Hcb; symmetry in Hcb.
-destruct ca, cb; cbn. {
-...
-  rewrite Hca, Hcb.
-  now rewrite IHl.
-} {
-  rewrite Hcb.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba; [ now rewrite Hca | ].
-  specialize (Htot c b) as Hbc.
-  rewrite Hcb in Hbc; cbn in Hbc.
-  specialize (Htot b a) as Hab.
-  rewrite Hba in Hab; cbn in Hab.
-  specialize (Htr c a b Hca Hab) as H1.
-  congruence.
-} {
-  rewrite Hca, Hcb.
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ easy | ].
-  specialize (Htot c a) as Hac.
-  rewrite Hca in Hac; cbn in Hac.
-  specialize (Htot a b) as Hba.
-  rewrite Hab in Hba; cbn in Hba.
-  specialize (Htr a c b Hac Hcb) as H1.
-  congruence.
-} {
-  rewrite Hca, Hcb.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct ac, bc; cbn; rewrite Hac, Hbc. {
   remember (rel a b) as ab eqn:Hab; symmetry in Hab.
   remember (rel b a) as ba eqn:Hba; symmetry in Hba.
   destruct ab, ba; [ | easy | easy | ]. {
@@ -3276,22 +3251,17 @@ destruct ca, cb; cbn. {
     specialize (Htot a b).
     now rewrite Hab, Hba in Htot.
   }
+} {
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  now rewrite (Htra b a c Hba Hac) in Hbc.
+} {
+  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy ].
+  now rewrite (Htra a b c Hab Hbc) in Hac.
+} {
+  f_equal; apply IHl.
 }
-Qed.
-
-Theorem isort_loop_insert_middle : ∀ A (rel : A → _),
-  antisymmetric rel
-  → transitive rel
-  → total_relation rel
-  → ∀ ls la lb a,
-  isort_loop rel ls (la ++ a :: lb) =
-  isort_loop rel (isort_insert rel a ls) (la ++ lb).
-Proof.
-intros * Hant Htr Hto *.
-revert a ls lb.
-induction la as [| b]; intros; [ easy | cbn ].
-rewrite IHla.
-now rewrite isort_insert_insert_sym.
 Qed.
 
 (* isort and ssort return same *)
@@ -3549,29 +3519,24 @@ induction la as [| a]; intros; cbn; [ now rewrite Hfb | ].
 assert (H : sorted leb la) by now apply sorted_cons in Hs.
 specialize (IHla H); clear H.
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-remember (leb a b) as ab eqn:Hab; symmetry in Hab.
+remember (leb b a) as ba eqn:Hba; symmetry in Hba.
 destruct fa; cbn. {
-  rewrite Hab.
-  destruct ab; cbn; rewrite Hfa; [ | now rewrite Hfb ].
+  rewrite Hba.
+  destruct ba; cbn; rewrite Hfa; [ now rewrite Hfb | ].
   now f_equal; apply IHla.
 }
-destruct ab; [ now cbn; rewrite Hfa; apply IHla | cbn ].
-rewrite Hfb, Hfa.
-destruct la as [| a']; [ easy | cbn ].
-remember (f a') as fa' eqn:Hfa'; symmetry in Hfa'.
+destruct ba; cbn; rewrite Hfa; [ | now apply IHla ].
+rewrite Hfb.
+rewrite IHla; [ | easy ].
+destruct la as [| a']; cbn; [ now rewrite Hfb | ].
 apply (sorted_cons_iff Htra) in Hs.
-destruct Hs as (Hs & Ha').
-specialize (Ha' _ (or_introl eq_refl)).
-specialize (IHla b Hfb) as H1.
-cbn in H1.
-rewrite Hfa' in H1.
-rewrite H1; clear H1.
-remember (leb a' b) as a'b eqn:Ha'b; symmetry in Ha'b.
-destruct a'b; cbn; [ | now rewrite Hfb, Hfa' ].
-specialize (Htra a a' b Ha' Ha'b) as H1.
-congruence.
+destruct Hs as (Hs & Haa').
+specialize (Haa' _ (or_introl eq_refl)).
+rewrite (Htra b a a' Hba Haa'); cbn.
+now rewrite Hfb.
 Qed.
 
+(*
 Theorem isort_loop_filter : ∀ A (leb : A → _),
   transitive leb →
   total_relation leb →
@@ -3598,6 +3563,7 @@ destruct fa. {
 apply IHla.
 now apply sorted_cons in Hs.
 Qed.
+*)
 
 Theorem isort_filter : ∀ A (leb : A → _),
   transitive leb →
@@ -3607,6 +3573,7 @@ Theorem isort_filter : ∀ A (leb : A → _),
 Proof.
 intros * Htra Htot *.
 induction la as [| a]; [ easy | cbn ].
+...
 rewrite <- isort_loop_filter; [ | easy | easy | easy ].
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
 now destruct fa; cbn; rewrite Hfa.
