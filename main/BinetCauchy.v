@@ -3884,6 +3884,48 @@ rewrite Hld in H1.
 now rewrite Hrd in H1.
 Qed.
 
+Theorem isort_insert_isort : ∀ A (rel : A → _),
+  transitive rel →
+  connected_relation rel →
+  ∀ a la,
+  isort_insert rel a (isort rel la) = isort rel (isort_insert rel a la).
+Proof.
+intros * Htran Hcon *.
+revert a.
+induction la as [| b]; intros; [ easy | cbn ].
+rewrite IHla.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; cbn; [ now rewrite IHla | ].
+do 2 rewrite <- IHla.
+clear IHla.
+remember (isort rel la) as lb eqn:Hlb; symmetry in Hlb.
+clear Hlb.
+revert a b la Hab.
+induction lb as [| c]; intros; cbn. {
+  rewrite Hab.
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ easy | ].
+  now rewrite (Hcon a b Hab).
+}
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc. {
+  cbn; rewrite Hab.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac; cbn; rewrite Hbc; [ | easy ].
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ easy | ].
+  now rewrite (Hcon a b Hab Hba).
+}
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac; cbn; rewrite Hac, Hbc. {
+  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ | easy ].
+  now rewrite (Htran b a c Hba Hac) in Hbc.
+}
+f_equal.
+now apply IHlb.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4215,37 +4257,32 @@ Theorem isort_app : ∀ A (rel : A → _),
   ∀ la lb,
   isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
 Proof.
-intros * Hant Htra Hcon *.
 (*
-Theorem isort_loop_app : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ ls la lb,
-  sorted rel ls
-  → isort_loop rel ls (la ++ lb) = isort rel (isort_loop rel ls la ++ lb).
-Proof.
-intros * Htra * Hs.
-revert ls lb Hs.
-induction la as [| a]; intros; cbn. {
-  revert ls Hs.
-  induction lb as [| b]; intros; cbn. {
-    rewrite app_nil_r.
-    symmetry.
-    now apply isort_when_sorted.
-  }
+intros * Hant Htra Hcon *.
+revert la.
+induction lb as [| b]; intros; cbn.
+2: {
+rewrite List_app_cons, app_assoc.
+rewrite IHlb.
 ...
-  rewrite IHlb. 2: {
-Search (sorted _ (isort_insert _ _ _)).
-About sorted_isort_insert.
-...
-intros * Hs.
-...
-now apply glop.
-cbn.
 *)
+intros * Hant Htra Hcon *.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
-rewrite IHla.
-Search (isort_insert _ _ (_ ++ _)).
+rewrite IHla; clear IHla.
+revert la.
+induction lb as [| b]; intros; cbn. {
+  do 2 rewrite app_nil_r.
+  now apply isort_insert_isort.
+}
+...
+rewrite isort_insert_isort; [ | easy | easy ].
+rewrite isort_insert_isort; [ | easy | easy ].
+rewrite List_app_cons, app_assoc; symmetry.
+rewrite List_app_cons, app_assoc; symmetry.
+f_equal.
+rewrite List_app_cons, app_assoc; symmetry.
+rewrite List_app_cons, app_assoc; symmetry.
 ...
 destruct la as [| b]; [ easy | cbn ].
 ...
