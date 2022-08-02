@@ -1513,48 +1513,6 @@ apply in_isort_insert in Ha.
 destruct Ha as [Ha| Ha]; [ now left | now right; apply IHl ].
 Qed.
 
-(*
-Theorem isort_insert_trans_r : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ a b la,
-  rel b a = false
-  → isort_insert rel a la = la ++ [a]
-  → isort_insert rel b (la ++ [a]) = la ++ [a; b].
-Proof.
-intros * Htra * Hba Hs.
-revert a b Hba Hs.
-induction la as [| c]; intros; cbn; [ now rewrite Hba | ].
-remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-destruct bc. {
-  cbn in Hs.
-  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-  destruct ac. {
-    injection Hs; clear Hs; intros Hs H1; subst c.
-    congruence.
-  }
-  injection Hs; clear Hs; intros Hs.
-  apply IHla with (b := b) in Hs; [ | easy ].
-...
-  specialize (Htra c a b Hca Hab) as H1.
-  congruence.
-}
-f_equal.
-apply IHla.
-cbn in Hs.
-remember (rel c a) as ca eqn:Hca; symmetry in Hca.
-destruct ca; [ now injection Hs | ].
-injection Hs; clear Hs; intros Hs H1; subst c.
-apply cons_app_repeat in Hs.
-rewrite Hs.
-remember (length la) as len eqn:Hlen.
-clear - Htra.
-induction len; [ easy | cbn ].
-destruct (rel a a); [ now f_equal | ].
-f_equal.
-apply repeat_cons.
-Qed.
-*)
-
 (* *)
 
 Theorem select_first_permutation :
