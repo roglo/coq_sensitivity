@@ -3388,6 +3388,7 @@ cbn in Hnl.
 rewrite <- Nat.add_succ_comm in Hnl.
 now apply IHl.
 Qed.
+*)
 
 Theorem nth_isort_rank_of_nodup_sorted : ∀ A (rel : A → _),
   transitive rel
@@ -3403,6 +3404,7 @@ cbn - [ isort_rank_loop nth ].
 remember (d :: l) as l' eqn:Hl'.
 clear l Hl'; rename l' into l.
 replace [] with (seq 0 0) by easy.
+...
 now apply nth_isort_rank_loop_of_nodup_sorted.
 Qed.
 
