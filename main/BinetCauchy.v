@@ -3926,6 +3926,20 @@ f_equal.
 now apply IHlb.
 Qed.
 
+Theorem isort_app : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb,
+  isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
+Proof.
+intros * Heqb Hant Htra Htot *.
+apply (isort_when_permuted Heqb); [ easy | easy | easy | ].
+apply (permutation_app Heqb); [ | now apply permutation_refl ].
+now apply permuted_isort.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4245,19 +4259,19 @@ revert i m.
 induction n; intros; [ now destruct m | cbn ].
 destruct m; [ easy | cbn ].
 rewrite flat_map_app.
+assert (Heql : equality (list_eqv Nat.eqb)). {
+  intros la lb.
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+rewrite (isort_app Heql).
 Search (isort _ (_ ++ _)).
 (*
 Theorem isort_app : ∀ A (rel : A → _) la lb,
   isort rel (la ++ lb) = isort_loop rel (isort rel la) (isort rel lb).
 *)
-Theorem isort_app : ∀ A (rel : A → _),
-  antisymmetric rel →
-  transitive rel →
-  total_relation rel →
-  connected_relation rel →
-  ∀ la lb,
-  isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
-Proof.
+...
 (*
 intros * Hant Htra Htot *.
 revert la.
