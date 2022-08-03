@@ -4271,12 +4271,10 @@ rewrite isort_when_sorted. 2: {
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite <- list_prodn_prodn_repeat.
-(*
-...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
-    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
-    (flat_map all_permut (sub_lists_of_seq_1_n n m)).
+    (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
+    (flat_map all_permut (sls1n 1 n m)).
 Proof.
 intros.
 assert (Hel : equality (list_eqv eqb)). {
@@ -4284,21 +4282,23 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
+Compute (
+let n := 5 in
+let m := 3 in
+    (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))) =
+    (flat_map all_permut (sls1n 1 n m))).
+...
 apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
 specialize Nat.ltb_irrefl as Hirr.
 specialize Nat_ltb_connected as Hcon.
 specialize Nat_ltb_antisym as Hant.
 specialize Nat_ltb_trans as Htra.
 rewrite isort_when_sorted. 2: {
-  rewrite <- list_prodn_prodn_repeat.
   apply sorted_filter; [ now apply transitive_list_ltb | ].
-  apply list_prodn_repeat_seq_sorted.
+  apply list_prodn_repeat_seq_ltb_sorted.
 }
 symmetry.
-rewrite <- list_prodn_prodn_repeat.
-unfold sub_lists_of_seq_1_n.
 ...
-*)
 Theorem isort_all_permut_filter_no_dup : ∀ i n m,
   isort (list_leb Nat.leb) (flat_map all_permut (sls1n i n m)) =
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m)).
@@ -4310,7 +4310,7 @@ let n := 5 in
 let m := 2 in
 let la := [] in
 (
-  (*isort (list_leb Nat.leb)*) (map all_permut (sls1n i n m)),
+  isort (list_leb Nat.leb) (flat_map all_permut (sls1n i n m)),
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m))
 )).
 ...
