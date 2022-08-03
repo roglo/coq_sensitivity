@@ -3963,6 +3963,16 @@ apply (permutation_app Heqb); [ now apply permutation_refl | ].
 now apply permuted_isort.
 Qed.
 
+Theorem all_permut_length : ∀ A (la : list A),
+  length (all_permut la) = (length la)!.
+Proof.
+intros.
+unfold all_permut.
+destruct la as [| a]; [ easy | ].
+unfold canon_sym_gr_list_list.
+now rewrite map_length, List_map_seq_length.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4276,6 +4286,31 @@ Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
     (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
     (flat_map all_permut (sls1n 1 n m)).
 Proof.
+intros.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+apply (permutation_nth Hel _ _ []); cbn.
+remember (length (filter _ _)) as len eqn:Hfl.
+symmetry in Hfl.
+split. {
+  subst len; symmetry.
+  rewrite List_flat_map_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros la Hla.
+    rewrite all_permut_length.
+    replace (length la) with m. 2: {
+      apply in_sls1n_iff in Hla.
+      destruct Hla as [Hla| Hla]; [ now destruct Hla; subst m la | easy ].
+    }
+    easy.
+  }
+  cbn - [ rngl_add rngl_zero ].
+  rewrite nat_summation_list_all_same.
+  rewrite sls1n_length.
+...
 intros.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
