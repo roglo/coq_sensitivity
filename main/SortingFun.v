@@ -3654,20 +3654,33 @@ rewrite if_leb_le_dec.
 destruct (le_dec (i + j) (k + i)) as [H| H]; [ easy | flia Hjk H].
 Qed.
 
-(* to be completed
 Theorem list_ltb_leb_incl : ∀ la lb,
-  list_leb Nat.ltb la lb = true
+  list_ltb Nat.ltb la lb = true
   → list_leb Nat.leb la lb = true.
 Proof.
 intros * Hlab.
 revert lb Hlab.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | ].
-do 2 rewrite if_leb_le_dec.
+cbn in Hlab.
+destruct b. {
+  destruct a; [ now apply IHla | easy ].
+}
+rewrite if_leb_le_dec in Hlab.
 destruct (le_dec a b) as [Hab| Hab]. {
-  destruct (le_dec b a) as [Hba| Hba]; [ | easy ].
-  apply Nat.le_antisymm in Hab; [ subst b | easy ].
-...
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec a (S b)) as [H| H]; [ clear H | flia Hab H ].
+  destruct (le_dec (S b) a) as [H| H]; [ flia Hab H | easy ].
+}
+destruct a; [ easy | cbn ].
+apply Nat.nle_gt in Hab.
+rewrite if_leb_le_dec in Hlab.
+destruct (le_dec (S b) a) as [Hsba| Hsba]; [ easy | ].
+apply Nat.nle_gt in Hsba.
+replace b with a by flia Hab Hsba.
+rewrite Nat.leb_refl.
+now apply IHla.
+Qed.
 
 Theorem sorted_list_ltb_leb_incl : ∀ lla,
   sorted (list_ltb Nat.ltb) lla → sorted (list_leb Nat.leb) lla.
@@ -3692,41 +3705,9 @@ apply sorted_cons_iff; [ easy | ].
 destruct Hs as (Hs, Hab).
 split; [ now apply IHlla | ].
 intros lb Hlb.
-...
-revert i n.
-induction m; intros; [ easy | cbn ].
-rewrite flat_map_concat_map.
-specialize Nat_ltb_antisym as Hant.
-specialize Nat_ltb_connected as Hcon.
-specialize Nat_ltb_trans as Htra.
-apply sorted_concat_iff; [ now apply transitive_list_ltb | ].
-rewrite List_map_seq_length.
-split. {
-  intros ll Hll.
-  apply in_map_iff in Hll.
-  destruct Hll as (a & Hll & Ha); subst ll.
-  apply sorted_sorted_map_cons; [ easy | easy | easy | apply IHm ].
-}
-intros j k Hjk la lb Ha Hb.
-rewrite (List_map_nth' 0) in Ha; [ | rewrite seq_length; flia Hjk ].
-rewrite (List_map_nth' 0) in Hb; [ | rewrite seq_length; easy ].
-apply in_map_iff in Ha, Hb.
-destruct Ha as (lc & Hc & Hlc).
-destruct Hb as (ld & Hd & Hld).
-move ld before lc.
-subst la lb; cbn.
-rename lc into la; rename ld into lb.
-remember (nth k (seq i n) 0) as a eqn:Ha; symmetry in Ha.
-remember (nth j (seq i n) 0) as b eqn:Hb; symmetry in Hb.
-rewrite seq_nth in Ha; [ | easy ].
-rewrite seq_nth in Hb; [ | flia Hjk ].
-subst a b.
-destruct k; [ easy | ].
-rewrite Nat.add_comm; cbn.
-rewrite if_leb_le_dec.
-destruct (le_dec (i + j) (k + i)) as [H| H]; [ easy | flia Hjk H].
+apply list_ltb_leb_incl.
+now apply Hab.
 Qed.
-*)
 
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →

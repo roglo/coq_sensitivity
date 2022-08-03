@@ -4265,10 +4265,13 @@ specialize Nat_leb_trans as Htra.
 rewrite isort_when_sorted. 2: {
   rewrite <- list_prodn_prodn_repeat.
   apply sorted_filter; [ now apply transitive_list_leb | ].
-About list_prodn_repeat_seq_sorted.
-...
-  apply list_prodn_repeat_seq_sorted.
+  apply sorted_list_ltb_leb_incl.
+  apply list_prodn_repeat_seq_ltb_sorted.
 }
+symmetry.
+unfold sub_lists_of_seq_1_n.
+rewrite <- list_prodn_prodn_repeat.
+(*
 ...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
@@ -4295,8 +4298,9 @@ symmetry.
 rewrite <- list_prodn_prodn_repeat.
 unfold sub_lists_of_seq_1_n.
 ...
+*)
 Theorem isort_all_permut_filter_no_dup : ∀ i n m,
-  isort (list_ltb Nat.ltb) (flat_map all_permut (sls1n i n m)) =
+  isort (list_leb Nat.leb) (flat_map all_permut (sls1n i n m)) =
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m)).
 Proof.
 intros.
@@ -4304,38 +4308,24 @@ revert i m.
 induction n; intros; [ now destruct m | cbn ].
 destruct m; [ easy | cbn ].
 rewrite flat_map_app.
-...
 assert (Heql : equality (list_eqv Nat.eqb)). {
   intros la lb.
   apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
-assert (Hantl : antisymmetric (list_ltb Nat.ltb)). {
-  apply antisymmetric_list_ltb. {
-    unfold irreflexive; apply Nat.ltb_irrefl.
-  } {
-    apply Nat_ltb_connected.
-  } {
-    apply Nat_ltb_antisym.
-  }
+assert (Hantl : antisymmetric (list_leb Nat.leb)). {
+  apply antisymmetric_list_leb, Nat_leb_antisym.
 }
-assert (Htral : transitive (list_ltb Nat.ltb)). {
-  apply transitive_list_ltb. {
-    apply Nat_ltb_antisym.
-  } {
-    apply Nat_ltb_connected.
-  } {
-    apply Nat_ltb_trans.
-  }
+assert (Htral : transitive (list_leb Nat.leb)). {
+  apply transitive_list_leb, Nat_leb_trans.
 }
-rewrite (isort_app_distr_l Heql); [ | easy | easy | ]. 2: {
-  (* blocked *)
-...
-rewrite (isort_app_distr_r Heql); [ | easy | easy | ].
-...
+assert (Htotl : total_relation (list_leb Nat.leb)). {
+  apply total_relation_list_leb, Nat_leb_total_relation.
+}
+rewrite (isort_app_distr_r Heql); [ | easy | easy | easy ].
 rewrite IHn.
-Search (isort _ (_ ++ _)).
+...
 (*
 Theorem isort_app : ∀ A (rel : A → _) la lb,
   isort rel (la ++ lb) = isort_loop rel (isort rel la) (isort rel lb).
