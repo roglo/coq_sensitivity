@@ -3926,7 +3926,7 @@ f_equal.
 now apply IHlb.
 Qed.
 
-Theorem isort_app : ∀ A (eqb rel : A → _),
+Theorem isort_app_distr_l : ∀ A (eqb rel : A → _),
   equality eqb →
   antisymmetric rel →
   transitive rel →
@@ -3937,6 +3937,20 @@ Proof.
 intros * Heqb Hant Htra Htot *.
 apply (isort_when_permuted Heqb); [ easy | easy | easy | ].
 apply (permutation_app Heqb); [ | now apply permutation_refl ].
+now apply permuted_isort.
+Qed.
+
+Theorem isort_app_distr_r : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ la lb,
+  isort rel (la ++ lb) = isort rel (la ++ isort rel lb).
+Proof.
+intros * Heqb Hant Htra Htot *.
+apply (isort_when_permuted Heqb); [ easy | easy | easy | ].
+apply (permutation_app Heqb); [ now apply permutation_refl | ].
 now apply permuted_isort.
 Qed.
 
@@ -4265,7 +4279,29 @@ assert (Heql : equality (list_eqv Nat.eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-rewrite (isort_app Heql).
+assert (Hantl : antisymmetric (list_ltb Nat.ltb)). {
+  apply antisymmetric_list_ltb. {
+    unfold irreflexive; apply Nat.ltb_irrefl.
+  } {
+    apply Nat_ltb_connected.
+  } {
+    apply Nat_ltb_antisym.
+  }
+}
+assert (Htral : transitive (list_ltb Nat.ltb)). {
+  apply transitive_list_ltb. {
+    apply Nat_ltb_antisym.
+  } {
+    apply Nat_ltb_connected.
+  } {
+    apply Nat_ltb_trans.
+  }
+}
+rewrite (isort_app_distr_l Heql); [ | easy | easy | ]. 2: {
+...
+rewrite (isort_app_distr_r Heql); [ | easy | easy | ].
+...
+rewrite IHn.
 Search (isort _ (_ ++ _)).
 (*
 Theorem isort_app : ∀ A (rel : A → _) la lb,
