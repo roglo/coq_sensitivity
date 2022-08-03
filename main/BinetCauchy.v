@@ -4310,6 +4310,28 @@ split. {
   cbn - [ rngl_add rngl_zero ].
   rewrite nat_summation_list_all_same.
   rewrite sls1n_length.
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    subst m; cbn.
+    now rewrite binomial_0_r.
+  }
+  set (f := no_dup Nat.eqb).
+  set (lla := list_prodn (repeat (seq 1 n) m)).
+  specialize (List_add_length_filter_length_filter_negb f lla) as H1.
+  remember (length (filter f lla)) as len1 eqn:Hlen1.
+  remember (length (filter (λ la, negb (f la)) lla)) as len2 eqn:Hlen2.
+  replace len1 with (length lla - len2) by flia H1; clear len1 H1 Hlen1.
+  unfold lla.
+  rewrite list_prodn_length by now intros Hr; apply List_eq_repeat_nil in Hr.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros la Hla.
+    replace (length la) with n. 2: {
+      apply repeat_spec in Hla; subst la; symmetry; apply seq_length.
+    }
+    easy.
+  }
+  cbn - [ rngl_mul rngl_one ].
+  rewrite nat_product_list_all_same.
+  rewrite repeat_length.
 ...
 intros.
 assert (Hel : equality (list_eqv eqb)). {

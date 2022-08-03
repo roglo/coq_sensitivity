@@ -512,6 +512,15 @@ split. {
 }
 Qed.
 
+Theorem List_add_length_filter_length_filter_negb : ∀ A f (la : list A),
+  length (filter f la) + length (filter (λ x, negb (f x)) la) = length la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+destruct (f a); cbn; [ now f_equal | ].
+now rewrite Nat.add_succ_r; f_equal.
+Qed.
+
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
