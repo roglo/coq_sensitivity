@@ -4304,6 +4304,17 @@ Theorem isort_all_permut_filter_no_dup : ∀ i n m,
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m)).
 Proof.
 intros.
+Compute (
+let i := 14 in
+let n := 5 in
+let m := 2 in
+let la := [] in
+(
+  (*isort (list_leb Nat.leb)*) (map all_permut (sls1n i n m)),
+  filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m))
+)).
+...
+intros.
 revert i m.
 induction n; intros; [ now destruct m | cbn ].
 destruct m; [ easy | cbn ].
@@ -4325,6 +4336,18 @@ assert (Htotl : total_relation (list_leb Nat.leb)). {
 }
 rewrite (isort_app_distr_r Heql); [ | easy | easy | easy ].
 rewrite IHn.
+rewrite flat_map_concat_map.
+rewrite map_map.
+rewrite <- flat_map_concat_map.
+rewrite (isort_app_distr_l Heql); [ | easy | easy | easy ].
+remember (λ la, _) as x; subst x.
+...
+Compute (
+  let i:= 14 in
+  let n := 5 in
+  let m := 2 in
+  let lla := sls1n (S i) n m in
+  all_permut (i :: nth 2 lla [])).
 ...
 (*
 Theorem isort_app : ∀ A (rel : A → _) la lb,
