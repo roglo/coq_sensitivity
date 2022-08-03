@@ -4332,6 +4332,11 @@ split. {
   cbn - [ rngl_mul rngl_one ].
   rewrite nat_product_list_all_same.
   rewrite repeat_length.
+Compute (
+let n := 5 in
+map (λ m,
+let lla := list_prodn (repeat (seq 1 n) m) in
+length (filter (λ la : list nat, negb (f la)) lla)) (seq 1 n)).
 ...
 intros.
 assert (Hel : equality (list_eqv eqb)). {
