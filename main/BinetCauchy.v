@@ -3935,6 +3935,15 @@ Theorem isort_app_distr_l : ∀ A (eqb rel : A → _),
   isort rel (la ++ lb) = isort rel (isort rel la ++ lb).
 Proof.
 intros * Heqb Hant Htra Htot *.
+(*
+Compute (
+  let rel := λ a b, fst a <? fst b in
+  let la := [(1, 2); (1, 3); (1, 4)] in
+  let lb := [(2, 1); (7, 1); (1, 1); (5, 1); (1, 7)] in
+  isort rel (la ++ lb) = isort rel (isort rel la ++ lb)).
+  isort rel (la ++ lb) = isort rel (la ++ isort rel lb)).
+...
+*)
 apply (isort_when_permuted Heqb); [ easy | easy | easy | ].
 apply (permutation_app Heqb); [ | now apply permutation_refl ].
 now apply permuted_isort.
@@ -4251,6 +4260,27 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
+apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
+specialize Nat_leb_trans as Htra.
+rewrite isort_when_sorted. 2: {
+  rewrite <- list_prodn_prodn_repeat.
+  apply sorted_filter; [ now apply transitive_list_leb | ].
+About list_prodn_repeat_seq_sorted.
+...
+  apply list_prodn_repeat_seq_sorted.
+}
+...
+Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
+  permutation (list_eqv eqb)
+    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
+    (flat_map all_permut (sub_lists_of_seq_1_n n m)).
+Proof.
+intros.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
 apply permut_if_isort with (rel := list_ltb Nat.ltb); [ easy | ].
 specialize Nat.ltb_irrefl as Hirr.
 specialize Nat_ltb_connected as Hcon.
@@ -4264,6 +4294,7 @@ rewrite isort_when_sorted. 2: {
 symmetry.
 rewrite <- list_prodn_prodn_repeat.
 unfold sub_lists_of_seq_1_n.
+...
 Theorem isort_all_permut_filter_no_dup : ∀ i n m,
   isort (list_ltb Nat.ltb) (flat_map all_permut (sls1n i n m)) =
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq i n) m)).
@@ -4273,6 +4304,7 @@ revert i m.
 induction n; intros; [ now destruct m | cbn ].
 destruct m; [ easy | cbn ].
 rewrite flat_map_app.
+...
 assert (Heql : equality (list_eqv Nat.eqb)). {
   intros la lb.
   apply -> equality_list_eqv.
@@ -4298,6 +4330,7 @@ assert (Htral : transitive (list_ltb Nat.ltb)). {
   }
 }
 rewrite (isort_app_distr_l Heql); [ | easy | easy | ]. 2: {
+  (* blocked *)
 ...
 rewrite (isort_app_distr_r Heql); [ | easy | easy | ].
 ...
