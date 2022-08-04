@@ -4332,6 +4332,23 @@ split. {
   cbn - [ rngl_mul rngl_one ].
   rewrite nat_product_list_all_same.
   rewrite repeat_length.
+subst f len2 lla.
+clear Hmz.
+(**)
+revert m.
+induction n; intros; cbn - [ binomial seq ]. {
+  destruct m; [ easy | cbn ].
+  symmetry; apply Nat.mul_0_r.
+}
+Search (binomial (S _)).
+...
+revert n.
+induction m; intros; cbn; [ now rewrite binomial_0_r | ].
+rewrite flat_map_concat_map.
+rewrite <- concat_filter_map.
+rewrite <- flat_map_concat_map.
+rewrite List_flat_map_length.
+...
 Compute (
 let n := 5 in
 map (λ m,
