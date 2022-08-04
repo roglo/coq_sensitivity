@@ -4424,6 +4424,15 @@ split. {
   }
   rewrite rngl_summation_seq_summation; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
+Compute (
+let n := 6 in
+let m := 4 in
+let ll := repeat (seq 1 n) m in
+(
+map (λ i,
+length (filter (λ l' : list nat, negb (member Nat.eqb i l')) (list_prodn_nodup Nat.eqb ll)))
+(seq 1 n),
+(S m)! * binomial n (S m))).
 ...
   ============================
   ∑ (i = 1, n), length (filter (λ l' : list nat, negb (member Nat.eqb i l')) (list_prodn_nodup Nat.eqb ll)) =
