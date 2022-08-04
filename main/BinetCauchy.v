@@ -3977,6 +3977,49 @@ unfold canon_sym_gr_list_list.
 now rewrite map_length, List_map_seq_length.
 Qed.
 
+Fixpoint list_prodn_nodup A (eqb : A → _) ll :=
+  match ll with
+  | [] => [[]]
+  | l :: ll' =>
+      let ll'' := list_prodn_nodup eqb ll' in
+      flat_map
+        (λ a,
+         map (cons a) (filter (λ l', negb (member eqb a l')) ll''))
+        l
+  end.
+
+Theorem list_prodn_nodup_list_prodn_nodup : ∀ A (eqb : A → _) ll,
+  list_prodn_nodup eqb ll = filter (no_dup eqb) (list_prodn ll).
+Proof.
+intros.
+induction ll as [| la]; [ easy | cbn ].
+symmetry; rewrite flat_map_concat_map.
+rewrite <- concat_filter_map; symmetry.
+rewrite flat_map_concat_map.
+rewrite map_map.
+rewrite IHll.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  rewrite List_filter_filter.
+  remember (λ lb, _) as x; subst x.
+  easy.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  rewrite List_filter_map.
+  easy.
+}
+cbn.
+f_equal.
+apply map_ext_in.
+intros a Ha.
+f_equal.
+apply filter_ext_in.
+intros lb Hlb.
+now destruct (member eqb a lb).
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4318,19 +4361,28 @@ split. {
     subst m; cbn.
     now rewrite binomial_0_r.
   }
-Search (length _ = length _).
+(**)
+  rewrite <- list_prodn_nodup_list_prodn_nodup.
+  remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
+  clear Hmz.
+  revert n m Hll.
+  induction ll as [| la]; intros; cbn. {
+    apply List_eq_repeat_nil in Hll.
+    subst m; cbn.
+    now rewrite binomial_0_r.
+  }
+  destruct m; [ easy | ].
+  cbn in Hll.
+  injection Hll; clear Hll; intros Hll Hla.
+  rewrite List_flat_map_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros a Ha.
+    rewrite map_length.
+Search (length (filter _ _)).
+...
 erewrite (permutation_length Hel).
+
 Print list_prodn.
-Fixpoint list_prodn_nodup A (eqb : A → _) ll :=
-  match ll with
-  | [] => [[]]
-  | l :: ll' =>
-      let ll'' := list_prodn_nodup eqb ll' in
-      flat_map
-        (λ a,
-         map (cons a) (filter (λ l', negb (member eqb a l')) ll''))
-        l
-  end.
 Compute (
 let n := 5 in
 let m := 3 in
@@ -4338,10 +4390,6 @@ let m := 3 in
   list_prodn_nodup Nat.eqb (repeat (seq 1 n) m),
   filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))
 )).
-Theorem list_prodn_nodup_list_prodn_nodup : ∀ A (eqb : A → _) ll,
-  list_prodn_nodup eqb ll = filter (no_dup eqb) (list_prodn ll).
-Proof.
-intros.
 ...
 2: {
 rewrite <- list_prodn_nodup_list_prodn_nodup.
