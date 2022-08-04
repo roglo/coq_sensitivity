@@ -4320,11 +4320,31 @@ split. {
   }
 Search (length _ = length _).
 erewrite (permutation_length Hel).
-Print filter.
-Definition filter_no_dup {A{ (eqb : A → _) lla :=
-  match lla with
-  | [] => []
-  | la :: lla' =>
+Print list_prodn.
+Fixpoint list_prodn_nodup A (eqb : A → _) ll :=
+  match ll with
+  | [] => [[]]
+  | l :: ll' =>
+      let ll'' := list_prodn_nodup eqb ll' in
+      flat_map
+        (λ a,
+         map (cons a) (filter (λ l', negb (member eqb a l')) ll''))
+        l
+  end.
+Compute (
+let n := 5 in
+let m := 3 in
+(
+  list_prodn_nodup Nat.eqb (repeat (seq 1 n) m),
+  filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))
+)).
+Theorem list_prodn_nodup_list_prodn_nodup : ∀ A (eqb : A → _) ll,
+  list_prodn_nodup eqb ll = filter (no_dup eqb) (list_prodn ll).
+Proof.
+intros.
+...
+2: {
+rewrite <- list_prodn_nodup_list_prodn_nodup.
 ...
 Compute (
 let n := 4 in
