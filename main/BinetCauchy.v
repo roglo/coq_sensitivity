@@ -4362,6 +4362,37 @@ split. {
     now rewrite binomial_0_r.
   }
 (**)
+  remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
+  clear Hmz.
+  revert n m Hll.
+  induction ll as [| la]; intros; cbn. {
+    apply List_eq_repeat_nil in Hll.
+    subst m; cbn.
+    now rewrite binomial_0_r.
+  }
+  destruct m; [ easy | ].
+  cbn in Hll.
+  injection Hll; clear Hll; intros Hll Hla.
+  rewrite flat_map_concat_map.
+  rewrite <- concat_filter_map.
+  rewrite map_map.
+  rewrite <- flat_map_concat_map.
+  rewrite List_flat_map_length.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros a Ha.
+    rewrite List_filter_map.
+    rewrite map_length.
+    easy.
+  }
+  subst la.
+  rewrite rngl_summation_seq_summation.
+  rewrite Nat.add_comm, Nat.add_sub.
+  cbn - [ rngl_add rngl_zero ].
+...
+  ============================
+  ∑ (i = 1, n), length (filter (λ a : list nat, no_dup Nat.eqb (i :: a)) (list_prodn ll)) =
+  (S m)! * binomial n (S m)
+...
   rewrite <- list_prodn_nodup_list_prodn_nodup.
   remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
   clear Hmz.
@@ -4378,7 +4409,15 @@ split. {
   erewrite rngl_summation_list_eq_compat. 2: {
     intros a Ha.
     rewrite map_length.
-Search (length (filter _ _)).
+    easy.
+  }
+  subst la.
+  rewrite rngl_summation_seq_summation.
+  rewrite Nat.add_comm, Nat.add_sub.
+...
+  ============================
+  ∑ (i = 1, n), length (filter (λ l' : list nat, negb (member Nat.eqb i l')) (list_prodn_nodup Nat.eqb ll)) =
+  (S m)! * binomial n (S m)
 ...
 erewrite (permutation_length Hel).
 
