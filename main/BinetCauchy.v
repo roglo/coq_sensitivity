@@ -4364,7 +4364,7 @@ split. {
     subst m; cbn.
     now rewrite binomial_0_r.
   }
-(*
+(**)
   remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
   clear Hmz.
   revert n m Hll.
@@ -4388,14 +4388,38 @@ split. {
     easy.
   }
   subst la.
-  rewrite rngl_summation_seq_summation.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    rewrite rngl_summation_list_empty; [ | easy ].
+    rewrite binomial_0_l; [ | easy ].
+    symmetry; apply rngl_mul_0_r.
+    now right.
+  }
+  rewrite rngl_summation_seq_summation; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   cbn - [ rngl_add rngl_zero ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+    remember (length (filter _ _)) as x eqn:Hx in |-*.
+    assert (H : x = (S m)! * binomial n (S m) / n). {
+      subst x ll.
+...
+Compute (
+map (λ n,
+map (λ m,
+map (λ i,
+  length
+    (filter (λ a : list nat, if member Nat.eqb i a then false else no_dup Nat.eqb a)
+       (list_prodn (repeat (seq 1 n) m))) = (S m)! * binomial n (S m) / n)
+(seq 1 n))
+(seq 0 n))
+(seq 0 7)
+).
 ...
   ============================
   ∑ (i = 1, n), length (filter (λ a : list nat, no_dup Nat.eqb (i :: a)) (list_prodn ll)) =
   (S m)! * binomial n (S m)
-*)
+...
   rewrite <- list_prodn_nodup_list_prodn_nodup.
   remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
   clear Hmz.
@@ -4424,15 +4448,26 @@ split. {
   }
   rewrite rngl_summation_seq_summation; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
+...
 Compute (
-let n := 6 in
-let m := 4 in
+let n := 5 in
+map (λ m,
 let ll := repeat (seq 1 n) m in
 (
 map (λ i,
 length (filter (λ l' : list nat, negb (member Nat.eqb i l')) (list_prodn_nodup Nat.eqb ll)))
 (seq 1 n),
-(S m)! * binomial n (S m))).
+(S m)! * binomial n (S m)))
+(seq 0 n)).
+Compute (
+let m := 4 in
+let n := 6 in
+let ll := repeat (seq 1 n) m in
+(
+map (λ i,
+length (filter (λ a : list nat, no_dup Nat.eqb (i :: a)) (list_prodn ll)))
+(seq 1 n),
+ (S m)! * binomial n (S m))).
 ...
   ============================
   ∑ (i = 1, n), length (filter (λ l' : list nat, negb (member Nat.eqb i l')) (list_prodn_nodup Nat.eqb ll)) =
