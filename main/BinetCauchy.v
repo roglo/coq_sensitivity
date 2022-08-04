@@ -67,6 +67,10 @@ Qed.
 
 (* end borrowed code *)
 
+Theorem binomial_succ_succ : ∀ n k,
+  binomial (S n) (S k) = binomial n k + binomial n (S k).
+Proof. easy. Qed.
+
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
 Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
@@ -4314,6 +4318,20 @@ split. {
     subst m; cbn.
     now rewrite binomial_0_r.
   }
+Search (length _ = length _).
+erewrite (permutation_length Hel).
+Print filter.
+Definition filter_no_dup {A{ (eqb : A → _) lla :=
+  match lla with
+  | [] => []
+  | la :: lla' =>
+...
+Compute (
+let n := 4 in
+map (λ m,
+  (length (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+   m! * binomial n m))
+(seq 0 (2 + n))).
   set (f := no_dup Nat.eqb).
   set (lla := list_prodn (repeat (seq 1 n) m)).
   specialize (List_add_length_filter_length_filter_negb f lla) as H1.
@@ -4332,15 +4350,18 @@ split. {
   cbn - [ rngl_mul rngl_one ].
   rewrite nat_product_list_all_same.
   rewrite repeat_length.
+...
 subst f len2 lla.
 clear Hmz.
-(**)
 revert m.
 induction n; intros; cbn - [ binomial seq ]. {
   destruct m; [ easy | cbn ].
   symmetry; apply Nat.mul_0_r.
 }
-Search (binomial (S _)).
+destruct m; [ easy | ].
+rewrite binomial_succ_succ.
+cbn.
+(* there is no simple relation between a^b and (a+1)^b *)
 ...
 revert n.
 induction m; intros; cbn; [ now rewrite binomial_0_r | ].
