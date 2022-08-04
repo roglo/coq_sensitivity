@@ -35,6 +35,9 @@ Fixpoint binomial n k :=
      end
   end.
 
+Theorem binomial_0_l : ∀ n, n ≠ 0 → binomial 0 n = 0.
+Proof. now intros * Hnz; induction n. Qed.
+
 Theorem binomial_0_r : ∀ n, binomial n 0 = 1.
 Proof. now intros; induction n. Qed.
 
@@ -4361,7 +4364,7 @@ split. {
     subst m; cbn.
     now rewrite binomial_0_r.
   }
-(**)
+(*
   remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
   clear Hmz.
   revert n m Hll.
@@ -4392,7 +4395,7 @@ split. {
   ============================
   ∑ (i = 1, n), length (filter (λ a : list nat, no_dup Nat.eqb (i :: a)) (list_prodn ll)) =
   (S m)! * binomial n (S m)
-...
+*)
   rewrite <- list_prodn_nodup_list_prodn_nodup.
   remember (repeat (seq 1 n) m) as ll eqn:Hll; symmetry in Hll.
   clear Hmz.
@@ -4412,7 +4415,14 @@ split. {
     easy.
   }
   subst la.
-  rewrite rngl_summation_seq_summation.
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    subst n.
+    rewrite rngl_summation_list_empty; [ | easy ].
+    rewrite binomial_0_l; [ | easy ].
+    symmetry; apply rngl_mul_0_r.
+    now right.
+  }
+  rewrite rngl_summation_seq_summation; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
 ...
   ============================
