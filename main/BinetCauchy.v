@@ -4425,6 +4425,48 @@ split. {
     assert (H : x = (S m)! * binomial n (S m) / n). {
       subst x ll.
       remember (λ la, _) as x; subst x.
+      replace
+        (filter
+           (λ la, if member Nat.eqb i la then false else no_dup Nat.eqb la)
+           (list_prodn (repeat (seq 1 n) m)))
+      with
+        (filter (no_dup Nat.eqb)
+           (list_prodn
+              (repeat (seq 1 (i - 1) ++ seq (i + 1) (n - i)) m))). 2: {
+        erewrite filter_ext_in. 2: {
+          intros la Hla.
+          replace (no_dup Nat.eqb la) with
+            (if member Nat.eqb i la then false else no_dup Nat.eqb la). 2: {
+            rewrite if_bool_if_dec.
+            destruct (bool_dec (member Nat.eqb i la)) as [Hila| ]; [ | easy ].
+            exfalso.
+            apply (@member_true_iff _ _ Nat.eqb_eq) in Hila.
+            destruct Hila as (l1 & l2 & Hila).
+            subst la.
+            apply In_nth with (d := []) in Hla.
+            destruct Hla as (j & Hj & Hla).
+            rewrite list_prodn_repeat_length in Hj.
+            rewrite app_length in Hj.
+            do 2 rewrite seq_length in Hj.
+            replace (i - 1 + (n - i)) with (n - 1) in Hj by flia Hi.
+            apply List_eq_iff in Hla.
+            destruct Hla as (Hl, Hla).
+            specialize (Hla 0 (length l1)).
+            rewrite app_nth2 in Hla; [ | now unfold ge ].
+            rewrite Nat.sub_diag in Hla; cbn in Hla.
+Search (nth _ _ _ = nth _ _ _).
+...
+            rewrite list_prodn_length in Hj.
+            apply (nth_in_list_prodn 0) with (i := length l1) in Hla. 2: {
+              rewrite repeat_length.
+            apply in_list_prodn in Hla.
+...
+ Search (filter _ _ = filter _ _).
+      apply List_ext_in.
+Compute (
+  let n := 14 in
+  let i := 3 in
+(seq 1 n, seq 1 (i - 1) ++ seq (i + 1) (n - i))).
 Check list_prodn_length.
 Search (length (list_prodn _)).
 ...
