@@ -4401,6 +4401,15 @@ split. {
           }
           easy.
         }
+Theorem glop : ∀ A (lla llb : list (list A)),
+  list_prodn (lla ++ llb) =
+  map (uncurry (λ la lb, la ++ lb))
+    (list_prod (list_prodn lla) (list_prodn llb)).
+Compute (
+(* ah oui mais non, ça marche pas, ça *)
+let lla := repeat (seq 1 (i - 1))
+).
+Search (list_prodn (_ ++ _)).
 Search (filter _ _ = filter _ _).
 ...
             subst la.
