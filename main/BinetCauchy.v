@@ -4390,6 +4390,18 @@ split. {
             rewrite repeat_length in Hla.
             destruct Hla as (Hlm, Hla).
             rewrite Hlm in Hla.
+            apply In_nth with (d := 0) in Hila.
+            destruct Hila as (j & Hjl & H); subst i.
+            rewrite Hlm in Hjl.
+            specialize (Hla _ Hjl) as H1.
+            rewrite List_nth_repeat in H1.
+            destruct (lt_dec j m) as [H| H]; [ clear H | easy ].
+            apply in_app_or in H1.
+            destruct H1 as [H1| H1]; apply in_seq in H1; flia H1.
+          }
+          easy.
+        }
+Search (filter _ _ = filter _ _).
 ...
             subst la.
             apply In_nth with (d := []) in Hla.
