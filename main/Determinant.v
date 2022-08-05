@@ -309,67 +309,41 @@ Proof.
 intros.
 split. {
   intros [(Hnz, H1)| (Hnz & Hn & Hm)]; [ now subst n l; left | ].
-  subst n.
-  revert m Hm.
-  induction l as [| a]; intros; [ easy | clear Hnz; cbn ].
-  apply in_flat_map.
-  exists a.
-  split. {
-    apply in_seq.
-    specialize (Hm a (or_introl eq_refl)).
-    split; [ easy | cbn ].
-    now apply -> Nat.succ_le_mono.
-  } {
-    apply in_map_iff.
-    exists l.
-    split; [ easy | ].
-    remember (repeat (seq 1 m) (length l)) as ll eqn:Hll; symmetry in Hll.
-    destruct ll as [| l1]. {
-      apply List_eq_repeat_nil in Hll.
-      apply length_zero_iff_nil in Hll; subst l.
-      now left.
-    }
-    cbn.
-    destruct l as [| b]; [ easy | ].
-    cbn in Hll.
-    injection Hll; clear Hll; intros Hll H; subst l1.
-    destruct m. {
-      specialize (Hm _ (or_introl eq_refl)); flia Hm.
-    }
-    specialize (IHl (Nat.neq_succ_0 _)).
-    specialize (IHl (S m)) as H1.
-    assert (H : ∀ i, i ∈ b :: l → 1 ≤ i ≤ S m). {
-      intros i Hi.
-      now apply Hm; right.
-    }
-    specialize (H1 H); clear H.
-    cbn - [ seq ] in H1.
-    now rewrite Hll in H1.
-  }
+  apply (in_list_prodn_iff 0).
+  rewrite repeat_length.
+  split; [ easy | ].
+  intros i Hi.
+  rewrite List_nth_repeat.
+  rewrite Hn in Hi.
+  destruct (lt_dec i n) as [H| H]; [ clear H | easy ].
+  apply in_seq.
+  specialize (Hm (nth i l 0)) as H1.
+  assert (H : nth i l 0 ∈ l) by now apply nth_In; rewrite Hn.
+  specialize (H1 H); clear H.
+  split; [ easy | ].
+  now apply Nat.lt_succ_r.
 } {
   intros Hl.
-  revert m l Hl.
-  induction n; intros; [ now left; destruct Hl | right ].
-  split; [ easy | ].
-  cbn in Hl.
-  apply in_flat_map in Hl.
-  destruct Hl as (a & Ha & Hl).
-  apply in_map_iff in Hl.
-  destruct Hl as (l2 & Hl & Hl2); subst l.
-  apply in_seq in Ha.
-  apply IHn in Hl2.
-  destruct Hl2 as [(Hnz, Hl2)| Hl2]. {
-    subst n l2.
-    split; [ easy | ].
-    intros i Hi.
-    destruct Hi as [Hi| Hi]; [ subst i | easy ].
-    flia Ha.
+  apply (in_list_prodn_iff 0) in Hl.
+  rewrite repeat_length in Hl.
+  destruct Hl as (Hln, Hl).
+  destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+    left; subst n.
+    split; [ easy | now apply length_zero_iff_nil in Hnz ].
   }
-  destruct Hl2 as (Hnz & Hl2 & Hm).
-  split; [ now cbn; f_equal | ].
-  intros j Hj.
-  destruct Hj as [Hj| Hj]; [ subst j | now apply Hm ].
-  flia Ha.
+  right.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros i Hi.
+  apply (In_nth _ _ 0) in Hi.
+  destruct Hi as (j & Hjl & Hj); subst i.
+  specialize (Hl j Hjl) as H1.
+  rewrite List_nth_repeat in H1.
+  rewrite Hln in Hjl.
+  destruct (lt_dec j n) as [H| H]; [ clear H | easy ].
+  apply in_seq in H1.
+  split; [ easy | ].
+  now apply Nat.lt_succ_r.
 }
 Qed.
 

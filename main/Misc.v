@@ -2798,6 +2798,92 @@ split. {
 }
 Qed.
 
+Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
+  l ∈ list_prodn ll → length l = length ll.
+Proof.
+intros * Hl.
+revert l Hl.
+induction ll as [| l1]; intros. {
+  cbn in Hl.
+  destruct Hl as [Hl| Hl]; [ now subst l | easy ].
+}
+cbn in Hl.
+apply in_flat_map in Hl.
+destruct Hl as (a & Hl1 & Ha).
+apply in_map_iff in Ha.
+destruct Ha as (l3 & Hl & Hl3).
+subst l; cbn; f_equal.
+now apply IHll.
+Qed.
+
+Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
+  i < length ll
+  → l ∈ list_prodn ll
+  → nth i l d ∈ nth i ll [].
+Proof.
+intros * Hi Hll.
+revert l i Hi Hll.
+induction ll as [| l1]; intros; [ easy | ].
+cbn in Hll |-*.
+destruct i. {
+  destruct ll as [| l2]. {
+    apply in_flat_map in Hll.
+    destruct Hll as (a & Ha & Hla).
+    apply in_map_iff in Hla.
+    now destruct Hla as (l2 & H & Hl2); subst l.
+  }
+  apply in_flat_map in Hll.
+  destruct Hll as (a & Hl1 & Hl).
+  apply in_map_iff in Hl.
+  now destruct Hl as (l3 & H & Hl3); subst l.
+}
+cbn in Hi; apply Nat.succ_lt_mono in Hi.
+destruct ll as [| l2]; [ easy | ].
+apply in_flat_map in Hll.
+destruct Hll as (a & Ha & Hl).
+apply in_map_iff in Hl.
+destruct Hl as (l3 & H & Hl3); subst l.
+rewrite List_nth_succ_cons.
+now apply IHll.
+Qed.
+
+Theorem in_list_prodn_iff : ∀ A (d : A) ll la,
+  la ∈ list_prodn ll
+  ↔ length la = length ll ∧ ∀ i, i < length la → nth i la d ∈ nth i ll [].
+Proof.
+intros.
+split. {
+  intros Hla.
+  split; [ now apply in_list_prodn_length in Hla | ].
+  intros i Hi.
+  apply nth_in_list_prodn; [ | easy ].
+  apply in_list_prodn_length in Hla.
+  congruence.
+} {
+  intros (Hla & Hnth).
+  revert la Hla Hnth.
+  induction ll as [| lb]; intros. {
+    now apply length_zero_iff_nil in Hla; subst la; left.
+  }
+  cbn.
+  destruct la as [| a]; [ easy | ].
+  cbn in Hla; apply Nat.succ_inj in Hla.
+  apply in_flat_map.
+  exists a.
+  specialize (Hnth 0 (Nat.lt_0_succ _)) as H1; cbn in H1.
+  split; [ easy | ].
+  apply in_map_iff.
+  exists la.
+  split; [ easy | ].
+  apply IHll; [ easy | ].
+  intros i Hi.
+  specialize (Hnth (S i)) as H2.
+  cbn in H2.
+  apply Nat.succ_lt_mono in Hi.
+  now specialize (H2 Hi).
+}
+Qed.
+
 (* end list_prodn *)
 
 Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).

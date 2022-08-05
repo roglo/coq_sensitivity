@@ -2569,28 +2569,6 @@ apply IHlll. {
 }
 Qed.
 
-Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
-  (∀ l, l ∈ ll → l ≠ [])
-  → l ∈ list_prodn ll
-  → length l = length ll.
-Proof.
-intros * Hlz Hl.
-revert l Hl.
-induction ll as [| l1]; intros. {
-  cbn in Hl.
-  destruct Hl as [Hl| Hl]; [ now subst l | easy ].
-}
-cbn in Hl.
-apply in_flat_map in Hl.
-destruct Hl as (a & Hl1 & Ha).
-apply in_map_iff in Ha.
-destruct Ha as (l3 & Hl & Hl3).
-subst l; cbn; f_equal.
-apply IHll; [ | easy ].
-intros l4 Hl4.
-now apply Hlz; right.
-Qed.
-
 Theorem nth_list_prodn_same_length : ∀ A n (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l = n)
   → i < n ^ length ll
@@ -2640,11 +2618,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   apply in_map_iff in Hl2.
   destruct Hl2 as (l3 & Hl3 & Hl2).
   subst l2; cbn; f_equal.
-  apply in_list_prodn_length in Hl2; [ easy | ].
-  intros l4 Hl4.
-  specialize (Hll _ (or_intror Hl4)).
-  destruct l4; [ | easy ].
-  now symmetry in Hll.
+  now apply in_list_prodn_length in Hl2.
 } {
   rewrite map_length.
   rewrite Hll; [ | now left ].
@@ -2729,37 +2703,6 @@ destruct Hj as (H1 & H2 & H3).
 apply H3.
 apply nth_In.
 now rewrite H2.
-Qed.
-
-Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
-  i < length ll
-  → l ∈ list_prodn ll
-  → nth i l d ∈ nth i ll [].
-Proof.
-intros * Hi Hll.
-revert l i Hi Hll.
-induction ll as [| l1]; intros; [ easy | ].
-cbn in Hll |-*.
-destruct i. {
-  destruct ll as [| l2]. {
-    apply in_flat_map in Hll.
-    destruct Hll as (a & Ha & Hla).
-    apply in_map_iff in Hla.
-    now destruct Hla as (l2 & H & Hl2); subst l.
-  }
-  apply in_flat_map in Hll.
-  destruct Hll as (a & Hl1 & Hl).
-  apply in_map_iff in Hl.
-  now destruct Hl as (l3 & H & Hl3); subst l.
-}
-cbn in Hi; apply Nat.succ_lt_mono in Hi.
-destruct ll as [| l2]; [ easy | ].
-apply in_flat_map in Hll.
-destruct Hll as (a & Ha & Hl).
-apply in_map_iff in Hl.
-destruct Hl as (l3 & H & Hl3); subst l.
-rewrite List_nth_succ_cons.
-now apply IHll.
 Qed.
 
 Theorem nat_summation_list_all_same : ∀ A (l : list A) a,
@@ -4256,11 +4199,7 @@ remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
-    apply in_list_prodn_length in Hla. 2: {
-      intros lb Hlb.
-      apply repeat_spec in Hlb; subst lb.
-      now destruct n.
-    }
+    apply in_list_prodn_length in Hla.
     rewrite repeat_length in Hla.
     congruence.
   } {
@@ -4447,8 +4386,10 @@ split. {
               now apply in_or_app; right; left.
             }
             clear l1 l2 Hila; rename H into Hila.
-Search (_ ∈ list_prodn _).
-Search (repeat (_ ++ _)).
+            apply (in_list_prodn_iff 0) in Hla.
+            rewrite repeat_length in Hla.
+            destruct Hla as (Hlm, Hla).
+            rewrite Hlm in Hla.
 ...
             subst la.
             apply In_nth with (d := []) in Hla.
