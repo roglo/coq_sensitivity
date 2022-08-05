@@ -4442,6 +4442,14 @@ split. {
             exfalso.
             apply (@member_true_iff _ _ Nat.eqb_eq) in Hila.
             destruct Hila as (l1 & l2 & Hila).
+            assert (H : i ∈ la). {
+              rewrite Hila.
+              now apply in_or_app; right; left.
+            }
+            clear l1 l2 Hila; rename H into Hila.
+Search (_ ∈ list_prodn _).
+Search (repeat (_ ++ _)).
+...
             subst la.
             apply In_nth with (d := []) in Hla.
             destruct Hla as (j & Hj & Hla).
@@ -4461,6 +4469,7 @@ assert (H : i ∈ nth j ll []). {
   rewrite Hl.
   rewrite app_length; cbn; flia.
 }
+...
 Search (_ ∈ _ → _).
 ...
 Search (_ → _ ∈ _).
