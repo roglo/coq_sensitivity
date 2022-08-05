@@ -4023,6 +4023,27 @@ intros lb Hlb.
 now destruct (member eqb a lb).
 Qed.
 
+Theorem list_prodn_repeat_length : ∀ A (l : list A) n,
+  length (list_prodn (repeat l n)) = length l ^ n.
+Proof.
+intros.
+revert l.
+induction n; intros; [ easy | cbn ].
+destruct l as [| a]; [ easy | cbn ].
+rewrite app_length, map_length.
+rewrite IHn; cbn; f_equal.
+rewrite List_flat_map_length.
+remember (∑ (b ∈ l), _) as x; subst x.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros b Hb.
+  rewrite map_length, IHn; cbn.
+  easy.
+}
+cbn - [ rngl_add rngl_zero ].
+rewrite nat_summation_list_all_same.
+apply Nat.mul_comm.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4403,6 +4424,9 @@ split. {
     remember (length (filter _ _)) as x eqn:Hx in |-*.
     assert (H : x = (S m)! * binomial n (S m) / n). {
       subst x ll.
+      remember (λ la, _) as x; subst x.
+Check list_prodn_length.
+Search (length (list_prodn _)).
 ...
 Compute (
 map (λ n,
