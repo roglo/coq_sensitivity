@@ -4401,6 +4401,25 @@ split. {
           }
           easy.
         }
+Theorem glop : ∀ A (la lb : list A) n,
+  list_prodn (repeat (la ++ lb) n) =
+  map (uncurry (λ la lb, la ++ lb))
+    (list_prod (list_prodn (repeat la n)) (list_prodn (repeat lb n))).
+Proof.
+intros.
+Compute (
+let n := 3 in
+let la := [1;2] in
+let lb := [7;8;9] in
+  list_prodn (repeat (la ++ lb) n) =
+  map (uncurry (λ la0 lb0, la0 ++ lb0))
+    (list_prod (list_prodn (repeat la n)) (list_prodn (repeat lb n)))).
+(* bon, c'est pas ça, faut réfléchir *)
+...
+set (f := λ la, if member Nat.eqb i la then false else no_dup Nat.eqb la).
+rewrite glop.
+rewrite List_filter_map.
+...
 Theorem glop : ∀ A (lla llb : list (list A)),
   list_prodn (lla ++ llb) =
   map (uncurry (λ la lb, la ++ lb))
