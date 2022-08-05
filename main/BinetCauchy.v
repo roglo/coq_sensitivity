@@ -4454,6 +4454,16 @@ split. {
             specialize (Hla 0 (length l1)).
             rewrite app_nth2 in Hla; [ | now unfold ge ].
             rewrite Nat.sub_diag in Hla; cbn in Hla.
+remember (list_prodn (repeat (seq 1 (i - 1) ++ seq (i + 1) (n - i)) m)) as ll eqn:Hll.
+assert (H : i ∈ nth j ll []). {
+  rewrite <- Hla at 1.
+  apply nth_In.
+  rewrite Hl.
+  rewrite app_length; cbn; flia.
+}
+Search (_ ∈ _ → _).
+...
+Search (_ → _ ∈ _).
 Search (nth _ _ _ = nth _ _ _).
 ...
             rewrite list_prodn_length in Hj.
