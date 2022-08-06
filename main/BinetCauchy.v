@@ -4372,6 +4372,13 @@ split. {
   assert (H : ∀ i j, 1 ≤ i ≤ n → 1 ≤ j ≤ n → f i = f j). {
     intros i j Hi Hj.
     unfold f.
+Compute (
+  let n := 4 in
+  let m := 2 in
+  let i := 3 in
+  let ll1 := repeat (seq 1 n) m in
+  let ll2 := repeat (i :: seq 1 (i - 1) ++ seq (i + 1) (n - i)) m in
+  (list_prodn ll1, list_prodn ll2)).
 ...
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
