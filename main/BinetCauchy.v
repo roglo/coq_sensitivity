@@ -4358,12 +4358,29 @@ split. {
   rewrite rngl_summation_seq_summation; [ | easy ].
   rewrite Nat.add_comm, Nat.add_sub.
   cbn - [ rngl_add rngl_zero ].
+(**)
+  set
+    (f := λ i,
+     length
+       (filter
+          (λ la, if member Nat.eqb i la then false else no_dup Nat.eqb la)
+          (list_prodn ll))).
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
+    now fold (f i).
+  }
+  assert (H : ∀ i j, 1 ≤ i ≤ n → 1 ≤ j ≤ n → f i = f j). {
+    intros i j Hi Hj.
+    unfold f.
+...
+  erewrite rngl_summation_eq_compat. 2: {
+    intros i Hi.
+...
     remember (length (filter _ _)) as x eqn:Hx in |-*.
     assert (H : x = (S m)! * binomial n (S m) / n). {
       subst x ll.
       remember (λ la, _) as x; subst x.
+...
       replace
         (filter
            (λ la, if member Nat.eqb i la then false else no_dup Nat.eqb la)
@@ -4372,6 +4389,7 @@ split. {
         (filter (no_dup Nat.eqb)
            (list_prodn
               (repeat (seq 1 (i - 1) ++ seq (i + 1) (n - i)) m))). 2: {
+...
         erewrite filter_ext_in. 2: {
           intros la Hla.
           replace (no_dup Nat.eqb la) with
