@@ -723,6 +723,14 @@ f_equal.
 apply IHl1.
 Qed.
 
+Theorem repeat_app_map2 : ∀ A (la lb : list A) n,
+  repeat (la ++ lb) n = map2 (λ x y, app x y) (repeat la n) (repeat lb n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal; apply IHn.
+Qed.
+
 (* end map2 *)
 
 (* rank: rank of the first element satisfying a predicate *)

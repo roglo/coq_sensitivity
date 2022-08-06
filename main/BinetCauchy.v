@@ -4401,7 +4401,9 @@ split. {
           }
           easy.
         }
+        rewrite repeat_app_map2.
 ...
+Search (list_prodn (map _ _)).
 Theorem glop : ∀ A (la lb : list A) n,
   list_prodn (repeat (la ++ lb) n) =
   map (uncurry (λ la lb, la ++ lb))
@@ -4412,6 +4414,9 @@ Compute (
 let n := 3 in
 let la := [1;2] in
 let lb := [7;8;9] in
+(repeat (la ++ lb) n =
+ map (uncurry (λ x y, app x y)) (combine (repeat la n) (repeat lb n)))).
+Search combine.
 length
   (list_prodn (repeat (la ++ lb) n))
 =
