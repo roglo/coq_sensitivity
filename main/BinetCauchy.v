@@ -4400,6 +4400,15 @@ destruct Hlxl as (Hbef & H & Hlb).
 apply Heqb in H; subst x.
 subst llb.
 remember (∀ lb, _) as x eqn:Hx in Hbef; subst x.
+Theorem glop : ∀ A (d : A) (ll : list (list A)) i j,
+  list_prodn (list_swap_elem [] ll i j) =
+  map (λ la, list_swap_elem d la i j) (list_prodn ll).
+Proof.
+intros.
+revert i j.
+induction ll as [| la]; intros; [ easy | cbn ].
+(* ça fait chier, ce "flat_map" qui apparaît chaque fois *)
+...
 apply IHlla in Hab.
 ...
 destruct llb as [| lb]; [ easy | cbn ].
