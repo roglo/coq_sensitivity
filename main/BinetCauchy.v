@@ -4379,6 +4379,31 @@ Compute (
   let ll1 := repeat (seq 1 n) m in
   let ll2 := repeat (i :: seq 1 (i - 1) ++ seq (i + 1) (n - i)) m in
   (list_prodn ll1, list_prodn ll2)).
+Theorem glop : ∀ A (eqb : list A → _),
+  equality eqb →
+  ∀ lla llb,
+  permutation eqb lla llb
+  → permutation eqb (list_prodn lla) (list_prodn llb).
+Proof.
+intros * Heqb * Hab.
+revert llb Hab.
+induction lla as [| la]; intros; cbn. {
+  apply permutation_nil_l in Hab; subst llb.
+  now apply permutation_refl.
+}
+apply permutation_cons_l_iff in Hab.
+remember (extract (eqb la) llb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+subst llb.
+remember (∀ lb, _) as x eqn:Hx in Hbef; subst x.
+apply IHlla in Hab.
+...
+destruct llb as [| lb]; [ easy | cbn ].
+Search (permutation _ (_ :: _) _ → _).
 ...
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
