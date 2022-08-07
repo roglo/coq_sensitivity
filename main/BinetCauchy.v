@@ -4426,6 +4426,17 @@ Proof.
 intros.
 revert i j.
 induction ll as [| la]; intros; [ easy | ].
+cbn - [ seq ].
+rewrite flat_map_concat_map.
+rewrite concat_map.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  now rewrite map_map.
+}
+rewrite <- flat_map_concat_map.
+cbn.
+(* pfff... c'est nul tout ce que je fais... *)
 ...
 intros.
 do 2 rewrite list_prodn_list_prodn'.
