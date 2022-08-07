@@ -4007,6 +4007,9 @@ now rewrite IHla.
 Qed.
 
 (*
+Search list_prodn.
+About NoDup_list_prodn_repeat.
+
 Compute (list_prod [[1;2];[3;4;5]] [[6;7;8];[9;10]]).
 
 Fixpoint list_prodn_loop A (lla llb : list (list A)) :=
@@ -4270,7 +4273,6 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
-...
 rewrite list_prodn_prodn_repeat.
 rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
@@ -4305,7 +4307,6 @@ rewrite all_0_rngl_summation_list_0. 2: {
 subst g.
 rewrite rngl_add_0_l.
 apply (rngl_summation_list_permut _ Hel).
-...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
@@ -4327,6 +4328,50 @@ rewrite isort_when_sorted. 2: {
 }
 symmetry.
 unfold sub_lists_of_seq_1_n.
+rewrite flat_map_concat_map.
+rewrite <- list_prodn_prodn_repeat.
+Compute (
+let n := 5 in
+let m := 3 in
+concat (map all_permut (sls1n 1 n m))
+).
+...
+Compute (
+let rel := list_leb Nat.leb in
+let l := map all_permut [[3;4;5];[1;2]] in
+  isort rel (concat l) = isort rel (flat_map (isort rel) l)
+).
+...
+Theorem isort_concat : ∀ A (eqb rel : A → A → bool),
+  equality eqb →
+  antisymmetric rel →
+  transitive rel →
+  total_relation rel →
+  ∀ ll, isort rel (concat ll) = isort rel (flat_map (isort rel) ll).
+Proof.
+intros * Heqb Hant Htra Htot *.
+induction ll as [| la]; [ easy | cbn ].
+rewrite (isort_app_distr_l Heqb); [ | easy | easy | easy ].
+rewrite (isort_app_distr_r Heqb); [ | easy | easy | easy ].
+symmetry.
+rewrite (isort_app_distr_r Heqb); [ | easy | easy | easy ].
+symmetry.
+now f_equal; f_equal.
+Qed.
+rewrite (isort_concat Hel).
+rewrite flat_map_concat_map.
+rewrite map_map.
+remember (λ la, _) as x; subst x.
+Compute (
+let la := [1;2;3] in
+(all_permut la) =
+isort (list_leb Nat.leb) (all_permut la)
+).
+...
+  ============================
+  isort (list_leb Nat.leb) (concat (map all_permut (sls1n 1 n m))) =
+  filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)
+...
 rewrite <- list_prodn_prodn_repeat.
 ...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
