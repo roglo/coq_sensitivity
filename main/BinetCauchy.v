@@ -4254,6 +4254,7 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
+...
 rewrite list_prodn_prodn_repeat.
 rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
@@ -4288,6 +4289,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 subst g.
 rewrite rngl_add_0_l.
 apply (rngl_summation_list_permut _ Hel).
+...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
@@ -4310,6 +4312,7 @@ rewrite isort_when_sorted. 2: {
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite <- list_prodn_prodn_repeat.
+...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
