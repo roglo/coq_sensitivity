@@ -4006,6 +4006,22 @@ rewrite map_app, map_map.
 now rewrite IHla.
 Qed.
 
+(*
+Compute (list_prod [[1;2];[3;4;5]] [[6;7;8];[9;10]]).
+
+Fixpoint list_prodn_loop A (lla llb : list (list A)) :=
+  match lla with
+  | [] => []
+  | [la] => map (λ a,
+...
+
+Definition list_prodn'' A (ll : list (list A)) := list_prodn_loop [[]] ll.
+...
+  | la :: ll' => map pair_cons (list_prod la (list_prodn'' ll'))
+  end.
+...
+*)
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
