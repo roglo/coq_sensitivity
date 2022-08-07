@@ -4333,7 +4333,7 @@ rewrite <- list_prodn_prodn_repeat.
 Compute (
 let n := 5 in
 let m := 3 in
-concat (map all_permut (sls1n 1 n m))
+ (map (λ la, (la, all_permut la)) (sls1n 1 n m))
 ).
 ...
 Compute (
