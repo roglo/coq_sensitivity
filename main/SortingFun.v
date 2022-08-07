@@ -233,10 +233,10 @@ destruct Hsort as (Hcd, Hsort).
 split; [ now apply Htra with (b := c) | easy ].
 Qed.
 
-Theorem sorted_lt_NoDup : ∀ A (ltb : A → A → bool),
-  irreflexive ltb →
-  transitive ltb →
-  ∀ l, sorted ltb l → NoDup l.
+Theorem sorted_NoDup : ∀ A (rel : A → A → bool),
+  irreflexive rel →
+  transitive rel →
+  ∀ l, sorted rel l → NoDup l.
 Proof.
 intros * Hirr Htra * Hsort.
 induction l as [| a]; [ constructor | ].
@@ -2479,7 +2479,7 @@ rename lc into lb; rename ld into lc.
 now apply sorted_middle in Hsort.
 Qed.
 
-Theorem sorted_ltb_leb_incl : ∀ l,
+Theorem sorted_nat_ltb_leb_incl : ∀ l,
   sorted Nat.ltb l → sorted Nat.leb l.
 Proof.
 intros * Hs.
@@ -3485,21 +3485,21 @@ Qed.
 
 (* *)
 
-Theorem filter_isort_insert : ∀ A (leb : A → _),
-  transitive leb →
+Theorem filter_isort_insert : ∀ A (rel : A → _),
+  transitive rel →
   ∀ la b f,
-  sorted leb la
-  → filter f (isort_insert leb b la) =
-      if f b then isort_insert leb b (filter f la)
+  sorted rel la
+  → filter f (isort_insert rel b la) =
+      if f b then isort_insert rel b (filter f la)
       else filter f la.
 Proof.
 intros * Htra * Hs.
 revert b.
 induction la as [| a]; intros; cbn; [ easy | ].
-assert (H : sorted leb la) by now apply sorted_cons in Hs.
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
 specialize (IHla H); clear H.
 remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-remember (leb b a) as ba eqn:Hba; symmetry in Hba.
+remember (rel b a) as ba eqn:Hba; symmetry in Hba.
 destruct fa; cbn. {
   rewrite Hba.
   destruct ba; cbn; rewrite Hfa; [ easy | ].
@@ -3515,7 +3515,7 @@ rewrite <- H1; clear H1 IHla Hfa.
 revert b Hba Hfb.
 induction la as [| c]; intros; cbn; [ now rewrite Hfb | ].
 remember (f c) as fc eqn:Hfc; symmetry in Hfc.
-remember (leb b c) as bc eqn:Hbc; symmetry in Hbc.
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct fc. {
   destruct bc; cbn; rewrite Hfc; [ now rewrite Hfb | ].
   unfold sorted in Hs.
@@ -3535,11 +3535,11 @@ intros d Hd.
 now apply Hac; right.
 Qed.
 
-Theorem isort_filter : ∀ A (leb : A → _),
-  transitive leb →
-  total_relation leb →
+Theorem isort_filter : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
   ∀ la f,
-  isort leb (filter f la) = filter f (isort leb la).
+  isort rel (filter f la) = filter f (isort rel la).
 Proof.
 intros * Htra Htot *.
 induction la as [| a]; [ easy | cbn ].
@@ -3549,13 +3549,13 @@ remember (f a) as fa eqn:Hfa; symmetry in Hfa.
 now destruct fa.
 Qed.
 
-Theorem sorted_concat_iff : ∀ A (leb : A → _),
-  transitive leb →
+Theorem sorted_concat_iff : ∀ A (rel : A → _),
+  transitive rel →
   ∀ ll,
-  sorted leb (concat ll) ↔
-    (∀ l, l ∈ ll → sorted leb l) ∧
+  sorted rel (concat ll) ↔
+    (∀ l, l ∈ ll → sorted rel l) ∧
     (∀ i j, i < j < length ll →
-     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → leb a b = true).
+     ∀ a b, a ∈ nth i ll [] → b ∈ nth j ll [] → rel a b = true).
 Proof.
 intros * Htra *.
 split. {
@@ -3571,7 +3571,7 @@ split. {
   intros i j Hij a b Ha Hb.
   revert i j a b Hij Ha Hb.
   induction ll as [| la]; intros; [ easy | ].
-  assert (H : sorted leb (concat ll)). {
+  assert (H : sorted rel (concat ll)). {
     now cbn in Hs; apply sorted_app_iff in Hs; [ | easy ].
   }
   specialize (IHll H); clear H.
