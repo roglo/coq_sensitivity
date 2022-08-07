@@ -4270,6 +4270,7 @@ Theorem rngl_summation_filter_no_dup_list_prodn :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
+...
 rewrite list_prodn_prodn_repeat.
 rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
@@ -4304,6 +4305,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
 subst g.
 rewrite rngl_add_0_l.
 apply (rngl_summation_list_permut _ Hel).
+...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
@@ -4326,6 +4328,7 @@ rewrite isort_when_sorted. 2: {
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite <- list_prodn_prodn_repeat.
+...
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
@@ -4442,6 +4445,17 @@ Proof.
 intros.
 revert i j.
 induction ll as [| la]; intros; [ easy | ].
+cbn - [ seq ].
+rewrite flat_map_concat_map.
+rewrite concat_map.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros k Hk.
+  now rewrite map_map.
+}
+rewrite <- flat_map_concat_map.
+cbn.
+(* pfff... c'est nul tout ce que je fais... *)
 ...
 intros.
 do 2 rewrite list_prodn_list_prodn'.
