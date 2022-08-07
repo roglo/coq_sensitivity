@@ -3987,6 +3987,82 @@ rewrite nat_summation_list_all_same.
 apply Nat.mul_comm.
 Qed.
 
+(* new experimental list_prodn, named list_prodn'
+   because I am tired of that "flat_mat" that appears
+   each time I use list_prodn *)
+Fixpoint list_prodn' A (ll : list (list A)) :=
+  match ll with
+  | [] => [[]]
+  | la :: ll' => map (λ ab, fst ab :: snd ab) (list_prod la (list_prodn' ll'))
+  end.
+
+Theorem list_prodn_list_prodn' : ∀ A (ll : list (list A)),
+  list_prodn ll = list_prodn' ll.
+Proof.
+intros.
+induction ll as [| la]; [ easy | cbn ].
+rewrite IHll; clear IHll.
+induction la as [| a]; [ easy | cbn ].
+rewrite map_app, map_map.
+now rewrite IHla.
+Qed.
+
+Definition list_prodn'' A (ll : list (list A)) :=
+  fold_left (λ ll' la, map (λ ab, fst ab :: snd ab) (list_prod la ll'))
+    ll [[]].
+
+(* to be completed, if possible
+Theorem list_prodn'_list_prodn'' : ∀ A (ll : list (list A)),
+  list_prodn' ll = list_prodn'' ll.
+Proof.
+intros.
+induction ll as [| la]; [ easy | cbn ].
+rewrite IHll; clear IHll.
+set (pair_cons := λ ab, fst ab :: snd ab).
+Compute (
+  let la := [1;2;3] in
+  let lla := [[4; 5]] in
+(
+  list_prod la lla,
+  list_prodn (la :: lla)
+)).
+(* bon, c'est la merde *)
+...
+Theorem glop : ∀ A (d : A) la lla,
+  list_prod la lla = map (λ lc, (hd d lc, hd [] (tl lc))) (list_prodn (la :: lla)).
+...
+rewrite glop.
+induction la as [| a]. {
+  cbn.
+  induction ll as [| la]; [ easy | cbn ].
+  induction la as [| a]; [ easy | cbn ].
+  apply IHla.
+}
+cbn.
+rewrite map_app, map_map.
+rewrite IHla.
+...
+
+Theorem list_prodn_list_prodn'' : ∀ A (ll : list (list A)),
+  list_prodn ll = list_prodn'' ll.
+Proof.
+intros.
+induction ll as [| la]; [ easy | cbn ].
+rewrite IHll; clear IHll.
+induction la as [| a]. {
+  cbn.
+  induction ll as [| la]; [ easy | cbn ].
+  induction la as [| a]; [ easy | cbn ].
+  apply IHla.
+}
+cbn.
+rewrite IHla.
+...
+rewrite map_app, map_map.
+now rewrite IHla.
+Qed.
+*)
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4405,14 +4481,39 @@ Theorem glop : ∀ A (d : A) (ll : list (list A)) i j,
   map (λ la, list_swap_elem d la i j) (list_prodn ll).
 Proof.
 intros.
+do 2 rewrite list_prodn_list_prodn'.
+revert i j.
+induction ll as [| la]; intros; [ easy | ].
+cbn - [ list_swap_elem ].
+rewrite map_map.
+remember (λ ala, _) as x; subst x.
+Print list_prodn'.
+Print fold_left.
+...
+list_prodn' = 
+fix list_prodn' (A : Type) (ll : list (list A)) {struct ll} : list (list A) :=
+  match ll with
+  | [] => [[]]
+  | la :: ll' => map (λ ab : A * list A, fst ab :: snd ab) (list_prod la (list_prodn' A ll'))
+  end
+fold_left = 
+λ (A B : Type) (f : A → B → A),
+  fix fold_left (l : list B) (a0 : A) {struct l} : A :=
+    match l with
+    | [] => a0
+    | b :: t => fold_left t (f a0 b)
+    end
+...
+rewrite map_map.
+remember (transposition i j 0) as n eqn:Hn; symmetry in Hn.
+destruct n. {
+  cbn.
+  rewrite Hn.
+Search (map _ (list_prod _ _)).
+...
+intros.
 revert i j.
 induction ll as [| la]; intros; [ easy | cbn ].
-(* ça fait chier, ce "flat_map" qui apparaît chaque fois *)
-...
-apply IHlla in Hab.
-...
-destruct llb as [| lb]; [ easy | cbn ].
-Search (permutation _ (_ :: _) _ → _).
 ...
   erewrite rngl_summation_eq_compat. 2: {
     intros i Hi.
