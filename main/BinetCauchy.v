@@ -4424,6 +4424,10 @@ Theorem glop : ∀ A (d : A) (ll : list (list A)) i j,
   map (λ la, list_swap_elem d la i j) (list_prodn ll).
 Proof.
 intros.
+revert i j.
+induction ll as [| la]; intros; [ easy | ].
+...
+intros.
 do 2 rewrite list_prodn_list_prodn'.
 unfold list_prodn' at 1.
 unfold list_swap_elem at 1.
