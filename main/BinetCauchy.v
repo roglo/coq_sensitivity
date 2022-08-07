@@ -3990,10 +3990,12 @@ Qed.
 (* new experimental list_prodn, named list_prodn'
    because I am tired of that "flat_mat" that appears
    each time I use list_prodn *)
+Definition pair_cons {A} (ala : A * _) := fst ala :: snd ala.
+
 Fixpoint list_prodn' A (ll : list (list A)) :=
   match ll with
   | [] => [[]]
-  | la :: ll' => map (λ ab, fst ab :: snd ab) (list_prod la (list_prodn' ll'))
+  | la :: ll' => map pair_cons (list_prod la (list_prodn' ll'))
   end.
 
 Theorem list_prodn_list_prodn' : ∀ A (ll : list (list A)),
@@ -4007,25 +4009,27 @@ rewrite map_app, map_map.
 now rewrite IHla.
 Qed.
 
+(*
 Definition list_prodn'' A (ll : list (list A)) :=
-  fold_left (λ ll' la, map (λ ab, fst ab :: snd ab) (list_prod la ll'))
-    ll [[]].
+  fold_right (λ la ll', map pair_cons (list_prod la ll')) [[]] ll.
 
-(* to be completed, if possible
+Compute (
+  let la := [1;2;3] in
+  let lla := [[4; 5]; [6;7]] in
+(
+  list_prodn'' (la :: lla) =
+  list_prodn (la :: lla)
+)).
+
+Search (fold_right _ _ _ = fold_left _ _ _).
+
 Theorem list_prodn'_list_prodn'' : ∀ A (ll : list (list A)),
   list_prodn' ll = list_prodn'' ll.
 Proof.
 intros.
-induction ll as [| la]; [ easy | cbn ].
-rewrite IHll; clear IHll.
-set (pair_cons := λ ab, fst ab :: snd ab).
-Compute (
-  let la := [1;2;3] in
-  let lla := [[4; 5]] in
-(
-  list_prod la lla,
-  list_prodn (la :: lla)
-)).
+unfold list_prodn''.
+induction ll as [| la]; [ easy | ].
+cbn; rewrite IHll; clear IHll.
 (* bon, c'est la merde *)
 ...
 Theorem glop : ∀ A (d : A) la lla,
