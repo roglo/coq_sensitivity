@@ -3992,11 +3992,8 @@ Qed.
    each time I use list_prodn *)
 Definition pair_cons {A} (ala : A * _) := fst ala :: snd ala.
 
-Fixpoint list_prodn' A (ll : list (list A)) :=
-  match ll with
-  | [] => [[]]
-  | la :: ll' => map pair_cons (list_prod la (list_prodn' ll'))
-  end.
+Definition list_prodn' A (ll : list (list A)) :=
+  fold_right (λ la ll', map pair_cons (list_prod la ll')) [[]] ll.
 
 Theorem list_prodn_list_prodn' : ∀ A (ll : list (list A)),
   list_prodn ll = list_prodn' ll.
@@ -4008,64 +4005,6 @@ induction la as [| a]; [ easy | cbn ].
 rewrite map_app, map_map.
 now rewrite IHla.
 Qed.
-
-(*
-Definition list_prodn'' A (ll : list (list A)) :=
-  fold_right (λ la ll', map pair_cons (list_prod la ll')) [[]] ll.
-
-Compute (
-  let la := [1;2;3] in
-  let lla := [[4; 5]; [6;7]] in
-(
-  list_prodn'' (la :: lla) =
-  list_prodn (la :: lla)
-)).
-
-Search (fold_right _ _ _ = fold_left _ _ _).
-
-Theorem list_prodn'_list_prodn'' : ∀ A (ll : list (list A)),
-  list_prodn' ll = list_prodn'' ll.
-Proof.
-intros.
-unfold list_prodn''.
-induction ll as [| la]; [ easy | ].
-cbn; rewrite IHll; clear IHll.
-(* bon, c'est la merde *)
-...
-Theorem glop : ∀ A (d : A) la lla,
-  list_prod la lla = map (λ lc, (hd d lc, hd [] (tl lc))) (list_prodn (la :: lla)).
-...
-rewrite glop.
-induction la as [| a]. {
-  cbn.
-  induction ll as [| la]; [ easy | cbn ].
-  induction la as [| a]; [ easy | cbn ].
-  apply IHla.
-}
-cbn.
-rewrite map_app, map_map.
-rewrite IHla.
-...
-
-Theorem list_prodn_list_prodn'' : ∀ A (ll : list (list A)),
-  list_prodn ll = list_prodn'' ll.
-Proof.
-intros.
-induction ll as [| la]; [ easy | cbn ].
-rewrite IHll; clear IHll.
-induction la as [| a]. {
-  cbn.
-  induction ll as [| la]; [ easy | cbn ].
-  induction la as [| a]; [ easy | cbn ].
-  apply IHla.
-}
-cbn.
-rewrite IHla.
-...
-rewrite map_app, map_map.
-now rewrite IHla.
-Qed.
-*)
 
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
@@ -4485,18 +4424,44 @@ Theorem glop : ∀ A (d : A) (ll : list (list A)) i j,
   map (λ la, list_swap_elem d la i j) (list_prodn ll).
 Proof.
 intros.
+do 2 rewrite list_prodn_list_prodn'.
+unfold list_prodn' at 1.
+unfold list_swap_elem at 1.
+remember (map _ _) as l eqn:Hl.
+rewrite <- rev_involutive in Hl; subst l.
+rewrite fold_left_rev_right.
+rewrite <- map_rev.
+symmetry.
+replace ll with (rev (rev ll)) at 1 by apply rev_involutive.
+symmetry.
+unfold list_prodn'.
+rewrite fold_left_rev_right.
 revert i j.
-induction ll as [| la] using rev_ind; intros; [ easy | cbn ].
+induction ll as [| la] using rev_ind; intros; [ easy | ].
+rewrite app_length.
+rewrite Nat.add_comm.
+rewrite seq_S; cbn.
+rewrite rev_app_distr; cbn.
 ...
-Theorem glop : ∀ A (d : A) (ll : list (list A)) i j,
-  list_prodn (list_swap_elem [] ll i j) =
-  map (λ la, list_swap_elem d la i j) (list_prodn ll).
-Proof.
+Search (rev (_ ++ _)).
+cbn - [ list_swap_elem ].
+rewrite map_map.
+remember (λ ala, _) as x; subst x.
+...
+intros.
+do 2 rewrite list_prodn_list_prodn'.
+remember (length ll) as len eqn:Hlen; symmetry in Hlen.
+revert i j ll Hlen.
+induction len; intros; cbn. {
+  now apply length_zero_iff_nil in Hlen; subst ll.
+}
+destruct ll as [| la]; [ easy | ].
+cbn in Hlen; apply Nat.succ_inj in Hlen.
+cbn - [ list_swap_elem ].
+...
 intros.
 do 2 rewrite list_prodn_list_prodn'.
 revert i j.
-induction ll as [| la] using rev_ind; intros; [ easy | cbn ].
-...
 induction ll as [| la]; intros; [ easy | ].
 cbn - [ list_swap_elem ].
 rewrite map_map.
