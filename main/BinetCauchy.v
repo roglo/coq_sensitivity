@@ -4484,10 +4484,18 @@ apply in_map_iff in Hpab.
 destruct Hpab as (a & Hba & Ha).
 apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
 apply in_map_iff.
+remember (length (b :: lb)) as len eqn:Hlen.
+remember (length bef) as i eqn:Hi.
 ...
-exists (canon_sym_gr_list_inv (length (b :: lb)) (b :: lb)).
-rewrite canon_sym_gr_list_canon_sym_gr_list_inv.
-Search canon_sym_gr_list.
+exists (canon_sym_gr_list_inv len (seq i (len - i) ++ seq 0 i)).
+rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+...
+}
+rewrite map_app.
+
+nth i (b :: lb) d = b
+i = 0
+seq i (len - i) ++ seq 0 i
 ...
 Theorem in_all_permut_iff : ∀ la lb,
   la ∈ all_permut lb ↔ permutation eqb la lb.
