@@ -4480,6 +4480,14 @@ destruct Hlxl as (Hbef & H & Hlb).
 apply Nat.eqb_eq in H; subst x la.
 apply (permutation_sym Nat.eqb_eq) in Hpab.
 apply IHlb in Hpab.
+apply in_map_iff in Hpab.
+destruct Hpab as (a & Hba & Ha).
+apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
+apply in_map_iff.
+...
+exists (canon_sym_gr_list_inv (length (b :: lb)) (b :: lb)).
+rewrite canon_sym_gr_list_canon_sym_gr_list_inv.
+Search canon_sym_gr_list.
 ...
 Theorem in_all_permut_iff : ∀ la lb,
   la ∈ all_permut lb ↔ permutation eqb la lb.
