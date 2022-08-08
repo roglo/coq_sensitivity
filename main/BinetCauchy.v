@@ -4483,9 +4483,27 @@ apply IHlb in Hpab.
 apply in_map_iff in Hpab.
 destruct Hpab as (a & Hba & Ha).
 apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
+remember (canon_sym_gr_list (length lb) a) as la eqn:Hla.
+generalize Hba; intros H.
+rewrite <- (firstn_skipn (length bef) la) in H.
+rewrite map_app in H.
+apply List_app_eq_app' in H. 2: {
+  rewrite map_length, firstn_length, Hla.
+  rewrite canon_sym_gr_list_length.
+  apply min_l.
+  apply (f_equal length) in Hba.
+  rewrite map_length, app_length in Hba.
+  apply (f_equal length) in Hla.
+  rewrite canon_sym_gr_list_length in Hla.
+  rewrite <- Hla, Hba.
+  apply Nat.le_add_r.
+}
+destruct H as (Hbef', Haft').
+...
+remember (length (b :: lb)) as n eqn:Hn.
+replace n with (length bef + (n - length bef)).
 ...
 apply in_map_iff.
-remember (length (b :: lb)) as n eqn:Hn.
 remember (length bef) as i eqn:Hi.
 ...
 exists (canon_sym_gr_list_inv len (seq i (len - i) ++ seq 0 i)).
