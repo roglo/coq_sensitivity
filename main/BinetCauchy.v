@@ -3923,6 +3923,7 @@ unfold canon_sym_gr_list_list.
 now rewrite map_length, List_map_seq_length.
 Qed.
 
+(*
 Fixpoint list_prodn_nodup A (eqb : A → _) ll :=
   match ll with
   | [] => [[]]
@@ -3965,6 +3966,7 @@ apply filter_ext_in.
 intros lb Hlb.
 now destruct (member eqb a lb).
 Qed.
+*)
 
 Theorem list_prodn_repeat_length : ∀ A (l : list A) n,
   length (list_prodn (repeat l n)) = length l ^ n.
@@ -4334,6 +4336,11 @@ Compute (
 let n := 4 in
 let m := 3 in
  (map (λ la, (la, all_permut la)) (sls1n 1 n m))
+).
+Compute (
+let n := 4 in
+let m := 3 in
+ list_prodn (repeat (seq 1 n) m)
 ).
 ...
 (*
