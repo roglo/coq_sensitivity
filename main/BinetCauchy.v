@@ -4483,8 +4483,9 @@ apply IHlb in Hpab.
 apply in_map_iff in Hpab.
 destruct Hpab as (a & Hba & Ha).
 apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
+...
 apply in_map_iff.
-remember (length (b :: lb)) as len eqn:Hlen.
+remember (length (b :: lb)) as n eqn:Hn.
 remember (length bef) as i eqn:Hi.
 ...
 exists (canon_sym_gr_list_inv len (seq i (len - i) ++ seq 0 i)).
