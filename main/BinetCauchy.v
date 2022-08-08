@@ -4331,16 +4331,12 @@ unfold sub_lists_of_seq_1_n.
 rewrite flat_map_concat_map.
 rewrite <- list_prodn_prodn_repeat.
 Compute (
-let n := 5 in
+let n := 4 in
 let m := 3 in
  (map (λ la, (la, all_permut la)) (sls1n 1 n m))
 ).
 ...
-Compute (
-let rel := list_leb Nat.leb in
-let l := map all_permut [[3;4;5];[1;2]] in
-  isort rel (concat l) = isort rel (flat_map (isort rel) l)
-).
+(*
 ...
 Theorem isort_concat : ∀ A (eqb rel : A → A → bool),
   equality eqb →
@@ -4374,6 +4370,7 @@ isort (list_leb Nat.leb) (all_permut la)
 ...
 rewrite <- list_prodn_prodn_repeat.
 ...
+*)
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
     (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
@@ -4499,8 +4496,8 @@ erewrite map_ext_in. 2: {
   now rewrite map_map.
 }
 rewrite <- flat_map_concat_map.
-cbn.
-(* pfff... c'est nul tout ce que je fais... *)
+Print list_swap_elem.
+Print replace_at.
 ...
 intros.
 do 2 rewrite list_prodn_list_prodn'.
