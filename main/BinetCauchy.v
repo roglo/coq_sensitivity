@@ -4446,30 +4446,89 @@ assert (Hab : la ⊂ lb). {
   }
   destruct Hlb as (Hsb & Hlb & Hb).
   apply filter_In.
-(*
-Theorem in_all_permut_iff : ∀ la lb,
-  la ∈ all_permut lb → permutation eqb la lb.
+(**)
+Theorem permutation_in_all_permut : ∀ la lb,
+  permutation eqb la lb → la ∈ all_permut lb.
 Proof.
-intros * Hla.
-revert la Hla.
-induction lb as [| b]; intros. {
-  destruct la; [ easy | now destruct Hla ].
+intros * Hpab.
+destruct lb as [| d]. {
+  apply permutation_nil_r in Hpab; subst la.
+  now left.
 }
-cbn - [ canon_sym_gr_list nth fact ] in Hla.
-apply in_map_iff in Hla.
-destruct Hla as (lc & Hlan & Hla).
-unfold canon_sym_gr_list_list in Hla.
-apply in_map_iff in Hla.
-destruct Hla as (ld & Hla & Hlc).
-subst la lc; cbn.
-apply in_seq in Hlc.
-rewrite Nat.add_0_l in Hlc.
+unfold all_permut.
+remember (d :: lb) as l eqn:Hl.
+clear lb Hl.
+rename l into lb.
+unfold canon_sym_gr_list_list.
+rewrite map_map.
+cbn - [ canon_sym_gr_list nth fact ].
+revert la Hpab.
+induction lb as [| b]; intros. {
+  apply permutation_nil_r in Hpab; subst la.
+  now left.
+}
+(*
+cbn - [ canon_sym_gr_list nth fact ].
+*)
+apply (permutation_sym Nat.eqb_eq) in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x la.
+apply (permutation_sym Nat.eqb_eq) in Hpab.
+apply IHlb in Hpab.
 ...
-rewrite Nat.div_small.
-Search (permutation _ (map _ _)).
+Theorem in_all_permut_iff : ∀ la lb,
+  la ∈ all_permut lb ↔ permutation eqb la lb.
+Proof.
+intros.
+split. {
+  intros Hla.
+  revert la Hla.
+  induction lb as [| b]; intros. {
+    destruct la; [ easy | now destruct Hla ].
+  }
+  cbn - [ canon_sym_gr_list nth fact ] in Hla.
+  apply in_map_iff in Hla.
+  destruct Hla as (lc & Hla & H).
+  unfold canon_sym_gr_list_list in H.
+  apply in_map_iff in H.
+  destruct H as (ld & Hlc & Hld).
+  apply in_seq in Hld.
+  destruct Hld as (_, Hld); rewrite Nat.add_0_l in Hld.
+  cbn in Hlc.
+  remember (ld / (length lb)!) as a eqn:Ha.
+  remember (map (succ_when_ge a) _) as le eqn:Hle.
+  subst lc; rename le into lc.
+  cbn - [ nth ] in Hla.
+  destruct (lt_dec ld (length lb)!) as [Hdb| Hdb]. {
+    rewrite Nat.div_small in Ha; [ | easy ].
+    rewrite Nat.mod_small in Hle; [ | easy ].
+    subst a.
+    rewrite List_nth_0_cons in Hla.
+    subst la.
+    apply (permutation_skip Nat.eqb_eq).
+    apply IHlb.
+    unfold succ_when_ge in Hle.
+    erewrite map_ext_in in Hle. 2: {
+      intros a Ha.
+      now cbn; rewrite Nat.add_1_r.
+    }
+    subst lc.
+    rewrite map_map.
+    erewrite map_ext_in; [ | now intros; cbn ].
+Search all_permut.
+...
+  subst la lc; cbn.
+  rewrite Nat.add_0_l in Hlc.
+  ...
+  rewrite Nat.div_small.
+  Search (permutation _ (map _ _)).
 Search (canon_sym_gr_list).
 ...
-*)
   split. 2: {
     apply (no_dup_NoDup Nat.eqb_eq).
     clear Hlb Hb.
