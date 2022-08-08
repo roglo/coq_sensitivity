@@ -4087,6 +4087,33 @@ apply IHla. {
 }
 Qed.
 
+Theorem nth_canon_sym_gr_list_ub : ∀ d i n k,
+  i < n
+  → k < n!
+  → nth i (canon_sym_gr_list n k) d < n.
+Proof.
+intros * Hin Hkn.
+revert i k Hin Hkn.
+induction n; intros; [ easy | cbn ].
+destruct i. {
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  rewrite Nat.mul_comm.
+  now rewrite <- Nat_fact_succ.
+}
+apply Nat.succ_lt_mono in Hin.
+rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
+unfold succ_when_ge.
+specialize (IHn i (k mod n!) Hin) as H1.
+assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
+specialize (H1 H); clear H.
+rewrite <- Nat.add_1_l, Nat.add_comm.
+rewrite nth_indep with (d' := 0) in H1. 2: {
+  now rewrite canon_sym_gr_list_length.
+}
+apply Nat.add_le_lt_mono; [ | easy ].
+apply Nat_b2n_upper_bound.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4419,8 +4446,119 @@ assert (Hab : la ⊂ lb). {
   }
   destruct Hlb as (Hsb & Hlb & Hb).
   apply filter_In.
+(*
+Theorem in_all_permut_iff : ∀ la lb,
+  la ∈ all_permut lb → permutation eqb la lb.
+Proof.
+intros * Hla.
+revert la Hla.
+induction lb as [| b]; intros. {
+  destruct la; [ easy | now destruct Hla ].
+}
+cbn - [ canon_sym_gr_list nth fact ] in Hla.
+apply in_map_iff in Hla.
+destruct Hla as (lc & Hlan & Hla).
+unfold canon_sym_gr_list_list in Hla.
+apply in_map_iff in Hla.
+destruct Hla as (ld & Hla & Hlc).
+subst la lc; cbn.
+apply in_seq in Hlc.
+rewrite Nat.add_0_l in Hlc.
+...
+rewrite Nat.div_small.
+Search (permutation _ (map _ _)).
+Search (canon_sym_gr_list).
+...
+*)
   split. 2: {
     apply (no_dup_NoDup Nat.eqb_eq).
+    clear Hlb Hb.
+    revert la Hla.
+    induction lb as [| b]; intros; cbn. {
+      destruct Hla as [Hla| ]; [ | easy ].
+      subst la; constructor.
+    }
+    assert (H : sorted Nat.ltb lb) by now apply sorted_cons in Hsb.
+    specialize (IHlb H); clear H.
+    cbn - [ canon_sym_gr_list_list nth ] in Hla.
+    apply in_map_iff in Hla.
+    destruct Hla as (lc & Hla & Hlc); subst la.
+    apply (NoDup_map_iff 0).
+    intros i j Hi Hj Hij.
+    unfold canon_sym_gr_list_list in Hlc.
+    apply in_map_iff in Hlc.
+    destruct Hlc as (a & H1 & Hlc).
+    apply in_seq in Hlc.
+    destruct Hlc as (_, Ha); rewrite Nat.add_0_l in Ha.
+    rewrite <- H1 in Hi, Hj.
+    rewrite canon_sym_gr_list_length in Hi, Hj.
+    apply NoDup_nth in Hij; cycle 1. {
+      now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
+    } {
+      cbn; rewrite <- H1.
+      now apply nth_canon_sym_gr_list_ub.
+    } {
+      cbn; rewrite <- H1.
+      now apply nth_canon_sym_gr_list_ub.
+    }
+    rewrite <- H1 in Hij.
+    now apply nth_canon_sym_gr_list_inj1 in Hij.
+  } {
+    apply (in_list_prodn_iff 0).
+    rewrite repeat_length; subst m.
+    assert (Hll : length la = length lb). {
+      clear Hsb Hb.
+      revert lb Hla.
+      induction la as [| a]; intros. {
+        destruct lb as [| b]; [ easy | ].
+        cbn - [ canon_sym_gr_list nth fact ] in Hla.
+        apply in_map_iff in Hla.
+        destruct Hla as (la & Hlan & Hla).
+        apply map_eq_nil in Hlan; subst la.
+        unfold canon_sym_gr_list_list in Hla.
+        apply in_map_iff in Hla.
+        now destruct Hla as (lc & Hla & Hlc).
+      }
+      cbn.
+      destruct lb as [| b]; [ now destruct Hla | ].
+      cbn; f_equal.
+      cbn - [ canon_sym_gr_list nth fact ] in Hla.
+      apply in_map_iff in Hla.
+      destruct Hla as (lc & Hlan & Hla).
+      apply in_map_iff in Hla.
+      destruct Hla as (c & Hlc & Hc).
+      subst lc.
+      cbn - [ nth ] in Hlan.
+      injection Hlan; clear Hlan; intros H1 H2.
+      rewrite map_map in H1.
+      rewrite <- H1.
+      rewrite map_length.
+      apply canon_sym_gr_list_length.
+    }
+    split; [ easy | ].
+    intros i Hi.
+    rewrite List_nth_repeat.
+    destruct (lt_dec i (length lb)) as [Him| ]; [ | now rewrite Hll in Hi ].
+    clear Him.
+    apply in_seq, Hb.
+    clear Hb Hsb.
+    revert la Hla Hll Hi.
+    induction lb as [| b]; intros; [ now rewrite Hll in Hi | ].
+    destruct la as [| a]; [ easy | ].
+    cbn in Hll; apply Nat.succ_inj in Hll.
+    destruct i. {
+      rewrite List_nth_0_cons.
+      cbn - [ canon_sym_gr_list nth fact ] in Hla.
+      apply in_map_iff in Hla.
+      destruct Hla as (lc & Hlc & Hc).
+      apply in_map_iff in Hc.
+      destruct Hc as (d & Hld & Hd).
+      cbn in Hld.
+      subst lc.
+      injection Hlc; clear Hlc; intros H1 H2.
+      destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
+        rewrite Nat.div_small in H2; [ now subst b; left | easy ].
+      }
 ...
 (*
 ...
