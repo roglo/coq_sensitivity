@@ -4472,12 +4472,47 @@ destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
   now apply canon_sym_gr_list_is_permut_list.
 }
 apply Nat.nlt_ge in Hdb.
+rename a into i.
+apply (permutation_sym Nat.eqb_eq).
+apply permutation_cons_l_iff.
+remember (extract (Nat.eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  rewrite <- Hla in H1.
+  destruct i. {
+    rewrite List_nth_0_cons in H1.
+    specialize (H1 _ (or_introl eq_refl)).
+    now rewrite Nat.eqb_refl in H1.
+  }
+  rewrite List_nth_succ_cons in H1.
+  specialize (H1 b).
+  assert (H : b ∈ map (λ i, nth i (b :: lb) b) lc). {
+    apply in_map_iff.
+    exists 0.
+    split; [ easy | ].
+    rewrite Hle.
+    apply in_map_iff.
+    exists 0.
+    unfold succ_when_ge.
+    split; [ easy | ].
+Search (_ ∈ canon_sym_gr_list _ _).
+...
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x.
+subst llb.
+remember (∀ lb, _) as x eqn:Hx in Hbef; subst x.
+
+remember (extract (Nat.eqb b) la) as
+...
 erewrite map_ext_in in Hle. 2: {
   intros e He.
   unfold succ_when_ge.
   apply (In_nth _ _ 0) in He.
   rewrite canon_sym_gr_list_length in He.
   destruct He as (m & Hm & He).
+...
   replace (a <=? e) with false. 2: {
     symmetry.
     apply Nat.leb_gt.
