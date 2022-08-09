@@ -4459,6 +4459,33 @@ unfold all_permut.
 remember (d :: lb) as l eqn:Hl.
 clear lb Hl.
 rename l into lb.
+erewrite map_ext_in. 2: {
+  intros lc Hlc.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    rewrite nth_indep with (d' := 0). 2: {
+      apply in_map_iff in Hlc.
+      destruct Hlc as (b & H & Hlc); subst lc.
+      apply (In_nth _ _ 0) in Hi.
+      rewrite canon_sym_gr_list_length in Hi.
+      destruct Hi as (j & Hjb & Hi).
+      subst i.
+      apply in_seq in Hlc.
+      now apply nth_canon_sym_gr_list_ub.
+    }
+    easy.
+  }
+  easy.
+}
+clear d.
+apply in_map_iff.
+unfold canon_sym_gr_list_list.
+exists (permutation_assoc eqb la lb).
+apply (perm_assoc_is_permut_list Nat.eqb_eq) in Hpab.
+remember (permutation_assoc Nat.eqb la lb) as p eqn:Hp.
+erewrite map_ext_in; [ | now intros; rewrite fold_ff_app ].
+rewrite fold_comp_list.
+...
 revert lb Hpab.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
