@@ -4459,6 +4459,39 @@ unfold all_permut.
 remember (d :: lb) as l eqn:Hl.
 clear lb Hl.
 rename l into lb.
+revert lb Hpab.
+induction la as [| a]; intros. {
+  apply permutation_nil_l in Hpab; subst lb.
+  now left.
+}
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x lb.
+specialize (IHla _ Hpab) as Hla.
+Print canon_sym_gr_list_list.
+Print canon_sym_gr_list.
+...
+apply IHlb in Hpab.
+apply in_map_iff in Hpab.
+destruct Hpab as (a & Hba & Ha).
+apply in_seq in Ha; destruct Ha as (_, Ha); cbn in Ha.
+remember (canon_sym_gr_list (length lb) a) as la eqn:Hla.
+generalize Hba; intros H.
+rewrite <- (firstn_skipn (length bef) la) in H.
+...
+intros * Hpab.
+destruct lb as [| d]. {
+  apply permutation_nil_r in Hpab; subst la.
+  now left.
+}
+unfold all_permut.
+remember (d :: lb) as l eqn:Hl.
+clear lb Hl.
+rename l into lb.
 unfold canon_sym_gr_list_list.
 rewrite map_map.
 cbn - [ canon_sym_gr_list nth fact ].
@@ -4500,6 +4533,7 @@ apply List_app_eq_app' in H. 2: {
 }
 destruct H as (Hbef', Haft').
 remember (length (b :: lb)) as n eqn:Hn.
+...
 replace (bef ++ b :: aft) with
   (map (λ i, nth (S i) (b :: lb) d) (firstn (length bef) la) ++
    nth 0 (b :: lb) d ::
