@@ -4472,6 +4472,25 @@ destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
   now apply canon_sym_gr_list_is_permut_list.
 }
 apply Nat.nlt_ge in Hdb.
+erewrite map_ext_in in Hle. 2: {
+  intros e He.
+  unfold succ_when_ge.
+  apply (In_nth _ _ 0) in He.
+  rewrite canon_sym_gr_list_length in He.
+  destruct He as (m & Hm & He).
+  replace (a <=? e) with false. 2: {
+    symmetry.
+    apply Nat.leb_gt.
+    rewrite Ha.
+    specialize (nth_canon_sym_gr_list_ub 0) as H1.
+    specialize (H1 m (length lb) (d mod (length lb)!) Hm).
+    assert (H : d mod (length lb)! < (length lb)!). {
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+    specialize (H1 H); clear H.
+    rewrite He in H1.
+...
+unfold succ_when_ge in Hle.
 ...
   subst la lc; cbn.
   rewrite Nat.add_0_l in Hlc.
