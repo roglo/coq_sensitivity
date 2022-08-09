@@ -1040,7 +1040,7 @@ destruct (Nat.eq_dec len 0) as [Hnz| Hnz]. {
 }
 unfold ε.
 rewrite seq_length.
-unfold sign_diff, ff_app.
+unfold sign_diff.
 erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
@@ -1489,7 +1489,6 @@ split. {
   rewrite app_length, seq_length, list_swap_elem_length.
   cbn - [ list_swap_elem ].
   intros u v Hu Hv Huv.
-  unfold ff_app in Huv.
   destruct (lt_dec u i) as [Hui| Hui]. {
     rewrite app_nth1 in Huv; [ | now rewrite seq_length ].
     rewrite seq_nth in Huv; [ | easy ].
@@ -1826,7 +1825,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     specialize (H2 H); clear H.
     assert (H : j < i + S (length l)) by flia Hc.
     specialize (H2 H); clear H.
-    unfold ff_app in H2.
     rewrite app_nth2 in H2; [ | now rewrite seq_length; unfold ge ].
     rewrite seq_length, Nat.sub_diag in H2; cbn in H2.
     rewrite app_nth1 in H2; [ | rewrite seq_length; flia Hij Hc ].
@@ -1928,7 +1926,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite app_length, seq_length.
   cbn.
   unfold "°".
-  unfold ff_app.
   enough
     (H : seq 0 i ++ la =
      map (λ i0 : nat, nth i0 (seq 0 i ++ j :: l) 0) (swap (i + S (length l)) i j)). {
@@ -2207,7 +2204,6 @@ assert (Hilj : i < j). {
   specialize (H2 H); clear H.
   assert (H : j < i + S (length l)) by flia Hc.
   specialize (H2 H); clear H.
-  unfold ff_app in H2.
   rewrite app_nth2 in H2; [ | now rewrite seq_length; unfold ge ].
   rewrite seq_length, Nat.sub_diag in H2; cbn in H2.
   rewrite app_nth1 in H2; [ | rewrite seq_length; flia Hij Hc ].
@@ -2420,10 +2416,9 @@ Qed.
 
 Theorem eq_transp_list_cons : ∀ la lb i j,
   transp_list la = (i, j) :: lb
-  → (∀ k, k < i → ff_app la k = k) ∧ nth i la 0 = j.
+  → (∀ k, k < i → nth k la 0 = k) ∧ nth i la 0 = j.
 Proof.
 intros * Hla.
-unfold ff_app.
 unfold transp_list in Hla.
 specialize eq_transp_loop_cons as H1.
 specialize (H1 (length la + nb_nfit 0 la) i j 0 la lb Hla).
@@ -3013,12 +3008,13 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     apply ε_collapse_ε.
     now apply (no_dup_NoDup Nat.eqb_eq).
   }
-  set (g2 := λ i, S (ff_app (isort_rank Nat.leb kl) (i - 1))).
-  set (h2 := λ i, S (ff_app (collapse kl) (i - 1))).
+  set (g2 := λ i, S (nth (i - 1) (isort_rank Nat.leb kl) 0)).
+  set (h2 := λ i, S (nth (i - 1) (collapse kl) 0)).
   assert (Hgh2 : ∀ i, 1 ≤ i ≤ n → g2 (h2 i) = i). {
     intros i Hi.
     unfold g2, h2.
     rewrite Nat_sub_succ_1.
+    unfold collapse.
     rewrite permut_permut_isort; [ flia Hi | | ]. {
       apply isort_rank_is_permut_list.
     }
@@ -3043,7 +3039,6 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     intros i Hi.
     unfold g1.
     unfold "°".
-    unfold ff_app.
     unfold g2.
     rewrite Nat_sub_succ_1.
     rewrite (List_map_nth' 0). 2: {
@@ -3051,7 +3046,6 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
       apply isort_rank_ub.
       now intros H; rewrite H in Hn.
     }
-    do 3 rewrite fold_ff_app.
     unfold collapse.
     rewrite permut_isort_permut; cycle 1. {
       apply isort_rank_is_permut_list.
@@ -3142,7 +3136,7 @@ apply NoDup_permutation. {
   specialize (ext_in_map Hij) as H1.
   assert
     (H : ∀ k, k < n →
-     ff_app (nth i (all_comb n) []) k = ff_app (nth j (all_comb n) []) k). {
+     nth k (nth i (all_comb n) []) 0 = nth k (nth j (all_comb n) []) 0). {
     intros k Hk.
     apply H1.
     apply (permutation_in_iff Nat.eqb_eq) with (la := seq 0 n). 2: {
@@ -4192,7 +4186,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
       apply in_all_comb_iff in Hl.
       destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hlm & Hl).
-      unfold ff_app.
       assert (H : nth (i - 1) l 0 ∈ l). {
         apply nth_In.
         rewrite Hlm; flia Hi.
@@ -4496,14 +4489,15 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     exists 0.
     unfold succ_when_ge.
     split; [ easy | ].
-Search (_ ∈ canon_sym_gr_list _ _).
+Search canon_sym_gr_list.
+Search is_permut_list.
 ...
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Heqb in H; subst x.
 subst llb.
 remember (∀ lb, _) as x eqn:Hx in Hbef; subst x.
-
+...
 remember (extract (Nat.eqb b) la) as
 ...
 erewrite map_ext_in in Hle. 2: {
@@ -5552,7 +5546,7 @@ Some terms of the lhs must cancel each other. But which ones?
 *)
 destruct n; [ easy | ].
 destruct n. {
-  cbn - [ "/" ff_app ].
+  cbn - [ "/" nth ].
 ...
   unfold ε'.
   do 3 rewrite rngl_summation_only_one.

@@ -801,7 +801,7 @@ Qed.
 
 Theorem map_permut_seq_is_permut : ∀ n σ,
   is_permut n σ
-  → is_permut n (map (ff_app σ) (seq 0 n)).
+  → is_permut n (map (λ i, nth i σ 0) (seq 0 n)).
 Proof.
 intros * Hσ.
 split; [ | now rewrite List_map_seq_length ].

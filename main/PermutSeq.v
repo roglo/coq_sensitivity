@@ -11,10 +11,8 @@ Require Import Misc PermutationFun SortingFun.
 Require Import IterAnd.
 Require Import Pigeonhole.
 
-Definition ff_app l i := nth i l 0.
-
 Definition comp {A B C} (f : B → C) (g : A → B) x := f (g x).
-Definition comp_list (la lb : list nat) := map (ff_app la) lb.
+Definition comp_list (la lb : list nat) := map (λ i, nth i la 0) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
@@ -72,14 +70,11 @@ split. {
 
 Definition is_permut n f := is_permut_list f ∧ length f = n.
 
-Theorem fold_ff_app : ∀ l i, nth i l 0 = ff_app l i.
-Proof. easy. Qed.
-
 (* *)
 
 Theorem NoDup_nat : ∀ l,
   NoDup l
-  → (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j).
+  → (∀ i j, i < length l → j < length l → nth i l 0 = nth j l 0 → i = j).
 Proof.
 intros * Hnd.
 now apply NoDup_nth.
@@ -87,7 +82,7 @@ Qed.
 Arguments NoDup_nat : clear implicits.
 
 Theorem nat_NoDup : ∀ l,
-  (∀ i j, i < length l → j < length l → ff_app l i = ff_app l j → i = j)
+  (∀ i j, i < length l → j < length l → nth i l 0 = nth j l 0 → i = j)
   → NoDup l.
 Proof.
 intros * Hnd.
@@ -305,7 +300,7 @@ split. {
 Qed.
 
 Theorem comp_map_seq : ∀ la lb,
-  la ° lb = map (λ i, ff_app la (ff_app lb i)) (seq 0 (length lb)).
+  la ° lb = map (λ i, nth (nth i lb 0) la 0) (seq 0 (length lb)).
 Proof.
 intros.
 unfold "°".
@@ -318,9 +313,6 @@ apply in_seq in Hi.
 now rewrite (List_map_nth' 0).
 Qed.
 
-Theorem List_map_ff_app_seq : ∀ l, l = map (ff_app l) (seq 0 (length l)).
-Proof. intros; apply List_map_nth_seq. Qed.
-
 Theorem permut_comp_assoc : ∀ n f g h,
   length g = n
   → is_permut n h
@@ -331,7 +323,6 @@ unfold "°", comp_list; cbn.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi.
-unfold ff_app.
 rewrite (List_map_nth' 0); [ easy | ].
 rewrite Hg, <- Hh.
 now apply Hph.
@@ -500,10 +491,8 @@ symmetry.
 unfold "°".
 rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length ].
 specialize (isort_isort_rank ord 0 l) as H1.
-do 2 rewrite fold_ff_app; cbn.
 apply (f_equal (λ l, nth i l 0)) in H1.
 rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
-do 3 rewrite fold_ff_app in H1.
 easy.
 Qed.
 
@@ -609,11 +598,10 @@ split. {
   }
   remember (permutation_assoc_loop eqb la (map Some (lb ++ lc))) as
     ld eqn:Hld; symmetry in Hld.
-  rewrite fold_ff_app in Hij.
   destruct j. {
     cbn - [ "<?" ] in Hij.
     rewrite if_ltb_lt_dec in Hij.
-    destruct (lt_dec (ff_app ld i) (length lb)) as [H| H]; flia H Hij.
+    destruct (lt_dec (nth i ld 0) (length lb)) as [H| H]; flia H Hij.
   }
   apply Nat.succ_lt_mono in Hj.
   cbn - [ "<?" ] in Hij.
@@ -622,16 +610,16 @@ split. {
     rewrite (permutation_assoc_loop_length Heqb); [ easy | ].
     now rewrite filter_Some_map_Some.
   }
-  rewrite fold_ff_app in Hij; f_equal.
+  f_equal.
   do 2 rewrite if_ltb_lt_dec in Hij.
-  destruct (lt_dec (ff_app ld i) (length lb)) as [H1| H1]. {
-    destruct (lt_dec (ff_app ld j) (length lb)) as [H2| H2]. {
+  destruct (lt_dec (nth i ld 0) (length lb)) as [H1| H1]. {
+    destruct (lt_dec (nth j ld 0) (length lb)) as [H2| H2]. {
       rewrite <- Hld in Hij.
       now apply IHla with (lb := lb ++ lc).
     }
     flia H1 H2 Hij.
   } {
-    destruct (lt_dec (ff_app ld j) (length lb)) as [H2| H2]. {
+    destruct (lt_dec (nth j ld 0) (length lb)) as [H2| H2]. {
       flia H1 H2 Hij.
     }
     apply Nat.succ_inj in Hij.
@@ -681,7 +669,6 @@ split. {
   assert (H : j < S (length l)) by flia Hjl.
   specialize (H1 H); clear H.
   specialize (H1 (Nat.lt_succ_diag_r _)).
-  unfold ff_app in H1.
   rewrite app_nth1 in H1; [ | easy ].
   rewrite app_nth2 in H1; [ | now unfold ge ].
   rewrite Nat.sub_diag, Hji in H1.
@@ -756,7 +743,6 @@ assert (Hal : a = length l). {
   specialize (H9 H); clear H.
   assert (H : x' < S (length l)) by flia H6.
   specialize (H9 H); clear H.
-  unfold ff_app in H9.
   apply H7, H9.
   rewrite app_nth1; [ | easy ].
   rewrite app_nth1; [ | easy ].
@@ -802,7 +788,7 @@ Qed.
 Theorem permut_isort_permut : ∀ i l,
   is_permut_list l
   → i < length l
-  → ff_app (isort_rank Nat.leb l) (ff_app l i) = i.
+  → nth (nth i l 0) (isort_rank Nat.leb l) 0 = i.
 Proof.
 intros * Hp Hil.
 specialize (permut_comp_isort_rank_r Hp) as H1.
@@ -811,15 +797,15 @@ destruct H1 as (_, H1).
 specialize (H1 0).
 unfold "°" in H1.
 assert
-  (H2 : ∀ j, j < length l → ff_app l (ff_app (isort_rank Nat.leb l) j) = j). {
+  (H2 : ∀ j, j < length l → nth (nth j (isort_rank Nat.leb l) 0) l 0 = j). {
   intros j Hj.
   specialize (H1 j).
   rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
   now rewrite seq_nth in H1.
 }
 clear H1.
-specialize (H2 (ff_app l i)) as H2.
-assert (H : ff_app l i < length l) by now apply Hp, nth_In.
+specialize (H2 (nth i l 0)) as H2.
+assert (H : nth i l 0 < length l) by now apply Hp, nth_In.
 specialize (H2 H); clear H.
 destruct Hp as (Ha, Hp).
 apply (NoDup_nat _ Hp) in H2; [ easy | | easy ].
@@ -846,14 +832,13 @@ rewrite nth_indep with (d' := 0); [ | now rewrite comp_length ].
 clear d.
 unfold "°".
 rewrite (List_map_nth' 0); [ | easy ].
-rewrite fold_ff_app; cbn.
 now apply permut_isort_permut.
 Qed.
 
 Theorem permut_permut_isort : ∀ i l,
   is_permut_list l
   → i < length l
-  → ff_app l (ff_app (isort_rank Nat.leb l) i) = i.
+  → nth (nth i (isort_rank Nat.leb l) 0) l 0 = i.
 Proof.
 intros * Hp Hil.
 specialize (permut_comp_isort_rank_l Hp) as H1.
@@ -862,15 +847,15 @@ destruct H1 as (_, H1).
 specialize (H1 0).
 unfold "°" in H1.
 assert
-  (H2 : ∀ j, j < length l → ff_app (isort_rank Nat.leb l) (ff_app l j) = j). {
+  (H2 : ∀ j, j < length l → nth (nth j l 0) (isort_rank Nat.leb l) 0 = j). {
   intros j Hj.
   specialize (H1 j).
   rewrite (List_map_nth' 0) in H1; [ | easy ].
   now rewrite seq_nth in H1.
 }
 clear H1.
-specialize (H2 (ff_app (isort_rank Nat.leb l) i)) as H2.
-assert (H : ff_app (isort_rank Nat.leb l) i < length l). {
+specialize (H2 (nth i (isort_rank Nat.leb l) 0)) as H2.
+assert (H : nth i (isort_rank Nat.leb l) 0 < length l). {
   apply isort_rank_ub.
   now intros H; subst l.
 }
@@ -1033,7 +1018,6 @@ split; cbn. {
   apply nat_NoDup.
   rewrite List_map_seq_length.
   intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
   rewrite seq_nth in Hij; [ | easy ].
@@ -1139,7 +1123,6 @@ split. {
   apply nat_NoDup.
   cbn; rewrite seq_length.
   intros i j Hi Hj Hij.
-  unfold ff_app in Hij.
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   easy.
@@ -1300,7 +1283,7 @@ Qed.
 Theorem canon_sym_gr_list_ub : ∀ n k i,
   k < n!
   → i < n
-  → ff_app (canon_sym_gr_list n k) i < n.
+  → nth i (canon_sym_gr_list n k) 0 < n.
 Proof.
 intros * Hkn Hi.
 revert i k Hkn Hi.
@@ -1320,10 +1303,10 @@ Qed.
 Theorem canon_sym_gr_inv_list_ub : ∀ n k j,
   k < n!
   → j < n
-  → ff_app (canon_sym_gr_inv_list n k) j < n.
+  → nth j (canon_sym_gr_inv_list n k) 0 < n.
 Proof.
 intros * Hkn Hjn.
-unfold canon_sym_gr_inv_list, ff_app.
+unfold canon_sym_gr_inv_list.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ cbn | easy ].
 revert k j Hkn Hjn.
@@ -1361,11 +1344,10 @@ Qed.
 Theorem canon_sym_gr_inv_sym_gr : ∀ n k i,
   k < n!
   → i < n
-  → ff_app (canon_sym_gr_inv_list n k) (ff_app (canon_sym_gr_list n k) i) = i.
+  → nth (nth i (canon_sym_gr_list n k) 0)  (canon_sym_gr_inv_list n k) 0 = i.
 Proof.
 intros * Hkn Hi.
 unfold canon_sym_gr_inv_list.
-unfold ff_app.
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
   now apply canon_sym_gr_list_ub.
@@ -1426,11 +1408,10 @@ Qed.
 Theorem canon_sym_gr_sym_gr_inv : ∀ n k i,
   k < n!
   → i < n
-  → ff_app (canon_sym_gr_list n k) (ff_app (canon_sym_gr_inv_list n k) i) = i.
+  → nth (nth i (canon_sym_gr_inv_list n k) 0) (canon_sym_gr_list n k) 0 = i.
 Proof.
 intros * Hkn Hi.
 unfold canon_sym_gr_inv_list.
-unfold ff_app.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_0_l.
@@ -1498,7 +1479,7 @@ Theorem nth_canon_sym_gr_list_inj1 : ∀ n k i j,
   k < fact n
   → i < n
   → j < n
-  → ff_app (canon_sym_gr_list n k) i = ff_app (canon_sym_gr_list n k) j
+  → nth i (canon_sym_gr_list n k) 0 = nth j (canon_sym_gr_list n k) 0
   → i = j.
 Proof.
 intros * Hk Hi Hj Hij.
@@ -1567,7 +1548,7 @@ intros * Hi.
 apply nat_NoDup.
 rewrite canon_sym_gr_inv_list_length.
 intros j k Hj Hk Hjk.
-apply (f_equal (ff_app (canon_sym_gr_list n i))) in Hjk.
+apply (f_equal (λ m, nth m (canon_sym_gr_list n i) 0)) in Hjk.
 rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
 rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
 easy.
