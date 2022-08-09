@@ -4479,6 +4479,13 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     now rewrite Nat.eqb_refl in H1.
   }
   rewrite List_nth_succ_cons in H1.
+  destruct (lt_dec i (length lb)) as [Hilb| Hilb]. 2: {
+    apply Nat.nlt_ge in Hilb.
+    specialize (H1 b).
+    rewrite nth_overflow in H1; [ | easy ].
+    specialize (H1 (or_introl eq_refl)).
+    now rewrite (equality_refl Nat.eqb_eq) in H1.
+  }
   specialize (H1 b).
   assert (H : b ∈ map (λ i, nth i (b :: lb) b) lc). {
     apply in_map_iff.
@@ -4489,16 +4496,29 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     exists 0.
     unfold succ_when_ge.
     split; [ easy | ].
-Search canon_sym_gr_list.
-Search is_permut_list.
-...
+    remember (length lb) as n eqn:Hn.
+    specialize canon_sym_gr_list_is_permut_list as H2.
+    specialize (H2 n (d mod n!)).
+    assert (H : d mod n! < n!) by (apply Nat.mod_upper_bound, fact_neq_0).
+    specialize (H2 H); clear H.
+    specialize permut_list_surj as H3.
+    specialize (H3 0 _ H2).
+    rewrite canon_sym_gr_list_length in H3.
+    assert (H : 0 < n) by flia Hilb.
+    specialize (H3 H); clear H.
+    destruct H3 as (j & Hjn & Hj).
+    rewrite <- Hj.
+    apply nth_In.
+    now rewrite canon_sym_gr_list_length.
+  }
+  specialize (H1 (or_intror H)).
+  now rewrite (equality_refl Nat.eqb_eq) in H1.
+}
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
-apply Heqb in H; subst x.
-subst llb.
-remember (∀ lb, _) as x eqn:Hx in Hbef; subst x.
-...
-remember (extract (Nat.eqb b) la) as
+apply Nat.eqb_eq in H; subst x.
+apply (permutation_sym Nat.eqb_eq).
+apply IHlb.
 ...
 erewrite map_ext_in in Hle. 2: {
   intros e He.
