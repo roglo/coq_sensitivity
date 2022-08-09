@@ -4419,12 +4419,10 @@ assert (Hab : la ⊂ lb). {
   }
   destruct Hlb as (Hsb & Hlb & Hb).
   apply filter_In.
-Theorem in_all_permut_iff : ∀ la lb,
-  la ∈ all_permut lb ↔ permutation eqb la lb.
+Theorem in_all_permut_permutation : ∀ la lb,
+  la ∈ all_permut lb → permutation eqb la lb.
 Proof.
-intros.
-split; [ | apply permutation_in_all_permut ].
-intros Hla.
+intros * Hla.
 revert la Hla.
 induction lb as [| b]; intros. {
   destruct la; [ easy | now destruct Hla ].
@@ -4434,27 +4432,21 @@ apply in_map_iff in Hla.
 destruct Hla as (lc & Hla & H).
 unfold canon_sym_gr_list_list in H.
 apply in_map_iff in H.
-destruct H as (ld & Hlc & Hld).
-apply in_seq in Hld.
-destruct Hld as (_, Hld); rewrite Nat.add_0_l in Hld.
+destruct H as (d & Hlc & Hd).
+apply in_seq in Hd.
+destruct Hd as (_, Hd); rewrite Nat.add_0_l in Hd.
 cbn in Hlc.
-remember (ld / (length lb)!) as a eqn:Ha.
+remember (d / (length lb)!) as a eqn:Ha.
 remember (map (succ_when_ge a) _) as le eqn:Hle.
 subst lc; rename le into lc.
 cbn - [ nth ] in Hla.
-destruct (lt_dec ld (length lb)!) as [Hdb| Hdb]. {
+destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
   rewrite Nat.div_small in Ha; [ | easy ].
   rewrite Nat.mod_small in Hle; [ | easy ].
   subst a.
   rewrite List_nth_0_cons in Hla.
   subst la.
   apply (permutation_skip Nat.eqb_eq).
-(*
-  ============================
-  permutation Nat.eqb
-    (map (λ x : nat, nth (succ_when_ge 0 x) (b :: lb) b)
-       (canon_sym_gr_list (length lb) ld)) lb
-*)
   apply IHlb.
   unfold succ_when_ge in Hle.
   erewrite map_ext_in in Hle. 2: {
@@ -4468,7 +4460,18 @@ destruct (lt_dec ld (length lb)!) as [Hdb| Hdb]. {
   apply (permutation_sym Nat.eqb_eq).
   specialize (permutation_refl Nat.eqb_eq lb) as H.
   rewrite (map_permutation_assoc Nat.eqb_eq b H) at 1.
-  apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+  apply (permutation_map Nat.eqb_eq Nat.eqb_eq); clear H.
+  eapply (permutation_trans Nat.eqb_eq). {
+    apply (permutation_permutation_assoc Nat.eqb_eq).
+    apply (permutation_refl Nat.eqb_eq).
+  }
+  specialize (canon_sym_gr_list_length d (length lb)) as H1.
+  rewrite <- H1 at 1.
+  apply (permutation_sym Nat.eqb_eq).
+  apply permut_list_permutation_iff.
+  now apply canon_sym_gr_list_is_permut_list.
+}
+apply Nat.nlt_ge in Hdb.
 ...
   subst la lc; cbn.
   rewrite Nat.add_0_l in Hlc.
