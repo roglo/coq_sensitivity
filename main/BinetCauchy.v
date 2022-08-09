@@ -4481,10 +4481,56 @@ clear d.
 apply in_map_iff.
 unfold canon_sym_gr_list_list.
 exists (permutation_assoc eqb la lb).
-apply (perm_assoc_is_permut_list Nat.eqb_eq) in Hpab.
+generalize Hpab; intros Hpa.
+apply (perm_assoc_is_permut_list Nat.eqb_eq) in Hpa.
 remember (permutation_assoc Nat.eqb la lb) as p eqn:Hp.
 erewrite map_ext_in; [ | now intros; rewrite fold_ff_app ].
 rewrite fold_comp_list.
+assert (Hbpa : lb ° p = la). {
+  subst p.
+Theorem comp_permutation_assoc : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb,
+  permutation eqb la lb
+  → la = map (λ i, nth i lb d) (permutation_assoc eqb la lb).
+Proof.
+intros * Heqb * Hpab.
+unfold permutation_assoc.
+revert lb Hpab.
+induction la as [| a]; intros; [ easy | ].
+(**)
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+symmetry in Hlxl.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Heqb in H; subst x lb.
+...
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+...
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x lb.
+specialize (IHla _ Hpab) as Hla.
+Print canon_sym_gr_list_list.
+Print canon_sym_gr_list.
+...
+apply IHlb in Hpab.
+...
+Compute (
+let la := [7;2;1;3] in
+let d := 42 in
+map (λ lb,
+  map (λ i, nth i lb d) (permutation_assoc eqb la lb) = la)
+(all_permut la)
+).
 ...
 revert lb Hpab.
 induction la as [| a]; intros. {
