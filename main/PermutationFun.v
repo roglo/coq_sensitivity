@@ -1775,6 +1775,101 @@ rewrite fold_permutation_assoc.
 now apply IHla.
 Qed.
 
+Theorem map_permutation_assoc : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ d la lb,
+  permutation eqb la lb
+  → la = map (λ i, nth i lb d) (permutation_assoc eqb la lb).
+Proof.
+intros * Heqb * Hpab.
+unfold permutation_assoc.
+revert lb Hpab.
+induction la as [| a]; intros; [ easy | ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+symmetry in Hlxl.
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Heqb in H; subst x lb.
+cbn - [ option_eqb ].
+remember (extract _ _) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef', x), aft')| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn - [ option_eqb ] in H1.
+  specialize (H1 (Some a)).
+  assert (H : Some a ∈ map Some (bef ++ a :: aft)). {
+    rewrite map_app; cbn.
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Hlb); cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+rewrite map_app in Hlb; cbn in Hlb.
+apply List_app_eq_app' in Hlb. 2: {
+  rewrite map_length.
+  clear Hpab.
+  revert bef' Hbef' Hlb.
+  induction bef as [| b]; intros. {
+    cbn in Hlb.
+    destruct bef' as [| b']; [ easy | ].
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros; subst b'.
+    specialize (Hbef' _ (or_introl eq_refl)) as H1; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hlb.
+  destruct bef' as [| b']. {
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros Hlb H; subst b.
+    specialize (Hbef _ (or_introl eq_refl)).
+    now rewrite (equality_refl Heqb) in Hbef.
+  }
+  cbn; f_equal.
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros Hlb H; subst b'.
+  apply IHbef; [ | | easy ]. {
+    now intros; apply Hbef; right.
+  } {
+    now intros; apply Hbef'; right.
+  }
+}
+destruct Hlb as (Hbb' & Haa').
+subst bef'.
+injection Haa'; clear Haa'; intros; subst aft'.
+rewrite map_length.
+cbn.
+rewrite app_nth2; [ | now unfold ge ].
+rewrite Nat.sub_diag; cbn.
+f_equal.
+rewrite (permutation_assoc_loop_None_inside Heqb).
+rewrite map_length.
+rewrite <- map_app.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros b Hb.
+  replace (nth _ _ _) with (nth b (bef ++ aft) d). 2: {
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec b (length bef)) as [Hbb| Hbb]. {
+      rewrite app_nth1; [ | easy ].
+      now rewrite app_nth1.
+    }
+    apply Nat.nlt_ge in Hbb.
+    rewrite app_nth2; [ | easy ].
+    rewrite app_nth2; [ | flia Hbb ].
+    now rewrite Nat.sub_succ_l.
+  }
+  easy.
+}
+now apply IHla.
+Qed.
+
 Theorem permutation_fun_nth : ∀ A (eqb : A → _),
   equality eqb →
   ∀ d la lb i,
