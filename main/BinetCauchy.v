@@ -4506,18 +4506,40 @@ symmetry in Hlxl.
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Haft).
 apply Heqb in H; subst x lb.
-...
 cbn - [ option_eqb ].
 remember (extract _ _) as lxl eqn:Hlxl.
 symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]. 2: {
+destruct lxl as [((bef', x), aft')| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
   cbn - [ option_eqb ] in H1.
   specialize (H1 (Some a)).
-...
+  assert (H : Some a ∈ map Some (bef ++ a :: aft)). {
+    rewrite map_app; cbn.
+    now apply in_or_app; right; left.
+  }
+  specialize (H1 H); clear H.
+  cbn in H1.
+  now rewrite (equality_refl Heqb) in H1.
+}
 apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Hlb).
-apply Nat.eqb_eq in H; subst x lb.
+destruct Hlxl as (Hbef' & H & Hlb); cbn in H.
+destruct x as [x| ]; [ | easy ].
+apply Heqb in H; subst x.
+rewrite map_app in Hlb; cbn in Hlb.
+apply List_app_eq_app' in Hlb. 2: {
+  rewrite map_length.
+  clear Hpab.
+  revert bef' Hbef' Hlb.
+  induction bef as [| b]; intros. {
+    cbn in Hlb.
+    destruct bef' as [| b']; [ easy | ].
+    cbn in Hlb.
+    injection Hlb; clear Hlb; intros; subst b'.
+    specialize (Hbef' _ (or_introl eq_refl)) as H1; cbn in H1.
+    now rewrite (equality_refl Heqb) in H1.
+  }
+  cbn in Hlb.
+...
 specialize (IHla _ Hpab) as Hla.
 Print canon_sym_gr_list_list.
 Print canon_sym_gr_list.
