@@ -4499,8 +4499,16 @@ apply List_app_eq_app' in H. 2: {
   apply Nat.le_add_r.
 }
 destruct H as (Hbef', Haft').
-...
 remember (length (b :: lb)) as n eqn:Hn.
+replace (bef ++ b :: aft) with
+  (map (λ i, nth (S i) (b :: lb) d) (firstn (length bef) la) ++
+   nth 0 (b :: lb) d ::
+   map (λ i, nth (S i) (b :: lb) d) (skipn (length bef) la)). 2: {
+  now cbn; rewrite Hbef', Haft'.
+}
+remember (b :: lb) as lc eqn:Hlc.
+...
+apply in_map_iff.
 replace n with (length bef + (n - length bef)).
 ...
 apply in_map_iff.
