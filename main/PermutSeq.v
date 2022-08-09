@@ -1551,7 +1551,7 @@ destruct (le_dec (j / n!) _) as [H2| H2]. {
 destruct (le_dec (j / n!) _) as [H3| H3]; [ flia H1 H2 H3 | flia H1 ].
 Qed.
 
-Theorem length_canon_sym_gr_inv_list : ∀ n i,
+Theorem canon_sym_gr_inv_list_length : ∀ n i,
   length (canon_sym_gr_inv_list n i) = n.
 Proof.
 intros.
@@ -1565,7 +1565,7 @@ Theorem NoDup_canon_sym_gr_inv_list : ∀ n i,
 Proof.
 intros * Hi.
 apply nat_NoDup.
-rewrite length_canon_sym_gr_inv_list.
+rewrite canon_sym_gr_inv_list_length.
 intros j k Hj Hk Hjk.
 apply (f_equal (ff_app (canon_sym_gr_list n i))) in Hjk.
 rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
@@ -2146,6 +2146,97 @@ Theorem isort_rank_is_permut_list : ∀ A (ord : A → _) l,
 Proof.
 intros.
 now apply (isort_rank_is_permut _ (length l)).
+Qed.
+
+(* *)
+
+Theorem nth_canon_sym_gr_list_ub : ∀ d i n k,
+  i < n
+  → k < n!
+  → nth i (canon_sym_gr_list n k) d < n.
+Proof.
+intros * Hin Hkn.
+revert i k Hin Hkn.
+induction n; intros; [ easy | cbn ].
+destruct i. {
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  rewrite Nat.mul_comm.
+  now rewrite <- Nat_fact_succ.
+}
+apply Nat.succ_lt_mono in Hin.
+rewrite (List_map_nth' 0); [ | now rewrite canon_sym_gr_list_length ].
+unfold succ_when_ge.
+specialize (IHn i (k mod n!) Hin) as H1.
+assert (H : k mod n! < n!) by apply Nat.mod_upper_bound, fact_neq_0.
+specialize (H1 H); clear H.
+rewrite <- Nat.add_1_l, Nat.add_comm.
+rewrite nth_indep with (d' := 0) in H1. 2: {
+  now rewrite canon_sym_gr_list_length.
+}
+apply Nat.add_le_lt_mono; [ | easy ].
+apply Nat_b2n_upper_bound.
+Qed.
+
+Theorem permutation_in_all_permut : ∀ la lb,
+  permutation eqb la lb → la ∈ all_permut lb.
+Proof.
+intros * Hpab.
+destruct lb as [| d]. {
+  apply permutation_nil_r in Hpab; subst la.
+  now left.
+}
+unfold all_permut.
+remember (d :: lb) as l eqn:Hl.
+clear lb Hl.
+rename l into lb.
+erewrite map_ext_in. 2: {
+  intros lc Hlc.
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    rewrite nth_indep with (d' := 0). 2: {
+      apply in_map_iff in Hlc.
+      destruct Hlc as (b & H & Hlc); subst lc.
+      apply (In_nth _ _ 0) in Hi.
+      rewrite canon_sym_gr_list_length in Hi.
+      destruct Hi as (j & Hjb & Hi).
+      subst i.
+      apply in_seq in Hlc.
+      now apply nth_canon_sym_gr_list_ub.
+    }
+    easy.
+  }
+  easy.
+}
+clear d.
+apply in_map_iff.
+unfold canon_sym_gr_list_list.
+exists (permutation_assoc eqb la lb).
+split. {
+  symmetry.
+  now apply (map_permutation_assoc Nat.eqb_eq).
+}
+apply in_map_iff.
+remember (length lb) as n eqn:Hlb; symmetry in Hlb.
+remember (permutation_assoc eqb la lb) as p eqn:Hp.
+exists (canon_sym_gr_list_inv n p).
+rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+  subst p.
+  split; [ now apply (perm_assoc_is_permut_list Nat.eqb_eq) | ].
+  generalize Hpab; intros H.
+  apply (permutation_length Nat.eqb_eq) in H.
+  rewrite <- Hlb, <- H.
+  now apply (permutation_assoc_length Nat.eqb_eq).
+}
+split; [ easy | ].
+apply in_seq.
+split; [ easy | ].
+apply canon_sym_gr_list_inv_ub.
+rewrite Hp.
+split; [ now apply (perm_assoc_is_permut_list Nat.eqb_eq) | ].
+generalize Hpab; intros H.
+apply (permutation_length Nat.eqb_eq) in H.
+rewrite <- Hlb, <- H.
+now apply (permutation_assoc_length Nat.eqb_eq).
 Qed.
 
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
