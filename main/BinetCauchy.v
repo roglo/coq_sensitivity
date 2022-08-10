@@ -4542,25 +4542,30 @@ induction bef as [| a]. {
   clear Hbef.
   subst lc.
   rewrite map_map.
+(*
   specialize (map_permutation_assoc Nat.eqb_eq) as H1.
-  specialize (H1 b lb).
+  specialize (H1 b).
+*)
+  remember (λ j, _) as x; subst x.
+(*
+unfold succ_when_ge.
+...
+nth j lb b = nth (succ_when_ge (S i) j) (b :: lb) b
+nth (S j) (b :: lb) b = nth (succ_when_ge (S i) j) (b :: lb) b
+...
 specialize (H1 lb).
 (*
   specialize (H1 (butn i (b :: lb))).
 *)
+*)
   erewrite map_ext_in. 2: {
     intros j Hj.
-    replace (nth _ _ _) with (nth j (butn (S i) (b :: lb)) b). 2: {
-      unfold succ_when_ge.
-      unfold Nat.b2n.
-      rewrite if_leb_le_dec.
-      rewrite nth_butn.
-      unfold Nat.b2n.
-      now rewrite if_leb_le_dec.
+    replace (nth _ _ _) with (nth j (b :: butn i lb) b). 2: {
+      destruct j; [ easy | cbn ].
+      now rewrite nth_butn.
     }
     easy.
   }
-(* ouais, zut, j'ai peur que ça ne marche pas... *)
 ...
   rewrite H1; [ | ].
   erewrite map_ext_in. 2: {
