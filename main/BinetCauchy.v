@@ -4544,38 +4544,58 @@ induction bef as [| a]. {
   rewrite map_map.
   specialize (map_permutation_assoc Nat.eqb_eq) as H1.
   specialize (H1 b lb).
+specialize (H1 lb).
+(*
   specialize (H1 (butn i (b :: lb))).
+*)
   erewrite map_ext_in. 2: {
     intros j Hj.
-    replace (nth _ _ _) with (nth j (butn i (b :: lb)) b). 2: {
+    replace (nth _ _ _) with (nth j (butn (S i) (b :: lb)) b). 2: {
       unfold succ_when_ge.
+      unfold Nat.b2n.
+      rewrite if_leb_le_dec.
+      rewrite nth_butn.
+      unfold Nat.b2n.
+      now rewrite if_leb_le_dec.
+    }
+    easy.
+  }
+(* ouais, zut, j'ai peur que ça ne marche pas... *)
+...
+  rewrite H1; [ | ].
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite butn_cons.
+    rewrite <- map_butn.
+    easy.
+  }
+...
+Search (butn (S _)).
+    rewrite nth_butn.
+...
+  }
+...
+  flia Hj Hij Hisn.
+}
+apply Nat.nle_gt in Hij.
+rewrite Nat.add_0_r.
+rewrite nth_butn.
 unfold Nat.b2n.
 rewrite if_leb_le_dec.
-destruct (le_dec (S i) j) as [Hij| Hij]. {
-  rewrite Nat.add_1_r, List_nth_succ_cons.
-  unfold butn.
-  rewrite skipn_cons.
-  rewrite app_nth2. 2: {
-    rewrite firstn_length.
-    unfold ge.
-    transitivity i; [ | flia Hij ].
-    apply Nat.le_min_l.
-  }
-  rewrite firstn_length; cbn.
-  rewrite Hb.
-  rewrite List_nth_skipn.
-  rewrite <- Nat.add_sub_swap. 2: {
-    transitivity i; [ | flia Hij ].
-    apply Nat.le_min_l.
-  }
-  destruct (le_dec i (S n)) as [Hisn| Hisn]. {
-    rewrite Nat.min_l; [ | easy ].
-    now rewrite Nat.add_sub.
-  }
-  apply Nat.nle_gt in Hisn.
-(* ouais, bon, en principe j < n par Hj mais faut vérifier... *)
+destruct (le_dec i j) as [Heij| Heij]; [ | now rewrite Nat.add_0_r ].
+assert (H : i = j) by flia Hij Heij; subst j; clear Hij Heij.
+apply in_canon_sym_gr_list in Hj. 2: {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+d / n! < S n
+d < (S n)!
 ...
-  rewrite Nat.min_r; [ | flia Hisn ].
+Search (nth _ (butn _ _)).
+flia Hij ].
+rewrite nth_butn_after; [ | ].
+...
+rewrite butn_out; [ easy | ].
+cbn; rewrite Hb.
 ...
 Search (_ - _ + _).
   destruct (le_dec i (S n)) as [Hin| Hin]. {

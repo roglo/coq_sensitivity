@@ -1573,6 +1573,16 @@ split. {
 }
 Qed.
 
+Theorem in_canon_sym_gr_list : ∀ n k i,
+  k < n! → i ∈ canon_sym_gr_list n k → i < n.
+Proof.
+intros * Hkn Hi.
+apply (In_nth _ _ 0) in Hi.
+destruct Hi as (j & Hj & Hi); subst i.
+rewrite canon_sym_gr_list_length in Hj.
+now apply canon_sym_gr_list_ub.
+Qed.
+
 (* *)
 
 Definition sub_canon_permut_list (l : list nat) :=
