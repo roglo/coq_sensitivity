@@ -4542,22 +4542,7 @@ induction bef as [| a]. {
   clear Hbef.
   subst lc.
   rewrite map_map.
-(*
-  specialize (map_permutation_assoc Nat.eqb_eq) as H1.
-  specialize (H1 b).
-*)
   remember (λ j, _) as x; subst x.
-(*
-unfold succ_when_ge.
-...
-nth j lb b = nth (succ_when_ge (S i) j) (b :: lb) b
-nth (S j) (b :: lb) b = nth (succ_when_ge (S i) j) (b :: lb) b
-...
-specialize (H1 lb).
-(*
-  specialize (H1 (butn i (b :: lb))).
-*)
-*)
   erewrite map_ext_in. 2: {
     intros j Hj.
     replace (nth _ _ _) with (nth j (b :: butn i lb) b). 2: {
@@ -4566,22 +4551,46 @@ specialize (H1 lb).
     }
     easy.
   }
-...
-  rewrite H1; [ | ].
-  erewrite map_ext_in. 2: {
-    intros j Hj.
+  specialize (map_permutation_assoc Nat.eqb_eq) as H1.
+  specialize (H1 b lb).
+  specialize (H1 (b :: butn i lb)).
+  apply (permutation_sym Nat.eqb_eq).
+  assert (Hin : i < n). {
+    apply Nat.succ_lt_mono.
+    rewrite Ha.
+    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+    now rewrite Nat.mul_comm, <- Nat_fact_succ.
+  }
+  assert (Hbbb : permutation Nat.eqb lb (b :: butn i lb)). {
+    rewrite <- Hb in Hin.
+    clear Hb H1 Ha d n Hd Hdb IHlb.
+    rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
+    subst b.
+    revert i Hin.
+    induction lb as [| b]; intros; [ easy | ].
+    destruct i; [ apply (permutation_refl Nat.eqb_eq) | ].
+    cbn in Hin; apply Nat.succ_lt_mono in Hin.
+    rewrite List_nth_succ_cons.
     rewrite butn_cons.
-    rewrite <- map_butn.
-    easy.
+    eapply (permutation_trans Nat.eqb_eq). 2: {
+      apply (permutation_swap Nat.eqb_eq).
+    }
+    apply (permutation_skip Nat.eqb_eq).
+    now apply IHlb.
   }
-...
-Search (butn (S _)).
-    rewrite nth_butn.
-...
+  specialize (H1 Hbbb).
+  rewrite H1 at 1.
+  apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+  eapply (permutation_trans Nat.eqb_eq). {
+    now apply (permutation_permutation_assoc Nat.eqb_eq).
   }
-...
-  flia Hj Hij Hisn.
+  specialize (canon_sym_gr_list_length (d mod n!) n) as H2.
+  rewrite Hb, <- H2 at 1.
+  apply (permutation_sym Nat.eqb_eq).
+  apply permut_list_permutation_iff.
+  now apply canon_sym_gr_list_is_permut_list.
 }
+...
 apply Nat.nle_gt in Hij.
 rewrite Nat.add_0_r.
 rewrite nth_butn.
