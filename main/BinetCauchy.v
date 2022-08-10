@@ -4412,6 +4412,14 @@ assert (Hab : la ⊂ lb). {
   }
   destruct Hlb as (Hsb & Hlb & Hb).
   apply filter_In.
+  split. {
+    apply in_list_prodn_repeat_iff.
+    destruct m; [ left | right ]. {
+      apply length_zero_iff_nil in Hlb; subst lb.
+      now destruct Hla.
+    }
+    split; [ easy | ].
+Search all_permut.
 Theorem in_all_permut_permutation : ∀ la lb,
   la ∈ all_permut lb → permutation eqb la lb.
 Proof.
@@ -4525,11 +4533,117 @@ destruct i. {
   now apply Nat.nle_gt in Ha.
 }
 rewrite List_nth_succ_cons in Hlb.
-...
+clear la Hla.
+remember (length lb) as n eqn:Hb; symmetry in Hb.
 induction bef as [| a]. {
   rewrite app_nil_l.
   remember (map _ _) as x in Hlb; cbn in Hlb.
   injection Hlb; clear Hlb; intros H Hlb; subst aft x.
+  clear Hbef.
+  subst lc.
+  rewrite map_map.
+  specialize (map_permutation_assoc Nat.eqb_eq) as H1.
+  specialize (H1 b lb).
+  specialize (H1 (butn i (b :: lb))).
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    replace (nth _ _ _) with (nth j (butn i (b :: lb)) b). 2: {
+      unfold succ_when_ge.
+unfold Nat.b2n.
+rewrite if_leb_le_dec.
+destruct (le_dec (S i) j) as [Hij| Hij]. {
+  rewrite Nat.add_1_r, List_nth_succ_cons.
+  unfold butn.
+  rewrite skipn_cons.
+  rewrite app_nth2. 2: {
+    rewrite firstn_length.
+    unfold ge.
+    transitivity i; [ | flia Hij ].
+    apply Nat.le_min_l.
+  }
+  rewrite firstn_length; cbn.
+  rewrite Hb.
+  rewrite List_nth_skipn.
+  rewrite <- Nat.add_sub_swap. 2: {
+    transitivity i; [ | flia Hij ].
+    apply Nat.le_min_l.
+  }
+  destruct (le_dec i (S n)) as [Hisn| Hisn]. {
+    rewrite Nat.min_l; [ | easy ].
+    now rewrite Nat.add_sub.
+  }
+  apply Nat.nle_gt in Hisn.
+(* ouais, bon, en principe j < n par Hj mais faut vérifier... *)
+...
+  rewrite Nat.min_r; [ | flia Hisn ].
+...
+Search (_ - _ + _).
+  destruct (le_dec i (S n)) as [Hin| Hin]. {
+    rewrite Nat.min_l; [ | easy ].
+Search (nth _ (skipn _ _)).
+rewrite List_nth_skipn.
+...
+          now rewrite Nat.add_1_r.
+        }
+...
+      unfold succ_when_ge.
+      destruct i. {
+        unfold butn.
+        rewrite firstn_O, app_nil_l.
+        rewrite skipn_cons, skipn_O.
+        unfold Nat.b2n.
+        rewrite if_leb_le_dec.
+        destruct (le_dec 1 j) as [H1j| H1j]. {
+          now rewrite Nat.add_1_r.
+        }
+        apply Nat.nle_gt in H1j.
+        now apply Nat.lt_1_r in H1j; subst j.
+      }
+      unfold butn.
+      rewrite firstn_cons, skipn_cons.
+      cbn - [ nth skipn "<=?" ].
+      erewrite
+...
+        rewrite firstn_0_cons.
+        rewrite butn_0_l.
+...
+    }
+    easy.
+  }
+  apply (permutation_sym Nat.eqb_eq).
+  rewrite H1 at 1.
+...
+(*
+    replace (nth _ _ _) with
+      (nth i lb b). 2: {
+      destruct (Nat.eq_dec j 0) as [Hjz| Hjz]; [ now subst j | ].
+      destruct j; [ easy | ].
+      unfold succ_when_ge.
+      cbn.
+...
+*)
+    replace (nth _ _ _) with
+      (nth (if Nat.eq_dec j 0 then i else succ_when_ge i (j - 1)) lb b). 2: {
+      destruct (Nat.eq_dec j 0) as [Hjz| Hjz]; [ now subst j | ].
+      destruct j; [ easy | ].
+      now rewrite Nat_sub_succ_1.
+    }
+...
+    replace (nth _ _ _) with
+      (if Nat.eq_dec j 0 then nth i lb b
+       else nth (succ_when_ge i (j - 1)) lb b). 2: {
+      destruct (Nat.eq_dec j 0) as [Hjz| Hjz]; [ now subst j | ].
+      destruct j; [ easy | ].
+      now rewrite Nat_sub_succ_1.
+...
+    replace (nth _ _ _) with
+      (if Nat.eq_dec j 0 then b else nth (succ_when_ge i (j - 1)) lb b). 2: {
+      destruct (Nat.eq_dec j 0) as [Hjz| Hjz]; [ now subst j | ].
+      destruct j; [ easy | ].
+      now rewrite Nat_sub_succ_1.
+    }
+    easy.
+  }
 ...
 }
 ...
