@@ -4518,6 +4518,52 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Nat.eqb_eq in H; subst x.
 apply (permutation_sym Nat.eqb_eq).
+rewrite <- Hla in Hlb.
+destruct i. {
+  symmetry in Ha.
+  apply Nat.div_small_iff in Ha; [ | apply fact_neq_0 ].
+  now apply Nat.nle_gt in Ha.
+}
+rewrite List_nth_succ_cons in Hlb.
+...
+induction bef as [| a]. {
+  rewrite app_nil_l.
+  remember (map _ _) as x in Hlb; cbn in Hlb.
+  injection Hlb; clear Hlb; intros H Hlb; subst aft x.
+...
+}
+...
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+  apply (permutation_sym Nat.eqb_eq).
+...
+specialize (map_permutation_assoc Nat.eqb_eq b) as H1.
+specialize (H1 (b :: lb) (b :: lb)).
+  specialize (permutation_refl Nat.eqb_eq (b :: lb)) as H.
+specialize (H1 H); clear H.
+...
+  rewrite (map_permutation_assoc Nat.eqb_eq b H).
+...
+  rewrite Hle, map_map.
+...
+...
+  unfold succ_when_ge.
+  remember (λ j, _) as x in |-*; subst x.
+  apply (permutation_map Nat.eqb_eq Nat.eqb_eq); clear H.
+  eapply (permutation_trans Nat.eqb_eq). {
+    apply (permutation_permutation_assoc Nat.eqb_eq).
+    apply (permutation_refl Nat.eqb_eq).
+  }
+  specialize (canon_sym_gr_list_length d (length lb)) as H1.
+  rewrite <- H1 at 1.
+  apply (permutation_sym Nat.eqb_eq).
+  apply permut_list_permutation_iff.
+  now apply canon_sym_gr_list_is_permut_list.
+...
+  ============================
+  permutation Nat.eqb
+    (map (λ j : nat, nth (j + Nat.b2n (S i <=? j)) (b :: lb) b)
+       (canon_sym_gr_list (length lb) (d mod (length lb)!))) lb
 ...
 apply IHlb.
 ...
