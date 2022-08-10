@@ -4535,36 +4535,54 @@ destruct i. {
 rewrite List_nth_succ_cons in Hlb.
 clear la Hla.
 remember (length lb) as n eqn:Hb; symmetry in Hb.
-induction bef as [| a]. {
+subst n lc.
+assert (Hin : i < length lb). {
+  apply Nat.succ_lt_mono.
+  rewrite Ha.
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  now rewrite Nat.mul_comm, <- Nat_fact_succ.
+}
+clear IHlb Hdb Hd Ha.
+rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
+erewrite map_ext_in in Hlb. 2: {
+  intros j Hj.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hk & Hj).
+  rewrite nth_indep with (d' := 0). 2: {
+    rewrite <- Hk.
+    unfold succ_when_ge.
+    apply in_canon_sym_gr_list in Hj. 2: {
+      apply Nat.mod_upper_bound, fact_neq_0.
+    }
+    cbn - [ "<=?" ].
+    rewrite Nat.add_comm.
+    unfold Nat.b2n.
+    destruct (S i <=? k); flia Hj.
+  }
+  easy.
+}
+revert i lb Hlb Hin.
+induction bef as [| a]; intros. {
   rewrite app_nil_l.
   remember (map _ _) as x in Hlb; cbn in Hlb.
   injection Hlb; clear Hlb; intros H Hlb; subst aft x.
   clear Hbef.
-  subst lc.
   rewrite map_map.
   remember (λ j, _) as x; subst x.
   erewrite map_ext_in. 2: {
     intros j Hj.
-    replace (nth _ _ _) with (nth j (b :: butn i lb) b). 2: {
+    replace (nth _ _ _) with (nth j (b :: butn i lb) 0). 2: {
       destruct j; [ easy | cbn ].
       now rewrite nth_butn.
     }
     easy.
   }
   specialize (map_permutation_assoc Nat.eqb_eq) as H1.
-  specialize (H1 b lb).
+  specialize (H1 0 lb).
   specialize (H1 (b :: butn i lb)).
   apply (permutation_sym Nat.eqb_eq).
-  assert (Hin : i < n). {
-    apply Nat.succ_lt_mono.
-    rewrite Ha.
-    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
-    now rewrite Nat.mul_comm, <- Nat_fact_succ.
-  }
   assert (Hbbb : permutation Nat.eqb lb (b :: butn i lb)). {
-    rewrite <- Hb in Hin.
-    clear Hb H1 Ha d n Hd Hdb IHlb.
-    rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
+    clear H1 d.
     subst b.
     revert i Hin.
     induction lb as [| b]; intros; [ easy | ].
@@ -4584,12 +4602,65 @@ induction bef as [| a]. {
   eapply (permutation_trans Nat.eqb_eq). {
     now apply (permutation_permutation_assoc Nat.eqb_eq).
   }
+  remember (length lb) as n eqn:Hn.
   specialize (canon_sym_gr_list_length (d mod n!) n) as H2.
-  rewrite Hb, <- H2 at 1.
+  subst n.
+  rewrite <- H2 at 1.
   apply (permutation_sym Nat.eqb_eq).
   apply permut_list_permutation_iff.
   now apply canon_sym_gr_list_is_permut_list.
 }
+cbn.
+remember nth as f.
+injection Hlb; clear Hlb; intros Hlb H; subst f.
+subst a.
+assert (H : ∀ x, x ∈ bef → (b =? x) = false). {
+  intros j Hj.
+  now apply Hbef; right.
+}
+specialize (IHbef H); clear H.
+assert (H : lb = firstn i lb ++ nth i lb 0 :: skipn (S i) lb). {
+  rewrite <- (firstn_skipn i lb) at 1.
+  f_equal.
+  now apply List_skipn_is_cons.
+}
+apply (permutation_sym Nat.eqb_eq).
+rewrite H at 1.
+apply (permutation_sym Nat.eqb_eq).
+eapply (permutation_trans Nat.eqb_eq). 2: {
+  apply (permutation_middle Nat.eqb_eq).
+}
+apply (permutation_skip Nat.eqb_eq).
+destruct i. {
+  cbn - [ skipn ].
+  destruct lb as [| a]; [ easy | ].
+  cbn; clear H.
+  cbn - [ In ] in Hbef.
+  cbn in Hin.
+  destruct lb as [| c]. {
+    cbn in Hlb.
+    symmetry in Hlb.
+    assert (bef = [] ∧ aft = []). {
+      clear Hbef IHbef Hin a d.
+      destruct bef. {
+        cbn in Hlb.
+        now injection Hlb; clear Hlb; intros; subst aft.
+      }
+      cbn in Hlb.
+      injection Hlb; clear Hlb; intros; subst b.
+      exfalso.
+      now destruct bef.
+    }
+    now destruct H; subst bef aft.
+  }
+  apply (IHbef 0); [ | now cbn ].
+  rewrite List_nth_0_cons.
+...
+apply (IHbef (S i)). 2: {
+  rewrite app_length, firstn_length, skipn_length.
+  destruct (Nat.eq_dec (S i) (length lb)) as [H1| H1]. {
+    rewrite H1, Nat.sub_diag.
+  rewrite Nat.min_l; [ | flia Hin ].
 ...
 apply Nat.nle_gt in Hij.
 rewrite Nat.add_0_r.
