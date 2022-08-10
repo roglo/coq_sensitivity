@@ -4561,7 +4561,7 @@ erewrite map_ext_in in Hlb. 2: {
   }
   easy.
 }
-revert i lb Hlb Hin.
+revert i lb aft Hlb Hin.
 induction bef as [| a]; intros. {
   rewrite app_nil_l.
   remember (map _ _) as x in Hlb; cbn in Hlb.
@@ -4625,12 +4625,13 @@ assert (H : lb = firstn i lb ++ nth i lb 0 :: skipn (S i) lb). {
   now apply List_skipn_is_cons.
 }
 apply (permutation_sym Nat.eqb_eq).
-rewrite H at 1.
+rewrite H at 1; clear H.
 apply (permutation_sym Nat.eqb_eq).
 eapply (permutation_trans Nat.eqb_eq). 2: {
   apply (permutation_middle Nat.eqb_eq).
 }
 apply (permutation_skip Nat.eqb_eq).
+...
 destruct i. {
   cbn - [ skipn ].
   destruct lb as [| a]; [ easy | ].
@@ -4653,6 +4654,7 @@ destruct i. {
     }
     now destruct H; subst bef aft.
   }
+...
   apply (IHbef 0); [ | now cbn ].
   rewrite List_nth_0_cons.
 ...
