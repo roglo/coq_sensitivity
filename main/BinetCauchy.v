@@ -4622,6 +4622,14 @@ assert (Hb'b : length bef' ≤ length bef). {
     now apply nth_In.
   }
   rewrite Hbef' in Hbb.
+  destruct Hbb as [Hbb| Hbb]. {
+    rewrite Hbb in Hbef'.
+    rewrite Hbef' in Hlb.
+    destruct bef as [| c]. {
+...
+      cbn - [ nth ] in Hlb.
+      remember (map _ _) as x eqn:Hx in Hlb.
+      injection Hlb; clear Hlb; intros Hlb; subst x.
 ...
   assert (H : b ∉ bef'). {
     intros H.
