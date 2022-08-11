@@ -4608,6 +4608,36 @@ assert (Hbb' : length bef ≤ length bef'). {
   now rewrite (equality_refl Nat.eqb_eq) in H2.
 }
 assert (Hb'b : length bef' ≤ length bef). {
+  apply Nat.nlt_ge; intros Hb.
+  assert (H : b ∉ bef'). {
+    intros H.
+    rewrite Hbef' in H.
+    destruct H as [H| H]. 2: {
+      apply in_map_iff in H.
+      destruct H as (k & Hk & H).
+      destruct k. {
+        clear Hk.
+        apply (In_nth _ _ 0) in H.
+        destruct H as (k & Hk & H).
+        rewrite firstn_length in Hk.
+        rewrite Nat.min_l in Hk. 2: {
+          rewrite Hp, canon_sym_gr_list_length.
+          rewrite Hj.
+          apply Nat.lt_le_incl.
+          apply canon_sym_gr_inv_list_ub; [ easy | flia Hin ].
+        }
+        specialize (NoDup_canon_sym_gr_inv_list n Hdm) as H2.
+        specialize (NoDup_nat _ H2) as H3; clear H2.
+        rewrite canon_sym_gr_inv_list_length in H3.
+        specialize (H3 0 k).
+        rewrite <- Hj in H3.
+(* ouais, chais pas *)
+...
+Search (NoDup _ → _).
+        rewrite
+  ∀ n i : nat, i < n! → NoDup (canon_sym_gr_inv_list n i)
+Search canon_sym_gr_inv_list.
+...
   rewrite Hbef'; cbn; rewrite map_length, firstn_length.
   rewrite Hp, canon_sym_gr_list_length.
 ...
