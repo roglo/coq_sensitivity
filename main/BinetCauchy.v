@@ -4607,17 +4607,24 @@ assert (Hbb' : length bef ≤ length bef'). {
   rewrite Nat.sub_diag in H2; cbn in H2.
   now rewrite (equality_refl Nat.eqb_eq) in H2.
 }
+(*
 assert (Hb'b : length bef' ≤ length bef). {
   apply Nat.nlt_ge; intros Hb.
-  assert (Hbb : b ∈ bef'). {
-    assert (Hbb : nth (length bef) bef' 0 = b). {
-      assert (nth (length bef) (bef' ++ b :: aft') 0 = b). {
-        rewrite Hlb.
-        rewrite app_nth2; [ | now unfold ge ].
-        now rewrite Nat.sub_diag.
-      }
-      now rewrite app_nth1 in H.
-    }
+*)
+(*
+assert (Hbb : b ∈ bef'). {
+  assert (Hbb : nth (length bef) bef' 0 = b). {
+*)
+assert (Hbba : nth (length bef) (bef' ++ b :: aft') 0 = b). {
+  rewrite Hlb.
+  rewrite app_nth2; [ | now unfold ge ].
+  now rewrite Nat.sub_diag.
+}
+destruct (lt_dec (length bef) (length bef')) as [Hbb| Hbb]. {
+  rewrite app_nth1 in Hbba; [ | easy ].
+  clear Hbb'.
+...
+  }
     rewrite <- Hbb.
     now apply nth_In.
   }
@@ -4626,10 +4633,19 @@ assert (Hb'b : length bef' ≤ length bef). {
     rewrite Hbb in Hbef'.
     rewrite Hbef' in Hlb.
     destruct bef as [| c]. {
-...
+      clear Hbef.
       cbn - [ nth ] in Hlb.
       remember (map _ _) as x eqn:Hx in Hlb.
       injection Hlb; clear Hlb; intros Hlb; subst x.
+      clear Hbb' Hb.
+      symmetry in Hlb; move Hlb before Haft'.
+      clear aft Hlb.
+      clear aft' Haft'.
+      clear bef' Hbef'.
+      subst j.
+      clear b Hbb.
+      subst p.
+      rewrite canon_sym_gr_sym_gr_inv in H1.
 ...
   assert (H : b ∉ bef'). {
     intros H.
