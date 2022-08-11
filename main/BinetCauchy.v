@@ -4561,6 +4561,43 @@ erewrite map_ext_in in Hlb. 2: {
   }
   easy.
 }
+(**)
+rewrite map_map in Hlb.
+remember (λ j, _) as x; subst x.
+erewrite map_ext_in in Hlb. 2: {
+  intros j Hj.
+  replace (nth _ _ _) with (nth j (b :: butn i lb) 0). 2: {
+    destruct j; [ easy | cbn ].
+    now rewrite nth_butn.
+  }
+  easy.
+}
+remember (length lb) as n eqn:Hn.
+specialize canon_sym_gr_inv_sym_gr as H1.
+specialize (H1 n (d mod n!) i).
+assert (H : d mod n! < n!). {
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+specialize (H1 H Hin).
+remember (canon_sym_gr_list n (d mod n!)) as p eqn:Hp.
+remember (canon_sym_gr_inv_list n (d mod n!)) as la eqn:Hla.
+...
+remember (nth i (canon_sym_gr_inv_list n (d mod n!)) 0) as j eqn:Hj.
+assert (H : nth j p 0 = i). {
+  rewrite Hj, Hp.
+Check canon_sym_gr_inv_sym_gr.
+...
+Search (nth _ (canon_sym_gr_list _ _)).
+apply canon_sym_gr_inv_sym_gr.
+
+remember (canon_sym_gr_list_inv n (d mod n!)
+
+
+...
+finding k such that
+nth k (canon_sym_gr_list n (d mod n!)) 0 = 0
+...
+...
 revert i lb aft Hlb Hin.
 induction bef as [| a]; intros. {
   rewrite app_nil_l.
