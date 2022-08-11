@@ -4609,6 +4609,20 @@ assert (Hbb' : length bef ≤ length bef'). {
 }
 assert (Hb'b : length bef' ≤ length bef). {
   apply Nat.nlt_ge; intros Hb.
+  assert (Hbb : b ∈ bef'). {
+    assert (Hbb : nth (length bef) bef' 0 = b). {
+      assert (nth (length bef) (bef' ++ b :: aft') 0 = b). {
+        rewrite Hlb.
+        rewrite app_nth2; [ | now unfold ge ].
+        now rewrite Nat.sub_diag.
+      }
+      now rewrite app_nth1 in H.
+    }
+    rewrite <- Hbb.
+    now apply nth_In.
+  }
+  rewrite Hbef' in Hbb.
+...
   assert (H : b ∉ bef'). {
     intros H.
     rewrite Hbef' in H.
