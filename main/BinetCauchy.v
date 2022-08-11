@@ -4594,7 +4594,7 @@ remember (map _ _) as aft' eqn:Haft' in Hlb.
 move bef' before aft; move aft' before bef'.
 move p before lb; move n before b.
 move i before b; move d before b; move j before i.
-assert (H : length bef ≤ length bef'). {
+assert (Hbb' : length bef ≤ length bef'). {
   apply Nat.nlt_ge; intros Hb.
   specialize (Hbef (nth (length bef') (bef ++ b :: aft) 0)) as H2.
   assert (H : nth (length bef') (bef ++ b :: aft) 0 ∈ bef). {
@@ -4602,7 +4602,38 @@ assert (H : length bef ≤ length bef'). {
     now apply nth_In.
   }
   specialize (H2 H); clear H.
-  rewrite app_nth1 in H2; [ | easy ].
+  rewrite <- Hlb in H2.
+  rewrite app_nth2 in H2; [ | now unfold ge ].
+  rewrite Nat.sub_diag in H2; cbn in H2.
+  now rewrite (equality_refl Nat.eqb_eq) in H2.
+}
+assert (Hb'b : length bef' ≤ length bef). {
+  rewrite Hbef'; cbn; rewrite map_length, firstn_length.
+  rewrite Hp, canon_sym_gr_list_length.
+...
+  rewrite Nat.min_l. 2: {
+    rewrite Hj.
+    transitivity n!.
+Check canon_sym_gr_list_inv_ub.
+    apply canon_sym_gr_list_inv_ub.
+...
+  apply Nat.nlt_ge; intros Hb.
+...
+  specialize (Hbef (nth (length bef) (bef' ++ b :: aft') 0)) as H2.
+  assert (H : nth (length bef) (bef' ++ b :: aft') 0 ∈ bef). {
+    rewrite app_nth1; [ | easy ].
+    assert (H : nth (length bef) bef' 0 ∈ bef'). {
+      now apply nth_In.
+    }
+...
+    now apply nth_In.
+  }
+  specialize (H2 H); clear H.
+  rewrite <- Hlb in H2.
+  rewrite app_nth2 in H2; [ | now unfold ge ].
+  rewrite Nat.sub_diag in H2; cbn in H2.
+  now rewrite (equality_refl Nat.eqb_eq) in H2.
+}
 ...
 apply List_app_eq_app' in Hlb.
 destruct Hlb as (Hbef', Haft').
