@@ -4478,6 +4478,8 @@ apply (permutation_sym Nat.eqb_eq).
 apply permutation_cons_l_iff.
 remember (extract (Nat.eqb b) la) as lxl eqn:Hlxl.
 symmetry in Hlxl.
+remember (length lb) as n eqn:Hn.
+assert (Hdm : d mod n! < n!) by (apply Nat.mod_upper_bound, fact_neq_0).
 destruct lxl as [((bef, x), aft)| ]. 2: {
   specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
   rewrite <- Hla in H1.
@@ -4487,10 +4489,10 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     now rewrite Nat.eqb_refl in H1.
   }
   rewrite List_nth_succ_cons in H1.
-  destruct (lt_dec i (length lb)) as [Hilb| Hilb]. 2: {
+  destruct (lt_dec i n) as [Hilb| Hilb]. 2: {
     apply Nat.nlt_ge in Hilb.
     specialize (H1 b).
-    rewrite nth_overflow in H1; [ | easy ].
+    rewrite nth_overflow in H1; [ | now rewrite <- Hn ].
     specialize (H1 (or_introl eq_refl)).
     now rewrite (equality_refl Nat.eqb_eq) in H1.
   }
@@ -4504,11 +4506,8 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
     exists 0.
     unfold succ_when_ge.
     split; [ easy | ].
-    remember (length lb) as n eqn:Hn.
     specialize canon_sym_gr_list_is_permut_list as H2.
-    specialize (H2 n (d mod n!)).
-    assert (H : d mod n! < n!) by (apply Nat.mod_upper_bound, fact_neq_0).
-    specialize (H2 H); clear H.
+    specialize (H2 n (d mod n!) Hdm).
     specialize permut_list_surj as H3.
     specialize (H3 0 _ H2).
     rewrite canon_sym_gr_list_length in H3.
@@ -4534,14 +4533,13 @@ destruct i. {
 }
 rewrite List_nth_succ_cons in Hlb.
 clear la Hla.
-remember (length lb) as n eqn:Hb; symmetry in Hb.
-subst n lc.
-assert (Hin : i < length lb). {
+assert (Hin : i < n). {
   apply Nat.succ_lt_mono.
   rewrite Ha.
   apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
   now rewrite Nat.mul_comm, <- Nat_fact_succ.
 }
+subst n lc.
 clear IHlb Hdb Hd Ha.
 rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
 erewrite map_ext_in in Hlb. 2: {
@@ -4551,9 +4549,7 @@ erewrite map_ext_in in Hlb. 2: {
   rewrite nth_indep with (d' := 0). 2: {
     rewrite <- Hk.
     unfold succ_when_ge.
-    apply in_canon_sym_gr_list in Hj. 2: {
-      apply Nat.mod_upper_bound, fact_neq_0.
-    }
+    apply in_canon_sym_gr_list in Hj; [ | easy ].
     cbn - [ "<=?" ].
     rewrite Nat.add_comm.
     unfold Nat.b2n.
@@ -4561,7 +4557,6 @@ erewrite map_ext_in in Hlb. 2: {
   }
   easy.
 }
-(**)
 rewrite map_map in Hlb.
 remember (λ j, _) as x; subst x.
 erewrite map_ext_in in Hlb. 2: {
@@ -4573,14 +4568,74 @@ erewrite map_ext_in in Hlb. 2: {
   easy.
 }
 remember (length lb) as n eqn:Hn.
+specialize canon_sym_gr_sym_gr_inv as H1.
+specialize (H1 n (d mod n!) 0 Hdm).
+assert (H : 0 < n) by flia Hin.
+specialize (H1 H); clear H.
+remember (canon_sym_gr_list n (d mod n!)) as p eqn:Hp.
+remember (canon_sym_gr_inv_list n (d mod n!)) as la eqn:Hla.
+remember (nth 0 la 0) as j eqn:Hj; subst la.
+assert (H : p = firstn j p ++ nth j p 0 :: skipn (S j) p). {
+  rewrite <- (firstn_skipn j p) at 1.
+  f_equal.
+  apply List_skipn_is_cons.
+  rewrite Hp, canon_sym_gr_list_length, Hj.
+  apply canon_sym_gr_inv_list_ub; [ easy | flia Hin ].
+}
+rewrite H in Hlb; clear H.
+rewrite map_app in Hlb.
+remember (b :: butn i lb) as x eqn:Hx.
+cbn - [ skipn ] in Hlb; subst x.
+rewrite H1, List_nth_0_cons in Hlb.
+rewrite List_cons_is_app, app_assoc in Hlb.
+rewrite <- List_cons_is_app in Hlb.
+remember (nth _ _ _ :: _) as bef' eqn:Hbef' in Hlb.
+remember (map _ _) as aft' eqn:Haft' in Hlb.
+move bef' before aft; move aft' before bef'.
+move p before lb; move n before b.
+move i before b; move d before b; move j before i.
+assert (H : length bef ≤ length bef'). {
+  apply Nat.nlt_ge; intros Hb.
+  specialize (Hbef (nth (length bef') bef 0)) as H2.
+  assert (H : nth (length bef') bef 0 ∈ bef) by now apply nth_In.
+  specialize (H2 H); clear H.
+(* ouais, bon, faut voir... *)
+...
+apply List_app_eq_app' in Hlb.
+destruct Hlb as (Hbef', Haft').
+remember (b :: butn i lb) as x eqn:Hx.
+remember (skipn (S j) p) as y eqn:Hy.
+injection Haft'; clear Haft'; intros Haft.
+cbn in Hbef'.
+subst x y.
+symmetry in Hbef', Haft.
+move j before i.
+move Hbef' before Haft.
+2: {
+  rewrite app_length; cbn.
+  rewrite map_length, firstn_length, Hp.
+  rewrite canon_sym_gr_list_length.
+  rewrite Nat.min_l. 2: {
+    rewrite Hj.
+    apply Nat.lt_le_incl.
+    apply canon_sym_gr_inv_list_ub; [ easy | flia Hin ].
+  }
+  apply Nat.le_antisymm. 2: {
+    specialize (Hbef b) as H2.
+(* mouais, chais pas bien... *)
+...
+    apply Nat.le_succ_l.
+...
 specialize canon_sym_gr_inv_sym_gr as H1.
 specialize (H1 n (d mod n!) i).
 assert (H : d mod n! < n!). {
   apply Nat.mod_upper_bound, fact_neq_0.
 }
-specialize (H1 H Hin).
+specialize (H1 H Hin); clear H.
 remember (canon_sym_gr_list n (d mod n!)) as p eqn:Hp.
 remember (canon_sym_gr_inv_list n (d mod n!)) as la eqn:Hla.
+nth j p 0 = 0
+nth j (canon_sym_gr_list n (d mod n!)) 0 = 0
 ...
 remember (nth i (canon_sym_gr_inv_list n (d mod n!)) 0) as j eqn:Hj.
 assert (H : nth j p 0 = i). {
