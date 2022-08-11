@@ -4596,10 +4596,13 @@ move p before lb; move n before b.
 move i before b; move d before b; move j before i.
 assert (H : length bef ≤ length bef'). {
   apply Nat.nlt_ge; intros Hb.
-  specialize (Hbef (nth (length bef') bef 0)) as H2.
-  assert (H : nth (length bef') bef 0 ∈ bef) by now apply nth_In.
+  specialize (Hbef (nth (length bef') (bef ++ b :: aft) 0)) as H2.
+  assert (H : nth (length bef') (bef ++ b :: aft) 0 ∈ bef). {
+    rewrite app_nth1; [ | easy ].
+    now apply nth_In.
+  }
   specialize (H2 H); clear H.
-(* ouais, bon, faut voir... *)
+  rewrite app_nth1 in H2; [ | easy ].
 ...
 apply List_app_eq_app' in Hlb.
 destruct Hlb as (Hbef', Haft').
