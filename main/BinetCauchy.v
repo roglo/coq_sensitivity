@@ -4457,6 +4457,18 @@ assert (Hba : lb ⊂ la). {
     split; [ easy | now apply Nat.lt_succ_r ].
   }
   clear Hla; rename H into Hla.
+  exists (isort Nat.ltb la).
+  split. 2: {
+    apply permutation_in_all_permut.
+    apply permuted_isort; unfold equality.
+    apply Nat.eqb_eq.
+  }
+  apply in_sls1n_iff.
+  rewrite isort_length.
+  right.
+  split. {
+Check sorted_isort.
+    apply sorted_isort.
 ...
   specialize (Hla (nth a la 0)) as H1.
   assert (H : nth a la 0 < m). {
