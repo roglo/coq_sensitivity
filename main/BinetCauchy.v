@@ -4500,8 +4500,67 @@ apply (isort_when_permuted Hel). {
 }
 apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
   unfold la.
-Search (NoDup (flat_map _ _)).
-Search (NoDup (concat _)).
+  rewrite flat_map_concat_map.
+  apply NoDup_concat_if. {
+    intros lc Hlc.
+    apply in_map_iff in Hlc.
+    destruct Hlc as (ld & H & Hld); subst lc.
+    destruct ld as [| d]. {
+      constructor; [ easy | constructor ].
+    }
+    unfold all_permut.
+    apply NoDup_map_iff with (d0 := []).
+    unfold canon_sym_gr_list_list at 1 2.
+    rewrite List_map_seq_length.
+    intros * Hi Hj Hij.
+    unfold canon_sym_gr_list_list in Hij.
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    do 2 rewrite Nat.add_0_l in Hij.
+    rewrite List_cons_length in Hij.
+    eapply canon_sym_gr_list_inj; [ apply Hi | easy | ].
+    rewrite List_cons_length.
+    apply List_eq_iff in Hij.
+    do 2 rewrite map_length in Hij.
+    destruct Hij as (_, Hij).
+    apply List_eq_iff.
+    do 2 rewrite canon_sym_gr_list_length.
+    split; [ easy | ].
+    intros d' i'.
+    specialize (Hij 0 i').
+    destruct (lt_dec i' (S (length ld))) as [Hi'd| Hi'd]. 2: {
+      apply Nat.nlt_ge in Hi'd.
+      rewrite nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
+      rewrite nth_overflow; [ | now rewrite canon_sym_gr_list_length ].
+      easy.
+    }
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      now rewrite canon_sym_gr_list_length.
+    }
+    rewrite (List_map_nth' 0) in Hij. 2: {
+      now rewrite canon_sym_gr_list_length.
+    }
+    rewrite nth_indep with (d' := 0). 2: {
+      now rewrite canon_sym_gr_list_length.
+    }
+Search (nth _ (canon_sym_gr_list _ _)).
+...
+    intros H.
+    intros
+...
+    do 2 rewrite canon_sym_gr_list_length in Hij.
+
+    specialize list_eqb_eq as H1.
+    specialize (H1 _ Nat.eqb Nat.eqb_eq).
+    specialize (proj2 (H1 _ _) Hij) as H2.
+Print Misc.
+...
+Search (map _ _ = map _ _ → _).
+Search (list _ → list _ → _).
+...
+apply map_ext_in_iff in Hij.
 ...
 Search (_ ⊂ _ → _ ⊂ _ → _).
 Search permutation.
