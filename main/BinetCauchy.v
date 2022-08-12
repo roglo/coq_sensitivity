@@ -4535,19 +4535,105 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
   }
   rewrite (List_map_nth' []) in Hlci; [ | now rewrite sls1n_length ].
   rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
-(*
-  apply (In_nth _ _ []) in Hlci.
-  apply (In_nth _ _ []) in Hlcj.
-  rewrite all_permut_length in Hlci, Hlcj.
-  destruct Hlci as (u & Hu & Hlci).
-  destruct Hlcj as (v & Hv & Hlcj).
-Search (nth _ (all_permut _)).
-...
-*)
   apply in_all_permut_permutation in Hlci.
   apply in_all_permut_permutation in Hlcj.
   apply (permutation_sym Nat.eqb_eq) in Hlci.
   eapply (permutation_trans Nat.eqb_eq) in Hlcj; [ | apply Hlci ].
+  specialize sorted_sorted_permuted as H1.
+  apply (H1 _ _ Nat.ltb) in Hlcj; cycle 1. {
+    unfold equality; apply Nat.eqb_eq.
+  } {
+    apply Nat_ltb_antisym.
+  } {
+    apply Nat_ltb_trans.
+  } {
+    apply (sls1n_are_sorted 1 n m), nth_In.
+    now rewrite sls1n_length.
+  } {
+    apply (sls1n_are_sorted 1 n m), nth_In.
+    now rewrite sls1n_length.
+  }
+  clear H1.
+Search (nth _ (sls1n _ _ _)).
+Theorem sls1n_inj : ∀ i n k u v,
+  u < binomial n k
+  → v < binomial n k
+  → nth u (sls1n i n k) [] = nth v (sls1n i n k) []
+  → u = v.
+Proof.
+intros * Hu Hv Huv.
+revert i u v k Hu Hv Huv.
+induction n; intros; cbn in Huv. {
+  destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | easy ].
+}
+destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | ].
+destruct (lt_dec u (binomial n k)) as [Hub| Hub]. {
+  rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+  destruct (lt_dec v (binomial n k)) as [Hvb| Hvb]. {
+    rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
+    rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+    injection Huv; clear Huv; intros Huv.
+    now apply IHn in Huv.
+  }
+  apply Nat.nlt_ge in Hvb.
+  rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
+  rewrite map_length, sls1n_length in Huv.
+  destruct (Nat.eq_dec v (binomial n k)) as [Hvbe| Hvbe]. {
+    rewrite Hvbe, Nat.sub_diag in Huv; clear Hvb.
+    destruct (le_dec k n) as [Hkn| Hkn]. 2: {
+      apply Nat.nle_gt in Hkn.
+      now rewrite binomial_out in Hub.
+    }
+    destruct n; [ easy | ].
+    cbn in Huv.
+...
+    destruct n. {
+      destruct k. {
+        cbn in Hub, Hvbe.
+        apply Nat.lt_1_r in Hub; subst u v.
+        cbn in Huv.
+        injection Huv; intros H; flia H.
+      }
+      destruct k; [ | easy ].
+      cbn in Hv, Hvbe.
+      now subst v.
+    }
+    rewrite app_nth1 in Huv. 2: {
+      rewrite map_length, sls1n_length.
+Theorem binomial_neq_0 : ∀ n k, k ≤ n → binomial n k ≠ 0.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.le_0_r in Hkn; subst k | ].
+destruct k; [ easy | cbn ].
+apply Nat.succ_le_mono in Hkn.
+intros H1.
+apply Nat.eq_add_0 in H1.
+destruct H1 as (H1, _).
+now revert H1; apply IHn.
+Qed.
+apply Nat.neq_0_lt_0.
+apply binomial_neq_0.
+...
+      destruct k; cbn; [ easy | ].
+      destruct n; cbn. {
+        destruct k; [ easy | ].
+        cbn in Hub, Hvbe.
+Search binomial.
+Print binomial.
+...
+  rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
+    rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+    injection Huv; clear Huv; intros Huv.
+    now apply IHn in Huv.
+
+...
+now apply sls1n_inj in Hlcj.
+}
+...
+(*
+...
 Theorem glop : ∀ i n k u v,
   u < binomial n k
   → v < binomial n k
@@ -4595,22 +4681,31 @@ cbn in Hlcj.
 ...
 Search sls1n.
 ...
-(*
-Theorem NoDup_permutation_nth_nth : ∀ A (eqb : A → _) lla i j,
+*)
+...
+Theorem NoDup_permutation_nth_nth : ∀ A (eqb rel : A → _),
+  equality eqb →
+  antisymmetric rel →
+  ∀ lla i j,
   NoDup lla
+  → (∀ la, la ∈ lla → sorted rel la)
   → i < length lla
   → j < length lla
   → permutation eqb (nth i lla []) (nth j lla [])
   → i = j.
 Proof.
-intros * Hnd Hi Hj Hpij.
+intros * Heqb Hant * Hnd Hs Hi Hj Hpij.
+apply (sorted_sorted_permuted Heqb Hant) in Hpij.
+Check sorted_sorted_permuted.
+...
+intros * Hnd Hs Hi Hj Hpij.
 revert i j Hi Hj Hpij.
 induction lla as [| la]; intros; [ easy | ].
 destruct i. {
   destruct j; [ easy | ].
   cbn in Hpij.
-(* ouais mais non ça c'est faux *)
-*)
+Check sorted_sorted_permuted.
+Search permutation.
 ...
 apply NoDup_permutation_nth_nth in Hlcj.
   apply permutation_in_all_permut in Hlcj.
