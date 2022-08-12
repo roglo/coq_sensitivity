@@ -2230,4 +2230,194 @@ rewrite <- Hlb, <- H.
 now apply (permutation_assoc_length Nat.eqb_eq).
 Qed.
 
+Theorem in_all_permut_permutation : ∀ la lb,
+  la ∈ all_permut lb → permutation eqb la lb.
+Proof.
+intros * Hla.
+revert la Hla.
+induction lb as [| b]; intros. {
+  destruct la; [ easy | now destruct Hla ].
+}
+cbn - [ canon_sym_gr_list nth fact ] in Hla.
+apply in_map_iff in Hla.
+destruct Hla as (lc & Hla & H).
+unfold canon_sym_gr_list_list in H.
+apply in_map_iff in H.
+destruct H as (d & Hlc & Hd).
+apply in_seq in Hd.
+destruct Hd as (_, Hd); rewrite Nat.add_0_l in Hd.
+cbn in Hlc.
+remember (d / (length lb)!) as a eqn:Ha.
+remember (map (succ_when_ge a) _) as le eqn:Hle.
+subst lc; rename le into lc.
+cbn - [ nth ] in Hla.
+destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
+  rewrite Nat.div_small in Ha; [ | easy ].
+  rewrite Nat.mod_small in Hle; [ | easy ].
+  subst a.
+  rewrite List_nth_0_cons in Hla.
+  subst la.
+  apply (permutation_skip Nat.eqb_eq).
+  apply IHlb.
+  unfold succ_when_ge in Hle.
+  erewrite map_ext_in in Hle. 2: {
+    intros a Ha.
+    now cbn; rewrite Nat.add_1_r.
+  }
+  subst lc.
+  rewrite map_map.
+  erewrite map_ext_in; [ | now intros; cbn ].
+  apply permutation_in_all_permut.
+  apply (permutation_sym Nat.eqb_eq).
+  specialize (permutation_refl Nat.eqb_eq lb) as H.
+  rewrite (map_permutation_assoc Nat.eqb_eq b H) at 1.
+  apply (permutation_map Nat.eqb_eq Nat.eqb_eq); clear H.
+  eapply (permutation_trans Nat.eqb_eq). {
+    apply (permutation_permutation_assoc Nat.eqb_eq).
+    apply (permutation_refl Nat.eqb_eq).
+  }
+  specialize (canon_sym_gr_list_length d (length lb)) as H1.
+  rewrite <- H1 at 1.
+  apply (permutation_sym Nat.eqb_eq).
+  apply permut_list_permutation_iff.
+  now apply canon_sym_gr_list_is_permut_list.
+}
+apply Nat.nlt_ge in Hdb.
+rename a into i.
+apply (permutation_sym Nat.eqb_eq).
+apply permutation_cons_l_iff.
+remember (extract (Nat.eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+remember (length lb) as n eqn:Hn.
+assert (Hdm : d mod n! < n!) by (apply Nat.mod_upper_bound, fact_neq_0).
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  rewrite <- Hla in H1.
+  destruct i. {
+    rewrite List_nth_0_cons in H1.
+    specialize (H1 _ (or_introl eq_refl)).
+    now rewrite Nat.eqb_refl in H1.
+  }
+  rewrite List_nth_succ_cons in H1.
+  destruct (lt_dec i n) as [Hilb| Hilb]. 2: {
+    apply Nat.nlt_ge in Hilb.
+    specialize (H1 b).
+    rewrite nth_overflow in H1; [ | now rewrite <- Hn ].
+    specialize (H1 (or_introl eq_refl)).
+    now rewrite (equality_refl Nat.eqb_eq) in H1.
+  }
+  specialize (H1 b).
+  assert (H : b ∈ map (λ i, nth i (b :: lb) b) lc). {
+    apply in_map_iff.
+    exists 0.
+    split; [ easy | ].
+    rewrite Hle.
+    apply in_map_iff.
+    exists 0.
+    unfold succ_when_ge.
+    split; [ easy | ].
+    specialize canon_sym_gr_list_is_permut_list as H2.
+    specialize (H2 n (d mod n!) Hdm).
+    specialize permut_list_surj as H3.
+    specialize (H3 0 _ H2).
+    rewrite canon_sym_gr_list_length in H3.
+    assert (H : 0 < n) by flia Hilb.
+    specialize (H3 H); clear H.
+    destruct H3 as (j & Hjn & Hj).
+    rewrite <- Hj.
+    apply nth_In.
+    now rewrite canon_sym_gr_list_length.
+  }
+  specialize (H1 (or_intror H)).
+  now rewrite (equality_refl Nat.eqb_eq) in H1.
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x.
+apply (permutation_sym Nat.eqb_eq).
+rewrite <- Hla in Hlb.
+destruct i. {
+  symmetry in Ha.
+  apply Nat.div_small_iff in Ha; [ | apply fact_neq_0 ].
+  now apply Nat.nle_gt in Ha.
+}
+rewrite List_nth_succ_cons in Hlb.
+clear la Hla.
+assert (Hin : i < n). {
+  apply Nat.succ_lt_mono.
+  rewrite Ha.
+  apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+  now rewrite Nat.mul_comm, <- Nat_fact_succ.
+}
+subst lc.
+(*
+clear IHlb Hdb Hd Ha.
+*)
+rewrite nth_indep with (d' := 0) in Hlb; [ | now rewrite <- Hn ].
+erewrite map_ext_in in Hlb. 2: {
+  intros j Hj.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hk & Hj).
+  rewrite nth_indep with (d' := 0). 2: {
+    rewrite <- Hk.
+    unfold succ_when_ge.
+    apply in_canon_sym_gr_list in Hj; [ | easy ].
+    cbn - [ "<=?" ].
+    rewrite Nat.add_comm.
+    unfold Nat.b2n.
+    destruct (S i <=? k); flia Hn Hj.
+  }
+  easy.
+}
+rewrite map_map in Hlb.
+erewrite map_ext_in in Hlb. 2: {
+  intros j Hj.
+  replace (nth _ _ _) with (nth j (b :: butn i lb) 0). 2: {
+    destruct j; [ easy | cbn ].
+    now rewrite nth_butn.
+  }
+  easy.
+}
+(**)
+apply (permutation_cons_inv Nat.eqb_eq) with (a := b).
+eapply (permutation_trans Nat.eqb_eq). {
+  apply (permutation_middle Nat.eqb_eq).
+}
+rewrite <- Hlb.
+assert (H : lb = firstn i lb ++ nth i lb 0 :: skipn (S i) lb). {
+  rewrite <- (firstn_skipn i lb) at 1.
+  f_equal.
+  apply List_skipn_is_cons.
+  now rewrite <- Hn.
+}
+apply (permutation_sym Nat.eqb_eq).
+rewrite H at 1; clear H.
+apply (permutation_sym Nat.eqb_eq).
+rewrite app_comm_cons.
+eapply (permutation_trans Nat.eqb_eq). 2: {
+  apply (permutation_middle Nat.eqb_eq).
+}
+apply (permutation_skip Nat.eqb_eq).
+cbn - [ nth skipn ].
+rewrite fold_butn.
+rewrite List_map_nth_seq with (d := 0).
+apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+cbn - [ seq ].
+rewrite butn_length.
+generalize Hin; intros H.
+apply Nat.ltb_lt in H.
+rewrite Hn in H; rewrite H; clear H.
+rewrite <- Hn.
+rewrite <- Nat.sub_succ_l; [ | cbn; flia Hin ].
+rewrite Nat_sub_succ_1.
+rewrite Hn.
+eapply (permutation_trans Nat.eqb_eq). {
+  apply permut_list_permutation_iff.
+  apply canon_sym_gr_list_is_permut_list.
+  apply Nat.mod_upper_bound, fact_neq_0.
+}
+rewrite canon_sym_gr_list_length.
+apply (permutation_refl Nat.eqb_eq).
+Qed.
+
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.
