@@ -4539,11 +4539,11 @@ assert (Hin : i < n). {
   apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
   now rewrite Nat.mul_comm, <- Nat_fact_succ.
 }
-subst n lc.
+subst lc.
 (*
 clear IHlb Hdb Hd Ha.
 *)
-rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
+rewrite nth_indep with (d' := 0) in Hlb; [ | now rewrite <- Hn ].
 erewrite map_ext_in in Hlb. 2: {
   intros j Hj.
   apply in_map_iff in Hj.
@@ -4555,12 +4555,11 @@ erewrite map_ext_in in Hlb. 2: {
     cbn - [ "<=?" ].
     rewrite Nat.add_comm.
     unfold Nat.b2n.
-    destruct (S i <=? k); flia Hj.
+    destruct (S i <=? k); flia Hn Hj.
   }
   easy.
 }
 rewrite map_map in Hlb.
-remember (λ j, _) as x; subst x.
 erewrite map_ext_in in Hlb. 2: {
   intros j Hj.
   replace (nth _ _ _) with (nth j (b :: butn i lb) 0). 2: {
@@ -4569,7 +4568,9 @@ erewrite map_ext_in in Hlb. 2: {
   }
   easy.
 }
-remember (length lb) as n eqn:Hn.
+(**)
+apply IHlb.
+...
 specialize canon_sym_gr_sym_gr_inv as H1.
 specialize (H1 n (d mod n!) 0 Hdm).
 assert (H : 0 < n) by flia Hin.
