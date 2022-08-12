@@ -4540,7 +4540,9 @@ assert (Hin : i < n). {
   now rewrite Nat.mul_comm, <- Nat_fact_succ.
 }
 subst n lc.
+(*
 clear IHlb Hdb Hd Ha.
+*)
 rewrite nth_indep with (d' := 0) in Hlb; [ | easy ].
 erewrite map_ext_in in Hlb. 2: {
   intros j Hj.
@@ -4623,6 +4625,10 @@ assert (Hbba : nth (length bef) (bef' ++ b :: aft') 0 = b). {
 destruct (lt_dec (length bef) (length bef')) as [Hbb| Hbb]. {
   rewrite app_nth1 in Hbba; [ | easy ].
   clear Hbb'.
+  rewrite Hbef' in Hbba.
+  destruct bef as [| a]. 2: {
+    rewrite List_cons_length in Hbba.
+    rewrite List_nth_succ_cons in Hbba.
 ...
   }
     rewrite <- Hbb.
