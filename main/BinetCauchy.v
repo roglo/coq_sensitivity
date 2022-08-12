@@ -4438,6 +4438,40 @@ assert (Hab : la ⊂ lb). {
   now apply (permutation_NoDup Nat.eqb_eq) in Hla.
 }
 assert (Hba : lb ⊂ la). {
+  subst la lb.
+  intros la Hla.
+  apply filter_In in Hla.
+  destruct Hla as (Hla, Hnd).
+  apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
+  apply in_flat_map.
+  apply (in_list_prodn_iff 0) in Hla.
+  rewrite repeat_length in Hla.
+  destruct Hla as (Hm, Hla).
+  rewrite Hm in Hla.
+  assert (H : ∀ i, i < m → 1 ≤ nth i la 0 ≤ n). {
+    intros i Hi.
+    specialize (Hla _ Hi) as H1.
+    rewrite List_nth_repeat in H1.
+    destruct (lt_dec i m); [ | easy ].
+    apply in_seq in H1.
+    split; [ easy | now apply Nat.lt_succ_r ].
+  }
+  clear Hla; rename H into Hla.
+...
+  specialize (Hla (nth a la 0)) as H1.
+  assert (H : nth a la 0 < m). {
+    rewrite <- Hm.
+Search (nth _ _ _ < _).
+  assert (
+rewrite nth_repeat in Hla.
+...
+  apply in_sls1n_iff.
+  destruct Hlb as [Hlb| Hlb]. {
+    destruct Hlb; subst m lb.
+    destruct Hla as [Hla| ]; [ subst la | easy ].
+    cbn; now left.
+  }
+  destruct Hlb as (Hsb & Hlb & Hb).
 ...
 Search sorted.
 permutation_permut:
