@@ -4569,7 +4569,30 @@ erewrite map_ext_in in Hlb. 2: {
   easy.
 }
 (**)
-apply IHlb.
+apply (permutation_cons_inv Nat.eqb_eq) with (a := b).
+eapply (permutation_trans Nat.eqb_eq). {
+  apply (permutation_middle Nat.eqb_eq).
+}
+rewrite <- Hlb.
+assert (H : lb = firstn i lb ++ nth i lb 0 :: skipn (S i) lb). {
+  rewrite <- (firstn_skipn i lb) at 1.
+  f_equal.
+  apply List_skipn_is_cons.
+  now rewrite <- Hn.
+}
+apply (permutation_sym Nat.eqb_eq).
+rewrite H at 1; clear H.
+apply (permutation_sym Nat.eqb_eq).
+rewrite app_comm_cons.
+eapply (permutation_trans Nat.eqb_eq). 2: {
+  apply (permutation_middle Nat.eqb_eq).
+}
+apply (permutation_skip Nat.eqb_eq).
+cbn - [ nth skipn ].
+Print butn.
+Search (butn _ _ = _).
+...
+rewrite fold_butn.
 ...
 specialize canon_sym_gr_sym_gr_inv as H1.
 specialize (H1 n (d mod n!) 0 Hdm).

@@ -1044,6 +1044,10 @@ Qed.
 Definition butn {A} n (l : list A) :=
   firstn n l ++ skipn (S n) l.
 
+Theorem fold_butn : ∀ A n (l : list A),
+  firstn n l ++ skipn (S n) l = butn n l.
+Proof. easy. Qed.
+
 Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
 Proof. now intros; destruct n. Qed.
 
