@@ -2350,9 +2350,6 @@ assert (Hin : i < n). {
   now rewrite Nat.mul_comm, <- Nat_fact_succ.
 }
 subst lc.
-(*
-clear IHlb Hdb Hd Ha.
-*)
 rewrite nth_indep with (d' := 0) in Hlb; [ | now rewrite <- Hn ].
 erewrite map_ext_in in Hlb. 2: {
   intros j Hj.
@@ -2378,7 +2375,6 @@ erewrite map_ext_in in Hlb. 2: {
   }
   easy.
 }
-(**)
 apply (permutation_cons_inv Nat.eqb_eq) with (a := b).
 eapply (permutation_trans Nat.eqb_eq). {
   apply (permutation_middle Nat.eqb_eq).
@@ -2418,6 +2414,68 @@ eapply (permutation_trans Nat.eqb_eq). {
 }
 rewrite canon_sym_gr_list_length.
 apply (permutation_refl Nat.eqb_eq).
+Qed.
+
+Theorem NoDup_all_permut : ∀ A (la : list A),
+  NoDup la → NoDup (all_permut la).
+Proof.
+intros * Hnd.
+destruct la as [| d]. {
+  constructor; [ easy | constructor ].
+}
+unfold all_permut.
+remember (d :: la) as lb eqn:Hlb.
+clear la Hlb.
+rename lb into la.
+apply (NoDup_map_iff []).
+unfold canon_sym_gr_list_list.
+rewrite List_map_seq_length.
+intros * Hi Hj Hij.
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0) in Hij; [ | now rewrite seq_length ].
+rewrite seq_nth in Hij; [ | easy ].
+rewrite seq_nth in Hij; [ | easy ].
+do 2 rewrite Nat.add_0_l in Hij.
+apply List_eq_iff in Hij.
+destruct Hij as (_, Hij).
+specialize (Hij d).
+remember (∀ k, _) as x in Hij; subst x.
+assert
+  (H : ∀ k,
+   nth (nth k (canon_sym_gr_list (length la) i) 0) la d =
+   nth (nth k (canon_sym_gr_list (length la) j) 0) la d). {
+  intros.
+  specialize (Hij k).
+  destruct (lt_dec k (length la)) as [Hka| Hka]. 2: {
+    apply Nat.nlt_ge in Hka.
+    rewrite nth_overflow with (n := k). 2: {
+      now rewrite canon_sym_gr_list_length.
+    }
+    rewrite nth_overflow with (n := k). 2: {
+      now rewrite canon_sym_gr_list_length.
+    }
+    easy.
+  }
+  rewrite (List_map_nth' 0) in Hij. 2: {
+    now rewrite canon_sym_gr_list_length.
+  }
+  rewrite (List_map_nth' 0) in Hij. 2: {
+    now rewrite canon_sym_gr_list_length.
+  }
+  easy.
+}
+clear Hij; rename H into Hij.
+apply nth_canon_sym_gr_list_inj2 with (n := length la); [ easy | easy | ].
+intros k Hk.
+specialize (Hij k).
+remember (nth k (canon_sym_gr_list (length la) i) 0) as i' eqn:Hi'.
+remember (nth k (canon_sym_gr_list (length la) j) 0) as j' eqn:Hj'.
+specialize (proj1 (NoDup_nth la d) Hnd) as H1.
+apply H1; [ | | easy ]. {
+  now rewrite Hi'; apply canon_sym_gr_list_ub.
+} {
+  now rewrite Hj'; apply canon_sym_gr_list_ub.
+}
 Qed.
 
 Arguments nth_canon_sym_gr_list_inj2 n%nat [i j]%nat.

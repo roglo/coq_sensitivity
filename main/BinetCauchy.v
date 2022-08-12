@@ -4505,6 +4505,61 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
     intros lc Hlc.
     apply in_map_iff in Hlc.
     destruct Hlc as (ld & H & Hld); subst lc.
+    apply NoDup_all_permut.
+    apply in_sls1n_iff in Hld.
+    destruct Hld as [Hld| Hld]. {
+      destruct Hld; subst m ld; constructor.
+    }
+    destruct Hld as (Hs & Hdm & Hld).
+    now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
+  }
+  intros i j Hij lc Hlci Hlcj.
+  apply Hij; clear Hij.
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    subst m.
+    rewrite sls1n_0_r in Hlci, Hlcj.
+    cbn in Hlci, Hlcj.
+    destruct i; [ | now rewrite Tauto_match_nat_same in Hlci ].
+    destruct j; [ | now rewrite Tauto_match_nat_same in Hlcj ].
+    easy.
+  }
+  destruct (lt_dec i (binomial n m)) as [Hinm| Hinm]. 2: {
+    apply Nat.nlt_ge in Hinm.
+    rewrite nth_overflow in Hlci; [ easy | ].
+    now rewrite map_length, sls1n_length.
+  }
+  destruct (lt_dec j (binomial n m)) as [Hjnm| Hjnm]. 2: {
+    apply Nat.nlt_ge in Hjnm.
+    rewrite nth_overflow in Hlcj; [ easy | ].
+    now rewrite map_length, sls1n_length.
+  }
+  rewrite (List_map_nth' []) in Hlci; [ | now rewrite sls1n_length ].
+  rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+Search all_permut.
+...
+  apply in_all_permut_permutation in Hlci.
+  apply in_all_permut_permutation in Hlcj.
+  apply (permutation_sym Nat.eqb_eq) in Hlci.
+  eapply (permutation_trans Nat.eqb_eq) in Hlcj; [ | apply Hlci ].
+  apply permutation_in_all_permut in Hlcj.
+...
+    cbn in Hlci.
+    destruct Hlci; [ subst lc | easy ].
+    destruct (lt_dec j (binomial n m)) as [Hjnm| Hjnm]. 2: {
+      apply Nat.nlt_ge in Hjnm.
+      rewrite nth_overflow in Hlcj; [ easy | ].
+      now rewrite map_length, sls1n_length.
+    }
+    rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+    apply in_all_permut_permutation in Hlcj.
+    apply permutation_nil_l in Hlcj.
+    apply eq_nth_sls1n_nil in Hlcj; [ | now rewrite sls1n_length ].
+    subst m.
+    rewrite binomial_0_r in Hjnm.
+...
+    cbn in Hlci.
+    destruct Hlci; [ subst lc | easy ].
+...
     destruct ld as [| d]. {
       constructor; [ easy | constructor ].
     }
