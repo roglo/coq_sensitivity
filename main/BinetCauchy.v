@@ -4457,7 +4457,7 @@ assert (Hba : lb ⊂ la). {
     split; [ easy | now apply Nat.lt_succ_r ].
   }
   clear Hla; rename H into Hla.
-  exists (isort Nat.ltb la).
+  exists (isort Nat.leb la).
   split. 2: {
     apply permutation_in_all_permut.
     apply permuted_isort; unfold equality.
@@ -4467,7 +4467,55 @@ assert (Hba : lb ⊂ la). {
   rewrite isort_length.
   right.
   split. {
+    apply NoDup_sorted_nat_leb_ltb. 2: {
+      apply sorted_isort; apply Nat_leb_total_relation.
+    }
+    apply (permutation_NoDup Nat.eqb_eq) with (la := la); [ | easy ].
+    apply permuted_isort.
+    unfold equality.
+    apply Nat.eqb_eq.
+  }
+  split; [ easy | ].
+  intros j Hj.
+  apply in_isort in Hj.
+  apply (In_nth _ _ 0) in Hj.
+  destruct Hj as (k & Hk & Hj).
+  rewrite Hm in Hk.
+  specialize (Hla k Hk) as H1.
+  rewrite Hj in H1.
+  split; [ easy | now apply Nat.lt_succ_r ].
+}
+rewrite <- isort_when_sorted with (rel := list_leb Nat.leb) (l := lb). 2: {
+  unfold lb.
+  apply sorted_filter; [ apply transitive_list_leb, Nat_leb_trans | ].
+  apply sorted_list_ltb_leb_incl.
+  apply list_prodn_repeat_seq_ltb_sorted.
+}
+apply (isort_when_permuted Hel). {
+  apply antisymmetric_list_leb, Nat_leb_antisym.
+} {
+  apply transitive_list_leb, Nat_leb_trans.
+} {
+  apply total_relation_list_leb, Nat_leb_total_relation.
+}
+apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
+  unfold la.
+Search (NoDup (flat_map _ _)).
+Search (NoDup (concat _)).
+...
+Search (_ ⊂ _ → _ ⊂ _ → _).
+Search permutation.
+Search (isort _ _ = _).
+...
+revert a Hnd.
+induction la as [| b]; intros; [ easy | ].
+cbn.
+rewrite IHla.
+...
+    split; [ easy | ].
+...
 Check sorted_isort.
+About sorted_isort.
     apply sorted_isort.
 ...
   specialize (Hla (nth a la 0)) as H1.

@@ -3709,6 +3709,74 @@ apply list_ltb_leb_incl.
 now apply Hab.
 Qed.
 
+Theorem NoDup_isort_insert_ltb_leb : ∀ a la,
+  sorted Nat.leb la
+  → isort_insert Nat.ltb a la = isort_insert Nat.leb a la.
+Proof.
+intros * Hs.
+revert a.
+induction la as [| b]; intros; [ easy | ].
+assert (H : sorted Nat.leb la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+cbn - [ Nat.ltb ].
+rewrite if_ltb_lt_dec.
+rewrite if_leb_le_dec.
+destruct (lt_dec a b) as [Htab| Htab]. {
+  destruct (le_dec a b) as [H| H]; [ easy | flia Htab H ].
+}
+apply Nat.nlt_ge in Htab.
+destruct (le_dec a b) as [Hab| Hab]; [ | f_equal; apply IHla ].
+apply Nat.le_antisymm in Hab; [ subst b; clear Htab; f_equal | easy ].
+rewrite IHla.
+destruct la as [| b]; intros; [ easy | cbn ].
+rewrite if_leb_le_dec.
+destruct (le_dec a b) as [Hab| Hab]; [ easy | ].
+apply Nat.nle_gt in Hab.
+apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
+destruct Hs as (Hs, Hbs).
+specialize (Hbs b (or_introl eq_refl)) as H1.
+apply Nat.leb_le in H1.
+flia Hab H1.
+Qed.
+
+Theorem NoDup_isort_ltb_leb : ∀ la,
+  NoDup la → isort Nat.ltb la = isort Nat.leb la.
+Proof.
+intros * Hnd.
+induction la as [| a]; [ easy | cbn ].
+rewrite IHla; [ | now apply NoDup_cons_iff in Hnd ].
+assert (H : NoDup la) by now apply NoDup_cons_iff in Hnd.
+specialize (IHla H); clear H.
+apply NoDup_isort_insert_ltb_leb.
+apply sorted_isort.
+apply Nat_leb_total_relation.
+Qed.
+
+Theorem NoDup_sorted_nat_leb_ltb : ∀ l,
+  NoDup l → sorted Nat.leb l → sorted Nat.ltb l.
+Proof.
+intros * Hns Hs.
+induction l as [| a]; [ easy | cbn ].
+assert (H : NoDup l) by now apply NoDup_cons_iff in Hns.
+specialize (IHl H); clear H.
+assert (H : sorted Nat.leb l). {
+  apply sorted_cons_iff in Hs; [ easy | apply Nat_leb_trans ].
+}
+specialize (IHl H); clear H.
+apply sorted_cons_iff; [ apply Nat_ltb_trans | ].
+split; [ easy | ].
+intros b Hb.
+apply Nat.ltb_lt.
+apply NoDup_cons_iff in Hns.
+destruct Hns as (Hal, Hnd).
+apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
+destruct Hs as (Hs & Hab).
+specialize (Hab _ Hb) as H1.
+apply Nat.leb_le in H1.
+destruct (Nat.eq_dec a b) as [H| H]; [ now subst b | ].
+flia H1 H.
+Qed.
+
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
   ∀ l f,
