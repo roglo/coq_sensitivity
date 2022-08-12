@@ -997,6 +997,46 @@ split; [ apply Hiab | ].
 now apply NoDup_length_incl.
 Qed.
 
+Theorem permutation_NoDup : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb la lb → NoDup la → NoDup lb.
+Proof.
+intros * Heqb * Hpab Hla.
+revert lb Hpab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Heqb in H; subst x lb.
+generalize Hpab; intros H.
+apply IHla in H; [ | now apply NoDup_cons_iff in Hla ].
+apply NoDup_app_iff in H.
+apply NoDup_app_iff.
+destruct H as (Hndb & Hnda & Haft).
+split; [ easy | ].
+split. {
+  apply NoDup_cons_iff.
+  split; [ | easy ].
+  intros Ha.
+  assert (H : a ∈ bef ++ aft) by now apply in_or_app; right.
+  apply (permutation_in_iff Heqb) with (a := a) in Hpab.
+  apply Hpab in H.
+  now apply NoDup_cons_iff in Hla.
+}
+intros b Hb.
+intros H.
+destruct H as [H| H]; [ subst b | now apply Haft in Hb ].
+assert (H : a ∈ bef ++ aft) by now apply in_or_app; left.
+apply (permutation_in_iff Heqb) with (a := a) in Hpab.
+apply Hpab in H.
+now apply NoDup_cons_iff in Hla.
+Qed.
+
 Theorem permutation_map : ∀ A B (eqba : A → _) (eqbb : B → _),
   equality eqba →
   equality eqbb →

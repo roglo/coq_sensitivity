@@ -4385,6 +4385,7 @@ symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite flat_map_concat_map.
 rewrite <- list_prodn_prodn_repeat.
+(*
 Compute (
 let n := 4 in
 let m := 3 in
@@ -4396,6 +4397,7 @@ let m := 3 in
  list_prodn (repeat (seq 1 n) m)
 ).
 Check incl_incl_permutation.
+*)
 rewrite <- flat_map_concat_map.
 set (la := flat_map all_permut (sls1n 1 n m)).
 set (lb := filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))).
@@ -4420,6 +4422,30 @@ assert (Hab : la ⊂ lb). {
     }
     split; [ easy | ].
     apply in_all_permut_permutation in Hla.
+    split. {
+      apply (permutation_length Nat.eqb_eq) in Hla; congruence.
+    }
+    intros i Hi.
+    specialize (permutation_in_iff Nat.eqb_eq Hla) as H1.
+    apply H1 in Hi.
+    specialize (Hb _ Hi) as H2.
+    split; [ easy | now apply Nat.lt_succ_r ].
+  }
+  apply in_all_permut_permutation in Hla.
+  apply (no_dup_NoDup Nat.eqb_eq).
+  apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hsb.
+  apply (permutation_sym Nat.eqb_eq) in Hla.
+  now apply (permutation_NoDup Nat.eqb_eq) in Hla.
+}
+assert (Hba : lb ⊂ la). {
+...
+Search sorted.
+permutation_permut:
+  ∀ la lb : list nat,
+    permutation Nat.eqb la lb → is_permut_list la → is_permut_list lb
+Search NoDup.
+Search permutation.
+Search (permutation _ _ _ → no_dup _ _ = true).
 ...
 specialize canon_sym_gr_sym_gr_inv as H1.
 specialize (H1 n (d mod n!) 0 Hdm).
