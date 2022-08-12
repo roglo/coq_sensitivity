@@ -4535,6 +4535,93 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
   }
   rewrite (List_map_nth' []) in Hlci; [ | now rewrite sls1n_length ].
   rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+(*
+  apply (In_nth _ _ []) in Hlci.
+  apply (In_nth _ _ []) in Hlcj.
+  rewrite all_permut_length in Hlci, Hlcj.
+  destruct Hlci as (u & Hu & Hlci).
+  destruct Hlcj as (v & Hv & Hlcj).
+Search (nth _ (all_permut _)).
+...
+*)
+  apply in_all_permut_permutation in Hlci.
+  apply in_all_permut_permutation in Hlcj.
+  apply (permutation_sym Nat.eqb_eq) in Hlci.
+  eapply (permutation_trans Nat.eqb_eq) in Hlcj; [ | apply Hlci ].
+Theorem glop : ∀ i n k u v,
+  u < binomial n k
+  → v < binomial n k
+  → permutation Nat.eqb (nth u (sls1n i n k) []) (nth v (sls1n i n k) [])
+  → u = v.
+Proof.
+intros * Hu Hv Hpuv.
+revert i k u v Hu Hv Hpuv.
+induction n; intros. {
+  destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | easy ].
+}
+cbn in Hpuv.
+destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | ].
+destruct (lt_dec u (binomial n k)) as [Hub| Hub]. {
+  rewrite app_nth1 in Hpuv; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []) in Hpuv; [ | now rewrite sls1n_length ].
+  destruct (lt_dec v (binomial n k)) as [Hvb| Hvb]. {
+    rewrite app_nth1 in Hpuv; [ | now rewrite map_length, sls1n_length ].
+    rewrite (List_map_nth' []) in Hpuv; [ | now rewrite sls1n_length ].
+    apply permutation_cons_inv in Hpuv. 2: {
+      unfold equality; apply Nat.eqb_eq.
+    }
+    now apply IHn in Hpuv.
+  }
+  apply Nat.nlt_ge in Hvb.
+  rewrite app_nth2 in Hpuv; [ | now rewrite map_length, sls1n_length ].
+  rewrite map_length, sls1n_length in Hpuv.
+(* pfff... *)
+...
+  destruct n; [ now destruct m | ].
+  cbn in Hlcj.
+  destruct m; [ easy | ].
+  destruct (lt_dec i (binomial n m)) as [Hib| Hib]. {
+    rewrite app_nth1 in Hlcj; [ | now rewrite map_length, sls1n_length ].
+    rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+    destruct (lt_dec j (binomial n m)) as [Hjb| Hjb]. {
+      rewrite app_nth1 in Hlcj; [ | now rewrite map_length, sls1n_length ].
+      rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+      apply permutation_cons_inv in Hlcj. 2: {
+        unfold equality; apply Nat.eqb_eq.
+      }
+
+Print sls1n.
+cbn in Hlcj.
+...
+Search sls1n.
+...
+(*
+Theorem NoDup_permutation_nth_nth : ∀ A (eqb : A → _) lla i j,
+  NoDup lla
+  → i < length lla
+  → j < length lla
+  → permutation eqb (nth i lla []) (nth j lla [])
+  → i = j.
+Proof.
+intros * Hnd Hi Hj Hpij.
+revert i j Hi Hj Hpij.
+induction lla as [| la]; intros; [ easy | ].
+destruct i. {
+  destruct j; [ easy | ].
+  cbn in Hpij.
+(* ouais mais non ça c'est faux *)
+*)
+...
+apply NoDup_permutation_nth_nth in Hlcj.
+  apply permutation_in_all_permut in Hlcj.
+...
+  apply (In_nth _ _ []) in Hlci.
+  apply (In_nth _ _ []) in Hlcj.
+  rewrite all_permut_length in Hlci, Hlcj.
+  destruct Hlci as (u & Hu & Hlci).
+  destruct Hlcj as (v & Hv & Hlcj).
+Search (nth _ (all_permut _)).
+Search (length (nth _ (sls1n _ _ _) _)).
 Search all_permut.
 ...
   apply in_all_permut_permutation in Hlci.
