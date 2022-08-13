@@ -350,6 +350,7 @@ Proof.
 intros * Hnk.
 now apply sls1n_out.
 Qed.
+
 Theorem sls1n_inj : ∀ i n k u v,
   u < binomial n k
   → v < binomial n k
@@ -4679,9 +4680,7 @@ rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
 }
 rewrite Har.
 remember (∑ (kl ∈ _), _) as x; subst x.
-...
 unfold all_comb.
-(**)
 rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
@@ -4694,23 +4693,29 @@ remember (∑ (jl' ∈ _), _) as x; subst x.
   (∑ (kl ∈ all_permut jl'), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag.
+rewrite rngl_summation_list_only_one.
+Compute (all_permut (seq 1 3)).
+Compute (all_permut [1;3;4]).
 ...
 (*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (sub_lists_of_seq_1_n 3 2).
 Compute (
-  let m := 2 in
-  let n := 3 in
-  let A := mk_mat [[1;-2;3];[4;5;-6]]%Z in
-  let jl := [1; 3] in
+  let A := mk_mat [[1;-2;3;7];[4;5;-6;-12];[8;-3;5;9]]%Z in
+  let m := mat_nrows A in
+  let n := mat_ncols A in
+  let jl := nth 2 (sub_lists_of_seq_1_n n m) [] in
+jl).
   ∑ (jl' ∈ sub_lists_of_seq_1_n m m),
   (∑ (kl ∈ all_permut jl'),
    ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 ).
-*)
 ...
+*)
 (*
   ============================
   ∑ (l ∈ list_prodn (repeat (seq 1 m) m)), ε l * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i l.(i) =
