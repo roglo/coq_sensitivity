@@ -556,15 +556,19 @@ Qed.
 Theorem det'_is_det'' :
   rngl_has_opp = true →
   rngl_has_eqb = true →
-  ∀ (M : matrix T), mat_nrows M ≠ 0 → det' M = det'' M.
+  ∀ (M : matrix T), det' M = det'' M.
 Proof.
-intros Hop Heq * Hnz.
+intros Hop Heq *.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  unfold det', det''.
+  now rewrite Hrz.
+}
 unfold det''.
 remember (mat_nrows M) as n eqn:Hn.
 unfold det'.
 rewrite <- Hn.
 specialize (fact_neq_0 n) as Hfnz.
-specialize (Nat.pow_nonzero n n Hnz) as Hpnz.
+specialize (Nat.pow_nonzero n n Hrz) as Hpnz.
 erewrite rngl_summation_change_var. 2: {
   intros i Hi.
   apply canon_sym_gr_list_inv_canon_sym_gr_list with (n := n).
@@ -728,6 +732,23 @@ apply rngl_summation_list_incl; [ | | easy ]. {
   rewrite map_id.
   apply NoDup_all_comb.
 }
+Qed.
+
+(* det and det'' are equal *)
+
+Theorem det_is_det'' :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_eqb = true →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → det M = det'' M.
+Proof.
+intros Hic Hop Hin H10 Heq * Hm.
+rewrite det_is_det'; [ | easy | easy | easy | easy | easy ].
+now apply det'_is_det''.
 Qed.
 
 (* multilinearity *)
@@ -2701,7 +2722,8 @@ Arguments determinant_alternating {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_loop {T}%type {ro} n%nat M%M.
 Arguments determinant_same_rows {T}%type {ro rp} _ M%M [p q]%nat.
 Arguments determinant_transpose {T ro rp} _ M%M.
-Arguments det_is_det' {T}%type {ro rp} _ M%M.
+Arguments det_is_det' {T}%type {ro rp} _ _ _ _ M%M.
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
+Arguments det_is_det'' {T ro rp} _ _ _ _ _ M%M.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
 

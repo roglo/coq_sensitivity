@@ -3000,13 +3000,10 @@ destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   cbn; rewrite ε_nil; symmetry.
   apply rngl_mul_1_l.
 }
-rewrite det_is_det'; try now destruct Hif. 2: {
+rewrite det_is_det''; try now destruct Hif. 2: {
   now apply mat_select_rows_is_square.
 }
-rewrite det'_is_det''; try now destruct Hif. 2: {
-  now rewrite mat_select_rows_nrows.
-}
-rewrite det_is_det'; try now destruct Hif. 2: {
+rewrite det_is_det''; try now destruct Hif. 2: {
   apply mat_select_rows_is_square; [ easy | | ]. {
     now rewrite isort_length.
   } {
@@ -3014,10 +3011,6 @@ rewrite det_is_det'; try now destruct Hif. 2: {
     apply Hkl.
     now apply in_isort in Hk.
   }
-}
-rewrite det'_is_det''; try now destruct Hif. 2: {
-  rewrite mat_select_rows_nrows.
-  now rewrite isort_length.
 }
 unfold det''.
 do 2 rewrite mat_select_rows_nrows.
@@ -4346,7 +4339,7 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
 }
 Qed.
 
-Theorem rngl_summation_filter_no_dup_list_prodn :
+Theorem rngl_summation_list_prodn_sub_lists_all_permut :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ n m f,
@@ -4460,11 +4453,7 @@ assert (Hab : is_square_matrix (A * B) = true). {
     now rewrite List_map_seq_length.
   }
 }
-(**)
-rewrite det_is_det'; try now destruct Hif.
-rewrite det'_is_det''; try now destruct Hif. 2: {
-  now rewrite mat_mul_nrows, Har.
-}
+rewrite det_is_det''; try now destruct Hif.
 unfold det''.
 rewrite mat_mul_nrows, Har.
 unfold "*"%M at 1.
@@ -4558,14 +4547,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
     apply in_list_prodn_repeat_iff in H.
     destruct H as [H| H]; [ easy | ].
     destruct H as (_ & Hlm & Hln).
-    rewrite det_is_det'; try now destruct Hif. 2: {
+    rewrite det_is_det''; try now destruct Hif. 2: {
       apply mat_select_rows_is_square; [ easy | congruence | ].
       rewrite Hbr.
       intros j Hj.
       now apply Hln.
-    }
-    rewrite det'_is_det''; try now destruct Hif. 2: {
-      rewrite mat_select_rows_nrows; congruence.
     }
     unfold det''.
     rewrite mat_select_rows_nrows, Hlm.
@@ -4630,7 +4616,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
-rewrite rngl_summation_filter_no_dup_list_prodn; cycle 1. {
+rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
   now destruct Hif.
@@ -4661,8 +4647,28 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 rewrite <- rngl_mul_summation_list_distr_r; [ | now destruct Hif; left ].
 f_equal; symmetry.
-Search (det (mat_select_rows _ _)).
-Search (det (mat_select_cols _ _)).
+remember (∑ (kl ∈ _), _) as x; subst x.
+rewrite det_is_det''; try now destruct Hif. 2: {
+  generalize Hjl; intros H.
+  apply in_sub_lists_of_seq_1_n_length in H.
+  apply mat_select_cols_is_square; [ easy | congruence | ].
+  rewrite Hac.
+  intros j Hj.
+  now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
+}
+unfold det''.
+rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
+  now apply sub_lists_of_seq_1_n_are_correct in Hjl.
+}
+rewrite Har.
+unfold all_comb.
+remember (∑ (kl ∈ _), _) as x; subst x.
+rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+}
+unfold sub_lists_of_seq_1_n.
 ...
 *)
 
