@@ -4678,6 +4678,8 @@ rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
   now apply sub_lists_of_seq_1_n_are_correct in Hjl.
 }
 rewrite Har.
+remember (∑ (kl ∈ _), _) as x; subst x.
+...
 unfold all_comb.
 (**)
 rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
