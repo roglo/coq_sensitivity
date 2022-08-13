@@ -4687,15 +4687,68 @@ rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 }
 remember (∑ (jl' ∈ _), _) as x; subst x.
-(*
-  ============================
-  ∑ (jl' ∈ sub_lists_of_seq_1_n m m),
-  (∑ (kl ∈ all_permut jl'), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) =
-  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
-*)
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
+(*
+  ============================
+  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
+  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+*)
+symmetry.
+set (g1 := isort_rank Nat.leb). (* à corriger *)
+set (h1 := λ l, map S (collapse l)).
+erewrite rngl_summation_list_change_var with (g := g1) (h := h1).
+replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
+  unfold h1.
+(*
+Compute (
+  let jl := [2;3;5] in
+  let m := length jl in
+  all_permut (seq 1 m) = map (map S) (map collapse (all_permut jl))
+).
+*)
+  unfold sub_lists_of_seq_1_n in Hjl.
+  apply in_sls1n_iff in Hjl.
+  destruct Hjl as [Hjl| Hjl]; [ easy | ].
+  destruct Hjl as (Hs & Hjlm & Hjl).
+  rewrite <- Hjlm.
+  clear Hjlm.
+  induction jl as [| j]; [ easy | ].
+  cbn - [ nth seq ].
+  rewrite map_map.
+  unfold canon_sym_gr_list_list.
+  rewrite map_map.
+  unfold all_permut.
+  rewrite seq_length.
+  rewrite <- cons_seq.
+  unfold canon_sym_gr_list_list.
+  rewrite map_map.
+  apply map_ext_in.
+  intros i Hi.
+  apply in_seq in Hi.
+  symmetry.
+  remember (map S) as x.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    erewrite nth_indep with (d' := 0). 2: {
+      now apply in_canon_sym_gr_list in Hk.
+    }
+    easy.
+  }
+  subst x.
+  symmetry.
+...
+  rewrite permut_collapse. 2: {
+    apply (map_nth_is_permut_list 42).
+    erewrite
+Search (is_permut_list (map _ _)).
+Search collapse.
+  unfold collapse.
+Search isort_rank.
+Search (seq (S _)).
+Search (_ ∈ sls1n _ _ _).
+Search (_ ∈ sub_lists_of_seq_1_n _ _).
 ...
 unfold mat_select_cols, mat_select_rows.
 rewrite mat_transp_ncols, Hac, Har.
