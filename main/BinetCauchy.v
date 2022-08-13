@@ -4694,6 +4694,22 @@ remember (∑ (jl' ∈ _), _) as x; subst x.
 *)
 ...
 (*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (sub_lists_of_seq_1_n 3 2).
+Compute (
+  let m := 2 in
+  let n := 3 in
+  let A := mk_mat [[1;-2;3];[4;5;-6]]%Z in
+  let jl := [1; 3] in
+  ∑ (jl' ∈ sub_lists_of_seq_1_n m m),
+  (∑ (kl ∈ all_permut jl'),
+   ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) =
+  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+).
+*)
+...
+(*
   ============================
   ∑ (l ∈ list_prodn (repeat (seq 1 m) m)), ε l * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i l.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
