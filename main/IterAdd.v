@@ -308,19 +308,19 @@ intros.
 apply rngl_mul_summation_list_distr_l.
 Qed.
 
+Theorem rngl_mul_summation_list_distr_r : ∀ A a (la : list A) f,
+  ((∑ (i ∈ la), f i) * a = ∑ (i ∈ la), f i * a)%F.
+Proof.
+intros.
+rewrite mul_iter_list_distr_r; [ | intros; apply rngl_mul_add_distr_r ].
+now rewrite rngl_mul_0_l.
+Qed.
+
 Theorem rngl_mul_summation_distr_r : ∀ a b e f,
   ((∑ (i = b, e), f i) * a = ∑ (i = b, e), f i * a)%F.
 Proof.
 intros.
-unfold iter_seq, iter_list.
-remember (S e - b) as n eqn:Hn.
-revert e a b Hn.
-induction n; intros; [ now apply rngl_mul_0_l | cbn ].
-do 2 rewrite rngl_add_0_l.
-rewrite fold_left_rngl_add_fun_from_0; symmetry.
-rewrite fold_left_rngl_add_fun_from_0; symmetry.
-rewrite rngl_mul_add_distr_r.
-rewrite (IHn e); [ easy | flia Hn ].
+apply rngl_mul_summation_list_distr_r.
 Qed.
 
 Theorem rngl_summation_list_only_one : ∀ A g (a : A),
@@ -690,7 +690,8 @@ End a.
 Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.
 Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
 Arguments rngl_summation_list_split_first {T}%type {ro rp} A%type l%list.
-Arguments rngl_mul_summation_list_distr_l {T ro rp} Hom A%type a la%list.
+Arguments rngl_mul_summation_list_distr_l {T ro rp}.
+Arguments rngl_mul_summation_list_distr_r {T ro rp}.
 Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
 Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
 Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
