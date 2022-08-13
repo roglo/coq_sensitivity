@@ -4696,6 +4696,105 @@ remember (∑ (jl' ∈ _), _) as x; subst x.
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
+...
+unfold mat_select_cols, mat_select_rows.
+rewrite mat_transp_ncols, Hac, Har.
+generalize Hnz; intros H.
+apply Nat.eqb_neq in H; rewrite H; clear H.
+...
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros kl Hkl.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+...
+    rewrite mat_transp_el; [ | | flia Hi | ]; cycle 1. {
+      erewrite map_ext_in. 2: {
+        intros j Hj.
+        erewrite map_ext_in. 2: {
+          intros k Hk.
+          apply in_seq in Hk.
+          rewrite mat_transp_el; [ | easy | | flia Hk ]. 2: {
+            apply (sub_lists_of_seq_1_n_bounds n m) in Hj; [ | easy ].
+            flia Hj.
+          }
+          easy.
+        }
+        easy.
+      }
+      unfold is_correct_matrix.
+      unfold mat_ncols; cbn.
+      rewrite map_length.
+      apply Bool.andb_true_iff.
+      rewrite List_hd_nth_0.
+      rewrite (List_map_nth' 0). 2: {
+        apply in_sub_lists_of_seq_1_n_length in Hjl.
+        apply Nat.neq_0_lt_0.
+        congruence.
+      }
+      rewrite List_map_seq_length.
+      split. {
+        apply Bool.orb_true_iff.
+        left.
+        apply Bool.negb_true_iff.
+        now apply Nat.eqb_neq.
+      } {
+        apply all_true_and_list_true_iff.
+        intros la Hla.
+        apply in_map_iff in Hla.
+        destruct Hla as (a & H & Hla); subst la.
+        rewrite List_map_seq_length.
+        apply Nat.eqb_refl.
+      }
+    } {
+      unfold all_permut in Hkl.
+      destruct m; [ easy | ].
+      cbn - [ nth ] in Hkl.
+      apply in_map_iff in Hkl.
+      destruct Hkl as (la & H & Hla); subst kl.
+      apply in_map_iff in Hla.
+      destruct Hla as (a & H & Hla).
+      rewrite (List_map_nth' 0). 2: {
+        subst la; cbn.
+        rewrite map_length, seq_length.
+        rewrite canon_sym_gr_list_length.
+        flia Hi.
+      }
+      replace (1 :: seq 2 m) with (seq 1 (S m)) by easy.
+      rewrite seq_nth; cbn. 2: {
+        subst la.
+        rewrite seq_length.
+        destruct i; [ flia Hi | ].
+        cbn; rewrite Nat.sub_0_r.
+        destruct i. {
+          apply in_seq in Hla.
+          rewrite seq_length in Hla.
+...
+        rewrite List_nth_succ_cons.
+        rewrite Nat.sub_0_r.
+        rewrite
+      easy.
+...
+      apply in_all_permut_permutation in Hkl.
+...
+Search permutation.
+      replace m with (length kl) in Hkl.
+...
+      apply permut_list_permutation_iff in Hkl.
+      apply permutation_length in Hkl.
+      apply all_permut_bounds in Hkl.
+...
+Search (map _ (seq _ _)).
+fold_mat_transp:
+  ∀ (T : Type) (ro : ring_like_op T) (M : matrix T),
+    {|
+      mat_list_list :=
+        map (λ j : nat, map (λ i : nat, mat_el M i j) (seq 1 (mat_nrows M)))
+          (seq 1 (mat_ncols M))
+    |} = M⁺%M
+
+      Search is_correct_matrix.
+cbn.
+...
 symmetry.
 erewrite rngl_summation_list_change_var.
 ...
