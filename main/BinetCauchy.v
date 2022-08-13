@@ -4636,35 +4636,33 @@ rewrite rngl_summation_filter_no_dup_list_prodn; cycle 1. {
   now destruct Hif.
 }
 apply rngl_summation_list_eq_compat.
-intros i Hi.
+intros jl Hjl.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
-  rewrite isort_when_sorted. 2: {
-    apply sorted_nat_ltb_leb_incl.
-Theorem all_permut_sorted : ∀ n la, la ∈ all_permut n → sorted Nat.ltb la.
-Proof.
-intros * Hla.
-...
-now apply all_permut_sorted in Hkl.
+  replace (isort Nat.leb kl) with jl. 2: {
+    symmetry.
+    apply in_all_permut_permutation in Hkl.
+    rewrite (isort_when_permuted Nat.eqb_eq) with (lb := jl); cycle 1. {
+      apply Nat_leb_antisym.
+    } {
+      apply Nat_leb_trans.
+    } {
+      apply Nat_leb_total_relation.
+    } {
+      easy.
+    }
+    apply isort_when_sorted.
+    apply (sub_lists_of_seq_1_n_are_sorted n m) in Hjl; [ | easy ].
+    now apply sorted_nat_ltb_leb_incl.
+  }
+  rewrite rngl_mul_assoc.
+  easy.
 }
-rewrite rngl_mul_assoc.
-easy.
-}
-symmetry; symmetry.
-...
-About rngl_mul_summation_list_distr_l.
-...
-specialize rngl_mul_summation_list_distr_r as H1.
-assert (H : rngl_has_opp = true ∨ rngl_has_sous = true) by now destruct Hif; left.
-specialize (H1 H); clear H.
-specialize (H1 _ (det (mat_select_rows i0 B))
-
-rewrite rngl_mul_summation_list_distr_r.
-Arguments rngl_mul_summation_list_distr_l {T ro rp} _ _%type_scope _ _%list_scope _
-specialize rngl_mul_summation_list_distr_r as H1.
-...
-Search all_permut.
-Search (_ ∈ all_permut _).
+cbn - [ det ].
+rewrite <- rngl_mul_summation_list_distr_r; [ | now destruct Hif; left ].
+f_equal; symmetry.
+Search (det (mat_select_rows _ _)).
+Search (det (mat_select_cols _ _)).
 ...
 *)
 
