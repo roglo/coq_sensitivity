@@ -4696,8 +4696,51 @@ remember (∑ (jl' ∈ _), _) as x; subst x.
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
+symmetry.
+erewrite rngl_summation_list_change_var.
+...
+(g i).(i0) = nth i jl 0
 Compute (all_permut (seq 1 3)).
 Compute (all_permut [1;3;4]).
+Print all_permut.
+destruct m; [ easy | ].
+unfold all_permut at 1.
+set (s := seq 1 (S m)) at 1.
+cbn in s; subst s.
+cbn - [ mat_el seq ].
+rewrite seq_length.
+unfold all_permut.
+destruct n; [ easy | ].
+cbn in Hjl.
+apply in_app_or in Hjl.
+destruct Hjl as [Hjl| Hjl]. {
+  apply in_map_iff in Hjl.
+  destruct Hjl as (la & Hla & Hjl); subst jl.
+  rewrite List_cons_length.
+  apply in_sls1n_iff in Hjl.
+  destruct Hjl as [Hjl| Hjl]. {
+    destruct Hjl; subst m la.
+...
+    cbn.
+    rewrite rngl_summation_list_only_one.
+    rewrite rngl_product_only_one.
+    cbn.
+    rewrite map_length, seq_length.
+...
+  generalize Hjl; intros H.
+Search (_ ∈ sls1n _ _ _).
+  apply sls1n_length in Hjl.
+
+remember (seq 1 (S m)) as s eqn:Hs.
+
+cbn - [ all_permut mat_el ].
+unfold all_permut at 1.
+
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+erewrite rngl_summation_list_change_var.
+...
+map h (all_permut (seq 1 m)) = all_permut jl.
+g i = nth i jl ...
 ...
 (*
 Require Import RnglAlg.Zrl.
