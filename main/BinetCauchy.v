@@ -4738,6 +4738,16 @@ Compute (
   }
   subst x.
   symmetry.
+  erewrite map_ext_in. 2: {
+    intros k Hk.
+    apply in_canon_sym_gr_list in Hk; [ | easy ].
+    rewrite cons_seq, seq_nth; [ | easy ].
+    now rewrite Nat.add_1_l.
+  }
+  f_equal.
+  symmetry.
+Search collapse.
+Search (map (λ _, nth _ _ _)).
 ...
   rewrite permut_collapse. 2: {
     apply (map_nth_is_permut_list 42).
