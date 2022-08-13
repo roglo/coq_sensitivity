@@ -74,6 +74,19 @@ Theorem binomial_succ_succ : ∀ n k,
   binomial (S n) (S k) = binomial n k + binomial n (S k).
 Proof. easy. Qed.
 
+Theorem binomial_neq_0 : ∀ n k, k ≤ n → binomial n k ≠ 0.
+Proof.
+intros * Hkn.
+revert k Hkn.
+induction n; intros; [ now apply Nat.le_0_r in Hkn; subst k | ].
+destruct k; [ easy | cbn ].
+apply Nat.succ_le_mono in Hkn.
+intros H1.
+apply Nat.eq_add_0 in H1.
+destruct H1 as (H1, _).
+now revert H1; apply IHn.
+Qed.
+
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
 Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
@@ -336,6 +349,72 @@ Theorem sub_lists_of_seq_1_n_out : ∀ n k,
 Proof.
 intros * Hnk.
 now apply sls1n_out.
+Qed.
+Theorem sls1n_inj : ∀ i n k u v,
+  u < binomial n k
+  → v < binomial n k
+  → nth u (sls1n i n k) [] = nth v (sls1n i n k) []
+  → u = v.
+Proof.
+intros * Hu Hv Huv.
+revert i u v k Hu Hv Huv.
+induction n; intros; cbn in Huv. {
+  destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | easy ].
+}
+destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | ].
+destruct (lt_dec u (binomial n k)) as [Hub| Hub]. {
+  rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+  destruct (lt_dec v (binomial n k)) as [Hvb| Hvb]. {
+    rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
+    rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+    injection Huv; clear Huv; intros Huv.
+    now apply IHn in Huv.
+  }
+  apply Nat.nlt_ge in Hvb.
+  rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
+  rewrite map_length, sls1n_length in Huv.
+  specialize sls1n_bounds as H1.
+  specialize (H1 (S i) n (S k)).
+  remember (sls1n (S i) n (S k)) as la eqn:Hla.
+  remember (v - binomial n k) as j eqn:Hj.
+  specialize (H1 (nth j la [])).
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+    apply Nat.nlt_ge in Hjla.
+    now rewrite nth_overflow with (n := j) in Huv.
+  }
+  assert (H : nth j la [] ∈ la) by now apply nth_In.
+  specialize (H1 H); clear H.
+  rewrite <- Huv in H1.
+  specialize (H1 _ (or_introl eq_refl)).
+  flia H1.
+}
+apply Nat.nlt_ge in Hub.
+rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
+rewrite map_length, sls1n_length in Huv.
+destruct (lt_dec v (binomial n k)) as [Hvb| Hvb]. {
+  rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
+  rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
+  specialize sls1n_bounds as H1.
+  specialize (H1 (S i) n (S k)).
+  remember (sls1n (S i) n (S k)) as la eqn:Hla.
+  remember (u - binomial n k) as j eqn:Hj.
+  specialize (H1 (nth j la [])).
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
+    apply Nat.nlt_ge in Hjla.
+    now rewrite nth_overflow with (n := j) in Huv.
+  }
+  assert (H : nth j la [] ∈ la) by now apply nth_In.
+  specialize (H1 H); clear H.
+  rewrite Huv in H1.
+  specialize (H1 _ (or_introl eq_refl)).
+  flia H1.
+}
+apply Nat.nlt_ge in Hvb.
+rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
+rewrite map_length, sls1n_length in Huv.
+apply IHn in Huv; [ | cbn in Hu; flia Hu Hub | cbn in Hv; flia Hv Hvb ].
+flia Huv Hub Hvb.
 Qed.
 
 Theorem rsls1n_out : ∀ i n k t,
@@ -4081,6 +4160,237 @@ apply IHla. {
 }
 Qed.
 
+Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
+  permutation (list_eqv eqb)
+    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
+    (flat_map all_permut (sub_lists_of_seq_1_n n m)).
+Proof.
+intros.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
+specialize Nat_leb_trans as Htra.
+rewrite isort_when_sorted. 2: {
+  rewrite <- list_prodn_prodn_repeat.
+  apply sorted_filter; [ now apply transitive_list_leb | ].
+  apply sorted_list_ltb_leb_incl.
+  apply list_prodn_repeat_seq_ltb_sorted.
+}
+symmetry.
+unfold sub_lists_of_seq_1_n.
+rewrite flat_map_concat_map.
+rewrite <- list_prodn_prodn_repeat.
+rewrite <- flat_map_concat_map.
+set (la := flat_map all_permut (sls1n 1 n m)).
+set (lb := filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))).
+assert (Hab : la ⊂ lb). {
+  subst la lb.
+  intros la Hla.
+  apply in_flat_map in Hla.
+  destruct Hla as (lb & Hlb & Hla).
+  apply in_sls1n_iff in Hlb.
+  destruct Hlb as [Hlb| Hlb]. {
+    destruct Hlb; subst m lb.
+    destruct Hla as [Hla| ]; [ subst la | easy ].
+    cbn; now left.
+  }
+  destruct Hlb as (Hsb & Hlb & Hb).
+  apply filter_In.
+  split. {
+    apply in_list_prodn_repeat_iff.
+    destruct m; [ left | right ]. {
+      apply length_zero_iff_nil in Hlb; subst lb.
+      now destruct Hla.
+    }
+    split; [ easy | ].
+    apply in_all_permut_permutation in Hla.
+    split. {
+      apply (permutation_length Nat.eqb_eq) in Hla; congruence.
+    }
+    intros i Hi.
+    specialize (permutation_in_iff Nat.eqb_eq Hla) as H1.
+    apply H1 in Hi.
+    specialize (Hb _ Hi) as H2.
+    split; [ easy | now apply Nat.lt_succ_r ].
+  }
+  apply in_all_permut_permutation in Hla.
+  apply (no_dup_NoDup Nat.eqb_eq).
+  apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hsb.
+  apply (permutation_sym Nat.eqb_eq) in Hla.
+  now apply (permutation_NoDup Nat.eqb_eq) in Hla.
+}
+assert (Hba : lb ⊂ la). {
+  subst la lb.
+  intros la Hla.
+  apply filter_In in Hla.
+  destruct Hla as (Hla, Hnd).
+  apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
+  apply in_flat_map.
+  apply (in_list_prodn_iff 0) in Hla.
+  rewrite repeat_length in Hla.
+  destruct Hla as (Hm, Hla).
+  rewrite Hm in Hla.
+  assert (H : ∀ i, i < m → 1 ≤ nth i la 0 ≤ n). {
+    intros i Hi.
+    specialize (Hla _ Hi) as H1.
+    rewrite List_nth_repeat in H1.
+    destruct (lt_dec i m); [ | easy ].
+    apply in_seq in H1.
+    split; [ easy | now apply Nat.lt_succ_r ].
+  }
+  clear Hla; rename H into Hla.
+  exists (isort Nat.leb la).
+  split. 2: {
+    apply permutation_in_all_permut.
+    apply permuted_isort; unfold equality.
+    apply Nat.eqb_eq.
+  }
+  apply in_sls1n_iff.
+  rewrite isort_length.
+  right.
+  split. {
+    apply NoDup_sorted_nat_leb_ltb. 2: {
+      apply sorted_isort; apply Nat_leb_total_relation.
+    }
+    apply (permutation_NoDup Nat.eqb_eq) with (la := la); [ | easy ].
+    apply permuted_isort.
+    unfold equality.
+    apply Nat.eqb_eq.
+  }
+  split; [ easy | ].
+  intros j Hj.
+  apply in_isort in Hj.
+  apply (In_nth _ _ 0) in Hj.
+  destruct Hj as (k & Hk & Hj).
+  rewrite Hm in Hk.
+  specialize (Hla k Hk) as H1.
+  rewrite Hj in H1.
+  split; [ easy | now apply Nat.lt_succ_r ].
+}
+rewrite <- isort_when_sorted with (rel := list_leb Nat.leb) (l := lb). 2: {
+  unfold lb.
+  apply sorted_filter; [ apply transitive_list_leb, Nat_leb_trans | ].
+  apply sorted_list_ltb_leb_incl.
+  apply list_prodn_repeat_seq_ltb_sorted.
+}
+apply (isort_when_permuted Hel). {
+  apply antisymmetric_list_leb, Nat_leb_antisym.
+} {
+  apply transitive_list_leb, Nat_leb_trans.
+} {
+  apply total_relation_list_leb, Nat_leb_total_relation.
+}
+apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
+  unfold la.
+  rewrite flat_map_concat_map.
+  apply NoDup_concat_if. {
+    intros lc Hlc.
+    apply in_map_iff in Hlc.
+    destruct Hlc as (ld & H & Hld); subst lc.
+    apply NoDup_all_permut.
+    apply in_sls1n_iff in Hld.
+    destruct Hld as [Hld| Hld]. {
+      destruct Hld; subst m ld; constructor.
+    }
+    destruct Hld as (Hs & Hdm & Hld).
+    now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
+  }
+  intros i j Hij lc Hlci Hlcj.
+  apply Hij; clear Hij.
+  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+    subst m.
+    rewrite sls1n_0_r in Hlci, Hlcj.
+    cbn in Hlci, Hlcj.
+    destruct i; [ | now rewrite Tauto_match_nat_same in Hlci ].
+    destruct j; [ | now rewrite Tauto_match_nat_same in Hlcj ].
+    easy.
+  }
+  destruct (lt_dec i (binomial n m)) as [Hinm| Hinm]. 2: {
+    apply Nat.nlt_ge in Hinm.
+    rewrite nth_overflow in Hlci; [ easy | ].
+    now rewrite map_length, sls1n_length.
+  }
+  destruct (lt_dec j (binomial n m)) as [Hjnm| Hjnm]. 2: {
+    apply Nat.nlt_ge in Hjnm.
+    rewrite nth_overflow in Hlcj; [ easy | ].
+    now rewrite map_length, sls1n_length.
+  }
+  rewrite (List_map_nth' []) in Hlci; [ | now rewrite sls1n_length ].
+  rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
+  apply in_all_permut_permutation in Hlci.
+  apply in_all_permut_permutation in Hlcj.
+  apply (permutation_sym Nat.eqb_eq) in Hlci.
+  eapply (permutation_trans Nat.eqb_eq) in Hlcj; [ | apply Hlci ].
+  specialize sorted_sorted_permuted as H1.
+  apply (H1 _ _ Nat.ltb) in Hlcj; cycle 1. {
+    unfold equality; apply Nat.eqb_eq.
+  } {
+    apply Nat_ltb_antisym.
+  } {
+    apply Nat_ltb_trans.
+  } {
+    apply (sls1n_are_sorted 1 n m), nth_In.
+    now rewrite sls1n_length.
+  } {
+    apply (sls1n_are_sorted 1 n m), nth_In.
+    now rewrite sls1n_length.
+  }
+  now apply sls1n_inj in Hlcj.
+} {
+  unfold lb.
+  apply NoDup_filter.
+  apply NoDup_list_prodn_repeat.
+}
+Qed.
+
+Theorem rngl_summation_filter_no_dup_list_prodn :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ n m f,
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
+Proof.
+intros Hopp Heqb *.
+rewrite list_prodn_prodn_repeat.
+rewrite rngl_summation_summation_list_flat_map; cbn.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+set (g := no_dup Nat.eqb).
+erewrite (rngl_summation_list_permut _ Hel). 2: {
+  assert (H : ∀ ll,
+    permutation (list_eqv eqb) ll
+      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
+    now apply permutation_filter_app_filter.
+  }
+  apply H.
+}
+rewrite rngl_summation_list_app.
+rewrite rngl_add_comm.
+rewrite all_0_rngl_summation_list_0. 2: {
+  intros kl Hkl.
+  apply filter_In in Hkl.
+  destruct Hkl as (Hkl, Hsl).
+  unfold g in Hsl.
+  apply Bool.negb_true_iff in Hsl.
+  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+    intros H.
+    apply (no_dup_NoDup Nat.eqb_eq) in H.
+    congruence.
+  }
+  now apply rngl_mul_0_l; left.
+}
+subst g.
+rewrite rngl_add_0_l.
+apply (rngl_summation_list_permut _ Hel).
+apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -4320,273 +4630,64 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
-Theorem rngl_summation_filter_no_dup_list_prodn :
-  rngl_has_opp = true →
-  rngl_has_eqb = true →
-  ∀ n m f,
-  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
-Proof.
-intros Hopp Heqb *.
-rewrite list_prodn_prodn_repeat.
-rewrite rngl_summation_summation_list_flat_map; cbn.
-assert (Hel : equality (list_eqv eqb)). {
-  apply -> equality_list_eqv.
-  unfold equality.
-  apply Nat.eqb_eq.
-}
-set (g := no_dup Nat.eqb).
-erewrite (rngl_summation_list_permut _ Hel). 2: {
-  assert (H : ∀ ll,
-    permutation (list_eqv eqb) ll
-      (filter g ll ++ filter (λ l, negb (g l)) ll)). {
-    now apply permutation_filter_app_filter.
-  }
-  apply H.
-}
-rewrite rngl_summation_list_app.
-rewrite rngl_add_comm.
-rewrite all_0_rngl_summation_list_0. 2: {
-  intros kl Hkl.
-  apply filter_In in Hkl.
-  destruct Hkl as (Hkl, Hsl).
-  unfold g in Hsl.
-  apply Bool.negb_true_iff in Hsl.
-  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
-    intros H.
-    apply (no_dup_NoDup Nat.eqb_eq) in H.
-    congruence.
-  }
-  now apply rngl_mul_0_l; left.
-}
-subst g.
-rewrite rngl_add_0_l.
-apply (rngl_summation_list_permut _ Hel).
-Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
-  permutation (list_eqv eqb)
-    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
-    (flat_map all_permut (sub_lists_of_seq_1_n n m)).
-Proof.
-intros.
-assert (Hel : equality (list_eqv eqb)). {
-  apply -> equality_list_eqv.
-  unfold equality.
-  apply Nat.eqb_eq.
-}
-apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
-specialize Nat_leb_trans as Htra.
-rewrite isort_when_sorted. 2: {
-  rewrite <- list_prodn_prodn_repeat.
-  apply sorted_filter; [ now apply transitive_list_leb | ].
-  apply sorted_list_ltb_leb_incl.
-  apply list_prodn_repeat_seq_ltb_sorted.
-}
-symmetry.
-unfold sub_lists_of_seq_1_n.
-rewrite flat_map_concat_map.
-rewrite <- list_prodn_prodn_repeat.
-(*
-Compute (
-let n := 4 in
-let m := 3 in
- (map (λ la, (la, all_permut la)) (sls1n 1 n m))
-).
-Compute (
-let n := 4 in
-let m := 3 in
- list_prodn (repeat (seq 1 n) m)
-).
-Check incl_incl_permutation.
-*)
-rewrite <- flat_map_concat_map.
-set (la := flat_map all_permut (sls1n 1 n m)).
-set (lb := filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))).
-assert (Hab : la ⊂ lb). {
-  subst la lb.
-  intros la Hla.
-  apply in_flat_map in Hla.
-  destruct Hla as (lb & Hlb & Hla).
-  apply in_sls1n_iff in Hlb.
-  destruct Hlb as [Hlb| Hlb]. {
-    destruct Hlb; subst m lb.
-    destruct Hla as [Hla| ]; [ subst la | easy ].
-    cbn; now left.
-  }
-  destruct Hlb as (Hsb & Hlb & Hb).
-  apply filter_In.
-  split. {
-    apply in_list_prodn_repeat_iff.
-    destruct m; [ left | right ]. {
-      apply length_zero_iff_nil in Hlb; subst lb.
-      now destruct Hla.
-    }
-    split; [ easy | ].
-    apply in_all_permut_permutation in Hla.
-    split. {
-      apply (permutation_length Nat.eqb_eq) in Hla; congruence.
-    }
-    intros i Hi.
-    specialize (permutation_in_iff Nat.eqb_eq Hla) as H1.
-    apply H1 in Hi.
-    specialize (Hb _ Hi) as H2.
-    split; [ easy | now apply Nat.lt_succ_r ].
-  }
-  apply in_all_permut_permutation in Hla.
-  apply (no_dup_NoDup Nat.eqb_eq).
-  apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans) in Hsb.
-  apply (permutation_sym Nat.eqb_eq) in Hla.
-  now apply (permutation_NoDup Nat.eqb_eq) in Hla.
-}
-assert (Hba : lb ⊂ la). {
-  subst la lb.
-  intros la Hla.
-  apply filter_In in Hla.
-  destruct Hla as (Hla, Hnd).
-  apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
-  apply in_flat_map.
-  apply (in_list_prodn_iff 0) in Hla.
-  rewrite repeat_length in Hla.
-  destruct Hla as (Hm, Hla).
-  rewrite Hm in Hla.
-  assert (H : ∀ i, i < m → 1 ≤ nth i la 0 ≤ n). {
-    intros i Hi.
-    specialize (Hla _ Hi) as H1.
-    rewrite List_nth_repeat in H1.
-    destruct (lt_dec i m); [ | easy ].
-    apply in_seq in H1.
-    split; [ easy | now apply Nat.lt_succ_r ].
-  }
-  clear Hla; rename H into Hla.
-  exists (isort Nat.leb la).
-  split. 2: {
-    apply permutation_in_all_permut.
-    apply permuted_isort; unfold equality.
-    apply Nat.eqb_eq.
-  }
-  apply in_sls1n_iff.
-  rewrite isort_length.
-  right.
-  split. {
-    apply NoDup_sorted_nat_leb_ltb. 2: {
-      apply sorted_isort; apply Nat_leb_total_relation.
-    }
-    apply (permutation_NoDup Nat.eqb_eq) with (la := la); [ | easy ].
-    apply permuted_isort.
-    unfold equality.
-    apply Nat.eqb_eq.
-  }
-  split; [ easy | ].
-  intros j Hj.
-  apply in_isort in Hj.
-  apply (In_nth _ _ 0) in Hj.
-  destruct Hj as (k & Hk & Hj).
-  rewrite Hm in Hk.
-  specialize (Hla k Hk) as H1.
-  rewrite Hj in H1.
-  split; [ easy | now apply Nat.lt_succ_r ].
-}
-rewrite <- isort_when_sorted with (rel := list_leb Nat.leb) (l := lb). 2: {
-  unfold lb.
-  apply sorted_filter; [ apply transitive_list_leb, Nat_leb_trans | ].
-  apply sorted_list_ltb_leb_incl.
-  apply list_prodn_repeat_seq_ltb_sorted.
-}
-apply (isort_when_permuted Hel). {
-  apply antisymmetric_list_leb, Nat_leb_antisym.
+rewrite rngl_summation_filter_no_dup_list_prodn; cycle 1. {
+  now destruct Hif.
 } {
-  apply transitive_list_leb, Nat_leb_trans.
-} {
-  apply total_relation_list_leb, Nat_leb_total_relation.
+  now destruct Hif.
 }
-apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
-  unfold la.
-  rewrite flat_map_concat_map.
-  apply NoDup_concat_if. {
-    intros lc Hlc.
-    apply in_map_iff in Hlc.
-    destruct Hlc as (ld & H & Hld); subst lc.
-    apply NoDup_all_permut.
-    apply in_sls1n_iff in Hld.
-    destruct Hld as [Hld| Hld]. {
-      destruct Hld; subst m ld; constructor.
-    }
-    destruct Hld as (Hs & Hdm & Hld).
-    now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
-  }
-  intros i j Hij lc Hlci Hlcj.
-  apply Hij; clear Hij.
-  destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-    subst m.
-    rewrite sls1n_0_r in Hlci, Hlcj.
-    cbn in Hlci, Hlcj.
-    destruct i; [ | now rewrite Tauto_match_nat_same in Hlci ].
-    destruct j; [ | now rewrite Tauto_match_nat_same in Hlcj ].
-    easy.
-  }
-  destruct (lt_dec i (binomial n m)) as [Hinm| Hinm]. 2: {
-    apply Nat.nlt_ge in Hinm.
-    rewrite nth_overflow in Hlci; [ easy | ].
-    now rewrite map_length, sls1n_length.
-  }
-  destruct (lt_dec j (binomial n m)) as [Hjnm| Hjnm]. 2: {
-    apply Nat.nlt_ge in Hjnm.
-    rewrite nth_overflow in Hlcj; [ easy | ].
-    now rewrite map_length, sls1n_length.
-  }
-  rewrite (List_map_nth' []) in Hlci; [ | now rewrite sls1n_length ].
-  rewrite (List_map_nth' []) in Hlcj; [ | now rewrite sls1n_length ].
-  apply in_all_permut_permutation in Hlci.
-  apply in_all_permut_permutation in Hlcj.
-  apply (permutation_sym Nat.eqb_eq) in Hlci.
-  eapply (permutation_trans Nat.eqb_eq) in Hlcj; [ | apply Hlci ].
-  specialize sorted_sorted_permuted as H1.
-  apply (H1 _ _ Nat.ltb) in Hlcj; cycle 1. {
-    unfold equality; apply Nat.eqb_eq.
-  } {
-    apply Nat_ltb_antisym.
-  } {
-    apply Nat_ltb_trans.
-  } {
-    apply (sls1n_are_sorted 1 n m), nth_In.
-    now rewrite sls1n_length.
-  } {
-    apply (sls1n_are_sorted 1 n m), nth_In.
-    now rewrite sls1n_length.
-  }
-  clear H1.
-Search (nth _ (sls1n _ _ _)).
-Theorem sls1n_inj : ∀ i n k u v,
-  u < binomial n k
-  → v < binomial n k
-  → nth u (sls1n i n k) [] = nth v (sls1n i n k) []
-  → u = v.
-Proof.
-intros * Hu Hv Huv.
-revert i u v k Hu Hv Huv.
-induction n; intros; cbn in Huv. {
-  destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | easy ].
-}
-destruct k; [ apply Nat.lt_1_r in Hu, Hv; congruence | ].
-destruct (lt_dec u (binomial n k)) as [Hub| Hub]. {
-  rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
-  rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
-  destruct (lt_dec v (binomial n k)) as [Hvb| Hvb]. {
-    rewrite app_nth1 in Huv; [ | now rewrite map_length, sls1n_length ].
-    rewrite (List_map_nth' []) in Huv; [ | now rewrite sls1n_length ].
-    injection Huv; clear Huv; intros Huv.
-    now apply IHn in Huv.
-  }
-  apply Nat.nlt_ge in Hvb.
-  rewrite app_nth2 in Huv; [ | now rewrite map_length, sls1n_length ].
-  rewrite map_length, sls1n_length in Huv.
+apply rngl_summation_list_eq_compat.
+intros i Hi.
+...
   destruct (Nat.eq_dec v (binomial n k)) as [Hvbe| Hvbe]. {
     rewrite Hvbe, Nat.sub_diag in Huv; clear Hvb.
     destruct (le_dec k n) as [Hkn| Hkn]. 2: {
       apply Nat.nle_gt in Hkn.
       now rewrite binomial_out in Hub.
     }
-    destruct n; [ easy | ].
-    cbn in Huv.
+    destruct (le_dec (S k) n) as [Hskn| Hskn]. {
+      destruct n; [ easy | ].
+      apply Nat.succ_le_mono in Hskn.
+      cbn in Huv.
+      rewrite app_nth1 in Huv. 2: {
+        rewrite map_length, sls1n_length.
+        apply Nat.neq_0_lt_0.
+        now apply binomial_neq_0.
+      }
+      rewrite (List_map_nth' []) in Huv. 2: {
+        rewrite sls1n_length.
+        apply Nat.neq_0_lt_0.
+        now apply binomial_neq_0.
+      }
+      injection Huv; intros H1 H2; flia H2.
+    }
+    apply Nat.nle_gt in Hskn.
+    assert (k = n) by flia Hkn Hskn; subst k; clear Hkn Hskn.
+    rewrite binomial_diag in Hu, Hv.
+    apply Nat.lt_1_r in Hu, Hv; congruence.
+  }
+  rewrite Nat_succ_sub_succ_r in Huv; [ | flia Hvb Hvbe ].
+  destruct n. 2: {
+    cbn - [ binomial ] in Huv.
+    destruct k. {
+      rewrite binomial_0_r in Hub.
+      apply Nat.lt_1_r in Hub; subst u.
+      rewrite app_nth2 in Huv. 2: {
+        rewrite map_length, sls1n_length.
+        do 2 rewrite binomial_0_r; flia.
+      }
+      rewrite map_length, sls1n_length in Huv.
+      do 2 rewrite binomial_0_r in Huv; cbn in Huv.
+      rewrite Nat.sub_0_r in Huv.
+...
+        rewrite binomial_0_r in Hub, Hvbe |-*.
+        rewrite binomial_0_r; flia.
+..
+    rewrite app_nth2 in Huv. 2: {
+      rewrite map_length, sls1n_length.
+      destruct k. {
+        rewrite binomial_0_r in Hub, Hvbe |-*.
+        rewrite binomial_0_r; flia.
+      }
 ...
     destruct n. {
       destruct k. {
@@ -4599,20 +4700,11 @@ destruct (lt_dec u (binomial n k)) as [Hub| Hub]. {
       cbn in Hv, Hvbe.
       now subst v.
     }
+    rewrite app_nth2 in Huv. 2: {
+      rewrite map_length, sls1n_length.
+...
     rewrite app_nth1 in Huv. 2: {
       rewrite map_length, sls1n_length.
-Theorem binomial_neq_0 : ∀ n k, k ≤ n → binomial n k ≠ 0.
-Proof.
-intros * Hkn.
-revert k Hkn.
-induction n; intros; [ now apply Nat.le_0_r in Hkn; subst k | ].
-destruct k; [ easy | cbn ].
-apply Nat.succ_le_mono in Hkn.
-intros H1.
-apply Nat.eq_add_0 in H1.
-destruct H1 as (H1, _).
-now revert H1; apply IHn.
-Qed.
 apply Nat.neq_0_lt_0.
 apply binomial_neq_0.
 ...
