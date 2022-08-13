@@ -4339,16 +4339,14 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
 }
 Qed.
 
-Theorem rngl_summation_list_prodn_sub_lists_all_permut :
+Theorem rngl_summation_list_prodn_repeat_filter_no_dup :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ n m f,
-  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
+  ∑ (kl ∈ prodn_repeat_seq 1 n m), ε kl * f kl =
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
-rewrite list_prodn_prodn_repeat.
-rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
   unfold equality.
@@ -4380,6 +4378,25 @@ rewrite all_0_rngl_summation_list_0. 2: {
 }
 subst g.
 rewrite rngl_add_0_l.
+easy.
+Qed.
+
+Theorem rngl_summation_list_prodn_sub_lists_all_permut :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
+  ∀ n m f,
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)), ε kl * f kl =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
+Proof.
+intros Hopp Heqb *.
+rewrite list_prodn_prodn_repeat.
+rewrite rngl_summation_summation_list_flat_map; cbn.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+rewrite rngl_summation_list_prodn_repeat_filter_no_dup; [ | easy | easy ].
 apply (rngl_summation_list_permut _ Hel).
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 Qed.
@@ -4663,12 +4680,25 @@ rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
 rewrite Har.
 unfold all_comb.
 remember (∑ (kl ∈ _), _) as x; subst x.
+rewrite list_prodn_prodn_repeat.
+rewrite rngl_summation_list_prodn_repeat_filter_no_dup; try now destruct Hif.
+assert (Hel : equality (list_eqv eqb)). {
+  apply -> equality_list_eqv.
+  unfold equality.
+  apply Nat.eqb_eq.
+}
+erewrite rngl_summation_list_permut; [ | apply Hel | ]. 2: {
+  apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
+}
+...
+Check permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
+...
 rewrite rngl_summation_list_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
   now destruct Hif.
 }
-unfold sub_lists_of_seq_1_n.
+unfold sub_lists_of_seq_1_n in Hjl |-*.
 ...
 *)
 
