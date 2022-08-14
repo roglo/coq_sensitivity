@@ -3329,6 +3329,18 @@ Qed.
 
 (* *)
 
+Theorem sorted_seq : ∀ sta len, sorted Nat.ltb (seq sta len).
+Proof.
+intros.
+revert sta.
+induction len; intros; [ easy | cbn ].
+apply sorted_cons_iff; [ apply Nat_ltb_trans | ].
+split; [ apply IHlen | ].
+intros a Ha.
+apply in_seq in Ha.
+now apply Nat.ltb_lt.
+Qed.
+
 Theorem antisymmetric_list_leb : ∀ A (leb : A → _),
   antisymmetric leb → antisymmetric (list_leb leb).
 Proof.

@@ -4698,12 +4698,14 @@ rewrite rngl_summation_list_only_one.
 apply in_sls1n_iff in Hjl.
 destruct Hjl as [Hjl| Hjl]; [ easy | ].
 destruct Hjl as (Hsj & Hjm & Hjl).
+...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
   rewrite (@isort_when_sorted _ _ (seq 1 m)) in Hkl. 2: {
-    unfold sorted; cbn.
-Search (is_sorted _ (seq _ _)).
+    apply sorted_nat_ltb_leb_incl.
+    apply sorted_seq.
+  }
 ...
 Theorem isort_isort_rank_iff : ∀ A (eqb rel : A → _),
   equality eqb →
