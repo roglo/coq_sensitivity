@@ -4714,7 +4714,75 @@ split; intros Hab. {
   apply List_eq_iff in Hab.
   do 2 rewrite map_length, isort_rank_length in Hab.
   destruct Hab as (Hlen, Hab).
-  specialize (Hab d).
+  apply List_eq_iff.
+  do 2 rewrite isort_rank_length.
+  split; [ easy | ].
+  intros d' i.
+  destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+    apply Nat.nlt_ge in Hil.
+    rewrite nth_overflow with (n := i); [ | now rewrite isort_rank_length ].
+    rewrite Hlen in Hil.
+    rewrite nth_overflow with (n := i); [ | now rewrite isort_rank_length ].
+    easy.
+  }
+  rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
+  rewrite Hlen in Hil; symmetry.
+  rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
+  rewrite <- Hlen in Hil; symmetry.
+  clear d'.
+...
+  specialize (Hab d i) as H1.
+  rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
+  rewrite Hlen in Hil.
+  rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
+  rewrite <- Hlen in Hil.
+  remember (nth i (isort_rank rel la) 0) as u eqn:Hu.
+  remember (nth i (isort_rank rel lb) 0) as v eqn:Hv.
+  move v before u.
+  assert (H : isort_rank rel la = isort_rank rel lb). {
+    apply List_eq_iff.
+    do 2 rewrite isort_rank_length.
+    split; [ easy | ].
+    intros d' j.
+    apply List_eq_iff.
+    apply List_eq_iff.
+    do 2 rewrite isort_rank_length.
+    split; [ easy | ].
+    intros d'' k.
+...
+Search (∀ _, nth _ _ _ = nth _ _ _).
+...
+  assert (H : isort_rank rel la = isort_rank rel lb). {
+    apply List_eq_iff.
+    do 2 rewrite isort_rank_length.
+    split; [ easy | ].
+    intros d' j.
+...
+  ============================
+  nth j (isort_rank rel la) d' = nth j (isort_rank rel lb) d'
+...
+  apply isort_rank_inj in Hab.
+Search (nth _ (isort_rank _ _)).
+...
+  assert
+    (H : ∀ i,
+     nth (nth i (isort_rank rel la) 0) la d =
+     nth (nth i (isort_rank rel lb) 0) lb d). {
+    intros i.
+    destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+      apply Nat.nlt_ge in Hil.
+      rewrite nth_overflow with (n := i); [ | now rewrite isort_rank_length ].
+      rewrite Hlen in Hil.
+      rewrite nth_overflow with (n := i); [ | now rewrite isort_rank_length ].
+      rewrite <- Hlen in Hil.
+      specialize (Hab i).
+      rewrite nth_overflow in Hab.
+2: now rewrite map_length, isort_rank_length.
+
+...
+    specialize (Hab i).
+    rewrite (List_map_nth' 0) in Hab; [ | rewrite isort_rank_length ].
+
 ...
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
