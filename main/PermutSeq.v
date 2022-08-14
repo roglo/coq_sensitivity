@@ -2416,6 +2416,25 @@ rewrite canon_sym_gr_list_length.
 apply (permutation_refl Nat.eqb_eq).
 Qed.
 
+Theorem in_all_permut_iff : ∀ la lb,
+  la ∈ all_permut lb ↔ isort Nat.leb la = isort Nat.leb lb.
+Proof.
+intros.
+split; intros Hab. {
+  apply in_all_permut_permutation in Hab.
+  apply (isort_when_permuted Nat.eqb_eq); [ | | | easy ]. {
+    apply Nat_leb_antisym.
+  } {
+    apply Nat_leb_trans.
+  } {
+    apply Nat_leb_total_relation.
+  }
+} {
+  apply permutation_in_all_permut.
+  now apply (permut_if_isort Nat.leb Nat.eqb_eq).
+}
+Qed.
+
 Theorem NoDup_all_permut : ∀ A (la : list A),
   NoDup la → NoDup (all_permut la).
 Proof.

@@ -3312,6 +3312,23 @@ Qed.
 
 (* *)
 
+Theorem neq_isort_insert_nil : ∀ A (rel : A → _) a la,
+  isort_insert rel a la ≠ [].
+Proof.
+intros * Hla.
+destruct la as [| b]; [ easy | cbn in Hla ].
+now destruct (rel a b).
+Qed.
+
+Theorem eq_isort_nil : ∀ A (rel : A → _) la, isort rel la = [] → la = [].
+Proof.
+intros * Hla.
+destruct la as [| a]; [ easy | cbn in Hla ].
+now apply neq_isort_insert_nil in Hla.
+Qed.
+
+(* *)
+
 Theorem antisymmetric_list_leb : ∀ A (leb : A → _),
   antisymmetric leb → antisymmetric (list_leb leb).
 Proof.

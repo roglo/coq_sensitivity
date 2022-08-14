@@ -4695,14 +4695,33 @@ rewrite rngl_summation_list_only_one.
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
-...
 symmetry.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
+  apply in_all_permut_iff in Hkl.
+Theorem isort_isort_rank_iff : ∀ A (rel : A → _) la lb,
+  isort rel la = isort rel lb ↔ isort_rank rel la = isort_rank rel lb.
+Proof.
+intros.
+split; intros Hab. {
+  destruct la as [| d]. {
+    symmetry in Hab; cbn in Hab.
+    now apply eq_isort_nil in Hab; subst lb.
+  }
+  remember (d :: la) as l eqn:Hl.
+  clear la Hl; rename l into la; move la after lb.
+  do 2 rewrite isort_isort_rank with (d := d) in Hab.
+  apply List_eq_iff in Hab.
+  do 2 rewrite map_length, isort_rank_length in Hab.
+  destruct Hab as (Hlen, Hab).
+  specialize (Hab d).
+...
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     replace (mat_el A i kl.(i)) with
       (mat_el (mat_select_cols jl A) i (S (collapse kl).(i))). 2: {
+      unfold collapse.
+...
 cbn.
 apply in_sls1n_iff in Hjl.
 destruct Hjl as [Hjl| Hjl]; [ easy | ].
@@ -4758,57 +4777,6 @@ rewrite seq_nth.
 rewrite Nat.add_comm, Nat.sub_add.
 Search (_ ∈ all_permut _).
 ...
-Theorem in_all_permut_iff : ∀ la lb,
-  lb ∈ all_permut la ↔ isort_rank Nat.leb la = isort_rank Nat.leb lb.
-Proof.
-intros.
-split; intros Hab. {
-  unfold all_permut in Hab.
-  destruct la as [| a]. {
-    destruct Hab as [Hab| ]; [ | easy ].
-    now subst lb.
-  }
-  apply in_map_iff in Hab.
-  destruct Hab as (lc & H & Hlc).
-  subst lb.
-  apply in_map_iff in Hlc.
-  destruct Hlc as (b & H & Hb); subst lc.
-  apply in_seq in Hb; cbn - [ fact ] in Hb; destruct Hb as (_, Hb).
-  cbn.
-  destruct (lt_dec b (length la)!) as [Hbla| Hbla]. {
-    rewrite Nat.div_small; [ | easy ].
-    rewrite Nat.mod_small; [ | easy ].
-    rewrite map_map.
-    unfold succ_when_ge.
-    unfold Nat.b2n; cbn.
-    erewrite map_ext_in. 2: {
-      intros i Hi.
-      rewrite Nat.add_1_r.
-      rewrite nth_indep with (d' := 0). 2: {
-        now apply in_canon_sym_gr_list in Hi.
-      }
-      easy.
-    }
-    rewrite fold_comp_list.
-    rewrite isort_comp_permut_r; [ easy | ].
-    now apply canon_sym_gr_list_is_permut.
-  }
-  apply Nat.nlt_ge in Hbla.
-(* ouais bof bon c'est compliqué *)
-...
-  apply in_all_permut_iff in Hkl.
-Search (nth _ (isort_rank _ _)).
-Search (nth _ (collapse _)).
-...
-    }
-    easy.
-  }
-  easy.
-}
-cbn - [ all_permut mat_el ].
-remember (∑ (kl ∈ _), _) as x; subst x.
-...
-      (mat_el (mat_select_cols jl A) i (nth i (collapse kl) 0)). 2: {
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
