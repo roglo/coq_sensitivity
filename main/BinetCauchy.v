@@ -902,6 +902,61 @@ rewrite mat_transp_ncols.
 now apply Nat.eqb_neq in Hcz; rewrite Hcz.
 Qed.
 
+Theorem mat_select_cols_el : ∀ M i j jl,
+  1 ≤ i ≤ mat_nrows M
+  → 1 ≤ j ≤ length jl
+  → (∀ j, 1 ≤ j ≤ length jl → 1 ≤ jl.(j) ≤ mat_ncols M)
+  → mat_el (mat_select_cols jl M) i j = mat_el M i jl.(j).
+Proof.
+intros * Hi Hj Hjl.
+assert (Hjlz : jl ≠ []). {
+  intros H; rewrite H in Hj; cbn in Hj; flia Hj.
+}
+cbn.
+rewrite map_length.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, mat_select_rows_ncols; [ | easy ].
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ | flia Hi ].
+  specialize (Hjl _ Hj); flia Hjl Hcz.
+}
+rewrite seq_nth. 2: {
+  rewrite mat_select_rows_ncols; [ | easy ].
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ | flia Hi ].
+  specialize (Hjl _ Hj); flia Hjl Hcz.
+}
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite seq_nth; [ | flia Hj ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite (List_map_nth' 0); [ | flia Hj ].
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ | flia Hi ].
+  specialize (Hjl _ Hj); flia Hjl Hcz.
+}
+rewrite seq_nth. 2: {
+  rewrite mat_transp_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mat_ncols M) 0) as [Hcz| Hcz]; [ | flia Hi ].
+  specialize (Hjl _ Hj); flia Hjl Hcz.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  specialize (Hjl _ Hj); flia Hjl.
+}
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite seq_nth; [ | specialize (Hjl _ Hj); flia Hjl ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+rewrite Nat.add_comm, Nat.sub_add; [ | now specialize (Hjl _ Hj) ].
+rewrite seq_nth; [ | flia Hi ].
+now rewrite Nat.add_comm, Nat.sub_add.
+Qed.
+
 Theorem mat_select_rows_is_square : ∀ kl (A : matrix T),
   is_correct_matrix A = true
   → mat_ncols A = length kl
@@ -4698,14 +4753,50 @@ rewrite rngl_summation_list_only_one.
 apply in_sls1n_iff in Hjl.
 destruct Hjl as [Hjl| Hjl]; [ easy | ].
 destruct Hjl as (Hsj & Hjm & Hjl).
-...
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
+  generalize Hkl; intros Hpk.
+  apply (permut_if_isort _ Nat.eqb_eq) in Hpk.
   rewrite (@isort_when_sorted _ _ (seq 1 m)) in Hkl. 2: {
     apply sorted_nat_ltb_leb_incl.
     apply sorted_seq.
   }
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    rewrite mat_select_cols_el; cycle 1. {
+      now rewrite Har.
+    } {
+      rewrite Hjm.
+      assert (Hklen : length kl = m). {
+        apply (f_equal length) in Hkl.
+        now rewrite isort_length, seq_length in Hkl.
+      }
+      rewrite <- Hklen in Hpk.
+      specialize (permutation_in_iff Nat.eqb_eq) as Hp.
+      specialize (Hp _ _ Hpk).
+      assert (H : kl.(i) ∈ kl). {
+        apply nth_In; rewrite Hklen; flia Hi.
+      }
+      apply Hp in H.
+      rewrite Hklen in H.
+      apply in_seq in H.
+      split; [ easy | flia H ].
+    } {
+      rewrite Hac.
+      intros j Hj.
+      specialize (Hjl jl.(j)).
+      assert (H : jl.(j) ∈ jl). {
+        apply nth_In; flia Hj.
+      }
+      specialize (Hjl H); clear H.
+      flia Hjl.
+    }
+    easy.
+  }
+  now cbn.
+}
+remember (∑ (kl ∈ _), _) as x; subst x.
 ...
 Theorem isort_isort_rank_iff : ∀ A (eqb rel : A → _),
   equality eqb →
