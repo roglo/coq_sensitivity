@@ -4695,6 +4695,7 @@ rewrite rngl_summation_list_only_one.
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
+...
 symmetry.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
@@ -4727,9 +4728,38 @@ rewrite (List_map_nth' 0). 2: {
   specialize (H2 _ Nat.leb (isort_rank Nat.leb kl)).
   specialize (H2 (i - 1)).
   rewrite isort_rank_length in H2.
+_admit.
+}
+rewrite (List_map_nth' 0). 2: {
+  _admit.
+}
+rewrite mat_select_rows_ncols.
+rewrite mat_transp_ncols, Har, Hac.
+rewrite Hnz.
+rewrite seq_nth; [ | flia Hi ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length; flia Hi.
+}
+rewrite seq_nth; [ | flia Hi ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length.
+  _admit.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length; flia Hi.
+}
+rewrite seq_nth; [ | flia Hi ].
+rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+f_equal.
+rewrite seq_nth.
+rewrite seq_nth.
+rewrite Nat.add_comm, Nat.sub_add.
 Search (_ ∈ all_permut _).
+...
 Theorem in_all_permut_iff : ∀ la lb,
-  lb ∈ all_permut la ↔ isort Nat.leb la = isort Nat.leb lb.
+  lb ∈ all_permut la ↔ isort_rank Nat.leb la = isort_rank Nat.leb lb.
 Proof.
 intros.
 split; intros Hab. {
