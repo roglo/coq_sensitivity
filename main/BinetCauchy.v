@@ -4695,10 +4695,15 @@ rewrite rngl_summation_list_only_one.
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
-symmetry.
+apply in_sls1n_iff in Hjl.
+destruct Hjl as [Hjl| Hjl]; [ easy | ].
+destruct Hjl as (Hsj & Hjm & Hjl).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
+  rewrite (@isort_when_sorted _ _ (seq 1 m)) in Hkl. 2: {
+    unfold sorted; cbn.
+Search (is_sorted _ (seq _ _)).
 ...
 Theorem isort_isort_rank_iff : ∀ A (eqb rel : A → _),
   equality eqb →
