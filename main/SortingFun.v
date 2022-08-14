@@ -3175,80 +3175,6 @@ destruct (rel (f ia) (f ib)); [ easy | ].
 now cbn; f_equal.
 Qed.
 
-(* to be completed
-Theorem sorted_isort_rank : ∀ A (rel : A → _),
-  ∀ la, sorted Nat.ltb (isort_rank rel la).
-Proof.
-intros.
-induction la as [| a]; [ easy | ].
-cbn - [ nth ].
-Print isort_rank_insert.
-Theorem sorted_isort_rank_insert : ∀ A B (rela : A → _) (relb : B → _),
-  transitive relb →
-  connected_relation relb →
-  ∀ f, (∀ ia ib, rela (f ia) (f ib) = relb ia ib)
-  → ∀ (ia : B) (lrank : list B),
-  sorted relb lrank
-  → sorted relb (isort_rank_insert rela f ia lrank).
-Proof.
-intros * Htrab Hconnb * Hfab * Hs.
-revert ia.
-induction lrank as [| ib]; intros; [ easy | cbn ].
-remember (rela (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply sorted_cons_iff; [ easy | ].
-  split; [ easy | ].
-  intros ic Hic.
-  generalize Hab; intros Hiab.
-  rewrite Hfab in Hiab.
-  destruct Hic as [Hic| Hic]; [ now subst ic | ].
-  apply sorted_cons_iff in Hs; [ | easy ].
-  destruct Hs as (Hs, Hib).
-  specialize (Hib _ Hic) as Hibc.
-  now apply (Htrab _ ib).
-}
-apply sorted_cons_iff; [ easy | ].
-apply sorted_cons_iff in Hs; [ | easy ].
-destruct Hs as (Hs, Hib).
-split; [ now apply IHlrank | ].
-intros ic Hic.
-apply in_isort_rank_insert in Hic.
-destruct Hic as [Hic| Hic]. {
-  subst ic.
-  rewrite Hfab in Hab.
-  remember (relb ib ia) as ba eqn:Hba; symmetry in Hba.
-  destruct ba; [ easy | exfalso ].
-  specialize (Hconnb ia ib Hab Hba) as H1.
-  subst ib.
-(* bof, non, ça a pas l'air d'être ça... *)
-...
-  unfold sorted; cbn.
-  rewrite Hfab; [ | easy ].
-  destruct lrank as [| ic]; [ easy | ].
-...
-apply sorted_isort_rank_insert.
-...
-
-Theorem isort_rank_when_permuted: ∀ A (eqb rel : A → A → bool),
-  ∀ la lb, permutation eqb la lb → isort_rank rel la = isort_rank rel lb.
-Proof.
-intros * Hab.
-Check sorted_isort.
-...
-Check permuted_isort.
-specialize (sorted_isort Htot la) as Hsa.
-specialize (sorted_isort Htot lb) as Hsb.
-specialize (permuted_isort rel Heqb la) as Hpa.
-specialize (permuted_isort rel Heqb lb) as Hpb.
-assert (Hsab : permutation eqb (isort rel la) (isort rel lb)). {
-  eapply (permutation_trans Heqb); [ | apply Hpb ].
-  eapply (permutation_trans Heqb); [ | apply Hpab ].
-  now apply (permutation_sym Heqb).
-}
-now apply (sorted_sorted_permuted Heqb Hant Htra).
-...
-*)
-
 (* *)
 
 Theorem isort_isort_rank : ∀ A (rel : A → A → bool) (d : A) l,
@@ -3867,6 +3793,109 @@ apply Nat.leb_le in H1.
 destruct (Nat.eq_dec a b) as [H| H]; [ now subst b | ].
 flia H1 H.
 Qed.
+
+Theorem sorted_isort_rank_insert : ∀ A B (rela : A → _) (relb : B → _),
+  transitive relb →
+  total_relation relb →
+  ∀ f, (∀ ia ib, rela (f ia) (f ib) = relb ia ib)
+  → ∀ (ia : B) (lrank : list B),
+  sorted relb lrank
+  → sorted relb (isort_rank_insert rela f ia lrank).
+Proof.
+intros * Htrab Htotb * Hfab * Hs.
+revert ia.
+induction lrank as [| ib]; intros; [ easy | cbn ].
+remember (rela (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply sorted_cons_iff; [ easy | ].
+  split; [ easy | ].
+  intros ic Hic.
+  generalize Hab; intros Hiab.
+  rewrite Hfab in Hiab.
+  destruct Hic as [Hic| Hic]; [ now subst ic | ].
+  apply sorted_cons_iff in Hs; [ | easy ].
+  destruct Hs as (Hs, Hib).
+  specialize (Hib _ Hic) as Hibc.
+  now apply (Htrab _ ib).
+}
+apply sorted_cons_iff; [ easy | ].
+apply sorted_cons_iff in Hs; [ | easy ].
+destruct Hs as (Hs, Hib).
+split; [ now apply IHlrank | ].
+intros ic Hic.
+apply in_isort_rank_insert in Hic.
+destruct Hic as [Hic| Hic]. {
+  subst ic.
+  rewrite Hfab in Hab.
+  specialize (Htotb ia ib).
+  now rewrite Hab in Htotb.
+}
+now apply Hib.
+Qed.
+
+(* to be completed
+qu'est-ce que je raconte ? isort_rank n'est pas du tout sorted !
+Theorem sorted_isort_rank : ∀ A (rel : A → _),
+  reflexive rel →
+  ∀ la, sorted Nat.ltb (isort_rank rel la).
+Proof.
+intros * Href *.
+apply NoDup_sorted_nat_leb_ltb; [ apply NoDup_isort_rank | ].
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+apply sorted_isort_rank_insert. {
+  apply Nat_leb_trans.
+} {
+  apply Nat_leb_total_relation.
+} {
+  intros.
+  remember (ia <=? ib) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Nat.leb_le in Hab.
+    cbn.
+    destruct ia. {
+      destruct ib; [ apply Href | ].
+...
+  apply (Hirrb ia ib Hab).
+
+  remember (relb ib ia) as ba eqn:Hba; symmetry in Hba.
+  destruct ba; [ easy | exfalso ].
+...
+  specialize (Hconnb ia ib Hab Hba) as H1.
+  subst ib.
+(* bof, non, ça a pas l'air d'être ça... *)
+...
+  unfold sorted; cbn.
+  rewrite Hfab; [ | easy ].
+  destruct lrank as [| ic]; [ easy | ].
+...
+apply sorted_isort_rank_insert.
+...
+
+Theorem isort_rank_when_permuted : ∀ A (eqb rel : A → A → bool),
+  ∀ la lb, permutation eqb la lb → isort_rank rel la = isort_rank rel lb.
+Proof.
+intros * Hab.
+Compute (
+  let la := [1;2;3] in
+  let lb := [2;1;3] in
+  isort_rank Nat.ltb la = isort_rank Nat.ltb lb
+).
+Check sorted_isort.
+...
+Check permuted_isort.
+specialize (sorted_isort Htot la) as Hsa.
+specialize (sorted_isort Htot lb) as Hsb.
+specialize (permuted_isort rel Heqb la) as Hpa.
+specialize (permuted_isort rel Heqb lb) as Hpb.
+assert (Hsab : permutation eqb (isort rel la) (isort rel lb)). {
+  eapply (permutation_trans Heqb); [ | apply Hpb ].
+  eapply (permutation_trans Heqb); [ | apply Hpab ].
+  now apply (permutation_sym Heqb).
+}
+now apply (sorted_sorted_permuted Heqb Hant Htra).
+...
+*)
 
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
