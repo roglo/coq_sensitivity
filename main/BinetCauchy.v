@@ -4710,6 +4710,16 @@ split; intros Hab. {
   }
   remember (d :: la) as l eqn:Hl.
   clear la Hl; rename l into la; move la after lb.
+(*
+...
+intros.
+split; intros Hab. {
+  destruct la as [| d]. {
+    symmetry in Hab; cbn in Hab.
+    now apply eq_isort_nil in Hab; subst lb.
+  }
+  remember (d :: la) as l eqn:Hl.
+  clear la Hl; rename l into la; move la after lb.
 (**)
 revert lb Hab.
 induction la as [| a]; intros. {
@@ -4730,10 +4740,17 @@ destruct la as [| a']. {
   cbn in Hab.
   cbn - [ nth ].
 ...
+*)
   do 2 rewrite isort_isort_rank with (d := d) in Hab.
+  assert (Hlen : length la = length lb). {
+    apply List_eq_iff in Hab.
+    now do 2 rewrite map_length, isort_rank_length in Hab.
+  }
+(*
   apply List_eq_iff in Hab.
   do 2 rewrite map_length, isort_rank_length in Hab.
   destruct Hab as (Hlen, Hab).
+*)
   apply List_eq_iff.
   do 2 rewrite isort_rank_length.
   split; [ easy | ].
