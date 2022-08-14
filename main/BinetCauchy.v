@@ -4699,10 +4699,12 @@ symmetry.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
-Theorem isort_isort_rank_iff : ∀ A (rel : A → _) la lb,
+Theorem isort_isort_rank_iff : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
   isort rel la = isort rel lb ↔ isort_rank rel la = isort_rank rel lb.
 Proof.
-intros.
+intros * Heqb *.
 split; intros Hab. {
   destruct la as [| d]. {
     symmetry in Hab; cbn in Hab.
@@ -4710,6 +4712,13 @@ split; intros Hab. {
   }
   remember (d :: la) as l eqn:Hl.
   clear la Hl; rename l into la; move la after lb.
+  apply (permut_if_isort _ Heqb) in Hab.
+Check isort_when_permuted.
+Search permutation.
+About isort_when_permuted.
+...
+apply (isort_rank_when_permuted Heqb).
+...
 (*
 ...
 intros.
