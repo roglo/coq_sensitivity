@@ -4869,7 +4869,92 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   unfold g1, h1.
   replace (collapse (map S (collapse kl))) with (collapse kl). 2: {
     symmetry.
+(*
+apply List_eq_iff.
+rewrite collapse_length, map_length.
+split; [ easy | ].
+intros d i.
+specialize collapse_keeps_order as H1.
+apply Nat.eqb_eq.
+rewrite H1.
+*)
     unfold collapse at 1 3; f_equal.
+...
+Theorem isort_rank_same_order : ∀ la lb,
+  length la = length lb
+  → (∀ i j, i < length la → j < length la →
+     nth i la 0 ≤ nth j la 0 → nth i lb 0 ≤ nth j lb 0)
+  → isort_rank Nat.leb la = isort_rank Nat.leb lb.
+Proof.
+intros * Hab Hrab.
+revert lb Hab Hrab.
+induction la as [| a]; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+cbn - [ nth ].
+...
+Check isort_insert_map.
+Theorem glop : ∀ (rel : nat → _) a lsorted,
+  isort_insert rel a lsorted =
+  isort_insert (λ x y, rel (S x) (S y)) a lsorted.
+Proof.
+intros.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+...
+remember (rel (f a) (f b)) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | cbn ].
+f_equal.
+apply IHlsorted.
+Qed.
+...
+Search (isort_insert _ _ (map _ _)).
+specialize isort_insert_map_nth as H1.
+...
+intros * Hab Hrab.
+apply List_eq_iff.
+do 2 rewrite isort_rank_length.
+split; [ easy | ].
+intros d i.
+destruct la as [| a]. {
+  cbn; rewrite Tauto_match_nat_same.
+  destruct lb as [| b]; [ now cbn; rewrite Tauto_match_nat_same | ].
+  easy.
+}
+cbn - [ nth ].
+destruct lb as [| b]; [ easy | ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+cbn - [ nth ].
+...
+apply isort_rank_same_order.
+...
+    remember (map S (collapse kl)) as la eqn:Hla.
+    symmetry in Hla.
+clear Hkl.
+revert kl Hla.
+    induction la as [| a]; intros. {
+      apply map_eq_nil in Hla.
+      unfold collapse in Hla.
+      apply eq_isort_rank_nil in Hla.
+      now rewrite Hla.
+    }
+    cbn - [ nth ].
+    destruct kl as [| k]; [ easy | ].
+    cbn - [ nth ].
+Search (isort_insert _ _ _ = isort_insert _ _ _).
+Print isort_insert.
+...
+do 2 rewrite isort_insert_map.
+cbn - [ nth ] in Hla.
+cbn.
+Search (isort_insert _ _ (isort_rank _ _)).
+...
+Search (collapse _ = _).
+Check permut_collapse.
+...
+Search (isort_rank _ _).
+Search (nth _ (isort_rank _ _)).
 ...
 Search (isort_rank _ _ = _).
 Print comp_list.

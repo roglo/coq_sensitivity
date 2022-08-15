@@ -3101,6 +3101,19 @@ rewrite isort_rank_length in Hl.
 now apply length_zero_iff_nil in Hl.
 Qed.
 
+Theorem isort_insert_map : ∀ A B (rel : A → _) a lsorted (f : B → _),
+  isort_insert rel (f a) (map f lsorted) =
+  map f (isort_insert (λ x y, rel (f x) (f y)) a lsorted).
+Proof.
+intros.
+revert a.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel (f a) (f b)) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | cbn ].
+f_equal.
+apply IHlsorted.
+Qed.
+
 Theorem isort_insert_map_nth : ∀ A (rel : A → _) l d a lsorted,
   isort_insert rel a (map (λ i, nth i l d) lsorted) =
   map (λ i, nth i (a :: l) d)
@@ -3108,10 +3121,9 @@ Theorem isort_insert_map_nth : ∀ A (rel : A → _) l d a lsorted,
        (map S lsorted)).
 Proof.
 intros.
-induction lsorted as [| ib]; [ easy | cbn ].
-remember (rel a (nth ib l d)) as ab eqn:Hab; symmetry in Hab.
-destruct ab; cbn; f_equal; [ now rewrite map_map | ].
-apply IHlsorted.
+rewrite <- isort_insert_map.
+rewrite List_nth_0_cons.
+now rewrite map_map.
 Qed.
 
 (* *)
