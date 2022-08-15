@@ -4885,6 +4885,8 @@ clear d; cbn.
 revert i Hil.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
+Search (nth _ (isort_insert _ _ _)).
+...
 Check isort_insert_isort_rank_insert.
 Search isort_rank_insert.
 Print isort_rank_insert.
