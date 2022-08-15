@@ -3780,3 +3780,116 @@ destruct fa. {
 apply sorted_cons in Hs.
 now apply IHl.
 Qed.
+
+Theorem sorted_map : ∀ A B (rel : A → _),
+  transitive rel →
+  ∀ la (f : B → A),
+  sorted (λ a b, rel (f a) (f b)) la → sorted rel (map f la).
+Proof.
+intros * Htra * Hs.
+induction la as [| a]; [ easy | cbn ].
+apply sorted_cons_iff; [ easy | ].
+split. {
+  apply IHla.
+  apply sorted_cons_iff in Hs; [ easy | ].
+  intros x y z Hxy Hyz.
+  now apply (Htra (f x) (f y) (f z)).
+}
+intros b Hb.
+apply in_map_iff in Hb.
+destruct Hb as (c & Hb & Hc); subst b.
+apply sorted_cons_iff in Hs. 2: {
+  intros x y z Hxy Hyz.
+  now apply (Htra (f x) (f y) (f z)).
+}
+now apply Hs.
+Qed.
+
+Theorem sorted_isort_rank : ∀ A d (rel : A → _),
+  total_relation rel
+  → ∀ la, sorted (λ i j, nth i la d <=? nth j la d) (isort_rank Nat.leb la).
+Proof.
+intros * Hto *.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+rewrite isort_insert_nth_indep with (d' := d); [ | now cbn | ]. 2: {
+  intros i Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hj & Hi); subst i.
+  cbn; apply -> Nat.succ_lt_mono.
+  now apply in_isort_rank in Hi.
+}
+apply sorted_isort_insert. {
+  intros i j.
+  apply Bool.orb_true_iff.
+  remember (_ <=? _) as x eqn:Hx; symmetry in Hx.
+  destruct x; [ now left | right ].
+  apply Nat.leb_le.
+  apply Nat.leb_nle, Nat.nle_gt in Hx.
+  now apply Nat.lt_le_incl.
+}
+apply sorted_map; [ | apply IHla ].
+intros x y z Hx Hy.
+apply Nat.leb_le in Hx, Hy.
+apply Nat.leb_le.
+etransitivity; [ apply Hx | apply Hy ].
+Qed.
+
+Theorem eq_sorted_isort_rank_seq : ∀ la,
+  sorted Nat.leb la
+  → isort_rank Nat.leb la = seq 0 (length la).
+Proof.
+intros * Hs.
+apply List_eq_iff.
+rewrite isort_rank_length, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite isort_rank_length ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite seq_nth; [ | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
+clear d; cbn.
+revert i Hil.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+rewrite sorted_cons_isort_insert; cycle 1. {
+  intros x y z Hxy Hyz.
+  apply Nat.leb_le in Hxy, Hyz.
+  apply Nat.leb_le.
+  etransitivity; [ apply Hxy | easy ].
+} {
+  apply sorted_cons_iff. {
+    intros x y z Hxy Hyz.
+    apply Nat.leb_le in Hxy, Hyz.
+    apply Nat.leb_le.
+    etransitivity; [ apply Hxy | easy ].
+  }
+  split. {
+    apply sorted_map. {
+      intros x y z Hxy Hyz.
+      apply Nat.leb_le in Hxy, Hyz.
+      apply Nat.leb_le.
+      now transitivity (nth y (a :: la) a).
+    }
+    cbn.
+    apply (sorted_isort_rank a Nat_leb_total_relation).
+  }
+  intros j Hj.
+  apply in_map_iff in Hj.
+  destruct Hj as (k & Hk & Hj); subst j.
+  cbn.
+  apply in_isort_rank in Hj.
+  apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
+  destruct Hs as (Hs & Ha).
+  apply Ha.
+  now apply nth_In.
+}
+destruct i; [ easy | cbn ].
+cbn in Hil; apply Nat.succ_lt_mono in Hil.
+rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length ].
+f_equal.
+apply sorted_cons_iff in Hs; [ now apply IHla | apply Nat_leb_trans ].
+Qed.

@@ -4865,53 +4865,15 @@ rewrite collapse_comp; cycle 1. {
 } {
   symmetry; apply canon_sym_gr_list_length.
 }
-Theorem sorted_isort_rank : ∀ rel la,
-  sorted rel la
-  → isort_rank Nat.leb la = seq 0 (length la).
-Proof.
-intros * Hs.
-apply List_eq_iff.
-rewrite isort_rank_length, seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
-  apply Nat.nlt_ge in Hil.
-  rewrite nth_overflow; [ | now rewrite isort_rank_length ].
-  rewrite nth_overflow; [ easy | now rewrite seq_length ].
-}
-rewrite seq_nth; [ | easy ].
-rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
-clear d; cbn.
-revert i Hil.
-induction la as [| a]; intros; [ easy | ].
-cbn - [ nth ].
-rewrite sorted_cons_isort_insert; cycle 1. {
-  intros x y z Hxy Hyz.
-  apply Nat.leb_le in Hxy, Hyz.
-  apply Nat.leb_le.
-  etransitivity; [ apply Hxy | easy ].
-} {
-...
-intros * Hs.
-Compute (
-let ia := 3 in
-let lrank := [7;8;15] in
-let rel := Nat.ltb in
-let f ia := 40 - ia in
-  isort_rank_insert rel f ia lrank = ia :: lrank
-).
-...
-revert ia Hs.
-induction lrank as [| ib]; intros; [ easy | cbn ].
-remember (rel (f ia) (f ib)) as ab eqn:Hab.
-symmetry in Hab.
-destruct ab. {
-  f_equal.
-...
-rewrite sorted_isort_rank_insert.
-...
 unfold collapse.
-rewrite (sorted_isort_rank Hs).
+rewrite eq_sorted_isort_rank_seq. 2: {
+Search (sorted _ (isort_rank _ _)).
+(* bon. faut voir à voir... *)
+...
+rewrite isort_rank_length.
+Search (seq _ _ ° _).
+apply comp_1_l.
+intros i Hi.
 ...
 rewrite (@sorted_collapse Nat.ltb); [ | easy ].
 ...
