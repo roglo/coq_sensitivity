@@ -3743,46 +3743,22 @@ destruct (Nat.eq_dec a b) as [H| H]; [ now subst b | ].
 flia H1 H.
 Qed.
 
-(*
-Theorem sorted_isort_rank_insert : ∀ A B (rela : A → _) (relb : B → _),
-  transitive relb →
-  total_relation relb →
-  ∀ f, (∀ ia ib, rela (f ia) (f ib) = relb ia ib)
-  → ∀ (ia : B) (lrank : list B),
-  sorted relb lrank
-  → sorted relb (isort_rank_insert rela f ia lrank).
+Theorem sorted_cons_isort_insert : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ a lsorted,
+  sorted rel (a :: lsorted)
+  → isort_insert rel a lsorted = a :: lsorted.
 Proof.
-intros * Htrab Htotb * Hfab * Hs.
-revert ia.
-induction lrank as [| ib]; intros; [ easy | cbn ].
-remember (rela (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
-destruct ab. {
-  apply sorted_cons_iff; [ easy | ].
-  split; [ easy | ].
-  intros ic Hic.
-  generalize Hab; intros Hiab.
-  rewrite Hfab in Hiab.
-  destruct Hic as [Hic| Hic]; [ now subst ic | ].
-  apply sorted_cons_iff in Hs; [ | easy ].
-  destruct Hs as (Hs, Hib).
-  specialize (Hib _ Hic) as Hibc.
-  now apply (Htrab _ ib).
-}
-apply sorted_cons_iff; [ easy | ].
+intros * Htran * Hs.
+revert a Hs.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
 apply sorted_cons_iff in Hs; [ | easy ].
-destruct Hs as (Hs, Hib).
-split; [ now apply IHlrank | ].
-intros ic Hic.
-apply in_isort_rank_insert in Hic.
-destruct Hic as [Hic| Hic]. {
-  subst ic.
-  rewrite Hfab in Hab.
-  specialize (Htotb ia ib).
-  now rewrite Hab in Htotb.
-}
-now apply Hib.
+destruct Hs as (Hs & Habs).
+specialize (Habs _ (or_introl eq_refl)).
+congruence.
 Qed.
-*)
 
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →

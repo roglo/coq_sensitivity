@@ -4885,16 +4885,8 @@ clear d; cbn.
 revert i Hil.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
-Search (nth _ (isort_insert _ _ _)).
+rewrite sorted_cons_isort_insert.
 ...
-Check isort_insert_isort_rank_insert.
-Search isort_rank_insert.
-Print isort_rank_insert.
-About isort_rank.
-Theorem sorted_isort_rank_insert : ∀ rel (ia : nat) lrank f,
-  sorted rel (ia :: lrank)
-  → isort_rank_insert rel f ia lrank = ia :: lrank.
-Proof.
 intros * Hs.
 Compute (
 let ia := 3 in
