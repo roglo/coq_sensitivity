@@ -4854,11 +4854,24 @@ erewrite map_ext_in. 2: {
 remember (a :: la) as lb eqn:Hlb.
 replace (S (length la)) with (length lb) in Hk |-* by now subst lb.
 clear a la Hlb; rename lb into la.
+rewrite fold_comp_list.
+apply in_sls1n_iff in Hla.
+destruct Hla as [Hla| Hla]; [ now destruct Hla; subst m la | ].
+destruct Hla as (Hs & Hlam & Hla).
+rewrite collapse_comp; cycle 1. {
+  now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
+} {
+  now apply canon_sym_gr_list_is_permut_list.
+} {
+  symmetry; apply canon_sym_gr_list_length.
+}
+Theorem sorted_collapse : ∀ rel la,
+  sorted rel la
+  → collapse la = seq 0 (length la).
+Proof.
+intros * Hs.
 ...
-rewrite permut_isort_rank_involutive. 2: {
-  apply (map_nth_is_permut_list (length la)). 2: {
-    now apply canon_sym_gr_list_is_permut.
-  }
+rewrite (@sorted_collapse Nat.ltb); [ | easy ].
 ...
 specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
 replace (add 1) with S in H1 by easy.
