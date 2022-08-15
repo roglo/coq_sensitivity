@@ -4750,11 +4750,10 @@ rewrite rngl_summation_list_only_one.
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
-(*
-apply in_sls1n_iff in Hjl.
-destruct Hjl as [Hjl| Hjl]; [ easy | ].
-destruct Hjl as (Hsj & Hjm & Hjl).
-*)
+generalize Hjl; intros H.
+apply in_sls1n_iff in H.
+destruct H as [H| H]; [ easy | ].
+destruct H as (Hsj & Hjm & Hjlb).
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
@@ -4764,9 +4763,6 @@ erewrite rngl_summation_list_eq_compat. 2: {
     apply sorted_nat_ltb_leb_incl.
     apply sorted_seq.
   }
-  apply in_sls1n_iff in Hjl.
-  destruct Hjl as [Hjl| Hjl]; [ easy | ].
-  destruct Hjl as (Hsj & Hjm & Hjl).
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite mat_select_cols_el; cycle 1. {
@@ -4790,12 +4786,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
     } {
       rewrite Hac.
       intros j Hj.
-      specialize (Hjl jl.(j)).
-      assert (H : jl.(j) ∈ jl). {
-        apply nth_In; flia Hj.
-      }
-      specialize (Hjl H); clear H.
-      flia Hjl.
+      specialize (Hjlb jl.(j)).
+      assert (H : jl.(j) ∈ jl) by (apply nth_In; flia Hj).
+      specialize (Hjlb H); clear H.
+      flia Hjlb.
     }
     easy.
   }
@@ -4867,19 +4861,24 @@ rewrite collapse_comp; cycle 1. {
 }
 unfold collapse.
 rewrite eq_sorted_isort_rank_seq. 2: {
-Search (sorted _ (isort_rank _ _)).
-(* bon. faut voir à voir... *)
-...
+  rewrite eq_sorted_isort_rank_seq. 2: {
+    now apply sorted_nat_ltb_leb_incl.
+  }
+  apply sorted_nat_ltb_leb_incl.
+  apply sorted_seq.
+}
 rewrite isort_rank_length.
-Search (seq _ _ ° _).
 apply comp_1_l.
 intros i Hi.
-...
-rewrite (@sorted_collapse Nat.ltb); [ | easy ].
-...
+now apply in_canon_sym_gr_list in Hi.
+Qed.
+Inspect 1.
+Check map_collapse_all_permut_seq.
 specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
 replace (add 1) with S in H1 by easy.
 rewrite H1.
+rewrite Hjm.
+remember (∑ (kl ∈ _), _) as x; subst x.
 ...
 (*
 ...
