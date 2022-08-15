@@ -4885,7 +4885,12 @@ clear d; cbn.
 revert i Hil.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
-rewrite sorted_cons_isort_insert.
+rewrite sorted_cons_isort_insert; cycle 1. {
+  intros x y z Hxy Hyz.
+  apply Nat.leb_le in Hxy, Hyz.
+  apply Nat.leb_le.
+  etransitivity; [ apply Hxy | easy ].
+} {
 ...
 intros * Hs.
 Compute (
