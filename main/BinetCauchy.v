@@ -4869,6 +4869,53 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   unfold g1, h1.
   replace (collapse (map S (collapse kl))) with (collapse kl). 2: {
     symmetry.
+    unfold collapse at 1 3; f_equal.
+...
+Search (isort_rank _ _ = _).
+Print comp_list.
+Compute (
+let kl := [3;5;8;7;0;7;0] in
+  isort_rank Nat.leb (map S (isort_rank Nat.leb (isort_rank Nat.leb kl))) = isort_rank Nat.leb kl).
+unfold collapse.
+f_equal.
+f_equal.
+...
+destruct kl as [| k]; [ easy | ].
+cbn - [ nth ].
+...
+rewrite fold_collapse.
+specialize isort_insert_map_nth as H1.
+specialize (H1 nat Nat.leb (isort_rank Nat.leb kl)).
+...
+          (isort_insert (λ ia ib : nat, nth ia (k :: kl) k <=? nth ib (k :: kl) k) 0
+             (map S (isort_rank Nat.leb kl))))) =
+specialize (H1 (isort_rank Nat.leb kl)).
+...
+isort_insert_map_nth:
+  ∀ (A : Type) (rel : A → A → bool) (l : list A) (d a : A) (lsorted : list nat),
+    isort_insert rel a (map (λ i : nat, nth i l d) lsorted) =
+    map (λ i : nat, nth i (a :: l) d)
+      (isort_insert (λ ia ib : nat, rel (nth ia (a :: l) d) (nth ib (a :: l) d)) 0 (map S lsorted))
+apply List_eq_iff.
+rewrite collapse_length, map_length.
+split; [ easy | ].
+intros d i.
+unfold collapse.
+Search (nth i (isort_rank _ _)).
+unfold collapse.
+Search isort_rank.
+...
+Search (isort_rank _ (map _ _)).
+Check permut_comp_cancel_r.
+intros * Hp.
+remember (isort_rank Nat.leb la) as lb eqn:Hlb.
+apply (@permut_comp_cancel_r (length lb)) with (lc := lb). {
+  now apply isort_rank_is_permut.
+...
+rewrite permut_collapse.
+Check collapse_is_permut.
+About collapse_idemp.
+Search collapse.
 Search (collapse _ = collapse _).
 Search (collapse (map _ _)).
 unfold collapse at 1.
