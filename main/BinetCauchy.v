@@ -4887,6 +4887,8 @@ induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
 Check isort_insert_isort_rank_insert.
 Search isort_rank_insert.
+Print isort_rank_insert.
+About isort_rank.
 Theorem sorted_isort_rank_insert : ∀ rel (ia : nat) lrank f,
   sorted rel (ia :: lrank)
   → isort_rank_insert rel f ia lrank = ia :: lrank.
