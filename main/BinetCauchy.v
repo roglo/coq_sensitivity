@@ -4870,6 +4870,7 @@ Theorem sorted_collapse : ∀ rel la,
   → collapse la = seq 0 (length la).
 Proof.
 intros * Hs.
+unfold collapse.
 ...
 rewrite (@sorted_collapse Nat.ltb); [ | easy ].
 ...

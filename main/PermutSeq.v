@@ -469,8 +469,8 @@ unfold "°"; cbn.
 now rewrite map_length.
 Qed.
 
-Theorem comp_isort_rank_r : ∀ ord l,
-  l ° isort_rank ord l = isort ord l.
+Theorem comp_isort_rank_r : ∀ rel l,
+  l ° isort_rank rel l = isort rel l.
 Proof.
 intros.
 apply List_eq_iff.
@@ -490,7 +490,7 @@ rewrite nth_indep with (d' := 0); [ | now rewrite isort_length ].
 symmetry.
 unfold "°".
 rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length ].
-specialize (isort_isort_rank ord 0 l) as H1.
+specialize (isort_isort_rank rel 0 l) as H1.
 apply (f_equal (λ l, nth i l 0)) in H1.
 rewrite (List_map_nth' 0) in H1; [ | now rewrite isort_rank_length ].
 easy.
@@ -2107,9 +2107,9 @@ rewrite <- (isort_rank_length Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_isort_rank _ _)) in Hij.
 Qed.
 
-Theorem isort_rank_is_permut : ∀ A (ord : A → _) n l,
+Theorem isort_rank_is_permut : ∀ A (rel : A → _) n l,
   length l = n
-  → is_permut n (isort_rank ord l).
+  → is_permut n (isort_rank rel l).
 Proof.
 intros.
 subst n.
@@ -2130,10 +2130,10 @@ split. {
 apply isort_rank_length.
 Qed.
 
-Arguments isort_rank_is_permut {A} ord n%nat [l]%list.
+Arguments isort_rank_is_permut {A} rel n%nat [l]%list.
 
-Theorem isort_rank_is_permut_list : ∀ A (ord : A → _) l,
-  is_permut_list (isort_rank ord l).
+Theorem isort_rank_is_permut_list : ∀ A (rel : A → _) l,
+  is_permut_list (isort_rank rel l).
 Proof.
 intros.
 now apply (isort_rank_is_permut _ (length l)).
