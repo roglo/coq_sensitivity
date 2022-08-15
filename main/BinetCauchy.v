@@ -4750,9 +4750,11 @@ rewrite rngl_summation_list_only_one.
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
+(*
 apply in_sls1n_iff in Hjl.
 destruct Hjl as [Hjl| Hjl]; [ easy | ].
 destruct Hjl as (Hsj & Hjm & Hjl).
+*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   apply in_all_permut_iff in Hkl.
@@ -4762,6 +4764,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
     apply sorted_nat_ltb_leb_incl.
     apply sorted_seq.
   }
+  apply in_sls1n_iff in Hjl.
+  destruct Hjl as [Hjl| Hjl]; [ easy | ].
+  destruct Hjl as (Hsj & Hjm & Hjl).
   erewrite rngl_product_eq_compat. 2: {
     intros i Hi.
     rewrite mat_select_cols_el; cycle 1. {
@@ -4797,6 +4802,84 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now cbn.
 }
 remember (∑ (kl ∈ _), _) as x; subst x.
+(*
+  ============================
+  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
+  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+*)
+symmetry.
+set (h1 := λ l, map S (collapse l)).
+erewrite rngl_summation_list_change_var with (h := h1).
+unfold h1.
+Theorem map_collapse_all_permut_seq : ∀ i la n m,
+  la ∈ sub_lists_of_seq_1_n n m
+  → map (λ lb, map (add i) (collapse lb)) (all_permut la) =
+    all_permut (seq i (length la)).
+Proof.
+intros * Hla.
+destruct la as [| a]; intros; [ easy | ].
+cbn - [ all_permut seq ].
+unfold all_permut.
+rewrite <- cons_seq at 1.
+rewrite seq_length.
+rewrite map_map.
+apply map_ext_in.
+intros lb Hlb.
+apply in_map_iff in Hlb.
+destruct Hlb as (k & Hlb & Hk).
+apply in_seq in Hk; destruct Hk as (_, Hk); rewrite Nat.add_0_l in Hk.
+subst lb.
+erewrite map_ext_in with (f := λ j, nth _ (seq _ _) _). 2: {
+  intros j Hj.
+  apply in_canon_sym_gr_list in Hj; [ | easy ].
+  now rewrite seq_nth.
+}
+f_equal.
+clear i.
+(*
+Compute (
+let la := [3;7;8] in
+let i := 0 in
+  map (λ lb, map (add i) (collapse lb)) (all_permut la) =
+  all_permut (seq i (length la))
+).
+*)
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  rewrite nth_indep with (d' := 0). 2: {
+    now apply in_canon_sym_gr_list in Hj.
+  }
+  easy.
+}
+remember (a :: la) as lb eqn:Hlb.
+replace (S (length la)) with (length lb) in Hk |-* by now subst lb.
+clear a la Hlb; rename lb into la.
+...
+rewrite permut_isort_rank_involutive. 2: {
+  apply (map_nth_is_permut_list (length la)). 2: {
+    now apply canon_sym_gr_list_is_permut.
+  }
+...
+specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
+replace (add 1) with S in H1 by easy.
+rewrite H1.
+...
+(*
+...
+Search (isort_rank _ _ = _).
+Theorem isort_rank_when_permut : ∀ la,
+  is_permut_list la
+  → isort_rank Nat.leb la = la.
+...
+rewrite isort_rank_when_permut.
+...
+*)
+rewrite permut_isort_rank_involutive. 2: {
+  apply (map_nth_is_permut_list (length la)). 2: {
+    now apply canon_sym_gr_list_is_permut.
+  }
+...
+rewrite map_collapse_all_permut_seq.
 ...
 Theorem isort_isort_rank_iff : ∀ A (eqb rel : A → _),
   equality eqb →
