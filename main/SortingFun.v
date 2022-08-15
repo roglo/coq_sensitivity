@@ -422,21 +422,6 @@ Fixpoint bsort_loop {A} (rel : A → A → bool) it l :=
 
 Definition bsort {A} (rel : A → _) l := bsort_loop rel (length l * length l) l.
 
-(*
-Compute (bsort Nat.leb [7;5;3;22;8]).
-Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
-Fixpoint canon_sym_gr_list n k : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end.
-Definition canon_sym_gr_list_list n : list (list nat) :=
-  map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, bsort Nat.leb l) (canon_sym_gr_list_list 5)).
-*)
-
 (* merge sort *)
 
 Fixpoint merge_loop {A} (rel : A → A → bool) it la lb :=
@@ -476,40 +461,9 @@ Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
 Definition msort {A} (rel : A → _) la :=
   msort_loop rel (length la) la.
 
-(*
-Compute (msort Nat.leb [7;5;3;22;8]).
-Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
-Fixpoint canon_sym_gr_list n k : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end.
-Definition canon_sym_gr_list_list n : list (list nat) :=
-  map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, msort Nat.leb l) (canon_sym_gr_list_list 5)).
-*)
-
 (* isort_rank: like isort but return the rank of what have been
    sorted; its result, when applied to the initial list as an
    operator, returns the sorted list  *)
-
-(*
-Fixpoint isort_rank_insert' {A} (rel : A → A → bool) la d ia lrank :=
-  match lrank with
-  | [] => [ia]
-  | ib :: l =>
-      if rel (nth ia la d) (nth ib la d) then ia :: lrank
-      else ib :: isort_rank_insert' rel la d ia l
-  end.
-
-Fixpoint isort_rank' {A} (rel : A → A → bool) (l : list A) :=
-  match l with
-  | [] => []
-  | d :: l' => isort_rank_insert' rel l d 0 (map S (isort_rank' rel l'))
-  end.
-*)
 
 Fixpoint isort_rank {A} (rel : A → A → bool) (l : list A) :=
   match l with
@@ -518,11 +472,6 @@ Fixpoint isort_rank {A} (rel : A → A → bool) (l : list A) :=
       isort_insert (λ ia ib, rel (nth ia l d) (nth ib l d)) 0
         (map S (isort_rank rel l'))
   end.
-
-(*
-Compute (isort_rank Nat.ltb [3;7;2;5]).
-Compute (isort_rank' Nat.ltb [3;7;2;5]).
-*)
 
 (*
 Compute (let l := [7;2] in isort_rank Nat.leb l).
@@ -2026,22 +1975,6 @@ Fixpoint nb_disorder A (rel : A → _) l :=
   | [] => 0
   | a :: l' => nb_nrel rel a l' + nb_disorder rel l'
   end.
-
-(*
-Compute (nb_disorder Nat.leb [7;5;3;22;8]).
-Definition succ_when_ge k a := a + Nat.b2n (k <=? a).
-Fixpoint canon_sym_gr_list n k : list nat :=
-  match n with
-  | 0 => []
-  | S n' =>
-      k / n'! ::
-      map (succ_when_ge (k / n'!)) (canon_sym_gr_list n' (k mod n'!))
-  end.
-Definition canon_sym_gr_list_list n : list (list nat) :=
-  map (canon_sym_gr_list n) (seq 0 n!).
-Compute (map (λ l, (l, nb_disorder Nat.leb l)) (canon_sym_gr_list_list 5)).
-Compute (map (λ l, list_eqb Nat.eqb (bsort_loop Nat.leb (nb_disorder Nat.leb l(* - 1*)) l) (seq 0 5)) (canon_sym_gr_list_list 5)).
-*)
 
 Theorem nb_disorder_le_square : ∀ A (rel : A → _) l,
   nb_disorder rel l ≤ length l * length l.
@@ -3810,8 +3743,7 @@ destruct (Nat.eq_dec a b) as [H| H]; [ now subst b | ].
 flia H1 H.
 Qed.
 
-...
-
+(*
 Theorem sorted_isort_rank_insert : ∀ A B (rela : A → _) (relb : B → _),
   transitive relb →
   total_relation relb →
@@ -3850,6 +3782,7 @@ destruct Hic as [Hic| Hic]. {
 }
 now apply Hib.
 Qed.
+*)
 
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
