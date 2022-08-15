@@ -4879,6 +4879,12 @@ apply Nat.eqb_eq.
 rewrite H1.
 *)
     unfold collapse at 1 3; f_equal.
+    apply List_eq_iff.
+    do 2 rewrite isort_rank_length.
+    rewrite map_length, collapse_length.
+    split; [ easy | ].
+    intros d i.
+Search isort_rank.
 ...
 Theorem isort_rank_same_order : ∀ la lb,
   length la = length lb
