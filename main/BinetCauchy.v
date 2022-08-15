@@ -4865,12 +4865,30 @@ rewrite collapse_comp; cycle 1. {
 } {
   symmetry; apply canon_sym_gr_list_length.
 }
-Theorem sorted_collapse : ∀ rel la,
+Theorem sorted_isort_rank : ∀ rel la,
   sorted rel la
-  → collapse la = seq 0 (length la).
+  → isort_rank Nat.leb la = seq 0 (length la).
 Proof.
 intros * Hs.
+apply List_eq_iff.
+rewrite isort_rank_length, seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hil| Hil]. 2: {
+  apply Nat.nlt_ge in Hil.
+  rewrite nth_overflow; [ | now rewrite isort_rank_length ].
+  rewrite nth_overflow; [ easy | now rewrite seq_length ].
+}
+rewrite seq_nth; [ | easy ].
+rewrite nth_indep with (d' := 0); [ | now rewrite isort_rank_length ].
+clear d; cbn.
+revert i Hil.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+Print isort_rank_insert.
+...
 unfold collapse.
+rewrite (sorted_isort_rank Hs).
 ...
 rewrite (@sorted_collapse Nat.ltb); [ | easy ].
 ...
