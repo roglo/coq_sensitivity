@@ -4885,7 +4885,29 @@ clear d; cbn.
 revert i Hil.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
-Print isort_rank_insert.
+Check isort_insert_isort_rank_insert.
+Search isort_rank_insert.
+Theorem sorted_isort_rank_insert : ∀ rel (ia : nat) lrank f,
+  sorted rel (ia :: lrank)
+  → isort_rank_insert rel f ia lrank = ia :: lrank.
+Proof.
+intros * Hs.
+Compute (
+let ia := 3 in
+let lrank := [7;8;15] in
+let rel := Nat.ltb in
+let f ia := 40 - ia in
+  isort_rank_insert rel f ia lrank = ia :: lrank
+).
+...
+revert ia Hs.
+induction lrank as [| ib]; intros; [ easy | cbn ].
+remember (rel (f ia) (f ib)) as ab eqn:Hab.
+symmetry in Hab.
+destruct ab. {
+  f_equal.
+...
+rewrite sorted_isort_rank_insert.
 ...
 unfold collapse.
 rewrite (sorted_isort_rank Hs).
