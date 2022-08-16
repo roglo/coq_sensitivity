@@ -4907,7 +4907,7 @@ Theorem isort_comp_collapse : ∀ la,
 Proof.
 intros.
 unfold collapse.
-Search "°".
+apply List_eq_iff.
 ...
 rewrite <- isort_comp_permut_r with (p := isort_rank Nat.leb la).
 rewrite isort_isort_rank with (d := 0).
