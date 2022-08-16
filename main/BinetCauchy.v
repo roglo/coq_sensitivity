@@ -4884,7 +4884,27 @@ Compute (
   jl ° collapse kl = kl
 ).
 unfold collapse.
-Search (isort _ _ ° _).
+Fixpoint isort_rank_insert {A B} (rel : A → A → bool) (f : B → A) ia lrank :=
+  match lrank with
+  | [] => [ia]
+  | ib :: l =>
+      if rel (f ia) (f ib) then ia :: lrank
+      else ib :: isort_rank_insert rel f ia l
+  end.
+
+Fixpoint isort_rank' {A} (rel : A → A → bool) (l : list A) :=
+  match l with
+  | [] => []
+  | d :: l' =>
+      isort_rank_insert rel (λ i, nth i l d) 0 (map S (isort_rank' rel l'))
+  end.
+
+Print isort_rank.
+
+assert (H : jl ° isort_rank' Nat.leb (isort_rank' Nat.leb kl) = kl). {
+destruct kl as [| k]; [ easy | ].
+cbn - [ nth ].
+(* ouais, bon, j'y crois pas beaucoup *)
 ...
   unfold comp_list.
   unfold collapse.
