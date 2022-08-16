@@ -4877,26 +4877,21 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     apply permut_isort_rank_involutive.
     apply isort_rank_is_permut_list.
   }
-  apply in_all_permut_iff in Hkl.
-  unfold collapse.
-Search (isort_rank _ _ = isort_rank _ _).
+  apply in_all_permut_permutation in Hkl.
+...
+(*
 Theorem isort_isort_rank_compat : ∀ A (rel : A → _) la lb,
   isort rel la = isort rel lb → isort_rank rel la = isort_rank rel lb.
 Proof.
 intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros. {
-  symmetry in Hab.
-  now apply eq_isort_nil in Hab; subst lb.
-}
-cbn in Hab.
-cbn - [ nth ].
-destruct lb as [| b]. {
-  cbn in Hab.
-  now apply neq_isort_insert_nil in Hab.
-}
-cbn in Hab.
-cbn - [ nth ].
+(* bin non, c'est faux, ça *)
+Compute (
+  let rel := Nat.ltb in
+  let la := [3;5;4;8] in
+  let lb := [5;3;4;8] in
+  isort rel la = isort rel lb → isort_rank rel la = isort_rank rel lb
+).
+*)
 ...
 erewrite isort_insert_rel_eq_compat. 2: {
   intros x y Hx Hy.
