@@ -4878,6 +4878,16 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     apply isort_rank_is_permut_list.
   }
   apply in_all_permut_permutation in Hkl.
+Compute (
+  let kl := [5;3;4;8] in
+  let jl := isort Nat.ltb kl in
+  jl ° collapse kl = kl
+).
+unfold collapse.
+Search (isort _ _ ° _).
+...
+  unfold comp_list.
+  unfold collapse.
 ...
 (*
 Theorem isort_isort_rank_compat : ∀ A (rel : A → _) la lb,
