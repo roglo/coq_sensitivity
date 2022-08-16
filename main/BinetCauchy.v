@@ -4884,57 +4884,21 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
   now apply sorted_nat_ltb_leb_incl.
 }
 replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
+  symmetry.
   unfold h1.
-(*
-Compute (
-  let jl := [2;3;5] in
-  let m := length jl in
-  all_permut (seq 1 m) =
-  map (λ l : list nat, map S (collapse l)) (all_permut jl)
-).
-*)
+  specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
+  replace (add 1) with S in H1 by easy.
+  now rewrite Hjm in H1.
+}
+apply rngl_summation_list_eq_compat.
+intros kl Hkl.
+f_equal. {
+  unfold g1.
+  rewrite sorted_permuted_comp_collapse; [ easy | | ]. {
+    now apply sorted_nat_ltb_leb_incl.
+  }
 ...
-replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
-  unfold h1.
-  rewrite <- Hjm.
-  clear Hjl Hjm g1.
-  induction jl as [| j]; [ easy | ].
-  cbn - [ nth seq ].
-  rewrite map_map.
-  unfold canon_sym_gr_list_list.
-  rewrite map_map.
-  unfold all_permut.
-  rewrite seq_length.
-  rewrite <- cons_seq.
-  unfold canon_sym_gr_list_list.
-  rewrite map_map.
-  apply map_ext_in.
-  intros i Hi.
-  apply in_seq in Hi.
-  symmetry.
-  remember (map S) as x.
-  erewrite map_ext_in. 2: {
-    intros k Hk.
-    erewrite nth_indep with (d' := 0). 2: {
-      now apply in_canon_sym_gr_list in Hk.
-    }
-    easy.
-  }
-  subst x.
-  symmetry.
-  erewrite map_ext_in. 2: {
-    intros k Hk.
-    apply in_canon_sym_gr_list in Hk; [ | easy ].
-    rewrite cons_seq, seq_nth; [ | easy ].
-    now rewrite Nat.add_1_l.
-  }
-  f_equal.
-  symmetry.
-  rewrite permut_collapse. 2: {
-    apply (map_nth_is_permut_list (length (j :: jl))). 2: {
-      now apply canon_sym_gr_list_is_permut.
-    }
-(* ah mais oui mais non *)
+  apply in_all_permut_permutation in Hkl.
 ...
 rewrite <- isort_comp_permut_r with (p := isort_rank Nat.leb la).
 rewrite isort_isort_rank with (d := 0).
