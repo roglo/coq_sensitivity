@@ -2471,6 +2471,63 @@ rewrite (permut_isort_rank_comp (length lb)); [ easy | | | ]. {
 }
 Qed.
 
+Theorem isort_comp_collapse : ∀ la,
+  isort Nat.leb la ° collapse la = la.
+Proof.
+intros.
+apply List_eq_iff.
+rewrite comp_length, collapse_length.
+split; [ easy | ].
+intros d i.
+unfold comp_list.
+destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow; [ | now rewrite map_length, collapse_length ].
+  now rewrite nth_overflow.
+}
+rewrite nth_indep with (d' := 0). 2: {
+  now rewrite map_length, collapse_length.
+}
+symmetry.
+rewrite nth_indep with (d' := 0); [ | easy ].
+symmetry.
+clear d.
+rewrite (isort_isort_rank _ 0).
+rewrite (List_map_nth' 0); [ | now rewrite collapse_length ].
+rewrite (List_map_nth' 0). 2: {
+  unfold collapse.
+  apply isort_rank_ub.
+  now intros H; apply eq_isort_rank_nil in H; subst la.
+}
+unfold collapse.
+rewrite permut_permut_isort with (i := i); [ easy | | ]. 2: {
+  now rewrite isort_rank_length.
+}
+apply isort_rank_is_permut_list.
+Qed.
+
+Theorem sorted_permuted_comp_collapse : ∀ la lb,
+  sorted Nat.leb la
+  → permutation Nat.eqb la lb
+  → la ° collapse lb = lb.
+Proof.
+intros * Hs Hp.
+assert (Hba : isort Nat.leb lb = la). {
+  rewrite isort_when_permuted with (eqb := Nat.eqb) (lb := la).
+  now apply isort_when_sorted.
+  unfold equality; apply Nat.eqb_eq.
+  apply Nat_leb_antisym.
+  apply Nat_leb_trans.
+  apply Nat_leb_total_relation.
+  apply permutation_sym; [ | easy ].
+  unfold equality; apply Nat.eqb_eq.
+}
+rewrite <- Hba.
+clear la Hs Hp Hba.
+rename lb into la.
+apply isort_comp_collapse.
+Qed.
+
 Theorem NoDup_collapse : ∀ la,
   NoDup la → NoDup (collapse la).
 Proof.

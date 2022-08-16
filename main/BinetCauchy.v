@@ -4878,36 +4878,11 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     apply isort_rank_is_permut_list.
   }
   apply in_all_permut_permutation in Hkl.
-Compute (
-  let kl := [5;3;4;8] in
-  let jl := isort Nat.ltb kl in
-  jl ° collapse kl = kl
-).
-Theorem glop : ∀ la lb,
-  sorted Nat.leb la
-  → permutation Nat.eqb la lb
-  → la ° collapse lb = lb.
-Proof.
-intros * Hs Hp.
-assert (Hba : isort Nat.leb lb = la). {
-  rewrite isort_when_permuted with (eqb := Nat.eqb) (lb := la).
-  now apply isort_when_sorted.
-  unfold equality; apply Nat.eqb_eq.
-  apply Nat_leb_antisym.
-  apply Nat_leb_trans.
-  apply Nat_leb_total_relation.
-  apply permutation_sym; [ | easy ].
-  unfold equality; apply Nat.eqb_eq.
+  apply sorted_permuted_comp_collapse. 2: {
+    now apply (permutation_sym Nat.eqb_eq).
+  }
+  now apply sorted_nat_ltb_leb_incl.
 }
-rewrite <- Hba.
-clear la Hs Hp Hba.
-rename lb into la.
-Theorem isort_comp_collapse : ∀ la,
-  isort Nat.leb la ° collapse la = la.
-Proof.
-intros.
-unfold collapse.
-apply List_eq_iff.
 ...
 rewrite <- isort_comp_permut_r with (p := isort_rank Nat.leb la).
 rewrite isort_isort_rank with (d := 0).
