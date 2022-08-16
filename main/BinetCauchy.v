@@ -4889,6 +4889,58 @@ Theorem glop : ∀ la lb,
   → la ° collapse lb = lb.
 Proof.
 intros * Hs Hp.
+assert (Hba : isort Nat.leb lb = la). {
+  rewrite isort_when_permuted with (eqb := Nat.eqb) (lb := la).
+  now apply isort_when_sorted.
+  unfold equality; apply Nat.eqb_eq.
+  apply Nat_leb_antisym.
+  apply Nat_leb_trans.
+  apply Nat_leb_total_relation.
+  apply permutation_sym; [ | easy ].
+  unfold equality; apply Nat.eqb_eq.
+}
+rewrite <- Hba.
+clear la Hs Hp Hba.
+rename lb into la.
+Theorem isort_comp_collapse : ∀ la,
+  isort Nat.leb la ° collapse la = la.
+Proof.
+intros.
+unfold collapse.
+Search "°".
+...
+rewrite <- isort_comp_permut_r with (p := isort_rank Nat.leb la).
+rewrite isort_isort_rank with (d := 0).
+Search (nth _ (_ ° _)).
+isort_comp_permut_r: ∀ l p : list nat, is_permut (length l) p → isort Nat.leb (l ° p) = isort Nat.leb l
+......
+apply isort_comp_collapse.
+Compute (
+let la := [8;7;2;3] in
+  isort Nat.leb la ° collapse la = la
+).
+...
+rewrite isort_isort_rank with (d := 0).
+unfold "°"; cbn.
+unfold collapse.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  generalize Hi; intros Hli.
+  apply in_isort_rank in Hli.
+  rewrite (List_map_nth' 0); [ | easy ].
+  rewrite isort_rank_length in Hli.
+  easy.
+}
+Search (nth (nth _ (isort_rank _ _) _)).
+rewrite nth_nth_isort_rank; [ | easy ].
+easy.
+}
+...
+  rewrite permut_permut_isort; [ | | easy ]. 2: {
+}
+...
+intros * Hs Hp.
+unfold collapse.
 revert lb Hp.
 induction la as [| a]; intros; cbn. {
   now apply permutation_nil_l in Hp; subst lb.
@@ -4900,6 +4952,13 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb).
 apply Nat.eqb_eq in H; subst x lb.
+replace (isort_rank Nat.leb (bef ++ a :: aft)) with (0 :: map S (isort_rank Nat.leb (bef ++ aft))). 2: {
+  clear Hp.
+  induction bef as [| b]. {
+    cbn - [ nth ].
+...
+permut_isort_rank_involutive: ∀ la : list nat, is_permut_list la → isort_rank Nat.leb (isort_rank Nat.leb la) = la
+f (f (f l)) = f l
 ...
 (*
 Compute (
