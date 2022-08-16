@@ -4883,7 +4883,33 @@ Compute (
   let jl := isort Nat.ltb kl in
   jl ° collapse kl = kl
 ).
+Theorem glop : ∀ la lb,
+  sorted Nat.leb la
+  → permutation Nat.eqb la lb
+  → la ° collapse lb = lb.
+Proof.
+intros * Hs Hp.
+revert lb Hp.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hp; subst lb.
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract (Nat.eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Hlb).
+apply Nat.eqb_eq in H; subst x lb.
+...
+(*
+Compute (
+  let la := [2;3;7;8] in
+map (λ lb, la ° collapse lb = lb) (all_permut la)).
+*)
+...
+apply glop.
 unfold collapse.
+...
 Fixpoint isort_rank_insert {A B} (rel : A → A → bool) (f : B → A) ia lrank :=
   match lrank with
   | [] => [ia]
