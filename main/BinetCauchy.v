@@ -4877,6 +4877,16 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     apply permut_isort_rank_involutive.
     apply isort_rank_is_permut_list.
   }
+(*
+  apply in_all_permut_iff in Hkl.
+*)
+  unfold collapse.
+Check comp_isort_rank_r.
+Search (isort_rank _ _ = isort_rank _ _).
+...
+  rewrite isort_isort_rank with (d := 0) in Hkl.
+  rewrite isort_isort_rank with (d := 0) in Hkl.
+Search isort.
 ...
 assert (∀ kl, kl ∈ all_permut jl → g1 (h1 kl) = kl). {
   intros kl Hkl.
