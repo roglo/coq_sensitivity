@@ -4899,9 +4899,23 @@ Theorem glop : ∀ la i j,
   isort_rank Nat.leb (map (add j) (collapse la)).
 Proof.
 intros.
-revert i j.
-induction la as [| a]; intros; [ easy | ].
+destruct la as [| a]; [ easy | ].
 cbn - [ nth ].
+rewrite isort_insert_nth_indep with (d' := 0); [ | now cbn | ]. 2: {
+  clear i j.
+  intros i Hi.
+  apply in_map_iff in Hi.
+  destruct Hi as (j & Hj & Hi); subst i; rename j into i.
+  cbn; apply -> Nat.succ_lt_mono.
+  now apply in_isort_rank in Hi.
+}
+set (rel' := λ ia ib, nth ia (a :: la) 0 <=? nth ib (a :: la) 0).
+...
+unfold isort_rank at 3.
+cbn - [ isort_rank nth ].
+remember (d :: la) as lb eqn:Hlb.
+clear Hlb.
+Print isort_rank.
 ...
     apply List_eq_iff.
     do 2 rewrite isort_rank_length.
