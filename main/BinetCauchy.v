@@ -4879,11 +4879,36 @@ apply Nat.eqb_eq.
 rewrite H1.
 *)
     unfold collapse at 1 3; f_equal.
+Print isort_insert.
+Print isort.
+Print isort_rank.
+
+Fixpoint isort_rank' {A} (rel : A → A → bool) i (l : list A) :=
+  match l with
+  | [] => []
+  | d :: l' =>
+      isort_insert (λ ia ib, rel (nth (ia - i) l d) (nth (ib - i) l d)) i
+        (map S (isort_rank' rel i l'))
+  end.
+Print isort_rank'.
+Compute (isort_rank Nat.ltb [7;3;1;8;10]).
+Compute (isort_rank' Nat.ltb 10 [7;3;1;8;10]).
+Compute (collapse [7;3;1;8;10]).
+Theorem glop : ∀ la i j,
+  isort_rank Nat.leb (map (add i) (collapse la)) =
+  isort_rank Nat.leb (map (add j) (collapse la)).
+Proof.
+intros.
+revert i j.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+...
     apply List_eq_iff.
     do 2 rewrite isort_rank_length.
     rewrite map_length, collapse_length.
     split; [ easy | ].
     intros d i.
+...
 Search isort_rank.
 ...
 Theorem isort_rank_same_order : ∀ la lb,
