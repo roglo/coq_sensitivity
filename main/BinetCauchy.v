@@ -4901,6 +4901,12 @@ Compute (
 let m := length jl in
 map (λ kl,
   ε (jl ° collapse kl) = ε kl) (all_permut (seq 1 m))).
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+  (jl ° collapse kl) = kl) (all_permut (seq 1 m))).
+Search (ε _ = ε _).
 About sorted_permuted_comp_collapse.
 ...
   rewrite sorted_permuted_comp_collapse; [ easy | | ]. {
