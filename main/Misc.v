@@ -218,6 +218,19 @@ Qed.
 
 (* *)
 
+Theorem Nat_leb_add_mono_l : ∀ a b c, (a + b <=? a + c) = (b <=? c).
+Proof.
+intros.
+remember (b <=? c) as x eqn:Hx; symmetry in Hx.
+destruct x. {
+  apply Nat.leb_le in Hx.
+  now apply Nat.leb_le, Nat.add_le_mono_l.
+}
+apply Nat.leb_gt in Hx.
+apply Nat.leb_gt.
+now apply Nat.add_lt_mono_l.
+Qed.
+
 Theorem Nat_sub_sub_swap : ∀ a b c, a - b - c = a - c - b.
 Proof.
 intros.

@@ -3905,3 +3905,73 @@ rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length ].
 f_equal.
 apply sorted_cons_iff in Hs; [ now apply IHla | apply Nat_leb_trans ].
 Qed.
+
+Theorem isort_insert_rel_eq_compat : ∀ A (rel1 rel2 : A → _) a la,
+  (∀ x y, x ∈ a :: la → y ∈ a :: la → rel1 x y = rel2 x y)
+  → isort_insert rel1 a la = isort_insert rel2 a la.
+Proof.
+intros * Hab.
+induction la as [| b]; [ easy | cbn ].
+rewrite (Hab _ _ (or_introl eq_refl) (or_intror (or_introl eq_refl))).
+rewrite IHla; [ easy | ].
+intros x y Hx Hy.
+apply Hab. {
+  destruct Hx; [ now left | now right; right ].
+} {
+  destruct Hy; [ now left | now right; right ].
+}
+Qed.
+
+Theorem isort_rank_map_add_compat : ∀ i j la,
+  isort_rank Nat.leb (map (add i) la) = isort_rank Nat.leb (map (add j) la).
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+rewrite IHla.
+erewrite isort_insert_rel_eq_compat. 2: {
+  intros x y Hx Hy.
+  rewrite <- map_cons.
+  rewrite (List_map_nth' 0). 2: {
+    destruct Hx as [Hx| Hx]; [ now subst x; cbn | ].
+    apply in_map_iff in Hx.
+    destruct Hx as (z & Hz & Hx); subst x.
+    cbn; apply -> Nat.succ_lt_mono.
+    apply in_isort_rank in Hx.
+    now rewrite map_length in Hx.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    destruct Hy as [Hy| Hy]; [ now subst y; cbn | ].
+    apply in_map_iff in Hy.
+    destruct Hy as (z & Hz & Hy); subst y.
+    cbn; apply -> Nat.succ_lt_mono.
+    apply in_isort_rank in Hy.
+    now rewrite map_length in Hy.
+  }
+  now rewrite Nat_leb_add_mono_l.
+}
+symmetry.
+erewrite isort_insert_rel_eq_compat. 2: {
+  intros x y Hx Hy.
+  rewrite <- map_cons.
+  rewrite (List_map_nth' 0). 2: {
+    destruct Hx as [Hx| Hx]; [ now subst x; cbn | ].
+    apply in_map_iff in Hx.
+    destruct Hx as (z & Hz & Hx); subst x.
+    cbn; apply -> Nat.succ_lt_mono.
+    apply in_isort_rank in Hx.
+    now rewrite map_length in Hx.
+  }
+  rewrite (List_map_nth' 0). 2: {
+    destruct Hy as [Hy| Hy]; [ now subst y; cbn | ].
+    apply in_map_iff in Hy.
+    destruct Hy as (z & Hz & Hy); subst y.
+    cbn; apply -> Nat.succ_lt_mono.
+    apply in_isort_rank in Hy.
+    now rewrite map_length in Hy.
+  }
+  now rewrite Nat_leb_add_mono_l.
+}
+symmetry.
+easy.
+Qed.
