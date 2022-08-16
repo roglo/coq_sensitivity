@@ -4877,12 +4877,37 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     apply permut_isort_rank_involutive.
     apply isort_rank_is_permut_list.
   }
-(*
   apply in_all_permut_iff in Hkl.
-*)
   unfold collapse.
-Check comp_isort_rank_r.
 Search (isort_rank _ _ = isort_rank _ _).
+Theorem isort_isort_rank_compat : ∀ A (rel : A → _) la lb,
+  isort rel la = isort rel lb → isort_rank rel la = isort_rank rel lb.
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros. {
+  symmetry in Hab.
+  now apply eq_isort_nil in Hab; subst lb.
+}
+cbn in Hab.
+cbn - [ nth ].
+destruct lb as [| b]. {
+  cbn in Hab.
+  now apply neq_isort_insert_nil in Hab.
+}
+cbn in Hab.
+cbn - [ nth ].
+...
+erewrite isort_insert_rel_eq_compat. 2: {
+  intros x y Hx Hy.
+...
+Search (isort_insert _ _ (map _ _)).
+Search isort_insert.
+...
+Search (_ ° collapse _).
+  unfold collapse.
+Search (_ ° isort_rank _ _).
+Check comp_isort_rank_r.
 ...
   rewrite isort_isort_rank with (d := 0) in Hkl.
   rewrite isort_isort_rank with (d := 0) in Hkl.
