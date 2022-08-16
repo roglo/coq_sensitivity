@@ -2512,15 +2512,28 @@ Theorem sorted_permuted_comp_collapse : ∀ la lb,
   → la ° collapse lb = lb.
 Proof.
 intros * Hs Hp.
+(*
+clear Hp.
+*)
 assert (Hba : isort Nat.leb lb = la). {
-  rewrite isort_when_permuted with (eqb := Nat.eqb) (lb := la).
-  now apply isort_when_sorted.
-  unfold equality; apply Nat.eqb_eq.
-  apply Nat_leb_antisym.
-  apply Nat_leb_trans.
-  apply Nat_leb_total_relation.
-  apply permutation_sym; [ | easy ].
-  unfold equality; apply Nat.eqb_eq.
+(**)
+  rewrite isort_when_permuted with (eqb := Nat.eqb) (lb := la). {
+(*
+  erewrite isort_when_permuted with (eqb := Nat.eqb). {
+*)
+    now apply isort_when_sorted.
+  } {
+    unfold equality; apply Nat.eqb_eq.
+  } {
+    apply Nat_leb_antisym.
+  } {
+    apply Nat_leb_trans.
+  } {
+    apply Nat_leb_total_relation.
+  } {
+    apply permutation_sym; [ | easy ].
+    unfold equality; apply Nat.eqb_eq.
+  }
 }
 rewrite <- Hba.
 clear la Hs Hp Hba.

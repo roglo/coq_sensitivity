@@ -4894,6 +4894,15 @@ apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
   unfold g1.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+  ε (jl ° collapse kl) = ε kl) (all_permut (seq 1 m))).
+About sorted_permuted_comp_collapse.
+...
   rewrite sorted_permuted_comp_collapse; [ easy | | ]. {
     now apply sorted_nat_ltb_leb_incl.
   }
