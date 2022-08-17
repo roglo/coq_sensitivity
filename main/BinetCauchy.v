@@ -1563,33 +1563,33 @@ now destruct H1 as ((_, H1), H2).
 Qed.
 *)
 
-Theorem app_seq_swap_is_permut_list : ∀ i j l,
-  is_permut_list (seq 0 i ++ j :: l)
+Theorem app_seq_swap_permut_seq : ∀ i j l,
+  permut_seq (seq 0 i ++ j :: l)
   → i < j
-  → is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i)).
+  → permut_seq (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i)).
 Proof.
 (*
 intros * Hp Hilj.
-unfold is_permut_list.
+unfold permut_seq.
 rewrite app_length, seq_length, list_swap_elem_length.
 rewrite seq_app, Nat.add_0_l.
 apply (permutation_app_head Nat.eqb_eq).
-unfold is_permut_list in Hp.
+unfold permut_seq in Hp.
 rewrite app_length, seq_length, seq_app, Nat.add_0_l in Hp.
 apply (permutation_app_inv_l Nat.eqb_eq) in Hp.
-Search (is_permut_list (list_swap_elem _ _ _ _)).
+Search (permut_seq (list_swap_elem _ _ _ _)).
 rewrite <- list_swap_elem_length with (d := 0) (p := 0) (q := j - i).
-Check list_swap_elem_is_permut_list.
+Check list_swap_elem_permut_seq.
 ...
-Definition is_permut_list l := permutation Nat.eqb l (seq 0 (length l)).
-Search is_permut_list.
+Definition permut_seq l := permutation Nat.eqb l (seq 0 (length l)).
+Search permut_seq.
 ...
 rewrite app_length, seq_length in Hp; cbn in Hp.
 Search (seq _ (_ + _)).
 ...
 *)
 intros * Hp Hilj.
-apply is_permut_list_iff.
+apply permut_seq_iff.
 split. {
   intros k Hk.
   rewrite app_length, seq_length, list_swap_elem_length; cbn.
@@ -1604,7 +1604,7 @@ split. {
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
     subst u.
-    apply is_permut_list_iff in Hp.
+    apply permut_seq_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     specialize (Hpp (nth (j - i) (j :: l) 0)) as H2.
@@ -1627,7 +1627,7 @@ split. {
   }
   destruct u; [ easy | ].
   cbn.
-  apply is_permut_list_iff in Hp.
+  apply permut_seq_iff in Hp.
   destruct Hp as (Hpp, Hpl).
   rewrite app_length, seq_length in Hpp; cbn in Hpp.
   apply Hpp, in_or_app.
@@ -1686,7 +1686,7 @@ split. {
       rewrite Nat_succ_sub_succ_r in Huv; [ | easy ].
       rewrite List_nth_succ_cons in Huv.
       rewrite <- Huv.
-      apply is_permut_list_iff in Hp.
+      apply permut_seq_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       assert (Hj : j ∈ seq (S i) (length l)). {
@@ -1717,7 +1717,7 @@ split. {
     }
     rewrite Nat_succ_sub_succ_r; [ | flia Hvi Hviz ].
     rewrite List_nth_succ_cons.
-    apply is_permut_list_iff in Hp.
+    apply permut_seq_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     unfold list_swap_elem in Huv.
@@ -1778,7 +1778,7 @@ split. {
         rewrite List_nth_0_cons in Huv.
         assert (H : v = j) by flia Hvij Hviz.
         subst v; clear Hvij Hviz.
-        apply is_permut_list_iff in Hp.
+        apply permut_seq_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         assert (Hul : j ∈ l). {
@@ -1791,7 +1791,7 @@ split. {
         apply NoDup_cons_iff in Hjl.
         easy.
       }
-      apply is_permut_list_iff in Hp.
+      apply permut_seq_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       apply NoDup_app_iff in Hpl.
@@ -1820,7 +1820,7 @@ split. {
           apply nth_In.
           flia Hu Hilj.
         }
-        apply is_permut_list_iff in Hp.
+        apply permut_seq_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1838,7 +1838,7 @@ split. {
         apply nth_In.
         flia Hv Hviz.
       }
-      apply is_permut_list_iff in Hp.
+      apply permut_seq_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       apply NoDup_app_iff in Hpl.
@@ -1853,7 +1853,7 @@ split. {
         clear Hvi Hviz Hv.
         rewrite (@Nat_succ_sub_succ_r j i) in Huv; [ | easy ].
         rewrite List_nth_succ_cons in Huv.
-        apply is_permut_list_iff in Hp.
+        apply permut_seq_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1881,7 +1881,7 @@ split. {
           apply nth_In.
           flia Hu Huiz.
         }
-        apply is_permut_list_iff in Hp.
+        apply permut_seq_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1891,7 +1891,7 @@ split. {
       } {
         rewrite (@Nat_succ_sub_succ_r v i) in Huv; [ | flia Hviz ].
         rewrite List_nth_succ_cons in Huv.
-        apply is_permut_list_iff in Hp.
+        apply permut_seq_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1919,7 +1919,7 @@ split. {
     }
     rewrite seq_nth in Hvi; [ | cbn; flia Hu ].
     rewrite Nat.add_0_l in Hvi.
-    apply is_permut_list_iff in Hp.
+    apply permut_seq_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     apply NoDup_app_iff in Hpl.
@@ -1956,7 +1956,7 @@ now rewrite IHla, Nat.add_assoc, Nat.add_succ_comm.
 Qed.
 
 Theorem permut_eq_iter_list_transp_loop : ∀ l it i,
-  is_permut_list (seq 0 i ++ l)
+  permut_seq (seq 0 i ++ l)
   → length l + nb_nfit i l ≤ it
   → fold_left (λ l t, l ° swap (length l) (fst t) (snd t))
       (transp_loop it i l) (seq 0 i ++ l) = seq 0 (i + length l).
@@ -2012,9 +2012,9 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     flia H2 Hilj.
   }
   move Hji before Hilj.
-  assert (Hpa : is_permut_list (seq 0 i ++ la)). {
+  assert (Hpa : permut_seq (seq 0 i ++ la)). {
     rewrite Hla.
-    now apply app_seq_swap_is_permut_list.
+    now apply app_seq_swap_permut_seq.
   }
   specialize (IHit la i Hpa) as H1.
   assert (H : length la + nb_nfit i la ≤ it). {
@@ -2197,7 +2197,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 Qed.
 
 Theorem permut_eq_iter_list_transp : ∀ l,
-  is_permut_list l
+  permut_seq l
   → iter_list (transp_list l) (λ l t, l ° swap (length l) (fst t) (snd t)) l =
     seq 0 (length l).
 Proof.
@@ -2211,7 +2211,7 @@ Qed.
 *)
 
 Theorem permut_list_max : ∀ l,
-  is_permut_list l
+  permut_seq l
   → Max (i ∈ l), i = length l - 1.
 Proof.
 intros * Hp.
@@ -2224,7 +2224,7 @@ induction n; intros. {
 rewrite Nat_sub_succ_1.
 specialize permut_without_highest as H1.
 specialize (H1 n l).
-assert (H : is_permut (S n) l) by easy.
+assert (H : permut_seq_with_len (S n) l) by easy.
 specialize (H1 H); clear H.
 destruct H1 as (j & Hj & Hjn & Hpj & Hpjl).
 specialize (nth_split _ 0 Hj) as H1.
@@ -2335,7 +2335,7 @@ Qed.
 
 (*
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
-  is_permut_list (seq 0 i ++ p)
+  permut_seq (seq 0 i ++ p)
   → length p + nb_nfit i p ≤ it1
   → length p + nb_nfit i p ≤ it2
   → transp_loop it1 i p = transp_loop it2 i p.
@@ -2542,7 +2542,7 @@ apply IHit1; cycle 1. {
   apply -> Nat.succ_le_mono.
   now apply Nat.add_le_mono_l.
 }
-now apply app_seq_swap_is_permut_list.
+now apply app_seq_swap_permut_seq.
 Qed.
 
 Theorem nb_nfit_succ_le : ∀ i j l, nb_nfit (S i) l ≤ nb_nfit i (j :: l).
@@ -3129,9 +3129,9 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
     rewrite Hn.
     apply collapse_length.
   } {
-    apply collapse_is_permut.
+    apply collapse_permut_seq_with_len.
   }
-  rewrite permut_comp_isort_rank_r; [ | apply isort_rank_is_permut_list ].
+  rewrite permut_comp_isort_rank_r; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
   apply in_all_comb_iff in Hl.
@@ -3146,10 +3146,10 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
     rewrite Hn.
     apply isort_rank_length.
   } {
-    apply isort_rank_is_permut_list.
+    apply isort_rank_permut_seq.
   }
   unfold collapse.
-  rewrite permut_comp_isort_rank_l; [ | apply isort_rank_is_permut_list ].
+  rewrite permut_comp_isort_rank_l; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
   apply in_all_comb_iff in Hl.
@@ -3167,7 +3167,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
       rewrite Hnc, Hn.
-      apply collapse_is_permut.
+      apply collapse_permut_seq_with_len.
     }
     rewrite rngl_mul_comm; [ | now destruct Hif ].
     f_equal.
@@ -3182,7 +3182,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     rewrite Nat_sub_succ_1.
     unfold collapse.
     rewrite permut_permut_isort; [ flia Hi | | ]. {
-      apply isort_rank_is_permut_list.
+      apply isort_rank_permut_seq.
     }
     rewrite isort_rank_length, <- Hn; flia Hi.
   }
@@ -3192,7 +3192,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     rewrite Nat_sub_succ_1.
     unfold collapse.
     rewrite permut_isort_permut; [ flia Hi | | ]. {
-      apply isort_rank_is_permut_list.
+      apply isort_rank_permut_seq.
     }
     rewrite isort_rank_length, <- Hn; flia Hi.
   }
@@ -3214,7 +3214,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     }
     unfold collapse.
     rewrite permut_isort_permut; cycle 1. {
-      apply isort_rank_is_permut_list.
+      apply isort_rank_permut_seq.
     } {
       rewrite isort_rank_length, <- Hn.
       flia Hi.
@@ -3250,7 +3250,7 @@ rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
     apply Nat.succ_inj in Hij.
     do 2 rewrite Nat.add_comm, Nat.add_sub in Hij.
     apply isort_rank_inj in Hij; [ easy | | | ]. {
-      apply isort_rank_is_permut_list.
+      apply isort_rank_permut_seq.
     } {
       now rewrite isort_rank_length, <- Hn.
     } {
@@ -3310,7 +3310,7 @@ apply NoDup_permutation. {
     }
     apply (permutation_sym Nat.eqb_eq).
     eapply (permutation_trans Nat.eqb_eq). {
-      apply isort_rank_is_permut_list.
+      apply isort_rank_permut_seq.
     }
     rewrite isort_rank_length, <- Hn.
     apply (permutation_refl Nat.eqb_eq).
@@ -4536,7 +4536,7 @@ destruct Hla as (Hs & Hlam & Hla).
 rewrite collapse_comp; cycle 1. {
   now apply (sorted_NoDup Nat.ltb_irrefl Nat_ltb_trans).
 } {
-  now apply canon_sym_gr_list_is_permut_list.
+  now apply canon_sym_gr_list_permut_seq.
 } {
   symmetry; apply canon_sym_gr_list_length.
 }
@@ -4912,7 +4912,7 @@ rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
     rewrite map_id.
     unfold collapse.
     apply permut_isort_rank_involutive.
-    apply isort_rank_is_permut_list.
+    apply isort_rank_permut_seq.
   }
   apply in_all_permut_permutation in Hkl.
   apply sorted_permuted_comp_collapse. 2: {
@@ -5135,7 +5135,7 @@ rewrite collapse_comp.
 rewrite <- isort_comp_permut_r with (p := isort_rank Nat.leb la).
 rewrite isort_isort_rank with (d := 0).
 Search (nth _ (_ ° _)).
-isort_comp_permut_r: ∀ l p : list nat, is_permut (length l) p → isort Nat.leb (l ° p) = isort Nat.leb l
+isort_comp_permut_r: ∀ l p : list nat, permut_seq_with_len (length l) p → isort Nat.leb (l ° p) = isort Nat.leb l
 ......
 apply isort_comp_collapse.
 Compute (
@@ -5180,7 +5180,7 @@ replace (isort_rank Nat.leb (bef ++ a :: aft)) with (0 :: map S (isort_rank Nat.
   induction bef as [| b]. {
     cbn - [ nth ].
 ...
-permut_isort_rank_involutive: ∀ la : list nat, is_permut_list la → isort_rank Nat.leb (isort_rank Nat.leb la) = la
+permut_isort_rank_involutive: ∀ la : list nat, permut_seq la → isort_rank Nat.leb (isort_rank Nat.leb la) = la
 f (f (f l)) = f l
 ...
 (*
@@ -5372,15 +5372,15 @@ remember (∑ (kl ∈ _), _) as x; subst x.
 ...
 Search (isort_rank _ _ = _).
 Theorem isort_rank_when_permut : ∀ la,
-  is_permut_list la
+  permut_seq la
   → isort_rank Nat.leb la = la.
 ...
 rewrite isort_rank_when_permut.
 ...
 *)
 rewrite permut_isort_rank_involutive. 2: {
-  apply (map_nth_is_permut_list (length la)). 2: {
-    now apply canon_sym_gr_list_is_permut.
+  apply (map_nth_permut_seq (length la)). 2: {
+    now apply canon_sym_gr_list_permut_seq_with_len.
   }
 ...
 rewrite map_collapse_all_permut_seq.
@@ -5650,9 +5650,9 @@ Search collapse.
 Search (map (λ _, nth _ _ _)).
 ...
   rewrite permut_collapse. 2: {
-    apply (map_nth_is_permut_list 42).
+    apply (map_nth_permut_seq 42).
     erewrite
-Search (is_permut_list (map _ _)).
+Search (permut_seq (map _ _)).
 Search collapse.
   unfold collapse.
 Search isort_rank.

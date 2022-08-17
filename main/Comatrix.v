@@ -798,13 +798,13 @@ rewrite rngl_opp_involutive; [ | now destruct Hif ].
 easy.
 Qed.
 
-Theorem map_permut_seq_is_permut : ∀ n σ,
-  is_permut n σ
-  → is_permut n (map (λ i, nth i σ 0) (seq 0 n)).
+Theorem map_permut_seq_permut_seq_with_len : ∀ n σ,
+  permut_seq_with_len n σ
+  → permut_seq_with_len n (map (λ i, nth i σ 0) (seq 0 n)).
 Proof.
 intros * Hσ.
 split; [ | now rewrite List_map_seq_length ].
-apply is_permut_list_iff.
+apply permut_seq_iff.
 split. {
   intros i Hi.
   apply in_map_iff in Hi.
@@ -823,7 +823,7 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
   destruct Hσ as (Hσa, Hσl).
-  apply is_permut_list_iff in Hσa.
+  apply permut_seq_iff in Hσa.
   destruct Hσa as (Hσa, Hσn).
   apply (NoDup_nat _ Hσn); [ congruence | congruence | easy ].
 }
