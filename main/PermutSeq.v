@@ -743,11 +743,11 @@ assert
 }
 clear H1.
 specialize (H2 (nth i l 0)) as H2.
-...
-assert (H : nth i l 0 < length l) by now apply Hp, nth_In.
+assert (H : nth i l 0 < length l). {
+  apply permut_list_ub; [ easy | now apply nth_In ].
+}
 specialize (H2 H); clear H.
-destruct Hp as (Ha, Hp).
-apply (NoDup_nat _ Hp) in H2; [ easy | | easy ].
+apply NoDup_nat in H2; [ easy | now apply permut_list_NoDup | | easy ].
 apply isort_rank_ub.
 now intros H; subst l.
 Qed.
@@ -799,13 +799,13 @@ assert (H : nth i (isort_rank Nat.leb l) 0 < length l). {
   now intros H; subst l.
 }
 specialize (H2 H); clear H.
-destruct Hp as (Ha, Hp).
 specialize (NoDup_isort_rank Nat.leb l) as H3.
 apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
   now rewrite isort_rank_length.
 }
 rewrite isort_rank_length.
-apply Ha, nth_In.
+apply permut_list_ub; [ easy | ].
+apply nth_In.
 apply isort_rank_ub.
 now intros H; subst l.
 Qed.
@@ -882,15 +882,6 @@ symmetry.
 apply List_map_nth_seq.
 Qed.
 
-Theorem permut_list_ub : ∀ l i,
-  is_permut_list l → i < length l → nth i l 0 < length l.
-Proof.
-intros * Hp Hin.
-destruct Hp as (Hp1, Hp2).
-clear Hp2.
-now apply Hp1, nth_In.
-Qed.
-
 Theorem transposition_out : ∀ i j k, k ≠ i → k ≠ j → transposition i j k = k.
 Proof.
 intros * Hi Hj.
@@ -945,6 +936,7 @@ Proof.
 intros * Hp Hq Hσ.
 unfold is_permut_list, list_swap_elem.
 rewrite map_length, seq_length.
+...
 split; cbn. {
   intros i Hi.
   apply in_map_iff in Hi.
