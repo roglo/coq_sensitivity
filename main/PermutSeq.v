@@ -89,17 +89,93 @@ apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
   apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
   revert i Hi.
   induction l as [| j]; intros; [ easy | ].
-(**)
+(*
   specialize (pigeonhole_list i (j :: l) Hi) as H1.
   assert (H : ∀ k, k ∈ j :: l → k < i). {
     intros k Hk.
     destruct Hk as [Hk| Hk]. {
       subst k.
-...
+*)
   destruct i. {
     destruct j; [ now left | right ].
+    clear Hi.
     apply NoDup_cons_iff in Hp2.
     destruct Hp2 as (Hj & Hnd).
+    assert (H : ∀ i, i ∈ l → i < length l). {
+      intros i Hi.
+      specialize (Hp1 _ (or_intror Hi)) as H1.
+      cbn in H1.
+      destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
+      exfalso; subst i; clear H1.
+      specialize (Hp1 _ (or_introl eq_refl)) as H2.
+      cbn in H2.
+      apply Nat.succ_lt_mono in H2.
+      cbn - [ In ] in Hp1.
+(**)
+apply (In_nth _ _ 0) in Hi.
+destruct Hi as (k & Hk & Hi).
+Check pigeonhole_list.
+(* je sais plus, tiens, zut *)
+...
+specialize (pigeonhole_list (S (length l)) (S j :: butn k l)) as H3.
+l = S j :: butn k l
+x < S (length l)
+...
+cbn - [ In nth ] in H3.
+rewrite butn_length in H3.
+...
+specialize (pigeonhole_list (nth k l 0) (S j :: butn k l)) as H3.
+cbn - [ In nth ] in H3.
+rewrite Hi in H3.
+rewrite butn_length in H3.
+generalize Hk; intros H.
+apply Nat.ltb_lt in H; rewrite H in H3; clear H.
+...
+rewrite <- Nat.sub_succ_l in H3.
+2: cbn.
+...
+specialize (pigeonhole_list (nth k l 0) (butn k l)) as H3.
+rewrite Hi in H3.
+
+...
+specialize (pigeonhole_list (nth j l 0)) as H3.
+...
+specialize (Hp1 j) as H3.
+...
+specialize (pigeonhole_list (length (S j :: l))) as H3.
+...
+      specialize (pigeonhole_list j l H2) as H3.
+      assert (H : ∀ k, k ∈ l → k < j). {
+        intros k Hk.
+        specialize (Hp1 _ (or_intror Hk)) as H4.
+        cbn in H4.
+...
+(**)
+      destruct (Nat.eq_dec (S j) (length l)) as [H1| H1]. {
+        now rewrite <- H1 in Hi.
+      }
+      specialize (pigeonhole_list (S j) (S j :: l)) as H2.
+      assert (H : S j < length (S j :: l)). {
+        now specialize (Hp1 _ (or_introl eq_refl)).
+      }
+      specialize (H2 H); clear H.
+      assert (H : ∀ k, k ∈ S j :: l → k < S j). {
+        intros k Hk.
+        destruct Hk as [Hk| Hk]. {
+          subst k.
+...
+      specialize (pigeonhole_list (length l) (S j :: l)) as H1.
+      assert (H : length l < length (S j :: l)) by now cbn.
+      specialize (H1 H); clear H.
+      assert (H : ∀ k, k ∈ S j :: l → k < length l). {
+        intros k Hk.
+        destruct Hk as [Hk| Hk]. {
+          subst k.
+          specialize (Hp1 _ (or_introl eq_refl)); cbn in Hp1.
+          apply Nat.succ_lt_mono in Hp1.
+          destruct (Nat.eq_dec (S j) (length l)) as [H2| H2]; [ | flia H2 Hp1 ].
+...
+
     apply IHl; [ | easy | ]. 2: {
       specialize (Hp1 _ (or_introl eq_refl)).
       cbn in Hp1.
@@ -111,6 +187,10 @@ apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
     cbn in H1.
     destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
     exfalso; subst i; clear H1.
+    specialize (Hp1 _ (or_introl eq_refl)) as H2.
+    cbn in H2.
+    apply Nat.succ_lt_mono in H2.
+Search (NoDup _ → ∀ _, _).
 ...
 
 (* *)
