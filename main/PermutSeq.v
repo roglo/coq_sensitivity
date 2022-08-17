@@ -43,12 +43,75 @@ Qed.
 
 (* Permutations of {0, 1, 2, ... n-1} *)
 
-(*
+(**)
 Definition is_permut_list l := permutation Nat.eqb l (seq 0 (length l)).
-*)
+Definition is_permut n f := is_permut_list f ∧ length f = n.
+(*
 Definition is_permut_list l := AllLt l (length l) ∧ NoDup l.
 Definition is_permut n f := is_permut_list f ∧ length f = n.
+*)
+
+Theorem permut_list_NoDup : ∀ l, is_permut_list l → NoDup l.
+Proof.
+intros * Hp.
+unfold is_permut_list in Hp.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+apply (permutation_NoDup Nat.eqb_eq Hp (seq_NoDup _ _)).
+Qed.
+
+Theorem permut_list_ub : ∀ l, is_permut_list l → AllLt l (length l).
+Proof.
+intros * Hp.
+unfold is_permut_list in Hp.
+specialize (permutation_in_iff Nat.eqb_eq Hp) as H1.
+intros i Hi.
+apply H1 in Hi.
+now apply in_seq in Hi.
+Qed.
+
+Theorem is_permut_list_iff : ∀ l,
+  is_permut_list l ↔ AllLt l (length l) ∧ NoDup l.
+Proof.
+intros.
+split; intros Hl. {
+  now split; [ apply permut_list_ub | apply permut_list_NoDup ].
+}
+destruct Hl as (Hp1, Hp2).
+unfold is_permut_list.
+apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
+  unfold equality; apply Nat.eqb_eq.
+} {
+  intros i.
+  unfold AllLt in Hp1.
+  split; intros Hi. {
+    apply in_seq; split; [ easy | now apply Hp1 ].
+  }
+  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+  revert i Hi.
+  induction l as [| j]; intros; [ easy | ].
 (**)
+  specialize (pigeonhole_list i (j :: l) Hi) as H1.
+  assert (H : ∀ k, k ∈ j :: l → k < i). {
+    intros k Hk.
+    destruct Hk as [Hk| Hk]. {
+      subst k.
+...
+  destruct i. {
+    destruct j; [ now left | right ].
+    apply NoDup_cons_iff in Hp2.
+    destruct Hp2 as (Hj & Hnd).
+    apply IHl; [ | easy | ]. 2: {
+      specialize (Hp1 _ (or_introl eq_refl)).
+      cbn in Hp1.
+      apply Nat.succ_lt_mono in Hp1; flia Hp1.
+    }
+    clear Hi.
+    intros i Hi.
+    specialize (Hp1 _ (or_intror Hi)) as H1.
+    cbn in H1.
+    destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
+    exfalso; subst i; clear H1.
+...
 
 (* *)
 
@@ -76,12 +139,18 @@ Theorem permut_list_without : ∀ n l,
   → False.
 Proof.
 intros * Hp Hn Hnn.
+(*
 destruct Hp as (Hp1, Hp2).
+*)
 specialize (pigeonhole_list (length l) (n :: l)) as H1.
 specialize (H1 (Nat.lt_succ_diag_r _)).
 assert (H : ∀ x, x ∈ n :: l → x < length l). {
   intros z Hz.
+(**)
+  destruct Hz as [Hz| Hz]; [ now subst z | now apply permut_list_ub ].
+(*
   destruct Hz as [Hz| Hz]; [ now subst z | now apply Hp1 ].
+*)
 }
 specialize (H1 H); clear H.
 remember (pigeonhole_comp_list (n :: l)) as xx eqn:Hxx.
@@ -102,6 +171,9 @@ destruct x. {
   }
   cbn in Hnxx.
   cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
+(**)
+  specialize (permut_list_NoDup Hp) as Hp2.
+(**)
   specialize (NoDup_nat _ Hp2 x x' Hxl Hx'l Hnxx) as H1.
   now destruct H1.
 }
@@ -150,6 +222,7 @@ intros i.
 now destruct (Nat.eq_dec (nth i l 0) n) as [H| H]; [ right | left ].
 Qed.
 
+(*
 Theorem permut_list_permutation_iff : ∀ la,
   is_permut_list la ↔ permutation Nat.eqb la (seq 0 (length la)).
 Proof.
@@ -278,6 +351,7 @@ split. {
   }
 }
 Qed.
+*)
 
 Theorem comp_map_seq : ∀ la lb,
   la ° lb = map (λ i, nth (nth i lb 0) la 0) (seq 0 (length lb)).
@@ -295,17 +369,18 @@ Qed.
 
 Theorem permut_comp_assoc : ∀ n f g h,
   length g = n
-  → is_permut n h
+  → length h = n
+  → is_permut_list h
   → f ° (g ° h) = (f ° g) ° h.
 Proof.
-intros * Hg (Hph, Hh).
+intros * Hg Hh Hph.
 unfold "°", comp_list; cbn.
 rewrite map_map.
 apply map_ext_in.
 intros i Hi.
 rewrite (List_map_nth' 0); [ easy | ].
 rewrite Hg, <- Hh.
-now apply Hph.
+now apply permut_list_ub.
 Qed.
 
 Arguments permut_comp_assoc n%nat [f g h]%list.
@@ -415,8 +490,7 @@ Theorem List_rank_not_None' : ∀ n l i,
 Proof.
 intros n f i (Hs, Hf) Hi.
 apply (@List_rank_not_None n); [ | easy ].
-rewrite <- Hf.
-now apply permut_list_permutation_iff.
+now rewrite <- Hf.
 Qed.
 
 Theorem perm_assoc_is_permut_list : ∀ A (eqb : A → _),
@@ -431,6 +505,10 @@ specialize (permutation_assoc_loop_length Heqb) as Hlen.
 specialize (Hlen la (map Some lb)).
 rewrite filter_Some_map_Some in Hlen.
 specialize (Hlen Hpab).
+(**)
+unfold is_permut_list.
+rewrite Hlen.
+...
 split. {
   intros i Hi.
   rewrite Hlen.
