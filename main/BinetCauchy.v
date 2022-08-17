@@ -4931,6 +4931,46 @@ apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
   unfold g1.
+(**)
+  apply in_all_permut_permutation in Hkl.
+Search (permutation _ _ (seq _ _)).
+Print permutation_assoc.
+Print permutation_assoc_loop.
+Search permutation_assoc.
+Theorem permutation_seq_shift : ∀ la sta len,
+  permutation eqb la (seq sta len)
+  → permutation eqb (map (λ i, i - sta) la) (seq 0 len).
+Proof.
+intros * Hp.
+revert la sta Hp.
+induction len; intros. {
+  now apply permutation_nil_r in Hp; subst la.
+}
+rewrite seq_S in Hp |-*; cbn.
+eapply (permutation_trans Nat.eqb_eq). 2: {
+  apply (permutation_cons_append Nat.eqb_eq).
+}
+apply (permutation_sym Nat.eqb_eq).
+apply permutation_cons_l_iff.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl len) as H1.
+  rewrite Nat.eqb_refl in H1.
+  assert (H : len ∈ map (λ i, i - sta) la). {
+    apply in_map_iff.
+    exists (sta + len).
+    split; [ now rewrite Nat.add_comm, Nat.add_sub | ].
+    eapply (permutation_in_iff Nat.eqb_eq); [ apply Hp | ].
+    now apply in_or_app; right; left.
+  }
+  now specialize (H1 H).
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+......
+apply permutation_seq_shift in Hkl.
+...
   replace (collapse kl) with (map pred kl). 2: {
     apply in_all_permut_permutation in Hkl.
     assert (H : equality eqb) by now unfold equality; apply Nat.eqb_eq.
