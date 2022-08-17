@@ -1596,7 +1596,7 @@ apply Nat.succ_lt_mono in Hin, Hjn.
 now apply (NoDup_nat _ Hn).
 Qed.
 
-Theorem length_sub_canon_permut_list : ∀ l,
+Theorem sub_canon_permut_list_length : ∀ l,
   length (sub_canon_permut_list l) = length l - 1.
 Proof.
 intros.
@@ -1620,16 +1620,17 @@ apply Nat.add_lt_le_mono. {
     apply (In_nth _ _ 0) in Hi.
     destruct Hi as (j & Hj & Hji).
     rewrite <- Hji.
-    rewrite length_sub_canon_permut_list in Hj |-*.
-...
-    apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
+    rewrite sub_canon_permut_list_length in Hj |-*.
+    apply sub_canon_permut_list_elem_ub; [ | flia Hj ].
+    now apply is_permut_list_iff.
   } {
     apply nat_NoDup.
     intros i j Hi Hj.
-    rewrite length_sub_canon_permut_list in Hi, Hj.
-    apply sub_canon_sym_gr_elem_inj1; [ easy | flia Hi | flia Hj ].
+    rewrite sub_canon_permut_list_length in Hi, Hj.
+    apply sub_canon_sym_gr_elem_inj1; [ | flia Hi | flia Hj ].
+    now apply is_permut_list_iff.
   }
-  now rewrite length_sub_canon_permut_list, Hln, Nat_sub_succ_1.
+  now rewrite sub_canon_permut_list_length, Hln, Nat_sub_succ_1.
 }
 apply Nat.mul_le_mono_r.
 specialize (Hvn (hd 0 l)).
@@ -1644,17 +1645,18 @@ Theorem sub_canon_permut_list_is_permut : ∀ l,
   → is_permut_list (sub_canon_permut_list l).
 Proof.
 intros * Hl.
+apply is_permut_list_iff.
 split. {
   intros i Hi.
   apply (In_nth _ _ 0) in Hi.
   destruct Hi as (j & Hj & Hji).
   rewrite <- Hji.
-  rewrite length_sub_canon_permut_list in Hj |-*.
+  rewrite sub_canon_permut_list_length in Hj |-*.
   apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
 } {
   apply nat_NoDup.
   intros i j Hi Hj Hij.
-  rewrite length_sub_canon_permut_list in Hi, Hj.
+  rewrite sub_canon_permut_list_length in Hi, Hj.
   apply sub_canon_sym_gr_elem_inj1 in Hij; [ easy | easy | | ]. {
     flia Hi.
   } {
@@ -1667,7 +1669,9 @@ Theorem canon_sym_gr_list_canon_sym_gr_list_inv : ∀ n l,
   is_permut n l
   → canon_sym_gr_list n (canon_sym_gr_list_inv n l) = l.
 Proof.
-intros * ((Hvn, Hn), Hln).
+intros * (Hp, Hln).
+apply is_permut_list_iff in Hp.
+destruct Hp as (Hvn, Hn).
 revert l Hvn Hn Hln.
 induction n; intros; [ now apply length_zero_iff_nil in Hln | cbn ].
 destruct l as [| a]; [ easy | ].
@@ -1678,7 +1682,8 @@ f_equal. {
   apply Nat.div_small.
   apply canon_sym_gr_list_inv_ub.
   split. {
-    now apply sub_canon_permut_list_is_permut.
+    apply sub_canon_permut_list_is_permut.
+    now apply is_permut_list_iff.
   } {
     cbn; rewrite map_length.
     now cbn in Hln; apply Nat.succ_inj in Hln.
@@ -1691,9 +1696,10 @@ f_equal. {
   rewrite Nat.mod_small. 2: {
     apply canon_sym_gr_list_inv_ub.
     split. {
-      now apply sub_canon_permut_list_is_permut.
+      apply sub_canon_permut_list_is_permut.
+      now apply is_permut_list_iff.
     } {
-      rewrite length_sub_canon_permut_list; cbn.
+      rewrite sub_canon_permut_list_length; cbn.
       now rewrite Hln, Nat.sub_0_r.
     }
   }
@@ -1702,17 +1708,19 @@ f_equal. {
     apply (In_nth _ _ 0) in Hi.
     destruct Hi as (j & Hj & Hji).
     rewrite <- Hji.
-    apply permut_list_ub; [ | easy ].
-    now apply sub_canon_permut_list_is_permut.
+    apply permut_list_ub; [ | now apply nth_In ].
+    apply sub_canon_permut_list_is_permut.
+    now apply is_permut_list_iff.
   } {
     apply nat_NoDup.
     intros i j Hi Hj.
-    rewrite length_sub_canon_permut_list in Hi, Hj.
+    rewrite sub_canon_permut_list_length in Hi, Hj.
     cbn in Hi, Hj.
     rewrite Nat.sub_0_r in Hi, Hj.
-    apply sub_canon_sym_gr_elem_inj1; [ easy | cbn; flia Hi | cbn; flia Hj ].
+    apply sub_canon_sym_gr_elem_inj1; [ | cbn; flia Hi | cbn; flia Hj ].
+    now apply is_permut_list_iff.
   } {
-    rewrite length_sub_canon_permut_list; cbn.
+    rewrite sub_canon_permut_list_length; cbn.
     now rewrite Nat.sub_0_r.
   }
   cbn - [ sub_canon_permut_list ].
@@ -1734,16 +1742,18 @@ f_equal. {
     rewrite Nat.div_small; [ flia Hai | ].
     apply canon_sym_gr_list_inv_ub.
     split; [ | now cbn; rewrite map_length ].
-    now apply sub_canon_permut_list_is_permut.
+    apply sub_canon_permut_list_is_permut.
+    now apply is_permut_list_iff.
   }
   apply Nat.nlt_ge in Hai.
   rewrite Nat.sub_0_r.
   rewrite Nat.div_small. 2: {
     apply canon_sym_gr_list_inv_ub.
     split. {
-      now apply sub_canon_permut_list_is_permut.
+      apply sub_canon_permut_list_is_permut.
+      now apply is_permut_list_iff.
     } {
-      rewrite length_sub_canon_permut_list; cbn; rewrite Hln.
+      rewrite sub_canon_permut_list_length; cbn; rewrite Hln.
       apply Nat.sub_0_r.
     }
   }
@@ -1762,6 +1772,7 @@ Theorem canon_sym_gr_list_is_permut_list : ∀ n k,
   → is_permut_list (canon_sym_gr_list n k).
 Proof.
 intros * Hkn.
+apply is_permut_list_iff.
 split. {
   intros i Hi.
   rewrite canon_sym_gr_list_length.
@@ -2043,6 +2054,7 @@ Proof.
 intros.
 subst n.
 split. {
+  apply is_permut_list_iff.
   split. {
     intros i Hi.
     rewrite isort_rank_length.
@@ -2208,7 +2220,6 @@ destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
   specialize (canon_sym_gr_list_length d (length lb)) as H1.
   rewrite <- H1 at 1.
   apply (permutation_sym Nat.eqb_eq).
-  apply permut_list_permutation_iff.
   now apply canon_sym_gr_list_is_permut_list.
 }
 apply Nat.nlt_ge in Hdb.
@@ -2337,7 +2348,6 @@ rewrite <- Nat.sub_succ_l; [ | cbn; flia Hin ].
 rewrite Nat_sub_succ_1.
 rewrite Hn.
 eapply (permutation_trans Nat.eqb_eq). {
-  apply permut_list_permutation_iff.
   apply canon_sym_gr_list_is_permut_list.
   apply Nat.mod_upper_bound, fact_neq_0.
 }
