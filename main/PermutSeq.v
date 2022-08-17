@@ -87,6 +87,28 @@ apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
     apply in_seq; split; [ easy | now apply Hp1 ].
   }
   apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+(**)
+remember (length l) as n eqn:Hn; symmetry in Hn.
+revert i l Hn Hp1 Hp2 Hi.
+induction n; intros; [ easy | cbn ].
+destruct l as [| a]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+destruct (Nat.eq_dec i a) as [Hia| Hia]. {
+  now subst a; left.
+}
+right.
+apply IHn; [ easy | | | ]. 3: {
+  destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia Hi Hin ].
+  subst i; exfalso; clear Hi.
+  assert (Hp3 : ∀ i, i ∈ a :: l → i < n). {
+    intros i Hi.
+    specialize (Hp1 _ Hi) as H1.
+    destruct Hi as [Hi| Hi]. {
+      subst a; flia Hia H1.
+    }
+    destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
+    subst i; exfalso; clear H1.
+...
   revert i Hi.
   induction l as [| j]; intros; [ easy | ].
 (*
@@ -112,10 +134,26 @@ apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
       apply Nat.succ_lt_mono in H2.
       cbn - [ In ] in Hp1.
 (**)
+      rename Hi into Hll.
+...
+      assert (H : ∀ i, i ∈ l → i < length l). {
+        intros i Hi.
+        specialize (Hp1 _ (or_intror Hi)) as H1.
+        destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
+        exfalso; subst i; clear H1 Hi.
+...
+(**)
 apply (In_nth _ _ 0) in Hi.
-destruct Hi as (k & Hk & Hi).
+destruct Hi as (k & Hkl & Hi).
+destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
+  subst k; clear H2.
+  specialize (pigeonhole_list (length l) (butn j l)) as H3.
+  assert (H : ∀ x, x ∈ l → x < j). {
+    intros k Hk.
+    specialize (Hp1 _ (or_intror Hk)).
+...
 Check pigeonhole_list.
-(* je sais plus, tiens, zut *)
+specialize (pigeonhole_list (length l)) as H3.
 ...
 specialize (pigeonhole_list (S (length l)) (S j :: butn k l)) as H3.
 l = S j :: butn k l
@@ -175,7 +213,6 @@ specialize (pigeonhole_list (length (S j :: l))) as H3.
           apply Nat.succ_lt_mono in Hp1.
           destruct (Nat.eq_dec (S j) (length l)) as [H2| H2]; [ | flia H2 Hp1 ].
 ...
-
     apply IHl; [ | easy | ]. 2: {
       specialize (Hp1 _ (or_introl eq_refl)).
       cbn in Hp1.
