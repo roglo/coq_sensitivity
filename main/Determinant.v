@@ -2248,11 +2248,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
     assert (H : length (isort_rank Nat.leb σ) = n). {
       rewrite isort_rank_length; apply Hσ.
     }
-...
-    rewrite <- (permut_comp_assoc _ H Hσ); clear H.
-    rewrite permut_comp_isort_rank_l; [ | now destruct Hσ ].
+    destruct Hσ.
+    rewrite <- (permut_comp_assoc _ H); clear H; [ | easy | easy ].
+    rewrite permut_comp_isort_rank_l; [ | easy ].
     apply comp_1_r.
-    destruct Hσ, Hpμ; congruence.
+    destruct Hpμ; congruence.
   }
   subst ν.
   rewrite <- Hσν at 1.
@@ -2264,7 +2264,8 @@ erewrite rngl_summation_list_eq_compat. 2: {
   }
   rewrite <- (rngl_mul_assoc _ (ε σ) (ε σ)).
   rewrite NoDup_ε_square; [ | now destruct Hif | ]. 2: {
-    now destruct Hσ as ((_, H), _).
+    destruct Hσ as (Hσ, _).
+    now apply is_permut_list_iff in Hσ.
   }
   rewrite rngl_mul_1_r.
   easy.
@@ -2295,7 +2296,8 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite <- Hkj.
       destruct Hσ as (H1, H2).
       rewrite <- H2 in Hk.
-      now apply permut_list_ub.
+      apply permut_list_ub; [ easy | ].
+      now apply nth_In.
     }
     easy.
   }
@@ -2386,7 +2388,6 @@ split. {
     rewrite isort_rank_length.
     now destruct Hσ.
   }
-  apply permut_list_permutation_iff.
   apply isort_rank_is_permut_list.
 } {
   intros l Hl.
@@ -2398,8 +2399,10 @@ split. {
     now apply map_nth_permut_permut_is_permut.
   }
   split. {
-    rewrite <- (permut_comp_assoc n); [ | easy | ]. 2: {
-      now apply isort_rank_is_permut.
+    rewrite <- (permut_comp_assoc n); [ | easy | | ]; cycle 1. {
+      now rewrite isort_rank_length.
+    } {
+      apply isort_rank_is_permut_list.
     }
     rewrite permut_comp_isort_rank_r; [ | easy ].
     apply comp_1_r.
@@ -2429,8 +2432,10 @@ apply (f_equal (comp_list l1)) in Hill.
 rewrite comp_isort_rank_r in Hill.
 rewrite permut_isort_leb in Hill; [ | easy ].
 apply (f_equal (λ l, comp_list l l2)) in Hill.
-rewrite comp_1_l in Hill; [ | now rewrite Hll; destruct Hpl2 ].
-rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy ]. 2: {
+rewrite comp_1_l in Hill. 2: {
+  now rewrite Hll; apply is_permut_list_iff in Hpl2.
+}
+rewrite <- (@permut_comp_assoc (length l2)) in Hill; [ | | easy | easy ]. 2: {
   apply isort_rank_length.
 }
 rewrite permut_comp_isort_rank_l in Hill; [ | easy ].
@@ -2464,7 +2469,9 @@ erewrite rngl_summation_list_eq_compat. 2: {
       rewrite isort_rank_length.
       apply Hpμ.
     }
-    rewrite <- (permut_comp_assoc _ H); clear H; [ | apply Hpμ ].
+    rewrite <- (permut_comp_assoc _ H); clear H; [ | apply Hpμ | ]. 2: {
+      now destruct Hpμ.
+    }
     rewrite permut_comp_isort_rank_l; [ | now destruct Hpμ ].
     apply comp_1_r.
     destruct Hσ, Hpμ; congruence.
@@ -2481,7 +2488,10 @@ erewrite rngl_summation_list_eq_compat. 2: {
   destruct Hif as (Hic & Hop & Hiv & Hit & H10 & Hde & Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
-  rewrite NoDup_ε_square; [ | easy | now destruct Hpμ as ((_, H), _) ].
+  rewrite NoDup_ε_square; [ | easy | ]. 2: {
+    apply permut_list_NoDup.
+    now destruct Hpμ.
+  }
   rewrite rngl_mul_1_l.
   easy.
 }
@@ -2523,6 +2533,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     rewrite <- Hkj.
     apply permut_list_ub; [ apply Hc | ].
+    apply nth_In.
     now rewrite canon_sym_gr_list_length.
   }
   cbn.
@@ -2603,7 +2614,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-        apply permut_list_ub; [ | easy ].
+        apply permut_list_ub; [ | now apply nth_In ].
         apply isort_rank_is_permut_list.
       }
       rewrite isort_rank_length.
@@ -2620,6 +2631,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
+...
         apply permut_list_ub; [ | easy ].
         apply isort_rank_is_permut_list.
       }
