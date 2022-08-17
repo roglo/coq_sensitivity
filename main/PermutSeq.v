@@ -50,24 +50,6 @@ Definition is_permut_list_bool l :=
   (⋀ (i = 1, length l),
      (⋀ (j = 1, length l), ((l.(i) ≠? l.(j)) || (i =? j)))).
 
-(* bof, faut voir...
-Definition permut_list l := permutation Nat.eqb l (seq 0 (length l)).
-
-Theorem is_permut_list_bool_permut_list : ∀ l,
-  is_permut_list_bool l = true ↔ permut_list l.
-Proof.
-intros l.
-split. {
-  intros Hl.
-  unfold permut_list.
-  induction l as [| a]; intros; [ apply permutation_nil_nil | ].
-  unfold is_permut_list_bool in Hl.
-  apply Bool.andb_true_iff in Hl.
-  destruct Hl as (H1, H2).
-  cbn in H1, H2.
-...
-*)
-
 Definition is_permut n f := is_permut_list f ∧ length f = n.
 
 (* *)
