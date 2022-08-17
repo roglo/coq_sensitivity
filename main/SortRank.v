@@ -256,3 +256,35 @@ rewrite (isort_isort_rank _ d).
 rewrite (List_map_nth' 0); [ easy | ].
 now rewrite isort_rank_length.
 Qed.
+
+(* collapse: transforms a list of n different naturals into a permutation of
+   {0..n-1} such that they are in the same order than the initial list;
+   E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.
+   I claim that list has the same ε than the initial list i.e.
+      ε (collapse l) = ε l
+   I also claim that
+      collapse (collapse l) = collapse l
+      collapse (la ° lb) = collapse la ° collapse lb
+      collapse la = la, if la is a permutation
+   And
+      collapse is a permutation
+      it is the invert permutation of isort_rank
+      i.e. isort_rank of isort_rank
+      isort_rank ord l = rank of the elements in the sorted list
+      e.g.
+        isort_rank Nat.leb [19;3;7;6] = [1;3;2;0] means thatn
+        - the first element of [1;3;2;0], 1, is the rank of the lowest
+          value in [19;3;7;6] which is 3,
+        - the second element of [1;3;2;0], 3, is the rank of the next
+          lowest value in [19;3;7;6] which is 6,
+        - and so on
+*)
+
+Definition collapse l := isort_rank Nat.leb (isort_rank Nat.leb l).
+
+Theorem collapse_length : ∀ l, length (collapse l) = length l.
+Proof.
+intros.
+unfold collapse.
+now do 2 rewrite isort_rank_length.
+Qed.
