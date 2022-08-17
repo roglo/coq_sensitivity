@@ -43,14 +43,12 @@ Qed.
 
 (* Permutations of {0, 1, 2, ... n-1} *)
 
+(*
+Definition is_permut_list l := permutation Nat.eqb l (seq 0 (length l)).
+*)
 Definition is_permut_list l := AllLt l (length l) ∧ NoDup l.
-
-Definition is_permut_list_bool l :=
-  (⋀ (a ∈ l), (a <? length l)) &&
-  (⋀ (i = 1, length l),
-     (⋀ (j = 1, length l), ((l.(i) ≠? l.(j)) || (i =? j)))).
-
 Definition is_permut n f := is_permut_list f ∧ length f = n.
+(**)
 
 (* *)
 
@@ -311,76 +309,6 @@ now apply Hph.
 Qed.
 
 Arguments permut_comp_assoc n%nat [f g h]%list.
-
-Theorem is_permut_list_is_permut_list_bool : ∀ l,
-  is_permut_list l ↔ is_permut_list_bool l = true.
-Proof.
-intros.
-split. {
-  intros (H1, H2).
-  unfold is_permut_list_bool.
-  apply andb_true_iff.
-  split. {
-    apply all_true_and_list_true_iff.
-    intros i Hi.
-    apply Nat.ltb_lt.
-    now apply H1.
-  } {
-    apply all_true_and_seq_true_iff.
-    intros i Hi.
-    apply all_true_and_seq_true_iff.
-    intros j Hj.
-    apply orb_true_iff.
-    specialize (NoDup_nat _ H2 (i - 1) (j - 1)) as H3.
-    assert (H : i - 1 < length l) by flia Hi.
-    specialize (H3 H); clear H.
-    assert (H : j - 1 < length l) by flia Hj.
-    specialize (H3 H); clear H.
-    destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-      subst j.
-      now right; rewrite Nat.eqb_eq.
-    }
-    left.
-    apply negb_true_iff.
-    apply Nat.eqb_neq.
-    intros H.
-    specialize (H3 H).
-    flia Hi Hj H3 Hij.
-  }
-} {
-  intros Hb.
-  unfold is_permut_list_bool in Hb.
-  apply andb_true_iff in Hb.
-  destruct Hb as (H1, H2).
-  split. {
-    intros i Hi.
-    specialize (proj2 (all_true_and_list_true_iff _ _ _) H1) as H3.
-    specialize (H3 _ Hi).
-    now apply Nat.ltb_lt.
-  } {
-    clear H1.
-    apply nat_NoDup.
-    intros i j Hi Hj Hij.
-    specialize (proj2 (all_true_and_list_true_iff _ _ _) H2) as H3.
-    rewrite Nat_sub_succ_1 in H3.
-    specialize (H3 (S i)).
-    rewrite Nat_sub_succ_1 in H3.
-    assert (H : S i ∈ seq 1 (length l)) by (apply in_seq; flia Hi).
-    specialize (H3 H); clear H.
-    specialize (proj2 (all_true_and_list_true_iff _ _ _) H3) as H4.
-    rewrite Nat_sub_succ_1 in H4.
-    specialize (H4 (S j)).
-    rewrite Nat_sub_succ_1 in H4; cbn in H4.
-    assert (H : S j ∈ seq 1 (length l)) by (apply in_seq; flia Hj).
-    specialize (H4 H); clear H.
-    apply orb_true_iff in H4.
-    rewrite Nat.eqb_eq in H4.
-    destruct H4 as [H4| H4]; [ | easy ].
-    apply negb_true_iff in H4.
-    now apply Nat.eqb_neq in H4.
-  }
-}
-Qed.
 
 (*
    Canonical Symmetric Group.
@@ -1199,7 +1127,7 @@ intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
 assert (H : is_permut 0 []). {
   split; [ | easy ].
-  now apply is_permut_list_is_permut_list_bool.
+  split; [ easy | constructor ].
 }
 specialize (Hsurj _ H) as H1; clear H.
 apply (In_nth _ _ []) in H1.
