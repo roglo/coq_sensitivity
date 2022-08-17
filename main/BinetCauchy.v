@@ -1568,7 +1568,28 @@ Theorem app_seq_swap_is_permut_list : ∀ i j l,
   → i < j
   → is_permut_list (seq 0 i ++ list_swap_elem 0 (j :: l) 0 (j - i)).
 Proof.
+(*
 intros * Hp Hilj.
+unfold is_permut_list.
+rewrite app_length, seq_length, list_swap_elem_length.
+rewrite seq_app, Nat.add_0_l.
+apply (permutation_app_head Nat.eqb_eq).
+unfold is_permut_list in Hp.
+rewrite app_length, seq_length, seq_app, Nat.add_0_l in Hp.
+apply (permutation_app_inv_l Nat.eqb_eq) in Hp.
+Search (is_permut_list (list_swap_elem _ _ _ _)).
+rewrite <- list_swap_elem_length with (d := 0) (p := 0) (q := j - i).
+Check list_swap_elem_is_permut_list.
+...
+Definition is_permut_list l := permutation Nat.eqb l (seq 0 (length l)).
+Search is_permut_list.
+...
+rewrite app_length, seq_length in Hp; cbn in Hp.
+Search (seq _ (_ + _)).
+...
+*)
+intros * Hp Hilj.
+apply is_permut_list_iff.
 split. {
   intros k Hk.
   rewrite app_length, seq_length, list_swap_elem_length; cbn.
@@ -1583,6 +1604,7 @@ split. {
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec u 0) as [Huz| Huz]. {
     subst u.
+    apply is_permut_list_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     specialize (Hpp (nth (j - i) (j :: l) 0)) as H2.
@@ -1605,6 +1627,7 @@ split. {
   }
   destruct u; [ easy | ].
   cbn.
+  apply is_permut_list_iff in Hp.
   destruct Hp as (Hpp, Hpl).
   rewrite app_length, seq_length in Hpp; cbn in Hpp.
   apply Hpp, in_or_app.
@@ -1663,6 +1686,7 @@ split. {
       rewrite Nat_succ_sub_succ_r in Huv; [ | easy ].
       rewrite List_nth_succ_cons in Huv.
       rewrite <- Huv.
+      apply is_permut_list_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       assert (Hj : j ∈ seq (S i) (length l)). {
@@ -1693,6 +1717,7 @@ split. {
     }
     rewrite Nat_succ_sub_succ_r; [ | flia Hvi Hviz ].
     rewrite List_nth_succ_cons.
+    apply is_permut_list_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     unfold list_swap_elem in Huv.
@@ -1753,6 +1778,7 @@ split. {
         rewrite List_nth_0_cons in Huv.
         assert (H : v = j) by flia Hvij Hviz.
         subst v; clear Hvij Hviz.
+        apply is_permut_list_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         assert (Hul : j ∈ l). {
@@ -1765,6 +1791,7 @@ split. {
         apply NoDup_cons_iff in Hjl.
         easy.
       }
+      apply is_permut_list_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       apply NoDup_app_iff in Hpl.
@@ -1793,6 +1820,7 @@ split. {
           apply nth_In.
           flia Hu Hilj.
         }
+        apply is_permut_list_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1810,6 +1838,7 @@ split. {
         apply nth_In.
         flia Hv Hviz.
       }
+      apply is_permut_list_iff in Hp.
       destruct Hp as (Hpp, Hpl).
       rewrite app_length, seq_length in Hpp; cbn in Hpp.
       apply NoDup_app_iff in Hpl.
@@ -1824,6 +1853,7 @@ split. {
         clear Hvi Hviz Hv.
         rewrite (@Nat_succ_sub_succ_r j i) in Huv; [ | easy ].
         rewrite List_nth_succ_cons in Huv.
+        apply is_permut_list_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1851,6 +1881,7 @@ split. {
           apply nth_In.
           flia Hu Huiz.
         }
+        apply is_permut_list_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1860,6 +1891,7 @@ split. {
       } {
         rewrite (@Nat_succ_sub_succ_r v i) in Huv; [ | flia Hviz ].
         rewrite List_nth_succ_cons in Huv.
+        apply is_permut_list_iff in Hp.
         destruct Hp as (Hpp, Hpl).
         rewrite app_length, seq_length in Hpp; cbn in Hpp.
         apply NoDup_app_iff in Hpl.
@@ -1887,6 +1919,7 @@ split. {
     }
     rewrite seq_nth in Hvi; [ | cbn; flia Hu ].
     rewrite Nat.add_0_l in Hvi.
+    apply is_permut_list_iff in Hp.
     destruct Hp as (Hpp, Hpl).
     rewrite app_length, seq_length in Hpp; cbn in Hpp.
     apply NoDup_app_iff in Hpl.
@@ -3094,6 +3127,8 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
     now rewrite isort_rank_length.
   } {
     rewrite Hn.
+    apply collapse_length.
+  } {
     apply collapse_is_permut.
   }
   rewrite permut_comp_isort_rank_r; [ | apply isort_rank_is_permut_list ].
@@ -3109,7 +3144,9 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
     now rewrite collapse_length.
   } {
     rewrite Hn.
-    now apply isort_rank_is_permut.
+    apply isort_rank_length.
+  } {
+    apply isort_rank_is_permut_list.
   }
   unfold collapse.
   rewrite permut_comp_isort_rank_l; [ | apply isort_rank_is_permut_list ].
@@ -3273,7 +3310,6 @@ apply NoDup_permutation. {
     }
     apply (permutation_sym Nat.eqb_eq).
     eapply (permutation_trans Nat.eqb_eq). {
-      apply permut_list_permutation_iff.
       apply isort_rank_is_permut_list.
     }
     rewrite isort_rank_length, <- Hn.

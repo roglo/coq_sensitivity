@@ -2631,8 +2631,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-...
-        apply permut_list_ub; [ | easy ].
+        apply permut_list_ub; [ | now apply nth_In ].
         apply isort_rank_is_permut_list.
       }
       rewrite isort_rank_length.
@@ -2670,6 +2669,8 @@ split. {
   } {
     do 2 apply isort_rank_is_permut.
     now destruct Hl.
+  } {
+    apply isort_rank_is_permut_list.
   }
   rewrite permut_comp_isort_rank_r; [ | now destruct Hσ ].
   rewrite comp_1_l. 2: {

@@ -804,6 +804,7 @@ Theorem map_permut_seq_is_permut : ∀ n σ,
 Proof.
 intros * Hσ.
 split; [ | now rewrite List_map_seq_length ].
+apply is_permut_list_iff.
 split. {
   intros i Hi.
   apply in_map_iff in Hi.
@@ -813,7 +814,7 @@ split. {
   rewrite <- Hji.
   destruct Hσ as (H1, H2).
   rewrite <- H2 in Hj |-*.
-  now apply permut_list_ub.
+  apply permut_list_ub; [ easy | now apply nth_In ].
 } {
   apply (NoDup_map_iff 0).
   rewrite seq_length.
@@ -821,7 +822,9 @@ split. {
   rewrite seq_nth in Hij; [ | easy ].
   rewrite seq_nth in Hij; [ | easy ].
   do 2 rewrite Nat.add_0_l in Hij.
-  destruct Hσ as ((Hσa, Hσn), Hσl).
+  destruct Hσ as (Hσa, Hσl).
+  apply is_permut_list_iff in Hσa.
+  destruct Hσa as (Hσa, Hσn).
   apply (NoDup_nat _ Hσn); [ congruence | congruence | easy ].
 }
 Qed.
