@@ -4894,6 +4894,173 @@ apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
   unfold g1.
+  replace (collapse kl) with (map pred kl). 2: {
+    apply in_all_permut_permutation in Hkl.
+    assert (H : equality eqb) by now unfold equality; apply Nat.eqb_eq.
+    eapply permutation_map with (f := pred) in Hkl; [ | easy | easy ].
+    replace (map pred (seq 1 m)) with (seq 0 m) in Hkl. 2: {
+      clear; remember 0 as sta; clear Heqsta.
+      revert sta.
+      induction m; intros; [ easy | cbn ].
+      f_equal; apply IHm.
+    }
+Search (collapse (map _ _)).
+Fixpoint isort_rank_insert {A} (rel : A → A → bool) la d ia lrank :=
+  match lrank with
+  | [] => [ia]
+  | ib :: l =>
+      if rel (nth ia la d) (nth ib la d) then ia :: lrank
+      else ib :: isort_rank_insert rel la d ia l
+  end.
+
+Fixpoint isort_rank' {A} (rel : A → A → bool) (l : list A) :=
+  match l with
+  | [] => []
+  | d :: l' => isort_rank_insert rel l d 0 (map S (isort_rank' rel l'))
+  end.
+
+Theorem isort_insert_isort_rank_insert : ∀ A d (rel : A → _) la ia lrank,
+  isort_insert (λ ia ib, rel (nth ia la d) (nth ib la d)) ia lrank =
+  isort_rank_insert rel la d ia lrank.
+Proof.
+intros.
+revert la ia.
+induction lrank as [| ib]; intros; [ easy | cbn ].
+remember (rel (nth ia la d) (nth ib la d)) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+f_equal.
+apply IHlrank.
+Qed.
+
+Theorem isort_rank_isort_rank' : ∀ A (rel : A → _) la,
+  isort_rank rel la = isort_rank' rel la.
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+rewrite <- IHla.
+apply isort_insert_isort_rank_insert.
+Qed.
+
+Theorem collapse_map : ∀ f la,
+  (∀ a b, a ∈ la → b ∈ la → (a <=? b) = (f a <=? f b))
+  → collapse (map f la) = collapse la.
+Proof.
+intros * Hf.
+unfold collapse.
+do 2 rewrite isort_rank_isort_rank'.
+destruct la as [| a]; [ easy | ].
+cbn - [ nth ].
+rewrite isort_insert_isort_rank_insert.
+do 2 rewrite isort_rank_isort_rank'.
+f_equal.
+rewrite <- map_cons.
+Print isort_rank_insert.
+Print isort_insert.
+Search (isort_insert _ _ (map _ _)).
+Theorem isort_rank_insert_map : ∀ d la ia lrank f,
+  (∀ ia ib d, ia < length la → ib < length la →
+    (nth ia (map f la) d <=? nth ib (map f la) d) =
+    (nth ia la d <=? nth ib la d))
+  → isort_rank_insert Nat.leb (map f la) (f d) ia lrank =
+    isort_rank_insert Nat.leb la (f d) ia lrank.
+Proof.
+intros * Hab.
+revert la ia Hab.
+induction lrank as [| ib]; intros; [ easy | cbn ].
+rewrite IHlrank. 2: {
+  intros ic id e.
+  now apply Hab.
+}
+destruct (lt_dec ia (length la)) as [Hia| Hia]. 2: {
+  apply Nat.nlt_ge in Hia.
+  rewrite nth_overflow; [ | now rewrite map_length ].
+  symmetry.
+  rewrite nth_overflow; [ | easy ].
+  symmetry.
+  destruct (lt_dec ib (length la)) as [Hib| Hib]. 2: {
+    apply Nat.nlt_ge in Hib.
+    rewrite nth_overflow; [ | now rewrite map_length ].
+    now rewrite nth_overflow.
+  }
+...
+rewrite Hab, if_leb_le_dec; [ easy | | ].
+Qed.
+rewrite isort_rank_insert_map. 2: {
+  intros ia ib d.
+  destruct (lt_dec ia (S (length la))) as [Hial| Hial]. 2: {
+    apply Nat.nlt_ge in Hial.
+    rewrite nth_overflow; [ | now rewrite map_length ].
+    destruct (lt_dec ib (S (length la))) as [Hibl| Hibl]. 2: {
+      apply Nat.nlt_ge in Hibl.
+      rewrite nth_overflow; [ | now rewrite map_length ].
+      rewrite Nat.leb_refl; symmetry.
+      rewrite nth_overflow; [ | easy ].
+      rewrite nth_overflow; [ | easy ].
+      apply Nat.leb_refl.
+    }
+    symmetry.
+    rewrite nth_overflow; [ | easy ].
+...
+      rewrite Hf; cycle 1. {
+        destruct ia; [ easy | cbn ].
+        apply Nat.succ_le_mono in Hial.
+        rewrite nth_overflow; [ | easy ].
+...
+      apply Nat.leb_le.
+
+
+  rewrite (List_map_nth' d).
+
+...
+  rewrite <- Hf.
+  rewrite Hf; cycle 1. {
+...
+    rewrite (List_map_nth' d).
+...
+  remember (_ <=? _) as x eqn:Hx; symmetry in Hx |-*.
+  destruct x. {
+    apply Nat.leb_le in Hx; apply Nat.leb_le.
+...
+  isort_rank_insert Nat.leb (map f (a :: la)) (f a) 0 (map S (isort_rank' Nat.leb (map f la))) =
+  isort_rank_insert Nat.leb (a :: la) a 0 (map S (isort_rank' Nat.leb la))
+...
+intros * Hf.
+unfold collapse.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+Print isort_rank.
+...
+rewrite <- (collapse_map pred).
+Search (permutation _ (seq _ _)).
+Search (permutation _ _ (seq _ _)).
+Search (collapse _ = _).
+Search (map _ (seq _ _)).
+Search (map pred).
+About permutation_map.
+Require Import Permutation.
+Check Permutation_map.
+Search (Permutation (map _ _)).
+...
+    apply in_all_permut_iff in Hkl.
+Search (permutation _ _ (seq _ _)).
+...
+  unfold "°".
+  rewrite map_map.
+Search (ε (map _ _)).
+...
+  rewrite <- (@ε_collapse_ε _ _ kl).
+Search (ε (_ ° _)).
+  rewrite sorted_permuted_comp_collapse; [ | | ]. {
+...
+  replace (collapse kl) with (map pred kl).
+...
+  rewrite sorted_permuted_comp_collapse; [ | | ]. {
+...
+unfold "°".
+rewrite map_map.
+...
+(*
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
@@ -4906,8 +5073,21 @@ Compute (
 let m := length jl in
 map (λ kl,
   (jl ° collapse kl) = kl) (all_permut (seq 1 m))).
+*)
 Search (ε _ = ε _).
 About sorted_permuted_comp_collapse.
+...
+  rewrite sorted_permuted_comp_collapse; [ | | ]. {
+...
+Theorem collapse_collapse_ε : ∀ i j la lb,
+  collapse (map (add i) la) = collapse (map (add j) lb) → ε la = ε lb.
+...
+apply (collapse_collapse_ε 1 0).
+replace (add 1) with S by easy.
+rewrite map_id.
+cbn.
+rewrite collapse_comp.
+  rewrite sorted_permuted_comp_collapse; [ | | ]. {
 ...
   rewrite sorted_permuted_comp_collapse; [ easy | | ]. {
     now apply sorted_nat_ltb_leb_incl.
