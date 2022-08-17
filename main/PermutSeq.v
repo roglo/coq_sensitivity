@@ -16,12 +16,6 @@ Definition comp_list (la lb : list nat) := map (λ i, nth i la 0) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
-(* faut-il remplacer AllLt (perso) par FinFun.bfun (officiel) ?
-Print FinFun.bFun.
-Print AllLt.
-Print FinFun.bInjective.
-*)
-
 Theorem FinFun_bfun_AllLt : ∀ la,
   FinFun.bFun (length la) (λ i, nth i la 0) ↔ AllLt la (length la).
 Proof.
