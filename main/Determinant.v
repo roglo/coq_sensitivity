@@ -663,7 +663,10 @@ assert (H1 :
     exists (canon_sym_gr_list_inv n (map pred l)).
     assert (Hp : is_permut n (map pred l)). {
       unfold is_permut.
-      split; [ split | ]; [ | easy | now rewrite map_length ].
+      rewrite map_length.
+      split; [ | easy ].
+      apply is_permut_list_iff.
+      split; [ | easy ].
       intros j Hj.
       rewrite map_length, Hln.
       apply in_map_iff in Hj.
@@ -1223,7 +1226,6 @@ erewrite rngl_summation_eq_compat. 2: {
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
     replace n with (length la) by now rewrite Hla, List_map_seq_length.
-    apply permut_list_permutation_iff.
     subst la.
     now apply transposition_is_permut.
   }
@@ -1347,6 +1349,7 @@ erewrite rngl_summation_eq_compat. 2: {
       symmetry.
       apply canon_sym_gr_list_length.
     }
+    apply is_permut_list_iff.
     split. {
       intros i Hi.
       rewrite List_map_seq_length.
@@ -1414,6 +1417,7 @@ rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
     rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
 (* lemme à faire ? *)
       split; [ | now rewrite map_length, seq_length ].
+      apply is_permut_list_iff.
       split. {
         intros j Hj.
         rewrite map_length, seq_length.
@@ -1454,10 +1458,10 @@ rewrite (rngl_summation_list_permut _ Nat.eqb_eq) with (lb := seq 0 n!);
     cycle 1. {
   remember (map _ _) as la eqn:Hla.
   replace n! with (length la) by now rewrite Hla, List_map_seq_length.
-  apply permut_list_permutation_iff.
   subst la.
 (* lemma to do? *)
   unfold g, f.
+  apply is_permut_list_iff.
   split. {
     intros i Hi.
     rewrite map_length, seq_length.
@@ -1762,7 +1766,9 @@ Proof.
 intros Hic * Hnz Hσ.
 destruct n; [ easy | clear Hnz ].
 rewrite Nat_sub_succ_1.
-destruct Hσ as ((Hs, Hinj) & Hσl).
+destruct Hσ as (Hs, Hσl).
+apply is_permut_list_iff in Hs.
+destruct Hs as (Hs, Hinj).
 revert σ Hs Hinj Hσl.
 induction n; intros; cbn. {
   do 2 rewrite rngl_product_only_one.
@@ -1794,7 +1800,9 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
     rewrite Hσl in H1.
     enough (H : nth i σ 0 ≠ S n) by flia H1 H; intros Hσs.
     rewrite <- Hσs in His.
-    rewrite permut_isort_permut in His; [ | easy | rewrite Hσl; flia Hi ].
+    rewrite permut_isort_permut in His; [ | | rewrite Hσl; flia Hi ]. 2: {
+      now apply is_permut_list_iff.
+    }
     now apply lt_irrefl in His.
   } {
     rewrite Nat.add_1_r.
@@ -1807,7 +1815,9 @@ assert (Hs' : ∀ x, x ∈ σ' → x < S n). {
     rewrite Hσl in H1.
     enough (H : nth (S i) σ 0 ≠ S n) by flia H1 H; intros Hσs.
     rewrite <- Hσs in His.
-    rewrite permut_isort_permut in His; [ | easy | rewrite Hσl; flia Hi ].
+    rewrite permut_isort_permut in His; [ | | rewrite Hσl; flia Hi ]. 2: {
+      now apply is_permut_list_iff.
+    }
     now apply His.
   }
 }
@@ -1866,12 +1876,14 @@ destruct (Nat.eq_dec k (S n)) as [Hksn| Hksn]. {
   rewrite IHn; f_equal; f_equal.
   rewrite Hk in Hksn.
   rewrite <- Hksn at 1.
-  apply permut_permut_isort; [ easy | now rewrite Hσl ].
+  apply permut_permut_isort; [ | now rewrite Hσl ].
+  now apply is_permut_list_iff.
 }
 specialize (isort_rank_is_permut_list Nat.leb) as H1.
 specialize (H1 σ).
 rewrite rngl_product_split with (j := k) in IHn. 2: {
   split; [ flia | ].
+  apply is_permut_list_iff in H1.
   destruct H1 as (H1 & H2).
   apply -> Nat.succ_le_mono.
   rewrite isort_rank_length, Hσl in H1.
@@ -1915,7 +1927,8 @@ destruct (Nat.eq_dec k 0) as [Hkz| Hkz]. {
   f_equal.
   f_equal. 2: {
     f_equal; rewrite Hk at 1.
-    apply permut_permut_isort; [ easy | now rewrite Hσl ].
+    apply permut_permut_isort; [ | now rewrite Hσl ].
+    now apply is_permut_list_iff.
   }
   apply rngl_product_eq_compat.
   intros i Hi.
@@ -1926,6 +1939,7 @@ erewrite rngl_product_eq_compat in IHn. 2: {
   intros i Hi.
   unfold σ'; cbn - [ seq ].
   assert (H : i - 1 < S n). {
+    apply is_permut_list_iff in H1.
     destruct H1 as (H1, H2).
     specialize (H1 k).
     assert (H : k ∈ isort_rank Nat.leb σ). {
@@ -1967,6 +1981,7 @@ symmetry.
 rewrite rngl_product_split with (j := k). 2: {
   split; [ flia | ].
   rewrite Hk.
+  apply is_permut_list_iff in H1.
   destruct H1 as (H1, H2).
   rewrite isort_rank_length, Hσl in H1.
   apply Nat.lt_le_incl.
@@ -1977,6 +1992,7 @@ do 2 rewrite <- rngl_mul_assoc.
 f_equal.
 rewrite rngl_product_split_last. 2: {
   rewrite Nat.add_1_r, Hk.
+  apply is_permut_list_iff in H1.
   destruct H1 as (H1, H2).
   rewrite isort_rank_length, Hσl in H1.
   apply Nat.lt_succ_r.
@@ -1986,6 +2002,7 @@ rewrite rngl_product_split_last. 2: {
 rewrite rngl_product_succ_succ' with (g0 := λ i, f (nth i σ 0)).
 rewrite rngl_product_split_first. 2: {
   rewrite Nat.add_1_r.
+  apply is_permut_list_iff in H1.
   destruct H1 as (H1, H2).
   rewrite isort_rank_length, Hσl in H1.
   specialize (H1 (S k)).
@@ -2001,7 +2018,8 @@ replace (nth (k + 1) σ 0) with (S n). 2: {
   rewrite Nat.add_1_r.
   rewrite Hk.
   symmetry.
-  apply permut_permut_isort; [ easy | now rewrite Hσl ].
+  apply permut_permut_isort; [ | now rewrite Hσl ].
+  now apply is_permut_list_iff.
 }
 rewrite <- rngl_mul_assoc.
 rewrite rngl_mul_comm; [ | easy ].
@@ -2022,6 +2040,7 @@ destruct
 }
 assert (Hkn : S (k + 1) ≤ n). {
   rewrite Nat.add_1_r.
+  apply is_permut_list_iff in H1.
   destruct H1 as (H1, H2).
   apply Nat.le_succ_l.
   rewrite isort_rank_length, Hσl in H1.
@@ -2067,8 +2086,7 @@ rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
     (lb := seq 0 n); [ | easy | ]. 2: {
   destruct Hσ as (H1, H2).
   rewrite <- H2 at 1.
-  rewrite <- List_map_nth_seq, <- H2.
-  now apply permut_list_permutation_iff.
+  now rewrite <- List_map_nth_seq, <- H2.
 }
 unfold iter_seq.
 rewrite Nat_sub_succ_1.
@@ -2136,10 +2154,10 @@ rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
 rewrite Nat_sub_succ_1.
 remember (map _ _) as la eqn:Hla.
 replace n! with (length la) by now rewrite Hla, List_map_seq_length.
-apply permut_list_permutation_iff.
 subst la.
 (* lemma to do? *)
 unfold h.
+apply is_permut_list_iff.
 split. {
   intros i Hi.
   rewrite List_map_seq_length.
@@ -2172,6 +2190,7 @@ Theorem map_nth_permut_permut_is_permut : ∀ n l1 l2,
 Proof.
 intros n l σ (Hl1, Hl2) (Hσ1, Hσ2).
 split; [ | now rewrite map_length ].
+apply is_permut_list_iff.
 split. {
   intros i Hi; apply in_map_iff in Hi.
   destruct Hi as (j & Hji & Hj).
@@ -2179,19 +2198,25 @@ split. {
   rewrite <- Hji.
   rewrite Hσ2, <- Hl2.
   apply permut_list_ub; [ easy | ].
+  apply nth_In.
   rewrite Hl2, <- Hσ2.
+  apply is_permut_list_iff in Hσ1.
   now apply Hσ1.
 } {
   apply (NoDup_map_iff 0).
   intros u v Hu Hv Huv.
+  apply is_permut_list_iff in Hl1.
   destruct Hl1 as (Ha1, Hn1).
   apply (NoDup_nat _ Hn1) in Huv; cycle 1. {
     rewrite Hl2, <- Hσ2.
+    apply is_permut_list_iff in Hσ1.
     now apply Hσ1, nth_In.
   } {
     rewrite Hl2, <- Hσ2.
+    apply is_permut_list_iff in Hσ1.
     now apply Hσ1, nth_In.
   }
+  apply is_permut_list_iff in Hσ1.
   destruct Hσ1 as (Hσa1, Hσn1).
   now apply (NoDup_nat _ Hσn1) in Huv.
 }
@@ -2223,6 +2248,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     assert (H : length (isort_rank Nat.leb σ) = n). {
       rewrite isort_rank_length; apply Hσ.
     }
+...
     rewrite <- (permut_comp_assoc _ H Hσ); clear H.
     rewrite permut_comp_isort_rank_l; [ | now destruct Hσ ].
     apply comp_1_r.
