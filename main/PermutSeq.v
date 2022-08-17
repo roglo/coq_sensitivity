@@ -78,157 +78,75 @@ split; intros Hl. {
 }
 destruct Hl as (Hp1, Hp2).
 unfold is_permut_list.
-apply NoDup_permutation; [ | easy | apply seq_NoDup | ]. {
-  unfold equality; apply Nat.eqb_eq.
-} {
-  intros i.
-  unfold AllLt in Hp1.
-  split; intros Hi. {
-    apply in_seq; split; [ easy | now apply Hp1 ].
-  }
-  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
-(**)
-remember (length l) as n eqn:Hn; symmetry in Hn.
-revert i l Hn Hp1 Hp2 Hi.
-induction n; intros; [ easy | cbn ].
-destruct l as [| a]; [ easy | ].
-cbn in Hn; apply Nat.succ_inj in Hn.
-destruct (Nat.eq_dec i a) as [Hia| Hia]. {
-  now subst a; left.
+remember (length l) as len eqn:Hlen; symmetry in Hlen.
+revert l Hlen Hp1 Hp2.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst l.
 }
-right.
-apply IHn; [ easy | | | ]. 3: {
-  destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia Hi Hin ].
-  subst i; exfalso; clear Hi.
-  assert (Hp3 : ∀ i, i ∈ a :: l → i < n). {
+rewrite seq_S; cbn.
+unfold AllLt in Hp1.
+assert (H : len ∈ l). {
+  destruct (equality_in_dec Nat.eqb_eq len l) as [H1| H1]; [ easy | exfalso ].
+  specialize (pigeonhole_list len l) as H2.
+  rewrite Hlen in H2.
+  assert (H : len < S len) by easy.
+  specialize (H2 H); clear H.
+  assert (H : ∀ i, i ∈ l → i < len). {
     intros i Hi.
-    specialize (Hp1 _ Hi) as H1.
-    destruct Hi as [Hi| Hi]. {
-      subst a; flia Hia H1.
-    }
-    destruct (Nat.eq_dec i n) as [Hin| Hin]; [ | flia H1 Hin ].
-    subst i; exfalso; clear H1.
-...
-  revert i Hi.
-  induction l as [| j]; intros; [ easy | ].
-(*
-  specialize (pigeonhole_list i (j :: l) Hi) as H1.
-  assert (H : ∀ k, k ∈ j :: l → k < i). {
-    intros k Hk.
-    destruct Hk as [Hk| Hk]. {
-      subst k.
-*)
-  destruct i. {
-    destruct j; [ now left | right ].
-    clear Hi.
-    apply NoDup_cons_iff in Hp2.
-    destruct Hp2 as (Hj & Hnd).
-    assert (H : ∀ i, i ∈ l → i < length l). {
-      intros i Hi.
-      specialize (Hp1 _ (or_intror Hi)) as H1.
-      cbn in H1.
-      destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
-      exfalso; subst i; clear H1.
-      specialize (Hp1 _ (or_introl eq_refl)) as H2.
-      cbn in H2.
-      apply Nat.succ_lt_mono in H2.
-      cbn - [ In ] in Hp1.
-(**)
-      rename Hi into Hll.
-...
-      assert (H : ∀ i, i ∈ l → i < length l). {
-        intros i Hi.
-        specialize (Hp1 _ (or_intror Hi)) as H1.
-        destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
-        exfalso; subst i; clear H1 Hi.
-...
-(**)
-apply (In_nth _ _ 0) in Hi.
-destruct Hi as (k & Hkl & Hi).
-destruct (Nat.eq_dec j k) as [Hjk| Hjk]. {
-  subst k; clear H2.
-  specialize (pigeonhole_list (length l) (butn j l)) as H3.
-  assert (H : ∀ x, x ∈ l → x < j). {
-    intros k Hk.
-    specialize (Hp1 _ (or_intror Hk)).
-...
-Check pigeonhole_list.
-specialize (pigeonhole_list (length l)) as H3.
-...
-specialize (pigeonhole_list (S (length l)) (S j :: butn k l)) as H3.
-l = S j :: butn k l
-x < S (length l)
-...
-cbn - [ In nth ] in H3.
-rewrite butn_length in H3.
-...
-specialize (pigeonhole_list (nth k l 0) (S j :: butn k l)) as H3.
-cbn - [ In nth ] in H3.
-rewrite Hi in H3.
-rewrite butn_length in H3.
-generalize Hk; intros H.
-apply Nat.ltb_lt in H; rewrite H in H3; clear H.
-...
-rewrite <- Nat.sub_succ_l in H3.
-2: cbn.
-...
-specialize (pigeonhole_list (nth k l 0) (butn k l)) as H3.
-rewrite Hi in H3.
-
-...
-specialize (pigeonhole_list (nth j l 0)) as H3.
-...
-specialize (Hp1 j) as H3.
-...
-specialize (pigeonhole_list (length (S j :: l))) as H3.
-...
-      specialize (pigeonhole_list j l H2) as H3.
-      assert (H : ∀ k, k ∈ l → k < j). {
-        intros k Hk.
-        specialize (Hp1 _ (or_intror Hk)) as H4.
-        cbn in H4.
-...
-(**)
-      destruct (Nat.eq_dec (S j) (length l)) as [H1| H1]. {
-        now rewrite <- H1 in Hi.
-      }
-      specialize (pigeonhole_list (S j) (S j :: l)) as H2.
-      assert (H : S j < length (S j :: l)). {
-        now specialize (Hp1 _ (or_introl eq_refl)).
-      }
-      specialize (H2 H); clear H.
-      assert (H : ∀ k, k ∈ S j :: l → k < S j). {
-        intros k Hk.
-        destruct Hk as [Hk| Hk]. {
-          subst k.
-...
-      specialize (pigeonhole_list (length l) (S j :: l)) as H1.
-      assert (H : length l < length (S j :: l)) by now cbn.
-      specialize (H1 H); clear H.
-      assert (H : ∀ k, k ∈ S j :: l → k < length l). {
-        intros k Hk.
-        destruct Hk as [Hk| Hk]. {
-          subst k.
-          specialize (Hp1 _ (or_introl eq_refl)); cbn in Hp1.
-          apply Nat.succ_lt_mono in Hp1.
-          destruct (Nat.eq_dec (S j) (length l)) as [H2| H2]; [ | flia H2 Hp1 ].
-...
-    apply IHl; [ | easy | ]. 2: {
-      specialize (Hp1 _ (or_introl eq_refl)).
-      cbn in Hp1.
-      apply Nat.succ_lt_mono in Hp1; flia Hp1.
-    }
-    clear Hi.
-    intros i Hi.
-    specialize (Hp1 _ (or_intror Hi)) as H1.
-    cbn in H1.
-    destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
-    exfalso; subst i; clear H1.
-    specialize (Hp1 _ (or_introl eq_refl)) as H2.
-    cbn in H2.
-    apply Nat.succ_lt_mono in H2.
-Search (NoDup _ → ∀ _, _).
-...
+    specialize (Hp1 _ Hi).
+    destruct (Nat.eq_dec i len) as [Hil| Hil]; [ | flia Hp1 Hil ].
+    now subst i.
+  }
+  specialize (H2 H); clear H.
+  remember (pigeonhole_comp_list l) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (i, j).
+  specialize (H2 _ _ eq_refl).
+  destruct H2 as (Hil & Hj & H & Hij).
+  apply H; clear H.
+  rewrite <- Hlen in Hil, Hj.
+  now apply (NoDup_nth l 0).
+}
+apply in_split in H.
+destruct H as (l1 & l2 & Hl); subst l.
+apply (permutation_elt Nat.eqb_eq).
+rewrite app_nil_r.
+apply IHlen. {
+  rewrite app_length in Hlen; cbn in Hlen.
+  rewrite Nat.add_succ_r in Hlen.
+  apply Nat.succ_inj in Hlen.
+  now rewrite <- app_length in Hlen.
+} {
+  intros i Hi.
+  specialize (Hp1 i) as H1.
+  assert (H : i ∈ l1 ++ len :: l2). {
+    apply in_app_or in Hi; apply in_or_app.
+    destruct Hi as [Hi| Hi]; [ now left | now right; right ].
+  }
+  specialize (H1 H); clear H.
+  destruct (Nat.eq_dec i len) as [H2| H2]; [ | flia H1 H2 ].
+  subst i; clear H1.
+  apply NoDup_app_iff in Hp2.
+  destruct Hp2 as (H1 & H2 & H4).
+  apply NoDup_cons_iff in H2.
+  destruct H2 as (H2 & H3).
+  apply in_app_or in Hi.
+  destruct Hi as [Hi| Hi]; [ | easy ].
+  specialize (H4 _ Hi).
+  now exfalso; apply H4; left.
+} {
+  apply NoDup_app_iff in Hp2.
+  apply NoDup_app_iff.
+  destruct Hp2 as (H1 & H2 & H3).
+  apply NoDup_cons_iff in H2.
+  split; [ easy | ].
+  split; [ easy | ].
+  intros i Hi.
+  specialize (H3 _ Hi).
+  intros H4; apply H3.
+  now right.
+}
+Qed.
 
 (* *)
 
@@ -623,9 +541,7 @@ specialize (Hlen la (map Some lb)).
 rewrite filter_Some_map_Some in Hlen.
 specialize (Hlen Hpab).
 (**)
-unfold is_permut_list.
-rewrite Hlen.
-...
+apply is_permut_list_iff.
 split. {
   intros i Hi.
   rewrite Hlen.
@@ -740,8 +656,7 @@ Theorem permutation_permut : ∀ la lb,
   → is_permut_list lb.
 Proof.
 intros * Hpab Ha.
-apply permut_list_permutation_iff in Ha.
-apply permut_list_permutation_iff.
+unfold is_permut_list in Ha |-*.
 eapply (permutation_trans Nat.eqb_eq). {
   apply (permutation_sym Nat.eqb_eq), Hpab.
 }
@@ -755,33 +670,11 @@ Theorem is_permut_list_app_max : ∀ l,
   → is_permut_list l.
 Proof.
 intros * Hp.
-destruct Hp as (Hp, Hl).
-unfold AllLt in Hp.
-rewrite app_length, Nat.add_comm in Hp.
-cbn in Hp.
-split. {
-  intros i Hi.
-  specialize (Hp i) as H1.
-  assert (H : i ∈ l ++ [length l]) by now apply in_or_app; left.
-  specialize (H1 H); clear H.
-  destruct (Nat.eq_dec i (length l)) as [Hil| Hil]; [ | flia H1 Hil ].
-  clear H1; exfalso.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (j & Hjl & Hji).
-  specialize (NoDup_nat _ Hl) as H1.
-  rewrite app_length, Nat.add_comm in H1; cbn in H1.
-  specialize (H1 j (length l)).
-  assert (H : j < S (length l)) by flia Hjl.
-  specialize (H1 H); clear H.
-  specialize (H1 (Nat.lt_succ_diag_r _)).
-  rewrite app_nth1 in H1; [ | easy ].
-  rewrite app_nth2 in H1; [ | now unfold ge ].
-  rewrite Nat.sub_diag, Hji in H1.
-  specialize (H1 Hil).
-  flia Hjl H1.
-} {
-  now apply NoDup_app_remove_r in Hl.
-}
+unfold is_permut_list in Hp |-*.
+rewrite app_length in Hp; cbn in Hp.
+rewrite Nat.add_1_r, seq_S in Hp; cbn in Hp.
+apply (permutation_app_inv Nat.eqb_eq) in Hp.
+now do 2 rewrite app_nil_r in Hp.
 Qed.
 
 Theorem sorted_permut : ∀ l,
@@ -790,73 +683,13 @@ Theorem sorted_permut : ∀ l,
   → l = seq 0 (length l).
 Proof.
 intros * Hl Hs.
-induction l as [| a] using rev_ind; [ easy | ].
-rewrite app_length; cbn.
-rewrite Nat.add_1_r.
-rewrite seq_S; cbn.
-assert (Hal : a = length l). {
-  destruct Hl as (H1, H2).
-  rewrite app_length, Nat.add_comm in H1; cbn in H1.
-  unfold AllLt in H1.
-  specialize (H1 a) as H3.
-  assert (H : a ∈ l ++ [a]) by now apply in_or_app; right; left.
-  specialize (H3 H); clear H.
-  assert (H4 : ∀ c, c ∈ l → c ≤ a). {
-    intros c Hc.
-    specialize (proj1 (sorted_app_iff Nat_leb_trans _ _) Hs) as H4.
-    destruct H4 as (_ & _ & H4).
-    specialize (H4 c a Hc (or_introl eq_refl)).
-    now apply Nat.leb_le in H4.
-  }
-  destruct (Nat.eq_dec a (length l)) as [Hal| Hal]; [ easy | exfalso ].
-  assert (H5 : a < length l) by flia H3 Hal; clear H3 Hal.
-  specialize (pigeonhole (length l) a) as H3.
-  specialize (H3 (λ i, nth i l 0)).
-  specialize (H3 H5).
-  cbn in H3.
-  assert (H : ∀ x, x < length l → nth x l 0 < a). {
-    intros x Hx.
-    specialize (H4 (nth x l 0)) as H7.
-    assert (H : nth x l 0 ∈ l) by now apply nth_In.
-    specialize (H7 H); clear H.
-    destruct (Nat.eq_dec (nth x l 0) a) as [Hxa| Hxa]; [ | flia H7 Hxa ].
-    replace a with (nth (length l) (l ++ [a]) 0) in Hxa. 2: {
-      rewrite app_nth2; [ | now unfold ge ].
-      now rewrite Nat.sub_diag.
-    }
-    replace (nth x l 0) with (nth x (l ++ [a]) 0) in Hxa. 2: {
-      now rewrite app_nth1.
-    }
-    apply (NoDup_nat _ H2) in Hxa; cycle 1. {
-      rewrite app_length, Nat.add_comm; cbn.
-      flia Hx.
-    } {
-      now rewrite app_length, Nat.add_comm; cbn.
-    }
-    flia Hx Hxa.
-  }
-  specialize (H3 H); clear H.
-  remember (pigeonhole_fun (length l) (λ i : nat, nth i l 0)) as xx eqn:Hxx.
-  symmetry in Hxx.
-  destruct xx as (x, x').
-  specialize (H3 x x' eq_refl).
-  destruct H3 as (H3 & H6 & H7 & H8).
-  specialize (NoDup_nat _ H2) as H9.
-  specialize (H9 x x').
-  rewrite app_length, Nat.add_comm in H9; cbn in H9.
-  assert (H : x < S (length l)) by flia H3.
-  specialize (H9 H); clear H.
-  assert (H : x' < S (length l)) by flia H6.
-  specialize (H9 H); clear H.
-  apply H7, H9.
-  rewrite app_nth1; [ | easy ].
-  rewrite app_nth1; [ | easy ].
-  easy.
+unfold is_permut_list in Hl.
+apply (sorted_sorted_permuted Nat.eqb_eq Nat_leb_antisym); [ | easy | | ]. {
+  apply Nat_leb_trans.
+} {
+  apply sorted_nat_ltb_leb_incl, sorted_seq.
 }
-rewrite Hal; f_equal.
-apply IHl; [ | now apply (sorted_app_iff Nat_leb_trans) in Hs ].
-subst a.
-now apply is_permut_list_app_max.
+easy.
 Qed.
 
 (* *)
@@ -910,6 +743,7 @@ assert
 }
 clear H1.
 specialize (H2 (nth i l 0)) as H2.
+...
 assert (H : nth i l 0 < length l) by now apply Hp, nth_In.
 specialize (H2 H); clear H.
 destruct Hp as (Ha, Hp).
