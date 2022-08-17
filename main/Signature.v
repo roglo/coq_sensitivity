@@ -2081,16 +2081,6 @@ apply isort_rank_is_permut.
 apply isort_rank_length.
 Qed.
 
-Theorem nth_nth_isort_rank : ∀ A d ord (l : list A) i,
-  i < length l
-  → nth (nth i (isort_rank ord l) 0) l d = nth i (isort ord l) d.
-Proof.
-intros * Hil.
-rewrite (isort_isort_rank _ d).
-rewrite (List_map_nth' 0); [ easy | ].
-now rewrite isort_rank_length.
-Qed.
-
 Theorem permut_isort_rank_involutive : ∀ la,
   is_permut_list la
   → isort_rank Nat.leb (isort_rank Nat.leb la) = la.

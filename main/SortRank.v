@@ -246,3 +246,13 @@ erewrite isort_insert_rel_eq_compat. 2: {
 symmetry.
 easy.
 Qed.
+
+Theorem nth_nth_isort_rank : ∀ A d ord (l : list A) i,
+  i < length l
+  → nth (nth i (isort_rank ord l) 0) l d = nth i (isort ord l) d.
+Proof.
+intros * Hil.
+rewrite (isort_isort_rank _ d).
+rewrite (List_map_nth' 0); [ easy | ].
+now rewrite isort_rank_length.
+Qed.
