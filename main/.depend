@@ -1,9 +1,9 @@
-BinetCauchy.vio: BinetCauchy.v Misc.vio PermutationFun.vio SortingFun.vio RingLike.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio NatRingLike.vio
-BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo PermutationFun.vo SortingFun.vo RingLike.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo NatRingLike.vo
-Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio PermutationFun.vio SortingFun.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
-Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo PermutationFun.vo SortingFun.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
-Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio SortingFun.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio NatRingLike.vio
-Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo PermutationFun.vo SortingFun.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo NatRingLike.vo
+BinetCauchy.vio: BinetCauchy.v Misc.vio RingLike.vio PermutationFun.vio SortingFun.vio SortRank.vio IterAdd.vio IterMul.vio IterAnd.vio Pigeonhole.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio NatRingLike.vio
+BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo RingLike.vo PermutationFun.vo SortingFun.vo SortRank.vo IterAdd.vo IterMul.vo IterAnd.vo Pigeonhole.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo NatRingLike.vo
+Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio PermutationFun.vio SortingFun.vio SortRank.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
+Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo PermutationFun.vo SortingFun.vo SortRank.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
+Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio SortingFun.vio SortRank.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio NatRingLike.vio
+Determinant.vo Determinant.glob Determinant.v.beautified Determinant.required_vo: Determinant.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo PermutationFun.vo SortingFun.vo SortRank.vo MyVector.vo Matrix.vo PermutSeq.vo Signature.vo NatRingLike.vo
 IterAdd.vio: IterAdd.v Misc.vio RingLike.vio PermutationFun.vio
 IterAdd.vo IterAdd.glob IterAdd.v.beautified IterAdd.required_vo: IterAdd.v Misc.vo RingLike.vo PermutationFun.vo
 IterAnd.vio: IterAnd.v Misc.vio
@@ -22,8 +22,8 @@ MyVector.vio: MyVector.v Misc.vio RingLike.vio IterAdd.vio
 MyVector.vo MyVector.glob MyVector.v.beautified MyVector.required_vo: MyVector.v Misc.vo RingLike.vo IterAdd.vo
 NatRingLike.vio: NatRingLike.v Misc.vio RingLike.vio
 NatRingLike.vo NatRingLike.glob NatRingLike.v.beautified NatRingLike.required_vo: NatRingLike.v Misc.vo RingLike.vo
-PermutSeq.vio: PermutSeq.v Misc.vio PermutationFun.vio SortingFun.vio IterAnd.vio Pigeonhole.vio
-PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo PermutationFun.vo SortingFun.vo IterAnd.vo Pigeonhole.vo
+PermutSeq.vio: PermutSeq.v Misc.vio PermutationFun.vio SortingFun.vio SortRank.vio IterAnd.vio Pigeonhole.vio
+PermutSeq.vo PermutSeq.glob PermutSeq.v.beautified PermutSeq.required_vo: PermutSeq.v Misc.vo PermutationFun.vo SortingFun.vo SortRank.vo IterAnd.vo Pigeonhole.vo
 PermutationFun.vio: PermutationFun.v Misc.vio
 PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
@@ -32,7 +32,9 @@ RingLike.vio: RingLike.v
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio SortingFun.vio IterAdd.vio NatRingLike.vio
 Sensitivity.vo Sensitivity.glob Sensitivity.v.beautified Sensitivity.required_vo: Sensitivity.v Misc.vo SortingFun.vo IterAdd.vo NatRingLike.vo
-Signature.vio: Signature.v Misc.vio SortingFun.vio PermutationFun.vio RingLike.vio IterMul.vio PermutSeq.vio
-Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo SortingFun.vo PermutationFun.vo RingLike.vo IterMul.vo PermutSeq.vo
+Signature.vio: Signature.v Misc.vio RingLike.vio SortingFun.vio SortRank.vio PermutationFun.vio IterMul.vio PermutSeq.vio
+Signature.vo Signature.glob Signature.v.beautified Signature.required_vo: Signature.v Misc.vo RingLike.vo SortingFun.vo SortRank.vo PermutationFun.vo IterMul.vo PermutSeq.vo
+SortRank.vio: SortRank.v Misc.vio SortingFun.vio
+SortRank.vo SortRank.glob SortRank.v.beautified SortRank.required_vo: SortRank.v Misc.vo SortingFun.vo
 SortingFun.vio: SortingFun.v Misc.vio PermutationFun.vio
 SortingFun.vo SortingFun.glob SortingFun.v.beautified SortingFun.required_vo: SortingFun.v Misc.vo PermutationFun.vo

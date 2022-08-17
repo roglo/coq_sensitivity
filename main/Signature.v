@@ -6,7 +6,8 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations.
 
-Require Import Misc SortingFun PermutationFun RingLike.
+Require Import Misc RingLike.
+Require Import SortingFun SortRank PermutationFun.
 Require Import IterMul PermutSeq.
 
 Section a.

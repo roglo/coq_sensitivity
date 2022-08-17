@@ -8,7 +8,7 @@ Import List List.ListNotations.
 Import Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul.
-Require Import PermutationFun SortingFun.
+Require Import PermutationFun SortingFun SortRank.
 Require Import MyVector Matrix PermutSeq Signature.
 Require Import NatRingLike.
 Import matrix_Notations.
