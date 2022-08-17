@@ -2869,7 +2869,7 @@ f_equal. {
     apply in_seq in Hj.
     rewrite permut_permut_isort; [ | easy | ]. 2: {
       rewrite <- Hji.
-...
+      apply is_permut_list_iff in Hp'p.
       destruct Hp'p as (Hp'a, Hp'n).
       apply Hp'a, nth_In.
       now rewrite Hp'l.
@@ -2879,10 +2879,11 @@ f_equal. {
   cbn - [ "<?" seq ].
   rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
+    apply is_permut_list_iff in Hp'p.
     destruct Hp'p as (Hp'a, Hp'n).
     rewrite <- Hp'l at 1.
     rewrite <- List_map_nth_seq, <- Hp'l.
-    now apply permut_list_permutation_iff.
+    now apply is_permut_list_iff.
   }
   rewrite rngl_product_seq_product; [ | easy ].
   rewrite Nat.add_0_l.
@@ -2898,7 +2899,9 @@ f_equal. {
     apply -> Nat.succ_le_mono.
     enough (H : x < S n) by flia H Hnz.
     replace x with (nth 0 σ 0) by now rewrite H1.
-    destruct Hp as ((Hp1, Hp2), Hp3).
+    destruct Hp as (Hp, Hp3).
+    apply is_permut_list_iff in Hp.
+    destruct Hp as (Hp1, Hp2).
     rewrite <- Hp3.
     apply Hp1, nth_In.
     rewrite Hp3; flia.
