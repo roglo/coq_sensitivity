@@ -2223,10 +2223,6 @@ unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
 
-Theorem fold_collapse : ∀ l,
-  isort_rank Nat.leb (isort_rank Nat.leb l) = collapse l.
-Proof. easy. Qed.
-
 Theorem comp_0_l : ∀ l, [] ° l = repeat 0 (length l).
 Proof.
 intros.

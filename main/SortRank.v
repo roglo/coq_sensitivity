@@ -282,6 +282,10 @@ Qed.
 
 Definition collapse l := isort_rank Nat.leb (isort_rank Nat.leb l).
 
+Theorem fold_collapse : ∀ l,
+  isort_rank Nat.leb (isort_rank Nat.leb l) = collapse l.
+Proof. easy. Qed.
+
 Theorem collapse_length : ∀ l, length (collapse l) = length l.
 Proof.
 intros.
