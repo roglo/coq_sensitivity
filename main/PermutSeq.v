@@ -934,9 +934,9 @@ Theorem list_swap_elem_is_permut_list : ∀ σ p q,
   → is_permut_list (list_swap_elem 0 σ p q).
 Proof.
 intros * Hp Hq Hσ.
-unfold is_permut_list, list_swap_elem.
+apply is_permut_list_iff.
+unfold list_swap_elem.
 rewrite map_length, seq_length.
-...
 split; cbn. {
   intros i Hi.
   apply in_map_iff in Hi.
@@ -944,6 +944,7 @@ split; cbn. {
   apply in_seq in Hj.
   rewrite <- Hji.
   apply permut_list_ub; [ easy | ].
+  apply nth_In.
   now apply transposition_lt.
 } {
   apply nat_NoDup.
@@ -956,30 +957,31 @@ split; cbn. {
   do 2 rewrite Nat.add_0_l in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
+  apply permut_list_NoDup in Hσ.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-      now subst j; apply (NoDup_nat _ (proj2 Hσ)).
+      now subst j; apply (NoDup_nat σ).
     }
     apply Nat.neq_sym in Hjq.
-    now exfalso; apply Hjq, (NoDup_nat _ (proj2 Hσ)).
+    now exfalso; apply Hjq, (NoDup_nat σ).
   }
   destruct (Nat.eq_dec i q) as [Hiq| Hiq]. {
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-      now subst i j; apply (NoDup_nat _ (proj2 Hσ)).
+      now subst i j; apply (NoDup_nat σ).
     }
     destruct (Nat.eq_dec j q) as [Hjq| Hjq]; [ congruence | ].
     apply Nat.neq_sym in Hjp; exfalso; apply Hjp.
-    now apply (NoDup_nat _ (proj2 Hσ)).
+    now apply (NoDup_nat σ).
   }
   destruct (Nat.eq_dec j p) as [Hjp| Hjp]. {
-    now exfalso; apply Hiq, (NoDup_nat _ (proj2 Hσ)).
+    now exfalso; apply Hiq, (NoDup_nat σ).
   }
   destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
-    now exfalso; apply Hip, (NoDup_nat _ (proj2 Hσ)).
+    now exfalso; apply Hip, (NoDup_nat σ).
   }
-  now apply (NoDup_nat _ (proj2 Hσ)).
+  now apply (NoDup_nat σ).
 }
 Qed.
 
@@ -1046,18 +1048,9 @@ Qed.
 Theorem seq_is_permut_list : ∀ n, is_permut_list (seq 0 n).
 Proof.
 intros.
-split. {
-  cbn; rewrite seq_length.
-  intros i Hin.
-  now rewrite in_seq in Hin.
-} {
-  apply nat_NoDup.
-  cbn; rewrite seq_length.
-  intros i j Hi Hj Hij.
-  rewrite seq_nth in Hij; [ | easy ].
-  rewrite seq_nth in Hij; [ | easy ].
-  easy.
-}
+unfold is_permut_list.
+rewrite seq_length.
+apply (permutation_refl Nat.eqb_eq).
 Qed.
 
 Theorem seq_is_permut : ∀ n, is_permut n (seq 0 n).
@@ -1146,10 +1139,7 @@ Theorem length_of_empty_sym_gr : ∀ sg,
 Proof.
 intros * Hsg.
 destruct Hsg as (Hsg & Hinj & Hsurj).
-assert (H : is_permut 0 []). {
-  split; [ | easy ].
-  split; [ easy | constructor ].
-}
+assert (H : is_permut 0 []) by easy.
 specialize (Hsurj _ H) as H1; clear H.
 apply (In_nth _ _ []) in H1.
 destruct H1 as (i & Hil & Hi).
@@ -1490,6 +1480,7 @@ Theorem canon_sym_gr_inv_list_is_permut_list : ∀ n i,
   → is_permut_list (canon_sym_gr_inv_list n i).
 Proof.
 intros * Hi.
+apply is_permut_list_iff.
 split. {
   unfold canon_sym_gr_inv_list.
   rewrite List_map_seq_length.
@@ -1532,7 +1523,9 @@ Theorem sub_canon_permut_list_elem_ub : ∀ l i,
   → S i < length l
   → nth i (sub_canon_permut_list l) 0 < length l - 1.
 Proof.
-intros * (Hvn, Hn) Hin.
+intros * Hp Hin.
+apply is_permut_list_iff in Hp.
+destruct Hp as (Hvn, Hn).
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin |-*.
 rewrite Nat.sub_0_r.
@@ -1563,7 +1556,9 @@ Theorem sub_canon_sym_gr_elem_inj1 : ∀ l i j,
   → nth i (sub_canon_permut_list l) 0 = nth j (sub_canon_permut_list l) 0
   → i = j.
 Proof.
-intros * (Hvn, Hn) Hin Hjn Hij.
+intros * Hp Hin Hjn Hij.
+apply is_permut_list_iff in Hp.
+destruct Hp as (Hvn, Hn).
 destruct l as [| a]; [ easy | ].
 cbn - [ "<?" ] in Hin, Hjn, Hij.
 apply Nat.succ_lt_mono in Hin, Hjn.
@@ -1613,7 +1608,9 @@ Theorem canon_sym_gr_list_inv_ub : ∀ n l,
   is_permut n l
   → canon_sym_gr_list_inv n l < n!.
 Proof.
-intros * ((Hvn, Hn), Hln).
+intros * (Hp, Hln).
+apply is_permut_list_iff in Hp.
+destruct Hp as (Hvn, Hn).
 revert l Hvn Hn Hln.
 induction n; intros; cbn; [ easy | ].
 rewrite Nat.add_comm.
@@ -1624,6 +1621,7 @@ apply Nat.add_lt_le_mono. {
     destruct Hi as (j & Hj & Hji).
     rewrite <- Hji.
     rewrite length_sub_canon_permut_list in Hj |-*.
+...
     apply sub_canon_permut_list_elem_ub; [ easy | flia Hj ].
   } {
     apply nat_NoDup.
