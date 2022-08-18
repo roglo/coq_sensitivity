@@ -4932,9 +4932,47 @@ intros kl Hkl.
 f_equal. {
   unfold g1.
 (**)
+(*
   apply in_all_permut_permutation in Hkl.
-  rewrite <- ε_collapse_ε.
-Search (collapse (_ ° _)).
+*)
+  assert (Hndj : NoDup jl). {
+    apply sorted_NoDup in Hsj; [ easy | | ]. {
+      unfold irreflexive; apply Nat.ltb_irrefl.
+    } {
+      apply Nat_ltb_trans.
+    }
+  }
+  assert (Hkm : length kl = m). {
+    apply in_all_permut_permutation in Hkl.
+    apply (permutation_length Nat.eqb_eq) in Hkl.
+    now rewrite seq_length in Hkl.
+  }
+  rewrite <- ε_collapse_ε. 2: {
+    apply NoDup_comp_iff; [ | easy ].
+    rewrite Hjm, <- Hkm.
+    apply collapse_permut_seq_with_len.
+  }
+  rewrite collapse_comp; [ | easy | | ]; cycle 1. {
+    apply isort_rank_permut_seq.
+  } {
+    rewrite collapse_length; congruence.
+  }
+  symmetry.
+  rewrite <- ε_collapse_ε. 2: {
+  symmetry.
+  f_equal.
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+  (collapse jl ° collapse kl) = collapse kl)
+  (all_permut (seq 1 m))).
+...
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+   collapse (jl ° collapse kl) = collapse kl) (all_permut (seq 1 m))).
 ...
 Theorem collapse_ε : ∀ la lb, collapse la = collapse lb → ε la = ε lb.
 Proof.
