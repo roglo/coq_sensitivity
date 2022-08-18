@@ -5059,6 +5059,17 @@ f_equal. {
   now rewrite ε_seq, rngl_mul_1_l.
 }
 unfold g1.
+apply rngl_product_eq_compat.
+intros i Hi.
+f_equal.
+...
+  Hjl : jl ∈ sub_lists_of_seq_1_n n m
+  Hsj : sorted Nat.ltb jl
+  Hjm : length jl = m
+  Hkl : kl ∈ all_permut (seq 1 m)
+  Hi : 1 ≤ i ≤ m
+  ============================
+  (jl ° collapse kl).(i) = jl.(kl.(i))
 ...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
@@ -5068,6 +5079,12 @@ Compute (
   let n := mat_ncols A in
   let jl := [1; 3; 4] in
   let kl := [2; 1; 3] in
+map (λ i,
+ (jl ° collapse kl).(i) = jl.(kl.(i))) (seq 1 m)).
+...
+map (λ i,
+mat_el A i (jl ° collapse kl).(i) = mat_el A i jl.(kl.(i))) (seq 1 m)).
+...
   ∏ (i = 1, m), mat_el A i (jl ° collapse kl).(i) = ∏ (i = 1, m), mat_el A i jl.(kl.(i))
 ).
 ...
