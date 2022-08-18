@@ -4966,13 +4966,20 @@ destruct jia, jib; try easy; exfalso. {
   apply Nat.compare_eq_iff in Hjia.
   apply Nat.compare_lt_iff in Hjib.
   clear Hlab.
-...
   revert i j lb Hab Hi Hj Hij Hjia Hjib.
   induction la as [| a]; intros; cbn in Hi, Hj. {
     now apply Nat.le_0_r in Hi, Hj; subst i j.
   }
   rewrite Nat.sub_0_r in Hi, Hj.
   cbn - [ nth ] in Hab.
+  set (rela := λ ia ib, nth ia (a :: la) a <=? nth ib (a :: la) a).
+  fold rela in Hab.
+  destruct lb as [| b]. {
+    now do 2 rewrite List_nth_nil in Hjib.
+  }
+  cbn - [ nth ] in Hab.
+  set (relb := λ ia ib, nth ia (b :: lb) b <=? nth ib (b :: lb) b).
+  fold relb in Hab.
 .....
 apply collapse_ε.
 Search (collapse (_ ° _)).
