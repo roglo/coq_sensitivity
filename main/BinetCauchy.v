@@ -4933,9 +4933,15 @@ f_equal. {
   unfold g1.
 (**)
   apply in_all_permut_permutation in Hkl.
+  rewrite <- ε_collapse_ε.
+Search (collapse (_ ° _)).
+...
 Theorem collapse_ε : ∀ la lb, collapse la = collapse lb → ε la = ε lb.
 Proof.
 intros * Hab.
+Search (collapse _ = collapse _).
+Search (ε (collapse _)).
+...
 apply isort_rank_inj2 in Hab; cycle 1. {
   apply isort_rank_permut_seq.
 } {
@@ -4946,10 +4952,13 @@ Theorem isort_rank_ε : ∀ la lb,
   → ε la = ε lb.
 Proof.
 intros * Hab.
-unfold ε.
+Search (isort_rank _ _ = isort_rank _ _).
+...
+intros * Hab.
 generalize Hab; intros Hlab.
 apply (f_equal length) in Hlab.
 do 2 rewrite isort_rank_length in Hlab.
+unfold ε.
 rewrite <- Hlab.
 apply rngl_product_eq_compat.
 intros i (_, Hi).
@@ -4958,6 +4967,7 @@ intros j (_, Hj).
 move j before i.
 do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+...
 unfold sign_diff.
 remember (nth j la 0 ?= nth i la 0) as jia eqn:Hjia; symmetry in Hjia.
 remember (nth j lb 0 ?= nth i lb 0) as jib eqn:Hjib; symmetry in Hjib.
@@ -4965,7 +4975,58 @@ move jib before jia.
 destruct jia, jib; try easy; exfalso. {
   apply Nat.compare_eq_iff in Hjia.
   apply Nat.compare_lt_iff in Hjib.
-  clear Hlab.
+(**)
+  rewrite Hlab in Hj.
+  revert i j lb Hab Hi Hj Hij Hjia Hjib Hlab.
+  induction la as [| a]; intros; rewrite <- Hlab in Hj; cbn in Hi, Hj. {
+    now apply Nat.le_0_r in Hi, Hj; subst i j.
+  }
+  rewrite Nat.sub_0_r in Hi, Hj.
+  destruct lb as [| b]. {
+    now do 2 rewrite List_nth_nil in Hjib.
+  }
+  cbn in Hlab; apply Nat.succ_inj in Hlab.
+  rewrite Hlab in Hj.
+  cbn - [ nth ] in Hab.
+  rewrite isort_insert_nth_indep with (d' := 0) in Hab; [ | now cbn | ]. 2: {
+    intros k Hk.
+    apply in_map_iff in Hk.
+    destruct Hk as (u & H & Hk); subst k; cbn.
+    apply -> Nat.succ_lt_mono.
+    now apply in_isort_rank in Hk.
+  }
+  symmetry in Hab.
+  rewrite isort_insert_nth_indep with (d' := 0) in Hab; [ | now cbn | ]. 2: {
+    intros k Hk.
+    apply in_map_iff in Hk.
+    destruct Hk as (u & H & Hk); subst k; cbn.
+    apply -> Nat.succ_lt_mono.
+    now apply in_isort_rank in Hk.
+  }
+  symmetry in Hab.
+  set (rela := λ ia ib, nth ia (a :: la) 0 <=? nth ib (a :: la) 0).
+  set (relb := λ ia ib, nth ia (b :: lb) 0 <=? nth ib (b :: lb) 0).
+  fold rela in Hab.
+  fold relb in Hab.
+(*
+Compute (
+let a := 14 in
+let b := 3 in
+let la := [17;2;7] in
+let lb := [5;9;8] in
+  let rela := λ ia ib, nth ia (a :: la) 0 <=? nth ib (a :: la) 0 in
+  let relb := λ ia ib, nth ia (b :: lb) 0 <=? nth ib (b :: lb) 0 in
+  isort_insert rela 0 (map S (isort_rank Nat.leb la)) =
+  isort_insert relb 0 (map S (isort_rank Nat.leb lb))
+).
+(* trop compliqué *)
+*)
+Theorem glop :
+  sorted rela la
+  → sorted relb lb
+  → isort_insert rela i la = isort_insert relb i lb
+  →
+...
   revert i j lb Hab Hi Hj Hij Hjia Hjib.
   induction la as [| a]; intros; cbn in Hi, Hj. {
     now apply Nat.le_0_r in Hi, Hj; subst i j.
@@ -4980,7 +5041,10 @@ destruct jia, jib; try easy; exfalso. {
   cbn - [ nth ] in Hab.
   set (relb := λ ia ib, nth ia (b :: lb) b <=? nth ib (b :: lb) b).
   fold relb in Hab.
-.....
+Theorem glop :
+  isort_insert rela i la = isort_insert relb i lb
+  →
+...
 apply collapse_ε.
 Search (collapse (_ ° _)).
 Compute (
