@@ -4980,6 +4980,18 @@ rewrite (List_map_nth' 0). 2: {
 f_equal.
 subst k.
 apply in_all_permut_permutation in Hkl.
+Theorem permutation_seq_collapse : ∀ sta la,
+  permutation Nat.eqb la (seq sta (length la))
+  → collapse la = map (λ i, i - sta) la.
+Proof.
+intros * Hp.
+revert sta Hp.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+... ...
+rewrite (permutation_seq_collapse 1); [ | now rewrite Hkm ].
+apply (List_map_nth' 0).
+subst j; rewrite Hkm; flia Hi.
 ...
 subst j.
 rewrite <- Hkm in Hi, Hkl.
