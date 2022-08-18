@@ -4899,10 +4899,24 @@ remember (∑ (kl ∈ _), _) as x; subst x.
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
 symmetry.
+(*
+set (h1 := λ l, map S (collapse l)).
+erewrite rngl_summation_list_change_var with (h := h1).
+remember (∑ (kl ∈ _), _) as x; subst x.
+Compute (
+let jl := [1; 5; 9] in
+let m := length jl in
+map h1 (all_permut jl) =
+all_permut (seq 1 m)
+).
+...
+seq 1 m = map S (collapse jl)
+collapse jl = seq 0 m
+...
 Check incl_incl_permutation.
 assert
   (H : permutation (list_eqv eqb) (all_permut jl) (all_permut (seq 1 m))). {
-  admit.
+...
 }
 Check rngl_summation_list_permut.
 ...
@@ -4938,7 +4952,7 @@ Print rsls1n.
 ...
   remember (rsls1n 1 n k t) as u eqn:Hu.
 ...
-(* je pense que je me suis trompé *)
+*)
 set (g1 := λ l, jl ° collapse l).
 set (h1 := λ l, map S (collapse l)).
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
@@ -4968,6 +4982,8 @@ replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
   now rewrite Hjm in H1.
 }
 remember (∑ (kl ∈ _), _) as x; subst x.
+(*
+...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
@@ -4975,16 +4991,21 @@ Compute (
   let m := mat_nrows A in
   let n := mat_ncols A in
   let jl := [1; 3; 4] in
+(*
   let kl := [3; 1; 4] in
+*)
+map (λ kl,
   let g1 := λ l : list nat, jl ° collapse l in
   let h1 := λ l : list nat, map S (collapse l) in
   (ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
-   ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)))%F
+   ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)))%F) (all_permut (seq 1 m))
 ).
+...
   ∑ (kl ∈ all_permut (seq 1 m)), ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
   ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))
 ).
 ...
+*)
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
@@ -5038,6 +5059,7 @@ f_equal. {
   now rewrite ε_seq, rngl_mul_1_l.
 }
 unfold g1.
+...
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 Compute (
@@ -5045,7 +5067,7 @@ Compute (
   let m := mat_nrows A in
   let n := mat_ncols A in
   let jl := [1; 3; 4] in
-  let kl := [3; 1; 4] in
+  let kl := [2; 1; 3] in
   ∏ (i = 1, m), mat_el A i (jl ° collapse kl).(i) = ∏ (i = 1, m), mat_el A i jl.(kl.(i))
 ).
 ...
