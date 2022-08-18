@@ -4568,20 +4568,6 @@ Theorem cauchy_binet_formula : in_charac_0_field →
      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
 intros Hif * Hca Hcb Har Hac Hbr Hbc.
-(*
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Compute (
-  let m := 2 in
-  let n := 3 in
-  let A := mk_mat [[1;2;3];[4;5;6]]%Z in
-  let B := mk_mat [[7;8];[9;-10];[11;12]]%Z in
-     det (A * B) =
-     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
-     det (mat_select_cols jl A) * det (mat_select_rows jl B)
-).
-...
-*)
 destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
   move Hmz at top; subst m.
   apply is_scm_mat_iff in Hcb.
@@ -4893,66 +4879,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now cbn.
 }
 remember (∑ (kl ∈ _), _) as x; subst x.
-(*
-  ============================
-  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
-  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
-*)
 symmetry.
-(*
-set (h1 := λ l, map S (collapse l)).
-erewrite rngl_summation_list_change_var with (h := h1).
-remember (∑ (kl ∈ _), _) as x; subst x.
-Compute (
-let jl := [1; 5; 9] in
-let m := length jl in
-map h1 (all_permut jl) =
-all_permut (seq 1 m)
-).
-...
-seq 1 m = map S (collapse jl)
-collapse jl = seq 0 m
-...
-Check incl_incl_permutation.
-assert
-  (H : permutation (list_eqv eqb) (all_permut jl) (all_permut (seq 1 m))). {
-...
-}
-Check rngl_summation_list_permut.
-...
-erewrite rngl_summation_list_change_var.
-remember (∑ (kl ∈ _), _) as x; subst x.
-...
-assert (∀ kl, kl ∈ all_permut (seq 1 m) → ∀ g1 i, (g1 jl kl).(i) = jl.(kl.(i))). {
-  intros * Hkl *.
-  remember (i - 1) as j eqn:Hj.
-  remember (nth j kl 0 - 1) as k eqn:Hk.
-  clear i Hj.
-  apply in_all_permut_permutation in Hkl.
-  remember (permutation_fun eqb kl (seq 1 m) j) as k' eqn:Hk'.
-  specialize (permutation_fun_nth Nat.eqb_eq 0) as H1.
-  specialize (H1 _ _ j Hkl).
-  rewrite <- Hk' in H1.
-Search permutation_fun.
-...
-  unfold sub_lists_of_seq_1_n in Hjl.
-  apply (In_nth _ _ []) in Hjl.
-  destruct Hjl as (p & Hp & Hjl).
-  subst jl.
-  rewrite sls1n_length in Hp.
-  specialize (@nth_rsls1n_sls1n 1 n m _ Hsj Hjm Hjlb) as H1.
-...
-  rewrite (rsls1n_of_nth_sls1n _ _ _ Hp) in H1.
-...
-  remember (rsls1n 1 n m (nth p (sls1n 1 n m) [])) as u eqn:Hu.
-  specialize (
-Search rsls1n.
-Search sls1n.
-Print rsls1n.
-...
-  remember (rsls1n 1 n k t) as u eqn:Hu.
-...
-*)
 set (g1 := λ l, jl ° collapse l).
 set (h1 := λ l, map S (collapse l)).
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
@@ -4982,30 +4909,6 @@ replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
   now rewrite Hjm in H1.
 }
 remember (∑ (kl ∈ _), _) as x; subst x.
-(*
-...
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-Compute (
-  let A := mk_mat [[1;-2;3;7];[4;5;-6;-12];[8;-3;5;9]]%Z in
-  let m := mat_nrows A in
-  let n := mat_ncols A in
-  let jl := [1; 3; 4] in
-(*
-  let kl := [3; 1; 4] in
-*)
-map (λ kl,
-  let g1 := λ l : list nat, jl ° collapse l in
-  let h1 := λ l : list nat, map S (collapse l) in
-  (ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
-   ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)))%F) (all_permut (seq 1 m))
-).
-...
-  ∑ (kl ∈ all_permut (seq 1 m)), ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
-  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))
-).
-...
-*)
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
