@@ -4899,6 +4899,8 @@ remember (∑ (kl ∈ _), _) as x; subst x.
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
 symmetry.
+(* je pense que je me suie trompé *)
+...
 set (g1 := λ l, jl ° collapse l).
 set (h1 := λ l, map S (collapse l)).
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
@@ -4927,14 +4929,28 @@ replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
   replace (add 1) with S in H1 by easy.
   now rewrite Hjm in H1.
 }
+remember (∑ (kl ∈ _), _) as x; subst x.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let A := mk_mat [[1;-2;3;7];[4;5;-6;-12];[8;-3;5;9]]%Z in
+  let m := mat_nrows A in
+  let n := mat_ncols A in
+  let jl := [1; 3; 4] in
+  let kl := [3; 1; 4] in
+  let g1 := λ l : list nat, jl ° collapse l in
+  let h1 := λ l : list nat, map S (collapse l) in
+  (ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
+   ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)))%F
+).
+  ∑ (kl ∈ all_permut (seq 1 m)), ε (g1 kl) * ∏ (i = 1, m), mat_el A i (g1 kl).(i) =
+  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))
+).
+...
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 f_equal. {
   unfold g1.
-(**)
-(*
-  apply in_all_permut_permutation in Hkl.
-*)
   assert (Hndj : NoDup jl). {
     apply sorted_NoDup in Hsj; [ easy | | ]. {
       unfold irreflexive; apply Nat.ltb_irrefl.
@@ -4959,52 +4975,56 @@ f_equal. {
   }
   symmetry.
   rewrite <- ε_collapse_ε. 2: {
+    apply in_all_permut_permutation in Hkl.
+    apply (permutation_sym Nat.eqb_eq) in Hkl.
+    apply (permutation_NoDup Nat.eqb_eq) in Hkl; [ easy | ].
+    apply seq_NoDup.
+  }
   symmetry.
-  f_equal.
-Compute (
-  let jl := [1; 3; 4;7] in
-let m := length jl in
-map (λ kl,
-  (collapse jl ° collapse kl) = collapse kl)
-  (all_permut (seq 1 m))).
-...
-Compute (
-  let jl := [1; 3; 4;7] in
-let m := length jl in
-map (λ kl,
-   collapse (jl ° collapse kl) = collapse kl) (all_permut (seq 1 m))).
-...
-Theorem collapse_ε : ∀ la lb, collapse la = collapse lb → ε la = ε lb.
-Proof.
-intros * Hab.
-Search (collapse _ = collapse _).
-Search (ε (collapse _)).
-...
-apply isort_rank_inj2 in Hab; cycle 1. {
-  apply isort_rank_permut_seq.
-} {
-  apply isort_rank_permut_seq.
+  rewrite (sign_comp Hif). 2: {
+    rewrite collapse_length, Hjm, <- Hkm.
+    apply collapse_permut_seq_with_len.
+  }
+  replace (collapse jl) with (seq 0 (length jl)). 2: {
+    symmetry.
+    apply sorted_nat_ltb_leb_incl in Hsj.
+    apply eq_sorted_isort_rank_seq in Hsj.
+    unfold collapse; rewrite Hsj.
+    rewrite Hjm.
+    assert (H : sorted Nat.leb (seq 0 m)). {
+      apply sorted_nat_ltb_leb_incl, sorted_seq.
+    }
+    specialize (eq_sorted_isort_rank_seq H) as H1; clear H.
+    now rewrite seq_length in H1.
+  }
+  now rewrite ε_seq, rngl_mul_1_l.
 }
-Theorem isort_rank_ε : ∀ la lb,
-  isort_rank Nat.leb la = isort_rank Nat.leb lb
-  → ε la = ε lb.
-Proof.
-intros * Hab.
-Search (isort_rank _ _ = isort_rank _ _).
+unfold g1.
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let A := mk_mat [[1;-2;3;7];[4;5;-6;-12];[8;-3;5;9]]%Z in
+  let m := mat_nrows A in
+  let n := mat_ncols A in
+  let jl := [1; 3; 4] in
+  let kl := [3; 1; 4] in
+  ∏ (i = 1, m), mat_el A i (jl ° collapse kl).(i) = ∏ (i = 1, m), mat_el A i jl.(kl.(i))
+).
 ...
-intros * Hab.
-generalize Hab; intros Hlab.
-apply (f_equal length) in Hlab.
-do 2 rewrite isort_rank_length in Hlab.
-unfold ε.
-rewrite <- Hlab.
-apply rngl_product_eq_compat.
-intros i (_, Hi).
-apply rngl_product_eq_compat.
-intros j (_, Hj).
-move j before i.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+     = [3 = 4; 1 = 1; 4 = 7; 7 = 0]
+apply rngl_product_list_eq_compat.
+rewrite Nat_sub_succ_1.
+intros i Hi.
+unfold g1.
+f_equal.
+Compute (
+  let jl := [1; 3; 4; 7] in
+  let kl := [3; 1; 4; 7] in
+  let m := length jl in
+map (λ i,
+  (jl ° collapse kl).(i) = jl.(kl.(i)))
+(seq 1 m)
+).
 ...
 unfold sign_diff.
 remember (nth j la 0 ?= nth i la 0) as jia eqn:Hjia; symmetry in Hjia.
@@ -5134,7 +5154,7 @@ destruct lxl as [((bef, x), aft)| ]. 2: {
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Haft).
 apply Nat.eqb_eq in H; subst x.
-......
+... ...
 apply permutation_seq_shift in Hkl.
 ...
   replace (collapse kl) with (map pred kl). 2: {
