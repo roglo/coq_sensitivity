@@ -4965,6 +4965,46 @@ unfold g1.
 apply rngl_product_eq_compat.
 intros i Hi.
 f_equal.
+remember (i - 1) as j.
+remember (nth j kl 0 - 1) as k.
+unfold comp_list.
+assert (Hkm : length kl = m). {
+  apply in_all_permut_permutation in Hkl.
+  apply (permutation_length Nat.eqb_eq) in Hkl.
+  now rewrite seq_length in Hkl.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite collapse_length, Hkm, Heqj.
+  flia Hi.
+}
+f_equal.
+subst k.
+apply in_all_permut_permutation in Hkl.
+...
+subst j.
+rewrite <- Hkm in Hi, Hkl.
+clear - Hkl Hi.
+revert i Hi.
+induction kl as [| k]; intros. {
+  now cbn; rewrite Tauto_match_nat_same.
+}
+...
+Search (permutation _ _ (seq _ _)).
+Search (nth _ (isort_rank _ _)).
+Search (nth _ (collapse _)).
+Search all_permut.
+unfold collapse.
+Search (nth _ (isort_rank _ _)).
+...
+apply in_all_permut_iff in Hkl.
+rewrite Hkl.
+in_all_permut_iff: ∀ la lb : list nat, la ∈ all_permut lb ↔ isort Nat.leb la = isort Nat.leb lb
+...
+unfold collapse.
+Search (nth _ (collapse _)).
+Search (nth _ (isort_rank _ _)).
+...
+rewrite sorted_permuted_comp_collapse.
 ...
   Hjl : jl ∈ sub_lists_of_seq_1_n n m
   Hsj : sorted Nat.ltb jl
