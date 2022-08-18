@@ -4933,6 +4933,63 @@ f_equal. {
   unfold g1.
 (**)
   apply in_all_permut_permutation in Hkl.
+Theorem collapse_ε : ∀ la lb, collapse la = collapse lb → ε la = ε lb.
+Proof.
+intros * Hab.
+apply isort_rank_inj2 in Hab; cycle 1. {
+  apply isort_rank_permut_seq.
+} {
+  apply isort_rank_permut_seq.
+}
+Theorem isort_rank_ε : ∀ la lb,
+  isort_rank Nat.leb la = isort_rank Nat.leb lb
+  → ε la = ε lb.
+Proof.
+intros * Hab.
+unfold ε.
+generalize Hab; intros Hlab.
+apply (f_equal length) in Hlab.
+do 2 rewrite isort_rank_length in Hlab.
+rewrite <- Hlab.
+apply rngl_product_eq_compat.
+intros i (_, Hi).
+apply rngl_product_eq_compat.
+intros j (_, Hj).
+move j before i.
+do 2 rewrite if_ltb_lt_dec.
+destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+unfold sign_diff.
+remember (nth j la 0 ?= nth i la 0) as jia eqn:Hjia; symmetry in Hjia.
+remember (nth j lb 0 ?= nth i lb 0) as jib eqn:Hjib; symmetry in Hjib.
+move jib before jia.
+destruct jia, jib; try easy; exfalso. {
+  apply Nat.compare_eq_iff in Hjia.
+  apply Nat.compare_lt_iff in Hjib.
+  clear Hlab.
+...
+  revert i j lb Hab Hi Hj Hij Hjia Hjib.
+  induction la as [| a]; intros; cbn in Hi, Hj. {
+    now apply Nat.le_0_r in Hi, Hj; subst i j.
+  }
+  rewrite Nat.sub_0_r in Hi, Hj.
+  cbn - [ nth ] in Hab.
+.....
+apply collapse_ε.
+Search (collapse (_ ° _)).
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+   collapse (jl ° collapse kl) = collapse kl) (all_permut (seq 1 m))).
+...
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Compute (
+  let jl := [1; 3; 4;7] in
+let m := length jl in
+map (λ kl,
+  ε (jl ° collapse kl) = ε kl) (all_permut (seq 1 m))).
+...
 Search (permutation _ _ (seq _ _)).
 Print permutation_assoc.
 Print permutation_assoc_loop.
