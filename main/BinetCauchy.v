@@ -4899,8 +4899,46 @@ remember (∑ (kl ∈ _), _) as x; subst x.
   ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
 symmetry.
-(* je pense que je me suie trompé *)
+Check incl_incl_permutation.
+assert
+  (H : permutation (list_eqv eqb) (all_permut jl) (all_permut (seq 1 m))). {
+  admit.
+}
+Check rngl_summation_list_permut.
 ...
+erewrite rngl_summation_list_change_var.
+remember (∑ (kl ∈ _), _) as x; subst x.
+...
+assert (∀ kl, kl ∈ all_permut (seq 1 m) → ∀ g1 i, (g1 jl kl).(i) = jl.(kl.(i))). {
+  intros * Hkl *.
+  remember (i - 1) as j eqn:Hj.
+  remember (nth j kl 0 - 1) as k eqn:Hk.
+  clear i Hj.
+  apply in_all_permut_permutation in Hkl.
+  remember (permutation_fun eqb kl (seq 1 m) j) as k' eqn:Hk'.
+  specialize (permutation_fun_nth Nat.eqb_eq 0) as H1.
+  specialize (H1 _ _ j Hkl).
+  rewrite <- Hk' in H1.
+Search permutation_fun.
+...
+  unfold sub_lists_of_seq_1_n in Hjl.
+  apply (In_nth _ _ []) in Hjl.
+  destruct Hjl as (p & Hp & Hjl).
+  subst jl.
+  rewrite sls1n_length in Hp.
+  specialize (@nth_rsls1n_sls1n 1 n m _ Hsj Hjm Hjlb) as H1.
+...
+  rewrite (rsls1n_of_nth_sls1n _ _ _ Hp) in H1.
+...
+  remember (rsls1n 1 n m (nth p (sls1n 1 n m) [])) as u eqn:Hu.
+  specialize (
+Search rsls1n.
+Search sls1n.
+Print rsls1n.
+...
+  remember (rsls1n 1 n k t) as u eqn:Hu.
+...
+(* je pense que je me suis trompé *)
 set (g1 := λ l, jl ° collapse l).
 set (h1 := λ l, map S (collapse l)).
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
