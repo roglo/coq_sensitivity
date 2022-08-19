@@ -337,7 +337,7 @@ specialize (H1 H); clear H.
 now apply Nat.leb_le.
 Qed.
 
-Theorem isort_rank_insert_f_eq_compat : ∀ A (f g : A → _) ia lrank,
+Theorem isort_rank_insert_eq_compat : ∀ A (f g : A → _) ia lrank,
   (∀ x y, x ∈ ia :: lrank → y ∈ ia :: lrank → (f x <=? f y) = (g x <=? g y))
   → isort_rank_insert Nat.leb f ia lrank =
     isort_rank_insert Nat.leb g ia lrank.
@@ -361,7 +361,7 @@ intros.
 induction la as [| a]; [ easy | ].
 cbn - [ nth ].
 rewrite IHla.
-apply isort_rank_insert_f_eq_compat.
+apply isort_rank_insert_eq_compat.
 intros ia ib Hia Hib.
 destruct Hia as [Hia| Hia]. {
   subst ia; do 2 rewrite List_nth_0_cons.

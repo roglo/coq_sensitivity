@@ -4578,6 +4578,33 @@ specialize (Ha _ (or_introl eq_refl)).
 congruence.
 Qed.
 
+Theorem isort_rank_insert_lb_app : ∀ A B (rel : A → _) (f : B → _) ia lrank,
+  (∀ ib, ib ∈ lrank → rel (f ia) (f ib) = true)
+  → isort_rank_insert rel f ia lrank = ia :: lrank.
+Proof.
+intros * Ha.
+induction lrank as [| ib]; [ easy | cbn ].
+remember (rel (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+rewrite Ha in Hab; [ easy | now left ].
+Qed.
+
+Theorem isort_rank_insert_ub_app : ∀ A B (rel : A → _) (f : B → _) ia lrank,
+  (∀ ib, ib ∈ lrank → rel (f ia) (f ib) = false)
+  → isort_rank_insert rel f ia lrank = lrank ++ [ia].
+Proof.
+intros * Ha.
+induction lrank as [| ib]; [ easy | cbn ].
+remember (rel (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
+destruct ab. 2: {
+  f_equal.
+  apply IHlrank.
+  intros ic Hic.
+  now apply Ha; right.
+}
+rewrite Ha in Hab; [ easy | now left ].
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -5055,10 +5082,72 @@ let a := 40 in
 *)
 revert a lb Hab.
 induction la as [| b]; intros. {
-  cbn - [ nth ].
-Inspect 2.
-(* to do *)
+  cbn - [ nth ]; cbn in Hab.
   rewrite isort_rank_insert_ub_app. 2: {
+    intros ib Hb.
+    rewrite List_nth_0_cons.
+    apply Nat.leb_gt, Hab.
+    apply in_map_iff in Hb.
+    destruct Hb as (ic & H & Hc); subst ib; cbn.
+    apply in_isort_rank in Hc.
+    now apply nth_In.
+  }
+  induction lb as [| ib]; [ easy | ].
+  cbn - [ nth ].
+  remember (isort_rank_insert _ _ _ _) as la eqn:Hla.
+...
+  apply (f_equal length) in Hla.
+  rewrite isort_rank_insert_length in Hla.
+  rewrite map_length, isort_rank_length in Hla.
+  rewrite <- Hla.
+...
+Theorem isort_rank_app_map_S_zero : ∀ la,
+  isort_rank Nat.leb (map S la ++ [0]) =
+  length la :: isort_rank Nat.leb la.
+Proof.
+induction la as [| a]; [ easy | ].
+cbn - [ nth ].
+rewrite IHla.
+cbn - [ nth ].
+rewrite List_nth_0_cons.
+rewrite List_nth_succ_cons.
+rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
+rewrite map_length, Nat.sub_diag, List_nth_0_cons.
+cbn - [ nth ].
+f_equal.
+rewrite isort_rank_insert_lb_app. 2: {
+  intros ib Hib.
+  apply in_map_iff in Hib.
+  destruct Hib as (ic & H & Hic); subst ib.
+  apply in_isort_rank in Hic.
+  rewrite List_nth_0_cons.
+  rewrite List_nth_succ_cons.
+  apply Nat.leb_le; cbn.
+  rewrite app_nth1; [ | now rewrite map_length ].
+  rewrite (List_map_nth' 0); [ | easy ].
+  apply -> Nat.succ_le_mono.
+...
+  }
+  apply Nat.nle_gt in Ha.
+    rewrite (List_map_nth' 0); [ | easy ].
+  destruct (le_dec a (nth ic la 0)) as [Ha| Ha]. {
+...
+  rewrite (List_map_nth' []).
+  cbn - [ map ].
+...
+Search isort_rank_insert.
+...
+apply isort_rank_insert_eq_compat.
+intros ia ib Hia Hib.
+destruct Hia as [Hia| Hia].
+...
+  rewrite eq_sorted_isort_rank_insert_seq. 2: {
+    intros ic Hic.
+    rewrite List_nth_0_cons.
+    apply in_map_iff in Hic.
+    destruct Hic as (id & H & Hid); subst ic.
+    rewrite List_nth_succ_cons.
+    apply in_isort_rank in Hid.
 ...
   rewrite isort_insert_ub_app. 2: {
     intros b Hb.
