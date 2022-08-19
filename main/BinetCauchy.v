@@ -4579,14 +4579,15 @@ congruence.
 Qed.
 
 Theorem isort_rank_insert_lb_app : ∀ A B (rel : A → _) (f : B → _) ia lrank,
-  (∀ ib, ib ∈ lrank → rel (f ia) (f ib) = true)
+  lrank = [] ∨ rel (f ia) (f (hd ia lrank)) = true
   → isort_rank_insert rel f ia lrank = ia :: lrank.
 Proof.
 intros * Ha.
+destruct Ha as [Ha| Ha]; [ now subst lrank | ].
 induction lrank as [| ib]; [ easy | cbn ].
 remember (rel (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ easy | ].
-rewrite Ha in Hab; [ easy | now left ].
+cbn in Ha; congruence.
 Qed.
 
 Theorem isort_rank_insert_ub_app : ∀ A B (rel : A → _) (f : B → _) ia lrank,
@@ -5095,12 +5096,10 @@ induction la as [| b]; intros. {
   induction lb as [| ib]; [ easy | ].
   cbn - [ nth ].
   remember (isort_rank_insert _ _ _ _) as la eqn:Hla.
-...
   apply (f_equal length) in Hla.
   rewrite isort_rank_insert_length in Hla.
   rewrite map_length, isort_rank_length in Hla.
   rewrite <- Hla.
-...
 Theorem isort_rank_app_map_S_zero : ∀ la,
   isort_rank Nat.leb (map S la ++ [0]) =
   length la :: isort_rank Nat.leb la.
@@ -5116,11 +5115,21 @@ rewrite map_length, Nat.sub_diag, List_nth_0_cons.
 cbn - [ nth ].
 f_equal.
 rewrite isort_rank_insert_lb_app. 2: {
+  rewrite List_nth_0_cons.
+  destruct la as [| ib]; [ now left | right ].
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length; cbn ].
+  rewrite List_nth_succ_cons.
+  cbn - [ nth ] in IHla.
+  cbn - [ nth "<=?" ].
+...
+Search (nth _ (isort_rank_insert _ _ _ _)).
+...
   intros ib Hib.
   apply in_map_iff in Hib.
   destruct Hib as (ic & H & Hic); subst ib.
-  apply in_isort_rank in Hic.
-  rewrite List_nth_0_cons.
+  generalize Hic; intros H.
+  apply in_isort_rank in H.
   rewrite List_nth_succ_cons.
   apply Nat.leb_le; cbn.
   rewrite app_nth1; [ | now rewrite map_length ].
