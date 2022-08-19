@@ -5080,20 +5080,22 @@ Theorem isort_rank_app : ∀ la lb,
     map (add (length la)) (isort_rank Nat.leb lb) ++ isort_rank Nat.leb la.
 Proof.
 intros * Hlab.
-(*
+(**)
 Compute (
 let la := [13; 34; 15] in
 let lb := [8; 5; 7; 9] in
   isort_rank Nat.leb (la ++ lb) =
     map (add (length la)) (isort_rank Nat.leb lb) ++ isort_rank Nat.leb la
 ).
-*)
+...
+(**)
 revert lb Hlab.
 induction la as [| a]; intros. {
   cbn; rewrite app_nil_r.
   now rewrite map_id.
 }
 cbn - [ nth ].
+...
 rewrite isort_insert_lb_app. 2: {
   rewrite List_nth_0_cons.
   remember (la ++ lb) as lc eqn:Hlc; symmetry in Hlc.
@@ -5102,12 +5104,12 @@ rewrite isort_insert_lb_app. 2: {
   rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length; cbn ].
   rewrite <- Hlc.
   apply Nat.leb_le.
-(**)
   destruct lb as [| b]. {
     rewrite app_nil_r in Hlc |-*.
     rewrite List_nth_succ_cons.
     rewrite Hlc.
-(* ah putain ça fait chier *)
+    cbn - [ nth ].
+Search (nth _ (isort_insert _ _ _)).
 ...
     rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
     rewrite Nat.sub_0_l, app_nil_r.
