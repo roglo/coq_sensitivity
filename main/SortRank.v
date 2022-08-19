@@ -418,6 +418,14 @@ rewrite (List_map_nth' 0); [ easy | ].
 now rewrite isort_rank_length.
 Qed.
 
+Theorem neq_isort_rank_insert_nil : ∀ A B rel (f : B → A) ia lrank,
+  isort_rank_insert rel f ia lrank ≠ [].
+Proof.
+intros * Hla.
+destruct lrank as [| ib]; [ easy | cbn in Hla ].
+now destruct (rel (f ia) (f ib)).
+Qed.
+
 (* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
    E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.

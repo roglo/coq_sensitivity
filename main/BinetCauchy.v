@@ -5073,8 +5073,8 @@ intros * Hab.
 (*
 Compute (
 let la := [13; 34; 15] in
-let lb := [8; 5; 17; 9] in
-let a := 40 in
+let lb := [8; 5; 17; 40] in
+let a := 41 in
     collapse (la ++ a :: lb) =
      firstn (length la) (collapse (la ++ lb)) ++
      length (la ++ lb) :: skipn (length la) (collapse (la ++ lb))
@@ -5101,6 +5101,7 @@ induction la as [| b]; intros. {
   rewrite isort_rank_insert_length in Hlab.
   rewrite map_length, isort_rank_length in Hlab.
   rewrite <- Hlab.
+(*
   assert (Hs : sorted Nat.leb la). {
     rewrite Hla.
     apply sorted_isort_rank_insert. {
@@ -5124,13 +5125,16 @@ induction la as [| b]; intros. {
 ...
         apply in_isort_rank in Hid; cbn.
 ...
+*)
 Theorem isort_rank_app_map_S_zero : ∀ la,
   isort_rank Nat.leb (map S la ++ [0]) =
   length la :: isort_rank Nat.leb la.
 Proof.
+intros.
 induction la as [| a]; [ easy | ].
 cbn - [ nth ].
 rewrite IHla.
+clear IHla.
 cbn - [ nth ].
 rewrite List_nth_0_cons.
 rewrite List_nth_succ_cons.
@@ -5139,13 +5143,31 @@ rewrite map_length, Nat.sub_diag, List_nth_0_cons.
 cbn - [ nth ].
 f_equal.
 rewrite isort_rank_insert_lb_app. 2: {
+  rename a into ia.
   rewrite List_nth_0_cons.
   destruct la as [| ib]; [ now left | right ].
   rewrite List_hd_nth_0.
   rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length; cbn ].
   rewrite List_nth_succ_cons.
-  cbn - [ nth ] in IHla.
+  rewrite app_nth1. 2: {
+    rewrite map_length; cbn - [ nth ].
+    apply isort_rank_insert_ub; [ easy | ].
+    intros i Hi.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & H & Hj); subst i.
+    apply -> Nat.succ_lt_mono.
+    now apply in_isort_rank in Hj.
+  }
   cbn - [ nth "<=?" ].
+  remember (isort_rank_insert Nat.leb (λ i : nat, nth i (ib :: la) ib) 0
+    (map S (isort_rank Nat.leb la))) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [| ic]. {
+About neq_isort_insert_nil.
+...
+    apply neq_isort_rank_insert_nil in Hlb.
+...
+  cbn - [ nth ] in IHla.
 ...
 Search (nth _ (isort_rank_insert _ _ _ _)).
 ...
