@@ -4494,6 +4494,7 @@ apply (rngl_summation_list_permut _ Hel).
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 Qed.
 
+(* to be completed
 Theorem map_collapse_all_permut_seq : ∀ i la n m,
   la ∈ sub_lists_of_seq_1_n n m
   → map (λ lb, map (add i) (collapse lb)) (all_permut la) =
@@ -4541,6 +4542,7 @@ rewrite collapse_comp; cycle 1. {
   symmetry; apply canon_sym_gr_list_length.
 }
 unfold collapse.
+...
 rewrite eq_sorted_isort_rank_seq. 2: {
   rewrite eq_sorted_isort_rank_seq. 2: {
     now apply sorted_nat_ltb_leb_incl.
@@ -4553,6 +4555,7 @@ apply comp_1_l.
 intros i Hi.
 now apply in_canon_sym_gr_list in Hi.
 Qed.
+*)
 
 Theorem isort_insert_lb_app : ∀ A (rel : A → _) a lsorted,
   lsorted = [] ∨ rel a (hd a lsorted) = true
