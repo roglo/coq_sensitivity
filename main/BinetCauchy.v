@@ -4554,6 +4554,38 @@ intros i Hi.
 now apply in_canon_sym_gr_list in Hi.
 Qed.
 
+Theorem isort_insert_lb_app : ∀ A (rel : A → _) a lsorted,
+  lsorted = [] ∨ rel a (hd a lsorted) = true
+  → isort_insert rel a lsorted = a :: lsorted.
+Proof.
+intros * Ha.
+destruct Ha as [Ha| Ha]; [ now subst lsorted | ].
+revert a Ha.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab.
+destruct ab; [ easy | ].
+cbn in Ha.
+now rewrite <- Hab in Ha.
+Qed.
+
+Theorem isort_insert_ub_app : ∀ A (rel : A → _) a lsorted,
+  (∀ b, b ∈ lsorted → rel a b = false)
+  → isort_insert rel a lsorted = lsorted ++ [a].
+Proof.
+intros * Ha.
+revert a Ha.
+induction lsorted as [| b]; intros; [ easy | cbn ].
+remember (rel a b) as ab eqn:Hab.
+destruct ab. 2: {
+  f_equal.
+  apply IHlsorted.
+  intros c Hc.
+  now apply Ha; right.
+}
+specialize (Ha _ (or_introl eq_refl)).
+congruence.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -5018,9 +5050,109 @@ Theorem collapse_app_cons : ∀ la lb a,
      length (la ++ lb) :: skipn (length la) (collapse (la ++ lb)).
 Proof.
 intros * Hab.
+(*
+Compute (
+let la := [13; 34; 15] in
+let lb := [8; 5; 17; 9] in
+let a := 40 in
+    collapse (la ++ a :: lb) =
+     firstn (length la) (collapse (la ++ lb)) ++
+     length (la ++ lb) :: skipn (length la) (collapse (la ++ lb))
+).
+...
+*)
 revert a lb Hab.
 induction la as [| b]; intros. {
   cbn - [ nth ].
+  rewrite isort_insert_ub_app. 2: {
+    intros b Hb.
+    rewrite List_nth_0_cons.
+    apply Nat.leb_gt, Hab.
+    rewrite app_nil_l.
+    apply in_map_iff in Hb.
+    destruct Hb as (c & H & Hc); subst b; cbn.
+    apply in_isort_rank in Hc.
+    now apply nth_In.
+  }
+Theorem isort_rank_app : ∀ la lb,
+  (∀ a b, a ∈ la → b ∈ lb → b < a)
+  → isort_rank Nat.leb (la ++ lb) =
+    map (add (length la)) (isort_rank Nat.leb lb) ++ isort_rank Nat.leb la.
+Proof.
+intros * Hlab.
+(*
+Compute (
+let la := [13; 34; 15] in
+let lb := [8; 5; 7; 9] in
+  isort_rank Nat.leb (la ++ lb) =
+    map (add (length la)) (isort_rank Nat.leb lb) ++ isort_rank Nat.leb la
+).
+*)
+revert lb Hlab.
+induction la as [| a]; intros. {
+  cbn; rewrite app_nil_r.
+  now rewrite map_id.
+}
+cbn - [ nth ].
+rewrite isort_insert_lb_app. 2: {
+  rewrite List_nth_0_cons.
+  remember (la ++ lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]; [ now left | right ].
+  rewrite List_hd_nth_0.
+  rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length; cbn ].
+  rewrite <- Hlc.
+  apply Nat.leb_le.
+(**)
+  destruct lb as [| b]. {
+    rewrite app_nil_r in Hlc |-*.
+    rewrite List_nth_succ_cons.
+    rewrite Hlc.
+(* ah putain ça fait chier *)
+...
+    rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
+    rewrite Nat.sub_0_l, app_nil_r.
+    cbn; rewrite app_nil_r in Hlc.
+...
+  rewrite IHla. 2: {
+    intros b d Hb Hd.
+    apply Hlab; [ now right | easy ].
+  }
+  destruct lb as [| b]. {
+    rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
+    rewrite Nat.sub_0_l, app_nil_r.
+    cbn; rewrite app_nil_r in Hlc.
+...
+  }
+  rewrite (List_map_nth' 0).
+...
+  apply in_map_iff in Hb.
+  destruct Hb as (c & H & Hc); subst b; cbn.
+  apply in_isort_rank in Hc.
+  apply Nat.leb_gt.
+  rewrite app_length in Hc.
+  destruct (lt_dec c (length la)) as [Hcla| Hcla]. {
+    rewrite app_nth1; [ | easy ].
+    apply Hlab; [ now left | ].
+Check isort_insert_ub_app.
+...
+isort_insert_ub_app
+     : ∀ (A : Type) (rel : A → A → bool) (a : A) (lsorted : list A),
+         (∀ b : A, b ∈ lsorted → rel a b = false) → isort_insert rel a lsorted = lsorted ++ [a]
+...
+Print isort_insert.
+...
+... ...
+rewrite isort_rank_app. 2: {
+  intros b c Hb Hc.
+  destruct Hc as [Hc| Hc]; [ subst c | easy ].
+  apply in_map_iff in Hb.
+  now destruct Hb as (d & H & Hd); subst b.
+}
+cbn.
+rewrite map_length, isort_rank_length, Nat.add_0_r.
+specialize (isort_rank_map_add_compat 1 0) as H1.
+replace (add 1) with S in H1 by easy.
+now rewrite H1, map_id.
 ... ...
 rewrite collapse_app_cons. 2: {
   intros i Hi.
