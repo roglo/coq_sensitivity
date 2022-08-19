@@ -233,13 +233,14 @@ Qed.
 Theorem sorted_isort_rank_insert : ∀ A B (rela : A → _) (relb : B → _),
   transitive relb →
   total_relation relb →
-  ∀ f, (∀ ia ib, rela (f ia) (f ib) = relb ia ib)
-  → ∀ (ia : B) (lrank : list B),
-  sorted relb lrank
+  ∀ f ia lrank,
+  (∀ ib ic, ib ∈ ia :: lrank → ic ∈ ia :: lrank →
+   rela (f ib) (f ic) = relb ib ic)
+  → sorted relb lrank
   → sorted relb (isort_rank_insert rela f ia lrank).
 Proof.
 intros * Htrab Htotb * Hfab * Hs.
-revert ia.
+revert ia Hfab.
 induction lrank as [| ib]; intros; [ easy | cbn ].
 remember (rela (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
@@ -247,7 +248,7 @@ destruct ab. {
   split; [ easy | ].
   intros ic Hic.
   generalize Hab; intros Hiab.
-  rewrite Hfab in Hiab.
+  rewrite Hfab in Hiab; [ | now left | now right; left ].
   destruct Hic as [Hic| Hic]; [ now subst ic | ].
   apply sorted_cons_iff in Hs; [ | easy ].
   destruct Hs as (Hs, Hib).
@@ -257,12 +258,20 @@ destruct ab. {
 apply sorted_cons_iff; [ easy | ].
 apply sorted_cons_iff in Hs; [ | easy ].
 destruct Hs as (Hs, Hib).
-split; [ now apply IHlrank | ].
+split. {
+  apply IHlrank; [ easy | ].
+  intros ic id Hic Hid.
+  apply Hfab. {
+    destruct Hic as [Hic| Hic]; [ now subst ic; left | now right; right ].
+  } {
+    destruct Hid as [Hid| Hid]; [ now subst id; left | now right; right ].
+  }
+}
 intros ic Hic.
 apply in_isort_rank_insert in Hic.
 destruct Hic as [Hic| Hic]. {
   subst ic.
-  rewrite Hfab in Hab.
+  rewrite Hfab in Hab; [ | now left | now right; left ].
   specialize (Htotb ia ib).
   now rewrite Hab in Htotb.
 }

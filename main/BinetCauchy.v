@@ -5096,10 +5096,34 @@ induction la as [| b]; intros. {
   induction lb as [| ib]; [ easy | ].
   cbn - [ nth ].
   remember (isort_rank_insert _ _ _ _) as la eqn:Hla.
-  apply (f_equal length) in Hla.
-  rewrite isort_rank_insert_length in Hla.
-  rewrite map_length, isort_rank_length in Hla.
-  rewrite <- Hla.
+  generalize Hla; intros Hlab.
+  apply (f_equal length) in Hlab.
+  rewrite isort_rank_insert_length in Hlab.
+  rewrite map_length, isort_rank_length in Hlab.
+  rewrite <- Hlab.
+  assert (Hs : sorted Nat.leb la). {
+    rewrite Hla.
+    apply sorted_isort_rank_insert. {
+      apply Nat_leb_trans.
+    } {
+      apply Nat_leb_total_relation.
+    } {
+      intros ia ic Hia Hic.
+      destruct Hia as [Hia| Hia]. {
+        subst ia; rewrite List_nth_0_cons.
+        destruct Hic as [Hic| Hic]. {
+          subst ic; rewrite List_nth_0_cons.
+          now do 2 rewrite Nat.leb_refl.
+        }
+        apply in_map_iff in Hic.
+        destruct Hic as (id & H & Hid); subst ic.
+        rewrite List_nth_succ_cons.
+        cbn; apply Nat.leb_le.
+        generalize Hid; intros Hidb.
+        apply in_isort_rank in Hidb.
+...
+        apply in_isort_rank in Hid; cbn.
+...
 Theorem isort_rank_app_map_S_zero : ∀ la,
   isort_rank Nat.leb (map S la ++ [0]) =
   length la :: isort_rank Nat.leb la.
