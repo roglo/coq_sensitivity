@@ -4985,9 +4985,71 @@ Theorem permutation_seq_collapse : ∀ sta la,
   → collapse la = map (λ i, i - sta) la.
 Proof.
 intros * Hp.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert sta la Hlen Hp.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+apply (permutation_sym Nat.eqb_eq) in Hp.
+rewrite seq_S in Hp.
+eapply (permutation_trans Nat.eqb_eq) in Hp. 2: {
+  apply (permutation_cons_append Nat.eqb_eq).
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+subst la.
+rewrite app_length in Hlen; cbn in Hlen.
+rewrite Nat.add_succ_r in Hlen.
+apply Nat.succ_inj in Hlen.
+rewrite <- app_length in Hlen.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+specialize (IHlen _ _ Hlen Hp) as H1.
+Search (collapse (_ ++ _)).
+Search (isort_rank _ (_ ++ _)).
+...
+cbn - [ seq ] in Haft.
+replace (S (length la)) with (length bef + (S (length la) - length bef))
+  in Haft. 2: {
+  rewrite Nat.add_comm, Nat.sub_add; [ easy | ].
+  apply (f_equal length) in Haft.
+  rewrite app_length, seq_length in Haft.
+  rewrite Haft.
+  now apply Nat.le_add_r.
+}
+rewrite seq_app in Haft.
+apply List_app_eq_app' in Haft; [ | now rewrite seq_length ].
+destruct Haft as (Hbef1 & Haft).
+rewrite <- Hbef1 in Hbef, Hp.
+clear Hbef1.
+...
+intros * Hp.
 revert sta Hp.
 induction la as [| a]; intros; [ easy | ].
 cbn - [ nth ].
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+cbn - [ seq ] in Haft.
+replace (S (length la)) with (length bef + (S (length la) - length bef))
+  in Haft. 2: {
+  rewrite Nat.add_comm, Nat.sub_add; [ easy | ].
+  apply (f_equal length) in Haft.
+  rewrite app_length, seq_length in Haft.
+  rewrite Haft.
+  now apply Nat.le_add_r.
+}
+rewrite seq_app in Haft.
+apply List_app_eq_app' in Haft; [ | now rewrite seq_length ].
+destruct Haft as (Hbef1 & Haft).
+rewrite <- Hbef1 in Hbef, Hp.
+clear Hbef1.
 ... ...
 rewrite (permutation_seq_collapse 1); [ | now rewrite Hkm ].
 apply (List_map_nth' 0).
