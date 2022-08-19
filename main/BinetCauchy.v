@@ -5063,6 +5063,17 @@ specialize (IHlen _ _ Hlen Hp) as H1.
 rewrite map_app.
 remember (sta + len) as n eqn:Hn; cbn.
 replace (n - sta) with len by now rewrite Hn, Nat.add_comm, Nat.add_sub.
+rewrite map_app in H1.
+rewrite <- firstn_skipn with (n := length bef) (l := collapse _) in H1.
+apply List_app_eq_app' in H1. 2: {
+  rewrite firstn_length, map_length, collapse_length.
+  apply Nat.min_l.
+  rewrite app_length; apply Nat.le_add_r.
+}
+destruct H1 as (H1, H2).
+rewrite <- H1, <- H2.
+rewrite <- Hlen, Hn.
+...
 Theorem collapse_app_cons : ∀ la lb a,
   (∀ b, b ∈ la ++ lb → b < a)
   → collapse (la ++ a :: lb) =
@@ -5080,6 +5091,29 @@ let a := 41 in
      length (la ++ lb) :: skipn (length la) (collapse (la ++ lb))
 ).
 ...
+*)
+(*
+remember (length la) as n eqn:Hn; symmetry in Hn.
+revert a la lb Hab Hn.
+induction n; intros. {
+  apply length_zero_iff_nil in Hn; subst la.
+  rewrite firstn_O, skipn_O.
+  cbn - [ nth ] in Hab |-*.
+  rewrite isort_rank_insert_ub_app. 2: {
+    intros ib Hb.
+    rewrite List_nth_0_cons.
+    apply Nat.leb_gt, Hab.
+    apply in_map_iff in Hb.
+    destruct Hb as (ic & H & Hc); subst ib; cbn.
+    apply in_isort_rank in Hc.
+    now apply nth_In.
+  }
+  rewrite isort_rank_app_map_S_zero.
+  now rewrite isort_rank_length.
+}
+destruct la as [| b]; [ easy | ].
+cbn in Hn; apply Nat.succ_inj in Hn.
+cbn - [ collapse firstn skipn ].
 *)
 revert a lb Hab.
 induction la as [| b]; intros. {
