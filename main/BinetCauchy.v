@@ -5131,7 +5131,14 @@ Theorem isort_rank_app_map_S_zero : ∀ la,
   length la :: isort_rank Nat.leb la.
 Proof.
 intros.
-induction la as [| a]; [ easy | ].
+(*
+Compute (
+let la := [13; 13; 34; 15; 12] in
+  isort_rank Nat.leb (map S la ++ [0]) =
+  length la :: isort_rank Nat.leb la
+).
+*)
+induction la as [| ia]; [ easy | ].
 cbn - [ nth ].
 rewrite IHla.
 clear IHla.
@@ -5142,8 +5149,8 @@ rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
 rewrite map_length, Nat.sub_diag, List_nth_0_cons.
 cbn - [ nth ].
 f_equal.
+Check isort_rank_insert_lb_app.
 rewrite isort_rank_insert_lb_app. 2: {
-  rename a into ia.
   rewrite List_nth_0_cons.
   destruct la as [| ib]; [ now left | right ].
   rewrite List_hd_nth_0.
@@ -5163,9 +5170,14 @@ rewrite isort_rank_insert_lb_app. 2: {
     (map S (isort_rank Nat.leb la))) as lb eqn:Hlb.
   symmetry in Hlb.
   destruct lb as [| ic]. {
-About neq_isort_insert_nil.
+    now apply neq_isort_rank_insert_nil in Hlb.
+  }
+  rewrite List_nth_0_cons.
+  destruct ic. {
+    rewrite List_nth_0_cons.
+    cbn; apply Nat.leb_le.
+    exfalso; clear ia.
 ...
-    apply neq_isort_rank_insert_nil in Hlb.
 ...
   cbn - [ nth ] in IHla.
 ...
