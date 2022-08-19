@@ -4541,6 +4541,10 @@ rewrite collapse_comp; cycle 1. {
 } {
   symmetry; apply canon_sym_gr_list_length.
 }
+Search collapse.
+Theorem eq_sorted_collapse_seq : ∀ la,
+  sorted Nat.ltb la → collapse la = seq 0 (length la).
+...
 unfold collapse.
 ...
 rewrite eq_sorted_isort_rank_seq. 2: {
