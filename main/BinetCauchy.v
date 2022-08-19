@@ -5008,6 +5008,32 @@ apply Nat.succ_inj in Hlen.
 rewrite <- app_length in Hlen.
 apply (permutation_sym Nat.eqb_eq) in Hp.
 specialize (IHlen _ _ Hlen Hp) as H1.
+rewrite map_app.
+remember (sta + len) as n eqn:Hn; cbn.
+replace (n - sta) with len by now rewrite Hn, Nat.add_comm, Nat.add_sub.
+Theorem collapse_app_cons : ∀ la lb a,
+  (∀ b, b ∈ la ++ lb → b < a)
+  → collapse (la ++ a :: lb) =
+     firstn (length la) (collapse (la ++ lb)) ++
+     length (la ++ lb) :: skipn (length la) (collapse (la ++ lb)).
+Proof.
+intros * Hab.
+revert a lb Hab.
+induction la as [| b]; intros. {
+  cbn - [ nth ].
+... ...
+rewrite collapse_app_cons. 2: {
+  intros i Hi.
+  apply (permutation_in_iff Nat.eqb_eq Hp i) in Hi.
+  now apply in_seq in Hi; rewrite <- Hn in Hi.
+}
+rewrite Hlen, H1.
+rewrite firstn_map, skipn_map.
+rewrite firstn_app, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite firstn_all.
+rewrite skipn_app, Nat.sub_diag, skipn_O.
+now rewrite skipn_all, app_nil_l.
+...
 Search (collapse (_ ++ _)).
 Search (isort_rank _ (_ ++ _)).
 ...
