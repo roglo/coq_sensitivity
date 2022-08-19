@@ -444,3 +444,16 @@ intros.
 unfold collapse.
 now do 2 rewrite isort_rank_length.
 Qed.
+
+Theorem eq_sorted_collapse_seq : ∀ la,
+  sorted Nat.leb la → collapse la = seq 0 (length la).
+Proof.
+intros * Hs.
+unfold collapse.
+rewrite eq_sorted_isort_rank_seq. 2: {
+  rewrite eq_sorted_isort_rank_seq; [ | easy ].
+  apply sorted_nat_ltb_leb_incl.
+  apply sorted_seq.
+}
+now rewrite isort_rank_length.
+Qed.
