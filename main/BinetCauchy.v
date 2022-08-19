@@ -5101,58 +5101,37 @@ induction la as [| b]; intros. {
   rewrite isort_rank_insert_length in Hlab.
   rewrite map_length, isort_rank_length in Hlab.
   rewrite <- Hlab.
-(*
-  assert (Hs : sorted Nat.leb la). {
-    rewrite Hla.
-    apply sorted_isort_rank_insert. {
-      apply Nat_leb_trans.
-    } {
-      apply Nat_leb_total_relation.
-    } {
-      intros ia ic Hia Hic.
-      destruct Hia as [Hia| Hia]. {
-        subst ia; rewrite List_nth_0_cons.
-        destruct Hic as [Hic| Hic]. {
-          subst ic; rewrite List_nth_0_cons.
-          now do 2 rewrite Nat.leb_refl.
-        }
-        apply in_map_iff in Hic.
-        destruct Hic as (id & H & Hid); subst ic.
-        rewrite List_nth_succ_cons.
-        cbn; apply Nat.leb_le.
-        generalize Hid; intros Hidb.
-        apply in_isort_rank in Hidb.
+  apply isort_rank_app_map_S_zero.
+}
+cbn - [ collapse firstn skipn ].
+specialize (Hab _ (or_introl eq_refl)) as Hba.
 ...
-        apply in_isort_rank in Hid; cbn.
+  destruct Hic as [Hic| Hic]. {
+    subst ic.
+    now do 2 rewrite List_nth_0_cons.
+  }
+  apply in_map_iff in Hic.
+  destruct Hic as (id & H & Hid); subst ic.
+  do 2 rewrite List_nth_succ_cons.
+  apply in_isort_rank in Hid.
+  rewrite app_nth1; [ | now rewrite map_length ].
+  rewrite (List_map_nth' 0); [ | easy ].
+  cbn; symmetry.
+  now rewrite nth_indep with (d' := 0).
+}
 ...
-*)
-Theorem isort_rank_app_map_S_zero : ∀ la,
-  isort_rank Nat.leb (map S la ++ [0]) =
-  length la :: isort_rank Nat.leb la.
-Proof.
-intros.
-(*
-Compute (
-let la := [13; 13; 34; 15; 12] in
-  isort_rank Nat.leb (map S la ++ [0]) =
-  length la :: isort_rank Nat.leb la
-).
-*)
-induction la as [| ia]; [ easy | ].
-cbn - [ nth ].
-rewrite IHla.
-clear IHla.
-cbn - [ nth ].
-rewrite List_nth_0_cons.
-rewrite List_nth_succ_cons.
-rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
-rewrite map_length, Nat.sub_diag, List_nth_0_cons.
-cbn - [ nth ].
-f_equal.
-Check isort_rank_insert_lb_app.
 rewrite isort_rank_insert_lb_app. 2: {
+Compute (
+let la := [35; 13; 13; 34; 15; 12] in
+let ia := 17 in
+  map S (isort_rank Nat.leb la) = []
+  ∨ (nth 0 (S ia :: map S la ++ [0]) (S ia) <=?
+     nth (hd 0 (map S (isort_rank Nat.leb la))) (S ia :: map S la ++ [0]) (S ia)) = true
+).
+...
   rewrite List_nth_0_cons.
   destruct la as [| ib]; [ now left | right ].
+  apply Nat.leb_le.
   rewrite List_hd_nth_0.
   rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length; cbn ].
   rewrite List_nth_succ_cons.
@@ -5165,6 +5144,13 @@ rewrite isort_rank_insert_lb_app. 2: {
     apply -> Nat.succ_lt_mono.
     now apply in_isort_rank in Hj.
   }
+Compute (
+let la := [35; 13; 13; 34; 15; 12] in
+let ia := 17 in
+let ib := 5 in
+  S ia ≤ nth (nth 0 (isort_rank Nat.leb (ib :: la)) 0) (map S (ib :: la)) (S ia)
+).
+...
   cbn - [ nth "<=?" ].
   remember (isort_rank_insert Nat.leb (λ i : nat, nth i (ib :: la) ib) 0
     (map S (isort_rank Nat.leb la))) as lb eqn:Hlb.
@@ -5177,6 +5163,16 @@ rewrite isort_rank_insert_lb_app. 2: {
     rewrite List_nth_0_cons.
     cbn; apply Nat.leb_le.
     exfalso; clear ia.
+    apply (f_equal (λ l, nth 0 l 0)) in Hlb.
+    rewrite List_nth_0_cons in Hlb.
+Search (nth _ (isort_rank_insert _ _ _ _)).
+Compute (
+let la := [3;7;2;5;27] in
+let lb := [8;1;7;9] in
+let ib := 2 in
+  isort_rank_insert Nat.leb (λ i : nat, nth i (ib :: la) ib) 0 (map S (isort_rank Nat.leb la)) = 0 :: lb
+).
+Search (nth _ (isort_rank_insert _ _ _ _)).
 ...
 ...
   cbn - [ nth ] in IHla.
