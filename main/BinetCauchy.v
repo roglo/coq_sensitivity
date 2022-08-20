@@ -5034,6 +5034,49 @@ subst k.
 apply in_all_permut_permutation in Hkl.
 clear A B Hca Hcb Har Hac Hbr Hbc Hab.
 clear g1 h1.
+subst j.
+Theorem permutation_seq_collapse : ∀ la,
+  permutation Nat.eqb la (seq 1 (length la))
+  → collapse la = map pred la.
+Proof.
+intros * Hp.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert la Hlen Hp.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+apply (permutation_sym Nat.eqb_eq) in Hp.
+rewrite seq_S in Hp.
+eapply (permutation_trans Nat.eqb_eq) in Hp. 2: {
+  apply (permutation_cons_append Nat.eqb_eq).
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+subst la.
+rewrite app_length in Hlen; cbn in Hlen.
+rewrite Nat.add_succ_r in Hlen.
+apply Nat.succ_inj in Hlen.
+rewrite <- app_length in Hlen.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+specialize (IHlen _ Hlen Hp) as H1.
+rewrite map_app.
+remember (1 + len) as n eqn:Hn; cbn.
+replace (pred n) with len by now rewrite Hn, Nat.pred_succ.
+rewrite map_app in H1.
+rewrite <- firstn_skipn with (n := length bef) (l := collapse _) in H1.
+apply List_app_eq_app' in H1. 2: {
+  rewrite firstn_length, map_length, collapse_length.
+  apply Nat.min_l.
+  rewrite app_length; apply Nat.le_add_r.
+}
+cbn in Hn; subst n.
+...
+destruct H1 as (H1, H2).
+rewrite <- H1, <- H2.
 ...
 Theorem permutation_seq_collapse : ∀ sta la,
   permutation Nat.eqb la (seq sta (length la))
