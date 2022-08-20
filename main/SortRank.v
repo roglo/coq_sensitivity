@@ -310,6 +310,18 @@ etransitivity; [ apply Hx | apply Hy ].
 Qed.
 *)
 
+Theorem eq_sorted_isort_rank_insert_seq : ∀ A (rel : A → _) (ia : A) lrank f,
+  (∀ ib, ib ∈ lrank → rel (f ia) (f ib) = true)
+  → isort_rank_insert rel f ia lrank = ia :: lrank.
+Proof.
+intros * Ha.
+destruct lrank as [| ib]; [ easy | cbn ].
+remember (rel (f ia) (f ib)) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+rewrite Ha in Hab; [ easy | now left ].
+Qed.
+
+(*
 Theorem eq_sorted_isort_rank_insert_seq : ∀ A ia lrank (f : A → _),
   (∀ ib, ib ∈ lrank → f ia ≤ f ib)
   → isort_rank_insert Nat.leb f ia lrank = ia :: lrank.
@@ -321,6 +333,42 @@ destruct (le_dec (f ia) (f ib)) as [Hab| Hab]; [ easy | ].
 now exfalso; apply Hab, Ha; left.
 Qed.
 
+Theorem eq_sorted_isort_rank_insert_ltb_seq : ∀ A ia lrank (f : A → _),
+  (∀ ib, ib ∈ lrank → f ia < f ib)
+  → isort_rank_insert Nat.ltb f ia lrank = ia :: lrank.
+Proof.
+intros * Ha.
+destruct lrank as [| ib]; [ easy | ].
+cbn - [ "<?" ].
+rewrite if_ltb_lt_dec.
+destruct (lt_dec (f ia) (f ib)) as [Hab| Hab]; [ easy | ].
+now exfalso; apply Hab, Ha; left.
+Qed.
+*)
+
+Theorem eq_sorted_isort_rank_seq : ∀ (rel : nat → _),
+  transitive rel →
+  ∀ la, sorted rel la
+  → isort_rank rel la = seq 0 (length la).
+Proof.
+intros * Htra * Hs.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth seq ].
+rewrite IHla; [ | now apply sorted_cons in Hs ].
+rewrite seq_shift.
+cbn - [ nth ].
+apply eq_sorted_isort_rank_insert_seq.
+intros * Hb.
+apply in_seq in Hb.
+rewrite List_nth_0_cons.
+apply sorted_cons_iff in Hs; [ | easy ].
+destruct Hs as (Hs, Ha).
+apply Ha.
+destruct ib; [ easy | cbn ].
+apply nth_In; flia Hb.
+Qed.
+
+(*
 Theorem eq_sorted_isort_rank_seq : ∀ la,
   sorted Nat.leb la
   → isort_rank Nat.leb la = seq 0 (length la).
@@ -345,6 +393,7 @@ assert (H : nth ib (a :: la) a ∈ la). {
 specialize (H1 H); clear H.
 now apply Nat.leb_le.
 Qed.
+*)
 
 Theorem isort_rank_insert_eq_compat : ∀ A (f g : A → _) ia lrank,
   (∀ x y, x ∈ ia :: lrank → y ∈ ia :: lrank → (f x <=? f y) = (g x <=? g y))
@@ -408,9 +457,9 @@ rewrite (List_map_nth' 0); [ | easy ].
 now do 2 rewrite Nat_leb_add_mono_l.
 Qed.
 
-Theorem nth_nth_isort_rank : ∀ A d ord (l : list A) i,
+Theorem nth_nth_isort_rank : ∀ A d rel (l : list A) i,
   i < length l
-  → nth (nth i (isort_rank ord l) 0) l d = nth i (isort ord l) d.
+  → nth (nth i (isort_rank rel l) 0) l d = nth i (isort rel l) d.
 Proof.
 intros * Hil.
 rewrite (isort_isort_rank _ d).
@@ -525,8 +574,8 @@ Theorem eq_sorted_collapse_seq : ∀ la,
 Proof.
 intros * Hs.
 unfold collapse.
-rewrite eq_sorted_isort_rank_seq. 2: {
-  rewrite eq_sorted_isort_rank_seq; [ | easy ].
+rewrite eq_sorted_isort_rank_seq; [ | apply Nat_leb_trans | ]. 2: {
+  rewrite eq_sorted_isort_rank_seq; [ | apply Nat_leb_trans | easy ].
   apply sorted_nat_ltb_leb_incl.
   apply sorted_seq.
 }

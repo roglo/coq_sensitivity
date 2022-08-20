@@ -1787,11 +1787,22 @@ now apply (NoDup_nat _ (NoDup_isort_rank _ _)) in Hij.
 Qed.
 
 (**)
-Theorem isort_rank_seq : ∀ n, isort_rank Nat.leb (seq 0 n) = seq 0 n.
+Theorem isort_rank_leb_seq : ∀ n, isort_rank Nat.leb (seq 0 n) = seq 0 n.
 Proof.
 intros.
-rewrite eq_sorted_isort_rank_seq; [ now rewrite seq_length | ].
+rewrite (eq_sorted_isort_rank_seq Nat_leb_trans). {
+  now rewrite seq_length.
+}
 apply sorted_nat_ltb_leb_incl.
+apply sorted_seq.
+Qed.
+
+Theorem isort_rank_ltb_seq : ∀ n, isort_rank Nat.ltb (seq 0 n) = seq 0 n.
+Proof.
+intros.
+rewrite (eq_sorted_isort_rank_seq Nat_ltb_trans). {
+  now rewrite seq_length.
+}
 apply sorted_seq.
 Qed.
 
@@ -1833,7 +1844,37 @@ rewrite seq_nth. 2: {
   now rewrite H2 in Hila.
 }
 cbn.
-Search (isort_rank Nat.ltb _).
+(*
+Compute (
+let la := [3;9;7;9;5;5;2] in
+let rel := Nat.ltb in
+map (λ i,
+  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0) (isort_rank rel la) 0 =
+  nth i (isort_rank Nat.ltb (seq 0 (length la))) 0) (seq 0 (length la))
+).
+*)
+rewrite isort_rank_ltb_seq.
+rewrite seq_nth; [ | easy ].
+Search (isort_rank _ (isort_rank _ _)).
+...
+rewrite nth_nth_isort_rank; [ | now rewrite isort_rank_length ].
+Compute (
+let la := [3;9;7;9;5;5;2] in
+let rel := λ i j, Nat.leb j i in
+map (λ i,
+  nth i (isort Nat.ltb (isort_rank rel la)) 0 = 0 + i
+) (seq 0 (length la))
+).
+rewrite isort_isort_rank with (d := 0).
+rewrite (List_map_nth' 0); [ | now do 2 rewrite isort_rank_length ].
+rewrite nth_nth_isort_rank.
+  ============================
+  nth i (isort Nat.ltb (isort_rank rel la)) 0 = 0 + i
+
+...
+rewrite nth_nth_isort_rank.
+...
+rewrite isort_rank_seq.
 ...
 rewrite isort_rank_seq.
 now rewrite seq_nth.
