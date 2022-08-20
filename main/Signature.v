@@ -2178,14 +2178,13 @@ rewrite <- Hlr in Hc2.
 now apply Nat.nle_gt in Hc2.
 Qed.
 
-Theorem collapse_keeps_order : ∀ l i j,
+Theorem collapse_keeps_order : ∀ l,
   NoDup l
-  → i < length l
-  → j < length l
+  → ∀ i j,  i < length l → j < length l
   → (nth i (collapse l) 0 ?= nth j (collapse l) 0) =
     (nth i l 0 ?= nth j l 0).
 Proof.
-intros * Hnd Hi Hj.
+intros * Hnd * Hi Hj.
 remember (nth i (collapse l) 0 ?= nth j (collapse l) 0) as c1 eqn:Hc1.
 remember (nth i l 0 ?= nth j l 0) as c2 eqn:Hc2.
 specialize (collapse_permut_seq_with_len l) as Hc.

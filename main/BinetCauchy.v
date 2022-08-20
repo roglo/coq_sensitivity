@@ -5034,7 +5034,25 @@ subst k.
 apply in_all_permut_permutation in Hkl.
 clear A B Hca Hcb Har Hac Hbr Hbc Hab.
 clear g1 h1.
+Theorem permutation_seq_collapse : ∀ sta la,
+  permutation Nat.eqb la (seq sta (length la))
+  → collapse la = map (λ i, i - sta) la.
+Proof.
+intros * Hp.
+specialize collapse_keeps_order as H1.
+specialize (H1 la).
+Search permutation.
+Check permutation_NoDup.
+assert (H : NoDup la). {
+  eapply (permutation_NoDup Nat.eqb_eq). {
+    apply (permutation_sym Nat.eqb_eq), Hp.
+  }
+  apply seq_NoDup.
+}
+specialize (H1 H); clear H.
+...
 subst j.
+...
 Theorem permutation_seq_collapse : ∀ la,
   permutation Nat.eqb la (seq 1 (length la))
   → collapse la = map pred la.
