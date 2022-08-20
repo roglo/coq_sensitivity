@@ -5090,7 +5090,32 @@ split; intros Hab. {
 (**)
   apply extract_Some_iff in Hlxl.
   destruct Hlxl as (Hbef & H & Haft).
-  apply Nat.eqb_eq in H; subst x.
+  apply Nat.eqb_eq in H; subst x lb.
+  rewrite app_length in Hb; cbn in Hb.
+  rewrite Nat.add_succ_r in Hb.
+  apply Nat.succ_inj in Hb.
+  rewrite <- app_length in Hb.
+(**)
+  apply (permutation_sym Nat.eqb_eq) in Hpab.
+  generalize Hpab; intros Hc.
+  apply IHn with (la := collapse (bef ++ aft)) in Hc; cycle 1. {
+    apply NoDup_collapse.
+  } {
+    now rewrite collapse_length.
+  } {
+    easy.
+  } {
+    apply (permutation_sym Nat.eqb_eq) in Hpab.
+    apply (permutation_NoDup Nat.eqb_eq) in Hpab; [ easy | ].
+    apply seq_NoDup.
+  } {
+    intros i j Hi Hj.
+    apply collapse_keeps_order; [ | congruence | congruence ].
+    apply (permutation_sym Nat.eqb_eq) in Hpab.
+    apply (permutation_NoDup Nat.eqb_eq) in Hpab; [ easy | ].
+    apply seq_NoDup.
+  }
+  rewrite collapse_idemp in Hc.
 ...
   apply (permutation_sym Nat.eqb_eq) in Hpab.
   apply IHn with (la := isort_rank Nat.ltb (bef ++ aft)) in Hpab; cycle 1. {
