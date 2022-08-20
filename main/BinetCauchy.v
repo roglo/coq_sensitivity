@@ -5032,6 +5032,9 @@ rewrite (List_map_nth' 0). 2: {
 f_equal.
 subst k.
 apply in_all_permut_permutation in Hkl.
+clear A B Hca Hcb Har Hac Hbr Hbc Hab.
+clear g1 h1.
+...
 Theorem permutation_seq_collapse : ∀ sta la,
   permutation Nat.eqb la (seq sta (length la))
   → collapse la = map (λ i, i - sta) la.
