@@ -5116,6 +5116,44 @@ split; intros Hab. {
     apply seq_NoDup.
   }
   rewrite collapse_idemp in Hc.
+  assert
+    (Hbi : ∀ i, i < length la → i ≠ length bef
+     → nth i la 0 < nth (length bef) la 0). {
+    intros i Hi Hib.
+    rewrite Ha in Hi.
+    specialize (Hko i (length bef) Hi) as H1.
+    assert (H : length bef < S n). {
+      rewrite <- Hb; rewrite app_length; flia.
+    }
+    specialize (H1 H); clear H.
+    rewrite app_nth2 with (n := length bef) (l := bef) in H1. 2: {
+      now unfold ge.
+    }
+    rewrite Nat.sub_diag, List_nth_0_cons in H1.
+    apply Nat.compare_lt_iff; rewrite H1.
+    apply Nat.compare_lt_iff.
+    destruct (lt_dec i (length bef)) as [Hilb| Hilb]. {
+      rewrite app_nth1; [ | easy ].
+      apply (permutation_in_iff Nat.eqb_eq) with (a := i) in Hpab.
+...
+      assert (H : i ∈ bef). {
+...
+Search (permutation _ _ _ → _ → _).
+Search (permutation _ _ (seq _ _)).
+
+Search ((_ ?= _) = Lt).
+Search (_ < _ ↔ _ = Lt).
+Search (_ = Lt ↔ _ < _).
+About nat_compare_lt.
+    apply Nat.ltb_compare.
+
+Search (isort_rank _ (_ ++ _)).
+Search (firstn _ _ ++ _).
+Search (collapse _ = _ ++ _).
+(∀ j, j < length la → j ≠ i → nth j la 0 < nth i la 0)
+→ ∃ l1 l2, collapse la = l1 ++ i :: l2
+
+specialize (Hko (length bef)
 ...
   apply (permutation_sym Nat.eqb_eq) in Hpab.
   apply IHn with (la := isort_rank Nat.ltb (bef ++ aft)) in Hpab; cycle 1. {
