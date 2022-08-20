@@ -5073,25 +5073,14 @@ apply List_app_eq_app' in H1. 2: {
 destruct H1 as (H1, H2).
 rewrite <- H1, <- H2.
 rewrite <- Hlen, Hn.
-...
 Theorem collapse_app_cons : ∀ la lb a,
-  (∀ b, b ∈ la ++ lb → b < a)
+  NoDup (a :: la ++ lb)
+  → (∀ b, b ∈ la ++ lb → b < a)
   → collapse (la ++ a :: lb) =
      firstn (length la) (collapse (la ++ lb)) ++
      length (la ++ lb) :: skipn (length la) (collapse (la ++ lb)).
 Proof.
-intros * Hab.
-(*
-Compute (
-let la := [13; 34; 15] in
-let lb := [8; 5; 17; 40] in
-let a := 41 in
-    collapse (la ++ a :: lb) =
-     firstn (length la) (collapse (la ++ lb)) ++
-     length (la ++ lb) :: skipn (length la) (collapse (la ++ lb))
-).
-...
-*)
+intros * Hnd Hab.
 (*
 remember (length la) as n eqn:Hn; symmetry in Hn.
 revert a la lb Hab Hn.
@@ -5115,7 +5104,7 @@ destruct la as [| b]; [ easy | ].
 cbn in Hn; apply Nat.succ_inj in Hn.
 cbn - [ collapse firstn skipn ].
 *)
-revert a lb Hab.
+revert a lb Hab Hnd.
 induction la as [| b]; intros. {
   cbn - [ nth ]; cbn in Hab.
   rewrite isort_rank_insert_ub_app. 2: {
@@ -5139,6 +5128,83 @@ induction la as [| b]; intros. {
 }
 cbn - [ collapse firstn skipn ].
 specialize (Hab _ (or_introl eq_refl)) as Hba.
+Theorem collapse_app : ∀ la lb,
+  NoDup (la ++ lb)
+  → collapse (la ++ lb) =
+      skipn (length lb) (collapse (lb ++ la)) ++
+      firstn (length lb) (collapse (lb ++ la)).
+Proof.
+intros * Hnd.
+revert la Hnd.
+induction lb as [| b]; intros. {
+  rewrite app_nil_r in Hnd.
+  now do 2 rewrite app_nil_r; cbn.
+}
+rewrite List_cons_is_app, app_assoc.
+rewrite IHlb; [ | now rewrite <- app_assoc ].
+cbn - [ collapse firstn skipn ].
+Theorem glop : ∀ la lb lc,
+  NoDup (la ++ lb ++ lc)
+  → skipn (length (la ++ lb)) (collapse (la ++ lb ++ lc)) =
+     skipn (length (la ++ lb)) (collapse (lb ++ la ++ lc)).
+Proof.
+intros * Hnd.
+revert lb lc Hnd.
+induction la as [| a]; intros; [ easy | ].
+cbn - [ collapse skipn ].
+(* ouais, chais pas si ça a du sens, tout ça... *)
+...
+rewrite glop.
+Proof.
+intros * Hnd.
+revert a lb Hnd.
+induction la as [| b]; intros. {
+  cbn in Hnd.
+  cbn - [ collapse skipn ].
+... ...
+rewrite glop.
+...
+Theorem collapse_cons : ∀ a la,
+  NoDup (a :: la)
+  → collapse (a :: la) =
+    skipn (length la) (collapse (la ++ [a])) ++
+    firstn (length la) (collapse (la ++ [a])).
+Proof.
+intros * Hnd.
+(*
+Compute (
+let la := [3;7;2;5;27] in
+let a := 17 in
+  collapse (a :: la) =
+  skipn (length la) (collapse (la ++ [a])) ++ firstn (length la) (collapse (la ++ [a]))).
+...
+*)
+revert a Hnd.
+induction la as [| b]; intros; [ easy | ].
+cbn - [ collapse firstn skipn ].
+... ...
+rewrite collapse_cons.
+rewrite app_length.
+cbn - [ collapse firstn skipn ].
+rewrite Nat.add_succ_r, <- app_length.
+rewrite <- app_assoc.
+cbn - [ collapse firstn skipn ].
+rewrite IHla. 2: {
+  intros c Hc.
+  apply Hab; cbn - [ In ].
+  apply in_app_or in Hc.
+  destruct Hc as [Hc| Hc]; [ now right; apply in_or_app; left | ].
+  apply in_app_or in Hc.
+  destruct Hc as [Hc| Hc]; [ now right; apply in_or_app; right | ].
+  destruct Hc; [ now subst c; left | easy ].
+}
+rewrite skipn_app.
+rewrite skipn_all2. 2: {
+  rewrite firstn_length, collapse_length, app_length.
+  rewrite Nat.min_l; [ | apply Nat.le_add_r ].
+  rewrite app_length, <- Nat.add_succ_r.
+  apply Nat.le_add_r.
+}
 ...
   destruct Hic as [Hic| Hic]. {
     subst ic.
