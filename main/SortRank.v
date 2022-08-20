@@ -532,3 +532,9 @@ rewrite eq_sorted_isort_rank_seq. 2: {
 }
 now rewrite isort_rank_length.
 Qed.
+
+Theorem NoDup_collapse : ∀ la, NoDup (collapse la).
+Proof.
+intros.
+apply NoDup_isort_rank.
+Qed.

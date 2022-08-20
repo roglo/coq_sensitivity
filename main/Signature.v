@@ -2524,22 +2524,6 @@ rename lb into la.
 apply isort_comp_collapse.
 Qed.
 
-Theorem NoDup_collapse : ∀ la,
-  NoDup la → NoDup (collapse la).
-Proof.
-intros * Hla.
-specialize (NoDup_nat _ Hla) as Ha.
-apply nat_NoDup.
-rewrite collapse_length.
-intros i j Hi Hj Hij.
-specialize (collapse_keeps_order Hla Hi Hj) as H1.
-apply Nat.compare_eq_iff in Hij.
-rewrite Hij in H1.
-symmetry in H1.
-apply Nat.compare_eq_iff in H1.
-now apply Ha.
-Qed.
-
 Theorem NoDup_comp_iff : ∀ la lb,
   permut_seq_with_len (length la) lb
   → NoDup la

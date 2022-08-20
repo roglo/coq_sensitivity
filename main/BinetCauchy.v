@@ -5039,10 +5039,9 @@ Theorem permutation_seq_collapse : ∀ sta la,
   → collapse la = map (λ i, i - sta) la.
 Proof.
 intros * Hp.
+(*
 specialize collapse_keeps_order as H1.
 specialize (H1 la).
-Search permutation.
-Check permutation_NoDup.
 assert (H : NoDup la). {
   eapply (permutation_NoDup Nat.eqb_eq). {
     apply (permutation_sym Nat.eqb_eq), Hp.
@@ -5050,6 +5049,32 @@ assert (H : NoDup la). {
   apply seq_NoDup.
 }
 specialize (H1 H); clear H.
+*)
+Theorem collapse_eq_iff : ∀ la lb,
+  collapse la = lb
+  ↔ ∃ n, length la = n ∧ length lb = n ∧
+    NoDup lb ∧ permutation Nat.eqb lb (seq 0 n) ∧
+    ∀ i j, i < n → j < n
+    → (nth i la 0 ?= nth j la 0) = (nth i lb 0 ?= nth j lb 0).
+Proof.
+intros.
+split; intros Hab. {
+  exists (length la).
+  split; [ easy | ].
+  split. {
+    apply (f_equal length) in Hab.
+    now rewrite collapse_length in Hab.
+  }
+  split; [ subst lb; apply NoDup_collapse | ].
+  split. {
+About isort_rank_permut_seq.
+Search (permutation _ _ (isort_rank _ _)).
+... ...
+apply collapse_eq_iff.
+exists (length la).
+rewrite map_length.
+split; [ easy | ].
+split; [ easy | ].
 ...
 subst j.
 ...

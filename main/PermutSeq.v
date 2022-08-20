@@ -1786,6 +1786,116 @@ rewrite <- (isort_rank_length Nat.leb) in Hi, Hj.
 now apply (NoDup_nat _ (NoDup_isort_rank _ _)) in Hij.
 Qed.
 
+(**)
+Theorem isort_rank_seq : ∀ n, isort_rank Nat.leb (seq 0 n) = seq 0 n.
+Proof.
+intros.
+rewrite eq_sorted_isort_rank_seq; [ now rewrite seq_length | ].
+apply sorted_nat_ltb_leb_incl.
+apply sorted_seq.
+Qed.
+
+(* to be completed
+   and put in SortRank.v
+   and prove isort_rank_permut_seq_with_len with that
+Theorem permutation_isort_rank : ∀ A (rel : A → _) la,
+  permutation Nat.eqb (isort_rank rel la) (seq 0 (length la)).
+Proof.
+intros.
+apply (permut_if_isort Nat.ltb Nat.eqb_eq).
+rewrite isort_isort_rank with (d := 0).
+rewrite isort_isort_rank with (d := 0).
+apply List_eq_iff.
+do 2 rewrite map_length.
+do 3 rewrite isort_rank_length.
+rewrite seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow. 2: {
+    rewrite map_length.
+    now do 2 rewrite isort_rank_length.
+  }
+  rewrite nth_overflow. 2: {
+    now rewrite map_length, isort_rank_length, seq_length.
+  }
+  easy.
+}
+rewrite (List_map_nth' 0); [ | now do 2 rewrite isort_rank_length ].
+rewrite (List_map_nth' 0); [ | now rewrite isort_rank_length, seq_length ].
+rewrite seq_nth. 2: {
+  specialize (isort_rank_ub Nat.ltb) as H1.
+  specialize (H1 (seq 0 (length la)) i).
+  rewrite seq_length in H1.
+  apply H1; intros H2.
+  apply List_seq_eq_nil in H2.
+  now rewrite H2 in Hila.
+}
+cbn.
+Search (isort_rank Nat.ltb _).
+...
+rewrite isort_rank_seq.
+now rewrite seq_nth.
+...
+intros.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert la Hlen.
+induction len; intros; [ now apply length_zero_iff_nil in Hlen; subst la | ].
+rewrite seq_S; cbn.
+eapply (permutation_trans Nat.eqb_eq). 2: {
+  apply (permutation_cons_append Nat.eqb_eq).
+}
+apply (permutation_sym Nat.eqb_eq).
+apply permutation_cons_l_iff.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  specialize (pigeonhole_list len (isort_rank rel la)) as H2.
+  rewrite isort_rank_length, Hlen in H2.
+  assert (H : len < S len) by easy.
+  specialize (H2 H); clear H.
+  assert (H : ∀ i, i ∈ isort_rank rel la → i < len). {
+    intros i Hi.
+    destruct (Nat.eq_dec i len) as [Hil| Hil]. {
+      subst i; apply H1 in Hi.
+      now rewrite Nat.eqb_refl in Hi.
+    }
+    apply in_isort_rank in Hi; rewrite Hlen in Hi.
+    flia Hi Hil.
+  }
+  specialize (H2 H); clear H.
+  remember (pigeonhole_comp_list (isort_rank rel la)) as xx eqn:Hxx.
+  symmetry in Hxx.
+  destruct xx as (i, j).
+  specialize (H2 _ _ eq_refl).
+  destruct H2 as (Hil & Hjl & H & Hij).
+  apply H; clear H.
+  rewrite <- Hlen in Hil, Hjl.
+  apply (NoDup_nth (isort_rank rel la) 0); [ | | | easy ]. {
+    apply NoDup_isort_rank.
+  } {
+    now rewrite isort_rank_length.
+  } {
+    now rewrite isort_rank_length.
+  }
+}
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+Check permutation_elt.
+...
+  destruct la as [| a]; [ easy | ].
+  cbn in Hlen.
+...
+  assert (H : len ∈ isort_rank rel la). {
+Search (_ ∈ isort_rank _ _).
+...
+Check permut_seq_iff.
+Print permut_seq.
+...
+*)
+
 Theorem isort_rank_permut_seq_with_len : ∀ A (rel : A → _) n l,
   length l = n
   → permut_seq_with_len n (isort_rank rel l).
@@ -1818,6 +1928,26 @@ Proof.
 intros.
 now apply (isort_rank_permut_seq_with_len _ (length l)).
 Qed.
+
+Theorem permutation_isort_rank : ∀ A (rel : A → _) la,
+  permutation Nat.eqb (isort_rank rel la) (seq 0 (length la)).
+Proof.
+intros.
+specialize (isort_rank_permut_seq rel la) as H1.
+unfold permut_seq in H1.
+now rewrite isort_rank_length in H1.
+Qed.
+
+(*
+Theorem isort_rank_permut_seq' : ∀ A (rel : A → _) l,
+  permut_seq (isort_rank rel l).
+Proof.
+intros.
+unfold permut_seq.
+rewrite isort_rank_length.
+Search (permutation _ (isort_rank _ _)).
+...
+*)
 
 (* *)
 
