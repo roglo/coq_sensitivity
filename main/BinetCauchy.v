@@ -5046,13 +5046,14 @@ assert (H : NoDup la). {
 specialize (H1 H); clear H.
 *)
 Theorem collapse_eq_iff : ∀ la lb,
-  collapse la = lb
+  NoDup la
+  → collapse la = lb
   ↔ ∃ n, length la = n ∧ length lb = n ∧
     NoDup lb ∧ permutation Nat.eqb lb (seq 0 n) ∧
     ∀ i j, i < n → j < n
     → (nth i la 0 ?= nth j la 0) = (nth i lb 0 ?= nth j lb 0).
 Proof.
-intros.
+intros * Hnd.
 split; intros Hab. {
   exists (length la).
   split; [ easy | ].
@@ -5069,10 +5070,70 @@ split; intros Hab. {
   }
   intros i j Hi Hj.
   symmetry; rewrite <- Hab.
-Check collapse_keeps_order.
+  now apply collapse_keeps_order.
+} {
+  destruct Hab as (n & Ha & Hb & Hndb & Hpab & Hko).
+  revert la lb Hnd Ha Hb Hndb Hpab Hko.
+  induction n; intros. {
+    apply length_zero_iff_nil in Ha; subst la.
+    apply length_zero_iff_nil in Hb; subst lb.
+    easy.
+  }
+  rewrite seq_S in Hpab; cbn in Hpab.
+  apply (permutation_sym Nat.eqb_eq) in Hpab.
+  eapply (permutation_trans Nat.eqb_eq) in Hpab. 2: {
+    apply (permutation_cons_append Nat.eqb_eq).
+  }
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+(**)
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Haft).
+  apply Nat.eqb_eq in H; subst x.
 ...
-  apply collapse_keeps_order; [ | easy | easy ].
-(* ah oui, ah non, la n'est pas NoDup *)
+  apply (permutation_sym Nat.eqb_eq) in Hpab.
+  apply IHn with (la := isort_rank Nat.ltb (bef ++ aft)) in Hpab; cycle 1. {
+    apply NoDup_isort_rank.
+  } {
+    rewrite isort_rank_length.
+    apply (permutation_length Nat.eqb_eq) in Hpab.
+    now rewrite seq_length in Hpab.
+  } {
+    apply (permutation_length Nat.eqb_eq) in Hpab.
+    now rewrite seq_length in Hpab.
+  } {
+    apply (permutation_sym Nat.eqb_eq) in Hpab.
+    apply (permutation_NoDup Nat.eqb_eq) in Hpab; [ easy | ].
+    apply seq_NoDup.
+  } {
+    intros i j Hi Hj.
+...
+Search (NoDup _ ↔ permutation _ _).
+Search (permutation _ _ ↔ NoDup _).
+...
+  apply IHn with (la := isort_rank Nat.ltb (bef ++ aft)) in Hpab. {
+    unfold collapse in Hpab.
+    rewrite permut_isort_rank_involutive in Hpab. 2: {
+      apply isort_rank_permut_seq.
+    }
+Compute (
+  let lb := [2; 3; 1; 0] in
+  isort_rank Nat.ltb lb = lb).
+...
+Check permut_isort_rank_involutive.
+Search (isort_rank _ _).
+Search (collapse (isort_rank _ _)).
+Search (isort_rank _ (collapse _)).
+Search (isort_rank
+...
+Search isort_rank_insert.
+...
+isort_rank_app_map_S_zero:
+  ∀ la : list nat,
+    isort_rank Nat.leb (map S la ++ [0]) = length la :: isort_rank Nat.leb la
+...
+Qed.
 ... ...
 apply collapse_eq_iff.
 exists (length la).
