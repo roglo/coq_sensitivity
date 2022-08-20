@@ -5002,14 +5002,9 @@ f_equal. {
   replace (collapse jl) with (seq 0 (length jl)). 2: {
     symmetry.
     apply sorted_nat_ltb_leb_incl in Hsj.
-    apply eq_sorted_isort_rank_seq in Hsj.
+    apply (eq_sorted_isort_rank_seq Nat_leb_trans) in Hsj.
     unfold collapse; rewrite Hsj.
-    rewrite Hjm.
-    assert (H : sorted Nat.leb (seq 0 m)). {
-      apply sorted_nat_ltb_leb_incl, sorted_seq.
-    }
-    specialize (eq_sorted_isort_rank_seq H) as H1; clear H.
-    now rewrite seq_length in H1.
+    apply isort_rank_leb_seq.
   }
   now rewrite ε_seq, rngl_mul_1_l.
 }
@@ -5067,8 +5062,17 @@ split; intros Hab. {
   }
   split; [ subst lb; apply NoDup_collapse | ].
   split. {
-About isort_rank_permut_seq.
-Search (permutation _ _ (isort_rank _ _)).
+    rewrite <- Hab.
+    unfold collapse.
+    rewrite <- (isort_rank_length Nat.leb).
+    apply permutation_isort_rank.
+  }
+  intros i j Hi Hj.
+  symmetry; rewrite <- Hab.
+Check collapse_keeps_order.
+...
+  apply collapse_keeps_order; [ | easy | easy ].
+(* ah oui, ah non, la n'est pas NoDup *)
 ... ...
 apply collapse_eq_iff.
 exists (length la).
