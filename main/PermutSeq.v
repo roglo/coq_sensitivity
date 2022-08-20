@@ -1813,6 +1813,13 @@ Theorem permutation_isort_rank : ∀ A (rel : A → _) la,
   permutation Nat.eqb (isort_rank rel la) (seq 0 (length la)).
 Proof.
 intros.
+induction la as [| a]; [ easy | ].
+cbn - [ nth seq ].
+Search (permutation _ (isort_insert _ _ _)).
+Search (permutation _ (isort_rank_insert _ _ _ _)).
+Print isort_rank_insert.
+...
+intros.
 apply (permut_if_isort Nat.ltb Nat.eqb_eq).
 rewrite isort_isort_rank with (d := 0).
 rewrite isort_isort_rank with (d := 0).
@@ -1855,14 +1862,30 @@ map (λ i,
 (**)
 rewrite isort_rank_ltb_seq.
 rewrite seq_nth; [ | easy ].
-Search collapse.
-...
 Compute (
 let la := [3;9;7;9;5;5;2] in
-let rel := Nat.leb in
+let rel := λ i j, false in
 map (λ i,
-  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0) (isort_rank rel la) 0 = i
+  nth (nth i (isort_rank Nat.ltb (isort_rank rel la)) 0) (isort_rank rel la) 0 = 0 + i
 ) (seq 0 (length la))
+).
+remember (isort_rank rel la) as lb eqn:Hlb.
+assert (H : i < length lb) by now rewrite Hlb, isort_rank_length.
+assert (Hp : permutation Nat.ltb lb (seq 0 (length lb))).
+rewrite Hlb.
+rewrite isort_rank_length.
+Search (permutation _ _ (isort_rank _ _)).
+Search (permutation _ (isort_rank _ _)).
+...
+clear d la Hila Hlb.
+rename lb into la; rename H into Hla; cbn.
+Search (nth _ (isort_rank _ _)).
+Compute (
+map (λ la,
+map (λ i,
+  nth (nth i (isort_rank Nat.ltb la) 0) la 0 = i
+) (seq 0 (length la))
+) (all_permut (seq 0 4))
 ).
 rewrite nth_nth_isort_rank; [ | now rewrite isort_rank_length ].
 Search (nth _ (isort _ _)).
