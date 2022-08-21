@@ -5072,6 +5072,16 @@ subst k.
 apply in_all_permut_permutation in Hkl.
 clear A B Hca Hcb Har Hac Hbr Hbc Hab.
 clear g1 h1.
+Theorem glop : ∀ la,
+  permutation eqb la (seq 1 (length la))
+  → ∀ i, 1 ≤ i ≤ length la
+  → (collapse la).(i) = la.(i) - 1.
+Proof.
+intros * Hp * Hi.
+... ...
+move Hkm at top; subst j m.
+now apply glop.
+...
 Theorem permutation_seq_collapse : ∀ la,
   permutation Nat.eqb la (seq 1 (length la))
   → collapse la = map pred la.
