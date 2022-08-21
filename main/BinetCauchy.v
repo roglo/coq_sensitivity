@@ -1526,7 +1526,7 @@ apply permut_collapse.
 now unfold permut_seq.
 Qed.
 
-Theorem cauchy_binet_formula : in_charac_0_field →
+Theorem binet_cauchy_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
   → is_correct_matrix B = true
@@ -1959,9 +1959,9 @@ Qed.
 
 End a.
 
-Arguments cauchy_binet_formula {T ro rp} _ [m n]%nat.
+Arguments binet_cauchy_formula {T ro rp} _ [m n]%nat.
 
-Check cauchy_binet_formula.
+Check binet_cauchy_formula.
 
 Theorem mat_select_all_rows : ∀ A,
   is_square_matrix A = true
@@ -2019,7 +2019,7 @@ Corollary determinant_mul : in_charac_0_field →
   → det (A * B) = (det A * det B)%F.
 Proof.
 intros Hif * Hsma Hsmb Hrab *.
-specialize cauchy_binet_formula as H1.
+specialize binet_cauchy_formula as H1.
 remember (mat_nrows A) as n eqn:Hn.
 rename Hn into Hra; rename Hrab into Hrb.
 symmetry in Hra, Hrb.
