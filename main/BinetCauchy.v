@@ -5124,6 +5124,52 @@ Theorem isort_rank_with_max : ∀ a la lb,
       [length la].
 Proof.
 intros * Hnd Ha.
+revert a la Hnd Ha.
+induction lb as [| b]; intros. {
+  rewrite app_nil_r in Hnd, Ha |-*.
+Search (isort_rank _ (_ ++ _)).
+Theorem glop : ∀ a la,
+  (∀ b, b ∈ la → b < a)
+  → isort_rank Nat.leb (la ++ [a]) = isort_rank Nat.leb la ++ [length la].
+Proof.
+intros * Ha.
+revert a Ha.
+induction la as [| b]; intros; [ easy | ].
+cbn - [ nth ].
+rewrite IHla by now intros c Hc; apply Ha; right.
+rewrite map_app.
+cbn - [ nth ].
+Theorem glop : ∀ f ia la n,
+  n = S (length la)
+  → (∀ ib, 1 ≤ ib ≤ n → f ia < f ib)
+  → isort_rank_insert Nat.leb f ia (la ++ [n]) =
+    isort_rank_insert Nat.leb f ia la ++ [n].
+Proof.
+intros * Ha Hn.
+revert la Ha.
+induction n; intros; [ easy | cbn ].
+apply Nat.succ_inj in Ha.
+destruct la as [| ib]. {
+  cbn in Ha; subst n; cbn.
+  specialize (Hn 1); cbn in Hn.
+  assert (H : 1 ≤ 1 ≤ 1) by easy.
+  specialize (Hn H); clear H.
+  apply Nat.lt_le_incl in Hn.
+  now apply Nat.leb_le in Hn; rewrite Hn.
+}
+cbn.
+remember (f ia <=? f ib) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ easy | ].
+cbn; f_equal.
+...
+specialize (Hn ib) as H1.
+cbn in H1.
+... ...
+rewrite glop; [ | now rewrite map_length, isort_rank_length ].
+... ...
+rewrite glop.
+...
+intros * Hnd Ha.
 revert a lb Hnd Ha.
 induction la as [| b]; intros. {
   cbn - [ nth ].
@@ -5141,6 +5187,12 @@ induction la as [| b]; intros. {
   apply Nat.leb_gt, Ha, nth_In.
   now apply in_isort_rank in Hic.
 }
+Search (isort_rank _ (_ :: _)).
+cbn - [ nth ].
+Print isort_rank_insert.
+firstn ... lrank ++ ia :: skipn ... lrank.
+Theorem glop : ∀ ia lrank,
+  isort_rank_insert Nat.leb f ia lrank =
 ... ...
 rewrite isort_rank_with_max.
 ...
