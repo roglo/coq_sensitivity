@@ -5152,6 +5152,14 @@ split; intros Hab. {
       flia Hj Hb Hilb Hib Hi.
     }
   }
+  rewrite <- (firstn_skipn (length bef) (collapse la)).
+  f_equal. {
+    rewrite <- (firstn_skipn (length bef) (collapse _)) in Hc.
+    apply List_app_eq_app' in Hc. 2: {
+      rewrite firstn_length, collapse_length, app_length.
+      apply Nat.min_l, Nat.le_add_r.
+    }
+    destruct Hc as (Hc1, Hc2).
 ...
 specialize (Hko (length bef)
 ...
