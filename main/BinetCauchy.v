@@ -5072,6 +5072,100 @@ subst k.
 apply in_all_permut_permutation in Hkl.
 clear A B Hca Hcb Har Hac Hbr Hbc Hab.
 clear g1 h1.
+Theorem permutation_seq_collapse : ∀ la,
+  permutation Nat.eqb la (seq 1 (length la))
+  → collapse la = map pred la.
+Proof.
+intros * Hp.
+apply (permutation_map Nat.eqb_eq Nat.eqb_eq pred) in Hp.
+rewrite List_map_seq, map_id in Hp.
+(**)
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert la Hlen Hp.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+rewrite seq_S in Hp; cbn in Hp.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+eapply (permutation_trans Nat.eqb_eq) in Hp. 2: {
+  apply (permutation_cons_app Nat.eqb_eq).
+  rewrite app_nil_r.
+  apply (permutation_refl Nat.eqb_eq).
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+...
+induction la as [| a]; [ easy | ].
+cbn - [ seq ] in Hp.
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+...
+Compute (
+let la := [2; 3; 0] in
+  permutation Nat.eqb (map pred la) (seq 0 (length la))
+  → collapse la = map pred la
+).
+assert (∀ a, a ∈ la → 0 < a). {
+  intros a Ha.
+  destruct a; [ exfalso | easy ].
+  apply (In_nth _ _ 0) in Ha.
+  destruct Ha as (i & Hi & Ha).
+...
+remember (map pred la) as lb eqn:Hlb; symmetry in Hlb.
+...
+assert (Hab : la = map S lb). {
+  rewrite <- Hlb.
+  rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros a Ha.
+    rewrite Nat.succ_pred_pos. 2: {
+      subst lb.
+      induction la as [| b]; [ easy | ].
+      cbn in Hp.
+      destruct a; [ exfalso | easy ].
+      destruct Ha as [Ha| Ha]. {
+        subst b.
+        cbn in Hp.
+        apply (permutation_cons_inv Nat.eqb_eq) in Hp.
+
+Compute (
+let la := [2; 3; 1] in
+  permutation Nat.eqb (map pred la) (seq 0 (length la))
+  → collapse la = map pred la
+).
+...
+apply (permutation_sym Nat.eqb_eq) in Hp.
+eapply (permutation_trans Nat.eqb_eq) in Hp. 2: {
+  apply (permutation_isort_rank Nat.leb).
+}
+unfold collapse.
+remember (isort_rank Nat.leb la) as lb eqn:Hlb; symmetry in Hlb.
+Check sorted_permuted_comp_collapse.
+...
+apply sorted_permuted_comp_collapse in Hp.
+2: {
+apply (permutation_sym Nat.eqb_eq) in Hp.
+sorted_permuted_comp_collapse:
+  ∀ la lb : list nat, sorted Nat.leb la → permutation Nat.eqb la lb → la ° collapse lb = lb
+
+unfold collapse.
+Search (permutation).
+Check permutation_isort_rank.
+Search (permutation _ (isort_rank _ _)).
+Search (isort_rank _ _ = map _ _).
+...
+induction la as [| a]; intros; [ easy | ].
+cbn - [ nth ].
+...
 Theorem permutation_seq_collapse : ∀ sta la,
   permutation Nat.eqb la (seq sta (length la))
   → collapse la = map (λ i, i - sta) la.
@@ -5090,6 +5184,7 @@ apply (eq_isort_rank_cons 0) in Hlb; cycle 1. {
 }
 destruct Hlb as (Hib & Hlb).
 cbn - [ nth ].
+...
 rewrite (IHlb sta (butn ia la)); cycle 1. {
   rewrite butn_length.
   generalize Hib; intros H; apply Nat.ltb_lt in H.
