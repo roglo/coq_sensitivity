@@ -5134,25 +5134,25 @@ split; intros Hab. {
     apply Nat.compare_lt_iff.
     destruct (lt_dec i (length bef)) as [Hilb| Hilb]. {
       rewrite app_nth1; [ | easy ].
-      apply (permutation_in_iff Nat.eqb_eq) with (a := i) in Hpab.
+      apply (permutation_in_iff Nat.eqb_eq) with (a := nth i bef 0) in Hpab.
+      enough (H : nth i bef 0 ∈ seq 0 n) by now apply in_seq in H.
+      apply Hpab, in_or_app; left.
+      now apply nth_In.
+    } {
+      apply Nat.nlt_ge in Hilb.
+      rewrite app_nth2; [ | easy ].
+      remember (i - S (length bef)) as j eqn:Hj.
+      replace (i - length bef) with (S j) by flia Hib Hilb Hj.
+      rewrite List_nth_succ_cons.
+      apply (permutation_in_iff Nat.eqb_eq) with (a := nth j aft 0) in Hpab.
+      enough (H : nth j aft 0 ∈ seq 0 n) by now apply in_seq in H.
+      apply Hpab, in_or_app; right.
+      apply nth_In.
+      rewrite app_length in Hb.
+      flia Hj Hb Hilb Hib Hi.
+    }
+  }
 ...
-      assert (H : i ∈ bef). {
-...
-Search (permutation _ _ _ → _ → _).
-Search (permutation _ _ (seq _ _)).
-
-Search ((_ ?= _) = Lt).
-Search (_ < _ ↔ _ = Lt).
-Search (_ = Lt ↔ _ < _).
-About nat_compare_lt.
-    apply Nat.ltb_compare.
-
-Search (isort_rank _ (_ ++ _)).
-Search (firstn _ _ ++ _).
-Search (collapse _ = _ ++ _).
-(∀ j, j < length la → j ≠ i → nth j la 0 < nth i la 0)
-→ ∃ l1 l2, collapse la = l1 ++ i :: l2
-
 specialize (Hko (length bef)
 ...
   apply (permutation_sym Nat.eqb_eq) in Hpab.
