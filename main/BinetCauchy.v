@@ -1963,6 +1963,86 @@ Arguments cauchy_binet_formula {T ro rp} _ [m n]%nat.
 
 Check cauchy_binet_formula.
 
+Theorem mat_select_all_rows : ∀ A,
+  is_square_matrix A = true
+  → mat_select_rows (seq 1 (mat_nrows A)) A = A.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols A Hsm) as Hc.
+generalize Hsm; intros H.
+apply is_scm_mat_iff in H.
+destruct H as (_, Hcla).
+unfold mat_select_rows.
+destruct A as (lla); cbn; f_equal.
+cbn in Hsm, Hc, Hcla.
+apply List_eq_iff.
+rewrite List_map_seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length lla)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+  now rewrite nth_overflow.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Hc.
+rewrite <- seq_shift, map_map; cbn.
+erewrite map_ext_in; [ | now intros; rewrite Nat.sub_0_r ].
+specialize (List_map_nth_seq (nth i lla [])) as H1.
+rewrite Hcla in H1 by now apply nth_In.
+rewrite <- H1.
+now symmetry; apply nth_indep.
+Qed.
+
+Theorem mat_select_all_cols : ∀ A,
+  is_square_matrix A = true
+  → mat_select_cols (seq 1 (mat_ncols A)) A = A.
+Proof.
+intros * Hsm.
+unfold mat_select_cols.
+rewrite <- mat_transp_nrows.
+rewrite mat_select_all_rows. {
+  apply mat_transp_involutive.
+  now apply squ_mat_is_corr.
+} {
+  now apply mat_transp_is_square.
+}
+Qed.
+
+Corollary determinant_mul : in_charac_0_field →
+  ∀ A B,
+  is_square_matrix A = true
+  → is_square_matrix B = true
+  → mat_nrows A = mat_nrows B
+  → det (A * B) = (det A * det B)%F.
+Proof.
+intros Hif * Hsma Hsmb Hrab *.
+specialize cauchy_binet_formula as H1.
+remember (mat_nrows A) as n eqn:Hn.
+rename Hn into Hra; rename Hrab into Hrb.
+symmetry in Hra, Hrb.
+specialize (H1 Hif n n A B).
+assert (H : is_correct_matrix A = true) by now apply squ_mat_is_corr.
+specialize (H1 H); clear H.
+assert (H : is_correct_matrix B = true) by now apply squ_mat_is_corr.
+specialize (H1 H); clear H.
+assert (Hca : mat_ncols A = n) by now rewrite square_matrix_ncols.
+assert (Hcb : mat_ncols B = n) by now rewrite square_matrix_ncols.
+specialize (H1 Hra Hca Hrb Hcb).
+rewrite H1.
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag.
+rewrite rngl_summation_list_only_one.
+rewrite <- Hrb.
+rewrite mat_select_all_rows; [ | easy ].
+rewrite Hrb, <- Hca.
+now rewrite mat_select_all_cols.
+Qed.
+
+Check determinant_mul.
+
 (* other attempts to prove det(AB)=det(A)det(B) *)
 
 (*
