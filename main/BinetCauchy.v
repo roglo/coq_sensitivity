@@ -5078,6 +5078,14 @@ Theorem glop : ∀ la,
   → (collapse la).(i) = la.(i) - 1.
 Proof.
 intros * Hp * Hi.
+Theorem glop : ∀ la,
+  permutation eqb la (seq 1 (length la))
+  → collapse la = map pred la.
+Proof.
+intros * Hp.
+... ...
+rewrite glop; [ | easy ].
+rewrite (List_map_nth' 0); [ flia | flia Hi ].
 ... ...
 move Hkm at top; subst j m.
 now apply glop.
