@@ -36,6 +36,7 @@ Fixpoint binomial n k :=
      end
   end.
 
+(*
 Theorem binomial_0_l : ∀ n, n ≠ 0 → binomial 0 n = 0.
 Proof. now intros * Hnz; induction n. Qed.
 
@@ -87,6 +88,7 @@ apply Nat.eq_add_0 in H1.
 destruct H1 as (H1, _).
 now revert H1; apply IHn.
 Qed.
+*)
 
 (* all lists [j1;j2;...jm] such that 0≤j1<j2<...<jm<n for some m and n *)
 
@@ -102,6 +104,7 @@ Fixpoint sls1n (i n k : nat) {struct n} : list (list nat) :=
 
 Definition sub_lists_of_seq_1_n := sls1n 1.
 
+(*
 Fixpoint rsls1n i n k (t : list nat) : nat :=
   match k with
   | 0 => 0
@@ -119,6 +122,7 @@ Fixpoint rsls1n i n k (t : list nat) : nat :=
   end.
 
 Definition rank_of_sub_lists_of_seq_1_n := rsls1n 1.
+*)
 
 Theorem sls1n_length : ∀ i n k,
   length (sls1n i n k) = binomial n k.
@@ -131,6 +135,7 @@ rewrite app_length, map_length.
 now rewrite IHn, IHn.
 Qed.
 
+(*
 Theorem sub_lists_of_seq_1_n_length : ∀ k n,
   length (sub_lists_of_seq_1_n n k) = binomial n k.
 Proof.
@@ -138,6 +143,7 @@ intros.
 unfold sub_lists_of_seq_1_n.
 apply sls1n_length.
 Qed.
+*)
 
 Theorem sls1n_bounds : ∀ i n k t,
   t ∈ sls1n i n k
@@ -319,8 +325,10 @@ Qed.
 
 (* *)
 
+(*
 Theorem sub_lists_of_seq_1_n_0_r : ∀ n, sub_lists_of_seq_1_n n 0 = [[]].
 Proof. now intros; destruct n. Qed.
+*)
 
 Theorem sls1n_out : ∀ i n k,
   n < k
@@ -336,6 +344,7 @@ apply IHn.
 now apply Nat.lt_lt_succ_r.
 Qed.
 
+(*
 Theorem sub_lists_of_seq_1_n_out : ∀ n k,
   n < k
   → sub_lists_of_seq_1_n n k = [].
@@ -343,6 +352,7 @@ Proof.
 intros * Hnk.
 now apply sls1n_out.
 Qed.
+*)
 
 Theorem sls1n_inj : ∀ i n k u v,
   u < binomial n k
@@ -411,6 +421,7 @@ apply IHn in Huv; [ | cbn in Hu; flia Hu Hub | cbn in Hv; flia Hv Hvb ].
 flia Huv Hub Hvb.
 Qed.
 
+(*
 Theorem rsls1n_out : ∀ i n k t,
   n < k
   → rsls1n i n k t = 0.
@@ -665,10 +676,12 @@ specialize (Hlt j Hj).
 split; [ easy | ].
 now apply Nat.lt_succ_r.
 Qed.
+*)
 
 Theorem sls1n_0_r : ∀ i n, sls1n i n 0 = [[]].
 Proof. now intros; destruct n. Qed.
 
+(*
 Theorem sls1n_1_r : ∀ i n, sls1n i n 1 = map (λ j, [j]) (seq i n).
 Proof.
 intros.
@@ -678,6 +691,7 @@ rewrite sls1n_0_r; cbn.
 f_equal.
 apply IHn.
 Qed.
+*)
 
 Theorem sls1n_diag : ∀ i n, sls1n i n n = [seq i n].
 Proof.
@@ -689,6 +703,7 @@ f_equal.
 now apply sls1n_out.
 Qed.
 
+(*
 Theorem sub_lists_of_seq_1_n_1_r : ∀ n,
   sub_lists_of_seq_1_n n 1 = map (λ i, [i]) (seq 1 n).
 Proof.
@@ -702,6 +717,7 @@ Proof.
 intros.
 apply sls1n_diag.
 Qed.
+*)
 
 Theorem sls1n_are_correct : ∀ i k n t,
   k ≠ 0
@@ -743,6 +759,7 @@ subst ll.
 now apply sls1n_are_sorted in Hl.
 Qed.
 
+(*
 Theorem sub_list_of_seq_1_n_has_no_dup :
   ∀ m n l, l ∈ sub_lists_of_seq_1_n m n → NoDup l.
 Proof.
@@ -814,6 +831,7 @@ split. {
   now apply (sub_lists_of_seq_1_n_is_surj n k).
 }
 Qed.
+*)
 
 Section a.
 
@@ -985,6 +1003,7 @@ apply mat_select_rows_is_square. {
 }
 Qed.
 
+(*
 Theorem det_mat_swap_rows_with_rows : in_charac_0_field →
   ∀ p q A jl,
   is_correct_matrix A = true
@@ -1036,6 +1055,7 @@ rewrite seq_S; cbn.
 rewrite map_app; cbn; f_equal.
 apply IHn.
 Qed.
+*)
 
 Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%F.
 Proof.
@@ -1071,6 +1091,7 @@ intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
 
+(*
 Theorem ε_swap_id : ∀ n k, ε (swap n k k) = 1%F.
 Proof.
 intros.
@@ -1778,6 +1799,7 @@ specialize (Hnl (S i)).
 assert (H : S i < length (a :: l)) by now cbn; flia Hi.
 now specialize (Hnl H).
 Qed.
+*)
 
 Theorem nth_concat_same_length : ∀ A m n (lll : list (list (list A))) i,
   (∀ ll, ll ∈ lll → length ll = m)
@@ -1883,6 +1905,7 @@ rewrite nth_list_prodn_same_length with (n := n). {
 }
 Qed.
 
+(*
 Theorem all_comb_elem_ub : ∀ i j n,
   nth i (nth j (all_comb n) []) 0 ≤ n.
 Proof.
@@ -2081,6 +2104,7 @@ rewrite rngl_summation_list_cons in Hil.
 cbn in Hil |-*.
 flia Hil Hila.
 Qed.
+*)
 
 Theorem det_isort_rows_with_dup : in_charac_0_field →
   ∀ A kl,
@@ -2507,6 +2531,7 @@ destruct (bool_dec (f a)) as [Hfa| Hfa]. {
 }
 Qed.
 
+(*
 Theorem List_filter_map : ∀ A B (f : B → bool) (g : A → B) (l : list A),
   filter f (map g l) =
   map g (filter (λ a, f (g a)) l).
@@ -2660,6 +2685,7 @@ rewrite if_bool_if_dec.
 destruct (bool_dec (sta =? a)) as [Hsa| Hsa]; [ | easy ].
 apply Nat.eqb_eq in Hsa; subst a; flia Ha.
 Qed.
+*)
 
 Fixpoint prodn_repeat_seq sta len n :=
   match n with
@@ -2686,6 +2712,7 @@ Qed.
 
 (* equivalence classes *)
 
+(*
 Fixpoint ecl {A} (eqv : A → _) it la :=
   match it with
   | 0 => []
@@ -3140,6 +3167,7 @@ induction la as [| a]; [ easy | cbn ].
 rewrite map_app, map_map.
 now rewrite IHla.
 Qed.
+*)
 
 Theorem incl_incl_permutation : ∀ A (eqb : A → _),
   equality eqb →
@@ -3500,6 +3528,7 @@ intros i Hi.
 now apply in_canon_sym_gr_list in Hi.
 Qed.
 
+(*
 Theorem isort_insert_lb_app : ∀ A (rel : A → _) a lsorted,
   lsorted = [] ∨ rel a (hd a lsorted) = true
   → isort_insert rel a lsorted = a :: lsorted.
@@ -3600,6 +3629,7 @@ intros * Hia.
 rewrite <- List_skipn_is_cons; [ | easy ].
 symmetry; apply firstn_skipn.
 Qed.
+*)
 
 Theorem permutation_seq_collapse : ∀ la,
   permutation eqb la (seq 1 (length la))
