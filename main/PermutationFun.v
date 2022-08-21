@@ -2660,6 +2660,65 @@ f_equal.
 apply op_comm.
 Qed.
 
+Theorem incl_incl_permutation : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb, NoDup la → NoDup lb → la ⊂ lb → lb ⊂ la → permutation eqb la lb.
+Proof.
+intros * Heqb * Hnda Hndb Hla Hlb.
+revert lb Hndb Hla Hlb.
+induction la as [| a]; intros. {
+  destruct lb as [| b]; [ easy | exfalso ].
+  now specialize (Hlb b (or_introl eq_refl)).
+}
+assert (H : NoDup la) by now apply NoDup_cons_iff in Hnda.
+specialize (IHla H); clear H.
+specialize (Hla _ (or_introl eq_refl)) as Ha.
+apply in_split in Ha.
+destruct Ha as (l1 & l2 & H); subst lb.
+apply (permutation_cons_app Heqb).
+apply IHla. {
+  apply NoDup_app_iff in Hndb.
+  apply NoDup_app_iff.
+  split; [ easy | ].
+  destruct Hndb as (_ & H1 & H2).
+  apply NoDup_cons_iff in H1.
+  split; [ easy | ].
+  intros c Hc Hc2.
+  now specialize (H2 _ Hc); apply H2; right.
+} {
+  intros c Hc.
+  unfold incl in Hla.
+  specialize (Hla _ (or_intror Hc)).
+  apply in_app_or in Hla.
+  apply in_or_app.
+  destruct Hla as [Hla| Hla]; [ now left | ].
+  destruct Hla as [Hla| Hla]; [ | now right ].
+  subst c.
+  now apply NoDup_cons_iff in Hnda.
+} {
+  intros c Hc.
+  unfold incl in Hla, Hlb.
+  specialize (Hlb c).
+  assert (H : c ∈ l1 ++ a :: l2). {
+    apply in_app_or in Hc.
+    apply in_or_app.
+    destruct Hc as [Hc| Hc]; [ now left | ].
+    now right; right.
+  }
+  specialize (Hlb H); clear H.
+  destruct Hlb as [Hca| Hca]; [ | easy ].
+  subst c.
+  apply NoDup_app_iff in Hndb.
+  apply in_app_or in Hc.
+  destruct Hndb as (H1 & H2 & H3).
+  destruct Hc as [Hc| Hc]. {
+    specialize (H3 _ Hc).
+    now exfalso; apply H3; left.
+  }
+  now apply NoDup_cons_iff in H2.
+}
+Qed.
+
 (* *)
 
 Require Import Permutation.

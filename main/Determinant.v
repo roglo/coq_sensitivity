@@ -16,8 +16,6 @@ Import matrix_Notations.
 Definition set_minus {A} (eqb : A → _) E F :=
   filter (λ e, negb (member eqb e F)) E.
 
-Notation "E ⊂ F" := (incl E F) (at level 70).
-
 Section a.
 
 Context {T : Type}.
