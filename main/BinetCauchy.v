@@ -5077,6 +5077,128 @@ Theorem permutation_seq_collapse : ∀ la,
   → collapse la = map pred la.
 Proof.
 intros * Hp.
+remember (length la) as len eqn:Hlen; symmetry in Hlen.
+revert la Hlen Hp.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlen; subst la.
+}
+rewrite seq_S in Hp; cbn in Hp.
+apply (permutation_sym Nat.eqb_eq) in Hp.
+eapply (permutation_trans Nat.eqb_eq) in Hp. 2: {
+  apply (permutation_cons_app Nat.eqb_eq).
+  rewrite app_nil_r.
+  apply (permutation_refl Nat.eqb_eq).
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+generalize Hp; intros H1.
+apply (permutation_sym Nat.eqb_eq) in H1.
+apply IHlen in H1. 2: {
+  apply (f_equal length) in Haft.
+  rewrite app_length in Haft; cbn in Haft.
+  rewrite Hlen, Nat.add_succ_r, <- app_length in Haft.
+  now symmetry in Haft; apply Nat.succ_inj in Haft.
+}
+rewrite Haft at 1.
+Search (permutation _ (_ ++ _ :: _)).
+Theorem collapse_with_max : ∀ a la lb,
+  NoDup (la ++ lb)
+  → (∀ b, b ∈ la ++ lb → b < a)
+  → collapse (la ++ a :: lb) =
+      firstn (length la) (collapse (la ++ lb)) ++
+      length (la ++ lb) ::
+      skipn (length la) (collapse (la ++ lb)).
+Proof.
+intros * Hnd Ha.
+unfold collapse at 1.
+Search (isort_rank _ (_ ++ _)).
+Theorem isort_rank_with_max : ∀ a la lb,
+  NoDup (la ++ lb)
+  → (∀ b, b ∈ la ++ lb → b < a)
+  → isort_rank Nat.leb (la ++ a :: lb) =
+      map (succ_when_ge (length la)) (isort_rank Nat.leb (la ++ lb)) ++
+      [length la].
+Proof.
+intros * Hnd Ha.
+revert a lb Hnd Ha.
+induction la as [| b]; intros. {
+  cbn - [ nth ].
+  rewrite isort_rank_insert_ub_app. {
+    f_equal.
+    unfold succ_when_ge; cbn.
+    apply map_ext_in.
+    intros b Hb.
+    symmetry; apply Nat.add_1_r.
+  }
+  intros ib Hib.
+  apply in_map_iff in Hib.
+  destruct Hib as (ic & H & Hic); subst ib.
+  rewrite List_nth_0_cons, List_nth_succ_cons.
+  apply Nat.leb_gt, Ha, nth_In.
+  now apply in_isort_rank in Hic.
+}
+... ...
+rewrite isort_rank_with_max.
+...
+Compute (
+let la := [7; 5; 2] in
+let lb := [8; 9; 17; 3] in
+let a := 40 in
+  isort_rank Nat.leb (la ++ a :: lb) =
+      map (succ_when_ge (length la)) (isort_rank Nat.leb (la ++ lb)) ++
+      [length la]
+).
+... ...
+rewrite isort_rank_with_max.
+...
+      firstn (length la) (isort_rank Nat.leb (la ++ lb)) ++
+      length la ::
+      skipn (length la) (isort_rank Nat.leb (la ++ lb)).
+Proof.
+intros * Hnd Ha.
+revert a lb Hnd Ha.
+induction la as [| b]; intros. {
+  cbn - [ nth ].
+...
+  rewrite isort_rank_insert_ub_app.
+...
+rewrite isort_rank_with_max.
+
+rewrite isort_rank_with_max.
+... ...
+rewrite collapse_with_max.
+rewrite H1.
+rewrite firstn_map, firstn_app, Nat.sub_diag.
+rewrite firstn_all, firstn_O, app_nil_r.
+rewrite skipn_map, skipn_app, Nat.sub_diag.
+rewrite skipn_all, skipn_O, app_nil_l.
+rewrite Haft.
+rewrite map_app.
+cbn; f_equal; f_equal.
+apply (f_equal length) in Haft.
+rewrite Hlen, app_length in Haft; cbn in Haft.
+rewrite Nat.add_succ_r in Haft; apply Nat.succ_inj in Haft.
+now rewrite <- app_length in Haft.
+...
+Proof.
+intros * Hnd.
+revert la Hnd.
+induction lb as [| b]; intros. {
+  rewrite app_nil_r in Hnd.
+  now do 2 rewrite app_nil_r; cbn.
+}
+rewrite List_cons_is_app, app_assoc.
+rewrite IHlb; [ | now rewrite <- app_assoc ].
+cbn - [ collapse firstn skipn ].
+Theorem glop :
+  skipn (S (length la)) (collapse (la ++ lb)) =
+...
+...
+intros * Hp.
 apply (permutation_map Nat.eqb_eq Nat.eqb_eq pred) in Hp.
 rewrite List_map_seq, map_id in Hp.
 (**)
@@ -5549,21 +5671,7 @@ induction la as [| b]; intros. {
 }
 cbn - [ collapse firstn skipn ].
 specialize (Hab _ (or_introl eq_refl)) as Hba.
-Theorem collapse_app : ∀ la lb,
-  NoDup (la ++ lb)
-  → collapse (la ++ lb) =
-      skipn (length lb) (collapse (lb ++ la)) ++
-      firstn (length lb) (collapse (lb ++ la)).
-Proof.
-intros * Hnd.
-revert la Hnd.
-induction lb as [| b]; intros. {
-  rewrite app_nil_r in Hnd.
-  now do 2 rewrite app_nil_r; cbn.
-}
-rewrite List_cons_is_app, app_assoc.
-rewrite IHlb; [ | now rewrite <- app_assoc ].
-cbn - [ collapse firstn skipn ].
+...
 Theorem glop : ∀ la lb lc,
   NoDup (la ++ lb ++ lc)
   → skipn (length (la ++ lb)) (collapse (la ++ lb ++ lc)) =
