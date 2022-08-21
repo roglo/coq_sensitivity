@@ -4606,6 +4606,38 @@ destruct ab. 2: {
 rewrite Ha in Hab; [ easy | now left ].
 Qed.
 
+Theorem eq_isort_rank_cons : ∀ A d (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ la ia lrank,
+  isort_rank rel la = ia :: lrank
+  → ia < length la ∧
+    ∀ ib, ib ∈ lrank → ib ≠ ia ∧ rel (nth ia la d) (nth ib la d) = true.
+Proof.
+intros * Htra Htot * Hla.
+assert (Hia : ia < length la). {
+  now apply (in_isort_rank rel); rewrite Hla; left.
+}
+split; [ easy | ].
+intros * Hib.
+assert (Hab : ib ≠ ia). {
+  intros H; subst ib.
+  specialize (NoDup_isort_rank rel la) as H1.
+  rewrite Hla in H1.
+  now apply NoDup_cons_iff in H1.
+}
+split; [ easy | ].
+specialize (isort_isort_rank rel d la) as H1.
+rewrite Hla in H1; cbn in H1.
+specialize (sorted_isort Htot la) as H2.
+rewrite H1 in H2.
+apply (sorted_cons_iff Htra) in H2.
+destruct H2 as (H2, H3).
+apply H3.
+apply in_map_iff.
+now exists ib.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -5036,30 +5068,46 @@ Proof.
 intros * Hp.
 unfold collapse.
 remember (isort_rank Nat.leb la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| ia]; [ now apply eq_isort_rank_nil in Hlb; subst la | ].
-(* chais pas si ça sert, mais bon, c'est une prop intéressante *)
-Theorem eq_isort_rank_cons : ∀ A d (rel : A → _) la ia lrank,
-  isort_rank rel la = ia :: lrank
-  → ia < length la ∧
-    ∀ ib, ib ∈ lrank → ib ≠ ia ∧ rel (nth ia la d) (nth ib la d) = true.
-Proof.
-intros * Hla.
-assert (Hia : ia < length la). {
-  now apply (in_isort_rank rel); rewrite Hla; left.
+revert sta la Hp Hlb.
+induction lb as [| ia]; intros. {
+  now apply eq_isort_rank_nil in Hlb; subst la.
 }
-split; [ easy | ].
-intros * Hib.
-assert (Hab : ib ≠ ia). {
-  intros H; subst ib.
-  specialize (NoDup_isort_rank rel la) as H1.
-  rewrite Hla in H1.
-  now apply NoDup_cons_iff in H1.
+apply (eq_isort_rank_cons 0) in Hlb; cycle 1. {
+  apply Nat_leb_trans.
+} {
+  apply Nat_leb_total_relation.
 }
-split; [ easy | ].
-... ...
-apply (eq_isort_rank_cons 0) in Hlb.
 destruct Hlb as (Hib & Hlb).
 cbn - [ nth ].
+rewrite (IHlb sta (butn ia la)); cycle 1. {
+  rewrite butn_length.
+  generalize Hib; intros H; apply Nat.ltb_lt in H.
+  rewrite H; clear H; cbn.
+...
+specialize butn_permut_seq_with_len as H1.
+unfold permut_seq_with_len in H1.
+unfold permut_seq in H1.
+Print permut_seq.
+remember (map (λ i, i - sta) (butn ia la)) as lc eqn:Hlc.
+specialize (H1 (length la) ia lc).
+...
+butn_permut_seq_with_len:
+  ∀ (n i : nat) (l : list nat),
+    permut_seq_with_len (S n) l
+    → n = nth i l 0 → i < length l → permut_seq_with_len n (butn i l)
+...
+  unfold butn.
+Search butn.
+Search (_ = _ ++ _ :: _).
+...
+List_in_split':
+  ∀ A : Type,
+    (∀ x y : A, {x = y} + {x ≠ y})
+    → ∀ (x : A) (l : list A),
+        x ∈ l → ∃ l1 l2 : list A, l = l1 ++ x :: l2 ∧ x ∉ l1
+...
+Search (permutation _ (_ ++ _)).
+Print split_list_inv.
 ...
 intros * Hp.
 (*
