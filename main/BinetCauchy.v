@@ -15,11 +15,9 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List List.ListNotations Init.Nat.
 
-Require Import Misc RingLike.
+Require Import Misc RingLike IterAdd IterMul.
 Require Import PermutationFun SortingFun SortRank.
-Require Import IterAdd IterMul.
-Require Import Matrix PermutSeq Signature.
-Require Import Determinant.
+Require Import PermutSeq Signature Matrix Determinant.
 Import matrix_Notations.
 
 (* binomial *)

@@ -1,5 +1,5 @@
-BinetCauchy.vio: BinetCauchy.v Misc.vio RingLike.vio PermutationFun.vio SortingFun.vio SortRank.vio IterAdd.vio IterMul.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
-BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo RingLike.vo PermutationFun.vo SortingFun.vo SortRank.vo IterAdd.vo IterMul.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
+BinetCauchy.vio: BinetCauchy.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio SortingFun.vio SortRank.vio PermutSeq.vio Signature.vio Matrix.vio Determinant.vio
+BinetCauchy.vo BinetCauchy.glob BinetCauchy.v.beautified BinetCauchy.required_vo: BinetCauchy.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo PermutationFun.vo SortingFun.vo SortRank.vo PermutSeq.vo Signature.vo Matrix.vo Determinant.vo
 Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio PermutationFun.vio SortingFun.vio SortRank.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
 Comatrix.vo Comatrix.glob Comatrix.v.beautified Comatrix.required_vo: Comatrix.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo Pigeonhole.vo PermutationFun.vo SortingFun.vo SortRank.vo Matrix.vo PermutSeq.vo Signature.vo Determinant.vo
 Determinant.vio: Determinant.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio SortingFun.vio SortRank.vio MyVector.vio Matrix.vio PermutSeq.vio Signature.vio NatRingLike.vio
