@@ -5034,6 +5034,34 @@ Theorem permutation_seq_collapse : ∀ sta la,
   → collapse la = map (λ i, i - sta) la.
 Proof.
 intros * Hp.
+unfold collapse.
+remember (isort_rank Nat.leb la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| ia]; [ now apply eq_isort_rank_nil in Hlb; subst la | ].
+(* chais pas si ça sert, mais bon, c'est une prop intéressante *)
+Theorem eq_isort_rank_cons : ∀ A d (rel : A → _) la ia lrank,
+  isort_rank rel la = ia :: lrank
+  → ia < length la ∧
+    ∀ ib, ib ∈ lrank → ib ≠ ia ∧ rel (nth ia la d) (nth ib la d) = true.
+Proof.
+intros * Hla.
+assert (Hia : ia < length la). {
+  now apply (in_isort_rank rel); rewrite Hla; left.
+}
+split; [ easy | ].
+intros * Hib.
+assert (Hab : ib ≠ ia). {
+  intros H; subst ib.
+  specialize (NoDup_isort_rank rel la) as H1.
+  rewrite Hla in H1.
+  now apply NoDup_cons_iff in H1.
+}
+split; [ easy | ].
+... ...
+apply (eq_isort_rank_cons 0) in Hlb.
+destruct Hlb as (Hib & Hlb).
+cbn - [ nth ].
+...
+intros * Hp.
 (*
 specialize collapse_keeps_order as H1.
 specialize (H1 la).
