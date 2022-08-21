@@ -2320,6 +2320,7 @@ erewrite map_ext_in. 2: {
 apply List_skipn_map_nth_seq.
 Qed.
 
+(*
 Theorem skipn_cons_skipn_succ : ∀ A (d : A) l i,
   i < length l
   → skipn i l = nth i l d :: skipn (S i) l.
@@ -2332,6 +2333,7 @@ cbn in Hi.
 apply Nat.succ_lt_mono in Hi.
 now apply IHl.
 Qed.
+*)
 
 (*
 Theorem transp_loop_enough_iter : ∀ it1 it2 i p,
@@ -4638,6 +4640,15 @@ apply in_map_iff.
 now exists ib.
 Qed.
 
+Theorem List_nth_split' : ∀ A i (la : list A) d,
+  i < length la
+  → la = firstn i la ++ nth i la d :: skipn (S i) la.
+Proof.
+intros * Hia.
+rewrite <- List_skipn_is_cons; [ | easy ].
+symmetry; apply firstn_skipn.
+Qed.
+
 (* to be completed
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
@@ -5083,6 +5094,20 @@ rewrite (IHlb sta (butn ia la)); cycle 1. {
   rewrite butn_length.
   generalize Hib; intros H; apply Nat.ltb_lt in H.
   rewrite H; clear H; cbn.
+  specialize (List_nth_split' la 0 Hib) as H1.
+  rewrite H1 in Hp at 1.
+  specialize List_nth_split' as H2.
+  specialize (H2 _ ia (seq sta (length la)) 0).
+  rewrite seq_length in H2.
+  specialize (H2 Hib).
+  rewrite List_firstn_seq in H2.
+  rewrite Nat.min_l in H2; [ | flia Hib ].
+  rewrite List_skipn_seq in H2; [ | easy ].
+  rewrite seq_nth in H2; [ | easy ].
+  rewrite H2 in Hp.
+(* n'importe quoi... *)
+...
+  specialize (List_nth_split' (seq sta (length la)) 0 Hib) as H2.
 ...
 specialize butn_permut_seq_with_len as H1.
 unfold permut_seq_with_len in H1.
