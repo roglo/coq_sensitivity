@@ -1073,32 +1073,9 @@ destruct (bool_dec (f a)) as [Hfa| Hfa]. {
 }
 Qed.
 
-Fixpoint prodn_repeat_seq sta len n :=
-  match n with
-  | 0 => [[]]
-  | S n' =>
-      flat_map (λ i, map (cons i) (prodn_repeat_seq sta len n')) (seq sta len)
-  end.
-
-Definition all_comb' n := prodn_repeat_seq 1 n n.
-
-Theorem list_prodn_prodn_repeat : ∀ sta len n,
-  list_prodn (repeat (seq sta len) n) = prodn_repeat_seq sta len n.
-Proof.
-intros.
-revert sta len.
-induction n; intros; [ easy | now cbn; rewrite IHn ].
-Qed.
-
-Theorem all_comb_all_comb' : ∀ n, all_comb n = all_comb' n.
-Proof.
-intros.
-apply list_prodn_prodn_repeat.
-Qed.
-
 Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
-    (filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m))
+    (filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m)))
     (flat_map all_permut (sub_lists_of_seq_1_n n m)).
 Proof.
 intros.
@@ -1110,7 +1087,6 @@ assert (Hel : equality (list_eqv eqb)). {
 apply permut_if_isort with (rel := list_leb Nat.leb); [ easy | ].
 specialize Nat_leb_trans as Htra.
 rewrite isort_when_sorted. 2: {
-  rewrite <- list_prodn_prodn_repeat.
   apply sorted_filter; [ now apply transitive_list_leb | ].
   apply sorted_list_ltb_leb_incl.
   apply list_prodn_repeat_seq_ltb_sorted.
@@ -1118,7 +1094,6 @@ rewrite isort_when_sorted. 2: {
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite flat_map_concat_map.
-rewrite <- list_prodn_prodn_repeat.
 rewrite <- flat_map_concat_map.
 set (la := flat_map all_permut (sls1n 1 n m)).
 set (lb := filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))).
@@ -1286,8 +1261,10 @@ Theorem rngl_summation_list_prodn_repeat_filter_no_dup :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ n m f,
-  ∑ (kl ∈ prodn_repeat_seq 1 n m), ε kl * f kl =
-  ∑ (kl ∈ filter (no_dup Nat.eqb) (prodn_repeat_seq 1 n m)), ε kl * f kl.
+  ∑ (kl ∈ list_prodn (repeat (seq 1 n) m)),
+    ε kl * f kl =
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (list_prodn (repeat (seq 1 n) m))),
+    ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
 assert (Hel : equality (list_eqv eqb)). {
@@ -1332,7 +1309,6 @@ Theorem rngl_summation_list_prodn_sub_lists_all_permut :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
-rewrite list_prodn_prodn_repeat.
 rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
@@ -1949,316 +1925,3 @@ now rewrite mat_select_all_cols.
 Qed.
 
 Check determinant_mul.
-
-(* other attempts to prove det(AB)=det(A)det(B) *)
-
-(*
-Theorem determinant_mul : ∀ A B, det (A * B) = (det A * det B)%F.
-Proof.
-intros.
-(* essai avec les formes multilinéaires alternées...
-
-trouvé sur le web
-(https://les-mathematiques.net/vanilla/index.php?p=discussion/1339028#Comment_1339028)
-
- Il vaut mieux éviter à tout prix la formule explicite. On peut
- utiliser la méthode de Gauss, ou bien utiliser le fait que
- l'application B↦det(AB) est multilinéaire alternée, et donc est un
- multiple de B↦detB
-
- Il faut d'abord avoir établi que l'espace des formes multilinéaires
- alternées est de dimension 1 et que le déterminant est l'unique telle
- forme qui vaut 1 en l'identité. Une fois ceci acquis, on en déduit
- que det(AB)=αdetB où α est un scalaire qui ne dépend que de A. On le
- trouve en prenant B=I, ce qui donne detA=αdetI=α.
-*)
-Check determinant_multilinear.
-Check determinant_alternating.
-...
-
-(* very interesting, too, contains several proofs of det(AB)=det(A)det(B)
-https://proofwiki.org/wiki/Determinant_of_Matrix_Product
-*)
-
-(* stuff to play with "ring_simplify" below *)
-Context {Hic : @rngl_is_comm T ro rp = true}.
-Context {Hop : @rngl_has_opp T ro = true}.
-Require Import Ring.
-Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
-(* end stuff *)
-
-Theorem determinant_mul : in_charac_0_field →
-  ∀ A B,
-  is_square_matrix A = true
-  → is_square_matrix B = true
-  → mat_nrows A = mat_nrows B
-  → det (A * B) = (det A * det B)%F.
-Proof.
-intros Hif * Hasm Hbsm Hrab.
-(* essai avec le déterminant défini par permutations *)
-assert (Habsm : is_square_matrix (A * B) = true). {
-  now apply squ_mat_mul_is_squ.
-}
-remember (mat_nrows A) as n eqn:Hra.
-rename Hrab into Hrb.
-symmetry in Hra, Hrb.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  unfold det; cbn.
-  move Hnz at top; subst n; cbn.
-  rewrite Hra, Hrb; cbn.
-  symmetry; apply rngl_mul_1_l.
-}
-...
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite det_is_det_by_canon_permut; [ | easy | easy ].
-rewrite mat_mul_nrows.
-unfold det'.
-rewrite Hra, Hrb.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_el_mul; cycle 1. {
-      rewrite mat_mul_nrows, Hra.
-      flia Hj.
-    } {
-      rewrite mat_mul_ncols; [ | rewrite Hra; flia Hj ].
-      rewrite square_matrix_ncols; [ | easy ].
-      rewrite Hrb.
-      apply canon_sym_gr_list_ub; [ | flia Hj ].
-      specialize (fact_neq_0 n) as Hfnz.
-      flia Hi Hfnz.
-    }
-    rewrite square_matrix_ncols; [ | easy ].
-    rewrite Hra.
-    easy.
-  }
-  cbn.
-  easy.
-}
-cbn.
-(*1*)
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros j (_, Hj).
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-symmetry.
-(*
-Noting
-   ε(i) = signature of the i-th permutation in the canonic symmetric group
-   σ(i,j) = j-th element of the i-th permutation in the canonic sym gr
-We have to prove that
-  ∑ (i = 0, n!-1), ε(i) ∏ (j = 0, n-1), ∑ (k = 0, n-1), a(j,k) * b(k,σ(i,j)) =
-  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), a(j,σ(i,j)) *
-  ∑ (i = 0, n! - 1), ε(i) ∏ (j = 0, n-1), b(j,σ(i,j))
-The problem is that the lhs contains
-  n!*n^n terms
-But the rhs contains
-  n!*n! terms
-Some terms of the lhs must cancel each other. But which ones?
-*)
-destruct n; [ easy | ].
-destruct n. {
-  cbn - [ "/" nth ].
-...
-  unfold ε'.
-  do 3 rewrite rngl_summation_only_one.
-  do 7 rewrite rngl_product_only_one.
-  rewrite rngl_summation_only_one; cbn.
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  now do 3 rewrite rngl_mul_1_l.
-}
-destruct n. {
-  unfold iter_seq, iter_list; cbn.
-  do 7 rewrite rngl_add_0_l.
-  do 6 rewrite rngl_mul_1_l.
-  unfold ε', iter_seq, iter_list; cbn.
-  do 8 rewrite rngl_mul_1_l.
-  rewrite rngl_add_0_r.
-  rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
-  rewrite rngl_add_sub; [ | now destruct Hif; left ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  remember (mat_el A) as a eqn:Ha.
-  remember (mat_el B) as b eqn:Hb.
-  move b before a.
-(**)
-  ring_simplify.
-(*
-  rewrite rngl_mul_1_l.
-  do 2 rewrite rngl_mul_1_l.
-  unfold rngl_sub.
-  replace rngl_has_opp with true by now destruct Hif.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_add_0_l.
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  rewrite rngl_mul_opp_l; [ | now destruct Hif ].
-  do 3 rewrite rngl_mul_1_l.
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-  rewrite fold_rngl_sub; [ | now destruct Hif ].
-*)
-...
-(*
-  (a 0 0 * b 0 0 + a 0 1 * b 1 0) * (a 1 0 * b 0 1 + a 1 1 * b 1 1) -
-  (a 0 0 * b 0 1 + a 0 1 * b 1 1) * (a 1 0 * b 0 0 + a 1 1 * b 1 0) =
-
-  (a 0 0 * a 1 1 - a 0 1 * a 1 0) * (b 0 0 * b 1 1 - b 0 1 * b 1 0)
-*)
-...1
-rewrite rngl_summation_mul_summation; [ | now destruct Hif; left ].
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-  easy.
-}
-symmetry.
-apply rngl_summation_eq_compat.
-intros i (_, Hi).
-rewrite <- rngl_mul_assoc.
-f_equal.
-symmetry.
-rewrite rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
-symmetry.
-rewrite rngl_product_shift; [ | flia Hnz ].
-rewrite rngl_product_summation_distr; [ | destruct Hif; now left ].
-rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
-rewrite Nat_sub_succ_1.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  erewrite rngl_product_eq_compat. 2: {
-    intros k Hk.
-    now rewrite (Nat.add_comm 1 k), Nat.add_sub.
-  }
-  easy.
-}
-cbn.
-symmetry.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite rngl_mul_assoc.
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
-  rewrite <- rngl_product_mul_distr; [ | now destruct Hif ].
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
-  rewrite rngl_product_shift; [ | flia Hnz ].
-  erewrite rngl_product_eq_compat. 2: {
-    intros k Hk.
-    rewrite Nat.add_comm, Nat.add_sub.
-    easy.
-  }
-  easy.
-}
-symmetry.
-(* bizarre: n^n termes vs n! termes *)
-destruct (Nat.eq_dec n 2) as [Hn2| Hn2]. {
-  move Hn2 at top; subst n.
-  cbn - [ "/" "mod" Nat.pow "-" canon_sym_gr_list ].
-  replace (2 - 1) with 1 by easy.
-  replace (2 ^ 2 - 1) with 3 by easy.
-  cbn in Hi.
-  cbn - [ "/" "mod" ].
-  unfold iter_seq, iter_list.
-  cbn - [ "/" "mod" ].
-  do 2 rewrite rngl_add_0_l.
-  do 6 rewrite rngl_mul_1_l.
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.div_0_l; [ | easy ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  rewrite Nat.mod_0_l; [ | easy ].
-  do 4 rewrite Nat.div_1_r.
-  rewrite Nat.div_same; [ | easy ].
-  rewrite Nat.mod_same; [ | easy ].
-  rewrite Nat.mod_small; [ | flia ].
-  cbn.
-  unfold ε'; cbn.
-  unfold iter_seq, iter_list; cbn.
-  do 8 rewrite rngl_mul_1_l.
-  repeat rewrite rngl_add_0_r.
-  rewrite rngl_sub_0_r; [ | now destruct Hif; left ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
-  rewrite rngl_add_sub; [ | now destruct Hif; left ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_div_1_r; [ | now destruct Hif; left | now destruct Hif ].
-  rewrite rngl_mul_1_l.
-  rewrite rngl_mul_1_r.
-  destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
-    subst i.
-    cbn.
-...
-intros.
-(* essai avec le déterminant défini par récurrence *)
-cbn.
-rewrite List_map_seq_length.
-unfold det.
-remember (mat_nrows A) as n eqn:Hra.
-symmetry in Hra.
-enough (Hrb : mat_nrows B = n).
-...
-intros.
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite laplace_formula_on_rows with (i := 0).
-rewrite mat_mul_ncols.
-(* déjà, ce serait pas mal si on  prouvait que com(A*B)=com(A)*com(B) *)
-(* mais je viens de laisser tomber cette idée parce que, de toutes façons,
-   la définition de com fait déjà intervenir det : ça boucle ! *)
-...
-Check comatrix_mul.
-...
-intros.
-Check @laplace_formula_on_rows.
-(* https://www.youtube.com/watch?v=-CySi7uauCg *)
-...
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-rewrite det_is_det_by_canon_permut.
-cbn; rewrite List_map_seq_length.
-unfold determinant'.
-...
-Check laplace_formula_on_rows.
-Check laplace_formula_on_cols.
-Search comatrix.
-...
-Require Import IterMul.
-Search determinant.
-...
-intros.
-unfold determinant; cbn.
-rewrite List_map_seq_length.
-Print determinant_loop.
-...
-*)
