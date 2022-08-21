@@ -17,10 +17,9 @@ Import List List.ListNotations Init.Nat.
 
 Require Import Misc RingLike.
 Require Import PermutationFun SortingFun SortRank.
-Require Import IterAdd IterMul IterAnd Pigeonhole.
+Require Import IterAdd IterMul.
 Require Import Matrix PermutSeq Signature.
 Require Import Determinant.
-Require Import NatRingLike.
 Import matrix_Notations.
 
 (* binomial *)
