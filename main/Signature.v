@@ -3076,6 +3076,40 @@ destruct H1 as [H1| H1]; rewrite H1. {
 }
 Qed.
 
+Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%F.
+Proof.
+intros.
+destruct (Nat.eq_dec len 0) as [Hnz| Hnz]. {
+  subst len; cbn.
+  unfold ε; cbn.
+  unfold iter_seq, iter_list; cbn.
+  now do 2 rewrite rngl_mul_1_l.
+}
+unfold ε.
+rewrite seq_length.
+unfold sign_diff.
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite seq_nth; [ | flia Hj Hnz ].
+    rewrite seq_nth; [ | flia Hi Hnz ].
+    replace (if _ <? _ then _ else _) with 1%F. 2: {
+      symmetry.
+      rewrite if_ltb_lt_dec.
+      destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
+      apply Nat.add_lt_mono_l with (p := sta) in Hij.
+      now apply Nat.compare_gt_iff in Hij; rewrite Hij.
+    }
+    easy.
+  }
+  easy.
+}
+apply all_1_rngl_product_1.
+intros i Hi.
+now apply all_1_rngl_product_1.
+Qed.
+
 End a.
 
 Arguments ε {T}%type {ro}.
