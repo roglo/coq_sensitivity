@@ -1462,6 +1462,7 @@ Qed.
 (* TODO: find another name for "all_comb";
    something more explicit, more understandable *)
 Print all_comb.
+Compute (all_comb 2).
 Compute (all_comb 3).
 
 Lemma cauchy_binet_formula_step_1 : in_charac_0_field →
