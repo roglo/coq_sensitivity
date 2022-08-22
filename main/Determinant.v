@@ -88,11 +88,11 @@ Arguments det' M%M.
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-Definition all_comb n := list_prodn (repeat (seq 1 n) n).
+Definition all_comb n := prodn (repeat (seq 1 n) n).
 
 (*
 Compute (all_comb 3).
-Compute (list_prodn (repeat (seq 0 10) 2)).
+Compute (prodn (repeat (seq 0 10) 2)).
 *)
 
 Definition det'' (M : matrix T) :=
@@ -117,11 +117,11 @@ Proof. easy. Qed.
 
 (*
 End a.
-Compute (length (list_prodn [[2;3];[5;7;2];[8;3];[7;2]])).
-Compute (length (list_prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
-Compute (length (list_prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (list_prodn [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (list_prodn [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (prodn [[2;3];[5;7;2];[8;3];[7;2]])).
+Compute (length (prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
+Compute (length (prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (prodn [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (prodn [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
 Arguments det'' {T ro} M%M.
@@ -223,9 +223,9 @@ rewrite rngl_summation_list_cons.
 now cbn; f_equal.
 Qed.
 
-Theorem list_prodn_length : ∀ A (ll : list (list A)),
+Theorem prodn_length : ∀ A (ll : list (list A)),
   ll ≠ []
-  → length (list_prodn ll) = ∏ (l ∈ ll), length l.
+  → length (prodn ll) = ∏ (l ∈ ll), length l.
 Proof.
 intros * Hll.
 revert Hll.
@@ -269,7 +269,7 @@ Theorem all_comb_length : ∀ n, n ≠ 0 → length (all_comb n) = n ^ n.
 Proof.
 intros * Hnz.
 unfold all_comb.
-rewrite list_prodn_length; [ | now destruct n ].
+rewrite prodn_length; [ | now destruct n ].
 rewrite rngl_product_same_length with (n := n). 2: {
   intros l Hl.
   apply repeat_spec in Hl; subst l.
@@ -299,15 +299,15 @@ Compute (
 ).
 *)
 
-Theorem in_list_prodn_repeat_iff : ∀ m n l,
+Theorem in_prodn_repeat_iff : ∀ m n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
-  ↔ l ∈ list_prodn (repeat (seq 1 m) n).
+  ↔ l ∈ prodn (repeat (seq 1 m) n).
 Proof.
 intros.
 split. {
   intros [(Hnz, H1)| (Hnz & Hn & Hm)]; [ now subst n l; left | ].
-  apply (in_list_prodn_iff 0).
+  apply (in_prodn_iff 0).
   rewrite repeat_length.
   split; [ easy | ].
   intros i Hi.
@@ -322,7 +322,7 @@ split. {
   now apply Nat.lt_succ_r.
 } {
   intros Hl.
-  apply (in_list_prodn_iff 0) in Hl.
+  apply (in_prodn_iff 0) in Hl.
   rewrite repeat_length in Hl.
   destruct Hl as (Hln, Hl).
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -351,11 +351,11 @@ Theorem in_all_comb_iff : ∀ n l,
   ↔ l ∈ all_comb n.
 Proof.
 intros.
-now apply in_list_prodn_repeat_iff.
+now apply in_prodn_repeat_iff.
 Qed.
 
-Theorem NoDup_list_prodn_repeat : ∀ m n,
-  NoDup (list_prodn (repeat (seq 1 m) n)).
+Theorem NoDup_prodn_repeat : ∀ m n,
+  NoDup (prodn (repeat (seq 1 m) n)).
 Proof.
 intros.
 revert m.
@@ -364,7 +364,7 @@ induction n; intros. {
 }
 cbn.
 specialize (IHn m) as H1.
-remember (list_prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
+remember (prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
 rewrite flat_map_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
@@ -400,7 +400,7 @@ Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
 Proof.
 intros n.
 unfold all_comb.
-apply NoDup_list_prodn_repeat.
+apply NoDup_prodn_repeat.
 Qed.
 
 Theorem all_comb_inj : ∀ n i j,

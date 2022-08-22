@@ -2792,16 +2792,16 @@ intros.
 now apply iter_seq_only_one.
 Qed.
 
-(* list_prodn: cartesian product of several lists *)
+(* prodn: cartesian product of several lists *)
 
-Fixpoint list_prodn {A} (ll : list (list A)) :=
+Fixpoint prodn {A} (ll : list (list A)) :=
   match ll with
   | [] => [[]]
-  | l :: ll' => flat_map (λ a, map (cons a) (list_prodn ll')) l
+  | l :: ll' => flat_map (λ a, map (cons a) (prodn ll')) l
   end.
 
-Theorem eq_list_prodn_nil_iff : ∀ A (ll : list (list A)),
-  list_prodn ll = [] ↔ [] ∈ ll.
+Theorem eq_prodn_nil_iff : ∀ A (ll : list (list A)),
+  prodn ll = [] ↔ [] ∈ ll.
 Proof.
 intros.
 split. {
@@ -2826,8 +2826,8 @@ split. {
 }
 Qed.
 
-Theorem in_list_prodn_length : ∀ A (ll : list (list A)) l,
-  l ∈ list_prodn ll → length l = length ll.
+Theorem in_prodn_length : ∀ A (ll : list (list A)) l,
+  l ∈ prodn ll → length l = length ll.
 Proof.
 intros * Hl.
 revert l Hl.
@@ -2844,9 +2844,9 @@ subst l; cbn; f_equal.
 now apply IHll.
 Qed.
 
-Theorem nth_in_list_prodn : ∀ A (d : A) ll l i,
+Theorem nth_in_prodn : ∀ A (d : A) ll l i,
   i < length ll
-  → l ∈ list_prodn ll
+  → l ∈ prodn ll
   → nth i l d ∈ nth i ll [].
 Proof.
 intros * Hi Hll.
@@ -2875,17 +2875,17 @@ rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
 
-Theorem in_list_prodn_iff : ∀ A (d : A) ll la,
-  la ∈ list_prodn ll
+Theorem in_prodn_iff : ∀ A (d : A) ll la,
+  la ∈ prodn ll
   ↔ length la = length ll ∧ ∀ i, i < length la → nth i la d ∈ nth i ll [].
 Proof.
 intros.
 split. {
   intros Hla.
-  split; [ now apply in_list_prodn_length in Hla | ].
+  split; [ now apply in_prodn_length in Hla | ].
   intros i Hi.
-  apply nth_in_list_prodn; [ | easy ].
-  apply in_list_prodn_length in Hla.
+  apply nth_in_prodn; [ | easy ].
+  apply in_prodn_length in Hla.
   congruence.
 } {
   intros (Hla & Hnth).
@@ -2912,7 +2912,7 @@ split. {
 }
 Qed.
 
-(* end list_prodn *)
+(* end prodn *)
 
 Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).
 Proof.

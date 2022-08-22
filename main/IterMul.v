@@ -575,7 +575,7 @@ Theorem rngl_product_summation_distr_prodn :
   ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-    ∑ (l ∈ list_prodn (repeat (seq 1 n) m)),
+    ∑ (l ∈ prodn (repeat (seq 1 n) m)),
       ∏ (i = 1, m), f i (nth (i - 1) l 0%nat).
 Proof.
 intros Hop * Hmz.

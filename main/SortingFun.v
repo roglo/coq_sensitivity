@@ -3481,8 +3481,8 @@ split; [ easy | cbn ].
 now apply -> Nat.succ_lt_mono.
 Qed.
 
-Theorem list_prodn_repeat_seq_ltb_sorted : ∀ i n m,
-  sorted (list_ltb Nat.ltb) (list_prodn (repeat (seq i n) m)).
+Theorem prodn_repeat_seq_ltb_sorted : ∀ i n m,
+  sorted (list_ltb Nat.ltb) (prodn (repeat (seq i n) m)).
 Proof.
 intros.
 revert i n.
