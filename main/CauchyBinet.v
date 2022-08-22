@@ -1408,6 +1408,54 @@ apply permut_collapse.
 now unfold permut_seq.
 Qed.
 
+Theorem mat_select_all_rows : ∀ A,
+  is_square_matrix A = true
+  → mat_select_rows (seq 1 (mat_nrows A)) A = A.
+Proof.
+intros * Hsm.
+specialize (square_matrix_ncols A Hsm) as Hc.
+generalize Hsm; intros H.
+apply is_scm_mat_iff in H.
+destruct H as (_, Hcla).
+unfold mat_select_rows.
+destruct A as (lla); cbn; f_equal.
+cbn in Hsm, Hc, Hcla.
+apply List_eq_iff.
+rewrite List_map_seq_length.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length lla)) as [Hila| Hila]. 2: {
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
+  now rewrite nth_overflow.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Hc.
+rewrite <- seq_shift, map_map; cbn.
+erewrite map_ext_in; [ | now intros; rewrite Nat.sub_0_r ].
+specialize (List_map_nth_seq (nth i lla [])) as H1.
+rewrite Hcla in H1 by now apply nth_In.
+rewrite <- H1.
+now symmetry; apply nth_indep.
+Qed.
+
+Theorem mat_select_all_cols : ∀ A,
+  is_square_matrix A = true
+  → mat_select_cols (seq 1 (mat_ncols A)) A = A.
+Proof.
+intros * Hsm.
+unfold mat_select_cols.
+rewrite <- mat_transp_nrows.
+rewrite mat_select_all_rows. {
+  apply mat_transp_involutive.
+  now apply squ_mat_is_corr.
+} {
+  now apply mat_transp_is_square.
+}
+Qed.
+
 (* Cauchy-Binet formula in several steps *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
@@ -1924,54 +1972,6 @@ End a.
 Arguments cauchy_binet_formula {T ro rp} _ [m n]%nat.
 
 Check cauchy_binet_formula.
-
-Theorem mat_select_all_rows : ∀ A,
-  is_square_matrix A = true
-  → mat_select_rows (seq 1 (mat_nrows A)) A = A.
-Proof.
-intros * Hsm.
-specialize (square_matrix_ncols A Hsm) as Hc.
-generalize Hsm; intros H.
-apply is_scm_mat_iff in H.
-destruct H as (_, Hcla).
-unfold mat_select_rows.
-destruct A as (lla); cbn; f_equal.
-cbn in Hsm, Hc, Hcla.
-apply List_eq_iff.
-rewrite List_map_seq_length.
-split; [ easy | ].
-intros d i.
-destruct (lt_dec i (length lla)) as [Hila| Hila]. 2: {
-  apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ | now rewrite List_map_seq_length ].
-  now rewrite nth_overflow.
-}
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite Hc.
-rewrite <- seq_shift, map_map; cbn.
-erewrite map_ext_in; [ | now intros; rewrite Nat.sub_0_r ].
-specialize (List_map_nth_seq (nth i lla [])) as H1.
-rewrite Hcla in H1 by now apply nth_In.
-rewrite <- H1.
-now symmetry; apply nth_indep.
-Qed.
-
-Theorem mat_select_all_cols : ∀ A,
-  is_square_matrix A = true
-  → mat_select_cols (seq 1 (mat_ncols A)) A = A.
-Proof.
-intros * Hsm.
-unfold mat_select_cols.
-rewrite <- mat_transp_nrows.
-rewrite mat_select_all_rows. {
-  apply mat_transp_involutive.
-  now apply squ_mat_is_corr.
-} {
-  now apply mat_transp_is_square.
-}
-Qed.
 
 Corollary determinant_mul : in_charac_0_field →
   ∀ A B,
