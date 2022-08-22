@@ -88,16 +88,16 @@ Arguments det' M%M.
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-Definition all_comb n := prodn (repeat (seq 1 n) n).
+Definition prodn_rep_seq n := prodn (repeat (seq 1 n) n).
 
 (*
-Compute (all_comb 3).
+Compute (prodn_rep_seq 3).
 Compute (prodn (repeat (seq 0 10) 2)).
 *)
 
 Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
-  ∑ (l ∈ all_comb n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
+  ∑ (l ∈ prodn_rep_seq n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
 (* *)
 
@@ -265,10 +265,10 @@ intros l1 Hl1.
 now apply Hll; right.
 Qed.
 
-Theorem all_comb_length : ∀ n, n ≠ 0 → length (all_comb n) = n ^ n.
+Theorem prodn_rep_seq_length : ∀ n, n ≠ 0 → length (prodn_rep_seq n) = n ^ n.
 Proof.
 intros * Hnz.
-unfold all_comb.
+unfold prodn_rep_seq.
 rewrite prodn_length; [ | now destruct n ].
 rewrite rngl_product_same_length with (n := n). 2: {
   intros l Hl.
@@ -278,24 +278,24 @@ rewrite rngl_product_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
-Fixpoint all_comb_inv n l :=
+Fixpoint prodn_rep_seq_inv n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a * n ^ length l' + all_comb_inv n l'
+  | a :: l' => pred a * n ^ length l' + prodn_rep_seq_inv n l'
   end.
 
-Fixpoint old_all_comb_inv_loop n l :=
+Fixpoint old_prodn_rep_seq_inv_loop n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a + n * old_all_comb_inv_loop n l'
+  | a :: l' => pred a + n * old_prodn_rep_seq_inv_loop n l'
   end.
 
-Definition old_all_comb_inv n l := old_all_comb_inv_loop n (rev l).
+Definition old_prodn_rep_seq_inv n l := old_prodn_rep_seq_inv_loop n (rev l).
 
 (*
 Compute (
   let n := 3 in
-  map (λ l, (all_comb_inv n l, old_all_comb_inv n l)) (all_comb n)
+  map (λ l, (prodn_rep_seq_inv n l, old_prodn_rep_seq_inv n l)) (prodn_rep_seq n)
 ).
 *)
 
@@ -345,10 +345,10 @@ split. {
 }
 Qed.
 
-Theorem in_all_comb_iff : ∀ n l,
+Theorem in_prodn_rep_seq_iff : ∀ n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i, i ∈ l → 1 ≤ i ≤ n)
-  ↔ l ∈ all_comb n.
+  ↔ l ∈ prodn_rep_seq n.
 Proof.
 intros.
 now apply in_prodn_repeat_iff.
@@ -396,27 +396,27 @@ rewrite seq_nth in Hji; [ | easy ].
 now apply Nat.succ_inj in Hji; symmetry in Hji.
 Qed.
 
-Theorem NoDup_all_comb : ∀ n, NoDup (all_comb n).
+Theorem NoDup_prodn_rep_seq : ∀ n, NoDup (prodn_rep_seq n).
 Proof.
 intros n.
-unfold all_comb.
+unfold prodn_rep_seq.
 apply NoDup_prodn_repeat.
 Qed.
 
-Theorem all_comb_inj : ∀ n i j,
+Theorem prodn_rep_seq_inj : ∀ n i j,
   n ≠ 0
   → i < n ^ n
   → j < n ^ n
-  → nth i (all_comb n) [] = nth j (all_comb n) []
+  → nth i (prodn_rep_seq n) [] = nth j (prodn_rep_seq n) []
   → i = j.
 Proof.
 intros * Hnz Hi Hj Hij.
-apply (NoDup_nth (all_comb n) []); [ | | | easy ]. {
-  apply NoDup_all_comb.
+apply (NoDup_nth (prodn_rep_seq n) []); [ | | | easy ]. {
+  apply NoDup_prodn_rep_seq.
 } {
-  now rewrite all_comb_length.
+  now rewrite prodn_rep_seq_length.
 } {
-  now rewrite all_comb_length.
+  now rewrite prodn_rep_seq_length.
 }
 Qed.
 
@@ -588,7 +588,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
+assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (prodn_rep_seq n)). {
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
@@ -603,7 +603,7 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   }
   rewrite map_id.
   split; [ easy | ].
-  apply in_all_comb_iff.
+  apply in_prodn_rep_seq_iff.
   right.
   split; [ easy | ].
   split; [ now rewrite map_length, canon_sym_gr_list_length | ].
@@ -619,11 +619,11 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (all_comb n)). {
   now apply canon_sym_gr_list_ub.
 }
 symmetry.
-replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
+replace (prodn_rep_seq n) with (map (λ l, map S (map pred l)) (prodn_rep_seq n)). 2: {
   erewrite map_ext_in. 2: {
     intros l Hl.
     rewrite map_map.
-    apply in_all_comb_iff in Hl.
+    apply in_prodn_rep_seq_iff in Hl.
     destruct Hl as [Hl| Hl]; [ now exfalso | ].
     destruct Hl as (_ & _ & Hl).
     erewrite map_ext_in. 2: {
@@ -639,9 +639,9 @@ replace (all_comb n) with (map (λ l, map S (map pred l)) (all_comb n)). 2: {
 rewrite <- map_map.
 rewrite rngl_summation_list_map.
 assert (H1 :
-  ∑ (l ∈ map (map pred) (all_comb n)),
+  ∑ (l ∈ map (map pred) (prodn_rep_seq n)),
   ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1) =
-  ∑ (l ∈ map (map pred) (all_comb n)),
+  ∑ (l ∈ map (map pred) (prodn_rep_seq n)),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
     ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1)
   else 0). {
@@ -655,7 +655,7 @@ assert (H1 :
     apply in_map_iff.
     apply in_map_iff in Hl.
     destruct Hl as (l1 & H & Hl); subst l; rename l1 into l.
-    apply in_all_comb_iff in Hl.
+    apply in_prodn_rep_seq_iff in Hl.
     destruct Hl as [Hl| Hl]; [ easy | ].
     destruct Hl as (_ & Hln & Hin).
     exists (canon_sym_gr_list_inv n (map pred l)).
@@ -691,7 +691,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
       destruct Hl as (l1 & H & Hl); subst l.
       rename l1 into l.
       rewrite map_length.
-      apply in_all_comb_iff in Hl.
+      apply in_prodn_rep_seq_iff in Hl.
       destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hln & Hin).
       rewrite Hln; flia Hi.
@@ -721,7 +721,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     rewrite map_map.
     erewrite map_ext_in. 2: {
       intros i Hi.
-      apply in_all_comb_iff in Hl.
+      apply in_prodn_rep_seq_iff in Hl.
       destruct Hl as [Hl| Hl]; [ now exfalso | ].
       destruct Hl as (_ & _ & Hl).
       specialize (Hl i Hi).
@@ -731,7 +731,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     now rewrite map_id.
   }
   rewrite map_id.
-  apply NoDup_all_comb.
+  apply NoDup_prodn_rep_seq.
 }
 Qed.
 

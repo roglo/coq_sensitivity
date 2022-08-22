@@ -630,12 +630,12 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
 }
 Qed.
 
-Theorem nth_all_comb_length : ∀ n i,
+Theorem nth_prodn_rep_seq_length : ∀ n i,
   i < n ^ n
-  → length (nth i (all_comb n) []) = n.
+  → length (nth i (prodn_rep_seq n) []) = n.
 Proof.
 intros * Hi.
-unfold all_comb.
+unfold prodn_rep_seq.
 rewrite nth_prodn_same_length with (n := n). {
   apply repeat_length.
 } {
@@ -761,7 +761,7 @@ assert (Heql : equality (list_eqv Nat.eqb)). {
 }
 set (g1 := λ l, l ° collapse kl).
 set (h1 := λ l, l ° isort_rank Nat.leb kl).
-assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
+assert (Hgh : ∀ l, l ∈ prodn_rep_seq n → g1 (h1 l) = l). {
   intros l Hl.
   unfold g1, h1.
   rewrite <- (permut_comp_assoc n); cycle 1. {
@@ -775,10 +775,10 @@ assert (Hgh : ∀ l, l ∈ all_comb n → g1 (h1 l) = l). {
   rewrite permut_comp_isort_rank_r; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
-  apply in_all_comb_iff in Hl.
+  apply in_prodn_rep_seq_iff in Hl.
   now destruct Hl.
 }
-assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
+assert (Hhg : ∀ l, l ∈ prodn_rep_seq n → h1 (g1 l) = l). {
   intros l Hl.
   unfold g1, h1.
   rewrite <- (permut_comp_assoc n); cycle 1. {
@@ -793,18 +793,18 @@ assert (Hhg : ∀ l, l ∈ all_comb n → h1 (g1 l) = l). {
   rewrite permut_comp_isort_rank_l; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
-  apply in_all_comb_iff in Hl.
+  apply in_prodn_rep_seq_iff in Hl.
   now destruct Hl.
 }
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
-    with (lb := all_comb n); [ | easy | ]. {
+    with (lb := prodn_rep_seq n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
     unfold g1.
     rewrite (sign_comp Hif). 2: {
-      apply in_all_comb_iff in Hla.
+      apply in_prodn_rep_seq_iff in Hla.
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
       rewrite Hnc, Hn.
@@ -936,14 +936,14 @@ apply NoDup_permutation. {
   apply Nat.eqb_eq.
 } {
   apply (NoDup_map_iff []).
-  rewrite all_comb_length; [ | easy ].
+  rewrite prodn_rep_seq_length; [ | easy ].
   intros i j Hi Hj Hij.
   unfold h1 in Hij.
   unfold "°" in Hij.
   specialize (ext_in_map Hij) as H1.
   assert
     (H : ∀ k, k < n →
-     nth k (nth i (all_comb n) []) 0 = nth k (nth j (all_comb n) []) 0). {
+     nth k (nth i (prodn_rep_seq n) []) 0 = nth k (nth j (prodn_rep_seq n) []) 0). {
     intros k Hk.
     apply H1.
     apply (permutation_in_iff Nat.eqb_eq) with (la := seq 0 n). 2: {
@@ -957,53 +957,53 @@ apply NoDup_permutation. {
     apply (permutation_refl Nat.eqb_eq).
   }
   clear H1; rename H into H1.
-  specialize (all_comb_inj Hkz Hi Hj) as H2.
+  specialize (prodn_rep_seq_inj Hkz Hi Hj) as H2.
   apply H2.
-  remember (nth i (all_comb n) []) as la eqn:Hla.
-  remember (nth j (all_comb n) []) as lb eqn:Hlb.
+  remember (nth i (prodn_rep_seq n) []) as la eqn:Hla.
+  remember (nth j (prodn_rep_seq n) []) as lb eqn:Hlb.
   move lb before la.
   apply List_eq_iff.
   split. {
     rewrite Hla, Hlb.
-    rewrite nth_all_comb_length; [ | easy ].
-    now rewrite nth_all_comb_length.
+    rewrite nth_prodn_rep_seq_length; [ | easy ].
+    now rewrite nth_prodn_rep_seq_length.
   }
   intros d k.
   destruct (lt_dec k n) as [Hkn| Hkn]. 2: {
     apply Nat.nlt_ge in Hkn.
     rewrite nth_overflow. 2: {
       rewrite Hla.
-      now rewrite nth_all_comb_length.
+      now rewrite nth_prodn_rep_seq_length.
     }
     rewrite nth_overflow. 2: {
       rewrite Hlb.
-      now rewrite nth_all_comb_length.
+      now rewrite nth_prodn_rep_seq_length.
     }
     easy.
   }
   rewrite nth_indep with (d' := 0). 2: {
     rewrite Hla.
-    now rewrite nth_all_comb_length.
+    now rewrite nth_prodn_rep_seq_length.
   }
   symmetry.
   rewrite nth_indep with (d' := 0). 2: {
     rewrite Hlb.
-    now rewrite nth_all_comb_length.
+    now rewrite nth_prodn_rep_seq_length.
   }
   symmetry.
   now apply H1.
 } {
-  apply NoDup_all_comb.
+  apply NoDup_prodn_rep_seq.
 }
 intros la.
 split; intros Hla. {
   apply in_map_iff in Hla.
   destruct Hla as (lb & Hla & Hlb); subst la.
-  apply in_all_comb_iff in Hlb.
+  apply in_prodn_rep_seq_iff in Hlb.
   destruct Hlb as [Hlb| Hlb]; [ easy | ].
   destruct Hlb as (_ & Hlb & Hlbn).
   unfold h1, "°"; cbn.
-  apply in_all_comb_iff; right.
+  apply in_prodn_rep_seq_iff; right.
   split; [ easy | ].
   rewrite map_length, isort_rank_length.
   split; [ easy | ].
@@ -1014,15 +1014,15 @@ split; intros Hla. {
   apply in_isort_rank in Hj.
   congruence.
 } {
-  apply in_all_comb_iff in Hla.
+  apply in_prodn_rep_seq_iff in Hla.
   destruct Hla as [Hla| Hla]; [ easy | ].
   destruct Hla as (_ & Hlan & Hla).
   apply in_map_iff.
   exists (g1 la).
   split. {
-    now apply Hhg, in_all_comb_iff; right.
+    now apply Hhg, in_prodn_rep_seq_iff; right.
   }
-  apply in_all_comb_iff; right.
+  apply in_prodn_rep_seq_iff; right.
   split; [ easy | ].
   split. {
     unfold g1.
@@ -1459,19 +1459,13 @@ Qed.
 (* Cauchy-Binet formula in several steps *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-(* TODO: find another name for "all_comb";
-   something more explicit, more understandable *)
-Print all_comb.
-Compute (all_comb 2).
-Compute (all_comb 3).
-
 Lemma cauchy_binet_formula_step_1 : in_charac_0_field →
   ∀ m n A B, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
   → mat_ncols B = m
   → det (A * B) =
-      ∑ (l ∈ all_comb m),
+      ∑ (l ∈ prodn_rep_seq m),
         ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)).
 Proof.
 intros Hif * Hmz Har Hac Hbc.
@@ -1510,7 +1504,7 @@ rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
 rewrite seq_nth; [ | flia Hi ].
 rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
 assert (Him : l.(i) - 1 < m). {
-  apply in_all_comb_iff in Hl.
+  apply in_prodn_rep_seq_iff in Hl.
   destruct Hl as [Hl| Hl]; [ easy | ].
   destruct Hl as (_ & Hlm & Hl).
   assert (H : l.(i) ∈ l). {
@@ -1524,7 +1518,7 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_comm.
 rewrite Nat.sub_add; [ easy | ].
-apply in_all_comb_iff in Hl.
+apply in_prodn_rep_seq_iff in Hl.
 destruct Hl as [Hl| Hl]; [ easy | ].
 destruct Hl as (_ & Hlm & Hl).
 assert (H : nth (i - 1) l 0 ∈ l). {
@@ -1536,11 +1530,11 @@ Qed.
 
 Lemma cauchy_binet_formula_step_2 : in_charac_0_field →
   ∀ m n A B, m ≠ 0 →
-  ∑ (l ∈ all_comb m),
+  ∑ (l ∈ prodn_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
-    (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
+    (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hif * Hmz.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -1578,7 +1572,7 @@ Lemma cauchy_binet_formula_step_3 : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-      f kl * (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+      f kl * (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
     ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B).
 Proof.
@@ -1718,7 +1712,7 @@ rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
 }
 rewrite Har.
 remember (∑ (kl ∈ _), _) as x; subst x.
-unfold all_comb.
+unfold prodn_rep_seq.
 rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
@@ -1930,7 +1924,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 rewrite (cauchy_binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
-  ∑ (l ∈ all_comb m),
+  ∑ (l ∈ prodn_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
@@ -1938,7 +1932,7 @@ rewrite (cauchy_binet_formula_step_2 Hif n A B Hmz).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
-    (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+    (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
 rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
