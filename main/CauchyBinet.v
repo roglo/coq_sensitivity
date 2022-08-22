@@ -1745,6 +1745,14 @@ rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 *)
 apply (cauchy_binet_formula_step_5 Hif A B Hmz Hnz Hca Har Hac).
 intros jl Hjl.
+(*
+  Hjl : jl ∈ sub_lists_of_seq_1_n n m
+  ============================
+  ∑ (kl ∈ all_permut (seq 1 m)),
+    ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
+  ∑ (kl ∈ all_permut jl),
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+*)
 generalize Hjl; intros H.
 apply in_sls1n_iff in H.
 destruct H as [H| H]; [ easy | ].
