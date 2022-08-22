@@ -1778,7 +1778,7 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
-Lemma cauchy_binet_formula_step_10 : in_charac_0_field →
+Lemma cauchy_binet_formula_step_7 : in_charac_0_field →
   ∀ m n A jl, m ≠ 0 →
   jl ∈ sub_lists_of_seq_1_n n m
   → ∑ (kl ∈ all_permut (seq 1 m)),
@@ -1967,7 +1967,7 @@ rewrite (cauchy_binet_formula_step_6 A jl Hmz Har Hac Hjl).
   ∑ (kl ∈ all_permut jl),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
-apply (cauchy_binet_formula_step_10 Hif n A jl Hmz Hjl).
+apply (cauchy_binet_formula_step_7 Hif n A jl Hmz Hjl).
 Qed.
 
 End a.
