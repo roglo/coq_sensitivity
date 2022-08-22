@@ -1411,6 +1411,13 @@ Qed.
 (* Binet-Cauchy formula in several steps *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
+(* TODO: find another name for "all_comb";
+   something more explicit, more understandable *)
+(*
+Print all_comb.
+Compute (all_comb 3).
+*)
+
 Lemma binet_cauchy_formula_step_1 : in_charac_0_field →
   ∀ m n A B,
   mat_nrows A = m
