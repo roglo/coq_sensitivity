@@ -1417,16 +1417,15 @@ Print all_comb.
 Compute (all_comb 3).
 
 Lemma binet_cauchy_formula_step_1 : in_charac_0_field →
-  ∀ m n A B,
+  ∀ m n A B, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
   → mat_ncols B = m
-  → m ≠ 0
   → det (A * B) =
       ∑ (l ∈ all_comb m),
         ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)).
 Proof.
-intros Hif * Har Hac Hbc Hmz.
+intros Hif * Hmz Har Hac Hbc.
 assert (Hab : is_square_matrix (A * B) = true). {
   apply is_scm_mat_iff.
   split. {
@@ -1524,6 +1523,57 @@ cbn.
 rewrite <- rngl_mul_summation_list_distr_l; [ easy | now destruct Hif; left ].
 Qed.
 
+Lemma binet_cauchy_formula_step_3 : in_charac_0_field →
+  ∀ m n A B, m ≠ 0 →
+  is_correct_matrix B = true
+  → mat_nrows B = n
+  → mat_ncols B = m
+  → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      (∏ (i = 1, m), mat_el A i kl.(i)) *
+      (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+    ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      (∏ (i = 1, m), mat_el A i kl.(i)) *
+      det (mat_select_rows kl B).
+Proof.
+intros Hif * Hmz Hcb Hbr Hbc.
+apply rngl_summation_list_eq_compat.
+intros l Hl.
+f_equal.
+generalize Hl; intros H.
+apply in_prodn_repeat_iff in H.
+destruct H as [H| H]; [ easy | ].
+destruct H as (_ & Hlm & Hln).
+rewrite det_is_det''; try now destruct Hif. 2: {
+  apply mat_select_rows_is_square; [ easy | congruence | ].
+  rewrite Hbr.
+  intros j Hj.
+  now apply Hln.
+}
+unfold det''.
+rewrite mat_select_rows_nrows, Hlm.
+apply rngl_summation_list_eq_compat.
+intros l1 Hl1.
+f_equal.
+apply rngl_product_eq_compat.
+intros i Hi.
+unfold mat_select_rows, mat_el; cbn.
+rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
+assert (H1 : l1.(i) - 1 < m). {
+  apply in_prodn_repeat_iff in Hl1.
+  destruct Hl1 as [Hl1| Hl1]; [ easy | ].
+  destruct Hl1 as (_ & Hl1m & Hl1).
+  specialize (Hl1 (nth (i - 1) l1 0)).
+  assert (H : nth (i - 1) l1 0 ∈ l1). {
+    apply nth_In; rewrite Hl1m; flia Hi.
+  }
+  specialize (Hl1 H); clear H.
+  flia Hl1.
+}
+rewrite (List_map_nth' 0); [ | now rewrite seq_length, Hbc ].
+rewrite seq_nth; [ | now rewrite Hbc ].
+now rewrite Nat.add_comm, Nat.add_sub.
+Qed.
+
 Theorem binet_cauchy_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -1559,7 +1609,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hcra Hac) as H1.
   now rewrite Har in H1.
 }
-rewrite (binet_cauchy_formula_step_1 Hif A B Har Hac Hbc Hmz).
+rewrite (binet_cauchy_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ all_comb m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
@@ -1572,53 +1622,13 @@ rewrite (binet_cauchy_formula_step_2 Hif n A B Hmz).
     (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-(**)
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros l Hl.
-  replace (∑ (i ∈ all_comb m), ε i * ∏ (j = _, _), _) with
-    (det (mat_select_rows l B)). 2: {
-    generalize Hl; intros H.
-    apply in_prodn_repeat_iff in H.
-    destruct H as [H| H]; [ easy | ].
-    destruct H as (_ & Hlm & Hln).
-    rewrite det_is_det''; try now destruct Hif. 2: {
-      apply mat_select_rows_is_square; [ easy | congruence | ].
-      rewrite Hbr.
-      intros j Hj.
-      now apply Hln.
-    }
-    unfold det''.
-    rewrite mat_select_rows_nrows, Hlm.
-    apply rngl_summation_list_eq_compat.
-    intros l1 Hl1.
-    f_equal.
-    apply rngl_product_eq_compat.
-    intros i Hi.
-    unfold mat_select_rows, mat_el; cbn.
-    rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
-    assert (H1 : l1.(i) - 1 < m). {
-      apply in_prodn_repeat_iff in Hl1.
-      destruct Hl1 as [Hl1| Hl1]; [ easy | ].
-      destruct Hl1 as (_ & Hl1m & Hl1).
-      specialize (Hl1 (nth (i - 1) l1 0)).
-      assert (H : nth (i - 1) l1 0 ∈ l1). {
-        apply nth_In; rewrite Hl1m; flia Hi.
-      }
-      specialize (Hl1 H); clear H.
-      flia Hl1.
-    }
-    rewrite (List_map_nth' 0); [ | now rewrite seq_length, Hbc ].
-    rewrite seq_nth; [ | now rewrite Hbc ].
-    now rewrite Nat.add_comm, Nat.add_sub.
-  }
-  easy.
-}
-cbn - [ det ].
-remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
+rewrite (binet_cauchy_formula_step_3 Hif A B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-  ∏ (i = 1, m), mat_el A i kl.(i) * det (mat_select_rows kl B) =
+    (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
+  ∑ (jl ∈ sub_lists...
 *)
+(**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
