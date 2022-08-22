@@ -1602,67 +1602,22 @@ assert (H : rngl_is_comm = true) by now destruct Hif.
 now rewrite (rngl_mul_comm H _ (ε la)).
 Qed.
 
-Theorem cauchy_binet_formula : in_charac_0_field →
-  ∀ m n A B,
+Lemma cauchy_binet_formula_step_5 : in_charac_0_field →
+  ∀ m n A B, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
-  → is_correct_matrix B = true
   → mat_nrows A = m
   → mat_ncols A = n
-  → mat_nrows B = n
-  → mat_ncols B = m
-  → det (A * B) =
-     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
-     det (mat_select_cols jl A) * det (mat_select_rows jl B).
+  → (∀ jl, jl ∈ sub_lists_of_seq_1_n n m →
+       ∑ (kl ∈ all_permut (seq 1 m)),
+         ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
+       ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i))
+  → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+      det (mat_select_rows (isort Nat.leb kl) B) =
+    ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+      det (mat_select_cols jl A) * det (mat_select_rows jl B).
 Proof.
-intros Hif * Hca Hcb Har Hac Hbr Hbc.
-destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
-  move Hmz at top; subst m.
-  apply is_scm_mat_iff in Hcb.
-  destruct Hcb as (Hcrb, Hclb).
-  specialize (Hcrb Hbc) as H1.
-  rewrite Hbr in H1.
-  move H1 at top; subst n.
-  destruct A as (lla).
-  destruct B as (llb).
-  cbn in Har, Hbr.
-  apply length_zero_iff_nil in Har, Hbr.
-  subst lla llb; cbn.
-  rewrite rngl_summation_list_only_one; cbn.
-  symmetry; apply rngl_mul_1_l.
-}
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  apply is_scm_mat_iff in Hca.
-  destruct Hca as (Hcra, Hcla).
-  specialize (Hcra Hac) as H1.
-  now rewrite Har in H1.
-}
-rewrite (cauchy_binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
-(*
-  ∑ (l ∈ all_comb m),
-    ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
-  ∑ (jl ∈ sub_lists...
-*)
-rewrite (cauchy_binet_formula_step_2 Hif n A B Hmz).
-(*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-    (∏ (i = 1, m), mat_el A i kl.(i)) *
-    (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
-  ∑ (jl ∈ sub_lists...
-*)
-rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
-(*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-    (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
-  ∑ (jl ∈ sub_lists...
-*)
-rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
-(*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
-    det (mat_select_rows (isort Nat.leb kl) B) =
-  ∑ (jl ∈ sub_lists...
-*)
+intros Hif * Hmz Hnz Hca Har Hac * Hjla.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
   now rewrite <- rngl_mul_assoc.
@@ -1724,11 +1679,72 @@ remember (∑ (jl' ∈ _), _) as x; subst x.
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
+now apply Hjla.
+Qed.
+
+Theorem cauchy_binet_formula : in_charac_0_field →
+  ∀ m n A B,
+  is_correct_matrix A = true
+  → is_correct_matrix B = true
+  → mat_nrows A = m
+  → mat_ncols A = n
+  → mat_nrows B = n
+  → mat_ncols B = m
+  → det (A * B) =
+     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+     det (mat_select_cols jl A) * det (mat_select_rows jl B).
+Proof.
+intros Hif * Hca Hcb Har Hac Hbr Hbc.
+destruct (Nat.eq_dec m 0) as [Hmz| Hmz]. {
+  move Hmz at top; subst m.
+  apply is_scm_mat_iff in Hcb.
+  destruct Hcb as (Hcrb, Hclb).
+  specialize (Hcrb Hbc) as H1.
+  rewrite Hbr in H1.
+  move H1 at top; subst n.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in Har, Hbr.
+  apply length_zero_iff_nil in Har, Hbr.
+  subst lla llb; cbn.
+  rewrite rngl_summation_list_only_one; cbn.
+  symmetry; apply rngl_mul_1_l.
+}
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  apply is_scm_mat_iff in Hca.
+  destruct Hca as (Hcra, Hcla).
+  specialize (Hcra Hac) as H1.
+  now rewrite Har in H1.
+}
+rewrite (cauchy_binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
-  ============================
-  ∑ (kl ∈ all_permut (seq 1 m)), ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
-  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+  ∑ (l ∈ all_comb m),
+    ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
+  ∑ (jl ∈ sub_lists...
 *)
+rewrite (cauchy_binet_formula_step_2 Hif n A B Hmz).
+(*
+  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    (∏ (i = 1, m), mat_el A i kl.(i)) *
+    (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+  ∑ (jl ∈ sub_lists...
+*)
+rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
+(*
+  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
+  ∑ (jl ∈ sub_lists...
+*)
+rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
+(*
+  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+    det (mat_select_rows (isort Nat.leb kl) B) =
+  ∑ (jl ∈ sub_lists...
+*)
+apply (cauchy_binet_formula_step_5 Hif A B Hmz Hnz Hca Har Hac).
+intros jl Hjl.
 generalize Hjl; intros H.
 apply in_sls1n_iff in H.
 destruct H as [H| H]; [ easy | ].
