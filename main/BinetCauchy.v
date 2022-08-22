@@ -1524,16 +1524,14 @@ rewrite <- rngl_mul_summation_list_distr_l; [ easy | now destruct Hif; left ].
 Qed.
 
 Lemma binet_cauchy_formula_step_3 : in_charac_0_field →
-  ∀ m n A B, m ≠ 0 →
+  ∀ m n f B, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
   → mat_ncols B = m
   → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-      (∏ (i = 1, m), mat_el A i kl.(i)) *
-      (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+      f kl * (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
     ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-      (∏ (i = 1, m), mat_el A i kl.(i)) *
-      det (mat_select_rows kl B).
+      f kl * det (mat_select_rows kl B).
 Proof.
 intros Hif * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
@@ -1622,7 +1620,7 @@ rewrite (binet_cauchy_formula_step_2 Hif n A B Hmz).
     (∑ (l ∈ all_comb m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (binet_cauchy_formula_step_3 Hif A B Hmz Hcb Hbr Hbc).
+rewrite (binet_cauchy_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
