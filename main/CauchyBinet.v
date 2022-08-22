@@ -1682,6 +1682,115 @@ rewrite rngl_summation_list_only_one.
 now apply Hjla.
 Qed.
 
+Lemma cauchy_binet_formula_step_10 : in_charac_0_field →
+  ∀ m n A jl, m ≠ 0 →
+  jl ∈ sub_lists_of_seq_1_n n m
+  → ∑ (kl ∈ all_permut (seq 1 m)),
+      ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
+    ∑ (kl ∈ all_permut jl),
+      ε kl * ∏ (i = 1, m), mat_el A i kl.(i).
+Proof.
+intros Hif * Hmz Hjl.
+symmetry.
+generalize Hjl; intros H.
+apply in_sls1n_iff in H.
+destruct H as [H| H]; [ easy | ].
+destruct H as (Hsj & Hjm & Hjlb).
+set (g1 := λ l, jl ° collapse l).
+set (h1 := λ l, map S (collapse l)).
+rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
+  intros kl Hkl.
+  unfold g1, h1.
+  replace (collapse (map S (collapse kl))) with (collapse kl). 2: {
+    symmetry.
+    unfold collapse at 1 3; f_equal.
+    specialize (isort_rank_map_add_compat 1 0) as H1.
+    rewrite H1; cbn.
+    rewrite map_id.
+    unfold collapse.
+    apply permut_isort_rank_involutive.
+    apply isort_rank_permut_seq.
+  }
+  apply in_all_permut_permutation in Hkl.
+  apply sorted_permuted_comp_collapse. 2: {
+    now apply (permutation_sym Nat.eqb_eq).
+  }
+  now apply sorted_nat_ltb_leb_incl.
+}
+replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
+  symmetry.
+  unfold h1.
+  specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
+  replace (add 1) with S in H1 by easy.
+  now rewrite Hjm in H1.
+}
+remember (∑ (kl ∈ _), _) as x; subst x.
+unfold g1.
+apply rngl_summation_list_eq_compat.
+intros kl Hkl.
+f_equal. {
+  unfold g1.
+  assert (Hndj : NoDup jl). {
+    apply sorted_NoDup in Hsj; [ easy | | ]. {
+      unfold irreflexive; apply Nat.ltb_irrefl.
+    } {
+      apply Nat_ltb_trans.
+    }
+  }
+  assert (Hkm : length kl = m). {
+    apply in_all_permut_permutation in Hkl.
+    apply (permutation_length Nat.eqb_eq) in Hkl.
+    now rewrite seq_length in Hkl.
+  }
+  rewrite <- ε_collapse_ε. 2: {
+    apply NoDup_comp_iff; [ | easy ].
+    rewrite Hjm, <- Hkm.
+    apply collapse_permut_seq_with_len.
+  }
+  rewrite collapse_comp; [ | easy | | ]; cycle 1. {
+    apply isort_rank_permut_seq.
+  } {
+    rewrite collapse_length; congruence.
+  }
+  symmetry.
+  rewrite <- ε_collapse_ε. 2: {
+    apply in_all_permut_permutation in Hkl.
+    apply (permutation_sym Nat.eqb_eq) in Hkl.
+    apply (permutation_NoDup Nat.eqb_eq) in Hkl; [ easy | ].
+    apply seq_NoDup.
+  }
+  symmetry.
+  rewrite (sign_comp Hif). 2: {
+    rewrite collapse_length, Hjm, <- Hkm.
+    apply collapse_permut_seq_with_len.
+  }
+  replace (collapse jl) with (seq 0 (length jl)). 2: {
+    symmetry.
+    apply sorted_nat_ltb_leb_incl in Hsj.
+    apply (eq_sorted_isort_rank_seq Nat_leb_trans) in Hsj.
+    unfold collapse; rewrite Hsj.
+    apply isort_rank_leb_seq.
+  }
+  now rewrite ε_seq, rngl_mul_1_l.
+}
+apply rngl_product_eq_compat.
+intros i Hi.
+f_equal.
+unfold comp_list.
+assert (Hkm : length kl = m). {
+  apply in_all_permut_permutation in Hkl.
+  apply (permutation_length Nat.eqb_eq) in Hkl.
+  now rewrite seq_length in Hkl.
+}
+rewrite (List_map_nth' 0); [ | rewrite collapse_length, Hkm; flia Hi ].
+f_equal.
+rewrite <- Hkm in Hkl, Hi.
+apply in_all_permut_permutation in Hkl.
+apply permutation_seq_collapse in Hkl.
+rewrite Hkl.
+rewrite (List_map_nth' 0); [ flia | flia Hi ].
+Qed.
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -1799,109 +1908,15 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now cbn.
 }
 remember (∑ (kl ∈ _), _) as x; subst x.
-symmetry.
-set (g1 := λ l, jl ° collapse l).
-set (h1 := λ l, map S (collapse l)).
-rewrite rngl_summation_list_change_var with (g := g1) (h := h1). 2: {
-  intros kl Hkl.
-  unfold g1, h1.
-  replace (collapse (map S (collapse kl))) with (collapse kl). 2: {
-    symmetry.
-    unfold collapse at 1 3; f_equal.
-    specialize (isort_rank_map_add_compat 1 0) as H1.
-    rewrite H1; cbn.
-    rewrite map_id.
-    unfold collapse.
-    apply permut_isort_rank_involutive.
-    apply isort_rank_permut_seq.
-  }
-  apply in_all_permut_permutation in Hkl.
-  apply sorted_permuted_comp_collapse. 2: {
-    now apply (permutation_sym Nat.eqb_eq).
-  }
-  now apply sorted_nat_ltb_leb_incl.
-}
-replace (map h1 (all_permut jl)) with (all_permut (seq 1 m)). 2: {
-  symmetry.
-  unfold h1.
-  specialize (map_collapse_all_permut_seq 1 _ _ _ Hjl) as H1.
-  replace (add 1) with S in H1 by easy.
-  now rewrite Hjm in H1.
-}
-remember (∑ (kl ∈ _), _) as x; subst x.
-apply rngl_summation_list_eq_compat.
-intros kl Hkl.
-f_equal. {
-  unfold g1.
-  assert (Hndj : NoDup jl). {
-    apply sorted_NoDup in Hsj; [ easy | | ]. {
-      unfold irreflexive; apply Nat.ltb_irrefl.
-    } {
-      apply Nat_ltb_trans.
-    }
-  }
-  assert (Hkm : length kl = m). {
-    apply in_all_permut_permutation in Hkl.
-    apply (permutation_length Nat.eqb_eq) in Hkl.
-    now rewrite seq_length in Hkl.
-  }
-  rewrite <- ε_collapse_ε. 2: {
-    apply NoDup_comp_iff; [ | easy ].
-    rewrite Hjm, <- Hkm.
-    apply collapse_permut_seq_with_len.
-  }
-  rewrite collapse_comp; [ | easy | | ]; cycle 1. {
-    apply isort_rank_permut_seq.
-  } {
-    rewrite collapse_length; congruence.
-  }
-  symmetry.
-  rewrite <- ε_collapse_ε. 2: {
-    apply in_all_permut_permutation in Hkl.
-    apply (permutation_sym Nat.eqb_eq) in Hkl.
-    apply (permutation_NoDup Nat.eqb_eq) in Hkl; [ easy | ].
-    apply seq_NoDup.
-  }
-  symmetry.
-  rewrite (sign_comp Hif). 2: {
-    rewrite collapse_length, Hjm, <- Hkm.
-    apply collapse_permut_seq_with_len.
-  }
-  replace (collapse jl) with (seq 0 (length jl)). 2: {
-    symmetry.
-    apply sorted_nat_ltb_leb_incl in Hsj.
-    apply (eq_sorted_isort_rank_seq Nat_leb_trans) in Hsj.
-    unfold collapse; rewrite Hsj.
-    apply isort_rank_leb_seq.
-  }
-  now rewrite ε_seq, rngl_mul_1_l.
-}
-unfold g1.
-apply rngl_product_eq_compat.
-intros i Hi.
-f_equal.
-remember (i - 1) as j.
-remember (nth j kl 0 - 1) as k.
-unfold comp_list.
-assert (Hkm : length kl = m). {
-  apply in_all_permut_permutation in Hkl.
-  apply (permutation_length Nat.eqb_eq) in Hkl.
-  now rewrite seq_length in Hkl.
-}
-rewrite (List_map_nth' 0). 2: {
-  rewrite collapse_length, Hkm, Heqj.
-  flia Hi.
-}
-f_equal.
-subst k.
-apply in_all_permut_permutation in Hkl.
-rewrite <- Hkm in Hkl.
-apply permutation_seq_collapse in Hkl.
-rewrite Hkl.
-rewrite (List_map_nth' 0). 2: {
-  subst j; rewrite Hkm; flia Hi.
-}
-flia.
+(*
+  Hjl : jl ∈ sub_lists_of_seq_1_n n m
+  ============================
+  ∑ (kl ∈ all_permut (seq 1 m)),
+    ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
+  ∑ (kl ∈ all_permut jl),
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+*)
+apply (cauchy_binet_formula_step_10 Hif n A jl Hmz Hjl).
 Qed.
 
 End a.
