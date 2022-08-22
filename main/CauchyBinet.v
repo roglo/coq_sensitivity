@@ -1572,6 +1572,36 @@ rewrite seq_nth; [ | now rewrite Hbc ].
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
+Lemma cauchy_binet_formula_step_4 : in_charac_0_field →
+  ∀ m n f B, m ≠ 0 →
+  is_correct_matrix B = true
+  → mat_nrows B = n
+  → mat_ncols B = m
+  → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      f kl * det (mat_select_rows kl B) =
+    ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      ε kl * f kl * det (mat_select_rows (isort Nat.leb kl) B).
+Proof.
+intros Hif * Hmz Hcb Hbr Hbc.
+apply rngl_summation_list_eq_compat.
+intros la Hla.
+rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
+  apply in_prodn_length in Hla.
+  rewrite repeat_length in Hla.
+  congruence.
+} {
+  intros k Hk.
+  apply in_prodn_repeat_iff in Hla.
+  destruct Hla as [| Hla]; [ easy | ].
+  destruct Hla as (_ & Hlam & Hla).
+  rewrite Hbr.
+  now apply Hla.
+}
+rewrite rngl_mul_assoc.
+assert (H : rngl_is_comm = true) by now destruct Hif.
+now rewrite (rngl_mul_comm H _ (ε la)).
+Qed.
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -1626,32 +1656,12 @@ rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-(**)
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros la Hla.
-  rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
-    apply in_prodn_length in Hla.
-    rewrite repeat_length in Hla.
-    congruence.
-  } {
-    intros k Hk.
-    apply in_prodn_repeat_iff in Hla.
-    destruct Hla as [| Hla]; [ easy | ].
-    destruct Hla as (_ & Hlam & Hla).
-    rewrite Hbr.
-    now apply Hla.
-  }
-  rewrite rngl_mul_assoc.
-  assert (H : rngl_is_comm = true) by now destruct Hif.
-  rewrite (rngl_mul_comm H _ (ε la)); clear H.
-  easy.
-}
-cbn - [ det ].
-remember (∑ (kl ∈ _), _) as x; subst x. (* renaming *)
+rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-  ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
-  det (mat_select_rows (isort Nat.leb kl) B) =
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
+    det (mat_select_rows (isort Nat.leb kl) B) =
+  ∑ (jl ∈ sub_lists...
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros la Hla.
