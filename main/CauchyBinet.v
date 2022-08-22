@@ -1730,6 +1730,59 @@ rewrite rngl_summation_list_only_one.
 now apply Hjla.
 Qed.
 
+Lemma cauchy_binet_formula_step_6 :
+  ∀ m n A jl, m ≠ 0 →
+  mat_nrows A = m
+  → mat_ncols A = n
+  → jl ∈ sub_lists_of_seq_1_n n m
+  → ∑ (kl ∈ all_permut (seq 1 m)),
+      ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
+    ∑ (kl ∈ all_permut (seq 1 m)),
+      ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)).
+Proof.
+intros * Hmz Har Hac Hjl.
+generalize Hjl; intros H.
+apply in_sls1n_iff in H.
+destruct H as [H| H]; [ easy | ].
+destruct H as (Hsj & Hjm & Hjlb).
+apply rngl_summation_list_eq_compat.
+intros kl Hkl.
+apply in_all_permut_iff in Hkl.
+generalize Hkl; intros Hpk.
+apply (permut_if_isort _ Nat.eqb_eq) in Hpk.
+rewrite (@isort_when_sorted _ _ (seq 1 m)) in Hkl. 2: {
+  apply sorted_nat_ltb_leb_incl.
+  apply sorted_seq.
+}
+f_equal.
+apply rngl_product_eq_compat.
+intros i Hi.
+rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
+  rewrite Hjm.
+  assert (Hklen : length kl = m). {
+    apply (f_equal length) in Hkl.
+    now rewrite isort_length, seq_length in Hkl.
+  }
+  rewrite <- Hklen in Hpk.
+  specialize (permutation_in_iff Nat.eqb_eq) as Hp.
+  specialize (Hp _ _ Hpk).
+  assert (H : kl.(i) ∈ kl). {
+    apply nth_In; rewrite Hklen; flia Hi.
+  }
+  apply Hp in H.
+  rewrite Hklen in H.
+  apply in_seq in H.
+  split; [ easy | flia H ].
+} {
+  rewrite Hac.
+  intros j Hj.
+  specialize (Hjlb jl.(j)).
+  assert (H : jl.(j) ∈ jl) by (apply nth_In; flia Hj).
+  specialize (Hjlb H); clear H.
+  flia Hjlb.
+}
+Qed.
+
 Lemma cauchy_binet_formula_step_10 : in_charac_0_field →
   ∀ m n A jl, m ≠ 0 →
   jl ∈ sub_lists_of_seq_1_n n m
@@ -1910,52 +1963,7 @@ intros jl Hjl.
   ∑ (kl ∈ all_permut jl),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
 *)
-generalize Hjl; intros H.
-apply in_sls1n_iff in H.
-destruct H as [H| H]; [ easy | ].
-destruct H as (Hsj & Hjm & Hjlb).
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros kl Hkl.
-  apply in_all_permut_iff in Hkl.
-  generalize Hkl; intros Hpk.
-  apply (permut_if_isort _ Nat.eqb_eq) in Hpk.
-  rewrite (@isort_when_sorted _ _ (seq 1 m)) in Hkl. 2: {
-    apply sorted_nat_ltb_leb_incl.
-    apply sorted_seq.
-  }
-  erewrite rngl_product_eq_compat. 2: {
-    intros i Hi.
-    rewrite mat_select_cols_el; cycle 1. {
-      now rewrite Har.
-    } {
-      rewrite Hjm.
-      assert (Hklen : length kl = m). {
-        apply (f_equal length) in Hkl.
-        now rewrite isort_length, seq_length in Hkl.
-      }
-      rewrite <- Hklen in Hpk.
-      specialize (permutation_in_iff Nat.eqb_eq) as Hp.
-      specialize (Hp _ _ Hpk).
-      assert (H : kl.(i) ∈ kl). {
-        apply nth_In; rewrite Hklen; flia Hi.
-      }
-      apply Hp in H.
-      rewrite Hklen in H.
-      apply in_seq in H.
-      split; [ easy | flia H ].
-    } {
-      rewrite Hac.
-      intros j Hj.
-      specialize (Hjlb jl.(j)).
-      assert (H : jl.(j) ∈ jl) by (apply nth_In; flia Hj).
-      specialize (Hjlb H); clear H.
-      flia Hjlb.
-    }
-    easy.
-  }
-  now cbn.
-}
-remember (∑ (kl ∈ _), _) as x; subst x.
+rewrite (cauchy_binet_formula_step_6 A jl Hmz Har Hac Hjl).
 (*
   Hjl : jl ∈ sub_lists_of_seq_1_n n m
   ============================
