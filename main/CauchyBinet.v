@@ -1870,16 +1870,20 @@ rewrite (List_map_nth' 0); [ flia | flia Hi ].
 Qed.
 
 Lemma cauchy_binet_formula_step_7 :
-  ∀ m n A jl, m ≠ 0 →
+  ∀ m n A f, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
-  → jl ∈ sub_lists_of_seq_1_n n m
-  → ∑ (kl ∈ all_permut (seq 1 m)),
-      ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
-    ∑ (kl ∈ all_permut (seq 1 m)),
-      ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)).
+  → ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+       (∑ (kl ∈ all_permut (seq 1 m)),
+          ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i))) * f jl =
+     ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+       (∑ (kl ∈ all_permut (seq 1 m)),
+          ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) * f jl.
 Proof.
-intros * Hmz Har Hac Hjl.
+intros * Hmz Har Hac.
+apply rngl_summation_list_eq_compat.
+intros jl Hjl.
+f_equal; symmetry.
 generalize Hjl; intros H.
 apply in_sls1n_iff in H.
 destruct H as [H| H]; [ easy | ].
@@ -1999,21 +2003,13 @@ rewrite (cauchy_binet_formula_step_6 Hif n A _ Hmz).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros jl Hjl.
-  rewrite <- (cauchy_binet_formula_step_7 A jl Hmz Har Hac Hjl).
-  easy.
-}
-cbn - [ det mat_el ].
-remember (∑ (jl ∈ _), _) as x; subst x.
+rewrite (cauchy_binet_formula_step_7 A _ Hmz Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
        ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) *
     det (mat_select_rows jl B) =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
-    det (mat_select_cols jl A) *
-    det (mat_select_rows jl B)
+  ∑ (jl ∈ sub_lists_...
 *)
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
