@@ -1983,38 +1983,56 @@ rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 rewrite (cauchy_binet_formula_step_5 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
+    det (mat_select_rows jl B) =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    det (mat_select_cols jl A) *
+    det (mat_select_rows jl B)
+*)
+symmetry.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  rewrite det_is_det''; try now destruct Hif. 2: {
+    generalize Hjl; intros H.
+    apply in_sub_lists_of_seq_1_n_length in H.
+    apply mat_select_cols_is_square; [ easy | congruence | ].
+    rewrite Hac.
+    intros j Hj.
+    now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
+  }
+  unfold det''.
+  rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
+    now apply sub_lists_of_seq_1_n_are_correct in Hjl.
+  }
+  rewrite Har.
+  remember (∑ (kl ∈ _), _) as x; subst x.
+  unfold prodn_rep_seq.
+  rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
+    now destruct Hif.
+  } {
+    now destruct Hif.
+  }
+  remember (∑ (jl' ∈ _), _) as x; subst x.
+  unfold sub_lists_of_seq_1_n.
+  rewrite sls1n_diag.
+  rewrite rngl_summation_list_only_one.
+  easy.
+}
+cbn - [ det mat_el ].
+remember (∑ (jl ∈ _), _) as x; subst x.
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    (∑ (kl ∈ all_permut (seq 1 m)),
+       ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) *
+    det (mat_select_rows jl B) =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl),
-       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows jl B) =
-  ∑ (jl ∈ sub_lists_...
+       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
+    det (mat_select_rows jl B)
 *)
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
-f_equal; symmetry.
-remember (∑ (kl ∈ _), _) as x; subst x.
-rewrite det_is_det''; try now destruct Hif. 2: {
-  generalize Hjl; intros H.
-  apply in_sub_lists_of_seq_1_n_length in H.
-  apply mat_select_cols_is_square; [ easy | congruence | ].
-  rewrite Hac.
-  intros j Hj.
-  now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
-}
-unfold det''.
-rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
-  now apply sub_lists_of_seq_1_n_are_correct in Hjl.
-}
-rewrite Har.
-remember (∑ (kl ∈ _), _) as x; subst x.
-unfold prodn_rep_seq.
-rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
-  now destruct Hif.
-} {
-  now destruct Hif.
-}
-remember (∑ (jl' ∈ _), _) as x; subst x.
-unfold sub_lists_of_seq_1_n.
-rewrite sls1n_diag.
-rewrite rngl_summation_list_only_one.
+f_equal.
 rewrite (cauchy_binet_formula_step_6 A jl Hmz Har Hac Hjl).
 (*
   ∑ (kl ∈ all_permut (seq 1 m)),
