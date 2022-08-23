@@ -2020,16 +2020,17 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det mat_el ].
 remember (∑ (jl ∈ _), _) as x; subst x.
+symmetry.
 (*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
+    det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
        ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) *
-    det (mat_select_rows jl B) =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
-    (∑ (kl ∈ all_permut jl),
-       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B)
 *)
+symmetry.
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
