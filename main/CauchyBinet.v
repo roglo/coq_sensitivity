@@ -1466,7 +1466,7 @@ Lemma cauchy_binet_formula_step_1 : in_charac_0_field →
   → mat_ncols B = m
   → det (A * B) =
       ∑ (l ∈ prodn_rep_seq m),
-        ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)).
+        ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)).
 Proof.
 intros Hif * Hmz Har Hac Hbc.
 assert (Hab : is_square_matrix (A * B) = true). {
@@ -1925,7 +1925,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 rewrite (cauchy_binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ prodn_rep_seq m),
-    ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
+    ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
 rewrite (cauchy_binet_formula_step_2 Hif n A B Hmz).
