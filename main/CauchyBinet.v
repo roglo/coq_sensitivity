@@ -1751,11 +1751,19 @@ erewrite rngl_summation_list_eq_compat. 2: {
   now rewrite <- rngl_mul_assoc.
 }
 cbn - [ det ].
+remember (∑ (kl ∈ _), _) as x; subst x.
 rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
   now destruct Hif.
 }
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    (∑ (kl ∈ all_permut jl),
+       ε kl * (∏ (i = 1, m), mat_el A i kl.(i) * det (mat_select_rows (isort Nat.leb kl) B))) =
+  ∑ (jl ∈ sub_lists_...
+*)
+(**)
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -2038,7 +2046,6 @@ rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-(**)
 rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
@@ -2046,6 +2053,7 @@ rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
+(**)
 rewrite (cauchy_binet_formula_step_5 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
