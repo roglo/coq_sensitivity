@@ -2016,6 +2016,12 @@ unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
 rewrite (cauchy_binet_formula_step_6 A jl Hmz Har Hac Hjl).
+(*
+  ∑ (kl ∈ all_permut (seq 1 m)),
+    ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
+  ∑ (kl ∈ all_permut jl),
+    ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
+*)
 apply (cauchy_binet_formula_step_7 Hif n A jl Hmz Hjl).
 Qed.
 
