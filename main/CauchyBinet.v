@@ -2011,25 +2011,88 @@ rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
-apply (cauchy_binet_formula_step_5 Hif A B Hmz Hnz Hca Har Hac).
+(**)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros kl Hkl.
+  now rewrite <- rngl_mul_assoc.
+}
+cbn - [ det ].
+rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+}
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros kl Hkl.
+    replace (isort Nat.leb kl) with jl. 2: {
+      symmetry.
+      apply in_all_permut_permutation in Hkl.
+      rewrite (isort_when_permuted Nat.eqb_eq) with (lb := jl); cycle 1. {
+        apply Nat_leb_antisym.
+      } {
+        apply Nat_leb_trans.
+      } {
+        apply Nat_leb_total_relation.
+      } {
+        easy.
+      }
+      apply isort_when_sorted.
+      apply (sub_lists_of_seq_1_n_are_sorted n m) in Hjl; [ | easy ].
+      now apply sorted_nat_ltb_leb_incl.
+    }
+    rewrite rngl_mul_assoc.
+    easy.
+  }
+  easy.
+}
+cbn - [ det ].
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros jl Hjl.
+  rewrite <- rngl_mul_summation_list_distr_r; [ | now destruct Hif; left ].
+  remember (∑ (kl ∈ _), _) as x; subst x.
+  easy.
+}
+cbn - [ det ].
+remember (∑ (jl ∈ _), _) as x; subst x.
+(**)
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    (∑ (kl ∈ all_permut jl),
+       ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows jl B) =
+  ∑ (jl ∈ sub_lists_...
+*)
+(**)
+apply rngl_summation_list_eq_compat.
 intros jl Hjl.
-(*
-  Hjl : jl ∈ sub_lists_of_seq_1_n n m
-  ============================
-  ∑ (kl ∈ all_permut (seq 1 m)),
-    ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i) =
-  ∑ (kl ∈ all_permut jl),
-    ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
-*)
+f_equal; symmetry.
+remember (∑ (kl ∈ _), _) as x; subst x.
+rewrite det_is_det''; try now destruct Hif. 2: {
+  generalize Hjl; intros H.
+  apply in_sub_lists_of_seq_1_n_length in H.
+  apply mat_select_cols_is_square; [ easy | congruence | ].
+  rewrite Hac.
+  intros j Hj.
+  now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
+}
+unfold det''.
+rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
+  now apply sub_lists_of_seq_1_n_are_correct in Hjl.
+}
+rewrite Har.
+remember (∑ (kl ∈ _), _) as x; subst x.
+unfold prodn_rep_seq.
+rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+}
+remember (∑ (jl' ∈ _), _) as x; subst x.
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag.
+rewrite rngl_summation_list_only_one.
 rewrite (cauchy_binet_formula_step_6 A jl Hmz Har Hac Hjl).
-(*
-  Hjl : jl ∈ sub_lists_of_seq_1_n n m
-  ============================
-  ∑ (kl ∈ all_permut (seq 1 m)),
-    ε kl * ∏ (i = 1, m), mat_el A i jl.(kl.(i)) =
-  ∑ (kl ∈ all_permut jl),
-    ε kl * ∏ (i = 1, m), mat_el A i kl.(i)
-*)
 apply (cauchy_binet_formula_step_7 Hif n A jl Hmz Hjl).
 Qed.
 
