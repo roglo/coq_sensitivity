@@ -1323,6 +1323,12 @@ Definition det''' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (l ∈ all_permut (seq 1 n)), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
+Theorem fold_det''' : ∀ n M,
+  mat_nrows M = n
+  → ∑ (l ∈ all_permut (seq 1 n)), ε l * ∏ (i = 1, n), mat_el M i l.(i) =
+    det''' M.
+Proof. now intros; subst n. Qed.
+
 Theorem det_is_det''' :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1949,6 +1955,35 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
+Lemma cauchy_binet_formula_step_8 : in_charac_0_field →
+  ∀ m n A f, m ≠ 0 → n ≠ 0 →
+  is_correct_matrix A = true
+  → mat_nrows A = m
+  → mat_ncols A = n
+  → ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+      (∑ (kl ∈ all_permut (seq 1 m)),
+         ε kl * ∏ (i = 1, m), mat_el (mat_select_cols jl A) i kl.(i)) *
+      f jl =
+    ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+      det (mat_select_cols jl A) * f jl.
+Proof.
+intros Hif * Hmz Hnz Hca Har Hac.
+apply rngl_summation_list_eq_compat.
+intros jl Hjl.
+f_equal.
+rewrite fold_det'''. 2: {
+  rewrite mat_select_cols_nrows; [ easy | | congruence ].
+  now apply sub_lists_of_seq_1_n_are_correct in Hjl.
+}
+rewrite <- det_is_det'''; try now destruct Hif.
+generalize Hjl; intros H.
+apply in_sub_lists_of_seq_1_n_length in H.
+apply mat_select_cols_is_square; [ easy | congruence | ].
+rewrite Hac.
+intros j Hj.
+now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
+Qed.
+
 Theorem cauchy_binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
@@ -2034,23 +2069,13 @@ rewrite (cauchy_binet_formula_step_7 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-apply rngl_summation_list_eq_compat.
-intros jl Hjl.
-f_equal.
-symmetry.
-rewrite det_is_det'''; try now destruct Hif. 2: {
-  generalize Hjl; intros H.
-  apply in_sub_lists_of_seq_1_n_length in H.
-  apply mat_select_cols_is_square; [ easy | congruence | ].
-  rewrite Hac.
-  intros j Hj.
-  now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
-}
-unfold det'''.
-rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
-  now apply sub_lists_of_seq_1_n_are_correct in Hjl.
-}
-now rewrite Har.
+rewrite (cauchy_binet_formula_step_8 Hif A _ Hmz Hnz Hca Har Hac).
+(*
+  ∑ (jl ∈ sub_lists_of_seq_1_n n m),
+    det (mat_select_cols jl A) * det (mat_select_rows jl B) =
+  ∑ (jl ∈ sub_lists_...
+*)
+easy.
 Qed.
 
 End a.
