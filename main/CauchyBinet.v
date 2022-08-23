@@ -1319,6 +1319,29 @@ apply (rngl_summation_list_permut _ Hel).
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 Qed.
 
+Definition det''' (M : matrix T) :=
+  let n := mat_nrows M in
+  ∑ (l ∈ all_permut (seq 1 n)), ε l * ∏ (i = 1, n), mat_el M i l.(i).
+
+Theorem det_is_det''' :
+  rngl_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_has_1_neq_0 = true →
+  rngl_has_eqb = true →
+  ∀ M, is_square_matrix M = true
+  → det M = det''' M.
+Proof.
+intros Hic Hop Hin H10 Heq * Hm.
+rewrite det_is_det''; [ | easy | easy | easy | easy | easy | easy ].
+unfold det'', det'''.
+unfold prodn_rep_seq.
+rewrite rngl_summation_prodn_sub_lists_all_permut; [ | easy | easy ].
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag.
+now rewrite rngl_summation_list_only_one.
+Qed.
+
 Theorem map_collapse_all_permut_seq : ∀ i la n m,
   la ∈ sub_lists_of_seq_1_n n m
   → map (λ lb, map (add i) (collapse lb)) (all_permut la) =
@@ -2014,7 +2037,8 @@ rewrite (cauchy_binet_formula_step_7 A _ Hmz Har Hac).
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.
-rewrite det_is_det''; try now destruct Hif. 2: {
+symmetry.
+rewrite det_is_det'''; try now destruct Hif. 2: {
   generalize Hjl; intros H.
   apply in_sub_lists_of_seq_1_n_length in H.
   apply mat_select_cols_is_square; [ easy | congruence | ].
@@ -2022,23 +2046,11 @@ rewrite det_is_det''; try now destruct Hif. 2: {
   intros j Hj.
   now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
 }
-unfold det''.
+unfold det'''.
 rewrite mat_select_cols_nrows; [ | | congruence ]. 2: {
   now apply sub_lists_of_seq_1_n_are_correct in Hjl.
 }
-rewrite Har.
-remember (∑ (kl ∈ _), _) as x; subst x.
-unfold prodn_rep_seq.
-rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
-  now destruct Hif.
-} {
-  now destruct Hif.
-}
-remember (∑ (jl' ∈ _), _) as x; subst x.
-unfold sub_lists_of_seq_1_n.
-rewrite sls1n_diag.
-rewrite rngl_summation_list_only_one.
-easy.
+now rewrite Har.
 Qed.
 
 End a.
