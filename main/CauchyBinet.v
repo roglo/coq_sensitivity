@@ -1542,6 +1542,14 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite rngl_product_summation_distr_prodn; [ | | easy ]. 2: {
     now destruct Hif; left.
   }
+  remember (∑ (kl ∈ _), _) as x; subst x.
+  easy.
+}
+cbn - [ det].
+remember (∑ (l ∈ _), _) as x; subst x.
+(**)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
     intros l1 Hl1.
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
@@ -1552,6 +1560,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn - [ det ].
+remember (∑ (l ∈ _), _) as x; subst x.
 rewrite rngl_summation_summation_list_swap.
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
