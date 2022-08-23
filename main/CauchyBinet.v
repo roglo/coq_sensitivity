@@ -1547,32 +1547,38 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det].
 remember (∑ (l ∈ _), _) as x; subst x.
-(**)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
-    intros l1 Hl1.
+    intros kl Hkl.
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     easy.
   }
   cbn.
   rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  remember (∑ (kl ∈ _), _) as x; subst x.
   easy.
 }
 cbn - [ det ].
 remember (∑ (l ∈ _), _) as x; subst x.
 rewrite rngl_summation_summation_list_swap.
+remember (∑ (kl ∈ _), _) as x; subst x.
+(**)
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
 erewrite rngl_summation_list_eq_compat. 2: {
-  intros l1 Hl1.
+  intros l Hl.
   rewrite rngl_mul_comm; [ | now destruct Hif ].
   rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite <- rngl_mul_assoc.
   easy.
 }
 cbn.
-rewrite <- rngl_mul_summation_list_distr_l; [ easy | now destruct Hif; left ].
+remember (∑ (l ∈ _), _) as x; subst x.
+(**)
+symmetry.
+apply rngl_mul_summation_list_distr_l.
+now destruct Hif; left.
 Qed.
 
 Lemma cauchy_binet_formula_step_3 : in_charac_0_field →
