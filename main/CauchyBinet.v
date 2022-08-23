@@ -1491,6 +1491,12 @@ assert (Hab : is_square_matrix (A * B) = true). {
 rewrite det_is_det''; try now destruct Hif.
 unfold det''.
 rewrite mat_mul_nrows, Har.
+(*
+  ∑ (l ∈ prodn_rep_seq m),
+    ε l * ∏ (i = 1, m), mat_el (A * B) i l.(i) =
+  ∑ (l ∈ prodn_...
+
+*)
 unfold "*"%M at 1.
 unfold mat_mul_el.
 rewrite Har, Hac, Hbc.
@@ -1547,6 +1553,13 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det].
 remember (∑ (l ∈ _), _) as x; subst x.
+(*
+  ∑ (l ∈ prodn_rep_seq m),
+    ε l *
+    (∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+       ∏ (i = 1, m), (mat_el A i kl.(i) * mat_el B kl.(i) l.(i))) =
+  ∑ (kl ∈ prodn ...
+*)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   erewrite rngl_summation_list_eq_compat. 2: {
@@ -1554,31 +1567,64 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite rngl_product_mul_distr; [ | now destruct Hif ].
     easy.
   }
-  cbn.
-  rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
-  remember (∑ (kl ∈ _), _) as x; subst x.
-  easy.
-}
-cbn - [ det ].
-remember (∑ (l ∈ _), _) as x; subst x.
-rewrite rngl_summation_summation_list_swap.
-remember (∑ (kl ∈ _), _) as x; subst x.
-(**)
-apply rngl_summation_list_eq_compat.
-intros kl Hkl.
-erewrite rngl_summation_list_eq_compat. 2: {
-  intros l Hl.
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
-  rewrite <- rngl_mul_assoc.
   easy.
 }
 cbn.
 remember (∑ (l ∈ _), _) as x; subst x.
-(**)
-symmetry.
-apply rngl_mul_summation_list_distr_l.
-now destruct Hif; left.
+(*
+  ∑ (l ∈ prodn_rep_seq m),
+    ε l *
+    (∑ (i ∈ prodn (repeat (seq 1 n) m)),
+       ∏ (i0 = 1, m), mat_el A i0 i.(i0) *
+       ∏ (i0 = 1, m), mat_el B i.(i0) l.(i0)) =
+  ∑ (kl ∈ prodn ...
+*)
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  erewrite rngl_summation_list_eq_compat. 2: {
+    intros kl Hkl.
+    rewrite rngl_mul_assoc.
+    easy.
+  }
+  remember (∑ (kl ∈ _), _) as x; subst x.
+  easy.
+}
+cbn.
+remember (∑ (l ∈ _), _) as x; subst x.
+(*
+  ∑ (l ∈ prodn_rep_seq m),
+    (∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+       ε l * ∏ (i = 1, m), mat_el A i kl.(i) *
+       ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+  ∑ (kl ∈ prodn ...
+*)
+rewrite rngl_summation_summation_list_swap.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros kl Hkl.
+  remember (∑ (l ∈ _), _) as x; subst x.
+  easy.
+}
+cbn.
+remember (∑ (kl ∈ _), _) as x; subst x.
+(*
+  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    (∑ (l ∈ prodn_rep_seq m),
+       ε l * ∏ (i = 1, m), mat_el A i kl.(i) *
+       ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+  ∑ (kl ∈ prodn ...
+*)
+apply rngl_summation_list_eq_compat.
+intros kl Hkl.
+erewrite rngl_summation_list_eq_compat. 2: {
+  intros l Hl.
+  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+  easy.
+}
+cbn.
+rewrite <- rngl_mul_summation_list_distr_r; [ | now destruct Hif; left ].
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+easy.
 Qed.
 
 Lemma cauchy_binet_formula_step_3 : in_charac_0_field →
@@ -1587,7 +1633,8 @@ Lemma cauchy_binet_formula_step_3 : in_charac_0_field →
   → mat_nrows B = n
   → mat_ncols B = m
   → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-      f kl * (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+      f kl *
+      (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
     ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B).
 Proof.
@@ -1956,6 +2003,7 @@ rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
+(**)
 rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
