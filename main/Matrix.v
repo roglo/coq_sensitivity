@@ -611,6 +611,25 @@ rewrite if_eqb_eq_dec.
 now destruct (Nat.eq_dec i j).
 Qed.
 
+Theorem mI_any_seq_start : ∀ sta len,
+  mI len = mk_mat (map (λ i, map (δ i) (seq sta len)) (seq sta len)).
+Proof.
+intros.
+unfold mI; f_equal.
+symmetry.
+rewrite List_map_seq.
+apply map_ext_in.
+intros i Hi.
+rewrite List_map_seq.
+apply map_ext_in.
+intros j Hj.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  now subst j; do 2 rewrite δ_diag.
+}
+rewrite δ_ndiag; [ | flia Hij ].
+now rewrite δ_ndiag.
+Qed.
+
 End a.
 
 Section a.
@@ -3042,6 +3061,7 @@ Arguments mat_transp_is_square {T ro} M%M.
 Arguments mat_transp_nrows {T}%type {ro} M%M.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
+Arguments mI_any_seq_start {T ro} (sta len)%nat.
 Arguments minus_one_pow {T ro}.
 Arguments subm {T} i%nat j%nat M%M.
 Arguments mat_subm_transp {T ro} [i j]%nat.

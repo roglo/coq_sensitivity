@@ -2089,7 +2089,15 @@ End a.
 
 Arguments cauchy_binet_formula {T ro rp} _ [m n]%nat.
 
+(*
 Check cauchy_binet_formula.
+*)
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
 
 Corollary determinant_mul : in_charac_0_field →
   ∀ A B,
@@ -2121,4 +2129,10 @@ rewrite Hrb, <- Hca.
 now rewrite mat_select_all_cols.
 Qed.
 
+(*
 Check determinant_mul.
+*)
+
+End a.
+
+Arguments determinant_mul {T ro rp} _ (A B)%M.

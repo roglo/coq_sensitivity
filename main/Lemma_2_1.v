@@ -19,6 +19,7 @@ Require Import Sorted.
 
 Require Import Misc RingLike IterAdd IterMul MyVector.
 Require Import Matrix Signature Determinant Comatrix.
+Require Import CauchyBinet.
 Import matrix_Notations.
 
 Section a.
@@ -915,7 +916,6 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-(* to be completed
 Theorem diagonalized_matrix_prop : in_charac_0_field →
   ∀ n (M : matrix T) ev eV D U,
   is_symm_mat M
@@ -953,30 +953,28 @@ rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
   rewrite Ho, mat_with_vect_nrows.
   rewrite square_matrix_ncols; [ easy | now destruct Hsy ].
 }
+assert (Hsu : is_square_matrix U = true). {
+  rewrite Ho; apply mat_with_vect_is_square.
+}
 assert (Hdu : det U ≠ 0%F). {
-  rewrite Ho.
-unfold eigenvalues_and_norm_vectors in Hvv.
-...
-Check @determinant_multilinear.
-Print mat_repl_vect'.
-Print mat_with_vect.
-mat_repl_vect' =
-λ (T : Type) (k : nat) (M : matrix T) (V : vector T),
-  {|
-    mat_list_list := map2 (replace_at (k - 1)) (mat_list_list M) (vect_list V)
-  |}
-     : ∀ T : Type, nat → matrix T → vector T → matrix T
-mat_with_vect =
-λ (n : nat) (Vl : list (vector T)),
-  {|
-    mat_list_list :=
-      map
-        (λ i : nat,
-           map (λ j : nat, vect_el (nth j Vl (vect_zero n)) i) (seq 0 n))
-        (seq 1 n)
-  |}
-     : nat → list (vector T) → matrix T
-... ...
+  generalize Hvv; intros H.
+  apply for_symm_squ_mat_eigen_vect_mat_is_ortho with (A := U) in H;
+    try (now destruct Hif); [ | now destruct Hif; left ].
+  rename H into Huu.
+  apply (f_equal det) in Huu.
+  rewrite (determinant_mul Hif) in Huu; [ | | easy | ]; cycle 1. {
+    now apply mat_transp_is_square.
+  } {
+    rewrite mat_transp_nrows.
+    now apply square_matrix_ncols.
+  }
+  rewrite (determinant_transpose Hif) in Huu; [ | easy ].
+  rewrite det_mI in Huu; [ | now destruct Hif; left ].
+  intros H; rewrite H in Huu.
+  rewrite rngl_mul_0_r in Huu; [ | now destruct Hif; left ].
+  symmetry in Huu; revert Huu.
+  apply rngl_1_neq_0; now destruct Hif.
+}
 rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   rewrite <- H1v.
   rewrite <- mat_mul_assoc; [ | now destruct Hif | | | ]; cycle 1. {
@@ -1004,55 +1002,7 @@ rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   rewrite Ho.
   apply mat_with_vect_is_square.
 }
-...
-rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
-  rewrite Ho.
-  apply mat_with_vect_is_square.
-} {
-  rewrite Ho.
-  rewrite det_is_det''; try now destruct Hif. 2: {
-    apply mat_with_vect_is_square.
-  }
-  unfold det''.
-  rewrite mat_with_vect_nrows.
-...
-(* tout un programme ! *)
-Search mat_with_vect.
-(* for_symm_squ_mat_eigen_vect_mat_is_ortho seems to say that U⁻¹=U⁺ and,
-   therefore their determinants are equal, therefore equal to det(U) *)
-(* or I can also "f_equal (λ A, (A * U⁺)%M)" instead of U⁻¹ and use
-   for_symm_squ_mat_eigen_vect_mat_is_ortho with version "U * U⁺ = I" *)
-(* I don't know *)
-  rewrite det_is_det_by_canon_permut; [ | easy | ]. 2: {
-    apply mat_with_vect_is_square.
-  }
-Require Import IterMul.
-Require Import PermutSeq Signature.
-unfold det'.
-rewrite mat_with_vect_nrows.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i (_, Hi).
-  erewrite rngl_product_eq_compat. 2: {
-    intros j Hj.
-    rewrite mat_with_vect_el; [ | flia Hj | ]. 2: {
-      apply canon_sym_gr_list_ub; [ | flia Hj ].
-      specialize (fact_neq_0 n) as H2.
-      flia Hi H2.
-    }
-    easy.
-  }
-  easy.
-}
-cbn.
-Print determinant'.
-...
-unfold eigenvalues_and_norm_vectors in Hvv.
-...
-  unfold mat_with_vect; cbn.
-  rewrite List_map_seq_length.
-  cb
-...
-*)
+Qed.
 
 Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
 Proof.

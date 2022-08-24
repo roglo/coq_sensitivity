@@ -2750,6 +2750,31 @@ rewrite <- determinant_transpose; [ | easy | ]. 2: {
 now rewrite mat_subm_transp.
 Qed.
 
+Theorem det_mI :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ n, det (mI n) = 1%F.
+Proof.
+intros Hop *; cbn.
+rewrite List_map_seq_length.
+induction n; intros; [ easy | ].
+rewrite determinant_succ.
+rewrite rngl_summation_split_first; [ | flia ].
+replace (minus_one_pow 2) with 1%F by easy.
+rewrite rngl_mul_1_l.
+rewrite mat_el_mI_diag; [ | flia ].
+rewrite rngl_mul_1_l.
+rewrite all_0_rngl_summation_0. 2: {
+  intros i Hi.
+  rewrite mat_el_mI_ndiag; [ | easy | flia Hi | flia Hi ].
+  rewrite rngl_mul_0_r; [ | easy ].
+  now apply rngl_mul_0_l.
+}
+rewrite rngl_add_0_r.
+unfold subm, mI; cbn.
+rewrite map_map; cbn.
+now rewrite (mI_any_seq_start 1) in IHn.
+Qed.
+
 End a.
 
 Arguments det {T ro} M%M.
@@ -2762,5 +2787,5 @@ Arguments determinant_transpose {T ro rp} _ M%M.
 Arguments det_is_det' {T}%type {ro rp} _ _ _ _ M%M.
 Arguments det'_is_det'' {T ro rp} _ _ M%M.
 Arguments det_is_det'' {T ro rp} _ _ _ _ _ M%M.
+Arguments det_mI {T ro rp} _ n%nat.
 Arguments det_subm_transp {T ro rp} _ [i j]%nat.
-
