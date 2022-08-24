@@ -953,6 +953,58 @@ rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
   rewrite Ho, mat_with_vect_nrows.
   rewrite square_matrix_ncols; [ easy | now destruct Hsy ].
 }
+assert (Hdu : det U ≠ 0%F). {
+  rewrite Ho.
+unfold eigenvalues_and_norm_vectors in Hvv.
+...
+Check @determinant_multilinear.
+Print mat_repl_vect'.
+Print mat_with_vect.
+mat_repl_vect' =
+λ (T : Type) (k : nat) (M : matrix T) (V : vector T),
+  {|
+    mat_list_list := map2 (replace_at (k - 1)) (mat_list_list M) (vect_list V)
+  |}
+     : ∀ T : Type, nat → matrix T → vector T → matrix T
+mat_with_vect =
+λ (n : nat) (Vl : list (vector T)),
+  {|
+    mat_list_list :=
+      map
+        (λ i : nat,
+           map (λ j : nat, vect_el (nth j Vl (vect_zero n)) i) (seq 0 n))
+        (seq 1 n)
+  |}
+     : nat → list (vector T) → matrix T
+... ...
+rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
+  rewrite <- H1v.
+  rewrite <- mat_mul_assoc; [ | now destruct Hif | | | ]; cycle 1. {
+    now rewrite Ho, mat_with_vect_nrows.
+  } {
+    now rewrite Ho, mat_with_vect_ncols.
+  } {
+    rewrite Ho, mat_with_vect_nrows, square_matrix_ncols; [ easy | ].
+    now unfold is_symm_mat in Hsy.
+  }
+  rewrite mat_mul_inv_r; [ | easy | | apply Hdu ]. 2: {
+    rewrite Ho.
+    apply mat_with_vect_is_square.
+  }
+  symmetry.
+  apply mat_mul_1_r; [ now destruct Hif | | ]. {
+    unfold is_symm_mat in Hsy.
+    now apply squ_mat_is_corr.
+  }
+  rewrite Ho, mat_with_vect_nrows; symmetry.
+  rewrite <- Hrn.
+  apply square_matrix_ncols.
+  now destruct Hsy.
+} {
+  rewrite Ho.
+  apply mat_with_vect_is_square.
+}
+...
 rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
   rewrite Ho.
   apply mat_with_vect_is_square.
