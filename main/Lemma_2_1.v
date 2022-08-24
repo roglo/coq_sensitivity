@@ -17,9 +17,8 @@ Require Import Utf8 Arith.
 Import Init.Nat List List.ListNotations.
 Require Import Sorted.
 
-Require Import Misc MyVector Matrix Determinant Comatrix.
-Require Import RingLike.
-Require Import IterAdd.
+Require Import Misc RingLike IterAdd IterMul MyVector.
+Require Import Matrix Signature Determinant Comatrix.
 Import matrix_Notations.
 
 Section a.
@@ -959,6 +958,11 @@ rewrite mat_mul_inv_r in H1; [ | easy | | ]; cycle 1. {
   apply mat_with_vect_is_square.
 } {
   rewrite Ho.
+  rewrite det_is_det''; try now destruct Hif. 2: {
+    apply mat_with_vect_is_square.
+  }
+  unfold det''.
+  rewrite mat_with_vect_nrows.
 ...
 (* tout un programme ! *)
 Search mat_with_vect.
