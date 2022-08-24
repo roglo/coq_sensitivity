@@ -1038,8 +1038,8 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → y = (U⁺ • x)%M
   → y ≠ vect_zero n
   → Rayleigh_quotient M x =
-      ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y (i - 1))) /
-       (∑ (i = 1, n), rngl_squ (vect_el y (i - 1))))%F.
+      ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y i)) /
+       (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hnz Hsym Hsmu Hsmd Hr Hsx Hx1 HeV HU Hmin Hmax Hyz.
 (*1*)
@@ -1127,19 +1127,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   enough (H : ≺ y, y ≻ ≠ 0%F). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
-    rewrite Nat.min_id, Hsy in H.
-    rewrite (rngl_summation_shift 1). 2: {
-      split; [ easy | now apply Nat.neq_0_lt_0 ].
-    }
-    erewrite rngl_summation_eq_compat. 2: {
-      intros i Hi.
-      rewrite Nat.add_comm, Nat.add_sub.
-      unfold rngl_squ.
-      easy.
-    }
-    cbn.
-...
-    easy.
+    now rewrite Nat.min_id, Hsy in H.
   }
   intros H.
   apply eq_vect_squ_0 in H; [ | easy | easy | easy | easy ].
