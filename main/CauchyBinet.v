@@ -1308,13 +1308,13 @@ Theorem rngl_summation_prodn_sub_lists_all_permut :
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
-rewrite rngl_summation_summation_list_flat_map; cbn.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
   unfold equality.
   apply Nat.eqb_eq.
 }
 rewrite rngl_summation_prodn_repeat_filter_no_dup; [ | easy | easy ].
+rewrite rngl_summation_summation_list_flat_map; cbn.
 apply (rngl_summation_list_permut _ Hel).
 apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
 Qed.
