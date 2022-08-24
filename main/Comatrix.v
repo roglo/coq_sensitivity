@@ -1658,6 +1658,9 @@ now apply rngl_squ_opp_1.
 Qed.
 
 (* to be completed
+j'abandonne parce que ce théorème essaie de prouver com(A*B)=com(A)*com(B) dans
+le but lointain de prouver det(A*B)=det(A)*det(B), sauf que com fait déjà
+intervenir det ; c'est donc peut-être une mauvaise piste
 Theorem comatrix_mul :
   rngl_is_comm = true →
   rngl_has_opp = true →
@@ -1669,6 +1672,14 @@ Theorem comatrix_mul :
   → com (A * B) = (com A * com B)%M.
 Proof.
 intros Hic Hop * Hsma Hsmb Hra Hrb.
+(*
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n.
+  apply eq_mat_nrows_0 in Hnz.
+  destruct A as (lla).
+  now cbn in Hnz; subst lla.
+}
+*)
 unfold mat_mul; cbn.
 assert (Hca : mat_ncols A = n) by now rewrite square_matrix_ncols.
 assert (Hcb : mat_ncols B = n) by now rewrite square_matrix_ncols.
@@ -1678,15 +1689,13 @@ do 2 rewrite List_map_seq_length.
 rewrite comatrix_ncols, Hcb.
 f_equal.
 apply map_ext_in.
-intros i Hi; apply in_seq in Hi.
-destruct Hi as (_, Hi); cbn in Hi.
+intros i Hi; apply in_seq in Hi; cbn in Hi.
 unfold mat_ncols.
 cbn - [ det ].
-rewrite (List_map_hd 0); [ | rewrite seq_length; flia Hi ].
+rewrite (List_map_hd 0); [ | now rewrite seq_length; flia Hi ].
 rewrite List_map_seq_length.
 apply map_ext_in.
-intros j Hj; apply in_seq in Hj.
-destruct Hj as (_, Hj); cbn in Hj.
+intros j Hj; apply in_seq in Hj; cbn in Hj.
 move j before i.
 symmetry.
 unfold mat_mul_el at 1.
@@ -1697,14 +1706,16 @@ cbn - [ det ].
 rewrite Hra, Hrb, Hca, Hcb.
 erewrite rngl_summation_eq_compat. 2: {
   intros u Hu.
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
-  rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-  rewrite seq_nth; [ | easy ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+  rewrite seq_nth; [ | flia Hi ].
   rewrite seq_nth; [ | flia Hu Hi ].
-  rewrite seq_nth; [ | easy ].
-  do 3 rewrite Nat.add_0_l.
+  rewrite seq_nth; [ | flia Hj ].
+  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
+  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
+  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
   rewrite rngl_mul_mul_swap with (n0 := minus_one_pow (i + u)); [ | easy ].
   rewrite rngl_mul_assoc.
   rewrite minus_one_pow_add_r; [ | easy ].
@@ -1762,6 +1773,7 @@ rewrite map_butn_seq.
 rewrite map_length.
 rewrite seq_length.
 rewrite Hra.
+...
 apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
 apply Nat.ltb_lt in Hi.
 erewrite rngl_summation_eq_compat. 2: {
