@@ -282,7 +282,7 @@ Definition mat_with_diag n d :=
 
 Definition mat_with_vect n Vl :=
   mk_mat
-    (map (λ i, map (λ j, vect_el' (nth j Vl (vect_zero n)) i) (seq 0 n))
+    (map (λ i, map (λ j, vect_el (nth j Vl (vect_zero n)) i) (seq 0 n))
        (seq 1 n)).
 
 (*
@@ -531,7 +531,7 @@ specialize (H1 H eq_refl eq_refl); clear H.
 remember (nth (j - 1) ev 0%F) as μ eqn:Hμ.
 remember (nth (j - 1) eV (vect_zero n)) as V eqn:Hv.
 symmetry.
-apply (f_equal (λ x, vect_el' x i)) in H1.
+apply (f_equal (λ x, vect_el x i)) in H1.
 cbn - [ iter_seq ] in H1.
 rewrite (List_map_nth' []) in H1; [ | now rewrite fold_mat_nrows, Hrn ].
 rewrite (List_map_nth' 0%F) in H1. 2: {
@@ -549,7 +549,7 @@ unfold mat_el.
 remember (nth (i - 1) (mat_list_list M) []) as l eqn:Hl.
 erewrite rngl_summation_eq_compat. 2: {
   intros u Hu.
-  replace (nth (u - 1) l 0%F) with (vect_el' (mk_vect l) u) by easy.
+  replace (nth (u - 1) l 0%F) with (vect_el (mk_vect l) u) by easy.
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
   easy.
@@ -709,7 +709,7 @@ Qed.
 Theorem mat_with_vect_el : ∀ n lv i j,
   1 ≤ i ≤ n
   → 1 ≤ j ≤ n
-  → mat_el (mat_with_vect n lv) i j = vect_el' (nth (j - 1) lv (vect_zero n)) i.
+  → mat_el (mat_with_vect n lv) i j = vect_el (nth (j - 1) lv (vect_zero n)) i.
 Proof.
 intros * Hin Hjn; cbn.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
@@ -721,7 +721,7 @@ easy.
 Qed.
 
 Theorem fold_vect_dot_mul' : ∀ U V,
-  ∑ (i = 1, min (vect_size U) (vect_size V)), vect_el' U i * vect_el' V i =
+  ∑ (i = 1, min (vect_size U) (vect_size V)), vect_el U i * vect_el V i =
   vect_dot_mul' U V.
 Proof. easy. Qed.
 
@@ -819,7 +819,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     intros j Hj.
     f_equal.
     rewrite Hvj; cbn.
-    unfold vect_el'; cbn.
+    unfold vect_el; cbn.
     rewrite List_nth_repeat.
     rewrite <- if_ltb_lt_dec.
     rewrite Tauto.if_same.
@@ -1135,6 +1135,8 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
       unfold rngl_squ.
       easy.
     }
+    cbn.
+...
     easy.
   }
   intros H.

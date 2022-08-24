@@ -828,7 +828,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn, Hr.
     }
-    unfold vect_el'.
+    unfold vect_el.
     cbn - [ Nat.eq_dec ].
     easy.
   }
@@ -863,7 +863,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn, Hr.
     }
-    now unfold vect_el'; cbn.
+    now unfold vect_el; cbn.
   }
   easy.
 }
@@ -891,7 +891,7 @@ erewrite rngl_summation_eq_compat. 2: {
     } {
       now rewrite Hcn, Hr.
     }
-    now unfold vect_el'; cbn.
+    now unfold vect_el; cbn.
   }
   easy.
 }

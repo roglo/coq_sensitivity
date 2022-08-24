@@ -440,7 +440,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → 1 ≤ j ≤ mat_ncols M
   → 1 ≤ k ≤ mat_ncols M
   → mat_el (mat_repl_vect' k M V) i j =
-    if Nat.eq_dec j k then vect_el' V i else mat_el M i j.
+    if Nat.eq_dec j k then vect_el V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
 rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
@@ -1598,10 +1598,10 @@ Theorem mat_vect_mul_assoc_as_sums :
   1 ≤ i ≤ mat_nrows A
   → ∑ (j = 1, mat_ncols A),
        mat_el A i j *
-       (∑ (k = 1, vect_size V), mat_el B j k * vect_el' V k) =
+       (∑ (k = 1, vect_size V), mat_el B j k * vect_el V k) =
      ∑ (j = 1, vect_size V),
        (∑ (k = 1, mat_ncols A), mat_el A i k * mat_el B k j) *
-        vect_el' V j.
+        vect_el V j.
 Proof.
 intros * Hi.
 erewrite rngl_summation_eq_compat. 2: {
@@ -1777,7 +1777,7 @@ rewrite Nat.sub_diag, Nat.add_0_l, Nat_sub_succ_1.
 apply rngl_summation_eq_compat.
 intros j Hj.
 f_equal.
-unfold vect_el'.
+unfold vect_el.
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 

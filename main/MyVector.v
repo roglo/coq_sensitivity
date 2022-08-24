@@ -19,11 +19,11 @@ Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
 
-Definition vect_el' {T} {ro : ring_like_op T} (V : vector T) i :=
+Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
   nth (i - 1) (vect_list V) 0%F.
 
 Theorem vector_eq : ∀ T {ro : ring_like_op T} (U V : vector T),
-  (∀ i, 1 ≤ i ≤ vect_size U → vect_el' U i = vect_el' V i)
+  (∀ i, 1 ≤ i ≤ vect_size U → vect_el U i = vect_el V i)
   → vect_size U = vect_size V
   → U = V.
 Proof.
@@ -50,10 +50,10 @@ Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
 
 Theorem fold_vect_el : ∀ (V : vector T) i,
-  nth i (vect_list V) 0%F = vect_el' V (S i).
+  nth i (vect_list V) 0%F = vect_el V (S i).
 Proof.
 intros.
-unfold vect_el'.
+unfold vect_el.
 now rewrite Nat_sub_succ_1.
 Qed.
 
@@ -80,7 +80,7 @@ Definition vect_dot_mul (U V : vector T) :=
   ∑ (t ∈ map2 rngl_mul (vect_list U) (vect_list V)), t.
 Definition vect_dot_mul' (U V : vector T) :=
   ∑ (i = 1, min (vect_size U) (vect_size V)),
-  vect_el' U i * vect_el' V i.
+  vect_el U i * vect_el V i.
 
 Theorem vect_dot_mul_dot_mul' :
   rngl_has_opp = true ∨ rngl_has_sous = true →
@@ -142,7 +142,7 @@ Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
 Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
 
-Arguments vect_el' {T}%type {ro} V%V i%nat.
+Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.
 
 Theorem vect_mul_scal_l_mul_assoc : ∀ (a b : T) (V : vector T),
@@ -177,15 +177,15 @@ exfalso; apply Hvz; clear Hvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
 intros i Hi; cbn.
 rewrite nth_repeat.
-specialize (H1 (vect_el' V i)) as H2.
-assert (H : vect_el' V i ∈ vect_list V). {
-  unfold vect_el'.
+specialize (H1 (vect_el V i)) as H2.
+assert (H : vect_el V i ∈ vect_list V). {
+  unfold vect_el.
   apply nth_In.
   rewrite fold_vect_size.
   now apply Nat_1_le_sub_lt.
 }
 specialize (H2 H); clear H.
-remember (rngl_eqb (vect_el' V i) 0%F) as vz eqn:Hvz; symmetry in Hvz.
+remember (rngl_eqb (vect_el V i) 0%F) as vz eqn:Hvz; symmetry in Hvz.
 destruct vz; [ now apply rngl_eqb_eq | ].
 apply (rngl_eqb_neq Heq) in Hvz.
 now apply rngl_mul_cancel_r in H2.
@@ -277,7 +277,7 @@ Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
 Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
 Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
-Arguments vect_el' {T}%type {ro} V%V i%nat.
+Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.
 Arguments vect_squ_norm {T}%type {ro} V%V.
 Arguments vector_eq {T}%type {ro} (U V)%V.
