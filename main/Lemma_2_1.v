@@ -1025,12 +1025,12 @@ Qed.
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   rngl_has_1_neq_0 = true →
   ∀ n (M : matrix T) D U eV x y ev,
-  n ≠ 0
+  mat_nrows M = n
+  → vect_size x = n
+  → n ≠ 0
   → is_symm_mat M
   → is_square_matrix U = true
   → is_square_matrix D = true
-  → mat_nrows M = n
-  → vect_size x = n
   → ≺ x, x ≻ = 1%F
   → eigenvalues_and_norm_vectors n M ev eV
   → U = mat_with_vect n eV
@@ -1041,8 +1041,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
       ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y i)) /
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
-intros Hof H10 * Hnz Hsym Hsmu Hsmd Hr Hsx Hx1 HeV HU Hmin Hmax Hyz.
-...
+intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
