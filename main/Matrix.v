@@ -413,17 +413,35 @@ Definition mat_opp (M : matrix T) : matrix T :=
 Definition mat_sub (MA MB : matrix T) :=
   mat_add MA (mat_opp MB).
 
+(* vector as a matrix nx1 *)
+
+Definition mat_of_vert_vect (V : vector T) :=
+  mk_mat [vect_list V].
+
+(* vector as a matrix 1xn *)
+
+Definition mat_of_horiz_vect (V : vector T) :=
+  mk_mat (map (λ i, [i]) (vect_list V)).
+
 (* concatenation of a matrix and a column vector *)
 
 Definition mat_vect_concat (M : matrix T) V :=
   mk_mat (map2 (λ row e, row ++ [e]) (mat_list_list M) (vect_list V)).
 
-(* multiplication of a matrix by a vector *)
+(* multiplication of a matrix and a vector *)
+
+(*
+Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
+  mat_mul M (mat_of_vert_vect V).
+(* interesting definition but it returns a matrix, but I want the result
+   to be a vector *)
+Check mat_mul_vect_r.
+*)
 
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
   mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
 
-(* multiplication of a vector by a matrix *)
+(* multiplication of a vector and a matrix *)
 
 (* to be analyzed and completed
 Definition mat_mul_vect_l (V : vector T) (M : matrix T) :=
