@@ -2157,6 +2157,31 @@ symmetry in Hra, Hrb.
 symmetry.
 remember (∑ (jl ∈ _), _) as x; subst x.
 symmetry.
+(*
+  ============================
+  ∑ (jl ∈ sub_lists_of_seq_1_n n n), ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
+  ∑ (jl ∈ sub_lists_of_seq_1_n n n),
+    ∑ (j ∈ sub_lists_of_seq_1_n n n),
+      (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
+      (∑ (kl ∈ all_permut j), ε kl * ∏ (i = 1, n), mat_el B i kl.(i))
+*)
+apply rngl_summation_list_eq_compat.
+intros jl Hjl.
+rewrite <- rngl_mul_summation_list_distr_l.
+remember (∑ (l ∈ sub_lists_of_seq_1_n _ _), _) as x; subst x.
+(*
+  ============================
+  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
+  ((∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
+   (∑ (l ∈ sub_lists_of_seq_1_n n n), ∑ (kl ∈ all_permut l), ε kl * ∏ (i = 1, n), mat_el B i kl.(i)))%F
+*)
+erewrite <- rngl_summation_prodn_sub_lists_all_permut.
+(*
+  ============================
+  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
+  ((∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
+   (∑ (kl ∈ prodn (repeat (seq 1 n) n)), ε kl * ∏ (i = 1, n), mat_el B i kl.(i)))%F
+*)
 ...
 rewrite rngl_summation_prodn_sub_lists_all_permut; [ | easy | easy ].
 unfold sub_lists_of_seq_1_n.
