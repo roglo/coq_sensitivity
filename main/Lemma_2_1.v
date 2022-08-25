@@ -1048,6 +1048,17 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+Search (matrix _ → vector _ → _).
+Search (vector _ → matrix _ → _).
+Print vect_dot_mul.
+...
+Print vect_dot_mul'.
+(*
+  R(M,x) = (x*Mx) / (x*x)
+  eigenpair (λ_i, v_i)
+  y_i = v_i* x
+*)
+...
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
@@ -1140,6 +1151,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   now rewrite Hsy in H.
 }
 rewrite rngl_mul_1_l.
+...
 rewrite Hmax.
 Check diagonalized_matrix_prop_1.
 ...

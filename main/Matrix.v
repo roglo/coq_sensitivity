@@ -423,6 +423,13 @@ Definition mat_vect_concat (M : matrix T) V :=
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
   mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
 
+(* multiplication of a vector by a matrix *)
+
+(* to be analyzed and completed
+Definition mat_mul_vect_l (V : vector T) (M : matrix T) :=
+  mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
+*)
+
 (* multiplication of a matrix by a scalar *)
 
 Definition mat_mul_scal_l s (M : matrix T) :=
