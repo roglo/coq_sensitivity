@@ -10,12 +10,12 @@ Require Import Misc RingLike PermutationFun.
 Notation "'∑' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, b at level 60, e at level 60,
-   format "'[v  ' ∑  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'").
+   format "'[hv  ' ∑  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'").
 
 Notation "'∑' ( i ∈ l ) , g" :=
   (iter_list l (λ c i, (c + g)%F) 0%F)
   (at level 45, i at level 0, l at level 60,
-   format "'[v  ' ∑  ( i  ∈  l ) ,  '/' '[' g ']' ']'").
+   format "'[hv  ' ∑  ( i  ∈  l ) ,  '/' '[' g ']' ']'").
 
 Section a.
 

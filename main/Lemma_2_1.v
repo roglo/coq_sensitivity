@@ -1045,8 +1045,6 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
-Print Rayleigh_quotient.
-...
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
@@ -1089,7 +1087,7 @@ assert (Hcu : mat_ncols U = n). {
 assert (Hru : mat_nrows U = n). {
   now rewrite square_matrix_ncols in Hcu.
 }
-move Hru after Hcu.
+move Hru before Hsy; move Hcu before Hru.
 unfold Rayleigh_quotient.
 destruct Hof as (Hic & Hop & Hde & Hdl & Hit & Hiv & Hor).
 rewrite Hx1.
@@ -1139,6 +1137,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   now rewrite Hsy in H.
 }
 rewrite rngl_mul_1_l.
+rewrite Hmax.
 Check diagonalized_matrix_prop_1.
 ...
 (* faudrait que j'essaie avec des exemples *)
