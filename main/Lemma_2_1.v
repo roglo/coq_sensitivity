@@ -1029,6 +1029,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → is_symm_mat M
   → is_square_matrix U = true
   → is_square_matrix D = true
+  → mat_nrows M = n
   → vect_size x = n
   → ≺ x, x ≻ = 1%F
   → eigenvalues_and_norm_vectors n M ev eV
