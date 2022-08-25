@@ -301,13 +301,355 @@ mat_with_vect 3 Vl
 ).
 *)
 
-(* In the real case, the symmetric matrix M is diagonalisable in the
-   sense that there exists an orthogonal matrix U (the columns of which
-   are eigenvectors) and a diagonal matrix D the coefficients of which
-   are eigenvalues μ_i such that
-      M = U . D . U^t *)
+Theorem mat_with_vect_nrows : ∀ n vl, mat_nrows (mat_with_vect n vl) = n.
+Proof.
+intros.
+now cbn; rewrite List_map_seq_length.
+Qed.
 
-Theorem diagonalized_matrix_prop_1 :
+Theorem mat_with_vect_ncols : ∀ n vl, mat_ncols (mat_with_vect n vl) = n.
+Proof.
+intros.
+unfold mat_ncols; cbn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+now rewrite List_map_seq_length.
+Qed.
+
+Theorem mat_with_vect_is_square : ∀ n vl,
+  is_square_matrix (mat_with_vect n vl) = true.
+Proof.
+intros.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
+apply Nat.neq_0_lt_0 in Hnz.
+apply is_scm_mat_iff.
+split. {
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
+  now rewrite List_map_seq_length.
+} {
+  unfold mat_ncols; cbn.
+  rewrite List_map_seq_length.
+  intros l Hl.
+  apply in_map_iff in Hl.
+  destruct Hl as (x & Hxl & Hx).
+  apply in_seq in Hx.
+  rewrite <- Hxl.
+  now rewrite List_map_seq_length.
+}
+Qed.
+
+Theorem mat_with_vect_is_corr : ∀ n vl,
+  is_correct_matrix (mat_with_vect n vl) = true.
+Proof.
+intros.
+apply squ_mat_is_corr, mat_with_vect_is_square.
+Qed.
+
+Theorem mat_with_vect_el : ∀ n lv i j,
+  1 ≤ i ≤ n
+  → 1 ≤ j ≤ n
+  → mat_el (mat_with_vect n lv) i j = vect_el (nth (j - 1) lv (vect_zero n)) i.
+Proof.
+intros * Hin Hjn; cbn.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hjn ].
+rewrite seq_nth; [ | flia Hjn ].
+rewrite seq_nth; [ | flia Hin ].
+rewrite Nat.add_0_l, Nat.add_comm, Nat.sub_add; [ | easy ].
+easy.
+Qed.
+
+Theorem fold_vect_dot_mul' : ∀ U V,
+  ∑ (i = 1, min (vect_size U) (vect_size V)), vect_el U i * vect_el V i =
+  vect_dot_mul' U V.
+Proof. easy. Qed.
+
+Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
+Proof.
+intros; cbn.
+now rewrite map_length.
+Qed.
+
+Theorem mat_mul_vect_dot_vect :
+  rngl_is_comm = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  ∀ (M : matrix T) U V,
+  is_square_matrix M = true
+  → vect_size U = mat_nrows M
+  → vect_size V = mat_nrows M
+  → ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
+Proof.
+intros Hic Hos * Hsm Hur Hvr.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  rewrite Hrz in Hur, Hvr.
+  destruct M as (ll).
+  destruct U as (lu).
+  destruct V as (lv); cbn.
+  cbn in Hur, Hvr, Hrz.
+  apply length_zero_iff_nil in Hur, Hvr, Hrz.
+  now subst lu lv ll.
+}
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'.
+rewrite Hur, Hvr.
+cbn.
+do 3 rewrite map_length.
+rewrite seq_length.
+rewrite fold_mat_nrows.
+rewrite square_matrix_ncols; [ | easy ].
+rewrite Nat.min_id.
+destruct M as (ll).
+destruct U as (lu).
+destruct V as (lv); cbn.
+cbn in Hur, Hvr, Hrz.
+rewrite map_map.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite (List_map_nth' []). 2: {
+   apply Nat.min_glb_lt_iff with (m := length lv).
+   rewrite Hvr, Nat.min_id.
+   flia Hi Hrz.
+  }
+  rewrite vect_dot_mul_dot_mul'; [ | easy ].
+  unfold vect_dot_mul'; cbn.
+  apply is_scm_mat_iff in Hsm.
+  destruct Hsm as (Hcr, Hcl).
+  rewrite (Hcl (nth (i - 1) ll [])). 2: {
+    cbn; apply nth_In; flia Hi Hrz.
+  }
+  cbn; rewrite Hur, Nat.min_id.
+  rewrite rngl_mul_summation_distr_r; [ | easy ].
+  easy.
+}
+cbn.
+unfold iter_seq at 1 2.
+rewrite rngl_summation_summation_list_swap.
+rewrite fold_iter_seq.
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite fold_iter_seq.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  easy.
+}
+cbn.
+rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+f_equal.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hrz ].
+rewrite vect_dot_mul_dot_mul'; [ | easy ].
+unfold vect_dot_mul'; cbn.
+rewrite List_map_seq_length.
+rewrite Hvr, Nat.min_id.
+eapply rngl_summation_eq_compat.
+intros j Hj.
+f_equal.
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hrz ].
+rewrite seq_nth; [ | flia Hi Hrz ].
+rewrite seq_nth; [ | flia Hj Hrz ].
+rewrite Nat.add_comm, Nat.add_sub.
+rewrite Nat.add_comm, Nat.add_sub.
+easy.
+Qed.
+
+(* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
+
+Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
+  rngl_is_comm = true →
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_eqb = true →
+  rngl_has_inv = true →
+  ∀ n (M : matrix T) ev eV A,
+  is_symm_mat M
+  → mat_nrows M = n
+  → eigenvalues_and_norm_vectors n M ev eV
+  → A = mat_with_vect n eV
+  → (A⁺ * A = mI n)%M.
+Proof.
+intros Hic Hos Heq Hii * Hsy Hr Hvv Hm.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
+rewrite Hm.
+apply matrix_eq; cycle 1. {
+  apply mat_mul_is_corr. {
+    apply mat_transp_is_corr.
+    apply mat_with_vect_is_corr.
+  } {
+    apply mat_with_vect_is_corr.
+  }
+  now cbn; rewrite List_map_seq_length.
+} {
+  apply mI_is_correct_matrix.
+} {
+  cbn; do 3 rewrite List_map_seq_length.
+  apply mat_with_vect_ncols.
+} {
+  rewrite mI_ncols.
+  rewrite mat_mul_ncols. 2: {
+    now rewrite mat_transp_nrows, mat_with_vect_ncols.
+  }
+  apply mat_with_vect_ncols.
+}
+rewrite mat_mul_nrows.
+rewrite mat_transp_nrows.
+rewrite mat_with_vect_ncols.
+rewrite mI_ncols.
+intros * Hi Hj.
+assert (Hi' : i - 1 < n) by flia Hi.
+assert (Hj' : j - 1 < n) by flia Hj.
+rewrite mat_el_mul; cycle 1. {
+  now rewrite mat_mul_nrows, mat_transp_nrows, mat_with_vect_ncols.
+} {
+  rewrite mat_mul_ncols. 2: {
+    now rewrite mat_transp_nrows, mat_with_vect_ncols.
+  }
+  now rewrite mat_with_vect_ncols.
+}
+rewrite mat_transp_ncols.
+rewrite mat_with_vect_ncols.
+apply Nat.eqb_neq in Hnz; rewrite Hnz.
+rewrite mat_with_vect_nrows.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite mat_transp_el; [ | | flia Hi | flia Hk ]. 2: {
+    apply mat_with_vect_is_corr.
+  }
+  rewrite mat_with_vect_el; [ | easy | easy ].
+  rewrite mat_with_vect_el; [ | easy | easy ].
+  easy.
+}
+cbn.
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite seq_nth; [ | easy ].
+rewrite seq_nth; [ | easy ].
+cbn.
+remember (nth (i - 1) eV (vect_zero n)) as vi eqn:Hvi.
+remember (nth (j - 1) eV (vect_zero n)) as vj eqn:Hvj.
+move vj before vi.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j; clear Hj.
+  rewrite δ_diag.
+  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
+  specialize (Hall_norm_1 (i - 1) Hi') as H1.
+  unfold vect_squ_norm in H1.
+  rewrite <- Hvi in H1.
+  rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
+  unfold vect_dot_mul' in H1.
+  rewrite Nat.min_id in H1.
+  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
+    apply Nat.nle_gt in Hie.
+    rewrite <- H1.
+    rewrite nth_overflow in Hvi; [ subst vi | flia Hie ].
+    unfold vect_zero; cbn.
+    rewrite repeat_length.
+    apply rngl_summation_eq_compat.
+    intros j Hj.
+    f_equal.
+    rewrite Hvj; cbn.
+    unfold vect_el; cbn.
+    rewrite List_nth_repeat.
+    rewrite <- if_ltb_lt_dec.
+    rewrite Tauto.if_same.
+    rewrite nth_overflow with (n := i - 1); [ | flia Hie ].
+    now cbn; rewrite nth_repeat.
+  }
+  rewrite Hev in H1. 2: {
+    rewrite Hvi.
+    apply nth_In; flia Hi Hie.
+  }
+  now rewrite Hvj, <- Hvi.
+} {
+  rewrite δ_ndiag; [ | flia Hij Hi Hj ].
+  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
+  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
+    apply Nat.nle_gt in Hie.
+    apply all_0_rngl_summation_0.
+    intros k Hk.
+    rewrite Hvi.
+    rewrite nth_overflow; [ cbn | flia Hie ].
+    rewrite nth_repeat.
+    now apply rngl_mul_0_l.
+  }
+  destruct (le_dec j (length eV)) as [Hje| Hje]. 2: {
+    apply Nat.nle_gt in Hje.
+    apply all_0_rngl_summation_0.
+    intros k Hk.
+    rewrite Hvj.
+    rewrite nth_overflow; [ cbn | flia Hje ].
+    rewrite nth_repeat.
+    now apply rngl_mul_0_r.
+  }
+  replace n with (min (vect_size vi) (vect_size vj)). 2: {
+    rewrite Hev; [ | rewrite Hvi; apply nth_In; flia Hie Hi ].
+    rewrite Hev; [ | rewrite Hvj; apply nth_In; flia Hje Hj ].
+    apply Nat.min_id.
+  }
+  rewrite fold_vect_dot_mul'.
+  rewrite <- vect_dot_mul_dot_mul'; [ | easy ].
+  specialize (mat_mul_vect_dot_vect Hic Hos M vi vj) as H1.
+  destruct Hsy as (Hsm, Hsy).
+  specialize (H1 Hsm).
+  rewrite Hr in H1.
+  assert (H : vect_size vi = n). {
+    rewrite Hvi, Hev; [ easy | ].
+    apply nth_In; flia Hie Hi.
+  }
+  specialize (H1 H); clear H.
+  assert (H : vect_size vj = n). {
+    rewrite Hvj, Hev; [ easy | ].
+    apply nth_In; flia Hje Hj.
+  }
+  specialize (H1 H); clear H.
+  (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
+  specialize (Hvv (i - 1) _ vi Hi' eq_refl Hvi) as H2.
+  rewrite H2 in H1.
+  clear H2.
+  replace (M⁺)%M with M in H1. 2: {
+    unfold mat_transp; cbn.
+    rewrite square_matrix_ncols; [ rewrite Hr | easy ].
+    destruct M as (ll); cbn in Hr, Hsy |-*; f_equal.
+    rewrite (List_map_nth_seq ll []) at 1.
+    rewrite Hr.
+    rewrite <- seq_shift, map_map.
+    apply map_ext_in.
+    intros k Hk; apply in_seq in Hk.
+    rewrite Nat_sub_succ_1.
+    rewrite (List_map_nth_seq (nth k ll []) 0%F) at 1.
+    apply is_scm_mat_iff in Hsm; cbn in Hsm.
+    destruct Hsm as (Hcr, Hcl).
+    rewrite Hcl; [ rewrite Hr | now apply nth_In; rewrite Hr ].
+    rewrite map_map.
+    apply map_ext_in.
+    intros l Hl; apply in_seq in Hl.
+    rewrite Nat_sub_succ_1.
+    specialize (Hsy (S k) (S l)).
+    do 2 rewrite Nat_sub_succ_1 in Hsy.
+    apply Hsy; rewrite Hr; [ flia Hk | flia Hl ].
+  }
+  specialize (Hvv (j - 1) _ vj Hj' eq_refl Hvj) as H2.
+  rewrite H2 in H1.
+  clear H2.
+  rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
+  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
+  remember (rngl_eqb (≺ vi, vj ≻) 0%F) as vvij eqn:Hvvij.
+  symmetry in Hvvij.
+  destruct vvij; [ now apply rngl_eqb_eq | ].
+  apply rngl_eqb_neq in Hvvij; [ | easy ].
+  exfalso.
+  apply rngl_mul_cancel_r in H1; [ | now left | easy ].
+  revert H1.
+  apply Hall_diff; [ easy | easy | flia Hij Hi Hj ].
+}
+Qed.
+
+(* A lemma to prove the theorem M = U . D . U^t
+   see the comment for the theorem below *)
+Lemma diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ n (M : matrix T) ev eV D U,
@@ -579,358 +921,25 @@ replace (vect_size W) with n. 2: {
 now rewrite Nat.min_id.
 Qed.
 
-Theorem mat_mul_vect_dot_vect :
-  rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ (M : matrix T) U V,
-  is_square_matrix M = true
-  → vect_size U = mat_nrows M
-  → vect_size V = mat_nrows M
-  → ≺ M • U, V ≻ = ≺ U, M⁺ • V ≻.
-Proof.
-intros Hic Hos * Hsm Hur Hvr.
-destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
-  rewrite Hrz in Hur, Hvr.
-  destruct M as (ll).
-  destruct U as (lu).
-  destruct V as (lv); cbn.
-  cbn in Hur, Hvr, Hrz.
-  apply length_zero_iff_nil in Hur, Hvr, Hrz.
-  now subst lu lv ll.
-}
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-unfold vect_dot_mul'.
-rewrite Hur, Hvr.
-cbn.
-do 3 rewrite map_length.
-rewrite seq_length.
-rewrite fold_mat_nrows.
-rewrite square_matrix_ncols; [ | easy ].
-rewrite Nat.min_id.
-destruct M as (ll).
-destruct U as (lu).
-destruct V as (lv); cbn.
-cbn in Hur, Hvr, Hrz.
-rewrite map_map.
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite (List_map_nth' []). 2: {
-   apply Nat.min_glb_lt_iff with (m := length lv).
-   rewrite Hvr, Nat.min_id.
-   flia Hi Hrz.
-  }
-  rewrite vect_dot_mul_dot_mul'; [ | easy ].
-  unfold vect_dot_mul'; cbn.
-  apply is_scm_mat_iff in Hsm.
-  destruct Hsm as (Hcr, Hcl).
-  rewrite (Hcl (nth (i - 1) ll [])). 2: {
-    cbn; apply nth_In; flia Hi Hrz.
-  }
-  cbn; rewrite Hur, Nat.min_id.
-  rewrite rngl_mul_summation_distr_r; [ | easy ].
-  easy.
-}
-cbn.
-unfold iter_seq at 1 2.
-rewrite rngl_summation_summation_list_swap.
-rewrite fold_iter_seq.
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite fold_iter_seq.
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  rewrite rngl_mul_comm; [ | easy ].
-  easy.
-}
-cbn.
-rewrite <- rngl_mul_summation_distr_l; [ | easy ].
-f_equal.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hrz ].
-rewrite vect_dot_mul_dot_mul'; [ | easy ].
-unfold vect_dot_mul'; cbn.
-rewrite List_map_seq_length.
-rewrite Hvr, Nat.min_id.
-eapply rngl_summation_eq_compat.
-intros j Hj.
-f_equal.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj Hrz ].
-rewrite seq_nth; [ | flia Hi Hrz ].
-rewrite seq_nth; [ | flia Hj Hrz ].
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite Nat.add_comm, Nat.add_sub.
-easy.
-Qed.
-
-Theorem mat_with_vect_is_square : ∀ n vl,
-  is_square_matrix (mat_with_vect n vl) = true.
-Proof.
-intros.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-apply is_scm_mat_iff.
-split. {
-  unfold mat_ncols; cbn.
-  rewrite List_map_seq_length.
-  rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-  now rewrite List_map_seq_length.
-} {
-  unfold mat_ncols; cbn.
-  rewrite List_map_seq_length.
-  intros l Hl.
-  apply in_map_iff in Hl.
-  destruct Hl as (x & Hxl & Hx).
-  apply in_seq in Hx.
-  rewrite <- Hxl.
-  now rewrite List_map_seq_length.
-}
-Qed.
-
-Theorem mat_with_vect_is_corr : ∀ n vl,
-  is_correct_matrix (mat_with_vect n vl) = true.
-Proof.
-intros.
-apply squ_mat_is_corr, mat_with_vect_is_square.
-Qed.
-
-Theorem mat_with_vect_nrows : ∀ n vl, mat_nrows (mat_with_vect n vl) = n.
-Proof.
-intros.
-now cbn; rewrite List_map_seq_length.
-Qed.
-
-Theorem mat_with_vect_ncols : ∀ n vl, mat_ncols (mat_with_vect n vl) = n.
-Proof.
-intros.
-unfold mat_ncols; cbn.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
-apply Nat.neq_0_lt_0 in Hnz.
-rewrite (List_map_hd 0); [ | now rewrite seq_length ].
-now rewrite List_map_seq_length.
-Qed.
-
-Theorem mat_with_vect_el : ∀ n lv i j,
-  1 ≤ i ≤ n
-  → 1 ≤ j ≤ n
-  → mat_el (mat_with_vect n lv) i j = vect_el (nth (j - 1) lv (vect_zero n)) i.
-Proof.
-intros * Hin Hjn; cbn.
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hin ].
-rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hjn ].
-rewrite seq_nth; [ | flia Hjn ].
-rewrite seq_nth; [ | flia Hin ].
-rewrite Nat.add_0_l, Nat.add_comm, Nat.sub_add; [ | easy ].
-easy.
-Qed.
-
-Theorem fold_vect_dot_mul' : ∀ U V,
-  ∑ (i = 1, min (vect_size U) (vect_size V)), vect_el U i * vect_el V i =
-  vect_dot_mul' U V.
-Proof. easy. Qed.
-
-(* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
-
-Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
-  rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_has_eqb = true →
-  rngl_has_inv = true →
-  ∀ n (M : matrix T) ev eV A,
-  is_symm_mat M
-  → mat_nrows M = n
-  → eigenvalues_and_norm_vectors n M ev eV
-  → A = mat_with_vect n eV
-  → (A⁺ * A = mI n)%M.
-Proof.
-intros Hic Hos Heq Hii * Hsy Hr Hvv Hm.
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
-rewrite Hm.
-apply matrix_eq; cycle 1. {
-  apply mat_mul_is_corr. {
-    apply mat_transp_is_corr.
-    apply mat_with_vect_is_corr.
-  } {
-    apply mat_with_vect_is_corr.
-  }
-  now cbn; rewrite List_map_seq_length.
-} {
-  apply mI_is_correct_matrix.
-} {
-  cbn; do 3 rewrite List_map_seq_length.
-  apply mat_with_vect_ncols.
-} {
-  rewrite mI_ncols.
-  rewrite mat_mul_ncols. 2: {
-    now rewrite mat_transp_nrows, mat_with_vect_ncols.
-  }
-  apply mat_with_vect_ncols.
-}
-rewrite mat_mul_nrows.
-rewrite mat_transp_nrows.
-rewrite mat_with_vect_ncols.
-rewrite mI_ncols.
-intros * Hi Hj.
-assert (Hi' : i - 1 < n) by flia Hi.
-assert (Hj' : j - 1 < n) by flia Hj.
-rewrite mat_el_mul; cycle 1. {
-  now rewrite mat_mul_nrows, mat_transp_nrows, mat_with_vect_ncols.
-} {
-  rewrite mat_mul_ncols. 2: {
-    now rewrite mat_transp_nrows, mat_with_vect_ncols.
-  }
-  now rewrite mat_with_vect_ncols.
-}
-rewrite mat_transp_ncols.
-rewrite mat_with_vect_ncols.
-apply Nat.eqb_neq in Hnz; rewrite Hnz.
-rewrite mat_with_vect_nrows.
-erewrite rngl_summation_eq_compat. 2: {
-  intros k Hk.
-  rewrite mat_transp_el; [ | | flia Hi | flia Hk ]. 2: {
-    apply mat_with_vect_is_corr.
-  }
-  rewrite mat_with_vect_el; [ | easy | easy ].
-  rewrite mat_with_vect_el; [ | easy | easy ].
-  easy.
-}
-cbn.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | easy ].
-cbn.
-remember (nth (i - 1) eV (vect_zero n)) as vi eqn:Hvi.
-remember (nth (j - 1) eV (vect_zero n)) as vj eqn:Hvj.
-move vj before vi.
-destruct (Nat.eq_dec i j) as [Hij| Hij]. {
-  subst j; clear Hj.
-  rewrite δ_diag.
-  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
-  specialize (Hall_norm_1 (i - 1) Hi') as H1.
-  unfold vect_squ_norm in H1.
-  rewrite <- Hvi in H1.
-  rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
-  unfold vect_dot_mul' in H1.
-  rewrite Nat.min_id in H1.
-  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
-    apply Nat.nle_gt in Hie.
-    rewrite <- H1.
-    rewrite nth_overflow in Hvi; [ subst vi | flia Hie ].
-    unfold vect_zero; cbn.
-    rewrite repeat_length.
-    apply rngl_summation_eq_compat.
-    intros j Hj.
-    f_equal.
-    rewrite Hvj; cbn.
-    unfold vect_el; cbn.
-    rewrite List_nth_repeat.
-    rewrite <- if_ltb_lt_dec.
-    rewrite Tauto.if_same.
-    rewrite nth_overflow with (n := i - 1); [ | flia Hie ].
-    now cbn; rewrite nth_repeat.
-  }
-  rewrite Hev in H1. 2: {
-    rewrite Hvi.
-    apply nth_In; flia Hi Hie.
-  }
-  now rewrite Hvj, <- Hvi.
-} {
-  rewrite δ_ndiag; [ | flia Hij Hi Hj ].
-  destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
-  destruct (le_dec i (length eV)) as [Hie| Hie]. 2: {
-    apply Nat.nle_gt in Hie.
-    apply all_0_rngl_summation_0.
-    intros k Hk.
-    rewrite Hvi.
-    rewrite nth_overflow; [ cbn | flia Hie ].
-    rewrite nth_repeat.
-    now apply rngl_mul_0_l.
-  }
-  destruct (le_dec j (length eV)) as [Hje| Hje]. 2: {
-    apply Nat.nle_gt in Hje.
-    apply all_0_rngl_summation_0.
-    intros k Hk.
-    rewrite Hvj.
-    rewrite nth_overflow; [ cbn | flia Hje ].
-    rewrite nth_repeat.
-    now apply rngl_mul_0_r.
-  }
-  replace n with (min (vect_size vi) (vect_size vj)). 2: {
-    rewrite Hev; [ | rewrite Hvi; apply nth_In; flia Hie Hi ].
-    rewrite Hev; [ | rewrite Hvj; apply nth_In; flia Hje Hj ].
-    apply Nat.min_id.
-  }
-  rewrite fold_vect_dot_mul'.
-  rewrite <- vect_dot_mul_dot_mul'; [ | easy ].
-  specialize (mat_mul_vect_dot_vect Hic Hos M vi vj) as H1.
-  destruct Hsy as (Hsm, Hsy).
-  specialize (H1 Hsm).
-  rewrite Hr in H1.
-  assert (H : vect_size vi = n). {
-    rewrite Hvi, Hev; [ easy | ].
-    apply nth_In; flia Hie Hi.
-  }
-  specialize (H1 H); clear H.
-  assert (H : vect_size vj = n). {
-    rewrite Hvj, Hev; [ easy | ].
-    apply nth_In; flia Hje Hj.
-  }
-  specialize (H1 H); clear H.
-  (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
-  specialize (Hvv (i - 1) _ vi Hi' eq_refl Hvi) as H2.
-  rewrite H2 in H1.
-  clear H2.
-  replace (M⁺)%M with M in H1. 2: {
-    unfold mat_transp; cbn.
-    rewrite square_matrix_ncols; [ rewrite Hr | easy ].
-    destruct M as (ll); cbn in Hr, Hsy |-*; f_equal.
-    rewrite (List_map_nth_seq ll []) at 1.
-    rewrite Hr.
-    rewrite <- seq_shift, map_map.
-    apply map_ext_in.
-    intros k Hk; apply in_seq in Hk.
-    rewrite Nat_sub_succ_1.
-    rewrite (List_map_nth_seq (nth k ll []) 0%F) at 1.
-    apply is_scm_mat_iff in Hsm; cbn in Hsm.
-    destruct Hsm as (Hcr, Hcl).
-    rewrite Hcl; [ rewrite Hr | now apply nth_In; rewrite Hr ].
-    rewrite map_map.
-    apply map_ext_in.
-    intros l Hl; apply in_seq in Hl.
-    rewrite Nat_sub_succ_1.
-    specialize (Hsy (S k) (S l)).
-    do 2 rewrite Nat_sub_succ_1 in Hsy.
-    apply Hsy; rewrite Hr; [ flia Hk | flia Hl ].
-  }
-  specialize (Hvv (j - 1) _ vj Hj' eq_refl Hvj) as H2.
-  rewrite H2 in H1.
-  clear H2.
-  rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
-  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
-  remember (rngl_eqb (≺ vi, vj ≻) 0%F) as vvij eqn:Hvvij.
-  symmetry in Hvvij.
-  destruct vvij; [ now apply rngl_eqb_eq | ].
-  apply rngl_eqb_neq in Hvvij; [ | easy ].
-  exfalso.
-  apply rngl_mul_cancel_r in H1; [ | now left | easy ].
-  revert H1.
-  apply Hall_diff; [ easy | easy | flia Hij Hi Hj ].
-}
-Qed.
+(* In the real case, the symmetric matrix M is diagonalisable in the
+   sense that there exists an orthogonal matrix U (the columns of which
+   are eigenvectors) and a diagonal matrix D the coefficients of which
+   are eigenvalues μ_i such that
+      M = U . D . U^t *)
 
 Theorem diagonalized_matrix_prop : in_charac_0_field →
-  ∀ n (M : matrix T) ev eV D U,
-  is_symm_mat M
-  → mat_nrows M = n
-  → eigenvalues_and_norm_vectors n M ev eV
+  ∀ n (M : matrix T) ev eV,
+  mat_nrows M = n
   → length eV = n
   → (∀ V, V ∈ eV → vect_size V = n)
-  → D = mat_with_diag n ev
+  → is_symm_mat M
+  → eigenvalues_and_norm_vectors n M ev eV
+  → ∀ D U,
+  D = mat_with_diag n ev
   → U = mat_with_vect n eV
   → (M = U * D * U⁻¹)%M.
 Proof.
-intros Hif * Hsy Hrn Hvv Hlev Hevn Hd Ho.
+intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_with_vect in Ho; cbn in Ho.
@@ -1005,12 +1014,6 @@ rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   rewrite Ho.
   apply mat_with_vect_is_square.
 }
-Qed.
-
-Theorem mat_mul_vect_size : ∀ M V, vect_size (M • V) = mat_nrows M.
-Proof.
-intros; cbn.
-now rewrite map_length.
 Qed.
 
 (* https://people.orie.cornell.edu/dpw/orie6334/Fall2016/lecture4.pdf *)
