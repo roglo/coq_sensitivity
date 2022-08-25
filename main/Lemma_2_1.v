@@ -308,16 +308,16 @@ Theorem diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
   rngl_has_opp = true ∨ rngl_has_sous = true →
   ∀ n (M : matrix T) ev eV D U,
-  is_symm_mat M
-  → mat_nrows M = n
-  → eigenvalues_and_norm_vectors n M ev eV
+  mat_nrows M = n
   → length eV = n
+  → is_symm_mat M
+  → eigenvalues_and_norm_vectors n M ev eV
   → (∀ V, V ∈ eV → vect_size V = n)
   → D = mat_with_diag n ev
   → U = mat_with_vect n eV
   → (M * U = U * D)%M.
 Proof.
-intros Hic Hos * Hsy Hrn Hvv Hlev Hevn Hd Ho.
+intros Hic Hos * Hrn Hlev Hsy Hvv Hevn Hd Ho.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_with_vect in Ho; cbn in Ho.
@@ -942,7 +942,7 @@ assert (H : rngl_is_comm = true) by now destruct Hif.
 specialize (H1 H); clear H.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (H1 (or_introl H)); clear H.
-specialize (H1 n M ev eV D U Hsy Hrn Hvv Hlev Hevn Hd Ho).
+specialize (H1 n M ev eV D U Hrn Hlev Hsy Hvv Hevn Hd Ho).
 generalize H1; intros H1v.
 apply (f_equal (λ A, (A * U⁻¹)%M)) in H1.
 rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
@@ -1029,7 +1029,6 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → is_symm_mat M
   → is_square_matrix U = true
   → is_square_matrix D = true
-  → mat_nrows M = n
   → vect_size x = n
   → ≺ x, x ≻ = 1%F
   → eigenvalues_and_norm_vectors n M ev eV
@@ -1042,6 +1041,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hnz Hsym Hsmu Hsmd Hr Hsx Hx1 HeV HU Hmin Hmax Hyz.
+...
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
