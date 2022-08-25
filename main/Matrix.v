@@ -416,12 +416,12 @@ Definition mat_sub (MA MB : matrix T) :=
 (* vector as a matrix nx1 *)
 
 Definition mat_of_vert_vect (V : vector T) :=
-  mk_mat [vect_list V].
+  mk_mat (map (λ i, [i]) (vect_list V)).
 
 (* vector as a matrix 1xn *)
 
 Definition mat_of_horiz_vect (V : vector T) :=
-  mk_mat (map (λ i, [i]) (vect_list V)).
+  mk_mat [vect_list V].
 
 (* concatenation of a matrix and a column vector *)
 
@@ -430,16 +430,17 @@ Definition mat_vect_concat (M : matrix T) V :=
 
 (* multiplication of a matrix and a vector *)
 
-(*
-Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
-  mat_mul M (mat_of_vert_vect V).
-(* interesting definition but it returns a matrix, but I want the result
-   to be a vector *)
-Check mat_mul_vect_r.
-*)
-
 Definition mat_mul_vect_r (M : matrix T) (V : vector T) :=
   mk_vect (map (λ row, vect_dot_mul (mk_vect row) V) (mat_list_list M)).
+
+(*
+Definition mat_mul_vect_r' (M : matrix T) (V : vector T) :=
+  mk_vect
+    match vect_list V with
+    | nil => []
+    | cons d _ => map (hd d) (mat_list_list (mat_mul M (mat_of_vert_vect V)))
+  end.
+*)
 
 (* multiplication of a vector and a matrix *)
 
