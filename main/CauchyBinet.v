@@ -2121,10 +2121,6 @@ End a.
 
 Arguments Cauchy_Binet_formula {T ro rp} _ [m n]%nat.
 
-(*
-Check Cauchy_Binet_formula.
-*)
-
 Section a.
 
 Context {T : Type}.
@@ -2138,56 +2134,41 @@ Corollary determinant_mul : in_charac_0_field →
   → mat_nrows A = mat_nrows B
   → det (A * B) = (det A * det B)%F.
 Proof.
-(* est-ce qu'on pourrait se passer de Binet_Cauchy formula ?
+(*
 intros Hif * Hsma Hsmb Hrab *.
-rewrite det_is_det''.
-rewrite det_is_det''.
-rewrite det_is_det''. {
-  unfold det''.
-  rewrite mat_mul_nrows.
-unfold prodn_rep_seq.
-erewrite rngl_summation_prodn_sub_lists_all_permut.
-erewrite rngl_summation_prodn_sub_lists_all_permut.
-erewrite rngl_summation_prodn_sub_lists_all_permut.
-rewrite rngl_summation_list_mul_summation_list.
-rewrite <- Hrab.
-remember (mat_nrows A) as n eqn:Hra.
-rename Hrab into Hrb.
-symmetry in Hra, Hrb.
-symmetry.
-remember (∑ (jl ∈ _), _) as x; subst x.
-symmetry.
-(*
-  ============================
-  ∑ (jl ∈ sub_lists_of_seq_1_n n n), ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
-  ∑ (jl ∈ sub_lists_of_seq_1_n n n),
-    ∑ (j ∈ sub_lists_of_seq_1_n n n),
-      (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
-      (∑ (kl ∈ all_permut j), ε kl * ∏ (i = 1, n), mat_el B i kl.(i))
-*)
-apply rngl_summation_list_eq_compat.
-intros jl Hjl.
-rewrite <- rngl_mul_summation_list_distr_l.
-remember (∑ (l ∈ sub_lists_of_seq_1_n _ _), _) as x; subst x.
-(*
-  ============================
-  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
-  ((∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
-   (∑ (l ∈ sub_lists_of_seq_1_n n n), ∑ (kl ∈ all_permut l), ε kl * ∏ (i = 1, n), mat_el B i kl.(i)))%F
-*)
-erewrite <- rngl_summation_prodn_sub_lists_all_permut.
-(*
-  ============================
-  ∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el (A * B) i kl.(i) =
-  ((∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, n), mat_el A i kl.(i)) *
-   (∑ (kl ∈ prodn (repeat (seq 1 n) n)), ε kl * ∏ (i = 1, n), mat_el B i kl.(i)))%F
-*)
-...
-rewrite rngl_summation_prodn_sub_lists_all_permut; [ | easy | easy ].
+remember (mat_nrows A) as n eqn:Har.
+rename Hrab into Hbr.
+symmetry in Har, Hbr.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  destruct A as (lla).
+  destruct B as (llb).
+  cbn in *.
+  apply length_zero_iff_nil in Har, Hbr.
+  subst lla llb; cbn.
+  symmetry; apply rngl_mul_1_l.
+}
+specialize (square_matrix_ncols A Hsma) as Hac.
+specialize (square_matrix_ncols B Hsmb) as Hbc.
+rewrite Har in Hac; rewrite Hbr in Hbc.
+specialize (squ_mat_is_corr A Hsma) as Hca.
+specialize (squ_mat_is_corr B Hsmb) as Hcb.
+rewrite (Cauchy_Binet_formula_step_1 Hif A B Hnz Har Hac Hbc).
+rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hnz).
+rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hnz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hnz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_5 Hif).
+rewrite (Cauchy_Binet_formula_step_6 Hif n A _ Hnz).
+rewrite (Cauchy_Binet_formula_step_7 _ A _ Hnz Har Hac).
+rewrite (Cauchy_Binet_formula_step_8 Hif A _ Hnz Hnz Hca Har Hac).
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
-now rewrite rngl_summation_list_only_one.
-Check @rngl_summation_prodn_sub_lists_all_permut.
+rewrite rngl_summation_list_only_one.
+rewrite <- Hac at 1.
+rewrite mat_select_all_cols; [ | easy ].
+rewrite <- Hbr.
+rewrite mat_select_all_rows; [ | easy ].
+easy.
 ...
 *)
 intros Hif * Hsma Hsmb Hrab *.
@@ -2212,10 +2193,6 @@ rewrite mat_select_all_rows; [ | easy ].
 rewrite Hrb, <- Hca.
 now rewrite mat_select_all_cols.
 Qed.
-
-(*
-Check determinant_mul.
-*)
 
 End a.
 
