@@ -1329,7 +1329,10 @@ Proof.
 intros.
 unfold det', det'''.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+unfold all_permut.
+rewrite seq_length.
 Compute (canon_sym_gr_list_list 4, all_permut (seq 0 4)).
+pas claire, mon histoire...
 ...
 fix canon_sym_gr_list (n k : nat) {struct n} : list nat :=
   match n with
