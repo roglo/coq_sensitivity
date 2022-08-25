@@ -2138,6 +2138,33 @@ Corollary determinant_mul : in_charac_0_field →
   → mat_nrows A = mat_nrows B
   → det (A * B) = (det A * det B)%F.
 Proof.
+(* est-ce qu'on pourrait se passer de Binet_Cauchy formula ?
+intros Hif * Hsma Hsmb Hrab *.
+rewrite det_is_det''.
+rewrite det_is_det''.
+rewrite det_is_det''. {
+  unfold det''.
+  rewrite mat_mul_nrows.
+unfold prodn_rep_seq.
+erewrite rngl_summation_prodn_sub_lists_all_permut.
+erewrite rngl_summation_prodn_sub_lists_all_permut.
+erewrite rngl_summation_prodn_sub_lists_all_permut.
+rewrite rngl_summation_list_mul_summation_list.
+rewrite <- Hrab.
+remember (mat_nrows A) as n eqn:Hra.
+rename Hrab into Hrb.
+symmetry in Hra, Hrb.
+symmetry.
+remember (∑ (jl ∈ _), _) as x; subst x.
+symmetry.
+...
+rewrite rngl_summation_prodn_sub_lists_all_permut; [ | easy | easy ].
+unfold sub_lists_of_seq_1_n.
+rewrite sls1n_diag.
+now rewrite rngl_summation_list_only_one.
+Check @rngl_summation_prodn_sub_lists_all_permut.
+...
+*)
 intros Hif * Hsma Hsmb Hrab *.
 specialize Cauchy_Binet_formula as H1.
 remember (mat_nrows A) as n eqn:Hn.
