@@ -22,6 +22,9 @@ Require Import Matrix Signature Determinant Comatrix.
 Require Import CauchyBinet.
 Import matrix_Notations.
 
+Notation "l .( i )" := (nth (i - 1) l 0%F)
+  (at level 1, format "l .( i )") : ring_like_scope.
+
 Section a.
 
 Context {T : Type}.
@@ -62,10 +65,10 @@ Definition eigenvalues_and_norm_vectors n M ev eV :=
 
 (* Rayleigh quotient *)
 
-Definition Rayleigh_quotient (M : matrix T) (x : vector T) :=
-  (≺ x, M • x ≻ / ≺ x, x ≻)%F.
+Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
+  (≺ v, M • v ≻ / ≺ v, v ≻)%F.
 
-Arguments Rayleigh_quotient M%M x%V.
+Arguments Rayleigh_quotient M%M v%V.
 
 Theorem rngl_0_le_squ :
   rngl_has_dec_le = true →
@@ -1038,10 +1041,12 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → y = (U⁺ • x)%M
   → y ≠ vect_zero n
   → Rayleigh_quotient M x =
-      ((∑ (i = 1, n), nth (i - 1) ev 0%F * rngl_squ (vect_el y i)) /
+      ((∑ (i = 1, n), ev.(i)* rngl_squ (vect_el y i)) /
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+Print Rayleigh_quotient.
+...
 (*1*)
 assert (HUU : (U⁺ * U)%M = mI n). {
   specialize for_symm_squ_mat_eigen_vect_mat_is_ortho as HUU.
