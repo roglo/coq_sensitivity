@@ -1520,7 +1520,7 @@ Qed.
 (* Cauchy-Binet formula in several steps *)
 (* https://proofwiki.org/wiki/Cauchy-Binet_Formula *)
 
-Lemma cauchy_binet_formula_step_1 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_1 : in_charac_0_field →
   ∀ m n A B, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
@@ -1595,7 +1595,7 @@ assert (H : nth (i - 1) l 0 ∈ l). {
 now specialize (Hl _ H).
 Qed.
 
-Lemma cauchy_binet_formula_step_2 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
   ∀ m n A B, m ≠ 0 →
   ∑ (l ∈ prodn_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
@@ -1688,7 +1688,7 @@ rewrite rngl_mul_comm; [ | now destruct Hif ].
 easy.
 Qed.
 
-Lemma cauchy_binet_formula_step_3 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_3 : in_charac_0_field →
   ∀ m n f B, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1738,7 +1738,7 @@ rewrite seq_nth; [ | now rewrite Hbc ].
 now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
-Lemma cauchy_binet_formula_step_4 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_4 : in_charac_0_field →
   ∀ m n f B, m ≠ 0 →
   is_correct_matrix B = true
   → mat_nrows B = n
@@ -1768,7 +1768,7 @@ assert (H : rngl_is_comm = true) by now destruct Hif.
 now rewrite (rngl_mul_comm H _ (ε la)).
 Qed.
 
-Lemma cauchy_binet_formula_step_5 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5 : in_charac_0_field →
   ∀ m n A B,
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -1825,7 +1825,7 @@ apply rngl_mul_summation_list_distr_r.
 now destruct Hif; left.
 Qed.
 
-Lemma cauchy_binet_formula_step_6 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_6 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
@@ -1938,7 +1938,7 @@ rewrite Hkl.
 rewrite (List_map_nth' 0); [ flia | flia Hi ].
 Qed.
 
-Lemma cauchy_binet_formula_step_7 :
+Lemma Cauchy_Binet_formula_step_7 :
   ∀ m n A f, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
@@ -1995,7 +1995,7 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
-Lemma cauchy_binet_formula_step_8 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_8 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
@@ -2024,7 +2024,7 @@ intros j Hj.
 now apply sub_lists_of_seq_1_n_bounds with (a := j) in Hjl.
 Qed.
 
-Theorem cauchy_binet_formula : in_charac_0_field →
+Theorem Cauchy_Binet_formula : in_charac_0_field →
   ∀ m n A B,
   is_correct_matrix A = true
   → is_correct_matrix B = true
@@ -2059,40 +2059,40 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   specialize (Hcra Hac) as H1.
   now rewrite Har in H1.
 }
-rewrite (cauchy_binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
+rewrite (Cauchy_Binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
   ∑ (l ∈ prodn_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (cauchy_binet_formula_step_2 Hif n A B Hmz).
+rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hmz).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
     (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (cauchy_binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (cauchy_binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
+rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 (*
   ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (cauchy_binet_formula_step_5 Hif).
+rewrite (Cauchy_Binet_formula_step_5 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (cauchy_binet_formula_step_6 Hif n A _ Hmz).
+rewrite (Cauchy_Binet_formula_step_6 Hif n A _ Hmz).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2100,7 +2100,7 @@ rewrite (cauchy_binet_formula_step_6 Hif n A _ Hmz).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (cauchy_binet_formula_step_7 A _ Hmz Har Hac).
+rewrite (Cauchy_Binet_formula_step_7 A _ Hmz Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2108,7 +2108,7 @@ rewrite (cauchy_binet_formula_step_7 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (cauchy_binet_formula_step_8 Hif A _ Hmz Hnz Hca Har Hac).
+rewrite (Cauchy_Binet_formula_step_8 Hif A _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     det (mat_select_cols jl A) * det (mat_select_rows jl B) =
@@ -2119,10 +2119,10 @@ Qed.
 
 End a.
 
-Arguments cauchy_binet_formula {T ro rp} _ [m n]%nat.
+Arguments Cauchy_Binet_formula {T ro rp} _ [m n]%nat.
 
 (*
-Check cauchy_binet_formula.
+Check Cauchy_Binet_formula.
 *)
 
 Section a.
@@ -2139,7 +2139,7 @@ Corollary determinant_mul : in_charac_0_field →
   → det (A * B) = (det A * det B)%F.
 Proof.
 intros Hif * Hsma Hsmb Hrab *.
-specialize cauchy_binet_formula as H1.
+specialize Cauchy_Binet_formula as H1.
 remember (mat_nrows A) as n eqn:Hn.
 rename Hn into Hra; rename Hrab into Hrb.
 symmetry in Hra, Hrb.
