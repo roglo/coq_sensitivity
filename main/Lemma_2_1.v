@@ -1048,6 +1048,17 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
+  rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
+  unfold vect_dot_mul'.
+  rewrite Nat.min_id.
+  replace (vect_size y) with n; [ easy | ].
+  rewrite Hmax, mat_mul_vect_size, mat_transp_nrows.
+  now rewrite HU, mat_with_vect_ncols.
+}
+rewrite H.
+...
+Search vect_dot_mul.
 Search (matrix _ → vector _ → _).
 Search (vector _ → matrix _ → _).
 Print vect_dot_mul.
