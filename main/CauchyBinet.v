@@ -1323,6 +1323,10 @@ Definition det''' (M : matrix T) :=
   let n := mat_nrows M in
   ∑ (l ∈ all_permut (seq 1 n)), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
+(* (I am not happy of this definition; it is close to det' since both
+    use canon_sym_gr_list but with a different way, and I don't know
+    how to fix it) *)
+
 (*
 Theorem det'_is_det''' : ∀ M, det' M = det''' M.
 Proof.
