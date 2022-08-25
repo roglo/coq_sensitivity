@@ -2134,7 +2134,7 @@ Corollary determinant_mul : in_charac_0_field →
   → mat_nrows A = mat_nrows B
   → det (A * B) = (det A * det B)%F.
 Proof.
-(*
+(* version shunting Cauchy_Binet_formula using only steps 1 to 5
 intros Hif * Hsma Hsmb Hrab *.
 remember (mat_nrows A) as n eqn:Har.
 rename Hrab into Hbr.
@@ -2158,14 +2158,11 @@ rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hnz).
 rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hnz Hcb Hbr Hbc).
 rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hnz Hcb Hbr Hbc).
 rewrite (Cauchy_Binet_formula_step_5 Hif).
-rewrite (Cauchy_Binet_formula_step_6 Hif n A _ Hnz).
-rewrite (Cauchy_Binet_formula_step_7 _ A _ Hnz Har Hac).
-rewrite (Cauchy_Binet_formula_step_8 Hif A _ Hnz Hnz Hca Har Hac).
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
-rewrite <- Hac at 1.
-rewrite mat_select_all_cols; [ | easy ].
+rewrite (fold_det''' _ A Har).
+rewrite <- (det_is_det''' _); try (now destruct Hif).
 rewrite <- Hbr.
 rewrite mat_select_all_rows; [ | easy ].
 easy.
