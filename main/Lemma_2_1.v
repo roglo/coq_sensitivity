@@ -1048,6 +1048,23 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+assert (Huc : mat_ncols U = n). {
+  apply (f_equal mat_nrows) in Hmin.
+  do 2 rewrite mat_mul_nrows in Hmin.
+  rewrite mat_transp_nrows in Hmin.
+  congruence.
+}
+assert (Hur : mat_nrows U = n). {
+  now rewrite square_matrix_ncols in Huc.
+}
+assert (Hyi : ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth i eV (vect_zero n), x ≻). {
+  intros i Hi.
+  rewrite Hmax; cbn.
+  rewrite map_map, Hur, Huc.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+  rewrite HU; cbn.
+  f_equal.
+...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
   unfold vect_dot_mul'.
