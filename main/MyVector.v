@@ -15,12 +15,12 @@ Record vector T := mk_vect
 
 Definition vect_size {T} (v : vector T) := length (vect_list v).
 
+Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
+  nth (i - 1) (vect_list V) 0%F.
+
 Theorem fold_vect_size {T} : ∀ (V : vector T),
   length (vect_list V) = vect_size V.
 Proof. easy. Qed.
-
-Definition vect_el {T} {ro : ring_like_op T} (V : vector T) i :=
-  nth (i - 1) (vect_list V) 0%F.
 
 Theorem vector_eq : ∀ T {ro : ring_like_op T} (U V : vector T),
   (∀ i, 1 ≤ i ≤ vect_size U → vect_el U i = vect_el V i)

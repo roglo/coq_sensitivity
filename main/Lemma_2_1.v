@@ -1044,7 +1044,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → y = (U⁺ • x)%M
   → y ≠ vect_zero n
   → Rayleigh_quotient M x =
-      ((∑ (i = 1, n), ev.(i)* rngl_squ (vect_el y i)) /
+      ((∑ (i = 1, n), ev.(i) * rngl_squ (vect_el y i)) /
        (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
@@ -1057,13 +1057,53 @@ assert (Huc : mat_ncols U = n). {
 assert (Hur : mat_nrows U = n). {
   now rewrite square_matrix_ncols in Huc.
 }
-assert (Hyi : ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth i eV (vect_zero n), x ≻). {
+assert
+  (Hyi :
+     ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth (i - 1) eV (vect_zero n), x ≻). {
   intros i Hi.
   rewrite Hmax; cbn.
   rewrite map_map, Hur, Huc.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
   rewrite HU; cbn.
   f_equal.
+  rewrite seq_nth; [ | flia Hi ].
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  rewrite <- seq_shift.
+  rewrite map_map.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite Nat_sub_succ_1.
+    apply in_seq in Hj.
+    rewrite (List_map_nth' 0); [ | now rewrite List_map_seq_length ].
+    rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+    rewrite seq_nth; [ | flia Hi ].
+    rewrite Nat.add_0_l.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_l.
+    unfold vect_el.
+    now rewrite Nat_sub_succ_1.
+  }
+  destruct (lt_dec (i - 1) (length eV)) as [HieV| HieV]. 2: {
+    apply Nat.nlt_ge in HieV.
+    rewrite nth_overflow; [ cbn | easy ].
+    erewrite map_ext_in. 2: {
+      intros j Hj.
+      now rewrite nth_repeat.
+    }
+    now rewrite <- List_repeat_as_map.
+  }
+  remember (nth (i - 1) eV (vect_zero n)) as v eqn:Hv.
+  replace n with (length (vect_list v)). 2: {
+    rewrite Hv; cbn.
+    rewrite fold_vect_size.
+    unfold eigenvalues_and_norm_vectors in HeV.
+    destruct HeV as (H1, HeV).
+    now apply H1, nth_In.
+  }
+  rewrite <- List_map_nth_seq.
+  now destruct v.
+}
 ...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
