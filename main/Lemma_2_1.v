@@ -1110,6 +1110,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ rngl_power ].
+erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
+  now intros; rewrite Hyi.
+}
+cbn - [ "^"%F ].
+unfold eigenvalues_and_norm_vectors in HeV.
+unfold Rayleigh_quotient.
 ...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
