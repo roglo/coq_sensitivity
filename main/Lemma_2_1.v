@@ -1044,8 +1044,8 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → y = (U⁺ • x)%M
   → y ≠ vect_zero n
   → Rayleigh_quotient M x =
-      ((∑ (i = 1, n), ev.(i) * rngl_squ (vect_el y i)) /
-       (∑ (i = 1, n), rngl_squ (vect_el y i)))%F.
+      ((∑ (i = 1, n), ev.(i) * (vect_el y i) ^ 2) /
+       (∑ (i = 1, n), vect_el y i ^ 2))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
 assert (Huc : mat_ncols U = n). {
@@ -1104,6 +1104,12 @@ assert
   rewrite <- List_map_nth_seq.
   now destruct v.
 }
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite Hyi; [ | easy ].
+  easy.
+}
+cbn - [ rngl_power ].
 ...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
