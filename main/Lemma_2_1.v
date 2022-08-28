@@ -1062,6 +1062,29 @@ assert (Huc : mat_ncols U = n). {
 assert (Hur : mat_nrows U = n). {
   now rewrite square_matrix_ncols in Huc.
 }
+assert (HneV : n ≤ length eV). {
+  unfold eigenvalues_and_norm_vectors in HeV.
+  destruct HeV as (Hvs & Hvd & Hvn & Hmv).
+  apply Nat.nlt_ge; intros HeVl.
+  specialize (Hvn n) as H1.
+  assert (H : 1 ≤ n ≤ n) by now split; [ flia Hnz | ].
+  specialize (H1 H); clear H.
+  rewrite nth_overflow in H1; [ | flia HeVl ].
+  unfold vect_squ_norm in H1.
+  unfold vect_dot_mul in H1.
+  rewrite all_0_rngl_summation_list_0 in H1. 2: {
+    intros a Ha; cbn in Ha.
+    apply in_map2_iff in Ha.
+    rewrite repeat_length in Ha.
+    rewrite Nat.min_id in Ha.
+    destruct Ha as (i & Hi & b & c & Hbc).
+    rewrite List_nth_repeat in Hbc.
+    destruct (lt_dec i n) as [H| H]; [ clear H | flia Hi H ].
+    rewrite rngl_mul_0_l in Hbc; [ easy | now destruct Hof; left ].
+  }
+  symmetry in H1.
+  apply rngl_1_neq_0 in H1; [ easy | now destruct Hof ].
+}
 assert
   (Hyi :
      ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth (i - 1) eV (vect_zero n), x ≻). {
@@ -1116,7 +1139,7 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ rngl_power ].
 erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
-  now intros; rewrite Hyi.
+  now intros; cbn; rewrite rngl_mul_1_r, Hyi.
 }
 cbn - [ "^"%F ].
 unfold eigenvalues_and_norm_vectors in HeV.
@@ -1128,7 +1151,7 @@ erewrite rngl_summation_eq_compat. 2: {
     now destruct Hof; left.
   }
   rewrite <- (Hmv i); [ | easy | easy | easy ].
-  rewrite mat_mul_vect_dot_vect; cycle 1. {
+  rewrite mat_mul_vect_dot_vect; [ | | | | | congruence ]; cycle 1. {
     now destruct Hof.
   } {
     now destruct Hof; left.
@@ -1136,10 +1159,47 @@ erewrite rngl_summation_eq_compat. 2: {
     now destruct Hsym.
   } {
     rewrite Hr; apply Hvs.
-    apply nth_In.
-...
+    apply nth_In; flia HneV Hi.
+  }
   unfold is_symm_mat in Hsym.
   replace (M⁺)%M with M by easy.
+  easy.
+}
+cbn.
+set (nth_eV := λ i, nth (i - 1) eV (vect_zero n)).
+erewrite rngl_summation_eq_compat by now intros i Hi; fold (nth_eV i).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  specialize (Hvn i Hi) as H1.
+  unfold vect_squ_norm in H1.
+  fold (nth_eV i) in H1.
+  rewrite <- vect_scal_mul_dot_mul_comm.
+Search (≺ _, _ ≻ × _)%V.
+Search (_ × ≺ _, _ ≻)%V.
+Locate "×".
+Search vect_mul_scal_l.
+...
+  rewrite <- vect_dot_mul_scal_mul_comm.
+...
+Search (≺ _, _ • _ ≻)%F.
+Search (≺ _, _ × _ ≻)%F.
+Search (_ * ≺ _, _ ≻)%F.
+...
+remember (∑ (i = _, _), _) as z.
+erewrite rngl_summation_eq_compat; [ | ]. 2: {
+erewrite rngl_summation_eq_compat; [ subst z | ]. 2: {
+  intros i Hi.
+  specialize (Hvn i Hi) as H1.
+  unfold vect_squ_norm in H1.
+Search (≺ _, _ ≻ * _)%F.
+Search (_ * ≺ _, _ ≻)%F.
+rewerite
+...
+  rewrite Hvn.
+  now intros i Hi; fold (nth_eV i).
+}
+cbn.
+unfold Rayleigh_quotient.
 ...
 Search (≺ _ • _, _ ≻).
 Search (≺ _ , _ ≻ * _)%F.
