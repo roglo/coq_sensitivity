@@ -239,10 +239,18 @@ Qed.
 Theorem vect_mul_scal_l_dot_mul_swap :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
-  ∀ U V W,
+  ∀ n U V W, vect_size U = n → vect_size V = n → vect_size W = n →
   (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
 Proof.
-intros Hopp Hcomm *.
+intros Hopp Hcomm * Hu Hv Hw.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  destruct U as (llu).
+  destruct V as (llv).
+  destruct W as (llw); cbn in Hu, Hv, Hw |-*.
+  apply length_zero_iff_nil in Hu, Hv, Hw.
+  now subst llu llv llw.
+}
 unfold vect_mul_scal_l.
 f_equal; cbn.
 erewrite map_ext_in. 2: {
@@ -262,7 +270,7 @@ symmetry.
 unfold vect_dot_mul.
 destruct U as (llu).
 destruct V as (llv).
-destruct W as (llw); cbn.
+destruct W as (llw); cbn in Hu, Hv, Hw |-*.
 erewrite map_ext_in. 2: {
   intros a Ha.
   now rewrite map2_map_r.
@@ -303,31 +311,69 @@ erewrite map_ext_in. 2: {
   easy.
 }
 symmetry.
-set (n := min (length llu) (length llv)).
 erewrite map_ext_in. 2: {
   intros c Hc.
-Theorem map2_first_first : ∀ A B C n la lb (f : A → B → C),
-  n = min (length la) (length lb)
-  → map2 f la lb = map2 f (firstn n la) (firstn n lb).
-Admitted.
-rewrite (map2_first_first _ _ _ eq_refl).
+  rewrite (map2_first_first _ _ _ eq_refl).
+  rewrite Hu, Hv, Nat.min_id.
+  rewrite firstn_all2; [ | now rewrite Hu ].
+  rewrite firstn_all2; [ | now rewrite Hv ].
   rewrite (map2_map2_seq_l _ 0%F).
   rewrite (map2_map2_seq_r _ 0%F).
-do 2 rewrite firstn_length.
-remember (min (min _ _) _) as x eqn:Hx.
-rewrite Nat.min_comm in Hx.
-rewrite Nat.min_assoc, Nat.min_id in Hx; subst x.
-remember (min (min _ _) _) as x eqn:Hx.
-rewrite <- Nat.min_assoc, Nat.min_id in Hx; subst x.
-rewrite map2_diag.
-fold n.
-Search (∑ (_ ∈ map _ _), _).
-rewrite rngl_summation_list_map.
-easy.
+  rewrite Hu, Hv.
+  rewrite map2_diag.
+  rewrite rngl_summation_list_map.
+  rewrite rngl_summation_seq_summation; [ | easy ].
+  now rewrite Nat.add_0_l.
 }
-rewrite rngl_summation_seq_summation.
-rewrite Nat.add_0_l.
+symmetry.
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  rewrite (map2_first_first _ _ _ eq_refl).
+  rewrite Hu, Hw, Nat.min_id.
+  rewrite firstn_all2; [ | now rewrite Hu ].
+  rewrite firstn_all2; [ | now rewrite Hw ].
+  rewrite (map2_map2_seq_l _ 0%F).
+  rewrite (map2_map2_seq_r _ 0%F).
+  rewrite Hu, Hw.
+  rewrite map2_diag.
+  rewrite rngl_summation_list_map.
+  rewrite rngl_summation_seq_summation; [ | easy ].
+  now rewrite Nat.add_0_l.
+}
+symmetry.
+rewrite (List_map_nth_seq llw 0%F) at 1.
+rewrite (List_map_nth_seq llv 0%F) at 1.
+rewrite Hv, Hw.
+do 2 rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_comm; [ | easy ].
+    easy.
+  }
+  cbn.
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    rewrite rngl_mul_comm; [ | easy ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
+    easy.
+  }
+  cbn.
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+symmetry.
 ...
+rewrite rngl_summation_seq_summation.
 ...
 enough (length llu = length llv).
 rewrite H.

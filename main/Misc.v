@@ -747,6 +747,28 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
+Theorem map2_first_first : ∀ A B C n la lb (f : A → B → C),
+  n = min (length la) (length lb)
+  → map2 f la lb = map2 f (firstn n la) (firstn n lb).
+Proof.
+intros * Hn.
+symmetry in Hn.
+(**)
+revert la lb Hn.
+induction n; intros. {
+  do 2 rewrite firstn_O.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  easy.
+}
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+cbn; f_equal.
+cbn in Hn.
+apply Nat.succ_inj in Hn.
+now apply IHn.
+Qed.
+
 (* end map2 *)
 
 (* rank: rank of the first element satisfying a predicate *)
