@@ -303,6 +303,44 @@ erewrite map_ext_in. 2: {
   easy.
 }
 symmetry.
+set (n := min (length llu) (length llv)).
+erewrite map_ext_in. 2: {
+  intros c Hc.
+Theorem map2_first_first : ∀ A B C n la lb (f : A → B → C),
+  n = min (length la) (length lb)
+  → map2 f la lb = map2 f (firstn n la) (firstn n lb).
+Admitted.
+rewrite (map2_first_first _ _ _ eq_refl).
+  rewrite (map2_map2_seq_l _ 0%F).
+  rewrite (map2_map2_seq_r _ 0%F).
+do 2 rewrite firstn_length.
+remember (min (min _ _) _) as x eqn:Hx.
+rewrite Nat.min_comm in Hx.
+rewrite Nat.min_assoc, Nat.min_id in Hx; subst x.
+remember (min (min _ _) _) as x eqn:Hx.
+rewrite <- Nat.min_assoc, Nat.min_id in Hx; subst x.
+rewrite map2_diag.
+fold n.
+Search (∑ (_ ∈ map _ _), _).
+rewrite rngl_summation_list_map.
+easy.
+}
+rewrite rngl_summation_seq_summation.
+rewrite Nat.add_0_l.
+...
+...
+enough (length llu = length llv).
+rewrite H.
+rewrite map2_diag.
+Search map2.
+...
+map2_diag:
+  ∀ (A B : Type) (f : A → A → B) (la : list A),
+    map2 f la la = map (λ i : A, f i i) la
+
+remember (λ i b, _) as f.
+  rewrite (map2_map2_seq_l _ 0) with (lb := llv).
+  rewrite seq_length.
 Check map2_map2_seq_l.
 Check map_map2.
 ...
