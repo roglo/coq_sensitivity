@@ -280,6 +280,7 @@ erewrite map_ext_in. 2: {
   erewrite map2_ext_in. 2: {
     intros a b Ha Hb.
     rewrite rngl_mul_comm; [ | easy ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
     now rewrite <- rngl_mul_assoc.
   }
   rewrite <- map_map2.
@@ -293,6 +294,7 @@ erewrite map_ext_in. 2: {
   erewrite map2_ext_in. 2: {
     intros a b Ha Hb.
     rewrite rngl_mul_comm; [ | easy ].
+    rewrite rngl_mul_mul_swap; [ | easy ].
     now rewrite <- rngl_mul_assoc.
   }
   rewrite <- map_map2.
@@ -301,9 +303,8 @@ erewrite map_ext_in. 2: {
   easy.
 }
 symmetry.
-...
 Check map2_map2_seq_l.
-Search map2.
+Check map_map2.
 ...
 erewrite map_ext_in. 2: {
   intros c Hc.
