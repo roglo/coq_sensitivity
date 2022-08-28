@@ -285,13 +285,23 @@ erewrite map_ext_in. 2: {
   intros c Hc.
   erewrite map2_ext_in. 2: {
     intros a b Ha Hb.
+(**)
+    rewrite rngl_mul_comm; [ | easy ].
+    now rewrite <- rngl_mul_assoc.
+  }
+  rewrite <- map_map2.
+  now rewrite rngl_summation_list_map.
+}
+(*
     rewrite (rngl_mul_comm Hcomm c b).
     easy.
   }
   rewrite <- map2_map_r.
   easy.
 }
+*)
 symmetry.
+(*
 erewrite map_ext_in. 2: {
   intros c Hc.
   erewrite map2_ext_in. 2: {
@@ -302,7 +312,26 @@ erewrite map_ext_in. 2: {
   rewrite <- map2_map_r.
   easy.
 }
+*)
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  erewrite map2_ext_in. 2: {
+    intros a b Ha Hb.
+    rewrite rngl_mul_comm; [ | easy ].
+    now rewrite <- rngl_mul_assoc.
+  }
+  rewrite <- map_map2.
+  now rewrite rngl_summation_list_map.
+}
+(**)
 symmetry.
+...
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  rewrite <- map_map2.
+Search map2.
+Check map2_map2_seq_l.
+Check map_map2.
 ...
   ============================
   map (λ c : T, ∑ (t ∈ map2 rngl_mul llu (map (λ b : T, (b * c)%F) llv)), t)
