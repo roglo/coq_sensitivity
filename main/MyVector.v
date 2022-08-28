@@ -275,56 +275,35 @@ erewrite map_ext_in. 2: {
 symmetry.
 remember (λ c, _) as x; subst x; symmetry.
 remember (λ c, _) as x; subst x; symmetry.
-(*
-Search (∑ (_ ∈ map2 _ _), _).
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  erewrite map2_ext_in. 2: {
+    intros a b Ha Hb.
+    rewrite rngl_mul_comm; [ | easy ].
+    now rewrite <- rngl_mul_assoc.
+  }
+  rewrite <- map_map2.
+  rewrite rngl_summation_list_map.
+  rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
+  easy.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  erewrite map2_ext_in. 2: {
+    intros a b Ha Hb.
+    rewrite rngl_mul_comm; [ | easy ].
+    now rewrite <- rngl_mul_assoc.
+  }
+  rewrite <- map_map2.
+  rewrite rngl_summation_list_map.
+  rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
+  easy.
+}
+symmetry.
+...
+Check map2_map2_seq_l.
 Search map2.
-Search (map (λ _, ∑ (_ ∈ _), _)%F).
-Search (map (λ _, ∑ (_ = _, _), _)%F).
-*)
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  erewrite map2_ext_in. 2: {
-    intros a b Ha Hb.
-(**)
-    rewrite rngl_mul_comm; [ | easy ].
-    now rewrite <- rngl_mul_assoc.
-  }
-  rewrite <- map_map2.
-  now rewrite rngl_summation_list_map.
-}
-(*
-    rewrite (rngl_mul_comm Hcomm c b).
-    easy.
-  }
-  rewrite <- map2_map_r.
-  easy.
-}
-*)
-symmetry.
-(*
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  erewrite map2_ext_in. 2: {
-    intros a b Ha Hb.
-    rewrite (rngl_mul_comm Hcomm c b).
-    easy.
-  }
-  rewrite <- map2_map_r.
-  easy.
-}
-*)
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  erewrite map2_ext_in. 2: {
-    intros a b Ha Hb.
-    rewrite rngl_mul_comm; [ | easy ].
-    now rewrite <- rngl_mul_assoc.
-  }
-  rewrite <- map_map2.
-  now rewrite rngl_summation_list_map.
-}
-(**)
-symmetry.
 ...
 erewrite map_ext_in. 2: {
   intros c Hc.
