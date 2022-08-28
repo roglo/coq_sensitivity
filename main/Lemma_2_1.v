@@ -1174,9 +1174,38 @@ erewrite rngl_summation_eq_compat. 2: {
   unfold vect_squ_norm in H1.
   fold (nth_eV i) in H1.
   rewrite <- vect_scal_mul_dot_mul_comm.
+About vect_mul_scal_l_dot_mul_swap.
+...
+Theorem vect_mul_scal_l_dot_mul_swap : ∀ U V W,
+  (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
+Proof.
+intros.
+unfold vect_mul_scal_l.
+f_equal; cbn.
+Search ((≺ _, _ ≻ * _)%V).
+Search ((_ * ≺ _, _ ≻)%V).
+...
+Search (_ × _)%V.
+Search (≺ _, _ ≻ × _)%V.
+rewrite vect_mul_scal_l_dot_mul_swap.
+...
+
+vect_mul_vect_dot_
+...
+Check vect_scal_mul_dot_mul_comm.
+  rewrite <- vect_scal_mul_dot_mul_comm with (V := nth_eV i).
+Locate "×".
+Search (_ × _)%V.
+...
+Check vect_mul_scal_l.
+
+Theorem glop : ∀ a U V, (≺ U, U ≻ × V = (a * (U × V))%F)%V.
+...
+Theorem vect_mul_comm : ∀ U V, (U × V)%V = (V × U)%V.
+Search (_ × _)%V.
+Locate "×".
 Search (≺ _, _ ≻ × _)%V.
 Search (_ × ≺ _, _ ≻)%V.
-Locate "×".
 Search vect_mul_scal_l.
 ...
   rewrite <- vect_dot_mul_scal_mul_comm.

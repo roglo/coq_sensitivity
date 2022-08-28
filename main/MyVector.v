@@ -235,6 +235,83 @@ f_equal; symmetry.
 apply rngl_mul_assoc.
 Qed.
 
+(* to be completed
+Theorem vect_mul_scal_l_dot_mul_swap :
+  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_is_comm = true →
+  ∀ U V W,
+  (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
+Proof.
+intros Hopp Hcomm *.
+unfold vect_mul_scal_l.
+f_equal; cbn.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite <- vect_dot_mul_scal_mul_comm; [ | easy | easy ].
+  easy.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite <- vect_dot_mul_scal_mul_comm; [ | easy | easy ].
+  easy.
+}
+symmetry.
+unfold vect_dot_mul.
+destruct U as (llu).
+destruct V as (llv).
+destruct W as (llw); cbn.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  now rewrite map2_map_r.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  now rewrite map2_map_r.
+}
+symmetry.
+remember (λ c, _) as x; subst x; symmetry.
+remember (λ c, _) as x; subst x; symmetry.
+(*
+Search (∑ (_ ∈ map2 _ _), _).
+Search map2.
+Search (map (λ _, ∑ (_ ∈ _), _)%F).
+Search (map (λ _, ∑ (_ = _, _), _)%F).
+*)
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  erewrite map2_ext_in. 2: {
+    intros a b Ha Hb.
+    rewrite (rngl_mul_comm Hcomm c b).
+    easy.
+  }
+  rewrite <- map2_map_r.
+  easy.
+}
+symmetry.
+erewrite map_ext_in. 2: {
+  intros c Hc.
+  erewrite map2_ext_in. 2: {
+    intros a b Ha Hb.
+    rewrite (rngl_mul_comm Hcomm c b).
+    easy.
+  }
+  rewrite <- map2_map_r.
+  easy.
+}
+symmetry.
+...
+  ============================
+  map (λ c : T, ∑ (t ∈ map2 rngl_mul llu (map (λ b : T, (b * c)%F) llv)), t)
+    llw =
+  map (λ c : T, ∑ (t ∈ map2 rngl_mul llu (map (λ b : T, (b * c)%F) llw)), t)
+    llv
+...
+*)
+
 Theorem vect_eq_dec :
   rngl_has_eqb = true →
   ∀ (U V : vector T), {U = V} + {U ≠ V}.
