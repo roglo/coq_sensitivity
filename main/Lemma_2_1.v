@@ -31,10 +31,14 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
+(*
 Definition is_symm_mat (A : matrix T) :=
   is_square_matrix A = true ∧
   ∀ i j, 1 ≤ i ≤ mat_nrows A → 1 ≤ j ≤ mat_nrows A →
   mat_el A i j = mat_el A j i.
+*)
+Definition is_symm_mat (A : matrix T) :=
+  is_square_matrix A = true ∧ A = (A⁺)%M.
 
 Definition princ_subm_1 (A : matrix T) k := subm (S k) (S k) A.
 
@@ -55,13 +59,14 @@ Definition eigenvalues n M ev :=
   ∀ μ, μ ∈ ev → ∃ V, V ≠ vect_zero n ∧ (M • V = μ × V)%V.
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
-  (∀ V, V ∈ eV → vect_size V = n) ∧
-  (∀ i j, i < n → j < n → i ≠ j → nth i ev 0%F ≠ nth j ev 0%F) ∧
-  (∀ i, i < n → vect_squ_norm (nth i eV (vect_zero n)) = 1%F) ∧
-  ∀ i μ V, i < n →
-  μ = nth i ev 0%F
-  → V = nth i eV (vect_zero n)
-  → (M • V = μ × V)%V.
+  (∀ V : vector T, V ∈ eV → vect_size V = n) ∧
+  (∀ i j, 1 ≤ i ≤ n → 1 ≤ j ≤ n → i ≠ j → ev.(i)%F ≠ ev.(j)%F) ∧
+  (∀ i, 1 ≤ i ≤ n → vect_squ_norm (nth (i - 1) eV (vect_zero n)) = 1%F) ∧
+  (∀ i (μ : T) (V : vector T),
+   1 ≤ i ≤ n
+   → μ = ev.(i)%F
+   → V = nth (i - 1) eV (vect_zero n)
+   → (M • V)%V = (μ × V)%V).
 
 (* Rayleigh quotient *)
 
@@ -499,8 +504,6 @@ rewrite mat_transp_nrows.
 rewrite mat_with_vect_ncols.
 rewrite mI_ncols.
 intros * Hi Hj.
-assert (Hi' : i - 1 < n) by flia Hi.
-assert (Hj' : j - 1 < n) by flia Hj.
 rewrite mat_el_mul; cycle 1. {
   now rewrite mat_mul_nrows, mat_transp_nrows, mat_with_vect_ncols.
 } {
@@ -523,10 +526,10 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite seq_nth; [ | easy ].
-rewrite seq_nth; [ | easy ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
+rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
+rewrite seq_nth; [ | flia Hi ].
+rewrite seq_nth; [ | flia Hj ].
 cbn.
 remember (nth (i - 1) eV (vect_zero n)) as vi eqn:Hvi.
 remember (nth (j - 1) eV (vect_zero n)) as vj eqn:Hvj.
@@ -535,7 +538,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   subst j; clear Hj.
   rewrite δ_diag.
   destruct Hvv as (Hev & Hall_diff & Hall_norm_1 & Hvv).
-  specialize (Hall_norm_1 (i - 1) Hi') as H1.
+  specialize (Hall_norm_1 i Hi) as H1.
   unfold vect_squ_norm in H1.
   rewrite <- Hvi in H1.
   rewrite vect_dot_mul_dot_mul' in H1; [ | easy ].
@@ -606,9 +609,11 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (H1 H); clear H.
   (* H1 : ≺ M • vi, vj ≻ = ≺ vi, M⁺ • vj ≻ *)
-  specialize (Hvv (i - 1) _ vi Hi' eq_refl Hvi) as H2.
+  specialize (Hvv i _ vi Hi eq_refl Hvi) as H2.
   rewrite H2 in H1.
   clear H2.
+  replace (M⁺)%M with M in H1 by easy.
+(*
   replace (M⁺)%M with M in H1. 2: {
     unfold mat_transp; cbn.
     rewrite square_matrix_ncols; [ rewrite Hr | easy ].
@@ -631,7 +636,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     do 2 rewrite Nat_sub_succ_1 in Hsy.
     apply Hsy; rewrite Hr; [ flia Hk | flia Hl ].
   }
-  specialize (Hvv (j - 1) _ vj Hj' eq_refl Hvj) as H2.
+*)
+  specialize (Hvv j _ vj Hj eq_refl Hvj) as H2.
   rewrite H2 in H1.
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
@@ -749,8 +755,8 @@ intros i j Hi Hj.
 unfold mat_ncols, mat_with_diag in Hj; cbn in Hj.
 rewrite (List_map_hd 0) in Hj; [ | now rewrite seq_length ].
 rewrite List_map_seq_length in Hj.
-assert (Hi' : i - 1 < n) by flia Hi.
-assert (Hj' : j - 1 < n) by flia Hj.
+assert (Hi' : i - 1 < n) by now apply Nat_1_le_sub_lt.
+assert (Hj' : j - 1 < n) by now apply Nat_1_le_sub_lt.
 rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite (List_map_nth' 0). 2: {
   rewrite seq_length.
@@ -870,10 +876,9 @@ erewrite rngl_summation_eq_compat. 2: {
   now cbn.
 }
 cbn.
-specialize (Hvv (j - 1) (nth (j - 1) ev 0%F)) as H1.
+specialize (Hvv j (ev.(j))%F) as H1.
 specialize (H1 (nth (j - 1) eV (vect_zero n))).
-assert (H : j - 1 < n) by flia Hj.
-specialize (H1 H eq_refl eq_refl); clear H.
+specialize (H1 Hj eq_refl eq_refl).
 remember (nth (j - 1) ev 0%F) as μ eqn:Hμ.
 remember (nth (j - 1) eV (vect_zero n)) as V eqn:Hv.
 symmetry.
@@ -1115,7 +1120,29 @@ erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
 }
 cbn - [ "^"%F ].
 unfold eigenvalues_and_norm_vectors in HeV.
-unfold Rayleigh_quotient.
+destruct HeV as (Hvs & Hvd & Hvn & Hmv).
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi; cbn.
+  rewrite rngl_mul_1_r, rngl_mul_assoc.
+  rewrite <- vect_scal_mul_dot_mul_comm with (a := (ev.(i))%F). 2: {
+    now destruct Hof; left.
+  }
+  rewrite <- (Hmv i); [ | easy | easy | easy ].
+  rewrite mat_mul_vect_dot_vect; cycle 1. {
+    now destruct Hof.
+  } {
+    now destruct Hof; left.
+  } {
+    now destruct Hsym.
+  } {
+    rewrite Hr; apply Hvs.
+    apply nth_In.
+...
+  unfold is_symm_mat in Hsym.
+  replace (M⁺)%M with M by easy.
+...
+Search (≺ _ • _, _ ≻).
+Search (≺ _ , _ ≻ * _)%F.
 ...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
