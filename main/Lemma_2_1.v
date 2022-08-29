@@ -1168,67 +1168,20 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 set (nth_eV := λ i, nth (i - 1) eV (vect_zero n)).
 erewrite rngl_summation_eq_compat by now intros i Hi; fold (nth_eV i).
+remember (∑ (i = _, _), _) as z eqn:Hz.
+erewrite rngl_summation_eq_compat by now intros i Hi; fold (nth_eV i).
+subst z.
+unfold Rayleigh_quotient.
+...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   specialize (Hvn i Hi) as H1.
   unfold vect_squ_norm in H1.
   fold (nth_eV i) in H1.
-  rewrite <- vect_scal_mul_dot_mul_comm.
-About vect_mul_scal_l_dot_mul_swap.
-...
-Theorem vect_mul_scal_l_dot_mul_swap : ∀ U V W,
-  (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
-Proof.
-intros.
-unfold vect_mul_scal_l.
-f_equal; cbn.
-Search ((≺ _, _ ≻ * _)%V).
-Search ((_ * ≺ _, _ ≻)%V).
-...
-Search (_ × _)%V.
-Search (≺ _, _ ≻ × _)%V.
-rewrite vect_mul_scal_l_dot_mul_swap.
-...
-
-vect_mul_vect_dot_
-...
-Check vect_scal_mul_dot_mul_comm.
-  rewrite <- vect_scal_mul_dot_mul_comm with (V := nth_eV i).
-Locate "×".
-Search (_ × _)%V.
-...
-Check vect_mul_scal_l.
-
-Theorem glop : ∀ a U V, (≺ U, U ≻ × V = (a * (U × V))%F)%V.
-...
-Theorem vect_mul_comm : ∀ U V, (U × V)%V = (V × U)%V.
-Search (_ × _)%V.
-Locate "×".
-Search (≺ _, _ ≻ × _)%V.
-Search (_ × ≺ _, _ ≻)%V.
-Search vect_mul_scal_l.
-...
-  rewrite <- vect_dot_mul_scal_mul_comm.
-...
-Search (≺ _, _ • _ ≻)%F.
-Search (≺ _, _ × _ ≻)%F.
-Search (_ * ≺ _, _ ≻)%F.
-...
-remember (∑ (i = _, _), _) as z.
-erewrite rngl_summation_eq_compat; [ | ]. 2: {
-erewrite rngl_summation_eq_compat; [ subst z | ]. 2: {
-  intros i Hi.
-  specialize (Hvn i Hi) as H1.
-  unfold vect_squ_norm in H1.
-Search (≺ _, _ ≻ * _)%F.
-Search (_ * ≺ _, _ ≻)%F.
-rewerite
-...
-  rewrite Hvn.
-  now intros i Hi; fold (nth_eV i).
+  rewrite <- vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
+  easy.
 }
 cbn.
-unfold Rayleigh_quotient.
 ...
 Search (≺ _ • _, _ ≻).
 Search (≺ _ , _ ≻ * _)%F.
