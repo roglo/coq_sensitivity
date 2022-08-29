@@ -1142,6 +1142,7 @@ erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
   now intros; cbn; rewrite rngl_mul_1_r, Hyi.
 }
 cbn - [ "^"%F ].
+...
 unfold eigenvalues_and_norm_vectors in HeV.
 destruct HeV as (Hvs & Hvd & Hvn & Hmv).
 erewrite rngl_summation_eq_compat. 2: {
@@ -1201,6 +1202,11 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn; symmetry.
+...
+  ============================
+  (≺ x, M • x ≻ / ≺ x, x ≻)%F =
+  ((∑ (i = 1, n), ev.(i) * ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻) /
+   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
 ...
 Search (≺ _, _ • _ ≻).
 mat_mul_vect_dot_vect:
