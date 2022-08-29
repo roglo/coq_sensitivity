@@ -1167,11 +1167,43 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 unfold Rayleigh_quotient.
-...
+(*
   ============================
   (≺ x, M • x ≻ / ≺ x, x ≻)%F =
   ((∑ (i = 1, n), ≺ nth_eV i, M • x ≻ * ≺ nth_eV i, x ≻) /
    (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
+*)
+unfold is_symm_mat in Hsym.
+destruct Hsym as (Hsmm, Htm).
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite <- (mat_transp_involutive _ M) at 1. 2: {
+    now apply squ_mat_is_corr.
+  }
+  rewrite <- mat_mul_vect_dot_vect; cycle 1. {
+    now destruct Hof.
+  } {
+    now destruct Hof; left.
+  } {
+    now rewrite <- Htm.
+  } {
+    rewrite mat_transp_nrows.
+    rewrite Hvs; [ | apply nth_In; flia Hi HneV ].
+    now rewrite square_matrix_ncols, Hr.
+  } {
+    rewrite mat_transp_nrows, Hsx.
+    now rewrite square_matrix_ncols, Hr.
+  }
+  rewrite <- Htm.
+  erewrite (Hmv i _ _ Hi eq_refl); [ | easy ].
+  rewrite vect_scal_mul_dot_mul_comm; [ | now destruct Hof; left ].
+  easy.
+}
+cbn; symmetry.
+...
+Search (≺ _, _ • _ ≻).
+mat_mul_vect_dot_vect:
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
