@@ -1085,10 +1085,10 @@ assert (HneV : n ≤ length eV). {
   symmetry in H1.
   apply rngl_1_neq_0 in H1; [ easy | now destruct Hof ].
 }
-assert
-  (Hyi :
-     ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth (i - 1) eV (vect_zero n), x ≻). {
+set (nth_eV := λ i, nth (i - 1) eV (vect_zero n)).
+assert (Hyi : ∀ i, 1 ≤ i ≤ n → vect_el y i = ≺ nth_eV i, x ≻). {
   intros i Hi.
+  unfold nth_eV.
   rewrite Hmax; cbn.
   rewrite map_map, Hur, Huc.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
@@ -1166,12 +1166,12 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-set (nth_eV := λ i, nth (i - 1) eV (vect_zero n)).
-erewrite rngl_summation_eq_compat by now intros i Hi; fold (nth_eV i).
-remember (∑ (i = _, _), _) as z eqn:Hz.
-erewrite rngl_summation_eq_compat by now intros i Hi; fold (nth_eV i).
-subst z.
 unfold Rayleigh_quotient.
+...
+  ============================
+  (≺ x, M • x ≻ / ≺ x, x ≻)%F =
+  ((∑ (i = 1, n), ≺ nth_eV i, M • x ≻ * ≺ nth_eV i, x ≻) /
+   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
