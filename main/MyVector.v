@@ -235,7 +235,7 @@ f_equal; symmetry.
 apply rngl_mul_assoc.
 Qed.
 
-(* to be completed
+(* seems to be false
 Theorem vect_mul_scal_l_dot_mul_swap :
   rngl_has_opp = true ∨ rngl_has_sous = true →
   rngl_is_comm = true →
@@ -243,6 +243,38 @@ Theorem vect_mul_scal_l_dot_mul_swap :
   (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
 Proof.
 intros Hopp Hcomm * Hu Hv Hw.
+Abort.
+End a.
+Require Import NatRingLike.
+Declare Scope V_scope.
+Delimit Scope V_scope with V.
+Arguments vect_add {T}%type {ro} (U V)%V.
+Arguments vect_sub {T ro} U%V V%V.
+Arguments vect_opp {T ro} V%V.
+Arguments vect_mul_scal_l {T ro} s%F V%V.
+Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
+Arguments vect_zero {T ro} n%nat.
+Arguments vect_dot_mul {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
+Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
+Arguments vect_el {T}%type {ro} V%V i%nat.
+Arguments vect_size {T}%type v%V.
+Arguments vect_squ_norm {T}%type {ro} V%V.
+Arguments vector_eq {T}%type {ro} (U V)%V.
+Notation "U + V" := (vect_add U V) : V_scope.
+Notation "U - V" := (vect_sub U V) : V_scope.
+Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
+Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
+Notation "- V" := (vect_opp V) : V_scope.
+Compute (
+  let U := mk_vect [3;4;5] in
+  let V := mk_vect [1;3;2] in
+  let W := mk_vect [8;1;1] in
+  (≺ U, V ≻ × W)%V = (≺ U, W ≻ × V)%V).
+(* it's false! *)
+...
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   destruct U as (llu).
@@ -372,6 +404,15 @@ erewrite map_ext_in. 2: {
   easy.
 }
 symmetry.
+...
+Require Import NatRingLike.
+Compute (
+  let llu := [3;4;5] in
+  let llv := [1;3;2] in
+  let llw := [8;1;1] in
+  let n := length llu in
+  map (λ i : nat, ∑ (j = 0, n - 1), nth j llu 0 * nth j llv 0 * nth i llw 0) (seq 0 n) =
+  map (λ i : nat, ∑ (j = 0, n - 1), nth j llu 0 * nth i llv 0 * nth j llw 0) (seq 0 n)).
 ...
 rewrite rngl_summation_seq_summation.
 ...
