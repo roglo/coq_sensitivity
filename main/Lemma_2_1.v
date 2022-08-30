@@ -1142,6 +1142,9 @@ erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
   now intros; cbn; rewrite rngl_mul_1_r, Hyi.
 }
 cbn - [ "^"%F ].
+unfold Rayleigh_quotient.
+rewrite Hx1.
+rewrite rngl_div_1_r; [ | now destruct Hof; left | now destruct Hof ].
 ...
 unfold eigenvalues_and_norm_vectors in HeV.
 destruct HeV as (Hvs & Hvd & Hvn & Hmv).
