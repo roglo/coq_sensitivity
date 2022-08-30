@@ -1031,6 +1031,7 @@ Qed.
 (* https://en.wikipedia.org/wiki/Rayleigh_quotient#Bounds_for_Hermitian_M *)
 (* https://en.wikipedia.org/wiki/Normal_matrix *)
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
+(* https://ecroot.math.gatech.edu/notes_linear.pdf *)
 
 (* to be completed
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
@@ -1053,6 +1054,14 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), vect_el y i ^ 2))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+...
+assert (mat_is_ortho U = true). {
+...
+}
+assert (mat_is_diag_and_hold_eigenv M). {
+...
+}
+...
 assert (Huc : mat_ncols U = n). {
   apply (f_equal mat_nrows) in Hmin.
   do 2 rewrite mat_mul_nrows in Hmin.
@@ -1145,7 +1154,7 @@ cbn - [ "^"%F ].
 unfold Rayleigh_quotient.
 rewrite Hx1.
 rewrite rngl_div_1_r; [ | now destruct Hof; left | now destruct Hof ].
-...
+(**)
 unfold eigenvalues_and_norm_vectors in HeV.
 destruct HeV as (Hvs & Hvd & Hvn & Hmv).
 erewrite rngl_summation_eq_compat. 2: {
@@ -1170,10 +1179,11 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-unfold Rayleigh_quotient.
+Search vect_dot_mul.
+...
 (*
   ============================
-  (≺ x, M • x ≻ / ≺ x, x ≻)%F =
+  ≺ x, M • x ≻ =
   ((∑ (i = 1, n), ≺ nth_eV i, M • x ≻ * ≺ nth_eV i, x ≻) /
    (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
 *)
