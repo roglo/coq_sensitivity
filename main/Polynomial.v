@@ -15,10 +15,16 @@ Record poly T {ro : ring_like_op T} := mk_poly
   { lap : list T;
     lap_prop : rngl_eqb (last lap 1%F) 0%F = false }.
 
+Arguments mk_poly {T ro} lap%list.
 Arguments lap {T ro}.
 
-Theorem eq_poly_eq : ∀ T {ro : ring_like_op T} (P Q : poly T),
-  P = Q ↔ lap P = lap Q.
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+
+Theorem eq_poly_eq : ∀ (P Q : poly T), P = Q ↔ lap P = lap Q.
 Proof.
 intros.
 split; intros Heq; [ now subst P | ].
@@ -30,39 +36,28 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-...
-
-Theorem eq_poly_prop {A} {rng : ring A} : ∀ la,
-  rng_eqb (last la 1%Rng) 0%Rng = false ↔ last la 1%Rng ≠ 0%Rng.
+Theorem lap_1_0_prop :
+  rngl_has_eqb = true →
+  rngl_has_1_neq_0 = true →
+  (last [] 1 =? 0)%F = false.
 Proof.
-intros.
-unfold rng_eqb.
-now destruct (rng_eq_dec (last la 1%Rng) 0%Rng).
+intros Heq H10; cbn.
+apply (rngl_eqb_neq Heq).
+now apply rngl_1_neq_0.
 Qed.
 
-Arguments mkpoly {_} {_}.
-
-Theorem lap_1_0_prop {A} {rng : ring A} :
-  rng_eqb (last [] 1%Rng) 0%Rng = false.
-Proof.
-cbn.
-unfold rng_eqb.
-destruct (rng_eq_dec 1%Rng 0%Rng); [ | easy ].
-now apply rng_1_neq_0 in e.
-Qed.
-
-Definition poly_zero {α} {r : ring α} := mkpoly [] lap_1_0_prop.
-Definition poly_one {α} {r : ring α} := mkpoly [1%Rng] lap_1_0_prop.
+Definition poly_zero Hop H10 := mk_poly [] (lap_1_0_prop Hop H10).
+Definition poly_one Hop H10 := mk_poly [1%F] (lap_1_0_prop Hop H10).
 
 (* normalization *)
 
-Fixpoint strip_0s {A} {rng : ring A} la :=
+Fixpoint strip_0s la :=
   match la with
   | [] => []
-  | a :: la' => if rng_eq_dec a 0%Rng then strip_0s la' else la
+  | a :: la' => if (a =? 0)%F then strip_0s la' else la
   end.
 
-Lemma strip_0s_app {A} {rng : ring A} : ∀ la lb,
+Lemma strip_0s_app : ∀ la lb,
   strip_0s (la ++ lb) =
   match strip_0s la with
   | [] => strip_0s lb
@@ -72,10 +67,28 @@ Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
-destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ apply IHla | easy ].
+destruct (a =? 0)%F; [ apply IHla | easy ].
 Qed.
 
-Definition lap_norm {A} {rng : ring A} la := rev (strip_0s (rev la)).
+Definition lap_norm la := rev (strip_0s (rev la)).
+
+Theorem poly_norm_prop : ∀ la, last (lap_norm la) 1%F ≠ 0%F.
+Proof.
+intros.
+unfold lap_norm.
+induction la as [| a]. {
+  apply rngl_1_neq_0.
+...
+induction la as [| a]; [ apply rngl_1_neq_0 | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; cbn. {
+  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ apply rng_1_neq_0 | easy ].
+}
+cbn in IHla.
+rewrite List_last_app.
+now rewrite List_last_app in IHla.
+Qed.
 
 Theorem poly_norm_prop {A} {rng : ring A} : ∀ la,
   last (lap_norm la) 1%Rng ≠ 0%Rng.
