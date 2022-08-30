@@ -1088,6 +1088,14 @@ assert
     rewrite Huc.
     now apply Nat.eqb_neq in Hnz; rewrite Hnz.
   }
+(* here I am waiting for me to have implemented:
+   - polynomials
+   - characteristic polynomials
+   - proof that all polynomials of degree n have n roots
+   - building eigenvalues and eigenvectors
+   - diagonalization
+   - and then U and D are the result of this diagonalization
+*)
 ...
   assert (Hdc : mat_ncols D = n) by _admit.
   assert (H1 : mat_nrows (U⁺ * D) = n). {
