@@ -1071,8 +1071,15 @@ assert
   assert (Huu1 : (U * U⁺ = mI n)%M) by admit.
   assert (Huu2 : (U⁺ * U = mI n)%M) by admit.
   destruct Hsym as (Hsmm, Htm).
+  assert (H1 : mat_nrows (U⁺ * D) ≠ 0). {
+    rewrite mat_mul_nrows. {
+      rewrite mat_transp_nrows.
+      rewrite square_matrix_ncols; [ | easy ].
+...
   assert (Hdm : D = (U * M * U⁺)%M). {
     rewrite Hmin.
+    rewrite mat_mul_assoc; [ | easy | | admit | admit ].
+...
     rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
     rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
     rewrite Huu1.
