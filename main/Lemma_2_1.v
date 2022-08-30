@@ -1057,61 +1057,61 @@ intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
 (**)
 Print Rayleigh_quotient.
 assert
-  (∀ v,
-     vect_size v = n
-     → Rayleigh_quotient M v =
-         (≺ U • v, D • (U • x) ≻ / ≺ U • x, U • x ≻)%F). {
+  (Hrqd :
+     ∀ v,
+       vect_size v = n
+       → Rayleigh_quotient M v =
+           (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%F). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
+  assert (Hos : rngl_has_opp = true ∨ rngl_has_sous = true) by now left.
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).
   unfold Rayleigh_quotient.
-  f_equal.
-(* marche mais incomplet
- 2: {
-    rewrite mat_mul_vect_dot_vect.
-    rewrite mat_vect_mul_assoc.
-...
-  ============================
-  ≺ v, v ≻ = ≺ x, (U⁺ * U) • x ≻
-    ...
-  }
-*)
-  {
-    destruct Hsym as (Hsmm, Htm).
-    rewrite Htm.
-    rewrite <- mat_mul_vect_dot_vect; try easy; try congruence. 2: {
-      now left.
-    }
+  assert (Huu1 : (U * U⁺ = mI n)%M) by admit.
+  assert (Huu2 : (U⁺ * U = mI n)%M) by admit.
+  destruct Hsym as (Hsmm, Htm).
+  assert (Hdm : D = (U * M * U⁺)%M). {
     rewrite Hmin.
-    rewrite <- mat_vect_mul_assoc.
-    rewrite mat_mul_vect_dot_vect.
-    rewrite mat_transp_mul.
-    rewrite mat_transp_involutive.
-    rewrite <- mat_vect_mul_assoc.
-    f_equal; f_equal.
-assert (Hdd : D⁺%M = D). {
-  generalize Hmin; intros H.
-  apply (f_equal mat_transp) in H.
-  do 2 rewrite mat_transp_mul in H.
-  rewrite mat_transp_involutive in H.
-  rewrite mat_mul_assoc in H.
-  rewrite <- Htm in H.
-assert (Hdm : D = (U * M * U⁺)%M). {
+    rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
+    rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
+    rewrite Huu1.
+    rewrite mat_mul_1_l; [ | easy | admit | admit ].
+    rewrite <- mat_mul_assoc; [ | easy | admit | admit | admit ].
+    rewrite Huu1.
+    symmetry; apply mat_mul_1_r; [ easy | admit | admit ].
+  }
+  assert (Hdd : D⁺%M = D). {
+    rewrite Hdm.
+    rewrite mat_transp_mul; [ | easy | admit | admit | admit | admit | admit ].
+    rewrite mat_transp_involutive; [ | admit ].
+    rewrite mat_transp_mul; [ | easy | admit | admit | admit | admit | admit ].
+    rewrite <- Htm.
+    rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
+    easy.
+  }
+  f_equal. 2: {
+    rewrite mat_mul_vect_dot_vect; [ | easy | easy | easy | admit | admit ].
+    rewrite mat_vect_mul_assoc; [ | easy | admit | admit | admit | admit ].
+    rewrite Huu2.
+    now rewrite mat_vect_mul_1_l.
+  }
+  rewrite Htm.
+  rewrite <- mat_mul_vect_dot_vect; try easy; try congruence.
   rewrite Hmin.
-  rewrite mat_mul_assoc.
-  rewrite mat_mul_assoc.
-assert (Huu : (U * U⁺ = mI n)%M).
+  rewrite <- mat_vect_mul_assoc; [ | easy | admit | admit | admit | admit ].
+  rewrite mat_mul_vect_dot_vect; [ | easy | admit | admit | admit | admit ].
+  rewrite mat_transp_mul; [ | easy | admit | admit | admit | admit | admit ].
+  rewrite mat_transp_involutive; [ | admit ].
+  rewrite <- mat_vect_mul_assoc; [ | easy | admit | admit | admit | admit ].
+  now rewrite Hdd.
+}
 (* bon, il faut que je prouve que, si M est symétrique, alors
    M est diagonalisable avec M = U⁺ D U, avec
    - U est orthogonale, c'est-à-dire U U⁺ = 1
    - D est diagonale
    - la diagonale de D contient les valeurs propres de M
 *)
-...
-Search (≺ _, _ • _ ≻).
-mat_mul_vect_dot_vect:
-≺ M • U, V ≻ = ≺ U, M⁺ • V ≻
 ...
 assert (mat_is_ortho U = true). {
 ...
