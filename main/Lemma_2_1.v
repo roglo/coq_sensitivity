@@ -1068,21 +1068,46 @@ assert
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).
   unfold Rayleigh_quotient.
+  destruct Hsym as (Hsmm, Htm).
+  assert (Hur : mat_nrows U = n). {
+    apply (f_equal mat_nrows) in Hmin.
+    rewrite mat_mul_nrows in Hmin.
+    rewrite mat_mul_nrows in Hmin.
+    rewrite mat_transp_nrows in Hmin.
+    rewrite square_matrix_ncols in Hmin; [ | easy ].
+    congruence.
+  }
+  assert (Huc : mat_ncols U = n). {
+    now rewrite square_matrix_ncols.
+  }
+  assert (Hu'r : mat_nrows U⁺ = n). {
+    now rewrite mat_transp_nrows.
+  }
+  assert (Hu'c : mat_ncols U⁺ = n). {
+    rewrite mat_transp_ncols.
+    rewrite Huc.
+    now apply Nat.eqb_neq in Hnz; rewrite Hnz.
+  }
+  assert (Hdc : mat_ncols D = n) by admit.
+  assert (H1 : mat_nrows (U⁺ * D) = n). {
+    rewrite mat_mul_nrows, mat_transp_nrows.
+    congruence.
+  }
+  assert (H2 : mat_ncols (U⁺ * D) = n). {
+    rewrite mat_mul_ncols; [ congruence | ].
+    rewrite mat_transp_nrows.
+    rewrite square_matrix_ncols; [ | easy ].
+    congruence.
+  }
   assert (Huu1 : (U * U⁺ = mI n)%M) by admit.
   assert (Huu2 : (U⁺ * U = mI n)%M) by admit.
-  destruct Hsym as (Hsmm, Htm).
-  assert (H1 : mat_nrows (U⁺ * D) ≠ 0). {
-    rewrite mat_mul_nrows. {
-      rewrite mat_transp_nrows.
-      rewrite square_matrix_ncols; [ | easy ].
-...
   assert (Hdm : D = (U * M * U⁺)%M). {
     rewrite Hmin.
-    rewrite mat_mul_assoc; [ | easy | | admit | admit ].
-...
-    rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
-    rewrite mat_mul_assoc; [ | easy | admit | admit | admit ].
+    rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
+    rewrite mat_mul_assoc; [ | easy | | | ]; try congruence.
     rewrite Huu1.
+    rewrite mat_mul_1_l; [ | easy | | ]. 2: {
+...
     rewrite mat_mul_1_l; [ | easy | admit | admit ].
     rewrite <- mat_mul_assoc; [ | easy | admit | admit | admit ].
     rewrite Huu1.
