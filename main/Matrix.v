@@ -3050,8 +3050,9 @@ Module matrix_Notations.
 Declare Scope M_scope.
 Delimit Scope M_scope with M.
 
-Arguments mat_el {T}%type {ro} M%M (i j)%nat.
-Arguments mat_add {T}%type {ro} (MA MB)%M.
+Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
+Arguments is_correct_matrix {T}%type M%M.
+Arguments is_square_matrix {T}%type M%M.
 Arguments mat_add_0_l {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_0_r {T}%type {ro rp} {m n}%nat M%M.
 Arguments mat_add_add_swap {T}%type {ro rp} (MA MB MC)%M.
@@ -3059,47 +3060,47 @@ Arguments mat_add_assoc {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_add_comm {T}%type {ro rp} (MA MB)%M.
 Arguments mat_add_opp_r {T}%type {ro rp} Hop M%M.
 Arguments mat_add_sub {T}%type {ro rp} Hop (MA MB)%M.
+Arguments mat_add {T}%type {ro} (MA MB)%M.
+Arguments mat_el {T}%type {ro} M%M (i j)%nat.
 Arguments mat_list_list {T}%type m%M.
-Arguments mat_mul {T}%type {ro} (MA MB)%M.
+Arguments mat_mul_1_l {T}%type {ro rp} Hop {n}%nat M%M.
+Arguments mat_mul_1_r {T}%type {ro rp} Hop {n}%nat M%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_mul_assoc {T}%type {ro rp} Hop (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hop Hic a%F (MA MB)%M.
+Arguments mat_mul_scal_1_l {T}%type {ro rp} M%M.
 Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
 Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.
-Arguments mat_mul_scal_1_l {T}%type {ro rp} M%M.
-Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%F (MA MB)%M.
 Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%F M%M.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hop Hic a%F (MA MB)%M.
+Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%F (MA MB)%M.
 Arguments mat_mul_scal_l {T ro} s%F M%M.
-Arguments mat_mul_vect_r {T ro} M%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%F MA%M V%V.
 Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hop a%F MA%M V%V.
-Arguments mat_nrows {T}%type M%M.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%F MA%M V%V.
+Arguments mat_mul {T}%type {ro} (MA MB)%M.
+Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_ncols {T}%type M%M.
-Arguments mat_vect_mul_assoc {T}%type {ro rp} Hop (A B)%M V%V.
-Arguments mat_mul_1_l {T}%type {ro rp} Hop {n}%nat M%M.
-Arguments mat_mul_1_r {T}%type {ro rp} Hop {n}%nat M%M.
+Arguments mat_nrows {T}%type M%M.
 Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
-Arguments mat_sub {T ro} MA%M MB%M.
-Arguments mat_transp {T ro} M%M.
-Arguments mat_transp_is_square {T ro} M%M.
-Arguments mat_transp_nrows {T}%type {ro} M%M.
-Arguments mI {T ro} n%nat.
-Arguments mZ {T ro} (m n)%nat.
-Arguments mI_any_seq_start {T ro} (sta len)%nat.
-Arguments minus_one_pow {T ro}.
-Arguments subm {T} i%nat j%nat M%M.
+Arguments matrix_eq {T ro} (MA MB)%M.
 Arguments mat_subm_transp {T ro} [i j]%nat.
+Arguments mat_sub {T ro} MA%M MB%M.
+Arguments mat_transp_is_square {T ro} M%M.
+Arguments mat_transp_mul {T ro rp} _ (MA MB)%M.
+Arguments mat_transp_nrows {T}%type {ro} M%M.
+Arguments mat_transp {T ro} M%M.
 Arguments mat_vect_mul_0_r {T}%type {ro rp} Hop [m n]%nat M%M.
 Arguments mat_vect_mul_1_l {T}%type {ro rp} Hop {n}%nat V%V.
-Arguments δ {T}%type {ro} (i j)%nat.
-Arguments matrix_eq {T ro} (MA MB)%M.
-Arguments is_correct_matrix {T}%type M%M.
-Arguments is_square_matrix {T}%type M%M.
+Arguments mat_vect_mul_assoc {T}%type {ro rp} Hop (A B)%M V%V.
+Arguments mI_any_seq_start {T ro} (sta len)%nat.
 Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
+Arguments minus_one_pow {T ro}.
+Arguments mI {T ro} n%nat.
+Arguments mZ {T ro} (m n)%nat.
 Arguments square_matrix_ncols {T}%type M%M.
-Arguments Build_square_matrix n%nat [T]%type sm_mat%M.
+Arguments subm {T} i%nat j%nat M%M.
+Arguments δ {T}%type {ro} (i j)%nat.
 
 Notation "A + B" := (mat_add A B) : M_scope.
 Notation "A - B" := (mat_sub A B) : M_scope.

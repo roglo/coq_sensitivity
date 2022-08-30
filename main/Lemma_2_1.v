@@ -1054,6 +1054,64 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
        (∑ (i = 1, n), vect_el y i ^ 2))%F.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
+(**)
+Print Rayleigh_quotient.
+assert
+  (∀ v,
+     vect_size v = n
+     → Rayleigh_quotient M v =
+         (≺ U • v, D • (U • x) ≻ / ≺ U • x, U • x ≻)%F). {
+  intros v Hsv.
+  destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
+  unfold eigenvalues_and_norm_vectors in HeV.
+  destruct HeV as (Hvs & Hvd & Hvn & Hmv).
+  unfold Rayleigh_quotient.
+  f_equal.
+(* marche mais incomplet
+ 2: {
+    rewrite mat_mul_vect_dot_vect.
+    rewrite mat_vect_mul_assoc.
+...
+  ============================
+  ≺ v, v ≻ = ≺ x, (U⁺ * U) • x ≻
+    ...
+  }
+*)
+  {
+    destruct Hsym as (Hsmm, Htm).
+    rewrite Htm.
+    rewrite <- mat_mul_vect_dot_vect; try easy; try congruence. 2: {
+      now left.
+    }
+    rewrite Hmin.
+    rewrite <- mat_vect_mul_assoc.
+    rewrite mat_mul_vect_dot_vect.
+    rewrite mat_transp_mul.
+    rewrite mat_transp_involutive.
+    rewrite <- mat_vect_mul_assoc.
+    f_equal; f_equal.
+assert (Hdd : D⁺%M = D). {
+  generalize Hmin; intros H.
+  apply (f_equal mat_transp) in H.
+  do 2 rewrite mat_transp_mul in H.
+  rewrite mat_transp_involutive in H.
+  rewrite mat_mul_assoc in H.
+  rewrite <- Htm in H.
+assert (Hdm : D = (U * M * U⁺)%M). {
+  rewrite Hmin.
+  rewrite mat_mul_assoc.
+  rewrite mat_mul_assoc.
+assert (Huu : (U * U⁺ = mI n)%M).
+(* bon, il faut que je prouve que, si M est symétrique, alors
+   M est diagonalisable avec M = U⁺ D U, avec
+   - U est orthogonale, c'est-à-dire U U⁺ = 1
+   - D est diagonale
+   - la diagonale de D contient les valeurs propres de M
+*)
+...
+Search (≺ _, _ • _ ≻).
+mat_mul_vect_dot_vect:
+≺ M • U, V ≻ = ≺ U, M⁺ • V ≻
 ...
 assert (mat_is_ortho U = true). {
 ...
