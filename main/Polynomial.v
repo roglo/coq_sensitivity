@@ -176,12 +176,23 @@ Arguments lap_monom {T ro} i%nat.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments monom {T ro rp Heb H10} i%nat.
 
+(*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (lap_monom 1).
 Compute (lap_monom 3).
 Global Existing Instance Z_ring_like_prop.
 Compute (monom 1).
+*)
+Require Import NatRingLike.
+Compute (lap_monom 1).
+Compute (monom 1).
+(* ah bin zut, ça affiche le long Z_ring_like_prop *)
+(* puis je vois plus tard que ça n'affiche pas la notation prévue
+   non plus *)
+(* peut-être que, finalement, faut que je laisse tomber ce champ
+   "lap_prop" dans le type polyn ? *)
+...
 Opaque Z_ring_like_prop.
 Compute (monom 3).
 Opaque monom_norm.
