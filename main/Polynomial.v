@@ -13,7 +13,9 @@ Require Import Misc RingLike.
 (* (lap : list as polynomial) *)
 Record poly T {ro : ring_like_op T} := mk_poly
   { lap : list T;
-    lap_prop : rngl_eqb (last lap 1%F) 0%F = false }.
+    lap_prop : (last lap 1 ≠? 0)%F = true }.
+
+Print poly.
 
 Arguments mk_poly {T ro} lap%list.
 Arguments lap {T ro}.
@@ -23,6 +25,8 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
+
+Print poly.
 
 Theorem eq_poly_eq : ∀ (P Q : poly T), P = Q ↔ lap P = lap Q.
 Proof.
@@ -39,9 +43,10 @@ Qed.
 Theorem lap_1_0_prop :
   rngl_has_eqb = true →
   rngl_has_1_neq_0 = true →
-  (last [] 1 =? 0)%F = false.
+  (last [] 1 ≠? 0)%F = true.
 Proof.
 intros Heq H10; cbn.
+apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heq).
 now apply rngl_1_neq_0.
 Qed.
