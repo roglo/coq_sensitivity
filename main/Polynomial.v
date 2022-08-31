@@ -12,6 +12,39 @@ Require Import Misc RingLike IterAdd.
 
 (* definition of a polynomial *)
 
+(*
+Module ListNotations.
+Notation "[ ]" := nil (format "[ ]") : list_scope.
+Notation "[ x ]" := (cons x nil) : list_scope.
+Notation "[ x ; y ; .. ; z ]" :=  (cons x (cons y .. (cons z nil) ..)) : list_scope.
+End ListNotations.
+*)
+
+Print list.
+(* faire une copie du type list à utiliser pour les polynômes
+   qui auront donc leur syntaxe *)
+...
+
+Module MyListNotations.
+Notation "'[' ']'" := nil (format "[ ]") : list_scope.
+Notation "[ x ]" := (cons x nil) : list_scope.
+Notation "[ x ; y ; .. ; z ]" :=  (cons x (cons y .. (cons z nil) ..)) : list_scope.
+End MyListNotations.
+
+Import MyListNotations.
+
+Compute nil.
+Compute ([])%list.
+
+...
+
+Pour la notation des polynômes, par exemple pour afficher 3x2-2x+5
+comme, mettons 3ⓧ^2-2ⓧ+5, voir comment s'affichent les notations
+des listes, par exemple [5;-2;3] dans la librairie de Coq.
+ListNotations
+
+...
+
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
 Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
@@ -155,7 +188,18 @@ Definition lap_mul la lb :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
-(* monomial x^i *)
+(* monomial a * x^i *)
+
+Definition lap_monom a i := repeat 0%F i ++ [a].
+
+Theorem monom_norm : ∀ a i, last_lap_neq_0 (lap_monom a i).
+...
+
+Definition monom a i := mk_polyn (lap_monom a i) 42.
+
+...
+
+(* monomial x^i (to be removed) *)
 
 Theorem monom_norm : ∀ i, last_lap_neq_0 (repeat 0%F i ++ [1%F]).
 Proof.
