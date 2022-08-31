@@ -6,7 +6,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List ListNotations.
+Import Init.Nat List ListNotations.
 
 Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
@@ -67,36 +67,27 @@ Arguments mk_polyn {T ro} monl%plist_scope.
 Arguments monl_prop {T ro p}.
 *)
 
+(*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute
   (mk_polyn
      (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-(*
-Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
 *)
 
-(*
-Notation "c 'ⓧ'" := (Mon c 1) (at level 30, format "c ⓧ") : monl_scope.
-Notation "c 'ⓧ' a" :=
-  (Mon c a) (at level 30, format "c ⓧ a") : monl_scope.
-*)
 Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓") : monl_scope.
 Notation "c ☓ a" :=
   (Mon c a) (at level 30, format "c ☓ a") : monl_scope.
+
 (*
-Notation "c ⒳" := (Mon c 1) (at level 30, format "c ⒳") : monl_scope.
-Notation "c ⒳ a" :=
-  (Mon c a) (at level 30, format "c ⒳ a") : monl_scope.
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
+
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
 *)
-
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
 
 (*
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
@@ -105,31 +96,22 @@ Compute [3ⓧ5; (-5)ⓧ2; 8ⓧ].
 *)
 Compute (Mon 3 8).
 
-(*
-Module PlistNotations.
-Notation "x ⊕ y ⊕ .. ⊕ z" :=
-  (pcons x (pcons y .. (pcons z pnil) ..))
-  (at level 50, format "x  ⊕  y  ⊕  ..  ⊕  z")
-  : plist_scope.
-End PlistNotations.
-*)
 Module PlistNotations.
 Notation "x ☩ y ☩ .. ☩ z" :=
   (pcons x (pcons y .. (pcons z pnil) ..))
   (at level 50, y at next level, z at next level, format "x  ☩  y  ☩  ..  ☩  z")
   : plist_scope.
 End PlistNotations.
-(**)
 
 Compute (3 + 4).
 Import PlistNotations.
-Print Grammar constr.
 Compute (3 + 4).
 
 Compute (Mon 8 0).
 
 Open Scope monl_scope.
 
+(*
 Compute
   (mk_polyn
      (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
@@ -143,6 +125,76 @@ Compute (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl).
 Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%P.
 
 Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
+*)
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+(*
+Context (rp : ring_like_prop T).
+Context {Heb : rngl_has_eqb = true}.
+Context {H10 : rngl_has_1_neq_0 = true}.
+*)
+
+(* addition *)
+
+Fixpoint monl_add it al1 al2 :=
+  match it with
+  | 0 => pnil
+  | S it' =>
+      match al1 with
+      | pnil => al2
+      | pcons (Mon c1 d1) bl1 =>
+          match al2 with
+          | pnil => al1
+          | pcons (Mon c2 d2) bl2 =>
+              match Nat.compare d1 d2 with
+              | Lt => pcons (Mon c2 d2) (monl_add it' al1 bl2)
+              | Eq => pcons (Mon (c1 + c2)%F d1) (monl_add it' bl1 bl2)
+              | Gt => pcons (Mon c1 d1) (monl_add it' bl1 al2)
+              end
+          end
+      end
+  end.
+
+Definition degree p :=
+  match monl p with
+  | pcons (Mon _ d) _ => d
+  | pnil => 0 (* should be -1 *)
+  end.
+
+Theorem polyn_add_is_correct : ∀ p1 p2,
+  monl_is_correct
+    (monl_add (Init.Nat.max (degree p1) (degree p2)) (monl p1) (monl p2)) =
+  true.
+Proof.
+intros.
+unfold monl_is_correct.
+apply Bool.andb_true_iff.
+split. {
+Search is_sorted.
+...
+
+Definition polyn_add p1 p2 :=
+  mk_polyn (monl_add (max (degree p1) (degree p2)) (monl p1) (monl p2))
+    (polyn_add_is_correct p1 p2).
+
+...
+
+End a.
+
+Require Import NatRingLike.
+Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)%P).
+Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
+Compute
+  (polyn_add
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)).
+Compute
+  (polyn_add
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
+     (mk_polyn (3☓5 ☩ 5☓ ☩ 8☓0) eq_refl)).
 
 ...
 
