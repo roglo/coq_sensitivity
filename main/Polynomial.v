@@ -12,41 +12,12 @@ Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
 (* definition of a polynomial *)
 
-Inductive monom T := Mon : T → nat → monom T.
+Record monom T := Mon { mcoeff : T; mdeg : nat }.
 
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (Mon (-3) 4).
-*)
-
-Definition mdeg {T} (m : monom T) := match m with Mon _ d => d end.
-Definition mcoeff {T} (m : monom T) := match m with Mon c _ => c end.
-
-(*
-Require Import ZArith RnglAlg.Zrl.
-Open Scope Z_scope.
-Compute (monl_is_correct [Mon 3 5; Mon 5 2; Mon 8 0]).
-*)
-
-(*
-Inductive plist (A : Type) : Type :=
-  | pnil : plist A
-  | pcons : A → plist A → plist A.
-
-Declare Scope plist_scope.
-Delimit Scope plist_scope with plist.
-Arguments pnil {A}%type.
-Arguments pcons {A}%type a l%plist_scope.
-(*
-Open Scope plist_scope.
-*)
-
-Fixpoint list_of_plist {A} (pl : plist A) :=
-  match pl with
-  | pnil => []
-  | pcons a pl' => a :: list_of_plist pl'
-  end.
 *)
 
 Declare Scope plist_scope.
@@ -170,26 +141,6 @@ Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ 5☓
 Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
 *)
 
-(*
-Theorem polyn_add_is_correct : ∀ p1 p2,
-  monl_is_correct
-    (monl_add (Init.Nat.max (degree p1) (degree p2)) (monl p1) (monl p2)) =
-  true.
-Proof.
-intros.
-unfold monl_is_correct.
-apply Bool.andb_true_iff.
-split. {
-  destruct p1 as (l1, p1).
-  destruct p2 as (l2, p2).
-  move l2 before l1; cbn.
-  unfold degree; cbn.
-  remember (max _ _) as it eqn:Hit; symmetry in Hit.
-  revert l1 l2 p1 p2 Hit.
-  induction it; intros; [ easy | cbn ].
-...
-*)
-
 Theorem polyn_add_is_correct : ∀ p1 p2,
   let it := max (degree p1) (degree p2) in
   monl_is_correct
@@ -197,7 +148,7 @@ Theorem polyn_add_is_correct : ∀ p1 p2,
 Proof.
 intros.
 subst it.
-unfold monl_is_correct.
+unfold monl_is_correct; cbn.
 apply Bool.andb_true_iff.
 destruct p1 as ((l1), p1).
 destruct p2 as ((l2), p2).
@@ -279,6 +230,7 @@ split. {
     cbn in Hm.
     destruct m1 as (c1', d1').
     destruct m2 as (c2', d2').
+    cbn in Hm12.
 ...
 Print mdeg.
 Print monl_degree.
