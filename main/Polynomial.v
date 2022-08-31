@@ -29,6 +29,7 @@ Open Scope Z_scope.
 Compute (monl_is_correct [Mon 3 5; Mon 5 2; Mon 8 0]).
 *)
 
+(*
 Inductive plist (A : Type) : Type :=
   | pnil : plist A
   | pcons : A → plist A → plist A.
@@ -46,85 +47,67 @@ Fixpoint list_of_plist {A} (pl : plist A) :=
   | pnil => []
   | pcons a pl' => a :: list_of_plist pl'
   end.
+*)
+
+Declare Scope plist_scope.
+Declare Scope polyn_scope.
+Declare Scope monom_scope.
+
+Delimit Scope plist_scope with plist.
+Delimit Scope polyn_scope with P.
+Delimit Scope monom_scope with M.
+
+Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓") : monom_scope.
+Notation "c ☓ a" :=
+  (Mon c a) (at level 30, format "c ☓ a") : monom_scope.
+
+Open Scope monom_scope.
+
+Record plist T := mk_plist { p_list : list T }.
 
 Definition monl_is_correct T {ro : ring_like_op T} (monl : plist (monom T)) :=
-  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (list_of_plist monl) &&
-   ⋀ (x ∈ list_of_plist monl), (mcoeff x ≠? 0)%F)%bool.
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (p_list monl) &&
+   ⋀ (x ∈ p_list monl), (mcoeff x ≠? 0)%F)%bool.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { monl : plist (monom T);
     monl_prop : monl_is_correct monl = true }.
 
-Declare Scope monl_scope.
-Delimit Scope monl_scope with m.
-
-Declare Scope polyn_scope.
-Delimit Scope polyn_scope with p.
-
-Arguments polyn T%type {ro}.
+Arguments p_list {T} p%plist.
 Arguments mk_polyn {T ro} monl%plist_scope.
-(*
-Arguments monl_prop {T ro p}.
-*)
+Arguments polyn T%type {ro}.
 
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-*)
-
-Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓") : monl_scope.
-Notation "c ☓ a" :=
-  (Mon c a) (at level 30, format "c ☓ a") : monl_scope.
-
-(*
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-*)
-
-(*
-Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
-Compute (mk_polyn [3ⓧ5; (-5)ⓧ2; 8ⓧ] eq_refl).
-Compute [3ⓧ5; (-5)ⓧ2; 8ⓧ].
-*)
+Compute (mk_polyn (mk_plist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
+Open Scope monom_scope.
+Compute (mk_polyn (mk_plist [3☓5; (-5)☓2; 8☓0]) eq_refl).
 Compute (Mon 3 8).
+*)
 
 Module PlistNotations.
 Notation "x ☩ y ☩ .. ☩ z" :=
-  (pcons x (pcons y .. (pcons z pnil) ..))
-  (at level 50, y at next level, z at next level, format "x  ☩  y  ☩  ..  ☩  z")
+  (mk_plist (cons x (cons y .. (cons z nil) ..)))
+  (at level 50, y at next level, z at next level,
+   format "x  ☩  y  ☩  ..  ☩  z")
   : plist_scope.
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn (mk_plist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
+Compute (mk_polyn (mk_plist [3☓5; (-5)☓2; 8☓0]) eq_refl).
+Compute (Mon 3 8).
+*)
 End PlistNotations.
 
-Compute (3 + 4).
 Import PlistNotations.
-Compute (3 + 4).
-
-Compute (Mon 8 0).
-
-Open Scope monl_scope.
 
 (*
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
-
-Compute
-  (mk_polyn
-     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 1) pnil))) eq_refl).
-
-Compute (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl).
-
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%P.
-
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%plist.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%plist.
 *)
 
 Section a.
@@ -141,48 +124,51 @@ Context {H10 : rngl_has_1_neq_0 = true}.
 
 Fixpoint monl_add it al1 al2 :=
   match it with
-  | 0 => pnil
+  | 0 => []
   | S it' =>
       match al1 with
-      | pnil => al2
-      | pcons (Mon c1 d1) bl1 =>
+      | [] => al2
+      | Mon c1 d1 :: bl1 =>
           match al2 with
-          | pnil => al1
-          | pcons (Mon c2 d2) bl2 =>
+          | [] => al1
+          | Mon c2 d2 :: bl2 =>
               match Nat.compare d1 d2 with
-              | Lt => pcons (Mon c2 d2) (monl_add it' al1 bl2)
-              | Gt => pcons (Mon c1 d1) (monl_add it' bl1 al2)
+              | Lt => Mon c2 d2 :: monl_add it' al1 bl2
+              | Gt => Mon c1 d1 :: monl_add it' bl1 al2
               | Eq =>
                   let c := (c1 + c2)%F in
                   if (c =? 0)%F then monl_add it' bl1 bl2
-                  else pcons (Mon c d1) (monl_add it' bl1 bl2)
+                  else Mon c d1 :: monl_add it' bl1 bl2
               end
           end
       end
   end.
 
-Definition monl_degree {T} (ml : plist (monom T)) :=
+Definition monl_degree {T} (ml : list (monom T)) :=
   match ml with
-  | pcons (Mon _ d) _ => d
-  | pnil => 0 (* should be -1 *)
+  | Mon _ d :: _ => d
+  | [] => 0 (* should be -1 *)
   end.
 
-Definition degree p := monl_degree (monl p).
+Definition degree p := monl_degree (p_list (monl p)).
+
+Arguments monl_add it%nat al1%list al2%list.
+Arguments monl_is_correct {T ro} monl%plist.
 
 (*
 End a.
-
-Arguments monl_add {T ro} it%nat al1%plist al2%plist.
+Arguments monl_add {T ro} it%nat al1%list al2%list.
 Arguments monl_is_correct {T ro} monl%plist.
-
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓7)).
 Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
-Compute (monl_add 50 (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ 5☓2 ☩ 8☓)).
-Compute (monl_add 50 (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ (-5)☓2 ☩ 8☓)).
+Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ 5☓2 ☩ 8☓))).
+Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
 *)
 
+(*
 Theorem polyn_add_is_correct : ∀ p1 p2,
   monl_is_correct
     (monl_add (Init.Nat.max (degree p1) (degree p2)) (monl p1) (monl p2)) =
@@ -200,9 +186,37 @@ split. {
   revert l1 l2 p1 p2 Hit.
   induction it; intros; [ easy | cbn ].
 ...
+*)
+
+Theorem polyn_add_is_correct : ∀ p1 p2,
+  let it := max (degree p1) (degree p2) in
+  monl_is_correct
+    (mk_plist (monl_add it (p_list (monl p1)) (p_list (monl p2)))) = true.
+Proof.
+intros.
+subst it.
+unfold monl_is_correct.
+apply Bool.andb_true_iff.
+destruct p1 as ((l1), p1).
+destruct p2 as ((l2), p2).
+move l2 before l1.
+unfold degree; cbn.
+unfold monl_is_correct in p1, p2.
+cbn in p1,p2.
+apply Bool.andb_true_iff in p1, p2.
+destruct p1 as (Hs1, Hc1).
+destruct p2 as (Hs2, Hc2).
+move Hs2 before Hs1.
+remember (max (monl_degree l1) (monl_degree l2)) as it eqn:Hit.
+symmetry in Hit.
+split. {
+  revert l1 l2 Hs1 Hs2 Hc1 Hc2 Hit.
+  induction it; intros; [ easy | cbn ].
+...
 
 Definition polyn_add p1 p2 :=
-  mk_polyn (monl_add (max (degree p1) (degree p2)) (monl p1) (monl p2))
+  let it := max (degree p1) (degree p2) in
+  mk_polyn (mk_plist (monl_add it (p_list (monl p1)) (p_list (monl p2))))
     (polyn_add_is_correct p1 p2).
 
 ...
