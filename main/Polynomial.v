@@ -8,11 +8,12 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List ListNotations.
 
-Require Import Misc RingLike.
+Require Import Misc RingLike IterAdd.
 
 (* definition of a polynomial *)
 
 (* (lap : list as polynomial) *)
+(* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
 Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
   (last lap 1 ≠? 0)%F = true.
 
@@ -29,7 +30,7 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
-Context {Hop : rngl_has_eqb = true}.
+Context {Heb : rngl_has_eqb = true}.
 Context {H10 : rngl_has_1_neq_0 = true}.
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
@@ -61,12 +62,12 @@ Qed.
 Theorem lap_1_0_prop : last_lap_neq_0 [].
 Proof.
 apply Bool.negb_true_iff.
-apply (rngl_eqb_neq Hop).
+apply (rngl_eqb_neq Heb).
 apply (rngl_1_neq_0 H10).
 Qed.
 
-Definition poly_zero := mk_polyn [] lap_1_0_prop.
-Definition poly_one := mk_polyn [1%F] lap_1_0_prop.
+Definition polyn_zero := mk_polyn [] lap_1_0_prop.
+Definition polyn_one := mk_polyn [1%F] lap_1_0_prop.
 
 (* normalization *)
 
@@ -95,129 +96,55 @@ Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
 Proof.
 intros.
 unfold last_lap_neq_0, lap_norm.
-induction la as [| a]. {
-  cbn.
+induction la as [| a]; cbn. {
   apply Bool.negb_true_iff.
-Check rngl_add_comm.
-...
-  apply rngl_1_neq_0.
-...
+  apply (rngl_eqb_neq Heb).
+  now apply rngl_1_neq_0.
+}
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; cbn. {
+  remember (a =? 0)%F as az eqn:Haz; symmetry in Haz.
+  destruct az; [ easy | cbn ].
+  now apply Bool.negb_true_iff.
+}
+cbn in IHla.
+now rewrite last_last in IHla |-*.
+Qed.
 
-Definition polyn_norm (la : list T) :=
+Definition polyn_norm la :=
   mk_polyn (lap_norm la) (polyn_norm_prop la).
-...
-
-Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
-Proof.
-intros.
-unfold last_lap_neq_0, lap_norm.
-induction la as [| a]. {
-  cbn.
-  apply Bool.negb_true_iff.
-...
-  apply rngl_1_neq_0.
-...
-induction la as [| a]; [ apply rngl_1_neq_0 | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]; cbn. {
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ apply rng_1_neq_0 | easy ].
-}
-cbn in IHla.
-rewrite List_last_app.
-now rewrite List_last_app in IHla.
-Qed.
-
-Theorem poly_norm_prop {A} {rng : ring A} : ∀ la,
-  last (lap_norm la) 1%Rng ≠ 0%Rng.
-Proof.
-intros.
-unfold lap_norm.
-induction la as [| a]; [ apply rng_1_neq_0 | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]; cbn. {
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ apply rng_1_neq_0 | easy ].
-}
-cbn in IHla.
-rewrite List_last_app.
-now rewrite List_last_app in IHla.
-Qed.
-
-Definition poly_norm {A} {rng : ring A} la :=
-  mkpoly (lap_norm la) (proj2 (eq_poly_prop _) (poly_norm_prop la)).
-
-(**)
-Require Import ZArith.
-
-Theorem Z_1_neq_0 : (1 ≠ 0)%Z.
-Proof. easy. Qed.
-
-Definition Z_ring : ring Z :=
-  {| rng_zero := 0%Z;
-     rng_one := 1%Z;
-     rng_add := Z.add;
-     rng_mul := Z.mul;
-     rng_opp := Z.opp;
-     rng_1_neq_0 := Z_1_neq_0;
-     rng_eq_dec := Z.eq_dec;
-     rng_add_comm := Z.add_comm;
-     rng_add_assoc := Z.add_assoc;
-     rng_add_0_l := Z.add_0_l;
-     rng_add_opp_l := Z.add_opp_diag_l;
-     rng_mul_comm := Z.mul_comm;
-     rng_mul_assoc := Z.mul_assoc;
-     rng_mul_1_l := Z.mul_1_l;
-     rng_mul_add_distr_l := Z.mul_add_distr_l |}.
-
-(* allows to use ring theorems on Z *)
-Canonical Structure Z_ring.
-
-(*
-Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
-*)
-(**)
 
 (* addition *)
 
-Fixpoint lap_add {α} {r : ring α} al1 al2 :=
+Fixpoint lap_add al1 al2 :=
   match al1 with
   | [] => al2
   | a1 :: bl1 =>
       match al2 with
       | [] => al1
-      | a2 :: bl2 => (a1 + a2)%Rng :: lap_add bl1 bl2
+      | a2 :: bl2 => (a1 + a2)%F :: lap_add bl1 bl2
       end
   end.
 
-Definition lap_opp {α} {r : ring α} la := List.map rng_opp la.
-Definition lap_sub {A} {rng : ring A} la lb := lap_add la (lap_opp lb).
+Definition lap_opp la := List.map rngl_opp la.
+Definition lap_sub la lb := lap_add la (lap_opp lb).
 
-Definition poly_add {A} {rng : ring A} p1 p2 :=
-  poly_norm (lap_add (lap p1) (lap p2)).
-
-Definition poly_opp {α} {r : ring α} pol :=
-  poly_norm (lap_opp (lap pol)).
-
-Definition poly_sub {α} {r : ring α} p1 p2 :=
-  poly_add p1 (poly_opp p2).
-
-(*
-Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-4;5]%Z)).
-Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-5]%Z)).
-*)
+Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
+Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
+Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
 
 (* multiplication *)
 
-Fixpoint lap_convol_mul {α} {r : ring α} al1 al2 i len :=
+Fixpoint lap_convol_mul al1 al2 i len :=
   match len with
   | O => []
   | S len1 =>
-      (Σ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%Rng ::
+      (∑ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%F ::
       lap_convol_mul al1 al2 (S i) len1
   end.
 
-Definition lap_mul {α} {R : ring α} la lb :=
+Definition lap_mul la lb :=
   match la with
   | [] => []
   | _ =>
@@ -227,8 +154,85 @@ Definition lap_mul {α} {R : ring α} la lb :=
       end
   end.
 
-Definition poly_mul {A} {rng : ring A} p1 p2 :=
-  poly_norm (lap_mul (lap p1) (lap p2)).
+Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
+
+End a.
+
+Arguments lap_add {T ro} (al1 al2)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+
+Declare Scope lap_scope.
+Delimit Scope lap_scope with lap.
+(*
+Notation "1" := [1%F] : lap_scope.
+*)
+Notation "- a" := (lap_opp a) : lap_scope.
+Notation "a + b" := (lap_add a b) : lap_scope.
+Notation "a - b" := (lap_sub a b) : lap_scope.
+Notation "a * b" := (lap_mul a b) : lap_scope.
+(*
+Notation "a ^ b" := (lap_power a b) : lap_scope.
+*)
+
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (lap_add [1;2;3] [4;5;6]).
+Check (lap_add [1;2;3] [4;5;6]).
+Compute ([1;2;3] + [4;5;6])%lap.
+Compute ([1; 1] * [-1; 1])%lap.
+
+...
+
+Definition list_nth_def_0 {α} {R : ring α} n l := List.nth n l 0%Rng.
+
+Declare Scope poly_scope.
+Delimit Scope poly_scope with pol.
+Notation "0" := poly_zero : poly_scope.
+Notation "1" := poly_one : poly_scope.
+Notation "- a" := (poly_opp a) : poly_scope.
+Notation "a + b" := (poly_add a b) : poly_scope.
+Notation "a - b" := (poly_sub a b) : poly_scope.
+Notation "a * b" := (poly_mul a b) : poly_scope.
+Notation "'ⓧ' ^ a" := (xpow a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
+Notation "'ⓧ'" := (xpow 1) (at level 30, format "'ⓧ'") : poly_scope.
+
+Check polyn_mul.
+
+...
+
+(* euclidean division *)
+
+Definition polyn_div p1 p2 :=
+...
+
+(* ring-like *)
+
+Definition polyn_ring_like_op : ring_like_op (polyn T) :=
+  {| rngl_zero := polyn_zero;
+     rngl_one := polyn_one;
+     rngl_add := polyn_add;
+     rngl_mul := polyn_mul;
+     rngl_opt_opp := Some polyn_opp;
+     rngl_opt_inv := None;
+     rngl_opt_sous := Some polyn_sub;
+     rngl_opt_quot := Some Nat.div;
+     rngl_opt_eqb := Some Nat.eqb;
+     rngl_le := Nat.le |}.
+
+(* allows to use ring-like theorems on polynomials *)
+Canonical Structure polyn_ring_like_op.
+
+(*
+Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
+*)
+(**)
+
+(*
+Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-4;5]%Z)).
+Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-5]%Z)).
+*)
+
+...
 
 (*
 Compute (@lap_mul Z Z_ring [3;4;5]%Z [2;3;-4;5]%Z).
