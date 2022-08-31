@@ -32,9 +32,9 @@ Arguments pcons {A}%plist_scope a l%plist_scope.
 Open Scope plist_scope.
 
 Module PlistNotations.
-Notation "[. .]" := pnil (format "[. .]") : plist_scope.
-Notation "[. x .]" := (pcons x pnil) : plist_scope.
-Notation "[. x ; y ; .. ; z .]" :=  (pcons x (pcons y .. (pcons z pnil) ..)) : plist_scope.
+Notation "'[:' ':]'" := pnil (format "[: :]") : plist_scope.
+Notation "'[:' x ':]'" := (pcons x pnil) : plist_scope.
+Notation "'[:' x ; y ; .. ; z ':]'" :=  (pcons x (pcons y .. (pcons z pnil) ..)) : plist_scope.
 End PlistNotations.
 
 Import PlistNotations.
@@ -43,15 +43,11 @@ Compute [].
 Compute nil.
 Compute [3].
 
-About nil.
-
-...
-(* ça boucle ! *)
-Compute ([. .]).
 Compute pnil.
+Compute ([: :] ).
 
 Compute (pcons 3 pnil).
-Compute [. 3 .].
+Compute [: 3;4 :].
 
 About list.
 About plist.
