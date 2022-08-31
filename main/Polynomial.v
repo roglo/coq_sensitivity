@@ -97,8 +97,7 @@ Proof.
 intros.
 unfold last_lap_neq_0, lap_norm.
 induction la as [| a]; cbn. {
-  apply Bool.negb_true_iff.
-  apply (rngl_eqb_neq Heb).
+  apply Bool.negb_true_iff, (rngl_eqb_neq Heb).
   now apply rngl_1_neq_0.
 }
 rewrite strip_0s_app.
@@ -156,10 +155,39 @@ Definition lap_mul la lb :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
+(* monomial x^i *)
+
+Theorem monom_norm : ∀ i, last_lap_neq_0 (repeat 0%F i ++ [1%F]).
+Proof.
+intros.
+unfold last_lap_neq_0.
+rewrite last_last.
+apply Bool.negb_true_iff, (rngl_eqb_neq Heb).
+now apply rngl_1_neq_0.
+Qed.
+
+Definition lap_monom i := repeat 0%F i ++ [1%F].
+Definition monom i := mk_polyn (lap_monom i) (monom_norm i).
+
 End a.
 
 Arguments lap_add {T ro} (al1 al2)%list.
+Arguments lap_monom {T ro} i%nat.
 Arguments lap_mul {T ro} (la lb)%list.
+Arguments monom {T ro rp Heb H10} i%nat.
+
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (lap_monom 1).
+Compute (lap_monom 3).
+Global Existing Instance Z_ring_like_prop.
+Compute (monom 1).
+Opaque Z_ring_like_prop.
+Compute (monom 3).
+Opaque monom_norm.
+Compute (monom 3).
+Opaque lap_prop.
+Compute (monom 3).
 
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
@@ -174,12 +202,26 @@ Notation "a * b" := (lap_mul a b) : lap_scope.
 Notation "a ^ b" := (lap_power a b) : lap_scope.
 *)
 
+Declare Scope poly_scope.
+Delimit Scope poly_scope with pol.
+
+Notation "a + b" := (polyn_add a b) : poly_scope.
+Notation "a - b" := (polyn_sub a b) : poly_scope.
+Notation "a * b" := (polyn_mul a b) : poly_scope.
+Notation "'ⓧ' ^ a" := (monom a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
+Notation "'ⓧ'" := (monom 1) (at level 30, format "'ⓧ'") : poly_scope.
+
+(*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+*)
 Compute (lap_add [1;2;3] [4;5;6]).
 Check (lap_add [1;2;3] [4;5;6]).
 Compute ([1;2;3] + [4;5;6])%lap.
+(* (x-1)(x+1) *)
 Compute ([1; 1] * [-1; 1])%lap.
+Compute (monom 3).
+Compute (ⓧ)%pol.
 
 ...
 
