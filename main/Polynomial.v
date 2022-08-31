@@ -34,7 +34,7 @@ Inductive plist (A : Type) : Type :=
   | pcons : A → plist A → plist A.
 
 Declare Scope plist_scope.
-Delimit Scope plist_scope with P.
+Delimit Scope plist_scope with plist.
 Arguments pnil {A}%type.
 Arguments pcons {A}%type a l%plist_scope.
 (*
@@ -151,18 +151,37 @@ Fixpoint monl_add it al1 al2 :=
           | pcons (Mon c2 d2) bl2 =>
               match Nat.compare d1 d2 with
               | Lt => pcons (Mon c2 d2) (monl_add it' al1 bl2)
-              | Eq => pcons (Mon (c1 + c2)%F d1) (monl_add it' bl1 bl2)
               | Gt => pcons (Mon c1 d1) (monl_add it' bl1 al2)
+              | Eq =>
+                  let c := (c1 + c2)%F in
+                  if (c =? 0)%F then monl_add it' bl1 bl2
+                  else pcons (Mon c d1) (monl_add it' bl1 bl2)
               end
           end
       end
   end.
 
-Definition degree p :=
-  match monl p with
+Definition monl_degree {T} (ml : plist (monom T)) :=
+  match ml with
   | pcons (Mon _ d) _ => d
   | pnil => 0 (* should be -1 *)
   end.
+
+Definition degree p := monl_degree (monl p).
+
+(*
+End a.
+
+Arguments monl_add {T ro} it%nat al1%plist al2%plist.
+Arguments monl_is_correct {T ro} monl%plist.
+
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
+Compute (monl_add 50 (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (monl_add 50 (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ (-5)☓2 ☩ 8☓)).
+*)
 
 Theorem polyn_add_is_correct : ∀ p1 p2,
   monl_is_correct
@@ -173,7 +192,13 @@ intros.
 unfold monl_is_correct.
 apply Bool.andb_true_iff.
 split. {
-Search is_sorted.
+  destruct p1 as (l1, p1).
+  destruct p2 as (l2, p2).
+  move l2 before l1; cbn.
+  unfold degree; cbn.
+  remember (max _ _) as it eqn:Hit; symmetry in Hit.
+  revert l1 l2 p1 p2 Hit.
+  induction it; intros; [ easy | cbn ].
 ...
 
 Definition polyn_add p1 p2 :=
@@ -182,11 +207,6 @@ Definition polyn_add p1 p2 :=
 
 ...
 
-End a.
-
-Require Import NatRingLike.
-Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)%P).
-Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
 Compute
   (polyn_add
      (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
@@ -197,6 +217,8 @@ Compute
      (mk_polyn (3☓5 ☩ 5☓ ☩ 8☓0) eq_refl)).
 
 ...
+
+(* old version *)
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list (T * nat);
