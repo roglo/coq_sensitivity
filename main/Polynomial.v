@@ -175,6 +175,8 @@ Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_monom {T ro} i%nat.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments monom {T ro rp Heb H10} i%nat.
+Arguments monom_norm {T ro rp} {Heb H10 i}.
+Arguments polyn_norm_prop {T ro rp} {Heb H10 la}.
 
 (*
 Require Import ZArith RnglAlg.Zrl.
@@ -183,22 +185,14 @@ Compute (lap_monom 1).
 Compute (lap_monom 3).
 Global Existing Instance Z_ring_like_prop.
 Compute (monom 1).
+Compute (monom 3).
 *)
+(*
 Require Import NatRingLike.
 Compute (lap_monom 1).
 Compute (monom 1).
-(* ah bin zut, ça affiche le long Z_ring_like_prop *)
-(* puis je vois plus tard que ça n'affiche pas la notation prévue
-   non plus *)
-(* peut-être que, finalement, faut que je laisse tomber ce champ
-   "lap_prop" dans le type polyn ? *)
-...
-Opaque Z_ring_like_prop.
-Compute (monom 3).
-Opaque monom_norm.
-Compute (monom 3).
-Opaque lap_prop.
-Compute (monom 3).
+About monom_norm.
+*)
 
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
@@ -216,16 +210,18 @@ Notation "a ^ b" := (lap_power a b) : lap_scope.
 Declare Scope poly_scope.
 Delimit Scope poly_scope with pol.
 
+Arguments polyn_add {T ro rp} {Heb H10} (p1 p2)%pol.
+Arguments polyn_sub {T ro rp} {Heb H10} (p1 p2)%pol.
+
 Notation "a + b" := (polyn_add a b) : poly_scope.
 Notation "a - b" := (polyn_sub a b) : poly_scope.
 Notation "a * b" := (polyn_mul a b) : poly_scope.
 Notation "'ⓧ' ^ a" := (monom a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
 Notation "'ⓧ'" := (monom 1) (at level 30, format "'ⓧ'") : poly_scope.
 
-(*
 Require Import ZArith RnglAlg.Zrl.
+Global Existing Instance Z_ring_like_prop.
 Open Scope Z_scope.
-*)
 Compute (lap_add [1;2;3] [4;5;6]).
 Check (lap_add [1;2;3] [4;5;6]).
 Compute ([1;2;3] + [4;5;6])%lap.
@@ -233,6 +229,11 @@ Compute ([1;2;3] + [4;5;6])%lap.
 Compute ([1; 1] * [-1; 1])%lap.
 Compute (monom 3).
 Compute (ⓧ^4)%pol.
+Compute (ⓧ^4+ⓧ)%pol.
+Compute (ⓧ^4-ⓧ)%pol.
+Compute (3*ⓧ^4)%pol.
+...
+Compute (ⓧ^4-ⓧ+2%F)%pol.
 Compute (ⓧ)%pol.
 (* ah bin zut, non seulement ça n'affiche pas la notation, mais
    ça affiche le long Z_ring_like_prop *)
