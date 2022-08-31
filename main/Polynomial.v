@@ -98,6 +98,23 @@ unfold last_lap_neq_0, lap_norm.
 induction la as [| a]. {
   cbn.
   apply Bool.negb_true_iff.
+Check rngl_add_comm.
+...
+  apply rngl_1_neq_0.
+...
+
+Definition polyn_norm (la : list T) :=
+  mk_polyn (lap_norm la) (polyn_norm_prop la).
+...
+
+Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
+Proof.
+intros.
+unfold last_lap_neq_0, lap_norm.
+induction la as [| a]. {
+  cbn.
+  apply Bool.negb_true_iff.
+...
   apply rngl_1_neq_0.
 ...
 induction la as [| a]; [ apply rngl_1_neq_0 | cbn ].
