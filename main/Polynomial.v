@@ -80,6 +80,10 @@ Notation "c 'ⓧ'" := (Mon c 0) (at level 30, format "c ⓧ") : monl_scope.
 Notation "c 'ⓧ' a" :=
   (Mon c a) (at level 30, format "c ⓧ a") : monl_scope.
 *)
+Notation "c ☓" := (Mon c 0) (at level 30, format "c ☓) : monl_scope.
+Notation "c ☓ a" :=
+  (Mon c a) (at level 30, format "c ☓ a") : monl_scope.
+(**)
 
 Compute
   (mk_polyn
@@ -96,31 +100,29 @@ Compute [3ⓧ5; (-5)ⓧ2; 8ⓧ].
 *)
 Compute (Mon 3 8).
 
-Print Grammar constr.
-
+(*
 Module PlistNotations.
-(*
-Notation "c ⓧ d" := (pcons (Mon c d) pnil) : plist_scope.
-*)
-Notation "'pol' 'lop'" := pnil : plist_scope.
-Notation "'pol' x 'lop'" := (pcons x pnil) : plist_scope.
-Notation "'pol' x + y + .. + z 'lop'" :=
+Notation "x ⊕ y ⊕ .. ⊕ z" :=
   (pcons x (pcons y .. (pcons z pnil) ..))
-  (format "'pol'  x  +  y  +  ..  +  z  'lop'")
+  (at level 50, format "x  ⊕  y  ⊕  ..  ⊕  z")
   : plist_scope.
-
-(*
-Notation "'pol' x + y + .. + z" :=
-  (pcons x (pcons y .. (pcons z pnil) ..))
-  (at level 0, x at level 32, y at level 32, z at level 32) : plist_scope.
-*)
-(*
-Notation "[ x ; y ; .. ; z ]" :=  (cons x (cons y .. (cons z nil) ..)) : list_scope.
-*)
 End PlistNotations.
+*)
+Module PlistNotations.☓
+Notation "x ☩ y ☩ .. ☩ z" :=
+  (pcons x (pcons y .. (pcons z pnil) ..))
+  (at level 50, format "x  ☩  y  ☩  ..  ☩  z")
+  : plist_scope.
+End PlistNotations.
+(**)
+
+Compute (3 + 4).
 Import PlistNotations.
+Compute (3 + 4).
 
 Compute (Mon 8 0).
+
+Open Scope monl_scope.
 
 Compute
   (mk_polyn
