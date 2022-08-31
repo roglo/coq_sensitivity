@@ -65,6 +65,9 @@ Definition sorted A (rel : A → _) l :=
 Definition strongly_sorted A (rel : A → _) l :=
   is_strongly_sorted rel l = true.
 
+Theorem fold_sorted : ∀ A f (l : list A), (is_sorted f l = true) = sorted f l.
+Proof. easy. Qed.
+
 Theorem sorted_cons : ∀ A (rel : A → _) a la,
   sorted rel (a :: la) → sorted rel la.
 Proof.

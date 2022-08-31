@@ -114,9 +114,9 @@ Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
-(*
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
+(*
 Context {H10 : rngl_has_1_neq_0 = true}.
 *)
 
@@ -146,7 +146,7 @@ Fixpoint monl_add it al1 al2 :=
 
 Definition monl_degree {T} (ml : list (monom T)) :=
   match ml with
-  | Mon _ d :: _ => d
+  | m :: _ => mdeg m
   | [] => 0 (* should be -1 *)
   end.
 
@@ -209,9 +209,78 @@ destruct p2 as (Hs2, Hc2).
 move Hs2 before Hs1.
 remember (max (monl_degree l1) (monl_degree l2)) as it eqn:Hit.
 symmetry in Hit.
+rewrite fold_sorted in Hs1, Hs2.
 split. {
+  apply Nat.eq_le_incl in Hit.
   revert l1 l2 Hs1 Hs2 Hc1 Hc2 Hit.
   induction it; intros; [ easy | cbn ].
+  destruct l1 as [| (c1, d1)]; [ easy | ].
+  destruct l2 as [| (c2, d2)]; [ easy | ].
+  cbn in Hit.
+  move c2 before c1; move d2 before d1.
+  remember (d1 ?= d2) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    apply Nat.compare_eq_iff in Hc.
+    move Hc at top; subst d2.
+    move Hc2 before Hc1.
+    rewrite Nat.max_id in Hit.
+    remember (c1 + c2 =? 0)%F as ccz eqn:Hccz; symmetry in Hccz.
+    destruct ccz. {
+      apply (rngl_eqb_eq Heb) in Hccz.
+      apply IHit. {
+        now apply sorted_cons in Hs1.
+      } {
+        now apply sorted_cons in Hs2.
+      } {
+        rewrite iter_list_cons in Hc1; [ | easy | | ]; cycle 1. {
+          apply Bool.andb_true_r.
+        } {
+          apply Bool.andb_assoc.
+        }
+        now apply Bool.andb_true_iff in Hc1.
+      } {
+        rewrite iter_list_cons in Hc2; [ | easy | | ]; cycle 1. {
+          apply Bool.andb_true_r.
+        } {
+          apply Bool.andb_assoc.
+        }
+        now apply Bool.andb_true_iff in Hc2.
+      }
+      apply sorted_cons_iff in Hs1.
+      apply sorted_cons_iff in Hs2.
+      cbn in Hs1, Hs2.
+      destruct Hs1 as (Hs1, Hm1).
+      destruct Hs2 as (Hs2, Hm2).
+      move Hs2 before Hs1.
+      destruct l1 as [| m1]; cbn. {
+        destruct l2 as [| m2]; [ easy | cbn ].
+        specialize (Hm2 _ (or_introl eq_refl)).
+        apply Bool.negb_true_iff in Hm2.
+        apply Nat.leb_gt in Hm2.
+        flia Hm2 Hit.
+      }
+      destruct l2 as [| m2]; cbn. {
+        rewrite Nat.max_0_r.
+        specialize (Hm1 _ (or_introl eq_refl)).
+        apply Bool.negb_true_iff in Hm1.
+        apply Nat.leb_gt in Hm1.
+        flia Hm1 Hit.
+      }
+...
+Print mdeg.
+Print monl_degree.
+Search (sorted _ (_ :: _)).
+...
+cbn in Hc1.
+Search (is_sorted _ (_ :: _)).
+Search (sorted _ (_ :: _)).
+        cbn in Hs1.
+...
+Search ((_ =? _)%F = true).
+specialize (@rngl_eqb_eq) as H1.
+specialize (H1 T ro rp Heb).
+apply H1 in Hccz.
+      apply rngl_
 ...
 
 Definition polyn_add p1 p2 :=
