@@ -13,9 +13,12 @@ Require Import Misc RingLike.
 (* definition of a polynomial *)
 
 (* (lap : list as polynomial) *)
+Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
+  (last lap 1 ≠? 0)%F = true.
+
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
-    lap_prop : (last lap 1 ≠? 0)%F = true }.
+    lap_prop : last_lap_neq_0 lap }.
 
 Arguments polyn T {ro}.
 Arguments mk_polyn {T ro} lap%list.
@@ -55,25 +58,15 @@ split; intros Hpq. {
 }
 Qed.
 
-End a.
-
-About polyn_eqb_eq.
-Arguments polyn_eqb_eq {T ro}.
-Check polyn_eqb_eq.
-
-...
-
-Theorem lap_1_0_prop :
-  (last [] 1 ≠? 0)%F = true.
+Theorem lap_1_0_prop : last_lap_neq_0 [].
 Proof.
-intros Heq H10; cbn.
 apply Bool.negb_true_iff.
-apply (rngl_eqb_neq Heq).
-now apply rngl_1_neq_0.
+apply (rngl_eqb_neq Hop).
+apply (rngl_1_neq_0 H10).
 Qed.
 
-Definition poly_zero Hop H10 := mk_poly [] (lap_1_0_prop Hop H10).
-Definition poly_one Hop H10 := mk_poly [1%F] (lap_1_0_prop Hop H10).
+Definition poly_zero := mk_polyn [] lap_1_0_prop.
+Definition poly_one := mk_polyn [1%F] lap_1_0_prop.
 
 (* normalization *)
 
@@ -98,11 +91,13 @@ Qed.
 
 Definition lap_norm la := rev (strip_0s (rev la)).
 
-Theorem poly_norm_prop : ∀ la, last (lap_norm la) 1%F ≠ 0%F.
+Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
 Proof.
 intros.
-unfold lap_norm.
+unfold last_lap_neq_0, lap_norm.
 induction la as [| a]. {
+  cbn.
+  apply Bool.negb_true_iff.
   apply rngl_1_neq_0.
 ...
 induction la as [| a]; [ apply rngl_1_neq_0 | cbn ].
