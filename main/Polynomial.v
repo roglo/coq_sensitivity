@@ -21,8 +21,41 @@ End ListNotations.
 *)
 
 Print list.
-(* faire une copie du type list à utiliser pour les polynômes
-   qui auront donc leur syntaxe *)
+
+(**)
+
+Declare Scope plist_scope.
+Inductive plist (A : Type) : Type :=  pnil : plist A | pcons : A → plist A → plist A.
+Arguments pnil {A}%plist_scope.
+Arguments pcons {A}%plist_scope a l%plist_scope.
+
+Open Scope plist_scope.
+
+Module PlistNotations.
+Notation "[. .]" := pnil (format "[. .]") : plist_scope.
+Notation "[. x .]" := (pcons x pnil) : plist_scope.
+Notation "[. x ; y ; .. ; z .]" :=  (pcons x (pcons y .. (pcons z pnil) ..)) : plist_scope.
+End PlistNotations.
+
+Import PlistNotations.
+
+Compute [].
+Compute nil.
+Compute [3].
+
+About nil.
+
+...
+(* ça boucle ! *)
+Compute ([. .]).
+Compute pnil.
+
+Compute (pcons 3 pnil).
+Compute [. 3 .].
+
+About list.
+About plist.
+
 ...
 
 Module MyListNotations.
