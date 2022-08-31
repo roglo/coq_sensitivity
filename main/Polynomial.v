@@ -23,18 +23,35 @@ Compute (Mon (-3) 4).
 Definition mdeg {T} (m : monom T) := match m with Mon _ d => d end.
 Definition mcoeff {T} (m : monom T) := match m with Mon c _ => c end.
 
-Definition monl_is_correct T {ro : ring_like_op T} (monl : list (monom T)) :=
-  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) monl &&
-   ⋀ (x ∈ monl), (mcoeff x ≠? 0)%F)%bool.
-
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (monl_is_correct [Mon 3 5; Mon 5 2; Mon 8 0]).
 *)
 
+Inductive plist (A : Type) : Type :=
+  | pnil : plist A
+  | pcons : A → plist A → plist A.
+
+Declare Scope plist_scope.
+Arguments pnil {A}%type.
+Arguments pcons {A}%type a l%plist_scope.
+(*
+Open Scope plist_scope.
+*)
+
+Fixpoint list_of_plist {A} (pl : plist A) :=
+  match pl with
+  | pnil => []
+  | pcons a pl' => a :: list_of_plist pl'
+  end.
+
+Definition monl_is_correct T {ro : ring_like_op T} (monl : plist (monom T)) :=
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (list_of_plist monl) &&
+   ⋀ (x ∈ list_of_plist monl), (mcoeff x ≠? 0)%F)%bool.
+
 Record polyn T {ro : ring_like_op T} := mk_polyn
-  { monl : list (monom T);
+  { monl : plist (monom T);
     monl_prop : monl_is_correct monl = true }.
 
 Declare Scope monl_scope.
@@ -44,22 +61,70 @@ Declare Scope polyn_scope.
 Delimit Scope polyn_scope with p.
 
 Arguments polyn T%type {ro}.
-Arguments mk_polyn {T ro} monl%list.
+Arguments mk_polyn {T ro} monl%plist_scope.
 (*
 Arguments monl_prop {T ro p}.
 *)
 
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
+(*
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
+*)
 
+(*
 Notation "c 'ⓧ'" := (Mon c 0) (at level 30, format "c ⓧ") : monl_scope.
-Notation "c 'ⓧ' ^ a" := (Mon c a) (at level 30, format "c ⓧ ^ a") : monl_scope.
+Notation "c 'ⓧ' a" :=
+  (Mon c a) (at level 30, format "c ⓧ a") : monl_scope.
+*)
 
-Open Scope monl_scope.
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
 
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
+
+(*
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
+Compute (mk_polyn [3ⓧ5; (-5)ⓧ2; 8ⓧ] eq_refl).
+Compute [3ⓧ5; (-5)ⓧ2; 8ⓧ].
+*)
 Compute (Mon 3 8).
+
+Print Grammar constr.
+
+Module PlistNotations.
+(*
+Notation "c ⓧ d" := (pcons (Mon c d) pnil) : plist_scope.
+*)
+Notation "'pol' 'lop'" := pnil : plist_scope.
+Notation "'pol' x 'lop'" := (pcons x pnil) : plist_scope.
+Notation "'pol' x + y + .. + z 'lop'" :=
+  (pcons x (pcons y .. (pcons z pnil) ..))
+  (format "'pol'  x  +  y  +  ..  +  z  'lop'")
+  : plist_scope.
+
+(*
+Notation "'pol' x + y + .. + z" :=
+  (pcons x (pcons y .. (pcons z pnil) ..))
+  (at level 0, x at level 32, y at level 32, z at level 32) : plist_scope.
+*)
+(*
+Notation "[ x ; y ; .. ; z ]" :=  (cons x (cons y .. (cons z nil) ..)) : list_scope.
+*)
+End PlistNotations.
+Import PlistNotations.
+
+Compute (Mon 8 0).
+
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
 
 ...
 
