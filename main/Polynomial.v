@@ -8,9 +8,65 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List ListNotations.
 
-Require Import Misc RingLike IterAdd.
+Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
 (* definition of a polynomial *)
+
+Inductive monom T := Mon : T → nat → monom T.
+
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (Mon (-3) 4).
+*)
+
+Definition mdeg {T} (m : monom T) := match m with Mon _ d => d end.
+Definition mcoeff {T} (m : monom T) := match m with Mon c _ => c end.
+
+Definition monl_is_correct T {ro : ring_like_op T} (monl : list (monom T)) :=
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) monl &&
+   ⋀ (x ∈ monl), (mcoeff x ≠? 0)%F)%bool.
+
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (monl_is_correct [Mon 3 5; Mon 5 2; Mon 8 0]).
+*)
+
+Record polyn T {ro : ring_like_op T} := mk_polyn
+  { monl : list (monom T);
+    monl_prop : monl_is_correct monl = true }.
+
+Declare Scope monl_scope.
+Delimit Scope monl_scope with m.
+
+Declare Scope polyn_scope.
+Delimit Scope polyn_scope with p.
+
+Arguments polyn T%type {ro}.
+Arguments mk_polyn {T ro} monl%list.
+(*
+Arguments monl_prop {T ro p}.
+*)
+
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
+
+Notation "c 'ⓧ'" := (Mon c 0) (at level 30, format "c ⓧ") : monl_scope.
+Notation "c 'ⓧ' ^ a" := (Mon c a) (at level 30, format "c ⓧ ^ a") : monl_scope.
+
+Open Scope monl_scope.
+
+Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
+Compute (Mon 3 8).
+
+...
+
+Record polyn T {ro : ring_like_op T} := mk_polyn
+  { lap : list (T * nat);
+    lap_prop : last_lap_neq_0 lap }.
+...
 
 (*
 Module ListNotations.
