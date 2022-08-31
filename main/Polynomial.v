@@ -122,6 +122,8 @@ Context {H10 : rngl_has_1_neq_0 = true}.
 
 (* addition *)
 
+Print comparison.
+
 Fixpoint monl_add it al1 al2 :=
   match it with
   | 0 => []
@@ -133,12 +135,12 @@ Fixpoint monl_add it al1 al2 :=
           | [] => al1
           | Mon c2 d2 :: bl2 =>
               match Nat.compare d1 d2 with
-              | Lt => Mon c2 d2 :: monl_add it' al1 bl2
-              | Gt => Mon c1 d1 :: monl_add it' bl1 al2
               | Eq =>
                   let c := (c1 + c2)%F in
                   if (c =? 0)%F then monl_add it' bl1 bl2
                   else Mon c d1 :: monl_add it' bl1 bl2
+              | Lt => Mon c2 d2 :: monl_add it' al1 bl2
+              | Gt => Mon c1 d1 :: monl_add it' bl1 al2
               end
           end
       end
@@ -209,63 +211,74 @@ destruct p2 as (Hs2, Hc2).
 move Hs2 before Hs1.
 remember (max (monl_degree l1) (monl_degree l2)) as it eqn:Hit.
 symmetry in Hit.
-rewrite fold_sorted in Hs1, Hs2.
+rewrite fold_sorted in Hs1, Hs2 |-*.
+assert (Htr : transitive (λ x y : monom T, negb (mdeg x <=? mdeg y))). {
+  intros a b c Hab Hbc.
+  apply Bool.negb_true_iff in Hab, Hbc.
+  apply Bool.negb_true_iff.
+  apply Nat.leb_gt in Hab, Hbc.
+  apply Nat.leb_gt.
+  now transitivity (mdeg b).
+}
 split. {
   apply Nat.eq_le_incl in Hit.
-  revert l1 l2 Hs1 Hs2 Hc1 Hc2 Hit.
+  clear Hc1 Hc2.
+  revert l1 l2 Hs1 Hs2 Hit.
   induction it; intros; [ easy | cbn ].
   destruct l1 as [| (c1, d1)]; [ easy | ].
   destruct l2 as [| (c2, d2)]; [ easy | ].
   cbn in Hit.
+  apply sorted_cons_iff in Hs1; [ | easy ].
+  apply sorted_cons_iff in Hs2; [ | easy ].
+  cbn in Hs1, Hs2.
+  destruct Hs1 as (Hs1, Hm1).
+  destruct Hs2 as (Hs2, Hm2).
+  move Hs2 before Hs1.
+  assert (Hm12 : max (monl_degree l1) (monl_degree l2) ≤ it). {
+    destruct l1 as [| m1]; cbn. {
+      destruct l2 as [| m2]; [ easy | cbn ].
+      specialize (Hm2 _ (or_introl eq_refl)).
+      apply Bool.negb_true_iff, Nat.leb_gt in Hm2.
+      flia Hm2 Hit.
+    }
+    destruct l2 as [| m2]; cbn. {
+      rewrite Nat.max_0_r.
+      specialize (Hm1 _ (or_introl eq_refl)).
+      apply Bool.negb_true_iff, Nat.leb_gt in Hm1.
+      flia Hm1 Hit.
+    }
+    specialize (Hm1 _ (or_introl eq_refl)).
+    specialize (Hm2 _ (or_introl eq_refl)).
+    apply Bool.negb_true_iff, Nat.leb_gt in Hm1, Hm2.
+    flia Hm1 Hm2 Hit.
+  }
   move c2 before c1; move d2 before d1.
   remember (d1 ?= d2) as c eqn:Hc; symmetry in Hc.
   destruct c. {
-    apply Nat.compare_eq_iff in Hc.
-    move Hc at top; subst d2.
-    move Hc2 before Hc1.
+    apply Nat.compare_eq_iff in Hc; subst d2.
+    move Hm2 before Hm1.
     rewrite Nat.max_id in Hit.
     remember (c1 + c2 =? 0)%F as ccz eqn:Hccz; symmetry in Hccz.
-    destruct ccz. {
-      apply (rngl_eqb_eq Heb) in Hccz.
-      apply IHit. {
-        now apply sorted_cons in Hs1.
-      } {
-        now apply sorted_cons in Hs2.
-      } {
-        rewrite iter_list_cons in Hc1; [ | easy | | ]; cycle 1. {
-          apply Bool.andb_true_r.
-        } {
-          apply Bool.andb_assoc.
-        }
-        now apply Bool.andb_true_iff in Hc1.
-      } {
-        rewrite iter_list_cons in Hc2; [ | easy | | ]; cycle 1. {
-          apply Bool.andb_true_r.
-        } {
-          apply Bool.andb_assoc.
-        }
-        now apply Bool.andb_true_iff in Hc2.
-      }
-      apply sorted_cons_iff in Hs1.
-      apply sorted_cons_iff in Hs2.
-      cbn in Hs1, Hs2.
-      destruct Hs1 as (Hs1, Hm1).
-      destruct Hs2 as (Hs2, Hm2).
-      move Hs2 before Hs1.
-      destruct l1 as [| m1]; cbn. {
-        destruct l2 as [| m2]; [ easy | cbn ].
-        specialize (Hm2 _ (or_introl eq_refl)).
-        apply Bool.negb_true_iff in Hm2.
-        apply Nat.leb_gt in Hm2.
-        flia Hm2 Hit.
-      }
-      destruct l2 as [| m2]; cbn. {
-        rewrite Nat.max_0_r.
-        specialize (Hm1 _ (or_introl eq_refl)).
-        apply Bool.negb_true_iff in Hm1.
-        apply Nat.leb_gt in Hm1.
-        flia Hm1 Hit.
-      }
+    destruct ccz; [ now apply IHit | ].
+    apply sorted_cons_iff; [ easy | ].
+    split; [ now apply IHit | ].
+    intros m Hm; cbn.
+    apply Bool.negb_true_iff, Nat.leb_gt.
+    destruct l1 as [| m1]. {
+      destruct it; [ easy | cbn in Hm ].
+      specialize (Hm2 _ Hm).
+      now apply Bool.negb_true_iff, Nat.leb_gt in Hm2.
+    }
+    destruct l2 as [| m2]. {
+      destruct it; [ easy | cbn in Hm ].
+      destruct m1 as (c1', d1').
+      specialize (Hm1 _ Hm).
+      now apply Bool.negb_true_iff, Nat.leb_gt in Hm1.
+    }
+    destruct it; [ easy | ].
+    cbn in Hm.
+    destruct m1 as (c1', d1').
+    destruct m2 as (c2', d2').
 ...
 Print mdeg.
 Print monl_degree.
