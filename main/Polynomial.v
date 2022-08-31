@@ -140,9 +140,9 @@ Compute
 
 Compute (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl).
 
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
-
 Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%P.
+
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
 
 ...
 
