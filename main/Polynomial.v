@@ -34,6 +34,7 @@ Inductive plist (A : Type) : Type :=
   | pcons : A → plist A → plist A.
 
 Declare Scope plist_scope.
+Delimit Scope plist_scope with P.
 Arguments pnil {A}%type.
 Arguments pcons {A}%type a l%plist_scope.
 (*
@@ -76,14 +77,18 @@ Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0] eq_refl).
 *)
 
 (*
-Notation "c 'ⓧ'" := (Mon c 0) (at level 30, format "c ⓧ") : monl_scope.
+Notation "c 'ⓧ'" := (Mon c 1) (at level 30, format "c ⓧ") : monl_scope.
 Notation "c 'ⓧ' a" :=
   (Mon c a) (at level 30, format "c ⓧ a") : monl_scope.
 *)
-Notation "c ☓" := (Mon c 0) (at level 30, format "c ☓) : monl_scope.
+Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓") : monl_scope.
 Notation "c ☓ a" :=
   (Mon c a) (at level 30, format "c ☓ a") : monl_scope.
-(**)
+(*
+Notation "c ⒳" := (Mon c 1) (at level 30, format "c ⒳") : monl_scope.
+Notation "c ⒳ a" :=
+  (Mon c a) (at level 30, format "c ⒳ a") : monl_scope.
+*)
 
 Compute
   (mk_polyn
@@ -108,16 +113,17 @@ Notation "x ⊕ y ⊕ .. ⊕ z" :=
   : plist_scope.
 End PlistNotations.
 *)
-Module PlistNotations.☓
+Module PlistNotations.
 Notation "x ☩ y ☩ .. ☩ z" :=
   (pcons x (pcons y .. (pcons z pnil) ..))
-  (at level 50, format "x  ☩  y  ☩  ..  ☩  z")
+  (at level 50, y at next level, z at next level, format "x  ☩  y  ☩  ..  ☩  z")
   : plist_scope.
 End PlistNotations.
 (**)
 
 Compute (3 + 4).
 Import PlistNotations.
+Print Grammar constr.
 Compute (3 + 4).
 
 Compute (Mon 8 0).
@@ -127,6 +133,16 @@ Open Scope monl_scope.
 Compute
   (mk_polyn
      (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 0) pnil))) eq_refl).
+
+Compute
+  (mk_polyn
+     (pcons (Mon 3 5) (pcons (Mon (-5) 2) (pcons (Mon 8 1) pnil))) eq_refl).
+
+Compute (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl).
+
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
+
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%P.
 
 ...
 
