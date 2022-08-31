@@ -50,29 +50,14 @@ Proof.
 intros * Heqb *.
 split; intros Hab. {
   unfold mat_eqb in Hab.
+  apply list_eqb_eq in Hab; [ | now apply -> equality_list_eqv ].
   destruct A as (lla).
   destruct B as (llb).
-  cbn in Hab; f_equal.
-  specialize list_eqb_eq as H1.
-  specialize (H1 (list T) (list_eqv eqb)).
-  apply H1; [ | easy ].
-  intros la lb.
-  specialize (list_eqb_eq Heqb la lb) as H2.
-  split; [ apply H2 | ].
-  intros; subst lb.
-  clear - Heqb.
-  induction la as [| a]; [ easy | cbn ].
-  now rewrite (equality_refl Heqb).
+  now cbn in Hab; f_equal.
 } {
   subst B.
-  destruct A as (ll); cbn.
-  induction ll as [| la]; [ easy | cbn ].
-  remember (list_eqv eqb la la) as b eqn:Hb; symmetry in Hb.
-  destruct b; [ easy | ].
-  exfalso; apply Bool.not_true_iff_false in Hb; apply Hb.
-  clear - Heqb.
-  induction la as [| a]; [ easy | cbn ].
-  now rewrite (equality_refl Heqb).
+  apply list_eqb_eq; [ | easy ].
+  now apply -> equality_list_eqv.
 }
 Qed.
 

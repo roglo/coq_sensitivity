@@ -3,6 +3,8 @@
 (* polynomials on a RingLike *)
 
 Set Nested Proofs Allowed.
+Set Implicit Arguments.
+
 Require Import Utf8 Arith.
 Import List ListNotations.
 
@@ -11,13 +13,12 @@ Require Import Misc RingLike.
 (* definition of a polynomial *)
 
 (* (lap : list as polynomial) *)
-Record poly T {ro : ring_like_op T} := mk_poly
+Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
     lap_prop : (last lap 1 ≠? 0)%F = true }.
 
-Print poly.
-
-Arguments mk_poly {T ro} lap%list.
+Arguments polyn T {ro}.
+Arguments mk_polyn {T ro} lap%list.
 Arguments lap {T ro}.
 
 Section a.
@@ -25,24 +26,44 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
+Context {Hop : rngl_has_eqb = true}.
+Context {H10 : rngl_has_1_neq_0 = true}.
 
-Print poly.
+Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
+  list_eqv eqb (lap P) (lap Q).
 
-Theorem eq_poly_eq : ∀ (P Q : poly T), P = Q ↔ lap P = lap Q.
+(* polyn_eqb is an equality *)
+
+Theorem polyn_eqb_eq : ∀ (eqb : T → T → bool),
+  equality eqb →
+  ∀ (P Q : polyn T),
+  polyn_eqb eqb P Q = true ↔ P = Q.
 Proof.
-intros.
-split; intros Heq; [ now subst P | ].
-destruct P as (P, Pprop).
-destruct Q as (Q, Qprop).
-cbn in Heq; cbn.
-destruct Heq.
-f_equal.
-apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+intros * Heqb *.
+split; intros Hpq. {
+  unfold polyn_eqb in Hpq.
+  apply list_eqb_eq in Hpq; [ | easy ].
+  destruct P as (P, Pprop).
+  destruct Q as (Q, Qprop).
+  cbn in Hpq; cbn.
+  destruct Hpq.
+  f_equal.
+  apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+} {
+  subst Q.
+  now apply list_eqb_eq.
+}
 Qed.
 
+End a.
+
+About polyn_eqb_eq.
+Arguments polyn_eqb_eq {T ro}.
+Check polyn_eqb_eq.
+
+...
+
 Theorem lap_1_0_prop :
-  rngl_has_eqb = true →
-  rngl_has_1_neq_0 = true →
   (last [] 1 ≠? 0)%F = true.
 Proof.
 intros Heq H10; cbn.
