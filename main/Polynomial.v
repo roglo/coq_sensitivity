@@ -221,7 +221,12 @@ Compute ([1;2;3] + [4;5;6])%lap.
 (* (x-1)(x+1) *)
 Compute ([1; 1] * [-1; 1])%lap.
 Compute (monom 3).
+Compute (ⓧ^4)%pol.
 Compute (ⓧ)%pol.
+(* ah bin zut, non seulement ça n'affiche pas la notation, mais
+   ça affiche le long Z_ring_like_prop *)
+(* peut-être que, finalement, faut que je laisse tomber ce champ
+   "lap_prop" dans le type polyn ? *)
 
 ...
 
