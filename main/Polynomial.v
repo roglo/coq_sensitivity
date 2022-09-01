@@ -10,7 +10,13 @@ Import Init.Nat List ListNotations.
 
 Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
-(* definition of a polynomial *)
+Declare Scope polyn_scope.
+Declare Scope mlist_scope.
+
+Delimit Scope polyn_scope with P.
+Delimit Scope mlist_scope with mlist.
+
+(* definition of a monomial *)
 
 Record monom T := Mon { mcoeff : T; mdeg : nat }.
 
@@ -20,65 +26,60 @@ Open Scope Z_scope.
 Compute (Mon (-3) 4).
 *)
 
-Declare Scope plist_scope.
-Declare Scope polyn_scope.
-Declare Scope monom_scope.
+Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓").
+Notation "c ☓ a" := (Mon c a) (at level 30, format "c ☓ a").
 
-Delimit Scope plist_scope with plist.
-Delimit Scope polyn_scope with P.
-Delimit Scope monom_scope with M.
+(* definition of a list of monomials *)
 
-Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓") : monom_scope.
-Notation "c ☓ a" :=
-  (Mon c a) (at level 30, format "c ☓ a") : monom_scope.
+Record mlist T := mk_mlist { m_list : list (monom T) }.
 
-Open Scope monom_scope.
+Definition monl_is_correct T {ro : ring_like_op T} (monl : mlist T) :=
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (m_list monl) &&
+   ⋀ (x ∈ m_list monl), (mcoeff x ≠? 0)%F)%bool.
 
-Record plist T := mk_plist { p_list : list T }.
+(* definition of a polynomial *)
 
-Definition monl_is_correct T {ro : ring_like_op T} (monl : plist (monom T)) :=
-  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (p_list monl) &&
-   ⋀ (x ∈ p_list monl), (mcoeff x ≠? 0)%F)%bool.
-
-Record polyn T {ro : ring_like_op T} := mk_polyn
-  { monl : plist (monom T);
+Record polyn T (ro : ring_like_op T) := mk_polyn
+  { monl : mlist T;
     monl_prop : monl_is_correct monl = true }.
 
-Arguments p_list {T} p%plist.
-Arguments mk_polyn {T ro} monl%plist_scope.
+Arguments m_list {T} m%mlist.
+Arguments mk_polyn {T ro} monl%mlist_scope.
 Arguments polyn T%type {ro}.
+Arguments monl_is_correct {T ro} monl%mlist.
 
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (mk_polyn (mk_plist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
-Open Scope monom_scope.
-Compute (mk_polyn (mk_plist [3☓5; (-5)☓2; 8☓0]) eq_refl).
+Compute (mk_polyn (mk_mlist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
+Compute (mk_polyn (mk_mlist [3☓5; (-5)☓2; 8☓0]) eq_refl).
 Compute (Mon 3 8).
+Compute (mk_mlist [3☓5; (-5)☓2; 8☓0]).
+Compute [3☓5; (-5)☓2; 8☓0].
 *)
 
-Module PlistNotations.
+Module MlistNotations.
 Notation "x ☩ y ☩ .. ☩ z" :=
-  (mk_plist (cons x (cons y .. (cons z nil) ..)))
+  (mk_mlist (cons x (cons y .. (cons z nil) ..)))
   (at level 50, y at next level, z at next level,
    format "x  ☩  y  ☩  ..  ☩  z")
-  : plist_scope.
+  : mlist_scope.
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (mk_polyn (mk_plist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
-Compute (mk_polyn (mk_plist [3☓5; (-5)☓2; 8☓0]) eq_refl).
+Compute (mk_polyn (mk_mlist [Mon 3 5; Mon (-5) 2; Mon 8 0]) eq_refl).
+Compute (mk_polyn (mk_mlist [3☓5; (-5)☓2; 8☓0]) eq_refl).
 Compute (Mon 3 8).
 *)
-End PlistNotations.
+End MlistNotations.
 
-Import PlistNotations.
+Import MlistNotations.
 
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%plist.
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%plist.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%mlist.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%mlist.
 *)
 
 Section a.
@@ -91,9 +92,121 @@ Context {Heb : rngl_has_eqb = true}.
 Context {H10 : rngl_has_1_neq_0 = true}.
 *)
 
+(* normalisation *)
+
+Fixpoint monl_norm_loop it (la : list (monom T))  :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] | [_] => la
+      | Mon c1 d1 :: Mon c2 d2 :: lb =>
+          if Nat.eq_dec d1 d2 then
+            let c := (c1 + c2)%F in
+            if (c =? 0)%F then monl_norm_loop it' lb
+            else monl_norm_loop it' (Mon c d1 :: lb)
+          else
+            Mon c1 d1 :: monl_norm_loop it' (Mon c2 d2 :: lb)
+      end
+  end.
+
+Definition monl_norm (la : list (monom T)) :=
+  monl_norm_loop (length la) la.
+
+Arguments monl_norm_loop it%nat la%list.
+Arguments monl_norm la%list.
+
 (* addition *)
 
-Print comparison.
+Fixpoint monl_add_loop it (al1 al2 : list (monom T))  :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match al1 with
+      | [] => al2
+      | Mon c1 d1 :: bl1 =>
+          match al2 with
+          | [] => al1
+          | Mon c2 d2 :: bl2 =>
+              if le_dec d1 d2 then Mon c2 d2 :: monl_add_loop it' al1 bl2
+              else Mon c1 d1 :: monl_add_loop it' bl1 al2
+          end
+      end
+  end.
+
+Definition monl_add (la lb : list (monom T)) :=
+  monl_add_loop (length la + length lb) la lb.
+
+Arguments monl_add_loop it%nat al1%list al2%list.
+Arguments monl_add la%list lb%list.
+
+(*
+End a.
+Arguments monl_add {T} la%list lb%list.
+Arguments monl_is_correct {T ro} monl%mlist.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓7)).
+Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
+Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ 5☓2 ☩ 8☓))).
+Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
+*)
+
+Print polyn.
+
+Definition deg_non_incr (ma mb : monom T) := (mdeg mb <=? mdeg ma).
+
+Theorem monl_add_is_sorted : ∀ la lb, sorted deg_non_incr (monl_add la lb).
+Proof.
+intros.
+remember (monl_add la lb) as lab eqn:Hlab; symmetry in Hlab.
+unfold sorted.
+revert la lb Hlab.
+induction lab as [| ab]; intros; [ easy | cbn ].
+destruct lab as [| ab2]; [ easy | ].
+apply Bool.andb_true_iff.
+split. {
+  unfold deg_non_incr.
+  apply Nat.leb_le.
+  destruct la as [| a]. {
+    cbn in Hlab.
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlab.
+    injection Hlab; clear Hlab; intros; subst b lb.
+...
+
+Theorem monl_norm_is_correct : ∀ s (ss : sorted deg_non_incr s),
+  monl_is_correct (mk_mlist (monl_norm s)) = true.
+...
+
+Definition polyn_add p1 p2 :=
+  let s := monl_add (m_list (monl p1)) (m_list (monl p2)) in
+  let ss := monl_add_is_sorted (m_list (monl p1)) (m_list (monl p2)) in
+  mk_polyn (mk_mlist (monl_norm s)) (monl_norm_is_correct ss).
+
+(*
+End a.
+Arguments monl_add {T} la%list lb%list.
+Arguments monl_is_correct {T ro} monl%mlist.
+About polyn_add.
+Arguments polyn_add {T ro rp Heb} p1%P p2%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
+Compute
+  (polyn_add
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)).
+Compute
+  (polyn_add
+     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
+     (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl)).
+*)
+
+...
+
+(* old version *)
 
 Fixpoint monl_add it al1 al2 :=
   match it with
@@ -126,7 +239,6 @@ Definition monl_degree {T} (ml : list (monom T)) :=
 Definition degree p := monl_degree (p_list (monl p)).
 
 Arguments monl_add it%nat al1%list al2%list.
-Arguments monl_is_correct {T ro} monl%plist.
 
 (*
 End a.
@@ -231,6 +343,9 @@ split. {
     destruct m1 as (c1', d1').
     destruct m2 as (c2', d2').
     cbn in Hm12.
+    (* bon, preuve un peu trop longue, mais peut-être faisable quand
+       même ; cependant, je vais essayer plutôt de programmer mon
+       truc différemment en séparant l'addition de la normalisation *)
 ...
 Print mdeg.
 Print monl_degree.
