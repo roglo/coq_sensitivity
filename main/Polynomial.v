@@ -168,7 +168,6 @@ apply Bool.andb_true_iff in Hlac, Hlbc.
 destruct Hlac as (Hsa, _).
 destruct Hlbc as (Hsb, _).
 rewrite fold_sorted in Hsa, Hsb.
-unfold deg_non_incr.
 remember (length la + length lb) as it eqn:Hit; symmetry in Hit.
 apply Nat.eq_le_incl in Hit.
 assert (Htr : transitive (λ x y : monom T, negb (mdeg x <=? mdeg y))). {
@@ -179,31 +178,83 @@ assert (Htr : transitive (λ x y : monom T, negb (mdeg x <=? mdeg y))). {
   apply Nat.leb_gt.
   now transitivity (mdeg b).
 }
+assert (Htr' : transitive deg_non_incr). {
+  unfold deg_non_incr.
+  intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
 revert la lb Hsa Hsb Hit.
 induction it; intros; [ easy | cbn ].
-destruct la as [| ma]. {
+destruct la as [| (mac, mad)]. {
   cbn in Hit; clear Hsa.
   destruct lb as [| mb]; [ easy | cbn ].
   apply sorted_cons_iff in Hsb; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
   destruct Hsb as (Hs & Hmb).
-  apply sorted_cons_iff; [ | ].
-...
-
-remember (monl_add (m_list (monl pa)) (m_list (monl pb))) as lab eqn:Hlab.
-symmetry in Hlab.
-unfold sorted.
-revert pa pb Hlab.
-induction lab as [| ab]; intros; [ easy | cbn ].
-destruct lab as [| ab2]; [ easy | ].
-apply Bool.andb_true_iff.
-split. {
   unfold deg_non_incr.
-  apply Nat.leb_le.
-  destruct la as [| a]. {
-    cbn in Hlab.
-    destruct lb as [| b]; [ easy | ].
-    cbn in Hlab.
-    injection Hlab; clear Hlab; intros; subst b lb.
+  split. {
+    clear mb Hmb Hit.
+    induction lb as [| mb]; [ easy | ].
+    apply sorted_cons_iff in Hs; [ | easy ].
+    apply sorted_cons_iff; [ easy | ].
+    destruct Hs as (Hs & Hmb).
+    specialize (IHlb Hs).
+    split; [ easy | ].
+    intros mc Hmc.
+    specialize (Hmb _ Hmc).
+    apply Bool.negb_true_iff in Hmb.
+    apply Nat.leb_gt, Nat.lt_le_incl in Hmb.
+    now apply Nat.leb_le.
+  }
+  intros mc Hmc.
+  specialize (Hmb _ Hmc).
+  apply Bool.negb_true_iff in Hmb.
+  apply Nat.leb_gt, Nat.lt_le_incl in Hmb.
+  now apply Nat.leb_le.
+}
+destruct lb as [| (mbc, mbd)]. {
+  cbn in Hit; clear Hsb.
+  apply sorted_cons_iff in Hsa; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hsa as (Hsa & Hma).
+  unfold deg_non_incr.
+  cbn in Hma |-*.
+  split. {
+    clear Hma Hit.
+    induction la as [| ma]; [ easy | ].
+    apply sorted_cons_iff in Hsa; [ | easy ].
+    apply sorted_cons_iff; [ easy | ].
+    destruct Hsa as (Hsa & Hma).
+    specialize (IHla Hsa).
+    split; [ easy | ].
+    intros mc Hmc.
+    specialize (Hma _ Hmc).
+    apply Bool.negb_true_iff in Hma.
+    apply Nat.leb_gt, Nat.lt_le_incl in Hma.
+    now apply Nat.leb_le.
+  }
+  intros mc Hmc.
+  specialize (Hma _ Hmc).
+  apply Bool.negb_true_iff in Hma.
+  apply Nat.leb_gt, Nat.lt_le_incl in Hma.
+  now apply Nat.leb_le.
+}
+destruct (le_dec mad mbd) as [Habd| Habd]. {
+  apply sorted_cons_iff in Hsa; [ | easy ].
+  apply sorted_cons_iff in Hsb; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hsa as (Hsa & Hma).
+  destruct Hsb as (Hsb & Hmb).
+  move Hsb before Hsa.
+  cbn in Hit.
+  rewrite Nat.add_succ_r in Hit.
+  apply Nat.succ_le_mono in Hit.
+  split. {
+    destruct it; [ easy | cbn ].
+    destruct lb as [| (mbc2, mbd2)]. {
+      apply sorted_cons_iff; [ easy | cbn ].
 ...
 
 Theorem monl_norm_is_correct : ∀ s (ss : sorted deg_non_incr s),
