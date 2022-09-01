@@ -696,8 +696,6 @@ rewrite rngl_mul_add_distr_l.
 now rewrite H1.
 Qed.
 
-...
-
 Theorem fold_rngl_div :
   rngl_has_inv = true →
   ∀ a b, (a * b⁻¹)%F = (a / b)%F.
@@ -778,11 +776,11 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_div_0_l :
-  (rngl_has_opp = true ∨ rngl_has_sous = true) ∧
-  (rngl_has_inv = true ∨ rngl_has_quot = true) →
+  rngl_has_opp_or_sous = true →
+  rngl_has_inv = true ∨ rngl_has_quot = true →
   ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
 Proof.
-intros Hiv * Haz.
+intros Hos Hiv * Haz.
 remember (0 / a)%F as x eqn:Hx.
 replace 0%F with (0 * a)%F in Hx. 2: {
   now apply rngl_mul_0_l.
@@ -820,7 +818,7 @@ split. {
 Qed.
 
 Theorem rngl_integral :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   (rngl_is_integral ||
    ((rngl_has_inv || rngl_has_quot) && rngl_has_eqb))%bool = true →
   ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
@@ -856,30 +854,35 @@ destruct iv. {
   specialize (H1 a b Haz) as H4.
   rewrite Hab in H4.
   rewrite <- H4.
-  apply rngl_div_0_l; [ | easy ].
-  split; [ easy | now right ].
+  apply rngl_div_0_l; [ easy | | easy ].
+  now right.
 }
 Qed.
 
 Theorem rngl_sub_move_0_r :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b : T, (a - b)%F = 0%F ↔ a = b.
 Proof.
 intros Hop *.
-split. {
-  intros Hab.
+split; intros Hab. {
+  specialize (rngl_add_opp_l Hop) as H1.
+  unfold rngl_opp in H1.
   apply (rngl_add_compat_r _ _ b) in Hab.
   unfold rngl_sub in Hab.
-  rewrite Hop in Hab.
+  unfold rngl_has_opp' in Hop.
+  destruct rngl_opt_opp_or_sous as [opp_sous| ]; [ | easy ].
+  destruct opp_sous as [opp| sous]; [ | easy ].
   rewrite <- rngl_add_assoc in Hab.
-  rewrite rngl_add_opp_l in Hab; [ | easy ].
+  rewrite H1 in Hab.
   now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 } {
-  intros Hab.
   rewrite Hab.
-  now apply rngl_sub_diag; left.
+  apply rngl_sub_diag.
+  now apply rngl_has_opp_has_opp_or_sous.
 }
 Qed.
+
+...
 
 Theorem rngl_div_cancel_l : ∀ a b c,
   (a = b)%F → (a / c = b / c)%F.
