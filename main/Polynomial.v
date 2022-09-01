@@ -178,43 +178,29 @@ Fixpoint monl_convol_mul it al1 al2 i :=
       monl_convol_mul it' al1 al2 (S i)
   end.
 
-Definition monl_mul la lb :=
-  match la with
+Fixpoint monl_mul_mon_l ma lb :=
+  match lb with
   | [] => []
-  | _ =>
-      match lb with
-      | [] => []
-      | _ => monl_convol_mul (length la + length lb - 1) la lb 0
-      end
+  | mb :: lb' =>
+      Mon (mcoeff ma * mcoeff mb) (mdeg ma + mdeg mb) :: monl_mul_mon_l ma lb'
   end.
 
-(* supposer que les deux polynômes sont canoniques
-   prendre le degré du premier avec son 1er terme → da
-   prendre le degré du deuxième avec son 1er terme → db
-   faire un fixpoint en partant de (da+db)
-   et ça pourra faire un résultat canonique au fur et à
-   mesure *)
+Fixpoint monl_mul la lb :=
+  match la with
+  | [] => []
+  | ma :: la' => monl_mul_mon_l ma lb ++ monl_mul la' lb
+  end.
 
-(* ou alors multiplier chaque terme du 1er par chaque terme
-   du second, mais alors pour avoir un résultat canonique,
-   ça risque de ne pas être possible (mais à voir) *)
-
-Definition polyn_mul pa pb := monl_mul (monl pa) (monl pb).
-
-...
+Definition polyn_mul pa pb := mk_polyn (monl_mul (monl pa) (monl pb)).
 
 End a.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_mul (1☓ ☩ 1·) (1☓ ☩ (-1)·)).
-...
-Compute (3☓^5 ☩ 5☓^2 ☩ 8☓)%P.
-Compute (mk_polyn [Mon 1 5; Mon 1 2; Mon 1 1; Mon 1 0]).
-Compute (mk_polyn [Mon 1 5; Mon 1 2; Mon (-1) 1; Mon 1 0]).
-...
-
-Check polyn_mul.
+Compute (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·)).
+Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
+*)
 
 ...
 
