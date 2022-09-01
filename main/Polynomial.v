@@ -11,6 +11,154 @@ Import Init.Nat List ListNotations.
 Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
 Declare Scope polyn_scope.
+Delimit Scope polyn_scope with P.
+
+(* definition of a monomial *)
+
+Record monom T := Mon { mcoeff : T; mdeg : nat }.
+
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (Mon (-3) 4).
+*)
+
+Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓").
+Notation "c ☓ a" := (Mon c a) (at level 30, format "c ☓ a").
+
+(* definition of a polynomial *)
+
+Record polyn T := mk_polyn { monl : list (monom T) }.
+
+Arguments mk_polyn {T} monl%list.
+Arguments polyn T%type.
+Arguments monl {T} p%P.
+
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0]).
+Compute (mk_polyn [3☓5; (-5)☓2; 8☓0]).
+Compute (Mon 3 8).
+Compute [3☓5; (-5)☓2; 8☓0].
+*)
+
+(* canonicity of a polynomial
+   i.e. the fact that the degrees are in decreasing order
+   and that there are no nul coefficient. *)
+
+Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (monl p) &&
+   ⋀ (x ∈ monl p), (mcoeff x ≠? 0)%F)%bool.
+
+(* notation for polynomials *)
+
+Module PolynNotation.
+Notation "x ☩ y ☩ .. ☩ z" :=
+  (mk_polyn (cons x (cons y .. (cons z nil) ..)))
+  (at level 50, y at next level, z at next level,
+   format "x  ☩  y  ☩  ..  ☩  z")
+  : polyn_scope.
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0]).
+Compute (mk_polyn [3☓5; (-5)☓2; 8☓0]).
+Compute (Mon 3 8).
+*)
+End PolynNotation.
+
+Import PolynNotation.
+
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%P.
+Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%P.
+*)
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+(*
+Context (rp : ring_like_prop T).
+Context {Heb : rngl_has_eqb = true}.
+*)
+
+(* addition *)
+
+(* if "pa" and "pb" are polynomials in canonical order,
+   i.e.
+   - degrees are in decreasing order
+   - no coefficien is nul,
+   then "polyn_add pa pb" is also in canonical order
+   (this must be proven, if necessary) *)
+
+Fixpoint monl_add it la lb :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] => lb
+      | Mon ac ad :: la' =>
+          match lb with
+          | [] => la
+          | Mon bc bd :: lb' =>
+              match Nat.compare ad bd with
+              | Eq =>
+                  let c := (ac + bc)%F in
+                  if (c =? 0)%F then monl_add it' la' lb'
+                  else Mon c ad :: monl_add it' la' lb'
+              | Lt => Mon bc bd :: monl_add it' la lb'
+              | Gt => Mon ac ad :: monl_add it' la' lb
+              end
+          end
+      end
+  end.
+
+Arguments monl_add it%nat (la lb)%list.
+
+(*
+End a.
+Arguments monl_add {T ro} it%nat (la lb)%list.
+Arguments polyn_is_canon {T ro} p%P.
+Arguments monl {T} p%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_is_canon (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (polyn_is_canon (3☓5 ☩ 5☓2 ☩ 8☓7)).
+Compute (3☓5 ☩ 5☓2 ☩ 8☓)%P.
+About monl.
+Compute (monl_add 50 (monl (3☓5 ☩ 5☓2 ☩ 8☓)) (monl (3☓5 ☩ 5☓2 ☩ 8☓))).
+Compute (monl_add 50 (monl (3☓5 ☩ 5☓2 ☩ 8☓)) (monl (3☓5 ☩ (-5)☓2 ☩ 8☓))).
+*)
+
+Definition polyn_add (pa pb : polyn T) :=
+  mk_polyn
+    (monl_add (length (monl pa) + length (monl pb)) (monl pa) (monl pb)).
+
+Arguments polyn_add (pa pb)%P.
+
+(*
+End a.
+Arguments polyn_add {T ro} (pa pb)%P.
+Arguments polyn_is_canon {T ro} p%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_is_canon (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (polyn_is_canon (3☓5 ☩ 5☓2 ☩ 8☓7)).
+Compute (polyn_add (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ 5☓2 ☩ 8☓)).
+Compute (polyn_add (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ (-5)☓2 ☩ 8☓)).
+Compute (polyn_is_canon (polyn_add (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ 5☓2 ☩ 8☓))).
+Compute (polyn_is_canon (polyn_add (3☓5 ☩ 5☓2 ☩ 8☓) (3☓5 ☩ (-5)☓2 ☩ 8☓))).
+*)
+
+...
+
+(* old version *)
+
+Declare Scope polyn_scope.
 Declare Scope mlist_scope.
 
 Delimit Scope polyn_scope with P.
@@ -532,6 +680,8 @@ des listes, par exemple [5;-2;3] dans la librairie de Coq.
 ListNotations
 
 ...
+
+(* old version *)
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
