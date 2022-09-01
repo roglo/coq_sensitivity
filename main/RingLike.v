@@ -1169,9 +1169,7 @@ rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
 
-...
-
-Theorem rngl_squ_opp_1 : rngl_has_opp = true → (-1 * -1)%F = 1%F.
+Theorem rngl_squ_opp_1 : rngl_has_opp' = true → (-1 * -1)%F = 1%F.
 Proof.
 intros Hop.
 rewrite rngl_mul_opp_opp; [ | easy ].
@@ -1179,7 +1177,7 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_opp_inj :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (- a = - b)%F → a = b.
 Proof.
 intros Hro * H.
@@ -1189,7 +1187,7 @@ now apply rngl_opp_involutive.
 Qed.
 
 Theorem rngl_inv_inj :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
@@ -1201,7 +1199,7 @@ now apply rngl_inv_involutive.
 Qed.
 
 Theorem rngl_inv_mul_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
@@ -1252,46 +1250,68 @@ split. {
 Qed.
 
 Theorem rngl_opp_sub_distr :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (- (a - b) = b - a)%F.
 Proof.
 intros Hro *.
-unfold rngl_sub at 1.
-rewrite Hro.
-rewrite rngl_opp_add_distr; [ | easy ].
-now rewrite rngl_opp_involutive.
+specialize (rngl_opp_add_distr Hro) as H1.
+specialize (rngl_opp_involutive Hro) as H2.
+unfold rngl_sub, rngl_opp in H1.
+unfold rngl_sub, rngl_opp in H2.
+unfold rngl_sub, rngl_opp.
+unfold rngl_has_opp' in Hro.
+destruct rngl_opt_opp_or_sous as [x| ]; [ | easy ].
+destruct x as [opp| sous]; [ | easy ].
+rewrite H1.
+f_equal.
+apply H2.
 Qed.
 
 Theorem rngl_sub_add_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a b c, (a - (b + c) = a - b - c)%F.
 Proof.
 intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
+specialize rngl_opp_add_distr as H1.
+unfold rngl_has_opp', rngl_opp in H1.
+specialize rngl_opt_sub_sub_sub_add as H2.
+unfold rngl_has_sous' in H2.
+unfold rngl_has_opp_or_sous, bool_of_option in Hom.
+remember rngl_opt_opp_or_sous as x eqn:Hop; symmetry in Hop.
+destruct x as [opp_sous| ]; [ | easy ].
+destruct opp_sous as [opp| sous]. {
+  specialize (H1 eq_refl).
   unfold rngl_sub.
-  rewrite rngl_opp_add_distr; [ | easy ].
+  rewrite Hop, H1.
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_add_assoc.
   apply rngl_add_add_swap.
 }
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo; [ clear Hom | now destruct Hom ].
-specialize rngl_opt_sub_sub_sub_add as H1.
-now rewrite Hmo in H1.
+symmetry; apply H2.
 Qed.
 
 Theorem rngl_sub_sub_distr :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b c, (a - (b - c) = a - b + c)%F.
 Proof.
-intros Hop *.
+intros Hom *.
+specialize rngl_opp_add_distr as H1.
+unfold rngl_has_opp', rngl_opp in H1.
+specialize (rngl_opp_involutive Hom) as H2.
+unfold rngl_opp in H2.
+unfold rngl_has_opp_or_sous, bool_of_option in Hom.
+remember rngl_opt_opp_or_sous as x eqn:Hop; symmetry in Hop.
+destruct x as [opp_sous| ]. 2: {
+  rewrite <- H2; symmetry.
+  now rewrite <- H2.
+}
+destruct opp_sous as [opp| sous]. 2: {
+  rewrite <- H2; symmetry.
+  now rewrite <- H2.
+}
+specialize (H1 eq_refl).
 unfold rngl_sub.
-rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
-rewrite rngl_opp_involutive; [ | easy ].
+rewrite Hop, H1, H2.
 unfold rngl_sub; rewrite Hop.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
@@ -1308,6 +1328,8 @@ specialize rngl_characteristic_prop as rngl_char_prop.
 rewrite Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
+
+...
 
 Theorem rngl_of_nat_inj :
   rngl_has_opp = true ∨ rngl_has_sous = true →
