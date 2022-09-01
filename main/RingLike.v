@@ -660,7 +660,7 @@ split; intros H. {
   unfold rngl_sub in H.
   unfold rngl_has_opp' in Hro.
   unfold rngl_opp.
-  destruct rngl_opt_opp_or_sous as [x| x]; [ | easy ].
+  destruct rngl_opt_opp_or_sous as [x| ]; [ | easy ].
   destruct x as [x| x]; [ | easy ].
   now rewrite rngl_add_0_l in H.
 } {
@@ -991,35 +991,67 @@ Theorem rngl_opp_add_distr :
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
-apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
+specialize (rngl_has_opp_has_opp_or_sous Hro) as Hro'.
+generalize Hro; intros Hro''.
+unfold rngl_has_opp' in Hro''.
+apply rngl_add_cancel_l with (a := (a + b)%F); [ easy | ].
 rewrite (fold_rngl_sub Hro).
-rewrite rngl_sub_diag; [ | now left ].
+rewrite rngl_sub_diag; [ | easy ].
 unfold rngl_sub.
-rewrite Hro.
+specialize (rngl_add_sub Hro') as H1.
+specialize (rngl_sub_diag Hro') as H2.
+unfold rngl_sub in H2.
+unfold rngl_opp.
+unfold rngl_has_opp_or_sous, bool_of_option in Hro'.
+destruct rngl_opt_opp_or_sous as [opp_sous| ]; [ | easy ].
+destruct opp_sous as [opp| sous]; [ | easy ].
 rewrite rngl_add_assoc.
-do 2 rewrite (fold_rngl_sub Hro).
-rewrite rngl_add_sub; [ | now left ].
-symmetry.
-now apply rngl_sub_diag; left.
+rewrite <- (rngl_add_assoc _ _ (opp b)).
+rewrite H2, rngl_add_0_r.
+now symmetry; apply H2.
 Qed.
 
-...
-
-Theorem rngl_opp_add_distr :
-  rngl_has_opp' = true →
-  ∀ a b, (- (a + b) = - b - a)%F.
+Theorem rngl_has_opp_or_sous_cases :
+  rngl_has_opp_or_sous = true
+  → rngl_has_opp' = true ∨ rngl_has_sous' = true.
 Proof.
-intros Hro *.
-apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
-rewrite (fold_rngl_sub Hro).
-rewrite rngl_sub_diag; [ | now left ].
-unfold rngl_sub.
-rewrite Hro.
-rewrite rngl_add_assoc.
-do 2 rewrite (fold_rngl_sub Hro).
-rewrite rngl_add_sub; [ | now left ].
-symmetry.
-now apply rngl_sub_diag; left.
+intros Hos.
+unfold rngl_has_opp_or_sous, bool_of_option in Hos.
+unfold rngl_has_opp', rngl_has_sous'.
+destruct rngl_opt_opp_or_sous as [opp| sous]; [ | easy ].
+now destruct opp; [ left | right ].
+Qed.
+
+Theorem rngl_add_sub_simpl_l :
+  rngl_has_opp_or_sous = true →
+  ∀ a b c : T, (a + b - (a + c) = b - c)%F.
+Proof.
+intros Hom *.
+apply rngl_has_opp_or_sous_cases in Hom.
+remember rngl_has_opp' as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+...
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_opp_add_distr; [ | easy ].
+  unfold rngl_sub; rewrite Hop.
+  rewrite rngl_add_assoc.
+  rewrite rngl_add_add_swap.
+  rewrite (rngl_add_add_swap a).
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite fold_rngl_sub; [ | easy ].
+  rewrite rngl_sub_diag, rngl_add_0_l; [ easy | now left ].
+}
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo; [ clear Hom | now destruct Hom ].
+specialize rngl_opt_sub_sub_sub_add as H1.
+rewrite Hmo in H1.
+rewrite <- H1.
+rewrite rngl_add_comm.
+rewrite rngl_add_sub; [ easy | ].
+now right.
 Qed.
 
 ...
@@ -1053,6 +1085,8 @@ rewrite rngl_add_comm.
 rewrite rngl_add_sub; [ easy | ].
 now right.
 Qed.
+
+...
 
 Theorem rngl_inv_1 :
   rngl_has_inv = true →
