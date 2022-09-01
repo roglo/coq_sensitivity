@@ -979,6 +979,8 @@ Theorem mat_mul_1_l {n} : ∀ (M : matrix T),
   → (mI n * M)%M = M.
 Proof.
 intros * HM Hn; subst n.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
@@ -989,7 +991,6 @@ unfold mat_ncols; cbn.
 remember (length (hd [] ll)) as ncols eqn:Hc.
 remember (map _ _) as x.
 rewrite List_map_nth_seq with (d := []); subst x.
-(**)
 rewrite <- seq_shift.
 rewrite <- seq_shift, map_map.
 apply map_ext_in.
@@ -1015,7 +1016,7 @@ rewrite rngl_summation_split3 with (j0 := S i). 2: {
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk | flia Hk | flia Hk ].
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 rewrite rngl_add_0_l.
 apply in_seq in Hi.
@@ -1027,7 +1028,7 @@ rewrite <- Hla.
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk | flia Hk | flia Hk ].
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 apply rngl_add_0_r.
 Qed.
@@ -1038,6 +1039,8 @@ Theorem mat_mul_1_r {n} : ∀ (M : matrix T),
   → (M * mI n)%M = M.
 Proof.
 intros * HM H; subst n.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
@@ -1080,7 +1083,7 @@ rewrite rngl_summation_split_last; [ | now apply -> Nat.succ_le_mono ].
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk | flia | flia Hk ].
-  now apply rngl_mul_0_r; left.
+  now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_l.
 apply in_seq in Hj.
@@ -1089,7 +1092,7 @@ rewrite rngl_mul_1_r.
 rewrite all_0_rngl_summation_0. 2: {
   intros k Hk.
   rewrite mat_el_mI_ndiag; [ | flia Hk | flia | flia Hk ].
-  now apply rngl_mul_0_r; left.
+  now apply rngl_mul_0_r.
 }
 rewrite rngl_add_0_r.
 subst la; cbn.
@@ -1101,6 +1104,8 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   → (mI n • V)%M = V.
 Proof.
 intros * Hn; subst n.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 apply vector_eq. 2: {
   now cbn; do 2 rewrite map_length; rewrite seq_length.
 }
@@ -1128,7 +1133,7 @@ erewrite map2_ext_in. 2: {
   intros j k Hj Hk; apply in_seq in Hj.
   destruct Hj as (_, Hj); cbn in Hj.
   rewrite δ_ndiag; [ | flia Hj ].
-  rewrite rngl_mul_0_l; [ easy | now left ].
+  now rewrite rngl_mul_0_l.
 }
 rewrite rngl_summation_list_app.
 rewrite all_0_rngl_summation_list_0. 2: {
@@ -1155,7 +1160,7 @@ erewrite map2_ext_in. 2: {
   intros j k Hj Hk; apply in_seq in Hj.
   destruct Hj as (Hj, _).
   rewrite δ_ndiag; [ | flia Hj ].
-  rewrite rngl_mul_0_l; [ easy | now left ].
+  now rewrite rngl_mul_0_l.
 }
 rewrite rngl_summation_list_cons.
 rewrite all_0_rngl_summation_list_0. 2: {
@@ -1182,6 +1187,8 @@ Theorem mat_mul_assoc :
   → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
 intros * Hrbz Hcbz Hcarb.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "*"%M.
 f_equal.
 unfold mat_nrows at 5; cbn.
@@ -1231,7 +1238,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     easy.
   }
-  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
   erewrite rngl_summation_eq_compat. 2: {
     intros m Hm.
     now rewrite rngl_mul_assoc.
@@ -1264,7 +1271,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite seq_nth; [ | flia Hcbz Hk ].
     easy.
   }
-  rewrite rngl_mul_summation_distr_r; [ | now left ].
+  rewrite rngl_mul_summation_distr_r; [ | easy ].
   apply in_seq in Hi.
   rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
   rewrite Nat.add_1_r.
@@ -1506,6 +1513,8 @@ Theorem mat_mul_scal_l_mul :
   → (a × MA * MB = a × (MA * MB))%M.
 Proof.
 intros * Ha.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite map_length; cbn.
@@ -1526,7 +1535,7 @@ rewrite (List_map_hd []). 2: {
 }
 rewrite map_length.
 rewrite fold_mat_ncols.
-rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite List_map_nth' with (a := []). 2: {
@@ -1565,6 +1574,8 @@ Theorem mat_mul_mul_scal_l :
   → (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros Hic * Hb Hcaz Hcarb.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 apply Nat.neq_0_lt_0 in Hcaz.
 unfold "*"%M, "×"%M; cbn.
 f_equal.
@@ -1579,7 +1590,7 @@ rewrite map_map.
 apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el; cbn.
-rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite List_map_nth' with (a := []). 2: {
@@ -1634,14 +1645,16 @@ Theorem mat_vect_mul_assoc_as_sums :
         vect_el V j.
 Proof.
 intros * Hi.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite rngl_mul_summation_distr_l; [ easy | now left ].
+  now rewrite rngl_mul_summation_distr_l.
 }
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite rngl_mul_summation_distr_r; [ easy | now left ].
+  now rewrite rngl_mul_summation_distr_r.
 }
 symmetry.
 cbn.
@@ -1664,6 +1677,8 @@ Theorem mat_vect_mul_assoc :
   → (A • (B • V) = (A * B) • V)%M.
 Proof.
 intros * Ha Hb Hcarb Hcbv.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "•"%M, "*"%M; cbn.
 f_equal.
 rewrite map_map.
@@ -1798,7 +1813,7 @@ destruct s. {
   rewrite Hcarb.
   rewrite rngl_summation_empty; [ | easy ].
   symmetry.
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 rewrite (rngl_summation_shift 1). 2: {
   split; [ easy | flia ].
@@ -1818,6 +1833,8 @@ Theorem mat_mul_scal_vect_assoc :
   → (a × (MA • V))%V = ((a × MA) • V)%M.
 Proof.
 intros * Ha Hcav.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "×"%V, "×"%M, "•"%V; cbn.
 f_equal.
 do 2 rewrite map_map.
@@ -1829,7 +1846,7 @@ apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
-rewrite rngl_mul_summation_list_distr_l; [ | now left ].
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 rewrite map2_map2_seq_l with (d := 0%F).
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Harc, Ha).
@@ -1879,6 +1896,8 @@ Theorem mat_mul_scal_vect_comm :
   → (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros Hic * Ha Hcav.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "×"%V, "•"%M; cbn.
 f_equal.
 rewrite map_map.
@@ -1887,7 +1906,7 @@ rewrite fold_mat_nrows.
 apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
-rewrite rngl_mul_summation_list_distr_l; [ | now left ].
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 rewrite map2_map_r.
 rewrite map2_map2_seq_l with (d := 0%F).
 rewrite map2_map2_seq_r with (d := 0%F).
@@ -2757,6 +2776,8 @@ Theorem mat_vect_mul_0_r : ∀ m n (M : matrix T),
   → (M • vect_zero n = vect_zero m)%V.
 Proof.
 intros * Hr Hc.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 subst m n.
 unfold "•"%V, vect_zero; cbn; f_equal.
 unfold vect_dot_mul; cbn.
@@ -2776,7 +2797,7 @@ rewrite List_nth_repeat; cbn.
 rewrite repeat_length in Hkm.
 apply Nat.min_glb_lt_iff in Hkm.
 destruct (lt_dec k (length (hd [] lla))) as [H| H]; [ | flia Hkm H ].
-now apply rngl_mul_0_r; left.
+now apply rngl_mul_0_r.
 Qed.
 
 Notation "A ⁺" := (mat_transp A) (at level 1, format "A ⁺") : M_scope.

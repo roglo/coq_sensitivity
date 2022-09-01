@@ -167,9 +167,8 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_one := @qi_one d;
      rngl_add := @qi_add d;
      rngl_mul := @qi_mul d;
-     rngl_opt_opp := Some (@qi_opp d);
+     rngl_opt_opp_or_sous := Some (inl (@qi_opp d));
      rngl_opt_inv := None;
-     rngl_opt_sous := None;
      rngl_opt_quot := Some (@qi_quot d);
      rngl_opt_eqb := None; (* to be improved, perhaps *)
      rngl_le := phony_qi_le |}.
@@ -1068,9 +1067,8 @@ Check glip.
 *)
 
 Theorem quad_int_consistent :
- (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
  (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. split; [ now right | now left ]. Qed.
+Proof. now left. Qed.
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;

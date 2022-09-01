@@ -82,7 +82,9 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-rewrite <- (rngl_mul_0_r (or_introl Hop) 0).
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
+rewrite <- (rngl_mul_0_r Hop' 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
@@ -121,6 +123,8 @@ Theorem eq_vect_squ_0 :
   ∀ v, ≺ v, v ≻ = 0%F → v = vect_zero (vect_size v).
 Proof.
 intros Hop Hed Hdo Hor * Hvvz.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold vect_dot_mul in Hvvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
 intros i Hi.
@@ -150,14 +154,14 @@ apply rngl_eq_add_0 in Hvvz; [ | easy | | ]; cycle 1. {
 destruct Hvvz as (Haz, Hvvz).
 specialize (IHla Hvvz).
 destruct i. {
-  apply rngl_integral in Haz; [ | now left | ]. 2: {
+  apply rngl_integral in Haz; [ | easy | ]. 2: {
     now apply Bool.orb_true_iff; left.
   }
   now destruct Haz.
 }
 rewrite Nat_sub_succ_1.
 destruct i. {
-  apply rngl_integral in Haz; [ | now left | ]. 2: {
+  apply rngl_integral in Haz; [ | easy | ]. 2: {
     now apply Bool.orb_true_iff; left.
   }
   now destruct Haz.
@@ -169,7 +173,7 @@ flia Hi.
 Qed.
 
 Theorem Rayleigh_quotient_mul_scal_l_zero :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ c M,
   Rayleigh_quotient M (c × vect_zero (mat_nrows M)) =
   Rayleigh_quotient M (vect_zero (mat_nrows M)).
@@ -221,9 +225,11 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros Hof * Hsm Hsr Hcz.
 destruct Hof as (Hic & Hop & Heq & Hld & Hdo & Hin & Hor).
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
   subst V; cbn.
-  now apply Rayleigh_quotient_mul_scal_l_zero; left.
+  now apply Rayleigh_quotient_mul_scal_l_zero.
 }
 unfold Rayleigh_quotient.
 rewrite <- mat_mul_scal_vect_comm; [ | easy | easy | | ]; cycle 1. {
@@ -231,16 +237,16 @@ rewrite <- mat_mul_scal_vect_comm; [ | easy | easy | | ]; cycle 1. {
 } {
   now rewrite square_matrix_ncols.
 }
-rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
-rewrite vect_scal_mul_dot_mul_comm; [ | now left ].
-rewrite vect_scal_mul_dot_mul_comm; [ | now left ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
+rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
+rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hin.
-rewrite rngl_inv_mul_distr; [ | now left | easy | easy | | ]; cycle 1. {
+rewrite rngl_inv_mul_distr; [ | easy | easy | easy | | ]; cycle 1. {
   intros H.
-  apply rngl_integral in H; [ now destruct H | now left | ].
+  apply rngl_integral in H; [ now destruct H | easy | ].
   now apply Bool.orb_true_iff; left.
 } {
   intros H.
@@ -252,7 +258,7 @@ rewrite rngl_mul_comm; [ | easy ].
 do 2 rewrite rngl_mul_assoc.
 rewrite rngl_mul_inv_l; [ now rewrite rngl_mul_1_l | easy | ].
 intros H; apply Hcz.
-apply rngl_integral in H; [ now destruct H| now left | ].
+apply rngl_integral in H; [ now destruct H | easy | ].
 now apply Bool.orb_true_iff; left.
 Qed.
 
@@ -269,9 +275,11 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold Rayleigh_quotient.
 rewrite Hmv.
-rewrite vect_dot_mul_scal_mul_comm; [ | now left | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 apply rngl_mul_div_l; [ now left | ].
 intros H.
 now apply eq_vect_squ_0 in H.
@@ -380,7 +388,7 @@ Qed.
 
 Theorem mat_mul_vect_dot_vect :
   rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ (M : matrix T) U V,
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -466,7 +474,7 @@ Qed.
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
@@ -657,7 +665,7 @@ Qed.
    see the comment for the theorem below *)
 Lemma diagonalized_matrix_prop_1 :
   rngl_is_comm = true →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ n (M : matrix T) ev eV D U,
   mat_nrows M = n
   → length eV = n
@@ -945,6 +953,10 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
   → (M = U * D * U⁻¹)%M.
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_with_vect in Ho; cbn in Ho.
@@ -956,9 +968,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 specialize diagonalized_matrix_prop_1 as H1.
 assert (H : rngl_is_comm = true) by now destruct Hif.
-specialize (H1 H); clear H.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (H1 (or_introl H)); clear H.
+specialize (H1 H Hop'); clear H.
 specialize (H1 n M ev eV D U Hrn Hlev Hsy Hvv Hevn Hd Ho).
 generalize H1; intros H1v.
 apply (f_equal (λ A, (A * U⁻¹)%M)) in H1.
@@ -976,7 +986,7 @@ assert (Hsu : is_square_matrix U = true). {
 assert (Hdu : det U ≠ 0%F). {
   generalize Hvv; intros H.
   apply for_symm_squ_mat_eigen_vect_mat_is_ortho with (A := U) in H;
-    try (now destruct Hif); [ | now destruct Hif; left ].
+    try (now destruct Hif).
   rename H into Huu.
   apply (f_equal det) in Huu.
   rewrite (determinant_mul Hif) in Huu; [ | | easy | ]; cycle 1. {
@@ -986,9 +996,9 @@ assert (Hdu : det U ≠ 0%F). {
     now apply square_matrix_ncols.
   }
   rewrite (determinant_transpose Hif) in Huu; [ | easy ].
-  rewrite det_mI in Huu; [ | now destruct Hif; left ].
+  rewrite det_mI in Huu; [ | easy ].
   intros H; rewrite H in Huu.
-  rewrite rngl_mul_0_r in Huu; [ | now destruct Hif; left ].
+  rewrite rngl_mul_0_r in Huu; [ | easy ].
   symmetry in Huu; revert Huu.
   apply rngl_1_neq_0; now destruct Hif.
 }
@@ -1064,7 +1074,8 @@ assert
            (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%F). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
-  assert (Hos : rngl_has_opp = true ∨ rngl_has_sous = true) by now left.
+...
+  assert (Hos : rngl_has_opp_or_sous = true) by now left.
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).
   unfold Rayleigh_quotient.

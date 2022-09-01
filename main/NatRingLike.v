@@ -12,9 +12,8 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_one := 1;
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
-     rngl_opt_opp := None;
+     rngl_opt_opp_or_sous := Some (inr Nat.sub);
      rngl_opt_inv := None;
-     rngl_opt_sous := Some Nat.sub;
      rngl_opt_quot := Some Nat.div;
      rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
@@ -68,9 +67,8 @@ apply Nat.sub_add_distr.
 Qed.
 
 Theorem Nat_consistent :
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now split; left. Qed.
+Proof. now left. Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;

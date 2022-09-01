@@ -12,9 +12,8 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_one := 1%Q;
      rngl_add := Q.add;
      rngl_mul := Q.mul;
-     rngl_opt_opp := Some Q.opp;
+     rngl_opt_opp_or_sous := Some (inl Q.opp);
      rngl_opt_inv := Some Q.inv;
-     rngl_opt_sous := None;
      rngl_opt_quot := None;
      rngl_opt_eqb := Some Q.eqb;
      rngl_le := Q.le |}.
@@ -68,9 +67,8 @@ now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
 Theorem Q_consistent :
- (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
  (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now split; right. Qed.
+Proof. now right. Qed.
 
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;

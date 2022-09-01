@@ -341,7 +341,9 @@ Theorem lemma_2_A_n_2_eq_n_I :
   rngl_has_opp = true →
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
-intros Hro *.
+intros Hop *.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite mA_nrows.
@@ -366,8 +368,8 @@ induction n; intros. {
   apply Nat.lt_1_r in Hi, Hk; subst i k; cbn.
   rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
-  rewrite rngl_mul_0_l; [ | now left ].
-  rewrite rngl_mul_0_l; [ easy | now left ].
+  rewrite rngl_mul_0_l; [ | easy ].
+  now rewrite rngl_mul_0_l.
 }
 rewrite (rngl_summation_split (2 ^ n)). 2: {
   split; [ flia | ].
@@ -546,9 +548,9 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]. {
           rewrite Hij, Hjk in Hik; flia Hik.
         }
-        now apply rngl_mul_0_r; left.
+        now apply rngl_mul_0_r.
       } {
-        now apply rngl_mul_0_l; left.
+        now apply rngl_mul_0_l.
       }
     } {
       subst k.
@@ -557,7 +559,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite all_0_rngl_summation_0. 2: {
         intros j Hj.
         rewrite δ_ndiag; [ | flia Hj ].
-        now apply rngl_mul_0_l; left.
+        now apply rngl_mul_0_l.
       }
       rewrite rngl_add_0_l.
       rewrite Nat_sub_succ_1.
@@ -565,7 +567,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite all_0_rngl_summation_0. 2: {
         intros j Hj.
         rewrite δ_ndiag; [ | flia Hj ].
-        now apply rngl_mul_0_l; left.
+        now apply rngl_mul_0_l.
       }
       apply rngl_add_0_r.
     } {
@@ -578,15 +580,15 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         destruct (Nat.eq_dec (j - 1) k) as [Hjk| Hjk]. {
           rewrite Hij, Hjk in Hik; flia Hik.
         }
-        now apply rngl_mul_0_r; left.
+        now apply rngl_mul_0_r.
       } {
-        now apply rngl_mul_0_l; left.
+        now apply rngl_mul_0_l.
       }
     }
   } {
     apply Nat.nlt_ge in Hkn.
     rewrite δ_ndiag; [ | flia Hin Hkn ].
-    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_r; [ | easy ].
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       assert (Hj' : j - 1 ≤ 2 ^ S n - 1) by flia Hj.
@@ -670,13 +672,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_r.
     rewrite (rngl_summation_split3 i). 2: {
@@ -686,17 +688,17 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_l; left.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_l; left.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_r.
     rewrite Nat.add_1_r.
-    now apply rngl_sub_diag; left.
+    now apply rngl_sub_diag.
   }
 } {
   apply Nat.nlt_ge in Hin.
@@ -750,7 +752,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   cbn - [ "^" ].
   destruct (lt_dec k (2 ^ n)) as [Hkn| Hkn]. {
     rewrite δ_ndiag; [ | flia Hin Hkn ].
-    rewrite rngl_mul_0_r; [ | now left ].
+    rewrite rngl_mul_0_r; [ | easy ].
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       rewrite app_nth1. 2: {
@@ -771,13 +773,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj Hkn ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite δ_ndiag; [ | flia Hj Hkn ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_r.
     erewrite rngl_summation_eq_compat. 2: {
@@ -838,7 +840,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       rewrite seq_nth; [ | cbn in Hi; flia Hj Hi ].
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_l; left.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_l.
     rewrite app_nth1. 2: {
@@ -873,7 +875,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       }
       rewrite seq_nth; [ | flia Hj ].
       rewrite δ_ndiag; [ | flia Hj ].
-      now apply rngl_mul_0_l; left.
+      now apply rngl_mul_0_l.
     }
     rewrite rngl_add_0_r.
     now apply rngl_add_opp_l.
@@ -1019,13 +1021,13 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite (@δ_ndiag _ _ (j - 1 - 1)); [ | flia Hj ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_l.
     rewrite all_0_rngl_summation_0. 2: {
       intros j Hj.
       rewrite (@δ_ndiag _ _ (j - 1)); [ | flia Hj ].
-      now apply rngl_mul_0_r; left.
+      now apply rngl_mul_0_r.
     }
     rewrite rngl_add_0_r.
     rewrite Nat.add_sub, δ_diag, rngl_mul_1_r.
@@ -1589,7 +1591,9 @@ Theorem An_eigen_equation_for_sqrt_n :
       → (mA (S n') • V = μ × V)%V
   end.
 Proof.
-intros Hic Hro Hin Heq * Hμ.
+intros Hic Hop Hin Heq * Hμ.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 destruct n. {
   intros V Hv.
   cbn in Hμ, V |-*.
@@ -1598,7 +1602,7 @@ destruct n. {
     destruct μz; [ now apply rngl_eqb_eq | ].
     apply rngl_eqb_neq in Hμz; [ | easy ].
     apply (f_equal (rngl_mul (μ⁻¹)%F)) in Hμ.
-    rewrite rngl_mul_0_r in Hμ; [ | now left ].
+    rewrite rngl_mul_0_r in Hμ; [ | easy ].
     rewrite rngl_mul_assoc in Hμ.
     rewrite rngl_mul_inv_l in Hμ; [ | easy | easy ].
     now rewrite rngl_mul_1_l in Hμ.
@@ -1614,7 +1618,7 @@ destruct n. {
   destruct la; [ cbn | easy ].
   unfold vect_dot_mul; cbn.
   unfold iter_list; cbn.
-  rewrite rngl_add_0_l, rngl_mul_0_l; [ easy | now left ].
+  now rewrite rngl_add_0_l, rngl_mul_0_l.
 }
 intros * HU HV.
 subst V.
@@ -1820,7 +1824,9 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
-intros Hic Hro Heq Hin H10 *.
+intros Hic Hop Heq Hin H10 *.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 split. {
   intros HV.
   destruct HV as (V & Hvz & Hv).
@@ -1838,7 +1844,7 @@ split. {
       now revert H; apply rngl_1_neq_0.
     }
     specialize An_eigen_equation_for_sqrt_n as H1.
-    specialize (H1 Hic Hro Hin Heq).
+    specialize (H1 Hic Hop Hin Heq).
     now apply (H1 0).
   }
   remember (A_Sn_eigenvector_of_sqrt_Sn n μ (base_vector_1 (2 ^ n))) as V
@@ -1858,7 +1864,7 @@ split. {
   }
   split. 2: {
     specialize An_eigen_equation_for_sqrt_n as H1.
-    specialize (H1 Hic Hro Hin Heq).
+    specialize (H1 Hic Hop Hin Heq).
     specialize (H1 (S n) μ Hμ).
     cbn - [ mA ] in H1.
     specialize (H1 (base_vector_1 (2 ^ n)) V).
@@ -1916,7 +1922,7 @@ split. {
     rewrite map2_diag in Hi.
     apply in_map_iff in Hi.
     destruct Hi as (j & Hi & Hj); subst i.
-    now apply rngl_mul_0_r; left.
+    now apply rngl_mul_0_r.
   }
   rewrite rngl_add_0_r in H2.
   now specialize (rngl_1_neq_0 H10) as H3.

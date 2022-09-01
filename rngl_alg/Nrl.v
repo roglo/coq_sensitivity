@@ -110,9 +110,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
-     rngl_opt_opp := Some (Zn_opp n);
+     rngl_opt_opp_or_sous := Some (inl (Zn_opp n));
      rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
-     rngl_opt_sous := None;
      rngl_opt_quot := None;
      rngl_opt_eqb := Some (Zn_eqb n);
      rngl_le := Zn_le n |}.
@@ -354,9 +353,8 @@ apply Nat.sub_diag.
 Qed.
 
 Theorem Zn_consistent :
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now split; right. Qed.
+Proof. now right. Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_is_comm := true;
@@ -418,9 +416,8 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_one := 1;
      rngl_add := Nat.lcm;
      rngl_mul := Nat.mul;
-     rngl_opt_opp := None;
+     rngl_opt_opp_or_sous := None;
      rngl_opt_inv := None;
-     rngl_opt_sous := None;
      rngl_opt_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
@@ -446,11 +443,8 @@ now left.
 Qed.
 
 Theorem lcm_consistent :
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof.
-now split; left.
-Qed.
+Proof. now left. Qed.
 
 Definition lcm_ring_like_prop :=
   {| rngl_is_comm := true;

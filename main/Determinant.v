@@ -432,6 +432,8 @@ Theorem det_is_det' :
   → det M = det' M.
 Proof.
 intros Hic Hop Hin H10 * Hm.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 unfold det'.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 unfold det.
@@ -469,7 +471,7 @@ cbn - [ canon_sym_gr_list fact nth ].
 clear IHn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | now left ].
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
   easy.
 }
 cbn - [ canon_sym_gr_list fact nth ].
@@ -557,6 +559,8 @@ Theorem det'_is_det'' :
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop Heq *.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold det', det''.
   now rewrite Hrz.
@@ -679,7 +683,7 @@ assert (H1 :
     now apply canon_sym_gr_list_inv_ub.
   }
   rewrite H.
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -770,6 +774,8 @@ Theorem determinant_multilinear :
         b * det (mat_repl_vect' i M V))%F.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
 rewrite det_is_det'; try easy. 2: {
@@ -836,8 +842,8 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
-rewrite rngl_mul_summation_distr_l; [ | now left ].
-rewrite rngl_mul_summation_distr_l; [ | now left ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -1182,6 +1188,10 @@ Theorem determinant_alternating : in_charac_0_field →
   → det (mat_swap_rows p q M) = (- det M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 rewrite det_is_det'; try now destruct Hif. 2: {
   rewrite <- Hr in Hp, Hq.
@@ -1395,7 +1405,7 @@ erewrite rngl_summation_eq_compat. 2: {
   flia Hp Hq Hpq.
 }
 cbn - [ f ].
-rewrite <- rngl_mul_summation_distr_l; [ | now destruct Hif; left ].
+rewrite <- rngl_mul_summation_distr_l; [ | easy ].
 rewrite rngl_mul_opp_l; [ | now destruct Hif ].
 f_equal.
 rewrite rngl_mul_1_l.
@@ -1538,6 +1548,8 @@ Theorem determinant_same_rows : in_charac_0_field →
   → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hch.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : det M = (- det M)%F). {
@@ -1584,7 +1596,7 @@ assert (HM : det M = (- det M)%F). {
   easy.
 }
 apply rngl_add_move_0_r in HM; [ | easy ].
-apply eq_rngl_add_same_0 in HM; try easy; [ now left | ].
+apply eq_rngl_add_same_0 in HM; try easy.
 apply Bool.orb_true_iff.
 now left.
 Qed.
@@ -2751,7 +2763,7 @@ now rewrite mat_subm_transp.
 Qed.
 
 Theorem det_mI :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ n, det (mI n) = 1%F.
 Proof.
 intros Hop *; cbn.

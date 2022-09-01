@@ -83,7 +83,7 @@ Definition vect_dot_mul' (U V : vector T) :=
   vect_el U i * vect_el V i.
 
 Theorem vect_dot_mul_dot_mul' :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ U V,
   vect_dot_mul U V = vect_dot_mul' U V.
 Proof.
@@ -195,7 +195,7 @@ Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
 Proof. now intros; cbn; rewrite map_length. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_comm = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
@@ -217,7 +217,7 @@ now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ (a : T) (U V : vector T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
@@ -234,217 +234,6 @@ intros * Hb.
 f_equal; symmetry.
 apply rngl_mul_assoc.
 Qed.
-
-(* seems to be false
-Theorem vect_mul_scal_l_dot_mul_swap :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  rngl_is_comm = true →
-  ∀ n U V W, vect_size U = n → vect_size V = n → vect_size W = n →
-  (≺ U, V ≻ × W = ≺ U, W ≻ × V)%V.
-Proof.
-intros Hopp Hcomm * Hu Hv Hw.
-Abort.
-End a.
-Require Import NatRingLike.
-Declare Scope V_scope.
-Delimit Scope V_scope with V.
-Arguments vect_add {T}%type {ro} (U V)%V.
-Arguments vect_sub {T ro} U%V V%V.
-Arguments vect_opp {T ro} V%V.
-Arguments vect_mul_scal_l {T ro} s%F V%V.
-Arguments vect_mul_scal_reg_r {T}%type {ro rp} Hde Hii V%V (a b)%F.
-Arguments vect_zero {T ro} n%nat.
-Arguments vect_dot_mul {T}%type {ro} (U V)%V.
-Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
-Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
-Arguments vect_el {T}%type {ro} V%V i%nat.
-Arguments vect_size {T}%type v%V.
-Arguments vect_squ_norm {T}%type {ro} V%V.
-Arguments vector_eq {T}%type {ro} (U V)%V.
-Notation "U + V" := (vect_add U V) : V_scope.
-Notation "U - V" := (vect_sub U V) : V_scope.
-Notation "μ × V" := (vect_mul_scal_l μ V) (at level 40) : V_scope.
-Notation "≺ U , V ≻" := (vect_dot_mul U V) (at level 35).
-Notation "- V" := (vect_opp V) : V_scope.
-Compute (
-  let U := mk_vect [3;4;5] in
-  let V := mk_vect [1;3;2] in
-  let W := mk_vect [8;1;1] in
-  (≺ U, V ≻ × W)%V = (≺ U, W ≻ × V)%V).
-(* it's false! *)
-...
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  move Hnz at top; subst n.
-  destruct U as (llu).
-  destruct V as (llv).
-  destruct W as (llw); cbn in Hu, Hv, Hw |-*.
-  apply length_zero_iff_nil in Hu, Hv, Hw.
-  now subst llu llv llw.
-}
-unfold vect_mul_scal_l.
-f_equal; cbn.
-erewrite map_ext_in. 2: {
-  intros a Ha.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite <- vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-  easy.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros a Ha.
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite <- vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-  easy.
-}
-symmetry.
-unfold vect_dot_mul.
-destruct U as (llu).
-destruct V as (llv).
-destruct W as (llw); cbn in Hu, Hv, Hw |-*.
-erewrite map_ext_in. 2: {
-  intros a Ha.
-  now rewrite map2_map_r.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros a Ha.
-  now rewrite map2_map_r.
-}
-symmetry.
-remember (λ c, _) as x; subst x; symmetry.
-remember (λ c, _) as x; subst x; symmetry.
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  erewrite map2_ext_in. 2: {
-    intros a b Ha Hb.
-    rewrite rngl_mul_comm; [ | easy ].
-    rewrite rngl_mul_mul_swap; [ | easy ].
-    now rewrite <- rngl_mul_assoc.
-  }
-  rewrite <- map_map2.
-  rewrite rngl_summation_list_map.
-  rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
-  easy.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  erewrite map2_ext_in. 2: {
-    intros a b Ha Hb.
-    rewrite rngl_mul_comm; [ | easy ].
-    rewrite rngl_mul_mul_swap; [ | easy ].
-    now rewrite <- rngl_mul_assoc.
-  }
-  rewrite <- map_map2.
-  rewrite rngl_summation_list_map.
-  rewrite <- rngl_mul_summation_list_distr_l; [ | easy ].
-  easy.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  rewrite (map2_first_first _ _ _ eq_refl).
-  rewrite Hu, Hv, Nat.min_id.
-  rewrite firstn_all2; [ | now rewrite Hu ].
-  rewrite firstn_all2; [ | now rewrite Hv ].
-  rewrite (map2_map2_seq_l _ 0%F).
-  rewrite (map2_map2_seq_r _ 0%F).
-  rewrite Hu, Hv.
-  rewrite map2_diag.
-  rewrite rngl_summation_list_map.
-  rewrite rngl_summation_seq_summation; [ | easy ].
-  now rewrite Nat.add_0_l.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  rewrite (map2_first_first _ _ _ eq_refl).
-  rewrite Hu, Hw, Nat.min_id.
-  rewrite firstn_all2; [ | now rewrite Hu ].
-  rewrite firstn_all2; [ | now rewrite Hw ].
-  rewrite (map2_map2_seq_l _ 0%F).
-  rewrite (map2_map2_seq_r _ 0%F).
-  rewrite Hu, Hw.
-  rewrite map2_diag.
-  rewrite rngl_summation_list_map.
-  rewrite rngl_summation_seq_summation; [ | easy ].
-  now rewrite Nat.add_0_l.
-}
-symmetry.
-rewrite (List_map_nth_seq llw 0%F) at 1.
-rewrite (List_map_nth_seq llv 0%F) at 1.
-rewrite Hv, Hw.
-do 2 rewrite map_map.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | easy ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_mul_comm; [ | easy ].
-    easy.
-  }
-  cbn.
-  remember (∑ (j = _, _), _) as x; subst x.
-  easy.
-}
-symmetry.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | easy ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    rewrite rngl_mul_comm; [ | easy ].
-    rewrite rngl_mul_mul_swap; [ | easy ].
-    easy.
-  }
-  cbn.
-  remember (∑ (j = _, _), _) as x; subst x.
-  easy.
-}
-symmetry.
-...
-Require Import NatRingLike.
-Compute (
-  let llu := [3;4;5] in
-  let llv := [1;3;2] in
-  let llw := [8;1;1] in
-  let n := length llu in
-  map (λ i : nat, ∑ (j = 0, n - 1), nth j llu 0 * nth j llv 0 * nth i llw 0) (seq 0 n) =
-  map (λ i : nat, ∑ (j = 0, n - 1), nth j llu 0 * nth i llv 0 * nth j llw 0) (seq 0 n)).
-...
-rewrite rngl_summation_seq_summation.
-...
-enough (length llu = length llv).
-rewrite H.
-rewrite map2_diag.
-Search map2.
-...
-map2_diag:
-  ∀ (A B : Type) (f : A → A → B) (la : list A),
-    map2 f la la = map (λ i : A, f i i) la
-
-remember (λ i b, _) as f.
-  rewrite (map2_map2_seq_l _ 0) with (lb := llv).
-  rewrite seq_length.
-Check map2_map2_seq_l.
-Check map_map2.
-...
-erewrite map_ext_in. 2: {
-  intros c Hc.
-  rewrite <- map_map2.
-Search map2.
-Check map2_map2_seq_l.
-Check map_map2.
-...
-  ============================
-  map (λ c : T, ∑ (t ∈ map2 rngl_mul llu (map (λ b : T, (b * c)%F) llv)), t)
-    llw =
-  map (λ c : T, ∑ (t ∈ map2 rngl_mul llu (map (λ b : T, (b * c)%F) llw)), t)
-    llv
-...
-*)
 
 Theorem vect_eq_dec :
   rngl_has_eqb = true →

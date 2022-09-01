@@ -657,6 +657,10 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
 destruct Hadk as (l1 & l2 & l3 & a & Ha).
 rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
@@ -667,7 +671,7 @@ rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
   apply in_or_app; right.
   now apply in_or_app; right; left.
 }
-rewrite rngl_mul_0_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_0_l; [ | easy ].
 set (p1 := S (length l1)).
 set (q1 := S (length (l1 ++ a :: l2))).
 apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
@@ -726,6 +730,10 @@ Theorem det_isort_rows_no_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -746,7 +754,7 @@ rewrite det_is_det''; try now destruct Hif. 2: {
 unfold det''.
 do 2 rewrite mat_select_rows_nrows.
 rewrite isort_length.
-rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 symmetry; erewrite rngl_summation_list_eq_compat. 2: {
   intros jl Hjl.
   now rewrite rngl_mul_assoc.
@@ -1266,6 +1274,8 @@ Theorem rngl_summation_prodn_repeat_filter_no_dup :
     ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
+specialize (rngl_has_opp_has_opp_or_sous Hopp) as Hop'.
+move Hop' before Hopp.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
   unfold equality.
@@ -1293,7 +1303,7 @@ rewrite all_0_rngl_summation_list_0. 2: {
     apply (no_dup_NoDup Nat.eqb_eq) in H.
     congruence.
   }
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 subst g.
 rewrite rngl_add_0_l.
@@ -1604,11 +1614,13 @@ Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
     (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hif * Hmz.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_product_summation_distr_prodn; [ | | easy ]. 2: {
-    now destruct Hif; left.
-  }
+  rewrite rngl_product_summation_distr_prodn; [ | easy | easy ].
   remember (∑ (kl ∈ _), _) as x; subst x.
   easy.
 }
@@ -1642,7 +1654,7 @@ remember (∑ (l ∈ _), _) as x; subst x.
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_mul_summation_list_distr_l; [ | now destruct Hif; left ].
+  rewrite rngl_mul_summation_list_distr_l; [ | easy ].
   erewrite rngl_summation_list_eq_compat. 2: {
     intros kl Hkl.
     rewrite rngl_mul_assoc.
@@ -1683,7 +1695,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite <- rngl_mul_summation_list_distr_r; [ | now destruct Hif; left ].
+rewrite <- rngl_mul_summation_list_distr_r; [ | easy ].
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 easy.
 Qed.
@@ -1778,6 +1790,10 @@ Lemma Cauchy_Binet_formula_step_5 : in_charac_0_field →
     det (mat_select_rows jl B).
 Proof.
 intros Hif *.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   now rewrite <- rngl_mul_assoc.
@@ -1822,7 +1838,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 symmetry.
 apply rngl_mul_summation_list_distr_r.
-now destruct Hif; left.
+now destruct Hif.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_6 : in_charac_0_field →

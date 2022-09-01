@@ -254,7 +254,7 @@ now rewrite Nat.add_1_r.
 Qed.
 
 Theorem rngl_product_list_integral :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ A (l : list A) f,
@@ -284,7 +284,7 @@ split; [ now right | easy ].
 Qed.
 
 Theorem rngl_product_integral :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
   ∀ b e f,
@@ -334,7 +334,7 @@ flia Hi.
 Qed.
 
 Theorem rngl_inv_product_list :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -372,7 +372,7 @@ apply fold_left_app.
 Qed.
 
 Theorem rngl_inv_product :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -424,7 +424,7 @@ Qed.
 
 Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   equality eqb →
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -440,7 +440,7 @@ now apply permutation_rev_l.
 Qed.
 
 Theorem rngl_inv_product_comm :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -457,7 +457,7 @@ apply Hnz; flia Hi.
 Qed.
 
 Theorem rngl_product_div_distr :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -575,7 +575,7 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
 Theorem rngl_product_summation_distr_prodn :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =

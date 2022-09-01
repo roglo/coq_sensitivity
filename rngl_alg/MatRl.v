@@ -16,7 +16,7 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-Context {Hro : @rngl_has_opp T ro = true}.
+Context {Hop : @rngl_has_opp T ro = true}.
 
 Theorem mZ_is_square_matrix : ∀ n,
   (mat_nrows (mZ n n) =? n) && is_square_matrix (mZ n n) = true.
@@ -116,19 +116,14 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_one := smI n;
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
-     rngl_opt_opp := Some square_matrix_opp;
+     rngl_opt_opp_or_sous := Some (inl square_matrix_opp);
      rngl_opt_inv := None;
-     rngl_opt_sous := None;
      rngl_opt_quot := None;
-(**)
      rngl_opt_eqb :=
        match rngl_opt_eqb with
        | Some eqb => Some (square_matrix_eqb eqb)
        | None => None
        end;
-(*
-     rngl_opt_eqb := None;
-*)
      rngl_le := phony_mat_le |}.
 
 (*
@@ -155,16 +150,14 @@ apply Nat.min_id.
 Qed.
 
 Theorem sm_mat_of_nat :
-  @rngl_has_opp T ro = true ∨ @rngl_has_sous T ro = true
-  → ∀ n m,
-     sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
+  ∀ n m,
+    sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
 (*
-  rngl_has_opp = true ∨ rngl_has_sous = true
-  → ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
+  ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
 *)
 Proof.
 cbn.
-intros Hop; cbn.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
@@ -195,8 +188,7 @@ Theorem mat_el_of_nat_diag {n} : ∀ m i,
 Proof.
 intros * Hin.
 assert (Hi' : i - 1 < n) by flia Hin.
-rewrite sm_mat_of_nat; [ | now left ].
-cbn.
+rewrite sm_mat_of_nat; cbn.
 rewrite map_map.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
 rewrite List_map_nth' with (a := 0%F). 2: {
@@ -563,27 +555,6 @@ apply List_hd_in, Nat.neq_0_lt_0.
 now rewrite fold_mat_nrows, Hr.
 Qed.
 
-(*
-Theorem squ_mat_opt_eq_dec {n} :
-  if rngl_has_dec_eq then ∀ MA MB : square_matrix n T, {MA = MB} + {MA ≠ MB}
-  else not_applicable.
-Proof.
-remember rngl_has_dec_eq as b eqn:Hed; symmetry in Hed.
-destruct b; [ | easy ].
-intros.
-destruct MA as (MA & Ha).
-destruct MB as (MB & Hb).
-move MB before MA.
-destruct (mat_eq_dec Hed MA MB) as [Hab| Hab]. {
-  left; subst MB.
-  now apply square_matrix_eq.
-} {
-  right; intros H; apply Hab; clear Hab.
-  now injection H.
-}
-Qed.
-*)
-
 Theorem squ_mat_characteristic_prop {n} :
   if (if n =? 0 then 1 else rngl_characteristic) =? 0
   then
@@ -592,6 +563,8 @@ Theorem squ_mat_characteristic_prop {n} :
     @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
       (if n =? 0 then 1 else rngl_characteristic) = 0%F.
 Proof.
+specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+move Hop' before Hop.
 rewrite (if_eqb_eq_dec n).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
@@ -661,19 +634,19 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
 }
 cbn.
 apply square_matrix_eq; cbn.
-rewrite sm_mat_of_nat; [ | now left ].
+rewrite sm_mat_of_nat.
 unfold "×"%M, mZ.
 f_equal; rewrite H1.
 destruct n; [ flia Hnz | clear Hnz ].
 cbn.
 f_equal. {
-  f_equal; [ now apply rngl_mul_0_l; left | ].
+  f_equal; [ now apply rngl_mul_0_l | ].
   rewrite <- seq_shift.
   rewrite map_map, map_map.
   rewrite List_repeat_as_map.
   apply map_ext_in.
   intros i Hi.
-  now apply rngl_mul_0_l; left.
+  now apply rngl_mul_0_l.
 }
 rewrite <- seq_shift.
 rewrite map_map, map_map.
@@ -681,13 +654,13 @@ rewrite List_repeat_as_map.
 apply map_ext_in.
 intros i Hi.
 rewrite map_map; cbn.
-rewrite rngl_mul_0_l; [ | now left ].
+rewrite rngl_mul_0_l; [ | easy ].
 f_equal.
 rewrite List_repeat_as_map.
 rewrite map_map.
 apply map_ext_in.
 intros j Hj.
-now apply rngl_mul_0_l; left.
+now apply rngl_mul_0_l.
 Qed.
 
 (* to be completed
@@ -715,16 +688,13 @@ split; intros Hab. {
 *)
 
 Theorem squ_mat_consistent {n} :
-  (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n) = false
-   ∨ @rngl_has_sous (square_matrix n T) (mat_ring_like_op n) = false)
-  ∧ (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
-     ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
+  (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
+   ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
 (*
-  (rngl_has_opp = false ∨ rngl_has_sous = false) ∧
   (rngl_has_inv = false ∨ rngl_has_quot = false)
 *)
 Proof.
-now split; right.
+now right.
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :

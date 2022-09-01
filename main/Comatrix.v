@@ -1221,6 +1221,10 @@ Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 destruct M as (ll); cbn - [ det ].
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
@@ -1323,7 +1327,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 } {
   (* not on diagonal: zeroes *)
   rewrite δ_ndiag; [ | easy ].
-  rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
+  rewrite rngl_mul_0_r; [ | easy ].
   unfold mat_transp.
   unfold mat_mul_el.
   cbn - [ com ].
@@ -1403,6 +1407,10 @@ Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
+specialize rngl_has_opp_has_opp_or_sous as Hop'.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hop' H); clear H.
+move Hop' before Hif.
 destruct M as (ll); cbn - [ det ].
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
   apply length_zero_iff_nil in Hlz; subst ll; cbn.
@@ -1473,7 +1481,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 } {
   (* not on diagonal: zeroes *)
   rewrite δ_ndiag; [ | easy ].
-  rewrite rngl_mul_0_r; [ | now destruct Hif; left ].
+  rewrite rngl_mul_0_r; [ | easy ].
   unfold mat_transp.
   cbn - [ com ].
   erewrite rngl_summation_eq_compat. 2: {
@@ -1656,173 +1664,6 @@ unfold minus_one_pow.
 destruct (i mod 2); [ apply rngl_mul_1_l | ].
 now apply rngl_squ_opp_1.
 Qed.
-
-(* to be completed
-j'abandonne parce que ce théorème essaie de prouver com(A*B)=com(A)*com(B) dans
-le but lointain de prouver det(A*B)=det(A)*det(B), sauf que com fait déjà
-intervenir det ; c'est donc peut-être une mauvaise piste
-Theorem comatrix_mul :
-  rngl_is_comm = true →
-  rngl_has_opp = true →
-  ∀ n A B,
-  is_square_matrix A = true
-  → is_square_matrix B = true
-  → mat_nrows A = n
-  → mat_nrows B = n
-  → com (A * B) = (com A * com B)%M.
-Proof.
-intros Hic Hop * Hsma Hsmb Hra Hrb.
-(*
-destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
-  subst n.
-  apply eq_mat_nrows_0 in Hnz.
-  destruct A as (lla).
-  now cbn in Hnz; subst lla.
-}
-*)
-unfold mat_mul; cbn.
-assert (Hca : mat_ncols A = n) by now rewrite square_matrix_ncols.
-assert (Hcb : mat_ncols B = n) by now rewrite square_matrix_ncols.
-rewrite Hra, Hca, Hcb.
-unfold com at 1; cbn - [ det ].
-do 2 rewrite List_map_seq_length.
-rewrite comatrix_ncols, Hcb.
-f_equal.
-apply map_ext_in.
-intros i Hi; apply in_seq in Hi; cbn in Hi.
-unfold mat_ncols.
-cbn - [ det ].
-rewrite (List_map_hd 0); [ | now rewrite seq_length; flia Hi ].
-rewrite List_map_seq_length.
-apply map_ext_in.
-intros j Hj; apply in_seq in Hj; cbn in Hj.
-move j before i.
-symmetry.
-unfold mat_mul_el at 1.
-rewrite comatrix_ncols, Hca.
-unfold com at 1.
-unfold com at 1.
-cbn - [ det ].
-rewrite Hra, Hrb, Hca, Hcb.
-erewrite rngl_summation_eq_compat. 2: {
-  intros u Hu.
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hu Hi ].
-  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hj ].
-  rewrite seq_nth; [ | flia Hi ].
-  rewrite seq_nth; [ | flia Hu Hi ].
-  rewrite seq_nth; [ | flia Hj ].
-  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
-  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
-  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
-  rewrite rngl_mul_mul_swap with (n0 := minus_one_pow (i + u)); [ | easy ].
-  rewrite rngl_mul_assoc.
-  rewrite minus_one_pow_add_r; [ | easy ].
-  rewrite minus_one_pow_add_r; [ | easy ].
-  rewrite rngl_mul_assoc.
-  rewrite <- rngl_mul_assoc with (a := minus_one_pow i).
-  rewrite minus_one_pow_mul_same; [ | easy ].
-  rewrite rngl_mul_1_r.
-  rewrite <- minus_one_pow_add_r; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
-  rewrite <- rngl_mul_assoc.
-  easy.
-}
-cbn - [ det ].
-rewrite <- rngl_mul_summation_distr_l; [ | now left ].
-f_equal.
-remember (mat_mul A B) as C eqn:HC.
-generalize HC; intros H.
-unfold mat_mul in H.
-rewrite Hcb, Hra in H.
-rewrite <- H, HC; clear C HC H.
-symmetry.
-(* lemma, perhaps? *)
-(*1
-rewrite det_is_det'.
-erewrite rngl_summation_eq_compat. 2: {
-  intros u (_, Hu).
-  rewrite det_is_det'.
-  rewrite det_is_det'.
-  do 2 rewrite mat_nrows_subm.
-  rewrite Hra, Hrb.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  assert (H : u < n) by flia Hu Hj.
-  apply Nat.ltb_lt in H; rewrite H.
-  now cbn.
-...
-}
-cbn.
-rewrite map_length.
-rewrite <- map_butn.
-rewrite map_butn_seq.
-rewrite map_length.
-rewrite seq_length.
-rewrite Hra.
-apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
-apply Nat.ltb_lt in Hi.
-cbn.
-Print det'.
-...
-1*)
-cbn.
-rewrite map_length.
-rewrite <- map_butn.
-rewrite map_butn_seq.
-rewrite map_length.
-rewrite seq_length.
-rewrite Hra.
-...
-apply Nat.ltb_lt in Hi; rewrite Hi; cbn.
-apply Nat.ltb_lt in Hi.
-erewrite rngl_summation_eq_compat. 2: {
-  intros u (_, Hu).
-  do 2 rewrite map_length.
-  do 2 rewrite butn_length.
-  do 2 rewrite fold_mat_nrows.
-  rewrite Hra, Hrb.
-  apply Nat.ltb_lt in Hi; rewrite Hi.
-  assert (H : u < n) by flia Hu Hj.
-  apply Nat.ltb_lt in H; rewrite H.
-  now cbn.
-}
-cbn.
-...
-j'abandonne parce que ce théorème essaie de prouver com(A*B)=com(A)*com(B) dans
-le but lointain de prouver det(A*B)=det(A)*det(B), sauf que com fait déjà
-intervenir det ; c'est donc peut-être une mauvaise piste
-...
-destruct n. {
-  cbn.
-  rewrite rngl_summation_only_one.
-  symmetry.
-  apply rngl_mul_1_l.
-}
-rewrite Nat_sub_succ_1.
-induction n. {
-  cbn.
-  rewrite rngl_summation_only_one.
-  symmetry.
-  apply rngl_mul_1_l.
-}
-Search (determinant_loop (S _)).
-rewrite determinant_succ.
-...
-rewrite subm_mat_swap_rows_circ; [ | easy ].
-destruct i; [ flia Hiz | ].
-rewrite minus_one_pow_succ; [ | easy ].
-rewrite rngl_opp_involutive; [ | easy ].
-rewrite Nat_sub_succ_1.
-rewrite subm_fold_left_lt; [ | flia ].
-apply determinant_circular_shift_rows; [ easy | | ]. {
-  rewrite mat_nrows_subm.
-  apply Nat.ltb_lt in Hin; rewrite Hin; cbn.
-  apply Nat.ltb_lt in Hin; flia Hin.
-}
-apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
-...
-*)
 
 End a.
 
