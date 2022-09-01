@@ -1100,19 +1100,19 @@ split; intros H. {
 }
 Qed.
 
-...
-
 Theorem rngl_opp_involutive :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ x, (- - x)%F = x.
 Proof.
 intros Hro *.
 symmetry.
-specialize (rngl_sub_diag (or_introl Hro)) as H.
-unfold rngl_sub in H.
-rewrite Hro in H.
-now apply rngl_add_move_0_r.
+apply (rngl_add_move_0_r Hro).
+rewrite (fold_rngl_sub Hro).
+apply rngl_sub_diag.
+now apply rngl_has_opp_has_opp_or_sous.
 Qed.
+
+...
 
 Theorem rngl_inv_neq_0 :
   rngl_has_opp = true ∨ rngl_has_sous = true →
