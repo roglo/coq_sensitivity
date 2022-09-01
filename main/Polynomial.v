@@ -153,20 +153,46 @@ Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ 5☓2 �
 Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
 *)
 
-Print polyn.
-
 Definition deg_non_incr (ma mb : monom T) := (mdeg mb <=? mdeg ma).
-
-Print polyn.
 
 Theorem monl_add_is_sorted : ∀ pa pb,
   sorted deg_non_incr (monl_add (m_list (monl pa)) (m_list (monl pb))).
 Proof.
 intros.
+destruct pa as ((la), Hlac).
+destruct pb as ((lb), Hlbc).
+move lb before la; cbn.
+unfold monl_is_correct in Hlac, Hlbc.
+cbn in Hlac, Hlbc.
+apply Bool.andb_true_iff in Hlac, Hlbc.
+destruct Hlac as (Hsa, _).
+destruct Hlbc as (Hsb, _).
+rewrite fold_sorted in Hsa, Hsb.
+unfold deg_non_incr.
+remember (length la + length lb) as it eqn:Hit; symmetry in Hit.
+apply Nat.eq_le_incl in Hit.
+assert (Htr : transitive (λ x y : monom T, negb (mdeg x <=? mdeg y))). {
+  intros a b c Hab Hbc.
+  apply Bool.negb_true_iff in Hab, Hbc.
+  apply Bool.negb_true_iff.
+  apply Nat.leb_gt in Hab, Hbc.
+  apply Nat.leb_gt.
+  now transitivity (mdeg b).
+}
+revert la lb Hsa Hsb Hit.
+induction it; intros; [ easy | cbn ].
+destruct la as [| ma]. {
+  cbn in Hit; clear Hsa.
+  destruct lb as [| mb]; [ easy | cbn ].
+  apply sorted_cons_iff in Hsb; [ | easy ].
+  destruct Hsb as (Hs & Hmb).
+  apply sorted_cons_iff; [ | ].
 ...
-remember (monl_add la lb) as lab eqn:Hlab; symmetry in Hlab.
+
+remember (monl_add (m_list (monl pa)) (m_list (monl pb))) as lab eqn:Hlab.
+symmetry in Hlab.
 unfold sorted.
-revert la lb Hlab.
+revert pa pb Hlab.
 induction lab as [| ab]; intros; [ easy | cbn ].
 destruct lab as [| ab2]; [ easy | ].
 apply Bool.andb_true_iff.
