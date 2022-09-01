@@ -582,40 +582,8 @@ destruct opp_sous as [opp| sous]. {
 }
 Qed.
 
-...
-
-Theorem rngl_add_cancel_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
-  ∀ a b c, (a + b = a + c)%F → (b = c)%F.
-Proof.
-intros Hom * Habc.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  apply (f_equal (λ x, rngl_sub x a)) in Habc.
-  do 2 rewrite (rngl_add_comm a) in Habc.
-  unfold rngl_sub in Habc.
-  rewrite Hop in Habc.
-  do 2 rewrite <- rngl_add_assoc in Habc.
-  rewrite fold_rngl_sub in Habc; [ | easy ].
-  rewrite rngl_sub_diag in Habc; [ | now rewrite Hop ].
-  now do 2 rewrite rngl_add_0_r in Habc.
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 c a) as H2.
-  rewrite rngl_add_comm, <- Habc in H2.
-  rewrite rngl_add_comm in H2.
-  now rewrite H1 in H2.
-}
-now destruct Hom.
-Qed.
-
 Theorem rngl_add_sub_eq_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a b c, (a + b = c → c - a = b)%F.
 Proof.
 intros Hom * Hab.
@@ -625,7 +593,7 @@ now apply rngl_add_sub.
 Qed.
 
 Theorem rngl_add_sub_eq_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
    ∀ a b c, (a + b = c → c - b = a)%F.
 Proof.
 intros Hom * Hab.
@@ -641,7 +609,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_add_cancel_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a b c, (a + c = b + c)%F → (a = b)%F.
 Proof.
 intros Hom * Habc.
@@ -650,7 +618,7 @@ now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a, (a * 0 = 0)%F.
 Proof.
 intros Hom *.
@@ -660,7 +628,7 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_mul_0_l :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a, (0 * a = 0)%F.
 Proof.
 intros Hom a.
@@ -670,21 +638,45 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_add_move_0_r :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (a + b = 0)%F ↔ (a = - b)%F.
 Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
-  rewrite rngl_add_sub in H; [ | now left ].
+  rewrite rngl_add_sub in H. 2: {
+    unfold rngl_has_opp' in Hro.
+    unfold rngl_has_opp_or_sous, bool_of_option.
+    now destruct rngl_opt_opp_or_sous.
+  }
   unfold rngl_sub in H.
-  rewrite Hro in H.
+  unfold rngl_has_opp' in Hro.
+  unfold rngl_opp.
+  destruct rngl_opt_opp_or_sous as [x| x]; [ | easy ].
+  destruct x as [x| x]; [ | easy ].
   now rewrite rngl_add_0_l in H.
 } {
   rewrite H.
   now rewrite rngl_add_opp_l.
 }
 Qed.
+
+Theorem rngl_mul_opp_r :
+  rngl_has_opp' = true →
+  ∀ a b, (a * - b = - (a * b))%F.
+Proof.
+intros Hro *.
+specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
+rewrite fold_rngl_sub in H; [ | easy ].
+...
+rewrite rngl_sub_diag in H; [ | now left ].
+rewrite rngl_mul_0_r in H; [ | now left ].
+symmetry in H.
+rewrite rngl_add_comm in H.
+now apply rngl_add_move_0_r in H.
+Qed.
+
+...
 
 Theorem rngl_mul_opp_r :
   rngl_has_opp = true →
