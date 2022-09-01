@@ -882,8 +882,6 @@ split; intros Hab. {
 }
 Qed.
 
-...
-
 Theorem rngl_div_cancel_l : ∀ a b c,
   (a = b)%F → (a / c = b / c)%F.
 Proof.
@@ -950,7 +948,7 @@ Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
   ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
 Proof. now destruct x. Qed.
 
-Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%F.
+Theorem rngl_opp_0 : rngl_has_opp' = true → (- 0 = 0)%F.
 Proof.
 intros Hro.
 transitivity (0 + - 0)%F. {
@@ -958,32 +956,32 @@ transitivity (0 + - 0)%F. {
   apply rngl_add_0_l.
 }
 rewrite fold_rngl_sub; [ | easy ].
-now apply rngl_sub_diag; left.
+apply rngl_sub_diag.
+now apply rngl_has_opp_has_opp_or_sous.
 Qed.
 
 Theorem rngl_sub_0_r :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   ∀ a, (a - 0 = a)%F.
 Proof.
 intros Hom *.
-remember rngl_has_opp as op eqn:Hop.
-symmetry in Hop.
-destruct op. {
-  unfold rngl_sub.
-  rewrite Hop.
-  rewrite rngl_opp_0; [ | easy ].
-  apply rngl_add_0_r.
-}
-remember rngl_has_sous as mo eqn:Hmo.
-symmetry in Hmo.
-destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 a 0%F) as H2.
+unfold rngl_has_opp_or_sous, bool_of_option in Hom.
+specialize rngl_opp_0 as H1.
+specialize rngl_opt_add_sub as H2.
+unfold rngl_has_opp', rngl_opp in H1.
+unfold rngl_has_sous', rngl_sub in H2.
+unfold rngl_sub.
+destruct rngl_opt_opp_or_sous as [opp_sous| ]; [ | easy ].
+destruct opp_sous as [opp| sous]. {
+  rewrite H1; [ | easy ].
+  now apply rngl_add_0_r.
+} {
+  specialize (H2 a 0%F).
   now rewrite rngl_add_0_r in H2.
 }
-now destruct Hom.
 Qed.
+
+...
 
 Theorem rngl_opp_add_distr :
   rngl_has_opp = true →
