@@ -99,7 +99,7 @@ Definition polyn_one := mk_polyn [Mon 1 0] : polyn T.
    then "polyn_add pa pb" is also in canonical order
    (this must be proven, if necessary) *)
 
-Fixpoint monl_add it la lb :=
+Fixpoint monl_add_loop it la lb :=
   match it with
   | 0 => []
   | S it' =>
@@ -112,20 +112,23 @@ Fixpoint monl_add it la lb :=
               match Nat.compare ad bd with
               | Eq =>
                   let c := (ac + bc)%F in
-                  if (c =? 0)%F then monl_add it' la' lb'
-                  else Mon c ad :: monl_add it' la' lb'
-              | Lt => Mon bc bd :: monl_add it' la lb'
-              | Gt => Mon ac ad :: monl_add it' la' lb
+                  if (c =? 0)%F then monl_add_loop it' la' lb'
+                  else Mon c ad :: monl_add_loop it' la' lb'
+              | Lt => Mon bc bd :: monl_add_loop it' la lb'
+              | Gt => Mon ac ad :: monl_add_loop it' la' lb
               end
           end
       end
   end.
 
-Arguments monl_add it%nat (la lb)%list.
+Definition monl_add la lb := monl_add_loop (length la + length lb) la lb.
+
+Arguments monl_add_loop it%nat (la lb)%list.
+Arguments monl_add (la lb)%list.
 
 (*
 End a.
-Arguments monl_add {T ro} it%nat (la lb)%list.
+Arguments monl_add {T ro} (la lb)%list.
 Arguments polyn_is_canon {T ro} p%P.
 Arguments monl {T} p%P.
 Require Import ZArith RnglAlg.Zrl.
@@ -133,14 +136,12 @@ Open Scope Z_scope.
 Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓)).
 Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓^7)).
 Compute (3☓^5 ☩ 5☓^2 ☩ 8☓)%P.
-About monl.
-Compute (monl_add 50 (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ 5☓^2 ☩ 8☓))).
-Compute (monl_add 50 (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ (-5)☓^2 ☩ 8☓))).
+Compute (monl_add (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ 5☓^2 ☩ 8☓))).
+Compute (monl_add (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ (-5)☓^2 ☩ 8☓))).
 *)
 
 Definition polyn_add (pa pb : polyn T) :=
-  mk_polyn
-    (monl_add (length (monl pa) + length (monl pb)) (monl pa) (monl pb)).
+  mk_polyn (monl_add (monl pa) (monl pb)).
 
 Arguments polyn_add (pa pb)%P.
 
@@ -151,11 +152,6 @@ Arguments polyn_is_canon {T ro} p%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (3☓^5 ☩ 5☓^2 ☩ 8☓)%P.
-Compute (mk_polyn [Mon 1 5; Mon 1 2; Mon 1 1; Mon 1 0]).
-Compute (mk_polyn [Mon 1 5; Mon 1 2; Mon (-1) 1; Mon 1 0]).
-Compute (1☓^5 ☩ 1☓^2 ☩ 1☓ ☩ 1·)%P.
-Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓)).
-Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓^7)).
 Compute (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ 5☓^2 ☩ 8☓)).
 Compute (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ (-5)☓^2 ☩ 7·)).
 Compute (polyn_is_canon (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ 5☓^2 ☩ 8☓))).
@@ -164,35 +160,24 @@ Compute (polyn_is_canon (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ (-5)
 
 (* multiplication *)
 
-Definition coeff_of_deg (ml : list (monom T)) i :=
-  match find (λ m, mdeg m =? i) ml with
-  | Some m => mcoeff m
-  | None => 0%F
-  end.
-
-Fixpoint monl_convol_mul it al1 al2 i :=
-  match it with
-  | O => []
-  | S it' =>
-      (∑ (j = 0, i), coeff_of_deg al1 j * coeff_of_deg al2 (i - j))%F ::
-      monl_convol_mul it' al1 al2 (S i)
-  end.
-
 Fixpoint monl_mul_mon_l ma lb :=
   match lb with
   | [] => []
   | mb :: lb' =>
-      Mon (mcoeff ma * mcoeff mb) (mdeg ma + mdeg mb) :: monl_mul_mon_l ma lb'
+      let c := (mcoeff ma * mcoeff mb)%F in
+      if (c =? 0)%F then monl_mul_mon_l ma lb'
+      else Mon c (mdeg ma + mdeg mb) :: monl_mul_mon_l ma lb'
   end.
 
 Fixpoint monl_mul la lb :=
   match la with
   | [] => []
-  | ma :: la' => monl_mul_mon_l ma lb ++ monl_mul la' lb
+  | ma :: la' => monl_add (monl_mul_mon_l ma lb) (monl_mul la' lb)
   end.
 
 Definition polyn_mul pa pb := mk_polyn (monl_mul (monl pa) (monl pb)).
 
+(*
 End a.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Require Import ZArith RnglAlg.Zrl.
@@ -202,7 +187,23 @@ Compute (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·)).
 Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
 *)
 
-...
+(* opposite *)
+
+Definition polyn_opp p :=
+  mk_polyn (map (λ m, Mon (- mcoeff m)%F (mdeg m)) (monl p)).
+
+(*
+End a.
+Arguments polyn_opp {T ro} p%P.
+Arguments polyn_mul {T ro} (pa pb)%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_opp (1☓ ☩ 1·)).
+Compute (polyn_opp (1☓ ☩ (-1)·)).
+Compute (polyn_opp (3☓^5 ☩ 1·)).
+Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
+Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
+*)
 
 (* ring-like *)
 
@@ -213,7 +214,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_mul := polyn_mul;
      rngl_opt_opp := Some polyn_opp;
      rngl_opt_inv := None;
-     rngl_opt_sous := Some polyn_sub;
+     rngl_opt_sous := None;
      rngl_opt_quot := Some Nat.div;
      rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
