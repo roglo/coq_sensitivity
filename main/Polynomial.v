@@ -188,7 +188,20 @@ Definition monl_mul la lb :=
       end
   end.
 
+(* supposer que les deux polynômes sont canoniques
+   prendre le degré du premier avec son 1er terme → da
+   prendre le degré du deuxième avec son 1er terme → db
+   faire un fixpoint en partant de (da+db)
+   et ça pourra faire un résultat canonique au fur et à
+   mesure *)
+
+(* ou alors multiplier chaque terme du 1er par chaque terme
+   du second, mais alors pour avoir un résultat canonique,
+   ça risque de ne pas être possible (mais à voir) *)
+
 Definition polyn_mul pa pb := monl_mul (monl pa) (monl pb).
+
+...
 
 End a.
 Arguments polyn_mul {T ro} (pa pb)%P.
