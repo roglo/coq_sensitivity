@@ -1112,10 +1112,8 @@ apply rngl_sub_diag.
 now apply rngl_has_opp_has_opp_or_sous.
 Qed.
 
-...
-
 Theorem rngl_inv_neq_0 :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ a, a ≠ 0%F → (a⁻¹ ≠ 0)%F.
@@ -1129,7 +1127,7 @@ now apply rngl_1_neq_0.
 Qed.
 
 Theorem rngl_inv_involutive :
-  rngl_has_opp = true ∨ rngl_has_sous = true →
+  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ x, x ≠ 0%F → (x⁻¹⁻¹)%F = x.
@@ -1148,19 +1146,21 @@ now apply rngl_inv_neq_0.
 Qed.
 
 Theorem rngl_mul_opp_l :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (- a * b = - (a * b))%F.
 Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
 rewrite rngl_add_opp_l in H; [ | easy ].
-rewrite rngl_mul_0_l in H; [ | now left ].
+rewrite rngl_mul_0_l in H. 2: {
+  now apply rngl_has_opp_has_opp_or_sous.
+}
 symmetry in H.
 now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_opp_opp :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (- a * - b = a * b)%F.
 Proof.
 intros Hro *.
@@ -1168,6 +1168,8 @@ rewrite rngl_mul_opp_l; [ | easy ].
 rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
+
+...
 
 Theorem rngl_squ_opp_1 : rngl_has_opp = true → (-1 * -1)%F = 1%F.
 Proof.
