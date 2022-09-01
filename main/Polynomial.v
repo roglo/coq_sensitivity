@@ -207,6 +207,8 @@ Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
 
 (* ring-like *)
 
+Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
+
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
      rngl_one := polyn_one;
@@ -214,9 +216,12 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_mul := polyn_mul;
      rngl_opt_opp_or_sous := Some (inl polyn_opp);
      rngl_opt_inv := None;
-     rngl_opt_quot := Some Nat.div;
-     rngl_opt_eqb := Some Nat.eqb;
-     rngl_le := Nat.le |}.
+     rngl_opt_quot := None;
+     rngl_opt_eqb := None;
+     rngl_le := phony_polyn_le |}.
+
+(* allows to use ring-like theorems on polynomials *)
+Canonical Structure polyn_ring_like_op.
 
 ...
 
