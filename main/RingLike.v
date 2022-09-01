@@ -66,6 +66,11 @@ Delimit Scope ring_like_scope with F.
 Definition rngl_has_opp_or_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_opp_or_sous.
 
+(* added a ' (prime) after rngl_has_opp, juste le temps de
+   faire le changement vers "rngl_opt_opp_or_sous" pour que
+   la compil s'arrête dessus dans ce module et dans les autres
+   pour que je sois sûr que c'est pas un rngl_has_opp_or_sous
+   qu'il faut mettre. Pareil pour rngl_has_sous' plus loin *)
 Definition rngl_has_opp' {T} {R : ring_like_op T} :=
   match rngl_opt_opp_or_sous with
   | Some (inl _) => true
@@ -981,10 +986,8 @@ destruct opp_sous as [opp| sous]. {
 }
 Qed.
 
-...
-
 Theorem rngl_opp_add_distr :
-  rngl_has_opp = true →
+  rngl_has_opp' = true →
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hro *.
@@ -999,6 +1002,27 @@ rewrite rngl_add_sub; [ | now left ].
 symmetry.
 now apply rngl_sub_diag; left.
 Qed.
+
+...
+
+Theorem rngl_opp_add_distr :
+  rngl_has_opp' = true →
+  ∀ a b, (- (a + b) = - b - a)%F.
+Proof.
+intros Hro *.
+apply rngl_add_cancel_l with (a := (a + b)%F); [ now left | ].
+rewrite (fold_rngl_sub Hro).
+rewrite rngl_sub_diag; [ | now left ].
+unfold rngl_sub.
+rewrite Hro.
+rewrite rngl_add_assoc.
+do 2 rewrite (fold_rngl_sub Hro).
+rewrite rngl_add_sub; [ | now left ].
+symmetry.
+now apply rngl_sub_diag; left.
+Qed.
+
+...
 
 Theorem rngl_add_sub_simpl_l :
   rngl_has_opp = true ∨ rngl_has_sous = true →
