@@ -157,9 +157,13 @@ Print polyn.
 
 Definition deg_non_incr (ma mb : monom T) := (mdeg mb <=? mdeg ma).
 
-Theorem monl_add_is_sorted : ∀ la lb, sorted deg_non_incr (monl_add la lb).
+Print polyn.
+
+Theorem monl_add_is_sorted : ∀ pa pb,
+  sorted deg_non_incr (monl_add (m_list (monl pa)) (m_list (monl pb))).
 Proof.
 intros.
+...
 remember (monl_add la lb) as lab eqn:Hlab; symmetry in Hlab.
 unfold sorted.
 revert la lb Hlab.
@@ -180,9 +184,11 @@ Theorem monl_norm_is_correct : ∀ s (ss : sorted deg_non_incr s),
   monl_is_correct (mk_mlist (monl_norm s)) = true.
 ...
 
+Print polyn.
+
 Definition polyn_add p1 p2 :=
   let s := monl_add (m_list (monl p1)) (m_list (monl p2)) in
-  let ss := monl_add_is_sorted (m_list (monl p1)) (m_list (monl p2)) in
+  let ss := monl_add_is_sorted p1 p2 in
   mk_polyn (mk_mlist (monl_norm s)) (monl_norm_is_correct ss).
 
 (*
