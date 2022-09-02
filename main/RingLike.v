@@ -1354,25 +1354,11 @@ Theorem rngl_sub_sub_distr :
   rngl_has_opp = true →
   ∀ a b c, (a - (b - c) = a - b + c)%F.
 Proof.
-intros Hom *.
-specialize rngl_opp_add_distr as H1.
-unfold rngl_has_opp, rngl_opp in H1.
-specialize (rngl_opp_involutive Hom) as H2.
-unfold rngl_opp in H2.
-unfold rngl_has_opp_or_sous, bool_of_option in Hom.
-remember rngl_opt_opp_or_sous as x eqn:Hop; symmetry in Hop.
-destruct x as [opp_sous| ]. 2: {
-  rewrite <- H2; symmetry.
-  now rewrite <- H2.
-}
-destruct opp_sous as [opp| sous]. 2: {
-  rewrite <- H2; symmetry.
-  now rewrite <- H2.
-}
-specialize (H1 eq_refl).
+intros Hop *.
 unfold rngl_sub.
-...
-rewrite Hop, H1, H2.
+rewrite Hop.
+rewrite rngl_opp_add_distr; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
 unfold rngl_sub; rewrite Hop.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
@@ -1421,7 +1407,9 @@ Theorem rngl_opp_inv :
   ∀ a, a ≠ 0%F → (- a⁻¹ = (- a)⁻¹)%F.
 Proof.
 intros Hop Hin H10 * Haz.
-specialize (rngl_has_inv_has_inv_or_quot Hin) as Hin'.
+specialize (proj2 rngl_has_inv_or_quot_iff) as Hin'.
+rewrite Hin in Hin'.
+specialize (Hin' (or_introl eq_refl)).
 move Hin' before Hin.
 assert (Hoaz : (- a)%F ≠ 0%F). {
   intros H.
@@ -1430,9 +1418,9 @@ assert (Hoaz : (- a)%F ≠ 0%F). {
   now rewrite rngl_opp_0 in H.
 }
 apply (rngl_mul_cancel_l Hin' (- a)%F); [ easy | ].
-specialize (rngl_opt_mul_inv_r) as mul_inv_r.
-rewrite Hin in mul_inv_r; cbn in mul_inv_r.
+specialize (rngl_opt_mul_inv_r) as H2.
 remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+rewrite Hin in H2; cbn in H2.
 rewrite rngl_mul_opp_opp; [ | easy ].
 destruct ic. {
   symmetry.
@@ -1442,11 +1430,11 @@ destruct ic. {
   rewrite rngl_mul_inv_l; [ | easy | easy ].
   easy.
 } {
-  cbn in mul_inv_r.
+  cbn in H2.
   rewrite fold_rngl_div; [ | easy ].
   rewrite fold_rngl_div; [ | easy ].
-  rewrite mul_inv_r; [ | easy ].
-  now symmetry; apply mul_inv_r.
+  rewrite H2; [ | easy ].
+  now rewrite H2.
 }
 Qed.
 
@@ -1462,6 +1450,7 @@ unfold rngl_div.
 remember rngl_opt_inv_or_quot as a eqn:Ha; symmetry in Ha.
 destruct a as [inv_quot| ]; [ | easy ].
 destruct inv_quot as [inv| quot]; [ | easy ].
+...
 rewrite rngl_mul_assoc; f_equal.
 rewrite <- rngl_mul_assoc.
 rewrite mul_inv_l; [ | easy ].
