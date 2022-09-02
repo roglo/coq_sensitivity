@@ -323,7 +323,6 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-(*
 Theorem rngl_has_opp_has_opp_or_sous :
   rngl_has_opp = true
   → rngl_has_opp_or_sous = true.
@@ -343,7 +342,6 @@ unfold rngl_has_inv in H.
 unfold rngl_has_inv_or_quot, bool_of_option.
 now destruct rngl_opt_inv_or_quot.
 Qed.
-*)
 
 (* theorems easier to use *)
 
@@ -821,13 +819,9 @@ Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
-...
   rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_has_opp_or_sous ].
   unfold rngl_sub in H.
-  unfold rngl_has_opp in Hro.
-  unfold rngl_opp.
-  destruct rngl_opt_opp_or_sous as [x| ]; [ | easy ].
-  destruct x as [x| x]; [ | easy ].
+  rewrite Hro in H.
   now rewrite rngl_add_0_l in H.
 } {
   rewrite H.
@@ -863,6 +857,7 @@ unfold rngl_has_sous, rngl_sub in H2.
 destruct rngl_opt_opp_or_sous as [opp_sous| ]; [ | easy ].
 destruct opp_sous as [opp| sous]; [ | apply H2 ].
 specialize (H1 eq_refl).
+...
 rewrite rngl_mul_add_distr_l.
 now rewrite H1.
 Qed.
