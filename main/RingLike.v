@@ -1239,27 +1239,32 @@ Theorem rngl_inv_mul_distr :
   ∀ a b, a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
 Proof.
 intros Hom Hdo Hin * Haz Hbz.
-specialize rngl_mul_cancel_l as H1.
-...
-specialize rngl_mul_inv_r as H2.
-specialize (rngl_integral Hom) as H3.
-unfold rngl_div in H2.
-rewrite Hdo in H3; cbn in H3.
-specialize (H3 eq_refl).
+specialize (rngl_has_inv_has_inv_or_quot Hin) as Hin'.
+move Hin' before Hin.
+specialize (rngl_mul_cancel_l Hin') as mul_cancel_l.
+specialize (rngl_div_diag Hin') as div_diag.
+specialize (rngl_integral Hom) as integral.
+unfold rngl_div in div_diag.
+rewrite Hdo in integral; cbn in integral.
+specialize (integral eq_refl).
 assert (Habz : (a * b)%F ≠ 0%F). {
   intros H.
-  specialize (H3 a b H).
-  now destruct H3.
+  specialize (integral a b H).
+  now destruct integral.
 }
-rewrite Hin in H2.
-specialize (H2 (or_introl eq_refl)).
-apply H1 with (a := (a * b)%F); [ now left | easy | ].
-rewrite H2; [ | easy ].
+apply mul_cancel_l with (a := (a * b)%F); [ easy | ].
+unfold rngl_has_inv in Hin.
+unfold rngl_inv.
+remember rngl_opt_inv_or_quot as x eqn:Hx.
+symmetry in Hx.
+destruct x as [inv_quot| ]; [ | easy ].
+destruct inv_quot as [inv| quot]; [ | easy ].
+rewrite div_diag; [ | easy ].
 rewrite rngl_mul_assoc.
 rewrite <- (rngl_mul_assoc a).
-rewrite H2; [ | easy ].
+rewrite div_diag; [ | easy ].
 rewrite rngl_mul_1_r.
-now rewrite H2.
+now symmetry; apply div_diag.
 Qed.
 
 Theorem rngl_eq_add_0 :
@@ -1401,6 +1406,7 @@ assert (Hoaz : (- a)%F ≠ 0%F). {
   rewrite rngl_opp_involutive in H; [ | easy ].
   now rewrite rngl_opp_0 in H.
 }
+...
 apply (rngl_mul_cancel_l (or_introl Hin) (- a)%F); [ easy | ].
 specialize (rngl_opt_mul_inv_r) as H2.
 remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
