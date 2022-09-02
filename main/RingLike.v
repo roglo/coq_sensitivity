@@ -1443,17 +1443,10 @@ Theorem rngl_div_mul_div :
   ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
 Proof.
 intros Hin * Hs.
-specialize (rngl_mul_inv_l Hin) as mul_inv_l.
-unfold rngl_has_inv in Hin.
-unfold rngl_inv in mul_inv_l.
-unfold rngl_div.
-remember rngl_opt_inv_or_quot as a eqn:Ha; symmetry in Ha.
-destruct a as [inv_quot| ]; [ | easy ].
-destruct inv_quot as [inv| quot]; [ | easy ].
-...
+unfold rngl_div; rewrite Hin.
 rewrite rngl_mul_assoc; f_equal.
 rewrite <- rngl_mul_assoc.
-rewrite mul_inv_l; [ | easy ].
+rewrite rngl_mul_inv_l; [ | easy| easy ].
 apply rngl_mul_1_r.
 Qed.
 
@@ -1470,29 +1463,32 @@ Theorem rngl_mul_sub_distr_r :
   rngl_has_opp_or_sous = true →
   ∀ a b c, ((a - b) * c = a * c - b * c)%F.
 Proof.
-intros Hom *.
-specialize rngl_mul_opp_l as H1.
-specialize rngl_opt_mul_sub_distr_r as H2.
-unfold rngl_has_opp, rngl_opp in H1.
-unfold rngl_has_sous in H2.
-generalize Hom; intros Hom'.
-unfold rngl_has_opp_or_sous, bool_of_option in Hom.
-remember rngl_opt_opp_or_sous as x eqn:Hop; symmetry in Hop.
-destruct x as [opp_sous| ]; [ | easy ].
-destruct opp_sous as [opp| sous]. {
-  specialize (H1 eq_refl).
+intros Hos *.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op. {
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_mul_add_distr_r.
-  now rewrite H1.
+  now rewrite rngl_mul_opp_l.
 }
-remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct ic. {
-  specialize rngl_opt_mul_comm as rngl_mul_comm.
-  rewrite Hic in rngl_mul_comm.
-  rewrite rngl_mul_comm, rngl_mul_sub_distr_l; [ | easy ].
-  now rewrite (rngl_mul_comm a), (rngl_mul_comm b).
+remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
+destruct mo. {
+  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  destruct ic. {
+    specialize rngl_opt_mul_comm as rngl_mul_comm.
+    rewrite Hic in rngl_mul_comm.
+    rewrite rngl_mul_comm.
+    rewrite rngl_mul_sub_distr_l; [ | easy ].
+    rewrite (rngl_mul_comm c a).
+    rewrite (rngl_mul_comm c b).
+    easy.
+  } {
+    specialize rngl_opt_mul_sub_distr_r as H1.
+    rewrite Hmo, Hic in H1.
+    apply H1.
+  }
 }
-apply H2.
+apply rngl_has_opp_or_sous_iff in Hos.
+destruct Hos; congruence.
 Qed.
 
 Theorem eq_rngl_add_same_0 :
@@ -1547,6 +1543,7 @@ remember rngl_opt_opp_or_sous as a eqn:Ha; symmetry in Ha.
 destruct a as [opp_sous| ]; [ | easy ].
 destruct opp_sous as [opp| sous]; [ | easy ].
 unfold rngl_opp.
+...
 now rewrite Ha.
 Qed.
 
