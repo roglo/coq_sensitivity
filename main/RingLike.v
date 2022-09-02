@@ -1448,12 +1448,12 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem eq_rngl_div_1 :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
+  rngl_has_inv_or_quot = true →
    ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
 Proof.
 intros Hiv * Hbz Hab.
 subst a.
-now apply rngl_mul_inv_r.
+now apply rngl_div_diag.
 Qed.
 
 Theorem rngl_mul_sub_distr_r :
@@ -1487,24 +1487,22 @@ Qed.
 
 Theorem eq_rngl_add_same_0 :
   rngl_has_opp_or_sous = true →
-  (rngl_is_integral ||
-   (rngl_has_inv || rngl_has_quot) && rngl_has_eqb)%bool = true →
+  (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
   rngl_has_1_neq_0 = true →
   rngl_characteristic = 0 →
   ∀ a,
   (a + a = 0)%F
   → a = 0%F.
 Proof.
-intros H1 H2 H10 H3 * Haa.
+intros Hos Hii H10 Hch * Haa.
 rewrite <- (rngl_mul_1_l a) in Haa.
 rewrite <- rngl_mul_add_distr_r in Haa.
 apply rngl_integral in Haa; [ | easy | easy ].
 destruct Haa as [Haa| Haa]; [ | easy ].
-specialize rngl_characteristic_prop as H4.
-rewrite H3 in H4.
-specialize (H4 1).
-cbn in H4.
-now rewrite rngl_add_0_r in H4.
+specialize rngl_characteristic_prop as char_prop.
+rewrite Hch in char_prop; cbn in char_prop.
+specialize (char_prop 1); cbn in char_prop.
+now rewrite rngl_add_0_r in char_prop.
 Qed.
 
 Definition in_charac_0_field :=
