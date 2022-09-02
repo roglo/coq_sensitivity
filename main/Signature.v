@@ -931,9 +931,11 @@ erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
+Print rngl_div.
+...
     unfold rngl_div.
 ...
-    rewrite Hiq.
+    rewrite Hin.
     rewrite <- rngl_mul_assoc.
     easy.
   }
