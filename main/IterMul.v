@@ -468,11 +468,17 @@ Theorem rngl_product_div_distr :
     ((∏ (i = b, e), f i) / (∏ (i = b, e), g i))%F.
 Proof.
 intros Hom Hic Hin H10 Hit * Hg.
+specialize rngl_inv_product_comm as inv_product_comm.
+unfold rngl_has_inv in Hin.
+unfold rngl_inv in inv_product_comm.
+unfold rngl_has_inv in inv_product_comm.
 unfold rngl_div.
-rewrite Hin.
+remember rngl_opt_inv_or_quot as x eqn:Hx; symmetry in Hx.
+destruct x as [inv_quot| ]; [ | easy ].
+destruct inv_quot as [inv| quot]; [ | easy ].
 rewrite rngl_product_mul_distr; [ | easy ].
 f_equal; symmetry.
-now apply rngl_inv_product_comm.
+now apply inv_product_comm.
 Qed.
 
 Theorem rngl_product_seq_product : ∀ b len f,

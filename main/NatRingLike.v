@@ -13,8 +13,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_add := Nat.add;
      rngl_mul := Nat.mul;
      rngl_opt_opp_or_sous := Some (inr Nat.sub);
-     rngl_opt_inv := None;
-     rngl_opt_quot := Some Nat.div;
+     rngl_opt_inv_or_quot := Some (inr Nat.div);
      rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
 
@@ -29,10 +28,9 @@ Proof. easy. Qed.
 Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
 Proof. easy. Qed.
 
-Theorem Nat_mul_div_l : ∀ a b : nat, a ≠ 0%F → (a * b / a)%F = b.
+Theorem Nat_mul_div : ∀ a b, b ≠ 0%F → (a * b / b)%F = a.
 Proof.
-intros * Haz.
-rewrite Nat.mul_comm.
+intros * Hbz.
 now apply Nat.div_mul.
 Qed.
 
@@ -91,7 +89,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_quot_l := Nat_mul_div_l;
+     rngl_opt_mul_div := Nat_mul_div;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_le_dec := le_dec;
