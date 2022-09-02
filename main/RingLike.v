@@ -1088,19 +1088,20 @@ Theorem rngl_div_1_l :
   ∀ a, (1 / a = a⁻¹)%F.
 Proof.
 intros Hin *.
-unfold rngl_div.
-...
-rewrite Hin.
+unfold rngl_has_inv in Hin.
+unfold rngl_div, rngl_inv.
+destruct rngl_opt_inv_or_quot as [inv_quot| ]; [ | easy ].
+destruct inv_quot as [inv| quot]; [ | easy ].
 apply rngl_mul_1_l.
 Qed.
 
 Theorem rngl_div_1_r :
-  rngl_has_inv = true ∨ rngl_has_quot = true →
+  rngl_has_inv_or_quot = true →
   rngl_has_1_neq_0 = true →
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
-specialize (rngl_mul_div_l Hid a 1%F (rngl_1_neq_0 H10)) as H1.
+specialize (rngl_mul_div Hid a 1%F (rngl_1_neq_0 H10)) as H1.
 now rewrite rngl_mul_1_r in H1.
 Qed.
 
@@ -1110,16 +1111,19 @@ Proof.
 intros Hin * Hbz.
 split; intros H. {
   apply rngl_div_compat_l with (c := b) in H; [ | easy | easy ].
+  specialize rngl_mul_div as H1.
+  unfold rngl_has_inv_or_quot, bool_of_option in H1.
+  unfold rngl_div in H1.
+  unfold rngl_has_inv in Hin.
   unfold rngl_div in H.
-  rewrite Hin in H.
-  rewrite <- rngl_mul_assoc in H.
-  rewrite fold_rngl_div in H; [ | easy ].
-  rewrite rngl_mul_inv_r in H; [ | now left | easy ].
-  now rewrite rngl_mul_1_r, rngl_mul_1_l in H.
+  unfold rngl_inv.
+  destruct rngl_opt_inv_or_quot as [inv_quot| ]; [ | easy ].
+  destruct inv_quot as [inv| quot]; [ | easy ].
+  rewrite rngl_mul_1_l in H.
+  now rewrite H1 in H.
 } {
   rewrite H.
-  specialize (rngl_mul_inv_l Hin) as H1.
-  now apply H1.
+  now apply rngl_mul_inv_l.
 }
 Qed.
 
@@ -1157,6 +1161,7 @@ Theorem rngl_inv_involutive :
 Proof.
 intros Hom Hin H10 * Hxz.
 symmetry.
+...
 specialize (rngl_mul_inv_r (or_introl Hin)) as H.
 unfold rngl_div in H.
 rewrite Hin in H.
