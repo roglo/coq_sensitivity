@@ -154,44 +154,6 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
-(*
-Theorem rngl_has_opp_has_opp_or_sous {T} {ro : ring_like_op T} :
-  rngl_has_opp = true
-  → rngl_has_opp_or_sous = true.
-Proof.
-intros H.
-unfold rngl_has_opp in H.
-unfold rngl_has_opp_or_sous, bool_of_option.
-now destruct rngl_opt_opp_or_sous.
-Qed.
-
-Theorem rngl_has_inv_has_inv_or_quot {T} {ro : ring_like_op T} :
-  rngl_has_inv = true
-  → rngl_has_inv_or_quot = true.
-Proof.
-intros H.
-unfold rngl_has_inv in H.
-unfold rngl_has_inv_or_quot, bool_of_option.
-now destruct rngl_opt_inv_or_quot.
-Qed.
-*)
-
-(*
-Definition rngl_sub {T} {R : ring_like_op T} a b :=
-  match rngl_opt_opp_or_sous with
-  | Some (inl rngl_opp) => rngl_add a (rngl_opp b)
-  | Some (inr rngl_sous) => rngl_sous a b
-  | None => rngl_zero
-  end.
-
-Definition rngl_div {T} {R : ring_like_op T} a b :=
-  match rngl_opt_inv_or_quot with
-  | Some (inl rngl_inv) => rngl_mul a (rngl_inv b)
-  | Some (inr rngl_quot) => rngl_quot a b
-  | None => rngl_zero
-  end.
-*)
-
 Definition rngl_eqb {T} {R : ring_like_op T} a b :=
   match rngl_opt_eqb with
   | Some rngl_eqb => rngl_eqb a b
@@ -345,7 +307,7 @@ Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
 
-(* theorems easier to use *)
+(* theorems *)
 
 Theorem rngl_1_neq_0 :
   rngl_has_1_neq_0 = true →
@@ -1538,13 +1500,7 @@ Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%F.
 Proof.
 intros.
 unfold rngl_sub.
-unfold rngl_has_opp in Hop.
-remember rngl_opt_opp_or_sous as a eqn:Ha; symmetry in Ha.
-destruct a as [opp_sous| ]; [ | easy ].
-destruct opp_sous as [opp| sous]; [ | easy ].
-unfold rngl_opp.
-...
-now rewrite Ha.
+now rewrite Hop.
 Qed.
 
 Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%F = 0%F.
@@ -1552,7 +1508,7 @@ Proof.
 intros.
 rewrite fold_rngl_sub; [ | easy ].
 apply rngl_sub_diag.
-now apply rngl_has_opp_has_opp_or_sous.
+now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
 Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
@@ -1589,17 +1545,17 @@ easy.
 Qed.
 *)
 
-Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
-Arguments rngl_sub_diag {T}%type {ro rp} Hom a%F.
 Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%F.
+Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%F.
-Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
 Arguments rngl_integral {T}%type {ro rp}.
+Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%F.
-Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%F.
-Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
-Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%F.
+Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
+Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
+Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_opp_0 {T}%type {ro rp}.
 Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
+Arguments rngl_sub_diag {T}%type {ro rp} Hom a%F.
