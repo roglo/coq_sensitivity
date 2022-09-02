@@ -607,7 +607,7 @@ destruct mo. {
   now rewrite rngl_add_0_l in H1.
 }
 apply rngl_has_opp_or_sous_iff in Hos.
-now destruct Hos; congruence.
+destruct Hos; congruence.
 Qed.
 
 Theorem rngl_div_diag :
@@ -635,7 +635,7 @@ destruct qu. {
   now rewrite rngl_mul_1_l in rngl_mul_div.
 }
 apply rngl_has_inv_or_quot_iff in Hiq.
-now destruct Hiq; congruence.
+destruct Hiq; congruence.
 Qed.
 
 Theorem rngl_add_sub :
@@ -660,7 +660,7 @@ destruct mo. {
   apply H1.
 }
 apply rngl_has_opp_or_sous_iff in Hom.
-now destruct Hom; congruence.
+destruct Hom; congruence.
 Qed.
 
 Theorem rngl_mul_div :
@@ -684,7 +684,7 @@ destruct qu. {
   now apply mul_div.
 }
 apply rngl_has_inv_or_quot_iff in Hii.
-now destruct Hii; congruence.
+destruct Hii; congruence.
 Qed.
 
 Theorem rngl_add_cancel_l :
@@ -692,26 +692,30 @@ Theorem rngl_add_cancel_l :
   ∀ a b c, (a + b = a + c)%F → (b = c)%F.
 Proof.
 intros Hom * Habc.
-...
-intros Hom * Habc.
-unfold rngl_has_opp_or_sous, bool_of_option in Hom.
-specialize rngl_add_opp_l as H1.
-unfold rngl_has_opp, rngl_opp in H1.
-specialize rngl_opt_add_sub as H2.
-unfold rngl_has_sous, rngl_sub in H2.
-apply (f_equal (λ x, rngl_sub x a)) in Habc.
-unfold rngl_sub in Habc.
-destruct rngl_opt_opp_or_sous as [opp_sous| ]; [ | easy ].
-destruct opp_sous as [opp| sous]. {
-  specialize (H1 eq_refl).
-  do 2 rewrite (rngl_add_comm _ (opp a)) in Habc.
-  do 2 rewrite rngl_add_assoc in Habc.
-  rewrite H1 in Habc.
-  now do 2 rewrite rngl_add_0_l in Habc.
-} {
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  apply (f_equal (λ x, rngl_sub x a)) in Habc.
   do 2 rewrite (rngl_add_comm a) in Habc.
-  now rewrite <- (H2 b a), <- (H2 c a).
+  unfold rngl_sub in Habc.
+  rewrite Hop in Habc.
+  do 2 rewrite <- rngl_add_assoc in Habc.
+  rewrite fold_rngl_sub in Habc; [ | easy ].
+  rewrite rngl_sub_diag in Habc; [ | easy ].
+  now do 2 rewrite rngl_add_0_r in Habc.
 }
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+  rewrite Hmo in H1.
+  specialize (H1 c a) as H2.
+  rewrite rngl_add_comm, <- Habc in H2.
+  rewrite rngl_add_comm in H2.
+  now rewrite H1 in H2.
+}
+apply rngl_has_opp_or_sous_iff in Hom.
+destruct Hom; congruence.
 Qed.
 
 Theorem rngl_mul_cancel_l :
@@ -720,36 +724,39 @@ Theorem rngl_mul_cancel_l :
   → (a * b = a * c)%F
   → b = c.
 Proof.
-intros Hiq * Haz Habc.
-unfold rngl_has_inv_or_quot, bool_of_option in Hiq.
-specialize rngl_mul_inv_l as H1.
-unfold rngl_has_inv, rngl_inv in H1.
-specialize rngl_opt_mul_div as H2.
-unfold rngl_has_quot, rngl_div in H2.
-specialize rngl_opt_mul_quot_r as H3.
-unfold rngl_has_quot, rngl_div in H3.
-remember rngl_opt_inv_or_quot as x eqn:Hx.
-symmetry in Hx.
-destruct x as [inv_quot| ]; [ | easy ].
-destruct inv_quot as [inv| quot]. {
-  specialize (H1 eq_refl).
-  apply (f_equal (λ x, rngl_mul (inv a) x)) in Habc.
+intros Hii * Haz Habc.
+remember rngl_has_inv as iv eqn:Hiv.
+symmetry in Hiv.
+destruct iv. {
+  apply (f_equal (λ x, rngl_mul (a⁻¹)%F x)) in Habc.
   do 2 rewrite rngl_mul_assoc in Habc.
-  rewrite H1 in Habc; [ | easy ].
+  rewrite rngl_mul_inv_l in Habc; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in Habc.
-} {
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
-  apply (f_equal (λ x, quot x a)) in Habc.
+}
+remember rngl_has_quot as qu eqn:Hqu.
+symmetry in Hqu.
+destruct qu. {
+  apply (f_equal (λ x, rngl_div x a)) in Habc.
+  remember rngl_is_comm as ic eqn:Hic.
+  symmetry in Hic.
   destruct ic. {
     do 2 rewrite (rngl_mul_comm Hic a) in Habc.
-    rewrite H2 in Habc; [ | easy ].
-    rewrite H2 in Habc; [ | easy ].
+    specialize rngl_opt_mul_div as mul_div.
+    rewrite Hqu in mul_div.
+    rewrite mul_div in Habc; [ | easy ].
+    rewrite mul_div in Habc; [ | easy ].
     easy.
   } {
-    cbn in H3.
-    now do 2 rewrite (H3 _ _ Haz) in Habc.
+    specialize rngl_opt_mul_quot_r as mul_quot_r.
+    rewrite Hqu, Hic in mul_quot_r.
+    cbn in mul_quot_r.
+    rewrite mul_quot_r in Habc; [ | easy ].
+    rewrite mul_quot_r in Habc; [ | easy ].
+    easy.
   }
 }
+apply rngl_has_inv_or_quot_iff in Hii.
+destruct Hii; congruence.
 Qed.
 
 Theorem rngl_add_sub_eq_l :
@@ -814,6 +821,7 @@ Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
+...
   rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_has_opp_or_sous ].
   unfold rngl_sub in H.
   unfold rngl_has_opp in Hro.
