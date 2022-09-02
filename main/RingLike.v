@@ -154,6 +154,26 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
+Theorem rngl_has_opp_has_opp_or_sous {T} {ro : ring_like_op T} :
+  rngl_has_opp = true
+  → rngl_has_opp_or_sous = true.
+Proof.
+intros H.
+unfold rngl_has_opp in H.
+unfold rngl_has_opp_or_sous, bool_of_option.
+now destruct rngl_opt_opp_or_sous.
+Qed.
+
+Theorem rngl_has_inv_has_inv_or_quot {T} {ro : ring_like_op T} :
+  rngl_has_inv = true
+  → rngl_has_inv_or_quot = true.
+Proof.
+intros H.
+unfold rngl_has_inv in H.
+unfold rngl_has_inv_or_quot, bool_of_option.
+now destruct rngl_opt_inv_or_quot.
+Qed.
+
 (*
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   match rngl_opt_opp_or_sous with
@@ -322,26 +342,6 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-
-Theorem rngl_has_opp_has_opp_or_sous :
-  rngl_has_opp = true
-  → rngl_has_opp_or_sous = true.
-Proof.
-intros H.
-unfold rngl_has_opp in H.
-unfold rngl_has_opp_or_sous, bool_of_option.
-now destruct rngl_opt_opp_or_sous.
-Qed.
-
-Theorem rngl_has_inv_has_inv_or_quot :
-  rngl_has_inv = true
-  → rngl_has_inv_or_quot = true.
-Proof.
-intros H.
-unfold rngl_has_inv in H.
-unfold rngl_has_inv_or_quot, bool_of_option.
-now destruct rngl_opt_inv_or_quot.
-Qed.
 
 (* theorems easier to use *)
 
