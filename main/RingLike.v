@@ -590,7 +590,6 @@ Theorem rngl_sub_diag :
   ∀ a, (a - a = 0)%F.
 Proof.
 intros Hos *.
-apply rngl_has_opp_or_sous_iff in Hos.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
@@ -607,7 +606,8 @@ destruct mo. {
   specialize (H1 0%F a).
   now rewrite rngl_add_0_l in H1.
 }
-now destruct Hos.
+apply rngl_has_opp_or_sous_iff in Hos.
+now destruct Hos; congruence.
 Qed.
 
 Theorem rngl_div_diag :
@@ -615,7 +615,6 @@ Theorem rngl_div_diag :
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
 Proof.
 intros Hiq * Haz.
-apply rngl_has_inv_or_quot_iff in Hiq.
 remember rngl_has_inv as ai eqn:Hai; symmetry in Hai.
 destruct ai. {
   remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
@@ -627,13 +626,16 @@ destruct ai. {
   specialize rngl_opt_mul_inv_r as rngl_mul_inv_r.
   rewrite Hai, Hic in rngl_mul_inv_r; cbn in rngl_mul_inv_r.
   now apply rngl_mul_inv_r.
-} {
-  destruct Hiq as [| Haq]; [ easy | ].
+}
+remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
+destruct qu. {
   specialize rngl_opt_mul_div as rngl_mul_div.
-  rewrite Haq in rngl_mul_div.
+  rewrite Hqu in rngl_mul_div.
   specialize (rngl_mul_div 1%F a Haz).
   now rewrite rngl_mul_1_l in rngl_mul_div.
 }
+apply rngl_has_inv_or_quot_iff in Hiq.
+now destruct Hiq; congruence.
 Qed.
 
 Theorem rngl_add_sub :
