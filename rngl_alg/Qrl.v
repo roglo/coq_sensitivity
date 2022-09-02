@@ -66,10 +66,6 @@ apply Heab.
 now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
-Theorem Q_consistent :
- (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now right. Qed.
-
 Definition Q_ring_like_prop :=
   {| rngl_is_comm := true;
      rngl_has_eqb := true;
@@ -108,5 +104,4 @@ Definition Q_ring_like_prop :=
      rngl_opt_mul_le_compat_nonneg := Q_mul_le_compat_nonneg;
      rngl_opt_mul_le_compat_nonpos := Q_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := Q_not_le;
-     rngl_consistent := Q_consistent |}.
+     rngl_opt_not_le := Q_not_le |}.

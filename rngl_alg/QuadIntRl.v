@@ -1061,15 +1061,6 @@ f_equal. {
 }
 Qed.
 
-(*
-Check glop.
-Check glip.
-*)
-
-Theorem quad_int_consistent :
- (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now left. Qed.
-
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_is_comm := true;
      rngl_has_eqb := false; (* to be improved, perhaps *)
@@ -1108,7 +1099,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA;
-     rngl_consistent := quad_int_consistent |}.
+     rngl_opt_not_le := NA |}.
 
 End a.

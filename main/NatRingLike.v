@@ -66,10 +66,6 @@ symmetry.
 apply Nat.sub_add_distr.
 Qed.
 
-Theorem Nat_consistent :
-  (rngl_has_inv = false ∨ rngl_has_quot = false).
-Proof. now left. Qed.
-
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
   {| rngl_is_comm := true;
      rngl_has_eqb := true;
@@ -108,8 +104,7 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := Nat_mul_le_compat;
-     rngl_opt_not_le := Nat_not_le;
-     rngl_consistent := Nat_consistent |}.
+     rngl_opt_not_le := Nat_not_le |}.
 
 Global Existing Instance nat_ring_like_prop.
 

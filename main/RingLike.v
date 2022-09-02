@@ -255,10 +255,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_not_le :
       if rngl_is_ordered then
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
-      else not_applicable;
-    (* consistency *)
-    rngl_consistent :
-      (rngl_has_inv = false ∨ rngl_has_quot = false) }.
+      else not_applicable }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with

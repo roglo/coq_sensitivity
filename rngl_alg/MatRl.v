@@ -687,16 +687,6 @@ split; intros Hab. {
 ...
 *)
 
-Theorem squ_mat_consistent {n} :
-  (@rngl_has_inv (square_matrix n T) (mat_ring_like_op n) = false
-   ∨ @rngl_has_quot (square_matrix n T) (mat_ring_like_op n) = false).
-(*
-  (rngl_has_inv = false ∨ rngl_has_quot = false)
-*)
-Proof.
-now right.
-Qed.
-
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_is_comm := false;
@@ -736,7 +726,6 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_le_compat_nonneg := NA;
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
-     rngl_opt_not_le := NA;
-     rngl_consistent := squ_mat_consistent |}.
+     rngl_opt_not_le := NA |}.
 
 End a.
