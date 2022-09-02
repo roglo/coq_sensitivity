@@ -1160,17 +1160,23 @@ Theorem rngl_inv_involutive :
   ∀ x, x ≠ 0%F → (x⁻¹⁻¹)%F = x.
 Proof.
 intros Hom Hin H10 * Hxz.
+specialize (rngl_has_inv_has_inv_or_quot Hin) as Hin'.
+move Hin' before Hin.
 symmetry.
-...
-specialize (rngl_mul_inv_r (or_introl Hin)) as H.
-unfold rngl_div in H.
-rewrite Hin in H.
-specialize (rngl_mul_move_1_r Hin) as H1.
-apply H1. 2: {
-  rewrite fold_rngl_div; [ | easy ].
-  apply rngl_mul_inv_r; [ now left | easy ].
+specialize (rngl_mul_div Hin') as mul_div.
+specialize (rngl_mul_move_1_r Hin) as mul_move_1_r.
+specialize (rngl_inv_neq_0 Hom Hin H10) as inv_neq_0.
+unfold rngl_div in mul_div.
+unfold rngl_inv in mul_move_1_r, inv_neq_0.
+unfold rngl_has_inv in Hin.
+unfold rngl_inv.
+destruct rngl_opt_inv_or_quot as [inv_quot| ]; [ | easy ].
+destruct inv_quot as [inv| quot]; [ | easy ].
+apply mul_move_1_r. 2: {
+  specialize (mul_div 1%F x Hxz).
+  now rewrite rngl_mul_1_l in mul_div.
 }
-now apply rngl_inv_neq_0.
+now apply inv_neq_0.
 Qed.
 
 Theorem rngl_mul_opp_l :
@@ -1234,6 +1240,7 @@ Theorem rngl_inv_mul_distr :
 Proof.
 intros Hom Hdo Hin * Haz Hbz.
 specialize rngl_mul_cancel_l as H1.
+...
 specialize rngl_mul_inv_r as H2.
 specialize (rngl_integral Hom) as H3.
 unfold rngl_div in H2.
