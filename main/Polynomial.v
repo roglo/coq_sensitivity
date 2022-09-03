@@ -273,6 +273,8 @@ End a.
 Declare Scope P_scope.
 Delimit Scope P_scope with P.
 
+Arguments monl_add {T ro} (la lb)%list.
+Arguments monl_add_loop {T ro} it%nat (la lb)%list.
 Arguments polyn_add {T ro} (pa pb)%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Arguments polyn_one {T ro}.
@@ -291,6 +293,7 @@ Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
 
 (* polynomial ring-like operators *)
 
@@ -314,10 +317,54 @@ Global Existing Instance polyn_ring_like_op.
 
 (* polynomial ring-like properties *)
 
-Theorem polyn_add_comm : ∀ a b : polyn T, (a + b)%F = (b + a)%F.
+Theorem monl_add_loop_comm : ∀ it (la lb : list (monom T)),
+  length la + length lb ≤ it
+  → monl_add_loop it la lb = monl_add_loop it lb la.
+Proof.
+intros * Hit.
+revert la lb Hit.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]. {
+  now destruct lb as [| (cb, db) ].
+}
+destruct lb as [| (cb, db)]; [ easy | ].
+cbn in Hit.
+rewrite Nat.add_succ_r in Hit.
+apply Nat.succ_le_mono in Hit.
+move db before da; move cb before ca.
+rewrite (Nat.compare_antisym da).
+unfold CompOpp.
+rewrite (rngl_add_comm cb).
+remember (da ?= db) as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply Nat.compare_eq in Hc; subst db.
+  rewrite IHit; [ easy | now apply Nat.lt_le_incl ].
+} {
+  now f_equal; apply IHit.
+} {
+  f_equal; apply IHit; cbn.
+  now rewrite Nat.add_succ_r.
+}
+Qed.
+
+Theorem monl_add_comm : ∀ (la lb : list (monom T)),
+  monl_add la lb = monl_add lb la.
+Proof.
+intros.
+unfold monl_add.
+rewrite (Nat.add_comm (length lb)).
+now apply monl_add_loop_comm.
+Qed.
+
+Theorem polyn_add_comm : ∀ a b, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
-...
+unfold polyn_add; f_equal.
+destruct a as (la).
+destruct b as (lb).
+cbn - [ monl_add ].
+apply monl_add_comm.
+Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := false; (* à voir *)
@@ -328,7 +375,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_is_integral := false; (* à voir *)
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
-    rngl_add_assoc := ?rngl_add_assoc;
+     rngl_add_assoc := 42;
     rngl_add_0_l := ?rngl_add_0_l;
     rngl_mul_assoc := ?rngl_mul_assoc;
     rngl_mul_1_l := ?rngl_mul_1_l;
