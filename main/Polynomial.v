@@ -57,22 +57,28 @@ Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
 
 (* notation for polynomials *)
 
+Print Grammar constr.
+
 Module PolynNotation.
-Notation "[ ]" := (mk_polyn []) : polyn_scope.
-Notation "[ x ]" := (mk_polyn (cons x nil)) : polyn_scope.
-Notation "x ☩ y ☩ .. ☩ z" :=
+Notation "《 》" := (mk_polyn []) : polyn_scope.
+Notation "《 x 》" := (mk_polyn (cons x nil)) (x at level 40) : polyn_scope.
+Notation "《 x + y + .. + z 》" :=
   (mk_polyn (cons x (cons y .. (cons z nil) ..)))
-  (at level 50, y at next level, z at next level,
-   format "x  ☩  y  ☩  ..  ☩  z")
-  : polyn_scope.
+  (x at level 40, y at level 40, z at level 40,
+   format "《  x  +  y  +  ..  +  z  》") : polyn_scope.
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (mk_polyn [Mon 3 5]).
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0]).
 Compute (mk_polyn [3☓^5; (-5)☓^2; 88·]).
+Compute 《 3☓^5 》%P.
+Compute 《 88· 》%P.
+Compute 《 3☓^5 + (-5)☓^2 》%P.
+Compute 《 3☓^5 + (-5)☓^2 + 88· 》%P.
 Compute (Mon 3 8).
 Compute [3].
+Compute [(3+2)%nat].
 *)
 End PolynNotation.
 
@@ -81,9 +87,9 @@ Import PolynNotation.
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (3☓^5 ☩ (-5)☓^2 ☩ 8☓)%P.
-Compute (3☓^5 ☩ (-5)☓^2 ☩ 8☓^0)%P.
-Compute (3☓^5 ☩ (-5)☓^2 ☩ 8·)%P.
+Compute (《 3☓^5 + (-5)☓^2 + 8☓》)%P.
+Compute (《 3☓^5 + (-5)☓^2 + 8☓^0 》)%P.
+Compute 《3☓^5 + (-5)☓^2 + 8·》%P.
 Compute (3☓^5)%P.
 Compute (8·)%P.
 Compute [3☓^5]%P.
@@ -143,11 +149,10 @@ Arguments polyn_is_canon {T ro} p%P.
 Arguments monl {T} p%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓)).
-Compute (polyn_is_canon (3☓^5 ☩ 5☓^2 ☩ 8☓^7)).
-Compute (3☓^5 ☩ 5☓^2 ☩ 8☓)%P.
-Compute (monl_add (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ 5☓^2 ☩ 8☓))).
-Compute (monl_add (monl (3☓^5 ☩ 5☓^2 ☩ 8☓)) (monl (3☓^5 ☩ (-5)☓^2 ☩ 8☓))).
+Compute (polyn_is_canon 《3☓^5 + 5☓^2 + 8☓》).
+Compute (polyn_is_canon 《3☓^5 + 5☓^2 + 8☓^7》).
+Compute (monl_add (monl 《3☓^5 + 5☓^2 + 8☓》) (monl 《3☓^5 + 5☓^2 + 8☓》)).
+Compute (monl_add (monl 《3☓^5 + 5☓^2 + 8☓》) (monl 《3☓^5 + (-5)☓^2 + 8☓》)).
 *)
 
 Definition polyn_add (pa pb : polyn T) :=
@@ -161,11 +166,10 @@ Arguments polyn_add {T ro} (pa pb)%P.
 Arguments polyn_is_canon {T ro} p%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (3☓^5 ☩ 5☓^2 ☩ 8☓)%P.
-Compute (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ 5☓^2 ☩ 8☓)).
-Compute (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ (-5)☓^2 ☩ 7·)).
-Compute (polyn_is_canon (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ 5☓^2 ☩ 8☓))).
-Compute (polyn_is_canon (polyn_add (3☓^5 ☩ 5☓^2 ☩ 8☓) (3☓^5 ☩ (-5)☓^2 ☩ 7·))).
+Compute (polyn_add 《3☓^5 + 5☓^2 + 8☓》 《3☓^5 + 5☓^2 + 8☓》).
+Compute (polyn_add 《3☓^5 + 5☓^2 + 8☓》 《3☓^5 + (-5)☓^2 + 7·》).
+Compute (polyn_is_canon (polyn_add 《 3☓^5 + 5☓^2 + 8☓》 《3☓^5 + 5☓^2 + 8☓》)).
+Compute (polyn_is_canon (polyn_add 《3☓^5 + 5☓^2 + 8☓》 《3☓^5 + (-5)☓^2 + 7·》)).
 *)
 
 (* multiplication *)
@@ -192,9 +196,9 @@ End a.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_mul (1☓ ☩ 1·) (1☓ ☩ (-1)·)).
-Compute (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·)).
-Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
+Compute (polyn_mul 《1☓ + 1·》 《1☓ + (-1)·》).
+Compute (polyn_mul 《3☓^5 + 1·》 《1☓ + (-1)·》).
+Compute (polyn_mul 《1☓ + (-1)·》 《3☓^5 + 1·》).
 *)
 
 (* opposite *)
@@ -207,18 +211,20 @@ Definition polyn_opp p := mk_polyn (monl_opp (monl p)).
 Definition monl_sub la lb := monl_add la (monl_opp lb).
 Definition polyn_sub pa pb := mk_polyn (monl_sub (monl pa) (monl pb)).
 
-(*
+(**)
 End a.
 Arguments polyn_opp {T ro} p%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_opp (1☓)%P).
-Compute (polyn_opp (1☓ ☩ 1·)).
-Compute (polyn_opp (1☓ ☩ (-1)·)).
-Compute (polyn_opp (3☓^5 ☩ 1·)).
-Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
-Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
+Compute (mk_polyn [Mon 1 2]).
+Compute 《 1☓^2 》%P.
+Compute (polyn_opp《1☓》).
+Compute (polyn_opp 《1☓ + 1·》).
+Compute (polyn_opp《1☓ + (-1)·》).
+Compute (polyn_opp (3☓^5 + 1·)).
+Compute (polyn_mul (1☓ + (-1)·) (3☓^5 + 1·)).
+Compute (polyn_opp (polyn_mul (3☓^5 + 1·) (1☓ + (-1)·))).
 *)
 
 (* euclidean division *)
@@ -269,11 +275,11 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 (**)
-Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [2·]).
-Compute (polyn_quot_rem (4☓^2 ☩ (-1)·) [2·]).
-Compute (polyn_quot_rem (1☓^2 ☩ 3☓ ☩ 7·) (1☓ ☩ 1·)).
-Compute (polyn_quot_rem (1☓^2 ☩ 3☓ ☩ 7·) []).
-Compute (polyn_quot_rem [] (1☓^2 ☩ 3☓ ☩ 7·)).
+Compute (polyn_quot_rem (1☓^2 + (-1)·) [2·]).
+Compute (polyn_quot_rem (4☓^2 + (-1)·) [2·]).
+Compute (polyn_quot_rem (1☓^2 + 3☓ + 7·) (1☓ + 1·)).
+Compute (polyn_quot_rem (1☓^2 + 3☓ + 7·) []).
+Compute (polyn_quot_rem [] (1☓^2 + 3☓ + 7·)).
 *)
 
 (* ring-like *)
@@ -346,10 +352,10 @@ Compute [3☓5; (-5)☓2; 8☓0].
 *)
 
 Module MlistNotations.
-Notation "x ☩ y ☩ .. ☩ z" :=
+Notation "x + y + .. + z" :=
   (mk_mlist (cons x (cons y .. (cons z nil) ..)))
   (at level 50, y at next level, z at next level,
-   format "x  ☩  y  ☩  ..  ☩  z")
+   format "x  +  y  +  ..  +  z")
   : mlist_scope.
 (*
 Require Import ZArith RnglAlg.Zrl.
@@ -365,8 +371,8 @@ Import MlistNotations.
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓)%mlist.
-Compute (3☓5 ☩ (-5)☓2 ☩ 8☓0)%mlist.
+Compute (3☓5 + (-5)☓2 + 8☓)%mlist.
+Compute (3☓5 + (-5)☓2 + 8☓0)%mlist.
 *)
 
 Section a.
@@ -433,11 +439,11 @@ Arguments monl_add {T} la%list lb%list.
 Arguments monl_is_correct {T ro} monl%mlist.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)).
-Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓7)).
-Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
-Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ 5☓2 ☩ 8☓))).
-Compute (monl_add (m_list (3☓5 ☩ 5☓2 ☩ 8☓)) (m_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
+Compute (monl_is_correct (3☓5 + 5☓2 + 8☓)).
+Compute (monl_is_correct (3☓5 + 5☓2 + 8☓7)).
+Compute (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl).
+Compute (monl_add (m_list (3☓5 + 5☓2 + 8☓)) (m_list (3☓5 + 5☓2 + 8☓))).
+Compute (monl_add (m_list (3☓5 + 5☓2 + 8☓)) (m_list (3☓5 + (-5)☓2 + 8☓))).
 *)
 
 Definition deg_non_incr (ma mb : monom T) := (mdeg mb <=? mdeg ma).
@@ -563,15 +569,15 @@ About polyn_add.
 Arguments polyn_add {T ro rp Heb} p1%P p2%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
+Compute (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl).
 Compute
   (polyn_add
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)).
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)).
 Compute
   (polyn_add
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
-     (mk_polyn (3☓5 ☩ (-5)☓2 ☩ 8☓) eq_refl)).
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)
+     (mk_polyn (3☓5 + (-5)☓2 + 8☓) eq_refl)).
 *)
 
 ...
@@ -616,11 +622,11 @@ Arguments monl_add {T ro} it%nat al1%list al2%list.
 Arguments monl_is_correct {T ro} monl%plist.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓)).
-Compute (monl_is_correct (3☓5 ☩ 5☓2 ☩ 8☓7)).
-Compute (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl).
-Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ 5☓2 ☩ 8☓))).
-Compute (monl_add 50 (p_list (3☓5 ☩ 5☓2 ☩ 8☓)) (p_list (3☓5 ☩ (-5)☓2 ☩ 8☓))).
+Compute (monl_is_correct (3☓5 + 5☓2 + 8☓)).
+Compute (monl_is_correct (3☓5 + 5☓2 + 8☓7)).
+Compute (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl).
+Compute (monl_add 50 (p_list (3☓5 + 5☓2 + 8☓)) (p_list (3☓5 + 5☓2 + 8☓))).
+Compute (monl_add 50 (p_list (3☓5 + 5☓2 + 8☓)) (p_list (3☓5 + (-5)☓2 + 8☓))).
 *)
 
 Theorem polyn_add_is_correct : ∀ p1 p2,
@@ -742,12 +748,12 @@ Definition polyn_add p1 p2 :=
 
 Compute
   (polyn_add
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)).
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)).
 Compute
   (polyn_add
-     (mk_polyn (3☓5 ☩ 5☓2 ☩ 8☓) eq_refl)
-     (mk_polyn (3☓5 ☩ 5☓ ☩ 8☓0) eq_refl)).
+     (mk_polyn (3☓5 + 5☓2 + 8☓) eq_refl)
+     (mk_polyn (3☓5 + 5☓ + 8☓0) eq_refl)).
 
 ...
 
