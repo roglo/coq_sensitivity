@@ -278,6 +278,7 @@ Open Scope Q_scope.
 Compute (polyn_quot_rem «1☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «4☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «1☓^2 + (-1)·» «2☓»).
+(* y a un truc qui déconne, là, mais uniquement avec Z *)
 ...
 Compute (polyn_quot_rem «1☓^2 + 3☓ + 7·» «1☓ + 1·»).
 Compute (polyn_quot_rem «1☓^2 + 3☓ + 7·» «»).
