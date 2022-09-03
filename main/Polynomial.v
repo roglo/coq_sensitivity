@@ -26,8 +26,8 @@ Compute (Mon (-3) 4).
 *)
 
 Notation "c ·" := (Mon c 0) (at level 30, format "c ·").
-Notation "c ☓" := (Mon c 1) (at level 30, format "c ☓").
-Notation "c ☓ ^ a" := (Mon c a) (at level 30, format "c ☓ ^ a").
+Notation "c * ☓" := (Mon c 1) (at level 30, format "c * ☓").
+Notation "c * ☓ ^ a" := (Mon c a) (at level 30, format "c * ☓ ^ a").
 
 (* definition of a polynomial *)
 
@@ -239,19 +239,19 @@ Fixpoint monl_quot_rem_loop it la lb :=
           match lb with
           | [] => ([], []) (* division by zero *)
           | Mon cb db :: _ =>
-              if le_dec db da then
-                let c := (ca / cb)%F in
-                let mq := Mon c (da - db) in
-                let lr := monl_sub la (monl_mul lb [mq]) in
-                let (lq', lr') := monl_quot_rem_loop it' lr lb in
-                if rngl_eqb c 0%F then (lq', lr') else
-                (mq :: lq', lr')
-              else ([], la)
+            let c := (ca / cb)%F in
+            if (c =? 0)%F then ([], la)
+            else if da <? db then ([], la)
+            else
+              let mq := Mon c (da - db) in
+              let lr := monl_sub la (monl_mul lb [mq]) in
+              let (lq', lr') := monl_quot_rem_loop it' lr lb in
+              (mq :: lq', lr')
           end
       end
   end.
 
-Definition monl_quot_rem la lb := monl_quot_rem_loop (S (length la) + 50) la lb.
+Definition monl_quot_rem la lb := monl_quot_rem_loop (S (length la)) la lb.
 
 Definition polyn_quot_rem pa pb :=
   let (lq, lr) := monl_quot_rem (monl pa) (monl pb) in
@@ -260,10 +260,13 @@ Definition polyn_quot_rem pa pb :=
 Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
 Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
 
-(**)
+(*
 End a.
+Arguments monl_quot_rem_loop {T ro} it%nat (la lb)%list.
 Arguments monl_quot_rem {T ro} (la lb)%list.
 Arguments polyn_quot_rem {T ro} (pa pb)%P.
+Arguments polyn_quot {T ro} (pa pb)%P.
+Arguments polyn_rem {T ro} (pa pb)%P.
 Arguments monl_mul {T ro} (la lb)%list.
 Arguments monl_sub {T ro} (la lb)%list.
 (**)
@@ -275,14 +278,14 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 *)
-Compute (polyn_quot_rem «1☓^2 + (-1)·» «2·»).
-Compute (polyn_quot_rem «4☓^2 + (-1)·» «2·»).
-Compute (polyn_quot_rem «1☓^2 + (-1)·» «2☓»).
-(* y a un truc qui déconne, là, mais uniquement avec Z *)
-...
-Compute (polyn_quot_rem «1☓^2 + 3☓ + 7·» «1☓ + 1·»).
-Compute (polyn_quot_rem «1☓^2 + 3☓ + 7·» «»).
-Compute (polyn_quot_rem «» «1☓^2 + 3☓ + 7·»).
+Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2·»).
+Compute (polyn_quot_rem «4*☓^2 + (-1)·» «2·»).
+Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2*☓»).
+Compute (polyn_quot_rem «1·» «2·»).
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «1*☓ + 1·»).
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «2*☓ + 1·»).
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
+Compute (polyn_quot_rem «» «1*☓^2 + 3*☓ + 7·»).
 *)
 
 (* ring-like *)
