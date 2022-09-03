@@ -6,7 +6,7 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import Init.Nat List ListNotations.
+Import PeanoNat.Nat List ListNotations.
 
 Require Import Misc RingLike IterAdd IterAnd SortingFun.
 
@@ -95,7 +95,7 @@ Definition polyn_one := mk_polyn [Mon 1 0] : polyn T.
 
 Fixpoint monl_add_loop it la lb :=
   match it with
-  | 0 => []
+  | 0 => [Mon 0 99] (* algo error: not enough iterations *)
   | S it' =>
       match la with
       | [] => lb
@@ -115,7 +115,8 @@ Fixpoint monl_add_loop it la lb :=
       end
   end.
 
-Definition monl_add la lb := monl_add_loop (length la + length lb) la lb.
+Definition monl_add_nb_iter (la lb : list (monom T)) := length la + length lb.
+Definition monl_add la lb := monl_add_loop (monl_add_nb_iter la lb) la lb.
 
 Arguments monl_add_loop it%nat (la lb)%list.
 Arguments monl_add (la lb)%list.
@@ -131,6 +132,8 @@ Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓»).
 Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓^7»).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + 5*☓^2 + 8*☓»)).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
+Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl « »)).
+Compute (monl_add (monl « ») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
 *)
 
 Definition polyn_add (pa pb : polyn T) :=
@@ -318,10 +321,11 @@ Global Existing Instance polyn_ring_like_op.
 (* polynomial ring-like properties *)
 
 Theorem monl_add_loop_comm : ∀ it (la lb : list (monom T)),
-  length la + length lb ≤ it
+  monl_add_nb_iter la lb ≤ it
   → monl_add_loop it la lb = monl_add_loop it lb la.
 Proof.
 intros * Hit.
+unfold monl_add_nb_iter in Hit.
 revert la lb Hit.
 induction it; intros; [ easy | cbn ].
 destruct la as [| (ca, da)]. {
@@ -347,14 +351,54 @@ destruct c. {
 }
 Qed.
 
+Theorem monl_add_nb_iter_comm : ∀ (la lb : list (monom T)),
+  monl_add_nb_iter la lb = monl_add_nb_iter lb la.
+Proof.
+intros.
+apply Nat.add_comm.
+Qed.
+
+Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
+  monl_add_loop it1 la (monl_add_loop it2 lb lc) =
+  monl_add_loop it3 (monl_add_loop it4 la lb) lc.
+Proof.
+intros.
+...
+
+(* *)
+
 Theorem monl_add_comm : ∀ (la lb : list (monom T)),
   monl_add la lb = monl_add lb la.
 Proof.
 intros.
 unfold monl_add.
-rewrite (Nat.add_comm (length lb)).
+rewrite (monl_add_nb_iter_comm lb).
 now apply monl_add_loop_comm.
 Qed.
+
+Theorem monl_add_assoc : ∀ (la lb lc : list (monom T)),
+  monl_add la (monl_add lb lc) = monl_add (monl_add la lb) lc.
+Proof.
+intros.
+unfold monl_add.
+(*
+remember (monl_add_nb_iter la lb) as it_ab eqn:Hit_ab in |-*.
+remember (monl_add_nb_iter lb lc) as it_bc eqn:Hit_bc in |-*.
+remember (monl_add_nb_iter la _) as it_a_bc eqn:Hit_a_bc in |-*.
+remember (monl_add_nb_iter _ lc) as it_ab_c eqn:Hit_ab_c in |-*.
+move it_bc before it_ab; move it_a_bc before it_bc.
+move it_ab_c before it_a_bc.
+*)
+remember (monl_add_nb_iter _ _) as it1 eqn:Hit1.
+remember (monl_add_nb_iter _ _) as it2 eqn:Hit2 in |-*.
+remember (monl_add_nb_iter _ _) as it3 eqn:Hit3 in |-*.
+remember (monl_add_nb_iter _ _) as it4 eqn:Hit4 in |-*.
+move it2 before it1; move it3 before it2; move it4 before it3.
+... ...
+apply monl_add_loop_assoc.
+...
+
+(* *)
 
 Theorem polyn_add_comm : ∀ a b, (a + b)%F = (b + a)%F.
 Proof.
@@ -366,6 +410,18 @@ cbn - [ monl_add ].
 apply monl_add_comm.
 Qed.
 
+Theorem polyn_add_assoc : ∀ a b c : polyn T, (a + (b + c))%F = (a + b + c)%F.
+Proof.
+intros; cbn.
+unfold polyn_add; f_equal.
+destruct a as (la).
+destruct b as (lb).
+destruct c as (lc).
+cbn - [ monl_add ].
+... ...
+apply monl_add_assoc.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := false; (* à voir *)
      rngl_has_eqb := false; (* à voir *)
@@ -375,7 +431,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_is_integral := false; (* à voir *)
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
-     rngl_add_assoc := 42;
+     rngl_add_assoc := polyn_add_assoc;
     rngl_add_0_l := ?rngl_add_0_l;
     rngl_mul_assoc := ?rngl_mul_assoc;
     rngl_mul_1_l := ?rngl_mul_1_l;
