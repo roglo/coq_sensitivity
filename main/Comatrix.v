@@ -1221,10 +1221,10 @@ Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 destruct M as (ll); cbn - [ det ].
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
@@ -1407,10 +1407,10 @@ Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 destruct M as (ll); cbn - [ det ].
 destruct (Nat.eq_dec (length ll) 0) as [Hlz| Hlz]. {
   apply length_zero_iff_nil in Hlz; subst ll; cbn.

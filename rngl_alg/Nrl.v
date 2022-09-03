@@ -111,8 +111,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
      rngl_opt_opp_or_sous := Some (inl (Zn_opp n));
-     rngl_opt_inv := if is_prime n then Some (Zn_inv n) else None;
-     rngl_opt_quot := None;
+     rngl_opt_inv_or_quot :=
+       if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
      rngl_le := Zn_le n |}.
 
@@ -316,7 +316,26 @@ destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
 Theorem Zn_opt_mul_inv_r :
-  if (rngl_has_inv && negb true)%bool then ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
+  if (rngl_has_inv && negb true)%bool then
+    ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
+  else not_applicable.
+Proof.
+now rewrite Bool.andb_false_r.
+Qed.
+
+Theorem Zn_opt_mul_div :
+  if rngl_has_quot then ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a
+  else not_applicable.
+Proof.
+intros.
+unfold rngl_has_quot; cbn.
+remember (is_prime n) as p eqn:Hp; symmetry in Hp.
+now destruct p.
+Qed.
+
+Theorem Zn_opt_mul_quot_r :
+  if (rngl_has_quot && negb true)%bool then
+    ∀ a b : Zn n, b ≠ 0%F → (b * a / b)%F = a
   else not_applicable.
 Proof.
 now rewrite Bool.andb_false_r.
@@ -377,8 +396,8 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
-     rngl_opt_mul_quot_l := NA;
-     rngl_opt_mul_quot_r := NA;
+     rngl_opt_mul_div := Zn_opt_mul_div;
+     rngl_opt_mul_quot_r := Zn_opt_mul_quot_r;
      rngl_opt_eqb_eq := Zn_eqb_eq;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
@@ -412,8 +431,7 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_add := Nat.lcm;
      rngl_mul := Nat.mul;
      rngl_opt_opp_or_sous := None;
-     rngl_opt_inv := None;
-     rngl_opt_quot := None;
+     rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
      rngl_le := Nat.le |}.
 
@@ -462,7 +480,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_quot_l := NA;
+     rngl_opt_mul_div := NA;
      rngl_opt_eqb_eq := Nat.eqb_eq;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA;

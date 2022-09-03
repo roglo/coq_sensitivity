@@ -342,8 +342,9 @@ Theorem lemma_2_A_n_2_eq_n_I :
   ∀ n, (mA n * mA n)%M = (rngl_of_nat n × mI (2 ^ n))%M.
 Proof.
 intros Hop *.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite mA_nrows.
@@ -1592,8 +1593,9 @@ Theorem An_eigen_equation_for_sqrt_n :
   end.
 Proof.
 intros Hic Hop Hin Heq * Hμ.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 destruct n. {
   intros V Hv.
   cbn in Hμ, V |-*.
@@ -1783,13 +1785,16 @@ Theorem A_n_eigenvalue_squared_is_n :
   → (mA n • V = μ × V)%V
   → (μ * μ)%F = rngl_of_nat n.
 Proof.
-intros Hic Hro Heq Hin * Hvs Hvr Hav.
-specialize (lemma_2_A_n_2_eq_n_I Hro n) as Ha.
+intros Hic Hop Heq Hin * Hvs Hvr Hav.
+specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
+specialize (Hiq (or_introl Hin)).
+move Hiq before Hin.
+specialize (lemma_2_A_n_2_eq_n_I Hop n) as Ha.
 specialize (mA_is_correct n) as Hac.
 specialize (mI_is_correct_matrix (2 ^ n)) as Hicm.
 assert (Hcs : mat_ncols (mA n) = vect_size V) by now rewrite mA_ncols.
 (* μ * μ = rngl_of_nat n *)
-apply vect_mul_scal_reg_r with (V0 := V); [ now left | easy | congruence | ].
+apply vect_mul_scal_reg_r with (V0 := V); [ easy | easy | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)
@@ -1825,8 +1830,9 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.
 intros Hic Hop Heq Hin H10 *.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before H10.
 split. {
   intros HV.
   destruct HV as (V & Hvz & Hv).

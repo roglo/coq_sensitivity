@@ -15,8 +15,7 @@ Canonical Structure Z_ring_like_op : ring_like_op Z :=
      rngl_add := Z.add;
      rngl_mul := Z.mul;
      rngl_opt_opp_or_sous := Some (inl Z.opp);
-     rngl_opt_inv := None;
-     rngl_opt_quot := Some Z.quot;
+     rngl_opt_inv_or_quot := Some (inr Z.quot);
      rngl_opt_eqb := Some Z.eqb;
      rngl_le := Z.le |}.
 
@@ -45,13 +44,6 @@ apply Z.nlt_ge in Hz; apply Hz.
 rewrite <- H.
 apply Z.lt_sub_lt_add_r.
 now rewrite Z.sub_diag.
-Qed.
-
-Theorem Z_mul_div_l : ∀ a b : Z, a ≠ 0%F → (a * b ÷ a)%Z = b.
-Proof.
-intros * Haz.
-rewrite Z.mul_comm.
-now apply Z.quot_mul.
 Qed.
 
 Theorem Z_mul_le_compat_nonneg : ∀ a b c d,
@@ -103,7 +95,7 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_quot_l := Z_mul_div_l;
+     rngl_opt_mul_div := Z.quot_mul;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := Z.eqb_eq;
      rngl_opt_le_dec := Z_le_dec;

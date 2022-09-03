@@ -979,8 +979,9 @@ Theorem mat_mul_1_l {n} : ∀ (M : matrix T),
   → (mI n * M)%M = M.
 Proof.
 intros * HM Hn; subst n.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
@@ -1039,8 +1040,9 @@ Theorem mat_mul_1_r {n} : ∀ (M : matrix T),
   → (M * mI n)%M = M.
 Proof.
 intros * HM H; subst n.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 apply is_scm_mat_iff in HM.
 destruct HM as (_, HM).
 unfold "*"%M.
@@ -1104,8 +1106,9 @@ Theorem mat_vect_mul_1_l : ∀ n (V : vector T),
   → (mI n • V)%M = V.
 Proof.
 intros * Hn; subst n.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 apply vector_eq. 2: {
   now cbn; do 2 rewrite map_length; rewrite seq_length.
 }
@@ -1187,8 +1190,9 @@ Theorem mat_mul_assoc :
   → (MA * (MB * MC))%M = ((MA * MB) * MC)%M.
 Proof.
 intros * Hrbz Hcbz Hcarb.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "*"%M.
 f_equal.
 unfold mat_nrows at 5; cbn.
@@ -1513,8 +1517,9 @@ Theorem mat_mul_scal_l_mul :
   → (a × MA * MB = a × (MA * MB))%M.
 Proof.
 intros * Ha.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "*"%M, "×"%M.
 cbn; f_equal.
 rewrite map_length; cbn.
@@ -1574,8 +1579,9 @@ Theorem mat_mul_mul_scal_l :
   → (MA * (a × MB) = a × (MA * MB))%M.
 Proof.
 intros Hic * Hb Hcaz Hcarb.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 apply Nat.neq_0_lt_0 in Hcaz.
 unfold "*"%M, "×"%M; cbn.
 f_equal.
@@ -1645,8 +1651,9 @@ Theorem mat_vect_mul_assoc_as_sums :
         vect_el V j.
 Proof.
 intros * Hi.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   now rewrite rngl_mul_summation_distr_l.
@@ -1677,8 +1684,9 @@ Theorem mat_vect_mul_assoc :
   → (A • (B • V) = (A * B) • V)%M.
 Proof.
 intros * Ha Hb Hcarb Hcbv.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "•"%M, "*"%M; cbn.
 f_equal.
 rewrite map_map.
@@ -1833,8 +1841,9 @@ Theorem mat_mul_scal_vect_assoc :
   → (a × (MA • V))%V = ((a × MA) • V)%M.
 Proof.
 intros * Ha Hcav.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "×"%V, "×"%M, "•"%V; cbn.
 f_equal.
 do 2 rewrite map_map.
@@ -1896,8 +1905,9 @@ Theorem mat_mul_scal_vect_comm :
   → (a × (MA • V) = MA • (a × V))%V.
 Proof.
 intros Hic * Ha Hcav.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold "×"%V, "•"%M; cbn.
 f_equal.
 rewrite map_map.
@@ -2776,8 +2786,9 @@ Theorem mat_vect_mul_0_r : ∀ m n (M : matrix T),
   → (M • vect_zero n = vect_zero m)%V.
 Proof.
 intros * Hr Hc.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 subst m n.
 unfold "•"%V, vect_zero; cbn; f_equal.
 unfold vect_dot_mul; cbn.

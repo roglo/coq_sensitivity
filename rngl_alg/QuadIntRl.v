@@ -168,8 +168,7 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_add := @qi_add d;
      rngl_mul := @qi_mul d;
      rngl_opt_opp_or_sous := Some (inl (@qi_opp d));
-     rngl_opt_inv := None;
-     rngl_opt_quot := Some (@qi_quot d);
+     rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
      rngl_opt_eqb := None; (* to be improved, perhaps *)
      rngl_le := phony_qi_le |}.
 
@@ -846,6 +845,45 @@ apply square_free_not_mul_square in H; [ | easy | ]. {
 }
 Qed.
 
+Theorem quad_int_mul_div : ∀ a b : quad_int d, b ≠ 0%F → (a * b / b)%F = a.
+Proof.
+intros * Hbz; cbn.
+unfold "*"%QI, "÷"%QI; cbn.
+destruct a as (a, a').
+destruct b as (b, b'); cbn.
+assert (Hbz' : b ^ 2 - d * b' ^ 2 ≠ 0). {
+  intros H; apply Hbz; clear Hbz.
+  apply -> Z.sub_move_0_r in H.
+  do 2 rewrite Z.pow_2_r in H.
+  rewrite Z.mul_assoc in H.
+  apply square_free_not_mul_square in H; [ | easy | ]. {
+    now destruct H; subst b b'.
+  } {
+    now apply square_free_not_square.
+  }
+}
+f_equal. {
+  remember (_ + _) as z eqn:Hz.
+  remember (_ + _) as t eqn:Ht in |-*.
+  ring_simplify in Hz; subst z.
+  ring_simplify in Ht; subst t.
+  rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  now apply Z.quot_mul.
+} {
+  remember (_ + _) as z eqn:Hz.
+  remember (_ + _) as t eqn:Ht in |-*.
+  ring_simplify in Hz; subst z.
+  ring_simplify in Ht; subst t.
+  rewrite (Z.mul_comm (b ^ 2)).
+  rewrite (Z.mul_comm d).
+  rewrite <- Z.mul_assoc.
+  rewrite <- Z.mul_sub_distr_l.
+  now apply Z.quot_mul.
+}
+Qed.
+
+(*
 Theorem quad_int_mul_quot_l : ∀ a b : quad_int d,
   a ≠ 0%QI
   → (a * b ÷ a)%QI = b.
@@ -885,6 +923,7 @@ f_equal. {
   now apply eq_quad_int_norm_zero in H.
 }
 Qed.
+*)
 
 (*
 Search (_ / (_ * _)).
@@ -1086,7 +1125,7 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_quot_l := quad_int_mul_quot_l;
+     rngl_opt_mul_div := quad_int_mul_div;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;

@@ -657,10 +657,10 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 apply (no_dup_false_iff Nat.eqb_eq) in Hadk.
 destruct Hadk as (l1 & l2 & l3 & a & Ha).
 rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
@@ -730,10 +730,10 @@ Theorem det_isort_rows_no_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 destruct (Nat.eq_dec (length kl) 0) as [Hkz| Hkz]. {
   apply length_zero_iff_nil in Hkz; subst kl.
   cbn; rewrite ε_nil; symmetry.
@@ -1273,9 +1273,10 @@ Theorem rngl_summation_prodn_repeat_filter_no_dup :
   ∑ (kl ∈ filter (no_dup Nat.eqb) (prodn (repeat (seq 1 n) m))),
     ε kl * f kl.
 Proof.
-intros Hopp Heqb *.
-specialize (rngl_has_opp_has_opp_or_sous Hopp) as Hop'.
-move Hop' before Hopp.
+intros Hop Heqb *.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 assert (Hel : equality (list_eqv eqb)). {
   apply -> equality_list_eqv.
   unfold equality.
@@ -1614,10 +1615,10 @@ Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
     (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hif * Hmz.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
   rewrite rngl_product_summation_distr_prodn; [ | easy | easy ].
@@ -1790,10 +1791,10 @@ Lemma Cauchy_Binet_formula_step_5 : in_charac_0_field →
     det (mat_select_rows jl B).
 Proof.
 intros Hif *.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros kl Hkl.
   now rewrite <- rngl_mul_assoc.

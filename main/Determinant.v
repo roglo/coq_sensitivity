@@ -432,8 +432,9 @@ Theorem det_is_det' :
   → det M = det' M.
 Proof.
 intros Hic Hop Hin H10 * Hm.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold det'.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 unfold det.
@@ -559,8 +560,9 @@ Theorem det'_is_det'' :
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop Heq *.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold det', det''.
   now rewrite Hrz.
@@ -774,8 +776,9 @@ Theorem determinant_multilinear :
         b * det (mat_repl_vect' i M V))%F.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
 rewrite det_is_det'; try easy. 2: {
@@ -1188,10 +1191,10 @@ Theorem determinant_alternating : in_charac_0_field →
   → det (mat_swap_rows p q M) = (- det M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 rewrite det_is_det'; try now destruct Hif. 2: {
   rewrite <- Hr in Hp, Hq.
@@ -1548,8 +1551,9 @@ Theorem determinant_same_rows : in_charac_0_field →
   → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hch.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
 assert (HM : det M = (- det M)%F). {

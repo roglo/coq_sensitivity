@@ -82,9 +82,10 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%F.
 Proof.
 intros Hld Hop Hor *.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
-rewrite <- (rngl_mul_0_r Hop' 0).
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+rewrite <- (rngl_mul_0_r Hos 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
@@ -123,8 +124,9 @@ Theorem eq_vect_squ_0 :
   ∀ v, ≺ v, v ≻ = 0%F → v = vect_zero (vect_size v).
 Proof.
 intros Hop Hed Hdo Hor * Hvvz.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 unfold vect_dot_mul in Hvvz.
 apply vector_eq; [ | now cbn; rewrite repeat_length ].
 intros i Hi.
@@ -225,8 +227,9 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros Hof * Hsm Hsr Hcz.
 destruct Hof as (Hic & Hop & Heq & Hld & Hdo & Hin & Hor).
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
   subst V; cbn.
   now apply Rayleigh_quotient_mul_scal_l_zero.
@@ -274,13 +277,17 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → (M • V = μ × V)%V
   → Rayleigh_quotient M V = μ.
 Proof.
-intros Hic Hop Hii Hdo Hor Hdl * Hvz Hmv.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+intros Hic Hop Hii Hdo Hin Hdl * Hvz Hmv.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
+specialize (Hiq (or_introl Hin)).
+move Hiq before Hin.
 unfold Rayleigh_quotient.
 rewrite Hmv.
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-apply rngl_mul_div_l; [ now left | ].
+apply rngl_mul_div; [ easy | ].
 intros H.
 now apply eq_vect_squ_0 in H.
 Qed.
@@ -484,7 +491,10 @@ Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   → A = mat_with_vect n eV
   → (A⁺ * A = mI n)%M.
 Proof.
-intros Hic Hos Heq Hii * Hsy Hr Hvv Hm.
+intros Hic Hos Heq Hin * Hsy Hr Hvv Hm.
+specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
+specialize (Hiq (or_introl Hin)).
+move Hiq before Hin.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n A | ].
 rewrite Hm.
 apply matrix_eq; cycle 1. {
@@ -655,7 +665,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   destruct vvij; [ now apply rngl_eqb_eq | ].
   apply rngl_eqb_neq in Hvvij; [ | easy ].
   exfalso.
-  apply rngl_mul_cancel_r in H1; [ | now left | easy ].
+  apply rngl_mul_cancel_r in H1; [ | easy | easy ].
   revert H1.
   apply Hall_diff; [ easy | easy | flia Hij Hi Hj ].
 }
@@ -953,10 +963,10 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
   → (M = U * D * U⁻¹)%M.
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
-specialize rngl_has_opp_has_opp_or_sous as Hop'.
+specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hop' H); clear H.
-move Hop' before Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
   unfold mat_with_vect in Ho; cbn in Ho.
@@ -968,7 +978,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 specialize diagonalized_matrix_prop_1 as H1.
 assert (H : rngl_is_comm = true) by now destruct Hif.
-specialize (H1 H Hop'); clear H.
+specialize (H1 H Hos); clear H.
 specialize (H1 n M ev eV D U Hrn Hlev Hsy Hvv Hevn Hd Ho).
 generalize H1; intros H1v.
 apply (f_equal (λ A, (A * U⁻¹)%M)) in H1.

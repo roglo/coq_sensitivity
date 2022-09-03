@@ -117,8 +117,7 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
      rngl_opt_opp_or_sous := Some (inl square_matrix_opp);
-     rngl_opt_inv := None;
-     rngl_opt_quot := None;
+     rngl_opt_inv_or_quot := None;
      rngl_opt_eqb :=
        match rngl_opt_eqb with
        | Some eqb => Some (square_matrix_eqb eqb)
@@ -156,8 +155,8 @@ Theorem sm_mat_of_nat :
   ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
 *)
 Proof.
-cbn.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
+intros; cbn.
+specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
 induction m; cbn. {
   unfold "×"%M, mZ, mI.
   f_equal; cbn.
@@ -563,8 +562,8 @@ Theorem squ_mat_characteristic_prop {n} :
     @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
       (if n =? 0 then 1 else rngl_characteristic) = 0%F.
 Proof.
-specialize (rngl_has_opp_has_opp_or_sous Hop) as Hop'.
-move Hop' before Hop.
+specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
+move Hos before Hop.
 rewrite (if_eqb_eq_dec n).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
@@ -713,7 +712,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_sub_distr_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
-     rngl_opt_mul_quot_l := NA;
+     rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
      rngl_opt_eqb_eq := NA; (* squ_mat_opt_eqb_eq to be completed *)
      rngl_opt_le_dec := NA;
