@@ -266,7 +266,33 @@ Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
 Compute (polyn_quot_rem «» «1*☓^2 + 3*☓ + 7·»).
 *)
 
-(* ring-like operators *)
+End a.
+
+(* polynomial notations *)
+
+Declare Scope P_scope.
+Delimit Scope P_scope with P.
+
+Arguments polyn_add {T ro} (pa pb)%P.
+Arguments polyn_mul {T ro} (pa pb)%P.
+Arguments polyn_one {T ro}.
+Arguments polyn_opp {T ro} p%P.
+Arguments polyn_quot {T ro} (pa pb)%P.
+
+Module polynomial_Notations.
+
+Notation "pa + pb" := (polyn_add pa pb) : P_scope.
+
+End polynomial_Notations.
+
+Import polynomial_Notations.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+
+(* polynomial ring-like operators *)
 
 Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
 
@@ -286,17 +312,22 @@ Canonical Structure polyn_ring_like_op.
 (* to search for ring-like polynomials operators in the context *)
 Global Existing Instance polyn_ring_like_op.
 
-(* ring-like properties *)
+(* polynomial ring-like properties *)
+
+Theorem polyn_add_comm : ∀ a b : polyn T, (a + b)%F = (b + a)%F.
+Proof.
+intros; cbn.
+...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
-  {| rngl_mul_is_comm := @rngl_mul_is_comm T _ _;
-     rngl_has_eqb := ?rngl_has_eqb;
-    rngl_has_dec_le := ?rngl_has_dec_le;
-    rngl_has_1_neq_0 := ?rngl_has_1_neq_0;
-    rngl_is_ordered := ?rngl_is_ordered;
-    rngl_is_integral := ?rngl_is_integral;
-    rngl_characteristic := ?rngl_characteristic;
-    rngl_add_comm := ?rngl_add_comm;
+  {| rngl_mul_is_comm := false; (* à voir *)
+     rngl_has_eqb := false; (* à voir *)
+     rngl_has_dec_le := false; (* à voir *)
+     rngl_has_1_neq_0 := false; (* à voir *)
+     rngl_is_ordered := false; (* à voir *)
+     rngl_is_integral := false; (* à voir *)
+     rngl_characteristic := rngl_characteristic;
+     rngl_add_comm := polyn_add_comm;
     rngl_add_assoc := ?rngl_add_assoc;
     rngl_add_0_l := ?rngl_add_0_l;
     rngl_mul_assoc := ?rngl_mul_assoc;
