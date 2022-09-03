@@ -40,10 +40,11 @@ Arguments monl {T} p%P.
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+Compute (mk_polyn [Mon 3 5]).
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0]).
-Compute (mk_polyn [3☓5; (-5)☓2; 8☓0]).
+Compute (mk_polyn [3☓^5; (-5)☓^2; 8☓^0]).
 Compute (Mon 3 8).
-Compute [3☓5; (-5)☓2; 8☓0].
+Compute [3☓^5; (-5)☓^2; 8☓^0].
 *)
 
 (* canonicity of a polynomial
@@ -57,6 +58,7 @@ Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
 (* notation for polynomials *)
 
 Module PolynNotation.
+Notation "[ x ]" := (mk_polyn (cons x nil)) : polyn_scope.
 Notation "x ☩ y ☩ .. ☩ z" :=
   (mk_polyn (cons x (cons y .. (cons z nil) ..)))
   (at level 50, y at next level, z at next level,
@@ -65,9 +67,11 @@ Notation "x ☩ y ☩ .. ☩ z" :=
 (*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+Compute (mk_polyn [Mon 3 5]).
 Compute (mk_polyn [Mon 3 5; Mon (-5) 2; Mon 8 0]).
 Compute (mk_polyn [3☓^5; (-5)☓^2; 88·]).
 Compute (Mon 3 8).
+Compute [3].
 *)
 End PolynNotation.
 
@@ -78,6 +82,11 @@ Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (3☓^5 ☩ (-5)☓^2 ☩ 8☓)%P.
 Compute (3☓^5 ☩ (-5)☓^2 ☩ 8☓^0)%P.
+Compute (3☓^5 ☩ (-5)☓^2 ☩ 8·)%P.
+Compute (3☓^5)%P.
+Compute (8·)%P.
+Compute [3☓^5]%P.
+Compute [8·]%P.
 *)
 
 Section a.
@@ -105,17 +114,17 @@ Fixpoint monl_add_loop it la lb :=
   | S it' =>
       match la with
       | [] => lb
-      | Mon ac ad :: la' =>
+      | Mon ca da :: la' =>
           match lb with
           | [] => la
-          | Mon bc bd :: lb' =>
-              match Nat.compare ad bd with
+          | Mon cb db :: lb' =>
+              match Nat.compare da db with
               | Eq =>
-                  let c := (ac + bc)%F in
+                  let c := (ca + cb)%F in
                   if (c =? 0)%F then monl_add_loop it' la' lb'
-                  else Mon c ad :: monl_add_loop it' la' lb'
-              | Lt => Mon bc bd :: monl_add_loop it' la lb'
-              | Gt => Mon ac ad :: monl_add_loop it' la' lb
+                  else Mon c da :: monl_add_loop it' la' lb'
+              | Lt => Mon cb db :: monl_add_loop it' la lb'
+              | Gt => Mon ca da :: monl_add_loop it' la' lb
               end
           end
       end
@@ -189,8 +198,13 @@ Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
 
 (* opposite *)
 
-Definition polyn_opp p :=
-  mk_polyn (map (λ m, Mon (- mcoeff m)%F (mdeg m)) (monl p)).
+Definition monl_opp la := map (λ m, Mon (- mcoeff m)%F (mdeg m)) la.
+Definition polyn_opp p := mk_polyn (monl_opp (monl p)).
+
+(* subtraction *)
+
+Definition monl_sub la lb := monl_add la (monl_opp lb).
+Definition polyn_sub pa pb := mk_polyn (monl_sub (monl pa) (monl pb)).
 
 (*
 End a.
@@ -198,6 +212,7 @@ Arguments polyn_opp {T ro} p%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+Compute (polyn_opp (1☓)%P).
 Compute (polyn_opp (1☓ ☩ 1·)).
 Compute (polyn_opp (1☓ ☩ (-1)·)).
 Compute (polyn_opp (3☓^5 ☩ 1·)).
@@ -207,17 +222,55 @@ Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
 
 (* euclidean division *)
 
-(* is it possible? *)
-
-Fixpoint monl_quot la lb :=
-  match la with
-  | [] => []
-  | ma :: la' => ...
+Fixpoint monl_quot_rem it la lb :=
+  match it with
+  | 0 => ([], [])
+  | S it' =>
+      match la with
+      | [] => ([], lb)
+      | Mon ca da :: la' =>
+          match lb with
+          | [] => ([], [])
+          | Mon cb db :: _ =>
+              if le_dec db da then
+                let c := (ca / cb)%F in
+                let mq := Mon c (da - db) in
+                let lr := monl_sub la (monl_mul lb [mq]) in
+                let '(lq', lr') := monl_quot_rem it' lr lb in
+(*
+                if rngl_eqb c 0%F then (lq', lr') else
+*)
+                ((mq :: lq'), lr')
+              else ([], la)
+          end
+      end
   end.
 
-...
+Definition polyn_quot_rem pa pb :=
+  let it := length (monl pa) in
+  let (lq, lr) := monl_quot_rem it (monl pa) (monl pb) in
+  (mk_polyn lq, mk_polyn lr).
 
-Definition polyn_quot pa pb := mk_polyn (monl_quot (monl pa) (monl pb)).
+(**)
+End a.
+About polyn_quot_rem.
+Arguments polyn_quot_rem {T ro} (pa pb)%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_quot_rem (1☓ ☩ (-1)·) [1·]).
+Compute (polyn_quot_rem (4☓ ☩ (-2)·) [(-2)·]).
+Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) (1☓^2 ☩ (-1)·)).
+(* quotient, c'est bon, mais reste, c'est pas ça *)
+...
+Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [2·]).
+Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [(-2)·]).
+...
+Compute (polyn_opp (3☓^5 ☩ 1·)).
+Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
+Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
+*)
+
+...
 
 (* ring-like *)
 
