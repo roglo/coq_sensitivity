@@ -367,6 +367,15 @@ Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
     monl_add_loop it3 (monl_add_loop it4 la lb) lc.
 Proof.
 intros * Hit1 Hit2 Hit3 Hit4.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (
+  let pa := « » in
+  let pb := « » in
+  let pc := « 3*☓ » in
+  ((pa + pb) + pc = pa + (pb + pc))%P).
+(* voilà un contre-exemple *)
+...
 revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4.
 induction it1; intros; cbn. {
   apply Nat.le_0_r in Hit1.
