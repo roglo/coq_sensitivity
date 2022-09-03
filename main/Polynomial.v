@@ -115,8 +115,10 @@ Fixpoint monl_add_loop it la lb :=
       end
   end.
 
-Definition monl_add_nb_iter (la lb : list (monom T)) := length la + length lb.
-Definition monl_add la lb := monl_add_loop (monl_add_nb_iter la lb) la lb.
+Definition monl_add_nb_iter (la lb : list (monom T)) :=
+  S (length la + length lb).
+Definition monl_add la lb :=
+  monl_add_loop (monl_add_nb_iter la lb) la lb.
 
 Arguments monl_add_loop it%nat (la lb)%list.
 Arguments monl_add (la lb)%list.
@@ -355,7 +357,39 @@ Theorem monl_add_nb_iter_comm : ∀ (la lb : list (monom T)),
   monl_add_nb_iter la lb = monl_add_nb_iter lb la.
 Proof.
 intros.
-apply Nat.add_comm.
+unfold monl_add_nb_iter.
+now rewrite Nat.add_comm.
+Qed.
+
+Theorem monl_add_loop_enough_iter : ∀ it1 it2 (la lb : list (monom T)),
+  monl_add_nb_iter la lb ≤ it1
+  → monl_add_nb_iter la lb ≤ it2
+  → monl_add_loop it1 la lb = monl_add_loop it2 la lb.
+Proof.
+intros * Hit1 Hit2.
+unfold monl_add_nb_iter in Hit1, Hit2.
+revert it2 la lb Hit1 Hit2.
+induction it1; intros; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit1.
+destruct la as [| (ca, da)]; [ now destruct it2 | ].
+destruct lb as [| (cb, db)]; [ now destruct it2 | ].
+cbn in Hit1, Hit2.
+destruct it2; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit2.
+remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
+destruct dab. {
+  destruct (ca + cb =? 0)%F; [ | f_equal ]. {
+    apply IHit1; [ flia Hit1 | flia Hit2 ].
+  } {
+    apply IHit1; [ flia Hit1 | flia Hit2 ].
+  }
+} {
+  f_equal.
+  apply IHit1; cbn; [ flia Hit1 | flia Hit2 ].
+} {
+  f_equal.
+  apply IHit1; cbn; [ flia Hit1 | flia Hit2 ].
+}
 Qed.
 
 Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
@@ -367,45 +401,13 @@ Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
     monl_add_loop it3 (monl_add_loop it4 la lb) lc.
 Proof.
 intros * Hit1 Hit2 Hit3 Hit4.
-Require Import ZArith RnglAlg.Zrl.
-Open Scope Z_scope.
-Compute (
-  let pa := « » in
-  let pb := « » in
-  let pc := « 3*☓ » in
-  ((pa + pb) + pc = pa + (pb + pc))%P).
-(* voilà un contre-exemple *)
-...
 revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4.
-induction it1; intros; cbn. {
-  apply Nat.le_0_r in Hit1.
-  unfold monl_add_nb_iter in Hit1.
-  apply Nat.eq_add_0 in Hit1.
-  destruct Hit1 as (Hla, Hit1).
-  apply length_zero_iff_nil in Hla; subst la.
-  destruct it3; [ easy | ].
-  cbn in Hit3, Hit4 |-*.
-  destruct it4. {
-    apply Nat.le_0_r in Hit4; cbn in Hit4.
-    apply length_zero_iff_nil in Hit4; subst lb.
-    cbn in Hit1, Hit3.
-    now destruct lc.
-  }
-  cbn.
-  destruct lb as [| (cb, db)]; [ now destruct lc | ].
-  destruct lc as [| (cc, dc)]; [ easy | ].
-  cbn in Hit1, Hit2, Hit3, Hit4.
-  remember (db ?= dc) as dbc eqn:Hdbc; symmetry in Hdbc.
-  destruct dbc. {
-    apply Nat.compare_eq_iff in Hdbc; subst dc.
-    remember (cb + cc =? 0)%F as cbc eqn:Hcbc; symmetry in Hcbc.
-    destruct cbc. {
-      destruct it3; [ easy | cbn ].
-      destruct lb. {
-        cbn in Hit1.
-        apply length_zero_iff_nil in Hit1; subst lc.
-        cbn in Hit2, Hit3, Hit4.
-(* bon, bin c'est donc faux *)
+induction it1; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]. {
+  destruct it4; [ easy | cbn ].
+  cbn in Hit3.
+  now apply monl_add_loop_enough_iter.
+}
 ...
 
 (* *)
