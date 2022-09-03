@@ -58,6 +58,7 @@ Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
 (* notation for polynomials *)
 
 Module PolynNotation.
+Notation "[ ]" := (mk_polyn []) : polyn_scope.
 Notation "[ x ]" := (mk_polyn (cons x nil)) : polyn_scope.
 Notation "x ☩ y ☩ .. ☩ z" :=
   (mk_polyn (cons x (cons y .. (cons z nil) ..)))
@@ -222,55 +223,58 @@ Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
 
 (* euclidean division *)
 
-Fixpoint monl_quot_rem it la lb :=
+Fixpoint monl_quot_rem_loop it la lb :=
   match it with
-  | 0 => ([], [])
+  | 0 => ([], [Mon (rngl_of_nat 99) 0]) (* algo err: not enough iterations *)
   | S it' =>
       match la with
-      | [] => ([], lb)
+      | [] => ([], [])
       | Mon ca da :: la' =>
           match lb with
-          | [] => ([], [])
+          | [] => ([], []) (* division by zero *)
           | Mon cb db :: _ =>
               if le_dec db da then
                 let c := (ca / cb)%F in
                 let mq := Mon c (da - db) in
                 let lr := monl_sub la (monl_mul lb [mq]) in
-                let '(lq', lr') := monl_quot_rem it' lr lb in
-(*
+                let (lq', lr') := monl_quot_rem_loop it' lr lb in
                 if rngl_eqb c 0%F then (lq', lr') else
-*)
-                ((mq :: lq'), lr')
+                (mq :: lq', lr')
               else ([], la)
           end
       end
   end.
 
+Definition monl_quot_rem la lb := monl_quot_rem_loop (S (length la)) la lb.
+
 Definition polyn_quot_rem pa pb :=
-  let it := length (monl pa) + length (monl pb) in
-  let (lq, lr) := monl_quot_rem it (monl pa) (monl pb) in
+  let (lq, lr) := monl_quot_rem (monl pa) (monl pb) in
   (mk_polyn lq, mk_polyn lr).
 
-(**)
+Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
+Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
+
+(*
 End a.
-About polyn_quot_rem.
+Arguments monl_quot_rem {T ro} (la lb)%list.
 Arguments polyn_quot_rem {T ro} (pa pb)%P.
+Arguments monl_mul {T ro} (la lb)%list.
+Arguments monl_sub {T ro} (la lb)%list.
+(*
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_quot_rem (1☓ ☩ (-1)·) [1·]).
-Compute (polyn_quot_rem (4☓ ☩ (-2)·) [(-2)·]).
-Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) (1☓^2 ☩ (-1)·)).
- (* quotient, c'est bon, mais reste, c'est pas ça *)
-...
-Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [2·]).
-Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [(-2)·]).
-...
-Compute (polyn_opp (3☓^5 ☩ 1·)).
-Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
-Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
 *)
-
-...
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+(**)
+Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [2·]).
+Compute (polyn_quot_rem (4☓^2 ☩ (-1)·) [2·]).
+Compute (polyn_quot_rem (1☓^2 ☩ 3☓ ☩ 7·) (1☓ ☩ 1·)).
+Compute (polyn_quot_rem (1☓^2 ☩ 3☓ ☩ 7·) []).
+Compute (polyn_quot_rem [] (1☓^2 ☩ 3☓ ☩ 7·)).
+*)
 
 (* ring-like *)
 
@@ -282,7 +286,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
      rngl_opt_opp_or_sous := Some (inl polyn_opp);
-     rngl_opt_inv_or_quot := Some (inl polyn_quot);
+     rngl_opt_inv_or_quot := Some (inr polyn_quot);
      rngl_opt_eqb := None;
      rngl_le := phony_polyn_le |}.
 
