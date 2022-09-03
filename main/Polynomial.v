@@ -205,6 +205,20 @@ Compute (polyn_mul (1☓ ☩ (-1)·) (3☓^5 ☩ 1·)).
 Compute (polyn_opp (polyn_mul (3☓^5 ☩ 1·) (1☓ ☩ (-1)·))).
 *)
 
+(* euclidean division *)
+
+(* is it possible? *)
+
+Fixpoint monl_quot la lb :=
+  match la with
+  | [] => []
+  | ma :: la' => ...
+  end.
+
+...
+
+Definition polyn_quot pa pb := mk_polyn (monl_quot (monl pa) (monl pb)).
+
 (* ring-like *)
 
 Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
@@ -215,8 +229,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
      rngl_opt_opp_or_sous := Some (inl polyn_opp);
-     rngl_opt_inv := None;
-     rngl_opt_quot := None;
+     rngl_opt_inv_or_quot := Some (inl polyn_quot);
      rngl_opt_eqb := None;
      rngl_le := phony_polyn_le |}.
 
