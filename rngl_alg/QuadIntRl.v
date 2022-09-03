@@ -1101,7 +1101,7 @@ f_equal. {
 Qed.
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
-  {| rngl_is_comm := true;
+  {| rngl_mul_is_comm := true;
      rngl_has_eqb := false; (* to be improved, perhaps *)
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := true;

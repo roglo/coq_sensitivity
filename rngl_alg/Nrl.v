@@ -110,7 +110,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
-     rngl_opt_opp_or_sous := Some (inl (Zn_opp n));
+     rngl_opt_opp_or_sous :=
+       Some (inl (Zn_opp n));
      rngl_opt_inv_or_quot :=
        if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
@@ -372,7 +373,7 @@ apply Nat.sub_diag.
 Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
-  {| rngl_is_comm := true;
+  {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := 1 <? n;
@@ -456,7 +457,7 @@ now left.
 Qed.
 
 Definition lcm_ring_like_prop :=
-  {| rngl_is_comm := true;
+  {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := false;

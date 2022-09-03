@@ -196,7 +196,7 @@ Proof. now intros; cbn; rewrite map_length. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.

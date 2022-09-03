@@ -108,7 +108,7 @@ destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
 Qed.
 
 Definition in_ordered_field :=
-  rngl_is_comm = true ∧
+  rngl_mul_is_comm = true ∧
   rngl_has_opp = true ∧
   rngl_has_eqb = true ∧
   rngl_has_dec_le = true ∧
@@ -266,7 +266,7 @@ now apply Bool.orb_true_iff; left.
 Qed.
 
 Theorem Rayleigh_quotient_of_eigenvector :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_dec_le = true →
   rngl_is_integral = true →
@@ -394,7 +394,7 @@ now rewrite map_length.
 Qed.
 
 Theorem mat_mul_vect_dot_vect :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp_or_sous = true →
   ∀ (M : matrix T) U V,
   is_square_matrix M = true
@@ -480,7 +480,7 @@ Qed.
 (* https://math.stackexchange.com/questions/82467/eigenvectors-of-real-symmetric-matrices-are-orthogonal *)
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp_or_sous = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
@@ -674,7 +674,7 @@ Qed.
 (* A lemma to prove the theorem M = U . D . U^t
    see the comment for the theorem below *)
 Lemma diagonalized_matrix_prop_1 :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp_or_sous = true →
   ∀ n (M : matrix T) ev eV D U,
   mat_nrows M = n
@@ -977,7 +977,7 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   now apply length_zero_iff_nil in Hrn; cbn in Hrn; subst ll.
 }
 specialize diagonalized_matrix_prop_1 as H1.
-assert (H : rngl_is_comm = true) by now destruct Hif.
+assert (H : rngl_mul_is_comm = true) by now destruct Hif.
 specialize (H1 H Hos); clear H.
 specialize (H1 n M ev eV D U Hrn Hlev Hsy Hvv Hevn Hd Ho).
 generalize H1; intros H1v.

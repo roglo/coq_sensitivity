@@ -16,7 +16,8 @@
      to make a field:
         rngl_opt_opp_or_sous = Some (inl opp), where opp is the opposite
         rngl_opt_inv = Some inv, where opp is the inverse function
-   They can be commutative or not by setting rngl_is_comm to true or false.
+   Multiplication can be commutative or not by setting rngl_mul_is_comm
+   to true or false.
    There are many other properties that are implemented here or could be
    implemented :
      - archimedian or not
@@ -187,7 +188,7 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
   end.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
-  { rngl_is_comm : bool;
+  { rngl_mul_is_comm : bool;
     rngl_has_eqb : bool;
     rngl_has_dec_le : bool;
     rngl_has_1_neq_0 : bool;
@@ -204,12 +205,12 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_1_neq_0 : if rngl_has_1_neq_0 then (1 ≠ 0)%F else not_applicable;
     (* when multiplication is commutative *)
     rngl_opt_mul_comm :
-      if rngl_is_comm then ∀ a b, (a * b = b * a)%F else not_applicable;
+      if rngl_mul_is_comm then ∀ a b, (a * b = b * a)%F else not_applicable;
     (* when multiplication is not commutative *)
     rngl_opt_mul_1_r :
-      if rngl_is_comm then not_applicable else ∀ a, (a * 1 = a)%F;
+      if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1 = a)%F;
     rngl_opt_mul_add_distr_r :
-      if rngl_is_comm then not_applicable else
+      if rngl_mul_is_comm then not_applicable else
        ∀ a b c, ((a + b) * c = a * c + b * c)%F;
     (* when has opposite *)
     rngl_opt_add_opp_l :
@@ -226,7 +227,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
       if rngl_has_sous then
-        if rngl_is_comm then not_applicable
+        if rngl_mul_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
       else not_applicable;
     (* when has inverse *)
@@ -234,7 +235,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F
       else not_applicable;
     rngl_opt_mul_inv_r :
-      if (rngl_has_inv && negb rngl_is_comm)%bool then
+      if (rngl_has_inv && negb rngl_mul_is_comm)%bool then
         ∀ a : T, a ≠ 0%F → (a / a = 1)%F
       else not_applicable;
     (* when has division (quot) *)
@@ -242,7 +243,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       if rngl_has_quot then ∀ a b, b ≠ 0%F → (a * b / b)%F = a
       else not_applicable;
     rngl_opt_mul_quot_r :
-      if (rngl_has_quot && negb rngl_is_comm)%bool then
+      if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
         ∀ a b, b ≠ 0%F → (b * a / b)%F = a
       else not_applicable;
     (* when equality is calculable *)
@@ -319,7 +320,7 @@ now rewrite H10 in H.
 Qed.
 
 Theorem rngl_mul_comm :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ a b, (a * b = b * a)%F.
 Proof.
 intros H1 *.
@@ -332,7 +333,7 @@ Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
 Proof.
 intros.
 specialize rngl_opt_mul_1_r as rngl_mul_1_r.
-remember rngl_is_comm as ic eqn:Hic.
+remember rngl_mul_is_comm as ic eqn:Hic.
 symmetry in Hic.
 destruct ic; [ | easy ].
 now rewrite rngl_mul_comm, rngl_mul_1_l.
@@ -343,7 +344,7 @@ Theorem rngl_mul_add_distr_r : ∀ x y z,
 Proof.
 intros x y z; simpl.
 specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
-remember rngl_is_comm as ic eqn:Hic.
+remember rngl_mul_is_comm as ic eqn:Hic.
 symmetry in Hic.
 destruct ic. {
   rewrite rngl_mul_comm; [ | easy ].
@@ -497,7 +498,7 @@ rewrite H; reflexivity.
 Qed.
 
 Theorem rngl_mul_mul_swap :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ n m p, (n * m * p = n * p * m)%F.
 Proof.
 intros Hic n m p; simpl.
@@ -507,7 +508,7 @@ rewrite H; reflexivity.
 Qed.
 
 Theorem rngl_div_div_swap :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ a b c,
   (a / b / c = a / c / b)%F.
@@ -579,7 +580,7 @@ Proof.
 intros Hiq * Haz.
 remember rngl_has_inv as ai eqn:Hai; symmetry in Hai.
 destruct ai. {
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
     unfold rngl_div; rewrite Hai.
     rewrite rngl_mul_comm; [ | easy ].
@@ -699,7 +700,7 @@ remember rngl_has_quot as qu eqn:Hqu.
 symmetry in Hqu.
 destruct qu. {
   apply (f_equal (λ x, rngl_div x a)) in Habc.
-  remember rngl_is_comm as ic eqn:Hic.
+  remember rngl_mul_is_comm as ic eqn:Hic.
   symmetry in Hic.
   destruct ic. {
     do 2 rewrite (rngl_mul_comm Hic a) in Habc.
@@ -854,7 +855,7 @@ now apply rngl_mul_div.
 Qed.
 
 Theorem rngl_div_div_mul_mul :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ a b c d,
   b ≠ 0%F
@@ -1381,7 +1382,7 @@ assert (Hoaz : (- a)%F ≠ 0%F). {
 }
 apply (rngl_mul_cancel_l Hin' (- a)%F); [ easy | ].
 specialize (rngl_opt_mul_inv_r) as H2.
-remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
 rewrite Hin in H2; cbn in H2.
 rewrite rngl_mul_opp_opp; [ | easy ].
 destruct ic. {
@@ -1434,7 +1435,7 @@ destruct op. {
 }
 remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
-  remember rngl_is_comm as ic eqn:Hic; symmetry in Hic.
+  remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
     specialize rngl_opt_mul_comm as rngl_mul_comm.
     rewrite Hic in rngl_mul_comm.
@@ -1474,7 +1475,7 @@ now rewrite rngl_add_0_r in char_prop.
 Qed.
 
 Definition in_charac_0_field :=
-  rngl_is_comm = true ∧
+  rngl_mul_is_comm = true ∧
   rngl_has_opp = true ∧
   rngl_has_inv = true ∧
   rngl_has_1_neq_0 = true ∧
@@ -1493,7 +1494,7 @@ Section a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hic : @rngl_is_comm T ro rp = true}.
+Context {Hic : @rngl_mul_is_comm T ro rp = true}.
 Context {Hop : @rngl_has_opp T ro = true}.
 
 Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%F.
@@ -1529,7 +1530,7 @@ End a.
 Context {T : Type}.
 Context {ro : ring_like_op T}.
 Context {rp : ring_like_prop T}.
-Context {Hic : @rngl_is_comm T ro rp = true}.
+Context {Hic : @rngl_mul_is_comm T ro rp = true}.
 Context {Hop : @rngl_has_opp T ro = true}.
 
 Require Import Ring.

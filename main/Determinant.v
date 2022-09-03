@@ -423,7 +423,7 @@ Qed.
 (* det and det' are equal *)
 
 Theorem det_is_det' :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -744,7 +744,7 @@ Qed.
 (* det and det'' are equal *)
 
 Theorem det_is_det'' :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -761,7 +761,7 @@ Qed.
 (* multilinearity *)
 
 Theorem determinant_multilinear :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -1771,7 +1771,7 @@ now apply rngl_summation_add_distr.
 Qed.
 
 Theorem rngl_product_seq_permut :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ n σ (f : nat → T),
   n ≠ 0
   → permut_seq_with_len n σ
@@ -2089,7 +2089,7 @@ rewrite Nat.sub_add; [ easy | flia Hi ].
 Qed.
 
 Theorem rngl_product_map_permut :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
    ∀ n f σ,
   permut_seq_with_len n σ
   → ∏ (i ∈ map (λ i, nth i σ 0) (seq 0 n)), f i = ∏ (i = 1, n), f (i - 1)%nat.

@@ -66,7 +66,7 @@ now apply Q.le_antisymm; apply Q.lt_le_incl.
 Qed.
 
 Definition Q_ring_like_prop :=
-  {| rngl_is_comm := true;
+  {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := true;
      rngl_has_1_neq_0 := true;

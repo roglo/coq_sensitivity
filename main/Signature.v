@@ -341,7 +341,7 @@ Qed.
 
 Theorem rngl_product_product_div_eq_1 :
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
@@ -426,7 +426,7 @@ easy.
 Qed.
 
 Theorem rngl_product_product_by_swap :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ n f,
   (∏ (i ∈ seq 0 n), ∏ (j ∈ seq 0 n), f i j)%F =
   ((∏ (i ∈ seq 0 n), f i i) *
@@ -554,7 +554,7 @@ easy.
 Qed.
 
 Theorem permut_swap_mul_cancel : ∀ n σ f,
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   permut_seq_with_len n σ
@@ -642,7 +642,7 @@ apply rngl_mul_1_l.
 Qed.
 
 Theorem product_product_if_permut_div :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_1_neq_0 = true →
   rngl_has_inv = true →
   ∀ n σ f,
@@ -678,7 +678,7 @@ Qed.
 
 Theorem product_product_if_permut :
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
   rngl_has_1_neq_0 = true →
@@ -1018,7 +1018,7 @@ now rewrite map_length, seq_length.
 Qed.
 
 Theorem transposition_signature_lt :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ n p q,
   p < q
@@ -1193,7 +1193,7 @@ now rewrite Hij.
 Qed.
 
 Theorem transposition_signature :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ n p q,
   p ≠ q
@@ -1346,7 +1346,7 @@ Arguments signature_comp_fun_expand_1 _ n%nat [f g]%list.
 Theorem signature_comp_fun_expand_2_1 :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
@@ -1440,7 +1440,7 @@ Qed.
 Theorem signature_comp_fun_expand_2_2 :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
   rngl_characteristic = 0 →
@@ -1517,7 +1517,7 @@ Qed.
 Theorem signature_comp_fun_changement_of_variable :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_eqb = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -2799,7 +2799,7 @@ Qed.
 (* equality of ε of sym_gr elem and ε_permut *)
 
 Theorem ε_of_sym_gr_permut_succ :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →

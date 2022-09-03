@@ -65,7 +65,7 @@ apply Nat.sub_add_distr.
 Qed.
 
 Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
-  {| rngl_is_comm := true;
+  {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := true;
      rngl_has_1_neq_0 := true;

@@ -1571,7 +1571,7 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem mat_mul_mul_scal_l :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ a (MA : matrix T) (MB : matrix T),
   is_correct_matrix MB = true
   → mat_ncols MA ≠ 0
@@ -1898,7 +1898,7 @@ apply rngl_mul_assoc.
 Qed.
 
 Theorem mat_mul_scal_vect_comm :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ a (MA : matrix T) V,
   is_correct_matrix MA = true
   → mat_ncols MA = vect_size V
@@ -2107,7 +2107,7 @@ rewrite fold_mat_nrows; flia Hjz Hjr.
 Qed.
 
 Theorem mat_transp_mul :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ (MA : matrix T) (MB : matrix T),
   is_correct_matrix MA = true
   → is_correct_matrix MB = true

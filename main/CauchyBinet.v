@@ -1373,7 +1373,7 @@ Theorem fold_det''' : ∀ n M,
 Proof. now intros; subst n. Qed.
 
 Theorem det_is_det''' :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
@@ -1777,7 +1777,7 @@ rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
   now apply Hla.
 }
 rewrite rngl_mul_assoc.
-assert (H : rngl_is_comm = true) by now destruct Hif.
+assert (H : rngl_mul_is_comm = true) by now destruct Hif.
 now rewrite (rngl_mul_comm H _ (ε la)).
 Qed.
 

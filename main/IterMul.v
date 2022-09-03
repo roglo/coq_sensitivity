@@ -187,7 +187,7 @@ now apply iter_seq_empty.
 Qed.
 
 Theorem rngl_product_list_mul_distr :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ A g h (l : list A),
   (∏ (i ∈ l), (g i * h i) =
   (∏ (i ∈ l), g i) * ∏ (i ∈ l), h i)%F.
@@ -203,7 +203,7 @@ apply iter_list_distr. {
 Qed.
 
 Theorem rngl_product_mul_distr :
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ g h b k,
   (∏ (i = b, k), (g i * h i) =
   (∏ (i = b, k), g i) * ∏ (i = b, k), h i)%F.
@@ -301,7 +301,7 @@ Qed.
 
 Theorem rngl_product_list_permut : ∀ A (eqb : A → _),
   equality eqb →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   ∀ (la lb : list A) f,
   permutation eqb la lb
   → ∏ (i ∈ la), f i = ∏ (i ∈ lb), f i.
@@ -425,7 +425,7 @@ Qed.
 Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   equality eqb →
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -441,7 +441,7 @@ Qed.
 
 Theorem rngl_inv_product_comm :
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →
@@ -458,7 +458,7 @@ Qed.
 
 Theorem rngl_product_div_distr :
   rngl_has_opp_or_sous = true →
-  rngl_is_comm = true →
+  rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   rngl_is_integral = true →

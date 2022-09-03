@@ -688,7 +688,7 @@ split; intros Hab. {
 
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
-  {| rngl_is_comm := false;
+  {| rngl_mul_is_comm := false;
      rngl_has_eqb := false; (* rngl_has_eqb to be completed *)
      rngl_has_dec_le := false;
      rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
