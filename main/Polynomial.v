@@ -247,7 +247,7 @@ Fixpoint monl_quot_rem it la lb :=
   end.
 
 Definition polyn_quot_rem pa pb :=
-  let it := length (monl pa) in
+  let it := length (monl pa) + length (monl pb) in
   let (lq, lr) := monl_quot_rem it (monl pa) (monl pb) in
   (mk_polyn lq, mk_polyn lr).
 
@@ -260,7 +260,7 @@ Open Scope Z_scope.
 Compute (polyn_quot_rem (1☓ ☩ (-1)·) [1·]).
 Compute (polyn_quot_rem (4☓ ☩ (-2)·) [(-2)·]).
 Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) (1☓^2 ☩ (-1)·)).
-(* quotient, c'est bon, mais reste, c'est pas ça *)
+ (* quotient, c'est bon, mais reste, c'est pas ça *)
 ...
 Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [2·]).
 Compute (polyn_quot_rem (1☓^2 ☩ (-1)·) [(-2)·]).
