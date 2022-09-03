@@ -359,10 +359,44 @@ apply Nat.add_comm.
 Qed.
 
 Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
-  monl_add_loop it1 la (monl_add_loop it2 lb lc) =
-  monl_add_loop it3 (monl_add_loop it4 la lb) lc.
+  monl_add_nb_iter la (monl_add_loop (monl_add_nb_iter lb lc) lb lc) ≤ it1
+  → monl_add_nb_iter lb lc ≤ it2
+  → monl_add_nb_iter (monl_add_loop (monl_add_nb_iter la lb) la lb) lc ≤ it3
+  → monl_add_nb_iter la lb ≤ it4
+  → monl_add_loop it1 la (monl_add_loop it2 lb lc) =
+    monl_add_loop it3 (monl_add_loop it4 la lb) lc.
 Proof.
-intros.
+intros * Hit1 Hit2 Hit3 Hit4.
+revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4.
+induction it1; intros; cbn. {
+  apply Nat.le_0_r in Hit1.
+  unfold monl_add_nb_iter in Hit1.
+  apply Nat.eq_add_0 in Hit1.
+  destruct Hit1 as (Hla, Hit1).
+  apply length_zero_iff_nil in Hla; subst la.
+  destruct it3; [ easy | ].
+  cbn in Hit3, Hit4 |-*.
+  destruct it4. {
+    apply Nat.le_0_r in Hit4; cbn in Hit4.
+    apply length_zero_iff_nil in Hit4; subst lb.
+    cbn in Hit1, Hit3.
+    now destruct lc.
+  }
+  cbn.
+  destruct lb as [| (cb, db)]; [ now destruct lc | ].
+  destruct lc as [| (cc, dc)]; [ easy | ].
+  cbn in Hit1, Hit2, Hit3, Hit4.
+  remember (db ?= dc) as dbc eqn:Hdbc; symmetry in Hdbc.
+  destruct dbc. {
+    apply Nat.compare_eq_iff in Hdbc; subst dc.
+    remember (cb + cc =? 0)%F as cbc eqn:Hcbc; symmetry in Hcbc.
+    destruct cbc. {
+      destruct it3; [ easy | cbn ].
+      destruct lb. {
+        cbn in Hit1.
+        apply length_zero_iff_nil in Hit1; subst lc.
+        cbn in Hit2, Hit3, Hit4.
+(* bon, bin c'est donc faux *)
 ...
 
 (* *)
