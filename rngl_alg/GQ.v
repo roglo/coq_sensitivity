@@ -125,6 +125,8 @@ Import GQ_Notations.
 
 (*
 Check 3%GQ.
+Check (3/1)%GQ.
+Compute (3/2)%GQ.
 Check (3 // 1)%GQ.
 Compute 3%GQ.
 Compute (3 // 1)%GQ.

@@ -163,9 +163,11 @@ Number Notation nnn nnn_of_numeral_int nnn_to_numeral_uint : nnn_scope.
 (*
 Check (12 - 7)%PQ.
 Check 25%PQ.
-Check (22 // 7)%PQ.
-Compute (22 // 7)%PQ.
-Compute (22 // 1)%PQ.
+Check (22 / 7)%PQ.
+Print PQ.
+Check (PQmake 22 7 / 7)%PQ.
+Compute (22 / 7)%PQ.
+Compute (22 / 1)%PQ.
 Check (mknn 21).
 Check 3%PQ.
 Compute 3%PQ.
