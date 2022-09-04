@@ -579,7 +579,16 @@ destruct dbc. {
             subst la.
             apply monl_opp_involutive.
           }
-Print monl_mul.
+          remember (dac ?= da) as daca eqn:Hdaca; symmetry in Hdaca.
+          destruct daca. {
+            apply Nat.compare_eq_iff in Hdaca; subst dac.
+            rewrite (fold_rngl_sub Hop).
+            remember (cac - cb =? 0)%F as cab eqn:Hcab.
+            symmetry in Hcab.
+            destruct cab. {
+              apply (rngl_eqb_eq Heq) in Hcab.
+              apply -> (rngl_sub_move_0_r Hop) in Hcab; subst cac.
+              symmetry.
 ...
       move cab before cbc; move mab before mbc.
       destruct cab. {
