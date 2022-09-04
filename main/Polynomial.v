@@ -595,25 +595,32 @@ destruct dbc. {
                 cbn in Hcna.
                 now rewrite Nat.leb_refl in Hcna.
               }
-(* bon, ça marche en utilisant le fait que "la" est canonique mais, du
-   coup, va falloir que les polynômes soient une espèce d'anneau que
-   s'ils sont canoniques, ce qui restreint leur usage.
-     L'alternative, ce serait d'avoir une égalité spéciale entre
-   polynômes, mais je n'aime pas tellement cette idée non plus, car
-   je trouve que "=", c'est plus pratique que les relations
-   d'équivalence. *)
-...
-                destruct it3; [ easy | cbn ].
+              destruct it3; [ easy | cbn ].
+              apply Nat.succ_le_mono in Hit3.
+              destruct mab as [| (ca', da')]. {
+                cbn in Hmab.
+                destruct it4; [ easy | ].
+                cbn in Hmab.
                 destruct la as [| (ca', da')]. {
-Require Import ZArith RnglAlg.Zrl.
-Open Scope Z_scope.
-Compute (
-  let pa := « 1· » in
-  let pb := « (-1)· » in
-  let pc := « 0· » in
-  (pa + (pb + pc) = (pa + pb) + pc)%P
-).
-(* ah oui, tiens, en effet, c'est pas bon *)
+                  injection Hmab; clear Hmab; intros Hmab H H'; subst dc cab.
+                  apply map_eq_nil in Hmab; subst lc; f_equal; f_equal.
+                  rewrite rngl_add_comm in Hcaba.
+                  rewrite (fold_rngl_sub Hop) in Hcaba.
+                  now apply -> (rngl_sub_move_0_r Hop) in Hcaba.
+                }
+                cbn in Hcna, Hcnc, Hcnb.
+                f_equal. {
+                  f_equal. {
+                    remember (da' ?= dc) as dac eqn:Hdac; symmetry in Hdac.
+                    destruct dac. {
+                      apply Nat.compare_eq_iff in Hdac; subst da'.
+                      rewrite (fold_rngl_sub) in Hmab.
+                      remember (ca' - cc =? 0)%F as cac eqn:Hcac.
+                      symmetry in Hcac.
+                      destruct cac. {
+                        apply (rngl_eqb_eq Heq) in Hcac.
+                        apply -> (rngl_sub_move_0_r Hop) in Hcac.
+                        subst ca'.
 ...
 
 (* *)
