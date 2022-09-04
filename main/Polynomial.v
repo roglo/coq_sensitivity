@@ -621,6 +621,56 @@ destruct dbc. {
                         apply (rngl_eqb_eq Heq) in Hcac.
                         apply -> (rngl_sub_move_0_r Hop) in Hcac.
                         subst ca'.
+                        cbn in Hit4.
+                        apply Nat.succ_le_mono in Hit4.
+                        destruct it4; [ easy | ].
+                        apply Nat.succ_le_mono in Hit4.
+                        cbn in Hmab.
+                        destruct la as [|( ca', da')]. {
+                          destruct lc as [| (cc', dc')]; [ easy | ].
+                          destruct lc; [ | easy ].
+                          cbn in Hmab.
+                          injection Hmab; clear Hmab; intros; subst da cab.
+                          unfold monl_is_canon in Hcnc.
+                          apply Bool.andb_true_iff in Hcnc.
+                          destruct Hcnc as (Hs, Hcnc).
+                          cbn in Hs.
+                          rewrite Bool.andb_true_r in Hs.
+                          apply Bool.andb_true_iff in Hs.
+                          destruct Hs as (H1, H2).
+                          apply Bool.negb_true_iff in H1, H2.
+                          apply leb_gt in H1, H2.
+                          flia H1 H2.
+                        }
+                        destruct lc as [| (cc', dc')]. {
+                          cbn in Hmab.
+                          injection Hmab; clear Hmab; intros; subst la da' ca'.
+                          unfold monl_is_canon in Hcna.
+                          apply Bool.andb_true_iff in Hcna.
+                          destruct Hcna as (Hs, Hcna).
+                          cbn in Hs.
+                          rewrite Bool.andb_true_r in Hs.
+                          apply Bool.andb_true_iff in Hs.
+                          destruct Hs as (H1, H2).
+                          apply Bool.negb_true_iff in H1, H2.
+                          apply leb_gt in H1, H2.
+                          flia H1 H2.
+                        }
+                        cbn in Hmab.
+                        remember (da' ?= dc') as dac eqn:Hdac; symmetry in Hdac.
+                        destruct dac. {
+                          apply Nat.compare_eq_iff in Hdac; subst dc'.
+                          rewrite fold_rngl_sub in Hmab.
+                          remember (ca' - cc' =? 0)%F as cac eqn:Hcac.
+                          symmetry in Hcac.
+                          destruct cac. {
+                            apply (rngl_eqb_eq Heq) in Hcac.
+                            apply -> (rngl_sub_move_0_r Hop) in Hcac.
+                            subst cc'.
+                            cbn in Hit4.
+                            destruct it4; [ easy | ].
+                            apply Nat.succ_le_mono in Hit4.
+                            cbn in Hmab.
 ...
 
 (* *)
