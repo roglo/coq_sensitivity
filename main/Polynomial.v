@@ -555,13 +555,33 @@ destruct dbc. {
   destruct dab. {
     apply Nat.compare_eq_iff in Hdab; subst db.
     remember (cb + cc =? 0)%F as cbc eqn:Hcbc; symmetry in Hcbc.
-    remember (ca + cb =? 0)%F as cab eqn:Hcab; symmetry in Hcab.
     remember (monl_add_loop it2 lb lc) as mbc eqn:Hmbc; symmetry in Hmbc.
-    remember (monl_add_loop it4 la lb) as mab eqn:Hmab; symmetry in Hmab.
-    move cab before cbc; move mab before mbc.
     rewrite rngl_add_comm in Hcbc.
     destruct cbc. {
       apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcbc.
+      subst cc.
+      destruct mbc as [| (cbc, dbc)]. {
+        apply eq_monl_add_loop_nil in Hmbc. 2: {
+          unfold monl_add_nb_iter; flia Hit2.
+        }
+        subst lb.
+        remember (ca + cb =? 0)%F as cab eqn:Hcab; symmetry in Hcab.
+        destruct cab. {
+          apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcab.
+          subst ca.
+          remember (monl_add_loop it4 la (monl_opp lc)) as mac eqn:Hmac.
+          symmetry in Hmac.
+          destruct mac as [| (cac, dac)]. {
+            f_equal.
+            apply eq_monl_add_loop_nil in Hmac. 2: {
+              unfold monl_add_nb_iter; flia Hit4.
+            }
+            subst la.
+            apply monl_opp_involutive.
+          }
+Print monl_mul.
+...
+      move cab before cbc; move mab before mbc.
       destruct cab. {
         apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcab.
         rewrite <- Hcab in Hcbc; subst cc.
@@ -671,6 +691,15 @@ destruct dbc. {
                             destruct it4; [ easy | ].
                             apply Nat.succ_le_mono in Hit4.
                             cbn in Hmab.
+                            destruct la as [| (ca'', da'')]. {
+                              destruct lc as [| (cc', dc')]; [ easy | ].
+                              destruct lc; [ cbn in Hmab | easy ].
+                              injection Hmab; clear Hmab; intros H Hmab; subst dc'.
+                              cbn in Hcnb.
+...
+                              cbn - [ monl_add_loop ] in Hit1, Hit3.
+                              cbn in Hit2, Hit4.
+                              cbn in Hcnb.
 ...
 
 (* *)
