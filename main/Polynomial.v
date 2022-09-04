@@ -280,6 +280,7 @@ Delimit Scope P_scope with P.
 
 Arguments monl_add {T ro} (la lb)%list.
 Arguments monl_add_loop {T ro} it%nat (la lb)%list.
+Arguments monl_opp {T ro} la%list.
 Arguments polyn_add {T ro} (pa pb)%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
 Arguments polyn_one {T ro}.
@@ -299,6 +300,8 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
+Context {Heq : rngl_has_eqb = true}.
+Context {Hop : rngl_has_opp = true}.
 
 (* polynomial ring-like operators *)
 
@@ -390,6 +393,30 @@ destruct dab. {
   f_equal.
   apply IHit1; cbn; [ flia Hit1 | flia Hit2 ].
 }
+Qed.
+
+Theorem eq_monl_add_loop_nil : ∀ it (la lb : list (monom T)),
+  monl_add_nb_iter la lb ≤ it
+  → monl_add_loop it la lb = []
+  → la = monl_opp lb.
+Proof.
+intros * Hit Hab.
+unfold monl_add_nb_iter in Hit.
+revert la lb Hab Hit.
+induction it; intros; [ easy | ].
+cbn in Hab.
+destruct la as [| (ca, da)]; [ now subst lb | ].
+destruct lb as [| (cb, db)]; [ easy | cbn ].
+remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+rewrite Nat.add_succ_r in Hit.
+destruct dab; [ | easy | easy ].
+apply Nat.compare_eq_iff in Hdab; subst db.
+remember (ca + cb =? 0)%F as cab eqn:Hcab; symmetry in Hcab.
+destruct cab; [ | easy ].
+apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcab.
+rewrite <- Hcab; f_equal.
+apply IHit; [ easy | flia Hit ].
 Qed.
 
 Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
@@ -484,6 +511,40 @@ destruct lc as [| (cc, dc)]. {
   }
 }
 cbn - [ monl_add_loop ] in Hit1, Hit2, Hit3, Hit4.
+cbn.
+destruct it3; [ easy | cbn ].
+destruct it4; [ easy | cbn ].
+remember (db ?= dc) as dbc eqn:Hdbc; symmetry in Hdbc.
+remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
+destruct dbc. {
+  apply Nat.compare_eq_iff in Hdbc; subst dc.
+  destruct dab. {
+    apply Nat.compare_eq_iff in Hdab; subst db.
+    remember (cb + cc =? 0)%F as cbc eqn:Hcbc; symmetry in Hcbc.
+    remember (ca + cb =? 0)%F as cab eqn:Hcab; symmetry in Hcab.
+    remember (monl_add_loop it2 lb lc) as mbc eqn:Hmbc; symmetry in Hmbc.
+    remember (monl_add_loop it4 la lb) as mab eqn:Hmab; symmetry in Hmab.
+    move cab before cbc; move mab before mbc.
+    rewrite rngl_add_comm in Hcbc.
+    destruct cbc. {
+      apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcbc.
+      destruct cab. {
+        apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcab.
+        rewrite <- Hcab in Hcbc; subst cc.
+        destruct mbc as [| (cbc, dbc)]. {
+          destruct mab as [| (cab, dab)]. {
+            f_equal.
+            rewrite monl_add_loop_comm in Hmbc. 2: {
+              unfold monl_add_nb_iter; flia Hit2.
+            }
+            apply eq_monl_add_loop_nil in Hmbc. 2: {
+              unfold monl_add_nb_iter; flia Hit2.
+            }
+            apply eq_monl_add_loop_nil in Hmab. 2: {
+              unfold monl_add_nb_iter; flia Hit4.
+            }
+            congruence.
+          }
 ...
 
 (* *)
