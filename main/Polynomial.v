@@ -47,9 +47,12 @@ Compute [3*☓^5; (-5)*☓^2; 8*☓^0].
    i.e. the fact that the degrees are in decreasing order
    and that there are no nul coefficient. *)
 
+Definition monl_is_canon T {ro : ring_like_op T} (la : list (monom T)) :=
+  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) la &&
+   ⋀ (x ∈ la), (mcoeff x ≠? 0)%F)%bool.
+
 Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
-  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) (monl p) &&
-   ⋀ (x ∈ monl p), (mcoeff x ≠? 0)%F)%bool.
+  monl_is_canon (monl p).
 
 (* notation for polynomials *)
 
@@ -442,16 +445,19 @@ apply IHit; [ easy | flia Hit ].
 Qed.
 
 Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
-  monl_add_nb_iter la (monl_add_loop (monl_add_nb_iter lb lc) lb lc) ≤ it1
+  monl_is_canon la = true
+  → monl_is_canon lb = true
+  → monl_is_canon lc = true
+  → monl_add_nb_iter la (monl_add_loop (monl_add_nb_iter lb lc) lb lc) ≤ it1
   → monl_add_nb_iter lb lc ≤ it2
   → monl_add_nb_iter (monl_add_loop (monl_add_nb_iter la lb) la lb) lc ≤ it3
   → monl_add_nb_iter la lb ≤ it4
   → monl_add_loop it1 la (monl_add_loop it2 lb lc) =
     monl_add_loop it3 (monl_add_loop it4 la lb) lc.
 Proof.
-intros * Hit1 Hit2 Hit3 Hit4.
+intros * Hcna Hcnb Hcnc Hit1 Hit2 Hit3 Hit4.
 unfold monl_add_nb_iter in Hit1, Hit2, Hit3, Hit4.
-revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4.
+revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4 Hcna Hcnb Hcnc.
 induction it1; intros; [ easy | cbn ].
 destruct la as [| (ca, da)]. {
   destruct it4; [ easy | cbn ].
@@ -585,6 +591,18 @@ destruct dbc. {
                 destruct it4; [ easy | cbn in Hmab ].
                 destruct la as [| (ca', da')]; [ easy | ].
                 injection Hmab; clear Hmab; intros; subst ca' da' mab.
+                unfold monl_is_canon in Hcna.
+                cbn in Hcna.
+                now rewrite Nat.leb_refl in Hcna.
+              }
+(* bon, ça marche en utilisant le fait que "la" est canonique mais, du
+   coup, va falloir que les polynômes soient une espèce d'anneau que
+   s'ils sont canoniques, ce qui restreint leur usage.
+     L'alternative, ce serait d'avoir une égalité spéciale entre
+   polynômes, mais je n'aime pas tellement cette idée non plus, car
+   je trouve que "=", c'est plus pratique que les relations
+   d'équivalence. *)
+...
                 destruct it3; [ easy | cbn ].
                 destruct la as [| (ca', da')]. {
 Require Import ZArith RnglAlg.Zrl.
