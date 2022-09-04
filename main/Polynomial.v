@@ -325,6 +325,27 @@ Global Existing Instance polyn_ring_like_op.
 
 (* polynomial ring-like properties *)
 
+Theorem monl_opp_length : ∀ la : list (monom T),
+  length (monl_opp la) = length la.
+Proof.
+now intros; unfold monl_opp; rewrite map_length.
+Qed.
+
+Theorem monl_opp_involutive : ∀ (la : list (monom T)),
+  monl_opp (monl_opp la) = la.
+Proof.
+intros.
+unfold monl_opp.
+rewrite map_map.
+erewrite map_ext_in. 2: {
+  intros ma Hma; cbn.
+  rewrite rngl_opp_involutive; [ | easy ].
+  easy.
+}
+induction la as [| (ca, da)]; [ easy | cbn ].
+now f_equal.
+Qed.
+
 Theorem monl_add_loop_comm : ∀ it (la lb : list (monom T)),
   monl_add_nb_iter la lb ≤ it
   → monl_add_loop it la lb = monl_add_loop it lb la.
@@ -407,6 +428,7 @@ induction it; intros; [ easy | ].
 cbn in Hab.
 destruct la as [| (ca, da)]; [ now subst lb | ].
 destruct lb as [| (cb, db)]; [ easy | cbn ].
+move cb before ca; move db before da.
 remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
 cbn in Hit; apply Nat.succ_le_mono in Hit.
 rewrite Nat.add_succ_r in Hit.
@@ -469,6 +491,8 @@ destruct lb as [| (cb, db)]. {
     }
   }
 }
+move cb before ca.
+move db before da.
 cbn - [ monl_add_loop ] in Hit1, Hit2, Hit3, Hit4.
 apply Nat.succ_le_mono in Hit1, Hit2.
 destruct lc as [| (cc, dc)]. {
@@ -510,10 +534,14 @@ destruct lc as [| (cc, dc)]. {
     unfold monl_add_nb_iter; cbn; flia Hit4.
   }
 }
+move cc before cb; move dc before db.
 cbn - [ monl_add_loop ] in Hit1, Hit2, Hit3, Hit4.
 cbn.
 destruct it3; [ easy | cbn ].
 destruct it4; [ easy | cbn ].
+cbn - [ monl_add_loop ] in Hit3.
+apply Nat.succ_le_mono in Hit3, Hit4.
+rewrite Nat.add_succ_r in Hit3.
 remember (db ?= dc) as dbc eqn:Hdbc; symmetry in Hdbc.
 remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
 destruct dbc. {
@@ -532,19 +560,43 @@ destruct dbc. {
         apply (rngl_eqb_eq Heq), (rngl_add_move_0_r Hop) in Hcab.
         rewrite <- Hcab in Hcbc; subst cc.
         destruct mbc as [| (cbc, dbc)]. {
+          apply eq_monl_add_loop_nil in Hmbc. 2: {
+            unfold monl_add_nb_iter; flia Hit2.
+          }
+          subst lb.
+          rewrite monl_opp_length in Hit1, Hit2, Hit3, Hit4.
           destruct mab as [| (cab, dab)]. {
             f_equal.
-            rewrite monl_add_loop_comm in Hmbc. 2: {
-              unfold monl_add_nb_iter; flia Hit2.
-            }
-            apply eq_monl_add_loop_nil in Hmbc. 2: {
-              unfold monl_add_nb_iter; flia Hit2.
-            }
             apply eq_monl_add_loop_nil in Hmab. 2: {
-              unfold monl_add_nb_iter; flia Hit4.
+              unfold monl_add_nb_iter.
+              rewrite monl_opp_length; flia Hit4.
             }
-            congruence.
+            now rewrite monl_opp_involutive in Hmab.
           }
+          move cab before cb; move dab before da.
+          remember (dab ?= da) as daba eqn:Hdaba; symmetry in Hdaba.
+          destruct daba. {
+            apply Nat.compare_eq_iff in Hdaba; subst dab.
+            remember (cab + ca =? 0)%F as caba eqn:Hcaba.
+            symmetry in Hcaba.
+            destruct caba. {
+              apply (rngl_eqb_eq Heq) in Hcaba.
+              destruct lc as [| (cc, dc)]. {
+                destruct it4; [ easy | cbn in Hmab ].
+                destruct la as [| (ca', da')]; [ easy | ].
+                injection Hmab; clear Hmab; intros; subst ca' da' mab.
+                destruct it3; [ easy | cbn ].
+                destruct la as [| (ca', da')]. {
+(* ha, y a un truc qui déconne *)
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (
+  let pa := « 1· » in
+  let pb := « (-1)· » in
+  let pc := « 7*☓ » in
+  ((pa + pb) + pc = pa + (pb + pc))%P
+).
+(* bon, faut que je trouve un contre-exemple qui marche *)
 ...
 
 (* *)
