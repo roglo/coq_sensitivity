@@ -422,17 +422,13 @@ destruct lb as [| (cb, db)]. {
     remember (da ?= dc) as dac eqn:Hdac; symmetry in Hdac.
     destruct dac. {
       destruct (ca + cc =? 0)%F; [ | f_equal ]. {
-        apply monl_add_loop_enough_iter. {
-          unfold monl_add_nb_iter; flia Hit1.
-        } {
-          unfold monl_add_nb_iter; flia Hit3.
-        }
+        apply monl_add_loop_enough_iter.
+        unfold monl_add_nb_iter; flia Hit1.
+        unfold monl_add_nb_iter; flia Hit3.
       } {
-        apply monl_add_loop_enough_iter. {
-          unfold monl_add_nb_iter; flia Hit1.
-        } {
-          unfold monl_add_nb_iter; flia Hit3.
-        }
+        apply monl_add_loop_enough_iter.
+        unfold monl_add_nb_iter; flia Hit1.
+        unfold monl_add_nb_iter; flia Hit3.
       }
     } {
       f_equal.
@@ -446,8 +442,49 @@ destruct lb as [| (cb, db)]. {
     }
   }
 }
+cbn - [ monl_add_loop ] in Hit1, Hit2, Hit3, Hit4.
+apply Nat.succ_le_mono in Hit1, Hit2.
+destruct lc as [| (cc, dc)]. {
+  cbn in Hit1.
+  destruct it4; [ easy | cbn ].
+  destruct it3; [ easy | ].
+  remember (da ?= db) as dab eqn:Hdab; symmetry in Hdab.
+  destruct dab. {
+    apply Nat.compare_eq_iff in Hdab; subst db.
+    destruct (ca + cb =? 0)%F. {
+      remember (monl_add_loop it4 _ _) as ld eqn:Hld.
+      symmetry in Hld.
+      destruct ld as [| (cd, dd)]. {
+        cbn; rewrite <- Hld.
+        apply monl_add_loop_enough_iter.
+        unfold monl_add_nb_iter; flia Hit1.
+        unfold monl_add_nb_iter; flia Hit4.
+      } {
+        cbn; rewrite <- Hld.
+        apply monl_add_loop_enough_iter.
+        unfold monl_add_nb_iter; flia Hit1.
+        unfold monl_add_nb_iter; flia Hit4.
+      }
+    } {
+      cbn; f_equal.
+      apply monl_add_loop_enough_iter.
+      unfold monl_add_nb_iter; flia Hit1.
+      unfold monl_add_nb_iter; flia Hit4.
+    }
+  } {
+    cbn; f_equal.
+    apply monl_add_loop_enough_iter.
+    unfold monl_add_nb_iter; cbn; flia Hit1.
+    unfold monl_add_nb_iter; cbn; flia Hit4.
+  } {
+    cbn; f_equal.
+    apply monl_add_loop_enough_iter.
+    unfold monl_add_nb_iter; cbn; flia Hit1.
+    unfold monl_add_nb_iter; cbn; flia Hit4.
+  }
+}
+cbn - [ monl_add_loop ] in Hit1, Hit2, Hit3, Hit4.
 ...
-
 
 (* *)
 
