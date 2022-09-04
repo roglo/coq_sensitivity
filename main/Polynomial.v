@@ -401,6 +401,7 @@ Theorem monl_add_loop_assoc : ∀ it1 it2 it3 it4 (la lb lc : list (monom T)),
     monl_add_loop it3 (monl_add_loop it4 la lb) lc.
 Proof.
 intros * Hit1 Hit2 Hit3 Hit4.
+unfold monl_add_nb_iter in Hit1, Hit2, Hit3, Hit4.
 revert la lb lc it2 it3 it4 Hit1 Hit2 Hit3 Hit4.
 induction it1; intros; [ easy | cbn ].
 destruct la as [| (ca, da)]. {
@@ -408,7 +409,45 @@ destruct la as [| (ca, da)]. {
   cbn in Hit3.
   now apply monl_add_loop_enough_iter.
 }
+destruct it2; [ easy | ].
+destruct lb as [| (cb, db)]. {
+  destruct lc as [| (cc, dc)]. {
+    cbn in Hit1, Hit2, Hit3, Hit4; cbn.
+    destruct it3; [ easy | cbn ].
+    destruct it4; [ easy | easy ].
+  } {
+    cbn in Hit1, Hit2, Hit3, Hit4; cbn.
+    destruct it3; [ easy | cbn ].
+    destruct it4; [ easy | cbn ].
+    remember (da ?= dc) as dac eqn:Hdac; symmetry in Hdac.
+    destruct dac. {
+      destruct (ca + cc =? 0)%F; [ | f_equal ]. {
+        apply monl_add_loop_enough_iter. {
+          unfold monl_add_nb_iter; flia Hit1.
+        } {
+          unfold monl_add_nb_iter; flia Hit3.
+        }
+      } {
+        apply monl_add_loop_enough_iter. {
+          unfold monl_add_nb_iter; flia Hit1.
+        } {
+          unfold monl_add_nb_iter; flia Hit3.
+        }
+      }
+    } {
+      f_equal.
+      apply Nat.succ_le_mono in Hit1, Hit3.
+      rewrite Nat.add_succ_r in Hit1, Hit3.
+      now apply monl_add_loop_enough_iter.
+    } {
+      f_equal.
+      apply Nat.succ_le_mono in Hit1, Hit3.
+      apply monl_add_loop_enough_iter; [ easy | easy ].
+    }
+  }
+}
 ...
+
 
 (* *)
 
