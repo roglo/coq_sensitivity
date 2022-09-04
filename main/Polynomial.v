@@ -587,16 +587,15 @@ destruct dbc. {
                 injection Hmab; clear Hmab; intros; subst ca' da' mab.
                 destruct it3; [ easy | cbn ].
                 destruct la as [| (ca', da')]. {
-(* ha, y a un truc qui déconne *)
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (
   let pa := « 1· » in
   let pb := « (-1)· » in
-  let pc := « 7*☓ » in
-  ((pa + pb) + pc = pa + (pb + pc))%P
+  let pc := « 0· » in
+  (pa + (pb + pc) = (pa + pb) + pc)%P
 ).
-(* bon, faut que je trouve un contre-exemple qui marche *)
+(* ah oui, tiens, en effet, c'est pas bon *)
 ...
 
 (* *)
