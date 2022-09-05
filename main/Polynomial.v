@@ -47,12 +47,12 @@ Compute [3*☓^5; (-5)*☓^2; 8*☓^0].
    i.e. the fact that the degrees are in decreasing order
    and that there are no nul coefficient. *)
 
-Definition monl_is_canon T {ro : ring_like_op T} (la : list (monom T)) :=
+Definition is_canon_monl T {ro : ring_like_op T} (la : list (monom T)) :=
   (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) la &&
    ⋀ (x ∈ la), (mcoeff x ≠? 0)%F)%bool.
 
-Definition polyn_is_canon T {ro : ring_like_op T} (p : polyn T) :=
-  monl_is_canon (monl p).
+Definition is_canon_polyn T {ro : ring_like_op T} (p : polyn T) :=
+  is_canon_monl (monl p).
 
 (* notation for polynomials *)
 
@@ -311,27 +311,61 @@ End polynomial_Notations.
 
 Import polynomial_Notations.
 
+(* canon_polyn: normalised polynomial
+   its degrees are in decreasing order
+   and that there are no nul coefficient. *)
+Record canon_polyn T {ro : ring_like_op T} := mk_canon_polyn
+  { cp_polyn : polyn T;
+    cp_prop : is_canon_polyn cp_polyn = true }.
+
+Arguments canon_polyn T {ro}.
+Arguments mk_canon_polyn {T ro} cp_polyn%P.
+
 Section a.
 
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heq : rngl_has_eqb = true}.
+(*
 Context {Hop : rngl_has_opp = true}.
+*)
+Context {H10 : rngl_has_1_neq_0 = true}.
 
 (* polynomial ring-like operators *)
+(* limited to normalised (or canonical) polynomials in order to use
+   normal equality instead of equivalence relation as equality because
+   normal equality allows to replace expressions without questioning *)
 
-Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
+Theorem zero_is_canon_polyn : is_canon_polyn polyn_zero = true.
+Proof.
+now cbn; rewrite iter_list_empty.
+Qed.
 
-Definition polyn_ring_like_op : ring_like_op (polyn T) :=
-  {| rngl_zero := polyn_zero;
-     rngl_one := polyn_one;
-     rngl_add := polyn_add;
-     rngl_mul := polyn_mul;
-     rngl_opt_opp_or_sous := Some (inl polyn_opp);
-     rngl_opt_inv_or_quot := Some (inr polyn_quot);
-     rngl_opt_eqb := None;
-     rngl_le := phony_polyn_le |}.
+Theorem one_is_canon_polyn : is_canon_polyn polyn_one = true.
+Proof.
+cbn; rewrite iter_list_only_one; [ cbn | easy ].
+apply Bool.negb_true_iff.
+apply (rngl_eqb_neq Heq).
+apply (rngl_1_neq_0 H10).
+Qed.
+
+Definition canon_polyn_zero := mk_canon_polyn polyn_zero zero_is_canon_polyn.
+Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
+
+...
+
+Definition canon_polyn_add (pa pb : canon_polyn T) := 42.
+
+Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
+  {| rngl_zero := canon_polyn_zero;
+     rngl_one := canon_polyn_one;
+     rngl_add := canon_polyn_add;
+    rngl_mul := ?rngl_mul;
+    rngl_opt_opp_or_sous := ?rngl_opt_opp_or_sous;
+    rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
+    rngl_opt_eqb := ?rngl_opt_eqb;
+    rngl_le := ?rngl_le |}.
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
