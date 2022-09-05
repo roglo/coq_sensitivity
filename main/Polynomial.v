@@ -193,7 +193,7 @@ Fixpoint monl_norm_loop it (la : list (monom T)) :=
       end
   end.
 
-Definition monl_norm_nb_iter (la : list (monom T)) := S (length la + 50).
+Definition monl_norm_nb_iter (la : list (monom T)) := length la.
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
@@ -237,7 +237,10 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
   end.
 
 Definition monl_quot_rem_nb_iter (la lb : list (monom T)) :=
-  S (length la + length lb + 50).
+  S (length la).
+(*
+  S (length la + length lb).
+*)
 
 Definition monl_quot_rem la lb :=
   monl_quot_rem_loop (monl_quot_rem_nb_iter la lb) la lb.
@@ -269,26 +272,17 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
+Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «4*☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2*☓»).
 Compute (polyn_quot_rem «1·» «2·»).
-Compute (polyn_norm (polyn_rem «1·» «2·»)).
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «1*☓ + 1·»).
-Compute (
-  let (ca, da) := (1, 2%nat) in
-  let (cb, db) := (1, 1%nat) in
-  let la := [3*☓; 7·] in
-  let lb := [1·] in
-  let c := (ca / cb)%F in
-  let mq := Mon c (da - db) in
-(*
-  monl_sub la (monl_mul lb [mq])
-*)
-  monl_norm (monl_sub la (monl_mul lb [mq]))
-).
-...
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «2*☓ + 1·»).
+(*
+     = (« 〈1╱2〉*☓ + 〈5╱4〉· », « 〈23╱4〉· »)
+     : polyn Q * polyn Q
+*)
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
 Compute (polyn_quot_rem «» «1*☓^2 + 3*☓ + 7·»).
 *)
