@@ -288,6 +288,112 @@ Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
 Compute (polyn_quot_rem «» «1*☓^2 + 3*☓ + 7·»).
 *)
 
+End a.
+
+(* polynomial notations *)
+
+Declare Scope P_scope.
+Delimit Scope P_scope with P.
+
+Arguments monl_add {T} (la lb)%list.
+Arguments monl_opp {T ro} la%list.
+Arguments polyn_add {T} (pa pb)%P.
+Arguments polyn_mul {T ro} (pa pb)%P.
+Arguments polyn_one {T ro}.
+Arguments polyn_opp {T ro} p%P.
+Arguments polyn_quot {T ro} (pa pb)%P.
+
+Module polynomial_Notations.
+
+Notation "pa + pb" := (polyn_add pa pb) : P_scope.
+
+End polynomial_Notations.
+
+Import polynomial_Notations.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+Context {Heq : rngl_has_eqb = true}.
+Context {Hop : rngl_has_opp = true}.
+
+(* polynomial ring-like operators *)
+
+Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
+
+Definition polyn_ring_like_op : ring_like_op (polyn T) :=
+  {| rngl_zero := polyn_zero;
+     rngl_one := polyn_one;
+     rngl_add := polyn_add;
+     rngl_mul := polyn_mul;
+     rngl_opt_opp_or_sous := Some (inl polyn_opp);
+     rngl_opt_inv_or_quot := Some (inr polyn_quot);
+     rngl_opt_eqb := None;
+     rngl_le := phony_polyn_le |}.
+
+(* allows to use ring-like theorems on polynomials *)
+Canonical Structure polyn_ring_like_op.
+
+(* to search for ring-like polynomials operators in the context *)
+Global Existing Instance polyn_ring_like_op.
+
+(* polynomial ring-like properties *)
+
+Theorem polyn_add_comm : ∀ a b : polyn T, (a + b)%F = (b + a)%F.
+Proof.
+intros; cbn.
+unfold polyn_add.
+f_equal.
+unfold monl_add.
+(* wrong: I must either use a specific equality (normalising)
+   or restraint ring-like to normalised polynomials *)
+(* second solution adopted: I prefer use normal equality, because
+   it allows to replace without questioning *)
+...
+
+Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
+  {| rngl_mul_is_comm := false; (* à voir *)
+     rngl_has_eqb := false; (* à voir *)
+     rngl_has_dec_le := false; (* à voir *)
+     rngl_has_1_neq_0 := false; (* à voir *)
+     rngl_is_ordered := false; (* à voir *)
+     rngl_is_integral := false; (* à voir *)
+     rngl_characteristic := rngl_characteristic;
+     rngl_add_comm := polyn_add_comm;
+     rngl_add_assoc := 42;
+    rngl_add_0_l := ?rngl_add_0_l;
+    rngl_mul_assoc := ?rngl_mul_assoc;
+    rngl_mul_1_l := ?rngl_mul_1_l;
+    rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+    rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
+    rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+    rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+    rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+    rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+    rngl_opt_add_sub := ?rngl_opt_add_sub;
+    rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
+    rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
+    rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
+    rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+    rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+    rngl_opt_mul_div := ?rngl_opt_mul_div;
+    rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+    rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+    rngl_opt_le_dec := ?rngl_opt_le_dec;
+    rngl_opt_integral := ?rngl_opt_integral;
+    rngl_characteristic_prop := ?rngl_characteristic_prop;
+    rngl_opt_le_refl := ?rngl_opt_le_refl;
+    rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+    rngl_opt_le_trans := ?rngl_opt_le_trans;
+    rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+    rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+    rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+    rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+    rngl_opt_not_le := ?rngl_opt_not_le
+  |}.
+
 ...
 
 (* old version *)
