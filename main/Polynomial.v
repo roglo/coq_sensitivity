@@ -207,7 +207,7 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
     list (monom T) * list (monom T) :=
   match it with
 (**)
-  | 0 => ([], [Mon (rngl_of_nat 98) 0]) (* algo err: not enough iterations *)
+  | 0 => ([], [Mon (rngl_of_nat 97) 0]) (* algo err: not enough iterations *)
 (*
   | 0 => ([], [])
 *)
@@ -223,7 +223,10 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
               if (c =? 0)%F then ([], la)
               else if da <? db then ([], la)
               else
-(**)
+(*
+              if da <? db then ([], la)
+              else
+*)
                 let mq := Mon c (da - db) in
 (*
                 let lr := monl_sub la (monl_mul lb [mq]) in
@@ -238,9 +241,6 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
 
 Definition monl_quot_rem_nb_iter (la lb : list (monom T)) :=
   S (length la).
-(*
-  S (length la + length lb).
-*)
 
 Definition monl_quot_rem la lb :=
   monl_quot_rem_loop (monl_quot_rem_nb_iter la lb) la lb.
@@ -252,7 +252,7 @@ Definition polyn_quot_rem pa pb :=
 Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
 Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
 
-(**)
+(*
 End a.
 Arguments monl_norm {T ro} la%list.
 Arguments monl_quot_rem_loop {T ro} it%nat (la lb)%list.
@@ -272,6 +272,7 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
+(**)
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «4*☓^2 + (-1)·» «2·»).
