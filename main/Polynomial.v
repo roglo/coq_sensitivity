@@ -370,6 +370,9 @@ unfold monl_norm.
 apply Bool.andb_true_iff.
 split. {
   induction la as [| (ca, da)]; [ easy | ].
+  set (f := λ ma mb, _).
+  set (g := λ ma mb, _) in |-*.
+  fold f g in IHla.
   rewrite monl_norm_nb_iter_cons.
   cbn - [ isort ].
   remember (isort _ _) as lb eqn:Hlb in |-*.
@@ -380,10 +383,6 @@ split. {
   remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
   destruct cbz. {
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
-    set (f := λ ma mb, _).
-    set (g := λ ma mb, _) in Hlb.
-    fold f g in IHla.
-    move g after f.
     cbn in Hlb.
 ...
 
