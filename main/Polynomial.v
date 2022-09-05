@@ -384,6 +384,7 @@ split. {
     set (g := λ ma mb, _) in Hlb.
     fold f g in IHla.
     move g after f.
+    cbn in Hlb.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
