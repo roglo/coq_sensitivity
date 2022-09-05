@@ -150,6 +150,136 @@ Compute (polyn_mul «1*☓ + (-1)·» «3*☓^5 + 1·»).
 
 (* opposite *)
 
+Definition monl_opp la := map (λ m, Mon (- mcoeff m)%F (mdeg m)) la.
+Definition polyn_opp p := mk_polyn (monl_opp (monl p)).
+
+(* subtraction *)
+
+Definition monl_sub la lb := monl_add la (monl_opp lb).
+Definition polyn_sub pa pb := mk_polyn (monl_sub (monl pa) (monl pb)).
+
+(*
+End a.
+Arguments polyn_opp {T ro} p.
+Arguments polyn_mul {T ro} (pa pb).
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (mk_polyn [Mon 1 2]).
+Compute « 1*☓^2 ».
+Compute (polyn_opp «1*☓»).
+Compute (polyn_opp «1*☓ + 1·»).
+Compute (polyn_opp «1*☓ + (-1)·»).
+Compute (polyn_opp «3*☓^5 + 1·»).
+Compute (polyn_opp «3*☓^5»).
+Compute (polyn_mul «1*☓ + (-1)·» «3*☓^5 + 1·»).
+Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
+*)
+
+(* normalisation
+   return a polynomial whose degree are in decreasing order
+   and no coefficient is nul *)
+
+Fixpoint monl_norm_loop it (la : list (monom T)) :=
+  match it with
+  | 0 => []
+  | S it' =>
+      match la with
+      | [] => []
+      | [Mon ca da] => if (ca =? 0)%F then [] else la
+      | Mon ca da :: ((Mon cb db :: lb) as lb') =>
+          if (ca =? 0)%F then monl_norm_loop it' lb'
+          else if da =? db then monl_norm_loop it' (Mon (ca + cb)%F da :: lb)
+          else monl_norm_loop it' (Mon ca da :: lb')
+      end
+  end.
+
+Definition monl_norm_nb_iter (la : list (monom T)) := length la.
+
+Definition monl_norm (la : list (monom T)) :=
+  monl_norm_loop (monl_norm_nb_iter la)
+    (isort (λ ma mb, mdeg mb <=? mdeg ma) la).
+
+Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
+
+(* euclidean division *)
+
+Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
+    list (monom T) * list (monom T) :=
+  match it with
+(**)
+  | 0 => ([], [Mon (rngl_of_nat 99) 0]) (* algo err: not enough iterations *)
+(*
+  | 0 => ([], [])
+*)
+  | S it' =>
+      match la with
+      | [] => ([], [])
+      | Mon ca da :: la' =>
+          match lb with
+          | [] => ([], []) (* division by zero *)
+          | Mon cb db :: _ =>
+              let c := (ca / cb)%F in
+(**)
+              if (c =? 0)%F then ([], la)
+              else if da <? db then ([], la)
+              else
+(**)
+                let mq := Mon c (da - db) in
+(*
+                let lr := monl_sub la (monl_mul lb [mq]) in
+*)
+                let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
+(**)
+                let (lq', lr') := monl_quot_rem_loop it' lr lb in
+                (mq :: lq', lr')
+          end
+      end
+  end.
+
+Definition monl_quot_rem_nb_iter (la lb : list (monom T)) :=
+  S (length la + length lb + 50).
+
+Definition monl_quot_rem la lb :=
+  monl_quot_rem_loop (monl_quot_rem_nb_iter la lb) la lb.
+
+Definition polyn_quot_rem pa pb :=
+  let (lq, lr) := monl_quot_rem (monl pa) (monl pb) in
+  (mk_polyn lq, mk_polyn lr).
+
+Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
+Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
+
+(**)
+End a.
+Arguments monl_quot_rem_loop {T ro} it%nat (la lb)%list.
+Arguments monl_quot_rem {T ro} (la lb)%list.
+Arguments polyn_norm {T ro} pa.
+Arguments polyn_rem {T ro} pa pb.
+Arguments polyn_quot_rem {T ro} (pa pb).
+Arguments polyn_quot {T ro} (pa pb).
+Arguments polyn_rem {T ro} (pa pb).
+Arguments monl_mul {T ro} (la lb)%list.
+Arguments monl_sub {T ro} (la lb)%list.
+(*
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+*)
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2·»).
+Compute (polyn_quot_rem «4*☓^2 + (-1)·» «2·»).
+Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2*☓»).
+Compute (polyn_quot_rem «1·» «2·»).
+Compute (polyn_norm (polyn_rem «1·» «2·»)).
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «1*☓ + 1·»).
+...
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «2*☓ + 1·»).
+Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
+Compute (polyn_quot_rem «» «1*☓^2 + 3*☓ + 7·»).
+*)
+
 ...
 
 (* old version *)
