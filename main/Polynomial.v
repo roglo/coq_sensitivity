@@ -589,6 +589,10 @@ destruct dbc. {
               apply (rngl_eqb_eq Heq) in Hcab.
               apply -> (rngl_sub_move_0_r Hop) in Hcab; subst cac.
               symmetry.
+              remember (- cb)%F as ca eqn:Hca.
+              apply (f_equal rngl_opp) in Hca.
+              rewrite (rngl_opp_involutive Hop) in Hca.
+              subst cb.
 ...
       move cab before cbc; move mab before mbc.
       destruct cab. {
