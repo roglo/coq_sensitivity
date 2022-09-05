@@ -181,7 +181,7 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
 
 Fixpoint monl_norm_loop it (la : list (monom T)) :=
   match it with
-  | 0 => []
+  | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
   | S it' =>
       match la with
       | [] => []
@@ -189,11 +189,11 @@ Fixpoint monl_norm_loop it (la : list (monom T)) :=
       | Mon ca da :: ((Mon cb db :: lb) as lb') =>
           if (ca =? 0)%F then monl_norm_loop it' lb'
           else if da =? db then monl_norm_loop it' (Mon (ca + cb)%F da :: lb)
-          else monl_norm_loop it' (Mon ca da :: lb')
+          else Mon ca da :: monl_norm_loop it' lb'
       end
   end.
 
-Definition monl_norm_nb_iter (la : list (monom T)) := length la.
+Definition monl_norm_nb_iter (la : list (monom T)) := S (length la + 50).
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
@@ -207,7 +207,7 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
     list (monom T) * list (monom T) :=
   match it with
 (**)
-  | 0 => ([], [Mon (rngl_of_nat 99) 0]) (* algo err: not enough iterations *)
+  | 0 => ([], [Mon (rngl_of_nat 98) 0]) (* algo err: not enough iterations *)
 (*
   | 0 => ([], [])
 *)
@@ -251,6 +251,7 @@ Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
 
 (**)
 End a.
+Arguments monl_norm {T ro} la%list.
 Arguments monl_quot_rem_loop {T ro} it%nat (la lb)%list.
 Arguments monl_quot_rem {T ro} (la lb)%list.
 Arguments polyn_norm {T ro} pa.
@@ -274,6 +275,18 @@ Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2*☓»).
 Compute (polyn_quot_rem «1·» «2·»).
 Compute (polyn_norm (polyn_rem «1·» «2·»)).
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «1*☓ + 1·»).
+Compute (
+  let (ca, da) := (1, 2%nat) in
+  let (cb, db) := (1, 1%nat) in
+  let la := [3*☓; 7·] in
+  let lb := [1·] in
+  let c := (ca / cb)%F in
+  let mq := Mon c (da - db) in
+(*
+  monl_sub la (monl_mul lb [mq])
+*)
+  monl_norm (monl_sub la (monl_mul lb [mq]))
+).
 ...
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «2*☓ + 1·»).
 Compute (polyn_quot_rem «1*☓^2 + 3*☓ + 7·» «»).
