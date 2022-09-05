@@ -89,6 +89,71 @@ Definition polyn_one := mk_polyn [Mon 1 0] : polyn T.
 
 (* addition *)
 
+Definition monl_add (la lb : list (monom T)) := la ++ lb.
+
+(*
+End a.
+Arguments polyn_is_canon {T ro} p.
+Arguments monl {T} p.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓^7»).
+Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + 5*☓^2 + 8*☓»)).
+Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
+Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl « »)).
+Compute (monl_add (monl « ») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
+*)
+
+Definition polyn_add (pa pb : polyn T) :=
+  mk_polyn (monl_add (monl pa) (monl pb)).
+
+(*
+End a.
+Arguments polyn_is_canon {T ro} p.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
+Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»)).
+Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»).
+Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»)).
+*)
+
+(* multiplication *)
+
+Fixpoint monl_mul_mon_l ma lb :=
+  match lb with
+  | [] => []
+  | mb :: lb' =>
+      let c := (mcoeff ma * mcoeff mb)%F in
+      Mon c (mdeg ma + mdeg mb) :: monl_mul_mon_l ma lb'
+  end.
+
+Fixpoint monl_mul la lb :=
+  match la with
+  | [] => []
+  | ma :: la' => monl_add (monl_mul_mon_l ma lb) (monl_mul la' lb)
+  end.
+
+Definition polyn_mul pa pb := mk_polyn (monl_mul (monl pa) (monl pb)).
+
+(*
+End a.
+Arguments polyn_mul {T ro} (pa pb).
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_mul «1*☓ + 1·» «1*☓ + (-1)·»).
+Compute (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»).
+Compute (polyn_mul «1*☓ + (-1)·» «3*☓^5 + 1·»).
+*)
+
+(* opposite *)
+
+...
+
+(* old version *)
+
 (* if "pa" and "pb" are polynomials in canonical order,
    i.e.
    - degrees are in decreasing order
