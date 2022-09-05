@@ -295,10 +295,14 @@ End a.
 Declare Scope P_scope.
 Delimit Scope P_scope with P.
 
+Arguments is_canon_polyn {T ro} p%P.
 Arguments monl_add {T} (la lb)%list.
+Arguments monl_norm {T ro} la%list.
+Arguments monl_norm_loop {T ro} it%nat la%list.
 Arguments monl_opp {T ro} la%list.
 Arguments polyn_add {T} (pa pb)%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
+Arguments polyn_norm {T ro} pa%P.
 Arguments polyn_one {T ro}.
 Arguments polyn_opp {T ro} p%P.
 Arguments polyn_quot {T ro} (pa pb)%P.
@@ -353,15 +357,54 @@ Qed.
 Definition canon_polyn_zero := mk_canon_polyn polyn_zero zero_is_canon_polyn.
 Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
 
+Theorem monl_norm_nb_iter_cons : ∀ (ma : monom T) la,
+  monl_norm_nb_iter (ma :: la) = S (monl_norm_nb_iter la).
+Proof. easy. Qed.
+
+Theorem monl_norm_is_canon_monl : ∀ la,
+  is_canon_monl (monl_norm la) = true.
+Proof.
+intros.
+unfold is_canon_monl; cbn.
+unfold monl_norm.
+apply Bool.andb_true_iff.
+split. {
+  induction la as [| (ca, da)]; [ easy | ].
+  rewrite monl_norm_nb_iter_cons.
 ...
 
-Definition canon_polyn_add (pa pb : canon_polyn T) := 42.
+Theorem polyn_norm_is_canon_polyn : ∀ pa,
+  is_canon_polyn (polyn_norm pa) = true.
+Proof.
+intros.
+destruct pa as (la); cbn.
+unfold is_canon_polyn.
+unfold polyn_norm.
+cbn - [ monl_norm ].
+... ...
+apply monl_norm_is_canon_monl.
+...
+
+Theorem canon_polyn_add_prop : ∀ pa pb,
+  is_canon_polyn (polyn_norm (cp_polyn pa + cp_polyn pb)) = true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+move pb before pa; cbn.
+... ...
+apply polyn_norm_is_canon_polyn.
+...
+
+Definition canon_polyn_add (pa pb : canon_polyn T) :=
+  mk_canon_polyn (polyn_norm (polyn_add (cp_polyn pa) (cp_polyn pb)))
+    (canon_polyn_add_prop pa pb).
 
 Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
   {| rngl_zero := canon_polyn_zero;
      rngl_one := canon_polyn_one;
      rngl_add := canon_polyn_add;
-    rngl_mul := ?rngl_mul;
+    rngl_mul := 42;
     rngl_opt_opp_or_sous := ?rngl_opt_opp_or_sous;
     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
     rngl_opt_eqb := ?rngl_opt_eqb;
