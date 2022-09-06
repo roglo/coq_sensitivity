@@ -199,6 +199,13 @@ Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
     (isort (λ ma mb, mdeg mb <? mdeg ma) la).
 
+Definition monl_norm' (la : list (monom T)) :=
+  monl_norm_loop (monl_norm_nb_iter la)
+    (isort (λ ma mb, mdeg mb <=? mdeg ma) la).
+
+(* prove that monl_norm = monl_norm' *)
+...
+
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
 (* euclidean division *)
