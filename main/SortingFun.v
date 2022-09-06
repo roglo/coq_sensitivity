@@ -3662,6 +3662,39 @@ specialize (Habs _ (or_introl eq_refl)).
 congruence.
 Qed.
 
+Theorem isort_insert_sorted_cons : ∀ A (rel : A → _),
+  reflexive rel
+  → transitive rel
+  → ∀ a lsorted la,
+  sorted rel lsorted
+  → isort_insert rel a lsorted = a :: la
+  → la = lsorted ∧ sorted rel (a :: la).
+Proof.
+intros * Href Htra * Hs His.
+revert a la His.
+induction lsorted as [| b]; intros; cbn. {
+  cbn in His.
+  injection His; clear His; intros; subst la.
+  easy.
+}
+cbn in His.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  injection His; clear His; intros; subst la.
+  split; [ easy | ].
+  apply (sorted_cons_iff Htra).
+  split; [ easy | ].
+  intros c Hc.
+  destruct Hc as [Hc| Hc]; [ now subst c | ].
+  apply (sorted_cons_iff Htra) in Hs.
+  apply (Htra a b c Hab).
+  now apply Hs.
+} {
+  injection His; clear His; intros; subst b la.
+  now rewrite Href in Hab.
+}
+Qed.
+
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
   ∀ l f,

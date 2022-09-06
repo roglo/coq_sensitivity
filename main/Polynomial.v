@@ -384,6 +384,33 @@ split. {
   destruct cbz. {
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
+    specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
+    rewrite Hlb in H1.
+    destruct H1 as [H1| H1]. {
+      injection H1; clear H1; intros; subst ca db.
+      apply isort_insert_sorted_cons in Hlb; cycle 1. {
+        intros ma; apply Nat.leb_refl.
+      } {
+        unfold g.
+        intros ma mb mc Hmab Hmbc.
+        apply Nat.leb_le in Hmab, Hmbc.
+        apply Nat.leb_le.
+        now transitivity (mdeg mb).
+      } {
+        apply sorted_isort.
+        intros ma mb; unfold g.
+        apply Bool.orb_true_iff.
+        remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
+        symmetry in Hmdab.
+        destruct mdab; [ now left | right ].
+        apply leb_gt in Hmdab.
+        now apply leb_le, lt_le_incl.
+      }
+      destruct Hlb as (Hlb, Hs).
+      now rewrite Hlb.
+    }
+    destruct H1 as [H1| H1]. {
+      injection H1; clear H1; intros; subst cc dc.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
