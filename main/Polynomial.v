@@ -371,7 +371,8 @@ apply Bool.andb_true_iff.
 split. {
   induction la as [| (ca, da)]; [ easy | ].
   set (f := λ ma mb, _).
-  fold f in IHla.
+  set (g := λ ma mb, _).
+  fold f g in IHla.
   rewrite monl_norm_nb_iter_cons.
   cbn - [ isort ].
   remember (isort _ _) as lb eqn:Hlb in |-*.
@@ -383,53 +384,31 @@ split. {
   destruct cbz. {
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
-(*
-Theorem isort_insert_exist : ∀ A (rel : A → _) a la lb,
-  sorted rel la
-  → isort_insert rel a la = lb
-  → ∃ l1 l2, la = l1 ++ l2 ∧ lb = l1 ++ a :: l2.
-...
-apply isort_insert_exist in Hlb.
-destruct Hlb as (lm1 & lm2 & Hla & Hlb).
-rewrite Hla in IHla.
-Search (sorted _ (_ ++ _)).
-rewrite fold_sorted in IHla.
-Search monl_norm_loop.
-apply sorted_app_iff in IHla.
-...
-*)
-    specialize (in_isort_insert_id f (Mon ca da) (isort f la)) as H1.
+    specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
     rewrite Hlb in H1.
-    assert (Htrg : transitive f). {
+    assert (Htrg : transitive g). {
       intros ma mb mc Hmab Hmbc.
-      unfold f in Hmab, Hmbc|-*.
-      apply Nat.ltb_lt in Hmab, Hmbc.
-      apply Nat.ltb_lt.
+      unfold g in Hmab, Hmbc|-*.
+      apply Nat.leb_le in Hmab, Hmbc.
+      apply Nat.leb_le.
       now transitivity (mdeg mb).
     }
-(*
-    assert (Hsis : sorted f (isort f la)). {
+    assert (Hsis : sorted g (isort g la)). {
       apply sorted_isort.
-      intros ma mb; unfold f.
+      intros ma mb; unfold g.
       apply Bool.orb_true_iff.
-      do 2 rewrite <- ltb_antisym.
-      remember (mdeg mb <? mdeg ma) as mdab eqn:Hmdab.
+      remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
       symmetry in Hmdab.
       destruct mdab; [ now left | right ].
-      apply ltb_ge in Hmdab.
-      apply ltb_lt.
-(* crotte *)
-...
+      apply leb_gt in Hmdab.
       now apply leb_le, lt_le_incl.
     }
-*)
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst ca db.
-      apply isort_insert_sorted_cons in Hlb; [ | easy | ]. 2: {
-...
       apply isort_insert_sorted_cons in Hlb; [ | easy | easy ].
       now rewrite Hlb in IHla.
     }
+...
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
       apply isort_insert_sorted_cons2 in Hlb; [ | easy | easy ].
