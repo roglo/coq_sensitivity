@@ -410,8 +410,9 @@ split. {
     }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
-      apply isort_insert_sorted_cons2 in Hlb; [ | easy | easy ].
-      rewrite Hlb in IHla.
+      generalize Hlb; intros Hga.
+      apply isort_insert_sorted_cons2 in Hga; [ | easy | easy ].
+      rewrite Hga in IHla, Hlb.
 ...
       destruct la as [| (cc, dc)]; [ easy | ].
       cbn in IHla |-*.
