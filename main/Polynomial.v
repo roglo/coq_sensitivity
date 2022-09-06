@@ -197,45 +197,7 @@ Definition monl_norm_nb_iter (la : list (monom T)) := length la.
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
-    (isort (λ ma mb, mdeg mb <? mdeg ma) la).
-
-Definition monl_norm' (la : list (monom T)) :=
-  monl_norm_loop (monl_norm_nb_iter la)
     (isort (λ ma mb, mdeg mb <=? mdeg ma) la).
-
-Theorem monl_norm_monl_norm' : ∀ la, monl_norm la = monl_norm' la.
-Proof.
-intros.
-unfold monl_norm, monl_norm'.
-set (f := λ ma mb, _).
-set (g := λ ma mb, _).
-remember (monl_norm_nb_iter la) as it; clear Heqit.
-remember (isort f la) as lb eqn:Hlb; symmetry in Hlb.
-remember (isort g la) as lc eqn:Hlc; symmetry in Hlc.
-move lc before lb.
-revert la lb lc Hlb Hlc.
-induction it; intros; [ easy | ].
-cbn - [ "<?" ].
-destruct lb as [| (cb, db)]. {
-  apply eq_isort_nil in Hlb; subst la.
-  now cbn in Hlc; subst lc.
-}
-destruct lc as [| (cc, dc)]. {
-  now apply eq_isort_nil in Hlc; subst la.
-}
-specialize (IHit _ _ _ Hlb Hlc) as H1.
-...
-destruct lb as [| (cb', db')]. {
-  apply eq_isort_single in Hlb; subst la.
-  cbn in Hlc.
-  injection Hlc; clear Hlc; intros; subst lc dc cc.
-  easy.
-}
-destruct lc as [| (cc', dc')]. {
-  now apply eq_isort_single in Hlc; subst la.
-}
-specialize (IHit _ _ _ Hlb Hlc) as H1.
-...
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
