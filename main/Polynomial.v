@@ -48,7 +48,7 @@ Compute [3*☓^5; (-5)*☓^2; 8*☓^0].
    and that there are no nul coefficient. *)
 
 Definition is_canon_monl T {ro : ring_like_op T} (la : list (monom T)) :=
-  (is_sorted (λ x y, negb (mdeg x <=? mdeg y)) la &&
+  (is_sorted (λ x y, mdeg y <? mdeg x) la &&
    ⋀ (x ∈ la), (mcoeff x ≠? 0)%F)%bool.
 
 Definition is_canon_polyn T {ro : ring_like_op T} (p : polyn T) :=
@@ -197,7 +197,7 @@ Definition monl_norm_nb_iter (la : list (monom T)) := length la.
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
-    (isort (λ ma mb, negb (mdeg ma <=? mdeg mb)) la).
+    (isort (λ ma mb, mdeg mb <? mdeg ma) la).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
@@ -365,7 +365,7 @@ Theorem monl_norm_is_canon_monl : ∀ la,
   is_canon_monl (monl_norm la) = true.
 Proof.
 intros.
-unfold is_canon_monl; cbn.
+unfold is_canon_monl; cbn - [ "<?" ].
 unfold monl_norm.
 apply Bool.andb_true_iff.
 split. {
@@ -403,8 +403,6 @@ apply sorted_app_iff in IHla.
     assert (Htrg : transitive f). {
       intros ma mb mc Hmab Hmbc.
       unfold f in Hmab, Hmbc|-*.
-      rewrite <- ltb_antisym in Hmab, Hmbc.
-      rewrite <- ltb_antisym.
       apply Nat.ltb_lt in Hmab, Hmbc.
       apply Nat.ltb_lt.
       now transitivity (mdeg mb).
