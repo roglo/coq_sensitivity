@@ -3151,19 +3151,25 @@ Qed.
 
 (* *)
 
-Theorem neq_isort_insert_nil : ∀ A (rel : A → _) a la,
-  isort_insert rel a la ≠ [].
+Theorem eq_isort_nil : ∀ A (rel : A → _) la, isort rel la = [] → la = [].
 Proof.
 intros * Hla.
+destruct la as [| a]; [ easy | cbn in Hla; exfalso ].
+remember (isort rel la) as lb; clear la Heqlb.
+rename lb into la.
 destruct la as [| b]; [ easy | cbn in Hla ].
 now destruct (rel a b).
 Qed.
 
-Theorem eq_isort_nil : ∀ A (rel : A → _) la, isort rel la = [] → la = [].
+Theorem eq_isort_single : ∀ A (rel : A → _) a la,
+  isort rel la = [a] → la = [a].
 Proof.
 intros * Hla.
-destruct la as [| a]; [ easy | cbn in Hla ].
-now apply neq_isort_insert_nil in Hla.
+destruct la as [| b]; [ easy | cbn in Hla ].
+destruct la as [| c]; [ easy | exfalso ].
+apply (f_equal length) in Hla.
+rewrite isort_insert_length in Hla; cbn in Hla.
+now rewrite isort_insert_length in Hla.
 Qed.
 
 (* *)
