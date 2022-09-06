@@ -433,6 +433,11 @@ apply sorted_app_iff in IHla.
         unfold equality.
         apply (rngl_eqb_eq Heq).
       }
+      remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+      destruct caz; [ easy | ].
+      remember (da =? dd) as dad eqn:Hdad; symmetry in Hdad.
+      destruct dad. {
+        apply Nat.eqb_eq in Hdad; subst dd.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
