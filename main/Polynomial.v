@@ -197,7 +197,7 @@ Definition monl_norm_nb_iter (la : list (monom T)) := length la.
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
-    (isort (λ ma mb, mdeg mb <=? mdeg ma) la).
+    (isort (λ ma mb, negb (mdeg ma <=? mdeg mb)) la).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
@@ -371,8 +371,7 @@ apply Bool.andb_true_iff.
 split. {
   induction la as [| (ca, da)]; [ easy | ].
   set (f := λ ma mb, _).
-  set (g := λ ma mb, _) in |-*.
-  fold f g in IHla.
+  fold f in IHla.
   rewrite monl_norm_nb_iter_cons.
   cbn - [ isort ].
   remember (isort _ _) as lb eqn:Hlb in |-*.
@@ -399,26 +398,37 @@ Search monl_norm_loop.
 apply sorted_app_iff in IHla.
 ...
 *)
-    specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
+    specialize (in_isort_insert_id f (Mon ca da) (isort f la)) as H1.
     rewrite Hlb in H1.
-    assert (Htrg : transitive g). {
+    assert (Htrg : transitive f). {
       intros ma mb mc Hmab Hmbc.
-      apply Nat.leb_le in Hmab, Hmbc.
-      apply Nat.leb_le.
+      unfold f in Hmab, Hmbc|-*.
+      rewrite <- ltb_antisym in Hmab, Hmbc.
+      rewrite <- ltb_antisym.
+      apply Nat.ltb_lt in Hmab, Hmbc.
+      apply Nat.ltb_lt.
       now transitivity (mdeg mb).
     }
-    assert (Hsis : sorted g (isort g la)). {
+(*
+    assert (Hsis : sorted f (isort f la)). {
       apply sorted_isort.
-      intros ma mb; unfold g.
+      intros ma mb; unfold f.
       apply Bool.orb_true_iff.
-      remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
+      do 2 rewrite <- ltb_antisym.
+      remember (mdeg mb <? mdeg ma) as mdab eqn:Hmdab.
       symmetry in Hmdab.
       destruct mdab; [ now left | right ].
-      apply leb_gt in Hmdab.
+      apply ltb_ge in Hmdab.
+      apply ltb_lt.
+(* crotte *)
+...
       now apply leb_le, lt_le_incl.
     }
+*)
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst ca db.
+      apply isort_insert_sorted_cons in Hlb; [ | easy | ]. 2: {
+...
       apply isort_insert_sorted_cons in Hlb; [ | easy | easy ].
       now rewrite Hlb in IHla.
     }
@@ -438,6 +448,30 @@ apply sorted_app_iff in IHla.
       remember (da =? dd) as dad eqn:Hdad; symmetry in Hdad.
       destruct dad. {
         apply Nat.eqb_eq in Hdad; subst dd.
+        rewrite Hlb in Hsis.
+        assert (Hlab : length la = length (cd*☓^da :: lb)). {
+          apply (f_equal length) in Hlb.
+          rewrite isort_length in Hlb; cbn in Hlb.
+          now apply Nat.succ_inj in Hlb.
+        }
+        rewrite Hlab in IHla.
+        assert (H : cd*☓^da :: lb = isort f (cd*☓^da :: lb)). {
+          symmetry.
+          apply isort_when_sorted.
+...
+Print monl_norm_nb_iter.
+Theorem fold_monl_norm_nb_iter : ∀ (la : list (monom T)),
+  length la = monl_norm_nb_iter la.
+Proof. easy. Qed.
+rewrite fold_monl_norm_nb_iter in IHla.
+Print monl_norm.
+Theorem fold_monl_norm : ∀ la,
+  monl_norm_loop (monl_norm_nb_iter la)
+    (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) =
+  monl_norm la.
+Proof. easy. Qed.
+        unfold f in IHla.
+        rewrite fold_monl_norm in IHla.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
