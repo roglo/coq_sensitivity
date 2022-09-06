@@ -3663,35 +3663,45 @@ congruence.
 Qed.
 
 Theorem isort_insert_sorted_cons : ∀ A (rel : A → _),
-  reflexive rel
-  → transitive rel
-  → ∀ a lsorted la,
-  sorted rel lsorted
-  → isort_insert rel a lsorted = a :: la
-  → la = lsorted ∧ sorted rel (a :: la).
+  transitive rel
+  → ∀ a la lb,
+  sorted rel la
+  → isort_insert rel a la = a :: lb
+  → la = lb.
 Proof.
-intros * Href Htra * Hs His.
-revert a la His.
-induction lsorted as [| b]; intros; cbn. {
-  cbn in His.
-  injection His; clear His; intros; subst la.
+intros * Htra * Hs His.
+destruct la as [| b]. {
+  injection His; clear His; intros; subst lb.
   easy.
 }
 cbn in His.
 remember (rel a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
-  injection His; clear His; intros; subst la.
-  split; [ easy | ].
-  apply (sorted_cons_iff Htra).
-  split; [ easy | ].
-  intros c Hc.
-  destruct Hc as [Hc| Hc]; [ now subst c | ].
-  apply (sorted_cons_iff Htra) in Hs.
-  apply (Htra a b c Hab).
-  now apply Hs.
+  now injection His; clear His; intros; subst lb.
 } {
-  injection His; clear His; intros; subst b la.
-  now rewrite Href in Hab.
+  injection His; clear His; intros; subst b lb.
+  now symmetry; apply sorted_cons_isort_insert.
+}
+Qed.
+
+Theorem isort_insert_sorted_cons2 : ∀ A (rel : A → _),
+  transitive rel
+  → ∀ a b la lb,
+  sorted rel la
+  → isort_insert rel a la = b :: a :: lb
+  → la = b :: lb.
+Proof.
+intros * Htra * Hs His.
+destruct la as [| c]; [ easy | ].
+cbn in His.
+remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+destruct ac. {
+  now injection His; clear His; intros; subst b c lb.
+} {
+  injection His; clear His; intros His H; subst c.
+  f_equal.
+  apply sorted_cons in Hs.
+  now apply isort_insert_sorted_cons in His.
 }
 Qed.
 

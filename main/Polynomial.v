@@ -384,33 +384,55 @@ split. {
   destruct cbz. {
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
+(*
+Theorem isort_insert_exist : ∀ A (rel : A → _) a la lb,
+  sorted rel la
+  → isort_insert rel a la = lb
+  → ∃ l1 l2, la = l1 ++ l2 ∧ lb = l1 ++ a :: l2.
+...
+apply isort_insert_exist in Hlb.
+destruct Hlb as (lm1 & lm2 & Hla & Hlb).
+rewrite Hla in IHla.
+Search (sorted _ (_ ++ _)).
+rewrite fold_sorted in IHla.
+Search monl_norm_loop.
+apply sorted_app_iff in IHla.
+...
+*)
     specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
     rewrite Hlb in H1.
+    assert (Htrg : transitive g). {
+      intros ma mb mc Hmab Hmbc.
+      apply Nat.leb_le in Hmab, Hmbc.
+      apply Nat.leb_le.
+      now transitivity (mdeg mb).
+    }
+    assert (Hsis : sorted g (isort g la)). {
+      apply sorted_isort.
+      intros ma mb; unfold g.
+      apply Bool.orb_true_iff.
+      remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
+      symmetry in Hmdab.
+      destruct mdab; [ now left | right ].
+      apply leb_gt in Hmdab.
+      now apply leb_le, lt_le_incl.
+    }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst ca db.
-      apply isort_insert_sorted_cons in Hlb; cycle 1. {
-        intros ma; apply Nat.leb_refl.
-      } {
-        unfold g.
-        intros ma mb mc Hmab Hmbc.
-        apply Nat.leb_le in Hmab, Hmbc.
-        apply Nat.leb_le.
-        now transitivity (mdeg mb).
-      } {
-        apply sorted_isort.
-        intros ma mb; unfold g.
-        apply Bool.orb_true_iff.
-        remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
-        symmetry in Hmdab.
-        destruct mdab; [ now left | right ].
-        apply leb_gt in Hmdab.
-        now apply leb_le, lt_le_incl.
-      }
-      destruct Hlb as (Hlb, Hs).
-      now rewrite Hlb.
+      apply isort_insert_sorted_cons in Hlb; [ | easy | easy ].
+      now rewrite Hlb in IHla.
     }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
+      apply isort_insert_sorted_cons2 in Hlb; [ | easy | easy ].
+      rewrite Hlb in IHla.
+      destruct la as [| (cc, dc)]; [ easy | ].
+      cbn in IHla |-*.
+      destruct lb as [| (cd, dd)]; [ now destruct (ca =? 0)%F | ].
+      rewrite equality_refl in IHla. 2: {
+        unfold equality.
+        apply (rngl_eqb_eq Heq).
+      }
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
