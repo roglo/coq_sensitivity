@@ -408,11 +408,11 @@ split. {
       apply isort_insert_sorted_cons in Hlb; [ | easy | easy ].
       now rewrite Hlb in IHla.
     }
-...
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
       apply isort_insert_sorted_cons2 in Hlb; [ | easy | easy ].
       rewrite Hlb in IHla.
+...
       destruct la as [| (cc, dc)]; [ easy | ].
       cbn in IHla |-*.
       destruct lb as [| (cd, dd)]; [ now destruct (ca =? 0)%F | ].
