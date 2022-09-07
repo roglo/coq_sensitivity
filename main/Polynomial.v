@@ -486,14 +486,22 @@ split. {
             assert (Hsg : sorted g (isort g (ma :: la))). {
               now apply sorted_isort.
             }
-            apply IHla; [ easy | now subst | easy | | ].
-...
-            apply IHla; [ | now subst | easy | | ].
-...
-            apply IHla; [ now subst | easy | ].
-            specialize (permuted_isort g (equality_monom_eqb)) as Hp.
-            specialize (Hp (ma :: mb :: la)) as Hp1.
-            rewrite Hga in Hp1.
+            apply IHla; [ easy | now subst | easy | | ]. 2: {
+              rewrite <- Hme, <- Hmf.
+              move Hlb at bottom.
+              cbn in Hlb |-*.
+              remember (g mf mc) as fc eqn:Hfc; symmetry in Hfc.
+              destruct fc. {
+                injection Hlb; clear Hlb; intros H1 H2.
+                now move H1 at top; subst mf.
+              }
+              remember (g mf me) as fe eqn:Hfe; symmetry in Hfe.
+              destruct fe; [ easy | ].
+              unfold g in Hfe.
+              rewrite Hme, Hmf in Hfe.
+              cbn in Hfe.
+              now rewrite Nat.leb_refl in Hfe.
+            }
             rewrite <- Hme.
             (* would work if mb = md *)
 ... ...
