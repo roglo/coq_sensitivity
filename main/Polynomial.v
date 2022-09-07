@@ -422,6 +422,33 @@ split. {
       rewrite if_bool_if_dec.
       destruct (bool_dec _) as [Hdab| Hdab]. {
         apply Nat.eqb_eq in Hdab; subst db'.
+        clear - Heq IHla Hcaz Hga.
+        rename IHla into Hs.
+        revert ca da cb lb Hs Hcaz Hga.
+        induction la as [| (ca'', da'')]; intros; [ easy | ].
+        cbn in Hs |-*.
+        destruct lb as [| (cb', db')]; [ now destruct (ca + cb =? 0)%F | ].
+        rewrite if_bool_if_dec in Hs.
+        destruct (bool_dec _) as [Hcbz| Hcbz]. {
+          apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+          rewrite rngl_add_0_r; rewrite Hcaz.
+          rewrite if_bool_if_dec.
+          destruct (bool_dec _) as [Hdab| Hdab]. {
+            apply Nat.eqb_eq in Hdab; subst db'.
+            apply IHla; [ easy | easy | admit ].
+          }
+          apply (sorted_cons_iff). {
+            unfold f.
+            intros ma mb mc Hab Hbc.
+            apply Nat.ltb_lt in Hab, Hbc.
+            apply Nat.ltb_lt.
+            now transitivity (mdeg mb).
+          }
+          split; [ easy | ].
+          intros (ca''', da''') Hma.
+          unfold f.
+          cbn - [ "<?" ].
+          apply Nat.ltb_lt.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
