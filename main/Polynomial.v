@@ -448,9 +448,13 @@ split. {
       rewrite if_bool_if_dec.
       destruct (bool_dec _) as [Hdab| Hdab]. {
         apply Nat.eqb_eq in Hdab; subst db'.
-        clear - Heq IHla Hcaz Hga.
         rename IHla into Hs.
+(*
+        clear - Heq Hs Hcaz Hga.
         revert ca da cb lb Hs Hcaz Hga.
+*)
+        revert ca da cb lb Hs Hcaz Hga Hlb.
+(**)
         induction la as [| (ca'', da'')]; intros; [ easy | ].
         cbn in Hs |-*.
         destruct lb as [| (cb', db')]; [ now destruct (ca + cb =? 0)%F | ].
@@ -466,12 +470,19 @@ split. {
             remember (0*☓^db) as mc eqn:Hmc.
             remember (0*☓^da) as md eqn:Hmd.
             remember (cb'*☓^da) as me eqn:Hme.
+            remember (ca*☓^da) as mf eqn:Hmf.
             move mb before ma; move mc before mb.
-            move md before mc; move me before md.
+            move md before mc; move me before md; move mf before me.
             move Hmb before Hma; move Hmc before Hmb.
-            move Hmd before Hmc; move Hme before Hmd.
+            move Hmd before Hmc; move Hme before Hmd; move Hmf before Hme.
             move ca'' before ca'; move db before da''; move da before db.
             move cb' before ca''; move ca before cb'.
+(**)
+            assert (H : sorted g (isort g (ma :: la))). {
+              cbn in Hsis.
+              rewrite isort_insert_insert_sym in Hsis; [ | | easy | ].
+...
+            apply IHla; [ | now subst | easy | | ].
 ...
             apply IHla; [ now subst | easy | ].
             specialize (permuted_isort g (equality_monom_eqb)) as Hp.
