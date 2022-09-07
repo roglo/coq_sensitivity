@@ -477,7 +477,6 @@ split. {
             move Hmd before Hmc; move Hme before Hmd; move Hmf before Hme.
             move ca'' before ca'; move db before da''; move da before db.
             move cb' before ca''; move ca before cb'.
-(**)
             rewrite Hga in Hsis.
             assert (Htotg : total_relation g). {
               intros m1 m2; unfold g.
@@ -486,7 +485,8 @@ split. {
             assert (Hsg : sorted g (isort g (ma :: la))). {
               now apply sorted_isort.
             }
-            apply IHla; [ easy | now subst | easy | | ]. 2: {
+            specialize (IHla Hsg).
+            apply IHla; [ now subst | easy | | ]. 2: {
               rewrite <- Hme, <- Hmf.
               move Hlb at bottom.
               cbn in Hlb |-*.
@@ -503,6 +503,9 @@ split. {
               now rewrite Nat.leb_refl in Hfe.
             }
             rewrite <- Hme.
+...
+db ≤ da ≤ da ≤ da ≤ ...
+isort (da' ... da'' :: la) → db ... da ... da :: lb
             (* would work if mb = md *)
 ... ...
           }
