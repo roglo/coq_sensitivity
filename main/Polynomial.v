@@ -477,6 +477,8 @@ split. {
             specialize (permuted_isort g (equality_monom_eqb)) as Hp.
             specialize (Hp (ma :: mb :: la)) as Hp1.
             rewrite Hga in Hp1.
+            rewrite <- Hme.
+            (* would work if mb = md *)
 ... ...
           }
           apply (sorted_cons_iff). {
