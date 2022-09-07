@@ -478,9 +478,15 @@ split. {
             move ca'' before ca'; move db before da''; move da before db.
             move cb' before ca''; move ca before cb'.
 (**)
-            assert (H : sorted g (isort g (ma :: la))). {
-              cbn in Hsis.
-              rewrite isort_insert_insert_sym in Hsis; [ | | easy | ].
+            rewrite Hga in Hsis.
+            assert (Htotg : total_relation g). {
+              intros m1 m2; unfold g.
+              apply Nat_leb_total_relation.
+            }
+            assert (Hsg : sorted g (isort g (ma :: la))). {
+              now apply sorted_isort.
+            }
+            apply IHla; [ easy | now subst | easy | | ].
 ...
             apply IHla; [ | now subst | easy | | ].
 ...
