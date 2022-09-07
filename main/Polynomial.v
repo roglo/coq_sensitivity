@@ -6,9 +6,10 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import PeanoNat.Nat List ListNotations.
+Import List ListNotations.
 
-Require Import Misc RingLike IterAdd IterAnd SortingFun.
+Require Import Misc RingLike IterAdd IterAnd.
+Require Import PermutationFun SortingFun.
 
 (* definition of a monomial *)
 
@@ -336,6 +337,31 @@ Context {Hop : rngl_has_opp = true}.
 *)
 Context {H10 : rngl_has_1_neq_0 = true}.
 
+Definition monom_eqb ma mb :=
+  (rngl_eqb (mcoeff ma) (mcoeff mb) && Nat.eqb (mdeg ma) (mdeg mb))%bool.
+
+Theorem equality_monom_eqb : equality monom_eqb.
+Proof.
+intros ma mb.
+split; intros Hab. {
+  destruct ma as (ca, da).
+  destruct mb as (cb, db).
+  unfold monom_eqb in Hab; cbn in Hab.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Hcab, Hdab).
+  apply (rngl_eqb_eq Heq) in Hcab; subst cb.
+  apply Nat.eqb_eq in Hdab; subst db.
+  easy.
+} {
+  subst mb.
+  unfold monom_eqb.
+  rewrite Nat.eqb_refl, Bool.andb_true_r.
+  apply equality_refl.
+  unfold equality.
+  apply (rngl_eqb_eq Heq).
+}
+Qed.
+
 (* polynomial ring-like operators *)
 (* limited to normalised (or canonical) polynomials in order to use
    normal equality instead of equivalence relation as equality because
@@ -400,8 +426,8 @@ split. {
       remember (mdeg mb <=? mdeg ma) as mdab eqn:Hmdab.
       symmetry in Hmdab.
       destruct mdab; [ now left | right ].
-      apply leb_gt in Hmdab.
-      now apply leb_le, lt_le_incl.
+      apply Nat.leb_gt in Hmdab.
+      now apply Nat.leb_le, Nat.lt_le_incl.
     }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst ca db.
@@ -435,7 +461,22 @@ split. {
           rewrite if_bool_if_dec.
           destruct (bool_dec _) as [Hdab| Hdab]. {
             apply Nat.eqb_eq in Hdab; subst db'.
-            apply IHla; [ easy | easy | admit ].
+            apply IHla; [ easy | easy | ].
+            remember (ca'*☓^da') as ma eqn:Hma.
+            remember (ca''*☓^da'') as mb eqn:Hmb.
+            remember (0*☓^db) as mc eqn:Hmc.
+            remember (0*☓^da) as md eqn:Hmd.
+            remember (cb'*☓^da) as me eqn:Hme.
+            move mb before ma; move mc before mb.
+            move md before mc; move me before md.
+            move Hmb before Hma; move Hmc before Hmb.
+            move Hmd before Hmc; move Hme before Hmd.
+            move ca'' before ca'; move db before da''; move da before db.
+            move cb' before ca''; move ca before cb'.
+            specialize (permuted_isort g (equality_monom_eqb)) as Hp.
+            specialize (Hp (ma :: mb :: la)) as Hp1.
+            specialize (Hp (ma :: la)) as Hp2.
+...
           }
           apply (sorted_cons_iff). {
             unfold f.
