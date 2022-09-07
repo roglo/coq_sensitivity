@@ -449,6 +449,7 @@ split. {
           unfold f.
           cbn - [ "<?" ].
           apply Nat.ltb_lt.
+          remember (cb'*☓^db' :: lb) as lc eqn:Hlc.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
