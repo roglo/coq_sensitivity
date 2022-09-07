@@ -419,6 +419,11 @@ split. {
       apply Nat.leb_le.
       now transitivity (mdeg mb).
     }
+    assert (Httg : total_relation g). {
+      intros ma mb.
+      unfold g; cbn.
+      apply Nat_leb_total_relation.
+    }
     assert (Hsis : sorted g (isort g la)). {
       apply sorted_isort.
       intros ma mb; unfold g.
@@ -436,6 +441,37 @@ split. {
     }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
+(**)
+      remember (ca*☓^da) as ma eqn:Hma.
+      remember (0*☓^db) as mb eqn:Hmb.
+      move lb before la; move db before da.
+      move ma before lb; move mb before ma.
+      assert (Hdab : da ≤ db). {
+        assert (Hs : sorted g (mb :: ma :: lb)). {
+          rewrite <- Hlb.
+          apply sorted_isort_insert; [ easy | easy ].
+        }
+        apply (sorted_cons_iff Htrg) in Hs.
+        destruct Hs as (Hs & Hsb).
+        specialize (Hsb ma (or_introl eq_refl)) as H1.
+        unfold g in H1; rewrite Hma, Hmb in H1; cbn in H1.
+        now apply Nat.leb_le in H1.
+      }
+...
+        apply (f_equal (sorted g)) in Hlb.
+        unfold sorted in Hlb.
+        rewrite sorted_isort_insert in Hlb.
+        cbn in Hlb.
+        unfold g in Hlb.
+        rewrite Hma, Hmb in Hlb.
+        cbn in Hlb.
+        apply Nat.leb_gt in Hab.
+        rewrite Hab in Hlb; cbn in Hlb.
+...
+        destruct la as [| mc]; [ easy | ].
+        cbn in Hlb.
+        cbn in Hsis.
+...
       generalize Hlb; intros Hga.
       apply isort_insert_sorted_cons2 in Hga; [ | easy | easy ].
       rewrite Hga in IHla, Hlb.
@@ -449,12 +485,7 @@ split. {
       destruct (bool_dec _) as [Hdab| Hdab]. {
         apply Nat.eqb_eq in Hdab; subst db'.
         rename IHla into Hs.
-(*
-        clear - Heq Hs Hcaz Hga.
-        revert ca da cb lb Hs Hcaz Hga.
-*)
         revert ca da cb lb Hs Hcaz Hga Hlb.
-(**)
         induction la as [| (ca'', da'')]; intros; [ easy | ].
         cbn in Hs |-*.
         destruct lb as [| (cb', db')]; [ now destruct (ca + cb =? 0)%F | ].
