@@ -380,8 +380,8 @@ split. {
   move lb before la.
   destruct lb as [| (cb, db)]; [ easy | ].
   destruct lb as [| (cc, dc)]; [ now destruct (cb =? 0)%F | ].
-  remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
-  destruct cbz. {
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hcbz| Hcbz]. {
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
     specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
@@ -413,43 +413,15 @@ split. {
       generalize Hlb; intros Hga.
       apply isort_insert_sorted_cons2 in Hga; [ | easy | easy ].
       rewrite Hga in IHla, Hlb.
-...
-      destruct la as [| (cc, dc)]; [ easy | ].
-      cbn in IHla |-*.
-      destruct lb as [| (cd, dd)]; [ now destruct (ca =? 0)%F | ].
-      rewrite equality_refl in IHla. 2: {
-        unfold equality.
-        apply (rngl_eqb_eq Heq).
-      }
-      remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
-      destruct caz; [ easy | ].
-      remember (da =? dd) as dad eqn:Hdad; symmetry in Hdad.
-      destruct dad. {
-        apply Nat.eqb_eq in Hdad; subst dd.
-        rewrite Hlb in Hsis.
-        assert (Hlab : length la = length (cd*☓^da :: lb)). {
-          apply (f_equal length) in Hlb.
-          rewrite isort_length in Hlb; cbn in Hlb.
-          now apply Nat.succ_inj in Hlb.
-        }
-        rewrite Hlab in IHla.
-        assert (H : cd*☓^da :: lb = isort f (cd*☓^da :: lb)). {
-          symmetry.
-          apply isort_when_sorted.
-...
-Print monl_norm_nb_iter.
-Theorem fold_monl_norm_nb_iter : ∀ (la : list (monom T)),
-  length la = monl_norm_nb_iter la.
-Proof. easy. Qed.
-rewrite fold_monl_norm_nb_iter in IHla.
-Print monl_norm.
-Theorem fold_monl_norm : ∀ la,
-  monl_norm_loop (monl_norm_nb_iter la)
-    (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) =
-  monl_norm la.
-Proof. easy. Qed.
-        unfold f in IHla.
-        rewrite fold_monl_norm in IHla.
+      destruct la as [| (ca', da')]; [ easy | ].
+      cbn in IHla.
+      rewrite (equality_refl (rngl_eqb_eq Heq)) in IHla.
+      destruct lb as [| (cb, db')]; cbn; [ now destruct (ca =? 0)%F | ].
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Hcaz| Hcaz]; [ easy | ].
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Hdab| Hdab]. {
+        apply Nat.eqb_eq in Hdab; subst db'.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
