@@ -461,7 +461,6 @@ split. {
           rewrite if_bool_if_dec.
           destruct (bool_dec _) as [Hdab| Hdab]. {
             apply Nat.eqb_eq in Hdab; subst db'.
-            apply IHla; [ easy | easy | ].
             remember (ca'*☓^da') as ma eqn:Hma.
             remember (ca''*☓^da'') as mb eqn:Hmb.
             remember (0*☓^db) as mc eqn:Hmc.
@@ -473,10 +472,12 @@ split. {
             move Hmd before Hmc; move Hme before Hmd.
             move ca'' before ca'; move db before da''; move da before db.
             move cb' before ca''; move ca before cb'.
+...
+            apply IHla; [ now subst | easy | ].
             specialize (permuted_isort g (equality_monom_eqb)) as Hp.
             specialize (Hp (ma :: mb :: la)) as Hp1.
-            specialize (Hp (ma :: la)) as Hp2.
-...
+            rewrite Hga in Hp1.
+... ...
           }
           apply (sorted_cons_iff). {
             unfold f.
