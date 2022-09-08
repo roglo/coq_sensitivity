@@ -504,18 +504,24 @@ split; intros Hab. {
   cbn in Hab |-*.
   destruct la as [| (ca, da)]; [ easy | ].
   destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
-  destruct (ca =? 0)%F; [ now apply IHit | ].
-  destruct (da =? db); [ now apply IHit | ].
+  remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+  destruct caz; [ now apply IHit | ].
+  apply (rngl_eqb_neq Heq) in Hcaz.
+  remember (da =? db) as dab eqn:Hdab; symmetry in Hdab.
+  destruct dab; [ now apply IHit | ].
+  apply Nat.eqb_neq in Hdab.
   apply sorted_cons_iff in Hab; [ | easy ].
   apply sorted_cons_iff; [ easy | ].
   destruct Hab as (Hsf, Hab).
   split; [ now apply IHit | ].
-  intros ma Hma.
-  specialize (Hab ma Hma).
-  unfold g in Hab; unfold f.
-  cbn - [ "<?" ] in Hab |-*.
-  apply Nat.leb_le in Hab.
+  intros (cc, dc) Hmc.
+  specialize (Hab _ Hmc) as H1.
+  unfold g in H1; unfold f.
+  cbn - [ "<?" ] in H1 |-*.
+  apply Nat.leb_le in H1.
   apply Nat.ltb_lt.
+  destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H1 H ].
+  clear H1; exfalso.
 ... ...
 apply sorted_monl_norm_loop_lt_le_iff in IHla.
 apply sorted_monl_norm_loop_lt_le_iff.
