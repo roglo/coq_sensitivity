@@ -52,7 +52,7 @@ Qed.
 
 Definition AllLt l u := ∀ i, i ∈ l → i < u.
 
-(* iterations in list of naturals
+(* iterations in a list
    in order to later define syntaxes : Max, Σ, Π, ...
    e.g. "Σ (i ∈ l), f i", "Π (i ∈ l), f i", ... *)
 
