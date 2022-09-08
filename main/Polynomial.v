@@ -483,7 +483,7 @@ assert (Htrg : transitive g). {
 split; intros Hab. {
   revert la Hab.
   induction it; intros; [ easy | ].
-  cbn - [ "<?" ] in Hab |-*.
+  cbn in Hab |-*.
   destruct la as [| (ca, da)]; [ easy | ].
   destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
   destruct (ca =? 0)%F; [ now apply IHit | ].
@@ -495,9 +495,27 @@ split; intros Hab. {
   intros ma Hma.
   specialize (Hab ma Hma).
   unfold f in Hab; unfold g.
+  cbn - [ "<?" ] in Hab |-*.
   apply Nat.ltb_lt in Hab.
   now apply Nat.leb_le, Nat.lt_le_incl.
 } {
+  revert la Hab.
+  induction it; intros; [ easy | ].
+  cbn in Hab |-*.
+  destruct la as [| (ca, da)]; [ easy | ].
+  destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
+  destruct (ca =? 0)%F; [ now apply IHit | ].
+  destruct (da =? db); [ now apply IHit | ].
+  apply sorted_cons_iff in Hab; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hab as (Hsf, Hab).
+  split; [ now apply IHit | ].
+  intros ma Hma.
+  specialize (Hab ma Hma).
+  unfold g in Hab; unfold f.
+  cbn - [ "<?" ] in Hab |-*.
+  apply Nat.leb_le in Hab.
+  apply Nat.ltb_lt.
 ... ...
 apply sorted_monl_norm_loop_lt_le_iff in IHla.
 apply sorted_monl_norm_loop_lt_le_iff.
