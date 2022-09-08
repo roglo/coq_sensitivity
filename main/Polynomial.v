@@ -457,6 +457,8 @@ split. {
         unfold g in H1; rewrite Hma, Hmb in H1; cbn in H1.
         now apply Nat.leb_le in H1.
       }
+      destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
+        subst ca.
 ...
         apply (f_equal (sorted g)) in Hlb.
         unfold sorted in Hlb.
