@@ -523,6 +523,14 @@ split; intros Hab. {
   destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H1 H ].
   clear H1; exfalso.
   specialize (IHit _ Hsg) as Hsf.
+(**)
+...
+Theorem sorted_deg_lt_monl_norm_loop_nodup : ∀ it la,
+  sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la)
+  → NoDup la.
+...
+apply sorted_deg_lt_monl_norm_loop_nodup in Hsf.
+...
   assert (H : cc*☓^da ∈ monl_norm_loop it la). {
     destruct it; [ easy | ].
     cbn in Hmc |-*.
@@ -531,6 +539,13 @@ split; intros Hab. {
       destruct Hmc as [Hmc| Hmc]; [ | easy ].
       now injection Hmc; clear Hmc; intros; subst db.
     }
+(**)
+    remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+    destruct cbz. {
+      apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+      cbn in Hsf.
+      rewrite (equality_refl) in Hsf.
+...
     destruct la as [| (ca'', da'')]. {
       remember (ca' =? 0)%F as caz' eqn:Hcaz'; symmetry in Hcaz'.
       destruct caz'. {
