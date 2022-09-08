@@ -464,7 +464,40 @@ Theorem sorted_monl_norm_loop_lt_le_iff : ∀ it la,
   ↔ sorted (λ ma mb, mdeg mb <=? mdeg ma) (monl_norm_loop it la).
 Proof.
 intros.
+set (f := λ ma mb, _).
+set (g := λ ma mb, _).
+assert (Htrf : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+assert (Htrg : transitive g). {
+  intros ma mb mc Hmab Hmbc.
+  unfold g in Hmab, Hmbc|-*.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
 split; intros Hab. {
+  revert la Hab.
+  induction it; intros; [ easy | ].
+  cbn - [ "<?" ] in Hab |-*.
+  destruct la as [| (ca, da)]; [ easy | ].
+  destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
+  destruct (ca =? 0)%F; [ now apply IHit | ].
+  destruct (da =? db); [ now apply IHit | ].
+  apply sorted_cons_iff in Hab; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hab as (Hsf, Hab).
+  split; [ now apply IHit | ].
+  intros ma Hma.
+  specialize (Hab ma Hma).
+  unfold f in Hab; unfold g.
+  apply Nat.ltb_lt in Hab.
+  now apply Nat.leb_le, Nat.lt_le_incl.
+} {
 ... ...
 apply sorted_monl_norm_loop_lt_le_iff in IHla.
 apply sorted_monl_norm_loop_lt_le_iff.
