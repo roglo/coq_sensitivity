@@ -459,9 +459,16 @@ split. {
       }
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
-...
-prove that
-is_sorted f (monl_norm_loop _ _) ↔ is_sorted g (monl_norm_loop _ _)
+Theorem sorted_monl_norm_loop_lt_le_iff : ∀ it la,
+  sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la)
+  ↔ sorted (λ ma mb, mdeg mb <=? mdeg ma) (monl_norm_loop it la).
+Proof.
+intros.
+split; intros Hab. {
+... ...
+apply sorted_monl_norm_loop_lt_le_iff in IHla.
+apply sorted_monl_norm_loop_lt_le_iff.
+fold g in IHla |-*.
 ...
         apply (f_equal (sorted g)) in Hlb.
         unfold sorted in Hlb.
