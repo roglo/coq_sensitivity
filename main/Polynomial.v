@@ -512,7 +512,7 @@ split; intros Hab. {
   apply Nat.eqb_neq in Hdab.
   apply sorted_cons_iff in Hab; [ | easy ].
   apply sorted_cons_iff; [ easy | ].
-  destruct Hab as (Hsf, Hab).
+  destruct Hab as (Hsg, Hab).
   split; [ now apply IHit | ].
   intros (cc, dc) Hmc.
   specialize (Hab _ Hmc) as H1.
@@ -522,6 +522,7 @@ split; intros Hab. {
   apply Nat.ltb_lt.
   destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H1 H ].
   clear H1; exfalso.
+  specialize (IHit _ Hsg) as Hsf.
 ... ...
 apply sorted_monl_norm_loop_lt_le_iff in IHla.
 apply sorted_monl_norm_loop_lt_le_iff.
