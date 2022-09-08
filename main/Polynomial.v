@@ -460,6 +460,9 @@ split. {
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
 ...
+prove that
+is_sorted f (monl_norm_loop _ _) ↔ is_sorted g (monl_norm_loop _ _)
+...
         apply (f_equal (sorted g)) in Hlb.
         unfold sorted in Hlb.
         rewrite sorted_isort_insert in Hlb.
