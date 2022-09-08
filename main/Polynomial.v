@@ -523,6 +523,28 @@ split; intros Hab. {
   destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H1 H ].
   clear H1; exfalso.
   specialize (IHit _ Hsg) as Hsf.
+  assert (H : cc*☓^da ∈ monl_norm_loop it la). {
+    destruct it; [ easy | ].
+    cbn in Hmc |-*.
+    destruct la as [| (ca', da')]. {
+      destruct (cb =? 0)%F; [ easy | ].
+      destruct Hmc as [Hmc| Hmc]; [ | easy ].
+      now injection Hmc; clear Hmc; intros; subst db.
+    }
+    destruct la as [| (ca'', da'')]. {
+      remember (ca' =? 0)%F as caz' eqn:Hcaz'; symmetry in Hcaz'.
+      destruct caz'. {
+        exfalso.
+        apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
+        cbn in Hsf.
+        remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+        destruct cbz. {
+          apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+(* bon, je m'en sors pas *)
+...
+      destruct Hmc as [Hmc| Hmc]; [ | easy ].
+      now injection Hmc; clear Hmc; intros; subst db.
+    }
 ... ...
 apply sorted_monl_norm_loop_lt_le_iff in IHla.
 apply sorted_monl_norm_loop_lt_le_iff.
