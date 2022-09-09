@@ -1916,15 +1916,6 @@ rewrite sign_diff'_sign_diff; [ | easy ].
 now apply sign_diff_mul.
 Qed.
 
-Theorem fold_comp_lt : ∀ la lb i,
-  i < length lb
-  → nth (nth i lb 0) la 0 = nth i (la ° lb) 0.
-Proof.
-intros * Hib.
-unfold "°".
-now rewrite (List_map_nth' 0).
-Qed.
-
 Theorem map_nth_permut_seq : ∀ n la lb,
   permut_seq_with_len n la
   → permut_seq_with_len n lb

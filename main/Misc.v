@@ -810,45 +810,6 @@ intros * Hi.
 now apply List_rank_loop_Some_lt in Hi.
 Qed.
 
-Theorem find_vs_rank : ∀ A f l (d : A),
-  find f l = option_map (λ i, nth i l d) (List_rank f l).
-Proof.
-intros.
-remember (List_rank f l) as n eqn:Hn; symmetry in Hn.
-destruct n as [n| ]; cbn. {
-  apply (List_rank_Some d) in Hn.
-  destruct Hn as (Hnl & Hfn & Hn).
-  revert n Hnl Hfn Hn.
-  induction l as [| a]; intros; [ easy | cbn ].
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    destruct n; [ easy | f_equal ].
-    specialize (Hfn 0 (Nat.lt_0_succ _)).
-    cbn in Hfn; congruence.
-  }
-  destruct n; [ cbn in Hn; congruence | ].
-  cbn in Hnl, Hn.
-  apply Nat.succ_lt_mono in Hnl.
-  apply IHl; [ easy | | easy ].
-  intros i Hi.
-  apply (Hfn (S i)).
-  now apply Nat.succ_lt_mono in Hi.
-} {
-  specialize (List_rank_None d _ _ Hn) as Hfn.
-  clear Hn.
-  induction l as [| a]; [ easy | cbn ].
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    specialize (Hfn 0 (Nat.lt_0_succ _)).
-    cbn in Hfn; congruence.
-  }
-  apply IHl.
-  intros i Hi.
-  apply (Hfn (S i)).
-  now apply Nat.succ_lt_mono in Hi.
-}
-Qed.
-
 (* end List_rank *)
 
 Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.

@@ -22,10 +22,6 @@ Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
 
 Definition permutation A (eqb : A → _) la lb := is_permutation eqb la lb = true.
 
-Theorem fold_permutation : ∀ A (eqb : A → _) la lb,
-  is_permutation eqb la lb = true → permutation eqb la lb.
-Proof. easy. Qed.
-
 (*
 Require Import Relations.
 

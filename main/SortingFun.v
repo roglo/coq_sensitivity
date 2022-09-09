@@ -1115,10 +1115,6 @@ apply sorted_merge; [ easy | | ]. {
 }
 Qed.
 
-Theorem fold_merge : ∀ A (rel : A → _) la lb,
-  merge_loop rel (length la + length lb) la lb = merge rel la lb.
-Proof. easy. Qed.
-
 Theorem merge_loop_when_sorted : ∀ A (rel : A → _),
   antisymmetric rel →
   transitive rel →

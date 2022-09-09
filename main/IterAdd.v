@@ -655,17 +655,6 @@ apply Hgh.
 flia Hi.
 Qed.
 
-Theorem fold_left_add_fun_from_0 {A} : ∀ a l (f : A → nat),
-  fold_left (λ c i, c + f i) l a =
-  a + fold_left (λ c i, c + f i) l 0.
-Proof.
-intros.
-revert a.
-induction l as [| x l]; intros; [ symmetry; apply Nat.add_0_r | cbn ].
-rewrite IHl; symmetry; rewrite IHl.
-apply Nat.add_assoc.
-Qed.
-
 Theorem rngl_summation_le_compat :
   rngl_is_ordered = true →
   ∀ b e g h,
