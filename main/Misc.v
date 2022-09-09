@@ -456,31 +456,6 @@ split. {
 }
 Qed.
 
-Theorem List_filter_filter : ∀ A (f g : A → bool) l,
-  filter f (filter g l) = filter (λ x, (f x && g x)%bool) l.
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-rewrite if_bool_if_dec.
-destruct (bool_dec (g a)) as [Hga| Hga]; rewrite Hga. 2: {
-  now rewrite Bool.andb_false_r.
-}
-rewrite Bool.andb_true_r; cbn.
-rewrite if_bool_if_dec.
-destruct (bool_dec (f a)) as [Hfa| Hfa]; rewrite Hfa; [ | easy ].
-now f_equal.
-Qed.
-
-Theorem List_filter_length_le : ∀ A f (l : list A),
-  length (filter f l) ≤ length l.
-Proof.
-intros.
-induction l as [| a]; [ easy | cbn ].
-destruct (f a); cbn; [ now apply Nat.succ_le_mono in IHl | ].
-etransitivity; [ apply IHl | ].
-apply Nat.le_succ_diag_r.
-Qed.
-
 Theorem List_partition_filter_iff : ∀ A (f : A → _) la lb lc,
   partition f la = (lb, lc)
   ↔ filter f la = lb ∧ filter (λ a, negb (f a)) la = lc.
@@ -526,15 +501,6 @@ split. {
     now injection IHla; clear IHla; intros; subst ld le.
   }
 }
-Qed.
-
-Theorem List_add_length_filter_length_filter_negb : ∀ A f (la : list A),
-  length (filter f la) + length (filter (λ x, negb (f x)) la) = length la.
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-destruct (f a); cbn; [ now f_equal | ].
-now rewrite Nat.add_succ_r; f_equal.
 Qed.
 
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
@@ -1996,9 +1962,6 @@ intros i lb Hi; apply in_seq in Hi.
 now rewrite map_length, seq_length.
 Qed.
 
-Theorem List_eq_repeat_nil : ∀ A (l : list A) n, repeat l n = [] → n = 0.
-Proof. now intros; destruct n. Qed.
-
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
 Proof.
 intros * Hl.
@@ -2236,32 +2199,6 @@ f_equal; [ apply (Hll a1 0) | ].
 apply IHl1; [ easy | ].
 intros.
 now specialize (Hll d (S i)).
-Qed.
-
-Theorem List_combine_map_r : ∀ A B C (la : list A) (lb : list B) (f : B → C),
-  combine la (map f lb) = map (λ ab, (fst ab, f (snd ab))) (combine la lb).
-Proof.
-intros.
-revert lb.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-f_equal.
-apply IHla.
-Qed.
-
-Theorem List_combine_app_app : ∀ A B (la1 la2 : list A) (lb1 lb2 : list B),
-  length la1 = length lb1
-  → combine (la1 ++ la2) (lb1 ++ lb2) = combine la1 lb1 ++ combine la2 lb2.
-Proof.
-intros * Hlab.
-revert la2 lb1 lb2 Hlab.
-induction la1 as [| a1]; intros; cbn. {
-  now symmetry in Hlab; apply length_zero_iff_nil in Hlab; subst lb1.
-}
-destruct lb1 as [| b]; [ easy | ].
-cbn in Hlab; apply Nat.succ_inj in Hlab.
-cbn; f_equal.
-now apply IHla1.
 Qed.
 
 (* common for all iterators *)
