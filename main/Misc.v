@@ -1106,17 +1106,6 @@ Definition insert_at A k (la : list A) e :=
 Definition replace_at {A} k (la : list A) e :=
   firstn k la ++ e :: skipn (S k) la.
 
-Theorem length_replace_at : ∀ A k la (e : A),
-  k < length la
-  → length (replace_at k la e) = length la.
-Proof.
-intros * Hkla.
-unfold replace_at.
-rewrite app_length, firstn_length.
-rewrite List_cons_length, skipn_length.
-flia Hkla.
-Qed.
-
 Theorem replace_at_succ_cons : ∀ A i a b (l : list A),
   replace_at (S i) (a :: l) b = a :: replace_at i l b.
 Proof. easy. Qed.
@@ -1222,28 +1211,6 @@ Fixpoint list_compare {A} (compare : A → A → comparison) la lb :=
 Definition comparator {A} (compare : A → _) :=
   ∀ a b, compare a b = Eq ↔ a = b.
 
-Theorem list_compare_eq_iff : ∀ A (compare : A → _),
-  comparator compare →
-  ∀ la lb, list_compare compare la lb = Eq ↔ la = lb.
-Proof.
-intros * Hcomp *.
-split; intros Hlab. {
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn in Hlab ].
-  remember (compare a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy | easy ].
-  apply Hcomp in Hab.
-  subst b; f_equal.
-  now apply IHla.
-} {
-  subst lb.
-  induction la as [| a]; [ easy | cbn ].
-  unfold comparator in Hcomp.
-  now rewrite (proj2 (Hcomp a a) eq_refl).
-}
-Qed.
-
 (* list_eqv *)
 
 Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
@@ -1259,46 +1226,6 @@ Fixpoint list_eqv A (eqv : A → A → bool) la lb :=
       | b :: lb' => if eqv a b then list_eqv eqv la' lb' else false
       end
   end.
-
-Theorem list_eqv_eq : ∀ A (eqv : A → _) d la lb,
-  list_eqv eqv la lb = true ↔
-  length la = length lb ∧
-  ∀ i, i < length la → eqv (nth i la d) (nth i lb d) = true.
-Proof.
-intros.
-split; intros Hlab. {
-  revert lb Hlab.
-  induction la as [| a]; intros; [ now destruct lb | cbn ].
-  destruct lb as [| b]; [ easy | cbn in Hlab ].
-  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  specialize (IHla lb Hlab) as H1.
-  destruct H1 as (H1, H2).
-  split; [ now rewrite H1 | ].
-  intros i Hi; cbn.
-  destruct i; [ easy | ].
-  apply Nat.succ_lt_mono in Hi.
-  now apply H2.
-} {
-  destruct Hlab as (Hlab & Heab).
-  revert lb Hlab Heab.
-  induction la as [| a]; intros. {
-    symmetry in Hlab.
-    now apply length_zero_iff_nil in Hlab; subst lb.
-  }
-  destruct lb as [| b]; [ easy | cbn ].
-  cbn in Hlab; apply Nat.succ_inj in Hlab.
-  remember (eqv a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    apply IHla; [ easy | ].
-    intros i Hi.
-    apply (Heab (S i)).
-    now cbn; apply -> Nat.succ_lt_mono.
-  }
-  specialize (Heab 0) as H1; cbn in H1.
-  now rewrite H1 in Hab.
-}
-Qed.
 
 Theorem list_eqb_eq : ∀ A (eqb : A → _),
   equality eqb →
@@ -1707,16 +1634,6 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
-Theorem list_all_nth_prop : ∀ A (P : A → Prop) l d,
-  (∀ x, x ∈ l → P x)
-  → ∀ i, i < length l → P (nth i l d).
-Proof.
-intros * HP.
-intros i Hi.
-apply HP.
-now apply nth_In.
-Qed.
-
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
   map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
 Proof.
@@ -1811,12 +1728,6 @@ induction l as [| a la]; intros. {
 destruct j; [ now rewrite Nat.add_0_r | ].
 rewrite Nat.add_succ_r; cbn.
 apply IHla.
-Qed.
-
-Theorem length_nzero_iff_nnil : ∀ A (l : list A), length l ≠ 0 ↔ l ≠ [].
-Proof.
-intros.
-now split; intros H1 H2; apply H1; apply length_zero_iff_nil.
 Qed.
 
 Theorem List_app_eq_app' :
@@ -2093,10 +2004,6 @@ unfold iter_list; cbn.
 rewrite op_d_l.
 now apply (fold_left_op_fun_from_d d).
 Qed.
-
-Theorem iter_list_cons' : ∀ A B a l (f : A → B → A) d,
-  iter_list (a :: l) f d = iter_list l f (f d a).
-Proof. easy. Qed.
 
 Theorem iter_list_eq_compat : ∀ A B d (op : A → A → A) (l : list B) g h,
   (∀ i, i ∈ l → g i = h i)

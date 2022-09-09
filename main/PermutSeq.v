@@ -1940,17 +1940,6 @@ unfold permut_seq in H1.
 now rewrite isort_rank_length in H1.
 Qed.
 
-(*
-Theorem isort_rank_permut_seq' : ∀ A (rel : A → _) l,
-  permut_seq (isort_rank rel l).
-Proof.
-intros.
-unfold permut_seq.
-rewrite isort_rank_length.
-Search (permutation _ (isort_rank _ _)).
-...
-*)
-
 (* *)
 
 Theorem nth_canon_sym_gr_list_ub : ∀ d i n k,

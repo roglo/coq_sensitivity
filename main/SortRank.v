@@ -423,64 +423,6 @@ destruct lrank as [| ib]; [ easy | cbn in Hla ].
 now destruct (rel (f ia) (f ib)).
 Qed.
 
-Theorem isort_rank_app_map_S_zero : ∀ la,
-  isort_rank Nat.leb (map S la ++ [0]) =
-  length la :: isort_rank Nat.leb la.
-Proof.
-intros.
-induction la as [| ia]; [ easy | ].
-cbn - [ nth ].
-rewrite IHla.
-clear IHla.
-cbn - [ nth ].
-rewrite List_nth_0_cons.
-rewrite List_nth_succ_cons.
-rewrite app_nth2; [ | now rewrite map_length; unfold ge ].
-rewrite map_length, Nat.sub_diag, List_nth_0_cons.
-cbn - [ nth ].
-f_equal.
-apply isort_rank_insert_eq_compat.
-intros ib ic Hib Hic.
-destruct Hib as [Hib| Hib]. {
-  subst ib.
-  do 2 rewrite List_nth_0_cons.
-  destruct Hic as [Hic| Hic]. {
-    subst ic.
-    now do 2 rewrite List_nth_0_cons.
-  }
-  apply in_map_iff in Hic.
-  destruct Hic as (id & H & Hid); subst ic.
-  do 2 rewrite List_nth_succ_cons.
-  apply in_isort_rank in Hid.
-  rewrite app_nth1; [ | now rewrite map_length ].
-  rewrite (List_map_nth' 0); [ | easy ].
-  cbn; symmetry.
-  now rewrite nth_indep with (d' := 0).
-}
-apply in_map_iff in Hib.
-destruct Hib as (id & H & Hid); subst ib.
-do 2 rewrite List_nth_succ_cons.
-apply in_isort_rank in Hid.
-rewrite app_nth1; [ | now rewrite map_length ].
-rewrite (List_map_nth' 0); [ | easy ].
-destruct Hic as [Hic| Hic]. {
-  subst ic.
-  do 2 rewrite List_nth_0_cons.
-  symmetry.
-  now rewrite nth_indep with (d' := 0).
-}
-apply in_map_iff in Hic.
-destruct Hic as (ie & H & Hie); subst ic.
-do 2 rewrite List_nth_succ_cons.
-apply in_isort_rank in Hie.
-rewrite app_nth1; [ | now rewrite map_length ].
-rewrite (List_map_nth' 0); [ | easy ].
-symmetry.
-rewrite nth_indep with (d' := 0); [ | easy ].
-rewrite nth_indep with (d := ia) (d' := 0); [ | easy ].
-easy.
-Qed.
-
 (* collapse: transforms a list of n different naturals into a permutation of
    {0..n-1} such that they are in the same order than the initial list;
    E.g. collapse [3;1;7;2] = [2;0;3;1]; it is the list of the ranks.

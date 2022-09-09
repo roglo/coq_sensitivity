@@ -2809,21 +2809,6 @@ apply Nat.ltb_ge in Hab, Hba.
 now apply Nat.le_antisymm.
 Qed.
 
-(* *)
-
-Theorem isort_insert_map : ∀ A B (rel : A → _) a lsorted (f : B → _),
-  isort_insert rel (f a) (map f lsorted) =
-  map f (isort_insert (λ x y, rel (f x) (f y)) a lsorted).
-Proof.
-intros.
-revert a.
-induction lsorted as [| b]; intros; [ easy | cbn ].
-remember (rel (f a) (f b)) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ easy | cbn ].
-f_equal.
-apply IHlsorted.
-Qed.
-
 (* isort and ssort return same *)
 
 Theorem isort_ssort : ∀ (A : Type) (eqb : A → _) (rel : A → A → bool),
