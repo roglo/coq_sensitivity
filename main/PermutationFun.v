@@ -1062,23 +1062,6 @@ Qed.
 
 (* *)
 
-Theorem List_rank_loop_eqb_inside : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ l1 l2 a i,
-  List_rank_loop i (eqb a) (l1 ++ a :: l2) ≠ None.
-Proof.
-intros * Heqb *.
-revert i.
-induction l1 as [| b]; intros. {
-  cbn.
-  now rewrite (equality_refl Heqb).
-}
-cbn.
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ easy | ].
-apply IHl1.
-Qed.
-
 Theorem List_rank_loop_extract : ∀ A (la : list A) f i,
   List_rank_loop i f la =
   match extract f la with

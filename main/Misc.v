@@ -1868,23 +1868,6 @@ destruct l as [| a]; [ easy | cbn in Hl ].
 now apply app_eq_nil in Hl.
 Qed.
 
-Theorem List_rev_inj : ∀ A (la lb : list A), rev la = rev lb → la = lb.
-Proof.
-intros * Hab.
-apply (f_equal (@rev A)) in Hab.
-now do 2 rewrite rev_involutive in Hab.
-Qed.
-
-Theorem List_rev_nth : ∀ A (ll : list (list A)) i,
-  rev (nth i ll []) = nth i (map (@rev A) ll) [].
-Proof.
-intros.
-revert i.
-induction ll as [| l]; intros; cbn - [ nth ]; [ now rewrite List_nth_nil | ].
-destruct i; [ easy | cbn ].
-apply IHll.
-Qed.
-
 Theorem list_all_nth_prop : ∀ A (P : A → Prop) l d,
   (∀ x, x ∈ l → P x)
   → ∀ i, i < length l → P (nth i l d).
@@ -1989,30 +1972,6 @@ induction l as [| a la]; intros. {
 destruct j; [ now rewrite Nat.add_0_r | ].
 rewrite Nat.add_succ_r; cbn.
 apply IHla.
-Qed.
-
-Theorem List_skipn_map_nth_seq : ∀ A (d : A) i l,
-  skipn i l = map (λ k, nth (k + i) l d) (seq 0 (length l - i)).
-Proof.
-intros.
-revert i.
-induction l as [| j]; intros; [ apply skipn_nil | ].
-rewrite List_cons_length.
-destruct i. {
-  rewrite Nat.sub_0_r.
-  cbn - [ nth ]; f_equal.
-  rewrite <- seq_shift, map_map.
-  erewrite map_ext_in. 2: {
-    intros k Hk.
-    now rewrite Nat.add_0_r.
-  }
-  apply List_map_nth_seq.
-}
-cbn - [ nth ].
-rewrite IHl.
-apply map_ext_in.
-intros k Hk.
-now rewrite Nat.add_succ_r.
 Qed.
 
 Theorem length_nzero_iff_nnil : ∀ A (l : list A), length l ≠ 0 ↔ l ≠ [].
@@ -3213,23 +3172,6 @@ cbn in Hla.
 injection Hla; clear Hla; intros Hla H1; subst b.
 f_equal.
 now apply IHla.
-Qed.
-
-(* the coq theorem "repeat_eq_cons" misses the conclusion
-   that n ≠ 0 *)
-Theorem List_repeat_eq_cons_iff : ∀ A (x y : A) n l,
-  repeat x n = y :: l ↔ n ≠ 0 ∧ x = y ∧ repeat x (pred n) = l.
-Proof.
-intros.
-split. {
-  intros Hxy.
-  destruct n; [ easy | ].
-  split; [ easy | ].
-  now apply repeat_eq_cons.
-} {
-  intros (Hnz & Hxy & Hr); subst y l.
-  now destruct n.
-}
 Qed.
 
 (* *)
