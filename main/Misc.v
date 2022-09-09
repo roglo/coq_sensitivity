@@ -290,17 +290,6 @@ Notation "a ≢ b 'mod' c" := (a mod c ≠ b mod c) (at level 70, b at level 36)
 Theorem List_hd_nth_0 {A} : ∀ l (d : A), hd d l = nth 0 l d.
 Proof. intros; now destruct l. Qed.
 
-Theorem List_last_nth {A} : ∀ l (d : A), last l d = nth (length l - 1) l d.
-Proof.
-intros.
-induction l using rev_ind; [ easy | ].
-rewrite app_length; cbn.
-rewrite Nat.add_sub.
-rewrite last_last.
-rewrite app_nth2; [ | now unfold ge ].
-now rewrite Nat.sub_diag.
-Qed.
-
 Theorem List_hd_in : ∀ A (l : list A) d, 0 < length l → hd d l ∈ l.
 Proof.
 intros.
@@ -355,15 +344,6 @@ do 2 rewrite List_hd_nth_0.
 now apply List_map_nth'.
 Qed.
 
-Theorem List_map_const_is_repeat : ∀ A B b (f : A → B) l,
-  (∀ a, f a = b)
-  → map f l = repeat b (length l).
-Proof.
-intros * Hf.
-induction l as [| a]; [ easy | ].
-cbn; rewrite Hf; f_equal; apply IHl.
-Qed.
-
 Theorem List_app_cons : ∀ A la lb (b : A), la ++ b :: lb = la ++ [b] ++ lb.
 Proof. easy. Qed.
 
@@ -407,31 +387,6 @@ destruct la as [| b]; [ easy | ].
 cbn in Haf.
 destruct Haf; [ now left | right ].
 now apply IHk.
-Qed.
-
-Theorem List_in_skipn : ∀ A (a : A) k la, a ∈ skipn k la → a ∈ la.
-Proof.
-intros * Has.
-revert la Has.
-induction k; intros; [ easy | ].
-destruct la as [| b]; [ easy | ].
-cbn in Has.
-right.
-now apply IHk.
-Qed.
-
-Theorem List_firstn_seq : ∀ n start len,
-  firstn n (seq start len) = seq start (min n len).
-Proof.
-intros.
-revert start len.
-induction n; intros; [ easy | cbn ].
-remember (seq start len) as l eqn:Hl; symmetry in Hl.
-destruct l as [| a l]; [ now destruct len | ].
-destruct len; [ easy | cbn in Hl; cbn ].
-injection Hl; clear Hl; intros Hl Ha.
-subst start; f_equal.
-rewrite <- Hl; apply IHn.
 Qed.
 
 Theorem List_filter_nil_iff {A} : ∀ f (l : list A),
@@ -508,15 +463,6 @@ Proof. easy. Qed.
 
 Theorem List_cons_is_app : ∀ A (a : A) la, a :: la = [a] ++ la.
 Proof. easy. Qed.
-
-Theorem List_length_fold_right : ∀ A B (f : B → list A → list A) la lb,
-  (∀ b l, length (f b l) = length l)
-  → length (fold_right f la lb) = length la.
-Proof.
-intros * Hbl.
-induction lb as [| b]; [ easy | cbn ].
-now rewrite Hbl.
-Qed.
 
 (* map2: map with two lists *)
 
@@ -2098,27 +2044,6 @@ rewrite Nat.add_succ_r; cbn.
 apply IHla.
 Qed.
 
-Theorem List_firstn_map_nth_seq : ∀ A (d : A) i l,
-  i < length l
-  → firstn i l = map (λ k : nat, nth k l d) (seq 0 i).
-Proof.
-intros * Hi.
-revert i Hi.
-induction l as [| j]; intros; [ easy | ].
-cbn - [ nth ].
-destruct i; [ easy | ].
-cbn in Hi.
-apply Nat.succ_lt_mono in Hi.
-cbn - [ nth ].
-f_equal.
-rewrite <- seq_shift, map_map.
-erewrite map_ext_in. 2: {
-  intros k Hk.
-  now rewrite List_nth_succ_cons.
-}
-now apply IHl.
-Qed.
-
 Theorem List_skipn_map_nth_seq : ∀ A (d : A) i l,
   skipn i l = map (λ k, nth (k + i) l d) (seq 0 (length l - i)).
 Proof.
@@ -3165,17 +3090,6 @@ destruct Hll' as [Hll'| Hll']. 2: {
 now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
 Qed.
 
-Theorem List_hd_concat : ∀ A (d : A) ll,
-  hd [] ll ≠ []
-  → hd d (concat ll) = hd d (hd [] ll).
-Proof.
-intros * Hll.
-destruct ll as [| l]; [ easy | cbn ].
-rewrite List_app_hd1; [ easy | ].
-cbn in Hll.
-destruct l as [| a]; [ easy | now cbn ].
-Qed.
-
 Theorem List_nth_succ_concat : ∀ A (d : A) ll i,
   (∀ l, l ∈ ll → l ≠ [])
   → nth (S i) (concat ll) d = nth i (concat (tl (hd [] ll) :: tl ll)) d.
@@ -3198,17 +3112,6 @@ destruct l as [| a]. {
 }
 cbn in Hil; apply Nat.succ_le_mono in Hil.
 now rewrite app_nth2.
-Qed.
-
-Theorem List_flat_map_ext_in : ∀ (A B : Type) (f g : A → list B) (l : list A),
-  (∀ a : A, a ∈ l → f a = g a) → flat_map f l = flat_map g l.
-Proof.
-intros * Hfg.
-induction l as [| a]; intros; [ easy | cbn ].
-f_equal; [ now apply Hfg; left | ].
-apply IHl.
-intros b Hb.
-now apply Hfg; right.
 Qed.
 
 (* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)
