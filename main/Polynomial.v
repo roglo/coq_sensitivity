@@ -517,6 +517,33 @@ revert la lb Hab Hlb Hneq.
   destruct la as [| (ca', da')]; [ now destruct (ca =? 0)%F; subst lb | ].
   remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
   destruct caz. {
+    apply IHit with (la := ca'*☓^da' :: la); [ easy | easy | ].
+    intros c i Hi.
+    now apply Hneq.
+  }
+  rewrite if_bool_if_dec in Hlb.
+  destruct (bool_dec (da =? da')) as [Hdaa| Hdaa]. {
+    apply Nat.eqb_eq in Hdaa; subst da'.
+    apply IHit with (la := (ca + ca')*☓^da :: la); [ easy | easy | ].
+    intros c i Hi.
+    now apply Hneq.
+  }
+  destruct lb as [| (cb, db)]; [ easy | ].
+  injection Hlb; clear Hlb; intros Hlb H1 H2; subst cb db.
+  apply (sorted_cons_iff Htrg) in Hab.
+  apply (sorted_cons_iff Htrf).
+  destruct Hab as (Hsg, Hab).
+  split. {
+    apply IHit with (la := ca'*☓^da' :: la); [ easy | easy | ].
+    intros c i Hi.
+    apply (Hneq c (S i)); cbn.
+    now apply -> Nat.succ_lt_mono.
+  }
+  intros ma Hma.
+  specialize (Hab ma Hma) as H1.
+  unfold g in H1; unfold f; cbn - [ "<?" ] in H1 |-*.
+  apply Nat.leb_le in H1.
+  apply Nat.ltb_lt.
 ...
   revert la Hab.
   induction it; intros; [ easy | ].
