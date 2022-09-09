@@ -611,7 +611,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   subst ll1.
   rewrite map_length.
   rewrite prodn_length; [ | easy ].
-  apply rngl_product_same_length.
+  apply iter_list_mul_same_length.
   intros l2 Hl2.
   now apply Hll; right.
 } {

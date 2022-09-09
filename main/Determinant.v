@@ -203,23 +203,16 @@ f_equal; [ f_equal | ]. {
 }
 Qed.
 
-Theorem App_list_length : ∀ A B l (f : A → list B),
-  length (App (a ∈ l), f a) = ∑ (a ∈ l), length (f a).
-Proof.
-intros.
-induction l as [| a]; [ easy | ].
-rewrite App_list_cons, app_length.
-rewrite rngl_summation_list_cons.
-now rewrite IHl.
-Qed.
-
-Theorem rngl_product_same_length : ∀ A (ll : list (list A)) n,
+Theorem iter_list_mul_same_length : ∀ A (ll : list (list A)) n,
   (∀ l, l ∈ ll → length l = n)
-  → ∏ (l ∈ ll), length l = n ^ length ll.
+  → iter_list ll (λ c l, c * length l) 1 = n ^ length ll.
 Proof.
 intros * Hll.
 induction ll as [| l]; [ now rewrite iter_list_empty | ].
-rewrite rngl_product_list_cons; cbn.
+rewrite iter_list_cons; cbn; cycle 1.
+  apply Nat.add_0_r.
+  apply Nat.mul_1_r.
+  apply Nat.mul_assoc.
 rewrite Hll; [ f_equal | now left ].
 apply IHll.
 intros l1 Hl1.
@@ -231,7 +224,7 @@ Proof.
 intros * Hnz.
 unfold prodn_rep_seq.
 rewrite prodn_length; [ | now destruct n ].
-rewrite rngl_product_same_length with (n := n). 2: {
+rewrite iter_list_mul_same_length with (n := n). 2: {
   intros l Hl.
   apply repeat_spec in Hl; subst l.
   apply seq_length.
