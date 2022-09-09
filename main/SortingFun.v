@@ -1929,24 +1929,6 @@ symmetry in Hlc.
 now destruct lc.
 Qed.
 
-Theorem bsort_swap_Some_iff : ∀ A (rel : A → _) la lb,
-  bsort_swap rel la = Some lb
-  ↔ is_sorted rel la = false ∧
-    ∃ a b lc ld, rel a b = false ∧
-    sorted rel (lc ++ [a]) ∧
-    la = lc ++ a :: b :: ld ∧
-    lb = lc ++ b :: a :: ld.
-Proof.
-intros.
-split; [ apply bsort_swap_Some | ].
-intros (Hsa & a & b & lc & ld & Hab & Hsc & Hla & Hlb).
-subst la lb.
-clear Hsa.
-rename lc into la; rename ld into lb.
-rewrite bsort_swap_app_cons_when_sorted; [ | easy ].
-now cbn; rewrite Hab.
-Qed.
-
 Fixpoint nb_nrel A (rel : A → A → bool) a l :=
   match l with
   | [] => 0
@@ -2500,21 +2482,6 @@ Theorem eq_merge_nil : ∀ A (rel : A → _) la lb,
 Proof.
 intros * Hmab.
 now apply eq_merge_loop_nil in Hmab.
-Qed.
-
-Theorem eq_msort_loop_nil : ∀ A (rel : A → _) it la,
-  msort_loop rel it la = [] → la = [].
-Proof.
-intros * Hla.
-revert la Hla.
-induction it; intros; [ easy | ].
-cbn in Hla.
-remember (split_list la) as ll eqn:Hll; symmetry in Hll.
-destruct ll as (lb, lc).
-apply eq_merge_nil in Hla.
-destruct Hla as (Hlb, Hlc).
-apply IHit in Hlb, Hlc; subst lb lc.
-now apply split_list_nil_l in Hll.
 Qed.
 
 Theorem msort_loop_enough_iter : ∀ A (rel : A → _) la ita itb,
@@ -3098,29 +3065,6 @@ apply (sorted_unique Heqb Href Hant Htra). {
   split; [ | now apply sorted_isort ].
   now apply permutation_sym, permuted_isort.
 }
-Qed.
-
-(* *)
-
-Theorem eq_isort_nil : ∀ A (rel : A → _) la, isort rel la = [] → la = [].
-Proof.
-intros * Hla.
-destruct la as [| a]; [ easy | cbn in Hla; exfalso ].
-remember (isort rel la) as lb; clear la Heqlb.
-rename lb into la.
-destruct la as [| b]; [ easy | cbn in Hla ].
-now destruct (rel a b).
-Qed.
-
-Theorem eq_isort_single : ∀ A (rel : A → _) a la,
-  isort rel la = [a] → la = [a].
-Proof.
-intros * Hla.
-destruct la as [| b]; [ easy | cbn in Hla ].
-destruct la as [| c]; [ easy | exfalso ].
-apply (f_equal length) in Hla.
-rewrite isort_insert_length in Hla; cbn in Hla.
-now rewrite isort_insert_length in Hla.
 Qed.
 
 (* *)

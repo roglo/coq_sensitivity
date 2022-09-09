@@ -218,20 +218,6 @@ intros i.
 now destruct (Nat.eq_dec (nth i l 0) n) as [H| H]; [ right | left ].
 Qed.
 
-Theorem comp_map_seq : ∀ la lb,
-  la ° lb = map (λ i, nth (nth i lb 0) la 0) (seq 0 (length lb)).
-Proof.
-intros.
-unfold "°".
-symmetry.
-rewrite List_map_nth_seq with (d := 0).
-rewrite map_length.
-apply map_ext_in.
-intros i Hi.
-apply in_seq in Hi.
-now rewrite (List_map_nth' 0).
-Qed.
-
 Theorem permut_comp_assoc : ∀ n f g h,
   length g = n
   → length h = n

@@ -3033,20 +3033,6 @@ Qed.
 
 (* *)
 
-Theorem cons_app_repeat : ∀ A (a : A) la,
-  a :: la = la ++ [a]
-  → la = repeat a (length la).
-Proof.
-intros * Hla.
-induction la as [| b]; intros; [ easy | cbn ].
-cbn in Hla.
-injection Hla; clear Hla; intros Hla H1; subst b.
-f_equal.
-now apply IHla.
-Qed.
-
-(* *)
-
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=
   match P with
   | left _ _ => true
