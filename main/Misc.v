@@ -2503,32 +2503,6 @@ Fixpoint prodn {A} (ll : list (list A)) :=
   | l :: ll' => flat_map (λ a, map (cons a) (prodn ll')) l
   end.
 
-Theorem eq_prodn_nil_iff : ∀ A (ll : list (list A)),
-  prodn ll = [] ↔ [] ∈ ll.
-Proof.
-intros.
-split. {
-  intros Hll.
-  induction ll as [| l1]; [ easy | ].
-  cbn in Hll.
-  rewrite flat_map_concat_map in Hll.
-  apply concat_nil_Forall in Hll.
-  specialize (proj1 (Forall_forall _ _) Hll) as H1.
-  cbn in H1.
-  destruct l1 as [| a]; [ now left | right ].
-  specialize (H1 _ (or_introl eq_refl)).
-  apply map_eq_nil in H1.
-  now apply IHll.
-} {
-  intros Hll.
-  induction ll as [| l1]; [ easy | cbn ].
-  destruct Hll as [Hll| Hll]; [ now subst l1 | ].
-  specialize (IHll Hll).
-  rewrite IHll; cbn.
-  now induction l1.
-}
-Qed.
-
 Theorem prodn_length : ∀ A (ll : list (list A)),
   ll ≠ []
   → length (prodn ll) = iter_list ll (fun c l => c * length l) 1.

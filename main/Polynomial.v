@@ -499,6 +499,21 @@ split; intros Hab. {
   apply Nat.ltb_lt in Hab.
   now apply Nat.leb_le, Nat.lt_le_incl.
 } {
+Theorem sorted_le_monl_norm_loop_neq : ∀ it (la : list (monom T)),
+  let lb := monl_norm_loop it la in
+  sorted (λ ma mb, mdeg mb <=? mdeg ma) lb
+  → True ∧ ∀ c i, S i < length lb →
+    mdeg (nth i lb (Mon c 0)) ≠ mdeg (nth (S i) lb (Mon c 0)).
+Admitted.
+generalize Hab; intros Hneq.
+apply sorted_le_monl_norm_loop_neq in Hneq.
+destruct Hneq as (_, Hneq).
+remember (monl_norm_loop it la) as lb eqn:Hlb.
+symmetry in Hlb.
+revert la lb Hab Hlb Hneq.
+  induction it; intros; [ now subst lb | ].
+  cbn in Hlb.
+...
   revert la Hab.
   induction it; intros; [ easy | ].
   cbn in Hab |-*.

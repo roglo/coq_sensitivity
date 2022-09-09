@@ -321,31 +321,6 @@ destruct ab; [ easy | ].
 rewrite Ha in Hab; [ easy | now left ].
 Qed.
 
-(*
-Theorem eq_sorted_isort_rank_insert_seq : ∀ A ia lrank (f : A → _),
-  (∀ ib, ib ∈ lrank → f ia ≤ f ib)
-  → isort_rank_insert Nat.leb f ia lrank = ia :: lrank.
-Proof.
-intros * Ha.
-destruct lrank as [| ib]; [ easy | cbn ].
-rewrite if_leb_le_dec.
-destruct (le_dec (f ia) (f ib)) as [Hab| Hab]; [ easy | ].
-now exfalso; apply Hab, Ha; left.
-Qed.
-
-Theorem eq_sorted_isort_rank_insert_ltb_seq : ∀ A ia lrank (f : A → _),
-  (∀ ib, ib ∈ lrank → f ia < f ib)
-  → isort_rank_insert Nat.ltb f ia lrank = ia :: lrank.
-Proof.
-intros * Ha.
-destruct lrank as [| ib]; [ easy | ].
-cbn - [ "<?" ].
-rewrite if_ltb_lt_dec.
-destruct (lt_dec (f ia) (f ib)) as [Hab| Hab]; [ easy | ].
-now exfalso; apply Hab, Ha; left.
-Qed.
-*)
-
 Theorem eq_sorted_isort_rank_seq : ∀ (rel : nat → _),
   transitive rel →
   ∀ la, sorted rel la
@@ -367,33 +342,6 @@ apply Ha.
 destruct ib; [ easy | cbn ].
 apply nth_In; flia Hb.
 Qed.
-
-(*
-Theorem eq_sorted_isort_rank_seq : ∀ la,
-  sorted Nat.leb la
-  → isort_rank Nat.leb la = seq 0 (length la).
-Proof.
-intros * Hs.
-induction la as [| a]; intros; [ easy | ].
-cbn - [ nth seq ].
-rewrite IHla; [ | now apply sorted_cons in Hs ].
-rewrite seq_shift.
-cbn - [ nth ].
-apply eq_sorted_isort_rank_insert_seq.
-intros * Hb.
-apply in_seq in Hb.
-rewrite List_nth_0_cons.
-apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
-destruct Hs as (Hs, Ha).
-specialize (Ha (nth ib (a :: la) a)) as H1.
-assert (H : nth ib (a :: la) a ∈ la). {
-  destruct ib; [ easy | cbn ].
-  apply nth_In; flia Hb.
-}
-specialize (H1 H); clear H.
-now apply Nat.leb_le.
-Qed.
-*)
 
 Theorem isort_rank_insert_eq_compat : ∀ A (f g : A → _) ia lrank,
   (∀ x y, x ∈ ia :: lrank → y ∈ ia :: lrank → (f x <=? f y) = (g x <=? g y))

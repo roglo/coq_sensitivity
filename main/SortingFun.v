@@ -2477,13 +2477,6 @@ destruct lb as [| b]; [ easy | ].
 now destruct (rel a b).
 Qed.
 
-Theorem eq_merge_nil : ∀ A (rel : A → _) la lb,
-  merge rel la lb = [] → la = [] ∧ lb = [].
-Proof.
-intros * Hmab.
-now apply eq_merge_loop_nil in Hmab.
-Qed.
-
 Theorem msort_loop_enough_iter : ∀ A (rel : A → _) la ita itb,
   length la ≤ ita
   → length la ≤ itb
