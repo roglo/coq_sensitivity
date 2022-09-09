@@ -348,16 +348,6 @@ Qed.
 
 (* *)
 
-Theorem List_rank_not_None' : ∀ n l i,
-  permut_seq_with_len n l
-  → i < n
-  → List_rank (Nat.eqb i) l ≠ None.
-Proof.
-intros n f i (Hs, Hf) Hi.
-apply (@List_rank_not_None n); [ | easy ].
-now rewrite <- Hf.
-Qed.
-
 Theorem perm_assoc_permut_seq : ∀ A (eqb : A → _),
   equality eqb →
   ∀ la lb,

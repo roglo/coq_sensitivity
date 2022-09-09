@@ -411,53 +411,6 @@ split. {
 }
 Qed.
 
-Theorem List_partition_filter_iff : ∀ A (f : A → _) la lb lc,
-  partition f la = (lb, lc)
-  ↔ filter f la = lb ∧ filter (λ a, negb (f a)) la = lc.
-Proof.
-intros.
-split. {
-  intros * Hp.
-  revert lb lc Hp.
-  induction la as [| a]; intros. {
-    now injection Hp; clear Hp; intros; subst lb lc.
-  }
-  cbn in Hp |-*.
-  remember (partition f la) as q eqn:Hq; symmetry in Hq.
-  destruct q as (ld, le).
-  specialize (IHla _ _ eq_refl).
-  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-  destruct fa; cbn. {
-    injection Hp; clear Hp; intros; subst lb le.
-    split; [ now f_equal | easy ].
-  } {
-    injection Hp; clear Hp; intros; subst ld lc.
-    split; [ easy | now f_equal ].
-  }
-} {
-  intros (Hb, Hc).
-  revert lb lc Hb Hc.
-  induction la as [| a]; intros. {
-    now cbn in Hb, Hc |-*; subst lb lc.
-  }
-  cbn in Hb, Hc |-*.
-  remember (partition f la) as q eqn:Hq; symmetry in Hq.
-  destruct q as (ld, le).
-  remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-  destruct fa; cbn in Hc |-*. {
-    destruct lb as [| b]; [ easy | ].
-    injection Hb; clear Hb; intros Hb H; subst b.
-    specialize (IHla _ _ Hb Hc).
-    now injection IHla; clear IHla; intros; subst ld le.
-  } {
-    destruct lc as [| c]; [ easy | ].
-    injection Hc; clear Hc; intros Hc H; subst c.
-    specialize (IHla _ _ Hb Hc).
-    now injection IHla; clear IHla; intros; subst ld le.
-  }
-}
-Qed.
-
 Theorem List_cons_length : ∀ A (a : A) la, length (a :: la) = S (length la).
 Proof. easy. Qed.
 
@@ -1942,12 +1895,6 @@ apply HP.
 now apply nth_In.
 Qed.
 
-Theorem List_map_eq_nil_iff : ∀ A B (f : A → B) l, map f l = [] ↔ l = [].
-Proof.
-intros.
-split; [ apply map_eq_nil | now intros; subst l ].
-Qed.
-
 Theorem List_map_seq : ∀ A (f : _ → A) sta len,
   map f (seq sta len) = map (λ i, f (sta + i)) (seq 0 len).
 Proof.
@@ -3088,30 +3035,6 @@ destruct Hll' as [Hll'| Hll']. 2: {
   now apply Hll.
 }
 now specialize (Hll 0 1 (Nat.neq_0_succ _) _ Hi).
-Qed.
-
-Theorem List_nth_succ_concat : ∀ A (d : A) ll i,
-  (∀ l, l ∈ ll → l ≠ [])
-  → nth (S i) (concat ll) d = nth i (concat (tl (hd [] ll) :: tl ll)) d.
-Proof.
-intros * Hll.
-revert i.
-induction ll as [| l]; intros; cbn. {
-  now rewrite Tauto_match_nat_same.
-}
-destruct (lt_dec (S i) (length l)) as [Hil| Hil]. {
-  rewrite app_nth1; [ | easy ].
-  destruct l as [| a]; [ easy | cbn in Hil |-* ].
-  apply Nat.succ_lt_mono in Hil.
-  now rewrite app_nth1.
-}
-apply Nat.nlt_ge in Hil.
-rewrite app_nth2; [ | easy ].
-destruct l as [| a]. {
-  now specialize (Hll _ (or_introl eq_refl)).
-}
-cbn in Hil; apply Nat.succ_le_mono in Hil.
-now rewrite app_nth2.
 Qed.
 
 (* "to_radix_loop u r i" is the last u digits of i in base r (in reverse) *)

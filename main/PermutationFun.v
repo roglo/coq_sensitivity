@@ -1079,16 +1079,6 @@ destruct ab; [ easy | ].
 apply IHl1.
 Qed.
 
-Theorem List_rank_eqb_inside : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ l1 l2 a,
-  List_rank (eqb a) (l1 ++ a :: l2) ≠ None.
-Proof.
-intros * Heqb *.
-unfold List_rank.
-now apply List_rank_loop_eqb_inside.
-Qed.
-
 Theorem List_rank_loop_extract : ∀ A (la : list A) f i,
   List_rank_loop i f la =
   match extract f la with
