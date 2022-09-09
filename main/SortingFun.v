@@ -2811,59 +2811,6 @@ Qed.
 
 (* *)
 
-Theorem isort_insert_nth_indep : ∀ A rel (d d' : A) ia lsorted l,
-  ia < length l
-  → (∀ i, i ∈ lsorted → i < length l)
-  → isort_insert (λ ia ib, rel (nth ia l d) (nth ib l d)) ia lsorted =
-    isort_insert (λ ia ib, rel (nth ia l d') (nth ib l d')) ia lsorted.
-Proof.
-intros * Hia Hl.
-induction lsorted as [| ib]; [ easy | ].
-cbn - [ nth ].
-specialize (Hl ib (or_introl eq_refl)) as Hib.
-rewrite (nth_indep _ _ d' Hia).
-rewrite (nth_indep _ _ d' Hib).
-remember (rel (nth ia l d') (nth ib l d')) as x eqn:Hx.
-symmetry in Hx.
-destruct x; [ easy | ].
-f_equal.
-apply IHlsorted.
-intros i Hi.
-apply Hl.
-now right.
-Qed.
-
-Theorem isort_insert_nat_ub : ∀ rel ia lsorted i n,
-  ia < n
-  → (∀ i, i ∈ lsorted → i < n)
-  → nth i (isort_insert rel ia lsorted) 0 < n.
-Proof.
-intros * Hia Hn.
-revert i.
-induction lsorted as [| ib]; intros. {
-  destruct i; [ easy | cbn ].
-  rewrite Tauto_match_nat_same; flia Hia.
-}
-cbn - [ nth ].
-remember (rel ia ib) as x eqn:Hx.
-symmetry in Hx.
-destruct x. {
-  destruct i; [ easy | ].
-  destruct i; cbn; [ now apply Hn; left | ].
-  destruct (lt_dec i (length lsorted)) as [Hii| Hii]. 2: {
-    apply Nat.nlt_ge in Hii.
-    rewrite nth_overflow; [ flia Hia | easy ].
-  }
-  apply Hn; right.
-  now apply nth_In.
-} {
-  destruct i; cbn; [ now apply Hn; left | ].
-  apply IHlsorted.
-  intros j Hj.
-  now apply Hn; right.
-}
-Qed.
-
 Theorem isort_insert_map : ∀ A B (rel : A → _) a lsorted (f : B → _),
   isort_insert rel (f a) (map f lsorted) =
   map f (isort_insert (λ x y, rel (f x) (f y)) a lsorted).
@@ -2875,65 +2822,6 @@ remember (rel (f a) (f b)) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ easy | cbn ].
 f_equal.
 apply IHlsorted.
-Qed.
-
-Theorem isort_insert_map_nth : ∀ A (rel : A → _) l d a lsorted,
-  isort_insert rel a (map (λ i, nth i l d) lsorted) =
-  map (λ i, nth i (a :: l) d)
-    (isort_insert (λ ia ib, rel (nth ia (a :: l) d) (nth ib (a :: l) d)) 0
-       (map S lsorted)).
-Proof.
-intros.
-rewrite <- isort_insert_map.
-rewrite List_nth_0_cons.
-now rewrite map_map.
-Qed.
-
-(* *)
-
-Theorem isort_insert_insert_sym : ∀ A (rel : A → _),
-  antisymmetric rel
-  → transitive rel
-  → total_relation rel
-  → ∀ a b l,
-  isort_insert rel a (isort_insert rel b l) =
-  isort_insert rel b (isort_insert rel a l).
-Proof.
-intros * Hant Htra Htot *.
-revert a b.
-induction l as [| c]; intros; cbn. {
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ab, ba; [ | easy | easy | ]. {
-    specialize (Hant _ _ Hab Hba).
-    now subst b.
-  } {
-    specialize (Htot a b).
-    now rewrite Hab, Hba in Htot.
-  }
-}
-remember (rel a c) as ac eqn:Hac; symmetry in Hac.
-remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-destruct ac, bc; cbn; rewrite Hac, Hbc. {
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ab, ba; [ | easy | easy | ]. {
-    now rewrite (Hant a b Hab Hba).
-  } {
-    specialize (Htot a b).
-    now rewrite Hab, Hba in Htot.
-  }
-} {
-  remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-  destruct ba; [ | easy ].
-  now rewrite (Htra b a c Hba Hac) in Hbc.
-} {
-  remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-  destruct ab; [ | easy ].
-  now rewrite (Htra a b c Hab Hbc) in Hac.
-} {
-  f_equal; apply IHl.
-}
 Qed.
 
 (* isort and ssort return same *)
@@ -3213,20 +3101,6 @@ apply sorted_cons_iff in Hs; [ | easy ].
 split; [ easy | ].
 intros d Hd.
 now apply Hac; right.
-Qed.
-
-Theorem isort_filter : ∀ A (rel : A → _),
-  transitive rel →
-  total_relation rel →
-  ∀ la f,
-  isort rel (filter f la) = filter f (isort rel la).
-Proof.
-intros * Htra Htot *.
-induction la as [| a]; [ easy | cbn ].
-rewrite filter_isort_insert; [ | easy | now apply sorted_isort ].
-rewrite <- IHla.
-remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-now destruct fa.
 Qed.
 
 Theorem sorted_concat_iff : ∀ A (rel : A → _),
@@ -3517,20 +3391,4 @@ apply sorted_cons_iff in Hs. 2: {
   now apply (Htra (f x) (f y) (f z)).
 }
 now apply Hs.
-Qed.
-
-Theorem isort_insert_rel_eq_compat : ∀ A (rel1 rel2 : A → _) a la,
-  (∀ x y, x ∈ a :: la → y ∈ a :: la → rel1 x y = rel2 x y)
-  → isort_insert rel1 a la = isort_insert rel2 a la.
-Proof.
-intros * Hab.
-induction la as [| b]; [ easy | cbn ].
-rewrite (Hab _ _ (or_introl eq_refl) (or_intror (or_introl eq_refl))).
-rewrite IHla; [ easy | ].
-intros x y Hx Hy.
-apply Hab. {
-  destruct Hx; [ now left | now right; right ].
-} {
-  destruct Hy; [ now left | now right; right ].
-}
 Qed.
