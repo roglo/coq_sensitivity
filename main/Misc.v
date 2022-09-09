@@ -378,17 +378,6 @@ rewrite seq_nth; [ | easy ].
 apply Nat.add_0_r.
 Qed.
 
-Theorem List_in_firstn : ∀ A (a : A) k la, a ∈ firstn k la → a ∈ la.
-Proof.
-intros * Haf.
-revert la Haf.
-induction k; intros; [ easy | ].
-destruct la as [| b]; [ easy | ].
-cbn in Haf.
-destruct Haf; [ now left | right ].
-now apply IHk.
-Qed.
-
 Theorem List_filter_nil_iff {A} : ∀ f (l : list A),
   filter f l = [] ↔ (∀ a, a ∈ l → f a = false).
 Proof.
@@ -861,22 +850,6 @@ destruct n as [n| ]; cbn. {
 Qed.
 
 (* end List_rank *)
-
-Theorem Nat_ltb_mono_l : ∀ a b c, (a + b <? a + c) = (b <? c).
-Proof.
-intros.
-remember (_ <? _) as x eqn:Hx in |-*; symmetry in Hx.
-remember (_ <? _) as y eqn:Hy in |-*; symmetry in Hy.
-destruct x, y; [ easy | | | easy ]. {
-  apply Nat.ltb_lt in Hx.
-  apply Nat.ltb_nlt in Hy.
-  flia Hx Hy.
-} {
-  apply Nat.ltb_nlt in Hx.
-  apply Nat.ltb_lt in Hy.
-  flia Hx Hy.
-}
-Qed.
 
 Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
 Proof.
@@ -2747,16 +2720,6 @@ split. {
 Qed.
 
 (* end prodn *)
-
-Theorem NoDup_skipn : ∀ A k (la : list A), NoDup la → NoDup (skipn k la).
-Proof.
-intros * Hnd.
-revert la Hnd.
-induction k; intros; [ easy | cbn ].
-destruct la as [| a]; [ constructor | cbn ].
-apply IHk.
-now apply NoDup_cons_iff in Hnd.
-Qed.
 
 Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
 Proof.

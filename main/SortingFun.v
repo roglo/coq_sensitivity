@@ -3217,31 +3217,6 @@ destruct ba; [ | easy ].
 apply IHla.
 Qed.
 
-Theorem antisymmetric_list_ltb : ∀ A (ltb : A → _),
-  irreflexive ltb
-  → connected_relation ltb
-  → antisymmetric ltb
-  → antisymmetric (list_ltb ltb).
-Proof.
-intros * Hirr Hcon Hant.
-intros la lb Hlab Hlba.
-revert la Hlab Hlba.
-induction lb as [| b]; intros; [ now destruct la | ].
-destruct la as [| a]; [ easy | ].
-cbn in Hlab, Hlba.
-remember (ltb a b) as ab eqn:Hab; symmetry in Hab.
-remember (ltb b a) as ba eqn:Hba; symmetry in Hba.
-destruct ab. {
-  destruct ba; [ | easy ].
-  specialize (Hant a b Hab Hba) as H1; subst b.
-  now rewrite (Hirr a) in Hab.
-}
-destruct ba; [ easy | ].
-specialize (Hcon a b Hab Hba) as H1; subst b.
-f_equal.
-now apply IHlb.
-Qed.
-
 Theorem transitive_list_ltb : ∀ A (ltb : A → _),
   antisymmetric ltb
   → connected_relation ltb
@@ -3576,19 +3551,6 @@ destruct Hs as (Hs, Hbs).
 specialize (Hbs b (or_introl eq_refl)) as H1.
 apply Nat.leb_le in H1.
 flia Hab H1.
-Qed.
-
-Theorem NoDup_isort_ltb_leb : ∀ la,
-  NoDup la → isort Nat.ltb la = isort Nat.leb la.
-Proof.
-intros * Hnd.
-induction la as [| a]; [ easy | cbn ].
-rewrite IHla; [ | now apply NoDup_cons_iff in Hnd ].
-assert (H : NoDup la) by now apply NoDup_cons_iff in Hnd.
-specialize (IHla H); clear H.
-apply NoDup_isort_insert_ltb_leb.
-apply sorted_isort.
-apply Nat_leb_total_relation.
 Qed.
 
 Theorem NoDup_sorted_nat_leb_ltb : ∀ l,
