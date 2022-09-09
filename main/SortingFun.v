@@ -2882,12 +2882,6 @@ destruct (le_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem Nat_leb_refl : reflexive Nat.leb.
-Proof.
-intros a.
-apply Nat.leb_refl.
-Qed.
-
 Theorem Nat_leb_antisym : antisymmetric Nat.leb.
 Proof.
 intros a b Hab Hba.
@@ -2979,35 +2973,6 @@ destruct x. {
   intros j Hj.
   now apply Hn; right.
 }
-Qed.
-
-Theorem NoDup_isort_insert : ∀ A (rel : A → _) a lsorted,
-  NoDup (a :: lsorted)
-  → NoDup (isort_insert rel a lsorted).
-Proof.
-intros * Hnd.
-revert a Hnd.
-induction lsorted as [| b]; intros. {
-  cbn; constructor; [ easy | constructor ].
-}
-cbn.
-destruct (rel a b); [ easy | ].
-apply NoDup_cons_iff in Hnd.
-destruct Hnd as (Ha, Hnd).
-apply NoDup_cons_iff in Hnd.
-destruct Hnd as (Hb, Hnd).
-apply NoDup_cons_iff.
-split. 2: {
-  apply IHlsorted.
-  apply NoDup_cons_iff.
-  split; [ | easy ].
-  now intros H; apply Ha; right.
-}
-intros Hb'.
-apply in_isort_insert in Hb'.
-destruct Hb' as [Hb'| Hb']; [ | easy ].
-subst b; apply Ha.
-now left.
 Qed.
 
 Theorem isort_insert_map : ∀ A B (rel : A → _) a lsorted (f : B → _),

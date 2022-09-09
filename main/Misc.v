@@ -878,14 +878,6 @@ destruct x, y; [ easy | | | easy ]. {
 }
 Qed.
 
-Theorem Nat_ltb_mono_r : ∀ a b c, (a + c <? b + c) = (a <? b).
-Proof.
-intros.
-rewrite (Nat.add_comm a).
-rewrite (Nat.add_comm b).
-apply Nat_ltb_mono_l.
-Qed.
-
 Theorem Nat_b2n_upper_bound : ∀ b, Nat.b2n b ≤ 1.
 Proof.
 intros; destruct b; cbn; flia.
@@ -2755,22 +2747,6 @@ split. {
 Qed.
 
 (* end prodn *)
-
-Theorem NoDup_firstn : ∀ A k (la : list A), NoDup la → NoDup (firstn k la).
-Proof.
-intros * Hnd.
-revert la Hnd.
-induction k; intros; [ constructor | cbn ].
-destruct la as [| a]; [ constructor | cbn ].
-apply NoDup_cons_iff.
-apply NoDup_cons_iff in Hnd.
-destruct Hnd as (Ha & Hnd).
-split. {
-  intros Haf; apply Ha; clear Ha.
-  now apply List_in_firstn in Haf.
-}
-now apply IHk.
-Qed.
 
 Theorem NoDup_skipn : ∀ A k (la : list A), NoDup la → NoDup (skipn k la).
 Proof.
