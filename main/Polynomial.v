@@ -513,6 +513,10 @@ symmetry in Hlb.
 revert la lb Hab Hlb Hneq.
   induction it; intros; [ now subst lb | ].
   cbn in Hlb.
+  destruct la as [| (ca, da)]; [ now subst lb | ].
+  destruct la as [| (ca', da')]; [ now destruct (ca =? 0)%F; subst lb | ].
+  remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+  destruct caz. {
 ...
   revert la Hab.
   induction it; intros; [ easy | ].
