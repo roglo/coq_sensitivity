@@ -2292,15 +2292,6 @@ unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
 
-Theorem comp_0_l : ∀ l, [] ° l = repeat 0 (length l).
-Proof.
-intros.
-unfold "°".
-induction l as [| a]; [ easy | cbn ].
-rewrite Tauto_match_nat_same; f_equal.
-apply IHl.
-Qed.
-
 Theorem permut_isort : ∀ ord,
   antisymmetric ord
   → transitive ord
@@ -2408,67 +2399,6 @@ Qed.
 
 Arguments permut_isort_rank_comp n%nat [la lb]%list.
 
-Theorem butn_permut_seq : ∀ i la,
-  permut_seq la
-  → i = nth (length la - 1) (isort_rank Nat.leb la) 0
-  → permut_seq (butn i la).
-Proof.
-intros * Hp Hi.
-destruct (Nat.eq_dec (length la) 0) as [Hlz| Hlz]. {
-  apply length_zero_iff_nil in Hlz;subst la.
-  now cbn in Hi; subst i; cbn.
-}
-apply permut_seq_iff.
-split. {
-  intros j Hj.
-  rewrite butn_length.
-  unfold Nat.b2n; rewrite if_ltb_lt_dec.
-  destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
-    exfalso; apply Hila; clear Hila.
-    rewrite Hi.
-    rewrite <- (isort_rank_length Nat.leb).
-    specialize (isort_rank_permut_seq Nat.leb la) as H1.
-    apply permut_seq_iff in H1.
-    apply H1, nth_In.
-    rewrite isort_rank_length; cbn.
-    apply in_butn in Hj.
-    flia Hlz.
-  }
-  specialize (in_butn _ _ _ Hj) as H1.
-  apply permut_seq_iff in Hp.
-  apply Hp in H1.
-  destruct (Nat.eq_dec j (length la - 1)) as [Hjl| H]; [ | flia H1 H ].
-  clear H1; exfalso.
-  rewrite <- Hjl in Hi.
-  assert (Hji : j = nth i la 0). {
-    rewrite Hi; symmetry.
-    apply permut_permut_isort; [ | flia Hjl Hlz ].
-    now apply permut_seq_iff.
-  }
-  apply (In_nth _ _ 0) in Hj.
-  rewrite butn_length in Hj.
-  apply Nat.ltb_lt in Hila.
-  rewrite Hila in Hj.
-  apply Nat.ltb_lt in Hila.
-  destruct Hj as (k & Hki & Hkj).
-  cbn in Hki.
-  rewrite nth_butn in Hkj.
-  rewrite <- Hkj in Hji.
-  destruct Hp as (Hpa, Hpd).
-  apply (NoDup_nat _ Hpd) in Hji; [ | | easy ]. 2: {
-    unfold Nat.b2n; rewrite if_leb_le_dec.
-    destruct (le_dec i k) as [Hik| Hik]; [ flia Hki | ].
-    apply Nat.nle_gt in Hik.
-    flia Hila Hik.
-  }
-  unfold Nat.b2n in Hji; rewrite if_leb_le_dec in Hji.
-  destruct (le_dec i k) as [H| H]; flia H Hji.
-}
-apply NoDup_butn.
-apply permut_seq_iff in Hp.
-now destruct Hp.
-Qed.
-
 Theorem permut_collapse : ∀ la,
   permut_seq la
   → collapse la = la.
@@ -2476,14 +2406,6 @@ Proof.
 intros * Ha.
 unfold collapse.
 now apply permut_isort_rank_involutive.
-Qed.
-
-Theorem collapse_idemp : ∀ la,
-  collapse (collapse la) = collapse la.
-Proof.
-intros.
-apply permut_collapse.
-apply collapse_permut_seq_with_len.
 Qed.
 
 Theorem collapse_comp : ∀ la lb,

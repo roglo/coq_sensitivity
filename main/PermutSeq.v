@@ -898,19 +898,6 @@ f_equal; rewrite map_length.
 apply IHn.
 Qed.
 
-Theorem canon_sym_gr_list_0_r : ∀ n, canon_sym_gr_list n 0 = seq 0 n.
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite Nat.div_0_l; [ | apply fact_neq_0 ].
-rewrite Nat.mod_0_l; [ | apply fact_neq_0 ].
-f_equal; rewrite IHn.
-unfold succ_when_ge; cbn.
-rewrite <- seq_shift.
-apply map_ext_in.
-intros; apply Nat.add_1_r.
-Qed.
-
 Theorem canon_sym_gr_list_ub : ∀ n k i,
   k < n!
   → i < n
@@ -1183,26 +1170,6 @@ apply (f_equal (λ m, nth m (canon_sym_gr_list n i) 0)) in Hjk.
 rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
 rewrite canon_sym_gr_sym_gr_inv in Hjk; [ | easy | easy ].
 easy.
-Qed.
-
-Theorem canon_sym_gr_inv_list_permut_seq : ∀ n i,
-  i < n!
-  → permut_seq (canon_sym_gr_inv_list n i).
-Proof.
-intros * Hi.
-apply permut_seq_iff.
-split. {
-  unfold canon_sym_gr_inv_list.
-  rewrite List_map_seq_length.
-  intros j Hj.
-  apply in_map_iff in Hj.
-  destruct Hj as (k & Hkj & Hk).
-  apply in_seq in Hk.
-  rewrite <- Hkj.
-  now apply canon_sym_gr_inv_elem_ub.
-} {
-  now apply NoDup_canon_sym_gr_inv_list.
-}
 Qed.
 
 Theorem in_canon_sym_gr_list : ∀ n k i,

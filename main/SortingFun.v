@@ -2477,20 +2477,6 @@ subst b.
 now rewrite (equality_refl Heqb) in Hab.
 Qed.
 
-Theorem bsort_swap_Some_permutation : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ la lb,
-  bsort_swap rel la = Some lb
-  → permutation eqb la lb.
-Proof.
-intros * Heqb * Hs.
-apply bsort_swap_Some_iff in Hs.
-destruct Hs as (Hns & a & b & lc & ld & Hab & Hs & Hla & Hlb).
-subst la lb.
-apply (permutation_app_head Heqb).
-apply (permutation_swap Heqb).
-Qed.
-
 Theorem eq_merge_loop_nil : ∀ A (rel : A → _) la lb it,
   length la + length lb ≤ it
   → merge_loop rel it la lb = []
@@ -3521,36 +3507,6 @@ split; [ now apply IHlla | ].
 intros lb Hlb.
 apply list_ltb_leb_incl.
 now apply Hab.
-Qed.
-
-Theorem NoDup_isort_insert_ltb_leb : ∀ a la,
-  sorted Nat.leb la
-  → isort_insert Nat.ltb a la = isort_insert Nat.leb a la.
-Proof.
-intros * Hs.
-revert a.
-induction la as [| b]; intros; [ easy | ].
-assert (H : sorted Nat.leb la) by now apply sorted_cons in Hs.
-specialize (IHla H); clear H.
-cbn - [ Nat.ltb ].
-rewrite if_ltb_lt_dec.
-rewrite if_leb_le_dec.
-destruct (lt_dec a b) as [Htab| Htab]. {
-  destruct (le_dec a b) as [H| H]; [ easy | flia Htab H ].
-}
-apply Nat.nlt_ge in Htab.
-destruct (le_dec a b) as [Hab| Hab]; [ | f_equal; apply IHla ].
-apply Nat.le_antisymm in Hab; [ subst b; clear Htab; f_equal | easy ].
-rewrite IHla.
-destruct la as [| b]; intros; [ easy | cbn ].
-rewrite if_leb_le_dec.
-destruct (le_dec a b) as [Hab| Hab]; [ easy | ].
-apply Nat.nle_gt in Hab.
-apply sorted_cons_iff in Hs; [ | apply Nat_leb_trans ].
-destruct Hs as (Hs, Hbs).
-specialize (Hbs b (or_introl eq_refl)) as H1.
-apply Nat.leb_le in H1.
-flia Hab H1.
 Qed.
 
 Theorem NoDup_sorted_nat_leb_ltb : ∀ l,
