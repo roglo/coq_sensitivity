@@ -1754,9 +1754,8 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
   → is_square_matrix M = true
   → is_sym_gr_list n sg
   → det M =
-    ∑ (k = 0, n! - 1),
-    ε (nth k sg []) *
-    ∏ (i = 1, n), mat_el M i (nth (i - 1) (nth k sg []) 0 + 1).
+      ∑ (k = 0, n! - 1),
+        ε (nth k sg []) * ∏ (i = 1, n), mat_el M i ((nth k sg []).(i) + 1).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
 rewrite det_is_det'; try now destruct Hif.
@@ -1880,7 +1879,7 @@ Theorem det_any_permut_l : in_charac_0_field →
   → permut_seq_with_len n σ
   → det M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
-     ∏ (k = 0, n - 1), mat_el M (nth k σ 0 + 1) (nth k μ 0 + 1))%F.
+     ∏ (k = 0, n - 1), mat_el M (nth k σ 0 + 1) (nth k μ 0 + 1)).
 Proof.
 intros Hif * Hnz Hr Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
