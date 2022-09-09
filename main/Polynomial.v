@@ -499,15 +499,17 @@ split; intros Hab. {
   apply Nat.ltb_lt in Hab.
   now apply Nat.leb_le, Nat.lt_le_incl.
 } {
-Theorem sorted_le_monl_norm_loop_neq : ∀ it (la : list (monom T)),
+Theorem sorted_le_monl_norm_loop_inj : ∀ it (la : list (monom T)),
   let lb := monl_norm_loop it la in
   sorted (λ ma mb, mdeg mb <=? mdeg ma) lb
-  → True ∧ ∀ c i, S i < length lb →
-    mdeg (nth i lb (Mon c 0)) ≠ mdeg (nth (S i) lb (Mon c 0)).
+  → True ∧ ∀ c i j, i < length lb → j < length lb →
+  mdeg (nth i lb (Mon c 0)) = mdeg (nth (S i) lb (Mon c 0))
+  → i = j.
 Admitted.
 generalize Hab; intros Hneq.
-apply sorted_le_monl_norm_loop_neq in Hneq.
+apply sorted_le_monl_norm_loop_inj in Hneq.
 destruct Hneq as (_, Hneq).
+...
 remember (monl_norm_loop it la) as lb eqn:Hlb.
 symmetry in Hlb.
 revert la lb Hab Hlb Hneq.
@@ -544,6 +546,13 @@ revert la lb Hab Hlb Hneq.
   unfold g in H1; unfold f; cbn - [ "<?" ] in H1 |-*.
   apply Nat.leb_le in H1.
   apply Nat.ltb_lt.
+  apply (In_nth _ _ (0·)) in Hma.
+  destruct Hma as (i & Hi & Hma).
+  specialize (Hneq 0%F i) as H2.
+  cbn - [ nth ] in H2.
+  apply Nat.succ_lt_mono in Hi.
+  specialize (H2 Hi).
+  rewrite List_nth_succ_cons, Hma in H2.
 ...
   revert la Hab.
   induction it; intros; [ easy | ].
