@@ -503,9 +503,42 @@ Theorem sorted_le_monl_norm_loop_inj : ∀ it (la : list (monom T)),
   let lb := monl_norm_loop it la in
   sorted (λ ma mb, mdeg mb <=? mdeg ma) lb
   → True ∧ ∀ c i j, i < length lb → j < length lb →
-  mdeg (nth i lb (Mon c 0)) = mdeg (nth (S i) lb (Mon c 0))
+  mdeg (nth i lb (Mon c 0)) = mdeg (nth j lb (Mon c 0))
   → i = j.
-Admitted.
+Proof.
+intros * Hs.
+split; [ easy | ].
+intros * Hi Hj Hij.
+subst lb.
+revert i j la Hs Hi Hj Hij.
+induction it; intros. {
+  apply Nat.lt_1_r in Hi, Hj.
+  now subst i j.
+}
+destruct la as [| (ca, da)]; [ easy | ].
+destruct la as [| (ca', da')]. {
+  cbn in Hi, Hj.
+  destruct (ca =? 0)%F; [ easy | ].
+  apply Nat.lt_1_r in Hi, Hj.
+  now subst i j.
+}
+cbn in Hs, Hi, Hj, Hij.
+remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+destruct caz. {
+  apply (rngl_eqb_eq Heq) in Hcaz; subst ca.
+  now apply IHit with (la := ca'*☓^da' :: la).
+}
+rewrite if_eqb_eq_dec in Hs, Hi, Hj, Hij.
+destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
+  subst da'.
+  now apply IHit with (la := (ca + ca')*☓^da :: la).
+}
+destruct i. {
+  destruct j; [ easy | exfalso ].
+  cbn in Hij.
+  apply sorted_cons_iff in Hs.
+  destruct Hs as (Hs, Hab).
+... ...
 generalize Hab; intros Hneq.
 apply sorted_le_monl_norm_loop_inj in Hneq.
 destruct Hneq as (_, Hneq).
