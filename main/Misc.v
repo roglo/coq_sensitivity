@@ -1207,18 +1207,6 @@ intros * Heqb *.
 now apply Heqb.
 Qed.
 
-Theorem equality_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a b : A),
-  { a = b } + { a ≠ b }.
-Proof.
-intros.
-remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ now left; apply Heqb in Hab | right ].
-apply Bool.not_true_iff_false in Hab.
-intros H2; apply Hab; clear Hab.
-subst b.
-now apply Heqb.
-Qed.
-
 Theorem equality_in_dec : ∀ A (eqb : A → _) (Heqb : equality eqb) (a : A) la,
   { a ∈ la } + { a ∉ la }.
 Proof.
@@ -1476,13 +1464,6 @@ split; intros Hab. {
     apply (equality_refl Heqbb).
   }
 }
-Qed.
-
-Theorem equality_pair_eqb : ∀ A B (eqba : A → _) (eqbb : B → _),
-  equality eqba → equality eqbb → equality (pair_eqb eqba eqbb).
-Proof.
-intros * Heqba Heqbb ab1 ab2.
-now apply pair_eqb_eq.
 Qed.
 
 (* end pair_eqb *)

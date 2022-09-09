@@ -1894,41 +1894,6 @@ rewrite Hlc, Hle.
 easy.
 Qed.
 
-Theorem bsort_swap_app_cons_when_sorted : ∀ A (rel : A → _) la lb a,
-  sorted rel (la ++ [a])
-  → bsort_swap rel (la ++ a :: lb) =
-    match bsort_swap rel (a :: lb) with
-    | Some lc => Some (la ++ lc)
-    | None => None
-    end.
-Proof.
-intros * Hs.
-revert lb a Hs.
-induction la as [| b]; intros. {
-  rewrite app_nil_l.
-  now destruct (bsort_swap rel (a :: lb)).
-}
-cbn in Hs.
-cbn - [ bsort_swap ].
-remember (a :: lb) as l; cbn; subst l.
-destruct la as [| c]. {
-  unfold sorted in Hs; cbn in Hs.
-  rewrite Bool.andb_true_r in Hs.
-  now cbn; rewrite Hs.
-}
-cbn in Hs; unfold sorted in Hs.
-remember (c :: la ++ [a]) as l; cbn in Hs; subst l.
-apply Bool.andb_true_iff in Hs.
-destruct Hs as (Hbc, Hs).
-cbn - [ bsort_swap ].
-rewrite Hbc.
-cbn - [ bsort_swap ] in IHla.
-rewrite IHla; [ | easy ].
-remember (bsort_swap rel (a :: lb)) as lc eqn:Hlc.
-symmetry in Hlc.
-now destruct lc.
-Qed.
-
 Fixpoint nb_nrel A (rel : A → A → bool) a l :=
   match l with
   | [] => 0
@@ -2457,24 +2422,6 @@ specialize (H1 _ rel Htra _ _ [] _ _ Hsb) as H3.
 specialize (Hant _ _ H2 H3) as H4.
 subst b.
 now rewrite (equality_refl Heqb) in Hab.
-Qed.
-
-Theorem eq_merge_loop_nil : ∀ A (rel : A → _) la lb it,
-  length la + length lb ≤ it
-  → merge_loop rel it la lb = []
-  → la = [] ∧ lb = [].
-Proof.
-intros * Hit Hmab.
-revert la lb Hit Hmab.
-induction it; intros. {
-  apply Nat.le_0_r, Nat.eq_add_0 in Hit.
-  destruct Hit as (H1, H2).
-  now apply length_zero_iff_nil in H1, H2.
-}
-cbn in Hmab.
-destruct la as [| a]; [ easy | exfalso ].
-destruct lb as [| b]; [ easy | ].
-now destruct (rel a b).
 Qed.
 
 Theorem msort_loop_enough_iter : ∀ A (rel : A → _) la ita itb,
