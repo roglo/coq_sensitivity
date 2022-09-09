@@ -16,25 +16,6 @@ Definition comp_list (la lb : list nat) := map (λ i, nth i la 0) lb.
 
 Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associativity).
 
-Theorem FinFun_bfun_AllLt : ∀ la,
-  FinFun.bFun (length la) (λ i, nth i la 0) ↔ AllLt la (length la).
-Proof.
-intros.
-unfold FinFun.bFun, AllLt.
-split. {
-  intros H1 i Hi.
-  apply (In_nth _ _ 0) in Hi.
-  destruct Hi as (j & Hj & Hji); subst i.
-  now apply H1.
-} {
-  intros H1 i Hi.
-  apply H1.
-  now apply nth_In.
-}
-Qed.
-
-(* *)
-
 (* Permutations of {0, 1, 2, ... n-1} *)
 
 Definition permut_seq l := permutation Nat.eqb l (seq 0 (length l)).
