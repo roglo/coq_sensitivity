@@ -2726,6 +2726,22 @@ apply iter_list_cons. {
 }
 Qed.
 
+Theorem List_flat_map_length : ∀ A B (f : A → list B) l,
+  length (flat_map f l) = iter_list l (fun c a => c + length (f a)) 0.
+Proof.
+intros.
+induction l as [| a]; [ now rewrite iter_list_empty | cbn ].
+rewrite app_length.
+rewrite iter_list_cons; cycle 1. {
+  apply Nat.add_0_l.
+} {
+  apply Nat.add_0_r.
+} {
+  apply Nat.add_assoc.
+}
+now cbn; f_equal.
+Qed.
+
 (* App : a notation for iterating concatenation of a list of lists *)
 
 
@@ -2846,6 +2862,42 @@ split. {
   rewrite IHll; cbn.
   now induction l1.
 }
+Qed.
+
+Theorem prodn_length : ∀ A (ll : list (list A)),
+  ll ≠ []
+  → length (prodn ll) = iter_list ll (fun c l => c * length l) 1.
+Proof.
+intros * Hll.
+revert Hll.
+induction ll as [| l1]; intros; [ easy | clear Hll; cbn ].
+rewrite iter_list_cons; cycle 1.
+  apply Nat.mul_1_l.
+  apply Nat.mul_1_r.
+  apply Nat.mul_assoc.
+rewrite List_flat_map_length.
+erewrite iter_list_eq_compat. 2: {
+  intros i Hi.
+  now rewrite map_length.
+}
+cbn.
+destruct ll as [| l2]. {
+  rewrite iter_list_empty with (l := []); [ | easy ].
+  rewrite Nat.mul_1_r; cbn.
+  induction l1 as [| a]; [ easy | ].
+  rewrite iter_list_cons; cycle 1.
+    apply Nat.add_0_l.
+    apply Nat.add_0_r.
+    apply Nat.add_assoc.
+  now cbn; rewrite IHl1.
+}
+rewrite IHll; [ | easy ].
+induction l1 as [| a]; [ easy | ].
+rewrite iter_list_cons; cycle 1.
+  apply Nat.add_0_l.
+  apply Nat.add_0_r.
+  apply Nat.add_assoc.
+now cbn; rewrite IHl1.
 Qed.
 
 Theorem in_prodn_length : ∀ A (ll : list (list A)) l,
