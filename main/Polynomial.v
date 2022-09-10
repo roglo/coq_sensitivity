@@ -499,6 +499,7 @@ split; intros Hab. {
   apply Nat.ltb_lt in Hab.
   now apply Nat.leb_le, Nat.lt_le_incl.
 } {
+...
 Theorem sorted_le_monl_norm_loop_inj : ∀ it (la : list (monom T)),
   let lb := monl_norm_loop it la in
   monl_norm_nb_iter la ≤ it
@@ -517,9 +518,6 @@ assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
-(*
-apply (sorted_strongly_sorted Htr) in Hs.
-*)
 subst lb.
 revert i j la Hit Hs Hi Hj Hij.
 induction it; intros. {
