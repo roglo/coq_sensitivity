@@ -526,7 +526,53 @@ split; intros Hab. {
   apply Nat.ltb_lt.
   destruct (Nat.eq_dec da' da) as [H| H]; [ subst da' | flia H1 H].
   exfalso; clear H1.
-unfold g in Hab; cbn in Hab.
+...
+  unfold g in Hab; cbn in Hab.
+  destruct it; [ easy | ].
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
+  cbn in Hma.
+  destruct la as [| (ca'', da'')]. {
+    destruct (cb =? 0)%F; [ easy | ].
+    destruct Hma as [Hma| Hma]; [ | easy ].
+    now injection Hma; clear Hma; intros; subst ca' db.
+  }
+  cbn in Hsf, Hab.
+  remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+  destruct cbz. {
+    destruct it; [ easy | ].
+    cbn in Hit.
+    apply Nat.succ_le_mono in Hit.
+    cbn in Hsf, Hab, Hma.
+    destruct la as [| (ca''', da')]. {
+      destruct (ca'' =? 0)%F; [ easy | ].
+      destruct Hma as [Hma| Hma]; [ | easy ].
+      injection Hma; clear Hma; intros; subst ca'' da''.
+      specialize (Hab _ (or_introl eq_refl)).
+      cbn in Hab.
+...
+  remember (cb*☓^db :: la) as lb.
+  clear la Heqlb.
+  rename lb into la.
+  cbn in Hit.
+  clear ca db Hcaf Hdab IHit.
+  rename ca' into ca.
+  revert la Hit Hsf Hab Hma.
+  induction it; intros; [ easy | ].
+  cbn in Hsf, Hab, Hma.
+  destruct la as [| (ca', da')]; [ easy | ].
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
+  destruct it; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  destruct la as [| (ca'', da'')]. {
+    remember (ca' =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+    destruct caz; [ easy | ].
+    destruct Hma as [Hma| Hma]; [ | easy ].
+    injection Hma; clear Hma; intros; subst ca' da'.
+    specialize (Hab _ (or_introl eq_refl)).
+   cbn in Hab.
+...
 Theorem glop : ∀ it (la : list (monom T)),
   monl_norm_nb_iter la ≤ it
   → sorted (λ ma mb, mdeg mb <? mdeg ma) la
@@ -535,7 +581,6 @@ Proof.
 intros * Hit Hs.
 revert la Hit Hs.
 induction it; intros; [ easy | ].
-Admitted.
 ...
 (* mouais, bon, c'est pas ça *)
 apply glop with (it := S it) in Hsf. 2: {
