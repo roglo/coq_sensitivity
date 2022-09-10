@@ -510,6 +510,14 @@ Proof.
 intros * Hit Hs.
 split; [ easy | ].
 intros * Hi Hj Hij.
+assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
+  clear c Hij.
+  intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+apply (sorted_strongly_sorted Htr) in Hs.
 subst lb.
 revert i j la Hit Hs Hi Hj Hij.
 induction it; intros. {
@@ -535,14 +543,18 @@ destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
   subst da'.
   now apply IHit with (la := (ca + ca')*☓^da :: la).
 }
+cbn in Hi, Hj.
 destruct i. {
   clear Hi.
   destruct j; [ easy | exfalso ].
   cbn in Hj, Hij.
   apply Nat.succ_lt_mono in Hj.
-  apply sorted_cons_iff in Hs.
+  apply strongly_sorted_sorted in Hs.
+  apply (sorted_cons_iff Htr) in Hs.
   destruct Hs as (Hs, Hab).
+  apply (sorted_strongly_sorted Htr) in Hs.
   destruct it; [ easy | ].
+  cbn in Hs.
   apply Nat.succ_le_mono in Hit.
   destruct la as [| (ca'', da'')]. {
     cbn in Hs, Hab, Hj, Hij.
@@ -556,11 +568,12 @@ destruct i. {
     destruct it; [ easy | ].
     cbn in Hs, Hab, Hj, Hij.
     destruct la as [| (ca''', da''')]. {
-      destruct (ca'' =? 0)%F; [ easy | ].
+      remember (ca'' =? 0)%F as caz eqn:Hcaz'; symmetry in Hcaz'.
+      destruct caz; [ easy | ].
       apply Nat.lt_1_r in Hj; subst j.
       cbn in Hij; subst da''.
-      specialize (Hab _ (or_introl eq_refl)).
-      cbn in Hab.
+      specialize (Hab _ (or_introl eq_refl)) as H1.
+      cbn in H1.
 (* ah bin non *)
 ... ...
 generalize Hab; intros Hneq.
