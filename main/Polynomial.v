@@ -194,7 +194,7 @@ Fixpoint monl_norm_loop it (la : list (monom T)) :=
       end
   end.
 
-Definition monl_norm_nb_iter (la : list (monom T)) := length la.
+Definition monl_norm_nb_iter (la : list (monom T)) := S (length la).
 
 Definition monl_norm (la : list (monom T)) :=
   monl_norm_loop (monl_norm_nb_iter la)
@@ -391,7 +391,7 @@ Theorem monl_norm_is_canon_monl : ∀ la,
   is_canon_monl (monl_norm la) = true.
 Proof.
 intros.
-unfold is_canon_monl; cbn - [ "<?" ].
+unfold is_canon_monl; cbn - [ "<?" monl_norm_nb_iter ].
 unfold monl_norm.
 apply Bool.andb_true_iff.
 split. {
@@ -400,7 +400,7 @@ split. {
   set (g := λ ma mb, _).
   fold f g in IHla.
   rewrite monl_norm_nb_iter_cons.
-  cbn - [ isort ].
+  cbn - [ isort monl_norm_nb_iter ].
   remember (isort _ _) as lb eqn:Hlb in |-*.
   symmetry in Hlb.
   move lb before la.
@@ -441,7 +441,6 @@ split. {
     }
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst cc dc.
-(**)
       remember (ca*☓^da) as ma eqn:Hma.
       remember (0*☓^db) as mb eqn:Hmb.
       move lb before la; move db before da.
@@ -460,10 +459,11 @@ split. {
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
 Theorem sorted_monl_norm_loop_lt_le_iff : ∀ it la,
-  sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la)
-  ↔ sorted (λ ma mb, mdeg mb <=? mdeg ma) (monl_norm_loop it la).
+  monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la)
+    ↔ sorted (λ ma mb, mdeg mb <=? mdeg ma) (monl_norm_loop it la).
 Proof.
-intros.
+intros * Hit.
 set (f := λ ma mb, _).
 set (g := λ ma mb, _).
 assert (Htrf : transitive f). {
@@ -481,8 +481,10 @@ assert (Htrg : transitive g). {
   now transitivity (mdeg mb).
 }
 split; intros Hab. {
-  revert la Hab.
+  unfold monl_norm_nb_iter in Hit.
+  revert la Hit Hab.
   induction it; intros; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
   cbn in Hab |-*.
   destruct la as [| (ca, da)]; [ easy | ].
   destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
@@ -499,6 +501,51 @@ split; intros Hab. {
   apply Nat.ltb_lt in Hab.
   now apply Nat.leb_le, Nat.lt_le_incl.
 } {
+  unfold monl_norm_nb_iter in Hit.
+  revert la Hit Hab.
+  induction it; intros; [ easy | ].
+  apply Nat.succ_le_mono in Hit.
+  cbn in Hab |-*.
+  destruct la as [| (ca, da)]; [ easy | ].
+  destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
+  remember (ca =? 0)%F as caf eqn:Hcaf; symmetry in Hcaf.
+  destruct caf; [ now apply IHit | ].
+  remember (da =? db) as dab eqn:Hdab; symmetry in Hdab.
+  destruct dab; [ now apply IHit | ].
+  apply Nat.eqb_neq in Hdab.
+  apply sorted_cons_iff in Hab; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hab as (Hsf, Hab).
+  apply IHit in Hsf; [ | easy ].
+  split; [ easy | ].
+  intros (ca', da') Hma.
+  specialize (Hab _ Hma) as H1.
+  unfold g in H1; unfold f.
+  cbn - [ "<?" ] in H1 |-*.
+  apply Nat.leb_le in H1.
+  apply Nat.ltb_lt.
+  destruct (Nat.eq_dec da' da) as [H| H]; [ subst da' | flia H1 H].
+  exfalso; clear H1.
+unfold g in Hab; cbn in Hab.
+Theorem glop : ∀ it (la : list (monom T)),
+  monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) la
+  → monl_norm_loop it la = la.
+Proof.
+intros * Hit Hs.
+revert la Hit Hs.
+induction it; intros; [ easy | ].
+Admitted.
+...
+(* mouais, bon, c'est pas ça *)
+apply glop with (it := S it) in Hsf. 2: {
+  cbn.
+...
+rewrite Hsf in Hab, Hma.
+destruct Hma as [Hma| Hma]. {
+  now injection Hma; clear Hma; intros; subst db.
+}
+(* ça ne résout pas la question *)
 ...
 Theorem sorted_le_monl_norm_loop_inj : ∀ it (la : list (monom T)),
   let lb := monl_norm_loop it la in
