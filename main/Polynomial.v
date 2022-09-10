@@ -502,7 +502,7 @@ split; intros Hab. {
 Theorem sorted_le_monl_norm_loop_inj : ∀ it (la : list (monom T)),
   let lb := monl_norm_loop it la in
   monl_norm_nb_iter la ≤ it
-  → sorted (λ ma mb, mdeg mb <=? mdeg ma) lb
+  → sorted (λ ma mb, mdeg mb <=? mdeg ma) la
   → True ∧ ∀ c i j, i < length lb → j < length lb →
   mdeg (nth i lb (Mon c 0)) = mdeg (nth j lb (Mon c 0))
   → i = j.
@@ -517,7 +517,9 @@ assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
+(*
 apply (sorted_strongly_sorted Htr) in Hs.
+*)
 subst lb.
 revert i j la Hit Hs Hi Hj Hij.
 induction it; intros. {
@@ -536,12 +538,23 @@ apply Nat.succ_le_mono in Hit.
 remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
 destruct caz. {
   apply (rngl_eqb_eq Heq) in Hcaz; subst ca.
+  apply sorted_cons in Hs.
   now apply IHit with (la := ca'*☓^da' :: la).
 }
-rewrite if_eqb_eq_dec in Hs, Hi, Hj, Hij.
+rewrite if_eqb_eq_dec in Hi, Hj, Hij.
 destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
   subst da'.
-  now apply IHit with (la := (ca + ca')*☓^da :: la).
+  apply IHit with (la := (ca + ca')*☓^da :: la); try easy.
+  apply (sorted_cons_iff Htr) in Hs.
+  destruct Hs as (Hs, Hda).
+  apply (sorted_cons_iff Htr) in Hs.
+  destruct Hs as (Hs, Hda').
+  apply (sorted_cons_iff Htr).
+  split; [ easy | ].
+  intros (cb, db) Hmb; cbn.
+  apply Nat.leb_le.
+  specialize (Hda' _ Hmb) as H1.
+  now apply Nat.leb_le in H1; cbn in H1.
 }
 cbn in Hi, Hj.
 destruct i. {
@@ -549,19 +562,23 @@ destruct i. {
   destruct j; [ easy | exfalso ].
   cbn in Hj, Hij.
   apply Nat.succ_lt_mono in Hj.
-  apply strongly_sorted_sorted in Hs.
   apply (sorted_cons_iff Htr) in Hs.
-  destruct Hs as (Hs, Hab).
-  apply (sorted_strongly_sorted Htr) in Hs.
+  destruct Hs as (Hs, Hda).
+  apply (sorted_cons_iff Htr) in Hs.
+  destruct Hs as (Hs, Hda').
   destruct it; [ easy | ].
-  cbn in Hs.
   apply Nat.succ_le_mono in Hit.
   destruct la as [| (ca'', da'')]. {
-    cbn in Hs, Hab, Hj, Hij.
+    clear Hs Hda'.
+    cbn in Hda, Hj, Hij.
     destruct (ca' =? 0)%F; [ easy | ].
     now apply Nat.lt_1_r in Hj; subst j.
   }
-  cbn in Hs, Hab, Hj, Hij.
+  cbn - [ In ] in Hs, Hda, Hda', Hj, Hij.
+  remember (ca' =? 0)%F as caz eqn:Hcaz'; symmetry in Hcaz'.
+  destruct caz. {
+    apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
+...
   remember (ca' =? 0)%F as caz eqn:Hcaz'; symmetry in Hcaz'.
   destruct caz. {
     apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
