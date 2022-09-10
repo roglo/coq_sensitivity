@@ -3038,56 +3038,6 @@ Qed.
 
 (* *)
 
-Theorem filter_isort_insert : ∀ A (rel : A → _),
-  transitive rel →
-  ∀ la b f,
-  sorted rel la
-  → filter f (isort_insert rel b la) =
-      if f b then isort_insert rel b (filter f la)
-      else filter f la.
-Proof.
-intros * Htra * Hs.
-revert b.
-induction la as [| a]; intros; cbn; [ easy | ].
-assert (H : sorted rel la) by now apply sorted_cons in Hs.
-specialize (IHla H); clear H.
-remember (f a) as fa eqn:Hfa; symmetry in Hfa.
-remember (rel b a) as ba eqn:Hba; symmetry in Hba.
-destruct fa; cbn. {
-  rewrite Hba.
-  destruct ba; cbn; rewrite Hfa; [ easy | ].
-  rewrite IHla.
-  now destruct (f b).
-}
-destruct ba; cbn; rewrite Hfa; [ | now apply IHla ].
-remember (f b) as fb eqn:Hfb; symmetry in Hfb.
-destruct fb; [ | easy ].
-specialize (IHla b) as H1.
-rewrite Hfb in H1.
-rewrite <- H1; clear H1 IHla Hfa.
-revert b Hba Hfb.
-induction la as [| c]; intros; cbn; [ now rewrite Hfb | ].
-remember (f c) as fc eqn:Hfc; symmetry in Hfc.
-remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
-destruct fc. {
-  destruct bc; cbn; rewrite Hfc; [ now rewrite Hfb | ].
-  unfold sorted in Hs.
-  remember (c :: la) as lb; cbn in Hs; subst lb.
-  apply Bool.andb_true_iff in Hs.
-  destruct Hs as (Hac, Hs).
-  now rewrite (Htra b a c Hba Hac) in Hbc.
-}
-destruct bc; cbn; rewrite Hfc; [ now rewrite Hfb | ].
-apply IHla; [ | easy | easy ].
-apply sorted_cons_iff in Hs; [ | easy ].
-apply sorted_cons_iff; [ easy | ].
-destruct Hs as (Hs & Hac).
-apply sorted_cons_iff in Hs; [ | easy ].
-split; [ easy | ].
-intros d Hd.
-now apply Hac; right.
-Qed.
-
 Theorem sorted_concat_iff : ∀ A (rel : A → _),
   transitive rel →
   ∀ ll,

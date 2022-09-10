@@ -601,28 +601,6 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
-Theorem map2_first_first : ∀ A B C n la lb (f : A → B → C),
-  n = min (length la) (length lb)
-  → map2 f la lb = map2 f (firstn n la) (firstn n lb).
-Proof.
-intros * Hn.
-symmetry in Hn.
-(**)
-revert la lb Hn.
-induction n; intros. {
-  do 2 rewrite firstn_O.
-  destruct la as [| a]; [ easy | ].
-  destruct lb as [| b]; [ easy | ].
-  easy.
-}
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | ].
-cbn; f_equal.
-cbn in Hn.
-apply Nat.succ_inj in Hn.
-now apply IHn.
-Qed.
-
 (* end map2 *)
 
 (* rank: rank of the first element satisfying a predicate *)
@@ -979,25 +957,6 @@ destruct b. {
   rewrite nth_butn_after; [ | easy ].
   now rewrite Nat.add_0_r.
 }
-Qed.
-
-Theorem map_butn_out : ∀ A (ll : list (list A)) i,
-  (∀ l, l ∈ ll → length l ≤ i)
-  → map (butn i) ll = ll.
-Proof.
-intros * Hi.
-revert i Hi.
-induction ll as [| la]; intros; [ easy | cbn ].
-rewrite IHll. 2: {
-  intros l Hl.
-  now apply Hi; right.
-}
-f_equal.
-specialize (Hi la (or_introl eq_refl)).
-unfold butn.
-rewrite firstn_all2; [ | easy ].
-rewrite skipn_all2; [ | flia Hi ].
-apply app_nil_r.
 Qed.
 
 Theorem in_butn : ∀ A (l : list A) i a, a ∈ butn i l → a ∈ l.
