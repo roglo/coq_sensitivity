@@ -459,13 +459,87 @@ split. {
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
 Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
-  sorted (λ ma mb, mdeg mb <=? mdeg ma) la
+  monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <=? mdeg ma) la
   → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
 Proof.
-intros * Hs.
-revert la Hs.
-induction it; intros; [ easy | ].
-cbn.
+intros * Hit Hs.
+assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htrlt : transitive (λ ma mb : monom T, mdeg mb <? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+unfold monl_norm_nb_iter in Hit.
+revert la Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | ].
+destruct la as [| (cb, db)]; [ now destruct (ca =? 0)%F | ].
+apply Nat.succ_le_mono in Hit; cbn in Hit.
+destruct (ca =? 0)%F. {
+  apply IHit; [ cbn; flia Hit | ].
+  now apply sorted_cons in Hs.
+}
+remember (da =? db) as dab eqn:Hdab; symmetry in Hdab.
+destruct dab. {
+  apply Nat.eqb_eq in Hdab; subst db.
+  apply IHit; [ easy | ].
+  apply (sorted_cons_iff Htr) in Hs.
+  destruct Hs as (Hs & Hada).
+  apply (sorted_cons_iff Htr) in Hs.
+  destruct Hs as (Hs & Hbda).
+  cbn - [ In ] in Hada, Hbda.
+  apply sorted_cons_iff; [ easy | ].
+  split; [ easy | ].
+  intros (cc, dc) Hc; cbn.
+  apply (Hbda _ Hc).
+}
+apply (sorted_cons_iff Htr) in Hs.
+destruct Hs as (Hs & Hada).
+generalize Hs; intros Hs'.
+apply IHit in Hs'; [ | easy ].
+(*
+apply (sorted_cons_iff Htr) in Hs.
+destruct Hs as (Hs & Hbda).
+*)
+cbn - [ In ] in Hada.
+apply sorted_cons_iff; [ easy | ].
+split; [ now apply IHit in Hs | ].
+intros (cc, dc) Hc; cbn.
+specialize (Hada _ (or_introl eq_refl)) as H1; cbn in H1.
+apply Nat.leb_le in H1.
+apply Nat.ltb_lt.
+apply IHit in Hs; [ | easy ].
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hs, Hc, Hs'.
+destruct la as [| (cd, dd)]. {
+  destruct (cb =? 0)%F; [ easy | ].
+  destruct Hc as [Hc| Hc]; [ | easy ].
+  injection Hc; clear Hc; intros; subst cc dc.
+  apply Nat.eqb_neq in Hdab.
+  flia Hdab H1.
+}
+remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+destruct cbz. {
+  apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+  destruct it; [ easy | ].
+  cbn in Hs, Hc, Hs'.
+  destruct la as [| (ce, de)]. {
+    destruct (cd =? 0)%F; [ easy | ].
+    destruct Hc as [Hc| Hc]; [ | easy ].
+    injection Hc; clear Hc; intros; subst cd dd.
+    specialize (Hada _ (or_intror (or_introl eq_refl))) as H2.
+    cbn in H2.
+    apply Nat.leb_le in H2.
+    destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H2 H ].
+(* mmm... ça a pas trop l'air de marcher... *)
 ...
 apply sorted_le_sorted_lt_monl_norm_loop.
 apply sorted_cons_iff.
