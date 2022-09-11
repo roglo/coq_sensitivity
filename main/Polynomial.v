@@ -467,9 +467,8 @@ unfold monl_norm.
 ...
 Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
   monl_norm_nb_iter la ≤ it
-  → sorted (λ ma mb, mdeg mb <? mdeg ma)
-       (monl_norm_loop (monl_norm_nb_iter la)
-          (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
+  → sorted (λ ma mb, mdeg mb <=? mdeg ma) la
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
 Proof.
 intros * Hit Hs.
 assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
