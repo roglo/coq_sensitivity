@@ -2303,17 +2303,17 @@ intros.
 now apply iter_seq_only_one.
 Qed.
 
-(* prodn: cartesian product of several lists *)
+(* cart_prod: cartesian product of several lists *)
 
-Fixpoint prodn {A} (ll : list (list A)) :=
+Fixpoint cart_prod {A} (ll : list (list A)) :=
   match ll with
   | [] => [[]]
-  | l :: ll' => flat_map (λ a, map (cons a) (prodn ll')) l
+  | l :: ll' => flat_map (λ a, map (cons a) (cart_prod ll')) l
   end.
 
-Theorem prodn_length : ∀ A (ll : list (list A)),
+Theorem cart_prod_length : ∀ A (ll : list (list A)),
   ll ≠ []
-  → length (prodn ll) = iter_list ll (fun c l => c * length l) 1.
+  → length (cart_prod ll) = iter_list ll (fun c l => c * length l) 1.
 Proof.
 intros * Hll.
 revert Hll.
@@ -2347,8 +2347,8 @@ rewrite iter_list_cons; cycle 1.
 now cbn; rewrite IHl1.
 Qed.
 
-Theorem in_prodn_length : ∀ A (ll : list (list A)) l,
-  l ∈ prodn ll → length l = length ll.
+Theorem in_cart_prod_length : ∀ A (ll : list (list A)) l,
+  l ∈ cart_prod ll → length l = length ll.
 Proof.
 intros * Hl.
 revert l Hl.
@@ -2365,9 +2365,9 @@ subst l; cbn; f_equal.
 now apply IHll.
 Qed.
 
-Theorem nth_in_prodn : ∀ A (d : A) ll l i,
+Theorem nth_in_cart_prod : ∀ A (d : A) ll l i,
   i < length ll
-  → l ∈ prodn ll
+  → l ∈ cart_prod ll
   → nth i l d ∈ nth i ll [].
 Proof.
 intros * Hi Hll.
@@ -2396,17 +2396,17 @@ rewrite List_nth_succ_cons.
 now apply IHll.
 Qed.
 
-Theorem in_prodn_iff : ∀ A (d : A) ll la,
-  la ∈ prodn ll
+Theorem in_cart_prod_iff : ∀ A (d : A) ll la,
+  la ∈ cart_prod ll
   ↔ length la = length ll ∧ ∀ i, i < length la → nth i la d ∈ nth i ll [].
 Proof.
 intros.
 split. {
   intros Hla.
-  split; [ now apply in_prodn_length in Hla | ].
+  split; [ now apply in_cart_prod_length in Hla | ].
   intros i Hi.
-  apply nth_in_prodn; [ | easy ].
-  apply in_prodn_length in Hla.
+  apply nth_in_cart_prod; [ | easy ].
+  apply in_cart_prod_length in Hla.
   congruence.
 } {
   intros (Hla & Hnth).
@@ -2433,7 +2433,7 @@ split. {
 }
 Qed.
 
-(* end prodn *)
+(* end cart_prod *)
 
 Theorem NoDup_filter {A} : ∀ (f : A → _) l, NoDup l → NoDup (filter f l).
 Proof.

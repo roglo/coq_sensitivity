@@ -88,16 +88,16 @@ Arguments det' M%M.
    remaining terms, whose ε is not 0, i.e. 1 or -1, are the ones when all
    selected columns are different. It holds n^n terms *)
 
-Definition prodn_rep_seq n := prodn (repeat (seq 1 n) n).
+Definition cart_prod_rep_seq n := cart_prod (repeat (seq 1 n) n).
 
 (*
-Compute (prodn_rep_seq 3).
-Compute (prodn (repeat (seq 0 10) 2)).
+Compute (cart_prod_rep_seq 3).
+Compute (cart_prod (repeat (seq 0 10) 2)).
 *)
 
 Definition det'' (M : matrix T) :=
   let n := mat_nrows M in
-  ∑ (l ∈ prodn_rep_seq n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
+  ∑ (l ∈ cart_prod_rep_seq n), ε l * ∏ (i = 1, n), mat_el M i l.(i).
 
 (* *)
 
@@ -117,11 +117,11 @@ Proof. easy. Qed.
 
 (*
 End a.
-Compute (length (prodn [[2;3];[5;7;2];[8;3];[7;2]])).
-Compute (length (prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
-Compute (length (prodn [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (prodn [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
-Compute (length (prodn [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (cart_prod [[2;3];[5;7;2];[8;3];[7;2]])).
+Compute (length (cart_prod [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;2;1]])).
+Compute (length (cart_prod [[3;7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (cart_prod [[7;4;1];[0;6;2;7];[1;3;1;1];[18;3;1]])).
+Compute (length (cart_prod [[7;4;1];[2;7];[1;3;1;1];[18;3;1]])).
 Arguments det {T ro} M%M.
 Arguments det' {T ro} M%M.
 Arguments det'' {T ro} M%M.
@@ -219,11 +219,11 @@ intros l1 Hl1.
 now apply Hll; right.
 Qed.
 
-Theorem prodn_rep_seq_length : ∀ n, n ≠ 0 → length (prodn_rep_seq n) = n ^ n.
+Theorem cart_prod_rep_seq_length : ∀ n, n ≠ 0 → length (cart_prod_rep_seq n) = n ^ n.
 Proof.
 intros * Hnz.
-unfold prodn_rep_seq.
-rewrite prodn_length; [ | now destruct n ].
+unfold cart_prod_rep_seq.
+rewrite cart_prod_length; [ | now destruct n ].
 rewrite iter_list_mul_same_length with (n := n). 2: {
   intros l Hl.
   apply repeat_spec in Hl; subst l.
@@ -232,36 +232,36 @@ rewrite iter_list_mul_same_length with (n := n). 2: {
 f_equal; apply repeat_length.
 Qed.
 
-Fixpoint prodn_rep_seq_inv n l :=
+Fixpoint cart_prod_rep_seq_inv n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a * n ^ length l' + prodn_rep_seq_inv n l'
+  | a :: l' => pred a * n ^ length l' + cart_prod_rep_seq_inv n l'
   end.
 
-Fixpoint old_prodn_rep_seq_inv_loop n l :=
+Fixpoint old_cart_prod_rep_seq_inv_loop n l :=
   match l with
   | [] => 0
-  | a :: l' => pred a + n * old_prodn_rep_seq_inv_loop n l'
+  | a :: l' => pred a + n * old_cart_prod_rep_seq_inv_loop n l'
   end.
 
-Definition old_prodn_rep_seq_inv n l := old_prodn_rep_seq_inv_loop n (rev l).
+Definition old_cart_prod_rep_seq_inv n l := old_cart_prod_rep_seq_inv_loop n (rev l).
 
 (*
 Compute (
   let n := 3 in
-  map (λ l, (prodn_rep_seq_inv n l, old_prodn_rep_seq_inv n l)) (prodn_rep_seq n)
+  map (λ l, (cart_prod_rep_seq_inv n l, old_cart_prod_rep_seq_inv n l)) (cart_prod_rep_seq n)
 ).
 *)
 
-Theorem in_prodn_repeat_iff : ∀ m n l,
+Theorem in_cart_prod_repeat_iff : ∀ m n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i : nat, i ∈ l → 1 ≤ i ≤ m)
-  ↔ l ∈ prodn (repeat (seq 1 m) n).
+  ↔ l ∈ cart_prod (repeat (seq 1 m) n).
 Proof.
 intros.
 split. {
   intros [(Hnz, H1)| (Hnz & Hn & Hm)]; [ now subst n l; left | ].
-  apply (in_prodn_iff 0).
+  apply (in_cart_prod_iff 0).
   rewrite repeat_length.
   split; [ easy | ].
   intros i Hi.
@@ -276,7 +276,7 @@ split. {
   now apply Nat.lt_succ_r.
 } {
   intros Hl.
-  apply (in_prodn_iff 0) in Hl.
+  apply (in_cart_prod_iff 0) in Hl.
   rewrite repeat_length in Hl.
   destruct Hl as (Hln, Hl).
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -299,17 +299,17 @@ split. {
 }
 Qed.
 
-Theorem in_prodn_rep_seq_iff : ∀ n l,
+Theorem in_cart_prod_rep_seq_iff : ∀ n l,
   n = 0 ∧ l = [] ∨
   n ≠ 0 ∧ length l = n ∧ (∀ i, i ∈ l → 1 ≤ i ≤ n)
-  ↔ l ∈ prodn_rep_seq n.
+  ↔ l ∈ cart_prod_rep_seq n.
 Proof.
 intros.
-now apply in_prodn_repeat_iff.
+now apply in_cart_prod_repeat_iff.
 Qed.
 
-Theorem NoDup_prodn_repeat : ∀ m n,
-  NoDup (prodn (repeat (seq 1 m) n)).
+Theorem NoDup_cart_prod_repeat : ∀ m n,
+  NoDup (cart_prod (repeat (seq 1 m) n)).
 Proof.
 intros.
 revert m.
@@ -318,7 +318,7 @@ induction n; intros. {
 }
 cbn.
 specialize (IHn m) as H1.
-remember (prodn (repeat (seq 1 m) n)) as ll eqn:Hll.
+remember (cart_prod (repeat (seq 1 m) n)) as ll eqn:Hll.
 rewrite flat_map_concat_map.
 apply NoDup_concat_if. {
   intros l Hl.
@@ -350,27 +350,27 @@ rewrite seq_nth in Hji; [ | easy ].
 now apply Nat.succ_inj in Hji; symmetry in Hji.
 Qed.
 
-Theorem NoDup_prodn_rep_seq : ∀ n, NoDup (prodn_rep_seq n).
+Theorem NoDup_cart_prod_rep_seq : ∀ n, NoDup (cart_prod_rep_seq n).
 Proof.
 intros n.
-unfold prodn_rep_seq.
-apply NoDup_prodn_repeat.
+unfold cart_prod_rep_seq.
+apply NoDup_cart_prod_repeat.
 Qed.
 
-Theorem prodn_rep_seq_inj : ∀ n i j,
+Theorem cart_prod_rep_seq_inj : ∀ n i j,
   n ≠ 0
   → i < n ^ n
   → j < n ^ n
-  → nth i (prodn_rep_seq n) [] = nth j (prodn_rep_seq n) []
+  → nth i (cart_prod_rep_seq n) [] = nth j (cart_prod_rep_seq n) []
   → i = j.
 Proof.
 intros * Hnz Hi Hj Hij.
-apply (NoDup_nth (prodn_rep_seq n) []); [ | | | easy ]. {
-  apply NoDup_prodn_rep_seq.
+apply (NoDup_nth (cart_prod_rep_seq n) []); [ | | | easy ]. {
+  apply NoDup_cart_prod_rep_seq.
 } {
-  now rewrite prodn_rep_seq_length.
+  now rewrite cart_prod_rep_seq_length.
 } {
-  now rewrite prodn_rep_seq_length.
+  now rewrite cart_prod_rep_seq_length.
 }
 Qed.
 
@@ -548,7 +548,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (prodn_rep_seq n)). {
+assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (cart_prod_rep_seq n)). {
   intros l Hl.
   apply in_map_iff in Hl.
   apply in_map_iff.
@@ -563,7 +563,7 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (prodn_rep_seq n)). 
   }
   rewrite map_id.
   split; [ easy | ].
-  apply in_prodn_rep_seq_iff.
+  apply in_cart_prod_rep_seq_iff.
   right.
   split; [ easy | ].
   split; [ now rewrite map_length, canon_sym_gr_list_length | ].
@@ -579,11 +579,11 @@ assert (Hincl : canon_sym_gr_list_list n ⊂ map (map pred) (prodn_rep_seq n)). 
   now apply canon_sym_gr_list_ub.
 }
 symmetry.
-replace (prodn_rep_seq n) with (map (λ l, map S (map pred l)) (prodn_rep_seq n)). 2: {
+replace (cart_prod_rep_seq n) with (map (λ l, map S (map pred l)) (cart_prod_rep_seq n)). 2: {
   erewrite map_ext_in. 2: {
     intros l Hl.
     rewrite map_map.
-    apply in_prodn_rep_seq_iff in Hl.
+    apply in_cart_prod_rep_seq_iff in Hl.
     destruct Hl as [Hl| Hl]; [ now exfalso | ].
     destruct Hl as (_ & _ & Hl).
     erewrite map_ext_in. 2: {
@@ -599,9 +599,9 @@ replace (prodn_rep_seq n) with (map (λ l, map S (map pred l)) (prodn_rep_seq n)
 rewrite <- map_map.
 rewrite rngl_summation_list_map.
 assert (H1 :
-  ∑ (l ∈ map (map pred) (prodn_rep_seq n)),
+  ∑ (l ∈ map (map pred) (cart_prod_rep_seq n)),
   ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1) =
-  ∑ (l ∈ map (map pred) (prodn_rep_seq n)),
+  ∑ (l ∈ map (map pred) (cart_prod_rep_seq n)),
   if ListDec.In_dec (list_eq_dec Nat.eq_dec) l (canon_sym_gr_list_list n) then
     ε l * ∏ (j = 1, n), mat_el M j (l.(j) + 1)
   else 0). {
@@ -615,7 +615,7 @@ assert (H1 :
     apply in_map_iff.
     apply in_map_iff in Hl.
     destruct Hl as (l1 & H & Hl); subst l; rename l1 into l.
-    apply in_prodn_rep_seq_iff in Hl.
+    apply in_cart_prod_rep_seq_iff in Hl.
     destruct Hl as [Hl| Hl]; [ easy | ].
     destruct Hl as (_ & Hln & Hin).
     exists (canon_sym_gr_list_inv n (map pred l)).
@@ -651,7 +651,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
       destruct Hl as (l1 & H & Hl); subst l.
       rename l1 into l.
       rewrite map_length.
-      apply in_prodn_rep_seq_iff in Hl.
+      apply in_cart_prod_rep_seq_iff in Hl.
       destruct Hl as [Hl| Hl]; [ easy | ].
       destruct Hl as (_ & Hln & Hin).
       rewrite Hln; flia Hi.
@@ -681,7 +681,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     rewrite map_map.
     erewrite map_ext_in. 2: {
       intros i Hi.
-      apply in_prodn_rep_seq_iff in Hl.
+      apply in_cart_prod_rep_seq_iff in Hl.
       destruct Hl as [Hl| Hl]; [ now exfalso | ].
       destruct Hl as (_ & _ & Hl).
       specialize (Hl i Hi).
@@ -691,7 +691,7 @@ apply rngl_summation_list_incl; [ | | easy ]. {
     now rewrite map_id.
   }
   rewrite map_id.
-  apply NoDup_prodn_rep_seq.
+  apply NoDup_cart_prod_rep_seq.
 }
 Qed.
 

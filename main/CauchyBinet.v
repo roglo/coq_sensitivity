@@ -573,10 +573,10 @@ apply IHlll. {
 }
 Qed.
 
-Theorem nth_prodn_same_length : ∀ A n (ll : list (list A)) i,
+Theorem nth_cart_prod_same_length : ∀ A n (ll : list (list A)) i,
   (∀ l, l ∈ ll → length l = n)
   → i < n ^ length ll
-  → length (nth i (prodn ll) []) = length ll.
+  → length (nth i (cart_prod ll) []) = length ll.
 Proof.
 intros * Hll Hi.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -610,7 +610,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   destruct Hll1 as (a & Hll1 & Ha).
   subst ll1.
   rewrite map_length.
-  rewrite prodn_length; [ | easy ].
+  rewrite cart_prod_length; [ | easy ].
   apply iter_list_mul_same_length.
   intros l2 Hl2.
   now apply Hll; right.
@@ -622,7 +622,7 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
   apply in_map_iff in Hl2.
   destruct Hl2 as (l3 & Hl3 & Hl2).
   subst l2; cbn; f_equal.
-  now apply in_prodn_length in Hl2.
+  now apply in_cart_prod_length in Hl2.
 } {
   rewrite map_length.
   rewrite Hll; [ | now left ].
@@ -630,13 +630,13 @@ apply nth_concat_same_length with (m := n ^ length (l1 :: ll)). {
 }
 Qed.
 
-Theorem nth_prodn_rep_seq_length : ∀ n i,
+Theorem nth_cart_prod_rep_seq_length : ∀ n i,
   i < n ^ n
-  → length (nth i (prodn_rep_seq n) []) = n.
+  → length (nth i (cart_prod_rep_seq n) []) = n.
 Proof.
 intros * Hi.
-unfold prodn_rep_seq.
-rewrite nth_prodn_same_length with (n := n). {
+unfold cart_prod_rep_seq.
+rewrite nth_cart_prod_same_length with (n := n). {
   apply repeat_length.
 } {
   intros l Hl.
@@ -769,7 +769,7 @@ assert (Heql : equality (list_eqv Nat.eqb)). {
 }
 set (g1 := λ l, l ° collapse kl).
 set (h1 := λ l, l ° isort_rank Nat.leb kl).
-assert (Hgh : ∀ l, l ∈ prodn_rep_seq n → g1 (h1 l) = l). {
+assert (Hgh : ∀ l, l ∈ cart_prod_rep_seq n → g1 (h1 l) = l). {
   intros l Hl.
   unfold g1, h1.
   rewrite <- (permut_comp_assoc n); cycle 1. {
@@ -783,10 +783,10 @@ assert (Hgh : ∀ l, l ∈ prodn_rep_seq n → g1 (h1 l) = l). {
   rewrite permut_comp_isort_rank_r; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
-  apply in_prodn_rep_seq_iff in Hl.
+  apply in_cart_prod_rep_seq_iff in Hl.
   now destruct Hl.
 }
-assert (Hhg : ∀ l, l ∈ prodn_rep_seq n → h1 (g1 l) = l). {
+assert (Hhg : ∀ l, l ∈ cart_prod_rep_seq n → h1 (g1 l) = l). {
   intros l Hl.
   unfold g1, h1.
   rewrite <- (permut_comp_assoc n); cycle 1. {
@@ -801,18 +801,18 @@ assert (Hhg : ∀ l, l ∈ prodn_rep_seq n → h1 (g1 l) = l). {
   rewrite permut_comp_isort_rank_l; [ | apply isort_rank_permut_seq ].
   rewrite isort_rank_length, <- Hn.
   apply comp_1_r.
-  apply in_prodn_rep_seq_iff in Hl.
+  apply in_cart_prod_rep_seq_iff in Hl.
   now destruct Hl.
 }
 rewrite rngl_summation_list_change_var with (g := g1) (h := h1); [ | easy ].
 rewrite (rngl_summation_list_permut (list_eqv Nat.eqb))
-    with (lb := prodn_rep_seq n); [ | easy | ]. {
+    with (lb := cart_prod_rep_seq n); [ | easy | ]. {
   apply rngl_summation_list_eq_compat.
   intros la Hla.
   f_equal. {
     unfold g1.
     rewrite (sign_comp Hif). 2: {
-      apply in_prodn_rep_seq_iff in Hla.
+      apply in_cart_prod_rep_seq_iff in Hla.
       destruct Hla as [Hla| Hla]; [ easy | ].
       destruct Hla as (_ & Hnc & Hcn).
       rewrite Hnc, Hn.
@@ -944,14 +944,14 @@ apply NoDup_permutation. {
   apply Nat.eqb_eq.
 } {
   apply (NoDup_map_iff []).
-  rewrite prodn_rep_seq_length; [ | easy ].
+  rewrite cart_prod_rep_seq_length; [ | easy ].
   intros i j Hi Hj Hij.
   unfold h1 in Hij.
   unfold "°" in Hij.
   specialize (ext_in_map Hij) as H1.
   assert
     (H : ∀ k, k < n →
-     nth k (nth i (prodn_rep_seq n) []) 0 = nth k (nth j (prodn_rep_seq n) []) 0). {
+     nth k (nth i (cart_prod_rep_seq n) []) 0 = nth k (nth j (cart_prod_rep_seq n) []) 0). {
     intros k Hk.
     apply H1.
     apply (permutation_in_iff Nat.eqb_eq) with (la := seq 0 n). 2: {
@@ -965,53 +965,53 @@ apply NoDup_permutation. {
     apply (permutation_refl Nat.eqb_eq).
   }
   clear H1; rename H into H1.
-  specialize (prodn_rep_seq_inj Hkz Hi Hj) as H2.
+  specialize (cart_prod_rep_seq_inj Hkz Hi Hj) as H2.
   apply H2.
-  remember (nth i (prodn_rep_seq n) []) as la eqn:Hla.
-  remember (nth j (prodn_rep_seq n) []) as lb eqn:Hlb.
+  remember (nth i (cart_prod_rep_seq n) []) as la eqn:Hla.
+  remember (nth j (cart_prod_rep_seq n) []) as lb eqn:Hlb.
   move lb before la.
   apply List_eq_iff.
   split. {
     rewrite Hla, Hlb.
-    rewrite nth_prodn_rep_seq_length; [ | easy ].
-    now rewrite nth_prodn_rep_seq_length.
+    rewrite nth_cart_prod_rep_seq_length; [ | easy ].
+    now rewrite nth_cart_prod_rep_seq_length.
   }
   intros d k.
   destruct (lt_dec k n) as [Hkn| Hkn]. 2: {
     apply Nat.nlt_ge in Hkn.
     rewrite nth_overflow. 2: {
       rewrite Hla.
-      now rewrite nth_prodn_rep_seq_length.
+      now rewrite nth_cart_prod_rep_seq_length.
     }
     rewrite nth_overflow. 2: {
       rewrite Hlb.
-      now rewrite nth_prodn_rep_seq_length.
+      now rewrite nth_cart_prod_rep_seq_length.
     }
     easy.
   }
   rewrite nth_indep with (d' := 0). 2: {
     rewrite Hla.
-    now rewrite nth_prodn_rep_seq_length.
+    now rewrite nth_cart_prod_rep_seq_length.
   }
   symmetry.
   rewrite nth_indep with (d' := 0). 2: {
     rewrite Hlb.
-    now rewrite nth_prodn_rep_seq_length.
+    now rewrite nth_cart_prod_rep_seq_length.
   }
   symmetry.
   now apply H1.
 } {
-  apply NoDup_prodn_rep_seq.
+  apply NoDup_cart_prod_rep_seq.
 }
 intros la.
 split; intros Hla. {
   apply in_map_iff in Hla.
   destruct Hla as (lb & Hla & Hlb); subst la.
-  apply in_prodn_rep_seq_iff in Hlb.
+  apply in_cart_prod_rep_seq_iff in Hlb.
   destruct Hlb as [Hlb| Hlb]; [ easy | ].
   destruct Hlb as (_ & Hlb & Hlbn).
   unfold h1, "°"; cbn.
-  apply in_prodn_rep_seq_iff; right.
+  apply in_cart_prod_rep_seq_iff; right.
   split; [ easy | ].
   rewrite map_length, isort_rank_length.
   split; [ easy | ].
@@ -1022,15 +1022,15 @@ split; intros Hla. {
   apply in_isort_rank in Hj.
   congruence.
 } {
-  apply in_prodn_rep_seq_iff in Hla.
+  apply in_cart_prod_rep_seq_iff in Hla.
   destruct Hla as [Hla| Hla]; [ easy | ].
   destruct Hla as (_ & Hlan & Hla).
   apply in_map_iff.
   exists (g1 la).
   split. {
-    now apply Hhg, in_prodn_rep_seq_iff; right.
+    now apply Hhg, in_cart_prod_rep_seq_iff; right.
   }
-  apply in_prodn_rep_seq_iff; right.
+  apply in_cart_prod_rep_seq_iff; right.
   split; [ easy | ].
   split. {
     unfold g1.
@@ -1080,9 +1080,9 @@ destruct (bool_dec (f a)) as [Hfa| Hfa]. {
 }
 Qed.
 
-Theorem permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists : ∀ n m,
+Theorem permutation_no_dup_cart_prod_repeat_flat_all_permut_sub_lists : ∀ n m,
   permutation (list_eqv eqb)
-    (filter (no_dup Nat.eqb) (prodn (repeat (seq 1 n) m)))
+    (filter (no_dup Nat.eqb) (cart_prod (repeat (seq 1 n) m)))
     (flat_map all_permut (sub_lists_of_seq_1_n n m)).
 Proof.
 intros.
@@ -1096,14 +1096,14 @@ specialize Nat_leb_trans as Htra.
 rewrite isort_when_sorted. 2: {
   apply sorted_filter; [ now apply transitive_list_leb | ].
   apply sorted_list_ltb_leb_incl.
-  apply prodn_repeat_seq_ltb_sorted.
+  apply cart_prod_repeat_seq_ltb_sorted.
 }
 symmetry.
 unfold sub_lists_of_seq_1_n.
 rewrite flat_map_concat_map.
 rewrite <- flat_map_concat_map.
 set (la := flat_map all_permut (sls1n 1 n m)).
-set (lb := filter (no_dup Nat.eqb) (prodn (repeat (seq 1 n) m))).
+set (lb := filter (no_dup Nat.eqb) (cart_prod (repeat (seq 1 n) m))).
 assert (Hab : la ⊂ lb). {
   subst la lb.
   intros la Hla.
@@ -1118,7 +1118,7 @@ assert (Hab : la ⊂ lb). {
   destruct Hlb as (Hsb & Hlb & Hb).
   apply filter_In.
   split. {
-    apply in_prodn_repeat_iff.
+    apply in_cart_prod_repeat_iff.
     destruct m; [ left | right ]. {
       apply length_zero_iff_nil in Hlb; subst lb.
       now destruct Hla.
@@ -1147,7 +1147,7 @@ assert (Hba : lb ⊂ la). {
   destruct Hla as (Hla, Hnd).
   apply (no_dup_NoDup Nat.eqb_eq) in Hnd.
   apply in_flat_map.
-  apply (in_prodn_iff 0) in Hla.
+  apply (in_cart_prod_iff 0) in Hla.
   rewrite repeat_length in Hla.
   destruct Hla as (Hm, Hla).
   rewrite Hm in Hla.
@@ -1192,7 +1192,7 @@ rewrite <- isort_when_sorted with (rel := list_leb Nat.leb) (l := lb). 2: {
   unfold lb.
   apply sorted_filter; [ apply transitive_list_leb, Nat_leb_trans | ].
   apply sorted_list_ltb_leb_incl.
-  apply prodn_repeat_seq_ltb_sorted.
+  apply cart_prod_repeat_seq_ltb_sorted.
 }
 apply (isort_when_permuted Hel). {
   apply antisymmetric_list_leb, Nat_leb_antisym.
@@ -1260,17 +1260,17 @@ apply (incl_incl_permutation Hel); [ | | easy | easy ]. {
 } {
   unfold lb.
   apply NoDup_filter.
-  apply NoDup_prodn_repeat.
+  apply NoDup_cart_prod_repeat.
 }
 Qed.
 
-Theorem rngl_summation_prodn_repeat_filter_no_dup :
+Theorem rngl_summation_cart_prod_repeat_filter_no_dup :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ n m f,
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * f kl =
-  ∑ (kl ∈ filter (no_dup Nat.eqb) (prodn (repeat (seq 1 n) m))),
+  ∑ (kl ∈ filter (no_dup Nat.eqb) (cart_prod (repeat (seq 1 n) m))),
     ε kl * f kl.
 Proof.
 intros Hop Heqb *.
@@ -1311,11 +1311,11 @@ rewrite rngl_add_0_l.
 easy.
 Qed.
 
-Theorem rngl_summation_prodn_sub_lists_all_permut :
+Theorem rngl_summation_cart_prod_sub_lists_all_permut :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ n m f,
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)), ε kl * f kl =
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)), ε kl * f kl =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m), ∑ (kl ∈ all_permut jl), ε kl * f kl.
 Proof.
 intros Hopp Heqb *.
@@ -1324,10 +1324,10 @@ assert (Hel : equality (list_eqv eqb)). {
   unfold equality.
   apply Nat.eqb_eq.
 }
-rewrite rngl_summation_prodn_repeat_filter_no_dup; [ | easy | easy ].
+rewrite rngl_summation_cart_prod_repeat_filter_no_dup; [ | easy | easy ].
 rewrite rngl_summation_summation_list_flat_map; cbn.
 apply (rngl_summation_list_permut _ Hel).
-apply permutation_no_dup_prodn_repeat_flat_all_permut_sub_lists.
+apply permutation_no_dup_cart_prod_repeat_flat_all_permut_sub_lists.
 Qed.
 
 Definition det''' (M : matrix T) :=
@@ -1384,8 +1384,8 @@ Proof.
 intros Hic Hop Hin H10 Heq * Hm.
 rewrite det_is_det''; [ | easy | easy | easy | easy | easy | easy ].
 unfold det'', det'''.
-unfold prodn_rep_seq.
-rewrite rngl_summation_prodn_sub_lists_all_permut; [ | easy | easy ].
+unfold cart_prod_rep_seq.
+rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 now rewrite rngl_summation_list_only_one.
@@ -1537,7 +1537,7 @@ Lemma Cauchy_Binet_formula_step_1 : in_charac_0_field →
   → mat_ncols A = n
   → mat_ncols B = m
   → det (A * B) =
-      ∑ (l ∈ prodn_rep_seq m),
+      ∑ (l ∈ cart_prod_rep_seq m),
         ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)).
 Proof.
 intros Hif * Hmz Har Hac Hbc.
@@ -1564,9 +1564,9 @@ rewrite det_is_det''; try now destruct Hif.
 unfold det''.
 rewrite mat_mul_nrows, Har.
 (*
-  ∑ (l ∈ prodn_rep_seq m),
+  ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), mat_el (A * B) i l.(i) =
-  ∑ (l ∈ prodn_...
+  ∑ (l ∈ cart_prod_...
 
 *)
 unfold "*"%M at 1.
@@ -1582,7 +1582,7 @@ rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi ].
 rewrite seq_nth; [ | flia Hi ].
 rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
 assert (Him : l.(i) - 1 < m). {
-  apply in_prodn_rep_seq_iff in Hl.
+  apply in_cart_prod_rep_seq_iff in Hl.
   destruct Hl as [Hl| Hl]; [ easy | ].
   destruct Hl as (_ & Hlm & Hl).
   assert (H : l.(i) ∈ l). {
@@ -1596,7 +1596,7 @@ rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite seq_nth; [ | easy ].
 rewrite Nat.add_comm.
 rewrite Nat.sub_add; [ easy | ].
-apply in_prodn_rep_seq_iff in Hl.
+apply in_cart_prod_rep_seq_iff in Hl.
 destruct Hl as [Hl| Hl]; [ easy | ].
 destruct Hl as (_ & Hlm & Hl).
 assert (H : nth (i - 1) l 0 ∈ l). {
@@ -1608,11 +1608,11 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
   ∀ m n A B, m ≠ 0 →
-  ∑ (l ∈ prodn_rep_seq m),
+  ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (j = 1, n), mat_el A i j * mat_el B j l.(i)) =
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
-    (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
+    (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hif * Hmz.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
@@ -1621,18 +1621,18 @@ specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_product_summation_distr_prodn; [ | easy | easy ].
+  rewrite rngl_product_summation_distr_cart_prod; [ | easy | easy ].
   remember (∑ (kl ∈ _), _) as x; subst x.
   easy.
 }
 cbn - [ det].
 remember (∑ (l ∈ _), _) as x; subst x.
 (*
-  ∑ (l ∈ prodn_rep_seq m),
+  ∑ (l ∈ cart_prod_rep_seq m),
     ε l *
-    (∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    (∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
        ∏ (i = 1, m), (mat_el A i kl.(i) * mat_el B kl.(i) l.(i))) =
-  ∑ (kl ∈ prodn ...
+  ∑ (kl ∈ cart_prod ...
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -1646,12 +1646,12 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 remember (∑ (l ∈ _), _) as x; subst x.
 (*
-  ∑ (l ∈ prodn_rep_seq m),
+  ∑ (l ∈ cart_prod_rep_seq m),
     ε l *
-    (∑ (i ∈ prodn (repeat (seq 1 n) m)),
+    (∑ (i ∈ cart_prod (repeat (seq 1 n) m)),
        ∏ (i0 = 1, m), mat_el A i0 i.(i0) *
        ∏ (i0 = 1, m), mat_el B i.(i0) l.(i0)) =
-  ∑ (kl ∈ prodn ...
+  ∑ (kl ∈ cart_prod ...
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
@@ -1667,11 +1667,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 remember (∑ (l ∈ _), _) as x; subst x.
 (*
-  ∑ (l ∈ prodn_rep_seq m),
-    (∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (l ∈ cart_prod_rep_seq m),
+    (∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
        ε l * ∏ (i = 1, m), mat_el A i kl.(i) *
        ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
-  ∑ (kl ∈ prodn ...
+  ∑ (kl ∈ cart_prod ...
 *)
 rewrite rngl_summation_summation_list_swap.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -1682,11 +1682,11 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn.
 remember (∑ (kl ∈ _), _) as x; subst x.
 (*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
-    (∑ (l ∈ prodn_rep_seq m),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
+    (∑ (l ∈ cart_prod_rep_seq m),
        ε l * ∏ (i = 1, m), mat_el A i kl.(i) *
        ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
-  ∑ (kl ∈ prodn ...
+  ∑ (kl ∈ cart_prod ...
 *)
 apply rngl_summation_list_eq_compat.
 intros kl Hkl.
@@ -1706,10 +1706,10 @@ Lemma Cauchy_Binet_formula_step_3 : in_charac_0_field →
   is_correct_matrix B = true
   → mat_nrows B = n
   → mat_ncols B = m
-  → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  → ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl *
-      (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
-    ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+      (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+    ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B).
 Proof.
 intros Hif * Hmz Hcb Hbr Hbc.
@@ -1717,7 +1717,7 @@ apply rngl_summation_list_eq_compat.
 intros l Hl.
 f_equal.
 generalize Hl; intros H.
-apply in_prodn_repeat_iff in H.
+apply in_cart_prod_repeat_iff in H.
 destruct H as [H| H]; [ easy | ].
 destruct H as (_ & Hlm & Hln).
 rewrite det_is_det''; try now destruct Hif. 2: {
@@ -1736,7 +1736,7 @@ intros i Hi.
 unfold mat_select_rows, mat_el; cbn.
 rewrite (List_map_nth' 0); [ | rewrite Hlm; flia Hi ].
 assert (H1 : l1.(i) - 1 < m). {
-  apply in_prodn_repeat_iff in Hl1.
+  apply in_cart_prod_repeat_iff in Hl1.
   destruct Hl1 as [Hl1| Hl1]; [ easy | ].
   destruct Hl1 as (_ & Hl1m & Hl1).
   specialize (Hl1 (nth (i - 1) l1 0)).
@@ -1756,21 +1756,21 @@ Lemma Cauchy_Binet_formula_step_4 : in_charac_0_field →
   is_correct_matrix B = true
   → mat_nrows B = n
   → mat_ncols B = m
-  → ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  → ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       f kl * det (mat_select_rows kl B) =
-    ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+    ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
       ε kl * f kl * det (mat_select_rows (isort Nat.leb kl) B).
 Proof.
 intros Hif * Hmz Hcb Hbr Hbc.
 apply rngl_summation_list_eq_compat.
 intros la Hla.
 rewrite (det_isort_rows Hif _ _ Hcb); cycle 1. {
-  apply in_prodn_length in Hla.
+  apply in_cart_prod_length in Hla.
   rewrite repeat_length in Hla.
   congruence.
 } {
   intros k Hk.
-  apply in_prodn_repeat_iff in Hla.
+  apply in_cart_prod_repeat_iff in Hla.
   destruct Hla as [| Hla]; [ easy | ].
   destruct Hla as (_ & Hlam & Hla).
   rewrite Hbr.
@@ -1783,7 +1783,7 @@ Qed.
 
 Lemma Cauchy_Binet_formula_step_5 : in_charac_0_field →
   ∀ m n A B,
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
@@ -1801,7 +1801,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 }
 cbn - [ det ].
 remember (∑ (kl ∈ _), _) as x; subst x.
-rewrite rngl_summation_prodn_sub_lists_all_permut; cycle 1. {
+rewrite rngl_summation_cart_prod_sub_lists_all_permut; cycle 1. {
   now destruct Hif.
 } {
   now destruct Hif.
@@ -2078,26 +2078,26 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
 }
 rewrite (Cauchy_Binet_formula_step_1 Hif A B Hmz Har Hac Hbc).
 (*
-  ∑ (l ∈ prodn_rep_seq m),
+  ∑ (l ∈ cart_prod_rep_seq m),
     ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
 rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hmz).
 (*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) *
-    (∑ (l ∈ prodn_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
+    (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)) =
   ∑ (jl ∈ sub_lists...
 *)
 rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hmz Hcb Hbr Hbc).
 (*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     (∏ (i = 1, m), mat_el A i kl.(i)) * det (mat_select_rows kl B) =
   ∑ (jl ∈ sub_lists...
 *)
 rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
 (*
-  ∑ (kl ∈ prodn (repeat (seq 1 n) m)),
+  ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...

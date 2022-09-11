@@ -574,12 +574,12 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-Theorem rngl_product_summation_distr_prodn :
+Theorem rngl_product_summation_distr_cart_prod :
   rngl_has_opp_or_sous = true →
   ∀ m n (f : nat → nat → T),
   m ≠ 0
   → ∏ (i = 1, m), (∑ (j = 1, n), f i j) =
-    ∑ (l ∈ prodn (repeat (seq 1 n) m)),
+    ∑ (l ∈ cart_prod (repeat (seq 1 n) m)),
       ∏ (i = 1, m), f i (nth (i - 1) l 0%nat).
 Proof.
 intros Hop * Hmz.
@@ -640,4 +640,4 @@ Arguments rngl_product_list_cons {T}%type {ro rp} A%type _ la%list.
 Arguments rngl_product_list_only_one {T ro rp} A%type.
 Arguments rngl_product_list_permut {T ro rp} [A]%type _ _ _ (la lb)%list.
 Arguments rngl_product_shift {T}%type {ro} (s b)%nat _%function k%nat.
-Arguments rngl_product_summation_distr_prodn {T ro rp} _ (m n)%nat.
+Arguments rngl_product_summation_distr_cart_prod {T ro rp} _ (m n)%nat.
