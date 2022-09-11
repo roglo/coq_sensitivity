@@ -465,9 +465,42 @@ intros.
 unfold monl_norm.
 Theorem sorted_lt_monl_norm_loop : ∀ it la,
   monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <=? mdeg ma) la
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
+Proof.
+intros * Hit Hs.
+unfold monl_norm_nb_iter in Hit.
+revert la Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| (ca', da')]; [ now destruct (ca =? 0)%F | ].
+remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+destruct caz. {
+  apply (rngl_eqb_eq Heq) in Hcaz; subst ca.
+  apply IHit; [ easy | ].
+  now apply sorted_cons in Hs.
+}
+...
+Theorem sorted_lt_monl_norm_loop : ∀ it la,
+  monl_norm_nb_iter la ≤ it
   → sorted (λ ma mb, mdeg mb <? mdeg ma)
       (monl_norm_loop it (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 Proof.
+intros * Hit.
+revert la Hit.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | ].
+remember (isort _ _) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| (cb, db)]; [ easy | ].
+cbn in Hlb.
+destruct la as [| (ca', da')]. {
+  cbn in Hlb.
+  injection Hlb; clear Hlb; intros; subst lb cb db.
+  now destruct (ca =? 0)%F.
+}
+cbn in Hlb.
+...
 intros * Hit.
 remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lb eqn:Hlb.
 symmetry in Hlb.
