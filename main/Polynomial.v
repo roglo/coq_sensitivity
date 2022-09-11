@@ -460,8 +460,16 @@ split. {
         subst ca.
 Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
   monl_norm_nb_iter la ≤ it
-  → sorted (λ ma mb, mdeg mb <=? mdeg ma) la
-  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm la).
+Proof.
+intros * Hit.
+unfold monl_norm.
+...
+Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
+  monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <? mdeg ma)
+       (monl_norm_loop (monl_norm_nb_iter la)
+          (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 Proof.
 intros * Hit Hs.
 assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
@@ -539,6 +547,8 @@ destruct cbz. {
     cbn in H2.
     apply Nat.leb_le in H2.
     destruct (Nat.eq_dec dc da) as [H| H]; [ subst dc | flia H2 H ].
+    exfalso; clear H2 Hs Hs'.
+Print monl_norm.
 (* mmm... ça a pas trop l'air de marcher... *)
 ...
 apply sorted_le_sorted_lt_monl_norm_loop.
