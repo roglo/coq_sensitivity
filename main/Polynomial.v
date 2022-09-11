@@ -469,6 +469,18 @@ Theorem sorted_lt_monl_norm_loop : ∀ it la,
   → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
 Proof.
 intros * Hit Hs.
+assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htrlt : transitive (λ ma mb : monom T, mdeg mb <? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
 unfold monl_norm_nb_iter in Hit.
 revert la Hit Hs.
 induction it; intros; [ easy | cbn ].
@@ -481,6 +493,98 @@ destruct caz. {
   apply IHit; [ easy | ].
   now apply sorted_cons in Hs.
 }
+remember (da =? da') as daa eqn:Hdaa; symmetry in Hdaa.
+destruct daa. {
+  apply Nat.eqb_eq in Hdaa; subst da'.
+  apply IHit; [ easy | ].
+  now apply (sorted_cons_iff Htr) in Hs.
+}
+apply (sorted_cons_iff Htrlt).
+split. {
+  apply IHit; [ easy | ].
+  now apply (sorted_cons_iff Htr) in Hs.
+}
+intros (ca'', da'') Hma; cbn.
+apply (sorted_cons_iff Htr) in Hs.
+destruct Hs as (Hs, Hda'); cbn - [ In ] in Hda'.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+apply (sorted_strongly_sorted Htr) in Hs.
+specialize (strongly_sorted_if Htr Hs) as H1.
+cbn - [ nth ] in H1.
+cbn in Hma.
+destruct la as [| (ca''', da''')]. {
+  destruct (ca' =? 0)%F; [ easy | ].
+  destruct Hma as [Hma| Hma]; [ | easy ].
+  injection Hma; clear Hma; intros; subst ca'' da''.
+  specialize (Hda' _ (or_introl eq_refl)) as H2; cbn in H2.
+  apply Nat.leb_le in H2; apply Nat.ltb_lt.
+  apply Nat.eqb_neq in Hdaa.
+  flia Hdaa H2.
+}
+remember (ca' =? 0)%F as caz eqn:Hcaz'; symmetry in Hcaz'.
+destruct caz. {
+  apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
+  destruct it; [ easy | ].
+  cbn in Hma.
+(* ouais, chais pas *)
+...
+intros * Hit Hs.
+assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htrlt : transitive (λ ma mb : monom T, mdeg mb <? mdeg ma)). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+unfold monl_norm_nb_iter in Hit.
+revert la Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| (ca', da')]; [ now destruct (ca =? 0)%F | ].
+remember (ca =? 0)%F as caz eqn:Hcaz; symmetry in Hcaz.
+destruct caz. {
+  apply (rngl_eqb_eq Heq) in Hcaz; subst ca.
+  apply IHit; [ easy | ].
+  now apply sorted_cons in Hs.
+}
+remember (da =? da') as daa eqn:Hdaa; symmetry in Hdaa.
+destruct daa. {
+  apply Nat.eqb_eq in Hdaa; subst da'.
+  apply IHit; [ easy | ].
+  now apply (sorted_cons_iff Htr) in Hs.
+}
+apply (sorted_cons_iff Htrlt).
+split. {
+  apply IHit; [ easy | ].
+  now apply (sorted_cons_iff Htr) in Hs.
+}
+intros (ca'', da'') Hma; cbn.
+apply (sorted_cons_iff Htr) in Hs.
+destruct Hs as (Hs, Hda'); cbn - [ In ] in Hda'.
+destruct it; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hma. {
+  destruct la as [| (ca''', da''')]. {
+    destruct (ca' =? 0)%F; [ easy | ].
+    destruct Hma as [Hma| Hma]; [ | easy ].
+    injection Hma; clear Hma; intros; subst ca'' da''.
+    specialize (Hda' _ (or_introl eq_refl)) as H1; cbn in H1.
+    apply Nat.leb_le in H1; apply Nat.ltb_lt.
+    apply Nat.eqb_neq in Hdaa.
+    flia Hdaa H1.
+  }
+  remember (ca' =? 0)%F as caz eqn:Hcaz'; symmetry in Hcaz'.
+  destruct caz. {
+    apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
+    destruct it; [ easy | ].
+    cbn in Hma.
 ...
 Theorem sorted_lt_monl_norm_loop : ∀ it la,
   monl_norm_nb_iter la ≤ it
