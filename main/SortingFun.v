@@ -3131,6 +3131,7 @@ destruct Ha as (lc & Hc & Hlc).
 destruct Hb as (ld & Hd & Hld).
 move ld before lc.
 subst la lb; cbn.
+unfold "<?"; cbn.
 rename lc into la; rename ld into lb.
 remember (nth k (seq i n) 0) as a eqn:Ha; symmetry in Ha.
 remember (nth j (seq i n) 0) as b eqn:Hb; symmetry in Hb.
@@ -3152,6 +3153,7 @@ revert lb Hlab.
 induction la as [| a]; intros; [ easy | cbn ].
 destruct lb as [| b]; [ easy | ].
 cbn in Hlab.
+unfold "<?" in Hlab; cbn in Hlab.
 destruct b. {
   destruct a; [ now apply IHla | easy ].
 }

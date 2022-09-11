@@ -292,6 +292,8 @@ unfold rngl_inv.
 cbn - [ "/" "mod" ].
 rewrite Hp.
 cbn - [ "/" "mod" ].
+unfold "<?".
+cbn - [ "/" "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 replace (at_least_1 n) with n. 2: {
   destruct n as [| n']; [ easy | ].

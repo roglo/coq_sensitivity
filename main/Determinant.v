@@ -398,7 +398,7 @@ induction n; intros. {
   cbn.
   rewrite rngl_summation_only_one.
   rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
-  unfold ε, iter_seq, iter_list; cbn.
+  unfold ε, iter_seq, iter_list; unfold "<?"; cbn.
   now do 3 rewrite rngl_mul_1_l.
 }
 rewrite determinant_succ.
@@ -477,7 +477,7 @@ f_equal. {
     apply is_scm_mat_iff in Hm.
     destruct Hm as (Hcr & Hc).
     rewrite butn_length, fold_mat_nrows, Hr.
-    cbn; flia Hi Hnz.
+    unfold "<?"; cbn; flia Hi Hnz.
   }
   rewrite Nat.sub_0_r.
   unfold succ_when_ge, Nat.b2n.

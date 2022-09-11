@@ -458,6 +458,19 @@ split. {
       }
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
+Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
+  sorted (λ ma mb, mdeg mb <=? mdeg ma) la
+  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la).
+Proof.
+intros * Hs.
+revert la Hs.
+induction it; intros; [ easy | ].
+cbn.
+...
+apply sorted_le_sorted_lt_monl_norm_loop.
+apply sorted_cons_iff.
+(* bon, chais pas, faut voir, hein... *)
+...
 Theorem sorted_monl_norm_loop_lt_le_iff : ∀ it la,
   monl_norm_nb_iter la ≤ it
   → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm_loop it la)
@@ -471,6 +484,8 @@ assert (Htrf : transitive f). {
   unfold f in Hmab, Hmbc|-*.
   apply Nat.ltb_lt in Hmab, Hmbc.
   apply Nat.ltb_lt.
+Print monl_norm_loop.
+...
   now transitivity (mdeg mb).
 }
 assert (Htrg : transitive g). {

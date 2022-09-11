@@ -2832,5 +2832,6 @@ Notation "a ∧∧ b" := (sumbool_and a b) (at level 80).
 
 Arguments iter_list {A B}%type l%list f%function : simpl never.
 Arguments iter_shift {T}%type s [b k]%nat.
+Arguments "<?" : simpl never.
 
 Global Hint Resolve Nat_mod_fact_upper_bound : core.

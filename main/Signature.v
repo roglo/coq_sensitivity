@@ -1308,6 +1308,7 @@ unfold ε', comp_list; cbn - [ "<?" ].
 rewrite map_length, Hfn, Hgn.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   move Hnz at top; subst n.
+  unfold "<?".
   do 8 rewrite rngl_product_only_one; cbn.
   symmetry.
   rewrite rngl_div_1_r; [ | easy | now destruct Hif ].
