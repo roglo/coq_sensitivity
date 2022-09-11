@@ -458,10 +458,57 @@ split. {
       }
       destruct (rngl_eq_dec Heq ca 0) as [Hcaz| Hcaz]. {
         subst ca.
-Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
-  monl_norm_nb_iter la ≤ it
-  → sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm la).
+Theorem sorted_lt_monl_norm : ∀ la,
+  sorted (λ ma mb, mdeg mb <? mdeg ma) (monl_norm la).
 Proof.
+intros.
+unfold monl_norm.
+Theorem sorted_lt_monl_norm_loop : ∀ it la,
+  monl_norm_nb_iter la ≤ it
+  → sorted (λ ma mb, mdeg mb <? mdeg ma)
+      (monl_norm_loop it (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
+Proof.
+intros * Hit.
+remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lb eqn:Hlb.
+symmetry in Hlb.
+unfold monl_norm_nb_iter in Hit.
+revert la lb Hit Hlb.
+induction it; intros; [ easy | cbn ].
+destruct lb as [| (cb, db)]; [ easy | ].
+destruct lb as [| (cb', db')]; [ now destruct (cb =? 0)%F | ].
+apply Nat.succ_le_mono in Hit.
+remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+destruct cbz. {
+  apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+  destruct la as [| (ca, da)]; [ easy | cbn ].
+  cbn in Hit, Hlb.
+  remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lc eqn:Hlc.
+  symmetry in Hlc.
+  generalize Hlc; intros Hs.
+  apply (IHit _ _ Hit) in Hs.
+(* ah putain fait chier *)
+(* faut réfléchir *)
+...
+  apply (IHit la _ Hit).
+  cbn in Hlb.
+  remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lc eqn:Hlc.
+  symmetry in Hlc.
+...
+remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [| (cb, db)]; [ easy | ].
+destruct lb as [| (cb', db')]; [ now destruct (cb =? 0)%F | ].
+remember (cb =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+destruct cbz. {
+  apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+  destruct la as [| (ca, da)]; [ easy | cbn ].
+clear it Hit.
+  cbn in Hit.
+  destruct lb as [| (cb, db'')]; [ now destruct (cb' =? 0)%F | ].
+  remember (cb' =? 0)%F as cbz eqn:Hcbz; symmetry in Hcbz.
+  destruct cbz. {
+    apply (rngl_eqb_eq Heq) in Hcbz; subst cb'.
+...
 intros * Hit.
 unfold monl_norm.
 unfold monl_norm_nb_iter in Hit.
@@ -474,6 +521,8 @@ destruct lb as [| (cb, db)]; [ easy | ].
 destruct lb as [| (cb', db')]; [ now destruct (cb =? 0)%F | ].
 destruct (cb =? 0)%F. {
   destruct la as [| (ca, da)]; [ easy | ].
+  cbn in Hit.
+  specialize (IHit _ Hit) as H1.
   cbn.
 ...
 Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
