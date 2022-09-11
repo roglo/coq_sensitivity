@@ -464,6 +464,13 @@ Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
 Proof.
 intros * Hit.
 unfold monl_norm.
+unfold monl_norm_nb_iter in Hit.
+revert la Hit.
+induction it; intros; [ easy | cbn ].
+remember (isort (λ ma mb : monom T, mdeg mb <=? mdeg ma) la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [| (ca, da)]; [ easy | ].
+destruct lb as [| (cb, db)]. {
 ...
 Theorem sorted_le_sorted_lt_monl_norm_loop : ∀ it la,
   monl_norm_nb_iter la ≤ it
