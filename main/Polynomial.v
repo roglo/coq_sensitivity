@@ -194,7 +194,7 @@ Fixpoint merge_mon it la :=
       end
   end.
 
-Definition merge_mon_nb_iter (la : list (monom T)) := length la.
+Definition merge_mon_nb_iter (la : list (monom T)) := S (length la).
 
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
@@ -211,6 +211,7 @@ Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_norm « 1· + 1*☓^2 + (-1)· »).
+Compute (polyn_norm « »).
 *)
 
 (* euclidean division *)
@@ -393,23 +394,34 @@ intros; cbn.
 now rewrite Nat.eqb_refl.
 Qed.
 
-Theorem monl_norm_is_sorted_le : ∀ la,
-  sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
+Theorem in_merge_mon : ∀ it (ma : monom T) la,
+  merge_mon_nb_iter la ≤ it
+  → ma ∈ merge_mon it la
+  → mdeg ma ∈ map (λ mb, mdeg mb) la.
 Proof.
-intros.
-set (f := λ x y : monom T, mdeg y <=? mdeg x).
-assert (Htr : transitive f). {
-  intros ma mb mc Hmab Hmbc.
-  apply Nat.leb_le in Hmab, Hmbc.
-  apply Nat.leb_le.
-  now transitivity (mdeg mb).
+intros * Hit Hma.
+unfold merge_mon_nb_iter in Hit.
+revert ma la Hit Hma.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+destruct la as [| (cb, db)]; [ easy | ].
+cbn - [ In ] in Hma |-*.
+destruct la as [| (ca, da)]. {
+  destruct Hma as [Hma| Hma]; [ | easy ].
+  now subst ma; left.
 }
-unfold monl_norm.
-fold f.
-apply (sorted_filter Htr).
-remember (merge_mon_nb_iter la) as it eqn:H.
-assert (Hit : merge_mon_nb_iter la ≤ it) by now subst it.
-clear H.
+cbn in Hma.
+rewrite if_eqb_eq_dec in Hma.
+destruct (Nat.eq_dec db da) as [Hdba| Hdba]. {
+  subst db.
+  specialize (IHit ma ((cb + ca)*☓^da :: la) Hit Hma) as H1.
+  destruct H1 as [H1| H1]; [ now cbn in H1; subst da; left | ].
+  now right; right.
+}
+destruct Hma as [Hma| Hma]; [ now subst ma; left | ].
+now right; apply IHit.
+Qed.
+
 Theorem sorted_sorted_merge_mon : ∀ it la,
   let f := λ ma mb, mdeg mb <=? mdeg ma in
   merge_mon_nb_iter la ≤ it
@@ -449,49 +461,41 @@ intros (cb, db) Hb.
 unfold f; cbn.
 specialize (Ha _ (or_introl eq_refl)) as H1.
 unfold f in H1; cbn in H1.
-... ...
-apply sorted_sorted_merge_mon. 2: {
-  fold f.
-  apply sorted_isort.
-  (* ok *)
-...
-unfold merge_mon_nb_iter in Hit.
-remember (isort f la) as lb eqn:Hlb; symmetry in Hlb.
-revert la lb Hit Hlb.
-induction it; intros; [ easy | cbn ].
-destruct lb as [| (cb, db)]; [ easy | ].
-destruct lb as [| (cb', db')]; [ easy | cbn ].
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
-  subst db'.
-  destruct la as [| (ca, da)]; [ easy | ].
-  cbn in Hit; apply Nat.succ_le_mono in Hit.
-...
-destruct la as [| (ca, da)]; [ easy | ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-cbn - [ isort ].
-remember (isort f _) as lb eqn:Hlb in |-*; symmetry in Hlb.
-destruct lb as [| (cb, db)]; [ easy | ].
-destruct lb as [| (cb', db')]; [ easy | cbn ].
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
-  subst db'.
-...
-  apply (f_equal (merge_mon (S it))) in Hlb.
-  rewrite merge_mon_same_deg in Hlb.
-  rewrite <- Hlb.
-  cbn - [ isort ].
-  remember (isort f _) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| (cc, dc)]; [ easy | ].
-  destruct lc as [| (cc', dc')]; [ easy | cbn ].
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec dc dc') as [Hdcc| Hdcc]. {
-    subst dc'.
-...
-  cbn in Hlb.
-  destruct la as [| (ca', da')]; [ easy | ].
-(* pffff... *)
-...
+apply in_merge_mon in Hb; [ | easy ].
+cbn - [ In ] in Hb.
+destruct Hb as [Hb| Hb]; [ now subst da' | ].
+apply in_map_iff in Hb.
+destruct Hb as ((cc, dc) & Hb & Hmc).
+cbn in Hb; subst dc.
+apply (sorted_cons_iff Htrf) in Hs.
+destruct Hs as (Hs & Ha').
+specialize (Ha' _ Hmc) as H2.
+cbn in H2.
+apply Nat.leb_le in H1, H2.
+apply Nat.leb_le.
+now transitivity da'.
+Qed.
+
+Theorem monl_norm_is_sorted_le : ∀ la,
+  sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
+Proof.
+intros.
+set (f := λ x y : monom T, mdeg y <=? mdeg x).
+assert (Htr : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htt : total_relation f). {
+  intros ma mb.
+  apply Nat_leb_total_relation.
+}
+unfold monl_norm.
+apply (sorted_filter Htr).
+apply sorted_sorted_merge_mon; [ | now apply sorted_isort ].
+now unfold merge_mon_nb_iter; rewrite isort_length.
+Qed.
 
 Theorem monl_norm_is_sorted_lt : ∀ la,
   sorted (λ x y : monom T, mdeg y <? mdeg x) (monl_norm la).
