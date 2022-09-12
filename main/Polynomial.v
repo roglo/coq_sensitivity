@@ -385,6 +385,14 @@ Theorem merge_mon_nb_iter_cons : ∀ (ma : monom T) la,
   merge_mon_nb_iter (ma :: la) = S (merge_mon_nb_iter la).
 Proof. easy. Qed.
 
+Theorem merge_mon_same_deg : ∀ it ca cb da la,
+  merge_mon (S it) (ca*☓^da :: cb*☓^da :: la) =
+  merge_mon it ((ca + cb)*☓^da :: la).
+Proof.
+intros; cbn.
+now rewrite Nat.eqb_refl.
+Qed.
+
 Theorem monl_norm_is_sorted_le : ∀ la,
   sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
 Proof.
@@ -399,15 +407,32 @@ assert (Htr : transitive f). {
 unfold monl_norm.
 fold f.
 apply (sorted_filter Htr).
-unfold merge_mon_nb_iter.
-induction la as [| (ca, da)]; [ easy | ].
+remember (merge_mon_nb_iter la) as it eqn:H.
+assert (Hit : merge_mon_nb_iter la ≤ it) by now subst it.
+clear H.
+unfold merge_mon_nb_iter in Hit.
+revert la Hit.
+induction it; intros; [ easy | ].
+destruct la as [| (ca, da)]; [ easy | ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+cbn - [ isort ].
 remember (isort f _) as lb eqn:Hlb in |-*; symmetry in Hlb.
-cbn.
 destruct lb as [| (cb, db)]; [ easy | ].
 destruct lb as [| (cb', db')]; [ easy | cbn ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
   subst db'.
+  apply (f_equal (merge_mon (S it))) in Hlb.
+  rewrite merge_mon_same_deg in Hlb.
+  rewrite <- Hlb; cbn.
+...
+  cbn - [ isort ].
+...
+  apply IHit.
+...
+  cbn in Hlb.
+Search (isort_insert _ _ _ = _ :: _).
+...
   cbn in Hlb.
   destruct la as [| (ca', da')]; [ easy | ].
 (* pffff... *)
