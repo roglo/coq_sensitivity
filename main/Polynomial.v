@@ -188,9 +188,10 @@ Fixpoint monl_norm_loop it (la : list (monom T)) :=
       | [] => []
       | [Mon ca da] => if (ca =? 0)%F then [] else la
       | Mon ca da :: ((Mon cb db :: lb) as lb') =>
-          if (ca =? 0)%F then monl_norm_loop it' lb'
-          else if da =? db then monl_norm_loop it' (Mon (ca + cb)%F da :: lb)
-          else Mon ca da :: monl_norm_loop it' lb'
+          if ((ca =? 0)%F || (da =? db))%bool then
+            monl_norm_loop it' (Mon (ca + cb) db :: lb)
+          else
+            Mon ca da :: monl_norm_loop it' lb'
       end
   end.
 
@@ -261,6 +262,7 @@ Import Q.Notations.
 Open Scope Q_scope.
 (**)
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
+Compute (polyn_norm « 7· + 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «4*☓^2 + (-1)·» «2·»).
 Compute (polyn_quot_rem «1*☓^2 + (-1)·» «2*☓»).
@@ -377,7 +379,7 @@ Theorem monl_norm_is_canon_monl : ∀ la,
   is_canon_monl (monl_norm la) = true.
 Proof.
 intros.
-unfold is_canon_monl; cbn - [ "<?" monl_norm_nb_iter ].
+unfold is_canon_monl; cbn - [ monl_norm_nb_iter ].
 unfold monl_norm.
 apply Bool.andb_true_iff.
 split. {
@@ -394,6 +396,13 @@ split. {
   destruct lb as [| (cc, dc)]; [ now destruct (cb =? 0)%F | ].
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [Hcbz| Hcbz]. {
+(**)
+    cbn.
+    destruct lb as [| (cb', db')]; [ now destruct (cb + cc =? 0)%F | ].
+    remember ((cb + cc =? 0)%F || (dc =? db'))%bool as cbcz eqn:Hcbcz.
+    symmetry in Hcbcz.
+    destruct cbcz. {
+...
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
     specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
