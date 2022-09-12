@@ -419,7 +419,8 @@ destruct lb as [| (cb', db')]; [ easy | cbn ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
   subst db'.
-  apply IHit with (la := la).
+  destruct la as [| (ca, da)]; [ easy | ].
+  cbn in Hit; apply Nat.succ_le_mono in Hit.
 ...
 destruct la as [| (ca, da)]; [ easy | ].
 cbn in Hit; apply Nat.succ_le_mono in Hit.
