@@ -396,15 +396,17 @@ split. {
   destruct lb as [| (cc, dc)]; [ now destruct (cb =? 0)%F | ].
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [Hcbz| Hcbz]. {
-(**)
+(*
     cbn.
     destruct lb as [| (cb', db')]; [ now destruct (cb + cc =? 0)%F | ].
     remember ((cb + cc =? 0)%F || (dc =? db'))%bool as cbcz eqn:Hcbcz.
     symmetry in Hcbcz.
     destruct cbcz. {
       unfold monl_norm_nb_iter in IHla; cbn in IHla.
-...
+*)
+(*
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+*)
     cbn in Hlb.
     specialize (in_isort_insert_id g (Mon ca da) (isort g la)) as H1.
     rewrite Hlb in H1.
@@ -433,6 +435,21 @@ split. {
     destruct H1 as [H1| H1]. {
       injection H1; clear H1; intros; subst ca db.
       apply isort_insert_sorted_cons in Hlb; [ | easy | easy ].
+      rewrite Hlb in IHla.
+      rewrite fold_sorted in IHla |-*.
+...
+      apply Bool.orb_true_iff in Hcbz.
+      destruct Hcbz as [Hcbz| Hcbz]. {
+        apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
+        now rewrite rngl_add_0_l.
+      } {
+        clear da Hcbz.
+        apply Nat.eqb_eq in Hcbz; subst dc.
+        rewrite Hlb in Hsis.
+...
+        apply (sorted_cons_iff Htrg) in Hsis.
+        cbn in IHla |-*.
+...
       now rewrite Hlb in IHla.
     }
     destruct H1 as [H1| H1]. {
