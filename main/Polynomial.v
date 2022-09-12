@@ -438,6 +438,10 @@ split. {
       rewrite Hlb in IHla.
       rewrite fold_sorted in IHla |-*.
 ...
+(**)
+      cbn in IHla |-*.
+      destruct lb as [| (cb', db')]; [ now destruct (cb + cc =? 0)%F | ].
+...
       apply Bool.orb_true_iff in Hcbz.
       destruct Hcbz as [Hcbz| Hcbz]. {
         apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
