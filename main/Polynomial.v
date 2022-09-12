@@ -207,11 +207,7 @@ Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
     list (monom T) * list (monom T) :=
   match it with
-(**)
   | 0 => ([], [Mon (rngl_of_nat 97) 0]) (* algo err: not enough iterations *)
-(*
-  | 0 => ([], [])
-*)
   | S it' =>
       match la with
       | [] => ([], [])
@@ -220,20 +216,10 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
           | [] => ([], []) (* division by zero *)
           | Mon cb db :: _ =>
               let c := (ca / cb)%F in
-(**)
-              if (c =? 0)%F then ([], la)
-              else if da <? db then ([], la)
+              if ((c =? 0)%F || (da <? db))%bool then ([], la)
               else
-(*
-              if da <? db then ([], la)
-              else
-*)
                 let mq := Mon c (da - db) in
-(*
-                let lr := monl_sub la (monl_mul lb [mq]) in
-*)
                 let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
-(**)
                 let (lq', lr') := monl_quot_rem_loop it' lr lb in
                 (mq :: lq', lr')
           end
@@ -509,9 +495,11 @@ apply (sorted_cons_iff Htr) in Hs.
 destruct Hs as (Hs, Hda'); cbn - [ In ] in Hda'.
 destruct it; [ easy | ].
 apply Nat.succ_le_mono in Hit.
+(*
 apply (sorted_strongly_sorted Htr) in Hs.
 specialize (strongly_sorted_if Htr Hs) as H1.
 cbn - [ nth ] in H1.
+*)
 cbn in Hma.
 destruct la as [| (ca''', da''')]. {
   destruct (ca' =? 0)%F; [ easy | ].
@@ -527,7 +515,23 @@ destruct caz. {
   apply (rngl_eqb_eq Heq) in Hcaz'; subst ca'.
   destruct it; [ easy | ].
   cbn in Hma.
-(* ouais, chais pas *)
+  destruct la as [| (ca', da'''')]. {
+    destruct (ca''' =? 0)%F; [ easy | ].
+    destruct Hma as [Hma| Hma]; [ | easy ].
+    injection Hma; clear Hma; intros; subst ca''' da'''.
+    specialize (Hda' _ (or_intror (or_introl eq_refl))) as H1.
+    cbn in H1.
+    apply Nat.leb_le in H1.
+    apply Nat.ltb_lt.
+    specialize (Hda' _ (or_introl eq_refl)) as H2.
+    cbn in H2.
+    apply Nat.eqb_neq in Hdaa.
+    apply Nat.leb_le in H2.
+    unfold sorted in Hs; cbn in Hs.
+    rewrite Bool.andb_true_r in Hs.
+    apply Nat.leb_le in Hs.
+    flia Hs H2 Hdaa.
+  }
 ...
 intros * Hit Hs.
 assert (Htr : transitive (λ ma mb : monom T, mdeg mb <=? mdeg ma)). {
