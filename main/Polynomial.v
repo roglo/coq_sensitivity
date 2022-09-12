@@ -180,28 +180,45 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
    return a polynomial whose degree are in decreasing order
    and no coefficient is nul *)
 
-Fixpoint monl_norm_loop it (la : list (monom T)) :=
+Fixpoint merge_near {A} (merge_op : A → A → option A) it la :=
   match it with
-  | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
+  | 0 => []
   | S it' =>
       match la with
-      | [] => []
-      | [Mon ca da] => if (ca =? 0)%F then [] else la
-      | Mon ca da :: ((Mon cb db :: lb) as lb') =>
-          if ((ca =? 0)%F || (da =? db))%bool then
-            monl_norm_loop it' (Mon (ca + cb) db :: lb)
-          else
-            Mon ca da :: monl_norm_loop it' lb'
+      | [] | [_] => la
+      | a :: b :: lb =>
+          match merge_op a b with
+          | Some c => merge_near merge_op it' (c :: lb)
+          | None => a :: merge_near merge_op it' (b :: lb)
+          end
       end
   end.
 
-Definition monl_norm_nb_iter (la : list (monom T)) := S (length la).
+Definition merge_near_nb_iter (la : list (monom T)) := length la.
+
+Definition merge_mon :=
+  merge_near
+    (λ ma mb,
+       if mdeg ma =? mdeg mb then
+         Some (Mon (mcoeff ma + mcoeff mb) (mdeg ma))
+       else None).
 
 Definition monl_norm (la : list (monom T)) :=
-  monl_norm_loop (monl_norm_nb_iter la)
-    (isort (λ ma mb, mdeg mb <=? mdeg ma) la).
+  filter (λ ma, (mcoeff ma ≠? 0)%F)
+    (merge_mon
+       (merge_near_nb_iter la)
+       (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
+
+(*
+End a.
+Arguments polyn_norm {T ro} pa.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
+Compute (polyn_norm « 1· + 1*☓^2 + (-1)· »).
+*)
 
 (* euclidean division *)
 
@@ -285,9 +302,9 @@ Declare Scope P_scope.
 Delimit Scope P_scope with P.
 
 Arguments is_canon_polyn {T ro} p%P.
+Arguments merge_mon {T ro} it%nat la%list.
 Arguments monl_add {T} (la lb)%list.
 Arguments monl_norm {T ro} la%list.
-Arguments monl_norm_loop {T ro} it%nat la%list.
 Arguments monl_opp {T ro} la%list.
 Arguments polyn_add {T} (pa pb)%P.
 Arguments polyn_mul {T ro} (pa pb)%P.
@@ -371,15 +388,30 @@ Qed.
 Definition canon_polyn_zero := mk_canon_polyn polyn_zero zero_is_canon_polyn.
 Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
 
-Theorem monl_norm_nb_iter_cons : ∀ (ma : monom T) la,
-  monl_norm_nb_iter (ma :: la) = S (monl_norm_nb_iter la).
+Theorem merge_near_nb_iter_cons : ∀ (ma : monom T) la,
+  merge_near_nb_iter (ma :: la) = S (merge_near_nb_iter la).
 Proof. easy. Qed.
-
 
 Theorem monl_norm_is_sorted_le : ∀ la,
   sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
 Proof.
 intros.
+set (f := λ x y : monom T, mdeg y <=? mdeg x).
+assert (Htr : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+unfold monl_norm.
+fold f.
+apply (sorted_filter Htr).
+unfold merge_near_nb_iter.
+induction la as [| (ca, da)]; [ easy | ].
+remember (isort f _) as lb eqn:Hlb in |-*; symmetry in Hlb.
+cbn.
+destruct lb as [| (cb, db)]; [ easy | ].
+destruct lb as [| (cb', db')]; [ easy | ].
 cbn.
 ...
 
