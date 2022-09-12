@@ -180,33 +180,26 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
    return a polynomial whose degree are in decreasing order
    and no coefficient is nul *)
 
-Fixpoint merge_near {A} (merge_op : A → A → option A) it la :=
+Fixpoint merge_mon it la :=
   match it with
-  | 0 => []
+  | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
   | S it' =>
       match la with
       | [] | [_] => la
-      | a :: b :: lb =>
-          match merge_op a b with
-          | Some c => merge_near merge_op it' (c :: lb)
-          | None => a :: merge_near merge_op it' (b :: lb)
-          end
+      | ma :: mb :: lb =>
+          if mdeg ma =? mdeg mb then
+            merge_mon it' ((mcoeff ma + mcoeff mb)*☓^mdeg ma :: lb)
+          else
+            ma :: merge_mon it' (mb :: lb)
       end
   end.
 
-Definition merge_near_nb_iter (la : list (monom T)) := length la.
-
-Definition merge_mon :=
-  merge_near
-    (λ ma mb,
-       if mdeg ma =? mdeg mb then
-         Some (Mon (mcoeff ma + mcoeff mb) (mdeg ma))
-       else None).
+Definition merge_mon_nb_iter (la : list (monom T)) := length la.
 
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
     (merge_mon
-       (merge_near_nb_iter la)
+       (merge_mon_nb_iter la)
        (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
@@ -388,8 +381,8 @@ Qed.
 Definition canon_polyn_zero := mk_canon_polyn polyn_zero zero_is_canon_polyn.
 Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
 
-Theorem merge_near_nb_iter_cons : ∀ (ma : monom T) la,
-  merge_near_nb_iter (ma :: la) = S (merge_near_nb_iter la).
+Theorem merge_mon_nb_iter_cons : ∀ (ma : monom T) la,
+  merge_mon_nb_iter (ma :: la) = S (merge_mon_nb_iter la).
 Proof. easy. Qed.
 
 Theorem monl_norm_is_sorted_le : ∀ la,
@@ -406,13 +399,18 @@ assert (Htr : transitive f). {
 unfold monl_norm.
 fold f.
 apply (sorted_filter Htr).
-unfold merge_near_nb_iter.
+unfold merge_mon_nb_iter.
 induction la as [| (ca, da)]; [ easy | ].
 remember (isort f _) as lb eqn:Hlb in |-*; symmetry in Hlb.
 cbn.
 destruct lb as [| (cb, db)]; [ easy | ].
-destruct lb as [| (cb', db')]; [ easy | ].
-cbn.
+destruct lb as [| (cb', db')]; [ easy | cbn ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
+  subst db'.
+  cbn in Hlb.
+  destruct la as [| (ca', da')]; [ easy | ].
+(* pffff... *)
 ...
 
 Theorem monl_norm_is_sorted_lt : ∀ la,
