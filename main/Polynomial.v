@@ -375,9 +375,29 @@ Theorem monl_norm_nb_iter_cons : ∀ (ma : monom T) la,
   monl_norm_nb_iter (ma :: la) = S (monl_norm_nb_iter la).
 Proof. easy. Qed.
 
+
+Theorem monl_norm_is_sorted_le : ∀ la,
+  sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
+Proof.
+intros.
+cbn.
+...
+
+Theorem monl_norm_is_sorted_lt : ∀ la,
+  sorted (λ x y : monom T, mdeg y <? mdeg x) (monl_norm la).
+Proof.
+intros.
+...
+
 Theorem monl_norm_is_canon_monl : ∀ la,
   is_canon_monl (monl_norm la) = true.
 Proof.
+intros.
+unfold is_canon_monl.
+apply Bool.andb_true_iff.
+split. {
+  rewrite fold_sorted.
+...
 intros.
 unfold is_canon_monl; cbn - [ monl_norm_nb_iter ].
 unfold monl_norm.
