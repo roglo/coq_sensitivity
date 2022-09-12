@@ -501,6 +501,19 @@ Theorem monl_norm_is_sorted_lt : ∀ la,
   sorted (λ x y : monom T, mdeg y <? mdeg x) (monl_norm la).
 Proof.
 intros.
+unfold monl_norm.
+set (f := λ x y : monom T, mdeg y <? mdeg x).
+set (g := λ x y : monom T, mdeg y <=? mdeg x).
+assert (Htrf : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+apply (sorted_filter Htrf).
+...
+apply sorted_sorted_merge_mon; [ | now apply sorted_isort ].
+now unfold merge_mon_nb_iter; rewrite isort_length.
 ...
 
 Theorem monl_norm_is_canon_monl : ∀ la,
