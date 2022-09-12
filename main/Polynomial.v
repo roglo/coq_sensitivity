@@ -410,7 +410,7 @@ apply (sorted_filter Htr).
 remember (merge_mon_nb_iter la) as it eqn:H.
 assert (Hit : merge_mon_nb_iter la ≤ it) by now subst it.
 clear H.
-Theorem glop : ∀ it la,
+Theorem sorted_sorted_merge_mon : ∀ it la,
   let f := λ ma mb, mdeg mb <=? mdeg ma in
   merge_mon_nb_iter la ≤ it
   → sorted f la
@@ -444,17 +444,13 @@ destruct (da =? da'). {
 apply sorted_cons_iff in Hs; [ | easy ].
 apply sorted_cons_iff; [ easy | ].
 destruct Hs as (Hs & Ha).
-(*
-apply sorted_cons_iff in Hs; [ | easy ].
-destruct Hs as (Hs, Ha').
-*)
 split; [ now apply IHit | ].
 intros (cb, db) Hb.
 unfold f; cbn.
 specialize (Ha _ (or_introl eq_refl)) as H1.
 unfold f in H1; cbn in H1.
 ... ...
-apply glop. 2: {
+apply sorted_sorted_merge_mon. 2: {
   fold f.
   apply sorted_isort.
   (* ok *)
