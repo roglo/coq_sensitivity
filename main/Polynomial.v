@@ -402,6 +402,7 @@ split. {
     remember ((cb + cc =? 0)%F || (dc =? db'))%bool as cbcz eqn:Hcbcz.
     symmetry in Hcbcz.
     destruct cbcz. {
+      unfold monl_norm_nb_iter in IHla; cbn in IHla.
 ...
     apply (rngl_eqb_eq Heq) in Hcbz; subst cb.
     cbn in Hlb.
