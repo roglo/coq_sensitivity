@@ -411,8 +411,16 @@ remember (merge_mon_nb_iter la) as it eqn:H.
 assert (Hit : merge_mon_nb_iter la ≤ it) by now subst it.
 clear H.
 unfold merge_mon_nb_iter in Hit.
-revert la Hit.
-induction it; intros; [ easy | ].
+remember (isort f la) as lb eqn:Hlb; symmetry in Hlb.
+revert la lb Hit Hlb.
+induction it; intros; [ easy | cbn ].
+destruct lb as [| (cb, db)]; [ easy | ].
+destruct lb as [| (cb', db')]; [ easy | cbn ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
+  subst db'.
+  apply IHit with (la := la).
+...
 destruct la as [| (ca, da)]; [ easy | ].
 cbn in Hit; apply Nat.succ_le_mono in Hit.
 cbn - [ isort ].
@@ -422,16 +430,17 @@ destruct lb as [| (cb', db')]; [ easy | cbn ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
   subst db'.
+...
   apply (f_equal (merge_mon (S it))) in Hlb.
   rewrite merge_mon_same_deg in Hlb.
-  rewrite <- Hlb; cbn.
-...
+  rewrite <- Hlb.
   cbn - [ isort ].
-...
-  apply IHit.
-...
-  cbn in Hlb.
-Search (isort_insert _ _ _ = _ :: _).
+  remember (isort f _) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| (cc, dc)]; [ easy | ].
+  destruct lc as [| (cc', dc')]; [ easy | cbn ].
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec dc dc') as [Hdcc| Hdcc]. {
+    subst dc'.
 ...
   cbn in Hlb.
   destruct la as [| (ca', da')]; [ easy | ].
