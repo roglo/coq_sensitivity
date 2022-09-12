@@ -410,6 +410,55 @@ apply (sorted_filter Htr).
 remember (merge_mon_nb_iter la) as it eqn:H.
 assert (Hit : merge_mon_nb_iter la ≤ it) by now subst it.
 clear H.
+Theorem glop : ∀ it la,
+  let f := λ ma mb, mdeg mb <=? mdeg ma in
+  merge_mon_nb_iter la ≤ it
+  → sorted f la
+  → sorted f (merge_mon it la).
+Proof.
+intros * Hit Hs.
+assert (Htrf : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+unfold merge_mon_nb_iter in Hit.
+revert la Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | cbn ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| (ca', da')]; [ easy | cbn ].
+destruct (da =? da'). {
+  apply IHit; [ easy | ].
+  apply sorted_cons_iff in Hs; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hs as (Hs & Ha).
+  apply sorted_cons_iff in Hs; [ | easy ].
+  destruct Hs as (Hs, Ha').
+  split; [ easy | ].
+  intros (cb, db) Hb; cbn.
+  now apply (Ha _ (or_intror Hb)).
+}
+apply sorted_cons_iff in Hs; [ | easy ].
+apply sorted_cons_iff; [ easy | ].
+destruct Hs as (Hs & Ha).
+(*
+apply sorted_cons_iff in Hs; [ | easy ].
+destruct Hs as (Hs, Ha').
+*)
+split; [ now apply IHit | ].
+intros (cb, db) Hb.
+unfold f; cbn.
+specialize (Ha _ (or_introl eq_refl)) as H1.
+unfold f in H1; cbn in H1.
+... ...
+apply glop. 2: {
+  fold f.
+  apply sorted_isort.
+  (* ok *)
+...
 unfold merge_mon_nb_iter in Hit.
 remember (isort f la) as lb eqn:Hlb; symmetry in Hlb.
 revert la lb Hit Hlb.
