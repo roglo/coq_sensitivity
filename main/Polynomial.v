@@ -788,7 +788,7 @@ Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
      rngl_mul := canon_polyn_mul;
      rngl_opt_opp_or_sous := canon_polyn_opt_opp_or_sous;
      rngl_opt_inv_or_quot := canon_polyn_opt_inv_or_quot;
-    rngl_opt_eqb := ?rngl_opt_eqb;
+    rngl_opt_eqb := 42;
     rngl_le := ?rngl_le |}.
 
 (* allows to use ring-like theorems on polynomials *)
