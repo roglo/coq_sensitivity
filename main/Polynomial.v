@@ -398,6 +398,13 @@ Qed.
 
 (* could add here ring-like of general polynomials (not necessarily
    canonical, with a specific equality (equivalence relation) *)
+(* but... but... actually it is not possible, because the present
+   version of ring-like use Leibnitz equality; for example the
+   axiom of commutativity of addition is written
+     a + b = b + a
+   and not, e.g.
+     myeq (a+b) (b+a)
+*)
 
 (* ... *)
 
