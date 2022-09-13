@@ -198,7 +198,8 @@ Fixpoint merge_mon it la :=
   | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
   | S it' =>
       match la with
-      | [] | [_] => la
+      | [] => []
+      | [ma] => [ma]
       | ma :: mb :: lb =>
           if mdeg ma =? mdeg mb then
             merge_mon it' ((mcoeff ma + mcoeff mb)*☓^mdeg ma :: lb)
@@ -798,6 +799,22 @@ Global Existing Instance polyn_ring_like_op.
 
 (* canonical polynomial ring-like properties *)
 
+Theorem neq_isort_insert_nil : ∀ A rel a (la : list A),
+  isort_insert rel a la ≠ [].
+Proof.
+intros.
+destruct la as [| b]; [ easy | cbn ].
+now destruct (rel a b).
+Qed.
+
+Theorem eq_isort_nil : ∀ A (la : list A) rel, isort rel la = [] → la = [].
+Proof.
+intros * Hla.
+destruct la as [| a]; [ easy | exfalso ].
+cbn in Hla; revert Hla.
+apply neq_isort_insert_nil.
+Qed.
+
 (* canon_polyn: commutativity of addition *)
 
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
@@ -813,6 +830,24 @@ rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 Search (isort _ (_ ++ _)).
 (* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
+set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+clear Hit.
+revert la lb.
+induction it; intros; [ easy | cbn ].
+remember (isort f (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort f (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+move lba before lab.
+destruct lab as [| (cab, dab)]. {
+  destruct lba as [| (cba, dba)]; [ easy | ].
+  apply eq_isort_nil in Hlab.
+  apply app_eq_nil in Hlab.
+  now destruct Hlab; subst la lb.
+}
+destruct lba as [| (cba, dba)]. {
+  apply eq_isort_nil in Hlba.
+  apply app_eq_nil in Hlba.
+  now destruct Hlba; subst la lb.
+}
 ...
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
