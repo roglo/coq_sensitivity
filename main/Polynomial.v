@@ -154,23 +154,38 @@ Compute (polyn_mul «1*☓ + (-1)·» «3*☓^5 + 1·»).
 Definition monl_opp la := map (λ m, Mon (- mcoeff m)%F (mdeg m)) la.
 Definition polyn_opp p := mk_polyn (monl_opp (monl p)).
 
-(* subtraction only
+(* subtraction only *)
+
+Fixpoint monl_sous_loop it la lb :=
+  match it with
+  | 0 => [Mon 0 99] (* algo error: not enough iterations *)
+  | S it' =>
+      match la with
+      | [] => lb
+      | Mon ca da :: la' =>
+          match lb with
+          | [] => la
+          | Mon cb db :: lb' =>
+              if da =? db then Mon (ca - cb) da :: monl_sous_loop it' la' lb'
+              else Mon ca da :: monl_sous_loop it' la' lb
+          end
+      end
+  end.
+
+Definition monl_sous_nb_iter (la lb : list (monom T)) :=
+  S (length la + length lb).
 
 Definition monl_sous la lb :=
-  (* not so simple: to be implemented *)
-  (* find the old way monl_add was written *)
-...
+  monl_sous_loop (monl_sous_nb_iter la lb) la lb.
 
-Definition polyn_sous pa pb := mk_polyn (monl_sous la lb).
-
-*)
+Definition polyn_sous pa pb := mk_polyn (monl_sous (monl pa) (monl pb)).
 
 (* subtraction *)
 
 Definition monl_sub (la lb : list (monom T)) :=
   match rngl_opt_opp_or_sous with
   | Some (inl _) => monl_add la (monl_opp lb)
-  | Some (inr _) => [] (* monl_sous la lb *)
+  | Some (inr _) => monl_sous la lb
   | None => []
   end.
 
@@ -324,11 +339,13 @@ Arguments polyn_norm {T ro} pa%P.
 Arguments polyn_one {T ro}.
 Arguments polyn_opp {T ro} p%P.
 Arguments polyn_quot {T ro} (pa pb)%P.
+Arguments polyn_sous {T ro} (pa pb)%P.
 
 Module polynomial_Notations.
 
 Notation "pa + pb" := (polyn_add pa pb) : P_scope.
 Notation "pa * pb" := (polyn_mul pa pb) : P_scope.
+Notation "pa - pb" := (polyn_sous pa pb) : P_scope.
 
 End polynomial_Notations.
 
@@ -700,9 +717,12 @@ Definition canon_polyn_opp pa :=
     (polyn_norm (polyn_opp (cp_polyn pa)))
     (canon_polyn_opp_prop pa).
 
-(* to be implemented when polyn_sous is implemented
 Theorem canon_polyn_sous_prop : ∀ pa pb,
-  is_canon_polyn (polyn_norm (polyn_sous (cp_polyn pa) (cp_polyn pb))) = true.
+  is_canon_polyn
+    (polyn_norm
+       (polyn_sous
+          (polyn_norm (cp_polyn pa))
+          (polyn_norm (cp_polyn pb)))) = true.
 Proof.
 intros.
 destruct pa as (pa, ppa).
@@ -712,9 +732,11 @@ Qed.
 
 Definition canon_polyn_sous pa pb :=
   mk_canon_polyn
-    (polyn_norm (polyn_sous (cp_polyn pa) (cp_polyn pb)))
+    (polyn_norm
+       (polyn_sous
+          (polyn_norm (cp_polyn pa))
+          (polyn_norm (cp_polyn pb))))
     (canon_polyn_sous_prop pa pb).
-*)
 
 Definition canon_polyn_opt_opp_or_sous :
    option
@@ -722,7 +744,7 @@ Definition canon_polyn_opt_opp_or_sous :
       (canon_polyn T → canon_polyn T → canon_polyn T)) :=
   match (@rngl_opt_opp_or_sous T ro) with
   | Some (inl _) => Some (inl canon_polyn_opp)
-  | Some (inr _) => None (*Some (inr canon_polyn_sous)*)
+  | Some (inr _) => Some (inr canon_polyn_sous)
   | None => None
   end.
 
