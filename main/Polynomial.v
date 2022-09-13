@@ -851,6 +851,7 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+...
 rewrite isort_when_permuted with (lb := lb ++ la) (eqb := monom_eqb). {
   easy.
 } {
