@@ -476,6 +476,86 @@ apply Nat.leb_le.
 now transitivity da'.
 Qed.
 
+Theorem sorted_le_sorted_lt_merge_mon : ∀ it la,
+  let f := λ ma mb, mdeg mb <=? mdeg ma in
+  let g := λ ma mb, mdeg mb <? mdeg ma in
+  merge_mon_nb_iter la ≤ it
+  → sorted f la
+  → sorted g (merge_mon it la).
+Proof.
+intros * Hit Hs.
+assert (Htrf : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htrg : transitive g). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+unfold merge_mon_nb_iter in Hit.
+revert la Hit Hs.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]; [ easy | cbn ].
+cbn in Hit; apply Nat.succ_le_mono in Hit.
+destruct la as [| (ca', da')]; [ easy | cbn ].
+destruct (da =? da'). {
+  apply IHit; [ easy | ].
+  apply sorted_cons_iff in Hs; [ | easy ].
+  apply sorted_cons_iff; [ easy | ].
+  destruct Hs as (Hs & Ha).
+  apply sorted_cons_iff in Hs; [ | easy ].
+  destruct Hs as (Hs, Ha').
+  split; [ easy | ].
+  intros (cb, db) Hb; cbn.
+  now apply (Ha _ (or_intror Hb)).
+}
+apply sorted_cons_iff in Hs; [ | easy ].
+apply sorted_cons_iff; [ easy | ].
+destruct Hs as (Hs & Ha).
+split; [ now apply IHit | ].
+intros (cb, db) Hb.
+unfold g; cbn.
+specialize (Ha _ (or_introl eq_refl)) as H1.
+unfold f in H1; cbn in H1.
+(**)
+generalize Hb; intros Hc.
+apply in_merge_mon in Hc; [ | easy ].
+cbn - [ In ] in Hc.
+destruct Hc as [Hc| Hc]. {
+  subst da'.
+  apply Nat.leb_le in H1.
+  apply Nat.ltb_lt.
+  destruct (Nat.eq_dec db da) as [H| H]; [ subst db | flia H1 H ].
+  exfalso.
+...
+apply in_merge_mon in Hb; [ | easy ].
+cbn - [ In ] in Hb.
+destruct Hb as [Hb| Hb]. {
+  subst da'.
+  apply Nat.leb_le in H1.
+  apply Nat.ltb_lt.
+  destruct (Nat.eq_dec db da) as [H| H]; [ subst db | flia H1 H ].
+...
+destruct Hb as [Hb| Hb]; [ now subst da' | ].
+apply in_map_iff in Hb.
+destruct Hb as ((cc, dc) & Hb & Hmc).
+cbn in Hb; subst dc.
+apply (sorted_cons_iff Htrf) in Hs.
+destruct Hs as (Hs & Ha').
+specialize (Ha' _ Hmc) as H2.
+cbn in H2.
+apply Nat.leb_le in H1, H2.
+apply Nat.leb_le.
+now transitivity da'.
+Qed.
+...
+
 Theorem monl_norm_is_sorted_le : ∀ la,
   sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
 Proof.
@@ -510,9 +590,14 @@ assert (Htrf : transitive f). {
   apply Nat.ltb_lt.
   now transitivity (mdeg mb).
 }
+assert (Httg : total_relation g). {
+  intros ma mb.
+  unfold g; cbn.
+  apply Nat_leb_total_relation.
+}
 apply (sorted_filter Htrf).
-...
-apply sorted_sorted_merge_mon; [ | now apply sorted_isort ].
+... ...
+apply sorted_le_sorted_lt_merge_mon; [ | now apply sorted_isort ].
 now unfold merge_mon_nb_iter; rewrite isort_length.
 ...
 
