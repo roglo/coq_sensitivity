@@ -595,6 +595,8 @@ destruct Hc as [Hc| Hc]. {
   destruct (Nat.eq_dec db da) as [H| H]; [ subst db | flia H1 H ].
   exfalso; clear H1.
   specialize (IHit _ Hit Hs) as H1.
+(* peut-être qu'il faut que je fasse une induction sur la *)
+(* en commençant plus haut *)
 ...
 }
 specialize (IHit _ Hit Hs) as H2.
