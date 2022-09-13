@@ -352,6 +352,25 @@ Context {Hop : rngl_has_opp = true}.
 *)
 Context {H10 : rngl_has_1_neq_0 = true}.
 
+(* equality of canonical polynomials is equivalent to
+   equality on polynomials because of unicity of
+   proof of equality between booleans *)
+
+Theorem canon_polyn_eq_eq : ∀ (pa pb : canon_polyn T),
+  pa = pb ↔ cp_polyn pa = cp_polyn pb.
+Proof.
+intros.
+split; [ now intros; subst pb | ].
+intros Hab.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+cbn in Hab; subst pb.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
+(* *)
+
 Definition monom_eqb ma mb :=
   (rngl_eqb (mcoeff ma) (mcoeff mb) && Nat.eqb (mdeg ma) (mdeg mb))%bool.
 
@@ -775,6 +794,11 @@ Global Existing Instance polyn_ring_like_op.
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
+destruct a as (pa, ppa).
+destruct b as (pb, ppb).
+move pb before pa.
+apply canon_polyn_eq_eq; cbn.
+unfold polyn_add, monl_add.
 ...
 
 Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
@@ -785,7 +809,7 @@ Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
      rngl_is_ordered := false; (* à voir *)
      rngl_is_integral := false; (* à voir *)
      rngl_characteristic := rngl_characteristic;
-     rngl_add_comm := polyn_add_comm;
+     rngl_add_comm := canon_polyn_add_comm;
      rngl_add_assoc := 42;
     rngl_add_0_l := ?rngl_add_0_l;
     rngl_mul_assoc := ?rngl_mul_assoc;
