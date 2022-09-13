@@ -298,6 +298,7 @@ Delimit Scope P_scope with P.
 Arguments is_canon_polyn {T ro} p%P.
 Arguments merge_mon {T ro} it%nat la%list.
 Arguments monl_add {T} (la lb)%list.
+Arguments monl_mul {T ro} (la lb)%list.
 Arguments monl_norm {T ro} la%list.
 Arguments monl_opp {T ro} la%list.
 Arguments polyn_add {T} (pa pb)%P.
@@ -310,6 +311,7 @@ Arguments polyn_quot {T ro} (pa pb)%P.
 Module polynomial_Notations.
 
 Notation "pa + pb" := (polyn_add pa pb) : P_scope.
+Notation "pa * pb" := (polyn_mul pa pb) : P_scope.
 
 End polynomial_Notations.
 
@@ -648,15 +650,26 @@ Definition canon_polyn_add (pa pb : canon_polyn T) :=
   mk_canon_polyn (polyn_norm (polyn_add (cp_polyn pa) (cp_polyn pb)))
     (canon_polyn_add_prop pa pb).
 
+Theorem canon_polyn_mul_prop : ∀ pa pb,
+  is_canon_polyn (polyn_norm (cp_polyn pa * cp_polyn pb)) = true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+move pb before pa; cbn.
+apply polyn_norm_is_canon_polyn.
+Qed.
+
 Definition canon_polyn_mul (pa pb : canon_polyn T) :=
-...
+  mk_canon_polyn (polyn_norm (polyn_mul (cp_polyn pa) (cp_polyn pb)))
+    (canon_polyn_mul_prop pa pb).
 
 Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
   {| rngl_zero := canon_polyn_zero;
      rngl_one := canon_polyn_one;
      rngl_add := canon_polyn_add;
-    rngl_mul := 42;
-    rngl_opt_opp_or_sous := ?rngl_opt_opp_or_sous;
+     rngl_mul := canon_polyn_mul;
+    rngl_opt_opp_or_sous := 42;
     rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
     rngl_opt_eqb := ?rngl_opt_eqb;
     rngl_le := ?rngl_le |}.
