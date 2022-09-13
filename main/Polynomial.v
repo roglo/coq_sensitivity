@@ -377,7 +377,13 @@ split; intros Hab. {
 }
 Qed.
 
-(* polynomial ring-like operators *)
+(* could add here ring-like of general polynomials (not necessarily
+   canonical, with a specific equality (equivalence relation) *)
+
+(* ... *)
+
+(* canonical polynomial ring-like operators *)
+
 (* limited to normalised (or canonical) polynomials in order to use
    normal equality instead of equivalence relation as equality because
    normal equality allows to replace expressions without questioning *)
@@ -733,6 +739,21 @@ Definition canon_polyn_opt_inv_or_quot :
   | None => None
   end.
 
+(* canon polyn eqb *)
+
+Definition polyn_eqb pa pb := list_eqv monom_eqb (monl pa) (monl pb).
+Definition canon_polyn_eqb pa pb := polyn_eqb (cp_polyn pa) (cp_polyn pb).
+
+Definition canon_polyn_opt_eqb :=
+  match @rngl_opt_eqb T ro with
+  | Some _ => Some canon_polyn_eqb
+  | None => None
+  end.
+
+(* canon polyn le *)
+
+Definition phony_canon_polyn_le (pa pb : canon_polyn T) := False.
+
 Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
   {| rngl_zero := canon_polyn_zero;
      rngl_one := canon_polyn_one;
@@ -740,8 +761,8 @@ Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
      rngl_mul := canon_polyn_mul;
      rngl_opt_opp_or_sous := canon_polyn_opt_opp_or_sous;
      rngl_opt_inv_or_quot := canon_polyn_opt_inv_or_quot;
-    rngl_opt_eqb := 42;
-    rngl_le := ?rngl_le |}.
+     rngl_opt_eqb := canon_polyn_opt_eqb;
+     rngl_le := phony_canon_polyn_le |}.
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
@@ -749,21 +770,14 @@ Canonical Structure polyn_ring_like_op.
 (* to search for ring-like polynomials operators in the context *)
 Global Existing Instance polyn_ring_like_op.
 
-(* polynomial ring-like properties *)
+(* canonical polynomial ring-like properties *)
 
-Theorem polyn_add_comm : ∀ a b : polyn T, (a + b)%F = (b + a)%F.
+Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
-unfold polyn_add.
-f_equal.
-unfold monl_add.
-(* wrong: I must either use a specific equality (normalising)
-   or restraint ring-like to normalised polynomials *)
-(* second solution adopted: I prefer use normal equality, because
-   it allows to replace without questioning *)
 ...
 
-Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
+Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
   {| rngl_mul_is_comm := false; (* à voir *)
      rngl_has_eqb := false; (* à voir *)
      rngl_has_dec_le := false; (* à voir *)
