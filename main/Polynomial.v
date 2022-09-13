@@ -803,12 +803,38 @@ destruct la as [| b]; [ easy | cbn ].
 now destruct (rel a b).
 Qed.
 
-Theorem eq_isort_nil : ∀ A (la : list A) rel, isort rel la = [] → la = [].
+Theorem eq_isort_nil : ∀ A rel (la : list A), isort rel la = [] → la = [].
 Proof.
 intros * Hla.
 destruct la as [| a]; [ easy | exfalso ].
 cbn in Hla; revert Hla.
 apply neq_isort_insert_nil.
+Qed.
+
+Theorem eq_isort_insert_single : ∀ A rel a b (la : list A),
+  isort_insert rel a la = [b] → a = b ∧ la = [].
+Proof.
+intros * Hab.
+destruct la as [| c]; cbn. {
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst b.
+}
+cbn in Hab.
+destruct (rel a c); [ easy | ].
+injection Hab; clear Hab; intros Hab H; subst c.
+exfalso; revert Hab.
+apply neq_isort_insert_nil.
+Qed.
+
+Theorem eq_isort_single : ∀ A rel a (la : list A),
+  isort rel la = [a] → la = [a].
+Proof.
+intros * Hla.
+destruct la as [| b]; [ easy | ].
+cbn in Hla.
+apply eq_isort_insert_single in Hla.
+destruct Hla as (Hab, Hla); subst b.
+now apply eq_isort_nil in Hla; subst la.
 Qed.
 
 (* canon_polyn: commutativity of addition *)
@@ -844,6 +870,41 @@ destruct lba as [| (cba, dba)]. {
   apply app_eq_nil in Hlba.
   now destruct Hlba; subst la lb.
 }
+destruct lab as [| (cab', dab')]. {
+  destruct lba as [| (cba', dba')]. {
+    apply eq_isort_single in Hlab, Hlba.
+    apply app_eq_unit in Hlab, Hlba.
+    destruct Hlab as [Hlab| Hlab]. {
+      destruct Hlab; subst la lb.
+      now destruct Hlba.
+    }
+    destruct Hlab; subst la lb.
+    now destruct Hlba.
+  }
+  apply eq_isort_single in Hlab.
+  apply app_eq_unit in Hlab.
+  destruct Hlab as [Hlab| Hlab]; [ now destruct Hlab; subst la lb | ].
+  now destruct Hlab; subst la lb.
+}
+cbn.
+destruct lba as [| (cba', dba')]. {
+  apply eq_isort_single in Hlba.
+  apply app_eq_unit in Hlba.
+  destruct Hlba as [Hlba| Hlba]. {
+    destruct Hlba; subst la lb.
+    now rewrite app_nil_r in Hlab.
+  }
+  now destruct Hlba; subst la lb.
+}
+cbn.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec dab dab') as [Hdab| Hdab]. {
+  subst dab'.
+  destruct (Nat.eq_dec dba dba') as [Hdba| Hdba]. {
+    subst dba'.
+...
+Theorem eq_isort_cons_cons :
+  isort f la = a :: b :: lb → f a b && sorted f (b :: lb).
 ...
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
