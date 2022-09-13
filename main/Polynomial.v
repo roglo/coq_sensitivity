@@ -154,9 +154,26 @@ Compute (polyn_mul «1*☓ + (-1)·» «3*☓^5 + 1·»).
 Definition monl_opp la := map (λ m, Mon (- mcoeff m)%F (mdeg m)) la.
 Definition polyn_opp p := mk_polyn (monl_opp (monl p)).
 
+(* subtraction only
+
+Definition monl_sous la lb :=
+  (* not so simple: to be implemented *)
+  (* find the old way monl_add was written *)
+...
+
+Definition polyn_sous pa pb := mk_polyn (monl_sous la lb).
+
+*)
+
 (* subtraction *)
 
-Definition monl_sub la lb := monl_add la (monl_opp lb).
+Definition monl_sub (la lb : list (monom T)) :=
+  match rngl_opt_opp_or_sous with
+  | Some (inl _) => monl_add la (monl_opp lb)
+  | Some (inr _) => [] (* monl_sous la lb *)
+  | None => []
+  end.
+
 Definition polyn_sub pa pb := mk_polyn (monl_sub (monl pa) (monl pb)).
 
 (*
@@ -636,6 +653,8 @@ cbn - [ monl_norm ].
 apply monl_norm_is_canon_monl.
 Qed.
 
+(* canon polyn addition *)
+
 Theorem canon_polyn_add_prop : ∀ pa pb,
   is_canon_polyn (polyn_norm (cp_polyn pa + cp_polyn pb)) = true.
 Proof.
@@ -649,6 +668,8 @@ Qed.
 Definition canon_polyn_add (pa pb : canon_polyn T) :=
   mk_canon_polyn (polyn_norm (polyn_add (cp_polyn pa) (cp_polyn pb)))
     (canon_polyn_add_prop pa pb).
+
+(* canon polyn multiplication *)
 
 Theorem canon_polyn_mul_prop : ∀ pa pb,
   is_canon_polyn (polyn_norm (cp_polyn pa * cp_polyn pb)) = true.
@@ -664,13 +685,81 @@ Definition canon_polyn_mul (pa pb : canon_polyn T) :=
   mk_canon_polyn (polyn_norm (polyn_mul (cp_polyn pa) (cp_polyn pb)))
     (canon_polyn_mul_prop pa pb).
 
+(* canon polyn opposite or subtraction *)
+
+Theorem canon_polyn_opp_prop : ∀ pa,
+  is_canon_polyn (polyn_norm (polyn_opp (cp_polyn pa))) = true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+apply polyn_norm_is_canon_polyn.
+Qed.
+
+Definition canon_polyn_opp pa :=
+  mk_canon_polyn
+    (polyn_norm (polyn_opp (cp_polyn pa)))
+    (canon_polyn_opp_prop pa).
+
+(* to be implemented when polyn_sous is implemented
+Theorem canon_polyn_sous_prop : ∀ pa pb,
+  is_canon_polyn (polyn_norm (polyn_sous (cp_polyn pa) (cp_polyn pb))) = true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+apply polyn_norm_is_canon_polyn.
+Qed.
+
+Definition canon_polyn_sous pa pb :=
+  mk_canon_polyn
+    (polyn_norm (polyn_sous (cp_polyn pa) (cp_polyn pb)))
+    (canon_polyn_sous_prop pa pb).
+*)
+
+Definition canon_polyn_opt_opp_or_sous :
+   option
+     ((canon_polyn T → canon_polyn T) +
+      (canon_polyn T → canon_polyn T → canon_polyn T)) :=
+  match (@rngl_opt_opp_or_sous T ro) with
+  | Some (inl _) => Some (inl canon_polyn_opp)
+  | Some (inr _) => None (*Some (inr canon_polyn_sous)*)
+  | None => None
+  end.
+
+(* canon polyn quotient *)
+
+Theorem canon_polyn_quot_prop : ∀ pa pb,
+  is_canon_polyn (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb))) = true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+move pb before pa; cbn.
+apply polyn_norm_is_canon_polyn.
+Qed.
+
+Definition canon_polyn_quot pa pb :=
+  mk_canon_polyn
+    (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb)))
+    (canon_polyn_quot_prop pa pb).
+
+Definition canon_polyn_opt_inv_or_quot :
+   option
+     ((canon_polyn T → canon_polyn T) +
+      (canon_polyn T → canon_polyn T → canon_polyn T)) :=
+  match (@rngl_opt_inv_or_quot T ro) with
+  | Some _ =>
+      Some (inr canon_polyn_quot)
+  | None => None
+  end.
+
 Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
   {| rngl_zero := canon_polyn_zero;
      rngl_one := canon_polyn_one;
      rngl_add := canon_polyn_add;
      rngl_mul := canon_polyn_mul;
-    rngl_opt_opp_or_sous := 42;
-    rngl_opt_inv_or_quot := ?rngl_opt_inv_or_quot;
+     rngl_opt_opp_or_sous := canon_polyn_opt_opp_or_sous;
+     rngl_opt_inv_or_quot := canon_polyn_opt_inv_or_quot;
     rngl_opt_eqb := ?rngl_opt_eqb;
     rngl_le := ?rngl_le |}.
 
