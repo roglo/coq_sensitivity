@@ -193,11 +193,18 @@ Definition polyn_sub pa pb := mk_polyn (monl_sub (monl pa) (monl pb)).
 
 (*
 End a.
-Arguments polyn_opp {T ro} p.
 Arguments polyn_mul {T ro} (pa pb).
+Arguments polyn_opp {T ro} p.
+Arguments polyn_sub {T ro} (pa pb).
+(**)
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
+(*
+Require Import NatRingLike.
+*)
 Compute (mk_polyn [Mon 1 2]).
+Compute (polyn_sub «1*☓ » «3*☓^5 + 1·»).
+Compute (polyn_sub «3*☓^5 + 1·» « 2*☓^5 »).
 Compute « 1*☓^2 ».
 Compute (polyn_opp «1*☓»).
 Compute (polyn_opp «1*☓ + 1·»).
@@ -770,8 +777,7 @@ Definition canon_polyn_opt_inv_or_quot :
      ((canon_polyn T → canon_polyn T) +
       (canon_polyn T → canon_polyn T → canon_polyn T)) :=
   match (@rngl_opt_inv_or_quot T ro) with
-  | Some _ =>
-      Some (inr canon_polyn_quot)
+  | Some _ => Some (inr canon_polyn_quot)
   | None => None
   end.
 
