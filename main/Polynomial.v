@@ -398,8 +398,8 @@ Qed.
 
 (* could add here ring-like of general polynomials (not necessarily
    canonical, with a specific equality (equivalence relation) *)
-(* but... but... actually it is not possible, because the present
-   version of ring-like use Leibnitz equality; for example the
+(* but... but... actually it is not possible, because my present
+   version of ring-likes use Leibnitz equality; for example the
    axiom of commutativity of addition is written
      a + b = b + a
    and not, e.g.
@@ -798,6 +798,23 @@ Global Existing Instance polyn_ring_like_op.
 
 (* canonical polynomial ring-like properties *)
 
+(* canon_polyn: commutativity of addition *)
+
+Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
+  monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
+Proof.
+intros.
+unfold monl_add, monl_norm.
+f_equal.
+unfold merge_mon_nb_iter.
+do 2 rewrite app_length.
+rewrite (Nat.add_comm (length lb)).
+rewrite <- app_length.
+remember (S (length (la ++ lb))) as it eqn:Hit.
+Search (isort _ (_ ++ _)).
+(* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
+...
+
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
@@ -805,7 +822,11 @@ destruct a as (pa, ppa).
 destruct b as (pb, ppb).
 move pb before pa.
 apply canon_polyn_eq_eq; cbn.
-unfold polyn_add, monl_add.
+unfold polyn_add, polyn_norm.
+cbn - [ merge_mon ].
+f_equal.
+...
+apply monl_norm_add_comm.
 ...
 
 Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
