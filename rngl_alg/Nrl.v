@@ -115,7 +115,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_inv_or_quot :=
        if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
-     rngl_le := Zn_le n |}.
+     rngl_opt_le := Some (Zn_le n) |}.
 
 Global Existing Instance Zn_ring_like_op.
 
@@ -436,7 +436,7 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_opt_opp_or_sous := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
-     rngl_le := Nat.le |}.
+     rngl_opt_le := Some Nat.le |}.
 
 Section a.
 

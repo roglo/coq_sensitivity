@@ -777,10 +777,6 @@ Definition canon_polyn_opt_eqb :=
   | None => None
   end.
 
-(* canon polyn le *)
-
-Definition phony_canon_polyn_le (pa pb : canon_polyn T) := False.
-
 Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
   {| rngl_zero := canon_polyn_zero;
      rngl_one := canon_polyn_one;
@@ -789,7 +785,7 @@ Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
      rngl_opt_opp_or_sous := canon_polyn_opt_opp_or_sous;
      rngl_opt_inv_or_quot := canon_polyn_opt_inv_or_quot;
      rngl_opt_eqb := canon_polyn_opt_eqb;
-     rngl_le := phony_canon_polyn_le |}.
+     rngl_opt_le := None |}.
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.

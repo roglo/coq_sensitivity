@@ -15,7 +15,7 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_opp_or_sous := Some (inl Q.opp);
      rngl_opt_inv_or_quot := Some (inl Q.inv);
      rngl_opt_eqb := Some Q.eqb;
-     rngl_le := Q.le |}.
+     rngl_opt_le := Some Q.le |}.
 
 Global Existing Instance Q_ring_like_op.
 

@@ -156,8 +156,6 @@ Check (mk_qi (-1) 0 0).
 Check (mk_qi (-1) 2 (-3)).
 *)
 
-Definition phony_qi_le {d} (a b : quad_int d) := False.
-
 Definition having_eucl_div :=
   [-11; -7; -3; -2; -1; 2; 3; 5; 6; 7; 11; 13; 17; 19; 21;
    29; 33; 37; 41; 57; 73].
@@ -170,7 +168,7 @@ Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
      rngl_opt_opp_or_sous := Some (inl (@qi_opp d));
      rngl_opt_inv_or_quot := Some (inr (@qi_quot d));
      rngl_opt_eqb := None; (* to be improved, perhaps *)
-     rngl_le := phony_qi_le |}.
+     rngl_opt_le := None |}.
 
 (*
 Compute (mk_qi (-1) (- 36) 242 ÷ mk_qi (-1) 50 50)%QI.

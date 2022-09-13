@@ -15,7 +15,7 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_opp_or_sous := Some (inr Nat.sub);
      rngl_opt_inv_or_quot := Some (inr Nat.div);
      rngl_opt_eqb := Some Nat.eqb;
-     rngl_le := Nat.le |}.
+     rngl_opt_le := Some Nat.le |}.
 
 Global Existing Instance nat_ring_like_op.
 

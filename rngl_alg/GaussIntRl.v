@@ -61,8 +61,6 @@ Definition gi_div α β := fst (gi_eucl_div α β).
 
 Notation "α / β" := (gi_div α β) : G_scope.
 
-Definition phony_gi_le (a b : gauss_int) := False.
-
 Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
   {| rngl_zero := gi_zero;
      rngl_one := gi_one;
@@ -71,7 +69,7 @@ Canonical Structure gauss_int_ring_like_op : ring_like_op gauss_int :=
      rngl_opt_opp_or_sous := Some (inl gi_opp);
      rngl_opt_inv_or_quot := Some (inr gi_div);
      rngl_opt_eqb := None; (* to be improved, perhaps *)
-     rngl_le := phony_gi_le |}.
+     rngl_opt_le := None |}.
 
 (*
 Compute (mk_gi (- 36) 242 / mk_gi 50 50)%G.

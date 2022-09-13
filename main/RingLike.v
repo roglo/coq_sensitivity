@@ -58,7 +58,7 @@ Class ring_like_op T :=
     rngl_opt_opp_or_sous : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
     rngl_opt_eqb : option (T → T → bool);
-    rngl_le : T → T → Prop }.
+    rngl_opt_le : option (T → T → Prop) }.
 
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with F.
@@ -159,6 +159,12 @@ Definition rngl_eqb {T} {R : ring_like_op T} a b :=
   match rngl_opt_eqb with
   | Some rngl_eqb => rngl_eqb a b
   | None => false
+  end.
+
+Definition rngl_le {T} {R : ring_like_op T} a b :=
+  match rngl_opt_le with
+  | Some rngl_le => rngl_le a b
+  | None => False
   end.
 
 Notation "0" := rngl_zero : ring_like_scope.

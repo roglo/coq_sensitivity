@@ -109,8 +109,6 @@ Definition square_matrix_opp {n} (M : square_matrix n T) :
 Definition square_matrix_eqb eqb {n} (A B : square_matrix n T) :=
   mat_eqb eqb (sm_mat A) (sm_mat B).
 
-Definition phony_mat_le {n} (MA MB : square_matrix n T) := True.
-
 Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
   {| rngl_zero := smZ n;
      rngl_one := smI n;
@@ -123,7 +121,7 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
        | Some eqb => Some (square_matrix_eqb eqb)
        | None => None
        end;
-     rngl_le := phony_mat_le |}.
+     rngl_opt_le := None |}.
 
 (*
 Canonical Structure mat_ring_like_op.
