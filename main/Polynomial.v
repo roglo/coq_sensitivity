@@ -851,21 +851,29 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-Print monom_eqb.
-Definition mdeg_eqb (ma mb : monom T) := mdeg ma =? mdeg mb.
-rewrite isort_when_permuted with (lb := lb ++ la) (eqb := mdeg_eqb). {
+rewrite isort_when_permuted with (lb := lb ++ la) (eqb := monom_eqb). {
   easy.
 } {
-  intros a b.
-(* ouais mais ça c'est faux, ça *)
-...
+  apply equality_monom_eqb.
 } {
   unfold f; intros ma mb Hab Hba.
   apply Nat.leb_le in Hab, Hba.
-Print monom_eqb.
+  destruct ma as (ca, da).
+  destruct mb as (cb, db).
+  cbn in Hab, Hba.
 ...
-Search isort.
-
+} {
+  unfold f; intros ma mb mc Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+} {
+  unfold f; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+apply permutation_app_comm.
+apply equality_monom_eqb.
+...
 Search (isort _ (_ ++ _)).
 (* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
 clear Hit.
