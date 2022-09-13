@@ -850,9 +850,24 @@ do 2 rewrite app_length.
 rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
+set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+Print monom_eqb.
+Definition mdeg_eqb (ma mb : monom T) := mdeg ma =? mdeg mb.
+rewrite isort_when_permuted with (lb := lb ++ la) (eqb := mdeg_eqb). {
+  easy.
+} {
+  intros a b.
+(* ouais mais ça c'est faux, ça *)
+...
+} {
+  unfold f; intros ma mb Hab Hba.
+  apply Nat.leb_le in Hab, Hba.
+Print monom_eqb.
+...
+Search isort.
+
 Search (isort _ (_ ++ _)).
 (* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
-set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
 revert la lb.
 induction it; intros; [ easy | cbn ].
@@ -903,8 +918,11 @@ destruct (Nat.eq_dec dab dab') as [Hdab| Hdab]. {
   destruct (Nat.eq_dec dba dba') as [Hdba| Hdba]. {
     subst dba'.
 ...
-Theorem eq_isort_cons_cons :
-  isort f la = a :: b :: lb → f a b && sorted f (b :: lb).
+Theorem eq_isort_cons_cons : ∀ A (rel : A → _) a b la lb,
+  isort rel la = a :: b :: lb → rel a b = true ∧ sorted rel (b :: lb).
+...
+    apply eq_isort_cons_cons in Hlab, Hlba.
+    cbn in Hlab, Hlba.
 ...
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
