@@ -929,7 +929,14 @@ destruct bef as [| (cb, db)]. {
       }
     }
   }
-  cbn.
+  cbn in Hp |-*.
+...
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
+    subst da'.
+    destruct (Nat.eq_dec da db) as [Hdab| Hdab]. {
+      subst db.
+      apply IHit; cycle 2. {
 ...
 destruct lb as [| (cb, db)]. {
   now apply permutation_nil_r in Hp.
