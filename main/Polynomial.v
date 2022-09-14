@@ -851,6 +851,16 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+Theorem merge_mon_when_sorted_permuted : ∀ rel eqb,
+  ∀ it (la lb : list (monom T)),
+  sorted rel la
+  → sorted rel lb
+  → permutation eqb la lb
+  → merge_mon it la = merge_mon it lb.
+Proof.
+intros * Hsa Hsb Hp.
+Admitted.
+apply (@merge_mon_when_sorted_permuted f monom_eqb).
 ...
 rewrite isort_when_permuted with (lb := lb ++ la) (eqb := monom_eqb). {
   easy.
@@ -878,7 +888,10 @@ apply equality_monom_eqb.
 Search (isort _ (_ ++ _)).
 (* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
 clear Hit.
-revert la lb.
+...
+assert (H : S (length (la ++ lb)) ≤ it) by now rewrite Hit.
+clear Hit; rename H into Hit.
+revert la lb Hit.
 induction it; intros; [ easy | cbn ].
 remember (isort f (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort f (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
