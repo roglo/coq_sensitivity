@@ -872,6 +872,65 @@ induction it; intros; [ easy | cbn ].
 destruct la as [| (ca, da)]. {
   now apply permutation_nil_l in Hp; subst lb.
 }
+(**)
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Haft).
+apply Heqb in Hx; subst x lb.
+move bef before la; move aft before bef.
+destruct bef as [| (cb, db)]. {
+  cbn in Hsb, Hp |-*; clear Hbef.
+  destruct la as [| (ca', da')]. {
+    now apply permutation_nil_l in Hp; subst aft.
+  }
+  move ca' before ca; move da' before da.
+  cbn.
+  apply permutation_cons_l_iff in Hp.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft')| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & Hx & Haft).
+  apply Heqb in Hx; subst x aft.
+  move bef before la; move aft' before bef.
+  destruct bef as [| (cb, db)]. {
+    cbn in Hsb, Hp |-*; clear Hbef.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
+      subst da'.
+      apply IHit; [ | | now apply permutation_skip ]. {
+        apply (sorted_cons_iff Htr) in Hsa.
+        destruct Hsa as (Hsa & H1).
+        apply (sorted_cons_iff Htr) in Hsa.
+        destruct Hsa as (Hsa & H2).
+        now apply (sorted_cons_iff Htr).
+      } {
+        apply (sorted_cons_iff Htr) in Hsb.
+        destruct Hsb as (Hsb & H1).
+        apply (sorted_cons_iff Htr) in Hsb.
+        destruct Hsb as (Hsb & H2).
+        now apply (sorted_cons_iff Htr).
+      }
+    } {
+      f_equal.
+      apply IHit; [ | | now apply permutation_skip ]. {
+        apply (sorted_cons_iff Htr) in Hsa.
+        destruct Hsa as (Hsa & H1).
+        apply (sorted_cons_iff Htr) in Hsa.
+        destruct Hsa as (Hsa & H2).
+        now apply (sorted_cons_iff Htr).
+      } {
+        apply (sorted_cons_iff Htr) in Hsb.
+        destruct Hsb as (Hsb & H1).
+        apply (sorted_cons_iff Htr) in Hsb.
+        destruct Hsb as (Hsb & H2).
+        now apply (sorted_cons_iff Htr).
+      }
+    }
+  }
+  cbn.
+...
 destruct lb as [| (cb, db)]. {
   now apply permutation_nil_r in Hp.
 }
