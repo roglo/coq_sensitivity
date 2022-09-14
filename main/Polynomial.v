@@ -851,16 +851,70 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-Theorem merge_mon_when_sorted_permuted : ∀ rel eqb,
+Theorem merge_mon_when_sorted_permuted : ∀ eqb,
+  equality eqb →
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
   ∀ it (la lb : list (monom T)),
   sorted rel la
   → sorted rel lb
   → permutation eqb la lb
   → merge_mon it la = merge_mon it lb.
 Proof.
-intros * Hsa Hsb Hp.
-Admitted.
-apply (@merge_mon_when_sorted_permuted f monom_eqb).
+intros * Heqb * Hsa Hsb Hp.
+assert (Htr : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+revert la lb Hsa Hsb Hp.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]. {
+  now apply permutation_nil_l in Hp; subst lb.
+}
+destruct lb as [| (cb, db)]. {
+  now apply permutation_nil_r in Hp.
+}
+destruct la as [| (ca', da')]. {
+  apply (permutation_length_1_inv_l Heqb) in Hp.
+  now injection Hp; clear Hp; intros; subst cb db lb.
+}
+cbn.
+destruct lb as [| (cb', db')]. {
+  now apply (permutation_length_1_inv_r Heqb) in Hp.
+}
+cbn.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
+  subst da'.
+  destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
+    subst db'.
+    apply IHit. {
+      apply (sorted_cons_iff Htr) in Hsa.
+      destruct Hsa as (Hsa, H1).
+      apply (sorted_cons_iff Htr) in Hsa.
+      destruct Hsa as (Hsa, H2).
+      apply (sorted_cons_iff Htr).
+      split; [ easy | ].
+      intros (cc, dc) Hc; cbn.
+      unfold rel in H1, H2; cbn - [ In ] in H1, H2.
+      apply (H2 _ Hc).
+    } {
+      apply (sorted_cons_iff Htr) in Hsb.
+      destruct Hsb as (Hsb, H1).
+      apply (sorted_cons_iff Htr) in Hsb.
+      destruct Hsb as (Hsb, H2).
+      apply (sorted_cons_iff Htr).
+      split; [ easy | ].
+      intros (cc, dc) Hc; cbn.
+      unfold rel in H1, H2; cbn - [ In ] in H1, H2.
+      apply (H2 _ Hc).
+    }
+(* bon, fait chier *)
+... ...
+apply (merge_mon_when_sorted_permuted equality_monom_eqb).
+apply sorted_isort.
+(* ouais ok *)
 ...
 rewrite isort_when_permuted with (lb := lb ++ la) (eqb := monom_eqb). {
   easy.

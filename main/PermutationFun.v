@@ -910,7 +910,7 @@ remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab; [ now apply Heqb in Hab | easy ].
 Qed.
 
-Theorem permutation_length_1_inv : ∀ A (eqb : A → _) (Heqb : equality eqb),
+Theorem permutation_length_1_inv_l : ∀ A (eqb : A → _) (Heqb : equality eqb),
   ∀ a l, permutation eqb [a] l → l = [a].
 Proof.
 intros * Heqb * Ha.
@@ -924,6 +924,14 @@ apply app_eq_nil in Ha.
 destruct Ha; subst bef aft; cbn in H2; subst l.
 f_equal; symmetry.
 now apply Heqb.
+Qed.
+
+Theorem permutation_length_1_inv_r : ∀ A (eqb : A → _) (Heqb : equality eqb),
+  ∀ a l, permutation eqb l [a] → l = [a].
+Proof.
+intros * Heqb * Ha.
+apply (permutation_sym Heqb) in Ha.
+now apply permutation_length_1_inv_l in Ha.
 Qed.
 
 Theorem NoDup_permutation : ∀ A (eqb : A → _),
