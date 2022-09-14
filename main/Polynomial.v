@@ -851,6 +851,8 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+Print merge_mon.
+...
 Theorem merge_mon_when_sorted_permuted : ∀ eqb,
   equality eqb →
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
