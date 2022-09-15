@@ -867,6 +867,22 @@ destruct lba as [| (cba, dba)]. {
   now destruct Hlba; subst la lb.
 }
 assert (H : dab = dba). {
+Theorem glop : ∀ A (eqb rel : A → _) a b la lb la' lb',
+  permutation eqb la lb
+  → isort rel la = a :: la'
+  → isort rel lb = b :: lb'
+  → rel a b = true ∧ rel b a = true.
+Proof.
+intros * Hab Ha Hb.
+...
+eapply glop with (eqb := monom_eqb) in Hlab; [ | | apply Hlba ].
+unfold f in Hlab; cbn in Hlab.
+2: {
+apply permutation_app_comm.
+apply equality_monom_eqb.
+}
+(* ouais, ok *)
+...
   destruct la as [| (ca, da)]. {
     rewrite app_nil_l in Hlab.
     rewrite app_nil_r in Hlba.
