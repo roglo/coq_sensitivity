@@ -859,11 +859,18 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   }
   move H after H1; clear H2; rename H into H2.
 ...
-  replace (b :: lb') with ([] ++ b :: lb') in H2 by easy.
-  apply (permutation_elt Heqb) in H2.
-  specialize (permutation_elt Heqb) as H3.
-Check permutation_app_comm.
-Search (permutation _ (_ ++ _)).
+... ...
+specialize (glop f equality_monom_eqb) as H1.
+specialize (H1 (cab*☓^dab) (cba*☓^dba) (la ++ lb) (lb ++ la)).
+specialize (H1 lab lba).
+assert (H : permutation monom_eqb (la ++ lb) (lb ++ la)). {
+  apply (permutation_app_comm equality_monom_eqb).
+}
+specialize (H1 H Hlab Hlba); clear H.
+unfold f in H1; cbn in H1.
+destruct H1 as (H1, H2).
+apply Nat.leb_le in H1, H2.
+now apply Nat.le_antisymm.
 ...
 unfold f in Hlab; cbn in Hlab.
 2: {
