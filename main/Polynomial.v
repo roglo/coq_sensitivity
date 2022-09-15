@@ -851,7 +851,22 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-Print merge_mon.
+clear Hit.
+remember (isort f (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort f (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+move lba before lab.
+destruct lab as [| (cab, dab)]. {
+  destruct lba as [| (cba, dba)]; [ easy | ].
+  apply eq_isort_nil in Hlab.
+  apply app_eq_nil in Hlab.
+  now destruct Hlab; subst la lb.
+}
+destruct lba as [| (cba, dba)]. {
+  apply eq_isort_nil in Hlba.
+  apply app_eq_nil in Hlba.
+  now destruct Hlba; subst la lb.
+}
+assert (H : dab = dba). {
 ...
 Theorem merge_mon_when_sorted_permuted : ∀ eqb,
   equality eqb →
