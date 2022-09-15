@@ -867,6 +867,21 @@ destruct lba as [| (cba, dba)]. {
   now destruct Hlba; subst la lb.
 }
 assert (H : dab = dba). {
+  destruct la as [| (ca, da)]. {
+    rewrite app_nil_l in Hlab.
+    rewrite app_nil_r in Hlba.
+    rewrite Hlba in Hlab.
+    now injection Hlab; clear Hlab; intros; subst.
+  }
+  cbn in Hlab.
+  destruct lb as [| (cb, db)]. {
+    rewrite app_nil_r in Hlab.
+    rewrite app_nil_l in Hlba.
+    cbn in Hlba.
+    rewrite Hlba in Hlab.
+    now injection Hlab; clear Hlab; intros; subst.
+  }
+  cbn in Hlba.
 ...
 Theorem merge_mon_when_sorted_permuted : ∀ eqb,
   equality eqb →
