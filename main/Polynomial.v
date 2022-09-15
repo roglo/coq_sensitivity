@@ -836,14 +836,14 @@ Proof.
 intros * Heqb * Hab Ha Hb.
 Theorem glip : ∀ A (eqb rel : A → _),
   equality eqb →
-  reflexive rel →
+  total_relation rel →
   ∀ a b la lb la' lb',
   permutation eqb la lb
   → isort rel la = a :: la'
   → isort rel lb = b :: lb'
-  → rel a b = true.
+  → rel b a = true.
 Proof.
-intros * Heqb Href * Hab Ha Hb.
+intros * Heqb Htot * Hab Ha Hb.
 (*
 specialize (permuted_isort rel Heqb la) as H1.
 rewrite Ha in H1.
@@ -861,12 +861,19 @@ apply eq_isort_insert_cons in Ha.
 destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
   clear Hab Hbef.
-  induction bef as [| c]. {
+  revert b lb' Hb.
+  induction bef as [| c]; intros. {
     cbn in Hb.
     apply eq_isort_insert_cons in Hb.
     destruct Hb as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-      subst b; apply Href.
+      subst b.
+      apply total_relation_is_reflexive in Htot.
+      apply Htot.
     }
+    specialize (Htot a b) as H4.
+    now rewrite H1 in H4.
+  }
+  cbn in Hb.
 ...
   apply (permutation_cons_inv Heqb) in H1.
   assert (H : permutation eqb (a :: bef ++ aft) (b :: lb')). {
