@@ -837,6 +837,23 @@ destruct Hla as (Hab, Hla); subst b.
 now apply eq_isort_nil in Hla; subst la.
 Qed.
 
+Theorem eq_isort_insert_cons : ∀ A (rel : A → _) a b la lb,
+  isort_insert rel a la = b :: lb
+  → a = b ∧ la = lb ∨ rel a b = false ∧ isort_insert rel a (tl la) = lb.
+Proof.
+intros * Hs.
+destruct la as [| c]. {
+  cbn in Hs.
+  now injection Hs; clear Hs; intros; left.
+}
+cbn in Hs.
+rewrite if_bool_if_dec in Hs.
+destruct (bool_dec (rel a c)) as [Hac| Hac]. {
+  now injection Hs; clear Hs; intros; subst b lb; left.
+}
+now injection Hs; clear Hs; intros; subst c; right.
+Qed.
+
 (* canon_polyn: commutativity of addition *)
 
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
@@ -887,17 +904,10 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Haft).
 apply Heqb in H; subst x lb.
-Theorem glop : ∀ A (rel : A → _) a b la lb,
-  isort_insert rel a la = b :: lb
-  → a = b ∨ rel b a = true.
-Proof.
+apply eq_isort_insert_cons in Ha.
+destruct Ha as [(Haa, Hlaa)| (Haa, Hlaa)]. 2: {
 ...
-generalize Ha; intros H.
-apply glop in H.
-destruct H as [H| Haa]. {
-  subst a'.
-  apply isort_insert_sorted_cons in Ha.
-Search (isort_insert _ _ _ = _ :: _).
+  subst a' la'.
 ...
 eapply glop with (eqb := monom_eqb) in Hlab; [ | | apply Hlba ].
 unfold f in Hlab; cbn in Hlab.
