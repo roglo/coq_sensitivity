@@ -834,10 +834,21 @@ Theorem glop : ∀ A (eqb rel : A → _),
   → rel a b = true ∧ rel b a = true.
 Proof.
 intros * Heqb * Hab Ha Hb.
+Theorem glip : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a b la lb la' lb',
+  permutation eqb la lb
+  → isort rel la = a :: la'
+  → isort rel lb = b :: lb'
+  → rel a b = true.
+Proof.
+intros * Heqb * Hab Ha Hb.
+(*
 specialize (permuted_isort rel Heqb la) as H1.
 rewrite Ha in H1.
 specialize (permuted_isort rel Heqb lb) as H2.
 rewrite Hb in H2.
+*)
 destruct la as [| a']; [ easy | cbn in Ha ].
 apply permutation_cons_l_iff in Hab.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -848,6 +859,14 @@ apply Heqb in H; subst x lb.
 apply eq_isort_insert_cons in Ha.
 destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
+  clear Hab.
+  clear Hbef.
+  induction bef as [| c]. {
+    cbn in Hb.
+    apply eq_isort_insert_cons in Hb.
+    destruct Hb as [(H1 & H2 & H3)| ]. {
+      subst b.
+...
   apply (permutation_cons_inv Heqb) in H1.
   assert (H : permutation eqb (a :: bef ++ aft) (b :: lb')). {
     eapply (permutation_trans Heqb); [ | apply H2 ].
@@ -858,6 +877,7 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
     apply (permutation_app_comm Heqb).
   }
   move H after H1; clear H2; rename H into H2.
+Search isort.
 ...
 ... ...
 specialize (glop f equality_monom_eqb) as H1.
