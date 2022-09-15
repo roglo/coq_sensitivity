@@ -795,65 +795,6 @@ Global Existing Instance polyn_ring_like_op.
 
 (* canonical polynomial ring-like properties *)
 
-Theorem neq_isort_insert_nil : ∀ A rel a (la : list A),
-  isort_insert rel a la ≠ [].
-Proof.
-intros.
-destruct la as [| b]; [ easy | cbn ].
-now destruct (rel a b).
-Qed.
-
-Theorem eq_isort_nil : ∀ A rel (la : list A), isort rel la = [] → la = [].
-Proof.
-intros * Hla.
-destruct la as [| a]; [ easy | exfalso ].
-cbn in Hla; revert Hla.
-apply neq_isort_insert_nil.
-Qed.
-
-Theorem eq_isort_insert_single : ∀ A rel a b (la : list A),
-  isort_insert rel a la = [b] → a = b ∧ la = [].
-Proof.
-intros * Hab.
-destruct la as [| c]; cbn. {
-  cbn in Hab.
-  now injection Hab; clear Hab; intros; subst b.
-}
-cbn in Hab.
-destruct (rel a c); [ easy | ].
-injection Hab; clear Hab; intros Hab H; subst c.
-exfalso; revert Hab.
-apply neq_isort_insert_nil.
-Qed.
-
-Theorem eq_isort_single : ∀ A rel a (la : list A),
-  isort rel la = [a] → la = [a].
-Proof.
-intros * Hla.
-destruct la as [| b]; [ easy | ].
-cbn in Hla.
-apply eq_isort_insert_single in Hla.
-destruct Hla as (Hab, Hla); subst b.
-now apply eq_isort_nil in Hla; subst la.
-Qed.
-
-Theorem eq_isort_insert_cons : ∀ A (rel : A → _) a b la lb,
-  isort_insert rel a la = b :: lb
-  → a = b ∧ la = lb ∨ rel a b = false ∧ isort_insert rel a (tl la) = lb.
-Proof.
-intros * Hs.
-destruct la as [| c]. {
-  cbn in Hs.
-  now injection Hs; clear Hs; intros; left.
-}
-cbn in Hs.
-rewrite if_bool_if_dec in Hs.
-destruct (bool_dec (rel a c)) as [Hac| Hac]. {
-  now injection Hs; clear Hs; intros; subst b lb; left.
-}
-now injection Hs; clear Hs; intros; subst c; right.
-Qed.
-
 (* canon_polyn: commutativity of addition *)
 
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
@@ -905,11 +846,25 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Haft).
 apply Heqb in H; subst x lb.
 apply eq_isort_insert_cons in Ha.
-destruct Ha as [(Haa, Hlaa)| (Haa, Hlaa)]. 2: {
-...
+destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
+  apply (permutation_cons_inv Heqb) in H1.
+  assert (H : permutation eqb (a :: bef ++ aft) (b :: lb')). {
+    eapply (permutation_trans Heqb); [ | apply H2 ].
+    rewrite List_cons_is_app.
+    rewrite (List_cons_is_app _ aft).
+    do 2 rewrite app_assoc.
+    apply (permutation_app_tail Heqb).
+    apply (permutation_app_comm Heqb).
+  }
+  move H after H1; clear H2; rename H into H2.
 ...
-eapply glop with (eqb := monom_eqb) in Hlab; [ | | apply Hlba ].
+  replace (b :: lb') with ([] ++ b :: lb') in H2 by easy.
+  apply (permutation_elt Heqb) in H2.
+  specialize (permutation_elt Heqb) as H3.
+Check permutation_app_comm.
+Search (permutation _ (_ ++ _)).
+...
 unfold f in Hlab; cbn in Hlab.
 2: {
 apply permutation_app_comm.
