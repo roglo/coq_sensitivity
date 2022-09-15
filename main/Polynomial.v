@@ -867,13 +867,37 @@ destruct lba as [| (cba, dba)]. {
   now destruct Hlba; subst la lb.
 }
 assert (H : dab = dba). {
-Theorem glop : ∀ A (eqb rel : A → _) a b la lb la' lb',
+Theorem glop : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ a b la lb la' lb',
   permutation eqb la lb
   → isort rel la = a :: la'
   → isort rel lb = b :: lb'
   → rel a b = true ∧ rel b a = true.
 Proof.
-intros * Hab Ha Hb.
+intros * Heqb * Hab Ha Hb.
+specialize (permuted_isort rel Heqb la) as H1.
+rewrite Ha in H1.
+specialize (permuted_isort rel Heqb lb) as H2.
+rewrite Hb in H2.
+destruct la as [| a']; [ easy | cbn in Ha ].
+apply permutation_cons_l_iff in Hab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Heqb in H; subst x lb.
+Theorem glop : ∀ A (rel : A → _) a b la lb,
+  isort_insert rel a la = b :: lb
+  → a = b ∨ rel b a = true.
+Proof.
+...
+generalize Ha; intros H.
+apply glop in H.
+destruct H as [H| Haa]. {
+  subst a'.
+  apply isort_insert_sorted_cons in Ha.
+Search (isort_insert _ _ _ = _ :: _).
 ...
 eapply glop with (eqb := monom_eqb) in Hlab; [ | | apply Hlba ].
 unfold f in Hlab; cbn in Hlab.
