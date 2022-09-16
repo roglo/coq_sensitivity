@@ -838,15 +838,79 @@ assert (H : dab = dba). {
   destruct Hlba as (Hbaz, Hlba).
   move Hbaz before Habz.
   destruct Hlab as [Hlab| Hlab]. {
+    destruct Hlab as (H1 & H2 & H3).
     destruct Hlba as [Hlba| Hlba]. {
+      destruct Hlba as (H4 & H5 & H6).
+      move H4 before H1; move H5 before H2.
+      unfold f in H3, H6; cbn in H3, H6.
       remember (la ++ lb) as lalb eqn:Hlalb; symmetry in Hlalb.
       remember (lb ++ la) as lbla eqn:Hlbla; symmetry in Hlbla.
       move Hlbla before Hlalb.
       move lbla before lalb.
       destruct lalb as [| a]; [ easy | clear Habz ].
       destruct lbla as [| b]; [ easy | clear Hbaz ].
-      cbn in Hlab, Hlba.
-(* pfff... quel bordel *)
+      cbn in H1, H4, H2, H5, H3, H6.
+      subst a b; cbn in H3, H6.
+      destruct lab as [| a]. {
+        clear H3.
+        apply eq_isort_nil in H2; subst lalb.
+        apply app_eq_unit in Hlalb.
+        destruct lba as [| a]. {
+          clear H6.
+          apply eq_isort_nil in H5; subst lbla.
+          apply app_eq_unit in Hlbla.
+          destruct Hlalb as [(H1, H2)| (H1, H2)]; subst la lb. {
+            destruct Hlbla as [| (H1, H2)]; [ easy | ].
+            now injection H1; clear H1; intros; subst cba dba.
+          } {
+            destruct Hlbla as [(H1, H2)| ]; [ | easy ].
+            now injection H2; clear H2; intros; subst cba dba.
+          }
+        } {
+          destruct Hlalb as [(H1, H2)| (H1, H2)]; subst la lb. {
+            cbn in Hlbla.
+            now injection Hlbla; clear Hlbla; intros; subst cba dba lbla.
+          } {
+            cbn in Hlbla.
+            now injection Hlbla; clear Hlbla; intros; subst cba dba lbla.
+          }
+        }
+      }
+      cbn in H3.
+      destruct lba as [| b]. {
+        clear H6.
+        apply eq_isort_nil in H5; subst lbla.
+        apply app_eq_unit in Hlbla.
+        destruct Hlbla as [(H4, H5)| (H4, H5)]; subst la lb. {
+          cbn in Hlalb.
+          now injection Hlalb; clear Hlalb; intros; subst cba dba.
+        } {
+          cbn in Hlalb.
+          now injection Hlalb; clear Hlalb; intros; subst cba dba.
+        }
+      }
+      cbn in H6.
+      move b before a.
+      clear H2 H5.
+      revert lb lalb lbla Hlalb Hlbla.
+      induction la as [| c]; intros. {
+        cbn in Hlalb; rewrite app_nil_r in Hlbla.
+        rewrite Hlbla in Hlalb.
+        now injection Hlalb; clear Hlalb; intros; subst dba.
+      }
+      cbn in Hlalb.
+      injection Hlalb; clear Hlalb; intros Hlalb H; subst c.
+      destruct lb as [| c]. {
+        cbn in Hlbla; rewrite app_nil_r in Hlalb; subst la.
+        now injection Hlbla; clear Hlbla; intros; subst dba.
+      }
+      cbn in Hlbla.
+      injection Hlbla; clear Hlbla; intros Hlbla H; subst c.
+      destruct lalb as [| c]; [ now destruct la | ].
+      destruct lbla as [| d]; [ now destruct lb | ].
+      specialize (IHla (cba*☓^dba :: lb)) as H1.
+...
+      specialize (H1 _ _ Hlalb).
 ...
 Theorem glop : ∀ A (eqb rel : A → _),
   equality eqb →
