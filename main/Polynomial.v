@@ -862,6 +862,7 @@ apply eq_isort_insert_cons_iff in Ha. 2: {
 }
 destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
+(*
 ...
   clear Hab Hbef.
   revert b lb' Hb.
@@ -884,6 +885,34 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
 ...
 *)
 Print isort.
+*)
+Check eq_isort_insert_cons_iff.
+Theorem eq_isort_cons_iff : ∀ A (rel : A → _),
+  reflexive rel →
+  ∀ a la lb,
+  isort rel la = a :: lb
+  ↔ hd a la = a ∧ isort rel (tl la) = lb ∧
+      rel (hd a la) (hd a lb) = true ∨
+    rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
+      isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb.
+Proof.
+intros * Href *.
+split; intros Hs. {
+  destruct la as [| b]; [ easy | cbn ].
+  cbn in Hs.
+  apply (eq_isort_insert_cons_iff Href) in Hs.
+  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+    left; subst b.
+    split; [ easy | ].
+    split; [ easy | ].
+    now rewrite H2 in H3.
+  } {
+    right.
+    split; [ easy | ].
+    split; [ now destruct (isort rel la) | easy ].
+  }
+} {
+..
 Theorem eq_isort_cons : ∀ A (rel : A → _) a la lb,
   isort rel la = a :: lb
   → hd a la = a ∧ isort rel (tl la) = lb ∧
