@@ -874,6 +874,96 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
     now rewrite H1 in H4.
   }
   cbn in Hb.
+Print isort.
+Theorem eq_isort_cons : ∀ A (rel : A → _) a la lb,
+  isort rel la = a :: lb
+  → hd a la = a ∧ isort rel (tl la) = lb ∧
+       isort rel la = hd a la :: isort rel (tl la) ∨
+     rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
+       isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb.
+Proof.
+intros * Hs.
+destruct la as [| b]; [ easy | cbn ].
+cbn in Hs.
+apply eq_isort_insert_cons in Hs.
+destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]; [ now subst b lb; left | ].
+right.
+split; [ easy | ].
+split; [ now destruct (isort rel la) | easy ].
+Qed.
+
+Theorem eq_isort_cons_if : ∀ A (rel : A → _),
+  reflexive rel →
+  ∀ a la lb,
+  hd a la = a ∧ isort rel (tl la) = lb ∧
+    rel (hd a (tl la)) a = false ∨
+(*
+    isort rel la = a :: lb ∨
+*)
+(*
+    isort rel la = hd a la :: isort rel (tl la) ∨
+*)
+  rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
+    isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb
+  → isort rel la = a :: lb.
+Proof.
+intros * Href * Hs.
+destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+  destruct la as [| b]; [ now rewrite Href in H3 | ].
+  cbn in H1, H2, H3 |-*; subst b.
+  destruct la as [| b]; [ now rewrite Href in H3 | ].
+  cbn in H2, H3 |-*.
+  rewrite H2.
+  destruct lb as [| c]; [ easy | cbn ].
+  apply eq_isort_insert_cons in H2.
+  destruct H2 as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
+    subst c.
+    rewrite H5 in H6.
+    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ easy | ].
+(* chuis parti en couille, là ; chais pas, y a un truc qui déconne *)
+...
+  cbn in H1, H2 |-*; subst b.
+Print isort.
+isort rel (a :: la) = a :: lb
+...
+  rewrite H2.
+Print isort.
+isort rel (a :: lb)
+...
+...cbn in H2.
+
+  cbn in H1, H2 |-*.
+  subst b lb.
+Print isort.
+...
+isort rel (a :: la) = a :: isort rel la.
+...
+  replace la with (hd a la :: tl la).
+  cbn; rewrite H1, H2.
+  rewrite H1.
+  cbn; rewrite H2.
+...
+...
+destruct la as [| c]. {
+  cbn in Hla; subst b.
+  now rewrite Href in Hab.
+}
+cbn in Hla, Hs |-*; subst c.
+now rewrite Hab; subst lb.
+...
+destruct la as [| b]; [ easy | cbn ].
+cbn in Hs.
+apply eq_isort_insert_cons in Hs.
+destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]; [ now subst b lb; left | ].
+right.
+split; [ easy | ].
+split; [ now destruct (isort rel la) | easy ].
+Qed.
+...
+eapply IHbef.
+...
+apply eq_isort_cons_if.
 ...
   apply (permutation_cons_inv Heqb) in H1.
   assert (H : permutation eqb (a :: bef ++ aft) (b :: lb')). {
