@@ -634,7 +634,7 @@ induction it; [ easy | cbn ].
 now rewrite IHit; cbn.
 Qed.
 
-Theorem msort_loop_single : ∀ A (rel : A → _) it a,
+Theorem msort_loop_unit : ∀ A (rel : A → _) it a,
   msort_loop rel it [a] = [a].
 Proof.
 intros.
@@ -648,7 +648,7 @@ Theorem msort_loop_pair : ∀ A (rel : A → _) it a b,
 Proof.
 intros * Hab.
 induction it; [ easy | cbn ].
-do 2 rewrite msort_loop_single; cbn.
+do 2 rewrite msort_loop_unit; cbn.
 now rewrite Hab.
 Qed.
 
@@ -1099,7 +1099,7 @@ destruct l as [| a]. {
 }
 destruct l as [| b]. {
   injection Hla; clear Hla; intros; subst la lb; cbn.
-  now rewrite msort_loop_single, msort_loop_nil.
+  now rewrite msort_loop_unit, msort_loop_nil.
 }
 cbn in Hla.
 remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
@@ -1264,7 +1264,7 @@ destruct l as [| a]. {
 }
 destruct l as [| b]. {
   injection Hla; clear Hla; intros; subst la lb.
-  now rewrite msort_loop_single, msort_loop_nil.
+  now rewrite msort_loop_unit, msort_loop_nil.
 }
 cbn in Hla.
 remember (split_list l) as lc eqn:Hlc; symmetry in Hlc.
@@ -2445,7 +2445,7 @@ cbn in Ha, Hb.
 apply Nat.succ_le_mono in Ha, Hb.
 destruct la as [| b]. {
   injection Hll; clear Hll; intros; subst lc ld.
-  now do 2 rewrite msort_loop_single, msort_loop_nil.
+  now do 2 rewrite msort_loop_unit, msort_loop_nil.
 }
 cbn in Ha, Hb.
 cbn in Hll.
@@ -3301,7 +3301,7 @@ cbn in Hla; revert Hla.
 apply neq_isort_insert_nil.
 Qed.
 
-Theorem eq_isort_insert_single : ∀ A rel a b (la : list A),
+Theorem eq_isort_insert_unit : ∀ A rel a b (la : list A),
   isort_insert rel a la = [b] → a = b ∧ la = [].
 Proof.
 intros * Hab.
@@ -3316,54 +3316,56 @@ exfalso; revert Hab.
 apply neq_isort_insert_nil.
 Qed.
 
-Theorem eq_isort_single : ∀ A rel a (la : list A),
+Theorem eq_isort_unit : ∀ A rel a (la : list A),
   isort rel la = [a] → la = [a].
 Proof.
 intros * Hla.
 destruct la as [| b]; [ easy | ].
 cbn in Hla.
-apply eq_isort_insert_single in Hla.
+apply eq_isort_insert_unit in Hla.
 destruct Hla as (Hab, Hla); subst b.
 now apply eq_isort_nil in Hla; subst la.
 Qed.
 
-Theorem eq_isort_insert_cons : ∀ A (rel : A → _),
-  ∀ a b la lb,
-  isort_insert rel a la = b :: lb
-  → a = b ∧ la = lb ∧ isort_insert rel a la = a :: la ∨
-    rel a b = false ∧ hd a la = b ∧ isort_insert rel a (tl la) = lb.
-Proof.
-intros * Hs.
-destruct la as [| c]. {
-  cbn in Hs.
-  now injection Hs; clear Hs; intros; left.
-}
-cbn in Hs.
-rewrite if_bool_if_dec in Hs.
-destruct (bool_dec (rel a c)) as [Hac| Hac]. {
-  injection Hs; clear Hs; intros; subst b lb; left.
-  split; [ easy | ].
-  split; [ easy | ].
-  now cbn; rewrite Hac.
-}
-now injection Hs; clear Hs; intros; subst c; right.
-Qed.
-
-Theorem eq_isort_insert_cons_if : ∀ A (rel : A → _),
+Theorem eq_isort_insert_cons_iff : ∀ A (rel : A → _),
   reflexive rel →
   ∀ a b la lb,
-  a = b ∧ la = lb ∧ isort_insert rel a la = a :: la ∨
-  rel a b = false ∧ hd a la = b ∧ isort_insert rel a (tl la) = lb
-  → isort_insert rel a la = b :: lb.
+  isort_insert rel a la = b :: lb
+  ↔ a = b ∧ la = lb ∧ rel a (hd a la) = true ∨
+    rel a b = false ∧ hd a la = b ∧ isort_insert rel a (tl la) = lb.
 Proof.
-intros * Href * Hs.
-destruct Hs as [(Hab & Hlab & Hs)| (Hab & Hla & Hs)]; [ now subst b lb | ].
-destruct la as [| c]. {
-  cbn in Hla; subst b.
-  now rewrite Href in Hab.
+intros * Href *.
+split; intros Hs. {
+  destruct la as [| c]. {
+    cbn in Hs.
+    injection Hs; clear Hs; intros; subst b lb; left.
+    split; [ easy | ].
+    split; [ easy | ].
+    apply Href.
+  }
+  cbn in Hs.
+  rewrite if_bool_if_dec in Hs.
+  destruct (bool_dec (rel a c)) as [Hac| Hac]. {
+    injection Hs; clear Hs; intros; subst b lb; left.
+    split; [ easy | ].
+    split; [ easy | ].
+    now cbn; rewrite Hac.
+  }
+  now injection Hs; clear Hs; intros; subst c; right.
+} {
+  destruct Hs as [(Hab & Hlab & Hs)| (Hab & Hla & Hs)]. {
+    subst b lb.
+    destruct la as [| b]; [ easy | ].
+    cbn in Hs |-*.
+    now rewrite Hs.
+  }
+  destruct la as [| c]. {
+    cbn in Hla; subst b.
+    now rewrite Href in Hab.
+  }
+  cbn in Hla, Hs |-*; subst c.
+  now rewrite Hab; subst lb.
 }
-cbn in Hla, Hs |-*; subst c.
-now rewrite Hab; subst lb.
 Qed.
 
 Theorem sorted_filter : ∀ A (rel : A → _),

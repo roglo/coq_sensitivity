@@ -857,9 +857,12 @@ destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Haft).
 apply Heqb in H; subst x lb.
-apply eq_isort_insert_cons in Ha.
+apply eq_isort_insert_cons_iff in Ha. 2: {
+  now apply total_relation_is_reflexive.
+}
 destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
+...
   clear Hab Hbef.
   revert b lb' Hb.
   induction bef as [| c]; intros. {
@@ -874,6 +877,12 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
     now rewrite H1 in H4.
   }
   cbn in Hb.
+(*
+  apply eq_isort_insert_cons in Hb.
+  destruct Hb as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+    subst c.
+...
+*)
 Print isort.
 Theorem eq_isort_cons : ∀ A (rel : A → _) a la lb,
   isort rel la = a :: lb
@@ -909,11 +918,30 @@ Theorem eq_isort_cons_if : ∀ A (rel : A → _),
 Proof.
 intros * Href * Hs.
 destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+(*
+  now rewrite H1, H2 in H3.
+*)
   destruct la as [| b]; [ now rewrite Href in H3 | ].
-  cbn in H1, H2, H3 |-*; subst b.
+  cbn in H1, H2, H3 |-*; subst b lb.
   destruct la as [| b]; [ now rewrite Href in H3 | ].
-  cbn in H2, H3 |-*.
+  cbn in H3 |-*.
+  apply (eq_isort_insert_cons_if Href).
+  left.
+  split; [ easy | ].
+  split; [ easy | ].
+...
+  ============================
+  isort_insert rel a (isort_insert rel b (isort rel la)) =
+  a :: isort_insert rel b (isort rel la)
+...
   rewrite H2.
+  destruct la as [| c]. {
+    cbn in H2; subst lb.
+    cbn.
+    admit.
+  }
+  cbn in H2.
+...
   destruct lb as [| c]; [ easy | cbn ].
   apply eq_isort_insert_cons in H2.
   destruct H2 as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
@@ -1191,7 +1219,7 @@ destruct lba as [| (cba, dba)]. {
 }
 destruct lab as [| (cab', dab')]. {
   destruct lba as [| (cba', dba')]. {
-    apply eq_isort_single in Hlab, Hlba.
+    apply eq_isort_unit in Hlab, Hlba.
     apply app_eq_unit in Hlab, Hlba.
     destruct Hlab as [Hlab| Hlab]. {
       destruct Hlab; subst la lb.
@@ -1200,14 +1228,14 @@ destruct lab as [| (cab', dab')]. {
     destruct Hlab; subst la lb.
     now destruct Hlba.
   }
-  apply eq_isort_single in Hlab.
+  apply eq_isort_unit in Hlab.
   apply app_eq_unit in Hlab.
   destruct Hlab as [Hlab| Hlab]; [ now destruct Hlab; subst la lb | ].
   now destruct Hlab; subst la lb.
 }
 cbn.
 destruct lba as [| (cba', dba')]. {
-  apply eq_isort_single in Hlba.
+  apply eq_isort_unit in Hlba.
   apply app_eq_unit in Hlba.
   destruct Hlba as [Hlba| Hlba]. {
     destruct Hlba; subst la lb.
