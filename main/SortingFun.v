@@ -3368,6 +3368,65 @@ split; intros Hs. {
 }
 Qed.
 
+Theorem eq_isort_cons_iff : ∀ A (rel : A → _),
+  reflexive rel →
+  ∀ a la lb,
+  isort rel la = a :: lb
+  ↔ la ≠ [] ∧
+    (hd a la = a ∧ isort rel (tl la) = lb ∧
+       rel (hd a la) (hd a lb) = true ∨
+     rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
+       isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb ∧
+       tl la ≠ []).
+Proof.
+intros * Href *.
+split; intros Hs. {
+  destruct la as [| b]; [ easy | cbn ].
+  split; [ easy | ].
+  cbn in Hs.
+  apply (eq_isort_insert_cons_iff Href) in Hs.
+  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+    left; subst b.
+    split; [ easy | ].
+    split; [ easy | ].
+    now rewrite H2 in H3.
+  } {
+    right.
+    split; [ easy | ].
+    split; [ now destruct (isort rel la) | ].
+    split; [ easy | ].
+    destruct la as [| c]; [ | easy ].
+    cbn in H2; subst b.
+    now rewrite Href in H1.
+  }
+} {
+  destruct Hs as (Hlaz, Hs).
+  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3 & H4)]. {
+    destruct la as [| b]; [ easy | clear Hlaz ].
+    cbn in H1, H2, H3 |-*; subst b.
+    rewrite H2.
+    destruct lb as [| b]; [ easy | ].
+    cbn in H3 |-*.
+    now rewrite H3.
+  } {
+    destruct la as [| b]; [ easy | clear Hlaz ].
+    cbn in H1, H2, H3, H4 |-*.
+    apply (eq_isort_insert_cons_iff Href).
+    right.
+    split; [ easy | ].
+    split; [ | easy ].
+    destruct la as [| c]; [ easy | clear H4 ].
+    cbn in H2, H3 |-*.
+    remember (isort_insert rel c (isort rel la)) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| d]. {
+      now apply neq_isort_insert_nil in Hlc.
+    }
+    now cbn in H2 |-*.
+  }
+}
+Qed.
+
 Theorem sorted_filter : ∀ A (rel : A → _),
   transitive rel →
   ∀ l f,

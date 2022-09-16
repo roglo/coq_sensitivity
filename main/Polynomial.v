@@ -824,7 +824,30 @@ destruct lba as [| (cba, dba)]. {
   apply app_eq_nil in Hlba.
   now destruct Hlba; subst la lb.
 }
+assert (Href : reflexive f). {
+  unfold f; intros a.
+  apply Nat.leb_refl.
+}
+move Href before f.
+move cba before cab.
+move dba before dab.
 assert (H : dab = dba). {
+  apply (eq_isort_cons_iff Href) in Hlab.
+  apply (eq_isort_cons_iff Href) in Hlba.
+  destruct Hlab as (Habz, Hlab).
+  destruct Hlba as (Hbaz, Hlba).
+  move Hbaz before Habz.
+  destruct Hlab as [Hlab| Hlab]. {
+    destruct Hlba as [Hlba| Hlba]. {
+      remember (la ++ lb) as lalb eqn:Hlalb; symmetry in Hlalb.
+      remember (lb ++ la) as lbla eqn:Hlbla; symmetry in Hlbla.
+      move Hlbla before Hlalb.
+      move lbla before lalb.
+      destruct lalb as [| a]; [ easy | clear Habz ].
+      destruct lbla as [| b]; [ easy | clear Hbaz ].
+      cbn in Hlab, Hlba.
+(* pfff... quel bordel *)
+...
 Theorem glop : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ a b la lb la' lb',
@@ -844,6 +867,20 @@ Theorem glip : ∀ A (eqb rel : A → _),
   → rel b a = true.
 Proof.
 intros * Heqb Htot * Hab Ha Hb.
+specialize (total_relation_is_reflexive Htot) as Href.
+move Href before Htot.
+apply (eq_isort_cons_iff Href) in Ha.
+apply (eq_isort_cons_iff Href) in Hb.
+destruct Ha as (Haz, Ha).
+destruct Hb as (Hbz, Hb).
+destruct la as [| c]; [ easy | clear Haz; cbn in Ha ].
+destruct lb as [| d]; [ easy | clear Hbz; cbn in Hb ].
+destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+  subst c la'.
+  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
+    subst d lb'.
+...
+intros * Heqb Htot * Hab Ha Hb.
 (*
 specialize (permuted_isort rel Heqb la) as H1.
 rewrite Ha in H1.
@@ -862,6 +899,23 @@ apply eq_isort_insert_cons_iff in Ha. 2: {
 }
 destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
   subst a' la'.
+  specialize (total_relation_is_reflexive Htot) as Href.
+  move Href before Htot.
+  apply (eq_isort_cons_iff Href) in Hb.
+  destruct Hb as (_, Hb).
+  destruct Hb as [(H1 & H2 & H3)| Hb]. {
+    clear lb' Hab H2 H3 Hbef.
+    revert a b H1 Ha.
+    induction bef as [| c]; intros. {
+      cbn in H1; subst b.
+      apply Href.
+    }
+    cbn in H1; subst c.
+    apply IHbef; [ | easy ].
+...
+    specialize (Hbef _ (or_introl eq_refl)) as H1.
+    specialize (Htot a b) as H4.
+...
 (*
 ...
   clear Hab Hbef.
@@ -886,65 +940,6 @@ destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
 *)
 Print isort.
 *)
-Check eq_isort_insert_cons_iff.
-Theorem eq_isort_cons_iff : ∀ A (rel : A → _),
-  reflexive rel →
-  ∀ a la lb,
-  isort rel la = a :: lb
-  ↔ la ≠ [] ∧
-    (hd a la = a ∧ isort rel (tl la) = lb ∧
-       rel (hd a la) (hd a lb) = true ∨
-     rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
-       isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb ∧
-       tl la ≠ []).
-Proof.
-intros * Href *.
-split; intros Hs. {
-  destruct la as [| b]; [ easy | cbn ].
-  split; [ easy | ].
-  cbn in Hs.
-  apply (eq_isort_insert_cons_iff Href) in Hs.
-  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-    left; subst b.
-    split; [ easy | ].
-    split; [ easy | ].
-    now rewrite H2 in H3.
-  } {
-    right.
-    split; [ easy | ].
-    split; [ now destruct (isort rel la) | ].
-    split; [ easy | ].
-    destruct la as [| c]; [ | easy ].
-    cbn in H2; subst b.
-    now rewrite Href in H1.
-  }
-} {
-  destruct Hs as (Hlaz, Hs).
-  destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3 & H4)]. {
-    destruct la as [| b]; [ easy | clear Hlaz ].
-    cbn in H1, H2, H3 |-*; subst b.
-    rewrite H2.
-    destruct lb as [| b]; [ easy | ].
-    cbn in H3 |-*.
-    now rewrite H3.
-  } {
-    destruct la as [| b]; [ easy | clear Hlaz ].
-    cbn in H1, H2, H3, H4 |-*.
-    apply (eq_isort_insert_cons_iff Href).
-    right.
-    split; [ easy | ].
-    split; [ | easy ].
-    destruct la as [| c]; [ easy | clear H4 ].
-    cbn in H2, H3 |-*.
-    remember (isort_insert rel c (isort rel la)) as lc eqn:Hlc.
-    symmetry in Hlc.
-    destruct lc as [| d]. {
-      now apply neq_isort_insert_nil in Hlc.
-    }
-    now cbn in H2 |-*.
-  }
-}
-Qed.
 ..
 Theorem eq_isort_cons : ∀ A (rel : A → _) a la lb,
   isort rel la = a :: lb
