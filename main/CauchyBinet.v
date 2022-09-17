@@ -1781,7 +1781,7 @@ assert (H : rngl_mul_is_comm = true) by now destruct Hif.
 now rewrite (rngl_mul_comm H _ (ε la)).
 Qed.
 
-Lemma Cauchy_Binet_formula_step_5 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
   ∀ m n A B,
   ∑ (kl ∈ cart_prod (repeat (seq 1 n) m)),
     ε kl * ∏ (i = 1, m), mat_el A i kl.(i) *
@@ -1842,7 +1842,7 @@ apply rngl_mul_summation_list_distr_r.
 now destruct Hif.
 Qed.
 
-Lemma Cauchy_Binet_formula_step_6 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 →
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
@@ -1955,7 +1955,7 @@ rewrite Hkl.
 rewrite (List_map_nth' 0); [ flia | flia Hi ].
 Qed.
 
-Lemma Cauchy_Binet_formula_step_7 :
+Lemma Cauchy_Binet_formula_step_5_3 :
   ∀ m n A f, m ≠ 0 →
   mat_nrows A = m
   → mat_ncols A = n
@@ -2012,7 +2012,7 @@ rewrite mat_select_cols_el; [ easy | now rewrite Har | | ]. {
 }
 Qed.
 
-Lemma Cauchy_Binet_formula_step_8 : in_charac_0_field →
+Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
   ∀ m n A f, m ≠ 0 → n ≠ 0 →
   is_correct_matrix A = true
   → mat_nrows A = m
@@ -2102,14 +2102,14 @@ rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hmz Hcb Hbr Hbc).
     det (mat_select_rows (isort Nat.leb kl) B) =
   ∑ (jl ∈ sub_lists...
 *)
-rewrite (Cauchy_Binet_formula_step_5 Hif).
+rewrite (Cauchy_Binet_formula_step_5_1 Hif).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut jl), ε kl * ∏ (i = 1, m), mat_el A i kl.(i)) *
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_6 Hif n A _ Hmz).
+rewrite (Cauchy_Binet_formula_step_5_2 Hif n A _ Hmz).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2117,7 +2117,7 @@ rewrite (Cauchy_Binet_formula_step_6 Hif n A _ Hmz).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_7 A _ Hmz Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_3 A _ Hmz Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     (∑ (kl ∈ all_permut (seq 1 m)),
@@ -2125,7 +2125,7 @@ rewrite (Cauchy_Binet_formula_step_7 A _ Hmz Har Hac).
     det (mat_select_rows jl B) =
   ∑ (jl ∈ sub_lists_...
 *)
-rewrite (Cauchy_Binet_formula_step_8 Hif A _ Hmz Hnz Hca Har Hac).
+rewrite (Cauchy_Binet_formula_step_5_4 Hif A _ Hmz Hnz Hca Har Hac).
 (*
   ∑ (jl ∈ sub_lists_of_seq_1_n n m),
     det (mat_select_cols jl A) * det (mat_select_rows jl B) =
@@ -2174,7 +2174,7 @@ rewrite (Cauchy_Binet_formula_step_1 Hif A B Hnz Har Hac Hbc).
 rewrite (Cauchy_Binet_formula_step_2 Hif n A B Hnz).
 rewrite (Cauchy_Binet_formula_step_3 Hif _ B Hnz Hcb Hbr Hbc).
 rewrite (Cauchy_Binet_formula_step_4 Hif _ B Hnz Hcb Hbr Hbc).
-rewrite (Cauchy_Binet_formula_step_5 Hif).
+rewrite (Cauchy_Binet_formula_step_5_1 Hif).
 unfold sub_lists_of_seq_1_n.
 rewrite sls1n_diag.
 rewrite rngl_summation_list_only_one.
