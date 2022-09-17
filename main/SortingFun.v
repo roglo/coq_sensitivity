@@ -2367,6 +2367,74 @@ apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
+Theorem sorted_sorted_permuted_rel_1 : ∀ A (eqb rel : A → _),
+  equality eqb →
+  reflexive rel →
+  transitive rel →
+  ∀ d la lb,
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
+  → rel (hd d la) (hd d lb) = true.
+Proof.
+intros * Heqb Href Htra * Hpab Hsa Hsb.
+revert lb Hpab Hsb.
+induction la as [| a]; intros. {
+  apply permutation_nil_l in Hpab; subst lb; cbn.
+  apply Href.
+}
+cbn.
+assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+specialize (IHla H); clear H.
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | cbn ].
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefa & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+apply (permutation_sym Heqb) in Hpab.
+cbn in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefb & H & Hlb).
+apply Heqb in H; subst x.
+subst la.
+move Hab at bottom.
+move Hsa at bottom.
+move Hsb at bottom.
+specialize sorted_middle as H1.
+apply (H1 _ rel Htra _ _ [] _ _ Hsa).
+Qed.
+
+Theorem sorted_sorted_permuted_rel : ∀ A (eqb rel : A → _),
+  equality eqb →
+  reflexive rel →
+  transitive rel →
+  ∀ d la lb,
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
+  → rel (hd d la) (hd d lb) = true ∧
+    rel (hd d lb) (hd d la) = true.
+Proof.
+intros * Heqb Href Htra * Hpab Hsa Hsb.
+split. {
+  now apply (sorted_sorted_permuted_rel_1 Heqb).
+} {
+  apply (permutation_sym Heqb) in Hpab.
+  now apply (sorted_sorted_permuted_rel_1 Heqb).
+}
+Qed.
+
 Theorem sorted_sorted_permuted : ∀ A (eqb rel : A → _)
   (Heqb : equality eqb),
   antisymmetric rel →

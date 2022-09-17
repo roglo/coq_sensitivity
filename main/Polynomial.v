@@ -808,10 +808,10 @@ do 2 rewrite app_length.
 rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
-set (f := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
-remember (isort f (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
-remember (isort f (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
 destruct lab as [| (cab, dab)]. {
   destruct lba as [| (cba, dba)]; [ easy | ].
@@ -824,540 +824,50 @@ destruct lba as [| (cba, dba)]. {
   apply app_eq_nil in Hlba.
   now destruct Hlba; subst la lb.
 }
-assert (Href : reflexive f). {
-  unfold f; intros a.
+assert (Href : reflexive rel). {
+  unfold rel; intros a.
   apply Nat.leb_refl.
 }
-move Href before f.
-move cba before cab.
-move dba before dab.
-assert (H : dab = dba). {
-Theorem glup : ∀ A (eqb rel : A → _),
-  equality eqb →
-  total_relation rel →
-  ∀ d la lb,
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
-  → rel (hd d la) (hd d lb) = true.
-Proof.
-intros * Heqb Htot * Hab Ha Hb.
-...
-assert (H1 : sorted f (cab*☓^dab :: lab)) by _admit.
-assert (H2 : sorted f (cba*☓^dba :: lab)) by _admit.
-specialize glup as H3.
-assert (Htot : total_relation f) by _admit.
-specialize (H3 (monom T) monom_eqb f equality_monom_eqb Htot).
-specialize (H3 (Mon 0 0)).
-specialize (H3 (cab*☓^dab :: lab) (cba*☓^dba :: lba)).
-cbn in H3.
-(* ouais bon, faudra le faire pour dab ≤ dba aussi *)
-...
-Theorem glip : ∀ A (eqb rel : A → _),
-  equality eqb →
-  total_relation rel →
-  ∀ a b la lb la' lb',
-  permutation eqb la lb
-  → isort rel la = a :: la'
-  → isort rel lb = b :: lb'
-  → rel b a = true.
-Proof.
-intros * Heqb Htot * Hab Ha Hb.
-specialize (total_relation_is_reflexive Htot) as Href.
-move Href before Htot.
-apply (eq_isort_cons_iff Href) in Ha.
-apply (eq_isort_cons_iff Href) in Hb.
-destruct Ha as (Haz, Ha).
-destruct Hb as (Hbz, Hb).
-(**)
-move Hbz before Haz.
-destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
-    move H4 before H1.
-    move H5 before H2.
-    rewrite H1 in H3.
-    rewrite H4 in H6.
-    destruct la as [| a']; [ easy | clear Haz ].
-    destruct lb as [| b']; [ easy | clear Hbz ].
-    cbn in H1, H4; subst a' b'.
-    cbn in H2, H5.
-...
-enough (Htra : transitive rel).
-apply (Htra b (hd b lb') a H6).
-...
-destruct la as [| c]; [ easy | clear Haz; cbn in Ha ].
-destruct lb as [| d]; [ easy | clear Hbz; cbn in Hb ].
-destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-  subst c la'.
-  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
-    subst d lb'.
-...
-  apply (eq_isort_cons_iff Href) in Hlab.
-  apply (eq_isort_cons_iff Href) in Hlba.
-  destruct Hlab as (Habz, Hlab).
-  destruct Hlba as (Hbaz, Hlba).
-  move Hbaz before Habz.
-  destruct Hlab as [Hlab| Hlab]. {
-    destruct Hlab as (H1 & H2 & H3).
-    destruct Hlba as [Hlba| Hlba]. {
-      destruct Hlba as (H4 & H5 & H6).
-      move H4 before H1; move H5 before H2.
-      unfold f in H3, H6; cbn in H3, H6.
-      remember (la ++ lb) as lalb eqn:Hlalb; symmetry in Hlalb.
-      remember (lb ++ la) as lbla eqn:Hlbla; symmetry in Hlbla.
-      move Hlbla before Hlalb.
-      move lbla before lalb.
-      destruct lalb as [| a]; [ easy | clear Habz ].
-      destruct lbla as [| b]; [ easy | clear Hbaz ].
-      cbn in H1, H4, H2, H5, H3, H6.
-      subst a b; cbn in H3, H6.
-      destruct lab as [| a]. {
-        clear H3.
-        apply eq_isort_nil in H2; subst lalb.
-        apply app_eq_unit in Hlalb.
-        destruct lba as [| a]. {
-          clear H6.
-          apply eq_isort_nil in H5; subst lbla.
-          apply app_eq_unit in Hlbla.
-          destruct Hlalb as [(H1, H2)| (H1, H2)]; subst la lb. {
-            destruct Hlbla as [| (H1, H2)]; [ easy | ].
-            now injection H1; clear H1; intros; subst cba dba.
-          } {
-            destruct Hlbla as [(H1, H2)| ]; [ | easy ].
-            now injection H2; clear H2; intros; subst cba dba.
-          }
-        } {
-          destruct Hlalb as [(H1, H2)| (H1, H2)]; subst la lb. {
-            cbn in Hlbla.
-            now injection Hlbla; clear Hlbla; intros; subst cba dba lbla.
-          } {
-            cbn in Hlbla.
-            now injection Hlbla; clear Hlbla; intros; subst cba dba lbla.
-          }
-        }
-      }
-      cbn in H3.
-      destruct lba as [| b]. {
-        clear H6.
-        apply eq_isort_nil in H5; subst lbla.
-        apply app_eq_unit in Hlbla.
-        destruct Hlbla as [(H4, H5)| (H4, H5)]; subst la lb. {
-          cbn in Hlalb.
-          now injection Hlalb; clear Hlalb; intros; subst cba dba.
-        } {
-          cbn in Hlalb.
-          now injection Hlalb; clear Hlalb; intros; subst cba dba.
-        }
-      }
-      cbn in H6.
-      move b before a.
-...
-      revert a b lb lab lba lalb lbla Hlalb Hlbla H2 H5 H3 H6.
-      induction la as [| c]; intros. {
-        cbn in Hlalb; rewrite app_nil_r in Hlbla.
-        rewrite Hlbla in Hlalb.
-        now injection Hlalb; clear Hlalb; intros; subst dba.
-      }
-      cbn in Hlalb.
-      injection Hlalb; clear Hlalb; intros Hlalb H; subst c.
-      destruct lb as [| c]. {
-        cbn in Hlbla; rewrite app_nil_r in Hlalb; subst la.
-        now injection Hlbla; clear Hlbla; intros; subst dba.
-      }
-      cbn in Hlbla.
-      injection Hlbla; clear Hlbla; intros Hlbla H; subst c.
-      destruct lalb as [| c]; [ now destruct la | ].
-      destruct lbla as [| d]; [ now destruct lb | ].
-...
-      specialize (IHla (cba*☓^dba :: lb)) as H1.
-...
-      specialize (H1 _ _ Hlalb).
-...
-Theorem glop : ∀ A (eqb rel : A → _),
-  equality eqb →
-  ∀ a b la lb la' lb',
-  permutation eqb la lb
-  → isort rel la = a :: la'
-  → isort rel lb = b :: lb'
-  → rel a b = true ∧ rel b a = true.
-Proof.
-intros * Heqb * Hab Ha Hb.
-...
-intros * Heqb Htot * Hab Ha Hb.
-(*
-specialize (permuted_isort rel Heqb la) as H1.
-rewrite Ha in H1.
-specialize (permuted_isort rel Heqb lb) as H2.
-rewrite Hb in H2.
-*)
-destruct la as [| a']; [ easy | cbn in Ha ].
-apply permutation_cons_l_iff in Hab.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & H & Haft).
-apply Heqb in H; subst x lb.
-apply eq_isort_insert_cons_iff in Ha. 2: {
-  now apply total_relation_is_reflexive.
-}
-destruct Ha as [(Haa & Hlaa & Ha)| (Haa & Hlaa & Ha)]. {
-  subst a' la'.
-  specialize (total_relation_is_reflexive Htot) as Href.
-  move Href before Htot.
-  apply (eq_isort_cons_iff Href) in Hb.
-  destruct Hb as (_, Hb).
-  destruct Hb as [(H1 & H2 & H3)| Hb]. {
-    clear lb' Hab H2 H3 Hbef.
-    revert a b H1 Ha.
-    induction bef as [| c]; intros. {
-      cbn in H1; subst b.
-      apply Href.
-    }
-    cbn in H1; subst c.
-    apply IHbef; [ | easy ].
-...
-    specialize (Hbef _ (or_introl eq_refl)) as H1.
-    specialize (Htot a b) as H4.
-...
-(*
-...
-  clear Hab Hbef.
-  revert b lb' Hb.
-  induction bef as [| c]; intros. {
-    cbn in Hb.
-    apply eq_isort_insert_cons in Hb.
-    destruct Hb as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-      subst b.
-      apply total_relation_is_reflexive in Htot.
-      apply Htot.
-    }
-    specialize (Htot a b) as H4.
-    now rewrite H1 in H4.
-  }
-  cbn in Hb.
-(*
-  apply eq_isort_insert_cons in Hb.
-  destruct Hb as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-    subst c.
-...
-*)
-Print isort.
-*)
-..
-Theorem eq_isort_cons : ∀ A (rel : A → _) a la lb,
-  isort rel la = a :: lb
-  → hd a la = a ∧ isort rel (tl la) = lb ∧
-       isort rel la = hd a la :: isort rel (tl la) ∨
-     rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
-       isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb.
-Proof.
-intros * Hs.
-destruct la as [| b]; [ easy | cbn ].
-cbn in Hs.
-apply eq_isort_insert_cons in Hs.
-destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]; [ now subst b lb; left | ].
-right.
-split; [ easy | ].
-split; [ now destruct (isort rel la) | easy ].
-Qed.
-
-Theorem eq_isort_cons_if : ∀ A (rel : A → _),
-  reflexive rel →
-  ∀ a la lb,
-  hd a la = a ∧ isort rel (tl la) = lb ∧
-    rel (hd a (tl la)) a = false ∨
-(*
-    isort rel la = a :: lb ∨
-*)
-(*
-    isort rel la = hd a la :: isort rel (tl la) ∨
-*)
-  rel (hd a la) a = false ∧ hd a (isort rel (tl la)) = a ∧
-    isort_insert rel (hd a la) (tl (isort rel (tl la))) = lb
-  → isort rel la = a :: lb.
-Proof.
-intros * Href * Hs.
-destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-(*
-  now rewrite H1, H2 in H3.
-*)
-  destruct la as [| b]; [ now rewrite Href in H3 | ].
-  cbn in H1, H2, H3 |-*; subst b lb.
-  destruct la as [| b]; [ now rewrite Href in H3 | ].
-  cbn in H3 |-*.
-  apply (eq_isort_insert_cons_if Href).
-  left.
-  split; [ easy | ].
-  split; [ easy | ].
-...
-  ============================
-  isort_insert rel a (isort_insert rel b (isort rel la)) =
-  a :: isort_insert rel b (isort rel la)
-...
-  rewrite H2.
-  destruct la as [| c]. {
-    cbn in H2; subst lb.
-    cbn.
-    admit.
-  }
-  cbn in H2.
-...
-  destruct lb as [| c]; [ easy | cbn ].
-  apply eq_isort_insert_cons in H2.
-  destruct H2 as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
-    subst c.
-    rewrite H5 in H6.
-    remember (rel a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab; [ easy | ].
-(* chuis parti en couille, là ; chais pas, y a un truc qui déconne *)
-...
-  cbn in H1, H2 |-*; subst b.
-Print isort.
-isort rel (a :: la) = a :: lb
-...
-  rewrite H2.
-Print isort.
-isort rel (a :: lb)
-...
-...cbn in H2.
-
-  cbn in H1, H2 |-*.
-  subst b lb.
-Print isort.
-...
-isort rel (a :: la) = a :: isort rel la.
-...
-  replace la with (hd a la :: tl la).
-  cbn; rewrite H1, H2.
-  rewrite H1.
-  cbn; rewrite H2.
-...
-...
-destruct la as [| c]. {
-  cbn in Hla; subst b.
-  now rewrite Href in Hab.
-}
-cbn in Hla, Hs |-*; subst c.
-now rewrite Hab; subst lb.
-...
-destruct la as [| b]; [ easy | cbn ].
-cbn in Hs.
-apply eq_isort_insert_cons in Hs.
-destruct Hs as [(H1 & H2 & H3)| (H1 & H2 & H3)]; [ now subst b lb; left | ].
-right.
-split; [ easy | ].
-split; [ now destruct (isort rel la) | easy ].
-Qed.
-...
-eapply IHbef.
-...
-apply eq_isort_cons_if.
-...
-  apply (permutation_cons_inv Heqb) in H1.
-  assert (H : permutation eqb (a :: bef ++ aft) (b :: lb')). {
-    eapply (permutation_trans Heqb); [ | apply H2 ].
-    rewrite List_cons_is_app.
-    rewrite (List_cons_is_app _ aft).
-    do 2 rewrite app_assoc.
-    apply (permutation_app_tail Heqb).
-    apply (permutation_app_comm Heqb).
-  }
-  move H after H1; clear H2; rename H into H2.
-Search isort.
-...
-... ...
-specialize (glop f equality_monom_eqb) as H1.
-specialize (H1 (cab*☓^dab) (cba*☓^dba) (la ++ lb) (lb ++ la)).
-specialize (H1 lab lba).
-assert (H : permutation monom_eqb (la ++ lb) (lb ++ la)). {
-  apply (permutation_app_comm equality_monom_eqb).
-}
-specialize (H1 H Hlab Hlba); clear H.
-unfold f in H1; cbn in H1.
-destruct H1 as (H1, H2).
-apply Nat.leb_le in H1, H2.
-now apply Nat.le_antisymm.
-...
-unfold f in Hlab; cbn in Hlab.
-2: {
-apply permutation_app_comm.
-apply equality_monom_eqb.
-}
-(* ouais, ok *)
-...
-  destruct la as [| (ca, da)]. {
-    rewrite app_nil_l in Hlab.
-    rewrite app_nil_r in Hlba.
-    rewrite Hlba in Hlab.
-    now injection Hlab; clear Hlab; intros; subst.
-  }
-  cbn in Hlab.
-  destruct lb as [| (cb, db)]. {
-    rewrite app_nil_r in Hlab.
-    rewrite app_nil_l in Hlba.
-    cbn in Hlba.
-    rewrite Hlba in Hlab.
-    now injection Hlab; clear Hlab; intros; subst.
-  }
-  cbn in Hlba.
-...
-Theorem merge_mon_when_sorted_permuted : ∀ eqb,
-  equality eqb →
-  let rel := λ ma mb, mdeg mb <=? mdeg ma in
-  ∀ it (la lb : list (monom T)),
-  sorted rel la
-  → sorted rel lb
-  → permutation eqb la lb
-  → merge_mon it la = merge_mon it lb.
-Proof.
-intros * Heqb * Hsa Hsb Hp.
-assert (Htr : transitive rel). {
+assert (Htra : transitive rel). {
   unfold rel; intros a b c Hab Hbc.
   apply Nat.leb_le in Hab, Hbc.
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
-revert la lb Hsa Hsb Hp.
-induction it; intros; [ easy | cbn ].
-destruct la as [| (ca, da)]. {
-  now apply permutation_nil_l in Hp; subst lb.
-}
-(**)
-apply permutation_cons_l_iff in Hp.
-remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-destruct lxl as [((bef, x), aft)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbef & Hx & Haft).
-apply Heqb in Hx; subst x lb.
-move bef before la; move aft before bef.
-destruct bef as [| (cb, db)]. {
-  cbn in Hsb, Hp |-*; clear Hbef.
-  destruct la as [| (ca', da')]. {
-    now apply permutation_nil_l in Hp; subst aft.
-  }
-  move ca' before ca; move da' before da.
-  cbn.
-  apply permutation_cons_l_iff in Hp.
-  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
-  destruct lxl as [((bef, x), aft')| ]; [ | easy ].
-  apply extract_Some_iff in Hlxl.
-  destruct Hlxl as (Hbef & Hx & Haft).
-  apply Heqb in Hx; subst x aft.
-  move bef before la; move aft' before bef.
-  destruct bef as [| (cb, db)]. {
-    cbn in Hsb, Hp |-*; clear Hbef.
-    do 2 rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
-      subst da'.
-      apply IHit; [ | | now apply permutation_skip ]. {
-        apply (sorted_cons_iff Htr) in Hsa.
-        destruct Hsa as (Hsa & H1).
-        apply (sorted_cons_iff Htr) in Hsa.
-        destruct Hsa as (Hsa & H2).
-        now apply (sorted_cons_iff Htr).
-      } {
-        apply (sorted_cons_iff Htr) in Hsb.
-        destruct Hsb as (Hsb & H1).
-        apply (sorted_cons_iff Htr) in Hsb.
-        destruct Hsb as (Hsb & H2).
-        now apply (sorted_cons_iff Htr).
-      }
-    } {
-      f_equal.
-      apply IHit; [ | | now apply permutation_skip ]. {
-        apply (sorted_cons_iff Htr) in Hsa.
-        destruct Hsa as (Hsa & H1).
-        apply (sorted_cons_iff Htr) in Hsa.
-        destruct Hsa as (Hsa & H2).
-        now apply (sorted_cons_iff Htr).
-      } {
-        apply (sorted_cons_iff Htr) in Hsb.
-        destruct Hsb as (Hsb & H1).
-        apply (sorted_cons_iff Htr) in Hsb.
-        destruct Hsb as (Hsb & H2).
-        now apply (sorted_cons_iff Htr).
-      }
-    }
-  }
-  cbn in Hp |-*.
-...
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
-    subst da'.
-    destruct (Nat.eq_dec da db) as [Hdab| Hdab]. {
-      subst db.
-      apply IHit; cycle 2. {
-...
-destruct lb as [| (cb, db)]. {
-  now apply permutation_nil_r in Hp.
-}
-destruct la as [| (ca', da')]. {
-  apply (permutation_length_1_inv_l Heqb) in Hp.
-  now injection Hp; clear Hp; intros; subst cb db lb.
-}
-cbn.
-destruct lb as [| (cb', db')]. {
-  now apply (permutation_length_1_inv_r Heqb) in Hp.
-}
-cbn.
-do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec da da') as [Hdaa| Hdaa]. {
-  subst da'.
-  destruct (Nat.eq_dec db db') as [Hdbb| Hdbb]. {
-    subst db'.
-    apply IHit. {
-      apply (sorted_cons_iff Htr) in Hsa.
-      destruct Hsa as (Hsa, H1).
-      apply (sorted_cons_iff Htr) in Hsa.
-      destruct Hsa as (Hsa, H2).
-      apply (sorted_cons_iff Htr).
-      split; [ easy | ].
-      intros (cc, dc) Hc; cbn.
-      unfold rel in H1, H2; cbn - [ In ] in H1, H2.
-      apply (H2 _ Hc).
-    } {
-      apply (sorted_cons_iff Htr) in Hsb.
-      destruct Hsb as (Hsb, H1).
-      apply (sorted_cons_iff Htr) in Hsb.
-      destruct Hsb as (Hsb, H2).
-      apply (sorted_cons_iff Htr).
-      split; [ easy | ].
-      intros (cc, dc) Hc; cbn.
-      unfold rel in H1, H2; cbn - [ In ] in H1, H2.
-      apply (H2 _ Hc).
-    }
-(* bon, fait chier *)
-... ...
-apply (merge_mon_when_sorted_permuted equality_monom_eqb).
-apply sorted_isort.
-(* ouais ok *)
-...
-rewrite isort_when_permuted with (lb := lb ++ la) (eqb := monom_eqb). {
-  easy.
-} {
-  apply equality_monom_eqb.
-} {
-  unfold f; intros ma mb Hab Hba.
-  apply Nat.leb_le in Hab, Hba.
-  destruct ma as (ca, da).
-  destruct mb as (cb, db).
-  cbn in Hab, Hba.
-...
-} {
-  unfold f; intros ma mb mc Hab Hbc.
-  apply Nat.leb_le in Hab, Hbc.
-  apply Nat.leb_le.
-  now transitivity (mdeg mb).
-} {
-  unfold f; intros ma mb.
+assert (Htot : total_relation rel). {
+  intros ma mb.
   apply Nat_leb_total_relation.
 }
-apply permutation_app_comm.
-apply equality_monom_eqb.
-...
-Search (isort _ (_ ++ _)).
-(* ouais mais les deux isort ne sont pas forcément égaux, à cause de ce "<=" *)
-clear Hit.
+move Href before rel.
+move Htra before Href.
+move cba before cab.
+move dba before dab.
+assert (H : dab = dba). {
+  specialize sorted_sorted_permuted_rel as H1.
+  specialize (H1 (monom T) monom_eqb rel).
+  specialize (H1 equality_monom_eqb Href Htra (Mon 0 0)).
+  assert (H : permutation monom_eqb (cab*☓^dab :: lab) (cba*☓^dba :: lba)). {
+    rewrite <- Hlab, <- Hlba.
+    apply (permutation_trans equality_monom_eqb) with (lb := lb ++ la). 2: {
+      apply permuted_isort, equality_monom_eqb.
+    }
+    apply (permutation_trans equality_monom_eqb) with (lb := la ++ lb). {
+      apply (permutation_sym equality_monom_eqb).
+      apply permuted_isort, equality_monom_eqb.
+    }      
+    apply (permutation_app_comm equality_monom_eqb).
+  }
+  specialize (H1 _ _ H); clear H; cbn in H1.
+  rewrite <- Hlab, <- Hlba in H1.
+  assert (H : sorted rel (isort rel (la ++ lb))) by now apply sorted_isort.
+  specialize (H1 H); clear H.
+  assert (H : sorted rel (isort rel (lb ++ la))) by now apply sorted_isort.
+  specialize (H1 H); clear H.
+  destruct H1 as (H1, H2).
+  apply Nat.leb_le in H1, H2.
+  now apply Nat.le_antisymm.
+}
+subst dba.
 ...
 assert (H : S (length (la ++ lb)) ≤ it) by now rewrite Hit.
 clear Hit; rename H into Hit.
