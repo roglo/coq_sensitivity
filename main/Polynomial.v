@@ -810,6 +810,7 @@ rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
+...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
