@@ -868,6 +868,35 @@ assert (H : dab = dba). {
   now apply Nat.le_antisymm.
 }
 subst dba.
+destruct it; [ easy | cbn ].
+destruct lab as [| (ca, da)]. {
+  destruct lba as [| (cb, db)]. {
+    apply eq_isort_unit in Hlab, Hlba.
+    apply app_eq_unit in Hlab, Hlba.
+    now destruct Hlab as [(H1, H2)| (H1, H2)]; subst la lb; destruct Hlba.
+  }
+  exfalso.
+  apply (f_equal length) in Hlab, Hlba.
+  rewrite isort_length in Hlab, Hlba.
+  rewrite app_length in Hlab, Hlba.
+  cbn in Hlab, Hlba.
+  now rewrite Nat.add_comm, Hlba in Hlab.
+}
+cbn.
+destruct lba as [| (cb, db)]. {
+  exfalso.
+  apply (f_equal length) in Hlab, Hlba.
+  rewrite isort_length in Hlab, Hlba.
+  rewrite app_length in Hlab, Hlba.
+  cbn in Hlab, Hlba.
+  now rewrite Nat.add_comm, Hlba in Hlab.
+}
+cbn.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec dab da) as [Hdaba| Hdaba]. {
+  subst da.
+  destruct (Nat.eq_dec dab db) as [Hdaba| Hdaba]. {
+    subst db.
 ...
 assert (H : S (length (la ++ lb)) ≤ it) by now rewrite Hit.
 clear Hit; rename H into Hit.
