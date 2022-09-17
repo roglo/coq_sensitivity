@@ -892,22 +892,24 @@ assert (H : dab = dba). {
       cbn in H6.
       move b before a.
       clear H2 H5.
+      clear a b H3 H6.
       revert lb lalb lbla Hlalb Hlbla.
-      induction la as [| c]; intros. {
+      induction la as [| a]; intros. {
         cbn in Hlalb; rewrite app_nil_r in Hlbla.
         rewrite Hlbla in Hlalb.
         now injection Hlalb; clear Hlalb; intros; subst dba.
       }
       cbn in Hlalb.
-      injection Hlalb; clear Hlalb; intros Hlalb H; subst c.
-      destruct lb as [| c]. {
+      injection Hlalb; clear Hlalb; intros Hlalb H; subst a.
+      destruct lb as [| b]. {
         cbn in Hlbla; rewrite app_nil_r in Hlalb; subst la.
         now injection Hlbla; clear Hlbla; intros; subst dba.
       }
       cbn in Hlbla.
-      injection Hlbla; clear Hlbla; intros Hlbla H; subst c.
-      destruct lalb as [| c]; [ now destruct la | ].
-      destruct lbla as [| d]; [ now destruct lb | ].
+      injection Hlbla; clear Hlbla; intros Hlbla H; subst b.
+      destruct lalb as [| a]; [ now destruct la | ].
+      destruct lbla as [| b]; [ now destruct lb | ].
+...
       specialize (IHla (cba*☓^dba :: lb)) as H1.
 ...
       specialize (H1 _ _ Hlalb).
