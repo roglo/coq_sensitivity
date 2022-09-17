@@ -832,6 +832,66 @@ move Href before f.
 move cba before cab.
 move dba before dab.
 assert (H : dab = dba). {
+Theorem glup : ∀ A (eqb rel : A → _),
+  equality eqb →
+  total_relation rel →
+  ∀ d la lb,
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
+  → rel (hd d la) (hd d lb) = true.
+Proof.
+intros * Heqb Htot * Hab Ha Hb.
+...
+assert (H1 : sorted f (cab*☓^dab :: lab)) by _admit.
+assert (H2 : sorted f (cba*☓^dba :: lab)) by _admit.
+specialize glup as H3.
+assert (Htot : total_relation f) by _admit.
+specialize (H3 (monom T) monom_eqb f equality_monom_eqb Htot).
+specialize (H3 (Mon 0 0)).
+specialize (H3 (cab*☓^dab :: lab) (cba*☓^dba :: lba)).
+cbn in H3.
+(* ouais bon, faudra le faire pour dab ≤ dba aussi *)
+...
+Theorem glip : ∀ A (eqb rel : A → _),
+  equality eqb →
+  total_relation rel →
+  ∀ a b la lb la' lb',
+  permutation eqb la lb
+  → isort rel la = a :: la'
+  → isort rel lb = b :: lb'
+  → rel b a = true.
+Proof.
+intros * Heqb Htot * Hab Ha Hb.
+specialize (total_relation_is_reflexive Htot) as Href.
+move Href before Htot.
+apply (eq_isort_cons_iff Href) in Ha.
+apply (eq_isort_cons_iff Href) in Hb.
+destruct Ha as (Haz, Ha).
+destruct Hb as (Hbz, Hb).
+(**)
+move Hbz before Haz.
+destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
+    move H4 before H1.
+    move H5 before H2.
+    rewrite H1 in H3.
+    rewrite H4 in H6.
+    destruct la as [| a']; [ easy | clear Haz ].
+    destruct lb as [| b']; [ easy | clear Hbz ].
+    cbn in H1, H4; subst a' b'.
+    cbn in H2, H5.
+...
+enough (Htra : transitive rel).
+apply (Htra b (hd b lb') a H6).
+...
+destruct la as [| c]; [ easy | clear Haz; cbn in Ha ].
+destruct lb as [| d]; [ easy | clear Hbz; cbn in Hb ].
+destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+  subst c la'.
+  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
+    subst d lb'.
+...
   apply (eq_isort_cons_iff Href) in Hlab.
   apply (eq_isort_cons_iff Href) in Hlba.
   destruct Hlab as (Habz, Hlab).
@@ -891,6 +951,7 @@ assert (H : dab = dba). {
       }
       cbn in H6.
       move b before a.
+...
       revert a b lb lab lba lalb lbla Hlalb Hlbla H2 H5 H3 H6.
       induction la as [| c]; intros. {
         cbn in Hlalb; rewrite app_nil_r in Hlbla.
@@ -921,28 +982,6 @@ Theorem glop : ∀ A (eqb rel : A → _),
   → rel a b = true ∧ rel b a = true.
 Proof.
 intros * Heqb * Hab Ha Hb.
-Theorem glip : ∀ A (eqb rel : A → _),
-  equality eqb →
-  total_relation rel →
-  ∀ a b la lb la' lb',
-  permutation eqb la lb
-  → isort rel la = a :: la'
-  → isort rel lb = b :: lb'
-  → rel b a = true.
-Proof.
-intros * Heqb Htot * Hab Ha Hb.
-specialize (total_relation_is_reflexive Htot) as Href.
-move Href before Htot.
-apply (eq_isort_cons_iff Href) in Ha.
-apply (eq_isort_cons_iff Href) in Hb.
-destruct Ha as (Haz, Ha).
-destruct Hb as (Hbz, Hb).
-destruct la as [| c]; [ easy | clear Haz; cbn in Ha ].
-destruct lb as [| d]; [ easy | clear Hbz; cbn in Hb ].
-destruct Ha as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
-  subst c la'.
-  destruct Hb as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
-    subst d lb'.
 ...
 intros * Heqb Htot * Hab Ha Hb.
 (*
