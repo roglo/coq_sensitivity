@@ -861,16 +861,10 @@ move Hab at bottom.
 move Hsa at bottom.
 move Hsb at bottom.
 specialize (sorted_middle Htra _ _ [] _ _ Hsa) as H1.
-...
-destruct i. {
-  cbn.
-  apply (sorted_middle Htra _ _ [] _ _ Hsa).
-}
-cbn.
+destruct i; [ easy | cbn ].
 ...
 apply IHla; [ | now apply sorted_cons in Hsb ].
-...
-Qed.
+(* ah bin non *)
 ...
 Theorem sorted_sorted_permuted_rel' : ∀ (A : Type) (eqb rel : A → A → bool),
   equality eqb
