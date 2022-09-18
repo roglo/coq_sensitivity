@@ -9,13 +9,15 @@
      to make a semiring:
         rngl_opt_opp_or_sous = Some (inr sous) where sous is a subtraction
         rngl_opt_opp_or_sous = None otherwise
-        rngl_opt_inv = None
+        rngl_opt_inv_or_quot = Some (inr quot) where quot is a quotient
+        rngl_opt_inv_or_quot = None otherwise
      to make a ring:
         rngl_opt_opp_or_sous = Some (inl opp), where opp is the opposite
-        rngl_opt_inv = None
+        rngl_opt_inv_or_quot = Some (inr quot) where quot is a quotient
+        rngl_opt_inv_or_quot = None otherwise
      to make a field:
         rngl_opt_opp_or_sous = Some (inl opp), where opp is the opposite
-        rngl_opt_inv = Some inv, where opp is the inverse function
+        rngl_opt_inv_or_quot = Some (inl inv), where inv is the inverse
    Multiplication can be commutative or not by setting rngl_mul_is_comm
    to true or false.
    There are many other properties that are implemented here or could be
