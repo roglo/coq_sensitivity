@@ -6,10 +6,11 @@ Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
 Require Import Utf8 Arith.
-Import List ListNotations.
+Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
+
 
 (* definition of a monomial *)
 
@@ -923,8 +924,7 @@ apply IHi.
 (* bloque pour la même raison qu'avec l'induction sur "la" *)
 ...
 *)
-(* truc normal avec induction sur la, à voir si l'induction sur i
-   ne fonctionne pas *)
+(* ça pourrait être intéressant, mais c'est trop compliqué
   set (rel_lt := λ a b, (rel a b && negb (eqb a b))%bool).
   set (rel_rel := λ a b, (rel a b && rel b a)%bool).
 Fixpoint group_eqb {A} (eqb : A → A → bool) la :=
@@ -952,6 +952,7 @@ Compute (
     sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
       (group_eqb rel_rel lb)).
 ...
+*)
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -990,7 +991,72 @@ move Hab at bottom.
 move Hsa at bottom.
 move Hsb at bottom.
 specialize (sorted_middle Htra _ _ [] _ _ Hsa) as H1.
+specialize (sorted_middle Htra _ _ [] _ _ Hsb) as H2.
 destruct i; [ easy | cbn ].
+assert (Hraa : ∀ c, c ∈ befa → rel a c = true). {
+  intros c Hc.
+  apply (sorted_cons_iff Htra) in Hsb.
+  destruct Hsb as (Hsb & Hb).
+  apply (Htra a b c H1), Hb.
+  now apply in_or_app; left.
+}
+assert (Hrab : ∀ c, c ∈ befa → rel b c = true). {
+  intros c Hc.
+  apply (sorted_cons_iff Htra) in Hsb.
+  destruct Hsb as (Hsb & Hb).
+  apply Hb.
+  now apply in_or_app; left.
+}
+assert (Hrba : ∀ c, c ∈ befb → rel a c = true). {
+  intros c Hc.
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply Ha.
+  now apply in_or_app; left.
+}
+assert (Hrbb : ∀ c, c ∈ befb → rel b c = true). {
+  intros c Hc.
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply (Htra b a c H2), Ha.
+  now apply in_or_app; left.
+}
+destruct (lt_dec i (min (length befa) (length befb))) as [Hiab| Hiab]. {
+  rewrite app_nth1; [ | flia Hiab ].
+  rewrite app_nth1; [ | flia Hiab ].
+  apply (Htra (nth i befb d) b (nth i befa d)). 2: {
+    apply Hrab.
+    apply nth_In; flia Hiab.
+  }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply (sorted_app_iff Htra) in Hsa.
+  destruct Hsa as (Hsb' & Hsba & Ha').
+  apply Ha'; [ | now left ].
+  apply nth_In; flia Hiab.
+}
+apply Nat.nlt_ge in Hiab.
+destruct (lt_dec i (max (length befa) (length befb))) as [Himab| Himab]. {
+...
+  rewrite app_nth1. 2: {
+...
+  rewrite app_nth2; [ | flia Hiab ].
+  rewrite app_nth1; [ | flia Hiab ].
+  apply (Htra (nth i befb d) b (nth i befa d)). 2: {
+    apply Hrab.
+    apply nth_In; flia Hiab.
+  }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply (sorted_app_iff Htra) in Hsa.
+  destruct Hsa as (Hsb' & Hsba & Ha').
+  apply Ha'; [ | now left ].
+  apply nth_In; flia Hiab.
+}
+apply Nat.nlt_ge in Hiab.
+...
+  now apply in_or_app; left.
+}
 ...
 apply IHla; [ | now apply sorted_cons in Hsb ].
 (* ah bin non *)
