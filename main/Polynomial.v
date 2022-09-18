@@ -1021,6 +1021,21 @@ assert (Hrbb : ∀ c, c ∈ befb → rel b c = true). {
   apply (Htra b a c H2), Ha.
   now apply in_or_app; left.
 }
+remember (length (befa ++ a :: afta)) as len eqn:Hlena.
+symmetry in Hlena.
+assert (Hlenb : length (befb ++ b :: aftb) = len). {
+  apply (permutation_length Heqb) in Hpab.
+  rewrite app_length in Hlena |-*; cbn in Hlena |-*.
+  rewrite Nat.add_succ_r in Hlena |-*.
+  rewrite <- app_length in Hlena |-*.
+  now rewrite Hpab in Hlena.
+}
+destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
+  apply Nat.nlt_ge in Hilen.
+  rewrite nth_overflow; [ | now rewrite Hlenb ].
+  rewrite nth_overflow; [ | now rewrite Hlena ].
+  apply Href.
+}
 destruct (lt_dec i (min (length befa) (length befb))) as [Hiab| Hiab]. {
   rewrite app_nth1; [ | flia Hiab ].
   rewrite app_nth1; [ | flia Hiab ].
@@ -1036,6 +1051,49 @@ destruct (lt_dec i (min (length befa) (length befb))) as [Hiab| Hiab]. {
   apply nth_In; flia Hiab.
 }
 apply Nat.nlt_ge in Hiab.
+apply Nat.min_le_iff in Hiab.
+destruct (lt_dec i (length befb)) as [Hib| Hib]. {
+  destruct Hiab as [Hia| H]; [ | flia H Hib ].
+  rewrite app_nth1; [ | easy ].
+  rewrite app_nth2; [ | easy ].
+  apply (Htra (nth i befb d) b (nth (i - length befa) (a :: afta) d)). 2: {
+    apply (sorted_cons_iff Htra) in Hsb.
+    destruct Hsb as (Hsb & Hb).
+    apply Hb.
+    apply in_or_app; right.
+    apply nth_In; cbn.
+    rewrite app_length in Hlena; cbn in Hlena.
+    flia Hlena Hilen.
+  }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply (sorted_app_iff Htra) in Hsa.
+  destruct Hsa as (Hsb' & Hsba & Ha').
+  apply Ha'; [ | now left ].
+  now apply nth_In.
+}
+apply Nat.nlt_ge in Hib.
+clear Hiab.
+rewrite app_nth2; [ | easy ].
+destruct (lt_dec i (length befa)) as [Hia| Hia]. {
+  rewrite app_nth1; [ | easy ].
+  apply (Htra (nth (i - length befb) (b :: aftb) d) a (nth i befa d)). 2: {
+    apply Hraa.
+    now apply nth_In.
+  }
+  apply (sorted_cons_iff Htra) in Hsb.
+  destruct Hsb as (Hsb & Hb).
+  apply (sorted_app_iff Htra) in Hsb.
+  destruct Hsb as (Hsa' & Hsab & Hb').
+  apply Hb'; [ | now left ].
+(* ouais, bon, n'importe quoi *)
+...
+  now apply nth_In.
+}
+...
+    apply Ha'; [ | now left ].
+  apply nth_In; flia Hiab.
+...
 destruct (lt_dec i (max (length befa) (length befb))) as [Himab| Himab]. {
 ...
   rewrite app_nth1. 2: {
