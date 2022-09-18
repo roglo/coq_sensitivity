@@ -823,6 +823,27 @@ Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bo
      → ∀ i, rel (nth i la d) (nth i lb d) = true.
 Proof.
 intros * Heqb Href Htra * Hpab Hsa Hsb i.
+(* essai avec induction sur i *)
+revert la lb Hpab Hsa Hsb.
+induction i; intros. {
+  do 2 rewrite <- List_hd_nth_0.
+  apply (sorted_sorted_permuted_rel Heqb); try easy.
+  now apply (permutation_sym Heqb).
+}
+destruct la as [| a]. {
+  apply permutation_nil_l in Hpab; subst lb.
+  apply Href.
+}
+destruct lb as [| b]. {
+  now apply permutation_nil_r in Hpab.
+}
+cbn.
+apply IHi.
+(* bloque pour la même raison qu'avec l'induction sur "la" *)
+...
+(* truc normal avec induction sur la, à voir si l'induction sur i
+   ne fonctionne pas *)
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
