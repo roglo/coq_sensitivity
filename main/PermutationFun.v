@@ -68,6 +68,49 @@ remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 now destruct lxl as [((bef, x), aft)| ].
 Qed.
 
+(*
+Definition symmetric A (rel : A → A → bool) :=
+  ∀ a b, rel a b = true ↔ rel b a = true.
+
+Theorem permutation_cons_r_iff : ∀ A (eqb : A → _),
+  symmetric eqb →
+  ∀ b la lb,
+  permutation eqb la (b :: lb)
+  ↔ match extract (eqb b) la with
+     | Some (bef, _, aft) => permutation eqb (bef ++ aft) lb
+     | None => False
+     end.
+Proof.
+intros * Hsym *.
+destruct la as [| a]; [ easy | ].
+unfold permutation; cbn.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+remember (eqb b a) as ba eqn:Hba; symmetry in Hba.
+move ba before ab.
+destruct ab. {
+  destruct ba; [ easy | ].
+  apply Hsym in Hab; congruence.
+}
+destruct ba. {
+  apply Hsym in Hba; congruence.
+}
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]. {
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & Hbx & Haft).
+  subst la.
+  cbn.
+  remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+  symmetry in Hlxl.
+  destruct lxl as [((bef', x'), aft')| ]. {
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef' & Hax & Haft').
+    subst lb; cbn.
+(* marche pas *)
+...
+*)
+
 (* *)
 
 Theorem permutation_cons_inv : ∀ A (eqb : A → _),

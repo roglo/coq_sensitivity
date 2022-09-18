@@ -813,7 +813,7 @@ clear Hit.
 About sorted_sorted_permuted_rel.
 Check sorted_sorted_permuted.
 (* intéressant, à étudier, probablement bon, mais moins général qu'avec
-   une égalité quelconque eqb
+   une égalité quelconque eqb *)
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (rel : A → A → bool),
   reflexive rel
   → transitive rel
@@ -824,7 +824,56 @@ Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (rel : A → A → bool),
      → sorted rel lb
      → ∀ i, rel (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb i.
+intros * Href Htra * Hpab Hsa Hsb i.
+revert i lb Hpab Hsb.
+induction la as [| a]; intros. {
+  apply permutation_nil_l in Hpab; subst lb.
+  apply Href.
+}
+assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+specialize (IHla H); clear H.
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  destruct i; cbn. {
+    unfold eqb in Hab.
+    now apply Bool.andb_true_iff in Hab.
+  }
+  apply IHla; [ easy | ].
+  now apply sorted_cons in Hsb.
+}
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefa & H & Hlb).
+unfold eqb in H.
+apply Bool.andb_true_iff in H.
+destruct H as (Hax, Hxa).
+subst lb.
+(*
+apply (permutation_sym Heqb) in Hpab.
+*)
+cbn in Hpab.
+...
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefb & H & Hlb).
+apply Heqb in H; subst x.
+subst la.
+move Hab at bottom.
+move Hsa at bottom.
+move Hsb at bottom.
+specialize (sorted_middle Htra _ _ [] _ _ Hsa) as H1.
+destruct i; [ easy | cbn ].
+...
+apply IHla; [ | now apply sorted_cons in Hsb ].
+...
 revert la lb Hpab Hsa Hsb.
 induction i; intros. {
   do 2 rewrite <- List_hd_nth_0.
