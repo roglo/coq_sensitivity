@@ -925,6 +925,33 @@ apply IHi.
 *)
 (* truc normal avec induction sur la, à voir si l'induction sur i
    ne fonctionne pas *)
+  set (rel_lt := λ a b, (rel a b && negb (eqb a b))%bool).
+  set (rel_rel := λ a b, (rel a b && rel b a)%bool).
+Fixpoint group_eqb {A} (eqb : A → A → bool) la :=
+  match la with
+  | [] => []
+  | [a] => [[a]]
+  | a :: ((b :: lb) as lc) =>
+      let lla := group_eqb eqb lc in
+      if eqb a b then (a :: hd [] lla) :: tl lla
+      else [a] :: lla
+  end.
+(*
+Abort.
+Compute (group_eqb Nat.eqb [1;2;2;2;2;3;5;5;6;7]).
+Require Import NatRingLike.
+Definition rel_rel (ma mb : monom nat) := mdeg ma =? mdeg mb.
+Compute (
+  group_eqb rel_rel [Mon 3 5; Mon 5 5; Mon 1 5; Mon 7 1; Mon 1 0]
+).
+*)
+  enough (Hsa' :
+    sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
+      (group_eqb rel_rel la)).
+  enough (Hsb' :
+    sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
+      (group_eqb rel_rel lb)).
+...
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
