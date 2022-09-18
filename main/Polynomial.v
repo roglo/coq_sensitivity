@@ -810,6 +810,11 @@ rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
+Check sorted_sorted_permuted_rel.
+...
+  permutation eqb la lb
+  → sorted rel la
+  → sorted rel lb
 ...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
