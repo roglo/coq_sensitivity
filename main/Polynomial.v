@@ -813,7 +813,8 @@ clear Hit.
 About sorted_sorted_permuted_rel.
 Check sorted_sorted_permuted.
 (* intéressant, à étudier, probablement bon, mais moins général qu'avec
-   une égalité quelconque eqb *)
+   une égalité quelconque eqb...
+    sauf que.. bon, ça a pas l'air de marcher, en fait
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (rel : A → A → bool),
   reflexive rel
   → transitive rel
