@@ -810,11 +810,72 @@ rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
-Check sorted_sorted_permuted_rel.
+About sorted_sorted_permuted_rel.
+Check sorted_sorted_permuted.
+Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
+  equality eqb
+  → reflexive rel
+  → transitive rel
+  → ∀ (d : A) (la lb : list A),
+     permutation eqb la lb
+     → sorted rel la
+     → sorted rel lb
+     → ∀ i, rel (nth i la d) (nth i lb d) = true.
+Proof.
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
+revert lb Hpab Hsb.
+induction la as [| a]; intros. {
+  apply permutation_nil_l in Hpab; subst lb.
+  apply Href.
+}
+assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+specialize (IHla H); clear H.
+destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
+apply permutation_cons_l_iff in Hpab.
+cbn in Hpab.
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+(* ouais chais pas *)
+(* peut-être par induction sur i ? *)
 ...
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
+destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
+remember (extract (eqb a) lb) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefa & H & Hlb).
+apply Heqb in H; subst x.
+subst lb.
+apply (permutation_sym Heqb) in Hpab.
+cbn in Hpab.
+apply permutation_cons_l_iff in Hpab.
+remember (extract (eqb b) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbefb & H & Hlb).
+apply Heqb in H; subst x.
+subst la.
+move Hab at bottom.
+move Hsa at bottom.
+move Hsb at bottom.
+specialize sorted_middle as H1.
+apply (H1 _ rel Htra _ _ [] _ _ Hsa).
+Qed.
+...
+Theorem sorted_sorted_permuted_rel' : ∀ (A : Type) (eqb rel : A → A → bool),
+  equality eqb
+  → reflexive rel
+  → transitive rel
+  → ∀ (d : A) (la lb : list A),
+     permutation eqb la lb
+     → sorted rel la
+     → sorted rel lb
+     → ∀ i,
+        rel (nth i la d) (nth i lb d) = true ∧
+        rel (nth i lb d) (nth i la d) = true.
+Proof.
 ...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
