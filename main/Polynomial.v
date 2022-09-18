@@ -812,18 +812,19 @@ set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
 About sorted_sorted_permuted_rel.
 Check sorted_sorted_permuted.
-Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
-  equality eqb
-  → reflexive rel
+(* intéressant, à étudier, probablement bon, mais moins général qu'avec
+   une égalité quelconque eqb
+Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (rel : A → A → bool),
+  reflexive rel
   → transitive rel
-  → ∀ (d : A) (la lb : list A),
+  → let eqb a b := (rel a b && rel b a)%bool in
+    ∀ (d : A) (la lb : list A),
      permutation eqb la lb
      → sorted rel la
      → sorted rel lb
      → ∀ i, rel (nth i la d) (nth i lb d) = true.
 Proof.
 intros * Heqb Href Htra * Hpab Hsa Hsb i.
-(* essai avec induction sur i *)
 revert la lb Hpab Hsa Hsb.
 induction i; intros. {
   do 2 rewrite <- List_hd_nth_0.
@@ -839,11 +840,41 @@ destruct lb as [| b]. {
 }
 cbn.
 apply IHi.
+...
+*)
+Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
+  equality eqb
+  → reflexive rel
+  → transitive rel
+  → ∀ (d : A) (la lb : list A),
+     permutation eqb la lb
+     → sorted rel la
+     → sorted rel lb
+     → ∀ i, rel (nth i la d) (nth i lb d) = true.
+Proof.
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
+(* essai avec induction sur i
+revert la lb Hpab Hsa Hsb.
+induction i; intros. {
+  do 2 rewrite <- List_hd_nth_0.
+  apply (sorted_sorted_permuted_rel Heqb); try easy.
+  now apply (permutation_sym Heqb).
+}
+destruct la as [| a]. {
+  apply permutation_nil_l in Hpab; subst lb.
+  apply Href.
+}
+destruct lb as [| b]. {
+  now apply permutation_nil_r in Hpab.
+}
+cbn.
+...
+apply IHi.
 (* bloque pour la même raison qu'avec l'induction sur "la" *)
 ...
+*)
 (* truc normal avec induction sur la, à voir si l'induction sur i
    ne fonctionne pas *)
-intros * Heqb Href Htra * Hpab Hsa Hsb i.
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
