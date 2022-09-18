@@ -823,7 +823,7 @@ Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bo
      → ∀ i, rel (nth i la d) (nth i lb d) = true.
 Proof.
 intros * Heqb Href Htra * Hpab Hsa Hsb i.
-revert lb Hpab Hsb.
+revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
   apply Href.
@@ -836,10 +836,10 @@ cbn in Hpab.
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply Heqb in Hab; subst b.
-(* ouais chais pas *)
-(* peut-être par induction sur i ? *)
-...
-destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
+  destruct i; [ apply Href | cbn ].
+  apply sorted_cons in Hsb.
+  now apply IHla.
+}
 remember (extract (eqb a) lb) as lxl eqn:Hlxl.
 symmetry in Hlxl.
 destruct lxl as [((befa, x), afta)| ]; [ | easy ].
@@ -860,8 +860,16 @@ subst la.
 move Hab at bottom.
 move Hsa at bottom.
 move Hsb at bottom.
-specialize sorted_middle as H1.
-apply (H1 _ rel Htra _ _ [] _ _ Hsa).
+specialize (sorted_middle Htra _ _ [] _ _ Hsa) as H1.
+...
+destruct i. {
+  cbn.
+  apply (sorted_middle Htra _ _ [] _ _ Hsa).
+}
+cbn.
+...
+apply IHla; [ | now apply sorted_cons in Hsb ].
+...
 Qed.
 ...
 Theorem sorted_sorted_permuted_rel' : ∀ (A : Type) (eqb rel : A → A → bool),
