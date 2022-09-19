@@ -986,16 +986,27 @@ destruct n as [n| ]. 2: {
     cbn in Haft.
     injection Haft; clear Haft; intros Hb H; subst c lb.
     cbn - [ nth ] in Hn.
-    specialize (Hn 0 (Nat.lt_0_succ _)) as H1.
-    cbn in H1.
-    apply Bool.negb_false_iff in H1.
+    apply (permutation_in_iff Heqb) with (a := b) in Hpab.
+    cbn - [ In ] in Hpab.
+    specialize (proj2 Hpab (or_introl eq_refl)) as H1.
+    apply (In_nth _ _ d) in H1; cbn - [ nth ] in H1.
+    destruct H1 as (j & Hjl & Hj).
+    specialize (Hn _ Hjl).
+    rewrite Hj in Hn.
+    now apply Bool.negb_false_iff in Hn.
+  }
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Haft).
+  apply Heqb in H; subst x lb.
+  destruct bef as [| c]. {
+    cbn; apply IHla; [ easy | now apply sorted_cons in Hsb ].
+  }
+  cbn in Hsb |-*.
 ...
-remember (extract (λ b, negb (rel a b)) la) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((befa, x), afta)| ]. 2: {
-  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
-  cbn in H1.
-Print extract.
+  apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 apply permutation_cons_l_iff in Hpab.
