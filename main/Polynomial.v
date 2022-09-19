@@ -960,6 +960,42 @@ induction la as [| a]; intros. {
 }
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
+(**)
+remember (List_rank (λ b, negb (rel a b)) la) as n eqn:Hn.
+symmetry in Hn.
+destruct n as [n| ]. 2: {
+  specialize (List_rank_None d _ _ Hn) as H.
+  clear Hn; rename H into Hn; cbn in Hn.
+  destruct i; cbn. {
+    destruct lb as [| b]; cbn. {
+      now apply permutation_nil_r in Hpab.
+    }
+    apply permutation_cons_l_iff in Hpab.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Haft).
+    apply Heqb in H; subst x.
+    destruct bef as [| c]. {
+      injection Haft; intros; subst b.
+      apply Href.
+    }
+    destruct la as [| e]. {
+      now apply permutation_nil_l in Hpab.
+    }
+    cbn in Haft.
+    injection Haft; clear Haft; intros Hb H; subst c lb.
+    cbn - [ nth ] in Hn.
+    specialize (Hn 0 (Nat.lt_0_succ _)) as H1.
+    cbn in H1.
+    apply Bool.negb_false_iff in H1.
+...
+remember (extract (λ b, negb (rel a b)) la) as lxl eqn:Hlxl.
+symmetry in Hlxl.
+destruct lxl as [((befa, x), afta)| ]. 2: {
+  specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+  cbn in H1.
+Print extract.
 ...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 apply permutation_cons_l_iff in Hpab.
