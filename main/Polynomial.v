@@ -1061,6 +1061,16 @@ apply (List_rank_Some d) in Hn.
 destruct Hn as (Hnl & Hbef & Hwhi).
 apply Bool.negb_true_iff in Hwhi.
 apply Bool.andb_false_iff in Hwhi.
+destruct i. {
+  cbn.
+  destruct lb as [| b]; [ easy | cbn ].
+  destruct n. {
+    destruct la as [| a']; [ easy | ].
+    cbn in Hwhi.
+    apply (sorted_cons_iff Htra) in Hsa.
+    destruct Hsa as (Hsa, Haa).
+    specialize (Haa a' (or_introl eq_refl)) as H1.
+    destruct Hwhi as [Hwhi| Hwhi]; [ congruence | ].
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
