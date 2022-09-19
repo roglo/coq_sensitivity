@@ -973,7 +973,7 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   rewrite nth_overflow; [ | now rewrite Hlenb ].
   apply Href.
 }
-remember (List_rank (λ b, negb (rel a b)) la) as n eqn:Hn.
+remember (List_rank (λ b, negb (rel a b && rel b a)) la) as n eqn:Hn.
 symmetry in Hn.
 destruct n as [n| ]. 2: {
   specialize (List_rank_None d _ _ Hn) as H.
@@ -1005,7 +1005,8 @@ destruct n as [n| ]. 2: {
     destruct H1 as (j & Hjl & Hj).
     specialize (Hn _ Hjl).
     rewrite Hj in Hn.
-    now apply Bool.negb_false_iff in Hn.
+    apply Bool.negb_false_iff in Hn.
+    now apply Bool.andb_true_iff in Hn.
   }
   apply permutation_cons_l_iff in Hpab.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -1021,6 +1022,45 @@ destruct n as [n| ]. 2: {
   apply Nat.succ_lt_mono in Hilen.
   specialize (Hn _ Hilen) as H1.
   apply Bool.negb_false_iff in H1.
+  apply Bool.andb_true_iff in H1.
+  apply (Htra (nth i la d) a (nth i (bef ++ a :: aft) d)); [ easy | ].
+  destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth2; [ | now unfold ge; rewrite Hib ].
+    rewrite Hib, Nat.sub_diag; cbn.
+    apply Href.
+  }
+  assert (H : nth i (bef ++ a :: aft) d ∈ la). {
+    cbn in Hpab.
+    specialize (permutation_in_iff Heqb) as H2.
+    apply H2 with (la := c :: bef ++ aft). {
+      now apply (permutation_sym Heqb).
+    }
+    destruct (lt_dec i (length bef)) as [Hib1| Hib1]. {
+      rewrite app_nth1; [ | easy ].
+      right; apply in_or_app; left.
+      now apply nth_In.
+    }
+    apply Nat.nlt_ge in Hib1.
+    rewrite app_nth2; [ | easy ].
+    replace (i - length bef) with (S (i - S (length bef))) by flia Hib1 Hib.
+    cbn - [ In ].
+    right; apply in_or_app; right.
+    apply nth_In.
+    cbn in Hlenb.
+    rewrite app_length in Hlenb; cbn in Hlenb.
+    flia Hlena Hlenb Hilen Hib Hib1.
+  }
+  apply (In_nth _ _ d) in H.
+  destruct H as (j & Hjl & Hj).
+  specialize (Hn _ Hjl) as H2.
+  rewrite Hj in H2.
+  apply Bool.negb_false_iff in H2.
+  now apply Bool.andb_true_iff in H2.
+}
+apply (List_rank_Some d) in Hn.
+destruct Hn as (Hnl & Hbef & Hwhi).
+apply Bool.negb_true_iff in Hwhi.
+apply Bool.andb_false_iff in Hwhi.
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
