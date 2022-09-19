@@ -960,6 +960,7 @@ induction la as [| a]; intros. {
 }
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
+...
 destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | ].
 apply permutation_cons_l_iff in Hpab.
 cbn in Hpab.
