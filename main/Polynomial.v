@@ -1077,6 +1077,17 @@ clear Hiab.
 rewrite app_nth2; [ | easy ].
 destruct (lt_dec i (length befa)) as [Hia| Hia]. {
   rewrite app_nth1; [ | easy ].
+  apply (Htra (nth (i - length befb) (b :: aftb) d) b (nth i befa d)). 2: {
+    apply Hrab.
+    now apply nth_In.
+  }
+...
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Ha).
+  apply (sorted_app_iff Htra) in Hsa.
+  destruct Hsa as (Hsb' & Hsba & Ha').
+  apply Ha'; [ | now left ].
+...
   apply (Htra (nth (i - length befb) (b :: aftb) d) a (nth i befa d)). 2: {
     apply Hraa.
     now apply nth_In.
