@@ -961,6 +961,18 @@ induction la as [| a]; intros. {
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
 (**)
+remember (length (a :: la)) as len eqn:Hlena.
+symmetry in Hlena.
+assert (Hlenb : length lb = len). {
+  apply (permutation_length Heqb) in Hpab.
+  congruence.
+}
+destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
+  apply Nat.nlt_ge in Hilen.
+  rewrite nth_overflow; [ | now rewrite Hlena ].
+  rewrite nth_overflow; [ | now rewrite Hlenb ].
+  apply Href.
+}
 remember (List_rank (λ b, negb (rel a b)) la) as n eqn:Hn.
 symmetry in Hn.
 destruct n as [n| ]. 2: {
@@ -1005,6 +1017,10 @@ destruct n as [n| ]. 2: {
     cbn; apply IHla; [ easy | now apply sorted_cons in Hsb ].
   }
   cbn in Hsb |-*.
+  cbn in Hlena; rewrite <- Hlena in Hilen.
+  apply Nat.succ_lt_mono in Hilen.
+  specialize (Hn _ Hilen) as H1.
+  apply Bool.negb_false_iff in H1.
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
