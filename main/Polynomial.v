@@ -929,7 +929,7 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   rewrite nth_overflow; [ | now rewrite Hlenb ].
   apply Href.
 }
-remember (List_rank (λ b, negb (leb a b && leb b a)) la) as n eqn:Hn.
+remember (List_rank (λ b, negb (eqb a b)) la) as n eqn:Hn.
 symmetry in Hn.
 destruct n as [n| ]. 2: {
   specialize (List_rank_None d _ _ Hn) as H.
@@ -961,6 +961,7 @@ destruct n as [n| ]. 2: {
     specialize (Hn _ Hjl).
     rewrite Hj in Hn.
     apply Bool.negb_false_iff in Hn.
+    apply Heqr in Hn.
     now apply Bool.andb_true_iff in Hn.
   }
   apply permutation_cons_l_iff in Hpab.
@@ -977,6 +978,7 @@ destruct n as [n| ]. 2: {
   apply Nat.succ_lt_mono in Hilen.
   specialize (Hn _ Hilen) as H1.
   apply Bool.negb_false_iff in H1.
+  apply Heqr in H1.
   apply Bool.andb_true_iff in H1.
   apply (Htra (nth i la d) a (nth i (bef ++ a :: aft) d)); [ easy | ].
   destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
@@ -1010,12 +1012,12 @@ destruct n as [n| ]. 2: {
   specialize (Hn _ Hjl) as H2.
   rewrite Hj in H2.
   apply Bool.negb_false_iff in H2.
+  apply Heqr in H2.
   now apply Bool.andb_true_iff in H2.
 }
 apply (List_rank_Some d) in Hn.
 destruct Hn as (Hnl & Hbef & Hwhi).
 apply Bool.negb_true_iff in Hwhi.
-apply Bool.andb_false_iff in Hwhi.
 destruct i. {
   cbn.
   destruct lb as [| b]; [ easy | cbn ].
@@ -1026,7 +1028,6 @@ destruct i. {
     apply (sorted_cons_iff Htra) in Hsa.
     destruct Hsa as (Hsa, Haa).
     specialize (Haa a' (or_introl eq_refl)) as H1.
-    destruct Hwhi as [Hwhi| Hwhi]; [ congruence | ].
     apply permutation_cons_l_iff in Hpab.
     remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
     destruct lxl as [((bef, x), aft)| ]; [ | easy ].
