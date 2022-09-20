@@ -829,7 +829,7 @@ assert (Href : reflexive leb). {
   now apply Bool.andb_true_iff in H1.
 }
 move Href before Heqr.
-revert i lb Hpab Hsb.
+revert lb Hpab Hsb i.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
   apply Href.
@@ -981,6 +981,28 @@ destruct i. {
     now rewrite (equality_refl Heqb) in Hab.
   }
   cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+  specialize (IHla _ Hpab) as H1.
+  assert (H : sorted leb ((b :: bef) ++ aft)). {
+    cbn.
+    apply (sorted_cons_iff Htra) in Hsb.
+    apply (sorted_cons_iff Htra).
+    destruct Hsb as (Hsba & Hba).
+    apply (sorted_app_iff Htra) in Hsba.
+    destruct Hsba as (Hsbef & Hsaa & Hsba).
+    split. {
+      apply (sorted_app_iff Htra).
+      split; [ easy | ].
+      split; [ now apply sorted_cons in Hsaa | ].
+      intros x y Hx Hy.
+      apply Hsba; [ easy | now right ].
+    }
+    intros x Hx.
+    apply in_app_or in Hx.
+    apply Hba, in_or_app.
+    destruct Hx; [ now left | now right; right ].
+  }
+  specialize (H1 H); clear H.
+(* bon chais pas ; après avoir dormi, je saurai, peut-être... *)
 ... ...
 specialize (sorted_sorted_permuted_rel_1') as H1.
 specialize (H1 (monom T)).
