@@ -893,6 +893,7 @@ cbn.
 apply IHi.
 ...
 *)
+...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
   equality eqb
   → reflexive rel
@@ -1078,6 +1079,11 @@ destruct i. {
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & H & Haft).
     apply Heqb in H; subst x.
+...
+    apply (permutation_in_iff Heqb) with (a := b) in Hpab.
+    apply Haa.
+...
+    apply Hpab.
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
