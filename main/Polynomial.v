@@ -893,79 +893,31 @@ cbn.
 apply IHi.
 ...
 *)
-Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
-(*
+Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
-*)
-  (∀ a b, eqb a b = true → rel a b = true ∧ rel b a = true)
-(**)
-  → reflexive rel
-  → transitive rel
+  → (∀ a b, eqb a b = true → (leb a b && leb b a)%bool = true)
+  → transitive leb
   → ∀ (d : A) (la lb : list A),
      permutation eqb la lb
-     → sorted rel la
-     → sorted rel lb
-     → ∀ i, rel (nth i la d) (nth i lb d) = true.
+     → sorted leb la
+     → sorted leb lb
+     → ∀ i, leb (nth i la d) (nth i lb d) = true.
 Proof.
-intros * (*Heqb*)Heqr Href Htra * Hpab Hsa Hsb i.
-(* essai avec induction sur i
-revert la lb Hpab Hsa Hsb.
-induction i; intros. {
-  do 2 rewrite <- List_hd_nth_0.
-  apply (sorted_sorted_permuted_rel Heqb); try easy.
-  now apply (permutation_sym Heqb).
+intros * Heqb Heqr Htra * Hpab Hsa Hsb i.
+assert (Href : reflexive leb). {
+  intros a.
+  specialize (equality_refl Heqb a) as H1.
+  apply Heqr in H1.
+  now apply Bool.andb_true_iff in H1.
 }
-destruct la as [| a]. {
-  apply permutation_nil_l in Hpab; subst lb.
-  apply Href.
-}
-destruct lb as [| b]. {
-  now apply permutation_nil_r in Hpab.
-}
-cbn.
-...
-apply IHi.
-(* bloque pour la même raison qu'avec l'induction sur "la" *)
-...
-*)
-(* ça pourrait être intéressant, mais c'est trop compliqué
-  set (rel_lt := λ a b, (rel a b && negb (eqb a b))%bool).
-  set (rel_rel := λ a b, (rel a b && rel b a)%bool).
-Fixpoint group_eqb {A} (eqb : A → A → bool) la :=
-  match la with
-  | [] => []
-  | [a] => [[a]]
-  | a :: ((b :: lb) as lc) =>
-      let lla := group_eqb eqb lc in
-      if eqb a b then (a :: hd [] lla) :: tl lla
-      else [a] :: lla
-  end.
-(*
-Abort.
-Compute (group_eqb Nat.eqb [1;2;2;2;2;3;5;5;6;7]).
-Require Import NatRingLike.
-Definition rel_rel (ma mb : monom nat) := mdeg ma =? mdeg mb.
-Compute (
-  group_eqb rel_rel [Mon 3 5; Mon 5 5; Mon 1 5; Mon 7 1; Mon 1 0]
-).
-*)
-  enough (Hsa' :
-    sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
-      (group_eqb rel_rel la)).
-  enough (Hsb' :
-    sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
-      (group_eqb rel_rel lb)).
-...
-clear Heqb.
-*)
+move Href before Heqr.
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
   apply Href.
 }
-assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+assert (H : sorted leb la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
-(**)
 remember (length (a :: la)) as len eqn:Hlena.
 symmetry in Hlena.
 assert (Hlenb : length lb = len). {
@@ -977,7 +929,7 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   rewrite nth_overflow; [ | now rewrite Hlenb ].
   apply Href.
 }
-remember (List_rank (λ b, negb (rel a b && rel b a)) la) as n eqn:Hn.
+remember (List_rank (λ b, negb (leb a b && leb b a)) la) as n eqn:Hn.
 symmetry in Hn.
 destruct n as [n| ]. 2: {
   specialize (List_rank_None d _ _ Hn) as H.
@@ -991,8 +943,7 @@ destruct n as [n| ]. 2: {
     destruct lxl as [((bef, x), aft)| ]; [ | easy ].
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & H & Haft).
-    apply Heqr in H.
-    destruct H as (Hrax, Hrxa).
+    apply Heqb in H; subst x.
     destruct bef as [| c]. {
       now injection Haft; intros; subst b.
     }
@@ -1002,7 +953,6 @@ destruct n as [n| ]. 2: {
     cbn in Haft.
     injection Haft; clear Haft; intros Hb H; subst c lb.
     cbn - [ nth ] in Hn.
-...
     apply (permutation_in_iff Heqb) with (a := b) in Hpab.
     cbn - [ In ] in Hpab.
     specialize (proj2 Hpab (or_introl eq_refl)) as H1.
@@ -1083,11 +1033,19 @@ destruct i. {
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & H & Haft).
     apply Heqb in H; subst x.
-...
     apply (permutation_in_iff Heqb) with (a := b) in Hpab.
-    apply Haa.
-...
-    apply Hpab.
+    remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ now apply Heqr, Bool.andb_true_iff in Hab | ].
+    apply Haa, Hpab.
+    move Haft at bottom.
+    destruct bef as [| c]. {
+      cbn in Haft.
+      injection Haft; clear Haft; intros; subst b aft.
+      now rewrite (equality_refl Heqb) in Hab.
+    }
+    cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+    now cbn; left.
+  }
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
