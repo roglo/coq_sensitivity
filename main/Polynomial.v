@@ -970,6 +970,30 @@ destruct i. {
     apply Heqr in Hab.
     now apply Bool.andb_true_iff in Hab.
   }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Hbla).
+  apply Hbla.
+  apply (permutation_sym Heqb) in Hpab.
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Haft).
+  apply Heqb in H; subst x.
+  enough (H : b ∈ a :: la). {
+    destruct H as [H| H]; [ subst b | easy ].
+    now rewrite (equality_refl Heqb) in Hab.
+  }
+  rewrite Haft.
+  now apply in_or_app; right; left.
+}
+destruct lb as [| b]; [ cbn in Hlena, Hlenb; congruence | cbn ].
+remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+...
+apply IHla; [ | now apply sorted_cons in Hsb ].
+...
   apply permutation_cons_l_iff in Hpab.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
   destruct lxl as [((bef, x), aft)| ]; [ | easy ].
@@ -981,6 +1005,7 @@ destruct i. {
     now rewrite (equality_refl Heqb) in Hab.
   }
   cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+(*
   specialize (IHla _ Hpab) as H1.
   assert (H : sorted leb ((b :: bef) ++ aft)). {
     cbn.
@@ -1002,7 +1027,10 @@ destruct i. {
     destruct Hx; [ now left | now right; right ].
   }
   specialize (H1 H); clear H.
-(* bon chais pas ; après avoir dormi, je saurai, peut-être... *)
+*)
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Hbla).
+  apply Hbla.
 ... ...
 specialize (sorted_sorted_permuted_rel_1') as H1.
 specialize (H1 (monom T)).
