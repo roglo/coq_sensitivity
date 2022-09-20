@@ -376,7 +376,7 @@ Qed.
 Definition monom_eqb ma mb :=
   (rngl_eqb (mcoeff ma) (mcoeff mb) && Nat.eqb (mdeg ma) (mdeg mb))%bool.
 
-Theorem equality_monom_eqb : equality monom_eqb.
+Theorem monom_eqb_eq : equality monom_eqb.
 Proof.
 intros ma mb.
 split; intros Hab. {
@@ -1047,6 +1047,30 @@ destruct i. {
     cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
     now cbn; left.
   }
+... ...
+specialize (sorted_sorted_permuted_rel_1') as H1.
+specialize (H1 (monom T)).
+specialize (H1 monom_eqb rel monom_eqb_eq).
+assert (H : ∀ a b, monom_eqb a b = true → (rel a b && rel b a)%bool = true). {
+  intros a b Hab.
+  unfold rel; cbn.
+  unfold monom_eqb in Hab.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Hcab, Hdab).
+  apply Nat.eqb_eq in Hdab; rewrite <- Hdab.
+  now rewrite Nat.leb_refl.
+}
+specialize (H1 H); clear H.
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+specialize (H1 Htra).
+specialize (H1 (Mon 0 0) (isort rel (la ++ lb)) (isort rel (lb ++ la))).
+...
+unfold rel in H1 at 1 2.
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
