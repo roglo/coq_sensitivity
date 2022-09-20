@@ -894,6 +894,8 @@ apply IHi.
 ...
 *)
 ...
+(* c'est nul, ce truc ci-dessous : eqb n'est pas censé exister dans T *)
+(* ou alors, bon, tant pis, on le mettra en hypothèse ? *)
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
   equality eqb
   → reflexive rel
