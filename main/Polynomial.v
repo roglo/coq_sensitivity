@@ -893,8 +893,6 @@ cbn.
 apply IHi.
 ...
 *)
-(* c'est nul, ce truc ci-dessous : eqb n'est pas censé exister dans T *)
-(* ou alors, bon, tant pis, on le mettra en hypothèse ? *)
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
   equality eqb
   → reflexive rel
@@ -955,6 +953,7 @@ Compute (
       (group_eqb rel_rel lb)).
 ...
 *)
+clear Heqb.
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -966,8 +965,7 @@ specialize (IHla H); clear H.
 remember (length (a :: la)) as len eqn:Hlena.
 symmetry in Hlena.
 assert (Hlenb : length lb = len). {
-  apply (permutation_length Heqb) in Hpab.
-  congruence.
+  apply permutation_length in Hpab; congruence.
 }
 destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
   apply Nat.nlt_ge in Hilen.
@@ -989,9 +987,12 @@ destruct n as [n| ]. 2: {
     destruct lxl as [((bef, x), aft)| ]; [ | easy ].
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & H & Haft).
+(*
     apply Heqb in H; subst x.
+*)
     destruct bef as [| c]. {
       injection Haft; intros; subst b.
+...
       apply Href.
     }
     destruct la as [| e]. {

@@ -871,11 +871,10 @@ eapply (permutation_trans Heqb). 2: {
 now apply (permutation_skip Heqb).
 Qed.
 
-Theorem permutation_length : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ la lb, permutation eqb la lb → length la = length lb.
+Theorem permutation_length : ∀ A (eqb : A → _) la lb,
+  permutation eqb la lb → length la = length lb.
 Proof.
-intros * Heqb * Hpab.
+intros * Hpab.
 unfold permutation in Hpab.
 revert lb Hpab.
 induction la as [| a]; intros. {
@@ -886,7 +885,6 @@ remember (extract (eqb a) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hlb); subst lb.
-apply Heqb in H; subst x.
 rewrite app_length; cbn.
 rewrite Nat.add_succ_r, <- app_length; f_equal.
 now apply IHla.
@@ -1736,7 +1734,7 @@ specialize (IHla _ Hpab) as H3.
 rewrite List_seq_cut with (i := length bef). 2: {
   apply in_seq; split; [ easy | cbn ].
   rewrite H1, map_length.
-  apply (permutation_length Heqb) in Hpab.
+  apply permutation_length in Hpab.
   rewrite app_length in Hpab.
   flia Hpab.
 }
@@ -1745,7 +1743,7 @@ cbn - [ "<?" ].
 replace (length la - length bef) with (length aft). 2: {
   rewrite H1, H2.
   do 2 rewrite map_length.
-  apply (permutation_length Heqb) in Hpab.
+  apply permutation_length in Hpab.
   rewrite app_length in Hpab.
   flia Hpab.
 }
@@ -1776,7 +1774,7 @@ destruct (Nat.eq_dec (length aft) 0) as [Haz| Haz]. {
   }
   rewrite map_id.
   replace (length bef) with (length la). 2: {
-    rewrite (permutation_length Heqb Hpab).
+    rewrite (permutation_length Hpab).
     now rewrite H1, filter_Some_map_Some, map_length.
   }
   rewrite H1.
@@ -1824,7 +1822,7 @@ replace (seq 0 i ++ seq (S i) (length aft)) with
 }
 apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
 replace (i + length aft) with (length la). 2: {
-  rewrite (permutation_length Heqb Hpab).
+  rewrite (permutation_length Hpab).
   rewrite app_length.
   rewrite <- (map_length Some (filter_Some _)), <- H1.
   rewrite <- (map_length Some (filter_Some _)), <- H2.
@@ -1961,7 +1959,7 @@ apply (permutation_assoc_loop_nth_nth Heqb) with (d := d) in Hij; cycle 1. {
   now rewrite permutation_assoc_length in Hj.
 }
 rewrite (List_map_nth' d) in Hij; [ easy | ].
-now rewrite (permutation_length Heqb Hpab) in Hi.
+now rewrite (permutation_length Hpab) in Hi.
 Qed.
 
 Theorem permutation_nth : ∀ A (eqb : A → _),
@@ -1980,7 +1978,7 @@ split. {
   intros Hpab *.
   split. {
     subst n; symmetry.
-    apply (permutation_length Heqb Hpab).
+    apply (permutation_length Hpab).
   }
   exists (permutation_fun eqb la lb).
   split. {
@@ -2449,7 +2447,7 @@ destruct bef as [| a]. {
   rewrite fold_apply_transp_list.
   rewrite apply_transp_list_shift_1_cons. 2: {
     intros (i, j) Hij; cbn.
-    apply (permutation_length Heqb) in Hpab.
+    apply permutation_length in Hpab.
     now apply (in_transp_list_length Heqb _ _ Hpab).
   }
   f_equal.
@@ -2493,7 +2491,7 @@ move H before Hpab; clear Hpab; rename H into Hpab.
 rewrite fold_apply_transp_list.
 rewrite apply_transp_list_shift_1_cons. 2: {
   intros (i, j) Hij; cbn.
-  apply (permutation_length Heqb) in Hpab.
+  apply permutation_length in Hpab.
   now apply (in_transp_list_length Heqb _ _ Hpab).
 }
 f_equal.
@@ -2633,7 +2631,7 @@ Theorem iter_list_permut : ∀ A (eqb : A → _),
     iter_list l2 (λ (c : T) i, op c (f i)) d.
 Proof.
 intros * Heqb * op_d_l op_d_r op_comm op_assoc Hl.
-specialize (permutation_length Heqb Hl) as H1.
+specialize (permutation_length Hl) as H1.
 remember (length l2) as n eqn:H2.
 move H1 after H2; symmetry in H2.
 destruct n. {
@@ -2641,7 +2639,6 @@ destruct n. {
   apply length_zero_iff_nil in H2.
   now subst l1 l2.
 }
-(**)
 revert n l2 Hl H1 H2.
 induction l1 as [| a]; intros; [ easy | ].
 apply permutation_cons_l_iff in Hl.
@@ -2649,7 +2646,8 @@ remember (extract (eqb a) l2) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & H & Hl2).
-apply Heqb in H; subst x l2.
+apply Heqb in H; subst x.
+subst l2.
 cbn in H1; apply Nat.succ_inj in H1.
 rewrite app_length in H2; cbn in H2.
 rewrite Nat.add_succ_r in H2.

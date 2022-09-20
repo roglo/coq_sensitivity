@@ -1125,9 +1125,7 @@ assert (Hab : la ⊂ lb). {
     }
     split; [ easy | ].
     apply in_all_permut_permutation in Hla.
-    split. {
-      apply (permutation_length Nat.eqb_eq) in Hla; congruence.
-    }
+    split; [ apply permutation_length in Hla; congruence | ].
     intros i Hi.
     specialize (permutation_in_iff Nat.eqb_eq Hla) as H1.
     apply H1 in Hi.
@@ -1903,7 +1901,7 @@ f_equal. {
   }
   assert (Hkm : length kl = m). {
     apply in_all_permut_permutation in Hkl.
-    apply (permutation_length Nat.eqb_eq) in Hkl.
+    apply permutation_length in Hkl.
     now rewrite seq_length in Hkl.
   }
   rewrite <- ε_collapse_ε. 2: {
@@ -1943,7 +1941,7 @@ f_equal.
 unfold comp_list.
 assert (Hkm : length kl = m). {
   apply in_all_permut_permutation in Hkl.
-  apply (permutation_length Nat.eqb_eq) in Hkl.
+  apply permutation_length in Hkl.
   now rewrite seq_length in Hkl.
 }
 rewrite (List_map_nth' 0); [ | rewrite collapse_length, Hkm; flia Hi ].

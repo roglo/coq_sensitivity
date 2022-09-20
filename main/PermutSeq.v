@@ -356,7 +356,7 @@ unfold permut_seq in Ha |-*.
 eapply (permutation_trans Nat.eqb_eq). {
   apply (permutation_sym Nat.eqb_eq), Hpab.
 }
-now rewrite (permutation_length Nat.eqb_eq Hpab) in Ha.
+now rewrite (permutation_length Hpab) in Ha.
 Qed.
 
 (* *)
@@ -402,8 +402,7 @@ specialize permutation_permut as Hpl'.
 specialize (Hpl' l l' Hps Hp).
 move l' before l; move Hpl' before Hp.
 replace (length l) with (length l'). 2: {
-  apply (permutation_length Nat.eqb_eq).
-  now apply (permutation_sym Nat.eqb_eq).
+  now apply permutation_length in Hps.
 }
 clear l Hp Hps.
 rename l' into l.
@@ -2015,7 +2014,7 @@ rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
   subst p.
   split; [ now apply (perm_assoc_permut_seq Nat.eqb_eq) | ].
   generalize Hpab; intros H.
-  apply (permutation_length Nat.eqb_eq) in H.
+  apply permutation_length in H.
   rewrite <- Hlb, <- H.
   now apply (permutation_assoc_length Nat.eqb_eq).
 }
@@ -2026,7 +2025,7 @@ apply canon_sym_gr_list_inv_ub.
 rewrite Hp.
 split; [ now apply (perm_assoc_permut_seq Nat.eqb_eq) | ].
 generalize Hpab; intros H.
-apply (permutation_length Nat.eqb_eq) in H.
+apply permutation_length in H.
 rewrite <- Hlb, <- H.
 now apply (permutation_assoc_length Nat.eqb_eq).
 Qed.
