@@ -894,7 +894,11 @@ apply IHi.
 ...
 *)
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bool),
+(*
   equality eqb
+*)
+  (∀ a b, eqb a b = true → rel a b = true ∧ rel b a = true)
+(**)
   → reflexive rel
   → transitive rel
   → ∀ (d : A) (la lb : list A),
@@ -903,7 +907,7 @@ Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb rel : A → A → bo
      → sorted rel lb
      → ∀ i, rel (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb i.
+intros * (*Heqb*)Heqr Href Htra * Hpab Hsa Hsb i.
 (* essai avec induction sur i
 revert la lb Hpab Hsa Hsb.
 induction i; intros. {
@@ -952,8 +956,8 @@ Compute (
     sorted (λ l1 l2, rel_lt (hd d l1) (hd d l2))
       (group_eqb rel_rel lb)).
 ...
-*)
 clear Heqb.
+*)
 revert i lb Hpab Hsb.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -987,13 +991,10 @@ destruct n as [n| ]. 2: {
     destruct lxl as [((bef, x), aft)| ]; [ | easy ].
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & H & Haft).
-(*
-    apply Heqb in H; subst x.
-*)
+    apply Heqr in H.
+    destruct H as (Hrax, Hrxa).
     destruct bef as [| c]. {
-      injection Haft; intros; subst b.
-...
-      apply Href.
+      now injection Haft; intros; subst b.
     }
     destruct la as [| e]. {
       now apply permutation_nil_l in Hpab.
@@ -1001,6 +1002,7 @@ destruct n as [n| ]. 2: {
     cbn in Haft.
     injection Haft; clear Haft; intros Hb H; subst c lb.
     cbn - [ nth ] in Hn.
+...
     apply (permutation_in_iff Heqb) with (a := b) in Hpab.
     cbn - [ In ] in Hpab.
     specialize (proj2 Hpab (or_introl eq_refl)) as H1.
