@@ -1065,12 +1065,19 @@ destruct i. {
   cbn.
   destruct lb as [| b]; [ easy | cbn ].
   destruct n. {
+    clear Hbef.
     destruct la as [| a']; [ easy | ].
     cbn in Hwhi.
     apply (sorted_cons_iff Htra) in Hsa.
     destruct Hsa as (Hsa, Haa).
     specialize (Haa a' (or_introl eq_refl)) as H1.
     destruct Hwhi as [Hwhi| Hwhi]; [ congruence | ].
+    apply permutation_cons_l_iff in Hpab.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Haft).
+    apply Heqb in H; subst x.
 ...
   apply IHla; [ | now apply sorted_cons in Hsb ].
 ...
