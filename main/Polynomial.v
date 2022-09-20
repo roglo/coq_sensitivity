@@ -813,7 +813,7 @@ set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
-  → (∀ a b, eqb a b = true → (leb a b && leb b a)%bool = true)
+  → reflexive leb
   → transitive leb
   → ∀ (d : A) (la lb : list A),
      permutation eqb la lb
@@ -821,14 +821,7 @@ Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bo
      → sorted leb lb
      → ∀ i, leb (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb Heqr Htra * Hpab Hsa Hsb i.
-assert (Href : reflexive leb). {
-  intros a.
-  specialize (equality_refl Heqb a) as H1.
-  apply Heqr in H1.
-  now apply Bool.andb_true_iff in H1.
-}
-move Href before Heqr.
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
 revert lb Hpab Hsb i.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -878,9 +871,8 @@ destruct n as [n| ]. 2: {
     destruct H1 as (j & Hjl & Hj).
     specialize (Hn _ Hjl).
     rewrite Hj in Hn.
-    apply Bool.negb_false_iff in Hn.
-    apply Heqr in Hn.
-    now apply Bool.andb_true_iff in Hn.
+    apply Bool.negb_false_iff, Heqb in Hn; subst b.
+    apply Href.
   }
   apply permutation_cons_l_iff in Hpab.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
@@ -895,10 +887,8 @@ destruct n as [n| ]. 2: {
   cbn in Hlena; rewrite <- Hlena in Hilen.
   apply Nat.succ_lt_mono in Hilen.
   specialize (Hn _ Hilen) as H1.
-  apply Bool.negb_false_iff in H1.
-  apply Heqr in H1.
-  apply Bool.andb_true_iff in H1.
-  apply (Htra (nth i la d) a (nth i (bef ++ a :: aft) d)); [ easy | ].
+  apply Bool.negb_false_iff, Heqb in H1.
+  rewrite <- H1.
   destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
     rewrite app_nth2; [ | now unfold ge; rewrite Hib ].
     rewrite Hib, Nat.sub_diag; cbn.
@@ -929,9 +919,9 @@ destruct n as [n| ]. 2: {
   destruct H as (j & Hjl & Hj).
   specialize (Hn _ Hjl) as H2.
   rewrite Hj in H2.
-  apply Bool.negb_false_iff in H2.
-  apply Heqr in H2.
-  now apply Bool.andb_true_iff in H2.
+  apply Bool.negb_false_iff, Heqb in H2.
+  rewrite <- H2.
+  apply Href.
 }
 apply (List_rank_Some d) in Hn.
 destruct Hn as (Hnl & Hbef & Hwhi).
@@ -954,7 +944,7 @@ destruct i. {
     apply Heqb in H; subst x.
     apply (permutation_in_iff Heqb) with (a := b) in Hpab.
     remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab; [ now apply Heqr, Bool.andb_true_iff in Hab | ].
+    destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
     apply Haa, Hpab.
     move Haft at bottom.
     destruct bef as [| c]. {
@@ -967,8 +957,8 @@ destruct i. {
   }
   remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
   destruct ab. {
-    apply Heqr in Hab.
-    now apply Bool.andb_true_iff in Hab.
+    apply Heqb in Hab; subst b.
+    apply Href.
   }
   apply (sorted_cons_iff Htra) in Hsa.
   destruct Hsa as (Hsa & Hbla).
@@ -991,8 +981,9 @@ destruct lb as [| b]; [ cbn in Hlena, Hlenb; congruence | cbn ].
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
 destruct ab. {
   apply Heqb in Hab; subst b.
-...
-apply IHla; [ | now apply sorted_cons in Hsb ].
+  apply IHla; [ | now apply sorted_cons in Hsb ].
+  now apply (permutation_cons_inv Heqb) in Hpab.
+}
 ...
   apply permutation_cons_l_iff in Hpab.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
