@@ -965,6 +965,22 @@ destruct i. {
     cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
     now cbn; left.
   }
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Heqr in Hab.
+    now apply Bool.andb_true_iff in Hab.
+  }
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Haft).
+  apply Heqb in H; subst x.
+  destruct bef as [| c]. {
+    cbn in Haft; injection Haft; intros; subst b aft.
+    now rewrite (equality_refl Heqb) in Hab.
+  }
+  cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
 ... ...
 specialize (sorted_sorted_permuted_rel_1') as H1.
 specialize (H1 (monom T)).
