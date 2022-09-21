@@ -984,6 +984,39 @@ destruct ab. {
   apply IHla; [ | now apply sorted_cons in Hsb ].
   now apply (permutation_cons_inv Heqb) in Hpab.
 }
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef' & H & Haft).
+apply Heqb in H; subst x.
+destruct bef as [| c]. {
+  cbn in Haft; injection Haft; intros; subst b aft.
+  now rewrite (equality_refl Heqb) in Hab.
+}
+cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+specialize (IHla _ Hpab) as H1.
+assert (H : sorted leb ((b :: bef) ++ aft)). {
+  cbn.
+  apply (sorted_cons_iff Htra) in Hsb.
+  apply (sorted_cons_iff Htra).
+  destruct Hsb as (Hsba & Hba).
+  apply (sorted_app_iff Htra) in Hsba.
+  destruct Hsba as (Hsbef & Hsaa & Hsba).
+  split. {
+    apply (sorted_app_iff Htra).
+    split; [ easy | ].
+    split; [ now apply sorted_cons in Hsaa | ].
+    intros x y Hx Hy.
+    apply Hsba; [ easy | now right ].
+  }
+  intros x Hx.
+  apply in_app_or in Hx.
+  apply Hba, in_or_app.
+  destruct Hx; [ now left | now right; right ].
+}
+specialize (H1 H); clear H.
+cbn - [ nth ] in H1.
 ...
   apply permutation_cons_l_iff in Hpab.
   remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
