@@ -855,7 +855,8 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
       }
       now destruct Hlab as [(H1, H2)| (H1, H2)]; subst la lb.
     }
-    cbn in H3.
+    unfold rel in H3; cbn in H3.
+    apply Nat.leb_le in H3.
     destruct lba as [| b']. {
       clear H6.
       apply eq_isort_nil in H5.
@@ -865,6 +866,16 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
       apply app_eq_unit in Hlba.
       destruct Hlba as [(H4, H5)| (H4, H5)]; now subst la lb.
     }
+    unfold rel in H6; cbn in H6.
+    apply Nat.leb_le in H6.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (mdeg a) (mdeg a')) as [Haa| Haa]. {
+      clear H3.
+      destruct (Nat.eq_dec (mdeg b) (mdeg b')) as [Hbb| Hbb]. {
+        clear H6.
+(* ouais mais en fait, ça, c'est pas bon, parce qu'il peut y avoir d'autres
+   degrés égaux à celui de a dans lab, ce qui veut dire que rien ne prouve
+   que "mcoeff a + mcoeff a'" soit égal à "mcoeff b + mcoeff b'" *)
 ...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
