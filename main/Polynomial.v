@@ -815,6 +815,7 @@ assert (Href : reflexive rel). {
   unfold rel; intros a.
   apply Nat.leb_refl.
 }
+...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 revert it la lb lba Hlab Hlba.
