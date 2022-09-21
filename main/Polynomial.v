@@ -853,8 +853,18 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
         apply app_eq_unit in Hlba.
         destruct Hlab as [(H1, H2)| (H1, H2)]; now subst la lb; destruct Hlba.
       }
-      cbn in H6.
-      unfold rel in H6.
+      now destruct Hlab as [(H1, H2)| (H1, H2)]; subst la lb.
+    }
+    cbn in H3.
+    destruct lba as [| b']. {
+      clear H6.
+      apply eq_isort_nil in H5.
+      remember (lb ++ la) as lba eqn:Hlba; symmetry in Hlba.
+      destruct lba as [| b']; [ easy | clear Hbaz ].
+      cbn in H4, H5; subst b' lba.
+      apply app_eq_unit in Hlba.
+      destruct Hlba as [(H4, H5)| (H4, H5)]; now subst la lb.
+    }
 ...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
