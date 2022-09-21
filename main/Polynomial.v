@@ -876,8 +876,6 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
 (* ouais mais en fait, ça, c'est pas bon, parce qu'il peut y avoir d'autres
    degrés égaux à celui de a dans lab, ce qui veut dire que rien ne prouve
    que "mcoeff a + mcoeff a'" soit égal à "mcoeff b + mcoeff b'" *)
-(* peut-être en faisant une induction sur it, ce qui me permettrait de
-   généraliser lab également ? *)
 ...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
