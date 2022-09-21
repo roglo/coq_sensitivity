@@ -811,6 +811,51 @@ rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 clear Hit.
+assert (Href : reflexive rel). {
+  unfold rel; intros a.
+  apply Nat.leb_refl.
+}
+remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+revert it la lb Hlab Hlba.
+induction lab as [| a]; intros; cbn. {
+  apply eq_isort_nil, app_eq_nil in Hlab.
+  now destruct Hlab; subst la lb lba.
+}
+apply (eq_isort_cons_iff Href) in Hlab.
+destruct Hlab as (Habz, Hlab).
+destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+  rewrite H1 in H3.
+  destruct it; [ easy | cbn ].
+  destruct lba as [| b]. {
+    apply eq_isort_nil, app_eq_nil in Hlba.
+    now destruct Hlba; subst la lb.
+  }
+  apply (eq_isort_cons_iff Href) in Hlba.
+  destruct Hlba as (Hbaz, Hlba).
+  destruct Hlba as [(H4 & H5 & H6)| (H4 & H5 & H6)]. {
+    rewrite H4 in H6.
+    move Hbaz before Habz.
+    move H4 before H1; move H5 before H2.
+    destruct lab as [| a']. {
+      clear H3.
+      apply eq_isort_nil in H2.
+      remember (la ++ lb) as lab eqn:Hlab; symmetry in Hlab.
+      destruct lab as [| a']; [ easy | clear Habz ].
+      cbn in H1, H2; subst a' lab.
+      apply app_eq_unit in Hlab.
+      destruct lba as [| b']. {
+        clear H6.
+        apply eq_isort_nil in H5.
+        remember (lb ++ la) as lba eqn:Hlba; symmetry in Hlba.
+        destruct lba as [| b']; [ easy | clear Hbaz ].
+        cbn in H4, H5; subst b' lba.
+        apply app_eq_unit in Hlba.
+        destruct Hlab as [(H1, H2)| (H1, H2)]; now subst la lb; destruct Hlba.
+      }
+      cbn in H6.
+      unfold rel in H6.
+...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
   → reflexive leb
