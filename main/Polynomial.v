@@ -995,6 +995,7 @@ destruct bef as [| c]. {
   now rewrite (equality_refl Heqb) in Hab.
 }
 cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+...
 specialize (IHla _ Hpab) as H1.
 assert (H : sorted leb ((b :: bef) ++ aft)). {
   cbn.
