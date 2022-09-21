@@ -996,7 +996,23 @@ destruct bef as [| c]. {
 }
 cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
 cbn in Hpab.
-(* ah, c'est désespérant *)
+specialize (permutation_in_iff Heqb Hpab) as H1.
+specialize (proj2 (H1 b) (or_introl eq_refl)) as H2.
+apply (In_nth _ _ d) in H2.
+destruct H2 as (j & Hj & Hb).
+assert (Hjn : n ≤ j). {
+  apply Nat.nlt_ge; intros H.
+  specialize (Hbef _ H) as H2.
+  rewrite Hb in H2.
+  now rewrite Hab in H2.
+}
+apply (sorted_cons_iff Htra) in Hsb.
+destruct Hsb as (Hsb & Hbaa).
+specialize (Hbaa a) as H2.
+assert (H : a ∈ bef ++ a :: aft) by now apply in_or_app; right; left.
+specialize (H2 H); clear H.
+move Hsa at bottom.
+assert (leb (nth n la d) b = true).
 ...
 apply (permutation_sym Heqb) in Hpab.
 apply permutation_cons_l_iff in Hpab.
