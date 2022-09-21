@@ -810,19 +810,32 @@ rewrite (Nat.add_comm (length lb)).
 rewrite <- app_length.
 remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+(*
 clear Hit.
+*)
 assert (Href : reflexive rel). {
   unfold rel; intros a.
   apply Nat.leb_refl.
 }
-...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
-revert it la lb lba Hlab Hlba.
+move lba before lab.
+revert it la lb lba Hlab Hlba Hit.
 induction lab as [| a]; intros; cbn. {
   apply eq_isort_nil, app_eq_nil in Hlab.
   now destruct Hlab; subst la lb lba.
 }
+(**)
+set (f := λ ma mb : monom T, mdeg ma =? mdeg mb).
+remember (List_rank (λ b, negb (f a b)) la) as n eqn:Hn.
+symmetry in Hn.
+destruct n as [n| ]. 2: {
+  specialize (List_rank_None a _ _ Hn) as H1; cbn in H1.
+  replace (merge_mon it (a :: lab)) with
+    [Mon (∑ (b ∈ a :: lab), mcoeff b) (mdeg a)]. 2: {
+    destruct it; [ easy | ].
+    cbn.
+...
 apply (eq_isort_cons_iff Href) in Hlab.
 destruct Hlab as (Habz, Hlab).
 destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
