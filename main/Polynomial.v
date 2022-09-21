@@ -817,7 +817,7 @@ assert (Href : reflexive rel). {
 }
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
-revert it la lb Hlab Hlba.
+revert it la lb lba Hlab Hlba.
 induction lab as [| a]; intros; cbn. {
   apply eq_isort_nil, app_eq_nil in Hlab.
   now destruct Hlab; subst la lb lba.
@@ -876,6 +876,8 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
 (* ouais mais en fait, ça, c'est pas bon, parce qu'il peut y avoir d'autres
    degrés égaux à celui de a dans lab, ce qui veut dire que rien ne prouve
    que "mcoeff a + mcoeff a'" soit égal à "mcoeff b + mcoeff b'" *)
+(* peut-être en faisant une induction sur it, ce qui me permettrait de
+   généraliser lab également ? *)
 ...
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
