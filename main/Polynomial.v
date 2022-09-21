@@ -833,8 +833,19 @@ destruct n as [n| ]. 2: {
   specialize (List_rank_None a _ _ Hn) as H1; cbn in H1.
   replace (merge_mon it (a :: lab)) with
     [Mon (∑ (b ∈ a :: lab), mcoeff b) (mdeg a)]. 2: {
-    destruct it; [ easy | ].
-    cbn.
+    destruct it; [ easy | cbn ].
+    rewrite rngl_summation_list_cons.
+    destruct lab as [| b]. {
+      rewrite rngl_summation_list_empty; [ | easy ].
+      rewrite rngl_add_0_r.
+      now destruct a; cbn.
+    }
+    rewrite rngl_summation_list_cons, rngl_add_assoc.
+    apply (eq_isort_cons_iff Href) in Hlab.
+    destruct Hlab as (Habz, Hlab).
+    rename H1 into Nnf.
+    destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
+      cbn in H3.
 ...
 apply (eq_isort_cons_iff Href) in Hlab.
 destruct Hlab as (Habz, Hlab).
