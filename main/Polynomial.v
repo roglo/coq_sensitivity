@@ -194,28 +194,35 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
    return a polynomial whose degree are in decreasing order
    and no coefficient is nul *)
 
-Fixpoint merge_mon it la :=
+Fixpoint merge_mon_of_list_c it (la : list (monom (list T))) :=
   match it with
-  | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
+  | 0 => [Mon [] 0] (* algo err: not enough iterations *)
   | S it' =>
       match la with
       | [] => []
       | [ma] => [ma]
       | ma :: mb :: lb =>
           if mdeg ma =? mdeg mb then
-            merge_mon it' ((mcoeff ma + mcoeff mb)*☓^mdeg ma :: lb)
+            merge_mon_of_list_c it' ((mcoeff ma ++ mcoeff mb)*☓^mdeg ma :: lb)
           else
-            ma :: merge_mon it' (mb :: lb)
+            ma :: merge_mon_of_list_c it' (mb :: lb)
       end
   end.
+
+Definition monl_list_of_monl (la : list (monom T)) :=
+  map (λ ma, Mon [mcoeff ma] (mdeg ma)) la.
+
+Definition monl_of_monl_list (la : list (monom (list T))) :=
+  map (λ ma, Mon (∑ (c ∈ mcoeff ma), c) (mdeg ma)) la.
 
 Definition merge_mon_nb_iter (la : list (monom T)) := S (length la).
 
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_mon
-       (merge_mon_nb_iter la)
-       (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
+    (monl_of_monl_list
+       (merge_mon_of_list_c
+          (merge_mon_nb_iter la)
+          (monl_list_of_monl (isort (λ ma mb, mdeg mb <=? mdeg ma) la)))).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
@@ -311,7 +318,7 @@ Declare Scope P_scope.
 Delimit Scope P_scope with P.
 
 Arguments is_canon_polyn {T ro} p%P.
-Arguments merge_mon {T ro} it%nat la%list.
+Arguments merge_mon_of_list_c {T} it%nat la%list.
 Arguments monl_add {T} (la lb)%list.
 Arguments monl_mul {T ro} (la lb)%list.
 Arguments monl_norm {T ro} la%list.
@@ -435,6 +442,8 @@ Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
 Theorem merge_mon_nb_iter_cons : ∀ (ma : monom T) la,
   merge_mon_nb_iter (ma :: la) = S (merge_mon_nb_iter la).
 Proof. easy. Qed.
+
+...
 
 Theorem merge_mon_same_deg : ∀ it ca cb da la,
   merge_mon (S it) (ca*☓^da :: cb*☓^da :: la) =
