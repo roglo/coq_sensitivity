@@ -2656,8 +2656,8 @@ split. {
 }
 Qed.
 
-Theorem sorted_sorted_permuted : ∀ A (eqb rel : A → _)
-  (Heqb : equality eqb),
+Theorem sorted_sorted_permuted : ∀ A (eqb rel : A → _),
+  equality eqb →
   antisymmetric rel →
   transitive rel →
   ∀ la lb,
