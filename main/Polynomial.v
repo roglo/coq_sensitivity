@@ -831,8 +831,8 @@ remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
 (**)
-specialize (sorted_sorted_permuted_leb monom_eqb_eq Href Htra) as H1.
-specialize (H1 (Mon 0 0) lab lba).
+specialize (sorted_sorted_permuted_leb monom_eqb_eq Href Htra) as Hrr.
+specialize (Hrr (Mon 0 0) lab lba).
 assert (H : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
@@ -844,13 +844,13 @@ assert (H : permutation monom_eqb lab lba). {
   }
   apply (permutation_app_comm monom_eqb_eq).
 }
-specialize (H1 H); clear H.
+specialize (Hrr H); clear H.
 assert (H : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
-specialize (H1 H); clear H.
+specialize (Hrr H); clear H.
 assert (H : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
-specialize (H1 H); clear H.
+specialize (Hrr H); clear H.
 ...
-revert it la lb lba Hlab Hlba Hit.
+revert it la lb lba Hlab Hlba Hit Hrr.
 induction lab as [| a]; intros; cbn. {
   apply eq_isort_nil, app_eq_nil in Hlab.
   now destruct Hlab; subst la lb lba.
