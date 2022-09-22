@@ -2367,71 +2367,292 @@ apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
-Theorem sorted_sorted_permuted_rel_1 : ∀ A (eqb rel : A → _),
-  equality eqb →
-  reflexive rel →
-  transitive rel →
-  ∀ d la lb,
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
-  → rel (hd d la) (hd d lb) = true.
+Theorem sorted_sorted_permuted_leb_1 : ∀ (A : Type) (eqb leb : A → A → bool),
+  equality eqb
+  → reflexive leb
+  → transitive leb
+  → ∀ (d : A) (la lb : list A),
+     permutation eqb la lb
+     → sorted leb la
+     → sorted leb lb
+     → ∀ i, leb (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb.
-revert lb Hpab Hsb.
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
+revert lb Hpab Hsb i.
 induction la as [| a]; intros. {
-  apply permutation_nil_l in Hpab; subst lb; cbn.
+  apply permutation_nil_l in Hpab; subst lb.
   apply Href.
 }
-cbn.
-assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+assert (H : sorted leb la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
-destruct lb as [| b]; [ now apply permutation_nil_r in Hpab | cbn ].
-apply permutation_cons_l_iff in Hpab.
-cbn in Hpab.
+remember (length (a :: la)) as len eqn:Hlena.
+symmetry in Hlena.
+assert (Hlenb : length lb = len). {
+  apply permutation_length in Hpab; congruence.
+}
+destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
+  apply Nat.nlt_ge in Hilen.
+  rewrite nth_overflow; [ | now rewrite Hlena ].
+  rewrite nth_overflow; [ | now rewrite Hlenb ].
+  apply Href.
+}
+remember (List_rank (λ b, negb (eqb a b)) la) as n eqn:Hn.
+symmetry in Hn.
+destruct n as [n| ]. 2: {
+  specialize (List_rank_None d _ _ Hn) as H.
+  clear Hn; rename H into Hn; cbn in Hn.
+  destruct i; cbn. {
+    destruct lb as [| b]; cbn. {
+      now apply permutation_nil_r in Hpab.
+    }
+    apply permutation_cons_l_iff in Hpab.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Haft).
+    apply Heqb in H; subst x.
+    destruct bef as [| c]. {
+      now injection Haft; intros; subst b.
+    }
+    destruct la as [| e]. {
+      now apply permutation_nil_l in Hpab.
+    }
+    cbn in Haft.
+    injection Haft; clear Haft; intros Hb H; subst c lb.
+    cbn - [ nth ] in Hn.
+    apply (permutation_in_iff Heqb) with (a := b) in Hpab.
+    cbn - [ In ] in Hpab.
+    specialize (proj2 Hpab (or_introl eq_refl)) as H1.
+    apply (In_nth _ _ d) in H1; cbn - [ nth ] in H1.
+    destruct H1 as (j & Hjl & Hj).
+    specialize (Hn _ Hjl).
+    rewrite Hj in Hn.
+    apply Bool.negb_false_iff, Heqb in Hn; subst b.
+    apply Href.
+  }
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Haft).
+  apply Heqb in H; subst x lb.
+  destruct bef as [| c]. {
+    cbn; apply IHla; [ easy | now apply sorted_cons in Hsb ].
+  }
+  cbn in Hsb |-*.
+  cbn in Hlena; rewrite <- Hlena in Hilen.
+  apply Nat.succ_lt_mono in Hilen.
+  specialize (Hn _ Hilen) as H1.
+  apply Bool.negb_false_iff, Heqb in H1.
+  rewrite <- H1.
+  destruct (Nat.eq_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth2; [ | now unfold ge; rewrite Hib ].
+    rewrite Hib, Nat.sub_diag; cbn.
+    apply Href.
+  }
+  assert (H : nth i (bef ++ a :: aft) d ∈ la). {
+    cbn in Hpab.
+    specialize (permutation_in_iff Heqb) as H2.
+    apply H2 with (la := c :: bef ++ aft). {
+      now apply (permutation_sym Heqb).
+    }
+    destruct (lt_dec i (length bef)) as [Hib1| Hib1]. {
+      rewrite app_nth1; [ | easy ].
+      right; apply in_or_app; left.
+      now apply nth_In.
+    }
+    apply Nat.nlt_ge in Hib1.
+    rewrite app_nth2; [ | easy ].
+    replace (i - length bef) with (S (i - S (length bef))) by flia Hib1 Hib.
+    cbn - [ In ].
+    right; apply in_or_app; right.
+    apply nth_In.
+    cbn in Hlenb.
+    rewrite app_length in Hlenb; cbn in Hlenb.
+    flia Hlena Hlenb Hilen Hib Hib1.
+  }
+  apply (In_nth _ _ d) in H.
+  destruct H as (j & Hjl & Hj).
+  specialize (Hn _ Hjl) as H2.
+  rewrite Hj in H2.
+  apply Bool.negb_false_iff, Heqb in H2.
+  rewrite <- H2.
+  apply Href.
+}
+apply (List_rank_Some d) in Hn.
+destruct Hn as (Hnl & Hbef & Hwhi).
+apply Bool.negb_true_iff in Hwhi.
+destruct i. {
+  cbn.
+  destruct lb as [| b]; [ easy | cbn ].
+  destruct n. {
+    clear Hbef.
+    destruct la as [| a']; [ easy | ].
+    cbn in Hwhi.
+    apply (sorted_cons_iff Htra) in Hsa.
+    destruct Hsa as (Hsa, Haa).
+    specialize (Haa a' (or_introl eq_refl)) as H1.
+    apply permutation_cons_l_iff in Hpab.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & H & Haft).
+    apply Heqb in H; subst x.
+    apply (permutation_in_iff Heqb) with (a := b) in Hpab.
+    remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+    destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
+    apply Haa, Hpab.
+    move Haft at bottom.
+    destruct bef as [| c]. {
+      cbn in Haft.
+      injection Haft; clear Haft; intros; subst b aft.
+      now rewrite (equality_refl Heqb) in Hab.
+    }
+    cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+    now cbn; left.
+  }
+  remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    apply Heqb in Hab; subst b.
+    apply Href.
+  }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa & Hbla).
+  apply Hbla.
+  apply (permutation_sym Heqb) in Hpab.
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef' & H & Haft).
+  apply Heqb in H; subst x.
+  enough (H : b ∈ a :: la). {
+    destruct H as [H| H]; [ subst b | easy ].
+    now rewrite (equality_refl Heqb) in Hab.
+  }
+  rewrite Haft.
+  now apply in_or_app; right; left.
+}
+destruct lb as [| b]; [ cbn in Hlena, Hlenb; congruence | cbn ].
 remember (eqb a b) as ab eqn:Hab; symmetry in Hab.
-destruct ab; [ apply Heqb in Hab; subst b; apply Href | ].
-remember (extract (eqb a) lb) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((befa, x), afta)| ]; [ | easy ].
-apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbefa & H & Hlb).
-apply Heqb in H; subst x.
-subst lb.
-apply (permutation_sym Heqb) in Hpab.
-cbn in Hpab.
+destruct ab. {
+  apply Heqb in Hab; subst b.
+  apply IHla; [ | now apply sorted_cons in Hsb ].
+  now apply (permutation_cons_inv Heqb) in Hpab.
+}
 apply permutation_cons_l_iff in Hpab.
-remember (extract (eqb b) la) as lxl eqn:Hlxl.
-symmetry in Hlxl.
-destruct lxl as [((befb, x), aftb)| ]; [ | easy ].
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
-destruct Hlxl as (Hbefb & H & Hlb).
+destruct Hlxl as (Hbef' & H & Haft).
 apply Heqb in H; subst x.
-subst la.
-move Hab at bottom.
+destruct bef as [| c]. {
+  cbn in Haft; injection Haft; intros; subst b aft.
+  now rewrite (equality_refl Heqb) in Hab.
+}
+cbn in Haft; injection Haft; clear Haft; intros; subst c lb.
+cbn in Hpab.
+specialize (permutation_in_iff Heqb Hpab) as H1.
+specialize (proj2 (H1 b) (or_introl eq_refl)) as H2.
+apply (In_nth _ _ d) in H2.
+destruct H2 as (j & Hj & Hb).
+assert (Hjn : n ≤ j). {
+  apply Nat.nlt_ge; intros H.
+  specialize (Hbef _ H) as H2.
+  rewrite Hb in H2.
+  now rewrite Hab in H2.
+}
+apply (sorted_cons_iff Htra) in Hsb.
+destruct Hsb as (Hsb & Hbaa).
+specialize (Hbaa a) as H2.
+assert (H : a ∈ bef ++ a :: aft) by now apply in_or_app; right; left.
+specialize (H2 H); clear H.
 move Hsa at bottom.
 move Hsb at bottom.
-specialize sorted_middle as H1.
-apply (H1 _ rel Htra _ _ [] _ _ Hsa).
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  rewrite Hb.
+  apply Hbaa, nth_In.
+  cbn in Hlenb.
+  rewrite <- Hlenb in Hilen.
+  now apply Nat.succ_lt_mono in Hilen.
+}
+assert (Hbba : sorted leb (bef ++ b :: aft)). {
+  apply (sorted_app_iff Htra) in Hsb.
+  apply (sorted_app_iff Htra).
+  destruct Hsb as (Hsb & Hsaa & Hba).
+  split; [ easy | ].
+  apply (sorted_cons_iff Htra) in Hsaa.
+  split. {
+    apply (sorted_cons_iff Htra) in Hsa.
+    apply (sorted_cons_iff Htra).
+    split; [ easy | ].
+    intros c Hc.
+    now apply Hbaa, in_or_app; right; right.
+  }
+  intros x y Hx Hy.
+  destruct Hy as [Hy| Hy]. 2: {
+    apply Hba; [ easy | now right ].
+  }
+  subst y.
+  destruct Hsaa as (Hsa' & Hsaa).
+  apply (Htra x a b). {
+    apply Hba; [ easy | now left ].
+  }
+  apply (sorted_cons_iff Htra) in Hsa.
+  destruct Hsa as (Hsa, Hlab).
+  apply Hlab.
+  now apply H1; left.
+}
+destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+  rewrite app_nth1; [ | easy ].
+  rewrite <- app_nth1 with (l := bef) (l' := b :: aft); [ | easy ].
+  apply IHla; [ | easy ].
+  eapply (permutation_trans Heqb); [ apply Hpab | ].
+  apply (permutation_middle Heqb).
+}
+apply Nat.nlt_ge in Hib.
+rewrite app_nth2; [ | easy ].
+destruct (Nat.eq_dec i (length bef)) as [Hib'| Hib']. {
+  rewrite <- Hib', Nat.sub_diag; cbn.
+  apply (Htra _ b _); [ | easy ].
+  replace b with (nth i (bef ++ b :: aft) d). 2: {
+    rewrite app_nth2; [ | easy ].
+    now rewrite Hib', Nat.sub_diag; cbn.
+  }
+  apply IHla; [ | easy ].
+  eapply (permutation_trans Heqb); [ apply Hpab | ].
+  apply (permutation_middle Heqb).
+}
+replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
+cbn.
+replace (nth (i - S (length bef)) aft d) with (nth i (bef ++ b :: aft) d). 2: {
+  rewrite app_nth2; [ | easy ].
+  now replace (i - length bef) with (S (i - S (length bef))) by flia Hib Hib'.
+}
+apply IHla; [ | easy ].
+eapply (permutation_trans Heqb); [ apply Hpab | ].
+apply (permutation_middle Heqb).
 Qed.
 
-Theorem sorted_sorted_permuted_rel : ∀ A (eqb rel : A → _),
-  equality eqb →
-  reflexive rel →
-  transitive rel →
-  ∀ d la lb,
-  permutation eqb la lb
-  → sorted rel la
-  → sorted rel lb
-  → rel (hd d la) (hd d lb) = true ∧
-    rel (hd d lb) (hd d la) = true.
+Theorem sorted_sorted_permuted_leb : ∀ (A : Type) (eqb leb : A → A → bool),
+  equality eqb
+  → reflexive leb
+  → transitive leb
+  → ∀ (d : A) (la lb : list A),
+     permutation eqb la lb
+     → sorted leb la
+     → sorted leb lb
+     → ∀ i,
+       leb (nth i la d) (nth i lb d) = true ∧
+       leb (nth i lb d) (nth i la d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb.
+intros * Heqb Href Htra * Hpab Hsa Hsb i.
 split. {
-  now apply (sorted_sorted_permuted_rel_1 Heqb).
+  now apply (sorted_sorted_permuted_leb_1 Heqb).
 } {
   apply (permutation_sym Heqb) in Hpab.
-  now apply (sorted_sorted_permuted_rel_1 Heqb).
+  now apply (sorted_sorted_permuted_leb_1 Heqb).
 }
 Qed.
 
