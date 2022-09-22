@@ -2368,16 +2368,16 @@ now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
 Theorem sorted_sorted_permuted_not_antisym_1 : ∀ A (eqb leb : A → A → bool),
-  equality eqb
-  → reflexive leb
-  → transitive leb
-  → ∀ (d : A) (la lb : list A),
-     permutation eqb la lb
-     → sorted leb la
-     → sorted leb lb
-     → ∀ i, leb (nth i la d) (nth i lb d) = true.
+  equality eqb →
+  reflexive leb →
+  transitive leb →
+  ∀ (d : A) (la lb : list A),
+  sorted leb la
+  → sorted leb lb
+  → permutation eqb la lb
+  → ∀ i, leb (nth i la d) (nth i lb d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb i.
+intros * Heqb Href Htra * Hsa Hsb Hpab i.
 revert lb Hpab Hsb i.
 induction la as [| a]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -2636,18 +2636,18 @@ apply (permutation_middle Heqb).
 Qed.
 
 Theorem sorted_sorted_permuted_not_antisym : ∀ A (eqb leb : A → A → bool),
-  equality eqb
-  → reflexive leb
-  → transitive leb
-  → ∀ (d : A) (la lb : list A),
-     permutation eqb la lb
-     → sorted leb la
-     → sorted leb lb
-     → ∀ i,
-       leb (nth i la d) (nth i lb d) = true ∧
-       leb (nth i lb d) (nth i la d) = true.
+  equality eqb →
+  reflexive leb →
+  transitive leb →
+  ∀ (d : A) (la lb : list A),
+  sorted leb la
+  → sorted leb lb
+  → permutation eqb la lb
+  → ∀ i,
+    leb (nth i la d) (nth i lb d) = true ∧
+    leb (nth i lb d) (nth i la d) = true.
 Proof.
-intros * Heqb Href Htra * Hpab Hsa Hsb i.
+intros * Heqb Href Htra * Hsa Hsb Hpab i.
 split. {
   now apply (sorted_sorted_permuted_not_antisym_1 Heqb).
 } {
