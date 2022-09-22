@@ -866,32 +866,33 @@ rename Hsab into Hsa.
 rename Hsba into Hsb.
 revert la lb Hsa Hsb Hpab Hdd.
 induction it; intros; [ easy | cbn ].
-destruct la as [| (ca, da)]. {
+destruct la as [| ma]. {
   now apply permutation_nil_l in Hpab; subst lb.
 }
-destruct lb as [| (cb, db)]. {
+destruct lb as [| mb]. {
   now apply permutation_nil_r in Hpab.
 }
-specialize (Hdd 0) as H1; cbn in H1; subst db.
-destruct la as [| (ca', da')]. {
-  destruct lb as [| (cb', db')]. {
+destruct la as [| ma']. {
+  destruct lb as [| mb']. {
     apply (permutation_length_1 monom_eqb_eq) in Hpab.
     now f_equal.
   }
   now apply permutation_length in Hpab.
 }
 cbn.
-destruct lb as [| (cb', db')]. {
+destruct lb as [| mb']. {
   now apply permutation_length in Hpab.
 }
 cbn.
-specialize (Hdd 1) as H1; cbn in H1; subst db'.
+specialize (Hdd 0) as H1; cbn in H1.
+specialize (Hdd 1) as H2; cbn in H2.
+rewrite <- H1, <- H2; clear H1 H2.
 do 2 rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec da da') as [Hdda| Hdda]. {
-  subst da'.
-  apply IHit.
-(* non mais c'est pas bon, t'façons, vu qu'il faut regrouper les degrés égaux *)
-(* faut voir avec List_rank, peut-être *)
+destruct (Nat.eq_dec (mdeg ma) (mdeg ma')) as [Hdda| Hdda]. {
+  set (f := λ ma mb : monom T, mdeg ma =? mdeg mb).
+  remember (List_rank (λ mb, negb (f ma mb)) la) as n eqn:Hn.
+  symmetry in Hn.
+  subst f; cbn in Hn.
 ...
 revert it la lb lba Hlab Hlba Hit Hrr.
 induction lab as [| a]; intros; cbn. {
