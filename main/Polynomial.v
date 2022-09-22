@@ -1114,6 +1114,40 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   rewrite <- Hlenb in Hilen.
   now apply Nat.succ_lt_mono in Hilen.
 }
+(*
+specialize (IHla (bef ++ b :: aft)) as H3.
+...
+*)
+destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+  rewrite app_nth1; [ | easy ].
+  rewrite <- app_nth1 with (l := bef) (l' := b :: aft); [ | easy ].
+  apply IHla. 2: {
+    apply (sorted_app_iff Htra) in Hsb.
+    apply (sorted_app_iff Htra).
+    destruct Hsb as (Hsb & Hsaa & Hba).
+    split; [ easy | ].
+    apply (sorted_cons_iff Htra) in Hsaa.
+    split. {
+      apply (sorted_cons_iff Htra) in Hsa.
+      apply (sorted_cons_iff Htra).
+      split; [ easy | ].
+      intros c Hc.
+      now apply Hbaa, in_or_app; right; right.
+    }
+    intros x y Hx Hy.
+    destruct Hy as [Hy| Hy]. 2: {
+      apply Hba; [ easy | now right ].
+    }
+    subst y.
+    destruct Hsaa as (Hsa' & Hsaa).
+...
+    apply (Htra x a b). {
+      apply Hba; [ easy | now left ].
+    }
+    apply Hsaa.
+...
+    apply Hba; [ easy | ].
+    destruct Hy as [Hy| Hy]; [ subst y | now right ].
 ...
 assert (leb (nth n la d) b = true).
 ...
