@@ -95,12 +95,12 @@ Definition monl_add (la lb : list (monom T)) := la ++ lb.
 
 (*
 End a.
-Arguments polyn_is_canon {T ro} p.
+Arguments is_canon_polyn {T ro} p.
 Arguments monl {T} p.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓»).
-Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓^7»).
+Compute (is_canon_polyn «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (is_canon_polyn «3*☓^5 + 5*☓^2 + 8*☓^7»).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + 5*☓^2 + 8*☓»)).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl « »)).
@@ -112,14 +112,14 @@ Definition polyn_add (pa pb : polyn T) :=
 
 (*
 End a.
-Arguments polyn_is_canon {T ro} p.
+Arguments is_canon_polyn {T ro} p.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»).
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
-Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»)).
+Compute (is_canon_polyn (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»)).
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»).
-Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»)).
+Compute (is_canon_polyn (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»)).
 *)
 
 (* multiplication *)
@@ -1633,12 +1633,12 @@ Arguments monl_add (la lb)%list.
 (*
 End a.
 Arguments monl_add {T ro} (la lb)%list.
-Arguments polyn_is_canon {T ro} p.
+Arguments is_canon_polyn {T ro} p.
 Arguments monl {T} p.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
-Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓»).
-Compute (polyn_is_canon «3*☓^5 + 5*☓^2 + 8*☓^7»).
+Compute (is_canon_polyn «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (is_canon_polyn «3*☓^5 + 5*☓^2 + 8*☓^7»).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + 5*☓^2 + 8*☓»)).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl «3*☓^5 + (-5)*☓^2 + 8*☓»)).
 Compute (monl_add (monl «3*☓^5 + 5*☓^2 + 8*☓») (monl « »)).
@@ -1651,14 +1651,14 @@ Definition polyn_add (pa pb : polyn T) :=
 (*
 End a.
 Arguments polyn_add {T ro} (pa pb).
-Arguments polyn_is_canon {T ro} p.
+Arguments is_canon_polyn {T ro} p.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»).
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
-Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»)).
+Compute (is_canon_polyn (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»)).
 Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»).
-Compute (polyn_is_canon (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»)).
+Compute (is_canon_polyn (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^7 + 7·»)).
 *)
 
 (* multiplication *)
