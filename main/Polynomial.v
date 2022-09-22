@@ -833,6 +833,10 @@ move lba before lab.
 (**)
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
+assert (H : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
+specialize (Hrr H); clear H.
+assert (H : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
+specialize (Hrr H); clear H.
 assert (H : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
@@ -844,10 +848,6 @@ assert (H : permutation monom_eqb lab lba). {
   }
   apply (permutation_app_comm monom_eqb_eq).
 }
-specialize (Hrr H); clear H.
-assert (H : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
-specialize (Hrr H); clear H.
-assert (H : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr H); clear H.
 unfold rel in Hrr.
 assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
