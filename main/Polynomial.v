@@ -849,6 +849,17 @@ assert (H : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
 specialize (Hrr H); clear H.
 assert (H : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr H); clear H.
+unfold rel in Hrr.
+assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
+  intros i.
+  specialize (Hrr i).
+  destruct Hrr as (H1, H2).
+  apply Nat.leb_le in H1, H2.
+  now apply Nat.le_antisymm.
+}
+clear Hrr.
+(* d'une manière ou d'une autre, faut regrouper les monômes dont les degrés
+   sont égaux *)
 ...
 revert it la lb lba Hlab Hlba Hit Hrr.
 induction lab as [| a]; intros; cbn. {
@@ -856,6 +867,7 @@ induction lab as [| a]; intros; cbn. {
   now destruct Hlab; subst la lb lba.
 }
 (**)
+unfold rel in Hrr.
 set (f := λ ma mb : monom T, mdeg ma =? mdeg mb).
 remember (List_rank (λ b, negb (f a b)) la) as n eqn:Hn.
 symmetry in Hn.
@@ -934,6 +946,14 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
    que "mcoeff a + mcoeff a'" soit égal à "mcoeff b + mcoeff b'" *)
 ...
 *)
+      apply Nat.succ_inj in Hit; symmetry in Hit.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (mdeg a) (mdeg b)) as [Hab| Hab]. {
+        destruct it; [ now apply length_zero_iff_nil in Hit | cbn ].
+        destruct lab as [| ab]. {
+          rewrite rngl_summation_list_empty; [ | easy ].
+          now rewrite rngl_add_0_r.
+        }
 ...
 specialize (H1 (monom T)).
 specialize (H1 monom_eqb rel monom_eqb_eq).
