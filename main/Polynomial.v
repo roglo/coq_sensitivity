@@ -831,7 +831,7 @@ remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
 (**)
-specialize (sorted_sorted_permuted_leb monom_eqb_eq Href Htra) as Hrr.
+specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
 assert (H : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
@@ -1129,19 +1129,6 @@ apply Nat.nlt_ge in Hiab.
 ...
 apply IHla; [ | now apply sorted_cons in Hsb ].
 (* ah bin non *)
-...
-Theorem sorted_sorted_permuted_rel' : ∀ (A : Type) (eqb rel : A → A → bool),
-  equality eqb
-  → reflexive rel
-  → transitive rel
-  → ∀ (d : A) (la lb : list A),
-     permutation eqb la lb
-     → sorted rel la
-     → sorted rel lb
-     → ∀ i,
-        rel (nth i la d) (nth i lb d) = true ∧
-        rel (nth i lb d) (nth i la d) = true.
-Proof.
 ...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.

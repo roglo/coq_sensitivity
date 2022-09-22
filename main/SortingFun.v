@@ -2367,7 +2367,7 @@ apply Nat.ltb_lt in Hab.
 now apply Nat.leb_le, Nat.lt_le_incl.
 Qed.
 
-Theorem sorted_sorted_permuted_leb_1 : ∀ (A : Type) (eqb leb : A → A → bool),
+Theorem sorted_sorted_permuted_not_antisym_1 : ∀ A (eqb leb : A → A → bool),
   equality eqb
   → reflexive leb
   → transitive leb
@@ -2635,7 +2635,7 @@ eapply (permutation_trans Heqb); [ apply Hpab | ].
 apply (permutation_middle Heqb).
 Qed.
 
-Theorem sorted_sorted_permuted_leb : ∀ (A : Type) (eqb leb : A → A → bool),
+Theorem sorted_sorted_permuted_not_antisym : ∀ A (eqb leb : A → A → bool),
   equality eqb
   → reflexive leb
   → transitive leb
@@ -2649,10 +2649,10 @@ Theorem sorted_sorted_permuted_leb : ∀ (A : Type) (eqb leb : A → A → bool)
 Proof.
 intros * Heqb Href Htra * Hpab Hsa Hsb i.
 split. {
-  now apply (sorted_sorted_permuted_leb_1 Heqb).
+  now apply (sorted_sorted_permuted_not_antisym_1 Heqb).
 } {
   apply (permutation_sym Heqb) in Hpab.
-  now apply (sorted_sorted_permuted_leb_1 Heqb).
+  now apply (sorted_sorted_permuted_not_antisym_1 Heqb).
 }
 Qed.
 
