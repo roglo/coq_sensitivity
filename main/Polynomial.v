@@ -833,11 +833,11 @@ move lba before lab.
 (**)
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
-assert (H : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
-specialize (Hrr H); clear H.
-assert (H : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
-specialize (Hrr H); clear H.
-assert (H : permutation monom_eqb lab lba). {
+assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
+specialize (Hrr Hsab).
+assert (Hsba : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
+specialize (Hrr Hsba).
+assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
     apply permuted_isort, monom_eqb_eq.
@@ -848,7 +848,7 @@ assert (H : permutation monom_eqb lab lba). {
   }
   apply (permutation_app_comm monom_eqb_eq).
 }
-specialize (Hrr H); clear H.
+specialize (Hrr Hpab).
 unfold rel in Hrr.
 assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   intros i.
@@ -858,8 +858,40 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   now apply Nat.le_antisymm.
 }
 clear Hrr.
-(* d'une manière ou d'une autre, faut regrouper les monômes dont les degrés
-   sont égaux *)
+clear Hlab Hlba.
+clear la lb Hit.
+rename lab into la.
+rename lba into lb.
+rename Hsab into Hsa.
+rename Hsba into Hsb.
+revert la lb Hsa Hsb Hpab Hdd.
+induction it; intros; [ easy | cbn ].
+destruct la as [| (ca, da)]. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+destruct lb as [| (cb, db)]. {
+  now apply permutation_nil_r in Hpab.
+}
+specialize (Hdd 0) as H1; cbn in H1; subst db.
+destruct la as [| (ca', da')]. {
+  destruct lb as [| (cb', db')]. {
+    apply (permutation_length_1 monom_eqb_eq) in Hpab.
+    now f_equal.
+  }
+  now apply permutation_length in Hpab.
+}
+cbn.
+destruct lb as [| (cb', db')]. {
+  now apply permutation_length in Hpab.
+}
+cbn.
+specialize (Hdd 1) as H1; cbn in H1; subst db'.
+do 2 rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec da da') as [Hdda| Hdda]. {
+  subst da'.
+  apply IHit.
+(* non mais c'est pas bon, t'façons, vu qu'il faut regrouper les degrés égaux *)
+(* faut voir avec List_rank, peut-être *)
 ...
 revert it la lb lba Hlab Hlba Hit Hrr.
 induction lab as [| a]; intros; cbn. {
