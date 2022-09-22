@@ -846,6 +846,7 @@ destruct n as [n| ]. 2: {
     rename H1 into Nnf.
     destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
       cbn in H3.
+(*
 ...
 apply (eq_isort_cons_iff Href) in Hlab.
 destruct Hlab as (Habz, Hlab).
@@ -902,6 +903,7 @@ destruct Hlab as [(H1 & H2 & H3)| (H1 & H2 & H3)]. {
    degrés égaux à celui de a dans lab, ce qui veut dire que rien ne prouve
    que "mcoeff a + mcoeff a'" soit égal à "mcoeff b + mcoeff b'" *)
 ...
+*)
 Theorem sorted_sorted_permuted_rel_1' : ∀ (A : Type) (eqb leb : A → A → bool),
   equality eqb
   → reflexive leb
@@ -1103,6 +1105,16 @@ specialize (Hbaa a) as H2.
 assert (H : a ∈ bef ++ a :: aft) by now apply in_or_app; right; left.
 specialize (H2 H); clear H.
 move Hsa at bottom.
+move Hsb at bottom.
+destruct (Nat.eq_dec i j) as [Hij| Hij]. {
+  subst j.
+  rewrite Hb.
+  apply Hbaa, nth_In.
+  cbn in Hlenb.
+  rewrite <- Hlenb in Hilen.
+  now apply Nat.succ_lt_mono in Hilen.
+}
+...
 assert (leb (nth n la d) b = true).
 ...
 apply (permutation_sym Heqb) in Hpab.
