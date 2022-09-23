@@ -893,6 +893,8 @@ destruct (Nat.eq_dec (mdeg ma) (mdeg ma')) as [Hdda| Hdda]. {
   remember (List_rank (λ mb, negb (f ma mb)) la) as n eqn:Hn.
   symmetry in Hn.
   subst f; cbn in Hn.
+  apply (List_rank_if (Mon 0 0)) in Hn.
+  destruct Hn as (Hnf, Hn).
 ...
 revert it la lb lba Hlab Hlba Hit Hrr.
 induction lab as [| a]; intros; cbn. {
