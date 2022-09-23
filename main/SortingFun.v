@@ -2398,9 +2398,11 @@ destruct (lt_dec i len) as [Hilen| Hilen]. 2: {
 }
 remember (List_rank (λ b, negb (eqb a b)) la) as n eqn:Hn.
 symmetry in Hn.
-destruct n as [n| ]. 2: {
-  specialize (List_rank_None d _ _ Hn) as H.
-  clear Hn; rename H into Hn; cbn in Hn.
+destruct (Nat.eq_dec n (length la)) as [Hnla| Hnla]. {
+  apply (List_rank_if d) in Hn.
+  destruct Hn as (Hbefn, Hn).
+  destruct Hn as [Hn| Hn]; [ flia Hn Hnla | clear Hnla ].
+  rewrite Hn in Hbefn; clear Hn; rename Hbefn into Hn.
   destruct i; cbn. {
     destruct lb as [| b]; cbn. {
       now apply permutation_nil_r in Hpab.
@@ -2479,8 +2481,11 @@ destruct n as [n| ]. 2: {
   rewrite <- H2.
   apply Href.
 }
-apply (List_rank_Some d) in Hn.
-destruct Hn as (Hnl & Hbef & Hwhi).
+apply (List_rank_if d) in Hn.
+destruct Hn as (Hbef, Hn).
+destruct Hn as [Hn| Hn]; [ | easy ].
+destruct Hn as (Hnl & Hwhi).
+clear Hnla.
 apply Bool.negb_true_iff in Hwhi.
 destruct i. {
   cbn.

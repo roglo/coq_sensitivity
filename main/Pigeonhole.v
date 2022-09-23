@@ -463,10 +463,9 @@ Qed.
 Fixpoint search_double_loop {A} eqb i (l : list A) :=
   match l with
   | a :: l' =>
-      match List_rank (eqb a) l' with
-      | Some j => (i, j + 1)
-      | None => search_double_loop eqb (S i) l'
-      end
+      let j := List_rank (eqb a) l' in
+      if lt_dec j (length l') then (i, j + 1)
+      else search_double_loop eqb (S i) l'
   | [] => (0, 0)
   end.
 

@@ -606,60 +606,37 @@ Qed.
 (* rank: rank of the first element satisfying a predicate *)
 (* like "find" but returning the rank, not the element itself *)
 
-Fixpoint List_rank_loop i A (f : A → bool) (l : list A) : option nat :=
+Fixpoint List_rank_loop i A (f : A → bool) (l : list A) : nat :=
   match l with
-  | [] => None
-  | x :: tl => if f x then Some i else List_rank_loop (S i) f tl
+  | [] => i
+  | x :: tl => if f x then i else List_rank_loop (S i) f tl
 end.
 
 Definition List_rank := List_rank_loop 0.
 
-Theorem List_rank_loop_interv : ∀ A f (l : list A) i j,
-  List_rank_loop i f l = Some j
-  → i ≤ j < i + length l.
+Theorem List_rank_loop_interv : ∀ A f (l : list A) i,
+  i ≤ List_rank_loop i f l ≤ i + length l.
 Proof.
-intros * Hi.
-revert i Hi.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hi.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hi; clear Hi; intros; subst i.
-  cbn; flia.
+intros.
+revert i.
+induction l as [| a]; intros; cbn; [ now rewrite Nat.add_0_r | ].
+destruct (f a). {
+  split; [ easy | ].
+  apply Nat.le_add_r.
 }
-specialize (IHl (S i) Hi).
-cbn; flia IHl.
+specialize (IHl (S i)).
+rewrite Nat.add_succ_comm in IHl.
+split; [ flia IHl | easy ].
 Qed.
 
-Theorem List_rank_loop_Some : ∀ A d f (l : list A) i j,
-  List_rank_loop i f l = Some j
-  → j < i + length l ∧
-    (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
-    f (nth (j - i) l d) = true.
+Theorem List_rank_loop_if : ∀ A d f (l : list A) i j,
+  List_rank_loop i f l = j
+  → (∀ k, i ≤ k < j → f (nth (k - i) l d) = false) ∧
+    (j < i + length l ∧ f (nth (j - i) l d) = true ∨
+     j = i + length l).
 Proof.
 intros * Hi.
-split. {
-  remember (j - i) as k eqn:Hk.
-  replace j with (i + k) in Hi |-*. 2: {
-    specialize (List_rank_loop_interv f l i Hi) as H1.
-    flia Hk H1.
-  }
-  apply Nat.add_lt_mono_l.
-  clear j Hk.
-  revert i l Hi.
-  induction k; intros. {
-    destruct l; [ easy | cbn; flia ].
-  }
-  destruct l as [| a]; [ easy | ].
-  cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    injection Hi; clear Hi; intros Hi; flia Hi.
-  }
-  rewrite <- Nat.add_succ_comm in Hi.
-  apply -> Nat.succ_lt_mono.
-  now apply (IHk (S i)).
-}
+(**)
 split. {
   intros p Hp.
   remember (p - i) as k eqn:Hk.
@@ -668,124 +645,59 @@ split. {
   clear p Hk.
   revert i l Hi Hp.
   induction k; intros. {
-    destruct l as [| a]; [ easy | ].
+    rewrite Nat.add_0_r in Hp.
+    destruct l as [| a]. {
+      now subst j; apply Nat.lt_irrefl in Hp.
+    }
     cbn in Hi |-*.
-    destruct (f a); [ injection Hi; intros; subst i; flia Hp | easy ].
+    destruct (f a); [ | easy ].
+    now subst j; apply Nat.lt_irrefl in Hp.
   }
-  destruct l as [| a]; [ easy | ].
+  destruct l as [| a]; [ subst j; cbn in Hp; flia Hp | ].
   cbn in Hi |-*.
   rewrite <- Nat.add_succ_comm in Hp.
   remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    injection Hi; clear Hi; intros; subst j; flia Hp.
-  }
+  destruct b; [ subst j; flia Hp | ].
   now apply IHk with (i := S i).
-} {
-  remember (j - i) as k eqn:Hk.
-  replace j with (i + k) in Hi. 2: {
-    specialize (List_rank_loop_interv f l i Hi) as H1.
-    flia Hk H1.
-  }
-  clear j Hk.
-  revert i l Hi.
-  induction k; intros. {
-    rewrite Nat.add_0_r in Hi.
-    revert i Hi.
-    induction l as [| a]; intros; [ easy | ].
-    cbn in Hi |-*.
-    remember (f a) as b eqn:Hb; symmetry in Hb.
-    destruct b; [ easy | exfalso ].
-    specialize (List_rank_loop_interv f l (S i) Hi) as H1.
-    flia H1.
-  }
-  destruct l as [| a]; [ easy | ].
-  cbn in Hi |-*.
-  remember (f a) as b eqn:Hb; symmetry in Hb.
-  destruct b. {
-    injection Hi; clear Hi; intros Hi; flia Hi.
-  }
-  rewrite <- Nat.add_succ_comm in Hi.
-  now apply (IHk (S i)).
 }
+remember (j - i) as k eqn:Hk.
+replace j with (i + k) in Hi |-*. 2: {
+  specialize (List_rank_loop_interv f l i) as H1.
+  rewrite Hi in H1.
+  flia Hk H1.
+}
+clear j Hk.
+revert i l Hi.
+induction k; intros. {
+  rewrite Nat.add_0_r in Hi |-*.
+  destruct l; [ now right; symmetry; apply Nat.add_0_r | ].
+  left; cbn in Hi |-*.
+  split; [ flia | ].
+  destruct (f a); [ easy | ].
+  specialize (List_rank_loop_interv f l (S i)) as H1.
+  rewrite Hi in H1; flia H1.
+}
+destruct l; cbn in Hi; [ flia Hi | ].
+destruct (f a); [ flia Hi | cbn in Hi ].
+rewrite <- Nat.add_succ_comm in Hi.
+apply IHk in Hi; cbn.
+now do 2 rewrite <- Nat.add_succ_comm.
 Qed.
 
-Theorem List_rank_Some : ∀ A d f (l : list A) i,
-  List_rank f l = Some i
-  → i < length l ∧
-    (∀ j, j < i → f (nth j l d) = false) ∧
-    f (nth i l d) = true.
+Theorem List_rank_if : ∀ A d f (l : list A) i,
+  List_rank f l = i
+  → (∀ j, j < i → f (nth j l d) = false) ∧
+    (i < length l ∧ f (nth i l d) = true ∨ i = length l).
 Proof.
 intros * Hi.
-apply List_rank_loop_Some with (d := d) in Hi.
-rewrite Nat.sub_0_r in Hi.
-destruct Hi as (Hil & Hk & Hi).
-split; [ easy | ].
+apply List_rank_loop_if with (d := d) in Hi.
+rewrite Nat.sub_0_r in Hi; cbn in Hi.
+destruct Hi as (Hbef, Hat).
 split; [ | easy ].
 intros j Hj.
-specialize (Hk j).
-assert (H : 0 ≤ j < i) by flia Hj.
-specialize (Hk H); clear H.
-now rewrite Nat.sub_0_r in Hk.
-Qed.
-
-Theorem List_rank_loop_None : ∀ A (d : A) f l i,
-  List_rank_loop i f l = None
-  → ∀ j, i ≤ j < i + length l
-  → f (nth (j - i) l d) = false.
-Proof.
-intros * Hi p Hp.
-remember (p - i) as k eqn:Hk.
-replace p with (i + k) in Hp by flia Hp Hk.
-destruct Hp as (_, Hp).
-apply Nat.add_lt_mono_l in Hp.
-clear p Hk.
-revert i l Hi Hp.
-induction k; intros. {
-  destruct l as [| a]; [ easy | ].
-  cbn in Hi |-*.
-  now destruct (f a).
-}
-destruct l as [| a]; [ easy | ].
-cbn in Hi, Hp |-*.
-apply Nat.succ_lt_mono in Hp.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b; [ easy | ].
-now apply IHk with (i := S i).
-Qed.
-
-Theorem List_rank_None : ∀ A d f (l : list A),
-  List_rank f l = None
-  → ∀ j, j < length l
-  → f (nth j l d) = false.
-Proof.
-intros * Hi j Hj.
-specialize (List_rank_loop_None d f l Hi) as H1.
-specialize (H1 j).
-rewrite Nat.sub_0_r in H1.
-apply H1.
-split; [ flia | easy ].
-Qed.
-
-Theorem List_rank_loop_Some_lt : ∀ A f (l : list A) i j,
-  List_rank_loop i f l = Some j → j < i + length l.
-Proof.
-intros * Hij.
-revert i Hij.
-induction l as [| a]; intros; [ easy | ].
-cbn in Hij, IHl |-*.
-remember (f a) as b eqn:Hb; symmetry in Hb.
-destruct b. {
-  injection Hij; clear Hij; intros; subst j; flia.
-}
-rewrite <- Nat.add_succ_comm.
-now apply IHl.
-Qed.
-
-Theorem List_rank_Some_lt : ∀ A f (l : list A) i,
-  List_rank f l = Some i → i < length l.
-Proof.
-intros * Hi.
-now apply List_rank_loop_Some_lt in Hi.
+specialize (Hbef j).
+rewrite Nat.sub_0_r in Hbef.
+now apply Hbef.
 Qed.
 
 (* end List_rank *)

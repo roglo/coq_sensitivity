@@ -696,7 +696,8 @@ Qed.
 (* *)
 
 Definition sym_gr_inv (sg : list (list nat)) σ :=
-  unsome 0 (List_rank (list_eqv Nat.eqb σ) sg).
+  let j := List_rank (list_eqv Nat.eqb σ) sg in
+  if j =? length sg then 0 else j.
 
 Theorem sym_gr_inv_inj : ∀ n sg la lb,
   is_sym_gr_list n sg
@@ -711,17 +712,25 @@ remember (List_rank (list_eqv Nat.eqb la) sg) as x eqn:Hx.
 remember (List_rank (list_eqv Nat.eqb lb) sg) as y eqn:Hy.
 move y before x.
 symmetry in Hx, Hy.
-destruct x as [x| ]. {
-  apply (List_rank_Some []) in Hx.
-  destruct Hx as (Hxs & Hbefx & Hx).
+rewrite if_eqb_eq_dec in Hab.
+destruct (Nat.eq_dec x (length sg)) as [Hxg| Hxg]. 2: {
+  apply (List_rank_if []) in Hx.
+  destruct Hx as (Hbefx, Hx).
+  destruct Hx as [Hx| Hx]; [ | easy ].
+  destruct Hx as (Hxs & Hx).
   apply (list_eqb_eq Nat.eqb_eq) in Hx.
-  destruct y as [y| ]. {
-    apply (List_rank_Some []) in Hy.
-    destruct Hy as (Hys & Hbefy & Hy).
+  rewrite if_eqb_eq_dec in Hab.
+  destruct (Nat.eq_dec y (length sg)) as [Hyg| Hyg]. 2: {
+    apply (List_rank_if []) in Hy.
+    destruct Hy as (Hbefy & Hy).
+    destruct Hy as [Hy| Hy]; [ | easy ].
+    destruct Hy as (Hys & Hy).
     apply (list_eqb_eq Nat.eqb_eq) in Hy.
     congruence.
   }
-  specialize (List_rank_None [] _ _ Hy) as H1; cbn.
+  specialize (List_rank_if [] _ _ Hy) as H1.
+  destruct H1 as (H1, _).
+  rewrite Hyg in H1.
   destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
   specialize (Hsg_surj lb Hnb) as H2.
   apply In_nth with (d := []) in H2.
@@ -730,7 +739,9 @@ destruct x as [x| ]. {
   apply (list_eqb_neq Nat.eqb_eq) in H1.
   now symmetry in Hkb.
 }
-specialize (List_rank_None [] _ _ Hx) as H1; cbn.
+specialize (List_rank_if [] _ _ Hx) as H1; cbn.
+destruct H1 as (H1, _).
+rewrite Hxg in H1.
 destruct Hsg as (Hsg & Hsg_inj & Hsg_surj).
 specialize (Hsg_surj la Hna) as H2.
 apply In_nth with (d := []) in H2.
@@ -762,10 +773,13 @@ Theorem sym_gr_inv_lt : ∀ n sg v,
 Proof.
 intros * Hnz Hsg.
 unfold sym_gr_inv.
-unfold unsome.
+rewrite if_eqb_eq_dec.
 remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
-destruct i as [i| ]; [ now apply List_rank_Some_lt in Hi | ].
-clear Hi.
+destruct (Nat.eq_dec _ _) as [Hrl| Hrl]. 2: {
+  apply (List_rank_if []) in Hi.
+  destruct Hi as (_, H1).
+  now destruct H1.
+}
 destruct (lt_dec 0 (length sg)) as [Hs| Hs]; [ easy | ].
 apply Nat.nlt_ge in Hs; exfalso.
 apply Nat.le_0_r in Hs.
@@ -783,17 +797,24 @@ Theorem nth_sym_gr_inv_sym_gr : ∀ sg l n,
 Proof.
 intros * Hsg (Hp, Hs).
 unfold sym_gr_inv, unsome.
+rewrite if_eqb_eq_dec.
 remember (List_rank _ _) as i eqn:Hi; symmetry in Hi.
-destruct i as [i| ]. {
-  apply List_rank_Some with (d := []) in Hi.
-  destruct Hi as (His & Hji & Hi).
+destruct (Nat.eq_dec _ _) as [His| His]. 2: {
+  apply (List_rank_if []) in Hi.
+  destruct Hi as (Hji, H1).
+  destruct H1 as [H1| H1]; [ | easy ].
+  clear His.
+  destruct H1 as (His & Hi).
   now apply (list_eqb_eq Nat.eqb_eq) in Hi.
 }
 assert (H : l ∉ sg). {
   intros H.
   apply In_nth with (d := []) in H.
   destruct H as (j & Hj & Hjv).
-  specialize (List_rank_None [] _ _ Hi Hj) as H.
+  specialize (List_rank_if [] _ _ Hi) as H.
+  rewrite His in H.
+  destruct H as (H, _).
+  specialize (H _ Hj).
   apply (list_eqb_neq Nat.eqb_eq) in H.
   now symmetry in Hjv.
 }
@@ -810,22 +831,20 @@ Proof.
 intros * Hnz Hsg Hi.
 unfold sym_gr_inv, unsome.
 remember (List_rank _ _) as j eqn:Hj; symmetry in Hj.
-destruct j as [j| ]. {
-  apply List_rank_Some with (d := []) in Hj.
-  destruct Hj as (His & Hji & Hj).
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec j (length sg)) as [Hjs| Hjs]. 2: {
+  apply (List_rank_if []) in Hj.
+  destruct Hj as (Hji, Hj).
+  destruct Hj as [Hj| Hj]; [ clear Hjs | easy ].
+  destruct Hj as (Hjs, Hj).
   apply (list_eqb_eq Nat.eqb_eq) in Hj.
   destruct Hsg as (Hsg & Hinj & Hsurj).
-  assert (Hjs : j < length sg). {
-    destruct (lt_dec j (length sg)) as [Hjs| Hjs]; [ easy | exfalso ].
-    apply Nat.nlt_ge in Hjs.
-    rewrite (@nth_overflow _ _ j) in Hj; [ | easy ].
-    specialize (Hsg i Hi) as H1.
-    destruct H1 as (H1, H2).
-    now rewrite Hj in H1; cbn in H1; subst n.
-  }
   now apply Hinj.
 }
-specialize (List_rank_None [] _ _ Hj Hi) as H1.
+specialize (List_rank_if [] _ _ Hj) as H1.
+destruct H1 as (H1, _).
+rewrite Hjs in H1.
+specialize (H1 _ Hi).
 now apply (list_eqb_neq Nat.eqb_eq) in H1.
 Qed.
 
