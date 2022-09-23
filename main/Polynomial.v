@@ -872,6 +872,16 @@ destruct la as [| ma]. {
 destruct lb as [| mb]. {
   now apply permutation_nil_r in Hpab.
 }
+(**)
+specialize (Hdd 0) as H1; cbn in H1.
+rewrite <- H1.
+set (f := λ ma mb : monom T, mdeg ma =? mdeg mb).
+remember (List_rank (λ mb, negb (f ma mb)) la) as n eqn:Hn.
+symmetry in Hn.
+subst f; cbn in Hn.
+apply (List_rank_if (Mon 0 0)) in Hn.
+destruct Hn as (Hnf, Hn).
+...
 destruct la as [| ma']. {
   destruct lb as [| mb']. {
     apply (permutation_length_1 monom_eqb_eq) in Hpab.
