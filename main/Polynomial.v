@@ -194,28 +194,21 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
    return a polynomial whose degree are in decreasing order
    and no coefficient is nul *)
 
-Fixpoint merge_mon it la :=
-  match it with
-  | 0 => [Mon (rngl_of_nat 98) 0] (* algo err: not enough iterations *)
-  | S it' =>
-      match la with
-      | [] => []
-      | [ma] => [ma]
-      | ma :: mb :: lb =>
-          if mdeg ma =? mdeg mb then
-            merge_mon it' ((mcoeff ma + mcoeff mb)*☓^mdeg ma :: lb)
-          else
-            ma :: merge_mon it' (mb :: lb)
+Fixpoint merge_mon la :=
+  match la with
+  | [] => []
+  | ma :: lb =>
+      match merge_mon lb with
+      | [] => [ma]
+      | mb :: lc =>
+          if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
+          else ma :: mb :: lc
       end
   end.
 
-Definition merge_mon_nb_iter (la : list (monom T)) := S (length la).
-
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_mon
-       (merge_mon_nb_iter la)
-       (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
+    (merge_mon (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
 
@@ -311,7 +304,7 @@ Declare Scope P_scope.
 Delimit Scope P_scope with P.
 
 Arguments is_canon_polyn {T ro} p%P.
-Arguments merge_mon {T ro} it%nat la%list.
+Arguments merge_mon {T ro} la%list.
 Arguments monl_add {T} (la lb)%list.
 Arguments monl_mul {T ro} (la lb)%list.
 Arguments monl_norm {T ro} la%list.
@@ -432,44 +425,33 @@ Qed.
 Definition canon_polyn_zero := mk_canon_polyn polyn_zero zero_is_canon_polyn.
 Definition canon_polyn_one := mk_canon_polyn polyn_one one_is_canon_polyn.
 
-Theorem merge_mon_nb_iter_cons : ∀ (ma : monom T) la,
-  merge_mon_nb_iter (ma :: la) = S (merge_mon_nb_iter la).
-Proof. easy. Qed.
-
-Theorem merge_mon_same_deg : ∀ it ca cb da la,
-  merge_mon (S it) (ca*☓^da :: cb*☓^da :: la) =
-  merge_mon it ((ca + cb)*☓^da :: la).
-Proof.
-intros; cbn.
-now rewrite Nat.eqb_refl.
-Qed.
-
-Theorem in_merge_mon : ∀ it (ma : monom T) la,
-  merge_mon_nb_iter la ≤ it
-  → ma ∈ merge_mon it la
+Theorem in_merge_mon : ∀ (ma : monom T) la,
+  ma ∈ merge_mon la
   → mdeg ma ∈ map (λ mb, mdeg mb) la.
 Proof.
-intros * Hit Hma.
-unfold merge_mon_nb_iter in Hit.
+intros * Hma.
+...
 revert ma la Hit Hma.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
 destruct la as [| (cb, db)]; [ easy | ].
 cbn - [ In ] in Hma |-*.
-destruct la as [| (ca, da)]. {
+remember (merge_mon it la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]. {
   destruct Hma as [Hma| Hma]; [ | easy ].
   now subst ma; left.
 }
-cbn in Hma.
 rewrite if_eqb_eq_dec in Hma.
-destruct (Nat.eq_dec db da) as [Hdba| Hdba]. {
-  subst db.
-  specialize (IHit ma ((cb + ca)*☓^da :: la) Hit Hma) as H1.
-  destruct H1 as [H1| H1]; [ now cbn in H1; subst da; left | ].
-  now right; right.
+destruct (Nat.eq_dec db (mdeg mb)) as [Hbb| Hbb]. {
+  destruct Hma as [Hma| Hma]; [ now subst ma; left | ].
+  subst db; right.
+  apply IHit; [ easy | ].
+  now rewrite Hlb; right.
 }
 destruct Hma as [Hma| Hma]; [ now subst ma; left | ].
-now right; apply IHit.
+right.
+apply IHit; [ easy | ].
+now rewrite Hlb.
 Qed.
 
 (*
