@@ -457,6 +457,52 @@ Theorem sorted_le_sorted_lt_merge_mon : ∀ la,
   → sorted g (merge_mon la).
 Proof.
 intros * Hs.
+assert (Htrf : transitive f). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.leb_le in Hmab, Hmbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg mb).
+}
+assert (Htrg : transitive g). {
+  intros ma mb mc Hmab Hmbc.
+  unfold f in Hmab, Hmbc|-*.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+unfold merge_mon.
+induction la as [| ma]; [ easy | cbn ].
+assert (H : sorted f la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+unfold same_deg_sum_coeff at 1.
+remember (fold_right same_deg_sum_coeff [] la) as lb eqn:Hlb.
+symmetry in Hlb.
+destruct lb as [| mb]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hdab| Hdab]. {
+  apply (sorted_cons_iff Htrg).
+  apply (sorted_cons_iff Htrg) in IHla.
+  split; [ easy | ].
+  intros b Hb.
+  destruct IHla as (Hsb, Hgb).
+  unfold g in Hgb |-*; cbn.
+  rewrite <- Hdab in Hgb.
+  now apply Hgb.
+}
+apply (sorted_cons_iff Htrg).
+split; [ easy | ].
+intros mc Hmc.
+destruct Hmc as [Hmc| Hmc]. {
+  subst mc.
+  apply (sorted_cons_iff Htrf) in Hs.
+  destruct Hs as (Hsfa, Hfa).
+  apply (sorted_cons_iff Htrg) in IHla.
+  destruct IHla as (Hsgb, Hggb).
+...
+  apply (sorted_cons_iff Htrg) in IHla.
+  destruct IHla as (Hsb, Hgb).
+  apply Hgb.
 ...
 assert (Htrf : transitive f). {
   intros ma mb mc Hmab Hmbc.
