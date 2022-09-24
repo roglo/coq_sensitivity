@@ -752,16 +752,7 @@ Proof.
 intros.
 unfold monl_add, monl_norm.
 f_equal.
-...
-unfold merge_mon_nb_iter.
-do 2 rewrite app_length.
-rewrite (Nat.add_comm (length lb)).
-rewrite <- app_length.
-remember (S (length (la ++ lb))) as it eqn:Hit.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-(*
-clear Hit.
-*)
 assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
@@ -776,10 +767,10 @@ assert (Htra : transitive rel). {
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
+unfold merge_mon.
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
-(**)
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
 assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
@@ -808,11 +799,13 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
 }
 clear Hrr.
 clear Hlab Hlba.
-clear la lb Hit.
+clear la lb.
 rename lab into la.
 rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
+(**)
+...
 revert la lb Hsa Hsb Hpab Hdd.
 induction it; intros; [ easy | cbn ].
 destruct la as [| ma]. {
