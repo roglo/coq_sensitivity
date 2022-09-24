@@ -499,10 +499,36 @@ destruct Hmc as [Hmc| Hmc]. {
   destruct Hs as (Hsfa, Hfa).
   apply (sorted_cons_iff Htrg) in IHla.
   destruct IHla as (Hsgb, Hggb).
-...
-  apply (sorted_cons_iff Htrg) in IHla.
-  destruct IHla as (Hsb, Hgb).
-  apply Hgb.
+  unfold g; cbn.
+  apply Nat.ltb_lt.
+  specialize (Hfa mb) as H1.
+  destruct la as [| mc]; [ easy | ].
+  cbn in Hlb.
+  unfold same_deg_sum_coeff in Hlb at 1.
+  remember (fold_right same_deg_sum_coeff [] la) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [| md]. {
+    injection Hlb; clear Hlb; intros; subst mc lb.
+    specialize (H1 (or_introl eq_refl)).
+    unfold f in H1; cbn in H1.
+    apply Nat.leb_le in H1.
+    flia Hdab H1.
+  }
+  erewrite if_eqb_eq_dec in Hlb.
+  destruct (Nat.eq_dec (mdeg mc) (mdeg md)) as [Hdcd| Hdcd]. {
+    injection Hlb; clear Hlb; intros; subst mb ld.
+    cbn in Hdab |-*.
+    specialize (Hfa _ (or_introl eq_refl)) as H2.
+    unfold f in H2; cbn in H2.
+    apply Nat.leb_le in H2.
+    flia Hdab H2.
+  }
+  injection Hlb; clear Hlb; intros; subst mc lb.
+  specialize (H1 (or_introl eq_refl)).
+  unfold f in H1; cbn in H1.
+  apply Nat.leb_le in H1.
+  flia Hdab H1.
+}
 ...
 assert (Htrf : transitive f). {
   intros ma mb mc Hmab Hmbc.
