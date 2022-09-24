@@ -805,6 +805,24 @@ rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
 (**)
+revert lb Hsb Hpab Hdd.
+induction la as [| ma]; intros; cbn. {
+  now apply permutation_nil_l in Hpab; subst lb.
+}
+assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+specialize (IHla H); clear H.
+destruct lb as [| mb]. {
+  now apply permutation_nil_r in Hpab.
+}
+cbn.
+unfold same_deg_sum_coeff at 1 3.
+remember (fold_right same_deg_sum_coeff [] la) as lc eqn:Hlc.
+remember (fold_right same_deg_sum_coeff [] lb) as ld eqn:Hld.
+symmetry in Hlc, Hld.
+move Hsb before Hsa.
+move Hld before Hlc.
+move lb before la; move lc before lb; move ld before lc.
+move mb before ma.
 ...
 revert la lb Hsa Hsb Hpab Hdd.
 induction it; intros; [ easy | cbn ].
