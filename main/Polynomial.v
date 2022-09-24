@@ -202,44 +202,17 @@ Definition same_deg_sum_coeff ma la :=
       else ma :: mb :: lc
   end.
 
-Fixpoint merge_mon la :=
-  match la with
-  | [] => []
-  | ma :: lb => same_deg_sum_coeff ma (merge_mon lb)
-  end.
-
-Definition same_deg_sum_coeff' la ma :=
-  match la with
-  | [] => [ma]
-  | mb :: lc =>
-      if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
-      else ma :: mb :: lc
-  end.
-
-Definition merge_mon' la := fold_left same_deg_sum_coeff' la [].
-Definition merge_mon'' la := fold_right same_deg_sum_coeff [] la.
+Definition merge_mon la := fold_right same_deg_sum_coeff [] la.
 
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
     (merge_mon (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 
-Definition monl_norm' (la : list (monom T)) :=
-  filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_mon' (isort (λ ma mb, mdeg ma <=? mdeg mb) la)).
-
-Definition monl_norm'' (la : list (monom T)) :=
-  filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_mon'' (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
-
 Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
-Definition polyn_norm' pa := mk_polyn (monl_norm' (monl pa)).
-Definition polyn_norm'' pa := mk_polyn (monl_norm'' (monl pa)).
 
-(**)
+(*
 End a.
 Arguments polyn_norm {T ro} pa.
-Arguments polyn_norm' {T ro} pa.
-Arguments polyn_norm'' {T ro} pa.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
@@ -247,9 +220,6 @@ Compute (polyn_norm « 1· + 1*☓^2 + (-1)· »).
 Compute (polyn_norm « »).
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_norm « 7· + 1*☓^2 + 1· + (-1)· »).
-Compute (polyn_norm' « 7· + 1*☓^2 + 1· + (-1)· »).
-Compute (polyn_norm'' « 7· + 1*☓^2 + 1· + (-1)· »).
-...
 *)
 
 (* euclidean division *)
@@ -345,6 +315,7 @@ Arguments polyn_norm {T ro} pa%P.
 Arguments polyn_one {T ro}.
 Arguments polyn_opp {T ro} p%P.
 Arguments polyn_quot {T ro} (pa pb)%P.
+Arguments same_deg_sum_coeff {T ro} ma la%list.
 
 Module polynomial_Notations.
 
@@ -460,6 +431,10 @@ Theorem in_merge_mon : ∀ (ma : monom T) la,
   → mdeg ma ∈ map (λ mb, mdeg mb) la.
 Proof.
 intros * Hma.
+(**)
+revert ma Hma.
+induction la as [| mb]; intros; [ easy | ].
+cbn in Hma |-*.
 ...
 revert ma la Hit Hma.
 induction it; intros; [ easy | ].
