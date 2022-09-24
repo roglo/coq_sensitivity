@@ -194,32 +194,62 @@ Compute (polyn_opp (polyn_mul «3*☓^5 + 1·» «1*☓ + (-1)·»)).
    return a polynomial whose degree are in decreasing order
    and no coefficient is nul *)
 
+Definition same_deg_sum_coeff ma la :=
+  match la with
+  | [] => [ma]
+  | mb :: lc =>
+      if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
+      else ma :: mb :: lc
+  end.
+
 Fixpoint merge_mon la :=
   match la with
   | [] => []
-  | ma :: lb =>
-      match merge_mon lb with
-      | [] => [ma]
-      | mb :: lc =>
-          if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
-          else ma :: mb :: lc
-      end
+  | ma :: lb => same_deg_sum_coeff ma (merge_mon lb)
   end.
+
+Definition same_deg_sum_coeff' la ma :=
+  match la with
+  | [] => [ma]
+  | mb :: lc =>
+      if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
+      else ma :: mb :: lc
+  end.
+
+Definition merge_mon' la := fold_left same_deg_sum_coeff' la [].
+Definition merge_mon'' la := fold_right same_deg_sum_coeff [] la.
 
 Definition monl_norm (la : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
     (merge_mon (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
 
-Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
+Definition monl_norm' (la : list (monom T)) :=
+  filter (λ ma, (mcoeff ma ≠? 0)%F)
+    (merge_mon' (isort (λ ma mb, mdeg ma <=? mdeg mb) la)).
 
-(*
+Definition monl_norm'' (la : list (monom T)) :=
+  filter (λ ma, (mcoeff ma ≠? 0)%F)
+    (merge_mon'' (isort (λ ma mb, mdeg mb <=? mdeg ma) la)).
+
+Definition polyn_norm pa := mk_polyn (monl_norm (monl pa)).
+Definition polyn_norm' pa := mk_polyn (monl_norm' (monl pa)).
+Definition polyn_norm'' pa := mk_polyn (monl_norm'' (monl pa)).
+
+(**)
 End a.
 Arguments polyn_norm {T ro} pa.
+Arguments polyn_norm' {T ro} pa.
+Arguments polyn_norm'' {T ro} pa.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
 Compute (polyn_norm « 1· + 1*☓^2 + (-1)· »).
 Compute (polyn_norm « »).
+Compute (polyn_norm « 1*☓^2 + 1· + (-1)· »).
+Compute (polyn_norm « 7· + 1*☓^2 + 1· + (-1)· »).
+Compute (polyn_norm' « 7· + 1*☓^2 + 1· + (-1)· »).
+Compute (polyn_norm'' « 7· + 1*☓^2 + 1· + (-1)· »).
+...
 *)
 
 (* euclidean division *)
