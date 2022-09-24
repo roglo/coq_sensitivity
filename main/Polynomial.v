@@ -432,6 +432,15 @@ Theorem in_merge_mon : ∀ (ma : monom T) la,
 Proof.
 intros * Hma.
 (**)
+destruct ma as (ca, da); cbn.
+apply (In_nth _ _ (Mon 0 0)) in Hma.
+destruct Hma as (i & Hi & Him).
+apply in_map_iff.
+exists (Mon ca da).
+split; [ easy | ].
+rewrite <- Him.
+(* non, c'est faux, ça *)
+...
 unfold merge_mon in Hma.
 remember (fold_right same_deg_sum_coeff [] la) as lb eqn:Hlb.
 symmetry in Hlb.
