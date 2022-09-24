@@ -805,6 +805,7 @@ rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
 (**)
+...
 revert lb Hsb Hpab Hdd.
 induction la as [| ma]; intros; cbn. {
   now apply permutation_nil_l in Hpab; subst lb.
