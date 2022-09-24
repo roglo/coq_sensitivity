@@ -556,117 +556,19 @@ destruct (Nat.eq_dec (mdeg md) (mdeg me)) as [Hdde| Hdde]. {
   now apply Nat.leb_le in H2.
 }
 injection Hlb; clear Hlb; intros; subst md lb.
-destruct Hmc as [Hmc| Hmc]. {
-  subst me.
-  apply (sorted_cons_iff Htrf) in Hs.
-  destruct Hs as (Hsa, Hfa).
-  apply (sorted_cons_iff Htrg) in IHla.
-  destruct IHla as (Hsc, Hgc).
-  specialize (Hgc _ (or_introl eq_refl)) as H2.
-  unfold g in H2; cbn in H2.
-  apply Nat.ltb_lt in H2.
-  specialize (Hfa _ (or_introl eq_refl)) as H1.
-  unfold f in H1; cbn in H1.
-  apply Nat.leb_le in H1.
-  now apply (Nat.lt_le_trans _ (mdeg mb)).
-}
-...
-    specialize (Hfa _ (or_introl eq_refl)) as H2.
-    unfold f in H2; cbn in H2.
-    apply Nat.leb_le in H2.
-    flia Hdab H2.
-  }
-  injection Hlb; clear Hlb; intros; subst mc lb.
-  specialize (H1 (or_introl eq_refl)).
-  unfold f in H1; cbn in H1.
-  apply Nat.leb_le in H1.
-  flia Hdab H1.
-...
-assert (Htrf : transitive f). {
-  intros ma mb mc Hmab Hmbc.
-  unfold f in Hmab, Hmbc|-*.
-  apply Nat.leb_le in Hmab, Hmbc.
-  apply Nat.leb_le.
-  now transitivity (mdeg mb).
-}
-assert (Htrg : transitive g). {
-  intros ma mb mc Hmab Hmbc.
-  unfold f in Hmab, Hmbc|-*.
-  apply Nat.ltb_lt in Hmab, Hmbc.
-  apply Nat.ltb_lt.
-  now transitivity (mdeg mb).
-}
-unfold merge_mon_nb_iter in Hit.
-revert la Hit Hs.
-induction it; intros; [ easy | cbn ].
-destruct la as [| (ca, da)]; [ easy | cbn ].
-cbn in Hit; apply Nat.succ_le_mono in Hit.
-destruct la as [| (ca', da')]; [ easy | cbn ].
-remember (da =? da') as daa eqn:Hdaa; symmetry in Hdaa.
-destruct daa. {
-  apply IHit; [ easy | ].
-  apply sorted_cons_iff in Hs; [ | easy ].
-  apply sorted_cons_iff; [ easy | ].
-  destruct Hs as (Hs & Ha).
-  apply sorted_cons_iff in Hs; [ | easy ].
-  destruct Hs as (Hs, Ha').
-  split; [ easy | ].
-  intros (cb, db) Hb; cbn.
-  now apply (Ha _ (or_intror Hb)).
-}
-apply sorted_cons_iff in Hs; [ | easy ].
-apply sorted_cons_iff; [ easy | ].
-destruct Hs as (Hs & Ha).
-split; [ now apply IHit | ].
-intros (cb, db) Hb.
-unfold g; cbn.
-specialize (Ha _ (or_introl eq_refl)) as H1.
+(**)
+apply (sorted_cons_iff Htrf) in Hs.
+destruct Hs as (Hsa, Hfa).
+specialize (Hfa _ (or_introl eq_refl)) as H1.
 unfold f in H1; cbn in H1.
 apply Nat.leb_le in H1.
-apply Nat.ltb_lt.
-generalize Hb; intros Hc.
-apply in_merge_mon in Hc; [ | easy ].
-cbn - [ In ] in Hc.
-destruct Hc as [Hc| Hc]. {
-  subst da'.
-  destruct (Nat.eq_dec db da) as [H| H]; [ subst db | flia H1 H ].
-  now apply Nat.eqb_neq in Hdaa.
-}
-specialize (IHit _ Hit Hs) as H2.
-apply in_map_iff in Hc.
-destruct Hc as ((cc, dc) & Hc & Hmc).
-cbn in Hc; subst db.
-apply (sorted_cons_iff Htrf) in Hs.
-destruct Hs as (Hs & Ha').
-specialize (Ha' _ Hmc) as H3.
-cbn in H3.
-apply Nat.leb_le in H3.
-apply Nat.eqb_neq in Hdaa.
-flia H3 H1 Hdaa.
+apply (Nat.lt_le_trans _ (mdeg mb)); [ | easy ].
+apply (sorted_cons_iff Htrg) in IHla.
+destruct IHla as (Hsc, Hgc).
+specialize (Hgc _ Hmc) as H2.
+unfold g in H2; cbn in H2.
+now apply Nat.ltb_lt in H2.
 Qed.
-
-(*
-Theorem monl_norm_is_sorted_le : ∀ la,
-  sorted (λ x y : monom T, mdeg y <=? mdeg x) (monl_norm la).
-Proof.
-intros.
-set (f := λ x y : monom T, mdeg y <=? mdeg x).
-assert (Htr : transitive f). {
-  intros ma mb mc Hmab Hmbc.
-  apply Nat.leb_le in Hmab, Hmbc.
-  apply Nat.leb_le.
-  now transitivity (mdeg mb).
-}
-assert (Htt : total_relation f). {
-  intros ma mb.
-  apply Nat_leb_total_relation.
-}
-unfold monl_norm.
-apply (sorted_filter Htr).
-apply sorted_sorted_merge_mon; [ | now apply sorted_isort ].
-now unfold merge_mon_nb_iter; rewrite isort_length.
-Qed.
-*)
 
 Theorem monl_norm_is_sorted : ∀ la,
   sorted (λ x y : monom T, mdeg y <? mdeg x) (monl_norm la).
@@ -687,8 +589,8 @@ assert (Httg : total_relation g). {
   apply Nat_leb_total_relation.
 }
 apply (sorted_filter Htrf).
-apply sorted_le_sorted_lt_merge_mon; [ | now apply sorted_isort ].
-now unfold merge_mon_nb_iter; rewrite isort_length.
+apply sorted_le_sorted_lt_merge_mon.
+now apply sorted_isort.
 Qed.
 
 Theorem in_monl_norm_neq_mcoeff_0 : ∀ la ma,
@@ -850,6 +752,7 @@ Proof.
 intros.
 unfold monl_add, monl_norm.
 f_equal.
+...
 unfold merge_mon_nb_iter.
 do 2 rewrite app_length.
 rewrite (Nat.add_comm (length lb)).
