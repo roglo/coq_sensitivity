@@ -432,9 +432,20 @@ Theorem in_merge_mon : ∀ (ma : monom T) la,
 Proof.
 intros * Hma.
 (**)
-revert ma Hma.
-induction la as [| mb]; intros; [ easy | ].
-cbn in Hma |-*.
+unfold merge_mon in Hma.
+remember (fold_right same_deg_sum_coeff [] la) as lb eqn:Hlb.
+symmetry in Hlb.
+revert ma la Hma Hlb.
+induction lb as [| mb]; intros; [ easy | ].
+destruct Hma as [Hma| Hma]. {
+  subst mb.
+  destruct la as [| mc]; [ easy | ].
+  cbn - [ In ] in Hlb |-*.
+  specialize (IHlb
+(* bof, chais pas *)
+...
+induction la as [| (cb, db)]; intros; [ easy | ].
+cbn - [ In ] in Hma |-*.
 ...
 revert ma la Hit Hma.
 induction it; intros; [ easy | ].
