@@ -831,7 +831,23 @@ assert (Hbb : ∀ j, j < S n → mdeg (nth j lb (0·)) ≤ mdeg ma). {
   now apply Hba.
 }
 move Hbb before Hba.
-assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
+destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
+move mb before ma.
+assert
+  (H :
+     permutation monom_eqb
+       (firstn (S n) (ma :: la)) (firstn (S n) (mb :: lb))). {
+  cbn.
+  destruct Hnl as [Hnl| Hnl]. 2: {
+    rewrite Hnl, firstn_all.
+    generalize Hpab; intros H.
+    apply permutation_length in H; cbn in H.
+    apply Nat.succ_inj in H.
+    now rewrite H, firstn_all.
+  }
+  destruct Hnl as (Hnl, Haa).
+  apply Bool.negb_true_iff in Haa.
+  apply Nat.leb_gt in Haa.
 ...
 destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
 unfold same_deg_sum_coeff at 1 3.
