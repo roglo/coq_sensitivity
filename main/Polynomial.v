@@ -823,16 +823,16 @@ assert (H : ∀ j, j < n → mdeg (nth j la (0·)) = mdeg ma). {
   now apply Nat.eqb_eq in Hbn.
 }
 move H before Hbn; clear Hbn; rename H into Hba.
-assert (Hbb : ∀ j, j < S n → mdeg (nth j lb (0·)) = mdeg ma). {
+destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
+assert (Hbb : ∀ j, j < n → mdeg (nth j lb (0·)) = mdeg ma). {
   intros j Hj.
-  rewrite <- Hdd.
-  destruct j; [ easy | cbn ].
-  apply Nat.succ_lt_mono in Hj.
+  specialize (Hdd (S j)) as H1; cbn in H1.
+  rewrite <- H1.
   now apply Hba.
 }
 move Hbb before Hba.
-destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
 move mb before ma.
+assert (Hmba : mdeg mb = mdeg ma) by now specialize (Hdd 0) as H1.
 assert
   (H :
      permutation monom_eqb
