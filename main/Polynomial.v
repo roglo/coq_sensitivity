@@ -811,6 +811,7 @@ induction la as [| ma]; intros; cbn. {
 }
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
+...
 remember (List_rank (λ mb, negb (rel ma mb)) la) as n eqn:Hn.
 symmetry in Hn.
 unfold rel in Hn; cbn in Hn.
