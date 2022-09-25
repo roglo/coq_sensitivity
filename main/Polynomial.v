@@ -11,7 +11,6 @@ Import List ListNotations Init.Nat.
 Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
 
-
 (* definition of a monomial *)
 
 Record monom T := Mon { mcoeff : T; mdeg : nat }.
@@ -1394,8 +1393,25 @@ Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
   |}.
 
 ...
+(**)
 
 (* old version *)
+
+Record polyn T := mk_polyn { monl : list (monom T) }.
+
+Arguments mk_polyn {T} monl%list.
+Arguments polyn T%type.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+Context {Heq : rngl_has_eqb = true}.
+(*
+Context {Hop : rngl_has_opp = true}.
+*)
+Context {H10 : rngl_has_1_neq_0 = true}.
 
 (* if "pa" and "pb" are polynomials in canonical order,
    i.e.
@@ -1555,6 +1571,9 @@ Definition polyn_quot_rem pa pb :=
 Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
 Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
 
+Definition polyn_zero := mk_polyn [] : polyn T.
+Definition polyn_one := mk_polyn [Mon 1 0] : polyn T.
+
 (*
 End a.
 Arguments monl_quot_rem_loop {T ro} it%nat (la lb)%list.
@@ -1616,8 +1635,6 @@ Context {Hop : rngl_has_opp = true}.
 
 (* polynomial ring-like operators *)
 
-Definition phony_polyn_le : polyn T → polyn T → Prop := λ _ _, False.
-
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
      rngl_one := polyn_one;
@@ -1626,7 +1643,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_opp_or_sous := Some (inl polyn_opp);
      rngl_opt_inv_or_quot := Some (inr polyn_quot);
      rngl_opt_eqb := None;
-     rngl_le := phony_polyn_le |}.
+     rngl_opt_le := None |}.
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
@@ -1695,6 +1712,17 @@ intros.
 unfold monl_add_nb_iter.
 now rewrite Nat.add_comm.
 Qed.
+
+Theorem monl_add_comm : ∀ (la lb : list (monom T)),
+  monl_add la lb = monl_add lb la.
+Proof.
+intros.
+unfold monl_add.
+rewrite (monl_add_nb_iter_comm lb).
+now apply monl_add_loop_comm.
+Qed.
+
+...
 
 Theorem monl_add_loop_enough_iter : ∀ it1 it2 (la lb : list (monom T)),
   monl_add_nb_iter la lb ≤ it1
@@ -2024,15 +2052,6 @@ destruct dbc. {
 ...
 
 (* *)
-
-Theorem monl_add_comm : ∀ (la lb : list (monom T)),
-  monl_add la lb = monl_add lb la.
-Proof.
-intros.
-unfold monl_add.
-rewrite (monl_add_nb_iter_comm lb).
-now apply monl_add_loop_comm.
-Qed.
 
 Theorem monl_add_assoc : ∀ (la lb lc : list (monom T)),
   monl_add la (monl_add lb lc) = monl_add (monl_add la lb) lc.
