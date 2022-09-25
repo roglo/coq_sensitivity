@@ -848,6 +848,11 @@ assert
   destruct Hnl as (Hnl, Haa).
   apply Bool.negb_true_iff in Haa.
   apply Nat.leb_gt in Haa.
+(* ah bon, c'est bizarre, ça : pourquoi mdeg (nth n...) > mdeg a ?
+   ça devrait être le contraire, non ? *)
+  move Hsb before Hsa.
+  move lb before la.
+(* ne faut-il pas changer Hba pour dire = au lieu de ≤, en utiliser Hsa ? *)
 ...
 destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
 unfold same_deg_sum_coeff at 1 3.
