@@ -831,6 +831,7 @@ assert (Hbb : ∀ j, j < S n → mdeg (nth j lb (0·)) ≤ mdeg ma). {
   now apply Hba.
 }
 move Hbb before Hba.
+assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
 ...
 destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
 unfold same_deg_sum_coeff at 1 3.
