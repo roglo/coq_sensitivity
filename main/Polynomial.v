@@ -811,20 +811,19 @@ induction la as [| ma]; intros; cbn. {
 }
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
-...
-remember (List_rank (λ mb, negb (rel ma mb)) la) as n eqn:Hn.
+(**)
+remember (List_rank (λ mb, mdeg mb ≠? mdeg ma) la) as n eqn:Hn.
 symmetry in Hn.
-unfold rel in Hn; cbn in Hn.
 apply (List_rank_if (Mon 0 0)) in Hn.
 destruct Hn as (Hbn, Hnl).
-assert (H : ∀ j, j < n → mdeg (nth j la (0·)) ≤ mdeg ma). {
+assert (H : ∀ j, j < n → mdeg (nth j la (0·)) = mdeg ma). {
   intros j Hj.
   specialize (Hbn j Hj).
   apply Bool.negb_false_iff in Hbn.
-  now apply Nat.leb_le in Hbn.
+  now apply Nat.eqb_eq in Hbn.
 }
 move H before Hbn; clear Hbn; rename H into Hba.
-assert (Hbb : ∀ j, j < S n → mdeg (nth j lb (0·)) ≤ mdeg ma). {
+assert (Hbb : ∀ j, j < S n → mdeg (nth j lb (0·)) = mdeg ma). {
   intros j Hj.
   rewrite <- Hdd.
   destruct j; [ easy | cbn ].
@@ -848,12 +847,9 @@ assert
   }
   destruct Hnl as (Hnl, Haa).
   apply Bool.negb_true_iff in Haa.
-  apply Nat.leb_gt in Haa.
-(* ah bon, c'est bizarre, ça : pourquoi mdeg (nth n...) > mdeg a ?
-   ça devrait être le contraire, non ? *)
+  apply Nat.eqb_neq in Haa.
   move Hsb before Hsa.
   move lb before la.
-(* ne faut-il pas changer Hba pour dire = au lieu de ≤, en utiliser Hsa ? *)
 ...
 destruct lb as [| mb]; [ now apply permutation_nil_r in Hpab | cbn ].
 unfold same_deg_sum_coeff at 1 3.
