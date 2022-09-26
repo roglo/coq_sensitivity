@@ -808,6 +808,26 @@ rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
 do 2 rewrite fold_merge_mon.
+(**)
+remember (length la) as len eqn:Hlena; symmetry in Hlena.
+assert (Hlenb : length lb = len). {
+  apply permutation_length in Hpab; congruence.
+}
+revert la lb Hsa Hsb Hpab Hdd Hlena Hlenb.
+induction len; intros. {
+  now apply length_zero_iff_nil in Hlena, Hlenb; subst la lb.
+}
+remember (List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la) as n eqn:Hn.
+assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
+  generalize Hpab; intros Ha.
+  apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Ha.
+  apply (permutation_sym monom_eqb_eq) in Hpab.
+  generalize Hpab; intros Hb.
+  apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Hb.
+  rewrite Ha.
+  rewrite Hb at 2.
+  do 2 rewrite firstn_map.
+Search (permutation _ (map _ _)).
 ...
 revert lb Hsb Hpab Hdd.
 induction la as [| ma]; intros; cbn. {
@@ -835,10 +855,7 @@ assert (Hbb : ∀ j, j < n → mdeg (nth j lb (0·)) = mdeg ma). {
 }
 move Hbb before Hba.
 move mb before ma.
-unfold same_deg_sum_coeff at 1 3.
-...
 assert (Hmba : mdeg mb = mdeg ma) by now specialize (Hdd 0) as H1.
-...
 assert
   (H :
      permutation monom_eqb
