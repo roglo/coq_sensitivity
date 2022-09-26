@@ -770,7 +770,6 @@ assert (Htra : transitive rel). {
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
-unfold merge_mon.
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
 move lba before lab.
@@ -780,11 +779,7 @@ assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
 specialize (Hrr Hsab).
 assert (Hsba : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr Hsba).
-(**)
-apply sorted_le_sorted_lt_merge_mon in Hsab.
-apply sorted_le_sorted_lt_merge_mon in Hsba.
-do 2 rewrite fold_merge_mon.
-...
+(*
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
@@ -806,6 +801,29 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   now apply Nat.le_antisymm.
 }
 clear Hrr.
+*)
+apply sorted_le_sorted_lt_merge_mon in Hsab.
+apply sorted_le_sorted_lt_merge_mon in Hsba.
+set (f := λ ma mb : monom T, mdeg mb <? mdeg ma).
+fold f in Hsab, Hsba.
+specialize (sorted_sorted_permuted) as H1.
+specialize (H1 _ monom_eqb f monom_eqb_eq).
+apply H1; [ | | easy | easy | ]. {
+  unfold f; cbn; intros ma mb Hmab Hmba.
+  apply Nat.ltb_lt in Hmab, Hmba.
+  flia Hmab Hmba.
+} {
+  intros ma mb mc Hab Hbc.
+  apply Nat.ltb_lt in Hab, Hbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+clear H1.
+Search merge_mon.
+...
+  ============================
+  permutation monom_eqb (merge_mon lab) (merge_mon lba)
+...
 clear Hlab Hlba.
 clear la lb.
 rename lab into la.
