@@ -780,6 +780,11 @@ assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
 specialize (Hrr Hsab).
 assert (Hsba : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr Hsba).
+(**)
+apply sorted_le_sorted_lt_merge_mon in Hsab.
+apply sorted_le_sorted_lt_merge_mon in Hsba.
+do 2 rewrite fold_merge_mon.
+...
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
