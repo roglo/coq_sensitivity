@@ -828,6 +828,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   rewrite Hb at 2.
   do 2 rewrite firstn_map.
 Search (permutation _ (map _ _)).
+Search permutation_assoc.
 ...
 revert lb Hsb Hpab Hdd.
 induction la as [| ma]; intros; cbn. {
