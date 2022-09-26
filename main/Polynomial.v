@@ -803,7 +803,6 @@ rename lab into la.
 rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
-(**)
 revert lb Hsb Hpab Hdd.
 induction la as [| ma]; intros; cbn. {
   now apply permutation_nil_l in Hpab; subst lb.
@@ -811,6 +810,10 @@ induction la as [| ma]; intros; cbn. {
 assert (H : sorted rel la) by now apply sorted_cons in Hsa.
 specialize (IHla H); clear H.
 (**)
+unfold same_deg_sum_coeff at 1.
+remember (fold_right same_deg_sum_coeff [] la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mc]. {
+...
 remember (List_rank (λ mb, mdeg mb ≠? mdeg ma) la) as n eqn:Hn.
 symmetry in Hn.
 apply (List_rank_if (Mon 0 0)) in Hn.
@@ -832,6 +835,7 @@ assert (Hbb : ∀ j, j < n → mdeg (nth j lb (0·)) = mdeg ma). {
 move Hbb before Hba.
 move mb before ma.
 assert (Hmba : mdeg mb = mdeg ma) by now specialize (Hdd 0) as H1.
+...
 assert
   (H :
      permutation monom_eqb
