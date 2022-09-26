@@ -827,8 +827,28 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   rewrite Ha.
   rewrite Hb at 2.
   do 2 rewrite firstn_map.
-Search (permutation _ (map _ _)).
+Print permutation_assoc_loop.
+Abort.
+End a.
+Arguments monom_eqb {T ro} ma%F mb%F.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (
+  let la := [Mon 1 5; Mon 2 5; Mon 3 5; Mon 4 5; Mon 7 0] in
+  let lb := [Mon 1 5; Mon 4 5; Mon 2 5; Mon 3 5; Mon 7 0] in
+  let n := List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la in
+  (permutation_assoc monom_eqb la lb) =
+  (permutation_assoc monom_eqb lb la)).
+...
+  firstn n (permutation_assoc monom_eqb la lb) =
+  firstn n (permutation_assoc monom_eqb lb la)).
 Search permutation_assoc.
+...
+  permutation monom_eqb
+    (map (λ i : nat, nth i lb (0·))
+       (firstn n (permutation_assoc monom_eqb la lb)))
+    (map (λ i : nat, nth i la (0·))
+       (firstn n (permutation_assoc monom_eqb lb la)))).
 ...
 revert lb Hsb Hpab Hdd.
 induction la as [| ma]; intros; cbn. {
