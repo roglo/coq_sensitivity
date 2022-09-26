@@ -819,6 +819,18 @@ induction len; intros. {
 }
 remember (List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la) as n eqn:Hn.
 assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
+  symmetry in Hn.
+  apply (List_rank_if (Mon 0 0)) in Hn.
+  destruct Hn as (Hbn, Hnl).
+  destruct Hnl as [Hnl| Hnl]. 2: {
+    rewrite Hnl at 1.
+    rewrite Hlena, <- Hlenb in Hnl.
+    rewrite Hnl.
+    now do 2 rewrite firstn_all.
+  }
+  destruct Hnl as (Hnl, Haa).
+  apply Bool.negb_true_iff in Haa.
+  apply Nat.eqb_neq in Haa.
   generalize Hpab; intros Ha.
   apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Ha.
   apply (permutation_sym monom_eqb_eq) in Hpab.
@@ -827,6 +839,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   rewrite Ha.
   rewrite Hb at 2.
   do 2 rewrite firstn_map.
+...
 Print permutation_assoc_loop.
 Abort.
 End a.
