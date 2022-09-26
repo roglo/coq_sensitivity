@@ -779,7 +779,7 @@ assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
 specialize (Hrr Hsab).
 assert (Hsba : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr Hsba).
-(*
+(**)
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
@@ -801,7 +801,8 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   now apply Nat.le_antisymm.
 }
 clear Hrr.
-*)
+(*
+...
 apply sorted_le_sorted_lt_merge_mon in Hsab.
 apply sorted_le_sorted_lt_merge_mon in Hsba.
 set (f := λ ma mb : monom T, mdeg mb <? mdeg ma).
@@ -824,13 +825,13 @@ Search merge_mon.
   ============================
   permutation monom_eqb (merge_mon lab) (merge_mon lba)
 ...
+*)
 clear Hlab Hlba.
 clear la lb.
 rename lab into la.
 rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
-do 2 rewrite fold_merge_mon.
 (**)
 remember (length la) as len eqn:Hlena; symmetry in Hlena.
 assert (Hlenb : length lb = len). {
