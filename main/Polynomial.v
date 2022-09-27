@@ -860,8 +860,8 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   apply (permutation_sym monom_eqb_eq) in Hpab.
   generalize Hpab; intros Hb.
   apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Hb.
-  rewrite Ha.
-  rewrite Hb at 2.
+  apply (permutation_sym monom_eqb_eq) in Hpab.
+  rewrite Ha at 1; rewrite Hb at 2.
   do 2 rewrite firstn_map.
   apply (permutation_trans monom_eqb_eq) with
     (lb :=
@@ -869,6 +869,31 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
     apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
+Theorem permutation_firstn : ∀ la n,
+  n ≤ length la
+  → (∀ i, i < n → nth i la 0 < n)
+  → permutation eqb la (seq 0 (length la))
+  → permutation eqb (firstn n la) (seq 0 n).
+Proof.
+intros * Hna Hn Hp.
+revert la Hna Hn Hp.
+induction n; intros; [ easy | ].
+destruct la as [| a]; [ easy | ].
+cbn in Hna; apply Nat.succ_le_mono in Hna.
+cbn - [ seq ].
+(* trouver le rang dans la qui contient (length la - 1) *)
+(* un truc comme ça *)
+...
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Nat.eqb_eq in H; subst x.
+... ...
+apply permutation_firstn.
+rewrite (permutation_assoc_length monom_eqb_eq).
+now apply (permutation_permutation_assoc monom_eqb_eq).
 ...
 Abort.
 End a.
