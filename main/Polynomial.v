@@ -869,6 +869,8 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
     apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
+Check permutation_permutation_assoc.
+...
       induction la as [| a]; [ easy | ].
       cbn - [ option_eqb seq ].
       remember (extract (λ bo, option_eqb monom_eqb bo (Some a)) (map Some lb)) as lxl.
