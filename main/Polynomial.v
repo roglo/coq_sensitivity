@@ -876,6 +876,14 @@ Theorem permutation_firstn : ∀ la n,
   → permutation eqb (firstn n la) (seq 0 n).
 Proof.
 intros * Hna Hn Hp.
+rewrite <- (firstn_skipn n) in Hp at 1.
+rewrite <- (firstn_skipn n (seq 0 _)) in Hp.
+rewrite List_firstn_seq in Hp.
+rewrite Nat.min_l in Hp; [ | easy ].
+rewrite List_skipn_seq in Hp; [ | easy ].
+cbn in Hp.
+...
+intros * Hna Hn Hp.
 revert la Hna Hn Hp.
 induction n; intros; [ easy | ].
 destruct la as [| a]; [ easy | ].

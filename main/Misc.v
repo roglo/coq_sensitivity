@@ -1622,6 +1622,20 @@ specialize (IHx1 x2 y1 y2 Hxy H1).
 now destruct IHx1; subst y1 y2.
 Qed.
 
+Theorem List_firstn_seq : ∀ n start len,
+  firstn n (seq start len) = seq start (min n len).
+Proof.
+intros.
+revert start len.
+induction n; intros; [ easy | cbn ].
+remember (seq start len) as l eqn:Hl; symmetry in Hl.
+destruct l as [| a l]; [ now destruct len | ].
+destruct len; [ easy | cbn in Hl; cbn ].
+injection Hl; clear Hl; intros Hl Ha.
+subst start; f_equal.
+rewrite <- Hl; apply IHn.
+Qed.
+
 Theorem List_skipn_seq : ∀ n start len,
   n ≤ len → skipn n (seq start len) = seq (start + n) (len - n).
 Proof.
