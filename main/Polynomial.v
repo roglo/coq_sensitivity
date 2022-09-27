@@ -855,6 +855,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   destruct Hnl as (Hnl, Haa).
   apply Bool.negb_true_iff in Haa.
   apply Nat.eqb_neq in Haa.
+...
   generalize Hpab; intros Ha.
   apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Ha.
   apply (permutation_sym monom_eqb_eq) in Hpab.
