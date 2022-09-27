@@ -868,8 +868,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
        map (λ i : nat, nth i lb (0·))
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
-...
-Search (firstn _ (permutation_assoc _ _ _)).
+    apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
 ...
 Abort.
 End a.
@@ -877,10 +876,12 @@ Arguments monom_eqb {T ro} ma%F mb%F.
 Require Import ZArith RnglAlg.Zrl.
 Open Scope Z_scope.
 Compute (
-  let la := [Mon 1 5; Mon 2 5; Mon 3 5; Mon 4 5; Mon 7 0] in
-  let lb := [Mon 1 5; Mon 4 5; Mon 2 5; Mon 3 5; Mon 7 0] in
+  let la := [Mon 1 5; Mon 2 5; Mon 3 5; Mon 4 5; Mon 7 1; Mon 6 0; Mon 3 0] in
+  let lb := [Mon 1 5; Mon 4 5; Mon 2 5; Mon 3 5; Mon 7 1; Mon 3 0; Mon 6 0] in
   let n := List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la in
-  (permutation_assoc monom_eqb la lb) =
+  (firstn n (permutation_assoc monom_eqb la lb) = seq 0 n)).
+).
+  (permutation_assoc monom_eqb la lb =
   (permutation_assoc monom_eqb lb la)).
 ...
   firstn n (permutation_assoc monom_eqb la lb) =
