@@ -863,8 +863,14 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   rewrite Ha.
   rewrite Hb at 2.
   do 2 rewrite firstn_map.
+  apply (permutation_trans monom_eqb_eq) with
+    (lb :=
+       map (λ i : nat, nth i lb (0·))
+         (firstn n (permutation_assoc monom_eqb lb la))). {
+    apply (permutation_map Nat.eqb_eq monom_eqb_eq).
 ...
-Print permutation_assoc_loop.
+Search (firstn _ (permutation_assoc _ _ _)).
+...
 Abort.
 End a.
 Arguments monom_eqb {T ro} ma%F mb%F.
