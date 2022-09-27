@@ -869,6 +869,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
     apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
+Search (permutation _ _ (seq _ _)).
 ...
       specialize (permutation_permutation_assoc monom_eqb_eq Hpab) as H1.
       rewrite <- (firstn_skipn n) in H1 at 1.
