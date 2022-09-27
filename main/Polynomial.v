@@ -882,6 +882,10 @@ rewrite List_firstn_seq in Hp.
 rewrite Nat.min_l in Hp; [ | easy ].
 rewrite List_skipn_seq in Hp; [ | easy ].
 cbn in Hp.
+apply (permutation_app_inv_r Nat.eqb_eq) with (l := skipn n la).
+eapply (permutation_trans Nat.eqb_eq); [ apply Hp | ].
+apply (permutation_app_head Nat.eqb_eq).
+(* c'est pas clair, mon histoire *)
 ...
 intros * Hna Hn Hp.
 revert la Hna Hn Hp.
