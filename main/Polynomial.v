@@ -869,7 +869,138 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
     apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
-Search (permutation _ _ (seq _ _)).
+      induction la as [| a]; [ easy | ].
+      cbn - [ option_eqb seq ].
+      remember (extract (λ bo, option_eqb monom_eqb bo (Some a)) (map Some lb)) as lxl.
+      rename Heqlxl into Hlxl; symmetry in Hlxl.
+      destruct lxl as [((bef, x), aft)| ]. 2: {
+        specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+        cbn - [ option_eqb ] in H1.
+        specialize (H1 (Some a)).
+        assert (H : Some a ∈ map Some lb). {
+          apply in_map_iff.
+          exists a; split; [ easy | ].
+          now apply (permutation_in_iff monom_eqb_eq Hpab a); left.
+        }
+        specialize (H1 H); clear H.
+        cbn in H1.
+        now rewrite (equality_refl monom_eqb_eq) in H1.
+      }
+      apply extract_Some_iff in Hlxl.
+      destruct Hlxl as (Hbef & H & Hlb).
+      cbn in H.
+      destruct x as [x| ]; [ | easy ].
+      apply monom_eqb_eq in H; subst x.
+      apply unmap_Some_app_cons in Hlb.
+      destruct Hlb as (H1 & H2 & Hlb).
+      subst lb.
+      specialize (permutation_app_inv monom_eqb_eq [] _ _ _ _ Hpab) as H.
+      cbn in H; move H before Hpab; clear Hpab; rename H into Hpab.
+(*
+      specialize (IHla _ Hpab) as H3.
+*)
+      rewrite List_seq_cut with (i := length bef). 2: {
+        apply in_seq; split; [ easy | cbn ].
+        rewrite H1, map_length.
+        apply permutation_length in Hpab.
+        rewrite app_length in Hpab.
+...
+        flia Hpab.
+}
+rewrite Nat.sub_0_r, Nat.add_0_l.
+cbn - [ "<?" ].
+replace (length la - length bef) with (length aft). 2: {
+  rewrite H1, H2.
+  do 2 rewrite map_length.
+  apply permutation_length in Hpab.
+  rewrite app_length in Hpab.
+  flia Hpab.
+}
+remember (length bef) as i eqn:Hi.
+apply (permutation_elt Nat.eqb_eq []); cbn.
+rewrite (permutation_assoc_loop_None_inside Heqb).
+rewrite <- Hi.
+set (f := λ j, if j <? i then j else S j).
+destruct (Nat.eq_dec (length aft) 0) as [Haz| Haz]. {
+  apply length_zero_iff_nil in Haz; move Haz at top; subst aft.
+  clear H2; cbn in Hpab |-*.
+  rewrite app_nil_r in Hpab.
+  do 2 rewrite app_nil_r.
+  unfold f.
+  rewrite Hi.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j (length bef)) as [Hji| Hji]. 2: {
+      exfalso; apply Hji.
+      apply (In_nth _ _ 0) in Hj.
+      rewrite (permutation_assoc_loop_length Heqb) in Hj; [ | easy ].
+      destruct Hj as (k & Hk & Hkj).
+      rewrite <- Hkj.
+      now apply (permutation_assoc_loop_ub Heqb).
+    }
+    easy.
+  }
+  rewrite map_id.
+  replace (length bef) with (length la). 2: {
+    rewrite (permutation_length Hpab).
+    now rewrite H1, filter_Some_map_Some, map_length.
+  }
+  rewrite H1.
+  rewrite fold_permutation_assoc.
+  now apply IHla.
+}
+replace (seq 0 i ++ seq (S i) (length aft)) with
+    (map f (seq 0 (i + length aft))). 2: {
+  rewrite List_seq_cut with (i := i). 2: {
+    apply in_seq.
+    split; [ easy | ].
+    flia Haz.
+  }
+  rewrite Nat.sub_0_r, Nat.add_0_l.
+  rewrite map_app.
+  unfold f.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j i) as [Hji| Hji]. 2: {
+      apply in_seq in Hj.
+      now exfalso; apply Hji.
+    }
+    easy.
+  }
+  rewrite map_id; f_equal.
+  erewrite map_ext_in. 2: {
+    intros j Hj.
+    rewrite if_ltb_lt_dec.
+    destruct (lt_dec j i) as [Hji| Hji]. {
+      exfalso.
+      apply in_app_or in Hj.
+      destruct Hj as [[Hj| Hj]| Hj]; [ flia Hj Hji | easy | ].
+      apply in_seq in Hj.
+      flia Hj Hji.
+    }
+    easy.
+  }
+  cbn.
+  rewrite seq_shift.
+  destruct aft; [ easy | cbn ].
+  f_equal; f_equal.
+  rewrite Nat.add_succ_r; cbn.
+  now rewrite Nat.add_comm, Nat.add_sub.
+}
+apply (permutation_map Nat.eqb_eq Nat.eqb_eq).
+replace (i + length aft) with (length la). 2: {
+  rewrite (permutation_length Hpab).
+  rewrite app_length.
+  rewrite <- (map_length Some (filter_Some _)), <- H1.
+  rewrite <- (map_length Some (filter_Some _)), <- H2.
+  now rewrite Hi.
+}
+rewrite H1, H2, <- map_app.
+rewrite fold_permutation_assoc.
+now apply IHla.
+Qed.
 ...
       specialize (permutation_permutation_assoc monom_eqb_eq Hpab) as H1.
       rewrite <- (firstn_skipn n) in H1 at 1.
