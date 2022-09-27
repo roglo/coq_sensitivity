@@ -861,7 +861,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   generalize Hpab; intros Hb.
   apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Hb.
   apply (permutation_sym monom_eqb_eq) in Hpab.
-  rewrite Ha at 1; rewrite Hb at 2.
+  rewrite Ha at 1; rewrite Hb at 2; clear Ha Hb.
   do 2 rewrite firstn_map.
   apply (permutation_trans monom_eqb_eq) with
     (lb :=
@@ -869,6 +869,25 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
          (firstn n (permutation_assoc monom_eqb lb la))). {
     apply (permutation_map Nat.eqb_eq monom_eqb_eq).
     apply (permutation_trans Nat.eqb_eq) with (lb := seq 0 n). {
+...
+      specialize (permutation_permutation_assoc monom_eqb_eq Hpab) as H1.
+      rewrite <- (firstn_skipn n) in H1 at 1.
+      apply (permutation_app_inv_r Nat.eqb_eq) with
+        (l := seq n (length la - n)).
+      specialize (seq_app n (length la - n) 0) as H2.
+      rewrite Nat.add_sub_assoc in H2; [ | now apply Nat.lt_le_incl ].
+      rewrite Nat.add_comm, Nat.add_sub in H2; cbn in H2.
+      rewrite <- H2; clear H2.
+...
+      rewrite <- (firstn_skipn n (seq 0 _)) in H1.
+      rewrite List_firstn_seq in H1.
+      rewrite Nat.min_l in H1; [ | now apply Nat.lt_le_incl ].
+      rewrite List_skipn_seq in H1; [ | now apply Nat.lt_le_incl ].
+      cbn in H1.
+      apply (permutation_app_inv_r Nat.eqb_eq) with
+        (l := seq n (length la - n)).
+      apply
+...
 Theorem permutation_firstn : ∀ la n,
   n ≤ length la
   → (∀ i, i < n → nth i la 0 < n)
@@ -876,16 +895,17 @@ Theorem permutation_firstn : ∀ la n,
   → permutation eqb (firstn n la) (seq 0 n).
 Proof.
 intros * Hna Hn Hp.
-rewrite <- (firstn_skipn n) in Hp at 1.
-rewrite <- (firstn_skipn n (seq 0 _)) in Hp.
-rewrite List_firstn_seq in Hp.
-rewrite Nat.min_l in Hp; [ | easy ].
-rewrite List_skipn_seq in Hp; [ | easy ].
-cbn in Hp.
+generalize Hp; intros H.
+rewrite <- (firstn_skipn n) in H at 1.
+rewrite <- (firstn_skipn n (seq 0 _)) in H.
+rewrite List_firstn_seq in H.
+rewrite Nat.min_l in H; [ | easy ].
+rewrite List_skipn_seq in H; [ | easy ].
+cbn in H.
 apply (permutation_app_inv_r Nat.eqb_eq) with (l := skipn n la).
-eapply (permutation_trans Nat.eqb_eq); [ apply Hp | ].
+eapply (permutation_trans Nat.eqb_eq); [ apply H | clear H ].
 apply (permutation_app_head Nat.eqb_eq).
-(* c'est pas clair, mon histoire *)
+(* pas bon *)
 ...
 intros * Hna Hn Hp.
 revert la Hna Hn Hp.
