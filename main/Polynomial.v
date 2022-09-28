@@ -866,6 +866,9 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
     split. {
       apply Bool.negb_true_iff in Haa.
       apply Nat.eqb_neq in Haa.
+      intros Hiz; apply Haa; clear Haa.
+(* si c'eat bon en i, dans tous ceux qui sont avant, dont n, c'est bon *)
+...
       destruct la as [| ma]; [ easy | ].
       cbn - [ nth ] in Haa |-*.
       intros H; apply Haa; clear Haa.
@@ -874,6 +877,15 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       destruct n; [ easy | cbn ].
       cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
       apply Nat.succ_le_mono in Hi.
+      cbn - [ nth ] in Hbn.
+      specialize (Hbn n (Nat.lt_succ_diag_r _)) as H1.
+      apply Bool.negb_false_iff in H1.
+      apply Nat.eqb_eq in H1.
+      destruct n. {
+        clear Hi H1.
+        destruct la as [| mb]; [ easy | cbn ].
+        destruct i; [ easy | ].
+        cbn in H.
 ...
     specialize (Hbn _ Hi) as H1.
     apply Bool.negb_false_iff in H1.
