@@ -854,13 +854,15 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   }
   destruct Hnl as (Hnl, Haa).
 (**)
-Theorem permutation_firstn : ∀ A (eqb : A → _) P n la lb,
+Theorem permutation_firstn : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ P n la lb,
   (∀ i, i < n → P la i ∧ P lb i)
   → (∀ i, n ≤ i → ¬ P la i ∧ ¬ P lb i)
   → permutation eqb la lb
   → permutation eqb (firstn n la) (firstn n lb).
 Proof.
-intros * Hpn1 Hpn2 Hpab.
+intros * Heqb * Hpn1 Hpn2 Hpab.
 revert lb Hpn1 Hpn2 Hpab.
 induction la as [| ma]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
@@ -871,11 +873,18 @@ remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
 apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hax & Haft).
-subst lb.
+apply Heqb in Hax; subst x lb.
 destruct n; [ easy | ].
 rewrite firstn_cons.
-rewrite (List_cons_is_app x).
+rewrite (List_cons_is_app ma aft).
 rewrite app_assoc.
+Check firstn_app_2.
+assert (length (bef ++ [ma]) < n). {
+  apply Nat.nle_gt; intros H1.
+  apply Nat.lt_succ_r in H1.
+  specialize (Hpn2 _ H1) as H2.
+  destruct H2 as (H2, H3).
+...
 rewrite firstn_app.
 ...
   apply permutation_firstn with
