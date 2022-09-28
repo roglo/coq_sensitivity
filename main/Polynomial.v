@@ -863,11 +863,15 @@ Theorem permutation_firstn : ∀ A (eqb : A → _) d,
   → permutation eqb (firstn n la) (firstn n lb).
 Proof.
 intros * Heqb * Hpn1 Hpn2 Hpab.
-revert n lb Hpn1 Hpn2 Hpab.
-induction la as [| ma]; intros. {
-  apply permutation_nil_l in Hpab; subst lb.
-  now rewrite firstn_nil.
+destruct (le_dec (length la) n) as [Hlan| Hlan]. {
+  rewrite firstn_all2; [ | easy ].
+  rewrite firstn_all2; [ easy | ].
+  apply permutation_length in Hpab.
+  congruence.
 }
+apply Nat.nle_gt in Hlan.
+revert n lb Hpn1 Hpn2 Hpab Hlan.
+induction la as [| ma]; intros; [ easy | ].
 apply permutation_cons_l_iff in Hpab.
 remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
 destruct lxl as [((bef, x), aft)| ]; [ | easy ].
@@ -875,10 +879,7 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hax & Haft).
 apply Heqb in Hax; subst x lb.
 destruct n; [ easy | ].
-(*
 rewrite firstn_cons.
-rewrite (List_cons_is_app ma aft).
-*)
 assert (Hbn : length bef ≤ n). {
   apply Nat.nlt_ge; intros H1.
   specialize (Hpn2 _ H1) as H2.
@@ -887,19 +888,21 @@ assert (Hbn : length bef ≤ n). {
   rewrite Nat.sub_diag in H3; cbn in H3.
   now specialize (Hpn1 0 (Nat.lt_0_succ _)) as H4.
 }
-rewrite firstn_cons.
+cbn in Hlan; apply Nat.succ_lt_mono in Hlan.
 replace (S n) with (length bef + (S n - length bef)) by flia Hbn.
 rewrite firstn_app_2.
 rewrite Nat.sub_succ_l; [ | easy ].
 rewrite firstn_cons.
 apply (permutation_cons_app Heqb).
-eapply (permutation_trans Heqb). 2: {
-  apply (permutation_app_comm Heqb).
-}
-Search (firstn _ _ ++ _).
-specialize (firstn_app (n - length bef) aft bef) as H1.
-...
-rewrite firstn_app.
+specialize (firstn_app n bef aft) as H1.
+replace (firstn n bef) with bef in H1 by now symmetry; apply firstn_all2.
+rewrite <- H1; clear H1.
+apply IHla; [ | | easy | easy ]. {
+  intros i Hi.
+  apply Nat.succ_lt_mono in Hi.
+  specialize (Hpn1 _ Hi) as H1.
+  cbn in H1.
+  split; [ easy | ].
 ... ...
   apply (permutation_firstn (0·) monom_eqb_eq) with
       (P := λ ma, mdeg ma = mdeg (hd (0·) la)). {
