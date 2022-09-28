@@ -2768,6 +2768,95 @@ apply IHla. {
 }
 Qed.
 
+Theorem permutation_firstn : ∀ A (eqb : A → _) d,
+  equality eqb →
+  ∀ P n la lb,
+  (∀ i, i < n → P (nth i la d) ∧ P (nth i lb d))
+  → (∀ i, n ≤ i → ¬ P (nth i la d) ∧ ¬ P (nth i lb d))
+  → permutation eqb la lb
+  → permutation eqb (firstn n la) (firstn n lb).
+Proof.
+intros * Heqb * Hpn1 Hpn2 Hpab.
+destruct (le_dec (length la) n) as [Hlan| Hlan]. {
+  rewrite firstn_all2; [ | easy ].
+  rewrite firstn_all2; [ easy | ].
+  apply permutation_length in Hpab.
+  congruence.
+}
+apply Nat.nle_gt in Hlan.
+revert n lb Hpn1 Hpn2 Hpab Hlan.
+induction la as [| ma]; intros; [ easy | ].
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hax & Haft).
+apply Heqb in Hax; subst x lb.
+destruct n; [ easy | ].
+rewrite firstn_cons.
+assert (Hbn : length bef ≤ n). {
+  apply Nat.nlt_ge; intros H1.
+  specialize (Hpn2 _ H1) as H2.
+  destruct H2 as (H2, H3).
+  rewrite app_nth2 in H3; [ | flia ].
+  rewrite Nat.sub_diag in H3; cbn in H3.
+  now specialize (Hpn1 0 (Nat.lt_0_succ _)) as H4.
+}
+cbn in Hlan; apply Nat.succ_lt_mono in Hlan.
+replace (S n) with (length bef + (S n - length bef)) by flia Hbn.
+rewrite firstn_app_2.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite firstn_cons.
+apply (permutation_cons_app Heqb).
+specialize (firstn_app n bef aft) as H1.
+replace (firstn n bef) with bef in H1 by now symmetry; apply firstn_all2.
+rewrite <- H1; clear H1.
+apply IHla; [ | | easy | easy ]. {
+  intros i Hi.
+  apply Nat.succ_lt_mono in Hi.
+  specialize (Hpn1 _ Hi) as H1.
+  cbn in H1.
+  split; [ easy | ].
+  destruct H1 as (H1, H2).
+  destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth1; [ | easy ].
+    specialize (Hpn1 i) as H3.
+    assert (H : i < S n) by flia Hi.
+    specialize (H3 H); clear H.
+    destruct H3 as (H3, H4).
+    rewrite app_nth1 in H4; [ easy | easy ].
+  }
+  apply Nat.nlt_ge in Hib.
+  rewrite app_nth2; [ | easy ].
+  rewrite app_nth2 in H2; [ | flia Hib ].
+  rewrite Nat.sub_succ_l in H2; [ easy | easy ].
+} {
+  intros i Hni.
+  specialize (Hpn2 (S i)) as H1.
+  apply Nat.succ_le_mono in Hni.
+  specialize (H1 Hni).
+  split; [ easy | ].
+  destruct H1 as (H1, H2).
+  destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth1; [ | easy ].
+    specialize (Hpn2 i) as H3.
+    destruct (Nat.eq_dec i n) as [Hisn| Hisn]. 2: {
+      assert (H : S n ≤ i) by flia Hni Hisn.
+      specialize (H3 H); clear H.
+      destruct H3 as (H3, H4).
+      rewrite app_nth1 in H4; [ easy | easy ].
+    }
+    subst i; flia Hbn Hib.
+  }
+  apply Nat.nlt_ge in Hib.
+  rewrite app_nth2; [ | easy ].
+  specialize (Hpn2 (S i) Hni) as H3.
+  destruct H3 as (H3, H4).
+  rewrite app_nth2 in H4; [ | flia Hib ].
+  rewrite Nat.sub_succ_l in H4; [ easy | easy ].
+}
+Qed.
+
 (* *)
 
 Require Import Permutation.
