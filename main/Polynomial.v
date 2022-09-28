@@ -854,16 +854,16 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   }
   destruct Hnl as (Hnl, Haa).
 (**)
-Theorem permutation_firstn : ∀ A (eqb : A → _),
+Theorem permutation_firstn : ∀ A (eqb : A → _) d,
   equality eqb →
   ∀ P n la lb,
-  (∀ i, i < n → P la i ∧ P lb i)
-  → (∀ i, n ≤ i → ¬ P la i ∧ ¬ P lb i)
+  (∀ i, i < n → P (nth i la d) ∧ P (nth i lb d))
+  → (∀ i, n ≤ i → ¬ P (nth i la d) ∧ ¬ P (nth i lb d))
   → permutation eqb la lb
   → permutation eqb (firstn n la) (firstn n lb).
 Proof.
 intros * Heqb * Hpn1 Hpn2 Hpab.
-revert lb Hpn1 Hpn2 Hpab.
+revert n lb Hpn1 Hpn2 Hpab.
 induction la as [| ma]; intros. {
   apply permutation_nil_l in Hpab; subst lb.
   now rewrite firstn_nil.
@@ -875,28 +875,40 @@ apply extract_Some_iff in Hlxl.
 destruct Hlxl as (Hbef & Hax & Haft).
 apply Heqb in Hax; subst x lb.
 destruct n; [ easy | ].
+(*
 rewrite firstn_cons.
 rewrite (List_cons_is_app ma aft).
-rewrite app_assoc.
-Check firstn_app_2.
-assert (length (bef ++ [ma]) < n). {
-  apply Nat.nle_gt; intros H1.
-  apply Nat.lt_succ_r in H1.
+*)
+assert (Hbn : length bef ≤ n). {
+  apply Nat.nlt_ge; intros H1.
   specialize (Hpn2 _ H1) as H2.
   destruct H2 as (H2, H3).
+  rewrite app_nth2 in H3; [ | flia ].
+  rewrite Nat.sub_diag in H3; cbn in H3.
+  now specialize (Hpn1 0 (Nat.lt_0_succ _)) as H4.
+}
+rewrite firstn_cons.
+replace (S n) with (length bef + (S n - length bef)) by flia Hbn.
+rewrite firstn_app_2.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite firstn_cons.
+apply (permutation_cons_app Heqb).
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+Search (firstn _ _ ++ _).
+specialize (firstn_app (n - length bef) aft bef) as H1.
 ...
 rewrite firstn_app.
-...
-  apply permutation_firstn with
-      (P := λ l i, mdeg (nth i l (0·)) = mdeg (hd (0·) l)). {
+... ...
+  apply (permutation_firstn (0·) monom_eqb_eq) with
+      (P := λ ma, mdeg ma = mdeg (hd (0·) la)). {
     intros i Hi.
     specialize (Hbn _ Hi) as H1.
     apply Bool.negb_false_iff in H1.
     apply Nat.eqb_eq in H1.
     split; [ easy | ].
-    rewrite <- Hdd, H1.
-    do 2 rewrite List_hd_nth_0.
-    apply Hdd.
+    now rewrite <- Hdd, H1.
   }
 ...
   apply Bool.negb_true_iff in Haa.
