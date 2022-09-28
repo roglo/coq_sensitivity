@@ -918,6 +918,35 @@ apply IHla; [ | | easy | easy ]. {
   rewrite Nat.sub_succ_l in H2; [ easy | easy ].
 } {
   intros i Hni.
+  specialize (Hpn2 (S i)) as H1.
+  apply Nat.succ_le_mono in Hni.
+  specialize (H1 Hni).
+  split; [ easy | ].
+  destruct H1 as (H1, H2).
+  destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth1; [ | easy ].
+    specialize (Hpn2 i) as H3.
+    destruct (Nat.eq_dec i n) as [Hisn| Hisn]. 2: {
+      assert (H : S n ≤ i) by flia Hni Hisn.
+      specialize (H3 H); clear H.
+      destruct H3 as (H3, H4).
+      rewrite app_nth1 in H4; [ easy | easy ].
+    }
+    subst i; flia Hbn Hib.
+  }
+...
+    assert (H : i < S n) by flia Hni.
+    specialize (H3 H); clear H.
+    destruct H3 as (H3, H4).
+    rewrite app_nth1 in H4; [ easy | easy ].
+  }
+  apply Nat.nlt_ge in Hib.
+  rewrite app_nth2; [ | easy ].
+  rewrite app_nth2 in H2; [ | flia Hib ].
+  rewrite Nat.sub_succ_l in H2; [ easy | easy ].
+} {
+
+
 ... ...
   apply (permutation_firstn (0·) monom_eqb_eq) with
       (P := λ ma, mdeg ma = mdeg (hd (0·) la)). {
