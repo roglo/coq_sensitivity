@@ -853,6 +853,43 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
     now do 2 rewrite firstn_all.
   }
   destruct Hnl as (Hnl, Haa).
+(**)
+Theorem permutation_firstn : ∀ A (eqb : A → _) P n la lb,
+  (∀ i, i < n → P la i ∧ P lb i)
+  → (∀ i, n ≤ i → ¬ P la i ∧ ¬ P lb i)
+  → permutation eqb la lb
+  → permutation eqb (firstn n la) (firstn n lb).
+Proof.
+intros * Hpn1 Hpn2 Hpab.
+revert lb Hpn1 Hpn2 Hpab.
+induction la as [| ma]; intros. {
+  apply permutation_nil_l in Hpab; subst lb.
+  now rewrite firstn_nil.
+}
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hax & Haft).
+subst lb.
+destruct n; [ easy | ].
+rewrite firstn_cons.
+rewrite (List_cons_is_app x).
+rewrite app_assoc.
+rewrite firstn_app.
+...
+  apply permutation_firstn with
+      (P := λ l i, mdeg (nth i l (0·)) = mdeg (hd (0·) l)). {
+    intros i Hi.
+    specialize (Hbn _ Hi) as H1.
+    apply Bool.negb_false_iff in H1.
+    apply Nat.eqb_eq in H1.
+    split; [ easy | ].
+    rewrite <- Hdd, H1.
+    do 2 rewrite List_hd_nth_0.
+    apply Hdd.
+  }
+...
   apply Bool.negb_true_iff in Haa.
   apply Nat.eqb_neq in Haa.
   clear Hsb Hdd Hlenb Hlena.
