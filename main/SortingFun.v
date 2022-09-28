@@ -11,9 +11,6 @@ Require Import Misc PermutationFun.
 
 (* relation properties *)
 
-Definition reflexive A (rel : A → A → bool) :=
-  ∀ a, rel a a = true.
-
 Definition irreflexive A (rel : A → A → bool) :=
   ∀ a, rel a a = false.
 
@@ -1350,7 +1347,8 @@ revert a.
 induction la as [| b]; intros; [ now apply permutation_refl | cbn ].
 destruct (rel a b); [ now apply permutation_refl | ].
 eapply (permutation_trans Heqb); [ now apply permutation_swap | ].
-now apply permutation_skip.
+apply permutation_skip; [ | easy ].
+now unfold reflexive; apply equality_refl.
 Qed.
 
 Theorem permutation_cons_isort_insert : ∀ A (eqb rel : A → _),
@@ -1394,8 +1392,8 @@ destruct ab. 2: {
     now apply permutation_cons_isort_insert_id.
   }
   cbn in Hli.
-  injection Hli; clear Hli; intros Hli H; subst c.
-  cbn; apply permutation_skip; [ easy | ].
+  injection Hli; clear Hli; intros Hli H; subst c; cbn.
+  apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
   apply IHla; [ | easy ].
   now intros c Hc; apply Hbef; right.
 }
@@ -1484,7 +1482,8 @@ destruct ac. {
     specialize (IHla _ _ _ Hlc) as H1.
     apply permutation_cons_l_iff in H1; cbn in H1.
     rewrite (equality_refl Heqb) in H1; cbn in H1.
-    now apply (permutation_skip Heqb).
+    apply permutation_skip; [ | easy ].
+    now unfold reflexive; apply equality_refl.
   }
   remember (eqb a c) as eac eqn:Heac; symmetry in Heac.
   destruct eac. {
@@ -1541,7 +1540,8 @@ assert (H : length lc ≤ len). {
 specialize (H1 H); clear H.
 apply (select_first_permutation rel Heqb) in Hlc.
 apply (permutation_trans Heqb) with (lb := c :: lc); [ easy | ].
-now apply permutation_skip.
+apply permutation_skip; [ | easy ].
+now unfold reflexive; apply equality_refl.
 Qed.
 
 Theorem select_first_if : ∀ A (rel : A → _),
@@ -2089,6 +2089,7 @@ destruct ab. {
     apply (permutation_app_comm Heqb).
   }
   cbn.
+...
   apply (permutation_skip Heqb).
   eapply (permutation_trans Heqb). {
     apply IHit; [ | apply Hit ]; easy.

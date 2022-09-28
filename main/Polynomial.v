@@ -855,6 +855,49 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   destruct Hnl as (Hnl, Haa).
   apply Bool.negb_true_iff in Haa.
   apply Nat.eqb_neq in Haa.
+  clear Hsb Hdd Hlenb Hbn Haa Hlena.
+  revert n lb Hpab Hnl.
+  induction la as [| ma]; intros; [ easy | ].
+  assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+  specialize (IHla H); clear H.
+  destruct n; [ easy | ].
+  cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+  apply permutation_cons_l_iff in Hpab.
+  remember (extract (monom_eqb ma) lb) as lxl eqn:Hlxl; symmetry in Hlxl.
+  destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+  apply extract_Some_iff in Hlxl.
+  destruct Hlxl as (Hbef & H & Haft).
+  apply monom_eqb_eq in H; subst x lb.
+  destruct bef as [| mb]. {
+    cbn; apply (permutation_skip monom_eqb_eq).
+...
+  destruct la as [| mb]. {
+    now apply Nat.lt_1_r in Hnl; subst n.
+  }
+  destruct la as [| mc]. {
+    cbn in Hnl.
+    destruct n; [ easy | cbn ].
+    destruct n; [ clear Hnl; cbn | cbn in Hnl; flia Hnl ].
+    cbn in Hlena; apply Nat.succ_inj in Hlena; subst len.
+    destruct lb as [| mc]; [ easy | ].
+    destruct lb as [| md]; [ easy | ].
+    destruct lb; [ clear Hlenb | easy ].
+    cbn in Haa; clear Hbn.
+    specialize (Hdd 0) as H1; cbn in H1.
+    specialize (Hdd 1) as H2; cbn in H2.
+    clear Hdd.
+    apply permutation_cons_l_iff in Hpab.
+    cbn in Hpab.
+    rewrite if_bool_if_dec in Hpab.
+    destruct (bool_dec (monom_eqb ma mc)) as [Hac| Hac]. {
+      apply monom_eqb_eq in Hac; subst mc.
+      apply (permutation_refl monom_eqb_eq).
+    }
+    rewrite if_bool_if_dec in Hpab.
+    destruct (bool_dec (monom_eqb ma md)) as [Had| Had]; [ | easy ].
+    apply monom_eqb_eq in Had.
+    congruence.
+  }
 ...
   generalize Hpab; intros Ha.
   apply (map_permutation_assoc monom_eqb_eq) with (d := Mon 0 0) in Ha.

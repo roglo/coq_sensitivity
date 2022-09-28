@@ -10,6 +10,9 @@ Import List List.ListNotations.
 
 Require Import Misc.
 
+Definition reflexive A (rel : A → A → bool) :=
+  ∀ a, rel a a = true.
+
 Fixpoint is_permutation {A} (eqb : A → A → bool) (la lb : list A) :=
   match la with
   | [] => match lb with [] => true | _ => false end
@@ -520,12 +523,12 @@ Theorem permutation_nil_nil : ∀ A (eqb : A → _), permutation eqb [] [].
 Proof. easy. Qed.
 
 Theorem permutation_skip : ∀ A (eqb : A → _),
-  equality eqb →
-  ∀ a la lb, permutation eqb la lb → permutation eqb (a :: la) (a :: lb).
+  reflexive eqb
+  → ∀ a la lb, permutation eqb la lb → permutation eqb (a :: la) (a :: lb).
 Proof.
 intros * Heqb * Hpab; cbn.
 apply permutation_cons_l_iff; cbn.
-now rewrite (equality_refl Heqb).
+now rewrite Heqb.
 Qed.
 
 Theorem permutation_swap : ∀ A (eqb : A → _),
@@ -681,7 +684,8 @@ intros * Heqb *.
 revert x.
 induction l as [| a]; intros; [ now apply permutation_refl | cbn ].
 eapply (permutation_trans Heqb); [ apply (permutation_swap Heqb) | ].
-now apply permutation_skip.
+apply permutation_skip; [ | easy ].
+now unfold reflexive; apply equality_refl.
 Qed.
 
 Theorem permutation_app_comm : ∀ A (eqb : A → _),
@@ -856,7 +860,8 @@ eapply (permutation_trans Heqb). {
   apply (permutation_sym Heqb).
   apply (permutation_cons_append Heqb).
 }
-now apply (permutation_skip Heqb).
+apply permutation_skip; [ | easy ].
+now unfold reflexive; apply equality_refl.
 Qed.
 
 Theorem permutation_rev_r : ∀ A (eqb : A → _),
@@ -868,7 +873,8 @@ induction l as [| a]; [ easy | cbn ].
 eapply (permutation_trans Heqb). 2: {
   apply (permutation_cons_append Heqb).
 }
-now apply (permutation_skip Heqb).
+apply permutation_skip; [ | easy ].
+now unfold reflexive; apply equality_refl.
 Qed.
 
 Theorem permutation_length : ∀ A (eqb : A → _) la lb,
@@ -2249,7 +2255,8 @@ destruct pa as (ld, le).
 specialize (IHla _ _ eq_refl).
 remember (f a) as b eqn:Hb; symmetry in Hb.
 destruct b; injection Hp; clear Hp; intros; subst lb lc. {
-  now cbn; apply (permutation_skip Heqb).
+  cbn; apply permutation_skip; [ | easy ].
+  now unfold reflexive; apply equality_refl.
 } {
   now apply (permutation_cons_app Heqb).
 }
