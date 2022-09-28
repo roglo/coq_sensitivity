@@ -2089,8 +2089,7 @@ destruct ab. {
     apply (permutation_app_comm Heqb).
   }
   cbn.
-...
-  apply (permutation_skip Heqb).
+  apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
   eapply (permutation_trans Heqb). {
     apply IHit; [ | apply Hit ]; easy.
   }
@@ -2106,7 +2105,7 @@ eapply (permutation_trans Heqb). {
   apply (permutation_app_comm Heqb).
 }
 cbn.
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 eapply (permutation_trans Heqb). 2: {
   apply (permutation_app_comm Heqb).
 }
@@ -2157,12 +2156,12 @@ do 2 apply Nat.succ_inj in Hlen.
 remember (split_list l) as ll eqn:Hll'; symmetry in Hll'.
 destruct ll as (lc, ld).
 injection Hll; clear Hll; intros; subst la lb; cbn.
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 eapply (permutation_trans Heqb). 2: {
   apply (permutation_app_comm Heqb).
 }
 cbn.
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 eapply (permutation_trans Heqb). 2: {
   apply (permutation_app_comm Heqb).
 }
@@ -2204,14 +2203,14 @@ destruct lb as [| b]. {
   rewrite app_nil_r.
   apply (permutation_refl Heqb).
 }
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 apply (permutation_trans Heqb) with (lb := (b :: (la ++ lb))). {
   rewrite List_app_cons, app_assoc, app_comm_cons.
   apply (permutation_app_tail Heqb).
   apply (permutation_sym Heqb).
   apply (permutation_cons_append Heqb).
 }
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 apply IHla.
 Qed.
 
@@ -2256,12 +2255,12 @@ rewrite (List_cons_is_app a).
 rewrite (List_cons_is_app b).
 rewrite <- app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 rewrite (List_cons_is_app b).
 do 3 rewrite <- app_assoc.
 rewrite app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | cbn ].
-apply (permutation_skip Heqb).
+apply permutation_skip; [ now unfold reflexive; apply equality_refl | ].
 rewrite <- app_assoc.
 eapply (permutation_trans Heqb); [ now apply permutation_app_comm | ].
 do 2 rewrite <- app_assoc.

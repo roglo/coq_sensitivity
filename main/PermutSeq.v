@@ -2076,7 +2076,7 @@ destruct (lt_dec d (length lb)!) as [Hdb| Hdb]. {
   subst a.
   rewrite List_nth_0_cons in Hla.
   subst la.
-  apply (permutation_skip Nat.eqb_eq).
+  apply permutation_skip; [ now intros a; apply Nat.eqb_eq | ].
   apply IHlb.
   unfold succ_when_ge in Hle.
   erewrite map_ext_in in Hle. 2: {
@@ -2211,7 +2211,7 @@ rewrite app_comm_cons.
 eapply (permutation_trans Nat.eqb_eq). 2: {
   apply (permutation_middle Nat.eqb_eq).
 }
-apply (permutation_skip Nat.eqb_eq).
+apply permutation_skip; [ now intros a; apply Nat.eqb_eq | ].
 cbn - [ nth skipn ].
 rewrite fold_butn.
 rewrite List_map_nth_seq with (d := 0).

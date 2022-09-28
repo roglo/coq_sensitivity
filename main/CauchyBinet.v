@@ -1073,7 +1073,8 @@ induction la as [| a]; [ easy | cbn ].
 rewrite if_bool_if_dec.
 destruct (bool_dec (f a)) as [Hfa| Hfa]. {
   rewrite Hfa; cbn.
-  apply (permutation_skip Heqb), IHla.
+  apply permutation_skip; [ now intros b; apply Heqb | ].
+  apply IHla.
 } {
   rewrite Hfa; cbn.
   apply (permutation_cons_app Heqb), IHla.
