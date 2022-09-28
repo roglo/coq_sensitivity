@@ -855,8 +855,8 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   destruct Hnl as (Hnl, Haa).
   apply Bool.negb_true_iff in Haa.
   apply Nat.eqb_neq in Haa.
-  clear Hsb Hdd Hlenb Hbn Haa Hlena.
-  revert n lb Hpab Hnl.
+  clear Hsb Hdd Hlenb Hlena.
+  revert n lb Hpab Hnl Hbn Haa.
   induction la as [| ma]; intros; [ easy | ].
   assert (H : sorted rel la) by now apply sorted_cons in Hsa.
   specialize (IHla H); clear H.
@@ -869,7 +869,13 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
   destruct Hlxl as (Hbef & H & Haft).
   apply monom_eqb_eq in H; subst x lb.
   destruct bef as [| mb]. {
-    cbn; apply (permutation_skip monom_eqb_eq).
+    cbn; apply permutation_skip; [ now intros a; apply monom_eqb_eq | ].
+    apply IHla; [ easy | easy | | ]. {
+      intros j Hj.
+      cbn in Haa.
+...
+  }
+  cbn.
 ...
   destruct la as [| mb]. {
     now apply Nat.lt_1_r in Hnl; subst n.
