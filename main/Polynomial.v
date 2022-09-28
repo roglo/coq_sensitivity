@@ -868,6 +868,34 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       apply Nat.eqb_neq in Haa.
       intros Hiz; apply Haa; clear Haa.
 (* si c'eat bon en i, dans tous ceux qui sont avant, dont n, c'est bon *)
+      clear - Hsa Hi Hiz.
+      destruct la as [| ma]; [ now destruct n | ].
+      cbn - [ nth ] in Hiz |-*.
+      revert n i ma Hi Hiz Hsa.
+      induction la as [| mb]; intros. {
+        destruct n; [ easy | ].
+        destruct i; [ easy | ].
+        destruct n. {
+          cbn in Hiz |-*.
+          now destruct i.
+        }
+        cbn in Hiz |-*.
+        now destruct i.
+      }
+      destruct n; [ easy | ].
+      rewrite List_nth_succ_cons.
+      destruct i; [ easy | ].
+      rewrite List_nth_succ_cons in Hiz.
+      apply Nat.succ_le_mono in Hi.
+      rewrite IHla with (i := i).
+(* ouais bon non ça marche pas *)
+...
+      induction la as [| mb]; intros; [ now destruct n; cbn | ].
+      assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+      specialize (IHla H); clear H.
+      cbn - [ nth ] in Hiz |-*.
+      destruct n; [ easy | cbn ].
+      destruct i; [ easy | cbn in Hiz ].
 ...
       destruct la as [| ma]; [ easy | ].
       cbn - [ nth ] in Haa |-*.
