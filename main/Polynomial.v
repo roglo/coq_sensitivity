@@ -903,6 +903,21 @@ apply IHla; [ | | easy | easy ]. {
   specialize (Hpn1 _ Hi) as H1.
   cbn in H1.
   split; [ easy | ].
+  destruct H1 as (H1, H2).
+  destruct (lt_dec i (length bef)) as [Hib| Hib]. {
+    rewrite app_nth1; [ | easy ].
+    specialize (Hpn1 i) as H3.
+    assert (H : i < S n) by flia Hi.
+    specialize (H3 H); clear H.
+    destruct H3 as (H3, H4).
+    rewrite app_nth1 in H4; [ easy | easy ].
+  }
+  apply Nat.nlt_ge in Hib.
+  rewrite app_nth2; [ | easy ].
+  rewrite app_nth2 in H2; [ | flia Hib ].
+  rewrite Nat.sub_succ_l in H2; [ easy | easy ].
+} {
+  intros i Hni.
 ... ...
   apply (permutation_firstn (0·) monom_eqb_eq) with
       (P := λ ma, mdeg ma = mdeg (hd (0·) la)). {
