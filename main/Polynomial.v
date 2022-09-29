@@ -922,6 +922,15 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
     now apply Hba; right.
   }
 }
+assert
+  (Hss :
+     ∑ (ma ∈ firstn n la), mcoeff ma = ∑ (mb ∈ firstn n lb), mcoeff mb). {
+  now apply (rngl_summation_list_permut _ monom_eqb_eq).
+}
+assert
+  (H : mcoeff (hd (0·) (merge_mon la)) = mcoeff (hd (0·) (merge_mon lb))). {
+  etransitivity. {
+    etransitivity; [ | apply Hss ].
 ...
 destruct la as [| ma]; [ easy | ].
 cbn in Hlena; apply Nat.succ_inj in Hlena.
