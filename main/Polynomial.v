@@ -921,6 +921,41 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
     now apply Hba; right.
   }
 }
+destruct la as [| ma]; [ easy | ].
+cbn in Hlena; apply Nat.succ_inj in Hlena.
+cbn in Hn.
+rewrite Nat.eqb_refl in Hn; cbn in Hn.
+apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply monom_eqb_eq in H; subst x lb.
+rewrite app_length in Hlenb; cbn in Hlenb.
+rewrite Nat.add_succ_r, <- app_length in Hlenb.
+apply Nat.succ_inj in Hlenb.
+specialize (IHlen la (bef ++ aft)) as H1.
+assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+specialize (H1 H); clear H.
+assert (H : sorted rel (bef ++ aft)). {
+  apply (sorted_app_iff Htra) in Hsb.
+  apply (sorted_app_iff Htra).
+  split; [ easy | ].
+  destruct Hsb as (Hsb & Haa & Hab).
+  split; [ now apply sorted_cons in Haa | ].
+  intros mb mc Hmb Hmc.
+  apply Hab; [ easy | now right ].
+}
+specialize (H1 H); clear H.
+specialize (H1 Hpab).
+assert (H : ∀ i, mdeg (nth i la (0·)) = mdeg (nth i (bef ++ aft) (0·))). {
+  intros i.
+  destruct (lt_dec (S i) (length bef)) as [Hib| Hib]. {
+    specialize (Hdd (S i)) as H2.
+    cbn in H2.
+    rewrite app_nth1 in H2; [ | easy ].
+    rewrite app_nth1; [ | flia Hib ].
+(* mouais, bof *)
 ...
         destruct la as [| mc]; [ easy | ].
         destruct i; cbn in Hiz |-*. {
