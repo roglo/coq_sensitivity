@@ -843,12 +843,14 @@ induction len; intros. {
 }
 remember (List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la) as n eqn:Hn.
 assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
+  clear - Heq Hn Hlena Hlenb Hpab Hdd Hsa.
+  rewrite <- Hlenb in Hlena; clear Hlenb.
   symmetry in Hn.
   apply (List_rank_if (Mon 0 0)) in Hn.
   destruct Hn as (Hbn, Hnl).
   destruct Hnl as [Hnl| Hnl]. 2: {
     rewrite Hnl at 1.
-    rewrite Hlena, <- Hlenb in Hnl.
+    rewrite Hlena in Hnl.
     rewrite Hnl.
     now do 2 rewrite firstn_all.
   }
@@ -866,7 +868,7 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
     apply Bool.negb_true_iff in Haa.
     apply Nat.eqb_neq in Haa.
     rewrite <- Hdd.
-    clear - Haa Hsa Hi.
+    clear - Haa Hsa Hi rel.
     enough (H : mdeg (nth i la (0·)) ≠ mdeg (hd (0·) la)) by easy.
     intros Hiz; apply Haa; clear Haa.
     (* lemma, here, perhaps? *)
