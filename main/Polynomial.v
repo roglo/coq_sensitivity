@@ -802,7 +802,6 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
 }
 clear Hrr.
 (*
-...
 apply sorted_le_sorted_lt_merge_mon in Hsab.
 apply sorted_le_sorted_lt_merge_mon in Hsba.
 set (f := λ ma mb : monom T, mdeg mb <? mdeg ma).
@@ -820,7 +819,6 @@ apply H1; [ | | easy | easy | ]. {
   now transitivity (mdeg mb).
 }
 clear H1.
-Search merge_mon.
 ...
   ============================
   permutation monom_eqb (merge_mon lab) (merge_mon lba)
