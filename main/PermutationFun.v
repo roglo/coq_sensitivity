@@ -2772,7 +2772,7 @@ Theorem permutation_firstn : ∀ A (eqb : A → _) d,
   equality eqb →
   ∀ P n la lb,
   (∀ i, i < n → P (nth i la d) ∧ P (nth i lb d))
-  → (∀ i, n ≤ i → ¬ P (nth i la d) ∧ ¬ P (nth i lb d))
+  → (∀ i, n ≤ i < length la → ¬ P (nth i la d) ∧ ¬ P (nth i lb d))
   → permutation eqb la lb
   → permutation eqb (firstn n la) (firstn n lb).
 Proof.
@@ -2796,7 +2796,13 @@ destruct n; [ easy | ].
 rewrite firstn_cons.
 assert (Hbn : length bef ≤ n). {
   apply Nat.nlt_ge; intros H1.
-  specialize (Hpn2 _ H1) as H2.
+  specialize (Hpn2 (length bef)) as H2.
+  assert (H : S n ≤ length bef < length (ma :: la)). {
+    split; [ easy | ].
+    apply permutation_length in Hpab.
+    rewrite app_length in Hpab; cbn; flia Hpab.
+  }
+  specialize (H2 H); clear H.
   destruct H2 as (H2, H3).
   rewrite app_nth2 in H3; [ | flia ].
   rewrite Nat.sub_diag in H3; cbn in H3.
@@ -2833,15 +2839,17 @@ apply IHla; [ | | easy | easy ]. {
 } {
   intros i Hni.
   specialize (Hpn2 (S i)) as H1.
-  apply Nat.succ_le_mono in Hni.
-  specialize (H1 Hni).
+  cbn in H1.
+  assert (Hnia : S n ≤ S i < S (length la)) by flia Hni.
+  specialize (H1 Hnia).
   split; [ easy | ].
   destruct H1 as (H1, H2).
+  cbn - [ nth ] in Hpn2.
   destruct (lt_dec i (length bef)) as [Hib| Hib]. {
     rewrite app_nth1; [ | easy ].
     specialize (Hpn2 i) as H3.
     destruct (Nat.eq_dec i n) as [Hisn| Hisn]. 2: {
-      assert (H : S n ≤ i) by flia Hni Hisn.
+      assert (H : S n ≤ i < S (length la)) by flia Hni Hisn.
       specialize (H3 H); clear H.
       destruct H3 as (H3, H4).
       rewrite app_nth1 in H4; [ easy | easy ].
@@ -2850,7 +2858,7 @@ apply IHla; [ | | easy | easy ]. {
   }
   apply Nat.nlt_ge in Hib.
   rewrite app_nth2; [ | easy ].
-  specialize (Hpn2 (S i) Hni) as H3.
+  specialize (Hpn2 (S i) Hnia) as H3.
   destruct H3 as (H3, H4).
   rewrite app_nth2 in H4; [ | flia Hib ].
   rewrite Nat.sub_succ_l in H4; [ easy | easy ].
