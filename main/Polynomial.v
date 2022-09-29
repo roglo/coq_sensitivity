@@ -869,13 +869,13 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       intros Hiz; apply Haa; clear Haa.
 (* si c'eat bon en i, dans tous ceux qui sont avant, dont n, c'est bon *)
       clear - Hsa Hi Hiz.
-      rewrite <- Hiz.
       destruct la as [| ma]; [ now destruct n | ].
       cbn - [ nth ] in Hiz |-*.
       destruct n; [ easy | cbn ].
       destruct i; [ easy | cbn in Hi, Hiz ].
       assert (H : n ≤ i < length la) by flia Hi.
       clear Hi; rename H into Hi.
+...
       revert la i Hsa Hi Hiz.
       induction n; intros. {
         destruct Hi as (_, Hi).
@@ -885,7 +885,7 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
         destruct la as [| mb]; [ easy | cbn in Hiz |-* ].
         cbn in Hi; apply Nat.succ_lt_mono in Hi.
 specialize (IHi i (Nat.lt_succ_diag_r _) la) as H1.
-assert (H : sorted rel (ma :: la)) by admit.
+assert (H : sorted rel (ma :: la)) by _admit.
 specialize (H1 H Hi Hiz); clear H.
 (* ah chiasse de pute de merde *)
 ...
