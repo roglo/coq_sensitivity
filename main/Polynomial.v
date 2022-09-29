@@ -867,27 +867,56 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       apply Bool.negb_true_iff in Haa.
       apply Nat.eqb_neq in Haa.
       intros Hiz; apply Haa; clear Haa.
-(* si c'eat bon en i, dans tous ceux qui sont avant, dont n, c'est bon *)
       clear - Hsa Hi Hiz.
+      (* lemma, here, perhaps? *)
       destruct la as [| ma]; [ now destruct n | ].
       cbn - [ nth ] in Hiz |-*.
       destruct n; [ easy | cbn ].
       destruct i; [ easy | cbn in Hi, Hiz ].
       assert (H : n ≤ i < length la) by flia Hi.
       clear Hi; rename H into Hi.
-...
-      revert la i Hsa Hi Hiz.
+      destruct Hi as (Hni, Hia).
+      (* or statring the lemma here... *)
+      assert (Htra : transitive rel). {
+        unfold rel; intros a b c Hab Hbc.
+        apply Nat.leb_le in Hab, Hbc.
+        apply Nat.leb_le.
+        now transitivity (mdeg b).
+      }
+      apply (sorted_cons_iff Htra) in Hsa.
+      destruct Hsa as (Hsa, Hba).
+      assert (H : ∀ mb, mb ∈ la → mdeg mb ≤ mdeg ma). {
+        intros mb Hmb.
+        specialize (Hba _ Hmb).
+        now apply Nat.leb_le in Hba.
+      }
+      move H before Hba; clear Hba.
+      rename H into Hba.
+      revert la i Hsa Hba Hiz Hni Hia.
       induction n; intros. {
-        destruct Hi as (_, Hi).
-        revert la Hsa Hi Hiz.
-        induction i as (i, IHi) using lt_wf_rec; intros.
         destruct i; [ easy | ].
-        destruct la as [| mb]; [ easy | cbn in Hiz |-* ].
-        cbn in Hi; apply Nat.succ_lt_mono in Hi.
-specialize (IHi i (Nat.lt_succ_diag_r _) la) as H1.
-assert (H : sorted rel (ma :: la)) by _admit.
-specialize (H1 H Hi Hiz); clear H.
-(* ah chiasse de pute de merde *)
+        destruct la as [| mb]; [ easy | ].
+        cbn in Hia |-*; apply Nat.succ_lt_mono in Hia.
+        cbn in Hiz.
+        specialize (Hba _ (or_introl eq_refl)) as H1.
+        apply (sorted_cons_iff Htra) in Hsa.
+        destruct Hsa as (Hsa, Hb'a).
+        specialize (Hb'a (nth i la (0·))) as H2.
+        assert (H : nth i la (0·) ∈ la) by now apply nth_In.
+        specialize (H2 H); clear H.
+        apply Nat.leb_le in H2.
+        rewrite Hiz in H2.
+        now apply Nat.le_antisymm.
+      }
+      destruct i; [ easy | ].
+      destruct la as [| mb]; [ easy | ].
+      cbn in Hiz, Hia |-*; apply Nat.succ_lt_mono in Hia.
+      apply Nat.succ_le_mono in Hni.
+      apply sorted_cons in Hsa.
+      apply IHn with (i := i); [ easy | | easy | easy | easy ].
+      intros mc Hmc.
+      now apply Hba; right.
+    }
 ...
         destruct la as [| mc]; [ easy | ].
         destruct i; cbn in Hiz |-*. {
