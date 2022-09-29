@@ -871,6 +871,18 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       clear - Hsa Hi Hiz.
       destruct la as [| ma]; [ now destruct n | ].
       cbn - [ nth ] in Hiz |-*.
+...
+revert ma la i Hsa Hi Hiz.
+induction n; intros; cbn; [ easy | ].
+destruct i; [ easy | ].
+cbn in Hiz.
+apply Nat.succ_le_mono in Hi.
+destruct la as [| mb]. {
+  cbn in Hiz |-*.
+  now rewrite Tauto_match_nat_same in Hiz |-*.
+}
+apply IHn.
+...
       revert n i ma Hi Hiz Hsa.
       induction la as [| mb]; intros. {
         destruct n; [ easy | ].
