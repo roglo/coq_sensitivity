@@ -867,6 +867,15 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       apply Bool.negb_true_iff in Haa.
       apply Nat.eqb_neq in Haa.
       intros Hiz; apply Haa; clear Haa.
+      destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+        apply Nat.nlt_ge in Hila.
+        rewrite nth_overflow in Hiz; [ cbn in Hiz | easy ].
+        destruct la as [| ma]; [ easy | ].
+        cbn - [ nth ] in Hiz |-*.
+        destruct n; [ easy | cbn ].
+...
+        destruct n. {
+...
 (* si c'eat bon en i, dans tous ceux qui sont avant, dont n, c'est bon *)
       clear - Hsa Hi Hiz.
       destruct la as [| ma]; [ now destruct n | ].
@@ -874,6 +883,10 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       destruct n; [ easy | cbn ].
       destruct i; [ easy | cbn in Hiz ].
       apply Nat.succ_le_mono in Hi.
+      revert la i Hsa Hi Hiz.
+      induction n; intros. {
+        destruct i; [ easy | ].
+        destruct la as [| mb]; [ easy | cbn in Hiz |-* ].
 ...
 revert ma la i Hsa Hi Hiz.
 induction n; intros; cbn; [ easy | ].
