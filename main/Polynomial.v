@@ -842,7 +842,7 @@ induction len; intros. {
   now apply length_zero_iff_nil in Hlena, Hlenb; subst la lb.
 }
 remember (List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la) as n eqn:Hn.
-assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
+assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
   symmetry in Hn.
   apply (List_rank_if (Mon 0 0)) in Hn.
   destruct Hn as (Hbn, Hnl).
