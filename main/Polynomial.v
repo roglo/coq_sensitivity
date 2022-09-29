@@ -931,6 +931,29 @@ assert
   (H : mcoeff (hd (0·) (merge_mon la)) = mcoeff (hd (0·) (merge_mon lb))). {
   etransitivity. {
     etransitivity; [ | apply Hss ].
+    clear Hss Hpf; subst n.
+    clear Hsa Hpab Hdd Hlena.
+    induction la as [| ma].  {
+      now cbn; rewrite rngl_summation_list_empty.
+    }
+    cbn.
+    rewrite Nat.eqb_refl; cbn.
+    unfold same_deg_sum_coeff at 1.
+    remember (fold_right same_deg_sum_coeff [] la) as lc eqn:Hlc.
+    symmetry in Hlc.
+    destruct lc as [| mc]. {
+      cbn.
+      destruct la as [| ma']. {
+        now cbn; rewrite rngl_summation_list_only_one.
+      }
+      cbn in Hlc.
+      unfold same_deg_sum_coeff in Hlc at 1.
+      destruct (fold_right same_deg_sum_coeff [] la); [ easy | ].
+      now destruct (mdeg ma' =? mdeg m).
+    }
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+      cbn.
 ...
 destruct la as [| ma]; [ easy | ].
 cbn in Hlena; apply Nat.succ_inj in Hlena.
