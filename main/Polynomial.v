@@ -887,6 +887,19 @@ assert (H : permutation monom_eqb (firstn n la) (firstn n lb)). {
       destruct i; [ easy | ].
       rewrite List_nth_succ_cons in Hiz.
       apply Nat.succ_le_mono in Hi.
+destruct n; cbn. 2: {
+  destruct i; [ easy | ].
+  cbn in Hiz.
+...
+destruct i. {
+  cbn in Hiz.
+  now apply Nat.le_0_r in Hi; subst n.
+}
+cbn in Hiz.
+destruct n. {
+  cbn.
+  destruct i. {
+...
       rewrite IHla with (i := i).
 (* ouais bon non ça marche pas *)
 ...
