@@ -923,15 +923,9 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
 assert (Hps : permutation monom_eqb (skipn n la) (skipn n lb)). {
   rewrite <- (firstn_skipn n la) in Hpab.
   rewrite <- (firstn_skipn n lb) in Hpab.
-Theorem permutation_app_permutation_l : ∀ A (eqb : A → _) la lb lc ld,
-  permutation eqb (la ++ lb) (lc ++ ld)
-  → permutation eqb la lc
-  → permutation eqb lb ld.
-Proof.
-intros * Habcd Hac.
-... ...
-  now apply permutation_app_permutation_l with (la := firstn n la) in Hpab.
-...
+  apply permutation_app_permutation_l with (la := firstn n la) in Hpab;
+    [ easy | apply monom_eqb_eq | easy ].
+}
 symmetry in Hn.
 apply (List_rank_if (Mon 0 0)) in Hn.
 destruct Hn as (Hbn, Hnl).
@@ -954,7 +948,7 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
     now rewrite Hlenb, <- Hlena; apply Nat.lt_le_incl.
   }
   assert (H : sorted rel (firstn n la)). {
-    clear lb len Hdab Hpf H1 Hsb Hpab Hdd Hlenb IHlen Hlena.
+    clear lb len Hdab Hpf H1 Hsb Hpab Hdd Hlenb IHlen Hlena Hps.
     revert n Hbn Hnl.
     induction la as [| ma]; intros; [ easy | ].
     assert (H : sorted rel la) by now apply sorted_cons in Hsa.
@@ -983,7 +977,7 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
       rewrite List_hd_nth_0, <- Hdd, <- List_hd_nth_0.
       now apply Hbn.
     }
-    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf H1.
+    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf H1 Hps.
     rename Hbn' into Hbn.
     revert n Hbn Hnl.
     induction lb as [| mb]; intros; [ easy | ].
@@ -1030,6 +1024,7 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   specialize (H1 H); clear H.
   specialize (H1 eq_refl eq_refl).
+(* faire pareil pour skipn *)
 ...
 Theorem glop : ∀ la lb lc ld,
   let rel := λ ma mb, mdeg mb <=? mdeg ma in

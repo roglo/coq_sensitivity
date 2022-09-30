@@ -2865,6 +2865,40 @@ apply IHla; [ | | easy | easy ]. {
 }
 Qed.
 
+Theorem permutation_app_permutation_l : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ la lb lc ld,
+  permutation eqb (la ++ lb) (lc ++ ld)
+  → permutation eqb la lc
+  → permutation eqb lb ld.
+Proof.
+intros * Heqb * Habcd Hac.
+revert lb lc ld Habcd Hac.
+induction la as [| a]; intros. {
+  now apply permutation_nil_l in Hac; subst lc.
+}
+cbn in Habcd.
+apply permutation_cons_l_iff in Hac.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hax & Haft); subst lc.
+apply Heqb in Hax; subst x.
+rewrite <- app_assoc in Habcd; cbn in Habcd.
+assert (H : permutation eqb (la ++ lb) (bef ++ aft ++ ld)). {
+  apply (permutation_cons_inv Heqb) with (a := a).
+  eapply (permutation_trans Heqb); [ apply Habcd | ].
+  rewrite List_cons_is_app.
+  rewrite (List_cons_is_app a (bef ++ aft ++ ld)).
+  do 4 rewrite app_assoc.
+  do 2 apply (permutation_app_tail Heqb).
+  apply (permutation_sym Heqb); cbn.
+  apply (permutation_cons_append Heqb).
+}
+rewrite app_assoc in H.
+now apply IHla in H.
+Qed.
+
 (* *)
 
 Require Import Permutation.
