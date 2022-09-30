@@ -923,7 +923,16 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
 symmetry in Hn.
 apply (List_rank_if (Mon 0 0)) in Hn.
 destruct Hn as (Hbn, Hnl).
+assert (H : ∀ j, j < n → mdeg (nth j la (0·)) = mdeg (hd (0·) la)). {
+  intros j Hj.
+  specialize (Hbn _ Hj).
+  apply Bool.negb_false_iff in Hbn.
+  now apply Nat.eqb_eq in Hbn.
+}
+move H before Hbn; clear Hbn; rename H into Hbn.
 destruct Hnl as [(Hnl, Hdab)| Hnl]. {
+  apply Bool.negb_true_iff in Hdab.
+  apply Nat.eqb_neq in Hdab.
   specialize (IHlen n) as H1.
   rewrite <- Hlena in H1.
   specialize (H1 Hnl (firstn n la) (firstn n lb)).
@@ -956,9 +965,7 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   specialize (H1 H); clear H.
   assert (H : sorted rel (firstn n lb)). {
     rewrite Hlena, <- Hlenb in Hnl.
-    assert
-      (Hbn' :
-         ∀ j, j < n → (mdeg (nth j lb (0·)) ≠? mdeg (hd (0·) lb)) = false). {
+    assert (Hbn' : ∀ j, j < n → (mdeg (nth j lb (0·)) = mdeg (hd (0·) lb))). {
       intros j Hj.
       rewrite <- Hdd.
       rewrite List_hd_nth_0, <- Hdd, <- List_hd_nth_0.
