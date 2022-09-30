@@ -1024,9 +1024,12 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
     now rewrite Hlenb, <- Hlena; apply Nat.lt_le_incl.
   }
   specialize (H1 eq_refl eq_refl).
-  specialize (IHlen n) as H2.
+...
+  specialize (IHlen (length la - n)) as H2.
   rewrite <- Hlena in H2.
   specialize (H2 Hnl (skipn n la) (skipn n lb)).
+rewrite skipn_length in H2.
+...
   assert (H : sorted rel (skipn n la)). {
     clear lb len Hdab Hpf H1 H2 Hsb Hpab Hdd Hlenb IHlen Hlena Hps.
     destruct la as [| ma]; intros; [ easy | ].
@@ -1055,26 +1058,21 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   specialize (H2 H); clear H.
   assert (H : sorted rel (skipn n lb)). {
-    rewrite Hlena, <- Hlenb in Hnl.
     assert (Hbn' : ∀ j, j < n → (mdeg (nth j lb (0·)) = mdeg (hd (0·) lb))). {
       intros j Hj.
       rewrite <- Hdd.
       rewrite List_hd_nth_0, <- Hdd, <- List_hd_nth_0.
       now apply Hbn.
     }
+    move Hbn' before Hbn; clear Hbn; rename Hbn' into Hbn.
+    rewrite Hlena, <- Hlenb in Hnl.
+    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hdab Hpf Hps H1 H2.
     destruct lb as [| mb]; intros; [ easy | ].
-    cbn - [ nth ] in Hbn'.
-    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf H1 H2 Hps.
-    rename Hbn' into Hbn.
-    revert n mb Hbn Hnl Hsb.
-    induction lb as [| ma]; intros. {
-      now apply Nat.lt_1_r in Hnl; subst n.
-    }
-    destruct n; [ easy | cbn ].
-    cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
-    apply IHlb; [ | easy | now apply sorted_cons in Hsb ].
-    intros j Hj.
-...
+    cbn - [ nth ] in Hbn.
+    destruct n; [ easy | ].
+    cbn in Hnl |-*; apply Nat.succ_lt_mono in Hnl.
+    revert n Hbn Hnl.
+    induction lb as [| ma]; intros; [ easy | ].
     assert (H : sorted rel (mb :: lb)). {
       apply (sorted_cons_iff Htra) in Hsb.
       apply (sorted_cons_iff Htra).
@@ -1085,49 +1083,33 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
       now apply Hbb; right.
     }
     specialize (IHlb H); clear H.
-    destruct n; [ easy | ].
+    destruct n; [ now cbn; apply sorted_cons in Hsb | cbn ].
     cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
-    cbn.
-    apply IHlb.
-    specialize (IHlb n); cbn.
-    apply (sorted_cons_iff Htra) in Hsb.
-    apply (sorted_cons_iff Htra).
-    destruct Hsb as (Hsb, Hsbb).
-    split. {
-      rewrite <- (firstn_skipn n) in Hsb.
-      now apply (sorted_app_iff Htra) in Hsb.
-    }
-    intros ma Hma.
-    apply Hsbb.
-    rewrite <- (firstn_skipn n).
-    now apply in_or_app; left.
+    apply IHlb; [ | easy ].
+    intros j Hj.
+    destruct j; [ easy | cbn ].
+    apply -> Nat.succ_lt_mono in Hj.
+    now specialize (Hbn _ Hj).
   }
-  specialize (H1 H); clear H.
-  specialize (H1 Hpf).
+  specialize (H2 H); clear H.
+  specialize (H2 Hps).
   assert
     (H :
        ∀ i,
-       mdeg (nth i (firstn n la) (0·)) = mdeg (nth i (firstn n lb) (0·))). {
+       mdeg (nth i (skipn n la) (0·)) = mdeg (nth i (skipn n lb) (0·))). {
     intros i.
-    destruct (lt_dec i n) as [Hin| Hin]. 2: {
+    destruct (lt_dec (n + i) (length la)) as [Hin| Hin]. 2: {
       apply Nat.nlt_ge in Hin.
-      rewrite nth_overflow. 2: {
-        rewrite firstn_length, min_l; [ easy | ].
-        now apply Nat.lt_le_incl.
-      }
-      rewrite nth_overflow. 2: {
-        rewrite firstn_length, min_l; [ easy | ].
-        rewrite Hlenb, <- Hlena.
-        now apply Nat.lt_le_incl.
-      }
-      easy.
+      rewrite nth_overflow; [ | rewrite skipn_length; flia Hin ].
+      rewrite nth_overflow; [ easy | ].
+      rewrite skipn_length, Hlenb, <- Hlena; flia Hin.
     }
-    rewrite List_nth_firstn; [ | easy ].
-    rewrite List_nth_firstn; [ | easy ].
+    do 2 rewrite List_nth_skipn.
     apply Hdd.
   }
-  specialize (H1 H); clear H.
-  do 2 rewrite firstn_length in H1.
+  specialize (H2 H); clear H.
+  do 2 rewrite skipn_length in H2.
+...
   rewrite min_l in H1; [ | now apply Nat.lt_le_incl ].
   rewrite min_l in H1. 2: {
     now rewrite Hlenb, <- Hlena; apply Nat.lt_le_incl.
