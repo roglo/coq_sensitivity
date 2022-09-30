@@ -1018,7 +1018,14 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   specialize (H1 H); clear H.
   specialize (H1 eq_refl eq_refl).
-(* bon, bin là, c'est vachement sympa *)
+Theorem glop : ∀ la lb lc ld,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  sorted rel (la ++ lc)
+  → sorted rel (lb ++ ld)
+  → merge_mon la = merge_mon lb
+  → merge_mon lc = merge_mon ld
+  → merge_mon (la ++ lc) = merge_mon (lb ++ ld).
+(* est-ce que c'est vrai ? à vérifier *)
 ...
 assert
   (Hss :
