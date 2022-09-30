@@ -1029,33 +1029,32 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   specialize (H2 Hnl (skipn n la) (skipn n lb)).
   assert (H : sorted rel (skipn n la)). {
     clear lb len Hdab Hpf H1 H2 Hsb Hpab Hdd Hlenb IHlen Hlena Hps.
-    revert n Hbn Hnl.
-    induction la as [| ma]; intros; [ easy | ].
-    assert (H : sorted rel la) by now apply sorted_cons in Hsa.
-    specialize (IHla H); clear H.
+    destruct la as [| ma]; intros; [ easy | ].
+    cbn - [ nth ] in Hbn.
     destruct n; [ easy | ].
-    cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
-    apply (IHla n); [ | easy ].
-    intros j Hj.
-    apply Nat.succ_lt_mono in Hj.
-    specialize (Hbn (S j) Hj) as H1.
-    cbn in H1.
-(* bin oui, mais non *)
-...
-    apply (sorted_cons_iff Htra) in Hsa.
-    apply (sorted_cons_iff Htra).
-    destruct Hsa as (Hsa, Hsb).
-    split. {
-      rewrite <- (firstn_skipn n) in Hsa.
-      now apply (sorted_app_iff Htra) in Hsa.
+    cbn in Hnl |-*; apply Nat.succ_lt_mono in Hnl.
+    revert n Hbn Hnl.
+    induction la as [| mb]; intros; [ easy | ].
+    assert (H : sorted rel (ma :: la)). {
+      apply (sorted_cons_iff Htra) in Hsa.
+      apply (sorted_cons_iff Htra).
+      destruct Hsa as (Hsa, Hba).
+      apply (sorted_cons_iff Htra) in Hsa.
+      split; [ easy | ].
+      intros mc Hmc.
+      now apply Hba; right.
     }
-    intros mb Hma.
-    apply Hsb.
-    rewrite <- (firstn_skipn n).
-    now apply in_or_app; left.
+    specialize (IHla H); clear H.
+    destruct n; [ now cbn; apply sorted_cons in Hsa | cbn ].
+    cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+    apply IHla; [ | easy ].
+    intros j Hj.
+    destruct j; [ easy | cbn ].
+    apply -> Nat.succ_lt_mono in Hj.
+    now specialize (Hbn _ Hj).
   }
-  specialize (H1 H); clear H.
-  assert (H : sorted rel (firstn n lb)). {
+  specialize (H2 H); clear H.
+  assert (H : sorted rel (skipn n lb)). {
     rewrite Hlena, <- Hlenb in Hnl.
     assert (Hbn' : ∀ j, j < n → (mdeg (nth j lb (0·)) = mdeg (hd (0·) lb))). {
       intros j Hj.
@@ -1063,14 +1062,33 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
       rewrite List_hd_nth_0, <- Hdd, <- List_hd_nth_0.
       now apply Hbn.
     }
-    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf H1 Hps.
+    destruct lb as [| mb]; intros; [ easy | ].
+    cbn - [ nth ] in Hbn'.
+    clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf H1 H2 Hps.
     rename Hbn' into Hbn.
-    revert n Hbn Hnl.
-    induction lb as [| mb]; intros; [ easy | ].
-    assert (H : sorted rel lb) by now apply sorted_cons in Hsb.
+    revert n mb Hbn Hnl Hsb.
+    induction lb as [| ma]; intros. {
+      now apply Nat.lt_1_r in Hnl; subst n.
+    }
+    destruct n; [ easy | cbn ].
+    cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+    apply IHlb; [ | easy | now apply sorted_cons in Hsb ].
+    intros j Hj.
+...
+    assert (H : sorted rel (mb :: lb)). {
+      apply (sorted_cons_iff Htra) in Hsb.
+      apply (sorted_cons_iff Htra).
+      destruct Hsb as (Hsb, Hbb).
+      apply (sorted_cons_iff Htra) in Hsb.
+      split; [ easy | ].
+      intros mc Hmc.
+      now apply Hbb; right.
+    }
     specialize (IHlb H); clear H.
     destruct n; [ easy | ].
     cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+    cbn.
+    apply IHlb.
     specialize (IHlb n); cbn.
     apply (sorted_cons_iff Htra) in Hsb.
     apply (sorted_cons_iff Htra).
