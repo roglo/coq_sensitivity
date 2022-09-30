@@ -920,6 +920,18 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
     now apply Hba; right.
   }
 }
+assert (Hps : permutation monom_eqb (skipn n la) (skipn n lb)). {
+  rewrite <- (firstn_skipn n la) in Hpab.
+  rewrite <- (firstn_skipn n lb) in Hpab.
+Theorem permutation_app_permutation_l : ∀ A (eqb : A → _) la lb lc ld,
+  permutation eqb (la ++ lb) (lc ++ ld)
+  → permutation eqb la lc
+  → permutation eqb lb ld.
+Proof.
+intros * Habcd Hac.
+... ...
+  now apply permutation_app_permutation_l with (la := firstn n la) in Hpab.
+...
 symmetry in Hn.
 apply (List_rank_if (Mon 0 0)) in Hn.
 destruct Hn as (Hbn, Hnl).
@@ -1018,6 +1030,7 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   specialize (H1 H); clear H.
   specialize (H1 eq_refl eq_refl).
+...
 Theorem glop : ∀ la lb lc ld,
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   sorted rel (la ++ lc)
