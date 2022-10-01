@@ -1074,7 +1074,16 @@ remember (merge_mon la) as la' eqn:Hla' in Hmab; symmetry in Hla'.
 destruct la' as [| ma']. {
   symmetry in Hmab; cbn in Hmab.
   apply eq_merge_mon_nil in Hla'; subst la.
-  cbn in Hsac.
+  cbn in Hsac |-*.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon ld) as ld' eqn:Hld'; symmetry in Hld'.
+  destruct ld' as [| md']. {
+    apply eq_merge_mon_nil in Hld'; subst ld.
+    now rewrite app_nil_r.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mdeg ma) (mdeg md')) as [Had| Had]. {
+(* bordel *)
 ...
 (* ah oui mais non, c'est faux, ça, ci-dessous *)
 Theorem eq_merge_mon_unit : ∀ la (ma : monom T),
