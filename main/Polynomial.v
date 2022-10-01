@@ -1050,6 +1050,42 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
       now rewrite skipn_length, Hlena, <- Hlenb.
     }
   }
+  rewrite <- (firstn_skipn n la).
+  rewrite <- (firstn_skipn n lb).
+Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
+  merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
+Proof.
+intros.
+revert la.
+induction lb as [| mb]; intros. {
+  do 2 rewrite app_nil_r.
+Theorem merge_mon_idemp : ∀ (la : list (monom T)),
+  merge_mon (merge_mon la) = merge_mon la.
+Proof.
+intros.
+induction la as [| ma]; [ easy | cbn ].
+do 2 rewrite fold_merge_mon.
+unfold same_deg_sum_coeff.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+  cbn in IHla |-*.
+...
+Search (merge_mon (merge_mon _)).
+...
+revert lb.
+induction la as [| ma]; intros; [ easy | cbn ].
+do 3 rewrite fold_merge_mon.
+rewrite IHla; cbn.
+...
+rewrite IHla; cbn.
+do 2 rewrite fold_merge_mon.
+...
+  rewrite merge_mon_app_distr_l.
+  rewrite H1.
+  rewrite <- merge_mon_app_distr_l.
+...
 Theorem merge_mon_app_app_if : ∀ (la lb lc ld : list (monom T)),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   sorted rel (la ++ lc)
@@ -1123,8 +1159,6 @@ rewrite fold_merge_mon.
 ...
 unfold same_deg_sum_coeff in Hmab at 1.
 ... ...
-  rewrite <- (firstn_skipn n la).
-  rewrite <- (firstn_skipn n lb).
   apply merge_mon_app_app_if; [ | | easy | easy ].
 ...
 assert
