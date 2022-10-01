@@ -1071,6 +1071,20 @@ destruct lb as [| mb]; [ easy | ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   cbn in IHla |-*.
+  rewrite fold_merge_mon in IHla.
+  unfold same_deg_sum_coeff in IHla.
+  rewrite fold_merge_mon.
+  remember (merge_mon lb) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| mc]. {
+    now injection IHla; clear IHla; intros; subst lb.
+  }
+  cbn.
+  rewrite if_eqb_eq_dec in IHla.
+  rewrite if_eqb_eq_dec.
+  rewrite Hab.
+  destruct (Nat.eq_dec (mdeg mb) (mdeg mc)) as [Hbc| Hbc]. {
+    injection IHla; clear IHla; intros; subst lc.
+    f_equal.
 ...
 Search (merge_mon (merge_mon _)).
 ...
