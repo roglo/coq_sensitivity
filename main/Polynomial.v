@@ -1073,8 +1073,10 @@ rewrite fold_merge_mon in Hmab.
 remember (merge_mon la) as la' eqn:Hla' in Hmab; symmetry in Hla'.
 destruct la' as [| ma']. {
   symmetry in Hmab; cbn in Hmab.
+  apply eq_merge_mon_nil in Hla'; subst la.
+  cbn in Hsac.
 ...
-(* ah oui mais non, c'est faux, ça *)
+(* ah oui mais non, c'est faux, ça, ci-dessous *)
 Theorem eq_merge_mon_unit : ∀ la (ma : monom T),
   merge_mon la = [ma] → la = [ma].
 Proof.
@@ -1097,7 +1099,6 @@ destruct (Nat.eq_dec (mdeg mb) (mdeg mc)) as [Hbc| Hbc]. {
 ...
   clear Hlb.
 ...
-  apply eq_merge_mon_nil in Hla'; subst la; cbn.
   unfold same_deg_sum_coeff.
   remember (merge_mon ld) as ld' eqn:Hld'; symmetry in Hld'.
   destruct ld' as [| md']. {
