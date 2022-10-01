@@ -1068,6 +1068,44 @@ induction la as [| ma]; intros. {
 cbn in Hmab |-*.
 rewrite fold_right_app.
 rewrite fold_merge_mon.
+rewrite Hmcd.
+rewrite fold_merge_mon in Hmab.
+remember (merge_mon la) as la' eqn:Hla' in Hmab; symmetry in Hla'.
+destruct la' as [| ma']. {
+  symmetry in Hmab; cbn in Hmab.
+...
+(* ah oui mais non, c'est faux, ça *)
+Theorem eq_merge_mon_unit : ∀ la (ma : monom T),
+  merge_mon la = [ma] → la = [ma].
+Proof.
+intros * Ha.
+revert ma Ha.
+induction la as [| mb]; intros; [ easy | ].
+cbn in Ha.
+rewrite fold_merge_mon in Ha.
+remember (merge_mon la) as lb eqn:Hlb in Ha; symmetry in Hlb.
+destruct lb as [| mc]. {
+  now apply eq_merge_mon_nil in Hlb; subst la.
+}
+cbn in Ha.
+rewrite if_eqb_eq_dec in Ha.
+destruct (Nat.eq_dec (mdeg mb) (mdeg mc)) as [Hbc| Hbc]. {
+  injection Ha; clear Ha; intros; subst lb ma; cbn.
+  rewrite (IHla _ Hlb).
+...
+  specialize (IHla _ eq_refl); subst la.
+...
+  clear Hlb.
+...
+  apply eq_merge_mon_nil in Hla'; subst la; cbn.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon ld) as ld' eqn:Hld'; symmetry in Hld'.
+  destruct ld' as [| md']. {
+    apply eq_merge_mon_nil in Hld', Hmcd; subst lc ld.
+    now rewrite app_nil_r in Hsac, Hsbd |-*.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mdeg ma) (mdeg md')) as [Had| Had]. {
 ...
 rewrite (fold_merge_mon _ ) in Hmab.
 remember (fold_right same_deg_sum [] la
