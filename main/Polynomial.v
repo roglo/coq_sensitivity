@@ -749,6 +749,17 @@ Global Existing Instance polyn_ring_like_op.
 
 (* canon_polyn: commutativity of addition *)
 
+Theorem eq_merge_mon_nil : ∀ (la : list (monom T)),
+  merge_mon la = [] → la = [].
+Proof.
+intros * Hma.
+destruct la as [| ma]; [ easy | ].
+cbn in Hma.
+unfold same_deg_sum_coeff in Hma at 1.
+destruct (fold_right _ _ _) as [| mb lb]; [ easy | ].
+now destruct (mdeg ma =? mdeg mb).
+Qed.
+
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1039,15 +1050,34 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
       now rewrite skipn_length, Hlena, <- Hlenb.
     }
   }
-...
-Theorem glop : ∀ la lb lc ld,
+Theorem merge_mon_app_app_if : ∀ (la lb lc ld : list (monom T)),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   sorted rel (la ++ lc)
   → sorted rel (lb ++ ld)
   → merge_mon la = merge_mon lb
   → merge_mon lc = merge_mon ld
   → merge_mon (la ++ lc) = merge_mon (lb ++ ld).
-(* est-ce que c'est vrai ? à vérifier *)
+Proof.
+intros * Hsac Hsbd Hmab Hmcd.
+revert lb lc ld Hsac Hsbd Hmab Hmcd.
+induction la as [| ma]; intros. {
+  cbn in Hmab.
+  symmetry in Hmab.
+  now apply eq_merge_mon_nil in Hmab; subst lb.
+}
+cbn in Hmab |-*.
+rewrite fold_right_app.
+rewrite fold_merge_mon.
+...
+rewrite (fold_merge_mon _ ) in Hmab.
+remember (fold_right same_deg_sum [] la
+rewrite fold_merge_mon.
+...
+unfold same_deg_sum_coeff in Hmab at 1.
+... ...
+  rewrite <- (firstn_skipn n la).
+  rewrite <- (firstn_skipn n lb).
+  apply merge_mon_app_app_if; [ | | easy | easy ].
 ...
 assert
   (Hss :
