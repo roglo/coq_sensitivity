@@ -1063,6 +1063,36 @@ Theorem merge_mon_idemp : ∀ (la : list (monom T)),
   merge_mon (merge_mon la) = merge_mon la.
 Proof.
 intros.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+revert la Hlb.
+induction lb as [| ma]; intros; [ easy | cbn ].
+rewrite fold_merge_mon.
+unfold same_deg_sum_coeff.
+remember (merge_mon lb) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mb]. {
+  f_equal.
+  destruct lb as [| mc]; [ easy | exfalso ].
+  cbn in Hlc.
+  rewrite fold_merge_mon in Hlc.
+  unfold same_deg_sum_coeff in Hlc.
+  destruct (merge_mon lb) as [| md ld]; [ easy | ].
+  now destruct (mdeg mc =? mdeg md).
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+  f_equal. {
+    exfalso; clear IHlb.
+...
+Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
+  merge_mon la = ma :: mb :: lb
+  → mdeg ma ≠ mdeg mb.
+...
+destruct lb as [| mc]; [ easy | ].
+apply eq_merge_mon_cons_cons in Hlb.
+cbn in Hlc.
+rewrite fold_merge_mon in Hlc.
+...
+intros.
 induction la as [| ma]; [ easy | cbn ].
 do 2 rewrite fold_merge_mon.
 unfold same_deg_sum_coeff.
