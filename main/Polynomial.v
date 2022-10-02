@@ -791,6 +791,33 @@ specialize (IHla md mb eq_refl Hmb) as H1.
 congruence.
 Qed.
 
+Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
+  merge_mon la = ma :: mb :: lb
+  → mdeg ma ≠ mdeg mb.
+Proof.
+intros * Hma.
+intros Hab.
+destruct ma as (ca, da).
+destruct mb as (cb, db).
+cbn in Hab; subst db.
+revert ca cb da lb Hma.
+induction la as [| ma]; intros; [ easy | ].
+cbn in Hma.
+rewrite fold_merge_mon in Hma.
+unfold same_deg_sum_coeff in Hma.
+remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mb]; [ easy | ].
+rewrite if_eqb_eq_dec in Hma.
+destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
+  injection Hma; clear Hma; intros; subst lc ca da.
+  destruct ma as (ca, da).
+  destruct mb as (cc, dc).
+  cbn in Hlc, Hab; subst dc.
+  apply (IHla _ _ _ _ eq_refl).
+}
+now injection Hma; clear Hma; intros; subst lc ma mb.
+Qed.
+
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb →
   (lb = [] ∧ ∀ ma, ma ∈ la → mdeg ma = mdeg mb) ∨
@@ -805,31 +832,8 @@ destruct lb as [| mc]. {
 }
 right; cbn.
 move lb before la.
-...
-intros * Hma.
-revert mb lb Hma.
-induction la as [| ma]; intros; [ easy | ].
-cbn in Hma.
-destruct lb as [| mc]. {
-  left; split; [ easy | ].
-  intros mc Hmc.
-  rewrite fold_merge_mon in Hma.
-  unfold same_deg_sum_coeff in Hma.
-  remember (merge_mon la) as lb eqn:Hlb.
-  symmetry in Hlb.
-  destruct lb as [| md]. {
-    injection Hma; clear Hma; intros; subst mb.
-    apply eq_merge_mon_nil in Hlb; subst la.
-    destruct Hmc; [ now subst mc | easy ].
-  }
-  rewrite if_eqb_eq_dec in Hma.
-  destruct (Nat.eq_dec _ _) as [Had| Had]; [ | easy ].
-  injection Hma; clear Hma; intros; subst lb mb; cbn.
-  destruct Hmc as [Hmc| Hmc]; [ now subst mc | ].
-...
-unfold same_deg_sum_coeff in Hma at 1.
-destruct (fold_right _ _ _) as [| mb lb]; [ easy | ].
-now destruct (mdeg ma =? mdeg mb).
+apply Nat.neq_sym.
+now apply eq_merge_mon_cons_cons in Hma.
 Qed.
 
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
@@ -1154,8 +1158,13 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   f_equal. {
     exfalso; clear IHlb.
-(* fectivement, c'est pas possible, mais comment le prouver ? *)
-Search merge_mon.
+    apply eq_merge_mon_cons in Hlb.
+...
+    apply eq_merge_mon_cons in Hlc.
+    destruct Hlb as [Hlb| Hlb]. {
+      destruct Hlb as (H, Hlb); subst lb.
+      destruct Hlc as [Hlc| Hlc]. {
+        destruct Hlc as (H, _); subst lc.
 ...
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
   merge_mon la = ma :: mb :: lb
