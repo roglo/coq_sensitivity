@@ -1209,12 +1209,35 @@ Theorem glop : ∀ (la lb lc : list (monom T)),
   → merge_mon (la ++ lc) = merge_mon (lb ++ lc).
 Proof.
 intros * Hlab.
+revert lb lc Hlab.
+induction la as [| ma]; intros. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+cbn in Hlab |-*.
+rewrite fold_merge_mon in Hlab |-*.
+unfold same_deg_sum_coeff in Hlab |-*.
+remember (merge_mon la) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| md]. {
+  symmetry in Hlab.
+  remember (merge_mon (la ++ lc)) as ld eqn:Hle; symmetry in Hle.
+  destruct ld as [| md]. {
+    apply eq_merge_mon_nil in Hle.
+    apply app_eq_nil in Hle.
+    destruct Hle; subst la lc.
+    now rewrite app_nil_r.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Had| Had]. {
+...
+intros * Hlab.
 revert la lb Hlab.
 induction lc as [| mc]; intros; [ now do 2 rewrite app_nil_r | ].
 rewrite List_cons_is_app.
 do 2 rewrite app_assoc.
 apply IHlc.
 clear lc IHlc.
+...
 Theorem glip : ∀ (la lb : list (monom T)) mc,
   merge_mon la = merge_mon lb
   → merge_mon (la ++ [mc]) = merge_mon (lb ++ [mc]).
