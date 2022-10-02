@@ -1217,7 +1217,7 @@ induction la as [| ma]; intros. {
 cbn in Hlab |-*.
 rewrite fold_merge_mon in Hlab |-*.
 unfold same_deg_sum_coeff in Hlab |-*.
-remember (merge_mon la) as ld eqn:Hld; symmetry in Hld.
+remember (merge_mon la) as ld eqn:Hld in Hlab; symmetry in Hld.
 destruct ld as [| md]. {
   symmetry in Hlab.
   remember (merge_mon (la ++ lc)) as ld eqn:Hle; symmetry in Hle.
