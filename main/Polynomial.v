@@ -1082,6 +1082,7 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   f_equal. {
     exfalso; clear IHlb.
+(* fectivement, c'est pas possible, mais comment le prouver ? *)
 ...
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
   merge_mon la = ma :: mb :: lb
