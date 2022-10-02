@@ -1214,6 +1214,19 @@ induction lc as [| mc]; intros; [ now do 2 rewrite app_nil_r | ].
 rewrite List_cons_is_app.
 do 2 rewrite app_assoc.
 apply IHlc.
+revert lb mc Hlab.
+induction la as [| ma] using rev_ind; intros. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+rewrite <- app_assoc; cbn.
+induction lb as [| mb] using rev_ind; intros. {
+  apply eq_merge_mon_nil in Hlab.
+  now destruct la.
+}
+clear IHlb.
+rewrite <- app_assoc; cbn.
+...
 Theorem glip : ∀ (la lb : list (monom T)) mc,
   merge_mon la = merge_mon lb
   → merge_mon (la ++ [mc]) = merge_mon (lb ++ [mc]).
@@ -1224,6 +1237,12 @@ induction la as [| ma] using rev_ind; intros. {
   symmetry in Hlab.
   now apply eq_merge_mon_nil in Hlab; subst lb.
 }
+rewrite <- app_assoc; cbn.
+induction lb as [| mb] using rev_ind; intros. {
+  apply eq_merge_mon_nil in Hlab.
+  now destruct la.
+}
+clear IHlb.
 rewrite <- app_assoc; cbn.
 ...
 intros * Hlab.
