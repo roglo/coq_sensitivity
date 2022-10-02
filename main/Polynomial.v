@@ -760,11 +760,52 @@ destruct (fold_right _ _ _) as [| mb lb]; [ easy | ].
 now destruct (mdeg ma =? mdeg mb).
 Qed.
 
+Theorem eq_merge_mon_unit : ∀ (la : list (monom T)) ma,
+  merge_mon la = [ma] → ∀ mb, mb ∈ la → mdeg ma = mdeg mb.
+Proof.
+intros * Hma mb Hmb.
+revert ma mb Hma Hmb.
+induction la as [| mc]; intros; [ easy | ].
+cbn in Hma.
+rewrite fold_merge_mon in Hma.
+destruct Hmb as [Hmb| Hmb]. {
+  subst mc.
+  unfold same_deg_sum_coeff in Hma.
+  remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| mc]. {
+    now injection Hma; clear Hma; intros; subst mb.
+  }
+  rewrite if_eqb_eq_dec in Hma.
+  destruct (Nat.eq_dec (mdeg mb) (mdeg mc)) as [Hbc| Hbc]; [ | easy ].
+  now injection Hma; clear Hma; intros; subst ma.
+}
+unfold same_deg_sum_coeff in Hma.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| md]. {
+  now apply eq_merge_mon_nil in Hlb; subst la.
+}
+rewrite if_eqb_eq_dec in Hma.
+destruct (Nat.eq_dec (mdeg mc) (mdeg md)) as [Hcd| Hcd]; [ | easy ].
+injection Hma; clear Hma; intros; subst ma lb; cbn.
+specialize (IHla md mb eq_refl Hmb) as H1.
+congruence.
+Qed.
+
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb →
   (lb = [] ∧ ∀ ma, ma ∈ la → mdeg ma = mdeg mb) ∨
   mdeg (hd (0·) lb) ≠ mdeg mb.
 Proof.
+intros * Hma.
+destruct lb as [| mc]. {
+  left; split; [ easy | ].
+  intros ma Ha.
+  specialize (eq_merge_mon_unit _ Hma) as H1.
+  now symmetry; apply H1.
+}
+right; cbn.
+move lb before la.
+...
 intros * Hma.
 revert mb lb Hma.
 induction la as [| ma]; intros; [ easy | ].
