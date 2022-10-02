@@ -1231,10 +1231,37 @@ unfold same_deg_sum_coeff in Hlab |-*.
 remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| mb]. {
   apply eq_merge_mon_nil in Hlc; subst la; cbn.
+  clear IHla; symmetry in Hlab.
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hac| Hac]. {
-  symmetry in Hlab.
   destruct lb as [| mb]; [ easy | ].
+  cbn in Hlab |-*.
+  rewrite fold_merge_mon in Hlab |-*.
+  symmetry.
+  unfold same_deg_sum_coeff in Hlab |-*.
+  remember (merge_mon lb) as la eqn:Hla; symmetry in Hla.
+  destruct la as [| md]. {
+    injection Hlab; clear Hlab; intros; subst mb.
+    apply eq_merge_mon_nil in Hla; subst lb; cbn.
+    now rewrite Hac, Nat.eqb_refl.
+  }
+  rewrite if_eqb_eq_dec in Hlab.
+  destruct (Nat.eq_dec _ _) as [Hbd| Hbd]; [ | easy ].
+  injection Hlab; clear Hlab; intros; subst ma la.
+  cbn in Hac |-*.
+  remember (merge_mon (lb ++ [mc])) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| ma]. {
+    destruct lb as [| ma]; [ easy | ].
+    cbn in Hlc.
+    rewrite fold_merge_mon in Hlc.
+    unfold same_deg_sum_coeff in Hlc.
+    destruct (merge_mon (lb ++ [mc])) as [| me le]; [ easy | ].
+    now destruct (mdeg ma =? mdeg me).
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hba| Hba]. {
+    exfalso.
+...
   apply eq_merge_mon_unit with (mb := mb) in Hlab; [ | now left ].
   cbn.
   rewrite fold_merge_mon.
