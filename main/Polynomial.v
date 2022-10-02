@@ -1221,6 +1221,14 @@ Theorem glip : ∀ (la lb : list (monom T)) mc,
 Proof.
 intros * Hlab.
 revert lb mc Hlab.
+induction la as [| ma] using rev_ind; intros. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+rewrite <- app_assoc; cbn.
+...
+intros * Hlab.
+revert lb mc Hlab.
 induction la as [| ma]; intros; cbn. {
   symmetry in Hlab.
   now apply eq_merge_mon_nil in Hlab; subst lb.
