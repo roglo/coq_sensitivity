@@ -1178,7 +1178,7 @@ destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
 }
 f_equal.
 ...
-destruct la as [| mc]; [ easy | ].
+induction la as [| mc]; [ easy | ].
 cbn in Hlb.
 rewrite fold_merge_mon in Hlb.
 unfold same_deg_sum_coeff in Hlb.
@@ -1188,9 +1188,12 @@ destruct ld as [| md]. {
   now injection Hlb; clear Hlb; intros; subst lb.
 }
 rewrite if_eqb_eq_dec in Hlb.
-destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. {
-  injection Hlb; clear Hlb; intros; subst ma ld.
-  cbn in Hab.
+destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. 2: {
+  injection Hlb; clear Hlb; intros; subst mc lb.
+  now apply (IHlb la).
+}
+injection Hlb; clear Hlb; intros; subst ma ld.
+cbn in Hab.
 ...
   eapply IHlb.
   now injection Hlc; clear Hlc; intros; subst lc mb.
