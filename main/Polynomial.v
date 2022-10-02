@@ -1158,17 +1158,25 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   f_equal. {
     exfalso; clear IHlb.
-    apply eq_merge_mon_cons in Hlb.
-...
-    apply eq_merge_mon_cons in Hlc.
-    destruct Hlb as [Hlb| Hlb]. {
-      destruct Hlb as (H, Hlb); subst lb.
-      destruct Hlc as [Hlc| Hlc]. {
-        destruct Hlc as (H, _); subst lc.
-...
-Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
-  merge_mon la = ma :: mb :: lb
-  → mdeg ma ≠ mdeg mb.
+    move la after lb.
+    destruct lb as [| mc]; [ easy | ].
+    apply eq_merge_mon_cons_cons in Hlb.
+    rewrite Hab in Hlb; clear Hab.
+    cbn in Hlc.
+    rewrite fold_merge_mon in Hlc.
+    unfold same_deg_sum_coeff in Hlc.
+    clear la ma.
+    remember (merge_mon lb) as la eqn:Hla.
+    symmetry in Hla.
+    destruct la as [| ma]. {
+      now injection Hlc; clear Hlc; intros; subst mc lc.
+    }
+    rewrite if_eqb_eq_dec in Hlc.
+    destruct (Nat.eq_dec _ _) as [Hca| Hca]. {
+      now injection Hlc; clear Hlc; intros; subst lc mb.
+    }
+    now injection Hlc; clear Hlc; intros; subst mb lc.
+  }
 ...
 destruct lb as [| mc]; [ easy | ].
 apply eq_merge_mon_cons_cons in Hlb.
