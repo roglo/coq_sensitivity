@@ -760,6 +760,37 @@ destruct (fold_right _ _ _) as [| mb lb]; [ easy | ].
 now destruct (mdeg ma =? mdeg mb).
 Qed.
 
+Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
+  merge_mon la = mb :: lb →
+  (lb = [] ∧ ∀ ma, ma ∈ la → mdeg ma = mdeg mb) ∨
+  mdeg (hd (0·) lb) ≠ mdeg mb.
+Proof.
+intros * Hma.
+revert mb lb Hma.
+induction la as [| ma]; intros; [ easy | ].
+cbn in Hma.
+destruct lb as [| mc]. {
+  left; split; [ easy | ].
+  intros mc Hmc.
+  rewrite fold_merge_mon in Hma.
+  unfold same_deg_sum_coeff in Hma.
+  remember (merge_mon la) as lb eqn:Hlb.
+  symmetry in Hlb.
+  destruct lb as [| md]. {
+    injection Hma; clear Hma; intros; subst mb.
+    apply eq_merge_mon_nil in Hlb; subst la.
+    destruct Hmc; [ now subst mc | easy ].
+  }
+  rewrite if_eqb_eq_dec in Hma.
+  destruct (Nat.eq_dec _ _) as [Had| Had]; [ | easy ].
+  injection Hma; clear Hma; intros; subst lb mb; cbn.
+  destruct Hmc as [Hmc| Hmc]; [ now subst mc | ].
+...
+unfold same_deg_sum_coeff in Hma at 1.
+destruct (fold_right _ _ _) as [| mb lb]; [ easy | ].
+now destruct (mdeg ma =? mdeg mb).
+Qed.
+
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1083,6 +1114,7 @@ destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   f_equal. {
     exfalso; clear IHlb.
 (* fectivement, c'est pas possible, mais comment le prouver ? *)
+Search merge_mon.
 ...
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
   merge_mon la = ma :: mb :: lb
