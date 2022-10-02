@@ -899,6 +899,16 @@ injection Hlb; clear Hlb; intros; subst ma ld.
 now apply IHla with (ma := md).
 Qed.
 
+Theorem merge_mon_app_distr_r : ∀ (la lb : list (monom T)),
+  merge_mon (la ++ lb) = merge_mon (la ++ merge_mon lb).
+Proof.
+intros.
+revert lb.
+induction la as [| ma]; intros; [ symmetry; apply merge_mon_idemp | cbn ].
+do 2 rewrite fold_merge_mon.
+now rewrite IHla.
+Qed.
+
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1195,9 +1205,10 @@ Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
   merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
 Proof.
 intros.
+...
+intros.
 revert lb.
-induction la as [| ma]; intros; [ easy | ].
-cbn.
+induction la as [| ma]; intros; [ easy | cbn ].
 do 3 rewrite fold_merge_mon.
 rewrite IHla.
 unfold same_deg_sum_coeff.
@@ -1205,6 +1216,8 @@ remember (merge_mon la) as lc eqn:Hlc in |-*; symmetry in Hlc.
 destruct lc as [| mc]; [ easy | ].
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec _ _) as [Hac| Hac]. {
+  cbn.
+  rewrite fold_merge_mon.
 ...
 intros.
 revert la.
