@@ -836,6 +836,69 @@ apply Nat.neq_sym.
 now apply eq_merge_mon_cons_cons in Hma.
 Qed.
 
+Theorem merge_mon_idemp : ∀ (la : list (monom T)),
+  merge_mon (merge_mon la) = merge_mon la.
+Proof.
+intros.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+revert la Hlb.
+induction lb as [| ma]; intros; [ easy | cbn ].
+rewrite fold_merge_mon.
+unfold same_deg_sum_coeff.
+remember (merge_mon lb) as lc eqn:Hlc in |-*; symmetry in Hlc.
+destruct lc as [| mb]. {
+  f_equal.
+  destruct lb as [| mc]; [ easy | exfalso ].
+  cbn in Hlc.
+  rewrite fold_merge_mon in Hlc.
+  unfold same_deg_sum_coeff in Hlc.
+  destruct (merge_mon lb) as [| md ld]; [ easy | ].
+  now destruct (mdeg mc =? mdeg md).
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+  exfalso; clear IHlb.
+  move la after lb.
+  destruct lb as [| mc]; [ easy | ].
+  apply eq_merge_mon_cons_cons in Hlb.
+  rewrite Hab in Hlb; clear Hab.
+  cbn in Hlc.
+  rewrite fold_merge_mon in Hlc.
+  unfold same_deg_sum_coeff in Hlc.
+  clear la ma.
+  remember (merge_mon lb) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| ma]. {
+    now injection Hlc; clear Hlc; intros; subst mc lc.
+  }
+  rewrite if_eqb_eq_dec in Hlc.
+  destruct (Nat.eq_dec _ _) as [Hca| Hca]. {
+    now injection Hlc; clear Hlc; intros; subst lc mb.
+  }
+  now injection Hlc; clear Hlc; intros; subst mb lc.
+}
+f_equal.
+rewrite <- Hlc.
+clear lc mb Hlc Hab.
+revert ma lb IHlb Hlb.
+induction la as [| mb]; intros; [ easy | ].
+cbn in Hlb.
+rewrite fold_merge_mon in Hlb.
+unfold same_deg_sum_coeff in Hlb.
+remember (merge_mon la) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| md]. {
+  now injection Hlb; clear Hlb; intros; subst lb.
+}
+rewrite if_eqb_eq_dec in Hlb.
+destruct (Nat.eq_dec _ _) as [Hbd| Hbd]. 2: {
+  injection Hlb; clear Hlb; intros; subst mb lb.
+  now apply (IHlb la).
+}
+injection Hlb; clear Hlb; intros; subst ma ld.
+now apply IHla with (ma := md).
+Qed.
+
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1132,75 +1195,29 @@ Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
   merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
 Proof.
 intros.
+revert lb.
+induction la as [| ma]; intros; [ easy | ].
+cbn.
+do 3 rewrite fold_merge_mon.
+rewrite IHla.
+unfold same_deg_sum_coeff.
+remember (merge_mon la) as lc eqn:Hlc in |-*; symmetry in Hlc.
+destruct lc as [| mc]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hac| Hac]. {
+...
+intros.
 revert la.
 induction lb as [| mb]; intros. {
   do 2 rewrite app_nil_r.
-Theorem merge_mon_idemp : ∀ (la : list (monom T)),
-  merge_mon (merge_mon la) = merge_mon la.
-Proof.
-intros.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-revert la Hlb.
-induction lb as [| ma]; intros; [ easy | cbn ].
-rewrite fold_merge_mon.
-unfold same_deg_sum_coeff.
-remember (merge_mon lb) as lc eqn:Hlc in |-*; symmetry in Hlc.
-destruct lc as [| mb]. {
-  f_equal.
-  destruct lb as [| mc]; [ easy | exfalso ].
-  cbn in Hlc.
-  rewrite fold_merge_mon in Hlc.
-  unfold same_deg_sum_coeff in Hlc.
-  destruct (merge_mon lb) as [| md ld]; [ easy | ].
-  now destruct (mdeg mc =? mdeg md).
+  symmetry; apply merge_mon_idemp.
 }
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
-  exfalso; clear IHlb.
-  move la after lb.
-  destruct lb as [| mc]; [ easy | ].
-  apply eq_merge_mon_cons_cons in Hlb.
-  rewrite Hab in Hlb; clear Hab.
-  cbn in Hlc.
-  rewrite fold_merge_mon in Hlc.
-  unfold same_deg_sum_coeff in Hlc.
-  clear la ma.
-  remember (merge_mon lb) as la eqn:Hla.
-  symmetry in Hla.
-  destruct la as [| ma]. {
-    now injection Hlc; clear Hlc; intros; subst mc lc.
-  }
-  rewrite if_eqb_eq_dec in Hlc.
-  destruct (Nat.eq_dec _ _) as [Hca| Hca]. {
-    now injection Hlc; clear Hlc; intros; subst lc mb.
-  }
-  now injection Hlc; clear Hlc; intros; subst mb lc.
-}
-f_equal.
-rewrite <- Hlc.
-clear lc mb Hlc Hab.
 ...
-induction la as [| mc]; [ easy | ].
-cbn in Hlb.
-rewrite fold_merge_mon in Hlb.
-unfold same_deg_sum_coeff in Hlb.
-remember (merge_mon la) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as [| md]. {
-  now injection Hlb; clear Hlb; intros; subst lb.
-}
-rewrite if_eqb_eq_dec in Hlb.
-destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. 2: {
-  injection Hlb; clear Hlb; intros; subst mc lb.
-  now apply (IHlb la).
-}
-injection Hlb; clear Hlb; intros; subst ma ld.
-cbn in Hab.
+rewrite List_cons_is_app.
+do 2 rewrite app_assoc.
 ...
-  eapply IHlb.
-  now injection Hlc; clear Hlc; intros; subst lc mb.
-  }
-  now injection Hlc; clear Hlc; intros; subst mb lc.
+rewrite IHlb.
+f_equal; f_equal.
 ...
 destruct lb as [| mc]; [ easy | ].
 apply eq_merge_mon_cons_cons in Hlb.
