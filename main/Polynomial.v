@@ -1201,10 +1201,72 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   rewrite <- (firstn_skipn n la).
   rewrite <- (firstn_skipn n lb).
+  rewrite merge_mon_app_distr_r.
+  rewrite H2.
+  rewrite <- merge_mon_app_distr_r.
+Theorem glop : ∀ (la lb lc : list (monom T)),
+  merge_mon la = merge_mon lb
+  → merge_mon (la ++ lc) = merge_mon (lb ++ lc).
+Proof.
+intros * Hlab.
+revert la lb Hlab.
+induction lc as [| mc]; intros; [ now do 2 rewrite app_nil_r | ].
+rewrite List_cons_is_app.
+do 2 rewrite app_assoc.
+apply IHlc.
+clear lc IHlc.
+Theorem glip : ∀ (la lb : list (monom T)) mc,
+  merge_mon la = merge_mon lb
+  → merge_mon (la ++ [mc]) = merge_mon (lb ++ [mc]).
+Proof.
+intros * Hlab.
+revert lb mc Hlab.
+induction la as [| ma]; intros; cbn. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+cbn in Hlab.
+rewrite fold_merge_mon in Hlab |-*.
+unfold same_deg_sum_coeff in Hlab |-*.
+remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mb]. {
+  apply eq_merge_mon_nil in Hlc; subst la; cbn.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hac| Hac]. {
+  symmetry in Hlab.
+  destruct lb as [| mb]; [ easy | ].
+  apply eq_merge_mon_unit with (mb := mb) in Hlab; [ | now left ].
+  cbn.
+  rewrite fold_merge_mon.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon (lb ++ [mc])) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| md]. {
+    destruct lb; [ easy | ].
+    cbn in Hlc.
+    rewrite fold_merge_mon in Hlc.
+    unfold same_deg_sum_coeff in Hlc.
+    destruct (merge_mon (lb ++ [mc])); [ easy | ].
+    now destruct (mdeg _ =? mdeg _).
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hbd| Hbd]. {
+(* pfff.... *)
+...
+intros * Hlab.
+revert mc lb Hlab.
+induction la as [| ma] using rev_ind; intros. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+rewrite <- app_assoc; cbn.
+...
 Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
   merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
 Proof.
 intros.
+apply glop.
+... ...
+symmetry; apply merge_mon_idemp.
 ...
 intros.
 revert lb.
