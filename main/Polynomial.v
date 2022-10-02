@@ -1156,27 +1156,46 @@ destruct lc as [| mb]. {
 }
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
-  f_equal. {
-    exfalso; clear IHlb.
-    move la after lb.
-    destruct lb as [| mc]; [ easy | ].
-    apply eq_merge_mon_cons_cons in Hlb.
-    rewrite Hab in Hlb; clear Hab.
-    cbn in Hlc.
-    rewrite fold_merge_mon in Hlc.
-    unfold same_deg_sum_coeff in Hlc.
-    clear la ma.
-    remember (merge_mon lb) as la eqn:Hla.
-    symmetry in Hla.
-    destruct la as [| ma]. {
-      now injection Hlc; clear Hlc; intros; subst mc lc.
-    }
-    rewrite if_eqb_eq_dec in Hlc.
-    destruct (Nat.eq_dec _ _) as [Hca| Hca]. {
-      now injection Hlc; clear Hlc; intros; subst lc mb.
-    }
-    now injection Hlc; clear Hlc; intros; subst mb lc.
+  exfalso; clear IHlb.
+  move la after lb.
+  destruct lb as [| mc]; [ easy | ].
+  apply eq_merge_mon_cons_cons in Hlb.
+  rewrite Hab in Hlb; clear Hab.
+  cbn in Hlc.
+  rewrite fold_merge_mon in Hlc.
+  unfold same_deg_sum_coeff in Hlc.
+  clear la ma.
+  remember (merge_mon lb) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| ma]. {
+    now injection Hlc; clear Hlc; intros; subst mc lc.
   }
+  rewrite if_eqb_eq_dec in Hlc.
+  destruct (Nat.eq_dec _ _) as [Hca| Hca]. {
+    now injection Hlc; clear Hlc; intros; subst lc mb.
+  }
+  now injection Hlc; clear Hlc; intros; subst mb lc.
+}
+f_equal.
+...
+destruct la as [| mc]; [ easy | ].
+cbn in Hlb.
+rewrite fold_merge_mon in Hlb.
+unfold same_deg_sum_coeff in Hlb.
+remember (merge_mon la) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| md]. {
+  now injection Hlb; clear Hlb; intros; subst lb.
+}
+rewrite if_eqb_eq_dec in Hlb.
+destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. {
+  injection Hlb; clear Hlb; intros; subst ma ld.
+  cbn in Hab.
+...
+  eapply IHlb.
+  now injection Hlc; clear Hlc; intros; subst lc mb.
+  }
+  now injection Hlc; clear Hlc; intros; subst mb lc.
 ...
 destruct lb as [| mc]; [ easy | ].
 apply eq_merge_mon_cons_cons in Hlb.
