@@ -1144,7 +1144,7 @@ revert la Hlb.
 induction lb as [| ma]; intros; [ easy | cbn ].
 rewrite fold_merge_mon.
 unfold same_deg_sum_coeff.
-remember (merge_mon lb) as lc eqn:Hlc; symmetry in Hlc.
+remember (merge_mon lb) as lc eqn:Hlc in |-*; symmetry in Hlc.
 destruct lc as [| mb]. {
   f_equal.
   destruct lb as [| mc]; [ easy | exfalso ].
@@ -1177,6 +1177,8 @@ destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
   now injection Hlc; clear Hlc; intros; subst mb lc.
 }
 f_equal.
+rewrite <- Hlc.
+clear lc mb Hlc Hab.
 ...
 induction la as [| mc]; [ easy | ].
 cbn in Hlb.
