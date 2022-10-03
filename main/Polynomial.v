@@ -1209,6 +1209,54 @@ Theorem glop : ∀ (la lb lc : list (monom T)),
   → merge_mon (la ++ lc) = merge_mon (lb ++ lc).
 Proof.
 intros * Hlab.
+remember (merge_mon la) as ld eqn:Hlad; symmetry in Hlad.
+symmetry in Hlab.
+rename Hlab into Hlbd.
+revert la lb lc Hlad Hlbd.
+induction ld as [| md] using rev_ind; intros. {
+  apply eq_merge_mon_nil in Hlad; subst la.
+  apply eq_merge_mon_nil in Hlbd; subst lb.
+  easy.
+}
+Theorem glip : ∀ la lb (ma : monom T),
+  merge_mon la = lb ++ [ma]
+  → ∃ i, i < length la ∧
+    (if i =? 0 then True else mdeg (nth (i - 1) la (Mon 0 0)) ≠ mdeg ma) ∧
+    (∀ j, i ≤ j < length la → mdeg (nth j la (Mon 0 0)) = mdeg ma) ∧
+    merge_mon (firstn i la) = lb.
+Admitted.
+apply glip in Hlad.
+apply glip in Hlbd.
+destruct Hlad as (ia & Hila & Hia & Hija & Hfia).
+destruct Hlbd as (ib & Hilb & Hib & Hijb & Hfib).
+move ib before ia; move Hib before Hia; move Hijb before Hija.
+move Hilb before Hila.
+...
+specialize (IHld _ _ (skipn ia la ++ lc) Hfia Hfib) as H1.
+rewrite app_assoc, firstn_skipn in H1.
+specialize (IHld _ _ (skipn ib lb ++ lc) Hfia Hfib) as H2.
+rewrite (app_assoc (firstn ib lb)), firstn_skipn in H2.
+rewrite H1, <- H2.
+...
+do 2 rewrite app_assoc.
+apply IHld.
+...
+intros * Hlab.
+revert lb lc Hlab.
+induction la as [| ma] using rev_ind; intros. {
+  symmetry in Hlab.
+  now apply eq_merge_mon_nil in Hlab; subst lb.
+}
+rewrite <- app_assoc.
+destruct lb as [| mb] using rev_ind. {
+  apply eq_merge_mon_nil in Hlab.
+  now destruct la.
+}
+clear IHlb.
+rewrite <- app_assoc.
+rewrite IHla with (lb := lb).
+...
+intros * Hlab.
 revert la lb Hlab.
 induction lc as [| mc]; intros; [ now do 2 rewrite app_nil_r | ].
 rewrite List_cons_is_app.
