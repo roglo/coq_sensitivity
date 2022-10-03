@@ -1204,6 +1204,31 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   rewrite merge_mon_app_distr_r.
   rewrite H2.
   rewrite <- merge_mon_app_distr_r.
+Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
+  merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
+Proof.
+intros.
+Theorem merge_mon_rev : ∀ (la : list (monom T)),
+  merge_mon (rev la) = rev (merge_mon la).
+Proof.
+intros.
+induction la as [| ma]; [ easy | cbn ].
+do 2 rewrite fold_merge_mon.
+replace [ma] with (rev [ma]) by easy.
+rewrite <- rev_app_distr; cbn.
+rewrite fold_right_app; cbn.
+rewrite fold_left_rev_right.
+(* ouais, chais pas, c'est n'importe quoi, ça... faut que je réfléchisse *)
+... ...
+rewrite <- (rev_involutive (la ++ lb)).
+rewrite (merge_mon_rev (rev (la ++ lb))).
+rewrite rev_app_distr.
+rewrite merge_mon_app_distr_r.
+rewrite merge_mon_rev.
+rewrite <- rev_app_distr.
+rewrite merge_mon_rev.
+apply rev_involutive.
+...
 Theorem glop : ∀ (la lb lc : list (monom T)),
   merge_mon la = merge_mon lb
   → merge_mon (la ++ lc) = merge_mon (lb ++ lc).
@@ -1224,7 +1249,7 @@ Theorem glip : ∀ la lb (ma : monom T),
     (if i =? 0 then True else mdeg (nth (i - 1) la (Mon 0 0)) ≠ mdeg ma) ∧
     (∀ j, i ≤ j < length la → mdeg (nth j la (Mon 0 0)) = mdeg ma) ∧
     merge_mon (firstn i la) = lb.
-Admitted.
+...
 apply glip in Hlad.
 apply glip in Hlbd.
 destruct Hlad as (ia & Hila & Hia & Hija & Hfia).
