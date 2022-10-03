@@ -1276,6 +1276,8 @@ rewrite <- (firstn_skipn j la).
 rewrite rev_app_distr.
 rewrite <- H1.
 ...
+  merge_mon (la ++ lb) = merge_mon la ++ lc
+...
 specialize (firstn_rev (length la - j) la) as H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
 rewrite <- H1; clear H1.
