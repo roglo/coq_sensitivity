@@ -820,14 +820,15 @@ Qed.
 
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb
-  → ∃ i, i < length la ∧
+  → ∃ i, 0 < i ≤ length la ∧
     (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
     merge_mon (skipn i la) = lb ∧
-    mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff mb ∧
-    mdeg (hd (0·) lb) ≠ mdeg mb.
+    mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
+    mdeg (hd (Mon 0 (S (mdeg mb))) lb) ≠ mdeg mb.
 Proof.
 intros * Hma.
-destruct la as [| ma]; [ easy | ].
+revert mb lb Hma.
+induction la as [| ma]; intros; [ easy | ].
 cbn in Hma.
 rewrite fold_merge_mon in Hma.
 unfold same_deg_sum_coeff in Hma.
@@ -835,41 +836,54 @@ remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| mc]. {
   apply eq_merge_mon_nil in Hlc; subst la.
   injection Hma; clear Hma; intros; subst mb lb; cbn.
-  exists 0.
+  exists 1; cbn - [ In ].
   split; [ easy | ].
-  rewrite firstn_O, skipn_O.
+  split. {
+    intros mb Hmb.
+    destruct Hmb as [Hmb| ]; [ now subst mb | easy ].
+  }
   split; [ easy | ].
-...
-destruct lb as [| mc]. {
-  left; split; [ easy | ].
-  intros ma Ha.
-  specialize (eq_merge_mon_unit _ Hma) as H1.
-  now symmetry; apply H1.
+  rewrite rngl_summation_list_only_one.
+  split; [ easy | ].
+  apply Nat.neq_succ_diag_l.
 }
-right; cbn.
-move lb before la.
-apply Nat.neq_sym.
-now apply eq_merge_mon_cons_cons in Hma.
-Qed.
-
-...
-
-Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
-  merge_mon la = mb :: lb →
-  (lb = [] ∧ ∀ ma, ma ∈ la → mdeg ma = mdeg mb) ∨
-  mdeg (hd (0·) lb) ≠ mdeg mb.
-Proof.
-intros * Hma.
-destruct lb as [| mc]. {
-  left; split; [ easy | ].
-  intros ma Ha.
-  specialize (eq_merge_mon_unit _ Hma) as H1.
-  now symmetry; apply H1.
+rewrite if_eqb_eq_dec in Hma.
+destruct (Nat.eq_dec _ _) as [Hac| Hac]. 2: {
+  injection Hma; clear Hma; intros; subst mb lb.
+  cbn - [ In ].
+  exists 1.
+  split. {
+    split; [ easy | ].
+    now apply -> Nat.succ_le_mono.
+  }
+  split. {
+    intros mb Hmb; cbn - [ In ] in Hmb.
+    destruct Hmb as [Hmb| ]; [ now subst mb | easy ].
+  }
+  split; [ easy | ].
+  split; [ | now apply Nat.neq_sym ].
+  now cbn; rewrite rngl_summation_list_only_one.
 }
-right; cbn.
-move lb before la.
-apply Nat.neq_sym.
-now apply eq_merge_mon_cons_cons in Hma.
+injection Hma; clear Hma; intros; subst lc mb.
+cbn - [ In ].
+specialize (IHla mc lb eq_refl) as H1.
+destruct H1 as (j & Hjl & Hfj & Hmj & Hcj & Hc).
+exists (S j).
+split. {
+  split; [ easy | ].
+  now apply -> Nat.succ_le_mono.
+}
+split. {
+  intros mb Hmb.
+  cbn - [ In ] in Hmb.
+  destruct Hmb as [Hmb| Hmb]; [ now subst mb | ].
+  specialize (Hfj _ Hmb) as H1.
+  congruence.
+}
+split; [ easy | ].
+split; [ cbn | now rewrite Hac ].
+rewrite rngl_summation_list_cons.
+now f_equal.
 Qed.
 
 Theorem merge_mon_idemp : ∀ (la : list (monom T)),
@@ -1254,6 +1268,9 @@ induction lb as [| mb]; intros. {
   now apply eq_merge_mon_nil in Hlb; subst la.
 }
 cbn.
+apply eq_merge_mon_cons in Hlb.
+destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc).
+apply IHlb in Hmj.
 ...
 (*
 intros.
