@@ -819,6 +819,42 @@ now injection Hma; clear Hma; intros; subst lc ma mb.
 Qed.
 
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
+  merge_mon la = mb :: lb
+  → ∃ i, i < length la ∧
+    (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
+    merge_mon (skipn i la) = lb ∧
+    mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff mb ∧
+    mdeg (hd (0·) lb) ≠ mdeg mb.
+Proof.
+intros * Hma.
+destruct la as [| ma]; [ easy | ].
+cbn in Hma.
+rewrite fold_merge_mon in Hma.
+unfold same_deg_sum_coeff in Hma.
+remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mc]. {
+  apply eq_merge_mon_nil in Hlc; subst la.
+  injection Hma; clear Hma; intros; subst mb lb; cbn.
+  exists 0.
+  split; [ easy | ].
+  rewrite firstn_O, skipn_O.
+  split; [ easy | ].
+...
+destruct lb as [| mc]. {
+  left; split; [ easy | ].
+  intros ma Ha.
+  specialize (eq_merge_mon_unit _ Hma) as H1.
+  now symmetry; apply H1.
+}
+right; cbn.
+move lb before la.
+apply Nat.neq_sym.
+now apply eq_merge_mon_cons_cons in Hma.
+Qed.
+
+...
+
+Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb →
   (lb = [] ∧ ∀ ma, ma ∈ la → mdeg ma = mdeg mb) ∨
   mdeg (hd (0·) lb) ≠ mdeg mb.
@@ -1212,13 +1248,35 @@ Theorem merge_mon_rev : ∀ (la : list (monom T)),
   merge_mon (rev la) = rev (merge_mon la).
 Proof.
 intros.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+revert la Hlb.
+induction lb as [| mb]; intros. {
+  now apply eq_merge_mon_nil in Hlb; subst la.
+}
+cbn.
+...
+(*
+intros.
+induction la as [| ma] using rev_ind; [ easy | cbn ].
+rewrite rev_app_distr; cbn.
+rewrite fold_merge_mon, IHla.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+destruct la as [| mb]; [ now subst lb | ].
+cbn in Hlb |-*.
+rewrite fold_merge_mon.
+cbn in IHla.
+rewrite fold_merge_mon in IHla, Hlb.
+...
+intros.
 induction la as [| ma]; [ easy | cbn ].
 do 2 rewrite fold_merge_mon.
 replace [ma] with (rev [ma]) by easy.
 rewrite <- rev_app_distr; cbn.
 rewrite fold_right_app; cbn.
+unfold same_deg_sum_coeff at 2.
+...
 rewrite fold_left_rev_right.
-(* ouais, chais pas, c'est n'importe quoi, ça... faut que je réfléchisse *)
+*)
 ... ...
 rewrite <- (rev_involutive (la ++ lb)).
 rewrite (merge_mon_rev (rev (la ++ lb))).
