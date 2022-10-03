@@ -1270,12 +1270,15 @@ induction lb as [| mb]; intros. {
 cbn.
 apply eq_merge_mon_cons in Hlb.
 destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc).
-generalize Hmj; intros H.
-apply IHlb in H.
-rewrite <- H; clear H.
+specialize (IHlb _ Hmj) as H1.
+(**)
+rewrite <- (firstn_skipn j la).
+rewrite rev_app_distr.
+rewrite <- H1.
+...
 specialize (firstn_rev (length la - j) la) as H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
-rewrite <- H1.
+rewrite <- H1; clear H1.
 ...
 (*
 intros.
