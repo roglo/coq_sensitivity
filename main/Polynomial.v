@@ -1262,6 +1262,18 @@ Theorem merge_mon_rev : ∀ (la : list (monom T)),
   merge_mon (rev la) = rev (merge_mon la).
 Proof.
 intros.
+unfold merge_mon at 1.
+rewrite fold_left_rev_right.
+induction la as [| ma]; [ easy | ].
+cbn - [ merge_mon ].
+...
+specialize fold_left_op_fun_from_d as H1.
+specialize (H1 (list (monom T)) (monom T) []).
+rewrite H1.
+Print same_deg_sum_coeff.
+specialize (H1 (λ (x : list (monom T)) (y : list (monom T)), same_deg_sum_coeff y x)).
+...
+intros.
 remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
 revert la Hlb.
 induction lb as [| mb]; intros. {
