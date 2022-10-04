@@ -1314,6 +1314,7 @@ rewrite <- (firstn_skipn i la) in Hil.
 symmetry.
 remember (firstn i la) as lc eqn:Hlc.
 remember (skipn i la) as lb eqn:Hlb.
+assert (Hab : lc ++ lb ≠ []) by now destruct (lc ++ lb).
 clear la i Hlb Hlc Hil.
 rename lc into la.
 move la after lb.
@@ -1323,9 +1324,38 @@ assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
   now rewrite last_last.
 }
 clear Hc.
-...
-  ============================
-  merge_mon (rev (skipn j (rev la))) ++ [mb] = merge_mon la
+revert mb lb Hcj Hfi Hla Hab.
+induction la as [| ma]; intros. {
+  do 2 rewrite app_nil_l; symmetry.
+  clear Hla.
+  destruct mb as (cb, db).
+  cbn in Hab, Hcj, Hfi.
+  subst cb.
+  induction lb as [| ma]; [ easy | clear Hab ].
+  rewrite rngl_summation_list_cons.
+  cbn; rewrite fold_merge_mon.
+  assert (H : ∀ ma, ma ∈ lb → mdeg ma = db). {
+    intros mb Hma.
+    now apply Hfi; right.
+  }
+  specialize (IHlb H); clear H.
+  destruct lb as [| mb lb]. {
+    cbn; rewrite rngl_summation_list_empty; [ | easy ].
+    rewrite rngl_add_0_r.
+    specialize (Hfi _ (or_introl eq_refl)).
+    rewrite <- Hfi.
+    now destruct ma.
+  }
+  assert (H : mb :: lb ≠ []) by easy.
+  specialize (IHlb H); clear H.
+  rewrite IHlb; cbn.
+  rewrite Hfi; [ | now left ].
+  now rewrite Nat.eqb_refl.
+}
+clear Hab; cbn.
+do 2 rewrite fold_merge_mon.
+rewrite <- IHla with (mb := mb); try easy.
+(* mouais, chais pas, ça marche peut-être, faut voir... *)
 ...
 intros.
 remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
