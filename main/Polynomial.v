@@ -1282,6 +1282,7 @@ rewrite <- H1; clear H1.
 rewrite rev_involutive.
 rewrite firstn_rev in Hcj.
 rewrite firstn_rev in Hfj.
+rewrite skipn_rev in Hmj.
 remember (length la - j) as i eqn:Hi.
 remember (skipn i la) as lc.
 rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
@@ -1294,7 +1295,8 @@ assert (Hfi : ∀ ma, ma ∈ skipn i la → mdeg ma = mdeg mb). {
   apply in_rev in Hma.
   now specialize (Hfj ma Hma).
 }
-clear j lb IHlb Hjl Hfj Hi Hmj Hc.
+rewrite <- Hmj in Hc.
+clear j lb IHlb Hjl Hfj Hi Hmj.
 symmetry.
 rewrite <- (firstn_skipn i la) at 1.
 rewrite <- (firstn_skipn i la) in Hil.
