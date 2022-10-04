@@ -25,7 +25,8 @@ Compute (Mon (-3) 4).
 
 Notation "c ·" := (Mon c 0) (at level 30, format "c ·").
 Notation "c * ☓" := (Mon c 1) (at level 30, format "c * ☓").
-Notation "c * ☓ ^ a" := (Mon c a) (at level 30, format "c * ☓ ^ a").
+Notation "c * ☓ ^ a" := (Mon c a)
+  (at level 30, a at level 1, format "c * ☓ ^ a").
 
 (* definition of a polynomial *)
 
@@ -197,7 +198,7 @@ Definition same_deg_sum_coeff ma la :=
   match la with
   | [] => [ma]
   | mb :: lc =>
-      if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^mdeg ma :: lc
+      if mdeg ma =? mdeg mb then (mcoeff ma + mcoeff mb)*☓^(mdeg ma) :: lc
       else ma :: mb :: lc
   end.
 
@@ -824,19 +825,7 @@ Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
     (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
     merge_mon (skipn i la) = lb ∧
     mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
-    mdeg (hd mb (skipn i la)) ≠ mdeg mb.
-Proof.
-intros * Hma.
-(* donc, changement de la dernière ligne, à re-prouver donc *)
-...
-
-Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
-  merge_mon la = mb :: lb
-  → ∃ i, 0 < i ≤ length la ∧
-    (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
-    merge_mon (skipn i la) = lb ∧
-    mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
-    mdeg (hd (Mon 0 (S (mdeg mb))) lb) ≠ mdeg mb.
+    mdeg (hd (Mon 0 (S (mdeg mb))) (skipn i la)) ≠ mdeg mb.
 Proof.
 intros * Hma.
 revert mb lb Hma.
@@ -873,7 +862,21 @@ destruct (Nat.eq_dec _ _) as [Hac| Hac]. 2: {
     destruct Hmb as [Hmb| ]; [ now subst mb | easy ].
   }
   split; [ easy | ].
-  split; [ | now apply Nat.neq_sym ].
+  split. 2: {
+    destruct la as [| mb]; [ easy | cbn ].
+    cbn in Hlc.
+    intros H; apply Hac; clear Hac.
+    rewrite fold_merge_mon in Hlc.
+    unfold same_deg_sum_coeff in Hlc.
+    destruct (merge_mon la) as [| md ld]. {
+      now injection Hlc; clear Hlc; intros; subst mc lc.
+    }
+    rewrite if_eqb_eq_dec in Hlc.
+    destruct (Nat.eq_dec _ _) as [Hbd| Hbd]. {
+      now injection Hlc; clear Hlc; intros; subst mc lc.
+    }
+    now injection Hlc; clear Hlc; intros; subst mc lc.
+  }
   now cbn; rewrite rngl_summation_list_only_one.
 }
 injection Hma; clear Hma; intros; subst lc mb.
@@ -1001,7 +1004,6 @@ assert (Hsab : sorted rel lab) by now rewrite <- Hlab; apply sorted_isort.
 specialize (Hrr Hsab).
 assert (Hsba : sorted rel lba) by now rewrite <- Hlba; apply sorted_isort.
 specialize (Hrr Hsba).
-(**)
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
@@ -1292,9 +1294,8 @@ rewrite rev_length in Hjl, H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
 rewrite <- H1; clear H1.
 rewrite rev_involutive.
-rewrite firstn_rev in Hcj.
-rewrite firstn_rev in Hfj.
-rewrite skipn_rev in Hmj.
+rewrite firstn_rev in Hcj, Hfj.
+rewrite skipn_rev in Hmj, Hc.
 remember (length la - j) as i eqn:Hi.
 remember (skipn i la) as lc.
 rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
@@ -1307,7 +1308,6 @@ assert (Hfi : ∀ ma, ma ∈ skipn i la → mdeg ma = mdeg mb). {
   apply in_rev in Hma.
   now specialize (Hfj ma Hma).
 }
-rewrite <- Hmj in Hc.
 clear j lb IHlb Hjl Hfj Hi Hmj.
 symmetry.
 rewrite <- (firstn_skipn i la) at 1.
@@ -1318,11 +1318,12 @@ remember (skipn i la) as lb eqn:Hlb.
 clear la i Hlb Hlc Hil.
 rename lc into la.
 move la after lb.
-assert (Hla : if length la =? 0 then True else mdeg (last la mb) ≠ mdeg mb). {
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]; [ easy | ].
-  destruct la as [| ma]; [ easy | clear Haz ].
-  cbn in Hc.
+assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
+  destruct la as [| ma] using rev_ind; [ easy | ].
+  rewrite rev_app_distr in Hc; cbn in Hc.
+  now rewrite last_last.
+}
+clear Hc.
 ...
   ============================
   merge_mon (rev (skipn j (rev la))) ++ [mb] = merge_mon la
