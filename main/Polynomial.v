@@ -1280,6 +1280,30 @@ rewrite rev_length in Hjl, H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
 rewrite <- H1; clear H1.
 rewrite rev_involutive.
+rewrite firstn_rev in Hcj.
+rewrite firstn_rev in Hfj.
+remember (length la - j) as i eqn:Hi.
+remember (skipn i la) as lc.
+rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
+  apply (permutation_rev_l monom_eqb_eq).
+}
+subst lc.
+assert (Hil : i < length la) by flia Hjl Hi.
+assert (Hfi : ∀ ma, ma ∈ skipn i la → mdeg ma = mdeg mb). {
+  intros ma Hma.
+  apply in_rev in Hma.
+  now specialize (Hfj ma Hma).
+}
+clear j lb IHlb Hjl Hfj Hi Hmj Hc.
+symmetry.
+rewrite <- (firstn_skipn i la) at 1.
+rewrite <- (firstn_skipn i la) in Hil.
+symmetry.
+remember (firstn i la) as lc eqn:Hlc.
+remember (skipn i la) as lb eqn:Hlb.
+clear la i Hlb Hlc Hil.
+rename lc into la.
+move la after lb.
 ...
   ============================
   merge_mon (rev (skipn j (rev la))) ++ [mb] = merge_mon la
