@@ -1262,6 +1262,20 @@ Theorem merge_mon_rev : ∀ (la : list (monom T)),
   merge_mon (rev la) = rev (merge_mon la).
 Proof.
 intros.
+remember (merge_mon (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+revert la Hlb.
+induction lb as [| mb]; intros. {
+  apply eq_merge_mon_nil in Hlb.
+  now apply List_eq_rev_nil in Hlb; subst la.
+}
+apply eq_merge_mon_cons in Hlb.
+destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
+rewrite <- (rev_involutive (skipn j (rev la))) in Hmj.
+specialize (IHlb _ Hmj) as H1.
+rewrite H1; clear H1.
+Search (rev (skipn _ _)).
+...
+intros.
 remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
 revert la Hlb.
 induction lb as [| mb]; intros. {
