@@ -1263,9 +1263,21 @@ Theorem merge_mon_rev : ∀ (la : list (monom T)),
 Proof.
 intros.
 unfold merge_mon at 1.
+unfold merge_mon.
 rewrite fold_left_rev_right.
-induction la as [| ma]; [ easy | ].
-cbn - [ merge_mon ].
+symmetry.
+replace la with (rev (rev la)) at 1 by apply rev_involutive.
+rewrite fold_left_rev_right.
+induction la as [| ma]; [ easy | cbn ].
+rewrite fold_left_app.
+apply (f_equal (λ l, rev l)) in IHla.
+rewrite rev_involutive in IHla.
+rewrite IHla; cbn.
+unfold same_deg_sum_coeff at 1.
+clear IHla.
+destruct la as [| mb]; [ easy | ].
+cbn.
+(* pppp... *)
 ...
 specialize fold_left_op_fun_from_d as H1.
 specialize (H1 (list (monom T)) (monom T) []).
