@@ -824,6 +824,18 @@ Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
     (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
     merge_mon (skipn i la) = lb ∧
     mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
+    mdeg (hd mb (skipn i la)) ≠ mdeg mb.
+Proof.
+intros * Hma.
+(* donc, changement de la dernière ligne, à re-prouver donc *)
+...
+
+Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
+  merge_mon la = mb :: lb
+  → ∃ i, 0 < i ≤ length la ∧
+    (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
+    merge_mon (skipn i la) = lb ∧
+    mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
     mdeg (hd (Mon 0 (S (mdeg mb))) lb) ≠ mdeg mb.
 Proof.
 intros * Hma.
@@ -1306,6 +1318,11 @@ remember (skipn i la) as lb eqn:Hlb.
 clear la i Hlb Hlc Hil.
 rename lc into la.
 move la after lb.
+assert (Hla : if length la =? 0 then True else mdeg (last la mb) ≠ mdeg mb). {
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (length la) 0) as [Haz| Haz]; [ easy | ].
+  destruct la as [| ma]; [ easy | clear Haz ].
+  cbn in Hc.
 ...
   ============================
   merge_mon (rev (skipn j (rev la))) ++ [mb] = merge_mon la
