@@ -1324,6 +1324,11 @@ assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
   now rewrite last_last.
 }
 clear Hc.
+(**)
+destruct mb as (cb, db).
+cbn in Hcj, Hfi, Hla.
+subst cb.
+...
 revert mb lb Hcj Hfi Hla Hab.
 induction la as [| ma]; intros. {
   do 2 rewrite app_nil_l; symmetry.
