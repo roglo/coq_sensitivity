@@ -23,10 +23,9 @@ Open Scope Z_scope.
 Compute (Mon (-3) 4).
 *)
 
-Notation "c ·" := (Mon c 0) (at level 30, format "c ·").
-Notation "c * ☓" := (Mon c 1) (at level 30, format "c * ☓").
-Notation "c * ☓ ^ a" := (Mon c a)
-  (at level 30, a at level 1, format "c * ☓ ^ a").
+Notation "c ·" := (Mon c 0) (at level 1, format "c ·").
+Notation "c * ☓" := (Mon c 1) (at level 1, format "c * ☓").
+Notation "c * ☓ ^ a" := (Mon c a) (at level 1, format "c * ☓ ^ a").
 
 (* definition of a polynomial *)
 
