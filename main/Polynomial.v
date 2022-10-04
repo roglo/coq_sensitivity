@@ -1272,8 +1272,17 @@ apply eq_merge_mon_cons in Hlb.
 destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
 rewrite <- (rev_involutive (skipn j (rev la))) in Hmj.
 specialize (IHlb _ Hmj) as H1.
+rewrite rev_involutive in Hmj.
 rewrite H1; clear H1.
-Search (rev (skipn _ _)).
+rewrite <- rev_unit; f_equal.
+specialize (firstn_rev (length la - j) (rev la)) as H1.
+rewrite rev_length in Hjl, H1.
+replace (length la - (length la - j)) with j in H1 by flia Hjl.
+rewrite <- H1; clear H1.
+rewrite rev_involutive.
+...
+  ============================
+  merge_mon (rev (skipn j (rev la))) ++ [mb] = merge_mon la
 ...
 intros.
 remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
@@ -1284,6 +1293,9 @@ induction lb as [| mb]; intros. {
 apply eq_merge_mon_cons in Hlb.
 destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
 rewrite <- (IHlb (skipn j la)); [ | easy ].
+...
+  ============================
+  merge_mon (rev la) = merge_mon (rev (skipn j la)) ++ [mb]
 ...
 intros.
 unfold merge_mon at 1.
