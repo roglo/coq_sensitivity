@@ -1324,14 +1324,11 @@ destruct mb as (cb, db).
 cbn in Hcj, Hfi, Hla.
 subst cb.
 symmetry.
-...
-revert mb lb Hcj Hfi Hla Hab.
+revert lb Hfi Hla Hab.
 induction la as [| ma]; intros. {
   do 2 rewrite app_nil_l; symmetry.
   clear Hla.
-  destruct mb as (cb, db).
-  cbn in Hab, Hcj, Hfi.
-  subst cb.
+  cbn in Hab.
   induction lb as [| ma]; [ easy | clear Hab ].
   rewrite rngl_summation_list_cons.
   cbn; rewrite fold_merge_mon.
@@ -1355,7 +1352,7 @@ induction la as [| ma]; intros. {
 }
 clear Hab; cbn.
 do 2 rewrite fold_merge_mon.
-rewrite <- IHla with (mb := mb); try easy.
+rewrite <- IHla; try easy.
 (* mouais, chais pas, ça marche peut-être, faut voir... *)
 ...
 intros.
