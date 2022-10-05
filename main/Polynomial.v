@@ -824,7 +824,11 @@ Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
     (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
     merge_mon (skipn i la) = lb ∧
     mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
+(*
+    mdeg (nth i la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb.
+*)
     mdeg (hd (Mon 0 (S (mdeg mb))) (skipn i la)) ≠ mdeg mb.
+(**)
 Proof.
 intros * Hma.
 revert mb lb Hma.
