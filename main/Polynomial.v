@@ -791,33 +791,6 @@ specialize (IHla md mb eq_refl Hmb) as H1.
 congruence.
 Qed.
 
-Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
-  merge_mon la = ma :: mb :: lb
-  → mdeg ma ≠ mdeg mb.
-Proof.
-intros * Hma.
-intros Hab.
-destruct ma as (ca, da).
-destruct mb as (cb, db).
-cbn in Hab; subst db.
-revert ca cb da lb Hma.
-induction la as [| ma]; intros; [ easy | ].
-cbn in Hma.
-rewrite fold_merge_mon in Hma.
-unfold same_deg_sum_coeff in Hma.
-remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| mb]; [ easy | ].
-rewrite if_eqb_eq_dec in Hma.
-destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
-  injection Hma; clear Hma; intros; subst lc ca da.
-  destruct ma as (ca, da).
-  destruct mb as (cc, dc).
-  cbn in Hlc, Hab; subst dc.
-  apply (IHla _ _ _ _ eq_refl).
-}
-now injection Hma; clear Hma; intros; subst lc ma mb.
-Qed.
-
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb
   → ∃ i, 0 < i ≤ length la ∧
@@ -902,6 +875,33 @@ split; [ easy | ].
 split; [ cbn | now rewrite Hac ].
 rewrite rngl_summation_list_cons.
 now f_equal.
+Qed.
+
+Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
+  merge_mon la = ma :: mb :: lb
+  → mdeg ma ≠ mdeg mb.
+Proof.
+intros * Hma.
+intros Hab.
+destruct ma as (ca, da).
+destruct mb as (cb, db).
+cbn in Hab; subst db.
+revert ca cb da lb Hma.
+induction la as [| ma]; intros; [ easy | ].
+cbn in Hma.
+rewrite fold_merge_mon in Hma.
+unfold same_deg_sum_coeff in Hma.
+remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mb]; [ easy | ].
+rewrite if_eqb_eq_dec in Hma.
+destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
+  injection Hma; clear Hma; intros; subst lc ca da.
+  destruct ma as (ca, da).
+  destruct mb as (cc, dc).
+  cbn in Hlc, Hab; subst dc.
+  apply (IHla _ _ _ _ eq_refl).
+}
+now injection Hma; clear Hma; intros; subst lc ma mb.
 Qed.
 
 Theorem merge_mon_idemp : ∀ (la : list (monom T)),
