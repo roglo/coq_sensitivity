@@ -877,10 +877,28 @@ rewrite rngl_summation_list_cons.
 now f_equal.
 Qed.
 
+Theorem pouet : ∀ (la lb : list (monom T)) mb,
+  merge_mon la = mb :: lb
+  → mdeg (hd (Mon 0 (S (mdeg mb))) lb) ≠ mdeg mb.
+Proof.
+intros * Hma.
+apply eq_merge_mon_cons in Hma.
+destruct Hma as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
+...
+
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
   merge_mon la = ma :: mb :: lb
   → mdeg ma ≠ mdeg mb.
 Proof.
+(*
+intros * Hma.
+apply eq_merge_mon_cons in Hma.
+destruct Hma as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
+...
+apply eq_merge_mon_cons in Hmj.
+destruct Hmj as (k & Hkl & Hfk & Hmj & Hck & Hk); cbn.
+...
+*)
 intros * Hma.
 intros Hab.
 destruct ma as (ca, da).
