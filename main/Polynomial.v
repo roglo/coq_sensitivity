@@ -1311,7 +1311,6 @@ rewrite <- (firstn_skipn i la) in Hil.
 remember (firstn i la) as lc eqn:Hlc.
 remember (skipn i la) as lb eqn:Hlb.
 assert (Hab : lc ++ lb ≠ []) by now destruct (lc ++ lb).
-...
 clear la i Hlb Hlc Hil.
 rename lc into la.
 move la after lb.
@@ -1353,6 +1352,8 @@ induction la as [| ma]; intros. {
 }
 clear Hab; cbn.
 do 2 rewrite fold_merge_mon.
+(* marche pas si lb=[] *)
+...
 rewrite <- IHla; try easy. 3: {
   cbn in Hla.
   intros H; apply app_eq_nil in H.
