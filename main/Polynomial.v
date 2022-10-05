@@ -1275,43 +1275,39 @@ Theorem merge_mon_rev : ∀ (la : list (monom T)),
   merge_mon (rev la) = rev (merge_mon la).
 Proof.
 intros.
-remember (merge_mon (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
 revert la Hlb.
 induction lb as [| mb]; intros. {
-  apply eq_merge_mon_nil in Hlb.
-  now apply List_eq_rev_nil in Hlb; subst la.
+  now apply eq_merge_mon_nil in Hlb; subst la.
 }
 apply eq_merge_mon_cons in Hlb.
 destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
-rewrite <- (rev_involutive (skipn j (rev la))) in Hmj.
 specialize (IHlb _ Hmj) as H1.
-rewrite rev_involutive in Hmj.
-rewrite H1; clear H1.
-rewrite <- rev_unit; f_equal.
-specialize (firstn_rev (length la - j) (rev la)) as H1.
-rewrite rev_length in Hjl, H1.
+rewrite <- H1; clear H1.
+specialize (firstn_rev (length la - j) la) as H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
 rewrite <- H1; clear H1.
-rewrite rev_involutive.
+rewrite <- (rev_involutive la) in Hcj, Hfj, Hmj, Hc.
 rewrite firstn_rev in Hcj, Hfj.
 rewrite skipn_rev in Hmj, Hc.
+rewrite rev_length in Hcj, Hfj, Hmj, Hc.
 remember (length la - j) as i eqn:Hi.
-remember (skipn i la) as lc.
+remember (skipn i (rev la)) as lc.
 rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
   apply (permutation_rev_l monom_eqb_eq).
 }
 subst lc.
-assert (Hil : i < length la) by flia Hjl Hi.
-assert (Hfi : ∀ ma, ma ∈ skipn i la → mdeg ma = mdeg mb). {
+assert (Hil : i < length (rev la)) by (rewrite rev_length; flia Hjl Hi).
+assert (Hfi : ∀ ma, ma ∈ skipn i (rev la) → mdeg ma = mdeg mb). {
   intros ma Hma.
   apply in_rev in Hma.
   now specialize (Hfj ma Hma).
 }
 clear j lb IHlb Hjl Hfj Hi Hmj.
-symmetry.
+remember (rev la) as lc eqn:Hlc.
+clear la Hlc; rename lc into la.
 rewrite <- (firstn_skipn i la) at 1.
 rewrite <- (firstn_skipn i la) in Hil.
-symmetry.
 remember (firstn i la) as lc eqn:Hlc.
 remember (skipn i la) as lb eqn:Hlb.
 assert (Hab : lc ++ lb ≠ []) by now destruct (lc ++ lb).
@@ -1324,10 +1320,10 @@ assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
   now rewrite last_last.
 }
 clear Hc.
-(**)
 destruct mb as (cb, db).
 cbn in Hcj, Hfi, Hla.
 subst cb.
+symmetry.
 ...
 revert mb lb Hcj Hfi Hla Hab.
 induction la as [| ma]; intros. {
