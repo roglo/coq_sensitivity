@@ -877,6 +877,28 @@ rewrite rngl_summation_list_cons.
 now f_equal.
 Qed.
 
+Theorem merge_mon_cons_eq_cons : ∀ (ma mb : monom T) la lb,
+  merge_mon (ma :: la) = mb :: lb
+  → mdeg ma = mdeg mb.
+Proof.
+intros * Hab.
+destruct la as [| mc]; cbn. {
+  cbn in Hab.
+  now injection Hab; clear Hab; intros; subst mb.
+}
+remember (mc :: la) as lc eqn:Hlc.
+cbn in Hab; subst lc.
+rewrite fold_merge_mon in Hab.
+unfold same_deg_sum_coeff in Hab.
+remember (merge_mon (mc :: la)) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| md]. {
+  now injection Hab; clear Hab; intros; subst mb.
+}
+rewrite if_eqb_eq_dec in Hab.
+now destruct (Nat.eq_dec _ _); injection Hab; clear Hab; intros; subst mb.
+Qed.
+
 Theorem eq_merge_mon_cons_iff : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb
   ↔ ∃ i, 0 < i ≤ length la ∧
@@ -958,7 +980,9 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
         cbn in Hld.
         rewrite <- Hfi, Hab in Hnb.
         exfalso; apply Hnb.
-        clear ma la Hld IHla Hil Hfi Hab Hnb.
+        clear ma la Hld IHla Hil Hfi Hab Hnb Hfi'.
+        now apply merge_mon_cons_eq_cons in Hlb.
+      }
 ...
 }
 Qed.
