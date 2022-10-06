@@ -918,6 +918,45 @@ destruct lb as [| mb]. {
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
   rewrite (Hfi _ (or_introl eq_refl)).
+  f_equal. 2: {
+    clear IHla Hab.
+    symmetry.
+    assert (H : ∀ ma, ma ∈ firstn i la → mdeg ma = db). {
+      intros mc Hma.
+      now apply Hfi; right.
+    }
+    clear Hfi ma; rename H into Hfi.
+    rename i into n.
+    rewrite <- (firstn_skipn n la) in Hlb, Hnb.
+    move db before n.
+    rewrite app_nth2 in Hnb. 2: {
+      rewrite firstn_length, min_l; [ now unfold ge | easy ].
+    }
+    rewrite firstn_length, min_l in Hnb; [ | easy ].
+    rewrite Nat.sub_diag in Hnb.
+    remember (firstn n la) as lc eqn:Hlc.
+    remember (skipn n la) as ld eqn:Hld.
+    clear n la Hlc Hld Hil.
+    rename lc into la; rename lb into lc; rename ld into lb.
+    move la after lc; move lb after lc.
+    rewrite <- List_hd_nth_0 in Hnb.
+Theorem merge_mon_app_cons : ∀ (la lb lc : list (monom T)) mc db,
+  merge_mon (la ++ lb) = mc :: lc
+  → (∀ ma, ma ∈ la → mdeg ma = db)
+  → mdeg (hd 0*☓^(S db) lb) ≠ db
+  → merge_mon lb = lc.
+Proof.
+intros * Hmab Hdb Hndb.
+revert lb lc mc db Hmab Hdb Hndb.
+induction la as [| ma]; intros. {
+  cbn - [ merge_mon ] in Hmab.
+  destruct lb as [| mb]; [ easy | ].
+  cbn in Hndb.
+(* aïe aïe aïe *)
+... ...
+    apply (merge_mon_app_cons la lb Hlb Hfi Hnb).
+  }
+...
   apply eq_merge_mon_cons in Hlb.
   destruct Hlb as (j & Hjl & Hmab & Hfb & Hcb & Hdb).
 ...
