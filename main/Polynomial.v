@@ -884,6 +884,13 @@ Proof.
 intros * Hma.
 apply eq_merge_mon_cons in Hma.
 destruct Hma as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
+destruct lb as [| ma]; [ apply Nat.neq_succ_diag_l | cbn ].
+apply eq_merge_mon_cons in Hmj.
+destruct Hmj as (k & Hkl & Hfk & Hmj & Hck & Hk).
+destruct lb as [| mc]. {
+  apply eq_merge_mon_nil in Hmj.
+  rewrite List_skipn_skipn in Hmj.
+Search (skipn _ _ = []).
 ...
 
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
