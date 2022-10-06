@@ -1498,6 +1498,15 @@ intros i lb Hi; apply in_seq in Hi.
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem List_eq_firstn_nil : ∀ A n (l : list A),
+  firstn n l = [] → n = 0 ∨ l = [].
+Proof.
+intros * Hnl.
+revert l Hnl.
+induction n; intros; [ now left | right ].
+destruct l as [| x]; [ easy | easy ].
+Qed.
+
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
 Proof.
 intros * Hl.
