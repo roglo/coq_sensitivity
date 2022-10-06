@@ -960,8 +960,8 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     }
     rewrite firstn_length, min_l in Hnb; [ | easy ].
     rewrite Nat.sub_diag in Hnb.
-    remember (firstn n la) as lc eqn:Hlc.
-    remember (skipn n la) as ld eqn:Hld.
+    remember (firstn n la) as lc eqn:Hlc; symmetry in Hlc.
+    remember (skipn n la) as ld eqn:Hld; symmetry in Hld.
 (*
     clear n la Hlc Hld Hil.
     rename lc into la; rename lb into lc; rename ld into lb.
@@ -973,7 +973,6 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
       destruct ld as [| md]; [ easy | ].
       cbn in Hnb.
       specialize (Hfi ma (or_introl eq_refl)).
-      symmetry in Hlc.
       apply List_eq_firstn_nil in Hlc.
       destruct Hlc as [Hlc| Hlc]. {
         subst n.
@@ -983,6 +982,10 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
         clear ma la Hld IHla Hil Hfi Hab Hnb Hfi'.
         now apply merge_mon_cons_eq_cons in Hlb.
       }
+      subst la.
+      now rewrite skipn_nil in Hld.
+    }
+    cbn - [ merge_mon ] in Hlb.
 ...
 }
 Qed.
