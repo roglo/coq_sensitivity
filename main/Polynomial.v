@@ -1623,13 +1623,11 @@ destruct mb as (cb, db).
 cbn in Hcj, Hfi, Hla.
 subst cb.
 symmetry.
-...
-revert lb Hfi Hla Hab.
+revert lb Hfi Hla Hbz.
 induction la as [| ma]; intros. {
   do 2 rewrite app_nil_l; symmetry.
   clear Hla.
-  cbn in Hab.
-  induction lb as [| ma]; [ easy | clear Hab ].
+  induction lb as [| ma]; [ easy | clear Hbz ].
   rewrite rngl_summation_list_cons.
   cbn; rewrite fold_merge_mon.
   assert (H : ∀ ma, ma ∈ lb → mdeg ma = db). {
@@ -1650,15 +1648,14 @@ induction la as [| ma]; intros. {
   rewrite Hfi; [ | now left ].
   now rewrite Nat.eqb_refl.
 }
-clear Hab; cbn.
+cbn.
 do 2 rewrite fold_merge_mon.
-...
-(* marche pas si lb=[] *)
-rewrite <- IHla; try easy. 3: {
-  cbn in Hla.
-  intros H; apply app_eq_nil in H.
-  destruct H; subst la lb.
-  (* non *)
+rewrite <- IHla; [ | easy | | easy ]. 2: {
+  destruct la as [| mb] using rev_ind; [ cbn; flia | ].
+  rewrite List_cons_is_app, app_assoc in Hla.
+  rewrite last_last in Hla.
+  now rewrite last_last.
+}
 ...
 intros.
 remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
