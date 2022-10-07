@@ -1659,6 +1659,28 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
 clear Hpf Hps; subst n.
 rewrite <- Hlenb in Hlena.
 clear len IHlen Hlenb.
+clear Hsa Hsb.
+revert lb Hpab Hdd Hlena.
+induction la as [| ma]; intros. {
+  now symmetry in Hlena; apply length_zero_iff_nil in Hlena; subst lb.
+}
+apply permutation_cons_l_iff in Hpab.
+...
+sorted_sorted_permuted:
+  ∀ (A : Type) (eqb rel : A → A → bool),
+    equality eqb
+    → antisymmetric rel
+      → transitive rel → ∀ la lb : list A, sorted rel la → sorted rel lb → permutation eqb la lb → la = lb
+sorted_sorted_permuted_not_antisym:
+  ∀ (A : Type) (eqb leb : A → A → bool),
+    equality eqb
+    → reflexive leb
+      → transitive leb
+        → ∀ (d : A) (la lb : list A),
+            sorted leb la
+            → sorted leb lb
+              → permutation eqb la lb
+                → ∀ i : nat, leb (nth i la d) (nth i lb d) = true ∧ leb (nth i lb d) (nth i la d) = true
 ...
 Theorem glop : ∀ (la lb lc : list (monom T)),
   merge_mon la = merge_mon lb
