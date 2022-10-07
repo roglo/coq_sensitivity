@@ -1575,10 +1575,11 @@ specialize (IHlb _ Hmj) as H1.
 rewrite <- H1; clear H1.
 specialize (firstn_rev (length la - j) la) as H1.
 replace (length la - (length la - j)) with j in H1 by flia Hjl.
+rewrite <- (Nat.add_0_l j) in Hc.
+rewrite <- List_nth_skipn in Hc.
 rewrite <- H1; clear H1.
 rewrite <- (rev_involutive la) in Hcj, Hfj, Hmj, Hc.
 rewrite firstn_rev in Hcj, Hfj.
-...
 rewrite skipn_rev in Hmj, Hc.
 rewrite rev_length in Hcj, Hfj, Hmj, Hc.
 remember (length la - j) as i eqn:Hi.
