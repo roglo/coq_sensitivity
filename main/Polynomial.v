@@ -974,11 +974,7 @@ Theorem eq_merge_mon_cons_iff : ∀ (la lb : list (monom T)) mb,
     (∀ ma, ma ∈ firstn i la → mdeg ma = mdeg mb) ∧
     merge_mon (skipn i la) = lb ∧
     mcoeff mb = ∑ (ma ∈ firstn i la), mcoeff ma ∧
-(**)
     mdeg (nth i la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb.
-(*
-    mdeg (hd (Mon 0 (S (mdeg mb))) (skipn i la)) ≠ mdeg mb.
-*)
 Proof.
 intros.
 split; [ now apply eq_merge_mon_cons | ].
@@ -1064,53 +1060,15 @@ destruct la as [| mc]; [ easy | ].
 destruct i. {
   cbn; rewrite rngl_summation_list_empty; [ | easy ].
   rewrite rngl_add_0_r.
-  f_equal; [ now rewrite <- H1; destruct ma | ].
-  rewrite fold_merge_mon.
-  cbn in Hnb.
-  clear Hfi Hil.
-  symmetry.
-  unfold same_deg_sum_coeff.
-  remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| md]. {
-    apply eq_merge_mon_nil in Hlc; subst la.
-    cbn in Hlb.
-    now injection Hlb; clear Hlb; intros; subst mc lb.
-  }
-  rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. {
-    f_equal. {
-...
-  apply merge_mon_cons_eq_cons in Hlb.
-  rewrite H1 in Hab.
-  move Hlb at bottom.
-...
-    destruct lc as [| mc]. {
-      cbn - [ merge_mon ] in Hlb.
-      destruct ld as [| md]; [ easy | ].
-      cbn in Hnb.
-      specialize (Hfi ma (or_introl eq_refl)).
-      apply List_eq_firstn_nil in Hlc.
-      destruct Hlc as [Hlc| Hlc]. {
-        subst n.
-        cbn in Hld.
-        rewrite <- Hfi, Hab in Hnb.
-        exfalso; apply Hnb.
-        clear ma la Hld IHla Hil Hfi Hab Hnb Hfi'.
-        now apply merge_mon_cons_eq_cons in Hlb.
-      }
-      subst la.
-      now rewrite skipn_nil in Hld.
-    }
-    cbn - [ merge_mon ] in Hlb.
-    clear Hlc Hld IHla Hil.
-    specialize (Hfi ma (or_introl eq_refl)) as H1.
-    rewrite H1 in Hab.
-    clear ma Hfi H1.
-    symmetry in Hab.
-    clear la.
-    remember (mc :: lc) as la.
-...
+  f_equal; [ now rewrite <- H1; destruct ma | easy ].
 }
+cbn - [ In ] in Hfi.
+specialize (Hfi _ (or_intror (or_introl eq_refl))) as H2.
+apply merge_mon_cons_eq_cons in Hlb.
+congruence.
+Qed.
+
+Inspect 2.
 
 ...
 
