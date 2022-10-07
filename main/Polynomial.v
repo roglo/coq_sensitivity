@@ -1010,17 +1010,11 @@ rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
   rewrite (Hfi _ (or_introl eq_refl)).
   f_equal. 2: {
-(*
-    clear IHla Hab.
-*)
     symmetry.
     assert (Hfi' : ∀ ma, ma ∈ firstn i la → mdeg ma = db). {
       intros mc Hma.
       now apply Hfi; right.
     }
-(*
-    clear Hfi ma; rename H into Hfi.
-*)
     rename i into n.
     rewrite <- (firstn_skipn n la) in Hlb, Hnb.
     move db before n.
@@ -1031,11 +1025,6 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     rewrite Nat.sub_diag in Hnb.
     remember (firstn n la) as lc eqn:Hlc; symmetry in Hlc.
     remember (skipn n la) as ld eqn:Hld; symmetry in Hld.
-(*
-    clear n la Hlc Hld Hil.
-    rename lc into la; rename lb into lc; rename ld into lb.
-    move la after lc; move lb after lc.
-*)
     rewrite <- List_hd_nth_0 in Hnb.
     clear Hlc Hld IHla Hil.
     specialize (Hfi ma (or_introl eq_refl)) as H1.
@@ -1068,10 +1057,8 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
   specialize (H1 Hnb).
   remember (S i) as si.
   injection H1; clear H1; intros H1 H2; subst si.
-  rewrite H2.
-...
-  apply eq_merge_mon_cons in Hlb.
-  destruct Hlb as (j & Hja & Hb & Hlb & Hcb & Hdb).
+  now rewrite H2.
+}
 ...
     destruct lc as [| mc]. {
       cbn - [ merge_mon ] in Hlb.
