@@ -1601,6 +1601,16 @@ rewrite <- (firstn_skipn i la) at 1.
 rewrite <- (firstn_skipn i la) in Hil.
 remember (firstn i la) as lc eqn:Hlc.
 remember (skipn i la) as lb eqn:Hlb.
+(**)
+...
+rewrite app_length in Hil.
+apply (f_equal length) in Hlb, Hlc.
+rewrite skipn_length in Hlb.
+rewrite firstn_length in Hlc.
+rewrite min_l in Hlc.
+...
+rewrite Hlb in Hil.
+...
 assert (Hab : lc ++ lb ≠ []) by now destruct (lc ++ lb).
 clear la i Hlb Hlc Hil.
 rename lc into la.
@@ -1615,6 +1625,7 @@ destruct mb as (cb, db).
 cbn in Hcj, Hfi, Hla.
 subst cb.
 symmetry.
+...
 revert lb Hfi Hla Hab.
 induction la as [| ma]; intros. {
   do 2 rewrite app_nil_l; symmetry.
@@ -1643,8 +1654,8 @@ induction la as [| ma]; intros. {
 }
 clear Hab; cbn.
 do 2 rewrite fold_merge_mon.
-(* marche pas si lb=[] *)
 ...
+(* marche pas si lb=[] *)
 rewrite <- IHla; try easy. 3: {
   cbn in Hla.
   intros H; apply app_eq_nil in H.
