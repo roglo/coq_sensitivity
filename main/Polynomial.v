@@ -1059,6 +1059,17 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
   injection H1; clear H1; intros H1 H2; subst si.
   now rewrite H2.
 }
+specialize (Hfi _ (or_introl eq_refl)) as H1.
+destruct la as [| mc]; [ easy | ].
+destruct i. {
+  cbn; rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_add_0_r.
+  f_equal; [ now rewrite <- H1; destruct ma | ].
+  rewrite fold_merge_mon.
+...
+  apply merge_mon_cons_eq_cons in Hlb.
+  rewrite H1 in Hab.
+  move Hlb at bottom.
 ...
     destruct lc as [| mc]. {
       cbn - [ merge_mon ] in Hlb.
