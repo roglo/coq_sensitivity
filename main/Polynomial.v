@@ -1660,11 +1660,34 @@ clear Hpf Hps; subst n.
 rewrite <- Hlenb in Hlena.
 clear len IHlen Hlenb.
 clear Hsa Hsb.
+...
 revert lb Hpab Hdd Hlena.
 induction la as [| ma]; intros. {
   now symmetry in Hlena; apply length_zero_iff_nil in Hlena; subst lb.
 }
 apply permutation_cons_l_iff in Hpab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply monom_eqb_eq in H; subst x lb.
+cbn; rewrite fold_merge_mon.
+rewrite IHla with (lb := bef ++ aft); [ | | easy | | ].
+unfold same_deg_sum_coeff.
+remember (merge_mon (bef ++ aft)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]. {
+  apply eq_merge_mon_nil, app_eq_nil in Hlb.
+  now destruct Hlb; subst bef aft.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
+  symmetry.
+  destruct (Nat.eq_dec (length bef) 0) as [Hbz| Hbz]. {
+    apply length_zero_iff_nil in Hbz; subst bef.
+    rewrite app_nil_l in Hlb |-*.
+...
+  apply eq_merge_mon_cons_iff; cbn.
+  exists (length bef).
 ...
 sorted_sorted_permuted:
   ∀ (A : Type) (eqb rel : A → A → bool),
