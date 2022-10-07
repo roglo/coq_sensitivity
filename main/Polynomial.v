@@ -968,6 +968,44 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     move la after lc; move lb after lc.
 *)
     rewrite <- List_hd_nth_0 in Hnb.
+    clear Hlc Hld IHla Hil.
+    specialize (Hfi ma (or_introl eq_refl)) as H1.
+    rewrite H1 in Hab.
+    clear ma Hfi H1.
+    symmetry in Hab.
+    clear la n.
+    destruct mb as (cc, dc).
+    cbn in Hab; subst db.
+    rename lc into la; rename lb into lc; rename ld into lb.
+    move la before lc; move lb before lc.
+Theorem merge_mon_app_eq_cons : ∀ la lb lc cc dc,
+  merge_mon (la ++ lb) = cc*☓^dc :: lc
+  → mdeg (hd 0*☓^(S dc) lb) ≠ dc
+  → (∀ ma : monom T, ma ∈ la → mdeg ma = dc)
+  → merge_mon lb = lc.
+Proof.
+intros * Habc Hb Hdc.
+revert lb lc cc dc Habc Hb Hdc.
+induction la as [| ma]; intros. {
+  cbn - [ merge_mon ] in Habc.
+  destruct lb as [| mb]; [ easy | ].
+  cbn in Hb.
+  cbn in Habc; rewrite fold_merge_mon in Habc.
+  clear Hdc; exfalso.
+  unfold same_deg_sum_coeff in Habc.
+  remember (merge_mon lb) as la eqn:Hla; symmetry in Hla.
+  destruct la as [| ma]. {
+    now injection Habc; clear Habc; intros; subst mb.
+  }
+  rewrite if_eqb_eq_dec in Habc.
+  destruct (Nat.eq_dec _ _) as [Hba| Hba]. {
+    now injection Habc; clear Habc; intros; subst dc.
+  }
+  now injection Habc; clear Habc; intros; subst mb.
+}
+... ...
+    now apply merge_mon_app_eq_cons in Hlb.
+...
     destruct lc as [| mc]. {
       cbn - [ merge_mon ] in Hlb.
       destruct ld as [| md]; [ easy | ].
@@ -991,6 +1029,8 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     rewrite H1 in Hab.
     clear ma Hfi H1.
     symmetry in Hab.
+    clear la.
+    remember (mc :: lc) as la.
 ...
 }
 Qed.
