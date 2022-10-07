@@ -1050,6 +1050,26 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     now apply merge_mon_app_eq_cons in Hlb.
   }
   f_equal; f_equal.
+  destruct i. {
+    specialize (Hfi ma (or_introl eq_refl)).
+    cbn; rewrite rngl_summation_list_empty; [ | easy ].
+    destruct la as [| mc]; [ easy | ].
+    apply merge_mon_cons_eq_cons in Hlb; cbn in Hnb.
+    congruence.
+  }
+  specialize (IHla (S i) db) as H1.
+  assert (H : 0 < S i ≤ length la) by easy.
+  specialize (H1 H); clear H.
+  assert (H : ∀ ma, ma ∈ firstn (S i) la → mdeg ma = db). {
+    intros mc Hmc.
+    now apply Hfi; right.
+  }
+  specialize (H1 H); clear H.
+  specialize (H1 Hnb).
+  remember (S i) as si.
+  injection H1; clear H1; intros H1 H2; subst si.
+  rewrite H2.
+...
   apply eq_merge_mon_cons in Hlb.
   destruct Hlb as (j & Hja & Hb & Hlb & Hcb & Hdb).
 ...
