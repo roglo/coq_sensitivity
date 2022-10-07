@@ -1003,6 +1003,25 @@ induction la as [| ma]; intros. {
   }
   now injection Habc; clear Habc; intros; subst mb.
 }
+cbn in Habc; rewrite fold_merge_mon in Habc.
+unfold same_deg_sum_coeff in Habc.
+remember (merge_mon (la ++ lb)) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| (cd, dd)]. {
+  apply eq_merge_mon_nil, app_eq_nil in Hld.
+  destruct Hld; subst la lb.
+  now injection Habc; intros; subst lc.
+}
+rewrite if_eqb_eq_dec in Habc.
+destruct (Nat.eq_dec _ _) as [Had| Had]. {
+  cbn in Had; subst dd.
+  cbn in Habc.
+  injection Habc; clear Habc; intros; subst ld cc dc.
+  apply IHla in Hld; [ easy | easy | ].
+  intros mb Hmb.
+  now apply Hdc; right.
+}
+injection Habc; clear Habc; intros; subst ma lc.
+cbn in Had.
 ... ...
     now apply merge_mon_app_eq_cons in Hlb.
 ...
