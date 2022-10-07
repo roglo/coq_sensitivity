@@ -1262,6 +1262,126 @@ do 2 rewrite fold_merge_mon.
 now rewrite IHla.
 Qed.
 
+Theorem merge_mon_rev : ∀ (la : list (monom T)),
+  merge_mon (rev la) = rev (merge_mon la).
+Proof.
+intros.
+remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+revert la Hlb.
+induction lb as [| mb]; intros. {
+  now apply eq_merge_mon_nil in Hlb; subst la.
+}
+apply eq_merge_mon_cons_iff in Hlb.
+destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
+specialize (IHlb _ Hmj) as H1.
+rewrite <- H1; clear H1.
+specialize (firstn_rev (length la - j) la) as H1.
+replace (length la - (length la - j)) with j in H1 by flia Hjl.
+rewrite <- (Nat.add_0_l j) in Hc.
+rewrite <- List_nth_skipn in Hc.
+rewrite <- H1; clear H1.
+rewrite <- (rev_involutive la) in Hcj, Hfj, Hmj, Hc.
+rewrite firstn_rev in Hcj, Hfj.
+rewrite skipn_rev in Hmj, Hc.
+rewrite rev_length in Hcj, Hfj, Hmj, Hc.
+remember (length la - j) as i eqn:Hi.
+remember (skipn i (rev la)) as lc.
+rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
+  apply (permutation_rev_l monom_eqb_eq).
+}
+subst lc.
+assert (Hil : i < length (rev la)) by (rewrite rev_length; flia Hjl Hi).
+assert (Hfi : ∀ ma, ma ∈ skipn i (rev la) → mdeg ma = mdeg mb). {
+  intros ma Hma.
+  apply in_rev in Hma.
+  now specialize (Hfj ma Hma).
+}
+clear j lb IHlb Hjl Hfj Hi Hmj.
+remember (rev la) as lc eqn:Hlc.
+clear la Hlc; rename lc into la.
+rewrite <- (firstn_skipn i la) at 1.
+rewrite <- (firstn_skipn i la) in Hil.
+remember (firstn i la) as lc eqn:Hlc.
+remember (skipn i la) as lb eqn:Hlb.
+assert (Hbz : lb ≠ []). {
+  intros H; move H at top; subst lb.
+  symmetry in Hlb.
+  apply List_eq_skipn_nil in Hlb.
+  rewrite firstn_all2 in Hlc; [ | easy ].
+  subst lc.
+  rewrite app_nil_r in Hil.
+  now apply Nat.nle_gt in Hil.
+}
+clear la i Hlb Hlc Hil.
+rename lc into la.
+move la after lb.
+assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
+  destruct la as [| ma] using rev_ind; [ easy | ].
+  rewrite rev_app_distr in Hc; cbn in Hc.
+  now rewrite last_last.
+}
+clear Hc.
+destruct mb as (cb, db).
+cbn in Hcj, Hfi, Hla.
+subst cb.
+symmetry.
+revert lb Hfi Hla Hbz.
+induction la as [| ma]; intros. {
+  do 2 rewrite app_nil_l; symmetry.
+  clear Hla.
+  induction lb as [| ma]; [ easy | clear Hbz ].
+  rewrite rngl_summation_list_cons.
+  cbn; rewrite fold_merge_mon.
+  assert (H : ∀ ma, ma ∈ lb → mdeg ma = db). {
+    intros mb Hma.
+    now apply Hfi; right.
+  }
+  specialize (IHlb H); clear H.
+  destruct lb as [| mb lb]. {
+    cbn; rewrite rngl_summation_list_empty; [ | easy ].
+    rewrite rngl_add_0_r.
+    specialize (Hfi _ (or_introl eq_refl)).
+    rewrite <- Hfi.
+    now destruct ma.
+  }
+  assert (H : mb :: lb ≠ []) by easy.
+  specialize (IHlb H); clear H.
+  rewrite IHlb; cbn.
+  rewrite Hfi; [ | now left ].
+  now rewrite Nat.eqb_refl.
+}
+cbn.
+do 2 rewrite fold_merge_mon.
+rewrite <- IHla; [ | easy | | easy ]. 2: {
+  destruct la as [| mb] using rev_ind; [ cbn; flia | ].
+  rewrite List_cons_is_app, app_assoc in Hla.
+  rewrite last_last in Hla.
+  now rewrite last_last.
+}
+unfold same_deg_sum_coeff.
+remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| mc]; cbn. {
+  apply eq_merge_mon_nil in Hlc; subst la; cbn.
+  cbn in Hla.
+  now apply Nat.eqb_neq in Hla; rewrite Hla.
+}
+now destruct (mdeg ma =? mdeg mc).
+Qed.
+
+Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
+  merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
+Proof.
+intros.
+rewrite <- (rev_involutive (la ++ lb)).
+rewrite (merge_mon_rev (rev (la ++ lb))).
+rewrite rev_app_distr.
+rewrite merge_mon_app_distr_r.
+rewrite merge_mon_rev.
+rewrite <- rev_app_distr.
+rewrite merge_mon_rev.
+apply rev_involutive.
+Qed.
+
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1313,29 +1433,6 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   now apply Nat.le_antisymm.
 }
 clear Hrr.
-(*
-apply sorted_le_sorted_lt_merge_mon in Hsab.
-apply sorted_le_sorted_lt_merge_mon in Hsba.
-set (f := λ ma mb : monom T, mdeg mb <? mdeg ma).
-fold f in Hsab, Hsba.
-specialize (sorted_sorted_permuted) as H1.
-specialize (H1 _ monom_eqb f monom_eqb_eq).
-apply H1; [ | | easy | easy | ]. {
-  unfold f; cbn; intros ma mb Hmab Hmba.
-  apply Nat.ltb_lt in Hmab, Hmba.
-  flia Hmab Hmba.
-} {
-  intros ma mb mc Hab Hbc.
-  apply Nat.ltb_lt in Hab, Hbc.
-  apply Nat.ltb_lt.
-  now transitivity (mdeg mb).
-}
-clear H1.
-...
-  ============================
-  permutation monom_eqb (merge_mon lab) (merge_mon lba)
-...
-*)
 clear Hlab Hlba.
 clear la lb.
 rename lab into la.
@@ -1553,199 +1650,12 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   rewrite <- (firstn_skipn n la).
   rewrite <- (firstn_skipn n lb).
-  rewrite merge_mon_app_distr_r.
-  rewrite H2.
+  rewrite merge_mon_app_distr_r, H2.
   rewrite <- merge_mon_app_distr_r.
-Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
-  merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
-Proof.
-intros.
-Theorem merge_mon_rev : ∀ (la : list (monom T)),
-  merge_mon (rev la) = rev (merge_mon la).
-Proof.
-intros.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-revert la Hlb.
-induction lb as [| mb]; intros. {
-  now apply eq_merge_mon_nil in Hlb; subst la.
+  rewrite merge_mon_app_distr_l, H1.
+  rewrite <- merge_mon_app_distr_l.
+  easy.
 }
-apply eq_merge_mon_cons_iff in Hlb.
-destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
-specialize (IHlb _ Hmj) as H1.
-rewrite <- H1; clear H1.
-specialize (firstn_rev (length la - j) la) as H1.
-replace (length la - (length la - j)) with j in H1 by flia Hjl.
-rewrite <- (Nat.add_0_l j) in Hc.
-rewrite <- List_nth_skipn in Hc.
-rewrite <- H1; clear H1.
-rewrite <- (rev_involutive la) in Hcj, Hfj, Hmj, Hc.
-rewrite firstn_rev in Hcj, Hfj.
-rewrite skipn_rev in Hmj, Hc.
-rewrite rev_length in Hcj, Hfj, Hmj, Hc.
-remember (length la - j) as i eqn:Hi.
-remember (skipn i (rev la)) as lc.
-rewrite (rngl_summation_list_permut _ monom_eqb_eq _ lc) in Hcj. 2: {
-  apply (permutation_rev_l monom_eqb_eq).
-}
-subst lc.
-assert (Hil : i < length (rev la)) by (rewrite rev_length; flia Hjl Hi).
-assert (Hfi : ∀ ma, ma ∈ skipn i (rev la) → mdeg ma = mdeg mb). {
-  intros ma Hma.
-  apply in_rev in Hma.
-  now specialize (Hfj ma Hma).
-}
-clear j lb IHlb Hjl Hfj Hi Hmj.
-remember (rev la) as lc eqn:Hlc.
-clear la Hlc; rename lc into la.
-rewrite <- (firstn_skipn i la) at 1.
-rewrite <- (firstn_skipn i la) in Hil.
-remember (firstn i la) as lc eqn:Hlc.
-remember (skipn i la) as lb eqn:Hlb.
-assert (Hbz : lb ≠ []). {
-  intros H; move H at top; subst lb.
-  symmetry in Hlb.
-  apply List_eq_skipn_nil in Hlb.
-  rewrite firstn_all2 in Hlc; [ | easy ].
-  subst lc.
-  rewrite app_nil_r in Hil.
-  now apply Nat.nle_gt in Hil.
-}
-clear la i Hlb Hlc Hil.
-rename lc into la.
-move la after lb.
-assert (Hla : mdeg (last la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb). {
-  destruct la as [| ma] using rev_ind; [ easy | ].
-  rewrite rev_app_distr in Hc; cbn in Hc.
-  now rewrite last_last.
-}
-clear Hc.
-destruct mb as (cb, db).
-cbn in Hcj, Hfi, Hla.
-subst cb.
-symmetry.
-revert lb Hfi Hla Hbz.
-induction la as [| ma]; intros. {
-  do 2 rewrite app_nil_l; symmetry.
-  clear Hla.
-  induction lb as [| ma]; [ easy | clear Hbz ].
-  rewrite rngl_summation_list_cons.
-  cbn; rewrite fold_merge_mon.
-  assert (H : ∀ ma, ma ∈ lb → mdeg ma = db). {
-    intros mb Hma.
-    now apply Hfi; right.
-  }
-  specialize (IHlb H); clear H.
-  destruct lb as [| mb lb]. {
-    cbn; rewrite rngl_summation_list_empty; [ | easy ].
-    rewrite rngl_add_0_r.
-    specialize (Hfi _ (or_introl eq_refl)).
-    rewrite <- Hfi.
-    now destruct ma.
-  }
-  assert (H : mb :: lb ≠ []) by easy.
-  specialize (IHlb H); clear H.
-  rewrite IHlb; cbn.
-  rewrite Hfi; [ | now left ].
-  now rewrite Nat.eqb_refl.
-}
-cbn.
-do 2 rewrite fold_merge_mon.
-rewrite <- IHla; [ | easy | | easy ]. 2: {
-  destruct la as [| mb] using rev_ind; [ cbn; flia | ].
-  rewrite List_cons_is_app, app_assoc in Hla.
-  rewrite last_last in Hla.
-  now rewrite last_last.
-}
-...
-intros.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-revert la Hlb.
-induction lb as [| mb]; intros. {
-  now apply eq_merge_mon_nil in Hlb; subst la.
-}
-apply eq_merge_mon_cons in Hlb.
-destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
-rewrite <- (IHlb (skipn j la)); [ | easy ].
-...
-  ============================
-  merge_mon (rev la) = merge_mon (rev (skipn j la)) ++ [mb]
-...
-intros.
-unfold merge_mon at 1.
-unfold merge_mon.
-rewrite fold_left_rev_right.
-symmetry.
-replace la with (rev (rev la)) at 1 by apply rev_involutive.
-rewrite fold_left_rev_right.
-induction la as [| ma]; [ easy | cbn ].
-rewrite fold_left_app.
-apply (f_equal (λ l, rev l)) in IHla.
-rewrite rev_involutive in IHla.
-rewrite IHla; cbn.
-unfold same_deg_sum_coeff at 1.
-clear IHla.
-destruct la as [| mb]; [ easy | ].
-cbn.
-(* pppp... *)
-...
-specialize fold_left_op_fun_from_d as H1.
-specialize (H1 (list (monom T)) (monom T) []).
-rewrite H1.
-Print same_deg_sum_coeff.
-specialize (H1 (λ (x : list (monom T)) (y : list (monom T)), same_deg_sum_coeff y x)).
-...
-intros.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-revert la Hlb.
-induction lb as [| mb]; intros. {
-  now apply eq_merge_mon_nil in Hlb; subst la.
-}
-cbn.
-apply eq_merge_mon_cons in Hlb.
-destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc).
-specialize (IHlb _ Hmj) as H1.
-(**)
-rewrite <- (firstn_skipn j la).
-rewrite rev_app_distr.
-rewrite <- H1.
-...
-  merge_mon (la ++ lb) = merge_mon la ++ lc
-...
-specialize (firstn_rev (length la - j) la) as H1.
-replace (length la - (length la - j)) with j in H1 by flia Hjl.
-rewrite <- H1; clear H1.
-...
-(*
-intros.
-induction la as [| ma] using rev_ind; [ easy | cbn ].
-rewrite rev_app_distr; cbn.
-rewrite fold_merge_mon, IHla.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-destruct la as [| mb]; [ now subst lb | ].
-cbn in Hlb |-*.
-rewrite fold_merge_mon.
-cbn in IHla.
-rewrite fold_merge_mon in IHla, Hlb.
-...
-intros.
-induction la as [| ma]; [ easy | cbn ].
-do 2 rewrite fold_merge_mon.
-replace [ma] with (rev [ma]) by easy.
-rewrite <- rev_app_distr; cbn.
-rewrite fold_right_app; cbn.
-unfold same_deg_sum_coeff at 2.
-...
-rewrite fold_left_rev_right.
-*)
-... ...
-rewrite <- (rev_involutive (la ++ lb)).
-rewrite (merge_mon_rev (rev (la ++ lb))).
-rewrite rev_app_distr.
-rewrite merge_mon_app_distr_r.
-rewrite merge_mon_rev.
-rewrite <- rev_app_distr.
-rewrite merge_mon_rev.
-apply rev_involutive.
 ...
 Theorem glop : ∀ (la lb lc : list (monom T)),
   merge_mon la = merge_mon lb
@@ -1891,6 +1801,8 @@ destruct lc as [| mb]. {
     unfold same_deg_sum_coeff in Hlc.
     destruct (merge_mon (lb ++ [mc])); [ easy | ].
     now destruct (mdeg _ =? mdeg _).
+Show.
+
   }
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hbd| Hbd]. {
