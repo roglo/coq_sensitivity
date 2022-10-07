@@ -986,6 +986,11 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
       now rewrite skipn_nil in Hld.
     }
     cbn - [ merge_mon ] in Hlb.
+    clear Hlc Hld IHla Hil.
+    specialize (Hfi ma (or_introl eq_refl)) as H1.
+    rewrite H1 in Hab.
+    clear ma Hfi H1.
+    symmetry in Hab.
 ...
 }
 Qed.
