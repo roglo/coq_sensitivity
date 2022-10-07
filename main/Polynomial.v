@@ -791,6 +791,7 @@ specialize (IHla md mb eq_refl Hmb) as H1.
 congruence.
 Qed.
 
+(*
 Theorem eq_merge_mon_cons : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb
   → ∃ i, 0 < i ≤ length la ∧
@@ -876,6 +877,7 @@ split; [ cbn | now rewrite Hac ].
 rewrite rngl_summation_list_cons.
 now f_equal.
 Qed.
+*)
 
 Theorem merge_mon_cons_eq_cons : ∀ (ma mb : monom T) la lb,
   merge_mon (ma :: la) = mb :: lb
@@ -977,101 +979,172 @@ Theorem eq_merge_mon_cons_iff : ∀ (la lb : list (monom T)) mb,
     mdeg (nth i la (Mon 0 (S (mdeg mb)))) ≠ mdeg mb.
 Proof.
 intros.
-split; [ now apply eq_merge_mon_cons | ].
-intros H.
-destruct H as (i & Hil & Hfi & Hdb & Hcb & Hnb).
-destruct mb as (cb, db).
-cbn in Hfi, Hcb, Hnb.
-subst cb lb.
-revert i db Hil Hfi Hnb.
-induction la as [| ma]; intros; [ cbn in Hil; flia Hil | ].
-cbn; rewrite fold_merge_mon.
-destruct i; [ easy | ].
-destruct Hil as (_, Hil); cbn in Hil.
-apply Nat.succ_le_mono in Hil.
-cbn - [ In ] in Hfi.
-cbn in Hnb.
-cbn - [ merge_mon ].
-rewrite rngl_summation_list_cons.
-unfold same_deg_sum_coeff.
-remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| mb]. {
-  apply eq_merge_mon_nil in Hlb; subst la.
-  rewrite rngl_summation_list_empty; [ | apply firstn_nil ].
-  rewrite rngl_add_0_r, skipn_nil; cbn.
-  rewrite <- (Hfi _ (or_introl eq_refl)).
-  now destruct ma.
-}
-rewrite if_eqb_eq_dec.
-destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
-  rewrite (Hfi _ (or_introl eq_refl)).
-  f_equal. 2: {
-    symmetry.
-    assert (Hfi' : ∀ ma, ma ∈ firstn i la → mdeg ma = db). {
-      intros mc Hma.
-      now apply Hfi; right.
+split. {
+  intros * Hma.
+  revert mb lb Hma.
+  induction la as [| ma]; intros; [ easy | ].
+  cbn in Hma.
+  rewrite fold_merge_mon in Hma.
+  unfold same_deg_sum_coeff in Hma.
+  remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| mc]. {
+    apply eq_merge_mon_nil in Hlc; subst la.
+    injection Hma; clear Hma; intros; subst mb lb; cbn.
+    exists 1; cbn - [ In ].
+    split; [ easy | ].
+    split. {
+      intros mb Hmb.
+      destruct Hmb as [Hmb| ]; [ now subst mb | easy ].
     }
-    rename i into n.
-    rewrite <- (firstn_skipn n la) in Hlb, Hnb.
-    move db before n.
-    rewrite app_nth2 in Hnb. 2: {
-      rewrite firstn_length, min_l; [ now unfold ge | easy ].
-    }
-    rewrite firstn_length, min_l in Hnb; [ | easy ].
-    rewrite Nat.sub_diag in Hnb.
-    remember (firstn n la) as lc eqn:Hlc; symmetry in Hlc.
-    remember (skipn n la) as ld eqn:Hld; symmetry in Hld.
-    rewrite <- List_hd_nth_0 in Hnb.
-    clear Hlc Hld IHla Hil.
-    specialize (Hfi ma (or_introl eq_refl)) as H1.
-    rewrite H1 in Hab.
-    clear ma Hfi H1.
-    symmetry in Hab.
-    clear la n.
-    destruct mb as (cc, dc).
-    cbn in Hab; subst db.
-    rename lc into la; rename lb into lc; rename ld into lb.
-    move la before lc; move lb before lc.
-    now apply merge_mon_app_eq_cons in Hlb.
+    split; [ easy | ].
+    rewrite rngl_summation_list_only_one.
+    split; [ easy | ].
+    apply Nat.neq_succ_diag_l.
   }
-  f_equal; f_equal.
-  destruct i. {
-    specialize (Hfi ma (or_introl eq_refl)).
-    cbn; rewrite rngl_summation_list_empty; [ | easy ].
-    destruct la as [| mc]; [ easy | ].
-    apply merge_mon_cons_eq_cons in Hlb; cbn in Hnb.
+  rewrite if_eqb_eq_dec in Hma.
+  destruct (Nat.eq_dec _ _) as [Hac| Hac]. 2: {
+    injection Hma; clear Hma; intros; subst mb lb.
+    cbn - [ In ].
+    exists 1.
+    split. {
+      split; [ easy | ].
+      now apply -> Nat.succ_le_mono.
+    }
+    split. {
+      intros mb Hmb; cbn - [ In ] in Hmb.
+      destruct Hmb as [Hmb| ]; [ now subst mb | easy ].
+    }
+    split; [ easy | ].
+    split. 2: {
+      destruct la as [| mb]; [ easy | cbn ].
+      cbn in Hlc.
+      intros H; apply Hac; clear Hac.
+      rewrite fold_merge_mon in Hlc.
+      unfold same_deg_sum_coeff in Hlc.
+      destruct (merge_mon la) as [| md ld]. {
+        now injection Hlc; clear Hlc; intros; subst mc lc.
+      }
+      rewrite if_eqb_eq_dec in Hlc.
+      destruct (Nat.eq_dec _ _) as [Hbd| Hbd]. {
+        now injection Hlc; clear Hlc; intros; subst mc lc.
+      }
+      now injection Hlc; clear Hlc; intros; subst mc lc.
+    }
+    now cbn; rewrite rngl_summation_list_only_one.
+  }
+  injection Hma; clear Hma; intros; subst lc mb.
+  cbn - [ In ].
+  specialize (IHla mc lb eq_refl) as H1.
+  destruct H1 as (j & Hjl & Hfj & Hmj & Hcj & Hc).
+  exists (S j).
+  split. {
+    split; [ easy | ].
+    now apply -> Nat.succ_le_mono.
+  }
+  split. {
+    intros mb Hmb.
+    cbn - [ In ] in Hmb.
+    destruct Hmb as [Hmb| Hmb]; [ now subst mb | ].
+    specialize (Hfj _ Hmb) as H1.
     congruence.
   }
-  specialize (IHla (S i) db) as H1.
-  assert (H : 0 < S i ≤ length la) by easy.
-  specialize (H1 H); clear H.
-  assert (H : ∀ ma, ma ∈ firstn (S i) la → mdeg ma = db). {
-    intros mc Hmc.
-    now apply Hfi; right.
+  split; [ easy | ].
+  split; [ cbn | now rewrite Hac ].
+  rewrite rngl_summation_list_cons.
+  now f_equal.
+} {
+  intros H.
+  destruct H as (i & Hil & Hfi & Hdb & Hcb & Hnb).
+  destruct mb as (cb, db).
+  cbn in Hfi, Hcb, Hnb.
+  subst cb lb.
+  revert i db Hil Hfi Hnb.
+  induction la as [| ma]; intros; [ cbn in Hil; flia Hil | ].
+  cbn; rewrite fold_merge_mon.
+  destruct i; [ easy | ].
+  destruct Hil as (_, Hil); cbn in Hil.
+  apply Nat.succ_le_mono in Hil.
+  cbn - [ In ] in Hfi.
+  cbn in Hnb.
+  cbn - [ merge_mon ].
+  rewrite rngl_summation_list_cons.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| mb]. {
+    apply eq_merge_mon_nil in Hlb; subst la.
+    rewrite rngl_summation_list_empty; [ | apply firstn_nil ].
+    rewrite rngl_add_0_r, skipn_nil; cbn.
+    rewrite <- (Hfi _ (or_introl eq_refl)).
+    now destruct ma.
   }
-  specialize (H1 H); clear H.
-  specialize (H1 Hnb).
-  remember (S i) as si.
-  injection H1; clear H1; intros H1 H2; subst si.
-  now rewrite H2.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
+    rewrite (Hfi _ (or_introl eq_refl)).
+    f_equal. 2: {
+      symmetry.
+      assert (Hfi' : ∀ ma, ma ∈ firstn i la → mdeg ma = db). {
+        intros mc Hma.
+        now apply Hfi; right.
+      }
+      rename i into n.
+      rewrite <- (firstn_skipn n la) in Hlb, Hnb.
+      move db before n.
+      rewrite app_nth2 in Hnb. 2: {
+        rewrite firstn_length, min_l; [ now unfold ge | easy ].
+      }
+      rewrite firstn_length, min_l in Hnb; [ | easy ].
+      rewrite Nat.sub_diag in Hnb.
+      remember (firstn n la) as lc eqn:Hlc; symmetry in Hlc.
+      remember (skipn n la) as ld eqn:Hld; symmetry in Hld.
+      rewrite <- List_hd_nth_0 in Hnb.
+      clear Hlc Hld IHla Hil.
+      specialize (Hfi ma (or_introl eq_refl)) as H1.
+      rewrite H1 in Hab.
+      clear ma Hfi H1.
+      symmetry in Hab.
+      clear la n.
+      destruct mb as (cc, dc).
+      cbn in Hab; subst db.
+      rename lc into la; rename lb into lc; rename ld into lb.
+      move la before lc; move lb before lc.
+      now apply merge_mon_app_eq_cons in Hlb.
+    }
+    f_equal; f_equal.
+    destruct i. {
+      specialize (Hfi ma (or_introl eq_refl)).
+      cbn; rewrite rngl_summation_list_empty; [ | easy ].
+      destruct la as [| mc]; [ easy | ].
+      apply merge_mon_cons_eq_cons in Hlb; cbn in Hnb.
+      congruence.
+    }
+    specialize (IHla (S i) db) as H1.
+    assert (H : 0 < S i ≤ length la) by easy.
+    specialize (H1 H); clear H.
+    assert (H : ∀ ma, ma ∈ firstn (S i) la → mdeg ma = db). {
+      intros mc Hmc.
+      now apply Hfi; right.
+    }
+    specialize (H1 H); clear H.
+    specialize (H1 Hnb).
+    remember (S i) as si.
+    injection H1; clear H1; intros H1 H2; subst si.
+    now rewrite H2.
+  }
+  specialize (Hfi _ (or_introl eq_refl)) as H1.
+  destruct la as [| mc]; [ easy | ].
+  destruct i. {
+    cbn; rewrite rngl_summation_list_empty; [ | easy ].
+    rewrite rngl_add_0_r.
+    f_equal; [ now rewrite <- H1; destruct ma | easy ].
+  }
+  cbn - [ In ] in Hfi.
+  specialize (Hfi _ (or_intror (or_introl eq_refl))) as H2.
+  apply merge_mon_cons_eq_cons in Hlb.
+  congruence.
 }
-specialize (Hfi _ (or_introl eq_refl)) as H1.
-destruct la as [| mc]; [ easy | ].
-destruct i. {
-  cbn; rewrite rngl_summation_list_empty; [ | easy ].
-  rewrite rngl_add_0_r.
-  f_equal; [ now rewrite <- H1; destruct ma | easy ].
-}
-cbn - [ In ] in Hfi.
-specialize (Hfi _ (or_intror (or_introl eq_refl))) as H2.
-apply merge_mon_cons_eq_cons in Hlb.
-congruence.
 Qed.
 
-Inspect 2.
-
-...
-
+(*
 Theorem pouet : ∀ (la lb : list (monom T)) mb,
   merge_mon la = mb :: lb
   → mdeg (hd (Mon 0 (S (mdeg mb))) lb) ≠ mdeg mb.
@@ -1087,20 +1160,12 @@ destruct lb as [| mc]. {
   rewrite List_skipn_skipn in Hmj.
 Search (skipn _ _ = []).
 ...
+*)
 
 Theorem eq_merge_mon_cons_cons : ∀ la lb (ma mb : monom T),
   merge_mon la = ma :: mb :: lb
   → mdeg ma ≠ mdeg mb.
 Proof.
-(*
-intros * Hma.
-apply eq_merge_mon_cons in Hma.
-destruct Hma as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
-...
-apply eq_merge_mon_cons in Hmj.
-destruct Hmj as (k & Hkl & Hfk & Hmj & Hck & Hk); cbn.
-...
-*)
 intros * Hma.
 intros Hab.
 destruct ma as (ca, da).
@@ -1504,7 +1569,7 @@ revert la Hlb.
 induction lb as [| mb]; intros. {
   now apply eq_merge_mon_nil in Hlb; subst la.
 }
-apply eq_merge_mon_cons in Hlb.
+apply eq_merge_mon_cons_iff in Hlb.
 destruct Hlb as (j & Hjl & Hfj & Hmj & Hcj & Hc); cbn.
 specialize (IHlb _ Hmj) as H1.
 rewrite <- H1; clear H1.
@@ -1513,6 +1578,7 @@ replace (length la - (length la - j)) with j in H1 by flia Hjl.
 rewrite <- H1; clear H1.
 rewrite <- (rev_involutive la) in Hcj, Hfj, Hmj, Hc.
 rewrite firstn_rev in Hcj, Hfj.
+...
 rewrite skipn_rev in Hmj, Hc.
 rewrite rev_length in Hcj, Hfj, Hmj, Hc.
 remember (length la - j) as i eqn:Hi.
