@@ -1070,6 +1070,15 @@ destruct i. {
   clear Hfi Hil.
   symmetry.
   unfold same_deg_sum_coeff.
+  remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| md]. {
+    apply eq_merge_mon_nil in Hlc; subst la.
+    cbn in Hlb.
+    now injection Hlb; clear Hlb; intros; subst mc lb.
+  }
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hcd| Hcd]. {
+    f_equal. {
 ...
   apply merge_mon_cons_eq_cons in Hlb.
   rewrite H1 in Hab.
