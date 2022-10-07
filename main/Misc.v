@@ -1507,6 +1507,17 @@ induction n; intros; [ now left | right ].
 destruct l as [| x]; [ easy | easy ].
 Qed.
 
+Theorem List_eq_skipn_nil: ∀ A n (l : list A), skipn n l = [] → length l ≤ n.
+Proof.
+intros * Hnl.
+revert l Hnl.
+induction n; intros; [ now cbn in Hnl; subst l | ].
+destruct l as [| x]; [ easy | ].
+cbn in Hnl |-*.
+apply -> Nat.succ_le_mono.
+now apply IHn.
+Qed.
+
 Theorem List_eq_rev_nil {A} : ∀ (l : list A), rev l = [] → l = [].
 Proof.
 intros * Hl.

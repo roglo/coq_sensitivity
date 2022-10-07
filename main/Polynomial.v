@@ -1601,17 +1601,15 @@ rewrite <- (firstn_skipn i la) at 1.
 rewrite <- (firstn_skipn i la) in Hil.
 remember (firstn i la) as lc eqn:Hlc.
 remember (skipn i la) as lb eqn:Hlb.
-(**)
-...
-rewrite app_length in Hil.
-apply (f_equal length) in Hlb, Hlc.
-rewrite skipn_length in Hlb.
-rewrite firstn_length in Hlc.
-rewrite min_l in Hlc.
-...
-rewrite Hlb in Hil.
-...
-assert (Hab : lc ++ lb ≠ []) by now destruct (lc ++ lb).
+assert (Hbz : lb ≠ []). {
+  intros H; move H at top; subst lb.
+  symmetry in Hlb.
+  apply List_eq_skipn_nil in Hlb.
+  rewrite firstn_all2 in Hlc; [ | easy ].
+  subst lc.
+  rewrite app_nil_r in Hil.
+  now apply Nat.nle_gt in Hil.
+}
 clear la i Hlb Hlc Hil.
 rename lc into la.
 move la after lb.
