@@ -1066,6 +1066,10 @@ destruct i. {
   rewrite rngl_add_0_r.
   f_equal; [ now rewrite <- H1; destruct ma | ].
   rewrite fold_merge_mon.
+  cbn in Hnb.
+  clear Hfi Hil.
+  symmetry.
+  unfold same_deg_sum_coeff.
 ...
   apply merge_mon_cons_eq_cons in Hlb.
   rewrite H1 in Hab.
