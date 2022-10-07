@@ -1656,6 +1656,9 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   rewrite <- merge_mon_app_distr_l.
   easy.
 }
+clear Hpf Hps; subst n.
+rewrite <- Hlenb in Hlena.
+clear len IHlen Hlenb.
 ...
 Theorem glop : ∀ (la lb lc : list (monom T)),
   merge_mon la = merge_mon lb
