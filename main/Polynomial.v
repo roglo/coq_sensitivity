@@ -1748,6 +1748,8 @@ rewrite <- HPP at 1.
 rewrite <- filter_app.
 clear HPP.
 remember (P ++ Q) as R; clear P Q HeqR.
+apply sorted_isort_filter.
+...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
 destruct b. {

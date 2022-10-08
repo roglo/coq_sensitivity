@@ -3742,6 +3742,74 @@ apply sorted_cons in Hs.
 now apply IHl.
 Qed.
 
+Theorem sorted_isort_insert_filter : ∀ A (rel : A → _),
+  transitive rel →
+  ∀ f a la,
+  sorted rel la
+  → filter f (isort_insert rel a la) =
+     if f a then isort_insert rel a (filter f la)
+     else filter f la.
+Proof.
+intros * Htra * Hla.
+revert a.
+induction la as [| b]; intros; cbn; [ easy | ].
+assert (H : sorted rel la) by now apply sorted_cons in Hla.
+specialize (IHla H); clear H.
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+remember (rel a b) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  cbn; rewrite Hfa, Hfb.
+  destruct fa; [ | easy ].
+  destruct fb; cbn; [ now rewrite Hab | ].
+  specialize (IHla a) as H1.
+  rewrite Hfa in H1.
+  rewrite <- H1.
+  destruct la as [| c]; [ easy | cbn ].
+  remember (f c) as fc eqn:Hfc; symmetry in Hfc.
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct fc; cbn. {
+    destruct ac; cbn; rewrite Hfc; [ now rewrite Hfa | ].
+    apply (sorted_cons_iff Htra) in Hla.
+    destruct Hla as (Hsca, Hcla).
+    specialize (Hcla _ (or_introl eq_refl)) as Hbc.
+    now rewrite (Htra a b c Hab Hbc) in Hac.
+  }
+  destruct ac; cbn; rewrite Hfc; [ now rewrite Hfa | ].
+  apply (sorted_cons_iff Htra) in Hla.
+  destruct Hla as (Hsca, Hcla).
+  specialize (Hcla _ (or_introl eq_refl)) as Hbc.
+  now rewrite (Htra a b c Hab Hbc) in Hac.
+}
+cbn; rewrite Hfb.
+destruct fa. {
+  destruct fb. {
+    cbn; rewrite Hab; f_equal.
+    now rewrite IHla, Hfa.
+  }
+  now rewrite IHla, Hfa.
+}
+now destruct fb; rewrite IHla, Hfa.
+Qed.
+
+Theorem sorted_isort_filter : ∀ A (rel : A → _),
+  transitive rel →
+  total_relation rel →
+  ∀ f la, isort rel (filter f la) = filter f (isort rel la).
+Proof.
+intros * Htra Htot *.
+induction la as [| a]; [ easy | cbn ].
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa; cbn. {
+  rewrite IHla.
+  rewrite (sorted_isort_insert_filter Htra); [ now rewrite Hfa | ].
+  now apply sorted_isort.
+}
+rewrite IHla.
+rewrite (sorted_isort_insert_filter Htra); [ now rewrite Hfa | ].
+now apply sorted_isort.
+Qed.
+
 Theorem sorted_map : ∀ A B (rel : A → _),
   transitive rel →
   ∀ la (f : B → A),
