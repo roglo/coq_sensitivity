@@ -1660,6 +1660,9 @@ clear Hpf Hps; subst n.
 rewrite <- Hlenb in Hlena.
 clear len IHlen Hlenb.
 clear Hsa Hsb.
+(* on peut faire tout ça en dessous, mais chais pas, ça me paraît compliqué
+   y a pas une méthode plus simple ? *)
+...
 revert lb Hpab Hdd Hlena.
 induction la as [| ma]; intros. {
   now symmetry in Hlena; apply length_zero_iff_nil in Hlena; subst lb.
@@ -1698,7 +1701,17 @@ destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
     apply (In_nth _ _ (Mon 0 0)) in Hmc.
     destruct Hmc as (i & Hi & Hib); subst mc.
     cbn - [ nth ] in Hbn.
-(* pffff.... interminable... *)
+    specialize (Hdd i) as H1.
+    rewrite app_nth1 in H1; [ | easy ].
+    rewrite Hbn in H1; [ easy | ].
+    apply permutation_length in Hpab.
+    rewrite app_length in Hpab.
+    flia Hpab Hi.
+  }
+  split. {
+    rewrite skipn_app, Nat.sub_diag, skipn_O.
+    rewrite skipn_all, app_nil_l.
+    cbn; rewrite fold_merge_mon.
 ...
 sorted_sorted_permuted:
   ∀ (A : Type) (eqb rel : A → A → bool),
