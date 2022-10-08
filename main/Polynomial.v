@@ -1732,10 +1732,13 @@ unfold polyn_norm; f_equal; cbn.
 f_equal.
 do 4 rewrite fold_merge_mon.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-destruct a as (P, PP).
-destruct b as (Q, PQ).
-destruct c as (R, PR); cbn.
+destruct a as ((P), PP).
+destruct b as ((Q), PQ).
+destruct c as ((R), PR); cbn.
 move Q before P; move R before Q.
+unfold is_canon_polyn in PP, PQ, PR.
+cbn in PP, PQ, PR.
+do 4 rewrite fold_merge_mon.
 ...
 
 Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
