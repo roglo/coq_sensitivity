@@ -1739,6 +1739,45 @@ move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
+Theorem glop : ∀ rel (P Q : list (monom T)) f,
+  filter f P = P
+  → isort rel (P ++ filter f Q) = filter f (isort rel (P ++ Q)).
+Proof.
+intros * HPP.
+rewrite <- HPP at 1.
+rewrite <- filter_app.
+clear HPP.
+remember (P ++ Q) as R; clear P Q HeqR.
+induction R as [| ma]; [ easy | cbn ].
+remember (f ma) as b eqn:Hb; symmetry in Hb.
+destruct b. {
+  cbn; rewrite IHR.
+  clear IHR.
+  revert ma Hb.
+  induction R as [| mb]; intros; cbn; [ now rewrite Hb | ].
+  rewrite <- IHR.
+...
+intros * HPP.
+induction P as [| ma]. {
+  cbn.
+  induction Q as [| mb]; [ easy | cbn ].
+  remember (f mb) as b eqn:Hb; symmetry in Hb.
+  destruct b. {
+    cbn.
+    rewrite IHQ.
+    clear IHQ.
+    remember (isort rel Q) as P; clear HeqP.
+    revert mb Hb.
+    induction P as [| mc]; intros; cbn; [ now rewrite Hb | ].
+    remember (rel mb mc) as bc eqn:Hbc; symmetry in Hbc.
+    destruct bc. {
+      remember (f mc) as c eqn:Hc; symmetry in Hc.
+      cbn.
+      rewrite Hb, Hc.
+      destruct c; [ now cbn; rewrite Hbc | ].
+      rewrite IHP; [ | easy ].
+... ...
+rewrite glop.
 ...
 
 Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
