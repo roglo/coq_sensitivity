@@ -1252,7 +1252,7 @@ injection Hlb; clear Hlb; intros; subst ma ld.
 now apply IHla with (ma := md).
 Qed.
 
-Theorem merge_mon_app_distr_r : ∀ (la lb : list (monom T)),
+Theorem merge_mon_app_idemp_r : ∀ (la lb : list (monom T)),
   merge_mon (la ++ lb) = merge_mon (la ++ merge_mon lb).
 Proof.
 intros.
@@ -1368,14 +1368,14 @@ destruct lc as [| mc]; cbn. {
 now destruct (mdeg ma =? mdeg mc).
 Qed.
 
-Theorem merge_mon_app_distr_l : ∀ (la lb : list (monom T)),
+Theorem merge_mon_app_idemp_l : ∀ (la lb : list (monom T)),
   merge_mon (la ++ lb) = merge_mon (merge_mon la ++ lb).
 Proof.
 intros.
 rewrite <- (rev_involutive (la ++ lb)).
 rewrite (merge_mon_rev (rev (la ++ lb))).
 rewrite rev_app_distr.
-rewrite merge_mon_app_distr_r.
+rewrite merge_mon_app_idemp_r.
 rewrite merge_mon_rev.
 rewrite <- rev_app_distr.
 rewrite merge_mon_rev.
@@ -1682,10 +1682,10 @@ destruct Hnl as [(Hnl, Hdab)| Hnl]. {
   }
   rewrite <- (firstn_skipn n la).
   rewrite <- (firstn_skipn n lb).
-  rewrite merge_mon_app_distr_r, H2.
-  rewrite <- merge_mon_app_distr_r.
-  rewrite merge_mon_app_distr_l, H1.
-  rewrite <- merge_mon_app_distr_l.
+  rewrite merge_mon_app_idemp_r, H2.
+  rewrite <- merge_mon_app_idemp_r.
+  rewrite merge_mon_app_idemp_l, H1.
+  rewrite <- merge_mon_app_idemp_l.
   easy.
 }
 clear Hpf Hps; subst n.
@@ -1723,6 +1723,19 @@ f_equal.
 apply monl_norm_add_comm.
 Qed.
 
+Theorem canon_polyn_add_assoc :
+  ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
+Proof.
+intros; cbn.
+apply canon_polyn_eq_eq; cbn.
+unfold polyn_norm; f_equal; cbn.
+f_equal.
+do 4 rewrite fold_merge_mon.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+destruct a as (P, PP).
+destruct b as (Q, PQ).
+destruct c as (R, PR); cbn.
+move Q before P; move R before Q.
 ...
 
 Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
@@ -1734,7 +1747,7 @@ Definition canon_polyn_ring_like_prop : ring_like_prop (canon_polyn T) :=
      rngl_is_integral := false; (* à voir *)
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := canon_polyn_add_comm;
-     rngl_add_assoc := 42;
+     rngl_add_assoc := canon_polyn_add_assoc;
     rngl_add_0_l := ?rngl_add_0_l;
     rngl_mul_assoc := ?rngl_mul_assoc;
     rngl_mul_1_l := ?rngl_mul_1_l;
