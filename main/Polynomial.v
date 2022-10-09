@@ -1723,7 +1723,7 @@ f_equal.
 apply monl_norm_add_comm.
 Qed.
 
-Theorem canon_monl_is_filter_mdeg_non_zero : ∀ (P : list (monom T)),
+Theorem canon_monl_is_filter_deg_non_zero : ∀ (P : list (monom T)),
   is_canon_monl P = true
   → P = filter (λ ma, (mcoeff ma ≠? 0)%F) P.
 Proof.
@@ -1768,11 +1768,43 @@ unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
-rewrite (canon_monl_is_filter_mdeg_non_zero P PP) at 1; symmetry.
-rewrite (canon_monl_is_filter_mdeg_non_zero R PR) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero P PP) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
+Theorem merge_mon_filter_deg_non_zero : ∀ P,
+  merge_mon (filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) P) =
+  filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) (merge_mon P).
+Proof.
+intros.
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+induction P as [| ma la]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
+  cbn; do 2 rewrite fold_merge_mon.
+  rewrite IHla.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| mb]; [ now cbn; rewrite Hmaz | ].
+  cbn.
+  remember (f mb) as fmb eqn:Hmbz; symmetry in Hmbz.
+  destruct fmb. {
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+      unfold f; cbn; fold f.
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Habz| Habz]; [ easy | ].
+(* ah oui mais non mais ça c'est faux, ça ; merge_mon peut
+   créer des termes à coefficient nul *)
+... ...
+Search (isort _ (_ ++ _)).
+Search (merge_mon (isort _ _)).
+Search (merge_mon (_ ++ _)).
+Search (merge_mon (filter _ _)).
+Inspect 1.
+do 2 rewrite merge_mon_filter_deg_non_zero.
+f_equal.
 ...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
