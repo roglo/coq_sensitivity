@@ -1823,6 +1823,9 @@ destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
         rewrite Hmbz, rngl_add_0_r.
         unfold f in Hmaz; cbn in Hmaz.
 exfalso.
+apply Bool.negb_true_iff in Hmcz, Hmaz.
+apply (rngl_eqb_neq Heq) in Hmcz, Hmaz.
+...
 Search (merge_mon (filter _ _)).
 (* cb=0 donc, par Hlb, les premiers éléments de "la" de degré "db"
    ont 0 pour somme de coefficients ;
@@ -1846,6 +1849,17 @@ destruct la as [| me]. {
 }
 cbn - [ merge_mon ] in Hlb.
 rewrite List_nth_succ_cons in Hdb.
+(**)
+rewrite Hab in Hac.
+clear ma Hmaz Hab.
+rename Hac into Hbc.
+clear Hil.
+move lb before la; move lc before lb.
+move mc before mb.
+move Hmbz after Hmcz.
+move IHla before Hlb.
+subst lb.
+...
 destruct i. {
   cbn - [ In ] in Hcb, Hlb, Hdb, Hffa.
   rewrite rngl_summation_list_only_one in Hcb.
@@ -1877,6 +1891,21 @@ destruct i. {
     clear Hil.
     move lb before la; move lc before lb.
     move mb before ma; move mc before mb.
+...
+    unfold same_deg_sum_coeff in Hlb, Hlc.
+    remember (merge_mon la) as ld eqn:Hld; symmetry in Hld.
+    destruct ld as [| mf]. {
+      subst lb.
+      apply eq_merge_mon_nil in Hld; subst la.
+      cbn in Hlc.
+      injection Hlc; clear Hlc; intros; subst me lc.
+      congruence.
+    }
+    rewrite if_eqb_eq_dec in Hlb.
+    destruct (Nat.eq_dec (mdeg me) (mdeg mf)) as [Hef| Hef]. {
+      subst lb; unfold f in IHla.
+      cbn in IHla; fold f in IHla.
+      move Hef after Heb.
 ...
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
