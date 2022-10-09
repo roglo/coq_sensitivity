@@ -1851,6 +1851,20 @@ destruct i. {
   rewrite rngl_summation_list_only_one in Hcb.
   rewrite fold_merge_mon in Hlb.
   specialize (Hffa _ (or_introl eq_refl)).
+  cbn in Hlc.
+  unfold f in Hlc at 1.
+  rewrite Hcb in Hlc; cbn in Hlc.
+  rewrite if_bool_if_dec in Hlc.
+  destruct (bool_dec (0 ≠? 0)%F) as [H| H]; [ | clear H ]. {
+    apply Bool.negb_true_iff in H.
+    now apply (rngl_eqb_neq Heq) in H.
+  }
+  rewrite fold_merge_mon in Hlc.
+  remember (f me) as fe eqn:Hmez; symmetry in Hmez.
+  unfold f in Hmez; cbn in Hmez.
+  destruct fe. {
+    cbn in Hlc.
+    rewrite fold_merge_mon in Hlc.
 ...
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
