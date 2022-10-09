@@ -1832,14 +1832,26 @@ rename Hac into Hbc.
 move lb before la; move lc before lb.
 move mc before mb.
 move IHla before Hlc.
+...
 generalize Hlb; intros H.
 apply (f_equal (filter f)) in H.
 cbn in H.
 unfold f at 2 in H.
 rewrite Hmbz in H.
 rewrite if_bool_if_dec in H.
-destruct (bool_dec _) as [H'| H']. {
-  a
+destruct (bool_dec _) as [H'| H']; [ | clear H' ]. {
+  apply Bool.negb_true_iff in H'.
+  now apply (rngl_eqb_neq Heq) in H'.
+}
+rewrite Hlb in H.
+cbn in H.
+unfold f in H at 1.
+rewrite Hmbz in H.
+rewrite if_bool_if_dec in H.
+destruct (bool_dec _) as [H'| H']; [ | clear H' ]. {
+  apply Bool.negb_true_iff in H'.
+  now apply (rngl_eqb_neq Heq) in H'.
+}
 ...
 Search (merge_mon (filter _ _)).
 (* cb=0 donc, par Hlb, les premiers éléments de "la" de degré "db"
