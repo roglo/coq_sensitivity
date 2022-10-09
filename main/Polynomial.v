@@ -1766,6 +1766,7 @@ replace P with (filter f P). 2: {
 }
 rewrite <- filter_app.
 rewrite (sorted_isort_filter Htra Htot).
+Search (merge_mon (filter _ _)).
 ...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
