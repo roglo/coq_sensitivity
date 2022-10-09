@@ -1835,6 +1835,22 @@ Search (merge_mon (filter _ _)).
 apply eq_merge_mon_cons_iff in Hlb.
 destruct Hlb as (i & Hil & Hffa & Hlb & Hcb & Hdb).
 symmetry in Hcb; rewrite Hmbz in Hcb.
+destruct la as [| md]; [ easy | ].
+destruct i; [ easy | ].
+cbn in Hcb.
+destruct la as [| me]. {
+  rewrite firstn_nil in Hcb.
+  rewrite rngl_summation_list_only_one in Hcb.
+  cbn in Hlb.
+  now rewrite skipn_nil in Hlb; cbn in Hlb; subst lb.
+}
+cbn - [ merge_mon ] in Hlb.
+rewrite List_nth_succ_cons in Hdb.
+destruct i. {
+  cbn - [ In ] in Hcb, Hlb, Hdb, Hffa.
+  rewrite rngl_summation_list_only_one in Hcb.
+  rewrite fold_merge_mon in Hlb.
+  specialize (Hffa _ (or_introl eq_refl)).
 ...
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
