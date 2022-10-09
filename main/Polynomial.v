@@ -1822,10 +1822,28 @@ destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
         apply (rngl_eqb_eq Heq) in Hmbz.
         rewrite Hmbz, rngl_add_0_r.
         unfold f in Hmaz; cbn in Hmaz.
+exfalso.
+Search (merge_mon (filter _ _)).
+(* cb=0 donc, par Hlb, les premiers éléments de "la" de degré "db"
+   ont 0 pour somme de coefficients ;
+   - s'il n'y en a qu'un seul, alors il est nul et "filter f la"
+     a pour permier élément un monôme de degré ≠ mb donc mc a un
+     degré différent de mb : contradiction
+   - s'il y en a plusieurs, alors le coefficient de mc est 0 :
+     contradiction
+*)
+apply eq_merge_mon_cons_iff in Hlb.
+destruct Hlb as (i & Hil & Hffa & Hlb & Hcb & Hdb).
+symmetry in Hcb; rewrite Hmbz in Hcb.
+...
+apply eq_merge_mon_cons_iff in Hlc.
+destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
+...
+(*
         rewrite Hmaz.
         rewrite if_bool_if_dec.
         destruct (bool_dec _) as [Hcac| Hcac]. {
-(* tiens, c'est bizarre *)
+*)
 ...
   destruct lb as [| mb]; [ now cbn; rewrite Hmaz | ].
   cbn.
