@@ -1739,16 +1739,20 @@ move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
-Theorem glop : ∀ rel (P Q : list (monom T)) f,
+Theorem glop : ∀ rel,
+  transitive rel →
+  total_relation rel →
+  ∀ (P Q : list (monom T)) f,
   filter f P = P
   → isort rel (P ++ filter f Q) = filter f (isort rel (P ++ Q)).
 Proof.
-intros * HPP.
+intros * Htra Htot * HPP.
 rewrite <- HPP at 1.
 rewrite <- filter_app.
 clear HPP.
 remember (P ++ Q) as R; clear P Q HeqR.
-apply sorted_isort_filter.
+now apply sorted_isort_filter.
+Qed.
 ...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
