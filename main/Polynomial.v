@@ -1747,9 +1747,9 @@ Proof.
 intros P Q R; cbn.
 apply canon_polyn_eq_eq; cbn.
 unfold polyn_norm; f_equal; cbn.
-f_equal.
 do 4 rewrite fold_merge_mon.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
 assert (Htra : transitive rel). {
   unfold rel; intros a b c Hab Hbc.
   apply Nat.leb_le in Hab, Hbc.
@@ -1767,25 +1767,46 @@ move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
 rewrite (canon_monl_is_filter_deg_non_zero P PP) at 1; symmetry.
 rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
-Theorem merge_mon_filter_deg_non_zero : ∀ P,
-  merge_mon (filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) P) =
-  filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) (merge_mon P).
+Theorem filter_deg_non_zero_merge_mon_filter : ∀ P,
+  let f := λ ma : monom T, (mcoeff ma ≠? 0)%F in
+  filter f (merge_mon (filter f P)) = filter f (merge_mon P).
 Proof.
 intros.
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
 induction P as [| ma la]; [ easy | cbn ].
 rewrite if_bool_if_dec.
 destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
   cbn; do 2 rewrite fold_merge_mon.
-  rewrite IHla.
   unfold same_deg_sum_coeff.
   remember (merge_mon la) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| mb]. {
+    apply eq_merge_mon_nil in Hlb; subst la.
+    now cbn; rewrite Hmaz.
+  }
+  remember (merge_mon (filter f la)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| mc]. {
+    cbn in IHla; symmetry in IHla.
+    remember (f mb) as fmb eqn:Hmbz; symmetry in Hmbz.
+    destruct fmb; [ easy | ].
+    cbn; rewrite Hmaz.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec _ _) as [Hab| Hab]. {
+      cbn.
+      unfold f at 1; cbn.
+      unfold f in Hmaz, Hmbz; cbn in Hmaz, Hmbz.
+      apply Bool.negb_false_iff in Hmbz.
+      apply (rngl_eqb_eq Heq) in Hmbz.
+      rewrite Hmbz, rngl_add_0_r, Hmaz, IHla.
+      now destruct ma.
+    }
+    now cbn; rewrite Hmaz, Hmbz, IHla.
+  }
+  cbn in IHla.
+...
   destruct lb as [| mb]; [ now cbn; rewrite Hmaz | ].
   cbn.
   remember (f mb) as fmb eqn:Hmbz; symmetry in Hmbz.
@@ -1795,15 +1816,14 @@ destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
       unfold f; cbn; fold f.
       rewrite if_bool_if_dec.
       destruct (bool_dec _) as [Habz| Habz]; [ easy | ].
-(* ah oui mais non mais ça c'est faux, ça ; merge_mon peut
-   créer des termes à coefficient nul *)
+*)
 ... ...
 Search (isort _ (_ ++ _)).
 Search (merge_mon (isort _ _)).
 Search (merge_mon (_ ++ _)).
 Search (merge_mon (filter _ _)).
 Inspect 1.
-do 2 rewrite merge_mon_filter_deg_non_zero.
+do 2 rewrite filter_deg_non_zero_merge_mon_filter.
 f_equal.
 ...
 induction R as [| ma]; [ easy | cbn ].
