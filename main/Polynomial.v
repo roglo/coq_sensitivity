@@ -1865,6 +1865,18 @@ destruct i. {
   destruct fe. {
     cbn in Hlc.
     rewrite fold_merge_mon in Hlc.
+    rename Hdb into Heb; rename Hffa into Hdb.
+    move Hdb at bottom; move Heb at bottom.
+    apply Bool.negb_true_iff in Hmaz, Hmcz, Hmez.
+    apply (rngl_eqb_neq Heq) in Hmaz, Hmcz, Hmez.
+    move Hmbz after Hmaz.
+    move Hmcz after Hmbz.
+    move Hmez after Hmcz.
+    rename Hcb into Hmdz.
+    move Hmdz after Hmcz.
+    clear Hil.
+    move lb before la; move lc before lb.
+    move mb before ma; move mc before mb.
 ...
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
