@@ -1806,6 +1806,21 @@ destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
     now cbn; rewrite Hmaz, Hmbz, IHla.
   }
   cbn in IHla.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+      cbn.
+      unfold f at 1 4; cbn.
+      remember (f mc) as fmc eqn:Hmcz; symmetry in Hmcz.
+      remember (f mb) as fmb eqn:Hmbz; symmetry in Hmbz.
+      destruct fmc. {
+        destruct fmb. {
+          now injection IHla; clear IHla; intros H1 H; subst mc; rewrite H1.
+        }
+        unfold f in Hmbz, Hmcz.
+        apply Bool.negb_false_iff in Hmbz.
+        apply (rngl_eqb_eq Heq) in Hmbz.
+        rewrite Hmbz, rngl_add_0_r.
 ...
   destruct lb as [| mb]; [ now cbn; rewrite Hmaz | ].
   cbn.
