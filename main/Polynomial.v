@@ -1723,6 +1723,24 @@ f_equal.
 apply monl_norm_add_comm.
 Qed.
 
+Theorem canon_monl_is_filter_mdeg_non_zero : ∀ (P : list (monom T)),
+  is_canon_monl P = true
+  → P = filter (λ ma, (mcoeff ma ≠? 0)%F) P.
+Proof.
+intros * PP.
+unfold is_canon_monl in PP.
+apply Bool.andb_true_iff in PP.
+destruct PP as (Hps & Hpc).
+specialize (proj2 (all_true_and_list_true_iff _ _ _) Hpc) as H1.
+cbn in H1.
+clear Hpc Hps.
+induction P as [| ma la]; [ easy | cbn ].
+rewrite H1; [ f_equal | now left ].
+apply IHla.
+intros mb Hmb.
+now apply H1; right.
+Qed.
+
 Theorem canon_polyn_add_assoc :
   ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
 Proof.
@@ -1750,23 +1768,11 @@ unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
-replace P with (filter f P). 2: {
-  unfold is_canon_monl in PP.
-  apply Bool.andb_true_iff in PP.
-  destruct PP as (Hps & Hpc).
-  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hpc) as H1.
-  cbn in H1.
-  unfold f.
-  clear Hpc Hps.
-  induction P as [| ma la]; [ easy | cbn ].
-  rewrite H1; [ f_equal | now left ].
-  apply IHla.
-  intros mb Hmb.
-  now apply H1; right.
-}
-rewrite <- filter_app.
-rewrite (sorted_isort_filter Htra Htot).
-Search (merge_mon (filter _ _)).
+rewrite (canon_monl_is_filter_mdeg_non_zero P PP) at 1; symmetry.
+rewrite (canon_monl_is_filter_mdeg_non_zero R PR) at 1; symmetry.
+fold f.
+do 2 rewrite <- filter_app.
+do 2 rewrite (sorted_isort_filter Htra Htot).
 ...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
