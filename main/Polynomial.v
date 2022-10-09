@@ -1821,6 +1821,11 @@ destruct (bool_dec (f ma)) as [Hmaz| Hmaz]. {
         apply Bool.negb_false_iff in Hmbz.
         apply (rngl_eqb_eq Heq) in Hmbz.
         rewrite Hmbz, rngl_add_0_r.
+        unfold f in Hmaz; cbn in Hmaz.
+        rewrite Hmaz.
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Hcac| Hcac]. {
+(* tiens, c'est bizarre *)
 ...
   destruct lb as [| mb]; [ now cbn; rewrite Hmaz | ].
   cbn.
