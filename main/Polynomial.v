@@ -1726,33 +1726,46 @@ Qed.
 Theorem canon_polyn_add_assoc :
   ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
 Proof.
-intros; cbn.
+intros P Q R; cbn.
 apply canon_polyn_eq_eq; cbn.
 unfold polyn_norm; f_equal; cbn.
 f_equal.
 do 4 rewrite fold_merge_mon.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-destruct a as ((P), PP).
-destruct b as ((Q), PQ).
-destruct c as ((R), PR); cbn.
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+destruct P as ((P), PP).
+destruct Q as ((Q), PQ).
+destruct R as ((R), PR); cbn.
 move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
-Theorem glop : ∀ rel,
-  transitive rel →
-  total_relation rel →
-  ∀ (P Q : list (monom T)) f,
-  filter f P = P
-  → isort rel (P ++ filter f Q) = filter f (isort rel (P ++ Q)).
-Proof.
-intros * Htra Htot * HPP.
-rewrite <- HPP at 1.
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+replace P with (filter f P). 2: {
+  unfold is_canon_monl in PP.
+  apply Bool.andb_true_iff in PP.
+  destruct PP as (Hps & Hpc).
+  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hpc) as H1.
+  cbn in H1.
+  unfold f.
+  clear Hpc Hps.
+  induction P as [| ma la]; [ easy | cbn ].
+  rewrite H1; [ f_equal | now left ].
+  apply IHla.
+  intros mb Hmb.
+  now apply H1; right.
+}
 rewrite <- filter_app.
-clear HPP.
-remember (P ++ Q) as R; clear P Q HeqR.
-now apply sorted_isort_filter.
-Qed.
+rewrite (sorted_isort_filter Htra Htot).
 ...
 induction R as [| ma]; [ easy | cbn ].
 remember (f ma) as b eqn:Hb; symmetry in Hb.
