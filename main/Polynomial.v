@@ -1839,13 +1839,19 @@ rewrite Hmb in Hmbz.
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
 rewrite Hmc in Hmcz.
-...
 set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 assert
-  (H1 : ∑ (ma ∈ firstn i (filter f la ++ filter g la)), mcoeff ma = 0%F). {
-  erewrite (rngl_summation_list_permut _ monom_eqb_eq); [ apply Hmbz | ].
-Search (permutation _ (firstn _ _)).
-About permutation_firstn.
+  (H1 :
+     ∑ (ma ∈ firstn j (filter f la) ++ firstn j (filter g la)),
+     mcoeff ma ≠ 0%F). {
+  rewrite rngl_summation_list_app.
+  rewrite (all_0_rngl_summation_list_0 _ (firstn j (filter g la))). 2: {
+    intros k Hk.
+    apply (In_nth _ _ (Mon 0 0)) in Hk.
+    destruct Hk as (n & Hn & Hnk).
+    rewrite firstn_length in Hn; subst k.
+    unfold g; cbn.
+Search (firstn _ (filter _ _)).
 ...
 specialize permutation_firstn as H1.
 specialize (H1 _ monom_eqb (Mon 0 0) monom_eqb_eq).
