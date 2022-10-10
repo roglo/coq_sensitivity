@@ -1851,7 +1851,15 @@ assert
     destruct Hk as (n & Hn & Hnk).
     rewrite firstn_length in Hn; subst k.
     unfold g; cbn.
-Search (firstn _ (filter _ _)).
+    clear Hn.
+    clear Hj Hfj Hmsf Hmc Hdic Hmcz.
+    clear Hi Hfi Hms Hmb Hdi Hmbz.
+    induction la as [| ma]. {
+      cbn; rewrite firstn_nil.
+      now destruct n.
+    }
+    cbn.
+(* bof, non, faut réfléchir, quand même *)
 ...
 specialize permutation_firstn as H1.
 specialize (H1 _ monom_eqb (Mon 0 0) monom_eqb_eq).
