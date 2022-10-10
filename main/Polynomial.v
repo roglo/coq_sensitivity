@@ -1839,6 +1839,20 @@ rewrite Hmb in Hmbz.
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
 rewrite Hmc in Hmcz.
+set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
+assert
+  (H1 : ∑ (ma ∈ firstn i (filter f la ++ filter g la)), mcoeff ma = 0%F). {
+  rewrite firstn_app.
+(* ah non c'est pas ça *)
+...
+replace la with (filter f la
+...
+Search (∑ (_ ∈ _), _ + ∑ (_ ∈ _), _)%F.
+assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F).
+...
+replace (∑ (_ ∈ _), _) with (α
+rewrite rngl_summation_list_eq_compat with
+  (h := λ firstn j (filter f la ++ filter g la)) in Hmbz.
 ...
 destruct lb as [| md]; [ easy | ].
 cbn in IHla.
