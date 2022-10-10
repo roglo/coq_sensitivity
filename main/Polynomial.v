@@ -1839,6 +1839,7 @@ rewrite Hmb in Hmbz.
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
 rewrite Hmc in Hmcz.
+...
 set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 assert
   (H1 :
