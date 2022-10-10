@@ -1839,11 +1839,24 @@ rewrite Hmb in Hmbz.
 apply eq_merge_mon_cons_iff in Hlc.
 destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
 rewrite Hmc in Hmcz.
+...
 set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 assert
   (H1 : ∑ (ma ∈ firstn i (filter f la ++ filter g la)), mcoeff ma = 0%F). {
+  erewrite (rngl_summation_list_permut _ monom_eqb_eq); [ apply Hmbz | ].
+Search (permutation _ (firstn _ _)).
+About permutation_firstn.
+...
+specialize permutation_firstn as H1.
+specialize (H1 _ monom_eqb (Mon 0 0) monom_eqb_eq).
+specialize (H1 (λ _, True)).
+eapply H1.
+apply (permutation_firstn (Mon 0 0)).
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _)%F.
+Search (∑ (_ ∈ _), _ + ∑ (_ ∈ _), _)%F.
+...
   rewrite firstn_app.
-(* ah non c'est pas ça *)
+  rewrite rngl_summation_list_app.
 ...
 replace la with (filter f la
 ...
