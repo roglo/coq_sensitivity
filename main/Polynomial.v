@@ -1832,6 +1832,26 @@ rename Hac into Hbc.
 move lb before la; move lc before lb.
 move mc before mb.
 move IHla before Hlc.
+(**)
+destruct lb as [| md]; [ easy | ].
+cbn in IHla.
+remember (f md) as fd eqn:Hmdz; symmetry in Hmdz.
+destruct fd. {
+  injection IHla; clear IHla; intros H1 H; subst md.
+  now apply eq_merge_mon_cons_cons in Hlb.
+}
+unfold f in Hmdz; cbn in Hmdz.
+apply Bool.negb_false_iff in Hmdz.
+apply (rngl_eqb_eq Heq) in Hmdz.
+move Hmdz after Hmbz.
+destruct lb as [| me]; [ easy | ].
+cbn in IHla.
+remember (f me) as fe eqn:Hmez; symmetry in Hmez.
+destruct fe. {
+  injection IHla; clear IHla; intros H1 H; subst me.
+  apply eq_merge_mon_cons_iff in Hlb.
+  destruct Hlb as (i & Hi & Hfi & Hms & Hmb & Hdi).
+  clear Hmez.
 ...
 generalize Hlb; intros H.
 apply (f_equal (filter f)) in H.
@@ -1852,6 +1872,7 @@ destruct (bool_dec _) as [H'| H']; [ | clear H' ]. {
   apply Bool.negb_true_iff in H'.
   now apply (rngl_eqb_neq Heq) in H'.
 }
+(* aucun intérêt *)
 ...
 Search (merge_mon (filter _ _)).
 (* cb=0 donc, par Hlb, les premiers éléments de "la" de degré "db"
