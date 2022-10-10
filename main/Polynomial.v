@@ -1833,6 +1833,13 @@ move lb before la; move lc before lb.
 move mc before mb.
 move IHla before Hlc.
 (**)
+apply eq_merge_mon_cons_iff in Hlb.
+destruct Hlb as (i & Hi & Hfi & Hms & Hmb & Hdi).
+rewrite Hmb in Hmbz.
+apply eq_merge_mon_cons_iff in Hlc.
+destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
+rewrite Hmc in Hmcz.
+...
 destruct lb as [| md]; [ easy | ].
 cbn in IHla.
 remember (f md) as fd eqn:Hmdz; symmetry in Hmdz.
