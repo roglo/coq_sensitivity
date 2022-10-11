@@ -1832,7 +1832,7 @@ rename Hac into Hbc.
 move lb before la; move lc before lb.
 move mc before mb.
 move IHla before Hlc.
-(**)
+...
 apply eq_merge_mon_cons_iff in Hlb.
 destruct Hlb as (i & Hi & Hfi & Hms & Hmb & Hdib).
 rewrite Hmb in Hmbz.
@@ -1842,6 +1842,7 @@ rewrite Hmc in Hmcz.
 move Hdib before Hdic.
 rewrite <- Hbc in Hdic.
 set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
+...
 assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F). {
   apply all_0_rngl_summation_list_0.
   intros ma Hma.
