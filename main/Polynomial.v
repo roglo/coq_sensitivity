@@ -1741,6 +1741,42 @@ intros mb Hmb.
 now apply H1; right.
 Qed.
 
+Theorem canon_polyn_add_add_swap :
+  ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
+Proof.
+intros P Q R; cbn.
+apply canon_polyn_eq_eq; cbn.
+unfold polyn_norm; f_equal; cbn.
+do 4 rewrite fold_merge_mon.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+destruct P as ((P), PP).
+destruct Q as ((Q), PQ).
+destruct R as ((R), PR); cbn.
+move Q before P; move R before Q.
+unfold is_canon_polyn in PP, PQ, PR.
+cbn in PP, PQ, PR.
+do 4 rewrite fold_merge_mon.
+...
+rewrite (canon_monl_is_filter_deg_non_zero P PP).
+fold f.
+...
+rewrite (canon_monl_is_filter_deg_non_zero P PP) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
+fold f.
+...
+*)
+
 Theorem canon_polyn_add_assoc :
   ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
 Proof.
@@ -1772,6 +1808,7 @@ rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
+...
 Theorem filter_deg_non_zero_merge_mon_filter : ∀ P,
   let f := λ ma : monom T, (mcoeff ma ≠? 0)%F in
   filter f (merge_mon (filter f P)) = filter f (merge_mon P).
