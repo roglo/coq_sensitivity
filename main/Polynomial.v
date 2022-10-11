@@ -1841,6 +1841,10 @@ destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
 rewrite Hmc in Hmcz.
 ...
 set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
+assert (H1 : filter g la = []). {
+  apply List_filter_nil_iff.
+  intros ma Ha; unfold g.
+...
 assert
   (H1 :
      ∑ (ma ∈ firstn j (filter f la) ++ firstn j (filter g la)),
