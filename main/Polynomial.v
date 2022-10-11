@@ -1767,15 +1767,12 @@ move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_mon.
-...
-rewrite (canon_monl_is_filter_deg_non_zero P PP).
-fold f.
-...
-rewrite (canon_monl_is_filter_deg_non_zero P PP) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
 rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
+do 2 rewrite <- filter_app.
+do 2 rewrite (sorted_isort_filter Htra Htot).
 ...
-*)
 
 Theorem canon_polyn_add_assoc :
   ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
