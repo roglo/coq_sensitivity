@@ -1859,6 +1859,8 @@ destruct fa. {
         rewrite Hmc in Hfc.
         move Hdib before Hdic.
         rewrite <- Hac, Hab in Hdic.
+        assert (H1 : filter f (firstn j la) = firstn i (filter f la)).
+...
         set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 ...
 assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F). {
