@@ -411,6 +411,14 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_eqb_refl :
+  rngl_has_eqb = true →
+  ∀ a, rngl_eqb a a = true.
+Proof.
+intros Heqb *.
+now apply (rngl_eqb_eq Heqb).
+Qed.
+
 Theorem rngl_eq_dec : rngl_has_eqb = true → ∀ a b : T, {a = b} + {a ≠ b}.
 Proof.
 intros Heq *.

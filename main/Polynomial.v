@@ -1851,6 +1851,17 @@ destruct fa. {
         apply (rngl_eqb_neq Heq) in Hfa.
         move Hfa after Hfb.
 exfalso.
+Search (merge_mon (filter _ _)).
+Search (filter _ (merge_mon _)).
+generalize Hlc; intros H1.
+apply (f_equal (filter f)) in H1.
+cbn in H1.
+unfold f in H1 at 2.
+rewrite Hfc in H1.
+rewrite (rngl_eqb_refl Heq) in H1; cbn in H1.
+move H1 before Hlb.
+move lc before lb.
+rewrite <- IHla in H1.
 ...
         rewrite if_bool_if_dec.
         destruct (bool_dec _) as [Hcab| Hcab]. 2: {
