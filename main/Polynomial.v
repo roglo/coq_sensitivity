@@ -1772,6 +1772,28 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
+Theorem merge_mon_filter_isort : ∀ P,
+  let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
+  let f := λ ma : monom T, (mcoeff ma ≠? 0)%F in
+  filter f (merge_mon (filter f (isort rel P))) =
+  filter f (merge_mon (isort rel P)).
+Proof.
+intros.
+destruct P as [| ma la]; [ easy | ].
+cbn; do 2 rewrite fold_merge_mon.
+revert ma.
+induction la as [| mb]; intros; cbn. {
+  rewrite fold_merge_mon.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hmaz| Hmaz]; [ | easy ].
+  now cbn; rewrite Hmaz.
+}
+do 2 rewrite fold_merge_mon.
+Print isort_insert.
+(* bon, faut voir... *)
+... ...
+do 2 rewrite merge_mon_filter_isort.
+fold rel.
 ...
 
 Theorem canon_polyn_add_assoc :
