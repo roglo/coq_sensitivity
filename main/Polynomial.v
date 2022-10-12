@@ -1777,6 +1777,13 @@ do 2 rewrite (sorted_isort_filter Htra Htot).
 Theorem canon_polyn_add_assoc :
   ∀ a b c : canon_polyn T, (a + (b + c))%F = (a + b + c)%F.
 Proof.
+intros P Q R.
+symmetry.
+rewrite (canon_polyn_add_comm P).
+... ...
+rewrite canon_polyn_add_add_swap.
+now rewrite canon_polyn_add_comm.
+...
 intros P Q R; cbn.
 apply canon_polyn_eq_eq; cbn.
 unfold polyn_norm; f_equal; cbn.
