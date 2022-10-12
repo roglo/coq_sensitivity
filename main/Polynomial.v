@@ -1861,6 +1861,38 @@ destruct fa. {
         rewrite <- Hac, Hab in Hdic.
         set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 ...
+assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F). {
+  rename ma into ma'.
+  apply all_0_rngl_summation_list_0.
+  intros ma Hma.
+  apply (In_nth _ _ (Mon 0 0)) in Hma.
+  rewrite firstn_length in Hma.
+  destruct Hma as (n & Hn & Hma); subst ma.
+  destruct (lt_dec n (length (firstn j (filter g la)))) as [Hnj| Hnj]. 2: {
+    apply Nat.nlt_ge in Hnj.
+    rewrite nth_overflow; [ easy | easy ].
+  }
+  unfold g.
+  clear - Heq.
+  revert j n.
+  induction la as [| ma]; intros. {
+    now cbn; rewrite firstn_nil, List_nth_nil.
+  }
+  cbn; rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hmaz| Hmaz]. {
+    apply (rngl_eqb_eq Heq) in Hmaz.
+    destruct j; [ cbn; now destruct n | ].
+    cbn - [ nth ].
+    destruct n; [ easy | ].
+    apply IHla.
+  }
+  destruct j; [ cbn; now destruct n | ].
+  apply IHla.
+}
+rewrite <- (rngl_add_0_l (iter_list _ _ _)) in Hfc.
+rewrite <- H1 in Hfc at 1; clear H1.
+rewrite <- rngl_summation_list_app in Hfc.
+...
 intros.
 destruct P as [| ma la]; [ easy | ].
 cbn; do 2 rewrite fold_merge_mon.
