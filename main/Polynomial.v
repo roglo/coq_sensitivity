@@ -1858,8 +1858,12 @@ destruct fa. {
         destruct Hlc as (j & Hj & Hfj & Hmsf & Hmc & Hdic).
         rewrite Hmc in Hfc.
         move Hdib before Hdic.
-        rewrite <- Hac, Hab in Hdic.
-        assert (H1 : filter f (firstn j la) = firstn i (filter f la)).
+        rewrite <- Hac, Hab in Hdic, Hfj.
+        move j before i.
+        assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
+          clear - Hfi Hfj Hdib Hdic.
+Search (filter _ (firstn _ _)).
+Search (firstn _ (filter _ _)).
 ...
         set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 ...
