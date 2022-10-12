@@ -1779,6 +1779,52 @@ Theorem merge_mon_filter_isort : ∀ P,
   filter f (merge_mon (isort rel P)).
 Proof.
 intros.
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+specialize (sorted_isort Htot P) as Hs.
+remember (isort rel P) as la eqn:Hla.
+clear P Hla.
+induction la as [| ma]; [ easy | cbn ].
+rewrite fold_merge_mon.
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa. {
+  cbn; do 2 rewrite fold_merge_mon.
+  unfold same_deg_sum_coeff.
+  remember (merge_mon (filter f la)) as lb eqn:Hlb; symmetry in Hlb.
+  remember (merge_mon la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lb as [| mb]. {
+    apply eq_merge_mon_nil in Hlb.
+    specialize (proj1 (List_filter_nil_iff _ _) Hlb) as Ha; clear Hlb.
+    unfold f in Ha; cbn in Ha.
+    unfold f in Hfa.
+    destruct lc as [| mc]; [ easy | ].
+    symmetry in IHla.
+    specialize (proj1 (List_filter_nil_iff _ _) IHla) as Hc.
+    unfold f in Hc; cbn - [ In ] in Hc.
+    unfold f; cbn; rewrite Hfa.
+    rewrite if_eqb_eq_dec.
+    specialize (Hc _ (or_introl eq_refl)) as H1.
+    cbn in IHla.
+    unfold f in IHla at 1.
+    rewrite H1 in IHla.
+    destruct (Nat.eq_dec _ _) as [Hac| Hac]. {
+      cbn.
+      apply Bool.negb_false_iff in H1.
+      apply (rngl_eqb_eq Heq) in H1.
+      rewrite H1, rngl_add_0_r.
+      fold f.
+      rewrite Hfa, IHla.
+      now destruct ma.
+    }
+    cbn; fold f.
+    now rewrite Hfa, IHla, H1.
+  }
+...
+intros.
 destruct P as [| ma la]; [ easy | ].
 cbn; do 2 rewrite fold_merge_mon.
 revert ma.
