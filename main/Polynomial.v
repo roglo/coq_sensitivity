@@ -1850,6 +1850,10 @@ destruct fa. {
         apply (rngl_eqb_neq Heq) in Hfa; rewrite Hfa; cbn.
         apply (rngl_eqb_neq Heq) in Hfa.
         move Hfa after Hfb.
+exfalso.
+...
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Hcab| Hcab]. 2: {
 ...
 intros.
 destruct P as [| ma la]; [ easy | ].
