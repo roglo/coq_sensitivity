@@ -1823,6 +1823,33 @@ destruct fa. {
     cbn; fold f.
     now rewrite Hfa, IHla, H1.
   }
+  destruct lc as [| mc]. {
+    now apply eq_merge_mon_nil in Hlc; subst la.
+  }
+  unfold f in Hfa; cbn in Hfa.
+  apply Bool.negb_true_iff in Hfa.
+  apply (rngl_eqb_neq Heq) in Hfa.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+      unfold f; cbn; fold f.
+      cbn in IHla.
+      remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+      remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+      destruct fb. {
+        unfold f in Hfb.
+        apply Bool.negb_true_iff in Hfb.
+        apply (rngl_eqb_neq Heq) in Hfb.
+        destruct fc. {
+          now injection IHla; clear IHla; intros H1 H2; subst mc; rewrite H1.
+        }
+        unfold f in Hfc.
+        apply Bool.negb_false_iff in Hfc.
+        apply (rngl_eqb_eq Heq) in Hfc.
+        rewrite Hfc, rngl_add_0_r.
+        apply (rngl_eqb_neq Heq) in Hfa; rewrite Hfa; cbn.
+        apply (rngl_eqb_neq Heq) in Hfa.
+        move Hfa after Hfb.
 ...
 intros.
 destruct P as [| ma la]; [ easy | ].
