@@ -1862,6 +1862,36 @@ destruct fa. {
         move j before i.
         assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
           clear - Hfi Hfj Hdib Hdic.
+          revert i j Hfi Hfj Hdib Hdic.
+          induction la as [| ma]; intros; cbn. {
+            now do 2 rewrite firstn_nil.
+          }
+          cbn - [ In ] in Hfi, Hfj.
+          remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+          destruct fa. {
+            destruct j. {
+              cbn in Hdic |-*.
+              destruct i; [ easy | exfalso ].
+              cbn - [ In ] in Hfi.
+              now specialize (Hfi _ (or_introl eq_refl)).
+            }
+            cbn; rewrite Hfa.
+            destruct i; cbn. 2: {
+              f_equal.
+              cbn - [ In ] in Hfi, Hdib.
+              rewrite Hfa in Hdib.
+              apply IHla; [ | | easy | easy ]. {
+                now intros; apply Hfi; right.
+              } {
+                now intros; apply Hfj; right.
+              }
+            }
+            exfalso.
+            cbn - [ In ] in Hdib, Hdic, Hfj.
+            rewrite Hfa in Hdib; cbn in Hdib.
+            now specialize (Hfj _ (or_introl eq_refl)).
+          }
+          destruct j; cbn. {
 Search (filter _ (firstn _ _)).
 Search (firstn _ (filter _ _)).
 ...
