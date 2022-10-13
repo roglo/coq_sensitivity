@@ -1860,9 +1860,11 @@ destruct fa. {
         move Hdib before Hdic.
         rewrite <- Hac, Hab in Hdic, Hfj.
         move j before i.
+        assert (Hij : i ≤ j). {
+...
         assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
-          clear - Hfi Hfj Hdib Hdic.
-          revert i j Hfi Hfj Hdib Hdic.
+          clear - Hfi Hfj Hdib Hdic Hij.
+          revert i j Hfi Hfj Hdib Hdic Hij.
           induction la as [| ma]; intros; cbn. {
             now do 2 rewrite firstn_nil.
           }
@@ -1880,7 +1882,8 @@ destruct fa. {
               f_equal.
               cbn - [ In ] in Hfi, Hdib.
               rewrite Hfa in Hdib.
-              apply IHla; [ | | easy | easy ]. {
+              apply Nat.succ_le_mono in Hij.
+              apply IHla; [ | | easy | easy | easy ]. {
                 now intros; apply Hfi; right.
               } {
                 now intros; apply Hfj; right.
@@ -1892,6 +1895,8 @@ destruct fa. {
             now specialize (Hfj _ (or_introl eq_refl)).
           }
           destruct j; cbn. {
+now apply Nat.le_0_r in Hij; subst i.
+...
             cbn in Hdic.
             destruct i; [ easy | cbn ].
             cbn in Hdib.
