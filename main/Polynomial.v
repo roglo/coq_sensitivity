@@ -1892,6 +1892,15 @@ destruct fa. {
             now specialize (Hfj _ (or_introl eq_refl)).
           }
           destruct j; cbn. {
+            cbn in Hdic.
+            destruct i; [ easy | cbn ].
+            cbn in Hdib.
+            rewrite Hfa in Hdib.
+            remember (filter f la) as lb eqn:Hlb; symmetry in Hlb.
+            destruct lb as [| mc]; [ easy | exfalso ].
+            cbn - [ In ] in Hfi, Hdib.
+            specialize (Hfi _ (or_introl eq_refl)) as H1.
+            clear Hfj.
 Search (filter _ (firstn _ _)).
 Search (firstn _ (filter _ _)).
 ...
