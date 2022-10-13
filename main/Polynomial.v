@@ -1860,6 +1860,7 @@ destruct fa. {
         move Hdib before Hdic.
         rewrite <- Hac, Hab in Hdic, Hfj.
         move j before i.
+...
         assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
           clear - Hfi Hfj Hdib Hdic.
           revert i j Hfi Hfj Hdib Hdic.
@@ -1901,6 +1902,7 @@ destruct fa. {
             cbn - [ In ] in Hfi, Hdib.
             specialize (Hfi _ (or_introl eq_refl)) as H1.
             clear Hfj.
+...
 Search (filter _ (firstn _ _)).
 Search (firstn _ (filter _ _)).
 ...
