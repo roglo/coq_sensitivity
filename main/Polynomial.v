@@ -1840,6 +1840,12 @@ assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
 }
+assert (Htral : transitive (λ x y : monom T, mdeg y <? mdeg x)). {
+  intros a b c Hab Hbc.
+  apply Nat.ltb_lt in Hab, Hbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg b).
+}
 unfold merge_app_monl.
 remember (merge_app_monl_nb_iter P Q) as it.
 assert (Hit : merge_app_monl_nb_iter P Q ≤ it) by flia Heqit.
@@ -1880,6 +1886,59 @@ destruct (le_dec db da) as [Hba| Hba]. {
     now apply Bool.andb_true_iff in Hcp.
   }
   cbn.
+  remember (isort rel (P ++ cb*☓^db :: Q)) as la eqn:Hla.
+  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ da). {
+    intros ma Hma.
+    subst la.
+    apply in_isort in Hma.
+    apply in_app_or in Hma.
+    destruct Hma as [Hma| [Hma| Hma]]. {
+      unfold is_canon_monl in HP.
+      apply Bool.andb_true_iff in HP.
+      destruct HP as (Hs & Hap).
+      apply (sorted_cons_iff Htral) in Hs.
+      destruct Hs as (Hs & Hp).
+      cbn in Hp.
+      specialize (Hp _ Hma) as H1.
+      apply Nat.ltb_lt in H1.
+      now apply Nat.lt_le_incl.
+    } {
+      now subst ma; cbn.
+    } {
+      unfold is_canon_monl in HQ.
+      apply Bool.andb_true_iff in HQ.
+      destruct HQ as (Hs & Hap).
+      apply (sorted_cons_iff Htral) in Hs.
+      destruct Hs as (Hs & Hp).
+      cbn in Hp.
+      specialize (Hp _ Hma) as H2.
+      apply Nat.ltb_lt in H2.
+      transitivity db; [ | easy ].
+      now apply Nat.lt_le_incl.
+    }
+  }
+  clear Hla.
+  destruct la as [| ma]; [ easy | cbn ].
+  unfold rel at 1; cbn.
+  specialize (H1 _ (or_introl eq_refl)) as H2.
+  apply Nat.leb_le in H2.
+  now rewrite H2.
+} {
+  apply Nat.nle_gt in Hba.
+  rewrite <- IHit; [ | easy | | cbn; flia Hit ]. 2: {
+    unfold is_canon_monl in HQ |-*.
+    apply Bool.andb_true_iff in HQ.
+    apply Bool.andb_true_iff.
+    destruct HQ as (Hsp, Hcp).
+    split; [ now apply sorted_cons in Hsp | ].
+    rewrite and_list_cons in Hcp.
+    now apply Bool.andb_true_iff in Hcp.
+  }
+  cbn.
+...
+  remember (isort rel (P ++ cb*☓^db :: Q)) as la eqn:Hla.
+  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ da). {
+...
   revert ca da cb db Q HP HQ Hit Hba.
   induction P as [| (ca', da')]; intros; cbn. {
     apply (sorted_cons_isort_insert Htra).
@@ -1909,6 +1968,9 @@ destruct (le_dec db da) as [Hba| Hba]. {
     apply Nat.leb_le in Hrq.
     now transitivity db.
   }
+  cbn in Hit.
+  destruct (le_dec db da') as [Hba'| Hba']. 2: {
+    apply Nat.nle_gt in Hba'.
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
