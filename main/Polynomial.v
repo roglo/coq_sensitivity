@@ -1772,6 +1772,36 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
+Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
+  match it with
+  | 0 => [Mon 0 99] (* algo error: not enough iterations *)
+  | S it' =>
+      match P with
+      | [] => Q
+      | Mon ca da :: la =>
+          match Q with
+          | [] => P
+          | Mon cb db :: lb =>
+              match Nat.compare da db with
+              | Eq => Mon (ca + cb) da :: merge_app_monl_loop it' la lb
+              | Lt => Mon cb db :: merge_app_monl_loop it' P lb
+              | Gt => Mon ca da :: merge_app_monl_loop it' la Q
+              end
+          end
+      end
+  end.
+Definition merge_app_monl_nb_iter (la lb : list (monom T)) :=
+  S (length la + length lb).
+Definition merge_app_monl la lb :=
+  merge_app_monl_loop (merge_app_monl_nb_iter la lb) la lb.
+Theorem glop : ∀ P Q : list (monom T),
+  let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → isort rel (P ++ Q) = merge_app_monl P Q.
+Proof.
+intros * HP HQ.
+...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
   let f := λ ma : monom T, (mcoeff ma ≠? 0)%F in
