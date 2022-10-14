@@ -1830,6 +1830,16 @@ Theorem isort_merge_app_monl : ∀ P Q : list (monom T),
   → isort rel (P ++ Q) = merge_app_monl P Q.
 Proof.
 intros * HP HQ.
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
 unfold merge_app_monl.
 remember (merge_app_monl_nb_iter P Q) as it.
 assert (Hit : merge_app_monl_nb_iter P Q ≤ it) by flia Heqit.
@@ -1870,6 +1880,21 @@ destruct (le_dec db da) as [Hba| Hba]. {
     now apply Bool.andb_true_iff in Hcp.
   }
   cbn.
+  revert ca da cb db Q HP HQ Hit Hba.
+  induction P as [| (ca', da')]; intros; cbn. {
+    apply (sorted_cons_isort_insert Htra).
+    apply (sorted_cons_iff Htra).
+    split. {
+      apply (sorted_isort_insert Htot).
+      apply (sorted_isort Htot).
+    }
+    intros (cc, dc) Hc; cbn.
+    apply Nat.leb_le.
+...
+    apply in_isort_insert in Hc.
+    destruct Hc as [Hc| Hc]. {
+      now injection Hc; clear Hc; intros; subst.
+    }
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
