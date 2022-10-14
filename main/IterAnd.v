@@ -4,7 +4,7 @@ Set Nested Proofs Allowed.
 
 Require Import Utf8 Bool.
 Require Import Misc.
-Import List (*List.ListNotations*).
+Import List.
 
 Notation "'⋀' ( i = b , e ) , g" :=
   (iter_seq b e (λ c i, (c && g)%bool) true)
@@ -56,5 +56,18 @@ split. {
   intros Hb i Hi.
   apply H1; [ easy | ].
   apply in_seq; flia Hi.
+}
+Qed.
+
+Theorem and_list_cons : ∀ A (a : A) la f,
+  ⋀ (i ∈ a :: la), f i = (f a && ⋀ (i ∈ la), f i)%bool.
+Proof.
+intros.
+apply iter_list_cons. {
+  apply andb_true_l.
+} {
+  apply andb_true_r.
+} {
+  apply andb_assoc.
 }
 Qed.

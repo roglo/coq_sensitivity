@@ -87,11 +87,7 @@ split; intros Hm. {
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
   induction ll as [| la]; [ easy | cbn ].
-  rewrite iter_list_cons in Hc; cycle 1; try easy. {
-    intros b; apply andb_true_r.
-  } {
-    intros; apply andb_assoc.
-  }
+  rewrite and_list_cons in Hc.
   apply Bool.andb_true_iff in Hc.
   destruct Hc as (Hla, Hc).
   apply Nat.eqb_eq in Hla.
@@ -114,11 +110,7 @@ split; intros Hm. {
   remember (mat_list_list M) as ll eqn:Hll.
   clear Hll.
   induction ll as [| la]; [ easy | ].
-  rewrite iter_list_cons; cycle 1; try easy. {
-    intros b; apply andb_true_r.
-  } {
-    intros; apply andb_assoc.
-  }
+  rewrite and_list_cons.
   apply Bool.andb_true_iff.
   split; [ now apply Nat.eqb_eq, Hc; left | ].
   apply IHll.

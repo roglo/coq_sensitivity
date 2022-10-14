@@ -1814,8 +1814,8 @@ Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
           match Q with
           | [] => P
           | Mon cb db :: lb =>
-              if db <=? da then Mon ca da :: merge_app_monl_loop it' P lb
-              else Mon cb db :: merge_app_monl_loop it' la Q
+              if db <=? da then Mon ca da :: merge_app_monl_loop it' la Q
+              else Mon cb db :: merge_app_monl_loop it' P lb
           end
       end
   end.
@@ -1860,13 +1860,14 @@ destruct Q as [| (cb, db)]. {
 rewrite if_leb_le_dec.
 cbn in Hit.
 destruct (le_dec db da) as [Hba| Hba]. {
-...
-  rewrite <- IHit; [ | easy | | cbn; flia Hit ]. 2: {
-    unfold is_canon_monl in HQ |-*.
-    apply Bool.andb_true_iff in HQ.
+  rewrite <- IHit; [ | | easy | cbn; flia Hit ]. 2: {
+    unfold is_canon_monl in HP |-*.
+    apply Bool.andb_true_iff in HP.
     apply Bool.andb_true_iff.
-    destruct HQ as (Hsq, Hcq).
-    split; [ now apply sorted_cons in Hsq | ].
+    destruct HP as (Hsp, Hcp).
+    split; [ now apply sorted_cons in Hsp | ].
+    rewrite iter_list_cons in Hcp.
+Search (⋀ (_ ∈ _ :: _), _).
 ...
   cbn.
 ...
