@@ -460,7 +460,31 @@ Theorem sorted_lt_sorted_le_mdeg : ∀ la : list (monom T),
   → sorted g la.
 Proof.
 intros * Hs.
-...
+assert (Htraf : transitive f). {
+  unfold f; intros a b c Hab Hbc.
+  apply Nat.ltb_lt in Hab, Hbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg b).
+}
+assert (Htrag : transitive g). {
+  unfold g; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+induction la as [| ma]; [ easy | cbn ].
+assert (H : sorted f la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+apply (sorted_cons_iff Htrag).
+apply (sorted_cons_iff Htraf) in Hs.
+split; [ easy | ].
+intros mb Hmb.
+destruct Hs as (Hsf, Hs).
+specialize (Hs _ Hmb).
+apply Nat.ltb_lt in Hs.
+apply Nat.leb_le.
+now apply Nat.lt_le_incl.
+Qed.
 
 Theorem sorted_le_sorted_lt_merge_same_deg : ∀ la,
   let f := λ ma mb, mdeg mb <=? mdeg ma in
@@ -1823,8 +1847,8 @@ destruct P as [| (ca, da)]. {
   destruct HQ as (Hsq, Hcq).
   apply isort_when_sorted.
   rewrite fold_sorted in Hsq.
-... ...
   now apply sorted_lt_sorted_le_mdeg.
+}
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
