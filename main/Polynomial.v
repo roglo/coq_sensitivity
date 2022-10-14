@@ -1861,7 +1861,9 @@ destruct fa. {
         rewrite <- Hac, Hab in Hdic, Hfj.
         move j before i.
         assert (Hij : i ≤ j). {
-          apply Nat.nlt_ge; intros H.
+          apply Nat.nlt_ge; intros Hij.
+specialize (Hfi (nth j (firstn i (filter f la)) (Mon 0 0))) as H1.
+assert (H : nth j (firstn i (filter f la)) 0· ∈ firstn i (filter f la))
 ...
         assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
           clear - Hfi Hfj Hdib Hdic Hij.
