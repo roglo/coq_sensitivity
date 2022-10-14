@@ -1843,15 +1843,19 @@ destruct fa. {
         destruct fc. {
           now injection IHla; clear IHla; intros H1 H2; subst mc; rewrite H1.
         }
+exfalso.
         unfold f in Hfc.
         apply Bool.negb_false_iff in Hfc.
         apply (rngl_eqb_eq Heq) in Hfc.
+(*
         rewrite Hfc, rngl_add_0_r.
         apply (rngl_eqb_neq Heq) in Hfa; rewrite Hfa; cbn.
         apply (rngl_eqb_neq Heq) in Hfa.
+*)
         move Hfa after Hfb.
-...
+(*
         exfalso.
+*)
         apply eq_merge_same_deg_cons_iff in Hlb.
         destruct Hlb as (i & Hi & Hfi & Hms & Hmb & Hdib).
         rewrite Hmb in Hfb.
@@ -1861,6 +1865,9 @@ destruct fa. {
         move Hdib before Hdic.
         rewrite <- Hac, Hab in Hdic, Hfj.
         move j before i.
+rewrite Hac in Hab.
+apply sorted_cons in Hs.
+clear ma Hfa Hac.
 ...
 assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F). {
   rename ma into ma'.
