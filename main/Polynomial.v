@@ -1850,6 +1850,7 @@ destruct fa. {
         apply (rngl_eqb_neq Heq) in Hfa; rewrite Hfa; cbn.
         apply (rngl_eqb_neq Heq) in Hfa.
         move Hfa after Hfb.
+...
         exfalso.
         apply eq_merge_same_deg_cons_iff in Hlb.
         destruct Hlb as (i & Hi & Hfi & Hms & Hmb & Hdib).
@@ -1860,60 +1861,6 @@ destruct fa. {
         move Hdib before Hdic.
         rewrite <- Hac, Hab in Hdic, Hfj.
         move j before i.
-        assert (Hij : i ≤ j). {
-          apply Nat.nlt_ge; intros Hij.
-specialize (Hfi (nth j (firstn i (filter f la)) (Mon 0 0))) as H1.
-assert (H : nth j (firstn i (filter f la)) 0· ∈ firstn i (filter f la))
-...
-        assert (H1 : filter f (firstn j la) = firstn i (filter f la)). {
-          clear - Hfi Hfj Hdib Hdic Hij.
-          revert i j Hfi Hfj Hdib Hdic Hij.
-          induction la as [| ma]; intros; cbn. {
-            now do 2 rewrite firstn_nil.
-          }
-          cbn - [ In ] in Hfi, Hfj.
-          remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
-          destruct fa. {
-            destruct j. {
-              cbn in Hdic |-*.
-              destruct i; [ easy | exfalso ].
-              cbn - [ In ] in Hfi.
-              now specialize (Hfi _ (or_introl eq_refl)).
-            }
-            cbn; rewrite Hfa.
-            destruct i; cbn. 2: {
-              f_equal.
-              cbn - [ In ] in Hfi, Hdib.
-              rewrite Hfa in Hdib.
-              apply Nat.succ_le_mono in Hij.
-              apply IHla; [ | | easy | easy | easy ]. {
-                now intros; apply Hfi; right.
-              } {
-                now intros; apply Hfj; right.
-              }
-            }
-            exfalso.
-            cbn - [ In ] in Hdib, Hdic, Hfj.
-            rewrite Hfa in Hdib; cbn in Hdib.
-            now specialize (Hfj _ (or_introl eq_refl)).
-          }
-          destruct j; cbn. {
-now apply Nat.le_0_r in Hij; subst i.
-...
-            cbn in Hdic.
-            destruct i; [ easy | cbn ].
-            cbn in Hdib.
-            rewrite Hfa in Hdib.
-            remember (filter f la) as lb eqn:Hlb; symmetry in Hlb.
-            destruct lb as [| mc]; [ easy | exfalso ].
-            cbn - [ In ] in Hfi, Hdib.
-            specialize (Hfi _ (or_introl eq_refl)) as H1.
-            clear Hfj.
-...
-Search (filter _ (firstn _ _)).
-Search (firstn _ (filter _ _)).
-...
-        set (g := λ ma : monom T, (mcoeff ma =? 0)%F).
 ...
 assert (H1 : ∑ (ma ∈ firstn j (filter g la)), mcoeff ma = 0%F). {
   rename ma into ma'.
