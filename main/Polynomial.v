@@ -453,6 +453,15 @@ destruct Hma as [Hma| Hma]; [ now subst mb; left | ].
 now right; apply IHla.
 Qed.
 
+Theorem sorted_lt_sorted_le_mdeg : ∀ la : list (monom T),
+  let f := λ ma mb, mdeg mb <? mdeg ma in
+  let g := λ ma mb, mdeg mb <=? mdeg ma in
+  sorted f la
+  → sorted g la.
+Proof.
+intros * Hs.
+...
+
 Theorem sorted_le_sorted_lt_merge_same_deg : ∀ la,
   let f := λ ma mb, mdeg mb <=? mdeg ma in
   let g := λ ma mb, mdeg mb <? mdeg ma in
@@ -559,7 +568,6 @@ destruct (Nat.eq_dec (mdeg md) (mdeg me)) as [Hdde| Hdde]. {
   now apply Nat.leb_le in H2.
 }
 injection Hlb; clear Hlb; intros; subst md lb.
-(**)
 apply (sorted_cons_iff Htrf) in Hs.
 destruct Hs as (Hsa, Hfa).
 specialize (Hfa _ (or_introl eq_refl)) as H1.
@@ -1801,6 +1809,22 @@ Theorem glop : ∀ P Q : list (monom T),
   → isort rel (P ++ Q) = merge_app_monl P Q.
 Proof.
 intros * HP HQ.
+unfold merge_app_monl.
+remember (merge_app_monl_nb_iter P Q) as it.
+assert (Hit : merge_app_monl_nb_iter P Q ≤ it) by flia Heqit.
+clear Heqit.
+unfold merge_app_monl_nb_iter in Hit.
+revert P Q HP HQ Hit.
+induction it; intros; [ easy | cbn ].
+destruct P as [| (ca, da)]. {
+  cbn.
+  unfold is_canon_monl in HQ.
+  apply Bool.andb_true_iff in HQ.
+  destruct HQ as (Hsq, Hcq).
+  apply isort_when_sorted.
+  rewrite fold_sorted in Hsq.
+... ...
+  now apply sorted_lt_sorted_le_mdeg.
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
