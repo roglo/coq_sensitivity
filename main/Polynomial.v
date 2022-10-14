@@ -1917,7 +1917,6 @@ destruct (le_dec db da) as [Hba| Hba]. {
       now apply Nat.lt_le_incl.
     }
   }
-  clear Hla.
   destruct la as [| ma]; [ easy | cbn ].
   unfold rel at 1; cbn.
   specialize (H1 _ (or_introl eq_refl)) as H2.
@@ -1935,9 +1934,43 @@ destruct (le_dec db da) as [Hba| Hba]. {
     now apply Bool.andb_true_iff in Hcp.
   }
   cbn.
-...
   remember (isort rel (P ++ cb*☓^db :: Q)) as la eqn:Hla.
-  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ da). {
+  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ db). {
+    intros ma Hma.
+    subst la.
+    apply in_isort in Hma.
+    apply in_app_or in Hma.
+    destruct Hma as [Hma| [Hma| Hma]]. {
+      unfold is_canon_monl in HP.
+      apply Bool.andb_true_iff in HP.
+      destruct HP as (Hs & Hap).
+      apply (sorted_cons_iff Htral) in Hs.
+      destruct Hs as (Hs & Hp).
+      cbn in Hp.
+      specialize (Hp _ Hma) as H1.
+      apply Nat.ltb_lt in H1.
+      apply Nat.lt_le_incl.
+      now transitivity da.
+    } {
+      now subst ma; cbn.
+    } {
+      unfold is_canon_monl in HQ.
+      apply Bool.andb_true_iff in HQ.
+      destruct HQ as (Hs & Hap).
+      apply (sorted_cons_iff Htral) in Hs.
+      destruct Hs as (Hs & Hp).
+      cbn in Hp.
+      specialize (Hp _ Hma) as H2.
+      apply Nat.ltb_lt in H2.
+      now apply Nat.lt_le_incl.
+    }
+  }
+...
+  destruct la as [| ma]; [ easy | cbn ].
+  unfold rel at 1; cbn.
+  specialize (H1 _ (or_introl eq_refl)) as H2.
+  apply Nat.leb_le in H2.
+  now rewrite H2.
 ...
   revert ca da cb db Q HP HQ Hit Hba.
   induction P as [| (ca', da')]; intros; cbn. {
