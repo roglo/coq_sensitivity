@@ -1866,13 +1866,10 @@ destruct (le_dec db da) as [Hba| Hba]. {
     apply Bool.andb_true_iff.
     destruct HP as (Hsp, Hcp).
     split; [ now apply sorted_cons in Hsp | ].
-    rewrite iter_list_cons in Hcp.
-Search (⋀ (_ ∈ _ :: _), _).
-...
+    rewrite and_list_cons in Hcp.
+    now apply Bool.andb_true_iff in Hcp.
+  }
   cbn.
-...
-  cbn - [ isort ].
-  rewrite IHit; [ | easy | | ].
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in
