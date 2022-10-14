@@ -1890,11 +1890,25 @@ destruct (le_dec db da) as [Hba| Hba]. {
     }
     intros (cc, dc) Hc; cbn.
     apply Nat.leb_le.
-...
-    apply in_isort_insert in Hc.
+    rewrite fold_isort in Hc.
+    unfold is_canon_monl in HQ.
+    apply Bool.andb_true_iff in HQ.
+    destruct HQ as (Hsq, Hcq).
+    rewrite fold_sorted in Hsq.
+    generalize Hsq; intros Hsqi.
+    apply sorted_lt_sorted_le_mdeg in Hsq.
+    fold rel in Hsq.
+    rewrite (isort_when_sorted Hsq) in Hc.
     destruct Hc as [Hc| Hc]. {
       now injection Hc; clear Hc; intros; subst.
     }
+    apply (sorted_cons_iff Htra) in Hsq.
+    destruct Hsq as (Hsq, Hrq).
+    specialize (Hrq _ Hc).
+    cbn in Hrq.
+    apply Nat.leb_le in Hrq.
+    now transitivity db.
+  }
 ...
 Theorem merge_same_deg_filter_isort : ∀ P,
   let rel := λ ma mb : monom T, mdeg mb <=? mdeg ma in

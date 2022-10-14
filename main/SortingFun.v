@@ -1288,6 +1288,12 @@ do 2 apply sorted_cons in Hs.
 now apply merge_when_sorted.
 Qed.
 
+(* *)
+
+Theorem fold_isort : ∀ A (rel : A → _) a l,
+  isort_insert rel a (isort rel l) = isort rel (a :: l).
+Proof. easy. Qed.
+
 (* isort length *)
 
 Theorem isort_insert_length : ∀ A rel (a : A) lsorted,
