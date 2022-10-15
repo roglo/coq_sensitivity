@@ -1976,6 +1976,17 @@ destruct (le_dec db da) as [Hba| Hba]. {
     exfalso.
     destruct P as [| (cc, dc)]. {
       cbn in Hla |-*.
+      rewrite fold_isort in Hla.
+      rewrite isort_when_sorted in Hla. 2: {
+        apply Bool.andb_true_iff in HQ.
+        destruct HQ as (Hsq, Hcq).
+        now apply sorted_lt_sorted_le_mdeg.
+      }
+      injection Hla; clear Hla; intros; subst la ma.
+      cbn in Haa.
+      now apply Nat.nlt_ge in Haa.
+    }
+    cbn - [ isort ] in Hla.
 ...
       clear Hit HQ.
       revert la Hla H1.
