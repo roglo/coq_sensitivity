@@ -1965,6 +1965,45 @@ destruct (le_dec db da) as [Hba| Hba]. {
       now apply Nat.lt_le_incl.
     }
   }
+  destruct la as [| ma]. {
+    symmetry in Hla; apply eq_isort_nil in Hla.
+    now destruct P.
+  }
+  unfold rel at 1; cbn.
+  specialize (H1 _ (or_introl eq_refl)) as H2.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (mdeg ma) da) as [Haa| Haa]. {
+    exfalso.
+    destruct P as [| (cc, dc)]. {
+      cbn in Hla |-*.
+...
+      clear Hit HQ.
+      revert la Hla H1.
+      induction Q as [| (cc, dc)]; intros. {
+        cbn in Hla.
+        injection Hla; clear Hla; intros; subst ma la.
+        cbn in Haa.
+        now apply Nat.nlt_ge in Haa.
+      }
+      cbn in Hla.
+...
+      destruct Q as [| (cc2, dc2)]. {
+        cbn in Hla.
+        rewrite if_leb_le_dec in Hla.
+        destruct (le_dec dc db) as [Hcb| Hcb]. {
+          injection Hla; clear Hla; intros; subst ma la.
+          cbn in Haa.
+          now apply Nat.nlt_ge in Haa.
+        }
+        apply Nat.nle_gt in Hcb.
+        injection Hla; clear Hla; intros; subst ma la.
+        cbn in H2.
+        now apply Nat.nlt_ge in H2.
+      }
+      cbn in Hla.
+...
+  apply Nat.leb_le in H2.
+  rewrite H2.
 ...
   destruct la as [| ma]; [ easy | cbn ].
   unfold rel at 1; cbn.
