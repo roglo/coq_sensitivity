@@ -1971,8 +1971,11 @@ destruct (le_dec db da) as [Hba| Hba]. {
   }
   unfold rel at 1; cbn.
   specialize (H1 _ (or_introl eq_refl)) as H2.
-...
   rewrite if_leb_le_dec.
+  destruct (le_dec (mdeg ma) da) as [Haa| Haa]. 2: {
+    apply Nat.nle_gt in Haa.
+    fold rel.
+...
   destruct (le_dec (mdeg ma) da) as [Haa| Haa]. {
     exfalso.
 ...
