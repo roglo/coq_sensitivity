@@ -1975,25 +1975,23 @@ destruct (le_dec db da) as [Hba| Hba]. {
   destruct (le_dec (mdeg ma) da) as [Haa| Haa]. 2: {
     apply Nat.nle_gt in Haa.
     fold rel.
-...
-  destruct (le_dec (mdeg ma) da) as [Haa| Haa]. {
-    exfalso.
-...
-    induction P as [| (cc, dc)]. {
-      cbn in Hla |-*.
-      rewrite fold_isort in Hla.
+    destruct P as [| (cc, dc)]. {
+      cbn - [ isort ] in Hla.
       rewrite isort_when_sorted in Hla. 2: {
         apply Bool.andb_true_iff in HQ.
         destruct HQ as (Hsq, Hcq).
         now apply sorted_lt_sorted_le_mdeg.
       }
-      injection Hla; clear Hla; intros; subst la ma.
-      cbn in Haa.
-      now apply Nat.nlt_ge in Haa.
+      injection Hla; clear Hla; intros; subst ma la.
+      f_equal; cbn.
+      rewrite isort_when_sorted; [ easy | ].
+      apply Bool.andb_true_iff in HQ.
+      destruct HQ as (Hsq, Hcq).
+      rewrite fold_sorted in Hsq.
+      apply sorted_lt_sorted_le_mdeg in Hsq.
+      fold rel in Hsq.
+      now apply (sorted_cons_iff Htra) in Hsq.
     }
-    cbn in Hla.
-...
-    cbn - [ isort ] in Hla.
 ...
       clear Hit HQ.
       revert la Hla H1.
