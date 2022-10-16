@@ -2006,6 +2006,30 @@ destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
     destruct P as [| me]. {
       cbn in Hla.
       do 2 rewrite fold_isort in Hla.
+Theorem isort_cons_cons_swap : ∀ A (rel : A → _),
+  antisymmetric rel →
+  ∀ a b l,
+  rel a b = true
+  → isort rel (a :: b :: l) = isort rel (b :: a :: l).
+Proof.
+intros * Hant * Hab.
+revert a b Hab.
+induction l as [| c]; intros. {
+  cbn; rewrite Hab.
+  apply Hant in Hab.
+  destruct (rel b a); [ | easy ].
+  now rewrite Hab.
+}
+remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
+destruct bc. {
+  remember (b :: c :: l) as l'.
+  remember (a :: c :: l) as l''; cbn; subst l' l''.
+  rewrite IHl; [ | easy ].
+  cbn.
+...
+rewrite <- isort_cons_cons_swap in Hla. 2: {
+  now apply Nat.leb_le, Nat.lt_le_incl.
+}
 ...
       clear Hit HQ.
       revert la Hla H1.
