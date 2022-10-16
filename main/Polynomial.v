@@ -234,14 +234,14 @@ Fixpoint monl_quot_rem_loop it (la lb : list (monom T)) :
   | S it' =>
       match la with
       | [] => ([], [])
-      | Mon ca da :: la' =>
+      | ma :: la' =>
           match lb with
           | [] => ([], []) (* division by zero *)
-          | Mon cb db :: _ =>
-              let c := (ca / cb)%F in
-              if ((c =? 0)%F || (da <? db))%bool then ([], la)
+          | mb :: _ =>
+              let c := (mcoeff ma / mcoeff mb)%F in
+              if ((c =? 0)%F || (mdeg ma <? mdeg mb))%bool then ([], la)
               else
-                let mq := Mon c (da - db) in
+                let mq := Mon c (mdeg ma - mdeg mb) in
                 let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
                 let (lq', lr') := monl_quot_rem_loop it' lr lb in
                 (mq :: lq', lr')
@@ -1810,12 +1810,12 @@ Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
   | S it' =>
       match P with
       | [] => Q
-      | Mon ca da :: la =>
+      | ma :: la =>
           match Q with
           | [] => P
-          | Mon cb db :: lb =>
-              if db <=? da then Mon ca da :: merge_app_monl_loop it' la Q
-              else Mon cb db :: merge_app_monl_loop it' P lb
+          | mb :: lb =>
+              if mdeg mb <=? mdeg ma then ma :: merge_app_monl_loop it' la Q
+              else mb :: merge_app_monl_loop it' P lb
           end
       end
   end.
@@ -1853,7 +1853,7 @@ clear Heqit.
 unfold merge_app_monl_nb_iter in Hit.
 revert P Q HP HQ Hit.
 induction it; intros; [ easy | cbn ].
-destruct P as [| (ca, da)]. {
+destruct P as [| ma]. {
   cbn.
   unfold is_canon_monl in HQ.
   apply Bool.andb_true_iff in HQ.
@@ -1864,18 +1864,19 @@ destruct P as [| (ca, da)]. {
 }
 cbn in Hit.
 apply Nat.succ_le_mono in Hit.
-destruct Q as [| (cb, db)]. {
+destruct Q as [| mb]. {
   rewrite app_nil_r.
   unfold is_canon_monl in HP.
   apply Bool.andb_true_iff in HP.
   destruct HP as (Hsp, Hcp).
+  destruct ma.
   apply isort_when_sorted.
   rewrite fold_sorted in Hsp.
   now apply sorted_lt_sorted_le_mdeg.
 }
 rewrite if_leb_le_dec.
 cbn in Hit.
-destruct (le_dec db da) as [Hba| Hba]. {
+destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
   rewrite <- IHit; [ | | easy | cbn; flia Hit ]. 2: {
     unfold is_canon_monl in HP |-*.
     apply Bool.andb_true_iff in HP.
@@ -1886,24 +1887,24 @@ destruct (le_dec db da) as [Hba| Hba]. {
     now apply Bool.andb_true_iff in Hcp.
   }
   cbn.
-  remember (isort rel (P ++ cb*☓^db :: Q)) as la eqn:Hla.
-  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ da). {
-    intros ma Hma.
+  remember (isort rel (P ++ mb :: Q)) as la eqn:Hla.
+  assert (H1 : ∀ mx, mx ∈ la → mdeg mx ≤ mdeg ma). {
+    intros mx Hmx.
     subst la.
-    apply in_isort in Hma.
-    apply in_app_or in Hma.
-    destruct Hma as [Hma| [Hma| Hma]]. {
+    apply in_isort in Hmx.
+    apply in_app_or in Hmx.
+    destruct Hmx as [Hmx| [Hmx| Hmx]]. {
       unfold is_canon_monl in HP.
       apply Bool.andb_true_iff in HP.
       destruct HP as (Hs & Hap).
       apply (sorted_cons_iff Htral) in Hs.
       destruct Hs as (Hs & Hp).
       cbn in Hp.
-      specialize (Hp _ Hma) as H1.
+      specialize (Hp _ Hmx) as H1.
       apply Nat.ltb_lt in H1.
       now apply Nat.lt_le_incl.
     } {
-      now subst ma; cbn.
+      now subst mx; cbn.
     } {
       unfold is_canon_monl in HQ.
       apply Bool.andb_true_iff in HQ.
@@ -1911,13 +1912,13 @@ destruct (le_dec db da) as [Hba| Hba]. {
       apply (sorted_cons_iff Htral) in Hs.
       destruct Hs as (Hs & Hp).
       cbn in Hp.
-      specialize (Hp _ Hma) as H2.
+      specialize (Hp _ Hmx) as H2.
       apply Nat.ltb_lt in H2.
-      transitivity db; [ | easy ].
+      transitivity (mdeg mb); [ | easy ].
       now apply Nat.lt_le_incl.
     }
   }
-  destruct la as [| ma]; [ easy | cbn ].
+  destruct la as [| mc]; [ easy | cbn ].
   unfold rel at 1; cbn.
   specialize (H1 _ (or_introl eq_refl)) as H2.
   apply Nat.leb_le in H2.
@@ -1934,25 +1935,25 @@ destruct (le_dec db da) as [Hba| Hba]. {
     now apply Bool.andb_true_iff in Hcp.
   }
   cbn.
-  remember (isort rel (P ++ cb*☓^db :: Q)) as la eqn:Hla.
-  assert (H1 : ∀ ma, ma ∈ la → mdeg ma ≤ db). {
-    intros ma Hma.
+  remember (isort rel (P ++ mb :: Q)) as la eqn:Hla.
+  assert (H1 : ∀ mx, mx ∈ la → mdeg mx ≤ mdeg mb). {
+    intros mx Hmx.
     subst la.
-    apply in_isort in Hma.
-    apply in_app_or in Hma.
-    destruct Hma as [Hma| [Hma| Hma]]. {
+    apply in_isort in Hmx.
+    apply in_app_or in Hmx.
+    destruct Hmx as [Hmx| [Hmx| Hmx]]. {
       unfold is_canon_monl in HP.
       apply Bool.andb_true_iff in HP.
       destruct HP as (Hs & Hap).
       apply (sorted_cons_iff Htral) in Hs.
       destruct Hs as (Hs & Hp).
       cbn in Hp.
-      specialize (Hp _ Hma) as H1.
+      specialize (Hp _ Hmx) as H1.
       apply Nat.ltb_lt in H1.
       apply Nat.lt_le_incl.
-      now transitivity da.
+      now transitivity (mdeg ma).
     } {
-      now subst ma; cbn.
+      now subst mx; cbn.
     } {
       unfold is_canon_monl in HQ.
       apply Bool.andb_true_iff in HQ.
@@ -1960,29 +1961,30 @@ destruct (le_dec db da) as [Hba| Hba]. {
       apply (sorted_cons_iff Htral) in Hs.
       destruct Hs as (Hs & Hp).
       cbn in Hp.
-      specialize (Hp _ Hma) as H2.
+      specialize (Hp _ Hmx) as H2.
       apply Nat.ltb_lt in H2.
       now apply Nat.lt_le_incl.
     }
   }
-  destruct la as [| ma]. {
+  destruct la as [| mc]. {
     symmetry in Hla; apply eq_isort_nil in Hla.
     now destruct P.
   }
   unfold rel at 1; cbn.
   specialize (H1 _ (or_introl eq_refl)) as H2.
   rewrite if_leb_le_dec.
-  destruct (le_dec (mdeg ma) da) as [Haa| Haa]. 2: {
-    apply Nat.nle_gt in Haa.
+  move mb before ma; move mc before mb.
+  destruct (le_dec (mdeg mc) (mdeg ma)) as [Hca| Hca]. 2: {
+    apply Nat.nle_gt in Hca.
     fold rel.
-    destruct P as [| (cc, dc)]. {
+    destruct P as [| md]. {
       cbn - [ isort ] in Hla.
       rewrite isort_when_sorted in Hla. 2: {
         apply Bool.andb_true_iff in HQ.
         destruct HQ as (Hsq, Hcq).
         now apply sorted_lt_sorted_le_mdeg.
       }
-      injection Hla; clear Hla; intros; subst ma la.
+      injection Hla; clear Hla; intros; subst mc la.
       f_equal; cbn.
       rewrite isort_when_sorted; [ easy | ].
       apply Bool.andb_true_iff in HQ.
