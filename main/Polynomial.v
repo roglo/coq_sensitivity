@@ -2006,6 +2006,9 @@ destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
     destruct P as [| me]. {
       cbn in Hla.
       do 2 rewrite fold_isort in Hla.
+      cbn - [ isort ].
+      rewrite fold_isort.
+(* c'est pas clair, mon affaire *)
 ...
 Theorem isort_cons_cons_swap : ∀ A (rel : A → _),
   antisymmetric rel →
