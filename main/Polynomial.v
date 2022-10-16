@@ -2002,6 +2002,10 @@ destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
       apply Nat.lt_le_incl, Nat.ltb_lt.
       now apply Bool.andb_true_iff in Hsp.
     }
+    cbn in Hla.
+    destruct P as [| me]. {
+      cbn in Hla.
+      do 2 rewrite fold_isort in Hla.
 ...
       clear Hit HQ.
       revert la Hla H1.
