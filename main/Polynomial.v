@@ -2006,6 +2006,7 @@ destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
     destruct P as [| me]. {
       cbn in Hla.
       do 2 rewrite fold_isort in Hla.
+...
 Theorem isort_cons_cons_swap : ∀ A (rel : A → _),
   antisymmetric rel →
   ∀ a b l,
@@ -2024,8 +2025,14 @@ remember (rel b c) as bc eqn:Hbc; symmetry in Hbc.
 destruct bc. {
   remember (b :: c :: l) as l'.
   remember (a :: c :: l) as l''; cbn; subst l' l''.
-  rewrite IHl; [ | easy ].
-  cbn.
+  rewrite IHl; [ symmetry | easy ].
+  remember (rel a c) as ac eqn:Hac; symmetry in Hac.
+  destruct ac. {
+    rewrite IHl; [ | easy ].
+Search (sorted _ _ → isort _ _ = _).
+...
+  rewrite IHl; [ symmetry | ].
+  do 2 rewrite fold_isort.
 ...
 rewrite <- isort_cons_cons_swap in Hla. 2: {
   now apply Nat.leb_le, Nat.lt_le_incl.
