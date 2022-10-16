@@ -1994,6 +1994,14 @@ destruct (le_dec (mdeg mb) (mdeg ma)) as [Hba| Hba]. {
       fold rel in Hsq.
       now apply (sorted_cons_iff Htra) in Hsq.
     }
+    assert (Hdb : mdeg md < mdeg mb). {
+      apply (le_lt_trans _ (mdeg ma)); [ | easy ].
+      apply Bool.andb_true_iff in HP.
+      destruct HP as (Hsp, Hcp).
+      cbn in Hsp.
+      apply Nat.lt_le_incl, Nat.ltb_lt.
+      now apply Bool.andb_true_iff in Hsp.
+    }
 ...
       clear Hit HQ.
       revert la Hla H1.
