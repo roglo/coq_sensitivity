@@ -1870,13 +1870,15 @@ destruct fa. {
         clear ma Hfa Hab.
 clear Hfb Hfc.
 clear Hlb.
-        revert la lb mb mc Hs (*Hlb*) Hlc IHla Hbc.
+rename IHla into Hcb; symmetry in Hcb.
+...
+        revert la lb mb mc Hs (*Hlb*) Hlc Hcb Hbc.
         induction lc as [| md]; intros; [ easy | ].
         symmetry in Hbc.
-        cbn in IHla.
+        cbn in Hcb.
         remember (f md) as fd eqn:Hfd; symmetry in Hfd.
         destruct fd. {
-          injection IHla; clear IHla; intros H2 H3; subst md.
+          injection Hcb; clear Hcb; intros H2 H3; subst md.
           specialize (sorted_le_sorted_lt_merge_same_deg Hs) as H1.
           rewrite Hlc in H1.
           unfold sorted in H1; cbn in H1.
