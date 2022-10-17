@@ -1804,13 +1804,17 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
-(* montrer que f (m (f ...)) = f (m ...) *)
+
 Theorem glop : ∀ P : list (monom T),
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ ma, (mcoeff ma ≠? 0)%F in
-  filter f (merge_same_deg (filter f P)) = filter f (merge_same_deg P).
+  sorted rel P
+  → filter f (merge_same_deg (filter f P)) = filter f (merge_same_deg P).
 Proof.
-intros.
+intros * Hs.
 induction P as [| ma la]; [ easy | cbn ].
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
 do 2 rewrite fold_merge_same_deg.
 remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
 destruct fa. {
@@ -1859,6 +1863,21 @@ destruct fa. {
     destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
       destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
         exfalso.
+        move lb before la; move lc before lb.
+        move mb before ma; move mc before mb.
+        move Hfa after Hfb.
+        rewrite Hab in Hac; rename Hac into Hbc.
+        apply sorted_cons in Hs.
+        clear ma Hfa Hab.
+        destruct lc as [| md]; [ easy | ].
+        symmetry in Hbc.
+        generalize Hlc; intros Hcd.
+        apply eq_merge_same_deg_cons_cons in Hcd.
+        cbn in IHla.
+        remember (f md) as fd eqn:Hfd; symmetry in Hfd.
+        destruct fd. {
+          now injection IHla; clear IHla; intros H1 H2; subst md.
+        }
 ...
         cbn; unfold f at 1 4; cbn.
         unfold f in Hfa; rewrite Hfa.
