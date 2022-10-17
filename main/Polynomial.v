@@ -1868,21 +1868,37 @@ destruct fa. {
         rewrite Hab in Hac; rename Hac into Hbc.
         apply sorted_cons in Hs.
         clear ma Hfa Hab.
-        destruct lc as [| md]; [ easy | ].
+clear Hfb Hfc.
+clear Hlb.
+        revert la lb mb mc Hs (*Hlb*) Hlc IHla Hbc.
+        induction lc as [| md]; intros; [ easy | ].
         symmetry in Hbc.
-        generalize Hlc; intros Hcd.
-        apply eq_merge_same_deg_cons_cons in Hcd.
         cbn in IHla.
         remember (f md) as fd eqn:Hfd; symmetry in Hfd.
         destruct fd. {
-          now injection IHla; clear IHla; intros H1 H2; subst md.
+          injection IHla; clear IHla; intros H2 H3; subst md.
+          specialize (sorted_le_sorted_lt_merge_same_deg Hs) as H1.
+          rewrite Hlc in H1.
+          unfold sorted in H1; cbn in H1.
+          apply Bool.andb_true_iff in H1.
+          destruct H1 as (Hdc, H1).
+          apply Nat.ltb_lt in Hdc.
+          rewrite Hbc in Hdc.
+          now apply Nat.lt_irrefl in Hdc.
         }
+...
         destruct lc as [| me]; [ easy | ].
+        apply Bool.andb_true_iff in H1.
+        destruct H1 as (H1, H2).
+        apply Nat.ltb_lt in H1.
         cbn in IHla.
         remember (f me) as fe eqn:Hfe; symmetry in Hfe.
         destruct fe. {
-          injection IHla; clear IHla; intros H1 H2; subst me.
+          injection IHla; clear IHla; intros H3 H4; subst me.
           clear Hfe.
+          rewrite <- Hbc in H1.
+          flia Hdc H1.
+        }
 ...
         cbn; unfold f at 1 4; cbn.
         unfold f in Hfa; rewrite Hfa.
