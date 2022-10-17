@@ -1805,6 +1805,69 @@ fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
 (* montrer que f (m (f ...)) = f (m ...) *)
+Theorem glop : ∀ P : list (monom T),
+  let f := λ ma, (mcoeff ma ≠? 0)%F in
+  filter f (merge_same_deg (filter f P)) = filter f (merge_same_deg P).
+Proof.
+intros.
+induction P as [| ma la]; [ easy | cbn ].
+do 2 rewrite fold_merge_same_deg.
+remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa. {
+  cbn; rewrite fold_merge_same_deg.
+  unfold same_deg_sum_coeff.
+  remember (merge_same_deg (filter f la)) as lb eqn:Hlb; symmetry in Hlb.
+  remember (merge_same_deg la) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lb as [| mb]. {
+    cbn; rewrite Hfa.
+    destruct lc as [| mc]; [ now cbn; rewrite Hfa | ].
+    cbn in IHla; symmetry in IHla.
+    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+    destruct fc; [ easy | cbn ].
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+      unfold f in Hfc, Hfa.
+      apply Bool.negb_false_iff in Hfc.
+      apply (rngl_eqb_eq Heq) in Hfc.
+      rewrite Hfc, rngl_add_0_r.
+      cbn; rewrite IHla.
+      unfold f; cbn.
+      rewrite Hfa.
+      now destruct ma.
+    }
+    now cbn; rewrite Hfa, Hfc, IHla.
+  }
+  cbn in IHla.
+  remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+  destruct fb. {
+    destruct lc as [| mc]; [ easy | ].
+    cbn in IHla.
+    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+    destruct fc. {
+      injection IHla; clear IHla; intros H1 H2; subst mc.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+        now cbn; rewrite <- H1.
+      }
+      now cbn; rewrite <- H1.
+    }
+    unfold f in Hfc; cbn in Hfc.
+    apply Bool.negb_false_iff in Hfc.
+    apply (rngl_eqb_eq Heq) in Hfc.
+    rewrite Hfc, rngl_add_0_r.
+    do 2 rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+      destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+        exfalso.
+...
+        cbn; unfold f at 1 4; cbn.
+        unfold f in Hfa; rewrite Hfa.
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Hcab| Hcab]. 2: {
+          rewrite <- IHla.
+... ...
+do 2 rewrite glop.
+fold f.
 ...
 Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
   match it with
