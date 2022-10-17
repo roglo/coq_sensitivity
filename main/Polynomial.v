@@ -1804,6 +1804,7 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
+(* montrer que f (m (f ...)) = f (m ...) *)
 ...
 Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
   match it with
