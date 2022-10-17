@@ -1871,6 +1871,12 @@ destruct fa. {
 clear Hfb Hfc.
 clear Hlb.
 rename IHla into Hcb; symmetry in Hcb.
+(*
+revert Hbc.
+change (mdeg mb ≠ mdeg mc).
+*)
+apply eq_merge_same_deg_cons_iff in Hlc.
+destruct Hlc as (i & Hi & Hdd & Hlc & Hcc & Hdc).
 ...
         revert la lb mb mc Hs (*Hlb*) Hlc Hcb Hbc.
         induction lc as [| md]; intros; [ easy | ].
