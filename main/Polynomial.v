@@ -1804,8 +1804,7 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
-
-Theorem glop : ∀ P : list (monom T),
+Theorem filter_merge_filter : ∀ P : list (monom T),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ ma, (mcoeff ma ≠? 0)%F in
   sorted rel P
@@ -1878,6 +1877,12 @@ destruct fa. {
         destruct fd. {
           now injection IHla; clear IHla; intros H1 H2; subst md.
         }
+        destruct lc as [| me]; [ easy | ].
+        cbn in IHla.
+        remember (f me) as fe eqn:Hfe; symmetry in Hfe.
+        destruct fe. {
+          injection IHla; clear IHla; intros H1 H2; subst me.
+          clear Hfe.
 ...
         cbn; unfold f at 1 4; cbn.
         unfold f in Hfa; rewrite Hfa.
@@ -1885,7 +1890,8 @@ destruct fa. {
         destruct (bool_dec _) as [Hcab| Hcab]. 2: {
           rewrite <- IHla.
 ... ...
-do 2 rewrite glop.
+rewrite filter_merge_filter.
+rewrite filter_merge_filter.
 fold f.
 ...
 Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
