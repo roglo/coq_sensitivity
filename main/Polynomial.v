@@ -1885,10 +1885,11 @@ destruct fa. {
       }
       now cbn; rewrite <- H1.
     }
-    unfold f in Hfc; cbn in Hfc.
-    apply Bool.negb_false_iff in Hfc.
-    apply (rngl_eqb_eq Heq) in Hfc.
-    rewrite Hfc, rngl_add_0_r.
+    generalize Hfc; intros H.
+    unfold f in H; cbn in H.
+    apply Bool.negb_false_iff in H.
+    apply (rngl_eqb_eq Heq) in H.
+    rewrite H, rngl_add_0_r; clear H.
     do 2 rewrite if_eqb_eq_dec.
     symmetry in IHla.
     generalize Hs; intros H.
@@ -1900,6 +1901,10 @@ destruct fa. {
         rewrite <- Hab, <- Hac in H1.
         now apply Nat.lt_irrefl in H1.
       }
+      cbn; unfold f at 1; cbn.
+      rewrite Hfa, Hfc.
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Hcabz| Hcabz]. {
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
