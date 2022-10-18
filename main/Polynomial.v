@@ -1898,8 +1898,6 @@ destruct fa. {
     rewrite H, rngl_add_0_r; clear H.
     do 2 rewrite if_eqb_eq_dec.
     symmetry in IHla.
-(*
-*)
     assert (Hac' : mdeg mc ≤ mdeg ma). {
       apply (sorted_cons_iff Htra) in Hs.
       destruct Hs as (Hs, Hra).
@@ -1928,7 +1926,60 @@ destruct fa. {
       now destruct ma.
     }
     now cbn; rewrite Hfa, Hfb, Hfc, IHla.
-  }
+  } {
+    destruct lc as [| mc]. {
+      now apply eq_merge_same_deg_nil in Hlc; subst la.
+    }
+    assert (Hac' : mdeg mc ≤ mdeg ma). {
+      apply (sorted_cons_iff Htra) in Hs.
+      destruct Hs as (Hs, Hra).
+      assert (H : mc ∈ merge_same_deg la) by now rewrite Hlc; left.
+      apply in_merge_same_deg in H.
+      apply in_map_iff in H.
+      destruct H as (md & Hmd & Hmda).
+      apply Hra in Hmda.
+      unfold rel in Hmda.
+      apply Nat.leb_le in Hmda.
+      now rewrite Hmd in Hmda.
+    }
+    generalize Hfb; intros H.
+    unfold f in H; cbn in H.
+    apply Bool.negb_false_iff in H.
+    apply (rngl_eqb_eq Heq) in H.
+    rewrite H, rngl_add_0_r; clear H.
+...
+    cbn in IHla.
+    do 2 rewrite if_eqb_eq_dec.
+    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+    destruct fc. 2: {
+      generalize Hfc; intros H.
+      unfold f in H; cbn in H.
+      apply Bool.negb_false_iff in H.
+      apply (rngl_eqb_eq Heq) in H.
+      rewrite H, rngl_add_0_r; clear H.
+...
+...
+    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+    destruct fc. 2: {
+...
+      generalize Hfc; intros H.
+      unfold f in H; cbn in H.
+      apply Bool.negb_false_iff in H.
+...
+(*
+      injection IHla; clear IHla; intros H1 H2; subst mc.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
+        now cbn; rewrite <- H1.
+      }
+      now cbn; rewrite <- H1.
+    }
+*)
+    generalize Hfc; intros H.
+    unfold f in H; cbn in H.
+    apply Bool.negb_false_iff in H.
+    apply (rngl_eqb_eq Heq) in H.
+    rewrite H, rngl_add_0_r; clear H.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
