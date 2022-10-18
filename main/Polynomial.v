@@ -1927,6 +1927,8 @@ destruct fa. {
       rewrite IHla.
       now destruct ma.
     }
+    now cbn; rewrite Hfa, Hfb, Hfc, IHla.
+  }
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
