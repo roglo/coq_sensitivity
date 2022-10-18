@@ -1901,7 +1901,9 @@ destruct fa. {
         rewrite <- Hab, <- Hac in H1.
         now apply Nat.lt_irrefl in H1.
       }
-exfalso.
+...
+apply sorted_cons in Hs.
+clear ma Hfa Hab Hac.
 ...
       cbn; unfold f at 1; cbn.
       rewrite Hfa, Hfc.
