@@ -1890,6 +1890,7 @@ destruct fa. {
     apply (rngl_eqb_eq Heq) in Hfc.
     rewrite Hfc, rngl_add_0_r.
     do 2 rewrite if_eqb_eq_dec.
+    symmetry in IHla.
     destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
       destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
         exfalso.
@@ -1898,7 +1899,6 @@ destruct fa. {
         move Hfa after Hfb.
         rewrite Hab in Hac; rename Hac into Hbc.
         apply sorted_cons in Hs.
-        symmetry in IHla.
         specialize (merge_same_deg_cons_filter_cons Hs Hlc IHla) as H1.
         rewrite Hbc in H1.
         now apply Nat.lt_irrefl in H1.
