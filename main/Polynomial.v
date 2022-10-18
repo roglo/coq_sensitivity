@@ -1883,6 +1883,17 @@ rename la into P.
 move R before Q.
 rename mb into m;rename mc into m'.
 revert Hbc; change (mdeg m' ≠ mdeg m).
+Theorem merge_same_deg_cons_filter_cons : ∀ (P Q R : list (monom T)) m m',
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ ma, (mcoeff ma ≠? 0)%F in
+  sorted rel P
+  → merge_same_deg P = m :: Q
+  → filter f Q = m' :: R
+  → mdeg m' ≠ mdeg m.
+Proof.
+intros * Hs Hlc Hcb.
+... ...
+apply (merge_same_deg_cons_filter_cons Hs Hlc Hcb).
 ...
 apply eq_merge_same_deg_cons_iff in Hlc.
 destruct Hlc as (i & Hi & Hdd & Hlc & Hcc & Hdc).
