@@ -1773,6 +1773,37 @@ intros mb Hmb.
 now apply H1; right.
 Qed.
 
+Theorem merge_same_deg_cons_filter_cons : ∀ (P Q R : list (monom T)) m m',
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ ma, (mcoeff ma ≠? 0)%F in
+  sorted rel P
+  → merge_same_deg P = m :: Q
+  → filter f Q = m' :: R
+  → mdeg m' < mdeg m.
+Proof.
+intros * Hs Hlc Hcb.
+specialize (sorted_le_sorted_lt_merge_same_deg Hs) as H1.
+set (rel' := λ ma mb, mdeg mb <? mdeg ma) in H1.
+move rel' before rel.
+assert (Htra' : transitive rel'). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.ltb_lt in Hab, Hbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg b).
+}
+move Htra' before f.
+rewrite Hlc in H1.
+apply sorted_cons_iff in H1; [ | easy ].
+destruct H1 as (Hsq & Hdd).
+unfold rel' in Hdd.
+assert (H : m' ∈ Q). {
+  assert (H : m' ∈ filter f Q) by now rewrite Hcb; left.
+  now apply filter_In in H.
+}
+specialize (Hdd _ H).
+now apply Nat.ltb_lt in Hdd.
+Qed.
+
 Theorem canon_polyn_add_add_swap :
   ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
 Proof.
@@ -1867,62 +1898,11 @@ destruct fa. {
         move Hfa after Hfb.
         rewrite Hab in Hac; rename Hac into Hbc.
         apply sorted_cons in Hs.
-        clear ma Hfa Hab.
-clear Hfb Hfc.
-clear Hlb.
-rename IHla into Hcb; symmetry in Hcb.
-(*
-revert Hbc.
-change (mdeg mb ≠ mdeg mc).
-*)
-remember (filter f lb) as l.
-clear lb Heql; rename mb into m.
-rename mc into mb; rename lc into Q.
-rename m into mc; rename l into R.
-rename la into P.
-move R before Q.
-rename mb into m;rename mc into m'.
-revert Hbc; change (mdeg m' ≠ mdeg m).
-Theorem merge_same_deg_cons_filter_cons : ∀ (P Q R : list (monom T)) m m',
-  let rel := λ ma mb, mdeg mb <=? mdeg ma in
-  let f := λ ma, (mcoeff ma ≠? 0)%F in
-  sorted rel P
-  → merge_same_deg P = m :: Q
-  → filter f Q = m' :: R
-  → mdeg m' ≠ mdeg m.
-Proof.
-intros * Hs Hlc Hcb.
-... ...
-apply (merge_same_deg_cons_filter_cons Hs Hlc Hcb).
-...
-apply eq_merge_same_deg_cons_iff in Hlc.
-destruct Hlc as (i & Hi & Hdd & Hlc & Hcc & Hdc).
-rewrite <- Hlc in Hcb.
-...
-Search (filter _ _ = _ :: _).
-Search (filter _ _ = _).
-...
-remember (skipn i la) as ld eqn:Hld; symmetry in Hld.
-destruct ld as [| md]. {
-  now cbn in Hlc; subst lc.
-}
-...
-Theorem List_filter_cons : ∀ A (f : A → _) a l l',
-  filter f l = a :: l'
-  → ∃ i, (∀ b, b ∈ firstn i l → f b = false) ∧ f (nth i l a) = true.
-...
-apply List_filter_cons in Hcb.
-destruct Hcb as (j & Hbef & Hj).
-unfold f in Hj; cbn in Hj.
-...
-destruct i; [ easy | ].
-cbn in Hlc.
-destruct la as [| md]; [ easy | ].
-rewrite fold_merge_same_deg in Hlc.
-cbn - [ In ] in Hdd.
-specialize (Hdd _ (or_introl eq_refl)) as H1.
-cbn in Hdc.
-rewrite <- Hlc in Hcb.
+        symmetry in IHla.
+        specialize (merge_same_deg_cons_filter_cons Hs Hlc IHla) as H1.
+        rewrite Hbc in H1.
+        now apply Nat.lt_irrefl in H1.
+      }
 ...
         revert la lb mb mc Hs (*Hlb*) Hlc Hcb Hbc.
         induction lc as [| md]; intros; [ easy | ].
