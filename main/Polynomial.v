@@ -1891,54 +1891,15 @@ destruct fa. {
     rewrite Hfc, rngl_add_0_r.
     do 2 rewrite if_eqb_eq_dec.
     symmetry in IHla.
+    generalize Hs; intros H.
+    apply sorted_cons in H.
+    specialize (merge_same_deg_cons_filter_cons H Hlc IHla) as H1.
+    clear H.
     destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
       destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
-        exfalso.
-        move lb before la; move lc before lb.
-        move mb before ma; move mc before mb.
-        move Hfa after Hfb.
-        rewrite Hab in Hac; rename Hac into Hbc.
-        apply sorted_cons in Hs.
-        specialize (merge_same_deg_cons_filter_cons Hs Hlc IHla) as H1.
-        rewrite Hbc in H1.
+        rewrite <- Hab, <- Hac in H1.
         now apply Nat.lt_irrefl in H1.
       }
-...
-        revert la lb mb mc Hs (*Hlb*) Hlc Hcb Hbc.
-        induction lc as [| md]; intros; [ easy | ].
-        symmetry in Hbc.
-        cbn in Hcb.
-        remember (f md) as fd eqn:Hfd; symmetry in Hfd.
-        destruct fd. {
-          injection Hcb; clear Hcb; intros H2 H3; subst md.
-          specialize (sorted_le_sorted_lt_merge_same_deg Hs) as H1.
-          rewrite Hlc in H1.
-          unfold sorted in H1; cbn in H1.
-          apply Bool.andb_true_iff in H1.
-          destruct H1 as (Hdc, H1).
-          apply Nat.ltb_lt in Hdc.
-          rewrite Hbc in Hdc.
-          now apply Nat.lt_irrefl in Hdc.
-        }
-...
-        destruct lc as [| me]; [ easy | ].
-        apply Bool.andb_true_iff in H1.
-        destruct H1 as (H1, H2).
-        apply Nat.ltb_lt in H1.
-        cbn in IHla.
-        remember (f me) as fe eqn:Hfe; symmetry in Hfe.
-        destruct fe. {
-          injection IHla; clear IHla; intros H3 H4; subst me.
-          clear Hfe.
-          rewrite <- Hbc in H1.
-          flia Hdc H1.
-        }
-...
-        cbn; unfold f at 1 4; cbn.
-        unfold f in Hfa; rewrite Hfa.
-        rewrite if_bool_if_dec.
-        destruct (bool_dec _) as [Hcab| Hcab]. 2: {
-          rewrite <- IHla.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
