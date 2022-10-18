@@ -1947,39 +1947,32 @@ destruct fa. {
     apply Bool.negb_false_iff in H.
     apply (rngl_eqb_eq Heq) in H.
     rewrite H, rngl_add_0_r; clear H.
-...
-    cbn in IHla.
     do 2 rewrite if_eqb_eq_dec.
-    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
-    destruct fc. 2: {
-      generalize Hfc; intros H.
-      unfold f in H; cbn in H.
-      apply Bool.negb_false_iff in H.
-      apply (rngl_eqb_eq Heq) in H.
-      rewrite H, rngl_add_0_r; clear H.
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hdab| Hdab]. {
+      destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hdac| Hdac]. {
+        cbn; rewrite IHla; cbn.
+        remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+        destruct fc. 2: {
+          generalize Hfc; intros H.
+          unfold f in H; cbn in H.
+          apply Bool.negb_false_iff in H.
+          apply (rngl_eqb_eq Heq) in H.
+          now rewrite H, rngl_add_0_r; clear H.
+        }
+        exfalso.
+        clear Hac'.
+        cbn in IHla; rewrite Hfc in IHla.
+        generalize Hs; intros H.
+        apply sorted_cons in H.
+        specialize merge_same_deg_cons_filter_cons as H1.
+        specialize (H1 la lb (filter f lc) mc mc).
 ...
+        specialize (H1 H Hlc).
+        fold f in H1.
 ...
-    remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
-    destruct fc. 2: {
-...
-      generalize Hfc; intros H.
-      unfold f in H; cbn in H.
-      apply Bool.negb_false_iff in H.
-...
-(*
-      injection IHla; clear IHla; intros H1 H2; subst mc.
-      do 2 rewrite if_eqb_eq_dec.
-      destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
-        now cbn; rewrite <- H1.
-      }
-      now cbn; rewrite <- H1.
-    }
-*)
-    generalize Hfc; intros H.
-    unfold f in H; cbn in H.
-    apply Bool.negb_false_iff in H.
-    apply (rngl_eqb_eq Heq) in H.
-    rewrite H, rngl_add_0_r; clear H.
+        specialize (merge_same_deg_cons_filter_cons H Hlc IHla) as H1.
+    clear H.
+Inspect 1.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
