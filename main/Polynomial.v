@@ -1901,6 +1901,8 @@ destruct fa. {
         rewrite <- Hab, <- Hac in H1.
         now apply Nat.lt_irrefl in H1.
       }
+exfalso.
+...
       cbn; unfold f at 1; cbn.
       rewrite Hfa, Hfc.
       rewrite if_bool_if_dec.
