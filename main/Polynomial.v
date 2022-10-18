@@ -1842,6 +1842,12 @@ Theorem filter_merge_filter : ∀ P : list (monom T),
   → filter f (merge_same_deg (filter f P)) = filter f (merge_same_deg P).
 Proof.
 intros * Hs.
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
 induction P as [| ma la]; [ easy | cbn ].
 assert (H : sorted rel la) by now apply sorted_cons in Hs.
 specialize (IHla H); clear H.
@@ -1892,23 +1898,35 @@ destruct fa. {
     rewrite H, rngl_add_0_r; clear H.
     do 2 rewrite if_eqb_eq_dec.
     symmetry in IHla.
+(*
+*)
+    assert (Hac' : mdeg mc ≤ mdeg ma). {
+      apply (sorted_cons_iff Htra) in Hs.
+      destruct Hs as (Hs, Hra).
+      assert (H : mc ∈ merge_same_deg la) by now rewrite Hlc; left.
+      apply in_merge_same_deg in H.
+      apply in_map_iff in H.
+      destruct H as (md & Hmd & Hmda).
+      apply Hra in Hmda.
+      unfold rel in Hmda.
+      apply Nat.leb_le in Hmda.
+      now rewrite Hmd in Hmda.
+    }
     generalize Hs; intros H.
     apply sorted_cons in H.
     specialize (merge_same_deg_cons_filter_cons H Hlc IHla) as H1.
     clear H.
     destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hab| Hab]. {
-      destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
-        rewrite <- Hab, <- Hac in H1.
-        now apply Nat.lt_irrefl in H1.
-      }
-...
-apply sorted_cons in Hs.
-clear ma Hfa Hab Hac.
-...
-      cbn; unfold f at 1; cbn.
-      rewrite Hfa, Hfc.
-      rewrite if_bool_if_dec.
-      destruct (bool_dec _) as [Hcabz| Hcabz]. {
+      flia Hac' H1 Hab.
+    }
+    destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hac| Hac]. {
+      cbn; rewrite Hfa, Hfb.
+      unfold f at 2; cbn.
+      unfold f in Hfa; cbn in Hfa.
+      rewrite Hfa.
+      rewrite IHla.
+      now destruct ma.
+    }
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
