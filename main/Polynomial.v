@@ -1999,11 +1999,21 @@ destruct fa. {
         specialize (merge_same_deg_cons_filter_cons H Hlb IHla) as H1.
         clear H.
         rewrite <- Hdac in H1.
-(* contradiction, je crois, avec Hs, Hlb et H1 *)
-clear - rp Hs Hlb H1.
-...
-Search (merge_same_deg (filter _ _)).
-apply eq_merge_same_deg_cons_iff in Hlb.
+        clear - rp Htra Hs Hlb H1.
+        assert (H : mb ∈ mb :: lb) by now left.
+        rewrite <- Hlb in H.
+        specialize (in_merge_same_deg _ _ H) as H2; clear H.
+        apply in_map_iff in H2.
+        destruct H2 as (mc & Hmc & Hmca).
+        apply filter_In in Hmca.
+        destruct Hmca as (Hmca & Hfc).
+        apply (sorted_cons_iff Htra) in Hs.
+        destruct Hs as (Hs, Hma).
+        specialize (Hma _ Hmca).
+        unfold rel in Hma.
+        apply Nat.leb_le, Nat.nlt_ge in Hma.
+        now rewrite Hmc in Hma.
+      }
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
