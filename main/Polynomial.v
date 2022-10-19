@@ -1991,6 +1991,14 @@ destruct fa. {
           f_equal; [ now destruct ma | easy ].
         }
         exfalso.
+        clear Hac'.
+        specialize merge_same_deg_cons_filter_cons as H1.
+        specialize (H1 (filter f la) lb (filter f lc) mb mc).
+        assert (H : sorted rel (filter f la)). {
+          apply sorted_cons in Hs.
+          now apply (sorted_filter Htra).
+        }
+        specialize (H1 H Hlb IHla); clear H.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
