@@ -1999,8 +1999,9 @@ destruct fa. {
           now apply (sorted_filter Htra).
         }
         specialize (H1 H Hlb IHla); clear H.
-(* contradiction, je crois, avec Hs, Hlb, Hdac et H1 *)
-Search merge_same_deg.
+        rewrite <- Hdac in H1.
+(* contradiction, je crois, avec Hs, Hlb et H1 *)
+clear - rp Hs Hlb H1.
 apply eq_merge_same_deg_cons_iff in Hlb.
 ... ...
 rewrite filter_merge_filter.
