@@ -2046,7 +2046,16 @@ do 2 rewrite (sorted_isort_filter Htra Htot).
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal; clear f.
-(**)
+set (MS := λ l, merge_same_deg (isort rel l)).
+fold (MS (P ++ Q)).
+fold (MS (P ++ R)).
+fold (MS (MS (P ++ Q) ++ R)).
+fold (MS (MS (P ++ R) ++ Q)).
+...
+apply List_eq_iff.
+split. {
+Search (length (merge_same_deg _)).
+....
 revert Q R PQ PR.
 induction P as [| ma la]; intros; cbn. {
   do 4 rewrite fold_merge_same_deg.
@@ -2054,10 +2063,6 @@ induction P as [| ma la]; intros; cbn. {
   fold rel.
 Search (isort _ (_ ++ _)).
 ...
-apply List_eq_iff.
-split. {
-Search (length (merge_same_deg _)).
-....
 Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
   match it with
   | 0 => [Mon 0 99] (* algo error: not enough iterations *)
