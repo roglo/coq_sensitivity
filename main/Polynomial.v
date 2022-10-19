@@ -1446,13 +1446,12 @@ rewrite H1, Nat.eqb_refl; symmetry.
 now rewrite rngl_summation_list_cons.
 Qed.
 
-Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
-  monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
+Theorem merge_same_deg_isort_app_comm : ∀ la lb : list (monom T),
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  merge_same_deg (isort rel (la ++ lb)) =
+  merge_same_deg (isort rel (lb ++ la)).
 Proof.
 intros.
-unfold monl_add, monl_norm.
-f_equal.
-set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
@@ -1740,6 +1739,15 @@ destruct lb as [| mb]. {
 }
 f_equal; f_equal.
 now apply (rngl_summation_list_permut _ monom_eqb_eq).
+Qed.
+
+Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
+  monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
+Proof.
+intros.
+unfold monl_add, monl_norm.
+f_equal.
+apply merge_same_deg_isort_app_comm.
 Qed.
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
@@ -2042,6 +2050,9 @@ f_equal; clear f.
 revert Q R PQ PR.
 induction P as [| ma la]; intros; cbn. {
   do 4 rewrite fold_merge_same_deg.
+  rewrite merge_same_deg_isort_app_comm.
+  fold rel.
+Search (isort _ (_ ++ _)).
 ...
 apply List_eq_iff.
 split. {
