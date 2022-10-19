@@ -1962,17 +1962,14 @@ destruct fa. {
         exfalso.
         clear Hac'.
         cbn in IHla; rewrite Hfc in IHla.
-        generalize Hs; intros H.
-        apply sorted_cons in H.
-        specialize merge_same_deg_cons_filter_cons as H1.
-        specialize (H1 la lb (filter f lc) mc mc).
-...
-        specialize (H1 H Hlc).
-        fold f in H1.
-...
-        specialize (merge_same_deg_cons_filter_cons H Hlc IHla) as H1.
-    clear H.
-Inspect 1.
+        assert (H : sorted rel (filter f la)). {
+          apply sorted_cons in Hs.
+          now apply (sorted_filter Htra).
+        }
+        specialize (merge_same_deg_cons_filter_cons H Hlb IHla) as H1.
+        rewrite <- Hdab, Hdac in H1.
+        now apply Nat.lt_irrefl in H1.
+      }
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
