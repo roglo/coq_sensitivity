@@ -1970,6 +1970,27 @@ destruct fa. {
         rewrite <- Hdab, Hdac in H1.
         now apply Nat.lt_irrefl in H1.
       }
+      cbn; rewrite Hfa.
+      unfold f at 1; cbn.
+      generalize Hfa; intros H.
+      unfold f in H; rewrite H; clear H.
+      f_equal; [ now destruct ma | easy ].
+    } {
+      destruct (Nat.eq_dec (mdeg ma) (mdeg mc)) as [Hdac| Hdac]. {
+        cbn; rewrite Hfa, Hfb.
+        unfold f at 2; cbn.
+        cbn in IHla.
+        remember (f mc) as fc eqn:Hfc; symmetry in Hfc.
+        destruct fc. 2: {
+          generalize Hfc; intros H.
+          unfold f in H.
+          apply Bool.negb_false_iff in H.
+          apply (rngl_eqb_eq Heq) in H.
+          rewrite H, rngl_add_0_r.
+          unfold f in Hfa; rewrite Hfa.
+          f_equal; [ now destruct ma | easy ].
+        }
+        exfalso.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
