@@ -2013,7 +2013,13 @@ destruct fa. {
         unfold rel in Hma.
         apply Nat.leb_le, Nat.nlt_ge in Hma.
         now rewrite Hmc in Hma.
+      } {
+        now cbn; rewrite Hfa, Hfb; f_equal.
       }
+    }
+  }
+}
+rewrite IHla.
 ... ...
 rewrite filter_merge_filter.
 rewrite filter_merge_filter.
