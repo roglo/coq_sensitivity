@@ -1804,37 +1804,6 @@ specialize (Hdd _ H).
 now apply Nat.ltb_lt in Hdd.
 Qed.
 
-Theorem canon_polyn_add_add_swap :
-  ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
-Proof.
-intros P Q R; cbn.
-apply canon_polyn_eq_eq; cbn.
-unfold polyn_norm; f_equal; cbn.
-do 4 rewrite fold_merge_same_deg.
-set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
-assert (Htra : transitive rel). {
-  unfold rel; intros a b c Hab Hbc.
-  apply Nat.leb_le in Hab, Hbc.
-  apply Nat.leb_le.
-  now transitivity (mdeg b).
-}
-assert (Htot : total_relation rel). {
-  unfold rel; intros ma mb.
-  apply Nat_leb_total_relation.
-}
-destruct P as ((P), PP).
-destruct Q as ((Q), PQ).
-destruct R as ((R), PR); cbn.
-move Q before P; move R before Q.
-unfold is_canon_polyn in PP, PQ, PR.
-cbn in PP, PQ, PR.
-do 4 rewrite fold_merge_same_deg.
-rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
-rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
-fold f.
-do 2 rewrite <- filter_app.
-do 2 rewrite (sorted_isort_filter Htra Htot).
 Theorem filter_merge_filter : ∀ P : list (monom T),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ ma, (mcoeff ma ≠? 0)%F in
@@ -2020,11 +1989,56 @@ destruct fa. {
   }
 }
 rewrite IHla.
-... ...
-rewrite filter_merge_filter.
-rewrite filter_merge_filter.
+unfold same_deg_sum_coeff.
+remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]; cbn; [ now rewrite Hfa | ].
+cbn in IHla.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hab| Hab]; cbn; [ | now rewrite Hfa ].
+generalize Hfa; intros H.
+unfold f in H.
+apply Bool.negb_false_iff in H.
+apply (rngl_eqb_eq Heq) in H.
+rewrite H, rngl_add_0_l, Hab; clear H.
+unfold f at 1 4; cbn.
+now destruct mb.
+Qed.
+
+Theorem canon_polyn_add_add_swap :
+  ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
+Proof.
+intros P Q R; cbn.
+apply canon_polyn_eq_eq; cbn.
+unfold polyn_norm; f_equal; cbn.
+do 4 rewrite fold_merge_same_deg.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+destruct P as ((P), PP).
+destruct Q as ((Q), PQ).
+destruct R as ((R), PR); cbn.
+move Q before P; move R before Q.
+unfold is_canon_polyn in PP, PQ, PR.
+cbn in PP, PQ, PR.
+do 4 rewrite fold_merge_same_deg.
+rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
-...
+do 2 rewrite <- filter_app.
+do 2 rewrite (sorted_isort_filter Htra Htot).
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+f_equal; clear f.
+....
 Fixpoint merge_app_monl_loop it (P Q : list (monom T)) :=
   match it with
   | 0 => [Mon 0 99] (* algo error: not enough iterations *)
