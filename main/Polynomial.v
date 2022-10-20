@@ -2036,7 +2036,7 @@ Proof.
 intros.
 rewrite <- rngl_summation_list_app.
 rewrite <- filter_app.
-Theorem glip : ∀ (P : list (monom T)) d,
+Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ m, mdeg m =? d in
   ∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m =
@@ -2044,7 +2044,7 @@ Theorem glip : ∀ (P : list (monom T)) d,
 Proof.
 intros.
 ... ...
-apply glip.
+apply summation_filter_merge_isort_coeff.
 ... ...
 specialize (glop P Q) as H1.
 cbn in H1.
