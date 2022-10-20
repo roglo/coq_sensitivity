@@ -2043,6 +2043,10 @@ Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
   ∑ (m ∈ filter f P), mcoeff m.
 Proof.
 intros.
+transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+Search (permutation _ _ (filter _ _)).
+Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
 ... ...
 apply summation_filter_merge_isort_coeff.
 ... ...
