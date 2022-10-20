@@ -2032,6 +2032,19 @@ Theorem glop : ∀ (P Q : list (monom T)) d,
   let f := λ m, mdeg m =? d in
   ∑ (m ∈ filter f (merge_same_deg (isort rel (P ++ Q)))), mcoeff m =
   (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
+Proof.
+intros.
+rewrite <- rngl_summation_list_app.
+rewrite <- filter_app.
+Theorem glip : ∀ (P : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  ∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m =
+  ∑ (m ∈ filter f P), mcoeff m.
+Proof.
+intros.
+... ...
+apply glip.
 ... ...
 specialize (glop P Q) as H1.
 cbn in H1.
