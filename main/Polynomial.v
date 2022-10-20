@@ -2012,6 +2012,23 @@ unfold f at 1 4; cbn.
 now destruct mb.
 Qed.
 
+Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → is_canon_monl R = true
+  → let rel := λ ma mb, mdeg mb <=? mdeg ma in
+    merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ Q)) ++ R)) =
+    merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ R)) ++ Q)).
+Proof.
+intros * PP PQ PR.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma); cbn.
+set (MS := λ l, merge_same_deg (isort rel l)).
+fold (MS (P ++ Q)).
+fold (MS (P ++ R)).
+fold (MS (MS (P ++ Q) ++ R)).
+fold (MS (MS (P ++ R) ++ Q)).
+...
+
 Theorem canon_polyn_add_add_swap :
   ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
 Proof.
@@ -2046,11 +2063,8 @@ do 2 rewrite (sorted_isort_filter Htra Htot).
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal; clear f.
-set (MS := λ l, merge_same_deg (isort rel l)).
-fold (MS (P ++ Q)).
-fold (MS (P ++ R)).
-fold (MS (MS (P ++ Q) ++ R)).
-fold (MS (MS (P ++ R) ++ Q)).
+... ...
+now apply canon_polyn_merge_isort_merge_isort_swap.
 ...
 apply List_eq_iff.
 split. {
