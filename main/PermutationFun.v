@@ -2899,6 +2899,34 @@ rewrite app_assoc in H.
 now apply IHla in H.
 Qed.
 
+Theorem permutation_filter : ∀ A (eqb : A → _),
+  equality eqb →
+  ∀ f la lb,
+  permutation eqb la lb
+  → permutation eqb (filter f la) (filter f lb).
+Proof.
+intros * Heqb * Hab.
+revert lb Hab.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hab; subst lb.
+}
+apply permutation_cons_l_iff in Hab.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & H & Haft).
+apply Heqb in H; subst x lb.
+rewrite filter_app; cbn.
+remember (f a) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa. {
+  apply (permutation_cons_app Heqb).
+  rewrite <- filter_app.
+  now apply IHla.
+}
+rewrite <- filter_app.
+now apply IHla.
+Qed.
+
 (* *)
 
 Require Import Permutation.

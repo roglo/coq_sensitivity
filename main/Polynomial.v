@@ -2045,8 +2045,21 @@ Proof.
 intros.
 transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
   apply (rngl_summation_list_permut _ monom_eqb_eq).
-Search (permutation _ _ (filter _ _)).
-Search (∑ (_ ∈ _), _ = ∑ (_ ∈ _), _).
+  apply (permutation_filter monom_eqb_eq).
+  apply (permutation_sym monom_eqb_eq).
+  apply (permuted_isort _ monom_eqb_eq).
+}
+Theorem sorted_summation_filter_merge_coeff : ∀ (P : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  sorted rel P
+  → ∑ (m ∈ filter f (merge_same_deg P)), mcoeff m =
+    ∑ (m ∈ filter f P), mcoeff m.
+Proof.
+intros * Hs.
+... ...
+apply sorted_summation_filter_merge_coeff.
+fold rel.
 ... ...
 apply summation_filter_merge_isort_coeff.
 ... ...
