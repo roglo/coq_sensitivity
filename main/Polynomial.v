@@ -2027,6 +2027,16 @@ fold (MS (P ++ Q)).
 fold (MS (P ++ R)).
 fold (MS (MS (P ++ Q) ++ R)).
 fold (MS (MS (P ++ R) ++ Q)).
+Theorem glop : ∀ (P Q : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  ∑ (m ∈ filter f (merge_same_deg (isort rel (P ++ Q)))), mcoeff m =
+  (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
+... ...
+specialize (glop P Q) as H1.
+cbn in H1.
+fold rel in H1.
+fold (MS (P ++ Q)) in H1.
 ...
 
 Theorem canon_polyn_add_add_swap :
