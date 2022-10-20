@@ -2043,7 +2043,6 @@ Theorem glip : ∀ (P : list (monom T)) d,
   ∑ (m ∈ filter f P), mcoeff m.
 Proof.
 intros.
-Search (∑ (_ ∈ filter _ _), _).
 ... ...
 apply glip.
 ... ...
