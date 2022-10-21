@@ -2122,6 +2122,19 @@ assert
   apply H1.
 }
 clear H1; rename H into H1.
+specialize (H1 P Q) as H2.
+specialize (H1 (MS (P ++ Q)) R) as H3.
+...
+apply List_eq_iff.
+...
+Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
+  (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))
+  → P = Q.
+Proof.
+intros * Hc.
+...
+apply (coeff_eq_monl_eq (Mon 0 0)).
+intros i.
 ...
 
 Theorem canon_polyn_add_add_swap :
