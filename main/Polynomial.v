@@ -2120,6 +2120,7 @@ assert
 }
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
+(*
 apply List_eq_iff.
 split. 2: {
   intros.
@@ -2130,18 +2131,21 @@ split. 2: {
   move mb before ma.
   destruct ma as (ca, da).
   destruct mb as (cb, db).
-  f_equal.
-  do 3 rewrite rngl_summation_filter in H2, H3.
-  unfold f in H2, H3.
-...
+  f_equal. {
+    do 3 rewrite rngl_summation_filter in H2, H3.
+    unfold f in H2, H3.
+*)
 Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
-  (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))
+  let rel := λ ma mb : monom T, mdeg mb <? mdeg ma in
+  sorted rel P
+  → sorted rel Q
+  → (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))
   → P = Q.
 Proof.
 intros * Hc.
-...
-apply (coeff_eq_monl_eq (Mon 0 0)).
-intros i.
+... ...
+apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
+  intros i.
 ...
 
 Theorem canon_polyn_add_add_swap :
