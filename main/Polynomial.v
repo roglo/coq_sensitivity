@@ -2124,8 +2124,15 @@ assert
 clear H1; rename H into H1.
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
-...
 apply List_eq_iff.
+split. 2: {
+  intros.
+  remember (nth i _ _) as ma eqn:Hma; symmetry in Hma.
+  remember (nth i _ _) as mb eqn:Hmb in |-*; symmetry in Hmb.
+  move mb before ma.
+  destruct ma as (ca, da).
+  destruct mb as (cb, db).
+  f_equal.
 ...
 Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
   (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))
