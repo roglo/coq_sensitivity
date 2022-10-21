@@ -2109,19 +2109,15 @@ fold (MS (P ++ Q)).
 fold (MS (P ++ R)).
 fold (MS (MS (P ++ Q) ++ R)).
 fold (MS (MS (P ++ R) ++ Q)).
-specialize summation_filter_merge_isort_app as H1.
-cbn in H1.
-fold rel in H1.
 set (f := λ d (m : monom T), mdeg m =? d).
 assert
-  (H : ∀ P Q d,
+  (H1 : ∀ P Q d,
      ∑ (m ∈ filter (f d) (MS (P ++ Q))), mcoeff m =
      (∑ (m ∈ filter (f d) P), mcoeff m +
       ∑ (m ∈ filter (f d) Q), mcoeff m)%F). {
   intros.
-  apply H1.
+  apply summation_filter_merge_isort_app.
 }
-clear H1; rename H into H1.
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
 apply List_eq_iff.
