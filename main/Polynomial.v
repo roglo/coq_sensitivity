@@ -2127,6 +2127,8 @@ specialize (H1 (MS (P ++ Q)) R) as H3.
 apply List_eq_iff.
 split. 2: {
   intros.
+  specialize (H2 i).
+  specialize (H3 i).
   remember (nth i _ _) as ma eqn:Hma; symmetry in Hma.
   remember (nth i _ _) as mb eqn:Hmb in |-*; symmetry in Hmb.
   move mb before ma.
