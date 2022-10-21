@@ -2142,7 +2142,10 @@ Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
   → (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))
   → P = Q.
 Proof.
-intros * Hc.
+intros * Hp Hq Hc.
+apply List_eq_iff.
+split. 2: {
+  intros ma i.
 ... ...
 apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
   intros i.
