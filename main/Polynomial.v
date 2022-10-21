@@ -2131,6 +2131,8 @@ split. 2: {
   destruct ma as (ca, da).
   destruct mb as (cb, db).
   f_equal.
+  rewrite rngl_summation_filter in H2.
+  unfold f in H2 at 1.
 ...
 Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
   (∀ i, mcoeff (nth i P d) = mcoeff (nth i Q d))

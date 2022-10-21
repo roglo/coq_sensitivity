@@ -678,6 +678,22 @@ intros i Hbie.
 apply Hgh; flia Hbie.
 Qed.
 
+Theorem rngl_summation_filter : ∀ A l f (g : A → T),
+  ∑ (a ∈ filter f l), g a = ∑ (a ∈ l), if f a then g a else 0%F.
+Proof.
+intros.
+induction l as [| b]; [ easy | cbn ].
+rewrite rngl_summation_list_cons.
+remember (f b) as fb eqn:Hfb; symmetry in Hfb.
+destruct fb. {
+  rewrite rngl_summation_list_cons; f_equal.
+  apply IHl.
+} {
+  rewrite rngl_add_0_l.
+  apply IHl.
+}
+Qed.
+
 End a.
 
 Arguments all_0_rngl_summation_0 {T}%type {ro rp} (b e)%nat (f g)%function.
