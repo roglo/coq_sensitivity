@@ -2012,6 +2012,88 @@ unfold f at 1 4; cbn.
 now destruct mb.
 Qed.
 
+Theorem sorted_summation_filter_merge_coeff : ∀ (P : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  sorted rel P
+  → ∑ (m ∈ filter f (merge_same_deg P)), mcoeff m =
+    ∑ (m ∈ filter f P), mcoeff m.
+Proof.
+intros * Hs.
+induction P as [| ma la]; [ easy | cbn ].
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+rewrite fold_merge_same_deg.
+unfold same_deg_sum_coeff.
+remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]. {
+  now cbn; apply eq_merge_same_deg_nil in Hlb; subst la.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
+  cbn.
+  unfold f at 3.
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Had| Had]. {
+    do 2 rewrite rngl_summation_list_cons; cbn.
+    rewrite <- rngl_add_assoc; f_equal.
+    cbn in IHla.
+    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+    destruct fb. {
+      rewrite rngl_summation_list_cons in IHla.
+      apply IHla.
+    }
+    unfold f in Hfb.
+    apply Nat.eqb_neq in Hfb.
+    now rewrite <- Hdab in Hfb.
+  } {
+    cbn in IHla.
+    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+    destruct fb; [ | easy ].
+    unfold f in Hfb.
+    apply Nat.eqb_eq in Hfb.
+    now rewrite <- Hdab in Hfb.
+  }
+}
+rewrite <- Hlb; cbn; rewrite Hlb.
+remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa; [ | easy ].
+do 2 rewrite rngl_summation_list_cons.
+now f_equal.
+Qed.
+
+Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  ∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m =
+  ∑ (m ∈ filter f P), mcoeff m.
+Proof.
+intros.
+transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+  apply (permutation_filter monom_eqb_eq).
+  apply (permutation_sym monom_eqb_eq).
+  apply (permuted_isort _ monom_eqb_eq).
+}
+apply sorted_summation_filter_merge_coeff.
+fold rel.
+apply sorted_isort.
+unfold rel; intros ma mb.
+apply Nat_leb_total_relation.
+Qed.
+
+Theorem summation_filter_merge_isort_app : ∀ (P Q : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  ∑ (m ∈ filter f (merge_same_deg (isort rel (P ++ Q)))), mcoeff m =
+  (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
+Proof.
+intros.
+rewrite <- rngl_summation_list_app.
+rewrite <- filter_app.
+apply summation_filter_merge_isort_coeff.
+Qed.
+
 Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2027,43 +2109,7 @@ fold (MS (P ++ Q)).
 fold (MS (P ++ R)).
 fold (MS (MS (P ++ Q) ++ R)).
 fold (MS (MS (P ++ R) ++ Q)).
-Theorem glop : ∀ (P Q : list (monom T)) d,
-  let rel := λ ma mb, mdeg mb <=? mdeg ma in
-  let f := λ m, mdeg m =? d in
-  ∑ (m ∈ filter f (merge_same_deg (isort rel (P ++ Q)))), mcoeff m =
-  (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
-Proof.
-intros.
-rewrite <- rngl_summation_list_app.
-rewrite <- filter_app.
-Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
-  let rel := λ ma mb, mdeg mb <=? mdeg ma in
-  let f := λ m, mdeg m =? d in
-  ∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m =
-  ∑ (m ∈ filter f P), mcoeff m.
-Proof.
-intros.
-transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
-  apply (rngl_summation_list_permut _ monom_eqb_eq).
-  apply (permutation_filter monom_eqb_eq).
-  apply (permutation_sym monom_eqb_eq).
-  apply (permuted_isort _ monom_eqb_eq).
-}
-Theorem sorted_summation_filter_merge_coeff : ∀ (P : list (monom T)) d,
-  let rel := λ ma mb, mdeg mb <=? mdeg ma in
-  let f := λ m, mdeg m =? d in
-  sorted rel P
-  → ∑ (m ∈ filter f (merge_same_deg P)), mcoeff m =
-    ∑ (m ∈ filter f P), mcoeff m.
-Proof.
-intros * Hs.
-... ...
-apply sorted_summation_filter_merge_coeff.
-fold rel.
-... ...
-apply summation_filter_merge_isort_coeff.
-... ...
-specialize (glop P Q) as H1.
+specialize (summation_filter_merge_isort_app P Q) as H1.
 cbn in H1.
 fold rel in H1.
 fold (MS (P ++ Q)) in H1.
