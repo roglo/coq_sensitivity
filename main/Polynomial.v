@@ -2099,8 +2099,11 @@ Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
   → is_canon_monl Q = true
   → is_canon_monl R = true
   → let rel := λ ma mb, mdeg mb <=? mdeg ma in
-    merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ Q)) ++ R)) =
-    merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ R)) ++ Q)).
+    let f := λ ma : monom T, (mcoeff ma ≠? 0)%F in
+    filter f
+      (merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ Q)) ++ R))) =
+    filter f
+      (merge_same_deg (isort rel (merge_same_deg (isort rel (P ++ R)) ++ Q))).
 Proof.
 intros * PP PQ PR.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma); cbn.
@@ -2109,17 +2112,18 @@ fold (MS (P ++ Q)).
 fold (MS (P ++ R)).
 fold (MS (MS (P ++ Q) ++ R)).
 fold (MS (MS (P ++ R) ++ Q)).
-set (f := λ d (m : monom T), mdeg m =? d).
+set (g := λ d (m : monom T), mdeg m =? d).
 assert
   (H1 : ∀ P Q d,
-     ∑ (m ∈ filter (f d) (MS (P ++ Q))), mcoeff m =
-     (∑ (m ∈ filter (f d) P), mcoeff m +
-      ∑ (m ∈ filter (f d) Q), mcoeff m)%F). {
+     ∑ (m ∈ filter (g d) (MS (P ++ Q))), mcoeff m =
+     (∑ (m ∈ filter (g d) P), mcoeff m +
+      ∑ (m ∈ filter (g d) Q), mcoeff m)%F). {
   intros.
   apply summation_filter_merge_isort_app.
 }
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
+...
 (*
 apply List_eq_iff.
 split. 2: {
@@ -2152,6 +2156,7 @@ split. 2: {
 apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
   intros i.
 ...
+*)
 
 Theorem canon_polyn_add_add_swap :
   ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
@@ -2186,9 +2191,9 @@ do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
-f_equal; clear f.
 ... ...
 now apply canon_polyn_merge_isort_merge_isort_swap.
+... ...
 ...
 apply List_eq_iff.
 split. {
