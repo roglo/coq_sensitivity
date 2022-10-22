@@ -2135,6 +2135,7 @@ split. 2: {
     do 3 rewrite rngl_summation_filter in H2, H3.
     unfold f in H2, H3.
 *)
+...
 Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
   let rel := λ ma mb : monom T, mdeg mb <? mdeg ma in
   sorted rel P
@@ -2143,6 +2144,7 @@ Theorem coeff_eq_monl_eq : ∀ d (P Q : list (monom T)),
   → P = Q.
 Proof.
 intros * Hp Hq Hc.
+(* c'est faux : si un coefficient est nul ou absent, c'est pareil *)
 apply List_eq_iff.
 split. 2: {
   intros ma i.
