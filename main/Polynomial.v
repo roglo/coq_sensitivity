@@ -2123,6 +2123,7 @@ assert
 }
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
+Abort. (*
 ...
 (*
 apply List_eq_iff.
@@ -2163,6 +2164,16 @@ Theorem canon_polyn_add_add_swap :
 Proof.
 intros P Q R; cbn.
 apply canon_polyn_eq_eq; cbn.
+(**)
+unfold polyn_norm; f_equal.
+cbn - [ monl_norm ].
+destruct P as ((P), PP).
+destruct Q as ((Q), PQ).
+destruct R as ((R), PR); cbn - [ monl_norm ].
+move Q before P; move R before Q.
+unfold is_canon_polyn in PP, PQ, PR.
+cbn in PP, PQ, PR.
+...
 unfold polyn_norm; f_equal; cbn.
 do 4 rewrite fold_merge_same_deg.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
@@ -2184,6 +2195,15 @@ move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
 do 4 rewrite fold_merge_same_deg.
+(**)
+set (FMS := λ P, filter f (merge_same_deg (isort rel P))).
+...
+fold (FMS (P ++ Q)).
+fold (FMS (P ++ R)).
+fold (FMS (FMS (P ++ Q) ++ R)).
+fold (FMS (FMS (P ++ R) ++ Q)).
+Print monl_norm.
+...
 rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
 rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
