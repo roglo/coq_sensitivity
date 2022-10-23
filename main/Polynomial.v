@@ -2133,10 +2133,31 @@ destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
       apply (rngl_eqb_eq Heq) in Hcab.
       now rewrite Hcab, rngl_add_0_l.
     }
+  } {
+    apply Bool.negb_false_iff in Hgb.
+    apply (rngl_eqb_eq Heq) in Hgb.
+    rewrite Hgb, rngl_add_0_r; cbn.
+    unfold g at 1; cbn.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [Hga| Hga]. {
+      cbn; unfold f at 3.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec _ _) as [Had| Had]; [ | easy ].
+      do 2 rewrite rngl_summation_list_cons.
+      now cbn; f_equal.
+    } {
+      unfold f at 2.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec _ _) as [Had| Had]; [ | easy ].
+      rewrite rngl_summation_list_cons.
+      apply Bool.negb_false_iff in Hga.
+      apply (rngl_eqb_eq Heq) in Hga.
+      now rewrite Hga, rngl_add_0_l.
+    }
   }
-...
 }
 rewrite <- Hlb; cbn; rewrite Hlb.
+...
 remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
 destruct fa; [ | easy ].
 do 2 rewrite rngl_summation_list_cons.
