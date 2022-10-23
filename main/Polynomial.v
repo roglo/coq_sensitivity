@@ -2094,6 +2094,7 @@ rewrite <- filter_app.
 apply summation_filter_merge_isort_coeff.
 Qed.
 
+(*
 Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2123,7 +2124,6 @@ assert
 }
 specialize (H1 P Q) as H2.
 specialize (H1 (MS (P ++ Q)) R) as H3.
-Abort. (*
 ...
 (*
 apply List_eq_iff.
