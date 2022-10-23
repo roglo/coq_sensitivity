@@ -2062,6 +2062,66 @@ do 2 rewrite rngl_summation_list_cons.
 now f_equal.
 Qed.
 
+Theorem sorted_summation_filter_filter_merge_coeff : ∀ (P : list (monom T)) d,
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  let f := λ m, mdeg m =? d in
+  let g := λ ma, (mcoeff ma ≠? 0)%F in
+  sorted rel P
+  → ∑ (m ∈ filter f (filter g (merge_same_deg P))), mcoeff m =
+    ∑ (m ∈ filter f P), mcoeff m.
+Proof.
+intros * Hs.
+induction P as [| ma la]; [ easy | cbn ].
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H.
+rewrite fold_merge_same_deg.
+unfold same_deg_sum_coeff.
+remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]. {
+  cbn; apply eq_merge_same_deg_nil in Hlb; subst la.
+  remember (g ma) as ga eqn:Hga; symmetry in Hga.
+  destruct ga; [ easy | cbn ].
+  destruct (f ma); [ cbn | easy ].
+  rewrite rngl_summation_list_empty; [ | easy ].
+  rewrite rngl_summation_list_only_one.
+  unfold g in Hga.
+  apply Bool.negb_false_iff in Hga.
+  now apply (rngl_eqb_eq Heq) in Hga.
+}
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
+  cbn.
+  unfold f at 3.
+...
+  do 2 rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Had| Had]. {
+    do 2 rewrite rngl_summation_list_cons; cbn.
+    rewrite <- rngl_add_assoc; f_equal.
+    cbn in IHla.
+    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+    destruct fb. {
+      rewrite rngl_summation_list_cons in IHla.
+      apply IHla.
+    }
+    unfold f in Hfb.
+    apply Nat.eqb_neq in Hfb.
+    now rewrite <- Hdab in Hfb.
+  } {
+    cbn in IHla.
+    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+    destruct fb; [ | easy ].
+    unfold f in Hfb.
+    apply Nat.eqb_eq in Hfb.
+    now rewrite <- Hdab in Hfb.
+  }
+}
+rewrite <- Hlb; cbn; rewrite Hlb.
+remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+destruct fa; [ | easy ].
+do 2 rewrite rngl_summation_list_cons.
+now f_equal.
+...
+
 Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ m, mdeg m =? d in
@@ -2093,6 +2153,53 @@ rewrite <- rngl_summation_list_app.
 rewrite <- filter_app.
 apply summation_filter_merge_isort_coeff.
 Qed.
+
+Theorem summation_filter_monl_norm_app : ∀ (P Q : list (monom T)) d,
+  let f := λ m, mdeg m =? d in
+  ∑ (m ∈ filter f (monl_norm (P ++ Q))), mcoeff m =
+  (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
+Proof.
+intros.
+rewrite <- rngl_summation_list_app.
+rewrite <- filter_app.
+remember (P ++ Q) as R eqn:HR.
+clear P Q HR; rename R into P.
+unfold monl_norm.
+set (g := λ ma, (mcoeff ma ≠? 0)%F).
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+  apply (permutation_filter monom_eqb_eq).
+  apply (permutation_sym monom_eqb_eq).
+  apply (permuted_isort _ monom_eqb_eq).
+}
+... ...
+apply sorted_summation_filter_filter_merge_coeff.
+...
+transitivity (∑ (m ∈ filter f (filter g (isort rel P))), mcoeff m). 2: {
+...
+transitivity (∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m). {
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+  apply (permutation_filter monom_eqb_eq).
+Search (permutation _ (filter _ _)).
+...
+transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
+...
+transitivity (∑ (m ∈ filter f (monl_norm P)), mcoeff m). 2: {
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+  apply (permutation_filter monom_eqb_eq).
+  apply (permutation_sym monom_eqb_eq).
+  apply (permuted_isort _ monom_eqb_eq).
+}
+apply sorted_summation_filter_merge_coeff.
+fold rel.
+apply sorted_isort.
+unfold rel; intros ma mb.
+apply Nat_leb_total_relation.
+...
+apply summation_filter_merge_isort_coeff.
+Qed.
+*)
 
 (*
 Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
@@ -2173,6 +2280,18 @@ destruct R as ((R), PR); cbn - [ monl_norm ].
 move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
+(**)
+set (g := λ d (m : monom T), mdeg m =? d).
+assert
+  (H1 : ∀ P Q d,
+     ∑ (m ∈ filter (g d) (monl_norm (P ++ Q))), mcoeff m =
+     (∑ (m ∈ filter (g d) P), mcoeff m +
+      ∑ (m ∈ filter (g d) Q), mcoeff m)%F). {
+  intros.
+  apply summation_filter_monl_norm_app.
+}
+specialize (H1 P Q) as H2.
+specialize (H1 (P ++ Q) R) as H3.
 ...
 unfold polyn_norm; f_equal; cbn.
 do 4 rewrite fold_merge_same_deg.
