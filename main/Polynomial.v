@@ -2155,14 +2155,63 @@ destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
       now rewrite Hga, rngl_add_0_l.
     }
   }
+} {
+  rewrite <- Hlb; cbn; rewrite Hlb.
+  cbn in IHla.
+  remember (g mb) as gb eqn:Hgb; symmetry in Hgb.
+  destruct gb. {
+    cbn in IHla |-*.
+    rewrite Hgb.
+    remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+    destruct fb. {
+      destruct fa. {
+        unfold f in Hfa, Hfb.
+        apply Nat.eqb_eq in Hfa, Hfb.
+        now rewrite <- Hfb in Hfa.
+      }
+      remember (g ma) as ga eqn:Hga; symmetry in Hga.
+      destruct ga; cbn; rewrite Hfb; [ now rewrite Hfa | easy ].
+    } {
+      destruct fa. {
+        remember (g ma) as ga eqn:Hga; symmetry in Hga.
+        rewrite rngl_summation_list_cons.
+        destruct ga; cbn; rewrite Hfb. {
+          rewrite Hfa.
+          now rewrite rngl_summation_list_cons; cbn; f_equal.
+        } {
+          unfold g in Hga.
+          apply Bool.negb_false_iff in Hga.
+          apply (rngl_eqb_eq Heq) in Hga.
+          now rewrite Hga, rngl_add_0_l.
+        }
+      } {
+        remember (g ma) as ga eqn:Hga; symmetry in Hga.
+        destruct ga; cbn; rewrite Hfb; [ now rewrite Hfa | easy ].
+      }
+    }
+  } {
+    cbn; rewrite Hgb.
+    remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
+    destruct fa. {
+      remember (g ma) as ga eqn:Hga; symmetry in Hga.
+      rewrite rngl_summation_list_cons.
+      destruct ga; cbn. {
+        rewrite Hfa.
+        now rewrite rngl_summation_list_cons; cbn; f_equal.
+      } {
+        unfold g in Hga.
+        apply Bool.negb_false_iff in Hga.
+        apply (rngl_eqb_eq Heq) in Hga.
+        now rewrite Hga, rngl_add_0_l.
+      }
+    } {
+      remember (g ma) as ga eqn:Hga; symmetry in Hga.
+      destruct ga; cbn; [ now rewrite Hfa | easy ].
+    }
+  }
 }
-rewrite <- Hlb; cbn; rewrite Hlb.
-...
-remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
-destruct fa; [ | easy ].
-do 2 rewrite rngl_summation_list_cons.
-now f_equal.
-...
+Qed.
 
 Theorem summation_filter_merge_isort_coeff : ∀ (P : list (monom T)) d,
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
@@ -2215,33 +2264,12 @@ transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
   apply (permutation_sym monom_eqb_eq).
   apply (permuted_isort _ monom_eqb_eq).
 }
-... ...
 apply sorted_summation_filter_filter_merge_coeff.
-...
-transitivity (∑ (m ∈ filter f (filter g (isort rel P))), mcoeff m). 2: {
-...
-transitivity (∑ (m ∈ filter f (merge_same_deg (isort rel P))), mcoeff m). {
-  apply (rngl_summation_list_permut _ monom_eqb_eq).
-  apply (permutation_filter monom_eqb_eq).
-Search (permutation _ (filter _ _)).
-...
-transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
-...
-transitivity (∑ (m ∈ filter f (monl_norm P)), mcoeff m). 2: {
-  apply (rngl_summation_list_permut _ monom_eqb_eq).
-  apply (permutation_filter monom_eqb_eq).
-  apply (permutation_sym monom_eqb_eq).
-  apply (permuted_isort _ monom_eqb_eq).
-}
-apply sorted_summation_filter_merge_coeff.
 fold rel.
 apply sorted_isort.
 unfold rel; intros ma mb.
 apply Nat_leb_total_relation.
-...
-apply summation_filter_merge_isort_coeff.
 Qed.
-*)
 
 (*
 Theorem canon_polyn_merge_isort_merge_isort_swap : ∀ P Q R : list (monom T),
