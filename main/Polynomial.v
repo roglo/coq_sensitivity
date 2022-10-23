@@ -2362,6 +2362,9 @@ assert
 }
 specialize (H1 P Q) as H2.
 specialize (H1 (P ++ Q) R) as H3.
+apply List_eq_iff.
+split. 2: {
+  intros ma i.
 ...
 unfold polyn_norm; f_equal; cbn.
 do 4 rewrite fold_merge_same_deg.
