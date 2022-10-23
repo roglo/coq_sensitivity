@@ -2090,30 +2090,51 @@ destruct lb as [| mb]. {
 }
 rewrite if_eqb_eq_dec.
 destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
-  cbn.
-  unfold f at 3.
-...
-  do 2 rewrite if_eqb_eq_dec.
-  destruct (Nat.eq_dec _ _) as [Had| Had]. {
-    do 2 rewrite rngl_summation_list_cons; cbn.
-    rewrite <- rngl_add_assoc; f_equal.
-    cbn in IHla.
-    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
-    destruct fb. {
-      rewrite rngl_summation_list_cons in IHla.
-      apply IHla.
+  cbn in IHla.
+  remember (g mb) as gb eqn:Hgb; symmetry in Hgb.
+  destruct gb. {
+    cbn.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [Hcab| Hcab]. {
+      cbn; unfold f at 3.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec _ _) as [Had| Had]. {
+        do 2 rewrite rngl_summation_list_cons; cbn.
+        rewrite <- rngl_add_assoc; f_equal.
+        cbn in IHla.
+        remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+        destruct fb. {
+          rewrite rngl_summation_list_cons in IHla.
+          apply IHla.
+        }
+        unfold f in Hfb.
+        apply Nat.eqb_neq in Hfb.
+        now rewrite <- Hdab in Hfb.
+      } {
+        cbn in IHla.
+        remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
+        destruct fb; [ | easy ].
+        unfold f in Hfb.
+        apply Nat.eqb_eq in Hfb.
+        now rewrite <- Hdab in Hfb.
+      }
+    } {
+      cbn in IHla.
+      unfold f in IHla at 1.
+      rewrite <- Hdab in IHla.
+      unfold f at 2.
+      symmetry.
+      rewrite if_eqb_eq_dec in IHla |-*.
+      destruct (Nat.eq_dec _ _ ) as [Had| Had]; [ | easy ].
+      rewrite rngl_summation_list_cons in IHla |-*.
+      rewrite <- IHla, rngl_add_assoc.
+      unfold g in Hcab; cbn in Hcab.
+      apply Bool.negb_false_iff in Hcab.
+      apply (rngl_eqb_eq Heq) in Hcab.
+      now rewrite Hcab, rngl_add_0_l.
     }
-    unfold f in Hfb.
-    apply Nat.eqb_neq in Hfb.
-    now rewrite <- Hdab in Hfb.
-  } {
-    cbn in IHla.
-    remember (f mb) as fb eqn:Hfb; symmetry in Hfb.
-    destruct fb; [ | easy ].
-    unfold f in Hfb.
-    apply Nat.eqb_eq in Hfb.
-    now rewrite <- Hdab in Hfb.
   }
+...
 }
 rewrite <- Hlb; cbn; rewrite Hlb.
 remember (f ma) as fa eqn:Hfa; symmetry in Hfa.
