@@ -2360,8 +2360,6 @@ assert
   intros.
   apply summation_filter_monl_norm_app.
 }
-specialize (H1 P Q) as H2.
-specialize (H1 (P ++ Q) R) as H3.
 apply List_eq_iff.
 split. 2: {
   intros ma i.
