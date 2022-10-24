@@ -2245,20 +2245,29 @@ rewrite <- filter_app.
 apply summation_filter_merge_isort_coeff.
 Qed.
 
-Theorem summation_filter_monl_norm_app : ∀ (P Q : list (monom T)) d,
-  let f := λ m, mdeg m =? d in
-  ∑ (m ∈ filter f (monl_norm (P ++ Q))), mcoeff m =
-  (∑ (m ∈ filter f P), mcoeff m + ∑ (m ∈ filter f Q), mcoeff m)%F.
+Theorem summation_filter_monl_norm_app :
+  let has_deg := λ d m, mdeg m =? d in
+  ∀ (P Q : list (monom T)) d,
+  ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
+  (∑ (m ∈ filter (has_deg d) P), mcoeff m +
+   ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F.
 Proof.
 intros.
 rewrite <- rngl_summation_list_app.
 rewrite <- filter_app.
 remember (P ++ Q) as R eqn:HR.
 clear P Q HR; rename R into P.
+Theorem summation_filter_monl_norm :
+  let has_deg := λ d m, mdeg m =? d in
+  ∀ (P Q : list (monom T)) d,
+  ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
+  (∑ (m ∈ filter (has_deg d) P), mcoeff m +
+   ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F.
+...
 unfold monl_norm.
 set (g := λ ma, (mcoeff ma ≠? 0)%F).
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-transitivity (∑ (m ∈ filter f (isort rel P)), mcoeff m). 2: {
+transitivity (∑ (m ∈ filter (has_deg d) (isort rel P)), mcoeff m). 2: {
   apply (rngl_summation_list_permut _ monom_eqb_eq).
   apply (permutation_filter monom_eqb_eq).
   apply (permutation_sym monom_eqb_eq).
@@ -2349,8 +2358,25 @@ assert
      ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
      (∑ (m ∈ filter (has_deg d) P), mcoeff m +
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
-  intros.
   apply summation_filter_monl_norm_app.
+}
+assert
+  (H2 : ∀ P d,
+     ∑ (m ∈ filter (has_deg d) (monl_norm P)), mcoeff m =
+     ∑ (m ∈ filter (has_deg d) P), mcoeff m). {
+  intros P' d'.
+  unfold monl_norm.
+...
+  apply (rngl_summation_list_permut _ monom_eqb_eq).
+  apply (permutation_filter monom_eqb_eq).
+  apply (permutation_sym monom_eqb_eq).
+
+  apply (permuted_isort _ monom_eqb_eq).
+...
+  specialize (H1 P' [] d').
+  rewrite app_nil_r in H1; cbn in H1.
+  rewrite (rngl_summation_list_empty _ _ _ []) in H1; [ | easy ].
+  now rewrite rngl_add_0_r in H1.
 }
 ...
 unfold monl_norm.
