@@ -2336,6 +2336,29 @@ apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
 ...
 *)
 
+Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → is_canon_monl R = true
+  → monl_norm (monl_norm (P ++ Q) ++ R) = monl_norm (monl_norm (P ++ R) ++ Q).
+Proof.
+intros * PP PQ PR.
+set (has_deg := λ d (m : monom T), mdeg m =? d).
+assert
+  (H1 : ∀ P Q d,
+     ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
+     (∑ (m ∈ filter (has_deg d) P), mcoeff m +
+      ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
+  intros.
+  apply summation_filter_monl_norm_app.
+}
+...
+apply List_eq_iff.
+split. 2: {
+  intros ma i.
+  rename g into has_deg.
+...
+
 Theorem canon_polyn_add_add_swap :
   ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
 Proof.
@@ -2350,20 +2373,8 @@ destruct R as ((R), PR); cbn - [ monl_norm ].
 move Q before P; move R before Q.
 unfold is_canon_polyn in PP, PQ, PR.
 cbn in PP, PQ, PR.
-(**)
-set (g := λ d (m : monom T), mdeg m =? d).
-assert
-  (H1 : ∀ P Q d,
-     ∑ (m ∈ filter (g d) (monl_norm (P ++ Q))), mcoeff m =
-     (∑ (m ∈ filter (g d) P), mcoeff m +
-      ∑ (m ∈ filter (g d) Q), mcoeff m)%F). {
-  intros.
-  apply summation_filter_monl_norm_app.
-}
-apply List_eq_iff.
-split. 2: {
-  intros ma i.
-  rename g into has_deg.
+... ...
+now apply canon_monl_norm_add_add_swap.
 ...
 unfold polyn_norm; f_equal; cbn.
 do 4 rewrite fold_merge_same_deg.
