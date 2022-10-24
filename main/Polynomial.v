@@ -2364,6 +2364,33 @@ do 2 rewrite (sorted_isort_filter Htra Htot).
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal.
+(**)
+revert Q R PQ PR.
+induction P as [| ma la]; intros. {
+  do 2 rewrite app_nil_l.
+  revert R PR.
+  induction Q as [| mb lb]; intros. {
+    rewrite app_nil_r; cbn.
+    rewrite fold_merge_same_deg.
+    specialize (sorted_isort Htot R) as H1.
+    remember (isort rel R) as P eqn:HP; clear HP.
+    induction P as [| ma la]; [ easy | cbn ].
+    do 2 rewrite fold_merge_same_deg.
+    assert (H : sorted rel la) by now apply sorted_cons in H1.
+    specialize (IHla H); clear H.
+    unfold same_deg_sum_coeff.
+    remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
+    destruct lb as [| mb]; [ easy | cbn ].
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
+      cbn.
+...
+    rewrite app_nil_r; cbn - [ merge_same_deg ].
+...
+  rewrite merge_same_deg_isort_app_comm.
+  fold rel.
+Search merge_same_deg.
+...
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
   (H1 : ∀ P Q d,
