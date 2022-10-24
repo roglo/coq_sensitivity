@@ -2343,6 +2343,16 @@ Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   → monl_norm (monl_norm (P ++ Q) ++ R) = monl_norm (monl_norm (P ++ R) ++ Q).
 Proof.
 intros * PP PQ PR.
+set (has_deg := λ d (m : monom T), mdeg m =? d).
+assert
+  (H1 : ∀ P Q d,
+     ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
+     (∑ (m ∈ filter (has_deg d) P), mcoeff m +
+      ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
+  intros.
+  apply summation_filter_monl_norm_app.
+}
+...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
@@ -2365,6 +2375,7 @@ rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal.
 (**)
+...
 revert Q R PQ PR.
 induction P as [| ma la]; intros. {
   do 2 rewrite app_nil_l.
