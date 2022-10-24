@@ -2363,6 +2363,7 @@ assert
 apply List_eq_iff.
 split. 2: {
   intros ma i.
+  rename g into has_deg.
 ...
 unfold polyn_norm; f_equal; cbn.
 do 4 rewrite fold_merge_same_deg.
