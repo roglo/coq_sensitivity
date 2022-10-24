@@ -2343,6 +2343,29 @@ Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   → monl_norm (monl_norm (P ++ Q) ++ R) = monl_norm (monl_norm (P ++ R) ++ Q).
 Proof.
 intros * PP PQ PR.
+(**)
+unfold monl_norm.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+rewrite (canon_monl_is_filter_deg_non_zero R PR) at 1; symmetry.
+rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
+fold f.
+do 2 rewrite <- filter_app.
+do 2 rewrite (sorted_isort_filter Htra Htot).
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+f_equal.
+...
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
   (H1 : ∀ P Q d,
