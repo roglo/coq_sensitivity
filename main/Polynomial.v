@@ -2367,7 +2367,22 @@ assert
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
   apply summation_filter_monl_norm_app.
 }
-unfold monl_norm at 1.
+unfold monl_norm at 1 3.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+remember (merge_same_deg (isort rel (monl_norm (P ++ Q) ++ R))) as l1 eqn:Hl1.
+remember (merge_same_deg (isort rel (monl_norm (P ++ R) ++ Q))) as l2 eqn:Hl2.
+move l2 before l1.
+symmetry in Hl1, Hl2.
+revert l2 Hl2.
+induction l1 as [| h1 t1]; intros. {
+  apply eq_merge_same_deg_nil in Hl1.
+  apply eq_isort_nil in Hl1.
+  apply app_eq_nil in Hl1.
+  destruct Hl1 as (Hl1, H); subst R.
+Search (monl_norm _ = []).
+...
+  apply eq_monl_norm_nil in Hl1.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
