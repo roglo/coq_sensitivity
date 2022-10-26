@@ -2367,6 +2367,7 @@ assert
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
   apply summation_filter_monl_norm_app.
 }
+unfold monl_norm at 1.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
