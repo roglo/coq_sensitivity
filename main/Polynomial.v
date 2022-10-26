@@ -2355,17 +2355,17 @@ Proof.
 intros * PP PQ PR.
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
-  (H1 : ∀ P Q d,
+  (H1 : ∀ P d,
+     ∑ (m ∈ filter (has_deg d) (monl_norm P)), mcoeff m =
+     ∑ (m ∈ filter (has_deg d) P), mcoeff m). {
+  apply summation_filter_monl_norm.
+}
+assert
+  (H2 : ∀ P Q d,
      ∑ (m ∈ filter (has_deg d) (monl_norm (P ++ Q))), mcoeff m =
      (∑ (m ∈ filter (has_deg d) P), mcoeff m +
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
   apply summation_filter_monl_norm_app.
-}
-assert
-  (H2 : ∀ P d,
-     ∑ (m ∈ filter (has_deg d) (monl_norm P)), mcoeff m =
-     ∑ (m ∈ filter (has_deg d) P), mcoeff m). {
-  apply summation_filter_monl_norm.
 }
 ...
 unfold monl_norm.
