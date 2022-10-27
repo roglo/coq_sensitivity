@@ -2351,7 +2351,31 @@ Theorem sorted_lt_merge_same_deg : ∀ P : list (monom T),
   → merge_same_deg P = P.
 Proof.
 intros * Hs.
-...
+induction P as [| ma la]; [ easy | cbn ].
+rewrite fold_merge_same_deg.
+unfold same_deg_sum_coeff.
+remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| mb]. {
+  now apply eq_merge_same_deg_nil in Hlb; subst la.
+}
+set (rel := λ ma mb, mdeg mb <? mdeg ma) in Hs, IHla.
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.ltb_lt in Hab, Hbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg b).
+}
+assert (H : sorted rel la) by now apply sorted_cons in Hs.
+specialize (IHla H); clear H; subst la.
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hdab| Hdab]; [ | easy ].
+apply (sorted_cons_iff Htra) in Hs.
+destruct Hs as (Hs & Hma).
+specialize (Hma _ (or_introl eq_refl)).
+unfold rel in Hma.
+rewrite Hdab in Hma.
+now rewrite Nat.ltb_irrefl in Hma.
+Qed.
 
 Theorem canon_monl_is_norm : ∀ P : list (monom T),
   is_canon_monl P = true → monl_norm P = P.
@@ -2371,8 +2395,9 @@ assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
 }
 clear Hc.
 rewrite isort_when_sorted; [ | now apply sorted_lt_sorted_le_mdeg ].
-... ...
 rewrite (sorted_lt_merge_same_deg Hs).
+...
+apply List_eq_iff.
 ...
 specialize (canon_monl_is_filter_deg_non_zero P HP) as H1.
 fold f in H1.
