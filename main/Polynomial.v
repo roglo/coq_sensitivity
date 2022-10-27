@@ -660,12 +660,17 @@ Theorem canon_monl_is_norm : ∀ P : list (monom T),
   is_canon_monl P = true → monl_norm P = P.
 Proof.
 intros * HP.
+unfold monl_norm.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
 unfold is_canon_monl in HP.
 apply Bool.andb_true_iff in HP.
 destruct HP as (Hs, Hc).
-unfold monl_norm.
-specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
-clear Hc; cbn in H1.
+assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
+  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
+  apply H1.
+}
+clear Hc.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
