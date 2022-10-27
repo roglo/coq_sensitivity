@@ -664,7 +664,8 @@ unfold is_canon_monl in HP.
 apply Bool.andb_true_iff in HP.
 destruct HP as (Hs, Hc).
 unfold monl_norm.
-Search (_ → filter _ _ = _).
+specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
+clear Hc; cbn in H1.
 ...
 
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
