@@ -656,23 +656,6 @@ apply (rngl_eqb_neq Heq).
 now apply in_monl_norm_neq_mcoeff_0 in Hma.
 Qed.
 
-Theorem canon_monl_is_norm : ∀ P : list (monom T),
-  is_canon_monl P = true → monl_norm P = P.
-Proof.
-intros * HP.
-unfold monl_norm.
-set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
-unfold is_canon_monl in HP.
-apply Bool.andb_true_iff in HP.
-destruct HP as (Hs, Hc).
-assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
-  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
-  apply H1.
-}
-clear Hc.
-...
-
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
   is_canon_polyn (polyn_norm pa) = true.
 Proof.
@@ -2362,6 +2345,58 @@ apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
   intros i.
 ...
 *)
+
+Theorem canon_monl_is_norm : ∀ P : list (monom T),
+  is_canon_monl P = true → monl_norm P = P.
+Proof.
+intros * HP.
+unfold monl_norm.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+(*
+unfold is_canon_monl in HP.
+apply Bool.andb_true_iff in HP.
+destruct HP as (Hs, Hc).
+*)
+specialize (canon_monl_is_filter_deg_non_zero P HP) as H1.
+fold f in H1.
+...
+symmetry.
+rewrite canon_monl_is_filter_deg_non_zero at 1; [ | easy ].
+symmetry.
+fold f.
+Search (filter _ _ = filter _ _).
+...
+canon_monl_is_filter_deg_non_zero:
+  ∀ P : list (monom T),
+    is_canon_monl P = true → P = filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) P
+...
+assert (isort rel P = isort rel' P). {
+assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
+  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
+  apply H1.
+}
+clear Hc.
+rewrite fold_sorted in Hs.
+...
+Theorem filter_all : ∀ A (l : list A) f,
+  (∀ x, x ∈ l → f x = true) → filter f l = l.
+...
+erewrite filter_all.
+...
+transitivity (merge_same_deg (isort rel P)). {
+apply filter_all.
+...
+  rewrite filter_ext_in with (g := λ _, true). 2: {
+    intros ma Hma.
+...
+  apply in_merge_same_deg in Hma.
+  apply in_map_iff in Hma.
+  destruct Hma as (mb & Hmb & Hms).
+  apply H1.
+  generalize Hms; intros Hmbp.
+  apply in_isort in Hmbp.
+...
 
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
