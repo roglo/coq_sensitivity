@@ -2346,27 +2346,39 @@ apply (coeff_eq_monl_eq (Mon 0 0)). 3: {
 ...
 *)
 
+Theorem sorted_lt_merge_same_deg : ∀ P : list (monom T),
+  sorted (λ ma mb, mdeg mb <? mdeg ma) P
+  → merge_same_deg P = P.
+Proof.
+intros * Hs.
+...
+
 Theorem canon_monl_is_norm : ∀ P : list (monom T),
   is_canon_monl P = true → monl_norm P = P.
 Proof.
 intros * HP.
 unfold monl_norm.
+unfold is_canon_monl in HP.
+apply Bool.andb_true_iff in HP.
+destruct HP as (Hs, Hc).
+set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F).
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
-rewrite isort_when_sorted. 2: {
-  unfold is_canon_monl in HP.
-  apply Bool.andb_true_iff in HP.
-  destruct HP as (Hs, Hc).
-  now apply sorted_lt_sorted_le_mdeg.
+set (rel' := λ ma mb, mdeg mb <? mdeg ma) in Hs.
+move rel' after rel.
+assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
+  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
+  apply H1.
 }
-Search (filter _ (merge_same_deg _)).
+clear Hc.
+rewrite isort_when_sorted; [ | now apply sorted_lt_sorted_le_mdeg ].
+... ...
+rewrite (sorted_lt_merge_same_deg Hs).
 ...
 specialize (canon_monl_is_filter_deg_non_zero P HP) as H1.
 fold f in H1.
 unfold is_canon_monl in HP.
 apply Bool.andb_true_iff in HP.
 destruct HP as (Hs, Hc).
-set (rel' := λ ma mb, mdeg mb <? mdeg ma) in Hs.
 move rel' after rel.
 ...
 rewrite isort_when_sorted.
@@ -2395,7 +2407,6 @@ symmetry.
 rewrite canon_monl_is_filter_deg_non_zero at 1; [ | easy ].
 symmetry.
 fold f.
-
 Search (filter _ _ = filter _ _).
 ...
 canon_monl_is_filter_deg_non_zero:
