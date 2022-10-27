@@ -656,6 +656,17 @@ apply (rngl_eqb_neq Heq).
 now apply in_monl_norm_neq_mcoeff_0 in Hma.
 Qed.
 
+Theorem canon_monl_is_norm : ∀ P : list (monom T),
+  is_canon_monl P = true → monl_norm P = P.
+Proof.
+intros * HP.
+unfold is_canon_monl in HP.
+apply Bool.andb_true_iff in HP.
+destruct HP as (Hs, Hc).
+unfold monl_norm.
+Search (_ → filter _ _ = _).
+...
+
 Theorem polyn_norm_is_canon_polyn : ∀ pa,
   is_canon_polyn (polyn_norm pa) = true.
 Proof.
@@ -2382,11 +2393,15 @@ induction l1 as [| h1 t1]; intros. {
   destruct Hl1 as (Hl1, H); subst R.
   unfold monl_norm in Hl1.
   fold rel f in Hl1.
+  rewrite app_nil_r in Hl2.
+Search is_canon_monl.
+... ...
+rewrite (canon_monl_is_norm _ PP) in Hl2.
+...
   specialize @List_filter_nil_iff as H3.
   specialize (H3 (monom T)).
   specialize (proj1 (H3 _ _) Hl1) as H4.
   cbn in H4; clear H3.
-  rewrite app_nil_r in Hl2.
   clear Hl1.
   cbn; symmetry.
   revert P Q Hl2 PP PQ H4.
@@ -2397,7 +2412,6 @@ induction l1 as [| h1 t1]; intros. {
     unfold f in Hfh2.
     apply Bool.negb_true_iff in Hfh2.
     apply (rngl_eqb_neq Heq) in Hfh2.
-Search (merge_same_deg (isort _ _)).
 ...
   apply eq_monl_norm_nil in Hl1.
 ...
