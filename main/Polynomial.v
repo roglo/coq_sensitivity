@@ -1550,7 +1550,7 @@ assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
     assert (H : n ≤ i < length la) by flia Hi.
     clear Hi; rename H into Hi.
     destruct Hi as (Hni, Hia).
-    (* or statring the lemma here... *)
+    (* or starting the lemma here... *)
     assert (Htra : transitive rel). {
       unfold rel; intros a b c Hab Hbc.
       apply Nat.leb_le in Hab, Hbc.
@@ -2380,7 +2380,20 @@ induction l1 as [| h1 t1]; intros. {
   apply eq_isort_nil in Hl1.
   apply app_eq_nil in Hl1.
   destruct Hl1 as (Hl1, H); subst R.
-Search (monl_norm _ = []).
+  unfold monl_norm in Hl1.
+  fold rel f in Hl1.
+  specialize @List_filter_nil_iff as H3.
+  specialize (H3 (monom T)).
+  specialize (proj1 (H3 _ _) Hl1) as H4.
+  cbn in H4; clear H3.
+  rewrite app_nil_r in Hl2.
+  clear Hl1.
+  cbn; symmetry.
+  revert P Q Hl2 PP PQ H4.
+  induction l2 as [| h2 t2]; intros; [ easy | cbn ].
+  remember (f h2) as fh2 eqn:Hfh2; symmetry in Hfh2.
+  destruct fh2. {
+    exfalso.
 ...
   apply eq_monl_norm_nil in Hl1.
 ...
