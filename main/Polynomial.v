@@ -2394,6 +2394,10 @@ induction l1 as [| h1 t1]; intros. {
   remember (f h2) as fh2 eqn:Hfh2; symmetry in Hfh2.
   destruct fh2. {
     exfalso.
+    unfold f in Hfh2.
+    apply Bool.negb_true_iff in Hfh2.
+    apply (rngl_eqb_neq Heq) in Hfh2.
+Search (merge_same_deg (isort _ _)).
 ...
   apply eq_monl_norm_nil in Hl1.
 ...
