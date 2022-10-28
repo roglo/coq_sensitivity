@@ -2487,7 +2487,9 @@ destruct fh1. {
             apply nth_In.
             rewrite firstn_length.
             rewrite Nat.min_l; [ easy | ].
-            rewrite Hla.
+            now rewrite Hla, isort_length, app_length.
+          }
+          specialize (Hfi _ H) as H3.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
