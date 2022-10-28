@@ -2382,87 +2382,23 @@ Theorem canon_monl_is_norm : ∀ P : list (monom T),
 Proof.
 intros * HP.
 unfold monl_norm.
+specialize (canon_monl_is_filter_deg_non_zero P HP) as H1.
 unfold is_canon_monl in HP.
 apply Bool.andb_true_iff in HP.
 destruct HP as (Hs, Hc).
-set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F).
+set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F) in H1 |-*.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (rel' := λ ma mb, mdeg mb <? mdeg ma) in Hs.
 move rel' after rel.
-assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
-  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
-  apply H1.
+assert (H2 : ∀ ma : monom T, ma ∈ P → f ma = true). {
+  now apply all_true_and_list_true_iff.
 }
 clear Hc.
-rewrite isort_when_sorted; [ | now apply sorted_lt_sorted_le_mdeg ].
-rewrite (sorted_lt_merge_same_deg Hs).
-...
-apply List_eq_iff.
-...
-specialize (canon_monl_is_filter_deg_non_zero P HP) as H1.
-fold f in H1.
-unfold is_canon_monl in HP.
-apply Bool.andb_true_iff in HP.
-destruct HP as (Hs, Hc).
-move rel' after rel.
-...
-rewrite isort_when_sorted.
-replace (isort rel P) with (isort rel' P). 2: {
-  clear H1.
-  clear Hc f.
-Check isort_when_sorted.
-...
-  induction P as [| ma la]; [ easy | cbn ].
-  rewrite IHla; cycle 1. {
-    rewrite and_list_cons in Hc.
-    now apply Bool.andb_true_iff in Hc.
-  } {
-    now apply sorted_cons in Hs.
-  }
-...
-  remember (isort rel la) as lb eqn:Hlb; clear IHla.
-  clear Hc Hs; revert la Hlb.
-  induction lb as [| mb]; intros; [ easy | cbn ].
-
-...
-Search (isort _ (filter _ _)).
-Search (filter _ (merge_same_deg _)).
-...
-symmetry.
-rewrite canon_monl_is_filter_deg_non_zero at 1; [ | easy ].
-symmetry.
-fold f.
-Search (filter _ _ = filter _ _).
-...
-canon_monl_is_filter_deg_non_zero:
-  ∀ P : list (monom T),
-    is_canon_monl P = true → P = filter (λ ma : monom T, (mcoeff ma ≠? 0)%F) P
-...
-assert (H1 : ∀ ma : monom T, ma ∈ P → f ma = true). {
-  specialize (proj2 (all_true_and_list_true_iff _ _ _) Hc)  as H1.
-  apply H1.
+rewrite isort_when_sorted. 2: {
+  now apply sorted_lt_sorted_le_mdeg.
 }
-clear Hc.
-rewrite fold_sorted in Hs.
-...
-Theorem filter_all : ∀ A (l : list A) f,
-  (∀ x, x ∈ l → f x = true) → filter f l = l.
-...
-erewrite filter_all.
-...
-transitivity (merge_same_deg (isort rel P)). {
-apply filter_all.
-...
-  rewrite filter_ext_in with (g := λ _, true). 2: {
-    intros ma Hma.
-...
-  apply in_merge_same_deg in Hma.
-  apply in_map_iff in Hma.
-  destruct Hma as (mb & Hmb & Hms).
-  apply H1.
-  generalize Hms; intros Hmbp.
-  apply in_isort in Hmbp.
-...
+now rewrite (sorted_lt_merge_same_deg Hs).
+Qed.
 
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
@@ -2492,7 +2428,7 @@ remember (merge_same_deg (isort rel (monl_norm (P ++ Q) ++ R))) as l1 eqn:Hl1.
 remember (merge_same_deg (isort rel (monl_norm (P ++ R) ++ Q))) as l2 eqn:Hl2.
 move l2 before l1.
 symmetry in Hl1, Hl2.
-revert l2 Hl2.
+revert P Q R l2 PP PQ PR Hl1 Hl2.
 induction l1 as [| h1 t1]; intros. {
   apply eq_merge_same_deg_nil in Hl1.
   apply eq_isort_nil in Hl1.
@@ -2501,26 +2437,41 @@ induction l1 as [| h1 t1]; intros. {
   unfold monl_norm in Hl1.
   fold rel f in Hl1.
   rewrite app_nil_r in Hl2.
-Search is_canon_monl.
-... ...
-rewrite (canon_monl_is_norm _ PP) in Hl2.
-...
+  rewrite (canon_monl_is_norm _ PP) in Hl2.
   specialize @List_filter_nil_iff as H3.
   specialize (H3 (monom T)).
   specialize (proj1 (H3 _ _) Hl1) as H4.
   cbn in H4; clear H3.
-  clear Hl1.
+  rewrite Hl2 in H4.
   cbn; symmetry.
-  revert P Q Hl2 PP PQ H4.
-  induction l2 as [| h2 t2]; intros; [ easy | cbn ].
+  now apply List_filter_nil_iff.
+}
+cbn.
+remember (f h1) as fh1 eqn:Hfh1; symmetry in Hfh1.
+destruct fh1. {
+  destruct l2 as [| h2 t2]. {
+    exfalso.
+    apply eq_merge_same_deg_nil in Hl2.
+    apply eq_isort_nil in Hl2.
+    apply app_eq_nil in Hl2.
+    destruct Hl2 as (Hl2, H); subst Q.
+    rewrite app_nil_r in Hl1.
+    rewrite (canon_monl_is_norm _ PP) in Hl1.
+    specialize @List_filter_nil_iff as H3.
+    specialize (H3 (monom T)).
+    specialize (proj1 (H3 _ _) Hl2) as H4.
+    cbn in H4; clear H3.
+    fold rel in H4.
+    rewrite Hl1 in H4.
+    specialize (H4 _ (or_introl eq_refl)).
+    unfold f in Hfh1.
+    congruence.
+  }
+  cbn.
   remember (f h2) as fh2 eqn:Hfh2; symmetry in Hfh2.
   destruct fh2. {
-    exfalso.
-    unfold f in Hfh2.
-    apply Bool.negb_true_iff in Hfh2.
-    apply (rngl_eqb_neq Heq) in Hfh2.
-...
-  apply eq_monl_norm_nil in Hl1.
+    f_equal. {
+      apply eq_merge_same_deg_cons_iff in Hl1, Hl2.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
