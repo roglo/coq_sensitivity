@@ -2472,6 +2472,11 @@ destruct fh1. {
   destruct fh2. {
     f_equal. {
       apply eq_merge_same_deg_cons_iff in Hl1, Hl2.
+      destruct Hl1 as (i & Hi & Hfi & Hmsi & Hmbi & Hdib).
+      destruct Hl2 as (j & Hj & Hfj & Hmsj & Hmbj & Hdjb).
+      move j before i; move Hj before Hi; move Hfj before Hfi.
+      move Hmsj before Hmsi; move Hmbj before Hmbi.
+      rewrite isort_length, app_length in Hi, Hj.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
