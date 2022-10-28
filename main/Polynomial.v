@@ -2477,6 +2477,17 @@ destruct fh1. {
       move j before i; move Hj before Hi; move Hfj before Hfi.
       move Hmsj before Hmsi; move Hmbj before Hmbi.
       rewrite isort_length, app_length in Hi, Hj.
+      assert (H : i = j). {
+        apply Nat.le_antisymm. {
+          apply Nat.nlt_ge; intros Hij.
+          remember (isort rel (monl_norm (P ++ Q) ++ R)) as la eqn:Hla.
+          remember (nth j (firstn i la) (Mon 0 0)) as ma eqn:Hma.
+          assert (H : ma ∈ firstn i la). {
+            rewrite Hma.
+            apply nth_In.
+            rewrite firstn_length.
+            rewrite Nat.min_l; [ easy | ].
+            rewrite Hla.
 ...
 unfold monl_norm.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
