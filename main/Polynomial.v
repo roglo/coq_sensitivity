@@ -2421,7 +2421,6 @@ assert
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
   apply summation_filter_monl_norm_app.
 }
-...
 unfold monl_norm at 1 3.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
@@ -2470,6 +2469,15 @@ destruct fh1. {
   }
   cbn.
   remember (f h2) as fh2 eqn:Hfh2; symmetry in Hfh2.
+(**)
+  destruct fh2. 2: {
+    exfalso.
+    apply eq_merge_same_deg_cons_iff in Hl2.
+    destruct Hl2 as (i & Hi & Hfi & Hmsi & Hmbi & Hdib).
+    unfold f in Hfh2.
+    apply Bool.negb_false_iff in Hfh2.
+    apply (rngl_eqb_eq Heq) in Hfh2.
+...
   destruct fh2. {
     f_equal. {
       apply eq_merge_same_deg_cons_iff in Hl1, Hl2.
