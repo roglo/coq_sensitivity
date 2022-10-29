@@ -2421,6 +2421,7 @@ assert
       ∑ (m ∈ filter (has_deg d) Q), mcoeff m)%F). {
   apply summation_filter_monl_norm_app.
 }
+...
 unfold monl_norm at 1 3.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
@@ -2477,6 +2478,14 @@ destruct fh1. {
       move j before i; move Hj before Hi; move Hfj before Hfi.
       move Hmsj before Hmsi; move Hmbj before Hmbi.
       rewrite isort_length, app_length in Hi, Hj.
+      assert (H : mdeg h1 = mdeg h2). {
+        unfold f in Hfh1, Hfh2.
+        apply Bool.negb_true_iff in Hfh1, Hfh2.
+        apply (rngl_eqb_neq Heq) in Hfh1, Hfh2.
+        apply Nat.le_antisymm. {
+          apply Nat.nlt_ge; intros Hij.
+          specialize (H2 P Q (mdeg h2)) as H3.
+...
       assert (H : i = j). {
         apply Nat.le_antisymm. {
           apply Nat.nlt_ge; intros Hij.
