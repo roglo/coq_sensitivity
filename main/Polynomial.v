@@ -2406,6 +2406,7 @@ Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   → is_canon_monl R = true
   → monl_norm (monl_norm (P ++ Q) ++ R) = monl_norm (monl_norm (P ++ R) ++ Q).
 Proof.
+(*
 intros * PP PQ PR.
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
@@ -2469,7 +2470,7 @@ destruct fh1. {
   }
   cbn.
   remember (f h2) as fh2 eqn:Hfh2; symmetry in Hfh2.
-(**)
+(*
   destruct fh2. 2: {
     exfalso.
     apply eq_merge_same_deg_cons_iff in Hl2.
@@ -2478,7 +2479,10 @@ destruct fh1. {
     apply Bool.negb_false_iff in Hfh2.
     apply (rngl_eqb_eq Heq) in Hfh2.
 ...
+*)
   destruct fh2. {
+...
+erewrite IHt1 with (l2 := t2).
     f_equal. {
       apply eq_merge_same_deg_cons_iff in Hl1, Hl2.
       destruct Hl1 as (i & Hi & Hfi & Hmsi & Hmbi & Hdib).
@@ -2531,9 +2535,15 @@ rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal.
 (**)
 ...
+*)
+intros * PP PQ PR.
 revert Q R PQ PR.
 induction P as [| ma la]; intros. {
   do 2 rewrite app_nil_l.
+  specialize (monl_norm_add_comm Q R) as H1.
+  unfold monl_add in H1.
+Search monl_norm.
+...
   revert R PR.
   induction Q as [| mb lb]; intros. {
     rewrite app_nil_r; cbn.
