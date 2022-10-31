@@ -2400,6 +2400,12 @@ rewrite isort_when_sorted. 2: {
 now rewrite (sorted_lt_merge_same_deg Hs).
 Qed.
 
+Theorem monl_norm_app_idemp_l : ∀ P Q : list (monom T),
+  monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
+Proof.
+Admitted.
+...
+
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2540,9 +2546,9 @@ intros * PP PQ PR.
 revert Q R PQ PR.
 induction P as [| ma la]; intros. {
   do 2 rewrite app_nil_l.
-  specialize (monl_norm_add_comm Q R) as H1.
-  unfold monl_add in H1.
-Search monl_norm.
+... ...
+  do 2 rewrite <- monl_norm_app_idemp_l.
+  apply monl_norm_add_comm.
 ...
   revert R PR.
   induction Q as [| mb lb]; intros. {
