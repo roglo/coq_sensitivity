@@ -2403,7 +2403,15 @@ Qed.
 Theorem monl_norm_app_idemp_l : ∀ P Q : list (monom T),
   monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
 Proof.
-Admitted.
+intros.
+unfold monl_norm.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+...
+revert Q.
+induction P as [| ma la]; intros; [ easy | cbn ].
+do 3 rewrite fold_merge_same_deg.
+cbn in IHla.
 ...
 
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
