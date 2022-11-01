@@ -2400,19 +2400,35 @@ rewrite isort_when_sorted. 2: {
 now rewrite (sorted_lt_merge_same_deg Hs).
 Qed.
 
+(**)
 Theorem monl_norm_app_idemp_l : ∀ P Q : list (monom T),
-  monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
 Proof.
-intros.
+intros * HP HQ.
 unfold monl_norm.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
+...
+rewrite (canon_monl_is_filter_deg_non_zero P HP) at 1.
+fold f.
+f_equal.
+f_equal.
+Search (isort _ (_ ++ _)).
+rewrite sorted_isort_filter.
+Search (isort _ (_ ++ _)).
+Check filter_merge_filter.
+...
+do 2 rewrite (sorted_isort_filter Htra Htot).
+rewrite <- sorted_isort_filter.
 ...
 revert Q.
 induction P as [| ma la]; intros; [ easy | cbn ].
 do 3 rewrite fold_merge_same_deg.
 cbn in IHla.
 ...
+*)
 
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
