@@ -2400,16 +2400,94 @@ rewrite isort_when_sorted. 2: {
 now rewrite (sorted_lt_merge_same_deg Hs).
 Qed.
 
-(**)
+Theorem monl_norm_idemp : ∀ P : list (monom T),
+  monl_norm (monl_norm P) = monl_norm P.
+Proof.
+intros.
+unfold monl_norm.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+rewrite (sorted_isort_filter Htra Htot).
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+fold f.
+f_equal.
+assert (HP : sorted rel (isort rel P)) by now apply sorted_isort.
+remember (isort rel P) as Q eqn:HQ.
+clear P HQ; rename Q into P.
+induction P as [| ma la]; [ easy | cbn ].
+do 2 rewrite fold_merge_same_deg.
+unfold same_deg_sum_coeff.
+remember (merge_same_deg la) as lb eqn:Hlb in |-*; symmetry in Hlb.
+destruct lb as [| mb]; [ easy | cbn ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
+  apply eq_merge_same_deg_cons_iff.
+  rewrite isort_length; cbn.
+...
+destruct P as [| ma la]; [ easy | cbn ].
+do 2 rewrite fold_merge_same_deg.
+revert ma.
+induction la as [| mb]; intros; [ easy | cbn ].
+do 2 rewrite fold_merge_same_deg.
+Search isort_insert.
+do 2 rewrite fold_isort.
+Search (isort _ (_ :: _ :: _)).
+...
+rewrite fold_isort.
+...
+Search merge_same_deg.
+...
+rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+...
+induction P as [| ma la]; [ easy | cbn ].
+do 2 rewrite fold_merge_same_deg.
+unfold monl_norm in IHla.
+fold rel in IHla.
+fold f in IHla.
+rewrite sorted_isort_filter.
+...
+
+Theorem monl_norm_app_idemp_r : ∀ P Q : list (monom T),
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → monl_norm (P ++ monl_norm Q) = monl_norm (P ++ Q).
+Proof.
+intros * HP HQ.
+revert Q HQ.
+induction P as [| ma la]; intros. {
+  cbn - [ monl_norm ].
+Search (monl_norm (monl_norm _)).
+  apply monl_norm_idemp.
+...
+
 Theorem monl_norm_app_idemp_l : ∀ P Q : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
   → monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
 Proof.
 intros * HP HQ.
+...
+intros * HP HQ.
 unfold monl_norm.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
+(*
+...
+Search monl_norm.
+Search (isort _ (_ ++ _)).
+Search (isort _ (filter _ _)).
+rewrite sorted_isort_filter.
+rewrite
 ...
 rewrite (canon_monl_is_filter_deg_non_zero P HP) at 1.
 fold f.
@@ -2423,10 +2501,12 @@ Check filter_merge_filter.
 do 2 rewrite (sorted_isort_filter Htra Htot).
 rewrite <- sorted_isort_filter.
 ...
-revert Q.
+*)
+revert Q HQ.
 induction P as [| ma la]; intros; [ easy | cbn ].
 do 3 rewrite fold_merge_same_deg.
-cbn in IHla.
+do 2 rewrite fold_isort.
+Search (isort _ (_ ++ _)).
 ...
 *)
 
