@@ -2463,59 +2463,6 @@ rewrite sorted_isort_merge by now apply sorted_isort.
 now rewrite merge_same_deg_idemp.
 Qed.
 
-Theorem monl_norm_app_idemp_r : ∀ P Q : list (monom T),
-  is_canon_monl P = true
-  → is_canon_monl Q = true
-  → monl_norm (P ++ monl_norm Q) = monl_norm (P ++ Q).
-Proof.
-intros * HP HQ.
-revert Q HQ.
-induction P as [| ma la]; intros. {
-  cbn - [ monl_norm ].
-  apply monl_norm_idemp.
-}
-...
-
-Theorem monl_norm_app_idemp_l : ∀ P Q : list (monom T),
-  is_canon_monl P = true
-  → is_canon_monl Q = true
-  → monl_norm (P ++ Q) = monl_norm (monl_norm P ++ Q).
-Proof.
-intros * HP HQ.
-...
-intros * HP HQ.
-unfold monl_norm.
-set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-set (f := λ ma, (mcoeff ma ≠? 0)%F).
-(*
-...
-Search monl_norm.
-Search (isort _ (_ ++ _)).
-Search (isort _ (filter _ _)).
-rewrite sorted_isort_filter.
-rewrite
-...
-rewrite (canon_monl_is_filter_deg_non_zero P HP) at 1.
-fold f.
-f_equal.
-f_equal.
-Search (isort _ (_ ++ _)).
-rewrite sorted_isort_filter.
-Search (isort _ (_ ++ _)).
-Check filter_merge_filter.
-...
-do 2 rewrite (sorted_isort_filter Htra Htot).
-rewrite <- sorted_isort_filter.
-...
-*)
-revert Q HQ.
-induction P as [| ma la]; intros; [ easy | cbn ].
-do 3 rewrite fold_merge_same_deg.
-do 2 rewrite fold_isort.
-Search (isort _ (_ ++ _)).
-...
-*)
-
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2656,32 +2603,11 @@ intros * PP PQ PR.
 revert Q R PQ PR.
 induction P as [| ma la]; intros. {
   do 2 rewrite app_nil_l.
-... ...
-  do 2 rewrite <- monl_norm_app_idemp_l.
+  rewrite (canon_monl_is_norm Q PQ).
+  rewrite (canon_monl_is_norm R PR).
   apply monl_norm_add_comm.
-...
-  revert R PR.
-  induction Q as [| mb lb]; intros. {
-    rewrite app_nil_r; cbn.
-    rewrite fold_merge_same_deg.
-    specialize (sorted_isort Htot R) as H1.
-    remember (isort rel R) as P eqn:HP; clear HP.
-    induction P as [| ma la]; [ easy | cbn ].
-    do 2 rewrite fold_merge_same_deg.
-    assert (H : sorted rel la) by now apply sorted_cons in H1.
-    specialize (IHla H); clear H.
-    unfold same_deg_sum_coeff.
-    remember (merge_same_deg la) as lb eqn:Hlb; symmetry in Hlb.
-    destruct lb as [| mb]; [ easy | cbn ].
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec _ _) as [Hdab| Hdab]. {
-      cbn.
-...
-    rewrite app_nil_r; cbn - [ merge_same_deg ].
-...
-  rewrite merge_same_deg_isort_app_comm.
-  fold rel.
-Search merge_same_deg.
+}
+cbn - [ monl_norm ].
 ...
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
