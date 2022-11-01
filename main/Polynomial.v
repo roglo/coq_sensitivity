@@ -2463,6 +2463,11 @@ rewrite sorted_isort_merge by now apply sorted_isort.
 now rewrite merge_same_deg_idemp.
 Qed.
 
+Theorem fold_monl_norm : ∀ P : list (monom T),
+  filter (λ ma, (mcoeff ma ≠? 0)%F)
+    (merge_same_deg (isort (λ ma mb, mdeg mb <=? mdeg ma) P)) = monl_norm P.
+Proof. easy. Qed.
+
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2608,6 +2613,14 @@ induction P as [| ma la]; intros. {
   apply monl_norm_add_comm.
 }
 cbn - [ monl_norm ].
+cbn.
+do 4 rewrite fold_merge_same_deg.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+do 2 rewrite fold_monl_norm.
+...
+Search (isort _ (filter _ _)).
+rewrite sorted_isort_filter.
 ...
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
