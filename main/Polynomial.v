@@ -2618,6 +2618,7 @@ do 4 rewrite fold_merge_same_deg.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
 do 2 rewrite fold_monl_norm.
+do 2 rewrite fold_isort.
 ...
 Search (isort _ (filter _ _)).
 rewrite sorted_isort_filter.
