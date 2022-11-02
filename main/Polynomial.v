@@ -2480,9 +2480,43 @@ unfold monl_add, monl_norm.
 f_equal.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+assert (Href : reflexive rel). {
+  unfold rel; intros a.
+  apply Nat.leb_refl.
+}
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
 (* inspiré de merge_same_deg_isort_app_comm *)
-(* pas applicable ici, mais pour réfléchir *)
-Check sorted_sorted_permuted_not_antisym.
+remember (isort rel (filter f (merge_same_deg (isort rel (P ++ Q))) ++ R)) as lab eqn:Hlab.
+remember (isort rel (filter f (merge_same_deg (isort rel (P ++ R))) ++ Q)) as lba eqn:Hlba.
+move lba before lab.
+specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
+specialize (Hrr (Mon 0 0) lab lba).
+assert (Hsab : sorted rel lab) by now rewrite Hlab; apply sorted_isort.
+specialize (Hrr Hsab).
+assert (Hsba : sorted rel lba) by now rewrite Hlba; apply sorted_isort.
+specialize (Hrr Hsba).
+assert (Hpab : permutation monom_eqb lab lba). {
+  rewrite Hlab, Hlba.
+...
+  apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
+    apply permuted_isort, monom_eqb_eq.
+  }
+  apply (permutation_trans monom_eqb_eq) with (lb := la ++ lb). {
+    apply (permutation_sym monom_eqb_eq).
+    apply permuted_isort, monom_eqb_eq.
+  }
+  apply (permutation_app_comm monom_eqb_eq).
+}
+specialize (Hrr Hpab).
 ...
 remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
 remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
