@@ -2474,7 +2474,27 @@ Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   → is_canon_monl R = true
   → monl_norm (monl_norm (P ++ Q) ++ R) = monl_norm (monl_norm (P ++ R) ++ Q).
 Proof.
-(*
+(**)
+intros * PP PQ PR.
+unfold monl_add, monl_norm.
+f_equal.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+(* inspiré de merge_same_deg_isort_app_comm *)
+(* pas applicable ici, mais pour réfléchir *)
+Check sorted_sorted_permuted_not_antisym.
+...
+remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+move lba before lab.
+...
+specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
+specialize (Hrr (Mon 0 0) lab lba).
+...
+f_equal.
+remember (isort rel (la ++ lb)) as lab eqn:Hlab; symmetry in Hlab.
+remember (isort rel (lb ++ la)) as lba eqn:Hlba; symmetry in Hlba.
+...
 intros * PP PQ PR.
 set (has_deg := λ d (m : monom T), mdeg m =? d).
 assert
@@ -2603,7 +2623,6 @@ rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
 f_equal.
 (**)
 ...
-*)
 intros * PP PQ PR.
 revert Q R PQ PR.
 induction P as [| ma la]; intros. {
