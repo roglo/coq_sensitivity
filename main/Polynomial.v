@@ -2506,14 +2506,14 @@ assert (Hsba : sorted rel lba) by now rewrite Hlba; apply sorted_isort.
 specialize (Hrr Hsba).
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite Hlab, Hlba.
-...
-  apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
-    apply permuted_isort, monom_eqb_eq.
+  eapply (permutation_trans monom_eqb_eq). 2: {
+    apply (permuted_isort _ monom_eqb_eq).
   }
-  apply (permutation_trans monom_eqb_eq) with (lb := la ++ lb). {
+  eapply (permutation_trans monom_eqb_eq). {
     apply (permutation_sym monom_eqb_eq).
-    apply permuted_isort, monom_eqb_eq.
+    apply (permuted_isort _ monom_eqb_eq).
   }
+...
   apply (permutation_app_comm monom_eqb_eq).
 }
 specialize (Hrr Hpab).
