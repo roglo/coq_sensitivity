@@ -2498,6 +2498,7 @@ assert (Htra : transitive rel). {
 remember (isort rel (monl_norm (P ++ Q) ++ R)) as lab eqn:Hlab.
 remember (isort rel (monl_norm (P ++ R) ++ Q)) as lba eqn:Hlba.
 move lba before lab.
+(**)
 ...
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
@@ -2514,8 +2515,12 @@ assert (Hpab : permutation monom_eqb lab lba). {
     apply (permutation_sym monom_eqb_eq).
     apply (permuted_isort _ monom_eqb_eq).
   }
-  do 2 rewrite fold_monl_norm.
 (* je crois bien que c'est faux, ça *)
+...
+x -x 1
+monl_norm (P + Q) + R = 1
+monl_norm (P + R) + Q = x+1 -x
+  do 2 rewrite fold_monl_norm.
 ...
   apply (permutation_app_comm monom_eqb_eq).
 }
