@@ -2476,10 +2476,13 @@ Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
 Proof.
 (**)
 intros * PP PQ PR.
-unfold monl_add, monl_norm.
+unfold monl_add.
+unfold monl_norm at 1 3.
 f_equal.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+(*
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
+*)
 assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
@@ -2495,9 +2498,10 @@ assert (Htra : transitive rel). {
   now transitivity (mdeg b).
 }
 (* inspiré de merge_same_deg_isort_app_comm *)
-remember (isort rel (filter f (merge_same_deg (isort rel (P ++ Q))) ++ R)) as lab eqn:Hlab.
-remember (isort rel (filter f (merge_same_deg (isort rel (P ++ R))) ++ Q)) as lba eqn:Hlba.
+remember (isort rel (monl_norm (P ++ Q) ++ R)) as lab eqn:Hlab.
+remember (isort rel (monl_norm (P ++ R) ++ Q)) as lba eqn:Hlba.
 move lba before lab.
+...
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
 assert (Hsab : sorted rel lab) by now rewrite Hlab; apply sorted_isort.
@@ -2513,6 +2517,8 @@ assert (Hpab : permutation monom_eqb lab lba). {
     apply (permutation_sym monom_eqb_eq).
     apply (permuted_isort _ monom_eqb_eq).
   }
+  do 2 rewrite fold_monl_norm.
+(* je crois bien que c'est faux, ça *)
 ...
   apply (permutation_app_comm monom_eqb_eq).
 }
