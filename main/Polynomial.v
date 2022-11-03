@@ -2478,11 +2478,8 @@ Proof.
 intros * PP PQ PR.
 unfold monl_add.
 unfold monl_norm at 1 3.
-f_equal.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-(*
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
-*)
 assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
