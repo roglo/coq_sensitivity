@@ -669,6 +669,7 @@ Qed.
 
 (* canon polyn addition *)
 
+(*
 Theorem canon_polyn_add_prop : ∀ pa pb,
   is_canon_polyn (polyn_norm (cp_polyn pa + cp_polyn pb)) = true.
 Proof.
@@ -682,6 +683,48 @@ Qed.
 Definition canon_polyn_add (pa pb : canon_polyn T) :=
   mk_canon_polyn (polyn_norm (polyn_add (cp_polyn pa) (cp_polyn pb)))
     (canon_polyn_add_prop pa pb).
+*)
+
+Definition canon_monl_add (la lb : list (monom T)) :=
+  filter (λ ma, (mcoeff ma ≠? 0)%F)
+    (merge (λ ma mb, mdeg mb <=? mdeg ma) la lb).
+
+Theorem polyn_add_prop : ∀ pa pb,
+  is_canon_polyn pa = true
+  → is_canon_polyn pb = true
+  → is_canon_polyn (mk_polyn (canon_monl_add (monl pa) (monl pb))) = true.
+Proof.
+intros * ppa ppb.
+destruct pa as (la).
+destruct pb as (lb).
+unfold is_canon_polyn in ppa, ppb |-*.
+cbn in ppa, ppb |-*.
+Print is_canon_monl.
+...
+
+Theorem canon_polyn_add_prop : ∀ pa pb,
+  is_canon_polyn
+    (mk_polyn (canon_monl_add (monl (cp_polyn pa)) (monl (cp_polyn pb)))) =
+  true.
+Proof.
+intros.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+... ...
+now apply polyn_add_prop.
+...
+
+Definition canon_polyn_add (pa pb : canon_polyn T) :=
+  mk_canon_polyn
+    (mk_polyn (canon_monl_add (monl (cp_polyn pa)) (monl (cp_polyn pb))))
+    (canon_polyn_add_prop pa pb).
+
+...
+
+Check canon_polyn_add.
+
+
+(**)
 
 (* canon polyn multiplication *)
 
@@ -2494,12 +2537,13 @@ assert (Htra : transitive rel). {
   apply Nat.leb_le.
   now transitivity (mdeg b).
 }
+(**)
+f_equal.
+...
 (* inspiré de merge_same_deg_isort_app_comm *)
 remember (isort rel (monl_norm (P ++ Q) ++ R)) as lab eqn:Hlab.
 remember (isort rel (monl_norm (P ++ R) ++ Q)) as lba eqn:Hlba.
 move lba before lab.
-(**)
-...
 specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
 specialize (Hrr (Mon 0 0) lab lba).
 assert (Hsab : sorted rel lab) by now rewrite Hlab; apply sorted_isort.
