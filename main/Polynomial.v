@@ -90,7 +90,11 @@ Definition polyn_one := mk_polyn [Mon 1 0] : polyn T.
 
 (* addition *)
 
+(*
 Definition monl_add (la lb : list (monom T)) := la ++ lb.
+*)
+Definition monl_add (la lb : list (monom T)) :=
+  merge (λ ma mb, mdeg mb <=? mdeg ma) la lb.
 
 (*
 End a.
@@ -670,7 +674,7 @@ Qed.
 (* canon polyn addition *)
 
 (**)
-Theorem canon_polyn_add_prop : ∀ pa pb,
+Theorem old_canon_polyn_add_prop : ∀ pa pb,
   is_canon_polyn (polyn_norm (cp_polyn pa + cp_polyn pb)) = true.
 Proof.
 intros.
@@ -684,15 +688,11 @@ Definition old_polyn_add (P Q : polyn T) := polyn_norm (polyn_add P Q).
 
 Definition old_canon_polyn_add (pa pb : canon_polyn T) :=
   mk_canon_polyn (old_polyn_add (cp_polyn pa) (cp_polyn pb))
-    (canon_polyn_add_prop pa pb).
+    (old_canon_polyn_add_prop pa pb).
 (**)
 
 Definition canon_monl_add (la lb : list (monom T)) :=
-  filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_same_deg (merge (λ ma mb, mdeg mb <=? mdeg ma) la lb)).
-
-Definition polyn_add' (P Q : polyn T) :=
-  mk_polyn (canon_monl_add (monl P) (monl Q)).
+  filter (λ ma, (mcoeff ma ≠? 0)%F) (merge_same_deg (monl_add la lb)).
 
 (*
 End a.
@@ -710,10 +710,13 @@ Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»)
 ...
 *)
 
+Definition polyn_add_when_canon (P Q : polyn T) :=
+  mk_polyn (canon_monl_add (monl P) (monl Q)).
+
 Theorem polyn_add_prop : ∀ pa pb,
   is_canon_polyn pa = true
   → is_canon_polyn pb = true
-  → is_canon_polyn (polyn_add' pa pb) = true.
+  → is_canon_polyn (polyn_add_when_canon pa pb) = true.
 Proof.
 intros * ppa ppb.
 destruct pa as (la).
@@ -766,7 +769,7 @@ fold (fnz mc).
 ...
 
 Theorem canon_polyn_add_prop : ∀ pa pb,
-  is_canon_polyn (polyn_add' (cp_polyn pa) (cp_polyn pb)) = true.
+  is_canon_polyn (polyn_add_when_canon (cp_polyn pa) (cp_polyn pb)) = true.
 Proof.
 intros.
 destruct pa as (pa, ppa).
@@ -774,10 +777,10 @@ destruct pb as (pb, ppb).
 cbn.
 ... ...
 now apply polyn_add_prop.
-...
+Qed.
 
 Definition canon_polyn_add (pa pb : canon_polyn T) :=
-  mk_canon_polyn (polyn_add' (cp_polyn pa) (cp_polyn pb))
+  mk_canon_polyn (polyn_add_when_canon (cp_polyn pa) (cp_polyn pb))
     (canon_polyn_add_prop pa pb).
 
 ...
