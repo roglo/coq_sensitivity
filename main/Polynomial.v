@@ -1862,11 +1862,27 @@ destruct b as (pb, ppb).
 move pb before pa.
 apply canon_polyn_eq_eq; cbn.
 (**)
-unfold polyn_add_when_canon.
+specialize (polyn_add_prop _ _ ppa ppb) as Hab.
+specialize (polyn_add_prop _ _ ppb ppa) as Hba.
+unfold polyn_add_when_canon in Hab, Hba |-*.
 f_equal.
-unfold canon_monl_add.
+unfold canon_monl_add in Hab, Hba |-*.
 f_equal.
-Print monl_add.
+unfold monl_add.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+...
+destruct pa as (la).
+destruct pb as (lb).
+unfold is_canon_polyn in ppa, ppb.
+cbn in ppa, ppb |-*.
+do 2 rewrite fold_merge_same_deg.
+Search is_canon_polyn.
+...
+polyn_add_prop:
+  ∀ pa pb : polyn T,
+    is_canon_polyn pa = true
+    → is_canon_polyn pb = true
+      → is_canon_polyn (polyn_add_when_canon pa pb) = true
 ...
 unfold polyn_add, polyn_norm.
 cbn - [ merge_same_deg ].
