@@ -2849,6 +2849,10 @@ Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
     canon_monl_add (canon_monl_add P R) Q.
 Proof.
 intros * HP HQ HR.
+unfold canon_monl_add; f_equal.
+set (f := λ ma, (mcoeff ma ≠? 0)%F).
+unfold monl_add.
+set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 ...
 
 Theorem canon_polyn_add_add_swap :
