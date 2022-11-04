@@ -689,40 +689,42 @@ Definition canon_monl_add (la lb : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
     (merge (λ ma mb, mdeg mb <=? mdeg ma) la lb).
 
+Definition polyn_add' (P Q : polyn T) :=
+  mk_polyn (canon_monl_add (monl P) (monl Q)).
+
 Theorem polyn_add_prop : ∀ pa pb,
   is_canon_polyn pa = true
   → is_canon_polyn pb = true
-  → is_canon_polyn (mk_polyn (canon_monl_add (monl pa) (monl pb))) = true.
+  → is_canon_polyn (polyn_add' pa pb) = true.
 Proof.
 intros * ppa ppb.
 destruct pa as (la).
 destruct pb as (lb).
 unfold is_canon_polyn in ppa, ppb |-*.
 cbn in ppa, ppb |-*.
-Print is_canon_monl.
+set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F).
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+unfold is_canon_monl in ppa, ppb |-*.
+apply Bool.andb_true_iff in ppa, ppb.
+apply Bool.andb_true_iff.
 ...
 
 Theorem canon_polyn_add_prop : ∀ pa pb,
-  is_canon_polyn
-    (mk_polyn (canon_monl_add (monl (cp_polyn pa)) (monl (cp_polyn pb)))) =
-  true.
+  is_canon_polyn (polyn_add' (cp_polyn pa) (cp_polyn pb)) = true.
 Proof.
 intros.
 destruct pa as (pa, ppa).
 destruct pb as (pb, ppb).
+cbn.
 ... ...
 now apply polyn_add_prop.
 ...
 
 Definition canon_polyn_add (pa pb : canon_polyn T) :=
-  mk_canon_polyn
-    (mk_polyn (canon_monl_add (monl (cp_polyn pa)) (monl (cp_polyn pb))))
+  mk_canon_polyn (polyn_add' (cp_polyn pa) (cp_polyn pb))
     (canon_polyn_add_prop pa pb).
 
 ...
-
-Check canon_polyn_add.
-
 
 (**)
 
