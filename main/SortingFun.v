@@ -461,6 +461,10 @@ Fixpoint msort_loop {A} (rel : A → A → bool) it la :=
 Definition msort {A} (rel : A → _) la :=
   msort_loop rel (length la) la.
 
+Theorem fold_merge : ∀ A (rel : A → _) la lb,
+  merge_loop rel (length la + length lb) la lb = merge rel la lb.
+Proof. easy. Qed.
+
 (* *)
 
 Theorem split_list_nil_l : ∀ A (la lb : list A),

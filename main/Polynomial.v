@@ -737,8 +737,32 @@ assert (H : ∀ mb, mb ∈ lb → fnz mb = true). {
   now apply (proj2 (all_true_and_list_true_iff _ _ _) Hcb).
 }
 clear Hcb; rename H into Hcb.
-rewrite fold_merge_same_deg.
+rewrite fold_merge_same_deg, fold_merge.
+rewrite fold_sorted in Hsa, Hsb |-*.
+assert (Htrr' : transitive rel'). {
+  intros ma mb mc Hmab Hmbc.
+  apply Nat.ltb_lt in Hmab, Hmbc.
+  apply Nat.ltb_lt.
+  now transitivity (mdeg mb).
+}
+assert (Httr : total_relation rel). {
+  intros ma mb.
+  unfold rel; cbn.
+  apply Nat_leb_total_relation.
+}
 split. {
+  apply (sorted_filter Htrr').
+  apply sorted_le_sorted_lt_merge_same_deg.
+  fold rel.
+  apply sorted_merge; [ easy | | ]. {
+    now apply sorted_lt_sorted_le_mdeg.
+  } {
+    now apply sorted_lt_sorted_le_mdeg.
+  }
+}
+apply all_true_and_list_true_iff.
+intros mc Hmc.
+fold (fnz mc).
 ...
 
 Theorem canon_polyn_add_prop : ∀ pa pb,
