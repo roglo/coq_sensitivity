@@ -689,7 +689,7 @@ Definition old_canon_polyn_add (pa pb : canon_polyn T) :=
 
 Definition canon_monl_add (la lb : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge_same_deg ((merge (λ ma mb, mdeg mb <=? mdeg ma) la lb))).
+    (merge_same_deg (merge (λ ma mb, mdeg mb <=? mdeg ma) la lb)).
 
 Definition polyn_add' (P Q : polyn T) :=
   mk_polyn (canon_monl_add (monl P) (monl Q)).
