@@ -766,7 +766,8 @@ split. {
 apply all_true_and_list_true_iff.
 intros mc Hmc.
 fold (fnz mc).
-...
+now apply filter_In in Hmc.
+Qed.
 
 Theorem canon_polyn_add_prop : ∀ pa pb,
   is_canon_polyn (polyn_add_when_canon (cp_polyn pa) (cp_polyn pb)) = true.
@@ -775,15 +776,12 @@ intros.
 destruct pa as (pa, ppa).
 destruct pb as (pb, ppb).
 cbn.
-... ...
 now apply polyn_add_prop.
 Qed.
 
 Definition canon_polyn_add (pa pb : canon_polyn T) :=
   mk_canon_polyn (polyn_add_when_canon (cp_polyn pa) (cp_polyn pb))
     (canon_polyn_add_prop pa pb).
-
-...
 
 (**)
 
