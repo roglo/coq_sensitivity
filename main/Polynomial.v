@@ -1843,6 +1843,7 @@ f_equal; f_equal.
 now apply (rngl_summation_list_permut _ monom_eqb_eq).
 Qed.
 
+(*
 Theorem monl_norm_add_comm : ∀ (la lb : list (monom T)),
   monl_norm (monl_add la lb) = monl_norm (monl_add lb la).
 Proof.
@@ -1851,6 +1852,7 @@ unfold monl_add, monl_norm.
 f_equal.
 apply merge_same_deg_isort_app_comm.
 Qed.
+*)
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
@@ -1859,6 +1861,13 @@ destruct a as (pa, ppa).
 destruct b as (pb, ppb).
 move pb before pa.
 apply canon_polyn_eq_eq; cbn.
+(**)
+unfold polyn_add_when_canon.
+f_equal.
+unfold canon_monl_add.
+f_equal.
+Print monl_add.
+...
 unfold polyn_add, polyn_norm.
 cbn - [ merge_same_deg ].
 f_equal.
