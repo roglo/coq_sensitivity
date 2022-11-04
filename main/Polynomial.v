@@ -669,7 +669,7 @@ Qed.
 
 (* canon polyn addition *)
 
-(*
+(**)
 Theorem canon_polyn_add_prop : ∀ pa pb,
   is_canon_polyn (polyn_norm (cp_polyn pa + cp_polyn pb)) = true.
 Proof.
@@ -680,17 +680,35 @@ move pb before pa; cbn.
 apply polyn_norm_is_canon_polyn.
 Qed.
 
-Definition canon_polyn_add (pa pb : canon_polyn T) :=
-  mk_canon_polyn (polyn_norm (polyn_add (cp_polyn pa) (cp_polyn pb)))
+Definition old_polyn_add (P Q : polyn T) := polyn_norm (polyn_add P Q).
+
+Definition old_canon_polyn_add (pa pb : canon_polyn T) :=
+  mk_canon_polyn (old_polyn_add (cp_polyn pa) (cp_polyn pb))
     (canon_polyn_add_prop pa pb).
-*)
+(**)
 
 Definition canon_monl_add (la lb : list (monom T)) :=
   filter (λ ma, (mcoeff ma ≠? 0)%F)
-    (merge (λ ma mb, mdeg mb <=? mdeg ma) la lb).
+    (merge_same_deg ((merge (λ ma mb, mdeg mb <=? mdeg ma) la lb))).
 
 Definition polyn_add' (P Q : polyn T) :=
   mk_polyn (canon_monl_add (monl P) (monl Q)).
+
+(*
+End a.
+Arguments is_canon_polyn {T ro} p.
+Arguments old_polyn_add {T ro} (P Q)%P.
+Arguments polyn_add' {T ro} (P Q)%P.
+Require Import ZArith RnglAlg.Zrl.
+Open Scope Z_scope.
+Compute (old_polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (polyn_add' «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + 5*☓^2 + 8*☓»).
+Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
+Compute (old_polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
+Compute (polyn_add' «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
+Compute (polyn_add «3*☓^5 + 5*☓^2 + 8*☓» «3*☓^5 + (-5)*☓^2 + 7·»).
+...
+*)
 
 Theorem polyn_add_prop : ∀ pa pb,
   is_canon_polyn pa = true
@@ -702,11 +720,25 @@ destruct pa as (la).
 destruct pb as (lb).
 unfold is_canon_polyn in ppa, ppb |-*.
 cbn in ppa, ppb |-*.
-set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F).
+set (fnz := λ ma : monom T, (mcoeff ma ≠? 0)%F).
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
 unfold is_canon_monl in ppa, ppb |-*.
+set (rel' := λ ma mb, mdeg mb <? mdeg ma) in ppa, ppb |-*.
+move rel' after rel.
 apply Bool.andb_true_iff in ppa, ppb.
 apply Bool.andb_true_iff.
+destruct ppa as (Hsa, Hca).
+destruct ppb as (Hsb, Hcb).
+assert (H : ∀ ma, ma ∈ la → fnz ma = true). {
+  now apply (proj2 (all_true_and_list_true_iff _ _ _) Hca).
+}
+clear Hca; rename H into Hca.
+assert (H : ∀ mb, mb ∈ lb → fnz mb = true). {
+  now apply (proj2 (all_true_and_list_true_iff _ _ _) Hcb).
+}
+clear Hcb; rename H into Hcb.
+rewrite fold_merge_same_deg.
+split. {
 ...
 
 Theorem canon_polyn_add_prop : ∀ pa pb,
