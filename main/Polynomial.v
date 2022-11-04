@@ -1854,6 +1854,7 @@ apply merge_same_deg_isort_app_comm.
 Qed.
 *)
 
+(*
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
@@ -1889,6 +1890,7 @@ cbn - [ merge_same_deg ].
 f_equal.
 apply monl_norm_add_comm.
 Qed.
+*)
 
 Theorem canon_monl_is_filter_deg_non_zero : ∀ (P : list (monom T)),
   is_canon_monl P = true
@@ -2595,6 +2597,7 @@ Theorem fold_monl_norm : ∀ P : list (monom T),
     (merge_same_deg (isort (λ ma mb, mdeg mb <=? mdeg ma) P)) = monl_norm P.
 Proof. easy. Qed.
 
+(*
 Theorem canon_monl_norm_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2827,6 +2830,26 @@ split. 2: {
   intros ma i.
   rename g into has_deg.
 ...
+*)
+
+Theorem fold_monl_add : ∀ la lb : list (monom T),
+  merge (λ ma mb, mdeg mb <=? mdeg ma) la lb = monl_add la lb.
+Proof. easy. Qed.
+
+Theorem fold_canon_monl_add : ∀ la lb : list (monom T),
+  filter (λ ma, (mcoeff ma ≠? 0)%F) (merge_same_deg (monl_add la lb)) =
+  canon_monl_add la lb.
+Proof. easy. Qed.
+
+Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
+  is_canon_monl P = true
+  → is_canon_monl Q = true
+  → is_canon_monl R = true
+  → canon_monl_add (canon_monl_add P Q) R =
+    canon_monl_add (canon_monl_add P R) Q.
+Proof.
+intros * HP HQ HR.
+...
 
 Theorem canon_polyn_add_add_swap :
   ∀ a b c : canon_polyn T, (a + b + c)%F = (a + c + b)%F.
@@ -2834,6 +2857,20 @@ Proof.
 intros P Q R; cbn.
 apply canon_polyn_eq_eq; cbn.
 (**)
+unfold polyn_add_when_canon; f_equal.
+destruct P as ((P), PP).
+destruct Q as ((Q), PQ).
+destruct R as ((R), PR); cbn - [ monl_norm ].
+move Q before P; move R before Q.
+unfold is_canon_polyn in PP, PQ, PR.
+cbn in PP, PQ, PR.
+do 4 rewrite fold_merge_same_deg.
+do 4 rewrite fold_merge.
+do 4 rewrite fold_monl_add.
+do 4 rewrite fold_canon_monl_add.
+... ...
+now apply canon_monl_add_add_swap.
+...
 unfold polyn_norm; f_equal.
 cbn - [ monl_norm ].
 destruct P as ((P), PP).
