@@ -1854,7 +1854,7 @@ apply merge_same_deg_isort_app_comm.
 Qed.
 *)
 
-(*
+(**)
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
 intros; cbn.
@@ -2841,6 +2841,16 @@ Theorem fold_canon_monl_add : ∀ la lb : list (monom T),
   canon_monl_add la lb.
 Proof. easy. Qed.
 
+Theorem merge_loop_nil_l : ∀ A (rel : A → _) it P,
+  length P ≤ it
+  → merge_loop rel it [] P = P.
+Proof.
+intros * HP.
+destruct it; [ | easy ].
+apply Nat.le_0_r in HP.
+now apply length_zero_iff_nil in HP; subst P.
+Qed.
+
 Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -2853,6 +2863,14 @@ unfold canon_monl_add; f_equal.
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
 unfold monl_add.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+revert Q R HQ HR.
+induction P as [| ma]; intros; cbn. {
+  do 4 rewrite fold_merge_same_deg.
+  do 2 rewrite fold_merge.
+  do 2 rewrite fold_monl_add.
+  rewrite merge_loop_nil_l; [ | easy ].
+  rewrite merge_loop_nil_l; [ | easy ].
+Check monl_add_comm.
 ...
 
 Theorem canon_polyn_add_add_swap :
