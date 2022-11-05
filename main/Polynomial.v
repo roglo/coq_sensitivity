@@ -1939,7 +1939,27 @@ rewrite fold_merge_same_deg.
 rewrite fold_merge.
 replace (S (length la)) with (length (ma :: la)) by easy.
 rewrite fold_merge.
-destruct lb as [| lb]; [ easy | ].
+destruct lb as [| mb]; [ easy | ].
+unfold rel at 1.
+rewrite if_leb_le_dec.
+destruct (le_dec (mdeg mb) (mdeg ma)) as [Hlba| Hlba]. {
+  cbn; do 2 rewrite fold_merge_same_deg.
+  unfold rel at 2.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (mdeg ma) (mdeg mb)) as [Hlab| Hlab]. {
+    cbn; rewrite fold_merge_same_deg.
+    rewrite <- Nat.add_succ_comm; cbn.
+    rewrite fold_merge_same_deg.
+Search same_deg_sum_coeff.
+...
+Print merge.
+Theorem merge_cons_r : ∀ A (rel : A → _) la lb mb,
+  merge rel la (mb :: lb) =
+Proof.
+intros.
+unfold merge; cbn.
+rewrite <- Nat.add_succ_comm; cbn.
+destruct la as [| ma]. {
 ...
 Search (merge_loop _ _ [] _).
 ...
