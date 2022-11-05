@@ -1854,6 +1854,26 @@ apply merge_same_deg_isort_app_comm.
 Qed.
 *)
 
+Theorem merge_loop_nil_l : ∀ A (rel : A → _) it P,
+  length P ≤ it
+  → merge_loop rel it [] P = P.
+Proof.
+intros * HP.
+destruct it; [ | easy ].
+apply Nat.le_0_r in HP.
+now apply length_zero_iff_nil in HP; subst P.
+Qed.
+
+Theorem merge_loop_nil_r : ∀ A (rel : A → _) it P,
+  length P ≤ it
+  → merge_loop rel it P [] = P.
+Proof.
+intros * HP.
+destruct it; [ | now destruct P ].
+apply Nat.le_0_r in HP.
+now apply length_zero_iff_nil in HP; subst P.
+Qed.
+
 (**)
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
@@ -1863,21 +1883,73 @@ destruct b as (pb, ppb).
 move pb before pa.
 apply canon_polyn_eq_eq; cbn.
 (**)
+(*
 specialize (polyn_add_prop _ _ ppa ppb) as Hab.
 specialize (polyn_add_prop _ _ ppb ppa) as Hba.
-unfold polyn_add_when_canon in Hab, Hba |-*.
+unfold polyn_add_when_canon in Hab, Hba.
+*)
+unfold polyn_add_when_canon.
 f_equal.
-unfold canon_monl_add in Hab, Hba |-*.
+(*
+unfold canon_monl_add in Hab, Hba.
+*)
+unfold canon_monl_add.
 f_equal.
 unfold monl_add.
 set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-...
 destruct pa as (la).
 destruct pb as (lb).
 unfold is_canon_polyn in ppa, ppb.
+(*
+unfold is_canon_polyn in Hab, Hba.
+*)
 cbn in ppa, ppb |-*.
+(*
+cbn in Hab, Hba.
+*)
 do 2 rewrite fold_merge_same_deg.
-Search is_canon_polyn.
+(*
+rewrite fold_merge in Hab, Hba.
+rewrite fold_merge_same_deg in Hab, Hba.
+*)
+unfold is_canon_monl in ppa, ppb.
+apply Bool.andb_true_iff in ppa, ppb.
+destruct ppa as (Hsa, H1).
+destruct ppb as (Hsb, H2).
+set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F) in H1, H2.
+set (rel' := λ ma mb, mdeg mb <? mdeg ma) in Hsa, Hsb.
+move rel' after rel.
+assert (Ha : ∀ ma : monom T, ma ∈ la → f ma = true). {
+  now apply all_true_and_list_true_iff.
+}
+assert (Hb : ∀ mb : monom T, mb ∈ lb → f mb = true). {
+  now apply all_true_and_list_true_iff.
+}
+clear H1 H2.
+move f before rel'.
+revert lb Hsb Hb.
+induction la as [| ma]; intros; cbn. {
+  rewrite Nat.add_0_r.
+  rewrite fold_merge_same_deg.
+  rewrite merge_loop_nil_l; [ | easy ].
+  rewrite merge_loop_nil_r; [ | easy ].
+  easy.
+}
+rewrite fold_merge_same_deg.
+rewrite fold_merge.
+replace (S (length la)) with (length (ma :: la)) by easy.
+rewrite fold_merge.
+destruct lb as [| lb]; [ easy | ].
+...
+Search (merge_loop _ _ [] _).
+...
+rewrite isort_when_sorted. 2: {
+  now apply sorted_lt_sorted_le_mdeg.
+}
+now rewrite (sorted_lt_merge_same_deg Hs).
+...
+specialize (proj2 (all_true_and_list_true_iff _ _ _) H) as H1.
+cbn in H1.
 ...
 polyn_add_prop:
   ∀ pa pb : polyn T,
@@ -2840,16 +2912,6 @@ Theorem fold_canon_monl_add : ∀ la lb : list (monom T),
   filter (λ ma, (mcoeff ma ≠? 0)%F) (merge_same_deg (monl_add la lb)) =
   canon_monl_add la lb.
 Proof. easy. Qed.
-
-Theorem merge_loop_nil_l : ∀ A (rel : A → _) it P,
-  length P ≤ it
-  → merge_loop rel it [] P = P.
-Proof.
-intros * HP.
-destruct it; [ | easy ].
-apply Nat.le_0_r in HP.
-now apply length_zero_iff_nil in HP; subst P.
-Qed.
 
 Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
