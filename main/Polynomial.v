@@ -1915,10 +1915,53 @@ split; intros Ha. {
     destruct Ha as [Ha| Ha]; [ now left; right | now right ].
   } {
     destruct Ha as [Ha| Ha]; [ now right; left | ].
-...
-    apply IHla in Ha.
-    destruct Ha as [Ha| Ha]; [ now left; right | now right ].
-...
+    revert lb Ha.
+    induction lb as [| b']; intros; [ now left | ].
+    rewrite merge_cons_cons in Ha.
+    destruct (rel a' b'). {
+      destruct Ha as [Ha| Ha]; [ now left; left | ].
+      apply IHla in Ha.
+      destruct Ha as [Ha| Ha]; [ now left; right | now right; right ].
+    } {
+      destruct Ha as [Ha| Ha]; [ now right; right; left | ].
+      specialize (IHlb Ha).
+      destruct IHlb as [Hb| Hb]; [ now left | right ].
+      destruct Hb as [Hb| Hb]; [ now left | now right; right ].
+    }
+  }
+}
+destruct Ha as [Ha| Ha]. {
+  revert lb.
+  induction la as [| a']; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst a'; clear IHla.
+    induction lb as [| b]; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a b); [ now left | right; apply IHlb ].
+  } {
+    specialize (IHla Ha).
+    induction lb as [| b]; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ | right; apply IHlb ].
+    right; apply IHla.
+  }
+} {
+  revert la.
+  induction lb as [| b]; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
+    induction la as [| a']; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' a); [ right; apply IHla | now left ].
+  } {
+    specialize (IHlb Ha).
+    induction la as [| a']; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ right; apply IHla | ].
+    right; apply IHlb.
+  }
+}
+Qed.
 
 (* to be moved to SortingFun.v *)
 Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
@@ -1953,8 +1996,12 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
       specialize (H1 a) as H2.
       assert (H : a ∈ b :: merge rel lb (a :: la)). {
         right.
-... ...
         apply merge_in_iff.
+        now right; left.
+      }
+      specialize (H2 H); clear H.
+      now rewrite (equality_refl Heqb) in H2.
+    }
 ...
 Search (permutation _ (_ :: _)).
 select_first_permutation:
