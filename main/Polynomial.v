@@ -2009,9 +2009,41 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
       cbn in Haft.
       injection Haft; clear Haft; intros; subst b aft.
       clear Hba Hbef; cbn.
+(**)
+      eapply (permutation_trans Heqb); [ apply IHla | ].
+...
       destruct lb as [| b]. {
         cbn.
         eapply (permutation_trans Heqb); [ apply IHla | ].
+        clear IHla.
+        induction la as [| a']; [ apply (permutation_refl Heqb) | ].
+        unfold merge.
+        remember (a' :: la) as lb; cbn; subst lb.
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Haa'| Haa']. {
+          apply (permutation_refl Heqb).
+        }
+        replace (merge_loop _ _ _ _) with (merge rel [a] la) by easy.
+        eapply (permutation_trans Heqb); [ | apply (permutation_swap Heqb) ].
+        apply permutation_skip; [ now intros x; apply Heqb | easy ].
+      }
+      eapply (permutation_trans Heqb); [ apply IHla | ].
+      rewrite merge_cons_cons.
+      remember (b :: lb) as lc; cbn; subst lc.
+      rewrite fold_merge.
+      destruct la as [| a']. {
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Hba| Hba]. {
+        eapply (permutation_trans Heqb). {
+          apply (permutation_swap Heqb).
+        }
+        apply permutation_skip; [ now intros x; apply Heqb | ].
+...
+  ============================
+  permutation eqb (a :: lb) (merge rel lb [a])
+...
+
+Search (permutation _ (_ :: _) (_ :: _)).
 ...
         cbn.
         destruct la as [| a']; [ apply (permutation_refl Heqb) | ].
