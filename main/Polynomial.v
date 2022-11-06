@@ -1875,47 +1875,20 @@ now apply length_zero_iff_nil in HP; subst P.
 Qed.
 
 (**)
-Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
+
+Theorem merge_same_deg_merge_comm : ∀ la lb : list (monom T),
+  let rel := λ ma mb, mdeg mb <=? mdeg ma in
+  is_canon_monl la = true
+  → is_canon_monl lb = true
+  → merge_same_deg (merge rel la lb) =
+    merge_same_deg (merge rel lb la).
 Proof.
-intros; cbn.
-destruct a as (pa, ppa).
-destruct b as (pb, ppb).
-move pb before pa.
-apply canon_polyn_eq_eq; cbn.
-(**)
-(*
-specialize (polyn_add_prop _ _ ppa ppb) as Hab.
-specialize (polyn_add_prop _ _ ppb ppa) as Hba.
-unfold polyn_add_when_canon in Hab, Hba.
-*)
-unfold polyn_add_when_canon.
-f_equal.
-(*
-unfold canon_monl_add in Hab, Hba.
-*)
-unfold canon_monl_add.
-f_equal.
-unfold monl_add.
-set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-destruct pa as (la).
-destruct pb as (lb).
-unfold is_canon_polyn in ppa, ppb.
-(*
-unfold is_canon_polyn in Hab, Hba.
-*)
-cbn in ppa, ppb |-*.
-(*
-cbn in Hab, Hba.
-*)
-do 2 rewrite fold_merge_same_deg.
-(*
-rewrite fold_merge in Hab, Hba.
-rewrite fold_merge_same_deg in Hab, Hba.
-*)
+intros * ppa ppb.
 unfold is_canon_monl in ppa, ppb.
 apply Bool.andb_true_iff in ppa, ppb.
 destruct ppa as (Hsa, H1).
 destruct ppb as (Hsb, H2).
+rewrite fold_sorted in Hsa, Hsb.
 set (f := λ ma : monom T, (mcoeff ma ≠? 0)%F) in H1, H2.
 set (rel' := λ ma mb, mdeg mb <? mdeg ma) in Hsa, Hsb.
 move rel' after rel.
@@ -1927,7 +1900,306 @@ assert (Hb : ∀ mb : monom T, mb ∈ lb → f mb = true). {
 }
 clear H1 H2.
 move f before rel'.
-do 2 rewrite fold_merge.
+assert (Href : reflexive rel). {
+  unfold rel; intros a.
+  apply Nat.leb_refl.
+}
+assert (Htra : transitive rel). {
+  unfold rel; intros a b c Hab Hbc.
+  apply Nat.leb_le in Hab, Hbc.
+  apply Nat.leb_le.
+  now transitivity (mdeg b).
+}
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
+remember (merge rel la lb) as lab eqn:Hlab; symmetry in Hlab.
+remember (merge rel lb la) as lba eqn:Hlba; symmetry in Hlba.
+move lba before lab.
+specialize (sorted_sorted_permuted_not_antisym monom_eqb_eq Href Htra) as Hrr.
+specialize (Hrr (Mon 0 0) lab lba).
+assert (Hsab : sorted rel lab). {
+  rewrite <- Hlab.
+  apply (sorted_merge Htot).
+  now apply sorted_lt_sorted_le_mdeg.
+  now apply sorted_lt_sorted_le_mdeg.
+}
+specialize (Hrr Hsab).
+assert (Hsba : sorted rel lba). {
+  rewrite <- Hlba.
+  apply (sorted_merge Htot).
+  now apply sorted_lt_sorted_le_mdeg.
+  now apply sorted_lt_sorted_le_mdeg.
+}
+specialize (Hrr Hsba).
+assert (Hpab : permutation monom_eqb lab lba). {
+  rewrite <- Hlab, <- Hlba.
+Search (permutation _ (merge _ _ _)).
+...
+  apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
+    apply permuted_isort, monom_eqb_eq.
+  }
+  apply (permutation_trans monom_eqb_eq) with (lb := la ++ lb). {
+    apply (permutation_sym monom_eqb_eq).
+    apply permuted_isort, monom_eqb_eq.
+  }
+  apply (permutation_app_comm monom_eqb_eq).
+}
+specialize (Hrr Hpab).
+unfold rel in Hrr.
+assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
+  intros i.
+  specialize (Hrr i).
+  destruct Hrr as (H1, H2).
+  apply Nat.leb_le in H1, H2.
+  now apply Nat.le_antisymm.
+}
+clear Hrr.
+clear Hlab Hlba.
+clear la lb.
+rename lab into la.
+rename lba into lb.
+rename Hsab into Hsa.
+rename Hsba into Hsb.
+(**)
+remember (length la) as len eqn:Hlena; symmetry in Hlena.
+assert (Hlenb : length lb = len). {
+  apply permutation_length in Hpab; congruence.
+}
+revert la lb Hsa Hsb Hpab Hdd Hlena Hlenb.
+induction len as (len, IHlen) using lt_wf_rec; intros.
+destruct len. {
+  now apply length_zero_iff_nil in Hlena, Hlenb; subst la lb.
+}
+remember (List_rank (λ mb, mdeg mb ≠? mdeg (hd (Mon 0 0) la)) la) as n eqn:Hn.
+assert (Hpf : permutation monom_eqb (firstn n la) (firstn n lb)). {
+  clear - Heq Hn Hlena Hlenb Hpab Hdd Hsa.
+  rewrite <- Hlenb in Hlena; clear Hlenb.
+  symmetry in Hn.
+  apply (List_rank_if (Mon 0 0)) in Hn.
+  destruct Hn as (Hbn, Hnl).
+  destruct Hnl as [Hnl| Hnl]. 2: {
+    rewrite Hnl at 1.
+    rewrite Hlena in Hnl.
+    rewrite Hnl.
+    now do 2 rewrite firstn_all.
+  }
+  destruct Hnl as (Hnl, Haa).
+  apply (permutation_firstn (0·) monom_eqb_eq) with
+      (P := λ ma, mdeg ma = mdeg (hd (0·) la)); [ | | easy ]. {
+    intros i Hi.
+    specialize (Hbn _ Hi) as H1.
+    apply Bool.negb_false_iff in H1.
+    apply Nat.eqb_eq in H1.
+    split; [ easy | ].
+    now rewrite <- Hdd, H1.
+  } {
+    intros i Hi.
+    apply Bool.negb_true_iff in Haa.
+    apply Nat.eqb_neq in Haa.
+    rewrite <- Hdd.
+    clear - Haa Hsa Hi rel.
+    enough (H : mdeg (nth i la (0·)) ≠ mdeg (hd (0·) la)) by easy.
+    intros Hiz; apply Haa; clear Haa.
+    (* lemma, here, perhaps? *)
+    destruct la as [| ma]; [ now destruct n | ].
+    cbn - [ nth ] in Hiz |-*.
+    destruct n; [ easy | cbn ].
+    destruct i; [ easy | cbn in Hi, Hiz ].
+    assert (H : n ≤ i < length la) by flia Hi.
+    clear Hi; rename H into Hi.
+    destruct Hi as (Hni, Hia).
+    (* or starting the lemma here... *)
+    assert (Htra : transitive rel). {
+      unfold rel; intros a b c Hab Hbc.
+      apply Nat.leb_le in Hab, Hbc.
+      apply Nat.leb_le.
+      now transitivity (mdeg b).
+    }
+    apply (sorted_cons_iff Htra) in Hsa.
+    destruct Hsa as (Hsa, Hba).
+    assert (H : ∀ mb, mb ∈ la → mdeg mb ≤ mdeg ma). {
+      intros mb Hmb.
+      specialize (Hba _ Hmb).
+      now apply Nat.leb_le in Hba.
+    }
+    move H before Hba; clear Hba.
+    rename H into Hba.
+    revert la i Hsa Hba Hiz Hni Hia.
+    induction n; intros. {
+      destruct i; [ easy | ].
+      destruct la as [| mb]; [ easy | ].
+      cbn in Hia |-*; apply Nat.succ_lt_mono in Hia.
+      cbn in Hiz.
+      specialize (Hba _ (or_introl eq_refl)) as H1.
+      apply (sorted_cons_iff Htra) in Hsa.
+      destruct Hsa as (Hsa, Hb'a).
+      specialize (Hb'a (nth i la (0·))) as H2.
+      assert (H : nth i la (0·) ∈ la) by now apply nth_In.
+      specialize (H2 H); clear H.
+      apply Nat.leb_le in H2.
+      rewrite Hiz in H2.
+      now apply Nat.le_antisymm.
+    }
+    destruct i; [ easy | ].
+    destruct la as [| mb]; [ easy | ].
+    cbn in Hiz, Hia |-*; apply Nat.succ_lt_mono in Hia.
+    apply Nat.succ_le_mono in Hni.
+    apply sorted_cons in Hsa.
+    apply IHn with (i := i); [ easy | | easy | easy | easy ].
+    intros mc Hmc.
+    now apply Hba; right.
+  }
+}
+assert (Hps : permutation monom_eqb (skipn n la) (skipn n lb)). {
+  rewrite <- (firstn_skipn n la) in Hpab.
+  rewrite <- (firstn_skipn n lb) in Hpab.
+  apply permutation_app_permutation_l with (la := firstn n la) in Hpab;
+    [ easy | apply monom_eqb_eq | easy ].
+}
+symmetry in Hn.
+apply (List_rank_if (Mon 0 0)) in Hn.
+destruct Hn as (Hbn, Hnl).
+assert (H : ∀ j, j < n → mdeg (nth j la (0·)) = mdeg (hd (0·) la)). {
+  intros j Hj.
+  specialize (Hbn _ Hj).
+  apply Bool.negb_false_iff in Hbn.
+  now apply Nat.eqb_eq in Hbn.
+}
+move H before Hbn; clear Hbn; rename H into Hbn.
+destruct Hnl as [(Hnl, Hdab)| Hnl]. {
+  apply Bool.negb_true_iff in Hdab.
+  apply Nat.eqb_neq in Hdab.
+  assert (H1 : merge_same_deg (firstn n la) = merge_same_deg (firstn n lb)). {
+    apply (IHlen n); [ congruence | | | easy | | | ]. {
+      clear lb len Hdab Hpf Hsb Hpab Hdd Hlenb IHlen Hlena Hps.
+      revert n Hbn Hnl.
+      induction la as [| ma]; intros; [ easy | ].
+      assert (H : sorted rel la) by now apply sorted_cons in Hsa.
+      specialize (IHla H); clear H.
+      destruct n; [ easy | ].
+      cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+      specialize (IHla n); cbn.
+      apply (sorted_cons_iff Htra) in Hsa.
+      apply (sorted_cons_iff Htra).
+      destruct Hsa as (Hsa, Hsb).
+      split. {
+        rewrite <- (firstn_skipn n) in Hsa.
+        now apply (sorted_app_iff Htra) in Hsa.
+      }
+      intros mb Hma.
+      apply Hsb.
+      rewrite <- (firstn_skipn n).
+      now apply in_or_app; left.
+    } {
+      rewrite Hlena, <- Hlenb in Hnl.
+      assert (Hbn' : ∀ j, j < n → (mdeg (nth j lb (0·)) = mdeg (hd (0·) lb))). {
+        intros j Hj.
+        rewrite <- Hdd.
+        rewrite List_hd_nth_0, <- Hdd, <- List_hd_nth_0.
+        now apply Hbn.
+      }
+      clear la len IHlen Hsa Hpab Hdd Hlena Hlenb Hbn Hdab Hpf Hps.
+      rename Hbn' into Hbn.
+      revert n Hbn Hnl.
+      induction lb as [| mb]; intros; [ easy | ].
+      assert (H : sorted rel lb) by now apply sorted_cons in Hsb.
+      specialize (IHlb H); clear H.
+      destruct n; [ easy | ].
+      cbn in Hnl; apply Nat.succ_lt_mono in Hnl.
+      specialize (IHlb n); cbn.
+      apply (sorted_cons_iff Htra) in Hsb.
+      apply (sorted_cons_iff Htra).
+      destruct Hsb as (Hsb, Hsbb).
+      split. {
+        rewrite <- (firstn_skipn n) in Hsb.
+        now apply (sorted_app_iff Htra) in Hsb.
+      }
+      intros ma Hma.
+      apply Hsbb.
+      rewrite <- (firstn_skipn n).
+      now apply in_or_app; left.
+    } {
+      intros i.
+      destruct (lt_dec i n) as [Hin| Hin]. 2: {
+        apply Nat.nlt_ge in Hin.
+        rewrite nth_overflow. 2: {
+          rewrite firstn_length, min_l; [ easy | ].
+          now apply Nat.lt_le_incl.
+        }
+        rewrite nth_overflow. 2: {
+          rewrite firstn_length, min_l; [ easy | ].
+          rewrite Hlenb, <- Hlena.
+          now apply Nat.lt_le_incl.
+        }
+        easy.
+      }
+      rewrite List_nth_firstn; [ | easy ].
+      rewrite List_nth_firstn; [ | easy ].
+      apply Hdd.
+    } {
+      rewrite firstn_length.
+      apply min_l.
+      now apply Nat.lt_le_incl.
+    } {
+      rewrite firstn_length.
+      apply min_l.
+      now rewrite Hlenb, <- Hlena; apply Nat.lt_le_incl.
+    }
+  }
+  assert (H2 : merge_same_deg (skipn n la) = merge_same_deg (skipn n lb)). {
+    destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+      subst n; cbn.
+      now rewrite List_hd_nth_0 in Hdab.
+    }
+    apply (IHlen (length la - n)); [ | | | easy | | | ]. {
+      rewrite Hlena; flia Hnz.
+    } {
+      rewrite <- (firstn_skipn n) in Hsa.
+      now apply (sorted_app_iff Htra) in Hsa.
+    } {
+      rewrite <- (firstn_skipn n) in Hsb.
+      now apply (sorted_app_iff Htra) in Hsb.
+    } {
+      intros i.
+      do 2 rewrite List_nth_skipn.
+      apply Hdd.
+    } {
+      now rewrite skipn_length.
+    } {
+      now rewrite skipn_length, Hlena, <- Hlenb.
+    }
+  }
+  rewrite <- (firstn_skipn n la).
+  rewrite <- (firstn_skipn n lb).
+  rewrite merge_same_deg_app_idemp_r, H2.
+  rewrite <- merge_same_deg_app_idemp_r.
+  rewrite merge_same_deg_app_idemp_l, H1.
+  rewrite <- merge_same_deg_app_idemp_l.
+  easy.
+}
+clear Hpf Hps; subst n.
+clear len IHlen Hlenb Hlena.
+clear Hsa Hsb.
+remember (mdeg (hd (Mon 0 0) la)) as da; clear Heqda.
+move da before lb.
+clear rel Htot Href Htra.
+rewrite merge_same_deg_same_deg with (da := da); [ | easy ].
+rewrite merge_same_deg_same_deg with (da := da). 2: {
+  intros; rewrite <- Hdd; apply Hbn.
+  apply permutation_length in Hpab; congruence.
+}
+destruct la as [| ma]. {
+  destruct lb; [ easy | ].
+  now apply permutation_nil_l in Hpab.
+}
+destruct lb as [| mb]. {
+  now apply permutation_nil_r in Hpab.
+}
+f_equal; f_equal.
+now apply (rngl_summation_list_permut _ monom_eqb_eq).
+Qed.
 ...
 revert lb Hsb Hb.
 induction la as [| ma]; intros; cbn. {
@@ -1984,7 +2256,49 @@ cbn - [ merge_same_deg ].
 f_equal.
 apply monl_norm_add_comm.
 Qed.
+...
+
+Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
+Proof.
+intros; cbn.
+destruct a as (pa, ppa).
+destruct b as (pb, ppb).
+move pb before pa.
+apply canon_polyn_eq_eq; cbn.
+(**)
+(*
+specialize (polyn_add_prop _ _ ppa ppb) as Hab.
+specialize (polyn_add_prop _ _ ppb ppa) as Hba.
+unfold polyn_add_when_canon in Hab, Hba.
 *)
+unfold polyn_add_when_canon.
+f_equal.
+(*
+unfold canon_monl_add in Hab, Hba.
+*)
+unfold canon_monl_add.
+f_equal.
+unfold monl_add.
+set (rel := λ ma mb, mdeg mb <=? mdeg ma).
+destruct pa as (la).
+destruct pb as (lb).
+unfold is_canon_polyn in ppa, ppb.
+(*
+unfold is_canon_polyn in Hab, Hba.
+*)
+cbn in ppa, ppb |-*.
+(*
+cbn in Hab, Hba.
+*)
+do 2 rewrite fold_merge_same_deg.
+(*
+rewrite fold_merge in Hab, Hba.
+rewrite fold_merge_same_deg in Hab, Hba.
+*)
+do 2 rewrite fold_merge.
+... ...
+now apply merge_same_deg_merge_comm.
+...
 
 Theorem canon_monl_is_filter_deg_non_zero : ∀ (P : list (monom T)),
   is_canon_monl P = true
