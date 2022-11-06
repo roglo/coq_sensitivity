@@ -1935,7 +1935,17 @@ assert (Hsba : sorted rel lba). {
 specialize (Hrr Hsba).
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
-Search (permutation _ (merge _ _ _)).
+Search (permutation _ _ (merge _ _ _)).
+...
+  eapply (permutation_trans monom_eqb_eq). 2: {
+    apply (permutation_merge _ monom_eqb_eq).
+...
+    apply split_list_split_list_inv.
+...
+
+  apply (permutation_trans monom_eqb_eq) with (lb := split_list_inv lb la). 2: {
+    apply (permutation_merge _ monom_eqb_eq).
+Search split_list.
 ...
   apply (permutation_trans monom_eqb_eq) with (lb := lb ++ la). 2: {
     apply permuted_isort, monom_eqb_eq.
