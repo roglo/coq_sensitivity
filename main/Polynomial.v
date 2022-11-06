@@ -2005,6 +2005,13 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & Hx & Haft).
     apply Heqb in Hx; subst x.
+    destruct bef as [| c]. {
+      cbn in Haft.
+      injection Haft; clear Haft; intros; subst b aft.
+      clear Hba Hbef; cbn.
+      destruct lb as [| b]. {
+        cbn.
+        eapply (permutation_trans Heqb); [ apply IHla | ].
 ...
 Search (permutation _ (_ :: _)).
 select_first_permutation:
