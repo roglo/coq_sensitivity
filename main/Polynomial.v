@@ -2013,6 +2013,14 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
         cbn.
         eapply (permutation_trans Heqb); [ apply IHla | ].
 ...
+        cbn.
+        destruct la as [| a']; [ apply (permutation_refl Heqb) | ].
+        rewrite if_bool_if_dec.
+        destruct (bool_dec _) as [Haa'| Haa']. {
+          cbn; apply (permutation_refl Heqb).
+        }
+        cbn.
+...
 Search (permutation _ (_ :: _)).
 select_first_permutation:
   ∀ (A : Type) (eqb rel : A → A → bool),
