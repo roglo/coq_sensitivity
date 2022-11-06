@@ -2002,6 +2002,9 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
       specialize (H2 H); clear H.
       now rewrite (equality_refl Heqb) in H2.
     }
+    apply extract_Some_iff in Hlxl.
+    destruct Hlxl as (Hbef & Hx & Haft).
+    apply Heqb in Hx; subst x.
 ...
 Search (permutation _ (_ :: _)).
 select_first_permutation:
