@@ -1876,6 +1876,67 @@ Qed.
 
 (**)
 
+Theorem merge_nil_r : ∀ A (rel : A → _) la, merge rel la [] = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem merge_cons_cons : ∀ A (rel : A → _) a b la lb,
+  merge rel (a :: la) (b :: lb) =
+    if rel a b then a :: merge rel la (b :: lb)
+    else b :: merge rel (a :: la) lb.
+Proof.
+intros; cbn.
+replace (S (length lb)) with (length (b :: lb)) at 1 by easy.
+rewrite <- Nat.add_succ_comm.
+replace (S (length la)) with (length (a :: la)) at 1 by easy.
+now destruct (rel a b).
+Qed.
+
+Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (merge rel la lb) (merge rel lb la).
+Proof.
+intros * Heqb *.
+revert lb.
+induction la as [| a]; intros. {
+  cbn; rewrite merge_loop_nil_l; [ | easy ].
+  rewrite merge_nil_r.
+  apply (permutation_refl Heqb).
+}
+destruct lb as [| b]; [ apply (permutation_refl Heqb) | ].
+do 2 rewrite merge_cons_cons.
+(*
+do 2 rewrite Nat.add_succ_r.
+cbn.
+do 2 rewrite if_bool_if_dec.
+destruct (bool_dec (rel a b)) as [Hab| Hab]. {
+  destruct (bool_dec (rel b a)) as [Hba| Hba]. {
+...
+*)
+do 2 rewrite if_bool_if_dec.
+destruct (bool_dec (rel a b)) as [Hab| Hab]. {
+  destruct (bool_dec (rel b a)) as [Hba| Hba]. {
+    apply permutation_cons_l_iff.
+    remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+    destruct lxl as [((bef, x), aft)| ]. 2: {
+      specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
+      specialize (H1 a) as H2.
+...
+Search (permutation _ (_ :: _)).
+select_first_permutation:
+  ∀ (A : Type) (eqb rel : A → A → bool),
+    equality eqb
+    → ∀ (a b : A) (la lb : list A),
+        select_first rel a la = (b, lb) → permutation eqb (a :: la) (b :: lb)
+permutation_cons_l_iff:
+  ∀ (A : Type) (eqb : A → A → bool) (a : A) (la lb : list A),
+    permutation eqb (a :: la) lb
+    ↔ match extract (eqb a) lb with
+      | Some (bef, _, aft) => permutation eqb la (bef ++ aft)
+      | None => False
+      end
+...
+
 Theorem merge_same_deg_merge_comm : ∀ la lb : list (monom T),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   is_canon_monl la = true
@@ -1936,6 +1997,8 @@ specialize (Hrr Hsba).
 assert (Hpab : permutation monom_eqb lab lba). {
   rewrite <- Hlab, <- Hlba.
 Search (permutation _ _ (merge _ _ _)).
+... ...
+  apply permutation_merge_comm.
 ...
   eapply (permutation_trans monom_eqb_eq). 2: {
     apply (permutation_merge _ monom_eqb_eq).
