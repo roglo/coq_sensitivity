@@ -1927,6 +1927,8 @@ assert (Hb : ∀ mb : monom T, mb ∈ lb → f mb = true). {
 }
 clear H1 H2.
 move f before rel'.
+do 2 rewrite fold_merge.
+...
 revert lb Hsb Hb.
 induction la as [| ma]; intros; cbn. {
   rewrite Nat.add_0_r.
