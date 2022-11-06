@@ -1876,9 +1876,15 @@ Qed.
 
 (**)
 
+(* to be moved to SortingFun.v *)
+Theorem merge_nil_l : ∀ A (rel : A → _) la, merge rel [] la = la.
+Proof. now intros; destruct la. Qed.
+
+(* to be moved to SortingFun.v *)
 Theorem merge_nil_r : ∀ A (rel : A → _) la, merge rel la [] = la.
 Proof. now intros; destruct la. Qed.
 
+(* to be moved to SortingFun.v *)
 Theorem merge_cons_cons : ∀ A (rel : A → _) a b la lb,
   merge rel (a :: la) (b :: lb) =
     if rel a b then a :: merge rel la (b :: lb)
@@ -1891,6 +1897,30 @@ replace (S (length la)) with (length (a :: la)) at 1 by easy.
 now destruct (rel a b).
 Qed.
 
+(* to be moved to SortingFun.v *)
+Theorem merge_in_iff : ∀ A (rel : A → _) a la lb,
+  a ∈ merge rel la lb ↔ a ∈ la ∨ a ∈ lb.
+Proof.
+intros.
+split; intros Ha. {
+  revert lb Ha.
+  induction la as [| a']; intros. {
+    now rewrite merge_nil_l in Ha; right.
+  }
+  destruct lb as [| b]; [ now left | ].
+  rewrite merge_cons_cons in Ha.
+  destruct (rel a' b). {
+    destruct Ha as [Ha| Ha]; [ now left; left | ].
+    apply IHla in Ha.
+    destruct Ha as [Ha| Ha]; [ now left; right | now right ].
+  } {
+    destruct Ha as [Ha| Ha]; [ now right; left | ].
+...
+    apply IHla in Ha.
+    destruct Ha as [Ha| Ha]; [ now left; right | now right ].
+...
+
+(* to be moved to SortingFun.v *)
 Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb,
@@ -1921,6 +1951,10 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
     destruct lxl as [((bef, x), aft)| ]. 2: {
       specialize (proj1 (extract_None_iff _ _) Hlxl) as H1.
       specialize (H1 a) as H2.
+      assert (H : a ∈ b :: merge rel lb (a :: la)). {
+        right.
+... ...
+        apply merge_in_iff.
 ...
 Search (permutation _ (_ :: _)).
 select_first_permutation:
