@@ -1964,11 +1964,66 @@ destruct Ha as [Ha| Ha]. {
 Qed.
 
 (* to be moved to SortingFun.v *)
+Theorem merge_cons_l : ∀ A (rel : A → _) a la lb,
+  merge rel (a :: la) lb =
+    match lb with
+    | [] => a :: la
+    | b :: lb' =>
+        if rel a b then a :: merge rel la lb else b :: merge rel (a :: la) lb'
+    end.
+Proof.
+intros.
+unfold merge at 1.
+cbn - [ merge ].
+destruct lb as [| b]; [ easy | ].
+destruct (rel a b); [ easy | ].
+cbn - [ merge_loop ].
+rewrite <- Nat.add_succ_comm.
+now replace (S (length la)) with (length (a :: la)).
+Qed.
+
+(* to be moved to SortingFun.v *)
+Theorem permutation_app_merge : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (la ++ lb) (merge rel la lb).
+Proof.
+intros * Heqb *.
+revert lb.
+induction la as [| a]; intros. {
+  rewrite merge_nil_l.
+  apply (permutation_refl Heqb).
+}
+rewrite merge_cons_l.
+destruct lb as [| b]. {
+  rewrite app_nil_r.
+  apply (permutation_refl Heqb).
+}
+destruct (rel a b). {
+  cbn.
+  apply permutation_skip; [ now intros x; apply Heqb | ].
+  apply IHla.
+} {
+  cbn - [ merge ].
+...
+
+(* to be moved to SortingFun.v *)
 Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
   equality eqb →
   ∀ la lb,
   permutation eqb (merge rel la lb) (merge rel lb la).
 Proof.
+intros * Heqb *.
+... ...
+      eapply (permutation_trans Heqb). 2: {
+        apply permutation_app_merge.
+      }
+      eapply (permutation_trans Heqb). 2: {
+        apply (permutation_app_comm Heqb).
+      }
+      apply (permutation_sym Heqb).
+      apply permutation_app_merge.
+
 intros * Heqb *.
 revert lb.
 induction la as [| a]; intros. {
@@ -2005,12 +2060,25 @@ destruct (bool_dec (rel a b)) as [Hab| Hab]. {
     apply extract_Some_iff in Hlxl.
     destruct Hlxl as (Hbef & Hx & Haft).
     apply Heqb in Hx; subst x.
+... ...
+      eapply (permutation_trans Heqb). {
+        apply (permutation_sym Heqb).
+        apply permutation_app_merge.
+      }
+...
     destruct bef as [| c]. {
       cbn in Haft.
       injection Haft; clear Haft; intros; subst b aft.
       clear Hba Hbef; cbn.
 (**)
       eapply (permutation_trans Heqb); [ apply IHla | ].
+clear IHla Hab.
+revert a lb.
+induction la as [| a']; intros. {
+  cbn.
+Search merge.
+      eapply (permutation_trans Heqb); [  | ].
+
 ...
       destruct lb as [| b]. {
         cbn.
