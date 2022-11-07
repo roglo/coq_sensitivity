@@ -3242,6 +3242,13 @@ induction P as [| ma la]; intros. {
   rewrite canon_monl_filter_nz; [ | easy ].
   now apply merge_same_deg_monl_add_comm.
 }
+cbn - [ merge_same_deg ].
+destruct Q as [| mb lb]. {
+  destruct R as [| mc lc]; [ easy | ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec (rel ma mc)) as [Hdac| Hdac]. {
+    unfold rel in Hdac.
+    rewrite fold_merge.
 ...
 
 Theorem canon_polyn_add_add_swap :
