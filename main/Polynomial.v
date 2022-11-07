@@ -3164,6 +3164,58 @@ Theorem fold_canon_monl_add : ∀ la lb : list (monom T),
   canon_monl_add la lb.
 Proof. easy. Qed.
 
+Theorem is_canon_monl_cons : ∀ ma (la : list (monom T)),
+  is_canon_monl (ma :: la) = true → is_canon_monl la = true.
+Proof.
+intros * Ha.
+unfold is_canon_monl in Ha |-*.
+apply Bool.andb_true_iff in Ha.
+apply Bool.andb_true_iff.
+destruct Ha as (Hs, Hc).
+split; [ now apply sorted_cons in Hs | ].
+rewrite and_list_cons in Hc.
+now apply Bool.andb_true_iff in Hc.
+Qed.
+
+Theorem canon_monl_merge_same_deg : ∀ P : list (monom T),
+  is_canon_monl P = true
+  → merge_same_deg P = P.
+Proof.
+intros * Hp.
+induction P as [| ma la]; [ easy | cbn ].
+rewrite fold_merge_same_deg.
+rewrite IHla; [ | now apply is_canon_monl_cons in Hp ].
+unfold is_canon_monl in Hp.
+apply Bool.andb_true_iff in Hp.
+destruct Hp as (Hs, Hc).
+unfold same_deg_sum_coeff.
+destruct la as [| mb]; [ easy | ].
+rewrite if_eqb_eq_dec.
+destruct (Nat.eq_dec (mdeg ma) (mdeg mb)) as [Hdab| Hdab]; [ | easy ].
+cbn in Hs.
+rewrite Hdab in Hs.
+now rewrite Nat.ltb_irrefl in Hs.
+Qed.
+
+Theorem canon_monl_filter_nz : ∀ P : list (monom T),
+  is_canon_monl P = true
+  → filter (λ ma, (mcoeff ma ≠? 0)%F) P = P.
+Proof.
+intros * Hp.
+induction P as [| ma la]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Haz| Haz]. {
+  f_equal.
+  apply IHla.
+  now apply is_canon_monl_cons in Hp.
+}
+unfold is_canon_monl in Hp.
+apply Bool.andb_true_iff in Hp.
+destruct Hp as (Hs, Hc).
+rewrite and_list_cons in Hc.
+now rewrite Haz in Hc.
+Qed.
+
 Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
   is_canon_monl P = true
   → is_canon_monl Q = true
@@ -3177,21 +3229,19 @@ set (f := λ ma, (mcoeff ma ≠? 0)%F).
 unfold monl_add.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 revert Q R HQ HR.
-induction P as [| ma]; intros; cbn. {
+induction P as [| ma la]; intros. {
+  cbn.
   do 4 rewrite fold_merge_same_deg.
   do 2 rewrite fold_merge.
   do 2 rewrite fold_monl_add.
   rewrite merge_loop_nil_l; [ | easy ].
   rewrite merge_loop_nil_l; [ | easy ].
-...
-  rewrite merge_same_deg_monl_add_comm.
-...
-  rewrite merge_same_deg_monl_add_comm; symmetry.
-  rewrite merge_same_deg_monl_add_comm; symmetry.
-...
-Inspect 7.
-...
-Check monl_add_comm.
+  rewrite (canon_monl_merge_same_deg Q); [ | easy ].
+  rewrite (canon_monl_merge_same_deg R); [ | easy ].
+  rewrite canon_monl_filter_nz; [ | easy ].
+  rewrite canon_monl_filter_nz; [ | easy ].
+  now apply merge_same_deg_monl_add_comm.
+}
 ...
 
 Theorem canon_polyn_add_add_swap :
