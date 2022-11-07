@@ -3843,3 +3843,149 @@ apply sorted_cons_iff in Hs. 2: {
 }
 now apply Hs.
 Qed.
+
+(* *)
+
+Theorem merge_nil_l : ∀ A (rel : A → _) la, merge rel [] la = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem merge_nil_r : ∀ A (rel : A → _) la, merge rel la [] = la.
+Proof. now intros; destruct la. Qed.
+
+Theorem merge_cons_cons : ∀ A (rel : A → _) a b la lb,
+  merge rel (a :: la) (b :: lb) =
+    if rel a b then a :: merge rel la (b :: lb)
+    else b :: merge rel (a :: la) lb.
+Proof.
+intros; cbn.
+replace (S (length lb)) with (length (b :: lb)) at 1 by easy.
+rewrite <- Nat.add_succ_comm.
+replace (S (length la)) with (length (a :: la)) at 1 by easy.
+now destruct (rel a b).
+Qed.
+
+Theorem merge_in_iff : ∀ A (rel : A → _) a la lb,
+  a ∈ merge rel la lb ↔ a ∈ la ∨ a ∈ lb.
+Proof.
+intros.
+split; intros Ha. {
+  revert lb Ha.
+  induction la as [| a']; intros. {
+    now rewrite merge_nil_l in Ha; right.
+  }
+  destruct lb as [| b]; [ now left | ].
+  rewrite merge_cons_cons in Ha.
+  destruct (rel a' b). {
+    destruct Ha as [Ha| Ha]; [ now left; left | ].
+    apply IHla in Ha.
+    destruct Ha as [Ha| Ha]; [ now left; right | now right ].
+  } {
+    destruct Ha as [Ha| Ha]; [ now right; left | ].
+    revert lb Ha.
+    induction lb as [| b']; intros; [ now left | ].
+    rewrite merge_cons_cons in Ha.
+    destruct (rel a' b'). {
+      destruct Ha as [Ha| Ha]; [ now left; left | ].
+      apply IHla in Ha.
+      destruct Ha as [Ha| Ha]; [ now left; right | now right; right ].
+    } {
+      destruct Ha as [Ha| Ha]; [ now right; right; left | ].
+      specialize (IHlb Ha).
+      destruct IHlb as [Hb| Hb]; [ now left | right ].
+      destruct Hb as [Hb| Hb]; [ now left | now right; right ].
+    }
+  }
+}
+destruct Ha as [Ha| Ha]. {
+  revert lb.
+  induction la as [| a']; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst a'; clear IHla.
+    induction lb as [| b]; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a b); [ now left | right; apply IHlb ].
+  } {
+    specialize (IHla Ha).
+    induction lb as [| b]; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ | right; apply IHlb ].
+    right; apply IHla.
+  }
+} {
+  revert la.
+  induction lb as [| b]; intros; [ easy | ].
+  destruct Ha as [Ha| Ha]. {
+    subst b.
+    induction la as [| a']; [ now left | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' a); [ right; apply IHla | now left ].
+  } {
+    specialize (IHlb Ha).
+    induction la as [| a']; [ now right | ].
+    rewrite merge_cons_cons.
+    destruct (rel a' b); [ right; apply IHla | ].
+    right; apply IHlb.
+  }
+}
+Qed.
+
+Theorem merge_cons_l : ∀ A (rel : A → _) a la lb,
+  merge rel (a :: la) lb =
+    match lb with
+    | [] => a :: la
+    | b :: lb' =>
+        if rel a b then a :: merge rel la lb else b :: merge rel (a :: la) lb'
+    end.
+Proof.
+intros.
+unfold merge at 1.
+cbn - [ merge ].
+destruct lb as [| b]; [ easy | ].
+destruct (rel a b); [ easy | ].
+cbn - [ merge_loop ].
+rewrite <- Nat.add_succ_comm.
+now replace (S (length la)) with (length (a :: la)).
+Qed.
+
+Theorem permutation_app_merge : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (la ++ lb) (merge rel la lb).
+Proof.
+intros * Heqb *.
+revert la.
+induction lb as [| b]; intros. {
+  rewrite app_nil_r, merge_nil_r.
+  apply (permutation_refl Heqb).
+}
+induction la as [| a]. {
+  apply (permutation_refl Heqb).
+}
+cbn - [ merge ].
+rewrite merge_cons_cons.
+destruct (rel a b). {
+  apply permutation_skip; [ now intros x; apply Heqb | easy ].
+}
+rewrite (List_cons_is_app a (la ++ b :: lb)).
+rewrite app_assoc.
+apply (permutation_sym Heqb).
+apply (permutation_cons_app Heqb).
+apply (permutation_sym Heqb).
+apply IHlb.
+Qed.
+
+Theorem permutation_merge_comm : ∀ A (eqb rel : A → _),
+  equality eqb →
+  ∀ la lb,
+  permutation eqb (merge rel la lb) (merge rel lb la).
+Proof.
+intros * Heqb *.
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_merge _ Heqb).
+}
+eapply (permutation_trans Heqb). 2: {
+  apply (permutation_app_comm Heqb).
+}
+apply (permutation_sym Heqb).
+apply (permutation_app_merge _ Heqb).
+Qed.
