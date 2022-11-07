@@ -1938,7 +1938,6 @@ assert (Hpab : permutation monom_eqb lab lba). {
   apply (permutation_merge_comm _ monom_eqb_eq).
 }
 specialize (Hrr Hpab).
-...
 unfold rel in Hrr.
 assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
   intros i.
@@ -1949,12 +1948,11 @@ assert (Hdd : ∀ i, mdeg (nth i lab (0·)) = mdeg (nth i lba (0·))). {
 }
 clear Hrr.
 clear Hlab Hlba.
-clear la lb.
+clear la lb Hsa Hsb Ha Hb.
 rename lab into la.
 rename lba into lb.
 rename Hsab into Hsa.
 rename Hsba into Hsb.
-(**)
 remember (length la) as len eqn:Hlena; symmetry in Hlena.
 assert (Hlenb : length lb = len). {
   apply permutation_length in Hpab; congruence.
@@ -2192,63 +2190,16 @@ destruct lb as [| mb]. {
 f_equal; f_equal.
 now apply (rngl_summation_list_permut _ monom_eqb_eq).
 Qed.
-...
-revert lb Hsb Hb.
-induction la as [| ma]; intros; cbn. {
-  rewrite Nat.add_0_r.
-  rewrite fold_merge_same_deg.
-  rewrite merge_loop_nil_l; [ | easy ].
-  rewrite merge_loop_nil_r; [ | easy ].
-  easy.
-}
-rewrite fold_merge_same_deg.
-rewrite fold_merge.
-replace (S (length la)) with (length (ma :: la)) by easy.
-rewrite fold_merge.
-destruct lb as [| mb]; [ easy | ].
-unfold rel at 1.
-rewrite if_leb_le_dec.
-destruct (le_dec (mdeg mb) (mdeg ma)) as [Hlba| Hlba]. {
-  cbn; do 2 rewrite fold_merge_same_deg.
-  unfold rel at 2.
-  rewrite if_leb_le_dec.
-  destruct (le_dec (mdeg ma) (mdeg mb)) as [Hlab| Hlab]. {
-    cbn; rewrite fold_merge_same_deg.
-    rewrite <- Nat.add_succ_comm; cbn.
-    rewrite fold_merge_same_deg.
-Search same_deg_sum_coeff.
-...
-Print merge.
-Theorem merge_cons_r : ∀ A (rel : A → _) la lb mb,
-  merge rel la (mb :: lb) =
+
+Theorem merge_same_deg_monl_add_comm : ∀ la lb : list (monom T),
+  is_canon_monl la = true
+  → is_canon_monl lb = true
+  → merge_same_deg (monl_add la lb) = merge_same_deg (monl_add lb la).
 Proof.
-intros.
-unfold merge; cbn.
-rewrite <- Nat.add_succ_comm; cbn.
-destruct la as [| ma]. {
-...
-Search (merge_loop _ _ [] _).
-...
-rewrite isort_when_sorted. 2: {
-  now apply sorted_lt_sorted_le_mdeg.
-}
-now rewrite (sorted_lt_merge_same_deg Hs).
-...
-specialize (proj2 (all_true_and_list_true_iff _ _ _) H) as H1.
-cbn in H1.
-...
-polyn_add_prop:
-  ∀ pa pb : polyn T,
-    is_canon_polyn pa = true
-    → is_canon_polyn pb = true
-      → is_canon_polyn (polyn_add_when_canon pa pb) = true
-...
-unfold polyn_add, polyn_norm.
-cbn - [ merge_same_deg ].
-f_equal.
-apply monl_norm_add_comm.
+intros * Ha Hb.
+unfold monl_add.
+now apply merge_same_deg_merge_comm.
 Qed.
-...
 
 Theorem canon_polyn_add_comm : ∀ a b : canon_polyn T, (a + b)%F = (b + a)%F.
 Proof.
@@ -2257,40 +2208,12 @@ destruct a as (pa, ppa).
 destruct b as (pb, ppb).
 move pb before pa.
 apply canon_polyn_eq_eq; cbn.
-(**)
-(*
-specialize (polyn_add_prop _ _ ppa ppb) as Hab.
-specialize (polyn_add_prop _ _ ppb ppa) as Hba.
-unfold polyn_add_when_canon in Hab, Hba.
-*)
 unfold polyn_add_when_canon.
 f_equal.
-(*
-unfold canon_monl_add in Hab, Hba.
-*)
 unfold canon_monl_add.
 f_equal.
-unfold monl_add.
-set (rel := λ ma mb, mdeg mb <=? mdeg ma).
-destruct pa as (la).
-destruct pb as (lb).
-unfold is_canon_polyn in ppa, ppb.
-(*
-unfold is_canon_polyn in Hab, Hba.
-*)
-cbn in ppa, ppb |-*.
-(*
-cbn in Hab, Hba.
-*)
-do 2 rewrite fold_merge_same_deg.
-(*
-rewrite fold_merge in Hab, Hba.
-rewrite fold_merge_same_deg in Hab, Hba.
-*)
-do 2 rewrite fold_merge.
-... ...
-now apply merge_same_deg_merge_comm.
-...
+now apply merge_same_deg_monl_add_comm.
+Qed.
 
 Theorem canon_monl_is_filter_deg_non_zero : ∀ (P : list (monom T)),
   is_canon_monl P = true
@@ -3260,6 +3183,14 @@ induction P as [| ma]; intros; cbn. {
   do 2 rewrite fold_monl_add.
   rewrite merge_loop_nil_l; [ | easy ].
   rewrite merge_loop_nil_l; [ | easy ].
+...
+  rewrite merge_same_deg_monl_add_comm.
+...
+  rewrite merge_same_deg_monl_add_comm; symmetry.
+  rewrite merge_same_deg_monl_add_comm; symmetry.
+...
+Inspect 7.
+...
 Check monl_add_comm.
 ...
 
