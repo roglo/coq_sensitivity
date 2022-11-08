@@ -3247,6 +3247,62 @@ destruct Q as [| mb lb]. {
   rewrite if_bool_if_dec.
   destruct (bool_dec (rel ma mc)) as [Hdac| Hdac]. {
     unfold rel in Hdac.
+    apply Nat.leb_le in Hdac.
+    apply le_lt_or_eq in Hdac.
+    destruct Hdac as [Hdac| Hdac]. {
+      rewrite canon_monl_merge_same_deg. 2: {
+        unfold is_canon_monl.
+        apply Bool.andb_true_iff.
+        split. {
+          cbn.
+          remember (merge rel la (mc :: lc)) as ld eqn:Hld; symmetry in Hld.
+          destruct ld as [| md]; [ easy | ].
+          apply Bool.andb_true_iff.
+          split. {
+            destruct la as [| ma']. {
+              cbn in Hld.
+              apply Nat.ltb_lt.
+              now injection Hld; clear Hld; intros; subst md ld.
+            }
+            rewrite merge_cons_cons in Hld.
+            destruct (rel ma' mc). {
+              injection Hld; clear Hld; intros; subst ma' ld.
+              apply Bool.andb_true_iff in HP.
+              destruct HP as (Hsa, Hca).
+              cbn in Hsa.
+              now apply Bool.andb_true_iff in Hsa.
+            }
+            injection Hld; clear Hld; intros; subst md ld.
+            now apply Nat.ltb_lt.
+          }
+          apply Bool.andb_true_iff in HP.
+          destruct HP as (Hsa, Hca).
+          cbn in Hsa |-*.
+          destruct ld as [| md']; [ easy | ].
+          destruct la as [| ma']. {
+            cbn in Hld.
+            injection Hld; clear Hld; intros; subst md lc.
+            now apply Bool.andb_true_iff in HR.
+          }
+          rewrite merge_cons_cons in Hld.
+          rewrite if_bool_if_dec in Hld.
+          destruct (bool_dec (rel ma' mc)) as [Hda'c| Hda'c]. {
+            injection Hld; clear Hld; intros H1 H2; subst ma'.
+            unfold rel in Hda'c.
+            destruct la as [| ma']. {
+              cbn in H1.
+              injection H1; clear H1; intros; subst md' ld.
+              apply Bool.andb_true_iff.
+              split. {
+                apply Bool.andb_true_iff in Hsa.
+                destruct Hsa as (Hda, Hsa).
+                apply Nat.ltb_lt in Hda.
+                apply Nat.leb_le in Hda'c.
+                apply Nat.ltb_lt.
+                move Hda at bottom.
+(* bin chais pas, c'est peut-être faux, mon truc *)
+...
+                flia Hda Hdac Hda'c.
 ...
 
 Theorem canon_polyn_add_add_swap :
