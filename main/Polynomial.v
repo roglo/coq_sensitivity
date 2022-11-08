@@ -11,15 +11,7 @@ Import List ListNotations Init.Nat.
 Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
 
-(* (lap : list as polynomial) *)
-(* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
-Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
-  (last lap 1 ≠? 0)%F = true.
-
-Record polyn T {ro : ring_like_op T} := mk_polyn
-  { lap : list T;
-    lap_prop : last_lap_neq_0 lap }.
-
+(*
 ...
 
 (* old version defining polynomials as list (coeff * degree) *)
@@ -4116,7 +4108,6 @@ destruct Hlc as (i & Hil & Hffa & Hlc & Hcc & Hdc).
       unfold f; cbn; fold f.
       rewrite if_bool_if_dec.
       destruct (bool_dec _) as [Habz| Habz]; [ easy | ].
-*)
 ... ...
 Search (isort _ (_ ++ _)).
 Search (merge_same_deg (isort _ _)).
@@ -5407,6 +5398,11 @@ Compute
 
 (* old version *)
 
+(* (lap : list as polynomial) *)
+(* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
+Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
+  (last lap 1 ≠? 0)%F = true.
+
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list (T * nat);
     lap_prop : last_lap_neq_0 lap }.
@@ -5476,7 +5472,7 @@ ListNotations
 
 (* here *)
 
-(* old version *)
+*)
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
@@ -5621,6 +5617,7 @@ Definition lap_mul la lb :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
+(*
 (* monomial a * x^i *)
 
 Definition lap_monom a i := repeat 0%F i ++ [a].
@@ -5645,14 +5642,19 @@ Qed.
 
 Definition lap_monom i := repeat 0%F i ++ [1%F].
 Definition monom i := mk_polyn (lap_monom i) (monom_norm i).
+*)
 
 End a.
 
 Arguments lap_add {T ro} (al1 al2)%list.
+(*
 Arguments lap_monom {T ro} i%nat.
+*)
 Arguments lap_mul {T ro} (la lb)%list.
+(*
 Arguments monom {T ro rp Heb H10} i%nat.
 Arguments monom_norm {T ro rp} {Heb H10 i}.
+*)
 Arguments polyn_norm_prop {T ro rp} {Heb H10 la}.
 
 (*
@@ -5693,9 +5695,12 @@ Arguments polyn_sub {T ro rp} {Heb H10} (p1 p2)%pol.
 Notation "a + b" := (polyn_add a b) : poly_scope.
 Notation "a - b" := (polyn_sub a b) : poly_scope.
 Notation "a * b" := (polyn_mul a b) : poly_scope.
+(*
 Notation "'ⓧ' ^ a" := (monom a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
 Notation "'ⓧ'" := (monom 1) (at level 30, format "'ⓧ'") : poly_scope.
+*)
 
+(*
 Require Import ZArith RnglAlg.Zrl.
 Global Existing Instance Z_ring_like_prop.
 Open Scope Z_scope.
@@ -5716,6 +5721,7 @@ Compute (ⓧ)%pol.
    ça affiche le long Z_ring_like_prop *)
 (* peut-être que, finalement, faut que je laisse tomber ce champ
    "lap_prop" dans le type polyn ? *)
+*)
 
 ...
 
