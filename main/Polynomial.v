@@ -3238,11 +3238,17 @@ induction P as [| ma la]; intros. {
   now apply merge_same_deg_monl_add_comm.
 }
 destruct Q as [| mb lb]. {
-  destruct R as [| mc lc]; [ easy | ].
+  clear HQ.
+  move HP before HR.
   do 2 rewrite merge_nil_r.
   rewrite (canon_monl_merge_same_deg (ma :: la) HP).
   unfold f at 1.
   rewrite (canon_monl_filter_nz (ma :: la) HP).
+  assert (H : is_canon_monl la = true) by now apply is_canon_monl_cons in HP.
+  specialize (IHla H); clear H.
+  remember (ma :: la) as Q eqn:HQ.
+...
+  destruct R as [| mc lc]; [ easy | ].
   rewrite merge_cons_cons.
   rewrite if_bool_if_dec.
   destruct (bool_dec (rel ma mc)) as [Hdac| Hdac]. {
