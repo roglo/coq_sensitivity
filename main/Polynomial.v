@@ -3216,14 +3216,14 @@ rewrite and_list_cons in Hc.
 now rewrite Haz in Hc.
 Qed.
 
-Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
-  is_canon_monl P = true
-  → is_canon_monl Q = true
-  → is_canon_monl R = true
-  → canon_monl_add (canon_monl_add P Q) R =
-    canon_monl_add (canon_monl_add P R) Q.
+Theorem canon_monl_add_add_swap : ∀ la lb lc : list (monom T),
+  is_canon_monl la = true
+  → is_canon_monl lb = true
+  → is_canon_monl lc = true
+  → canon_monl_add (canon_monl_add la lb) lc =
+    canon_monl_add (canon_monl_add la lc) lb.
 Proof.
-intros * HP HQ HR.
+intros * Ha Hb Hc.
 unfold canon_monl_add.
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
 unfold monl_add.
@@ -3232,34 +3232,34 @@ assert (Htot : total_relation rel). {
   unfold rel; intros ma mb.
   apply Nat_leb_total_relation.
 }
-revert Q R HQ HR.
-induction P as [| ma la]; intros. {
+revert lb lc Hb Hc.
+induction la as [| ma]; intros. {
   do 2 rewrite merge_nil_l.
-  rewrite (canon_monl_merge_same_deg Q); [ | easy ].
-  rewrite (canon_monl_merge_same_deg R); [ | easy ].
+  rewrite (canon_monl_merge_same_deg lb); [ | easy ].
+  rewrite (canon_monl_merge_same_deg lc); [ | easy ].
   f_equal.
   rewrite canon_monl_filter_nz; [ | easy ].
   rewrite canon_monl_filter_nz; [ | easy ].
   now apply merge_same_deg_monl_add_comm.
 }
-destruct Q as [| mb lb]. {
-  clear HQ.
-  move HP before HR.
+destruct lb as [| mb]. {
+  clear Hb.
+  move Ha before Hc.
   do 2 rewrite merge_nil_r.
-  rewrite (canon_monl_merge_same_deg (ma :: la) HP).
+  rewrite (canon_monl_merge_same_deg (ma :: la) Ha).
   unfold f at 2.
-  rewrite (canon_monl_filter_nz (ma :: la) HP).
-  assert (H : is_canon_monl la = true) by now apply is_canon_monl_cons in HP.
+  rewrite (canon_monl_filter_nz (ma :: la) Ha).
+  assert (H : is_canon_monl la = true) by now apply is_canon_monl_cons in Ha.
   specialize (IHla H); clear H.
   rewrite filter_merge_same_deg_filter. 2: {
     apply sorted_sorted_merge_same_deg.
     apply sorted_merge; [ easy | | ]. {
-      unfold is_canon_monl in HP.
-      apply Bool.andb_true_iff in HP.
+      unfold is_canon_monl in Ha.
+      apply Bool.andb_true_iff in Ha.
       now apply sorted_lt_sorted_le_mdeg.
     } {
-      unfold is_canon_monl in HR.
-      apply Bool.andb_true_iff in HR.
+      unfold is_canon_monl in Hc.
+      apply Bool.andb_true_iff in Hc.
       now apply sorted_lt_sorted_le_mdeg.
     }
   }
