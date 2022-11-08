@@ -2264,7 +2264,7 @@ specialize (Hdd _ H).
 now apply Nat.ltb_lt in Hdd.
 Qed.
 
-Theorem filter_merge_filter : ∀ P : list (monom T),
+Theorem filter_merge_same_deg_filter : ∀ P : list (monom T),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   let f := λ ma, (mcoeff ma ≠? 0)%F in
   sorted rel P
@@ -2852,7 +2852,7 @@ rewrite isort_when_sorted. 2: {
 now rewrite (sorted_lt_merge_same_deg Hs).
 Qed.
 
-Theorem sorted_sorted_merge : ∀ P : list (monom T),
+Theorem sorted_sorted_merge_same_deg : ∀ P : list (monom T),
   let rel := λ ma mb, mdeg mb <=? mdeg ma in
   sorted rel P
   → sorted rel (merge_same_deg P).
@@ -2888,7 +2888,7 @@ Theorem sorted_isort_merge : ∀ P : list (monom T),
 Proof.
 intros * Hs.
 apply isort_when_sorted.
-now apply sorted_sorted_merge.
+now apply sorted_sorted_merge_same_deg.
 Qed.
 
 Theorem monl_norm_idemp : ∀ P : list (monom T),
@@ -2909,7 +2909,7 @@ assert (Htot : total_relation rel). {
   apply Nat_leb_total_relation.
 }
 rewrite (sorted_isort_filter Htra Htot).
-rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_same_deg_filter; [ | now fold rel; apply sorted_isort ].
 fold f.
 rewrite sorted_isort_merge by now apply sorted_isort.
 now rewrite merge_same_deg_idemp.
@@ -3114,8 +3114,8 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
-rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
-rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_same_deg_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_same_deg_filter; [ | now fold rel; apply sorted_isort ].
 f_equal.
 (**)
 ...
@@ -3224,15 +3224,20 @@ Theorem canon_monl_add_add_swap : ∀ P Q R : list (monom T),
     canon_monl_add (canon_monl_add P R) Q.
 Proof.
 intros * HP HQ HR.
-unfold canon_monl_add; f_equal.
+unfold canon_monl_add.
 set (f := λ ma, (mcoeff ma ≠? 0)%F).
 unfold monl_add.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
+assert (Htot : total_relation rel). {
+  unfold rel; intros ma mb.
+  apply Nat_leb_total_relation.
+}
 revert Q R HQ HR.
 induction P as [| ma la]; intros. {
   do 2 rewrite merge_nil_l.
   rewrite (canon_monl_merge_same_deg Q); [ | easy ].
   rewrite (canon_monl_merge_same_deg R); [ | easy ].
+  f_equal.
   rewrite canon_monl_filter_nz; [ | easy ].
   rewrite canon_monl_filter_nz; [ | easy ].
   now apply merge_same_deg_monl_add_comm.
@@ -3242,75 +3247,24 @@ destruct Q as [| mb lb]. {
   move HP before HR.
   do 2 rewrite merge_nil_r.
   rewrite (canon_monl_merge_same_deg (ma :: la) HP).
-  unfold f at 1.
+  unfold f at 2.
   rewrite (canon_monl_filter_nz (ma :: la) HP).
   assert (H : is_canon_monl la = true) by now apply is_canon_monl_cons in HP.
   specialize (IHla H); clear H.
-  remember (ma :: la) as Q eqn:HQ.
-  rewrite fold_monl_add.
-  rewrite fold_canon_monl_add.
-...
-  destruct R as [| mc lc]; [ easy | ].
-  rewrite merge_cons_cons.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec (rel ma mc)) as [Hdac| Hdac]. {
-    unfold rel in Hdac.
-    apply Nat.leb_le in Hdac.
-    apply le_lt_or_eq in Hdac.
-    destruct Hdac as [Hdac| Hdac]. {
-      rewrite canon_monl_merge_same_deg. 2: {
-        unfold is_canon_monl.
-        apply Bool.andb_true_iff.
-        split. {
-          cbn.
-          remember (merge rel la (mc :: lc)) as ld eqn:Hld; symmetry in Hld.
-          destruct ld as [| md]; [ easy | ].
-          apply Bool.andb_true_iff.
-          split. {
-            destruct la as [| ma']. {
-              cbn in Hld.
-              apply Nat.ltb_lt.
-              now injection Hld; clear Hld; intros; subst md ld.
-            }
-            rewrite merge_cons_cons in Hld.
-            destruct (rel ma' mc). {
-              injection Hld; clear Hld; intros; subst ma' ld.
-              apply Bool.andb_true_iff in HP.
-              destruct HP as (Hsa, Hca).
-              cbn in Hsa.
-              now apply Bool.andb_true_iff in Hsa.
-            }
-            injection Hld; clear Hld; intros; subst md ld.
-            now apply Nat.ltb_lt.
-          }
-          apply Bool.andb_true_iff in HP.
-          destruct HP as (Hsa, Hca).
-          cbn in Hsa |-*.
-          destruct ld as [| md']; [ easy | ].
-          destruct la as [| ma']. {
-            cbn in Hld.
-            injection Hld; clear Hld; intros; subst md lc.
-            now apply Bool.andb_true_iff in HR.
-          }
-          rewrite merge_cons_cons in Hld.
-          rewrite if_bool_if_dec in Hld.
-          destruct (bool_dec (rel ma' mc)) as [Hda'c| Hda'c]. {
-            injection Hld; clear Hld; intros H1 H2; subst ma'.
-            unfold rel in Hda'c.
-            destruct la as [| ma']. {
-              cbn in H1.
-              injection H1; clear H1; intros; subst md' ld.
-              apply Bool.andb_true_iff.
-              split. {
-                apply Bool.andb_true_iff in Hsa.
-                destruct Hsa as (Hda, Hsa).
-                apply Nat.ltb_lt in Hda.
-                apply Nat.leb_le in Hda'c.
-                apply Nat.ltb_lt.
-                move Hda at bottom.
-(* bin chais pas, c'est peut-être faux, mon truc *)
-...
-                flia Hda Hdac Hda'c.
+  rewrite filter_merge_same_deg_filter. 2: {
+    apply sorted_sorted_merge_same_deg.
+    apply sorted_merge; [ easy | | ]. {
+      unfold is_canon_monl in HP.
+      apply Bool.andb_true_iff in HP.
+      now apply sorted_lt_sorted_le_mdeg.
+    } {
+      unfold is_canon_monl in HR.
+      apply Bool.andb_true_iff in HR.
+      now apply sorted_lt_sorted_le_mdeg.
+    }
+  }
+  now rewrite merge_same_deg_idemp.
+}
 ...
 
 Theorem canon_polyn_add_add_swap :
@@ -3379,8 +3333,8 @@ rewrite (canon_monl_is_filter_deg_non_zero Q PQ) at 1; symmetry.
 fold f.
 do 2 rewrite <- filter_app.
 do 2 rewrite (sorted_isort_filter Htra Htot).
-rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
-rewrite filter_merge_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_same_deg_filter; [ | now fold rel; apply sorted_isort ].
+rewrite filter_merge_same_deg_filter; [ | now fold rel; apply sorted_isort ].
 ... ...
 now apply canon_polyn_merge_isort_merge_isort_swap.
 ... ...
