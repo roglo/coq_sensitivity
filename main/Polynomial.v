@@ -11,6 +11,19 @@ Import List ListNotations Init.Nat.
 Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
 
+(* (lap : list as polynomial) *)
+(* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
+Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
+  (last lap 1 ≠? 0)%F = true.
+
+Record polyn T {ro : ring_like_op T} := mk_polyn
+  { lap : list T;
+    lap_prop : last_lap_neq_0 lap }.
+
+...
+
+(* old version defining polynomials as list (coeff * degree) *)
+
 (* definition of a monomial *)
 
 Record monom T := Mon { mcoeff : T; mdeg : nat }.
@@ -5460,6 +5473,8 @@ des listes, par exemple [5;-2;3] dans la librairie de Coq.
 ListNotations
 
 ...
+
+(* here *)
 
 (* old version *)
 
