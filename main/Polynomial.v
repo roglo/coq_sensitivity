@@ -3230,25 +3230,23 @@ unfold monl_add.
 set (rel := λ ma mb : monom T, mdeg mb <=? mdeg ma).
 revert Q R HQ HR.
 induction P as [| ma la]; intros. {
-  cbn.
-  do 4 rewrite fold_merge_same_deg.
-  do 2 rewrite fold_merge.
-  do 2 rewrite fold_monl_add.
-  rewrite merge_loop_nil_l; [ | easy ].
-  rewrite merge_loop_nil_l; [ | easy ].
+  do 2 rewrite merge_nil_l.
   rewrite (canon_monl_merge_same_deg Q); [ | easy ].
   rewrite (canon_monl_merge_same_deg R); [ | easy ].
   rewrite canon_monl_filter_nz; [ | easy ].
   rewrite canon_monl_filter_nz; [ | easy ].
   now apply merge_same_deg_monl_add_comm.
 }
-cbn - [ merge_same_deg ].
 destruct Q as [| mb lb]. {
   destruct R as [| mc lc]; [ easy | ].
+  do 2 rewrite merge_nil_r.
+  rewrite (canon_monl_merge_same_deg (ma :: la) HP).
+  unfold f at 1.
+  rewrite (canon_monl_filter_nz (ma :: la) HP).
+  rewrite merge_cons_cons.
   rewrite if_bool_if_dec.
   destruct (bool_dec (rel ma mc)) as [Hdac| Hdac]. {
     unfold rel in Hdac.
-    rewrite fold_merge.
 ...
 
 Theorem canon_polyn_add_add_swap :
