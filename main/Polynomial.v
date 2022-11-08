@@ -3247,6 +3247,8 @@ destruct Q as [| mb lb]. {
   assert (H : is_canon_monl la = true) by now apply is_canon_monl_cons in HP.
   specialize (IHla H); clear H.
   remember (ma :: la) as Q eqn:HQ.
+  rewrite fold_monl_add.
+  rewrite fold_canon_monl_add.
 ...
   destruct R as [| mc lc]; [ easy | ].
   rewrite merge_cons_cons.
