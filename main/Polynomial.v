@@ -5622,6 +5622,30 @@ Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
 (* euclidean division *)
 
+
+Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
+  match it with
+  | 0 => ([], [rngl_of_nat 97) (* algo err: not enough iterations *)
+  | S it' =>
+      match rla with
+      | [] => ([], [])
+      | a :: rla' =>
+          match rlb with
+          | [] => ([], []) (* division by zero *)
+          | b :: _ =>
+              let c := (a / b)%F in
+              if ((c =? 0)%F || (length rla <? length rlb))%bool then ([], la)
+              else
+                let dq = length rla - length rlb in
+...
+                let mq := Mon c (mdeg ma - mdeg mb) in
+                let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
+                let (lq', lr') := monl_quot_rem_loop it' lr lb in
+                (mq :: lq', lr')
+          end
+      end
+  end.
+
 ...
 
 Fixpoint lap_quot_rem_loop it (la lb : list T) : list T * list T :=
