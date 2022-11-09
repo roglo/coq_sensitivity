@@ -12,7 +12,6 @@ Require Import Misc RingLike IterAdd IterAnd.
 Require Import PermutationFun SortingFun.
 
 (*
-...
 
 (* old version defining polynomials as list (coeff * degree) *)
 
@@ -877,6 +876,8 @@ Definition polyn_ring_like_op : ring_like_op (canon_polyn T) :=
      rngl_opt_inv_or_quot := canon_polyn_opt_inv_or_quot;
      rngl_opt_eqb := canon_polyn_opt_eqb;
      rngl_opt_le := None |}.
+
+...
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
@@ -4443,6 +4444,8 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
 
+... here here
+
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
 
@@ -5644,6 +5647,48 @@ Definition lap_monom i := repeat 0%F i ++ [1%F].
 Definition monom i := mk_polyn (lap_monom i) (monom_norm i).
 *)
 
+
+(* ring-like *)
+
+Definition polyn_ring_like_op : ring_like_op (polyn T) :=
+  {| rngl_zero := polyn_zero;
+     rngl_one := polyn_one;
+     rngl_add := polyn_add;
+     rngl_mul := polyn_mul;
+     rngl_opt_opp_or_sous := None;
+     rngl_opt_inv_or_quot := None;
+     rngl_opt_eqb := None;
+     rngl_opt_le := None |}.
+
+...
+
+Definition polyn_ring_like_op : ring_like_op (polyn T) :=
+  {| rngl_zero := polyn_zero;
+     rngl_one := polyn_one;
+     rngl_add := polyn_add;
+     rngl_mul := polyn_mul;
+     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
+     rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
+     rngl_opt_eqb := polyn_opt_eqb;
+     rngl_opt_le := None |}.
+
+  {| rngl_zero := polyn_zero;
+     rngl_one := polyn_one;
+     rngl_add := polyn_add;
+     rngl_mul := polyn_mul;
+...
+     rngl_opt_opp := Some polyn_opp;
+     rngl_opt_inv := None;
+     rngl_opt_sous := Some polyn_sub;
+     rngl_opt_quot := Some Nat.div;
+     rngl_opt_eqb := Some Nat.eqb;
+     rngl_le := Nat.le |}.
+
+(* allows to use ring-like theorems on polynomials *)
+Canonical Structure polyn_ring_like_op.
+
+...
+
 End a.
 
 Arguments lap_add {T ro} (al1 al2)%list.
@@ -5723,10 +5768,11 @@ Compute (ⓧ)%pol.
    "lap_prop" dans le type polyn ? *)
 *)
 
-...
-
+(*
 Definition list_nth_def_0 {α} {R : ring α} n l := List.nth n l 0%Rng.
+*)
 
+(*
 Declare Scope poly_scope.
 Delimit Scope poly_scope with pol.
 Notation "0" := poly_zero : poly_scope.
@@ -5741,28 +5787,20 @@ Notation "'ⓧ'" := (xpow 1) (at level 30, format "'ⓧ'") : poly_scope.
 Check polyn_mul.
 
 ...
+*)
 
 (* euclidean division *)
 
+(*
 Definition polyn_div p1 p2 :=
 ...
+*)
 
-(* ring-like *)
+Arguments polyn_zero {T ro rp Heb H10}.
+Arguments polyn_one {T ro rp Heb H10}.
+Arguments polyn_mul {T ro rp Heb H10} (p1 p2)%pol.
 
-Definition polyn_ring_like_op : ring_like_op (polyn T) :=
-  {| rngl_zero := polyn_zero;
-     rngl_one := polyn_one;
-     rngl_add := polyn_add;
-     rngl_mul := polyn_mul;
-     rngl_opt_opp := Some polyn_opp;
-     rngl_opt_inv := None;
-     rngl_opt_sous := Some polyn_sub;
-     rngl_opt_quot := Some Nat.div;
-     rngl_opt_eqb := Some Nat.eqb;
-     rngl_le := Nat.le |}.
-
-(* allows to use ring-like theorems on polynomials *)
-Canonical Structure polyn_ring_like_op.
+...
 
 (*
 Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
