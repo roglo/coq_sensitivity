@@ -5620,33 +5620,81 @@ Definition lap_mul la lb :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
+(* euclidean division *)
+
+...
+
+Fixpoint lap_quot_rem_loop it (la lb : list T) : list T * list T :=
+  match it with
+  | 0 => ([], [Mon (rngl_of_nat 97) 0]) (* algo err: not enough iterations *)
+  | S it' =>
+      match la with
+      | [] => ([], [])
+      | ma :: la' =>
+          match lb with
+          | [] => ([], []) (* division by zero *)
+          | mb :: _ =>
+              let c := (mcoeff ma / mcoeff mb)%F in
+              if ((c =? 0)%F || (mdeg ma <? mdeg mb))%bool then ([], la)
+              else
+                let mq := Mon c (mdeg ma - mdeg mb) in
+                let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
+                let (lq', lr') := monl_quot_rem_loop it' lr lb in
+                (mq :: lq', lr')
+          end
+      end
+  end.
+
+Definition monl_quot_rem_nb_iter (la lb : list (monom T)) :=
+  S (length la).
+
+Definition monl_quot_rem la lb :=
+  monl_quot_rem_loop (monl_quot_rem_nb_iter la lb) la lb.
+
+Definition polyn_quot_rem pa pb :=
+  let (lq, lr) := monl_quot_rem (monl pa) (monl pb) in
+  (mk_polyn lq, mk_polyn lr).
+
+Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
+Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
+
+...
+
+(* polyn opposite or subtraction *)
+
+Definition polyn_opt_opp_or_sous :
+  option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
+  match (@rngl_opt_opp_or_sous T ro) with
+  | Some (inl _) => Some (inl polyn_opp)
+  | Some (inr _) => None
+  | None => None
+  end.
+
+(* canon polyn quotient *)
+
 (*
-(* monomial a * x^i *)
-
-Definition lap_monom a i := repeat 0%F i ++ [a].
-
-Theorem monom_norm : ∀ a i, last_lap_neq_0 (lap_monom a i).
-...
-
-Definition monom a i := mk_polyn (lap_monom a i) 42.
-
-...
-
-(* monomial x^i (to be removed) *)
-
-Theorem monom_norm : ∀ i, last_lap_neq_0 (repeat 0%F i ++ [1%F]).
+Theorem canon_polyn_quot_prop : ∀ pa pb,
+  is_canon_polyn (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb))) = true.
 Proof.
 intros.
-unfold last_lap_neq_0.
-rewrite last_last.
-apply Bool.negb_true_iff, (rngl_eqb_neq Heb).
-now apply rngl_1_neq_0.
+destruct pa as (pa, ppa).
+destruct pb as (pb, ppb).
+move pb before pa; cbn.
+apply polyn_norm_is_canon_polyn.
 Qed.
 
-Definition lap_monom i := repeat 0%F i ++ [1%F].
-Definition monom i := mk_polyn (lap_monom i) (monom_norm i).
+Definition polyn_quot pa pb :=
+  mk_canon_polyn
+    (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb)))
+    (canon_polyn_quot_prop pa pb).
 *)
 
+Definition polyn_opt_inv_or_quot :
+  option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
+  match (@rngl_opt_inv_or_quot T ro) with
+  | Some _ => Some (inr polyn_quot)
+  | None => None
+  end.
 
 (* ring-like *)
 
@@ -5655,8 +5703,8 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_one := polyn_one;
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
-     rngl_opt_opp_or_sous := None;
-     rngl_opt_inv_or_quot := None;
+     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
+     rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
      rngl_opt_eqb := None;
      rngl_opt_le := None |}.
 
