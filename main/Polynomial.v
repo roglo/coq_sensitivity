@@ -5620,12 +5620,19 @@ Definition lap_mul la lb :=
 
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
-(* euclidean division *)
+(* power *)
 
+Fixpoint lap_power la n :=
+  match n with
+  | O => [1%F]
+  | S m => lap_mul la (lap_power la m)
+  end.
+
+(* euclidean division *)
 
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
-  | 0 => ([], [rngl_of_nat 97) (* algo err: not enough iterations *)
+  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
   | S it' =>
       match rla with
       | [] => ([], [])
@@ -5634,49 +5641,30 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
           | [] => ([], []) (* division by zero *)
           | b :: _ =>
               let c := (a / b)%F in
-              if ((c =? 0)%F || (length rla <? length rlb))%bool then ([], la)
+              if ((c =? 0)%F || (length rla <? length rlb))%bool then ([], rla)
               else
-                let dq = length rla - length rlb in
-...
-                let mq := Mon c (mdeg ma - mdeg mb) in
-                let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
-                let (lq', lr') := monl_quot_rem_loop it' lr lb in
-                (mq :: lq', lr')
+                let dq := length rla - length rlb in
+                let lr := lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [c])) in
+                let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
+                (c :: rlq', rlr')
           end
       end
   end.
 
-...
-
-Fixpoint lap_quot_rem_loop it (la lb : list T) : list T * list T :=
-  match it with
-  | 0 => ([], [Mon (rngl_of_nat 97) 0]) (* algo err: not enough iterations *)
-  | S it' =>
-      match la with
-      | [] => ([], [])
-      | ma :: la' =>
-          match lb with
-          | [] => ([], []) (* division by zero *)
-          | mb :: _ =>
-              let c := (mcoeff ma / mcoeff mb)%F in
-              if ((c =? 0)%F || (mdeg ma <? mdeg mb))%bool then ([], la)
-              else
-                let mq := Mon c (mdeg ma - mdeg mb) in
-                let lr := monl_norm (monl_sub la (monl_mul lb [mq])) in
-                let (lq', lr') := monl_quot_rem_loop it' lr lb in
-                (mq :: lq', lr')
-          end
-      end
-  end.
-
-Definition monl_quot_rem_nb_iter (la lb : list (monom T)) :=
+Definition rlap_quot_rem_nb_iter (la lb : list T) :=
   S (length la).
 
-Definition monl_quot_rem la lb :=
-  monl_quot_rem_loop (monl_quot_rem_nb_iter la lb) la lb.
+Definition rlap_quot_rem rla rlb :=
+  rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
 
-Definition polyn_quot_rem pa pb :=
-  let (lq, lr) := monl_quot_rem (monl pa) (monl pb) in
+Definition lap_quot_rem la lb :=
+  let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
+  (rev rlq, rev rlr).
+
+...
+
+Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
+  let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
   (mk_polyn lq, mk_polyn lr).
 
 Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
