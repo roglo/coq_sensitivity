@@ -5639,20 +5639,20 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
       | a :: rla' =>
           match rlb with
           | [] => ([], []) (* division by zero *)
-          | b :: _ =>
-              let c := (a / b)%F in
-              if ((c =? 0)%F || (length rla <? length rlb))%bool then ([], rla)
+          | b :: rlb' =>
+              let q := (a / b)%F in
+              if ((q =? 0)%F || (length rla' <? length rlb'))%bool then ([], rla)
               else
-                let dq := length rla - length rlb in
-                let lr := lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [c])) in
+                let dq := length rla' - length rlb' in
+                let lr := lap_norm (lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [q]))) in
                 let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
-                (c :: rlq', rlr')
+                (rlq' ++ [q], rlr')
           end
       end
   end.
 
 Definition rlap_quot_rem_nb_iter (la lb : list T) :=
-  S (length la).
+  S (length la + 50).
 
 Definition rlap_quot_rem rla rlb :=
   rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
@@ -5661,6 +5661,45 @@ Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev rlr).
 
+End a.
+
+Arguments lap_add {T ro} (al1 al2)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+
+(*
+Require Import RnglAlg.Zrl ZArith.
+Open Scope Z_scope.
+Compute (lap_quot_rem [-2;3;-1;-1;1] [1;-1;1]).
+(*
+Compute (lap_quot_rem [1;-1;1] [-2;3;-1;-1;1]).
+Compute (lap_quot_rem [3] [2]).
+Compute (lap_quot_rem [1;1] [1]).
+Compute (lap_quot_rem [1;2;1] [1;1]).
+*)
+Compute (lap_quot_rem [-2;5;1] [3;1]).
+Compute (lap_quot_rem [-2;2;0] [3;1]).
+Compute (lap_quot_rem [-2;2] [3;1]).
+...
+Compute (lap_add (lap_mul [3;1] [2;1]) [-8]).
+...
+Compute (lap_quot_rem [-2;2] [3;1]).
+(* bon *)
+...
+Compute (lap_quot_rem [-2;3;-1;-1;1] [1;-1;1]).
+...
+*)
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (lap_quot_rem [1;-1;1] [-2;3;-1;-1;1]).
+(* ok *)
+Compute (lap_quot_rem [3] [2]).
+Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
+(* censé être (x3-2x+1, x-1) *)
+Compute (lap_sub (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
