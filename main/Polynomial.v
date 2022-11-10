@@ -5783,6 +5783,12 @@ destruct (bool_dec _) as [Hab| Hab]. {
   destruct Hab as [Hab| Hab]; [ | now apply Nat.ltb_lt in Hab ].
   apply (rngl_eqb_eq Heb) in Hab.
   cbn in Hit.
+  unfold rngl_div in Hab.
+  remember rngl_has_inv as hi eqn:Hiv.
+  symmetry in Hiv.
+  destruct hi. {
+Check rngl_integral.
+apply rngl_integral in Hab.
 ...
   rewrite lap_mul_0_r, lap_add_0_l.
   now rewrite rev_unit, rev_involutive.
