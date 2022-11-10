@@ -5646,7 +5646,7 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
                 let dq := length rla' - length rlb' in
                 let lr := lap_norm (lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [q]))) in
                 let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
-                (rlq' ++ repeat 0%F (dq - length rlq') ++ [q], rlr')
+                (q :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
           end
       end
   end.
@@ -5694,14 +5694,9 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
-Compute (lap_quot_rem [1;-1;1] [-2;3;-1;-1;1]).
-(* ok *)
-Compute (lap_quot_rem [3] [2]).
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 (* censé être (x3-2x+1, x-1) *)
-Compute (lap_add (lap_mul [1;-1;1] [1;0;-2;1]) [-1;1]).
-...
-Compute (lap_sub (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
+Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
