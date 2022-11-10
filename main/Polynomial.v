@@ -5641,7 +5641,11 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
           | [] => ([], []) (* division by zero *)
           | b :: rlb' =>
               let q := (a / b)%F in
+(**)
               if ((q =? 0)%F || (length rla' <? length rlb'))%bool then ([], rla)
+(*
+              if length rla' <? length rlb' then ([], rla)
+*)
               else
                 let dq := length rla' - length rlb' in
                 let lr := lap_norm (lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [q]))) in
@@ -5667,22 +5671,22 @@ Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
-(*
+(**)
 Require Import RnglAlg.Zrl ZArith.
 Open Scope Z_scope.
-Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
-(* censé être (x3-2x+1, x-1) *)
-*)
+(*
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
+*)
+Compute (lap_quot_rem [1] [2]).
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 (* censé être (x3-2x+1, x-1) *)
-Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
+Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1] = [0;-2;3;-1;-1;1]).
 (**)
 Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
-Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2]).
+Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 ...
 *)
 
