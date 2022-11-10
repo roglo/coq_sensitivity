@@ -5762,15 +5762,15 @@ move rla after rlq; move rlb after rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 move Hbz after Hqr.
-revert rla rlb rlq rlr Hqr Hit Hbz.
+destruct rlb as [| b]; [ easy | clear Hbz ].
+cbn.
+revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
 cbn in Hqr.
 destruct rla as [| a]. {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  destruct rlb; [ easy | cbn; easy ].
+  now injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 }
-destruct rlb as [| b]; [ easy | clear Hbz ].
 rewrite if_bool_if_dec in Hqr.
 destruct (bool_dec _) as [Hab| Hab]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
@@ -5778,9 +5778,7 @@ destruct (bool_dec _) as [Hab| Hab]. {
   apply Bool.orb_true_iff in Hab.
   destruct Hab as [Hab| Hab]; [ | now apply Nat.ltb_lt in Hab ].
   apply (rngl_eqb_eq Heb) in Hab.
-...
   cbn in Hit.
-  eapply IHit; [ | apply Hit | ].
 ...
   rewrite lap_mul_0_r, lap_add_0_l.
   now rewrite rev_unit, rev_involutive.
