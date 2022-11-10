@@ -5735,7 +5735,7 @@ Qed.
 Theorem glop : ∀ la lb lq lr : list T,
   lb ≠ []
   → lap_quot_rem la lb = (lq, lr)
-  → la = lap_add (lap_mul lb lq) lr.
+  → length lr < length lb.
 Proof.
 intros * Hbz Hab.
 unfold lap_quot_rem in Hab.
@@ -5746,6 +5746,82 @@ injection Hab; clear Hab; intros; subst lq lr.
 unfold rlap_quot_rem in Hqr.
 remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
 unfold rlap_quot_rem_nb_iter in Hit.
+rewrite <- (rev_involutive lb).
+remember (rev la) as rla eqn:Hrla.
+clear la Hrla.
+do 2 rewrite rev_length.
+remember (rev lb) as rlb eqn:Hrlb.
+assert (H : rlb ≠ []). {
+  subst rlb.
+  intros H; apply Hbz.
+  now apply List_eq_rev_nil in H.
+}
+clear lb Hrlb Hbz.
+rename H into Hbz.
+move rla after rlq; move rlb after rlq.
+assert (H : S (length rla) ≤ it) by flia Hit.
+clear Hit; rename H into Hit.
+move Hbz after Hqr.
+revert rla rlb rlq rlr Hqr Hit Hbz.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hqr.
+destruct rla as [| a]. {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  destruct rlb; [ easy | cbn; easy ].
+}
+destruct rlb as [| b]; [ easy | clear Hbz ].
+rewrite if_bool_if_dec in Hqr.
+destruct (bool_dec _) as [Hab| Hab]. {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  apply -> Nat.succ_lt_mono.
+  apply Bool.orb_true_iff in Hab.
+  destruct Hab as [Hab| Hab]; [ | now apply Nat.ltb_lt in Hab ].
+  apply (rngl_eqb_eq Heb) in Hab.
+...
+  cbn in Hit.
+  eapply IHit; [ | apply Hit | ].
+...
+  rewrite lap_mul_0_r, lap_add_0_l.
+  now rewrite rev_unit, rev_involutive.
+}
+remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr').
+injection Hqr; clear Hqr; intros; subst rlq rlr.
+rename rlq' into rlq; rename rlr' into rlr.
+rename Hqr' into Hqr.
+...
+apply IHit in Hqr. 2: {
+  unfold lap_norm.
+  rewrite rev_involutive.
+...
+  etransitivity; [ | apply Hit ].
+  cbn - [ rev ].
+  apply -> Nat.succ_le_mono.
+  etransitivity; [ apply strip_0s_length_le | ].
+  rewrite rev_length.
+  rewrite lap_sub_length.
+  rewrite rev_length.
+...
+...
+
+Theorem glop : ∀ la lb lq lr : list T,
+  lb ≠ []
+  → lap_quot_rem la lb = (lq, lr)
+  → la = lap_add (lap_mul lb lq) lr ∧
+     length lr < length la.
+Proof.
+intros * Hbz Hab.
+unfold lap_quot_rem in Hab.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr).
+injection Hab; clear Hab; intros; subst lq lr.
+unfold rlap_quot_rem in Hqr.
+remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+...
 rewrite <- rev_involutive; symmetry.
 rewrite <- rev_involutive; symmetry.
 f_equal.
@@ -5764,6 +5840,7 @@ move rla after rlq; move rlb after rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 move Hbz after Hqr.
+...
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -5785,6 +5862,7 @@ destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
+...
 apply IHit in Hqr. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
