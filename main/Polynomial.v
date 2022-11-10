@@ -5764,7 +5764,7 @@ move rla after rlq; move rlb after rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 move Hbz after Hqr.
-revert rla rlb rlq rlr Hbz Hqr Hit.
+revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
 cbn in Hqr.
@@ -5785,9 +5785,10 @@ destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
-apply IHit in Hqr; [ | easy | ]. 2: {
+apply IHit in Hqr. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
+...
   etransitivity; [ | apply Hit ].
   cbn - [ rev ].
   apply -> Nat.succ_le_mono.
