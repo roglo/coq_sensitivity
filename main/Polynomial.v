@@ -5698,6 +5698,40 @@ Proof. easy. Qed.
 Theorem lap_mul_0_r : ∀ la, lap_mul la [] = [].
 Proof. now intros; destruct la. Qed.
 
+Theorem strip_0s_length_le : ∀ l, length (strip_0s l) ≤ length l.
+Proof.
+intros.
+induction l as [| a]; [ easy | cbn ].
+destruct (a =? 0)%F; cbn; [ | easy ].
+flia IHl.
+Qed.
+
+Theorem lap_add_length : ∀ la lb,
+  length (lap_add la lb) = max (length la) (length lb).
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+f_equal; apply IHla.
+Qed.
+
+Theorem lap_opp_length : ∀ la, length (lap_opp la) = length la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+f_equal; apply IHla.
+Qed.
+
+Theorem lap_sub_length : ∀ la lb,
+  length (lap_sub la lb) = max (length la) (length lb).
+Proof.
+intros.
+unfold lap_sub.
+rewrite lap_add_length.
+now rewrite lap_opp_length.
+Qed.
+
 Theorem glop : ∀ la lb lq lr : list T,
   lb ≠ []
   → lap_quot_rem la lb = (lq, lr)
@@ -5754,7 +5788,13 @@ rename Hqr' into Hqr.
 apply IHit in Hqr; [ | easy | ]. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
-Search (strip_0s (rev _)).
+  etransitivity; [ | apply Hit ].
+  cbn - [ rev ].
+  apply -> Nat.succ_le_mono.
+  etransitivity; [ apply strip_0s_length_le | ].
+  rewrite rev_length.
+  rewrite lap_sub_length.
+  rewrite rev_length.
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
