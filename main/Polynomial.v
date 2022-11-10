@@ -5699,6 +5699,7 @@ Compute (lap_quot_rem [1;-1;1] [-2;3;-1;-1;1]).
 Compute (lap_quot_rem [3] [2]).
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 (* censé être (x3-2x+1, x-1) *)
+...
 Compute (lap_sub (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
 ...
 
