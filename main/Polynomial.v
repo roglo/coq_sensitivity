@@ -5671,24 +5671,8 @@ Arguments lap_quot_rem {T ro} (la lb)%list.
 (*
 Require Import RnglAlg.Zrl ZArith.
 Open Scope Z_scope.
-Compute (lap_quot_rem [-2;3;-1;-1;1] [1;-1;1]).
-(*
-Compute (lap_quot_rem [1;-1;1] [-2;3;-1;-1;1]).
-Compute (lap_quot_rem [3] [2]).
-Compute (lap_quot_rem [1;1] [1]).
-Compute (lap_quot_rem [1;2;1] [1;1]).
-*)
-Compute (lap_quot_rem [-2;5;1] [3;1]).
-Compute (lap_quot_rem [-2;2;0] [3;1]).
-Compute (lap_quot_rem [-2;2] [3;1]).
-...
-Compute (lap_add (lap_mul [3;1] [2;1]) [-8]).
-...
-Compute (lap_quot_rem [-2;2] [3;1]).
-(* bon *)
-...
-Compute (lap_quot_rem [-2;3;-1;-1;1] [1;-1;1]).
-...
+Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
+(* censé être (x3-2x+1, x-1) *)
 *)
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
