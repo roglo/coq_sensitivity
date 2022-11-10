@@ -5681,6 +5681,9 @@ Open Scope Q_scope.
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 (* censé être (x3-2x+1, x-1) *)
 Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
+(**)
+Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
+Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2]).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
