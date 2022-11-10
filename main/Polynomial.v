@@ -5652,7 +5652,7 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   end.
 
 Definition rlap_quot_rem_nb_iter (la lb : list T) :=
-  S (length la + 50).
+  S (length la).
 
 Definition rlap_quot_rem rla rlb :=
   rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
@@ -5661,13 +5661,12 @@ Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev rlr).
 
+(*
 End a.
-
 Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
-
 (*
 Require Import RnglAlg.Zrl ZArith.
 Open Scope Z_scope.
@@ -5684,6 +5683,78 @@ Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1]).
 (**)
 Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
 Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2]).
+...
+*)
+
+Theorem lap_add_0_l : ∀ la, lap_add [] la = la.
+Proof. easy. Qed.
+
+Theorem lap_add_0_r : ∀ la, lap_add la [] = la.
+Proof. intros; now destruct la. Qed.
+
+Theorem lap_mul_0_l : ∀ la, lap_mul [] la = [].
+Proof. easy. Qed.
+
+Theorem lap_mul_0_r : ∀ la, lap_mul la [] = [].
+Proof. now intros; destruct la. Qed.
+
+Theorem glop : ∀ la lb lq lr : list T,
+  lb ≠ []
+  → lap_quot_rem la lb = (lq, lr)
+  → la = lap_add (lap_mul lb lq) lr.
+Proof.
+intros * Hbz Hab.
+unfold lap_quot_rem in Hab.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr).
+injection Hab; clear Hab; intros; subst lq lr.
+unfold rlap_quot_rem in Hqr.
+remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+rewrite <- rev_involutive; symmetry.
+rewrite <- rev_involutive; symmetry.
+f_equal.
+remember (rev la) as rla eqn:Hrla.
+clear la Hrla.
+rewrite <- (rev_involutive lb).
+remember (rev lb) as rlb eqn:Hrlb.
+assert (H : rlb ≠ []). {
+  subst rlb.
+  intros H; apply Hbz.
+  now apply List_eq_rev_nil in H.
+}
+clear lb Hrlb Hbz.
+rename H into Hbz.
+move rla after rlq; move rlb after rlq.
+assert (H : S (length rla) ≤ it) by flia Hit.
+clear Hit; rename H into Hit.
+move Hbz after Hqr.
+revert rla rlb rlq rlr Hbz Hqr Hit.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hqr.
+destruct rla as [| a]. {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  now rewrite lap_mul_0_r, lap_add_0_r.
+}
+destruct rlb as [| b]; [ easy | clear Hbz ].
+rewrite if_bool_if_dec in Hqr.
+destruct (bool_dec _) as [Hab| Hab]. {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  rewrite lap_mul_0_r, lap_add_0_l.
+  now rewrite rev_unit, rev_involutive.
+}
+remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr').
+injection Hqr; clear Hqr; intros; subst rlq rlr.
+rename rlq' into rlq; rename rlr' into rlr.
+rename Hqr' into Hqr.
+apply IHit in Hqr; [ | easy | ]. 2: {
+  unfold lap_norm.
+  rewrite rev_involutive.
+Search (strip_0s (rev _)).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
@@ -6144,12 +6215,6 @@ Theorem fold_lap_norm {A} {rng : ring A} :
   ∀ la, rev (strip_0s (rev la)) = lap_norm la.
 Proof. easy. Qed.
 
-Theorem lap_add_0_l {α} {r : ring α} : ∀ la, lap_add [] la = la.
-Proof. easy. Qed.
-
-Theorem lap_add_0_r {α} {r : ring α} : ∀ la, lap_add la [] = la.
-Proof. intros; now destruct la. Qed.
-
 Theorem poly_add_0_l {α} {r : ring α} : ∀ p, (0 + p)%pol = p.
 Proof.
 intros (la, lapr).
@@ -6172,12 +6237,6 @@ rewrite IHla; cbn. {
   apply rng_1_neq_0.
 }
 Qed.
-
-Theorem lap_mul_0_l {α} {r : ring α} : ∀ la, lap_norm (lap_mul [] la) = [].
-Proof. easy. Qed.
-
-Theorem lap_mul_0_r {α} {r : ring α} : ∀ la, lap_norm (lap_mul la []) = [].
-Proof. now intros; destruct la. Qed.
 
 Section lap.
 
