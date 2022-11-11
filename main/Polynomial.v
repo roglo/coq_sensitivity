@@ -5848,7 +5848,36 @@ destruct rlb as [| b']. {
   rewrite rngl_add_0_l, rngl_add_0_r in Hqr.
   apply IHit in Hqr. 2: {
     rewrite rev_length.
-Search lap_norm.
+    destruct rla as [| a'']. {
+      cbn.
+      rewrite rev_length.
+      rewrite rngl_mul_comm; [ | easy ].
+      rewrite rngl_div_mul; [ | easy | easy ].
+      rewrite (fold_rngl_sub Hop).
+      rewrite rngl_sub_diag; [ | easy ].
+      rewrite (rngl_eqb_refl Heb).
+      rewrite (rngl_opp_0 Hop).
+      rewrite rngl_add_0_r.
+      destruct (a' =? 0)%F; [ | easy ].
+      cbn in Hit |-*; flia Hit.
+    }
+    cbn.
+    rewrite rev_length.
+    etransitivity. {
+      apply -> Nat.succ_le_mono.
+      apply strip_0s_length_le.
+    }
+    rewrite rev_length.
+    rewrite lap_add_length; cbn.
+    do 3 rewrite app_length.
+    rewrite rev_length; cbn.
+    rewrite map_length.
+    do 3 rewrite Nat.add_1_r.
+    do 3 rewrite <- Nat.succ_max_distr.
+    cbn in Hit.
+    etransitivity; [ | apply Hit ].
+    do 3 apply -> Nat.succ_le_mono.
+(* ah bin non, tiens *)
 ...
 eapply IHit with (rla := rlr). 2: {
 ...
