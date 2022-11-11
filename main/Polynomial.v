@@ -5820,7 +5820,10 @@ assert (Hos : rngl_has_opp_or_sous = true). {
 }
 move Hos before Hiv.
 destruct rlb as [| b']. {
-  cbn in Hbq.
+  cbn in Hbq |-*.
+  apply Nat.lt_1_r.
+  apply length_zero_iff_nil.
+  destruct rlr as [| r]; [ easy | exfalso ].
   rewrite Nat.sub_0_r in Hbq.
   destruct rla as [| a']; cbn in Hbq. {
     rewrite rngl_summation_only_one in Hbq.
@@ -5828,24 +5831,50 @@ destruct rlb as [| b']. {
     rewrite rngl_div_mul in Hbq; [ | easy | easy ].
     cbn in A, B, Q.
     subst A B Q bq.
-    cbn in Hqr.
+    cbn in Hqr, Hit.
     rewrite rev_involutive in Hqr.
     rewrite (fold_rngl_sub Hop) in Hqr.
     rewrite rngl_sub_diag in Hqr; [ | easy ].
     rewrite (rngl_eqb_refl Heb) in Hqr.
-    apply IHit in Hqr; [ easy | easy ].
+    destruct it; [ easy | easy ].
   }
   rewrite app_length, repeat_length in Hbq.
-  cbn in Hbq.
+  cbn in Hbq, Hit.
   rewrite rngl_summation_only_one in Hbq.
-  rewrite rngl_mul_0_r in Hbq; [ | easy ].
+  rewrite (rngl_mul_0_r Hos) in Hbq.
   cbn in A, B, Q.
   subst A B Q bq.
   rewrite Nat.add_1_r in Hqr; cbn in Hqr.
   unfold iter_seq, iter_list in Hqr.
   cbn in Hqr.
-  rewrite rngl_mul_0_l in Hqr; [ | easy ].
+  rewrite (rngl_mul_0_l Hos) in Hqr.
   rewrite rngl_add_0_l, rngl_add_0_r in Hqr.
+(**)
+  destruct rla as [| a'']. {
+    cbn in Hqr, Hit.
+    rewrite rev_involutive in Hqr.
+    rewrite (rngl_mul_comm Hco) in Hqr.
+    rewrite (rngl_div_mul Hiv _ _ Hbn) in Hqr.
+    rewrite (fold_rngl_sub Hop) in Hqr.
+    rewrite (rngl_sub_diag Hos) in Hqr.
+    rewrite (rngl_eqb_refl Heb) in Hqr.
+    rewrite (rngl_opp_0 Hop) in Hqr.
+    rewrite rngl_add_0_r in Hqr.
+    destruct (a' =? 0)%F; [ now destruct Hit | ].
+    destruct it; [ easy | ].
+    cbn in Hqr.
+    apply Nat.succ_le_mono in Hit.
+    rewrite Nat.ltb_irrefl in Hqr.
+    rewrite rngl_summation_only_one in Hqr.
+    rewrite rev_involutive in Hqr.
+    rewrite (fold_rngl_sub Hop) in Hqr.
+    rewrite (rngl_mul_comm Hco) in Hqr.
+    rewrite (rngl_div_mul Hiv _ _ Hbn) in Hqr.
+    rewrite (rngl_sub_diag Hos) in Hqr.
+    rewrite (rngl_eqb_refl Heb) in Hqr.
+    now destruct it.
+  }
+...
   apply IHit in Hqr. 2: {
     rewrite rev_length.
     destruct rla as [| a'']. {
