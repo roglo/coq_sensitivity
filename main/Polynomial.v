@@ -5641,11 +5641,11 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
           | [] => ([], []) (* division by zero *)
           | b :: rlb' =>
               let q := (a / b)%F in
-(**)
-              if ((q =? 0)%F || (length rla' <? length rlb'))%bool then ([], rla)
 (*
-              if length rla' <? length rlb' then ([], rla)
+              if ((q =? 0)%F || (length rla' <? length rlb'))%bool then ([], rla)
 *)
+              if length rla' <? length rlb' then ([], rla)
+(**)
               else
                 let dq := length rla' - length rlb' in
                 let lr := lap_norm (lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [q]))) in
@@ -5671,15 +5671,10 @@ Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
-(**)
-Require Import RnglAlg.Zrl ZArith.
-Open Scope Z_scope.
-(*
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
-*)
 Compute (lap_quot_rem [1] [2]).
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 (* censé être (x3-2x+1, x-1) *)
@@ -5779,19 +5774,7 @@ rewrite if_bool_if_dec in Hqr.
 destruct (bool_dec _) as [Hab| Hab]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
   apply -> Nat.succ_lt_mono.
-  apply Bool.orb_true_iff in Hab.
-  destruct Hab as [Hab| Hab]; [ | now apply Nat.ltb_lt in Hab ].
-  apply (rngl_eqb_eq Heb) in Hab.
-  cbn in Hit.
-  unfold rngl_div in Hab.
-  remember rngl_has_inv as hi eqn:Hiv.
-  symmetry in Hiv.
-  destruct hi. {
-Check rngl_integral.
-apply rngl_integral in Hab.
-...
-  rewrite lap_mul_0_r, lap_add_0_l.
-  now rewrite rev_unit, rev_involutive.
+  now apply Nat.ltb_lt in Hab.
 }
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
