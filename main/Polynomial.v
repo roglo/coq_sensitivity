@@ -5815,11 +5815,14 @@ set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
 remember (lap_mul B Q) as bq eqn:Hbq.
 unfold lap_mul in Hbq.
 unfold B, Q in Hbq.
+assert (Hos : rngl_has_opp_or_sous = true). {
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+move Hos before Hiv.
 destruct rlb as [| b']. {
   cbn in Hbq.
   rewrite Nat.sub_0_r in Hbq.
-  destruct rla as [| a']. {
-    cbn in Hbq.
+  destruct rla as [| a']; cbn in Hbq. {
     rewrite rngl_summation_only_one in Hbq.
     rewrite rngl_mul_comm in Hbq; [ | easy ].
     rewrite rngl_div_mul in Hbq; [ | easy | easy ].
@@ -5828,12 +5831,24 @@ destruct rlb as [| b']. {
     cbn in Hqr.
     rewrite rev_involutive in Hqr.
     rewrite (fold_rngl_sub Hop) in Hqr.
-    rewrite rngl_sub_diag in Hqr. 2: {
-      now apply rngl_has_opp_or_sous_iff; left.
-    }
+    rewrite rngl_sub_diag in Hqr; [ | easy ].
     rewrite (rngl_eqb_refl Heb) in Hqr.
     apply IHit in Hqr; [ easy | easy ].
   }
+  rewrite app_length, repeat_length in Hbq.
+  cbn in Hbq.
+  rewrite rngl_summation_only_one in Hbq.
+  rewrite rngl_mul_0_r in Hbq; [ | easy ].
+  cbn in A, B, Q.
+  subst A B Q bq.
+  rewrite Nat.add_1_r in Hqr; cbn in Hqr.
+  unfold iter_seq, iter_list in Hqr.
+  cbn in Hqr.
+  rewrite rngl_mul_0_l in Hqr; [ | easy ].
+  rewrite rngl_add_0_l, rngl_add_0_r in Hqr.
+  apply IHit in Hqr. 2: {
+    rewrite rev_length.
+Search lap_norm.
 ...
 eapply IHit with (rla := rlr). 2: {
 ...
