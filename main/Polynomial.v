@@ -5776,17 +5776,24 @@ destruct (bool_dec _) as [Hab| Hab]. {
   apply -> Nat.succ_lt_mono.
   now apply Nat.ltb_lt in Hab.
 }
+apply Nat.ltb_ge in Hab.
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
+(**)
+cbn in Hit.
+eapply IHit with (rla := rlr). 2: {
+(* peut-être il faut un contre-exemple ; peut-être que
+   rlap_quot_rem_nb_iter n'est pas correct *)
+...
+eapply IHit with (rla := rla); [ | easy ].
 ...
 apply IHit in Hqr. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
-...
   etransitivity; [ | apply Hit ].
   cbn - [ rev ].
   apply -> Nat.succ_le_mono.
@@ -5794,7 +5801,7 @@ apply IHit in Hqr. 2: {
   rewrite rev_length.
   rewrite lap_sub_length.
   rewrite rev_length.
-...
+(* marche pas *)
 ...
 
 Theorem glop : ∀ la lb lq lr : list T,
