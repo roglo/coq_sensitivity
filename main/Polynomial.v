@@ -5773,6 +5773,8 @@ assert (H : hd 1%F rlb ≠ 0%F). {
   apply (rngl_eqb_neq Heb) in Hbn.
   move Hbn at bottom.
   intros H; apply Hbn; clear Hbn.
+Search (hd _ (rev _)).
+Search (last _ _ = _).
 ...
   clear Hbz Hqr.
   induction lb as [| b]; cbn in H |-*; [ easy | ].
