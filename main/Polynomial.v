@@ -5737,6 +5737,7 @@ now rewrite lap_opp_length.
 Qed.
 
 Theorem glop :
+  rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ la lb lq lr : list T,
@@ -5745,7 +5746,7 @@ Theorem glop :
   → lap_quot_rem la lb = (lq, lr)
   → length lr < length lb.
 Proof.
-intros Hco Hiv * Hbz Hbn Hab.
+intros Hop Hco Hiv * Hbz Hbn Hab.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -5764,7 +5765,7 @@ assert (H : rlb ≠ []). {
   intros H; apply Hbz.
   now apply List_eq_rev_nil in H.
 }
-clear Hbz.
+move H before Hbz; clear Hbz.
 rename H into Hbz.
 assert (H : hd 1%F rlb ≠ 0%F). {
   subst rlb.
@@ -5773,19 +5774,20 @@ assert (H : hd 1%F rlb ≠ 0%F). {
   apply (rngl_eqb_neq Heb) in Hbn.
   move Hbn at bottom.
   intros H; apply Hbn; clear Hbn.
-Search (hd _ (rev _)).
-Search (last _ _ = _).
-...
   clear Hbz Hqr.
-  induction lb as [| b]; cbn in H |-*; [ easy | ].
-...
-clear lb Hrlb Hbz.
-move rla after rlq; move rlb after rlq.
+  rewrite <- (rev_involutive lb).
+  destruct (rev lb); cbn in H |-*; [ easy | ].
+  now rewrite last_last.
+}
+move H before Hbn; clear Hbn.
+rename H into Hbn.
+clear lb Hrlb.
+move rla after rlb; move rlq before rlb.
+move rlr before rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
-move Hbz after Hqr.
 destruct rlb as [| b]; [ easy | clear Hbz ].
-cbn.
+cbn in Hbn |-*.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -5807,7 +5809,6 @@ injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
 (**)
-cbn in Hit.
 set (A := rev (a :: rla)) in Hqr.
 set (B := rev rlb ++ [b]) in Hqr.
 set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
@@ -5821,13 +5822,18 @@ destruct rlb as [| b']. {
     cbn in Hbq.
     rewrite rngl_summation_only_one in Hbq.
     rewrite rngl_mul_comm in Hbq; [ | easy ].
-    rewrite rngl_div_mul in Hbq; [ | easy | ].
-...
-Search ((_ / _) * _)%F.
-Search (_ * (_ / _))%F.
-rngl_div_mul:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a / b * b)%F = a
+    rewrite rngl_div_mul in Hbq; [ | easy | easy ].
+    cbn in A, B, Q.
+    subst A B Q bq.
+    cbn in Hqr.
+    rewrite rev_involutive in Hqr.
+    rewrite (fold_rngl_sub Hop) in Hqr.
+    rewrite rngl_sub_diag in Hqr. 2: {
+      now apply rngl_has_opp_or_sous_iff; left.
+    }
+    rewrite (rngl_eqb_refl Heb) in Hqr.
+    apply IHit in Hqr; [ easy | easy ].
+  }
 ...
 eapply IHit with (rla := rlr). 2: {
 ...
