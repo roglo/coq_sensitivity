@@ -5479,6 +5479,11 @@ ListNotations
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
+(* TODO: use an intermediate type, like in old versions, like this:
+      Record polyn T := mk_polyn { lap : list T }.
+   and another type for the condition that the last value in lap
+   is not null.
+*)
 Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
   (last lap 1 ≠? 0)%F = true.
 
@@ -5731,12 +5736,16 @@ rewrite lap_add_length.
 now rewrite lap_opp_length.
 Qed.
 
-Theorem glop : ∀ la lb lq lr : list T,
+Theorem glop :
+  rngl_mul_is_comm = true →
+  rngl_has_inv = true →
+  ∀ la lb lq lr : list T,
   lb ≠ []
+  → last_lap_neq_0 lb
   → lap_quot_rem la lb = (lq, lr)
   → length lr < length lb.
 Proof.
-intros * Hbz Hab.
+intros Hco Hiv * Hbz Hbn Hab.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -5755,8 +5764,20 @@ assert (H : rlb ≠ []). {
   intros H; apply Hbz.
   now apply List_eq_rev_nil in H.
 }
-clear lb Hrlb Hbz.
+clear Hbz.
 rename H into Hbz.
+assert (H : hd 1%F rlb ≠ 0%F). {
+  subst rlb.
+  unfold last_lap_neq_0 in Hbn.
+  apply Bool.negb_true_iff in Hbn.
+  apply (rngl_eqb_neq Heb) in Hbn.
+  move Hbn at bottom.
+  intros H; apply Hbn; clear Hbn.
+...
+  clear Hbz Hqr.
+  induction lb as [| b]; cbn in H |-*; [ easy | ].
+...
+clear lb Hrlb Hbz.
 move rla after rlq; move rlb after rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
@@ -5785,9 +5806,31 @@ rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
 (**)
 cbn in Hit.
+set (A := rev (a :: rla)) in Hqr.
+set (B := rev rlb ++ [b]) in Hqr.
+set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
+remember (lap_mul B Q) as bq eqn:Hbq.
+unfold lap_mul in Hbq.
+unfold B, Q in Hbq.
+destruct rlb as [| b']. {
+  cbn in Hbq.
+  rewrite Nat.sub_0_r in Hbq.
+  destruct rla as [| a']. {
+    cbn in Hbq.
+    rewrite rngl_summation_only_one in Hbq.
+    rewrite rngl_mul_comm in Hbq; [ | easy ].
+    rewrite rngl_div_mul in Hbq; [ | easy | ].
+...
+Search ((_ / _) * _)%F.
+Search (_ * (_ / _))%F.
+rngl_div_mul:
+  ∀ (T : Type) (ro : ring_like_op T),
+    ring_like_prop T → rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a / b * b)%F = a
+...
 eapply IHit with (rla := rlr). 2: {
-(* peut-être il faut un contre-exemple ; peut-être que
-   rlap_quot_rem_nb_iter n'est pas correct *)
+...
+*)
+(*
 Abort.
 End a.
 Arguments lap_add {T ro} (al1 al2)%list.
@@ -5798,9 +5841,11 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
-Compute (lap_quot_rem [] [2]).
-
+Compute (lap_quot_rem [1] [0]).
+Compute (lap_quot_rem [1] [0;0]).
+Compute (lap_quot_rem [1] [0;0;0]).
 ...
+*)
 eapply IHit with (rla := rla); [ | easy ].
 ...
 apply IHit in Hqr. 2: {
