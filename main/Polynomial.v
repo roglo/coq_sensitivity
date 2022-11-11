@@ -5788,6 +5788,18 @@ cbn in Hit.
 eapply IHit with (rla := rlr). 2: {
 (* peut-être il faut un contre-exemple ; peut-être que
    rlap_quot_rem_nb_iter n'est pas correct *)
+Abort.
+End a.
+Arguments lap_add {T ro} (al1 al2)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (lap_quot_rem [] [2]).
+
 ...
 eapply IHit with (rla := rla); [ | easy ].
 ...
