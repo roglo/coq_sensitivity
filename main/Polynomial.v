@@ -5645,17 +5645,17 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
           match rlb with
           | [] => ([], []) (* division by zero *)
           | b :: rlb' =>
-              let q := (a / b)%F in
-(*
-              if ((q =? 0)%F || (length rla' <? length rlb'))%bool then ([], rla)
-*)
               if length rla' <? length rlb' then ([], rla)
-(**)
               else
+                let cq := (a / b)%F in
                 let dq := length rla' - length rlb' in
-                let lr := lap_norm (lap_sub (rev rla) (lap_mul (rev rlb) (repeat 0%F dq ++ [q]))) in
+                let lr :=
+                  lap_norm
+                    (lap_sub (rev rla)
+                       (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])))
+                in
                 let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
-                (q :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
+                (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
           end
       end
   end.
