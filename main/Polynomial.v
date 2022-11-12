@@ -5736,7 +5736,7 @@ rewrite lap_add_length.
 now rewrite lap_opp_length.
 Qed.
 
-Theorem glop :
+Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
@@ -5752,6 +5752,9 @@ remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
+Print rlap_quot_rem.
+Print rlap_quot_rem_loop.
+...
 unfold rlap_quot_rem in Hqr.
 remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
 unfold rlap_quot_rem_nb_iter in Hit.
