@@ -5813,12 +5813,14 @@ set (A := rev (a :: rla)) in Hqr.
 set (B := rev rlb ++ [b]) in Hqr.
 set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
 remember (lap_mul B Q) as bq eqn:Hbq.
+...
 unfold lap_mul in Hbq.
 unfold B, Q in Hbq.
 assert (Hos : rngl_has_opp_or_sous = true). {
   now apply rngl_has_opp_or_sous_iff; left.
 }
 move Hos before Hiv.
+...
 destruct rlb as [| b']. {
   cbn in Hbq |-*.
   apply Nat.lt_1_r.
@@ -5842,6 +5844,14 @@ destruct rlb as [| b']. {
   cbn in Hbq, Hit.
   rewrite rngl_summation_only_one in Hbq.
   rewrite (rngl_mul_0_r Hos) in Hbq.
+Print lap_convol_mul.
+rewrite Nat.add_1_r in Hbq.
+cbn in Hbq.
+unfold iter_seq, iter_list in Hbq.
+cbn in Hbq.
+rewrite rngl_add_0_l, (rngl_mul_0_l Hos) in Hbq.
+rewrite rngl_add_0_r in Hbq.
+...
   cbn in A, B, Q.
   subst A B Q bq.
   rewrite Nat.add_1_r in Hqr; cbn in Hqr.
