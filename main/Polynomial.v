@@ -5746,9 +5746,11 @@ rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   cbn.
-...
-  destruct (rngl_eq_dec a 0%F) as [Haz| Haz]. {
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz.
     cbn; subst a; f_equal.
+...
     assert (H : lap_norm la = []). {
       apply all_0_lap_norm_nil.
       intros i.
