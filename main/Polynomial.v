@@ -5736,6 +5736,65 @@ rewrite lap_add_length.
 now rewrite lap_opp_length.
 Qed.
 
+Theorem lap_norm_repeat_0 : ∀ la,
+  la = lap_norm la ++ repeat 0%F (length la - length (lap_norm la)).
+Proof.
+intros.
+induction la as [| a]; [ easy | ].
+cbn.
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  cbn.
+...
+  destruct (rngl_eq_dec a 0%F) as [Haz| Haz]. {
+    cbn; subst a; f_equal.
+    assert (H : lap_norm la = []). {
+      apply all_0_lap_norm_nil.
+      intros i.
+      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
+      destruct (lt_dec i (length la)) as [Hila| Hila]. {
+        replace la with (rev (rev la)) by apply rev_involutive.
+        rewrite rev_nth; rewrite rev_length; [ | easy ].
+        apply H1.
+      }
+      apply Nat.nlt_ge in Hila.
+      now rewrite nth_overflow.
+    }
+    rewrite H in IHla; cbn in IHla.
+    now rewrite Nat.sub_0_r in IHla.
+  } {
+    cbn; f_equal.
+    assert (H : lap_norm la = []). {
+      apply all_0_lap_norm_nil.
+      intros i.
+      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
+      destruct (lt_dec i (length la)) as [Hila| Hila]. {
+        replace la with (rev (rev la)) by apply rev_involutive.
+        rewrite rev_nth; rewrite rev_length; [ | easy ].
+        apply H1.
+      }
+      apply Nat.nlt_ge in Hila.
+      now rewrite nth_overflow.
+    }
+    now rewrite H in IHla; cbn in IHla.
+  }
+} {
+  cbn.
+  rewrite rev_app_distr; cbn; f_equal.
+  replace (rev lb ++ [b]) with (rev (b :: lb)) by easy.
+  rewrite <- Hlb.
+  now rewrite fold_lap_norm.
+}
+Qed.
+
+Theorem lap_norm_length_le : ∀ la, length (lap_norm la) ≤ length la.
+Proof.
+intros.
+rewrite (lap_norm_repeat_0 la) at 2.
+rewrite app_length; flia.
+Qed.
+
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -5837,6 +5896,7 @@ destruct lb as [| b']. {
   rewrite rev_length.
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
+Search (length (lap_norm _)).
 ...
   destruct rla as [| a']; cbn in Hbq. {
     rewrite rngl_summation_only_one in Hbq.
@@ -7084,57 +7144,6 @@ assert (H : strip_0s (rev la) = []). {
 now rewrite Hlb in H.
 Qed.
 
-Theorem lap_norm_repeat_0 : ∀ la,
-  la = lap_norm la ++ repeat 0%Rng (length la - length (lap_norm la)).
-Proof.
-intros.
-induction la as [| a]; [ easy | ].
-cbn.
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  cbn.
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
-    cbn; subst a; f_equal.
-    assert (H : lap_norm la = []). {
-      apply all_0_lap_norm_nil.
-      intros i.
-      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
-      destruct (lt_dec i (length la)) as [Hila| Hila]. {
-        replace la with (rev (rev la)) by apply rev_involutive.
-        rewrite rev_nth; rewrite rev_length; [ | easy ].
-        apply H1.
-      }
-      apply Nat.nlt_ge in Hila.
-      now rewrite nth_overflow.
-    }
-    rewrite H in IHla; cbn in IHla.
-    now rewrite Nat.sub_0_r in IHla.
-  } {
-    cbn; f_equal.
-    assert (H : lap_norm la = []). {
-      apply all_0_lap_norm_nil.
-      intros i.
-      specialize (proj1 (eq_strip_0s_nil _) Hlb) as H1.
-      destruct (lt_dec i (length la)) as [Hila| Hila]. {
-        replace la with (rev (rev la)) by apply rev_involutive.
-        rewrite rev_nth; rewrite rev_length; [ | easy ].
-        apply H1.
-      }
-      apply Nat.nlt_ge in Hila.
-      now rewrite nth_overflow.
-    }
-    now rewrite H in IHla; cbn in IHla.
-  }
-} {
-  cbn.
-  rewrite rev_app_distr; cbn; f_equal.
-  replace (rev lb ++ [b]) with (rev (b :: lb)) by easy.
-  rewrite <- Hlb.
-  now rewrite fold_lap_norm.
-}
-Qed.
-
 Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
   lap_norm (lap_convol_mul (la ++ repeat 0%Rng n) lb i len) =
   lap_norm (lap_convol_mul la lb i len).
@@ -7202,13 +7211,6 @@ intros * Hlen.
 rewrite (lap_norm_repeat_0 la) at 2.
 rewrite app_comm_cons.
 now rewrite lap_convol_mul_app_rep_0_l.
-Qed.
-
-Theorem lap_norm_length_le : ∀ la, length (lap_norm la) ≤ length la.
-Proof.
-intros.
-rewrite (lap_norm_repeat_0 la) at 2.
-rewrite app_length; flia.
 Qed.
 
 Theorem nth_lap_add : ∀ i la lb,
