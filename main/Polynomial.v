@@ -5635,6 +5635,9 @@ Fixpoint lap_power la n :=
 
 (* euclidean division *)
 
+Definition rlap_quot_rem_nb_iter (la lb : list T) :=
+  S (length la).
+
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
@@ -5651,17 +5654,14 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
                 let dq := length rla' - length rlb' in
                 let lr :=
                   lap_norm
-                    (lap_sub (rev rla)
-                       (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])))
+                    (lap_sub (rev rla')
+                       (lap_mul (rev rlb') (repeat 0%F dq ++ [cq])))
                 in
                 let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
                 (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
           end
       end
   end.
-
-Definition rlap_quot_rem_nb_iter (la lb : list T) :=
-  S (length la).
 
 Definition rlap_quot_rem rla rlb :=
   rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
@@ -5752,9 +5752,6 @@ remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
-Print rlap_quot_rem.
-Print rlap_quot_rem_loop.
-...
 unfold rlap_quot_rem in Hqr.
 remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
 unfold rlap_quot_rem_nb_iter in Hit.
@@ -5811,7 +5808,7 @@ destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
-(**)
+...
 set (A := rev (a :: rla)) in Hqr.
 set (B := rev rlb ++ [b]) in Hqr.
 set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
