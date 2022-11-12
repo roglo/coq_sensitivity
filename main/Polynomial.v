@@ -5747,6 +5747,10 @@ Theorem lap_rem_length_lt :
   → length lr < length lb.
 Proof.
 intros Hop Hco Hiv * Hbz Hbn Hab.
+assert (Hos : rngl_has_opp_or_sous = true). {
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+move Hos before Hiv.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -5808,25 +5812,32 @@ destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
-...
-set (A := rev (a :: rla)) in Hqr.
-set (B := rev rlb ++ [b]) in Hqr.
-set (Q := repeat 0%F (length rla - length rlb) ++ [(a / b)%F]) in Hqr.
-remember (lap_mul B Q) as bq eqn:Hbq.
-...
+cbn in Hit.
+remember (rev rla) as la eqn:Hla.
+assert (H : rla = rev la) by now rewrite Hla, rev_involutive.
+move H at top; subst rla; clear Hla.
+rewrite rev_length in Hab, Hit, Hqr.
+remember (rev rlb) as lb eqn:Hlb.
+assert (H : rlb = rev lb) by now rewrite Hlb, rev_involutive.
+move H at top; subst rlb; clear Hlb.
+rewrite rev_length in Hab, Hqr |-*.
+remember (repeat 0%F (length la - length lb) ++ [(a / b)%F]) as lq eqn:Hlq.
+remember (lap_mul lb lq) as bq eqn:Hbq.
 unfold lap_mul in Hbq.
-unfold B, Q in Hbq.
-assert (Hos : rngl_has_opp_or_sous = true). {
-  now apply rngl_has_opp_or_sous_iff; left.
-}
-move Hos before Hiv.
-...
-destruct rlb as [| b']. {
-  cbn in Hbq |-*.
+move a after b.
+destruct lb as [| b']. {
+  clear Hab; subst bq; cbn in IHit, Hlq, Hqr |-*.
+  rewrite Nat.sub_0_r in Hlq.
+  unfold lap_sub, lap_opp in Hqr; cbn in Hqr.
+  rewrite lap_add_0_r in Hqr.
   apply Nat.lt_1_r.
   apply length_zero_iff_nil.
   destruct rlr as [| r]; [ easy | exfalso ].
-  rewrite Nat.sub_0_r in Hbq.
+  apply IHit in Hqr; [ cbn in Hqr; flia Hqr | ].
+  rewrite rev_length.
+  etransitivity; [ | apply Hit ].
+  apply -> Nat.succ_le_mono.
+...
   destruct rla as [| a']; cbn in Hbq. {
     rewrite rngl_summation_only_one in Hbq.
     rewrite rngl_mul_comm in Hbq; [ | easy ].
