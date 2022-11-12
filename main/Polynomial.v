@@ -5736,6 +5736,68 @@ rewrite lap_add_length.
 now rewrite lap_opp_length.
 Qed.
 
+Theorem eq_strip_0s_nil : ∀ la,
+  strip_0s la = [] ↔ ∀ i, nth i la 0%F = 0%F.
+Proof.
+intros.
+split. {
+  intros Hla *.
+  revert i.
+  induction la as [| a]; intros; [ now destruct i | cbn ].
+  cbn in Hla.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz.
+  destruct i; [ easy | ].
+  now apply IHla.
+} {
+  intros Hla.
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply IHla.
+    intros i.
+    now specialize (Hla (S i)).
+  }
+  apply (rngl_eqb_neq Heb) in Haz.
+  now specialize (Hla 0).
+}
+Qed.
+
+Theorem all_0_lap_norm_nil : ∀ la,
+  (∀ i, nth i la 0%F = 0%F)
+  → lap_norm la = [].
+Proof.
+intros * Hla.
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H1| H1]; [ easy | exfalso ].
+  apply (rngl_eqb_neq Heb) in H1.
+  now specialize (Hla 0); cbn in Hla.
+}
+exfalso.
+assert (H : strip_0s (rev la) = []). {
+  clear - rp Heb Hla.
+  apply eq_strip_0s_nil.
+  intros i.
+  destruct (lt_dec i (length la)) as [Hila| Hila]. {
+    rewrite rev_nth; [ | easy ].
+    specialize (Hla (S (length la - S i))).
+    now cbn in Hla.
+  }
+  apply Nat.nlt_ge in Hila.
+  rewrite nth_overflow; [ easy | now rewrite rev_length ].
+}
+now rewrite Hlb in H.
+Qed.
+
+Theorem fold_lap_norm : ∀ la, rev (strip_0s (rev la)) = lap_norm la.
+Proof. easy. Qed.
+
 Theorem lap_norm_repeat_0 : ∀ la,
   la = lap_norm la ++ repeat 0%F (length la - length (lap_norm la)).
 Proof.
@@ -5750,7 +5812,6 @@ destruct lb as [| b]. {
   destruct (bool_dec _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
     cbn; subst a; f_equal.
-...
     assert (H : lap_norm la = []). {
       apply all_0_lap_norm_nil.
       intros i.
@@ -5898,98 +5959,8 @@ destruct lb as [| b']. {
   rewrite rev_length.
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
-Search (length (lap_norm _)).
-...
-  destruct rla as [| a']; cbn in Hbq. {
-    rewrite rngl_summation_only_one in Hbq.
-    rewrite rngl_mul_comm in Hbq; [ | easy ].
-    rewrite rngl_div_mul in Hbq; [ | easy | easy ].
-    cbn in A, B, Q.
-    subst A B Q bq.
-    cbn in Hqr, Hit.
-    rewrite rev_involutive in Hqr.
-    rewrite (fold_rngl_sub Hop) in Hqr.
-    rewrite rngl_sub_diag in Hqr; [ | easy ].
-    rewrite (rngl_eqb_refl Heb) in Hqr.
-    destruct it; [ easy | easy ].
-  }
-  rewrite app_length, repeat_length in Hbq.
-  cbn in Hbq, Hit.
-  rewrite rngl_summation_only_one in Hbq.
-  rewrite (rngl_mul_0_r Hos) in Hbq.
-Print lap_convol_mul.
-rewrite Nat.add_1_r in Hbq.
-cbn in Hbq.
-unfold iter_seq, iter_list in Hbq.
-cbn in Hbq.
-rewrite rngl_add_0_l, (rngl_mul_0_l Hos) in Hbq.
-rewrite rngl_add_0_r in Hbq.
-...
-  cbn in A, B, Q.
-  subst A B Q bq.
-  rewrite Nat.add_1_r in Hqr; cbn in Hqr.
-  unfold iter_seq, iter_list in Hqr.
-  cbn in Hqr.
-  rewrite (rngl_mul_0_l Hos) in Hqr.
-  rewrite rngl_add_0_l, rngl_add_0_r in Hqr.
-(**)
-  destruct rla as [| a'']. {
-    cbn in Hqr, Hit.
-    rewrite rev_involutive in Hqr.
-    rewrite (rngl_mul_comm Hco) in Hqr.
-    rewrite (rngl_div_mul Hiv _ _ Hbn) in Hqr.
-    rewrite (fold_rngl_sub Hop) in Hqr.
-    rewrite (rngl_sub_diag Hos) in Hqr.
-    rewrite (rngl_eqb_refl Heb) in Hqr.
-    rewrite (rngl_opp_0 Hop) in Hqr.
-    rewrite rngl_add_0_r in Hqr.
-    destruct (a' =? 0)%F; [ now destruct Hit | ].
-    destruct it; [ easy | ].
-    cbn in Hqr.
-    apply Nat.succ_le_mono in Hit.
-    rewrite Nat.ltb_irrefl in Hqr.
-    rewrite rngl_summation_only_one in Hqr.
-    rewrite rev_involutive in Hqr.
-    rewrite (fold_rngl_sub Hop) in Hqr.
-    rewrite (rngl_mul_comm Hco) in Hqr.
-    rewrite (rngl_div_mul Hiv _ _ Hbn) in Hqr.
-    rewrite (rngl_sub_diag Hos) in Hqr.
-    rewrite (rngl_eqb_refl Heb) in Hqr.
-    now destruct it.
-  }
-...
-  apply IHit in Hqr. 2: {
-    rewrite rev_length.
-    destruct rla as [| a'']. {
-      cbn.
-      rewrite rev_length.
-      rewrite rngl_mul_comm; [ | easy ].
-      rewrite rngl_div_mul; [ | easy | easy ].
-      rewrite (fold_rngl_sub Hop).
-      rewrite rngl_sub_diag; [ | easy ].
-      rewrite (rngl_eqb_refl Heb).
-      rewrite (rngl_opp_0 Hop).
-      rewrite rngl_add_0_r.
-      destruct (a' =? 0)%F; [ | easy ].
-      cbn in Hit |-*; flia Hit.
-    }
-    cbn.
-    rewrite rev_length.
-    etransitivity. {
-      apply -> Nat.succ_le_mono.
-      apply strip_0s_length_le.
-    }
-    rewrite rev_length.
-    rewrite lap_add_length; cbn.
-    do 3 rewrite app_length.
-    rewrite rev_length; cbn.
-    rewrite map_length.
-    do 3 rewrite Nat.add_1_r.
-    do 3 rewrite <- Nat.succ_max_distr.
-    cbn in Hit.
-    etransitivity; [ | apply Hit ].
-    do 3 apply -> Nat.succ_le_mono.
-(* ah bin non, tiens *)
+  apply lap_norm_length_le.
+}
 ...
 eapply IHit with (rla := rlr). 2: {
 ...
@@ -6549,10 +6520,6 @@ induction la as [| a]; intros. {
 }
 Qed.
 
-Theorem fold_lap_norm {A} {rng : ring A} :
-  ∀ la, rev (strip_0s (rev la)) = lap_norm la.
-Proof. easy. Qed.
-
 Theorem poly_add_0_l {α} {r : ring α} : ∀ p, (0 + p)%pol = p.
 Proof.
 intros (la, lapr).
@@ -6990,30 +6957,6 @@ split; intros H i. {
 }
 Qed.
 
-Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] ↔ ∀ i, nth i la 0%Rng = 0%Rng.
-Proof.
-intros.
-split. {
-  intros Hla *.
-  revert i.
-  induction la as [| a]; intros; [ now destruct i | cbn ].
-  cbn in Hla.
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ | easy ].
-  destruct i; [ easy | ].
-  now apply IHla.
-} {
-  intros Hla.
-  induction la as [| a]; [ easy | cbn ].
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
-    apply IHla.
-    intros i.
-    now specialize (Hla (S i)).
-  }
-  now specialize (Hla 0).
-}
-Qed.
-
 Theorem eq_strip_0s_rev_nil : ∀ la,
   strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%Rng = 0%Rng.
 Proof.
@@ -7115,35 +7058,6 @@ destruct (le_dec (length la) j) as [H1| H1]. {
     flia H H1.
   }
 }
-Qed.
-
-Theorem all_0_lap_norm_nil : ∀ la,
-  (∀ i, nth i la 0%Rng = 0%Rng)
-  → lap_norm la = [].
-Proof.
-intros * Hla.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  cbn.
-  destruct (rng_eq_dec a 0%Rng) as [H1| H1]; [ easy | exfalso ].
-  now specialize (Hla 0); cbn in Hla.
-}
-exfalso.
-assert (H : strip_0s (rev la) = []). {
-  clear - Hla.
-  apply eq_strip_0s_nil.
-  intros i.
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite rev_nth; [ | easy ].
-    specialize (Hla (S (length la - S i))).
-    now cbn in Hla.
-  }
-  apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ easy | now rewrite rev_length ].
-}
-now rewrite Hlb in H.
 Qed.
 
 Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
