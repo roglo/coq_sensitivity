@@ -6028,7 +6028,6 @@ intros Hop Hco Hiv * Hbz Hbn Hab.
 split. 2: {
   now apply lap_rem_length_lt with (la := la) (lq := lq).
 }
-...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -6037,7 +6036,6 @@ injection Hab; clear Hab; intros; subst lq lr.
 unfold rlap_quot_rem in Hqr.
 remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
 unfold rlap_quot_rem_nb_iter in Hit.
-...
 rewrite <- rev_involutive; symmetry.
 rewrite <- rev_involutive; symmetry.
 f_equal.
@@ -6050,13 +6048,26 @@ assert (H : rlb ≠ []). {
   intros H; apply Hbz.
   now apply List_eq_rev_nil in H.
 }
-clear lb Hrlb Hbz.
+move H before Hbz; clear Hbz.
 rename H into Hbz.
-move rla after rlq; move rlb after rlq.
+assert (H : hd 1%F rlb ≠ 0%F). {
+  subst rlb.
+  unfold last_lap_neq_0 in Hbn.
+  apply Bool.negb_true_iff in Hbn.
+  apply (rngl_eqb_neq Heb) in Hbn.
+  move Hbn at bottom.
+  intros H; apply Hbn; clear Hbn.
+  clear Hbz Hqr.
+  rewrite <- (rev_involutive lb).
+  destruct (rev lb); cbn in H |-*; [ easy | ].
+  now rewrite last_last.
+}
+move H before Hbn; clear Hbn.
+rename H into Hbn.
+clear lb Hrlb.
+move rla after rlb; move rlq before rlb; move rlr before rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
-move Hbz after Hqr.
-...
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -6078,18 +6089,35 @@ destruct qr as (rlq', rlr').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
-...
+move a after b.
+move rla after rlb.
+move rlq before rlb.
+move rlr before rlq.
+apply Nat.ltb_ge in Hab.
 apply IHit in Hqr. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
-...
   etransitivity; [ | apply Hit ].
-  cbn - [ rev ].
+  cbn.
   apply -> Nat.succ_le_mono.
   etransitivity; [ apply strip_0s_length_le | ].
   rewrite rev_length.
   rewrite lap_sub_length.
+  rewrite rev_length, app_length.
+  rewrite map_length, repeat_length.
   rewrite rev_length.
+  rewrite Nat.sub_add; [ | easy ].
+  now rewrite Nat.max_id.
+}
+cbn.
+cbn in Hqr.
+cbn in Hbn.
+rewrite rev_app_distr.
+rewrite <- app_assoc.
+Search (lap_mul (_ ++ _)).
+Print lap_mul.
+Print lap_convol_mul.
+Search (rev (repeat _ _)).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
