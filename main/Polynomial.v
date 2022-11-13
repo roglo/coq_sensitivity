@@ -5479,21 +5479,23 @@ ListNotations
 
 (* (lap : list as polynomial) *)
 (* e.g. polynomial ax²+bx+c is implemented by the list [c;b;a] *)
-(* TODO: use an intermediate type, like in old versions, like this:
-      Record polyn T := mk_polyn { lap : list T }.
-   and another type for the condition that the last value in lap
-   is not null.
-*)
-Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
-  (last lap 1 ≠? 0)%F = true.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
-  { lap : list T;
-    lap_prop : last_lap_neq_0 lap }.
+  { lap : list T }.
 
 Arguments polyn T {ro}.
 Arguments mk_polyn {T ro} lap%list.
 Arguments lap {T ro}.
+
+Definition is_canon_lap T {ro : ring_like_op T} (lap : list T) :=
+  (last lap 1 ≠? 0)%F.
+
+Definition is_canon_polyn T {ro : ring_like_op T} (p : polyn T) :=
+  is_canon_lap (lap p).
+
+Record canon_polyn T {ro : ring_like_op T} := mk_canon_polyn
+  { cp_polyn : polyn T;
+    cp_prop : is_canon_polyn cp_polyn = true }.
 
 Section a.
 
@@ -5508,6 +5510,35 @@ Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
 
 (* polyn_eqb is an equality *)
 
+Definition monom_eqb ma mb :=
+  (rngl_eqb (mcoeff ma) (mcoeff mb) && Nat.eqb (mdeg ma) (mdeg mb))%bool.
+
+Theorem monom_eqb_eq : equality monom_eqb.
+
+...
+
+Theorem polyn_eqb_eq : equality (polyn_eqb.
+Proof.
+intros ma mb.
+split; intros Hab. {
+  destruct ma as (ca, da).
+  destruct mb as (cb, db).
+  unfold monom_eqb in Hab; cbn in Hab.
+  apply Bool.andb_true_iff in Hab.
+  destruct Hab as (Hcab, Hdab).
+  apply (rngl_eqb_eq Heq) in Hcab; subst cb.
+  apply Nat.eqb_eq in Hdab; subst db.
+  easy.
+} {
+  subst mb.
+  unfold monom_eqb.
+  rewrite Nat.eqb_refl, Bool.andb_true_r.
+  apply equality_refl.
+  unfold equality.
+  apply (rngl_eqb_eq Heq).
+}
+Qed.
+
 Theorem polyn_eqb_eq : ∀ (eqb : T → T → bool),
   equality eqb →
   ∀ (P Q : polyn T),
@@ -5517,6 +5548,7 @@ intros * Heqb *.
 split; intros Hpq. {
   unfold polyn_eqb in Hpq.
   apply list_eqb_eq in Hpq; [ | easy ].
+...
   destruct P as (P, Pprop).
   destruct Q as (Q, Qprop).
   cbn in Hpq; cbn.
