@@ -5878,6 +5878,25 @@ destruct os as [os| ]. {
 apply rngl_add_0_r.
 Qed.
 
+Theorem lap_norm_add_length_le : ∀ la lb,
+  length (lap_norm (lap_add la lb)) ≤ max (length la) (length lb).
+Proof.
+intros.
+unfold lap_norm.
+rewrite rev_length.
+etransitivity; [ apply strip_0s_length_le | ].
+rewrite rev_length.
+now rewrite lap_add_length.
+Qed.
+
+Theorem lap_norm_sub_length_le : ∀ la lb,
+  length (lap_norm (lap_sub la lb)) ≤ max (length la) (length lb).
+Proof.
+intros.
+etransitivity; [ apply lap_norm_add_length_le | ].
+now rewrite lap_opp_length.
+Qed.
+
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -5986,47 +6005,31 @@ apply IHit in Hqr; [ easy | ].
 rewrite rev_length.
 etransitivity; [ | apply Hit ].
 apply -> Nat.succ_le_mono.
-Search (lap_norm (lap_sub _ _)).
-...
-*)
-(*
-Abort.
-End a.
-Arguments lap_add {T ro} (al1 al2)%list.
-Arguments lap_sub {T ro} (la lb)%list.
-Arguments lap_mul {T ro} (la lb)%list.
-Arguments lap_quot_rem {T ro} (la lb)%list.
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute (lap_quot_rem [1] [0]).
-Compute (lap_quot_rem [1] [0;0]).
-Compute (lap_quot_rem [1] [0;0;0]).
-...
-*)
-eapply IHit with (rla := rla); [ | easy ].
-...
-apply IHit in Hqr. 2: {
-  unfold lap_norm.
-  rewrite rev_involutive.
-  etransitivity; [ | apply Hit ].
-  cbn - [ rev ].
-  apply -> Nat.succ_le_mono.
-  etransitivity; [ apply strip_0s_length_le | ].
-  rewrite rev_length.
-  rewrite lap_sub_length.
-  rewrite rev_length.
-(* marche pas *)
-...
+etransitivity; [ apply lap_norm_sub_length_le | ].
+rewrite max_l; [ easy | ].
+rewrite app_length, repeat_length; cbn.
+rewrite map_length.
+cbn in Hab.
+now rewrite Nat.sub_add.
+Qed.
 
-Theorem glop : ∀ la lb lq lr : list T,
+Theorem lap_quot_rem_prop :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  rngl_has_inv = true →
+  ∀ la lb lq lr : list T,
   lb ≠ []
+  → last_lap_neq_0 lb
   → lap_quot_rem la lb = (lq, lr)
   → la = lap_add (lap_mul lb lq) lr ∧
-     length lr < length la.
+     length lr < length lb.
 Proof.
-intros * Hbz Hab.
+intros Hop Hco Hiv * Hbz Hbn Hab.
+split. 2: {
+  now apply lap_rem_length_lt with (la := la) (lq := lq).
+}
+...
+
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
