@@ -5655,7 +5655,7 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
                 let lr :=
                   lap_norm
                     (lap_sub (rev rla')
-                       (lap_mul (rev rlb') (repeat 0%F dq ++ [cq])))
+                       (repeat 0%F dq ++ map (rngl_mul cq) (rev rlb')))
                 in
                 let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
                 (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
@@ -5921,6 +5921,7 @@ cbn in Hqr.
 destruct rla as [| a]. {
   now injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 }
+move a after b.
 rewrite if_bool_if_dec in Hqr.
 destruct (bool_dec _) as [Hab| Hab]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
@@ -5943,15 +5944,9 @@ remember (rev rlb) as lb eqn:Hlb.
 assert (H : rlb = rev lb) by now rewrite Hlb, rev_involutive.
 move H at top; subst rlb; clear Hlb.
 rewrite rev_length in Hab, Hqr |-*.
-remember (repeat 0%F (length la - length lb) ++ [(a / b)%F]) as lq eqn:Hlq.
-remember (lap_mul lb lq) as bq eqn:Hbq.
-unfold lap_mul in Hbq.
-move a after b.
 destruct lb as [| b']. {
-  clear Hab; subst bq; cbn in IHit, Hlq, Hqr |-*.
-  rewrite Nat.sub_0_r in Hlq.
-  unfold lap_sub, lap_opp in Hqr; cbn in Hqr.
-  rewrite lap_add_0_r in Hqr.
+  clear Hab; cbn in IHit, Hqr |-*.
+  rewrite Nat.sub_0_r, app_nil_r in Hqr.
   apply Nat.lt_1_r.
   apply length_zero_iff_nil.
   destruct rlr as [| r]; [ easy | exfalso ].
@@ -5959,6 +5954,7 @@ destruct lb as [| b']. {
   rewrite rev_length.
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
+...
   apply lap_norm_length_le.
 }
 ...
