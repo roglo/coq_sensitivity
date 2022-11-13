@@ -5858,6 +5858,26 @@ rewrite (lap_norm_repeat_0 la) at 2.
 rewrite app_length; flia.
 Qed.
 
+Theorem lap_sub_repeat_0 : ∀ la,
+  lap_sub la (repeat 0%F (length la)) = la.
+Proof.
+intros.
+unfold lap_sub, lap_opp.
+induction la as [| a]; [ easy | cbn ].
+rewrite IHla; f_equal.
+remember rngl_has_opp as hop eqn:Hop; symmetry in Hop.
+destruct hop. {
+  now rewrite (rngl_opp_0 Hop), rngl_add_0_r.
+}
+unfold rngl_opp.
+unfold rngl_has_opp in Hop.
+remember rngl_opt_opp_or_sous as os eqn:Hos; symmetry in Hos.
+destruct os as [os| ]. {
+  destruct os as [os| os]; [ easy | apply rngl_add_0_r ].
+}
+apply rngl_add_0_r.
+Qed.
+
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -5954,11 +5974,19 @@ destruct lb as [| b']. {
   rewrite rev_length.
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
-...
+  rewrite lap_sub_repeat_0.
   apply lap_norm_length_le.
 }
-...
-eapply IHit with (rla := rlr). 2: {
+cbn in IHit.
+rewrite app_length, rev_length in IHit.
+cbn in IHit |-*.
+rewrite Nat.add_1_r in IHit.
+cbn in Hqr.
+apply IHit in Hqr; [ easy | ].
+rewrite rev_length.
+etransitivity; [ | apply Hit ].
+apply -> Nat.succ_le_mono.
+Search (lap_norm (lap_sub _ _)).
 ...
 *)
 (*
