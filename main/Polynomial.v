@@ -6215,9 +6215,18 @@ rewrite <- (rev_involutive (b :: lb)) in Hab.
 remember (rev (b :: lb)) as rlb' eqn:Hrlb'.
 remember (rlap_quot_rem_loop it (rev rlr') (rev rlb')) as qr eqn:Hqr.
 symmetry in Hqr.
-destruct qr as (q, r).
+destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
+destruct rlr as [| r]. {
+  exfalso; revert Hr.
+  now apply rngl_1_neq_0.
+}
+cbn in Hr.
+subst r.
 ...
+Print rlap_quot_rem_loop.
+subst it.
+cbn in Hqr.
 Print rlap_quot_rem_loop.
 ...
 cbn in Hr.
