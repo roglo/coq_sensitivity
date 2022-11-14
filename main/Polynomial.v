@@ -6115,19 +6115,16 @@ rewrite List_rev_repeat.
 ...
 *)
 
-About mk_polyn.
-Print lap_quot_rem.
-Print rlap_quot_rem.
-Print rlap_quot_rem_loop.
-
-Print lap_quot_rem.
-
-Theorem hd_quot : ∀ la lb lq lr,
+Theorem hd_quot :
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
+  → hd 1%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → hd 1%F lq ≠ 0%F.
 Proof.
-intros * Ha Hab.
+intros Hop Hiv * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
 destruct la as [| a]. {
@@ -6139,13 +6136,45 @@ destruct lb as [| b]. {
   injection Hab; clear Hab; intros; subst lq lr.
   now apply rngl_1_neq_0 in Hq.
 }
+remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
+symmetry in Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+destruct it; [ easy | ].
+apply Nat.succ_inj in Hit.
 cbn in Hab.
 rewrite if_bool_if_dec in Hab.
 destruct (bool_dec _) as [Halb| Halb]. {
   injection Hab; clear Hab; intros; subst lq lr.
   now apply rngl_1_neq_0 in Hq.
 }
-...
+remember (a / b)%F as cq eqn:Hcq.
+remember
+  (lap_norm
+     (lap_sub (rev la)
+        (repeat 0%F (length la - length lb) ++ map (rngl_mul cq) (rev lb))))
+  as rlr' eqn:Hrlr'.
+rewrite <- (rev_involutive (b :: lb)) in Hab.
+remember (rev (b :: lb)) as rlb' eqn:Hrlb'.
+remember (rlap_quot_rem_loop it (rev rlr') (rev rlb')) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, r).
+injection Hab; clear Hab; intros; subst lq lr.
+cbn in Hq.
+subst cq.
+unfold rngl_div in Hq.
+rewrite Hiv in Hq.
+apply rngl_integral in Hq; cycle 1. {
+  now apply rngl_has_opp_or_sous_iff; left.
+} {
+  apply Bool.orb_true_iff; right.
+  rewrite Heb, Bool.andb_true_r.
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+destruct Hq as [Hq| Hq]; [ easy | ].
+exfalso; revert Hq.
+apply rngl_inv_neq_0; [ | easy | easy | easy ].
+now apply rngl_has_opp_or_sous_iff; left.
+Qed.
 
 Theorem quot_is_norm : ∀ la lb,
   last_lap_neq_0 (fst (lap_quot_rem la lb)).
@@ -6162,8 +6191,7 @@ apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
 rewrite List_last_rev.
 rename rlq into lq; rename rlr into lr.
-... ...
-now apply hd_quot in Hqr.
+apply hd_quot in Hqr; [ easy | | | | ].
 ...
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
@@ -6175,7 +6203,6 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
   (mk_polyn lq (quot_is_norm (lap pa) (lap pb) 42), mk_polyn lr).
-
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
