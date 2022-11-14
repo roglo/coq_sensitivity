@@ -1696,6 +1696,13 @@ intros.
 now specialize (Hll d (S i)).
 Qed.
 
+Theorem List_last_rev : ∀ A (l : list A) d,
+  last (rev l) d = hd d l.
+Proof.
+intros.
+destruct l as [| a]; [ easy | apply last_last ].
+Qed.
+
 (* common for all iterators *)
 
 Theorem iter_list_seq : ∀ T d (op : T → T → T) b len f,

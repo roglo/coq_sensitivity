@@ -6013,6 +6013,9 @@ cbn in Hab.
 now rewrite Nat.sub_add.
 Qed.
 
+(* bon, on verra plus tard ; je pense que le code de lap_quot_rem
+   est bon, j'ai assez confiance, mais il faut plein de lemmes qui
+   sont, ici, démontrés plus tard
 Theorem lap_quot_rem_prop :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -6058,6 +6061,7 @@ assert (H : hd 1%F rlb ≠ 0%F). {
   move Hbn at bottom.
   intros H; apply Hbn; clear Hbn.
   clear Hbz Hqr.
+...
   rewrite <- (rev_involutive lb).
   destruct (rev lb); cbn in H |-*; [ easy | ].
   now rewrite last_last.
@@ -6109,36 +6113,77 @@ move la after rlb.
 cbn in IHit.
 rewrite List_rev_repeat.
 ...
-apply IHit in Hqr. 2: {
-  unfold lap_norm.
-  rewrite rev_involutive.
-  etransitivity; [ | apply Hit ].
-  cbn.
-  apply -> Nat.succ_le_mono.
-  etransitivity; [ apply strip_0s_length_le | ].
-  rewrite rev_length.
-  rewrite lap_sub_length.
-  rewrite rev_length, app_length.
-  rewrite map_length, repeat_length.
-  rewrite rev_length.
-  rewrite Nat.sub_add; [ | easy ].
-  now rewrite Nat.max_id.
+*)
+
+About mk_polyn.
+Print lap_quot_rem.
+Print rlap_quot_rem.
+Print rlap_quot_rem_loop.
+
+Print lap_quot_rem.
+
+Theorem hd_quot : ∀ la lb lq lr,
+  hd 1%F la ≠ 0%F
+  → rlap_quot_rem la lb = (lq, lr)
+  → hd 1%F lq ≠ 0%F.
+Proof.
+intros * Ha Hab.
+intros Hq; apply Ha; clear Ha.
+unfold rlap_quot_rem in Hab.
+destruct la as [| a]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hq.
 }
 cbn.
-cbn in Hqr.
-cbn in Hbn.
-rewrite rev_app_distr.
-rewrite <- app_assoc.
+destruct lb as [| b]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hq.
+}
+cbn in Hab.
+rewrite if_bool_if_dec in Hab.
+destruct (bool_dec _) as [Halb| Halb]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hq.
+}
+...
+
+Theorem quot_is_norm : ∀ la lb,
+  last_lap_neq_0 (fst (lap_quot_rem la lb)).
+Proof.
+intros.
+unfold lap_quot_rem.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr); cbn.
+remember (rev la) as l; clear la Heql; rename l into la.
+remember (rev lb) as l; clear lb Heql; rename l into lb.
+unfold last_lap_neq_0.
+apply Bool.negb_true_iff.
+apply (rngl_eqb_neq Heb).
+rewrite List_last_rev.
+rename rlq into lq; rename rlr into lr.
+... ...
+now apply hd_quot in Hqr.
+...
+
+Definition polyn_quot (pa pb : polyn T) : polyn T :=
+  let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
+  mk_polyn lq (quot_is_norm (lap pa) (lap pb)).
+
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
-  (mk_polyn lq, mk_polyn lr).
+  (mk_polyn lq (quot_is_norm (lap pa) (lap pb) 42), mk_polyn lr).
+
+...
+
+Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
+  let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
+  (mk_polyn lq 42), mk_polyn lr).
 
 Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
 Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
-
-...
 
 (* polyn opposite or subtraction *)
 
