@@ -6101,6 +6101,12 @@ rewrite rev_app_distr.
 rewrite <- app_assoc.
 rewrite <- (rev_involutive (a :: rla)).
 f_equal; cbn.
+cbn in Hit.
+rewrite <- (rev_length rla) in Hab, Hqr, Hit |-*.
+remember (rev rla) as la eqn:Hla.
+clear rla Hla.
+move la after rlb.
+cbn in IHit.
 ...
 apply IHit in Hqr. 2: {
   unfold lap_norm.
