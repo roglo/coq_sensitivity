@@ -6115,16 +6115,16 @@ rewrite List_rev_repeat.
 ...
 *)
 
-Theorem hd_quot :
-  rngl_has_opp = true →
-  rngl_has_inv = true →
-  ∀ la lb lq lr,
+Context {Hop : rngl_has_opp = true}.
+Context {Hiv : rngl_has_inv = true}.
+
+Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → hd 1%F lq ≠ 0%F.
 Proof.
-intros Hop Hiv * Ha Hb Hab.
+intros * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
 destruct la as [| a]. {
@@ -6176,27 +6176,119 @@ apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
-Theorem quot_is_norm : ∀ la lb,
-  last_lap_neq_0 (fst (lap_quot_rem la lb)).
+Theorem hd_rem : ∀ la lb lq lr,
+  hd 1%F la ≠ 0%F
+  → hd 1%F lb ≠ 0%F
+  → rlap_quot_rem la lb = (lq, lr)
+  → hd 1%F lr ≠ 0%F.
 Proof.
-intros.
+intros * Ha Hb Hab.
+intros Hr; apply Ha; clear Ha.
+unfold rlap_quot_rem in Hab.
+destruct la as [| a]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hr.
+}
+cbn.
+destruct lb as [| b]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hr.
+}
+remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
+symmetry in Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+destruct it; [ easy | ].
+apply Nat.succ_inj in Hit.
+cbn in Hab.
+rewrite if_bool_if_dec in Hab.
+destruct (bool_dec _) as [Halb| Halb]. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  easy.
+}
+remember (a / b)%F as cq eqn:Hcq.
+remember
+  (lap_norm
+     (lap_sub (rev la)
+        (repeat 0%F (length la - length lb) ++ map (rngl_mul cq) (rev lb))))
+  as rlr' eqn:Hrlr'.
+rewrite <- (rev_involutive (b :: lb)) in Hab.
+remember (rev (b :: lb)) as rlb' eqn:Hrlb'.
+remember (rlap_quot_rem_loop it (rev rlr') (rev rlb')) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, r).
+injection Hab; clear Hab; intros; subst lq lr.
+...
+cbn in Hr.
+subst cq.
+unfold rngl_div in Hq.
+rewrite Hiv in Hq.
+apply rngl_integral in Hq; cycle 1. {
+  now apply rngl_has_opp_or_sous_iff; left.
+} {
+  apply Bool.orb_true_iff; right.
+  rewrite Heb, Bool.andb_true_r.
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+destruct Hq as [Hq| Hq]; [ easy | ].
+exfalso; revert Hq.
+apply rngl_inv_neq_0; [ | easy | easy | easy ].
+now apply rngl_has_opp_or_sous_iff; left.
+Qed.
+
+Theorem quot_is_norm : ∀ la lb,
+  last_lap_neq_0 la
+  → last_lap_neq_0 lb
+  → last_lap_neq_0 (fst (lap_quot_rem la lb)).
+Proof.
+intros * Ha Hb.
 unfold lap_quot_rem.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr); cbn.
-remember (rev la) as l; clear la Heql; rename l into la.
-remember (rev lb) as l; clear lb Heql; rename l into lb.
 unfold last_lap_neq_0.
 apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
-rewrite List_last_rev.
-rename rlq into lq; rename rlr into lr.
-apply hd_quot in Hqr; [ easy | | | | ].
+unfold last_lap_neq_0 in Ha, Hb.
+apply Bool.negb_true_iff in Ha, Hb.
+apply (rngl_eqb_neq Heb) in Ha, Hb.
+rewrite <- (rev_involutive la) in Ha.
+rewrite <- (rev_involutive lb) in Hb.
+rewrite List_last_rev in Ha, Hb |-*.
+now apply hd_quot in Hqr.
+Qed.
+
+Theorem rem_is_norm : ∀ la lb,
+  last_lap_neq_0 la
+  → last_lap_neq_0 lb
+  → last_lap_neq_0 (snd (lap_quot_rem la lb)).
+Proof.
+intros * Ha Hb.
+unfold lap_quot_rem.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr); cbn.
+unfold last_lap_neq_0.
+apply Bool.negb_true_iff.
+apply (rngl_eqb_neq Heb).
+unfold last_lap_neq_0 in Ha, Hb.
+apply Bool.negb_true_iff in Ha, Hb.
+apply (rngl_eqb_neq Heb) in Ha, Hb.
+rewrite <- (rev_involutive la) in Ha.
+rewrite <- (rev_involutive lb) in Hb.
+rewrite List_last_rev in Ha, Hb |-*.
 ...
+now apply hd_quot in Hqr.
+Qed.
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
-  mk_polyn lq (quot_is_norm (lap pa) (lap pb)).
+  mk_polyn lq (quot_is_norm (lap_prop pa) (lap_prop pb)).
+
+... ...
+
+Definition polyn_rem (pa pb : polyn T) : polyn T :=
+  let lr := snd (lap_quot_rem (lap pa) (lap pb)) in
+  mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb)).
 
 ...
 
