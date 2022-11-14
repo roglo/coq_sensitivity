@@ -6094,6 +6094,14 @@ move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
 apply Nat.ltb_ge in Hab.
+cbn in Hbn.
+(**)
+cbn.
+rewrite rev_app_distr.
+rewrite <- app_assoc.
+rewrite <- (rev_involutive (a :: rla)).
+f_equal; cbn.
+...
 apply IHit in Hqr. 2: {
   unfold lap_norm.
   rewrite rev_involutive.
@@ -6114,10 +6122,6 @@ cbn in Hqr.
 cbn in Hbn.
 rewrite rev_app_distr.
 rewrite <- app_assoc.
-Search (lap_mul (_ ++ _)).
-Print lap_mul.
-Print lap_convol_mul.
-Search (rev (repeat _ _)).
 ...
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
