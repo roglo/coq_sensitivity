@@ -6223,8 +6223,13 @@ destruct rlr as [| r]. {
 }
 cbn in Hr.
 subst r.
-...
+apply Nat.ltb_ge in Halb.
 Print rlap_quot_rem_loop.
+...
+Theorem glop :
+  rlap_quot_rem_looop it rla rlb = (rlq, 0%F :: rlr)
+  → rla ≠ [] ∧ rlb ≠ [] ∧ length rla < length rlb ∧ hd 1%F rla = 0%F.
+
 subst it.
 cbn in Hqr.
 Print rlap_quot_rem_loop.
