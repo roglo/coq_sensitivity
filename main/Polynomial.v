@@ -6218,6 +6218,8 @@ symmetry in Hqr.
 destruct qr as (q, r).
 injection Hab; clear Hab; intros; subst lq lr.
 ...
+Print rlap_quot_rem_loop.
+...
 cbn in Hr.
 subst cq.
 unfold rngl_div in Hq.
