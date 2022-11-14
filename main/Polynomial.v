@@ -6107,6 +6107,7 @@ remember (rev rla) as la eqn:Hla.
 clear rla Hla.
 move la after rlb.
 cbn in IHit.
+rewrite List_rev_repeat.
 ...
 apply IHit in Hqr. 2: {
   unfold lap_norm.

@@ -1577,6 +1577,15 @@ subst n.
 apply List_map_nth_seq.
 Qed.
 
+Theorem List_rev_repeat : ∀ A (x : A) n,
+  rev (repeat x n) = repeat x n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite repeat_cons; f_equal.
+apply IHn.
+Qed.
+
 Theorem List_nth_repeat : ∀ A (a d : A) i n,
   nth i (repeat a n) d = if lt_dec i n then a else d.
 Proof.
