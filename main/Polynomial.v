@@ -6190,13 +6190,45 @@ rewrite List_rev_repeat.
 Context {Hop : rngl_has_opp = true}.
 Context {Hiv : rngl_has_inv = true}.
 
-(*
 Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → hd 1%F lq ≠ 0%F.
 Proof.
+intros * Ha Hb Hab.
+intros Hq; apply Ha; clear Ha.
+unfold rlap_quot_rem in Hab.
+remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
+symmetry in Hit.
+revert la lb lq lr Hb Hit Hab Hq.
+induction it; intros. {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hq.
+}
+cbn in Hab.
+remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
+destruct orlr as (o, rlr).
+destruct o as [(cq, dq)| ]. 2: {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0 in Hq.
+}
+destruct lb as [| b]; [ easy | ].
+destruct la as [| a]; [ easy | cbn ].
+cbn in Hor.
+rewrite if_bool_if_dec in Hor.
+destruct (bool_dec _) as [Halb| Halb]; [ easy | ].
+apply Nat.ltb_ge in Halb.
+symmetry in Hor.
+injection Hor; clear Hor; intros Hrlr Hdq Hcq.
+rewrite <- Hcq, <- Hdq in Hrlr.
+remember (rlap_quot_rem_loop it rlr (b :: lb)) as rb eqn:Hrb.
+symmetry in Hrb.
+destruct rb as (lq', lr').
+symmetry in Hab.
+injection Hab; clear Hab; intros H1 Hlq; subst lr'.
+apply IHit in Hrb; [ | easy | | ].
+...
 intros * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
@@ -6247,7 +6279,8 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
-*)
+
+...
 
 (*
 Theorem hd_rem : ∀ la lb lq lr,
