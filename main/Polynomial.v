@@ -5638,6 +5638,47 @@ Fixpoint lap_power la n :=
 Definition rlap_quot_rem_nb_iter (la lb : list T) :=
   S (length la).
 
+Definition rlap_quot_rem_step (rla rlb : list T) :=
+  match rla with
+  | [] => (None, [])
+  | a :: rla' =>
+      match rlb with
+      | [] => (None, []) (* division by zero *)
+      | b :: rlb' =>
+          if length rla' <? length rlb' then (None, rla)
+          else
+            let cq := (a / b)%F in
+            let dq := length rla' - length rlb' in
+            let lr :=
+              lap_norm
+                (lap_sub (rev rla')
+                   (repeat 0%F dq ++ map (rngl_mul cq) (rev rlb')))
+            in
+            (Some (cq, dq), rev lr)
+      end
+  end.
+
+Fixpoint rlap_quot_rem_loop' it (rla rlb : list T) : list T * list T :=
+  match it with
+  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
+  | S it' =>
+      match rlap_quot_rem_step rla rlb with
+      | (Some (cq, dq), rlr) =>
+           let (rlq', rlr') := rlap_quot_rem_loop' it' rlr rlb in
+           (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
+      | (None, rlr) => ([], rlr)
+      end
+  end.
+
+Definition rlap_quot_rem' rla rlb :=
+  rlap_quot_rem_loop' (rlap_quot_rem_nb_iter rla rlb) rla rlb.
+
+Definition lap_quot_rem' la lb :=
+  let (rlq, rlr) := rlap_quot_rem' (rev la) (rev lb) in
+  (rev rlq, rev rlr).
+
+...
+
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
@@ -5676,16 +5717,21 @@ Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
+Arguments lap_quot_rem' {T ro} (la lb)%list.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (lap_quot_rem [1] [2]).
+Compute (lap_quot_rem' [1] [2]).
+(* censé ci-dessous être (x3-2x+1, x-1) *)
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
-(* censé être (x3-2x+1, x-1) *)
+Compute (lap_quot_rem' [0;-2;3;-1;-1;1] [1;-1;1]).
+Compute (lap_add (lap_mul [1;-1;1] (repeat 0 3%nat ++ [1])) [0; -2; 3; -2]).
 Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1] = [0;-2;3;-1;-1;1]).
 (**)
 Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
+Compute (lap_quot_rem' [-2;-2;9;-2;6] [2;0;1]).
 Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 ...
 *)
