@@ -6190,6 +6190,7 @@ rewrite List_rev_repeat.
 Context {Hop : rngl_has_opp = true}.
 Context {Hiv : rngl_has_inv = true}.
 
+(*
 Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
@@ -6246,7 +6247,9 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
+*)
 
+(*
 Theorem hd_rem : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
@@ -6324,6 +6327,7 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
+*)
 
 Theorem quot_is_norm : ∀ la lb,
   last_lap_neq_0 la
@@ -6344,6 +6348,7 @@ apply (rngl_eqb_neq Heb) in Ha, Hb.
 rewrite <- (rev_involutive la) in Ha.
 rewrite <- (rev_involutive lb) in Hb.
 rewrite List_last_rev in Ha, Hb |-*.
+...
 now apply hd_quot in Hqr.
 Qed.
 
