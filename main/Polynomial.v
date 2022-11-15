@@ -5639,12 +5639,12 @@ Definition rlap_quot_rem_nb_iter (la lb : list T) :=
   S (length la).
 
 Definition rlap_quot_rem_step (rla rlb : list T) :=
-  match rla with
-  | [] => (None, [])
-  | a :: rla' =>
-      match rlb with
-      | [] => (None, []) (* division by zero *)
-      | b :: rlb' =>
+  match rlb with
+  | [] => (None, []) (* division by zero *)
+  | b :: rlb' =>
+      match rla with
+      | [] => (None, [])
+      | a :: rla' =>
           if length rla' <? length rlb' then (None, rla)
           else
             let cq := (a / b)%F in
@@ -5657,25 +5657,26 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
       end
   end.
 
-Fixpoint rlap_quot_rem_loop' it (rla rlb : list T) : list T * list T :=
+Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
   | S it' =>
       match rlap_quot_rem_step rla rlb with
       | (Some (cq, dq), rlr) =>
-           let (rlq', rlr') := rlap_quot_rem_loop' it' rlr rlb in
+           let (rlq', rlr') := rlap_quot_rem_loop it' rlr rlb in
            (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
       | (None, rlr) => ([], rlr)
       end
   end.
 
-Definition rlap_quot_rem' rla rlb :=
-  rlap_quot_rem_loop' (rlap_quot_rem_nb_iter rla rlb) rla rlb.
+Definition rlap_quot_rem rla rlb :=
+  rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
 
-Definition lap_quot_rem' la lb :=
-  let (rlq, rlr) := rlap_quot_rem' (rev la) (rev lb) in
+Definition lap_quot_rem la lb :=
+  let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev rlr).
 
+(*
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
@@ -5707,8 +5708,9 @@ Definition rlap_quot_rem rla rlb :=
 Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev rlr).
+*)
 
-(**)
+(*
 End a.
 Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
@@ -6025,39 +6027,20 @@ remember (rev rlb) as lb eqn:Hlb.
 assert (H : rlb = rev lb) by now rewrite Hlb, rev_involutive.
 move H at top; subst rlb; clear Hlb.
 rewrite rev_length in Hab, Hqr |-*.
-destruct lb as [| b']. {
-  clear Hab; cbn in IHit, Hqr |-*.
-  rewrite Nat.sub_0_r, app_nil_r in Hqr.
-  apply Nat.lt_1_r.
-  apply length_zero_iff_nil.
-  destruct rlr as [| r]; [ easy | exfalso ].
-  apply IHit in Hqr; [ cbn in Hqr; flia Hqr | ].
-  rewrite rev_length.
+(**)
+apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
-  rewrite lap_sub_repeat_0.
-  apply lap_norm_length_le.
+  etransitivity; [ apply strip_0s_length_le | ].
+  rewrite lap_sub_length.
+  rewrite rev_length, app_length, map_length, repeat_length.
+  rewrite rev_length.
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  now rewrite Nat.max_id.
 }
-cbn in IHit.
-rewrite app_length, rev_length in IHit.
-cbn in IHit |-*.
-rewrite Nat.add_1_r in IHit.
-cbn in Hqr.
-apply IHit in Hqr; [ easy | ].
-rewrite rev_length.
-etransitivity; [ | apply Hit ].
-apply -> Nat.succ_le_mono.
-etransitivity; [ apply lap_norm_sub_length_le | ].
-rewrite max_l; [ easy | ].
-rewrite app_length, repeat_length; cbn.
-rewrite map_length.
-cbn in Hab.
-now rewrite Nat.sub_add.
+now rewrite rev_length in Hqr.
 Qed.
 
-(* bon, on verra plus tard ; je pense que le code de lap_quot_rem
-   est bon, j'ai assez confiance, mais il faut plein de lemmes qui
-   sont, ici, démontrés plus tard
 Theorem lap_quot_rem_prop :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -6103,7 +6086,6 @@ assert (H : hd 1%F rlb ≠ 0%F). {
   move Hbn at bottom.
   intros H; apply Hbn; clear Hbn.
   clear Hbz Hqr.
-...
   rewrite <- (rev_involutive lb).
   destruct (rev lb); cbn in H |-*; [ easy | ].
   now rewrite last_last.
@@ -6118,6 +6100,33 @@ revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
 cbn in Hqr.
+(**)
+remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
+symmetry in Hqrlr.
+destruct qrlr as (q, rlr').
+destruct q as [(cq, dq)| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  rewrite lap_mul_0_r, lap_add_0_l.
+  rewrite rev_involutive.
+  destruct rlb as [| b]; [ easy | ].
+  destruct rla as [| a]. {
+    now destruct rlb; injection Hqrlr; intros.
+  }
+  cbn in Hqrlr.
+  destruct (length rla <? length rlb); [ | easy ].
+  now injection Hqrlr.
+}
+remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr'').
+injection Hqr; clear Hqr; intros; subst rlq rlr.
+rename rlq' into rlq; rename rlr' into rlr.
+rename Hqr' into Hqr.
+move rla after rlb.
+move rlq before rlb.
+move rlr before rlq.
+apply IHit in Hqr.
+...
 destruct rla as [| a]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
   now rewrite lap_mul_0_r, lap_add_0_r.
@@ -6131,7 +6140,7 @@ destruct (bool_dec _) as [Hab| Hab]. {
 }
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
-destruct qr as (rlq', rlr').
+destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
 rename rlq' into rlq; rename rlr' into rlr.
 rename Hqr' into Hqr.
