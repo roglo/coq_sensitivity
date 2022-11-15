@@ -6285,8 +6285,7 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
-
-...
+*)
 
 (*
 Theorem hd_rem : ∀ la lb lq lr,
@@ -6368,6 +6367,7 @@ now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 *)
 
+(*
 Theorem quot_is_norm : ∀ la lb,
   last_lap_neq_0 la
   → last_lap_neq_0 lb
@@ -6390,6 +6390,7 @@ rewrite List_last_rev in Ha, Hb |-*.
 ...
 now apply hd_quot in Hqr.
 Qed.
+*)
 
 Theorem rem_is_norm : ∀ la lb,
   last_lap_neq_0 la
