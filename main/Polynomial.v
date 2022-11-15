@@ -6197,27 +6197,29 @@ Theorem hd_quot : ∀ la lb lq lr,
   → hd 1%F lq ≠ 0%F.
 Proof.
 intros * Ha Hb Hab.
+(*
 intros Hq; apply Ha; clear Ha.
+*)
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
 assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
 move H before Hit; clear Hit; rename H into Hit.
-revert la lb lq lr Hb Hit Hab Hq.
+revert la lb lq lr Ha Hb Hit Hab.
 induction it; intros. {
   injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hq.
+  now apply rngl_1_neq_0.
 }
 cbn in Hab.
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
 destruct o as [(cq, dq)| ]. 2: {
   injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hq.
+  now apply rngl_1_neq_0.
 }
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
-cbn in Hor.
+cbn in Ha, Hb, Hor.
 rewrite if_bool_if_dec in Hor.
 destruct (bool_dec _) as [Halb| Halb]; [ easy | ].
 apply Nat.ltb_ge in Halb.
@@ -6229,11 +6231,11 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-apply IHit in Hrb; [ | easy | | ]. 3: {
-...
-  unfold rlap_quot_rem_nb_iter in Hit |-*.
-  cbn in Hit.
-  apply Nat.succ_le_mono in Hit.
+unfold rlap_quot_rem_nb_iter in Hit |-*.
+cbn in Hit.
+apply Nat.succ_le_mono in Hit.
+apply IHit in Hrb; [ | | easy | ]. {
+  rewrite Hlq, Hcq; cbn.
 ...
 intros * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
