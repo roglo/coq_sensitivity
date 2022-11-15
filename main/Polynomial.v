@@ -6041,6 +6041,7 @@ apply IHit in Hqr. 2: {
 now rewrite rev_length in Hqr.
 Qed.
 
+(* on verra plus tard...
 Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
   rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
@@ -6052,7 +6053,9 @@ rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
-Search (rev (strip_0s _)).
+rewrite <- (rev_involutive (lap_sub _ _)).
+rewrite fold_lap_norm.
+Search (lap_add _ (lap_norm _)).
 ...
 
 Theorem lap_quot_rem_prop :
@@ -6197,14 +6200,12 @@ intros * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
 destruct la as [| a]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hq.
+  now destruct lb; injection Hab; clear Hab; intros; subst lq lr.
+}
+destruct lb as [| b]. {
+  now injection Hab; clear Hab; intros; subst lq lr.
 }
 cbn.
-destruct lb as [| b]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hq.
-}
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
 unfold rlap_quot_rem_nb_iter in Hit.
@@ -6217,6 +6218,7 @@ destruct (bool_dec _) as [Halb| Halb]. {
   now apply rngl_1_neq_0 in Hq.
 }
 remember (a / b)%F as cq eqn:Hcq.
+...
 remember
   (lap_norm
      (lap_sub (rev la)
