@@ -5649,12 +5649,11 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
           else
             let cq := (a / b)%F in
             let dq := length rla' - length rlb' in
-            let lr :=
-              lap_norm
-                (lap_sub (rev rla')
-                   (repeat 0%F dq ++ map (rngl_mul cq) (rev rlb')))
+            let rlr :=
+              strip_0s
+                (lap_sub rla' (map (rngl_mul cq) rlb' ++ repeat 0%F dq))
             in
-            (Some (cq, dq), rev lr)
+            (Some (cq, dq), rlr)
       end
   end.
 
@@ -5676,8 +5675,6 @@ Definition rlap_quot_rem' rla rlb :=
 Definition lap_quot_rem' la lb :=
   let (rlq, rlr) := rlap_quot_rem' (rev la) (rev lb) in
   (rev rlq, rev rlr).
-
-...
 
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
@@ -5711,7 +5708,7 @@ Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev rlr).
 
-(*
+(**)
 End a.
 Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
@@ -5727,7 +5724,6 @@ Compute (lap_quot_rem' [1] [2]).
 (* censé ci-dessous être (x3-2x+1, x-1) *)
 Compute (lap_quot_rem [0;-2;3;-1;-1;1] [1;-1;1]).
 Compute (lap_quot_rem' [0;-2;3;-1;-1;1] [1;-1;1]).
-Compute (lap_add (lap_mul [1;-1;1] (repeat 0 3%nat ++ [1])) [0; -2; 3; -2]).
 Compute (lap_add (lap_mul [1;-1;1] [1;-2;0;1]) [-1;1] = [0;-2;3;-1;-1;1]).
 (**)
 Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
