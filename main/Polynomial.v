@@ -6041,6 +6041,20 @@ apply IHit in Hqr. 2: {
 now rewrite rev_length in Hqr.
 Qed.
 
+Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
+  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
+Proof.
+intros * Hrl.
+destruct rlb as [| b]; [ easy | cbn in Hrl ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrl.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+Search (rev (strip_0s _)).
+...
+
 Theorem lap_quot_rem_prop :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -6125,6 +6139,10 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
+... ...
+(* chais pas si c'est utile, mais bon... *)
+apply rlap_quot_rem_step_Some in Hqrlr.
+...
 apply IHit in Hqr.
 ...
 destruct rla as [| a]. {
