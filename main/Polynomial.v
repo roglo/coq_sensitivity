@@ -6201,6 +6201,8 @@ intros Hq; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
+assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
+move H before Hit; clear Hit; rename H into Hit.
 revert la lb lq lr Hb Hit Hab Hq.
 induction it; intros. {
   injection Hab; clear Hab; intros; subst lq lr.
@@ -6227,7 +6229,11 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-apply IHit in Hrb; [ | easy | | ].
+apply IHit in Hrb; [ | easy | | ]. 3: {
+...
+  unfold rlap_quot_rem_nb_iter in Hit |-*.
+  cbn in Hit.
+  apply Nat.succ_le_mono in Hit.
 ...
 intros * Ha Hb Hab.
 intros Hq; apply Ha; clear Ha.
