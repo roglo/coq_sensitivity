@@ -6569,6 +6569,82 @@ Qed.
 
 (* associativity of multiplication *)
 
+Theorem lap_mul_norm_idemp_l : ∀ la lb,
+  lap_norm (lap_norm la * lb)%lap = lap_norm (la * lb)%lap.
+Proof.
+intros.
+unfold "*"%lap; cbn.
+destruct la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    cbn.
+    destruct lb as [| b]; [ easy | cbn ].
+...
+    rewrite lap_convol_mul_0_l; [ easy | ].
+    intros i; cbn.
+    destruct i; [ easy | ].
+    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    destruct (lt_dec i (length la)) as [Hil| Hil]. {
+      specialize (H1 (length la - S i)).
+      rewrite <- rev_length in H1.
+      rewrite <- rev_nth in H1. {
+        now rewrite rev_involutive in H1.
+      }
+      now rewrite rev_length.
+    }
+    apply Nat.nlt_ge in Hil.
+    now rewrite nth_overflow.
+  }
+  cbn.
+  destruct lb as [| b]; [ easy | ].
+  remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
+  do 2 rewrite Nat.sub_0_r.
+  rewrite fold_lap_norm.
+  rewrite (lap_convol_mul_cons_with_0_l _ la). 2: {
+    intros i.
+    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+    destruct (lt_dec i (length la)) as [Hil| Hil]. {
+      specialize (H1 (length la - S i)).
+      rewrite <- rev_length in H1.
+      rewrite <- rev_nth in H1. {
+        now rewrite rev_involutive in H1.
+      }
+      now rewrite rev_length.
+    }
+    apply Nat.nlt_ge in Hil.
+    now rewrite nth_overflow.
+  }
+  rewrite Nat.add_comm.
+  apply lap_convol_mul_more; cbn.
+  now rewrite Nat.sub_0_r.
+}
+rewrite rev_app_distr; cbn.
+rewrite fold_lap_norm.
+destruct lb as [| b]; [ easy | ].
+remember (b :: lb) as d eqn:Hd.
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+rewrite fold_lap_norm.
+do 2 rewrite Nat.sub_0_r.
+clear c lc b lb Hlc Hd.
+rename d into lb.
+rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
+  now cbn; rewrite Nat.sub_0_r.
+}
+rewrite (Nat.add_comm _ (length lb)).
+rewrite <- Nat.add_assoc.
+rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
+rewrite (Nat.add_comm _ (length la)).
+rewrite Nat.add_sub.
+rewrite Nat.add_comm.
+apply lap_norm_cons_norm.
+now cbn; rewrite Nat.sub_0_r.
+Qed.
+
 Theorem polyn_mul_assoc : ∀ p1 p2 p3,
   (p1 * (p2 * p3))%pol = ((p1 * p2) * p3) %pol.
 Proof.
@@ -6582,8 +6658,8 @@ clear p2 Heqlb.
 clear p3 Heqlc.
 unfold polyn_norm at 1 3.
 apply eq_polyn_eq; cbn.
-...
 rewrite lap_mul_norm_idemp_l.
+...
 rewrite lap_mul_norm_idemp_r.
 now rewrite lap_mul_assoc.
 Qed.
@@ -7445,80 +7521,6 @@ destruct lb as [| b]; cbn. {
 }
 destruct i; [ easy | ].
 apply IHla.
-Qed.
-
-Theorem lap_mul_norm_idemp_l : ∀ la lb,
-  lap_norm (lap_norm la * lb)%lap = lap_norm (la * lb)%lap.
-Proof.
-intros.
-unfold "*"%lap; cbn.
-destruct la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
-    cbn.
-    destruct lb as [| b]; [ easy | cbn ].
-    rewrite lap_convol_mul_0_l; [ easy | ].
-    intros i; cbn.
-    destruct i; [ easy | ].
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
-    destruct (lt_dec i (length la)) as [Hil| Hil]. {
-      specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
-      }
-      now rewrite rev_length.
-    }
-    apply Nat.nlt_ge in Hil.
-    now rewrite nth_overflow.
-  }
-  cbn.
-  destruct lb as [| b]; [ easy | ].
-  remember (b :: lb) as ld eqn:Hld; symmetry in Hld.
-  do 2 rewrite Nat.sub_0_r.
-  rewrite fold_lap_norm.
-  rewrite (lap_convol_mul_cons_with_0_l _ la). 2: {
-    intros i.
-    specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
-    destruct (lt_dec i (length la)) as [Hil| Hil]. {
-      specialize (H1 (length la - S i)).
-      rewrite <- rev_length in H1.
-      rewrite <- rev_nth in H1. {
-        now rewrite rev_involutive in H1.
-      }
-      now rewrite rev_length.
-    }
-    apply Nat.nlt_ge in Hil.
-    now rewrite nth_overflow.
-  }
-  rewrite Nat.add_comm.
-  apply lap_convol_mul_more; cbn.
-  now rewrite Nat.sub_0_r.
-}
-rewrite rev_app_distr; cbn.
-rewrite fold_lap_norm.
-destruct lb as [| b]; [ easy | ].
-remember (b :: lb) as d eqn:Hd.
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
-rewrite fold_lap_norm.
-do 2 rewrite Nat.sub_0_r.
-clear c lc b lb Hlc Hd.
-rename d into lb.
-rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
-  now cbn; rewrite Nat.sub_0_r.
-}
-rewrite (Nat.add_comm _ (length lb)).
-rewrite <- Nat.add_assoc.
-rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
-rewrite (Nat.add_comm _ (length la)).
-rewrite Nat.add_sub.
-rewrite Nat.add_comm.
-apply lap_norm_cons_norm.
-now cbn; rewrite Nat.sub_0_r.
 Qed.
 
 Theorem lap_mul_norm_idemp_r : ∀ la lb,
