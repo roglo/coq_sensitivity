@@ -6567,6 +6567,29 @@ rewrite IHla; cbn. {
 }
 Qed.
 
+(* associativity of multiplication *)
+
+Theorem polyn_mul_assoc : ∀ p1 p2 p3,
+  (p1 * (p2 * p3))%pol = ((p1 * p2) * p3) %pol.
+Proof.
+intros.
+unfold "*"%pol.
+remember (lap p1) as la.
+remember (lap p2) as lb.
+remember (lap p3) as lc.
+clear p1 Heqla.
+clear p2 Heqlb.
+clear p3 Heqlc.
+unfold polyn_norm at 1 3.
+apply eq_polyn_eq; cbn.
+...
+rewrite lap_mul_norm_idemp_l.
+rewrite lap_mul_norm_idemp_r.
+now rewrite lap_mul_assoc.
+Qed.
+
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -6578,7 +6601,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_comm := polyn_add_comm;
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
-     rngl_mul_assoc := 42;
+     rngl_mul_assoc := polyn_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
      rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
@@ -7504,24 +7527,6 @@ Proof.
 intros.
 setoid_rewrite lap_mul_comm.
 apply lap_mul_norm_idemp_l.
-Qed.
-
-Theorem poly_mul_assoc : ∀ p1 p2 p3,
-  (p1 * (p2 * p3))%pol = ((p1 * p2) * p3) %pol.
-Proof.
-intros.
-unfold "*"%pol.
-remember (lap p1) as la.
-remember (lap p2) as lb.
-remember (lap p3) as lc.
-clear p1 Heqla.
-clear p2 Heqlb.
-clear p3 Heqlc.
-unfold poly_norm at 1 3.
-apply eq_poly_eq; cbn.
-rewrite lap_mul_norm_idemp_l.
-rewrite lap_mul_norm_idemp_r.
-now rewrite lap_mul_assoc.
 Qed.
 
 Theorem lap_mul_mul_swap : ∀ la lb lc,
