@@ -6594,6 +6594,31 @@ rewrite Hlc in IHlen.
 now apply List_eq_rev_nil in IHlen.
 Qed.
 
+Theorem lap_convol_mul_0_r : ∀ la lb i len,
+  (∀ i, nth i lb 0%F = 0%F)
+  → lap_norm (lap_convol_mul la lb i len) = [].
+Proof.
+intros * Hb.
+revert i.
+induction len; intros; [ easy | ].
+cbn.
+rewrite strip_0s_app.
+remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite Hb, rngl_mul_0_r; [ easy | ].
+    now apply rngl_has_opp_or_sous_iff; left.
+  }
+  cbn.
+  now rewrite rngl_eqb_refl.
+}
+unfold lap_norm in IHlen.
+specialize (IHlen (S i)).
+rewrite Hlc in IHlen.
+now apply List_eq_rev_nil in IHlen.
+Qed.
+
 Theorem lap_convol_mul_cons_with_0_l : ∀ a la lb i len,
   (∀ i, nth i la 0%F = 0%F)
   → lap_convol_mul (a :: la) lb i len = lap_convol_mul [a] lb i len.
@@ -6831,6 +6856,67 @@ apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+(* vais-je arriver à le démontrer sans utiliser la commutativité de
+   la multiplication ? *)
+Theorem lap_mul_norm_idemp_r : ∀ la lb,
+  lap_norm (la * lap_norm lb)%lap = lap_norm (la * lb)%lap.
+Proof.
+intros.
+unfold "*"%lap; cbn.
+destruct la as [| a]; [ easy | cbn ].
+unfold lap_norm.
+remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  specialize (proj1 (eq_strip_0s_nil _) Hlc) as H1.
+  destruct lb as [| b]; [ easy | ].
+  cbn.
+  rewrite fold_lap_norm.
+  symmetry; apply lap_convol_mul_0_r.
+  intros i.
+  specialize (H1 (length lb - i)).
+  rewrite rev_nth in H1; [ | cbn; flia ].
+  cbn in H1.
+  destruct (le_dec i (length lb)) as [Hib| Hib]. 2: {
+    apply Nat.nle_gt in Hib.
+    now rewrite nth_overflow.
+  }
+  now replace (length lb - (length lb - i)) with i in H1 by flia Hib.
+}
+cbn.
+destruct lb as [| b]; [ easy | ].
+remember (rev lc ++ [c]) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]. {
+  now apply app_eq_nil in Hld.
+}
+do 2 rewrite Nat.sub_0_r.
+cbn.
+...
+rewrite rev_app_distr; cbn.
+rewrite fold_lap_norm.
+destruct lb as [| b]; [ easy | ].
+remember (b :: lb) as d eqn:Hd.
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+rewrite fold_lap_norm.
+do 2 rewrite Nat.sub_0_r.
+clear c lc b lb Hlc Hd.
+rename d into lb.
+rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
+  now cbn; rewrite Nat.sub_0_r.
+}
+rewrite (Nat.add_comm _ (length lb)).
+rewrite <- Nat.add_assoc.
+rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
+rewrite (Nat.add_comm _ (length la)).
+rewrite Nat.add_sub.
+rewrite Nat.add_comm.
+apply lap_norm_cons_norm.
+now cbn; rewrite Nat.sub_0_r.
+...
+
+(* supposes that mul is comm *)
+(*
 Theorem lap_convol_mul_comm : ∀ l1 l2 i len,
   lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
 Proof.
@@ -6866,6 +6952,7 @@ intros.
 setoid_rewrite lap_mul_comm.
 apply lap_mul_norm_idemp_l.
 Qed.
+*)
 
 Theorem polyn_mul_assoc : ∀ p1 p2 p3,
   (p1 * (p2 * p3))%pol = ((p1 * p2) * p3) %pol.
