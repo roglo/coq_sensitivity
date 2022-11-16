@@ -5586,12 +5586,12 @@ Definition polyn_norm la :=
 
 (* addition *)
 
-Fixpoint lap_add al1 al2 :=
-  match al1 with
-  | [] => al2
+Fixpoint lap_add la lb :=
+  match la with
+  | [] => lb
   | a1 :: bl1 =>
-      match al2 with
-      | [] => al1
+      match lb with
+      | [] => la
       | a2 :: bl2 => (a1 + a2)%F :: lap_add bl1 bl2
       end
   end.
@@ -6374,25 +6374,8 @@ Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lr := snd (lap_quot_rem (lap pa) (lap pb)) in
   mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb)).
 
-Theorem glop : ∀ la lb lq lr,
-  (lq, lr) = lap_quot_rem la lb
-  → last_lap_neq_0 lq.
-Admitted.
-
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
-  let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
-  (mk_polyn lq (glop (lap pa) (lap pb) eq_refl),
-   mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb))).
-...
-  (mk_polyn lq (quot_is_norm (lap pa) (lap pb) 42), mk_polyn lr).
-...
-
-Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
-  let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
-  (mk_polyn lq 42), mk_polyn lr).
-
-Definition polyn_quot pa pb := fst (polyn_quot_rem pa pb).
-Definition polyn_rem pa pb := snd (polyn_quot_rem pa pb).
+  (polyn_quot pa pb, polyn_rem pa pb).
 
 (* polyn opposite or subtraction *)
 
@@ -6404,24 +6387,7 @@ Definition polyn_opt_opp_or_sous :
   | None => None
   end.
 
-(* canon polyn quotient *)
-
-(*
-Theorem canon_polyn_quot_prop : ∀ pa pb,
-  is_canon_polyn (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb))) = true.
-Proof.
-intros.
-destruct pa as (pa, ppa).
-destruct pb as (pb, ppb).
-move pb before pa; cbn.
-apply polyn_norm_is_canon_polyn.
-Qed.
-
-Definition polyn_quot pa pb :=
-  mk_canon_polyn
-    (polyn_norm (polyn_quot (cp_polyn pa) (cp_polyn pb)))
-    (canon_polyn_quot_prop pa pb).
-*)
+(* polyn quotient *)
 
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
@@ -6430,7 +6396,7 @@ Definition polyn_opt_inv_or_quot :
   | None => None
   end.
 
-(* ring-like *)
+(* ring-like operators *)
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
@@ -6439,67 +6405,90 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_mul := polyn_mul;
      rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
-     rngl_opt_eqb := None;
+     rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
      rngl_opt_le := None |}.
-
-...
-
-Definition polyn_ring_like_op : ring_like_op (polyn T) :=
-  {| rngl_zero := polyn_zero;
-     rngl_one := polyn_one;
-     rngl_add := polyn_add;
-     rngl_mul := polyn_mul;
-     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
-     rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
-     rngl_opt_eqb := polyn_opt_eqb;
-     rngl_opt_le := None |}.
-
-  {| rngl_zero := polyn_zero;
-     rngl_one := polyn_one;
-     rngl_add := polyn_add;
-     rngl_mul := polyn_mul;
-...
-     rngl_opt_opp := Some polyn_opp;
-     rngl_opt_inv := None;
-     rngl_opt_sous := Some polyn_sub;
-     rngl_opt_quot := Some Nat.div;
-     rngl_opt_eqb := Some Nat.eqb;
-     rngl_le := Nat.le |}.
 
 (* allows to use ring-like theorems on polynomials *)
 Canonical Structure polyn_ring_like_op.
+
+(* to search for ring-like polynomials operators in the context *)
+Existing Instance polyn_ring_like_op.
+
+Declare Scope polyn_scope.
+Delimit Scope polyn_scope with pol.
+
+Notation "a + b" := (polyn_add a b) : polyn_scope.
+Notation "a - b" := (polyn_sub a b) : polyn_scope.
+Notation "a * b" := (polyn_mul a b) : polyn_scope.
+
+(* commutativity of addition *)
+
+Theorem lap_add_comm : ∀ al1 al2,
+  lap_add al1 al2 = lap_add al2 al1.
+Proof.
+intros al1 al2.
+revert al2.
+induction al1; intros; [ now destruct al2 | ].
+destruct al2; [ easy | cbn ].
+now rewrite rngl_add_comm, IHal1.
+Qed.
+
+Theorem polyn_add_comm : ∀ a b, (a + b)%pol = (b + a)%pol.
+Proof.
+intros.
+unfold "+"%pol.
+now rewrite lap_add_comm.
+Qed.
+
+Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
+  {| rngl_mul_is_comm := rngl_mul_is_comm;
+     rngl_has_eqb := rngl_has_eqb;
+     rngl_has_dec_le := rngl_has_dec_le;
+     rngl_has_1_neq_0 := rngl_has_1_neq_0;
+     rngl_is_ordered := rngl_is_ordered;
+     rngl_is_integral := rngl_is_integral;
+     rngl_characteristic := rngl_characteristic;
+     rngl_add_comm := polyn_add_comm;
+     rngl_add_assoc := 42;
+     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_mul_assoc := ?rngl_mul_assoc;
+     rngl_mul_1_l := ?rngl_mul_1_l;
+     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
+     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
+     rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
+     rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
+     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+     rngl_opt_mul_div := ?rngl_opt_mul_div;
+     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le |}.
 
 ...
 
 End a.
 
-Arguments lap_add {T ro} (al1 al2)%list.
-(*
-Arguments lap_monom {T ro} i%nat.
-*)
+Arguments polyn_ring_like_op T%type {ro rp Heb H10 Hop Hiv}.
 Arguments lap_mul {T ro} (la lb)%list.
-(*
-Arguments monom {T ro rp Heb H10} i%nat.
-Arguments monom_norm {T ro rp} {Heb H10 i}.
-*)
 Arguments polyn_norm_prop {T ro rp} {Heb H10 la}.
 
 (*
-Require Import ZArith RnglAlg.Zrl.
-Open Scope Z_scope.
-Compute (lap_monom 1).
-Compute (lap_monom 3).
-Global Existing Instance Z_ring_like_prop.
-Compute (monom 1).
-Compute (monom 3).
-*)
-(*
-Require Import NatRingLike.
-Compute (lap_monom 1).
-Compute (monom 1).
-About monom_norm.
-*)
-
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 (*
@@ -6512,16 +6501,8 @@ Notation "a * b" := (lap_mul a b) : lap_scope.
 (*
 Notation "a ^ b" := (lap_power a b) : lap_scope.
 *)
+*)
 
-Declare Scope poly_scope.
-Delimit Scope poly_scope with pol.
-
-Arguments polyn_add {T ro rp} {Heb H10} (p1 p2)%pol.
-Arguments polyn_sub {T ro rp} {Heb H10} (p1 p2)%pol.
-
-Notation "a + b" := (polyn_add a b) : poly_scope.
-Notation "a - b" := (polyn_sub a b) : poly_scope.
-Notation "a * b" := (polyn_mul a b) : poly_scope.
 (*
 Notation "'ⓧ' ^ a" := (monom a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
 Notation "'ⓧ'" := (monom 1) (at level 30, format "'ⓧ'") : poly_scope.
@@ -6554,52 +6535,13 @@ Compute (ⓧ)%pol.
 Definition list_nth_def_0 {α} {R : ring α} n l := List.nth n l 0%Rng.
 *)
 
-(*
-Declare Scope poly_scope.
-Delimit Scope poly_scope with pol.
-Notation "0" := poly_zero : poly_scope.
-Notation "1" := poly_one : poly_scope.
-Notation "- a" := (poly_opp a) : poly_scope.
-Notation "a + b" := (poly_add a b) : poly_scope.
-Notation "a - b" := (poly_sub a b) : poly_scope.
-Notation "a * b" := (poly_mul a b) : poly_scope.
-Notation "'ⓧ' ^ a" := (xpow a) (at level 30, format "'ⓧ' ^ a") : poly_scope.
-Notation "'ⓧ'" := (xpow 1) (at level 30, format "'ⓧ'") : poly_scope.
+Section a.
 
-Check polyn_mul.
+(* ring-like properties *)
+
+Existing Instance polyn_ring_like_op.
 
 ...
-*)
-
-(* euclidean division *)
-
-(*
-Definition polyn_div p1 p2 :=
-...
-*)
-
-Arguments polyn_zero {T ro rp Heb H10}.
-Arguments polyn_one {T ro rp Heb H10}.
-Arguments polyn_mul {T ro rp Heb H10} (p1 p2)%pol.
-
-...
-
-(*
-Compute (@lap_norm Z Z_ring [3; 4; 0; 5; 0; 0; 0]%Z).
-*)
-(**)
-
-(*
-Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-4;5]%Z)).
-Compute (@poly_add Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-5]%Z)).
-*)
-
-...
-
-(*
-Compute (@lap_mul Z Z_ring [3;4;5]%Z [2;3;-4;5]%Z).
-Compute (@poly_mul Z Z_ring (poly_norm [3;4;5]%Z) (poly_norm [2;3;-4;5]%Z)).
-*)
 
 (* power *)
 
@@ -6888,23 +6830,6 @@ Theorem eq_lap_convol_mul_nil : ∀ la lb i len,
 Proof. now intros; induction len. Qed.
 
 (* addition theorems *)
-
-Theorem lap_add_comm : ∀ al1 al2,
-  lap_add al1 al2 = lap_add al2 al1.
-Proof.
-intros al1 al2.
-revert al2.
-induction al1; intros; [ now destruct al2 | ].
-destruct al2; [ easy | cbn ].
-now rewrite rng_add_comm, IHal1.
-Qed.
-
-Theorem poly_add_comm : ∀ a b, (a + b)%pol = (b + a)%pol.
-Proof.
-intros.
-unfold "+"%pol.
-now rewrite lap_add_comm.
-Qed.
 
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb)%lap = lap_norm (la + lb)%lap.
