@@ -6275,7 +6275,8 @@ remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
 assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
 move H before Hit; clear Hit; rename H into Hit.
-destruct it; [ easy | ].
+revert la lb lq lr Ha Hb Hit Hab.
+induction it; intros; [ easy | ].
 cbn in Hab.
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
@@ -6298,98 +6299,27 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-...
-rewrite Hlq; cbn.
-rewrite Hcq.
-unfold rngl_div.
-rewrite Hiv.
-intros Hq.
-apply rngl_integral in Hq; cycle 1. {
-  now apply rngl_has_opp_or_sous_iff; left.
-} {
-  apply Bool.orb_true_iff; right.
-  rewrite Heb, Bool.andb_true_r.
-  now apply rngl_has_inv_or_quot_iff; left.
+eapply IHit; [ | | | apply Hrb ]; [ | apply Hb | ]. 2: {
+  unfold rlap_quot_rem_nb_iter in Hit |-*.
+  apply Nat.succ_le_mono in Hit.
+  etransitivity; [ | apply Hit ].
+  cbn; apply -> Nat.succ_le_mono.
+  rewrite Hrlr.
+  etransitivity; [ apply strip_0s_length_le | ].
+  rewrite lap_sub_length, app_length, map_length, repeat_length.
+  rewrite Hdq.
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  now rewrite Nat.max_id.
 }
-destruct Hq as [Hq| Hq]; [ easy | ].
-exfalso; revert Hq.
-apply rngl_inv_neq_0; [ | easy | easy | easy ].
-now apply rngl_has_opp_or_sous_iff; left.
-...
-intros * Ha Hb Hab.
-intros Hr; apply Ha; clear Ha.
-unfold rlap_quot_rem in Hab.
-destruct la as [| a]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hr.
-}
-cbn.
-destruct lb as [| b]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hr.
-}
-remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
-symmetry in Hit.
-unfold rlap_quot_rem_nb_iter in Hit.
-destruct it; [ easy | ].
-apply Nat.succ_inj in Hit.
-cbn in Hab.
-rewrite if_bool_if_dec in Hab.
-destruct (bool_dec _) as [Halb| Halb]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  easy.
-}
-remember (a / b)%F as cq eqn:Hcq.
-remember
-  (lap_norm
-     (lap_sub (rev la)
-        (repeat 0%F (length la - length lb) ++ map (rngl_mul cq) (rev lb))))
-  as rlr' eqn:Hrlr'.
-rewrite <- (rev_involutive (b :: lb)) in Hab.
-remember (rev (b :: lb)) as rlb' eqn:Hrlb'.
-remember (rlap_quot_rem_loop it (rev rlr') (rev rlb')) as qr eqn:Hqr.
-symmetry in Hqr.
-destruct qr as (rlq, rlr).
-injection Hab; clear Hab; intros; subst lq lr.
-destruct rlr as [| r]. {
-  exfalso; revert Hr.
-  now apply rngl_1_neq_0.
-}
-cbn in Hr.
-subst r.
-apply Nat.ltb_ge in Halb.
-Print rlap_quot_rem_loop.
-...
-Theorem glop :
-  rlap_quot_rem_loop (S it) rla rlb = (rlq, 0%F :: rlr)
-  → rla ≠ []
-  → rlb ≠ []
-  → length rlb ≤ length rla
-  → rlap_quot_rem_loop it...
-
-subst it.
-cbn in Hqr.
-Print rlap_quot_rem_loop.
-...
-cbn in Hr.
-subst cq.
-unfold rngl_div in Hq.
-rewrite Hiv in Hq.
-apply rngl_integral in Hq; cycle 1. {
-  now apply rngl_has_opp_or_sous_iff; left.
-} {
-  apply Bool.orb_true_iff; right.
-  rewrite Heb, Bool.andb_true_r.
-  now apply rngl_has_inv_or_quot_iff; left.
-}
-destruct Hq as [Hq| Hq]; [ easy | ].
-exfalso; revert Hq.
-apply rngl_inv_neq_0; [ | easy | easy | easy ].
-now apply rngl_has_opp_or_sous_iff; left.
+rewrite Hrlr.
+remember (lap_sub la (map _ _ ++ _)) as l eqn:Hl.
+clear Hl Hrlr.
+induction l as [| x]; [ now apply rngl_1_neq_0 | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn ].
+now apply rngl_eqb_neq in Hxz.
 Qed.
-*)
 
-(*
 Theorem quot_is_norm : ∀ la lb,
   last_lap_neq_0 la
   → last_lap_neq_0 lb
@@ -6409,10 +6339,8 @@ apply (rngl_eqb_neq Heb) in Ha, Hb.
 rewrite <- (rev_involutive la) in Ha.
 rewrite <- (rev_involutive lb) in Hb.
 rewrite List_last_rev in Ha, Hb |-*.
-...
 now apply hd_quot in Hqr.
 Qed.
-*)
 
 Theorem rem_is_norm : ∀ la lb,
   last_lap_neq_0 la
@@ -6433,24 +6361,29 @@ apply (rngl_eqb_neq Heb) in Ha, Hb.
 rewrite <- (rev_involutive la) in Ha.
 rewrite <- (rev_involutive lb) in Hb.
 rewrite List_last_rev in Ha, Hb |-*.
-apply hd_quot in Hqr; [ | easy | easy ].
-...
+generalize Hqr; intros Hq.
+apply hd_quot in Hq; [ | easy | easy ].
+apply (hd_rem _ _ Ha Hb Hqr).
 Qed.
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
   mk_polyn lq (quot_is_norm (lap_prop pa) (lap_prop pb)).
 
-... ...
-
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lr := snd (lap_quot_rem (lap pa) (lap pb)) in
   mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb)).
 
-...
+Theorem glop : ∀ la lb lq lr,
+  (lq, lr) = lap_quot_rem la lb
+  → last_lap_neq_0 lq.
+Admitted.
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   let (lq, lr) := lap_quot_rem (lap pa) (lap pb) in
+  (mk_polyn lq (glop (lap pa) (lap pb) eq_refl),
+   mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb))).
+...
   (mk_polyn lq (quot_is_norm (lap pa) (lap pb) 42), mk_polyn lr).
 ...
 
