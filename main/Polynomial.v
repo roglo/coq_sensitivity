@@ -6433,6 +6433,7 @@ Existing Instance polyn_ring_like_op.
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
+Notation "0" := polyn_zero : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
@@ -6538,6 +6539,34 @@ rewrite lap_add_norm_idemp_r.
 now rewrite lap_add_assoc.
 Qed.
 
+(* addition to 0 *)
+
+Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
+Proof.
+intros (la, lapr).
+apply eq_polyn_eq; cbn.
+unfold last_lap_neq_0 in lapr.
+apply Bool.negb_true_iff in lapr.
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+rewrite <- (rev_involutive (strip_0s _)).
+rewrite IHla; cbn. {
+  remember (rev la) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]. {
+    apply List_eq_rev_nil in Hlb; subst la.
+    cbn in lapr.
+    now rewrite lapr.
+  }
+  cbn.
+  rewrite rev_app_distr; cbn; f_equal.
+  now rewrite <- rev_involutive, Hlb.
+} {
+  destruct la as [| a2]; [ cbn | easy ].
+  apply (rngl_eqb_neq Heb).
+  now apply rngl_1_neq_0.
+}
+Qed.
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -6548,8 +6577,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
      rngl_add_assoc := polyn_add_assoc;
-     rngl_add_0_l := 42;
-     rngl_mul_assoc := ?rngl_mul_assoc;
+     rngl_add_0_l := polyn_add_0_l;
+     rngl_mul_assoc := 42;
      rngl_mul_1_l := ?rngl_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
      rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
@@ -6876,29 +6905,6 @@ induction la as [| a]; intros. {
   rewrite <- Hld.
   apply IHla.
   now intros i; specialize (Hi (S i)).
-}
-Qed.
-
-Theorem poly_add_0_l {α} {r : ring α} : ∀ p, (0 + p)%pol = p.
-Proof.
-intros (la, lapr).
-apply eq_poly_eq; cbn.
-apply eq_poly_prop in lapr.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-rewrite <- (rev_involutive (strip_0s _)).
-rewrite IHla; cbn. {
-  remember (rev la) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [| b]. {
-    apply List_eq_rev_nil in Hlb; subst la.
-    now destruct (rng_eq_dec a 0).
-  }
-  cbn.
-  rewrite rev_app_distr; cbn; f_equal.
-  now rewrite <- rev_involutive, Hlb.
-} {
-  destruct la as [| a2]; [ | easy ].
-  apply rng_1_neq_0.
 }
 Qed.
 
