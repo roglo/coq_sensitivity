@@ -6445,6 +6445,8 @@ Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
 
+Arguments lap_norm la%lap.
+
 (* commutativity of addition *)
 
 Theorem lap_add_comm : ∀ al1 al2,
@@ -6476,7 +6478,7 @@ now rewrite Haz.
 Qed.
 
 Theorem lap_add_norm_idemp_l : ∀ la lb,
-  lap_norm (lap_norm la + lb)%lap = lap_norm (la + lb)%lap.
+  lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
 intros.
 unfold lap_norm; f_equal.
@@ -6505,6 +6507,26 @@ rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
 
+Theorem lap_add_norm_idemp_r : ∀ la lb,
+  lap_norm (la + lap_norm lb) = lap_norm (la + lb).
+Proof.
+intros.
+rewrite lap_add_comm, lap_add_norm_idemp_l.
+now rewrite lap_add_comm.
+Qed.
+
+Theorem lap_add_assoc : ∀ al1 al2 al3,
+  (al1 + (al2 + al3))%lap = ((al1 + al2) + al3)%lap.
+Proof.
+intros al1 al2 al3.
+revert al2 al3.
+induction al1; intros; [ easy | ].
+destruct al2; [ easy | cbn ].
+destruct al3; [ easy | cbn ].
+rewrite rngl_add_assoc.
+now rewrite IHal1.
+Qed.
+
 Theorem polyn_add_assoc : ∀ pa pb pc,
   (pa + (pb + pc) = (pa + pb) + pc)%pol.
 Proof.
@@ -6512,12 +6534,9 @@ intros (la, lapr) (lb, lbpr) (lc, lcpr).
 apply eq_polyn_eq.
 cbn - [ lap_norm ].
 rewrite lap_add_norm_idemp_l.
-...
 rewrite lap_add_norm_idemp_r.
 now rewrite lap_add_assoc.
 Qed.
-
-...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -6529,7 +6548,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
      rngl_add_assoc := polyn_add_assoc;
-     rngl_add_0_l := ?rngl_add_0_l;
+     rngl_add_0_l := 42;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
@@ -6901,26 +6920,6 @@ Theorem eq_lap_convol_mul_nil : ∀ la lb i len,
 Proof. now intros; induction len. Qed.
 
 (* addition theorems *)
-
-Theorem lap_add_norm_idemp_r : ∀ la lb,
-  lap_norm (la + lap_norm lb)%lap = lap_norm (la + lb)%lap.
-Proof.
-intros.
-rewrite lap_add_comm, lap_add_norm_idemp_l.
-now rewrite lap_add_comm.
-Qed.
-
-Theorem lap_add_assoc : ∀ al1 al2 al3,
-  lap_add al1 (lap_add al2 al3) = lap_add (lap_add al1 al2) al3.
-Proof.
-intros al1 al2 al3.
-revert al2 al3.
-induction al1; intros; [ easy | ].
-destruct al2; [ easy | cbn ].
-destruct al3; [ easy | cbn ].
-rewrite rng_add_assoc.
-now rewrite IHal1.
-Qed.
 
 Theorem lap_add_add_swap : ∀ la lb lc,
   lap_add (lap_add la lb) lc = lap_add (lap_add la lc) lb.
