@@ -6569,6 +6569,47 @@ Qed.
 
 (* associativity of multiplication *)
 
+Theorem lap_convol_mul_0_l : ∀ la lb i len,
+  (∀ i, nth i la 0%F = 0%F)
+  → lap_norm (lap_convol_mul la lb i len) = [].
+Proof.
+intros * Ha.
+revert i.
+induction len; intros; [ easy | ].
+cbn.
+rewrite strip_0s_app.
+remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite Ha, rngl_mul_0_l; [ easy | ].
+    now apply rngl_has_opp_or_sous_iff; left.
+  }
+  cbn.
+  now rewrite rngl_eqb_refl.
+}
+unfold lap_norm in IHlen.
+specialize (IHlen (S i)).
+rewrite Hlc in IHlen.
+now apply List_eq_rev_nil in IHlen.
+Qed.
+
+Theorem lap_convol_mul_cons_with_0_l : ∀ a la lb i len,
+  (∀ i, nth i la 0%F = 0%F)
+  → lap_convol_mul (a :: la) lb i len = lap_convol_mul [a] lb i len.
+Proof.
+intros * Hla.
+revert i.
+induction len; intros; [ easy | ].
+cbn.
+f_equal; [ | apply IHlen ].
+apply rngl_summation_eq_compat.
+intros j Hj.
+destruct j; [ easy | ].
+rewrite Tauto_match_nat_same.
+now rewrite Hla.
+Qed.
+
 Theorem lap_mul_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la * lb)%lap = lap_norm (la * lb)%lap.
 Proof.
@@ -6582,8 +6623,8 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [Haz| Haz]. {
     cbn.
+    apply (rngl_eqb_eq Heb) in Haz.
     destruct lb as [| b]; [ easy | cbn ].
-...
     rewrite lap_convol_mul_0_l; [ easy | ].
     intros i; cbn.
     destruct i; [ easy | ].
@@ -6619,6 +6660,7 @@ destruct lc as [| c]. {
     now rewrite nth_overflow.
   }
   rewrite Nat.add_comm.
+...
   apply lap_convol_mul_more; cbn.
   now rewrite Nat.sub_0_r.
 }
@@ -7293,30 +7335,6 @@ do 4 rewrite lap_convol_mul_length.
 apply Nat.add_assoc.
 Qed.
 
-Theorem lap_convol_mul_0_l : ∀ la lb i len,
-  (∀ i, nth i la 0%Rng = 0%Rng)
-  → lap_norm (lap_convol_mul la lb i len) = [].
-Proof.
-intros * Ha.
-revert i.
-induction len; intros; [ easy | ].
-cbn - [ summation ].
-rewrite strip_0s_app.
-remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  rewrite all_0_summation_0. 2: {
-    intros j Hj.
-    now rewrite Ha, rng_mul_0_l.
-  }
-  cbn.
-  now destruct (rng_eq_dec 0%Rng 0%Rng).
-}
-unfold lap_norm in IHlen.
-specialize (IHlen (S i)).
-rewrite Hlc in IHlen.
-now apply List_eq_rev_nil in IHlen.
-Qed.
-
 Theorem all_0_all_rev_0 : ∀ la,
   (∀ i, nth i la 0%Rng = 0%Rng)
   ↔ (∀ i, nth i (rev la) 0%Rng = 0%Rng).
@@ -7348,22 +7366,6 @@ split; intros Hla. {
   apply all_0_all_rev_0.
   now rewrite rev_involutive.
 }
-Qed.
-
-Lemma lap_convol_mul_cons_with_0_l : ∀ a la lb i len,
-  (∀ i, nth i la 0%Rng = 0%Rng)
-  → lap_convol_mul (a :: la) lb i len = lap_convol_mul [a] lb i len.
-Proof.
-intros * Hla.
-revert i.
-induction len; intros; [ easy | ].
-cbn - [ summation ].
-f_equal; [ | apply IHlen ].
-apply summation_compat.
-intros j Hj.
-destruct j; [ easy | ].
-rewrite match_id.
-now rewrite Hla.
 Qed.
 
 Theorem lap_convol_mul_succ : ∀ la lb i len,
