@@ -6686,6 +6686,75 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 }
 Qed.
 
+Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
+  lap_norm (lap_convol_mul (la ++ repeat 0%F n) lb i len) =
+  lap_norm (lap_convol_mul la lb i len).
+Proof.
+intros.
+revert la i len.
+induction n; intros. {
+  now cbn; rewrite app_nil_r.
+}
+cbn.
+rewrite List_cons_is_app.
+rewrite app_assoc.
+rewrite IHn; clear n IHn.
+revert la i.
+induction len; intros; [ easy | ].
+cbn.
+do 2 rewrite strip_0s_app.
+rewrite <- (rev_involutive (strip_0s _)).
+rewrite fold_lap_norm.
+rewrite <- (rev_involutive (strip_0s (rev _))).
+rewrite fold_lap_norm.
+rewrite IHlen.
+remember (rev (lap_norm _)) as lc eqn:Hlc; symmetry in Hlc.
+f_equal.
+destruct lc as [| c]. {
+  apply List_eq_rev_nil in Hlc.
+  f_equal; f_equal.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  f_equal; clear.
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
+    now rewrite app_nth1.
+  }
+  apply Nat.nlt_ge in Hjla.
+  rewrite (nth_overflow la); [ | easy ].
+  rewrite app_nth2; [ | easy ].
+  destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
+    now rewrite Hjla2, Nat.sub_diag.
+  }
+  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
+} {
+  f_equal; f_equal.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  f_equal; clear.
+  destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
+    now rewrite app_nth1.
+  }
+  apply Nat.nlt_ge in Hjla.
+  rewrite (nth_overflow la); [ | easy ].
+  rewrite app_nth2; [ | easy ].
+  destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
+    now rewrite Hjla2, Nat.sub_diag.
+  }
+  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
+}
+Qed.
+
+Theorem lap_norm_cons_norm : ∀ a la lb i len,
+  length (a :: la) + length lb - 1 ≤ i + len
+  → lap_norm (lap_convol_mul (a :: lap_norm la) lb i len) =
+    lap_norm (lap_convol_mul (a :: la) lb i len).
+Proof.
+intros * Hlen.
+rewrite (lap_norm_repeat_0 la) at 2.
+rewrite app_comm_cons.
+now rewrite lap_convol_mul_app_rep_0_l.
+Qed.
+
 Theorem lap_mul_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la * lb)%lap = lap_norm (la * lb)%lap.
 Proof.
@@ -6758,9 +6827,44 @@ rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
 rewrite (Nat.add_comm _ (length la)).
 rewrite Nat.add_sub.
 rewrite Nat.add_comm.
-...
 apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
+Qed.
+
+Theorem lap_convol_mul_comm : ∀ l1 l2 i len,
+  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
+Proof.
+intros l1 l2 i len.
+revert i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+rewrite rngl_summation_rtl.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+rewrite Nat.add_0_r.
+rewrite rngl_mul_comm.
+...
+apply rng_mul_compat; [ idtac | reflexivity ].
+rewrite Nat_sub_sub_distr; [ idtac | easy ].
+rewrite Nat.sub_diag, Nat.add_0_l; reflexivity.
+Qed.
+
+Theorem lap_mul_comm : ∀ a b, lap_mul a b = lap_mul b a.
+Proof.
+intros la lb.
+unfold lap_mul.
+destruct la as [| a]; [ now destruct lb | cbn ].
+rewrite <- Nat.add_succ_comm; cbn.
+rewrite (Nat.add_comm (length lb)).
+...
+now rewrite lap_convol_mul_comm.
+Qed.
+
+Theorem lap_mul_norm_idemp_r : ∀ la lb,
+  lap_norm (la * lap_norm lb)%lap = lap_norm (la * lb)%lap.
+Proof.
+intros.
+setoid_rewrite lap_mul_comm.
+apply lap_mul_norm_idemp_l.
 Qed.
 
 Theorem polyn_mul_assoc : ∀ p1 p2 p3,
@@ -6958,22 +7062,6 @@ Notation "'ⓧ'" := (xpow 1) (at level 30, format "'ⓧ'") : poly_scope.
 
 (* *)
 
-Theorem lap_convol_mul_comm : ∀ α (R : ring α) l1 l2 i len,
-  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
-Proof.
-intros α R l1 l2 i len.
-revert i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
-rewrite summation_rtl.
-apply summation_compat; intros j (_, Hj).
-rewrite Nat.add_0_r.
-rewrite rng_mul_comm.
-apply rng_mul_compat; [ idtac | reflexivity ].
-rewrite Nat_sub_sub_distr; [ idtac | easy ].
-rewrite Nat.sub_diag, Nat.add_0_l; reflexivity.
-Qed.
-
 Theorem lap_convol_mul_nil_l : ∀ α (R : ring α) l i len,
   lap_norm (lap_convol_mul [] l i len) = [].
 Proof.
@@ -7153,16 +7241,6 @@ now rewrite (lap_add_comm lb).
 Qed.
 
 (* multiplication theorems *)
-
-Theorem lap_mul_comm : ∀ a b, lap_mul a b = lap_mul b a.
-Proof.
-intros la lb.
-unfold lap_mul.
-destruct la as [| a]; [ now destruct lb | cbn ].
-rewrite <- Nat.add_succ_comm; cbn.
-rewrite (Nat.add_comm (length lb)).
-now rewrite lap_convol_mul_comm.
-Qed.
 
 Theorem poly_mul_comm : ∀ pa pb, (pa * pb)%pol = (pb * pa)%pol.
 Proof.
@@ -7444,75 +7522,6 @@ split; intros Hla. {
 }
 Qed.
 
-Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
-  lap_norm (lap_convol_mul (la ++ repeat 0%Rng n) lb i len) =
-  lap_norm (lap_convol_mul la lb i len).
-Proof.
-intros.
-revert la i len.
-induction n; intros. {
-  now cbn; rewrite app_nil_r.
-}
-cbn.
-replace (0%Rng :: repeat 0%Rng n) with ([0%Rng] ++ repeat 0%Rng n) by easy.
-rewrite app_assoc.
-rewrite IHn; clear n IHn.
-revert la i.
-induction len; intros; [ easy | ].
-cbn - [ summation ].
-do 2 rewrite strip_0s_app.
-rewrite <- (rev_involutive (strip_0s _)).
-rewrite fold_lap_norm.
-rewrite <- (rev_involutive (strip_0s (rev _))).
-rewrite fold_lap_norm.
-rewrite IHlen.
-remember (rev (lap_norm _)) as lc eqn:Hlc; symmetry in Hlc.
-f_equal.
-destruct lc as [| c]. {
-  apply List_eq_rev_nil in Hlc.
-  f_equal; f_equal.
-  apply summation_compat.
-  intros j Hj.
-  f_equal; clear.
-  destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
-    now rewrite app_nth1.
-  }
-  apply Nat.nlt_ge in Hjla.
-  rewrite (nth_overflow la); [ | easy ].
-  rewrite app_nth2; [ | easy ].
-  destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
-    now rewrite Hjla2, Nat.sub_diag.
-  }
-  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
-} {
-  f_equal; f_equal.
-  apply summation_compat.
-  intros j Hj.
-  f_equal; clear.
-  destruct (lt_dec j (length la)) as [Hjla| Hjla]. {
-    now rewrite app_nth1.
-  }
-  apply Nat.nlt_ge in Hjla.
-  rewrite (nth_overflow la); [ | easy ].
-  rewrite app_nth2; [ | easy ].
-  destruct (Nat.eq_dec j (length la)) as [Hjla2| Hjla2]. {
-    now rewrite Hjla2, Nat.sub_diag.
-  }
-  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
-}
-Qed.
-
-Theorem lap_norm_cons_norm : ∀ a la lb i len,
-  length (a :: la) + length lb - 1 ≤ i + len
-  → lap_norm (lap_convol_mul (a :: lap_norm la) lb i len) =
-    lap_norm (lap_convol_mul (a :: la) lb i len).
-Proof.
-intros * Hlen.
-rewrite (lap_norm_repeat_0 la) at 2.
-rewrite app_comm_cons.
-now rewrite lap_convol_mul_app_rep_0_l.
-Qed.
-
 Theorem nth_lap_add : ∀ i la lb,
   nth i (la + lb)%lap 0%Rng = (nth i la 0 + nth i lb 0)%Rng.
 Proof.
@@ -7526,14 +7535,6 @@ destruct lb as [| b]; cbn. {
 }
 destruct i; [ easy | ].
 apply IHla.
-Qed.
-
-Theorem lap_mul_norm_idemp_r : ∀ la lb,
-  lap_norm (la * lap_norm lb)%lap = lap_norm (la * lb)%lap.
-Proof.
-intros.
-setoid_rewrite lap_mul_comm.
-apply lap_mul_norm_idemp_l.
 Qed.
 
 Theorem lap_mul_mul_swap : ∀ la lb lc,
