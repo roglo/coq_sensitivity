@@ -6213,9 +6213,9 @@ destruct o as [(cq, dq)| ]. 2: {
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
 cbn in Ha, Hb, Hor.
-rewrite if_bool_if_dec in Hor.
-destruct (bool_dec _) as [Halb| Halb]; [ easy | ].
-apply Nat.ltb_ge in Halb.
+rewrite if_ltb_lt_dec in Hor.
+destruct (lt_dec _ _) as [Halb| Halb]; [ easy | ].
+apply Nat.nlt_ge in Halb.
 symmetry in Hor.
 injection Hor; clear Hor; intros Hrlr Hdq Hcq.
 rewrite <- Hcq, <- Hdq in Hrlr.
@@ -6242,6 +6242,27 @@ apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
+Theorem rlap_quot_rem_step_None : ∀ la lb lr,
+  rlap_quot_rem_step la lb = (None, lr)
+  → lb = [] ∧ lr = [] ∨ la = [] ∧ lr = [] ∨ length la < length lb ∧ lr = la.
+Proof.
+intros * Hrl.
+destruct lb as [| b]. {
+  injection Hrl; clear Hrl; intros; subst.
+  now left.
+}
+destruct la as [| a]. {
+  injection Hrl; clear Hrl; intros; subst.
+  now right; left.
+}
+cbn in Hrl |-*; right; right.
+rewrite if_ltb_lt_dec in Hrl.
+destruct (lt_dec _ _) as [Hab| Hab]; [ | easy ].
+injection Hrl; clear Hrl; intros; subst lr.
+split; [ | easy ].
+now apply Nat.succ_lt_mono in Hab.
+Qed.
+
 Theorem hd_rem : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
@@ -6256,19 +6277,19 @@ assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
 move H before Hit; clear Hit; rename H into Hit.
 destruct it; [ easy | ].
 cbn in Hab.
-...
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
 destruct o as [(cq, dq)| ]. 2: {
   injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0.
+  apply rlap_quot_rem_step_None in Hor.
+  now destruct Hor as [(H1, H2)| [(H1, H2)| (H1, H2)]]; subst.
 }
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
 cbn in Ha, Hb, Hor.
-rewrite if_bool_if_dec in Hor.
-destruct (bool_dec _) as [Halb| Halb]; [ easy | ].
-apply Nat.ltb_ge in Halb.
+rewrite if_ltb_lt_dec in Hor.
+destruct (lt_dec _ _) as [Halb| Halb]; [ easy | ].
+apply Nat.nlt_ge in Halb.
 symmetry in Hor.
 injection Hor; clear Hor; intros Hrlr Hdq Hcq.
 rewrite <- Hcq, <- Hdq in Hrlr.
@@ -6277,6 +6298,7 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
+...
 rewrite Hlq; cbn.
 rewrite Hcq.
 unfold rngl_div.
