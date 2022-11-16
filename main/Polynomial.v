@@ -6197,19 +6197,12 @@ Theorem hd_quot : ∀ la lb lq lr,
   → hd 1%F lq ≠ 0%F.
 Proof.
 intros * Ha Hb Hab.
-(*
-intros Hq; apply Ha; clear Ha.
-*)
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
 assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
 move H before Hit; clear Hit; rename H into Hit.
-revert la lb lq lr Ha Hb Hit Hab.
-induction it; intros. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0.
-}
+destruct it; [ easy | ].
 cbn in Hab.
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
@@ -6231,50 +6224,11 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-unfold rlap_quot_rem_nb_iter in Hit |-*.
-cbn in Hit.
-apply Nat.succ_le_mono in Hit.
-apply IHit in Hrb; [ | | easy | ]. {
-  rewrite Hlq, Hcq; cbn.
-...
-intros * Ha Hb Hab.
-intros Hq; apply Ha; clear Ha.
-unfold rlap_quot_rem in Hab.
-destruct la as [| a]. {
-  now destruct lb; injection Hab; clear Hab; intros; subst lq lr.
-}
-destruct lb as [| b]. {
-  now injection Hab; clear Hab; intros; subst lq lr.
-}
-cbn.
-remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
-symmetry in Hit.
-unfold rlap_quot_rem_nb_iter in Hit.
-destruct it; [ easy | ].
-apply Nat.succ_inj in Hit.
-cbn in Hab.
-rewrite if_bool_if_dec in Hab.
-destruct (bool_dec _) as [Halb| Halb]. {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0 in Hq.
-}
-remember (a / b)%F as cq eqn:Hcq.
-...
-remember
-  (lap_norm
-     (lap_sub (rev la)
-        (repeat 0%F (length la - length lb) ++ map (rngl_mul cq) (rev lb))))
-  as rlr' eqn:Hrlr'.
-rewrite <- (rev_involutive (b :: lb)) in Hab.
-remember (rev (b :: lb)) as rlb' eqn:Hrlb'.
-remember (rlap_quot_rem_loop it (rev rlr') (rev rlb')) as qr eqn:Hqr.
-symmetry in Hqr.
-destruct qr as (q, r).
-injection Hab; clear Hab; intros; subst lq lr.
-cbn in Hq.
-subst cq.
-unfold rngl_div in Hq.
-rewrite Hiv in Hq.
+rewrite Hlq; cbn.
+rewrite Hcq.
+unfold rngl_div.
+rewrite Hiv.
+intros Hq.
 apply rngl_integral in Hq; cycle 1. {
   now apply rngl_has_opp_or_sous_iff; left.
 } {
@@ -6287,15 +6241,59 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ | easy | easy | easy ].
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
-*)
 
-(*
 Theorem hd_rem : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
   → hd 1%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → hd 1%F lr ≠ 0%F.
 Proof.
+intros * Ha Hb Hab.
+unfold rlap_quot_rem in Hab.
+remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
+symmetry in Hit.
+assert (H : rlap_quot_rem_nb_iter la lb ≤ it) by flia Hit.
+move H before Hit; clear Hit; rename H into Hit.
+destruct it; [ easy | ].
+cbn in Hab.
+...
+remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
+destruct orlr as (o, rlr).
+destruct o as [(cq, dq)| ]. 2: {
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0.
+}
+destruct lb as [| b]; [ easy | ].
+destruct la as [| a]; [ easy | cbn ].
+cbn in Ha, Hb, Hor.
+rewrite if_bool_if_dec in Hor.
+destruct (bool_dec _) as [Halb| Halb]; [ easy | ].
+apply Nat.ltb_ge in Halb.
+symmetry in Hor.
+injection Hor; clear Hor; intros Hrlr Hdq Hcq.
+rewrite <- Hcq, <- Hdq in Hrlr.
+remember (rlap_quot_rem_loop it rlr (b :: lb)) as rb eqn:Hrb.
+symmetry in Hrb.
+destruct rb as (lq', lr').
+symmetry in Hab.
+injection Hab; clear Hab; intros H1 Hlq; subst lr'.
+rewrite Hlq; cbn.
+rewrite Hcq.
+unfold rngl_div.
+rewrite Hiv.
+intros Hq.
+apply rngl_integral in Hq; cycle 1. {
+  now apply rngl_has_opp_or_sous_iff; left.
+} {
+  apply Bool.orb_true_iff; right.
+  rewrite Heb, Bool.andb_true_r.
+  now apply rngl_has_inv_or_quot_iff; left.
+}
+destruct Hq as [Hq| Hq]; [ easy | ].
+exfalso; revert Hq.
+apply rngl_inv_neq_0; [ | easy | easy | easy ].
+now apply rngl_has_opp_or_sous_iff; left.
+...
 intros * Ha Hb Hab.
 intros Hr; apply Ha; clear Ha.
 unfold rlap_quot_rem in Hab.
@@ -6413,8 +6411,8 @@ apply (rngl_eqb_neq Heb) in Ha, Hb.
 rewrite <- (rev_involutive la) in Ha.
 rewrite <- (rev_involutive lb) in Hb.
 rewrite List_last_rev in Ha, Hb |-*.
+apply hd_quot in Hqr; [ | easy | easy ].
 ...
-now apply hd_quot in Hqr.
 Qed.
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
