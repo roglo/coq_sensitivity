@@ -6610,6 +6610,82 @@ rewrite Tauto_match_nat_same.
 now rewrite Hla.
 Qed.
 
+Theorem lap_convol_mul_succ : ∀ la lb i len,
+  lap_convol_mul la lb i (S len) =
+  lap_convol_mul la lb i len ++
+    [∑ (j = 0, i + len),
+     List.nth j la 0 * List.nth (i + len - j) lb 0]%F.
+Proof.
+intros.
+cbn.
+revert i.
+induction len; intros. {
+  now rewrite Nat.add_0_r.
+}
+cbn.
+f_equal.
+specialize (IHlen (S i)).
+cbn in IHlen.
+rewrite Nat.add_succ_r.
+apply IHlen.
+Qed.
+
+Theorem lap_norm_app_0_r : ∀ la lb,
+  (∀ i, nth i lb 0%F = 0%F)
+  → lap_norm la = lap_norm (la ++ lb).
+Proof.
+intros * Hlb.
+unfold lap_norm; f_equal.
+induction la as [| a]. {
+  cbn; symmetry.
+  induction lb as [| b]; [ easy | cbn ].
+  rewrite strip_0s_app.
+  rewrite IHlb. 2: {
+    intros i.
+    now specialize (Hlb (S i)).
+  }
+  specialize (Hlb 0); cbn in Hlb; rewrite Hlb; cbn.
+  now rewrite rngl_eqb_refl.
+}
+cbn.
+do 2 rewrite strip_0s_app.
+now rewrite IHla.
+Qed.
+
+Theorem lap_convol_mul_more : ∀ n la lb i len,
+  length la + length lb - 1 ≤ i + len
+  → lap_norm (lap_convol_mul la lb i len) =
+    lap_norm (lap_convol_mul la lb i (len + n)).
+Proof.
+intros.
+induction n; [ rewrite Nat.add_0_r; reflexivity | idtac ].
+rewrite Nat.add_succ_r.
+rewrite lap_convol_mul_succ.
+rewrite IHn.
+apply lap_norm_app_0_r.
+intros j.
+rewrite all_0_rngl_summation_0. {
+  destruct j; [ easy | now destruct j ].
+}
+clear j.
+intros j (_, Hj).
+destruct (le_dec (length la) j) as [H1| H1]. {
+  rewrite List.nth_overflow; [ | easy ].
+  apply rngl_mul_0_l.
+  now apply rngl_has_opp_or_sous_iff; left.
+} {
+  apply Nat.nle_gt in H1.
+  destruct (le_dec (length lb) (i + (len + n) - j)) as [H2| H2]. {
+    rewrite (nth_overflow _ _ H2).
+    apply rngl_mul_0_r.
+    now apply rngl_has_opp_or_sous_iff; left.
+  } {
+    exfalso; apply H2; clear H2.
+    flia H H1.
+  }
+}
+Qed.
+
 Theorem lap_mul_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la * lb)%lap = lap_norm (la * lb)%lap.
 Proof.
@@ -6660,7 +6736,6 @@ destruct lc as [| c]. {
     now rewrite nth_overflow.
   }
   rewrite Nat.add_comm.
-...
   apply lap_convol_mul_more; cbn.
   now rewrite Nat.sub_0_r.
 }
@@ -6683,6 +6758,7 @@ rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
 rewrite (Nat.add_comm _ (length la)).
 rewrite Nat.add_sub.
 rewrite Nat.add_comm.
+...
 apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
@@ -7365,79 +7441,6 @@ split; intros Hla. {
   apply eq_strip_0s_nil.
   apply all_0_all_rev_0.
   now rewrite rev_involutive.
-}
-Qed.
-
-Theorem lap_convol_mul_succ : ∀ la lb i len,
-  lap_convol_mul la lb i (S len) =
-  lap_convol_mul la lb i len ++
-    [Σ (j = 0, i + len),
-     List.nth j la 0 * List.nth (i + len - j) lb 0]%Rng.
-Proof.
-intros.
-cbn - [ summation ].
-revert i.
-induction len; intros. {
-  now rewrite Nat.add_0_r.
-}
-cbn - [ summation ].
-f_equal.
-specialize (IHlen (S i)).
-cbn - [ summation ] in IHlen.
-rewrite Nat.add_succ_r.
-apply IHlen.
-Qed.
-
-Theorem lap_norm_app_0_r : ∀ la lb,
-  (∀ i, nth i lb 0%Rng = 0%Rng)
-  → lap_norm la = lap_norm (la ++ lb).
-Proof.
-intros * Hlb.
-unfold lap_norm; f_equal.
-induction la as [| a]. {
-  cbn; symmetry.
-  induction lb as [| b]; [ easy | cbn ].
-  rewrite strip_0s_app.
-  rewrite IHlb. 2: {
-    intros i.
-    now specialize (Hlb (S i)).
-  }
-  specialize (Hlb 0); cbn in Hlb; rewrite Hlb; cbn.
-  now destruct (rng_eq_dec 0%Rng 0%Rng).
-}
-cbn.
-do 2 rewrite strip_0s_app.
-now rewrite IHla.
-Qed.
-
-Theorem lap_convol_mul_more : ∀ n la lb i len,
-  length la + length lb - 1 ≤ i + len
-  → lap_norm (lap_convol_mul la lb i len) =
-    lap_norm (lap_convol_mul la lb i (len + n)).
-Proof.
-intros.
-induction n; [ rewrite Nat.add_0_r; reflexivity | idtac ].
-rewrite Nat.add_succ_r.
-rewrite lap_convol_mul_succ.
-rewrite IHn.
-apply lap_norm_app_0_r.
-intros j.
-rewrite all_0_summation_0. {
-  destruct j; [ easy | now destruct j ].
-}
-clear j.
-intros j (_, Hj).
-apply rng_mul_eq_0.
-destruct (le_dec (length la) j) as [H1| H1]. {
-  now left; rewrite List.nth_overflow.
-} {
-  apply Nat.nle_gt in H1.
-  destruct (le_dec (length lb) (i + (len + n) - j)) as [H2| H2]. {
-    now right; rewrite nth_overflow.
-  } {
-    exfalso; apply H2; clear H2.
-    flia H H1.
-  }
 }
 Qed.
 
