@@ -6437,6 +6437,14 @@ Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
 
+Declare Scope lap_scope.
+Delimit Scope lap_scope with lap.
+
+Notation "- a" := (lap_opp a) : lap_scope.
+Notation "a + b" := (lap_add a b) : lap_scope.
+Notation "a - b" := (lap_sub a b) : lap_scope.
+Notation "a * b" := (lap_mul a b) : lap_scope.
+
 (* commutativity of addition *)
 
 Theorem lap_add_comm : ∀ al1 al2,
@@ -6458,14 +6466,53 @@ Qed.
 
 (* associativity of addition *)
 
+Theorem strip_0s_idemp : ∀ la, strip_0s (strip_0s la) = strip_0s la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
+now rewrite Haz.
+Qed.
+
+Theorem lap_add_norm_idemp_l : ∀ la lb,
+  lap_norm (lap_norm la + lb)%lap = lap_norm (la + lb)%lap.
+Proof.
+intros.
+unfold lap_norm; f_equal.
+revert la.
+induction lb as [| b]; intros. {
+  do 2 rewrite lap_add_0_r.
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz.
+    subst a; rewrite rngl_add_0_l; cbn.
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+
 Theorem polyn_add_assoc : ∀ pa pb pc,
   (pa + (pb + pc) = (pa + pb) + pc)%pol.
 Proof.
 intros (la, lapr) (lb, lbpr) (lc, lcpr).
 apply eq_polyn_eq.
 cbn - [ lap_norm ].
-...
 rewrite lap_add_norm_idemp_l.
+...
 rewrite lap_add_norm_idemp_r.
 now rewrite lap_add_assoc.
 Qed.
@@ -6841,14 +6888,6 @@ Section lap.
 Context {α : Type}.
 Context {r : ring α}.
 
-Theorem strip_0s_idemp : ∀ la, strip_0s (strip_0s la) = strip_0s la.
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]; [ easy | cbn ].
-now destruct (rng_eq_dec a 0%Rng).
-Qed.
-
 Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
 Proof.
 intros.
@@ -6862,35 +6901,6 @@ Theorem eq_lap_convol_mul_nil : ∀ la lb i len,
 Proof. now intros; induction len. Qed.
 
 (* addition theorems *)
-
-Theorem lap_add_norm_idemp_l : ∀ la lb,
-  lap_norm (lap_norm la + lb)%lap = lap_norm (la + lb)%lap.
-Proof.
-intros.
-unfold lap_norm; f_equal.
-revert la.
-induction lb as [| b]; intros. {
-  do 2 rewrite lap_add_0_r.
-  now rewrite rev_involutive, strip_0s_idemp.
-}
-cbn.
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-rewrite <- IHlb.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  destruct (rng_eq_dec a 0) as [Haz| Haz]. {
-    subst a; rewrite rng_add_0_l; cbn.
-    now rewrite strip_0s_app.
-  }
-  cbn.
-  now rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
-Qed.
 
 Theorem lap_add_norm_idemp_r : ∀ la lb,
   lap_norm (la + lap_norm lb)%lap = lap_norm (la + lb)%lap.
