@@ -5506,6 +5506,22 @@ Context {H10 : rngl_has_1_neq_0 = true}.
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
 
+(* polyn_eq is equivalent to lap_eq *)
+
+Theorem eq_polyn_eq : ∀ pa pb,
+  lap pa = lap pb
+  ↔ pa = pb.
+Proof.
+intros.
+split; intros Hab; [ | now subst ].
+destruct pa as (la, pa).
+destruct pb as (lb, pb).
+cbn in Hab.
+subst lb.
+f_equal.
+apply (Eqdep_dec.UIP_dec Bool.bool_dec).
+Qed.
+
 (* polyn_eqb is an equality *)
 
 Theorem polyn_eqb_eq : ∀ (eqb : T → T → bool),
@@ -6440,6 +6456,22 @@ unfold "+"%pol.
 now rewrite lap_add_comm.
 Qed.
 
+(* associativity of addition *)
+
+Theorem polyn_add_assoc : ∀ pa pb pc,
+  (pa + (pb + pc) = (pa + pb) + pc)%pol.
+Proof.
+intros (la, lapr) (lb, lbpr) (lc, lcpr).
+apply eq_polyn_eq.
+cbn - [ lap_norm ].
+...
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_norm_idemp_r.
+now rewrite lap_add_assoc.
+Qed.
+
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -6449,7 +6481,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_is_integral := rngl_is_integral;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
-     rngl_add_assoc := 42;
+     rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := ?rngl_add_0_l;
      rngl_mul_assoc := ?rngl_mul_assoc;
      rngl_mul_1_l := ?rngl_mul_1_l;
@@ -6886,17 +6918,6 @@ Proof.
 intros la lb lc.
 do 2 rewrite <- lap_add_assoc.
 now rewrite (lap_add_comm lb).
-Qed.
-
-Theorem poly_add_assoc : ∀ pa pb pc,
-  (pa + (pb + pc) = (pa + pb) + pc)%pol.
-Proof.
-intros (la, lapr) (lb, lbpr) (lc, lcpr).
-apply eq_poly_eq.
-cbn - [ lap_norm ].
-rewrite lap_add_norm_idemp_l.
-rewrite lap_add_norm_idemp_r.
-now rewrite lap_add_assoc.
 Qed.
 
 (* multiplication theorems *)
