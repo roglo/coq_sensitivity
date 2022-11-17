@@ -7252,6 +7252,57 @@ induction la as [| a]; intros. {
 }
 Qed.
 
+Theorem eq_lap_convol_mul_nil : ∀ la lb i len,
+  lap_convol_mul la lb i len = [] → len = 0.
+Proof. now intros; induction len. Qed.
+
+Theorem list_nth_lap_convol_mul_aux : ∀ la lb n i len,
+  List.length la + List.length lb - 1 = (i + len)%nat
+  → (List.nth n (lap_convol_mul la lb i len) 0%F =
+     ∑ (j = 0, n + i),
+     List.nth j la 0 * List.nth (n + i - j) lb 0)%F.
+Proof.
+intros la lb n i len Hlen.
+assert (Hos : @rngl_has_opp_or_sous T ro = true). {
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+revert la lb i n Hlen.
+induction len; intros. {
+  cbn.
+  rewrite Nat.add_0_r in Hlen.
+  rewrite all_0_rngl_summation_0; [ now destruct n | ].
+  intros j (_, Hj).
+  destruct (le_dec (length la) j) as [H1| H1]. {
+    rewrite List.nth_overflow; [ | easy ].
+    now rewrite rngl_mul_0_l.
+  }
+  destruct (le_dec (length lb) (n + i - j)) as [H2| H2]. {
+    rewrite (nth_overflow _ _ H2).
+    now apply rngl_mul_0_r.
+  }
+  exfalso; apply H2; clear Hj H2.
+  apply Nat.nle_gt in H1; subst i.
+  flia H1.
+}
+cbn.
+destruct n; [ easy | ].
+rewrite Nat.add_succ_r, <- Nat.add_succ_l in Hlen.
+rewrite IHlen; [ | easy ].
+now rewrite Nat.add_succ_r, <- Nat.add_succ_l.
+Qed.
+
+(* to be unified perhaps with list_nth_convol_mul below *)
+Theorem list_nth_lap_convol_mul : ∀ la lb i len,
+  len = length la + length lb - 1
+  → (List.nth i (lap_convol_mul la lb 0 len) 0 =
+     ∑ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%F.
+Proof.
+intros la lb i len Hlen.
+symmetry in Hlen.
+rewrite list_nth_lap_convol_mul_aux; [ | easy ].
+now rewrite Nat.add_0_r.
+Qed.
+
 Theorem lap_norm_mul_assoc : ∀ la lb lc,
   lap_norm (la * (lb * lc))%lap = lap_norm (la * lb * lc)%lap.
 Proof.
@@ -7278,7 +7329,6 @@ destruct ld as [| d]. {
   destruct le as [| e]; [ easy | cbn ].
   rewrite Tauto_match_nat_same.
   move e before c.
-...
   apply eq_lap_convol_mul_nil in Hld.
   apply Nat.sub_0_le in Hld.
   remember (length la' + length lb') as len eqn:Hlen.
@@ -7293,7 +7343,7 @@ destruct ld as [| d]. {
   now rewrite Hla' in Hlen.
 }
 destruct le as [| e]. {
-  cbn; rewrite match_id.
+  cbn; rewrite Tauto_match_nat_same.
   move d before c.
   apply eq_lap_convol_mul_nil in Hle.
   apply Nat.sub_0_le in Hle.
@@ -7308,9 +7358,10 @@ destruct le as [| e]. {
   destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlc' in Hlen | ].
   now rewrite Hlb' in Hlen.
 }
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
+rewrite list_nth_lap_convol_mul; [ | easy ].
+rewrite list_nth_lap_convol_mul; [ | easy ].
 rewrite <- Hld, <- Hle.
+...
 rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
 rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
 rewrite <- summation_summation_mul_swap.
@@ -7647,10 +7698,6 @@ rewrite rev_involutive.
 now rewrite strip_0s_idemp.
 Qed.
 
-Theorem eq_lap_convol_mul_nil : ∀ la lb i len,
-  lap_convol_mul la lb i len = [] → len = 0.
-Proof. now intros; induction len. Qed.
-
 (* addition theorems *)
 
 Theorem lap_add_add_swap : ∀ la lb lc,
@@ -7668,51 +7715,6 @@ Proof.
 intros.
 apply eq_poly_eq; cbn.
 now rewrite lap_mul_comm.
-Qed.
-
-Theorem list_nth_lap_convol_mul_aux : ∀ la lb n i len,
-  List.length la + List.length lb - 1 = (i + len)%nat
-  → (List.nth n (lap_convol_mul la lb i len) 0%Rng =
-     Σ (j = 0, n + i),
-     List.nth j la 0 * List.nth (n + i - j) lb 0)%Rng.
-Proof.
-intros la lb n i len Hlen.
-revert la lb i n Hlen.
-induction len; intros.
- simpl.
- rewrite Nat.add_0_r in Hlen.
- rewrite all_0_summation_0; [ destruct n; reflexivity | idtac ].
- intros j (_, Hj).
- destruct (le_dec (length la) j) as [H1| H1].
-  rewrite List.nth_overflow; [ idtac | assumption ].
-  rewrite rng_mul_0_l; reflexivity.
-
-  destruct (le_dec (length lb) (n + i - j)) as [H2| H2].
-   rewrite rng_mul_comm.
-   rewrite List.nth_overflow; [ idtac | assumption ].
-   rewrite rng_mul_0_l; reflexivity.
-
-   exfalso; apply H2; clear Hj H2.
-   apply Nat.nle_gt in H1; subst i.
-   flia H1.
-
- simpl.
- destruct n; [ reflexivity | idtac ].
- rewrite Nat.add_succ_r, <- Nat.add_succ_l in Hlen.
- rewrite IHlen; [ idtac | assumption ].
- rewrite Nat.add_succ_r, <- Nat.add_succ_l; reflexivity.
-Qed.
-
-(* to be unified perhaps with list_nth_convol_mul below *)
-Theorem list_nth_lap_convol_mul : ∀ la lb i len,
-  len = length la + length lb - 1
-  → (List.nth i (lap_convol_mul la lb 0 len) 0 =
-     Σ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%Rng.
-Proof.
-intros la lb i len Hlen.
-symmetry in Hlen.
-rewrite list_nth_lap_convol_mul_aux; [ idtac | assumption ].
-rewrite Nat.add_0_r; reflexivity.
 Qed.
 
 Theorem summation_mul_list_nth_lap_convol_mul : ∀ la lb lc k,
