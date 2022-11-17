@@ -6774,7 +6774,54 @@ Theorem lap_convol_mul_app_rep_0_r : ∀ la lb i len n,
   lap_norm (lap_convol_mul la lb i len).
 Proof.
 intros.
-...
+revert lb i len.
+induction n; intros; [ now cbn; rewrite app_nil_r | cbn ].
+rewrite List_cons_is_app.
+rewrite app_assoc.
+rewrite IHn; clear n IHn.
+revert la i.
+induction len; intros; [ easy | cbn ].
+do 2 rewrite strip_0s_app.
+rewrite <- (rev_involutive (strip_0s _)).
+rewrite fold_lap_norm.
+rewrite <- (rev_involutive (strip_0s (rev _))).
+rewrite fold_lap_norm.
+rewrite IHlen.
+remember (rev (lap_norm _)) as lc eqn:Hlc; symmetry in Hlc.
+f_equal.
+destruct lc as [| c]. {
+  apply List_eq_rev_nil in Hlc.
+  f_equal; f_equal.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  f_equal; clear.
+  destruct (lt_dec (i - j) (length lb)) as [Hjla| Hjla]. {
+    now rewrite app_nth1.
+  }
+  apply Nat.nlt_ge in Hjla.
+  rewrite (nth_overflow lb); [ | easy ].
+  rewrite app_nth2; [ | easy ].
+  destruct (Nat.eq_dec (i - j) (length lb)) as [Hjla2| Hjla2]. {
+    now rewrite Hjla2, Nat.sub_diag.
+  }
+  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
+} {
+  f_equal; f_equal.
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  f_equal; clear.
+  destruct (lt_dec (i - j) (length lb)) as [Hjla| Hjla]. {
+    now rewrite app_nth1.
+  }
+  apply Nat.nlt_ge in Hjla.
+  rewrite (nth_overflow lb); [ | easy ].
+  rewrite app_nth2; [ | easy ].
+  destruct (Nat.eq_dec (i - j) (length lb)) as [Hjla2| Hjla2]. {
+    now rewrite Hjla2, Nat.sub_diag.
+  }
+  rewrite nth_overflow; [ easy | cbn; flia Hjla Hjla2 ].
+}
+Qed.
 
 Theorem lap_norm_convol_mul_norm_r : ∀ la lb i len,
   lap_norm (lap_convol_mul la (lap_norm lb) i len) =
@@ -6782,12 +6829,8 @@ Theorem lap_norm_convol_mul_norm_r : ∀ la lb i len,
 Proof.
 intros.
 rewrite (lap_norm_repeat_0 lb) at 2.
-... ...
-rewrite lap_convol_mul_app_rep_0_r.
-...
-Check lap_convol_mul_app_rep_0_l.
-Check lap_convol_mul_app_rep_0_r.
-...
+now rewrite lap_convol_mul_app_rep_0_r.
+Qed.
 
 Theorem lap_norm_cons_norm : ∀ a la lb i len,
   length (a :: la) + length lb - 1 ≤ i + len
@@ -6909,8 +6952,6 @@ split; intros Hla. {
 }
 Qed.
 
-(* vais-je arriver à le démontrer sans utiliser la commutativité de
-   la multiplication ? *)
 Theorem lap_mul_norm_idemp_r : ∀ la lb,
   lap_norm (la * lap_norm lb)%lap = lap_norm (la * lb)%lap.
 Proof.
@@ -6937,34 +6978,6 @@ destruct lc as [| c]. {
   now replace (length lb - (length lb - i)) with i in H1 by flia Hib.
 }
 cbn.
-(*
-destruct lb as [| b]; [ easy | ].
-remember (rev lc ++ [c]) as ld eqn:Hld; symmetry in Hld.
-destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
-f_equal.
-do 2 rewrite Nat.sub_0_r.
-rewrite <- Hld at 1.
-cbn.
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
-rewrite fold_lap_norm.
-...
-remember (b :: lb) as l.
-clear b lb Heql.
-rename l into lb.
-move lb before la; move lc before lb.
-...
-cbn.
-do 2 rewrite <- Nat.add_succ_comm.
-cbn.
-do 2 rewrite rngl_summation_only_one.
-...
-rewrite rev_app_distr; cbn.
-*)
-(*
-replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
-rewrite <- Hlc.
-*)
 rewrite fold_lap_norm.
 destruct lb as [| b]; [ easy | ].
 remember (b :: lb) as d eqn:Hd.
@@ -6996,31 +7009,9 @@ rewrite Nat.sub_add. 2: {
   etransitivity; [ | apply lap_norm_length_le ].
   now rewrite Hlc.
 }
-... ...
 rewrite <- Hlc.
 apply lap_norm_convol_mul_norm_r.
-...
-rewrite <- Nat.add_assoc.
-rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
-rewrite (Nat.add_comm _ (length la)).
-rewrite Nat.add_sub.
-...
-rewrite <- Hlc.
-...
-remember (a :: la) as ld.
-...
-...
-  rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
-...
-
-Check lap_norm_cons_norm.
-...
-  rewrite (Nat.add_comm _ (length lb)).
-rewrite Nat.add_sub.
-rewrite Nat.add_comm.
-apply lap_norm_cons_norm.
-now cbn; rewrite Nat.sub_0_r.
-...
+Qed.
 
 (* supposes that mul is comm *)
 (*
@@ -7075,8 +7066,8 @@ clear p3 Heqlc.
 unfold polyn_norm at 1 3.
 apply eq_polyn_eq; cbn.
 rewrite lap_mul_norm_idemp_l.
-...
 rewrite lap_mul_norm_idemp_r.
+...
 now rewrite lap_mul_assoc.
 Qed.
 
