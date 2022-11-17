@@ -6769,6 +6769,26 @@ destruct lc as [| c]. {
 }
 Qed.
 
+Theorem lap_convol_mul_app_rep_0_r : ∀ la lb i len n,
+  lap_norm (lap_convol_mul la (lb ++ repeat 0%F n) i len) =
+  lap_norm (lap_convol_mul la lb i len).
+Proof.
+intros.
+...
+
+Theorem lap_norm_convol_mul_norm_r : ∀ la lb i len,
+  lap_norm (lap_convol_mul la (lap_norm lb) i len) =
+  lap_norm (lap_convol_mul la lb i len).
+Proof.
+intros.
+rewrite (lap_norm_repeat_0 lb) at 2.
+... ...
+rewrite lap_convol_mul_app_rep_0_r.
+...
+Check lap_convol_mul_app_rep_0_l.
+Check lap_convol_mul_app_rep_0_r.
+...
+
 Theorem lap_norm_cons_norm : ∀ a la lb i len,
   length (a :: la) + length lb - 1 ≤ i + len
   → lap_norm (lap_convol_mul (a :: lap_norm la) lb i len) =
@@ -6967,6 +6987,28 @@ destruct lc as [| c]. {
 }
 cbn.
 rewrite fold_lap_norm.
+rewrite (lap_convol_mul_more (length lb - S (length lc))). 2: {
+  now cbn; rewrite Nat.sub_0_r.
+}
+rewrite <- Nat.add_assoc.
+rewrite (Nat.add_comm (S (length lc))).
+rewrite Nat.sub_add. 2: {
+  etransitivity; [ | apply lap_norm_length_le ].
+  now rewrite Hlc.
+}
+... ...
+rewrite <- Hlc.
+apply lap_norm_convol_mul_norm_r.
+...
+rewrite <- Nat.add_assoc.
+rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
+rewrite (Nat.add_comm _ (length la)).
+rewrite Nat.add_sub.
+...
+rewrite <- Hlc.
+...
+remember (a :: la) as ld.
+...
 ...
   rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
 ...
