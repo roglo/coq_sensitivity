@@ -6856,6 +6856,39 @@ apply lap_norm_cons_norm.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem all_0_all_rev_0 : ∀ la : list T,
+  (∀ i, nth i la 0%F = 0%F)
+  ↔ (∀ i, nth i (rev la) 0%F = 0%F).
+Proof.
+intros *.
+split; intros H i. {
+  destruct (lt_dec i (length la)) as [Hila| Hila]. {
+    rewrite rev_nth; [ apply H | easy ].
+  }
+  apply nth_overflow; rewrite rev_length; flia Hila.
+} {
+  destruct (lt_dec i (length la)) as [Hila| Hila]. {
+    rewrite <- (rev_involutive la).
+    rewrite rev_nth; [ apply H | now rewrite rev_length ].
+  }
+  apply nth_overflow; flia Hila.
+}
+Qed.
+
+Theorem eq_strip_0s_rev_nil : ∀ la,
+  strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%F = 0%F.
+Proof.
+intros.
+split; intros Hla. {
+  apply all_0_all_rev_0.
+  now apply eq_strip_0s_nil.
+} {
+  apply eq_strip_0s_nil.
+  apply all_0_all_rev_0.
+  now rewrite rev_involutive.
+}
+Qed.
+
 (* vais-je arriver à le démontrer sans utiliser la commutativité de
    la multiplication ? *)
 Theorem lap_mul_norm_idemp_r : ∀ la lb,
@@ -6884,15 +6917,34 @@ destruct lc as [| c]. {
   now replace (length lb - (length lb - i)) with i in H1 by flia Hib.
 }
 cbn.
+(*
 destruct lb as [| b]; [ easy | ].
 remember (rev lc ++ [c]) as ld eqn:Hld; symmetry in Hld.
-destruct ld as [| d]. {
-  now apply app_eq_nil in Hld.
-}
+destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
+f_equal.
 do 2 rewrite Nat.sub_0_r.
+rewrite <- Hld at 1.
 cbn.
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+rewrite fold_lap_norm.
+...
+remember (b :: lb) as l.
+clear b lb Heql.
+rename l into lb.
+move lb before la; move lc before lb.
+...
+cbn.
+do 2 rewrite <- Nat.add_succ_comm.
+cbn.
+do 2 rewrite rngl_summation_only_one.
 ...
 rewrite rev_app_distr; cbn.
+*)
+(*
+replace (rev lc ++ [c]) with (rev (c :: lc)) by easy.
+rewrite <- Hlc.
+*)
 rewrite fold_lap_norm.
 destruct lb as [| b]; [ easy | ].
 remember (b :: lb) as d eqn:Hd.
@@ -6902,13 +6954,26 @@ rewrite fold_lap_norm.
 do 2 rewrite Nat.sub_0_r.
 clear c lc b lb Hlc Hd.
 rename d into lb.
-rewrite (lap_convol_mul_more (length la - length (lap_norm la))). 2: {
-  now cbn; rewrite Nat.sub_0_r.
+remember (lap_norm lb) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]. {
+  rewrite fold_lap_norm.
+  unfold lap_norm in Hlc.
+  apply (f_equal (λ l, rev l)) in Hlc.
+  rewrite rev_involutive in Hlc; cbn in Hlc.
+  specialize (proj1 (eq_strip_0s_rev_nil lb) Hlc) as H1.
+  clear Hlc; rename H1 into Hlb.
+  now rewrite lap_convol_mul_0_r.
 }
-rewrite (Nat.add_comm _ (length lb)).
-rewrite <- Nat.add_assoc.
-rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
-rewrite (Nat.add_comm _ (length la)).
+cbn.
+rewrite fold_lap_norm.
+...
+  rewrite Nat.add_sub_assoc; [ | apply lap_norm_length_le ].
+...
+
+Check lap_norm_cons_norm.
+...
+  rewrite (Nat.add_comm _ (length lb)).
 rewrite Nat.add_sub.
 rewrite Nat.add_comm.
 apply lap_norm_cons_norm.
@@ -7574,39 +7639,6 @@ do 4 (rewrite Nat.add_succ_r; cbn); f_equal.
 do 2 rewrite rng_add_0_r.
 do 4 rewrite lap_convol_mul_length.
 apply Nat.add_assoc.
-Qed.
-
-Theorem all_0_all_rev_0 : ∀ la,
-  (∀ i, nth i la 0%Rng = 0%Rng)
-  ↔ (∀ i, nth i (rev la) 0%Rng = 0%Rng).
-Proof.
-intros *.
-split; intros H i. {
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite rev_nth; [ apply H | easy ].
-  }
-  apply nth_overflow; rewrite rev_length; flia Hila.
-} {
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite <- (rev_involutive la).
-    rewrite rev_nth; [ apply H | now rewrite rev_length ].
-  }
-  apply nth_overflow; flia Hila.
-}
-Qed.
-
-Theorem eq_strip_0s_rev_nil : ∀ la,
-  strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%Rng = 0%Rng.
-Proof.
-intros.
-split; intros Hla. {
-  apply all_0_all_rev_0.
-  now apply eq_strip_0s_nil.
-} {
-  apply eq_strip_0s_nil.
-  apply all_0_all_rev_0.
-  now rewrite rev_involutive.
-}
 Qed.
 
 Theorem nth_lap_add : ∀ i la lb,
