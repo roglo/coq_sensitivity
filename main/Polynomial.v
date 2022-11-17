@@ -7192,20 +7192,21 @@ induction la as [| a]; intros. {
       intros i.
       now specialize (Hlb (S i)).
     }
-...
+    apply (rngl_eqb_neq Heb) in Haz.
     destruct lb as [| b]; [ now specialize (Hi 0); cbn in Hi | cbn ].
     rewrite strip_0s_app; cbn.
     remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
     destruct ld as [| d]. {
-      destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
-        subst b.
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Hbz| Hbz]. {
+        apply (rngl_eqb_eq Heb) in Hbz; subst b.
         now specialize (Hi 0).
       }
       f_equal.
       now specialize (Hi 0).
     }
     specialize (IHla lb).
-    assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+    assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
       intros i.
       now specialize (Hi (S i)); cbn in Hi.
     }
@@ -7214,8 +7215,8 @@ induction la as [| a]; intros. {
   }
   destruct lb as [| b]. {
     specialize (IHla []).
-    assert (H : ∀ i : nat, nth i la 0%Rng = nth i [] 0%Rng). {
-      intros i; cbn; rewrite match_id.
+    assert (H : ∀ i : nat, nth i la 0%F = nth i [] 0%F). {
+      intros i; cbn; rewrite Tauto_match_nat_same.
       now specialize (Hi (S i)).
     }
     now specialize (IHla H).
@@ -7224,10 +7225,11 @@ induction la as [| a]; intros. {
   rewrite strip_0s_app; cbn.
   remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
   destruct ld as [| d]. {
-    destruct (rng_eq_dec b 0%Rng) as [Hbz| Hbz]. {
-      subst b.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [Hbz| Hbz]. {
+      apply (rngl_eqb_eq Heb) in Hbz; subst b.
       specialize (IHla lb).
-      assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+      assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
         intros i.
         now specialize (Hi (S i)); cbn in Hi.
       }
@@ -7235,7 +7237,7 @@ induction la as [| a]; intros. {
       now rewrite Hld in IHla.
     }
     specialize (IHla lb).
-    assert (H : ∀ i : nat, nth i la 0%Rng = nth i lb 0%Rng). {
+    assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
       intros i.
       now specialize (Hi (S i)); cbn in Hi.
     }
@@ -7249,8 +7251,6 @@ induction la as [| a]; intros. {
   now intros i; specialize (Hi (S i)).
 }
 Qed.
-
-...
 
 Theorem lap_norm_mul_assoc : ∀ la lb lc,
   lap_norm (la * (lb * lc))%lap = lap_norm (la * lb * lc)%lap.
@@ -7268,7 +7268,6 @@ move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
 remember (b :: lb) as lb' eqn:Hlb'.
 remember (c :: lc) as lc' eqn:Hlc'.
-...
 apply list_nth_lap_eq; intros k.
 remember (lap_convol_mul la' lb' 0 (length la' + length lb' - 1)) as ld
   eqn:Hld.
@@ -7277,8 +7276,9 @@ remember (lap_convol_mul lb' lc' 0 (length lb' + length lc' - 1)) as le
 symmetry in Hld, Hle.
 destruct ld as [| d]. {
   destruct le as [| e]; [ easy | cbn ].
-  rewrite match_id.
+  rewrite Tauto_match_nat_same.
   move e before c.
+...
   apply eq_lap_convol_mul_nil in Hld.
   apply Nat.sub_0_le in Hld.
   remember (length la' + length lb') as len eqn:Hlen.
