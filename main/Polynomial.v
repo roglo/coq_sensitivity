@@ -7175,22 +7175,24 @@ induction la as [| a]; intros. {
     }
     cbn.
     rewrite if_bool_if_dec.
-...
-    destruct (rng_eq_dec a 0%Rng) as [Haz| Haz]. {
-      assert (Hlb : ∀ i, nth i lb 0%Rng = 0%Rng). {
+    destruct (bool_dec _) as [Haz| Haz]. {
+      apply (rngl_eqb_eq Heb) in Haz.
+      assert (Hlb : ∀ i, nth i lb 0%F = 0%F). {
         intros.
         rewrite <- Hi; cbn.
         destruct i; [ easy | ].
         apply Hla.
       }
-      clear - Hlb.
+      clear - Heb Hlb.
       induction lb as [| b]; [ easy | cbn ].
       specialize (Hlb 0) as H1; cbn in H1; subst b.
       rewrite strip_0s_app; cbn.
-      rewrite <- IHlb; [ now destruct (rng_eq_dec 0%Rng 0%Rng) | ].
+      rewrite (rngl_eqb_refl Heb).
+      rewrite <- IHlb; [ easy | ].
       intros i.
       now specialize (Hlb (S i)).
     }
+...
     destruct lb as [| b]; [ now specialize (Hi 0); cbn in Hi | cbn ].
     rewrite strip_0s_app; cbn.
     remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
