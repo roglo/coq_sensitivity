@@ -7323,6 +7323,20 @@ rewrite Nat.add_comm, Nat.add_sub.
 now apply list_nth_lap_convol_mul.
 Qed.
 
+Theorem summation_mul_list_nth_lap_convol_mul_3 : ∀ la lb lc k,
+  ∑ (i = 0, k),
+    nth i (lap_convol_mul la lb 0 (length la + length lb - 1)) 0 *
+    nth (k - i) lc 0 =
+  ∑ (i = 0, k),
+    (∑ (j = 0, i), nth j la 0 * nth (i - j) lb 0) *
+    nth (k - i) lc 0.
+Proof.
+intros la lb lc k.
+apply rngl_summation_eq_compat; intros i (_, Hi).
+f_equal.
+now rewrite list_nth_lap_convol_mul.
+Qed.
+
 Theorem summation_mul_list_nth_lap_convol_mul : ∀ la lb lc k,
   (∑ (i = 0, k),
      List.nth i la 0 *
@@ -7344,11 +7358,22 @@ Theorem lap_norm_mul_assoc : ∀ la lb lc,
   lap_norm (la * (lb * lc))%lap = lap_norm (la * lb * lc)%lap.
 Proof.
 intros la lb lc.
+assert (Hos : @rngl_has_opp_or_sous T ro = true). {
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+(*
+symmetry.
+replace ((la * lb) * lc)%lap with (lc * (la * lb))%lap.
+*)
 unfold lap_mul.
 destruct lc as [| c]. {
   destruct la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | cbn ].
+(**)
   now rewrite <- Nat.add_succ_comm.
+(*
+  easy.
+*)
 }
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]; [ easy | ].
@@ -7398,9 +7423,30 @@ destruct le as [| e]. {
 rewrite list_nth_lap_convol_mul; [ | easy ].
 rewrite list_nth_lap_convol_mul; [ | easy ].
 rewrite <- Hld, <- Hle.
-...
 rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
-Check summation_mul_list_nth_lap_convol_mul.
+rewrite summation_mul_list_nth_lap_convol_mul_3; symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_l.
+}
+cbn.
+rewrite rngl_summation_summation_exch.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  now rewrite rngl_mul_summation_distr_r.
+}
+cbn.
+rewrite rngl_summation_summation_exch.
+symmetry.
+Search (∑ (_ = _, _), ∑ (_ = _, _), _).
+(* faut voir avec un bout de papier *)
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_summation_rtl.
+...
+rewrite summation_mul_list_nth_lap_convol_mul.
 ...
 rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
 rewrite <- summation_summation_mul_swap.
