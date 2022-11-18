@@ -7361,6 +7361,7 @@ intros la lb lc.
 assert (Hos : @rngl_has_opp_or_sous T ro = true). {
   now apply rngl_has_opp_or_sous_iff; left.
 }
+move Hos before Hiv.
 (*
 symmetry.
 replace ((la * lb) * lc)%lap with (lc * (la * lb))%lap.
@@ -7437,10 +7438,13 @@ erewrite rngl_summation_eq_compat. 2: {
   now rewrite rngl_mul_summation_distr_r.
 }
 cbn.
+(**)
 rewrite rngl_summation_summation_exch.
 symmetry.
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 (* faut voir avec un bout de papier *)
+...
+rewrite <- rngl_summation_summation_shift.
 ...
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
