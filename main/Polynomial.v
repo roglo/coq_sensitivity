@@ -7303,6 +7303,43 @@ rewrite list_nth_lap_convol_mul_aux; [ | easy ].
 now rewrite Nat.add_0_r.
 Qed.
 
+Theorem summation_mul_list_nth_lap_convol_mul_2 : ∀ la lb lc k,
+   (∑ (i = 0, k),
+      List.nth i lc 0 *
+      List.nth (k - i)
+        (lap_convol_mul la lb 0 (length la + length lb - 1))  0 =
+    ∑ (i = 0, k),
+      List.nth (k - i) lc 0 *
+      ∑ (j = 0, i),
+        List.nth j la 0 * List.nth (i - j) lb 0)%F.
+Proof.
+intros la lb lc k.
+rewrite rngl_summation_rtl.
+apply rngl_summation_eq_compat; intros i (_, Hi).
+rewrite Nat.add_0_r.
+f_equal.
+rewrite Nat_sub_sub_distr; [ | easy ].
+rewrite Nat.add_comm, Nat.add_sub.
+now apply list_nth_lap_convol_mul.
+Qed.
+
+Theorem summation_mul_list_nth_lap_convol_mul : ∀ la lb lc k,
+  (∑ (i = 0, k),
+     List.nth i la 0 *
+     List.nth (k - i)
+       (lap_convol_mul lb lc 0 (length lb + length lc - 1))
+       0 =
+   ∑ (i = 0, k),
+     List.nth i la 0 *
+     ∑ (j = 0, k - i),
+       List.nth j lb 0 * List.nth (k - i - j) lc 0)%F.
+Proof.
+intros la lb lc k.
+apply rngl_summation_eq_compat; intros i (_, Hi).
+f_equal.
+now rewrite list_nth_lap_convol_mul.
+Qed.
+
 Theorem lap_norm_mul_assoc : ∀ la lb lc,
   lap_norm (la * (lb * lc))%lap = lap_norm (la * lb * lc)%lap.
 Proof.
@@ -7363,6 +7400,8 @@ rewrite list_nth_lap_convol_mul; [ | easy ].
 rewrite <- Hld, <- Hle.
 ...
 rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
+Check summation_mul_list_nth_lap_convol_mul.
+...
 rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
 rewrite <- summation_summation_mul_swap.
 rewrite <- summation_summation_mul_swap.
@@ -7715,43 +7754,6 @@ Proof.
 intros.
 apply eq_poly_eq; cbn.
 now rewrite lap_mul_comm.
-Qed.
-
-Theorem summation_mul_list_nth_lap_convol_mul : ∀ la lb lc k,
-  (Σ (i = 0, k),
-     List.nth i la 0 *
-     List.nth (k - i)
-       (lap_convol_mul lb lc 0 (length lb + length lc - 1))
-       0 =
-   Σ (i = 0, k),
-     List.nth i la 0 *
-     Σ (j = 0, k - i),
-       List.nth j lb 0 * List.nth (k - i - j) lc 0)%Rng.
-Proof.
-intros la lb lc k.
-apply summation_compat; intros i (_, Hi).
-f_equal.
-rewrite list_nth_lap_convol_mul; reflexivity.
-Qed.
-
-Theorem summation_mul_list_nth_lap_convol_mul_2 : ∀ la lb lc k,
-   (Σ (i = 0, k),
-      List.nth i lc 0 *
-      List.nth (k - i)
-        (lap_convol_mul la lb 0 (length la + length lb - 1))  0 =
-    Σ (i = 0, k),
-      List.nth (k - i) lc 0 *
-      Σ (j = 0, i),
-        List.nth j la 0 * List.nth (i - j) lb 0)%Rng.
-Proof.
-intros la lb lc k.
-rewrite summation_rtl.
-apply summation_compat; intros i (_, Hi).
-rewrite Nat.add_0_r.
-f_equal.
-rewrite Nat_sub_sub_distr; [ idtac | easy ].
-rewrite Nat.sub_diag.
-apply list_nth_lap_convol_mul; reflexivity.
 Qed.
 
 Theorem lap_convol_mul_length : ∀ la lb i len,

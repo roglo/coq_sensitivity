@@ -242,6 +242,22 @@ rewrite Nat.add_comm.
 now rewrite Nat.sub_add_distr.
 Qed.
 
+Theorem Nat_sub_sub_distr : ∀ n m p, p ≤ m → n - (m - p) = n + p - m.
+Proof.
+intros n m p Hpm.
+rewrite Nat.add_comm.
+revert n m Hpm.
+induction p; intros. {
+  now rewrite Nat.sub_0_r, Nat.add_0_l.
+}
+destruct m as [| m]. {
+  exfalso; revert Hpm; apply Nat.nle_succ_0.
+}
+rewrite Nat.sub_succ; cbn.
+apply Nat.succ_le_mono in Hpm.
+now apply IHp.
+Qed.
+
 Theorem Nat_sub_succ_1 : ∀ n, S n - 1 = n.
 Proof. now intros; rewrite Nat.sub_succ, Nat.sub_0_r. Qed.
 
