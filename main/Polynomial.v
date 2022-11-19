@@ -7446,10 +7446,9 @@ cbn.
 (**)
 rewrite rngl_summation_summation_exch.
 symmetry.
+(*
 ...
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
-(* faut voir avec un bout de papier *)
-(**)
 induction k. {
   do 4 rewrite rngl_summation_only_one.
   now rewrite Nat.sub_0_r.
@@ -7465,6 +7464,7 @@ rewrite Nat.sub_diag.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
+*)
 destruct k. {
   do 4 rewrite rngl_summation_only_one.
   now rewrite Nat.sub_0_r.
@@ -7502,6 +7502,12 @@ destruct k. {
   remember (nth 1 _ _ * nth 2 _ _ * nth 0 _ _)%F as H.
   remember (nth 0 _ _ * nth 2 _ _ * nth 1 _ _)%F as I.
   remember (nth 0 _ _ * nth 3 _ _ * nth 0 _ _)%F as J.
+  move B before A; move C before B; move D before C; move E before D.
+  move F before E; move G before F; move H before G; move I before H.
+  move J before H; move d before c; move e before d.
+  move lb' before la'; move ld before lc; move lc' before lb'.
+  move le before ld.
+...
   symmetry; rewrite rngl_add_comm.
   repeat rewrite <- rngl_add_assoc; f_equal.
   symmetry.
