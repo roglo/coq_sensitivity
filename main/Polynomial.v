@@ -1557,45 +1557,6 @@ rewrite <- Hlc.
 apply lap_norm_convol_mul_norm_r.
 Qed.
 
-(* supposes that mul is comm *)
-(*
-Theorem lap_convol_mul_comm : ∀ l1 l2 i len,
-  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
-Proof.
-intros l1 l2 i len.
-revert i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
-rewrite rngl_summation_rtl.
-apply rngl_summation_eq_compat; intros j (_, Hj).
-rewrite Nat.add_0_r.
-rewrite rngl_mul_comm.
-...
-apply rng_mul_compat; [ idtac | reflexivity ].
-rewrite Nat_sub_sub_distr; [ idtac | easy ].
-rewrite Nat.sub_diag, Nat.add_0_l; reflexivity.
-Qed.
-
-Theorem lap_mul_comm : ∀ a b, lap_mul a b = lap_mul b a.
-Proof.
-intros la lb.
-unfold lap_mul.
-destruct la as [| a]; [ now destruct lb | cbn ].
-rewrite <- Nat.add_succ_comm; cbn.
-rewrite (Nat.add_comm (length lb)).
-...
-now rewrite lap_convol_mul_comm.
-Qed.
-
-Theorem lap_mul_norm_idemp_r : ∀ la lb,
-  lap_norm (la * lap_norm lb)%lap = lap_norm (la * lb)%lap.
-Proof.
-intros.
-setoid_rewrite lap_mul_comm.
-apply lap_mul_norm_idemp_l.
-Qed.
-*)
-
 Theorem eq_lap_norm_eq_length : ∀ la lb,
   lap_norm la = lap_norm lb
   → length la = length lb
@@ -2255,6 +2216,46 @@ rewrite H10.
 now intros H; apply eq_polyn_eq in H.
 Qed.
 
+(* optional multiplication commutativity *)
+
+Theorem lap_convol_mul_comm : rngl_mul_is_comm = true →
+  ∀ l1 l2 i len,
+  lap_convol_mul l1 l2 i len = lap_convol_mul l2 l1 i len.
+Proof.
+intros Hic l1 l2 i len.
+revert i.
+induction len; intros; [ easy | cbn ].
+rewrite IHlen; f_equal.
+rewrite rngl_summation_rtl.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+rewrite Nat.add_0_r.
+rewrite (rngl_mul_comm Hic).
+rewrite Nat_sub_sub_distr; [ | easy ].
+now rewrite Nat.add_comm, Nat.add_sub.
+Qed.
+
+Theorem lap_mul_comm : rngl_mul_is_comm = true →
+  ∀ a b, lap_mul a b = lap_mul b a.
+Proof.
+intros Hic la lb.
+unfold lap_mul.
+destruct la as [| a]; [ now destruct lb | cbn ].
+rewrite <- Nat.add_succ_comm; cbn.
+rewrite (Nat.add_comm (length lb)).
+now rewrite lap_convol_mul_comm.
+Qed.
+
+Theorem polyn_opt_mul_comm :
+  if rngl_mul_is_comm then ∀ a b : polyn T, (a * b)%pol = (b * a)%pol
+  else not_applicable.
+Proof.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
+apply eq_polyn_eq; cbn.
+now rewrite (lap_mul_comm Hic).
+Qed.
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2270,8 +2271,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_mul_1_l := polyn_mul_1_l;
      rngl_mul_add_distr_l := polyn_mul_add_distr_l;
      rngl_opt_1_neq_0 := polyn_1_neq_0;
-     rngl_opt_mul_comm := 42;
-     rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
+     rngl_opt_mul_comm := polyn_opt_mul_comm;
+     rngl_opt_mul_1_r := 42;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
@@ -2480,13 +2481,6 @@ now rewrite (lap_add_comm lb).
 Qed.
 
 (* multiplication theorems *)
-
-Theorem poly_mul_comm : ∀ pa pb, (pa * pb)%pol = (pb * pa)%pol.
-Proof.
-intros.
-apply eq_poly_eq; cbn.
-now rewrite lap_mul_comm.
-Qed.
 
 Theorem nth_lap_add : ∀ i la lb,
   nth i (la + lb)%lap 0%Rng = (nth i la 0 + nth i lb 0)%Rng.
