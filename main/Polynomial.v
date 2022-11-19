@@ -976,6 +976,9 @@ Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
+Arguments lap_add (la lb)%lap.
+Arguments lap_mul (la lb)%lap.
+
 Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
@@ -2232,6 +2235,8 @@ f_equal.
 now rewrite lap_mul_add_distr_l.
 Qed.
 
+(* 1 is not 0 *)
+
 Theorem polyn_1_neq_0 : if rngl_has_1_neq_0 then 1%F ≠ 0%F else not_applicable.
 Proof.
 rewrite H10.
@@ -2310,10 +2315,96 @@ Qed.
 (* optional right distributivity; not requied if multiplication
    is commutative *)
 
+Theorem lap_norm_mul_add_distr_r : ∀ la lb lc : list T,
+  lap_norm ((la + lb) * lc) = lap_norm (la * lc + lb * lc).
+Proof.
+intros la lb lc.
+unfold lap_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]. {
+  cbn.
+  destruct lc as [| c]; [ easy | ].
+  cbn; rewrite Nat.sub_0_r.
+  now rewrite lap_add_0_r.
+}
+...
+destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length la' + length (lap_add lb' lc') - 1) as labc.
+remember (length la' + length lb' - 1) as lab.
+remember (length la' + length lc' - 1) as lac.
+rewrite Heqlabc.
+remember (lb' + lc')%lap as lbc.
+symmetry in Heqlbc.
+destruct lbc as [| bc]. {
+  cbn.
+  now subst lb' lc'.
+}
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite lap_convol_mul_more with (n := (lab + lac)%nat). 2: {
+  subst; flia.
+}
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- lap_add_norm_idemp_l.
+rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
+rewrite <- Heqlab.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_comm.
+rewrite <- lap_add_norm_idemp_l.
+rewrite Heqlac.
+rewrite lap_convol_mul_more with (n := (labc + lab)%nat); [ | flia ].
+rewrite lap_add_norm_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite lap_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite lap_convol_mul_lap_add.
+now rewrite lap_add_lap_convol_mul.
+Qed.
+
+...
+
+Theorem lap_mul_add_distr_r : ∀ la lb lc,
+  ((la + lb) * lc)%lap = (la * lc + lb * lc)%lap.
+Proof.
+intros la lb lc.
+apply eq_lap_norm_eq_length. 2: {
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]. {
+    destruct lc as [| c]; [ easy | ].
+    now cbn; rewrite lap_add_0_r.
+  }
+  cbn.
+  destruct lc as [| c]; [ easy | ].
+  cbn; do 3 rewrite Nat.sub_0_r.
+  do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
+  rewrite lap_convol_mul_length.
+  do 2 rewrite lap_add_length; cbn.
+  do 2 rewrite lap_convol_mul_length.
+  now rewrite Nat.add_max_distr_r.
+}
+...
+apply lap_norm_mul_add_distr_l.
+Qed.
+
 Theorem polyn_mul_add_distr_r :
   ∀ a b c : polyn T, ((a + b) * c)%F = (a * c + b * c)%F.
 Proof.
 intros.
+apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm.
+rewrite lap_mul_norm_idemp_l.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_norm_idemp_r.
+f_equal.
+...
+now rewrite lap_mul_add_distr_r.
 ...
 
 Theorem polyn_opt_mul_add_distr_r :
