@@ -7362,19 +7362,11 @@ assert (Hos : @rngl_has_opp_or_sous T ro = true). {
   now apply rngl_has_opp_or_sous_iff; left.
 }
 move Hos before Hiv.
-(*
-symmetry.
-replace ((la * lb) * lc)%lap with (lc * (la * lb))%lap.
-*)
 unfold lap_mul.
 destruct lc as [| c]. {
   destruct la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | cbn ].
-(**)
   now rewrite <- Nat.add_succ_comm.
-(*
-  easy.
-*)
 }
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]; [ easy | ].
@@ -7429,22 +7421,6 @@ rewrite summation_mul_list_nth_lap_convol_mul_3; symmetry.
 move d before c; move e before d.
 move lb' before la'; move ld before lc; move lc' before lb'.
 move le before ld.
-(*
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | easy ].
-  erewrite rngl_summation_eq_compat. 2: {
-    intros j Hj.
-    now rewrite rngl_mul_assoc.
-  }
-  remember (∑ (j = 0, i), _) as x; subst x.
-  easy.
-}
-cbn.
-*)
-(*
-rewrite rngl_summation_summation_exch.
-*)
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
@@ -7479,192 +7455,49 @@ cbn.
 apply rngl_summation_eq_compat.
 intros i Hi.
 f_equal.
-...
-(**)
-Search (∑ (_ = _, _), ∑ (_ = _, _), _).
-induction k. {
-  do 4 rewrite rngl_summation_only_one.
-  now rewrite Nat.sub_0_r.
-}
-...
-Arguments rngl_summation_ub_add_distr {T ro rp} (a b)%nat.
-rewrite <- Nat.add_1_r.
-rewrite rngl_summation_ub_add_distr.
-rewrite Nat.add_1_r.
-do 2 rewrite rngl_summation_only_one.
+symmetry.
+rewrite (rngl_summation_shift i); [ | easy ].
 rewrite Nat.sub_diag.
-...
+remember (∑ (j = _, _), _) as x; subst x.
 erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-...
-(**)
-destruct k. {
-  do 4 rewrite rngl_summation_only_one.
-  now rewrite Nat.sub_0_r.
-}
-destruct k. {
-  unfold iter_seq, iter_list; cbn.
-  repeat rewrite rngl_add_0_l.
-  now symmetry; rewrite rngl_add_comm, <- rngl_add_assoc.
-}
-destruct k. {
-  unfold iter_seq, iter_list; cbn.
-  repeat rewrite rngl_add_0_l.
-  remember (nth 2 _ _ * nth 0 _ _ * nth 0 _ _)%F as A.
-  remember (nth 1 _ _ * nth 0 _ _ * nth 1 _ _)%F as B.
-  remember (nth 0 _ _ * nth 0 _ _ * nth 2 _ _)%F as C.
-  remember (nth 1 _ _ * nth 1 _ _ * nth 0 _ _)%F as D.
-  remember (nth 0 _ _ * nth 1 _ _ * nth 1 _ _)%F as E.
-  remember (nth 0 _ _ * nth 2 _ _ * nth 0 _ _)%F as F.
-  symmetry; rewrite rngl_add_comm.
-  repeat rewrite <- rngl_add_assoc; f_equal.
-  symmetry; rewrite rngl_add_comm, <- rngl_add_assoc; f_equal.
-  rewrite <- rngl_add_assoc, rngl_add_comm.
-  now repeat rewrite <- rngl_add_assoc.
-}
-destruct k. {
-  unfold iter_seq, iter_list; cbn.
-  repeat rewrite rngl_add_0_l.
-  remember (nth 3 _ _ * nth 0 _ _ * nth 0 _ _)%F as A.
-  remember (nth 2 _ _ * nth 0 _ _ * nth 1 _ _)%F as B.
-  remember (nth 1 _ _ * nth 0 _ _ * nth 2 _ _)%F as C.
-  remember (nth 0 _ _ * nth 0 _ _ * nth 3 _ _)%F as D.
-  remember (nth 2 _ _ * nth 1 _ _ * nth 0 _ _)%F as E.
-  remember (nth 1 _ _ * nth 1 _ _ * nth 1 _ _)%F as F.
-  remember (nth 0 _ _ * nth 1 _ _ * nth 2 _ _)%F as G.
-  remember (nth 1 _ _ * nth 2 _ _ * nth 0 _ _)%F as H.
-  remember (nth 0 _ _ * nth 2 _ _ * nth 1 _ _)%F as I.
-  remember (nth 0 _ _ * nth 3 _ _ * nth 0 _ _)%F as J.
-  move B before A; move C before B; move D before C; move E before D.
-  move F before E; move G before F; move H before G; move I before H.
-  move J before H.
-...
-  symmetry; rewrite rngl_add_comm.
-  repeat rewrite <- rngl_add_assoc; f_equal.
-  symmetry.
-  do 2 rewrite rngl_add_comm, <- rngl_add_assoc.
-  repeat rewrite <- rngl_add_assoc.
-  f_equal.
-  do 2 rewrite rngl_add_comm, <- rngl_add_assoc.
-  repeat rewrite <- rngl_add_assoc.
-  f_equal.
-  rewrite rngl_add_comm, <- rngl_add_assoc.
-  repeat rewrite <- rngl_add_assoc.
-  f_equal; f_equal.
-  rewrite rngl_add_comm, <- rngl_add_assoc.
-  repeat rewrite <- rngl_add_assoc.
-  f_equal.
-  rewrite rngl_add_comm, <- rngl_add_assoc.
-  repeat rewrite <- rngl_add_assoc.
+  intros j Hj.
+  rewrite Nat.add_comm, Nat.add_sub.
+  rewrite Nat.sub_add_distr.
+  rewrite Nat_sub_sub_swap.
   easy.
 }
-...
-rewrite <- rngl_summation_summation_shift.
-...
-erewrite rngl_summation_eq_compat. 2: {
-  intros i Hi.
-  rewrite rngl_summation_rtl.
-...
-rewrite summation_mul_list_nth_lap_convol_mul.
-...
-rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
-rewrite <- summation_summation_mul_swap.
-rewrite <- summation_summation_mul_swap.
-rewrite summation_summation_exch.
-rewrite summation_summation_shift.
-apply summation_compat; intros i Hi.
-apply summation_compat; intros j Hj.
-rewrite rng_mul_comm, rng_mul_assoc.
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite Nat.add_comm, Nat.sub_add_distr.
-reflexivity.
-...
-intros la lb lc.
-symmetry; rewrite lap_mul_comm.
-unfold lap_mul.
-destruct lc as [| c]. {
-  destruct la as [| a]; [ easy | now destruct lb ].
-}
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | ].
-move b before a; move c before b.
-remember (a :: la) as la' eqn:Hla'.
-remember (b :: lb) as lb' eqn:Hlb'.
-remember (c :: lc) as lc' eqn:Hlc'.
-apply list_nth_lap_eq; intros k.
-remember (lap_convol_mul la' lb' 0 (length la' + length lb' - 1)) as ld
-  eqn:Hld.
-remember (lap_convol_mul lb' lc' 0 (length lb' + length lc' - 1)) as le
-  eqn:Hle.
-symmetry in Hld, Hle.
-destruct ld as [| d]. {
-  destruct le as [| e]; [ easy | cbn ].
-  rewrite match_id.
-  move e before c.
-  apply eq_lap_convol_mul_nil in Hld.
-  apply Nat.sub_0_le in Hld.
-  remember (length la' + length lb') as len eqn:Hlen.
-  symmetry in Hlen.
-  destruct len. {
-    apply Nat.eq_add_0 in Hlen.
-    now subst la'.
-  }
-  destruct len; [ clear Hld | flia Hld ].
-  apply Nat.eq_add_1 in Hlen.
-  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlb' in Hlen | ].
-  now rewrite Hla' in Hlen.
-}
-destruct le as [| e]. {
-  cbn; rewrite match_id.
-  move d before c.
-  apply eq_lap_convol_mul_nil in Hle.
-  apply Nat.sub_0_le in Hle.
-  remember (length lb' + length lc') as len eqn:Hlen.
-  symmetry in Hlen.
-  destruct len. {
-    apply Nat.eq_add_0 in Hlen.
-    now subst lb'.
-  }
-  destruct len; [ clear Hle | flia Hle ].
-  apply Nat.eq_add_1 in Hlen.
-  destruct Hlen as [Hlen| Hlen]; [ now rewrite Hlc' in Hlen | ].
-  now rewrite Hlb' in Hlen.
-}
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
-rewrite list_nth_lap_convol_mul; [ idtac | reflexivity ].
-rewrite <- Hld, <- Hle.
-rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
-rewrite summation_mul_list_nth_lap_convol_mul; symmetry.
-rewrite <- summation_summation_mul_swap.
-rewrite <- summation_summation_mul_swap.
-rewrite summation_summation_exch.
-rewrite summation_summation_shift.
-apply summation_compat; intros i Hi.
-apply summation_compat; intros j Hj.
-rewrite rng_mul_comm, rng_mul_assoc.
-rewrite Nat.add_comm, Nat.add_sub.
-rewrite Nat.add_comm, Nat.sub_add_distr.
-reflexivity.
+easy.
+Qed.
+
+Theorem lap_convol_mul_length : ∀ la lb i len,
+  length (lap_convol_mul la lb i len) = len.
+Proof.
+intros.
+revert la lb i.
+induction len; intros; [ easy | ].
+cbn.
+now rewrite IHlen.
 Qed.
 
 Theorem lap_mul_assoc : ∀ la lb lc,
   (la * (lb * lc))%lap = ((la * lb) * lc)%lap.
 Proof.
 intros.
-apply eq_lap_norm_eq_length. {
-...
-apply eq_lap_norm_eq_length; [ apply lap_norm_mul_assoc | ].
-unfold "*"%lap.
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | ].
-destruct lc as [| c]. {
-  now destruct (lap_convol_mul _ _ _ _).
+apply eq_lap_norm_eq_length. 2: {
+  unfold "*"%lap.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  destruct lc as [| c]. {
+    now destruct (lap_convol_mul _ _ _ _).
+  }
+  cbn.
+  do 4 (rewrite Nat.add_succ_r; cbn); f_equal.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  do 4 rewrite lap_convol_mul_length.
+  apply Nat.add_assoc.
 }
-cbn.
-do 4 (rewrite Nat.add_succ_r; cbn); f_equal.
-do 2 rewrite rng_add_0_r.
-do 4 rewrite lap_convol_mul_length.
-apply Nat.add_assoc.
+apply lap_norm_mul_assoc.
 Qed.
 
 Theorem polyn_mul_assoc : ∀ p1 p2 p3,
@@ -7682,11 +7515,8 @@ unfold polyn_norm at 1 3.
 apply eq_polyn_eq; cbn.
 rewrite lap_mul_norm_idemp_l.
 rewrite lap_mul_norm_idemp_r.
-...
 now rewrite lap_mul_assoc.
 Qed.
-
-...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -7700,7 +7530,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
-     rngl_mul_1_l := ?rngl_mul_1_l;
+     rngl_mul_1_l := 42;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
      rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
@@ -7919,16 +7749,6 @@ Proof.
 intros.
 apply eq_poly_eq; cbn.
 now rewrite lap_mul_comm.
-Qed.
-
-Theorem lap_convol_mul_length : ∀ la lb i len,
-  length (lap_convol_mul la lb i len) = len.
-Proof.
-intros.
-revert la lb i.
-induction len; intros; [ easy | ].
-cbn.
-now rewrite IHlen.
 Qed.
 
 Theorem nth_lap_add : ∀ i la lb,
