@@ -2115,6 +2115,140 @@ apply eq_polyn_eq; cbn.
 now apply last_lap_neq_0_lap_norm.
 Qed.
 
+(* left distributivity *)
+
+Fixpoint lap_convol_mul_add (al1 al2 al3 : list T) i len :=
+  match len with
+  | O => []
+  | S len1 =>
+      (∑ (j = 0, i),
+       List.nth j al1 0 *
+       (List.nth (i - j) al2 0 + List.nth (i - j) al3 0))%F ::
+       lap_convol_mul_add al1 al2 al3 (S i) len1
+  end.
+
+Theorem list_nth_add : ∀ k la lb,
+  (List.nth k (lap_add la lb) 0 =
+   List.nth k la 0 + List.nth k lb 0)%F.
+Proof.
+intros k la lb.
+revert la lb.
+induction k; intros. {
+ destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
+ destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
+ easy.
+} {
+ destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
+ destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
+ apply IHk.
+}
+Qed.
+
+Theorem lap_convol_mul_lap_add : ∀ la lb lc i len,
+  lap_convol_mul la (lb + lc)%lap i len = lap_convol_mul_add la lb lc i len.
+Proof.
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+f_equal.
+now rewrite list_nth_add.
+Qed.
+
+Theorem lap_add_lap_convol_mul : ∀ la lb lc i len,
+  (lap_convol_mul la lb i len + lap_convol_mul la lc i len)%lap =
+  lap_convol_mul_add la lb lc i len.
+Proof.
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+rewrite <- rngl_summation_add_distr.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+now rewrite rngl_mul_add_distr_l.
+Qed.
+
+Theorem lap_norm_mul_add_distr_l : ∀ la lb lc,
+  lap_norm (la * (lb + lc))%lap = lap_norm (la * lb + la * lc)%lap.
+Proof.
+intros la lb lc.
+unfold lap_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length la' + length (lap_add lb' lc') - 1) as labc.
+remember (length la' + length lb' - 1) as lab.
+remember (length la' + length lc' - 1) as lac.
+rewrite Heqlabc.
+remember (lb' + lc')%lap as lbc.
+symmetry in Heqlbc.
+destruct lbc as [| bc]. {
+  cbn.
+  now subst lb' lc'.
+}
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite lap_convol_mul_more with (n := (lab + lac)%nat). 2: {
+  subst; flia.
+}
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- lap_add_norm_idemp_l.
+rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
+rewrite <- Heqlab.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_comm.
+rewrite <- lap_add_norm_idemp_l.
+rewrite Heqlac.
+rewrite lap_convol_mul_more with (n := (labc + lab)%nat); [ | flia ].
+rewrite lap_add_norm_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite lap_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite lap_convol_mul_lap_add.
+now rewrite lap_add_lap_convol_mul.
+Qed.
+
+Theorem lap_mul_add_distr_l : ∀ la lb lc,
+  (la * (lb + lc))%lap = (la * lb + la * lc)%lap.
+Proof.
+intros la lb lc.
+apply eq_lap_norm_eq_length. 2: {
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  destruct lc as [| c]. {
+    now cbn; rewrite lap_add_0_r.
+  }
+  cbn.
+  do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
+  rewrite lap_convol_mul_length.
+  do 2 rewrite lap_add_length; cbn.
+  do 2 rewrite lap_convol_mul_length.
+  now rewrite Nat.add_max_distr_l.
+}
+apply lap_norm_mul_add_distr_l.
+Qed.
+
+Theorem polyn_mul_add_distr_l : ∀ pa pb pc,
+  (pa * (pb + pc))%pol = (pa * pb + pa * pc)%pol.
+Proof.
+intros.
+apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm.
+rewrite lap_mul_norm_idemp_r.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_norm_idemp_r.
+f_equal.
+now rewrite lap_mul_add_distr_l.
+Qed.
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2128,8 +2262,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
      rngl_mul_1_l := polyn_mul_1_l;
-     rngl_mul_add_distr_l := 42;
-     rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
+     rngl_mul_add_distr_l := polyn_mul_add_distr_l;
+     rngl_opt_1_neq_0 := 42;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
@@ -2371,111 +2505,7 @@ do 2 rewrite <- lap_mul_assoc.
 now rewrite (lap_mul_comm lb).
 Qed.
 
-Fixpoint lap_convol_mul_add al1 al2 al3 i len :=
-  match len with
-  | O => []
-  | S len1 =>
-      (Σ (j = 0, i),
-       List.nth j al1 0 *
-       (List.nth (i - j) al2 0 + List.nth (i - j) al3 0))%Rng ::
-       lap_convol_mul_add al1 al2 al3 (S i) len1
-  end.
-
 (* *)
-
-Theorem list_nth_add : ∀ k la lb,
-  (List.nth k (lap_add la lb) 0 =
-   List.nth k la 0 + List.nth k lb 0)%Rng.
-Proof.
-intros k la lb.
-revert la lb.
-induction k; intros.
- destruct la as [| a]; simpl; [ rewrite rng_add_0_l; reflexivity | idtac ].
- destruct lb as [| b]; simpl; [ rewrite rng_add_0_r; reflexivity | idtac ].
- reflexivity.
-
- destruct la as [| a]; simpl; [ rewrite rng_add_0_l; reflexivity | idtac ].
- destruct lb as [| b]; simpl; [ rewrite rng_add_0_r; reflexivity | idtac ].
- apply IHk.
-Qed.
-
-Theorem lap_convol_mul_lap_add : ∀ la lb lc i len,
-  eq
-    (lap_convol_mul la (lap_add lb lc) i len)
-    (lap_convol_mul_add la lb lc i len).
-Proof.
-intros la lb lc i len.
-revert la lb lc i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
-apply summation_compat; intros j (_, Hj).
-f_equal.
-rewrite list_nth_add; reflexivity.
-Qed.
-
-Theorem lap_add_lap_convol_mul : ∀ la lb lc i len,
-  eq
-     (lap_add
-        (lap_convol_mul la lb i len)
-        (lap_convol_mul la lc i len))
-     (lap_convol_mul_add la lb lc i len).
-Proof.
-intros la lb lc i len.
-revert la lb lc i.
-induction len; intros; [ reflexivity | simpl ].
-rewrite IHlen; f_equal.
-rewrite <- summation_add_distr.
-apply summation_compat; intros j (_, Hj).
-rewrite rng_mul_add_distr_l; reflexivity.
-Qed.
-
-Lemma lap_norm_mul_add_distr_l : ∀ la lb lc,
-  lap_norm (la * (lb + lc))%lap = lap_norm (la * lb + la * lc)%lap.
-Proof.
-intros la lb lc.
-unfold lap_mul.
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | ].
-destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
-move b before a; move c before b.
-remember (a :: la) as la' eqn:Hla'.
-remember (b :: lb) as lb' eqn:Hlb'.
-remember (c :: lc) as lc' eqn:Hlc'.
-remember (length la' + length (lap_add lb' lc') - 1) as labc.
-remember (length la' + length lb' - 1) as lab.
-remember (length la' + length lc' - 1) as lac.
-rewrite Heqlabc.
-remember (lb' + lc')%lap as lbc.
-symmetry in Heqlbc.
-destruct lbc as [| bc]. {
-  cbn.
-  now subst lb' lc'.
-}
-rewrite <- Heqlbc in Heqlabc |-*.
-rewrite lap_convol_mul_more with (n := (lab + lac)%nat). 2: {
-  subst; flia.
-}
-rewrite <- Heqlabc.
-symmetry.
-rewrite Heqlab.
-rewrite <- lap_add_norm_idemp_l.
-rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
-rewrite <- Heqlab.
-rewrite lap_add_norm_idemp_l.
-rewrite lap_add_comm.
-rewrite <- lap_add_norm_idemp_l.
-rewrite Heqlac.
-rewrite lap_convol_mul_more with (n := (labc + lab)%nat); [ | flia ].
-rewrite lap_add_norm_idemp_l.
-rewrite <- Heqlac.
-rewrite Nat.add_comm.
-rewrite lap_add_comm.
-rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
-symmetry.
-rewrite lap_convol_mul_lap_add.
-rewrite lap_add_lap_convol_mul.
-reflexivity.
-Qed.
 
 Theorem lap_add_length : ∀ la lb,
   length (la + lb)%lap = max (length la) (length lb).
@@ -2486,36 +2516,6 @@ induction la as [| a]; intros; [ easy | ].
 cbn.
 destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
-Qed.
-
-Lemma lap_mul_add_distr_l : ∀ la lb lc,
-  (la * (lb + lc))%lap = (la * lb + la * lc)%lap.
-Proof.
-intros la lb lc.
-apply eq_lap_norm_eq_length; [ apply lap_norm_mul_add_distr_l | ].
-destruct la as [| a]; [ easy | ].
-destruct lb as [| b]; [ easy | ].
-destruct lc as [| c]. {
-  now cbn; rewrite lap_add_0_r.
-}
-cbn.
-do 3 (rewrite Nat.add_succ_r; cbn); f_equal.
-rewrite lap_convol_mul_length.
-do 2 rewrite lap_add_length; cbn.
-do 2 rewrite lap_convol_mul_length.
-now rewrite Nat.add_max_distr_l.
-Qed.
-
-Theorem poly_mul_add_distr_l : ∀ pa pb pc,
-  (pa * (pb + pc))%pol = (pa * pb + pa * pc)%pol.
-Proof.
-intros.
-apply eq_poly_eq; cbn.
-rewrite fold_lap_norm.
-rewrite lap_mul_norm_idemp_r.
-rewrite lap_add_norm_idemp_l.
-rewrite lap_add_norm_idemp_r.
-now rewrite lap_mul_add_distr_l.
 Qed.
 
 Theorem lap_mul_1_r : ∀ la, (la * [1%Rng])%lap = la.
