@@ -7433,21 +7433,34 @@ erewrite rngl_summation_eq_compat. 2: {
     intros j Hj.
     now rewrite rngl_mul_assoc.
   }
+  remember (∑ (j = 0, i), _) as x; subst x.
+  easy.
+}
+cbn.
+(*
+rewrite rngl_summation_summation_exch.
+*)
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_r; [ | easy ].
+  remember (∑ (j = 0, i), _) as x; subst x.
   easy.
 }
 cbn.
 rewrite rngl_summation_summation_exch.
 symmetry.
+rewrite rngl_summation_rtl.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite rngl_mul_summation_distr_r.
+  rewrite Nat.add_0_r.
+  rewrite Nat_sub_sub_distr; [ | easy ].
+  rewrite Nat.add_comm, Nat.add_sub.
+  easy.
 }
 cbn.
-(**)
-rewrite rngl_summation_summation_exch.
-symmetry.
-(*
 ...
+(**)
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 induction k. {
   do 4 rewrite rngl_summation_only_one.
@@ -7464,7 +7477,7 @@ rewrite Nat.sub_diag.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
-*)
+(**)
 move d before c; move e before d.
 move lb' before la'; move ld before lc; move lc' before lb'.
 move le before ld.
