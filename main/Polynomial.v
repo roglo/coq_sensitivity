@@ -7426,6 +7426,10 @@ rewrite list_nth_lap_convol_mul; [ | easy ].
 rewrite <- Hld, <- Hle.
 rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
 rewrite summation_mul_list_nth_lap_convol_mul_3; symmetry.
+move d before c; move e before d.
+move lb' before la'; move ld before lc; move lc' before lb'.
+move le before ld.
+(*
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
   rewrite rngl_mul_summation_distr_l; [ | easy ].
@@ -7437,6 +7441,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
+*)
 (*
 rewrite rngl_summation_summation_exch.
 *)
@@ -7449,6 +7454,18 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn.
 rewrite rngl_summation_summation_exch.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite <- rngl_mul_assoc.
+  }
+  cbn.
+  rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+  remember (∑ (j = _, _), _) as x; subst x.
+  easy.
+}
+cbn.
 symmetry.
 rewrite rngl_summation_rtl.
 erewrite rngl_summation_eq_compat. 2: {
@@ -7459,6 +7476,9 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
+apply rngl_summation_eq_compat.
+intros i Hi.
+f_equal.
 ...
 (**)
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
@@ -7478,9 +7498,6 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
 (**)
-move d before c; move e before d.
-move lb' before la'; move ld before lc; move lc' before lb'.
-move le before ld.
 destruct k. {
   do 4 rewrite rngl_summation_only_one.
   now rewrite Nat.sub_0_r.
