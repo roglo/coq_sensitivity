@@ -7428,7 +7428,12 @@ rewrite summation_mul_list_nth_lap_convol_mul_2; symmetry.
 rewrite summation_mul_list_nth_lap_convol_mul_3; symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  now rewrite rngl_mul_summation_distr_l.
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
+  erewrite rngl_summation_eq_compat. 2: {
+    intros j Hj.
+    now rewrite rngl_mul_assoc.
+  }
+  easy.
 }
 cbn.
 rewrite rngl_summation_summation_exch.
@@ -7443,6 +7448,62 @@ rewrite rngl_summation_summation_exch.
 symmetry.
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 (* faut voir avec un bout de papier *)
+destruct k. {
+  do 4 rewrite rngl_summation_only_one.
+  now rewrite Nat.sub_0_r.
+}
+destruct k. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_add_0_l.
+  now symmetry; rewrite rngl_add_comm, <- rngl_add_assoc.
+}
+destruct k. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_add_0_l.
+  remember (nth 2 _ _ * nth 0 _ _ * nth 0 _ _)%F as A.
+  remember (nth 1 _ _ * nth 0 _ _ * nth 1 _ _)%F as B.
+  remember (nth 0 _ _ * nth 0 _ _ * nth 2 _ _)%F as C.
+  remember (nth 1 _ _ * nth 1 _ _ * nth 0 _ _)%F as D.
+  remember (nth 0 _ _ * nth 1 _ _ * nth 1 _ _)%F as E.
+  remember (nth 0 _ _ * nth 2 _ _ * nth 0 _ _)%F as F.
+  symmetry; rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc; f_equal.
+  symmetry; rewrite rngl_add_comm, <- rngl_add_assoc; f_equal.
+  rewrite <- rngl_add_assoc, rngl_add_comm.
+  now repeat rewrite <- rngl_add_assoc.
+}
+destruct k. {
+  unfold iter_seq, iter_list; cbn.
+  repeat rewrite rngl_add_0_l.
+  remember (nth 3 _ _ * nth 0 _ _ * nth 0 _ _)%F as A.
+  remember (nth 2 _ _ * nth 0 _ _ * nth 1 _ _)%F as B.
+  remember (nth 1 _ _ * nth 0 _ _ * nth 2 _ _)%F as C.
+  remember (nth 0 _ _ * nth 0 _ _ * nth 3 _ _)%F as D.
+  remember (nth 2 _ _ * nth 1 _ _ * nth 0 _ _)%F as E.
+  remember (nth 1 _ _ * nth 1 _ _ * nth 1 _ _)%F as F.
+  remember (nth 0 _ _ * nth 1 _ _ * nth 2 _ _)%F as G.
+  remember (nth 1 _ _ * nth 2 _ _ * nth 0 _ _)%F as H.
+  remember (nth 0 _ _ * nth 2 _ _ * nth 1 _ _)%F as I.
+  remember (nth 0 _ _ * nth 3 _ _ * nth 0 _ _)%F as J.
+  symmetry; rewrite rngl_add_comm.
+  repeat rewrite <- rngl_add_assoc; f_equal.
+  symmetry.
+  do 2 rewrite rngl_add_comm, <- rngl_add_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  do 2 rewrite rngl_add_comm, <- rngl_add_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite rngl_add_comm, <- rngl_add_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal; f_equal.
+  rewrite rngl_add_comm, <- rngl_add_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  f_equal.
+  rewrite rngl_add_comm, <- rngl_add_assoc.
+  repeat rewrite <- rngl_add_assoc.
+  easy.
+}
 ...
 rewrite <- rngl_summation_summation_shift.
 ...
