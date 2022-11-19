@@ -2045,15 +2045,9 @@ rewrite all_0_rngl_summation_0. 2: {
 rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
 rewrite rngl_mul_1_l.
 rewrite IHlen; [ | flia Hlen ].
-clear - Hlen.
-revert i Hlen.
-induction la as [ | a]; intros. {
-  cbn in Hlen; flia Hlen.
-}
-cbn.
-destruct i; [ easy | ].
-rewrite IHla; [ easy | ].
-cbn in Hlen; flia Hlen.
+symmetry.
+apply (List_skipn_is_cons 0%F).
+flia Hlen.
 Qed.
 
 Theorem lap_convol_mul_1_r : ∀ la i len,
@@ -2067,42 +2061,22 @@ induction len; intros. {
   symmetry; apply skipn_all.
 }
 cbn - [ nth ].
-...
-rewrite rngl_summation_split_first; [ | easy ].
-rewrite Nat.sub_0_r.
-...
+Print lap_convol_mul.
+rewrite rngl_summation_split_last; [ | easy ].
 rewrite all_0_rngl_summation_0. 2: {
   intros j Hj.
-  destruct j; [ flia Hj | cbn ].
-  remember (i - S j) as k eqn:Hk; symmetry in Hk.
-  destruct k. 2: {
-    rewrite Tauto_match_nat_same.
-    apply rngl_mul_0_r.
-    now apply rngl_has_opp_or_sous_iff; left.
-  }
-  replace i with (S j) by flia Hj Hk.
-...
-  destruct (Nat.eq_dec i (S j)) as [Hij| Hij]. {
-...
-rewrite
+  replace (i - (j - 1)) with (S (i - j)) by flia Hj; cbn.
   rewrite Tauto_match_nat_same.
-  apply rngl_mul_0_l.
+  apply rngl_mul_0_r.
   now apply rngl_has_opp_or_sous_iff; left.
 }
-rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
-rewrite rngl_mul_1_l.
+rewrite Nat.sub_diag, rngl_add_0_l; cbn.
+rewrite rngl_mul_1_r.
 rewrite IHlen; [ | flia Hlen ].
-clear - Hlen.
-revert i Hlen.
-induction la as [ | a]; intros. {
-  cbn in Hlen; flia Hlen.
-}
-cbn.
-destruct i; [ easy | ].
-rewrite IHla; [ easy | ].
-cbn in Hlen; flia Hlen.
+symmetry.
+apply (List_skipn_is_cons 0%F).
+flia Hlen.
 Qed.
-...
 
 Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
 Proof.
@@ -2313,31 +2287,9 @@ intros la.
 unfold "*"%lap; cbn.
 destruct la as [| a]; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-Check lap_convol_mul_1_l.
-... ...
 apply lap_convol_mul_1_r.
-...
-rewrite Nat.add_comm; cbn.
-rewrite rngl_summation_only_one; cbn.
-rewrite rngl_mul_1_r; f_equal.
-...
-remember (length la) as len eqn:Hla; symmetry in Hla.
-revert a la Hla.
-induction la as [| b]; intros; [ now subst len | ].
-cbn.
-  subst len; cbn.
-  destruct len; [ easy | cbn ].
-  unfold iter_seq, iter_list; cbn.
-...
-induction la as [| b]; [ easy | ].
-cbn.
-cbn - [ lap_convol_mul ].
-remember (b :: la) as lb eqn:Hlb; cbn.
-...
-rewrite lap_mul_comm.
-apply lap_mul_1_l.
+now rewrite Nat.add_1_r.
 Qed.
-*)
 
 Theorem polyn_opt_mul_1_r :
   if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
@@ -2346,10 +2298,10 @@ remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
 destruct ic; [ easy | ].
 intros.
 apply eq_polyn_eq; cbn.
-... ...
 rewrite lap_mul_1_r.
 apply last_lap_neq_0_lap_norm.
-...
+now destruct a.
+Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
