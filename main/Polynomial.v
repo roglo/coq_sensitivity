@@ -1076,15 +1076,17 @@ Qed.
 
 (* addition to 0 *)
 
-Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
+Theorem last_lap_neq_0_lap_norm : ∀ la,
+  last_lap_neq_0 la
+  → lap_norm la = la.
 Proof.
-intros (la, lapr).
-apply eq_polyn_eq; cbn.
+intros * lapr.
 unfold last_lap_neq_0 in lapr.
 apply Bool.negb_true_iff in lapr.
 induction la as [| a]; [ easy | cbn ].
 rewrite strip_0s_app.
 rewrite <- (rev_involutive (strip_0s _)).
+rewrite fold_lap_norm.
 rewrite IHla; cbn. {
   remember (rev la) as lb eqn:Hlb; symmetry in Hlb.
   destruct lb as [| b]. {
@@ -1100,6 +1102,13 @@ rewrite IHla; cbn. {
   apply (rngl_eqb_neq Heb).
   now apply rngl_1_neq_0.
 }
+Qed.
+
+Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
+Proof.
+intros (la, lapr).
+apply eq_polyn_eq; cbn.
+now apply last_lap_neq_0_lap_norm.
 Qed.
 
 (* associativity of multiplication *)
@@ -2053,45 +2062,58 @@ rewrite lap_mul_norm_idemp_r.
 now rewrite lap_mul_assoc.
 Qed.
 
+Lemma lap_convol_mul_1_l : ∀ la i len,
+  length la = i + len
+  → lap_convol_mul [1%F] la i len = skipn i la.
+Proof.
+intros * Hlen.
+revert i Hlen.
+induction len; intros. {
+  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
+  symmetry; apply skipn_all.
+}
+cbn - [ nth ].
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros j Hj.
+  destruct j; [ flia Hj | cbn ].
+  rewrite Tauto_match_nat_same.
+  apply rngl_mul_0_l.
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
+rewrite rngl_mul_1_l.
+rewrite IHlen; [ | flia Hlen ].
+clear - Hlen.
+revert i Hlen.
+induction la as [ | a]; intros. {
+  cbn in Hlen; flia Hlen.
+}
+cbn.
+destruct i; [ easy | ].
+rewrite IHla; [ easy | ].
+cbn in Hlen; flia Hlen.
+Qed.
+
+Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
+Proof.
+intros la.
+unfold lap_mul.
+destruct la as [| a]; [ easy | cbn ].
+rewrite rngl_summation_only_one.
+rewrite rngl_mul_1_l; f_equal.
+now rewrite lap_convol_mul_1_l.
+Qed.
+
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
 Proof.
 intros (la, lapr).
 unfold "*"%pol.
 cbn - [ lap_mul ].
-...
 rewrite lap_mul_1_l; cbn.
-apply eq_poly_eq; cbn.
-unfold rng_eqb in lapr.
-unfold lap_norm.
-destruct (rng_eq_dec (last la 1%Rng) 0) as [Hlaz| Hlaz]; [ easy | ].
-clear lapr.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
-  cbn; clear Hlb.
-  destruct (rng_eq_dec a 0) as [Haz| Haz]. {
-    exfalso; subst a.
-    cbn in IHla.
-    destruct la as [| a]; [ easy | ].
-    remember (a :: la) as lb; cbn in Hlaz; subst lb.
-    now specialize (IHla Hlaz).
-  }
-  cbn in IHla |-*.
-  rewrite <- IHla; [ easy | ].
-  cbn in Hlaz.
-  destruct la as [| a2]; [ | easy ].
-  intros; apply rng_1_neq_0.
-}
-cbn.
-rewrite rev_app_distr; cbn; f_equal.
-apply IHla.
-cbn in Hlaz.
-now destruct la.
+apply eq_polyn_eq; cbn.
+now apply last_lap_neq_0_lap_norm.
 Qed.
-
-...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2106,7 +2128,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
      rngl_mul_1_l := polyn_mul_1_l;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_mul_add_distr_l := 42;
      rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
@@ -2494,46 +2516,6 @@ rewrite lap_mul_norm_idemp_r.
 rewrite lap_add_norm_idemp_l.
 rewrite lap_add_norm_idemp_r.
 now rewrite lap_mul_add_distr_l.
-Qed.
-
-Lemma lap_convol_mul_1_l : ∀ la i len,
-  length la = i + len
-  → lap_convol_mul [1%Rng] la i len = skipn i la.
-Proof.
-intros * Hlen.
-revert i Hlen.
-induction len; intros. {
-  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
-  symmetry; apply skipn_all.
-}
-cbn - [ summation nth ].
-rewrite summation_split_first; [ | flia ].
-rewrite all_0_summation_0. 2: {
-  intros j Hj.
-  destruct j; [ flia Hj | cbn ].
-  now rewrite match_id, rng_mul_0_l.
-}
-rewrite Nat.sub_0_r, rng_add_0_r; cbn.
-rewrite rng_mul_1_l.
-rewrite IHlen; [ | flia Hlen ].
-clear - Hlen.
-revert i Hlen.
-induction la as [ | a]; intros. {
-  cbn in Hlen; flia Hlen.
-}
-cbn.
-destruct i; [ easy | ].
-rewrite IHla; [ easy | ].
-cbn in Hlen; flia Hlen.
-Qed.
-
-Theorem lap_mul_1_l : ∀ la, ([1%Rng] * la)%lap = la.
-Proof.
-intros la.
-unfold lap_mul.
-destruct la as [| a]; [ easy | cbn ].
-rewrite rng_mul_1_l, rng_add_0_r; f_equal.
-now rewrite lap_convol_mul_1_l.
 Qed.
 
 Theorem lap_mul_1_r : ∀ la, (la * [1%Rng])%lap = la.
