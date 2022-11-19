@@ -2056,6 +2056,41 @@ rewrite IHla; [ easy | ].
 cbn in Hlen; flia Hlen.
 Qed.
 
+Theorem lap_convol_mul_1_r : ∀ la i len,
+  length la = i + len
+  → lap_convol_mul la [1%F] i len = skipn i la.
+Proof.
+intros * Hlen.
+revert i Hlen.
+induction len; intros. {
+  rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
+  symmetry; apply skipn_all.
+}
+cbn - [ nth ].
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite all_0_rngl_summation_0. 2: {
+  intros j Hj.
+  destruct j; [ flia Hj | cbn ].
+...
+  rewrite Tauto_match_nat_same.
+  apply rngl_mul_0_l.
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
+rewrite rngl_mul_1_l.
+rewrite IHlen; [ | flia Hlen ].
+clear - Hlen.
+revert i Hlen.
+induction la as [ | a]; intros. {
+  cbn in Hlen; flia Hlen.
+}
+cbn.
+destruct i; [ easy | ].
+rewrite IHla; [ easy | ].
+cbn in Hlen; flia Hlen.
+Qed.
+...
+
 Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
 Proof.
 intros la.
@@ -2265,6 +2300,10 @@ intros la.
 unfold "*"%lap; cbn.
 destruct la as [| a]; [ easy | cbn ].
 rewrite Nat.sub_0_r.
+Check lap_convol_mul_1_l.
+... ...
+apply lap_convol_mul_1_r.
+...
 rewrite Nat.add_comm; cbn.
 rewrite rngl_summation_only_one; cbn.
 rewrite rngl_mul_1_r; f_equal.
