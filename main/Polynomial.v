@@ -7465,6 +7465,9 @@ erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
 ...
 *)
+move d before c; move e before d.
+move lb' before la'; move ld before lc; move lc' before lb'.
+move le before ld.
 destruct k. {
   do 4 rewrite rngl_summation_only_one.
   now rewrite Nat.sub_0_r.
@@ -7504,9 +7507,7 @@ destruct k. {
   remember (nth 0 _ _ * nth 3 _ _ * nth 0 _ _)%F as J.
   move B before A; move C before B; move D before C; move E before D.
   move F before E; move G before F; move H before G; move I before H.
-  move J before H; move d before c; move e before d.
-  move lb' before la'; move ld before lc; move lc' before lb'.
-  move le before ld.
+  move J before H.
 ...
   symmetry; rewrite rngl_add_comm.
   repeat rewrite <- rngl_add_assoc; f_equal.
