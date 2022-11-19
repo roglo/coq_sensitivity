@@ -2291,16 +2291,37 @@ apply lap_convol_mul_1_r.
 now rewrite Nat.add_1_r.
 Qed.
 
-Theorem polyn_opt_mul_1_r :
-  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
+Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%F = a.
 Proof.
-remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
-destruct ic; [ easy | ].
 intros.
 apply eq_polyn_eq; cbn.
 rewrite lap_mul_1_r.
 apply last_lap_neq_0_lap_norm.
 now destruct a.
+Qed.
+
+Theorem polyn_opt_mul_1_r :
+  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
+Proof.
+destruct rngl_mul_is_comm; [ easy | ].
+apply polyn_mul_1_r.
+Qed.
+
+(* optional right distributivity; not requied if multiplication
+   is commutative *)
+
+Theorem polyn_mul_add_distr_r :
+  ∀ a b c : polyn T, ((a + b) * c)%F = (a * c + b * c)%F.
+Proof.
+intros.
+...
+
+Theorem polyn_opt_mul_add_distr_r :
+   if rngl_mul_is_comm then not_applicable
+   else ∀ a b c : polyn T, ((a + b) * c)%F = (a * c + b * c)%F.
+Proof.
+destruct rngl_mul_is_comm; [ easy | ].
+apply polyn_mul_add_distr_r.
 Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
@@ -2320,7 +2341,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_1_neq_0 := polyn_1_neq_0;
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
-     rngl_opt_mul_add_distr_r := 42;
+     rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
