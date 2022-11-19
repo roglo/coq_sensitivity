@@ -2249,6 +2249,12 @@ f_equal.
 now rewrite lap_mul_add_distr_l.
 Qed.
 
+Theorem polyn_1_neq_0 : if rngl_has_1_neq_0 then 1%F ≠ 0%F else not_applicable.
+Proof.
+rewrite H10.
+now intros H; apply eq_polyn_eq in H.
+Qed.
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2263,8 +2269,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_mul_assoc := polyn_mul_assoc;
      rngl_mul_1_l := polyn_mul_1_l;
      rngl_mul_add_distr_l := polyn_mul_add_distr_l;
-     rngl_opt_1_neq_0 := 42;
-     rngl_opt_mul_comm := ?rngl_opt_mul_comm;
+     rngl_opt_1_neq_0 := polyn_1_neq_0;
+     rngl_opt_mul_comm := 42;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
@@ -2558,9 +2564,6 @@ unfold poly_sub.
 rewrite poly_add_comm.
 apply poly_add_opp_l.
 Qed.
-
-Theorem poly_1_neq_0 {A} {rng : ring A} : 1%pol ≠ 0%pol.
-Proof. easy. Qed.
 
 Fixpoint lap_eqb {A} {rng : ring A} la lb :=
   match la with
