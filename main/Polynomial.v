@@ -2256,6 +2256,14 @@ apply eq_polyn_eq; cbn.
 now rewrite (lap_mul_comm Hic).
 Qed.
 
+(* optional right multiplication by 1; not required if multiplication
+   is commutative *)
+
+Theorem polyn_opt_mul_1_r :
+  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
+Proof.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2272,8 +2280,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_mul_add_distr_l := polyn_mul_add_distr_l;
      rngl_opt_1_neq_0 := polyn_1_neq_0;
      rngl_opt_mul_comm := polyn_opt_mul_comm;
-     rngl_opt_mul_1_r := 42;
-     rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
+     rngl_opt_mul_1_r := polyn_opt_mul_1_r;
+     rngl_opt_mul_add_distr_r := 42;
      rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
