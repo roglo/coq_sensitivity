@@ -2067,11 +2067,24 @@ induction len; intros. {
   symmetry; apply skipn_all.
 }
 cbn - [ nth ].
+...
 rewrite rngl_summation_split_first; [ | easy ].
+rewrite Nat.sub_0_r.
+...
 rewrite all_0_rngl_summation_0. 2: {
   intros j Hj.
   destruct j; [ flia Hj | cbn ].
+  remember (i - S j) as k eqn:Hk; symmetry in Hk.
+  destruct k. 2: {
+    rewrite Tauto_match_nat_same.
+    apply rngl_mul_0_r.
+    now apply rngl_has_opp_or_sous_iff; left.
+  }
+  replace i with (S j) by flia Hj Hk.
 ...
+  destruct (Nat.eq_dec i (S j)) as [Hij| Hij]. {
+...
+rewrite
   rewrite Tauto_match_nat_same.
   apply rngl_mul_0_l.
   now apply rngl_has_opp_or_sous_iff; left.
