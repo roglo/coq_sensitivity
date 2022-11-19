@@ -2327,29 +2327,26 @@ destruct lb as [| b]. {
   cbn; rewrite Nat.sub_0_r.
   now rewrite lap_add_0_r.
 }
-...
-destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
+destruct lc as [| c]; [ easy | ].
 move b before a; move c before b.
 remember (a :: la) as la' eqn:Hla'.
 remember (b :: lb) as lb' eqn:Hlb'.
 remember (c :: lc) as lc' eqn:Hlc'.
-remember (length la' + length (lap_add lb' lc') - 1) as labc.
-remember (length la' + length lb' - 1) as lab.
+remember (length (la' + lb')%lap + length lc' - 1) as labc.
 remember (length la' + length lc' - 1) as lac.
+remember (length lb' + length lc' - 1) as lbc.
 rewrite Heqlabc.
-remember (lb' + lc')%lap as lbc.
-symmetry in Heqlbc.
-destruct lbc as [| bc]. {
-  cbn.
-  now subst lb' lc'.
-}
-rewrite <- Heqlbc in Heqlabc |-*.
-rewrite lap_convol_mul_more with (n := (lab + lac)%nat). 2: {
+remember (la' + lb')%lap as lab.
+symmetry in Heqlab.
+destruct lab as [| ab]; [ now subst la' lb' | ].
+rewrite <- Heqlab in Heqlabc |-*.
+rewrite lap_convol_mul_more with (n := (lac + lbc)%nat). 2: {
   subst; flia.
 }
 rewrite <- Heqlabc.
 symmetry.
 rewrite Heqlab.
+...
 rewrite <- lap_add_norm_idemp_l.
 rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
 rewrite <- Heqlab.
