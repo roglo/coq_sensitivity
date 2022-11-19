@@ -2259,9 +2259,44 @@ Qed.
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
 
+Theorem lap_mul_1_r : ∀ la, (la * [1%F])%lap = la.
+Proof.
+intros la.
+unfold "*"%lap; cbn.
+destruct la as [| a]; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+rewrite Nat.add_comm; cbn.
+rewrite rngl_summation_only_one; cbn.
+rewrite rngl_mul_1_r; f_equal.
+...
+remember (length la) as len eqn:Hla; symmetry in Hla.
+revert a la Hla.
+induction la as [| b]; intros; [ now subst len | ].
+cbn.
+  subst len; cbn.
+  destruct len; [ easy | cbn ].
+  unfold iter_seq, iter_list; cbn.
+...
+induction la as [| b]; [ easy | ].
+cbn.
+cbn - [ lap_convol_mul ].
+remember (b :: la) as lb eqn:Hlb; cbn.
+...
+rewrite lap_mul_comm.
+apply lap_mul_1_l.
+Qed.
+*)
+
 Theorem polyn_opt_mul_1_r :
   if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
 Proof.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ easy | ].
+intros.
+apply eq_polyn_eq; cbn.
+... ...
+rewrite lap_mul_1_r.
+apply last_lap_neq_0_lap_norm.
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
@@ -2524,13 +2559,6 @@ induction la as [| a]; intros; [ easy | ].
 cbn.
 destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
-Qed.
-
-Theorem lap_mul_1_r : ∀ la, (la * [1%Rng])%lap = la.
-Proof.
-intros la.
-rewrite lap_mul_comm.
-apply lap_mul_1_l.
 Qed.
 
 End lap.
