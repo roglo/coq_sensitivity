@@ -968,6 +968,7 @@ Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
 Notation "0" := polyn_zero : polyn_scope.
+Notation "1" := polyn_one : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
@@ -2052,6 +2053,46 @@ rewrite lap_mul_norm_idemp_r.
 now rewrite lap_mul_assoc.
 Qed.
 
+Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
+Proof.
+intros (la, lapr).
+unfold "*"%pol.
+cbn - [ lap_mul ].
+...
+rewrite lap_mul_1_l; cbn.
+apply eq_poly_eq; cbn.
+unfold rng_eqb in lapr.
+unfold lap_norm.
+destruct (rng_eq_dec (last la 1%Rng) 0) as [Hlaz| Hlaz]; [ easy | ].
+clear lapr.
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
+  cbn; clear Hlb.
+  destruct (rng_eq_dec a 0) as [Haz| Haz]. {
+    exfalso; subst a.
+    cbn in IHla.
+    destruct la as [| a]; [ easy | ].
+    remember (a :: la) as lb; cbn in Hlaz; subst lb.
+    now specialize (IHla Hlaz).
+  }
+  cbn in IHla |-*.
+  rewrite <- IHla; [ easy | ].
+  cbn in Hlaz.
+  destruct la as [| a2]; [ | easy ].
+  intros; apply rng_1_neq_0.
+}
+cbn.
+rewrite rev_app_distr; cbn; f_equal.
+apply IHla.
+cbn in Hlaz.
+now destruct la.
+Qed.
+
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2064,7 +2105,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
-     rngl_mul_1_l := 42;
+     rngl_mul_1_l := polyn_mul_1_l;
      rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
      rngl_opt_1_neq_0 := ?rngl_opt_1_neq_0;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
@@ -2500,42 +2541,6 @@ Proof.
 intros la.
 rewrite lap_mul_comm.
 apply lap_mul_1_l.
-Qed.
-
-Theorem poly_mul_1_l : ∀ p, (1 * p)%pol = p.
-Proof.
-intros (la, lapr).
-unfold "*"%pol.
-rewrite lap_mul_1_l; cbn.
-apply eq_poly_eq; cbn.
-unfold rng_eqb in lapr.
-unfold lap_norm.
-destruct (rng_eq_dec (last la 1%Rng) 0) as [Hlaz| Hlaz]; [ easy | ].
-clear lapr.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
-  cbn; clear Hlb.
-  destruct (rng_eq_dec a 0) as [Haz| Haz]. {
-    exfalso; subst a.
-    cbn in IHla.
-    destruct la as [| a]; [ easy | ].
-    remember (a :: la) as lb; cbn in Hlaz; subst lb.
-    now specialize (IHla Hlaz).
-  }
-  cbn in IHla |-*.
-  rewrite <- IHla; [ easy | ].
-  cbn in Hlaz.
-  destruct la as [| a2]; [ | easy ].
-  intros; apply rng_1_neq_0.
-}
-cbn.
-rewrite rev_app_distr; cbn; f_equal.
-apply IHla.
-cbn in Hlaz.
-now destruct la.
 Qed.
 
 End lap.
