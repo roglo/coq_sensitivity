@@ -7446,8 +7446,25 @@ cbn.
 (**)
 rewrite rngl_summation_summation_exch.
 symmetry.
+...
 Search (∑ (_ = _, _), ∑ (_ = _, _), _).
 (* faut voir avec un bout de papier *)
+(**)
+induction k. {
+  do 4 rewrite rngl_summation_only_one.
+  now rewrite Nat.sub_0_r.
+}
+...
+Arguments rngl_summation_ub_add_distr {T ro rp} (a b)%nat.
+rewrite <- Nat.add_1_r.
+rewrite rngl_summation_ub_add_distr.
+rewrite Nat.add_1_r.
+do 2 rewrite rngl_summation_only_one.
+rewrite Nat.sub_diag.
+...
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+...
 destruct k. {
   do 4 rewrite rngl_summation_only_one.
   now rewrite Nat.sub_0_r.
