@@ -968,7 +968,9 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
 Canonical Structure polyn_ring_like_op.
 
 (* to search for ring-like polynomials operators in the context *)
+(*
 Existing Instance polyn_ring_like_op.
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -2336,7 +2338,7 @@ now rewrite lap_mul_add_distr_l.
 Qed.
 
 Theorem polyn_mul_add_distr_r :
-  ∀ a b c : polyn T, ((a + b) * c)%F = (a * c + b * c)%F.
+  ∀ a b c : polyn T, ((a + b) * c)%pol = (a * c + b * c)%pol.
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
@@ -2350,7 +2352,8 @@ Qed.
 
 (* 1 is not 0 *)
 
-Theorem polyn_1_neq_0 : if rngl_has_1_neq_0 then 1%F ≠ 0%F else not_applicable.
+Theorem polyn_1_neq_0 :
+  if rngl_has_1_neq_0 then 1%pol ≠ 0%pol else not_applicable.
 Proof.
 rewrite H10.
 now intros H; apply eq_polyn_eq in H.
@@ -2409,7 +2412,7 @@ apply lap_convol_mul_1_r.
 now rewrite Nat.add_1_r.
 Qed.
 
-Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%F = a.
+Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
@@ -2419,7 +2422,7 @@ now destruct a.
 Qed.
 
 Theorem polyn_opt_mul_1_r :
-  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%F = a.
+  if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 apply polyn_mul_1_r.
@@ -2430,7 +2433,7 @@ Qed.
 
 Theorem polyn_opt_mul_add_distr_r :
    if rngl_mul_is_comm then not_applicable
-   else ∀ a b c : polyn T, ((a + b) * c)%F = (a * c + b * c)%F.
+   else ∀ a b c : polyn T, ((a + b) * c)%pol = (a * c + b * c)%pol.
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 apply polyn_mul_add_distr_r.
@@ -2456,7 +2459,17 @@ rewrite (rngl_add_opp_l Hop).
 now rewrite rngl_eqb_refl.
 Qed.
 
+(*
 Theorem polyn_opt_add_opp_l :
+  match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
+  | true =>
+      forall a : @polyn T ro,
+      @eq (@polyn T ro)
+        (@rngl_add (@polyn T ro) polyn_ring_like_op (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
+        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
+  | false => not_applicable
+  end.
+(*
   match @rngl_has_opp T ro return Prop with
   | true =>
       forall a : @polyn T ro,
@@ -2465,17 +2478,22 @@ Theorem polyn_opt_add_opp_l :
         (@rngl_zero (@polyn T ro) polyn_ring_like_op)
   | false => not_applicable
   end.
+*)
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op; [ | easy ].
 intros; cbn.
 destruct a as (la, Ha); cbn.
 apply eq_polyn_eq; cbn.
+(*
 do 2 rewrite fold_lap_norm.
 rewrite lap_add_norm_idemp_l.
+*)
+unfold polyn_opp.
 apply lap_add_opp_l.
 easy.
 Qed.
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2495,7 +2513,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := polyn_opt_add_opp_l;
+     rngl_opt_add_opp_l := 42;
      rngl_opt_add_sub := 42;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
