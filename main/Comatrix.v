@@ -1327,7 +1327,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 } {
   (* not on diagonal: zeroes *)
   rewrite δ_ndiag; [ | easy ].
-  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_r; [ | easy ].
   unfold mat_transp.
   unfold mat_mul_el.
   cbn - [ com ].
@@ -1481,7 +1481,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 } {
   (* not on diagonal: zeroes *)
   rewrite δ_ndiag; [ | easy ].
-  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_r; [ | easy ].
   unfold mat_transp.
   cbn - [ com ].
   erewrite rngl_summation_eq_compat. 2: {

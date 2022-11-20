@@ -612,7 +612,7 @@ do 2 rewrite Nat_sub_succ_1.
 rewrite IHm.
 rewrite Hll.
 unfold iter_seq at 1.
-rewrite rngl_summation_list_mul_summation_list.
+rewrite rngl_summation_list_mul_summation_list; [ | easy ].
 rewrite Nat_sub_succ_1.
 apply rngl_summation_list_eq_compat.
 intros i Hi.

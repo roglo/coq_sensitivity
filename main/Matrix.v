@@ -1234,7 +1234,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     easy.
   }
-  rewrite rngl_mul_summation_distr_l.
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
   erewrite rngl_summation_eq_compat. 2: {
     intros m Hm.
     now rewrite rngl_mul_assoc.
@@ -1267,7 +1267,7 @@ erewrite rngl_summation_eq_compat. 2: {
     rewrite seq_nth; [ | flia Hcbz Hk ].
     easy.
   }
-  rewrite rngl_mul_summation_distr_r.
+  rewrite rngl_mul_summation_distr_r; [ | easy ].
   apply in_seq in Hi.
   rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
   rewrite Nat.add_1_r.
@@ -1532,7 +1532,7 @@ rewrite (List_map_hd []). 2: {
 }
 rewrite map_length.
 rewrite fold_mat_ncols.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite List_map_nth' with (a := []). 2: {
@@ -1588,7 +1588,7 @@ rewrite map_map.
 apply map_ext_in.
 intros j Hj.
 unfold mat_mul_el; cbn.
-rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l; [ | easy ].
 apply rngl_summation_eq_compat.
 intros k Hk.
 rewrite List_map_nth' with (a := []). 2: {
@@ -1847,7 +1847,7 @@ apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
-rewrite rngl_mul_summation_list_distr_l.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 rewrite map2_map2_seq_l with (d := 0%F).
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Harc, Ha).
@@ -1908,7 +1908,7 @@ rewrite fold_mat_nrows.
 apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
-rewrite rngl_mul_summation_list_distr_l.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 rewrite map2_map_r.
 rewrite map2_map2_seq_l with (d := 0%F).
 rewrite map2_map2_seq_r with (d := 0%F).

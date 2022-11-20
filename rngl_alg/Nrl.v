@@ -397,8 +397,6 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
-     rngl_opt_absorbing_l := NA;
-     rngl_opt_absorbing_r := NA;
      rngl_opt_mul_inv_l := Zn_opt_mul_inv_l;
      rngl_opt_mul_inv_r := Zn_opt_mul_inv_r;
      rngl_opt_mul_div := Zn_opt_mul_div;
@@ -460,15 +458,6 @@ apply Nat.eq_mul_1 in Hab.
 now left.
 Qed.
 
-(*
-Theorem lcm_opt_absorbing_l :
-  if rngl_has_opp_or_sous then not_applicable else ∀ a : nat, (0 * a)%F = 0%F.
-Proof.
-remember rngl_has_opp_or_sous as os eqn:Hos; symmetry in Hos.
-destruct os; [ easy | ].
-intros.
-...
-
 Definition lcm_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
@@ -492,8 +481,6 @@ Definition lcm_ring_like_prop :=
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
      rngl_opt_mul_sub_distr_r := NA;
-     rngl_opt_absorbing_l := lcm_opt_absorbing_l;
-     rngl_opt_absorbing_r := NA;
      rngl_opt_mul_inv_l := NA;
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
@@ -510,6 +497,5 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-*)
 
 End a.

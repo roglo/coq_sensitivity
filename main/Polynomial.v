@@ -790,7 +790,8 @@ apply rngl_integral in Hq; cycle 1. {
 }
 destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
-now apply rngl_inv_neq_0.
+apply rngl_inv_neq_0; [ | easy | easy | easy ].
+now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
 Theorem rlap_quot_rem_step_None : ∀ la lb lr,
@@ -1141,13 +1142,6 @@ remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   rewrite all_0_rngl_summation_0. 2: {
     intros j Hj.
-Search (_ * _ = 0)%F.
-...
-Theorem glop : ∀ a b : T, a = 0%F ∨ b = 0%F → (a * b = 0)%F.
-Proof.
-intros * Hab.
-destruct Hab as [Ha| Hb]; subst. {
-  apply rngl_mul_0_l.
 ...
     rewrite Ha, rngl_mul_0_l; [ easy | ].
     apply rngl_has_opp_or_sous_iff.

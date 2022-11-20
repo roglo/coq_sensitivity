@@ -671,7 +671,7 @@ rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
   apply in_or_app; right.
   now apply in_or_app; right; left.
 }
-rewrite rngl_mul_0_l.
+rewrite rngl_mul_0_l; [ | easy ].
 set (p1 := S (length l1)).
 set (q1 := S (length (l1 ++ a :: l2))).
 apply (determinant_same_rows Hif) with (p := p1) (q := q1); cycle 1. {
@@ -754,7 +754,7 @@ rewrite det_is_det''; try now destruct Hif. 2: {
 unfold det''.
 do 2 rewrite mat_select_rows_nrows.
 rewrite isort_length.
-rewrite rngl_mul_summation_list_distr_l.
+rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 symmetry; erewrite rngl_summation_list_eq_compat. 2: {
   intros jl Hjl.
   now rewrite rngl_mul_assoc.
@@ -1654,7 +1654,7 @@ remember (∑ (l ∈ _), _) as x; subst x.
 *)
 erewrite rngl_summation_list_eq_compat. 2: {
   intros l Hl.
-  rewrite rngl_mul_summation_list_distr_l.
+  rewrite rngl_mul_summation_list_distr_l; [ | easy ].
   erewrite rngl_summation_list_eq_compat. 2: {
     intros kl Hkl.
     rewrite rngl_mul_assoc.
@@ -1695,7 +1695,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite <- rngl_mul_summation_list_distr_r.
+rewrite <- rngl_mul_summation_list_distr_r; [ | easy ].
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 easy.
 Qed.
@@ -1838,6 +1838,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
 cbn - [ det ].
 symmetry.
 apply rngl_mul_summation_list_distr_r.
+now destruct Hif.
 Qed.
 
 Lemma Cauchy_Binet_formula_step_5_2 : in_charac_0_field →
