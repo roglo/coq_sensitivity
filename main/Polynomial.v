@@ -790,8 +790,7 @@ apply rngl_integral in Hq; cycle 1. {
 }
 destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
-apply rngl_inv_neq_0; [ | easy | easy | easy ].
-now apply rngl_has_opp_or_sous_iff; left.
+now apply rngl_inv_neq_0.
 Qed.
 
 Theorem rlap_quot_rem_step_None : ∀ la lb lr,
