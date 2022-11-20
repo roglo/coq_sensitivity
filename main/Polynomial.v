@@ -2455,6 +2455,7 @@ rewrite strip_0s_app.
 remember (strip_0s _) as lb eqn:Hlb; symmetry in Hlb.
 subst lb.
 rewrite IHla; cbn.
+Print polyn_ring_like_op.
 rewrite (rngl_add_opp_l Hop).
 now rewrite rngl_eqb_refl.
 Qed.
@@ -2471,43 +2472,17 @@ rewrite lap_add_norm_idemp_l.
 now apply lap_add_opp_l.
 Qed.
 
-...
-
-(**)
 Theorem polyn_opt_add_opp_l :
-  match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
-  | true =>
-      forall a : @polyn T ro,
-      @eq (@polyn T ro)
-        (@rngl_add (@polyn T ro) polyn_ring_like_op (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
-        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
-  | false => not_applicable
-  end.
-(*
-  match @rngl_has_opp T ro return Prop with
-  | true =>
-      forall a : @polyn T ro,
-      @eq (@polyn T ro)
-        (@rngl_add (@polyn T ro) polyn_ring_like_op (@polyn_opp a) a)
-        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
-  | false => not_applicable
-  end.
-*)
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%pol = 0%pol
+  else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op; [ | easy ].
-intros; cbn.
-destruct a as (la, Ha); cbn.
-apply eq_polyn_eq; cbn.
-(*
-do 2 rewrite fold_lap_norm.
-rewrite lap_add_norm_idemp_l.
-*)
-unfold polyn_opp.
-apply lap_add_opp_l.
-easy.
+destruct op; [ now apply polyn_add_opp_l | easy ].
 Qed.
-*)
+
+Print rngl_has_opp.
+
+...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2527,7 +2502,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := 42;
+     rngl_opt_add_opp_l := polyn_opt_add_opp_l;
      rngl_opt_add_sub := 42;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
