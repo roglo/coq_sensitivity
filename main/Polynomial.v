@@ -2440,11 +2440,15 @@ Qed.
    no opposite *)
 
 Theorem polyn_opt_add_opp_l :
-  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%pol = 0%pol
+  else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op; [ | easy ].
 intros; cbn.
+unfold polyn_opp.
+Set Printing All.
+...
 Search (- _ + _ = 0)%F.
 unfold rngl_opp.
 unfold rngl_has_opp in Hop.
@@ -2464,9 +2468,13 @@ unfold lap_opp.
 
 unfold lap_norm; cbn.
 ...
+*)
 
+(*
 Theorem poly_add_opp_l : ∀ p, (- p + p)%pol = 0%pol.
 Proof.
+intros p.
+...
 intros p.
 unfold "+"%pol; cbn.
 apply eq_poly_eq; cbn.
