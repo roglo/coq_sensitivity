@@ -737,6 +737,8 @@ rewrite List_rev_repeat.
 ...
 *)
 
+Section b.
+
 Context {Hop : rngl_has_opp = true}.
 Context {Hiv : rngl_has_inv = true}.
 
@@ -927,6 +929,8 @@ Definition polyn_rem (pa pb : polyn T) : polyn T :=
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
 
+End b.
+
 (* polyn opposite or subtraction *)
 
 Definition polyn_opt_opp_or_sous :
@@ -938,6 +942,8 @@ Definition polyn_opt_opp_or_sous :
   end.
 
 (* polyn quotient *)
+
+...
 
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
@@ -969,6 +975,7 @@ Delimit Scope polyn_scope with pol.
 
 Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
+Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
@@ -2431,7 +2438,7 @@ destruct rngl_mul_is_comm; [ easy | ].
 apply polyn_mul_1_r.
 Qed.
 
-(* optional right distributivity; not requied if multiplication
+(* optional right distributivity; not required if multiplication
    is commutative *)
 
 Theorem polyn_opt_mul_add_distr_r :
@@ -2441,6 +2448,24 @@ Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 apply polyn_mul_add_distr_r.
 Qed.
+
+(* optional left addition of opposite; not existing if there is
+   no opposite *)
+
+Theorem polyn_opt_add_opp_l :
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
+Proof.
+...
+
+Theorem poly_add_opp_l : ∀ p, (- p + p)%pol = 0%pol.
+Proof.
+intros p.
+unfold "+"%pol; cbn.
+apply eq_poly_eq; cbn.
+rewrite lap_add_norm_idemp_l.
+apply lap_add_opp_l.
+Qed.
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2460,8 +2485,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := 42;
-     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_add_opp_l := polyn_opt_add_opp_l;
+     rngl_opt_add_sub := 42;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
      rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
@@ -2719,15 +2744,6 @@ subst lb.
 rewrite IHla; cbn.
 rewrite rng_add_opp_l.
 now destruct (rng_eq_dec 0 0).
-Qed.
-
-Theorem poly_add_opp_l {α} {r : ring α} : ∀ p, (- p + p)%pol = 0%pol.
-Proof.
-intros p.
-unfold "+"%pol; cbn.
-apply eq_poly_eq; cbn.
-rewrite lap_add_norm_idemp_l.
-apply lap_add_opp_l.
 Qed.
 
 Theorem poly_add_opp_r {α} {r : ring α} : ∀ p, (p - p)%pol = 0%pol.
