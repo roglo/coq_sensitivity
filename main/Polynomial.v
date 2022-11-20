@@ -943,13 +943,19 @@ Definition polyn_opt_opp_or_sous :
 
 (* polyn quotient *)
 
-...
-
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match (@rngl_opt_inv_or_quot T ro) with
-  | Some _ => Some (inr polyn_quot)
-  | None => None
+  match bool_dec rngl_has_opp with
+  | left Hop =>
+      match bool_dec rngl_has_inv with
+     | left Hiv =>
+         match (@rngl_opt_inv_or_quot T ro) with
+         | Some _ => Some (inr (@polyn_quot Hop Hiv))
+         | None => None
+         end
+     | right _ => None
+     end
+  | right _ => None
   end.
 
 (* ring-like operators *)
@@ -1137,6 +1143,8 @@ destruct lc as [| c]. {
   rewrite all_0_rngl_summation_0. 2: {
     intros j Hj.
     rewrite Ha, rngl_mul_0_l; [ easy | ].
+    apply rngl_has_opp_or_sous_iff.
+...
     now apply rngl_has_opp_or_sous_iff; left.
   }
   cbn.
