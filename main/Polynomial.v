@@ -2447,6 +2447,14 @@ remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op; [ | easy ].
 intros; cbn.
 unfold polyn_opp.
+unfold lap_opp.
+apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm.
+rewrite lap_add_norm_idemp_l.
+destruct a as (a, Ha); cbn.
+rewrite fold_lap_norm.
+Search (lap_norm (_ + _)).
+...
 Set Printing All.
 ...
 Search (- _ + _ = 0)%F.
