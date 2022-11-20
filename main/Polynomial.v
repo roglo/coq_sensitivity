@@ -2130,7 +2130,7 @@ induction k; intros. {
 }
 Qed.
 
-Theorem lap_convol_mul_lap_add : ∀ la lb lc i len,
+Theorem lap_convol_mul_lap_add_r : ∀ la lb lc i len,
   lap_convol_mul la (lb + lc)%lap i len = lap_convol_mul_add la lb lc i len.
 Proof.
 intros la lb lc i len.
@@ -2198,7 +2198,7 @@ rewrite Nat.add_comm.
 rewrite lap_add_comm.
 rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
 symmetry.
-rewrite lap_convol_mul_lap_add.
+rewrite lap_convol_mul_lap_add_r.
 now rewrite lap_add_lap_convol_mul.
 Qed.
 
@@ -2346,21 +2346,37 @@ rewrite lap_convol_mul_more with (n := (lac + lbc)%nat). 2: {
 rewrite <- Heqlabc.
 symmetry.
 rewrite Heqlab.
-...
 rewrite <- lap_add_norm_idemp_l.
-rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
+rewrite lap_convol_mul_more with (n := (labc + lbc)%nat); [ | now subst lac ].
 rewrite <- Heqlab.
 rewrite lap_add_norm_idemp_l.
 rewrite lap_add_comm.
 rewrite <- lap_add_norm_idemp_l.
-rewrite Heqlac.
-rewrite lap_convol_mul_more with (n := (labc + lab)%nat); [ | flia ].
+rewrite Heqlbc.
+rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
 rewrite lap_add_norm_idemp_l.
-rewrite <- Heqlac.
+rewrite <- Heqlbc.
 rewrite Nat.add_comm.
 rewrite lap_add_comm.
 rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
 symmetry.
+...
+Check lap_convol_mul_lap_add_r.
+Check lap_add_lap_convol_mul.
+rewrite lap_add_lap_convol_mul.
+Theorem lap_convol_mul_lap_add_l : ∀ la lb lc i len,
+  lap_convol_mul (lb + lc)%lap la i len = lap_convol_mul_add la lb lc i len.
+Proof.
+intros la lb lc i len.
+revert la lb lc i.
+induction len; intros; [ reflexivity | simpl ].
+rewrite IHlen; f_equal.
+apply rngl_summation_eq_compat; intros j (_, Hj).
+f_equal.
+now rewrite list_nth_add.
+Qed.
+
+...
 rewrite lap_convol_mul_lap_add.
 now rewrite lap_add_lap_convol_mul.
 Qed.
