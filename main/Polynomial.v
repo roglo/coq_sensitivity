@@ -2440,6 +2440,43 @@ Qed.
    no opposite *)
 
 Theorem polyn_opt_add_opp_l :
+  match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
+  | true =>
+      forall a : @polyn T ro,
+      @eq (@polyn T ro)
+        (@rngl_add (@polyn T ro) polyn_ring_like_op (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
+        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
+  | false => not_applicable
+  end.
+Proof.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+destruct op; [ | easy ].
+intros; cbn.
+apply eq_polyn_eq; cbn.
+destruct a as (la, Ha); cbn.
+...
+Set Printing All.
+unfold polyn_ring_like_op.
+cbn.
+...
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+rewrite IHla. {
+  rewrite rngl_add_opp_l. {
+    now cbn; rewrite rngl_eqb_refl.
+  }
+move Hop at bottom.
+cbn in Hop.
+unfold rngl_has_opp in Hop |-*.
+unfold rngl_has_opp_or_sous in Hos.
+remember rngl_opt_opp_or_sous as x eqn:Hx.
+symmetry in Hx.
+unfold bool_of_option in Hos.
+clear IHla.
+exfalso.
+...
+(*
+Theorem polyn_opt_add_opp_l :
   if rngl_has_opp then ∀ a : polyn T, (- a + a)%pol = 0%pol
   else not_applicable.
 Proof.
@@ -2451,9 +2488,23 @@ unfold lap_opp.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
 rewrite lap_add_norm_idemp_l.
-destruct a as (a, Ha); cbn.
-rewrite fold_lap_norm.
-Search (lap_norm (_ + _)).
+destruct a as (la, Ha); cbn.
+rewrite <- rev_involutive; f_equal; cbn.
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+rewrite IHla. {
+  rewrite rngl_add_opp_l. {
+    now cbn; rewrite rngl_eqb_refl.
+  }
+move Hop at bottom.
+cbn in Hop.
+unfold rngl_has_opp in Hop |-*.
+unfold rngl_has_opp_or_sous in Hos.
+remember rngl_opt_opp_or_sous as x eqn:Hx.
+symmetry in Hx.
+unfold bool_of_option in Hos.
+clear IHla.
+exfalso.
 ...
 Set Printing All.
 ...
@@ -2491,6 +2542,7 @@ apply lap_add_opp_l.
 Qed.
 *)
 
+Set Printing All.
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2509,7 +2561,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_comm := polyn_opt_mul_comm;
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := polyn_opt_add_opp_l;
+     rngl_opt_add_opp_l := 42;
      rngl_opt_add_sub := 42;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
