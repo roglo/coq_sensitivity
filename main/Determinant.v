@@ -426,8 +426,7 @@ cbn - [ canon_sym_gr_list fact nth ].
 clear IHn.
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi.
-  rewrite rngl_mul_summation_distr_l; [ | easy ].
-  easy.
+  now rewrite rngl_mul_summation_distr_l.
 }
 cbn - [ canon_sym_gr_list fact nth ].
 rewrite (rngl_summation_shift 1); [ | flia ].
@@ -799,8 +798,8 @@ erewrite rngl_summation_eq_compat. 2: {
 }
 cbn - [ mat_el ].
 (* put a and b inside the sigma in the rhs *)
-rewrite rngl_mul_summation_distr_l; [ | easy ].
-rewrite rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_summation_distr_l.
+rewrite rngl_mul_summation_distr_l.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
@@ -1362,7 +1361,7 @@ erewrite rngl_summation_eq_compat. 2: {
   flia Hp Hq Hpq.
 }
 cbn - [ f ].
-rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+rewrite <- rngl_mul_summation_distr_l.
 rewrite rngl_mul_opp_l; [ | now destruct Hif ].
 f_equal.
 rewrite rngl_mul_1_l.
@@ -2417,7 +2416,7 @@ rewrite rngl_mul_1_l.
 rewrite all_0_rngl_summation_0. 2: {
   intros i Hi.
   rewrite mat_el_mI_ndiag; [ | easy | flia Hi | flia Hi ].
-  rewrite rngl_mul_0_r; [ | easy ].
+  rewrite rngl_mul_0_r.
   now apply rngl_mul_0_l.
 }
 rewrite rngl_add_0_r.

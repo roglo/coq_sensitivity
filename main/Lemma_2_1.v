@@ -85,7 +85,7 @@ intros Hld Hop Hor *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
-rewrite <- (rngl_mul_0_r Hos 0).
+rewrite <- (rngl_mul_0_r 0).
 destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
@@ -190,7 +190,7 @@ f_equal. {
   rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     now apply rngl_mul_0_l.
   }
   symmetry.
@@ -204,7 +204,7 @@ f_equal. {
   rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     now apply rngl_mul_0_l.
   }
   symmetry.
@@ -240,10 +240,10 @@ rewrite <- mat_mul_scal_vect_comm; [ | easy | easy | | ]; cycle 1. {
 } {
   now rewrite square_matrix_ncols.
 }
-rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
-rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
-rewrite vect_scal_mul_dot_mul_comm; [ | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
+rewrite vect_scal_mul_dot_mul_comm.
+rewrite vect_scal_mul_dot_mul_comm.
 do 2 rewrite rngl_mul_assoc.
 unfold rngl_div.
 rewrite Hin.
@@ -286,7 +286,7 @@ specialize (Hiq (or_introl Hin)).
 move Hiq before Hin.
 unfold Rayleigh_quotient.
 rewrite Hmv.
-rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
+rewrite vect_dot_mul_scal_mul_comm; [ | easy ].
 apply rngl_mul_div; [ easy | ].
 intros H.
 now apply eq_vect_squ_0 in H.
@@ -442,7 +442,7 @@ erewrite rngl_summation_eq_compat. 2: {
     cbn; apply nth_In; flia Hi Hrz.
   }
   cbn; rewrite Hur, Nat.min_id.
-  rewrite rngl_mul_summation_distr_r; [ | easy ].
+  rewrite rngl_mul_summation_distr_r.
   easy.
 }
 cbn.
@@ -459,7 +459,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn.
-rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+rewrite <- rngl_mul_summation_distr_l.
 f_equal.
 rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hi Hrz ].
 rewrite vect_dot_mul_dot_mul'; [ | easy ].
@@ -658,8 +658,8 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   specialize (Hvv j _ vj Hj eq_refl Hvj) as H2.
   rewrite H2 in H1.
   clear H2.
-  rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
-  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
+  rewrite vect_scal_mul_dot_mul_comm in H1.
+  rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy ].
   remember (rngl_eqb (≺ vi, vj ≻) 0%F) as vvij eqn:Hvvij.
   symmetry in Hvvij.
   destruct vvij; [ now apply rngl_eqb_eq | ].
@@ -1008,7 +1008,7 @@ assert (Hdu : det U ≠ 0%F). {
   rewrite (determinant_transpose Hif) in Huu; [ | easy ].
   rewrite det_mI in Huu; [ | easy ].
   intros H; rewrite H in Huu.
-  rewrite rngl_mul_0_r in Huu; [ | easy ].
+  rewrite rngl_mul_0_r in Huu.
   symmetry in Huu; revert Huu.
   apply rngl_1_neq_0; now destruct Hif.
 }

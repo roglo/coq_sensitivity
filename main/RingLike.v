@@ -238,6 +238,13 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         if rngl_mul_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
       else not_applicable;
+    (* when has neither opposite nor subtraction *)
+    rngl_opt_absorbing_l :
+      if rngl_has_opp_or_sous then not_applicable
+      else ∀ a, (0 * a = 0)%F;
+    rngl_opt_absorbing_r :
+      if (rngl_has_opp_or_sous || rngl_mul_is_comm)%bool then not_applicable
+      else ∀ a, (a * 0 = 0)%F;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
       if rngl_has_inv then ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F
@@ -773,24 +780,39 @@ eapply rngl_sub_compat_l with (c := c) in Habc.
 now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
-Theorem rngl_mul_0_r :
-  rngl_has_opp_or_sous = true →
-  ∀ a, (a * 0 = 0)%F.
+Theorem rngl_mul_0_l : ∀ a, (0 * a = 0)%F.
 Proof.
-intros Hom *.
-apply (rngl_add_cancel_r Hom _ _ (a * 1)%F).
-rewrite <- rngl_mul_add_distr_l.
-now do 2 rewrite rngl_add_0_l.
+intros.
+remember rngl_has_opp_or_sous as os eqn:Hos.
+symmetry in Hos.
+destruct os. {
+  apply (rngl_add_cancel_r Hos _ _ (1 * a)%F).
+  rewrite <- rngl_mul_add_distr_r.
+  now do 2 rewrite rngl_add_0_l.
+} {
+  specialize rngl_opt_absorbing_l as H1.
+  now rewrite Hos in H1.
+}
 Qed.
 
-Theorem rngl_mul_0_l :
-  rngl_has_opp_or_sous = true →
-  ∀ a, (0 * a = 0)%F.
+Theorem rngl_mul_0_r : ∀ a, (a * 0 = 0)%F.
 Proof.
-intros Hom a.
-apply (rngl_add_cancel_r Hom _ _ (1 * a)%F).
-rewrite <- rngl_mul_add_distr_r.
-now do 2 rewrite rngl_add_0_l.
+intros *.
+remember rngl_has_opp_or_sous as os eqn:Hos.
+symmetry in Hos.
+destruct os. {
+  apply (rngl_add_cancel_r Hos _ _ (a * 1)%F).
+  rewrite <- rngl_mul_add_distr_l.
+  now do 2 rewrite rngl_add_0_l.
+} {
+  specialize rngl_opt_absorbing_r as H1.
+  rewrite Hos in H1; cbn in H1.
+  remember rngl_mul_is_comm as ic eqn:Hic.
+  symmetry in Hic.
+  destruct ic; [ | easy ].
+  rewrite (rngl_mul_comm Hic).
+  apply rngl_mul_0_l.
+}
 Qed.
 
 Theorem rngl_add_move_0_r :
@@ -818,7 +840,7 @@ intros Hro *.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
-rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
+rewrite rngl_mul_0_r in H.
 symmetry in H.
 rewrite rngl_add_comm in H.
 now apply rngl_add_move_0_r in H.
@@ -918,7 +940,7 @@ destruct iv. {
   assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
-  rewrite rngl_mul_0_r in H; [ | easy ].
+  rewrite rngl_mul_0_r in H.
   remember (rngl_eqb a 0%F) as az eqn:Haz; symmetry in Haz.
   destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
   apply (rngl_eqb_neq Hde) in Haz.
@@ -1152,15 +1174,14 @@ now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
 Theorem rngl_inv_neq_0 :
-  rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_has_1_neq_0 = true →
   ∀ a, a ≠ 0%F → (a⁻¹ ≠ 0)%F.
 Proof.
-intros Hom Hin H10 * Haz H1.
+intros Hin H10 * Haz H1.
 symmetry in H1.
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
-rewrite rngl_mul_0_l in H1; [ | easy ].
+rewrite rngl_mul_0_l in H1.
 symmetry in H1; revert H1.
 now apply rngl_1_neq_0.
 Qed.
@@ -1193,9 +1214,7 @@ Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
 rewrite rngl_add_opp_l in H; [ | easy ].
-rewrite rngl_mul_0_l in H. 2: {
-  now apply rngl_has_opp_or_sous_iff; left.
-}
+rewrite rngl_mul_0_l in H.
 symmetry in H.
 now apply rngl_add_move_0_r in H.
 Qed.
@@ -1569,8 +1588,8 @@ Arguments rngl_eq_dec {T ro rp} Heq (a b)%F.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%F.
-Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%F.
-Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%F.
+Arguments rngl_mul_0_l {T}%type {ro rp} a%F.
+Arguments rngl_mul_0_r {T}%type {ro rp} a%F.
 Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.

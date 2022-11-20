@@ -701,8 +701,8 @@ Arguments all_0_rngl_summation_list_0 {T}%type {ro rp} A%type l%list.
 Arguments rngl_summation_list_split_first {T}%type {ro rp} A%type l%list.
 Arguments rngl_mul_summation_list_distr_l {T ro rp}.
 Arguments rngl_mul_summation_list_distr_r {T ro rp}.
-Arguments rngl_mul_summation_distr_l {T ro rp} Hom a b e f.
-Arguments rngl_mul_summation_distr_r {T ro rp} Hom a b e f.
+Arguments rngl_mul_summation_distr_l {T ro rp} a b e f.
+Arguments rngl_mul_summation_distr_r {T ro rp} a b e f.
 Arguments rngl_opp_summation {T}%type {ro rp} Hop (b e)%nat.
 Arguments rngl_summation_add_distr {T}%type {ro rp} _ _ (b k)%nat.
 Arguments rngl_summation_change_var {T ro} A%type (b e)%nat.
@@ -717,7 +717,7 @@ Arguments rngl_summation_list_mul_summation_list {T ro rp}.
 Arguments rngl_summation_list_only_one {T}%type {ro rp} A%type.
 Arguments rngl_summation_list_permut {T ro rp} [A]%type _ _ (la lb)%list.
 Arguments rngl_summation_list_split {T}%type {ro rp} A%type l%list _ n%nat.
-Arguments rngl_summation_mul_summation {T}%type {ro rp} Hom (bi bj ei ej)%nat.
+Arguments rngl_summation_mul_summation {T}%type {ro rp} (bi bj ei ej)%nat.
 Arguments rngl_summation_only_one {T}%type {ro rp} g%function n%nat.
 Arguments rngl_summation_rtl {T}%type {ro rp} _ (b k)%nat.
 Arguments rngl_summation_shift {T}%type {ro} (s b)%nat _%function k%nat.

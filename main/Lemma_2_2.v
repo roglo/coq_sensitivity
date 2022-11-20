@@ -369,8 +369,7 @@ induction n; intros. {
   apply Nat.lt_1_r in Hi, Hk; subst i k; cbn.
   rewrite rngl_summation_only_one.
   rewrite Nat.sub_diag.
-  rewrite rngl_mul_0_l; [ | easy ].
-  now rewrite rngl_mul_0_l.
+  now do 2 rewrite rngl_mul_0_l.
 }
 rewrite (rngl_summation_split (2 ^ n)). 2: {
   split; [ flia | ].
@@ -589,7 +588,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   } {
     apply Nat.nlt_ge in Hkn.
     rewrite δ_ndiag; [ | flia Hin Hkn ].
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       assert (Hj' : j - 1 ≤ 2 ^ S n - 1) by flia Hj.
@@ -753,7 +752,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
   cbn - [ "^" ].
   destruct (lt_dec k (2 ^ n)) as [Hkn| Hkn]. {
     rewrite δ_ndiag; [ | flia Hin Hkn ].
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     erewrite rngl_summation_eq_compat. 2: {
       intros j Hj.
       rewrite app_nth1. 2: {
@@ -1604,7 +1603,7 @@ destruct n. {
     destruct μz; [ now apply rngl_eqb_eq | ].
     apply rngl_eqb_neq in Hμz; [ | easy ].
     apply (f_equal (rngl_mul (μ⁻¹)%F)) in Hμ.
-    rewrite rngl_mul_0_r in Hμ; [ | easy ].
+    rewrite rngl_mul_0_r in Hμ.
     rewrite rngl_mul_assoc in Hμ.
     rewrite rngl_mul_inv_l in Hμ; [ | easy | easy ].
     now rewrite rngl_mul_1_l in Hμ.

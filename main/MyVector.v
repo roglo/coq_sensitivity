@@ -195,14 +195,13 @@ Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
 Proof. now intros; cbn; rewrite map_length. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
-  rngl_has_opp_or_sous = true →
   rngl_mul_is_comm = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
-intros Hom Hic *.
+intros Hic *.
 unfold vect_dot_mul.
-rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+rewrite rngl_mul_summation_list_distr_l.
 unfold "×"; cbn.
 unfold iter_list.
 rewrite map2_map_r.
@@ -217,13 +216,12 @@ now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
-  rngl_has_opp_or_sous = true →
   ∀ (a : T) (U V : vector T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%F.
 Proof.
-intros Hom *.
+intros.
 unfold vect_dot_mul; cbn.
-rewrite rngl_mul_summation_list_distr_l; [ | easy ].
+rewrite rngl_mul_summation_list_distr_l.
 unfold "×"; cbn.
 unfold iter_list.
 rewrite map2_map_l.
@@ -274,8 +272,8 @@ Arguments vect_zero {T ro} n%nat.
 Arguments vect_dot_mul {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul' {T}%type {ro} (U V)%V.
 Arguments vect_dot_mul_dot_mul' {T}%type {ro rp} Hop (U V)%V.
-Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hom Hic a%F (U V)%V.
-Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} Hom a%F (U V)%V.
+Arguments vect_dot_mul_scal_mul_comm {T}%type {ro rp} Hic a%F (U V)%V.
+Arguments vect_scal_mul_dot_mul_comm {T}%type {ro rp} a%F (U V)%V.
 Arguments vect_eq_dec {T}%type {ro rp} Hde U%V V%V.
 Arguments vect_el {T}%type {ro} V%V i%nat.
 Arguments vect_size {T}%type v%V.

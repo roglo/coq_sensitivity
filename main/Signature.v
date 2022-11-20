@@ -379,7 +379,7 @@ apply rngl_mul_cancel_r with (c := (b⁻¹)%F); [ easy | | ]. {
   apply (f_equal (rngl_mul b)) in Hbiz.
   rewrite fold_rngl_div in Hbiz; [ | easy ].
   rewrite rngl_div_diag in Hbiz; [ | easy | easy ].
-  rewrite rngl_mul_0_r in Hbiz; [ | easy ].
+  rewrite rngl_mul_0_r in Hbiz.
   now apply rngl_1_neq_0 in Hbiz.
 }
 remember (_ * _)%F as c.
@@ -1650,7 +1650,7 @@ rewrite product_product_if_permut; try easy. {
     now apply (NoDup_nat _ Hp1) in H.
   } {
     revert H.
-    apply rngl_inv_neq_0; [ easy | easy | easy | ].
+    apply rngl_inv_neq_0; [ easy | easy | ].
     intros H.
     apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | easy | easy ].
@@ -1857,12 +1857,12 @@ remember (a ?= b) as b1 eqn:Hb1; symmetry in Hb1.
 remember (c ?= d) as b2 eqn:Hb2; symmetry in Hb2.
 move b2 before b1.
 destruct b1. {
-  rewrite rngl_mul_0_l; [ | easy ].
+  rewrite rngl_mul_0_l.
   apply Nat.compare_eq_iff in Hb1; subst b.
   now rewrite Nat.add_comm, Nat.compare_refl.
 } {
   destruct b2. {
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     apply Nat.compare_eq_iff in Hb2; subst d.
     now rewrite Nat.compare_refl.
   } {
@@ -1881,7 +1881,7 @@ destruct b1. {
   }
 } {
   destruct b2. {
-    rewrite rngl_mul_0_r; [ | easy ].
+    rewrite rngl_mul_0_r.
     apply Nat.compare_eq_iff in Hb2; subst d.
     now rewrite Nat.compare_refl.
   } {
@@ -2592,10 +2592,10 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
   apply Nat.ltb_lt in Hlij; rewrite Hlij.
   rewrite Hij.
   rewrite sign_diff_id.
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
+  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_l.
+  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_l.
   easy.
 } {
   assert (H : j < i) by flia Heqj Hlij.
@@ -2610,10 +2610,10 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
   apply Nat.ltb_lt in Hlij; rewrite Hlij.
   rewrite Hij.
   rewrite sign_diff_id.
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
+  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_l.
+  rewrite rngl_mul_0_r.
+  rewrite rngl_mul_0_l.
   easy.
 }
 Qed.
