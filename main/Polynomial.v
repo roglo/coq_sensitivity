@@ -1142,9 +1142,9 @@ remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   rewrite all_0_rngl_summation_0. 2: {
     intros j Hj.
+...
     rewrite Ha, rngl_mul_0_l; [ easy | ].
     apply rngl_has_opp_or_sous_iff.
-...
     now apply rngl_has_opp_or_sous_iff; left.
   }
   cbn.
