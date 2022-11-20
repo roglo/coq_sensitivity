@@ -2443,7 +2443,7 @@ Qed.
    no opposite *)
 
 Theorem lap_add_opp_l :
-  @rngl_has_opp T ro = true
+  rngl_has_opp = true
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros Hop *.
@@ -2459,7 +2459,21 @@ rewrite (rngl_add_opp_l Hop).
 now rewrite rngl_eqb_refl.
 Qed.
 
-(*
+Theorem polyn_add_opp_l :
+  rngl_has_opp = true
+  → ∀ a : polyn T, (- a + a)%pol = 0%pol.
+Proof.
+intros Hop *.
+apply eq_polyn_eq.
+destruct a as (la, Ha); cbn.
+do 2 rewrite fold_lap_norm.
+rewrite lap_add_norm_idemp_l.
+now apply lap_add_opp_l.
+Qed.
+
+...
+
+(**)
 Theorem polyn_opt_add_opp_l :
   match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
   | true =>
