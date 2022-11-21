@@ -953,17 +953,20 @@ intros Hop *.
 split. {
   intros Hab.
   apply (rngl_add_compat_r _ _ b) in Hab.
+  specialize (rngl_add_opp_l Hop) as add_opp_l.
+  unfold rngl_opp in add_opp_l.
   unfold rngl_sub in Hab.
-...
-  rewrite Hop in Hab.
+  unfold rngl_has_opp in Hop.
+  destruct rngl_opt_opp; [ | easy ].
   rewrite <- rngl_add_assoc in Hab.
-  rewrite rngl_add_opp_l in Hab; [ | easy ].
+  rewrite add_opp_l in Hab.
   now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
 } {
   intros Hab.
   rewrite Hab.
   apply rngl_sub_diag.
-  now apply rngl_has_opp_or_sous_iff; left.
+  unfold rngl_has_opp_or_sous.
+  now rewrite Hop.
 }
 Qed.
 
@@ -1005,6 +1008,7 @@ transitivity (0 + - 0)%F. {
 }
 rewrite fold_rngl_sub; [ | easy ].
 apply rngl_sub_diag.
+...
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
