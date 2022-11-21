@@ -191,7 +191,10 @@ destruct (lt_dec i j) as [Hij| Hij]. {
     now apply Nat.le_0_r in Hij; subst j.
   }
   destruct j. {
-    unfold rngl_sub; rewrite Hop; cbn.
+    unfold rngl_sub.
+    unfold rngl_has_opp in Hop.
+    unfold rngl_opp.
+    destruct rngl_opt_opp as [opp| ]; [ cbn | easy ].
     now rewrite rngl_add_0_l.
   }
   cbn.
