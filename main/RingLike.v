@@ -664,26 +664,26 @@ symmetry in Hop.
 destruct op. {
   apply (f_equal (λ x, rngl_sub x a)) in Habc.
   do 2 rewrite (rngl_add_comm a) in Habc.
-  unfold rngl_sub in Habc.
-...
-  rewrite Hop in Habc.
+  specialize (rngl_sub_diag Hom a) as sub_diag.
+  unfold rngl_sub in Habc, sub_diag.
+  unfold rngl_has_opp, bool_of_option in Hop.
+  destruct rngl_opt_opp; [ | easy ].
   do 2 rewrite <- rngl_add_assoc in Habc.
-  rewrite fold_rngl_sub in Habc; [ | easy ].
-  rewrite rngl_sub_diag in Habc; [ | easy ].
+  rewrite sub_diag in Habc.
   now do 2 rewrite rngl_add_0_r in Habc.
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_add_sub as H1.
-  rewrite Hmo in H1.
-  specialize (H1 c a) as H2.
-  rewrite rngl_add_comm, <- Habc in H2.
-  rewrite rngl_add_comm in H2.
-  now rewrite H1 in H2.
+  specialize rngl_opt_add_sub as rngl_add_sub.
+  rewrite Hmo in rngl_add_sub.
+  specialize (rngl_add_sub c a) as H1.
+  rewrite rngl_add_comm, <- Habc in H1.
+  rewrite rngl_add_comm in H1.
+  now rewrite rngl_add_sub in H1.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
-destruct Hom; congruence.
+unfold rngl_has_opp_or_sous in Hom.
+now rewrite Hop, Hmo in Hom.
 Qed.
 
 Theorem rngl_mul_cancel_l :
@@ -789,6 +789,7 @@ Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
+...
   rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
   unfold rngl_sub in H.
   rewrite Hro in H.
