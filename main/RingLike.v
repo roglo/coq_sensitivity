@@ -1549,8 +1549,9 @@ Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%F.
 Proof.
 intros.
 unfold rngl_sub.
-...
-now rewrite Hop.
+unfold rngl_has_opp in Hop.
+unfold rngl_opp.
+now destruct rngl_opt_opp.
 Qed.
 
 Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%F = 0%F.
