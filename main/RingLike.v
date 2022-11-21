@@ -1340,7 +1340,11 @@ intros Hos *.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-  unfold rngl_sub.
+  specialize (rngl_opp_add_distr Hop) as opp_add_distr.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_sub, rngl_opp in opp_add_distr |-*.
+  destruct rngl_opt_opp as [opp| ]; [ | easy ].
+  rewrite opp_add_distr.
 ...
   rewrite rngl_opp_add_distr; [ | easy ].
   unfold rngl_sub; rewrite Hop.
