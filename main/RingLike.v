@@ -1055,20 +1055,20 @@ Theorem rngl_opp_add_distr :
   ∀ a b, (- (a + b) = - b - a)%F.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
-rewrite Hop in Hop'.
-apply rngl_add_cancel_l with (a := (a + b)%F); [ now apply Hop'; left | ].
+specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hop'.
+specialize (rngl_sub_diag Hop') as sub_diag.
+apply (rngl_add_cancel_l Hop') with (a := (a + b)%F).
 rewrite (fold_rngl_sub Hop).
-rewrite rngl_sub_diag; [ | now apply Hop'; left ].
-unfold rngl_sub.
-...
-rewrite Hop.
+rewrite (rngl_sub_diag Hop').
+generalize Hop; intros Hop2.
+unfold rngl_sub in sub_diag |-*.
+unfold rngl_has_opp in Hop.
+destruct rngl_opt_opp; [ | easy ].
 rewrite rngl_add_assoc.
-do 2 rewrite (fold_rngl_sub Hop).
-rewrite rngl_add_sub; [ | now apply Hop'; left ].
+rewrite (fold_rngl_sub Hop2).
+rewrite rngl_add_sub; [ | easy ].
 symmetry.
-apply rngl_sub_diag.
-now apply Hop'; left.
+apply sub_diag.
 Qed.
 
 Theorem rngl_add_sub_simpl_l :
@@ -1079,6 +1079,7 @@ intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
+...
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_opp_add_distr; [ | easy ].
   unfold rngl_sub; rewrite Hop.
