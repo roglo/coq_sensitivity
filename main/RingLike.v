@@ -1079,17 +1079,17 @@ intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
-...
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub; rewrite Hop.
+  specialize (rngl_opp_add_distr Hop) as opp_add_distr.
+  specialize (rngl_sub_diag Hom) as sub_diag.
+  unfold rngl_sub in opp_add_distr, sub_diag |-*.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_opp in opp_add_distr.
+  destruct rngl_opt_opp as [opp| ]; [ | easy ].
+  rewrite opp_add_distr.
   rewrite rngl_add_assoc.
   rewrite rngl_add_add_swap.
   rewrite (rngl_add_add_swap a).
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite fold_rngl_sub; [ | easy ].
-  rewrite rngl_sub_diag, rngl_add_0_l; [ easy | easy ].
+  now rewrite sub_diag, rngl_add_0_l.
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
@@ -1323,6 +1323,7 @@ Theorem rngl_opp_sub_distr :
 Proof.
 intros Hro *.
 unfold rngl_sub at 1.
+...
 rewrite Hro.
 rewrite rngl_opp_add_distr; [ | easy ].
 now rewrite rngl_opp_involutive.
