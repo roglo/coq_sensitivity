@@ -1475,10 +1475,11 @@ Proof.
 intros Hos *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
-...
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_mul_add_distr_r.
-  now rewrite rngl_mul_opp_l.
+  specialize (rngl_mul_opp_l Hop) as mul_opp_l.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_sub, rngl_opp in mul_opp_l |-*.
+  destruct rngl_opt_opp as [opp| ]; [ | easy ].
+  now rewrite rngl_mul_add_distr_r, mul_opp_l.
 }
 remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
@@ -1548,6 +1549,7 @@ Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%F.
 Proof.
 intros.
 unfold rngl_sub.
+...
 now rewrite Hop.
 Qed.
 
