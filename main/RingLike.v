@@ -789,10 +789,15 @@ Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
-...
-  rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
+  rewrite rngl_add_sub in H. 2: {
+    unfold rngl_has_opp_or_sous.
+    now rewrite Hro.
+  }
   unfold rngl_sub in H.
-  rewrite Hro in H.
+  unfold rngl_opp.
+  unfold rngl_has_opp in Hro.
+  specialize rngl_add_0_l as add_0_l.
+  destruct rngl_opt_opp; [ | easy ].
   now rewrite rngl_add_0_l in H.
 } {
   rewrite H.
@@ -807,6 +812,7 @@ Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
+...
 rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
 rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
 symmetry in H.
