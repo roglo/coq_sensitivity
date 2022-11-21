@@ -1031,11 +1031,12 @@ intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
+  specialize (rngl_opp_0 Hop) as opp_0.
   unfold rngl_sub.
-...
-  rewrite Hop.
-  rewrite rngl_opp_0; [ | easy ].
-  apply rngl_add_0_r.
+  unfold rngl_opp in opp_0.
+  unfold rngl_has_opp in Hop.
+  destruct rngl_opt_opp; [ | easy ].
+  now rewrite opp_0, rngl_add_0_r.
 }
 remember rngl_has_sous as mo eqn:Hmo.
 symmetry in Hmo.
@@ -1060,6 +1061,7 @@ apply rngl_add_cancel_l with (a := (a + b)%F); [ now apply Hop'; left | ].
 rewrite (fold_rngl_sub Hop).
 rewrite rngl_sub_diag; [ | now apply Hop'; left ].
 unfold rngl_sub.
+...
 rewrite Hop.
 rewrite rngl_add_assoc.
 do 2 rewrite (fold_rngl_sub Hop).
