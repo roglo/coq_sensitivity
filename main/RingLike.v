@@ -830,18 +830,21 @@ Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
-...
-  unfold rngl_sub; rewrite Hop.
+  specialize (rngl_mul_opp_r Hop) as mul_opp_r.
+  unfold rngl_has_opp in Hop.
+  unfold rngl_sub.
+  unfold rngl_opp in mul_opp_r.
+  destruct rngl_opt_opp; [ | easy ].
   rewrite rngl_mul_add_distr_l.
-  now rewrite rngl_mul_opp_r.
+  now rewrite mul_opp_r.
 }
 remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_mul_sub_distr_l as H1.
   now rewrite Hmo in H1.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
-destruct Hom; congruence.
+unfold rngl_has_opp_or_sous in Hom.
+now rewrite Hop, Hmo in Hom.
 Qed.
 
 Theorem rngl_div_mul :
@@ -951,6 +954,7 @@ split. {
   intros Hab.
   apply (rngl_add_compat_r _ _ b) in Hab.
   unfold rngl_sub in Hab.
+...
   rewrite Hop in Hab.
   rewrite <- rngl_add_assoc in Hab.
   rewrite rngl_add_opp_l in Hab; [ | easy ].
