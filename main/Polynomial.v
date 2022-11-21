@@ -2443,7 +2443,7 @@ Qed.
    no opposite *)
 
 Theorem lap_add_opp_l :
-  @rngl_has_opp (polyn T) polyn_ring_like_op = true
+  rngl_has_opp = true
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros Hop *.
@@ -2455,29 +2455,8 @@ rewrite strip_0s_app.
 remember (strip_0s _) as lb eqn:Hlb; symmetry in Hlb.
 subst lb.
 rewrite IHla; cbn.
-rewrite rngl_add_opp_l. 2: {
-unfold polyn_ring_like_op in Hop.
-Print polyn_ring_like_op.
-unfold polyn_opt_inv_or_quot in Hop.
-cbn in Hop.
-rewrite Hos in Hop.
-cbn in Hop.
-Print polyn_ring_like_op.
-Print polyn_opt_opp_or_sous.
-...
-Require Import ZArith.
-Check Z.add_opp_diag_l.
-...
-  move Hop at bottom.
-  unfold rngl_has_opp in Hop |-*.
-  unfold rngl_has_opp_or_sous in Hos.
-  destruct rngl_opt_opp_or_sous.
-Set Printing All.
-unfold polyn_ring_like_op in Hop.
-cbn in Hop.
-...
-rewrite (rngl_add_opp_l Hop).
-now rewrite rngl_eqb_refl.
+rewrite rngl_add_opp_l; [ | easy ].
+now rewrite (rngl_eqb_refl Heb).
 Qed.
 
 Theorem polyn_add_opp_l :
@@ -2493,15 +2472,31 @@ now apply lap_add_opp_l.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
-  if rngl_has_opp then ∀ a : polyn T, (- a + a)%pol = 0%pol
-  else not_applicable.
+  match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
+  | true =>
+      forall a : @polyn T ro,
+      @eq (@polyn T ro)
+        (@rngl_add (@polyn T ro) polyn_ring_like_op
+           (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
+        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
+  | false => not_applicable
+  end.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op; [ now apply polyn_add_opp_l | easy ].
-Qed.
-
-Print rngl_has_opp.
-
+intros; cbn.
+destruct op; [ | easy ].
+unfold rngl_opp; cbn.
+unfold rngl_has_opp in Hop; cbn in Hop.
+remember polyn_opt_opp_or_sous as os eqn:Hpos; symmetry in Hpos.
+destruct os as [os| ]; [ | easy ].
+destruct os; [ | easy ].
+unfold polyn_opt_opp_or_sous in Hpos.
+unfold rngl_has_opp_or_sous in Hos.
+destruct rngl_opt_opp_or_sous as [os| ]; [ | easy ].
+destruct os; [ | easy ].
+injection Hpos; clear Hpos; intros; subst p.
+apply polyn_add_opp_l.
+unfold rngl_has_opp.
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
