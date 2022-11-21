@@ -1344,11 +1344,7 @@ destruct op. {
   unfold rngl_has_opp in Hop.
   unfold rngl_sub, rngl_opp in opp_add_distr |-*.
   destruct rngl_opt_opp as [opp| ]; [ | easy ].
-  rewrite opp_add_distr.
-...
-  rewrite rngl_opp_add_distr; [ | easy ].
-  unfold rngl_sub; rewrite Hop.
-  rewrite rngl_add_assoc.
+  rewrite opp_add_distr, rngl_add_assoc.
   apply rngl_add_add_swap.
 }
 remember rngl_has_sous as mo eqn:Hmo.
@@ -1358,7 +1354,7 @@ destruct mo. {
   now rewrite Hmo in H1.
 }
 apply rngl_has_opp_or_sous_iff in Hos.
-now destruct Hos; congruence.
+destruct Hos; congruence.
 Qed.
 
 Theorem rngl_sub_sub_distr :
@@ -1367,6 +1363,7 @@ Theorem rngl_sub_sub_distr :
 Proof.
 intros Hop *.
 unfold rngl_sub.
+...
 rewrite Hop.
 rewrite rngl_opp_add_distr; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
