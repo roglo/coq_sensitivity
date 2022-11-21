@@ -812,9 +812,12 @@ Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
-...
-rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
-rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
+rewrite rngl_sub_diag in H. 2: {
+  now unfold rngl_has_opp_or_sous; rewrite Hro.
+}
+rewrite rngl_mul_0_r in H. 2: {
+  now unfold rngl_has_opp_or_sous; rewrite Hro.
+}
 symmetry in H.
 rewrite rngl_add_comm in H.
 now apply rngl_add_move_0_r in H.
@@ -827,6 +830,7 @@ Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
+...
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_mul_add_distr_l.
   now rewrite rngl_mul_opp_r.
