@@ -129,6 +129,18 @@ Definition rngl_div {T} {R : ring_like_op T} a b :=
   else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
 
+Theorem rngl_has_opp_or_sous_iff {T} {R : ring_like_op T} :
+  rngl_has_opp_or_sous = true
+  ↔ rngl_has_opp = true ∨ rngl_has_sous = true.
+Proof.
+unfold rngl_has_opp_or_sous.
+destruct rngl_has_opp; cbn. {
+  split; intros H; [ now left | easy ].
+} {
+  split; intros H; [ now right | now destruct H ].
+}
+Qed.
+
 Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
   rngl_has_inv_or_quot = true
   ↔ rngl_has_inv = true ∨ rngl_has_quot = true.
@@ -1008,7 +1020,6 @@ transitivity (0 + - 0)%F. {
 }
 rewrite fold_rngl_sub; [ | easy ].
 apply rngl_sub_diag.
-...
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
@@ -1021,6 +1032,7 @@ remember rngl_has_opp as op eqn:Hop.
 symmetry in Hop.
 destruct op. {
   unfold rngl_sub.
+...
   rewrite Hop.
   rewrite rngl_opp_0; [ | easy ].
   apply rngl_add_0_r.
