@@ -1362,12 +1362,13 @@ Theorem rngl_sub_sub_distr :
   ∀ a b c, (a - (b - c) = a - b + c)%F.
 Proof.
 intros Hop *.
+specialize (rngl_opp_add_distr Hop) as opp_add_distr.
+specialize (rngl_opp_involutive Hop) as opp_involutive.
+unfold rngl_has_opp in Hop.
+unfold rngl_opp, rngl_sub in opp_add_distr, opp_involutive |-*.
 unfold rngl_sub.
-...
-rewrite Hop.
-rewrite rngl_opp_add_distr; [ | easy ].
-rewrite rngl_opp_involutive; [ | easy ].
-unfold rngl_sub; rewrite Hop.
+destruct rngl_opt_opp as [opp| ]; [ | easy ].
+rewrite opp_add_distr, opp_involutive.
 rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
 Qed.
@@ -1474,6 +1475,7 @@ Proof.
 intros Hos *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 destruct op. {
+...
   unfold rngl_sub; rewrite Hop.
   rewrite rngl_mul_add_distr_r.
   now rewrite rngl_mul_opp_l.
