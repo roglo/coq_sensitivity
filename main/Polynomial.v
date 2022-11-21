@@ -2456,13 +2456,17 @@ remember (strip_0s _) as lb eqn:Hlb; symmetry in Hlb.
 subst lb.
 rewrite IHla; cbn.
 rewrite rngl_add_opp_l. 2: {
-Set Printing All.
 unfold polyn_ring_like_op in Hop.
 Print polyn_ring_like_op.
 unfold polyn_opt_inv_or_quot in Hop.
 cbn in Hop.
 rewrite Hos in Hop.
 cbn in Hop.
+Print polyn_ring_like_op.
+Print polyn_opt_opp_or_sous.
+...
+Require Import ZArith.
+Check Z.add_opp_diag_l.
 ...
   move Hop at bottom.
   unfold rngl_has_opp in Hop |-*.
