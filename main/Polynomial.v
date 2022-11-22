@@ -922,17 +922,18 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
 
 End b.
 
-(* polyn opposite or subtraction *)
+(* polyn opposite *)
 
-...
-
-Definition polyn_opt_opp_or_sous :
-  option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match (@rngl_opt_opp_or_sous T ro) with
-  | Some (inl _) => Some (inl polyn_opp)
-  | Some (inr _) => None
+Definition polyn_opt_opp : option (polyn T → polyn T) :=
+  match (@rngl_opt_opp T ro) with
+  | Some _ => Some (polyn_opp)
   | None => None
   end.
+
+(* polyn subtraction *)
+
+Definition polyn_opt_sous : option (polyn T → polyn T → polyn T) :=
+  None. (* perhaps improvable? *)
 
 (* polyn quotient *)
 
@@ -958,7 +959,8 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_one := polyn_one;
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
-     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
+     rngl_opt_opp := polyn_opt_opp;
+     rngl_opt_sous := polyn_opt_sous;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
      rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
      rngl_opt_le := None |}.
@@ -2486,6 +2488,7 @@ intros; cbn.
 destruct op; [ | easy ].
 unfold rngl_opp; cbn.
 unfold rngl_has_opp in Hop; cbn in Hop.
+...
 remember polyn_opt_opp_or_sous as os eqn:Hpos; symmetry in Hpos.
 destruct os as [os| ]; [ | easy ].
 destruct os; [ | easy ].
