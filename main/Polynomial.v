@@ -2492,39 +2492,21 @@ Qed.
 Theorem polyn_opt_add_sub :
   if rngl_has_sous then ∀ a b : polyn T, (a + b - b)%F = a else not_applicable.
 Proof.
-remember rngl_has_sous as so eqn:Hso; symmetry in Hso.
-intros.
-destruct so; [ | easy ].
-intros a b; cbn.
-unfold rngl_sub; cbn.
-remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-destruct op. {
-  rewrite <- polyn_add_assoc.
-  rewrite (polyn_add_comm b).
-  specialize (polyn_opt_add_opp_l) as H1.
-  rewrite Hop in H1.
-  rewrite H1.
-  rewrite polyn_add_comm.
-  apply polyn_add_0_l.
-}
-rewrite Hso.
-unfold rngl_sous.
-unfold rngl_has_sous in Hso.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
-destruct opp as [| opp]; [ easy | ].
-...
-Search (- (_ + _))%pol.
-specialize
-...
+unfold rngl_has_sous; cbn.
 unfold polyn_opt_opp_or_sous.
-specialize polyn_add_opp_l as add_opp_l.
-unfold rngl_has_opp in Hop, add_opp_l.
-cbn in Hop, add_opp_l.
-unfold polyn_opt_opp_or_sous in Hop, add_opp_l.
 destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
-destruct opp as [opp| ]; [ | easy ].
-now apply add_opp_l.
-...
+now destruct opp.
+Qed.
+
+Theorem polyn_opt_sub_sub_sub_add :
+  if rngl_has_sous then ∀ a b c : polyn T, (a - b - c)%F = (a - (b + c))%F
+  else not_applicable.
+Proof.
+unfold rngl_has_sous; cbn.
+unfold polyn_opt_opp_or_sous.
+destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2546,8 +2528,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
      rngl_opt_add_sub := polyn_opt_add_sub;
-     rngl_opt_sub_sub_sub_add := 42;
-     rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
+     rngl_opt_sub_sub_sub_add := polyn_opt_sub_sub_sub_add;
+     rngl_opt_mul_sub_distr_l := 42;
      rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
      rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
