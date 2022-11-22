@@ -2489,18 +2489,8 @@ Qed.
 
 (* *)
 
-Theorem polyn_opt_add_sub :
-  if rngl_has_sous then ∀ a b : polyn T, (a + b - b)%F = a else not_applicable.
-Proof.
-unfold rngl_has_sous; cbn.
-unfold polyn_opt_opp_or_sous.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
-now destruct opp.
-Qed.
-
-Theorem polyn_opt_sub_sub_sub_add :
-  if rngl_has_sous then ∀ a b c : polyn T, (a - b - c)%F = (a - (b + c))%F
-  else not_applicable.
+Theorem polyn_opt_has_no_sous : ∀ P,
+  if rngl_has_sous then P else not_applicable.
 Proof.
 unfold rngl_has_sous; cbn.
 unfold polyn_opt_opp_or_sous.
@@ -2527,11 +2517,11 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-     rngl_opt_add_sub := polyn_opt_add_sub;
-     rngl_opt_sub_sub_sub_add := polyn_opt_sub_sub_sub_add;
-     rngl_opt_mul_sub_distr_l := 42;
-     rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
-     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_add_sub := polyn_opt_has_no_sous _;
+     rngl_opt_sub_sub_sub_add := polyn_opt_has_no_sous _;
+     rngl_opt_mul_sub_distr_l := polyn_opt_has_no_sous _;
+     rngl_opt_mul_sub_distr_r := polyn_opt_has_no_sous _;
+     rngl_opt_mul_inv_l := 42;
      rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
