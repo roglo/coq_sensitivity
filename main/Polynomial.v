@@ -466,10 +466,7 @@ destruct hop. {
 }
 unfold rngl_opp.
 unfold rngl_has_opp in Hop.
-remember rngl_opt_opp_or_sous as os eqn:Hoos; symmetry in Hoos.
-destruct os as [os| ]. {
-  destruct os as [os| os]; [ easy | apply rngl_add_0_r ].
-}
+destruct rngl_opt_opp; [ easy | ].
 apply rngl_add_0_r.
 Qed.
 
@@ -926,6 +923,8 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
 End b.
 
 (* polyn opposite or subtraction *)
+
+...
 
 Definition polyn_opt_opp_or_sous :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
