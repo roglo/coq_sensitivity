@@ -2539,19 +2539,37 @@ destruct iv as [inv| ]; [ | easy ].
 intros a b Hbz.
 unfold rngl_div; cbn.
 unfold rngl_has_inv; cbn.
+(*1*)
 unfold polyn_opt_inv_or_quot.
 rewrite Hos.
 destruct (bool_dec true) as [H| ]; [ clear H | easy ].
-destruct (bool_dec rngl_has_inv) as [Hiv'| ]; [ | congruence ].
-clear Hiv; rename Hiv' into Hiv.
+destruct (bool_dec rngl_has_inv) as [H| ]; [ | congruence ].
+clear Hiv; rename H into Hiv.
 rewrite Hoiv.
 unfold rngl_has_quot; cbn.
-unfold polyn_opt_inv_or_quot; cbn.
+(*2*)
+unfold polyn_opt_inv_or_quot.
 rewrite Hos.
 destruct (bool_dec true) as [H| ]; [ clear H | easy ].
 destruct (bool_dec rngl_has_inv) as [H| ]; [ | congruence ].
+clear Hiv; rename H into Hiv.
 rewrite Hoiv.
-unfold rngl_quot.
+unfold rngl_quot; cbn.
+(*3*)
+unfold polyn_opt_inv_or_quot.
+rewrite Hos.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+destruct (bool_dec rngl_has_inv) as [H| ]; [ | congruence ].
+clear Hiv; rename H into Hiv.
+rewrite Hoiv.
+unfold rngl_quot; cbn.
+(*3*)
+unfold polyn_quot.
+apply eq_polyn_eq; cbn.
+unfold lap_quot_rem.
+remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (q, r); cbn.
+Search rlap_quot_rem.
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
