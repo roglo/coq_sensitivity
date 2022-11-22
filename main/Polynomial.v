@@ -969,9 +969,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
 Canonical Structure polyn_ring_like_op.
 
 (* to search for ring-like polynomials operators in the context *)
-(*
 Existing Instance polyn_ring_like_op.
-*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -2444,7 +2442,7 @@ Qed.
    no opposite *)
 
 Theorem lap_add_opp_l :
-  rngl_has_opp = true
+  @rngl_has_opp T _ = true
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros Hop *.
@@ -2461,7 +2459,7 @@ now rewrite (rngl_eqb_refl Heb).
 Qed.
 
 Theorem polyn_add_opp_l :
-  rngl_has_opp = true
+  @rngl_has_opp T _ = true
   → ∀ a : polyn T, (- a + a)%pol = 0%pol.
 Proof.
 intros Hop *.
@@ -2473,33 +2471,21 @@ now apply lap_add_opp_l.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
-  match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
-  | true =>
-      forall a : @polyn T ro,
-      @eq (@polyn T ro)
-        (@rngl_add (@polyn T ro) polyn_ring_like_op
-           (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
-        (@rngl_zero (@polyn T ro) polyn_ring_like_op)
-  | false => not_applicable
-  end.
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
-intros; cbn.
+intros.
 destruct op; [ | easy ].
+intros a.
 unfold rngl_opp; cbn.
-unfold rngl_has_opp in Hop; cbn in Hop.
-...
-remember polyn_opt_opp_or_sous as os eqn:Hpos; symmetry in Hpos.
-destruct os as [os| ]; [ | easy ].
-destruct os; [ | easy ].
-unfold polyn_opt_opp_or_sous in Hpos.
-unfold rngl_has_opp_or_sous in Hos.
-destruct rngl_opt_opp_or_sous as [os| ]; [ | easy ].
-destruct os; [ | easy ].
-injection Hpos; clear Hpos; intros; subst p.
-apply polyn_add_opp_l.
-unfold rngl_has_opp.
-...
+unfold polyn_opt_opp.
+specialize polyn_add_opp_l as add_opp_l.
+unfold rngl_has_opp in Hop, add_opp_l.
+cbn in Hop, add_opp_l.
+unfold polyn_opt_opp in Hop.
+destruct rngl_opt_opp as [opp| ]; [ | easy ].
+now apply add_opp_l.
+Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
