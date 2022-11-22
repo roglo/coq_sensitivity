@@ -2470,8 +2470,7 @@ now apply lap_add_opp_l.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
-  if @rngl_has_opp (polyn T) _ then ∀ a : polyn T, (- a + a)%F = 0%F
-  else not_applicable.
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 intros.
@@ -2487,6 +2486,13 @@ destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
 destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
+
+(* *)
+
+Theorem polyn_opt_add_sub :
+  if rngl_has_sous then ∀ a b : polyn T, (a + b - b)%F = a else not_applicable.
+Proof.
+...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -2507,8 +2513,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-     rngl_opt_add_sub := 42;
-     rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
+     rngl_opt_add_sub := polyn_opt_add_sub;
+     rngl_opt_sub_sub_sub_add := 42;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
      rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
      rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
