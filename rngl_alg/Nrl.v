@@ -110,8 +110,8 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_one := Zn_of_nat n 1;
      rngl_add := Zn_add n;
      rngl_mul := Zn_mul n;
-     rngl_opt_opp_or_sous :=
-       Some (inl (Zn_opp n));
+     rngl_opt_opp := Some (Zn_opp n);
+     rngl_opt_sous := None;
      rngl_opt_inv_or_quot :=
        if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
@@ -433,7 +433,8 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_one := 1;
      rngl_add := Nat.lcm;
      rngl_mul := Nat.mul;
-     rngl_opt_opp_or_sous := None;
+     rngl_opt_opp := None;
+     rngl_opt_sous := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
      rngl_opt_le := Some Nat.le |}.
