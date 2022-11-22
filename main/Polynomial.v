@@ -2569,7 +2569,8 @@ apply eq_polyn_eq; cbn.
 unfold lap_quot_rem.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r); cbn.
-Search rlap_quot_rem.
+unfold lap_norm in Hqr.
+rewrite rev_involutive in Hqr.
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
