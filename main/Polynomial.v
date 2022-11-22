@@ -466,7 +466,10 @@ destruct hop. {
 }
 unfold rngl_opp.
 unfold rngl_has_opp in Hop.
-destruct rngl_opt_opp; [ easy | ].
+remember rngl_opt_opp_or_sous as os eqn:Hoos; symmetry in Hoos.
+destruct os as [os| ]. {
+  destruct os as [os| os]; [ easy | apply rngl_add_0_r ].
+}
 apply rngl_add_0_r.
 Qed.
 
@@ -922,18 +925,15 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
 
 End b.
 
-(* polyn opposite *)
+(* polyn opposite or subtraction *)
 
-Definition polyn_opt_opp : option (polyn T → polyn T) :=
-  match (@rngl_opt_opp T ro) with
-  | Some _ => Some (polyn_opp)
+Definition polyn_opt_opp_or_sous :
+  option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
+  match (@rngl_opt_opp_or_sous T ro) with
+  | Some (inl _) => Some (inl polyn_opp)
+  | Some (inr _) => None
   | None => None
   end.
-
-(* polyn subtraction *)
-
-Definition polyn_opt_sous : option (polyn T → polyn T → polyn T) :=
-  None. (* perhaps improvable? *)
 
 (* polyn quotient *)
 
@@ -959,8 +959,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_one := polyn_one;
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
-     rngl_opt_opp := polyn_opt_opp;
-     rngl_opt_sous := polyn_opt_sous;
+     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
      rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
      rngl_opt_le := None |}.
@@ -2471,19 +2470,21 @@ now apply lap_add_opp_l.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
-  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
+  if @rngl_has_opp (polyn T) _ then ∀ a : polyn T, (- a + a)%F = 0%F
+  else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 intros.
 destruct op; [ | easy ].
 intros a.
 unfold rngl_opp; cbn.
-unfold polyn_opt_opp.
+unfold polyn_opt_opp_or_sous.
 specialize polyn_add_opp_l as add_opp_l.
 unfold rngl_has_opp in Hop, add_opp_l.
 cbn in Hop, add_opp_l.
-unfold polyn_opt_opp in Hop.
-destruct rngl_opt_opp as [opp| ]; [ | easy ].
+unfold polyn_opt_opp_or_sous in Hop, add_opp_l.
+destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
 

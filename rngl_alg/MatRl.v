@@ -114,8 +114,7 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_one := smI n;
      rngl_add := square_matrix_add;
      rngl_mul := square_matrix_mul;
-     rngl_opt_opp := Some square_matrix_opp;
-     rngl_opt_sous := None;
+     rngl_opt_opp_or_sous := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb :=
        match rngl_opt_eqb with
@@ -510,7 +509,6 @@ apply mat_mul_add_distr_r; [ easy | | | | | ]. {
 Qed.
 
 Theorem squ_mat_opt_add_opp_l {n} :
-(**)
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
     ∀ M : square_matrix n T, (- M + M)%F = 0%F
   else not_applicable.
