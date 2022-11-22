@@ -2523,6 +2523,37 @@ destruct (bool_dec rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
+(* *)
+
+Theorem polyn_opt_mul_div :
+  if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
+  else not_applicable.
+Proof.
+unfold rngl_has_quot; cbn.
+unfold polyn_opt_inv_or_quot.
+cbn; rewrite Hos.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
+remember rngl_opt_inv_or_quot as iv eqn:Hoiv; symmetry in Hoiv.
+destruct iv as [inv| ]; [ | easy ].
+intros a b Hbz.
+unfold rngl_div; cbn.
+unfold rngl_has_inv; cbn.
+unfold polyn_opt_inv_or_quot.
+rewrite Hos.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+destruct (bool_dec rngl_has_inv) as [Hiv'| ]; [ | congruence ].
+clear Hiv; rename Hiv' into Hiv.
+rewrite Hoiv.
+unfold rngl_has_quot; cbn.
+unfold polyn_opt_inv_or_quot; cbn.
+rewrite Hos.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+destruct (bool_dec rngl_has_inv) as [H| ]; [ | congruence ].
+rewrite Hoiv.
+unfold rngl_quot.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -2548,8 +2579,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_sous _;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
-     rngl_opt_mul_div := 42;
-     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_mul_div := polyn_opt_mul_div;
+     rngl_opt_mul_quot_r := 42;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
      rngl_opt_integral := ?rngl_opt_integral;
