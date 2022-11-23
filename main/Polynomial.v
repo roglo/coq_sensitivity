@@ -2547,8 +2547,10 @@ Theorem lap_mul_app_distr_r : ∀ la lb lc,
 Admitted.
 rewrite lap_mul_app_distr_r.
 cbn.
-rewrite rngl_summation
-rewrite repeat_length.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_r Hos).
+rewrite app_length, repeat_length.
+cbn.
 ...
 Theorem lap_app_is_add : ∀ la lb,
   (la ++ lb = la + (repeat 0%F (length la) ++ lb))%lap.
