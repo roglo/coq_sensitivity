@@ -2565,6 +2565,19 @@ move rlr before rlq.
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply lt_le_S.
+Print rlap_quot_rem_step.
+destruct rlb as [| b]; [ easy | ].
+cbn in Hqrlr.
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hqrlr.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+injection Hqrlr; clear Hqrlr; intros; subst cq dq rlr.
+eapply le_lt_trans.
+apply strip_0s_length_le.
+unfold lap_sub, lap_opp.
+rewrite map_app.
+rewrite map_map.
+Search (map _ (repeat _ _)).
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
