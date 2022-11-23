@@ -661,6 +661,7 @@ clear lb Hrlb.
 move rla after rlb; move rlq before rlb; move rlr before rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
+(**)
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -2525,7 +2526,7 @@ Qed.
 
 (* *)
 
-Theorem rlap_quot_rem_prop' : ∀ it (rla rlb rlq rlr : list T),
+Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
   rlb ≠ []
   → hd 1%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
@@ -2533,6 +2534,37 @@ Theorem rlap_quot_rem_prop' : ∀ it (rla rlb rlq rlr : list T),
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
 Proof.
 intros * Hbz Hbn Hqr Hit.
+revert rla rlq rlr Hqr Hit.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hqr.
+remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
+symmetry in Hqrlr.
+destruct qrlr as (q, rlr').
+destruct q as [(cq, dq)| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  rewrite lap_mul_0_r, lap_add_0_l.
+  f_equal.
+  destruct rlb as [| b]; [ easy | ].
+  destruct rla as [| a]. {
+    now destruct rlb; injection Hqrlr; intros.
+  }
+  cbn in Hqrlr.
+  destruct (length rla <? length rlb); [ | easy ].
+  now injection Hqrlr.
+}
+remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr'').
+injection Hqr; clear Hqr; intros; subst rlq rlr.
+rename rlq' into rlq; rename rlr' into rlr.
+rename Hqr' into Hqr.
+move rla after rlb.
+move rlq before rlb.
+move rlr before rlq.
+apply IHit in Hqr. 2: {
+  etransitivity; [ | apply Hit ].
+  apply lt_le_S.
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
