@@ -2542,6 +2542,21 @@ rewrite fold_lap_norm.
 Search (_ + lap_norm _)%lap.
 Print rlap_quot_rem_step.
 cbn.
+Theorem lap_mul_app_distr_r : ∀ la lb lc,
+  ((la ++ lb) * lc = la * lc + lb * (repeat 0%F (length lb) ++ lc))%lap.
+Admitted.
+rewrite lap_mul_app_distr_r.
+cbn.
+rewrite rngl_summation
+rewrite repeat_length.
+...
+Theorem lap_app_is_add : ∀ la lb,
+  (la ++ lb = la + (repeat 0%F (length la) ++ lb))%lap.
+sert à rien
+rewrite (lap_app_is_add _ [(a / b)%F]).
+rewrite repeat_length.
+rewrite
+...
 Search ((_ ++ _) * _)%lap.
 Search (_ * (_ ++ _))%lap.
 ...
