@@ -2537,7 +2537,16 @@ rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+remember (a / b)%F as cq eqn:Hcq.
+remember (length rla - length rlb) as dq eqn:Hdq.
+move Hcq after dq.
+move b before a.
+remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
+  as rlr eqn:Hrlr.
+Print rlap_quot_rem_step.
+...
 rewrite <- (rev_involutive (lap_sub _ _)).
+rewrite rev_involutive.
 rewrite fold_lap_norm.
 cbn.
 Print rlap_quot_rem_step.
