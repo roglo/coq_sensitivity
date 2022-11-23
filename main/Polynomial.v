@@ -2540,6 +2540,9 @@ injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite fold_lap_norm.
 cbn.
+Theorem glop : ∀ la lb,
+  (la ++ lb = la + (repeat 0%F (length la) ++ lb))%lap.
+...
 Theorem lap_mul_app_unit_distr_r : ∀ a la lb,
   lb ≠ []
   → ((la ++ [a]) * lb = la * lb + (0%F :: map (rngl_mul a) lb))%lap.
