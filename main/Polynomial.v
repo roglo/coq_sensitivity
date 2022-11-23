@@ -2525,6 +2525,69 @@ Qed.
 
 (* *)
 
+Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
+  rlb ≠ []
+  → hd 1%F rlb ≠ 0%F
+  → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
+  → S (length rla) ≤ it
+  → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
+Proof.
+intros * Hbz Hbn Hqr Hit.
+...
+
+Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
+  lb ≠ []
+  → last_lap_neq_0 lb
+  → lap_quot_rem la lb = (lq, lr)
+  → la = lap_add (lap_mul lb lq) lr.
+Proof.
+intros * Hbz Hbn Hab.
+unfold lap_quot_rem in Hab.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr).
+injection Hab; clear Hab; intros; subst lq lr.
+unfold rlap_quot_rem in Hqr.
+remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+rewrite <- rev_involutive; symmetry.
+rewrite <- rev_involutive; symmetry.
+f_equal.
+remember (rev la) as rla eqn:Hrla.
+clear la Hrla.
+rewrite <- (rev_involutive lb).
+remember (rev lb) as rlb eqn:Hrlb.
+assert (H : rlb ≠ []). {
+  subst rlb.
+  intros H; apply Hbz.
+  now apply List_eq_rev_nil in H.
+}
+move H before Hbz; clear Hbz.
+rename H into Hbz.
+assert (H : hd 1%F rlb ≠ 0%F). {
+  subst rlb.
+  unfold last_lap_neq_0 in Hbn.
+  apply Bool.negb_true_iff in Hbn.
+  apply (rngl_eqb_neq Heb) in Hbn.
+  move Hbn at bottom.
+  intros H; apply Hbn; clear Hbn.
+  clear Hbz Hqr.
+  rewrite <- (rev_involutive lb).
+  destruct (rev lb); cbn in H |-*; [ easy | ].
+  now rewrite last_last.
+}
+move H before Hbn; clear Hbn.
+rename H into Hbn.
+clear lb Hrlb.
+move rla after rlb; move rlq before rlb; move rlr before rlq.
+assert (H : S (length rla) ≤ it) by flia Hit.
+clear Hit; rename H into Hit.
+rewrite <- (rev_involutive rla).
+f_equal.
+... ...
+apply (rlap_quot_rem_prop rla Hbz Hbn Hqr Hit).
+...
+
 Theorem polyn_opt_mul_div :
   if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
   else not_applicable.
