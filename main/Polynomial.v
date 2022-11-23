@@ -2540,6 +2540,17 @@ injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite fold_lap_norm.
 cbn.
+Theorem glop : ∀ la a len,
+  (la * (repeat 0%F len ++ [a]) = repeat 0%F len ++ map (rngl_mul a) la)%lap.
+Proof.
+intros.
+revert a len.
+induction la as [| b]; intros; [ | cbn ].
+cbn.
+(* chiasse *)
+...
+rewrite glop.
+...
 Theorem glop : ∀ la lb,
   (la ++ lb = la + (repeat 0%F (length la) ++ lb))%lap.
 ...
@@ -2559,7 +2570,7 @@ induction la as [| a']; intros. {
 rewrite lap_mul_app_unit_distr_r.
 Theorem lap_mul_app_unit_distr_l : ∀ b la lb,
   (la * (lb ++ [b]) = la * lb + (0%F :: map (rngl_mul b) la))%lap.
-Admitted.
+...
 rewrite lap_mul_app_unit_distr_l.
 ...
 Theorem lap_mul_app_distr_r : ∀ la lb lc,
