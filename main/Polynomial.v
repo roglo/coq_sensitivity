@@ -2541,6 +2541,9 @@ rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite fold_lap_norm.
 Search (_ + lap_norm _)%lap.
 Print rlap_quot_rem_step.
+cbn.
+Search ((_ ++ _) * _)%lap.
+Search (_ * (_ ++ _))%lap.
 ...
 
 Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
