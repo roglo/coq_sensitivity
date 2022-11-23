@@ -2540,6 +2540,8 @@ injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite fold_lap_norm.
 cbn.
+Print rlap_quot_rem_step.
+...
 Theorem glop : ∀ la a len,
   (la * (repeat 0%F len ++ [a]) = repeat 0%F len ++ map (rngl_mul a) la)%lap.
 Proof.
