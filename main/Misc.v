@@ -1593,6 +1593,14 @@ subst n.
 apply List_map_nth_seq.
 Qed.
 
+Theorem List_map_repeat : ∀ A B x n (f : A → B),
+  map f (repeat x n) = repeat (f x) n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal; apply IHn.
+Qed.
+
 Theorem List_rev_repeat : ∀ A (x : A) n,
   rev (repeat x n) = repeat x n.
 Proof.
