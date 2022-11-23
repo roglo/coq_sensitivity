@@ -2525,7 +2525,7 @@ Qed.
 
 (* *)
 
-Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
+Theorem rlap_quot_rem_prop' : ∀ it (rla rlb rlq rlr : list T),
   rlb ≠ []
   → hd 1%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
@@ -2586,7 +2586,7 @@ rewrite <- (rev_involutive rla).
 f_equal.
 ... ...
 apply (rlap_quot_rem_prop rla Hbz Hbn Hqr Hit).
-...
+Qed.
 
 Theorem polyn_opt_mul_div :
   if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
@@ -2634,6 +2634,27 @@ remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r); cbn.
 unfold lap_norm in Hqr.
 rewrite rev_involutive in Hqr.
+... ...
+apply rlap_quot_rem_prop in Hqr; cycle 1. {
+  destruct b as (lb, Hlb); cbn.
+  intros H.
+  apply (f_equal (λ l, rev l)) in H.
+  rewrite rev_involutive in H; subst lb.
+  cbn in Hbz.
+  apply Hbz.
+  now apply eq_polyn_eq.
+} {
+  destruct b as (lb, Hlb); cbn.
+  intros H.
+...
+specialize lap_quot_rem_prop as H1.
+specialize (H1 (strip_0s (rev (lap a * lap b)%lap))).
+specialize (H1 (rev (lap b)) q r).
+assert (H : rev (lap b) ≠ []) by ...
+specialize (H1 H); clear H.
+assert (H : last_lap_neq_0 (rev (lap b))) by ...
+specialize (H1 H); clear H.
+Set Printing Implicit.
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
