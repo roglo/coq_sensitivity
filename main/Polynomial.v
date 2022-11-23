@@ -2526,6 +2526,22 @@ Qed.
 
 (* *)
 
+Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
+  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
+Proof.
+intros * Hrl.
+destruct rlb as [| b]; [ easy | cbn in Hrl ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrl.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+rewrite <- (rev_involutive (lap_sub _ _)).
+rewrite fold_lap_norm.
+Search (_ + lap_norm _)%lap.
+...
+
 Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
   rlb ≠ []
   → hd 1%F rlb ≠ 0%F
@@ -2582,6 +2598,7 @@ apply IHit in Hqr. 2: {
   rewrite Nat.sub_add; [ | easy ].
   now rewrite Nat.max_id; cbn.
 }
+Search rlap_quot_rem_step.
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
