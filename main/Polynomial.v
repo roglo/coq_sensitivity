@@ -2539,12 +2539,29 @@ apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite fold_lap_norm.
-Search (_ + lap_norm _)%lap.
-Print rlap_quot_rem_step.
 cbn.
+Theorem lap_mul_app_unit_distr_r : ∀ a la lb,
+  lb ≠ []
+  → ((la ++ [a]) * lb = la * lb + (0%F :: map (rngl_mul a) lb))%lap.
+Proof.
+intros * Hbz.
+revert a lb Hbz.
+induction la as [| a']; intros. {
+  cbn.
+  destruct lb as [| b]; [ easy | ].
+  cbn.
+  rewrite rngl_summation_only_one.
+(* ah oui non c'est faux *)
+...
+rewrite lap_mul_app_unit_distr_r.
+Theorem lap_mul_app_unit_distr_l : ∀ b la lb,
+  (la * (lb ++ [b]) = la * lb + (0%F :: map (rngl_mul b) la))%lap.
+Admitted.
+rewrite lap_mul_app_unit_distr_l.
+...
 Theorem lap_mul_app_distr_r : ∀ la lb lc,
   ((la ++ lb) * lc = la * lc + lb * (repeat 0%F (length lb) ++ lc))%lap.
-Admitted.
+...
 rewrite lap_mul_app_distr_r.
 cbn.
 rewrite rngl_summation_only_one.
@@ -2555,6 +2572,7 @@ rewrite Nat.add_1_r.
 cbn.
 unfold iter_seq, iter_list; cbn.
 rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+rewrite rngl_add_0_l.
 Search (lap_convol_mul [_]).
 ...
 Theorem lap_app_is_add : ∀ la lb,
