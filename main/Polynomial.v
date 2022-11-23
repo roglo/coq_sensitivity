@@ -2551,6 +2551,11 @@ rewrite rngl_summation_only_one.
 rewrite (rngl_mul_0_r Hos).
 rewrite app_length, repeat_length.
 cbn.
+rewrite Nat.add_1_r.
+cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+Search (lap_convol_mul [_]).
 ...
 Theorem lap_app_is_add : ∀ la lb,
   (la ++ lb = la + (repeat 0%F (length la) ++ lb))%lap.
