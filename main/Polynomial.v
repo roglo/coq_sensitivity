@@ -2545,6 +2545,8 @@ remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
   as rlr eqn:Hrlr.
 Print rlap_quot_rem_step.
 Print lap_quot_rem.
+...
+(*
 Abort.
 End a.
 Arguments lap_add {T ro} (la lb)%list.
@@ -2561,6 +2563,11 @@ Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
 Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
 Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
 Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
+Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
+Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
+Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
+Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
+*)
 ...
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite rev_involutive.
