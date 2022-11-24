@@ -2544,6 +2544,23 @@ move b before a.
 remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
   as rlr eqn:Hrlr.
 Print rlap_quot_rem_step.
+Print lap_quot_rem.
+Abort.
+End a.
+Arguments lap_add {T ro} (la lb)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+Arguments rlap_quot_rem {T ro} (rla rlb)%list.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
+Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
+Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
+Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
+Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
 ...
 rewrite <- (rev_involutive (lap_sub _ _)).
 rewrite rev_involutive.
