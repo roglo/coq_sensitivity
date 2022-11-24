@@ -2526,6 +2526,14 @@ Qed.
 
 (* *)
 
+Theorem map_opp_repeat : ∀ (x : T) n,
+  map rngl_opp (repeat x n) = repeat (rngl_opp x) n.
+Proof.
+intros.
+induction n; [ easy | cbn ].
+f_equal; apply IHn.
+Qed.
+
 Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
   rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
@@ -2543,6 +2551,21 @@ move Hcq after dq.
 move b before a.
 remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
   as rlr eqn:Hrlr.
+unfold lap_sub, lap_opp in Hrlr.
+rewrite map_app, map_map in Hrlr.
+rewrite map_opp_repeat in Hrlr.
+replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
+  specialize rngl_opp_0 as opp_0.
+  unfold rngl_has_opp, rngl_opp in opp_0.
+  unfold rngl_opp.
+  unfold rngl_has_opp_or_sous in Hos.
+  destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+  destruct opp as [opp| ]; [ | easy ].
+  now symmetry; apply opp_0.
+}
+...
+Check strip_0s.
+unfold lap_
 Print rlap_quot_rem_step.
 Print lap_quot_rem.
 ...
