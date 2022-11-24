@@ -2586,12 +2586,63 @@ replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
 }
 *)
 unfold lap_sub, lap_opp.
-Theorem glop : ∀ n la lb,
+Theorem glop : ∀ n la,
+  la ≠ []
+  → repeat 0%F n ++ la = ((repeat 0%F n ++ [1%F]) * la)%lap.
+Proof.
+intros * Haz.
+revert la Haz.
+induction n; intros; cbn. {
+  destruct la as [| a]; [ easy | clear Haz ].
+  rewrite Nat.sub_0_r; cbn.
+  rewrite rngl_summation_only_one.
+  rewrite rngl_mul_1_l; f_equal.
+  now rewrite lap_convol_mul_1_l.
+}
+rewrite (IHn _ Haz).
+destruct la as [| a]; [ easy | clear Haz; cbn ].
+rewrite app_length, repeat_length; cbn.
+rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos); f_equal.
+rewrite Nat.add_1_r; cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+rewrite rngl_add_0_l.
+destruct n; cbn. {
+  rewrite rngl_summation_only_one; f_equal.
+...
+  ============================
+  lap_convol_mul [1%F] (a :: la) 1 (length la) =
+  lap_convol_mul [0%F; 1%F] (a :: la) 2 (length la)
+...
+  destruct la as [| b]; [ easy | cbn ].
+  unfold iter_seq, iter_list; cbn.
+  rewrite rngl_add_0_l, rngl_mul_1_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, rngl_add_0_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_l, rngl_add_0_r.
+  f_equal.
+...
+  ============================
+  lap_convol_mul [1%F] (a :: b :: la) 2 (length la) =
+  lap_convol_mul [0%F; 1%F] (a :: b :: la) 3 (length la)
+...
+intros * Haz.
+revert n.
+induction la as [| a]; intros; [ easy | clear Haz ].
+...
+  rewrite app_nil_r.
+  rewrite lap_mul_0_r.
+...
+Theorem glip : ∀ n la lb,
   la ≠ []
   → lb ≠ []
   → (la * (repeat 0%F n ++ lb) = repeat 0%F n ++ (la * lb))%lap.
 Proof.
 intros * Haz Hbz.
+... ...
+rewrite glop.
+...
 revert n lb Hbz.
 induction la as [| a]; intros; [ easy | ].
 clear Haz; cbn.
