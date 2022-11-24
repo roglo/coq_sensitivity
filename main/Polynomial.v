@@ -2617,8 +2617,7 @@ remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
 rewrite lap_repeat_0_app; [ | easy ].
-rewrite lap_mul_assoc.
-cbn.
+rewrite lap_mul_assoc; cbn.
 ...
 (*
 remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
