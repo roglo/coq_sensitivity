@@ -2534,6 +2534,26 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
+Theorem lap_convol_mul_succ_l : ∀ la lb i len,
+  lap_convol_mul la (0%F :: lb) (S i) len =
+  lap_convol_mul la lb i len.
+Proof.
+intros.
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+rewrite rngl_summation_split_last; [ | easy ].
+rewrite rngl_summation_shift with (s := 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+rewrite Nat.sub_diag.
+rewrite (rngl_mul_0_r Hos), rngl_add_0_r.
+rewrite IHlen; f_equal.
+apply rngl_summation_eq_compat.
+intros j Hj.
+rewrite Nat.add_comm, Nat.add_sub; f_equal.
+destruct j; [ now rewrite Nat.sub_0_r | ].
+now replace (i - j) with (S (i - S j)) by flia Hj.
+Qed.
+
 Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
   rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
@@ -2568,10 +2588,11 @@ replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
 unfold lap_sub, lap_opp.
 Theorem glop : ∀ n la lb,
   la ≠ []
+  → lb ≠ []
   → (la * (repeat 0%F n ++ lb) = repeat 0%F n ++ (la * lb))%lap.
 Proof.
-intros * Haz.
-revert n lb.
+intros * Haz Hbz.
+revert n lb Hbz.
 induction la as [| a]; intros; [ easy | ].
 clear Haz; cbn.
 destruct n; [ easy | cbn ].
@@ -2579,11 +2600,23 @@ rewrite Nat.add_succ_r; cbn.
 rewrite rngl_summation_only_one.
 rewrite (rngl_mul_0_r Hos).
 f_equal.
-destruct lb as [| b]. {
-  rewrite app_nil_r.
-  rewrite repeat_length.
-  clear IHla.
-(* bon, je sais pas *)
+destruct lb as [| b]; [ easy | clear Hbz ].
+rewrite Nat.sub_0_r; cbn.
+rewrite Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite app_length, repeat_length; cbn.
+do 2 rewrite Nat.add_succ_r; cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, (rngl_mul_0_r Hos), rngl_add_0_r.
+destruct n; cbn. {
+  f_equal.
+  apply lap_convol_mul_succ_l.
+}
+rewrite (rngl_mul_0_r Hos).
+f_equal.
+rewrite Nat.add_succ_r; cbn.
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, (rngl_mul_0_r Hos), rngl_add_0_r.
 ...
   revert a la.
   induction n; intros; cbn. {
