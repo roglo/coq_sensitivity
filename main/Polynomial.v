@@ -2536,7 +2536,7 @@ Qed.
 
 Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
   rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
-  → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
+  → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
 intros * Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hrl ].
@@ -2549,6 +2549,7 @@ remember (a / b)%F as cq eqn:Hcq.
 remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
+(*
 remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
   as rlr eqn:Hrlr.
 unfold lap_sub, lap_opp in Hrlr.
@@ -2563,6 +2564,8 @@ replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
   destruct opp as [opp| ]; [ | easy ].
   now symmetry; apply opp_0.
 }
+*)
+unfold lap_sub, lap_opp.
 ...
 Check strip_0s.
 unfold lap_
