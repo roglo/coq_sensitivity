@@ -2569,39 +2569,7 @@ destruct j; [ now rewrite Nat.sub_0_r | ].
 now replace (i - j) with (S (i - S j)) by flia Hj.
 Qed.
 
-Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
-  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
-  → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
-Proof.
-intros * Hrl.
-destruct rlb as [| b]; [ easy | cbn in Hrl ].
-destruct rla as [| a]; [ easy | ].
-rewrite if_bool_if_dec in Hrl.
-destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
-apply Nat.ltb_ge in Hab.
-injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
-remember (a / b)%F as cq eqn:Hcq.
-remember (length rla - length rlb) as dq eqn:Hdq.
-move Hcq after dq.
-move b before a.
-(*
-remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
-  as rlr eqn:Hrlr.
-unfold lap_sub, lap_opp in Hrlr.
-rewrite map_app, map_map in Hrlr.
-rewrite map_opp_repeat in Hrlr.
-replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
-  specialize rngl_opp_0 as opp_0.
-  unfold rngl_has_opp, rngl_opp in opp_0.
-  unfold rngl_opp.
-  unfold rngl_has_opp_or_sous in Hos.
-  destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
-  destruct opp as [opp| ]; [ | easy ].
-  now symmetry; apply opp_0.
-}
-*)
-unfold lap_sub, lap_opp.
-Theorem glop : ∀ n la,
+Theorem lap_repeat_0_app : ∀ n la,
   la ≠ []
   → repeat 0%F n ++ la = ((repeat 0%F n ++ [1%F]) * la)%lap.
 Proof.
@@ -2621,16 +2589,54 @@ rewrite rngl_summation_only_one.
 rewrite (rngl_mul_0_l Hos); f_equal.
 rewrite lap_convol_mul_l_succ_l.
 rewrite IHn; [ | easy ].
+destruct n; [ easy | cbn ].
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos).
+rewrite Nat.sub_0_r.
+rewrite app_length, repeat_length; cbn.
+rewrite lap_convol_mul_l_succ_l.
+rewrite Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos); f_equal.
+apply lap_convol_mul_l_succ_l.
+Qed.
+
+Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
+  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
+Proof.
+intros * Hrl.
+destruct rlb as [| b]; [ easy | cbn in Hrl ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrl.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+remember (a / b)%F as cq eqn:Hcq.
+remember (length rla - length rlb) as dq eqn:Hdq.
+move Hcq after dq.
+move b before a.
+rewrite lap_repeat_0_app; [ | easy ].
+rewrite lap_mul_assoc.
+cbn.
 ...
-rewrite Nat.add_1_r; cbn.
-unfold iter_seq, iter_list; cbn.
-rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-rewrite rngl_add_0_l.
-destruct n; cbn. {
-  rewrite rngl_summation_only_one; f_equal.
-  symmetry; apply lap_convol_mul_l_succ_l.
+(*
+remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
+  as rlr eqn:Hrlr.
+unfold lap_sub, lap_opp in Hrlr.
+rewrite map_app, map_map in Hrlr.
+rewrite map_opp_repeat in Hrlr.
+replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
+  specialize rngl_opp_0 as opp_0.
+  unfold rngl_has_opp, rngl_opp in opp_0.
+  unfold rngl_opp.
+  unfold rngl_has_opp_or_sous in Hos.
+  destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+  destruct opp as [opp| ]; [ | easy ].
+  now symmetry; apply opp_0.
 }
-...
+*)
+unfold lap_sub, lap_opp.
 Theorem glop : ∀ la i len,
   lap_convol_mul [1%F] la i len =
   lap_convol_mul [0%F; 1%F] la (S i) len.
