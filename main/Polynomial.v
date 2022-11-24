@@ -2534,7 +2534,22 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
-Theorem lap_convol_mul_succ_l : ∀ la lb i len,
+Theorem lap_convol_mul_l_succ_l : ∀ la lb i len,
+  lap_convol_mul (0%F :: la) lb (S i) len =
+  lap_convol_mul la lb i len.
+Proof.
+intros.
+revert la lb i.
+induction len; intros; [ easy | cbn ].
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite rngl_summation_shift with (s := 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
+f_equal.
+apply IHlen.
+Qed.
+
+Theorem lap_convol_mul_r_succ_l : ∀ la lb i len,
   lap_convol_mul la (0%F :: lb) (S i) len =
   lap_convol_mul la lb i len.
 Proof.
@@ -2592,25 +2607,34 @@ Theorem glop : ∀ n la,
 Proof.
 intros * Haz.
 revert la Haz.
-induction n; intros; cbn. {
-  destruct la as [| a]; [ easy | clear Haz ].
-  rewrite Nat.sub_0_r; cbn.
+induction n; intros. {
+  destruct la as [| a]; [ easy | clear Haz; cbn ].
   rewrite rngl_summation_only_one.
   rewrite rngl_mul_1_l; f_equal.
   now rewrite lap_convol_mul_1_l.
 }
-rewrite (IHn _ Haz).
-destruct la as [| a]; [ easy | clear Haz; cbn ].
+cbn.
+destruct la as [| a]; [ easy | clear Haz ].
 rewrite app_length, repeat_length; cbn.
 rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
 rewrite rngl_summation_only_one.
 rewrite (rngl_mul_0_l Hos); f_equal.
+rewrite lap_convol_mul_l_succ_l.
+rewrite IHn; [ | easy ].
+...
 rewrite Nat.add_1_r; cbn.
 unfold iter_seq, iter_list; cbn.
 rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
 rewrite rngl_add_0_l.
 destruct n; cbn. {
   rewrite rngl_summation_only_one; f_equal.
+  symmetry; apply lap_convol_mul_l_succ_l.
+}
+...
+Theorem glop : ∀ la i len,
+  lap_convol_mul [1%F] la i len =
+  lap_convol_mul [0%F; 1%F] la (S i) len.
+Inspect 1.
 ...
   ============================
   lap_convol_mul [1%F] (a :: la) 1 (length la) =
