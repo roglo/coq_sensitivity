@@ -2566,6 +2566,32 @@ replace (@rngl_opp T ro (@rngl_zero T _)) with (@rngl_zero T _) in Hrlr. 2: {
 }
 *)
 unfold lap_sub, lap_opp.
+Theorem glop : ∀ n la lb,
+  la ≠ []
+  → (la * (repeat 0%F n ++ lb) = repeat 0%F n ++ (la * lb))%lap.
+Proof.
+intros * Haz.
+revert n lb.
+induction la as [| a]; intros; [ easy | ].
+clear Haz; cbn.
+destruct n; [ easy | cbn ].
+rewrite Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_r Hos).
+f_equal.
+destruct lb as [| b]. {
+  rewrite app_nil_r.
+  rewrite repeat_length.
+  clear IHla.
+(* bon, je sais pas *)
+...
+  revert a la.
+  induction n; intros; cbn. {
+    rewrite Nat.add_0_r.
+    induction la as [| b]; intros; [ easy | cbn ].
+    unfold iter_seq, iter_list; cbn.
+    do 2 rewrite (rngl_mul_0_r Hos).
+    do 2 rewrite rngl_add_0_l.
 ...
 Check strip_0s.
 unfold lap_
