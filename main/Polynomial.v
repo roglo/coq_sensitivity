@@ -2664,11 +2664,14 @@ destruct n; cbn; [ now rewrite Nat.sub_0_r | ].
 now rewrite app_length, repeat_length, Nat.sub_0_r.
 Qed.
 
-Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
+Theorem rlap_quot_rem_step_Some :
+  rngl_mul_is_comm = true →
+  @rngl_has_inv T _ = true →
+  ∀ rla rlb rlr cq dq,
   rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
-intros * Hrl.
+intros Hco Hiv * Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hrl ].
 destruct rla as [| a]; [ easy | ].
 rewrite if_bool_if_dec in Hrl.
@@ -2691,7 +2694,9 @@ rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
 rewrite Hcq at 1.
-Search (_ * (_ / _))%F.
+rewrite (rngl_mul_div_r Hco Hiv).
+... ...
+Check rngl_mul_div_r.
 ...
 unfold lap_mul.
 remember (repeat 0%F dq ++ rev rlb ++ [b]) as lc eqn:Hlc.

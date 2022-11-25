@@ -666,6 +666,22 @@ apply rngl_has_inv_or_quot_iff in Hii.
 destruct Hii; congruence.
 Qed.
 
+Theorem rngl_mul_div_r :
+  rngl_mul_is_comm = true →
+  rngl_has_inv = true →
+  ∀ a b : T,
+  b ≠ 0%F
+  → (b * (a / b))%F = a.
+Proof.
+intros Hco Hiv * Hbz.
+rewrite (rngl_mul_comm Hco).
+unfold "/"%F.
+rewrite Hiv.
+rewrite <- rngl_mul_assoc.
+rewrite (rngl_mul_inv_l Hiv _ Hbz).
+apply rngl_mul_1_r.
+Qed.
+
 Theorem rngl_add_cancel_l :
   rngl_has_opp_or_sous = true →
   ∀ a b c, (a + b = a + c)%F → (b = c)%F.
