@@ -2649,7 +2649,63 @@ rewrite lap_mul_assoc; cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
   now intros H; apply app_eq_nil in H.
 }
-Inspect 5.
+Search ([_] * _)%lap.
+
+Theorem lap_mul_const_r : ∀ la a,
+  (la * [a])%lap = map (λ b, (b * a)%F) la.
+Proof.
+intros.
+unfold "*"%lap; cbn.
+destruct la as [| b]; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+rewrite Nat.add_1_r; cbn.
+rewrite rngl_summation_only_one.
+f_equal.
+Theorem lap_convol_mul_const_r : ∀ a b la i len,
+  length la ≤ len
+  → lap_convol_mul (b :: la) [a] (S i) len =
+    map (λ b, (b * a)%F) la.
+Proof.
+intros * Hlen.
+revert a b la i Hlen.
+induction len; intros; cbn - [ nth ]. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hlen.
+  now subst la.
+}
+rewrite rngl_summation_split_first; [ | easy ].
+rewrite rngl_summation_shift with (s := 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+cbn.
+rewrite Tauto_match_nat_same.
+rewrite (rngl_mul_0_r Hos), rngl_add_0_l.
+...
+induction la as [| c]; [ easy | cbn ].
+unfold iter_seq, iter_list; cbn.
+rewrite rngl_add_0_l, (rngl_mul_0_r Hos).
+rewrite rngl_add_0_l; f_equal.
+...
+... ...
+apply lap_convol_mul_const_r.
+...
+  lap_convol_mul (b :: c :: la) [a] 2 (length la) =
+  map (λ b0 : T, (b0 * a)%F) la
+...
+... ...
+rewrite lap_mul_const_r.
+...
+unfold lap_mul.
+remember (repeat 0%F dq ++ rev rlb ++ [b]) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]. {
+  exfalso.
+  rewrite app_assoc in Hlc.
+  now apply app_eq_nil in Hlc.
+}
+cbn; rewrite Nat.sub_0_r.
+rewrite Nat.add_1_r.
+remember (c :: lc) as l; cbn; subst l.
+rewrite rngl_summation_only_one.
+cbn
 ...
 Theorem lap_mul_repeat_0_app_1_comm : ∀ la n,
   (la * (repeat 0%F n ++ [1%F]) = (repeat 0%F n ++ [1%F]) * la)%lap.
