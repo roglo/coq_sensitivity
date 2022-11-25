@@ -2569,7 +2569,7 @@ destruct j; [ now rewrite Nat.sub_0_r | ].
 now replace (i - j) with (S (i - S j)) by flia Hj.
 Qed.
 
-Theorem lap_repeat_0_app : ∀ n la,
+Theorem lap_repeat_0_app_is_mul_power_l : ∀ n la,
   la ≠ []
   → repeat 0%F n ++ la = ((repeat 0%F n ++ [1%F]) * la)%lap.
 Proof.
@@ -2583,6 +2583,40 @@ induction n; intros. {
 }
 cbn.
 destruct la as [| a]; [ easy | clear Haz ].
+rewrite app_length, repeat_length; cbn.
+rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos); f_equal.
+rewrite lap_convol_mul_l_succ_l.
+rewrite IHn; [ | easy ].
+destruct n; [ easy | cbn ].
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos).
+rewrite Nat.sub_0_r.
+rewrite app_length, repeat_length; cbn.
+rewrite lap_convol_mul_l_succ_l.
+rewrite Nat.add_succ_r; cbn.
+rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_l Hos); f_equal.
+apply lap_convol_mul_l_succ_l.
+Qed.
+
+Theorem lap_repeat_0_app_is_mul_power_r : ∀ n la,
+  la ≠ []
+  → repeat 0%F n ++ la = (la * (repeat 0%F n ++ [1%F]))%lap.
+Proof.
+intros * Haz.
+revert la Haz.
+induction n; intros. {
+  destruct la as [| a]; [ easy | clear Haz; cbn ].
+  rewrite Nat.sub_0_r, Nat.add_1_r; cbn.
+  rewrite rngl_summation_only_one.
+  rewrite rngl_mul_1_r; f_equal.
+  now rewrite lap_convol_mul_1_r.
+}
+cbn.
+destruct la as [| a]; [ easy | clear Haz ].
+...
 rewrite app_length, repeat_length; cbn.
 rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
 rewrite rngl_summation_only_one.
@@ -2616,8 +2650,66 @@ remember (a / b)%F as cq eqn:Hcq.
 remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
-rewrite lap_repeat_0_app; [ | easy ].
+rewrite lap_repeat_0_app_1_is_mul_l; [ | easy ].
 rewrite lap_mul_assoc; cbn.
+...
+Theorem lap_mul_repeat_0_app_1_comm : ∀ la n,
+  (la * (repeat 0%F n ++ [1%F]) = (repeat 0%F n ++ [1%F]) * la)%lap.
+Proof.
+(*
+intros.
+revert la.
+induction n; intros. {
+  cbn - [ lap_mul ].
+  now rewrite lap_mul_1_l, lap_mul_1_r.
+}
+unfold lap_mul; cbn.
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite Nat.sub_0_r.
+rewrite app_length, repeat_length; cbn.
+rewrite Nat.add_succ_r; symmetry.
+rewrite Nat.add_succ_r; symmetry; cbn.
+do 2 rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos); f_equal.
+rewrite lap_convol_mul_r_succ_l.
+rewrite lap_convol_mul_l_succ_l.
+rewrite Nat.add_comm.
+rewrite Nat.add_1_r; cbn.
+do 2 rewrite rngl_summation_only_one.
+cbn.
+...
+*)
+intros.
+Inspect 4.
+...
+rewrite <- lap_repeat_0_app.
+...
+destruct la as [| a]; [ symmetry; apply lap_mul_0_r | cbn ].
+destruct n; cbn. {
+  rewrite Nat.sub_0_r, Nat.add_comm; cbn.
+  do 2 rewrite rngl_summation_only_one.
+  rewrite rngl_mul_1_r, rngl_mul_1_l; f_equal.
+  rewrite lap_convol_mul_1_r; [ | easy ].
+  rewrite lap_convol_mul_1_l; [ | easy ].
+  easy.
+}
+do 2 rewrite Nat.sub_0_r.
+rewrite app_length, repeat_length; cbn.
+rewrite Nat.add_comm.
+symmetry; rewrite <- Nat.add_succ_comm; cbn.
+do 2 rewrite rngl_summation_only_one.
+rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos); f_equal.
+rewrite lap_convol_mul_l_succ_l.
+rewrite lap_convol_mul_r_succ_l.
+Inspect 5.
+...
+rewrite Nat.add_1_r; cbn.
+do 2 rewrite rngl_summation_only_one.
+rewrite lap_convol_mul_l_succ_l.
+rewrite lap_convol_mul_r_succ_l.
+rewrite Nat.add_1_r; cbn.
+... ...
+rewrite lap_mul_repeat_0_app_1_comm.
 ...
 (*
 remember (strip_0s (rla - (map (rngl_mul cq) rlb ++ repeat 0%F dq))%lap)
