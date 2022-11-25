@@ -202,7 +202,7 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
             let dq := length rla' - length rlb' in
             let rlr :=
               strip_0s
-                (lap_sub rla' (map (rngl_mul cq) rlb' ++ repeat 0%F dq))
+                (lap_sub rla' (map (λ cb, (cb * cq)%F) rlb' ++ repeat 0%F dq))
             in
             (Some (cq, dq), rlr)
       end
