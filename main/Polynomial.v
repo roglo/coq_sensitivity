@@ -2023,15 +2023,16 @@ rewrite lap_mul_norm_idemp_r.
 now rewrite lap_mul_assoc.
 Qed.
 
-Lemma lap_convol_mul_1_l : ∀ la i len,
+Theorem lap_convol_mul_const_l : ∀ a la i len,
   length la = i + len
-  → lap_convol_mul [1%F] la i len = skipn i la.
+  → lap_convol_mul [a] la i len =
+    map (λ b, (a * b)%F) (skipn i la).
 Proof.
 intros * Hlen.
 revert i Hlen.
 induction len; intros. {
   rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
-  symmetry; apply skipn_all.
+  now rewrite skipn_all.
 }
 cbn - [ nth ].
 rewrite rngl_summation_split_first; [ | easy ].
@@ -2042,11 +2043,9 @@ rewrite all_0_rngl_summation_0. 2: {
   now apply rngl_mul_0_l.
 }
 rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
-rewrite rngl_mul_1_l.
-rewrite IHlen; [ | flia Hlen ].
+rewrite IHlen; [ | now rewrite Nat.add_succ_r in Hlen ].
 symmetry.
-apply (List_skipn_is_cons 0%F).
-flia Hlen.
+rewrite (List_skipn_is_cons 0%F); [ easy | flia Hlen ].
 Qed.
 
 Theorem lap_convol_mul_const_r : ∀ a la i len,
@@ -2074,6 +2073,19 @@ symmetry.
 rewrite (List_skipn_is_cons 0%F); [ easy | flia Hlen ].
 Qed.
 
+Theorem lap_convol_mul_1_l : ∀ la i len,
+  length la = i + len
+  → lap_convol_mul [1%F] la i len = skipn i la.
+Proof.
+intros * Hlen.
+rewrite lap_convol_mul_const_l; [ | easy ].
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  now rewrite rngl_mul_1_l.
+}
+apply map_id.
+Qed.
+
 Theorem lap_convol_mul_1_r : ∀ la i len,
   length la = i + len
   → lap_convol_mul la [1%F] i len = skipn i la.
@@ -2086,8 +2098,6 @@ erewrite map_ext_in. 2: {
 }
 apply map_id.
 Qed.
-
-...
 
 Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
 Proof.
@@ -2102,7 +2112,6 @@ Qed.
 Theorem lap_mul_1_r : ∀ la, (la * [1%F])%lap = la.
 Proof.
 intros la.
-...
 unfold "*"%lap; cbn.
 destruct la as [| a]; [ easy | cbn ].
 rewrite Nat.sub_0_r.
@@ -2676,8 +2685,15 @@ rewrite lap_mul_assoc; cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
   now intros H; apply app_eq_nil in H.
 }
-... ...
 rewrite lap_mul_const_r.
+do 2 rewrite map_app; cbn.
+rewrite List_map_repeat.
+rewrite (rngl_mul_0_l Hos).
+rewrite map_rev.
+...
+rewrite app_assoc, map_app; cbn.
+rewrite Hcq at 1.
+Search (_ * (_ / _))%F.
 ...
 unfold lap_mul.
 remember (repeat 0%F dq ++ rev rlb ++ [b]) as lc eqn:Hlc.
