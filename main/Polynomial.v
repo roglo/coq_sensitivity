@@ -2616,23 +2616,16 @@ induction n; intros. {
 }
 cbn.
 destruct la as [| a]; [ easy | clear Haz ].
-...
-rewrite app_length, repeat_length; cbn.
-rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
-rewrite rngl_summation_only_one.
-rewrite (rngl_mul_0_l Hos); f_equal.
-rewrite lap_convol_mul_l_succ_l.
-rewrite IHn; [ | easy ].
-destruct n; [ easy | cbn ].
-rewrite rngl_summation_only_one.
-rewrite (rngl_mul_0_l Hos).
-rewrite Nat.sub_0_r.
-rewrite app_length, repeat_length; cbn.
-rewrite lap_convol_mul_l_succ_l.
+cbn.
+rewrite app_length, repeat_length, Nat.sub_0_r; cbn.
 rewrite Nat.add_succ_r; cbn.
 rewrite rngl_summation_only_one.
-rewrite (rngl_mul_0_l Hos); f_equal.
-apply lap_convol_mul_l_succ_l.
+rewrite (rngl_mul_0_r Hos); f_equal.
+rewrite IHn; [ | easy ].
+rewrite lap_convol_mul_r_succ_l.
+cbn.
+destruct n; cbn; [ now rewrite Nat.sub_0_r | ].
+now rewrite app_length, repeat_length, Nat.sub_0_r.
 Qed.
 
 Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
@@ -2650,8 +2643,13 @@ remember (a / b)%F as cq eqn:Hcq.
 remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
-rewrite lap_repeat_0_app_1_is_mul_l; [ | easy ].
+cbn.
+rewrite lap_repeat_0_app_is_mul_power_l; [ | easy ].
 rewrite lap_mul_assoc; cbn.
+rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
+  now intros H; apply app_eq_nil in H.
+}
+Inspect 5.
 ...
 Theorem lap_mul_repeat_0_app_1_comm : ∀ la n,
   (la * (repeat 0%F n ++ [1%F]) = (repeat 0%F n ++ [1%F]) * la)%lap.
