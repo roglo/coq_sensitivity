@@ -2049,18 +2049,18 @@ apply (List_skipn_is_cons 0%F).
 flia Hlen.
 Qed.
 
-Theorem lap_convol_mul_1_r : ∀ la i len,
+Theorem lap_convol_mul_const_r : ∀ a la i len,
   length la = i + len
-  → lap_convol_mul la [1%F] i len = skipn i la.
+  → lap_convol_mul la [a] i len =
+    map (λ b, (b * a)%F) (skipn i la).
 Proof.
 intros * Hlen.
 revert i Hlen.
 induction len; intros. {
   rewrite Nat.add_0_r in Hlen; rewrite <- Hlen.
-  symmetry; apply skipn_all.
+  now rewrite skipn_all.
 }
 cbn - [ nth ].
-Print lap_convol_mul.
 rewrite rngl_summation_split_last; [ | easy ].
 rewrite all_0_rngl_summation_0. 2: {
   intros j Hj.
@@ -2069,12 +2069,25 @@ rewrite all_0_rngl_summation_0. 2: {
   now apply rngl_mul_0_r.
 }
 rewrite Nat.sub_diag, rngl_add_0_l; cbn.
-rewrite rngl_mul_1_r.
 rewrite IHlen; [ | flia Hlen ].
 symmetry.
-apply (List_skipn_is_cons 0%F).
-flia Hlen.
+rewrite (List_skipn_is_cons 0%F); [ easy | flia Hlen ].
 Qed.
+
+Theorem lap_convol_mul_1_r : ∀ la i len,
+  length la = i + len
+  → lap_convol_mul la [1%F] i len = skipn i la.
+Proof.
+intros * Hlen.
+rewrite lap_convol_mul_const_r; [ | easy ].
+erewrite map_ext_in. 2: {
+  intros a Ha.
+  now rewrite rngl_mul_1_r.
+}
+apply map_id.
+Qed.
+
+...
 
 Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
 Proof.
@@ -2084,6 +2097,17 @@ destruct la as [| a]; [ easy | cbn ].
 rewrite rngl_summation_only_one.
 rewrite rngl_mul_1_l; f_equal.
 now rewrite lap_convol_mul_1_l.
+Qed.
+
+Theorem lap_mul_1_r : ∀ la, (la * [1%F])%lap = la.
+Proof.
+intros la.
+...
+unfold "*"%lap; cbn.
+destruct la as [| a]; [ easy | cbn ].
+rewrite Nat.sub_0_r.
+apply lap_convol_mul_1_r.
+now rewrite Nat.add_1_r.
 Qed.
 
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
@@ -2401,14 +2425,17 @@ Qed.
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
 
-Theorem lap_mul_1_r : ∀ la, (la * [1%F])%lap = la.
+Theorem lap_mul_const_r : ∀ la a,
+  (la * [a])%lap = map (λ b, (b * a)%F) la.
 Proof.
-intros la.
+intros.
 unfold "*"%lap; cbn.
-destruct la as [| a]; [ easy | cbn ].
+destruct la as [| b]; [ easy | cbn ].
 rewrite Nat.sub_0_r.
-apply lap_convol_mul_1_r.
-now rewrite Nat.add_1_r.
+rewrite Nat.add_1_r; cbn.
+rewrite rngl_summation_only_one.
+f_equal.
+now apply lap_convol_mul_const_r.
 Qed.
 
 Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
@@ -2649,47 +2676,6 @@ rewrite lap_mul_assoc; cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
   now intros H; apply app_eq_nil in H.
 }
-Search ([_] * _)%lap.
-
-Theorem lap_mul_const_r : ∀ la a,
-  (la * [a])%lap = map (λ b, (b * a)%F) la.
-Proof.
-intros.
-unfold "*"%lap; cbn.
-destruct la as [| b]; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-rewrite Nat.add_1_r; cbn.
-rewrite rngl_summation_only_one.
-f_equal.
-Theorem lap_convol_mul_const_r : ∀ a b la i len,
-  length la ≤ len
-  → lap_convol_mul (b :: la) [a] (S i) len =
-    map (λ b, (b * a)%F) la.
-Proof.
-intros * Hlen.
-revert a b la i Hlen.
-induction len; intros; cbn - [ nth ]. {
-  apply Nat.le_0_r, length_zero_iff_nil in Hlen.
-  now subst la.
-}
-rewrite rngl_summation_split_first; [ | easy ].
-rewrite rngl_summation_shift with (s := 1); [ | flia ].
-rewrite Nat.sub_diag, Nat_sub_succ_1.
-cbn.
-rewrite Tauto_match_nat_same.
-rewrite (rngl_mul_0_r Hos), rngl_add_0_l.
-...
-induction la as [| c]; [ easy | cbn ].
-unfold iter_seq, iter_list; cbn.
-rewrite rngl_add_0_l, (rngl_mul_0_r Hos).
-rewrite rngl_add_0_l; f_equal.
-...
-... ...
-apply lap_convol_mul_const_r.
-...
-  lap_convol_mul (b :: c :: la) [a] 2 (length la) =
-  map (λ b0 : T, (b0 * a)%F) la
-...
 ... ...
 rewrite lap_mul_const_r.
 ...
