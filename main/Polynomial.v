@@ -2690,8 +2690,6 @@ do 2 rewrite map_app; cbn.
 rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
-...
-rewrite app_assoc, map_app; cbn.
 rewrite Hcq at 1.
 Search (_ * (_ / _))%F.
 ...
