@@ -2668,13 +2668,14 @@ Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_inv T _ = true →
   ∀ rla rlb rlr cq dq,
-  hd 0%F rlb ≠ 0%F
+  hd 0%F rla ≠ 0%F
+  → hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
-intros Hco Hiv * Hbz Hrl.
+intros Hco Hiv * Haz Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
-destruct rla as [| a]; [ easy | ].
+destruct rla as [| a]; [ easy | cbn in Haz ].
 rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
