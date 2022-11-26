@@ -2705,6 +2705,7 @@ assert (Ha : rla = (rld + rlc)%lap). {
   rewrite Hrld.
   unfold lap_sub.
   rewrite <- lap_add_assoc.
+Search (- _ + _)%lap.
 Search (_ + lap_norm _)%lap.
 ...
 rewrite <- lap_add_norm_idemp_r.
