@@ -2719,17 +2719,29 @@ symmetry in Hrld.
 destruct rld as [| d]. {
   rewrite lap_add_0_r; f_equal.
   f_equal.
+(* euh... non, si (la - lb)%lap = [], alors ils sont tous des deux [] *)
+(* chuis con *)
+...
 Theorem lap_sub_move_0_r :
   ∀ la lb : list T, (la - lb)%lap = 0%lap ↔ la = lb.
 Proof.
 intros.
 split. {
   intros Hab.
+  generalize Hab; intros H.
+  apply (f_equal length) in H; cbn in H.
+  rewrite lap_sub_length in H.
+...
   apply (f_equal (λ lc, (lc + lb)%lap)) in Hab.
   cbn in Hab.
   unfold lap_sub in Hab.
   rewrite <- lap_add_assoc in Hab.
   rewrite lap_add_opp_l in Hab.
+  generalize Hab; intros H.
+  apply (f_equal length) in H.
+  rewrite lap_add_length in H.
+  rewrite repeat_length in H.
+  apply Nat.max_r_iff in H.
 ...
 Theorem lap_add_opp_l
 Search (_ - _)%lap.
