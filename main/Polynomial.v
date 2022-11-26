@@ -2721,9 +2721,12 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
-destruct rld as [| d]. {
+clear Hab Hdq Hrlc.
+revert rla rlc Hrld.
+induction rld as [| d]; intros. {
   rewrite lap_add_0_r; f_equal.
   f_equal.
   apply eq_lap_add_0 in Hrld.
@@ -2736,7 +2739,8 @@ destruct rld as [| d]. {
 cbn.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hdz| Hdz]. {
-  apply (rngl_eqb_eq Heb) in Hdz; subst d.
+  apply (rngl_eqb_eq Heb) in Hdz; subst d; cbn.
+  apply IHrld.
 ...
 (**)
 destruct rla as [| a2]. {
