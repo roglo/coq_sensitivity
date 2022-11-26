@@ -2700,10 +2700,13 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
-remember (rla - rlc)%lap as rld eqn:Hrld.
-assert (Ha : rla = (rld + rlc)%lap). {
+...
+remember (strip_0s (rla - rlc)%lap) as rld eqn:Hrld.
+assert (Ha : rla = (rld + strip_0s rlc)%lap). {
   rewrite Hrld.
+...
   unfold lap_sub.
+...
   rewrite <- lap_add_assoc.
 Search (- _ + _)%lap.
 Search (_ + lap_norm _)%lap.
