@@ -2677,6 +2677,13 @@ destruct n; cbn; [ now rewrite Nat.sub_0_r | ].
 now rewrite app_length, repeat_length, Nat.sub_0_r.
 Qed.
 
+Theorem eq_lap_add_0 : ∀ la lb, (la + lb = 0)%lap → (la = 0 ∧ lb = 0)%lap.
+Proof.
+intros * Hab.
+revert lb Hab.
+induction la as [| a]; intros; [ easy | now destruct lb ].
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_inv T _ = true →
@@ -2719,68 +2726,17 @@ symmetry in Hrld.
 destruct rld as [| d]. {
   rewrite lap_add_0_r; f_equal.
   f_equal.
-(* euh... non, si (la - lb)%lap = [], alors ils sont tous des deux [] *)
-(* chuis con *)
-...
-Theorem lap_sub_move_0_r :
-  ∀ la lb : list T, (la - lb)%lap = 0%lap ↔ la = lb.
-Proof.
-intros.
-split. {
-  intros Hab.
-  generalize Hab; intros H.
-  apply (f_equal length) in H; cbn in H.
-  rewrite lap_sub_length in H.
-...
-  apply (f_equal (λ lc, (lc + lb)%lap)) in Hab.
-  cbn in Hab.
-  unfold lap_sub in Hab.
-  rewrite <- lap_add_assoc in Hab.
-  rewrite lap_add_opp_l in Hab.
-  generalize Hab; intros H.
-  apply (f_equal length) in H.
-  rewrite lap_add_length in H.
-  rewrite repeat_length in H.
-  apply Nat.max_r_iff in H.
-...
-Theorem lap_add_opp_l
-Search (_ - _)%lap.
-...
-  apply (rngl_add_compat_r _ _ b) in Hab.
-  unfold rngl_sub in Hab.
-  rewrite Hop in Hab.
-  rewrite <- rngl_add_assoc in Hab.
-  rewrite rngl_add_opp_l in Hab; [ | easy ].
-  now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
-} {
-....
-Theorem lap_sub_eq_0 : ∀ la lb,
-  length la = length lb
-  → (la - lb = [])%lap
-  → la = lb.
-Proof.
-intros * Hlab Hab.
-unfold lap_sub, lap_opp in Hab.
-Search ((_ + _) = [])%lap.
-...
-Search (_ - _ = 0)%F.
-Check rngl_add_compat_r.
-Check lap_add_compat_r.
-...
-Search (_ - _)%lap.
-Theorem lap_sub_eq_0 : ∀ la lb,
-  length la = length lb
-  → (la - lb = [])%lap
-  → la = lb.
-Proof.
-intros * Hlab Hab.
-unfold lap_sub, lap_opp in Hab.
-Search ((_ + _) = [])%lap.
-... ...
-  apply lap_sub_eq_0; [ | easy ].
-  rewrite Hrlc, app_length, map_length, repeat_length.
-  rewrite Hdq, Nat.add_comm; symmetry.
-  now apply Nat.sub_add.
+  apply eq_lap_add_0 in Hrld.
+  destruct Hrld as (H1, H2); subst rla.
+  apply (f_equal length) in H2.
+  cbn in H2; unfold lap_opp in H2.
+  rewrite map_length in H2.
+  now apply length_zero_iff_nil in H2; rewrite H2.
+}
+cbn.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hdz| Hdz]. {
+  apply (rngl_eqb_eq Heb) in Hdz; subst d.
 ...
 (**)
 destruct rla as [| a2]. {
