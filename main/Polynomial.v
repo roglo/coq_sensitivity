@@ -2700,6 +2700,18 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+remember (rla - rlc)%lap as rld eqn:Hrld.
+assert (Ha : rla = (rld + rlc)%lap). {
+  rewrite Hrld.
+  unfold lap_sub.
+  rewrite <- lap_add_assoc.
+Search (_ + lap_norm _)%lap.
+...
+rewrite <- lap_add_norm_idemp_r.
+Check lap_add_opp_l.
+Search (_ - _ + _)%lap.
+Check rngl_sub_add.
+...
 rewrite <- rev_involutive; symmetry.
 rewrite <- rev_involutive; symmetry.
 f_equal.
