@@ -2701,6 +2701,17 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+destruct rlb as [| b2]. {
+  rewrite Nat.sub_0_r in Hdq.
+  cbn in Hrlc.
+  clear Hab.
+  subst rlc.
+  subst dq.
+  rewrite lap_sub_repeat_0.
+  induction rla as [| a2]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Ha2z| Ha2z]. {
+    apply (rngl_eqb_eq Heb) in Ha2z; subst a2.
 ...
 remember (strip_0s (rla - rlc)%lap) as rld eqn:Hrld.
 assert (Ha : rla = (rld + strip_0s rlc)%lap). {
