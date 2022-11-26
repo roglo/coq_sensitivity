@@ -2700,6 +2700,12 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+rewrite <- rev_involutive; symmetry.
+rewrite <- rev_involutive; symmetry.
+f_equal.
+rewrite rev_app_distr; cbn.
+rewrite rev_involutive.
+Search (rev (_ + _)%lap).
 ...
 unfold lap_mul.
 remember (repeat 0%F dq ++ rev rlb ++ [b]) as lc eqn:Hlc.
