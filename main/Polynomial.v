@@ -393,7 +393,7 @@ Qed.
 Theorem fold_lap_norm : ∀ la, rev (strip_0s (rev la)) = lap_norm la.
 Proof. easy. Qed.
 
-Theorem lap_norm_repeat_0 : ∀ la,
+Theorem lap_norm_app_repeat_0 : ∀ la,
   la = lap_norm la ++ repeat 0%F (length la - length (lap_norm la)).
 Proof.
 intros.
@@ -449,7 +449,7 @@ Qed.
 Theorem lap_norm_length_le : ∀ la, length (lap_norm la) ≤ length la.
 Proof.
 intros.
-rewrite (lap_norm_repeat_0 la) at 2.
+rewrite (lap_norm_app_repeat_0 la) at 2.
 rewrite app_length; flia.
 Qed.
 
@@ -987,6 +987,8 @@ Delimit Scope lap_scope with lap.
 Arguments lap_add (la lb)%lap.
 Arguments lap_mul (la lb)%lap.
 
+Notation "0" := [] : lap_scope.
+Notation "1" := [1%F] : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
@@ -1379,7 +1381,7 @@ Theorem lap_norm_convol_mul_norm_r : ∀ la lb i len,
   lap_norm (lap_convol_mul la lb i len).
 Proof.
 intros.
-rewrite (lap_norm_repeat_0 lb) at 2.
+rewrite (lap_norm_app_repeat_0 lb) at 2.
 now rewrite lap_convol_mul_app_rep_0_r.
 Qed.
 
@@ -1389,7 +1391,7 @@ Theorem lap_norm_cons_norm : ∀ a la lb i len,
     lap_norm (lap_convol_mul (a :: la) lb i len).
 Proof.
 intros * Hlen.
-rewrite (lap_norm_repeat_0 la) at 2.
+rewrite (lap_norm_app_repeat_0 la) at 2.
 rewrite app_comm_cons.
 now rewrite lap_convol_mul_app_rep_0_l.
 Qed.
@@ -2479,19 +2481,30 @@ Qed.
 
 Theorem lap_add_opp_l :
   @rngl_has_opp T _ = true
+  → ∀ la, (- la + la)%lap = repeat 0%F (length la).
+Proof.
+intros Hop *.
+induction la as [| a]; [ easy | cbn ].
+rewrite (rngl_add_opp_l Hop).
+now f_equal.
+Qed.
+
+Theorem lap_norm_repeat_0 : ∀ n, lap_norm (repeat 0%F n) = [].
+Proof.
+intros.
+unfold lap_norm.
+rewrite List_rev_repeat.
+induction n; [ easy | cbn ].
+now rewrite (rngl_eqb_refl Heb).
+Qed.
+
+Theorem lap_norm_add_opp_l :
+  @rngl_has_opp T _ = true
   → ∀ la, lap_norm (- la + la)%lap = [].
 Proof.
 intros Hop *.
-unfold lap_norm.
-apply List_eq_rev_nil.
-rewrite rev_involutive.
-induction la as [| a]; [ reflexivity | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s _) as lb eqn:Hlb; symmetry in Hlb.
-subst lb.
-rewrite IHla; cbn.
-rewrite rngl_add_opp_l; [ | easy ].
-now rewrite (rngl_eqb_refl Heb).
+rewrite (lap_add_opp_l Hop).
+apply lap_norm_repeat_0.
 Qed.
 
 Theorem polyn_add_opp_l :
@@ -2503,7 +2516,7 @@ apply eq_polyn_eq.
 destruct a as (la, Ha); cbn.
 do 2 rewrite fold_lap_norm.
 rewrite lap_add_norm_idemp_l.
-now apply lap_add_opp_l.
+now apply lap_norm_add_opp_l.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
@@ -2701,6 +2714,62 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+remember (rla - rlc)%lap as rld eqn:Hrld.
+symmetry in Hrld.
+destruct rld as [| d]. {
+  rewrite lap_add_0_r; f_equal.
+  f_equal.
+Theorem lap_sub_move_0_r :
+  ∀ la lb : list T, (la - lb)%lap = 0%lap ↔ la = lb.
+Proof.
+intros.
+split. {
+  intros Hab.
+  apply (f_equal (λ lc, (lc + lb)%lap)) in Hab.
+  cbn in Hab.
+  unfold lap_sub in Hab.
+  rewrite <- lap_add_assoc in Hab.
+  rewrite lap_add_opp_l in Hab.
+...
+Theorem lap_add_opp_l
+Search (_ - _)%lap.
+...
+  apply (rngl_add_compat_r _ _ b) in Hab.
+  unfold rngl_sub in Hab.
+  rewrite Hop in Hab.
+  rewrite <- rngl_add_assoc in Hab.
+  rewrite rngl_add_opp_l in Hab; [ | easy ].
+  now rewrite rngl_add_0_r, rngl_add_0_l in Hab.
+} {
+....
+Theorem lap_sub_eq_0 : ∀ la lb,
+  length la = length lb
+  → (la - lb = [])%lap
+  → la = lb.
+Proof.
+intros * Hlab Hab.
+unfold lap_sub, lap_opp in Hab.
+Search ((_ + _) = [])%lap.
+...
+Search (_ - _ = 0)%F.
+Check rngl_add_compat_r.
+Check lap_add_compat_r.
+...
+Search (_ - _)%lap.
+Theorem lap_sub_eq_0 : ∀ la lb,
+  length la = length lb
+  → (la - lb = [])%lap
+  → la = lb.
+Proof.
+intros * Hlab Hab.
+unfold lap_sub, lap_opp in Hab.
+Search ((_ + _) = [])%lap.
+... ...
+  apply lap_sub_eq_0; [ | easy ].
+  rewrite Hrlc, app_length, map_length, repeat_length.
+  rewrite Hdq, Nat.add_comm; symmetry.
+  now apply Nat.sub_add.
+...
 (**)
 destruct rla as [| a2]. {
   cbn in Hab, Hdq; subst dq; cbn.
