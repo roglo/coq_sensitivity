@@ -2696,6 +2696,10 @@ rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
 rewrite Hcq at 1.
 rewrite (rngl_mul_div_r Hco Hiv _ _ Hbz).
+rewrite <- List_rev_repeat at 1.
+rewrite app_assoc.
+rewrite <- rev_app_distr.
+remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 ...
 unfold lap_mul.
 remember (repeat 0%F dq ++ rev rlb ++ [b]) as lc eqn:Hlc.
