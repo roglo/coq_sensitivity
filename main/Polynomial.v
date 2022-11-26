@@ -2701,11 +2701,21 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+(**)
+destruct rla as [| a2]. {
+  cbn in Hab, Hdq; subst dq; cbn.
+  apply Nat.le_0_r in Hab.
+  apply length_zero_iff_nil in Hab; subst rlb.
+  now cbn in Hrlc; subst rlc.
+}
+cbn.
+...
 destruct rlb as [| b2]. {
   rewrite Nat.sub_0_r in Hdq.
   cbn in Hrlc.
   clear Hab.
   subst rlc.
+  rewrite List_rev_repeat.
   subst dq.
   rewrite lap_sub_repeat_0.
   induction rla as [| a2]; [ easy | cbn ].
