@@ -2718,6 +2718,22 @@ revert lb Hab.
 induction la as [| a]; intros; [ easy | now destruct lb ].
 Qed.
 
+Theorem lap_app_add_comm : ∀ la lb lc,
+  length lc ≤ length la
+  → (((la ++ lb) + lc) = (la + lc) ++ lb)%lap.
+Proof.
+intros * Hca.
+revert lb lc Hca.
+induction la as [| a]; intros; cbn. {
+  apply Nat.le_0_r, length_zero_iff_nil in Hca; subst lc.
+  now rewrite lap_add_0_r.
+}
+destruct lc as [| c]; [ easy | ].
+cbn in Hca |-*; f_equal.
+apply Nat.succ_le_mono in Hca.
+now apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_inv T _ = true →
@@ -2758,6 +2774,15 @@ rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 cbn in Hra.
 apply -> Nat.lt_succ_r in Hra.
+assert (Hca : length rlc = length rla). {
+  rewrite Hrlc, app_length, map_length, repeat_length.
+  now rewrite Hdq, Nat.add_comm, Nat.sub_add.
+}
+rewrite lap_app_add_comm. 2: {
+  do 2 rewrite rev_length.
+  now rewrite Hca.
+}
+f_equal.
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
