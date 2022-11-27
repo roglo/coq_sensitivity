@@ -2757,6 +2757,7 @@ rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 cbn in Hra.
+apply -> Nat.lt_succ_r in Hra.
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
