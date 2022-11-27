@@ -492,6 +492,47 @@ etransitivity; [ apply lap_norm_add_length_le | ].
 now rewrite lap_opp_length.
 Qed.
 
+Theorem rlap_quot_rem_step_None : ∀ la lb lr,
+  rlap_quot_rem_step la lb = (None, lr)
+  → lb = [] ∧ lr = [] ∨ la = [] ∧ lr = [] ∨ length la < length lb ∧ lr = la.
+Proof.
+intros * Hrl.
+destruct lb as [| b]. {
+  injection Hrl; clear Hrl; intros; subst.
+  now left.
+}
+destruct la as [| a]. {
+  injection Hrl; clear Hrl; intros; subst.
+  now right; left.
+}
+cbn in Hrl |-*; right; right.
+rewrite if_ltb_lt_dec in Hrl.
+destruct (lt_dec _ _) as [Hab| Hab]; [ | easy ].
+injection Hrl; clear Hrl; intros; subst lr.
+split; [ | easy ].
+now apply Nat.succ_lt_mono in Hab.
+Qed.
+
+Theorem rlap_quot_rem_step_length_lt : ∀ rla rlb rlr cq dq,
+  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → length rlr < length rla.
+Proof.
+intros * Hrab.
+unfold rlap_quot_rem_step in Hrab.
+destruct rlb as [| b]; [ easy | ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrab.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrab; clear Hrab; intros; subst cq dq rlr.
+eapply le_lt_trans; [ apply strip_0s_length_le | ].
+rewrite lap_sub_length.
+rewrite app_length, map_length, repeat_length.
+rewrite Nat.add_comm, (Nat.sub_add _ _ Hab).
+rewrite Nat.max_id.
+now cbn.
+Qed.
+
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -548,11 +589,26 @@ cbn in Hbn |-*.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
-cbn in Hqr.
+(*
+cbn - [ rlap_quot_rem_step ] in Hqr.
+remember (rlap_quot_rem_step rla (b :: rlb)) as orlr eqn:Horlr.
+symmetry in Horlr.
+destruct orlr as (o, rlr').
+destruct o as [(cq, dq)| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr'.
+  apply rlap_quot_rem_step_None in Horlr.
+  destruct Horlr as [| Horlr]; [ easy | ].
+  destruct Horlr as [Horlr| Horlr]. {
+    now destruct Horlr; subst rla rlr.
+  }
+  now destruct Horlr as (H1, H2); subst rlr.
+}
+*)
 destruct rla as [| a]. {
   now injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 }
 move a after b.
+cbn in Hqr.
 rewrite if_bool_if_dec in Hqr.
 destruct (bool_dec _) as [Hab| Hab]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
@@ -562,9 +618,9 @@ destruct (bool_dec _) as [Hab| Hab]. {
 apply Nat.ltb_ge in Hab.
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
-destruct qr as (rlq', rlr').
+destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr.
-rename rlq' into rlq; rename rlr' into rlr.
+rename rlq' into rlq; rename rlr'' into rlr.
 rename Hqr' into Hqr.
 cbn in Hit.
 remember (rev rla) as la eqn:Hla.
@@ -575,7 +631,6 @@ remember (rev rlb) as lb eqn:Hlb.
 assert (H : rlb = rev lb) by now rewrite Hlb, rev_involutive.
 move H at top; subst rlb; clear Hlb.
 rewrite rev_length in Hab, Hqr |-*.
-(**)
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply -> Nat.succ_le_mono.
@@ -787,27 +842,6 @@ apply rngl_integral in Hq; [ | easy | ]. 2: {
 destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
-Qed.
-
-Theorem rlap_quot_rem_step_None : ∀ la lb lr,
-  rlap_quot_rem_step la lb = (None, lr)
-  → lb = [] ∧ lr = [] ∨ la = [] ∧ lr = [] ∨ length la < length lb ∧ lr = la.
-Proof.
-intros * Hrl.
-destruct lb as [| b]. {
-  injection Hrl; clear Hrl; intros; subst.
-  now left.
-}
-destruct la as [| a]. {
-  injection Hrl; clear Hrl; intros; subst.
-  now right; left.
-}
-cbn in Hrl |-*; right; right.
-rewrite if_ltb_lt_dec in Hrl.
-destruct (lt_dec _ _) as [Hab| Hab]; [ | easy ].
-injection Hrl; clear Hrl; intros; subst lr.
-split; [ | easy ].
-now apply Nat.succ_lt_mono in Hab.
 Qed.
 
 Theorem hd_rem : ∀ la lb lq lr,
@@ -2694,6 +2728,7 @@ Theorem rlap_quot_rem_step_Some :
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
 intros Hco Hiv * Haz Hbz Hrl.
+specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | cbn in Haz ].
 rewrite if_bool_if_dec in Hrl.
@@ -2721,11 +2756,12 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
+cbn in Hra.
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
 clear Hab Hdq Hrlc.
-revert rla rlc Hrld.
+revert rla rlc Hrld Hra.
 induction rld as [| d]; intros. {
   rewrite lap_add_0_r; f_equal.
   f_equal.
