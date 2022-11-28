@@ -2815,14 +2815,19 @@ destruct (bool_dec _) as [Hdz| Hdz]. 2: {
   cbn in Hca.
   apply Nat.succ_inj in Hca.
   specialize (IHla lc Hca) as H1.
-  rewrite H1; cbn.
-...
-  rewrite lap_app_add_comm. 2: {
-    rewrite map_length, rev_length.
-    rewrite app_length, rev_length; cbn.
-    rewrite lap_add_length.
-...
-  apply (rngl_eqb_eq Heb) in Hdz; subst d; cbn.
+  rewrite H1 at 1; cbn.
+  remember (rev ((rev la ++ [a]) + map rngl_opp (rev lc ++ [c]))%lap) as ld eqn:Hld.
+  symmetry in Hld.
+  destruct ld as [| e]. {
+    apply (f_equal (λ l, rev l)) in Hld.
+    rewrite rev_involutive in Hld; cbn in Hld.
+    apply eq_lap_add_0 in Hld.
+    destruct Hld as (_, H2).
+    remember (rev lc ++ [c]) as le eqn:Hle.
+    symmetry in Hle.
+    destruct le; [ | easy ].
+    now apply app_eq_nil in Hle.
+  }
 ...
 clear Hab Hdq Hrlc.
 revert rla rlc Hrld Hra.
