@@ -2868,8 +2868,12 @@ rewrite (fold_rngl_sub Hop) in Hrld.
 injection Hrld; clear Hrld; intros Hrld Hac.
 apply -> (rngl_sub_move_0_r Hop) in Hac; subst a'.
 rewrite fold_lap_opp in Hrld; cbn.
+Check lap_app_add_comm.
+...
 rewrite lap_app_add_comm. 2: {
   do 2 rewrite rev_length.
+  cbn in Hca, Hra.
+  rewrite <- Hca in Hra.
 ...
   rewrite H1 at 1; cbn.
 ...
