@@ -2841,6 +2841,9 @@ destruct (bool_dec _) as [Hac| Hac]. {
     apply IHrla; [ easy | flia Hra Haca ].
   }
   clear Hra.
+  exfalso.
+  (* bin length (strip_0s (rla - rlc)) peut pas être supérieur à
+     length rla, ni length rlc *)
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
