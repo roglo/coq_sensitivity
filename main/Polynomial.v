@@ -157,6 +157,9 @@ Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
 
+Theorem fold_lap_sub : ∀ la lb, lap_add la (lap_opp lb) = lap_sub la lb.
+Proof. easy. Qed.
+
 (* multiplication *)
 
 Fixpoint lap_convol_mul al1 al2 i len :=
@@ -2806,6 +2809,38 @@ rewrite lap_app_add_comm. 2: {
   now rewrite Hca.
 }
 f_equal.
+(**)
+clear Hrlc Hab.
+clear a Haz Hcq Hdq.
+revert rlc Hca Hra.
+induction rla as [| a]; intros; cbn. {
+  now apply length_zero_iff_nil in Hca; subst rlc.
+}
+destruct rlc as [| c]; [ easy | cbn ].
+cbn in Hca; apply Nat.succ_inj in Hca.
+rewrite (fold_rngl_sub Hop).
+rewrite fold_lap_opp.
+rewrite fold_lap_sub.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hac| Hac]. {
+  apply (rngl_eqb_eq Heb) in Hac.
+  apply -> (rngl_sub_move_0_r Hop) in Hac; subst c.
+  cbn in Hra.
+  rewrite (fold_rngl_sub Hop) in Hra.
+  rewrite (rngl_sub_diag Hos) in Hra.
+  rewrite (rngl_eqb_refl Heb) in Hra.
+  rewrite fold_lap_opp in Hra.
+  rewrite fold_lap_sub in Hra.
+  destruct (Nat.eq_dec (length (strip_0s (rla - rlc)%lap)) (S (length rla)))
+    as [Haca| Haca]. 2: {
+    rewrite lap_app_add_comm. 2: {
+      do 2 rewrite rev_length.
+      flia Hca Hra Haca.
+    }
+    f_equal.
+    apply IHrla; [ easy | flia Hra Haca ].
+  }
+  clear Hra.
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
