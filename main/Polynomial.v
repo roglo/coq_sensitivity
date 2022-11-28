@@ -2783,9 +2783,26 @@ rewrite lap_app_add_comm. 2: {
   now rewrite Hca.
 }
 f_equal.
-...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
+destruct rld as [| d]. {
+  rewrite lap_add_0_r; f_equal.
+  apply eq_lap_add_0 in Hrld.
+  destruct Hrld as (H1, H2); subst rla.
+  apply (f_equal length) in H2.
+  cbn in H2; unfold lap_opp in H2.
+  rewrite map_length in H2.
+  now apply length_zero_iff_nil in H2; rewrite H2.
+}
+cbn.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hdz| Hdz]. 2: {
+  rewrite <- Hrld.
+Search (rev (_ - _)%lap).
+Search (rev _ + rev _)%lap.
+...
+  apply (rngl_eqb_eq Heb) in Hdz; subst d; cbn.
+...
 clear Hab Hdq Hrlc.
 revert rla rlc Hrld Hra.
 induction rld as [| d]; intros. {
