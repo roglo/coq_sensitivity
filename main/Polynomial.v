@@ -2853,6 +2853,23 @@ destruct (bool_dec _) as [Hdz| Hdz]. 2: {
 apply (rngl_eqb_eq Heb) in Hdz; subst d.
 cbn in Hra.
 rewrite (rngl_eqb_refl Heb) in Hra.
+destruct rla as [| a']. {
+  cbn in Hca; apply length_zero_iff_nil in Hca; subst rlc.
+  cbn in Hdq; subst dq.
+  apply app_eq_nil in Hca.
+  destruct Hca as (H1, _).
+  apply map_eq_nil in H1; subst rlb; cbn.
+  apply Nat.le_0_r, length_zero_iff_nil in Hra.
+  now rewrite Hra.
+}
+destruct rlc as [| c]; [ easy | ].
+cbn in Hrld.
+rewrite (fold_rngl_sub Hop) in Hrld.
+injection Hrld; clear Hrld; intros Hrld Hac.
+apply -> (rngl_sub_move_0_r Hop) in Hac; subst a'.
+rewrite fold_lap_opp in Hrld; cbn.
+rewrite lap_app_add_comm. 2: {
+  do 2 rewrite rev_length.
 ...
   rewrite H1 at 1; cbn.
 ...
