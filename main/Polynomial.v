@@ -2798,8 +2798,29 @@ cbn.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hdz| Hdz]. 2: {
   rewrite <- Hrld.
-Search (rev (_ - _)%lap).
-Search (rev _ + rev _)%lap.
+  remember (rev rla) as la eqn:Hla.
+  remember (rev rlc) as lc eqn:Hlc.
+  move lc before la.
+  rewrite <- (rev_involutive rla) in Hca |-*.
+  rewrite <- (rev_involutive rlc) in Hca |-*.
+  rewrite <- Hla, <- Hlc in Hca |-*.
+  do 2 rewrite rev_length in Hca.
+  clear Hla Hlc.
+  clear a Haz Hcq.
+  revert lc Hca.
+  induction la as [| a]; intros. {
+    now apply length_zero_iff_nil in Hca; subst lc.
+  }
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hca.
+  apply Nat.succ_inj in Hca.
+  specialize (IHla lc Hca) as H1.
+  rewrite H1; cbn.
+...
+  rewrite lap_app_add_comm. 2: {
+    rewrite map_length, rev_length.
+    rewrite app_length, rev_length; cbn.
+    rewrite lap_add_length.
 ...
   apply (rngl_eqb_eq Heb) in Hdz; subst d; cbn.
 ...
