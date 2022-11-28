@@ -2811,8 +2811,8 @@ rewrite lap_app_add_comm. 2: {
 f_equal.
 (**)
 clear Hrlc Hab.
-clear a Haz Hcq Hdq.
-revert rlc Hca Hra.
+clear a Haz Hcq Hdq Hra.
+revert rlc Hca.
 induction rla as [| a]; intros; cbn. {
   now apply length_zero_iff_nil in Hca; subst rlc.
 }
@@ -2825,25 +2825,22 @@ rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hac| Hac]. {
   apply (rngl_eqb_eq Heb) in Hac.
   apply -> (rngl_sub_move_0_r Hop) in Hac; subst c.
-  cbn in Hra.
-  rewrite (fold_rngl_sub Hop) in Hra.
-  rewrite (rngl_sub_diag Hos) in Hra.
-  rewrite (rngl_eqb_refl Heb) in Hra.
-  rewrite fold_lap_opp in Hra.
-  rewrite fold_lap_sub in Hra.
-  destruct (Nat.eq_dec (length (strip_0s (rla - rlc)%lap)) (S (length rla)))
-    as [Haca| Haca]. 2: {
-    rewrite lap_app_add_comm. 2: {
-      do 2 rewrite rev_length.
-      flia Hca Hra Haca.
-    }
-    f_equal.
-    apply IHrla; [ easy | flia Hra Haca ].
+  rewrite lap_app_add_comm. 2: {
+    do 2 rewrite rev_length.
+    specialize (strip_0s_length_le (rla - rlc)%lap) as H1.
+    rewrite lap_sub_length in H1.
+    now rewrite <- Hca, Nat.max_id in H1.
   }
-  clear Hra.
-  exfalso.
-  (* bin length (strip_0s (rla - rlc)) peut pas être supérieur à
-     length rla, ni length rlc *)
+  f_equal.
+  now apply IHrla.
+}
+cbn.
+...
+Search ((_ ++ _) + _)%lap.
+Search (_ + (_ ++ _))%lap.
+rewrite lap_app_add_comm. 2: {
+  rewrite app_length, rev_length; cbn.
+  rewrite rev_length.
 ...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
