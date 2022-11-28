@@ -589,6 +589,17 @@ apply rngl_has_opp_or_sous_iff in Hos.
 destruct Hos; congruence.
 Qed.
 
+Theorem rngl_sub_add :
+  rngl_has_opp = true →
+  ∀ a b, (a - b + b = a)%F.
+Proof.
+intros Hop *.
+unfold rngl_sub; rewrite Hop.
+rewrite <- rngl_add_assoc.
+rewrite (rngl_add_opp_l Hop).
+apply rngl_add_0_r.
+Qed.
+
 Theorem rngl_div_diag :
   rngl_has_inv_or_quot = true →
   ∀ a : T, a ≠ 0%F → (a / a = 1)%F.

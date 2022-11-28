@@ -154,6 +154,9 @@ Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
 
+Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
+Proof. easy. Qed.
+
 (* multiplication *)
 
 Fixpoint lap_convol_mul al1 al2 i len :=
@@ -2734,8 +2737,28 @@ apply Nat.succ_le_mono in Hca.
 now apply IHla.
 Qed.
 
+Theorem lap_sub_app_app :
+  ∀ la lb lc ld,
+  length la = length lb
+  → ((la ++ lc) - (lb ++ ld))%lap = (la - lb)%lap ++ (lc - ld)%lap.
+Proof.
+intros * Hab.
+revert lb lc ld Hab.
+induction la as [| a]; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hab.
+apply Nat.succ_inj in Hab.
+cbn; f_equal.
+rewrite fold_lap_opp; symmetry.
+rewrite fold_lap_opp; symmetry.
+now apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
   @rngl_has_inv T _ = true →
   ∀ rla rlb rlr cq dq,
   hd 0%F rla ≠ 0%F
@@ -2743,7 +2766,7 @@ Theorem rlap_quot_rem_step_Some :
   → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
-intros Hco Hiv * Haz Hbz Hrl.
+intros Hco Hop Hiv * Haz Hbz Hrl.
 specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | cbn in Haz ].
@@ -2815,7 +2838,24 @@ destruct (bool_dec _) as [Hdz| Hdz]. 2: {
   cbn in Hca.
   apply Nat.succ_inj in Hca.
   specialize (IHla lc Hca) as H1.
+  cbn - [ lap_add ].
+  rewrite lap_sub_app_app; [ | now do 2 rewrite rev_length ].
+  rewrite rev_app_distr.
+  cbn.
+  f_equal. {
+    symmetry.
+    rewrite (fold_rngl_sub Hop).
+    rewrite rngl_add_comm.
+    apply (rngl_sub_add Hop).
+  }
+  now apply IHla.
+}
+apply (rngl_eqb_eq Heb) in Hdz; subst d.
+cbn in Hra.
+rewrite (rngl_eqb_refl Heb) in Hra.
+...
   rewrite H1 at 1; cbn.
+...
   remember (rev ((rev la ++ [a]) + map rngl_opp (rev lc ++ [c]))%lap) as ld eqn:Hld.
   symmetry in Hld.
   destruct ld as [| e]. {
