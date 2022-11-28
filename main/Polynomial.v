@@ -2806,6 +2806,7 @@ rewrite lap_app_add_comm. 2: {
   now rewrite Hca.
 }
 f_equal.
+...
 remember (rla - rlc)%lap as rld eqn:Hrld.
 symmetry in Hrld.
 destruct rld as [| d]. {
@@ -2868,12 +2869,15 @@ rewrite (fold_rngl_sub Hop) in Hrld.
 injection Hrld; clear Hrld; intros Hrld Hac.
 apply -> (rngl_sub_move_0_r Hop) in Hac; subst a'.
 rewrite fold_lap_opp in Hrld; cbn.
-Check lap_app_add_comm.
-...
-rewrite lap_app_add_comm. 2: {
-  do 2 rewrite rev_length.
-  cbn in Hca, Hra.
-  rewrite <- Hca in Hra.
+destruct (Nat.eq_dec (length (strip_0s rld)) (S (length rlc)))
+  as [Hcd| Hcd]. 2: {
+  rewrite lap_app_add_comm. 2: {
+    do 2 rewrite rev_length.
+    cbn in Hca, Hra.
+    rewrite <- Hca in Hra.
+    flia Hra Hcd.
+  }
+  f_equal.
 ...
   rewrite H1 at 1; cbn.
 ...
