@@ -2777,6 +2777,22 @@ apply lap_add_app_app.
 now unfold lap_opp; rewrite map_length.
 Qed.
 
+Theorem length_strip_0s_eq : ∀ la,
+  length (strip_0s la) = length la
+  → strip_0s la = la.
+Proof.
+intros * Ha.
+destruct la as [| a]; [ easy | cbn ].
+cbn in Ha.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+rewrite Haz in Ha.
+specialize (strip_0s_length_le la) as H1.
+rewrite Ha in H1.
+apply Nat.nlt_ge in H1.
+now exfalso; apply H1.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2829,6 +2845,12 @@ rewrite lap_app_add_comm. 2: {
 f_equal.
 (**)
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
+clear Hra.
+remember (rla - rlc)%lap as r eqn:Hr.
+destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
+  subst r.
+  rewrite length_strip_0s_eq; [ | easy ].
+  clear Hrac.
 ...
 (**)
 clear Hrlc Hab.
