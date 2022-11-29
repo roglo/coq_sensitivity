@@ -2899,7 +2899,6 @@ rewrite lap_app_add_comm. 2: {
 f_equal.
 (**)
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
-clear Hra.
 remember (rla - rlc)%lap as r eqn:Hr.
 destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
   subst r.
@@ -2912,6 +2911,38 @@ destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
   now rewrite Hca.
 }
 subst r.
+Check rev_lap_add.
+Theorem gen_rev_lap_add : ∀ la lb,
+  (rev la + rev lb =
+   (rev la ++ repeat 0%F (length lb - length la)) +
+   (rev lb ++ repeat 0%F (length la - length lb)))%lap.
+Admitted.
+rewrite gen_rev_lap_add.
+Search (_ - _ = 0).
+rewrite (proj2 (Nat.sub_0_le _ _)). 2: {
+  now rewrite <- Hca in Hra.
+}
+rewrite app_nil_r.
+Search (_ + (_ ++ _))%lap.
+Check lap_add_app_app.
+Check lap_add_app_app.
+Theorem lap_add_app_r : ∀ la lb lc,
+  length la ≤ length lb
+  → (la + (lb ++ lc) = (la + lb) ++ lc)%lap.
+Proof.
+Admitted.
+rewrite lap_add_app_r.
+...
+specialize lap_add_app_app as H2.
+specialize (H2 (rev rlc)).
+specialize (H2 (rev (strip_0s (rla - rlc)%lap))).
+specialize (H2 []).
+...
+Search (_ + (_ ++ _))%lap.
+Search ((_ ++ _) + _)%lap.
+rewrite lap_add_comm.
+rewrite lap_app_add_comm. 2: {
+  do 2 rewrite rev_length.
 ...
 Check rev_lap_add.
 rewrite <- rev_lap_add. 2: {
