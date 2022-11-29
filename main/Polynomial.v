@@ -2740,10 +2740,10 @@ apply Nat.succ_le_mono in Hca.
 now apply IHla.
 Qed.
 
-Theorem lap_sub_app_app :
+Theorem lap_add_app_app :
   ∀ la lb lc ld,
   length la = length lb
-  → ((la ++ lc) - (lb ++ ld))%lap = (la - lb)%lap ++ (lc - ld)%lap.
+  → ((la ++ lc) + (lb ++ ld))%lap = (la + lb)%lap ++ (lc + ld)%lap.
 Proof.
 intros * Hab.
 revert lb lc ld Hab.
@@ -2754,9 +2754,27 @@ destruct lb as [| b]; [ easy | ].
 cbn in Hab.
 apply Nat.succ_inj in Hab.
 cbn; f_equal.
-rewrite fold_lap_opp; symmetry.
-rewrite fold_lap_opp; symmetry.
 now apply IHla.
+Qed.
+
+Theorem lap_opp_app_distr : ∀ la lb,
+  (- (la ++ lb) = (- la) ++ (- lb))%lap.
+Proof.
+intros.
+unfold lap_opp.
+now rewrite map_app.
+Qed.
+
+Theorem lap_sub_app_app :
+  ∀ la lb lc ld,
+  length la = length lb
+  → ((la ++ lc) - (lb ++ ld))%lap = (la - lb)%lap ++ (lc - ld)%lap.
+Proof.
+intros * Hab.
+unfold lap_sub.
+rewrite lap_opp_app_distr.
+apply lap_add_app_app.
+now unfold lap_opp; rewrite map_length.
 Qed.
 
 Theorem rlap_quot_rem_step_Some :
@@ -2835,6 +2853,41 @@ destruct (bool_dec _) as [Hac| Hac]. {
   now apply IHrla.
 }
 cbn.
+destruct (Nat.eq_dec (length (rla - rlc)%lap) (length rlc)) as [H1| H1]. {
+  rewrite lap_add_app_app; [ cbn | now do 2 rewrite rev_length ].
+  f_equal. 2: {
+    f_equal; symmetry.
+    rewrite rngl_add_comm.
+    apply (rngl_sub_add Hop).
+  }
+  remember (rla - rlc)%lap as rld eqn:Hrld; symmetry in Hrld.
+  destruct rld as [| d]. {
+    symmetry in H1; apply length_zero_iff_nil in H1; subst rlc.
+    symmetry in Hca; apply length_zero_iff_nil in Hca; subst rla.
+    easy.
+  }
+  destruct (rngl_eq_dec Heb d 0%F) as [Hdz| Hdz]. 2: {
+    rewrite (IHrla _ Hca); f_equal; f_equal.
+    rewrite Hrld; cbn.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [H| ]; [ | easy ].
+    now apply (rngl_eqb_eq Heb) in H.
+  }
+  subst d; cbn.
+(* pppp'... *)
+...
+  rewrite lap_add_comm.
+  rewrite lap_app_add_comm. 2: {
+Search (_ + (_ ++ _))%lap.
+Search ((_ ++ _) + _)%lap.
+...
+  unfold lap_sub, lap_opp.
+...
+  rewrite lap_add_comm.
+  rewrite lap_app_add_comm. 2: {
+    rewrite app_length, rev_length; cbn.
+    rewrite rev_length.
+
 ...
 Search ((_ ++ _) + _)%lap.
 Search (_ + (_ ++ _))%lap.
