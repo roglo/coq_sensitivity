@@ -2828,6 +2828,9 @@ rewrite lap_app_add_comm. 2: {
 }
 f_equal.
 (**)
+specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
+...
+(**)
 clear Hrlc Hab.
 clear a Haz Hcq Hdq Hra.
 revert rlc Hca.
