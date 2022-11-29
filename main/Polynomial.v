@@ -2965,6 +2965,15 @@ rewrite (proj2 (Nat.sub_0_le _ _)). 2: {
   now rewrite <- Hca in Hra.
 }
 rewrite app_nil_r.
+do 2 rewrite rev_length.
+remember (strip_0s (rla - rlc)%lap) as rld eqn:Hrld.
+rewrite <- (firstn_skipn (length (rev rld)) (rev rlc)).
+rewrite rev_length.
+rewrite lap_add_app_app. 2: {
+  rewrite firstn_length, rev_length, rev_length.
+  apply min_l.
+  now rewrite <- Hca in Hra.
+}
 ...
 rewrite lap_add_app_r. 2: {
   do 2 rewrite rev_length.
