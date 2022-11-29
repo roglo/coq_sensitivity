@@ -2724,7 +2724,7 @@ revert lb Hab.
 induction la as [| a]; intros; [ easy | now destruct lb ].
 Qed.
 
-Theorem lap_app_add_comm : ∀ la lb lc,
+Theorem lap_add_app_l : ∀ la lb lc,
   length lc ≤ length la
   → (((la ++ lb) + lc) = (la + lc) ++ lb)%lap.
 Proof.
@@ -2737,6 +2737,19 @@ induction la as [| a]; intros; cbn. {
 destruct lc as [| c]; [ easy | ].
 cbn in Hca |-*; f_equal.
 apply Nat.succ_le_mono in Hca.
+now apply IHla.
+Qed.
+
+Theorem lap_add_app_r : ∀ la lb lc,
+  length la ≤ length lb
+  → (la + (lb ++ lc) = (la + lb) ++ lc)%lap.
+Proof.
+intros * Hab.
+revert lb lc Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+cbn in Hab; apply Nat.succ_le_mono in Hab.
+f_equal.
 now apply IHla.
 Qed.
 
@@ -2847,19 +2860,6 @@ rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
 
-Theorem lap_add_app_r : ∀ la lb lc,
-  length la ≤ length lb
-  → (la + (lb ++ lc) = (la + lb) ++ lc)%lap.
-Proof.
-intros * Hab.
-revert lb lc Hab.
-induction la as [| a]; intros; [ easy | cbn ].
-destruct lb as [| b]; [ easy | cbn ].
-cbn in Hab; apply Nat.succ_le_mono in Hab.
-f_equal.
-now apply IHla.
-Qed.
-
 Theorem lap_add_repeat_0_l : ∀ la,
   (repeat 0%F (length la) + la = la)%lap.
 Proof.
@@ -2940,7 +2940,7 @@ assert (Hca : length rlc = length rla). {
   rewrite Hrlc, app_length, map_length, repeat_length.
   now rewrite Hdq, Nat.add_comm, Nat.sub_add.
 }
-rewrite lap_app_add_comm. 2: {
+rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
   now rewrite Hca.
 }
@@ -2974,6 +2974,15 @@ rewrite lap_add_app_app. 2: {
   apply min_l.
   now rewrite <- Hca in Hra.
 }
+specialize (lap_add_repeat_0_r (skipn (length rld) (rev rlc))) as H2.
+rewrite skipn_length in H2.
+rewrite rev_length in H2.
+rewrite H2; clear H2.
+rewrite <- lap_add_app_r. 2: {
+  rewrite firstn_length, rev_length, rev_length.
+  apply Nat.le_min_l.
+}
+Search ((_ + (_ ++ _)))%lap.
 ...
 rewrite lap_add_app_r. 2: {
   do 2 rewrite rev_length.
