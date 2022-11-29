@@ -2847,6 +2847,54 @@ rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
 
+Theorem lap_add_app_r : ∀ la lb lc,
+  length la ≤ length lb
+  → (la + (lb ++ lc) = (la + lb) ++ lc)%lap.
+Proof.
+intros * Hab.
+revert lb lc Hab.
+induction la as [| a]; intros; [ easy | cbn ].
+destruct lb as [| b]; [ easy | cbn ].
+cbn in Hab; apply Nat.succ_le_mono in Hab.
+f_equal.
+now apply IHla.
+Qed.
+
+Theorem lap_add_repeat_0_l : ∀ la,
+  (repeat 0%F (length la) + la = la)%lap.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+now rewrite rngl_add_0_l; f_equal.
+Qed.
+
+Theorem lap_add_repeat_0_r : ∀ la,
+  (la + repeat 0%F (length la) = la)%lap.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+now rewrite rngl_add_0_r; f_equal.
+Qed.
+
+Theorem gen_lap_add : ∀ la lb,
+  (la + lb =
+   (la ++ repeat 0%F (length lb - length la)) +
+   (lb ++ repeat 0%F (length la - length lb)))%lap.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  rewrite Nat.sub_0_r, app_nil_r.
+  symmetry; apply lap_add_repeat_0_l.
+}
+destruct lb as [| b]; cbn. {
+  rewrite rngl_add_0_r, app_nil_r; f_equal.
+  symmetry; apply lap_add_repeat_0_r.
+}
+f_equal.
+apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2911,27 +2959,15 @@ destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
   now rewrite Hca.
 }
 subst r.
-Check rev_lap_add.
-Theorem gen_rev_lap_add : ∀ la lb,
-  (rev la + rev lb =
-   (rev la ++ repeat 0%F (length lb - length la)) +
-   (rev lb ++ repeat 0%F (length la - length lb)))%lap.
-Admitted.
-rewrite gen_rev_lap_add.
-Search (_ - _ = 0).
+rewrite gen_lap_add.
 rewrite (proj2 (Nat.sub_0_le _ _)). 2: {
+  do 2 rewrite rev_length.
   now rewrite <- Hca in Hra.
 }
 rewrite app_nil_r.
-Search (_ + (_ ++ _))%lap.
-Check lap_add_app_app.
-Check lap_add_app_app.
-Theorem lap_add_app_r : ∀ la lb lc,
-  length la ≤ length lb
-  → (la + (lb ++ lc) = (la + lb) ++ lc)%lap.
-Proof.
-Admitted.
-rewrite lap_add_app_r.
+...
+rewrite lap_add_app_r. 2: {
+  do 2 rewrite rev_length.
 ...
 specialize lap_add_app_app as H2.
 specialize (H2 (rev rlc)).
