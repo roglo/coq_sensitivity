@@ -2874,6 +2874,9 @@ destruct (Nat.eq_dec (length (rla - rlc)%lap) (length rlc)) as [H1| H1]. {
     now apply (rngl_eqb_eq Heb) in H.
   }
   subst d; cbn.
+Check lap_add_app_app.
+...
+  specialize (lap_add_app_app (rev rlc) (rev rld) [] [0%F]) as H2.
 (* pppp'... *)
 ...
   rewrite lap_add_comm.
