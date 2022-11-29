@@ -2827,6 +2827,26 @@ rewrite rev_lap_add. 2: {
 now rewrite rev_lap_opp.
 Qed.
 
+Theorem lap_sub_add :
+  @rngl_has_opp T _ = true →
+  ∀ la lb,
+  length lb ≤ length la
+  → (la - lb + lb = la)%lap.
+Proof.
+intros Hop * Hba.
+unfold lap_sub.
+rewrite <- lap_add_assoc.
+rewrite (lap_add_opp_l Hop).
+revert lb Hba.
+induction la as [| a]; intros; cbn. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
+}
+destruct lb as [| b]; [ easy | cbn ].
+cbn in Hba; apply Nat.succ_le_mono in Hba.
+rewrite rngl_add_0_r; f_equal.
+now apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2887,18 +2907,15 @@ destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
   clear Hrac.
   rewrite rev_lap_sub; [ | easy ].
   symmetry; rewrite lap_add_comm.
-Theorem lap_sub_add :
-  @rngl_has_opp T _ = true →
-  ∀ la lb,
-  length lb ≤ length la
-  → (la - lb + lb = la)%lap.
-Proof.
-intros Hop * Hba.
-unfold lap_sub.
-rewrite <- lap_add_assoc.
-rewrite (lap_add_opp_l Hop).
-... ...
-  apply lap_sub_add.
+  apply (lap_sub_add Hop).
+  do 2 rewrite rev_length.
+  now rewrite Hca.
+}
+subst r.
+...
+Check rev_lap_add.
+rewrite <- rev_lap_add. 2: {
+Search (length (strip_0s _)).
 ...
 (**)
 clear Hrlc Hab.
