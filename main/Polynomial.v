@@ -3004,14 +3004,8 @@ destruct rlc as [| c]; [ easy | cbn ].
 cbn in Hca; apply Nat.succ_le_mono in Hca.
 destruct (Nat.eq_dec (length rlac) (length rlc)) as [Hlac| Hlac]. {
   rewrite rev_lap_add; [ | easy ].
-...
-  symmetry; rewrite gen_lap_add.
-  rewrite app_length, rev_length; cbn.
-  rewrite app_length, rev_length; cbn.
-  rewrite Hlac, Nat.sub_diag.
-  do 2 rewrite app_nil_r.
-...
-  rewrite Hlac, Nat.sub_diag.
+  rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
+}
 ...
 symmetry.
 rewrite gen_lap_add.
