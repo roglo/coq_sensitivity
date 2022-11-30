@@ -2895,6 +2895,26 @@ f_equal.
 apply IHla.
 Qed.
 
+Theorem lap_opp_involutive :
+  @rngl_has_opp T _ = true →
+  ∀ la, (- - la = la)%lap.
+Proof.
+intros Hop *.
+induction la as [| a]; [ easy | cbn ].
+now rewrite (rngl_opp_involutive Hop); f_equal.
+Qed.
+
+Theorem lap_sub_diag :
+  @rngl_has_opp T _ = true →
+  ∀ la, (la - la = repeat 0%F (length la))%lap.
+Proof.
+intros Hop *.
+induction la as [| a]; [ easy | cbn ].
+rewrite (fold_rngl_sub Hop).
+rewrite rngl_sub_diag; [ f_equal | easy ].
+apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2947,7 +2967,26 @@ rewrite lap_add_app_l. 2: {
 f_equal.
 (**)
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
-remember (rla - rlc)%lap as r eqn:Hr.
+remember (rla - rlc)%lap as rlac eqn:Hrlac.
+(**)
+symmetry in Hrlac.
+destruct rlac as [| ac]. {
+  cbn; rewrite lap_add_0_r; f_equal.
+  apply eq_lap_add_0 in Hrlac.
+  destruct Hrlac as (H1, H2); subst rla.
+  apply (f_equal lap_opp) in H2.
+  rewrite (lap_opp_involutive Hop) in H2.
+  now rewrite H2.
+}
+cbn.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hacz| Hacz]. {
+  apply (rngl_eqb_eq Heb) in Hacz; subst ac.
+  cbn in Hra, Hrac.
+  rewrite (rngl_eqb_refl Heb) in Hra, Hrac.
+...
+  rewrite lap_sub_diag.
+...
 destruct (Nat.eq_dec (length (strip_0s r)) (length r)) as [H1| H1]. {
   subst r.
   rewrite length_strip_0s_eq; [ | easy ].
