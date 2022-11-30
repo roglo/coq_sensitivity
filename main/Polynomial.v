@@ -2970,20 +2970,28 @@ specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
 (**)
 symmetry in Hrlac.
-destruct rlac as [| ac]. {
-  cbn; rewrite lap_add_0_r; f_equal.
-  apply eq_lap_add_0 in Hrlac.
-  destruct Hrlac as (H1, H2); subst rla.
-  apply (f_equal lap_opp) in H2.
-  rewrite (lap_opp_involutive Hop) in H2.
-  now rewrite H2.
+assert (rla = (rlc + rlac)%lap). {
+  rewrite <- Hrlac, lap_add_comm.
+  symmetry.
+  apply (lap_sub_add Hop).
+  now rewrite Hca.
 }
-cbn.
+subst rla.
+clear - Heb.
+revert rlc.
+induction rlac as [| ac]; intros. {
+  now cbn; do 2 rewrite lap_add_0_r.
+}
+rewrite lap_add_comm; cbn.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hacz| Hacz]. {
   apply (rngl_eqb_eq Heb) in Hacz; subst ac.
-  cbn in Hra, Hrac.
-  rewrite (rngl_eqb_refl Heb) in Hra, Hrac.
+  destruct rlc as [| c]. {
+    cbn.
+    apply
+...
+  cbn in Hra.
+  rewrite (rngl_eqb_refl Heb) in Hra.
 ...
   rewrite lap_sub_diag.
 ...
