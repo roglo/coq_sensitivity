@@ -2981,6 +2981,8 @@ rewrite lap_add_length in Hca.
 symmetry in Hca.
 apply Nat.max_l_iff in Hca.
 clear - Heb Hca.
+(* question : est-ce que c'est vrai, ça ? *)
+...
 revert rlc Hca.
 induction rlac as [| ac]; intros. {
   now cbn; do 2 rewrite lap_add_0_r.
