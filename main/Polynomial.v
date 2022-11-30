@@ -3040,7 +3040,6 @@ destruct q as [(cq, dq)| ]. 2: {
 }
 (**)
 apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Hqrlr; [ | easy ].
-...
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3055,6 +3054,7 @@ apply IHit in Hqr. 2: {
   apply lt_le_S.
   destruct rlb as [| b]; [ easy | ].
   cbn in Hqrlr.
+...
   destruct rla as [| a]; [ easy | ].
   rewrite if_bool_if_dec in Hqrlr.
   destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
