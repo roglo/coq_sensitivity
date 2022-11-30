@@ -3006,6 +3006,10 @@ destruct (Nat.eq_dec (length rlac) (length rlc)) as [Hlac| Hlac]. {
   rewrite rev_lap_add; [ | easy ].
   rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 }
+assert (H : length rlac < length rlc) by flia Hca Hlac.
+clear Hca Hlac; rename H into Hca.
+(* y a c qui dépasse, censé être égal à c+ac, mais c'est faux
+   parce que ac≠0 *)
 ...
 symmetry.
 rewrite gen_lap_add.
