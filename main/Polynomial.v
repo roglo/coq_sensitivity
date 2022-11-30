@@ -2977,18 +2977,50 @@ assert (rla = (rlc + rlac)%lap). {
   now rewrite Hca.
 }
 subst rla.
-clear - Heb.
-revert rlc.
+rewrite lap_add_length in Hca.
+symmetry in Hca.
+apply Nat.max_l_iff in Hca.
+clear - Heb Hca.
+revert rlc Hca.
 induction rlac as [| ac]; intros. {
   now cbn; do 2 rewrite lap_add_0_r.
 }
-rewrite lap_add_comm; cbn.
-rewrite if_bool_if_dec.
+cbn; rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hacz| Hacz]. {
   apply (rngl_eqb_eq Heb) in Hacz; subst ac.
-  destruct rlc as [| c]. {
-    cbn.
-    apply
+  destruct rlc as [| c]; [ easy | cbn ].
+  cbn in Hca; apply Nat.succ_le_mono in Hca.
+  rewrite rngl_add_0_r.
+  rewrite lap_add_app_l. 2: {
+    do 2 rewrite rev_length.
+    transitivity (length rlac); [ | easy ].
+    apply strip_0s_length_le.
+  }
+  f_equal.
+  now apply IHrlac.
+}
+cbn.
+destruct rlc as [| c]; [ easy | cbn ].
+cbn in Hca; apply Nat.succ_le_mono in Hca.
+destruct (Nat.eq_dec (length rlac) (length rlc)) as [Hlac| Hlac]. {
+  rewrite rev_lap_add; [ | easy ].
+...
+  symmetry; rewrite gen_lap_add.
+  rewrite app_length, rev_length; cbn.
+  rewrite app_length, rev_length; cbn.
+  rewrite Hlac, Nat.sub_diag.
+  do 2 rewrite app_nil_r.
+...
+  rewrite Hlac, Nat.sub_diag.
+...
+symmetry.
+rewrite gen_lap_add.
+cbn.
+rewrite app_length, rev_length; cbn.
+rewrite app_length, rev_length; cbn.
+...
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+
 ...
   cbn in Hra.
   rewrite (rngl_eqb_refl Heb) in Hra.
