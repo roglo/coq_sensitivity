@@ -2980,8 +2980,10 @@ subst rla.
 rewrite lap_add_length in Hca.
 symmetry in Hca.
 apply Nat.max_l_iff in Hca.
+...
 clear - Heb Hca.
 (* question : est-ce que c'est vrai, ça ? *)
+Search (rev (_ + _)%lap).
 ...
 revert rlc Hca.
 induction rlac as [| ac]; intros. {
