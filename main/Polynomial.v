@@ -3008,13 +3008,17 @@ rewrite rev_lap_add; [ | easy ].
 rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
-Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
+Theorem rlap_quot_rem_prop :
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
+  @rngl_has_inv T _ = true →
+  ∀ it (rla rlb rlq rlr : list T),
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
 Proof.
-intros * Hbn Hqr Hit.
+intros Hco Hop Hiv * Hbn Hqr Hit.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -3035,8 +3039,7 @@ destruct q as [(cq, dq)| ]. 2: {
   now injection Hqrlr.
 }
 (**)
-apply rlap_quot_rem_step_Some in Hqrlr; try easy.
-(* ouais, non, faut voir *)
+apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Hqrlr; [ | easy ].
 ...
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
