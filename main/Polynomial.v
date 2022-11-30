@@ -3010,13 +3010,12 @@ rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
 Theorem rlap_quot_rem_prop : ∀ it (rla rlb rlq rlr : list T),
-  rlb ≠ []
-  → hd 1%F rlb ≠ 0%F
+  hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
 Proof.
-intros * Hbz Hbn Hqr Hit.
+intros * Hbn Hqr Hit.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -3037,7 +3036,6 @@ destruct q as [(cq, dq)| ]. 2: {
   now injection Hqrlr.
 }
 (**)
-Inspect 1.
 apply rlap_quot_rem_step_Some in Hqrlr; try easy.
 (* ouais, non, faut voir *)
 ...
