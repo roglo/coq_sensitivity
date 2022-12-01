@@ -2851,8 +2851,7 @@ destruct (bool_dec _) as [Hacz| Hacz]. {
     rewrite Hrlac.
     apply strip_0s_length_le.
   }
-  f_equal.
-  now apply IHrlac.
+  now f_equal; apply IHrlac.
 }
 cbn.
 destruct rlc as [| c]; [ easy | cbn ].
@@ -2940,8 +2939,9 @@ destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
   rewrite <- (rev_length rlq).
   now rewrite lap_add_repeat_0_r.
 }
-apply Nat.nle_gt in Hqq.
+exfalso; apply Hqq; clear Hqq.
 ...
+apply Nat.nle_gt in Hqq.
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
 rewrite app_nil_r.
 ...
