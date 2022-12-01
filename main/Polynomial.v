@@ -2921,6 +2921,19 @@ destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
   now apply Nat.sub_add.
 }
 apply Nat.nle_gt in Hqq.
+apply IHit in Hqr'. 2: {
+  generalize Hqrlr; intros Ha.
+  apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
+  cbn in Ha.
+  transitivity (length rla); [ | easy ].
+  rewrite Hb.
+  apply -> Nat.succ_le_mono.
+...
+  rewrite <- (rev_length rla).
+  rewrite Ha.
+  rewrite lap_add_length.
+  rewrite rev_length.
+  rewrite max_l.
 ...
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
 ...
