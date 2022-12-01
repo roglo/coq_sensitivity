@@ -218,11 +218,12 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
   | S it' =>
-      match rlap_quot_rem_step rla rlb with
-      | (Some (cq, dq), rlr) =>
+      let (q, rlr) := rlap_quot_rem_step rla rlb in
+      match q with
+      | Some (cq, dq) =>
            let (rlq', rlr') := rlap_quot_rem_loop it' rlr rlb in
            (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
-      | (None, rlr) => ([], rlr)
+      | None => ([], rlr)
       end
   end.
 
@@ -2876,12 +2877,13 @@ rewrite rev_lap_add; [ | easy ].
 rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
+(*
 Theorem rlap_quot_rem_length :
   ∀ it (rla rlb rlq rlr : list T),
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
-  → length rla = length rlb + length rlq.
+  → length rlb + length rlq ≤ length rla.
 Proof.
 intros * Hbn Hqr Hit.
 revert rla rlq rlr Hqr Hit.
