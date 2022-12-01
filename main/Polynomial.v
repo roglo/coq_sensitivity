@@ -2768,6 +2768,22 @@ rewrite rngl_sub_diag; [ f_equal | easy ].
 apply IHla.
 Qed.
 
+Theorem rlap_quot_rem_step_Some_length : ∀ rla rlb rlr cq dq,
+  hd 0%F rlb ≠ 0%F
+  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → length rla = length rlb + dq.
+Proof.
+intros * Hbz Hrl.
+destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrl.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+cbn; rewrite Nat.add_comm.
+now rewrite Nat.sub_add.
+Qed.
+
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2860,6 +2876,38 @@ rewrite rev_lap_add; [ | easy ].
 rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
+(*
+Theorem rlap_quot_rem_length :
+  ∀ it (rla rlb rlq rlr : list T),
+  hd 0%F rlb ≠ 0%F
+  → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
+  → S (length rla) ≤ it
+  → length rla = length rlb + length rlq.
+Proof.
+intros * Hbn Hqr Hit.
+revert rla rlq rlr Hqr Hit.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hqr.
+remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
+symmetry in Hqrlr.
+destruct qrlr as (q, rlr').
+destruct q as [(cq, dq)| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+...
+  rewrite lap_mul_0_r, lap_add_0_l.
+  f_equal.
+  destruct rlb as [| b]; [ easy | ].
+  destruct rla as [| a]. {
+    now destruct rlb; injection Hqrlr; intros.
+  }
+  cbn in Hqrlr.
+  destruct (length rla <? length rlb); [ | easy ].
+  now injection Hqrlr.
+}
+...
+*)
+
 Theorem rlap_quot_rem_prop :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2893,6 +2941,8 @@ destruct q as [(cq, dq)| ]. 2: {
 (**)
 generalize Hqrlr; intros Ha.
 apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
+generalize Hqrlr; intros Hb.
+apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -2940,6 +2990,12 @@ destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
   now rewrite lap_add_repeat_0_r.
 }
 exfalso; apply Hqq; clear Hqq.
+replace dq with (length rla - length rlb) by flia Hb.
+...
+apply (f_equal length) in Ha.
+rewrite lap_add_length in Ha.
+do 2 rewrite rev_length in Ha.
+Search (length (_ * _)%lap).
 ...
 apply Nat.nle_gt in Hqq.
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
