@@ -2886,9 +2886,56 @@ Theorem rlap_quot_rem_length :
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
-  → length rlq = length rla - length rlb.
+  → length rlq = length rla - (length rlb - 1).
 Proof.
 intros Hco Hop Hiv * Hbn Hqr Hit.
+(*
+Abort.
+End a.
+Arguments lap_add {T ro} (la lb)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+Arguments rlap_quot_rem {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (
+  let rla := [6;-2;9;-2;-2] in
+  let rlb := [1;0;2] in
+  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
+  (length rlq = length rla - (length rlb - 1))%nat).
+Compute (
+  let rla := [1;6;-1;-30] in
+  let rlb := [1;5] in
+  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
+  (length rlq = length rla - (length rlb - 1))%nat).
+Compute (
+  let rla := [1;6;-1;-30] in
+  let rlb := [1] in
+  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
+  (length rlq = length rla - (length rlb - 1))%nat).
+...
+Compute (
+  let rla := [6;-2;9;-2;-2] in
+  let rlb := [1;0;2] in
+  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
+  (length rlq = length rla - (length rlb - 1))%nat).
+...
+Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
+Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
+Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
+Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
+Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
+Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
+Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
+Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
+Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
+...
+intros Hco Hop Hiv * Hbn Hqr Hit.
+*)
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -2903,7 +2950,6 @@ destruct q as [(cq, dq)| ]. 2: {
   destruct H1 as [H1| H1]; [ now destruct H1; subst rla | ].
   rewrite (proj2 (Nat.sub_0_le _ _)); [ easy | flia H1 ].
 }
-...
 generalize Hqrlr; intros Hb.
 apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
@@ -2911,7 +2957,26 @@ symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 rewrite app_length, repeat_length.
-Print rlap_quot_rem_loop.
+rewrite Hb.
+destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
+  rewrite Nat.sub_add; [ | easy ].
+  destruct rlb as [| b]; [ easy | ].
+  cbn - [ "-" ].
+  rewrite Nat_sub_succ_1.
+  rewrite <- Nat.add_succ_r, Nat.add_comm.
+  now rewrite Nat.add_sub.
+}
+apply Nat.nle_gt in Hqq.
+...
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
+cbn.
+destruct rlb as [| b]; [ easy | ].
+cbn - [ "-" ].
+rewrite Nat_sub_succ_1.
+rewrite <- Nat.add_succ_r, Nat.add_comm.
+rewrite Nat.add_sub.
+f_equal.
+cbn in Hb.
 ...
 destruct rla as [| a]. {
   symmetry in Hb.
