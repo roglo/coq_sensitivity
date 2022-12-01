@@ -2889,6 +2889,10 @@ Theorem rlap_quot_rem_length :
   → length rlq = length rla - (length rlb - 1).
 Proof.
 intros Hco Hop Hiv * Hbn Hqr Hit.
+destruct rlb as [| b]; [ easy | ].
+cbn; rewrite Nat.sub_0_r.
+cbn in Hbn.
+...
 (*
 Abort.
 End a.
@@ -2936,6 +2940,7 @@ Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
 ...
 intros Hco Hop Hiv * Hbn Hqr Hit.
 *)
+intros Hco Hop Hiv * Hbn Hqr Hit.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
