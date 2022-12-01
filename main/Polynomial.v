@@ -2876,7 +2876,6 @@ rewrite rev_lap_add; [ | easy ].
 rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
-(*
 Theorem rlap_quot_rem_length :
   ∀ it (rla rlb rlq rlr : list T),
   hd 0%F rlb ≠ 0%F
@@ -2894,6 +2893,11 @@ symmetry in Hqrlr.
 destruct qrlr as (q, rlr').
 destruct q as [(cq, dq)| ]. 2: {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  apply rlap_quot_rem_step_None in Hqrlr.
+  destruct Hqrlr as [H1| H1]; [ now destruct H1; subst rlb | ].
+  destruct H1 as [H1| H1]. {
+    destruct H1; subst rla rlr'.
+    cbn.
 ...
   rewrite lap_mul_0_r, lap_add_0_l.
   f_equal.
