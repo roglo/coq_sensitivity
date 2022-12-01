@@ -2923,6 +2923,27 @@ apply IHit in Hqr. 2: {
   rewrite Nat.sub_add; [ | easy ].
   now rewrite Nat.max_id; cbn.
 }
+rewrite Ha, Hqr.
+rewrite lap_add_assoc.
+f_equal; cbn.
+rewrite rev_app_distr.
+rewrite List_rev_repeat.
+rewrite <- lap_mul_add_distr_l.
+f_equal.
+rewrite lap_add_comm.
+destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
+  rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
+  f_equal.
+  replace dq with (length rlq + (dq - length rlq)) at 1 by flia Hqq.
+  rewrite repeat_app.
+  rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
+  rewrite <- (rev_length rlq).
+  now rewrite lap_add_repeat_0_r.
+}
+apply Nat.nle_gt in Hqq.
+...
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
+rewrite app_nil_r.
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
