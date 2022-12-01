@@ -2892,6 +2892,40 @@ intros Hco Hop Hiv * Hbn Hqr Hit.
 destruct rlb as [| b]; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
 cbn in Hbn.
+revert rla rlq rlr Hqr Hit.
+induction it; intros; [ easy | ].
+apply Nat.succ_le_mono in Hit.
+remember (b :: rlb) as l; cbn in Hqr; subst l.
+...
+remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
+symmetry in Hqrlr.
+destruct qrlr as (q, rlr').
+destruct q as [(cq, dq)| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+  apply rlap_quot_rem_step_None in Hqrlr.
+  destruct Hqrlr as [H1| H1]; [ now destruct H1; subst rlb | ].
+  destruct H1 as [H1| H1]; [ now destruct H1; subst rla | ].
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ easy | flia H1 ].
+}
+generalize Hqrlr; intros Hb.
+apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
+remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr'').
+injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
+rewrite app_length, repeat_length.
+rewrite Hb.
+destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
+  rewrite Nat.sub_add; [ | easy ].
+  destruct rlb as [| b]; [ easy | ].
+  cbn - [ "-" ].
+  rewrite Nat_sub_succ_1.
+  rewrite <- Nat.add_succ_r, Nat.add_comm.
+  now rewrite Nat.add_sub.
+}
+apply Nat.nle_gt in Hqq.
+...
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
 ...
 (*
 Abort.
