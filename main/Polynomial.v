@@ -650,153 +650,6 @@ apply IHit in Hqr. 2: {
 now rewrite rev_length in Hqr.
 Qed.
 
-(* on verra plus tard...
-Theorem rlap_quot_rem_step_Some : ∀ rla rlb rlr cq dq,
-  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
-  → rev rla = lap_add (lap_mul (rev rlb) (repeat 0%F dq ++ [cq])) (rev rlr).
-Proof.
-intros * Hrl.
-destruct rlb as [| b]; [ easy | cbn in Hrl ].
-destruct rla as [| a]; [ easy | ].
-rewrite if_bool_if_dec in Hrl.
-destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
-apply Nat.ltb_ge in Hab.
-injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
-rewrite <- (rev_involutive (lap_sub _ _)).
-rewrite fold_lap_norm.
-Search (lap_add _ (lap_norm _)).
-...
-
-Theorem lap_quot_rem_prop :
-  rngl_has_opp = true →
-  rngl_mul_is_comm = true →
-  rngl_has_inv = true →
-  ∀ la lb lq lr : list T,
-  lb ≠ []
-  → last_lap_neq_0 lb
-  → lap_quot_rem la lb = (lq, lr)
-  → la = lap_add (lap_mul lb lq) lr ∧
-     length lr < length lb.
-Proof.
-intros Hop Hco Hiv * Hbz Hbn Hab.
-split. 2: {
-  now apply lap_rem_length_lt with (la := la) (lq := lq).
-}
-unfold lap_quot_rem in Hab.
-remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
-symmetry in Hqr.
-destruct qr as (rlq, rlr).
-injection Hab; clear Hab; intros; subst lq lr.
-unfold rlap_quot_rem in Hqr.
-remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
-unfold rlap_quot_rem_nb_iter in Hit.
-rewrite <- rev_involutive; symmetry.
-rewrite <- rev_involutive; symmetry.
-f_equal.
-remember (rev la) as rla eqn:Hrla.
-clear la Hrla.
-rewrite <- (rev_involutive lb).
-remember (rev lb) as rlb eqn:Hrlb.
-assert (H : rlb ≠ []). {
-  subst rlb.
-  intros H; apply Hbz.
-  now apply List_eq_rev_nil in H.
-}
-move H before Hbz; clear Hbz.
-rename H into Hbz.
-assert (H : hd 1%F rlb ≠ 0%F). {
-  subst rlb.
-  unfold last_lap_neq_0 in Hbn.
-  apply Bool.negb_true_iff in Hbn.
-  apply (rngl_eqb_neq Heb) in Hbn.
-  move Hbn at bottom.
-  intros H; apply Hbn; clear Hbn.
-  clear Hbz Hqr.
-  rewrite <- (rev_involutive lb).
-  destruct (rev lb); cbn in H |-*; [ easy | ].
-  now rewrite last_last.
-}
-move H before Hbn; clear Hbn.
-rename H into Hbn.
-clear lb Hrlb.
-move rla after rlb; move rlq before rlb; move rlr before rlq.
-assert (H : S (length rla) ≤ it) by flia Hit.
-clear Hit; rename H into Hit.
-(**)
-revert rla rlq rlr Hqr Hit.
-induction it; intros; [ easy | ].
-apply Nat.succ_le_mono in Hit.
-cbn in Hqr.
-(**)
-remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
-symmetry in Hqrlr.
-destruct qrlr as (q, rlr').
-destruct q as [(cq, dq)| ]. 2: {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  rewrite lap_mul_0_r, lap_add_0_l.
-  rewrite rev_involutive.
-  destruct rlb as [| b]; [ easy | ].
-  destruct rla as [| a]. {
-    now destruct rlb; injection Hqrlr; intros.
-  }
-  cbn in Hqrlr.
-  destruct (length rla <? length rlb); [ | easy ].
-  now injection Hqrlr.
-}
-remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
-symmetry in Hqr'.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr.
-rename rlq' into rlq; rename rlr' into rlr.
-rename Hqr' into Hqr.
-move rla after rlb.
-move rlq before rlb.
-move rlr before rlq.
-... ...
-(* chais pas si c'est utile, mais bon... *)
-apply rlap_quot_rem_step_Some in Hqrlr.
-...
-apply IHit in Hqr.
-...
-destruct rla as [| a]. {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  now rewrite lap_mul_0_r, lap_add_0_r.
-}
-destruct rlb as [| b]; [ easy | clear Hbz ].
-rewrite if_bool_if_dec in Hqr.
-destruct (bool_dec _) as [Hab| Hab]. {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  rewrite lap_mul_0_r, lap_add_0_l.
-  now rewrite rev_unit, rev_involutive.
-}
-remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
-symmetry in Hqr'.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr.
-rename rlq' into rlq; rename rlr' into rlr.
-rename Hqr' into Hqr.
-move a after b.
-move rla after rlb.
-move rlq before rlb.
-move rlr before rlq.
-apply Nat.ltb_ge in Hab.
-cbn in Hbn.
-(**)
-cbn.
-rewrite rev_app_distr.
-rewrite <- app_assoc.
-rewrite <- (rev_involutive (a :: rla)).
-f_equal; cbn.
-cbn in Hit.
-rewrite <- (rev_length rla) in Hab, Hqr, Hit |-*.
-remember (rev rla) as la eqn:Hla.
-clear rla Hla.
-move la after rlb.
-cbn in IHit.
-rewrite List_rev_repeat.
-...
-*)
-
 Section b.
 
 Context {Hiv : rngl_has_inv = true}.
@@ -3039,7 +2892,8 @@ destruct q as [(cq, dq)| ]. 2: {
   now injection Hqrlr.
 }
 (**)
-apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Hqrlr; [ | easy ].
+generalize Hqrlr; intros Ha.
+apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3054,7 +2908,6 @@ apply IHit in Hqr. 2: {
   apply lt_le_S.
   destruct rlb as [| b]; [ easy | ].
   cbn in Hqrlr.
-...
   destruct rla as [| a]; [ easy | ].
   rewrite if_bool_if_dec in Hqrlr.
   destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
@@ -3070,7 +2923,6 @@ apply IHit in Hqr. 2: {
   rewrite Nat.sub_add; [ | easy ].
   now rewrite Nat.max_id; cbn.
 }
-Search rlap_quot_rem_step.
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
