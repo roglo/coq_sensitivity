@@ -3136,22 +3136,16 @@ f_equal.
 apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
 Qed.
 
-Theorem polyn_opt_mul_div :
+Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
-  else not_applicable.
+  @rngl_has_inv T _ = true →
+  ∀ inv a b,
+  @rngl_opt_inv_or_quot T _ = Some inv
+  → b ≠ 0%pol
+  → ((a * b)%pol / b)%F = a.
 Proof.
-intros Hco Hop.
-unfold rngl_has_quot; cbn.
-unfold polyn_opt_inv_or_quot.
-cbn; rewrite Hos.
-destruct (bool_dec true) as [H| ]; [ clear H | easy ].
-destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
-remember rngl_opt_inv_or_quot as iv eqn:Hoiv; symmetry in Hoiv.
-destruct iv as [inv| ]; [ | easy ].
-intros a b Hbz.
-...
+intros Hco Hop Hiv * Hoiv Hbz.
 unfold rngl_div; cbn.
 unfold rngl_has_inv; cbn.
 (*1*)
@@ -3202,7 +3196,6 @@ apply (rlap_quot_rem_prop Hco Hop Hiv) in Hqr; [ | | easy ]. 2: {
   now rewrite (rngl_eqb_refl Heb) in Hlb.
 } {
 ...
-
   intros H.
   apply (f_equal (λ l, rev l)) in H.
   rewrite rev_involutive in H; subst lb.
@@ -3221,6 +3214,25 @@ specialize (H1 H); clear H.
 assert (H : last_lap_neq_0 (rev (lap b))) by ...
 specialize (H1 H); clear H.
 Set Printing Implicit.
+...
+
+Theorem polyn_opt_mul_div :
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
+  if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
+  else not_applicable.
+Proof.
+intros Hco Hop.
+unfold rngl_has_quot; cbn.
+unfold polyn_opt_inv_or_quot.
+cbn; rewrite Hos.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
+remember rngl_opt_inv_or_quot as iv eqn:Hoiv; symmetry in Hoiv.
+destruct iv as [inv| ]; [ | easy ].
+intros a b Hbz.
+...
+now apply polyn_mul_div with (inv := inv).
 ...
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
