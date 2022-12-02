@@ -3136,6 +3136,55 @@ f_equal.
 apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
 Qed.
 
+Context {Hiv : @rngl_has_inv T _ = true}.
+Arguments polyn_quot_rem {Hiv} (pa pb)%pol.
+
+Theorem polyn_quot_rem_prop :
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
+  ∀ pa pb pq pr : polyn T,
+  pb ≠ 0%pol
+  → @polyn_quot_rem Hiv pa pb = (pq, pr)
+  → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
+Proof.
+intros * Hic Hop * Hbz Hab.
+destruct pa as (la, Hpa).
+destruct pb as (lb, Hpb).
+destruct pq as (lq, Hpq).
+destruct pr as (lr, Hpr); cbn.
+move lb before la; move lq before lb; move lr before lq.
+specialize (lap_quot_rem_prop Hic Hop Hiv la lb) as H1.
+specialize (H1 lq lr).
+assert (H : (last lb 0 ≠? 0)%F = true). {
+  apply Bool.negb_true_iff.
+  apply (rngl_eqb_neq Heb).
+  intros H; apply Hbz; clear Hbz Hab.
+  apply eq_polyn_eq; cbn.
+  apply -> Bool.negb_true_iff in Hpb.
+  apply (rngl_eqb_neq Heb) in Hpb.
+  rewrite <- (rev_involutive lb) in Hpb.
+  rewrite <- (rev_involutive lb) in H.
+  rewrite <- (rev_involutive lb).
+  destruct (rev lb) as [| b]; [ easy | ].
+  cbn in Hpb, H.
+  now rewrite last_last in Hpb, H.
+}
+specialize (H1 H); clear H.
+assert (H : lap_quot_rem la lb = (lq, lr)). {
+  unfold polyn_quot_rem in Hab.
+  unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
+  injection Hab; clear Hab; intros; subst lr lq.
+  apply surjective_pairing.
+}
+specialize (H1 H); clear H.
+destruct H1 as (H1, H2).
+split; [ | easy ].
+apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm.
+rewrite last_lap_neq_0_lap_norm. 2: {
+Search (last_lap_neq_0 (_ * _)%lap).
+...
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3146,6 +3195,7 @@ Theorem polyn_mul_div :
   → ((a * b)%pol / b)%F = a.
 Proof.
 intros Hco Hop Hiv * Hoiv Hbz.
+...
 unfold rngl_div; cbn.
 unfold rngl_has_inv; cbn.
 (*1*)
