@@ -3060,9 +3060,26 @@ Theorem lap_quot_rem_prop :
   ∀ la lb lq lr : list T,
   (last lb 0 ≠? 0)%F = true
   → lap_quot_rem la lb = (lq, lr)
-  → la = lap_add (lap_mul lb lq) lr.
+  → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
 intros Hco Hop Hiv * H1 Hab.
+split. 2: {
+  eapply (lap_rem_length_lt Hop Hco Hiv); [ | | apply Hab ]. {
+    intros H; subst lb; cbn in H1.
+    now rewrite (rngl_eqb_refl Heb) in H1.
+  } {
+    unfold last_lap_neq_0.
+    apply Bool.negb_true_iff in H1.
+    apply Bool.negb_true_iff.
+    apply (rngl_eqb_neq Heb) in H1.
+    apply (rngl_eqb_neq Heb).
+    intros H; apply H1.
+    rewrite <- (rev_involutive lb) in H |-*.
+    destruct (rev lb) as [| b]; [ easy | ].
+    cbn in H |-*.
+    now rewrite last_last in H |-*.
+  }
+}
 assert (Hbz : lb ≠ []). {
   intros H; subst lb.
   cbn in H1.
@@ -3119,14 +3136,13 @@ f_equal.
 apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
 Qed.
 
-Inspect 1.
-
-...
-
 Theorem polyn_opt_mul_div :
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
   if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
   else not_applicable.
 Proof.
+intros Hco Hop.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
 cbn; rewrite Hos.
@@ -3135,6 +3151,7 @@ destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
 remember rngl_opt_inv_or_quot as iv eqn:Hoiv; symmetry in Hoiv.
 destruct iv as [inv| ]; [ | easy ].
 intros a b Hbz.
+...
 unfold rngl_div; cbn.
 unfold rngl_has_inv; cbn.
 (*1*)
@@ -3169,9 +3186,23 @@ remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r); cbn.
 unfold lap_norm in Hqr.
 rewrite rev_involutive in Hqr.
-... ...
-apply rlap_quot_rem_prop in Hqr; cycle 1. {
+apply (rlap_quot_rem_prop Hco Hop Hiv) in Hqr; [ | | easy ]. 2: {
   destruct b as (lb, Hlb); cbn.
+  unfold last_lap_neq_0 in Hlb.
+  intros H.
+  apply Hbz; clear Hbz.
+  apply eq_polyn_eq; cbn.
+  cbn in Hqr.
+  rewrite <- (rev_involutive lb) in Hlb.
+  rewrite <- (rev_involutive lb).
+  destruct (rev lb) as [| b]; [ easy | ].
+  cbn in Hlb, H.
+  rewrite last_last in Hlb.
+  subst b.
+  now rewrite (rngl_eqb_refl Heb) in Hlb.
+} {
+...
+
   intros H.
   apply (f_equal (λ l, rev l)) in H.
   rewrite rev_involutive in H; subst lb.
