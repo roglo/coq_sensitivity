@@ -3058,12 +3058,23 @@ Theorem lap_quot_rem_prop :
   @rngl_has_opp T _ = true →
   @rngl_has_inv T _ = true →
   ∀ la lb lq lr : list T,
-  lb ≠ []
-  → last_lap_neq_0 lb
+  (last lb 0 ≠? 0)%F = true
   → lap_quot_rem la lb = (lq, lr)
   → la = lap_add (lap_mul lb lq) lr.
 Proof.
-intros Hco Hop Hiv * Hbz Hbn Hab.
+intros Hco Hop Hiv * H1 Hab.
+assert (Hbz : lb ≠ []). {
+  intros H; subst lb.
+  cbn in H1.
+  now rewrite (rngl_eqb_refl Heb) in H1.
+}
+assert (Hbn : last_lap_neq_0 lb). {
+  unfold last_lap_neq_0.
+  rewrite <- (rev_involutive lb) in H1, Hbz |-*.
+  destruct (rev lb) as [| b]; [ easy | ].
+  cbn in H1, Hbz |-*.
+  now rewrite last_last in H1 |-*.
+}
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -3099,7 +3110,7 @@ assert (H : hd 0%F rlb ≠ 0%F). {
 }
 move H before Hbn; clear Hbn.
 rename H into Hbn.
-clear lb Hrlb.
+clear lb Hrlb H1.
 move rla after rlb; move rlq before rlb; move rlr before rlq.
 assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
@@ -3108,9 +3119,9 @@ f_equal.
 apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
 Qed.
 
-...
-
 Inspect 1.
+
+...
 
 Theorem polyn_opt_mul_div :
   if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
