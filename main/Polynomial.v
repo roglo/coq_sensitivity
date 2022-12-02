@@ -3181,21 +3181,31 @@ destruct H1 as (H1, H2).
 split; [ | easy ].
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
-rewrite last_lap_neq_0_lap_norm. 2: {
-Search (last_lap_neq_0 (_ * _)%lap).
-...
+rewrite lap_add_norm_idemp_l.
+rewrite <- H1; symmetry.
+now apply last_lap_neq_0_lap_norm.
+Qed.
 
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  @rngl_has_inv T _ = true →
   ∀ inv a b,
   @rngl_opt_inv_or_quot T _ = Some inv
   → b ≠ 0%pol
   → ((a * b)%pol / b)%F = a.
 Proof.
-intros Hco Hop Hiv * Hoiv Hbz.
+intros Hco Hop * Hoiv Hbz.
+clear inv Hoiv.
+specialize (polyn_quot_rem_prop Hco Hop) as H1.
+specialize (H1 (a * b)%pol b).
+remember (polyn_quot_rem (a * b) b) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (pq, pr).
+specialize (H1 pq pr Hbz eq_refl).
+destruct H1 as (H1, H2).
+rewrite H1.
 ...
+intros Hco Hop * Hoiv Hbz.
 unfold rngl_div; cbn.
 unfold rngl_has_inv; cbn.
 (*1*)
