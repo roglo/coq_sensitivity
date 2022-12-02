@@ -3053,15 +3053,17 @@ Check rlap_quot_rem_length.
 flia Hra Hqrb.
 Qed.
 
-...
-
-Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
+Theorem lap_quot_rem_prop :
+  rngl_mul_is_comm = true →
+  @rngl_has_opp T _ = true →
+  @rngl_has_inv T _ = true →
+  ∀ la lb lq lr : list T,
   lb ≠ []
   → last_lap_neq_0 lb
   → lap_quot_rem la lb = (lq, lr)
   → la = lap_add (lap_mul lb lq) lr.
 Proof.
-intros * Hbz Hbn Hab.
+intros Hco Hop Hiv * Hbz Hbn Hab.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -3084,17 +3086,16 @@ assert (H : rlb ≠ []). {
 }
 move H before Hbz; clear Hbz.
 rename H into Hbz.
-assert (H : hd 1%F rlb ≠ 0%F). {
+assert (H : hd 0%F rlb ≠ 0%F). {
   subst rlb.
   unfold last_lap_neq_0 in Hbn.
   apply Bool.negb_true_iff in Hbn.
   apply (rngl_eqb_neq Heb) in Hbn.
   move Hbn at bottom.
   intros H; apply Hbn; clear Hbn.
-  clear Hbz Hqr.
   rewrite <- (rev_involutive lb).
-  destruct (rev lb); cbn in H |-*; [ easy | ].
-  now rewrite last_last.
+  destruct (rev lb); [ easy | ].
+  now cbn; rewrite last_last.
 }
 move H before Hbn; clear Hbn.
 rename H into Hbn.
@@ -3104,9 +3105,12 @@ assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 rewrite <- (rev_involutive rla).
 f_equal.
-... ...
-apply (rlap_quot_rem_prop rla Hbz Hbn Hqr Hit).
+apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
 Qed.
+
+...
+
+Inspect 1.
 
 Theorem polyn_opt_mul_div :
   if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
