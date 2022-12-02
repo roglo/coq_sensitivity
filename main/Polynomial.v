@@ -2926,6 +2926,39 @@ Theorem glop : ∀ it rla rlb rlq rlr rlr' cq dq,
   → length rlq ≤ dq.
 Proof.
 intros * Hqr Hqr'.
+...
+Abort.
+Abort.
+End a.
+Arguments lap_add {T ro} (la lb)%list.
+Arguments lap_sub {T ro} (la lb)%list.
+Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
+Arguments rlap_quot_rem {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (
+  let rla := [-3;0;1;0;-5;0;1] in
+  let rlb := [3;1;1] in
+  match rlap_quot_rem_step rla rlb with
+  | (Some (cq, dq), rlr) =>
+       let (rlq, rlr') := rlap_quot_rem_loop 50 rlr rlb in
+       (length rlq <= dq)%nat
+  | _ => False
+  end).
+Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
+Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
+Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
+Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
+Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
+Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
+Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
+Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
+Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
 ... ...
 eapply glop in Hqrlr; [ | apply Hqr' ].
 easy.
