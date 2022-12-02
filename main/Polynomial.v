@@ -2877,7 +2877,44 @@ rewrite rev_lap_add; [ | easy ].
 rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
 Qed.
 
-(**)
+Theorem rlap_quot_rem_step_loop_quot_le : ∀ it rla rlb rlq rlr rlr' cq dq,
+  hd 0%F rlb ≠ 0%F
+  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rlap_quot_rem_loop it rlr rlb = (rlq, rlr')
+  → length rlq ≤ dq.
+Proof.
+intros * Hbz Hqr Hqr'.
+generalize Hqr; intros Habq.
+apply rlap_quot_rem_step_Some_length in Habq; [ | easy ].
+generalize Hqr; intros Hra.
+apply rlap_quot_rem_step_length_lt in Hra.
+revert rla rlr rlq cq dq Hqr Hqr' Habq Hra.
+induction it; intros; cbn. {
+  cbn in Hqr'.
+  now injection Hqr'; clear Hqr'; intros; subst rlq rlr'.
+}
+cbn in Hqr'.
+remember (rlap_quot_rem_step rlr rlb) as qr eqn:Hqr''.
+symmetry in Hqr''.
+destruct qr as (q, rlr'').
+destruct q as [(cq', dq')| ]. 2: {
+  now injection Hqr'; clear Hqr'; intros; subst rlq rlr''.
+}
+remember (rlap_quot_rem_loop it rlr'' rlb) as qr eqn:Hqr'''.
+symmetry in Hqr'''.
+destruct qr as (q, rlr''').
+injection Hqr'; clear Hqr'; intros; subst rlq rlr'''.
+cbn; rewrite app_length, repeat_length.
+generalize Hqr''; intros Hqq.
+generalize Hqr''; intros Habq'.
+apply rlap_quot_rem_step_Some_length in Habq'; [ | easy ].
+generalize Hqr''; intros Hra'.
+apply rlap_quot_rem_step_length_lt in Hra'.
+apply IHit with (rlq := q) in Hqq; [ | easy | easy | easy ].
+rewrite Nat.sub_add; [ | easy ].
+flia Habq Hra Habq'.
+Qed.
+
 Theorem rlap_quot_rem_length :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -2922,222 +2959,9 @@ destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
 }
 generalize Hqrlr; intros Hra.
 apply rlap_quot_rem_step_length_lt in Hra.
-Theorem glop : ∀ it rla rlb rlq rlr rlr' cq dq,
-  hd 0%F rlb ≠ 0%F
-  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
-  → rlap_quot_rem_loop it rlr rlb = (rlq, rlr')
-  → length rlq ≤ dq.
-Proof.
-intros * Hbz Hqr Hqr'.
-generalize Hqr; intros Habq.
-apply rlap_quot_rem_step_Some_length in Habq; [ | easy ].
-generalize Hqr; intros Hra.
-apply rlap_quot_rem_step_length_lt in Hra.
-...
-Abort.
-Abort.
-End a.
-Arguments lap_add {T ro} (la lb)%list.
-Arguments lap_sub {T ro} (la lb)%list.
-Arguments lap_mul {T ro} (la lb)%list.
-Arguments lap_quot_rem {T ro} (la lb)%list.
-Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute (
-  let rla := [-3;0;1;0;-5;0;1] in
-  let rlb := [3;1;1] in
-  match rlap_quot_rem_step rla rlb with
-  | (Some (cq, dq), rlr) =>
-       let (rlq, rlr') := rlap_quot_rem_loop 50 rlr rlb in
-       (length rlq <= dq)%nat
-  | _ => False
-  end).
-Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
-Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
-Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
-Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
-Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
-Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
-Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
-Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
-Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
-... ...
-eapply glop in Hqrlr; [ | apply Hqr' ].
+eapply rlap_quot_rem_step_loop_quot_le in Hqrlr; [ | easy | apply Hqr' ].
 easy.
-...
-apply Nat.nle_gt in Hqq.
-destruct it. {
-  apply Nat.le_0_r in Hit.
-  now rewrite Hit in Hb.
-}
-remember (b :: rlb) as l; cbn in Hqr'; subst l.
-remember (rlap_quot_rem_step rlr' (b :: rlb)) as qr eqn:Hqr.
-symmetry in Hqr.
-destruct qr as (q, rlr).
-destruct q as [(cq', dq')| ]. 2: {
-  injection Hqr'; clear Hqr'; intros; subst rlq' rlr''.
-  now rewrite Nat.sub_0_r, Nat.add_0_r.
-}
-generalize Hqr; intros Ha.
-apply rlap_quot_rem_step_Some_length in Ha; [ | easy ].
-remember (rlap_quot_rem_loop it rlr (b :: rlb)) as x eqn:Hx.
-symmetry in Hx.
-destruct x as (rlq, rlr''').
-injection Hqr'; clear Hqr'; intros; subst rlq' rlr''.
-cbn.
-rewrite app_length, repeat_length.
-cbn in Ha.
-cbn in Hqq.
-rewrite app_length, repeat_length in Hqq.
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
-cbn.
-...
-apply IHit in Hqr'. 2: {
-  generalize Hqrlr; intros Ha.
-  apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
-  cbn in Ha.
-  transitivity (length rla); [ | easy ].
-  rewrite Hb.
-  apply -> Nat.succ_le_mono.
-...
-  rewrite <- (rev_length rla).
-  rewrite Ha.
-  rewrite lap_add_length.
-  rewrite rev_length.
-  rewrite max_l.
-...
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
-...
-(*
-Abort.
-End a.
-Arguments lap_add {T ro} (la lb)%list.
-Arguments lap_sub {T ro} (la lb)%list.
-Arguments lap_mul {T ro} (la lb)%list.
-Arguments lap_quot_rem {T ro} (la lb)%list.
-Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute (
-  let rla := [6;-2;9;-2;-2] in
-  let rlb := [1;0;2] in
-  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
-  (length rlq = length rla - (length rlb - 1))%nat).
-Compute (
-  let rla := [1;6;-1;-30] in
-  let rlb := [1;5] in
-  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
-  (length rlq = length rla - (length rlb - 1))%nat).
-Compute (
-  let rla := [1;6;-1;-30] in
-  let rlb := [1] in
-  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
-  (length rlq = length rla - (length rlb - 1))%nat).
-...
-Compute (
-  let rla := [6;-2;9;-2;-2] in
-  let rlb := [1;0;2] in
-  let (rlq, rlr) := rlap_quot_rem_loop (S (length rla)) rla rlb in
-  (length rlq = length rla - (length rlb - 1))%nat).
-...
-Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
-Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
-Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
-Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
-Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
-Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
-Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
-Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
-Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
-...
-intros Hco Hop Hiv * Hbn Hqr Hit.
-*)
-intros Hco Hop Hiv * Hbn Hqr Hit.
-revert rla rlq rlr Hqr Hit.
-induction it; intros; [ easy | ].
-apply Nat.succ_le_mono in Hit.
-cbn in Hqr.
-remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
-symmetry in Hqrlr.
-destruct qrlr as (q, rlr').
-destruct q as [(cq, dq)| ]. 2: {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  apply rlap_quot_rem_step_None in Hqrlr.
-  destruct Hqrlr as [H1| H1]; [ now destruct H1; subst rlb | ].
-  destruct H1 as [H1| H1]; [ now destruct H1; subst rla | ].
-  rewrite (proj2 (Nat.sub_0_le _ _)); [ easy | flia H1 ].
-}
-generalize Hqrlr; intros Hb.
-apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
-remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
-symmetry in Hqr'.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-rewrite app_length, repeat_length.
-rewrite Hb.
-destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
-  rewrite Nat.sub_add; [ | easy ].
-  destruct rlb as [| b]; [ easy | ].
-  cbn - [ "-" ].
-  rewrite Nat_sub_succ_1.
-  rewrite <- Nat.add_succ_r, Nat.add_comm.
-  now rewrite Nat.add_sub.
-}
-apply Nat.nle_gt in Hqq.
-...
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
-cbn.
-destruct rlb as [| b]; [ easy | ].
-cbn - [ "-" ].
-rewrite Nat_sub_succ_1.
-rewrite <- Nat.add_succ_r, Nat.add_comm.
-rewrite Nat.add_sub.
-f_equal.
-cbn in Hb.
-...
-destruct rla as [| a]. {
-  symmetry in Hb.
-  apply Nat.eq_add_0 in Hb.
-  destruct Hb as (H1, H2); subst dq.
-  now apply length_zero_iff_nil in H1; subst rlb.
-}
-cbn in Hit, Hb.
-apply IHit in Hqr'. 2: {
-  generalize Hqrlr; intros Ha.
-  apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
-...
-generalize Hqrlr; intros Hb.
-apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
-...
-rewrite <- rev_length in Hb.
-rewrite Ha in Hb.
-rewrite lap_add_length in Hb.
-rewrite rev_length in Hb.
-Search (length (_ * _)%lap).
-...
-destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. 2: {
-...
-apply IHit in Hqr'. 2: {
-  generalize Hqrlr; intros Ha.
-  apply rlap_quot_rem_step_Some in Ha.
-...
-rewrite Nat.sub_add.
-rename rlq' into rlq; rename rlr' into rlr.
-rename Hqr' into Hqr.
-move rla after rlb.
-move rlq before rlb.
-move rlr before rlq; cbn.
-apply IHit in Hqr. 2: {
-destruct qr as (q, rlr).
-...
+Qed.
 
 Theorem rlap_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -3169,7 +2993,6 @@ destruct q as [(cq, dq)| ]. 2: {
   destruct (length rla <? length rlb); [ | easy ].
   now injection Hqrlr.
 }
-(**)
 generalize Hqrlr; intros Ha.
 apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
 generalize Hqrlr; intros Hb.
@@ -3183,6 +3006,10 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
+generalize Hqrlr; intros Hra.
+apply rlap_quot_rem_step_length_lt in Hra.
+generalize Hqr; intros Hqrb.
+apply (rlap_quot_rem_length Hco Hop Hiv _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply lt_le_S.
@@ -3222,15 +3049,10 @@ destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
 }
 exfalso; apply Hqq; clear Hqq.
 replace dq with (length rla - length rlb) by flia Hb.
-...
-apply (f_equal length) in Ha.
-rewrite lap_add_length in Ha.
-do 2 rewrite rev_length in Ha.
-Search (length (_ * _)%lap).
-...
-apply Nat.nle_gt in Hqq.
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
-rewrite app_nil_r.
+Check rlap_quot_rem_length.
+flia Hra Hqrb.
+Qed.
+
 ...
 
 Theorem lap_quot_rem_prop : ∀ la lb lq lr : list T,
