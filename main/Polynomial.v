@@ -2920,12 +2920,19 @@ rewrite app_length, repeat_length; f_equal.
 destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
   now apply Nat.sub_add.
 }
+generalize Hqrlr; intros Hra.
+apply rlap_quot_rem_step_length_lt in Hra.
 Theorem glop : ∀ it rla rlb rlq rlr rlr' cq dq,
-  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  hd 0%F rlb ≠ 0%F
+  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rlap_quot_rem_loop it rlr rlb = (rlq, rlr')
   → length rlq ≤ dq.
 Proof.
-intros * Hqr Hqr'.
+intros * Hbz Hqr Hqr'.
+generalize Hqr; intros Habq.
+apply rlap_quot_rem_step_Some_length in Habq; [ | easy ].
+generalize Hqr; intros Hra.
+apply rlap_quot_rem_step_length_lt in Hra.
 ...
 Abort.
 Abort.
