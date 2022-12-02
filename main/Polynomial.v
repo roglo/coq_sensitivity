@@ -2920,7 +2920,43 @@ rewrite app_length, repeat_length; f_equal.
 destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
   now apply Nat.sub_add.
 }
+Theorem glop : ∀ it rla rlb rlq rlr rlr' cq dq,
+  rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rlap_quot_rem_loop it rlr rlb = (rlq, rlr')
+  → length rlq ≤ dq.
+Proof.
+intros * Hqr Hqr'.
+... ...
+eapply glop in Hqrlr; [ | apply Hqr' ].
+easy.
+...
 apply Nat.nle_gt in Hqq.
+destruct it. {
+  apply Nat.le_0_r in Hit.
+  now rewrite Hit in Hb.
+}
+remember (b :: rlb) as l; cbn in Hqr'; subst l.
+remember (rlap_quot_rem_step rlr' (b :: rlb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, rlr).
+destruct q as [(cq', dq')| ]. 2: {
+  injection Hqr'; clear Hqr'; intros; subst rlq' rlr''.
+  now rewrite Nat.sub_0_r, Nat.add_0_r.
+}
+generalize Hqr; intros Ha.
+apply rlap_quot_rem_step_Some_length in Ha; [ | easy ].
+remember (rlap_quot_rem_loop it rlr (b :: rlb)) as x eqn:Hx.
+symmetry in Hx.
+destruct x as (rlq, rlr''').
+injection Hqr'; clear Hqr'; intros; subst rlq' rlr''.
+cbn.
+rewrite app_length, repeat_length.
+cbn in Ha.
+cbn in Hqq.
+rewrite app_length, repeat_length in Hqq.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hqq ].
+cbn.
+...
 apply IHit in Hqr'. 2: {
   generalize Hqrlr; intros Ha.
   apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
