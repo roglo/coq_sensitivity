@@ -3175,15 +3175,15 @@ Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
 Notation "- a" := (polyn_opp a) : polyn_scope.
 *)
-(**)
+(*
 Notation "a + b" := (@polyn_add T ro rp Heb H10 a b) : polyn_scope.
 Notation "a * b" := (@polyn_mul T ro rp Heb H10 a b) : polyn_scope.
 Notation "a / b" := (@polyn_quot T ro rp Heb H10 Hos Hiv a b) : polyn_scope.
-(*
+*)
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
-*)
+(**)
 
 (*
 Existing Instance polyn_ring_like_op.
