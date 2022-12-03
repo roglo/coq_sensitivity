@@ -3091,6 +3091,7 @@ Qed.
 
 Context {Hiv : @rngl_has_inv T _ = true}.
 Arguments polyn_quot_rem {Hiv} (pa pb)%pol.
+Arguments polyn_quot {Hiv} (pa pb)%pol.
 
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -3101,16 +3102,19 @@ Theorem polyn_quot_rem_prop :
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
 intros * Hic Hop * Hbz Hab.
-(*
+(**)
 (* pourtant, ça marche, ici *)
 About polyn_mul.
 About polyn_quot.
 (* enfin, bon, à moitié *)
-Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+About polyn_quot.
+Theorem polyn_quot_unique : ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
+  → q = polyn_quot a b.
   → q = @polyn_quot Hiv a b.
 ....
+(*
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
