@@ -825,6 +825,7 @@ Notation "- a" := (polyn_opp a) : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
+Notation "a / b" := (polyn_quot a b) : polyn_scope.
 
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
@@ -838,6 +839,7 @@ Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
+Notation "a / b" := (polyn_quot a b) : polyn_scope.
 
 Arguments lap_norm la%lap.
 
@@ -3099,6 +3101,20 @@ Theorem polyn_quot_rem_prop :
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
 intros * Hic Hop * Hbz Hab.
+(* pourtant, ça marche, ici *)
+About polyn_mul.
+About polyn_quot.
+(* enfin, bon, à moitié *)
+Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+  length (lap r) < length (lap b)
+  → a = (b * q + r)%pol
+  → q = @polyn_quot Hiv a b.
+....
+Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+  length (lap r) < length (lap b)
+  → a = (b * q + r)%pol
+  → q = (a / b)%pol.
+...
 destruct pa as (la, Hpa).
 destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
@@ -3192,6 +3208,9 @@ Existing Instance polyn_ring_like_op.
 (*
 Let rngl_has_eqb := @rngl_has_eqb T ro.
 *)
+
+Check @lap_mul.
+Check @polyn_mul.
 
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
