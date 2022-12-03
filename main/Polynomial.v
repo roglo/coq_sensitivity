@@ -3204,6 +3204,9 @@ Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   → q = @polyn_quot Hiv a b.
 Proof.
 Print Nat.div_unique_exact.
+Print Nat.Private_NZDiv.div_unique_exact.
+Print Nat.Private_NZDiv.div_unique.
+Check Nat.Private_NZDiv.div_mod_unique.
 (* theories/Numbers/NatInt/NZDiv.v *)
 ...
 
