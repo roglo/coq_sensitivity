@@ -3169,13 +3169,16 @@ subst a.
 ...
 *)
 
+Check polyn_quot.
+
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
-  → q = @polyn_quot Hiv a b.
 (*
-  → q = (a / b)%pol.
+  → q = @polyn_quot Hiv a b
 *)
+  → q = (a / b)%pol.
+(**)
 ...
 
 End a.
