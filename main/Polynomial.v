@@ -3101,6 +3101,7 @@ Theorem polyn_quot_rem_prop :
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
 intros * Hic Hop * Hbz Hab.
+(*
 (* pourtant, ça marche, ici *)
 About polyn_mul.
 About polyn_quot.
@@ -3115,6 +3116,7 @@ Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   → a = (b * q + r)%pol
   → q = (a / b)%pol.
 ...
+*)
 destruct pa as (la, Hpa).
 destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
@@ -3167,6 +3169,15 @@ subst a.
 ...
 *)
 
+Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+  length (lap r) < length (lap b)
+  → a = (b * q + r)%pol
+  → q = @polyn_quot Hiv a b.
+(*
+  → q = (a / b)%pol.
+*)
+...
+
 End a.
 
 Section a.
@@ -3200,6 +3211,12 @@ Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 (**)
+
+Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+  length (lap r) < length (lap b)
+  → a = (b * q + r)%pol
+  → q = @polyn_quot T ro rp Heb H10 Hos Hiv a b.
+...
 
 (*
 Existing Instance polyn_ring_like_op.
