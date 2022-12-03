@@ -1794,7 +1794,7 @@ specialize (mA_is_correct n) as Hac.
 specialize (mI_is_correct_matrix (2 ^ n)) as Hicm.
 assert (Hcs : mat_ncols (mA n) = vect_size V) by now rewrite mA_ncols.
 (* μ * μ = rngl_of_nat n *)
-apply vect_mul_scal_reg_r with (V0 := V); [ easy | easy | congruence | ].
+apply vect_mul_scal_reg_r with (V := V); [ easy | easy | congruence | ].
 (* (μ * μ) × V = rngl_of_nat n × V *)
 rewrite <- vect_mul_scal_l_mul_assoc; [ | easy ].
 (* μ × (μ × V) = rngl_of_nat n × V *)

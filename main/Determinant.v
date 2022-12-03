@@ -1368,7 +1368,7 @@ f_equal.
 rewrite rngl_mul_1_l.
 symmetry.
 set (g := λ k, canon_sym_gr_list_inv n (f k)).
-rewrite rngl_summation_change_var with (g0 := g) (h := g). 2: {
+rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
   intros k (_, Hk).
   assert (Hkn : k < n!). {
     specialize (fact_neq_0 n) as Hn.
@@ -1763,7 +1763,7 @@ unfold det'.
 rewrite Hr.
 set (g := λ i, canon_sym_gr_list_inv n (nth i sg [])).
 set (h := λ i, sym_gr_inv sg (canon_sym_gr_list n i)).
-rewrite rngl_summation_change_var with (g0 := g) (h0 := h). 2: {
+rewrite rngl_summation_change_var with (g := g) (h := h). 2: {
   intros i (_, Hi).
   unfold g, h.
   rewrite (nth_sym_gr_inv_sym_gr Hsg). 2: {
