@@ -235,40 +235,6 @@ Definition lap_quot_rem la lb :=
   (rev rlq, rev rlr).
 
 (*
-Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
-  match it with
-  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
-  | S it' =>
-      match rla with
-      | [] => ([], [])
-      | a :: rla' =>
-          match rlb with
-          | [] => ([], []) (* division by zero *)
-          | b :: rlb' =>
-              if length rla' <? length rlb' then ([], rla)
-              else
-                let cq := (a / b)%F in
-                let dq := length rla' - length rlb' in
-                let lr :=
-                  lap_norm
-                    (lap_sub (rev rla')
-                       (repeat 0%F dq ++ map (rngl_mul cq) (rev rlb')))
-                in
-                let (rlq', rlr') := rlap_quot_rem_loop it' (rev lr) rlb in
-                (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
-          end
-      end
-  end.
-
-Definition rlap_quot_rem rla rlb :=
-  rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
-
-Definition lap_quot_rem la lb :=
-  let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
-  (rev rlq, rev rlr).
-*)
-
-(*
 End a.
 Arguments lap_add {T ro} (al1 al2)%list.
 Arguments lap_sub {T ro} (la lb)%list.
@@ -596,21 +562,6 @@ cbn in Hbn |-*.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
-(*
-cbn - [ rlap_quot_rem_step ] in Hqr.
-remember (rlap_quot_rem_step rla (b :: rlb)) as orlr eqn:Horlr.
-symmetry in Horlr.
-destruct orlr as (o, rlr').
-destruct o as [(cq, dq)| ]. 2: {
-  injection Hqr; clear Hqr; intros; subst rlq rlr'.
-  apply rlap_quot_rem_step_None in Horlr.
-  destruct Horlr as [| Horlr]; [ easy | ].
-  destruct Horlr as [Horlr| Horlr]. {
-    now destruct Horlr; subst rla rlr.
-  }
-  now destruct Horlr as (H1, H2); subst rlr.
-}
-*)
 destruct rla as [| a]. {
   now injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 }
@@ -3187,6 +3138,7 @@ now apply last_lap_neq_0_lap_norm.
 Qed.
 
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
+Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 
 (*
 Theorem polyn_div_unique_exact : ∀ a b q : polyn T,
@@ -3200,15 +3152,34 @@ subst a.
 *)
 
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
-  a = (b * q + r)%pol
+  length (lap r) < length (lap b)
+  → a = (b * q + r)%pol
   → q = @polyn_quot Hiv a b.
 Proof.
-intros * Hab.
+intros * Hrb Hab.
 Print Nat.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique.
 Check Nat.Private_NZDiv.div_mod_unique.
+Theorem polyn_quot_mod_unique : ∀ b q1 q2 r1 r2 : polyn T,
+  length (lap r1) < length (lap b)
+  → length (lap r2) < length (lap b)
+  → (b * q1 + r1 = b * q2 + r2)%pol
+  → q1 = q2 ∧ r1 = r2.
+Admitted.
+specialize polyn_quot_mod_unique as H1.
+specialize (H1 b q (@polyn_quot Hiv a b) r (@polyn_rem Hiv a b)).
+specialize (H1 Hrb).
+assert (length (lap (@polyn_quot Hiv a b)) < length (lap b)).
 ...
+assert (length (lap (a mod b)%pol) < length (lap b)).
+Check Nat.Private_NZDiv.div_mod_unique.
+Check Nat.Private_NZDiv.div_unique.
+Check Nat.Private_NZDiv.div_unique_exact.
+Check Nat.div_unique_exact.
+...
+specialize (H1 b q (polyn_quot a b) r (polyn_rem a b)).
+specialize (polyn_quot_mod_unique b q (a / b) r (a mod b)) as H1.
            Nat.Private_NZDiv.div_mod_unique b q (a / b) r (a mod b) (conj Hb Hr)
 (* theories/Numbers/NatInt/NZDiv.v *)
 ...
