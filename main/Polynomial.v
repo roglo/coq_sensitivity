@@ -3151,12 +3151,56 @@ subst a.
 ...
 *)
 
+End a.
+
+Section a.
+
+Context {T : Type}.
+Context (ro : ring_like_op T).
+Context (rp : ring_like_prop T).
+Context {Heb : rngl_has_eqb = true}.
+Context {H10 : rngl_has_1_neq_0 = true}.
+Context {Hos : rngl_has_opp_or_sous = true}.
+Context {Hiv : rngl_has_inv = true}.
+
+Declare Scope polyn_scope.
+Delimit Scope polyn_scope with pol.
+
+Arguments polyn_add {T ro rp} {Heb H10} (p1 p2)%pol.
+Arguments polyn_mul {T ro rp} {Heb H10} (p1 p2)%pol.
+Arguments polyn_quot {T ro rp} {Heb H10 Hos Hiv} (pa pb)%pol.
+
+(*
+Notation "0" := polyn_zero : polyn_scope.
+Notation "1" := polyn_one : polyn_scope.
+Notation "- a" := (polyn_opp a) : polyn_scope.
+*)
+Notation "a + b" := (polyn_add a b) : polyn_scope.
+(*
+Notation "a - b" := (polyn_sub a b) : polyn_scope.
+*)
+Notation "a * b" := (polyn_mul a b) : polyn_scope.
+
+(*
+Existing Instance polyn_ring_like_op.
+*)
+
+Theorem polyn_quot_unique: ∀ a b q r : polyn T,
+  length (lap r) < length (lap b)
+  → a = @polyn_add T ro rp Heb H10 (@polyn_mul T ro rp Heb H10 b q) r
+  → q = @polyn_quot T ro rp Heb H10 Hos Hiv a b.
+Proof.
+intros * Hrb Hab.
+Set Printing All.
+...
+
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
-  → q = @polyn_quot Hiv a b.
+  → q = polyn_quot a b.
 Proof.
 intros * Hrb Hab.
+...
 Print Nat.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique.
@@ -3168,6 +3212,7 @@ Theorem polyn_quot_mod_unique : ∀ b q1 q2 r1 r2 : polyn T,
   → q1 = q2 ∧ r1 = r2.
 Admitted.
 specialize polyn_quot_mod_unique as H1.
+specialize (H1 b q (a / b)%pol r (@polyn_rem Hiv a b)).
 specialize (H1 b q (@polyn_quot Hiv a b) r (@polyn_rem Hiv a b)).
 specialize (H1 Hrb).
 assert (length (lap (@polyn_quot Hiv a b)) < length (lap b)).
