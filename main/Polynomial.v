@@ -601,7 +601,9 @@ apply IHit in Hqr. 2: {
 now rewrite rev_length in Hqr.
 Qed.
 
+(*
 Section b.
+*)
 
 Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
@@ -766,7 +768,9 @@ Definition polyn_rem (pa pb : polyn T) : polyn T :=
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
 
+(*
 End b.
+*)
 
 (* polyn opposite or subtraction *)
 
@@ -838,6 +842,7 @@ Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 
+Arguments lap {T ro} p%pol.
 Arguments lap_norm la%lap.
 
 (* commutativity of addition *)
@@ -3101,7 +3106,6 @@ intros * Hic Hop * Hbz Hab.
 About polyn_mul.
 About polyn_quot.
 (* enfin, bon, à moitié *)
-About polyn_quot.
 Theorem polyn_quot_unique : ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
@@ -3182,6 +3186,7 @@ Theorem polyn_quot_unique: ∀ a b q r : polyn T,
 ...
 *)
 
+(*
 End a.
 
 Section a.
@@ -3193,13 +3198,16 @@ Context {Heb : rngl_has_eqb = true}.
 Context {H10 : rngl_has_1_neq_0 = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
 Context {Hiv : rngl_has_inv = true}.
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
 
+(*
 Arguments polyn_add {T ro rp Heb H10} (p1 p2)%pol.
 Arguments polyn_mul {T ro rp Heb H10} (p1 p2)%pol.
 Arguments polyn_quot {T ro rp Heb H10 Hos Hiv} (pa pb)%pol.
+*)
 
 (*
 Notation "0" := polyn_zero : polyn_scope.
@@ -3214,40 +3222,8 @@ Notation "a / b" := (@polyn_quot T ro rp Heb H10 Hos Hiv a b) : polyn_scope.
 Notation "a + b" := (polyn_add a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
+Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 (**)
-
-Theorem polyn_quot_unique: ∀ a b q r : polyn T,
-  length (lap r) < length (lap b)
-  → a = (b * q + r)%pol
-  → q = @polyn_quot T ro rp Heb H10 Hos Hiv a b.
-...
-
-(*
-Existing Instance polyn_ring_like_op.
-*)
-
-(*
-Let rngl_has_eqb := @rngl_has_eqb T ro.
-*)
-
-Check @lap_mul.
-Check @polyn_mul.
-
-Theorem polyn_quot_unique: ∀ a b q r : polyn T,
-  length (lap r) < length (lap b)
-  → a = (b * q + r)%pol
-  → q = (a / b)%pol.
-Proof.
-intros * Hrb Hab.
-...
-Theorem polyn_quot_unique: ∀ a b q r : polyn T,
-  length (lap r) < length (lap b)
-  → a = @polyn_add T ro rp Heb H10 (@polyn_mul T ro rp Heb H10 b q) r
-  → q = @polyn_quot T ro rp Heb H10 Hos Hiv a b.
-Proof.
-intros * Hrb Hab.
-Set Printing All.
-...
 
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
@@ -3255,22 +3231,48 @@ Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   → q = polyn_quot a b.
 Proof.
 intros * Hrb Hab.
-...
+(*
 Print Nat.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique.
 Check Nat.Private_NZDiv.div_mod_unique.
+*)
 Theorem polyn_quot_mod_unique : ∀ b q1 q2 r1 r2 : polyn T,
   length (lap r1) < length (lap b)
   → length (lap r2) < length (lap b)
   → (b * q1 + r1 = b * q2 + r2)%pol
   → q1 = q2 ∧ r1 = r2.
-Admitted.
+Proof.
+intros * Hr1b Hr2b Hbqr.
+Check Nat.Private_NZDiv.div_mod_unique.
+Print Nat.Private_NZDiv.div_mod_unique.
+(*
+Require Import ZArith.
+Check Z.div_mod_unique.
+Print Z.div_mod_unique.
+Check Z.Private_NZDiv.div_mod_unique.
+Print Z.Private_NZDiv.div_mod_unique.
+*)
+assert
+  (U : ∀ q1 q2 r1 r2 : polyn T,
+     (b * q1 + r1)%pol = (b * q2 + r2)%pol
+     → length (lap r1) < length (lap b)
+     → length (lap q1) < length (lap q2)
+     → False). {
+  clear q1 q2 r1 r2 Hr1b Hr2b Hbqr.
+  intros * Hbqr Hrb H12.
+...
+}
+specialize (U q1 q2 r1 r2 Hbqr Hr1b) as H1.
+...
+b * q1 + r1 < b * q1 + b
+Check Z.mul_cancel_l.
+Check Nat.lt_neq.
+... ...
 specialize polyn_quot_mod_unique as H1.
-specialize (H1 b q (a / b)%pol r (@polyn_rem Hiv a b)).
-specialize (H1 b q (@polyn_quot Hiv a b) r (@polyn_rem Hiv a b)).
+specialize (H1 b q (a / b)%pol r (a mod b)%pol).
 specialize (H1 Hrb).
-assert (length (lap (@polyn_quot Hiv a b)) < length (lap b)).
+assert (length (lap (a mod b)) < length (lap b)). {
 ...
 assert (length (lap (a mod b)%pol) < length (lap b)).
 Check Nat.Private_NZDiv.div_mod_unique.
