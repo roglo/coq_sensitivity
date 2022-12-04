@@ -3252,6 +3252,37 @@ Check Z.div_mod_unique.
 Print Z.div_mod_unique.
 Check Z.Private_NZDiv.div_mod_unique.
 Print Z.Private_NZDiv.div_mod_unique.
+Z.Private_NZDiv.div_mod_unique = 
+λ (b : Z) (U :
+           ∀ q1 q2 r1 r2 : Z,
+             (b * q1 + r1)%Z = (b * q2 + r2)%Z → (0 <= r1 < b)%Z → (0 <= r2)%Z → (q1 < q2)%Z → False :=
+           λ (q1 q2 r1 r2 : Z) (EQ : (b * q1 + r1)%Z = (b * q2 + r2)%Z) (LT : (0 <= r1 < b)%Z) 
+             (Hr1 : (0 <= r2)%Z) (Hr2 : (q1 < q2)%Z),
+             False_ind False
+               ((Z.lt_neq (b * q1 + r1) (b * q2 + r2)
+                   (Z.lt_le_trans (b * q1 + r1) (b * q1 + b) (b * q2 + r2)
+                      ((λ lemma : (r1 < b)%Z ↔ (b * q1 + r1 < b * q1 + b)%Z,
+                          Morphisms.iff_flip_impl_subrelation (b * q1 + r1 < b * q1 + b)%Z 
+                            (r1 < b)%Z (RelationClasses.symmetry lemma)) (Z.add_lt_mono_l r1 b (b * q1))
+                         (and_ind (λ (_ : (0 <= r1)%Z) (H0 : (r1 < b)%Z), H0) LT))
+                      (Z.le_trans (b * q1 + b) (b * q2) (b * q2 + r2)
+                         ((λ lemma : (b * q1)%Z = (q1 * b)%Z,
+                             Morphisms.subrelation_proper Z.le_wd tt
+                               (Morphisms.subrelation_respectful (Morphisms.subrelation_refl eq)
+                                  (Morphisms.subrelation_respectful (Morphisms.subrelation_refl eq)
+                                     Morphisms.iff_flip_impl_subrelation)) (b * q1 + b)%Z 
+                               (q1 * b + b)%Z
+                               (Z.add_wd (b * q1)%Z (q1 * b)%Z lemma b b
+                                  (Morphisms.reflexive_proper_proxy RelationClasses.Equivalence_Reflexive b))
+                               (b * q2)%Z (b * q2)%Z
+                               (Morphisms.reflexive_proper_proxy RelationClasses.Equivalence_Reflexive (b * q2)%Z))
+                            (Z.mul_comm b q1)
+                            ((λ lemma : (Z.succ q1 * b)%Z = (q1 * b + b)%Z,
+                                Morphisms.subrelation_proper Z.le_wd tt
+                                  (Morphisms.subrelation_respectful (Morphisms.subrelation_refl eq)
+                                     (Morphisms.subrelation_respectful (Morphisms.subrelation_refl eq)
+                                        Morphisms.iff_flip_impl_subrelation)) (q1 * b + b)%Z 
+                                  (Z.succ q1 * b)%Z (RelationClasses.symmetry lemma) (b * q2)%Z 
 *)
 assert
   (U : ∀ q1 q2 r1 r2 : polyn T,
