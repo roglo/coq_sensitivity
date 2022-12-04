@@ -3296,7 +3296,13 @@ assert
   cbn in Hbqr.
   do 2 rewrite fold_lap_norm in Hbqr.
   do 2 rewrite lap_add_norm_idemp_l in Hbqr.
+  specialize (lap_norm_add_length_le (lap b * lap q1)%lap (lap r1)) as H1.
+  rewrite Hbqr in H1.
+...
+Search (length (_ * _)%lap).
+...
 Search (lap_norm (_ + _)).
+lap_norm_add_length_le: ∀ la lb : list T, length (lap_norm (la + lb)) ≤ max (length la) (length lb)
 ...
 }
 specialize (U q1 q2 r1 r2 Hbqr Hr1b) as H1.
