@@ -37,6 +37,7 @@ Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
 Context {H10 : rngl_has_1_neq_0 = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
+Context {Hiv : rngl_has_inv = true}.
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -509,15 +510,13 @@ Qed.
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
-  rngl_has_inv = true →
   ∀ la lb lq lr : list T,
   lb ≠ []
   → last_lap_neq_0 lb
   → lap_quot_rem la lb = (lq, lr)
   → length lr < length lb.
 Proof.
-intros Hop Hco Hiv * Hbz Hbn Hab.
-move Hos before Hiv.
+intros Hop Hco * Hbz Hbn Hab.
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -603,8 +602,6 @@ now rewrite rev_length in Hqr.
 Qed.
 
 Section b.
-
-Context {Hiv : rngl_has_inv = true}.
 
 Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
@@ -790,7 +787,7 @@ Definition polyn_opt_inv_or_quot :
       match bool_dec rngl_has_inv with
      | left Hiv =>
          match (@rngl_opt_inv_or_quot T ro) with
-         | Some _ => Some (inr (@polyn_quot Hiv))
+         | Some _ => Some (inr polyn_quot)
          | None => None
          end
      | right _ => None
@@ -2741,13 +2738,12 @@ Qed.
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  @rngl_has_inv T _ = true →
   ∀ rla rlb rlr cq dq,
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
   → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
 Proof.
-intros Hco Hop Hiv * Hbz Hrl.
+intros Hco Hop * Hbz Hrl.
 specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
@@ -2871,14 +2867,13 @@ Qed.
 Theorem rlap_quot_rem_length :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  @rngl_has_inv T _ = true →
   ∀ it (rla rlb rlq rlr : list T),
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → length rlq = length rla - (length rlb - 1).
 Proof.
-intros Hco Hop Hiv * Hbn Hqr Hit.
+intros Hco Hop * Hbn Hqr Hit.
 destruct rlb as [| b]; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
 cbn in Hbn.
@@ -2919,14 +2914,13 @@ Qed.
 Theorem rlap_quot_rem_prop :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  @rngl_has_inv T _ = true →
   ∀ it (rla rlb rlq rlr : list T),
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
 Proof.
-intros Hco Hop Hiv * Hbn Hqr Hit.
+intros Hco Hop * Hbn Hqr Hit.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 apply Nat.succ_le_mono in Hit.
@@ -2947,7 +2941,7 @@ destruct q as [(cq, dq)| ]. 2: {
   now injection Hqrlr.
 }
 generalize Hqrlr; intros Ha.
-apply (rlap_quot_rem_step_Some Hco Hop Hiv) in Ha; [ | easy ].
+apply (rlap_quot_rem_step_Some Hco Hop) in Ha; [ | easy ].
 generalize Hqrlr; intros Hb.
 apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
@@ -2962,7 +2956,7 @@ move rlr before rlq.
 generalize Hqrlr; intros Hra.
 apply rlap_quot_rem_step_length_lt in Hra.
 generalize Hqr; intros Hqrb.
-apply (rlap_quot_rem_length Hco Hop Hiv _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
+apply (rlap_quot_rem_length Hco Hop _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
   etransitivity; [ | apply Hit ].
   apply lt_le_S.
@@ -3009,15 +3003,14 @@ Qed.
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
-  @rngl_has_inv T _ = true →
   ∀ la lb lq lr : list T,
   (last lb 0 ≠? 0)%F = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
-intros Hco Hop Hiv * H1 Hab.
+intros Hco Hop * H1 Hab.
 split. 2: {
-  eapply (lap_rem_length_lt Hop Hco Hiv); [ | | apply Hab ]. {
+  eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
     intros H; subst lb; cbn in H1.
     now rewrite (rngl_eqb_refl Heb) in H1.
   } {
@@ -3086,19 +3079,20 @@ assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 rewrite <- (rev_involutive rla).
 f_equal.
-apply (rlap_quot_rem_prop Hco Hop Hiv rla _ Hbn Hqr Hit).
+apply (rlap_quot_rem_prop Hco Hop rla _ Hbn Hqr Hit).
 Qed.
 
-Context {Hiv : @rngl_has_inv T _ = true}.
+(*
 Arguments polyn_quot_rem {Hiv} (pa pb)%pol.
 Arguments polyn_quot {Hiv} (pa pb)%pol.
+*)
 
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
   ∀ pa pb pq pr : polyn T,
   pb ≠ 0%pol
-  → @polyn_quot_rem Hiv pa pb = (pq, pr)
+  → @polyn_quot_rem pa pb = (pq, pr)
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
 intros * Hic Hop * Hbz Hab.
@@ -3127,7 +3121,7 @@ destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
 destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
-specialize (lap_quot_rem_prop Hic Hop Hiv la lb) as H1.
+specialize (lap_quot_rem_prop Hic Hop la lb) as H1.
 specialize (H1 lq lr).
 assert (H : (last lb 0 ≠? 0)%F = true). {
   apply Bool.negb_true_iff.
