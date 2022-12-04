@@ -3292,6 +3292,11 @@ assert
      → False). {
   clear q1 q2 r1 r2 Hr1b Hr2b Hbqr.
   intros * Hbqr Hrb H12.
+  apply (f_equal (λ p, length (lap p))) in Hbqr.
+  cbn in Hbqr.
+  do 2 rewrite fold_lap_norm in Hbqr.
+  do 2 rewrite lap_add_norm_idemp_l in Hbqr.
+Search (lap_norm (_ + _)).
 ...
 }
 specialize (U q1 q2 r1 r2 Hbqr Hr1b) as H1.
