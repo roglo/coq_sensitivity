@@ -276,6 +276,9 @@ Proof. easy. Qed.
 Theorem lap_add_0_r : ∀ la, lap_add la [] = la.
 Proof. intros; now destruct la. Qed.
 
+Theorem lap_sub_0_r : ∀ la, lap_sub la [] = la.
+Proof. intros; now destruct la. Qed.
+
 Theorem lap_mul_0_l : ∀ la, lap_mul [] la = [].
 Proof. easy. Qed.
 
@@ -915,6 +918,52 @@ Proof.
 intros.
 rewrite lap_add_comm, lap_add_norm_idemp_l.
 now rewrite lap_add_comm.
+Qed.
+
+Theorem lap_sub_norm_idemp_l : ∀ la lb,
+  lap_norm (lap_norm la - lb) = lap_norm (la - lb).
+Proof.
+intros.
+unfold lap_norm; f_equal.
+revert la.
+induction lb as [| b]; intros. {
+  do 2 rewrite lap_sub_0_r.
+  now rewrite rev_involutive, strip_0s_idemp.
+}
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz.
+(**)
+    subst a; cbn.
+    rewrite strip_0s_app.
+    rewrite fold_lap_opp.
+    destruct (strip_0s (rev (- lb)%lap)). {
+      rewrite if_bool_if_dec.
+      destruct (bool_dec _) as [Hbz| Hbz]. {
+        apply (rngl_eqb_eq Heb) in Hbz.
+        destruct (rngl_eq_dec Heb b 0) as [Hbz'| Hbz']. {
+          subst b; cbn.
+          rewrite if_bool_if_dec.
+          destruct (bool_dec _) as [Hbz''| Hbz'']; [ easy | ].
+          unfold rngl_sub in Hbz.
+...
+          rewrite rngl_opp_0.
+...
+    subst a; rewrite rngl_sub_0_l; cbn.
+    now rewrite strip_0s_app.
+  }
+  cbn.
+  now rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
 Qed.
 
 Theorem lap_add_assoc : ∀ al1 al2 al3,
@@ -2257,6 +2306,20 @@ apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
 rewrite lap_mul_norm_idemp_l.
 rewrite lap_add_norm_idemp_l.
+rewrite lap_add_norm_idemp_r.
+f_equal.
+now rewrite lap_mul_add_distr_r.
+Qed.
+
+Theorem polyn_mul_sub_distr_r :
+  ∀ a b c : polyn T, ((a - b) * c)%pol = (a * c - b * c)%pol.
+Proof.
+intros.
+apply eq_polyn_eq; cbn.
+rewrite fold_lap_norm.
+rewrite lap_mul_norm_idemp_l.
+...
+rewrite lap_sub_norm_idemp_l.
 rewrite lap_add_norm_idemp_r.
 f_equal.
 now rewrite lap_mul_add_distr_r.
