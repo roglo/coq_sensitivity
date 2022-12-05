@@ -3500,6 +3500,13 @@ destruct mo. {
   rewrite fold_lap_norm.
   rewrite lap_add_norm_idemp_l.
   rewrite lap_add_norm_idemp_r.
+  rewrite <- lap_add_assoc.
+  rewrite <- lap_add_norm_idemp_r.
+  Search (_ + - _)%lap.
+Search (_ - _)%lap.
+  rewrite lap_add_opp_r.
+...
+  unfold lap_opp.
   rewrite fold_lap_sub.
 Search (_ + _ - _)%lap.
 ...
