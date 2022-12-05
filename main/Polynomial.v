@@ -3254,10 +3254,10 @@ Print Nat.Private_NZDiv.div_unique_exact.
 Print Nat.Private_NZDiv.div_unique.
 Check Nat.Private_NZDiv.div_mod_unique.
 *)
-Theorem polyn_quot_mod_unique : ∀ b q1 q2 r1 r2 : polyn T,
-  length (lap r1) < length (lap b)
-  → length (lap r2) < length (lap b)
-  → (b * q1 + r1 = b * q2 + r2)%pol
+Theorem polyn_quot_mod_unique : ∀ pb q1 q2 r1 r2 : polyn T,
+  length (lap r1) < length (lap pb)
+  → length (lap r2) < length (lap pb)
+  → (pb * q1 + r1 = pb * q2 + r2)%pol
   → q1 = q2 ∧ r1 = r2.
 Proof.
 intros * Hr1b Hr2b Hbqr.
@@ -3302,29 +3302,34 @@ Z.Private_NZDiv.div_mod_unique =
                                   (Z.succ q1 * b)%Z (RelationClasses.symmetry lemma) (b * q2)%Z 
 *)
 assert
-  (U : ∀ q1 q2 r1 r2 : polyn T,
-     (b * q1 + r1)%pol = (b * q2 + r2)%pol
-     → length (lap r1) < length (lap b)
-     → length (lap q1) < length (lap q2)
+  (U : ∀ pq1 pq2 r1 r2 : polyn T,
+     (pb * pq1 + r1)%pol = (pb * pq2 + r2)%pol
+     → length (lap r1) < length (lap pb)
+     → length (lap pq1) < length (lap pq2)
      → False). {
   clear q1 q2 r1 r2 Hr1b Hr2b Hbqr.
   intros * Hbqr Hrb H12.
-  destruct b as (b, pb).
-  destruct q1 as (q1, pq1).
-  destruct q2 as (q2, pq2).
+  destruct pb as (lb, pb).
+  destruct pq1 as (lq1, pq1).
+  destruct pq2 as (lq2, pq2).
   destruct r1 as (r1, pr1).
   destruct r2 as (r2, pr2).
-  move q1 before b; move q2 before q1.
-  move r1 before q2; move r2 before r1.
+  move lq1 before lb; move lq2 before lq1.
+  move r1 before lq2; move r2 before r1.
   cbn in Hbqr, Hrb, H12.
   apply (f_equal (λ p, length (lap p))) in Hbqr.
   cbn in Hbqr.
   do 2 rewrite fold_lap_norm in Hbqr.
   do 2 rewrite lap_add_norm_idemp_l in Hbqr.
-  specialize (lap_norm_add_length_le (b * q1)%lap r1) as H1.
+  specialize (lap_norm_add_length_le (lb * lq1)%lap r1) as H1.
   rewrite Hbqr in H1.
-... ...
-  rewrite lap_mul_length in H1; [ | easy | easy ].
+  rewrite lap_mul_length in H1.
+  destruct lb as [| b]; [ easy | ].
+  destruct lq2 as [| q2]. {
+    cbn in H1.
+    rewrite fold_lap_norm in H1.
+    rewrite last_lap_neq_0_lap_norm in H1; [ | easy ].
+...
   rewrite app_length in H1.
   rewrite Nat.max_l in H1; [ | flia Hrb ].
 ...
