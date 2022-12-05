@@ -973,6 +973,14 @@ apply eq_polyn_eq; cbn.
 now apply last_lap_neq_0_lap_norm.
 Qed.
 
+Theorem polyn_add_0_r : ∀ p, (p + 0)%pol = p.
+Proof.
+intros (la, lapr).
+apply eq_polyn_eq; cbn.
+rewrite lap_add_0_r.
+now apply last_lap_neq_0_lap_norm.
+Qed.
+
 (* associativity of multiplication *)
 
 Theorem lap_convol_mul_0_l : ∀ la lb i len,
@@ -2355,6 +2363,18 @@ rewrite (rngl_add_opp_l Hop).
 now f_equal.
 Qed.
 
+Theorem lap_add_opp_r :
+  @rngl_has_opp T _ = true
+  → ∀ la, (la + - la)%lap = repeat 0%F (length la).
+Proof.
+intros Hop *.
+induction la as [| a]; [ easy | cbn ].
+rewrite fold_lap_opp.
+rewrite fold_rngl_sub; [ | easy ].
+rewrite rngl_sub_diag; [ | easy ].
+now f_equal.
+Qed.
+
 Theorem lap_norm_repeat_0 : ∀ n, lap_norm (repeat 0%F n) = [].
 Proof.
 intros.
@@ -2373,6 +2393,15 @@ rewrite (lap_add_opp_l Hop).
 apply lap_norm_repeat_0.
 Qed.
 
+Theorem lap_norm_add_opp_r :
+  @rngl_has_opp T _ = true
+  → ∀ la, lap_norm (la + - la)%lap = [].
+Proof.
+intros Hop *.
+rewrite (lap_add_opp_r Hop).
+apply lap_norm_repeat_0.
+Qed.
+
 Theorem polyn_add_opp_l :
   @rngl_has_opp T _ = true
   → ∀ a : polyn T, (- a + a)%pol = 0%pol.
@@ -2383,6 +2412,18 @@ destruct a as (la, Ha); cbn.
 do 2 rewrite fold_lap_norm.
 rewrite lap_add_norm_idemp_l.
 now apply lap_norm_add_opp_l.
+Qed.
+
+Theorem polyn_add_opp_r :
+  @rngl_has_opp T _ = true
+  → ∀ a : polyn T, (a + - a)%pol = 0%pol.
+Proof.
+intros Hop *.
+apply eq_polyn_eq.
+destruct a as (la, Ha); cbn.
+do 2 rewrite fold_lap_norm.
+rewrite lap_add_norm_idemp_r.
+now apply lap_norm_add_opp_r.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
@@ -3450,13 +3491,13 @@ destruct op. {
   rewrite <- polyn_add_assoc.
   rewrite (polyn_add_comm b).
   rewrite polyn_add_opp_l; [ | easy ].
-...
-  apply polyn_add_0_l.
+  apply polyn_add_0_r.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember (@rngl_has_sous T _) as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
-  specialize rngl_opt_add_sub as H1.
+...
+  specialize polyn_opt_add_sub as H1.
   rewrite Hmo in H1.
   apply H1.
 }
