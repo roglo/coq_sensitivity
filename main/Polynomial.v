@@ -443,22 +443,9 @@ Theorem lap_sub_repeat_0 : ∀ la,
   lap_sub la (repeat 0%F (length la)) = la.
 Proof.
 intros.
-...
-intros.
-unfold lap_sub, lap_opp.
 induction la as [| a]; [ easy | cbn ].
-rewrite IHla; f_equal.
-remember rngl_has_opp as hop eqn:Hop; symmetry in Hop.
-destruct hop. {
-  now rewrite (rngl_opp_0 Hop), rngl_add_0_r.
-}
-unfold rngl_opp.
-unfold rngl_has_opp in Hop.
-remember rngl_opt_opp_or_sous as os eqn:Hoos; symmetry in Hoos.
-destruct os as [os| ]. {
-  destruct os as [os| os]; [ easy | apply rngl_add_0_r ].
-}
-apply rngl_add_0_r.
+rewrite (rngl_sub_0_r Hos).
+now f_equal.
 Qed.
 
 Theorem lap_norm_add_length_le : ∀ la lb,
@@ -476,6 +463,7 @@ Theorem lap_norm_sub_length_le : ∀ la lb,
   length (lap_norm (lap_sub la lb)) ≤ max (length la) (length lb).
 Proof.
 intros.
+...
 etransitivity; [ apply lap_norm_add_length_le | ].
 now rewrite lap_opp_length.
 Qed.
