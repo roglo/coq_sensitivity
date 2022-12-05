@@ -149,10 +149,11 @@ Fixpoint lap_add la lb :=
   end.
 
 Definition lap_opp la := List.map rngl_opp la.
-Definition lap_sub la lb := lap_add la (lap_opp lb).
+Definition lap_sub la lb := map2 rngl_sub la lb.
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
+...
 Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
@@ -3496,11 +3497,14 @@ destruct op. {
 remember (@rngl_has_sous T _) as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
+  unfold polyn_sub.
+...
   apply eq_polyn_eq; cbn.
   rewrite fold_lap_norm.
   rewrite lap_add_norm_idemp_l.
   rewrite lap_add_norm_idemp_r.
   rewrite <- lap_add_assoc.
+..
   rewrite <- lap_add_norm_idemp_r.
   Search (_ + - _)%lap.
 Search (_ - _)%lap.
