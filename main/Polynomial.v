@@ -3322,13 +3322,19 @@ assert
   do 2 rewrite fold_lap_norm in Hbqr.
   do 2 rewrite lap_add_norm_idemp_l in Hbqr.
   specialize (lap_norm_add_length_le (lb * lq1)%lap r1) as H1.
+...
   rewrite Hbqr in H1.
   rewrite lap_mul_length in H1.
   destruct lb as [| b]; [ easy | ].
-  destruct lq2 as [| q2]. {
-    cbn in H1.
-    rewrite fold_lap_norm in H1.
-    rewrite last_lap_neq_0_lap_norm in H1; [ | easy ].
+  cbn - [ lap_mul ] in H1.
+  destruct lq1 as [| q1]. {
+    cbn - [ lap_mul ] in H1.
+    destruct lq2 as [| q2]; [ easy | ].
+    rewrite last_lap_neq_0_lap_norm in H1. 2: {
+      cbn.
+      rewrite Nat.add_succ_r; cbn.
+      rewrite rngl_summation_only_one.
+      cbn.
 ...
   rewrite app_length in H1.
   rewrite Nat.max_l in H1; [ | flia Hrb ].
