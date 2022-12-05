@@ -3104,8 +3104,8 @@ f_equal.
 apply (rlap_quot_rem_prop Hco Hop rla _ Hbn Hqr Hit).
 Qed.
 
+Arguments polyn_quot_rem (pa pb)%pol.
 (*
-Arguments polyn_quot_rem {Hiv} (pa pb)%pol.
 Arguments polyn_quot {Hiv} (pa pb)%pol.
 *)
 
@@ -3259,6 +3259,7 @@ rewrite fold_lap_norm in Hab.
 rewrite lap_add_norm_idemp_l in Hab.
 rewrite last_lap_neq_0_lap_norm in Hab. 2: {
   unfold last_lap_neq_0.
+Admitted. (*
 ...
 intros * Hrb Hab.
 (*
@@ -3380,13 +3381,14 @@ specialize (polyn_quot_mod_unique b q (a / b) r (a mod b)) as H1.
            Nat.Private_NZDiv.div_mod_unique b q (a / b) r (a mod b) (conj Hb Hr)
 (* theories/Numbers/NatInt/NZDiv.v *)
 ...
+*)
 
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
   ∀ a b,
   b ≠ 0%pol
-  → @polyn_quot Hiv (a * b)%pol b = a.
+  → (a * b / b)%pol = a.
 Proof.
 intros Hco Hop * Hbz.
 specialize (polyn_quot_rem_prop Hco Hop) as H1.
@@ -3396,6 +3398,114 @@ symmetry in Hqr.
 destruct qr as (pq, pr).
 specialize (H1 pq pr Hbz eq_refl).
 destruct H1 as (H1, H2).
+Search (_ - _)%lap.
+Search (_ - _)%F.
+Theorem pol_add_sub_eq_l : ∀ a b c : polyn T,
+  (a + b)%pol = c → (c - a)%pol = b.
+Proof.
+Admitted.
+symmetry in H1.
+specialize polyn_opt_mul_comm as polyn_mul_comm.
+rewrite Hco in polyn_mul_comm.
+rewrite polyn_mul_comm in H1.
+apply pol_add_sub_eq_l in H1.
+Search (_ * _ + _ * _)%pol.
+Theorem polyn_mul_sub_distr_r :
+  ∀ a b c : polyn T, ((a - b) * c)%pol = (a * c - b * c)%pol.
+Proof.
+intros.
+unfold polyn_sub.
+rewrite polyn_mul_add_distr_r.
+f_equal.
+Search (- (_ * _))%pol.
+Search (- (_ * _))%F.
+Theorem polyn_mul_opp_l :
+  @rngl_has_opp T _ = true →
+  ∀ a b : polyn T,
+  (- a * b)%pol = (- (a * b))%pol.
+Proof.
+intros Hop *.
+specialize (polyn_mul_add_distr_r (- a)%pol a b) as H.
+rewrite polyn_add_opp_l in H; [ | easy ].
+Theorem polyn_mul_0_l :
+  rngl_has_opp_or_sous = true →
+  ∀ a, (0 * a = 0)%pol.
+Proof.
+intros Hom a.
+Theorem polyn_add_cancel_l : ∀ a b c, (a + b = a + c)%pol → b = c.
+Proof.
+intros * Habc.
+remember rngl_has_opp as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  apply (f_equal (λ x, polyn_sub x a)) in Habc.
+  do 2 rewrite (polyn_add_comm a) in Habc.
+Theorem polyn_add_sub : ∀ a b, (a + b - b = a)%pol.
+Proof.
+intros.
+remember (@rngl_has_opp T _) as op eqn:Hop.
+symmetry in Hop.
+destruct op. {
+  unfold polyn_sub.
+  rewrite <- polyn_add_assoc.
+  rewrite (polyn_add_comm b).
+  rewrite polyn_add_opp_l; [ | easy ].
+...
+  apply polyn_add_0_l.
+}
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+  rewrite Hmo in H1.
+  apply H1.
+}
+apply rngl_has_opp_or_sous_iff in Hom.
+destruct Hom; congruence.
+Qed.
+...
+Check rngl_add_sub.
+  rewrite polyn_add_sub in Habc.
+  unfold rngl_sub in Habc.
+  rewrite Hop in Habc.
+  do 2 rewrite <- rngl_add_assoc in Habc.
+  rewrite fold_rngl_sub in Habc; [ | easy ].
+  rewrite rngl_sub_diag in Habc; [ | easy ].
+  now do 2 rewrite rngl_add_0_r in Habc.
+}
+remember rngl_has_sous as mo eqn:Hmo.
+symmetry in Hmo.
+destruct mo. {
+  specialize rngl_opt_add_sub as H1.
+  rewrite Hmo in H1.
+  specialize (H1 c a) as H2.
+  rewrite rngl_add_comm, <- Habc in H2.
+  rewrite rngl_add_comm in H2.
+  now rewrite H1 in H2.
+}
+apply rngl_has_opp_or_sous_iff in Hom.
+destruct Hom; congruence.
+Qed.
+...
+apply (polyn_add_cancel_r Hom _ _ (1 * a)%F).
+rewrite <- rngl_mul_add_distr_r.
+now do 2 rewrite rngl_add_0_l.
+Qed.
+...
+rewrite polyn_mul_0_l in H. 2: {
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+symmetry in H.
+now apply rngl_add_move_0_r in H.
+Qed.
+...
+polyn_opt_mul_add_distr_r:
+Search (_ * _ - _ * _)%pol.
+...
+generalize H1; intros H3.
+apply polyn_quot_unique in H1; [ | easy ].
+rewrite <- H1.
+...
 Require Import Arith.
 Check Nat.div_mul.
 Print Nat.div_mul.
