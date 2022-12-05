@@ -463,9 +463,11 @@ Theorem lap_norm_sub_length_le : ∀ la lb,
   length (lap_norm (lap_sub la lb)) ≤ max (length la) (length lb).
 Proof.
 intros.
-...
-etransitivity; [ apply lap_norm_add_length_le | ].
-now rewrite lap_opp_length.
+unfold lap_norm.
+rewrite rev_length.
+etransitivity; [ apply strip_0s_length_le | ].
+rewrite rev_length.
+now rewrite lap_sub_length.
 Qed.
 
 Theorem rlap_quot_rem_step_None : ∀ la lb lr,
@@ -2653,10 +2655,15 @@ Theorem lap_sub_app_app :
   → ((la ++ lc) - (lb ++ ld))%lap = (la - lb)%lap ++ (lc - ld)%lap.
 Proof.
 intros * Hab.
-unfold lap_sub.
-rewrite lap_opp_app_distr.
-apply lap_add_app_app.
-now unfold lap_opp; rewrite map_length.
+revert lb lc ld Hab.
+induction la as [| a]; intros. {
+  now symmetry in Hab; apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b]; [ easy | ].
+cbn in Hab.
+apply Nat.succ_inj in Hab.
+cbn; f_equal.
+now apply IHla.
 Qed.
 
 Theorem length_strip_0s_eq : ∀ la,
@@ -2702,11 +2709,18 @@ Theorem rev_lap_sub : ∀ la lb,
   → (rev (la - lb) = rev la - rev lb)%lap.
 Proof.
 intros * Hab.
-unfold lap_sub.
-rewrite rev_lap_add. 2: {
-  now unfold lap_opp; rewrite map_length.
+revert lb Hab.
+induction la as [| a]; intros. {
+  symmetry in Hab.
+  now apply length_zero_iff_nil in Hab; subst lb.
 }
-now rewrite rev_lap_opp.
+cbn.
+destruct lb as [| b]; [ easy | ].
+cbn in Hab |-*.
+apply Nat.succ_inj in Hab.
+rewrite IHla; [ | easy ].
+rewrite lap_sub_app_app; [ easy | ].
+now do 2 rewrite rev_length.
 Qed.
 
 Theorem lap_sub_add :
@@ -2716,16 +2730,14 @@ Theorem lap_sub_add :
   → (la - lb + lb = la)%lap.
 Proof.
 intros Hop * Hba.
-unfold lap_sub.
-rewrite <- lap_add_assoc.
-rewrite (lap_add_opp_l Hop).
 revert lb Hba.
 induction la as [| a]; intros; cbn. {
-  now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
+  apply Nat.le_0_r in Hba.
+  now apply length_zero_iff_nil in Hba; subst lb.
 }
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hba; apply Nat.succ_le_mono in Hba.
-rewrite rngl_add_0_r; f_equal.
+rewrite (rngl_sub_add Hop); f_equal.
 now apply IHla.
 Qed.
 
@@ -2779,9 +2791,7 @@ Theorem lap_sub_diag :
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
-rewrite (fold_rngl_sub Hop).
-rewrite rngl_sub_diag; [ f_equal | easy ].
-apply IHla.
+rewrite rngl_sub_diag; [ now f_equal | easy ].
 Qed.
 
 Theorem rlap_quot_rem_step_Some_length : ∀ rla rlb rlr cq dq,
@@ -3034,6 +3044,7 @@ apply IHit in Hqr. 2: {
   injection Hqrlr; clear Hqrlr; intros; subst cq dq rlr.
   eapply le_lt_trans; [ apply strip_0s_length_le | ].
   unfold lap_sub, lap_opp.
+...
   rewrite map_app, map_map.
   rewrite List_map_repeat.
   rewrite lap_add_length.
