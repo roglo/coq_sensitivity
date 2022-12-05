@@ -3043,15 +3043,22 @@ apply IHit in Hqr. 2: {
   apply Nat.ltb_ge in Hab.
   injection Hqrlr; clear Hqrlr; intros; subst cq dq rlr.
   eapply le_lt_trans; [ apply strip_0s_length_le | ].
-  unfold lap_sub, lap_opp.
-...
-  rewrite map_app, map_map.
-  rewrite List_map_repeat.
-  rewrite lap_add_length.
-  rewrite app_length, map_length, repeat_length.
+  rewrite <- (firstn_skipn (length rlb) rla) at 1.
+  rewrite lap_sub_app_app. 2: {
+    rewrite firstn_length, map_length.
+    now apply Nat.min_l.
+  }
+  rewrite app_length.
+  rewrite lap_sub_length.
+  rewrite firstn_length, map_length.
+  rewrite Nat.min_l; [ | easy ].
+  rewrite Nat.max_id.
+  rewrite lap_sub_length.
+  rewrite skipn_length, repeat_length.
+  rewrite Nat.max_id.
   rewrite Nat.add_comm.
   rewrite Nat.sub_add; [ | easy ].
-  now rewrite Nat.max_id; cbn.
+  cbn; easy.
 }
 rewrite Ha, Hqr.
 rewrite lap_add_assoc.
@@ -3469,6 +3476,7 @@ Theorem polyn_mul_sub_distr_r :
 Proof.
 intros.
 unfold polyn_sub.
+...
 rewrite polyn_mul_add_distr_r.
 f_equal.
 Search (- (_ * _))%pol.
