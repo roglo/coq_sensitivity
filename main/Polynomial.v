@@ -3245,8 +3245,21 @@ Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
-  → q = polyn_quot a b.
+  → q = (a / b)%pol.
 Proof.
+intros * Hrb Hab.
+destruct a as (la, pa).
+destruct b as (lb, pb).
+destruct q as (lq, pq).
+destruct r as (lr, pr).
+cbn in Hrb, Hab |-*.
+apply (f_equal lap) in Hab.
+cbn in Hab.
+rewrite fold_lap_norm in Hab.
+rewrite lap_add_norm_idemp_l in Hab.
+rewrite last_lap_neq_0_lap_norm in Hab. 2: {
+  unfold last_lap_neq_0.
+...
 intros * Hrb Hab.
 (*
 Print Nat.div_unique_exact.
