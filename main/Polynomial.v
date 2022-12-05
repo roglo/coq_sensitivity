@@ -3496,6 +3496,15 @@ destruct op. {
 remember (@rngl_has_sous T _) as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
+  apply eq_polyn_eq; cbn.
+  rewrite fold_lap_norm.
+  rewrite lap_add_norm_idemp_l.
+  rewrite lap_add_norm_idemp_r.
+  rewrite fold_lap_sub.
+Search (_ + _ - _)%lap.
+...
+Search (_ + _ - _)%pol.
+Theorem polyn_opt_add_sub :
 ...
   specialize polyn_opt_add_sub as H1.
   rewrite Hmo in H1.
