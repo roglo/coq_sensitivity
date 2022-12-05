@@ -149,18 +149,28 @@ Fixpoint lap_add la lb :=
   end.
 
 Definition lap_opp la := List.map rngl_opp la.
-Definition lap_sub la lb := map2 rngl_sub la lb.
+
+Fixpoint lap_sub la lb :=
+  match la with
+  | [] => lap_opp lb
+  | a1 :: bl1 =>
+      match lb with
+      | [] => la
+      | a2 :: bl2 => (a1 - a2)%F :: lap_sub bl1 bl2
+      end
+  end.
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
-...
-Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
+Definition polyn_sub p1 p2 := polyn_norm (lap_sub (lap p1) (lap p2)).
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
 
+(*
 Theorem fold_lap_sub : ∀ la lb, lap_add la (lap_opp lb) = lap_sub la lb.
 Proof. easy. Qed.
+*)
 
 (* multiplication *)
 
@@ -301,9 +311,10 @@ Theorem lap_sub_length : ∀ la lb,
   length (lap_sub la lb) = max (length la) (length lb).
 Proof.
 intros.
-unfold lap_sub.
-rewrite lap_add_length.
-now rewrite lap_opp_length.
+revert lb.
+induction la as [| a]; intros; cbn; [ now rewrite lap_opp_length | ].
+destruct lb as [| b]; [ easy | cbn ].
+now rewrite IHla.
 Qed.
 
 Theorem eq_strip_0s_nil : ∀ la,
@@ -431,6 +442,8 @@ Qed.
 Theorem lap_sub_repeat_0 : ∀ la,
   lap_sub la (repeat 0%F (length la)) = la.
 Proof.
+intros.
+...
 intros.
 unfold lap_sub, lap_opp.
 induction la as [| a]; [ easy | cbn ].
