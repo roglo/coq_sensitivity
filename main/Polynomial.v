@@ -1835,15 +1835,32 @@ cbn.
 now rewrite IHlen.
 Qed.
 
+Theorem lap_mul_length : ∀ la lb,
+  length (la * lb)%lap =
+    match (la, lb) with
+    | ([], _) | (_, []) => 0
+    | _ => length (la ++ lb) - 1
+    end.
+Proof.
+intros.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | cbn ].
+rewrite Nat.sub_0_r, Nat.add_succ_r; cbn.
+f_equal.
+rewrite lap_convol_mul_length.
+rewrite Nat.sub_0_r, app_length; cbn.
+now rewrite Nat.add_succ_r.
+Qed.
+
 Theorem lap_mul_assoc : ∀ la lb lc,
   (la * (lb * lc))%lap = ((la * lb) * lc)%lap.
 Proof.
 intros.
 apply eq_lap_norm_eq_length. 2: {
-  unfold "*"%lap.
   destruct la as [| a]; [ easy | ].
   destruct lb as [| b]; [ easy | ].
   destruct lc as [| c]. {
+    unfold "*"%lap.
     now destruct (lap_convol_mul _ _ _ _).
   }
   cbn.
@@ -3292,12 +3309,24 @@ assert
      → False). {
   clear q1 q2 r1 r2 Hr1b Hr2b Hbqr.
   intros * Hbqr Hrb H12.
+  destruct b as (b, pb).
+  destruct q1 as (q1, pq1).
+  destruct q2 as (q2, pq2).
+  destruct r1 as (r1, pr1).
+  destruct r2 as (r2, pr2).
+  move q1 before b; move q2 before q1.
+  move r1 before q2; move r2 before r1.
+  cbn in Hbqr, Hrb, H12.
   apply (f_equal (λ p, length (lap p))) in Hbqr.
   cbn in Hbqr.
   do 2 rewrite fold_lap_norm in Hbqr.
   do 2 rewrite lap_add_norm_idemp_l in Hbqr.
-  specialize (lap_norm_add_length_le (lap b * lap q1)%lap (lap r1)) as H1.
+  specialize (lap_norm_add_length_le (b * q1)%lap r1) as H1.
   rewrite Hbqr in H1.
+... ...
+  rewrite lap_mul_length in H1; [ | easy | easy ].
+  rewrite app_length in H1.
+  rewrite Nat.max_l in H1; [ | flia Hrb ].
 ...
 Search (length (_ * _)%lap).
 ...
