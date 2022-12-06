@@ -138,18 +138,26 @@ Definition polyn_norm la :=
 
 (* addition *)
 
-Fixpoint map2_end (A B C : Type) (f : A → B → C) fa fb la lb :=
+Fixpoint lap_add la lb :=
   match la with
-  | [] => fb lb
-  | a :: la' =>
+  | [] => lb
+  | a1 :: bl1 =>
       match lb with
-      | [] => fa la
-      | b :: lb' => f a b :: map2_end f fa fb la' lb'
+      | [] => la
+      | a2 :: bl2 => (a1 + a2)%F :: lap_add bl1 bl2
       end
   end.
 
-Definition lap_add la lb := map2_end rngl_add id id la lb.
-Definition lap_sub la lb := map2_end rngl_sub id (map (λ b, 0 - b)%F) la lb.
+Fixpoint lap_sub la lb :=
+  match la with
+  | [] => map (λ b, 0 - b)%F lb
+  | a1 :: bl1 =>
+      match lb with
+      | [] => la
+      | a2 :: bl2 => (a1 - a2)%F :: lap_sub bl1 bl2
+      end
+  end.
+
 Definition lap_opp la := map rngl_opp la.
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
@@ -946,10 +954,10 @@ Proof.
 intros.
 unfold lap_norm; f_equal.
 (**)
-unfold lap_sub.
 revert lb.
 induction la as [| a]; intros. {
-  cbn; rewrite map_rev, rev_involutive.
+  cbn; rewrite map_rev.
+  rewrite rev_involutive.
   rewrite <- map_rev.
   remember (rev lb) as la; clear lb Heqla.
   induction la as [| a]; [ easy | cbn ].
@@ -959,20 +967,62 @@ induction la as [| a]; intros. {
   rewrite (rngl_sub_diag Hos).
   now rewrite (rngl_eqb_refl Heb).
 }
-destruct lb as [| b]; [ easy | cbn ].
+(**)
+cbn; symmetry.
+rewrite <- (rev_involutive lb) at 1; symmetry.
+remember (rev lb) as lc; clear lb Heqlc.
+induction lc as [| c]; [ easy | cbn ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hcz| Hcz]. {
+  apply (rngl_eqb_eq Heb) in Hcz; subst c.
+  rewrite IHlc.
+  clear IHlc.
+  remember (rev lc) as lb; clear lc Heqlb.
+  induction lb as [| b]; cbn. {
+    rewrite (rngl_sub_0_r Hos).
+    now rewrite lap_sub_0_r.
+  }
+  do 2 rewrite strip_0s_app; cbn.
 ...
-(*
-revert lb.
-induction la as [| a]; intros; cbn. {
-  rewrite map_rev.
-  rewrite rev_involutive.
-  rewrite <- map_rev.
+  f_equal; f_equal.
+  f_equal.
+...
+destruct lb as [| b]; [ easy | cbn ].
+do 2 rewrite strip_0s_app.
+rewrite <- IHla.
+remember (rev lb) as lc; clear lb Heqlc.
+destruct lc as [| c]; cbn. {
+  rewrite lap_sub_0_r.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hbz| Hbz]. {
+    apply (rngl_eqb_eq Heb) in Hbz; subst b; cbn.
+    rewrite strip_0s_app.
+    now rewrite (rngl_sub_0_r Hos).
+  }
+  cbn; rewrite strip_0s_app.
+  now rewrite lap_sub_0_r.
+}
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hcz| Hcz]. {
+  clear c Hcz.
+  destruct lc as [| c]; cbn. {
+    rewrite lap_sub_0_r.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [Hbz| Hbz]. {
+      apply (rngl_eqb_eq Heb) in Hbz; subst b.
+      rewrite (rngl_sub_0_r Hos); cbn.
+      now rewrite strip_0s_app.
+    }
+    cbn.
+    rewrite lap_sub_0_r.
+    now rewrite strip_0s_app.
+  }
+...
   induction lb as [| b]; [ easy | cbn ].
   rewrite strip_0s_app; cbn.
   rewrite map_app, strip_0s_app.
 cbn.
 ...
-*)
 revert la.
 induction lb as [| b]; intros; [ easy | ].
 destruct la as [| a]; cbn. {
