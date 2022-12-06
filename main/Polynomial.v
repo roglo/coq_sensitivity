@@ -941,7 +941,17 @@ Search (- lap_norm _)%lap.
 Theorem lap_opp_norm : ∀ la,
   lap_norm (- la) = (- lap_norm la)%lap.
 Proof.
-Admitted.
+intros.
+unfold lap_norm, lap_opp.
+rewrite map_rev.
+f_equal.
+rewrite fold_lap_opp.
+induction la as [| a]; [ easy | cbn ].
+rewrite fold_lap_opp.
+do 2 rewrite strip_0s_app.
+symmetry; rewrite fold_lap_opp; symmetry.
+rewrite IHla; cbn.
+clear IHla.
 ... ...
 rewrite <- lap_opp_norm.
 apply lap_add_norm_idemp_r.
