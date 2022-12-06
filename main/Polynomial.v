@@ -948,9 +948,14 @@ rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
 
+(*
 Theorem lap_sub_norm_idemp_r : ∀ la lb,
   lap_norm (la - lap_norm lb) = lap_norm (la - lb).
 Proof.
+intros.
+(* c'est peut-être faux : il suffit d'ajouter plein de 0 à la
+   fin de lb *)
+...
 intros.
 unfold lap_norm; f_equal.
 (**)
@@ -985,6 +990,7 @@ destruct (bool_dec _) as [Hcz| Hcz]. {
   do 2 rewrite strip_0s_app; cbn.
   clear IHla IHlb.
   remember (a - b)%F as c; clear a b Heqc.
+...
   revert lb.
   induction la as [| a]; intros; cbn. {
     do 2 rewrite <- map_rev.
@@ -1062,6 +1068,7 @@ cbn.
 rewrite rev_app_distr; cbn.
 now rewrite strip_0s_app.
 Qed.
+*)
 
 Theorem lap_add_assoc : ∀ al1 al2 al3,
   (al1 + (al2 + al3))%lap = ((al1 + al2) + al3)%lap.
@@ -2291,6 +2298,56 @@ rewrite lap_convol_mul_lap_add_r.
 now rewrite lap_add_lap_convol_mul_r.
 Qed.
 
+Theorem lap_norm_mul_sub_distr_l : ∀ la lb lc,
+  lap_norm (la * (lb - lc))%lap = lap_norm (la * lb - la * lc)%lap.
+Proof.
+intros la lb lc.
+unfold lap_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]. {
+  cbn.
+...
+destruct lb as [| b]; [ easy | ].
+destruct lc as [| c]; [ now cbn; rewrite lap_add_0_r | ].
+move b before a; move c before b.
+remember (a :: la) as la' eqn:Hla'.
+remember (b :: lb) as lb' eqn:Hlb'.
+remember (c :: lc) as lc' eqn:Hlc'.
+remember (length la' + length (lap_add lb' lc') - 1) as labc.
+remember (length la' + length lb' - 1) as lab.
+remember (length la' + length lc' - 1) as lac.
+rewrite Heqlabc.
+remember (lb' + lc')%lap as lbc.
+symmetry in Heqlbc.
+destruct lbc as [| bc]. {
+  cbn.
+  now subst lb' lc'.
+}
+rewrite <- Heqlbc in Heqlabc |-*.
+rewrite lap_convol_mul_more with (n := (lab + lac)%nat). 2: {
+  subst; flia.
+}
+rewrite <- Heqlabc.
+symmetry.
+rewrite Heqlab.
+rewrite <- lap_add_norm_idemp_l.
+rewrite lap_convol_mul_more with (n := (labc + lac)%nat); [ | flia ].
+rewrite <- Heqlab.
+rewrite lap_add_norm_idemp_l.
+rewrite lap_add_comm.
+rewrite <- lap_add_norm_idemp_l.
+rewrite Heqlac.
+rewrite lap_convol_mul_more with (n := (labc + lab)%nat); [ | flia ].
+rewrite lap_add_norm_idemp_l.
+rewrite <- Heqlac.
+rewrite Nat.add_comm.
+rewrite lap_add_comm.
+rewrite Nat.add_assoc, Nat.add_shuffle0, Nat.add_comm, Nat.add_assoc.
+symmetry.
+rewrite lap_convol_mul_lap_add_r.
+now rewrite lap_add_lap_convol_mul_r.
+Qed.
+
 Theorem lap_norm_mul_add_distr_r : ∀ la lb lc : list T,
   lap_norm ((la + lb) * lc) = lap_norm (la * lc + lb * lc).
 Proof.
@@ -2358,6 +2415,35 @@ apply eq_lap_norm_eq_length. 2: {
   now rewrite Nat.add_max_distr_l.
 }
 apply lap_norm_mul_add_distr_l.
+Qed.
+
+Theorem lap_mul_sub_distr_l : ∀ la lb lc,
+  (la * (lb - lc))%lap = (la * lb - la * lc)%lap.
+Proof.
+intros la lb lc.
+apply eq_lap_norm_eq_length. 2: {
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]. {
+    rewrite lap_mul_0_r; cbn.
+    do 2 rewrite map_length.
+    destruct lc as [| c]; [ easy | cbn ].
+    now do 2 rewrite lap_convol_mul_length.
+  }
+  cbn.
+  destruct lc as [| c]. {
+    rewrite lap_sub_0_r.
+    now do 2 rewrite lap_convol_mul_length.
+  }
+  cbn.
+  rewrite lap_convol_mul_length.
+  do 2 rewrite lap_sub_length.
+  do 2 rewrite lap_convol_mul_length.
+  do 3 rewrite Nat.sub_0_r.
+  symmetry.
+  apply Nat.add_max_distr_l.
+}
+...
+apply lap_norm_mul_sub_distr_l.
 Qed.
 
 Theorem lap_mul_add_distr_r : ∀ la lb lc,
