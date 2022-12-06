@@ -148,11 +148,9 @@ Fixpoint lap_add la lb :=
       end
   end.
 
-Definition lap_opp la := List.map rngl_opp la.
-
 Fixpoint lap_sub la lb :=
   match la with
-  | [] => lap_opp lb
+  | [] => map (λ b, 0 - b)%F lb
   | a1 :: bl1 =>
       match lb with
       | [] => la
@@ -160,9 +158,11 @@ Fixpoint lap_sub la lb :=
       end
   end.
 
+Definition lap_opp la := map rngl_opp la.
+
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
-Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 Definition polyn_sub p1 p2 := polyn_norm (lap_sub (lap p1) (lap p2)).
+Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
@@ -315,7 +315,7 @@ Theorem lap_sub_length : ∀ la lb,
 Proof.
 intros.
 revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite lap_opp_length | ].
+induction la as [| a]; intros; cbn; [ now rewrite map_length | ].
 destruct lb as [| b]; [ easy | cbn ].
 now rewrite IHla.
 Qed.
@@ -939,27 +939,52 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
-(**)
-    subst a; cbn.
-    rewrite strip_0s_app.
-    rewrite fold_lap_opp.
-    destruct (strip_0s (rev (- lb)%lap)). {
-      rewrite if_bool_if_dec.
-      destruct (bool_dec _) as [Hbz| Hbz]. {
-        apply (rngl_eqb_eq Heb) in Hbz.
-        destruct (rngl_eq_dec Heb b 0) as [Hbz'| Hbz']. {
-          subst b; cbn.
-          rewrite if_bool_if_dec.
-          destruct (bool_dec _) as [Hbz''| Hbz'']; [ easy | ].
-          unfold rngl_sub in Hbz.
-...
-          rewrite rngl_opp_0.
-...
-    subst a; rewrite rngl_sub_0_l; cbn.
-    now rewrite strip_0s_app.
+    now subst a; cbn; rewrite strip_0s_app.
   }
+  now cbn; rewrite strip_0s_app.
+}
+cbn.
+rewrite rev_app_distr; cbn.
+now rewrite strip_0s_app.
+Qed.
+
+Theorem lap_sub_norm_idemp_r : ∀ la lb,
+  lap_norm (la - lap_norm lb) = lap_norm (la - lb).
+Proof.
+intros.
+unfold lap_norm; f_equal.
+(*
+revert lb.
+induction la as [| a]; intros; cbn. {
+  rewrite map_rev.
+  rewrite rev_involutive.
+  rewrite <- map_rev.
+  induction lb as [| b]; [ easy | cbn ].
+  rewrite strip_0s_app; cbn.
+  rewrite map_app, strip_0s_app.
+cbn.
+...
+*)
+revert la.
+induction lb as [| b]; intros; [ easy | ].
+destruct la as [| a]; cbn. {
+  do 2 rewrite strip_0s_app; cbn.
+  rewrite <- map_rev, rev_involutive.
+  rewrite <- map_rev.
   cbn.
-  now rewrite strip_0s_app.
+...
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app; cbn.
+rewrite <- IHlb.
+remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply (rngl_eqb_eq Heb) in Haz.
+    now subst a; cbn; rewrite strip_0s_app.
+  }
+  now cbn; rewrite strip_0s_app.
 }
 cbn.
 rewrite rev_app_distr; cbn.
@@ -2318,9 +2343,9 @@ intros.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
 rewrite lap_mul_norm_idemp_l.
-...
 rewrite lap_sub_norm_idemp_l.
-rewrite lap_add_norm_idemp_r.
+...
+rewrite lap_sub_norm_idemp_r.
 f_equal.
 now rewrite lap_mul_add_distr_r.
 Qed.
