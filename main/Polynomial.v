@@ -148,23 +148,17 @@ Fixpoint lap_add la lb :=
       end
   end.
 
-Fixpoint lap_sub la lb :=
-  match la with
-  | [] => map (λ b, 0 - b)%F lb
-  | a1 :: bl1 =>
-      match lb with
-      | [] => la
-      | a2 :: bl2 => (a1 - a2)%F :: lap_sub bl1 bl2
-      end
-  end.
-
 Definition lap_opp la := map rngl_opp la.
+Definition lap_sub la lb := lap_add la (lap_opp lb).
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
 Definition polyn_sub p1 p2 := polyn_norm (lap_sub (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
+Proof. easy. Qed.
+
+Theorem fold_lap_sub : ∀ la lb, lap_add la (lap_opp lb) = lap_sub la lb.
 Proof. easy. Qed.
 
 (*
@@ -315,9 +309,9 @@ Theorem lap_sub_length : ∀ la lb,
 Proof.
 intros.
 revert lb.
-induction la as [| a]; intros; cbn; [ now rewrite map_length | ].
+induction la as [| a]; intros; cbn; [ now rewrite lap_opp_length | ].
 destruct lb as [| b]; [ easy | cbn ].
-now rewrite IHla.
+f_equal; apply IHla.
 Qed.
 
 Theorem eq_strip_0s_nil : ∀ la,
@@ -447,8 +441,18 @@ Theorem lap_sub_repeat_0 : ∀ la,
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
-rewrite (rngl_sub_0_r Hos).
-now f_equal.
+rewrite fold_lap_opp, fold_lap_sub, IHla; f_equal.
+remember rngl_has_opp as hop eqn:Hop; symmetry in Hop.
+destruct hop. {
+  now rewrite (rngl_opp_0 Hop), rngl_add_0_r.
+}
+unfold rngl_opp.
+unfold rngl_has_opp in Hop.
+remember rngl_opt_opp_or_sous as os eqn:Hoos; symmetry in Hoos.
+destruct os as [os| ]. {
+  destruct os as [os| os]; [ easy | apply rngl_add_0_r ].
+}
+apply rngl_add_0_r.
 Qed.
 
 Theorem lap_norm_add_length_le : ∀ la lb,
@@ -932,6 +936,7 @@ induction lb as [| b]; intros. {
 }
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app; cbn.
+...
 rewrite <- IHlb.
 remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
