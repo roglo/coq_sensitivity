@@ -138,26 +138,18 @@ Definition polyn_norm la :=
 
 (* addition *)
 
-Fixpoint lap_add la lb :=
+Fixpoint map2_end (A B C : Type) (f : A → B → C) fa fb la lb :=
   match la with
-  | [] => lb
-  | a1 :: bl1 =>
+  | [] => fb lb
+  | a :: la' =>
       match lb with
-      | [] => la
-      | a2 :: bl2 => (a1 + a2)%F :: lap_add bl1 bl2
+      | [] => fa la
+      | b :: lb' => f a b :: map2_end f fa fb la' lb'
       end
   end.
 
-Fixpoint lap_sub la lb :=
-  match la with
-  | [] => map (λ b, 0 - b)%F lb
-  | a1 :: bl1 =>
-      match lb with
-      | [] => la
-      | a2 :: bl2 => (a1 - a2)%F :: lap_sub bl1 bl2
-      end
-  end.
-
+Definition lap_add la lb := map2_end rngl_add id id la lb.
+Definition lap_sub la lb := map2_end rngl_sub id (map (λ b, 0 - b)%F) la lb.
 Definition lap_opp la := map rngl_opp la.
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
@@ -953,6 +945,22 @@ Theorem lap_sub_norm_idemp_r : ∀ la lb,
 Proof.
 intros.
 unfold lap_norm; f_equal.
+(**)
+unfold lap_sub.
+revert lb.
+induction la as [| a]; intros. {
+  cbn; rewrite map_rev, rev_involutive.
+  rewrite <- map_rev.
+  remember (rev lb) as la; clear lb Heqla.
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  rewrite (rngl_sub_diag Hos).
+  now rewrite (rngl_eqb_refl Heb).
+}
+destruct lb as [| b]; [ easy | cbn ].
+...
 (*
 revert lb.
 induction la as [| a]; intros; cbn. {
