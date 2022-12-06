@@ -2898,15 +2898,16 @@ Theorem lap_sub_add :
   → (la - lb + lb = la)%lap.
 Proof.
 intros Hop * Hba.
+unfold lap_sub.
+rewrite <- lap_add_assoc.
+rewrite (lap_add_opp_l Hop).
 revert lb Hba.
 induction la as [| a]; intros; cbn. {
-  apply Nat.le_0_r in Hba.
-  now apply length_zero_iff_nil in Hba; subst lb.
+  now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
 }
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hba; apply Nat.succ_le_mono in Hba.
-...
-rewrite (rngl_sub_add Hop); f_equal.
+rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
 
@@ -2960,6 +2961,7 @@ Theorem lap_sub_diag :
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
+rewrite (fold_rngl_sub Hop).
 rewrite rngl_sub_diag; [ now f_equal | easy ].
 Qed.
 
@@ -3639,12 +3641,7 @@ specialize polyn_opt_mul_comm as polyn_mul_comm.
 rewrite Hco in polyn_mul_comm.
 rewrite polyn_mul_comm in H1.
 apply pol_add_sub_eq_l in H1.
-Search (_ * _ + _ * _)%pol.
-Theorem polyn_mul_sub_distr_r :
-  ∀ a b c : polyn T, ((a - b) * c)%pol = (a * c - b * c)%pol.
-Proof.
-intros.
-unfold polyn_sub.
+rewrite <- (polyn_mul_sub_distr_r Hop) in H1.
 ...
 rewrite polyn_mul_add_distr_r.
 f_equal.
