@@ -2886,19 +2886,9 @@ Theorem rev_lap_sub : ∀ la lb,
   → (rev (la - lb) = rev la - rev lb)%lap.
 Proof.
 intros * Hab.
-revert lb Hab.
-induction la as [| a]; intros. {
-  symmetry in Hab.
-  now apply length_zero_iff_nil in Hab; subst lb.
-}
-cbn.
-destruct lb as [| b]; [ easy | ].
-cbn in Hab |-*.
-apply Nat.succ_inj in Hab.
-...
-rewrite IHla; [ | easy ].
-rewrite lap_sub_app_app; [ easy | ].
-now do 2 rewrite rev_length.
+unfold lap_sub.
+rewrite rev_lap_add; [ | now rewrite lap_opp_length ].
+now rewrite rev_lap_opp.
 Qed.
 
 Theorem lap_sub_add :
@@ -2915,6 +2905,7 @@ induction la as [| a]; intros; cbn. {
 }
 destruct lb as [| b]; [ easy | cbn ].
 cbn in Hba; apply Nat.succ_le_mono in Hba.
+...
 rewrite (rngl_sub_add Hop); f_equal.
 now apply IHla.
 Qed.
