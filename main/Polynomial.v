@@ -928,152 +928,24 @@ Theorem lap_sub_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la - lb) = lap_norm (la - lb).
 Proof.
 intros.
-unfold lap_norm; f_equal.
-revert la.
-induction lb as [| b]; intros. {
-  do 2 rewrite lap_sub_0_r.
-  now rewrite rev_involutive, strip_0s_idemp.
-}
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-...
-rewrite <- IHlb.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
-    apply (rngl_eqb_eq Heb) in Haz.
-    now subst a; cbn; rewrite strip_0s_app.
-  }
-  now cbn; rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
+unfold lap_sub.
+now rewrite lap_add_norm_idemp_l.
 Qed.
 
-(*
 Theorem lap_sub_norm_idemp_r : ∀ la lb,
   lap_norm (la - lap_norm lb) = lap_norm (la - lb).
 Proof.
 intros.
-(* c'est peut-être faux : il suffit d'ajouter plein de 0 à la
-   fin de lb *)
+unfold lap_sub.
+Search (- lap_norm _)%lap.
+Theorem lap_opp_norm : ∀ la,
+  lap_norm (- la) = (- lap_norm la)%lap.
+Proof.
+Admitted.
+... ...
+rewrite <- lap_opp_norm.
+apply lap_add_norm_idemp_r.
 ...
-intros.
-unfold lap_norm; f_equal.
-(**)
-revert lb.
-induction la as [| a]; intros. {
-  cbn; rewrite map_rev.
-  rewrite rev_involutive.
-  rewrite <- map_rev.
-  remember (rev lb) as la; clear lb Heqla.
-  induction la as [| a]; [ easy | cbn ].
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
-  rewrite (rngl_sub_diag Hos).
-  now rewrite (rngl_eqb_refl Heb).
-}
-(**)
-cbn; symmetry.
-rewrite <- (rev_involutive lb) at 1; symmetry.
-remember (rev lb) as lc; clear lb Heqlc.
-induction lc as [| c]; [ easy | cbn ].
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hcz| Hcz]. {
-  apply (rngl_eqb_eq Heb) in Hcz; subst c.
-  rewrite IHlc.
-  clear IHlc.
-  remember (rev lc) as lb; clear lc Heqlb.
-  induction lb as [| b]; cbn. {
-    rewrite (rngl_sub_0_r Hos).
-    now rewrite lap_sub_0_r.
-  }
-  do 2 rewrite strip_0s_app; cbn.
-  clear IHla IHlb.
-  remember (a - b)%F as c; clear a b Heqc.
-...
-  revert lb.
-  induction la as [| a]; intros; cbn. {
-    do 2 rewrite <- map_rev.
-    rewrite rev_app_distr; cbn.
-    rewrite (rngl_sub_diag Hos).
-    now rewrite (rngl_eqb_refl Heb).
-  }
-  destruct lb as [| b]; cbn. {
-    rewrite (rngl_sub_0_r Hos).
-    now rewrite lap_sub_0_r.
-  }
-  do 2 rewrite strip_0s_app; cbn.
-...
-  f_equal; f_equal.
-  f_equal.
-...
-destruct lb as [| b]; [ easy | cbn ].
-do 2 rewrite strip_0s_app.
-rewrite <- IHla.
-remember (rev lb) as lc; clear lb Heqlc.
-destruct lc as [| c]; cbn. {
-  rewrite lap_sub_0_r.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Hbz| Hbz]. {
-    apply (rngl_eqb_eq Heb) in Hbz; subst b; cbn.
-    rewrite strip_0s_app.
-    now rewrite (rngl_sub_0_r Hos).
-  }
-  cbn; rewrite strip_0s_app.
-  now rewrite lap_sub_0_r.
-}
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hcz| Hcz]. {
-  clear c Hcz.
-  destruct lc as [| c]; cbn. {
-    rewrite lap_sub_0_r.
-    rewrite if_bool_if_dec.
-    destruct (bool_dec _) as [Hbz| Hbz]. {
-      apply (rngl_eqb_eq Heb) in Hbz; subst b.
-      rewrite (rngl_sub_0_r Hos); cbn.
-      now rewrite strip_0s_app.
-    }
-    cbn.
-    rewrite lap_sub_0_r.
-    now rewrite strip_0s_app.
-  }
-...
-  induction lb as [| b]; [ easy | cbn ].
-  rewrite strip_0s_app; cbn.
-  rewrite map_app, strip_0s_app.
-cbn.
-...
-revert la.
-induction lb as [| b]; intros; [ easy | ].
-destruct la as [| a]; cbn. {
-  do 2 rewrite strip_0s_app; cbn.
-  rewrite <- map_rev, rev_involutive.
-  rewrite <- map_rev.
-  cbn.
-...
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app; cbn.
-rewrite <- IHlb.
-remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
-    apply (rngl_eqb_eq Heb) in Haz.
-    now subst a; cbn; rewrite strip_0s_app.
-  }
-  now cbn; rewrite strip_0s_app.
-}
-cbn.
-rewrite rev_app_distr; cbn.
-now rewrite strip_0s_app.
-Qed.
-*)
 
 Theorem lap_add_assoc : ∀ al1 al2 al3,
   (al1 + (al2 + al3))%lap = ((al1 + al2) + al3)%lap.
