@@ -983,6 +983,20 @@ destruct (bool_dec _) as [Hcz| Hcz]. {
     now rewrite lap_sub_0_r.
   }
   do 2 rewrite strip_0s_app; cbn.
+  clear IHla IHlb.
+  remember (a - b)%F as c; clear a b Heqc.
+  revert lb.
+  induction la as [| a]; intros; cbn. {
+    do 2 rewrite <- map_rev.
+    rewrite rev_app_distr; cbn.
+    rewrite (rngl_sub_diag Hos).
+    now rewrite (rngl_eqb_refl Heb).
+  }
+  destruct lb as [| b]; cbn. {
+    rewrite (rngl_sub_0_r Hos).
+    now rewrite lap_sub_0_r.
+  }
+  do 2 rewrite strip_0s_app; cbn.
 ...
   f_equal; f_equal.
   f_equal.
