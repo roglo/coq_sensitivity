@@ -2388,6 +2388,16 @@ apply eq_lap_norm_eq_length. 2: {
 apply lap_norm_mul_add_distr_r.
 Qed.
 
+Theorem lap_mul_sub_distr_r :
+  @rngl_has_opp T _ = true →
+  ∀ la lb lc, ((la - lb) * lc)%lap = (la * lc - lb * lc)%lap.
+Proof.
+intros Hop *.
+unfold lap_sub.
+rewrite <- (lap_mul_opp_l Hop).
+now rewrite <- lap_mul_add_distr_r.
+Qed.
+
 Theorem polyn_mul_add_distr_l : ∀ pa pb pc,
   (pa * (pb + pc))%pol = (pa * pb + pa * pc)%pol.
 Proof.
@@ -2415,17 +2425,18 @@ now rewrite lap_mul_add_distr_r.
 Qed.
 
 Theorem polyn_mul_sub_distr_r :
+  @rngl_has_opp T _ = true →
   ∀ a b c : polyn T, ((a - b) * c)%pol = (a * c - b * c)%pol.
 Proof.
-intros.
+intros Hop *.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
 rewrite lap_mul_norm_idemp_l.
 rewrite lap_add_norm_idemp_l.
-...
-rewrite lap_sub_norm_idemp_r.
-f_equal.
-now rewrite lap_mul_add_distr_r.
+rewrite (lap_mul_sub_distr_r Hop).
+rewrite fold_lap_opp.
+rewrite fold_lap_sub.
+now rewrite (lap_sub_norm_idemp_r Hop).
 Qed.
 
 (* 1 is not 0 *)
@@ -2884,6 +2895,7 @@ cbn.
 destruct lb as [| b]; [ easy | ].
 cbn in Hab |-*.
 apply Nat.succ_inj in Hab.
+...
 rewrite IHla; [ | easy ].
 rewrite lap_sub_app_app; [ easy | ].
 now do 2 rewrite rev_length.
