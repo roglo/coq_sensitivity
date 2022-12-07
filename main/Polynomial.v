@@ -3642,6 +3642,27 @@ rewrite Hco in polyn_mul_comm.
 rewrite polyn_mul_comm in H1.
 apply pol_add_sub_eq_l in H1.
 rewrite <- (polyn_mul_sub_distr_r Hop) in H1.
+generalize H1; intros H.
+apply (f_equal (λ p, length (lap p))) in H.
+cbn in H.
+rewrite lap_mul_norm_idemp_l in H.
+rewrite <- H in H2; clear H.
+Search (lap_norm (_ + _)).
+Theorem lap_norm_mul_length : ∀ la lb,
+  lap_norm la ≠ [] → lap_norm lb ≠ [] →
+  length (lap_norm (la * lb)) = length (lap_norm la) + length (lap_norm lb) - 1.
+Admitted.
+rewrite lap_norm_mul_length in H2.
+Search (lap_norm _ = _).
+Check last_lap_neq_0_lap_norm.
+rewrite last_lap_neq_0_lap_norm with (la := lap b) in H2. 2: {
+  apply lap_prop.
+}
+assert (H : length (lap_norm (lap a - lap pq)) = 0) by flia H2.
+apply length_zero_iff_nil in H.
+Search (lap_norm _ = 0%lap).
+...
+Check lap_norm_sub_length_le.
 ...
 rewrite polyn_mul_add_distr_r.
 f_equal.
