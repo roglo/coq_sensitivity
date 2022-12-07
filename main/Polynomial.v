@@ -3647,17 +3647,29 @@ apply (f_equal (λ p, length (lap p))) in H.
 cbn in H.
 rewrite lap_mul_norm_idemp_l in H.
 rewrite <- H in H2; clear H.
+...
 Search (lap_norm (_ + _)).
 Theorem lap_norm_mul_length : ∀ la lb,
   lap_norm la ≠ [] → lap_norm lb ≠ [] →
   length (lap_norm (la * lb)) = length (lap_norm la) + length (lap_norm lb) - 1.
 Admitted.
-rewrite lap_norm_mul_length in H2.
-Search (lap_norm _ = _).
-Check last_lap_neq_0_lap_norm.
+assert (H3 : lap_norm (lap b) ≠ 0%lap). {
+  rewrite last_lap_neq_0_lap_norm by apply lap_prop.
+  intros H; apply Hbz.
+  now apply eq_polyn_eq.
+}
 rewrite last_lap_neq_0_lap_norm with (la := lap b) in H2. 2: {
   apply lap_prop.
 }
+...
+rewrite lap_norm_mul_length in H2; [ | | easy ].
+specialize list_eqb_eq as H4.
+specialize (H4 _ rngl_eqb (rngl_eqb_eq Heb)).
+specialize (H4 (lap a - lap pq)%lap 0%lap).
+...
+Search (last_lap_neq_0 (lap _)).
+Search (lap_norm _ = _).
+Check last_lap_neq_0_lap_norm.
 assert (H : length (lap_norm (lap a - lap pq)) = 0) by flia H2.
 apply length_zero_iff_nil in H.
 Search (lap_norm _ = 0%lap).
