@@ -2434,13 +2434,16 @@ Proof.
 intros Hop *.
 apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
+rewrite lap_add_norm_idemp_r.
 rewrite lap_mul_norm_idemp_l.
 rewrite lap_add_norm_idemp_l.
-...
-rewrite (lap_mul_sub_distr_r Hop).
-rewrite fold_lap_opp.
-rewrite fold_lap_sub.
-now rewrite (lap_sub_norm_idemp_r Hop).
+rewrite fold_lap_norm.
+rewrite (fold_lap_opp (lap_norm _)).
+rewrite <- (lap_opp_norm Hop).
+do 2 rewrite lap_add_norm_idemp_r.
+do 2 rewrite fold_lap_sub.
+f_equal.
+apply (lap_mul_sub_distr_r Hop).
 Qed.
 
 (* 1 is not 0 *)
@@ -3619,6 +3622,21 @@ specialize (polyn_quot_mod_unique b q (a / b) r (a mod b)) as H1.
 ...
 *)
 
+Theorem polyn_add_sub_eq_l :
+  @rngl_has_opp T _ = true →
+  ∀ a b c : polyn T,
+  (a + b)%pol = c → (c - a)%pol = b.
+Proof.
+intros Hop * Habc.
+subst c.
+rewrite polyn_add_comm.
+unfold polyn_sub.
+unfold lap_sub.
+rewrite <- polyn_add_assoc.
+rewrite (polyn_add_opp_r Hop).
+apply polyn_add_0_r.
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3634,36 +3652,19 @@ symmetry in Hqr.
 destruct qr as (pq, pr).
 specialize (H1 pq pr Hbz eq_refl).
 destruct H1 as (H1, H2).
-Search (_ - _)%lap.
-Search (_ - _)%F.
-Theorem pol_add_sub_eq_l : ∀ a b c : polyn T,
-  (a + b)%pol = c → (c - a)%pol = b.
-Proof.
-intros * Habc.
-subst c.
-rewrite polyn_add_comm.
-unfold polyn_sub.
-unfold lap_sub.
-Search (lap (_ + _)).
-Print polyn_sub.
-...
-destruct b as (b, pb).
-destruct a as (a, pa).
-apply eq_polyn_eq; cbn.
-
-...
 symmetry in H1.
 specialize polyn_opt_mul_comm as polyn_mul_comm.
 rewrite Hco in polyn_mul_comm.
 rewrite polyn_mul_comm in H1.
-apply pol_add_sub_eq_l in H1.
+apply (polyn_add_sub_eq_l Hop) in H1.
 rewrite <- (polyn_mul_sub_distr_r Hop) in H1.
 generalize H1; intros H.
 apply (f_equal (λ p, length (lap p))) in H.
 cbn in H.
+rewrite lap_add_norm_idemp_r in H.
 rewrite lap_mul_norm_idemp_l in H.
-rewrite <- H in H2; clear H.
-Search (lap_norm (_ + _)).
+rewrite fold_lap_sub in H.
+...
 Theorem lap_norm_mul_length : ∀ la lb,
   lap_norm la ≠ [] → lap_norm lb ≠ [] →
   length (lap_norm (la * lb)) = length (lap_norm la) + length (lap_norm lb) - 1.
