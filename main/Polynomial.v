@@ -152,8 +152,11 @@ Definition lap_opp la := map rngl_opp la.
 Definition lap_sub la lb := lap_add la (lap_opp lb).
 
 Definition polyn_add p1 p2 := polyn_norm (lap_add (lap p1) (lap p2)).
-Definition polyn_sub p1 p2 := polyn_norm (lap_sub (lap p1) (lap p2)).
 Definition polyn_opp pol := polyn_norm (lap_opp (lap pol)).
+Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
+(*
+Definition polyn_sub p1 p2 := polyn_norm (lap_sub (lap p1) (lap p2)).
+*)
 
 Theorem fold_lap_opp : ∀ la, map rngl_opp la = lap_opp la.
 Proof. easy. Qed.
@@ -2433,6 +2436,7 @@ apply eq_polyn_eq; cbn.
 rewrite fold_lap_norm.
 rewrite lap_mul_norm_idemp_l.
 rewrite lap_add_norm_idemp_l.
+...
 rewrite (lap_mul_sub_distr_r Hop).
 rewrite fold_lap_opp.
 rewrite fold_lap_sub.
@@ -3635,7 +3639,19 @@ Search (_ - _)%F.
 Theorem pol_add_sub_eq_l : ∀ a b c : polyn T,
   (a + b)%pol = c → (c - a)%pol = b.
 Proof.
-Admitted.
+intros * Habc.
+subst c.
+rewrite polyn_add_comm.
+unfold polyn_sub.
+unfold lap_sub.
+Search (lap (_ + _)).
+Print polyn_sub.
+...
+destruct b as (b, pb).
+destruct a as (a, pa).
+apply eq_polyn_eq; cbn.
+
+...
 symmetry in H1.
 specialize polyn_opt_mul_comm as polyn_mul_comm.
 rewrite Hco in polyn_mul_comm.
@@ -3647,12 +3663,13 @@ apply (f_equal (λ p, length (lap p))) in H.
 cbn in H.
 rewrite lap_mul_norm_idemp_l in H.
 rewrite <- H in H2; clear H.
-...
 Search (lap_norm (_ + _)).
 Theorem lap_norm_mul_length : ∀ la lb,
   lap_norm la ≠ [] → lap_norm lb ≠ [] →
   length (lap_norm (la * lb)) = length (lap_norm la) + length (lap_norm lb) - 1.
 Admitted.
+...
+rewrite last_lap_neq_0_lap_norm in H2.
 assert (H3 : lap_norm (lap b) ≠ 0%lap). {
   rewrite last_lap_neq_0_lap_norm by apply lap_prop.
   intros H; apply Hbz.
