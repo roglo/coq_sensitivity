@@ -3658,19 +3658,45 @@ rewrite Hco in polyn_mul_comm.
 rewrite polyn_mul_comm in H1.
 apply (polyn_add_sub_eq_l Hop) in H1.
 rewrite <- (polyn_mul_sub_distr_r Hop) in H1.
-generalize H1; intros H.
-apply (f_equal (λ p, length (lap p))) in H.
-cbn in H.
-rewrite lap_add_norm_idemp_r in H.
-rewrite lap_mul_norm_idemp_l in H.
-rewrite fold_lap_sub in H.
-...
+generalize H1; intros Hll.
+apply (f_equal (λ p, length (lap p))) in Hll.
+cbn in Hll.
+rewrite lap_add_norm_idemp_r in Hll.
+rewrite lap_mul_norm_idemp_l in Hll.
+rewrite fold_lap_sub in Hll.
 Theorem lap_norm_mul_length : ∀ la lb,
-  lap_norm la ≠ [] → lap_norm lb ≠ [] →
-  length (lap_norm (la * lb)) = length (lap_norm la) + length (lap_norm lb) - 1.
+  length (lap_norm (la * lb)) =
+    match lap_norm la with
+    | [] => 0
+    | _ =>
+        match lap_norm lb with
+        | [] => 0
+        | _ => length (lap_norm la) + length (lap_norm lb) - 1
+        end
+    end.
 Admitted.
+rewrite lap_norm_mul_length in Hll.
+remember (lap_norm (lap a - lap pq)) as laq eqn:Hlaq.
+symmetry in Hlaq.
+(*
+specialize list_eqb_eq as H4.
+specialize (H4 _ rngl_eqb (rngl_eqb_eq Heb)).
+*)
+destruct laq as [| aq]. {
+(*
+  specialize (proj2 (H4 (lap_norm (lap a - lap pq)) 0%lap) Hlaq) as H5.
+*)
+  symmetry in Hll.
+  apply length_zero_iff_nil in Hll.
+  destruct pr as (r, pr).
+  cbn in Hll; subst r.
+  cbn in H1, H2.
+  unfold polyn_quot_rem in Hqr.
+  injection Hqr; clear Hqr; intros H3 Hqr.
+  rewrite Hqr.
+  apply eq_polyn_eq.
+  Search (lap_norm _ = 0%lap).
 ...
-rewrite last_lap_neq_0_lap_norm in H2.
 assert (H3 : lap_norm (lap b) ≠ 0%lap). {
   rewrite last_lap_neq_0_lap_norm by apply lap_prop.
   intros H; apply Hbz.
