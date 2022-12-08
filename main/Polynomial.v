@@ -3680,6 +3680,7 @@ cbn in Hll.
 rewrite lap_add_norm_idemp_r in Hll.
 rewrite lap_mul_norm_idemp_l in Hll.
 rewrite fold_lap_sub in Hll.
+...
 Theorem lap_norm_mul_length : ∀ la lb,
   length (lap_norm (la * lb)) =
     match lap_norm la with
