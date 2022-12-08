@@ -3711,6 +3711,11 @@ destruct ld as [| d]. {
   now rewrite lap_convol_mul_0_r.
 }
 cbn; rewrite Nat.sub_0_r.
+rewrite <- lap_mul_norm_idemp_l, <- lap_mul_norm_idemp_r.
+rewrite Hlc, Hld.
+cbn.
+rewrite fold_lap_norm.
+Search (lap_norm (lap_convol_mul _  _ _ _)).
 ...
 rewrite lap_norm_mul_length in Hll.
 remember (lap_norm (lap a - lap pq)) as laq eqn:Hlaq.
