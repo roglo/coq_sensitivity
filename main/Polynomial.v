@@ -347,33 +347,49 @@ Qed.
 
 Theorem all_0_lap_norm_nil : ∀ la,
   (∀ i, nth i la 0%F = 0%F)
-  → lap_norm la = [].
+  ↔ lap_norm la = [].
 Proof.
-intros * Hla.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  cbn.
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [H1| H1]; [ easy | exfalso ].
-  apply (rngl_eqb_neq Heb) in H1.
-  now specialize (Hla 0); cbn in Hla.
-}
-exfalso.
-assert (H : strip_0s (rev la) = []). {
-  clear - rp Heb Hla.
-  apply eq_strip_0s_nil.
-  intros i.
-  destruct (lt_dec i (length la)) as [Hila| Hila]. {
-    rewrite rev_nth; [ | easy ].
-    specialize (Hla (S (length la - S i))).
-    now cbn in Hla.
+intros *.
+split; intros Hla. {
+  induction la as [| a]; [ easy | cbn ].
+  rewrite strip_0s_app.
+  remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]. {
+    cbn.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [H1| H1]; [ easy | exfalso ].
+    apply (rngl_eqb_neq Heb) in H1.
+    now specialize (Hla 0); cbn in Hla.
   }
-  apply Nat.nlt_ge in Hila.
-  rewrite nth_overflow; [ easy | now rewrite rev_length ].
+  exfalso.
+  assert (H : strip_0s (rev la) = []). {
+    clear - rp Heb Hla.
+    apply eq_strip_0s_nil.
+    intros i.
+    destruct (lt_dec i (length la)) as [Hila| Hila]. {
+      rewrite rev_nth; [ | easy ].
+      specialize (Hla (S (length la - S i))).
+      now cbn in Hla.
+    }
+    apply Nat.nlt_ge in Hila.
+    rewrite nth_overflow; [ easy | now rewrite rev_length ].
+  }
+  now rewrite Hlb in H.
+} {
+  intros i.
+  destruct (lt_dec i (length la)) as [Hila| Hila]. 2: {
+    apply Nat.nlt_ge in Hila.
+    now apply nth_overflow.
+  }
+  unfold lap_norm in Hla.
+  apply (f_equal (λ l, rev l)) in Hla.
+  rewrite rev_involutive in Hla; cbn in Hla.
+  apply eq_strip_0s_nil with (i := length la - S i) in Hla.
+  rewrite rev_nth in Hla; [ | flia Hila ].
+  rewrite <- Nat_succ_sub_succ_r in Hla; [ | easy ].
+  rewrite Nat_sub_sub_distr in Hla; [ | flia Hila ].
+  now rewrite Nat.add_comm, Nat.add_sub in Hla.
 }
-now rewrite Hlb in H.
 Qed.
 
 Theorem fold_lap_norm : ∀ la, rev (strip_0s (rev la)) = lap_norm la.
@@ -3678,14 +3694,7 @@ Admitted.
 rewrite lap_norm_mul_length in Hll.
 remember (lap_norm (lap a - lap pq)) as laq eqn:Hlaq.
 symmetry in Hlaq.
-(*
-specialize list_eqb_eq as H4.
-specialize (H4 _ rngl_eqb (rngl_eqb_eq Heb)).
-*)
 destruct laq as [| aq]. {
-(*
-  specialize (proj2 (H4 (lap_norm (lap a - lap pq)) 0%lap) Hlaq) as H5.
-*)
   symmetry in Hll.
   apply length_zero_iff_nil in Hll.
   destruct pr as (r, pr).
@@ -3695,7 +3704,7 @@ destruct laq as [| aq]. {
   injection Hqr; clear Hqr; intros H3 Hqr.
   rewrite Hqr.
   apply eq_polyn_eq.
-  Search (lap_norm _ = 0%lap).
+  specialize (proj2 (all_0_lap_norm_nil _) Hlaq) as H4.
 ...
 assert (H3 : lap_norm (lap b) ≠ 0%lap). {
   rewrite last_lap_neq_0_lap_norm by apply lap_prop.
