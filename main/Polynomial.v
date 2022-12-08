@@ -3690,7 +3690,28 @@ Theorem lap_norm_mul_length : ∀ la lb,
         | _ => length (lap_norm la) + length (lap_norm lb) - 1
         end
     end.
-Admitted.
+Proof.
+intros.
+remember (lap_norm la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H.
+  clear Hlc.
+  destruct la as [| a]; [ easy | cbn ].
+  rewrite fold_lap_norm.
+  destruct lb as [| b]; [ easy | ].
+  now rewrite lap_convol_mul_0_l.
+}
+remember (lap_norm lb) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]. {
+  specialize (proj2 (all_0_lap_norm_nil _) Hld) as H.
+  clear Hld.
+  destruct lb as [| b]; [ now rewrite lap_mul_0_r | ].
+  destruct la as [| a]; [ easy | cbn ].
+  rewrite fold_lap_norm.
+  now rewrite lap_convol_mul_0_r.
+}
+cbn; rewrite Nat.sub_0_r.
+...
 rewrite lap_norm_mul_length in Hll.
 remember (lap_norm (lap a - lap pq)) as laq eqn:Hlaq.
 symmetry in Hlaq.
