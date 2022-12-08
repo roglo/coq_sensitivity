@@ -3680,6 +3680,17 @@ cbn in Hll.
 rewrite lap_add_norm_idemp_r in Hll.
 rewrite lap_mul_norm_idemp_l in Hll.
 rewrite fold_lap_sub in Hll.
+destruct (Nat.eq_dec (length (lap a - lap pq)%lap) 0) as [Hz| Hz]. {
+  apply length_zero_iff_nil in Hz.
+...
+  rewrite Hz in Hll.
+  rewrite lap_mul_0_l in Hll.
+  symmetry in Hll; cbn in Hll.
+  apply length_zero_iff_nil in Hll.
+  rewrite <- H1 in Hll.
+  cbn in Hll.
+  rewrite lap_add_norm_idemp_r in Hll.
+  rewrite lap_mul_norm_idemp_l in Hll.
 ...
 Theorem lap_norm_mul_length : ∀ la lb,
   length (lap_norm (la * lb)) =
