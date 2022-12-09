@@ -3709,6 +3709,45 @@ apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
   now rewrite last_last in pb |-*.
 }
 destruct Hqr as (Hqr, Hrb).
+(**)
+rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
+  unfold last_lap_neq_0.
+Search (last (_ * _)%lap).
+Theorem last_lap_mul : ∀ la lb,
+  last (la * lb)%lap 0%F = (last la 0%F * last lb 0%F)%F.
+Proof.
+intros.
+unfold lap_mul.
+destruct la as [| a] using rev_ind. {
+  now symmetry; apply rngl_mul_0_l.
+}
+clear IHla.
+destruct lb as [| b] using rev_ind. {
+  cbn.
+  rewrite rngl_mul_0_r; [ | easy ].
+  now destruct (la ++ [a]).
+}
+clear IHlb.
+move b before a.
+remember (la ++ [a]) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ now apply app_eq_nil in Hlc | ].
+remember (lb ++ [b]) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
+rewrite <- Hlc, <- Hld.
+clear c d lc ld Hlc Hld.
+do 2 rewrite last_last.
+do 2 rewrite app_length.
+cbn.
+Search (lap_convol_mul (_ ++ _)).
+...
+destruct la as [| a]; [ now symmetry; apply rngl_mul_0_l | ].
+destruct lb as [| b]; [ now symmetry; apply rngl_mul_0_r | ].
+cbn.
+... ...
+rewrite last_lap_mul.
+...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
 specialize (H1 b a q).
 rewrite <- lap_sub_norm_idemp_l in H1.
@@ -3717,6 +3756,7 @@ rewrite Hqr in H1.
 rewrite lap_add_comm in H1.
 rewrite (lap_add_sub Hop) in H1.
 rewrite <- lap_norm_app_0_r in H1; [ | apply nth_repeat ].
+...
 (*
 specialize (lap_norm_length_le r) as Hr.
 specialize (lap_norm_length_le (b * (a - q))%lap) as Hbaq.
