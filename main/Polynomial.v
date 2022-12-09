@@ -3779,8 +3779,15 @@ destruct Hqr as (Hqr, Hrb).
 (**)
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   unfold last_lap_neq_0.
+  remember (a * b)%lap as ab eqn:Hab; symmetry in Hab.
+  destruct ab. {
+    cbn.
+    apply Bool.negb_true_iff.
+    apply (rngl_eqb_neq Heb).
+    apply (rngl_1_neq_0 H10).
+  }
+  rewrite <- Hab.
 Check last_lap_mul.
-  rewrite last_lap_mul.
 ...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
 specialize (H1 b a q).
