@@ -3675,21 +3675,11 @@ destruct (le_dec (length lb) (length la)) as [Hlba| Hlba]. {
   symmetry; apply app_nil_r.
 }
 apply Nat.nle_gt in Hlba.
-...
-rewrite lap_add_repeat_0_r.
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | ].
-Qed.
-
-Theorem lap_add_sub :
-  @rngl_has_opp T _ = true →
-  ∀ la lb,
-  length lb ≤ length la
-  → (la + lb - lb)%lap = la.
-Proof.
-intros Hop * Hba.
-unfold lap_sub.
-rewrite <- lap_add_assoc.
-rewrite (lap_add_opp_r Hop).
+replace (length lb) with (length la + (length lb - length la)) at 1
+  by flia Hlba.
+rewrite repeat_app.
+rewrite lap_add_app_r; [ | now rewrite repeat_length ].
+f_equal.
 now apply lap_add_repeat_0_r.
 Qed.
 
@@ -3725,8 +3715,12 @@ rewrite <- lap_sub_norm_idemp_l in H1.
 rewrite (lap_mul_comm Hco b a) in H1.
 rewrite Hqr in H1.
 rewrite lap_add_comm in H1.
-...
 rewrite (lap_add_sub Hop) in H1.
+rewrite <- lap_norm_app_0_r in H1; [ | apply nth_repeat ].
+specialize (lap_norm_length_le r) as Hr.
+specialize (lap_norm_length_le (b * (a - q))%lap) as Hbaq.
+rewrite H1 in Hbaq.
+...
 Search (_ + _ - _)%lap.
 Search (lap_norm (_ - _)).
 Search (lap_norm (_ * _)).
