@@ -2942,12 +2942,20 @@ induction la as [| a]; [ easy | cbn ].
 now rewrite rngl_add_0_l; f_equal.
 Qed.
 
-Theorem lap_add_repeat_0_r : ∀ la,
-  (la + repeat 0%F (length la) = la)%lap.
+Theorem lap_add_repeat_0_r : ∀ la len,
+  len ≤ length la
+  → (la + repeat 0%F len = la)%lap.
 Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-now rewrite rngl_add_0_r; f_equal.
+intros * Hlen.
+revert len Hlen.
+induction la as [| a]; intros. {
+  now apply Nat.le_0_r in Hlen; subst len.
+}
+cbn.
+destruct len; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+rewrite rngl_add_0_r; f_equal.
+now apply IHla.
 Qed.
 
 Theorem gen_lap_add : ∀ la lb,
@@ -2963,7 +2971,7 @@ induction la as [| a]; intros; cbn. {
 }
 destruct lb as [| b]; cbn. {
   rewrite rngl_add_0_r, app_nil_r; f_equal.
-  symmetry; apply lap_add_repeat_0_r.
+  now symmetry; apply lap_add_repeat_0_r.
 }
 f_equal.
 apply IHla.
@@ -3497,6 +3505,7 @@ Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
 (**)
 
+(*
 Theorem polyn_quot_unique: ∀ a b q r : polyn T,
   length (lap r) < length (lap b)
   → a = (b * q + r)%pol
@@ -3514,7 +3523,6 @@ rewrite fold_lap_norm in Hab.
 rewrite lap_add_norm_idemp_l in Hab.
 rewrite last_lap_neq_0_lap_norm in Hab. 2: {
   unfold last_lap_neq_0.
-Admitted. (*
 ...
 intros * Hrb Hab.
 (*
@@ -3653,6 +3661,38 @@ rewrite (polyn_add_opp_r Hop).
 apply polyn_add_0_r.
 Qed.
 
+Theorem lap_add_sub :
+  @rngl_has_opp T _ = true →
+  ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%F (length lb - length la).
+Proof.
+intros Hop *.
+unfold lap_sub.
+rewrite <- lap_add_assoc.
+rewrite (lap_add_opp_r Hop).
+destruct (le_dec (length lb) (length la)) as [Hlba| Hlba]. {
+  rewrite lap_add_repeat_0_r; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  symmetry; apply app_nil_r.
+}
+apply Nat.nle_gt in Hlba.
+...
+rewrite lap_add_repeat_0_r.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | ].
+Qed.
+
+Theorem lap_add_sub :
+  @rngl_has_opp T _ = true →
+  ∀ la lb,
+  length lb ≤ length la
+  → (la + lb - lb)%lap = la.
+Proof.
+intros Hop * Hba.
+unfold lap_sub.
+rewrite <- lap_add_assoc.
+rewrite (lap_add_opp_r Hop).
+now apply lap_add_repeat_0_r.
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3660,6 +3700,41 @@ Theorem polyn_mul_div :
   b ≠ 0%pol
   → (a * b / b)%pol = a.
 Proof.
+intros Hco Hop * Hbz.
+destruct a as (a, pa).
+destruct b as (b, pb).
+move b before a.
+assert (H : b ≠ 0%lap). {
+  intros H; apply Hbz.
+  now apply eq_polyn_eq.
+}
+clear Hbz; rename H into Hbz.
+apply eq_polyn_eq; cbn.
+remember (lap_quot_rem (lap_norm (a * b)) b) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (q, r); cbn.
+apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
+  unfold last_lap_neq_0 in pb.
+  destruct b as [| b lb] using rev_ind; [ easy | ].
+  now rewrite last_last in pb |-*.
+}
+destruct Hqr as (Hqr, Hrb).
+specialize (lap_norm_mul_sub_distr_l Hop) as H1.
+specialize (H1 b a q).
+rewrite <- lap_sub_norm_idemp_l in H1.
+rewrite (lap_mul_comm Hco b a) in H1.
+rewrite Hqr in H1.
+rewrite lap_add_comm in H1.
+...
+rewrite (lap_add_sub Hop) in H1.
+Search (_ + _ - _)%lap.
+Search (lap_norm (_ - _)).
+Search (lap_norm (_ * _)).
+Search (_ + _ = _ → _)%lap.
+Search (_ + _ = _ ↔ _)%lap.
+Search (_ + _ = _)%lap.
+Search (_ = _ + _)%lap.
+...
 intros Hco Hop * Hbz.
 specialize (polyn_quot_rem_prop Hco Hop) as H1.
 specialize (H1 (a * b)%pol b).
