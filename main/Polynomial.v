@@ -18,8 +18,10 @@ Require Import PermutationFun SortingFun.
    and another type for the condition that the last value in lap
    is not null.
 *)
+Definition is_empty_list {A} (la : list A) :=
+  match la with [] => true | _ => false end.
 Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
-  (last lap 1 ≠? 0)%F = true.
+  (is_empty_list lap || (last lap 0 ≠? 0)%F)%bool = true.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
@@ -81,15 +83,16 @@ split; intros Hpq. {
 }
 Qed.
 
-Theorem lap_1_0_prop : last_lap_neq_0 [].
+Theorem polyn_one_prop : last_lap_neq_0 [1%F].
 Proof.
+unfold last_lap_neq_0; cbn.
 apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
-apply (rngl_1_neq_0 H10).
+now apply rngl_1_neq_0.
 Qed.
 
-Definition polyn_zero := mk_polyn [] lap_1_0_prop.
-Definition polyn_one := mk_polyn [1%F] lap_1_0_prop.
+Definition polyn_zero := mk_polyn [] eq_refl.
+Definition polyn_one := mk_polyn [1%F] polyn_one_prop.
 
 (* normalization *)
 
@@ -112,25 +115,69 @@ induction la as [| a]; intros; [ easy | cbn ].
 destruct (a =? 0)%F; [ apply IHla | easy ].
 Qed.
 
+Theorem eq_strip_0s_nil : ∀ la,
+  strip_0s la = [] ↔ ∀ i, nth i la 0%F = 0%F.
+Proof.
+intros.
+split. {
+  intros Hla *.
+  revert i.
+  induction la as [| a]; intros; [ now destruct i | cbn ].
+  cbn in Hla.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz.
+  destruct i; [ easy | ].
+  now apply IHla.
+} {
+  intros Hla.
+  induction la as [| a]; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]. {
+    apply IHla.
+    intros i.
+    now specialize (Hla (S i)).
+  }
+  apply (rngl_eqb_neq Heb) in Haz.
+  now specialize (Hla 0).
+}
+Qed.
+
+Theorem eq_strip_0s_cons : ∀ la lb b,
+  strip_0s la = b :: lb → b ≠ 0%F.
+Proof.
+intros * Hab.
+intros H; subst b.
+induction la as [| a]; [ easy | cbn in Hab ].
+rewrite if_bool_if_dec in Hab.
+destruct (bool_dec _) as [Haz| Haz]; [ congruence | ].
+injection Hab; clear Hab; intros Hab Ha; subst a.
+now rewrite (rngl_eqb_refl Heb) in Haz.
+Qed.
+
 Definition lap_norm la := rev (strip_0s (rev la)).
 
 Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
 Proof.
 intros.
 unfold last_lap_neq_0, lap_norm.
-induction la as [| a]; cbn. {
-  apply Bool.negb_true_iff, (rngl_eqb_neq Heb).
-  now apply rngl_1_neq_0.
-}
+induction la as [| a]; [ easy | cbn ].
 rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; cbn. {
-  remember (a =? 0)%F as az eqn:Haz; symmetry in Haz.
-  destruct az; [ easy | cbn ].
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
   now apply Bool.negb_true_iff.
 }
 cbn in IHla.
-now rewrite last_last in IHla |-*.
+rewrite last_last in IHla.
+apply Bool.orb_true_iff in IHla.
+apply Bool.orb_true_iff; right.
+rewrite last_last.
+destruct IHla as [H1| H1]; [ | easy ].
+apply eq_strip_0s_cons in Hlb.
+apply Bool.negb_true_iff.
+now apply (rngl_eqb_neq Heb).
 Qed.
 
 Definition polyn_norm la :=
@@ -315,34 +362,6 @@ revert lb.
 induction la as [| a]; intros; cbn; [ now rewrite lap_opp_length | ].
 destruct lb as [| b]; [ easy | cbn ].
 f_equal; apply IHla.
-Qed.
-
-Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] ↔ ∀ i, nth i la 0%F = 0%F.
-Proof.
-intros.
-split. {
-  intros Hla *.
-  revert i.
-  induction la as [| a]; intros; [ now destruct i | cbn ].
-  cbn in Hla.
-  rewrite if_bool_if_dec in Hla.
-  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz.
-  destruct i; [ easy | ].
-  now apply IHla.
-} {
-  intros Hla.
-  induction la as [| a]; [ easy | cbn ].
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
-    apply IHla.
-    intros i.
-    now specialize (Hla (S i)).
-  }
-  apply (rngl_eqb_neq Heb) in Haz.
-  now specialize (Hla 0).
-}
 Qed.
 
 Theorem all_0_lap_norm_nil : ∀ la,
@@ -567,17 +586,19 @@ assert (H : rlb ≠ []). {
 }
 move H before Hbz; clear Hbz.
 rename H into Hbz.
-assert (H : hd 1%F rlb ≠ 0%F). {
+assert (H : hd 0%F rlb ≠ 0%F). {
   subst rlb.
   unfold last_lap_neq_0 in Hbn.
+  apply Bool.orb_true_iff in Hbn.
+  destruct Hbn as [Hbn| Hbn]. {
+    unfold is_empty_list in Hbn.
+    now destruct lb.
+  }
+  destruct lb as [| b] using rev_ind; [ easy | ].
+  rewrite last_last in Hbn.
+  rewrite rev_app_distr; cbn.
   apply Bool.negb_true_iff in Hbn.
-  apply (rngl_eqb_neq Heb) in Hbn.
-  move Hbn at bottom.
-  intros H; apply Hbn; clear Hbn.
-  clear Hbz Hqr.
-  rewrite <- (rev_involutive lb).
-  destruct (rev lb); cbn in H |-*; [ easy | ].
-  now rewrite last_last.
+  now apply (rngl_eqb_neq Heb) in Hbn.
 }
 move H before Hbn; clear Hbn.
 rename H into Hbn.
@@ -634,6 +655,8 @@ Qed.
 (*
 Section b.
 *)
+
+...
 
 Theorem hd_quot : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
@@ -752,6 +775,16 @@ remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr); cbn.
 unfold last_lap_neq_0.
+(**)
+apply Bool.orb_true_iff.
+destruct rlq as [| q]; [ now left | right ].
+cbn; rewrite last_last.
+apply hd_quot in Hqr.
+cbn in Hqr.
+...
+apply
+apply hd_quot in Hqr; [ easy | | ].
+...
 apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
 unfold last_lap_neq_0 in Ha, Hb.
