@@ -86,8 +86,7 @@ Qed.
 Theorem polyn_one_prop : has_polyn_prop [1%F] = true.
 Proof.
 unfold has_polyn_prop; cbn.
-apply Bool.negb_true_iff.
-apply (rngl_eqb_neq Heb).
+apply (rngl_neqb_neq Heb).
 now apply rngl_1_neq_0.
 Qed.
 
@@ -176,8 +175,7 @@ apply Bool.orb_true_iff; right.
 rewrite last_last.
 destruct IHla as [H1| H1]; [ | easy ].
 apply eq_strip_0s_cons in Hlb.
-apply Bool.negb_true_iff.
-now apply (rngl_eqb_neq Heb).
+now apply (rngl_neqb_neq Heb).
 Qed.
 
 Definition polyn_norm la :=
@@ -597,8 +595,7 @@ assert (H : hd 0%F rlb ≠ 0%F). {
   destruct lb as [| b] using rev_ind; [ easy | ].
   rewrite last_last in Hbn.
   rewrite rev_app_distr; cbn.
-  apply Bool.negb_true_iff in Hbn.
-  now apply (rngl_eqb_neq Heb) in Hbn.
+  now apply (rngl_neqb_neq Heb) in Hbn.
 }
 move H before Hbn; clear Hbn.
 rename H into Hbn.
@@ -709,10 +706,10 @@ apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
 Theorem hd_rem : ∀ la lb lq lr,
-  hd 1%F la ≠ 0%F
-  → hd 1%F lb ≠ 0%F
+  la = [] ∨ hd 0%F la ≠ 0%F
+  → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
-  → hd 1%F lr ≠ 0%F.
+  → lr = [] ∨ hd 0%F lr ≠ 0%F.
 Proof.
 intros * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
@@ -759,6 +756,7 @@ eapply IHit; [ | | | apply Hrb ]; [ | apply Hb | ]. 2: {
 rewrite Hrlr.
 remember (lap_sub la (map _ _ ++ _)) as l eqn:Hl.
 clear Hl Hrlr.
+...
 induction l as [| x]; [ now apply rngl_1_neq_0 | cbn ].
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn ].
@@ -790,8 +788,7 @@ apply hd_quot in Hqr; cycle 1. {
   }
   rewrite last_last in Ha.
   rewrite rev_app_distr; cbn.
-  apply Bool.negb_true_iff in Ha.
-  now apply (rngl_eqb_neq Heb) in Ha.
+  now apply (rngl_neqb_neq Heb) in Ha.
 } {
   unfold has_polyn_prop in Hb.
   apply Bool.orb_true_iff in Hb.
@@ -802,36 +799,85 @@ apply hd_quot in Hqr; cycle 1. {
   }
   rewrite last_last in Hb.
   rewrite rev_app_distr; cbn.
-  apply Bool.negb_true_iff in Hb.
-  now apply (rngl_eqb_neq Heb) in Hb.
+  now apply (rngl_neqb_neq Heb) in Hb.
 }
 destruct Hqr as [Hqr| Hqr]; [ easy | ].
 cbn in Hqr.
-Theorem rngl_neqb_eq : ∀ a, a ≠ 0%F → (a ≠? 0)%F = true.
-Admitted.
-Search ((_ =? _) = false).
-Search ((_ ≠? _) = true).
-Search ((_ ≠? _)%F = true).
-... ...
-apply rngl_neqb_eq.
-...
-apply Bool.negb_true_iff.
-now apply (rngl_eqb_neq Heb).
+now apply (rngl_neqb_neq Heb).
 Qed.
 
-...
-
 Theorem rem_is_norm : ∀ la lb,
-  last_lap_neq_0 la
-  → last_lap_neq_0 lb
-  → last_lap_neq_0 (snd (lap_quot_rem la lb)).
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop (snd (lap_quot_rem la lb)) = true.
 Proof.
 intros * Ha Hb.
 unfold lap_quot_rem.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr); cbn.
-unfold last_lap_neq_0.
+unfold has_polyn_prop.
+(**)
+destruct rlr as [| r]; [ easy | ].
+apply Bool.orb_true_iff; right.
+cbn; rewrite last_last.
+apply (rngl_neqb_neq Heb).
+unfold has_polyn_prop in Ha, Hb.
+apply Bool.orb_true_iff in Ha, Hb.
+destruct Ha as [Ha| Ha]. {
+  destruct la; [ | easy ].
+  destruct Hb as [Hb| Hb]; [ now destruct lb | ].
+  destruct lb as [| b] using rev_ind; [ easy | ].
+  rewrite last_last in Hb.
+  now rewrite rev_app_distr in Hqr.
+}
+destruct Hb as [Hb| Hb]; [ now destruct lb | ].
+apply (rngl_neqb_neq Heb) in Ha, Hb.
+rewrite <- (rev_involutive la) in Ha.
+rewrite <- (rev_involutive lb) in Hb.
+rewrite List_last_rev in Ha, Hb.
+generalize Hqr; intros Hq.
+apply hd_quot in Hqr; [ | now right | now right ].
+apply hd_rem in Hq; [ | | ].
+Check hd_quot.
+Check hd_rem.
+...
+  destruct la; [ | easy ].
+  destruct Hb as [Hb| Hb]; [ now destruct lb | ].
+  destruct lb as [| b] using rev_ind; [ easy | ].
+  rewrite last_last in Hb.
+  now rewrite rev_app_distr in Hqr.
+}
+  cbn in Hqr.
+  apply hd_quot in Hqr.
+    destruct lb; [ easy | easy ].
+    cbn in Hqr.
+...
+apply hd_quot in Hqr; cycle 1. {
+  unfold has_polyn_prop in Ha.
+  apply Bool.orb_true_iff in Ha.
+  destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
+  rewrite <- List_last_rev, rev_involutive.
+  now apply (rngl_neqb_neq Heb).
+} {
+  unfold has_polyn_prop in Hb.
+  apply Bool.orb_true_iff in Hb.
+  destruct Hb as [Hb| Hb]; [ now left; destruct lb | right ].
+  rewrite <- List_last_rev, rev_involutive.
+  now apply (rngl_neqb_neq Heb).
+}
+...
+  rewrite List_last_rev in Ha.
+  cbn in Ha.
+...
+unfold has_polyn_prop in Ha, Hb.
+apply Bool.orb_true_iff in Ha, Hb.
+Check hd_quot.
+destruct Ha as [Ha| Ha]. {
+  unfold is_empty_list in Ha.
+  destruct la; [ | easy ].
+  cbn in Hqr.
+...
 apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
 unfold last_lap_neq_0 in Ha, Hb.
