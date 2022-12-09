@@ -3741,6 +3741,12 @@ do 2 rewrite last_last.
 do 2 rewrite app_length.
 cbn.
 Search (lap_convol_mul (_ ++ _)).
+Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
+  last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%F.
+Proof.
+Print lap_convol_mul.
+... ...
+apply last_lap_convol_mul_last.
 ...
 destruct la as [| a]; [ now symmetry; apply rngl_mul_0_l | ].
 destruct lb as [| b]; [ now symmetry; apply rngl_mul_0_r | ].
