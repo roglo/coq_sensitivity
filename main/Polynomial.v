@@ -756,10 +756,11 @@ eapply IHit; [ | | | apply Hrb ]; [ | apply Hb | ]. 2: {
 rewrite Hrlr.
 remember (lap_sub la (map _ _ ++ _)) as l eqn:Hl.
 clear Hl Hrlr.
-...
-induction l as [| x]; [ now apply rngl_1_neq_0 | cbn ].
+destruct Ha as [Ha| Ha]; [ easy | ].
+destruct Hb as [Hb| Hb]; [ easy | ].
+induction l as [| x]; [ now left | cbn ].
 rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn ].
+destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn; right ].
 now apply rngl_eqb_neq in Hxz.
 Qed.
 
@@ -837,59 +838,11 @@ rewrite <- (rev_involutive la) in Ha.
 rewrite <- (rev_involutive lb) in Hb.
 rewrite List_last_rev in Ha, Hb.
 generalize Hqr; intros Hq.
-apply hd_quot in Hqr; [ | now right | now right ].
-apply hd_rem in Hq; [ | | ].
-Check hd_quot.
-Check hd_rem.
-...
-  destruct la; [ | easy ].
-  destruct Hb as [Hb| Hb]; [ now destruct lb | ].
-  destruct lb as [| b] using rev_ind; [ easy | ].
-  rewrite last_last in Hb.
-  now rewrite rev_app_distr in Hqr.
-}
-  cbn in Hqr.
-  apply hd_quot in Hqr.
-    destruct lb; [ easy | easy ].
-    cbn in Hqr.
-...
-apply hd_quot in Hqr; cycle 1. {
-  unfold has_polyn_prop in Ha.
-  apply Bool.orb_true_iff in Ha.
-  destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
-  rewrite <- List_last_rev, rev_involutive.
-  now apply (rngl_neqb_neq Heb).
-} {
-  unfold has_polyn_prop in Hb.
-  apply Bool.orb_true_iff in Hb.
-  destruct Hb as [Hb| Hb]; [ now left; destruct lb | right ].
-  rewrite <- List_last_rev, rev_involutive.
-  now apply (rngl_neqb_neq Heb).
-}
-...
-  rewrite List_last_rev in Ha.
-  cbn in Ha.
-...
-unfold has_polyn_prop in Ha, Hb.
-apply Bool.orb_true_iff in Ha, Hb.
-Check hd_quot.
-destruct Ha as [Ha| Ha]. {
-  unfold is_empty_list in Ha.
-  destruct la; [ | easy ].
-  cbn in Hqr.
-...
-apply Bool.negb_true_iff.
-apply (rngl_eqb_neq Heb).
-unfold last_lap_neq_0 in Ha, Hb.
-apply Bool.negb_true_iff in Ha, Hb.
-apply (rngl_eqb_neq Heb) in Ha, Hb.
-rewrite <- (rev_involutive la) in Ha.
-rewrite <- (rev_involutive lb) in Hb.
-rewrite List_last_rev in Ha, Hb |-*.
-generalize Hqr; intros Hq.
-apply hd_quot in Hq; [ | easy | easy ].
-apply (hd_rem _ _ Ha Hb Hqr).
+apply hd_rem in Hq; [ | now right | now right ].
+now destruct Hq.
 Qed.
+
+...
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
