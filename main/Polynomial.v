@@ -842,15 +842,13 @@ apply hd_rem in Hq; [ | now right | now right ].
 now destruct Hq.
 Qed.
 
-...
-
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
-  mk_polyn lq (quot_is_norm (lap_prop pa) (lap_prop pb)).
+  mk_polyn lq (quot_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
 
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lr := snd (lap_quot_rem (lap pa) (lap pb)) in
-  mk_polyn lr (rem_is_norm (lap_prop pa) (lap_prop pb)).
+  mk_polyn lr (rem_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
@@ -1079,32 +1077,26 @@ Qed.
 (* addition to 0 *)
 
 Theorem last_lap_neq_0_lap_norm : ∀ la,
-  last_lap_neq_0 la
+  has_polyn_prop la = true
   → lap_norm la = la.
 Proof.
 intros * lapr.
-unfold last_lap_neq_0 in lapr.
-apply Bool.negb_true_iff in lapr.
-induction la as [| a]; [ easy | cbn ].
-rewrite strip_0s_app.
-rewrite <- (rev_involutive (strip_0s _)).
-rewrite fold_lap_norm.
-rewrite IHla; cbn. {
-  remember (rev la) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [| b]. {
-    apply List_eq_rev_nil in Hlb; subst la.
-    cbn in lapr.
-    now rewrite lapr.
-  }
-  cbn.
-  rewrite rev_app_distr; cbn; f_equal.
-  now rewrite <- rev_involutive, Hlb.
-} {
-  destruct la as [| a2]; [ cbn | easy ].
-  apply (rngl_eqb_neq Heb).
-  now apply rngl_1_neq_0.
-}
+(**)
+unfold has_polyn_prop in lapr.
+apply Bool.orb_true_iff in lapr.
+destruct lapr as [lapr| lapr]; [ now destruct la | ].
+apply (rngl_neqb_neq Heb) in lapr.
+destruct la as [| a] using rev_ind; [ easy | cbn ].
+clear IHla.
+rewrite last_last in lapr.
+unfold lap_norm.
+rewrite rev_app_distr; cbn.
+apply (rngl_eqb_neq Heb) in lapr.
+rewrite lapr; cbn.
+now rewrite rev_involutive.
 Qed.
+
+...
 
 Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
 Proof.
