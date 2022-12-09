@@ -3384,15 +3384,12 @@ move H before Hbz; clear Hbz.
 rename H into Hbz.
 assert (H : hd 0%F rlb ≠ 0%F). {
   subst rlb.
-...
-  unfold last_lap_neq_0 in Hbn.
-  apply Bool.negb_true_iff in Hbn.
-  apply (rngl_eqb_neq Heb) in Hbn.
-  move Hbn at bottom.
-  intros H; apply Hbn; clear Hbn.
-  rewrite <- (rev_involutive lb).
-  destruct (rev lb); [ easy | ].
-  now cbn; rewrite last_last.
+  unfold has_polyn_prop in Hbn.
+  apply Bool.orb_true_iff in Hbn.
+  destruct Hbn as [Hbn| Hbn]; [ now destruct lb | ].
+  rewrite <- (rev_involutive lb) in Hbn.
+  rewrite List_last_rev in Hbn.
+  now apply (rngl_neqb_neq Heb) in Hbn.
 }
 move H before Hbn; clear Hbn.
 rename H into Hbn.
@@ -3419,25 +3416,6 @@ Theorem polyn_quot_rem_prop :
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
 intros * Hic Hop * Hbz Hab.
-(*
-(* pourtant, ça marche, ici *)
-About polyn_mul.
-About polyn_quot.
-(* enfin, bon, à moitié *)
-Theorem polyn_quot_unique : ∀ a b q r : polyn T,
-  length (lap r) < length (lap b)
-  → a = (b * q + r)%pol
-  → q = polyn_quot a b.
-  → q = @polyn_quot Hiv a b.
-....
-(*
-Theorem polyn_quot_unique: ∀ a b q r : polyn T,
-  length (lap r) < length (lap b)
-  → a = (b * q + r)%pol
-  → q = (a / b)%pol.
-...
-*)
-*)
 destruct pa as (la, Hpa).
 destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
@@ -3450,6 +3428,7 @@ assert (H : (last lb 0 ≠? 0)%F = true). {
   apply (rngl_eqb_neq Heb).
   intros H; apply Hbz; clear Hbz Hab.
   apply eq_polyn_eq; cbn.
+...
   apply -> Bool.negb_true_iff in Hpb.
   apply (rngl_eqb_neq Heb) in Hpb.
   rewrite <- (rev_involutive lb) in Hpb.
