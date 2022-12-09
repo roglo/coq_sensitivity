@@ -1096,8 +1096,6 @@ rewrite lapr; cbn.
 now rewrite rev_involutive.
 Qed.
 
-...
-
 Theorem polyn_add_0_l : ∀ p, (0 + p)%pol = p.
 Proof.
 intros (la, lapr).
@@ -3348,16 +3346,8 @@ split. 2: {
     intros H; subst lb; cbn in H1.
     now rewrite (rngl_eqb_refl Heb) in H1.
   } {
-    unfold last_lap_neq_0.
-    apply Bool.negb_true_iff in H1.
-    apply Bool.negb_true_iff.
-    apply (rngl_eqb_neq Heb) in H1.
-    apply (rngl_eqb_neq Heb).
-    intros H; apply H1.
-    rewrite <- (rev_involutive lb) in H |-*.
-    destruct (rev lb) as [| b]; [ easy | ].
-    cbn in H |-*.
-    now rewrite last_last in H |-*.
+    unfold has_polyn_prop.
+    now rewrite H1, Bool.orb_true_r.
   }
 }
 assert (Hbz : lb ≠ []). {
@@ -3365,12 +3355,10 @@ assert (Hbz : lb ≠ []). {
   cbn in H1.
   now rewrite (rngl_eqb_refl Heb) in H1.
 }
-assert (Hbn : last_lap_neq_0 lb). {
-  unfold last_lap_neq_0.
-  rewrite <- (rev_involutive lb) in H1, Hbz |-*.
-  destruct (rev lb) as [| b]; [ easy | ].
-  cbn in H1, Hbz |-*.
-  now rewrite last_last in H1 |-*.
+assert (Hbn : has_polyn_prop lb = true). {
+  unfold has_polyn_prop.
+  rewrite H1.
+  apply Bool.orb_true_r.
 }
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
@@ -3396,6 +3384,7 @@ move H before Hbz; clear Hbz.
 rename H into Hbz.
 assert (H : hd 0%F rlb ≠ 0%F). {
   subst rlb.
+...
   unfold last_lap_neq_0 in Hbn.
   apply Bool.negb_true_iff in Hbn.
   apply (rngl_eqb_neq Heb) in Hbn.
