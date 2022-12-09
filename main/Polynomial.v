@@ -762,19 +762,17 @@ destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn ].
 now apply rngl_eqb_neq in Hxz.
 Qed.
 
-...
-
 Theorem quot_is_norm : ∀ la lb,
-  last_lap_neq_0 la
-  → last_lap_neq_0 lb
-  → last_lap_neq_0 (fst (lap_quot_rem la lb)).
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop (fst (lap_quot_rem la lb)) = true.
 Proof.
 intros * Ha Hb.
 unfold lap_quot_rem.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr); cbn.
-unfold last_lap_neq_0.
+unfold has_polyn_prop.
 (**)
 apply Bool.orb_true_iff.
 destruct rlq as [| q]; [ now left | right ].
