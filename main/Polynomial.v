@@ -657,10 +657,10 @@ Section b.
 *)
 
 Theorem hd_quot : ∀ la lb lq lr,
-  hd 1%F la ≠ 0%F
-  → hd 1%F lb ≠ 0%F
+  la = [] ∨ hd 0%F la ≠ 0%F
+  → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
-  → hd 1%F lq ≠ 0%F.
+  → lq = [] ∨ hd 0%F lq ≠ 0%F.
 Proof.
 intros * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
@@ -674,10 +674,12 @@ remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
 destruct o as [(cq, dq)| ]. 2: {
   injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0.
+  now left.
 }
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
+destruct Ha as [Ha| Ha]; [ easy | ].
+destruct Hb as [Hb| Hb]; [ easy | ].
 cbn in Ha, Hb, Hor.
 rewrite if_ltb_lt_dec in Hor.
 destruct (lt_dec _ _) as [Halb| Halb]; [ easy | ].
@@ -694,6 +696,7 @@ rewrite Hlq; cbn.
 rewrite Hcq.
 unfold rngl_div.
 rewrite Hiv.
+right.
 intros Hq.
 apply rngl_integral in Hq; [ | easy | ]. 2: {
   apply Bool.orb_true_iff; right.
@@ -777,22 +780,46 @@ unfold has_polyn_prop.
 apply Bool.orb_true_iff.
 destruct rlq as [| q]; [ now left | right ].
 cbn; rewrite last_last.
-apply hd_quot in Hqr.
+apply hd_quot in Hqr; cycle 1. {
+  unfold has_polyn_prop in Ha.
+  apply Bool.orb_true_iff in Ha.
+  destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
+  destruct la as [| a] using rev_ind. {
+    cbn in Ha.
+    now rewrite (rngl_eqb_refl Heb) in Ha.
+  }
+  rewrite last_last in Ha.
+  rewrite rev_app_distr; cbn.
+  apply Bool.negb_true_iff in Ha.
+  now apply (rngl_eqb_neq Heb) in Ha.
+} {
+  unfold has_polyn_prop in Hb.
+  apply Bool.orb_true_iff in Hb.
+  destruct Hb as [Hb| Hb]; [ now left; destruct lb | right ].
+  destruct lb as [| b] using rev_ind. {
+    cbn in Hb.
+    now rewrite (rngl_eqb_refl Heb) in Hb.
+  }
+  rewrite last_last in Hb.
+  rewrite rev_app_distr; cbn.
+  apply Bool.negb_true_iff in Hb.
+  now apply (rngl_eqb_neq Heb) in Hb.
+}
+destruct Hqr as [Hqr| Hqr]; [ easy | ].
 cbn in Hqr.
-...
-apply
-apply hd_quot in Hqr; [ easy | | ].
+Theorem rngl_neqb_eq : ∀ a, a ≠ 0%F → (a ≠? 0)%F = true.
+Admitted.
+Search ((_ =? _) = false).
+Search ((_ ≠? _) = true).
+Search ((_ ≠? _)%F = true).
+... ...
+apply rngl_neqb_eq.
 ...
 apply Bool.negb_true_iff.
-apply (rngl_eqb_neq Heb).
-unfold last_lap_neq_0 in Ha, Hb.
-apply Bool.negb_true_iff in Ha, Hb.
-apply (rngl_eqb_neq Heb) in Ha, Hb.
-rewrite <- (rev_involutive la) in Ha.
-rewrite <- (rev_involutive lb) in Hb.
-rewrite List_last_rev in Ha, Hb |-*.
-now apply hd_quot in Hqr.
+now apply (rngl_eqb_neq Heb).
 Qed.
+
+...
 
 Theorem rem_is_norm : ∀ la lb,
   last_lap_neq_0 la

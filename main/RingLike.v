@@ -386,7 +386,7 @@ Qed.
 
 Theorem rngl_eqb_eq :
   rngl_has_eqb = true →
-  ∀ a b : T, rngl_eqb a b = true ↔ a = b.
+  ∀ a b : T, (a =? b)%F = true ↔ a = b.
 Proof.
 intros Heqb *.
 specialize rngl_opt_eqb_eq as H.
@@ -395,7 +395,7 @@ Qed.
 
 Theorem rngl_eqb_neq :
   rngl_has_eqb = true →
-  ∀ a b : T, rngl_eqb a b = false ↔ a ≠ b.
+  ∀ a b : T, (a =? b)%F = false ↔ a ≠ b.
 Proof.
 intros Heqb *.
 split; intros Hab. {
@@ -411,9 +411,24 @@ split; intros Hab. {
 }
 Qed.
 
+Theorem rngl_neqb_neq :
+  rngl_has_eqb = true →
+  ∀ a b : T, (a ≠? b)%F = true ↔ a ≠ b.
+Proof.
+intros Heqb *.
+split; intros Hab. {
+  intros H.
+  apply (rngl_eqb_eq Heqb) in H.
+  now rewrite H in Hab.
+} {
+  apply (rngl_eqb_neq Heqb) in Hab.
+  now rewrite Hab.
+}
+Qed.
+
 Theorem rngl_eqb_refl :
   rngl_has_eqb = true →
-  ∀ a, rngl_eqb a a = true.
+  ∀ a, (a =? a)%F = true.
 Proof.
 intros Heqb *.
 now apply (rngl_eqb_eq Heqb).
