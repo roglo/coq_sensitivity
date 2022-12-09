@@ -3683,6 +3683,73 @@ f_equal.
 now apply lap_add_repeat_0_r.
 Qed.
 
+Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
+  len ≠ 0
+  → length la + length lb + 1 = i + len
+  → last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%F.
+Proof.
+intros * Hlen Hlab.
+revert la lb i Hlab.
+induction len; intros; [ easy | clear Hlen ].
+cbn.
+destruct len. {
+  cbn.
+  rewrite rngl_summation_split3 with (j := length la); [ | flia Hlab ].
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
+  replace (i - length la) with (length lb) by flia Hlab.
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; cbn.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite (nth_overflow (lb ++ [b])). 2: {
+      rewrite app_length; cbn; flia Hlab Hj.
+    }
+    apply (rngl_mul_0_r Hos).
+  }
+  rewrite rngl_add_0_l.
+  rewrite all_0_rngl_summation_0. 2: {
+    intros j Hj.
+    rewrite (nth_overflow (la ++ [a])). 2: {
+      now rewrite app_length.
+    }
+    apply (rngl_mul_0_l Hos).
+  }
+  apply rngl_add_0_r.
+}
+rewrite IHlen; [ easy | easy | flia Hlab ].
+Qed.
+
+Theorem last_lap_mul : ∀ la lb,
+  last (la * lb)%lap 0%F = (last la 0%F * last lb 0%F)%F.
+Proof.
+intros.
+unfold lap_mul.
+destruct la as [| a] using rev_ind. {
+  now symmetry; apply rngl_mul_0_l.
+}
+clear IHla.
+destruct lb as [| b] using rev_ind. {
+  cbn.
+  rewrite rngl_mul_0_r; [ | easy ].
+  now destruct (la ++ [a]).
+}
+clear IHlb.
+move b before a.
+remember (la ++ [a]) as lc eqn:Hlc.
+symmetry in Hlc.
+destruct lc as [| c]; [ now apply app_eq_nil in Hlc | ].
+remember (lb ++ [b]) as ld eqn:Hld.
+symmetry in Hld.
+destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
+rewrite <- Hlc, <- Hld.
+clear c d lc ld Hlc Hld.
+do 2 rewrite last_last.
+do 2 rewrite app_length.
+cbn.
+apply last_lap_convol_mul_last; flia.
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3712,47 +3779,8 @@ destruct Hqr as (Hqr, Hrb).
 (**)
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   unfold last_lap_neq_0.
-Search (last (_ * _)%lap).
-Theorem last_lap_mul : ∀ la lb,
-  last (la * lb)%lap 0%F = (last la 0%F * last lb 0%F)%F.
-Proof.
-intros.
-unfold lap_mul.
-destruct la as [| a] using rev_ind. {
-  now symmetry; apply rngl_mul_0_l.
-}
-clear IHla.
-destruct lb as [| b] using rev_ind. {
-  cbn.
-  rewrite rngl_mul_0_r; [ | easy ].
-  now destruct (la ++ [a]).
-}
-clear IHlb.
-move b before a.
-remember (la ++ [a]) as lc eqn:Hlc.
-symmetry in Hlc.
-destruct lc as [| c]; [ now apply app_eq_nil in Hlc | ].
-remember (lb ++ [b]) as ld eqn:Hld.
-symmetry in Hld.
-destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
-rewrite <- Hlc, <- Hld.
-clear c d lc ld Hlc Hld.
-do 2 rewrite last_last.
-do 2 rewrite app_length.
-cbn.
-Search (lap_convol_mul (_ ++ _)).
-Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
-  last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%F.
-Proof.
-Print lap_convol_mul.
-... ...
-apply last_lap_convol_mul_last.
-...
-destruct la as [| a]; [ now symmetry; apply rngl_mul_0_l | ].
-destruct lb as [| b]; [ now symmetry; apply rngl_mul_0_r | ].
-cbn.
-... ...
-rewrite last_lap_mul.
+Check last_lap_mul.
+  rewrite last_lap_mul.
 ...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
 specialize (H1 b a q).
