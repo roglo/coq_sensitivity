@@ -20,12 +20,12 @@ Require Import PermutationFun SortingFun.
 *)
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
-Definition last_lap_neq_0 T {ro : ring_like_op T} (lap : list T) :=
-  (is_empty_list lap || (last lap 0 ≠? 0)%F)%bool = true.
+Definition has_polyn_prop T {ro : ring_like_op T} (lap : list T) :=
+  (is_empty_list lap || (last lap 0 ≠? 0)%F)%bool.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
-    lap_prop : last_lap_neq_0 lap }.
+    lap_prop : has_polyn_prop lap = true }.
 
 Arguments polyn T {ro}.
 Arguments mk_polyn {T ro} lap%list.
@@ -83,9 +83,9 @@ split; intros Hpq. {
 }
 Qed.
 
-Theorem polyn_one_prop : last_lap_neq_0 [1%F].
+Theorem polyn_one_prop : has_polyn_prop [1%F] = true.
 Proof.
-unfold last_lap_neq_0; cbn.
+unfold has_polyn_prop; cbn.
 apply Bool.negb_true_iff.
 apply (rngl_eqb_neq Heb).
 now apply rngl_1_neq_0.
@@ -157,10 +157,10 @@ Qed.
 
 Definition lap_norm la := rev (strip_0s (rev la)).
 
-Theorem polyn_norm_prop : ∀ la, last_lap_neq_0 (lap_norm la).
+Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
 Proof.
 intros.
-unfold last_lap_neq_0, lap_norm.
+unfold has_polyn_prop, lap_norm.
 induction la as [| a]; [ easy | cbn ].
 rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
@@ -561,7 +561,7 @@ Theorem lap_rem_length_lt :
   rngl_mul_is_comm = true →
   ∀ la lb lq lr : list T,
   lb ≠ []
-  → last_lap_neq_0 lb
+  → has_polyn_prop lb = true
   → lap_quot_rem la lb = (lq, lr)
   → length lr < length lb.
 Proof.
@@ -588,7 +588,7 @@ move H before Hbz; clear Hbz.
 rename H into Hbz.
 assert (H : hd 0%F rlb ≠ 0%F). {
   subst rlb.
-  unfold last_lap_neq_0 in Hbn.
+  unfold has_polyn_prop in Hbn.
   apply Bool.orb_true_iff in Hbn.
   destruct Hbn as [Hbn| Hbn]. {
     unfold is_empty_list in Hbn.
@@ -656,13 +656,11 @@ Qed.
 Section b.
 *)
 
-...
-
 Theorem hd_quot : ∀ la lb lq lr,
-  hd 1%F la ≠ 0%F
-  → hd 1%F lb ≠ 0%F
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
   → rlap_quot_rem la lb = (lq, lr)
-  → hd 1%F lq ≠ 0%F.
+  → has_polyn_prop lq = true.
 Proof.
 intros * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
@@ -675,8 +673,7 @@ cbn in Hab.
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
 destruct o as [(cq, dq)| ]. 2: {
-  injection Hab; clear Hab; intros; subst lq lr.
-  now apply rngl_1_neq_0.
+  now injection Hab; clear Hab; intros; subst lq lr.
 }
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
@@ -692,10 +689,17 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-rewrite Hlq; cbn.
+rewrite Hlq.
+(**)
+unfold has_polyn_prop.
+apply Bool.orb_true_iff; right.
+cbn.
+...
+cbn.
 rewrite Hcq.
 unfold rngl_div.
 rewrite Hiv.
+...
 intros Hq.
 apply rngl_integral in Hq; [ | easy | ]. 2: {
   apply Bool.orb_true_iff; right.
@@ -706,6 +710,8 @@ destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
+
+...
 
 Theorem hd_rem : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
