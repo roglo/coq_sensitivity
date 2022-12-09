@@ -3717,9 +3717,69 @@ rewrite Hqr in H1.
 rewrite lap_add_comm in H1.
 rewrite (lap_add_sub Hop) in H1.
 rewrite <- lap_norm_app_0_r in H1; [ | apply nth_repeat ].
+(*
 specialize (lap_norm_length_le r) as Hr.
 specialize (lap_norm_length_le (b * (a - q))%lap) as Hbaq.
 rewrite H1 in Hbaq.
+*)
+destruct b as [| b lb]; [ easy | ].
+Search (lap_norm (_ * _)).
+Theorem lap_norm_mul_length : ∀ la lb,
+  length (lap_norm (la * lb)) =
+    match lap_norm la with
+    | [] => 0
+    | _ =>
+        match lap_norm lb with
+        | [] => 0
+        | _ => length (lap_norm la) + length (lap_norm lb) - 1
+        end
+    end.
+Proof.
+intros.
+remember (lap_norm la) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H.
+  clear Hlc.
+  destruct la as [| a]; [ easy | cbn ].
+  rewrite fold_lap_norm.
+  destruct lb as [| b]; [ easy | ].
+  now rewrite lap_convol_mul_0_l.
+}
+remember (lap_norm lb) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]. {
+  specialize (proj2 (all_0_lap_norm_nil _) Hld) as H.
+  clear Hld.
+  destruct lb as [| b]; [ now rewrite lap_mul_0_r | ].
+  destruct la as [| a]; [ easy | cbn ].
+  rewrite fold_lap_norm.
+  now rewrite lap_convol_mul_0_r.
+}
+cbn; rewrite Nat.sub_0_r.
+rewrite <- lap_mul_norm_idemp_l, <- lap_mul_norm_idemp_r.
+Search (length (lap_norm _)).
+...
+rewrite Hlc, Hld.
+cbn.
+rewrite fold_lap_norm.
+Search (lap_norm (lap_convol_mul _  _ _ _)).
+...
+unfold lap_mul in H1.
+remember (a - q)%lap as aq eqn:Haq; symmetry in Haq.
+destruct aq as [| aq laq]. {
+  apply eq_lap_add_0 in Haq.
+  destruct Haq as (Ha, Hq); subst a.
+  apply (f_equal lap_opp) in Hq.
+  now rewrite (lap_opp_involutive Hop) in Hq; subst q.
+}
+cbn in H1.
+rewrite fold_lap_norm in H1.
+rewrite Nat.sub_0_r in H1.
+...
+Search (lap_norm (lap_convol_mul _ _ _ _)).
+...
+lap_norm_convol_mul_norm_r:
+  ∀ (la lb : list T) (i len : nat),
+    lap_norm (lap_convol_mul la (lap_norm lb) i len) = lap_norm (lap_convol_mul la lb i len)
 ...
 Search (_ + _ - _)%lap.
 Search (lap_norm (_ - _)).
@@ -3761,42 +3821,6 @@ destruct (Nat.eq_dec (length (lap a - lap pq)%lap) 0) as [Hz| Hz]. {
   rewrite lap_add_norm_idemp_r in Hll.
   rewrite lap_mul_norm_idemp_l in Hll.
 ...
-Theorem lap_norm_mul_length : ∀ la lb,
-  length (lap_norm (la * lb)) =
-    match lap_norm la with
-    | [] => 0
-    | _ =>
-        match lap_norm lb with
-        | [] => 0
-        | _ => length (lap_norm la) + length (lap_norm lb) - 1
-        end
-    end.
-Proof.
-intros.
-remember (lap_norm la) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H.
-  clear Hlc.
-  destruct la as [| a]; [ easy | cbn ].
-  rewrite fold_lap_norm.
-  destruct lb as [| b]; [ easy | ].
-  now rewrite lap_convol_mul_0_l.
-}
-remember (lap_norm lb) as ld eqn:Hld; symmetry in Hld.
-destruct ld as [| d]. {
-  specialize (proj2 (all_0_lap_norm_nil _) Hld) as H.
-  clear Hld.
-  destruct lb as [| b]; [ now rewrite lap_mul_0_r | ].
-  destruct la as [| a]; [ easy | cbn ].
-  rewrite fold_lap_norm.
-  now rewrite lap_convol_mul_0_r.
-}
-cbn; rewrite Nat.sub_0_r.
-rewrite <- lap_mul_norm_idemp_l, <- lap_mul_norm_idemp_r.
-rewrite Hlc, Hld.
-cbn.
-rewrite fold_lap_norm.
-Search (lap_norm (lap_convol_mul _  _ _ _)).
 ...
 rewrite lap_norm_mul_length in Hll.
 remember (lap_norm (lap a - lap pq)) as laq eqn:Hlaq.
