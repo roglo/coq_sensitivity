@@ -657,10 +657,10 @@ Section b.
 *)
 
 Theorem hd_quot : ∀ la lb lq lr,
-  has_polyn_prop la = true
-  → has_polyn_prop lb = true
+  hd 1%F la ≠ 0%F
+  → hd 1%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
-  → has_polyn_prop lq = true.
+  → hd 1%F lq ≠ 0%F.
 Proof.
 intros * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
@@ -673,7 +673,8 @@ cbn in Hab.
 remember (rlap_quot_rem_step la lb) as orlr eqn:Hor; symmetry in Hor.
 destruct orlr as (o, rlr).
 destruct o as [(cq, dq)| ]. 2: {
-  now injection Hab; clear Hab; intros; subst lq lr.
+  injection Hab; clear Hab; intros; subst lq lr.
+  now apply rngl_1_neq_0.
 }
 destruct lb as [| b]; [ easy | ].
 destruct la as [| a]; [ easy | cbn ].
@@ -689,17 +690,10 @@ symmetry in Hrb.
 destruct rb as (lq', lr').
 symmetry in Hab.
 injection Hab; clear Hab; intros H1 Hlq; subst lr'.
-rewrite Hlq.
-(**)
-unfold has_polyn_prop.
-apply Bool.orb_true_iff; right.
-cbn.
-...
-cbn.
+rewrite Hlq; cbn.
 rewrite Hcq.
 unfold rngl_div.
 rewrite Hiv.
-...
 intros Hq.
 apply rngl_integral in Hq; [ | easy | ]. 2: {
   apply Bool.orb_true_iff; right.
@@ -710,8 +704,6 @@ destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
-
-...
 
 Theorem hd_rem : ∀ la lb lq lr,
   hd 1%F la ≠ 0%F
@@ -769,6 +761,8 @@ rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn ].
 now apply rngl_eqb_neq in Hxz.
 Qed.
+
+...
 
 Theorem quot_is_norm : ∀ la lb,
   last_lap_neq_0 la
