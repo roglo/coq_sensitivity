@@ -3765,37 +3765,32 @@ Theorem polyn_mul_div :
   → (a * b / b)%pol = a.
 Proof.
 intros Hco Hop * Hbz.
-destruct a as (a, pa).
-destruct b as (b, pb).
-move b before a.
-assert (H : b ≠ 0%lap). {
+destruct a as (la, pa).
+destruct b as (lb, pb).
+move lb before la.
+assert (H : lb ≠ 0%lap). {
   intros H; apply Hbz.
   now apply eq_polyn_eq.
 }
 clear Hbz; rename H into Hbz.
 apply eq_polyn_eq; cbn.
-remember (lap_quot_rem (lap_norm (a * b)) b) as qr eqn:Hqr.
+remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (q, r); cbn.
 apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
-...
-  unfold last_lap_neq_0 in pb.
-  destruct b as [| b lb] using rev_ind; [ easy | ].
-  now rewrite last_last in pb |-*.
+  destruct lb as [| b] using rev_ind; [ easy | ].
+  unfold has_polyn_prop in pb.
+  rewrite last_last in pb |-*.
+  now destruct lb.
 }
 destruct Hqr as (Hqr, Hrb).
 (**)
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
-  unfold last_lap_neq_0.
-  remember (a * b)%lap as ab eqn:Hab; symmetry in Hab.
-  destruct ab. {
-    cbn.
-    apply Bool.negb_true_iff.
-    apply (rngl_eqb_neq Heb).
-    apply (rngl_1_neq_0 H10).
-  }
+  unfold has_polyn_prop.
+  remember (la * lb)%lap as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ easy | ].
+  cbn - [ last ].
   rewrite <- Hab.
-Check last_lap_mul.
 ...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
 specialize (H1 b a q).
