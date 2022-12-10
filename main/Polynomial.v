@@ -3641,7 +3641,7 @@ clear Hbz; rename H into Hbz.
 apply eq_polyn_eq; cbn.
 remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
 symmetry in Hqr.
-destruct qr as (q, r); cbn.
+destruct qr as (lq, lr); cbn.
 apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
   destruct lb as [| b] using rev_ind; [ easy | ].
   unfold has_polyn_prop in pb.
@@ -3680,8 +3680,43 @@ rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   now rewrite (rngl_eqb_refl Heb) in pb.
 }
 symmetry in Hqr.
-... ...
 apply (lap_add_move_l Hop) in Hqr.
+rewrite (lap_mul_comm Hco la) in Hqr.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+generalize Hqr; intros H.
+apply (f_equal length) in H.
+rewrite app_length, repeat_length in H.
+rewrite Nat.add_comm in H.
+do 2 rewrite lap_mul_length in H.
+destruct lb as [| b]; [ easy | clear Hbz ].
+destruct lq as [| q]. {
+  cbn in H.
+  rewrite lap_sub_0_r in H.
+  destruct la as [| a]; [ easy | ].
+  rewrite Nat.sub_0_r in H.
+  rewrite app_length in H; cbn in Hrb, H.
+  flia Hrb H.
+}
+cbn in H, Hrb.
+rewrite Nat.sub_0_r in H.
+rewrite app_length in H; cbn in H.
+rewrite Nat.sub_add in H; [ | flia Hrb ].
+remember (la - (q :: lq))%lap as laq eqn:Hlaq; symmetry in Hlaq.
+destruct laq as [| aq]; [ now rewrite Nat.add_succ_r in H | ].
+rewrite Nat.sub_0_r in H.
+rewrite app_length in H; cbn in H.
+apply Nat.add_cancel_l in H.
+apply Nat.succ_inj in H.
+generalize Hlaq; intros H1.
+apply (f_equal length) in H1.
+rewrite lap_sub_length in H1; cbn in H1.
+rewrite <- H in H1.
+apply Nat.max_r_iff in H1.
+Search (length _ ≤ length _).
+Search rlap_quot_rem.
+...
+rewrite (lap_mul_length _ (la - q)%lap) in H.
+destruct lb as [| b]; [ easy | clear Hbz ].
 ...
 }
 apply Nat.nle_gt in Hll.
