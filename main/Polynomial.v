@@ -3629,10 +3629,11 @@ Theorem rlap_quot_rem_prop_if :
   hd 0%F rlb ≠ 0%F
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap
+  → length rlr < length rlb
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
-intros Hco Hop * Hbz Hit Hab.
-revert rla rlq rlr Hit Hab.
+intros Hco Hop * Hbz Hit Hab Hrb.
+revert rla rlq rlr Hit Hab Hrb.
 induction it; intros; [ easy | cbn ].
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r).
