@@ -3622,6 +3622,28 @@ symmetry; rewrite lap_add_comm.
 now rewrite (lap_add_sub Hop).
 Qed.
 
+Theorem rlap_quot_rem_prop_if :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  ∀ (it : nat) (rla rlb rlq rlr : list T),
+  hd 0%F rlb ≠ 0%F
+  → S (length rla) ≤ it
+  → rev rla = (rev rlb * rev rlq + rev rlr)%lap
+  → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
+Proof.
+intros Hco Hop * Hbz Hit Hab.
+revert rla rlq rlr Hit Hab.
+induction it; intros; [ easy | cbn ].
+remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (q, r).
+destruct q as [(cq, dq)| ]; cycle 1. {
+  apply rlap_quot_rem_step_None in Hqr.
+  destruct Hqr as [(H1, H2)| Hqr]; [ now subst rlb | ].
+  destruct Hqr as [(H1, H2)| Hqr]. {
+    subst rla r.
+    cbn in Hab.
+...
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3630,6 +3652,8 @@ Theorem polyn_mul_div :
   → (a * b / b)%pol = a.
 Proof.
 intros Hco Hop * Hbz.
+Check rlap_quot_rem_prop.
+...
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
