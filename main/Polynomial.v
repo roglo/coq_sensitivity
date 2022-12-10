@@ -3424,19 +3424,9 @@ move lb before la; move lq before lb; move lr before lq.
 specialize (lap_quot_rem_prop Hic Hop la lb) as H1.
 specialize (H1 lq lr).
 assert (H : (last lb 0 ≠? 0)%F = true). {
-  apply Bool.negb_true_iff.
-  apply (rngl_eqb_neq Heb).
-  intros H; apply Hbz; clear Hbz Hab.
-  apply eq_polyn_eq; cbn.
-...
-  apply -> Bool.negb_true_iff in Hpb.
-  apply (rngl_eqb_neq Heb) in Hpb.
-  rewrite <- (rev_involutive lb) in Hpb.
-  rewrite <- (rev_involutive lb) in H.
-  rewrite <- (rev_involutive lb).
-  destruct (rev lb) as [| b]; [ easy | ].
-  cbn in Hpb, H.
-  now rewrite last_last in Hpb, H.
+  destruct lb; [ | easy ].
+  exfalso; apply Hbz.
+  now apply eq_polyn_eq.
 }
 specialize (H1 H); clear H.
 assert (H : lap_quot_rem la lb = (lq, lr)). {
@@ -3788,6 +3778,7 @@ remember (lap_quot_rem (lap_norm (a * b)) b) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (q, r); cbn.
 apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
+...
   unfold last_lap_neq_0 in pb.
   destruct b as [| b lb] using rev_ind; [ easy | ].
   now rewrite last_last in pb |-*.
