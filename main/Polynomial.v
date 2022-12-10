@@ -3784,16 +3784,60 @@ apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
   now destruct lb.
 }
 destruct Hqr as (Hqr, Hrb).
-(**)
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   unfold has_polyn_prop.
   remember (la * lb)%lap as ab eqn:Hab; symmetry in Hab.
   destruct ab; [ easy | ].
   cbn - [ last ].
   rewrite <- Hab.
+  rewrite last_lap_mul.
+  apply (rngl_neqb_neq Heb).
+  intros H1.
+  apply rngl_integral in H1; [ | easy | ]. 2: {
+    rewrite Heb, Bool.andb_true_r.
+    remember rngl_has_inv_or_quot as iq eqn:Hiq.
+    symmetry in Hiq.
+    destruct iq; [ apply Bool.orb_true_r | ].
+    unfold rngl_has_inv_or_quot in Hiq.
+    unfold rngl_has_inv in Hiv.
+    now destruct rngl_opt_inv_or_quot.
+  }
+  destruct H1 as [H1| H1]. {
+    unfold has_polyn_prop in pa.
+    rewrite H1, (rngl_eqb_refl Heb) in pa.
+    rewrite Bool.orb_false_r in pa.
+    now destruct la.
+  }
+  unfold has_polyn_prop in pb.
+  destruct lb as [| b]; [ easy | ].
+  cbn - [ last ] in pb.
+  rewrite H1 in pb.
+  now rewrite (rngl_eqb_refl Heb) in pb.
+}
+symmetry in Hqr.
+Theorem lap_add_move_l :
+  @rngl_has_opp T _ = true →
+  ∀ la lb lc : list T,
+  length la ≤ length lb
+  → (la + lb)%lap = lc ↔ lb = (lc - la)%lap.
+Proof.
+intros Hop * Hlab.
+split; intros Hab. {
+  subst lc.
+  symmetry; rewrite lap_add_comm.
+  rewrite (lap_add_sub Hop).
+  rewrite (proj2 (Nat.sub_0_le _ _) Hlab).
+  apply app_nil_r.
+} {
+  subst lb.
+(* ça va pas du tout, l'hypothèse length la ≤ length lb ne marche
+   pas ci-dessous *)
+... ...
+apply lap_add_move_l in Hqr.
+Search (_ - _)%lap.
 ...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
-specialize (H1 b a q).
+specialize (H1 lb la q).
 rewrite <- lap_sub_norm_idemp_l in H1.
 rewrite (lap_mul_comm Hco b a) in H1.
 rewrite Hqr in H1.
