@@ -3643,6 +3643,14 @@ destruct q as [(cq, dq)| ]; cycle 1. {
   destruct Hqr as [(H1, H2)| Hqr]. {
     subst rla r.
     cbn in Hab.
+    destruct rlq as [| q]. {
+      cbn in Hab.
+      rewrite lap_mul_0_r, lap_add_0_l in Hab.
+      apply (f_equal (λ l, rev l)) in Hab.
+      now rewrite rev_involutive in Hab; cbn in Hab; subst rlr.
+    }
+    exfalso.
+    cbn in Hab.
 ...
 
 Theorem polyn_mul_div :
