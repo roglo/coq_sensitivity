@@ -3683,35 +3683,42 @@ symmetry in Hqr.
 apply (lap_add_move_l Hop) in Hqr.
 rewrite (lap_mul_comm Hco la) in Hqr.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
-generalize Hqr; intros H.
-apply (f_equal length) in H.
-rewrite app_length, repeat_length in H.
-rewrite Nat.add_comm in H.
-do 2 rewrite lap_mul_length in H.
+generalize Hqr; intros H1.
+apply (f_equal length) in H1.
+rewrite app_length, repeat_length in H1.
+rewrite Nat.add_comm in H1.
+do 2 rewrite lap_mul_length in H1.
 destruct lb as [| b]; [ easy | clear Hbz ].
 destruct lq as [| q]. {
-  cbn in H.
-  rewrite lap_sub_0_r in H.
+  cbn in H1.
+  rewrite lap_sub_0_r in H1.
   destruct la as [| a]; [ easy | ].
-  rewrite Nat.sub_0_r in H.
-  rewrite app_length in H; cbn in Hrb, H.
-  flia Hrb H.
+  rewrite Nat.sub_0_r in H1.
+  rewrite app_length in H1; cbn in Hrb, H1.
+  flia Hrb H1.
 }
-cbn in H, Hrb.
-rewrite Nat.sub_0_r in H.
-rewrite app_length in H; cbn in H.
-rewrite Nat.sub_add in H; [ | flia Hrb ].
+cbn in H1, Hrb.
+rewrite Nat.sub_0_r in H1.
+rewrite app_length in H1; cbn in H1.
+rewrite Nat.sub_add in H1; [ | flia Hrb ].
 remember (la - (q :: lq))%lap as laq eqn:Hlaq; symmetry in Hlaq.
-destruct laq as [| aq]; [ now rewrite Nat.add_succ_r in H | ].
-rewrite Nat.sub_0_r in H.
-rewrite app_length in H; cbn in H.
-apply Nat.add_cancel_l in H.
-apply Nat.succ_inj in H.
-generalize Hlaq; intros H1.
-apply (f_equal length) in H1.
-rewrite lap_sub_length in H1; cbn in H1.
-rewrite <- H in H1.
-apply Nat.max_r_iff in H1.
+destruct laq as [| aq]; [ now rewrite Nat.add_succ_r in H1 | ].
+rewrite Nat.sub_0_r in H1.
+rewrite app_length in H1; cbn in H1.
+apply Nat.add_cancel_l in H1.
+apply Nat.succ_inj in H1.
+generalize Hlaq; intros H2.
+apply (f_equal length) in H2.
+rewrite lap_sub_length in H2; cbn in H2.
+rewrite <- H1 in H2.
+apply Nat.max_r_iff in H2.
+rewrite lap_mul_length in Hqr.
+rewrite app_length in Hqr; cbn - [ lap_mul ] in Hqr.
+rewrite Nat.sub_0_r in Hqr.
+enough (H : length lq ≤ length la).
+assert (H' : length la = S (length lq) ∨ length la = length lq) by flia H2 H.
+...
+cbn - [ lap_mul ] in Hqr.
 Search (length _ ≤ length _).
 Search rlap_quot_rem.
 ...
