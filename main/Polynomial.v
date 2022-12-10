@@ -3679,10 +3679,12 @@ rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   rewrite H1 in pb.
   now rewrite (rngl_eqb_refl Heb) in pb.
 }
+...
 symmetry in Hqr.
 apply (lap_add_move_l Hop) in Hqr.
 rewrite (lap_mul_comm Hco la) in Hqr.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+...
 generalize Hqr; intros Hqr1.
 apply (f_equal length) in Hqr1.
 rewrite app_length, repeat_length in Hqr1.
