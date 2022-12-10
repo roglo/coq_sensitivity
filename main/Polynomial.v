@@ -3757,6 +3757,18 @@ cbn.
 apply last_lap_convol_mul_last; flia.
 Qed.
 
+Theorem lap_add_move_l :
+  @rngl_has_opp T _ = true →
+  ∀ la lb lc : list T,
+  (la + lb)%lap = lc
+  → lb ++ repeat 0%F (length la - length lb) = (lc - la)%lap.
+Proof.
+intros Hop * Hab.
+subst lc.
+symmetry; rewrite lap_add_comm.
+now rewrite (lap_add_sub Hop).
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   @rngl_has_opp T _ = true →
@@ -3815,27 +3827,8 @@ rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   now rewrite (rngl_eqb_refl Heb) in pb.
 }
 symmetry in Hqr.
-...
-Theorem lap_add_move_l :
-  @rngl_has_opp T _ = true →
-  ∀ la lb lc : list T,
-  length la ≤ length lb
-  → (la + lb)%lap = lc ↔ lb = (lc - la)%lap.
-Proof.
-intros Hop * Hlab.
-split; intros Hab. {
-  subst lc.
-  symmetry; rewrite lap_add_comm.
-  rewrite (lap_add_sub Hop).
-  rewrite (proj2 (Nat.sub_0_le _ _) Hlab).
-  apply app_nil_r.
-} {
-  subst lb.
-(* ça va pas du tout, l'hypothèse length la ≤ length lb ne marche
-   pas ci-dessous *)
-...
-destruct (le_dec (length (lb * q)%lap) (length r)) as [Hll| Hll]. {
-  apply lap_add_move_l in Hqr; [ | easy | easy ].
+... ...
+apply (lap_add_move_l Hop) in Hqr.
 ...
 }
 apply Nat.nle_gt in Hll.
