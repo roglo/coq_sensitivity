@@ -3815,6 +3815,7 @@ rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   now rewrite (rngl_eqb_refl Heb) in pb.
 }
 symmetry in Hqr.
+...
 Theorem lap_add_move_l :
   @rngl_has_opp T _ = true →
   ∀ la lb lc : list T,
@@ -3832,8 +3833,12 @@ split; intros Hab. {
   subst lb.
 (* ça va pas du tout, l'hypothèse length la ≤ length lb ne marche
    pas ci-dessous *)
-... ...
-apply lap_add_move_l in Hqr.
+...
+destruct (le_dec (length (lb * q)%lap) (length r)) as [Hll| Hll]. {
+  apply lap_add_move_l in Hqr; [ | easy | easy ].
+...
+}
+apply Nat.nle_gt in Hll.
 Search (_ - _)%lap.
 ...
 specialize (lap_norm_mul_sub_distr_l Hop) as H1.
