@@ -3626,31 +3626,23 @@ Theorem rlap_quot_rem_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (it : nat) (rla rlb rlq rlr : list T),
-  hd 0%F rlb ≠ 0%F
+  hd 0%F rla ≠ 0%F
+  → hd 0%F rlb ≠ 0%F
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap
   → length rlr < length rlb
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
-intros Hco Hop * Hbz Hit Hab Hrb.
-revert rla rlq rlr Hit Hab Hrb.
+intros Hco Hop * Haz Hbz Hit Hab Hlrb.
+revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r).
 destruct q as [(cq, dq)| ]; cycle 1. {
   apply rlap_quot_rem_step_None in Hqr.
   destruct Hqr as [(H1, H2)| Hqr]; [ now subst rlb | ].
-  destruct Hqr as [(H1, H2)| Hqr]. {
-    subst rla r.
-    cbn in Hab.
-    destruct rlq as [| q]. {
-      cbn in Hab.
-      rewrite lap_mul_0_r, lap_add_0_l in Hab.
-      apply (f_equal (λ l, rev l)) in Hab.
-      now rewrite rev_involutive in Hab; cbn in Hab; subst rlr.
-    }
-    exfalso.
-    cbn in Hab.
+  destruct Hqr as [(H1, H2)| Hqr]; [ now subst rla | ].
+  destruct Hqr as (Hlab, H1); subst r.
 ...
 
 Theorem polyn_mul_div :
