@@ -2950,53 +2950,30 @@ unfold lap_opp.
 now rewrite map_rev.
 Qed.
 
-Theorem lap_add_repeat_0_l : ∀ la,
-  (repeat 0%F (length la) + la)%lap = la.
+Theorem lap_add_repeat_0_l : ∀ la len,
+  len ≤ length la
+  → (repeat 0%F len + la = la)%lap.
 Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-rewrite rngl_add_0_l; f_equal.
-apply IHla.
-Qed.
-
-Theorem rev_lap_add : ∀ la lb,
-  rev (la + lb)%lap =
-    ((rev la ++ repeat 0%F (length lb - length la)) +
-     (rev lb ++ repeat 0%F (length la - length lb)))%lap.
-Proof.
-intros.
-revert lb.
+intros * Hlen.
+revert len Hlen.
 induction la as [| a]; intros. {
-  cbn.
-  rewrite Nat.sub_0_r, app_nil_r.
-  rewrite <- rev_length.
-  symmetry; apply lap_add_repeat_0_l.
+  now apply Nat.le_0_r in Hlen; subst len.
 }
 cbn.
-destruct lb as [| b]. {
-  cbn.
-  rewrite app_nil_r; symmetry.
-  rewrite lap_add_comm.
-  rewrite <- lap_add_repeat_0_l.
-  now rewrite app_length, rev_length, Nat.add_comm.
-}
-cbn.
-rewrite IHla.
-(* pfff... fatigue *)
-...
-cbn in Hab; apply Nat.succ_le_mono in Hab.
-rewrite IHla; [ | easy ].
-
-
-rewrite (proj2 (Nat.sub_0_le _ _)); [ cbn | easy ].
-...
-rewrite IHla; [ | easy ].
-rewrite <- app_assoc; f_equal.
-...
-rewrite lap_add_app_app; [ | ].
-now do 2 rewrite rev_length.
+destruct len; [ easy | cbn ].
+cbn in Hlen; apply Nat.succ_le_mono in Hlen.
+rewrite rngl_add_0_l; f_equal.
+now apply IHla.
 Qed.
-...
+
+Theorem lap_add_repeat_0_r : ∀ la len,
+  len ≤ length la
+  → (la + repeat 0%F len = la)%lap.
+Proof.
+intros * Hlen.
+rewrite lap_add_comm.
+now apply lap_add_repeat_0_l.
+Qed.
 
 Theorem rev_lap_add : ∀ la lb,
   length la = length lb
@@ -3023,6 +3000,50 @@ rewrite rev_lap_add; [ | now rewrite lap_opp_length ].
 now rewrite rev_lap_opp.
 Qed.
 
+Theorem lap_add_norm : ∀ la lb,
+  (la + lb)%lap =
+    ((la ++ repeat 0%F (length lb - length la)) +
+     (lb ++ repeat 0%F (length la - length lb)))%lap.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros. {
+  cbn; rewrite Nat.sub_0_r, app_nil_r.
+  now symmetry; apply lap_add_repeat_0_l.
+}
+cbn.
+destruct lb as [| b]. {
+  cbn; rewrite app_nil_r, rngl_add_0_r; f_equal.
+  now symmetry; apply lap_add_repeat_0_r.
+}
+cbn; f_equal.
+apply IHla.
+Qed.
+
+Theorem rev_lap_add_norm : ∀ la lb,
+  rev (la + lb)%lap =
+    ((repeat 0%F (length lb - length la) ++ rev la) +
+     (repeat 0%F (length la - length lb) ++ rev lb))%lap.
+Proof.
+intros.
+rewrite <- (List_rev_repeat _ (length lb - _)).
+rewrite <- (List_rev_repeat _ (length la - _)).
+do 2 rewrite <- rev_app_distr.
+rewrite lap_add_norm.
+apply rev_lap_add.
+do 2 rewrite app_length, repeat_length.
+destruct (le_dec (length lb) (length la)) as [Hab| Hab]. {
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite Nat.add_0_r, Nat.add_comm; symmetry.
+  now apply Nat.sub_add.
+} {
+  apply Nat.nle_gt, Nat.lt_le_incl in Hab; symmetry.
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+  rewrite Nat.add_0_r, Nat.add_comm; symmetry.
+  now apply Nat.sub_add.
+}
+Qed.
+
 Theorem lap_sub_add :
   rngl_has_opp = true →
   ∀ la lb,
@@ -3043,30 +3064,6 @@ rewrite rngl_add_0_r; f_equal.
 now apply IHla.
 Qed.
 
-Theorem lap_add_repeat_0_l : ∀ la,
-  (repeat 0%F (length la) + la = la)%lap.
-Proof.
-intros.
-induction la as [| a]; [ easy | cbn ].
-now rewrite rngl_add_0_l; f_equal.
-Qed.
-
-Theorem lap_add_repeat_0_r : ∀ la len,
-  len ≤ length la
-  → (la + repeat 0%F len = la)%lap.
-Proof.
-intros * Hlen.
-revert len Hlen.
-induction la as [| a]; intros. {
-  now apply Nat.le_0_r in Hlen; subst len.
-}
-cbn.
-destruct len; [ easy | cbn ].
-cbn in Hlen; apply Nat.succ_le_mono in Hlen.
-rewrite rngl_add_0_r; f_equal.
-now apply IHla.
-Qed.
-
 Theorem gen_lap_add : ∀ la lb,
   (la + lb =
    (la ++ repeat 0%F (length lb - length la)) +
@@ -3076,7 +3073,7 @@ intros.
 revert lb.
 induction la as [| a]; intros; cbn. {
   rewrite Nat.sub_0_r, app_nil_r.
-  symmetry; apply lap_add_repeat_0_l.
+  now symmetry; apply lap_add_repeat_0_l.
 }
 destruct lb as [| b]; cbn. {
   rewrite rngl_add_0_r, app_nil_r; f_equal.
@@ -3749,7 +3746,14 @@ rewrite <- lap_mul_add_distr_l in Hqr1.
 move Hab before Hqr1.
 rewrite <- (rev_involutive (_ + rev q')%lap) in Hqr1.
 remember (rev ((repeat 0%F dq ++ [cq]) + rev q')%lap) as rlq' eqn:Hrlq'.
-Check rev_lap_add.
+rewrite rev_lap_add_norm in Hrlq'.
+rewrite rev_length, app_length, repeat_length in Hrlq'.
+cbn in Hrlq'.
+rewrite rev_app_distr, List_rev_repeat, rev_involutive in Hrlq'.
+cbn in Hrlq'.
+destruct (le_dec (length q') (dq + 1)) as [Hqq| Hqq]. {
+  rewrite (proj2 (Nat.sub_0_le _ _)) in Hrlq'; [ | easy ].
+  rewrite app_nil_l in Hrlq'.
 ...
 enough (Hqq : dq + 1 = length q').
 (* ouais, chuis pas sûr *)
