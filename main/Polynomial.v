@@ -3693,6 +3693,19 @@ rewrite Hqr'' in Hqr1.
 rewrite lap_add_assoc in Hqr1.
 rewrite <- lap_mul_add_distr_l in Hqr1.
 move Hab before Hqr1.
+rewrite <- (rev_involutive (_ + rev q')%lap) in Hqr1.
+remember (rev ((repeat 0%F dq ++ [cq]) + rev q')%lap) as rlq' eqn:Hrlq'.
+rewrite rev_lap_add in Hrlq'.
+(* ; cycle 1. {
+  rewrite app_length, repeat_length, rev_length; cbn.
+*)
+rewrite rev_involutive in Hrlq'.
+rewrite rev_app_distr in Hrlq'.
+rewrite List_rev_repeat in Hrlq'.
+cbn - [ lap_add ] in Hrlq'.
+(* mouais, bof, chais pas *)
+...
+rewrite lap_add_app_l in Hqr1; [ | rewrite rev_length, repeat_length ].
 ...
 generalize Hqr1; intros Hqr2.
 apply IHit in Hqr2; [ | easy | | ]; cycle 1.
