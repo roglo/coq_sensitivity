@@ -3691,8 +3691,10 @@ rewrite List_rev_repeat in Hqr1.
 generalize Hqr'; intros Hqr''.
 apply rlap_quot_rem_prop in Hqr''; [ | easy | easy | easy | ]; cycle 1. {
   transitivity (length rla); [ | easy ].
-Search (length _ < length _).
-...
+  apply Nat.le_succ_l.
+  eapply rlap_quot_rem_step_length_lt.
+  apply Hqr.
+}
 rewrite Hqr'' in Hqr1.
 rewrite lap_add_assoc in Hqr1.
 rewrite <- lap_mul_add_distr_l in Hqr1.
