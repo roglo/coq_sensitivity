@@ -900,7 +900,9 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
 Canonical Structure polyn_ring_like_op.
 
 (* to search for ring-like polynomials operators in the context *)
+(*
 Existing Instance polyn_ring_like_op.
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -2678,7 +2680,9 @@ now apply lap_norm_add_opp_r.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
-  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
+  if @rngl_has_opp (polyn T) polyn_ring_like_op then
+    ∀ a : polyn T, (- a + a)%pol = 0%pol
+  else not_applicable.
 Proof.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 intros.
@@ -3065,7 +3069,7 @@ Theorem rlap_quot_rem_step_Some :
   ∀ rla rlb rlr cq dq,
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
-  → rev rla = (rev rlb * (repeat 0%F dq ++ [cq]) + rev rlr)%lap.
+  → rev rla = (rev rlb * rev (cq :: repeat 0%F dq) + rev rlr)%lap.
 Proof.
 intros Hco Hop * Hbz Hrl.
 specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
@@ -3079,7 +3083,7 @@ remember (a / b)%F as cq eqn:Hcq.
 remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
-cbn.
+cbn; rewrite List_rev_repeat.
 rewrite lap_repeat_0_app_is_mul_power_l; [ | easy ].
 rewrite lap_mul_assoc; cbn.
 rewrite <- lap_repeat_0_app_is_mul_power_r. 2: {
@@ -3323,8 +3327,8 @@ destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
   replace dq with (length rlq + (dq - length rlq)) at 1 by flia Hqq.
   rewrite repeat_app.
   rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
-  rewrite <- (rev_length rlq).
-  now rewrite lap_add_repeat_0_r.
+  rewrite List_rev_repeat.
+  rewrite lap_add_repeat_0_r; [ easy | now rewrite rev_length ].
 }
 exfalso; apply Hqq; clear Hqq.
 replace dq with (length rla - length rlb) by flia Hb.
@@ -3666,6 +3670,12 @@ destruct q as [(cq, dq)| ]; cycle 1. {
   do 2 rewrite rev_involutive in Hab.
   now rewrite Hab.
 }
+apply (rlap_quot_rem_step_Some Hco) in Hqr; [ | | easy ].
+Set Printing All.
+remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (q', r').
+move Hab before Hqr.
 ...
 
 Theorem polyn_mul_div :
