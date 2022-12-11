@@ -3650,6 +3650,7 @@ Proof.
 intros Hco Hop * Haz Hbz Hit Hab Hlrb.
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r).
 destruct q as [(cq, dq)| ]; cycle 1. {
@@ -3688,22 +3689,31 @@ destruct qr as (q', r').
 cbn in Hqr1.
 rewrite List_rev_repeat in Hqr1.
 generalize Hqr'; intros Hqr''.
-apply rlap_quot_rem_prop in Hqr''; [ | easy | easy | easy | ].
+apply rlap_quot_rem_prop in Hqr''; [ | easy | easy | easy | ]; cycle 1. {
+  transitivity (length rla); [ | easy ].
+Search (length _ < length _).
+...
 rewrite Hqr'' in Hqr1.
 rewrite lap_add_assoc in Hqr1.
 rewrite <- lap_mul_add_distr_l in Hqr1.
 move Hab before Hqr1.
 rewrite <- (rev_involutive (_ + rev q')%lap) in Hqr1.
 remember (rev ((repeat 0%F dq ++ [cq]) + rev q')%lap) as rlq' eqn:Hrlq'.
-rewrite rev_lap_add in Hrlq'.
-(* ; cycle 1. {
-  rewrite app_length, repeat_length, rev_length; cbn.
-*)
+...
+assert (Hqq : dq + 1 = length q'). {
+(* ouais, chuis pas sûr *)
+...
+rewrite rev_lap_add in Hrlq';
+  [ | now rewrite app_length, repeat_length, rev_length; cbn ].
 rewrite rev_involutive in Hrlq'.
 rewrite rev_app_distr in Hrlq'.
 rewrite List_rev_repeat in Hrlq'.
 cbn - [ lap_add ] in Hrlq'.
-(* mouais, bof, chais pas *)
+Search (_ :: repeat _ _).
+...
+generalize Hqr1; intros Hqr2.
+apply IHit in Hqr2.
+move Hab before Hqr1.
 ...
 rewrite lap_add_app_l in Hqr1; [ | rewrite rev_length, repeat_length ].
 ...
