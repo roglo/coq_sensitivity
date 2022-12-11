@@ -3740,6 +3740,7 @@ apply rlap_quot_rem_prop in Hqr''; [ | easy | easy | easy | ]; cycle 1. {
   eapply rlap_quot_rem_step_length_lt.
   apply Hqr.
 }
+...
 rewrite Hqr'' in Hqr1.
 rewrite lap_add_assoc in Hqr1.
 rewrite <- lap_mul_add_distr_l in Hqr1.
@@ -3751,9 +3752,19 @@ rewrite rev_length, app_length, repeat_length in Hrlq'.
 cbn in Hrlq'.
 rewrite rev_app_distr, List_rev_repeat, rev_involutive in Hrlq'.
 cbn in Hrlq'.
-destruct (le_dec (length q') (dq + 1)) as [Hqq| Hqq]. {
+assert (H : length q' ≤ dq + 1). {
+...
+destruct (le_dec (length q') (dq + 1)) as [Hqq| Hqq]; cycle 1. {
+  apply Nat.nle_gt in Hqq.
+  rewrite (proj2 (Nat.sub_0_le _ _)); [ cbn | flia Hqq ].
+  rewrite (proj2 (Nat.sub_0_le (dq + 1) _)) in Hrlq'; [ | flia Hqq ].
+  cbn in Hrlq'.
+...
   rewrite (proj2 (Nat.sub_0_le _ _)) in Hrlq'; [ | easy ].
   rewrite app_nil_l in Hrlq'.
+  rewrite Nat.add_1_r in Hrlq'.
+...
+  rewrite Nat.sub_succ_l in Hrlq'.
 ...
 enough (Hqq : dq + 1 = length q').
 (* ouais, chuis pas sûr *)
