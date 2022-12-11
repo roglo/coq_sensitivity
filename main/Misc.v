@@ -2799,6 +2799,8 @@ rewrite to_radix_inv_to_radix in Hij; [ | easy ].
 easy.
 Qed.
 
+Definition abs_diff u v := if v <? u then u - v else v - u.
+
 (* *)
 
 Definition bool_of_sumbool {A B : Prop} (P : sumbool A B) :=

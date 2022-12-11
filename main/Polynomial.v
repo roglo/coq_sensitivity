@@ -2950,6 +2950,54 @@ unfold lap_opp.
 now rewrite map_rev.
 Qed.
 
+Theorem lap_add_repeat_0_l : ∀ la,
+  (repeat 0%F (length la) + la)%lap = la.
+Proof.
+intros.
+induction la as [| a]; [ easy | cbn ].
+rewrite rngl_add_0_l; f_equal.
+apply IHla.
+Qed.
+
+Theorem rev_lap_add : ∀ la lb,
+  rev (la + lb)%lap =
+    ((rev la ++ repeat 0%F (length lb - length la)) +
+     (rev lb ++ repeat 0%F (length la - length lb)))%lap.
+Proof.
+intros.
+revert lb.
+induction la as [| a]; intros. {
+  cbn.
+  rewrite Nat.sub_0_r, app_nil_r.
+  rewrite <- rev_length.
+  symmetry; apply lap_add_repeat_0_l.
+}
+cbn.
+destruct lb as [| b]. {
+  cbn.
+  rewrite app_nil_r; symmetry.
+  rewrite lap_add_comm.
+  rewrite <- lap_add_repeat_0_l.
+  now rewrite app_length, rev_length, Nat.add_comm.
+}
+cbn.
+rewrite IHla.
+(* pfff... fatigue *)
+...
+cbn in Hab; apply Nat.succ_le_mono in Hab.
+rewrite IHla; [ | easy ].
+
+
+rewrite (proj2 (Nat.sub_0_le _ _)); [ cbn | easy ].
+...
+rewrite IHla; [ | easy ].
+rewrite <- app_assoc; f_equal.
+...
+rewrite lap_add_app_app; [ | ].
+now do 2 rewrite rev_length.
+Qed.
+...
+
 Theorem rev_lap_add : ∀ la lb,
   length la = length lb
   → (rev (la + lb) = rev la + rev lb)%lap.
@@ -3701,10 +3749,10 @@ rewrite <- lap_mul_add_distr_l in Hqr1.
 move Hab before Hqr1.
 rewrite <- (rev_involutive (_ + rev q')%lap) in Hqr1.
 remember (rev ((repeat 0%F dq ++ [cq]) + rev q')%lap) as rlq' eqn:Hrlq'.
+Check rev_lap_add.
 ...
-assert (Hqq : dq + 1 = length q'). {
+enough (Hqq : dq + 1 = length q').
 (* ouais, chuis pas sûr *)
-...
 rewrite rev_lap_add in Hrlq';
   [ | now rewrite app_length, repeat_length, rev_length; cbn ].
 rewrite rev_involutive in Hrlq'.

@@ -24,7 +24,6 @@ Definition sign_diff u v :=
   | Eq => 0%F
   | Gt => 1%F
   end.
-Definition abs_diff u v := if v <? u then u - v else v - u.
 
 Definition ε (p : list nat) :=
   let n := length p in
