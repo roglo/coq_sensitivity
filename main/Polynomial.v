@@ -3697,12 +3697,12 @@ revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
 apply Nat.succ_le_mono in Hit.
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr; symmetry in Hqr.
-destruct qr as (q, r).
+destruct qr as (q, rlr').
 destruct q as [(cq, dq)| ]; cycle 1. {
   apply rlap_quot_rem_step_None in Hqr.
   destruct Hqr as [(H1, H2)| Hqr]; [ now subst rlb | ].
   destruct Hqr as [(H1, H2)| Hqr]; [ now subst rla | ].
-  destruct Hqr as (Hlab, H1); subst r.
+  destruct Hqr as (Hlab, H1); subst rlr'.
   generalize Hab; intros Habq.
   apply (f_equal length) in Habq.
   rewrite rev_length, lap_add_length in Habq.
@@ -3726,6 +3726,13 @@ destruct q as [(cq, dq)| ]; cycle 1. {
   do 2 rewrite rev_involutive in Hab.
   now rewrite Hab.
 }
+(**)
+remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq'', rlr'').
+move rlr' before rlr.
+move rlq'' before rlr'; move rlr'' before rlq''.
+...
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
 remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
