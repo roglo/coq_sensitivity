@@ -3643,6 +3643,29 @@ destruct q as [(cq, dq)| ]; cycle 1. {
   destruct Hqr as [(H1, H2)| Hqr]; [ now subst rlb | ].
   destruct Hqr as [(H1, H2)| Hqr]; [ now subst rla | ].
   destruct Hqr as (Hlab, H1); subst r.
+  generalize Hab; intros Habq.
+  apply (f_equal length) in Habq.
+  rewrite rev_length, lap_add_length in Habq.
+  rewrite rev_length in Habq.
+  rewrite lap_mul_length in Habq.
+  destruct rlb as [| b] using rev_ind; [ easy | ].
+  clear IHrlb.
+  rewrite rev_app_distr in Habq; cbn in Habq.
+  destruct rlq as [| q] using rev_ind; cycle 1. {
+    clear IHrlq.
+    rewrite rev_app_distr in Habq; cbn in Habq.
+    rewrite Nat.sub_0_r, app_length in Habq; cbn in Habq.
+    do 2 rewrite rev_length in Habq.
+    rewrite app_length in Hlrb, Hlab; cbn in Hlrb, Hlab.
+    exfalso; apply Nat.nlt_ge in Hlab; apply Hlab.
+    rewrite Habq; flia.
+  }
+  rewrite lap_mul_0_r in Hab.
+  rewrite lap_add_0_l in Hab.
+  apply (f_equal (λ l, rev l)) in Hab.
+  do 2 rewrite rev_involutive in Hab.
+  now rewrite Hab.
+}
 ...
 
 Theorem polyn_mul_div :
