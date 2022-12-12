@@ -3344,13 +3344,18 @@ remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-...
-apply IHit in Hqr'; [ | now rewrite Hb ].
+generalize Hqr'; intros Hqr.
+apply IHit in Hqr; [ | now rewrite Hb ].
 rewrite <- Hb; cbn.
-destruct rlb as [| b']; cbn; [ now rewrite Hqr', Nat.sub_0_r | ].
-rewrite Hqr'; cbn.
+destruct rlb as [| b']; cbn; [ now rewrite Hqr, Nat.sub_0_r | ].
+rewrite Hqr; cbn.
 rewrite <- Nat_succ_sub_succ_r; [ easy | ].
-cbn in Hqr'.
+cbn in Hqr.
+destruct rlq' as [| q]; [ | cbn in Hqr; flia Hqr ].
+symmetry in Hqr; cbn in Hqr.
+apply Nat.sub_0_le in Hqr.
+apply Nat.succ_le_mono in Hqr.
+rewrite Hb in Hqr.
 ...
 rewrite Hqr'.
 ...
