@@ -3301,7 +3301,6 @@ destruct q as [cq| ]. 2: {
   now apply Nat.lt_succ_r.
 }
 generalize Hqrlr; intros Hb.
-(**)
 apply rlap_quot_rem_step_length_r_a in Hb.
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
