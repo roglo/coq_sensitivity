@@ -283,43 +283,6 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
 Definition rlap_quot_rem rla rlb :=
   rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
 
-(*
-Definition rlap_quot_rem_step (rla rlb : list T) :=
-  match rlb with
-  | [] => (None, []) (* division by zero *)
-  | b :: rlb' =>
-      match rla with
-      | [] => (None, [])
-      | a :: rla' =>
-          if length rla' <? length rlb' then (None, rla)
-          else
-            let cq := (a / b)%F in
-            let dq := length rla' - length rlb' in
-            let rlr :=
-              strip_0s
-                (lap_sub rla' (map (λ cb, (cb * cq)%F) rlb' ++ repeat 0%F dq))
-            in
-            (Some (cq, dq), rlr)
-      end
-  end.
-
-Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
-  match it with
-  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
-  | S it' =>
-      let (q, rlr) := rlap_quot_rem_step rla rlb in
-      match q with
-      | Some (cq, dq) =>
-           let (rlq', rlr') := rlap_quot_rem_loop it' rlr rlb in
-           (cq :: repeat 0%F (dq - length rlq') ++ rlq', rlr')
-      | None => ([], rlr)
-      end
-  end.
-
-Definition rlap_quot_rem rla rlb :=
-  rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
-*)
-
 Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev (strip_0s rlr)).
