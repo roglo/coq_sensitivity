@@ -322,7 +322,7 @@ Definition rlap_quot_rem rla rlb :=
 
 Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
-  (rev rlq, rev rlr).
+  (rev rlq, rev (strip_0s rlr)).
 
 (*
 End a.
@@ -677,8 +677,11 @@ cbn in Hqr.
 rewrite if_bool_if_dec in Hqr.
 destruct (bool_dec _) as [Hab| Hab]. {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  apply -> Nat.succ_lt_mono.
-  now apply Nat.ltb_lt in Hab.
+  rewrite if_bool_if_dec.
+  apply Nat.ltb_lt, Nat.succ_lt_mono in Hab.
+  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  transitivity (S (length rla)); [ | easy ].
+  apply Nat.lt_succ_r, strip_0s_length_le.
 }
 apply Nat.ltb_ge in Hab.
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
@@ -764,8 +767,7 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
-...
-
+(*
 Theorem hd_rem : ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
@@ -823,6 +825,7 @@ rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn; right ].
 now apply rngl_eqb_neq in Hxz.
 Qed.
+*)
 
 Theorem quot_is_norm : ∀ la lb,
   has_polyn_prop la = true
@@ -880,26 +883,17 @@ destruct qr as (rlq, rlr); cbn.
 unfold has_polyn_prop.
 (**)
 destruct rlr as [| r]; [ easy | ].
-apply Bool.orb_true_iff; right.
-cbn; rewrite last_last.
-apply (rngl_neqb_neq Heb).
-unfold has_polyn_prop in Ha, Hb.
-apply Bool.orb_true_iff in Ha, Hb.
-destruct Ha as [Ha| Ha]. {
-  destruct la; [ | easy ].
-  destruct Hb as [Hb| Hb]; [ now destruct lb | ].
-  destruct lb as [| b] using rev_ind; [ easy | ].
-  rewrite last_last in Hb.
-  now rewrite rev_app_distr in Hqr.
+cbn; rewrite if_bool_if_dec.
+apply Bool.orb_true_iff.
+destruct (bool_dec _) as [Hrz| Hrz]. {
+  rewrite List_last_rev.
+  remember (strip_0s rlr) as rl eqn:Hrl;symmetry in Hrl.
+  destruct rl as [| a]; [ now left | right; cbn ].
+  apply eq_strip_0s_cons in Hrl.
+  now apply (rngl_neqb_neq Heb).
 }
-destruct Hb as [Hb| Hb]; [ now destruct lb | ].
-apply (rngl_neqb_neq Heb) in Ha, Hb.
-rewrite <- (rev_involutive la) in Ha.
-rewrite <- (rev_involutive lb) in Hb.
-rewrite List_last_rev in Ha, Hb.
-generalize Hqr; intros Hq.
-apply hd_rem in Hq; [ | now right | now right ].
-now destruct Hq.
+right; cbn; rewrite last_last.
+now rewrite Hrz.
 Qed.
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
@@ -3162,9 +3156,10 @@ rewrite (fold_rngl_sub Hop).
 rewrite rngl_sub_diag; [ now f_equal | easy ].
 Qed.
 
+(*
 Theorem rlap_quot_rem_step_Some_length : ∀ rla rlb rlr cq dq,
   hd 0%F rlb ≠ 0%F
-  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rlap_quot_rem_step rla rlb = (Some cq, rlr)
   → length rla = length rlb + dq.
 Proof.
 intros * Hbz Hrl.
@@ -3177,25 +3172,28 @@ injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
 cbn; rewrite Nat.add_comm.
 now rewrite Nat.sub_add.
 Qed.
+*)
 
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ rla rlb rlr cq dq,
   hd 0%F rlb ≠ 0%F
-  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rlap_quot_rem_step rla rlb = (Some cq, rlr)
+  → dq = length rla - length rlb
   → rev rla = (rev rlb * rev (cq :: repeat 0%F dq) + rev rlr)%lap.
 Proof.
-intros Hco Hop * Hbz Hrl.
+intros Hco Hop * Hbz Hrl Hdq.
 specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
+cbn in Hdq.
+rewrite <- Hdq in Hrl.
 rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
-injection Hrl; clear Hrl; intros H1 H2 H3; subst cq dq rlr.
+injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
 remember (a / b)%F as cq eqn:Hcq.
-remember (length rla - length rlb) as dq eqn:Hdq.
 move Hcq after dq.
 move b before a.
 cbn; rewrite List_rev_repeat.
@@ -3209,7 +3207,7 @@ do 2 rewrite map_app; cbn.
 rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
-rewrite Hcq at 1.
+replace (b * cq)%F with (b * (a / b))%F by now rewrite Hcq.
 rewrite (rngl_mul_div_r Hco Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
@@ -3249,25 +3247,10 @@ revert rlc Hrlac.
 induction rlac as [| ac]; intros. {
   now cbn; do 2 rewrite lap_add_0_r.
 }
-cbn; rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hacz| Hacz]. {
-  apply (rngl_eqb_eq Heb) in Hacz; subst ac.
-  destruct rlc as [| c]; [ easy | cbn ].
-  cbn in Hrlac; apply Nat.succ_inj in Hrlac.
-  rewrite rngl_add_0_r.
-  rewrite lap_add_app_l. 2: {
-    do 2 rewrite rev_length.
-    rewrite Hrlac.
-    apply strip_0s_length_le.
-  }
-  now f_equal; apply IHrlac.
-}
-cbn.
-destruct rlc as [| c]; [ easy | cbn ].
-cbn in Hrlac; apply Nat.succ_inj in Hrlac.
-rewrite rev_lap_add; [ | easy ].
-rewrite lap_add_app_app; [ easy | now do 2 rewrite rev_length ].
+now rewrite rev_lap_add.
 Qed.
+
+...
 
 Theorem rlap_quot_rem_step_loop_quot_le : ∀ it rla rlb rlq rlr rlr' cq dq,
   hd 0%F rlb ≠ 0%F
