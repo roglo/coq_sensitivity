@@ -3312,7 +3312,15 @@ apply IHit in Hqr; [ | now rewrite Hb ].
 rewrite <- Hb; cbn.
 destruct rlb as [| b']; cbn; [ now rewrite Hqr, Nat.sub_0_r | ].
 rewrite Hqr; cbn.
-rewrite <- Nat_succ_sub_succ_r; [ easy | ].
+destruct (lt_dec (length rlb) (length rlr')) as [Hrr| Hrr]. {
+  now rewrite <- Nat_succ_sub_succ_r.
+}
+apply Nat.nlt_ge in Hrr.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hrr ].
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+cbn in Hqr.
+rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr; [ | flia Hrr ].
+...
 cbn in Hqr.
 destruct rlq' as [| q]; [ | cbn in Hqr; flia Hqr ].
 symmetry in Hqr; cbn in Hqr.
