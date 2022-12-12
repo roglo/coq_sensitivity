@@ -330,15 +330,15 @@ Arguments lap_add {T ro} (la lb)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem' {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (rlap_quot_rem [1] [2]).
-Compute (rlap_quot_rem' [1] [2]).
 Compute (rlap_quot_rem [1;0;0;1] [1;1]).
-Compute (rlap_quot_rem' [1;0;0;1] [1;1]).
+Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
+...
 Compute (rlap_quot_rem [1;0;0;1] [1;7]).
 Compute (rlap_quot_rem' [1;0;0;1] [1;7]).
 Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
@@ -3349,7 +3349,6 @@ apply IHit in Hqr'; [ | now rewrite Hb ].
 rewrite <- Hb; cbn.
 destruct rlb as [| b']; cbn; [ now rewrite Hqr', Nat.sub_0_r | ].
 rewrite Hqr'; cbn.
-Search (S (_ - S _)).
 rewrite <- Nat_succ_sub_succ_r; [ easy | ].
 cbn in Hqr'.
 ...
