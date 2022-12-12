@@ -3309,6 +3309,15 @@ destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 generalize Hqr'; intros Hqr.
 apply IHit in Hqr; [ | now rewrite Hb ].
+(**)
+rewrite <- Hb, Hqr.
+destruct (le_dec (length rlb) (length rlr')) as [Hrr| Hrr]. {
+  now symmetry; rewrite Nat.sub_succ_l.
+}
+apply Nat.nle_gt in Hrr.
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hrr ].
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+...
 rewrite <- Hb; cbn.
 destruct rlb as [| b']; cbn; [ now rewrite Hqr, Nat.sub_0_r | ].
 rewrite Hqr; cbn.
