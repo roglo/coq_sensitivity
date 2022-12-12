@@ -595,6 +595,25 @@ split; [ | easy ].
 now apply Nat.succ_lt_mono in Hab.
 Qed.
 
+Theorem rlap_quot_rem_step_length_r_a : ∀ rla rlb rlr cq,
+  rlap_quot_rem_step rla rlb = (Some cq, rlr)
+  → S (length rlr) = length rla.
+Proof.
+intros * Hrab.
+unfold rlap_quot_rem_step in Hrab.
+destruct rlb as [| b]; [ easy | ].
+destruct rla as [| a]; [ easy | ].
+rewrite if_bool_if_dec in Hrab.
+destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+apply Nat.ltb_ge in Hab.
+injection Hrab; clear Hrab; intros; subst cq rlr.
+rewrite lap_sub_length.
+rewrite app_length, map_length, repeat_length.
+rewrite Nat.add_comm, (Nat.sub_add _ _ Hab).
+now rewrite Nat.max_id.
+Qed.
+
+(*
 Theorem rlap_quot_rem_step_length_lt : ∀ rla rlb rlr cq,
   rlap_quot_rem_step rla rlb = (Some cq, rlr)
   → length rlr < length rla.
@@ -613,6 +632,7 @@ rewrite Nat.add_comm, (Nat.sub_add _ _ Hab).
 rewrite Nat.max_id.
 now cbn.
 Qed.
+*)
 
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
@@ -3184,7 +3204,6 @@ Theorem rlap_quot_rem_step_Some :
   → rev rla = (rev rlb * rev (cq :: repeat 0%F dq) + rev rlr)%lap.
 Proof.
 intros Hco Hop * Hbz Hrl Hdq.
-specialize (rlap_quot_rem_step_length_lt _ _ Hrl) as Hra.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
 cbn in Hdq.
@@ -3213,15 +3232,14 @@ rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
-cbn in Hra.
-apply -> Nat.lt_succ_r in Hra.
 assert (Hca : length rlc = length rla). {
   rewrite Hrlc, app_length, map_length, repeat_length.
   now rewrite Hdq, Nat.add_comm, Nat.sub_add.
 }
 rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
-  now rewrite Hca.
+  rewrite lap_sub_length.
+  now rewrite Hca, Nat.max_id.
 }
 f_equal.
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
@@ -3250,14 +3268,16 @@ induction rlac as [| ac]; intros. {
 now rewrite rev_lap_add.
 Qed.
 
-...
-
-Theorem rlap_quot_rem_step_loop_quot_le : ∀ it rla rlb rlq rlr rlr' cq dq,
+Theorem rlap_quot_rem_step_loop_quot_le : ∀ it rla rlb rlq rlr rlr' cq,
   hd 0%F rlb ≠ 0%F
-  → rlap_quot_rem_step rla rlb = (Some (cq, dq), rlr)
+  → rlap_quot_rem_step rla rlb = (Some cq, rlr)
   → rlap_quot_rem_loop it rlr rlb = (rlq, rlr')
-  → length rlq ≤ dq.
+  → length rlq ≤ length rla - length rlb.
 Proof.
+intros * Hbz Hqr Hqr'.
+generalize Hqr; intros Hra.
+apply rlap_quot_rem_step_length_r_a in Hra.
+...
 intros * Hbz Hqr Hqr'.
 generalize Hqr; intros Habq.
 apply rlap_quot_rem_step_Some_length in Habq; [ | easy ].
