@@ -3308,7 +3308,6 @@ destruct qr as (rlq', rlr'').
 injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
 generalize Hqr'; intros Hqr.
 apply IHit in Hqr; [ | now rewrite Hb ].
-(**)
 rewrite <- Hb, Hqr.
 destruct (le_dec (length rlb) (length rlr')) as [Hrr| Hrr]. {
   now symmetry; rewrite Nat.sub_succ_l.
@@ -3316,48 +3315,14 @@ destruct (le_dec (length rlb) (length rlr')) as [Hrr| Hrr]. {
 apply Nat.nle_gt in Hrr.
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hrr ].
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-...
-rewrite <- Hb; cbn.
-destruct rlb as [| b']; cbn; [ now rewrite Hqr, Nat.sub_0_r | ].
-rewrite Hqr; cbn.
-destruct (lt_dec (length rlb) (length rlr')) as [Hrr| Hrr]. {
-  now rewrite <- Nat_succ_sub_succ_r.
-}
-apply Nat.nlt_ge in Hrr.
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | flia Hrr ].
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-cbn in Hqr.
-rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr; [ | flia Hrr ].
-...
-cbn in Hqr.
-destruct rlq' as [| q]; [ | cbn in Hqr; flia Hqr ].
-symmetry in Hqr; cbn in Hqr.
-apply Nat.sub_0_le in Hqr.
-apply Nat.succ_le_mono in Hqr.
-rewrite Hb in Hqr.
-...
-rewrite Hqr'.
-...
-Search rlap_quot_rem_step.
-...
-eapply rlap_quot_rem_step_loop_quot_le in Hqrlr; [ | easy | apply Hqr' ].
-easy.
-...
-apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
-cbn in Hb; rewrite Hb.
-rewrite <- Nat.add_succ_r, Nat.add_comm, Nat.add_sub.
-remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
-symmetry in Hqr'.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-rewrite app_length, repeat_length; f_equal.
-destruct (le_dec (length rlq') dq) as [Hqq| Hqq]. {
-  now apply Nat.sub_add.
-}
-generalize Hqrlr; intros Hra.
-apply rlap_quot_rem_step_length_lt in Hra.
-eapply rlap_quot_rem_step_loop_quot_le in Hqrlr; [ | easy | apply Hqr' ].
-easy.
+apply Nat.succ_lt_mono in Hrr.
+rewrite Hb in Hrr.
+cbn in Hqrlr.
+destruct rla as [| a]; [ easy | ].
+cbn in Hrr.
+apply Nat.succ_lt_mono in Hrr.
+apply Nat.ltb_lt in Hrr.
+now rewrite Hrr in Hqrlr.
 Qed.
 
 Theorem rlap_quot_rem_prop :
@@ -3377,6 +3342,7 @@ cbn in Hqr.
 remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
 symmetry in Hqrlr.
 destruct qrlr as (q, rlr').
+...
 destruct q as [(cq, dq)| ]. 2: {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
   rewrite lap_mul_0_r, lap_add_0_l.
