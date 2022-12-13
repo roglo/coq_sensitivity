@@ -3399,6 +3399,68 @@ destruct rlb as [| b]; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
+Theorem lap_add_rev_strip : ∀ la lb,
+  length lb ≤ length la
+  → (la + rev (strip_0s lb) = la + rev lb)%lap.
+Proof.
+intros * Hba.
+revert lb Hba.
+induction la as [| a]; intros. {
+  now apply Nat.le_0_r, length_zero_iff_nil in Hba; subst lb.
+}
+cbn.
+remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
+apply (f_equal (λ l, rev l)) in Hlc; cbn in Hlc.
+rewrite rev_involutive in Hlc; subst lb.
+destruct lc as [| c]; [ easy | ].
+cbn.
+rewrite strip_0s_app.
+remember (strip_0s (rev lc)) as lb eqn:Hlb; symmetry in Hlb.
+rewrite rev_length in Hba; cbn in Hba.
+apply Nat.succ_le_mono in Hba.
+destruct lb as [| b]. {
+  cbn.
+  specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
+  clear Hlb IHla.
+  rewrite if_bool_if_dec, lap_add_comm.
+  destruct (bool_dec _) as [Hcz| Hcz]. {
+    apply (rngl_eqb_eq Heb) in Hcz; subst c; cbn.
+    rewrite rngl_add_0_r; f_equal.
+    symmetry.
+    clear a.
+    revert la Hba.
+    induction lc as [| c]; intros; [ apply lap_add_0_l | cbn ].
+    destruct la as [| a]; [ easy | ].
+    cbn in Hba.
+    apply Nat.succ_le_mono in Hba.
+    specialize (H1 0) as H2; cbn in H2.
+    subst c; rewrite rngl_add_0_l; f_equal.
+    apply IHlc; [ | easy ].
+    intros i.
+    now specialize (H1 (S i)).
+  } {
+    cbn; f_equal; clear c Hcz.
+    rewrite lap_add_0_r.
+    symmetry.
+    clear a.
+    revert la Hba.
+    induction lc as [| c]; intros; [ apply lap_add_0_l | cbn ].
+    destruct la as [| a]; [ easy | ].
+    cbn in Hba.
+    apply Nat.succ_le_mono in Hba.
+    specialize (H1 0) as H2; cbn in H2.
+    subst c; rewrite rngl_add_0_l; f_equal.
+    apply IHlc; [ | easy ].
+    intros i.
+    now specialize (H1 (S i)).
+  }
+}
+rewrite <- Hlb.
+rewrite rev_app_distr; cbn; f_equal.
+rewrite IHla; [ | now rewrite rev_length ].
+now rewrite rev_involutive.
+Qed.
+
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -3482,13 +3544,9 @@ rewrite <- (rev_involutive rla).
 f_equal.
 specialize (rlap_quot_rem_prop Hco Hop) as H1.
 specialize (H1 it rla rlb rlq rlr Hbn Hqr Hit).
-Theorem lap_add_rev_strip : ∀ la lb,
-  length lb ≤ length la
-  → (la + rev (strip_0s lb) = la + rev lb)%lap.
-Proof.
-Admitted.
 rewrite H1; symmetry.
 apply lap_add_rev_strip.
+...
 rewrite lap_mul_length.
 remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
@@ -3517,8 +3575,10 @@ destruct lq as [| q]. {
     now destruct qr as (rlq', rlr').
   }
   injection Hqr; clear Hqr; intros; subst rlr.
-Search (rlap_quot_rem_step _ _ = (None, _)).
-apply rlap_quot_rem_step_None in Hqr'.
+  apply rlap_quot_rem_step_None in Hqr'.
+  destruct Hqr' as [(H1, H2)| Hqr']; [ now subst rlb | ].
+  destruct Hqr' as [(H1, H2)| Hqr']. {
+    subst rla; clear H2.
 ...
     injection Hqr; clear Hqr; intros; subst rlq rlr'.
     apply Nat.succ_le_mono in Hit.
