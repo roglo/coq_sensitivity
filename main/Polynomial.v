@@ -3417,6 +3417,20 @@ split. 2: {
     now rewrite H1, Bool.orb_true_r.
   }
 }
+(*
+unfold lap_quot_rem in Hab.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr).
+injection Hab; clear Hab; intros; subst lq lr.
+specialize rlap_quot_rem_prop as H2.
+...
+rewrite <- (rev_involutive la).
+rewrite <- (rev_involutive lb).
+unfold rlap_quot_rem in Hqr.
+eapply rlap_quot_rem_prop.
+...
+*)
 assert (Hbz : lb ≠ []). {
   intros H; subst lb.
   cbn in H1.
@@ -3466,6 +3480,11 @@ assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 rewrite <- (rev_involutive rla).
 f_equal.
+specialize (rlap_quot_rem_prop Hco Hop) as H1.
+specialize (H1 it rla rlb rlq rlr Hbn Hqr Hit).
+Search (_ + rev _)%lap.
+...
+apply (@rlap_quot_rem_prop Hco Hop it rla rlb rlq _ Hbn); [ | easy ].
 ...
 apply (rlap_quot_rem_prop Hco Hop rla _ Hbn Hqr Hit).
 Qed.
