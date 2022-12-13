@@ -3350,8 +3350,8 @@ destruct q as [cq| ]. 2: {
   destruct (length rla <? length rlb); [ | easy ].
   now injection Hqrlr.
 }
-generalize Hqrlr; intros Ha.
-apply (rlap_quot_rem_step_Some Hco Hop) in Ha; [ | easy ].
+generalize Hqrlr; intros Hqrlr'.
+apply (rlap_quot_rem_step_Some Hco Hop) in Hqrlr'; [ | easy ].
 (*
 generalize Hqrlr; intros Hb.
 apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
@@ -3365,9 +3365,8 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
-...
 generalize Hqrlr; intros Hra.
-apply rlap_quot_rem_step_length_lt in Hra.
+apply rlap_quot_rem_step_length_r_a in Hra.
 generalize Hqr; intros Hqrb.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
@@ -3379,33 +3378,28 @@ apply IHit in Hqr. 2: {
   rewrite if_bool_if_dec in Hqrlr.
   destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
   apply Nat.ltb_ge in Hab.
-  injection Hqrlr; clear Hqrlr; intros; subst cq dq rlr.
-  eapply le_lt_trans; [ apply strip_0s_length_le | ].
-  rewrite <- (firstn_skipn (length rlb) rla) at 1.
-  rewrite lap_sub_app_app. 2: {
-    rewrite firstn_length, map_length.
-    now apply Nat.min_l.
-  }
-  rewrite app_length.
+  injection Hqrlr; clear Hqrlr; intros; subst cq rlr.
   rewrite lap_sub_length.
-  rewrite firstn_length, map_length.
-  rewrite Nat.min_l; [ | easy ].
-  rewrite Nat.max_id.
-  rewrite lap_sub_length.
-  rewrite skipn_length, repeat_length.
-  rewrite Nat.max_id.
-  rewrite Nat.add_comm.
-  rewrite Nat.sub_add; [ | easy ].
-  cbn; easy.
+  rewrite app_length, map_length, repeat_length.
+  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+  now cbn; rewrite Nat.max_id.
 }
-rewrite Ha, Hqr.
+rewrite Hqrlr', Hqr.
 rewrite lap_add_assoc.
 f_equal; cbn.
+(*
 rewrite rev_app_distr.
+*)
 rewrite List_rev_repeat.
 rewrite <- lap_mul_add_distr_l.
 f_equal.
 rewrite lap_add_comm.
+rewrite lap_add_app_r; cycle 1. {
+  rewrite rev_length, repeat_length.
+  flia Hra Hqrb.
+}
+f_equal.
+...
 destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
   rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
   f_equal.
