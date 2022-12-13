@@ -3502,7 +3502,6 @@ destruct lq as [| q]. {
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   apply (f_equal (λ l, rev l)) in H1.
   do 2 rewrite rev_involutive in H1; subst rlr.
-...
   exfalso.
   revert rla Hqr Hit.
   induction it; intros; [ easy | ].
@@ -3515,7 +3514,12 @@ destruct lq as [| q]. {
     apply rlap_quot_rem_step_length_r_a in Hra.
     remember (rlap_quot_rem_loop it rlr rlb) as qr eqn:Hqr''.
     symmetry in Hqr''.
-    destruct qr as (rlq', rlr').
+    now destruct qr as (rlq', rlr').
+  }
+  injection Hqr; clear Hqr; intros; subst rlr.
+Search (rlap_quot_rem_step _ _ = (None, _)).
+apply rlap_quot_rem_step_None in Hqr'.
+...
     injection Hqr; clear Hqr; intros; subst rlq rlr'.
     apply Nat.succ_le_mono in Hit.
     rewrite <- Hra in Hit.
