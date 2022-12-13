@@ -3544,9 +3544,7 @@ rewrite <- (rev_involutive rla).
 f_equal.
 specialize (rlap_quot_rem_prop Hco Hop) as H1.
 specialize (H1 it rla rlb rlq rlr Hbn Hqr Hit).
-rewrite H1; symmetry.
-apply lap_add_rev_strip.
-...
+rewrite lap_add_rev_strip; [ easy | ].
 rewrite lap_mul_length.
 remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
@@ -3560,7 +3558,9 @@ destruct lq as [| q]. {
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   apply (f_equal (λ l, rev l)) in H1.
   do 2 rewrite rev_involutive in H1; subst rlr.
-  exfalso.
+  apply Nat.le_0_r, length_zero_iff_nil.
+Print rlap_quot_rem_loop.
+...
   revert rla Hqr Hit.
   induction it; intros; [ easy | ].
   cbn in Hqr.
@@ -3576,9 +3576,11 @@ destruct lq as [| q]. {
   }
   injection Hqr; clear Hqr; intros; subst rlr.
   apply rlap_quot_rem_step_None in Hqr'.
-  destruct Hqr' as [(H1, H2)| Hqr']; [ now subst rlb | ].
-  destruct Hqr' as [(H1, H2)| Hqr']. {
-    subst rla; clear H2.
+  destruct Hqr' as [(H1, H2)| Hqr']; [ easy | ].
+  destruct Hqr' as [(H1, H2)| Hqr']; [ easy | ].
+  destruct Hqr' as (H1, H2); clear H2.
+  apply Nat.succ_le_mono in Hit.
+  destruct rla as [| a]; [ easy | ].
 ...
     injection Hqr; clear Hqr; intros; subst rlq rlr'.
     apply Nat.succ_le_mono in Hit.
