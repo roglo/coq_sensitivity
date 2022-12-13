@@ -3482,7 +3482,57 @@ rewrite <- (rev_involutive rla).
 f_equal.
 specialize (rlap_quot_rem_prop Hco Hop) as H1.
 specialize (H1 it rla rlb rlq rlr Hbn Hqr Hit).
-Search (_ + rev _)%lap.
+Theorem lap_add_rev_strip : ∀ la lb,
+  length lb ≤ length la
+  → (la + rev (strip_0s lb) = la + rev lb)%lap.
+Proof.
+Admitted.
+rewrite H1; symmetry.
+apply lap_add_rev_strip.
+rewrite lap_mul_length.
+remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  apply (f_equal (λ l, rev l)) in Hlb.
+  now rewrite rev_involutive in Hlb; subst rlb.
+}
+remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+destruct lq as [| q]. {
+  apply (f_equal (λ l, rev l)) in Hlq.
+  rewrite rev_involutive in Hlq; cbn in Hlq; subst rlq.
+  rewrite lap_mul_0_r, lap_add_0_l in H1.
+  apply (f_equal (λ l, rev l)) in H1.
+  do 2 rewrite rev_involutive in H1; subst rlr.
+...
+  exfalso.
+  revert rla Hqr Hit.
+  induction it; intros; [ easy | ].
+  cbn in Hqr.
+  remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'.
+  symmetry in Hqr'.
+  destruct qr as (q, rlr).
+  destruct q as [cq| ]. {
+    generalize Hqr'; intros Hra.
+    apply rlap_quot_rem_step_length_r_a in Hra.
+    remember (rlap_quot_rem_loop it rlr rlb) as qr eqn:Hqr''.
+    symmetry in Hqr''.
+    destruct qr as (rlq', rlr').
+    injection Hqr; clear Hqr; intros; subst rlq rlr'.
+    apply Nat.succ_le_mono in Hit.
+    rewrite <- Hra in Hit.
+    apply IHit in Hqr''.
+    remember (lap_quot_rem_loop
+...
+rlap_quot_rem_step_length_r_a:
+  ∀ (rla rlb rlr : list T) (cq : T),
+    rlap_quot_rem_step rla rlb = (Some cq, rlr) → S (length rlr) = length rla
+Print rlap_quot_rem_step.
+Search rlap_quot_rem_loop.
+...
+
+clear IHrlb; cbn.
+rewrite rev_app_distr; cbn.
+destruct rlq as [| q] using rev_ind. {
+  cbn.
 ...
 apply (@rlap_quot_rem_prop Hco Hop it rla rlb rlq _ Hbn); [ | easy ].
 ...
