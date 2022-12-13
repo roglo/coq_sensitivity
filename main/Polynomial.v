@@ -3160,23 +3160,21 @@ Qed.
 Theorem rlap_quot_rem_step_Some :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  ∀ rla rlb rlr cq dq,
+  ∀ rla rlb rlr cq,
   hd 0%F rlb ≠ 0%F
   → rlap_quot_rem_step rla rlb = (Some cq, rlr)
-  → dq = length rla - length rlb
-  → rev rla = (rev rlb * rev (cq :: repeat 0%F dq) + rev rlr)%lap.
+  → rev rla =
+      (rev rlb * rev (cq :: repeat 0%F (length rla - length rlb)) +
+       rev rlr)%lap.
 Proof.
-intros Hco Hop * Hbz Hrl Hdq.
+intros Hco Hop * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
-cbn in Hdq.
-rewrite <- Hdq in Hrl.
 rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
 remember (a / b)%F as cq eqn:Hcq.
-move Hcq after dq.
 move b before a.
 cbn; rewrite List_rev_repeat.
 rewrite lap_repeat_0_app_is_mul_power_l; [ | easy ].
@@ -3197,7 +3195,7 @@ rewrite <- rev_app_distr.
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 assert (Hca : length rlc = length rla). {
   rewrite Hrlc, app_length, map_length, repeat_length.
-  now rewrite Hdq, Nat.add_comm, Nat.sub_add.
+  now rewrite Nat.add_comm, Nat.sub_add.
 }
 rewrite lap_add_app_l. 2: {
   do 2 rewrite rev_length.
@@ -3342,23 +3340,22 @@ cbn in Hqr.
 remember (rlap_quot_rem_step rla rlb) as qrlr eqn:Hqrlr.
 symmetry in Hqrlr.
 destruct qrlr as (q, rlr').
-...
-destruct q as [(cq, dq)| ]. 2: {
+destruct q as [cq| ]. 2: {
   injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
   rewrite lap_mul_0_r, lap_add_0_l.
   f_equal.
   destruct rlb as [| b]; [ easy | ].
-  destruct rla as [| a]. {
-    now destruct rlb; injection Hqrlr; intros.
-  }
+  destruct rla as [| a]; [ now destruct rlb; injection Hqrlr; intros | ].
   cbn in Hqrlr.
   destruct (length rla <? length rlb); [ | easy ].
   now injection Hqrlr.
 }
 generalize Hqrlr; intros Ha.
 apply (rlap_quot_rem_step_Some Hco Hop) in Ha; [ | easy ].
+(*
 generalize Hqrlr; intros Hb.
 apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
+*)
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3368,6 +3365,7 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
+...
 generalize Hqrlr; intros Hra.
 apply rlap_quot_rem_step_length_lt in Hra.
 generalize Hqr; intros Hqrb.
@@ -3422,6 +3420,8 @@ replace dq with (length rla - length rlb) by flia Hb.
 Check rlap_quot_rem_length.
 flia Hra Hqrb.
 Qed.
+
+...
 
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
