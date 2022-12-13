@@ -3559,8 +3559,6 @@ destruct lq as [| q]. {
   apply (f_equal (λ l, rev l)) in H1.
   do 2 rewrite rev_involutive in H1; subst rlr.
   apply Nat.le_0_r, length_zero_iff_nil.
-Print rlap_quot_rem_loop.
-...
   revert rla Hqr Hit.
   induction it; intros; [ easy | ].
   cbn in Hqr.
@@ -3575,12 +3573,14 @@ Print rlap_quot_rem_loop.
     now destruct qr as (rlq', rlr').
   }
   injection Hqr; clear Hqr; intros; subst rlr.
+Print rlap_quot_rem_step.
+...
   apply rlap_quot_rem_step_None in Hqr'.
   destruct Hqr' as [(H1, H2)| Hqr']; [ easy | ].
   destruct Hqr' as [(H1, H2)| Hqr']; [ easy | ].
   destruct Hqr' as (H1, H2); clear H2.
   apply Nat.succ_le_mono in Hit.
-  destruct rla as [| a]; [ easy | ].
+  destruct rla as [| a]; [ easy | exfalso ].
 ...
     injection Hqr; clear Hqr; intros; subst rlq rlr'.
     apply Nat.succ_le_mono in Hit.
