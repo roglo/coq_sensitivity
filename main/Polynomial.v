@@ -3352,10 +3352,6 @@ destruct q as [cq| ]. 2: {
 }
 generalize Hqrlr; intros Hqrlr'.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqrlr'; [ | easy ].
-(*
-generalize Hqrlr; intros Hb.
-apply rlap_quot_rem_step_Some_length in Hb; [ | easy ].
-*)
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3387,9 +3383,6 @@ apply IHit in Hqr. 2: {
 rewrite Hqrlr', Hqr.
 rewrite lap_add_assoc.
 f_equal; cbn.
-(*
-rewrite rev_app_distr.
-*)
 rewrite List_rev_repeat.
 rewrite <- lap_mul_add_distr_l.
 f_equal.
@@ -3399,23 +3392,12 @@ rewrite lap_add_app_r; cycle 1. {
   flia Hra Hqrb.
 }
 f_equal.
-...
-destruct (le_dec (length rlq) dq) as [Hqq| Hqq]. {
-  rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
-  f_equal.
-  replace dq with (length rlq + (dq - length rlq)) at 1 by flia Hqq.
-  rewrite repeat_app.
-  rewrite lap_add_app_r; [ | now rewrite rev_length, repeat_length ].
-  rewrite List_rev_repeat.
-  rewrite lap_add_repeat_0_r; [ easy | now rewrite rev_length ].
-}
-exfalso; apply Hqq; clear Hqq.
-replace dq with (length rla - length rlb) by flia Hb.
-Check rlap_quot_rem_length.
-flia Hra Hqrb.
+apply lap_add_repeat_0_r.
+rewrite rev_length.
+rewrite <- Hra, Hqrb.
+destruct rlb as [| b]; [ easy | ].
+now cbn; rewrite Nat.sub_0_r.
 Qed.
-
-...
 
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -3484,6 +3466,7 @@ assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 rewrite <- (rev_involutive rla).
 f_equal.
+...
 apply (rlap_quot_rem_prop Hco Hop rla _ Hbn Hqr Hit).
 Qed.
 
