@@ -301,6 +301,7 @@ Open Scope Q_scope.
 Compute (rlap_quot_rem [1] [2]).
 Compute (rlap_quot_rem [1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
+Compute (rlap_quot_rem [0;1;1] [1;0;0;1]).
 ...
 Compute (rlap_quot_rem [1;0;0;1] [1;7]).
 Compute (rlap_quot_rem' [1;0;0;1] [1;7]).
@@ -3469,17 +3470,47 @@ Theorem lap_quot_rem_prop :
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
-intros Hco Hop * H1 Hab.
+intros Hco Hop * Hb Hab.
 assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
-    intros H; subst lb; cbn in H1.
-    now rewrite (rngl_eqb_refl Heb) in H1.
+    intros H; subst lb; cbn in Hb.
+    now rewrite (rngl_eqb_refl Heb) in Hb.
   } {
     unfold has_polyn_prop.
-    now rewrite H1, Bool.orb_true_r.
+    now rewrite Hb, Bool.orb_true_r.
   }
 }
 split; [ | easy ].
+assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
+  remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
+  apply (f_equal (λ l, rev l)) in Hlc.
+  rewrite rev_involutive in Hlc; subst lb.
+  destruct lc as [| c]; [ easy | ].
+  cbn in Hb.
+  rewrite last_last in Hb; cbn.
+  now apply (rngl_neqb_neq Heb) in Hb.
+}
+unfold lap_quot_rem in Hab.
+remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (rlq, rlr).
+injection Hab; clear Hab; intros; subst lq lr.
+rewrite rev_length in Hrb.
+rewrite lap_add_rev_strip. {
+  rewrite <- (rev_involutive la).
+  rewrite <- (rev_involutive lb).
+  apply (rlap_quot_rem_prop Hco Hop) with (it := S (length la)); cycle 2. {
+    now rewrite rev_length.
+  } {
+    easy.
+  }
+  unfold rlap_quot_rem in Hqr.
+  unfold rlap_quot_rem_nb_iter in Hqr.
+  now rewrite rev_length in Hqr.
+}
+...
+rewrite lap_mul_length.
+...
+intros Hco Hop * H1 Hab.
 (*
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
