@@ -3495,6 +3495,18 @@ remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
 rewrite rev_length in Hrb.
+remember (rev rlq) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  apply (f_equal (λ l, rev l)) in Hlc; cbn in Hlc.
+  rewrite rev_involutive in Hlc; subst rlq.
+  rewrite lap_mul_0_r, lap_add_0_l.
+  specialize (rlap_quot_rem_prop Hco Hop) as H1.
+  specialize (H1 (S (length (rev la))) (rev la) (rev lb) 0%lap rlr).
+  specialize (H1 Hbz Hqr (Nat.le_refl _)).
+  rewrite rev_involutive, lap_mul_0_r, lap_add_0_l in H1.
+Print rlap_quot_rem.
+Print lap_quot_rem.
+...
 rewrite lap_add_rev_strip. {
   rewrite <- (rev_involutive la).
   rewrite <- (rev_involutive lb).
@@ -3507,8 +3519,6 @@ rewrite lap_add_rev_strip. {
   unfold rlap_quot_rem_nb_iter in Hqr.
   now rewrite rev_length in Hqr.
 }
-...
-rewrite lap_mul_length.
 ...
 intros Hco Hop * H1 Hab.
 (*
