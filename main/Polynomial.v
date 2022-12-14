@@ -3472,7 +3472,7 @@ Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ la lb lq lr : list T,
-  (last la 0 ≠? 0)%F = true
+  has_polyn_prop la = true
   → (last lb 0 ≠? 0)%F = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
