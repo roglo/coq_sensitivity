@@ -292,6 +292,7 @@ End a.
 Arguments lap_add {T ro} (la lb)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
+Arguments lap_quot_rem {T ro} (la lb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Require Import RnglAlg.Qrl.
@@ -302,6 +303,11 @@ Compute (rlap_quot_rem [1] [2]).
 Compute (rlap_quot_rem [1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [0;1;1] [1;0;0;1]).
+Compute (
+  let la := [1;0;0] in
+  let lb := [1;0;0;1] in
+  let (lq, lr) := lap_quot_rem la lb in
+  (la = (lap_add (lap_mul lb lq) lr))).
 ...
 Compute (rlap_quot_rem [1;0;0;1] [1;7]).
 Compute (rlap_quot_rem' [1;0;0;1] [1;7]).
@@ -3466,11 +3472,12 @@ Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ la lb lq lr : list T,
-  (last lb 0 ≠? 0)%F = true
+  (last la 0 ≠? 0)%F = true
+  → (last lb 0 ≠? 0)%F = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
-intros Hco Hop * Hb Hab.
+intros Hco Hop * Ha Hb Hab.
 assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
     intros H; subst lb; cbn in Hb.
@@ -3495,11 +3502,14 @@ remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
 rewrite rev_length in Hrb.
+(*
 remember (rev rlq) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   apply (f_equal (λ l, rev l)) in Hlc; cbn in Hlc.
   rewrite rev_involutive in Hlc; subst rlq.
   rewrite lap_mul_0_r, lap_add_0_l.
+Print rlap_quot_rem.
+...
   specialize (rlap_quot_rem_prop Hco Hop) as H1.
   specialize (H1 (S (length (rev la))) (rev la) (rev lb) 0%lap rlr).
   specialize (H1 Hbz Hqr (Nat.le_refl _)).
@@ -3507,18 +3517,16 @@ destruct lc as [| c]. {
 Print rlap_quot_rem.
 Print lap_quot_rem.
 ...
-rewrite lap_add_rev_strip. {
-  rewrite <- (rev_involutive la).
-  rewrite <- (rev_involutive lb).
-  apply (rlap_quot_rem_prop Hco Hop) with (it := S (length la)); cycle 2. {
-    now rewrite rev_length.
-  } {
-    easy.
-  }
-  unfold rlap_quot_rem in Hqr.
-  unfold rlap_quot_rem_nb_iter in Hqr.
-  now rewrite rev_length in Hqr.
-}
+*)
+specialize (rlap_quot_rem_prop Hco Hop) as H1.
+specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
+specialize (H1 Hbz Hqr (Nat.le_refl _)).
+do 2 rewrite rev_involutive in H1.
+rewrite lap_add_rev_strip; [ easy | ].
+rewrite lap_mul_length.
+destruct lb as [| b]; [ easy | ].
+remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+destruct lq as [| q]. {
 ...
 intros Hco Hop * H1 Hab.
 (*
