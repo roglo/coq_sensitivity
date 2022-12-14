@@ -3470,7 +3470,7 @@ Theorem lap_quot_rem_prop :
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
 intros Hco Hop * H1 Hab.
-split. 2: {
+assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
     intros H; subst lb; cbn in H1.
     now rewrite (rngl_eqb_refl Heb) in H1.
@@ -3479,6 +3479,7 @@ split. 2: {
     now rewrite H1, Bool.orb_true_r.
   }
 }
+split; [ | easy ].
 (*
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
@@ -3517,6 +3518,8 @@ f_equal.
 remember (rev la) as rla eqn:Hrla.
 clear la Hrla.
 rewrite <- (rev_involutive lb).
+rewrite <- (rev_involutive lb) in Hrb.
+do 2 rewrite rev_length in Hrb.
 remember (rev lb) as rlb eqn:Hrlb.
 assert (H : rlb ≠ []). {
   subst rlb.
@@ -3553,13 +3556,13 @@ destruct lb as [| b]. {
 }
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 destruct lq as [| q]. {
-  apply (f_equal (λ l, rev l)) in Hlq.
-  rewrite rev_involutive in Hlq; cbn in Hlq; subst rlq.
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   apply (f_equal (λ l, rev l)) in H1.
   do 2 rewrite rev_involutive in H1; subst rlr.
+  apply (f_equal (λ l, rev l)) in Hlq.
+  rewrite rev_involutive in Hlq; cbn in Hlq; subst rlq.
   apply Nat.le_0_r, length_zero_iff_nil.
-  revert rla Hqr Hit.
+  revert rla Hqr Hit Hrb.
   induction it; intros; [ easy | ].
   cbn in Hqr.
   remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'.
@@ -3573,7 +3576,17 @@ destruct lq as [| q]. {
     now destruct qr as (rlq', rlr').
   }
   injection Hqr; clear Hqr; intros; subst rlr.
-Print rlap_quot_rem_step.
+  apply Nat.succ_le_mono in Hit.
+  destruct rla as [| a]; [ easy | exfalso ].
+  cbn in Hit.
+  destruct rlb as [| b']; [ easy | ].
+  cbn in Hqr'.
+  rewrite if_bool_if_dec in Hqr'.
+  destruct (bool_dec _) as [Hab| Hab]; [ | easy ].
+  clear Hqr'.
+  apply Nat.ltb_lt in Hab.
+  cbn in Hbn; clear Hbz.
+  cbn in Hrb.
 ...
   apply rlap_quot_rem_step_None in Hqr'.
   destruct Hqr' as [(H1, H2)| Hqr']; [ easy | ].
