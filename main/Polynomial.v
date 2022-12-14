@@ -304,6 +304,12 @@ Compute (rlap_quot_rem [1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [0;1;1] [1;0;0;1]).
 Compute (
+  let la := [0;1] in
+  let lb := [1;0;0;1] in
+  let (lq, lr) := lap_quot_rem la lb in
+  (la = (lap_add (lap_mul lb lq) lr))).
+...
+Compute (
   let la := [1;0;0] in
   let lb := [1;0;0;1] in
   let (lq, lr) := lap_quot_rem la lb in
@@ -3555,32 +3561,16 @@ rewrite lap_mul_length.
 destruct lb as [| b]; [ easy | ].
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 destruct lq as [| q]. {
+  apply (f_equal (λ l, rev l)) in Hlq; cbn in Hlq.
+  rewrite rev_involutive in Hlq; subst rlq.
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   apply (f_equal (λ l, rev l)) in H1.
   rewrite rev_involutive in H1; subst rlr.
   rewrite (polyn_length_strip_length _ Ha) in Hrb.
-...
-intros * Ha.
-rewrite <- (rev_length la).
-rewrite <- (rev_involutive la) in Ha.
-remember (rev la) as rla; clear la Heqrla.
-unfold has_polyn_prop in Ha.
-apply Bool.orb_true_iff in Ha.
-destruct Ha as [Ha| Ha]. {
-  apply is_empty_list_empty in Ha.
-  now apply List_eq_rev_nil in Ha; subst rla.
-}
-apply (rngl_neqb_neq Heb) in Ha.
-
-Search (last (rev _)).
-Search (length (strip_0s _)).
-...
-rewrite (polyn_length_strip_length _ Ha) in Hrb.
-...
-  apply (f_equal (λ l, rev l)) in Hlq.
-  rewrite rev_involutive in Hlq; cbn in Hlq; subst rlq.
-  apply Nat.le_0_r, length_zero_iff_nil.
-  rewrite <- (rev_involutive []); f_equal; cbn.
+  rewrite rev_length, Nat.le_0_r, length_zero_iff_nil.
+  unfold has_polyn_prop in Ha.
+  apply Bool.orb_true_iff in Ha.
+  destruct Ha as [Ha| Ha]; [ now apply is_empty_list_empty in Ha | ].
   cbn in Hqr.
   remember (rlap_quot_rem_step _ _) as qr eqn:Hqr'.
   symmetry in Hqr'.
@@ -3590,6 +3580,23 @@ rewrite (polyn_length_strip_length _ Ha) in Hrb.
     now destruct qr.
   }
   injection Hqr; clear Hqr; intros; subst rlr.
+...
+  apply rlap_quot_rem_step_None in Hqr'.
+  destruct Hqr' as [(H1, H2)| Hqr']. {
+    destruct lb using rev_ind; [ easy | ].
+    now rewrite rev_app_distr in H1.
+  }
+  destruct Hqr' as [(H1, H2)| Hqr']. {
+    apply (f_equal (λ l, rev l)) in H1; cbn in H1.
+    now rewrite rev_involutive in H1.
+  }
+  destruct Hqr' as (H1, _).
+  rewrite rev_length, app_length, rev_length in H1.
+  rewrite Nat.add_comm in H1; cbn in Hrb, H1.
+...
+  apply Nat.succ_le_mono in Hit.
+  destruct rla as [| a]; [ easy | exfalso ].
+
 Print rlap_quot_rem_step.
 ...
   revert la Hqr Hrb Ha.
