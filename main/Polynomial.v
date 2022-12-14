@@ -3468,6 +3468,34 @@ rewrite IHla; [ | now rewrite rev_length ].
 now rewrite rev_involutive.
 Qed.
 
+Theorem is_empty_list_empty : ∀ A (la : list A),
+  is_empty_list la = true → la = 0%lap.
+Proof.
+intros * Ha.
+unfold is_empty_list in Ha.
+now destruct la.
+Qed.
+
+Theorem polyn_length_strip_length : ∀ la,
+  has_polyn_prop la = true
+  → length (strip_0s (rev la)) = length la.
+Proof.
+intros * Ha.
+unfold has_polyn_prop in Ha.
+apply Bool.orb_true_iff in Ha.
+destruct Ha as [Ha| Ha]. {
+  apply is_empty_list_empty in Ha.
+  now subst la.
+}
+apply (rngl_neqb_neq Heb) in Ha.
+destruct la as [| a] using rev_ind; [ easy | ].
+rewrite last_last in Ha.
+rewrite rev_app_distr; cbn.
+apply (rngl_eqb_neq Heb) in Ha.
+rewrite Ha, app_length, Nat.add_comm; cbn.
+now rewrite rev_length.
+Qed.
+
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -3527,6 +3555,69 @@ rewrite lap_mul_length.
 destruct lb as [| b]; [ easy | ].
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 destruct lq as [| q]. {
+  rewrite lap_mul_0_r, lap_add_0_l in H1.
+  apply (f_equal (λ l, rev l)) in H1.
+  rewrite rev_involutive in H1; subst rlr.
+  rewrite (polyn_length_strip_length _ Ha) in Hrb.
+...
+intros * Ha.
+rewrite <- (rev_length la).
+rewrite <- (rev_involutive la) in Ha.
+remember (rev la) as rla; clear la Heqrla.
+unfold has_polyn_prop in Ha.
+apply Bool.orb_true_iff in Ha.
+destruct Ha as [Ha| Ha]. {
+  apply is_empty_list_empty in Ha.
+  now apply List_eq_rev_nil in Ha; subst rla.
+}
+apply (rngl_neqb_neq Heb) in Ha.
+
+Search (last (rev _)).
+Search (length (strip_0s _)).
+...
+rewrite (polyn_length_strip_length _ Ha) in Hrb.
+...
+  apply (f_equal (λ l, rev l)) in Hlq.
+  rewrite rev_involutive in Hlq; cbn in Hlq; subst rlq.
+  apply Nat.le_0_r, length_zero_iff_nil.
+  rewrite <- (rev_involutive []); f_equal; cbn.
+  cbn in Hqr.
+  remember (rlap_quot_rem_step _ _) as qr eqn:Hqr'.
+  symmetry in Hqr'.
+  destruct qr as (lq, rlr).
+  destruct lq as [| q]. {
+    remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr''.
+    now destruct qr.
+  }
+  injection Hqr; clear Hqr; intros; subst rlr.
+Print rlap_quot_rem_step.
+...
+  revert la Hqr Hrb Ha.
+  induction it; intros; [ easy | ].
+  cbn in Hqr.
+  remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'.
+  symmetry in Hqr'.
+  destruct qr as (q, rlr).
+  destruct q as [cq| ]. {
+    generalize Hqr'; intros Hra.
+    apply rlap_quot_rem_step_length_r_a in Hra.
+    remember (rlap_quot_rem_loop it rlr rlb) as qr eqn:Hqr''.
+    symmetry in Hqr''.
+    now destruct qr as (rlq', rlr').
+  }
+  injection Hqr; clear Hqr; intros; subst rlr.
+  apply Nat.succ_le_mono in Hit.
+  destruct rla as [| a]; [ easy | exfalso ].
+  cbn in Hit.
+  destruct rlb as [| b']; [ easy | ].
+  cbn in Hqr'.
+  rewrite if_bool_if_dec in Hqr'.
+  destruct (bool_dec _) as [Hab| Hab]; [ | easy ].
+  clear Hqr'.
+  apply Nat.ltb_lt in Hab.
+  cbn in Hbn; clear Hbz.
+  cbn in Hrb.
+...
 ...
 intros Hco Hop * H1 Hab.
 (*
