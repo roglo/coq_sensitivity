@@ -264,26 +264,6 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
       end
   end.
 
-(**)
-Definition rlap_quot_rem_step' (rla rlb : list T) :=
-  match rlb with
-  | [] => (None, []) (* division by zero *)
-  | b :: rlb' =>
-      match rla with
-      | [] => (None, [])
-      | a :: rla' =>
-          if length rla' <? length rlb' then (None, rla)
-          else
-            let cq := (a / b)%F in
-            let dq := length rla' - length rlb' in
-            let rlr :=
-              lap_sub rla' (map (λ cb, (cb * cq)%F) rlb' ++ repeat 0%F dq)
-            in
-            (Some cq, rlr)
-      end
-  end.
-(**)
-
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
   | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
@@ -297,28 +277,8 @@ Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
       end
   end.
 
-(*
-Fixpoint rlap_quot_rem_loop' it (rla rlb : list T) : list T * list T :=
-  match it with
-  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
-  | S it' =>
-      let (q, rlr) := rlap_quot_rem_step' rla rlb in
-      match q with
-      | Some cq =>
-           let (rlq', rlr') := rlap_quot_rem_loop' it' rlr rlb in
-           (cq :: rlq', rlr')
-      | None => ([], rlr)
-      end
-  end.
-*)
-
 Definition rlap_quot_rem rla rlb :=
   rlap_quot_rem_loop (rlap_quot_rem_nb_iter rla rlb) rla rlb.
-
-(*
-Definition rlap_quot_rem' rla rlb :=
-  rlap_quot_rem_loop' (rlap_quot_rem_nb_iter rla rlb) rla rlb.
-*)
 
 Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
@@ -3305,8 +3265,6 @@ destruct rlac as [| ac]; intros. {
 now rewrite rev_lap_add.
 Qed.
 
-...
-
 (*
 Theorem rlap_quot_rem_step_loop_quot_le : ∀ it rla rlb rlq rlr rlr' cq,
   hd 0%F rlb ≠ 0%F
@@ -3454,9 +3412,7 @@ apply IHit in Hqr. 2: {
   apply Nat.ltb_ge in Hab.
   injection Hqrlr; clear Hqrlr; intros; subst cq rlr.
   rewrite lap_sub_length.
-  rewrite app_length, map_length, repeat_length.
-  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-  now cbn; rewrite Nat.max_id.
+  now cbn; rewrite map_length, Nat.max_l.
 }
 rewrite Hqrlr', Hqr.
 rewrite lap_add_assoc.
@@ -3608,8 +3564,25 @@ destruct Hr as [Hr| Hr]. {
   injection Hab; clear Hab; intros Hr H; subst lq.
   apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
   rewrite rev_involutive in Hr.
-Print rlap_quot_rem_loop.
-Print rlap_quot_rem_step.
+Search rlap_quot_rem.
+apply hd_quot in Hqr; cycle 1. {
+  unfold has_polyn_prop in Ha.
+  apply Bool.orb_true_iff in Ha.
+  destruct Ha as [Ha| Ha]. {
+    apply is_empty_list_empty in Ha; subst la.
+    now left.
+  }
+  right.
+  apply (rngl_neqb_neq Heb) in Ha.
+  now rewrite <- List_last_rev, rev_involutive.
+} {
+  right.
+  apply (rngl_neqb_neq Heb) in Hb.
+  now rewrite <- List_last_rev, rev_involutive.
+}
+destruct Hqr as [Hqr| Hqr]. {
+  subst rlq.
+  rewrite lap_mul_0_r.
 ...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
