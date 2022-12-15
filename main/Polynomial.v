@@ -3927,6 +3927,29 @@ apply rlap_quot_rem_loop_prop in Hqr2; [ | easy | easy | easy | ]; cycle 1. {
   apply rlap_quot_rem_step_length_r_a in Hqr.
   now rewrite <- Hqr.
 }
+rewrite Hqr2 in Hqr1.
+rewrite lap_add_assoc in Hqr1.
+rewrite <- lap_mul_add_distr_l in Hqr1.
+cbn in Hqr1.
+rewrite List_rev_repeat in Hqr1.
+rewrite lap_add_app_l in Hqr1; cycle 1. {
+  rewrite rev_length, repeat_length.
+  generalize Hqr'; intros Hqr3.
+  apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr3; cycle 1. {
+    transitivity (length rla); [ | easy ].
+    apply Nat.le_succ_l.
+    apply rlap_quot_rem_step_length_r_a in Hqr.
+    now rewrite <- Hqr.
+  }
+  rewrite Hqr3.
+  destruct rlb as [| b]; [ easy | ].
+  cbn; rewrite Nat.sub_0_r.
+  cbn in Hlrb.
+  generalize Hqr; intros Hqr4.
+  apply rlap_quot_rem_step_length_r_a in Hqr4.
+  now rewrite <- Hqr4; cbn.
+}
+move Hab before Hqr1.
 ...
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
