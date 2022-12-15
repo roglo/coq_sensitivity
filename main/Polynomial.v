@@ -3622,6 +3622,11 @@ remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 destruct lq as [| q]. {
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   apply Nat.le_0_r, length_zero_iff_nil.
+  apply (f_equal (λ l, rev l)) in Hlq; cbn in Hlq.
+  rewrite rev_involutive in Hlq; subst rlq.
+  apply (f_equal (λ l, rev l)) in H1; cbn in H1.
+  rewrite rev_involutive in H1; subst rlr.
+  rewrite <- (rev_involutive []); f_equal; cbn.
 Search rlap_quot_rem.
 ...
 rewrite <- (rev_involutive lb) at 1.
