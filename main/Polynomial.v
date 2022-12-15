@@ -3335,7 +3335,7 @@ apply Nat.ltb_lt in Hrr.
 now rewrite Hrr in Hqrlr.
 Qed.
 
-Theorem rlap_quot_rem_prop :
+Theorem rlap_quot_rem_loop_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ it (rla rlb rlq rlr : list T),
@@ -3407,6 +3407,18 @@ rewrite rev_length.
 rewrite <- Hra, Hqrb.
 destruct rlb as [| b]; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
+Qed.
+
+Theorem rlap_quot_rem_prop :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  ∀ (rla rlb rlq rlr : list T),
+  hd 0%F rlb ≠ 0%F
+  → rlap_quot_rem rla rlb = (rlq, rlr)
+  → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
+Proof.
+intros Hco Hop * Hbn Hqr.
+now apply rlap_quot_rem_loop_prop in Hqr.
 Qed.
 
 Theorem lap_add_rev_strip : ∀ la lb,
@@ -3556,7 +3568,7 @@ destruct Hr as [Hr| Hr]. {
     apply (rngl_neqb_neq Heb) in Hb.
     now rewrite <- List_last_rev, rev_involutive.
   }
-  specialize (rlap_quot_rem_prop Hco Hop) as H1.
+  specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
   specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
   specialize (H1 Hbz Hqr (Nat.le_refl _)).
   do 2 rewrite rev_involutive in H1.
@@ -3598,8 +3610,24 @@ unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
+specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
+specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
+specialize (H1 Hbz Hqr (Nat.le_refl _)).
+do 2 rewrite rev_involutive in H1.
 rewrite rev_length in Hrb.
+rewrite lap_add_rev_strip; [ easy | ].
+rewrite lap_mul_length.
+destruct lb as [| b]; [ easy | ].
+remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+destruct lq as [| q]. {
+  rewrite lap_mul_0_r, lap_add_0_l in H1.
+  apply Nat.le_0_r, length_zero_iff_nil.
 Search rlap_quot_rem.
+...
+rewrite <- (rev_involutive lb) at 1.
+remember (rev lb) as rlb eqn:Hrlb; symmetry in Hrlb.
+destruct rlb as [| b]; [ easy | ].
+cbn.
 ...
 (*
 remember (rev rlq) as lc eqn:Hlc; symmetry in Hlc.
@@ -3609,7 +3637,7 @@ destruct lc as [| c]. {
   rewrite lap_mul_0_r, lap_add_0_l.
 Print rlap_quot_rem.
 ...
-  specialize (rlap_quot_rem_prop Hco Hop) as H1.
+  specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
   specialize (H1 (S (length (rev la))) (rev la) (rev lb) 0%lap rlr).
   specialize (H1 Hbz Hqr (Nat.le_refl _)).
   rewrite rev_involutive, lap_mul_0_r, lap_add_0_l in H1.
@@ -3617,7 +3645,7 @@ Print rlap_quot_rem.
 Print lap_quot_rem.
 ...
 *)
-specialize (rlap_quot_rem_prop Hco Hop) as H1.
+specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
 specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
 specialize (H1 Hbz Hqr (Nat.le_refl _)).
 do 2 rewrite rev_involutive in H1.
@@ -3718,12 +3746,12 @@ remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
-specialize rlap_quot_rem_prop as H2.
+specialize rlap_quot_rem_loop_prop as H2.
 ...
 rewrite <- (rev_involutive la).
 rewrite <- (rev_involutive lb).
 unfold rlap_quot_rem in Hqr.
-eapply rlap_quot_rem_prop.
+eapply rlap_quot_rem_loop_prop.
 ...
 *)
 assert (Hbz : lb ≠ []). {
@@ -3777,7 +3805,7 @@ assert (H : S (length rla) ≤ it) by flia Hit.
 clear Hit; rename H into Hit.
 rewrite <- (rev_involutive rla).
 f_equal.
-specialize (rlap_quot_rem_prop Hco Hop) as H1.
+specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
 specialize (H1 it rla rlb rlq rlr Hbn Hqr Hit).
 rewrite lap_add_rev_strip; [ easy | ].
 rewrite lap_mul_length.
@@ -3845,9 +3873,9 @@ rewrite rev_app_distr; cbn.
 destruct rlq as [| q] using rev_ind. {
   cbn.
 ...
-apply (@rlap_quot_rem_prop Hco Hop it rla rlb rlq _ Hbn); [ | easy ].
+apply (@rlap_quot_rem_loop_prop Hco Hop it rla rlb rlq _ Hbn); [ | easy ].
 ...
-apply (rlap_quot_rem_prop Hco Hop rla _ Hbn Hqr Hit).
+apply (rlap_quot_rem_loop_prop Hco Hop rla _ Hbn Hqr Hit).
 Qed.
 
 Arguments polyn_quot_rem (pa pb)%pol.
@@ -4070,7 +4098,7 @@ symmetry; rewrite lap_add_comm.
 now rewrite (lap_add_sub Hop).
 Qed.
 
-Theorem rlap_quot_rem_prop_if :
+Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (it : nat) (rla rlb rlq rlr : list T),
@@ -4130,7 +4158,7 @@ destruct qr as (q', r').
 cbn in Hqr1.
 rewrite List_rev_repeat in Hqr1.
 generalize Hqr'; intros Hqr''.
-apply rlap_quot_rem_prop in Hqr''; [ | easy | easy | easy | ]; cycle 1. {
+apply rlap_quot_rem_loop_prop in Hqr''; [ | easy | easy | easy | ]; cycle 1. {
   transitivity (length rla); [ | easy ].
   apply Nat.le_succ_l.
   eapply rlap_quot_rem_step_length_lt.
@@ -4191,7 +4219,7 @@ Theorem polyn_mul_div :
   → (a * b / b)%pol = a.
 Proof.
 intros Hco Hop * Hbz.
-Check rlap_quot_rem_prop.
+Check rlap_quot_rem_loop_prop.
 ...
 destruct a as (la, pa).
 destruct b as (lb, pb).
@@ -4616,7 +4644,7 @@ remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (q, r); cbn.
 unfold lap_norm in Hqr.
 rewrite rev_involutive in Hqr.
-apply (rlap_quot_rem_prop Hco Hop Hiv) in Hqr; [ | | easy ]. 2: {
+apply (rlap_quot_rem_loop_prop Hco Hop Hiv) in Hqr; [ | | easy ]. 2: {
   destruct b as (lb, Hlb); cbn.
   unfold last_lap_neq_0 in Hlb.
   intros H.
