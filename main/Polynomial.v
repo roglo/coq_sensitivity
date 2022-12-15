@@ -3508,10 +3508,11 @@ Theorem lap_quot_rem_prop :
   ∀ la lb lq lr : list T,
   has_polyn_prop la = true
   → (last lb 0 ≠? 0)%F = true
+  → has_polyn_prop lr = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
 Proof.
-intros Hco Hop * Ha Hb Hab.
+intros Hco Hop * Ha Hb Hr Hab.
 assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
     intros H; subst lb; cbn in Hb.
@@ -3557,6 +3558,21 @@ specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
 specialize (H1 Hbz Hqr (Nat.le_refl _)).
 do 2 rewrite rev_involutive in H1.
 Check lap_add_rev_strip.
+Search has_polyn_prop.
+apply Bool.orb_true_iff in Hr.
+destruct Hr as [Hr| Hr]. {
+  apply is_empty_list_empty in Hr.
+  rewrite Hr.
+...
+specialize last_lap_neq_0_lap_norm as H2.
+specialize (H2 (rev rlr)).
+unfold lap_norm in H2.
+assert (H : has_polyn_prop (rev rlr) = true). {
+  unfold has_polyn_prop in Hr |-*.
+  apply Bool.orb_true_iff in Hr.
+  apply Bool.orb_true_iff.
+  destruct Hr as [Hr| Hr]. {
+    apply is_empty_list_empty in Hr.
 ...
 rewrite lap_add_rev_strip; [ easy | ].
 rewrite lap_mul_length.
