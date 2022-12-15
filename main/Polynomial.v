@@ -742,7 +742,6 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
-(*
 Theorem hd_rem : ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
@@ -785,11 +784,11 @@ eapply IHit; [ | | | apply Hrb ]; [ | apply Hb | ]. 2: {
   etransitivity; [ | apply Hit ].
   cbn; apply -> Nat.succ_le_mono.
   rewrite Hrlr.
-  rewrite lap_sub_length, app_length, map_length, repeat_length.
-  rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
-  now rewrite Nat.max_id.
+  rewrite lap_sub_length, map_length.
+  now rewrite Nat.max_l.
 }
 rewrite Hrlr.
+...
 remember (lap_sub la (map _ _ ++ _)) as l eqn:Hl.
 clear Hl Hrlr.
 destruct Ha as [Ha| Ha]; [ easy | ].
@@ -800,7 +799,8 @@ rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hxz| Hxz]; [ easy | cbn; right ].
 now apply rngl_eqb_neq in Hxz.
 Qed.
-*)
+
+...
 
 Theorem quot_is_norm : ∀ la lb,
   has_polyn_prop la = true
@@ -3566,32 +3566,59 @@ destruct Hr as [Hr| Hr]. {
   unfold lap_quot_rem in Hab.
   remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
   destruct qr as (rlq, rlr).
+Search rlap_quot_rem.
+...
   injection Hab; clear Hab; intros Hr H; subst lq.
   apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
   rewrite rev_involutive in Hr.
-Search rlap_quot_rem.
-Check hd_quot.
-generalize Hqr; intros Hqr'.
-apply hd_quot in Hqr'; cycle 1. {
-  unfold has_polyn_prop in Ha.
-  apply Bool.orb_true_iff in Ha.
-  destruct Ha as [Ha| Ha]. {
-    apply is_empty_list_empty in Ha; subst la.
-    now left.
+  generalize Hqr; intros Hqr'.
+  apply hd_quot in Hqr'; cycle 1. {
+    unfold has_polyn_prop in Ha.
+    apply Bool.orb_true_iff in Ha.
+    destruct Ha as [Ha| Ha]. {
+      apply is_empty_list_empty in Ha; subst la.
+      now left.
+    }
+    right.
+    apply (rngl_neqb_neq Heb) in Ha.
+    now rewrite <- List_last_rev, rev_involutive.
+  } {
+    right.
+    apply (rngl_neqb_neq Heb) in Hb.
+    now rewrite <- List_last_rev, rev_involutive.
   }
-  right.
-  apply (rngl_neqb_neq Heb) in Ha.
-  now rewrite <- List_last_rev, rev_involutive.
-} {
-  right.
-  apply (rngl_neqb_neq Heb) in Hb.
-  now rewrite <- List_last_rev, rev_involutive.
-}
-destruct Hqr' as [Hqr'| Hqr']. {
-  subst rlq.
-  rewrite lap_mul_0_r.
-Print rlap_quot_rem_loop.
-Print rlap_quot_rem_step.
+  specialize (rlap_quot_rem_prop Hco Hop) as H1.
+  specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
+  specialize (H1 Hbz Hqr (Nat.le_refl _)).
+  do 2 rewrite rev_involutive in H1.
+  destruct Hqr' as [Hqr'| Hqr']. {
+    subst rlq.
+    rewrite lap_mul_0_r.
+    rewrite lap_mul_0_r, lap_add_0_l in H1.
+    apply (f_equal (λ l, rev l)) in H1.
+    rewrite rev_involutive in H1; subst rlr.
+    apply Bool.orb_true_iff in Ha.
+    destruct Ha as [Ha| Ha]. {
+      now apply is_empty_list_empty in Ha.
+    }
+    destruct la as [| a] using rev_ind; [ easy | ].
+    rewrite last_last in Ha.
+    rewrite rev_app_distr in Hr; cbn in Hr.
+    apply Bool.negb_true_iff in Ha.
+    now rewrite Ha in Hr.
+  }
+  rewrite <- lap_add_rev_strip in H1. {
+    now rewrite Hr, lap_add_0_r in H1.
+  }
+  rewrite lap_mul_length.
+  destruct lb as [| b]; [ easy | ].
+  remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+  destruct lq as [| q]. {
+    apply (f_equal (λ l, rev l)) in Hlq; cbn in Hlq.
+    now rewrite rev_involutive in Hlq; subst rlq.
+  }
+  cbn; rewrite Nat.sub_0_r.
+  rewrite app_length; cbn.
 ...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
