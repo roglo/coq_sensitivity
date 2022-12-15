@@ -3918,7 +3918,15 @@ symmetry in Hqr'.
 destruct qr as (rlq'', rlr'').
 move rlr' before rlr.
 move rlq'' before rlr'; move rlr'' before rlq''.
-Search rlap_quot_rem_loop.
+generalize Hqr; intros Hqr1.
+apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
+generalize Hqr'; intros Hqr2.
+apply rlap_quot_rem_loop_prop in Hqr2; [ | easy | easy | easy | ]; cycle 1. {
+  transitivity (length rla); [ | easy ].
+  apply Nat.le_succ_l.
+  apply rlap_quot_rem_step_length_r_a in Hqr.
+  now rewrite <- Hqr.
+}
 ...
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
