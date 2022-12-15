@@ -3627,6 +3627,10 @@ destruct lq as [| q]. {
   apply (f_equal (λ l, rev l)) in H1; cbn in H1.
   rewrite rev_involutive in H1; subst rlr.
   rewrite <- (rev_involutive []); f_equal; cbn.
+Print lap_quot_rem.
+Print rlap_quot_rem.
+Print rlap_quot_rem_loop.
+Print rlap_quot_rem_step.
 Search rlap_quot_rem.
 ...
 rewrite <- (rev_involutive lb) at 1.
