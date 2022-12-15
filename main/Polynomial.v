@@ -3239,16 +3239,6 @@ rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
-(*
-  ============================
-  rev (a :: rla) =
-  (rev (b :: rlb) *
-   rev ((a / b)%F :: repeat 0%F (length (a :: rla) - length (b :: rlb))) +
-   rev
-     (rla -
-      (map (λ cb : T, (cb * (a / b))%F) rlb ++
-       repeat 0%F (length rla - length rlb))))%lap
-*)
 remember (a / b)%F as cq eqn:Hcq.
 move b before a.
 cbn; rewrite List_rev_repeat.
@@ -3267,14 +3257,6 @@ rewrite (rngl_mul_div_r Hco Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
 rewrite <- rev_app_distr.
-(*
-...
-  ============================
-  rev rla ++ [a] =
-  ((rev
-      (map (λ b0 : T, (b0 * cq)%F) rlb ++ repeat 0%F (length rla - length rlb)) ++
-    [a]) + rev (rla - map (λ cb : T, (cb * cq)%F) rlb))%lap
-*)
 remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 rewrite rev_lap_sub_norm; [ | easy ].
 rewrite map_length.
@@ -3285,45 +3267,18 @@ rewrite <- Hrlc.
 subst x.
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
 cbn.
-Search ((_ ++ _) + _)%lap.
-...
-rewrite lap_add_app_l.
-...
 rewrite fold_lap_sub.
-...
-(**)
-...
-remember (map _ _ ++ repeat _ _) as rlc eqn:Hrlc.
 assert (Hca : length rlc = length rla). {
   rewrite Hrlc, app_length, map_length, repeat_length.
   now rewrite Nat.add_comm, Nat.sub_add.
 }
-...
-  ============================
-  rev rla ++ [a] = ((rev rlc ++ [a]) + rev (rla - rlc))%lap
-
+rewrite <- rev_lap_sub; [ | easy ].
 rewrite lap_add_app_l. 2: {
-(**)
   do 2 rewrite rev_length.
   rewrite lap_sub_length.
   now rewrite Hca, Nat.max_id.
-(*
-  do 2 rewrite rev_length.
-  now rewrite lap_sub_length, map_length, Hca, Nat.max_l.
-*)
 }
 f_equal.
-...
-  Hab : length rlb ≤ length rla
-  cq : T
-  Hcq : cq = (a / b)%F
-  rlc : list T
-  Hrlc : rlc =
-         map (λ b : T, (b * cq)%F) rlb ++ repeat 0%F (length rla - length rlb)
-  Hca : length rlc = length rla
-  ============================
-  rev rla = (rev rlc + rev (rla - map (λ cb : T, (cb * cq)%F) rlb))%lap
-...
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
 symmetry in Hrlac.
@@ -3342,18 +3297,11 @@ rewrite lap_sub_length in Hrlac.
 rewrite lap_add_length in Hrlac.
 rewrite Nat.max_l in Hrlac; [| apply Nat.le_max_l ].
 rewrite Nat.max_l in Hrlac; [ | easy ].
-(*
-clear - Heb Hrlac Hab.
-revert rlc Hrlac Hab.
-*)
 destruct rlac as [| ac]; intros. {
   apply length_zero_iff_nil in Hrlac; subst rlc; cbn.
   rewrite lap_add_0_l in Hab.
   now apply Nat.le_0_r, length_zero_iff_nil in Hab; subst rlb.
 }
-(**)
-rewrite rev_lap_add; [ | easy ].
-...
 now rewrite rev_lap_add.
 Qed.
 
