@@ -3564,6 +3564,9 @@ destruct lq as [| q]. {
   apply (f_equal (λ l, rev l)) in Hlq; cbn in Hlq.
   rewrite rev_involutive in Hlq; subst rlq.
   rewrite lap_mul_0_r, lap_add_0_l in H1.
+(* si q=0, normalement r=a et donc avec a=rev(r), on doit avoir que a
+   est un palindrome *)
+...
   apply (f_equal (λ l, rev l)) in H1.
   rewrite rev_involutive in H1; subst rlr.
   rewrite (polyn_length_strip_length _ Ha) in Hrb.
