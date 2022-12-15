@@ -3556,6 +3556,8 @@ specialize (rlap_quot_rem_prop Hco Hop) as H1.
 specialize (H1 (S (length (rev la))) (rev la) (rev lb) rlq rlr).
 specialize (H1 Hbz Hqr (Nat.le_refl _)).
 do 2 rewrite rev_involutive in H1.
+Check lap_add_rev_strip.
+...
 rewrite lap_add_rev_strip; [ easy | ].
 rewrite lap_mul_length.
 destruct lb as [| b]; [ easy | ].
@@ -3564,8 +3566,6 @@ destruct lq as [| q]. {
   apply (f_equal (λ l, rev l)) in Hlq; cbn in Hlq.
   rewrite rev_involutive in Hlq; subst rlq.
   rewrite lap_mul_0_r, lap_add_0_l in H1.
-(* si q=0, normalement r=a et donc avec a=rev(r), on doit avoir que a
-   est un palindrome *)
 ...
   apply (f_equal (λ l, rev l)) in H1.
   rewrite rev_involutive in H1; subst rlr.
