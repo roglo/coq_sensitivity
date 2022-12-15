@@ -3532,6 +3532,20 @@ assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
   rewrite last_last in Hb; cbn.
   now apply (rngl_neqb_neq Heb) in Hb.
 }
+apply Bool.orb_true_iff in Hr.
+destruct Hr as [Hr| Hr]. {
+  apply is_empty_list_empty in Hr.
+  subst lr.
+  rewrite lap_add_0_r.
+  unfold lap_quot_rem in Hab.
+  remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
+  destruct qr as (rlq, rlr).
+  injection Hab; clear Hab; intros Hr H; subst lq.
+  apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
+  rewrite rev_involutive in Hr.
+Print rlap_quot_rem_loop.
+Print rlap_quot_rem_step.
+...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq, rlr).
@@ -3563,6 +3577,8 @@ apply Bool.orb_true_iff in Hr.
 destruct Hr as [Hr| Hr]. {
   apply is_empty_list_empty in Hr.
   rewrite Hr.
+  apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
+  rewrite rev_involutive in Hr.
 ...
 specialize last_lap_neq_0_lap_norm as H2.
 specialize (H2 (rev rlr)).
