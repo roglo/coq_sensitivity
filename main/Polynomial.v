@@ -291,15 +291,20 @@ Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem' {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (rlap_quot_rem [1] [2]).
-Compute (rlap_quot_rem' [1] [2]).
 Compute (rlap_quot_rem [1;0;0;1] [1;1]).
-Compute (rlap_quot_rem' [1;0;0;1] [1;1]).
+Compute (rlap_quot_rem [1;1;0;1] [1;1]).
+Compute (rlap_quot_rem_step [1;1;0;1] [1;1]).
+Compute (rlap_quot_rem [0;0;1] [1;1]).
+Compute (rlap_quot_rem_step [0;0;1] [1;1]).
+Print rlap_quot_rem_loop.
+Print rlap_quot_rem.
+...
 Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
 Compute (rlap_quot_rem' [0;1;0;0;1] [1;1]).
 Compute (
@@ -3585,6 +3590,8 @@ apply hd_quot in Hqr'; cycle 1. {
 destruct Hqr' as [Hqr'| Hqr']. {
   subst rlq.
   rewrite lap_mul_0_r.
+Print rlap_quot_rem_loop.
+Print rlap_quot_rem_step.
 ...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
