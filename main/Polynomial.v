@@ -3565,7 +3565,9 @@ destruct Hr as [Hr| Hr]. {
   apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
   rewrite rev_involutive in Hr.
 Search rlap_quot_rem.
-apply hd_quot in Hqr; cycle 1. {
+Check hd_quot.
+generalize Hqr; intros Hqr'.
+apply hd_quot in Hqr'; cycle 1. {
   unfold has_polyn_prop in Ha.
   apply Bool.orb_true_iff in Ha.
   destruct Ha as [Ha| Ha]. {
@@ -3580,7 +3582,7 @@ apply hd_quot in Hqr; cycle 1. {
   apply (rngl_neqb_neq Heb) in Hb.
   now rewrite <- List_last_rev, rev_involutive.
 }
-destruct Hqr as [Hqr| Hqr]. {
+destruct Hqr' as [Hqr'| Hqr']. {
   subst rlq.
   rewrite lap_mul_0_r.
 ...
