@@ -590,6 +590,43 @@ rewrite lap_sub_length, map_length.
 now rewrite Nat.max_l.
 Qed.
 
+Theorem rlap_rem_prop : ∀ rla rlb rlq rlr,
+  rlb ≠ []
+  → rlap_quot_rem rla rlb = (rlq, rlr)
+  → length rlr < length rlb.
+Proof.
+intros * Hbz Hqr.
+unfold rlap_quot_rem in Hqr.
+remember (rlap_quot_rem_nb_iter rla rlb) as it eqn:Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+assert (H : S (length rla) ≤ it) by flia Hit.
+clear Hit; rename H into Hit.
+revert rla rlq rlr Hqr Hit.
+induction it; intros; [ easy | ].
+cbn in Hqr.
+remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'; symmetry in Hqr'.
+destruct qr as (q, rlr').
+destruct q as [cq| ]. 2: {
+  injection Hqr; clear Hqr; intros; subst rlq rlr'.
+  apply rlap_quot_rem_step_None in Hqr'.
+  destruct Hqr' as [(H1, H2)| Hqr]; [ easy | ].
+  destruct Hqr as [(H1, H2)| Hqr]. {
+    subst rla rlr.
+    destruct rlb; [ easy | ].
+    cbn; easy.
+  }
+  now destruct Hqr as (H1, H2); subst rlr.
+}
+remember (rlap_quot_rem_loop it rlr' rlb) as qr eqn:Hqr''.
+symmetry in Hqr''.
+destruct qr as (rlq', rlr'').
+injection Hqr; clear Hqr; intros; subst rlq rlr''.
+apply IHit in Hqr''; [ easy | ].
+apply rlap_quot_rem_step_length_r_a in Hqr'.
+rewrite Hqr'.
+now apply Nat.succ_le_mono in Hit.
+Qed.
+
 Theorem lap_rem_length_lt :
   rngl_has_opp = true →
   rngl_mul_is_comm = true →
@@ -605,92 +642,19 @@ remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
-unfold rlap_quot_rem in Hqr.
-remember (rlap_quot_rem_nb_iter (rev la) (rev lb)) as it eqn:Hit.
-unfold rlap_quot_rem_nb_iter in Hit.
-rewrite <- (rev_involutive lb).
-remember (rev la) as rla eqn:Hrla.
-clear la Hrla.
-do 2 rewrite rev_length.
-remember (rev lb) as rlb eqn:Hrlb.
-assert (H : rlb ≠ []). {
-  subst rlb.
-  intros H; apply Hbz.
-  now apply List_eq_rev_nil in H.
+apply rlap_rem_prop in Hqr. 2: {
+  now intros H; apply List_eq_rev_nil in H.
 }
-move H before Hbz; clear Hbz.
-rename H into Hbz.
-assert (H : hd 0%F rlb ≠ 0%F). {
-  subst rlb.
-  unfold has_polyn_prop in Hbn.
-  apply Bool.orb_true_iff in Hbn.
-  destruct Hbn as [Hbn| Hbn]. {
-    unfold is_empty_list in Hbn.
-    now destruct lb.
-  }
-  destruct lb as [| b] using rev_ind; [ easy | ].
-  rewrite last_last in Hbn.
-  rewrite rev_app_distr; cbn.
-  now apply (rngl_neqb_neq Heb) in Hbn.
-}
-move H before Hbn; clear Hbn.
-rename H into Hbn.
-clear lb Hrlb.
-move rla after rlb; move rlq before rlb.
-move rlr before rlq.
-assert (H : S (length rla) ≤ it) by flia Hit.
-clear Hit; rename H into Hit.
-destruct rlb as [| b]; [ easy | clear Hbz ].
-cbn in Hbn |-*.
-revert rla rlq rlr Hqr Hit.
-induction it; intros; [ easy | ].
-apply Nat.succ_le_mono in Hit.
-destruct rla as [| a]. {
-  now injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-}
-move a after b.
-cbn in Hqr.
-rewrite if_bool_if_dec in Hqr.
-destruct (bool_dec _) as [Hab| Hab]. {
-  injection Hqr; clear Hqr; intros; subst rlq rlr; cbn.
-  rewrite if_bool_if_dec.
-  apply Nat.ltb_lt, Nat.succ_lt_mono in Hab.
-  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
-  transitivity (S (length rla)); [ | easy ].
-  apply Nat.lt_succ_r, strip_0s_length_le.
-}
-apply Nat.ltb_ge in Hab.
-remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
-symmetry in Hqr'.
-destruct qr as (rlq', rlr'').
-injection Hqr; clear Hqr; intros; subst rlq rlr.
-rename rlq' into rlq; rename rlr'' into rlr.
-rename Hqr' into Hqr.
-cbn in Hit.
-remember (rev rla) as la eqn:Hla.
-assert (H : rla = rev la) by now rewrite Hla, rev_involutive.
-move H at top; subst rla; clear Hla.
-rewrite rev_length in Hab, Hit.
-remember (rev rlb) as lb eqn:Hlb.
-assert (H : rlb = rev lb) by now rewrite Hlb, rev_involutive.
-move H at top; subst rlb; clear Hlb.
-rewrite rev_length in Hab |-*.
-apply IHit in Hqr. 2: {
-  etransitivity; [ | apply Hit ].
-  apply -> Nat.succ_le_mono.
-  rewrite lap_sub_length.
-  rewrite rev_length, map_length.
-  rewrite rev_length.
-  now rewrite Nat.max_l.
-}
-now rewrite rev_length in Hqr.
+rewrite rev_length in Hqr |-*.
+eapply le_lt_trans; [ | apply Hqr ].
+apply strip_0s_length_le.
 Qed.
 
 (*
 Section b.
 *)
 
-Theorem hd_quot : ∀ la lb lq lr,
+Theorem rlap_quot_prop : ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
@@ -743,7 +707,7 @@ apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
 (*
-Theorem hd_rem : ∀ la lb lq lr,
+Theorem rlap_rem_prop : ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
@@ -824,7 +788,7 @@ unfold has_polyn_prop.
 apply Bool.orb_true_iff.
 destruct rlq as [| q]; [ now left | right ].
 cbn; rewrite last_last.
-apply hd_quot in Hqr; cycle 1. {
+apply rlap_quot_prop in Hqr; cycle 1. {
   unfold has_polyn_prop in Ha.
   apply Bool.orb_true_iff in Ha.
   destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
@@ -3577,7 +3541,7 @@ destruct Hr as [Hr| Hr]. {
   apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
   rewrite rev_involutive in Hr.
   generalize Hqr; intros Hqr'.
-  apply hd_quot in Hqr'; cycle 1. {
+  apply rlap_quot_prop in Hqr'; cycle 1. {
     unfold has_polyn_prop in Ha.
     apply Bool.orb_true_iff in Ha.
     destruct Ha as [Ha| Ha]. {
@@ -3624,14 +3588,19 @@ destruct Hr as [Hr| Hr]. {
   }
   cbn; rewrite Nat.sub_0_r.
   rewrite app_length; cbn.
-Search rlap_quot_rem.
-(* si hd_rem arrive à me prouver que length lr < length lb, alors j'ai gagné *)
-...
+  apply rlap_rem_prop in Hqr. 2: {
+    intros H.
+    now apply List_eq_rev_nil in H.
+  }
+  rewrite rev_length in Hqr; cbn in Hqr; flia Hqr.
+}
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq, rlr).
 injection Hab; clear Hab; intros; subst lq lr.
 rewrite rev_length in Hrb.
+Search rlap_quot_rem.
+...
 (*
 remember (rev rlq) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
