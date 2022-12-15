@@ -742,12 +742,18 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
+(*
 Theorem hd_rem : ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → lr = [] ∨ hd 0%F lr ≠ 0%F.
 Proof.
+intros * Ha Hb Hab.
+(* probablement faux ; maintenant, on peut avoir lr avec que des 0.
+   Par contre, on devrait avoir length lr ≤ length la.
+   Ou même plutôt, tiens, length lr < length lb *)
+...
 intros * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
@@ -801,6 +807,7 @@ now apply rngl_eqb_neq in Hxz.
 Qed.
 
 ...
+*)
 
 Theorem quot_is_norm : ∀ la lb,
   has_polyn_prop la = true
@@ -3566,8 +3573,6 @@ destruct Hr as [Hr| Hr]. {
   unfold lap_quot_rem in Hab.
   remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
   destruct qr as (rlq, rlr).
-Search rlap_quot_rem.
-...
   injection Hab; clear Hab; intros Hr H; subst lq.
   apply (f_equal (λ l, rev l)) in Hr; cbn in Hr.
   rewrite rev_involutive in Hr.
@@ -3619,6 +3624,8 @@ Search rlap_quot_rem.
   }
   cbn; rewrite Nat.sub_0_r.
   rewrite app_length; cbn.
+Search rlap_quot_rem.
+(* si hd_rem arrive à me prouver que length lr < length lb, alors j'ai gagné *)
 ...
 unfold lap_quot_rem in Hab.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr; symmetry in Hqr.
