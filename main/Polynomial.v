@@ -3935,11 +3935,19 @@ move rlq'' before rlr'; move rlr'' before rlq''.
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
 generalize Hqr'; intros Hqr2.
+generalize Hqr; intros Hqr3.
+apply rlap_quot_rem_step_length_r_a in Hqr3.
+assert (Hqr4 : length rlq'' = length rlr' - (length rlb - 1)). {
+  generalize Hqr'; intros Hqr4.
+Check rlap_quot_rem_length.
+Search rlap_quot_rem_loop.
+...
+  apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr4; [ easy | ].
+  now rewrite Hqr3.
+}
 apply rlap_quot_rem_loop_prop in Hqr2; [ | easy | easy | easy | ]; cycle 1. {
   transitivity (length rla); [ | easy ].
-  apply Nat.le_succ_l.
-  apply rlap_quot_rem_step_length_r_a in Hqr.
-  now rewrite <- Hqr.
+  now rewrite Hqr3.
 }
 rewrite Hqr2 in Hqr1.
 rewrite lap_add_assoc in Hqr1.
@@ -3948,20 +3956,13 @@ cbn in Hqr1.
 rewrite List_rev_repeat in Hqr1.
 rewrite lap_add_app_l in Hqr1; cycle 1. {
   rewrite rev_length, repeat_length.
-  generalize Hqr'; intros Hqr3.
-  apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr3; cycle 1. {
-    transitivity (length rla); [ | easy ].
-    apply Nat.le_succ_l.
-    apply rlap_quot_rem_step_length_r_a in Hqr.
-    now rewrite <- Hqr.
-  }
-  rewrite Hqr3.
+  rewrite Hqr4.
   destruct rlb as [| b]; [ easy | ].
   cbn; rewrite Nat.sub_0_r.
   cbn in Hlrb.
-  generalize Hqr; intros Hqr4.
-  apply rlap_quot_rem_step_length_r_a in Hqr4.
-  now rewrite <- Hqr4; cbn.
+  generalize Hqr; intros Hqr5.
+  apply rlap_quot_rem_step_length_r_a in Hqr5.
+  now rewrite <- Hqr5; cbn.
 }
 move Hab before Hqr1.
 rewrite Hqr1 in Hab.
@@ -3976,14 +3977,23 @@ apply (lap_add_sub_eq_r Hop) in Hab; cycle 1. {
   symmetry in Hld.
   destruct ld as [| d]; [ now apply app_eq_nil in Hld | ].
   cbn; rewrite Nat.sub_0_r.
-  rewrite app_length.
-...
-Theorem lap_add_sub_eq_l : ∀ la lb lc, (la + lb)%lap = lc → (lc - la)%lap = lb.
+  rewrite app_length, <- Hld.
+  rewrite app_length, lap_add_length.
+  rewrite repeat_length, rev_length; cbn.
+  rewrite Hqr4, <- Hqr3.
+  rewrite rev_length; cbn.
+  rewrite Nat.sub_0_r.
+  rewrite Nat.max_id.
+  rewrite rev_length in Hqr4; cbn in Hqr4.
+  rewrite Nat.sub_0_r in Hqr4.
+Search rlap_quot_rem_loop.
 ...
 Theorem lap_add_sub_distr: ∀ la lb lc, (la + (lb - lc))%lap = (la + lb - lc)%lap.
 ... ...
-apply lap_add_sub_eq_r in Hab.
 rewrite <- lap_add_sub_distr in Hab.
+...
+Theorem lap_add_sub_eq_l : ∀ la lb lc, (la + lb)%lap = lc → (lc - la)%lap = lb.
+... ...
 apply lap_add_sub_eq_l in Hab.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
 ...
