@@ -3916,6 +3916,7 @@ Theorem rlap_quot_rem_loop_prop_if :
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
 intros Hco Hop * Haz Hbz Hit Hab Hlrb.
+...
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
 apply Nat.succ_le_mono in Hit.
