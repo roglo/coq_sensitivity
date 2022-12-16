@@ -1601,6 +1601,19 @@ induction n; [ easy | cbn ].
 f_equal; apply IHn.
 Qed.
 
+Theorem List_rev_rev : ∀ A (la lb : list A), rev la = rev lb → la = lb.
+Proof.
+intros * Hab.
+apply (f_equal (λ l, rev l)) in Hab.
+now do 2 rewrite rev_involutive in Hab.
+Qed.
+
+Theorem List_rev_symm : ∀ A (la lb : list A), rev la = lb → la = rev lb.
+Proof.
+intros * Hab.
+now subst lb; rewrite rev_involutive.
+Qed.
+
 Theorem List_rev_repeat : ∀ A (x : A) n,
   rev (repeat x n) = repeat x n.
 Proof.
