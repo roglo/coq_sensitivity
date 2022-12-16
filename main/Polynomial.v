@@ -3935,9 +3935,10 @@ apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
   apply (f_equal (λ l, rev l)) in Hlb.
   rewrite rev_involutive in Hlb; subst rlb.
-  rewrite rev_length in Hqr1.
+  rewrite rev_length in Hlrb, Hqr1.
   destruct lb as [| b]; [ easy | ].
   cbn in Hqr1; rewrite Nat.sub_0_r in Hqr1.
+  cbn in Hlrb.
   remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
   apply (f_equal (λ l, rev l)) in Hlq.
   rewrite rev_involutive in Hlq; subst rlq.
