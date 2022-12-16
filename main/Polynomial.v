@@ -3868,6 +3868,20 @@ symmetry; rewrite lap_add_comm.
 now rewrite (lap_add_sub Hop).
 Qed.
 
+Theorem lap_add_sub_eq_l :
+  rngl_has_opp = true →
+  ∀ la lb lc,
+  length la ≤ length lb
+  → (la + lb)%lap = lc
+  → (lc - la)%lap = lb.
+Proof.
+intros Hop * Hlab Hlabc; subst lc.
+rewrite lap_add_comm.
+rewrite (lap_add_sub Hop).
+rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
+apply app_nil_r.
+Qed.
+
 Theorem lap_add_sub_eq_r :
   rngl_has_opp = true →
   ∀ la lb lc,
@@ -3880,6 +3894,14 @@ subst lc.
 rewrite (lap_add_sub Hop).
 rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
 apply app_nil_r.
+Qed.
+
+Theorem lap_add_sub_distr: ∀ la lb lc,
+  (la + (lb - lc))%lap = (la + lb - lc)%lap.
+Proof.
+intros.
+unfold lap_sub.
+apply lap_add_assoc.
 Qed.
 
 Theorem rlap_quot_rem_loop_prop_if :
@@ -3939,9 +3961,6 @@ generalize Hqr; intros Hqr3.
 apply rlap_quot_rem_step_length_r_a in Hqr3.
 assert (Hqr4 : length rlq'' = length rlr' - (length rlb - 1)). {
   generalize Hqr'; intros Hqr4.
-Check rlap_quot_rem_length.
-Search rlap_quot_rem_loop.
-...
   apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr4; [ easy | ].
   now rewrite Hqr3.
 }
@@ -3986,25 +4005,48 @@ apply (lap_add_sub_eq_r Hop) in Hab; cycle 1. {
   rewrite Nat.max_id.
   rewrite rev_length in Hqr4; cbn in Hqr4.
   rewrite Nat.sub_0_r in Hqr4.
-Search rlap_quot_rem_loop.
-...
-Theorem lap_add_sub_distr: ∀ la lb lc, (la + (lb - lc))%lap = (la + lb - lc)%lap.
-... ...
+  rewrite Nat.add_comm.
+  rewrite Nat.add_shuffle0.
+  apply (f_equal length) in Hqr2.
+  rewrite rev_length in Hqr2; cbn in Hqr2.
+  remember (rev rlq'') as lq'' eqn:Hlq''.
+  symmetry in Hlq''.
+  apply (f_equal (λ l, rev l)) in Hlq''; cbn in Hlq''.
+  rewrite rev_involutive in Hlq''; subst rlq''.
+  cbn in Hqr4.
+  rewrite <- Hqr4; cbn.
+  rewrite rev_length in Hlrb.
+  cbn in Hlrb.
+  rewrite Nat.add_1_r.
+  rewrite rev_length in Hqr4.
+  destruct lq'' as [| q'']. {
+    rewrite lap_add_0_l, rev_length in Hqr2.
+    rewrite <- Hqr2.
+    symmetry in Hqr4.
+    apply Nat.sub_0_le in Hqr4.
+    now apply Nat.le_le_succ_r.
+  }
+  rewrite rev_length.
+  cbn.
+  rewrite Nat.sub_0_r in Hqr2.
+  rewrite lap_add_length, rev_length in Hqr2.
+  rewrite lap_convol_mul_length in Hqr2.
+  cbn in Hqr2.
+  cbn in Hqr4.
+  rewrite <- Nat.add_succ_l.
+  rewrite Hqr4.
+  rewrite Nat.sub_add; [ | flia Hqr4 ].
+  rewrite Hqr4 in Hqr2.
+  rewrite Nat.add_comm in Hqr2.
+  rewrite Nat.sub_add in Hqr2; [ | flia Hqr4 ].
+  transitivity (length rlr'); [ | flia ].
+  rewrite Hqr2.
+  apply Nat.le_max_r.
+}
 rewrite <- lap_add_sub_distr in Hab.
-...
-Theorem lap_add_sub_eq_l : ∀ la lb lc, (la + lb)%lap = lc → (lc - la)%lap = lb.
-... ...
-apply lap_add_sub_eq_l in Hab.
-rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
+apply (lap_add_sub_eq_l Hop) in Hab; cycle 1. {
 ...
 rewrite lap_add_comm in Hab; symmetry in Hab.
-Search (_ - _)%F.
-rngl_add_sub_eq_r:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → rngl_has_opp_or_sous = true → ∀ a b c : T, (a + b)%F = c → (c - b)%F = a
-rngl_add_sub_eq_l:
-  ∀ (T : Type) (ro : ring_like_op T),
-    ring_like_prop T → rngl_has_opp_or_sous = true → ∀ a b c : T, (a + b)%F = c → (c - a)%F = b
 ...
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1; [ | easy ].
