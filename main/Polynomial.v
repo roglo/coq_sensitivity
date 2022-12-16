@@ -4045,6 +4045,20 @@ apply (lap_add_sub_eq_r Hop) in Hab; cycle 1. {
 }
 rewrite <- lap_add_sub_distr in Hab.
 apply (lap_add_sub_eq_l Hop) in Hab; cycle 1. {
+  rewrite lap_sub_length.
+  do 2 rewrite rev_length.
+  rewrite lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]; [ easy | ].
+  remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+  destruct lq as [| q]; [ easy | ].
+  cbn; rewrite app_length; cbn.
+  rewrite Nat.sub_0_r.
+  generalize Hqr2; intros Hqr5.
+  apply (f_equal length) in Hqr5.
+  rewrite rev_length, lap_add_length in Hqr5.
+  rewrite rev_length, lap_mul_length in Hqr5.
+(* oh c'est trop la merde, tiens *)
 ...
 rewrite lap_add_comm in Hab; symmetry in Hab.
 ...
