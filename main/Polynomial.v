@@ -3896,7 +3896,7 @@ rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
 apply app_nil_r.
 Qed.
 
-Theorem lap_add_sub_distr: ∀ la lb lc,
+Theorem lap_add_sub_distr : ∀ la lb lc,
   (la + (lb - lc))%lap = (la + lb - lc)%lap.
 Proof.
 intros.
@@ -3916,6 +3916,23 @@ Theorem rlap_quot_rem_loop_prop_if :
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
 intros Hco Hop * Haz Hbz Hit Hab Hlrb.
+remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (rlq', rlr').
+generalize Hqr; intros Hqr1.
+apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr1; [ | easy ].
+generalize Hqr; intros Hqr2.
+apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
+rewrite Hab in Hqr2.
+apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
+  rewrite rev_length, lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply (f_equal (λ l, rev l)) in Hlb.
+  rewrite rev_involutive in Hlb; subst rlb.
+  destruct lb as [| b]; [ easy | ].
+  remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+  apply (f_equal (λ l, rev l)) in Hlq.
+  rewrite rev_involutive in Hlq; subst rlq.
+  destruct lq as [| q]. {
 ...
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
