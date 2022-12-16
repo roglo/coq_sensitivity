@@ -3938,7 +3938,7 @@ apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   rewrite rev_length in Hlrb, Hqr1.
   destruct lb as [| b]; [ easy | ].
   cbn in Hqr1; rewrite Nat.sub_0_r in Hqr1.
-  cbn in Hlrb.
+  cbn in Hlrb; apply -> Nat.lt_succ_r in Hlrb.
   remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
   apply (f_equal (λ l, rev l)) in Hlq.
   rewrite rev_involutive in Hlq; subst rlq.
@@ -3948,6 +3948,12 @@ apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
     apply (f_equal (λ l, rev l)) in Hab.
     do 2 rewrite rev_involutive in Hab; subst rlr.
     apply Nat.le_0_r, length_zero_iff_nil.
+    rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr1; [ | easy ].
+    apply length_zero_iff_nil in Hqr1; subst rlq'.
+    rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
+    apply (f_equal (λ l, rev l)) in Hqr2.
+    do 2 rewrite rev_involutive in Hqr2; subst rlr'.
+(* et c'est là où ça déconne *)
 ...
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
