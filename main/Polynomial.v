@@ -3935,11 +3935,18 @@ apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
   apply (f_equal (λ l, rev l)) in Hlb.
   rewrite rev_involutive in Hlb; subst rlb.
+  rewrite rev_length in Hqr1.
   destruct lb as [| b]; [ easy | ].
+  cbn in Hqr1; rewrite Nat.sub_0_r in Hqr1.
   remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
   apply (f_equal (λ l, rev l)) in Hlq.
   rewrite rev_involutive in Hlq; subst rlq.
   destruct lq as [| q]. {
+    rewrite lap_mul_0_r, lap_add_0_l in Hab.
+    rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
+    apply (f_equal (λ l, rev l)) in Hab.
+    do 2 rewrite rev_involutive in Hab; subst rlr.
+    apply Nat.le_0_r, length_zero_iff_nil.
 ...
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
