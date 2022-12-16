@@ -3166,7 +3166,8 @@ Theorem rlap_quot_rem_step_Some :
   → rlap_quot_rem_step rla rlb = (Some cq, rlr)
   → rev rla =
       (rev rlb * rev (cq :: repeat 0%F (length rla - length rlb)) +
-       rev rlr)%lap.
+       rev rlr)%lap ∧
+    length rla = S (length rlr).
 Proof.
 intros Hco Hop * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
@@ -3214,6 +3215,9 @@ rewrite lap_add_app_l. 2: {
   rewrite lap_sub_length.
   now rewrite Hca, Nat.max_id.
 }
+rewrite lap_sub_length, map_length.
+rewrite Nat.max_l; [ | easy ].
+split; [ | easy ].
 f_equal.
 specialize (strip_0s_length_le (rla - rlc)%lap) as Hrac.
 remember (rla - rlc)%lap as rlac eqn:Hrlac.
@@ -3364,6 +3368,7 @@ destruct q as [cq| ]. 2: {
 }
 generalize Hqrlr; intros Hqrlr'.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqrlr'; [ | easy ].
+destruct Hqrlr' as (Hqrlr', Hra).
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3373,8 +3378,10 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
+(*
 generalize Hqrlr; intros Hra.
 apply rlap_quot_rem_step_length_r_a in Hra.
+*)
 generalize Hqr; intros Hqrb.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
@@ -3404,7 +3411,7 @@ rewrite lap_add_app_r; cycle 1. {
 f_equal.
 apply lap_add_repeat_0_r.
 rewrite rev_length.
-rewrite <- Hra, Hqrb.
+rewrite Hra, Hqrb.
 destruct rlb as [| b]; [ easy | ].
 now cbn; rewrite Nat.sub_0_r.
 Qed.
