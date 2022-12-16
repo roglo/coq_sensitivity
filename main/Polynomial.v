@@ -3920,9 +3920,10 @@ Theorem rlap_quot_rem_loop_prop_if :
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap
   → length rlr < length rlb
+  → length rlr ≤ length rla
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
-intros Hco Hop * Haz Hbz Hit Hab Hlrb.
+intros Hco Hop * Haz Hbz Hit Hab Hlrb Hlra.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq', rlr').
 generalize Hqr; intros Hqr1.
