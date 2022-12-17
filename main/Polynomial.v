@@ -3981,12 +3981,38 @@ rewrite Nat.sub_add in Hqr3; cycle 1. {
   generalize Hqr; intros Hqr4.
   apply (rlap_quot_rem_loop_prop Hco Hop) in Hqr4; [ | easy | easy ].
   do 2 rewrite rev_involutive in Hqr4.
-...
-  rewrite Nat.max_r; cycle 1. {
-    generalize Hqr; intros Hqr4.
-...
-  ============================
-  max (length rlr') (length rlr) ≤ length lb + S (length lq')
+  cbn in Hlrb.
+  apply Nat.max_lub; [ | flia Hlrb ].
+  apply (f_equal (λ l, length l)) in Hqr4.
+  rewrite rev_length, lap_add_length in Hqr4.
+  rewrite lap_mul_length, rev_length in Hqr4.
+  rewrite app_length in Hqr4; cbn in Hqr4.
+  cbn in Hqr1.
+  flia Hqr4 Hqr1.
+}
+do 2 rewrite lap_mul_length in Hqr3.
+remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+apply List_rev_symm in Hlb; subst rlb.
+destruct lb as [| b]; [ easy | ].
+remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
+apply List_rev_symm in Hlq'; subst rlq'.
+destruct lq' as [| q']. {
+  rewrite lap_sub_0_r in Hqr3.
+  rewrite app_length in Hqr3; cbn in Hqr3.
+  now rewrite Nat.sub_0_r, Nat.add_comm in Hqr3.
+}
+cbn in Hqr3.
+do 2 rewrite Nat.sub_0_r in Hqr3.
+do 2 rewrite app_length in Hqr3; cbn in Hqr3.
+apply Nat.add_cancel_l in Hqr3.
+apply Nat.succ_inj in Hqr3.
+rewrite lap_add_length in Hqr3.
+rewrite map_length in Hqr3.
+cbn in Hqr1.
+do 2 rewrite app_length in Hqr1.
+cbn in Hqr1.
+do 2 rewrite rev_length in Hqr1.
+rewrite Nat.add_sub in Hqr1.
 ...
 (**)
 remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
