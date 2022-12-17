@@ -3925,6 +3925,7 @@ destruct lq as [| q]. {
   rewrite rev_length in Hqr1; cbn in Hlrb, Hqr1.
   flia Hlrb Hqr1 Hqr3.
 }
+...
 rewrite Hab in Hqr2.
 (**)
 apply (lap_add_sub_eq_r Hop) in Hqr2.
