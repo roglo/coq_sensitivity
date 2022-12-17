@@ -4013,6 +4013,22 @@ do 2 rewrite app_length in Hqr1.
 cbn in Hqr1.
 do 2 rewrite rev_length in Hqr1.
 rewrite Nat.add_sub in Hqr1.
+apply Nat.max_r_iff in Hqr3.
+...
+generalize Hqr2; intros Hqr4.
+apply (f_equal (λ l, length l)) in Hqr4.
+rewrite lap_mul_length, app_length in Hqr4.
+cbn in Hqr4.
+rewrite lap_add_length, Nat.sub_0_r, app_length in Hqr4.
+rewrite map_length in Hqr4.
+rewrite lap_sub_length in Hqr4.
+do 2 rewrite rev_length in Hqr4.
+rewrite repeat_length in Hqr4.
+rewrite (Nat.add_comm (max _ _)) in Hqr4.
+rewrite Nat.sub_0_r in Hqr4.
+rewrite lap_convol_mul_length in Hqr4.
+rewrite Hqr3 in Hqr4.
+rewrite Nat.sub_add in Hqr4.
 ...
 (**)
 remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
