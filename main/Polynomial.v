@@ -3932,6 +3932,53 @@ destruct lq as [| q]. {
   flia Hlrb Hqr1 Hqr3.
 }
 rewrite Hab in Hqr2.
+(**)
+remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
+remember (rev rlb * rev rlq')%lap as A' eqn:HA'.
+move A' before A; move HA' before HA.
+remember (rev rlr) as B eqn:HB in Hqr2.
+remember (rev rlr') as B' eqn:HB' in Hqr2.
+move B before A'; move B' before A'.
+rewrite <- (@lap_add_repeat_0_r _ (length A - length B)) in Hqr2; cycle 1. {
+  subst B.
+  rewrite lap_add_length, rev_length.
+  etransitivity; [ | apply Nat.le_max_l ].
+  flia.
+}
+symmetry in Hqr2.
+rewrite <- (@lap_add_repeat_0_r _ (length A' - length B')) in Hqr2; cycle 1. {
+  subst B'.
+  rewrite lap_add_length, rev_length.
+  etransitivity; [ | apply Nat.le_max_l ].
+  flia.
+}
+symmetry in Hqr2.
+do 2 rewrite <- lap_add_assoc in Hqr2.
+apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
+  rewrite lap_add_length, repeat_length.
+  apply Nat.max_lub; [ | flia ].
+  rewrite HB, HA.
+  rewrite rev_length, lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  rewrite rev_length in Hlrb.
+  destruct lb as [| b]; [ easy | ].
+  rewrite app_length; cbn.
+  rewrite Nat.sub_0_r.
+  cbn in Hlrb; flia Hlrb.
+}
+rewrite <- lap_add_sub_distr in Hqr2.
+apply (lap_add_sub_eq_l Hop) in Hqr2; cycle 1. {
+  rewrite lap_sub_length.
+  do 2 rewrite lap_add_length.
+  do 2 rewrite repeat_length.
+  rewrite (Nat.max_comm (length B')).
+  rewrite Nat.max_assoc.
+  rewrite <- (Nat.max_assoc (length A' - length B')).
+  rewrite Nat.max_comm.
+  rewrite Nat.max_assoc.
+  rewrite (Nat.max_comm (length B')).
+...
 apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   rewrite rev_length, lap_mul_length.
   remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
@@ -3942,6 +3989,8 @@ apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   flia Hlrb.
 }
 rewrite <- lap_add_sub_distr in Hqr2.
+(**)
+apply (lap_add_sub_eq_l Hop) in Hqr2.
 ...
 apply (lap_add_sub_eq_l Hop) in Hqr2; cycle 1. {
   rewrite lap_sub_length.
