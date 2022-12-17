@@ -575,17 +575,13 @@ rewrite lap_sub_length, map_length.
 now rewrite Nat.max_l.
 Qed.
 
-Theorem rlap_rem_prop : ∀ rla rlb rlq rlr,
+Theorem rlap_rem_loop_prop : ∀ it rla rlb rlq rlr,
   rlb ≠ []
-  → rlap_quot_rem rla rlb = (rlq, rlr)
+  → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
+  → S (length rla) ≤ it
   → length rlr < length rlb.
 Proof.
-intros * Hbz Hqr.
-unfold rlap_quot_rem in Hqr.
-remember (rlap_quot_rem_nb_iter rla rlb) as it eqn:Hit.
-unfold rlap_quot_rem_nb_iter in Hit.
-assert (H : S (length rla) ≤ it) by flia Hit.
-clear Hit; rename H into Hit.
+intros * Hbz Hqr Hit.
 revert rla rlq rlr Hqr Hit.
 induction it; intros; [ easy | ].
 cbn in Hqr.
@@ -610,6 +606,19 @@ apply IHit in Hqr''; [ easy | ].
 apply rlap_quot_rem_step_length_r_a in Hqr'.
 rewrite Hqr'.
 now apply Nat.succ_le_mono in Hit.
+Qed.
+
+Theorem rlap_rem_prop : ∀ rla rlb rlq rlr,
+  rlb ≠ []
+  → rlap_quot_rem rla rlb = (rlq, rlr)
+  → length rlr < length rlb.
+Proof.
+intros * Hbz Hqr.
+unfold rlap_quot_rem in Hqr.
+remember (rlap_quot_rem_nb_iter rla rlb) as it eqn:Hit.
+unfold rlap_quot_rem_nb_iter in Hit.
+assert (H : S (length rla) ≤ it) by flia Hit.
+now apply rlap_rem_loop_prop in Hqr.
 Qed.
 
 Theorem lap_rem_length_lt :
@@ -3925,6 +3934,15 @@ destruct lq as [| q]. {
   rewrite rev_length in Hqr1; cbn in Hlrb, Hqr1.
   flia Hlrb Hqr1 Hqr3.
 }
+Search rlap_quot_rem.
+Check rlap_rem_prop.
+generalize Hqr; intros Hlrb'.
+apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
+  intros H; apply Hbz.
+  now subst rlb.
+}
+move Hlrb' before Hlrb.
+move rlq' before rlr; move rlr' before rlq'.
 ...
 rewrite Hab in Hqr2.
 (**)
