@@ -3896,6 +3896,10 @@ Theorem rlap_quot_rem_loop_prop_if :
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
 Proof.
 intros Hco Hop * Haz Hbz Hit Hab Hlrb.
+(* ça va pas, ça, il manque une hypothèse, une contraite sur rlr car,
+   pour l'instant rien n'empêche d'ajouter des zéros au début de rlr
+   tant que sa longueur n'excède pas celle de lb*lq *)
+...
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq', rlr').
 generalize Hqr; intros Hqr1.
