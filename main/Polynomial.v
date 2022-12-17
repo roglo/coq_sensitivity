@@ -3978,6 +3978,12 @@ rewrite Nat.sub_add in Hqr3; cycle 1. {
   }
   rewrite app_length; cbn.
   rewrite Nat.sub_0_r.
+  generalize Hqr; intros Hqr4.
+  apply (rlap_quot_rem_loop_prop Hco Hop) in Hqr4; [ | easy | easy ].
+  do 2 rewrite rev_involutive in Hqr4.
+...
+  rewrite Nat.max_r; cycle 1. {
+    generalize Hqr; intros Hqr4.
 ...
   ============================
   max (length rlr') (length rlr) ≤ length lb + S (length lq')
