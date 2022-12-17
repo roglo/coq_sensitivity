@@ -292,6 +292,7 @@ Arguments lap_mul {T ro} (la lb)%list.
 Arguments lap_quot_rem {T ro} (la lb)%list.
 Arguments rlap_quot_rem {T ro} (rla rlb)%list.
 Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
+Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
@@ -304,9 +305,7 @@ Compute (rlap_quot_rem [0;0;1] [1;1]).
 Compute (rlap_quot_rem_step [0;0;1] [1;1]).
 Print rlap_quot_rem_loop.
 Print rlap_quot_rem.
-...
 Compute (rlap_quot_rem [0;1;0;0;1] [1;1]).
-Compute (rlap_quot_rem' [0;1;0;0;1] [1;1]).
 Compute (
   let la := [0;1] in
   let lb := [1;0;0;1] in
@@ -318,36 +317,21 @@ Compute (
   let (lq, lr) := lap_quot_rem la lb in
   (la = (lap_add (lap_mul lb lq) lr))).
 Compute (rlap_quot_rem [1;0;0;1] [1;7]).
-Compute (rlap_quot_rem' [1;0;0;1] [1;7]).
-...
 Compute (rlap_quot_rem [6;-2;9;-2;-2] [1;0;2]).
-Compute (rlap_quot_rem' [6;-2;9;-2;-2] [1;0;2]).
 Compute (rlap_quot_rem [1;6;-1;-30] [1;5]).
-Compute (rlap_quot_rem' [1;6;-1;-30] [1;5]).
 Compute (rlap_quot_rem [1;3;-2;7;-12] [1;0;-1]).
-Compute (rlap_quot_rem' [1;3;-2;7;-12] [1;0;-1]).
 Compute (rlap_quot_rem [1;0;1;-10] [1;-2]).
-Compute (rlap_quot_rem' [1;0;1;-10] [1;-2]).
 Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
-Compute (rlap_quot_rem' [1;-1;-1;3;-2;0] [1;-1;1]).
 Compute (rlap_quot_rem [1;1;1;1] [1;0;1]).
-Compute (rlap_quot_rem' [1;1;1;1] [1;0;1]).
 Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
-Compute (rlap_quot_rem' [1;2;0;3] [1;-1;-1]).
 Compute (rlap_quot_rem [1;2;0;3] [1;-1;-1]).
-Compute (rlap_quot_rem' [1;2;0;3] [1;-1;-1]).
 Compute (rlap_quot_rem [1;0;0;-1;0] [2;1]).
-Compute (rlap_quot_rem' [1;0;0;-1;0] [2;1]).
 Compute (rlap_quot_rem [-3;0;1;0;-5;0;1] [3;1;1]).
-Compute (rlap_quot_rem' [-3;0;1;0;-5;0;1] [3;1;1]).
 Compute (rlap_quot_rem [-3;0;1;0;-5;0;1;0;0] [3;1;1;0]).
-Compute (rlap_quot_rem' [-3;0;1;0;-5;0;1;0;0] [3;1;1;0]).
 (* censé ci-dessous être (x3-2x+1, x-1) *)
 Compute (rlap_quot_rem [1;-1;-1;3;-2;0] [1;-1;1]).
-Compute (rlap_quot_rem' [1;-1;-1;3;-2;0] [1;-1;1]).
 (**)
 Compute (lap_quot_rem [-2;-2;9;-2;6] [2;0;1]).
-Compute (lap_quot_rem' [-2;-2;9;-2;6] [2;0;1]).
 Compute (lap_add (lap_mul [2;0;1] [-3;-2;6]) [4;2] = [-2;-2;9;-2;6]).
 ...
 *)
