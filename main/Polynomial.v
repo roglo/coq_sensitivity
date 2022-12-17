@@ -3433,9 +3433,7 @@ induction la as [| a]; intros. {
 }
 cbn.
 remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
-...
-rewrite <- (rev_involutive lc) in Hlc.
-apply List_rev_rev in Hlc; subst lb.
+apply List_rev_symm in Hlc; subst lb.
 destruct lc as [| c]; [ easy | ].
 cbn.
 rewrite strip_0s_app.
@@ -3536,8 +3534,7 @@ assert (Hrb : length lr < length lb). {
 split; [ | easy ].
 assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
   remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
-  rewrite <- (rev_involutive lc) in Hlc.
-  apply List_rev_rev in Hlc; subst lb.
+  apply List_rev_symm in Hlc; subst lb.
   destruct lc as [| c]; [ easy | ].
   cbn in Hb.
   rewrite last_last in Hb; cbn.
@@ -3577,8 +3574,7 @@ destruct Hr as [Hr| Hr]. {
     subst rlq.
     rewrite lap_mul_0_r.
     rewrite lap_mul_0_r, lap_add_0_l in H1.
-    rewrite <- (rev_involutive la) in H1.
-    apply List_rev_rev in H1; subst rlr.
+    symmetry in H1; apply List_rev_symm in H1; subst rlr.
     apply Bool.orb_true_iff in Ha.
     destruct Ha as [Ha| Ha]. {
       now apply is_empty_list_empty in Ha.
@@ -3923,8 +3919,7 @@ apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr1; [ | easy ].
 generalize Hqr; intros Hqr2.
 apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
-rewrite <- (rev_involutive lq) in Hlq.
-apply List_rev_rev in Hlq; subst rlq.
+apply List_rev_symm in Hlq; subst rlq.
 destruct lq as [| q]. {
   rewrite lap_mul_0_r, lap_add_0_l in Hab.
   apply List_rev_rev in Hab; subst rlr.
@@ -3933,14 +3928,12 @@ destruct lq as [| q]. {
   rewrite rev_length, lap_add_length in Hqr3.
   rewrite rev_length, lap_mul_length in Hqr3.
   remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
-  rewrite <- (rev_involutive lb) in Hlb.
-  apply List_rev_rev in Hlb; subst rlb.
+  apply List_rev_symm in Hlb; subst rlb.
   rewrite rev_length in Hlrb, Hqr1.
   destruct lb as [| b]; [ easy | ].
   cbn in Hqr1; rewrite Nat.sub_0_r in Hqr1.
   remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
-  rewrite <- (rev_involutive lq') in Hlq'.
-  apply List_rev_rev in Hlq'; subst rlq'.
+  apply List_rev_symm in Hlq'; subst rlq'.
   destruct lq' as [| q']. {
     rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
     now apply List_rev_rev in Hqr2; subst rlr'.
@@ -3954,32 +3947,31 @@ rewrite Hab in Hqr2.
 apply (lap_add_sub_eq_r Hop) in Hqr2. 2: {
   rewrite rev_length, lap_mul_length.
   remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
-... ...
-apply List_rev_symm in Hlb; subst rlb.
-...
-  apply (f_equal (λ l, rev l)) in Hlb.
-  rewrite rev_involutive in Hlb; subst rlb.
-  rewrite rev_length in Hlrb, Hqr1.
+  apply List_rev_symm in Hlb; subst rlb.
   destruct lb as [| b]; [ easy | ].
-  cbn in Hqr1; rewrite Nat.sub_0_r in Hqr1.
-  cbn in Hlrb; apply -> Nat.lt_succ_r in Hlrb.
-  remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
-  apply (f_equal (λ l, rev l)) in Hlq.
-  rewrite rev_involutive in Hlq; subst rlq.
-  destruct lq as [| q]. {
-    rewrite lap_mul_0_r, lap_add_0_l in Hab.
-    rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
+  rewrite app_length; cbn; rewrite Nat.sub_0_r.
+  rewrite rev_length in Hlrb; cbn in Hlrb.
+  flia Hlrb.
+}
+rewrite <- lap_add_sub_distr in Hqr2.
 ...
-    apply (f_equal (λ l, rev l)) in Hab.
-    do 2 rewrite rev_involutive in Hab; subst rlr.
-    apply Nat.le_0_r, length_zero_iff_nil.
-    rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr1; [ | easy ].
-    apply length_zero_iff_nil in Hqr1; subst rlq'.
-    rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
-...
-    apply (f_equal (λ l, rev l)) in Hqr2.
-    do 2 rewrite rev_involutive in Hqr2; subst rlr'.
-(* et c'est là où ça déconne *)
+apply (lap_add_sub_eq_l Hop) in Hqr2; cycle 1. {
+  rewrite lap_sub_length.
+  do 2 rewrite rev_length.
+  rewrite lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  destruct lb as [| b]; [ easy | ].
+  remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
+  apply List_rev_symm in Hlq'; subst rlq'.
+  destruct lq' as [| q']; [ easy | ].
+  cbn; rewrite app_length; cbn.
+  rewrite Nat.sub_0_r.
+  rewrite rev_length in Hlrb; cbn in Hlrb.
+  do 2 rewrite rev_length in Hqr1; cbn in Hqr1.
+  rewrite Nat.sub_0_r in Hqr1.
+  rewrite Hqr1.
+  rewrite Nat.add_comm, Nat.sub_add; [ | flia Hqr1 ].
 ...
 revert rla rlq rlr Haz Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
