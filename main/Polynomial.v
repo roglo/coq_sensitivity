@@ -3961,15 +3961,26 @@ rewrite Nat.sub_add in Hqr3; cycle 1. {
   do 2 rewrite rev_length in Hqr1; cbn in Hqr1.
   rewrite Nat.sub_0_r in Hqr1.
   destruct lq' as [| q']. {
+    rewrite lap_mul_0_r in Hqr2; cbn in Hqr2.
+    rewrite Nat.sub_0_r, app_nil_r in Hqr2.
     rewrite lap_sub_0_r, lap_mul_0_r in Hqr3.
     cbn in Hqr3; rewrite Nat.sub_0_r in Hqr3.
     rewrite lap_convol_mul_length in Hqr3.
     rewrite lap_sub_length in Hqr3.
     cbn in Hlrb.
-(* pfffff.... *)
+    generalize Hqr; intros Hqr4.
+    apply (rlap_quot_rem_loop_prop Hco Hop) in Hqr4; [ | easy | easy ].
+    rewrite lap_mul_0_r, lap_add_0_l in Hqr4.
+    apply List_rev_rev in Hqr4; subst rlr'.
+    do 2 rewrite rev_length in Hqr3.
+    cbn in Hqr1.
+    flia Hlrb Hqr1 Hqr3.
+  }
+  rewrite app_length; cbn.
+  rewrite Nat.sub_0_r.
 ...
-    symmetry in Hqr1; cbn in Hqr1.
-    apply Nat.sub_0_le in Hqr1.
+  ============================
+  max (length rlr') (length rlr) ≤ length lb + S (length lq')
 ...
 (**)
 remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
