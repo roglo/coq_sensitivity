@@ -3943,7 +3943,7 @@ apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
 }
 move Hlrb' before Hlrb.
 move rlq' before rlr; move rlr' before rlq'.
-...
+(**)
 rewrite Hab in Hqr2.
 (**)
 apply (lap_add_sub_eq_r Hop) in Hqr2.
