@@ -298,6 +298,8 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 Compute (rlap_quot_rem [1] [2]).
+Compute (rlap_quot_rem [1;0;1;1;0] [1;0;1;0;0]).
+Compute (rlap_quot_rem [1;1;1] [1;1;0]).
 Compute (rlap_quot_rem [1;0;0;1] [1;1]).
 Compute (rlap_quot_rem [1;1;0;1] [1;1]).
 Compute (rlap_quot_rem_step [1;1;0;1] [1;1]).
@@ -3888,18 +3890,15 @@ Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (it : nat) (rla rlb rlq rlr : list T),
-  hd 0%F rla ≠ 0%F
+  has_polyn_prop rla = true
   → hd 0%F rlb ≠ 0%F
+  → has_polyn_prop rlr = true
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap
   → length rlr < length rlb
-  → rlap_quot_rem_loop it rla rlb = (rlq, rlr).
+  → ∃ i, rlap_quot_rem_loop it rla rlb = (rlq, repeat 0%F i ++ rlr).
 Proof.
-intros Hco Hop * Haz Hbz Hit Hab Hlrb.
-(* ça va pas, ça, il manque une hypothèse, une contraite sur rlr car,
-   pour l'instant rien n'empêche d'ajouter des zéros au début de rlr
-   tant que sa longueur n'excède pas celle de lb*lq *)
-...
+intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq', rlr').
 generalize Hqr; intros Hqr1.
@@ -3924,7 +3923,8 @@ destruct lq as [| q]. {
   apply List_rev_symm in Hlq'; subst rlq'.
   destruct lq' as [| q']. {
     rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
-    now apply List_rev_rev in Hqr2; subst rlr'.
+    apply List_rev_rev in Hqr2; subst rlr'.
+    now exists 0.
   }
   rewrite app_length in Hqr3; cbn in Hqr3.
   rewrite Nat.sub_0_r in Hqr3.
