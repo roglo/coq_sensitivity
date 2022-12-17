@@ -3945,6 +3945,31 @@ rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr2; cycle 1. {
 }
 rewrite app_nil_r in Hqr2.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hqr2.
+generalize Hqr2; intros Hqr3.
+apply (f_equal (λ l, length l)) in Hqr3.
+rewrite app_length, repeat_length in Hqr3.
+rewrite Nat.add_comm in Hqr3.
+rewrite Nat.sub_add in Hqr3; cycle 1. {
+  rewrite lap_sub_length, lap_mul_length.
+  do 2 rewrite rev_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  rewrite rev_length in Hlrb.
+  destruct lb as [| b]; [ easy | ].
+  remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
+  apply List_rev_symm in Hlq'; subst rlq'.
+  do 2 rewrite rev_length in Hqr1; cbn in Hqr1.
+  rewrite Nat.sub_0_r in Hqr1.
+  destruct lq' as [| q']. {
+    rewrite lap_sub_0_r, lap_mul_0_r in Hqr3.
+    cbn in Hqr3; rewrite Nat.sub_0_r in Hqr3.
+    rewrite lap_convol_mul_length in Hqr3.
+    rewrite lap_sub_length in Hqr3.
+    cbn in Hlrb.
+(* pfffff.... *)
+...
+    symmetry in Hqr1; cbn in Hqr1.
+    apply Nat.sub_0_le in Hqr1.
 ...
 (**)
 remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
