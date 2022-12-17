@@ -4013,7 +4013,34 @@ do 2 rewrite app_length in Hqr1.
 cbn in Hqr1.
 do 2 rewrite rev_length in Hqr1.
 rewrite Nat.add_sub in Hqr1.
+(*
 apply Nat.max_r_iff in Hqr3.
+*)
+cbn - [ lap_mul ] in Hqr2.
+rewrite (fold_rngl_sub Hop) in Hqr2.
+rewrite lap_sub_length in Hqr2.
+do 2 rewrite rev_length in Hqr2.
+rewrite lap_mul_length in Hqr2.
+cbn - [ lap_mul ] in Hqr2.
+rewrite Nat.sub_0_r in Hqr2.
+rewrite app_length in Hqr2.
+cbn - [ lap_mul ] in Hqr2.
+rewrite fold_lap_sub in Hqr2.
+...
+rewrite Hqr3 in Hqr2.
+...
+rewrite lap_convol_mul_length in Hqr2.
+rewrite Nat.sub_0_r in Hqr2.
+rewrite lap_add_length in Hqr2.
+rewrite map_length in Hqr2.
+rewrite Hqr3 in Hqr2.
+rewrite Nat.sub_0_r in Hqr2.
+rewrite lap_sub_length in Hqr2.
+do 2 rewrite rev_length in Hqr2.
+rewrite (fold_rngl_sub Hop) in Hqr2.
+rewrite Nat.add_succ_r in Hqr2.
+cbn in Hqr2.
+rewrite rngl_summation_only_one in Hqr2.
 ...
 generalize Hqr2; intros Hqr4.
 apply (f_equal (λ l, length l)) in Hqr4.
