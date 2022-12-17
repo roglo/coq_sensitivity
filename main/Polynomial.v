@@ -3853,29 +3853,23 @@ Qed.
 Theorem lap_add_sub_eq_l :
   rngl_has_opp = true →
   ∀ la lb lc,
-  length la ≤ length lb
-  → (la + lb)%lap = lc
-  → (lc - la)%lap = lb.
+  (la + lb)%lap = lc
+  → (lc - la)%lap = lb ++ repeat 0%F (length la - length lb).
 Proof.
-intros Hop * Hlab Hlabc; subst lc.
+intros Hop * Hlab; subst lc.
 rewrite lap_add_comm.
-rewrite (lap_add_sub Hop).
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-apply app_nil_r.
+apply (lap_add_sub Hop).
 Qed.
 
 Theorem lap_add_sub_eq_r :
   rngl_has_opp = true →
   ∀ la lb lc,
-  length lb ≤ length la
-  → (la + lb)%lap = lc
-  → (lc - lb)%lap = la.
+  (la + lb)%lap = lc
+  → (lc - lb)%lap = la ++ repeat 0%F (length lb - length la).
 Proof.
-intros Hop * Hlba Habc.
+intros Hop * Habc.
 subst lc.
-rewrite (lap_add_sub Hop).
-rewrite (proj2 (Nat.sub_0_le _ _)); [ | easy ].
-apply app_nil_r.
+apply (lap_add_sub Hop).
 Qed.
 
 Theorem lap_add_sub_distr : ∀ la lb lc,
@@ -3932,6 +3926,26 @@ destruct lq as [| q]. {
   flia Hlrb Hqr1 Hqr3.
 }
 rewrite Hab in Hqr2.
+(**)
+apply (lap_add_sub_eq_r Hop) in Hqr2.
+rewrite <- lap_add_sub_distr in Hqr2.
+apply (lap_add_sub_eq_l Hop) in Hqr2.
+rewrite rev_length in Hqr2.
+rewrite (proj2 (Nat.sub_0_le _ _)) in Hqr2; cycle 1. {
+  rewrite lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  rewrite rev_length in Hlrb.
+  destruct lb as [| b]; [ easy | ].
+  rewrite app_length; cbn in Hlrb |-*.
+  apply -> Nat.lt_succ_r in Hlrb.
+  rewrite Nat.sub_0_r.
+  transitivity (length lb); [ easy | ].
+  apply Nat.le_add_r.
+}
+rewrite app_nil_r in Hqr2.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hqr2.
+...
 (**)
 remember (rev rlb * (q :: lq))%lap as A eqn:HA in Hqr2.
 remember (rev rlb * rev rlq')%lap as A' eqn:HA'.
