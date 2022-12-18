@@ -3889,6 +3889,47 @@ unfold lap_sub.
 apply lap_add_assoc.
 Qed.
 
+Theorem lap_eucl_div_quot_uniq : ∀ la lb lq lr lq' lr',
+  length lr < length lb
+  → length lr' < length lb
+  → la = (lb * lq + lr)%lap
+  → la = (lb * lq' + lr')%lap
+  → length lq' = length lq.
+Proof.
+intros * Hrb Hr'b Hr Hr'.
+apply (f_equal length) in Hr, Hr'.
+rewrite lap_add_length in Hr, Hr'.
+rewrite lap_mul_length in Hr, Hr'.
+destruct lb as [| b]; [ easy | ].
+destruct lq' as [| q']. {
+  rewrite Nat.max_0_l in Hr'.
+  destruct lq as [| q]; [ easy | ].
+  cbn in Hr.
+  rewrite app_length in Hr; cbn in Hr.
+  rewrite Nat.sub_0_r in Hr.
+  cbn in Hrb.
+  rewrite Nat.max_l in Hr; [ | flia Hrb ].
+  cbn in Hr'b.
+  flia Hr'b Hr Hr'.
+}
+cbn in Hr'.
+rewrite app_length in Hr'; cbn in Hr'.
+rewrite Nat.sub_0_r in Hr'.
+cbn in Hr'b.
+rewrite Nat.max_l in Hr'; [ | flia Hr'b ].
+destruct lq as [| q]. {
+  rewrite Nat.max_0_l in Hr.
+  cbn in Hrb.
+  flia Hrb Hr Hr'.
+}
+cbn in Hr.
+rewrite app_length in Hr; cbn in Hr.
+rewrite Nat.sub_0_r in Hr.
+cbn in Hrb.
+rewrite Nat.max_l in Hr; [ cbn | flia Hrb ].
+flia Hr Hr'.
+Qed.
+
 Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -3904,11 +3945,37 @@ Proof.
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
 destruct qr as (rlq', rlr').
+generalize Hqr; intros Hlrb'.
+apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
+  intros H; apply Hbz.
+  now subst rlb.
+}
+generalize Hqr; intros Hqr2.
+apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
+specialize lap_eucl_div_quot_uniq as Hqq.
+specialize (Hqq (rev rla) (rev rlb)).
+specialize (Hqq (rev rlq) (rev rlr) (rev rlq') (rev rlr')).
+do 5 rewrite rev_length in Hqq.
+specialize (Hqq Hlrb Hlrb' Hab Hqr2).
+...
+intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
+remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
+destruct qr as (rlq', rlr').
 generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr1; [ | easy ].
 generalize Hqr; intros Hqr2.
 apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
 move Hab at bottom.
+generalize Hqr; intros Hlrb'.
+apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
+  intros H; apply Hbz.
+  now subst rlb.
+}
+specialize lap_eucl_div_quot_uniq as H1.
+specialize (H1 (rev rla) (rev rlb) (rev rlq) (rev rlr) (rev rlq') (rev rlr')).
+do 4 rewrite rev_length in H1.
+specialize (H1 Hlrb Hlrb' Hab Hqr2).
+...
 (**)
 destruct (Nat.eq_dec (length rlq) (length rlq')) as [Hqq| Hqq]; cycle 1. {
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
