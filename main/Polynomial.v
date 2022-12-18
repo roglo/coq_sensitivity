@@ -3934,8 +3934,6 @@ destruct lq as [| q]. {
   rewrite rev_length in Hqr1; cbn in Hlrb, Hqr1.
   flia Hlrb Hqr1 Hqr3.
 }
-Search rlap_quot_rem.
-Check rlap_rem_prop.
 generalize Hqr; intros Hlrb'.
 apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
   intros H; apply Hbz.
@@ -3943,7 +3941,8 @@ apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
 }
 move Hlrb' before Hlrb.
 move rlq' before rlr; move rlr' before rlq'.
-(**)
+move Hab at bottom.
+...
 rewrite Hab in Hqr2.
 (**)
 apply (lap_add_sub_eq_r Hop) in Hqr2.
