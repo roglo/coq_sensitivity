@@ -3950,13 +3950,16 @@ apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
   intros H; apply Hbz.
   now subst rlb.
 }
-generalize Hqr; intros Hqr2.
-apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
+generalize Hqr; intros Hab'.
+apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hab'; [ | easy ].
 specialize lap_eucl_div_quot_uniq as Hqq.
 specialize (Hqq (rev rla) (rev rlb)).
 specialize (Hqq (rev rlq) (rev rlr) (rev rlq') (rev rlr')).
 do 5 rewrite rev_length in Hqq.
-specialize (Hqq Hlrb Hlrb' Hab Hqr2).
+specialize (Hqq Hlrb Hlrb' Hab Hab').
+move Hab' before Hab.
+move rlq' before rlr; move rlr' before rlq'.
+move Hlrb' before Hlrb.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
