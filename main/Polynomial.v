@@ -3908,8 +3908,11 @@ generalize Hqr; intros Hqr1.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqr1; [ | easy ].
 generalize Hqr; intros Hqr2.
 apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hqr2; [ | easy ].
+move Hab at bottom.
+...
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 apply List_rev_symm in Hlq; subst rlq.
+...
 destruct lq as [| q]. {
   rewrite lap_mul_0_r, lap_add_0_l in Hab.
   apply List_rev_rev in Hab; subst rlr.
@@ -3941,7 +3944,39 @@ apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
 }
 move Hlrb' before Hlrb.
 move rlq' before rlr; move rlr' before rlq'.
-move Hab at bottom.
+(**)
+remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
+apply List_rev_symm in Hlq'; subst rlq'.
+rewrite rev_length in Hqr1.
+destruct lq' as [| q']. {
+  rewrite lap_mul_0_r, lap_add_0_l in Hqr2.
+  apply List_rev_rev in Hqr2; subst rlr'.
+  rewrite <- (rev_length rla) in Hlrb'.
+  rewrite Hab in Hlrb'.
+  rewrite lap_add_length in Hlrb'.
+  rewrite lap_mul_length in Hlrb'.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  destruct lb as [| b]; [ easy | ].
+  cbn in Hlrb'.
+  rewrite app_length in Hlrb'; cbn in Hlrb'.
+  rewrite Nat.sub_0_r in Hlrb'.
+  rewrite app_length, rev_length in Hlrb'.
+  rewrite rev_length in Hlrb'; cbn in Hlrb'.
+  flia Hlrb'.
+}
+cbn in Hqr1.
+remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+apply List_rev_symm in Hlb; subst rlb.
+destruct lb as [| b]; [ easy | ].
+rewrite rev_length in Hqr1; cbn in Hqr1.
+rewrite Nat.sub_0_r in Hqr1.
+...
+cbn in Hqr2, Hab.
+rewrite Nat.sub_0_r in Hqr2, Hab.
+rewrite Nat.add_succ_r in Hqr2, Hab.
+cbn in Hqr2, Hab.
+rewrite rngl_summation_only_one in Hqr2, Hab.
 ...
 rewrite Hab in Hqr2.
 (**)
