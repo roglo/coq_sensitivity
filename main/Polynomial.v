@@ -3967,20 +3967,40 @@ apply (lap_add_sub_eq_r Hop) in Haa.
 rewrite <- lap_add_sub_distr in Haa.
 apply (lap_add_sub_eq_l Hop) in Haa.
 rewrite rev_length in Haa.
-rewrite (proj2 (Nat.sub_0_le _ _)) in Haa; cycle 1. {
+(**)
+remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+apply List_rev_symm in Hlb; subst rlb.
+rewrite rev_length in Hlrb, Hlrb'.
+destruct lb as [| b]; [ easy | cbn in Hlrb, Hlrb' ].
+remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
+apply List_rev_symm in Hlq'; subst rlq'.
+rewrite rev_length in Hqq.
+destruct lq' as [| q']. {
+  symmetry in Hqq; apply length_zero_iff_nil in Hqq; subst rlq.
+  rewrite lap_mul_0_r, lap_add_0_l in Hab, Hab'.
+  apply List_rev_rev in Hab, Hab'; subst rlr' rlr.
+  now exists 0.
+}
+cbn in Hqq.
+rewrite (proj2 (Nat.sub_0_le _ _)) in Haa. 2: {
   rewrite lap_mul_length.
-  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
-  apply List_rev_symm in Hlb; subst rlb.
-  rewrite rev_length in Hlrb, Hlrb'.
-  destruct lb as [| b]; [ easy | cbn in Hlrb, Hlrb' ].
-  remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
-  apply List_rev_symm in Hlq'; subst rlq'.
-  rewrite rev_length in Hqq.
-  destruct lq' as [| q']. {
-    symmetry in Hqq; apply length_zero_iff_nil in Hqq; subst rlq.
-    rewrite lap_mul_0_r, lap_add_0_l in Hab, Hab'.
-    apply List_rev_rev in Hab, Hab'; subst rlr' rlr.
-    clear Haa Hlrb' Hrp.
+  rewrite app_length; cbn.
+  rewrite Nat.sub_0_r.
+  flia Hlrb'.
+}
+rewrite app_nil_r in Haa.
+rewrite lap_mul_length in Haa.
+remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+apply List_rev_symm in Hlq; subst rlq.
+rewrite rev_length in Hqq.
+destruct lq as [| q]; [ easy | ].
+cbn in Hqq; apply Nat.succ_inj in Hqq.
+cbn - [ lap_mul ] in Haa.
+rewrite app_length, Nat.sub_0_r in Haa.
+cbn - [ lap_mul ] in Haa.
+rewrite lap_sub_length in Haa.
+do 2 rewrite rev_length in Haa.
+rewrite <- (lap_mul_sub_distr_l Hop) in Haa.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
