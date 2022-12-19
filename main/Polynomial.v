@@ -4184,6 +4184,7 @@ destruct b. {
   exfalso; apply Hrp; clear Hrp; rewrite Hab.
   now rewrite Nat_succ_sub_succ_r.
 }
+apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hb.
 ...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
