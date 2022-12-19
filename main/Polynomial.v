@@ -4026,9 +4026,38 @@ apply List_app_eq_app' in Haa. 2: {
   rewrite firstn_length.
   rewrite Nat.min_l; [ | apply Nat.le_sub_l ].
   rewrite Hlen.
-  rewrite Nat_sub_sub_distr.
+  rewrite Nat_sub_sub_distr. 2: {
+    rewrite lap_mul_length.
+    destruct lb as [| b]; [ easy | ].
+    destruct lq as [| q]; [ easy | ].
+    rewrite app_length; cbn.
+    rewrite Nat.sub_0_r.
+    cbn in Hlrb, Hlrb'.
+    apply Nat.max_lub; [ flia Hlrb | flia Hlrb' ].
+  }
   rewrite lap_sub_length.
   do 2 rewrite rev_length.
+  rewrite Nat.add_sub_swap. 2: {
+    rewrite Hx.
+    rewrite (lap_mul_sub_distr_l Hop).
+    rewrite lap_sub_length.
+    apply Nat.le_max_r.
+  }
+  rewrite Hx.
+  rewrite (lap_mul_sub_distr_l Hop).
+  rewrite lap_sub_length.
+  rewrite max_r. 2: {
+    do 2 rewrite lap_mul_length.
+    destruct lb as [| b]; [ easy | ].
+    destruct lq' as [| q']; [ easy | ].
+    destruct lq as [| q]; [ easy | ].
+    do 2 rewrite app_length.
+    now rewrite Hqq.
+  }
+  now rewrite Nat.sub_diag.
+}
+destruct Haa as (Hfi, Hsk).
+...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
   rewrite firstn_length, skipn_length, repeat_length in Haa.
