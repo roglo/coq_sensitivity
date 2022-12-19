@@ -4005,11 +4005,32 @@ do 2 rewrite rev_length in Haa.
 move lb before rlr'.
 move lq before lb; move lq' before lq.
 remember (length _ - max _ _) as len eqn:Hlen.
-...
-remember (length (lb * (lq' - lq))%lap - len) as n eqn:Hn.
-rewrite <- (firstn_skipn n (lb * _)%lap) in Haa.
+remember (lb * (lq' - lq))%lap as x eqn:Hx.
+assert (Hlx : len ≤ length x). {
+  subst len x.
+  do 2 rewrite lap_mul_length.
+  destruct lb as [| b]; [ easy | ].
+  destruct lq as [| q]; [ easy | ].
+  destruct lq' as [| q']; [ easy | ].
+  cbn.
+  do 2 rewrite app_length.
+  do 2 rewrite Nat.sub_0_r; cbn.
+  rewrite lap_add_length, map_length.
+  cbn in Hqq.
+  apply Nat.succ_inj in Hqq.
+  rewrite Hqq, Nat.max_id.
+  apply Nat.le_sub_l.
+}
+rewrite <- (firstn_skipn (length x - len) x) in Haa.
 apply List_app_eq_app' in Haa. 2: {
   rewrite firstn_length.
+  rewrite Nat.min_l; [ | apply Nat.le_sub_l ].
+  rewrite Hlen.
+  rewrite Nat_sub_sub_distr.
+  rewrite lap_sub_length.
+  do 2 rewrite rev_length.
+Search (_ - (_ - _)).
+...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
   rewrite repeat_length in Haa.
