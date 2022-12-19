@@ -4029,7 +4029,12 @@ apply List_app_eq_app' in Haa. 2: {
   rewrite Nat_sub_sub_distr.
   rewrite lap_sub_length.
   do 2 rewrite rev_length.
-Search (_ - (_ - _)).
+  apply (f_equal length) in Haa.
+  do 2 rewrite app_length in Haa.
+  rewrite firstn_length, skipn_length, repeat_length in Haa.
+  rewrite Nat_sub_sub_distr in Haa; [ | easy ].
+  rewrite (Nat.add_comm (length x)), Nat.add_sub in Haa.
+  apply Nat.add_cancel_r in Haa.
 ...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
