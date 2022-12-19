@@ -4001,6 +4001,9 @@ cbn - [ lap_mul ] in Haa.
 rewrite lap_sub_length in Haa.
 do 2 rewrite rev_length in Haa.
 rewrite <- (lap_mul_sub_distr_l Hop) in Haa.
+move lb before rlr'.
+move lq before lb; move lq' before lq.
+move b before lq'; move q before b; move q' before q.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
