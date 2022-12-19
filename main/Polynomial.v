@@ -4022,9 +4022,9 @@ Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ (it : nat) (rla rlb rlq rlr : list T),
-  has_polyn_prop rla = true
+  has_polyn_prop (rev rla) = true
   → hd 0%F rlb ≠ 0%F
-  → has_polyn_prop rlr = true
+  → has_polyn_prop (rev rlr) = true
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap
   → length rlr < length rlb
@@ -4174,10 +4174,16 @@ destruct b. {
   rewrite List_rev_repeat in Hab.
   apply Bool.orb_true_iff in Hrp.
   destruct Hrp as [Hrp| Hrp]. {
-    now apply is_empty_list_empty in Hrp; subst rlr.
+    apply is_empty_list_empty in Hrp.
+    now apply List_eq_rev_nil in Hrp; subst rlr.
   }
   move Hrp at bottom.
   move Hab at bottom.
+  rewrite List_last_rev in Hrp.
+  apply (rngl_neqb_neq Heb) in Hrp.
+  exfalso; apply Hrp; clear Hrp; rewrite Hab.
+  now rewrite Nat_succ_sub_succ_r.
+}
 ...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
@@ -4185,8 +4191,6 @@ Search (_ * repeat _ _)%lap.
   apply list_eqb_eq in Hb; [ | apply (rngl_eqb Heb) ].
 remember (list_eqb_eq (rngl_eqb_eq Heb) lq lq') as b eqn:Hb.
 symmetry in Hb.
-
-
 ...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
