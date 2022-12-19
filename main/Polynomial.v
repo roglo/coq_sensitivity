@@ -4063,6 +4063,48 @@ symmetry in Hb.
 destruct b. {
   apply (list_eqb_eq (rngl_eqb_eq Heb)) in Hb.
   subst lq'.
+  rewrite Hab' in Hab.
+Theorem lap_add_cancel_l :
+  rngl_has_opp = true →
+  ∀ la lb lc,
+  (la + lb = la + lc)%lap
+  → (lb ++ repeat 0%F (length lc - length lb)  =
+     lc ++ repeat 0%F (length lb - length lc))%lap.
+Proof.
+intros Hop * Habc.
+revert lb lc Habc.
+induction la as [| a]; intros; cbn. {
+  do 2 rewrite lap_add_0_l in Habc.
+  now subst lc.
+}
+cbn in Habc.
+destruct lb as [| b]. {
+  rewrite app_nil_r.
+  destruct lc as [| c]; [ easy | cbn ].
+  injection Habc; clear Habc; intros Hla Ha.
+  symmetry in Hla, Ha.
+  apply (rngl_add_sub_eq_l Hos) in Ha.
+  rewrite (rngl_sub_diag Hos) in Ha; subst c.
+  f_equal.
+  apply (lap_add_sub_eq_l Hop) in Hla.
+  rewrite (lap_sub_diag Hop) in Hla.
+  symmetry in Hla.
+...
+Search (repeat 0%F (length _)).
+Search (repeat 0%F _).
+lap_add_repeat_0_r: ∀ (la : list T) (len : nat), len ≤ length la → (la + repeat 0%F len)%lap = la
+lap_add_repeat_0_l: ∀ (la : list T) (len : nat), len ≤ length la → (repeat 0%F len + la)%lap = la
+lap_add_sub_eq_l:
+  rngl_has_opp = true
+  → ∀ la lb lc : list T, (la + lb)%lap = lc → (lc - la)%lap = lb ++ repeat 0%F (length la - length lb)
+...
+rewrite gen_lap_add in Habc; symmetry in Habc.
+rewrite gen_lap_add in Habc; symmetry in Habc.
+Search (_ + _ = _ + _)%lap.
+Search (_ + _ = _ + _ ↔ _).
+... ...
+apply lap_add_cancel_l in Hab.
+...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
 ...
