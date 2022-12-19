@@ -3967,11 +3967,14 @@ apply (lap_add_sub_eq_r Hop) in Haa.
 rewrite <- lap_add_sub_distr in Haa.
 apply (lap_add_sub_eq_l Hop) in Haa.
 rewrite rev_length in Haa.
-(**)
+rewrite lap_mul_length in Haa.
 remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
 apply List_rev_symm in Hlb; subst rlb.
 rewrite rev_length in Hlrb, Hlrb'.
-destruct lb as [| b]; [ easy | cbn in Hlrb, Hlrb' ].
+destruct lb as [| b]; [ easy | ].
+remember (b :: lb) as lb1 eqn:Hlb1.
+assert (Hlbz : lb1 ≠ []) by now rewrite Hlb1.
+clear b lb Hlb1; rename lb1 into lb.
 remember (rev rlq') as lq' eqn:Hlq'; symmetry in Hlq'.
 apply List_rev_symm in Hlq'; subst rlq'.
 rewrite rev_length in Hqq.
@@ -3981,29 +3984,26 @@ destruct lq' as [| q']. {
   apply List_rev_rev in Hab, Hab'; subst rlr' rlr.
   now exists 0.
 }
-cbn in Hqq.
-rewrite (proj2 (Nat.sub_0_le _ _)) in Haa. 2: {
-  rewrite lap_mul_length.
-  rewrite app_length; cbn.
-  rewrite Nat.sub_0_r.
-  flia Hlrb'.
-}
+remember (q' :: lq') as lq1 eqn:Hlq1.
+assert (Hlqz' : lq1 ≠ []) by now rewrite Hlq1.
+clear q' lq' Hlq1; rename lq1 into lq'.
+rewrite app_length in Haa.
+rewrite (proj2 (Nat.sub_0_le _ _)) in Haa; [ | flia Hlrb' ].
 rewrite app_nil_r in Haa.
-rewrite lap_mul_length in Haa.
+rewrite <- (lap_mul_sub_distr_l Hop) in Haa.
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 apply List_rev_symm in Hlq; subst rlq.
 rewrite rev_length in Hqq.
-destruct lq as [| q]; [ easy | ].
-cbn in Hqq; apply Nat.succ_inj in Hqq.
-cbn - [ lap_mul ] in Haa.
-rewrite app_length, Nat.sub_0_r in Haa.
-cbn - [ lap_mul ] in Haa.
+destruct lq as [| q]. {
+  now apply length_zero_iff_nil in Hqq.
+}
+remember (q :: lq) as lq1 eqn:Hlq1.
+assert (Hlqz : lq1 ≠ []) by now rewrite Hlq1.
+clear q lq Hlq1; rename lq1 into lq.
 rewrite lap_sub_length in Haa.
 do 2 rewrite rev_length in Haa.
-rewrite <- (lap_mul_sub_distr_l Hop) in Haa.
 move lb before rlr'.
 move lq before lb; move lq' before lq.
-move b before lq'; move q before b; move q' before q.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
