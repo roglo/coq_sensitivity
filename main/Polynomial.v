@@ -3930,6 +3930,94 @@ rewrite Nat.max_l in Hr; [ cbn | flia Hrb ].
 flia Hr Hr'.
 Qed.
 
+Theorem lap_add_cancel_l :
+  rngl_has_opp = true →
+  ∀ la lb lc,
+  (la + lb = la + lc)%lap
+  → (lb ++ repeat 0%F (length lc - length lb)  =
+     lc ++ repeat 0%F (length lb - length lc))%lap.
+Proof.
+intros Hop * Habc.
+revert lb lc Habc.
+induction la as [| a]; intros; cbn. {
+  do 2 rewrite lap_add_0_l in Habc.
+  now subst lc.
+}
+cbn in Habc.
+destruct lb as [| b]. {
+  rewrite app_nil_r.
+  destruct lc as [| c]; [ easy | cbn ].
+  injection Habc; clear Habc; intros Hla Ha.
+  symmetry in Hla, Ha.
+  apply (rngl_add_sub_eq_l Hos) in Ha.
+  rewrite (rngl_sub_diag Hos) in Ha; subst c.
+  f_equal.
+  apply (lap_add_sub_eq_l Hop) in Hla.
+  rewrite (lap_sub_diag Hop) in Hla.
+  symmetry in Hla.
+  specialize (proj1 (List_eq_iff _ _) Hla) as H1.
+  destruct H1 as (H, Hnth).
+  rewrite app_length, repeat_length in H.
+  rewrite repeat_length in H.
+  rewrite Nat.add_comm in H.
+  assert (Hlen : length lc ≤ length la) by flia H; clear H.
+  apply List_eq_iff.
+  rewrite repeat_length.
+  split; [ easy | ].
+  intros d i.
+  rewrite List_nth_repeat; symmetry.
+  destruct (lt_dec i (length lc)) as [Hic| Hic]. 2: {
+    apply Nat.nlt_ge in Hic.
+    now apply nth_overflow.
+  }
+  specialize (Hnth d i) as H1.
+  rewrite app_nth1 in H1; [ | easy ].
+  rewrite List_nth_repeat in H1.
+  destruct (lt_dec i (length la)) as [Hia| Hia]; [ easy | ].
+  exfalso; apply Hia.
+  now apply (lt_le_trans _ (length lc)).
+}
+destruct lc as [| c]. {
+  cbn; rewrite app_nil_r.
+  injection Habc; clear Habc; intros Hla Ha.
+  apply (rngl_add_sub_eq_l Hos) in Ha.
+  rewrite (rngl_sub_diag Hos) in Ha; subst b.
+  f_equal.
+  apply (lap_add_sub_eq_l Hop) in Hla.
+  rewrite (lap_sub_diag Hop) in Hla.
+  symmetry in Hla; symmetry.
+  (* TODO: make an assert to group together with the same
+     case with lc above *)
+  specialize (proj1 (List_eq_iff _ _) Hla) as H1.
+  destruct H1 as (H, Hnth).
+  rewrite app_length, repeat_length in H.
+  rewrite repeat_length in H.
+  rewrite Nat.add_comm in H.
+  assert (Hlen : length lb ≤ length la) by flia H; clear H.
+  apply List_eq_iff.
+  rewrite repeat_length.
+  split; [ easy | ].
+  intros d i.
+  rewrite List_nth_repeat; symmetry.
+  destruct (lt_dec i (length lb)) as [Hib| Hib]. 2: {
+    apply Nat.nlt_ge in Hib.
+    now apply nth_overflow.
+  }
+  specialize (Hnth d i) as H1.
+  rewrite app_nth1 in H1; [ | easy ].
+  rewrite List_nth_repeat in H1.
+  destruct (lt_dec i (length la)) as [Hia| Hia]; [ easy | ].
+  exfalso; apply Hia.
+  now apply (lt_le_trans _ (length lb)).
+}
+injection Habc; clear Habc; intros Hla Ha.
+apply (rngl_add_sub_eq_l Hos) in Ha.
+rewrite rngl_add_comm in Ha.
+rewrite (rngl_add_sub Hos) in Ha; subst c.
+cbn; f_equal.
+now apply IHla.
+Qed.
+
 Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -4064,46 +4152,32 @@ destruct b. {
   apply (list_eqb_eq (rngl_eqb_eq Heb)) in Hb.
   subst lq'.
   rewrite Hab' in Hab.
-Theorem lap_add_cancel_l :
-  rngl_has_opp = true →
-  ∀ la lb lc,
-  (la + lb = la + lc)%lap
-  → (lb ++ repeat 0%F (length lc - length lb)  =
-     lc ++ repeat 0%F (length lb - length lc))%lap.
-Proof.
-intros Hop * Habc.
-revert lb lc Habc.
-induction la as [| a]; intros; cbn. {
-  do 2 rewrite lap_add_0_l in Habc.
-  now subst lc.
-}
-cbn in Habc.
-destruct lb as [| b]. {
-  rewrite app_nil_r.
-  destruct lc as [| c]; [ easy | cbn ].
-  injection Habc; clear Habc; intros Hla Ha.
-  symmetry in Hla, Ha.
-  apply (rngl_add_sub_eq_l Hos) in Ha.
-  rewrite (rngl_sub_diag Hos) in Ha; subst c.
-  f_equal.
-  apply (lap_add_sub_eq_l Hop) in Hla.
-  rewrite (lap_sub_diag Hop) in Hla.
-  symmetry in Hla.
-...
-Search (repeat 0%F (length _)).
-Search (repeat 0%F _).
-lap_add_repeat_0_r: ∀ (la : list T) (len : nat), len ≤ length la → (la + repeat 0%F len)%lap = la
-lap_add_repeat_0_l: ∀ (la : list T) (len : nat), len ≤ length la → (repeat 0%F len + la)%lap = la
-lap_add_sub_eq_l:
-  rngl_has_opp = true
-  → ∀ la lb lc : list T, (la + lb)%lap = lc → (lc - la)%lap = lb ++ repeat 0%F (length la - length lb)
-...
-rewrite gen_lap_add in Habc; symmetry in Habc.
-rewrite gen_lap_add in Habc; symmetry in Habc.
-Search (_ + _ = _ + _)%lap.
-Search (_ + _ = _ + _ ↔ _).
-... ...
-apply lap_add_cancel_l in Hab.
+  apply (lap_add_cancel_l Hop) in Hab.
+  do 2 rewrite rev_length in Hab.
+  destruct (le_dec (length rlr) (length rlr')) as [Hrr| Hrr]. {
+    rewrite (proj2 (Nat.sub_0_le _ _)) in Hab; [ | easy ].
+    rewrite app_nil_r in Hab.
+    exists (length rlr' - length rlr).
+    f_equal.
+    apply (f_equal (λ l, rev l)) in Hab.
+    rewrite rev_app_distr in Hab.
+    do 2 rewrite rev_involutive in Hab.
+    now rewrite List_rev_repeat in Hab.
+  }
+  apply Nat.nle_gt in Hrr.
+  symmetry in Hab.
+  rewrite (proj2 (Nat.sub_0_le _ _)) in Hab; [ | now apply Nat.lt_le_incl ].
+  rewrite app_nil_r in Hab.
+  apply (f_equal (λ l, rev l)) in Hab.
+  rewrite rev_app_distr in Hab.
+  do 2 rewrite rev_involutive in Hab.
+  rewrite List_rev_repeat in Hab.
+  apply Bool.orb_true_iff in Hrp.
+  destruct Hrp as [Hrp| Hrp]. {
+    now apply is_empty_list_empty in Hrp; subst rlr.
+  }
+  move Hrp at bottom.
+  move Hab at bottom.
 ...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
