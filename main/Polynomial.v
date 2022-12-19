@@ -4057,6 +4057,7 @@ apply List_app_eq_app' in Haa. 2: {
   now rewrite Nat.sub_diag.
 }
 destruct Haa as (Hfi, Hsk).
+rewrite Hx in Hfi at 2, Hsk at 2.
 ...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
