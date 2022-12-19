@@ -4058,6 +4058,19 @@ apply List_app_eq_app' in Haa. 2: {
 }
 destruct Haa as (Hfi, Hsk).
 rewrite Hx in Hfi at 2, Hsk at 2.
+remember (list_eqv rngl_eqb lq lq') as b eqn:Hb.
+symmetry in Hb.
+destruct b. {
+  apply (list_eqb_eq (rngl_eqb_eq Heb)) in Hb.
+  subst lq'.
+  rewrite (lap_sub_diag Hop) in Hfi.
+Search (_ * repeat _ _)%lap.
+...
+  apply list_eqb_eq in Hb; [ | apply (rngl_eqb Heb) ].
+remember (list_eqb_eq (rngl_eqb_eq Heb) lq lq') as b eqn:Hb.
+symmetry in Hb.
+
+
 ...
   apply (f_equal length) in Haa.
   do 2 rewrite app_length in Haa.
