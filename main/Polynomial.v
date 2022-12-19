@@ -4004,6 +4004,46 @@ rewrite lap_sub_length in Haa.
 do 2 rewrite rev_length in Haa.
 move lb before rlr'.
 move lq before lb; move lq' before lq.
+remember (length _ - max _ _) as len eqn:Hlen.
+...
+remember (length (lb * (lq' - lq))%lap - len) as n eqn:Hn.
+rewrite <- (firstn_skipn n (lb * _)%lap) in Haa.
+apply List_app_eq_app' in Haa. 2: {
+  rewrite firstn_length.
+  apply (f_equal length) in Haa.
+  do 2 rewrite app_length in Haa.
+  rewrite repeat_length in Haa.
+  rewrite firstn_length, skipn_length in Haa.
+  rewrite Hn in Haa.
+  rewrite Nat_sub_sub_distr in Haa. 2: {
+    destruct n; [ | flia Hn ].
+    symmetry in Hn.
+    apply Nat.sub_0_le in Hn.
+    rewrite Hlen in Hn.
+    exfalso; apply Nat.nlt_ge in Hn; apply Hn; clear Hn.
+    do 2 rewrite lap_mul_length.
+    destruct lb as [| b]; [ easy | ].
+    destruct lq as [| q]; [ easy | ].
+    destruct lq' as [| q']; [ easy | ].
+    cbn.
+    do 2 rewrite Nat.sub_0_r.
+    do 2 rewrite app_length.
+    rewrite (fold_rngl_sub Hop).
+    rewrite <- Nat.add_sub_assoc.
+    apply Nat.add_lt_mono_l.
+    rewrite (List_cons_length (q' - q)%F).
+...
+    cbn.
+    cbn in Hlrb, Hlrb'.
+    flia Hlrb Hlrb'.
+...
+  rewrite (Nat.add_comm _ len), Nat.add_sub in Haa.
+  rewrite <- Hn in Haa.
+  now apply Nat.add_cancel_r in Haa.
+...
+  rewrite Hn, Hlen.
+  rewrite Nat_sub_sub_distr.
+  rewrite Nat.min_l.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
