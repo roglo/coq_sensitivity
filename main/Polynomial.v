@@ -284,6 +284,14 @@ Definition lap_quot_rem la lb :=
   let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
   (rev rlq, rev (strip_0s rlr)).
 
+Definition lap_quot la lb :=
+  let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
+  rev rlq.
+
+Definition lap_rem la lb :=
+  let (rlq, rlr) := rlap_quot_rem (rev la) (rev lb) in
+  rev (strip_0s rlr).
+
 (*
 End a.
 Arguments lap_add {T ro} (la lb)%list.
