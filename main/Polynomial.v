@@ -4195,6 +4195,21 @@ destruct (lt_dec i (length lq)) as [Hiq| Hiq]. 2: {
   rewrite nth_overflow; [ | now rewrite <- Hqq in Hiq ].
   easy.
 }
+destruct (lt_dec i (length x - len)) as [Hix| Hix]. 2: {
+  apply Nat.nlt_ge in Hix.
+  specialize (proj1 (List_eq_iff _ _) Hsk) as H1.
+  rewrite <- Hx in H1.
+  destruct H1 as (_, H1).
+...
+  specialize (H1 d (i - (length x - len))).
+  rewrite List_nth_skipn in H1.
+  rewrite Nat.sub_add in H1; [ | easy ].
+  rewrite List_nth_repeat in H1.
+  destruct (lt_dec (i - (length x - len)) len) as [Hil| Hil]. 2: {
+...
+  rewrite <- if_ltb_lt_dec in H1.
+  apply Nat.leb_le in Hix.
+  rewrite
 ...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
