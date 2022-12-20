@@ -4018,6 +4018,101 @@ cbn; f_equal.
 now apply IHla.
 Qed.
 
+Theorem lap_opp_sub_distr :
+  rngl_has_opp = true →
+  ∀ la lb, (- (la - lb) = lb - la)%lap.
+Proof.
+intros Hop *.
+revert lb.
+induction la as [| a]; intros; cbn. {
+  now rewrite (lap_opp_involutive Hop), lap_sub_0_r.
+}
+destruct lb as [| b]; [ easy | cbn ].
+rewrite fold_lap_opp.
+do 2 rewrite fold_lap_sub.
+rewrite IHla; f_equal.
+do 2 rewrite (fold_rngl_sub Hop).
+apply (rngl_opp_sub_distr Hop).
+Qed.
+
+Theorem lap_sub_move_0_r_le :
+  rngl_has_opp = true →
+  ∀ la lb,
+  length la ≤ length lb
+  → (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
+    la ++ repeat 0%F (length lb - length la) =
+    lb ++ repeat 0%F (length la - length lb).
+Proof.
+intros Hop * Hlab.
+rewrite Nat.max_r; [ | easy ].
+rewrite (proj2 (Nat.sub_0_le _ _) Hlab).
+rewrite app_nil_r.
+split; intros Hab. {
+  revert la Hlab Hab.
+  induction lb as [| b]; intros. {
+    now rewrite lap_sub_0_r in Hab; cbn in Hab; subst la.
+  }
+  destruct la as [| a]; cbn in Hab |-*. {
+    injection Hab; clear Hab; intros Hlb Hb.
+    apply (f_equal rngl_opp) in Hb.
+    rewrite (rngl_opp_involutive Hop) in Hb.
+    rewrite (rngl_opp_0 Hop) in Hb; subst b; f_equal.
+    rewrite fold_lap_opp in Hlb.
+    apply (f_equal lap_opp) in Hlb.
+    rewrite (lap_opp_involutive Hop) in Hlb.
+    unfold lap_opp in Hlb.
+    rewrite map_opp_repeat in Hlb.
+    now rewrite (rngl_opp_0 Hop) in Hlb.
+  }
+  rewrite (fold_rngl_sub Hop) in Hab.
+  injection Hab; clear Hab; intros Hab Ha.
+  apply -> (rngl_sub_move_0_r Hop) in Ha; subst b; f_equal.
+  cbn in Hlab; apply Nat.succ_le_mono in Hlab.
+  now apply IHlb.
+}
+rewrite <- (app_nil_r la).
+rewrite <- Hab.
+rewrite lap_sub_app_app; [ | easy ].
+rewrite (lap_sub_diag Hop); cbn.
+rewrite app_length, repeat_length.
+rewrite map_opp_repeat.
+rewrite (rngl_opp_0 Hop).
+now rewrite <- repeat_app.
+Qed.
+
+Theorem lap_sub_move_0_r :
+  rngl_has_opp = true →
+  ∀ la lb,
+  (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
+  la ++ repeat 0%F (length lb - length la) =
+  lb ++ repeat 0%F (length la - length lb).
+Proof.
+intros Hop *.
+destruct (le_dec (length la) (length lb)) as [Hlab| Hlab]. {
+  now apply lap_sub_move_0_r_le.
+}
+apply Nat.nle_gt, Nat.lt_le_incl in Hlab.
+apply (lap_sub_move_0_r_le Hop) in Hlab.
+split; intros H. {
+  symmetry.
+  apply Hlab.
+  rewrite Nat.max_comm.
+  rewrite <- (rngl_opp_0 Hop) at 1.
+  rewrite <- map_opp_repeat.
+  rewrite fold_lap_opp.
+  rewrite <- H.
+  symmetry; apply (lap_opp_sub_distr Hop).
+} {
+  symmetry in H.
+  specialize (proj2 Hlab H) as H1.
+  apply (f_equal lap_opp) in H1.
+  rewrite (lap_opp_sub_distr Hop) in H1.
+  rewrite H1.
+  rewrite map_opp_repeat, (rngl_opp_0 Hop).
+  now rewrite Nat.max_comm.
+}
+Qed.
+
 Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -4186,74 +4281,11 @@ destruct b. {
 }
 apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hb.
 exfalso; apply Hb; clear Hb.
-Search (_ - _ = 0)%F.
-Check rngl_sub_move_0_r.
-Theorem lap_sub_move_0_r_le :
-  rngl_has_opp = true →
-  ∀ la lb,
-  length la ≤ length lb
-  → (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
-    la ++ repeat 0%F (length lb - length la) =
-    lb ++ repeat 0%F (length la - length lb).
-Proof.
-intros Hop * Hlab.
-rewrite Nat.max_r; [ | easy ].
-rewrite (proj2 (Nat.sub_0_le _ _) Hlab).
-rewrite app_nil_r.
-split; intros Hab. {
-  revert la Hlab Hab.
-  induction lb as [| b]; intros. {
-    now rewrite lap_sub_0_r in Hab; cbn in Hab; subst la.
-  }
-  destruct la as [| a]; cbn in Hab |-*. {
-    injection Hab; clear Hab; intros Hlb Hb.
-    apply (f_equal rngl_opp) in Hb.
-    rewrite (rngl_opp_involutive Hop) in Hb.
-    rewrite (rngl_opp_0 Hop) in Hb; subst b; f_equal.
-    rewrite fold_lap_opp in Hlb.
-    apply (f_equal lap_opp) in Hlb.
-    rewrite (lap_opp_involutive Hop) in Hlb.
-    unfold lap_opp in Hlb.
-    rewrite map_opp_repeat in Hlb.
-    now rewrite (rngl_opp_0 Hop) in Hlb.
-  }
-  rewrite (fold_rngl_sub Hop) in Hab.
-  injection Hab; clear Hab; intros Hab Ha.
-  apply -> (rngl_sub_move_0_r Hop) in Ha; subst b; f_equal.
-  cbn in Hlab; apply Nat.succ_le_mono in Hlab.
-  now apply IHlb.
-}
-rewrite <- (app_nil_r la).
-rewrite <- Hab.
-rewrite lap_sub_app_app; [ | easy ].
-rewrite (lap_sub_diag Hop); cbn.
-rewrite app_length, repeat_length.
-rewrite map_opp_repeat.
-rewrite (rngl_opp_0 Hop).
-now rewrite <- repeat_app.
-Qed.
-Theorem lap_sub_move_0_r :
-  rngl_has_opp = true →
-  ∀ la lb,
-  (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
-  la ++ repeat 0%F (length lb - length la) =
-  lb ++ repeat 0%F (length la - length lb).
-Proof.
-intros Hop *.
-destruct (le_dec (length la) (length lb)) as [Hlab| Hlab]. {
-  now apply lap_sub_move_0_r_le.
-}
-apply Nat.nle_gt, Nat.lt_le_incl in Hlab.
-apply (lap_sub_move_0_r_le Hop) in Hlab.
-split. {
-  intros H; symmetry.
-  apply Hlab.
-  rewrite Nat.max_comm.
-  rewrite <- (rngl_opp_0 Hop) at 1.
-  rewrite <- map_opp_repeat.
-  rewrite fold_lap_opp.
-  rewrite <- H.
-Search (- (_ - _))%lap.
+specialize (lap_sub_move_0_r Hop lq lq') as H1.
+rewrite Hqq, Nat.sub_diag in H1.
+do 2 rewrite app_nil_r in H1.
+rewrite Nat.max_id in H1.
+apply H1.
 ...
 intros Hop *.
 split; intros Hab. {
