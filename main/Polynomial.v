@@ -4186,6 +4186,64 @@ destruct b. {
 }
 apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hb.
 exfalso; apply Hb; clear Hb.
+Search (_ - _ = 0)%F.
+Check rngl_sub_move_0_r.
+Theorem lap_sub_move_0_r :
+  rngl_has_opp = true →
+  ∀ la lb,
+  (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
+  la ++ repeat 0%F (length lb - length la) =
+  lb ++ repeat 0%F (length la - length lb).
+Proof.
+intros Hop *.
+destruct (le_dec (length la) (length lb)) as [Hlab| Hlab]. {
+  rewrite Nat.max_r; [ | easy ].
+  rewrite (proj2 (Nat.sub_0_le _ _) Hlab).
+  rewrite app_nil_r.
+  split; intros Hab. {
+    revert la Hlab Hab.
+    induction lb as [| b]; intros. {
+      now rewrite lap_sub_0_r in Hab; cbn in Hab; subst la.
+    }
+    destruct la as [| a]; cbn in Hab |-*. {
+      injection Hab; clear Hab; intros Hlb Hb.
+      apply (f_equal rngl_opp) in Hb.
+      rewrite (rngl_opp_involutive Hop) in Hb.
+      rewrite (rngl_opp_0 Hop) in Hb; subst b; f_equal.
+      rewrite fold_lap_opp in Hlb.
+      apply (f_equal lap_opp) in Hlb.
+      rewrite (lap_opp_involutive Hop) in Hlb.
+      unfold lap_opp in Hlb.
+      rewrite map_opp_repeat in Hlb.
+      now rewrite (rngl_opp_0 Hop) in Hlb.
+    }
+    rewrite (fold_rngl_sub Hop) in Hab.
+    injection Hab; clear Hab; intros Hab Ha.
+    apply -> (rngl_sub_move_0_r Hop) in Ha; subst b; f_equal.
+    cbn in Hlab; apply Nat.succ_le_mono in Hlab.
+    now apply IHlb.
+  }
+...
+intros Hop *.
+split; intros Hab. {
+  revert la Hab.
+  induction lb as [| b]; intros. {
+    rewrite lap_sub_0_r, Nat.max_l in Hab; [ cbn | easy ].
+    now rewrite app_nil_r, Nat.sub_0_r.
+  }
+...
+  induction lb as [| b]; intros; [ | now destruct la ].
+  now rewrite lap_sub_0_r in Hab; subst la.
+} {
+  revert la Hab.
+  induction lb as [| b]; intros; cbn. {
+    rewrite lap_sub_0_r.
+    cbn in Hab; rewrite app_nil_r in Hab.
+    rewrite Nat.sub_0_r in Hab.
+...
+symmetry.
+apply (lap_sub_move_0_r Hop).
+...
 apply List_eq_iff.
 split; [ easy | ].
 intros d i.
@@ -4195,6 +4253,7 @@ destruct (lt_dec i (length lq)) as [Hiq| Hiq]. 2: {
   rewrite nth_overflow; [ | now rewrite <- Hqq in Hiq ].
   easy.
 }
+...
 destruct (lt_dec i (length x - len)) as [Hix| Hix]. 2: {
   apply Nat.nlt_ge in Hix.
   specialize (proj1 (List_eq_iff _ _) Hsk) as H1.
