@@ -4294,6 +4294,27 @@ rewrite Hqq, Nat.sub_diag in H1.
 do 2 rewrite app_nil_r in H1.
 rewrite Nat.max_id in H1.
 apply H1.
+Theorem lap_mul_cancel_l :
+  ∀ la lb lc, la ≠ 0%lap → (la * lb)%lap = (la * lc)%lap → lb = lc.
+Proof.
+intros * Haz Habc.
+Print lap_quot.
+apply (f_equal (λ l, lap_quot l la)) in Habc.
+revert lb lc Habc.
+induction la as [| a]; intros; [ easy | clear Haz ].
+destruct lb as [| b]. {
+  destruct lc as [| c]; [ easy | exfalso ].
+  rewrite lap_mul_0_r in Habc.
+  unfold lap_quot in Habc at 1.
+  cbn - [ lap_mul ] in Habc.
+(* ah fait chier et en plus chais pas si je peux y arriver puisque c'est
+   ça que veut démontrer le théorème qui utilise ce théorème *)
+...
+  cbn - [ la_m in Habc.
+  rewrite Nat.sub_0_r i
+...
+apply lap_mul_cancel_l with (la := lb); [ easy | ].
+...
 ...
 intros Hop *.
 split; intros Hab. {
