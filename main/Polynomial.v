@@ -4152,6 +4152,29 @@ move Hab' before Hab.
 move rlq' before rlr; move rlr' before rlq'.
 move Hlrb' before Hlrb.
 (**)
+revert rla rlq' rlr' Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq.
+induction it; intros; [ easy | cbn ].
+apply Nat.succ_le_mono in Hit.
+cbn in Hqr.
+remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq'', rlr'').
+destruct rlq'' as [q''| ]. {
+  remember (rlap_quot_rem_loop it rlr'' rlb) as qr eqn:Hqr''.
+  symmetry in Hqr''.
+  destruct qr as (rlq'', rlr''').
+  injection Hqr; clear Hqr; intros; subst rlq' rlr'''.
+  specialize (IHit rlr'' rlq'' rlr').
+  generalize Hqr'; intros H.
+  apply (rlap_quot_rem_step_Some Hco Hop) in H; [ | easy ].
+  destruct H as (Hab'', Har'').
+  rewrite Har'' in Hit.
+  generalize Hqr''; intros H.
+  apply (rlap_quot_rem_loop_prop Hco Hop) in H; [ | easy | easy ].
+  rename H into Hr''.
+(* bon, chais pas *)
+...
+(**)
 generalize Hab; intros Haa.
 rewrite Hab' in Haa.
 apply (lap_add_sub_eq_r Hop) in Haa.
@@ -4294,6 +4317,7 @@ rewrite Hqq, Nat.sub_diag in H1.
 do 2 rewrite app_nil_r in H1.
 rewrite Nat.max_id in H1.
 apply H1.
+...
 Theorem lap_mul_cancel_l :
   ∀ la lb lc, la ≠ 0%lap → (la * lb)%lap = (la * lc)%lap → lb = lc.
 Proof.
