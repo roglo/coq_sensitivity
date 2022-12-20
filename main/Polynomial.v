@@ -4185,6 +4185,16 @@ destruct b. {
   now rewrite Nat_succ_sub_succ_r.
 }
 apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hb.
+exfalso; apply Hb; clear Hb.
+apply List_eq_iff.
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length lq)) as [Hiq| Hiq]. 2: {
+  apply Nat.nlt_ge in Hiq.
+  rewrite nth_overflow; [ | easy ].
+  rewrite nth_overflow; [ | now rewrite <- Hqq in Hiq ].
+  easy.
+}
 ...
   rewrite (lap_sub_diag Hop) in Hfi.
 Search (_ * repeat _ _)%lap.
