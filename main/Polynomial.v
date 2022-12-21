@@ -4168,6 +4168,32 @@ destruct rlq' as [cq| ]. 2: {
   rewrite Hab in Hlab.
   rewrite lap_add_length in Hlab.
   rewrite rev_length in Hlab.
+  apply Nat.max_lub_lt_iff in Hlab.
+  destruct Hlab as (H1, _).
+  remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+  apply List_rev_symm in Hlq; subst rlq.
+  destruct lq as [| q]. {
+    rewrite lap_mul_0_r, lap_add_0_l in Hab.
+    apply List_rev_rev in Hab; subst rlr.
+    now exists 0.
+  }
+  exfalso; apply Nat.nle_gt in H1; apply H1; clear H1.
+  rewrite lap_mul_length.
+  remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+  apply List_rev_symm in Hlb; subst rlb.
+  destruct lb as [| b]; [ easy | ].
+  rewrite rev_length; cbn.
+  rewrite app_length, Nat.sub_0_r; cbn.
+  rewrite Nat.add_succ_r.
+  apply -> Nat.succ_le_mono.
+  apply Nat.le_add_r.
+}
+apply (rlap_quot_rem_step_Some Hco Hop) in Hqr; [ | easy ].
+destruct Hqr as (Hab', Har).
+remember (rlap_quot_rem_loop it rlr' rlb) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq', rlr'').
+apply Nat.succ_le_mono in Hit.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 rename rlq into rlq1.
