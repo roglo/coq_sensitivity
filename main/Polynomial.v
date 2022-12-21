@@ -4194,6 +4194,16 @@ remember (rlap_quot_rem_loop it rlr' rlb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (rlq', rlr'').
 apply Nat.succ_le_mono in Hit.
+rewrite Har in Hit.
+generalize Hqr; intros H.
+apply (rlap_quot_rem_loop_prop Hco Hop) in H; [ | easy | easy ].
+rename H into Hrb.
+...
+generalize Hrb; intros H.
+apply IHit in H; [ | | | easy | ].
+destruct H as (i, Hi).
+rewrite Hqr in Hi.
+injection Hi; clear Hi; intros Hi.
 ...
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 rename rlq into rlq1.
