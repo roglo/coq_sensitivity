@@ -4155,8 +4155,7 @@ move rlq' before rlr; move rlr' before rlq'.
 move Hlrb' before Hlrb.
 move Hqr before Hit.
 ...
-(**)
-revert rla rlq' rlr' Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq.
+revert rla rlq' rlr' Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq Hqa.
 induction it; intros; [ easy | cbn ].
 apply Nat.succ_le_mono in Hit.
 cbn in Hqr.
@@ -4172,11 +4171,16 @@ destruct rlq'' as [q''| ]. {
   generalize Hqr'; intros H.
   apply (rlap_quot_rem_step_Some Hco Hop) in H; [ | easy ].
   destruct H as (Hab'', Har'').
-  rewrite Har'' in Hit.
+  rewrite Har'' in Hit, Hqa.
   generalize Hqr''; intros H.
   apply (rlap_quot_rem_loop_prop Hco Hop) in H; [ | easy | easy ].
   rename H into Hr''.
-(* bon, chais pas *)
+  cbn - [ Nat.sub ] in Hqa.
+  rewrite Nat.sub_succ_l in Hqa; [ | flia Hqa ].
+  apply Nat.succ_inj in Hqa.
+  enough (H : has_polyn_prop (rev rlr'') = true).
+  specialize (IHit H); clear H.
+  specialize (IHit Hit).
 ...
 (**)
 generalize Hab; intros Haa.
