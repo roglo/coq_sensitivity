@@ -4134,6 +4134,42 @@ Theorem rlap_quot_rem_loop_prop_if :
   → ∃ i, rlap_quot_rem_loop it rla rlb = (rlq, repeat 0%F i ++ rlr).
 Proof.
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
+revert rla rlq rlr Hap Hrp Hit Hab Hlrb.
+induction it; intros; [ easy | cbn ].
+remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq', rlr').
+destruct rlq' as [cq| ]. 2: {
+  apply rlap_quot_rem_step_None in Hqr.
+  destruct Hqr as [(H1, H2)| Hqr]; [ now subst rlb | ].
+  destruct Hqr as [(H1, H2)| Hqr]. {
+    subst rla rlr'.
+    apply (f_equal length) in Hab; cbn in Hab.
+    symmetry in Hab.
+    rewrite lap_add_length in Hab.
+    rewrite rev_length in Hab.
+    apply Nat.eq_le_incl in Hab.
+    apply Nat.max_lub_iff in Hab.
+    destruct Hab as (H1, H2).
+    apply Nat.le_0_r, length_zero_iff_nil in H2; subst rlr.
+    exists 0; cbn.
+    rewrite lap_mul_length in H1.
+    remember (rev rlb) as lb eqn:Hlb; symmetry in Hlb.
+    apply List_rev_symm in Hlb; subst rlb.
+    destruct lb as [| b]; [ easy | ].
+    remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
+    apply List_rev_symm in Hlq; subst rlq.
+    destruct lq as [| q]; [ easy | ].
+    rewrite app_length in H1; cbn in H1.
+    now rewrite Nat.sub_0_r, Nat.add_comm in H1.
+  }
+  destruct Hqr as (Hlab, Hra); subst rlr'.
+  rewrite <- (rev_length rla) in Hlab.
+  rewrite Hab in Hlab.
+  rewrite lap_add_length in Hlab.
+  rewrite rev_length in Hlab.
+...
+intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 rename rlq into rlq1.
 rename rlr into rlr1.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
