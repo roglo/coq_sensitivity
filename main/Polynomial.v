@@ -4156,6 +4156,10 @@ move Hab' before Hab.
 move rlq before rlr; move rlr before rlq.
 move Hlrb' before Hlrb.
 move Hqr before Hit.
+enough (rlq = rlq1 ∧ ∃ i, rlr = repeat 0%F i ++ rlr1). {
+  destruct H as (H1, (i & H2)); subst rlq.
+  now exists i; rewrite H2.
+}
 ...
 revert rla rlq rlr rlq1 rlr1 Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq Hqa Hrp.
 induction it; intros; [ easy | cbn ].
