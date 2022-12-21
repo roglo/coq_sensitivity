@@ -4148,9 +4148,13 @@ specialize (Hqq (rev rla) (rev rlb)).
 specialize (Hqq (rev rlq) (rev rlr) (rev rlq') (rev rlr')).
 do 5 rewrite rev_length in Hqq.
 specialize (Hqq Hlrb Hlrb' Hab Hab').
+generalize Hqr; intros Hqa.
+apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqa; [ | easy ].
 move Hab' before Hab.
 move rlq' before rlr; move rlr' before rlq'.
 move Hlrb' before Hlrb.
+move Hqr before Hit.
+...
 (**)
 revert rla rlq' rlr' Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq.
 induction it; intros; [ easy | cbn ].
