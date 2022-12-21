@@ -4134,8 +4134,10 @@ Theorem rlap_quot_rem_loop_prop_if :
   → ∃ i, rlap_quot_rem_loop it rla rlb = (rlq, repeat 0%F i ++ rlr).
 Proof.
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
+rename rlq into rlq1.
+rename rlr into rlr1.
 remember (rlap_quot_rem_loop it rla rlb) as qr eqn:Hqr; symmetry in Hqr.
-destruct qr as (rlq', rlr').
+destruct qr as (rlq, rlr).
 generalize Hqr; intros Hlrb'.
 apply rlap_rem_loop_prop in Hlrb'; [ | | easy ]; cycle 1. {
   intros H; apply Hbz.
@@ -4145,29 +4147,35 @@ generalize Hqr; intros Hab'.
 apply (rlap_quot_rem_loop_prop Hco Hop _ _ Hbz) in Hab'; [ | easy ].
 specialize lap_eucl_div_quot_uniq as Hqq.
 specialize (Hqq (rev rla) (rev rlb)).
-specialize (Hqq (rev rlq) (rev rlr) (rev rlq') (rev rlr')).
+specialize (Hqq (rev rlq1) (rev rlr1) (rev rlq) (rev rlr)).
 do 5 rewrite rev_length in Hqq.
 specialize (Hqq Hlrb Hlrb' Hab Hab').
 generalize Hqr; intros Hqa.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbz) in Hqa; [ | easy ].
 move Hab' before Hab.
-move rlq' before rlr; move rlr' before rlq'.
+move rlq before rlr; move rlr before rlq.
 move Hlrb' before Hlrb.
 move Hqr before Hit.
 ...
-revert rla rlq' rlr' Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq Hqa.
+revert rla rlq rlr rlq1 rlr1 Hap Hit Hab Hab' Hlrb Hqr Hlrb' Hqq Hqa Hrp.
 induction it; intros; [ easy | cbn ].
 apply Nat.succ_le_mono in Hit.
 cbn in Hqr.
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr'.
 symmetry in Hqr'.
-destruct qr as (rlq'', rlr'').
-destruct rlq'' as [q''| ]. {
-  remember (rlap_quot_rem_loop it rlr'' rlb) as qr eqn:Hqr''.
+destruct qr as (rlq', rlr').
+destruct rlq' as [q'| ]. {
+  remember (rlap_quot_rem_loop it rlr' rlb) as qr eqn:Hqr''.
   symmetry in Hqr''.
-  destruct qr as (rlq'', rlr''').
-  injection Hqr; clear Hqr; intros; subst rlq' rlr'''.
-  specialize (IHit rlr'' rlq'' rlr').
+  destruct qr as (rlq', rlr''').
+  injection Hqr; clear Hqr; intros; subst rlq rlr'''.
+  remember (rlap_quot_rem_loop it rlr rlb) as qr eqn:Hqr.
+  symmetry in Hqr.
+  rename rlq' into rlq''.
+  rename rlr' into rlr''.
+  destruct qr as (rlq', rlr').
+  specialize (IHit rlr rlq' rlr').
+...
   generalize Hqr'; intros H.
   apply (rlap_quot_rem_step_Some Hco Hop) in H; [ | easy ].
   destruct H as (Hab'', Har'').
@@ -4178,9 +4186,15 @@ destruct rlq'' as [q''| ]. {
   cbn - [ Nat.sub ] in Hqa.
   rewrite Nat.sub_succ_l in Hqa; [ | flia Hqa ].
   apply Nat.succ_inj in Hqa.
+...
+specialize (IHit rlq'' rlr').
   enough (H : has_polyn_prop (rev rlr'') = true).
   specialize (IHit H); clear H.
   specialize (IHit Hit).
+specialize (IHit Hr'' Hr'' Hlrb' Hqr'' Hlrb' eq_refl Hqa).
+enough (H : has_polyn_prop (rev rlr') = true).
+specialize (IHit H); clear H.
+destruct IHit as (i & H).
 ...
 (**)
 generalize Hab; intros Haa.
