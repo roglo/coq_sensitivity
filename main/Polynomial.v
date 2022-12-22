@@ -4134,6 +4134,8 @@ Theorem rlap_quot_rem_loop_prop_if :
   → ∃ i, rlap_quot_rem_loop it rla rlb = (rlq, repeat 0%F i ++ rlr).
 Proof.
 intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
+...
+intros Hco Hop * Hap Hbz Hrp Hit Hab Hlrb.
 revert rla rlq rlr Hap Hrp Hit Hab Hlrb.
 induction it; intros; [ easy | cbn ].
 remember (rlap_quot_rem_step rla rlb) as qr eqn:Hqr.
@@ -4198,7 +4200,6 @@ rewrite Har in Hit.
 generalize Hqr; intros H.
 apply (rlap_quot_rem_loop_prop Hco Hop) in H; [ | easy | easy ].
 rename H into Hrb.
-...
 generalize Hrb; intros H.
 apply IHit in H; [ | | | easy | ].
 destruct H as (i, Hi).
