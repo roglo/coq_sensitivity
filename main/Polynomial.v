@@ -5068,13 +5068,12 @@ apply IHit in Hqr2; [ | easy | | ]; cycle 1.
 ...
 *)
 
-Theorem lap_norm_mul : ∀ la lb,
+Theorem lap_mul_has_polyn_prop : ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
-  → lap_norm (la * lb) = (la * lb)%lap.
+  → has_polyn_prop (la * lb)%lap = true.
 Proof.
 intros * Ha Hb.
-apply last_lap_neq_0_lap_norm.
 unfold has_polyn_prop in Ha, Hb |-*.
 apply Bool.orb_true_iff in Ha, Hb.
 apply Bool.orb_true_iff.
@@ -5100,6 +5099,16 @@ apply rngl_has_inv_or_quot_iff.
 now rewrite Hiv; left.
 Qed.
 
+Theorem lap_norm_mul : ∀ la lb,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → lap_norm (la * lb) = (la * lb)%lap.
+Proof.
+intros * Ha Hb.
+apply last_lap_neq_0_lap_norm.
+now apply lap_mul_has_polyn_prop.
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -5121,14 +5130,27 @@ remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr); cbn.
 apply (lap_quot_rem_prop Hco Hop) in Hqr; cycle 1. {
-rewrite lap_norm_mul; [ | easy | easy ].
-Search (has_polyn_prop (_ * _)%lap).
-...
+  rewrite lap_norm_mul; [ | easy | easy ].
+  now apply lap_mul_has_polyn_prop.
+} {
   destruct lb as [| b] using rev_ind; [ easy | ].
   unfold has_polyn_prop in pb.
   rewrite last_last in pb |-*.
   now destruct lb.
+} {
+  unfold lap_quot_rem in Hqr.
+  remember (rlap_quot_rem _ _) as qr eqn:Hqr'.
+  symmetry in Hqr'.
+  destruct qr as (lq', lr').
+  injection Hqr; clear Hqr; intros; subst lq lr.
+  remember (rev lr') as rlr eqn:Hrlr.
+  symmetry in Hrlr.
+  apply List_rev_symm in Hrlr; subst lr'.
+  apply polyn_norm_prop.
 }
+destruct Hqr as (Hqr, Hrb).
+rewrite lap_norm_mul in Hqr; [ | easy | easy ].
+...
 destruct Hqr as (Hqr, Hrb).
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
   unfold has_polyn_prop.
