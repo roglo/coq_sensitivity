@@ -5095,6 +5095,25 @@ Theorem lap_norm_mul : ∀ la lb,
   → lap_norm (la * lb) = (la * lb)%lap.
 Proof.
 intros * Ha Hb.
+apply last_lap_neq_0_lap_norm.
+unfold has_polyn_prop in Ha, Hb |-*.
+apply Bool.orb_true_iff in Ha, Hb.
+apply Bool.orb_true_iff.
+destruct Ha as [Ha| Ha]. {
+  apply is_empty_list_empty in Ha; subst la.
+  rewrite lap_mul_0_l.
+  now left.
+}
+destruct Hb as [Hb| Hb]. {
+  apply is_empty_list_empty in Hb; subst lb.
+  rewrite lap_mul_0_r.
+  now left.
+}
+right.
+apply (rngl_neqb_neq Heb) in Ha, Hb.
+apply (rngl_neqb_neq Heb).
+...
+intros * Ha Hb.
 unfold lap_mul.
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]; [ easy | ].
@@ -5105,6 +5124,10 @@ Theorem lap_norm_convol_mul : ∀ la lb i len,
   → i + len = length la + length lb - 1
   → lap_norm (lap_convol_mul la lb i len) = lap_convol_mul la lb i len.
 Proof.
+intros * Ha Hb Hlen.
+apply last_lap_neq_0_lap_norm.
+Search (has_polyn_prop (lap_convol_mul _ _ _ _)).
+...
 intros * Ha Hb Hlen.
 unfold lap_norm.
 revert i la lb Ha Hb Hlen.
