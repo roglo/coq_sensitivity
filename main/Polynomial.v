@@ -5136,6 +5136,8 @@ destruct lc as [| c]. {
     apply Nat.succ_inj in Hlen.
     destruct len. 2: {
       cbn in Hlc.
+      rewrite strip_0s_app in Hlc.
+(* ah, c'est une galère ! *)
 ...
     rewrite (rngl_summation_split3 (length la)) in Hsz; [ | easy ].
 ...
