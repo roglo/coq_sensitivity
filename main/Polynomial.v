@@ -5150,6 +5150,13 @@ apply (lap_quot_rem_prop Hco Hop) in Hqr; cycle 1. {
 }
 destruct Hqr as (Hqr, Hrb).
 rewrite lap_norm_mul in Hqr; [ | easy | easy ].
+symmetry in Hqr.
+apply (lap_add_move_l Hop) in Hqr.
+symmetry in Hqr.
+rewrite (lap_mul_comm Hco) in Hqr.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+...
+rewrite lap_mul_length in Hqr.
 ...
 destruct Hqr as (Hqr, Hrb).
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
