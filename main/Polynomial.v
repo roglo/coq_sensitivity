@@ -5155,6 +5155,37 @@ apply (lap_add_move_l Hop) in Hqr.
 symmetry in Hqr.
 rewrite (lap_mul_comm Hco) in Hqr.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+enough (H : has_polyn_prop (lb * (la - lq))%lap = true).
+apply last_lap_neq_0_lap_norm in H.
+rewrite Hqr in H.
+apply (f_equal (λ l, last l 0%F)) in H.
+remember (length (lb * lq)%lap - length lr) as len eqn:Hlen.
+symmetry in Hlen.
+destruct len. {
+  cbn in H.
+  rewrite app_nil_r in Hqr, H.
+  apply Nat.sub_0_le in Hlen.
+  rewrite <- Hqr in Hrb.
+  rewrite lap_mul_length in Hrb.
+  destruct lb as [| b]; [ easy | ].
+  remember (la - lq)%lap as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]. {
+    rewrite lap_mul_0_r in Hqr; subst lr.
+    apply Nat.le_0_r, length_zero_iff_nil in Hlen.
+    destruct lq as [| q]; [ now rewrite lap_sub_0_r in Hlc | ].
+    cbn in Hlen.
+    now rewrite Nat.add_succ_r in Hlen.
+  }
+  rewrite app_length in Hrb; cbn in Hrb.
+  flia Hrb.
+}
+rewrite <- Nat.add_1_r in H.
+rewrite repeat_app in H.
+cbn in H.
+rewrite app_assoc in H.
+rewrite last_last in H.
+Search (last (lap_norm _)).
+(* normalement le last d'un lap_norm ne peut pas être 0 : à prouver *)
 ...
 rewrite lap_mul_length in Hqr.
 ...
