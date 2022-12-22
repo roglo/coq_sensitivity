@@ -5184,8 +5184,10 @@ rewrite repeat_app in H.
 cbn in H.
 rewrite app_assoc in H.
 rewrite last_last in H.
-Search (last (lap_norm _)).
 (* normalement le last d'un lap_norm ne peut pas être 0 : à prouver *)
+Theorem last_lap_norm : ∀ la,
+  last (lap_norm la) 0%F ≠ 0%F.
+(* ah mais non *)
 ...
 rewrite lap_mul_length in Hqr.
 ...
