@@ -5134,7 +5134,16 @@ destruct lc as [| c]. {
     rewrite Nat.add_assoc, Nat.add_sub in Hlen.
     rewrite Nat.add_1_r, Nat.add_succ_r in Hlen; cbn in Hlen.
     apply Nat.succ_inj in Hlen.
-Search lap_convol_mul.
+    destruct len. 2: {
+      cbn in Hlc.
+...
+    rewrite (rngl_summation_split3 (length la)) in Hsz; [ | easy ].
+...
+    destruct (le_dec (length la) i) as [Hai| Hai]. {
+      rewrite (rngl_summation_split3 (length la)) in Hsz; [ | easy ].
+      rewrite app_nth2 in Hsz; [ | now unfold ge ].
+      rewrite Nat.sub_diag in Hsz; cbn in Hsz.
+      rewrite nah_a
 ...
     destruct Ha as [Ha| Ha]. {
       apply is_empty_list_empty in Ha; subst la.
