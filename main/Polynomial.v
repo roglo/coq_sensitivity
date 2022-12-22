@@ -5098,9 +5098,10 @@ intros * Ha Hb.
 unfold lap_mul.
 destruct la as [| a]; [ easy | ].
 destruct lb as [| b]; [ easy | ].
+Print has_polyn_prop.
 Theorem lap_norm_convol_mul : ∀ la lb i len,
-  has_polyn_prop la = true
-  → has_polyn_prop lb = true
+  last la 0%F ≠ 0%F
+  → last lb 0%F ≠ 0%F
   → i + len = length la + length lb - 1
   → lap_norm (lap_convol_mul la lb i len) = lap_convol_mul la lb i len.
 Proof.
@@ -5117,8 +5118,24 @@ destruct lc as [| c]. {
   destruct (bool_dec _) as [Hsz| Hsz]. {
     exfalso.
     apply (rngl_eqb_eq Heb) in Hsz; subst s.
-    unfold has_polyn_prop in Ha, Hb.
-    apply Bool.orb_true_iff in Ha, Hb.
+(*
+    destruct la as [| a]; [ easy | ].
+    destruct lb as [| b]; [ easy | ].
+    cbn in Hlen; rewrite Nat.sub_0_r in Hlen.
+    do 2 rewrite Nat.add_succ_r in Hlen.
+    apply Nat.succ_inj in Hlen.
+    destruct len. {
+*)
+    destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+    destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+    rewrite last_last in Ha, Hb.
+    do 2 rewrite app_length in Hlen.
+    cbn in Hlen.
+    rewrite Nat.add_assoc, Nat.add_sub in Hlen.
+    rewrite Nat.add_1_r, Nat.add_succ_r in Hlen; cbn in Hlen.
+    apply Nat.succ_inj in Hlen.
+Search lap_convol_mul.
+...
     destruct Ha as [Ha| Ha]. {
       apply is_empty_list_empty in Ha; subst la.
       cbn in Hlen.
@@ -5133,11 +5150,12 @@ destruct lc as [| c]. {
       rewrite last_last in Hb.
       apply (rngl_neqb_neq Heb) in Hb.
       rewrite app_length, Nat.add_sub in Hlen.
+      destruct len. {
+Print lap_mul.
 ...
       cbn in Hb, Hlen; rewrite Nat.sub_0_r in Hlen.
       destruct lb as [| b']; [ easy | ].
       cbn in Hb.
-Print lap_convol_mul.
 Print lap_mul.
 ... ...
 rewrite lap_norm_mul; [ | easy | easy ].
