@@ -5181,6 +5181,12 @@ apply (lap_add_move_l Hop) in Hqr.
 symmetry in Hqr.
 rewrite (lap_mul_comm Hco) in Hqr.
 rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+(**)
+assert (H : has_polyn_prop (lb * (la - lq))%lap = true). {
+  apply lap_mul_has_polyn_prop; [ easy | ].
+Search (has_polyn_prop (_ - _)%lap).
+(* ouais, bin oui, c'est pas gagné, ça *)
+...
 enough (H : has_polyn_prop (lb * (la - lq))%lap = true).
 apply last_lap_neq_0_lap_norm in H.
 rewrite Hqr in H.
@@ -5216,8 +5222,21 @@ rewrite <- lap_norm_app_0_r in H. 2: {
   destruct i; [ easy | now cbn; rewrite Tauto_match_nat_same ].
 }
 specialize (proj2 (all_0_lap_norm_nil _) H) as H1.
-...
-rewrite lap_mul_length in Hqr.
+replace lr with (repeat 0%F (length lr)) in Hqr. 2: {
+  apply List_eq_iff.
+  rewrite repeat_length.
+  split; [ easy | ].
+  intros d i.
+  rewrite List_nth_repeat.
+  destruct (lt_dec i (length lr)) as [Hir| Hir]. {
+    specialize (H1 i).
+    rewrite app_nth1 in H1; [ | easy ].
+    now rewrite nth_indep with (d' := 0%F).
+  }
+  apply Nat.nlt_ge in Hir.
+  now rewrite nth_overflow.
+}
+rewrite <- repeat_app in Hqr.
 ...
 destruct Hqr as (Hqr, Hrb).
 rewrite last_lap_neq_0_lap_norm in Hqr. 2: {
