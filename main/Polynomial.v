@@ -5109,6 +5109,32 @@ apply last_lap_neq_0_lap_norm.
 now apply lap_mul_has_polyn_prop.
 Qed.
 
+Theorem last_lap_norm : ∀ la,
+  last (lap_norm la) 0%F = 0%F
+  → lap_norm la = 0%lap.
+Proof.
+intros * Ha.
+induction la as [| a] using rev_ind; [ easy | cbn ].
+destruct (rngl_eq_dec Heb a 0%F) as [Haz| Haz]. {
+  subst a.
+  rewrite <- lap_norm_app_0_r in Ha. 2: {
+    intros i.
+    destruct i; [ easy | cbn ].
+    apply Tauto_match_nat_same.
+  }
+  rewrite <- lap_norm_app_0_r. 2: {
+    intros i.
+    destruct i; [ easy | cbn ].
+    apply Tauto_match_nat_same.
+  }
+  now apply IHla.
+}
+rewrite last_lap_neq_0_lap_norm in Ha; [ now rewrite last_last in Ha | ].
+apply Bool.orb_true_iff; right.
+rewrite last_last.
+now apply (rngl_neqb_neq Heb).
+Qed.
+
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -5184,10 +5210,12 @@ rewrite repeat_app in H.
 cbn in H.
 rewrite app_assoc in H.
 rewrite last_last in H.
-(* normalement le last d'un lap_norm ne peut pas être 0 : à prouver *)
-Theorem last_lap_norm : ∀ la,
-  last (lap_norm la) 0%F ≠ 0%F.
-(* ah mais non *)
+apply last_lap_norm in H.
+rewrite <- lap_norm_app_0_r in H. 2: {
+  intros i.
+  destruct i; [ easy | now cbn; rewrite Tauto_match_nat_same ].
+}
+specialize (proj2 (all_0_lap_norm_nil _) H) as H1.
 ...
 rewrite lap_mul_length in Hqr.
 ...
