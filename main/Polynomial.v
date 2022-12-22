@@ -4121,6 +4121,7 @@ split; intros H. {
 }
 Qed.
 
+(*
 Theorem rlap_quot_rem_loop_prop_if :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -5065,6 +5066,7 @@ generalize Hqr1; intros Hqr2.
 apply IHit in Hqr2; [ | easy | | ]; cycle 1.
   Hqr : rlap_quot_rem_loop it rla rlb = (cq :: repeat 0%F dq, r)
 ...
+*)
 
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
@@ -5074,8 +5076,6 @@ Theorem polyn_mul_div :
   → (a * b / b)%pol = a.
 Proof.
 intros Hco Hop * Hbz.
-Check rlap_quot_rem_loop_prop.
-...
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
@@ -5088,7 +5088,62 @@ apply eq_polyn_eq; cbn.
 remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr); cbn.
-apply (lap_quot_rem_prop Hco Hop) in Hqr. 2: {
+apply (lap_quot_rem_prop Hco Hop) in Hqr; cycle 1. {
+Theorem lap_norm_mul : ∀ la lb,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → lap_norm (la * lb) = (la * lb)%lap.
+Proof.
+intros * Ha Hb.
+unfold lap_mul.
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+Theorem lap_norm_convol_mul : ∀ la lb i len,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → i + len = length la + length lb - 1
+  → lap_norm (lap_convol_mul la lb i len) = lap_convol_mul la lb i len.
+Proof.
+intros * Ha Hb Hlen.
+unfold lap_norm.
+revert i la lb Ha Hb Hlen.
+induction len; intros; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev _)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  cbn.
+  remember (∑ (j = _, _), _) as s eqn:Hs; symmetry in Hs.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hsz| Hsz]. {
+    exfalso.
+    apply (rngl_eqb_eq Heb) in Hsz; subst s.
+    unfold has_polyn_prop in Ha, Hb.
+    apply Bool.orb_true_iff in Ha, Hb.
+    destruct Ha as [Ha| Ha]. {
+      apply is_empty_list_empty in Ha; subst la.
+      cbn in Hlen.
+      destruct Hb as [Hb| Hb]. {
+        apply is_empty_list_empty in Hb; subst lb.
+        now rewrite Nat.add_comm in Hlen.
+      }
+      destruct lb as [| b] using rev_ind. {
+        now rewrite Nat.add_comm in Hlen.
+      }
+      clear IHlb.
+      rewrite last_last in Hb.
+      apply (rngl_neqb_neq Heb) in Hb.
+      rewrite app_length, Nat.add_sub in Hlen.
+...
+      cbn in Hb, Hlen; rewrite Nat.sub_0_r in Hlen.
+      destruct lb as [| b']; [ easy | ].
+      cbn in Hb.
+Print lap_convol_mul.
+Print lap_mul.
+... ...
+rewrite lap_norm_mul; [ | easy | easy ].
+Search lap_norm.
+Search (lap_norm (_ * _)).
+...
   destruct lb as [| b] using rev_ind; [ easy | ].
   unfold has_polyn_prop in pb.
   rewrite last_last in pb |-*.
