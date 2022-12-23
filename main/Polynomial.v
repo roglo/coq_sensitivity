@@ -5270,6 +5270,7 @@ apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1. 2: {
 do 2 rewrite rev_involutive in Hqr1.
 do 2 rewrite rev_length in Hqr1.
 destruct Hqr1 as (Hab, Hlab).
+...
 remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr').
