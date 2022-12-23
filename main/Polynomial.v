@@ -5218,7 +5218,15 @@ destruct lb as [| b]; [ easy | ].
 remember (la - lq)%lap as laq eqn:Hlaq'; symmetry in Hlaq'.
 destruct laq as [| aq]. {
   move Hlaq' at bottom; move Hlaq at bottom.
-Search (_ - _ = 0)%lap.
+  destruct lq as [| q]; [ now rewrite lap_sub_0_r in Hlaq' | ].
+  rewrite app_length in Hqr2; cbn in Hqr2.
+  flia Hqr2.
+}
+cbn in Hqr2.
+rewrite Nat.sub_0_r in Hqr2.
+rewrite app_length in Hqr2; cbn in Hqr2.
+destruct lq as [| q]; [ flia Hqr2 | ].
+rewrite app_length, Nat.sub_0_r in Hqr2; cbn in Hqr2.
 ...
 Search (length (_ + _)%lap).
 len lb + max (len la) len lq = len lr + len (lb * lq) - len lr
