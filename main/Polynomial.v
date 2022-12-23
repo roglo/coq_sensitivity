@@ -775,6 +775,49 @@ Qed.
 ...
 *)
 
+Theorem lap_quot_is_norm : ∀ la lb,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop (lap_quot la lb) = true.
+Proof.
+intros * Ha Hb.
+unfold lap_quot.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr); cbn.
+unfold has_polyn_prop.
+apply Bool.orb_true_iff.
+destruct rlq as [| q]; [ now left | right ].
+cbn; rewrite last_last.
+apply rlap_quot_prop in Hqr; cycle 1. {
+  unfold has_polyn_prop in Ha.
+  apply Bool.orb_true_iff in Ha.
+  destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
+  destruct la as [| a] using rev_ind. {
+    cbn in Ha.
+    now rewrite (rngl_eqb_refl Heb) in Ha.
+  }
+  rewrite last_last in Ha.
+  rewrite rev_app_distr; cbn.
+  now apply (rngl_neqb_neq Heb) in Ha.
+} {
+  unfold has_polyn_prop in Hb.
+  apply Bool.orb_true_iff in Hb.
+  destruct Hb as [Hb| Hb]; [ now left; destruct lb | right ].
+  destruct lb as [| b] using rev_ind. {
+    cbn in Hb.
+    now rewrite (rngl_eqb_refl Heb) in Hb.
+  }
+  rewrite last_last in Hb.
+  rewrite rev_app_distr; cbn.
+  now apply (rngl_neqb_neq Heb) in Hb.
+}
+destruct Hqr as [Hqr| Hqr]; [ easy | ].
+cbn in Hqr.
+now apply (rngl_neqb_neq Heb).
+Qed.
+
+(*
 Theorem quot_is_norm : ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
@@ -817,7 +860,34 @@ destruct Hqr as [Hqr| Hqr]; [ easy | ].
 cbn in Hqr.
 now apply (rngl_neqb_neq Heb).
 Qed.
+*)
 
+Theorem lap_rem_is_norm : ∀ la lb,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → has_polyn_prop (lap_rem la lb) = true.
+Proof.
+intros * Ha Hb.
+unfold lap_rem.
+remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr); cbn.
+unfold has_polyn_prop.
+destruct rlr as [| r]; [ easy | ].
+cbn; rewrite if_bool_if_dec.
+apply Bool.orb_true_iff.
+destruct (bool_dec _) as [Hrz| Hrz]. {
+  rewrite List_last_rev.
+  remember (strip_0s rlr) as rl eqn:Hrl;symmetry in Hrl.
+  destruct rl as [| a]; [ now left | right; cbn ].
+  apply eq_strip_0s_cons in Hrl.
+  now apply (rngl_neqb_neq Heb).
+}
+right; cbn; rewrite last_last.
+now rewrite Hrz.
+Qed.
+
+(*
 Theorem rem_is_norm : ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
@@ -843,7 +913,17 @@ destruct (bool_dec _) as [Hrz| Hrz]. {
 right; cbn; rewrite last_last.
 now rewrite Hrz.
 Qed.
+*)
 
+Definition polyn_quot (pa pb : polyn T) : polyn T :=
+  let lq := lap_quot (lap pa) (lap pb) in
+  mk_polyn lq (lap_quot_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
+
+Definition polyn_rem (pa pb : polyn T) : polyn T :=
+  let lq := lap_rem (lap pa) (lap pb) in
+  mk_polyn lq (lap_rem_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
+
+(*
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
   let lq := fst (lap_quot_rem (lap pa) (lap pb)) in
   mk_polyn lq (quot_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
@@ -851,6 +931,7 @@ Definition polyn_quot (pa pb : polyn T) : polyn T :=
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lr := snd (lap_quot_rem (lap pa) (lap pb)) in
   mk_polyn lr (rem_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
+*)
 
 Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
   (polyn_quot pa pb, polyn_rem pa pb).
@@ -932,6 +1013,9 @@ Delimit Scope lap_scope with lap.
 
 Arguments lap_add (la lb)%lap.
 Arguments lap_mul (la lb)%lap.
+Arguments lap_quot_rem (la lb)%lap.
+Arguments lap_quot (la lb)%lap.
+Arguments lap_rem (la lb)%lap.
 
 Notation "0" := [] : lap_scope.
 Notation "1" := [1%F] : lap_scope.
@@ -939,7 +1023,8 @@ Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
-Notation "a / b" := (polyn_quot a b) : polyn_scope.
+Notation "a / b" := (lap_quot a b) : lap_scope.
+Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
 
 Arguments lap {T ro} p%pol.
 Arguments lap_norm la%lap.
@@ -3678,7 +3763,9 @@ assert (H : lap_quot_rem la lb = (lq, lr)). {
   unfold polyn_quot_rem in Hab.
   unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
   injection Hab; clear Hab; intros; subst lr lq.
-  apply surjective_pairing.
+  unfold lap_quot_rem.
+  unfold lap_quot, lap_rem.
+  now destruct (rlap_quot_rem _ _).
 }
 specialize (H1 H); clear H.
 destruct H1 as (H1, H2).
@@ -5135,24 +5222,19 @@ rewrite last_last.
 now apply (rngl_neqb_neq Heb).
 Qed.
 
-Theorem polyn_mul_div :
+Theorem lap_mul_div :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  ∀ a b,
-  b ≠ 0%pol
-  → (a * b / b)%pol = a.
+  ∀ la lb,
+  has_polyn_prop la = true
+  → has_polyn_prop lb = true
+  → lb ≠ 0%lap
+  → (la * lb / lb)%lap = la.
 Proof.
-intros Hco Hop * Hbz.
-destruct a as (la, pa).
-destruct b as (lb, pb).
-move lb before la.
-assert (H : lb ≠ 0%lap). {
-  intros H; apply Hbz.
-  now apply eq_polyn_eq.
-}
-clear Hbz; rename H into Hbz.
-apply eq_polyn_eq; cbn.
-remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
+intros Hco Hop * pa pb Hbz.
+...
+intros Hco Hop * pa pb Hbz.
+remember (lap_quot_rem (la * lb) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr); cbn.
 generalize Hqr; intros Hqr1.
@@ -5761,6 +5843,29 @@ specialize (H1 H); clear H.
 Set Printing Implicit.
 ...
 *)
+...
+
+Theorem polyn_mul_div :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  ∀ a b,
+  b ≠ 0%pol
+  → (a * b / b)%pol = a.
+Proof.
+intros Hco Hop * Hbz.
+destruct a as (la, pa).
+destruct b as (lb, pb).
+move lb before la.
+assert (H : lb ≠ 0%lap). {
+  intros H; apply Hbz.
+  now apply eq_polyn_eq.
+}
+clear Hbz; rename H into Hbz.
+apply eq_polyn_eq; cbn.
+rewrite (lap_norm_mul _ _ pa pb).
+... ...
+now apply lap_mul_div.
+...
 
 (*
 Theorem polyn_opt_mul_div :
