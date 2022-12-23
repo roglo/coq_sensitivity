@@ -5270,6 +5270,19 @@ apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1. 2: {
 do 2 rewrite rev_involutive in Hqr1.
 do 2 rewrite rev_length in Hqr1.
 destruct Hqr1 as (Hab, Hlab).
+remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
+destruct qr as (rlq', rlr').
+...
+rewrite Hlab in Hqr'; cbn in Hqr'.
+remember (rlap_quot_rem_step rlr (rev lb)) as qr eqn:Hqr''.
+symmetry in Hqr''.
+destruct qr as (rlq'', rlr'').
+destruct rlq'' as [cq''| ]. {
+  remember (rlap_quot_rem_loop (length rlr) rlr'') as qr eqn:Hqr'''.
+  symmetry in Hqr'''.
+  destruct qr as (rlq''', rlr''').
+  injection Hqr'; clear Hqr'; intros; subst rlq' rlr'.
 ...
 intros Hco Hop * pa pb Hbz.
 remember (lap_quot_rem (la * lb) lb) as qr eqn:Hqr.
