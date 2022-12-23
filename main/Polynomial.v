@@ -5155,7 +5155,8 @@ apply eq_polyn_eq; cbn.
 remember (lap_quot_rem (lap_norm (la * lb)) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr); cbn.
-apply (lap_quot_rem_prop Hco Hop) in Hqr; cycle 1. {
+generalize Hqr; intros Hqr1.
+apply (lap_quot_rem_prop Hco Hop) in Hqr1; cycle 1. {
   rewrite lap_norm_mul; [ | easy | easy ].
   now apply lap_mul_has_polyn_prop.
 } {
@@ -5174,14 +5175,22 @@ apply (lap_quot_rem_prop Hco Hop) in Hqr; cycle 1. {
   apply List_rev_symm in Hrlr; subst lr'.
   apply polyn_norm_prop.
 }
-destruct Hqr as (Hqr, Hrb).
-rewrite lap_norm_mul in Hqr; [ | easy | easy ].
-symmetry in Hqr.
-apply (lap_add_move_l Hop) in Hqr.
-symmetry in Hqr.
-rewrite (lap_mul_comm Hco) in Hqr.
-rewrite <- (lap_mul_sub_distr_l Hop) in Hqr.
+destruct Hqr1 as (Hqr1, Hrb).
+rewrite lap_norm_mul in Hqr1; [ | easy | easy ].
+symmetry in Hqr1.
+apply (lap_add_move_l Hop) in Hqr1.
+symmetry in Hqr1.
+rewrite (lap_mul_comm Hco) in Hqr1.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hqr1.
 (**)
+remember (list_eqv rngl_eqb la lq) as laq eqn:Hlaq.
+symmetry in Hlaq.
+destruct laq as [| aq]. {
+  now apply (list_eqb_eq (rngl_eqb_eq Heb)) in Hlaq.
+}
+apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hlaq.
+exfalso.
+...
 assert (H : has_polyn_prop (lb * (la - lq))%lap = true). {
   apply lap_mul_has_polyn_prop; [ easy | ].
 Search (has_polyn_prop (_ - _)%lap).
