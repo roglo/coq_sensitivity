@@ -5227,6 +5227,28 @@ rewrite Nat.sub_0_r in Hqr2.
 rewrite app_length in Hqr2; cbn in Hqr2.
 destruct lq as [| q]; [ flia Hqr2 | ].
 rewrite app_length, Nat.sub_0_r in Hqr2; cbn in Hqr2.
+apply Nat.add_cancel_l in Hqr2.
+apply Nat.succ_inj in Hqr2.
+destruct la as [| a]. {
+  cbn in Hlaq'.
+  rewrite lap_mul_0_l in Hqr.
+  unfold lap_quot_rem in Hqr.
+  cbn - [ rlap_quot_rem ] in Hqr.
+  unfold rlap_quot_rem in Hqr.
+  unfold rlap_quot_rem_nb_iter in Hqr.
+  cbn - [ rlap_quot_rem_loop ] in Hqr.
+  cbn in Hqr.
+  remember (rlap_quot_rem_step 0%lap (rev lb ++ [b])) as qr eqn:Hqr3.
+  symmetry in Hqr3.
+  destruct qr as (q', lr').
+  destruct q' as [q'| ]. {
+    injection Hqr; clear Hqr; intros Hqr H; subst lq.
+    clear Hlaq.
+    apply length_zero_iff_nil in Hqr2; subst laq.
+    clear Hqr. (* bon, chais pas *)
+    cbn in Hlaq'.
+    injection Hlaq'; clear Hlaq'; intros; subst aq.
+    subst q'; clear Hbz pa.
 ...
 Search (length (_ + _)%lap).
 len lb + max (len la) len lq = len lr + len (lb * lq) - len lr
