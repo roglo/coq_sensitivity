@@ -3249,7 +3249,8 @@ Theorem rlap_quot_rem_step_Some :
   → rev rla =
       (rev rlb * rev (cq :: repeat 0%F (length rla - length rlb)) +
        rev rlr)%lap ∧
-    length rla = S (length rlr).
+    length rla = S (length rlr) ∧
+    cq = (hd 0 rla / hd 0 rlb)%F.
 Proof.
 intros Hco Hop * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
@@ -3450,7 +3451,7 @@ destruct q as [cq| ]. 2: {
 }
 generalize Hqrlr; intros Hqrlr'.
 apply (rlap_quot_rem_step_Some Hco Hop) in Hqrlr'; [ | easy ].
-destruct Hqrlr' as (Hqrlr', Hra).
+destruct Hqrlr' as (Hqrlr' & Hra & Hcq).
 remember (rlap_quot_rem_loop it _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
 destruct qr as (rlq', rlr'').
@@ -3460,10 +3461,6 @@ rename Hqr' into Hqr.
 move rla after rlb.
 move rlq before rlb.
 move rlr before rlq.
-(*
-generalize Hqrlr; intros Hra.
-apply rlap_quot_rem_step_length_r_a in Hra.
-*)
 generalize Hqr; intros Hqrb.
 apply (rlap_quot_rem_length Hco Hop _ _ Hbn) in Hqrb; [ | flia Hra Hit ].
 apply IHit in Hqr. 2: {
@@ -5269,7 +5266,12 @@ apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1. 2: {
 }
 do 2 rewrite rev_involutive in Hqr1.
 do 2 rewrite rev_length in Hqr1.
-destruct Hqr1 as (Hab, Hlab).
+destruct Hqr1 as (Hab & Hlab & Hcq).
+(**)
+symmetry in Hab.
+apply (lap_add_sub_eq_l Hop) in Hab.
+rewrite rev_length in Hab.
+rewrite (lap_mul_comm Hco), <- (lap_mul_sub_distr_l Hop) in Hab.
 ...
 remember (rlap_quot_rem_loop _ _ _) as qr eqn:Hqr'.
 symmetry in Hqr'.
