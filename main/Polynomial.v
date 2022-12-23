@@ -5190,6 +5190,38 @@ destruct laq as [| aq]. {
 }
 apply (list_eqb_neq (rngl_eqb_eq Heb)) in Hlaq.
 exfalso.
+generalize Hqr1; intros Hqr2.
+apply (f_equal length) in Hqr2.
+rewrite app_length, repeat_length in Hqr2.
+rewrite Nat.add_comm in Hqr2.
+rewrite Nat.sub_add in Hqr2. 2: {
+  rewrite lap_mul_length.
+  destruct lb as [| b]; [ easy | ].
+  destruct lq as [| q]. {
+    rewrite lap_mul_0_r in Hqr1.
+    rewrite Nat.sub_0_l, app_nil_r in Hqr1.
+    rewrite lap_sub_0_r in Hqr1.
+    rewrite <- Hqr1 in Hrb.
+    exfalso; apply Nat.nlt_ge in Hrb; apply Hrb.
+    rewrite lap_mul_length; cbn.
+    destruct la as [| a]; [ easy | ].
+    rewrite app_length; cbn.
+    rewrite Nat.sub_0_r.
+    flia.
+  }
+  rewrite app_length.
+  cbn in Hrb |-*.
+  flia Hrb.
+}
+do 2 rewrite lap_mul_length in Hqr2.
+destruct lb as [| b]; [ easy | ].
+remember (la - lq)%lap as laq eqn:Hlaq'; symmetry in Hlaq'.
+destruct laq as [| aq]. {
+  move Hlaq' at bottom; move Hlaq at bottom.
+Search (_ - _ = 0)%lap.
+...
+Search (length (_ + _)%lap).
+len lb + max (len la) len lq = len lr + len (lb * lq) - len lr
 ...
 assert (H : has_polyn_prop (lb * (la - lq))%lap = true). {
   apply lap_mul_has_polyn_prop; [ easy | ].
