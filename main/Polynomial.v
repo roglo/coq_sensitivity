@@ -5232,6 +5232,44 @@ Theorem lap_mul_div :
   → (la * lb / lb)%lap = la.
 Proof.
 intros Hco Hop * pa pb Hbz.
+unfold lap_quot.
+unfold rlap_quot_rem; cbn.
+rewrite rev_length.
+remember (rlap_quot_rem_step _ _) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (rlq, rlr).
+destruct rlq as [cq| ]. 2: {
+  apply rlap_quot_rem_step_None in Hqr.
+  destruct Hqr as [(H1, H2)| Hqr]; [ now apply List_rev_symm in H1 | ].
+  destruct Hqr as [(H1, H2)| Hqr]. {
+    apply List_rev_symm in H1; cbn in H1.
+    apply (f_equal length) in H1.
+    rewrite lap_mul_length in H1.
+    destruct la as [| a]; [ easy | ].
+    destruct lb as [| b]; [ easy | ].
+    rewrite app_length in H1; cbn in H1.
+    now rewrite Nat.add_comm in H1.
+  }
+  destruct Hqr as (H1, H2).
+  do 2 rewrite rev_length in H1.
+  rewrite lap_mul_length in H1.
+  destruct la as [| a]; [ easy | ].
+  destruct lb as [| b]; [ easy | ].
+  rewrite app_length in H1; cbn in H1.
+  exfalso; apply Nat.nlt_ge in H1; apply H1.
+  rewrite Nat.sub_0_r, Nat.add_comm.
+  apply Nat.lt_succ_r, Nat.le_add_r.
+}
+generalize Hqr; intros Hqr1.
+apply (rlap_quot_rem_step_Some Hco Hop) in Hqr1. 2: {
+  rewrite <- List_last_rev, rev_involutive.
+  apply Bool.orb_true_iff in pb.
+  destruct pb as [pb| pb]; [ now apply is_empty_list_empty in pb | ].
+  now apply (rngl_neqb_neq Heb) in pb.
+}
+do 2 rewrite rev_involutive in Hqr1.
+do 2 rewrite rev_length in Hqr1.
+destruct Hqr1 as (Hab, Hlab).
 ...
 intros Hco Hop * pa pb Hbz.
 remember (lap_quot_rem (la * lb) lb) as qr eqn:Hqr.
