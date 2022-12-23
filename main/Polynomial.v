@@ -5214,7 +5214,7 @@ rewrite Nat.sub_add in Hqr2. 2: {
   flia Hrb.
 }
 do 2 rewrite lap_mul_length in Hqr2.
-destruct lb as [| b]; [ easy | ].
+destruct lb as [| b]; [ easy | clear Hbz ].
 remember (la - lq)%lap as laq eqn:Hlaq'; symmetry in Hlaq'.
 destruct laq as [| aq]. {
   move Hlaq' at bottom; move Hlaq at bottom.
@@ -5241,7 +5241,16 @@ destruct la as [| a]. {
   remember (rlap_quot_rem_step 0%lap (rev lb ++ [b])) as qr eqn:Hqr3.
   symmetry in Hqr3.
   destruct qr as (q', lr').
-  destruct q' as [q'| ]. {
+  destruct q' as [q'| ]; [ | easy ].
+  apply (rlap_quot_rem_step_Some Hco Hop) in Hqr3; [ easy | ].
+  apply Bool.orb_true_iff in pb.
+  destruct pb as [pb| pb]; [ easy | ].
+  apply (rngl_neqb_neq Heb) in pb.
+  rewrite <- List_last_rev.
+  rewrite rev_app_distr.
+  now rewrite rev_involutive.
+}
+...
     injection Hqr; clear Hqr; intros Hqr H; subst lq.
     clear Hlaq.
     apply length_zero_iff_nil in Hqr2; subst laq.
@@ -5249,6 +5258,7 @@ destruct la as [| a]. {
     cbn in Hlaq'.
     injection Hlaq'; clear Hlaq'; intros; subst aq.
     subst q'; clear Hbz pa.
+    apply rlap_quot_rem_step.
 ...
 Search (length (_ + _)%lap).
 len lb + max (len la) len lq = len lr + len (lb * lq) - len lr
