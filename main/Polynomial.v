@@ -5229,6 +5229,19 @@ Theorem lap_mul_div :
   → (la * lb / lb)%lap = la.
 Proof.
 intros Hco Hop * pa pb Hbz.
+remember (lap_quot_rem (la * lb) lb) as qr eqn:Hqr.
+symmetry in Hqr.
+destruct qr as (lq, lr).
+specialize (lap_quot_rem_prop Hco Hop) as H1.
+specialize (H1 (la * lb)%lap lb lq lr).
+Search (has_polyn_prop (_ * _)%lap).
+specialize (H1 (lap_mul_has_polyn_prop la lb pa pb)).
+Check lap_quot_rem_prop.
+...
+assert (H : last lb 0 ≠ 0)
+Search has_polyn_prop.
+...
+intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
 unfold rlap_quot_rem; cbn.
 rewrite rev_length.
