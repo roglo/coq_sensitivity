@@ -5264,7 +5264,17 @@ rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
 apply (f_equal lap_norm) in Hab.
 rewrite <- lap_norm_app_0_r in Hab by apply nth_repeat.
 rewrite (last_lap_neq_0_lap_norm lr pr) in Hab.
-Search (lap_norm (_ * _)).
+rewrite <- lap_mul_norm_idemp_r in Hab.
+rewrite lap_norm_mul in Hab; [ | easy | apply polyn_norm_prop ].
+generalize Hab; intros Hab1.
+apply (f_equal length) in Hab1.
+rewrite lap_mul_length in Hab1.
+destruct lb as [| b]; [ easy | clear Hbz ].
+remember (lap_norm (la - lq)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
+  apply eq_sym, length_zero_iff_nil in Hab1.
+  clear Hab Hrb pr; subst lr.
+Search (lap_norm _ = 0%lap).
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
