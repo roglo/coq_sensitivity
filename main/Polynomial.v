@@ -3601,7 +3601,7 @@ Theorem lap_quot_rem_prop :
   rngl_has_opp = true →
   ∀ la lb lq lr : list T,
   has_polyn_prop la = true
-  → (last lb 0 ≠? 0)%F = true
+  → last lb 0%F ≠ 0%F
   → has_polyn_prop lr = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧ length lr < length lb.
@@ -3609,10 +3609,10 @@ Proof.
 intros Hco Hop * Ha Hb Hr Hab.
 assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
-    intros H; subst lb; cbn in Hb.
-    now rewrite (rngl_eqb_refl Heb) in Hb.
+    now intros H; subst lb.
   } {
     unfold has_polyn_prop.
+    apply (rngl_eqb_neq Heb) in Hb.
     now rewrite Hb, Bool.orb_true_r.
   }
 }
@@ -3622,8 +3622,7 @@ assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
   apply List_rev_symm in Hlc; subst lb.
   destruct lc as [| c]; [ easy | ].
   cbn in Hb.
-  rewrite last_last in Hb; cbn.
-  now apply (rngl_neqb_neq Heb) in Hb.
+  now rewrite last_last in Hb.
 }
 apply Bool.orb_true_iff in Hr.
 destruct Hr as [Hr| Hr]. {
@@ -3648,7 +3647,6 @@ destruct Hr as [Hr| Hr]. {
     now rewrite <- List_last_rev, rev_involutive.
   } {
     right.
-    apply (rngl_neqb_neq Heb) in Hb.
     now rewrite <- List_last_rev, rev_involutive.
   }
   specialize (rlap_quot_rem_loop_prop Hco Hop) as H1.
@@ -3750,7 +3748,8 @@ destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
 specialize (lap_quot_rem_prop Hic Hop la lb) as H1.
 specialize (H1 lq lr Hpa).
-assert (H : (last lb 0 ≠? 0)%F = true). {
+assert (H : (last lb 0 ≠ 0)%F). {
+  apply (rngl_neqb_neq Heb).
   destruct lb; [ | easy ].
   exfalso; apply Hbz.
   now apply eq_polyn_eq.
@@ -5234,12 +5233,33 @@ symmetry in Hqr.
 destruct qr as (lq, lr).
 specialize (lap_quot_rem_prop Hco Hop) as H1.
 specialize (H1 (la * lb)%lap lb lq lr).
-Search (has_polyn_prop (_ * _)%lap).
 specialize (H1 (lap_mul_has_polyn_prop la lb pa pb)).
-Check lap_quot_rem_prop.
-...
-assert (H : last lb 0 ≠ 0)
-Search has_polyn_prop.
+assert (H : last lb 0%F ≠ 0%F). {
+  apply (rngl_neqb_neq Heb).
+  apply Bool.orb_true_iff in pb.
+  destruct pb as [pb| ]; [ | easy ].
+  now apply is_empty_list_empty in pb.
+}
+specialize (H1 H); clear H.
+assert (pr : has_polyn_prop lr = true). {
+  specialize (lap_rem_is_norm (la * lb)%lap lb) as H2.
+  specialize (H2 (lap_mul_has_polyn_prop la lb pa pb) pb).
+  assert (H : lr = ((la * lb) mod lb)%lap). {
+    unfold lap_rem.
+    unfold lap_quot_rem in Hqr.
+    destruct (rlap_quot_rem _ _).
+    now injection Hqr.
+  }
+  now rewrite <- H in H2.
+}
+move pr before pb.
+specialize (H1 pr Hqr).
+destruct H1 as (Hab, Hrb).
+symmetry in Hab.
+apply (lap_add_move_l Hop) in Hab.
+symmetry in Hab.
+rewrite (lap_mul_comm Hco) in Hab.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
