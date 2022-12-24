@@ -5264,6 +5264,7 @@ rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
 apply (f_equal lap_norm) in Hab.
 rewrite <- lap_norm_app_0_r in Hab by apply nth_repeat.
 rewrite (last_lap_neq_0_lap_norm lr pr) in Hab.
+Search (lap_norm (_ * _)).
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
