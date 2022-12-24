@@ -5256,25 +5256,25 @@ move lq before lb; move lr before lq.
 move pr before pb.
 specialize (H1 pr Hqr).
 destruct H1 as (Hab, Hrb).
-symmetry in Hab.
-apply (lap_add_move_l Hop) in Hab.
-symmetry in Hab.
-rewrite (lap_mul_comm Hco) in Hab.
-rewrite <- (lap_mul_sub_distr_l Hop) in Hab.
-apply (f_equal lap_norm) in Hab.
-rewrite <- lap_norm_app_0_r in Hab by apply nth_repeat.
-rewrite (last_lap_neq_0_lap_norm lr pr) in Hab.
-rewrite <- lap_mul_norm_idemp_r in Hab.
-rewrite lap_norm_mul in Hab; [ | easy | apply polyn_norm_prop ].
 generalize Hab; intros Hab1.
-apply (f_equal length) in Hab1.
-rewrite lap_mul_length in Hab1.
+symmetry in Hab1.
+apply (lap_add_move_l Hop) in Hab1.
+symmetry in Hab1.
+rewrite (lap_mul_comm Hco) in Hab1.
+rewrite <- (lap_mul_sub_distr_l Hop) in Hab1.
+apply (f_equal lap_norm) in Hab1.
+rewrite <- lap_norm_app_0_r in Hab1 by apply nth_repeat.
+rewrite (last_lap_neq_0_lap_norm lr pr) in Hab1.
+rewrite <- lap_mul_norm_idemp_r in Hab1.
+rewrite lap_norm_mul in Hab1; [ | easy | apply polyn_norm_prop ].
+generalize Hab1; intros Hab2.
+apply (f_equal length) in Hab2.
+rewrite lap_mul_length in Hab2.
 destruct lb as [| b]; [ easy | clear Hbz ].
 remember (lap_norm (la - lq)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
-  apply eq_sym, length_zero_iff_nil in Hab1.
-  clear Hab Hrb pr; subst lr.
-Search (lap_norm _ = 0%lap).
+  apply eq_sym, length_zero_iff_nil in Hab2.
+  clear Hab Hab1 Hrb pr; subst lr.
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
