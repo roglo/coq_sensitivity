@@ -5330,11 +5330,48 @@ clear Hab Hab1 Hrb pr; subst lr.
 unfold lap_quot.
 unfold lap_quot_rem in Hqr.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr'.
+symmetry in Hqr'.
 destruct qr as (rlq, rlr).
 injection Hqr; clear Hqr; intros Hr Hq; rewrite Hq.
 specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H1.
 apply List_eq_iff.
 assert (Hqa : length lq = length la). {
+...
+  apply List_rev_symm in Hr; cbn in Hr.
+  assert (pr : has_polyn_prop rlr = true). {
+    specialize lap_rem_is_norm as H2.
+    specialize (H2 (la * (b :: lb))%lap (b :: lb)).
+(*
+  specialize (H2 (lap_mul_has_polyn_prop la lb pa pb) pb).
+*)
+    assert (H : rlr = rev ((la * (b :: lb)) mod (b :: lb))%lap). {
+      unfold lap_rem.
+      rewrite Hqr', rev_involutive.
+...
+      unfold lap_quot_rem in Hqr.
+    destruct (rlap_quot_rem _ _).
+    now injection Hqr.
+  }
+  now rewrite <- H in H2.
+}
+...
+Search rlap_quot_rem.
+Check lap_rem_is_norm.
+...
+  apply rlap_quot_rem_prop in Hqr'.
+...
+  apply (f_equal length) in Hlc; cbn in Hlc.
+  unfold lap_norm in Hlc.
+  rewrite rev_length in Hlc.
+...
+  rewrite polyn_length_strip_length in Hlc. 2: {
+...
+Search (has_polyn_prop (_ + _)%lap).
+Search (has_polyn_prop (_ - _)%lap).
+polyn_length_strip_length: ∀ la : list T, has_polyn_prop la = true → length (strip_0s (rev la)) = length la
+Search (length (strip_0s _)).
+Search (length (lap_norm _)).
+Search (lap_norm (_ + _)).
 ...
 }
 ... ...
