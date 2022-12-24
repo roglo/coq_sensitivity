@@ -5272,9 +5272,23 @@ apply (f_equal length) in Hab2.
 rewrite lap_mul_length in Hab2.
 destruct lb as [| b]; [ easy | clear Hbz ].
 remember (lap_norm (la - lq)) as lc eqn:Hlc; symmetry in Hlc.
-destruct lc as [| c]. {
-  apply eq_sym, length_zero_iff_nil in Hab2.
-  clear Hab Hab1 Hrb pr; subst lr.
+destruct lc as [| c]. 2: {
+  rewrite app_length in Hab2; cbn in Hab2.
+  cbn in Hrb; flia Hrb Hab2.
+}
+apply eq_sym, length_zero_iff_nil in Hab2.
+clear Hab Hab1 Hrb pr; subst lr.
+Search rlap_quot_rem.
+Search (lap_norm _ = []).
+Search (lap_norm (_ - _)).
+Search (lap_norm (_ + _)).
+unfold lap_quot.
+unfold lap_quot_rem in Hqr.
+remember (rlap_quot_rem _ _) as qr eqn:Hqr'.
+destruct qr as (rlq, rlr).
+injection Hqr; clear Hqr; intros Hr Hq; rewrite Hq.
+specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H1.
+(* ah pute vierge pute vierge fait chier *)
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
