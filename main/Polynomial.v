@@ -3604,7 +3604,9 @@ Theorem lap_quot_rem_prop :
   → last lb 0%F ≠ 0%F
   → has_polyn_prop lr = true
   → lap_quot_rem la lb = (lq, lr)
-  → la = (lb * lq + lr)%lap ∧ length lr < length lb.
+  → la = (lb * lq + lr)%lap ∧
+    length lr < length lb ∧
+    has_polyn_prop lq = true.
 Proof.
 intros Hco Hop * Ha Hb Hr Hab.
 assert (Hrb : length lr < length lb). {
@@ -3616,7 +3618,9 @@ assert (Hrb : length lr < length lb). {
     now rewrite Hb, Bool.orb_true_r.
   }
 }
-split; [ | easy ].
+rewrite and_comm, and_assoc.
+split; [ easy | ].
+rewrite and_comm.
 assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
   remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
   apply List_rev_symm in Hlc; subst lb.
@@ -3669,7 +3673,11 @@ destruct Hr as [Hr| Hr]. {
     now rewrite Ha in Hr.
   }
   rewrite <- lap_add_rev_strip in H1. {
-    now rewrite Hr, lap_add_0_r in H1.
+    rewrite Hr, lap_add_0_r in H1.
+    split; [ easy | ].
+    apply Bool.orb_true_iff; right.
+    rewrite List_last_rev.
+    now apply (rngl_neqb_neq Heb).
   }
   rewrite lap_mul_length.
   destruct lb as [| b]; [ easy | ].
@@ -3696,6 +3704,7 @@ do 2 rewrite rev_involutive in H1.
 rewrite rev_length in Hrb.
 remember (rev rlq) as lq eqn:Hlq; symmetry in Hlq.
 destruct lq as [| q]. {
+  split; [ | easy ].
   rewrite lap_mul_0_r, lap_add_0_l in H1.
   rewrite lap_mul_0_r, lap_add_0_l.
   rewrite H1; f_equal; symmetry.
@@ -3715,7 +3724,23 @@ destruct lq as [| q]. {
   rewrite last_last in Ha.
   now apply rngl_neqb_neq in Ha.
 }
-rewrite lap_add_rev_strip; [ easy | ].
+rewrite lap_add_rev_strip. {
+  split; [ easy | ].
+  apply Bool.orb_true_iff; right.
+  rewrite <- Hlq, List_last_rev.
+  apply (rngl_neqb_neq Heb).
+  apply rlap_quot_prop in Hqr; [ | | now right ]. 2: {
+    apply Bool.orb_true_iff in Ha.
+    destruct Ha as [Ha| Ha]. {
+      apply is_empty_list_empty in Ha; subst la.
+      now left.
+    }
+    right.
+    rewrite <- List_last_rev, rev_involutive.
+    now apply (rngl_neqb_neq Heb) in Ha.
+  }
+  destruct Hqr as [Hqr| Hqr]; [ now subst rlq | easy ].
+}
 rewrite lap_mul_length.
 destruct lb as [| b]; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
@@ -3728,9 +3753,6 @@ rewrite rev_length in Hqr; cbn in Hqr; flia Hqr.
 Qed.
 
 Arguments polyn_quot_rem (pa pb)%pol.
-(*
-Arguments polyn_quot {Hiv} (pa pb)%pol.
-*)
 
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
@@ -5255,7 +5277,8 @@ assert (pr : has_polyn_prop lr = true). {
 move lq before lb; move lr before lq.
 move pr before pb.
 specialize (H1 pr Hqr).
-destruct H1 as (Hab, Hrb).
+destruct H1 as (Hab & Hrb & pq).
+move pq before pb.
 generalize Hab; intros Hab1.
 symmetry in Hab1.
 apply (lap_add_move_l Hop) in Hab1.
@@ -5277,6 +5300,8 @@ destruct lc as [| c]. 2: {
   cbn in Hrb; flia Hrb Hab2.
 }
 apply eq_sym, length_zero_iff_nil in Hab2.
+Search (lap_norm (_ + _)).
+...
 clear Hab Hab1 Hrb pr; subst lr.
 Search rlap_quot_rem.
 Search (lap_norm _ = []).
