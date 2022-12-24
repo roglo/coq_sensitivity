@@ -2251,21 +2251,47 @@ Fixpoint lap_convol_mul_add_r (al1 al2 al3 : list T) i len :=
        lap_convol_mul_add_r al1 al2 al3 (S i) len1
   end.
 
-Theorem list_nth_add : ∀ k la lb,
+Theorem list_nth_lap_add : ∀ k la lb,
   (List.nth k (lap_add la lb) 0 =
    List.nth k la 0 + List.nth k lb 0)%F.
 Proof.
 intros k la lb.
 revert la lb.
 induction k; intros. {
- destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
- destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
- easy.
+  destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
+  destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
+  easy.
 } {
- destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
- destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
- apply IHk.
+  destruct la as [| a]; cbn; [ now rewrite rngl_add_0_l | ].
+  destruct lb as [| b]; cbn; [ now rewrite rngl_add_0_r | ].
+  apply IHk.
 }
+Qed.
+
+Theorem list_nth_lap_opp :
+  rngl_has_opp = true →
+  ∀ k la, (List.nth k (lap_opp la) 0 = - List.nth k la 0)%F.
+Proof.
+intros Hop *.
+revert la.
+induction k; intros. {
+  destruct la as [| a]; cbn; [ now rewrite rngl_opp_0 | easy ].
+}
+destruct la as [| a]; cbn; [ now rewrite rngl_opp_0 | ].
+apply IHk.
+Qed.
+
+Theorem list_nth_lap_sub :
+  rngl_has_opp = true →
+  ∀ k la lb,
+  (List.nth k (lap_sub la lb) 0 =
+   List.nth k la 0 - List.nth k lb 0)%F.
+Proof.
+intros Hop *.
+unfold lap_sub.
+rewrite list_nth_lap_add.
+rewrite (list_nth_lap_opp Hop).
+now rewrite (fold_rngl_sub Hop).
 Qed.
 
 Theorem lap_convol_mul_lap_add_l : ∀ la lb lc i len,
@@ -2277,7 +2303,7 @@ induction len; intros; [ reflexivity | simpl ].
 rewrite IHlen; f_equal.
 apply rngl_summation_eq_compat; intros j (_, Hj).
 f_equal.
-now rewrite list_nth_add.
+now rewrite list_nth_lap_add.
 Qed.
 
 Theorem lap_convol_mul_lap_add_r : ∀ la lb lc i len,
@@ -2289,7 +2315,7 @@ induction len; intros; [ reflexivity | simpl ].
 rewrite IHlen; f_equal.
 apply rngl_summation_eq_compat; intros j (_, Hj).
 f_equal.
-now rewrite list_nth_add.
+now rewrite list_nth_lap_add.
 Qed.
 
 Theorem lap_add_lap_convol_mul_l : ∀ la lb lc i len,
@@ -5300,20 +5326,40 @@ destruct lc as [| c]. 2: {
   cbn in Hrb; flia Hrb Hab2.
 }
 apply eq_sym, length_zero_iff_nil in Hab2.
-Search (lap_norm (_ + _)).
-...
 clear Hab Hab1 Hrb pr; subst lr.
-Search rlap_quot_rem.
-Search (lap_norm _ = []).
-Search (lap_norm (_ - _)).
-Search (lap_norm (_ + _)).
 unfold lap_quot.
 unfold lap_quot_rem in Hqr.
 remember (rlap_quot_rem _ _) as qr eqn:Hqr'.
 destruct qr as (rlq, rlr).
 injection Hqr; clear Hqr; intros Hr Hq; rewrite Hq.
 specialize (proj2 (all_0_lap_norm_nil _) Hlc) as H1.
-(* ah pute vierge pute vierge fait chier *)
+apply List_eq_iff.
+assert (Hqa : length lq = length la). {
+...
+}
+... ...
+split; [ easy | ].
+intros d i.
+destruct (lt_dec i (length la)) as [Hia| Hia]. 2: {
+  apply Nat.nlt_ge in Hia.
+  rewrite nth_overflow; [ | now rewrite Hqa ].
+  rewrite nth_overflow; [ | easy ].
+  easy.
+}
+specialize (H1 i).
+rewrite (list_nth_lap_sub Hop) in H1.
+apply -> (rngl_sub_move_0_r Hop) in H1.
+rewrite nth_indep with (d' := 0%F); [ | now rewrite Hqa ].
+symmetry.
+now rewrite nth_indep with (d' := 0%F).
+...
+  unfold lap_sub in H1.
+  rewrite list_nth_lap_add in H1.
+
+
+Search (nth _ (- _)%lap).
+...
+Search (length (lap_norm _)).
 ...
 intros Hco Hop * pa pb Hbz.
 unfold lap_quot.
