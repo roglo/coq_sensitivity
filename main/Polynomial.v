@@ -5392,6 +5392,47 @@ rewrite (lap_norm_mul _ _ pa pb).
 now apply lap_mul_div.
 Qed.
 
+(*
+Theorem polyn_opt_mul_div :
+(*
+  @rngl_mul_is_comm T ro rp = true →
+  @rngl_has_opp T _ = true →
+*)
+  match @rngl_has_quot (@polyn T ro) polyn_ring_like_op return Prop with
+  | true =>
+      forall (a b : @polyn T ro)
+        (_ : not
+               (@eq (@polyn T ro) b
+                  (@rngl_zero (@polyn T ro) polyn_ring_like_op))),
+      @eq (@polyn T ro)
+        (@rngl_div (@polyn T ro) polyn_ring_like_op
+           (@rngl_mul (@polyn T ro) polyn_ring_like_op a b) b) a
+  | false => not_applicable
+  end.
+Proof.
+intros.
+unfold rngl_has_quot; cbn.
+unfold polyn_opt_inv_or_quot.
+rewrite Hos, Hiv.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [inv| ]; [ | easy ].
+intros a b Hbz.
+unfold rngl_div, rngl_has_inv; cbn.
+unfold polyn_opt_inv_or_quot.
+unfold rngl_has_quot, polyn_opt_inv_or_quot; cbn.
+unfold rngl_quot; cbn.
+unfold polyn_opt_inv_or_quot.
+rewrite Hos, Hiv, Hiq.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
+Print polyn_ring_like_op.
+Print polyn_opt_inv_or_quot.
+Set Printing All.
+apply polyn_mul_div; [ | | easy ].
+Qed.
+...
+*)
+
 Theorem polyn_opt_mul_div :
   @rngl_mul_is_comm T ro rp = true →
   @rngl_has_opp T _ = true →
@@ -5444,7 +5485,7 @@ now apply polyn_mul_div.
 Qed.
 *)
 
-Definition polyn_ring_like_prop Hco Hop : ring_like_prop (polyn T) :=
+Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -5469,7 +5510,16 @@ Definition polyn_ring_like_prop Hco Hop : ring_like_prop (polyn T) :=
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_sous _;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
-     rngl_opt_mul_div := polyn_opt_mul_div Hco Hop;
+     rngl_opt_mul_div :=
+...
+       match bool_dec rngl_mul_is_comm with
+       | left Hco =>
+           match bool_dec rngl_has_opp with
+           | left Hop => polyn_opt_mul_div Hco Hop
+           | right _ => not_applicable
+           end
+       | right _ => not_applicable
+       end;
      rngl_opt_mul_quot_r := 42;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
