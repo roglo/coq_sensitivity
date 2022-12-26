@@ -836,6 +836,9 @@ Canonical Structure polyn_ring_like_op.
 (*
 Existing Instance polyn_ring_like_op.
 *)
+(* Another way is to add at the beginning of the theorem
+  let _ := polyn_ring_like_op in
+*)
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -2619,16 +2622,10 @@ now apply lap_norm_add_opp_r.
 Qed.
 
 Theorem polyn_opt_add_opp_l :
- match @rngl_has_opp (@polyn T ro) polyn_ring_like_op return Prop with
- | true =>
-     forall a : @polyn T ro,
-     @eq (@polyn T ro)
-       (@rngl_add (@polyn T ro) polyn_ring_like_op
-          (@rngl_opp (@polyn T ro) polyn_ring_like_op a) a)
-       (@rngl_zero (@polyn T ro) polyn_ring_like_op)
- | false => not_applicable
- end.
+  let _ := polyn_ring_like_op in
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
 Proof.
+intros rop; subst rop.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
 intros.
 destruct op; [ | easy ].
@@ -2647,7 +2644,8 @@ Qed.
 (* *)
 
 Theorem polyn_opt_has_no_sous : ∀ P,
-  if @rngl_has_sous _ polyn_ring_like_op then P else not_applicable.
+  let _ := polyn_ring_like_op in
+  if rngl_has_sous then P else not_applicable.
 Proof.
 intros.
 unfold rngl_has_sous; cbn.
@@ -2657,7 +2655,8 @@ now destruct opp.
 Qed.
 
 Theorem polyn_opt_has_no_inv : ∀ P,
-  if @rngl_has_inv _ polyn_ring_like_op then P else not_applicable.
+  let _ := polyn_ring_like_op in
+  if rngl_has_inv then P else not_applicable.
 Proof.
 intros.
 unfold rngl_has_inv; cbn.
@@ -2669,7 +2668,8 @@ now destruct rngl_opt_inv_or_quot.
 Qed.
 
 Theorem polyn_opt_has_no_inv_and : ∀ e P,
- if (@rngl_has_inv _ polyn_ring_like_op && e)%bool then P else not_applicable.
+  let _ := polyn_ring_like_op in
+  if (rngl_has_inv && e)%bool then P else not_applicable.
 Proof.
 intros.
 unfold rngl_has_inv; cbn.
