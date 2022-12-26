@@ -4138,18 +4138,11 @@ now rewrite Hiv in Hiv2.
 Qed.
 
 Theorem polyn_opt_mul_div :
-  match @rngl_has_quot (@polyn T ro) polyn_ring_like_op return Prop with
-  | true =>
-      forall (a b : @polyn T ro)
-        (_ : not
-               (@eq (@polyn T ro) b
-                  (@rngl_zero (@polyn T ro) polyn_ring_like_op))),
-      @eq (@polyn T ro)
-        (@rngl_div (@polyn T ro) polyn_ring_like_op
-           (@rngl_mul (@polyn T ro) polyn_ring_like_op a b) b) a
-  | false => not_applicable
-  end.
+  let _ := polyn_ring_like_op in
+  if rngl_has_quot then ∀ a b : polyn T, b ≠ 0%F → (a * b / b)%F = a
+  else not_applicable.
 Proof.
+intros; subst.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
@@ -4195,7 +4188,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
-     rngl_opt_mul_quot_r := 42;
+     rngl_opt_mul_quot_r := 5;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
      rngl_opt_integral := ?rngl_opt_integral;
