@@ -4172,12 +4172,27 @@ intros rop.
 destruct (bool_dec rngl_has_quot) as [Hqu| Hqu]; rewrite Hqu; [ | easy ].
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ easy | ].
 cbn; intros * Hbz.
+...
+apply eq_polyn_eq.
 unfold rngl_div.
 destruct (bool_dec rngl_has_inv) as [Hiv| Hiv]; rewrite Hiv. 2: {
+  rewrite Hqu.
+  f_equal.
   destruct (bool_dec rngl_has_quot) as [H| H]. 2: {
     now rewrite Hqu in H.
   }
   clear H; rewrite Hqu.
+...
+  enough (H : (b * a / b)%pol = a). {
+    unfold polyn_quot in H.
+    destruct (bool_dec rngl_has_inv) as [Hiv'| Hiv']. {
+      apply eq_polyn_eq in H; cbn in H.
+...
+      unfold rngl_quot.
+subst rop.
+Set Printing All.
+cbn in Hiv.
+...
   unfold rngl_quot.
   unfold rngl_has_quot in Hqu.
   remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
