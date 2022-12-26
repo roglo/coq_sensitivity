@@ -4234,6 +4234,41 @@ rewrite last_last in pa.
 destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
 rewrite last_last in pb.
 specialize (H1 (length la + length lb)).
+Search last.
+specialize (last_lap_mul (la ++ [a]) (lb ++ [b])) as H2.
+do 2 rewrite last_last in H2.
+Search last.
+Theorem List_last_nth : ∀ A (la : list A) d,
+  last la d = nth (length la - 1) la d.
+Proof.
+intros.
+destruct la as [| a] using rev_ind; [ easy | cbn ].
+rewrite last_last, app_length, Nat.add_sub.
+rewrite app_nth2; [ | now unfold ge ].
+now rewrite Nat.sub_diag.
+Qed.
+rewrite List_last_nth in H2.
+rewrite lap_mul_length in H2.
+destruct la as [| a']. {
+  cbn in H2.
+  destruct lb as [| b']. {
+    cbn in H2.
+    cbn in H1.
+    rewrite H1 in H2.
+    symmetry in H2.
+    apply rngl_integral in H2; [ | easy | now rewrite Hii ].
+    apply (rngl_neqb_neq Heb) in pa, pb.
+    now destruct H2.
+  }
+  cbn in H2.
+...
+remember (la ++ [a]) as l.
+destruct l; [ now left | ].
+destruct (la ++ [a]) as [| a']; [ now left | ].
+destruct (lb ++ [b]) as [| b']; [ now right | ].
+cbn in H2.
+rewrite app_length in H2; cbn in H2.
+
 unfold lap_mul in H1.
 (* ouais chais pas *)
 ...
