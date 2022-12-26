@@ -4149,7 +4149,6 @@ destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
 destruct (bool_dec rngl_has_opp) as [Hop| ]; [ | easy ].
 destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
 remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
-destruct (bool_dec true) as [H| ]; [ clear H | easy ].
 destruct iq as [inv| ]; [ | easy ].
 intros a b Hbz.
 unfold rngl_div, rngl_has_inv; cbn.
@@ -4169,70 +4168,11 @@ Theorem polyn_opt_mul_quot_r :
  else not_applicable.
 Proof.
 intros rop.
-destruct (bool_dec rngl_has_quot) as [Hqu| Hqu]; rewrite Hqu; [ | easy ].
-destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ easy | ].
-cbn; intros * Hbz.
-...
-apply eq_polyn_eq.
-unfold rngl_div.
-destruct (bool_dec rngl_has_inv) as [Hiv| Hiv]; rewrite Hiv. 2: {
-  rewrite Hqu.
-  f_equal.
-  destruct (bool_dec rngl_has_quot) as [H| H]. 2: {
-    now rewrite Hqu in H.
-  }
-  clear H; rewrite Hqu.
-...
-  enough (H : (b * a / b)%pol = a). {
-    unfold polyn_quot in H.
-    destruct (bool_dec rngl_has_inv) as [Hiv'| Hiv']. {
-      apply eq_polyn_eq in H; cbn in H.
-...
-      unfold rngl_quot.
-subst rop.
-Set Printing All.
-cbn in Hiv.
-...
-  unfold rngl_quot.
-  unfold rngl_has_quot in Hqu.
-  remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
-  destruct iq as [iq| ]; [ | easy ].
-  destruct iq as [| quot ]; [ easy | clear Hqu ].
-...
-  enough (H : (b * a / b)%pol = a). {
-    subst rop.
-Set Printing All.
-    unfold polyn_quot in H.
-    unfold rngl_div in H.
-Set Printing All.
-...
-    rewrite Hiv in H.
-    unfold rngl_has_quot in H.
-    unfold rngl_quot in H.
-    now rewrite Hiq in H.
-  }
-  cbn.
-  subst rop.
-  cbn.
-Set Printing All.
-...
+unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
-destruct (bool_dec rngl_has_opp) as [Hop| ]; [ | easy ].
-destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
-remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
-destruct (bool_dec true) as [H| ]; [ clear H | easy ].
-destruct iq as [inv| ]; [ | easy ].
-intros a b Hbz.
-unfold rngl_div, rngl_has_inv; cbn.
-unfold polyn_opt_inv_or_quot.
-unfold rngl_has_quot, polyn_opt_inv_or_quot; cbn.
-unfold rngl_quot; cbn.
-unfold polyn_opt_inv_or_quot.
-rewrite Hco, Hop, Hiv, Hiq.
-destruct (bool_dec true); [ | easy ].
-now apply polyn_mul_div.
-...
+destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
+now rewrite Bool.andb_false_r.
+Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
