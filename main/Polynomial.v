@@ -4201,6 +4201,38 @@ destruct rngl_has_dec_le; [ | easy ].
 now intros; right; cbn.
 Qed.
 
+Theorem polyn_opt_integral :
+  let _ := polyn_ring_like_op in
+  if rngl_is_integral then
+    ∀ a b : polyn T, (a * b)%F = 0%F → a = 0%F ∨ b = 0%F
+  else not_applicable.
+Proof.
+intros rop; subst rop.
+destruct (bool_dec rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
+intros * Hab.
+cbn in Hab.
+apply (f_equal lap) in Hab.
+cbn in Hab.
+specialize (proj2 (all_0_lap_norm_nil _) Hab) as H1.
+destruct a as (la, pa).
+destruct b as (lb, pb).
+cbn in Hab, H1 |-*.
+...
+apply eq_polyn_eq.
+Search (lap_norm _ = 0%lap).
+Search (lap_norm (_ * _)).
+...
+rewrite <- lap_mul_norm_idemp_l in Hab.
+rewrite <- lap_mul_norm_idemp_r in Hab.
+Search (lap_norm (_ * _)).
+rewrite lap_norm_mul in Hab.
+...
+apply rngl_integral in Hab.
+
+Check rngl_integral.
+Set Printing All.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -4230,8 +4262,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
      rngl_opt_eqb_eq := polyn_opt_eqb_eq;
      rngl_opt_le_dec := polyn_opt_le_dec;
-     rngl_opt_integral := 5;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_integral := polyn_opt_integral;
+     rngl_characteristic_prop := 5;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
