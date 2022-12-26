@@ -4162,16 +4162,43 @@ now apply polyn_mul_div.
 Qed.
 
 Theorem polyn_opt_mul_quot_r :
- let _ := polyn_ring_like_op in
- if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
-   ∀ a b, b ≠ 0%F → (b * a / b)%F = a
- else not_applicable.
+  let _ := polyn_ring_like_op in
+  if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
+    ∀ a b, b ≠ 0%F → (b * a / b)%F = a
+  else not_applicable.
 Proof.
 intros rop.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
+Qed.
+
+Theorem polyn_opt_eqb_eq :
+  let _ := polyn_ring_like_op in
+  if rngl_has_eqb then ∀ a b : polyn T, (a =? b)%F = true ↔ a = b
+  else not_applicable.
+Proof.
+intros rop; subst rop.
+rewrite Heb.
+apply polyn_eqb_eq.
+intros a b.
+split. 2: {
+  intros; subst b.
+  apply (rngl_eqb_refl Heb).
+}
+intros Hab.
+now apply (rngl_eqb_eq Heb) in Hab.
+Qed.
+
+Theorem polyn_opt_le_dec :
+  let _ := polyn_ring_like_op in
+  if rngl_has_dec_le then ∀ a b : polyn T, {(a ≤ b)%F} + {¬ (a ≤ b)%F}
+  else not_applicable.
+Proof.
+intros rop; subst rop.
+destruct rngl_has_dec_le; [ | easy ].
+now intros; right; cbn.
 Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
@@ -4201,9 +4228,9 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
      rngl_opt_mul_quot_r := polyn_opt_mul_quot_r;
-     rngl_opt_eqb_eq := 5;
-     rngl_opt_le_dec := ?rngl_opt_le_dec;
-     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_eqb_eq := polyn_opt_eqb_eq;
+     rngl_opt_le_dec := polyn_opt_le_dec;
+     rngl_opt_integral := 5;
      rngl_characteristic_prop := ?rngl_characteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
