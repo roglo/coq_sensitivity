@@ -37,7 +37,6 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
-Context {H10 : rngl_has_1_neq_0 = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
 Context {Hiv : rngl_has_inv = true}.
 
@@ -83,15 +82,23 @@ split; intros Hpq. {
 }
 Qed.
 
-Theorem polyn_one_prop : has_polyn_prop [1%F] = true.
+Definition lap_one :=
+  match bool_dec rngl_has_1_neq_0 with
+  | left H10 => [1%F]
+  | right _ => []
+  end.
+
+Theorem polyn_one_prop : has_polyn_prop lap_one = true.
 Proof.
+unfold lap_one.
+destruct (bool_dec _) as [H10| H10]; [ | easy ].
 unfold has_polyn_prop; cbn.
 apply (rngl_neqb_neq Heb).
 now apply rngl_1_neq_0.
 Qed.
 
 Definition polyn_zero := mk_polyn [] eq_refl.
-Definition polyn_one := mk_polyn [1%F] polyn_one_prop.
+Definition polyn_one := mk_polyn lap_one polyn_one_prop.
 
 (* normalization *)
 
@@ -644,13 +651,15 @@ eapply le_lt_trans; [ | apply Hqr ].
 apply strip_0s_length_le.
 Qed.
 
-Theorem rlap_quot_prop : ∀ la lb lq lr,
+Theorem rlap_quot_prop :
+  rngl_has_1_neq_0 = true →
+  ∀ la lb lq lr,
   la = [] ∨ hd 0%F la ≠ 0%F
   → lb = [] ∨ hd 0%F lb ≠ 0%F
   → rlap_quot_rem la lb = (lq, lr)
   → lq = [] ∨ hd 0%F lq ≠ 0%F.
 Proof.
-intros * Ha Hb Hab.
+intros H10 * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
@@ -696,12 +705,14 @@ exfalso; revert Hq.
 apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
 Qed.
 
-Theorem lap_quot_is_norm : ∀ la lb,
+Theorem lap_quot_is_norm :
+  rngl_has_1_neq_0 = true →
+  ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
   → has_polyn_prop (lap_quot la lb) = true.
 Proof.
-intros * Ha Hb.
+intros H10 * Ha Hb.
 unfold lap_quot.
 remember (rlap_quot_rem (rev la) (rev lb)) as qr eqn:Hqr.
 symmetry in Hqr.
@@ -710,8 +721,7 @@ unfold has_polyn_prop.
 apply Bool.orb_true_iff.
 destruct rlq as [| q]; [ now left | right ].
 cbn; rewrite last_last.
-apply rlap_quot_prop in Hqr; cycle 1. {
-  unfold has_polyn_prop in Ha.
+apply rlap_quot_prop in Hqr; [ | easy | | ]; cycle 1. {
   apply Bool.orb_true_iff in Ha.
   destruct Ha as [Ha| Ha]; [ now left; destruct la | right ].
   destruct la as [| a] using rev_ind. {
@@ -764,8 +774,13 @@ now rewrite Hrz.
 Qed.
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
-  let lq := lap_quot (lap pa) (lap pb) in
-  mk_polyn lq (lap_quot_is_norm (lap pa) (lap pb) (lap_prop pa) (lap_prop pb)).
+  match bool_dec rngl_has_1_neq_0 with
+  | left H10 =>
+      let lq := lap_quot (lap pa) (lap pb) in
+      mk_polyn lq
+        (lap_quot_is_norm H10 (lap pa) (lap pb) (lap_prop pa) (lap_prop pb))
+  | right _ => polyn_zero
+  end.
 
 Definition polyn_rem (pa pb : polyn T) : polyn T :=
   let lq := lap_rem (lap pa) (lap pb) in
@@ -846,7 +861,7 @@ Arguments lap_quot (la lb)%lap.
 Arguments lap_rem (la lb)%lap.
 
 Notation "0" := [] : lap_scope.
-Notation "1" := [1%F] : lap_scope.
+Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
@@ -2007,33 +2022,36 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
-Theorem lap_mul_1_l : ∀ la, ([1%F] * la)%lap = la.
+Theorem lap_mul_1_l : rngl_has_1_neq_0 = true → ∀ la, (1 * la)%lap = la.
 Proof.
-intros la.
-unfold lap_mul.
+intros H10 la.
+unfold lap_mul, lap_one; rewrite H10.
+destruct (bool_dec true) as [H| ]; [ clear H | easy ].
 destruct la as [| a]; [ easy | cbn ].
 rewrite rngl_summation_only_one.
 rewrite rngl_mul_1_l; f_equal.
 now rewrite lap_convol_mul_1_l.
 Qed.
 
-Theorem lap_mul_1_r : ∀ la, (la * [1%F])%lap = la.
+Theorem lap_mul_1_r : rngl_has_1_neq_0 = true → ∀ la, (la * 1)%lap = la.
 Proof.
-intros la.
-unfold "*"%lap; cbn.
+intros H10 la.
+unfold lap_mul, lap_one; cbn.
 destruct la as [| a]; [ easy | cbn ].
+rewrite H10.
+destruct (bool_dec _) as [H| ]; [ clear H | easy ].
 rewrite Nat.sub_0_r.
 apply lap_convol_mul_1_r.
 now rewrite Nat.add_1_r.
 Qed.
 
-Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
+Theorem polyn_mul_1_l : rngl_has_1_neq_0 = true → ∀ p, (1 * p)%pol = p.
 Proof.
-intros (la, lapr).
+intros H10 (la, lapr).
 unfold "*"%pol.
 cbn - [ lap_mul ].
-rewrite lap_mul_1_l; cbn.
 apply eq_polyn_eq; cbn.
+rewrite (lap_mul_1_l H10).
 now apply last_lap_neq_0_lap_norm.
 Qed.
 
@@ -2442,8 +2460,16 @@ Qed.
 Theorem polyn_1_neq_0 :
   if rngl_has_1_neq_0 then 1%pol ≠ 0%pol else not_applicable.
 Proof.
-rewrite H10.
-now intros H; apply eq_polyn_eq in H.
+destruct (bool_dec rngl_has_1_neq_0) as [H10| H10]; rewrite H10; [ | easy ].
+unfold polyn_one; cbn.
+destruct (bool_dec rngl_has_1_neq_0) as [H1| H1]. 2: {
+  now rewrite H10 in H1.
+}
+unfold lap_one.
+intros H; apply eq_polyn_eq in H.
+cbn in H.
+rewrite H10 in H.
+now destruct (bool_dec true).
 Qed.
 
 (* optional multiplication commutativity *)
@@ -2502,20 +2528,24 @@ f_equal.
 now apply lap_convol_mul_const_r.
 Qed.
 
-Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
+Theorem polyn_mul_1_r :
+  rngl_has_1_neq_0 = true →
+  ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
-intros.
+intros H10 *.
 apply eq_polyn_eq; cbn.
-rewrite lap_mul_1_r.
+rewrite (lap_mul_1_r H10).
 apply last_lap_neq_0_lap_norm.
 now destruct a.
 Qed.
 
 Theorem polyn_opt_mul_1_r :
+  rngl_has_1_neq_0 = true →
   if rngl_mul_is_comm then not_applicable else ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
+intros H10.
 destruct rngl_mul_is_comm; [ easy | ].
-apply polyn_mul_1_r.
+now apply polyn_mul_1_r.
 Qed.
 
 (* optional right distributivity; not required if multiplication
@@ -3362,6 +3392,7 @@ Qed.
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_has_1_neq_0 = true →
   ∀ la lb lq lr : list T,
   has_polyn_prop la = true
   → last lb 0%F ≠ 0%F
@@ -3371,7 +3402,7 @@ Theorem lap_quot_rem_prop :
     length lr < length lb ∧
     has_polyn_prop lq = true.
 Proof.
-intros Hco Hop * Ha Hb Hr Hab.
+intros Hco Hop H10 * Ha Hb Hr Hab.
 assert (Hrb : length lr < length lb). {
   eapply (lap_rem_length_lt Hop Hco); [ | | apply Hab ]. {
     now intros H; subst lb.
@@ -3402,7 +3433,7 @@ destruct Hr as [Hr| Hr]. {
   injection Hab; clear Hab; intros Hr H; subst lq.
   apply List_eq_rev_nil in Hr.
   generalize Hqr; intros Hqr'.
-  apply rlap_quot_prop in Hqr'; cycle 1. {
+  apply rlap_quot_prop in Hqr'; [ | easy | | ]; cycle 1. {
     unfold has_polyn_prop in Ha.
     apply Bool.orb_true_iff in Ha.
     destruct Ha as [Ha| Ha]. {
@@ -3492,7 +3523,7 @@ rewrite lap_add_rev_strip. {
   apply Bool.orb_true_iff; right.
   rewrite <- Hlq, List_last_rev.
   apply (rngl_neqb_neq Heb).
-  apply rlap_quot_prop in Hqr; [ | | now right ]. 2: {
+  apply rlap_quot_prop in Hqr; [ | easy | | now right ]. 2: {
     apply Bool.orb_true_iff in Ha.
     destruct Ha as [Ha| Ha]. {
       apply is_empty_list_empty in Ha; subst la.
@@ -3520,18 +3551,19 @@ Arguments polyn_quot_rem (pa pb)%pol.
 Theorem polyn_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_has_1_neq_0 = true →
   ∀ pa pb pq pr : polyn T,
   pb ≠ 0%pol
   → polyn_quot_rem pa pb = (pq, pr)
   → pa = (pb * pq + pr)%pol ∧ length (lap pr) < length (lap pb).
 Proof.
-intros * Hic Hop * Hbz Hab.
+intros * Hic Hop H10 * Hbz Hab.
 destruct pa as (la, Hpa).
 destruct pb as (lb, Hpb).
 destruct pq as (lq, Hpq).
 destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
-specialize (lap_quot_rem_prop Hic Hop la lb) as H1.
+specialize (lap_quot_rem_prop Hic Hop H10 la lb) as H1.
 specialize (H1 lq lr Hpa).
 assert (H : (last lb 0 ≠ 0)%F). {
   apply (rngl_neqb_neq Heb).
@@ -3543,10 +3575,13 @@ specialize (H1 H Hpr); clear H.
 assert (H : lap_quot_rem la lb = (lq, lr)). {
   unfold polyn_quot_rem in Hab.
   unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
-  injection Hab; clear Hab; intros; subst lr lq.
-  unfold lap_quot_rem.
-  unfold lap_quot, lap_rem.
-  now destruct (rlap_quot_rem _ _).
+  destruct (bool_dec rngl_has_1_neq_0) as [H11| H11]. {
+    injection Hab; clear Hab; intros; subst lr lq.
+    unfold lap_quot_rem.
+    unfold lap_quot, lap_rem.
+    now destruct (rlap_quot_rem _ _).
+  }
+  now rewrite H10 in H11.
 }
 specialize (H1 H); clear H.
 destruct H1 as (H1, H2).
@@ -4009,17 +4044,18 @@ Qed.
 Theorem lap_mul_div :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_has_1_neq_0 = true →
   ∀ la lb,
   has_polyn_prop la = true
   → has_polyn_prop lb = true
   → lb ≠ 0%lap
   → (la * lb / lb)%lap = la.
 Proof.
-intros Hco Hop * pa pb Hbz.
+intros Hco Hop H10 * pa pb Hbz.
 remember (lap_quot_rem (la * lb) lb) as qr eqn:Hqr.
 symmetry in Hqr.
 destruct qr as (lq, lr).
-specialize (lap_quot_rem_prop Hco Hop) as H1.
+specialize (lap_quot_rem_prop Hco Hop H10) as H1.
 specialize (H1 (la * lb)%lap lb lq lr).
 specialize (H1 (lap_mul_has_polyn_prop la lb pa pb)).
 assert (H : last lb 0%F ≠ 0%F). {
@@ -4086,25 +4122,32 @@ Qed.
 Theorem polyn_mul_div :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
+  rngl_has_1_neq_0 = true →
   ∀ a b,
   b ≠ 0%pol
   → (a * b / b)%pol = a.
 Proof.
-intros Hco Hop * Hbz.
+intros Hco Hop H10 * Hbz.
 destruct a as (la, pa).
 destruct b as (lb, pb).
 move lb before la.
+unfold polyn_mul.
 assert (H : lb ≠ 0%lap). {
   intros H; apply Hbz.
   now apply eq_polyn_eq.
 }
 clear Hbz; rename H into Hbz.
 apply eq_polyn_eq; cbn.
+unfold polyn_norm; cbn.
+unfold polyn_quot; cbn.
+destruct (bool_dec _) as [H11| H11]; [ | now rewrite H10 in H11 ].
+cbn.
 rewrite (lap_norm_mul _ _ pa pb).
 now apply lap_mul_div.
 Qed.
 
 Theorem polyn_opt_mul_div :
+  rngl_has_1_neq_0 = true →
   match @rngl_has_quot (@polyn T ro) polyn_ring_like_op return Prop with
   | true =>
       forall (a b : @polyn T ro)
@@ -4117,6 +4160,7 @@ Theorem polyn_opt_mul_div :
   | false => not_applicable
   end.
 Proof.
+intros H10.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
@@ -4136,7 +4180,8 @@ destruct (bool_dec true); [ | easy ].
 now apply polyn_mul_div.
 Qed.
 
-Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
+Definition polyn_ring_like_prop (H10 : rngl_has_1_neq_0 = true) :
+    ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -4148,11 +4193,11 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_add_assoc := polyn_add_assoc;
      rngl_add_0_l := polyn_add_0_l;
      rngl_mul_assoc := polyn_mul_assoc;
-     rngl_mul_1_l := polyn_mul_1_l;
+     rngl_mul_1_l := polyn_mul_1_l H10;
      rngl_mul_add_distr_l := polyn_mul_add_distr_l;
      rngl_opt_1_neq_0 := polyn_1_neq_0;
      rngl_opt_mul_comm := polyn_opt_mul_comm;
-     rngl_opt_mul_1_r := polyn_opt_mul_1_r;
+     rngl_opt_mul_1_r := polyn_opt_mul_1_r H10;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
      rngl_opt_add_sub := polyn_opt_has_no_sous _;
@@ -4161,7 +4206,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_sub_distr_r := polyn_opt_has_no_sous _;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
-     rngl_opt_mul_div := polyn_opt_mul_div;
+     rngl_opt_mul_div := polyn_opt_mul_div H10;
      rngl_opt_mul_quot_r := 42;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
      rngl_opt_le_dec := ?rngl_opt_le_dec;
