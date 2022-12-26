@@ -4217,6 +4217,31 @@ specialize (proj2 (all_0_lap_norm_nil _) Hab) as H1.
 destruct a as (la, pa).
 destruct b as (lb, pb).
 cbn in Hab, H1 |-*.
+enough (H : la = [] ∨ lb = []). {
+  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
+  now apply eq_polyn_eq.
+  now apply eq_polyn_eq.
+}
+apply Bool.orb_true_iff in pa, pb.
+destruct pa as [pa| pa]. {
+  now left; apply is_empty_list_empty in pa.
+}
+destruct pb as [pb| pb]. {
+  now right; apply is_empty_list_empty in pb.
+}
+destruct la as [| a] using rev_ind; [ now left | clear IHla ].
+rewrite last_last in pa.
+destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
+rewrite last_last in pb.
+specialize (H1 (length la + length lb)).
+unfold lap_mul in H1.
+(* ouais chais pas *)
+...
+Search last.
+last_lap_mul: ∀ la lb : list T, last (la * lb)%lap 0%F = (last la 0 * last lb 0)%F
+
+rewrite <- (rev_involutive la) in pa.
+rewrite List_last_rev in pa.
 ...
 apply eq_polyn_eq.
 Search (lap_norm _ = 0%lap).
