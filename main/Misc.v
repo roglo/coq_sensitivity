@@ -1740,6 +1740,16 @@ intros.
 destruct l as [| a]; [ easy | apply last_last ].
 Qed.
 
+Theorem List_last_nth : ∀ A (la : list A) d,
+  last la d = nth (length la - 1) la d.
+Proof.
+intros.
+destruct la as [| a] using rev_ind; [ easy | cbn ].
+rewrite last_last, app_length, Nat.add_sub.
+rewrite app_nth2; [ | now unfold ge ].
+now rewrite Nat.sub_diag.
+Qed.
+
 (* common for all iterators *)
 
 Theorem iter_list_seq : ∀ T d (op : T → T → T) b len f,

@@ -4238,15 +4238,7 @@ Search last.
 specialize (last_lap_mul (la ++ [a]) (lb ++ [b])) as H2.
 do 2 rewrite last_last in H2.
 Search last.
-Theorem List_last_nth : ∀ A (la : list A) d,
-  last la d = nth (length la - 1) la d.
-Proof.
-intros.
-destruct la as [| a] using rev_ind; [ easy | cbn ].
-rewrite last_last, app_length, Nat.add_sub.
-rewrite app_nth2; [ | now unfold ge ].
-now rewrite Nat.sub_diag.
-Qed.
+... ...
 rewrite List_last_nth in H2.
 rewrite lap_mul_length in H2.
 destruct la as [| a']. {
@@ -4260,6 +4252,8 @@ destruct la as [| a']. {
     apply (rngl_neqb_neq Heb) in pa, pb.
     now destruct H2.
   }
+  cbn in H2.
+  rewrite app_length, Nat.add_comm, Nat.sub_0_r in H2.
   cbn in H2.
 ...
 remember (la ++ [a]) as l.
