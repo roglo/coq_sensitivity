@@ -4346,7 +4346,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   destruct la as [| a] using rev_ind; [ easy | exfalso ].
   rewrite last_last in pa.
   symmetry in Ha.
-Theorem rngl_of_nat_char_length :
+Theorem rngl_of_nat_char :
   let _ := polyn_ring_like_op in
   rngl_characteristic ≠ 0
   → lap (rngl_of_nat rngl_characteristic) = [].
@@ -4356,13 +4356,24 @@ specialize rngl_characteristic_prop as H1.
 apply Nat.eqb_neq in Hch.
 rewrite Hch in H1.
 apply Nat.eqb_neq in Hch.
-...
 remember rngl_characteristic as n eqn:Hn; symmetry in Hn.
-destruct n; [ easy | ].
+rewrite <- Hn in Hch.
+clear Hn.
+induction n; [ easy | cbn ].
+cbn in H1.
+destruct n. {
+  cbn in H1; rewrite rngl_add_0_r in H1.
+  now apply rngl_1_neq_0 in H1.
+}
+cbn.
+...
 cbn in H1.
 ...
 specialize @rngl_characteristic_prop as H2.
 Set Printing Implicit.
+... ...
+rewrite rngl_of_nat_char in Ha; [ | easy ].
+now symmetry in Ha; apply app_eq_nil in Ha.
 ... ...
 generalize Ha; intros H.
 apply (f_equal length) in H.
