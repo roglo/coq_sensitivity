@@ -4251,10 +4251,34 @@ Theorem lap_rngl_of_nat :
   → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
 Proof.
 intros rop Hch * Hiz.
+remember (lap (rngl_of_nat i)) as la eqn:Hla.
+symmetry in Hla.
+destruct la as [| a]. {
+  destruct i; [ easy | cbn in Hla ].
+  clear Hiz; exfalso.
+  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec (1 =? 0)%F) as [H11| H11]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H11.
+    now apply rngl_1_neq_0 in H11.
+  }
+  cbn in Hla.
+  rewrite strip_0s_app in Hla.
+  remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]; [ | now cbn in Hla; apply app_eq_nil in Hla ].
+  cbn in Hla.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec _) as [H11| H11]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H11.
+  clear Hla.
+...
+intros rop Hch * Hiz.
 destruct i; [ easy | cbn; clear Hiz ].
 symmetry; apply List_rev_symm.
 cbn; symmetry.
-...
+remember (lap (rngl_of_nat i)) as la eqn:Hla.
 destruct la as [| a]. {
   cbn - [ strip_0s ].
   induction i. {
