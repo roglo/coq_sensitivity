@@ -4250,8 +4250,16 @@ Theorem polyn_characteristic_prop :
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else rngl_of_nat rngl_characteristic = 0%F.
 Proof.
-intros rop.
-rewrite if_eqb_eq_dec.
+intros rop; subst rop; cbn.
+specialize rngl_characteristic_prop as H1.
+rewrite if_eqb_eq_dec in H1 |-*.
+destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. 2: {
+  apply eq_polyn_eq; cbn.
+  remember rngl_characteristic as i eqn:Hi; symmetry in Hi.
+  clear Hi.
+  induction i; [ easy | clear Hcz ].
+  cbn in H1 |-*.
+...
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   specialize rngl_characteristic_prop as H1.
   rewrite Hcz in H1; cbn in H1.
