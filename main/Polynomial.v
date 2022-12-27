@@ -4346,7 +4346,42 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   destruct la as [| a] using rev_ind; [ easy | exfalso ].
   rewrite last_last in pa.
   symmetry in Ha.
+Theorem rngl_of_nat_char_length :
+  let _ := polyn_ring_like_op in
+  rngl_characteristic ≠ 0
+  → lap (rngl_of_nat rngl_characteristic) = [].
+Proof.
+intros rop Hch.
+specialize rngl_characteristic_prop as H1.
+apply Nat.eqb_neq in Hch.
+rewrite Hch in H1.
+apply Nat.eqb_neq in Hch.
+...
+remember rngl_characteristic as n eqn:Hn; symmetry in Hn.
+destruct n; [ easy | ].
+cbn in H1.
+...
+specialize @rngl_characteristic_prop as H2.
+Set Printing Implicit.
+... ...
+generalize Ha; intros H.
+apply (f_equal length) in H.
+rewrite rngl_of_nat_char_length in H; [ | easy ].
+rewrite app_length, Nat.add_comm in H; cbn in H.
+easy.
+destruct la; [ | easy ].
+cbn in Ha.
+...
   clear IHla.
+...
+Set Printing Implicit.
+Check lap_rngl_of_nat.
+Inspect 2.
+rewrite lap_polyn_rngl_of_nat in Ha; try easy.
+...
+  Search rngl_characteristic.
+rewrite lap_polyn_rngl_of_nat in Ha; try easy.
+2: {
 ...
 Inspect 2.
 rewrite lap_rngl_of_nat in H1.
