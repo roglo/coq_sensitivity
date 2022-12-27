@@ -40,6 +40,9 @@ Context {Heb : rngl_has_eqb = true}.
 Context (H10 : rngl_has_1_neq_0 = true).
 Context {Hos : rngl_has_opp_or_sous = true}.
 
+Definition lap_eqb (eqb : T → _) (P Q : list T) :=
+  list_eqv eqb P Q.
+
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
 
@@ -788,6 +791,14 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
 
 (* polyn opposite or subtraction *)
 
+Definition lap_opt_opp_or_sous :
+  option ((list T → list T) + (list T → list T → list T)) :=
+  match rngl_opt_opp_or_sous with
+  | Some (inl _) => Some (inl lap_opp)
+  | Some (inr _) => None
+  | None => None
+  end.
+
 Definition polyn_opt_opp_or_sous :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
   match rngl_opt_opp_or_sous with
@@ -797,6 +808,25 @@ Definition polyn_opt_opp_or_sous :
   end.
 
 (* polyn quotient *)
+
+Definition lap_opt_inv_or_quot :
+  option ((list T → list T) + (list T → list T → list T)) :=
+  match bool_dec rngl_mul_is_comm with
+  | left Hco =>
+      match bool_dec rngl_has_opp with
+      | left Hop =>
+          match bool_dec rngl_has_inv with
+         | left Hiv =>
+             match rngl_opt_inv_or_quot with
+             | Some _ => Some (inr lap_quot)
+             | None => None
+             end
+          | right _ => None
+          end
+      | right _ => None
+      end
+  | right _ => None
+  end.
 
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
@@ -818,6 +848,16 @@ Definition polyn_opt_inv_or_quot :
   end.
 
 (* ring-like operators *)
+
+Definition lap_ring_like_op : ring_like_op (list T) :=
+  {| rngl_zero := [];
+     rngl_one := lap_one;
+     rngl_add := lap_add;
+     rngl_mul := lap_mul;
+     rngl_opt_opp_or_sous := lap_opt_opp_or_sous;
+     rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
+     rngl_opt_eqb := Some (lap_eqb rngl_eqb);
+     rngl_opt_le := None |}.
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
   {| rngl_zero := polyn_zero;
@@ -4246,10 +4286,32 @@ now destruct H2.
 Qed.
 
 Theorem lap_rngl_of_nat :
+  let _ := lap_ring_like_op in
+  rngl_characteristic = 0
+  → ∀ i, i ≠ 0 → (rngl_of_nat i)%lap = [rngl_of_nat i].
+Proof.
+intros rop Hch * Hiz.
+subst rop.
+induction i; [ easy | clear Hiz; cbn ].
+destruct i; [ now cbn; rewrite rngl_add_0_r | ].
+now rewrite IHi.
+Qed.
+
+Theorem lap_polyn_rngl_of_nat :
   let _ := polyn_ring_like_op in
   rngl_characteristic = 0
-  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
+  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
+intros rop Hch * Hiz.
+rewrite <- lap_rngl_of_nat; [ | easy | easy ].
+destruct i; [ easy | clear Hiz; cbn ].
+remember (@rngl_of_nat (list T) _ i) as la eqn:Hla; symmetry in Hla.
+destruct la as [| a]. {
+  destruct i. {
+    rewrite lap_rngl_of_nat in Hla; [ easy | easy | ].
+    cbn in Hla.
+(* alors là, chuis dans la merde *)
+...
 intros rop Hch * Hiz.
 remember (lap (rngl_of_nat i)) as la eqn:Hla.
 symmetry in Hla.
