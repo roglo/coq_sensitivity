@@ -4258,12 +4258,41 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   intros i Hi.
   apply (f_equal lap) in Hi.
   cbn in Hi.
-...
 Theorem lap_rngl_of_nat :
   let _ := polyn_ring_like_op in
   ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
 Proof.
 intros rop * Hiz.
+remember (rngl_of_nat i) as a eqn:Ha.
+symmetry in Ha.
+destruct a as (la, pa); cbn.
+apply (f_equal lap) in Ha; cbn in Ha.
+apply Bool.orb_true_iff in pa.
+destruct pa as [pa| pa]. {
+  apply is_empty_list_empty in pa; subst la.
+  exfalso.
+  induction i; [ easy | clear Hiz ].
+  destruct i. {
+    cbn in Ha; rewrite if_bool_if_dec in Ha.
+    destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H1az.
+    now apply (rngl_1_neq_0 H10) in H1az.
+  }
+  remember (S i) as si; cbn in Ha; subst si.
+  remember (lap (rngl_of_nat (S i))) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| a]; [ now apply IHi | ].
+  cbn in Ha; clear IHi.
+  rewrite strip_0s_app in Ha.
+  remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]; [ | now apply app_eq_nil in Ha ].
+  cbn in Ha.
+  rewrite if_bool_if_dec in Ha.
+    destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H1az.
+...
+    now apply (rngl_1_neq_0 H10) in H1az.
+...
 induction i; [ easy | clear Hiz ].
 cbn.
 destruct i. {
