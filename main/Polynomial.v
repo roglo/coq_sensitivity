@@ -4258,6 +4258,14 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. 2: {
   remember rngl_characteristic as i eqn:Hi; symmetry in Hi.
   destruct i; [ easy | clear Hcz ].
 ...
+  remember (rngl_of_nat (S i)) as a eqn:Ha in |-*.
+  symmetry in Ha.
+  destruct a as (la, pa); cbn.
+  cbn in Ha.
+  induction la as [| a]; [ easy | exfalso ].
+  cbn in pa.
+  destruct la as [| b]. {
+...
   cbn in H1 |-*.
 ...
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
