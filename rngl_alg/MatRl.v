@@ -553,12 +553,11 @@ now rewrite fold_mat_nrows, Hr.
 Qed.
 
 Theorem squ_mat_characteristic_prop {n} :
-  if (if n =? 0 then 1 else rngl_characteristic) =? 0
-  then
-    ∀ i, @rngl_of_nat (square_matrix n T) (mat_ring_like_op n) (S i) ≠ 0%F
+  let _ := mat_ring_like_op n in
+  if (if n =? 0 then 1 else rngl_characteristic) =? 0 then
+    ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else
-    @rngl_of_nat (square_matrix n T) (mat_ring_like_op n)
-      (if n =? 0 then 1 else rngl_characteristic) = 0%F.
+    rngl_of_nat (if n =? 0 then 1 else rngl_characteristic) = 0%F.
 Proof.
 specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
 move Hos before Hop.
