@@ -4245,6 +4245,36 @@ apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
 now destruct H2.
 Qed.
 
+Theorem lap_rngl_of_nat :
+  let _ := polyn_ring_like_op in
+  rngl_characteristic = 0
+  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
+Proof.
+intros rop Hch * Hiz.
+destruct i; [ easy | cbn; clear Hiz ].
+symmetry; apply List_rev_symm.
+cbn; symmetry.
+...
+destruct la as [| a]. {
+  cbn - [ strip_0s ].
+  induction i. {
+    cbn; rewrite rngl_add_0_r.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec (1 =? 0)%F) as [H11| H11]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H11.
+    now apply rngl_1_neq_0 in H11.
+  }
+...
+  rewrite if_bool_if_dec.
+  destruct (bool_dec (1 =? 0)%F) as [H11| H11]. {
+    apply (rngl_eqb_eq Heb) in H11.
+    now apply rngl_1_neq_0 in H11.
+  }
+  f_equal; symmetry.
+  induction i; [ apply rngl_add_0_r | ].
+  cbn in Hla |-*.
+...
+
 Theorem polyn_characteristic_prop :
   let _ := polyn_ring_like_op in
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
