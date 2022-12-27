@@ -4250,14 +4250,14 @@ Theorem polyn_characteristic_prop :
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else rngl_of_nat rngl_characteristic = 0%F.
 Proof.
-intros rop; subst rop; cbn.
+intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
 rewrite if_eqb_eq_dec in H1 |-*.
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. 2: {
   apply eq_polyn_eq; cbn.
   remember rngl_characteristic as i eqn:Hi; symmetry in Hi.
-  clear Hi.
-  induction i; [ easy | clear Hcz ].
+  destruct i; [ easy | clear Hcz ].
+...
   cbn in H1 |-*.
 ...
 destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
@@ -4486,6 +4486,7 @@ Search ((_ + _) = 0)%pol.
 rewrite if_bool_if_dec.
 destruct (bool_dec (rngl_characteristic =? 0)) as [Hcz| Hcz].
 ...
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
