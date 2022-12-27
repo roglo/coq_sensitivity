@@ -4287,11 +4287,10 @@ Qed.
 
 Theorem lap_rngl_of_nat :
   let _ := lap_ring_like_op in
-  rngl_characteristic = 0
-  → ∀ i, i ≠ 0 → (rngl_of_nat i)%lap = [rngl_of_nat i].
+  ∀ i, i ≠ 0 → (rngl_of_nat i)%lap = [rngl_of_nat i].
 Proof.
-intros rop Hch * Hiz.
-subst rop.
+intros lop * Hiz.
+subst lop.
 induction i; [ easy | clear Hiz; cbn ].
 destruct i; [ now cbn; rewrite rngl_add_0_r | ].
 now rewrite IHi.
@@ -4303,63 +4302,24 @@ Theorem lap_polyn_rngl_of_nat :
   → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros rop Hch * Hiz.
-rewrite <- lap_rngl_of_nat; [ | easy | easy ].
-destruct i; [ easy | clear Hiz; cbn ].
-remember (@rngl_of_nat (list T) _ i) as la eqn:Hla; symmetry in Hla.
-destruct la as [| a]. {
-  destruct i. {
-    rewrite lap_rngl_of_nat in Hla; [ easy | easy | ].
-    cbn in Hla.
-(* alors là, chuis dans la merde *)
-...
-intros rop Hch * Hiz.
-remember (lap (rngl_of_nat i)) as la eqn:Hla.
-symmetry in Hla.
-destruct la as [| a]. {
-  destruct i; [ easy | cbn in Hla ].
-  clear Hiz; exfalso.
-  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [| b]. {
-    cbn in Hla.
-    rewrite if_bool_if_dec in Hla.
-    destruct (bool_dec (1 =? 0)%F) as [H11| H11]; [ | easy ].
-    apply (rngl_eqb_eq Heb) in H11.
-    now apply rngl_1_neq_0 in H11.
-  }
-  cbn in Hla.
-  rewrite strip_0s_app in Hla.
-  remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| c]; [ | now cbn in Hla; apply app_eq_nil in Hla ].
-  cbn in Hla.
-  rewrite if_bool_if_dec in Hla.
+subst rop.
+induction i; [ easy | clear Hiz; cbn ].
+destruct i. {
+  cbn; rewrite rngl_add_0_r.
+  rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H11| H11]; [ | easy ].
   apply (rngl_eqb_eq Heb) in H11.
-  clear Hla.
-...
-intros rop Hch * Hiz.
-destruct i; [ easy | cbn; clear Hiz ].
-symmetry; apply List_rev_symm.
-cbn; symmetry.
-remember (lap (rngl_of_nat i)) as la eqn:Hla.
-destruct la as [| a]. {
-  cbn - [ strip_0s ].
-  induction i. {
-    cbn; rewrite rngl_add_0_r.
-    rewrite if_bool_if_dec.
-    destruct (bool_dec (1 =? 0)%F) as [H11| H11]; [ | easy ].
-    apply (rngl_eqb_eq Heb) in H11.
-    now apply rngl_1_neq_0 in H11.
-  }
-...
-  rewrite if_bool_if_dec.
-  destruct (bool_dec (1 =? 0)%F) as [H11| H11]. {
-    apply (rngl_eqb_eq Heb) in H11.
-    now apply rngl_1_neq_0 in H11.
-  }
-  f_equal; symmetry.
-  induction i; [ apply rngl_add_0_r | ].
-  cbn in Hla |-*.
-...
+  now apply rngl_1_neq_0 in H11.
+}
+rewrite IHi; [ cbn | easy ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H11| H11]; [ | easy ].
+clear IHi; exfalso.
+apply (rngl_eqb_eq Heb) in H11.
+specialize rngl_characteristic_prop as H1.
+rewrite Hch in H1; cbn in H1.
+now specialize (H1 (S i)); cbn in H1.
+Qed.
 
 Theorem polyn_characteristic_prop :
   let _ := polyn_ring_like_op in
@@ -4369,8 +4329,41 @@ Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
 rewrite if_eqb_eq_dec in H1 |-*.
-destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. 2: {
+destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
+  intros i.
+  specialize (H1 i) as H.
+  intros Hi; apply H; clear H.
+  apply (f_equal lap) in Hi.
+  now rewrite lap_polyn_rngl_of_nat in Hi.
+} {
+  remember (rngl_of_nat rngl_characteristic) as a eqn:Ha in |-*.
+  destruct a as (la, pa).
   apply eq_polyn_eq; cbn.
+  apply (f_equal lap) in Ha; cbn in Ha.
+  apply Bool.orb_true_iff in pa.
+  destruct pa as [pa| pa]; [ now apply is_empty_list_empty in pa | ].
+  apply (rngl_neqb_neq Heb) in pa.
+  destruct la as [| a] using rev_ind; [ easy | exfalso ].
+  rewrite last_last in pa.
+  symmetry in Ha.
+  clear IHla.
+...
+Inspect 2.
+rewrite lap_rngl_of_nat in H1.
+  rewrite lap_polyn_rngl_of_nat in Ha; [ | | easy ]. 2: {
+
+...
+
+...
+  cbn in H1 |-*.
+  remember rngl_characteristic as n eqn:Hn.
+
+  unfold polyn_ring_like_op.
+  cbn.
+cbn.
+  apply eq_polyn_eq; cbn.
+
+  rewrite lap_polyn_rngl_of_nat; [ | | easy ].
   remember rngl_characteristic as i eqn:Hi; symmetry in Hi.
   destruct i; [ easy | clear Hcz ].
 ...
