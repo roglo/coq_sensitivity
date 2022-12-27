@@ -4258,6 +4258,51 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   intros i Hi.
   apply (f_equal lap) in Hi.
   cbn in Hi.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| a]. {
+    cbn in Hi.
+    rewrite if_bool_if_dec in Hi.
+    destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H1az.
+    now apply (rngl_1_neq_0 H10) in H1az.
+  }
+  cbn in Hi.
+  rewrite strip_0s_app in Hi.
+  remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb; [ cbn in Hi | now apply app_eq_nil in Hi ].
+  rewrite if_bool_if_dec in Hi.
+  destruct (bool_dec _) as [H1az| H1az]; [ clear Hi | easy ].
+  apply (rngl_eqb_eq Heb) in H1az.
+  destruct i; [ easy | cbn in Hla ].
+  remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [H2az| H2az]; [ easy | ].
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst a la.
+    clear Hlb H2az.
+    specialize (H1 1); cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+  }
+  cbn in Hla.
+  rewrite strip_0s_app in Hla.
+  remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
+  destruct ld as [| d]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [H2az| H2az]; [ easy | ].
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst a la.
+    clear Hlb.
+...
+    specialize (H1 1); cbn in H1.
+    now rewrite rngl_add_0_r in H1.
+...
+(* ce théorème ci-dessous, suppose que la caractéristique soit
+   nulle. Si non, contre-exemple : car=2 et lap (rngl_of_nat 2)
+   vaut [] et non pas [2] *)
 Theorem lap_rngl_of_nat :
   let _ := polyn_ring_like_op in
   ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
@@ -4271,6 +4316,36 @@ apply Bool.orb_true_iff in pa.
 destruct pa as [pa| pa]. {
   apply is_empty_list_empty in pa; subst la.
   exfalso.
+(**)
+  destruct i; [ easy | clear Hiz ].
+  cbn in Ha.
+  apply List_rev_symm in Ha; cbn in Ha.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla.
+  symmetry in Hla.
+  destruct la as [| a]. {
+    cbn in Ha.
+    rewrite if_bool_if_dec in Ha.
+    destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
+    apply (rngl_eqb_eq Heb) in H1az.
+    now apply (rngl_1_neq_0 H10) in H1az.
+  }
+  cbn in Ha.
+  rewrite strip_0s_app in Ha.
+  remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb; [ cbn in Ha | easy ].
+  rewrite if_bool_if_dec in Ha.
+  destruct (bool_dec _) as [H1az| H1az]; [ clear Ha | easy ].
+  apply (rngl_eqb_eq Heb) in H1az.
+  destruct i; [ easy | cbn in Hla ].
+  remember (lap (rngl_of_nat i)) as lb eqn:Hlb'; symmetry in Hlb'.
+  destruct lb. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [H2az| H2az]; [ easy | ].
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst a la.
+    clear Hlb H2az.
+...
   induction i; [ easy | clear Hiz ].
   destruct i. {
     cbn in Ha; rewrite if_bool_if_dec in Ha.
@@ -4278,6 +4353,8 @@ destruct pa as [pa| pa]. {
     apply (rngl_eqb_eq Heb) in H1az.
     now apply (rngl_1_neq_0 H10) in H1az.
   }
+  specialize (IHi (Nat.neq_succ_0 _)).
+...
   remember (S i) as si; cbn in Ha; subst si.
   remember (lap (rngl_of_nat (S i))) as la eqn:Hla.
   symmetry in Hla.
@@ -4290,6 +4367,7 @@ destruct pa as [pa| pa]. {
   rewrite if_bool_if_dec in Ha.
     destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
     apply (rngl_eqb_eq Heb) in H1az.
+    cbn in Hla.
 ...
     now apply (rngl_1_neq_0 H10) in H1az.
 ...
