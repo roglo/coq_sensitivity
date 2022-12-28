@@ -639,6 +639,9 @@ split. {
   intros * Hi.
   specialize (Hbef _ Hi) as H.
   intros H2; apply H; clear H.
+  destruct n; [ easy | ].
+  apply (f_equal (λ M, mat_el (sm_mat M) 1 1)) in H2.
+  cbn in H2.
 ...
   destruct i; [ easy | ].
 ...
