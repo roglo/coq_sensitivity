@@ -4298,6 +4298,36 @@ Qed.
 
 Theorem lap_polyn_rngl_of_nat :
   let _ := polyn_ring_like_op in
+  ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i]%F.
+Proof.
+intros rop * Hiz.
+induction i; [ easy | clear Hiz; cbn ].
+destruct i. {
+  cbn; rewrite rngl_add_0_r.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H11| H11]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H11.
+  now apply rngl_1_neq_0 in H11.
+}
+rewrite IHi; [ cbn | easy ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H11| H11]; [ | easy ].
+clear IHi; exfalso.
+apply (rngl_eqb_eq Heb) in H11.
+specialize rngl_characteristic_prop as H1.
+rewrite if_bool_if_dec in H1.
+destruct (bool_dec _) as [Hcz| Hcz]. {
+  apply Nat.eqb_eq in Hcz.
+  now specialize (H1 (S i)); cbn in H1.
+}
+apply Nat.eqb_neq in Hcz.
+...
+rewrite Hch in H1; cbn in H1.
+now specialize (H1 (S i)); cbn in H1.
+...
+
+Theorem lap_polyn_rngl_of_nat :
+  let _ := polyn_ring_like_op in
   rngl_characteristic = 0
   → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
@@ -4380,7 +4410,32 @@ destruct la as [| a]. {
     move b before j.
     rewrite <- H1 in Hbz.
     apply rngl_add_cancel_l in Hbz; [ | easy ].
-    subst b.
+    subst b j.
+    rewrite rngl_add_assoc in H1.
+    generalize Hlb; intros H2.
+    apply (f_equal length) in H2; cbn in H2.
+    remember (rngl_of_nat i) as a eqn:Ha in H2.
+    symmetry in Ha.
+    destruct a as (la, pa).
+    cbn in H2.
+    destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+    rewrite app_length, Nat.add_1_r in H2.
+    apply Nat.succ_inj in H2.
+    unfold has_polyn_prop in pa.
+    cbn - [ last ] in pa.
+    unfold is_empty_list in pa.
+    destruct la as [| b]. {
+      cbn in pa, Ha.
+      cbn in H2.
+      apply eq_sym, length_zero_iff_nil in H2; subst lb.
+      clear Hlc.
+      assert (pa' : a ≠ 0%F) by now apply (rngl_neqb_neq Heb).
+      generalize Ha; intros H.
+      apply (f_equal lap) in H; cbn in H.
+      clear pa Ha.
+      rewrite Hlb in H.
+      injection H; clear H; intros; subst a.
+      clear pa'.
 ...
 cbn in Hj |-*.
 ...
