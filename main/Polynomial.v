@@ -4629,12 +4629,53 @@ destruct i. {
   apply (rngl_eqb_eq Heb) in H11.
   now specialize (rngl_1_neq_0 H10) as H12.
 }
+...
 assert (H : 0 < S i < rngl_characteristic) by flia Hi.
 specialize (IHi H); clear H.
-remember (lap (rngl_of_nat (S i))) as la eqn:Hla.
+remember (lap (rngl_of_nat (S i))) as la eqn:Hla; symmetry in Hla.
 destruct la as [| a]; [ easy | clear IHi ].
 cbn in H2.
 rewrite strip_0s_app in H2.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  cbn in H2.
+  rewrite if_bool_if_dec in H2.
+  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in Haz.
+  cbn in Hla.
+  remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [H11| H11]. {
+      apply (rngl_eqb_eq Heb) in H11.
+      now specialize (rngl_1_neq_0 H10) as H12.
+    }
+    cbn in Hla; injection Hla; clear Hla; intros; subst a la.
+    clear Hlb H2.
+    specialize (Hbef 2).
+    cbn in Hbef.
+    assert (H : 0 < 2 < rngl_characteristic) by flia Hi.
+    specialize (Hbef H); clear H.
+    now rewrite rngl_add_0_r in Hbef.
+  }
+  cbn in Hla.
+  rewrite strip_0s_app in Hla.
+  remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
+  destruct ld as [| d]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [H11| H11]; [ easy | ].
+    cbn in Hla.
+    injection Hla; clear Hla; intros; subst a la.
+    clear Hlb H2.
+...
+Search (lap (rngl_of_nat _)).
+Set Printing All.
+...
+    apply (rngl_eqb_neq Heb) in H11.
+      now specialize (rngl_1_neq_0 H10) as H12.
+    }
 ...
 Check lap_rngl_of_nat.
 Set Printing Implicit.
