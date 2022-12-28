@@ -639,37 +639,14 @@ split. {
   intros * Hi.
   specialize (Hbef _ Hi) as H.
   intros H2; apply H; clear H.
+...
+  destruct i; [ easy | ].
+...
   destruct i; [ easy | cbn in H2 |-* ].
-  destruct i. {
-    cbn in H2 |-*.
-    destruct n; [ easy | cbn in H2 ].
-    now injection H2; clear H2; intros H2 H3 H4.
-  }
 ...
-  cbn in H2 |-*.
-  cbn in H2.
-unfold square_matrix_add in H2.
-  destruct i. {
-    cbn in H2 |-*.
-    destruct n; [ easy | cbn in H2 ].
-    now injection H2; clear H2; intros H2 H3 H4.
-  }
-...
-Search (map (δ _)).
-      unfold smI, smZ in H2.
-...
-    specialize (map2_map2_seq_l) as H3.
-    erewrite <- map2_map2_seq_l with (d := []) in H2.
-    erewrite map2_map2_seq_l with (d := []) in H2.
-    rewrite List_map_seq_length in H2.
-Search (map2 _ (seq _ _)).
-
-    cbn; apply rngl_add_0_r.
-...
-  specialize (@square_matrix_eq n T) as H.
-  specialize (H (rngl_of_nat i) (smZ n)).
-  cbn in H.
-...
+  injection H2; clear H2; intros H2.
+Print mat_add.
+... ...
 apply square_matrix_eq; cbn.
 rewrite sm_mat_of_nat.
 unfold "×"%M, mZ.
