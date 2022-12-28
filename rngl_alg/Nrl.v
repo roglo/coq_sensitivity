@@ -361,11 +361,24 @@ easy.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  match at_least_1 n with
-  | 0 => ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  | S _ => rngl_of_nat (at_least_1 n) = 0%F
-  end.
+  if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  else
+    (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%F) ∧
+    rngl_of_nat (at_least_1 n) = 0%F.
 Proof.
+split. {
+  intros i Hi.
+  cbn; intros H.
+  specialize (@proj1_sig_Zn_of_nat i) as H1.
+  subst ro.
+  unfold Zn in H.
+  rewrite H in H1.
+  cbn - [ "mod" ] in H1.
+  symmetry in H1.
+  rewrite Nat.mod_small in H1; [ | easy ].
+  cbn in H1.
+  now rewrite Nat.sub_diag in H1; subst i.
+}
 intros.
 apply Zn_eq.
 rewrite proj1_sig_Zn_of_nat.
@@ -458,6 +471,13 @@ apply Nat.eq_mul_1 in Hab.
 now left.
 Qed.
 
+Theorem lcm_characteristic_prop :
+  if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%F) ∧ rngl_of_nat 1 = 0%F.
+Proof.
+split; [ intros * Hi; flia Hi | easy ].
+Qed.
+
 Definition lcm_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
@@ -488,7 +508,7 @@ Definition lcm_ring_like_prop :=
      rngl_opt_mul_quot_r := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := lcm_opt_integral;
-     rngl_characteristic_prop := Nat.lcm_1_l 1;
+     rngl_characteristic_prop := lcm_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
