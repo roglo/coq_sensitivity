@@ -4309,10 +4309,11 @@ destruct i. {
   apply (rngl_eqb_eq Heb) in H11.
   now apply rngl_1_neq_0 in H11.
 }
-rewrite IHi; [ cbn | easy ].
+specialize (IHi (Nat.neq_succ_0 _)).
+rewrite IHi; cbn.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [H11| H11]; [ | easy ].
-clear IHi; exfalso.
+exfalso.
 apply (rngl_eqb_eq Heb) in H11.
 specialize rngl_characteristic_prop as H1.
 rewrite if_bool_if_dec in H1.
@@ -4321,9 +4322,6 @@ destruct (bool_dec _) as [Hcz| Hcz]. {
   now specialize (H1 (S i)); cbn in H1.
 }
 apply Nat.eqb_neq in Hcz.
-...
-rewrite Hch in H1; cbn in H1.
-now specialize (H1 (S i)); cbn in H1.
 ...
 
 Theorem lap_polyn_rngl_of_nat :
