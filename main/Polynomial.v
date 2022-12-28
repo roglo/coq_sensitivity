@@ -4629,7 +4629,6 @@ destruct i. {
   apply (rngl_eqb_eq Heb) in H11.
   now specialize (rngl_1_neq_0 H10) as H12.
 }
-...
 assert (H : 0 < S i < rngl_characteristic) by flia Hi.
 specialize (IHi H); clear H.
 remember (lap (rngl_of_nat (S i))) as la eqn:Hla; symmetry in Hla.
@@ -4637,11 +4636,12 @@ destruct la as [| a]; [ easy | clear IHi ].
 cbn in H2.
 rewrite strip_0s_app in H2.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  cbn in H2.
-  rewrite if_bool_if_dec in H2.
-  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
-  apply (rngl_eqb_eq Heb) in Haz.
+destruct lb; [ | now cbn in H2; apply app_eq_nil in H2 ].
+apply List_rev_symm in H2; cbn in H2.
+rewrite if_bool_if_dec in H2.
+destruct (bool_dec _) as [Haz| Haz]; [ clear H2 | easy ].
+apply (rngl_eqb_eq Heb) in Haz.
+...
   cbn in Hla.
   remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]. {
