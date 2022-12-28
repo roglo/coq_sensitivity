@@ -4351,6 +4351,47 @@ rewrite Hch in H1; cbn in H1.
 now specialize (H1 (S i)); cbn in H1.
 Qed.
 
+Theorem lap_polyn_rngl_of_nat_2 :
+  let rop := polyn_ring_like_op in
+  ∀ i, 0 < i < rngl_characteristic
+  → lap (rngl_of_nat i) = [rngl_of_nat i].
+Proof.
+intros * Hi.
+specialize rngl_characteristic_prop as Hch.
+rewrite if_bool_if_dec in Hch.
+destruct (bool_dec _) as [Hchz| Hchz]. {
+  apply Nat.eqb_eq in Hchz.
+  now rewrite Hchz in Hi.
+}
+clear Hchz.
+destruct Hch as (Hbef, Hch).
+destruct i; [ easy | cbn ].
+remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
+destruct la as [| b]; cbn. {
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H11| H11]. {
+    apply (rngl_eqb_eq Heb) in H11.
+    now specialize (rngl_1_neq_0 H10).
+  }
+  cbn; f_equal; symmetry.
+  destruct i; [ apply rngl_add_0_r | ].
+  cbn in Hla |-*.
+  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]. {
+    cbn in Hla.
+    now rewrite H11 in Hla.
+  }
+  cbn in Hla.
+  rewrite strip_0s_app in Hla.
+  remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
+  destruct lc as [| c]. {
+    cbn in Hla.
+    rewrite if_bool_if_dec in Hla.
+    destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
+    clear Hla.
+    apply (rngl_eqb_eq Heb) in Hbz.
+...
+
 (*
 Theorem lap_polyn_rngl_of_nat_2 :
   let _ := polyn_ring_like_op in
@@ -4596,7 +4637,7 @@ Set Printing Implicit.
 *)
 
 Theorem polyn_characteristic_prop :
-  let _ := polyn_ring_like_op in
+  let rop := polyn_ring_like_op in
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else
     (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
@@ -4641,34 +4682,36 @@ apply List_rev_symm in H2; cbn in H2.
 rewrite if_bool_if_dec in H2.
 destruct (bool_dec _) as [Haz| Haz]; [ clear H2 | easy ].
 apply (rngl_eqb_eq Heb) in Haz.
-...
+cbn in Hla.
+remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
+destruct lc as [| c]. {
   cbn in Hla.
-  remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| c]. {
-    cbn in Hla.
-    rewrite if_bool_if_dec in Hla.
-    destruct (bool_dec _) as [H11| H11]. {
-      apply (rngl_eqb_eq Heb) in H11.
-      now specialize (rngl_1_neq_0 H10) as H12.
-    }
-    cbn in Hla; injection Hla; clear Hla; intros; subst a la.
-    clear Hlb H2.
-    specialize (Hbef 2).
-    cbn in Hbef.
-    assert (H : 0 < 2 < rngl_characteristic) by flia Hi.
-    specialize (Hbef H); clear H.
-    now rewrite rngl_add_0_r in Hbef.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec _) as [H11| H11]. {
+    apply (rngl_eqb_eq Heb) in H11.
+    now specialize (rngl_1_neq_0 H10) as H12.
   }
+  cbn in Hla; injection Hla; clear Hla; intros; subst a la.
+  specialize (Hbef 2).
+  cbn in Hbef.
+  assert (H : 0 < 2 < rngl_characteristic) by flia Hi.
+  specialize (Hbef H); clear H.
+  now rewrite rngl_add_0_r in Hbef.
+}
+cbn in Hla.
+rewrite strip_0s_app in Hla.
+remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
+destruct ld as [| d]. {
   cbn in Hla.
-  rewrite strip_0s_app in Hla.
-  remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
-  destruct ld as [| d]. {
-    cbn in Hla.
-    rewrite if_bool_if_dec in Hla.
-    destruct (bool_dec _) as [H11| H11]; [ easy | ].
-    cbn in Hla.
-    injection Hla; clear Hla; intros; subst a la.
-    clear Hlb H2.
+  rewrite if_bool_if_dec in Hla.
+  destruct (bool_dec _) as [H11| H11]; [ easy | ].
+  cbn in Hla.
+  injection Hla; clear Hla; intros; subst a la.
+  clear Hlb.
+... ...
+rewrite lap_polyn_rngl_of_nat_2 in Hlc; [ | flia Hi ].
+injection Hlc; clear Hlc; intros; subst c lc.
+now specialize (Hbef (S (S i)) Hi).
 ...
 Search (lap (rngl_of_nat _)).
 Set Printing All.
