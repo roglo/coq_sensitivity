@@ -4376,6 +4376,11 @@ destruct la as [| a]. {
     destruct (bool_dec _) as [Hbz| Hbz]; [ clear Hla | easy ].
     apply (rngl_eqb_eq Heb) in Hbz.
     cbn in Hj.
+    move Hbz before H1.
+    move b before j.
+    rewrite <- H1 in Hbz.
+    apply rngl_add_cancel_l in Hbz; [ | easy ].
+    subst b.
 ...
 cbn in Hj |-*.
 ...
