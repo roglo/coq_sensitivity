@@ -554,17 +554,21 @@ Qed.
 
 Theorem squ_mat_characteristic_prop {n} :
   let _ := mat_ring_like_op n in
-  if (if n =? 0 then 1 else rngl_characteristic) =? 0 then
-    ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  let ch := if n =? 0 then 1 else rngl_characteristic in
+  if ch =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else
-    rngl_of_nat (if n =? 0 then 1 else rngl_characteristic) = 0%F.
+   (∀ i : nat, 0 < i < ch → rngl_of_nat i ≠ 0%F)
+   ∧ rngl_of_nat ch = 0%F.
 Proof.
+intros rop *.
 specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
 move Hos before Hop.
+subst ch.
 rewrite (if_eqb_eq_dec n).
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst n; cbn.
-  now apply square_matrix_eq.
+  split; [ | now apply square_matrix_eq ].
+  intros i Hi; flia Hi.
 }
 apply Nat.neq_0_lt_0 in Hnz.
 specialize @rngl_characteristic_prop as H1.
@@ -593,6 +597,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     now rewrite List_map_seq_length.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
+    subst rop.
     now rewrite mat_ncols_of_nat.
   }
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
@@ -629,6 +634,42 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   now specialize (H1 i); cbn in H1.
 }
 cbn.
+destruct H1 as (Hbef, H1).
+split. {
+  intros * Hi.
+  specialize (Hbef _ Hi) as H.
+  intros H2; apply H; clear H.
+  destruct i; [ easy | cbn in H2 |-* ].
+  destruct i. {
+    cbn in H2 |-*.
+    destruct n; [ easy | cbn in H2 ].
+    now injection H2; clear H2; intros H2 H3 H4.
+  }
+...
+  cbn in H2 |-*.
+  cbn in H2.
+unfold square_matrix_add in H2.
+  destruct i. {
+    cbn in H2 |-*.
+    destruct n; [ easy | cbn in H2 ].
+    now injection H2; clear H2; intros H2 H3 H4.
+  }
+...
+Search (map (δ _)).
+      unfold smI, smZ in H2.
+...
+    specialize (map2_map2_seq_l) as H3.
+    erewrite <- map2_map2_seq_l with (d := []) in H2.
+    erewrite map2_map2_seq_l with (d := []) in H2.
+    rewrite List_map_seq_length in H2.
+Search (map2 _ (seq _ _)).
+
+    cbn; apply rngl_add_0_r.
+...
+  specialize (@square_matrix_eq n T) as H.
+  specialize (H (rngl_of_nat i) (smZ n)).
+  cbn in H.
+...
 apply square_matrix_eq; cbn.
 rewrite sm_mat_of_nat.
 unfold "×"%M, mZ.
@@ -659,6 +700,8 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
+...
+
 (* to be completed
 Theorem squ_mat_opt_eqb_eq {n} :
   if rngl_has_eqb then ∀ a b : square_matrix n T, (a =? b)%F = true ↔ a = b
@@ -681,6 +724,7 @@ split; intros Hab. {
   apply rngl_eqb_eq.
   apply (@rngl_eqb_eq (square_matrix n T)).
 ...
+*)
 *)
 
 Definition mat_ring_like_prop (n : nat) :
