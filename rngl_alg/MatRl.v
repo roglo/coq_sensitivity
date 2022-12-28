@@ -642,14 +642,9 @@ split. {
   destruct n; [ easy | ].
   apply (f_equal (λ M, mat_el (sm_mat M) 1 1)) in H2.
   cbn in H2.
-...
-  destruct i; [ easy | ].
-...
-  destruct i; [ easy | cbn in H2 |-* ].
-...
-  injection H2; clear H2; intros H2.
-Print mat_add.
-... ...
+  subst rop.
+  now rewrite mat_el_of_nat_diag in H2; [ | flia ].
+}
 apply square_matrix_eq; cbn.
 rewrite sm_mat_of_nat.
 unfold "×"%M, mZ.
@@ -680,8 +675,6 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
-...
-
 (* to be completed
 Theorem squ_mat_opt_eqb_eq {n} :
   if rngl_has_eqb then ∀ a b : square_matrix n T, (a =? b)%F = true ↔ a = b
@@ -704,7 +697,6 @@ split; intros Hab. {
   apply rngl_eqb_eq.
   apply (@rngl_eqb_eq (square_matrix n T)).
 ...
-*)
 *)
 
 Definition mat_ring_like_prop (n : nat) :
