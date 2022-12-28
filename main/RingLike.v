@@ -270,7 +270,9 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* characteristic *)
     rngl_characteristic_prop :
       if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%F
-      else rngl_of_nat rngl_characteristic = 0%F;
+      else
+        (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
+        rngl_of_nat rngl_characteristic = 0%F;
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%F else not_applicable;

@@ -4296,6 +4296,7 @@ destruct i; [ now cbn; rewrite rngl_add_0_r | ].
 now rewrite IHi.
 Qed.
 
+(*
 Theorem lap_polyn_rngl_of_nat :
   let _ := polyn_ring_like_op in
   ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i]%F.
@@ -4323,6 +4324,7 @@ destruct (bool_dec _) as [Hcz| Hcz]. {
 }
 apply Nat.eqb_neq in Hcz.
 ...
+*)
 
 Theorem lap_polyn_rngl_of_nat :
   let _ := polyn_ring_like_op in
@@ -4352,6 +4354,83 @@ Qed.
 Theorem lap_polyn_rngl_of_nat_2 :
   let _ := polyn_ring_like_op in
   rngl_characteristic ≠ 0
+  → (∀ i, 0 < i < rngl_characteristic → lap (rngl_of_nat i) = [rngl_of_nat i]) ∧
+     lap (rngl_of_nat rngl_characteristic) = [].
+Proof.
+intros rop Hch *.
+subst rop.
+specialize rngl_characteristic_prop as H1.
+apply Nat.eqb_neq in Hch.
+rewrite Hch in H1.
+apply Nat.eqb_neq in Hch.
+destruct H1 as (Hbef, H1).
+specialize (rngl_1_neq_0 H10) as H11.
+split. {
+  intros i Hi.
+  specialize (Hbef _ Hi) as H2.
+  induction i; [ easy | ].
+  cbn in H2 |-*.
+  destruct i. {
+    cbn.
+    apply (rngl_eqb_neq Heb) in H11.
+    rewrite H11; cbn; f_equal; symmetry.
+    apply rngl_add_0_r.
+  }
+  rewrite IHi; cycle 1. {
+    split; [ easy | flia Hi ].
+  } {
+    apply Hbef.
+    split; [ easy | flia Hi ].
+  }
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hiz| Hiz]; [ | easy ].
+  cbn in H2.
+  now apply (rngl_eqb_eq Heb) in Hiz.
+}
+induction rngl_characteristic as [| i]; [ easy | clear Hch ].
+cbn in H1 |-*.
+destruct i. {
+  cbn in H1.
+  now rewrite rngl_add_0_r in H1.
+}
+specialize (IHi (Nat.neq_succ_0 _)).
+assert (H : ∀ j, 0 < j < S i → rngl_of_nat j ≠ 0%F). {
+  intros j Hj.
+  apply Hbef.
+  flia Hj.
+}
+specialize (IHi H); clear H.
+cbn in H1 |-*.
+...
+  remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
+  destruct la as [| a]. {
+    cbn.
+    specialize (rngl_1_neq_0 H10) as H11.
+    apply (rngl_eqb_neq Heb) in H11.
+    rewrite H11; cbn; f_equal; symmetry.
+    apply (rngl_eqb_neq Heb) in H11.
+...
+induction i; [ easy | clear Hiz; cbn ].
+destruct i. {
+  cbn; rewrite rngl_add_0_r.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H11| H11]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H11.
+  now apply rngl_1_neq_0 in H11.
+}
+rewrite IHi; [ cbn | easy ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H11| H11]; [ | easy ].
+clear IHi; exfalso.
+apply (rngl_eqb_eq Heb) in H11.
+now specialize (H1 (S i)); cbn in H1.
+Qed.
+
+(*
+Theorem lap_polyn_rngl_of_nat_2 :
+  let _ := polyn_ring_like_op in
+  rngl_characteristic ≠ 0
   → lap (rngl_of_nat rngl_characteristic) = [].
 Proof.
 intros rop Hch.
@@ -4359,12 +4438,13 @@ subst rop.
 specialize rngl_characteristic_prop as H1.
 apply Nat.eqb_neq in Hch.
 rewrite Hch in H1.
+destruct H1 as (Hbef, H1).
 apply Nat.eqb_neq in Hch.
-remember rngl_characteristic as i eqn:Hi.
-clear Hi.
-induction i; [ easy | clear Hch ].
+remember rngl_characteristic as n eqn:Hn.
+clear Hn.
+induction n; [ easy | clear Hch ].
 cbn in H1 |-*.
-destruct i. {
+destruct n. {
   cbn in H1; rewrite rngl_add_0_r in H1.
   cbn.
   rewrite if_bool_if_dec.
@@ -4372,8 +4452,8 @@ destruct i. {
   apply (rngl_eqb_eq Heb) in H1.
   now rewrite H1 in H11.
 }
-specialize (IHi (Nat.neq_succ_0 _)).
-remember (rngl_of_nat (S i)) as j eqn:Hj; symmetry in Hj.
+specialize (IHn (Nat.neq_succ_0 _)).
+remember (rngl_of_nat (S n)) as j eqn:Hj; symmetry in Hj.
 destruct (rngl_eq_dec Heb j 0%F) as [Hjz| Hjz]. {
   specialize (IHi Hjz).
   move Hjz at top; subst j.
@@ -4511,11 +4591,14 @@ cbn in H1.
 ...
 specialize @rngl_characteristic_prop as H2.
 Set Printing Implicit.
+*)
 
 Theorem polyn_characteristic_prop :
   let _ := polyn_ring_like_op in
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  else rngl_of_nat rngl_characteristic = 0%F.
+  else
+    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
+    rngl_of_nat rngl_characteristic = 0%F.
 Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
@@ -4527,6 +4610,14 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   apply (f_equal lap) in Hi.
   now rewrite lap_polyn_rngl_of_nat in Hi.
 } {
+  destruct H1 as (Hbef, Hch).
+  split. {
+    intros i Hi; cbn.
+    specialize (Hbef _ Hi) as H1.
+    intros H; apply H1; clear H1; rename H into H1.
+    apply (f_equal lap) in H1; cbn in H1.
+Check lap_rngl_of_nat.
+...
   remember (rngl_of_nat rngl_characteristic) as a eqn:Ha in |-*.
   destruct a as (la, pa).
   apply eq_polyn_eq; cbn.
@@ -4563,9 +4654,7 @@ rewrite lap_polyn_rngl_of_nat in Ha; try easy.
 Inspect 2.
 rewrite lap_rngl_of_nat in H1.
   rewrite lap_polyn_rngl_of_nat in Ha; [ | | easy ]. 2: {
-
 ...
-
 ...
   cbn in H1 |-*.
   remember rngl_characteristic as n eqn:Hn.
