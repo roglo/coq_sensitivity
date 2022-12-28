@@ -4286,7 +4286,7 @@ now destruct H2.
 Qed.
 
 Theorem lap_rngl_of_nat :
-  let _ := lap_ring_like_op in
+  let lop := lap_ring_like_op in
   ∀ i, i ≠ 0 → (rngl_of_nat i)%lap = [rngl_of_nat i].
 Proof.
 intros lop * Hiz.
@@ -4351,6 +4351,7 @@ rewrite Hch in H1; cbn in H1.
 now specialize (H1 (S i)); cbn in H1.
 Qed.
 
+(*
 Theorem lap_polyn_rngl_of_nat_2 :
   let _ := polyn_ring_like_op in
   rngl_characteristic ≠ 0
@@ -4426,6 +4427,7 @@ clear IHi; exfalso.
 apply (rngl_eqb_eq Heb) in H11.
 now specialize (H1 (S i)); cbn in H1.
 Qed.
+*)
 
 (*
 Theorem lap_polyn_rngl_of_nat_2 :
@@ -4615,8 +4617,27 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     intros i Hi; cbn.
     specialize (Hbef _ Hi) as H1.
     intros H; apply H1; clear H1; rename H into H1.
-    apply (f_equal lap) in H1; cbn in H1.
+    generalize H1; intros H2.
+    apply (f_equal lap) in H2; cbn in H2.
+exfalso; clear H1.
+induction i; [ easy | ].
+cbn in H2.
+destruct i. {
+  cbn in H2.
+  rewrite if_bool_if_dec in H2.
+  destruct (bool_dec _) as [H11| H11]; [ | easy ].
+  apply (rngl_eqb_eq Heb) in H11.
+  now specialize (rngl_1_neq_0 H10) as H12.
+}
+assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+specialize (IHi H); clear H.
+remember (lap (rngl_of_nat (S i))) as la eqn:Hla.
+destruct la as [| a]; [ easy | clear IHi ].
+cbn in H2.
+rewrite strip_0s_app in H2.
+...
 Check lap_rngl_of_nat.
+Set Printing Implicit.
 ...
   remember (rngl_of_nat rngl_characteristic) as a eqn:Ha in |-*.
   destruct a as (la, pa).
