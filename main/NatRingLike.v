@@ -25,7 +25,7 @@ Proof. now intros; apply Nat.eq_mul_0. Qed.
 Theorem Nat_neq_1_0 : 1 ≠ 0.
 Proof. easy. Qed.
 
-Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
+Theorem nat_characteristic_prop : ∀ i, (S i × 1 ≠ 0)%F.
 Proof. easy. Qed.
 
 Theorem Nat_mul_div : ∀ a b, b ≠ 0%F → (a * b / b)%F = a.

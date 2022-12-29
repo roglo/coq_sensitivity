@@ -136,21 +136,22 @@ end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it. [projec
 Existing Instance mat_ring_like_op.
 
 Theorem mat_ncols_of_nat {n} : ∀ i,
-  mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
+  mat_ncols (@sm_mat n T (rngl_mul_nat_l i 1)) = n.
 Proof.
 intros.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n; destruct i | ].
 induction i; [ now apply mZ_ncols | cbn ].
 rewrite mat_add_ncols.
+cbn in IHi.
 rewrite mI_ncols, IHi.
 apply Nat.min_id.
 Qed.
 
 Theorem sm_mat_of_nat :
   ∀ n m,
-    sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
+    sm_mat (rngl_mul_nat_l m 1 : square_matrix n T) = (rngl_mul_nat_l m 1 × mI n)%M.
 (*
-  ∀ n m : nat, sm_mat (rngl_of_nat m) = (rngl_of_nat m × mI n)%M
+  ∀ n m : nat, sm_mat (rngl_mul_nat_l m) = (rngl_mul_nat_l m × mI n)%M
 *)
 Proof.
 intros; cbn.
@@ -176,11 +177,11 @@ Theorem mat_el_of_nat_diag {n} : ∀ m i,
   1 ≤ i ≤ n
   → mat_el
       (sm_mat
-         (@rngl_of_nat (square_matrix n T) (mat_ring_like_op n) m)) i i =
-    rngl_of_nat m.
+         (@rngl_mul_nat_l (square_matrix n T) (mat_ring_like_op n) m 1)) i i =
+    rngl_mul_nat_l m 1.
 (*
   ∀ m i : nat, 1 ≤ i ≤ n →
-  mat_el (sm_mat (rngl_of_nat m)) i i = rngl_of_nat m
+  mat_el (sm_mat (rngl_mul_nat_l m)) i i = rngl_mul_nat_l m
 *)
 Proof.
 intros * Hin.
@@ -197,9 +198,9 @@ unfold δ.
 now rewrite Nat.eqb_refl, rngl_mul_1_r.
 Qed.
 
-Theorem rngl_of_nat_is_correct_matrix {n} :
+Theorem rngl_mul_nat_l_is_correct_matrix {n} :
   rngl_characteristic = 0
-  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)) = true.
+  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_mul_nat_l i 1)) = true.
 Proof.
 intros Hch *.
 apply is_scm_mat_iff.
@@ -240,14 +241,14 @@ split. {
     now rewrite squ_mat_ncols.
   }
   rewrite mat_el_mI_diag in Hlla; [ | easy ].
-  rewrite mat_el_of_nat_diag in Hlla; [ | easy ].
+  rewrite (@mat_el_of_nat_diag n) in Hlla; [ | easy ].
   specialize rngl_characteristic_prop as H1.
   rewrite Hch in H1; cbn in H1.
   now apply (H1 i).
 } {
   intros l Hl.
   rewrite mat_ncols_of_nat.
-  remember (rngl_of_nat i) as M eqn:HM.
+  remember (rngl_mul_nat_l i 1) as M eqn:HM.
   destruct M as (M, Hm); cbn in Hl.
   clear HM.
   apply Bool.andb_true_iff in Hm.
@@ -555,10 +556,10 @@ Qed.
 Theorem squ_mat_characteristic_prop {n} :
   let _ := mat_ring_like_op n in
   let ch := if n =? 0 then 1 else rngl_characteristic in
-  if ch =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  if ch =? 0 then ∀ i : nat, rngl_mul_nat_l (S i) 1 ≠ 0%F
   else
-   (∀ i : nat, 0 < i < ch → rngl_of_nat i ≠ 0%F)
-   ∧ rngl_of_nat ch = 0%F.
+   (∀ i : nat, 0 < i < ch → rngl_mul_nat_l i 1 ≠ 0%F)
+   ∧ rngl_mul_nat_l ch 1 = 0%F.
 Proof.
 intros rop *.
 specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
@@ -598,13 +599,13 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
     subst rop.
-    now rewrite mat_ncols_of_nat.
+    now rewrite (@mat_ncols_of_nat n).
   }
   rewrite List_map_nth' with (a := 0) in Hi; [ | now rewrite seq_length ].
   rewrite seq_nth in Hi; [ cbn in Hi | easy ].
   rewrite fold_mat_el in Hi.
-  replace (mat_el (sm_mat (rngl_of_nat i)) 1 1) with
-    (@rngl_of_nat T ro i) in Hi. 2: {
+  replace (mat_el (sm_mat (i × smI n)) 1 1)%F with
+    (@rngl_mul_nat_l T ro i 1) in Hi. 2: {
     symmetry.
     clear Hi.
     induction i. {
@@ -618,7 +619,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite mat_el_add; cycle 1. {
       apply mI_is_correct_matrix.
     } {
-      now apply rngl_of_nat_is_correct_matrix.
+      now apply rngl_mul_nat_l_is_correct_matrix.
     } {
       now rewrite mI_nrows.
     } {
@@ -643,7 +644,7 @@ split. {
   apply (f_equal (λ M, mat_el (sm_mat M) 1 1)) in H2.
   cbn in H2.
   subst rop.
-  now rewrite mat_el_of_nat_diag in H2; [ | flia ].
+  now rewrite @mat_el_of_nat_diag in H2; [ | flia ].
 }
 apply square_matrix_eq; cbn.
 rewrite sm_mat_of_nat.

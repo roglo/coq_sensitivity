@@ -797,18 +797,21 @@ destruct (Z.eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
-Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
+Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_mul_nat_l (S i) 1 ≠ 0%QI.
 Proof.
 (* proof perhaps a little bit complicated; maybe simpler proof to find *)
 intros * Hi; cbn in Hi.
 unfold qi_add, qi_zero in Hi.
 remember 1%QI as one eqn:Hone.
 injection Hi; clear Hi; intros H1 H2.
-remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
-destruct z as [| p| p]; [ now subst one | | ]. {
+remember (qi_re (rngl_mul_nat_l i 1)) as z eqn:Hz; symmetry in Hz.
+cbn in Hz.
+destruct z as [| p| p]; [ now subst one; rewrite Hz in H2 | | ]. {
   rewrite Z.add_comm in H2.
   subst one; cbn in H2.
   specialize (Pos2Z.is_pos (p + 1)) as H3.
+  cbn in H2, H3.
+  rewrite Hz in H2.
   flia H2 H3.
 } {
   subst one; cbn in Hz.
@@ -817,12 +820,14 @@ destruct z as [| p| p]; [ now subst one | | ]. {
   apply Z.nle_gt in H3; apply H3; clear H3.
   clear H1 Hz H2 p.
   induction i; [ easy | cbn ].
-  remember (qi_re (rngl_of_nat i)) as z eqn:Hz; symmetry in Hz.
+  remember (qi_re (rngl_mul_nat_l i 1)) as z eqn:Hz; symmetry in Hz.
+  cbn in Hz; rewrite Hz.
   destruct z as [| p| p]; [ easy | | ]. {
     apply Pos2Z.is_nonneg.
   } {
     apply Z.nlt_ge in IHi.
     exfalso; apply IHi.
+    rewrite Hz.
     apply Pos2Z.neg_is_neg.
   }
 }

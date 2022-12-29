@@ -345,7 +345,7 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem proj1_sig_Zn_of_nat : ∀ i,
-  proj1_sig (rngl_of_nat i) = i mod at_least_1 n.
+  proj1_sig (rngl_mul_nat_l i 1) = i mod at_least_1 n.
 Proof.
 intros.
 induction i. {
@@ -361,10 +361,10 @@ easy.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  if at_least_1 n =? 0 then ∀ i : nat, rngl_mul_nat_l (S i) 1 ≠ 0%F
   else
-    (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%F) ∧
-    rngl_of_nat (at_least_1 n) = 0%F.
+    (∀ i : nat, 0 < i < at_least_1 n → rngl_mul_nat_l i 1 ≠ 0%F) ∧
+    rngl_mul_nat_l (at_least_1 n) 1 = 0%F.
 Proof.
 split. {
   intros i Hi.
@@ -372,6 +372,7 @@ split. {
   specialize (@proj1_sig_Zn_of_nat i) as H1.
   subst ro.
   unfold Zn in H.
+  cbn - [ "mod" ] in H1.
   rewrite H in H1.
   cbn - [ "mod" ] in H1.
   symmetry in H1.
@@ -472,8 +473,8 @@ now left.
 Qed.
 
 Theorem lcm_characteristic_prop :
-  if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%F) ∧ rngl_of_nat 1 = 0%F.
+  if 1 =? 0 then ∀ i : nat, rngl_mul_nat_l (S i) 1 ≠ 0%F
+  else (∀ i : nat, 0 < i < 1 → rngl_mul_nat_l i 1 ≠ 0%F) ∧ rngl_mul_nat_l 1 1 = 0%F.
 Proof.
 split; [ intros * Hi; flia Hi | easy ].
 Qed.
