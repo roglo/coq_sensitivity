@@ -4376,23 +4376,20 @@ destruct la as [| b]; cbn. {
   cbn; f_equal; symmetry.
   rewrite <- rngl_add_0_r.
   apply rngl_add_compat_l.
-...
-  destruct i; [ apply rngl_add_0_r | ].
-  cbn in Hla |-*.
-  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [| b]. {
-    cbn in Hla.
-    now rewrite H11 in Hla.
-  }
+  induction i; [ easy | ].
   cbn in Hla.
+  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
+  destruct lb as [| b]; cbn in Hla; [ now rewrite H11 in Hla | ].
   rewrite strip_0s_app in Hla.
   remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]. {
     cbn in Hla.
     rewrite if_bool_if_dec in Hla.
     destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
-    clear Hla.
+    clear Hla IHi.
     apply (rngl_eqb_eq Heb) in Hbz.
+...
+Search (rngl_of_nat _ = 0%F).
 ...
 
 (*
