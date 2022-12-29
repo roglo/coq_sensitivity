@@ -4357,6 +4357,7 @@ Theorem lap_polyn_rngl_of_nat_2 :
   → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi.
+specialize (rngl_1_neq_0 H10) as H11.
 specialize rngl_characteristic_prop as Hch.
 rewrite if_bool_if_dec in Hch.
 destruct (bool_dec _) as [Hchz| Hchz]. {
@@ -4365,31 +4366,45 @@ destruct (bool_dec _) as [Hchz| Hchz]. {
 }
 clear Hchz.
 destruct Hch as (Hbef, Hch).
-destruct i; [ easy | cbn ].
+induction i; [ easy | cbn ].
 remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
-destruct la as [| b]; cbn. {
+destruct la as [| a]; cbn. {
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [H11| H11]. {
-    apply (rngl_eqb_eq Heb) in H11.
-    now specialize (rngl_1_neq_0 H10).
-  }
+  apply (rngl_eqb_neq Heb) in H11; rewrite H11.
+  destruct (bool_dec _) as [| H]; [ easy | clear H ].
   cbn; f_equal; symmetry.
   rewrite <- rngl_add_0_r.
   apply rngl_add_compat_l.
-  induction i; [ easy | ].
-  cbn in Hla.
-  remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
-  destruct lb as [| b]; cbn in Hla; [ now rewrite H11 in Hla | ].
-  rewrite strip_0s_app in Hla.
-  remember (strip_0s (rev lb)) as lc eqn:Hlc; symmetry in Hlc.
-  destruct lc as [| c]. {
+  destruct i; [ easy | ].
+  assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+  now specialize (IHi H).
+}
+symmetry; apply List_rev_symm; symmetry; cbn.
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H12| H12]. {
+    exfalso; apply (rngl_eqb_eq Heb) in H12.
+    destruct i; [ easy | ].
+    assert (H : 0 < S i < rngl_characteristic) by flia Hi.
+    specialize (IHi H); clear H.
+    injection IHi; clear IHi; intros; subst a la.
+    clear Hlb.
     cbn in Hla.
-    rewrite if_bool_if_dec in Hla.
-    destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
-    clear Hla IHi.
-    apply (rngl_eqb_eq Heb) in Hbz.
-...
-Search (rngl_of_nat _ = 0%F).
+    remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
+    destruct lb as [| b]. {
+      cbn in Hla.
+      rewrite if_bool_if_dec in Hla.
+      apply (rngl_eqb_neq Heb) in H11.
+      rewrite H11 in Hla.
+      destruct (bool_dec _) as [| H]; [ easy | clear H ].
+      cbn in Hla.
+      injection Hla; clear Hla; intros Hla; symmetry in Hla.
+      rewrite <- rngl_add_0_r in Hla.
+      apply (rngl_add_cancel_l Hos) in Hla.
+      rewrite Hla, rngl_add_0_r in H12.
 ...
 
 (*
