@@ -4374,6 +4374,9 @@ destruct la as [| b]; cbn. {
     now specialize (rngl_1_neq_0 H10).
   }
   cbn; f_equal; symmetry.
+  rewrite <- rngl_add_0_r.
+  apply rngl_add_compat_l.
+...
   destruct i; [ apply rngl_add_0_r | ].
   cbn in Hla |-*.
   remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
