@@ -4447,6 +4447,51 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     destruct (bool_dec _) as [Hbz| Hbz]. {
       clear Hla.
       apply (rngl_eqb_eq Heb) in Hbz.
+      rewrite <- Hch in Hbz.
+      apply (rngl_add_cancel_l Hos) in Hbz.
+      subst b.
+      clear Hch.
+      induction i; [ easy | cbn in Hlb ].
+      assert (H : ∀ i0 : nat, 0 < i0 < S (S i) → rngl_of_nat i0 ≠ 0%F). {
+        intros j Hj.
+        apply Hbef; flia Hj.
+      }
+      specialize (IHi H); clear H.
+      remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
+      destruct la as [| a]. {
+        cbn in Hlb.
+        apply (rngl_eqb_neq Heb) in H11.
+        rewrite H11 in Hlb; cbn in Hlb.
+        injection Hlb; clear Hlb; intros H Hlb; subst lb.
+        symmetry in Hlb.
+        clear IHi Hlc.
+        rewrite <- rngl_add_0_r in Hlb.
+        apply (rngl_add_cancel_l Hos) in Hlb.
+        specialize (Hbef (S i)) as H1.
+        apply H1, Hlb; flia.
+      }
+      cbn in Hlb, IHi.
+      rewrite strip_0s_app in Hlb.
+      remember (strip_0s (rev la)) as ld eqn:Hld; symmetry in Hld.
+      destruct ld as [| d]. {
+        cbn in Hlb.
+        rewrite if_bool_if_dec in Hlb.
+        destruct (bool_dec _) as [Haz| Haz]; [ easy | ].
+        injection Hlb; clear Hlb; intros H1 Hlb; subst lb.
+        apply (rngl_add_cancel_l Hos) in Hlb.
+        subst a.
+        clear Hlc.
+        destruct la as [| a]; [ now apply IHi | ].
+        clear IHi.
+        cbn in Hld.
+        rewrite strip_0s_app in Hld.
+        remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+        destruct lb; [ | easy ].
+        cbn in Hld.
+        rewrite if_bool_if_dec in Hld.
+        destruct (bool_dec _) as [Haz'| Haz']; [ | easy ].
+        clear Hld.
+        apply (rngl_eqb_eq Heb) in Haz'; subst a.
 ...
   specialize (rngl_1_neq_0 H10) as H11.
   cbn in Hch |-*.
