@@ -4448,6 +4448,15 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     apply (f_equal lap) in H2; cbn in H2.
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
+  induction rngl_characteristic as [| i]; [ easy | clear Hcz ].
+  specialize (rngl_1_neq_0 H10) as H11.
+  cbn in Hch |-*.
+...
+  destruct i. {
+    cbn in Hch.
+    now rewrite rngl_add_0_r in Hch.
+  }
+  specialize (IHi (Nat.neq_succ_0 _)).
 ...
     exfalso; clear H1.
     induction i; [ easy | ].
