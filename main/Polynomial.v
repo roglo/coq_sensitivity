@@ -4419,15 +4419,42 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
   apply eq_polyn_eq; cbn.
+...
+  remember (rngl_of_nat rngl_characteristic) as p eqn:Hp in |-*.
+  symmetry in Hp.
+  destruct p as (la, pa); cbn.
+  apply (f_equal lap) in Hp; cbn in Hp.
+  apply Bool.orb_true_iff in pa.
+  destruct pa as [pa| pa]; [ now destruct la | ].
+  apply (rngl_neqb_neq Heb) in pa.
+  destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+  rewrite last_last in pa; exfalso.
+  specialize (rngl_1_neq_0 H10) as H11.
+...
+  destruct la as [| b]. {
+    cbn in Hp.
+    clear IHla.
+    induction rngl_characteristic as [| n]; [ easy | clear Hcz ].
+    destruct n. {
+      cbn in Hch.
+      now rewrite rngl_add_0_r in Hch.
+    }
+    specialize (IHn (Nat.neq_succ_0 _)).
+    cbn in Hch, Hp.
+...
+    cbn in Hch, Hp.
+...
+Theorem eq_lap_nil_iff : ∀ p, lap p = [] ↔ ∀ i, i < length (lap p) → nth i (lap p) 0%F = 0%F
+...
+(**)
+  clear Hbef.
   destruct rngl_characteristic as [| i]; [ easy | clear Hcz ].
   cbn in Hch |-*.
   specialize (rngl_1_neq_0 H10) as H11.
   remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
   destruct la as [| a]. {
     exfalso.
-    destruct i. {
-      now cbn in Hch; rewrite rngl_add_0_r in Hch.
-    }
+    destruct i; [ now cbn in Hch; rewrite rngl_add_0_r in Hch | ].
     cbn in Hla.
     remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]. {
@@ -4452,21 +4479,46 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
       subst b.
       clear Hch.
       induction i; [ easy | cbn in Hlb ].
+(*
       assert (H : ∀ i0 : nat, 0 < i0 < S (S i) → rngl_of_nat i0 ≠ 0%F). {
         intros j Hj.
         apply Hbef; flia Hj.
       }
       specialize (IHi H); clear H.
+*)
       remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
       destruct la as [| a]. {
+        clear IHi.
         cbn in Hlb.
         apply (rngl_eqb_neq Heb) in H11.
         rewrite H11 in Hlb; cbn in Hlb.
+        apply (rngl_eqb_neq Heb) in H11.
         injection Hlb; clear Hlb; intros H Hlb; subst lb.
         symmetry in Hlb.
-        clear IHi Hlc.
+        clear Hlc.
         rewrite <- rngl_add_0_r in Hlb.
         apply (rngl_add_cancel_l Hos) in Hlb.
+        induction i. {
+          now cbn in Hlb; rewrite rngl_add_0_r in Hlb.
+        }
+        cbn in Hla.
+        remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
+        destruct lc as [| c]. {
+          cbn in Hla.
+          apply (rngl_eqb_neq Heb) in H11.
+          now rewrite H11 in Hla.
+        }
+        clear IHi.
+        cbn in Hla.
+        rewrite strip_0s_app in Hla.
+        remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
+        destruct ld as [| d]. {
+          cbn in Hla.
+          rewrite if_bool_if_dec in Hla.
+          destruct (bool_dec _) as [Hcz| Hcz]; [ | easy ].
+          clear Hla.
+          apply (rngl_eqb_eq Heb) in Hcz.
+...
         specialize (Hbef (S i)) as H1.
         apply H1, Hlb; flia.
       }
