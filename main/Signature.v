@@ -30,7 +30,7 @@ Definition ε (p : list nat) :=
   ∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
   if i <? j then sign_diff (nth j p O) (nth i p O) else 1.
 
-Definition rngl_sub_nat i j := (i × 1 - j × 1)%F.
+Definition rngl_sub_nat i j := (rngl_of_nat i - rngl_of_nat j)%F.
 
 (* other definition of ε *)
 
@@ -159,11 +159,12 @@ rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
 Qed.
 
-Theorem rngl_mul_nat_l_sub :
+Theorem rngl_of_nat_sub :
   rngl_has_opp = true →
   ∀ i j,
-  (j × 1 - i × 1)%F =
-     (if i <? j then ((j - i) × 1)%F else (- ((i - j) × 1))%F).
+  (rngl_of_nat j - rngl_of_nat i)%F =
+     if i <? j then rngl_of_nat (j - i)
+     else (- rngl_of_nat (i - j))%F.
 Proof.
 intros Hop *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
@@ -199,31 +200,29 @@ destruct (lt_dec i j) as [Hij| Hij]. {
 }
 Qed.
 
-Theorem rngl_mul_nat_l_add : ∀ a b, (a × 1 + b × 1)%F = ((a + b) × 1)%F.
+Theorem rngl_of_nat_add : ∀ a b,
+  (rngl_of_nat a + rngl_of_nat b)%F = rngl_of_nat (a + b).
 Proof.
 intros.
 induction a; [ apply rngl_add_0_l | ].
 now cbn; rewrite <- rngl_add_assoc; f_equal.
 Qed.
 
-Theorem rngl_mul_nat_l_mul :
+Theorem rngl_of_nat_mul :
   rngl_has_opp_or_sous = true →
-  ∀ a b : nat, ((a × 1) * (b × 1))%F = (a * b × 1)%F.
+  ∀ a b, (rngl_of_nat a * rngl_of_nat b)%F = rngl_of_nat (a * b).
 Proof.
 intros Hom *.
 induction a; [ now apply rngl_mul_0_l | cbn ].
 rewrite rngl_mul_add_distr_r.
 rewrite rngl_mul_1_l.
 rewrite IHa.
-apply rngl_mul_nat_l_add.
+apply rngl_of_nat_add.
 Qed.
 
-Theorem rngl_product_rngl_mul_nat_l :
+Theorem rngl_product_rngl_of_nat :
   rngl_has_opp_or_sous = true →
-(*
-  ∀ n, (∏ (i = 1, n), rngl_mul_nat_l i 1)%F = rngl_mul_nat_l (fact n) 1.
-*)
-  ∀ n, ∏ (i = 1, n), (i × 1) = (n! × 1)%F.
+  ∀ n, (∏ (i = 1, n), rngl_of_nat i)%F = rngl_of_nat (fact n).
 Proof.
 intros Hom *.
 induction n. {
@@ -236,11 +235,10 @@ erewrite rngl_product_eq_compat. 2: {
   intros i Hi.
   now rewrite Nat_sub_succ_1.
 }
-cbn - [ fact "×"%F ].
 rewrite IHn.
 rewrite Nat_fact_succ.
 rewrite Nat.mul_comm.
-now apply rngl_mul_nat_l_mul.
+now apply rngl_of_nat_mul.
 Qed.
 
 Definition sign_diff' u v := if u <? v then (-1)%F else 1%F.
@@ -264,7 +262,9 @@ Qed.
 
 Theorem rngl_sub_is_mul_sign_abs :
   rngl_has_opp = true →
-  ∀ a b, (a × 1 - b × 1)%F = (sign_diff a b * (abs_diff a b × 1))%F.
+  ∀ a b,
+  (rngl_of_nat a - rngl_of_nat b)%F =
+  (sign_diff a b * rngl_of_nat (abs_diff a b))%F.
 Proof.
 intros Hop *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
@@ -281,7 +281,7 @@ destruct ab. {
   apply nat_compare_lt in Hab.
   destruct (lt_dec b a) as [H| H]; [ flia Hab H | clear H ].
   rewrite <- rngl_opp_sub_distr; [ | easy ].
-  rewrite rngl_mul_nat_l_sub; [ | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
   apply Nat.ltb_lt in Hab; rewrite Hab.
   rewrite rngl_mul_opp_l; [ | easy ].
   now rewrite rngl_mul_1_l.
@@ -289,7 +289,7 @@ destruct ab. {
   apply nat_compare_gt in Hab.
   rewrite rngl_mul_1_l.
   destruct (lt_dec b a) as [H| H]; [ clear H | flia Hab H ].
-  rewrite rngl_mul_nat_l_sub; [ | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
   now apply Nat.ltb_lt in Hab; rewrite Hab.
 }
 Qed.
@@ -300,25 +300,30 @@ Theorem rngl_sign_diff'_sub_div_abs :
   rngl_characteristic = 0 →
   ∀ a b,
   a ≠ b
-  → sign_diff' a b = ((a × 1 - b × 1) / (abs_diff a b × 1))%F.
+  → sign_diff' a b =
+       ((rngl_of_nat a - rngl_of_nat b) / rngl_of_nat (abs_diff a b))%F.
 Proof.
 intros Hop Hiv Hch * Hab.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
 specialize (Hiq (or_introl Hiv)).
 move Hiq before Hiv.
-assert (Hnz : rngl_mul_nat_l (abs_diff a b) 1 ≠ 0%F). {
+assert (Hnz : rngl_of_nat (abs_diff a b) ≠ 0%F). {
   unfold abs_diff.
   rewrite if_ltb_lt_dec.
   intros H.
   destruct (lt_dec b a) as [Hba| Hba]. {
-    apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+    apply eq_rngl_of_nat_0 in H; [ | easy ].
     flia Hba H.
   } {
-    apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+    apply eq_rngl_of_nat_0 in H; [ | easy ].
     flia Hab Hba H.
   }
 }
-apply rngl_mul_cancel_r with (c := (abs_diff a b × 1)%F); [ easy | easy | ].
+apply rngl_mul_cancel_r with (c := rngl_of_nat (abs_diff a b)). {
+  easy.
+} {
+  easy.
+}
 rewrite rngl_div_mul; [ | easy | easy ].
 rewrite rngl_sub_is_mul_sign_abs; [ | easy ].
 f_equal.
@@ -702,8 +707,8 @@ Theorem rngl_product_product_abs_diff_div_diff : in_charac_0_field →
   → ∏ (i = 0, length p - 1),
     (∏ (j = 0, length p - 1),
      (if i <? j then
-        rngl_mul_nat_l (abs_diff (nth j p O) (nth i p O)) 1 /
-        rngl_mul_nat_l (j - i) 1
+        rngl_of_nat (abs_diff (nth j p O) (nth i p O)) /
+        rngl_of_nat (j - i)
       else 1)) = 1%F.
 Proof.
 intros (Hic & Hop & Hin & H10 & Hit & Hde & Hch) * Hp.
@@ -723,7 +728,7 @@ erewrite rngl_product_eq_compat. 2: {
   rewrite rngl_product_div_distr; try easy.
   intros j Hj.
   intros H.
-  apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
   flia Hj H.
 }
 cbn.
@@ -731,7 +736,7 @@ rewrite rngl_product_div_distr; try easy. 2: {
   intros i Hi H.
   apply (rngl_product_integral Hos Hit H10) in H.
   destruct H as (j & Hj & Hji).
-  apply eq_rngl_mul_nat_l_0 in Hji; [ | easy ].
+  apply eq_rngl_of_nat_0 in Hji; [ | easy ].
   flia Hj Hji.
 }
 apply eq_rngl_div_1; [ easy | | ]. {
@@ -740,7 +745,7 @@ apply eq_rngl_div_1; [ easy | | ]. {
   destruct H as (i & Hi & H).
   apply (rngl_product_integral Hos Hit H10) in H.
   destruct H as (j & Hj & H).
-  apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
   flia Hj H.
 }
 rewrite <- rngl_product_product_if; symmetry.
@@ -812,7 +817,7 @@ rewrite product_product_if_permut; try easy; cycle 1. {
   }
 } {
   intros * Hi Hj Hij H.
-  apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
   unfold abs_diff in H.
   rewrite if_ltb_lt_dec in H.
   destruct (lt_dec i j) as [Hlij| Hlij]; flia Hij Hlij H.
@@ -840,7 +845,7 @@ Theorem ε'_ε_1 : in_charac_0_field →
   (∏ (i = 0, length p - 1),
    ∏ (j = 0, length p - 1),
    if i <? j then
-      rngl_mul_nat_l (abs_diff (nth j p O) (nth i p O)) 1 / rngl_mul_nat_l (j - i) 1
+      rngl_of_nat (abs_diff (nth j p O) (nth i p O)) / rngl_of_nat (j - i)
    else 1) = 1%F
   → ε' p = ε p.
 Proof.
@@ -869,7 +874,7 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {
     intros j Hj.
-    rewrite rngl_mul_nat_l_sub; [ | easy ].
+    rewrite rngl_of_nat_sub; [ | easy ].
     rewrite if_ltb_lt_dec.
     destruct (lt_dec i j) as [Hij| Hij]; [ | flia Hj Hij ].
     easy.
@@ -886,12 +891,12 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
     replace (i + 1 + j - i) with (S j) by flia.
     easy.
   }
-  cbn - [ rngl_mul_nat_l ].
-  rewrite <- rngl_product_succ_succ with (g := λ k, (k × 1)%F).
+  cbn - [ rngl_of_nat ].
+  erewrite <- rngl_product_succ_succ.
   replace (S (length p - 1 - (i + 1))) with (length p - S i) by flia Hi Hein.
-  rewrite rngl_product_rngl_mul_nat_l; [ | easy ].
+  rewrite rngl_product_rngl_of_nat; [ | easy ].
   intros H.
-  apply eq_rngl_mul_nat_l_0 in H; [ | easy ].
+  apply eq_rngl_of_nat_0 in H; [ | easy ].
   now apply fact_neq_0 in H.
 }
 erewrite rngl_product_eq_compat. 2: {
@@ -900,7 +905,7 @@ erewrite rngl_product_eq_compat. 2: {
   intros j Hj.
   intros H.
   apply -> rngl_sub_move_0_r in H; [ | easy ].
-  apply rngl_mul_nat_l_inj in H; [ | easy | easy ].
+  apply rngl_of_nat_inj in H; [ | easy | easy ].
   flia Hj H.
 }
 cbn.
@@ -920,7 +925,7 @@ erewrite rngl_product_eq_compat. 2: {
       }
     }
     rewrite rngl_mul_1_l.
-    replace (rngl_mul_nat_l (abs_diff j i)) with (rngl_mul_nat_l (j - i)). 2: {
+    replace (rngl_of_nat (abs_diff j i)) with (rngl_of_nat (j - i)). 2: {
       unfold abs_diff.
       rewrite if_ltb_lt_dec.
       destruct (lt_dec i j) as [H| H]; [ easy | flia Hj H ].
@@ -1329,7 +1334,7 @@ destruct Hij as (j & Hj & Hij).
 rewrite if_ltb_lt_dec in Hij.
 destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 ].
 apply -> rngl_sub_move_0_r in Hij; [ | easy ].
-apply rngl_mul_nat_l_inj in Hij; [ | easy | easy ].
+apply rngl_of_nat_inj in Hij; [ | easy | easy ].
 apply permut_seq_iff in Hgp.
 destruct Hgp as (_, Hgp).
 apply (NoDup_nat _ Hgp) in Hij; [ | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
@@ -1359,9 +1364,9 @@ Theorem signature_comp_fun_expand_2_1 :
     (∏ (i = 0, n - 1),
       (∏ (j = 0, n - 1),
        (if i <? j then
-         (rngl_mul_nat_l (nth (nth j g O) f O) 1 -
-          rngl_mul_nat_l (nth (nth i g O) f O) 1) /
-         (rngl_mul_nat_l (nth j g O) 1 - rngl_mul_nat_l (nth i g O) 1)
+         (rngl_of_nat (nth (nth j g O) f O) -
+          rngl_of_nat (nth (nth i g O) f O)) /
+         (rngl_of_nat (nth j g O) - rngl_of_nat (nth i g O))
        else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch * (Hp2, Hn).
@@ -1385,7 +1390,7 @@ rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | easy | ]. 2: {
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply -> rngl_sub_move_0_r in Hij; [ | easy ].
-  apply rngl_mul_nat_l_inj in Hij; [ | easy | easy ].
+  apply rngl_of_nat_inj in Hij; [ | easy | easy ].
   rewrite <- Hn in Hnz.
   apply permut_seq_iff in Hp2.
   destruct Hp2 as (_, Hp2).
@@ -1402,7 +1407,7 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply -> rngl_sub_move_0_r in Hij; [ | easy ].
-    apply rngl_mul_nat_l_inj in Hij; [ | easy | easy ].
+    apply rngl_of_nat_inj in Hij; [ | easy | easy ].
     rewrite <- Hn in Hnz.
     apply permut_seq_iff in Hp2.
     destruct Hp2 as (_, Hp2).
@@ -1449,7 +1454,7 @@ Theorem signature_comp_fun_expand_2_2 :
   (∏ (i = 0, n - 1),
    (∏ (j = 0, n - 1),
     (if i <? j then
-      (rngl_mul_nat_l (f j) 1 - rngl_mul_nat_l (f i) 1) / rngl_mul_nat_l (j - i) 1
+      (rngl_of_nat (f j) - rngl_of_nat (f i)) / rngl_of_nat (j - i)
      else 1)))%F.
 Proof.
 intros Hop Hin Hic H10 Hit Hch *.
@@ -1464,7 +1469,7 @@ rewrite rngl_inv_product_comm; [ | easy | easy | easy | easy | easy | ]. 2: {
   rewrite if_ltb_lt_dec in Hij.
   destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
   apply -> rngl_sub_move_0_r in Hij; [ | easy ].
-  apply rngl_mul_nat_l_inj in Hij; [ | easy | easy ].
+  apply rngl_of_nat_inj in Hij; [ | easy | easy ].
   flia Hlij Hij.
 }
 erewrite <- rngl_product_mul_distr; [ | easy ].
@@ -1476,7 +1481,7 @@ erewrite rngl_product_eq_compat. 2: {
     rewrite if_ltb_lt_dec in Hij.
     destruct (lt_dec i j) as [Hlij| Hlij]; [ | now apply rngl_1_neq_0 in Hij ].
     apply -> rngl_sub_move_0_r in Hij; [ | easy ].
-    apply rngl_mul_nat_l_inj in Hij; [ | easy | easy ].
+    apply rngl_of_nat_inj in Hij; [ | easy | easy ].
     flia Hlij Hij.
   }
   erewrite <- rngl_product_mul_distr; [ | easy ].
@@ -1505,7 +1510,7 @@ do 2 rewrite if_ltb_lt_dec.
 destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 f_equal; f_equal.
 unfold rngl_sub_nat.
-rewrite rngl_mul_nat_l_sub; [ | easy ].
+rewrite rngl_of_nat_sub; [ | easy ].
 now apply Nat.ltb_lt in Hij; rewrite Hij.
 Qed.
 
@@ -1523,15 +1528,15 @@ Theorem signature_comp_fun_changement_of_variable :
   → (∏ (i = 0, n - 1),
      (∏ (j = 0, n - 1),
       (if i <? j then
-         (rngl_mul_nat_l (nth (nth j g O) f O) 1 -
-          rngl_mul_nat_l (nth (nth i g O) f O) 1) /
-         (rngl_mul_nat_l (nth j g O) 1 - rngl_mul_nat_l (nth i g O) 1)
+         (rngl_of_nat (nth (nth j g O) f O) -
+          rngl_of_nat (nth (nth i g O) f O)) /
+         (rngl_of_nat (nth j g O) - rngl_of_nat (nth i g O))
        else 1)))%F =
     (∏ (i = 0, n - 1),
      (∏ (j = 0, n - 1),
       (if i <? j then
-         (rngl_mul_nat_l (nth j f O) 1 - rngl_mul_nat_l (nth i f O) 1) /
-         rngl_mul_nat_l (j - i) 1
+         (rngl_of_nat (nth j f O) - rngl_of_nat (nth i f O)) /
+         rngl_of_nat (j - i)
        else 1)))%F.
 Proof.
 intros Hop Hin Hic Heq H10 Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
@@ -1608,7 +1613,7 @@ rewrite product_product_if_permut; try easy. {
   do 2 rewrite if_ltb_lt_dec.
   destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
   f_equal.
-  rewrite rngl_mul_nat_l_sub; [ | easy ].
+  rewrite rngl_of_nat_sub; [ | easy ].
   now apply Nat.ltb_lt in Hij; rewrite Hij.
 } {
   now apply (isort_rank_permut_seq_with_len _ n).
@@ -1625,7 +1630,7 @@ rewrite product_product_if_permut; try easy. {
     intros H.
     apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply Hij; symmetry.
-    apply rngl_mul_nat_l_inj in H; [ easy | easy | easy ].
+    apply rngl_of_nat_inj in H; [ easy | easy | easy ].
   }
   now rewrite rngl_opp_sub_distr.
 } {
@@ -1636,7 +1641,7 @@ rewrite product_product_if_permut; try easy. {
   apply rngl_integral in H; [ | easy | now rewrite Hit ].
   destruct H as [H| H]. {
     apply -> rngl_sub_move_0_r in H; [ | easy ].
-    apply rngl_mul_nat_l_inj in H; [ | easy | easy ].
+    apply rngl_of_nat_inj in H; [ | easy | easy ].
     apply Hij; symmetry.
     rewrite <- Hn1 in Hi, Hj.
     apply permut_seq_iff in Hp1.
@@ -1647,7 +1652,7 @@ rewrite product_product_if_permut; try easy. {
     apply rngl_inv_neq_0; [ easy | easy | easy | ].
     intros H.
     apply -> rngl_sub_move_0_r in H; [ | easy ].
-    apply rngl_mul_nat_l_inj in H; [ | easy | easy ].
+    apply rngl_of_nat_inj in H; [ | easy | easy ].
     now apply Hij; symmetry.
   }
 }

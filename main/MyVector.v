@@ -203,7 +203,7 @@ Proof.
 intros Hom Hic *.
 unfold vect_dot_mul.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-unfold "×"%V; cbn.
+unfold "×"; cbn.
 unfold iter_list.
 rewrite map2_map_r.
 rewrite List_fold_left_map2.
@@ -224,7 +224,7 @@ Proof.
 intros Hom *.
 unfold vect_dot_mul; cbn.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-unfold "×"%V; cbn.
+unfold "×"; cbn.
 unfold iter_list.
 rewrite map2_map_l.
 rewrite List_fold_left_map2.

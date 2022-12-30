@@ -263,7 +263,7 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
 
 Fixpoint rlap_quot_rem_loop it (rla rlb : list T) : list T * list T :=
   match it with
-  | 0 => ([], [rngl_mul_nat_l 97 1]) (* algo err: not enough iterations *)
+  | 0 => ([], [rngl_of_nat 97]) (* algo err: not enough iterations *)
   | S it' =>
       let (q, rlr) := rlap_quot_rem_step rla rlb in
       match q with
@@ -4285,22 +4285,21 @@ apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
 now destruct H2.
 Qed.
 
-Theorem lap_rngl_mul_nat_l :
+Theorem lap_rngl_of_nat :
   let lop := lap_ring_like_op in
-  ∀ i, i ≠ 0 → (rngl_mul_nat_l i 1)%lap = [rngl_mul_nat_l i 1].
+  ∀ i, i ≠ 0 → (rngl_of_nat i)%lap = [rngl_of_nat i].
 Proof.
 intros lop * Hiz.
 subst lop.
 induction i; [ easy | clear Hiz; cbn ].
 destruct i; [ now cbn; rewrite rngl_add_0_r | ].
-cbn in IHi |-*.
 now rewrite IHi.
 Qed.
 
-Theorem lap_polyn_rngl_mul_nat_l :
+Theorem lap_polyn_rngl_of_nat :
   let _ := polyn_ring_like_op in
   rngl_characteristic = 0
-  → ∀ i, i ≠ 0 → lap (rngl_mul_nat_l i 1) = [rngl_mul_nat_l i 1].
+  → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros rop Hch * Hiz.
 subst rop.
@@ -4312,7 +4311,6 @@ destruct i. {
   apply (rngl_eqb_eq Heb) in H11.
   now apply rngl_1_neq_0 in H11.
 }
-cbn in IHi |-*.
 rewrite IHi; [ cbn | easy ].
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [H11| H11]; [ | easy ].
@@ -4323,10 +4321,10 @@ rewrite Hch in H1; cbn in H1.
 now specialize (H1 (S i)); cbn in H1.
 Qed.
 
-Theorem lap_polyn_rngl_mul_nat_l_2 :
+Theorem lap_polyn_rngl_of_nat_2 :
   let rop := polyn_ring_like_op in
   ∀ i, 0 < i < rngl_characteristic
-  → lap (rngl_mul_nat_l i 1) = [rngl_mul_nat_l i 1].
+  → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi.
 specialize (rngl_1_neq_0 H10) as H11.
@@ -4339,7 +4337,7 @@ destruct (bool_dec _) as [Hchz| Hchz]. {
 clear Hchz.
 destruct Hch as (Hbef, Hch).
 induction i; [ easy | cbn ].
-remember (lap (rngl_mul_nat_l i 1)) as la eqn:Hla; symmetry in Hla.
+remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
 destruct la as [| a]; cbn. {
   rewrite if_bool_if_dec.
   apply (rngl_eqb_neq Heb) in H11; rewrite H11.
@@ -4365,7 +4363,7 @@ destruct lb as [| b]. {
     injection IHi; clear IHi; intros; subst a la.
     clear Hlb.
     cbn in Hla.
-    remember (lap (rngl_mul_nat_l i 1)) as lb eqn:Hlb; symmetry in Hlb.
+    remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]; cbn in Hla. {
       rewrite if_bool_if_dec in Hla.
       apply (rngl_eqb_neq Heb) in H11.
@@ -4396,10 +4394,10 @@ Qed.
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
-  if rngl_characteristic =? 0 then ∀ i : nat, rngl_mul_nat_l (S i) 1 ≠ 0%F
+  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
   else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_mul_nat_l i 1 ≠ 0%F) ∧
-    rngl_mul_nat_l rngl_characteristic 1 = 0%F.
+    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
+    rngl_of_nat rngl_characteristic = 0%F.
 Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
@@ -4409,60 +4407,34 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   specialize (H1 i) as H.
   intros Hi; apply H; clear H.
   apply (f_equal lap) in Hi.
-  now rewrite lap_polyn_rngl_mul_nat_l in Hi.
+  now rewrite lap_polyn_rngl_of_nat in Hi.
 } {
   destruct H1 as (Hbef, Hch).
-  assert (Hbeg :
-    let rop := polyn_ring_like_op in
-    ∀ i : nat, 0 < i < rngl_characteristic → (i × 1)%F ≠ 0%F). {
+  assert
+    (Hbeg :
+     let rop := polyn_ring_like_op in
+     ∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F). {
     intros rop i Hi; cbn.
     specialize (Hbef _ Hi) as H1.
     intros H; apply H1; clear H1; rename H into H1.
     generalize H1; intros H2.
     apply (f_equal lap) in H2; cbn in H2.
-    now rewrite lap_polyn_rngl_mul_nat_l_2 in H2.
+    now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
-  move Hbeg before Hbef.
   split; [ easy | ].
   apply eq_polyn_eq; cbn.
 ...
-  remember (rngl_mul_nat_l rngl_characteristic) as p eqn:Hp in |-*.
-  symmetry in Hp.
-  destruct p as (la, pa); cbn.
-  apply (f_equal lap) in Hp; cbn in Hp.
-  apply Bool.orb_true_iff in pa.
-  destruct pa as [pa| pa]; [ now destruct la | ].
-  apply (rngl_neqb_neq Heb) in pa.
-  destruct la as [| a] using rev_ind; [ easy | clear IHla ].
-  rewrite last_last in pa; exfalso.
-  specialize (rngl_1_neq_0 H10) as H11.
-...
-  destruct la as [| b]. {
-    cbn in Hp.
-    clear IHla.
-    induction rngl_characteristic as [| n]; [ easy | clear Hcz ].
-    destruct n. {
-      cbn in Hch.
-      now rewrite rngl_add_0_r in Hch.
-    }
-    specialize (IHn (Nat.neq_succ_0 _)).
-    cbn in Hch, Hp.
-...
-    cbn in Hch, Hp.
-...
-Theorem eq_lap_nil_iff : ∀ p, lap p = [] ↔ ∀ i, i < length (lap p) → nth i (lap p) 0%F = 0%F
-...
-(**)
-  clear Hbef.
   destruct rngl_characteristic as [| i]; [ easy | clear Hcz ].
   cbn in Hch |-*.
   specialize (rngl_1_neq_0 H10) as H11.
-  remember (lap (rngl_mul_nat_l i)) as la eqn:Hla; symmetry in Hla.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
   destruct la as [| a]. {
     exfalso.
-    destruct i; [ now cbn in Hch; rewrite rngl_add_0_r in Hch | ].
+    destruct i. {
+      now cbn in Hch; rewrite rngl_add_0_r in Hch.
+    }
     cbn in Hla.
-    remember (lap (rngl_mul_nat_l i)) as lb eqn:Hlb; symmetry in Hlb.
+    remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]. {
       cbn in Hla.
       apply (rngl_eqb_neq Heb) in H11.
@@ -4480,90 +4452,20 @@ Theorem eq_lap_nil_iff : ∀ p, lap p = [] ↔ ∀ i, i < length (lap p) → nth
     destruct (bool_dec _) as [Hbz| Hbz]. {
       clear Hla.
       apply (rngl_eqb_eq Heb) in Hbz.
-      rewrite <- Hch in Hbz.
-      apply (rngl_add_cancel_l Hos) in Hbz.
-      subst b.
-      clear Hch.
-      induction i; [ easy | cbn in Hlb ].
-(*
-      assert (H : ∀ i0 : nat, 0 < i0 < S (S i) → rngl_mul_nat_l i0 ≠ 0%F). {
-        intros j Hj.
-        apply Hbef; flia Hj.
-      }
-      specialize (IHi H); clear H.
-*)
-      remember (lap (rngl_mul_nat_l i)) as la eqn:Hla; symmetry in Hla.
-      destruct la as [| a]. {
-        clear IHi.
-        cbn in Hlb.
-        apply (rngl_eqb_neq Heb) in H11.
-        rewrite H11 in Hlb; cbn in Hlb.
-        apply (rngl_eqb_neq Heb) in H11.
-        injection Hlb; clear Hlb; intros H Hlb; subst lb.
-        symmetry in Hlb.
-        clear Hlc.
-        rewrite <- rngl_add_0_r in Hlb.
-        apply (rngl_add_cancel_l Hos) in Hlb.
-        induction i. {
-          now cbn in Hlb; rewrite rngl_add_0_r in Hlb.
-        }
-        cbn in Hla.
-        remember (lap (rngl_mul_nat_l i)) as lc eqn:Hlc; symmetry in Hlc.
-        destruct lc as [| c]. {
-          cbn in Hla.
-          apply (rngl_eqb_neq Heb) in H11.
-          now rewrite H11 in Hla.
-        }
-        clear IHi.
-        cbn in Hla.
-        rewrite strip_0s_app in Hla.
-        remember (strip_0s (rev lc)) as ld eqn:Hld; symmetry in Hld.
-        destruct ld as [| d]. {
-          cbn in Hla.
-          rewrite if_bool_if_dec in Hla.
-          destruct (bool_dec _) as [Hcz| Hcz]; [ | easy ].
-          clear Hla.
-          apply (rngl_eqb_eq Heb) in Hcz.
-...
-        specialize (Hbef (S i)) as H1.
-        apply H1, Hlb; flia.
-      }
-      cbn in Hlb, IHi.
-      rewrite strip_0s_app in Hlb.
-      remember (strip_0s (rev la)) as ld eqn:Hld; symmetry in Hld.
-      destruct ld as [| d]. {
-        cbn in Hlb.
-        rewrite if_bool_if_dec in Hlb.
-        destruct (bool_dec _) as [Haz| Haz]; [ easy | ].
-        injection Hlb; clear Hlb; intros H1 Hlb; subst lb.
-        apply (rngl_add_cancel_l Hos) in Hlb.
-        subst a.
-        clear Hlc.
-        destruct la as [| a]; [ now apply IHi | ].
-        clear IHi.
-        cbn in Hld.
-        rewrite strip_0s_app in Hld.
-        remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-        destruct lb; [ | easy ].
-        cbn in Hld.
-        rewrite if_bool_if_dec in Hld.
-        destruct (bool_dec _) as [Haz'| Haz']; [ | easy ].
-        clear Hld.
-        apply (rngl_eqb_eq Heb) in Haz'; subst a.
 ...
   specialize (rngl_1_neq_0 H10) as H11.
   cbn in Hch |-*.
   destruct i; [ now cbn in Hch; rewrite rngl_add_0_r in Hch | ].
 ...
-  rewrite lap_rngl_mul_nat_l; try easy. 2: {
+  rewrite lap_rngl_of_nat; try easy. 2: {
 
 
-Search (lap (rngl_mul_nat_l _)).
+Search (lap (rngl_of_nat _)).
 Inspect 4.
-rewrite lap_rngl_mul_nat_l.
-Search (lap (rngl_mul_nat_l _)).
+rewrite lap_rngl_of_nat.
+Search (lap (rngl_of_nat _)).
 ...
-  rewrite lap_polyn_rngl_mul_nat_l; try easy. 2: {
+  rewrite lap_polyn_rngl_of_nat; try easy. 2: {
 Set Printing Implicit.
 
   induction rngl_characteristic as [| i]; [ easy | clear Hcz ].
@@ -4592,7 +4494,7 @@ Inspect 1.
 ...
 assert (H : 0 < S i < rngl_characteristic) by flia Hi.
 specialize (IHi H); clear H.
-remember (lap (rngl_mul_nat_l (S i))) as la eqn:Hla; symmetry in Hla.
+remember (lap (rngl_of_nat (S i))) as la eqn:Hla; symmetry in Hla.
 destruct la as [| a]; [ easy | clear IHi ].
 cbn in H2.
 rewrite strip_0s_app in H2.
@@ -4604,7 +4506,7 @@ destruct (bool_dec _) as [Haz| Haz]; [ clear H2 | easy ].
 apply (rngl_eqb_eq Heb) in Haz.
 ...
 cbn in Hla.
-remember (lap (rngl_mul_nat_l i)) as lc eqn:Hlc; symmetry in Hlc.
+remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
@@ -4630,22 +4532,22 @@ destruct ld as [| d]. {
   injection Hla; clear Hla; intros; subst a la.
   clear Hlb.
   induction i; [ easy | ].
-  rewrite lap_polyn_rngl_mul_nat_l_2 in Hlc; [ | flia Hi ].
+  rewrite lap_polyn_rngl_of_nat_2 in Hlc; [ | flia Hi ].
   injection Hlc; clear Hlc; intros; subst c lc.
 ...
   now specialize (Hbef (S (S i)) Hi).
 ...
-Search (lap (rngl_mul_nat_l _)).
+Search (lap (rngl_of_nat _)).
 Set Printing All.
 ...
     apply (rngl_eqb_neq Heb) in H11.
       now specialize (rngl_1_neq_0 H10) as H12.
     }
 ...
-Check lap_rngl_mul_nat_l.
+Check lap_rngl_of_nat.
 Set Printing Implicit.
 ...
-  remember (rngl_mul_nat_l rngl_characteristic) as a eqn:Ha in |-*.
+  remember (rngl_of_nat rngl_characteristic) as a eqn:Ha in |-*.
   destruct a as (la, pa).
   apply eq_polyn_eq; cbn.
   apply (f_equal lap) in Ha; cbn in Ha.
@@ -4656,12 +4558,12 @@ Set Printing Implicit.
   rewrite last_last in pa.
   symmetry in Ha.
 ... ...
-rewrite rngl_mul_nat_l_char in Ha; [ | easy ].
+rewrite rngl_of_nat_char in Ha; [ | easy ].
 now symmetry in Ha; apply app_eq_nil in Ha.
 ... ...
 generalize Ha; intros H.
 apply (f_equal length) in H.
-rewrite rngl_mul_nat_l_char_length in H; [ | easy ].
+rewrite rngl_of_nat_char_length in H; [ | easy ].
 rewrite app_length, Nat.add_comm in H; cbn in H.
 easy.
 destruct la; [ | easy ].
@@ -4670,17 +4572,17 @@ cbn in Ha.
   clear IHla.
 ...
 Set Printing Implicit.
-Check lap_rngl_mul_nat_l.
+Check lap_rngl_of_nat.
 Inspect 2.
-rewrite lap_polyn_rngl_mul_nat_l in Ha; try easy.
+rewrite lap_polyn_rngl_of_nat in Ha; try easy.
 ...
   Search rngl_characteristic.
-rewrite lap_polyn_rngl_mul_nat_l in Ha; try easy.
+rewrite lap_polyn_rngl_of_nat in Ha; try easy.
 2: {
 ...
 Inspect 2.
-rewrite lap_rngl_mul_nat_l in H1.
-  rewrite lap_polyn_rngl_mul_nat_l in Ha; [ | | easy ]. 2: {
+rewrite lap_rngl_of_nat in H1.
+  rewrite lap_polyn_rngl_of_nat in Ha; [ | | easy ]. 2: {
 ...
 ...
   cbn in H1 |-*.
@@ -4691,11 +4593,11 @@ rewrite lap_rngl_mul_nat_l in H1.
 cbn.
   apply eq_polyn_eq; cbn.
 
-  rewrite lap_polyn_rngl_mul_nat_l; [ | | easy ].
+  rewrite lap_polyn_rngl_of_nat; [ | | easy ].
   remember rngl_characteristic as i eqn:Hi; symmetry in Hi.
   destruct i; [ easy | clear Hcz ].
 ...
-  remember (rngl_mul_nat_l (S i)) as a eqn:Ha in |-*.
+  remember (rngl_of_nat (S i)) as a eqn:Ha in |-*.
   symmetry in Ha.
   destruct a as (la, pa); cbn.
   cbn in Ha.
@@ -4711,7 +4613,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   intros i Hi.
   apply (f_equal lap) in Hi.
   cbn in Hi.
-  remember (lap (rngl_mul_nat_l i)) as la eqn:Hla.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| a]. {
     cbn in Hi.
@@ -4728,7 +4630,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   destruct (bool_dec _) as [H1az| H1az]; [ clear Hi | easy ].
   apply (rngl_eqb_eq Heb) in H1az.
   destruct i; [ easy | cbn in Hla ].
-  remember (lap (rngl_mul_nat_l i)) as lc eqn:Hlc; symmetry in Hlc.
+  remember (lap (rngl_of_nat i)) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]. {
     cbn in Hla.
     rewrite if_bool_if_dec in Hla.
@@ -4754,14 +4656,14 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     now rewrite rngl_add_0_r in H1.
 ...
 (* ce théorème ci-dessous, suppose que la caractéristique soit
-   nulle. Si non, contre-exemple : car=2 et lap (rngl_mul_nat_l 2)
+   nulle. Si non, contre-exemple : car=2 et lap (rngl_of_nat 2)
    vaut [] et non pas [2] *)
-Theorem lap_rngl_mul_nat_l :
+Theorem lap_rngl_of_nat :
   let _ := polyn_ring_like_op in
-  ∀ i, i ≠ 0 → lap (rngl_mul_nat_l i) = [(rngl_mul_nat_l i)%F].
+  ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [(rngl_of_nat i)%F].
 Proof.
 intros rop * Hiz.
-remember (rngl_mul_nat_l i) as a eqn:Ha.
+remember (rngl_of_nat i) as a eqn:Ha.
 symmetry in Ha.
 destruct a as (la, pa); cbn.
 apply (f_equal lap) in Ha; cbn in Ha.
@@ -4773,7 +4675,7 @@ destruct pa as [pa| pa]. {
   destruct i; [ easy | clear Hiz ].
   cbn in Ha.
   apply List_rev_symm in Ha; cbn in Ha.
-  remember (lap (rngl_mul_nat_l i)) as la eqn:Hla.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| a]. {
     cbn in Ha.
@@ -4790,7 +4692,7 @@ destruct pa as [pa| pa]. {
   destruct (bool_dec _) as [H1az| H1az]; [ clear Ha | easy ].
   apply (rngl_eqb_eq Heb) in H1az.
   destruct i; [ easy | cbn in Hla ].
-  remember (lap (rngl_mul_nat_l i)) as lb eqn:Hlb'; symmetry in Hlb'.
+  remember (lap (rngl_of_nat i)) as lb eqn:Hlb'; symmetry in Hlb'.
   destruct lb. {
     cbn in Hla.
     rewrite if_bool_if_dec in Hla.
@@ -4809,7 +4711,7 @@ destruct pa as [pa| pa]. {
   specialize (IHi (Nat.neq_succ_0 _)).
 ...
   remember (S i) as si; cbn in Ha; subst si.
-  remember (lap (rngl_mul_nat_l (S i))) as la eqn:Hla.
+  remember (lap (rngl_of_nat (S i))) as la eqn:Hla.
   symmetry in Hla.
   destruct la as [| a]; [ now apply IHi | ].
   cbn in Ha; clear IHi.
@@ -4847,11 +4749,11 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   now specialize (H11 (S i)); cbn in H11.
 }
 ... ...
-now rewrite lap_rngl_mul_nat_l in Hi.
+now rewrite lap_rngl_of_nat in Hi.
 ...
 (**)
   cbn in Hi.
-  remember (lap (rngl_mul_nat_l i)) as la eqn:Hla; symmetry in Hla.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
   destruct la as [| a]. {
     cbn in Hi.
     rewrite if_bool_if_dec in Hi.
@@ -4870,7 +4772,7 @@ now rewrite lap_rngl_mul_nat_l in Hi.
     specialize (H1
 ...
   cbn - [ lap_norm ] in Hi.
-  remember (lap (rngl_mul_nat_l i)) as la eqn:Hla; symmetry in Hla.
+  remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
   destruct la as [| a]. {
     cbn in Hi.
     rewrite if_bool_if_dec in Hi.
@@ -4893,11 +4795,11 @@ eq_lap_add_0: ∀ la lb : list T, (la + lb)%lap = [] → la = [] ∧ lb = []
     now rewrite H10 in H1.
   }
   intros H; apply IHi; clear IHi.
-Search rngl_mul_nat_l.
+Search rngl_of_nat.
 ...
-rngl_mul_nat_l_inj:
+rngl_of_nat_inj:
   ∀ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T),
-    rngl_has_opp_or_sous = true → rngl_characteristic = 0 → ∀ i j : nat, rngl_mul_nat_l i = rngl_mul_nat_l j → i = j
+    rngl_has_opp_or_sous = true → rngl_characteristic = 0 → ∀ i j : nat, rngl_of_nat i = rngl_of_nat j → i = j
 ...
   intros i; cbn.
   induction i. {

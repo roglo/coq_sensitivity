@@ -27,16 +27,16 @@ Proof. now apply Z.eq_mul_0. Qed.
 Theorem Z_1_neq_0 : (1 ≠ 0)%Z.
 Proof. easy. Qed.
 
-Theorem Z_characteristic_prop : ∀ i, rngl_mul_nat_l (S i) 1 ≠ 0%Z.
+Theorem Z_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Z.
 Proof.
 intros.
 cbn - [ Z.add ].
-assert (Hz : ∀ i, (0 <= rngl_mul_nat_l i 1)%Z). {
+assert (Hz : ∀ i, (0 <= rngl_of_nat i)%Z). {
   clear i; intros.
   cbn - [ Z.add ].
   induction i; [ easy | ].
   cbn - [ Z.add ].
-  now destruct (rngl_mul_nat_l i).
+  now destruct (rngl_of_nat i).
 }
 intros H.
 specialize (Hz i).

@@ -22,16 +22,16 @@ Global Existing Instance Q_ring_like_op.
 Theorem Q_1_neq_0 : (1 ≠ 0)%Q.
 Proof. easy. Qed.
 
-Theorem Q_characteristic_prop : ∀ i, rngl_mul_nat_l (S i) 1 ≠ 0%Q.
+Theorem Q_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Q.
 Proof.
 intros.
 cbn - [ Q.add ].
-assert (Hz : ∀ i, (0 ≤ rngl_mul_nat_l i 1)%Q). {
+assert (Hz : ∀ i, (0 ≤ rngl_of_nat i)%Q). {
   clear i; intros.
   cbn - [ Q.add ].
   induction i; [ easy | ].
   cbn - [ Q.add ].
-  now destruct (rngl_mul_nat_l i).
+  now destruct (rngl_of_nat i).
 }
 intros H.
 specialize (Hz i).

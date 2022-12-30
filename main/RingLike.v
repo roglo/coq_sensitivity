@@ -189,19 +189,11 @@ Notation "- 1" := (rngl_opp rngl_one) : ring_like_scope.
 
 Inductive not_applicable := NA.
 
-Fixpoint rngl_mul_nat_l {T} {ro : ring_like_op T} n a :=
+Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
   match n with
   | 0 => 0%F
-  | S n' => (a + rngl_mul_nat_l n' a)%F
+  | S n' => (1 + rngl_of_nat n')%F
   end.
-
-Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
-  match n with
-  | O => 1%F
-  | S m => (a * rngl_power a m)%F
-  end.
-
-Arguments rngl_mul_nat_l {T ro} n%nat a%F.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
@@ -277,10 +269,10 @@ Class ring_like_prop T {ro : ring_like_op T} :=
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
-      if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_mul_nat_l (S i) 1 ≠ 0%F
+      if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%F
       else
-        (∀ i, 0 < i < rngl_characteristic → rngl_mul_nat_l i 1 ≠ 0%F) ∧
-        rngl_mul_nat_l rngl_characteristic 1 = 0%F;
+        (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
+        rngl_of_nat rngl_characteristic = 0%F;
     (* when ordered *)
     rngl_opt_le_refl :
       if rngl_is_ordered then ∀ a, (a ≤ a)%F else not_applicable;
@@ -310,9 +302,14 @@ Class ring_like_prop T {ro : ring_like_op T} :=
         ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
       else not_applicable }.
 
+Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
+  match n with
+  | O => 1%F
+  | S m => (a * rngl_power a m)%F
+  end.
+
 Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%F.
 
-Notation "n × a" := (rngl_mul_nat_l n a) (at level 40) : ring_like_scope.
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
 Section a.
@@ -1390,9 +1387,9 @@ rewrite rngl_add_assoc.
 apply rngl_add_add_swap.
 Qed.
 
-Theorem eq_rngl_mul_nat_l_0 :
+Theorem eq_rngl_of_nat_0 :
   rngl_characteristic = 0 →
-  ∀ i, (i × 1 = 0)%F → i = 0.
+  ∀ i, rngl_of_nat i = 0%F → i = 0.
 Proof.
 intros Hch * Hi.
 induction i; [ easy | exfalso ].
@@ -1402,23 +1399,23 @@ rewrite Hch in rngl_char_prop.
 now specialize (rngl_char_prop i) as H.
 Qed.
 
-Theorem rngl_mul_nat_l_inj :
+Theorem rngl_of_nat_inj :
   rngl_has_opp_or_sous = true →
   rngl_characteristic = 0 →
   ∀ i j,
-  rngl_mul_nat_l i 1 = rngl_mul_nat_l j 1
+  rngl_of_nat i = rngl_of_nat j
   → i = j.
 Proof.
 intros Hom Hch * Hij.
 revert i Hij.
 induction j; intros. {
   cbn in Hij.
-  now apply eq_rngl_mul_nat_l_0 in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
 }
 destruct i. {
   exfalso.
   symmetry in Hij.
-  now apply eq_rngl_mul_nat_l_0 in Hij.
+  now apply eq_rngl_of_nat_0 in Hij.
 }
 f_equal.
 cbn in Hij.
