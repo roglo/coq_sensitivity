@@ -1825,7 +1825,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ n μ,
   (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
 Proof.

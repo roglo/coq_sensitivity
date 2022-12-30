@@ -963,8 +963,7 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
   → (M = U * D * U⁻¹)%M.
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
-assert (H10 : rngl_has_1_neq_0 = true). {
-  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+assert (H10 : rngl_characteristic ≠ 1). {
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
 }
@@ -1060,7 +1059,7 @@ Qed.
 
 (* to be completed
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) D U eV x y ev,
   mat_nrows M = n
   → vect_size x = n

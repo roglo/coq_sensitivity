@@ -510,7 +510,7 @@ rewrite rngl_add_comm.
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_1_neq_0 : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%F.
+Theorem rngl_1_neq_0_iff : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%F.
 Proof.
 specialize rngl_characteristic_prop as H1.
 split. {
@@ -535,21 +535,6 @@ split. {
   intros H10 Hc.
   rewrite Hc in H1; cbn in H1.
   now rewrite rngl_add_0_r in H1.
-}
-Qed.
-
-Definition rngl_has_1_neq_0 := negb (Nat.eqb rngl_characteristic 1).
-
-Theorem rngl_1_neq_0_iff : rngl_has_1_neq_0 = true ↔ (1 ≠ 0)%F.
-Proof.
-unfold rngl_has_1_neq_0.
-split; intros H. {
-  apply rngl_1_neq_0.
-  now intros H1; rewrite H1 in H.
-} {
-  apply rngl_1_neq_0 in H.
-  destruct rngl_characteristic as [| n]; [ easy | ].
-  now destruct n.
 }
 Qed.
 
@@ -1158,7 +1143,7 @@ Qed.
 
 Theorem rngl_inv_1 :
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   (1⁻¹ = 1)%F.
 Proof.
 intros Hin H10.
@@ -1185,7 +1170,7 @@ Qed.
 
 Theorem rngl_div_1_r :
   rngl_has_inv_or_quot = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ a, (a / 1 = a)%F.
 Proof.
 intros Hid H10 *.
@@ -1230,7 +1215,7 @@ Qed.
 Theorem rngl_inv_neq_0 :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ a, a ≠ 0%F → (a⁻¹ ≠ 0)%F.
 Proof.
 intros Hom Hin H10 * Haz H1.
@@ -1244,7 +1229,7 @@ Qed.
 Theorem rngl_inv_involutive :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ x, x ≠ 0%F → (x⁻¹⁻¹)%F = x.
 Proof.
 intros Hos Hin H10 * Hxz.
@@ -1306,7 +1291,7 @@ Qed.
 Theorem rngl_inv_inj :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ a b, a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
 Proof.
 intros Hom Hin H10 * Haz Hbz H.
@@ -1458,7 +1443,7 @@ Qed.
 Theorem rngl_opp_inv :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_characteristic ≠ 1 →
   ∀ a, a ≠ 0%F → (- a⁻¹ = (- a)⁻¹)%F.
 Proof.
 intros Hop Hin H10 * Haz.
