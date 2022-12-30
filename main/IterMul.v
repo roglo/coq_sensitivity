@@ -256,13 +256,17 @@ Qed.
 Theorem rngl_product_list_integral :
   rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   ∀ A (l : list A) f,
   (∏ (i ∈ l), f i)%F = 0%F
   → ∃ i, i ∈ l ∧ f i = 0%F.
 Proof.
 intros Hom Hin H10 * Hz.
-induction l as [| a]; [ now apply rngl_1_neq_0 in Hz | ].
+induction l as [| a]. {
+  apply rngl_1_neq_0 in Hz; [ easy | ].
+  apply rngl_1_neq_0.
+  now apply rngl_1_neq_0_iff.
+}
 unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
 rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
@@ -286,7 +290,7 @@ Qed.
 Theorem rngl_product_integral :
   rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   ∀ b e f,
   (∏ (i = b, e), f i = 0)%F
   → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
@@ -336,7 +340,7 @@ Qed.
 Theorem rngl_inv_product_list :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   rngl_is_integral = true →
   ∀ A (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
@@ -374,7 +378,7 @@ Qed.
 Theorem rngl_inv_product :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   rngl_is_integral = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
@@ -427,7 +431,7 @@ Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   rngl_has_opp_or_sous = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   rngl_is_integral = true →
   ∀ (l : list A) f,
   (∀ i, i ∈ l → f i ≠ 0%F)
@@ -443,7 +447,7 @@ Theorem rngl_inv_product_comm :
   rngl_has_opp_or_sous = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   rngl_is_integral = true →
   ∀ b e f,
   (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
@@ -460,7 +464,7 @@ Theorem rngl_product_div_distr :
   rngl_has_opp_or_sous = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0 = true →
+  rngl_has_1_neq_0' = true →
   rngl_is_integral = true →
   ∀ b e f g,
   (∀ i, b ≤ i ≤ e → g i ≠ 0%F)

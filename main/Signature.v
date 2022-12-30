@@ -379,7 +379,9 @@ apply rngl_mul_cancel_r with (c := (b⁻¹)%F); [ easy | | ]. {
   rewrite fold_rngl_div in Hbiz; [ | easy ].
   rewrite rngl_div_diag in Hbiz; [ | easy | easy ].
   rewrite rngl_mul_0_r in Hbiz; [ | easy ].
-  now apply rngl_1_neq_0 in Hbiz.
+  apply rngl_1_neq_0 in Hbiz; [ easy | ].
+  unfold rngl_has_1_neq_0 in H10.
+  now intros H1; rewrite H1 in H10.
 }
 remember (_ * _)%F as c.
 rewrite fold_rngl_div; [ | easy ].
@@ -580,7 +582,10 @@ destruct (lt_dec (nth i σ 0) (nth j σ 0)) as [H1| H1]. {
       apply Hfijnz; [ easy | easy | flia H3 ].
     }
     rewrite rngl_mul_1_l.
-    apply rngl_div_diag; [ easy | now apply rngl_1_neq_0 ].
+    apply rngl_div_diag; [ easy | ].
+    apply rngl_1_neq_0.
+    unfold rngl_has_1_neq_0 in H10.
+    now intros H; rewrite H in H10.
   }
   destruct (lt_dec j i) as [H4| H4]. {
     rewrite Hfij.
@@ -695,7 +700,11 @@ intros Hom Hic Hid Hin H10 Heq * (Hp, Hn) Hfij Hfijnz.
 apply rngl_product_product_div_eq_1; try easy. {
   intros i j Hi Hj.
   rewrite if_ltb_lt_dec.
-  destruct (lt_dec i j) as [Hij| Hij]; [ | now apply rngl_1_neq_0 ].
+  destruct (lt_dec i j) as [Hij| Hij]. 2: {
+    apply rngl_1_neq_0.
+    unfold rngl_has_1_neq_0 in H10.
+    now intros H; rewrite H in H10.
+  }
   apply Hfijnz; [ easy | easy | flia Hij ].
 }
 now apply product_product_if_permut_div.
@@ -882,6 +891,12 @@ rewrite <- rngl_product_div_distr; try easy. 2: {
   cbn.
   destruct (Nat.eq_dec i (length p - 1)) as [Hein| Hein]. {
     subst i.
+    rewrite rngl_product_empty; [ | flia ].
+    apply rngl_1_neq_0.
+...
+    apply rngl_has_1_neq_0_if.
+
+    unfold rngl_has_1_neq_0 in H10.
     rewrite rngl_product_empty; [ now apply rngl_1_neq_0 | flia ].
   }
   rewrite (rngl_product_shift (i + 1)); [ | flia Hi Hein ].
