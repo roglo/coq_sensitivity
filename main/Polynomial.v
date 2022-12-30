@@ -4411,28 +4411,71 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   now rewrite lap_polyn_rngl_of_nat in Hi.
 } {
   destruct H1 as (Hbef, Hch).
-  assert
-    (Hbeg :
-     let rop := polyn_ring_like_op in
-     ∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F). {
-    intros rop i Hi; cbn.
+  split. {
+    intros i Hi; cbn.
     specialize (Hbef _ Hi) as H1.
     intros H; apply H1; clear H1; rename H into H1.
     generalize H1; intros H2.
     apply (f_equal lap) in H2; cbn in H2.
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
-  split; [ easy | ].
   apply eq_polyn_eq; cbn.
-specialize (Hbef 1) as H1.
-specialize (Hbeg 1) as H2.
-assert (H : 0 < 1 < rngl_characteristic) by flia Hcz Hc1.
-specialize (H1 H).
-specialize (H2 H).
-clear H.
-cbn in H1, H2.
-rewrite rngl_add_0_r in H1.
-rewrite polyn_add_0_r in H2.
+(**)
+  specialize (Hbef 1) as H1.
+  assert (H : 0 < 1 < rngl_characteristic) by flia Hcz Hc1.
+  specialize (H1 H); clear H.
+  cbn in H1.
+  rewrite rngl_add_0_r in H1.
+  apply (rngl_eqb_neq Heb) in H1.
+  destruct (Nat.eq_dec rngl_characteristic 2) as [Hc2| Hc2]. {
+    rewrite Hc2; cbn.
+    rewrite H1; cbn.
+    rewrite Hc2 in Hch; cbn in Hch.
+    rewrite rngl_add_0_r in Hch.
+    apply (rngl_eqb_eq Heb) in Hch.
+    now rewrite Hch.
+  }
+  move Hc2 after Hc1.
+  specialize (Hbef 2) as H2.
+  assert (H : 0 < 2 < rngl_characteristic) by flia Hcz Hc1 Hc2.
+  specialize (H2 H); clear H.
+  cbn in H2.
+  rewrite rngl_add_0_r in H2.
+  apply (rngl_eqb_neq Heb) in H2.
+  destruct (Nat.eq_dec rngl_characteristic 3) as [Hc3| Hc3]. {
+    rewrite Hc3; cbn.
+    rewrite H1; cbn.
+    rewrite H2; cbn.
+    rewrite Hc3 in Hch; cbn in Hch.
+    rewrite rngl_add_0_r in Hch.
+    apply (rngl_eqb_eq Heb) in Hch.
+    now rewrite Hch.
+  }
+  move Hc3 after Hc2.
+  specialize (Hbef 3) as H3.
+  assert (H : 0 < 3 < rngl_characteristic) by flia Hcz Hc1 Hc2 Hc3.
+  specialize (H3 H); clear H.
+  cbn in H3.
+  rewrite rngl_add_0_r in H3.
+  apply (rngl_eqb_neq Heb) in H3.
+  destruct (Nat.eq_dec rngl_characteristic 4) as [Hc4| Hc4]. {
+    rewrite Hc4; cbn.
+    rewrite H1; cbn.
+    rewrite H2; cbn.
+    rewrite H3; cbn.
+    rewrite Hc4 in Hch; cbn in Hch.
+    rewrite rngl_add_0_r in Hch.
+    apply (rngl_eqb_eq Heb) in Hch.
+    now rewrite Hch.
+  }
+  move Hc4 after Hc3.
+  specialize (Hbef 4) as H4.
+  assert (H : 0 < 4 < rngl_characteristic) by flia Hcz Hc1 Hc2 Hc3 Hc4.
+  specialize (H4 H); clear H.
+  cbn in H4.
+  rewrite rngl_add_0_r in H4.
+  apply (rngl_eqb_neq Heb) in H4.
+  destruct (Nat.eq_dec rngl_characteristic 5) as [Hc5| Hc5]. {
 ...
   destruct rngl_characteristic as [| i]; [ easy | clear Hcz ].
   cbn in Hch |-*.
