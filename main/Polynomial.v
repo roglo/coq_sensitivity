@@ -38,7 +38,7 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
-Context (H10 : rngl_characteristic ≠ 1).
+Context (Hc1 : rngl_characteristic ≠ 1).
 
 Definition lap_eqb (eqb : T → _) (P Q : list T) :=
   list_eqv eqb P Q.
@@ -2500,7 +2500,7 @@ Qed.
 Theorem polyn_1_neq_0 :
   if rngl_has_1_neq_0 then 1%pol ≠ 0%pol else not_applicable.
 Proof.
-rewrite H10.
+rewrite Hc1.
 now intros H; apply eq_polyn_eq in H.
 Qed.
 *)
@@ -4328,7 +4328,7 @@ Theorem lap_polyn_rngl_of_nat_2 :
   → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi.
-specialize (proj1 rngl_1_neq_0_iff H10) as H11.
+specialize (proj1 rngl_1_neq_0_iff Hc1) as H11.
 specialize rngl_characteristic_prop as Hch.
 rewrite if_bool_if_dec in Hch.
 destruct (bool_dec _) as [Hchz| Hchz]. {
@@ -4424,10 +4424,19 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   split; [ easy | ].
   apply eq_polyn_eq; cbn.
+specialize (Hbef 1) as H1.
+specialize (Hbeg 1) as H2.
+assert (H : 0 < 1 < rngl_characteristic) by flia Hcz Hc1.
+specialize (H1 H).
+specialize (H2 H).
+clear H.
+cbn in H1, H2.
+rewrite rngl_add_0_r in H1.
+rewrite polyn_add_0_r in H2.
 ...
   destruct rngl_characteristic as [| i]; [ easy | clear Hcz ].
   cbn in Hch |-*.
-  specialize (rngl_1_neq_0 H10) as H11.
+  specialize (rngl_1_neq_0 Hc1) as H11.
   remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
   destruct la as [| a]. {
     exfalso.
@@ -4454,7 +4463,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
       clear Hla.
       apply (rngl_eqb_eq Heb) in Hbz.
 ...
-  specialize (rngl_1_neq_0 H10) as H11.
+  specialize (rngl_1_neq_0 Hc1) as H11.
   cbn in Hch |-*.
   destruct i; [ now cbn in Hch; rewrite rngl_add_0_r in Hch | ].
 ...
@@ -4470,7 +4479,7 @@ Search (lap (rngl_of_nat _)).
 Set Printing Implicit.
 
   induction rngl_characteristic as [| i]; [ easy | clear Hcz ].
-  specialize (rngl_1_neq_0 H10) as H11.
+  specialize (rngl_1_neq_0 Hc1) as H11.
   cbn in Hch |-*.
   destruct i; [ now cbn in Hch; rewrite rngl_add_0_r in Hch | ].
   cbn in Hch |-*.
@@ -4489,7 +4498,7 @@ Set Printing Implicit.
       rewrite if_bool_if_dec in H2.
       destruct (bool_dec _) as [H11| H11]; [ | easy ].
       apply (rngl_eqb_eq Heb) in H11.
-      now specialize (rngl_1_neq_0 H10) as H12.
+      now specialize (rngl_1_neq_0 Hc1) as H12.
     }
 Inspect 1.
 ...
@@ -4513,7 +4522,7 @@ destruct lc as [| c]. {
   rewrite if_bool_if_dec in Hla.
   destruct (bool_dec _) as [H11| H11]. {
     apply (rngl_eqb_eq Heb) in H11.
-    now specialize (rngl_1_neq_0 H10) as H12.
+    now specialize (rngl_1_neq_0 Hc1) as H12.
   }
   cbn in Hla; injection Hla; clear Hla; intros; subst a la.
   specialize (Hbef 2).
@@ -4542,7 +4551,7 @@ Search (lap (rngl_of_nat _)).
 Set Printing All.
 ...
     apply (rngl_eqb_neq Heb) in H11.
-      now specialize (rngl_1_neq_0 H10) as H12.
+      now specialize (rngl_1_neq_0 Hc1) as H12.
     }
 ...
 Check lap_rngl_of_nat.
@@ -4621,7 +4630,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     rewrite if_bool_if_dec in Hi.
     destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
     apply (rngl_eqb_eq Heb) in H1az.
-    now apply (rngl_1_neq_0 H10) in H1az.
+    now apply (rngl_1_neq_0 Hc1) in H1az.
   }
   cbn in Hi.
   rewrite strip_0s_app in Hi.
@@ -4683,7 +4692,7 @@ destruct pa as [pa| pa]. {
     rewrite if_bool_if_dec in Ha.
     destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
     apply (rngl_eqb_eq Heb) in H1az.
-    now apply (rngl_1_neq_0 H10) in H1az.
+    now apply (rngl_1_neq_0 Hc1) in H1az.
   }
   cbn in Ha.
   rewrite strip_0s_app in Ha.
@@ -4707,7 +4716,7 @@ destruct pa as [pa| pa]. {
     cbn in Ha; rewrite if_bool_if_dec in Ha.
     destruct (bool_dec _) as [H1az| H1az]; [ | easy ].
     apply (rngl_eqb_eq Heb) in H1az.
-    now apply (rngl_1_neq_0 H10) in H1az.
+    now apply (rngl_1_neq_0 Hc1) in H1az.
   }
   specialize (IHi (Nat.neq_succ_0 _)).
 ...
@@ -4725,7 +4734,7 @@ destruct pa as [pa| pa]. {
     apply (rngl_eqb_eq Heb) in H1az.
     cbn in Hla.
 ...
-    now apply (rngl_1_neq_0 H10) in H1az.
+    now apply (rngl_1_neq_0 Hc1) in H1az.
 ...
 induction i; [ easy | clear Hiz ].
 cbn.
@@ -4733,7 +4742,7 @@ destruct i. {
   cbn; rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H1az| H1az]. {
     apply (rngl_eqb_eq Heb) in H1az.
-    now apply (rngl_1_neq_0 H10) in H1az.
+    now apply (rngl_1_neq_0 Hc1) in H1az.
   }
   now rewrite rngl_add_0_r.
 }
@@ -4793,7 +4802,7 @@ eq_lap_add_0: ∀ la lb : list T, (la + lb)%lap = [] → la = [] ∧ lb = []
     cbn.
     rewrite polyn_add_0_r.
     specialize polyn_1_neq_0 as H1.
-    now rewrite H10 in H1.
+    now rewrite Hc1 in H1.
   }
   intros H; apply IHi; clear IHi.
 Search rngl_of_nat.
@@ -4806,7 +4815,7 @@ rngl_of_nat_inj:
   induction i. {
     rewrite polyn_add_0_r.
     specialize polyn_1_neq_0 as H1.
-    now rewrite H10 in H1.
+    now rewrite Hc1 in H1.
   }
   cbn.
   intros H; apply IHi; clear IHi.
@@ -4820,7 +4829,7 @@ Check rngl_add_sub_eq_l.
   induction i. {
     rewrite polyn_add_0_r.
     specialize polyn_1_neq_0 as H1.
-    now rewrite H10 in H1.
+    now rewrite Hc1 in H1.
   }
   cbn.
   intros H; apply IHi; clear IHi.
@@ -4880,9 +4889,9 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
 
 End a.
 
-Arguments polyn_ring_like_op T%type {ro rp Heb H10 Hop Hiv}.
+Arguments polyn_ring_like_op T%type {ro rp Heb Hc1 Hop Hiv}.
 Arguments lap_mul {T ro} (la lb)%list.
-Arguments polyn_norm_prop {T ro rp} {Heb H10 la}.
+Arguments polyn_norm_prop {T ro rp} {Heb Hc1 la}.
 
 (*
 Declare Scope lap_scope.
