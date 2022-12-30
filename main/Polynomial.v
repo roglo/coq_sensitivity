@@ -4421,7 +4421,6 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
 (**)
-cbn.
   induction rngl_characteristic as (n, IHn) using lt_wf_rec.
 ...
   specialize (Hbef 1) as H1.
