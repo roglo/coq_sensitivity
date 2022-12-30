@@ -1847,7 +1847,7 @@ split. {
     split. {
       intros H.
       injection H; clear H; intros H.
-      now revert H; apply rngl_1_neq_0.
+      now apply rngl_1_neq_0_iff in H.
     }
     specialize An_eigen_equation_for_sqrt_n as H1.
     specialize (H1 Hic Hop Hin Heq).
@@ -1931,7 +1931,7 @@ split. {
     now apply rngl_mul_0_r.
   }
   rewrite rngl_add_0_r in H2.
-  now specialize (rngl_1_neq_0 H10) as H3.
+  now apply rngl_1_neq_0_iff in H2.
 }
 Qed.
 

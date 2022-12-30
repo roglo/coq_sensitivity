@@ -410,31 +410,6 @@ apply mat_mul_add_distr_l. {
 }
 Qed.
 
-Theorem squ_mat_opt_1_neq_0 {n} :
-  if rngl_has_1_neq_0 && (n ≠? 0) then
-    @rngl_one _ (mat_ring_like_op n) ≠
-    @rngl_zero _ (mat_ring_like_op n)
-  else not_applicable.
-(*
-  if rngl_has_1_neq_0 && negb (n =? 0) then 1%F ≠ 0%F else not_applicable.
-*)
-Proof.
-remember (rngl_has_1_neq_0 && (n ≠? 0)) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Bool.andb_true_iff in Hb.
-destruct Hb as (H10, Hb).
-apply Bool.negb_true_iff in Hb.
-apply Nat.eqb_neq in Hb.
-intros H; cbn in H.
-unfold smI, smZ in H.
-injection H; clear H; intros H.
-destruct n; [ easy | ].
-cbn in H.
-injection H; intros H1 H2.
-now apply rngl_1_neq_0.
-Qed.
-
 Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
 Proof.
 intros.
@@ -704,7 +679,6 @@ Definition mat_ring_like_prop (n : nat) :
   {| rngl_mul_is_comm := false;
      rngl_has_eqb := false; (* rngl_has_eqb to be completed *)
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := rngl_has_1_neq_0 && (n ≠? 0);
      rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
@@ -714,7 +688,6 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_mul_assoc := squ_mat_mul_assoc;
      rngl_mul_1_l := squ_mat_mul_1_l;
      rngl_mul_add_distr_l := squ_mat_mul_add_distr_l;
-     rngl_opt_1_neq_0 := squ_mat_opt_1_neq_0;
      rngl_opt_mul_comm := NA;
      rngl_opt_mul_1_r := squ_mat_mul_1_r;
      rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r;

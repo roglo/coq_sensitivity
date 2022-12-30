@@ -380,7 +380,7 @@ Theorem det_is_det' :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0' = true →
+  rngl_has_1_neq_0 = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
   → det M = det' M.
@@ -701,7 +701,7 @@ Theorem det_is_det'' :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0' = true →
+  rngl_has_1_neq_0 = true →
   rngl_has_eqb = true →
   ∀ (M : matrix T),
   is_square_matrix M = true
@@ -718,7 +718,7 @@ Theorem determinant_multilinear :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_has_1_neq_0' = true →
+  rngl_has_1_neq_0 = true →
   ∀ n (M : matrix T) i a b U V,
   is_square_matrix M = true
   → mat_nrows M = n
@@ -1145,7 +1145,7 @@ Theorem determinant_alternating : in_charac_0_field →
   → det (mat_swap_rows p q M) = (- det M)%F.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
-assert (H10 : rngl_has_1_neq_0' = true). {
+assert (H10 : rngl_has_1_neq_0 = true). {
   apply rngl_1_neq_0_iff, rngl_1_neq_0.
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
@@ -1510,7 +1510,7 @@ Theorem determinant_same_rows : in_charac_0_field →
   → det M = 0%F.
 Proof.
 intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
-assert (H10 : rngl_has_1_neq_0' = true). {
+assert (H10 : rngl_has_1_neq_0 = true). {
   apply rngl_1_neq_0_iff, rngl_1_neq_0.
   now rewrite Hch.
 }
@@ -1767,7 +1767,7 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
         ε (nth k sg []) * ∏ (i = 1, n), mat_el M i ((nth k sg []).(i) + 1).
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
-assert (H10 : rngl_has_1_neq_0' = true). {
+assert (H10 : rngl_has_1_neq_0 = true). {
   apply rngl_1_neq_0_iff, rngl_1_neq_0.
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.

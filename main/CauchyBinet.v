@@ -730,6 +730,11 @@ Theorem det_isort_rows_no_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
+assert (H10 : rngl_has_1_neq_0 = true). {
+  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+  destruct Hif as (_ & _ & _ & _ & _ & H1).
+  now rewrite H1.
+}
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
@@ -1540,6 +1545,11 @@ Lemma Cauchy_Binet_formula_step_1 : in_charac_0_field →
         ε l * ∏ (i = 1, m), (∑ (k = 1, n), mat_el A i k * mat_el B k l.(i)).
 Proof.
 intros Hif * Hmz Har Hac Hbc.
+assert (H10 : rngl_has_1_neq_0 = true). {
+  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+  destruct Hif as (_ & _ & _ & _ & _ & H1).
+  now rewrite H1.
+}
 assert (Hab : is_square_matrix (A * B) = true). {
   apply is_scm_mat_iff.
   split. {
@@ -1712,6 +1722,11 @@ Lemma Cauchy_Binet_formula_step_3 : in_charac_0_field →
       f kl * det (mat_select_rows kl B).
 Proof.
 intros Hif * Hmz Hcb Hbr Hbc.
+assert (H10 : rngl_has_1_neq_0 = true). {
+  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+  destruct Hif as (_ & _ & _ & _ & _ & H1).
+  now rewrite H1.
+}
 apply rngl_summation_list_eq_compat.
 intros l Hl.
 f_equal.
@@ -2024,6 +2039,11 @@ Lemma Cauchy_Binet_formula_step_5_4 : in_charac_0_field →
       det (mat_select_cols jl A) * f jl.
 Proof.
 intros Hif * Hmz Hnz Hca Har Hac.
+assert (H10 : rngl_has_1_neq_0 = true). {
+  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+  destruct Hif as (_ & _ & _ & _ & _ & H1).
+  now rewrite H1.
+}
 apply rngl_summation_list_eq_compat.
 intros jl Hjl.
 f_equal.

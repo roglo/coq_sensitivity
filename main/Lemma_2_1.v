@@ -963,6 +963,11 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
   → (M = U * D * U⁻¹)%M.
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
+assert (H10 : rngl_has_1_neq_0 = true). {
+  apply rngl_1_neq_0_iff, rngl_1_neq_0.
+  destruct Hif as (_ & _ & _ & _ & _ & H1).
+  now rewrite H1.
+}
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
@@ -1010,7 +1015,7 @@ assert (Hdu : det U ≠ 0%F). {
   intros H; rewrite H in Huu.
   rewrite rngl_mul_0_r in Huu; [ | easy ].
   symmetry in Huu; revert Huu.
-  apply rngl_1_neq_0; now destruct Hif.
+  now apply rngl_1_neq_0_iff.
 }
 rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   rewrite <- H1v.

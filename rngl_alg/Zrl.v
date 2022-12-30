@@ -24,9 +24,6 @@ Global Existing Instance Z_ring_like_op.
 Theorem Z_eq_mul_0 :  ∀ n m, (n * m)%Z = 0%Z → n = 0%Z ∨ m = 0%Z.
 Proof. now apply Z.eq_mul_0. Qed.
 
-Theorem Z_1_neq_0 : (1 ≠ 0)%Z.
-Proof. easy. Qed.
-
 Theorem Z_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Z.
 Proof.
 intros.
@@ -74,7 +71,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := true;
-     rngl_has_1_neq_0 := true;
      rngl_is_ordered := true;
      rngl_is_integral := true;
      rngl_characteristic := 0;
@@ -84,7 +80,6 @@ Definition Z_ring_like_prop : ring_like_prop Z :=
      rngl_mul_assoc := Z.mul_assoc;
      rngl_mul_1_l := Z.mul_1_l;
      rngl_mul_add_distr_l := Z.mul_add_distr_l;
-     rngl_opt_1_neq_0 := Z_1_neq_0;
      rngl_opt_mul_comm := Z.mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;

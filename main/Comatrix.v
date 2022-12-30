@@ -522,7 +522,7 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   → det (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M') (seq 0 i) M) =
     (minus_one_pow i * det M)%F.
 Proof.
-intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hin Hsm.
+intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hin Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 revert M Hsm Hr.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
@@ -655,7 +655,7 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   → det (subm 1 j (mat_swap_rows 1 i M)) =
     (minus_one_pow i * det (subm i j M))%F.
 Proof.
-intros (Hic & Hop & Hiv & H10 & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
+intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ. 2: {
   split; [ flia Hiz | easy ].
 }
@@ -701,7 +701,7 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   cbn - [ butn ].
   apply rngl_summation_eq_compat.
   intros j Hj.
-  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch).
+  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
@@ -722,7 +722,7 @@ rewrite Nat_sub_succ_1.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  destruct Hif as (Hic & Hop & Hin & H10 & Hit & Hde & Hch) in Hj.
+  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch) in Hj.
   cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hlin ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].

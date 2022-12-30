@@ -249,9 +249,6 @@ unfold "*"%QI, "+"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_neq_1_0 : 1%F ≠ 0%F.
-Proof. easy. Qed.
-
 Theorem quad_int_mul_comm : ∀ a b : quad_int d, (a * b)%QI = (b * a)%QI.
 Proof.
 intros; cbn.
@@ -1102,7 +1099,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := false; (* to be improved, perhaps *)
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := true;
      rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := 0;
@@ -1112,7 +1108,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
      rngl_mul_assoc := @quad_int_mul_assoc d;
      rngl_mul_1_l := @quad_int_mul_1_l d;
      rngl_mul_add_distr_l := @quad_int_mul_add_distr_l d;
-     rngl_opt_1_neq_0 := @quad_int_neq_1_0 d;
      rngl_opt_mul_comm := @quad_int_mul_comm d;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;

@@ -201,25 +201,6 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
-Theorem Zn_neq_1_0 :
-  if 1 <? n then (1 ≠ 0)%F else not_applicable.
-Proof.
-intros.
-remember (1 <? n) as b eqn:Hb.
-symmetry in Hb.
-destruct b; [ | easy ].
-apply Nat.ltb_lt in Hb.
-apply Zn_neq; cbn - [ "mod" ].
-rewrite Nat.mod_small. 2: {
-  apply -> Nat.succ_lt_mono.
-  flia Hb.
-}
-rewrite Nat.mod_small. 2: {
-  apply Nat.lt_0_succ.
-}
-easy.
-Qed.
-
 Theorem Zn_mul_comm : ∀ (a b : Zn n), (a * b = b * a)%F.
 Proof.
 intros (a, Ha) (b, Hb).
@@ -391,7 +372,6 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := 1 <? n;
      rngl_is_ordered := false; (* well, it is, but not transitive *)
      rngl_is_integral := false;
      rngl_characteristic := at_least_1 n;
@@ -401,7 +381,6 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
      rngl_mul_assoc := Zn_mul_assoc;
      rngl_mul_1_l := Zn_mul_1_l;
      rngl_mul_add_distr_l := Zn_mul_add_distr_l;
-     rngl_opt_1_neq_0 := Zn_neq_1_0;
      rngl_opt_mul_comm := Zn_mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
@@ -482,7 +461,6 @@ Definition lcm_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
-     rngl_has_1_neq_0 := false;
      rngl_is_ordered := false;
      rngl_is_integral := true;
      rngl_characteristic := 1;
@@ -492,7 +470,6 @@ Definition lcm_ring_like_prop :=
      rngl_mul_assoc := Nat.mul_assoc;
      rngl_mul_1_l := Nat.mul_1_l;
      rngl_mul_add_distr_l := lcm_mul_add_distr_l;
-     rngl_opt_1_neq_0 := NA;
      rngl_opt_mul_comm := Nat.mul_comm;
      rngl_opt_mul_1_r := NA;
      rngl_opt_mul_add_distr_r := NA;
