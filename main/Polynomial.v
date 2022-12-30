@@ -4412,14 +4412,18 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   now rewrite lap_polyn_rngl_mul_nat_l in Hi.
 } {
   destruct H1 as (Hbef, Hch).
-  split. {
-    intros i Hi; cbn.
+  assert (Hbeg :
+    let rop := polyn_ring_like_op in
+    ∀ i : nat, 0 < i < rngl_characteristic → (i × 1)%F ≠ 0%F). {
+    intros rop i Hi; cbn.
     specialize (Hbef _ Hi) as H1.
     intros H; apply H1; clear H1; rename H into H1.
     generalize H1; intros H2.
     apply (f_equal lap) in H2; cbn in H2.
     now rewrite lap_polyn_rngl_mul_nat_l_2 in H2.
   }
+  move Hbeg before Hbef.
+  split; [ easy | ].
   apply eq_polyn_eq; cbn.
 ...
   remember (rngl_mul_nat_l rngl_characteristic) as p eqn:Hp in |-*.
