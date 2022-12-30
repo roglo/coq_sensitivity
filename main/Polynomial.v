@@ -37,8 +37,8 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
-Context (H10 : rngl_has_1_neq_0 = true).
 Context {Hos : rngl_has_opp_or_sous = true}.
+Context (H10 : rngl_characteristic ≠ 1).
 
 Definition lap_eqb (eqb : T → _) (P Q : list T) :=
   list_eqv eqb P Q.
@@ -92,7 +92,7 @@ Proof.
 unfold lap_one.
 unfold has_polyn_prop; cbn.
 apply (rngl_neqb_neq Heb).
-now apply rngl_1_neq_0.
+now apply rngl_1_neq_0_iff.
 Qed.
 
 Definition polyn_zero := mk_polyn [] eq_refl.
@@ -2267,7 +2267,7 @@ destruct la as [| a]; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 do 2 rewrite Nat.sub_0_r.
 rewrite map_length.
-remember 0 as i; clear Heqi.
+remember 0 as i in |-*; clear Heqi.
 remember (length la + S (length lb)) as len; clear Heqlen.
 revert i.
 induction len; intros; [ easy | cbn ].
@@ -2297,7 +2297,7 @@ destruct la as [| a]; [ easy | cbn ].
 destruct lb as [| b]; [ easy | cbn ].
 do 2 rewrite Nat.sub_0_r.
 rewrite map_length.
-remember 0 as i; clear Heqi.
+remember 0 as i in |-*; clear Heqi.
 remember (length la + S (length lb)) as len; clear Heqlen.
 revert i.
 induction len; intros; [ easy | cbn ].
@@ -2495,7 +2495,7 @@ f_equal.
 apply (lap_mul_sub_distr_r Hop).
 Qed.
 
-(* 1 is not 0 *)
+(* 1 is not 0
 
 Theorem polyn_1_neq_0 :
   if rngl_has_1_neq_0 then 1%pol ≠ 0%pol else not_applicable.
@@ -2503,6 +2503,7 @@ Proof.
 rewrite H10.
 now intros H; apply eq_polyn_eq in H.
 Qed.
+*)
 
 (* optional multiplication commutativity *)
 
@@ -4309,7 +4310,7 @@ destruct i. {
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H11| H11]; [ | easy ].
   apply (rngl_eqb_eq Heb) in H11.
-  now apply rngl_1_neq_0 in H11.
+  now apply rngl_1_neq_0_iff in H11.
 }
 rewrite IHi; [ cbn | easy ].
 rewrite if_bool_if_dec.
@@ -4327,7 +4328,7 @@ Theorem lap_polyn_rngl_of_nat_2 :
   → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi.
-specialize (rngl_1_neq_0 H10) as H11.
+specialize (proj1 rngl_1_neq_0_iff H10) as H11.
 specialize rngl_characteristic_prop as Hch.
 rewrite if_bool_if_dec in Hch.
 destruct (bool_dec _) as [Hchz| Hchz]. {
