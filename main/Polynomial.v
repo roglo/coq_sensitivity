@@ -4450,6 +4450,10 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
 }
 Qed.
 
+Theorem polyn_opt_le_refl :
+  if rngl_is_ordered then ∀ a : polyn T, (a ≤ a)%F else not_applicable.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
@@ -4479,7 +4483,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_le_dec := polyn_opt_le_dec;
      rngl_opt_integral := polyn_opt_integral;
      rngl_characteristic_prop := polyn_characteristic_prop;
-     rngl_opt_le_refl := 5;
+     rngl_opt_le_refl := polyn_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
      rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
