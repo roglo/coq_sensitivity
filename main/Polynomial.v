@@ -4297,7 +4297,7 @@ destruct i; [ now cbn; rewrite rngl_add_0_r | ].
 now rewrite IHi.
 Qed.
 
-Theorem lap_polyn_rngl_of_nat :
+Theorem lap_polyn_rngl_of_nat_char_0 :
   let _ := polyn_ring_like_op in
   rngl_characteristic = 0
   → ∀ i, i ≠ 0 → lap (rngl_of_nat i) = [rngl_of_nat i].
@@ -4408,7 +4408,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   specialize (H1 i) as H.
   intros Hi; apply H; clear H.
   apply (f_equal lap) in Hi.
-  now rewrite lap_polyn_rngl_of_nat in Hi.
+  now rewrite lap_polyn_rngl_of_nat_char_0 in Hi.
 } {
   destruct H1 as (Hbef, Hch).
   split. {
@@ -4421,6 +4421,18 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
 (**)
+Theorem lap_polyn_rngl_of_nat :
+  let rop := polyn_ring_like_op in
+  let lop := lap_ring_like_op in
+  ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn; cbn.
+do 2 rewrite fold_lap_norm.
+... ...
+rewrite lap_polyn_rngl_of_nat.
+...
   induction rngl_characteristic as (n, IHn) using lt_wf_rec.
 ...
   specialize (Hbef 1) as H1.
