@@ -4393,6 +4393,35 @@ specialize (IHi H); clear H.
 now injection IHi; clear IHi; intros; subst a la.
 Qed.
 
+Theorem lap_polyn_rngl_of_nat :
+  let rop := polyn_ring_like_op in
+  let lop := lap_ring_like_op in
+  ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
+Proof.
+intros.
+induction n; [ easy | cbn ].
+rewrite IHn; cbn.
+do 2 rewrite fold_lap_norm.
+remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
+destruct la as [| a]; [ easy | cbn ].
+do 2 rewrite strip_0s_app.
+cbn.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]. {
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]; [ cbn | easy ].
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  now rewrite rngl_add_0_r.
+}
+cbn; rewrite rev_app_distr; cbn.
+rewrite rev_app_distr; cbn.
+rewrite rev_involutive.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
+apply (rngl_eqb_eq Heb) in Hbz; subst b.
+now apply eq_strip_0s_cons in Hlb.
+Qed.
+
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
@@ -4420,18 +4449,35 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
   apply eq_polyn_eq; cbn.
-(**)
-Theorem lap_polyn_rngl_of_nat :
-  let rop := polyn_ring_like_op in
-  let lop := lap_ring_like_op in
-  ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
-Proof.
-intros.
-induction n; [ easy | cbn ].
-rewrite IHn; cbn.
-do 2 rewrite fold_lap_norm.
-... ...
-rewrite lap_polyn_rngl_of_nat.
+  rewrite lap_polyn_rngl_of_nat.
+  destruct rngl_characteristic as [| n]; [ easy | clear Hcz; cbn ].
+  destruct n; [ easy | clear Hc1; cbn ].
+  cbn in Hch.
+  destruct n. {
+    cbn in Hch |-*.
+    rewrite rngl_add_0_r in Hch.
+    now apply (rngl_eqb_eq Heb) in Hch; rewrite Hch.
+  }
+  destruct n. {
+    cbn in Hch |-*.
+    rewrite rngl_add_0_r in Hch.
+    now apply (rngl_eqb_eq Heb) in Hch; rewrite Hch.
+  }
+  destruct n. {
+    cbn in Hch |-*.
+    rewrite rngl_add_0_r in Hch.
+    now apply (rngl_eqb_eq Heb) in Hch; rewrite Hch.
+  }
+  destruct n. {
+    cbn in Hch |-*.
+    rewrite rngl_add_0_r in Hch.
+    now apply (rngl_eqb_eq Heb) in Hch; rewrite Hch.
+  }
+...
+  assert (H : S (S n) ≠ 1) by now intros H; apply Nat.succ_inj in H.
+  specialize (IHn H (Nat.neq_succ_0 _)); clear H.
+  rewrite fold_lap_norm.
+
 ...
   induction rngl_characteristic as (n, IHn) using lt_wf_rec.
 ...
