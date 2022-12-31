@@ -4450,14 +4450,8 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
-  destruct rngl_characteristic as [| n]; [ easy | clear Hcz; cbn ].
-  destruct n; [ easy | clear Hc1; cbn ].
-  cbn in Hch.
-  destruct n. {
-    cbn in Hch |-*.
-    rewrite rngl_add_0_r in Hch.
-    now apply (rngl_eqb_eq Heb) in Hch; rewrite Hch.
-  }
+  destruct rngl_characteristic as [| n]; [ easy | clear Hcz ].
+  destruct n; [ easy | clear Hc1 ].
   destruct n. {
     cbn in Hch |-*.
     rewrite rngl_add_0_r in Hch.
