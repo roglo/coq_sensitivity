@@ -4450,6 +4450,20 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
+Theorem lap_rngl_of_nat_rngl_of_nat :
+  let lop := lap_ring_like_op in
+  ∀ n, rngl_of_nat n =
+  if Nat.eq_dec n rngl_characteristic then [] else [rngl_of_nat n].
+Proof.
+intros.
+destruct (Nat.eq_dec n rngl_characteristic) as [Hnc| Hnc]. {
+  subst n.
+Search (rngl_of_nat rngl_characteristic).
+...
+rewrite lap_rngl_of_nat_rngl_of_nat.
+rewrite <- if_eqb_eq_dec.
+now rewrite Nat.eqb_refl.
+...
   destruct rngl_characteristic as [| n]; [ easy | clear Hcz ].
   destruct n; [ easy | clear Hc1 ].
   destruct n. {
