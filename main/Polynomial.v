@@ -4450,15 +4450,10 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
 }
 Qed.
 
-Theorem polyn_opt_le_refl :
-  if rngl_is_ordered then ∀ a : polyn T, (a ≤ a)%F else not_applicable.
-...
-
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
      rngl_has_dec_le := rngl_has_dec_le;
-     rngl_is_ordered := rngl_is_ordered;
      rngl_is_integral := rngl_is_integral;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
@@ -4483,18 +4478,18 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_le_dec := polyn_opt_le_dec;
      rngl_opt_integral := polyn_opt_integral;
      rngl_characteristic_prop := polyn_characteristic_prop;
-     rngl_opt_le_refl := polyn_opt_le_refl;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le |}.
-
-...
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA |}.
 
 End a.
+
+...
 
 Arguments polyn_ring_like_op T%type {ro rp Heb Hc1 Hop Hiv}.
 Arguments lap_mul {T ro} (la lb)%list.
