@@ -66,7 +66,6 @@ Definition Q_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := true;
-     rngl_is_ordered := true;
      rngl_is_integral := false;
      rngl_characteristic := 0;
      rngl_add_comm := Q.add_comm;

@@ -1099,7 +1099,6 @@ Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := false; (* to be improved, perhaps *)
      rngl_has_dec_le := false;
-     rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := 0;
      rngl_add_comm := @quad_int_add_comm d;

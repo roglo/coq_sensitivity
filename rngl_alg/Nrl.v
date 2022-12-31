@@ -102,8 +102,6 @@ Definition Zn_div n (a b : Zn n) : Zn n :=
   else a.
 Definition Zn_eqb n (a b : Zn n) : bool :=
   proj1_sig a =? proj1_sig b.
-Definition Zn_le n (a b : Zn n) : Prop :=
-  proj1_sig a ≤ proj1_sig b.
 
 Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
   {| rngl_zero := Zn_of_nat n 0;
@@ -115,7 +113,7 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_inv_or_quot :=
        if is_prime n then Some (inl (Zn_inv n)) else None;
      rngl_opt_eqb := Some (Zn_eqb n);
-     rngl_opt_le := Some (Zn_le n) |}.
+     rngl_opt_le := None |}.
 
 Global Existing Instance Zn_ring_like_op.
 
@@ -372,7 +370,6 @@ Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
-     rngl_is_ordered := false; (* well, it is, but not transitive *)
      rngl_is_integral := false;
      rngl_characteristic := at_least_1 n;
      rngl_add_comm := Zn_add_comm;
@@ -428,7 +425,7 @@ Definition lcm_ring_like_op : ring_like_op nat :=
      rngl_opt_opp_or_sous := None;
      rngl_opt_inv_or_quot := None;
      rngl_opt_eqb := Some Nat.eqb;
-     rngl_opt_le := Some Nat.le |}.
+     rngl_opt_le := None |}.
 
 Section a.
 
@@ -461,7 +458,6 @@ Definition lcm_ring_like_prop :=
   {| rngl_mul_is_comm := true;
      rngl_has_eqb := true;
      rngl_has_dec_le := false;
-     rngl_is_ordered := false;
      rngl_is_integral := true;
      rngl_characteristic := 1;
      rngl_add_comm := Nat.lcm_comm;

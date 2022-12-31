@@ -169,6 +169,9 @@ Definition rngl_le {T} {R : ring_like_op T} a b :=
   | None => False
   end.
 
+Definition rngl_is_ordered {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_le.
+
 Notation "0" := rngl_zero : ring_like_scope.
 Notation "1" := rngl_one : ring_like_scope.
 Notation "a + b" := (rngl_add a b) : ring_like_scope.
@@ -199,7 +202,6 @@ Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
     rngl_has_eqb : bool;
     rngl_has_dec_le : bool;
-    rngl_is_ordered : bool;
     rngl_is_integral : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;

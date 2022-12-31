@@ -679,7 +679,6 @@ Definition mat_ring_like_prop (n : nat) :
   {| rngl_mul_is_comm := false;
      rngl_has_eqb := false; (* rngl_has_eqb to be completed *)
      rngl_has_dec_le := false;
-     rngl_is_ordered := false;
      rngl_is_integral := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
      rngl_add_comm := squ_mat_add_comm;
