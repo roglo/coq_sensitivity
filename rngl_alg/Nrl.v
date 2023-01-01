@@ -368,7 +368,6 @@ Qed.
 
 Definition Zn_ring_like_prop : ring_like_prop (Zn n) :=
   {| rngl_mul_is_comm := true;
-     rngl_has_eqb := true;
      rngl_has_dec_le := false;
      rngl_is_integral := false;
      rngl_is_alg_closed := false;
@@ -458,7 +457,6 @@ Qed.
 
 Definition lcm_ring_like_prop :=
   {| rngl_mul_is_comm := true;
-     rngl_has_eqb := true;
      rngl_has_dec_le := false;
      rngl_is_integral := true;
      rngl_is_alg_closed := false;

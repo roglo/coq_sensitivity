@@ -165,6 +165,9 @@ Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   | cons a l' => rngl_add (rngl_mul (rngl_eval_polyn l' x) x) a
   end.
 
+Definition rngl_has_eqb {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_eqb.
+
 Definition rngl_eqb {T} {R : ring_like_op T} a b :=
   match rngl_opt_eqb with
   | Some rngl_eqb => rngl_eqb a b
@@ -208,7 +211,6 @@ Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
 
 Class ring_like_prop T {ro : ring_like_op T} :=
   { rngl_mul_is_comm : bool;
-    rngl_has_eqb : bool;
     rngl_has_dec_le : bool;
     rngl_is_integral : bool;
     rngl_is_alg_closed : bool;
