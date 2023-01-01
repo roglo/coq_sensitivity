@@ -4450,12 +4450,28 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
 }
 Qed.
 
+Theorem polyn_opt_alg_closed :
+  let pop := polyn_ring_like_op in
+  if rngl_is_alg_closed then
+   ∀ l : list (polyn T),
+     0 < length l → ∃ x : polyn T, rngl_eval_polyn l x = 0%F
+  else not_applicable.
+Proof.
+intros.
+remember rngl_is_alg_closed as ac eqn:Hac; symmetry in Hac.
+destruct ac; [ | easy ].
+intros * Hl.
+specialize rngl_opt_alg_closed as H1.
+rewrite Hac in H1.
+Set Printing Implicit.
+...
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_eqb := rngl_has_eqb;
      rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
-     rngl_is_alg_closed := false;
+     rngl_is_alg_closed := rngl_is_alg_closed;
      rngl_characteristic := rngl_characteristic;
      rngl_add_comm := polyn_add_comm;
      rngl_add_assoc := polyn_add_assoc;
@@ -4478,7 +4494,7 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_eqb_eq := polyn_opt_eqb_eq;
      rngl_opt_le_dec := polyn_opt_le_dec;
      rngl_opt_integral := polyn_opt_integral;
-     rngl_opt_alg_closed := NA;
+     rngl_opt_alg_closed := polyn_opt_alg_closed;
      rngl_characteristic_prop := polyn_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
