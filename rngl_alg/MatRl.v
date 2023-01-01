@@ -680,6 +680,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_has_eqb := false; (* rngl_has_eqb to be completed *)
      rngl_has_dec_le := false;
      rngl_is_integral := false;
+     rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
      rngl_add_comm := squ_mat_add_comm;
      rngl_add_assoc := squ_mat_add_assoc;
@@ -702,6 +703,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_eqb_eq := NA; (* squ_mat_opt_eqb_eq to be completed *)
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
+     rngl_opt_alg_closed := NA;
      rngl_characteristic_prop := squ_mat_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;

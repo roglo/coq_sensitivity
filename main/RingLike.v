@@ -157,6 +157,12 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
+Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
+  match l with
+  | nil => rngl_zero
+  | cons a l' => rngl_add a (rngl_mul (rngl_eval_polyn l' x) x)
+  end.
+
 Definition rngl_eqb {T} {R : ring_like_op T} a b :=
   match rngl_opt_eqb with
   | Some rngl_eqb => rngl_eqb a b
@@ -203,6 +209,7 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_has_eqb : bool;
     rngl_has_dec_le : bool;
     rngl_is_integral : bool;
+    rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
     rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
     rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
@@ -265,6 +272,11 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_opt_integral :
       if rngl_is_integral then
         ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+      else not_applicable;
+    (* when algebraically closed *)
+    rngl_opt_alg_closed :
+      if rngl_is_alg_closed then
+        ∀ l, 0 < length l → ∃ x, rngl_eval_polyn l x = 0%F
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
