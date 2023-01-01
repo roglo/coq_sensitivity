@@ -157,6 +157,8 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
+(* could be written with List.fold_right but this module is not
+   supposed to include the module List (nor Nat) *)
 Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   match l with
   | nil => rngl_zero
