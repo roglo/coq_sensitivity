@@ -25,7 +25,7 @@ Proof. now intros; apply Nat.eq_mul_0. Qed.
 Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
 Proof. easy. Qed.
 
-Theorem Nat_mul_div : ∀ a b, b ≠ 0%F → (a * b / b)%F = a.
+Theorem Nat_mul_div : ∀ a b, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros * Hbz.
 now apply Nat.div_mul.
@@ -48,7 +48,7 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
-Theorem Nat_mul_sub_distr_l : ∀ a b c, (a * (b - c))%F = (a * b - a * c)%F.
+Theorem Nat_mul_sub_distr_l : ∀ a b c, (a * (b - c))%L = (a * b - a * c)%L.
 Proof.
 intros.
 apply Nat.mul_sub_distr_l.
@@ -105,8 +105,8 @@ Global Existing Instance nat_ring_like_prop.
 (*
 Print nat_ring_like_op.
 Existing Instance nat_ring_like_op.
-Compute (7 - 3)%F.
+Compute (7 - 3)%L.
 Compute (7 - 3)%nat.
-Compute (15 / 3)%F.
+Compute (15 / 3)%L.
 Compute (15 / 3)%nat.
 *)

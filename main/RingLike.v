@@ -63,7 +63,7 @@ Class ring_like_op T :=
     rngl_opt_le : option (T → T → Prop) }.
 
 Declare Scope ring_like_scope.
-Delimit Scope ring_like_scope with F.
+Delimit Scope ring_like_scope with L.
 
 Definition rngl_has_opp_or_sous {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_opp_or_sous.
@@ -190,7 +190,7 @@ Notation "a ≤ b" := (rngl_le a b) : ring_like_scope.
 Notation "- a" := (rngl_opp a) : ring_like_scope.
 Notation "a '⁻¹'" := (rngl_inv a) (at level 1, format "a ⁻¹") :
   ring_like_scope.
-Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%F (at level 70, b at next level) :
+Notation "a ≤ b ≤ c" := (a ≤ b ∧ b ≤ c)%L (at level 70, b at next level) :
   ring_like_scope.
 
 Notation "a =? b" := (rngl_eqb a b) (at level 70) : ring_like_scope.
@@ -202,8 +202,8 @@ Inductive not_applicable := NA.
 
 Fixpoint rngl_of_nat {T} {ro : ring_like_op T} n :=
   match n with
-  | 0 => 0%F
-  | S n' => (1 + rngl_of_nat n')%F
+  | 0 => 0%L
+  | S n' => (1 + rngl_of_nat n')%L
   end.
 
 Class ring_like_prop T {ro : ring_like_op T} :=
@@ -213,115 +213,115 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     rngl_is_integral : bool;
     rngl_is_alg_closed : bool;
     rngl_characteristic : nat;
-    rngl_add_comm : ∀ a b : T, (a + b = b + a)%F;
-    rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%F;
-    rngl_add_0_l : ∀ a : T, (0 + a)%F = a;
-    rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%F;
-    rngl_mul_1_l : ∀ a : T, (1 * a)%F = a;
-    rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%F;
+    rngl_add_comm : ∀ a b : T, (a + b = b + a)%L;
+    rngl_add_assoc : ∀ a b c : T, (a + (b + c) = (a + b) + c)%L;
+    rngl_add_0_l : ∀ a : T, (0 + a)%L = a;
+    rngl_mul_assoc : ∀ a b c : T, (a * (b * c) = (a * b) * c)%L;
+    rngl_mul_1_l : ∀ a : T, (1 * a)%L = a;
+    rngl_mul_add_distr_l : ∀ a b c : T, (a * (b + c) = a * b + a * c)%L;
     (* when multiplication is commutative *)
     rngl_opt_mul_comm :
-      if rngl_mul_is_comm then ∀ a b, (a * b = b * a)%F else not_applicable;
+      if rngl_mul_is_comm then ∀ a b, (a * b = b * a)%L else not_applicable;
     (* when multiplication is not commutative *)
     rngl_opt_mul_1_r :
-      if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1 = a)%F;
+      if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1 = a)%L;
     rngl_opt_mul_add_distr_r :
       if rngl_mul_is_comm then not_applicable else
-       ∀ a b c, ((a + b) * c = a * c + b * c)%F;
+       ∀ a b c, ((a + b) * c = a * c + b * c)%L;
     (* when has opposite *)
     rngl_opt_add_opp_l :
-      if rngl_has_opp then ∀ a : T, (- a + a = 0)%F else not_applicable;
+      if rngl_has_opp then ∀ a : T, (- a + a = 0)%L else not_applicable;
     (* when has subtraction (sous) *)
     rngl_opt_add_sub :
-      if rngl_has_sous then ∀ a b, (a + b - b)%F = a
+      if rngl_has_sous then ∀ a b, (a + b - b)%L = a
       else not_applicable;
     rngl_opt_sub_sub_sub_add :
-      if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%F
+      if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%L
       else not_applicable;
     rngl_opt_mul_sub_distr_l :
-      if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%F
+      if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%L
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
       if rngl_has_sous then
         if rngl_mul_is_comm then not_applicable
-        else ∀ a b c : T, ((a - b) * c = a * c - b * c)%F
+        else ∀ a b c : T, ((a - b) * c = a * c - b * c)%L
       else not_applicable;
     (* when has inverse *)
     rngl_opt_mul_inv_l :
-      if rngl_has_inv then ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F
+      if rngl_has_inv then ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L
       else not_applicable;
     rngl_opt_mul_inv_r :
       if (rngl_has_inv && negb rngl_mul_is_comm)%bool then
-        ∀ a : T, a ≠ 0%F → (a / a = 1)%F
+        ∀ a : T, a ≠ 0%L → (a / a = 1)%L
       else not_applicable;
     (* when has division (quot) *)
     rngl_opt_mul_div :
-      if rngl_has_quot then ∀ a b, b ≠ 0%F → (a * b / b)%F = a
+      if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
       else not_applicable;
     rngl_opt_mul_quot_r :
       if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
-        ∀ a b, b ≠ 0%F → (b * a / b)%F = a
+        ∀ a b, b ≠ 0%L → (b * a / b)%L = a
       else not_applicable;
     (* when equality is calculable *)
     rngl_opt_eqb_eq :
-      if rngl_has_eqb then ∀ a b : T, (a =? b)%F = true ↔ a = b
+      if rngl_has_eqb then ∀ a b : T, (a =? b)%L = true ↔ a = b
       else not_applicable;
     (* when le comparison is decidable *)
     rngl_opt_le_dec :
-      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F
+      if rngl_has_dec_le then ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L
       else not_applicable;
     (* when has_no_zero_divisors *)
     rngl_opt_integral :
       if rngl_is_integral then
-        ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F
+        ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L
       else not_applicable;
     (* when algebraically closed *)
     rngl_opt_alg_closed :
       if rngl_is_alg_closed then
-        ∀ l, 0 < length l → ∃ x, rngl_eval_polyn l x = 0%F
+        ∀ l, 0 < length l → ∃ x, rngl_eval_polyn l x = 0%L
       else not_applicable;
     (* characteristic *)
     rngl_characteristic_prop :
-      if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%F
+      if Nat.eqb (rngl_characteristic) 0 then ∀ i, rngl_of_nat (S i) ≠ 0%L
       else
-        (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
-        rngl_of_nat rngl_characteristic = 0%F;
+        (∀ i, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
+        rngl_of_nat rngl_characteristic = 0%L;
     (* when ordered *)
     rngl_opt_le_refl :
-      if rngl_is_ordered then ∀ a, (a ≤ a)%F else not_applicable;
+      if rngl_is_ordered then ∀ a, (a ≤ a)%L else not_applicable;
     rngl_opt_le_antisymm :
-      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%F
+      if rngl_is_ordered then ∀ a b, (a ≤ b → b ≤ a → a = b)%L
       else not_applicable;
     rngl_opt_le_trans :
-      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%F
+      if rngl_is_ordered then ∀ a b c, (a ≤ b → b ≤ c → a ≤ c)%L
       else not_applicable;
     rngl_opt_add_le_compat :
-      if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F
+      if rngl_is_ordered then ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L
       else not_applicable;
     rngl_opt_mul_le_compat_nonneg :
       if (rngl_is_ordered && rngl_has_opp)%bool then
-        ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F
+        ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L
       else not_applicable;
     rngl_opt_mul_le_compat_nonpos :
       if (rngl_is_ordered && rngl_has_opp)%bool then
-        ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F
+        ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L
       else not_applicable;
     rngl_opt_mul_le_compat :
       if (rngl_is_ordered && negb rngl_has_opp)%bool then
-        ∀ a b c d, (a ≤ c)%F → (b ≤ d)%F → (a * b ≤ c * d)%F
+        ∀ a b c d, (a ≤ c)%L → (b ≤ d)%L → (a * b ≤ c * d)%L
       else not_applicable;
     rngl_opt_not_le :
       if rngl_is_ordered then
-        ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F
+        ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%L
       else not_applicable }.
 
 Fixpoint rngl_power {T} {ro : ring_like_op T} a n :=
   match n with
-  | O => 1%F
-  | S m => (a * rngl_power a m)%F
+  | O => 1%L
+  | S m => (a * rngl_power a m)%L
   end.
 
-Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%F.
+Definition rngl_squ {T} {ro : ring_like_op T} x := (x * x)%L.
 
 Notation "a ^ b" := (rngl_power a b) : ring_like_scope.
 
@@ -335,7 +335,7 @@ Context {rp : ring_like_prop T}.
 
 Theorem rngl_mul_comm :
   rngl_mul_is_comm = true →
-  ∀ a b, (a * b = b * a)%F.
+  ∀ a b, (a * b = b * a)%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_mul_comm as H.
@@ -343,7 +343,7 @@ rewrite H1 in H.
 apply H.
 Qed.
 
-Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%F.
+Theorem rngl_mul_1_r : ∀ a, (a * 1 = a)%L.
 Proof.
 intros.
 specialize rngl_opt_mul_1_r as rngl_mul_1_r.
@@ -354,7 +354,7 @@ now rewrite rngl_mul_comm, rngl_mul_1_l.
 Qed.
 
 Theorem rngl_mul_add_distr_r : ∀ x y z,
-  ((x + y) * z = x * z + y * z)%F.
+  ((x + y) * z = x * z + y * z)%L.
 Proof.
 intros x y z; simpl.
 specialize rngl_opt_mul_add_distr_r as rngl_mul_add_distr_r.
@@ -372,7 +372,7 @@ Qed.
 
 Theorem rngl_add_opp_l :
   rngl_has_opp = true →
-  ∀ x, (- x + x = 0)%F.
+  ∀ x, (- x + x = 0)%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_add_opp_l as H.
@@ -382,7 +382,7 @@ Qed.
 
 Theorem rngl_mul_inv_l :
   rngl_has_inv = true →
-  ∀ a : T, a ≠ 0%F → (a⁻¹ * a = 1)%F.
+  ∀ a : T, a ≠ 0%L → (a⁻¹ * a = 1)%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_mul_inv_l as H.
@@ -392,7 +392,7 @@ Qed.
 
 Theorem rngl_eqb_eq :
   rngl_has_eqb = true →
-  ∀ a b : T, (a =? b)%F = true ↔ a = b.
+  ∀ a b : T, (a =? b)%L = true ↔ a = b.
 Proof.
 intros Heqb *.
 specialize rngl_opt_eqb_eq as H.
@@ -401,7 +401,7 @@ Qed.
 
 Theorem rngl_eqb_neq :
   rngl_has_eqb = true →
-  ∀ a b : T, (a =? b)%F = false ↔ a ≠ b.
+  ∀ a b : T, (a =? b)%L = false ↔ a ≠ b.
 Proof.
 intros Heqb *.
 split; intros Hab. {
@@ -409,7 +409,7 @@ split; intros Hab. {
   apply (rngl_eqb_eq Heqb) in H.
   congruence.
 } {
-  remember (a =? b)%F as x eqn:Hx.
+  remember (a =? b)%L as x eqn:Hx.
   symmetry in Hx.
   destruct x; [ | easy ].
   exfalso; apply Hab.
@@ -419,7 +419,7 @@ Qed.
 
 Theorem rngl_neqb_neq :
   rngl_has_eqb = true →
-  ∀ a b : T, (a ≠? b)%F = true ↔ a ≠ b.
+  ∀ a b : T, (a ≠? b)%L = true ↔ a ≠ b.
 Proof.
 intros Heqb *.
 split; intros Hab. {
@@ -434,7 +434,7 @@ Qed.
 
 Theorem rngl_eqb_refl :
   rngl_has_eqb = true →
-  ∀ a, (a =? a)%F = true.
+  ∀ a, (a =? a)%L = true.
 Proof.
 intros Heqb *.
 now apply (rngl_eqb_eq Heqb).
@@ -449,7 +449,7 @@ Qed.
 
 Theorem rngl_le_dec :
   rngl_has_dec_le = true →
-  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%F.
+  ∀ a b : T, ({a ≤ b} + {¬ a ≤ b})%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_le_dec as H.
@@ -457,7 +457,7 @@ rewrite H1 in H.
 apply H.
 Qed.
 
-Theorem rngl_le_refl : rngl_is_ordered = true → ∀ a, (a ≤ a)%F.
+Theorem rngl_le_refl : rngl_is_ordered = true → ∀ a, (a ≤ a)%L.
 Proof.
 intros Hor *.
 specialize rngl_opt_le_refl as H.
@@ -467,7 +467,7 @@ Qed.
 
 Theorem rngl_le_trans :
   rngl_is_ordered = true →
-   ∀ a b c : T, (a ≤ b)%F → (b ≤ c)%F → (a ≤ c)%F.
+   ∀ a b c : T, (a ≤ b)%L → (b ≤ c)%L → (a ≤ c)%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_le_trans as H.
@@ -477,7 +477,7 @@ Qed.
 
 Theorem rngl_add_le_compat :
   rngl_is_ordered = true →
-  ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%F.
+  ∀ a b c d, (a ≤ b → c ≤ d → a + c ≤ b + d)%L.
 Proof.
 intros H1 *.
 specialize rngl_opt_add_le_compat as H.
@@ -488,7 +488,7 @@ Qed.
 Theorem rngl_mul_le_compat_nonneg :
   rngl_is_ordered = true →
   rngl_has_opp = true →
-  ∀ a b c d, (0 ≤ a ≤ c)%F → (0 ≤ b ≤ d)%F → (a * b ≤ c * d)%F.
+  ∀ a b c d, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hor Hop *.
 specialize rngl_opt_mul_le_compat_nonneg as H.
@@ -499,7 +499,7 @@ Qed.
 Theorem rngl_mul_le_compat_nonpos :
   rngl_is_ordered = true →
   rngl_has_opp = true →
-  ∀ a b c d, (c ≤ a ≤ 0)%F → (d ≤ b ≤ 0)%F → (a * b ≤ c * d)%F.
+  ∀ a b c d, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
 Proof.
 intros Hor Hop *.
 specialize rngl_opt_mul_le_compat_nonpos as H.
@@ -509,7 +509,7 @@ Qed.
 
 Theorem rngl_not_le :
   rngl_is_ordered = true →
-  ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%F.
+  ∀ a b, (¬ a ≤ b → a = b ∨ b ≤ a)%L.
 Proof.
 intros Hor *.
 specialize rngl_opt_not_le as H.
@@ -519,14 +519,14 @@ Qed.
 
 (* *)
 
-Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%F.
+Theorem rngl_add_0_r : ∀ a, (a + 0 = a)%L.
 Proof.
 intros a; simpl.
 rewrite rngl_add_comm.
 apply rngl_add_0_l.
 Qed.
 
-Theorem rngl_1_neq_0_iff : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%F.
+Theorem rngl_1_neq_0_iff : rngl_characteristic ≠ 1 ↔ (1 ≠ 0)%L.
 Proof.
 specialize rngl_characteristic_prop as H1.
 split. {
@@ -554,21 +554,21 @@ split. {
 }
 Qed.
 
-Theorem rngl_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%F.
+Theorem rngl_add_add_swap : ∀ n m p, (n + m + p = n + p + m)%L.
 Proof.
 intros n m p; simpl.
 do 2 rewrite <- rngl_add_assoc.
-assert (m + p = p + m)%F as H by apply rngl_add_comm.
+assert (m + p = p + m)%L as H by apply rngl_add_comm.
 rewrite H; reflexivity.
 Qed.
 
 Theorem rngl_mul_mul_swap :
   rngl_mul_is_comm = true →
-  ∀ n m p, (n * m * p = n * p * m)%F.
+  ∀ n m p, (n * m * p = n * p * m)%L.
 Proof.
 intros Hic n m p; simpl.
 do 2 rewrite <- rngl_mul_assoc.
-assert (m * p = p * m)%F as H by now apply rngl_mul_comm.
+assert (m * p = p * m)%L as H by now apply rngl_mul_comm.
 rewrite H; reflexivity.
 Qed.
 
@@ -576,7 +576,7 @@ Theorem rngl_div_div_swap :
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ a b c,
-  (a / b / c = a / c / b)%F.
+  (a / b / c = a / c / b)%L.
 Proof.
 intros Hic Hin *.
 unfold rngl_div.
@@ -584,14 +584,14 @@ now rewrite Hin, rngl_mul_mul_swap.
 Qed.
 
 Theorem rngl_add_compat_l : ∀ a b c,
-  (a = b)%F → (c + a = c + b)%F.
+  (a = b)%L → (c + a = c + b)%L.
 Proof.
 intros a b c Hab.
 now rewrite Hab.
 Qed.
 
 Theorem rngl_add_compat_r : ∀ a b c,
-  (a = b)%F → (a + c = b + c)%F.
+  (a = b)%L → (a + c = b + c)%L.
 Proof.
 intros a b c Hab.
 now rewrite Hab.
@@ -599,7 +599,7 @@ Qed.
 
 Theorem fold_rngl_sub :
   rngl_has_opp = true →
-  ∀ a b, (a + - b)%F = (a - b)%F.
+  ∀ a b, (a + - b)%L = (a - b)%L.
 Proof.
 intros Hro *.
 now unfold rngl_sub; rewrite Hro.
@@ -607,7 +607,7 @@ Qed.
 
 Theorem fold_rngl_div :
   rngl_has_inv = true →
-  ∀ a b, (a * b⁻¹)%F = (a / b)%F.
+  ∀ a b, (a * b⁻¹)%L = (a / b)%L.
 Proof.
 intros Hin *.
 now unfold rngl_div; rewrite Hin.
@@ -615,7 +615,7 @@ Qed.
 
 Theorem rngl_sub_diag :
   rngl_has_opp_or_sous = true →
-  ∀ a, (a - a = 0)%F.
+  ∀ a, (a - a = 0)%L.
 Proof.
 intros Hos *.
 remember rngl_has_opp as op eqn:Hop.
@@ -631,7 +631,7 @@ symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
   rewrite Hmo in H1.
-  specialize (H1 0%F a).
+  specialize (H1 0%L a).
   now rewrite rngl_add_0_l in H1.
 }
 apply rngl_has_opp_or_sous_iff in Hos.
@@ -640,7 +640,7 @@ Qed.
 
 Theorem rngl_sub_add :
   rngl_has_opp = true →
-  ∀ a b, (a - b + b = a)%F.
+  ∀ a b, (a - b + b = a)%L.
 Proof.
 intros Hop *.
 unfold rngl_sub; rewrite Hop.
@@ -651,7 +651,7 @@ Qed.
 
 Theorem rngl_div_diag :
   rngl_has_inv_or_quot = true →
-  ∀ a : T, a ≠ 0%F → (a / a = 1)%F.
+  ∀ a : T, a ≠ 0%L → (a / a = 1)%L.
 Proof.
 intros Hiq * Haz.
 remember rngl_has_inv as ai eqn:Hai; symmetry in Hai.
@@ -670,7 +670,7 @@ remember rngl_has_quot as qu eqn:Hqu; symmetry in Hqu.
 destruct qu. {
   specialize rngl_opt_mul_div as rngl_mul_div.
   rewrite Hqu in rngl_mul_div.
-  specialize (rngl_mul_div 1%F a Haz).
+  specialize (rngl_mul_div 1%L a Haz).
   now rewrite rngl_mul_1_l in rngl_mul_div.
 }
 apply rngl_has_inv_or_quot_iff in Hiq.
@@ -679,7 +679,7 @@ Qed.
 
 Theorem rngl_add_sub :
   rngl_has_opp_or_sous = true →
-  ∀ a b, (a + b - b = a)%F.
+  ∀ a b, (a + b - b = a)%L.
 Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
@@ -704,7 +704,7 @@ Qed.
 
 Theorem rngl_mul_div :
   rngl_has_inv_or_quot = true →
-  ∀ a b : T, b ≠ 0%F → (a * b / b)%F = a.
+  ∀ a b : T, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros Hii a b Hbz.
 remember rngl_has_inv as iv eqn:Hiv; symmetry in Hiv.
@@ -730,12 +730,12 @@ Theorem rngl_mul_div_r :
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ a b : T,
-  b ≠ 0%F
-  → (b * (a / b))%F = a.
+  b ≠ 0%L
+  → (b * (a / b))%L = a.
 Proof.
 intros Hco Hiv * Hbz.
 rewrite (rngl_mul_comm Hco).
-unfold "/"%F.
+unfold "/"%L.
 rewrite Hiv.
 rewrite <- rngl_mul_assoc.
 rewrite (rngl_mul_inv_l Hiv _ Hbz).
@@ -744,7 +744,7 @@ Qed.
 
 Theorem rngl_add_cancel_l :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, (a + b = a + c)%F → (b = c)%F.
+  ∀ a b c, (a + b = a + c)%L → (b = c)%L.
 Proof.
 intros Hom * Habc.
 remember rngl_has_opp as op eqn:Hop.
@@ -775,15 +775,15 @@ Qed.
 
 Theorem rngl_mul_cancel_l :
   rngl_has_inv_or_quot = true →
-  ∀ a b c, a ≠ 0%F
-  → (a * b = a * c)%F
+  ∀ a b c, a ≠ 0%L
+  → (a * b = a * c)%L
   → b = c.
 Proof.
 intros Hii * Haz Habc.
 remember rngl_has_inv as iv eqn:Hiv.
 symmetry in Hiv.
 destruct iv. {
-  apply (f_equal (λ x, rngl_mul (a⁻¹)%F x)) in Habc.
+  apply (f_equal (λ x, rngl_mul (a⁻¹)%L x)) in Habc.
   do 2 rewrite rngl_mul_assoc in Habc.
   rewrite rngl_mul_inv_l in Habc; [ | easy | easy ].
   now do 2 rewrite rngl_mul_1_l in Habc.
@@ -816,7 +816,7 @@ Qed.
 
 Theorem rngl_add_sub_eq_l :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, (a + b = c → c - a = b)%F.
+  ∀ a b c, (a + b = c → c - a = b)%L.
 Proof.
 intros Hom * Hab.
 rewrite <- Hab.
@@ -826,7 +826,7 @@ Qed.
 
 Theorem rngl_add_sub_eq_r :
   rngl_has_opp_or_sous = true →
-   ∀ a b c, (a + b = c → c - b = a)%F.
+   ∀ a b c, (a + b = c → c - b = a)%L.
 Proof.
 intros Hom * Hab.
 apply rngl_add_sub_eq_l; [ easy | ].
@@ -834,7 +834,7 @@ now rewrite rngl_add_comm.
 Qed.
 
 Theorem rngl_sub_compat_l : ∀ a b c,
-  (a = b)%F → (a - c = b - c)%F.
+  (a = b)%L → (a - c = b - c)%L.
 Proof.
 intros a b c Hab.
 now rewrite Hab.
@@ -842,7 +842,7 @@ Qed.
 
 Theorem rngl_add_cancel_r :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, (a + c = b + c)%F → (a = b)%F.
+  ∀ a b c, (a + c = b + c)%L → (a = b)%L.
 Proof.
 intros Hom * Habc.
 eapply rngl_sub_compat_l with (c := c) in Habc.
@@ -851,27 +851,27 @@ Qed.
 
 Theorem rngl_mul_0_r :
   rngl_has_opp_or_sous = true →
-  ∀ a, (a * 0 = 0)%F.
+  ∀ a, (a * 0 = 0)%L.
 Proof.
 intros Hom *.
-apply (rngl_add_cancel_r Hom _ _ (a * 1)%F).
+apply (rngl_add_cancel_r Hom _ _ (a * 1)%L).
 rewrite <- rngl_mul_add_distr_l.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_mul_0_l :
   rngl_has_opp_or_sous = true →
-  ∀ a, (0 * a = 0)%F.
+  ∀ a, (0 * a = 0)%L.
 Proof.
 intros Hom a.
-apply (rngl_add_cancel_r Hom _ _ (1 * a)%F).
+apply (rngl_add_cancel_r Hom _ _ (1 * a)%L).
 rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_add_move_0_r :
   rngl_has_opp = true →
-  ∀ a b, (a + b = 0)%F ↔ (a = - b)%F.
+  ∀ a b, (a + b = 0)%L ↔ (a = - b)%L.
 Proof.
 intros Hro *.
 split; intros H. {
@@ -888,10 +888,10 @@ Qed.
 
 Theorem rngl_mul_opp_r :
   rngl_has_opp = true →
-  ∀ a b, (a * - b = - (a * b))%F.
+  ∀ a b, (a * - b = - (a * b))%L.
 Proof.
 intros Hro *.
-specialize (rngl_mul_add_distr_l a b (- b)%F) as H.
+specialize (rngl_mul_add_distr_l a b (- b)%L) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
 rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
 rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
@@ -902,7 +902,7 @@ Qed.
 
 Theorem rngl_mul_sub_distr_l :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, (a * (b - c) = a * b - a * c)%F.
+  ∀ a b c, (a * (b - c) = a * b - a * c)%L.
 Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
@@ -922,7 +922,7 @@ Qed.
 
 Theorem rngl_div_mul :
   rngl_has_inv = true →
-  ∀ a b, b ≠ 0%F → (a / b * b)%F = a.
+  ∀ a b, b ≠ 0%L → (a / b * b)%L = a.
 Proof.
 intros Hin * Hbz.
 unfold rngl_div.
@@ -935,11 +935,11 @@ Qed.
 Theorem rngl_div_0_l :
   rngl_has_opp_or_sous = true →
   rngl_has_inv_or_quot = true →
-  ∀ a, a ≠ 0%F → (0 / a)%F = 0%F.
+  ∀ a, a ≠ 0%L → (0 / a)%L = 0%L.
 Proof.
 intros Hos Hiv * Haz.
-remember (0 / a)%F as x eqn:Hx.
-replace 0%F with (0 * a)%F in Hx. 2: {
+remember (0 / a)%L as x eqn:Hx.
+replace 0%L with (0 * a)%L in Hx. 2: {
   now apply rngl_mul_0_l.
 }
 subst x.
@@ -950,9 +950,9 @@ Theorem rngl_div_div_mul_mul :
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   ∀ a b c d,
-  b ≠ 0%F
-  → d ≠ 0%F
-  → (a / b = c / d)%F ↔ (a * d = b * c)%F.
+  b ≠ 0%L
+  → d ≠ 0%L
+  → (a / b = c / d)%L ↔ (a * d = b * c)%L.
 Proof.
 intros Hic Hin * Hbz Hdz.
 split. {
@@ -980,7 +980,7 @@ Qed.
 Theorem rngl_integral :
   rngl_has_opp_or_sous = true →
   (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
-  ∀ a b, (a * b = 0)%F → a = 0%F ∨ b = 0%F.
+  ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
 intros Hmo Hdo * Hab.
 specialize rngl_opt_integral as rngl_integral.
@@ -991,11 +991,11 @@ destruct iv. {
   remember rngl_has_eqb as de eqn:Hde; symmetry in Hde.
   destruct de; [ | now destruct rngl_has_inv_or_quot ].
   cbn; clear rngl_integral.
-  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%F). {
+  assert (H : (a⁻¹ * a * b = a⁻¹ * 0)%L). {
     now rewrite <- rngl_mul_assoc, Hab.
   }
   rewrite rngl_mul_0_r in H; [ | easy ].
-  remember (rngl_eqb a 0%F) as az eqn:Haz; symmetry in Haz.
+  remember (rngl_eqb a 0%L) as az eqn:Haz; symmetry in Haz.
   destruct az; [ now left; apply (rngl_eqb_eq Hde) | ].
   apply (rngl_eqb_neq Hde) in Haz.
   rewrite rngl_mul_inv_l in H; [ | easy | easy ].
@@ -1008,7 +1008,7 @@ destruct iv. {
   specialize rngl_mul_div as H1.
   rewrite Hdi in H1.
   specialize (H1 eq_refl).
-  remember (rngl_eqb b 0%F) as bz eqn:Hbz; symmetry in Hbz.
+  remember (rngl_eqb b 0%L) as bz eqn:Hbz; symmetry in Hbz.
   destruct bz; [ now right; apply (rngl_eqb_eq Hde) | left ].
   apply (rngl_eqb_neq Hde) in Hbz.
   specialize (H1 a b Hbz) as H4.
@@ -1020,7 +1020,7 @@ Qed.
 
 Theorem rngl_sub_move_0_r :
   rngl_has_opp = true →
-  ∀ a b : T, (a - b)%F = 0%F ↔ a = b.
+  ∀ a b : T, (a - b)%L = 0%L ↔ a = b.
 Proof.
 intros Hop *.
 split. {
@@ -1041,12 +1041,12 @@ Qed.
 
 Theorem rngl_mul_cancel_r :
   rngl_has_inv_or_quot = true →
-  ∀ a b c, c ≠ 0%F
-  → (a * c = b * c)%F
+  ∀ a b c, c ≠ 0%L
+  → (a * c = b * c)%L
   → a = b.
 Proof.
 intros Hii * Hcz Hab.
-assert (H : (a * c / c = b * c / c)%F) by now rewrite Hab.
+assert (H : (a * c / c = b * c / c)%L) by now rewrite Hab.
 rewrite rngl_mul_div in H; [ | easy | easy ].
 rewrite rngl_mul_div in H; [ | easy | easy ].
 easy.
@@ -1054,24 +1054,24 @@ Qed.
 
 Theorem rngl_div_compat_l :
   rngl_has_inv = true →
-  ∀ a b c, c ≠ 0%F → (a = b)%F → (a / c = b / c)%F.
+  ∀ a b c, c ≠ 0%L → (a = b)%L → (a / c = b / c)%L.
 Proof.
 intros Hin a b c Hcz Hab.
 now rewrite Hab.
 Qed.
 
 Theorem rngl_inv_if_then_else_distr : ∀ (c : bool) a b,
-  ((if c then a else b)⁻¹ = if c then a⁻¹ else b⁻¹)%F.
+  ((if c then a else b)⁻¹ = if c then a⁻¹ else b⁻¹)%L.
 Proof. now destruct c. Qed.
 
 Theorem rngl_mul_if_then_else_distr : ∀ (x : bool) a b c d,
-  ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%F.
+  ((if x then a else b) * (if x then c else d) = if x then a * c else b * d)%L.
 Proof. now destruct x. Qed.
 
-Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%F.
+Theorem rngl_opp_0 : rngl_has_opp = true → (- 0 = 0)%L.
 Proof.
 intros Hro.
-transitivity (0 + - 0)%F. {
+transitivity (0 + - 0)%L. {
   symmetry.
   apply rngl_add_0_l.
 }
@@ -1082,7 +1082,7 @@ Qed.
 
 Theorem rngl_sub_0_r :
   rngl_has_opp_or_sous = true →
-  ∀ a, (a - 0 = a)%F.
+  ∀ a, (a - 0 = a)%L.
 Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
@@ -1098,7 +1098,7 @@ symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
   rewrite Hmo in H1.
-  specialize (H1 a 0%F) as H2.
+  specialize (H1 a 0%L) as H2.
   now rewrite rngl_add_0_r in H2.
 }
 apply rngl_has_opp_or_sous_iff in Hom.
@@ -1107,12 +1107,12 @@ Qed.
 
 Theorem rngl_opp_add_distr :
   rngl_has_opp = true →
-  ∀ a b, (- (a + b) = - b - a)%F.
+  ∀ a b, (- (a + b) = - b - a)%L.
 Proof.
 intros Hop *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
 rewrite Hop in Hop'.
-apply rngl_add_cancel_l with (a := (a + b)%F); [ now apply Hop'; left | ].
+apply rngl_add_cancel_l with (a := (a + b)%L); [ now apply Hop'; left | ].
 rewrite (fold_rngl_sub Hop).
 rewrite rngl_sub_diag; [ | now apply Hop'; left ].
 unfold rngl_sub.
@@ -1127,7 +1127,7 @@ Qed.
 
 Theorem rngl_add_sub_simpl_l :
   rngl_has_opp_or_sous = true →
-  ∀ a b c : T, (a + b - (a + c) = b - c)%F.
+  ∀ a b c : T, (a + b - (a + c) = b - c)%L.
 Proof.
 intros Hom *.
 remember rngl_has_opp as op eqn:Hop.
@@ -1160,13 +1160,13 @@ Qed.
 Theorem rngl_inv_1 :
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
-  (1⁻¹ = 1)%F.
+  (1⁻¹ = 1)%L.
 Proof.
 intros Hin H10.
 specialize rngl_div_diag as H.
 unfold rngl_div in H.
 rewrite Hin in H.
-transitivity (1 * 1⁻¹)%F. {
+transitivity (1 * 1⁻¹)%L. {
   symmetry.
   apply rngl_mul_1_l.
 }
@@ -1176,7 +1176,7 @@ Qed.
 
 Theorem rngl_div_1_l :
   rngl_has_inv = true →
-  ∀ a, (1 / a = a⁻¹)%F.
+  ∀ a, (1 / a = a⁻¹)%L.
 Proof.
 intros Hin *.
 unfold rngl_div.
@@ -1187,16 +1187,16 @@ Qed.
 Theorem rngl_div_1_r :
   rngl_has_inv_or_quot = true →
   rngl_characteristic ≠ 1 →
-  ∀ a, (a / 1 = a)%F.
+  ∀ a, (a / 1 = a)%L.
 Proof.
 intros Hid H10 *.
-specialize (rngl_mul_div Hid a 1%F) as H1.
+specialize (rngl_mul_div Hid a 1%L) as H1.
 rewrite rngl_mul_1_r in H1.
 now apply H1, rngl_1_neq_0_iff.
 Qed.
 
 Theorem rngl_mul_move_1_r :
-  rngl_has_inv = true → ∀ a b : T, b ≠ 0%F → (a * b)%F = 1%F ↔ a = (b⁻¹)%F.
+  rngl_has_inv = true → ∀ a b : T, b ≠ 0%L → (a * b)%L = 1%L ↔ a = (b⁻¹)%L.
 Proof.
 intros Hin * Hbz.
 split; intros H. {
@@ -1218,7 +1218,7 @@ Qed.
 
 Theorem rngl_opp_involutive :
   rngl_has_opp = true →
-  ∀ x, (- - x)%F = x.
+  ∀ x, (- - x)%L = x.
 Proof.
 intros Hro *.
 symmetry.
@@ -1232,7 +1232,7 @@ Theorem rngl_inv_neq_0 :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
-  ∀ a, a ≠ 0%F → (a⁻¹ ≠ 0)%F.
+  ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
 intros Hom Hin H10 * Haz H1.
 symmetry in H1.
@@ -1246,7 +1246,7 @@ Theorem rngl_inv_involutive :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
-  ∀ x, x ≠ 0%F → (x⁻¹⁻¹)%F = x.
+  ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
 intros Hos Hin H10 * Hxz.
 symmetry.
@@ -1265,10 +1265,10 @@ Qed.
 
 Theorem rngl_mul_opp_l :
   rngl_has_opp = true →
-  ∀ a b, (- a * b = - (a * b))%F.
+  ∀ a b, (- a * b = - (a * b))%L.
 Proof.
 intros Hro *.
-specialize (rngl_mul_add_distr_r (- a)%F a b) as H.
+specialize (rngl_mul_add_distr_r (- a)%L a b) as H.
 rewrite rngl_add_opp_l in H; [ | easy ].
 rewrite rngl_mul_0_l in H. 2: {
   now apply rngl_has_opp_or_sous_iff; left.
@@ -1279,7 +1279,7 @@ Qed.
 
 Theorem rngl_mul_opp_opp :
   rngl_has_opp = true →
-  ∀ a b, (- a * - b = a * b)%F.
+  ∀ a b, (- a * - b = a * b)%L.
 Proof.
 intros Hro *.
 rewrite rngl_mul_opp_l; [ | easy ].
@@ -1287,7 +1287,7 @@ rewrite rngl_mul_opp_r; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem rngl_squ_opp_1 : rngl_has_opp = true → (-1 * -1)%F = 1%F.
+Theorem rngl_squ_opp_1 : rngl_has_opp = true → (-1 * -1)%L = 1%L.
 Proof.
 intros Hop.
 rewrite rngl_mul_opp_opp; [ | easy ].
@@ -1296,7 +1296,7 @@ Qed.
 
 Theorem rngl_opp_inj :
   rngl_has_opp = true →
-  ∀ a b, (- a = - b)%F → a = b.
+  ∀ a b, (- a = - b)%L → a = b.
 Proof.
 intros Hro * H.
 rewrite <- (rngl_opp_involutive Hro a).
@@ -1308,7 +1308,7 @@ Theorem rngl_inv_inj :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →(a⁻¹ = b⁻¹)%F → a = b.
+  ∀ a b, a ≠ 0%L → b ≠ 0%L →(a⁻¹ = b⁻¹)%L → a = b.
 Proof.
 intros Hom Hin H10 * Haz Hbz H.
 rewrite <- (rngl_inv_involutive Hom Hin H10 a); [ | easy ].
@@ -1320,7 +1320,7 @@ Theorem rngl_inv_mul_distr :
   rngl_has_opp_or_sous = true →
   rngl_is_integral = true →
   rngl_has_inv = true →
-  ∀ a b, a ≠ 0%F → b ≠ 0%F →((a * b)⁻¹ = b⁻¹ * a⁻¹)%F.
+  ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
 Proof.
 intros Hom Hdo Hin * Haz Hbz.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hin'.
@@ -1334,12 +1334,12 @@ unfold rngl_div in div_diag.
 rewrite Hin in div_diag.
 rewrite Hdo in integral; cbn in integral.
 specialize (integral eq_refl).
-assert (Habz : (a * b)%F ≠ 0%F). {
+assert (Habz : (a * b)%L ≠ 0%L). {
   intros H.
   specialize (integral a b H).
   now destruct integral.
 }
-apply mul_cancel_l with (a := (a * b)%F); [ easy | ].
+apply mul_cancel_l with (a := (a * b)%L); [ easy | ].
 unfold rngl_has_inv in Hin.
 rewrite div_diag; [ | easy ].
 rewrite rngl_mul_assoc.
@@ -1351,7 +1351,7 @@ Qed.
 
 Theorem rngl_eq_add_0 :
   rngl_is_ordered = true →
-  ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%F.
+  ∀ a b, (0 ≤ a → 0 ≤ b → a + b = 0 → a = 0 ∧ b = 0)%L.
 Proof.
 intros Hor * Haz Hbz Hab.
 specialize rngl_opt_le_antisymm as rngl_le_antisymm.
@@ -1359,13 +1359,13 @@ rewrite Hor in rngl_le_antisymm.
 split. {
   apply rngl_le_antisymm in Haz; [ easy | ].
   rewrite <- Hab.
-  remember (a + b)%F as ab.
+  remember (a + b)%L as ab.
   rewrite <- (rngl_add_0_r a); subst ab.
   apply rngl_add_le_compat; [ easy | now apply rngl_le_refl | easy ].
 } {
   apply rngl_le_antisymm in Hbz; [ easy | ].
   rewrite <- Hab.
-  remember (a + b)%F as ab.
+  remember (a + b)%L as ab.
   rewrite <- (rngl_add_0_l b); subst ab.
   apply rngl_add_le_compat; [ easy | easy | now apply rngl_le_refl ].
 }
@@ -1373,7 +1373,7 @@ Qed.
 
 Theorem rngl_opp_sub_distr :
   rngl_has_opp = true →
-  ∀ a b, (- (a - b) = b - a)%F.
+  ∀ a b, (- (a - b) = b - a)%L.
 Proof.
 intros Hro *.
 unfold rngl_sub at 1.
@@ -1384,7 +1384,7 @@ Qed.
 
 Theorem rngl_sub_add_distr :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, (a - (b + c) = a - b - c)%F.
+  ∀ a b c, (a - (b + c) = a - b - c)%L.
 Proof.
 intros Hos *.
 remember rngl_has_opp as op eqn:Hop.
@@ -1408,7 +1408,7 @@ Qed.
 
 Theorem rngl_sub_sub_distr :
   rngl_has_opp = true →
-  ∀ a b c, (a - (b - c) = a - b + c)%F.
+  ∀ a b c, (a - (b - c) = a - b + c)%L.
 Proof.
 intros Hop *.
 unfold rngl_sub.
@@ -1422,7 +1422,7 @@ Qed.
 
 Theorem eq_rngl_of_nat_0 :
   rngl_characteristic = 0 →
-  ∀ i, rngl_of_nat i = 0%F → i = 0.
+  ∀ i, rngl_of_nat i = 0%L → i = 0.
 Proof.
 intros Hch * Hi.
 induction i; [ easy | exfalso ].
@@ -1460,20 +1460,20 @@ Theorem rngl_opp_inv :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
-  ∀ a, a ≠ 0%F → (- a⁻¹ = (- a)⁻¹)%F.
+  ∀ a, a ≠ 0%L → (- a⁻¹ = (- a)⁻¹)%L.
 Proof.
 intros Hop Hin H10 * Haz.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hin'.
 rewrite Hin in Hin'.
 specialize (Hin' (or_introl eq_refl)).
 move Hin' before Hin.
-assert (Hoaz : (- a)%F ≠ 0%F). {
+assert (Hoaz : (- a)%L ≠ 0%L). {
   intros H.
   apply (f_equal rngl_opp) in H.
   rewrite rngl_opp_involutive in H; [ | easy ].
   now rewrite rngl_opp_0 in H.
 }
-apply (rngl_mul_cancel_l Hin' (- a)%F); [ easy | ].
+apply (rngl_mul_cancel_l Hin' (- a)%L); [ easy | ].
 specialize (rngl_opt_mul_inv_r) as H2.
 remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
 rewrite Hin in H2; cbn in H2.
@@ -1496,7 +1496,7 @@ Qed.
 
 Theorem rngl_div_mul_div :
   rngl_has_inv = true →
-  ∀ x y z, y ≠ 0%F → ((x / y) * (y / z))%F = (x / z)%F.
+  ∀ x y z, y ≠ 0%L → ((x / y) * (y / z))%L = (x / z)%L.
 Proof.
 intros Hin * Hs.
 unfold rngl_div; rewrite Hin.
@@ -1508,7 +1508,7 @@ Qed.
 
 Theorem eq_rngl_div_1 :
   rngl_has_inv_or_quot = true →
-   ∀ a b, b ≠ 0%F → a = b → (a / b = 1)%F.
+   ∀ a b, b ≠ 0%L → a = b → (a / b = 1)%L.
 Proof.
 intros Hiv * Hbz Hab.
 subst a.
@@ -1517,7 +1517,7 @@ Qed.
 
 Theorem rngl_mul_sub_distr_r :
   rngl_has_opp_or_sous = true →
-  ∀ a b c, ((a - b) * c = a * c - b * c)%F.
+  ∀ a b c, ((a - b) * c = a * c - b * c)%L.
 Proof.
 intros Hos *.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
@@ -1552,8 +1552,8 @@ Theorem eq_rngl_add_same_0 :
   (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
-  (a + a = 0)%F
-  → a = 0%F.
+  (a + a = 0)%L
+  → a = 0%L.
 Proof.
 intros Hos Hii Hch * Haa.
 rewrite <- (rngl_mul_1_l a) in Haa.
@@ -1588,14 +1588,14 @@ Context {rp : ring_like_prop T}.
 Context {Hic : @rngl_mul_is_comm T ro rp = true}.
 Context {Hop : @rngl_has_opp T ro = true}.
 
-Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%F.
+Theorem rngl_Rsub_def : ∀ x y, (x - y = x + (- y))%L.
 Proof.
 intros.
 unfold rngl_sub.
 now rewrite Hop.
 Qed.
 
-Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%F = 0%F.
+Theorem rngl_Ropp_def : ∀ x : T, (x + - x)%L = 0%L.
 Proof.
 intros.
 rewrite fold_rngl_sub; [ | easy ].
@@ -1629,7 +1629,7 @@ Add Ring rngl_ring : (@rngl_ring_theory T ro rp Hic Hop).
 
 (* example *)
 
-Example a2_b2 : ∀ a b, ((a + b) * (a - b) = a * a - b * b)%F.
+Example a2_b2 : ∀ a b, ((a + b) * (a - b) = a * a - b * b)%L.
 Proof.
 intros.
 ring_simplify. (* just to see what happens *)
@@ -1637,18 +1637,18 @@ easy.
 Qed.
 *)
 
-Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%F.
+Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%L.
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
-Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%F.
-Arguments rngl_eq_dec {T ro rp} Heq (a b)%F.
+Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
+Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
 Arguments rngl_integral {T}%type {ro rp}.
-Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%F b%F.
-Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%F.
-Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%F.
-Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%F.
-Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%F.
+Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%L b%L.
+Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
+Arguments rngl_mul_0_l {T}%type {ro rp} Hom a%L.
+Arguments rngl_mul_0_r {T}%type {ro rp} Hom a%L.
+Arguments rngl_mul_cancel_r {T}%type {ro rp} Hii (a b c)%L.
 Arguments rngl_mul_opp_opp {T}%type {ro rp} Hro.
 Arguments rngl_mul_opp_r {T}%type {ro rp} Hro.
 Arguments rngl_opp_0 {T}%type {ro rp}.
-Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%F b%F.
-Arguments rngl_sub_diag {T}%type {ro rp} Hom a%F.
+Arguments rngl_opp_add_distr {T}%type {ro rp} Hop a%L b%L.
+Arguments rngl_sub_diag {T}%type {ro rp} Hom a%L.

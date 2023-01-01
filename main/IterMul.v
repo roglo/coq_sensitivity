@@ -8,13 +8,13 @@ Import List List.ListNotations.
 Require Import Misc RingLike PermutationFun.
 
 Notation "'∏' ( i = b , e ) , g" :=
-  (iter_seq b e (λ c i, (c * g)%F) 1%F)
+  (iter_seq b e (λ c i, (c * g)%L) 1%L)
   (at level 35, i at level 0, b at level 60, e at level 60,
    right associativity,
    format "'[hv  ' ∏  ( i  =  b ,  e ) ,  '/' '[' g ']' ']'").
 
 Notation "'∏' ( i ∈ l ) , g" :=
-  (iter_list l (λ c i, (c * g)%F) 1%F)
+  (iter_list l (λ c i, (c * g)%L) 1%L)
   (at level 35, i at level 0, l at level 60,
    right associativity,
    format "'[hv  ' ∏  ( i  ∈  l ) ,  '/' '[' g ']' ']'").
@@ -28,7 +28,7 @@ Existing Instance ro.
 
 Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c * f i) l a =
-   a * fold_left (λ c i, c * f i) l 1)%F.
+   a * fold_left (λ c i, c * f i) l 1)%L.
 Proof.
 intros.
 apply fold_left_op_fun_from_d. {
@@ -41,8 +41,8 @@ apply fold_left_op_fun_from_d. {
 Qed.
 
 Theorem all_1_rngl_product_1 : ∀ b e f,
-  (∀ i, b ≤ i ≤ e → f i = 1%F)
-  → ∏ (i = b, e), f i = 1%F.
+  (∀ i, b ≤ i ≤ e → f i = 1%L)
+  → ∏ (i = b, e), f i = 1%L.
 Proof.
 intros * Hz.
 apply iter_seq_all_d; [ | | | easy ]. {
@@ -55,8 +55,8 @@ apply iter_seq_all_d; [ | | | easy ]. {
 Qed.
 
 Theorem all_1_rngl_product_list_1 : ∀ A (l : list A) f,
-  (∀ i, i ∈ l → f i = 1%F)
-  → ∏ (i ∈ l), f i = 1%F.
+  (∀ i, i ∈ l → f i = 1%L)
+  → ∏ (i ∈ l), f i = 1%L.
 Proof.
 intros * Hz.
 apply iter_list_all_d; [ | | | easy ]. {
@@ -70,7 +70,7 @@ Qed.
 
 Theorem rngl_product_split_first : ∀ b k g,
   b ≤ k
-  → ∏ (i = b, k), g i = (g b * ∏ (i = S b, k), g i)%F.
+  → ∏ (i = b, k), g i = (g b * ∏ (i = S b, k), g i)%L.
 Proof.
 intros * Hbk.
 apply iter_seq_split_first; [ | | | easy ]. {
@@ -84,7 +84,7 @@ Qed.
 
 Theorem rngl_product_split_last : ∀ b k g,
   b ≤ k
-  → ∏ (i = b, k), g i = (∏ (i = S b, k), g (i - 1)%nat * g k)%F.
+  → ∏ (i = b, k), g i = (∏ (i = S b, k), g (i - 1)%nat * g k)%L.
 Proof.
 intros * Hbk.
 now apply iter_seq_split_last.
@@ -92,7 +92,7 @@ Qed.
 
 Theorem rngl_product_split : ∀ j g b k,
   b ≤ S j ≤ S k
-  → ∏ (i = b, k), g i = ((∏ (i = b, j), g i) * (∏ (i = j+1, k), g i))%F.
+  → ∏ (i = b, k), g i = ((∏ (i = b, j), g i) * (∏ (i = j+1, k), g i))%L.
 Proof.
 intros * Hbjk.
 apply iter_seq_split; [ | | | easy ]. {
@@ -107,7 +107,7 @@ Qed.
 Theorem rngl_product_split3 : ∀ j g b k,
   b ≤ j ≤ k
   → ∏ (i = b, k), g i =
-       (∏ (i = S b, j), g (i - 1)%nat * g j * ∏ (i = j + 1, k), g i)%F.
+       (∏ (i = S b, j), g (i - 1)%nat * g j * ∏ (i = j + 1, k), g i)%L.
 Proof.
 intros * Hj.
 apply iter_seq_split3; [ | | | easy ]. {
@@ -124,23 +124,23 @@ now rewrite rngl_product_split_last.
 Qed.
 
 Theorem rngl_product_eq_compat : ∀ g h b k,
-  (∀ i, b ≤ i ≤ k → (g i = h i)%F)
-  → (∏ (i = b, k), g i = ∏ (i = b, k), h i)%F.
+  (∀ i, b ≤ i ≤ k → (g i = h i)%L)
+  → (∏ (i = b, k), g i = ∏ (i = b, k), h i)%L.
 Proof.
 intros * Hgh.
 now apply iter_seq_eq_compat.
 Qed.
 
 Theorem rngl_product_list_eq_compat : ∀ A g h (l : list A),
-  (∀ i, i ∈ l → (g i = h i)%F)
-  → (∏ (i ∈ l), g i = ∏ (i ∈ l), h i)%F.
+  (∀ i, i ∈ l → (g i = h i)%L)
+  → (∏ (i ∈ l), g i = ∏ (i ∈ l), h i)%L.
 Proof.
 intros * Hgh.
 now apply iter_list_eq_compat.
 Qed.
 
 Theorem rngl_product_list_cons : ∀ A (a : A) la f,
-  (∏ (i ∈ a :: la), f i = f a * ∏ (i ∈ la), f i)%F.
+  (∏ (i ∈ a :: la), f i = f a * ∏ (i ∈ la), f i)%L.
 Proof.
 intros.
 unfold iter_list; cbn.
@@ -149,7 +149,7 @@ now apply fold_left_rngl_mul_fun_from_1.
 Qed.
 
 Theorem rngl_product_list_app : ∀ A (la lb : list A) f,
-  ∏ (i ∈ la ++ lb), f i = (∏ (i ∈ la), f i * ∏ (i ∈ lb), f i)%F.
+  ∏ (i ∈ la ++ lb), f i = (∏ (i ∈ la), f i * ∏ (i ∈ lb), f i)%L.
 Proof.
 intros.
 rewrite iter_list_app.
@@ -158,14 +158,14 @@ apply fold_left_rngl_mul_fun_from_1.
 Qed.
 
 Theorem rngl_product_succ_succ : ∀ b k g,
-  (∏ (i = S b, S k), g i = ∏ (i = b, k), g (S i))%F.
+  (∏ (i = S b, S k), g i = ∏ (i = b, k), g (S i))%L.
 Proof.
 intros b k g.
 apply iter_seq_succ_succ.
 Qed.
 
 Theorem rngl_product_succ_succ' : ∀ b k g,
-  (∏ (i = S b, S k), g (i - 1)%nat = ∏ (i = b, k), g i)%F.
+  (∏ (i = S b, S k), g (i - 1)%nat = ∏ (i = b, k), g i)%L.
 Proof.
 intros.
 symmetry.
@@ -173,14 +173,14 @@ now rewrite <- iter_seq_succ_succ'.
 Qed.
 
 Theorem rngl_product_list_empty : ∀ A g (l : list A),
-  l = [] → ∏ (i ∈ l), g i = 1%F.
+  l = [] → ∏ (i ∈ l), g i = 1%L.
 Proof.
 intros * Hl.
 now apply iter_list_empty.
 Qed.
 
 Theorem rngl_product_empty : ∀ g b k,
-  k < b → (∏ (i = b, k), g i = 1)%F.
+  k < b → (∏ (i = b, k), g i = 1)%L.
 Proof.
 intros * Hkb.
 now apply iter_seq_empty.
@@ -190,7 +190,7 @@ Theorem rngl_product_list_mul_distr :
   rngl_mul_is_comm = true →
   ∀ A g h (l : list A),
   (∏ (i ∈ l), (g i * h i) =
-  (∏ (i ∈ l), g i) * ∏ (i ∈ l), h i)%F.
+  (∏ (i ∈ l), g i) * ∏ (i ∈ l), h i)%L.
 Proof.
 intros Hic *.
 apply iter_list_distr. {
@@ -206,7 +206,7 @@ Theorem rngl_product_mul_distr :
   rngl_mul_is_comm = true →
   ∀ g h b k,
   (∏ (i = b, k), (g i * h i) =
-  (∏ (i = b, k), g i) * ∏ (i = b, k), h i)%F.
+  (∏ (i = b, k), g i) * ∏ (i = b, k), h i)%L.
 Proof.
 intros Hic g h b k.
 apply iter_seq_distr. {
@@ -246,7 +246,7 @@ now rewrite Nat.add_comm, Nat.add_sub.
 Qed.
 
 Theorem rngl_product_ub_mul_distr : ∀ a b f,
-  (∏ (i = 0, a + b), f i)%F = (∏ (i = 0, a), f i * ∏ (i = S a, a + b), f i)%F.
+  (∏ (i = 0, a + b), f i)%L = (∏ (i = 0, a), f i * ∏ (i = S a, a + b), f i)%L.
 Proof.
 intros.
 rewrite (rngl_product_split a); [ | flia ].
@@ -258,14 +258,14 @@ Theorem rngl_product_list_integral :
   rngl_is_integral = true →
   rngl_characteristic ≠ 1 →
   ∀ A (l : list A) f,
-  (∏ (i ∈ l), f i)%F = 0%F
-  → ∃ i, i ∈ l ∧ f i = 0%F.
+  (∏ (i ∈ l), f i)%L = 0%L
+  → ∃ i, i ∈ l ∧ f i = 0%L.
 Proof.
 intros Hom Hin H10 * Hz.
 induction l as [| a]; [ now apply rngl_1_neq_0_iff in Hz | ].
 unfold iter_list in Hz; cbn in Hz.
 rewrite rngl_mul_1_l in Hz.
-rewrite (fold_left_op_fun_from_d 1%F) in Hz; cycle 1. {
+rewrite (fold_left_op_fun_from_d 1%L) in Hz; cycle 1. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
@@ -288,8 +288,8 @@ Theorem rngl_product_integral :
   rngl_is_integral = true →
   rngl_characteristic ≠ 1 →
   ∀ b e f,
-  (∏ (i = b, e), f i = 0)%F
-  → ∃ i, b ≤ i ≤ e ∧ f i = 0%F.
+  (∏ (i = b, e), f i = 0)%L
+  → ∃ i, b ≤ i ≤ e ∧ f i = 0%L.
 Proof.
 intros Hom Hin H10 * Hz.
 apply rngl_product_list_integral in Hz; [ | easy | easy | easy ].
@@ -320,7 +320,7 @@ Qed.
 
 Theorem rngl_product_change_var : ∀ A b e f g (h : _ → A),
   (∀ i, b ≤ i ≤ e → g (h i) = i)
-  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%F.
+  → (∏ (i = b, e), f i = ∏ (i ∈ map h (seq b (S e - b))), f (g i))%L.
 Proof.
 intros * Hgh.
 unfold iter_seq, iter_list.
@@ -339,14 +339,14 @@ Theorem rngl_inv_product_list :
   rngl_characteristic ≠ 1 →
   rngl_is_integral = true →
   ∀ A (l : list A) f,
-  (∀ i, i ∈ l → f i ≠ 0%F)
-  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%F.
+  (∀ i, i ∈ l → f i ≠ 0%L)
+  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ rev l), ((f i)⁻¹))%L.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
 unfold iter_list.
 induction l as [| a]; [ now apply rngl_inv_1 | cbn ].
 rewrite rngl_mul_1_l.
-rewrite (fold_left_op_fun_from_d 1%F); cycle 1. {
+rewrite (fold_left_op_fun_from_d 1%L); cycle 1. {
   apply rngl_mul_1_l.
 } {
   apply rngl_mul_1_r.
@@ -377,8 +377,8 @@ Theorem rngl_inv_product :
   rngl_characteristic ≠ 1 →
   rngl_is_integral = true →
   ∀ b e f,
-  (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
-  → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f (b + e - i)%nat)⁻¹))%F.
+  (∀ i, b ≤ i ≤ e → f i ≠ 0%L)
+  → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f (b + e - i)%nat)⁻¹))%L.
 Proof.
 intros Hom Hin H10 Hit * Hnz.
 unfold iter_seq.
@@ -430,8 +430,8 @@ Theorem rngl_inv_product_list_comm : ∀ A (eqb : A → A → bool),
   rngl_characteristic ≠ 1 →
   rngl_is_integral = true →
   ∀ (l : list A) f,
-  (∀ i, i ∈ l → f i ≠ 0%F)
-  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ l), (( f i)⁻¹))%F.
+  (∀ i, i ∈ l → f i ≠ 0%L)
+  → ((∏ (i ∈ l), f i)⁻¹ = ∏ (i ∈ l), (( f i)⁻¹))%L.
 Proof.
 intros * Heqb Hom Hic Hin H10 Hit * Hnz.
 rewrite rngl_inv_product_list; [ | easy | easy | easy | easy | easy ].
@@ -446,8 +446,8 @@ Theorem rngl_inv_product_comm :
   rngl_characteristic ≠ 1 →
   rngl_is_integral = true →
   ∀ b e f,
-  (∀ i, b ≤ i ≤ e → f i ≠ 0%F)
-  → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f i)⁻¹))%F.
+  (∀ i, b ≤ i ≤ e → f i ≠ 0%L)
+  → ((∏ (i = b, e), f i)⁻¹ = ∏ (i = b, e), ((f i)⁻¹))%L.
 Proof.
 intros Hom Hic Hin H10 Hit * Hnz.
 apply (rngl_inv_product_list_comm _ _ Nat.eqb_eq); try easy.
@@ -463,9 +463,9 @@ Theorem rngl_product_div_distr :
   rngl_characteristic ≠ 1 →
   rngl_is_integral = true →
   ∀ b e f g,
-  (∀ i, b ≤ i ≤ e → g i ≠ 0%F)
-  → (∏ (i = b, e), (f i / g i))%F =
-    ((∏ (i = b, e), f i) / (∏ (i = b, e), g i))%F.
+  (∀ i, b ≤ i ≤ e → g i ≠ 0%L)
+  → (∏ (i = b, e), (f i / g i))%L =
+    ((∏ (i = b, e), f i) / (∏ (i = b, e), g i))%L.
 Proof.
 intros Hom Hic Hin H10 Hit * Hg.
 unfold rngl_div.
@@ -477,7 +477,7 @@ Qed.
 
 Theorem rngl_product_seq_product : ∀ b len f,
   len ≠ 0
-  → (∏ (i ∈ seq b len), f i = ∏ (i = b, b + len - 1), f i)%F.
+  → (∏ (i ∈ seq b len), f i = ∏ (i = b, b + len - 1), f i)%L.
 Proof.
 intros * Hlen.
 now apply iter_list_seq.
@@ -486,14 +486,14 @@ Qed.
 Theorem rngl_product_1_opp_1 :
   rngl_has_opp = true →
   ∀ b e f,
-  (∀ i, b ≤ i ≤ e → f i = 1%F ∨ f i = (-1)%F)
-  → (∏ (i = b, e), f i = 1)%F ∨ (∏ (i = b, e), f i = -1)%F.
+  (∀ i, b ≤ i ≤ e → f i = 1%L ∨ f i = (-1)%L)
+  → (∏ (i = b, e), f i = 1)%L ∨ (∏ (i = b, e), f i = -1)%L.
 Proof.
 intros Hop * Hf.
 unfold iter_seq.
 remember (S e - b) as len eqn:Hlen.
 destruct len; [ now left | ].
-assert (H : ∀ i, b ≤ i ≤ b + len → f i = 1%F ∨ f i = (-1)%F). {
+assert (H : ∀ i, b ≤ i ≤ b + len → f i = 1%L ∨ f i = (-1)%L). {
   intros i Hi.
   apply Hf.
   flia Hlen Hi.
@@ -514,7 +514,7 @@ specialize (Hf b) as H1.
 assert (H : b ≤ b ≤ b + S len) by flia.
 specialize (H1 H); clear H.
 specialize (IHlen (S b)) as H2.
-assert (H : ∀ i, S b ≤ i ≤ S b + len → f i = 1%F ∨ f i = (-1)%F). {
+assert (H : ∀ i, S b ≤ i ≤ S b + len → f i = 1%L ∨ f i = (-1)%L). {
   intros i Hi.
   apply Hf.
   flia Hi.
@@ -534,14 +534,14 @@ destruct H1 as [H1| H1]; rewrite H1. {
 Qed.
 
 Theorem rngl_product_list_only_one : ∀ A g (a : A),
-  (∏ (i ∈ [a]), g i = g a)%F.
+  (∏ (i ∈ [a]), g i = g a)%L.
 Proof.
 intros.
 unfold iter_list; cbn.
 apply rngl_mul_1_l.
 Qed.
 
-Theorem rngl_product_only_one : ∀ g n, (∏ (i = n, n), g i = g n)%F.
+Theorem rngl_product_only_one : ∀ g n, (∏ (i = n, n), g i = g n)%L.
 Proof.
 intros g n.
 apply iter_seq_only_one, rngl_mul_1_l.

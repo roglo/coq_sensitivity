@@ -141,14 +141,14 @@ Context {n : nat}.
 Context (ro := Zn_ring_like_op n).
 Existing Instance ro.
 
-Theorem Zn_add_comm : ∀ (a b : Zn n), (a + b = b + a)%F.
+Theorem Zn_add_comm : ∀ (a b : Zn n), (a + b = b + a)%L.
 Proof.
 intros (a, Ha) (b, Hb).
 apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.add_comm.
 Qed.
 
-Theorem Zn_add_assoc : ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%F.
+Theorem Zn_add_assoc : ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%L.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
@@ -157,7 +157,7 @@ rewrite Nat.add_mod_idemp_r; [ | easy ].
 now rewrite Nat.add_assoc.
 Qed.
 
-Theorem Zn_add_0_l : ∀ (a : Zn n), (0 + a = a)%F.
+Theorem Zn_add_0_l : ∀ (a : Zn n), (0 + a = a)%L.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
@@ -168,7 +168,7 @@ destruct a as (a, Ha); cbn.
 now apply Nat.ltb_lt in Ha.
 Qed.
 
-Theorem Zn_mul_assoc : ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%F.
+Theorem Zn_mul_assoc : ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%L.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
@@ -177,7 +177,7 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_assoc.
 Qed.
 
-Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%F.
+Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%L.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
@@ -189,7 +189,7 @@ now apply Nat.mod_small.
 Qed.
 
 Theorem Zn_mul_add_distr_l : ∀ (a b c : Zn n),
-  (a * (b + c) = a * b + a * c)%F.
+  (a * (b + c) = a * b + a * c)%L.
 Proof.
 intros.
 apply Zn_eq; cbn - [ "mod" ].
@@ -199,14 +199,14 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
-Theorem Zn_mul_comm : ∀ (a b : Zn n), (a * b = b * a)%F.
+Theorem Zn_mul_comm : ∀ (a b : Zn n), (a * b = b * a)%L.
 Proof.
 intros (a, Ha) (b, Hb).
 apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.mul_comm.
 Qed.
 
-Theorem Zn_add_opp_l : ∀ (a : Zn n), (- a + a = 0)%F.
+Theorem Zn_add_opp_l : ∀ (a : Zn n), (- a + a = 0)%L.
 Proof.
 intros (a, Ha).
 apply Zn_eq; cbn - [ "mod" "-" ].
@@ -219,7 +219,7 @@ rewrite Nat.sub_add. 2: {
 now apply Nat.mod_same.
 Qed.
 
-Theorem Zn_eqb_eq : ∀ a b : Zn n, (a =? b)%F = true ↔ a = b.
+Theorem Zn_eqb_eq : ∀ a b : Zn n, (a =? b)%L = true ↔ a = b.
 Proof.
 intros (a, Ha) (b, Hb); cbn.
 split. {
@@ -235,7 +235,7 @@ split. {
 }
 Qed.
 
-Theorem Zn_eq_dec : ∀ (a b : Zn n), ({a = b} + {a ≠ b})%F.
+Theorem Zn_eq_dec : ∀ (a b : Zn n), ({a = b} + {a ≠ b})%L.
 Proof.
 intros (a, Ha) (b, Hb).
 destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
@@ -246,7 +246,7 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 Qed.
 
 Theorem Zn_opt_mul_inv_l :
-  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%F → (a⁻¹ * a)%F = 1%F
+  if rngl_has_inv then ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
 intros.
@@ -299,14 +299,14 @@ Qed.
 
 Theorem Zn_opt_mul_inv_r :
   if (rngl_has_inv && negb true)%bool then
-    ∀ a : Zn n, a ≠ 0%F → (a / a)%F = 1%F
+    ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
   else not_applicable.
 Proof.
 now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem Zn_opt_mul_div :
-  if rngl_has_quot then ∀ a b : Zn n, b ≠ 0%F → (a * b / b)%F = a
+  if rngl_has_quot then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
 intros.
@@ -317,7 +317,7 @@ Qed.
 
 Theorem Zn_opt_mul_quot_r :
   if (rngl_has_quot && negb true)%bool then
-    ∀ a b : Zn n, b ≠ 0%F → (b * a / b)%F = a
+    ∀ a b : Zn n, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
 now rewrite Bool.andb_false_r.
@@ -340,10 +340,10 @@ easy.
 Qed.
 
 Theorem Zn_characteristic_prop :
-  if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
-    (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%F) ∧
-    rngl_of_nat (at_least_1 n) = 0%F.
+    (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%L) ∧
+    rngl_of_nat (at_least_1 n) = 0%L.
 Proof.
 split. {
   intros i Hi.
@@ -450,8 +450,8 @@ now left.
 Qed.
 
 Theorem lcm_characteristic_prop :
-  if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
-  else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%F) ∧ rngl_of_nat 1 = 0%F.
+  if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 1 = 0%L.
 Proof.
 split; [ intros * Hi; flia Hi | easy ].
 Qed.

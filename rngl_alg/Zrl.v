@@ -51,7 +51,7 @@ now apply Z.mul_le_mono_nonneg.
 Qed.
 
 Theorem Z_mul_le_compat_nonpos : ∀ a b c d,
-  (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%F.
+  (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
 Proof.
 intros * Hac Hbd.
 now apply Z.mul_le_mono_nonpos.

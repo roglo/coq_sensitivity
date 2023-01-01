@@ -22,7 +22,7 @@ Require Import Matrix Signature Determinant Comatrix.
 Require Import CauchyBinet.
 Import matrix_Notations.
 
-Notation "l .( i )" := (nth (i - 1) l 0%F)
+Notation "l .( i )" := (nth (i - 1) l 0%L)
   (at level 1, format "l .( i )") : ring_like_scope.
 
 Section a.
@@ -60,18 +60,18 @@ Definition eigenvalues n M ev :=
 
 Definition eigenvalues_and_norm_vectors n M ev eV :=
   (∀ V : vector T, V ∈ eV → vect_size V = n) ∧
-  (∀ i j, 1 ≤ i ≤ n → 1 ≤ j ≤ n → i ≠ j → ev.(i)%F ≠ ev.(j)%F) ∧
-  (∀ i, 1 ≤ i ≤ n → vect_squ_norm (nth (i - 1) eV (vect_zero n)) = 1%F) ∧
+  (∀ i j, 1 ≤ i ≤ n → 1 ≤ j ≤ n → i ≠ j → ev.(i)%L ≠ ev.(j)%L) ∧
+  (∀ i, 1 ≤ i ≤ n → vect_squ_norm (nth (i - 1) eV (vect_zero n)) = 1%L) ∧
   (∀ i (μ : T) (V : vector T),
    1 ≤ i ≤ n
-   → μ = ev.(i)%F
+   → μ = ev.(i)%L
    → V = nth (i - 1) eV (vect_zero n)
    → (M • V)%V = (μ × V)%V).
 
 (* Rayleigh quotient *)
 
 Definition Rayleigh_quotient (M : matrix T) (v : vector T) :=
-  (≺ v, M • v ≻ / ≺ v, v ≻)%F.
+  (≺ v, M • v ≻ / ≺ v, v ≻)%L.
 
 Arguments Rayleigh_quotient M%M v%V.
 
@@ -79,14 +79,14 @@ Theorem rngl_0_le_squ :
   rngl_has_dec_le = true →
   rngl_has_opp = true →
   rngl_is_ordered = true →
-  ∀ n, (0 ≤ n * n)%F.
+  ∀ n, (0 ≤ n * n)%L.
 Proof.
 intros Hld Hop Hor *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 rewrite <- (rngl_mul_0_r Hos 0).
-destruct (rngl_le_dec Hld 0%F n) as [Hnz| Hnz]. {
+destruct (rngl_le_dec Hld 0%L n) as [Hnz| Hnz]. {
   apply rngl_mul_le_compat_nonneg; [ easy | easy | | ]. {
     split; [ now apply rngl_le_refl | easy ].
   } {
@@ -121,7 +121,7 @@ Theorem eq_vect_squ_0 :
   rngl_has_dec_le = true →
   rngl_is_integral = true →
   rngl_is_ordered = true →
-  ∀ v, ≺ v, v ≻ = 0%F → v = vect_zero (vect_size v).
+  ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
 intros Hop Hed Hdo Hor * Hvvz.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
@@ -187,28 +187,28 @@ unfold vect_dot_mul; cbn.
 do 3 rewrite map2_map_r.
 do 2 rewrite map2_map_l.
 f_equal. {
-  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
     rewrite rngl_mul_0_r; [ | easy ].
     now apply rngl_mul_0_l.
   }
   symmetry.
-  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
     now apply rngl_mul_0_l.
   }
   easy.
 } {
-  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
     rewrite rngl_mul_0_r; [ | easy ].
     now apply rngl_mul_0_l.
   }
   symmetry.
-  rewrite map2_ext_in with (g := λ _ _, 0%F). 2: {
+  rewrite map2_ext_in with (g := λ _ _, 0%L). 2: {
     intros i j Hi Hj.
     apply repeat_spec in Hi; subst i.
     now apply rngl_mul_0_l.
@@ -222,7 +222,7 @@ Theorem RQ_mul_scal_prop :
   ∀ (M : matrix T) V c,
   is_square_matrix M = true
   → vect_size V = mat_nrows M
-  → c ≠ 0%F
+  → c ≠ 0%L
   → Rayleigh_quotient M (c × V) = Rayleigh_quotient M V.
 Proof.
 intros Hof * Hsm Hsr Hcz.
@@ -299,7 +299,7 @@ Definition is_orthogonal_matrix (M : matrix T) :=
 
 Definition mat_with_diag n d :=
   mk_mat
-    (map (λ i, map (λ j, if i =? j then nth i d 0%F else 0%F) (seq 0 n))
+    (map (λ i, map (λ j, if i =? j then nth i d 0%L else 0%L) (seq 0 n))
        (seq 0 n)).
 
 (* matrix with columns given as list of vectors *)
@@ -642,7 +642,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     apply map_ext_in.
     intros k Hk; apply in_seq in Hk.
     rewrite Nat_sub_succ_1.
-    rewrite (List_map_nth_seq (nth k ll []) 0%F) at 1.
+    rewrite (List_map_nth_seq (nth k ll []) 0%L) at 1.
     apply is_scm_mat_iff in Hsm; cbn in Hsm.
     destruct Hsm as (Hcr, Hcl).
     rewrite Hcl; [ rewrite Hr | now apply nth_In; rewrite Hr ].
@@ -660,7 +660,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   clear H2.
   rewrite vect_scal_mul_dot_mul_comm in H1; [ | easy ].
   rewrite vect_dot_mul_scal_mul_comm in H1; [ | easy | easy ].
-  remember (rngl_eqb (≺ vi, vj ≻) 0%F) as vvij eqn:Hvvij.
+  remember (rngl_eqb (≺ vi, vj ≻) 0%L) as vvij eqn:Hvvij.
   symmetry in Hvvij.
   destruct vvij; [ now apply rngl_eqb_eq | ].
   apply rngl_eqb_neq in Hvvij; [ | easy ].
@@ -894,16 +894,16 @@ erewrite rngl_summation_eq_compat. 2: {
   now cbn.
 }
 cbn.
-specialize (Hvv j (ev.(j))%F) as H1.
+specialize (Hvv j (ev.(j))%L) as H1.
 specialize (H1 (nth (j - 1) eV (vect_zero n))).
 specialize (H1 Hj eq_refl eq_refl).
-remember (nth (j - 1) ev 0%F) as μ eqn:Hμ.
+remember (nth (j - 1) ev 0%L) as μ eqn:Hμ.
 remember (nth (j - 1) eV (vect_zero n)) as V eqn:Hv.
 symmetry.
 apply (f_equal (λ x, vect_el x i)) in H1.
 cbn - [ iter_seq ] in H1.
 rewrite (List_map_nth' []) in H1; [ | now rewrite fold_mat_nrows, Hrn ].
-rewrite (List_map_nth' 0%F) in H1. 2: {
+rewrite (List_map_nth' 0%L) in H1. 2: {
   rewrite fold_vect_size.
   rewrite Hevn; [ easy | ].
   rewrite Hv.
@@ -918,7 +918,7 @@ unfold mat_el.
 remember (nth (i - 1) (mat_list_list M) []) as l eqn:Hl.
 erewrite rngl_summation_eq_compat. 2: {
   intros u Hu.
-  replace (nth (u - 1) l 0%F) with (vect_el (mk_vect l) u) by easy.
+  replace (nth (u - 1) l 0%L) with (vect_el (mk_vect l) u) by easy.
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
   easy.
@@ -997,7 +997,7 @@ rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
 assert (Hsu : is_square_matrix U = true). {
   rewrite Ho; apply mat_with_vect_is_square.
 }
-assert (Hdu : det U ≠ 0%F). {
+assert (Hdu : det U ≠ 0%L). {
   generalize Hvv; intros H.
   apply for_symm_squ_mat_eigen_vect_mat_is_ortho with (A := U) in H;
     try (now destruct Hif).
@@ -1067,7 +1067,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → is_symm_mat M
   → is_square_matrix U = true
   → is_square_matrix D = true
-  → ≺ x, x ≻ = 1%F
+  → ≺ x, x ≻ = 1%L
   → eigenvalues_and_norm_vectors n M ev eV
   → U = mat_with_vect n eV
   → M = (U⁺ * D * U)%M
@@ -1075,7 +1075,7 @@ Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   → y ≠ vect_zero n
   → Rayleigh_quotient M x =
       ((∑ (i = 1, n), ev.(i) * (vect_el y i) ^ 2) /
-       (∑ (i = 1, n), vect_el y i ^ 2))%F.
+       (∑ (i = 1, n), vect_el y i ^ 2))%L.
 Proof.
 intros Hof H10 * Hr Hsx Hnz Hsym Hsmu Hsmd Hx1 HeV HU Hmin Hmax Hyz.
 (**)
@@ -1085,7 +1085,7 @@ assert
      ∀ v,
        vect_size v = n
        → Rayleigh_quotient M v =
-           (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%F). {
+           (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
   assert (Hos : rngl_has_opp_or_sous = true). {
@@ -1272,10 +1272,10 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ rngl_power ].
-erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%F). 2: {
+erewrite rngl_summation_eq_compat with (g := λ _, (_ ^ _)%L). 2: {
   now intros; cbn; rewrite rngl_mul_1_r, Hyi.
 }
-cbn - [ "^"%F ].
+cbn - [ "^"%L ].
 unfold Rayleigh_quotient.
 rewrite Hx1.
 rewrite rngl_div_1_r; [ | now destruct Hof; left | now destruct Hof ].
@@ -1285,7 +1285,7 @@ destruct HeV as (Hvs & Hvd & Hvn & Hmv).
 erewrite rngl_summation_eq_compat. 2: {
   intros i Hi; cbn.
   rewrite rngl_mul_1_r, rngl_mul_assoc.
-  rewrite <- vect_scal_mul_dot_mul_comm with (a := (ev.(i))%F). 2: {
+  rewrite <- vect_scal_mul_dot_mul_comm with (a := (ev.(i))%L). 2: {
     now destruct Hof; left.
   }
   rewrite <- (Hmv i); [ | easy | easy | easy ].
@@ -1310,7 +1310,7 @@ Search vect_dot_mul.
   ============================
   ≺ x, M • x ≻ =
   ((∑ (i = 1, n), ≺ nth_eV i, M • x ≻ * ≺ nth_eV i, x ≻) /
-   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
+   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%L
 *)
 unfold is_symm_mat in Hsym.
 destruct Hsym as (Hsmm, Htm).
@@ -1342,9 +1342,9 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn; symmetry.
 ...
   ============================
-  (≺ x, M • x ≻ / ≺ x, x ≻)%F =
+  (≺ x, M • x ≻ / ≺ x, x ≻)%L =
   ((∑ (i = 1, n), ev.(i) * ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻) /
-   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%F
+   (∑ (i = 1, n), ≺ nth_eV i, x ≻ * ≺ nth_eV i, x ≻))%L
 ...
 Search (≺ _, _ • _ ≻).
 mat_mul_vect_dot_vect:
@@ -1360,7 +1360,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 ...
 Search (≺ _ • _, _ ≻).
-Search (≺ _ , _ ≻ * _)%F.
+Search (≺ _ , _ ≻ * _)%L.
 ...
 assert (∑ (i = 1, n), rngl_squ (vect_el y i) = ≺ y, y ≻). {
   rewrite vect_dot_mul_dot_mul'; [ | now destruct Hof; left ].
@@ -1438,17 +1438,17 @@ rewrite Nat.min_id.
 (*
 ...
 , rngl_div_1_r; [ | now left | easy ].
-Search (_ = _ * _ ↔ _ / _ = _)%F.
-Search (_ = _ * _ ↔ _ = _ / _)%F.
-Search (_ * _ = _ ↔ _ / _ = _)%F.
-Search (_ * _ = _ ↔ _ = _ / _)%F.
-Search (_ = _ / _)%F.
+Search (_ = _ * _ ↔ _ / _ = _)%L.
+Search (_ = _ * _ ↔ _ = _ / _)%L.
+Search (_ * _ = _ ↔ _ / _ = _)%L.
+Search (_ * _ = _ ↔ _ = _ / _)%L.
+Search (_ = _ / _)%L.
 ...
 *)
 apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   now apply rngl_1_neq_0.
 (*
-  enough (H : ≺ x, x ≻ ≠ 0%F). {
+  enough (H : ≺ x, x ≻ ≠ 0%L). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
     now rewrite Nat.min_id, Hsx in H.
@@ -1466,7 +1466,7 @@ apply rngl_div_div_mul_mul; [ easy | easy | | | ]. {
   }
 *)
 } {
-  enough (H : ≺ y, y ≻ ≠ 0%F). {
+  enough (H : ≺ y, y ≻ ≠ 0%L). {
     rewrite vect_dot_mul_dot_mul' in H; [ | now left ].
     unfold vect_dot_mul' in H.
     now rewrite Nat.min_id, Hsy in H.
@@ -1569,7 +1569,7 @@ erewrite rngl_summation_eq_compat. 2: {
   easy.
 }
 cbn - [ vect_el ].
-unfold "/"%F.
+unfold "/"%L.
 rewrite Hiv.
 rewrite <- rngl_mul_summation_distr_r; [ | easy ].
 f_equal. {
@@ -1616,8 +1616,8 @@ Theorem Rayleigh_quotient_from_ortho : ∀ n (M : matrix n n T) D U x y ev,
   → M = (mat_transp U * D * U)%M
   → y = (mat_transp U • x)%M
   → Rayleigh_quotient M x =
-      (Σ (i = 1, n), nth i ev 0%F * rngl_squ (vect_el y i) /
-       Σ (i = 1, n), rngl_squ (vect_el y i))%F.
+      (Σ (i = 1, n), nth i ev 0%L * rngl_squ (vect_el y i) /
+       Σ (i = 1, n), rngl_squ (vect_el y i))%L.
 Proof.
 intros * Hsy Hev Hmin Hmax.
 ...
@@ -1631,9 +1631,9 @@ intros * Hsy Hev Hmin Hmax.
 Theorem glop : ∀ n (M : matrix T) x sev μ_min μ_max,
   eigenvalues M sev
   → Sorted rngl_le sev
-  → μ_min = hd 0%F sev
-  → μ_max = last sev 0%F
-  → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%F.
+  → μ_min = hd 0%L sev
+  → μ_max = last sev 0%L
+  → (μ_min ≤ Rayleigh_quotient M x ≤ μ_max)%L.
 Proof.
 intros * Hev Hsev Hmin Hmax.
 ...
@@ -1656,7 +1656,7 @@ Theorem lemma_2_1 :
   → Sorted rngl_le seva
   → Sorted rngl_le sevb
   → ∀ i, 1 ≤ i ≤ m →
-    (nth (i-n+m) seva 0%F ≤ nth i sevb 0%F ≤ nth i seva 0%F)%F.
+    (nth (i-n+m) seva 0%L ≤ nth i sevb 0%L ≤ nth i seva 0%L)%L.
 Proof.
 intros * Hm Hmn Hisa Hb Heva Hevb Hsa Hsb * Him.
 ...

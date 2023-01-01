@@ -597,7 +597,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         now rewrite List_map_seq_length.
       }
       rewrite List_map_seq_length.
-      rewrite (List_map_nth' 0%F). 2: {
+      rewrite (List_map_nth' 0%L). 2: {
         rewrite fold_corr_mat_ncols; cycle 1. {
           apply mA_is_correct.
         } {
@@ -738,7 +738,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
       rewrite fold_mat_nrows, mA_nrows.
       apply le_pow_succ_sub_1_lt; flia Hi.
     }
-    rewrite (List_map_nth' 0%F). 2: {
+    rewrite (List_map_nth' 0%L). 2: {
       rewrite fold_corr_mat_ncols; cycle 1. {
         apply mA_is_correct.
       } {
@@ -888,7 +888,7 @@ destruct (lt_dec i (2 ^ n)) as [Hin| Hin]. {
         now rewrite List_map_seq_length.
       }
       rewrite List_map_seq_length.
-      rewrite (List_map_nth' 0%F). 2: {
+      rewrite (List_map_nth' 0%L). 2: {
         rewrite fold_corr_mat_ncols; cycle 1. {
           apply mA_is_correct.
         } {
@@ -1334,12 +1334,12 @@ f_equal. {
 Qed.
 
 Definition base_vector_1 dim :=
-  mk_vect (1%F :: repeat 0%F (dim - 1)).
+  mk_vect (1%L :: repeat 0%L (dim - 1)).
 
 Definition A_Sn_eigenvector_of_sqrt_Sn n μ (V : vector T) : vector T :=
   (mat_of_mat_list_list [[(mA n + μ × mI (2 ^ n))]; [mI (2 ^ n)]] • V)%M.
 
-Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%F.
+Theorem rngl_mul_eq_if : ∀ a b c d, a = c → b = d → (a * b = c * d)%L.
 Proof.
 intros * Hac Hbd.
 now subst a b.
@@ -1582,7 +1582,7 @@ Theorem An_eigen_equation_for_sqrt_n :
   rngl_has_opp = true →
   rngl_has_inv = true →
   rngl_has_eqb = true →
-  ∀ n μ, (μ * μ)%F = rngl_of_nat n →
+  ∀ n μ, (μ * μ)%L = rngl_of_nat n →
   match n with
   | 0 => ∀ V, vect_size V = 1 → (mA 0 • V = μ × V)%V
   | S n' =>
@@ -1599,11 +1599,11 @@ move Hos before Hop.
 destruct n. {
   intros V Hv.
   cbn in Hμ, V |-*.
-  assert (H : μ = 0%F). {
-    remember (rngl_eqb μ 0%F) as μz eqn:Hμz; symmetry in Hμz.
+  assert (H : μ = 0%L). {
+    remember (rngl_eqb μ 0%L) as μz eqn:Hμz; symmetry in Hμz.
     destruct μz; [ now apply rngl_eqb_eq | ].
     apply rngl_eqb_neq in Hμz; [ | easy ].
-    apply (f_equal (rngl_mul (μ⁻¹)%F)) in Hμ.
+    apply (f_equal (rngl_mul (μ⁻¹)%L)) in Hμ.
     rewrite rngl_mul_0_r in Hμ; [ | easy ].
     rewrite rngl_mul_assoc in Hμ.
     rewrite rngl_mul_inv_l in Hμ; [ | easy | easy ].
@@ -1783,7 +1783,7 @@ Theorem A_n_eigenvalue_squared_is_n :
   vect_size V = 2 ^ n
   → V ≠ vect_zero (2 ^ n)
   → (mA n • V = μ × V)%V
-  → (μ * μ)%F = rngl_of_nat n.
+  → (μ * μ)%L = rngl_of_nat n.
 Proof.
 intros Hic Hop Heq Hin * Hvs Hvr Hav.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -1827,7 +1827,7 @@ Theorem μ_is_ev_of_An_iff_μ2_eq_n :
   rngl_has_inv = true →
   rngl_characteristic ≠ 1 →
   ∀ n μ,
-  (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%F.
+  (∃ V, is_eigenvector_of_An n μ V) ↔ (μ * μ = rngl_of_nat n)%L.
 Proof.
 intros Hic Hop Heq Hin H10 *.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.

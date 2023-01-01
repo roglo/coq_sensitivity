@@ -654,7 +654,7 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
   → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
   → no_dup Nat.eqb kl = false
   → det (mat_select_rows kl A) =
-      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
@@ -727,7 +727,7 @@ Theorem det_isort_rows_no_dup : in_charac_0_field →
   → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
   → no_dup Nat.eqb kl = true
   → det (mat_select_rows kl A) =
-      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
 assert (H10 : rngl_characteristic ≠ 1). {
@@ -1057,7 +1057,7 @@ Theorem det_isort_rows : in_charac_0_field →
   → mat_ncols A = length kl
   → (∀ k, k ∈ kl → 1 ≤ k ≤ mat_nrows A)
   → det (mat_select_rows kl A) =
-      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%F.
+      (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hif * Hcm Hac Hkl.
 remember (no_dup Nat.eqb kl) as adk eqn:Hadk; symmetry in Hadk.
@@ -2164,7 +2164,7 @@ Corollary determinant_mul : in_charac_0_field →
   is_square_matrix A = true
   → is_square_matrix B = true
   → mat_nrows A = mat_nrows B
-  → det (A * B) = (det A * det B)%F.
+  → det (A * B) = (det A * det B)%L.
 Proof.
 (* version shunting Cauchy_Binet_formula using only steps 1 to 5
 intros Hif * Hsma Hsmb Hrab *.

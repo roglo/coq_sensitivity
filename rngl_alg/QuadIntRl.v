@@ -210,14 +210,14 @@ now rewrite Z.add_comm, (Z.add_comm (qi_im b)).
 Qed.
 
 Theorem quad_int_add_assoc : ∀ a b c : quad_int d,
-  (a + (b + c))%F = (a + b + c)%F.
+  (a + (b + c))%L = (a + b + c)%L.
 Proof.
 intros; cbn.
 unfold "+"%QI; cbn.
 now do 2 rewrite Z.add_assoc.
 Qed.
 
-Theorem quad_int_add_0_l : ∀ a : quad_int d, (0 + a)%F = a.
+Theorem quad_int_add_0_l : ∀ a : quad_int d, (0 + a)%L = a.
 Proof.
 intros; cbn.
 unfold "+"%QI; cbn.
@@ -232,7 +232,7 @@ unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_mul_1_l : ∀ a : quad_int d, (1 * a)%F = a.
+Theorem quad_int_mul_1_l : ∀ a : quad_int d, (1 * a)%L = a.
 Proof.
 intros; cbn.
 unfold "*"%QI.
@@ -242,7 +242,7 @@ now destruct a, a'.
 Qed.
 
 Theorem quad_int_mul_add_distr_l : ∀ a b c : quad_int d,
-  (a * (b + c))%F = (a * b + a * c)%F.
+  (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 intros; cbn.
 unfold "*"%QI, "+"%QI; cbn.
@@ -256,7 +256,7 @@ unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_add_opp_l : ∀ a : quad_int d, (- a + a)%F = 0%F.
+Theorem quad_int_add_opp_l : ∀ a : quad_int d, (- a + a)%L = 0%L.
 Proof.
 intros; cbn.
 unfold qi_opp, "+"%QI, "0"%QI; cbn.
@@ -840,7 +840,7 @@ apply square_free_not_mul_square in H; [ | easy | ]. {
 }
 Qed.
 
-Theorem quad_int_mul_div : ∀ a b : quad_int d, b ≠ 0%F → (a * b / b)%F = a.
+Theorem quad_int_mul_div : ∀ a b : quad_int d, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros * Hbz; cbn.
 unfold "*"%QI, "÷"%QI; cbn.

@@ -47,7 +47,7 @@ n-1  | ......|    |. .....|   |.. ....|   |... ...|
 
 Fixpoint determinant_loop n (M : matrix T) :=
   match n with
-  | 0 => 1%F
+  | 0 => 1%L
   | S n' =>
       ∑ (j = 1, n),
       minus_one_pow (S j) * mat_el M 1 j *
@@ -105,7 +105,7 @@ Theorem fold_det : ∀ M, determinant_loop (mat_nrows M) M = det M.
 Proof. easy. Qed.
 
 Theorem determinant_zero : ∀ (M : matrix T),
-  determinant_loop 0 M = 1%F.
+  determinant_loop 0 M = 1%L.
 Proof. easy. Qed.
 
 Theorem determinant_succ : ∀ n (M : matrix T),
@@ -608,7 +608,7 @@ assert (H1 :
   apply rngl_summation_list_eq_compat.
   intros l Hl.
   destruct (ListDec.In_dec (list_eq_dec Nat.eq_dec)) as [H1| H1]; [ easy | ].
-  assert (H : ε l = 0%F). {
+  assert (H : ε l = 0%L). {
     apply ε_when_dup; [ easy | easy | ].
     intros Hnd.
     apply H1; clear H1.
@@ -727,7 +727,7 @@ Theorem determinant_multilinear :
   → 1 ≤ i ≤ n
   → det (mat_repl_vect' i M (a × U + b × V)%V) =
        (a * det (mat_repl_vect' i M U) +
-        b * det (mat_repl_vect' i M V))%F.
+        b * det (mat_repl_vect' i M V))%L.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
 specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
@@ -933,13 +933,13 @@ destruct (Nat.eq_dec i i) as [H| H]; [ clear H | easy ].
 do 4 rewrite rngl_mul_assoc.
 subst UV.
 cbn - [ mat_el ].
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   now rewrite map_length, fold_vect_size, Hu.
 } {
   now rewrite map_length, fold_vect_size, Hv.
 }
-rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hu ].
-rewrite (List_map_nth' 0%F); [ | now rewrite fold_vect_size, Hv ].
+rewrite (List_map_nth' 0%L); [ | now rewrite fold_vect_size, Hu ].
+rewrite (List_map_nth' 0%L); [ | now rewrite fold_vect_size, Hv ].
 do 2 rewrite fold_vect_el.
 rewrite Nat.sub_add; [ | flia Hi ].
 rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
@@ -1142,7 +1142,7 @@ Theorem determinant_alternating : in_charac_0_field →
   → 1 ≤ p ≤ mat_nrows M
   → 1 ≤ q ≤ mat_nrows M
   → is_square_matrix M = true
-  → det (mat_swap_rows p q M) = (- det M)%F.
+  → det (mat_swap_rows p q M) = (- det M)%L.
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 assert (H10 : rngl_characteristic ≠ 1). {
@@ -1506,7 +1506,7 @@ Theorem determinant_same_rows : in_charac_0_field →
   → 1 ≤ p ≤ mat_nrows M
   → 1 ≤ q ≤ mat_nrows M
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
-  → det M = 0%F.
+  → det M = 0%L.
 Proof.
 intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
@@ -1515,7 +1515,7 @@ specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 specialize (square_matrix_ncols M Hsm) as Hc.
-assert (HM : det M = (- det M)%F). {
+assert (HM : det M = (- det M)%L). {
   rewrite <- Hr in Hpn, Hqn.
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
   f_equal.
@@ -1528,8 +1528,8 @@ assert (HM : det M = (- det M)%F). {
   do 2 rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
     subst i.
-    rewrite List_map_nth_seq with (d := 0%F); symmetry.
-    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    rewrite List_map_nth_seq with (d := 0%L); symmetry.
+    rewrite List_map_nth_seq with (d := 0%L); symmetry.
     apply is_scm_mat_iff in Hsm.
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
@@ -1543,8 +1543,8 @@ assert (HM : det M = (- det M)%F). {
   }
   destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
     subst i.
-    rewrite List_map_nth_seq with (d := 0%F); symmetry.
-    rewrite List_map_nth_seq with (d := 0%F); symmetry.
+    rewrite List_map_nth_seq with (d := 0%L); symmetry.
+    rewrite List_map_nth_seq with (d := 0%L); symmetry.
     apply is_scm_mat_iff in Hsm.
     cbn in Hsm.
     destruct Hsm as (Hcz, Hsm).
@@ -1591,7 +1591,7 @@ Definition mat_mul_row_by_scal n k (M : matrix T) s :=
     (map
        (λ i,
         map
-          (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%F else mat_el M i j)
+          (λ j, if Nat.eq_dec i k then (s * mat_el M i j)%L else mat_el M i j)
           (seq 1 n))
        (seq 1 n)).
 
@@ -1619,10 +1619,10 @@ Theorem det_add_row_row : ∀ n (A B C : matrix T),
   → is_square_matrix A = true
   → is_square_matrix B = true
   → is_square_matrix C = true
-  → (∀ j, mat_el A 1 j = (mat_el B 1 j + mat_el C 1 j)%F)
+  → (∀ j, mat_el A 1 j = (mat_el B 1 j + mat_el C 1 j)%L)
   → (∀ i j, i ≠ 1 → mat_el B i j = mat_el A i j)
   → (∀ i j, i ≠ 1 → mat_el C i j = mat_el A i j)
-  → det A = (det B + det C)%F.
+  → det A = (det B + det C)%L.
 Proof.
 intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.
 specialize (square_matrix_ncols _ Hsma) as Hca.
@@ -1648,8 +1648,8 @@ assert (Hab : ∀ j, subm 1 j A = subm 1 j B). {
     subst u; cbn in Hu.
     now apply in_seq in Hu.
   }
-  rewrite (List_map_nth_seq (nth u lla []) 0%F).
-  rewrite (List_map_nth_seq (nth u llb []) 0%F).
+  rewrite (List_map_nth_seq (nth u lla []) 0%L).
+  rewrite (List_map_nth_seq (nth u llb []) 0%L).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
@@ -1690,8 +1690,8 @@ assert (Hac : ∀ j, subm 1 j A = subm 1 j C). {
     subst u; cbn in Hu.
     now apply in_seq in Hu.
   }
-  rewrite (List_map_nth_seq (nth u lla []) 0%F).
-  rewrite (List_map_nth_seq (nth u llc []) 0%F).
+  rewrite (List_map_nth_seq (nth u lla []) 0%L).
+  rewrite (List_map_nth_seq (nth u llc []) 0%L).
   apply is_scm_mat_iff in Hsma.
   destruct Hsma as (_ & Hca').
   apply in_butn, in_seq in Hu.
@@ -1915,7 +1915,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   subst ν.
   rewrite <- Hσν at 1.
   replace (ε ((μ ° isort_rank Nat.leb σ) ° σ)) with
-      (ε (μ ° isort_rank Nat.leb σ) * ε σ)%F. 2: {
+      (ε (μ ° isort_rank Nat.leb σ) * ε σ)%L. 2: {
     destruct Hσ.
     rewrite <- sign_comp; [ easy | easy | ].
     now rewrite comp_length, isort_rank_length.
@@ -2108,7 +2108,7 @@ Theorem det_any_permut_r : in_charac_0_field →
   → permut_seq_with_len n σ
   → det M =
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
-     ∏ (k = 0, n - 1), mat_el M (nth k μ 0 + 1) (nth k σ 0 + 1))%F.
+     ∏ (k = 0, n - 1), mat_el M (nth k μ 0 + 1) (nth k σ 0 + 1))%L.
 Proof.
 intros Hif * Hnz Hr Hsm Hσ.
 erewrite rngl_summation_list_eq_compat. 2: {
@@ -2137,7 +2137,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   subst ν.
   rewrite <- Hσν at 1.
   replace (ε ((σ ° isort_rank Nat.leb μ) ° μ)) with
-      (ε (σ ° isort_rank Nat.leb μ) * ε μ)%F. 2: {
+      (ε (σ ° isort_rank Nat.leb μ) * ε μ)%L. 2: {
     destruct Hif.
     rewrite <- sign_comp; [ easy | easy | ].
     rewrite comp_length, isort_rank_length.
@@ -2412,14 +2412,14 @@ Qed.
 
 Theorem det_mI :
   rngl_has_opp_or_sous = true →
-  ∀ n, det (mI n) = 1%F.
+  ∀ n, det (mI n) = 1%L.
 Proof.
 intros Hop *; cbn.
 rewrite List_map_seq_length.
 induction n; intros; [ easy | ].
 rewrite determinant_succ.
 rewrite rngl_summation_split_first; [ | flia ].
-replace (minus_one_pow 2) with 1%F by easy.
+replace (minus_one_pow 2) with 1%L by easy.
 rewrite rngl_mul_1_l.
 rewrite mat_el_mI_diag; [ | flia ].
 rewrite rngl_mul_1_l.

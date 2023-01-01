@@ -21,7 +21,7 @@ Definition com (M : matrix T) : matrix T :=
   mk_mat
     (map
       (λ i,
-       map (λ j, (minus_one_pow (i + j) * det (subm i j M))%F)
+       map (λ j, (minus_one_pow (i + j) * det (subm i j M))%L)
          (seq 1 (mat_ncols M)))
       (seq 1 (mat_nrows M))).
 
@@ -520,7 +520,7 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   i < mat_nrows M
   → is_square_matrix M = true
   → det (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M') (seq 0 i) M) =
-    (minus_one_pow i * det M)%F.
+    (minus_one_pow i * det M)%L.
 Proof.
 intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hin Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -653,7 +653,7 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   → 1 < i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_nrows M
   → det (subm 1 j (mat_swap_rows 1 i M)) =
-    (minus_one_pow i * det (subm i j M))%F.
+    (minus_one_pow i * det (subm i j M))%L.
 Proof.
 intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
 rewrite subm_mat_swap_rows_circ. 2: {
@@ -991,7 +991,7 @@ determinant_with_row
 determinant_with_bad_row
   ∀ (i k n : nat) (M : matrix (S n) (S n) T),
   i ≤ n → k ≤ n → i ≠ k
-  → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%F
+  → ∑ (j = 1, n), minus_one_pow (i + j) * M k j * det (subm M i j) = 0%L
 *)
 
 Theorem determinant_with_row : in_charac_0_field →
@@ -1061,7 +1061,7 @@ Theorem determinant_with_bad_row : in_charac_0_field →
   → 1 ≤ k ≤ mat_nrows M
   → i ≠ k
   → ∑ (j = 1, mat_nrows M),
-    minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%F.
+    minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%L.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
 specialize (square_matrix_ncols _ Hsm) as Hc.
@@ -1092,7 +1092,7 @@ assert (Hasm : is_square_matrix A = true). {
 assert (Hira : mat_nrows A = mat_nrows M). {
   now subst A; cbn; rewrite List_map_seq_length.
 }
-assert (H1 : det A = 0%F). {
+assert (H1 : det A = 0%L). {
   apply determinant_same_rows with (p := i) (q := k); try easy. {
     now rewrite Hira.
   } {
@@ -1179,7 +1179,7 @@ f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
   rewrite Nat_sub_succ_1.
-  rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
+  rewrite List_map_nth_seq with (d := 0%L) (la := nth u ll []).
   apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
@@ -1190,7 +1190,7 @@ f_equal. {
   apply map_ext_in.
   intros v Hv; apply in_seq in Hv.
   rewrite Nat_sub_succ_1.
-  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
+  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%L) at 1.
   f_equal; f_equal; f_equal.
   apply Hcl, nth_In; flia Hu Hir.
 } {
@@ -1198,7 +1198,7 @@ f_equal. {
   apply map_ext_in.
   intros u Hu; apply in_seq in Hu.
   rewrite Nat_sub_succ_1.
-  rewrite List_map_nth_seq with (d := 0%F) (la := nth u ll []).
+  rewrite List_map_nth_seq with (d := 0%L) (la := nth u ll []).
   apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr, Hcl).
   cbn in Hcl.
@@ -1209,7 +1209,7 @@ f_equal. {
   apply map_ext_in.
   intros v Hv; apply in_seq in Hv.
   rewrite Nat_sub_succ_1.
-  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%F) at 1.
+  rewrite List_map_nth_seq with (la := nth u ll []) (d := 0%L) at 1.
   f_equal; f_equal; f_equal.
   apply Hcl, nth_In; flia Hu.
 }
@@ -1603,7 +1603,7 @@ Definition mat_inv (M : matrix T) := ((det M)⁻¹ × (com M)⁺)%M.
 Theorem mat_mul_inv_r : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → det M ≠ 0%F
+  → det M ≠ 0%L
   → (M * mat_inv M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
@@ -1639,7 +1639,7 @@ Qed.
 Theorem mat_mul_inv_l : in_charac_0_field →
   ∀ (M : matrix T),
   is_square_matrix M = true
-  → det M ≠ 0%F
+  → det M ≠ 0%L
   → (mat_inv M * M = mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm Hdz.
@@ -1657,7 +1657,7 @@ Qed.
 
 Theorem minus_one_pow_mul_same :
   rngl_has_opp = true →
-  ∀ i, (minus_one_pow i * minus_one_pow i = 1)%F.
+  ∀ i, (minus_one_pow i * minus_one_pow i = 1)%L.
 Proof.
 intros Hop *.
 unfold minus_one_pow.
@@ -1668,7 +1668,7 @@ Qed.
 End a.
 
 Arguments com {T}%type {ro} M%M.
-Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%F.
+Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
 Arguments mat_inv {T}%type {ro} M%M.
 Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
 Arguments laplace_formula_on_cols {T}%type {ro rp} Hif M%M [j]%nat.

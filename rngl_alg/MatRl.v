@@ -188,7 +188,7 @@ assert (Hi' : i - 1 < n) by flia Hin.
 rewrite sm_mat_of_nat; cbn.
 rewrite map_map.
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
-rewrite List_map_nth' with (a := 0%F). 2: {
+rewrite List_map_nth' with (a := 0%L). 2: {
   now rewrite List_map_seq_length.
 }
 rewrite List_map_nth' with (a := 0); [ | now rewrite seq_length ].
@@ -218,7 +218,7 @@ split. {
   apply length_zero_iff_nil.
   remember (mat_list_list _) as lla eqn:Hlla.
   symmetry in Hlla.
-  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%F)) in Hlla.
+  apply (f_equal (λ ll, nth 0 (nth 0 ll []) 0%L)) in Hlla.
   rewrite fold_mat_el in Hlla.
   rewrite List_hd_nth_0 in Hc.
   rewrite Hc in Hlla; cbn in Hlla.
@@ -261,7 +261,7 @@ split. {
 Qed.
 
 Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
-  (MA + MB)%F = (MB + MA)%F.
+  (MA + MB)%L = (MB + MA)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -269,14 +269,14 @@ apply mat_add_comm.
 Qed.
 
 Theorem squ_mat_add_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA + (MB + MC) = (MA + MB) + MC)%F.
+  (MA + (MB + MC) = (MA + MB) + MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
 apply mat_add_assoc.
 Qed.
 
-Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%F = M.
+Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%L = M.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -290,7 +290,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA * (MB * MC) = (MA * MB) * MC)%F.
+  (MA * (MB * MC) = (MA * MB) * MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -333,7 +333,7 @@ apply mat_mul_assoc; [ easy | | | ]. {
 }
 Qed.
 
-Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%F = M.
+Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%L = M.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -342,7 +342,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_l {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA * (MB + MC) = MA * MB + MA * MC)%F.
+  (MA * (MB + MC) = MA * MB + MA * MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -410,7 +410,7 @@ apply mat_mul_add_distr_l. {
 }
 Qed.
 
-Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%F = M.
+Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%L = M.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -419,7 +419,7 @@ apply square_matrix_is_correct.
 Qed.
 
 Theorem squ_mat_mul_add_distr_r {n} : ∀ (MA MB MC : square_matrix n T),
-  ((MA + MB) * MC = MA * MC + MB * MC)%F.
+  ((MA + MB) * MC = MA * MC + MB * MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -485,10 +485,10 @@ Qed.
 
 Theorem squ_mat_opt_add_opp_l {n} :
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
-    ∀ M : square_matrix n T, (- M + M)%F = 0%F
+    ∀ M : square_matrix n T, (- M + M)%L = 0%L
   else not_applicable.
 (*
-  if rngl_has_opp then ∀ M : square_matrix n T, (- M + M)%F = 0%F
+  if rngl_has_opp then ∀ M : square_matrix n T, (- M + M)%L = 0%L
   else not_applicable.
 *)
 Proof.
@@ -530,10 +530,10 @@ Qed.
 Theorem squ_mat_characteristic_prop {n} :
   let _ := mat_ring_like_op n in
   let ch := if n =? 0 then 1 else rngl_characteristic in
-  if ch =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  if ch =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
-   (∀ i : nat, 0 < i < ch → rngl_of_nat i ≠ 0%F)
-   ∧ rngl_of_nat ch = 0%F.
+   (∀ i : nat, 0 < i < ch → rngl_of_nat i ≠ 0%L)
+   ∧ rngl_of_nat ch = 0%L.
 Proof.
 intros rop *.
 specialize (proj2 rngl_has_opp_or_sous_iff (or_introl Hop)) as Hos.
@@ -568,7 +568,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     rewrite fold_mat_nrows.
     flia Hnz IHi.
   }
-  rewrite map2_nth with (a := 0%F) (b := 0%F) in Hi; cycle 1. {
+  rewrite map2_nth with (a := 0%L) (b := 0%L) in Hi; cycle 1. {
     now rewrite List_map_seq_length.
   } {
     rewrite <- List_hd_nth_0, fold_mat_ncols.
@@ -652,7 +652,7 @@ Qed.
 
 (* to be completed
 Theorem squ_mat_opt_eqb_eq {n} :
-  if rngl_has_eqb then ∀ a b : square_matrix n T, (a =? b)%F = true ↔ a = b
+  if rngl_has_eqb then ∀ a b : square_matrix n T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 remember rngl_has_eqb as heq eqn:Heq.
@@ -663,7 +663,7 @@ split; intros Hab. {
   apply square_matrix_eq.
   specialize (@rngl_eqb_eq T ro rp Heq) as H1.
   apply (mat_eqb_eq H1).
-  unfold "=?"%F in Hab.
+  unfold "=?"%L in Hab.
   remember rngl_opt_eqb as c eqn:Hc; symmetry in Hc.
   destruct c as [eqb| ]; [ | easy ].
 ...

@@ -19,7 +19,7 @@ Record matrix T := mk_mat
 Definition mat_nrows {T} (M : matrix T) := length (mat_list_list M).
 Definition mat_ncols {T} (M : matrix T) := length (hd [] (mat_list_list M)).
 Definition mat_el {T} {ro : ring_like_op T} (M : matrix T) i j :=
-  nth (j - 1) (nth (i - 1) (mat_list_list M) []) 0%F.
+  nth (j - 1) (nth (i - 1) (mat_list_list M) []) 0%L.
 
 (* *)
 
@@ -186,7 +186,7 @@ destruct llb as [| lb]; [ easy | ].
 cbn in Hr, Hc, Hcc.
 apply Nat.succ_inj in Hr, Hc.
 f_equal. {
-  apply nth_ext with (d := 0%F) (d' := 0%F); [ easy | ].
+  apply nth_ext with (d := 0%L) (d' := 0%L); [ easy | ].
   intros i Hi.
   unfold mat_ncols in Hij.
   cbn - [ nth ] in Hij.
@@ -256,7 +256,7 @@ Theorem fold_mat_ncols {T} : ∀ (M : matrix T),
 Proof. easy. Qed.
 
 Theorem fold_mat_el {T} {ro : ring_like_op T} : ∀ (M : matrix T) i j,
-  nth j (nth i (mat_list_list M) []) 0%F = mat_el M (S i) (S j).
+  nth j (nth i (mat_list_list M) []) 0%L = mat_el M (S i) (S j).
 Proof.
 intros.
 unfold mat_el.
@@ -446,7 +446,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
     if Nat.eq_dec j k then vect_el V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
-rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := []) (b := 0%L); cycle 1. {
   rewrite fold_mat_nrows.
   now apply Nat_1_le_sub_lt.
 } {
@@ -532,7 +532,7 @@ apply Nat.neq_0_lt_0 in Hcz.
 unfold mat_ncols.
 cbn - [ skipn ].
 rewrite List_hd_nth_0.
-rewrite map2_nth with (a := []) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := []) (b := 0%L); cycle 1. {
   now rewrite fold_mat_nrows.
 } {
   now rewrite fold_vect_size, Hv.
@@ -592,21 +592,21 @@ Qed.
 (* null matrix of dimension m × n *)
 
 Definition mZ m n : matrix T :=
-  mk_mat (repeat (repeat 0%F n) m).
+  mk_mat (repeat (repeat 0%L n) m).
 
 (* identity square matrix of dimension n *)
 
-Definition δ i j := if i =? j then 1%F else 0%F.
+Definition δ i j := if i =? j then 1%L else 0%L.
 Definition mI n : matrix T := mk_mat (map (λ i, map (δ i) (seq 0 n)) (seq 0 n)).
 
-Theorem δ_diag : ∀ i, δ i i = 1%F.
+Theorem δ_diag : ∀ i, δ i i = 1%L.
 Proof.
 intros.
 unfold δ.
 now rewrite Nat.eqb_refl.
 Qed.
 
-Theorem δ_ndiag : ∀ i j, i ≠ j → δ i j = 0%F.
+Theorem δ_ndiag : ∀ i j, i ≠ j → δ i j = 0%L.
 Proof.
 intros * Hij.
 unfold δ.
@@ -651,7 +651,7 @@ Arguments matrix_eq {T}%type {ro} (MA MB)%M.
 Arguments mat_add {T ro} MA%M MB%M.
 Arguments mat_mul {T ro} MA%M MB%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
-Arguments mat_mul_scal_l {T ro} s%F M%M.
+Arguments mat_mul_scal_l {T ro} s%L M%M.
 Arguments mat_list_list [T]%type m%M.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_ncols {T}%type M%M.
@@ -871,7 +871,7 @@ Theorem mat_el_mI_ndiag : ∀ n i j,
   1 ≤ i
   → 1 ≤ j
   → i ≠ j
-  → mat_el (mI n) i j = 0%F.
+  → mat_el (mI n) i j = 0%L.
 Proof.
 intros * Hi Hj Hij.
 unfold mat_el, mI; cbn.
@@ -906,7 +906,7 @@ rewrite List_map_seq_length.
 flia Hin.
 Qed.
 
-Theorem mat_el_mI_diag : ∀ n i, 1 ≤ i ≤ n → mat_el (mI n) i i = 1%F.
+Theorem mat_el_mI_diag : ∀ n i, 1 ≤ i ≤ n → mat_el (mI n) i i = 1%L.
 Proof.
 intros * Hin.
 unfold mat_el, mI; cbn.
@@ -989,7 +989,7 @@ rewrite <- seq_shift, map_map.
 apply map_ext_in.
 intros i Hi.
 remember (nth i ll []) as la eqn:Hla.
-rewrite List_map_nth_seq with (d := 0%F).
+rewrite List_map_nth_seq with (d := 0%L).
 rewrite (HM la). 2: {
   rewrite Hla.
   apply nth_In.
@@ -1049,7 +1049,7 @@ rewrite <- seq_shift, <- seq_shift, map_map.
 apply map_ext_in.
 intros i Hi.
 remember (nth i ll []) as la eqn:Hla.
-rewrite List_map_nth_seq with (d := 0%F).
+rewrite List_map_nth_seq with (d := 0%L).
 rewrite (HM la). 2: {
   rewrite Hla.
   apply nth_In.
@@ -1324,7 +1324,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   rewrite Hcarb, Hcrbc in Hk.
   flia Hrbz Hcrbc Hk.
 }
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   apply is_scm_mat_iff in Hb.
   destruct Hb as (_, Hb).
   apply in_seq in Hj.
@@ -1399,7 +1399,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
   rewrite fold_mat_nrows, <- Hrarb.
   apply in_seq in Hi; flia Hi.
 }
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   apply in_seq in Hi.
   rewrite fold_corr_mat_ncols; [ flia Hcaz Hk | easy | flia Hi ].
 } {
@@ -1470,7 +1470,7 @@ Qed.
 (* left distributivity of multiplication by scalar over addition *)
 
 Theorem mat_mul_scal_l_add_distr_r : ∀ a b (M : matrix T),
-  ((a + b)%F × M)%M = (a × M + b × M)%M.
+  ((a + b)%L × M)%M = (a × M + b × M)%M.
 Proof.
 intros.
 unfold "+"%M, "×"%M.
@@ -1489,7 +1489,7 @@ Qed.
 (* associativity of multiplication by scalar *)
 
 Theorem mat_mul_scal_l_mul_assoc : ∀ a b (M : matrix T),
-  (a × (b × M))%M = ((a * b)%F × M)%M.
+  (a × (b × M))%M = ((a * b)%L × M)%M.
 Proof.
 intros.
 unfold "*"%M, "×"%M.
@@ -1539,7 +1539,7 @@ rewrite List_map_nth' with (a := []). 2: {
   rewrite fold_mat_nrows.
   apply in_seq in Hi; flia Hi.
 }
-rewrite List_map_nth' with (a := 0%F). 2: {
+rewrite List_map_nth' with (a := 0%L). 2: {
   apply is_scm_mat_iff in Ha.
   destruct Ha as (Harc, Ha).
   rewrite Ha. 2: {
@@ -1595,7 +1595,7 @@ rewrite List_map_nth' with (a := []). 2: {
   rewrite fold_mat_nrows, <- Hcarb.
   flia Hcaz Hk.
 }
-rewrite List_map_nth' with (a := 0%F). 2: {
+rewrite List_map_nth' with (a := 0%L). 2: {
   apply is_scm_mat_iff in Hb.
   destruct Hb as (Hbzz, Hb).
   rewrite Hb; [ apply in_seq in Hj; flia Hj | ].
@@ -1695,7 +1695,7 @@ apply map_ext_in.
 intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_r.
-rewrite map2_map2_seq_l with (d := 0%F).
+rewrite map2_map2_seq_l with (d := 0%L).
 rewrite map2_map2_seq_r with (d := []).
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Harc, Ha).
@@ -1706,7 +1706,7 @@ rewrite Ha. 2: {
 }
 rewrite fold_mat_nrows.
 symmetry.
-rewrite map2_map2_seq_r with (d := 0%F).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite fold_vect_size.
 symmetry.
 rewrite <- Hcarb.
@@ -1723,7 +1723,7 @@ erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
   rewrite fold_mat_el.
   unfold vect_dot_mul; cbn.
-  rewrite map2_map2_seq_l with (d := 0%F).
+  rewrite map2_map2_seq_l with (d := 0%L).
   rewrite Hb with (l := nth j (mat_list_list B) []). 2: {
     apply nth_In.
     rewrite fold_mat_nrows.
@@ -1739,7 +1739,7 @@ erewrite rngl_summation_eq_compat. 2: {
     }
     now rewrite Nat_sub_succ_1 in Hj.
   }
-  rewrite map2_map2_seq_r with (d := 0%F).
+  rewrite map2_map2_seq_r with (d := 0%L).
   rewrite fold_vect_size.
   rewrite Hcbv.
   rewrite map2_diag.
@@ -1848,7 +1848,7 @@ intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite map2_map_l.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
-rewrite map2_map2_seq_l with (d := 0%F).
+rewrite map2_map2_seq_l with (d := 0%L).
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Harc, Ha).
 rewrite Ha. 2: {
@@ -1856,7 +1856,7 @@ rewrite Ha. 2: {
   rewrite fold_mat_nrows.
   now apply in_seq in Hi.
 }
-rewrite map2_map2_seq_r with (d := 0%F).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite fold_vect_size, Hcav.
 rewrite map2_diag.
 rewrite rngl_summation_list_map.
@@ -1866,13 +1866,13 @@ rewrite rngl_summation_seq_summation. 2: {
   now rewrite H in Hi.
 }
 erewrite rngl_summation_eq_compat; [ | easy ].
-rewrite map2_map2_seq_l with (d := 0%F).
+rewrite map2_map2_seq_l with (d := 0%L).
 rewrite Ha. 2: {
   apply nth_In.
   rewrite fold_mat_nrows.
   now apply in_seq in Hi.
 }
-rewrite map2_map2_seq_r with (d := 0%F).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite fold_vect_size, Hcav.
 rewrite map2_diag.
 rewrite rngl_summation_list_map.
@@ -1910,8 +1910,8 @@ intros i Hi.
 unfold vect_dot_mul; cbn.
 rewrite rngl_mul_summation_list_distr_l; [ | easy ].
 rewrite map2_map_r.
-rewrite map2_map2_seq_l with (d := 0%F).
-rewrite map2_map2_seq_r with (d := 0%F).
+rewrite map2_map2_seq_l with (d := 0%L).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite fold_vect_size.
 apply is_scm_mat_iff in Ha.
 destruct Ha as (Harc, Ha).
@@ -1921,8 +1921,8 @@ rewrite Ha. 2: {
   now apply in_seq in Hi.
 }
 symmetry.
-rewrite map2_map2_seq_l with (d := 0%F).
-rewrite map2_map2_seq_r with (d := 0%F).
+rewrite map2_map2_seq_l with (d := 0%L).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite fold_vect_size.
 rewrite Ha. 2: {
   apply nth_In.
@@ -2738,7 +2738,7 @@ Theorem mat_el_add : ∀ (MA MB : matrix T) i j,
   → 1 ≤ i ≤ mat_nrows MB
   → 1 ≤ j ≤ mat_ncols MA
   → 1 ≤ j ≤ mat_ncols MB
-  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%F.
+  → mat_el (MA + MB) i j = (mat_el MA i j + mat_el MB i j)%L.
 Proof.
 intros * Ha Hb Hia Hib Hja Hjb.
 unfold "+"%M; cbn.
@@ -2747,7 +2747,7 @@ rewrite map2_nth with (a := []) (b := []); cycle 1. {
 } {
   rewrite fold_mat_nrows; flia Hib.
 }
-rewrite map2_nth with (a := 0%F) (b := 0%F); cycle 1. {
+rewrite map2_nth with (a := 0%L) (b := 0%L); cycle 1. {
   apply is_scm_mat_iff in Ha.
   destruct Ha as (Hcra & Hca).
   rewrite Hca; [ flia Hja | ].
@@ -3039,7 +3039,7 @@ erewrite map_ext_in. 2: {
 destruct ll as [| l]; [ easy | ].
 unfold mat_ncols in Hcz; cbn in Hcz.
 cbn - [ nth ].
-rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%F) at 1.
+rewrite (List_map_nth_seq (nth i (l :: ll) []) 0%L) at 1.
 apply is_scm_mat_iff in Hcm.
 unfold mat_ncols in Hcm; cbn - [ In ] in Hcm.
 destruct Hcm as (_, Hcl).
@@ -3077,15 +3077,15 @@ Arguments mat_mul_1_r {T}%type {ro rp} Hop {n}%nat M%M.
 Arguments mat_mul_add_distr_l {T}%type {ro rp} (MA MB MC)%M.
 Arguments mat_mul_assoc {T}%type {ro rp} Hop (MA MB MC)%M.
 Arguments mat_mul_el {T}%type {ro} (MA MB)%M (i k)%nat.
-Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hop Hic a%F (MA MB)%M.
+Arguments mat_mul_mul_scal_l {T}%type {ro rp} Hop Hic a%L (MA MB)%M.
 Arguments mat_mul_scal_1_l {T}%type {ro rp} M%M.
-Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%F (MA MB)%M.
-Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%F M%M.
-Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%F M%M.
-Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%F (MA MB)%M.
-Arguments mat_mul_scal_l {T ro} s%F M%M.
-Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hop a%F MA%M V%V.
-Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%F MA%M V%V.
+Arguments mat_mul_scal_l_add_distr_l {T}%type {ro rp} a%L (MA MB)%M.
+Arguments mat_mul_scal_l_add_distr_r {T}%type {ro rp} (a b)%L M%M.
+Arguments mat_mul_scal_l_mul_assoc {T}%type {ro rp} (a b)%L M%M.
+Arguments mat_mul_scal_l_mul {T}%type {ro rp} Hop a%L (MA MB)%M.
+Arguments mat_mul_scal_l {T ro} s%L M%M.
+Arguments mat_mul_scal_vect_assoc {T}%type {ro rp} Hop a%L MA%M V%V.
+Arguments mat_mul_scal_vect_comm {T}%type {ro rp} Hop Hic a%L MA%M V%V.
 Arguments mat_mul {T}%type {ro} (MA MB)%M.
 Arguments mat_mul_vect_r {T ro} M%M V%V.
 Arguments mat_ncols {T}%type M%M.

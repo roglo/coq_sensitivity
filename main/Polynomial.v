@@ -21,7 +21,7 @@ Require Import PermutationFun SortingFun.
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
 Definition has_polyn_prop T {ro : ring_like_op T} (lap : list T) :=
-  (is_empty_list lap || (last lap 0 ≠? 0)%F)%bool.
+  (is_empty_list lap || (last lap 0 ≠? 0)%L)%bool.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
@@ -85,7 +85,7 @@ split; intros Hpq. {
 }
 Qed.
 
-Definition lap_one := [1%F].
+Definition lap_one := [1%L].
 
 Theorem polyn_one_prop : has_polyn_prop lap_one = true.
 Proof.
@@ -103,7 +103,7 @@ Definition polyn_one := mk_polyn lap_one polyn_one_prop.
 Fixpoint strip_0s la :=
   match la with
   | [] => []
-  | a :: la' => if (a =? 0)%F then strip_0s la' else la
+  | a :: la' => if (a =? 0)%L then strip_0s la' else la
   end.
 
 Lemma strip_0s_app : ∀ la lb,
@@ -116,11 +116,11 @@ Proof.
 intros.
 revert lb.
 induction la as [| a]; intros; [ easy | cbn ].
-destruct (a =? 0)%F; [ apply IHla | easy ].
+destruct (a =? 0)%L; [ apply IHla | easy ].
 Qed.
 
 Theorem eq_strip_0s_nil : ∀ la,
-  strip_0s la = [] ↔ ∀ i, nth i la 0%F = 0%F.
+  strip_0s la = [] ↔ ∀ i, nth i la 0%L = 0%L.
 Proof.
 intros.
 split. {
@@ -148,7 +148,7 @@ split. {
 Qed.
 
 Theorem eq_strip_0s_cons : ∀ la lb b,
-  strip_0s la = b :: lb → b ≠ 0%F.
+  strip_0s la = b :: lb → b ≠ 0%L.
 Proof.
 intros * Hab.
 intros H; subst b.
@@ -194,7 +194,7 @@ Fixpoint lap_add la lb :=
   | a1 :: bl1 =>
       match lb with
       | [] => la
-      | a2 :: bl2 => (a1 + a2)%F :: lap_add bl1 bl2
+      | a2 :: bl2 => (a1 + a2)%L :: lap_add bl1 bl2
       end
   end.
 
@@ -217,7 +217,7 @@ Fixpoint lap_convol_mul al1 al2 i len :=
   match len with
   | O => []
   | S len1 =>
-      (∑ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%F ::
+      (∑ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%L ::
       lap_convol_mul al1 al2 (S i) len1
   end.
 
@@ -237,7 +237,7 @@ Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
 Fixpoint lap_power la n :=
   match n with
-  | O => [1%F]
+  | O => [1%L]
   | S m => lap_mul la (lap_power la m)
   end.
 
@@ -255,8 +255,8 @@ Definition rlap_quot_rem_step (rla rlb : list T) :=
       | a :: rla' =>
           if length rla' <? length rlb' then (None, rla)
           else
-            let cq := (a / b)%F in
-            let rlr := lap_sub rla' (map (λ cb, (cb * cq)%F) rlb') in
+            let cq := (a / b)%L in
+            let rlr := lap_sub rla' (map (λ cb, (cb * cq)%L) rlb') in
             (Some cq, rlr)
       end
   end.
@@ -362,7 +362,7 @@ Theorem strip_0s_length_le : ∀ l, length (strip_0s l) ≤ length l.
 Proof.
 intros.
 induction l as [| a]; [ easy | cbn ].
-destruct (a =? 0)%F; cbn; [ | easy ].
+destruct (a =? 0)%L; cbn; [ | easy ].
 flia IHl.
 Qed.
 
@@ -394,7 +394,7 @@ f_equal; apply IHla.
 Qed.
 
 Theorem all_0_lap_norm_nil : ∀ la,
-  (∀ i, nth i la 0%F = 0%F)
+  (∀ i, nth i la 0%L = 0%L)
   ↔ lap_norm la = [].
 Proof.
 intros *.
@@ -443,7 +443,7 @@ Theorem fold_lap_norm : ∀ la, rev (strip_0s (rev la)) = lap_norm la.
 Proof. easy. Qed.
 
 Theorem lap_norm_app_repeat_0 : ∀ la,
-  la = lap_norm la ++ repeat 0%F (length la - length (lap_norm la)).
+  la = lap_norm la ++ repeat 0%L (length la - length (lap_norm la)).
 Proof.
 intros.
 induction la as [| a]; [ easy | ].
@@ -503,7 +503,7 @@ rewrite app_length; flia.
 Qed.
 
 Theorem lap_sub_repeat_0 : ∀ la,
-  lap_sub la (repeat 0%F (length la)) = la.
+  lap_sub la (repeat 0%L (length la)) = la.
 Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
@@ -652,10 +652,10 @@ Qed.
 Theorem rlap_quot_prop :
   rngl_has_inv = true →
   ∀ la lb lq lr,
-  la = [] ∨ hd 0%F la ≠ 0%F
-  → lb = [] ∨ hd 0%F lb ≠ 0%F
+  la = [] ∨ hd 0%L la ≠ 0%L
+  → lb = [] ∨ hd 0%L lb ≠ 0%L
   → rlap_quot_rem la lb = (lq, lr)
-  → lq = [] ∨ hd 0%F lq ≠ 0%F.
+  → lq = [] ∨ hd 0%L lq ≠ 0%L.
 Proof.
 intros Hiv * Ha Hb Hab.
 unfold rlap_quot_rem in Hab.
@@ -1097,7 +1097,7 @@ Qed.
 (* associativity of multiplication *)
 
 Theorem lap_convol_mul_0_l : ∀ la lb i len,
-  (∀ i, nth i la 0%F = 0%F)
+  (∀ i, nth i la 0%L = 0%L)
   → lap_norm (lap_convol_mul la lb i len) = [].
 Proof.
 intros * Ha.
@@ -1121,7 +1121,7 @@ now apply List_eq_rev_nil in IHlen.
 Qed.
 
 Theorem lap_convol_mul_0_r : ∀ la lb i len,
-  (∀ i, nth i lb 0%F = 0%F)
+  (∀ i, nth i lb 0%L = 0%L)
   → lap_norm (lap_convol_mul la lb i len) = [].
 Proof.
 intros * Hb.
@@ -1145,7 +1145,7 @@ now apply List_eq_rev_nil in IHlen.
 Qed.
 
 Theorem lap_convol_mul_cons_with_0_l : ∀ a la lb i len,
-  (∀ i, nth i la 0%F = 0%F)
+  (∀ i, nth i la 0%L = 0%L)
   → lap_convol_mul (a :: la) lb i len = lap_convol_mul [a] lb i len.
 Proof.
 intros * Hla.
@@ -1164,7 +1164,7 @@ Theorem lap_convol_mul_succ : ∀ la lb i len,
   lap_convol_mul la lb i (S len) =
   lap_convol_mul la lb i len ++
     [∑ (j = 0, i + len),
-     List.nth j la 0 * List.nth (i + len - j) lb 0]%F.
+     List.nth j la 0 * List.nth (i + len - j) lb 0]%L.
 Proof.
 intros.
 cbn.
@@ -1181,7 +1181,7 @@ apply IHlen.
 Qed.
 
 Theorem lap_norm_app_0_r : ∀ la lb,
-  (∀ i, nth i lb 0%F = 0%F)
+  (∀ i, nth i lb 0%L = 0%L)
   → lap_norm la = lap_norm (la ++ lb).
 Proof.
 intros * Hlb.
@@ -1235,7 +1235,7 @@ destruct (le_dec (length la) j) as [H1| H1]. {
 Qed.
 
 Theorem lap_convol_mul_app_rep_0_l : ∀ la lb i len n,
-  lap_norm (lap_convol_mul (la ++ repeat 0%F n) lb i len) =
+  lap_norm (lap_convol_mul (la ++ repeat 0%L n) lb i len) =
   lap_norm (lap_convol_mul la lb i len).
 Proof.
 intros.
@@ -1293,7 +1293,7 @@ destruct lc as [| c]. {
 Qed.
 
 Theorem lap_convol_mul_app_rep_0_r : ∀ la lb i len n,
-  lap_norm (lap_convol_mul la (lb ++ repeat 0%F n) i len) =
+  lap_norm (lap_convol_mul la (lb ++ repeat 0%L n) i len) =
   lap_norm (lap_convol_mul la lb i len).
 Proof.
 intros.
@@ -1443,8 +1443,8 @@ now cbn; rewrite Nat.sub_0_r.
 Qed.
 
 Theorem all_0_all_rev_0 : ∀ la : list T,
-  (∀ i, nth i la 0%F = 0%F)
-  ↔ (∀ i, nth i (rev la) 0%F = 0%F).
+  (∀ i, nth i la 0%L = 0%L)
+  ↔ (∀ i, nth i (rev la) 0%L = 0%L).
 Proof.
 intros *.
 split; intros H i. {
@@ -1462,7 +1462,7 @@ split; intros H i. {
 Qed.
 
 Theorem eq_strip_0s_rev_nil : ∀ la,
-  strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%F = 0%F.
+  strip_0s (rev la) = [] ↔ ∀ i, nth i la 0%L = 0%L.
 Proof.
 intros.
 split; intros Hla. {
@@ -1596,7 +1596,7 @@ easy.
 Qed.
 
 Theorem list_nth_lap_eq : ∀ la lb,
-  (∀ i, (List.nth i la 0 = List.nth i lb 0)%F)
+  (∀ i, (List.nth i la 0 = List.nth i lb 0)%L)
   → lap_norm la = lap_norm lb.
 Proof.
 intros la lb Hi.
@@ -1630,7 +1630,7 @@ induction la as [| a]; intros. {
   rewrite strip_0s_app.
   remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
   destruct lc as [| c]. {
-    assert (Hla : ∀ i, nth i la 0%F = 0%F). {
+    assert (Hla : ∀ i, nth i la 0%L = 0%L). {
       intros i.
       clear - Heb Hlc.
       revert i.
@@ -1656,7 +1656,7 @@ induction la as [| a]; intros. {
     rewrite if_bool_if_dec.
     destruct (bool_dec _) as [Haz| Haz]. {
       apply (rngl_eqb_eq Heb) in Haz.
-      assert (Hlb : ∀ i, nth i lb 0%F = 0%F). {
+      assert (Hlb : ∀ i, nth i lb 0%L = 0%L). {
         intros.
         rewrite <- Hi; cbn.
         destruct i; [ easy | ].
@@ -1685,7 +1685,7 @@ induction la as [| a]; intros. {
       now specialize (Hi 0).
     }
     specialize (IHla lb).
-    assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
+    assert (H : ∀ i : nat, nth i la 0%L = nth i lb 0%L). {
       intros i.
       now specialize (Hi (S i)); cbn in Hi.
     }
@@ -1694,7 +1694,7 @@ induction la as [| a]; intros. {
   }
   destruct lb as [| b]. {
     specialize (IHla []).
-    assert (H : ∀ i : nat, nth i la 0%F = nth i [] 0%F). {
+    assert (H : ∀ i : nat, nth i la 0%L = nth i [] 0%L). {
       intros i; cbn; rewrite Tauto_match_nat_same.
       now specialize (Hi (S i)).
     }
@@ -1708,7 +1708,7 @@ induction la as [| a]; intros. {
     destruct (bool_dec _) as [Hbz| Hbz]. {
       apply (rngl_eqb_eq Heb) in Hbz; subst b.
       specialize (IHla lb).
-      assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
+      assert (H : ∀ i : nat, nth i la 0%L = nth i lb 0%L). {
         intros i.
         now specialize (Hi (S i)); cbn in Hi.
       }
@@ -1716,7 +1716,7 @@ induction la as [| a]; intros. {
       now rewrite Hld in IHla.
     }
     specialize (IHla lb).
-    assert (H : ∀ i : nat, nth i la 0%F = nth i lb 0%F). {
+    assert (H : ∀ i : nat, nth i la 0%L = nth i lb 0%L). {
       intros i.
       now specialize (Hi (S i)); cbn in Hi.
     }
@@ -1737,9 +1737,9 @@ Proof. now intros; induction len. Qed.
 
 Theorem list_nth_lap_convol_mul_aux : ∀ la lb n i len,
   List.length la + List.length lb - 1 = (i + len)%nat
-  → (List.nth n (lap_convol_mul la lb i len) 0%F =
+  → (List.nth n (lap_convol_mul la lb i len) 0%L =
      ∑ (j = 0, n + i),
-     List.nth j la 0 * List.nth (n + i - j) lb 0)%F.
+     List.nth j la 0 * List.nth (n + i - j) lb 0)%L.
 Proof.
 intros * Hlen.
 revert la lb i n Hlen.
@@ -1771,7 +1771,7 @@ Qed.
 Theorem list_nth_lap_convol_mul : ∀ la lb i len,
   len = length la + length lb - 1
   → (List.nth i (lap_convol_mul la lb 0 len) 0 =
-     ∑ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%F.
+     ∑ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%L.
 Proof.
 intros * Hlen.
 symmetry in Hlen.
@@ -1785,7 +1785,7 @@ Theorem summation_mul_list_nth_lap_convol_mul_r : ∀ la lb lc k,
       nth (k - i) (lap_convol_mul la lb 0 (length la + length lb - 1))  0 =
     ∑ (i = 0, k),
       nth (k - i) lc 0 *
-      ∑ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%F.
+      ∑ (j = 0, i), nth j la 0 * nth (i - j) lb 0)%L.
 Proof.
 intros la lb lc k.
 rewrite rngl_summation_rtl.
@@ -1991,7 +1991,7 @@ Qed.
 Theorem lap_convol_mul_const_l : ∀ a la i len,
   length la = i + len
   → lap_convol_mul [a] la i len =
-    map (λ b, (a * b)%F) (skipn i la).
+    map (λ b, (a * b)%L) (skipn i la).
 Proof.
 intros * Hlen.
 revert i Hlen.
@@ -2010,13 +2010,13 @@ rewrite all_0_rngl_summation_0. 2: {
 rewrite Nat.sub_0_r, rngl_add_0_r; cbn.
 rewrite IHlen; [ | now rewrite Nat.add_succ_r in Hlen ].
 symmetry.
-rewrite (List_skipn_is_cons 0%F); [ easy | flia Hlen ].
+rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
 Qed.
 
 Theorem lap_convol_mul_const_r : ∀ a la i len,
   length la = i + len
   → lap_convol_mul la [a] i len =
-    map (λ b, (b * a)%F) (skipn i la).
+    map (λ b, (b * a)%L) (skipn i la).
 Proof.
 intros * Hlen.
 revert i Hlen.
@@ -2035,12 +2035,12 @@ rewrite all_0_rngl_summation_0. 2: {
 rewrite Nat.sub_diag, rngl_add_0_l; cbn.
 rewrite IHlen; [ | flia Hlen ].
 symmetry.
-rewrite (List_skipn_is_cons 0%F); [ easy | flia Hlen ].
+rewrite (List_skipn_is_cons 0%L); [ easy | flia Hlen ].
 Qed.
 
 Theorem lap_convol_mul_1_l : ∀ la i len,
   length la = i + len
-  → lap_convol_mul [1%F] la i len = skipn i la.
+  → lap_convol_mul [1%L] la i len = skipn i la.
 Proof.
 intros * Hlen.
 rewrite lap_convol_mul_const_l; [ | easy ].
@@ -2053,7 +2053,7 @@ Qed.
 
 Theorem lap_convol_mul_1_r : ∀ la i len,
   length la = i + len
-  → lap_convol_mul la [1%F] i len = skipn i la.
+  → lap_convol_mul la [1%L] i len = skipn i la.
 Proof.
 intros * Hlen.
 rewrite lap_convol_mul_const_r; [ | easy ].
@@ -2103,7 +2103,7 @@ Fixpoint lap_convol_mul_add_l (al1 al2 al3 : list T) i len :=
   | S len1 =>
       (∑ (j = 0, i),
        (List.nth j al1 0 + List.nth j al2 0) *
-       List.nth (i - j) al3 0)%F ::
+       List.nth (i - j) al3 0)%L ::
        lap_convol_mul_add_l al1 al2 al3 (S i) len1
   end.
 
@@ -2113,13 +2113,13 @@ Fixpoint lap_convol_mul_add_r (al1 al2 al3 : list T) i len :=
   | S len1 =>
       (∑ (j = 0, i),
        List.nth j al1 0 *
-       (List.nth (i - j) al2 0 + List.nth (i - j) al3 0))%F ::
+       (List.nth (i - j) al2 0 + List.nth (i - j) al3 0))%L ::
        lap_convol_mul_add_r al1 al2 al3 (S i) len1
   end.
 
 Theorem list_nth_lap_add : ∀ k la lb,
   (List.nth k (lap_add la lb) 0 =
-   List.nth k la 0 + List.nth k lb 0)%F.
+   List.nth k la 0 + List.nth k lb 0)%L.
 Proof.
 intros k la lb.
 revert la lb.
@@ -2136,7 +2136,7 @@ Qed.
 
 Theorem list_nth_lap_opp :
   rngl_has_opp = true →
-  ∀ k la, (List.nth k (lap_opp la) 0 = - List.nth k la 0)%F.
+  ∀ k la, (List.nth k (lap_opp la) 0 = - List.nth k la 0)%L.
 Proof.
 intros Hop *.
 revert la.
@@ -2151,7 +2151,7 @@ Theorem list_nth_lap_sub :
   rngl_has_opp = true →
   ∀ k la lb,
   (List.nth k (lap_sub la lb) 0 =
-   List.nth k la 0 - List.nth k lb 0)%F.
+   List.nth k la 0 - List.nth k lb 0)%L.
 Proof.
 intros Hop *.
 unfold lap_sub.
@@ -2284,7 +2284,7 @@ destruct (lt_dec j (length la)) as [Hjla| Hjla]. 2: {
   rewrite nth_overflow; [ | easy ].
   symmetry; apply (rngl_opp_0 Hop).
 }
-now rewrite (List_map_nth' 0%F).
+now rewrite (List_map_nth' 0%L).
 Qed.
 
 Theorem lap_mul_opp_r :
@@ -2315,7 +2315,7 @@ destruct j. {
     rewrite nth_overflow; [ | easy ].
     symmetry; apply (rngl_opp_0 Hop).
   }
-  now rewrite (List_map_nth' 0%F).
+  now rewrite (List_map_nth' 0%L).
 }
 rewrite <- (rngl_mul_opp_r Hop); f_equal.
 destruct (i - S j) as [| k]; [ easy | ].
@@ -2325,7 +2325,7 @@ destruct (lt_dec k (length lb)) as [Hklb| Hklb]. 2: {
   rewrite nth_overflow; [ | easy ].
   symmetry; apply (rngl_opp_0 Hop).
 }
-now rewrite (List_map_nth' 0%F).
+now rewrite (List_map_nth' 0%L).
 Qed.
 
 Theorem lap_norm_mul_sub_distr_l :
@@ -2539,7 +2539,7 @@ Qed.
    is commutative *)
 
 Theorem lap_mul_const_r : ∀ la a,
-  (la * [a])%lap = map (λ b, (b * a)%F) la.
+  (la * [a])%lap = map (λ b, (b * a)%L) la.
 Proof.
 intros.
 unfold "*"%lap; cbn.
@@ -2583,7 +2583,7 @@ Qed.
 
 Theorem lap_add_opp_l :
   rngl_has_opp = true
-  → ∀ la, (- la + la)%lap = repeat 0%F (length la).
+  → ∀ la, (- la + la)%lap = repeat 0%L (length la).
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
@@ -2593,7 +2593,7 @@ Qed.
 
 Theorem lap_add_opp_r :
   rngl_has_opp = true
-  → ∀ la, (la + - la)%lap = repeat 0%F (length la).
+  → ∀ la, (la + - la)%lap = repeat 0%L (length la).
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
@@ -2603,7 +2603,7 @@ rewrite rngl_sub_diag; [ | easy ].
 now f_equal.
 Qed.
 
-Theorem lap_norm_repeat_0 : ∀ n, lap_norm (repeat 0%F n) = [].
+Theorem lap_norm_repeat_0 : ∀ n, lap_norm (repeat 0%L n) = [].
 Proof.
 intros.
 unfold lap_norm.
@@ -2656,7 +2656,7 @@ Qed.
 
 Theorem polyn_opt_add_opp_l :
   let _ := polyn_ring_like_op in
-  if rngl_has_opp then ∀ a : polyn T, (- a + a)%F = 0%F else not_applicable.
+  if rngl_has_opp then ∀ a : polyn T, (- a + a)%L = 0%L else not_applicable.
 Proof.
 intros rop; subst rop.
 remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
@@ -2724,7 +2724,7 @@ f_equal; apply IHn.
 Qed.
 
 Theorem lap_convol_mul_l_succ_l : ∀ la lb i len,
-  lap_convol_mul (0%F :: la) lb (S i) len =
+  lap_convol_mul (0%L :: la) lb (S i) len =
   lap_convol_mul la lb i len.
 Proof.
 intros.
@@ -2739,7 +2739,7 @@ apply IHlen.
 Qed.
 
 Theorem lap_convol_mul_r_succ_l : ∀ la lb i len,
-  lap_convol_mul la (0%F :: lb) (S i) len =
+  lap_convol_mul la (0%L :: lb) (S i) len =
   lap_convol_mul la lb i len.
 Proof.
 intros.
@@ -2760,7 +2760,7 @@ Qed.
 
 Theorem lap_repeat_0_app_is_mul_power_l : ∀ n la,
   la ≠ []
-  → repeat 0%F n ++ la = ((repeat 0%F n ++ [1%F]) * la)%lap.
+  → repeat 0%L n ++ la = ((repeat 0%L n ++ [1%L]) * la)%lap.
 Proof.
 intros * Haz.
 revert la Haz.
@@ -2792,7 +2792,7 @@ Qed.
 
 Theorem lap_repeat_0_app_is_mul_power_r : ∀ n la,
   la ≠ []
-  → repeat 0%F n ++ la = (la * (repeat 0%F n ++ [1%F]))%lap.
+  → repeat 0%L n ++ la = (la * (repeat 0%L n ++ [1%L]))%lap.
 Proof.
 intros * Haz.
 revert la Haz.
@@ -2920,7 +2920,7 @@ Qed.
 
 Theorem lap_add_repeat_0_l : ∀ la len,
   len ≤ length la
-  → (repeat 0%F len + la = la)%lap.
+  → (repeat 0%L len + la = la)%lap.
 Proof.
 intros * Hlen.
 revert len Hlen.
@@ -2936,7 +2936,7 @@ Qed.
 
 Theorem lap_add_repeat_0_r : ∀ la len,
   len ≤ length la
-  → (la + repeat 0%F len = la)%lap.
+  → (la + repeat 0%L len = la)%lap.
 Proof.
 intros * Hlen.
 rewrite lap_add_comm.
@@ -2970,8 +2970,8 @@ Qed.
 
 Theorem lap_add_norm : ∀ la lb,
   (la + lb)%lap =
-    ((la ++ repeat 0%F (length lb - length la)) +
-     (lb ++ repeat 0%F (length la - length lb)))%lap.
+    ((la ++ repeat 0%L (length lb - length la)) +
+     (lb ++ repeat 0%L (length la - length lb)))%lap.
 Proof.
 intros.
 revert lb.
@@ -2990,8 +2990,8 @@ Qed.
 
 Theorem rev_lap_add_norm : ∀ la lb,
   rev (la + lb)%lap =
-    ((repeat 0%F (length lb - length la) ++ rev la) +
-     (repeat 0%F (length la - length lb) ++ rev lb))%lap.
+    ((repeat 0%L (length lb - length la) ++ rev la) +
+     (repeat 0%L (length la - length lb) ++ rev lb))%lap.
 Proof.
 intros.
 rewrite <- (List_rev_repeat _ (length lb - _)).
@@ -3016,8 +3016,8 @@ Theorem rev_lap_sub_norm :
   rngl_has_opp = true →
   ∀ la lb,
   rev (la - lb)%lap =
-    ((repeat 0%F (length lb - length la) ++ rev la) -
-     (repeat 0%F (length la - length lb) ++ rev lb))%lap.
+    ((repeat 0%L (length lb - length la) ++ rev la) -
+     (repeat 0%L (length la - length lb) ++ rev lb))%lap.
 Proof.
 intros Hop *.
 unfold lap_sub.
@@ -3053,8 +3053,8 @@ Qed.
 
 Theorem gen_lap_add : ∀ la lb,
   (la + lb =
-   (la ++ repeat 0%F (length lb - length la)) +
-   (lb ++ repeat 0%F (length la - length lb)))%lap.
+   (la ++ repeat 0%L (length lb - length la)) +
+   (lb ++ repeat 0%L (length la - length lb)))%lap.
 Proof.
 intros.
 revert lb.
@@ -3081,7 +3081,7 @@ Qed.
 
 Theorem lap_sub_diag :
   rngl_has_opp = true →
-  ∀ la, (la - la = repeat 0%F (length la))%lap.
+  ∀ la, (la - la = repeat 0%L (length la))%lap.
 Proof.
 intros Hop *.
 induction la as [| a]; [ easy | cbn ].
@@ -3094,13 +3094,13 @@ Theorem rlap_quot_rem_step_Some :
   rngl_has_opp = true →
   rngl_has_inv = true →
   ∀ rla rlb rlr cq,
-  hd 0%F rlb ≠ 0%F
+  hd 0%L rlb ≠ 0%L
   → rlap_quot_rem_step rla rlb = (Some cq, rlr)
   → rev rla =
-      (rev rlb * rev (cq :: repeat 0%F (length rla - length rlb)) +
+      (rev rlb * rev (cq :: repeat 0%L (length rla - length rlb)) +
        rev rlr)%lap ∧
     length rla = S (length rlr) ∧
-    cq = (hd 0 rla / hd 0 rlb)%F.
+    cq = (hd 0 rla / hd 0 rlb)%L.
 Proof.
 intros Hco Hop Hiv * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
@@ -3109,7 +3109,7 @@ rewrite if_bool_if_dec in Hrl.
 destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
-remember (a / b)%F as cq eqn:Hcq.
+remember (a / b)%L as cq eqn:Hcq.
 move b before a.
 cbn; rewrite List_rev_repeat.
 rewrite lap_repeat_0_app_is_mul_power_l; [ | easy ].
@@ -3122,7 +3122,7 @@ do 2 rewrite map_app; cbn.
 rewrite List_map_repeat.
 rewrite (rngl_mul_0_l Hos).
 rewrite map_rev.
-replace (b * cq)%F with (b * (a / b))%F by now rewrite Hcq.
+replace (b * cq)%L with (b * (a / b))%L by now rewrite Hcq.
 rewrite (rngl_mul_div_r Hco Hiv _ _ Hbz).
 rewrite <- List_rev_repeat at 1.
 rewrite app_assoc.
@@ -3182,7 +3182,7 @@ Theorem rlap_quot_rem_length :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
   ∀ it (rla rlb rlq rlr : list T),
-  hd 0%F rlb ≠ 0%F
+  hd 0%L rlb ≠ 0%L
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → length rlq = length rla - (length rlb - 1).
@@ -3237,7 +3237,7 @@ Theorem rlap_quot_rem_loop_prop :
   rngl_has_opp = true →
   rngl_has_inv = true →
   ∀ it (rla rlb rlq rlr : list T),
-  hd 0%F rlb ≠ 0%F
+  hd 0%L rlb ≠ 0%L
   → rlap_quot_rem_loop it rla rlb = (rlq, rlr)
   → S (length rla) ≤ it
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
@@ -3311,7 +3311,7 @@ Theorem rlap_quot_rem_prop :
   rngl_has_opp = true →
   rngl_has_inv = true →
   ∀ (rla rlb rlq rlr : list T),
-  hd 0%F rlb ≠ 0%F
+  hd 0%L rlb ≠ 0%L
   → rlap_quot_rem rla rlb = (rlq, rlr)
   → rev rla = (rev rlb * rev rlq + rev rlr)%lap.
 Proof.
@@ -3414,7 +3414,7 @@ Theorem lap_quot_rem_prop :
   rngl_has_inv = true →
   ∀ la lb lq lr : list T,
   has_polyn_prop la = true
-  → last lb 0%F ≠ 0%F
+  → last lb 0%L ≠ 0%L
   → has_polyn_prop lr = true
   → lap_quot_rem la lb = (lq, lr)
   → la = (lb * lq + lr)%lap ∧
@@ -3434,7 +3434,7 @@ assert (Hrb : length lr < length lb). {
 rewrite and_comm, and_assoc.
 split; [ easy | ].
 rewrite and_comm.
-assert (Hbz : hd 0%F (rev lb) ≠ 0%F). {
+assert (Hbz : hd 0%L (rev lb) ≠ 0%L). {
   remember (rev lb) as lc eqn:Hlc; symmetry in Hlc.
   apply List_rev_symm in Hlc; subst lb.
   destruct lc as [| c]; [ easy | ].
@@ -3584,7 +3584,7 @@ destruct pr as (lr, Hpr); cbn.
 move lb before la; move lq before lb; move lr before lq.
 specialize (lap_quot_rem_prop Hic Hop Hiv la lb) as H1.
 specialize (H1 lq lr Hpa).
-assert (H : (last lb 0 ≠ 0)%F). {
+assert (H : (last lb 0 ≠ 0)%L). {
   apply (rngl_neqb_neq Heb).
   destruct lb; [ | easy ].
   exfalso; apply Hbz.
@@ -3640,7 +3640,7 @@ Qed.
 
 Theorem lap_add_sub :
   rngl_has_opp = true →
-  ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%F (length lb - length la).
+  ∀ la lb, (la + lb - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
 intros Hop *.
 unfold lap_sub.
@@ -3663,7 +3663,7 @@ Qed.
 Theorem last_lap_convol_mul_last : ∀ la lb a b i len d,
   len ≠ 0
   → length la + length lb + 1 = i + len
-  → last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%F.
+  → last (lap_convol_mul (la ++ [a]) (lb ++ [b]) i len) d = (a * b)%L.
 Proof.
 intros * Hlen Hlab.
 revert la lb i Hlab.
@@ -3698,7 +3698,7 @@ rewrite IHlen; [ easy | easy | flia Hlab ].
 Qed.
 
 Theorem last_lap_mul : ∀ la lb,
-  last (la * lb)%lap 0%F = (last la 0%F * last lb 0%F)%F.
+  last (la * lb)%lap 0%L = (last la 0%L * last lb 0%L)%L.
 Proof.
 intros.
 unfold lap_mul.
@@ -3731,7 +3731,7 @@ Theorem lap_add_move_l :
   rngl_has_opp = true →
   ∀ la lb lc : list T,
   (la + lb)%lap = lc
-  → lb ++ repeat 0%F (length la - length lb) = (lc - la)%lap.
+  → lb ++ repeat 0%L (length la - length lb) = (lc - la)%lap.
 Proof.
 intros Hop * Hab.
 subst lc.
@@ -3743,7 +3743,7 @@ Theorem lap_add_sub_eq_l :
   rngl_has_opp = true →
   ∀ la lb lc,
   (la + lb)%lap = lc
-  → (lc - la)%lap = lb ++ repeat 0%F (length la - length lb).
+  → (lc - la)%lap = lb ++ repeat 0%L (length la - length lb).
 Proof.
 intros Hop * Hlab; subst lc.
 rewrite lap_add_comm.
@@ -3754,7 +3754,7 @@ Theorem lap_add_sub_eq_r :
   rngl_has_opp = true →
   ∀ la lb lc,
   (la + lb)%lap = lc
-  → (lc - lb)%lap = la ++ repeat 0%F (length lb - length la).
+  → (lc - lb)%lap = la ++ repeat 0%L (length lb - length la).
 Proof.
 intros Hop * Habc.
 subst lc.
@@ -3814,8 +3814,8 @@ Theorem lap_add_cancel_l :
   rngl_has_opp = true →
   ∀ la lb lc,
   (la + lb = la + lc)%lap
-  → (lb ++ repeat 0%F (length lc - length lb)  =
-     lc ++ repeat 0%F (length lb - length lc))%lap.
+  → (lb ++ repeat 0%L (length lc - length lb)  =
+     lc ++ repeat 0%L (length lb - length lc))%lap.
 Proof.
 intros Hop * Habc.
 revert lb lc Habc.
@@ -3919,9 +3919,9 @@ Theorem lap_sub_move_0_r_le :
   rngl_has_opp = true →
   ∀ la lb,
   length la ≤ length lb
-  → (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
-    la ++ repeat 0%F (length lb - length la) =
-    lb ++ repeat 0%F (length la - length lb).
+  → (la - lb)%lap = repeat 0%L (max (length la) (length lb)) ↔
+    la ++ repeat 0%L (length lb - length la) =
+    lb ++ repeat 0%L (length la - length lb).
 Proof.
 intros Hop * Hlab.
 rewrite Nat.max_r; [ | easy ].
@@ -3963,9 +3963,9 @@ Qed.
 Theorem lap_sub_move_0_r :
   rngl_has_opp = true →
   ∀ la lb,
-  (la - lb)%lap = repeat 0%F (max (length la) (length lb)) ↔
-  la ++ repeat 0%F (length lb - length la) =
-  lb ++ repeat 0%F (length la - length lb).
+  (la - lb)%lap = repeat 0%L (max (length la) (length lb)) ↔
+  la ++ repeat 0%L (length lb - length la) =
+  lb ++ repeat 0%L (length la - length lb).
 Proof.
 intros Hop *.
 destruct (le_dec (length la) (length lb)) as [Hlab| Hlab]. {
@@ -4039,12 +4039,12 @@ now apply lap_mul_has_polyn_prop.
 Qed.
 
 Theorem last_lap_norm : ∀ la,
-  last (lap_norm la) 0%F = 0%F
+  last (lap_norm la) 0%L = 0%L
   → lap_norm la = [].
 Proof.
 intros * Ha.
 induction la as [| a] using rev_ind; [ easy | cbn ].
-destruct (rngl_eq_dec Heb a 0%F) as [Haz| Haz]. {
+destruct (rngl_eq_dec Heb a 0%L) as [Haz| Haz]. {
   subst a.
   rewrite <- lap_norm_app_0_r in Ha. 2: {
     intros i.
@@ -4081,7 +4081,7 @@ destruct qr as (lq, lr).
 specialize (lap_quot_rem_prop Hco Hop Hiv) as H1.
 specialize (H1 (la * lb)%lap lb lq lr).
 specialize (H1 (lap_mul_has_polyn_prop Hiv la lb pa pb)).
-assert (H : last lb 0%F ≠ 0%F). {
+assert (H : last lb 0%L ≠ 0%L). {
   apply (rngl_neqb_neq Heb).
   apply Bool.orb_true_iff in pb.
   destruct pb as [pb| ]; [ | easy ].
@@ -4172,7 +4172,7 @@ Qed.
 
 Theorem polyn_opt_mul_div :
   let _ := polyn_ring_like_op in
-  if rngl_has_quot then ∀ a b, b ≠ 0%F → (a * b / b)%F = a
+  if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -4197,7 +4197,7 @@ Qed.
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
   if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
-    ∀ a b, b ≠ 0%F → (b * a / b)%F = a
+    ∀ a b, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
 intros rop.
@@ -4209,7 +4209,7 @@ Qed.
 
 Theorem polyn_opt_eqb_eq :
   let _ := polyn_ring_like_op in
-  if rngl_has_eqb then ∀ a b : polyn T, (a =? b)%F = true ↔ a = b
+  if rngl_has_eqb then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -4226,7 +4226,7 @@ Qed.
 
 Theorem polyn_opt_le_dec :
   let _ := polyn_ring_like_op in
-  if rngl_has_dec_le then ∀ a b : polyn T, {(a ≤ b)%F} + {¬ (a ≤ b)%F}
+  if rngl_has_dec_le then ∀ a b : polyn T, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -4237,7 +4237,7 @@ Qed.
 Theorem polyn_opt_integral :
   let _ := polyn_ring_like_op in
   if rngl_is_integral then
-    ∀ a b : polyn T, (a * b)%F = 0%F → a = 0%F ∨ b = 0%F
+    ∀ a b : polyn T, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
   else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -4415,10 +4415,10 @@ Qed.
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
-  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%F
+  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%F) ∧
-    rngl_of_nat rngl_characteristic = 0%F.
+    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
+    rngl_of_nat rngl_characteristic = 0%L.
 Proof.
 intros rop; subst rop.
 specialize rngl_characteristic_prop as H1.
@@ -4497,13 +4497,13 @@ Definition lap_compose la lb :=
 Definition lap_compose2 la lb :=
   List.fold_right
     (λ i accu,
-     lap_add accu (lap_mul [List.nth i la 0] (lap_power lb i)))%F
+     lap_add accu (lap_mul [List.nth i la 0] (lap_power lb i)))%L
     [] (List.seq 0 (length la)).
 
 (* *)
 
 Definition eval_lap la x :=
-  (List.fold_right (λ c accu, accu * x + c) 0 la)%F.
+  (List.fold_right (λ c accu, accu * x + c) 0 la)%L.
 
 Definition eval_polyn pol :=
   eval_lap (lap pol).
