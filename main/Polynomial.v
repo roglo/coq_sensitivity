@@ -4506,4 +4506,11 @@ Definition eval_lap la x :=
 Definition eval_polyn pol :=
   eval_lap (lap pol).
 
+(* roots *)
+
+Theorem glop :
+  ∀ P, 0 < length (lap P) → ∃ x, eval_polyn P x = 0%F.
+Proof.
+...
+
 End a.

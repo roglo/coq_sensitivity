@@ -1057,7 +1057,7 @@ Qed.
 (* https://en.wikipedia.org/wiki/Min-max_theorem#Min-max_theorem *)
 (* https://ecroot.math.gatech.edu/notes_linear.pdf *)
 
-(* to be completed
+(* to be completed *)
 Theorem Rayleigh_quotient_from_ortho : in_ordered_field →
   rngl_characteristic ≠ 1 →
   ∀ n (M : matrix T) D U eV x y ev,
