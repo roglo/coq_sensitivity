@@ -4521,3 +4521,8 @@ apply IHla.
 Qed.
 
 End a.
+
+Require Import Reals.
+Print Scope Rfun_scope.
+
+...
