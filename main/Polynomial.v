@@ -4510,9 +4510,14 @@ Definition eval_polyn pol :=
 
 (* roots *)
 
-Theorem glop :
-  ∀ P, 0 < length (lap P) → ∃ x, eval_polyn P x = 0%F.
+Theorem eval_lap_is_rngl_eval_polyn :
+  ∀ la x, eval_lap la x = rngl_eval_polyn la x.
 Proof.
-...
+intros.
+unfold eval_lap.
+induction la as [| a]; [ easy | cbn ].
+f_equal; f_equal.
+apply IHla.
+Qed.
 
 End a.

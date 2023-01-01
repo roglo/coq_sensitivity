@@ -160,7 +160,7 @@ Qed.
 Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=
   match l with
   | nil => rngl_zero
-  | cons a l' => rngl_add a (rngl_mul (rngl_eval_polyn l' x) x)
+  | cons a l' => rngl_add (rngl_mul (rngl_eval_polyn l' x) x) a
   end.
 
 Definition rngl_eqb {T} {R : ring_like_op T} a b :=
