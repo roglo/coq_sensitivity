@@ -1088,8 +1088,9 @@ assert
            (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%F). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
-...
-  assert (Hos : rngl_has_opp_or_sous = true) by now left.
+  assert (Hos : rngl_has_opp_or_sous = true). {
+    now apply rngl_has_opp_or_sous_iff; left.
+  }
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).
   unfold Rayleigh_quotient.
