@@ -116,17 +116,8 @@ Definition mat_ring_like_op n : ring_like_op (square_matrix n T) :=
      rngl_mul := square_matrix_mul;
      rngl_opt_opp_or_sous := Some (inl square_matrix_opp);
      rngl_opt_inv_or_quot := None;
-     rngl_opt_eqb :=
-       match rngl_opt_eqb with
-       | Some eqb => Some (square_matrix_eqb eqb)
-       | None => None
-       end;
+     rngl_opt_eqb := None;
      rngl_opt_le := None |}.
-
-Set Printing Implicit.
-Print mat_ring_like_op.
-Print square_matrix_eqb.
-...
 
 (*
 Canonical Structure mat_ring_like_op.
@@ -655,41 +646,6 @@ intros j Hj.
 now apply rngl_mul_0_l.
 Qed.
 
-Theorem squ_mat_opt_eqb_eq {n} :
-  let mro := mat_ring_like_op n in
-  if @rngl_has_eqb T ro then
-    ∀ a b : square_matrix n T, (a =? b)%L = true ↔ a = b
-  else not_applicable.
-Proof.
-intros mro.
-Admitted. (*
-...
-remember rngl_has_eqb as heq eqn:Heq.
-symmetry in Heq.
-destruct heq; [ | easy ].
-intros A B.
-split; intros Hab. {
-  apply square_matrix_eq.
-Check rngl_eqb_eq.
-  specialize (@rngl_eqb_eq T ro rp Heq) as H1.
-  specialize (rngl_eqb_eq Heq) as H1.
-  specialize (@rngl_eqb_eq T ro (mat_ring_like_op n)) as H1.
-  specialize (@rngl_eqb_eq T ro rp Heq) as H1.
-  specialize (@rngl_eqb_eq T ro rp Heq) as H1.
-  apply (mat_eqb_eq H1).
-  unfold "=?"%L in Hab.
-  remember rngl_opt_eqb as c eqn:Hc; symmetry in Hc.
-  destruct c as [eqb| ]; [ | easy ].
-...
-  Check mat_eqb_eq.
-...
-  apply rngl_eqb_eq.
-  apply (@rngl_eqb_eq (square_matrix n T)).
-...
-*)
-
-Set Printing Implicit.
-
 Definition mat_ring_like_prop (n : nat) :
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
@@ -715,7 +671,7 @@ Definition mat_ring_like_prop (n : nat) :
      rngl_opt_mul_inv_r := NA;
      rngl_opt_mul_div := NA;
      rngl_opt_mul_quot_r := NA;
-     rngl_opt_eqb_eq := squ_mat_opt_eqb_eq;
+     rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := NA;
      rngl_opt_alg_closed := NA;
