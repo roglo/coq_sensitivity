@@ -4522,7 +4522,15 @@ Qed.
 
 End a.
 
+Require Import ConstructiveReals.
+Print Scopes.
+Print Scope CReal_scope.
+Search ConstructiveReals.
+
+Search ConstructiveReal.
+Print Scope CReal_scope.
+
 Require Import Reals.
-Print Scope Rfun_scope.
+Print Scope ring_like_scope.
 
 ...
