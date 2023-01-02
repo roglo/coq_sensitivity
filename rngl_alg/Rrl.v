@@ -18,6 +18,22 @@ Proof. intros; now rewrite Rplus_assoc. Qed.
 Theorem Rmult_assoc' : ∀ a b c : R, (a * (b * c))%R = (a * b * c)%R.
 Proof. intros; now rewrite Rmult_assoc. Qed.
 
+Theorem Rcharacteristic_prop :
+  let ror := reals_ring_like_op in
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%L.
+Proof.
+intros.
+assert (H : ∀ n, rngl_of_nat n = INR n). {
+  intros.
+  induction n; [ easy | cbn ].
+  destruct n; [ apply Rplus_0_r | ].
+  rewrite IHn.
+  apply Rplus_comm.
+}
+rewrite H.
+now apply not_0_INR.
+Qed.
+
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
@@ -45,8 +61,8 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_eqb_eq := NA;
      rngl_opt_le_dec := NA;
      rngl_opt_integral := Rmult_integral;
-     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_alg_closed := NA;
+     rngl_characteristic_prop := Rcharacteristic_prop;
      rngl_opt_le_refl := ?rngl_opt_le_refl;
      rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
      rngl_opt_le_trans := ?rngl_opt_le_trans;
