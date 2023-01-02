@@ -1632,7 +1632,7 @@ induction la as [| a]; intros. {
   destruct lc as [| c]. {
     assert (Hla : ∀ i, nth i la 0%L = 0%L). {
       intros i.
-      clear - Heb Hlc.
+      clear - ro rp Heb Hlc.
       revert i.
       induction la as [| a]; intros; cbn. {
         now rewrite Tauto_match_nat_same.
@@ -1662,7 +1662,7 @@ induction la as [| a]; intros. {
         destruct i; [ easy | ].
         apply Hla.
       }
-      clear - Heb Hlb.
+      clear - ro rp Heb Hlb.
       induction lb as [| b]; [ easy | cbn ].
       specialize (Hlb 0) as H1; cbn in H1; subst b.
       rewrite strip_0s_app; cbn.
@@ -4208,20 +4208,22 @@ now rewrite Bool.andb_false_r.
 Qed.
 
 Theorem polyn_opt_eqb_eq :
-  let _ := polyn_ring_like_op in
+  let rop := polyn_ring_like_op in
   if rngl_has_eqb then ∀ a b : polyn T, (a =? b)%L = true ↔ a = b
   else not_applicable.
 Proof.
 intros rop; subst rop.
-rewrite Heb.
-apply polyn_eqb_eq.
-intros a b.
-split. 2: {
-  intros; subst b.
-  apply (rngl_eqb_refl Heb).
+intros a b; cbn.
+unfold polyn_eqb.
+rewrite list_eqb_eq. 2: {
+  intros c d.
+  split; intros Hcd. {
+    now apply (rngl_eqb_eq Heb) in Hcd.
+  }
+  subst c.
+  now apply rngl_eqb_eq.
 }
-intros Hab.
-now apply (rngl_eqb_eq Heb) in Hab.
+apply eq_polyn_eq.
 Qed.
 
 Theorem polyn_opt_le_dec :
@@ -4452,7 +4454,6 @@ Qed.
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
-     rngl_has_eqb := rngl_has_eqb;
      rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
@@ -4521,16 +4522,3 @@ apply IHla.
 Qed.
 
 End a.
-
-Require Import ConstructiveReals.
-Print Scopes.
-Print Scope CReal_scope.
-Search ConstructiveReals.
-
-Search ConstructiveReal.
-Print Scope CReal_scope.
-
-Require Import Reals.
-Print Scope ring_like_scope.
-
-...
