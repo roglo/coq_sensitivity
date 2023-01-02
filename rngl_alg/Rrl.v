@@ -12,6 +12,12 @@ Canonical Structure reals_ring_like_op : ring_like_op R :=
      rngl_opt_eqb := None;
      rngl_opt_le := Some Rle |}.
 
+Theorem Rplus_assoc' : ∀ a b c : R, (a + (b + c))%R = (a + b + c)%R.
+Proof. intros; now rewrite Rplus_assoc. Qed.
+
+Theorem Rmult_assoc' : ∀ a b c : R, (a * (b * c))%R = (a * b * c)%R.
+Proof. intros; now rewrite Rmult_assoc. Qed.
+
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
@@ -19,11 +25,11 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_is_alg_closed := false;
      rngl_characteristic := 0;
      rngl_add_comm := Rplus_comm;
-     rngl_add_assoc := ?rngl_add_assoc;
-     rngl_add_0_l := ?rngl_add_0_l;
-     rngl_mul_assoc := ?rngl_mul_assoc;
-     rngl_mul_1_l := ?rngl_mul_1_l;
-     rngl_mul_add_distr_l := ?rngl_mul_add_distr_l;
+     rngl_add_assoc := Rplus_assoc';
+     rngl_add_0_l := Rplus_0_l;
+     rngl_mul_assoc := Rmult_assoc';
+     rngl_mul_1_l := Rmult_1_l;
+     rngl_mul_add_distr_l := Rmult_plus_distr_l;
      rngl_opt_mul_comm := ?rngl_opt_mul_comm;
      rngl_opt_mul_1_r := ?rngl_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := ?rngl_opt_mul_add_distr_r;
