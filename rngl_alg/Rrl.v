@@ -34,6 +34,39 @@ rewrite H.
 now apply not_0_INR.
 Qed.
 
+Theorem Ropt_mul_le_compat_nonneg :
+  let ror := reals_ring_like_op in
+  ∀ a b c d : R, (0 ≤ a ≤ c)%L → (0 ≤ b ≤ d)%L → (a * b ≤ c * d)%L.
+Proof.
+intros * Hac Hbd.
+now apply Rmult_le_compat.
+Qed.
+
+Theorem Ropt_mul_le_compat_nonpos :
+  let ror := reals_ring_like_op in
+  ∀ a b c d : R, (c ≤ a ≤ 0)%L → (d ≤ b ≤ 0)%L → (a * b ≤ c * d)%L.
+Proof.
+intros * Hca Hdb; cbn.
+apply Rle_trans with (r2 := (a * d)%R). {
+  now apply Rmult_le_compat_neg_l.
+}
+rewrite (Rmult_comm a), (Rmult_comm c).
+apply Rmult_le_compat_neg_l; [ | easy ].
+now apply Rle_trans with (r2 := b).
+Qed.
+
+Theorem Ropt_not_le :
+  let ror := reals_ring_like_op in
+  ∀ a b : R, ¬ (a ≤ b)%L → a = b ∨ (b ≤ a)%L.
+Proof.
+intros * Hab.
+cbn in Hab |-*.
+apply Rnot_le_lt in Hab.
+specialize (Rle_or_lt b a) as H1.
+destruct H1 as [| Hba]; [ now right | left ].
+now apply Rlt_asym in Hba.
+Qed.
+
 Canonical Structure reals_ring_like_prop : ring_like_prop R :=
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
@@ -67,7 +100,7 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_le_antisymm := Rle_antisym;
      rngl_opt_le_trans := Rle_trans;
      rngl_opt_add_le_compat := Rplus_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le |}.
+     rngl_opt_mul_le_compat_nonneg := Ropt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := Ropt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := Ropt_not_le |}.
