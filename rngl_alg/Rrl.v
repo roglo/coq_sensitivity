@@ -139,10 +139,6 @@ Definition glop l :=
   (0 :: l) :: (l ++ [0]) ::
   map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)).
 
-Compute (glop [0;0;0;0;0]).
-Compute (glop [0;0;0;1]).
-Compute (glop [0;2]).
-
 Require Import Main.SortingFun.
 
 Fixpoint list_nat_le la lb :=
@@ -168,5 +164,10 @@ Fixpoint list_list_nat_leb lla llb :=
       else false
   end.
 
-Check list_list_nat_leb.
-Check list_nat_le.
+(*
+Compute (glop [0;0;0;0;0]).
+Compute (isort list_nat_le (glop [0;0;0;0;0])).
+Compute (glop [0;0;0;1]).
+Compute (glop [0;2]).
+Compute (isort list_nat_le (glop [0;2])).
+*)
