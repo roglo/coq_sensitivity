@@ -126,3 +126,16 @@ Compute (generate_next_step 0).
 Compute (generate_next_step 1).
 Compute (generate_next_step 2).
 *)
+
+(* I need a function where, when n = 4, should result
+     [[0;0;0;0]; [0;0;1]; [0;1;0]; [1;0;0]; [0;2]; [2;0]; [3]
+   i.e. 2^n lists: all lists whose "step" is 4
+     Doing that, we can generate all lists of nat;
+   but, perhaps with an inductive type, it could be the same?
+   but not computable *)
+(*
+Fixpoint glop n i :=
+  match n with
+  | 0 => []
+  | S n' => repeat n i ::
+*)
