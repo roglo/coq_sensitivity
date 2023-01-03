@@ -104,3 +104,25 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_le_compat_nonpos := Ropt_mul_le_compat_nonpos;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := Ropt_not_le |}.
+
+(* experiment, to make, perhaps, an implementation of algebraic numbers A
+   where a first step is to generate all monic polynomials with values
+   in ℕ; since monic, it is not required to append the coefficient 1 to
+   the list representing the polynomial *)
+
+Require Import Arith.
+Import List List.ListNotations.
+Require Import Main.Misc Main.IterAdd Main.NatRingLike.
+
+(* I don't know how to call that; I temporarily call it "step". It is
+   a number associated with a list; the next list must have a "step"
+   whose value is nat successor (next of a step 42 must have a step 43 *)
+Definition step l := length l + ∑ (i = 1, length l), l.(i).
+
+Definition generate_next_step (n : nat) := [[n]; repeat 0 (S n)].
+
+(*
+Compute (generate_next_step 0).
+Compute (generate_next_step 1).
+Compute (generate_next_step 2).
+*)
