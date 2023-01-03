@@ -134,12 +134,39 @@ Compute (generate_next_step 2).
      Doing that, we can generate all lists of nat;
    but, perhaps with an inductive type, it could be the same?
    but not computable *)
-(*
-Fixpoint glop n i :=
-  match n with
-  | 0 => []
-  | S n' =>
-      match i with
-      | 0 => repeat n 0 :: glop n (S i)
-      | S i' => ...
-*)
+
+Definition glop l :=
+  (0 :: l) :: (l ++ [0]) ::
+  map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)).
+
+Compute (glop [0;0;0;0;0]).
+Compute (glop [0;0;0;1]).
+Compute (glop [0;2]).
+
+Require Import Main.SortingFun.
+
+Fixpoint list_nat_le la lb :=
+  match (la, lb) with
+  | ([], _) => true
+  | (_, []) => false
+  | (a :: la', b :: lb') =>
+      match a ?= b with
+      | Eq => list_nat_le la' lb'
+      | Lt => true
+      | Gt => false
+      end
+  end.
+
+Fixpoint list_list_nat_leb lla llb :=
+  match (lla, llb) with
+  | ([], _) => true
+  | (_, []) => false
+  | (la :: lla', lb :: llb') =>
+      if list_nat_le la lb then
+        if list_nat_le lb la then list_list_nat_leb lla' llb'
+        else true
+      else false
+  end.
+
+Check list_list_nat_leb.
+Check list_nat_le.
