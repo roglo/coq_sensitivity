@@ -138,5 +138,8 @@ Compute (generate_next_step 2).
 Fixpoint glop n i :=
   match n with
   | 0 => []
-  | S n' => repeat n i ::
+  | S n' =>
+      match i with
+      | 0 => repeat n 0 :: glop n (S i)
+      | S i' => ...
 *)
