@@ -105,10 +105,11 @@ Canonical Structure reals_ring_like_prop : ring_like_prop R :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := Ropt_not_le |}.
 
-(* experiment, to make, perhaps, an implementation of algebraic numbers A
+(* experiment, to make, perhaps, an implementation of algebraic numbers
    where a first step is to generate all monic polynomials with values
    in ℕ; since monic, it is not required to append the coefficient 1 to
-   the list representing the polynomial *)
+   the list representing the polynomial, so we have to generate all
+   lists of nat *)
 
 Require Import Arith.
 Import List List.ListNotations.
