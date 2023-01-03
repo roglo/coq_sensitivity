@@ -164,10 +164,36 @@ Fixpoint list_list_nat_leb lla llb :=
       else false
   end.
 
+Fixpoint uniq {A} (eqb : A → A → bool) (l : list A) :=
+  match l with
+  | [] => l
+  | a :: l' =>
+      match l' with
+      | [] => [a]
+      | b :: l'' => if eqb a b then uniq eqb l' else a :: uniq eqb l'
+      end
+  end.
+
 (*
 Compute (glop [0;0;0;0;0]).
 Compute (isort list_nat_le (glop [0;0;0;0;0])).
 Compute (glop [0;0;0;1]).
 Compute (glop [0;2]).
 Compute (isort list_nat_le (glop [0;2])).
+*)
+
+Definition list_nat_le' (la lb : list nat) :=
+  if lt_dec (length lb) (length la) then true
+  else false.
+
+Definition pouet (ll : list (list nat)) :=
+  isort list_nat_le'
+    (uniq (list_eqv Nat.eqb) (isort list_nat_le (concat (map glop ll)))).
+
+(*
+Compute (pouet [[]]).
+Compute (pouet [[0]]).
+Compute (pouet [[0; 0]; [1]]).
+Compute (pouet [[0; 0; 0]; [0; 1]; [1; 0]; [2]]).
+Compute (pouet [[0; 0; 0; 0]; [1; 0; 0]; [0; 1; 0]; [0; 0; 1]; [2; 0]; [1; 1]; [0; 2]; [3]]).
 *)
