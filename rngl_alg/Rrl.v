@@ -210,22 +210,42 @@ Fixpoint list_list_nat_len_sum (n s : nat) :=
   match n with
   | 0 => if s =? 0 then [[]] else []
   | S n' =>
+      map (λ l, 0 :: l) (list_list_nat_len_sum n' s) ++
       match s with
-      | 0 => [repeat 0 n]
+      | 0 => []
       | S s1 =>
-          map (λ i, replace_at (i - 1) (repeat 0 n) s) (seq 1 n) ++
+          map (λ l, 1 :: l) (list_list_nat_len_sum n' s1) ++
           match s1 with
           | 0 => []
           | S s2 =>
-(*
-              flat_map (λ l, map (λ i, replace_at (i - 1) l (l.(i) + 1)) (seq 1 n))
-*)
-                (list_list_nat_len_sum n s1)
+              map (λ l, 2 :: l) (list_list_nat_len_sum n' s2) ++
+              match s2 with
+              | 0 => []
+              | S s3 =>
+                  map (λ l, 3 :: l) (list_list_nat_len_sum n' s3) ++
+                  match s3 with
+                  | 0 => []
+                  | S s4 =>
+                      map (λ l, 4 :: l) (list_list_nat_len_sum n' s4) ++ [[42]]
+                  end
+              end
           end
       end
   end.
 
+Compute (list_list_nat_len_sum 0 0).
+Compute (list_list_nat_len_sum 0 1).
+Compute (list_list_nat_len_sum 1 0).
+Compute (list_list_nat_len_sum 1 1).
+Compute (list_list_nat_len_sum 1 2).
+Compute (list_list_nat_len_sum 1 3).
+Compute (list_list_nat_len_sum 1 4).
+...
+Compute (list_list_nat_len_sum 2 0).
+Compute (list_list_nat_len_sum 2 1).
 Compute (list_list_nat_len_sum 2 2).
+Compute (list_list_nat_len_sum 2 3).
+Compute (list_list_nat_len_sum 2 4).
 ...
 Compute (list_list_nat_len_sum 3 1).
 Compute (list_list_nat_len_sum 3 0).
