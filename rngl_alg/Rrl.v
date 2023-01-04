@@ -211,6 +211,7 @@ Compute (let ll := [[]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0; 0]; [1]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0; 0; 0]; [0; 1]; [1; 0]; [2]] in (pouet ll, gloup ll)).
+Compute (let ll := [[0; 0; 0; 0]; [1; 0; 0]; [0; 1; 0]; [0; 0; 1]; [2; 0]; [1; 1]; [0; 2]; [3]] in (pouet ll, gloup ll)).
 ...
 Compute (tagada 0).
 Compute (tagada 1).
