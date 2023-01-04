@@ -204,6 +204,29 @@ Definition gloup ll :=
        ll).
 
 (*
+Fixpoint toto len d :=
+  match d with
+(**)
+  | 0 => [[len]]
+(*
+  | 0 => [repeat 0 len]
+*)
+  | S d' =>
+      match d' with
+      | 0 =>
+          map (λ i, replace_at (i - 1) (repeat 0 len) 1)
+            (seq 0 len) ++
+          toto len d'
+      | S d'' => [42] :: toto len d'
+      end
+  end.
+
+Compute (toto 3 3).
+...
+(* ouais, c'est nul tout ça *)
+*)
+
+(*
 Compute (let ll := [[]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0; 0]; [1]] in (pouet ll, gloup ll)).
