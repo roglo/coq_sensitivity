@@ -204,6 +204,23 @@ Definition gloup ll :=
        ll).
 
 (*
+(* list of lists of nat of length n whose sum is s *)
+Fixpoint list_list_nat_len_sum (n s : nat) :=
+  match n with
+  | 0 => if s =? 0 then [[]] else []
+  | S n' => [s :: repeat 0 n']
+  end.
+
+Compute (list_list_nat_len_sum 4 42).
+Compute (list_list_nat_len_sum 3 42).
+Compute (list_list_nat_len_sum 2 42).
+Compute (list_list_nat_len_sum 1 42).
+Compute (list_list_nat_len_sum 0 42).
+Compute (list_list_nat_len_sum 0 0).
+...
+*)
+
+(*
 Fixpoint toto len d :=
   match d with
 (**)
