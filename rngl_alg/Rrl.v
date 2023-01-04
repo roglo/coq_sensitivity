@@ -203,14 +203,34 @@ Definition gloup ll :=
        (λ l, map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)))
        ll).
 
-(*
+(**)
 (* list of lists of nat of length n whose sum is s *)
+(* putain, j'ai de la merde dans la tête *)
 Fixpoint list_list_nat_len_sum (n s : nat) :=
   match n with
   | 0 => if s =? 0 then [[]] else []
-  | S n' => [s :: repeat 0 n']
+  | S n' =>
+      map (λ i, replace_at (i - 1) (repeat 0 n) s) (seq 1 n) ++
+      match s with
+      | 0 => []
+      | S s1 =>
+           map (λ l, 0 :: l) (list_list_nat_len_sum n' s1) ++
+           match s1 with
+           | 0 => []
+           | S s2 =>
+               map (λ l, 1 :: l) (list_list_nat_len_sum n' s2) ++
+               match s2 with
+               | 0 => []
+               | S s3 =>
+                   map (λ l, 2 :: l) (list_list_nat_len_sum n' s3) ++
+                   []
+               end
+           end
+      end
   end.
 
+Compute (list_list_nat_len_sum 3 3).
+...
 Compute (list_list_nat_len_sum 4 42).
 Compute (list_list_nat_len_sum 3 42).
 Compute (list_list_nat_len_sum 2 42).
