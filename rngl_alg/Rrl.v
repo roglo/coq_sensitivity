@@ -203,6 +203,7 @@ Definition gloup ll :=
        (λ l, map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)))
        ll).
 
+(*
 Compute (let ll := [[]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0; 0]; [1]] in (pouet ll, gloup ll)).
