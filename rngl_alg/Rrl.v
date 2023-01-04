@@ -190,7 +190,15 @@ Definition pouet (ll : list (list nat)) :=
   isort list_nat_le'
     (uniq (list_eqv Nat.eqb) (isort list_nat_le (concat (map glop ll)))).
 
+Fixpoint tagada n :=
+  match n with
+  | 0 => [[]]
+  | S n' => pouet (tagada n')
+  end.
+
 (*
+Compute (tagada 5).
+
 Compute (pouet [[]]).
 Compute (pouet [[0]]).
 Compute (pouet [[0; 0]; [1]]).
