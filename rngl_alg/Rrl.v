@@ -196,17 +196,13 @@ Fixpoint tagada n :=
   | S n' => pouet (tagada n')
   end.
 
-Definition oups l :=
-  (if Nat.eqb (∑ (i = 1, length l), l.(i)) 0 then
-    [repeat 0 (S (length l))]
-   else []) ++
-  if Nat.eqb (length l) 1 then
-    [[S (hd 0 l)]]
-  else map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)).
+Definition gloup ll :=
+  (0 :: hd [] ll) ::
+  concat
+    (map
+       (λ l, map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)))
+       ll).
 
-Definition gloup ll := map oups ll.
-
-(*
 Compute (let ll := [[]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0]] in (pouet ll, gloup ll)).
 Compute (let ll := [[0; 0]; [1]] in (pouet ll, gloup ll)).
