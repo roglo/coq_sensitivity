@@ -115,29 +115,28 @@ Require Import Arith.
 Import List List.ListNotations.
 Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
-(*
+Fixpoint llnls k (s : nat) :=
+  if k =? s then
+    if s =? 0 then [[]] else []
+  else
+    let fix llnls_aux k s i :=
+      match k with
+      | 0 => [[43]]
+      | S k' =>
+          map (λ l, i :: l) (llnls k' s) ++
+          match s with
+          | 0 => []
+          | S s' => llnls_aux k' s' (i + 1)
+          end
+      end
+    in
+    llnls_aux k s 0.
+
 (* list of lists of nat of length n whose sum is s *)
-Fixpoint llnls k (n s : nat) :=
-  match n with
-  | 0 => if s =? 0 then [[]] else []
-  | S n' =>
-      let fix llnls_aux k n s i :=
-        match k with
-        | 0 => [[43]]
-        | S k' =>
-            map (λ l, i :: l) (llnls k' n s) ++
-            match s with
-            | 0 => []
-            | S s' => llnls_aux k' n s' (i + 1)
-            end
-        end
-      in
-      llnls_aux k n' s 0
-  end.
-
 Definition list_list_nat_len_sum (n s : nat) :=
-  llnls (n + s) n s.
+  llnls (n + s) s.
 
+(*
 Compute (list_list_nat_len_sum 0 0).
 Compute (list_list_nat_len_sum 0 1).
 Compute (list_list_nat_len_sum 1 0).
