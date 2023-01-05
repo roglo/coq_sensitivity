@@ -116,18 +116,17 @@ Import List List.ListNotations.
 Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
 Fixpoint llnls k s i :=
-  if k =? s then
-    if s =? 0 then [[]] else []
-  else
-    match k with
-    | 0 => [[43]]
-    | S k' =>
+  match k with
+  | 0 => [[]]
+  | S k' =>
+      if k =? s then []
+      else
         match s with
         | 0 => []
-        | S s' => llnls k' s' (i + 1)
+        | S s' => llnls k' s' (S i)
         end ++
         map (λ l, i :: l) (llnls k' s 0)
-    end.
+   end.
 
 (* list of lists of nat of length n whose sum is s *)
 Definition list_list_nat_len_sum (n s : nat) :=
@@ -141,8 +140,8 @@ Definition list_list_step k :=
 Definition list_list_up_to_step k :=
   App (k1 = 0, k), list_list_step k1.
 
-(*
 Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 5)).
+...
      = [[1]; [1; 0]; [1; 0; 0]; [1; 1]; [1; 0; 0; 0]; [1; 0; 1]; [1; 1; 0]; [1; 2]; [1; 0; 0; 0; 0]; 
        [1; 0; 0; 1]; [1; 0; 1; 0]; [1; 1; 0; 0]; [1; 0; 2]; [1; 1; 1]; [1; 2; 0]; [1; 3]; 
        [1; 0; 0; 0; 0; 0]; [1; 0; 0; 0; 1]; [1; 0; 0; 1; 0]; [1; 0; 1; 0; 0]; [1; 1; 0; 0; 0]; 
