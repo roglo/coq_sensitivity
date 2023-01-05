@@ -145,12 +145,33 @@ Definition list_list_up_to_step k :=
   App (k1 = 0, k), list_list_step k1.
 
 (*
+Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 6)).
+(* polynomials
+   1, x, x², x+1, x³, x²+x, x¹+1, x+2, x⁴, x³+x², x³+x, x³+1, x²+2x,
+   x²+x+1, x²+2, x+3, x⁵, x⁴+x³, x⁴+x² x⁴+x, x⁴+1, x³+2x², x³+x²+x,
+   x³+2x, x³+x²+1, x³+x+1, x³+2, x²+3x, x²+2x+1, x²+x+2, x²+3, x+4,
+   x⁶, x⁵+x⁴, x⁵+x³, x⁵+x², x⁵+x, x⁵+1, x⁴+2x³ x⁴+x³+x², x⁴+2x,
+   x⁴+x³+x, x⁴+x²+x, x⁴+2x, x⁴+x³+1, x⁴+x²+1, x⁴+x+1, x⁴+2, x³+3x²,
+   x³+2x²+x, x³+x²+2x, x³+3x, x³+2x²+1, x³+x²+x+1, x³+2x+1, x³+x²+2,
+   x³+x+2, x³+3, x²+4x, x²+3x+1, x²+2x+2, x²+x+3, x²+4, x+5, ...
+*)
+...
 Compute (list_list_up_to_step 0).
 Compute (list_list_up_to_step 1).
 Compute (list_list_up_to_step 2).
 Compute (list_list_up_to_step 3).
 Compute (list_list_up_to_step 4).
 Compute (list_list_up_to_step 5).
+Require Import Main.Polynomial.
+Theorem glop : ∀ l, has_polyn_prop (l ++ [1]) = true.
+Proof.
+intros.
+apply Bool.orb_true_iff; right.
+now rewrite last_last.
+Qed.
+Compute (map (λ l, mk_polyn (l ++ [1]) (glop l)) (list_list_up_to_step 5)).
+*)
+(*
 ...
 Compute (list_list_step 0).
 Compute (list_list_step 1).
