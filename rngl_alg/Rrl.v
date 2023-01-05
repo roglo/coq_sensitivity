@@ -205,7 +205,6 @@ Definition gloup ll :=
 
 (*
 (* list of lists of nat of length n whose sum is s *)
-(* putain, j'ai de la merde dans la tête *)
 Fixpoint list_list_nat_len_sum (n s : nat) :=
   match n with
   | 0 => if s =? 0 then [[]] else []
@@ -231,7 +230,14 @@ Fixpoint list_list_nat_len_sum (n s : nat) :=
               end
           end
       end
+  end
+with arghh n s k :=
+  map (λ l, k :: l) (list_list_nat_len_sum n s) ++
+  match s with
+  | 0 => []
+  | S s' => arghh n s' (k + 1)
   end.
+
 
 Compute (list_list_nat_len_sum 0 0).
 Compute (list_list_nat_len_sum 0 1).
@@ -240,12 +246,13 @@ Compute (list_list_nat_len_sum 1 1).
 Compute (list_list_nat_len_sum 1 2).
 Compute (list_list_nat_len_sum 1 3).
 Compute (list_list_nat_len_sum 1 4).
-...
 Compute (list_list_nat_len_sum 2 0).
 Compute (list_list_nat_len_sum 2 1).
 Compute (list_list_nat_len_sum 2 2).
 Compute (list_list_nat_len_sum 2 3).
 Compute (list_list_nat_len_sum 2 4).
+Compute (list_list_nat_len_sum 3 0).
+Compute (list_list_nat_len_sum 3 1).
 ...
 Compute (list_list_nat_len_sum 3 1).
 Compute (list_list_nat_len_sum 3 0).
