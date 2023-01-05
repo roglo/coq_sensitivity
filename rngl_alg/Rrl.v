@@ -230,14 +230,14 @@ Fixpoint list_list_nat_len_sum (n s : nat) :=
               end
           end
       end
-  end
-with arghh n s k :=
+  end.
+
+Fixpoint arghh n s k :=
   map (λ l, k :: l) (list_list_nat_len_sum n s) ++
   match s with
   | 0 => []
   | S s' => arghh n s' (k + 1)
   end.
-
 
 Compute (list_list_nat_len_sum 0 0).
 Compute (list_list_nat_len_sum 0 1).
