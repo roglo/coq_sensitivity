@@ -142,6 +142,23 @@ Definition list_list_up_to_step k :=
 
 (*
 Compute (map (λ i, (i, Nat.log2 i)) (seq 1 32)).
+*)
+
+Definition glop' n :=
+  let k := Nat.log2 n in
+  nth (n - 2 ^ k) (list_list_step (S k)) [42].
+
+(*
+Compute (1 :: glop 0).
+Compute (1 :: glop 1).
+Compute (1 :: glop 2).
+Compute (1 :: glop 3).
+
+Compute (1 :: glop 4).
+Compute (1 :: glop 5).
+Compute (1 :: glop 6).
+Compute (1 :: glop 7).
+Compute (1 :: glop 8).
 
 Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 5)).
 ...
