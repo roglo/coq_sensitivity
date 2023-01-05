@@ -115,26 +115,23 @@ Require Import Arith.
 Import List List.ListNotations.
 Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
-Fixpoint llnls k (s : nat) :=
+Fixpoint llnls k s i :=
   if k =? s then
     if s =? 0 then [[]] else []
   else
-    let fix llnls_aux k s i :=
-      match k with
-      | 0 => [[43]]
-      | S k' =>
-          match s with
-          | 0 => []
-          | S s' => llnls_aux k' s' (i + 1)
-          end ++
-          map (λ l, i :: l) (llnls k' s)
-      end
-    in
-    llnls_aux k s 0.
+    match k with
+    | 0 => [[43]]
+    | S k' =>
+        match s with
+        | 0 => []
+        | S s' => llnls k' s' (i + 1)
+        end ++
+        map (λ l, i :: l) (llnls k' s 0)
+    end.
 
 (* list of lists of nat of length n whose sum is s *)
 Definition list_list_nat_len_sum (n s : nat) :=
-  llnls (n + s) s.
+  llnls (n + s) s 0.
 
 (* list of lists of nat of step k *)
 Definition list_list_step k :=
@@ -146,6 +143,13 @@ Definition list_list_up_to_step k :=
 
 (*
 Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 5)).
+     = [[1]; [1; 0]; [1; 0; 0]; [1; 1]; [1; 0; 0; 0]; [1; 0; 1]; [1; 1; 0]; [1; 2]; [1; 0; 0; 0; 0]; 
+       [1; 0; 0; 1]; [1; 0; 1; 0]; [1; 1; 0; 0]; [1; 0; 2]; [1; 1; 1]; [1; 2; 0]; [1; 3]; 
+       [1; 0; 0; 0; 0; 0]; [1; 0; 0; 0; 1]; [1; 0; 0; 1; 0]; [1; 0; 1; 0; 0]; [1; 1; 0; 0; 0]; 
+       [1; 0; 0; 2]; [1; 0; 1; 1]; [1; 1; 0; 1]; [1; 0; 2; 0]; [1; 1; 1; 0]; [1; 2; 0; 0]; 
+       [1; 0; 3]; [1; 1; 2]; [1; 2; 1]; [1; 3; 0]; [1; 4]]
+     : list (list nat)
+...
 (* polynomials
    1,
    x,
