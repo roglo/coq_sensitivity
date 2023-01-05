@@ -140,6 +140,7 @@ Definition list_list_step k :=
 Definition list_list_up_to_step k :=
   App (k1 = 0, k), list_list_step k1.
 
+(*
 Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 5)).
 ...
      = [[1]; [1; 0]; [1; 0; 0]; [1; 1]; [1; 0; 0; 0]; [1; 0; 1]; [1; 1; 0]; [1; 2]; [1; 0; 0; 0; 0]; 
