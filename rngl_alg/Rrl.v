@@ -117,22 +117,22 @@ Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
 (*
 (* list of lists of nat of length n whose sum is s *)
-Fixpoint llnls it (n s : nat) :=
+Fixpoint llnls k (n s : nat) :=
   match n with
   | 0 => if s =? 0 then [[]] else []
   | S n' =>
-      let fix llnls_aux it n s k :=
-        match it with
+      let fix llnls_aux k n s i :=
+        match k with
         | 0 => [[43]]
-        | S it' =>
-            map (λ l, k :: l) (llnls it' n s) ++
+        | S k' =>
+            map (λ l, i :: l) (llnls k' n s) ++
             match s with
             | 0 => []
-            | S s' => llnls_aux it' n s' (k + 1)
+            | S s' => llnls_aux k' n s' (i + 1)
             end
         end
       in
-      llnls_aux it n' s 0
+      llnls_aux k n' s 0
   end.
 
 Definition list_list_nat_len_sum (n s : nat) :=
