@@ -147,6 +147,9 @@ Definition list_nat_of_nat n :=
     nth (n - 2 ^ k) (list_list_step (S k)) [42].
 
 (*
+Compute (list_nat_of_nat 2022).
+Compute (list_nat_of_nat 2023).
+
 Compute (map (λ i, 1 :: rev (list_nat_of_nat i)) (seq 0 33)).
 Compute (map (λ l, 1 :: rev l) (list_list_up_to_step 5)).
 ...
