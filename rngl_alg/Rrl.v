@@ -115,6 +115,51 @@ Require Import Arith.
 Import List List.ListNotations.
 Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
+(*
+(* list of lists of nat of length n whose sum is s *)
+Fixpoint llnls it (n s : nat) :=
+  match n with
+  | 0 => if s =? 0 then [[]] else []
+  | S n' =>
+      let fix llnls_aux it n s k :=
+        match it with
+        | 0 => [[43]]
+        | S it' =>
+            map (λ l, k :: l) (llnls it' n s) ++
+            match s with
+            | 0 => []
+            | S s' => llnls_aux it' n s' (k + 1)
+            end
+        end
+      in
+      llnls_aux it n' s 0
+  end.
+
+Definition list_list_nat_len_sum (n s : nat) :=
+  llnls (n + s) n s.
+
+Compute (list_list_nat_len_sum 0 0).
+Compute (list_list_nat_len_sum 0 1).
+Compute (list_list_nat_len_sum 1 0).
+Compute (list_list_nat_len_sum 1 1).
+Compute (list_list_nat_len_sum 1 2).
+Compute (list_list_nat_len_sum 1 3).
+Compute (list_list_nat_len_sum 1 4).
+Compute (list_list_nat_len_sum 2 0).
+Compute (list_list_nat_len_sum 2 1).
+Compute (list_list_nat_len_sum 2 2).
+Compute (list_list_nat_len_sum 2 3).
+Compute (list_list_nat_len_sum 2 4).
+Compute (list_list_nat_len_sum 3 0).
+Compute (list_list_nat_len_sum 3 1).
+Compute (list_list_nat_len_sum 3 2).
+Compute (list_list_nat_len_sum 3 3).
+Compute (list_list_nat_len_sum 3 4).
+Compute (list_list_nat_len_sum 3 5).
+Compute (list_list_nat_len_sum 3 10).
+...
+*)
+
 (* I don't know how to call that; I temporarily call it "step". It is
    a number associated with a list; the next list must have a "step"
    whose value is nat successor (next of a step 42 must have a step 43 *)
@@ -202,51 +247,6 @@ Definition gloup ll :=
     (map
        (λ l, map (λ i, replace_at (i - 1) l (S (l.(i)))) (seq 1 (length l)))
        ll).
-
-(*
-(* list of lists of nat of length n whose sum is s *)
-Fixpoint llnls it (n s : nat) :=
-  match n with
-  | 0 => if s =? 0 then [[]] else []
-  | S n' =>
-      let fix arghh it n s k :=
-        match it with
-        | 0 => [[43]]
-        | S it' =>
-            map (λ l, k :: l) (llnls it' n s) ++
-              match s with
-              | 0 => []
-              | S s' => arghh it' n s' (k + 1)
-              end
-        end
-      in
-      arghh it n' s 0
-  end.
-
-Definition list_list_nat_len_sum (n s : nat) :=
-  llnls (n + s) n s.
-
-Compute (list_list_nat_len_sum 0 0).
-Compute (list_list_nat_len_sum 0 1).
-Compute (list_list_nat_len_sum 1 0).
-Compute (list_list_nat_len_sum 1 1).
-Compute (list_list_nat_len_sum 1 2).
-Compute (list_list_nat_len_sum 1 3).
-Compute (list_list_nat_len_sum 1 4).
-Compute (list_list_nat_len_sum 2 0).
-Compute (list_list_nat_len_sum 2 1).
-Compute (list_list_nat_len_sum 2 2).
-Compute (list_list_nat_len_sum 2 3).
-Compute (list_list_nat_len_sum 2 4).
-Compute (list_list_nat_len_sum 3 0).
-Compute (list_list_nat_len_sum 3 1).
-Compute (list_list_nat_len_sum 3 2).
-Compute (list_list_nat_len_sum 3 3).
-Compute (list_list_nat_len_sum 3 4).
-Compute (list_list_nat_len_sum 3 5).
-Compute (list_list_nat_len_sum 3 10).
-...
-*)
 
 (*
 Fixpoint toto len d :=
