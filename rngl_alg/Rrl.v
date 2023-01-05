@@ -136,7 +136,29 @@ Fixpoint llnls k (s : nat) :=
 Definition list_list_nat_len_sum (n s : nat) :=
   llnls (n + s) s.
 
+(* list of lists of nat of step k *)
+Definition list_list_step k :=
+  App (s = 0, k), list_list_nat_len_sum (k - s) s.
+
+(* list of lists of nat up to step k *)
+Definition list_list_up_to_step k :=
+  App (k1 = 0, k), list_list_step k1.
+
 (*
+Compute (list_list_up_to_step 0).
+Compute (list_list_up_to_step 1).
+Compute (list_list_up_to_step 2).
+Compute (list_list_up_to_step 3).
+Compute (list_list_up_to_step 4).
+Compute (list_list_up_to_step 5).
+...
+Compute (list_list_step 0).
+Compute (list_list_step 1).
+Compute (list_list_step 2).
+Compute (list_list_step 3).
+Compute (list_list_step 4).
+Compute (list_list_step 5).
+...
 Compute (list_list_nat_len_sum 0 0).
 Compute (list_list_nat_len_sum 0 1).
 Compute (list_list_nat_len_sum 1 0).
