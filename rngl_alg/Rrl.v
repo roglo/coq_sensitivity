@@ -146,7 +146,54 @@ Definition list_nat_of_nat n :=
     let k := Nat.log2 n in
     nth (n - 2 ^ k) (list_list_step (S k)) [42].
 
+(**)
+
+Fixpoint pow_2_of_nat_aux iter n :=
+  match iter with
+  | 0 => 0
+  | S i =>
+      match n with
+      | 0 => 0
+      | S m => if Nat.even n then 1 + pow_2_of_nat_aux i (Nat.div2 n) else 0
+      end
+  end.
+
+Definition pow_2_of_nat n := pow_2_of_nat_aux n n.
+
+Fixpoint nat_of_list_nat l :=
+  match l with
+  | [] => 0
+  | a :: l => 2 ^ a * (2 * nat_of_list_nat l + 1)
+  end.
+
+Fixpoint odd_part_of_nat_aux iter n :=
+  match iter with
+  | 0 => 0
+  | S i =>
+      match n with
+      | 0 => 0
+      | S m =>
+          if Nat.even n then odd_part_of_nat_aux i (Nat.div2 n)
+          else Nat.div2 n
+      end
+  end.
+
+Definition odd_part_of_nat n := odd_part_of_nat_aux n n.
+
+Fixpoint list_nat_of_nat_aux iter n :=
+  match iter with
+  | 0 => []
+  | S i =>
+      if zerop n then []
+      else pow_2_of_nat n :: list_nat_of_nat_aux i (odd_part_of_nat n)
+  end.
+
+Definition list_nat_of_nat' n := list_nat_of_nat_aux n n.
+
 (*
+Compute (nat_of_list_nat [4;3]).
+Compute (map list_nat_of_nat' (seq 0 32)).
+
 Compute (list_nat_of_nat 2022).
 Compute (list_nat_of_nat 2023).
 
