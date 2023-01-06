@@ -169,10 +169,23 @@ Fixpoint list_nat_of_nat_aux it n :=
 
 Definition list_nat_of_nat n := list_nat_of_nat_aux (n + 1) n.
 
+Require Import ZArith.
+
+Definition Z_of_nat n :=
+  if Nat.odd n then (- Z.of_nat (Nat.div2 (n + 1)))%Z
+  else Z.of_nat (Nat.div2 (n + 1)).
+Definition list_Z_of_nat n := map Z_of_nat (list_nat_of_nat n).
+
 (*
 Compute (list_nat_of_nat 2023).
-Compute (nat_of_list_nat [0; 0; 0; 2; 0; 0; 0; 0; 0]).
+Compute (nat_of_list_nat [0; 0; 0; 2; 0; 0; 0; 0; 0]%nat).
 Compute (map list_nat_of_nat (seq 0 100)).
+Open Scope Z_scope.
+Compute (map Z_of_nat (seq 0 10)).
+Compute (map list_Z_of_nat (seq 0 100)).
+Close Scope Z_scope.
 Compute (map (λ l, (l, step l, nat_of_list_nat l)) (map list_nat_of_nat (seq 0 100))).
 Compute (nat_of_list_nat [6]).
+...
+Compute (nat_of_list_Z [6]).
 *)
