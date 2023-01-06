@@ -155,17 +155,20 @@ Definition list_nat_of_nat n :=
 
 (* another version I implemented some years ago (hott.v in my reals) *)
 
-Fixpoint pow_2_of_nat_aux iter n :=
+Fixpoint how_many_times_div_by_2_aux iter n :=
   match iter with
   | 0 => 0
   | S i =>
       match n with
       | 0 => 0
-      | S m => if Nat.even n then 1 + pow_2_of_nat_aux i (Nat.div2 n) else 0
+      | S m =>
+          if Nat.even n then
+            1 + how_many_times_div_by_2_aux i (Nat.div2 n)
+          else 0
       end
   end.
 
-Definition pow_2_of_nat n := pow_2_of_nat_aux n n.
+Definition how_many_times_div_by_2 n := how_many_times_div_by_2_aux n n.
 
 Fixpoint nat_of_list_nat l :=
   match l with
@@ -192,7 +195,8 @@ Fixpoint list_nat_of_nat_aux iter n :=
   | 0 => []
   | S i =>
       if n =? 0 then []
-      else pow_2_of_nat n :: list_nat_of_nat_aux i (odd_part_of_nat n)
+      else
+        how_many_times_div_by_2 n :: list_nat_of_nat_aux i (odd_part_of_nat n)
   end.
 
 Definition list_nat_of_nat' n := list_nat_of_nat_aux n n.
@@ -201,7 +205,8 @@ Definition list_nat_of_nat' n := list_nat_of_nat_aux n n.
 Compute (nat_of_list_nat [4;3]).
 Compute (map list_nat_of_nat' (seq 0 33)).
 Compute (map list_nat_of_nat (seq 0 33)).
-Compute (map (λ n, (n, pow_2_of_nat n)) (seq 0 33)).
+Compute (map (λ n, (n, how_many_times_div_by_2 n)) (seq 0 33)).
+Compute (map (λ n, (n, odd_part_of_nat n)) (seq 0 33)).
 ...
      = [[];
         [0];
@@ -227,10 +232,7 @@ Compute (map (λ n, (n, pow_2_of_nat n)) (seq 0 33)).
        [0; 0; 0; 0; 0; 0]]
      : list (list nat)
 Compute (map step (map list_nat_of_nat' (seq 0 34))).
-
 ...
-
-(*
 Compute (list_nat_of_nat 2022).
 Compute (list_nat_of_nat 2023).
 
