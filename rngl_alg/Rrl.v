@@ -143,14 +143,14 @@ Fixpoint how_many_times_div_by_2_aux iter n :=
 
 Definition how_many_times_div_by_2 n := how_many_times_div_by_2_aux n n.
 
-Fixpoint odd_part_of_nat_aux iter n :=
-  match iter with
-  | 0 => 0
-  | S i =>
+Fixpoint odd_part_of_nat_aux it n :=
+  match it with
+  | 0 => 42
+  | S it' =>
       match n with
       | 0 => 0
       | S m =>
-          if Nat.even n then odd_part_of_nat_aux i (Nat.div2 n)
+          if Nat.even n then odd_part_of_nat_aux it' (Nat.div2 n)
           else n
       end
   end.
@@ -171,6 +171,8 @@ Definition list_nat_of_nat n := list_nat_of_nat_aux (n + 1) n.
 
 (*
 Compute (list_nat_of_nat 2023).
-Compute (nat_of_list_nat [4;3]).
-Compute (map list_nat_of_nat (seq 0 33)).
+Compute (nat_of_list_nat [0; 0; 0; 2; 0; 0; 0; 0; 0]).
+Compute (map list_nat_of_nat (seq 0 100)).
+Compute (map (λ l, (l, step l, nat_of_list_nat l)) (map list_nat_of_nat (seq 0 100))).
+Compute (nat_of_list_nat [6]).
 *)
