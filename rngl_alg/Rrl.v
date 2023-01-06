@@ -115,6 +115,13 @@ Require Import Arith.
 Import List List.ListNotations.
 Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 
+(* I don't know how to call that; I temporarily call it "step". It is
+   a number associated with a list; the next list must have a "step"
+   whose value is nat successor (next of a step 42 must have a step 43 *)
+Definition step l := length l + ∑ (i = 1, length l), l.(i).
+
+(* *)
+
 Fixpoint llnls k s i :=
   match k with
   | 0 => [[]]
@@ -146,7 +153,7 @@ Definition list_nat_of_nat n :=
     let k := Nat.log2 n in
     nth (n - 2 ^ k) (list_list_step (S k)) [42].
 
-(**)
+(* another version I implemented some years ago (hott.v in my reals) *)
 
 Fixpoint pow_2_of_nat_aux iter n :=
   match iter with
@@ -184,7 +191,7 @@ Fixpoint list_nat_of_nat_aux iter n :=
   match iter with
   | 0 => []
   | S i =>
-      if zerop n then []
+      if n =? 0 then []
       else pow_2_of_nat n :: list_nat_of_nat_aux i (odd_part_of_nat n)
   end.
 
@@ -192,8 +199,38 @@ Definition list_nat_of_nat' n := list_nat_of_nat_aux n n.
 
 (*
 Compute (nat_of_list_nat [4;3]).
-Compute (map list_nat_of_nat' (seq 0 32)).
+Compute (map list_nat_of_nat' (seq 0 33)).
+Compute (map list_nat_of_nat (seq 0 33)).
+Compute (map (λ n, (n, pow_2_of_nat n)) (seq 0 33)).
+...
+     = [[];
+        [0];
+        [1]; [0; 0];
+        [2]; [0; 1]; [1; 0]; [0; 0; 0];
+        [3]; [0; 2]; [1; 1]; [0; 0; 1]; [2; 0]; [0; 1; 0]; 
+          [1; 0; 0]; [0; 0; 0; 0];
+        [4]; [0; 3]; [1; 2];
+       [0; 0; 2]; [2; 1]; [0; 1; 1]; [1; 0; 1]; [0; 0; 0; 1]; 
+       [3; 0]; [0; 2; 0]; [1; 1; 0]; [0; 0; 1; 0]; [2; 0; 0]; 
+       [0; 1; 0; 0]; [1; 0; 0; 0]; [0; 0; 0; 0; 0]; [5]]
+     : list (list nat)
+     = [[];
+        [0];
+        [0; 0]; [1];
+        [0; 0; 0]; [1; 0]; [0; 1]; [2]; 
+        [0; 0; 0; 0]; [1; 0; 0]; [0; 1; 0]; [0; 0; 1]; [2; 0];
+          [1; 1]; [0; 2]; [3];
+        [0; 0; 0; 0; 0]; 
+       [1; 0; 0; 0]; [0; 1; 0; 0]; [0; 0; 1; 0]; [0; 0; 0; 1]; 
+       [2; 0; 0]; [1; 1; 0]; [1; 0; 1]; [0; 2; 0]; [0; 1; 1]; 
+       [0; 0; 2]; [3; 0]; [2; 1]; [1; 2]; [0; 3]; [4]; 
+       [0; 0; 0; 0; 0; 0]]
+     : list (list nat)
+Compute (map step (map list_nat_of_nat' (seq 0 34))).
 
+...
+
+(*
 Compute (list_nat_of_nat 2022).
 Compute (list_nat_of_nat 2023).
 
@@ -285,11 +322,6 @@ Compute (list_list_nat_len_sum 3 5).
 Compute (list_list_nat_len_sum 3 10).
 ...
 *)
-
-(* I don't know how to call that; I temporarily call it "step". It is
-   a number associated with a list; the next list must have a "step"
-   whose value is nat successor (next of a step 42 must have a step 43 *)
-Definition step l := length l + ∑ (i = 1, length l), l.(i).
 
 Definition generate_next_step (n : nat) := [[n]; repeat 0 (S n)].
 
