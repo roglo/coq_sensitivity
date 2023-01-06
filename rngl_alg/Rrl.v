@@ -122,6 +122,12 @@ Definition step l := length l + ∑ (i = 1, length l), l.(i).
 
 (* I implemented that some years ago (hott.v in my reals) *)
 
+Fixpoint nat_of_list_nat l :=
+  match l with
+  | [] => 0
+  | a :: l => 2 ^ a * (2 * nat_of_list_nat l + 1)
+  end.
+
 Fixpoint how_many_times_div_by_2_aux iter n :=
   match iter with
   | 0 => 0
@@ -136,12 +142,6 @@ Fixpoint how_many_times_div_by_2_aux iter n :=
   end.
 
 Definition how_many_times_div_by_2 n := how_many_times_div_by_2_aux n n.
-
-Fixpoint nat_of_list_nat l :=
-  match l with
-  | [] => 0
-  | a :: l => 2 ^ a * (2 * nat_of_list_nat l + 1)
-  end.
 
 Fixpoint odd_part_of_nat_aux iter n :=
   match iter with
