@@ -184,19 +184,20 @@ Fixpoint odd_part_of_nat_aux iter n :=
       | 0 => 0
       | S m =>
           if Nat.even n then odd_part_of_nat_aux i (Nat.div2 n)
-          else Nat.div2 n
+          else n
       end
   end.
 
 Definition odd_part_of_nat n := odd_part_of_nat_aux n n.
 
-Fixpoint list_nat_of_nat_aux iter n :=
-  match iter with
+Fixpoint list_nat_of_nat_aux it n :=
+  match it with
   | 0 => []
-  | S i =>
+  | S it' =>
       if n =? 0 then []
       else
-        how_many_times_div_by_2 n :: list_nat_of_nat_aux i (odd_part_of_nat n)
+        how_many_times_div_by_2 n ::
+        list_nat_of_nat_aux it' (Nat.div2 (odd_part_of_nat n))
   end.
 
 Definition list_nat_of_nat' n := list_nat_of_nat_aux n n.
@@ -207,6 +208,9 @@ Compute (map list_nat_of_nat' (seq 0 33)).
 Compute (map list_nat_of_nat (seq 0 33)).
 Compute (map (λ n, (n, how_many_times_div_by_2 n)) (seq 0 33)).
 Compute (map (λ n, (n, odd_part_of_nat n)) (seq 0 33)).
+Compute
+  (map (λ n, (n, 2 ^ how_many_times_div_by_2 n * odd_part_of_nat n))
+     (seq 0 33)).
 ...
      = [[];
         [0];
