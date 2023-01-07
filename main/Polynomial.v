@@ -3915,14 +3915,7 @@ Qed.
 
 End a.
 
-(*
-Print Nat.gcd.
-Compute (Nat.gcd 15 10).
-Compute (Nat.gcd 15 11).
-j'ai brusquement une merde dans la tête, là
-*)
-
-(* comment on calcule le pgcd de deux polynômes ?
+(* pgcd de deux polynômes
 Arguments lap_add {T ro} (la lb)%list.
 Arguments lap_sub {T ro} (la lb)%list.
 Arguments lap_mul {T ro} (la lb)%list.
@@ -3939,10 +3932,9 @@ Compute (rlap_quot_rem [1;0;1;1;0] [1;0;1;0;0]).
 (* https://uel.unisciel.fr/mathematiques/polynomes1/polynomes1_ch02/co/sexercer_ch2_2_01.html
   x5-2x4+x3-x2+2x-1 et x3-x2+2x-2 *)
 Compute (rlap_quot_rem [1;-2;1;-1;2;-1] [1;-1;2;-2]).
-Print Nat.gcd.
-Compute (rlap_quot_rem [1;4;-1] [1;-2-1;-1;2;-1]).
-Compute (rlap_quot_rem [1;-2;1] [1;-3;3]).
-Compute (rlap_quot_rem [1;-2] [1;-2;1]).
+Compute (rlap_quot_rem [1;-1;2-2] [1;4;-5]).
+Compute (rlap_quot_rem [1;4;-5] [-5;5]).
+...
 Compute (rlap_quot_rem [1;-2;1] [1;-3;2]).
-Compute (rlap_quot_rem [1;-1] [1;-2;1]).
+Compute (rlap_quot_rem [1;-3;2] [1;-1]).
 *)
