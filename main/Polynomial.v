@@ -3915,6 +3915,13 @@ Qed.
 
 End a.
 
+(*
+Print Nat.gcd.
+Compute (Nat.gcd 15 10).
+Compute (Nat.gcd 15 11).
+j'ai brusquement une merde dans la tête, là
+*)
+
 (* comment on calcule le pgcd de deux polynômes ?
 Arguments lap_add {T ro} (la lb)%list.
 Arguments lap_sub {T ro} (la lb)%list.
