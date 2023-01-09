@@ -50,6 +50,36 @@ Definition polyn_Q_ring_like_op :=
 Check (@polyn_sylvester_mat _ polyn_Q_ring_like_op).
 Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
 
+Check (@lap_compose Q Q_ring_like_op).
+Check lap_compose.
+Theorem glop {A} {ro : ring_like_op A} p q :
+  has_polyn_prop (lap_compose ro (lap p) (lap q)) = true.
+Proof.
+destruct p as (la, pa).
+destruct q as (lb, pb).
+cbn - [ lap_compose ].
+apply Bool.orb_true_iff in pa, pb.
+apply Bool.orb_true_iff.
+destruct pa as [pa| pa]. {
+  now apply is_empty_list_empty in pa; subst la; left.
+}
+destruct pb as [pb| pb]. {
+  apply is_empty_list_empty in pb; subst lb.
+  unfold lap_compose.
+}
+...
+Definition polyn_compose {A} {ro} (p q : polyn A) :=
+  mk_polyn (lap_compose ro (lap p) (lap q)) (glop p q).
+
+Print polyn_compose.
+
+(* p sur K[x], p' sur L[x]
+   calculer p (p') dans L[x]
+ah non : tous les polynômes dans L[x]
+voir lap_compose.
+...
+   Q[x] inclus dans Q[Q[x]].
+*)
 ...
 
 Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
