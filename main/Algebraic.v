@@ -58,9 +58,15 @@ clear Hq.
 rewrite last_last in pa, pb.
 unfold lap_compose.
 rewrite fold_right_app; cbn.
-revert a pa.
-induction la as [| c] using rev_ind; intros; [ easy | ].
-rewrite fold_right_app; cbn.
+revert a b pa pb lb.
+induction la as [| c]; intros; [ easy | ].
+cbn.
+remember (fold_right _ _ _) as lc eqn:Hlc.
+Search (_ * (_ ++ _))%lap.
+destruct lb as [| b']; cbn.
+cbn in Hlc.
+destruct lc as [| c']; cbn.
+symmetry in Hlc.
 ...
 
 (*
