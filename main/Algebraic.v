@@ -19,7 +19,8 @@ Context {ro : ring_like_op A}.
 Definition rlap_sylvester_list_list (rp rq : list A) : list (list A) :=
   let m := length rp - 1 in
   let n := length rq - 1 in
-  map (λ i, repeat 0%L i ++ rp ++ repeat 0%L (n - 1 - i)) (seq 0 n) ++
+  (rp ++ repeat 0%L n) ::
+  map (λ i, repeat 0%L i ++ rp ++ repeat 0%L (n - 1 - i)) (seq 1 (n - 2)) ++
   map (λ i, repeat 0%L i ++ rq ++ repeat 0%L (m - 1 - i)) (seq 0 m).
 
 Definition rlap_sylvester_mat (rp rq : list A) : matrix A :=
