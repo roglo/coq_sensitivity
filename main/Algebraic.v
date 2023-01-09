@@ -15,6 +15,7 @@ Section a.
 
 Context {A : Type}.
 Context {ro : ring_like_op A}.
+Context {rp : ring_like_prop A}.
 
 Definition rlap_sylvester_list_list (rla rlb : list A) : list (list A) :=
   let m := length rla - 1 in
@@ -30,6 +31,37 @@ Definition polyn_sylvester_mat (p q : polyn A) : matrix A :=
 
 Definition resultant (p q : polyn A) :=
   det (polyn_sylvester_mat p q).
+
+Theorem glop p q :
+  lap q ≠ []
+  → has_polyn_prop (lap_compose ro (lap p) (lap q)) = true.
+Proof.
+intros Hq.
+destruct p as (la, pa).
+destruct q as (lb, pb).
+move lb before la.
+cbn in Hq.
+cbn - [ lap_compose ].
+apply Bool.orb_true_iff in pa, pb.
+apply Bool.orb_true_iff.
+destruct pa as [pa| pa]. {
+  now apply is_empty_list_empty in pa; subst la; left.
+}
+destruct pb as [pb| pb]. {
+  now apply is_empty_list_empty in pb; subst lb.
+}
+right.
+destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
+move b before a.
+clear Hq.
+rewrite last_last in pa, pb.
+unfold lap_compose.
+rewrite fold_right_app; cbn.
+revert a pa.
+induction la as [| c] using rev_ind; intros; [ easy | ].
+rewrite fold_right_app; cbn.
+...
 
 (*
 résultant (selon le X) des polynomes Q et P(Y-X)
@@ -52,20 +84,22 @@ Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
 
 Check (@lap_compose Q Q_ring_like_op).
 Check lap_compose.
-Theorem glop {A} {ro : ring_like_op A} p q :
-  has_polyn_prop (lap_compose ro (lap p) (lap q)) = true.
-Proof.
-destruct p as (la, pa).
-destruct q as (lb, pb).
-cbn - [ lap_compose ].
-apply Bool.orb_true_iff in pa, pb.
-apply Bool.orb_true_iff.
-destruct pa as [pa| pa]. {
-  now apply is_empty_list_empty in pa; subst la; left.
+.
+Print fold_right.
+Theorem last_list_fold_right : ∀ A B (f : B → list A → list A) a l,
+  last (fold_right f a l) = a.
+...
+erewrite List_fold_right_ext_in. 2: {
+  intros c lc Hc.
+  rewrite (lap_add_comm rp); cbn.
+  easy.
 }
-destruct pb as [pb| pb]. {
-  apply is_empty_list_empty in pb; subst lb.
-  unfold lap_compose.
+...
+  destruct la as [| a] using rev_ind; [ now left | right; cbn ].
+  rewrite fold_right_app; cbn.
+  rewrite last_last in pa.
+  cbn.
+...
 }
 ...
 Definition polyn_compose {A} {ro} (p q : polyn A) :=

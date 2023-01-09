@@ -3914,3 +3914,22 @@ apply IHla.
 Qed.
 
 End a.
+
+Declare Scope lap_scope.
+Delimit Scope lap_scope with lap.
+
+Arguments lap_add {T ro} (la lb)%lap.
+Arguments lap_sub {T ro} (la lb)%lap.
+Arguments lap_opp {T ro} la%lap.
+Arguments lap_mul {T ro} (la lb)%lap.
+Arguments lap_quot_rem {T ro} (la lb)%lap.
+Arguments lap_quot {T ro} (la lb)%lap.
+Arguments lap_rem {T ro} (la lb)%lap.
+
+Notation "1" := lap_one : lap_scope.
+Notation "- a" := (lap_opp a) : lap_scope.
+Notation "a + b" := (lap_add a b) : lap_scope.
+Notation "a - b" := (lap_sub a b) : lap_scope.
+Notation "a * b" := (lap_mul a b) : lap_scope.
+Notation "a / b" := (lap_quot a b) : lap_scope.
+Notation "a 'mod' b" := (lap_rem a b) : lap_scope.

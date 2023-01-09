@@ -1499,6 +1499,20 @@ apply Hfg.
 now right.
 Qed.
 
+Theorem List_fold_right_ext_in : ∀ A B (f g : B → A → A) l a,
+  (∀ b c, b ∈ l → f b c = g b c)
+  → fold_right f a l = fold_right g a l.
+Proof.
+intros * Hfg.
+revert a.
+induction l as [| d]; intros; [ easy | cbn ].
+rewrite (Hfg d); [ | now left ].
+rewrite IHl; [ easy | ].
+intros b c Hb.
+apply Hfg.
+now right.
+Qed.
+
 Theorem List_fold_left_map_nth_len : ∀ A (la : list A) sta len f d,
   fold_left (λ lb k, map (λ i, nth (f k i) lb d) (seq 0 (length lb)))
     (seq sta len) la =

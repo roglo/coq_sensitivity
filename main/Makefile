@@ -1,4 +1,4 @@
-TARGET=CauchyBinet.vo Lemma_2_2.vo Lemma_2_1.vo Sensitivity.vo
+TARGET=Polynomial.vo CauchyBinet.vo Lemma_2_2.vo Lemma_2_1.vo Sensitivity.vo
 FILESFORDEP=`LC_ALL=C ls *.v`
 
 all: $(TARGET)
