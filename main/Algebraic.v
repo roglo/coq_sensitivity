@@ -19,24 +19,23 @@ Context {ro : ring_like_op A}.
 Definition rlap_sylvester_list_list (rp rq : list A) : list (list A) :=
   let m := length rp in
   let n := length rq in
-  (rp ++ repeat 0%L n) ::
-  (repeat 0%L 1 ++ rp ++ repeat 0%L (n - 1)) ::
-  (repeat 0%L 2 ++ rp ++ repeat 0%L (n - 2)) ::
-  (repeat 0%L 3 ++ rp ++ repeat 0%L (n - 3)) ::
-  repeat (repeat 0%L (m + n)) (m - 4 + n).
+  map (λ i, repeat 0%L i ++ rp ++ repeat 0%L (n - 2 - i)) (seq 0 (n - 1)) ++
+  map (λ i, repeat 0%L i ++ rq ++ repeat 0%L (m - 2 - i)) (seq 0 (m - 1)).
 
 Definition rlap_sylvester_mat (rp rq : list A) : matrix A :=
   mk_mat (rlap_sylvester_list_list rp rq).
 
 End a.
 
-About rlap_sylvester_list_list.
-
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
-Compute (rlap_sylvester_mat [1;2;3;4] [5;6;7]).
-Compute (mat_nrows (rlap_sylvester_mat [1;2;3;4] [5;6;7])).
-Compute (mat_ncols (rlap_sylvester_mat [1;2;3;4] [5;6;7])).
+Compute (rlap_sylvester_mat [1] [6]).
+Compute (rlap_sylvester_mat [1;2] [6;7]).
+Compute (rlap_sylvester_mat [1;2;3] [6;7;8]).
+Compute (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9]).
+Compute (mat_nrows (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
+Compute (mat_ncols (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
+Compute (is_square_matrix (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
