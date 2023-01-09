@@ -3914,27 +3914,3 @@ apply IHla.
 Qed.
 
 End a.
-
-(* pgcd de deux polynômes
-Arguments lap_add {T ro} (la lb)%list.
-Arguments lap_sub {T ro} (la lb)%list.
-Arguments lap_mul {T ro} (la lb)%list.
-Arguments lap_quot_rem {T ro} (la lb)%list.
-Arguments rlap_quot_rem {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_step {T ro} (rla rlb)%list.
-Arguments rlap_quot_rem_loop {T ro} it%nat (rla rlb)%list.
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-Compute (rlap_quot_rem [1] [2]).
-Compute (rlap_quot_rem [1;0;1;1;0] [1;0;1;0;0]).
-(* https://uel.unisciel.fr/mathematiques/polynomes1/polynomes1_ch02/co/sexercer_ch2_2_01.html
-  x5-2x4+x3-x2+2x-1 et x3-x2+2x-2 *)
-Compute (rlap_quot_rem [1;-2;1;-1;2;-1] [1;-1;2;-2]).
-Compute (rlap_quot_rem [1;-1;2-2] [1;4;-5]).
-Compute (rlap_quot_rem [1;4;-5] [-5;5]).
-...
-Compute (rlap_quot_rem [1;-2;1] [1;-3;2]).
-Compute (rlap_quot_rem [1;-3;2] [1;-1]).
-*)
