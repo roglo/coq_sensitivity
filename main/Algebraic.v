@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike.
-Require Import Polynomial Matrix.
+Require Import Polynomial Matrix Determinant.
 
 (* Sylvester matrix *)
 
@@ -38,9 +38,13 @@ Open Scope Q_scope.
 
 Check mk_polyn.
 Search has_polyn_prop.
-...
 
-Compute (polyn_sylvester_mat [1;2;3;4;5] [6;7;8;9]).
+Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl)).
+Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
+Time Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
+...
+Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
+...
 Compute (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9]).
 Compute (mat_nrows (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
 Compute (mat_ncols (rlap_sylvester_mat [1;2;3;4;5] [6;7;8;9])).
