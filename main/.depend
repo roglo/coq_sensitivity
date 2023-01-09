@@ -1,3 +1,5 @@
+Algebraic.vio: Algebraic.v Misc.vio RingLike.vio Polynomial.vio Matrix.vio
+Algebraic.vo Algebraic.glob Algebraic.v.beautified Algebraic.required_vo: Algebraic.v Misc.vo RingLike.vo Polynomial.vo Matrix.vo
 CauchyBinet.vio: CauchyBinet.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio PermutationFun.vio SortingFun.vio SortRank.vio PermutSeq.vio Signature.vio Matrix.vio Determinant.vio
 CauchyBinet.vo CauchyBinet.glob CauchyBinet.v.beautified CauchyBinet.required_vo: CauchyBinet.v Misc.vo RingLike.vo IterAdd.vo IterMul.vo PermutationFun.vo SortingFun.vo SortRank.vo PermutSeq.vo Signature.vo Matrix.vo Determinant.vo
 Comatrix.vio: Comatrix.v Misc.vio RingLike.vio IterAdd.vio IterMul.vio Pigeonhole.vio PermutationFun.vio SortingFun.vio SortRank.vio Matrix.vio PermutSeq.vio Signature.vio Determinant.vio
@@ -28,8 +30,8 @@ PermutationFun.vio: PermutationFun.v Misc.vio
 PermutationFun.vo PermutationFun.glob PermutationFun.v.beautified PermutationFun.required_vo: PermutationFun.v Misc.vo
 Pigeonhole.vio: Pigeonhole.v Misc.vio
 Pigeonhole.vo Pigeonhole.glob Pigeonhole.v.beautified Pigeonhole.required_vo: Pigeonhole.v Misc.vo
-Polynomial.vio: Polynomial.v Misc.vio RingLike.vio IterAdd.vio IterAnd.vio SortingFun.vio
-Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo RingLike.vo IterAdd.vo IterAnd.vo SortingFun.vo
+Polynomial.vio: Polynomial.v Misc.vio RingLike.vio IterAdd.vio IterAnd.vio PermutationFun.vio SortingFun.vio
+Polynomial.vo Polynomial.glob Polynomial.v.beautified Polynomial.required_vo: Polynomial.v Misc.vo RingLike.vo IterAdd.vo IterAnd.vo PermutationFun.vo SortingFun.vo
 RingLike.vio: RingLike.v 
 RingLike.vo RingLike.glob RingLike.v.beautified RingLike.required_vo: RingLike.v 
 Sensitivity.vio: Sensitivity.v Misc.vio SortingFun.vio IterAdd.vio NatRingLike.vio
