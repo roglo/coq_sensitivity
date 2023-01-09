@@ -28,6 +28,13 @@ Definition rlap_sylvester_mat (rla rlb : list A) : matrix A :=
 Definition polyn_sylvester_mat (p q : polyn A) : matrix A :=
   mk_mat (rlap_sylvester_list_list (rev (lap p)) (rev (lap q))).
 
+Definition resultant (p q : polyn A) :=
+  det (polyn_sylvester_mat p q).
+
+(*
+résultant (selon le X) des polynomes Q et P(Y-X)
+*)
+
 End a.
 
 (**)
@@ -36,8 +43,32 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
+Definition polyn_Q_ring_like_op :=
+  @polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl
+    (n_Sn _).
+
+Check (@polyn_sylvester_mat _ polyn_Q_ring_like_op).
+Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
+
+...
+
+Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
+Check [mk_polyn [-2;0;1] eq_refl]. (* x²-2) *)
+Check (@mk_polyn (polyn Q)).
+(*
+Theorem glop :
+  (@rngl_characteristic Q Q_ring_like_op Q_ring_like_prop) ≠ 1%nat.
+Proof. easy. Show Proof.
+...
+
+Check (polyn_ring_like_op Q_ring_like_prop (n_Sn _)).
+Check
+  (@polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl (n_Sn _)).
+Search rngl_characteristic.
+
 Check mk_polyn.
 Search has_polyn_prop.
+*)
 
 Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl)).
 Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
