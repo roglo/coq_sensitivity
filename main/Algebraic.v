@@ -50,6 +50,11 @@ destruct pa as [pa| pa]. {
 destruct pb as [pb| pb]. {
   now apply is_empty_list_empty in pb; subst lb.
 }
+destruct la as [| a] using rev_ind; [ now right | clear IHla ].
+destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
+clear Hq.
+rewrite last_last in pa, pb.
+...
 right.
 destruct la as [| a] using rev_ind; [ easy | clear IHla ].
 destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
@@ -80,6 +85,11 @@ Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
+
+(*
+Compute (lap_compose Q_ring_like_op [-1;1] [1;0;1]).
+Compute (lap_compose Q_ring_like_op [1;0;1] [-1;1]).
+*)
 
 Definition polyn_Q_ring_like_op :=
   @polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl
