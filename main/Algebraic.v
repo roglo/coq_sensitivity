@@ -60,38 +60,35 @@ Theorem last_lap_compose :
 Proof.
 intros Hos *.
 unfold lap_compose.
-rewrite <- (rev_involutive la).
-Abort. Abort. (*
-...
-  last (fold_left (λ (x : list A) (y : A), (x * lb + [y])%lap) (rev la) []) 0%L =
-...
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hbz| Hbz]. {
   apply Nat.eqb_eq, length_zero_iff_nil in Hbz; subst lb.
-  unfold lap_compose; cbn.
-  erewrite List_fold_right_ext_in. 2: {
+  unfold rlap_compose; cbn.
+  erewrite List_fold_left_ext_in. 2: {
     intros b lb Hb.
     now rewrite lap_mul_0_r, lap_add_0_l.
   }
-  now destruct la.
+  destruct la as [| a]; [ easy | cbn ].
+  now rewrite fold_left_app.
 }
 apply Nat.eqb_neq in Hbz.
-unfold lap_compose; cbn.
+unfold rlap_compose; cbn.
+rewrite rev_involutive.
 revert lb Hbz.
 induction la as [| a] using rev_ind; intros; cbn. {
   symmetry; apply (rngl_mul_0_l Hos).
 }
-rewrite fold_right_app; cbn.
+rewrite rev_app_distr; cbn.
 rewrite app_length; cbn.
 rewrite Nat.add_sub, last_last.
+...
+rewrite fold_iter_list.
+specialize iter_list_op_fun_from_d as H1.
+specialize (H1 (list A) A []).
+rewrite (H1 (λ a b, (a * lb + b)%lap) [a]).
+...
 destruct lb as [| b]; [ easy | clear Hbz; cbn ].
 destruct lb as [| b2]. {
-...
-fold_left_rev_right:
-  ∀ (A B : Type) (f : A → B → B) (l : list A) (i : B),
-    fold_right f i (rev l) = fold_left (λ (x : B) (y : A), f y x) l i
-Search fold_left.
-Search iter_list.
 ...
 iter_list_op_fun_from_d:
   ∀ (T A : Type) (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
@@ -146,10 +143,9 @@ Import Q.Notations.
 Open Scope Q_scope.
 
 Compute (
-  let ro := Q_ring_like_op in
   let rla := [2;3;5] in
   let rlb := [7;11] in
-  last (rlap_compose ro rla rlb) 0).
+  last (rlap_compose rla rlb) 0).
 ...
 2*7²
 Compute (
