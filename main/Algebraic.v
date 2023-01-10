@@ -51,6 +51,27 @@ destruct pb as [pb| pb]. {
   now apply is_empty_list_empty in pb; subst lb.
 }
 right.
+Theorem last_lap_compose :
+  rngl_has_opp_or_sous = true →
+  ∀ la lb,
+  (last (lap_compose ro la lb) 0 = last la 0 * last lb 0 ^ (length la - 1))%L.
+Proof.
+intros Hos *.
+unfold lap_compose; cbn.
+revert lb.
+induction la as [| a] using rev_ind; intros; cbn. {
+  symmetry; apply (rngl_mul_0_l Hos).
+}
+rewrite fold_right_app; cbn.
+rewrite app_length; cbn.
+rewrite Nat.add_1_r; cbn.
+rewrite last_last.
+rewrite Nat.sub_0_r.
+...
+rewrite IHla.
+... ...
+rewrite last_lap_compose.
+...
 destruct la as [| a] using rev_ind; [ easy | clear IHla ].
 destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
 clear Hq.
@@ -58,6 +79,7 @@ rewrite last_last in pa, pb.
 unfold lap_compose.
 rewrite fold_right_app; cbn.
 ...
+*)
 
 (*
 résultant (selon le X) des polynomes Q et P(Y-X)
@@ -71,6 +93,14 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
+...
+
+Compute (
+  let ro := Q_ring_like_op in
+  let la := [7;5;3;2] in
+  let lb := [11;13] in
+  last (lap_compose ro la lb) 0).
+2*13³
 (*
 Compute (lap_compose Q_ring_like_op [-1;1] [1;0;1]).
 Compute (lap_compose Q_ring_like_op [1;0;1] [-1;1]).
