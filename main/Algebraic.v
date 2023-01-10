@@ -34,7 +34,7 @@ Definition resultant (p q : polyn A) :=
 
 Theorem glop p q :
   lap q ≠ []
-  → has_polyn_prop (lap_compose ro (lap p) (lap q)) = true.
+  → has_polyn_prop (lap p ° lap q) = true.
 Proof.
 intros Hq.
 destruct p as (la, pa).
@@ -54,11 +54,17 @@ right.
 Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
-  last (lap_compose ro la lb) 0%L =
+  last (la ° lb)%lap 0%L =
     if length lb =? 0 then hd 0%L la
     else (last la 0 * last lb 0 ^ (length la - 1))%L.
 Proof.
 intros Hos *.
+unfold lap_compose.
+rewrite <- (rev_involutive la).
+Abort. Abort. (*
+...
+  last (fold_left (λ (x : list A) (y : A), (x * lb + [y])%lap) (rev la) []) 0%L =
+...
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hbz| Hbz]. {
   apply Nat.eqb_eq, length_zero_iff_nil in Hbz; subst lb.
@@ -80,6 +86,20 @@ rewrite app_length; cbn.
 rewrite Nat.add_sub, last_last.
 destruct lb as [| b]; [ easy | clear Hbz; cbn ].
 destruct lb as [| b2]. {
+...
+fold_left_rev_right:
+  ∀ (A B : Type) (f : A → B → B) (l : list A) (i : B),
+    fold_right f i (rev l) = fold_left (λ (x : B) (y : A), f y x) l i
+Search fold_left.
+Search iter_list.
+...
+iter_list_op_fun_from_d:
+  ∀ (T A : Type) (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
+    (∀ x : T, op d x = x)
+    → (∀ x : T, op x d = x)
+      → (∀ a0 b c : T, op a0 (op b c) = op (op a0 b) c)
+        → iter_list l (λ (c : T) (i : A), op c (f i)) a =
+          op a (iter_list l (λ (c : T) (i : A), op c (f i)) d)
 ...
 destruct la as [| a2] using rev_ind; intros; cbn. {
   symmetry; apply rngl_mul_1_r.
@@ -125,13 +145,17 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
-...
-
 Compute (
   let ro := Q_ring_like_op in
+  let rla := [2;3;5] in
+  let rlb := [7;11] in
+  last (rlap_compose ro rla rlb) 0).
+...
+2*7²
+Compute (
   let la := [7;5;3;2] in
   let lb := [11;13] in
-  last (lap_compose ro la lb) 0).
+  last (lap_compose la lb) 0).
 2*13³
 (*
 Compute (lap_compose Q_ring_like_op [-1;1] [1;0;1]).

@@ -20,8 +20,8 @@ Require Import PermutationFun SortingFun.
 *)
 Definition is_empty_list {A} (la : list A) :=
   match la with [] => true | _ => false end.
-Definition has_polyn_prop T {ro : ring_like_op T} (lap : list T) :=
-  (is_empty_list lap || (last lap 0 ≠? 0)%L)%bool.
+Definition has_polyn_prop T {ro : ring_like_op T} (la : list T) :=
+  (is_empty_list la || (last la 0 ≠? 0)%L)%bool.
 
 Record polyn T {ro : ring_like_op T} := mk_polyn
   { lap : list T;
@@ -3884,7 +3884,14 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
 
 (* composition *)
 
+Definition rlap_compose rla rlb :=
+  fold_left (λ accu a, lap_add (lap_mul accu (rev rlb)) [a]) rla [].
+
 Definition lap_compose la lb :=
+  rlap_compose (rev la) (rev lb).
+
+(*
+Definition old_lap_compose la lb :=
   List.fold_right (λ c accu, lap_add (lap_mul accu lb) [c]) [] la.
 
 Definition lap_compose2 la lb :=
@@ -3892,6 +3899,7 @@ Definition lap_compose2 la lb :=
     (λ i accu,
      lap_add accu (lap_mul [List.nth i la 0] (lap_power lb i)))%L
     [] (List.seq 0 (length la)).
+*)
 
 (* *)
 
@@ -3925,6 +3933,9 @@ Arguments lap_mul {T ro} (la lb)%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
+Arguments lap_compose {T ro} (la lb)%lap.
+Arguments rlap_compose {T ro} (rla rlb)%lap.
+Arguments has_polyn_prop {T ro} la%lap.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -3933,3 +3944,5 @@ Notation "a - b" := (lap_sub a b) : lap_scope.
 Notation "a * b" := (lap_mul a b) : lap_scope.
 Notation "a / b" := (lap_quot a b) : lap_scope.
 Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
+Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
+ lap_scope.
