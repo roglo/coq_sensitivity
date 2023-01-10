@@ -54,21 +54,53 @@ right.
 Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
-  (last (lap_compose ro la lb) 0 = last la 0 * last lb 0 ^ (length la - 1))%L.
+  last (lap_compose ro la lb) 0%L =
+    if length lb =? 0 then hd 0%L la
+    else (last la 0 * last lb 0 ^ (length la - 1))%L.
 Proof.
 intros Hos *.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hbz| Hbz]. {
+  apply Nat.eqb_eq, length_zero_iff_nil in Hbz; subst lb.
+  unfold lap_compose; cbn.
+  erewrite List_fold_right_ext_in. 2: {
+    intros b lb Hb.
+    now rewrite lap_mul_0_r, lap_add_0_l.
+  }
+  now destruct la.
+}
+apply Nat.eqb_neq in Hbz.
 unfold lap_compose; cbn.
-revert lb.
+revert lb Hbz.
 induction la as [| a] using rev_ind; intros; cbn. {
   symmetry; apply (rngl_mul_0_l Hos).
 }
 rewrite fold_right_app; cbn.
 rewrite app_length; cbn.
-rewrite Nat.add_1_r; cbn.
-rewrite last_last.
-rewrite Nat.sub_0_r.
+rewrite Nat.add_sub, last_last.
+destruct lb as [| b]; [ easy | clear Hbz; cbn ].
+destruct lb as [| b2]. {
 ...
-rewrite IHla.
+destruct la as [| a2] using rev_ind; intros; cbn. {
+  symmetry; apply rngl_mul_1_r.
+}
+clear IHla.
+rewrite fold_right_app; cbn.
+rewrite app_length; cbn.
+rewrite Nat.add_1_r; cbn.
+destruct lb as [| b]. {
+  cbn; rewrite (rngl_mul_0_l Hos), (rngl_mul_0_r Hos).
+  erewrite List_fold_right_ext_in. 2: {
+    intros b c Hb.
+    now rewrite lap_mul_0_r, lap_add_0_l.
+  }
+  clear a.
+  induction la as [| a]; cbn. 2: {
+...
+destruct la as [| a2] using rev_ind; intros; cbn. {
+  symmetry; apply rngl_mul_1_r.
+}
+clear IHla.
 ... ...
 rewrite last_lap_compose.
 ...
