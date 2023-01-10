@@ -81,11 +81,15 @@ induction la as [| a] using rev_ind; intros; cbn. {
 rewrite rev_app_distr; cbn.
 rewrite app_length; cbn.
 rewrite Nat.add_sub, last_last.
-...
 rewrite fold_iter_list.
 specialize iter_list_op_fun_from_d as H1.
-specialize (H1 (list A) A []).
-rewrite (H1 (λ a b, (a * lb + b)%lap) [a]).
+specialize (H1 (list A) A).
+...
+specialize (H1 (list A) A [a]).
+specialize (H1 (λ a b, (a * lb + b)%lap) [a] (rev la)).
+specialize (H1 (λ i, [i])).
+cbn in H1.
+rewrite H1.
 ...
 destruct lb as [| b]; [ easy | clear Hbz; cbn ].
 destruct lb as [| b2]. {
