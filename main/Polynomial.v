@@ -213,12 +213,12 @@ Proof. easy. Qed.
 
 (* multiplication *)
 
-Fixpoint lap_convol_mul al1 al2 i len :=
+Fixpoint lap_convol_mul la lb i len :=
   match len with
   | O => []
   | S len1 =>
-      (∑ (j = 0, i), List.nth j al1 0 * List.nth (i - j) al2 0)%L ::
-      lap_convol_mul al1 al2 (S i) len1
+      (∑ (j = 0, i), List.nth j la 0 * List.nth (i - j) lb 0)%L ::
+      lap_convol_mul la lb (S i) len1
   end.
 
 Definition lap_mul la lb :=
@@ -3934,6 +3934,7 @@ Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
+Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
 Arguments has_polyn_prop {T ro} la%lap.
 

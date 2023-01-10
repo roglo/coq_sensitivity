@@ -6,7 +6,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
-Require Import Misc RingLike.
+Require Import Misc RingLike IterAdd.
 Require Import Polynomial Matrix Determinant.
 
 (* Sylvester matrix *)
@@ -74,6 +74,26 @@ destruct (bool_dec _) as [Hbz| Hbz]. {
 apply Nat.eqb_neq in Hbz.
 unfold rlap_compose; cbn.
 rewrite rev_involutive.
+destruct la as [| a0]. {
+  symmetry; apply (rngl_mul_0_l Hos).
+...}
+cbn.
+destruct la as [| a1]. {
+  symmetry; apply rngl_mul_1_r.
+}
+cbn.
+destruct la as [| a2]. {
+  destruct lb as [| b0]; [ easy | cbn ].
+  clear Hbz.
+  rewrite lap_add_0_r.
+  destruct lb as [| b1]; cbn. {
+    rewrite rngl_summation_only_one.
+    rewrite rngl_mul_1_r.
+...
+    unfold iter_seq, iter_list; cbn.
+...
+}
+cbn.
 ...
 revert lb Hbz.
 induction la as [| a]; intros; cbn. {
