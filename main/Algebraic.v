@@ -50,28 +50,13 @@ destruct pa as [pa| pa]. {
 destruct pb as [pb| pb]. {
   now apply is_empty_list_empty in pb; subst lb.
 }
-destruct la as [| a] using rev_ind; [ now right | clear IHla ].
-destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
-clear Hq.
-rewrite last_last in pa, pb.
-...
 right.
 destruct la as [| a] using rev_ind; [ easy | clear IHla ].
 destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-move b before a.
 clear Hq.
 rewrite last_last in pa, pb.
 unfold lap_compose.
 rewrite fold_right_app; cbn.
-revert a b pa pb lb.
-induction la as [| c]; intros; [ easy | ].
-cbn.
-remember (fold_right _ _ _) as lc eqn:Hlc.
-Search (_ * (_ ++ _))%lap.
-destruct lb as [| b']; cbn.
-cbn in Hlc.
-destruct lc as [| c']; cbn.
-symmetry in Hlc.
 ...
 
 (*
