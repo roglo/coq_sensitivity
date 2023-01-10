@@ -74,13 +74,24 @@ destruct (bool_dec _) as [Hbz| Hbz]. {
 apply Nat.eqb_neq in Hbz.
 unfold rlap_compose; cbn.
 rewrite rev_involutive.
-destruct la as [| a] using rev_ind; cbn. {
+...
+revert lb Hbz.
+induction la as [| a]; intros; cbn. {
   symmetry; apply (rngl_mul_0_l Hos).
 }
-clear IHla.
-rewrite rev_app_distr; cbn.
+rewrite fold_left_app; cbn.
+...
 rewrite app_length; cbn.
 rewrite Nat.add_sub, last_last.
+rewrite glop.
+rewrite fold_left_app.
+cbn.
+...
+revert a lb Hbz.
+induction la as [| a']; intros; cbn. {
+  symmetry; apply rngl_mul_1_r.
+}
+rewrite fold_left_app; cbn.
 ...
 rewrite fold_iter_list.
 specialize iter_list_op_fun_from_d as H1.
