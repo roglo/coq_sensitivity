@@ -59,6 +59,8 @@ Theorem last_lap_compose :
     else (last la 0 * last lb 0 ^ (length la - 1))%L.
 Proof.
 intros Hos *.
+(* c'est faux, en fait *)
+...
 unfold lap_compose.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Hbz| Hbz]. {
