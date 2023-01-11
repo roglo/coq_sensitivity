@@ -6,7 +6,7 @@ Set Implicit Arguments.
 Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
-Require Import Misc RingLike IterAdd.
+Require Import Misc RingLike IterAdd IterMul.
 Require Import Polynomial Matrix Determinant.
 
 (* Sylvester matrix *)
@@ -76,20 +76,18 @@ destruct blen. {
 }
 unfold rlap_compose; cbn.
 rewrite rev_involutive.
-(*
 destruct blen. {
+  unfold eval_lap.
+  symmetry.
+  rewrite <- (rev_involutive la) at 1.
+  rewrite fold_left_rev_right; symmetry.
+  remember (rev la) as rla; clear la Heqrla.
   destruct lb as [| b]; [ easy | ].
-  destruct lb; [ cbn | easy ].
-  destruct la as [| a0]; [ easy | cbn ].
-  rewrite fold_left_app; cbn.
-  rewrite <- fold_left_rev_right.
-  rewrite rev_involutive.
-  destruct la as [| a1]. {
-    now cbn; rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
-  }
-  cbn.
+  destruct lb; [ cbn; clear Hbl | easy ].
+  revert b.
+  induction rla as [| a2]; intros; [ easy | cbn ].
+  rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
 ...
-*)
 destruct la as [| a0]. {
   destruct blen; [ easy | cbn ].
   symmetry; apply (rngl_mul_0_l Hos).
@@ -102,6 +100,8 @@ destruct la as [| a1]. {
   now rewrite rngl_mul_1_r.
 }
 cbn.
+destruct la as [| a2]. {
+...
 destruct la as [| a2]. {
   destruct lb as [| b0]; [ easy | cbn ].
   cbn in Hbl.
