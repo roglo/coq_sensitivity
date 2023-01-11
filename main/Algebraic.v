@@ -99,7 +99,6 @@ destruct blen. {
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
   apply last_fold_left_lap_mul_add.
 }
-...
 revert lb Hbl.
 induction la as [| a]; intros; cbn. {
   symmetry; apply rngl_mul_1_r.
@@ -118,6 +117,38 @@ destruct la as [| a2]. {
   clear blen IHla Hbl.
   rewrite Nat.sub_0_r.
   rewrite rngl_mul_1_r.
+  destruct lb as [| b1]. {
+    cbn; unfold iter_seq, iter_list; cbn.
+    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+    apply rngl_add_0_r.
+  }
+  destruct lb as [| b2]. {
+    cbn; unfold iter_seq, iter_list; cbn.
+    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+    apply rngl_add_0_r.
+  }
+Theorem glop :
+  rngl_has_opp_or_sous = true →
+  ∀ a1 a lb,
+  2 ≤ length lb
+  → last (lap_convol_mul [a1] lb 0 (length lb) + [a])%lap 0%L =
+    (a1 * last lb 0)%L.
+Proof.
+intros Hos * Hlb.
+revert a1 a.
+induction lb as [| b1]; intros; [ easy | ].
+cbn in Hlb; apply Nat.succ_le_mono in Hlb.
+...
+destruct lb as [| b2]; [ easy | ].
+cbn in Hlb; apply Nat.succ_le_mono in Hlb.
+remember (b2 :: lb) as lc; cbn; subst lc.
+...
+  cbn; unfold iter_seq, iter_list; cbn.
+  rewrite rngl_add_0_l.
+, (rngl_mul_0_l Hos).
+...
+apply glop.
 ...
 
 (*
