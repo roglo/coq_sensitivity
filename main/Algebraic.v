@@ -141,6 +141,8 @@ destruct la as [| a1]. {
   now cbn; rewrite rngl_mul_1_r.
 }
 cbn.
+rewrite List_cons_length in IHla.
+rewrite Nat_sub_succ_1 in IHla.
 destruct la as [| a2]. {
   cbn.
   destruct lb as [| b0]; [ easy | ].
@@ -152,6 +154,8 @@ destruct la as [| a2]. {
   easy.
 }
 rewrite fold_left_app; cbn.
+rewrite List_last_cons_cons in IHla.
+rewrite List_cons_length in IHla.
 destruct la as [| a3]. {
   cbn.
   destruct lb as [| b0]; [ easy | ].
@@ -159,11 +163,19 @@ destruct la as [| a3]. {
   destruct lb; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
   rewrite Nat.sub_0_r, rngl_mul_1_r.
+  rewrite List_last_cons_cons.
+  do 2 rewrite List_cons_length.
+  rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
+  rewrite skipn_O.
+...
   erewrite <- (last_cons_lap_convol_mul Hos) with (la := []); [ | easy ].
   rewrite List_last_cons_cons.
   cbn - [ last ].
   rewrite List_last_cons_cons.
   unfold iter_seq, iter_list; cbn.
+  do 4 rewrite rngl_add_0_l.
+  rewrite (rngl_mul_0_l Hos).
+  do 2 rewrite rngl_add_0_r.
 ...
 
 (*
