@@ -88,116 +88,27 @@ destruct blen. {
   induction rla as [| a2]; intros; [ easy | cbn ].
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
 ...
-destruct la as [| a0]. {
-  destruct blen; [ easy | cbn ].
-  symmetry; apply (rngl_mul_0_l Hos).
 }
-cbn.
-destruct la as [| a1]. {
-  destruct blen; cbn. {
-    now rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
-  }
-  now rewrite rngl_mul_1_r.
-}
-cbn.
-destruct la as [| a2]. {
 ...
-destruct la as [| a2]. {
-  destruct lb as [| b0]; [ easy | cbn ].
-  cbn in Hbl.
-  apply Nat.succ_inj in Hbl.
-  rewrite lap_add_0_r.
-  destruct lb as [| b1]; cbn. {
-    rewrite rngl_summation_only_one.
-    rewrite rngl_mul_1_r.
-    rewrite <- Hbl; cbn.
-    now rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
-  }
-  subst blen; cbn.
-  destruct lb as [| b2]. {
-    unfold iter_seq, iter_list; cbn.
-    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-    now rewrite rngl_add_0_r, rngl_mul_1_r.
-  }
-  cbn.
-...
-}
-cbn.
-...
-revert lb Hbz.
+revert lb Hbl.
 induction la as [| a]; intros; cbn. {
-  symmetry; apply (rngl_mul_0_l Hos).
+  symmetry; apply rngl_mul_1_r.
 }
 rewrite fold_left_app; cbn.
-...
-rewrite app_length; cbn.
-rewrite Nat.add_sub, last_last.
-rewrite glop.
-rewrite fold_left_app.
+destruct la as [| a1]. {
+  now cbn; rewrite rngl_mul_1_r.
+}
 cbn.
+destruct la as [| a2]. {
+  cbn.
+  destruct lb as [| b0]; [ easy | ].
+  cbn in Hbl; apply Nat.succ_inj in Hbl.
+  destruct lb; [ easy | ].
+  cbn in Hbl; apply Nat.succ_inj in Hbl.
+  clear blen IHla Hbl.
+  rewrite Nat.sub_0_r.
+  rewrite rngl_mul_1_r.
 ...
-revert a lb Hbz.
-induction la as [| a']; intros; cbn. {
-  symmetry; apply rngl_mul_1_r.
-}
-rewrite fold_left_app; cbn.
-...
-rewrite fold_iter_list.
-specialize iter_list_op_fun_from_d as H1.
-specialize (H1 (list A) A).
-specialize (H1 []).
-specialize (H1 (λ a b, (a * lb + b)%lap) [a] (rev la)).
-cbn in H1.
-rewrite H1.
-...
-specialize (H1 (list A) A [a]).
-specialize (H1 (λ a b, (a * lb + b)%lap) [a] (rev la)).
-specialize (H1 (λ i, [i])).
-cbn in H1.
-rewrite H1.
-...
-destruct lb as [| b]; [ easy | clear Hbz; cbn ].
-destruct lb as [| b2]. {
-...
-iter_list_op_fun_from_d:
-  ∀ (T A : Type) (d : T) (op : T → T → T) (a : T) (l : list A) (f : A → T),
-    (∀ x : T, op d x = x)
-    → (∀ x : T, op x d = x)
-      → (∀ a0 b c : T, op a0 (op b c) = op (op a0 b) c)
-        → iter_list l (λ (c : T) (i : A), op c (f i)) a =
-          op a (iter_list l (λ (c : T) (i : A), op c (f i)) d)
-...
-destruct la as [| a2] using rev_ind; intros; cbn. {
-  symmetry; apply rngl_mul_1_r.
-}
-clear IHla.
-rewrite fold_right_app; cbn.
-rewrite app_length; cbn.
-rewrite Nat.add_1_r; cbn.
-destruct lb as [| b]. {
-  cbn; rewrite (rngl_mul_0_l Hos), (rngl_mul_0_r Hos).
-  erewrite List_fold_right_ext_in. 2: {
-    intros b c Hb.
-    now rewrite lap_mul_0_r, lap_add_0_l.
-  }
-  clear a.
-  induction la as [| a]; cbn. 2: {
-...
-destruct la as [| a2] using rev_ind; intros; cbn. {
-  symmetry; apply rngl_mul_1_r.
-}
-clear IHla.
-... ...
-rewrite last_lap_compose.
-...
-destruct la as [| a] using rev_ind; [ easy | clear IHla ].
-destruct lb as [| b] using rev_ind; [ easy | clear IHlb ].
-clear Hq.
-rewrite last_last in pa, pb.
-unfold lap_compose.
-rewrite fold_right_app; cbn.
-...
-*)
 
 (*
 résultant (selon le X) des polynomes Q et P(Y-X)
