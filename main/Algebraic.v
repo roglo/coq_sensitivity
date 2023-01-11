@@ -162,10 +162,14 @@ Proof.
 intros Hos * Hi.
 revert a b la i Hi.
 induction lb as [| b1]; intros; [ easy | ].
-cbn - [ last ].
+cbn - [ last nth "-" ].
 do 2 rewrite List_last_cons_cons.
-unfold iter_seq, iter_list.
-cbn - [ last ].
+rewrite <- IHlb with (la := la ++ [b]) (i := S i). 2: {
+  rewrite app_length, Nat.add_1_r.
+  now f_equal.
+}
+f_equal.
+f_equal.
 ...
 specialize (IHlb a b1 (la ++ [b])).
 ...
