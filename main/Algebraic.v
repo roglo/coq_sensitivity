@@ -152,6 +152,36 @@ destruct la as [| a2]. {
   rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
   rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
   rewrite rngl_add_0_r.
+Theorem glop :
+  rngl_has_opp_or_sous = true →
+  ∀ i la lb a b,
+  i = S (length la)
+  → last ((a * b)%L :: lap_convol_mul [a] (la ++ b :: lb) i (length lb))
+      0%L = (a * last (b :: lb) 0)%L.
+Proof.
+intros Hos * Hi.
+revert la Hi.
+induction i; intros; [ easy | ].
+apply Nat.succ_inj in Hi.
+destruct lb as [| b1]; [ easy | ].
+cbn - [ last ].
+do 2 rewrite List_last_cons_cons.
+unfold iter_seq, iter_list.
+cbn - [ last ].
+rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+rewrite rngl_add_0_r.
+...
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
+... ...
+  now apply glop with (la := [b0; b1; b2; b3]).
+}
+...
+  last
+    ((a1 * b4)%L
+     :: lap_convol_mul [a1] (b0 :: b1 :: b2 :: b3 :: b4 :: lb) 5 (length lb))
+    0%L = (a1 * last (b4 :: lb) 0)%L
 ...
   destruct lb as [| b1]. {
     cbn; unfold iter_seq, iter_list; cbn.
