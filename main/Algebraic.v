@@ -43,6 +43,39 @@ rewrite rngl_summation_only_one.
 apply IHla.
 Qed.
 
+Theorem last_cons_lap_convol_mul :
+  rngl_has_opp_or_sous = true →
+  ∀ i la lb a b,
+  i = S (length la)
+  → last ((a * b)%L :: lap_convol_mul [a] (la ++ b :: lb) i (length lb))
+      0%L = (a * last (b :: lb) 0)%L.
+Proof.
+intros Hos * Hi.
+revert a b la i Hi.
+induction lb as [| b1]; intros; [ easy | ].
+cbn - [ last nth "-" ].
+do 2 rewrite List_last_cons_cons.
+rewrite <- IHlb with (la := la ++ [b]) (i := S i). 2: {
+  rewrite app_length, Nat.add_1_r.
+  now f_equal.
+}
+rewrite <- app_assoc.
+f_equal; f_equal.
+rewrite rngl_summation_split_first; [ | easy ].
+cbn.
+rewrite all_0_rngl_summation_0. 2: {
+  intros j Hj.
+  destruct j; [ easy | ].
+  rewrite Tauto_match_nat_same.
+  apply (rngl_mul_0_l Hos).
+}
+rewrite Nat.sub_0_r, rngl_add_0_r.
+subst i.
+rewrite app_nth2; [ | flia ].
+rewrite Nat.sub_succ_l; [ | easy ].
+now rewrite Nat.sub_diag.
+Qed.
+
 Theorem glop p q :
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -114,147 +147,23 @@ destruct la as [| a2]. {
   cbn in Hbl; apply Nat.succ_inj in Hbl.
   destruct lb; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
-  clear blen IHla Hbl.
-  rewrite Nat.sub_0_r.
-  rewrite rngl_mul_1_r.
-(**)
-  rename a0 into b1.
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list.
-  cbn - [ last ].
-  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r.
-  destruct lb as [| b2]; [ easy | ].
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list.
-  cbn - [ last ].
-  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r.
-  destruct lb as [| b3]; [ easy | ].
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list.
-  cbn - [ last ].
-  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r.
-  destruct lb as [| b4]; [ easy | ].
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list.
-  cbn - [ last ].
-  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r.
-Theorem glop :
-  rngl_has_opp_or_sous = true →
-  ∀ i la lb a b,
-  i = S (length la)
-  → last ((a * b)%L :: lap_convol_mul [a] (la ++ b :: lb) i (length lb))
-      0%L = (a * last (b :: lb) 0)%L.
-Proof.
-intros Hos * Hi.
-revert a b la i Hi.
-induction lb as [| b1]; intros; [ easy | ].
-cbn - [ last nth "-" ].
-do 2 rewrite List_last_cons_cons.
-rewrite <- IHlb with (la := la ++ [b]) (i := S i). 2: {
-  rewrite app_length, Nat.add_1_r.
-  now f_equal.
+  rewrite Nat.sub_0_r, rngl_mul_1_r.
+  erewrite <- (last_cons_lap_convol_mul Hos) with (la := []); [ | easy ].
+  easy.
 }
-f_equal.
-f_equal.
-...
-specialize (IHlb a b1 (la ++ [b])).
-...
-intros Hos * Hi.
-revert la Hi.
-induction i; intros; [ easy | ].
-apply Nat.succ_inj in Hi.
-destruct la as [| a1]. {
-  subst i.
-  destruct lb as [| b1]; [ easy | ].
+rewrite fold_left_app; cbn.
+destruct la as [| a3]. {
+  cbn.
+  destruct lb as [| b0]; [ easy | ].
+  cbn in Hbl; apply Nat.succ_inj in Hbl.
+  destruct lb; [ easy | ].
+  cbn in Hbl; apply Nat.succ_inj in Hbl.
+  rewrite Nat.sub_0_r, rngl_mul_1_r.
+  erewrite <- (last_cons_lap_convol_mul Hos) with (la := []); [ | easy ].
+  rewrite List_last_cons_cons.
   cbn - [ last ].
-  unfold iter_seq, iter_list.
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-  rewrite (rngl_mul_0_l Hos), rngl_add_0_r, rngl_add_0_l.
-...
-destruct lb as [| b1]; [ easy | ].
-cbn - [ last nth "-" ].
-do 2 rewrite List_last_cons_cons.
-unfold iter_seq, iter_list.
-rewrite Nat.sub_0_r.
-rewrite seq_S, fold_left_app.
-rewrite seq_S, fold_left_app.
-cbn - [ last nth "-" seq ].
-rewrite Nat.sub_diag.
-rewrite List_nth_succ_cons.
-rewrite List_nth_nil.
-rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
-rewrite Nat.sub_succ_l; [ | easy ].
-rewrite Nat.sub_diag.
-...
-remember (S i) as si; cbn - [ last ]; subst si.
-rewrite (rngl_mul_0_l Hos), rngl_add_0_r, rngl_add_0_l.
-rewrite Nat.sub_0_r.
-
-remember (S i) as si; cbn - [ last nth ]; subst si.
-rewrite Nat.sub_0_r.
-rewrite rngl_add_0_l.
-rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-rewrite rngl_add_0_r.
-...
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-  rewrite rngl_add_0_r.
-... ...
-  now apply glop with (la := [b0; b1; b2; b3]).
-}
-...
-  last
-    ((a1 * b4)%L
-     :: lap_convol_mul [a1] (b0 :: b1 :: b2 :: b3 :: b4 :: lb) 5 (length lb))
-    0%L = (a1 * last (b4 :: lb) 0)%L
-...
-  destruct lb as [| b1]. {
-    cbn; unfold iter_seq, iter_list; cbn.
-    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-    apply rngl_add_0_r.
-  }
-  destruct lb as [| b2]. {
-    cbn; unfold iter_seq, iter_list; cbn.
-    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
-    rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
-    apply rngl_add_0_r.
-  }
-Theorem glop :
-  rngl_has_opp_or_sous = true →
-  ∀ a1 a lb,
-  2 ≤ length lb
-  → last (lap_convol_mul [a1] lb 0 (length lb) + [a])%lap 0%L =
-    (a1 * last lb 0)%L.
-Proof.
-intros Hos * Hlb.
-revert a1 a.
-induction lb as [| b1]; intros; [ easy | ].
-cbn in Hlb; apply Nat.succ_le_mono in Hlb.
-...
-destruct lb as [| b2]; [ easy | ].
-cbn in Hlb; apply Nat.succ_le_mono in Hlb.
-remember (b2 :: lb) as lc; cbn; subst lc.
-...
-  cbn; unfold iter_seq, iter_list; cbn.
-  rewrite rngl_add_0_l.
-, (rngl_mul_0_l Hos).
-...
-apply glop.
+  rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list; cbn.
 ...
 
 (*
