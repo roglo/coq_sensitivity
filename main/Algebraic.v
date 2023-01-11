@@ -32,6 +32,17 @@ Definition polyn_sylvester_mat (p q : polyn A) : matrix A :=
 Definition resultant (p q : polyn A) :=
   det (polyn_sylvester_mat p q).
 
+Theorem last_fold_left_lap_mul_add : ∀ la b c,
+  last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
+  fold_left (λ x y, (x * b + y)%L) la c.
+Proof.
+intros.
+revert c.
+induction la as [| a]; intros; [ easy | cbn ].
+rewrite rngl_summation_only_one.
+apply IHla.
+Qed.
+
 Theorem glop p q :
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -84,10 +95,9 @@ destruct blen. {
   remember (rev la) as rla; clear la Heqrla.
   destruct lb as [| b]; [ easy | ].
   destruct lb; [ cbn; clear Hbl | easy ].
-  revert b.
-  induction rla as [| a2]; intros; [ easy | cbn ].
+  destruct rla as [| a2]; intros; [ easy | cbn ].
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
-...
+  apply last_fold_left_lap_mul_add.
 }
 ...
 revert lb Hbl.
