@@ -160,14 +160,50 @@ Theorem glop :
       0%L = (a * last (b :: lb) 0)%L.
 Proof.
 intros Hos * Hi.
-revert la Hi.
-induction i; intros; [ easy | ].
-apply Nat.succ_inj in Hi.
-destruct lb as [| b1]; [ easy | ].
+revert a b la i Hi.
+induction lb as [| b1]; intros; [ easy | ].
 cbn - [ last ].
 do 2 rewrite List_last_cons_cons.
 unfold iter_seq, iter_list.
 cbn - [ last ].
+...
+specialize (IHlb a b1 (la ++ [b])).
+...
+intros Hos * Hi.
+revert la Hi.
+induction i; intros; [ easy | ].
+apply Nat.succ_inj in Hi.
+destruct la as [| a1]. {
+  subst i.
+  destruct lb as [| b1]; [ easy | ].
+  cbn - [ last ].
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  rewrite (rngl_mul_0_l Hos), rngl_add_0_r, rngl_add_0_l.
+...
+destruct lb as [| b1]; [ easy | ].
+cbn - [ last nth "-" ].
+do 2 rewrite List_last_cons_cons.
+unfold iter_seq, iter_list.
+rewrite Nat.sub_0_r.
+rewrite seq_S, fold_left_app.
+rewrite seq_S, fold_left_app.
+cbn - [ last nth "-" seq ].
+rewrite Nat.sub_diag.
+rewrite List_nth_succ_cons.
+rewrite List_nth_nil.
+rewrite (rngl_mul_0_l Hos), rngl_add_0_r.
+rewrite Nat.sub_succ_l; [ | easy ].
+rewrite Nat.sub_diag.
+...
+remember (S i) as si; cbn - [ last ]; subst si.
+rewrite (rngl_mul_0_l Hos), rngl_add_0_r, rngl_add_0_l.
+rewrite Nat.sub_0_r.
+
+remember (S i) as si; cbn - [ last nth ]; subst si.
+rewrite Nat.sub_0_r.
+rewrite rngl_add_0_l.
 rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
 rewrite rngl_add_0_r.
 ...
