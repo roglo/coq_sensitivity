@@ -1702,6 +1702,10 @@ specialize (IHx1 x2 y1 y2 Hxy H1).
 now destruct IHx1; subst y1 y2.
 Qed.
 
+Theorem List_last_cons_cons : ∀ A l (x y d : A),
+  last (x :: y :: l) d = last (y :: l) d.
+Proof. easy. Qed.
+
 Theorem List_firstn_seq : ∀ n start len,
   firstn n (seq start len) = seq start (min n len).
 Proof.

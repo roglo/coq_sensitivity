@@ -117,6 +117,32 @@ destruct la as [| a2]. {
   clear blen IHla Hbl.
   rewrite Nat.sub_0_r.
   rewrite rngl_mul_1_r.
+(**)
+  rename a0 into b1.
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
+  destruct lb as [| b2]; [ easy | ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
+  destruct lb as [| b3]; [ easy | ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
+...
   destruct lb as [| b1]. {
     cbn; unfold iter_seq, iter_list; cbn.
     rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
