@@ -55,14 +55,17 @@ Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
   last (la ° lb)%lap 0%L =
-    if length lb =? 0 then hd 0%L la
-    else (last la 0 * last lb 0 ^ (length la - 1))%L.
+    match length lb with
+    | 0 => hd 0%L la
+    | 1 => eval_lap ro la (hd 0%L lb)
+    | _ => (last la 0 * last lb 0 ^ (length la - 1))%L
+    end.
 Proof.
 intros Hos *.
 unfold lap_compose.
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hbz| Hbz]. {
-  apply Nat.eqb_eq, length_zero_iff_nil in Hbz; subst lb.
+remember (length lb) as blen eqn:Hbl; symmetry in Hbl.
+destruct blen. {
+  apply length_zero_iff_nil in Hbl; subst lb.
   unfold rlap_compose; cbn.
   erewrite List_fold_left_ext_in. 2: {
     intros b lb Hb.
@@ -71,26 +74,52 @@ destruct (bool_dec _) as [Hbz| Hbz]. {
   destruct la as [| a]; [ easy | cbn ].
   now rewrite fold_left_app.
 }
-apply Nat.eqb_neq in Hbz.
 unfold rlap_compose; cbn.
 rewrite rev_involutive.
+(*
+destruct blen. {
+  destruct lb as [| b]; [ easy | ].
+  destruct lb; [ cbn | easy ].
+  destruct la as [| a0]; [ easy | cbn ].
+  rewrite fold_left_app; cbn.
+  rewrite <- fold_left_rev_right.
+  rewrite rev_involutive.
+  destruct la as [| a1]. {
+    now cbn; rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
+  }
+  cbn.
+...
+*)
 destruct la as [| a0]. {
+  destruct blen; [ easy | cbn ].
   symmetry; apply (rngl_mul_0_l Hos).
 }
 cbn.
 destruct la as [| a1]. {
-  symmetry; apply rngl_mul_1_r.
+  destruct blen; cbn. {
+    now rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
+  }
+  now rewrite rngl_mul_1_r.
 }
 cbn.
 destruct la as [| a2]. {
   destruct lb as [| b0]; [ easy | cbn ].
-  clear Hbz.
+  cbn in Hbl.
+  apply Nat.succ_inj in Hbl.
   rewrite lap_add_0_r.
   destruct lb as [| b1]; cbn. {
     rewrite rngl_summation_only_one.
     rewrite rngl_mul_1_r.
-...
+    rewrite <- Hbl; cbn.
+    now rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
+  }
+  subst blen; cbn.
+  destruct lb as [| b2]. {
     unfold iter_seq, iter_list; cbn.
+    rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+    now rewrite rngl_add_0_r, rngl_mul_1_r.
+  }
+  cbn.
 ...
 }
 cbn.
