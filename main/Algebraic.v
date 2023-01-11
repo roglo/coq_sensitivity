@@ -142,6 +142,16 @@ destruct la as [| a2]. {
   rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
   rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
   rewrite rngl_add_0_r.
+  destruct lb as [| b4]; [ easy | ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r, (rngl_mul_0_l Hos).
+  rewrite rngl_add_0_r.
 ...
   destruct lb as [| b1]. {
     cbn; unfold iter_seq, iter_list; cbn.
