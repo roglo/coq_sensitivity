@@ -1956,25 +1956,41 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
+Theorem lap_mul_const_l : ∀ a la, ([a] * la)%lap = map (λ b, (a * b)%L) la.
+Proof.
+intros.
+unfold lap_mul.
+destruct la as [| b]; [ easy | ].
+now rewrite lap_convol_mul_const_l.
+Qed.
+
+Theorem lap_mul_const_r : ∀ a la, (la * [a])%lap = map (λ b, (b * a)%L) la.
+Proof.
+intros.
+unfold lap_mul.
+destruct la as [| b]; [ easy | ].
+rewrite Nat.add_sub.
+now rewrite lap_convol_mul_const_r.
+Qed.
+
 Theorem lap_mul_1_l : ∀ la, (1 * la)%lap = la.
 Proof.
 intros.
-unfold lap_mul, lap_one.
-destruct (bool_dec true) as [H| ]; [ clear H | easy ].
-destruct la as [| a]; [ easy | cbn ].
-rewrite rngl_summation_only_one.
+unfold lap_one.
+rewrite lap_mul_const_l; cbn.
+induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_l; f_equal.
-now rewrite lap_convol_mul_1_l.
+apply IHla.
 Qed.
 
 Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
 Proof.
-intros la.
-unfold lap_mul, lap_one; cbn.
-destruct la as [| a]; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-apply lap_convol_mul_1_r.
-now rewrite Nat.add_1_r.
+intros.
+unfold lap_one.
+rewrite lap_mul_const_r; cbn.
+induction la as [| a]; [ easy | cbn ].
+rewrite rngl_mul_1_r; f_equal.
+apply IHla.
 Qed.
 
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
@@ -2359,19 +2375,6 @@ Qed.
 
 (* optional right multiplication by 1; not required if multiplication
    is commutative *)
-
-Theorem lap_mul_const_r : ∀ la a,
-  (la * [a])%lap = map (λ b, (b * a)%L) la.
-Proof.
-intros.
-unfold "*"%lap; cbn.
-destruct la as [| b]; [ easy | cbn ].
-rewrite Nat.sub_0_r.
-rewrite Nat.add_1_r; cbn.
-rewrite rngl_summation_only_one.
-f_equal.
-now apply lap_convol_mul_const_r.
-Qed.
 
 Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
 Proof.

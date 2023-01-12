@@ -111,6 +111,14 @@ cbn.
 rewrite List_cons_length in IHla.
 rewrite Nat_sub_succ_1 in IHla.
 destruct la as [| a2]. {
+  rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
+  cbn - [ lap_mul ].
+  rewrite lap_mul_0_l, lap_add_0_l.
+Check @lap_convol_mul_const_l.
+Check lap_mul_const_l.
+...
+  rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
+...
   cbn.
   destruct lb as [| b0]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
@@ -131,6 +139,10 @@ rewrite fold_left_app; cbn.
 rewrite List_last_cons_cons in IHla.
 rewrite List_cons_length in IHla.
 destruct la as [| a3]. {
+  rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
+  cbn - [ lap_mul ].
+  rewrite lap_mul_0_l, lap_add_0_l.
+...
   cbn.
   destruct lb as [| b0]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
@@ -216,6 +228,31 @@ destruct la as [| a3]. {
   unfold iter_seq, iter_list.
   cbn - [ last ].
   rewrite rngl_add_0_l.
+  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
+  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
+  rewrite Nat.add_succ_r; cbn - [ last ]; rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list; cbn - [ last ].
+...
+  ============================
+  last
+    ((0 + (a2 * b0 + a1) * nth 4 lb 0 + a2 * b1 * nth 3 lb 0 +
+      a2 * b2 * nth 2 lb 0 + a2 * b3 * nth 1 lb 0 + 
+      a2 * b4 * nth 0 lb 0 + a2 * b5 * b5 +
+      nth 0 (map (λ b : A, a2 * b) lb) 0 * b4 +
+      nth 1 (map (λ b : A, a2 * b) lb) 0 * b3 +
+      nth 2 (map (λ b : A, a2 * b) lb) 0 * b2 +
+      nth 3 (map (λ b : A, a2 * b) lb) 0 * b1 +
+      nth 4 (map (λ b : A, a2 * b) lb) 0 * b0)%L
+     :: lap_convol_mul
+          ((a2 * b0 + a1)%L
+           :: (a2 * b1)%L
+              :: (a2 * b2)%L
+                 :: (a2 * b3)%L
+                    :: (a2 * b4)%L
+                       :: (a2 * b5)%L :: map (λ b : A, (a2 * b)%L) lb)
+          (b0 :: b1 :: b2 :: b3 :: b4 :: b5 :: lb) 11 
+          (length lb + length lb)) 0%L =
+  (a2 * (last (b5 :: lb) 0 * last (b5 :: lb) 0))%L
 ...
 
 (*

@@ -1616,6 +1616,9 @@ Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
      Rsub_def := rngl_Rsub_def;
      Ropp_def := rngl_Ropp_def |}.
 
+Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
+Proof. easy. Qed.
+
 End a.
 
 (* code to be added to be able to use the Coq tactic "ring"
