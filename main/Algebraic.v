@@ -43,6 +43,69 @@ rewrite rngl_summation_only_one.
 apply IHla.
 Qed.
 
+Theorem last_lap_add : ∀ la lb,
+  last (la + lb)%lap 0%L =
+    if length la <? length lb then last lb 0%L
+    else if length lb <? length la then last la 0%L
+    else (last la 0 + last lb 0)%L.
+Proof.
+intros.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hab| Hab]. {
+  apply Nat.ltb_lt in Hab.
+  revert lb Hab.
+  induction la as [| a]; intros; [ easy | cbn ].
+  destruct lb as [| b]; [ cbn in Hab; flia Hab | ].
+  cbn in Hab.
+  apply Nat.succ_lt_mono in Hab.
+  specialize (IHla _ Hab).
+  destruct lb as [| b1]; [ easy | ].
+  rewrite List_last_cons_cons.
+  destruct la as [| a1]; [ | easy ].
+  cbn - [ last ].
+  now rewrite List_last_cons_cons.
+}
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hba| Hba]. {
+  clear Hab.
+  apply Nat.ltb_lt in Hba.
+  revert la Hba.
+  induction lb as [| b]; intros; [ now rewrite lap_add_0_r | ].
+  destruct la as [| a]; [ cbn in Hba; flia Hba | ].
+  cbn in Hba.
+  apply Nat.succ_lt_mono in Hba.
+  specialize (IHlb _ Hba).
+  destruct la as [| a1]; [ easy | ].
+  rewrite List_last_cons_cons.
+  destruct lb as [| b1]; [ | easy ].
+  cbn - [ last ].
+  now rewrite List_last_cons_cons.
+}
+apply Nat.ltb_ge in Hab, Hba.
+apply Nat.le_antisymm in Hab; [ clear Hba | easy ].
+remember (length la) as len eqn:Ha.
+rename Hab into Hb.
+symmetry in Ha, Hb.
+revert la lb Ha Hb.
+induction len; intros; cbn. {
+  apply length_zero_iff_nil in Ha, Hb; subst la lb.
+  cbn; symmetry; apply rngl_add_0_l.
+}
+destruct la as [| a]; [ easy | ].
+destruct lb as [| b]; [ easy | ].
+cbn in Ha, Hb.
+apply Nat.succ_inj in Ha, Hb.
+cbn - [ last ].
+destruct la as [| a1]. {
+  subst len.
+  now apply length_zero_iff_nil in Hb; subst lb.
+}
+destruct lb as [| b1]; [ now rewrite <- Hb in Ha | ].
+cbn - [ last ].
+do 3 rewrite List_last_cons_cons.
+now rewrite <- IHlen.
+Qed.
+
 Theorem glop p q :
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -129,36 +192,7 @@ destruct la as [| a1]. {
   now rewrite rngl_add_0_l.
 }
 cbn - [ lap_mul ].
-Theorem last_lap_add : ∀ la lb,
-  last (la + lb)%lap 0%L =
-    if length la <? length lb then last lb 0%L
-    else if length lb <? length la then last la 0%L
-    else (last la 0 + last lb 0)%L.
-Proof.
-intros.
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hab| Hab]. {
-  apply Nat.ltb_lt in Hab.
-  revert lb Hab.
-  induction la as [| a]; intros; [ easy | cbn ].
-  destruct lb as [| b]; [ cbn in Hab; flia Hab | ].
-  cbn in Hab.
-  apply Nat.succ_lt_mono in Hab.
-...
-  destruct lb as [| b1]; [ easy | ].
-  rewrite List_last_cons_cons.
-...
-  destruct la as [| a1]. {
-    destruct lb as [| b1]; [ easy | ].
-    cbn - [ last ].
-    now do 2 rewrite List_last_cons_cons.
-  }
-  destruct lb as [| b1]; [ easy | ].
-  cbn in Hab.
-  apply Nat.succ_lt_mono in Hab.
-  cbn - [ last ].
-  do 2 rewrite List_last_cons_cons.
-...
+Inspect 1.
 rewrite last_lap_add.
 cbn - [ last lap_mul ].
 rewrite lap_mul_length.
