@@ -151,6 +151,71 @@ destruct la as [| a3]. {
   unfold iter_seq, iter_list.
   cbn - [ last ].
   rewrite rngl_add_0_l, map_length.
+  destruct lb as [| b2]. {
+    cbn.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    symmetry; apply rngl_mul_assoc.
+  }
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, Nat.add_succ_r.
+  cbn - [ last ].
+  rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l.
+  destruct lb as [| b3]. {
+    cbn.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    symmetry; apply rngl_mul_assoc.
+  }
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l.
+  destruct lb as [| b4]. {
+    cbn.
+    unfold iter_seq, iter_list; cbn.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite rngl_add_0_l.
+    symmetry; apply rngl_mul_assoc.
+  }
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l.
+  destruct lb as [| b5]. {
+    cbn.
+    unfold iter_seq, iter_list; cbn.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite (rngl_mul_0_r Hos), (rngl_mul_0_l Hos).
+    rewrite rngl_add_0_l, rngl_add_0_r.
+    rewrite rngl_add_0_l.
+    symmetry; apply rngl_mul_assoc.
+  }
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l.
 ...
 
 (*
