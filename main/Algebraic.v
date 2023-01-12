@@ -13,23 +13,23 @@ Require Import Polynomial Matrix Determinant.
 
 Section a.
 
-Context {A : Type}.
-Context {ro : ring_like_op A}.
-Context {rp : ring_like_prop A}.
+Context {T : Type}.
+Context {ro : ring_like_op T}.
+Context {rp : ring_like_prop T}.
 
-Definition rlap_sylvester_list_list (rla rlb : list A) : list (list A) :=
+Definition rlap_sylvester_list_list (rla rlb : list T) : list (list T) :=
   let m := length rla - 1 in
   let n := length rlb - 1 in
   map (λ i, repeat 0%L i ++ rla ++ repeat 0%L (n - 1 - i)) (seq 0 n) ++
   map (λ i, repeat 0%L i ++ rlb ++ repeat 0%L (m - 1 - i)) (seq 0 m).
 
-Definition rlap_sylvester_mat (rla rlb : list A) : matrix A :=
+Definition rlap_sylvester_mat (rla rlb : list T) : matrix T :=
   mk_mat (rlap_sylvester_list_list rla rlb).
 
-Definition polyn_sylvester_mat (p q : polyn A) : matrix A :=
+Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
   mk_mat (rlap_sylvester_list_list (rev (lap p)) (rev (lap q))).
 
-Definition resultant (p q : polyn A) :=
+Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
 Theorem last_fold_left_lap_mul_add : ∀ la b c,
@@ -104,6 +104,18 @@ destruct lb as [| b1]; [ now rewrite <- Hb in Ha | ].
 cbn - [ last ].
 do 3 rewrite List_last_cons_cons.
 now rewrite <- IHlen.
+Qed.
+
+Theorem List_last_map : ∀ A B a b (f : A → B) la,
+  f a = b → last (map f la) b = f (last la a).
+Proof.
+intros * Hab.
+induction la as [| a1]; [ easy | ].
+cbn - [ last ].
+destruct la as [| a2]; [ easy | ].
+cbn - [ last ].
+do 2 rewrite List_last_cons_cons.
+apply IHla.
 Qed.
 
 Theorem glop p q :
@@ -194,7 +206,6 @@ destruct la as [| a1]. {
   now rewrite rngl_add_0_l.
 }
 cbn - [ lap_mul ].
-Inspect 1.
 rewrite last_lap_add.
 cbn - [ last lap_mul ].
 rewrite lap_mul_length.
@@ -225,6 +236,11 @@ apply Nat.ltb_lt in H; cbn in H.
 rewrite lap_convol_mul_length in H.
 apply Nat.succ_lt_mono in H.
 destruct la as [| a2]; [ easy | clear H ].
+rewrite lap_mul_const_l in IHla; [ | easy | easy ].
+rewrite lap_mul_const_l; [ | easy | easy ].
+rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
+rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
+now do 2 rewrite List_last_cons_cons.
 ...
 rewrite last_lap_mul_const_l_add_const_r.
   destruct lb as [| b0]; [ easy | ].
