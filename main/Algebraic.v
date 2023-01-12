@@ -123,12 +123,54 @@ Theorem last_lap_mul_const_l_add_const_r : ∀ a b la,
     end.
 Proof.
 intros.
-destruct la as [| a0]; [ easy | ].
+induction la as [| a0]; [ easy | ].
 destruct la as [| a1]. {
   cbn; unfold iter_seq, iter_list; cbn.
   now rewrite rngl_add_0_l.
 }
 cbn - [ lap_mul ].
+Theorem last_lap_add : ∀ la lb,
+  last (la + lb)%lap 0%L =
+    if length la <? length lb then last lb 0%L
+    else if length lb <? length la then last la 0%L
+    else (last la 0 + last lb 0)%L.
+Proof.
+intros.
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [Hab| Hab]. {
+  apply Nat.ltb_lt in Hab.
+  revert lb Hab.
+  induction la as [| a]; intros; [ easy | cbn ].
+  destruct lb as [| b]; [ cbn in Hab; flia Hab | ].
+  cbn in Hab.
+  apply Nat.succ_lt_mono in Hab.
+...
+  destruct lb as [| b1]; [ easy | ].
+  rewrite List_last_cons_cons.
+...
+  destruct la as [| a1]. {
+    destruct lb as [| b1]; [ easy | ].
+    cbn - [ last ].
+    now do 2 rewrite List_last_cons_cons.
+  }
+  destruct lb as [| b1]; [ easy | ].
+  cbn in Hab.
+  apply Nat.succ_lt_mono in Hab.
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+...
+rewrite last_lap_add.
+cbn - [ last lap_mul ].
+rewrite lap_mul_length.
+rewrite app_length.
+cbn - [ last lap_mul ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H| H]; [ apply Nat.leb_le in H; flia H | clear H ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H| H]; [ clear H | apply Nat.ltb_ge in H; flia H ].
+cbn - [ last lap_mul ] in IHla.
+rewrite last_lap_add in IHla.
+cbn - [ last lap_mul ] in IHla.
 ...
 rewrite last_lap_mul_const_l_add_const_r.
   destruct lb as [| b0]; [ easy | ].
