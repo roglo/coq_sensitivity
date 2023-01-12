@@ -114,13 +114,42 @@ destruct la as [| a2]. {
   rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
   cbn - [ lap_mul ].
   rewrite lap_mul_0_l, lap_add_0_l.
+Theorem last_lap_mul_const_l_add_const_r : ∀ a b la,
+  last ([a] * la + [b])%lap 0%L =
+    match length la with
+    | 0 => b
+    | 1 => (a * hd 0 la + b)%L
+    | _ => last (map (λ b, (a * b)%L) (tl la)) 0%L
+    end.
+Proof.
+intros.
+destruct la as [| a0]; [ easy | ].
+destruct la as [| a1]. {
+  cbn; unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_add_0_l.
+}
+cbn - [ lap_mul ].
+...
+rewrite last_lap_mul_const_l_add_const_r.
+  destruct lb as [| b0]; [ easy | ].
+  destruct lb as [| b1]; [ easy | ].
+  rewrite List_last_cons_cons.
+cbn - [ last ].
+...
+  destruct lb as [| b0]; [ easy | ].
+  destruct lb as [| b1]; [ easy | ].
+  rewrite List_last_cons_cons.
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l.
 ...
   rewrite lap_mul_const_l; [ | easy | easy ].
   rewrite lap_add_const_r; [ | easy ].
   rewrite List_map_tl.
 ...
 rewrite map_tl.
-
 Search ((_ + [_])%lap).
 Search ((_ * [_])%lap).
 ...
