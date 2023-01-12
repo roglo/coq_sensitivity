@@ -1956,6 +1956,19 @@ erewrite map_ext_in. 2: {
 apply map_id.
 Qed.
 
+Theorem lap_add_const_l : ∀ a la, ([a] + la)%lap = (a + hd 0 la)%L :: tl la.
+Proof.
+intros.
+destruct la as [| b]; cbn; f_equal; symmetry; apply rngl_add_0_r.
+Qed.
+
+Theorem lap_add_const_r : ∀ a la, (la + [a])%lap = (hd 0 la + a)%L :: tl la.
+Proof.
+intros.
+destruct la as [| b]; cbn; f_equal; [ symmetry; apply rngl_add_0_l | ].
+apply lap_add_0_r.
+Qed.
+
 Theorem lap_mul_const_l : ∀ a la, ([a] * la)%lap = map (λ b, (a * b)%L) la.
 Proof.
 intros.

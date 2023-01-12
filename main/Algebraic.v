@@ -114,10 +114,20 @@ destruct la as [| a2]. {
   rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
   cbn - [ lap_mul ].
   rewrite lap_mul_0_l, lap_add_0_l.
-Check @lap_convol_mul_const_l.
-Check lap_mul_const_l.
 ...
-  rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
+  rewrite lap_mul_const_l; [ | easy | easy ].
+  rewrite lap_add_const_r; [ | easy ].
+  rewrite List_map_tl.
+...
+rewrite map_tl.
+
+Search ((_ + [_])%lap).
+Search ((_ * [_])%lap).
+...
+Theorem List_last_map : ∀ A B (f : A → B) l d e,
+  f e = d → last (map f l) d = f (last l e).
+...
+rewrite List_last_map.
 ...
   cbn.
   destruct lb as [| b0]; [ easy | ].

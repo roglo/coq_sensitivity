@@ -360,6 +360,10 @@ do 2 rewrite List_hd_nth_0.
 now apply List_map_nth'.
 Qed.
 
+Theorem List_map_tl : ∀ A B (f : A → B) l,
+  tl (map f l) = map f (tl l).
+Proof. now intros; destruct l. Qed.
+
 Theorem List_app_cons : ∀ A la lb (b : A), la ++ b :: lb = la ++ [b] ++ lb.
 Proof. easy. Qed.
 
