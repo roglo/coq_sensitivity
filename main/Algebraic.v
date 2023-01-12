@@ -118,6 +118,59 @@ do 2 rewrite List_last_cons_cons.
 apply IHla.
 Qed.
 
+Theorem last_lap_mul_const_l_add_const_r :
+  rngl_has_opp_or_sous = true →
+  ∀ a b la,
+  last ([a] * la + [b])%lap 0%L =
+    match length la with
+    | 0 => b
+    | 1 => (a * hd 0 la + b)%L
+    | _ => last (map (λ b, (a * b)%L) (tl la)) 0%L
+    end.
+Proof.
+intros Hos *.
+induction la as [| a0]; [ easy | ].
+destruct la as [| a1]. {
+  cbn; unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_add_0_l.
+}
+cbn - [ lap_mul ].
+rewrite last_lap_add.
+cbn - [ last lap_mul ].
+rewrite lap_mul_length.
+rewrite app_length.
+cbn - [ last lap_mul ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H| H]; [ apply Nat.leb_le in H; flia H | clear H ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H| H]; [ clear H | apply Nat.ltb_ge in H; flia H ].
+cbn - [ last lap_mul ] in IHla.
+rewrite last_lap_add in IHla.
+cbn - [ last lap_mul ] in IHla.
+rewrite if_bool_if_dec in IHla.
+destruct (bool_dec _) as [H| H]. {
+  cbn in H; apply Nat.leb_le in H; flia H.
+}
+clear H.
+rewrite if_bool_if_dec in IHla.
+destruct (bool_dec _) as [H| H]. 2: {
+  cbn in H; apply Nat.leb_gt in H.
+  rewrite lap_convol_mul_length in H.
+  apply Nat.succ_lt_mono, Nat.lt_1_r in H.
+  apply length_zero_iff_nil in H; subst la.
+  cbn; unfold iter_seq, iter_list; cbn.
+  now rewrite rngl_add_0_l, (rngl_mul_0_l Hos), rngl_add_0_r.
+}
+apply Nat.ltb_lt in H; cbn in H.
+rewrite lap_convol_mul_length in H.
+apply Nat.succ_lt_mono in H.
+destruct la as [| a2]; [ easy | clear H ].
+rewrite lap_mul_const_l; [ | easy | easy ].
+rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
+rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
+now do 2 rewrite List_last_cons_cons.
+Qed.
+
 Theorem glop p q :
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -189,64 +242,11 @@ destruct la as [| a2]. {
   rewrite app_nil_l, rngl_pow_0_r, rngl_mul_1_r.
   cbn - [ lap_mul ].
   rewrite lap_mul_0_l, lap_add_0_l.
-Theorem last_lap_mul_const_l_add_const_r :
-  rngl_has_opp_or_sous = true →
-  ∀ a b la,
-  last ([a] * la + [b])%lap 0%L =
-    match length la with
-    | 0 => b
-    | 1 => (a * hd 0 la + b)%L
-    | _ => last (map (λ b, (a * b)%L) (tl la)) 0%L
-    end.
-Proof.
-intros Hos *.
-induction la as [| a0]; [ easy | ].
-destruct la as [| a1]. {
-  cbn; unfold iter_seq, iter_list; cbn.
-  now rewrite rngl_add_0_l.
-}
-cbn - [ lap_mul ].
-rewrite last_lap_add.
-cbn - [ last lap_mul ].
-rewrite lap_mul_length.
-rewrite app_length.
-cbn - [ last lap_mul ].
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [H| H]; [ apply Nat.leb_le in H; flia H | clear H ].
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [H| H]; [ clear H | apply Nat.ltb_ge in H; flia H ].
-cbn - [ last lap_mul ] in IHla.
-rewrite last_lap_add in IHla.
-cbn - [ last lap_mul ] in IHla.
-rewrite if_bool_if_dec in IHla.
-destruct (bool_dec _) as [H| H]. {
-  cbn in H; apply Nat.leb_le in H; flia H.
-}
-clear H.
-rewrite if_bool_if_dec in IHla.
-destruct (bool_dec _) as [H| H]. 2: {
-  cbn in H; apply Nat.leb_gt in H.
-  rewrite lap_convol_mul_length in H.
-  apply Nat.succ_lt_mono, Nat.lt_1_r in H.
-  apply length_zero_iff_nil in H; subst la.
-  cbn; unfold iter_seq, iter_list; cbn.
-  now rewrite rngl_add_0_l, (rngl_mul_0_l Hos), rngl_add_0_r.
-}
-apply Nat.ltb_lt in H; cbn in H.
-rewrite lap_convol_mul_length in H.
-apply Nat.succ_lt_mono in H.
-destruct la as [| a2]; [ easy | clear H ].
-rewrite lap_mul_const_l in IHla; [ | easy | easy ].
-rewrite lap_mul_const_l; [ | easy | easy ].
-rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
-rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
-now do 2 rewrite List_last_cons_cons.
-...
-rewrite last_lap_mul_const_l_add_const_r.
+  rewrite (last_lap_mul_const_l_add_const_r Hos).
   destruct lb as [| b0]; [ easy | ].
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
-cbn - [ last ].
+  cbn - [ last ].
 ...
   destruct lb as [| b0]; [ easy | ].
   destruct lb as [| b1]; [ easy | ].
