@@ -43,39 +43,6 @@ rewrite rngl_summation_only_one.
 apply IHla.
 Qed.
 
-Theorem last_cons_lap_convol_mul :
-  rngl_has_opp_or_sous = true →
-  ∀ i la lb a b,
-  i = S (length la)
-  → last ((a * b)%L :: lap_convol_mul [a] (la ++ b :: lb) i (length lb))
-      0%L = (a * last (b :: lb) 0)%L.
-Proof.
-intros Hos * Hi.
-revert a b la i Hi.
-induction lb as [| b1]; intros; [ easy | ].
-cbn - [ last nth "-" ].
-do 2 rewrite List_last_cons_cons.
-rewrite <- IHlb with (la := la ++ [b]) (i := S i). 2: {
-  rewrite app_length, Nat.add_1_r.
-  now f_equal.
-}
-rewrite <- app_assoc.
-f_equal; f_equal.
-rewrite rngl_summation_split_first; [ | easy ].
-cbn.
-rewrite all_0_rngl_summation_0. 2: {
-  intros j Hj.
-  destruct j; [ easy | ].
-  rewrite Tauto_match_nat_same.
-  apply (rngl_mul_0_l Hos).
-}
-rewrite Nat.sub_0_r, rngl_add_0_r.
-subst i.
-rewrite app_nth2; [ | flia ].
-rewrite Nat.sub_succ_l; [ | easy ].
-now rewrite Nat.sub_diag.
-Qed.
-
 Theorem glop p q :
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
@@ -147,11 +114,18 @@ destruct la as [| a2]. {
   cbn.
   destruct lb as [| b0]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
-  destruct lb; [ easy | ].
+  destruct lb as [| b1]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
   rewrite Nat.sub_0_r, rngl_mul_1_r.
-  erewrite <- (last_cons_lap_convol_mul Hos) with (la := []); [ | easy ].
-  easy.
+  rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  clear Hbl.
+  revert b1.
+  induction lb as [| b2]; intros; [ easy | ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  apply IHlb.
 }
 rewrite fold_left_app; cbn.
 rewrite List_last_cons_cons in IHla.
@@ -160,22 +134,23 @@ destruct la as [| a3]. {
   cbn.
   destruct lb as [| b0]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
-  destruct lb; [ easy | ].
+  destruct lb as [| b1]; [ easy | ].
   cbn in Hbl; apply Nat.succ_inj in Hbl.
   rewrite Nat.sub_0_r, rngl_mul_1_r.
   rewrite List_last_cons_cons.
   do 2 rewrite List_cons_length.
   rewrite lap_convol_mul_const_l; [ | easy | easy | easy ].
   rewrite skipn_O.
-...
-  erewrite <- (last_cons_lap_convol_mul Hos) with (la := []); [ | easy ].
-  rewrite List_last_cons_cons.
+  cbn - [ last ].
+  rewrite Nat.add_succ_r.
   cbn - [ last ].
   rewrite List_last_cons_cons.
-  unfold iter_seq, iter_list; cbn.
-  do 4 rewrite rngl_add_0_l.
-  rewrite (rngl_mul_0_l Hos).
-  do 2 rewrite rngl_add_0_r.
+  rewrite Nat.add_succ_r.
+  cbn - [ last ].
+  rewrite List_last_cons_cons.
+  unfold iter_seq, iter_list.
+  cbn - [ last ].
+  rewrite rngl_add_0_l, map_length.
 ...
 
 (*
