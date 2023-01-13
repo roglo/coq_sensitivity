@@ -193,7 +193,6 @@ destruct pb as [pb| pb]. {
 }
 right.
 apply (rngl_neqb_neq Heb) in pa, pb.
-...
 Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
@@ -217,8 +216,6 @@ destruct blen. {
   destruct la as [| a]; [ easy | cbn ].
   now rewrite fold_left_app.
 }
-unfold rlap_compose; cbn.
-rewrite rev_involutive.
 destruct blen. {
   unfold eval_lap, eval_rlap.
   remember (rev la) as rla; clear la Heqrla.
@@ -228,6 +225,7 @@ destruct blen. {
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
   apply last_fold_left_lap_mul_add.
 }
+...
 revert lb Hbl.
 induction la as [| a]; intros; cbn. {
   symmetry; apply rngl_mul_1_r.
