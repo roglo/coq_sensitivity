@@ -3898,8 +3898,8 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
 
+(*
 (* evaluation of a polynomial in x *)
-
 Definition eval_rlap rla x :=
   fold_left (λ accu a, (accu * x + a)%L) rla 0%L.
 
@@ -3919,17 +3919,30 @@ Definition lap_compose la lb :=
 
 (* grouping together "eval" and "compose" *)
 (* is it anecdotal or useful? *)
+*)
 
-Definition gen_eval_rlap A (zero : A) (add mul : A → A → A) rla x :=
-  fold_left (λ accu a, add (mul accu x) a) rla zero.
+(* evaluation of a polynomial in x *)
+(* and composition of polynomials *)
 
-Definition eval_rlap' :=
-  gen_eval_rlap 0%L rngl_add rngl_mul.
+Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
+  iter_list rla (λ accu a, add (mul accu x) a) zero.
 
-Definition rlap_compose' rla rlb :=
-  let ro := lap_ring_like_op in
-  gen_eval_rlap [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
+Definition eval_rlap :=
+  rlap_horner 0%L rngl_add rngl_mul.
 
+Definition eval_lap la x :=
+  eval_rlap (rev la) x.
+
+Definition eval_polyn pol :=
+  eval_lap (lap pol).
+
+Definition rlap_compose rla rlb :=
+  rlap_horner [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
+
+Definition lap_compose la lb :=
+  rlap_compose (rev la) (rev lb).
+
+(*
 Theorem eval_rlap_eval_rlap' : ∀ rla a,
   eval_rlap rla a = eval_rlap' rla a.
 Proof. easy. Qed.
@@ -3938,9 +3951,10 @@ Theorem rlap_compose_rlap_compose' : ∀ rla rlb,
   rlap_compose rla rlb = rlap_compose' rla rlb.
 Proof.
 intros.
-unfold rlap_compose', gen_eval_rlap.
+unfold rlap_compose', rlap_horner, iter_list.
 now rewrite List_fold_left_map.
 Qed.
+*)
 
 (* roots *)
 
@@ -3948,7 +3962,7 @@ Theorem eval_lap_is_rngl_eval_polyn :
   ∀ la x, eval_lap la x = rngl_eval_polyn la x.
 Proof.
 intros.
-unfold eval_lap, eval_rlap.
+unfold eval_lap, eval_rlap, rlap_horner, iter_list.
 induction la as [| a]; [ easy | cbn ].
 rewrite fold_left_app; cbn.
 now rewrite IHla.

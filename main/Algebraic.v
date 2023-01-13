@@ -208,32 +208,28 @@ unfold lap_compose.
 remember (length lb) as blen eqn:Hbl; symmetry in Hbl.
 destruct blen. {
   apply length_zero_iff_nil in Hbl; subst lb.
-  unfold rlap_compose; cbn.
+  unfold rlap_compose, rlap_horner, iter_list; cbn.
   erewrite List_fold_left_ext_in. 2: {
     intros b lb Hb.
     now rewrite lap_mul_0_r, lap_add_0_l.
   }
   destruct la as [| a]; [ easy | cbn ].
-  now rewrite fold_left_app.
+  now rewrite map_app, fold_left_app.
 }
 destruct blen. {
-  unfold eval_lap, eval_rlap.
+  unfold eval_lap, eval_rlap, rlap_horner, iter_list.
   remember (rev la) as rla; clear la Heqrla.
   destruct lb as [| b]; [ easy | ].
   destruct lb; [ cbn; clear Hbl | easy ].
   destruct rla as [| a2]; intros; [ easy | cbn ].
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
+  unfold rlap_compose, rlap_horner, iter_list; cbn.
+  rewrite List_fold_left_map.
   apply last_fold_left_lap_mul_add.
 }
-...
-rlap_compose =
-λ (T : Type) (ro : ring_like_op T) (rla rlb : list T),
-  fold_left (λ (accu : list T) (a : T), (accu * rev rlb + [a])%lap) rla []
-     : ∀ T : Type, ring_like_op T → list T → list T → list T
-eval_rlap =
-λ (T : Type) (ro : ring_like_op T) (rla : list T) (x : T),
-  fold_left (λ accu a : T, (accu * x + a)%L) rla 0%L
-     : ∀ T : Type, ring_like_op T → list T → T → T
+unfold rlap_compose, rlap_horner, iter_list.
+rewrite List_fold_left_map.
+rewrite rev_involutive.
 ...
 revert lb Hbl.
 induction la as [| a]; intros; cbn. {
