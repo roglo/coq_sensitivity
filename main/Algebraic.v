@@ -226,6 +226,15 @@ destruct blen. {
   apply last_fold_left_lap_mul_add.
 }
 ...
+rlap_compose =
+λ (T : Type) (ro : ring_like_op T) (rla rlb : list T),
+  fold_left (λ (accu : list T) (a : T), (accu * rev rlb + [a])%lap) rla []
+     : ∀ T : Type, ring_like_op T → list T → list T → list T
+eval_rlap =
+λ (T : Type) (ro : ring_like_op T) (rla : list T) (x : T),
+  fold_left (λ accu a : T, (accu * x + a)%L) rla 0%L
+     : ∀ T : Type, ring_like_op T → list T → T → T
+...
 revert lb Hbl.
 induction la as [| a]; intros; cbn. {
   symmetry; apply rngl_mul_1_r.
