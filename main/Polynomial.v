@@ -2006,6 +2006,13 @@ rewrite rngl_mul_1_r; f_equal.
 apply IHla.
 Qed.
 
+Theorem lap_opt_mul_1_r :
+  if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
+Proof.
+destruct rngl_mul_is_comm; [ easy | ].
+apply lap_mul_1_r.
+Qed.
+
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
 Proof.
 intros (la, lapr).
@@ -2373,6 +2380,16 @@ destruct la as [| a]; [ now destruct lb | cbn ].
 rewrite <- Nat.add_succ_comm; cbn.
 rewrite (Nat.add_comm (length lb)).
 now rewrite lap_convol_mul_comm.
+Qed.
+
+Theorem lap_opt_mul_comm :
+  if rngl_mul_is_comm then ∀ a b : list T, (a * b)%lap = (b * a)%lap
+  else not_applicable.
+Proof.
+remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
+destruct ic; [ | easy ].
+intros.
+apply (lap_mul_comm Hic).
 Qed.
 
 Theorem polyn_opt_mul_comm :
@@ -3860,6 +3877,49 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
 }
 Qed.
 
+(*
+Definition lap_ring_like_prop : ring_like_prop (list T) :=
+  let rol := lap_ring_like_op in
+  {| rngl_mul_is_comm := rngl_mul_is_comm;
+     rngl_has_dec_le := rngl_has_dec_le;
+     rngl_is_integral := rngl_is_integral;
+     rngl_is_alg_closed := false;
+     rngl_characteristic := rngl_characteristic;
+     rngl_add_comm := lap_add_comm;
+     rngl_add_assoc := lap_add_assoc;
+     rngl_add_0_l := lap_add_0_l;
+     rngl_mul_assoc := lap_mul_assoc;
+     rngl_mul_1_l := lap_mul_1_l;
+     rngl_mul_add_distr_l := lap_mul_add_distr_l;
+     rngl_opt_mul_comm := lap_opt_mul_comm;
+     rngl_opt_mul_1_r := lap_opt_mul_1_r;
+...
+     rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
+     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+     rngl_opt_add_sub := ?rngl_opt_add_sub;
+     rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
+     rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
+     rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
+     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
+     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+     rngl_opt_mul_div := ?rngl_opt_mul_div;
+     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
+     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
+     rngl_opt_le_dec := ?rngl_opt_le_dec;
+     rngl_opt_integral := ?rngl_opt_integral;
+     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
+     rngl_characteristic_prop := ?rngl_characteristic_prop;
+     rngl_opt_le_refl := ?rngl_opt_le_refl;
+     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
+     rngl_opt_le_trans := ?rngl_opt_le_trans;
+     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
+     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
+     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
+     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
+     rngl_opt_not_le := ?rngl_opt_not_le |}.
+...
+*)
+
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
      rngl_has_dec_le := rngl_has_dec_le;
@@ -3898,29 +3958,6 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
 
-(*
-(* evaluation of a polynomial in x *)
-Definition eval_rlap rla x :=
-  fold_left (λ accu a, (accu * x + a)%L) rla 0%L.
-
-Definition eval_lap la x :=
-  eval_rlap (rev la) x.
-
-Definition eval_polyn pol :=
-  eval_lap (lap pol).
-
-(* composition *)
-
-Definition rlap_compose rla rlb :=
-  fold_left (λ (accu : list T) (a : T), (accu * rev rlb + [a])%lap) rla [].
-
-Definition lap_compose la lb :=
-  rlap_compose (rev la) (rev lb).
-
-(* grouping together "eval" and "compose" *)
-(* is it anecdotal or useful? *)
-*)
-
 (* evaluation of a polynomial in x *)
 (* and composition of polynomials *)
 
@@ -3941,20 +3978,6 @@ Definition rlap_compose rla rlb :=
 
 Definition lap_compose la lb :=
   rlap_compose (rev la) (rev lb).
-
-(*
-Theorem eval_rlap_eval_rlap' : ∀ rla a,
-  eval_rlap rla a = eval_rlap' rla a.
-Proof. easy. Qed.
-
-Theorem rlap_compose_rlap_compose' : ∀ rla rlb,
-  rlap_compose rla rlb = rlap_compose' rla rlb.
-Proof.
-intros.
-unfold rlap_compose', rlap_horner, iter_list.
-now rewrite List_fold_left_map.
-Qed.
-*)
 
 (* roots *)
 
