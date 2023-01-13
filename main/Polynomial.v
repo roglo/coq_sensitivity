@@ -3669,6 +3669,34 @@ destruct (bool_dec _) as [Hiv2| Hiv2]. {
 now rewrite Hiv in Hiv2.
 Qed.
 
+(*
+Theorem lap_opt_mul_div :
+  let _ := lap_ring_like_op in
+  if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
+  else not_applicable.
+Proof.
+intros rol; subst rol.
+unfold rngl_has_quot; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
+destruct (bool_dec rngl_has_opp) as [Hop| ]; [ | easy ].
+destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
+remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
+destruct iq as [inv| ]; [ | easy ].
+intros a b Hbz.
+unfold rngl_div, rngl_has_inv; cbn.
+unfold lap_opt_inv_or_quot.
+unfold rngl_has_quot, lap_opt_inv_or_quot; cbn.
+unfold rngl_quot; cbn.
+unfold lap_opt_inv_or_quot.
+rewrite Hco, Hop, Hiv, Hiq.
+destruct (bool_dec true); [ | easy ].
+Check lap_mul_div.
+...
+apply lap_mul_div; try easy.
+Qed.
+*)
+
 Theorem polyn_opt_mul_div :
   let _ := polyn_ring_like_op in
   if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
@@ -3693,6 +3721,19 @@ destruct (bool_dec true); [ | easy ].
 now apply polyn_mul_div.
 Qed.
 
+Theorem lap_opt_mul_quot_r :
+  let rol := lap_ring_like_op in
+  if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
+    ∀ a b, b ≠ 0%L → (b * a / b)%L = a
+  else not_applicable.
+Proof.
+intros rol.
+unfold rngl_has_quot; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
+now rewrite Bool.andb_false_r.
+Qed.
+
 Theorem polyn_opt_mul_quot_r :
   let _ := polyn_ring_like_op in
   if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
@@ -3705,6 +3746,25 @@ unfold polyn_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
+
+(*
+Theorem lap_opt_eqb_eq :
+  let rol := lap_ring_like_op in
+  if rngl_has_eqb then ∀ a b, (a =? b)%L = true ↔ a = b
+  else not_applicable.
+Proof.
+intros rol; subst rol.
+intros a b; cbn.
+...
+apply lap_eqb_eq.
+intros c d.
+split; intros Hcd. {
+  now apply (rngl_eqb_eq Heb) in Hcd.
+}
+subst c.
+now apply rngl_eqb_eq.
+Qed.
+*)
 
 Theorem polyn_opt_eqb_eq :
   let rop := polyn_ring_like_op in
@@ -3722,6 +3782,16 @@ subst c.
 now apply rngl_eqb_eq.
 Qed.
 
+Theorem lap_opt_le_dec :
+  let rol := lap_ring_like_op in
+  if rngl_has_dec_le then ∀ a b, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
+  else not_applicable.
+Proof.
+intros rol; subst rol.
+destruct rngl_has_dec_le; [ | easy ].
+now intros; right; cbn.
+Qed.
+
 Theorem polyn_opt_le_dec :
   let _ := polyn_ring_like_op in
   if rngl_has_dec_le then ∀ a b : polyn T, {(a ≤ b)%L} + {¬ (a ≤ b)%L}
@@ -3730,6 +3800,45 @@ Proof.
 intros rop; subst rop.
 destruct rngl_has_dec_le; [ | easy ].
 now intros; right; cbn.
+Qed.
+
+Theorem lap_opt_integral :
+  let rol := lap_ring_like_op in
+  if rngl_is_integral then
+    ∀ a b, (a * b)%L = 0%L → a = 0%L ∨ b = 0%L
+  else not_applicable.
+Proof.
+intros rol; subst rol.
+destruct (bool_dec rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
+intros la lb Hab.
+cbn in Hab.
+enough (H : la = [] ∨ lb = []). {
+  destruct H as [H| Ha]; [ left; subst la | right; subst lb ].
+  easy.
+  easy.
+}
+destruct la as [| a] using rev_ind; [ now left | clear IHla ].
+destruct lb as [| b] using rev_ind; [ now right | clear IHlb ].
+specialize (last_lap_mul (la ++ [a]) (lb ++ [b])) as H2.
+do 2 rewrite last_last in H2.
+rewrite Hab in H2.
+symmetry in H2; cbn in H2.
+apply (rngl_integral Hos) in H2; [ | now rewrite Hii ].
+destruct H2 as [H2| H2]. {
+  subst a.
+  unfold lap_mul in Hab; cbn in Hab.
+  destruct la as [| a']; [ now destruct lb | ].
+  cbn in Hab.
+  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
+  now destruct lb.
+} {
+  subst b.
+  unfold lap_mul in Hab; cbn in Hab.
+  destruct la as [| a']; [ now destruct lb | ].
+  cbn in Hab.
+  rewrite app_length, Nat.add_1_r in Hab; cbn in Hab.
+  now destruct lb.
+}
 Qed.
 
 Theorem polyn_opt_integral :
@@ -3911,6 +4020,46 @@ apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
+(*
+Theorem lap_characteristic_prop :
+  let rol := lap_ring_like_op in
+  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  else
+    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
+    rngl_of_nat rngl_characteristic = 0%L.
+Proof.
+intros rol; subst rol.
+specialize rngl_characteristic_prop as H1.
+rewrite if_eqb_eq_dec in H1 |-*.
+destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
+  intros i.
+  specialize (H1 i) as H.
+  intros Hi; apply H; clear H.
+Check lap_polyn_rngl_of_nat_char_0.
+...
+  rewrite lap_polyn_rngl_of_nat_char_0 in Hi.
+} {
+  destruct H1 as (Hbef, Hch).
+  split. {
+    intros i Hi; cbn.
+    specialize (Hbef _ Hi) as H1.
+    intros H; apply H1; clear H1; rename H into H1.
+    generalize H1; intros H2.
+    apply (f_equal lap) in H2; cbn in H2.
+    now rewrite lap_polyn_rngl_of_nat_2 in H2.
+  }
+  apply eq_polyn_eq; cbn.
+  rewrite lap_polyn_rngl_of_nat.
+  rewrite lap_rngl_of_nat.
+  apply Nat.eqb_neq in Hcz.
+  rewrite <- if_eqb_eq_dec, Hcz.
+  apply Nat.eqb_neq in Hcz.
+  rewrite Hch; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
+Qed.
+*)
+
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
   if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -3974,21 +4123,27 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_sub_distr_r := lap_opt_has_no_sous _;
      rngl_opt_mul_inv_l := lap_opt_has_no_inv _;
      rngl_opt_mul_inv_r := lap_opt_has_no_inv_and _ _;
-     rngl_opt_mul_div := ?rngl_opt_mul_div;
-     rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
-     rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
-     rngl_opt_le_dec := ?rngl_opt_le_dec;
-     rngl_opt_integral := ?rngl_opt_integral;
-     rngl_opt_alg_closed := ?rngl_opt_alg_closed;
-     rngl_characteristic_prop := ?rngl_characteristic_prop;
-     rngl_opt_le_refl := ?rngl_opt_le_refl;
-     rngl_opt_le_antisymm := ?rngl_opt_le_antisymm;
-     rngl_opt_le_trans := ?rngl_opt_le_trans;
-     rngl_opt_add_le_compat := ?rngl_opt_add_le_compat;
-     rngl_opt_mul_le_compat_nonneg := ?rngl_opt_mul_le_compat_nonneg;
-     rngl_opt_mul_le_compat_nonpos := ?rngl_opt_mul_le_compat_nonpos;
-     rngl_opt_mul_le_compat := ?rngl_opt_mul_le_compat;
-     rngl_opt_not_le := ?rngl_opt_not_le |}.
+(*
+     rngl_opt_mul_div := lap_opt_mul_div;
+*)
+     rngl_opt_mul_quot_r := lap_opt_mul_quot_r;
+(*
+     rngl_opt_eqb_eq := lap_opt_eqb_eq;
+*)
+     rngl_opt_le_dec := lap_opt_le_dec;
+     rngl_opt_integral := lap_opt_integral;
+     rngl_opt_alg_closed := NA;
+(*
+     rngl_characteristic_prop := lap_characteristic_prop;
+*)
+     rngl_opt_le_refl := NA;
+     rngl_opt_le_antisymm := NA;
+     rngl_opt_le_trans := NA;
+     rngl_opt_add_le_compat := NA;
+     rngl_opt_mul_le_compat_nonneg := NA;
+     rngl_opt_mul_le_compat_nonpos := NA;
+     rngl_opt_mul_le_compat := NA;
+     rngl_opt_not_le := NA |}.
 ...
 *)
 
