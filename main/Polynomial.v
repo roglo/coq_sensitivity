@@ -2327,6 +2327,14 @@ apply eq_lap_norm_eq_length. 2: {
 apply lap_norm_mul_add_distr_r.
 Qed.
 
+Theorem lap_opt_mul_add_distr_r :
+   if rngl_mul_is_comm then not_applicable
+   else ∀ a b c : list T, ((a + b) * c)%lap = (a * c + b * c)%lap.
+Proof.
+destruct rngl_mul_is_comm; [ easy | ].
+apply lap_mul_add_distr_r.
+Qed.
+
 Theorem polyn_mul_add_distr_l : ∀ pa pb pc,
   (pa * (pb + pc))%pol = (pa * pb + pa * pc)%pol.
 Proof.
@@ -2488,8 +2496,34 @@ rewrite lap_add_norm_idemp_l.
 now apply lap_norm_add_opp_l.
 Qed.
 
+(*
+Theorem lap_opt_add_opp_l :
+  let rol := lap_ring_like_op in
+  if rngl_has_opp then ∀ a : list T, (- a + a)%L = 0%L else not_applicable.
+Proof.
+intros rol; subst rol.
+remember rngl_has_opp as op eqn:Hop; symmetry in Hop.
+intros.
+destruct op; [ | easy ].
+intros la.
+unfold rngl_opp; cbn.
+unfold lap_opt_opp_or_sous.
+specialize lap_add_opp_l as add_opp_l.
+unfold rngl_has_opp in Hop, add_opp_l.
+cbn in Hop, add_opp_l.
+unfold lap_opt_opp_or_sous in Hop, add_opp_l.
+destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+destruct opp as [opp| ]; [ | easy ].
+rewrite add_opp_l; [ | easy ].
+(* question of equality *)
+...
+  ============================
+  repeat 0%L (length la) = []
+Qed.
+*)
+
 Theorem polyn_opt_add_opp_l :
-  let _ := polyn_ring_like_op in
+  let rop := polyn_ring_like_op in
   if rngl_has_opp then ∀ a : polyn T, (- a + a)%L = 0%L else not_applicable.
 Proof.
 intros rop; subst rop.
@@ -3893,9 +3927,8 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_mul_add_distr_l := lap_mul_add_distr_l;
      rngl_opt_mul_comm := lap_opt_mul_comm;
      rngl_opt_mul_1_r := lap_opt_mul_1_r;
-...
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
-     rngl_opt_add_opp_l := ?rngl_opt_add_opp_l;
+     rngl_opt_add_opp_l := lap_opt_add_opp_l;
      rngl_opt_add_sub := ?rngl_opt_add_sub;
      rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
      rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
