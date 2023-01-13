@@ -193,6 +193,7 @@ destruct pb as [pb| pb]. {
 }
 right.
 apply (rngl_neqb_neq Heb) in pa, pb.
+...
 Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
@@ -219,10 +220,7 @@ destruct blen. {
 unfold rlap_compose; cbn.
 rewrite rev_involutive.
 destruct blen. {
-  unfold eval_lap.
-  symmetry.
-  rewrite <- (rev_involutive la) at 1.
-  rewrite fold_left_rev_right; symmetry.
+  unfold eval_lap, eval_rlap.
   remember (rev la) as rla; clear la Heqrla.
   destruct lb as [| b]; [ easy | ].
   destruct lb; [ cbn; clear Hbl | easy ].
@@ -235,10 +233,7 @@ induction la as [| a]; intros; cbn. {
   symmetry; apply rngl_mul_1_r.
 }
 rewrite fold_left_app; cbn.
-destruct la as [| a1]. {
-  now cbn; rewrite rngl_mul_1_r.
-}
-cbn.
+destruct la as [| a1]; [ now cbn; rewrite rngl_mul_1_r | cbn ].
 rewrite List_cons_length in IHla.
 rewrite Nat_sub_succ_1 in IHla.
 destruct la as [| a2]. {
@@ -259,6 +254,16 @@ destruct la as [| a2]. {
 }
 specialize (IHla _ Hbl) as H1.
 rewrite List_last_cons_cons in H1.
+rewrite last_lap_add.
+cbn - [ last ].
+rewrite if_bool_if_dec.
+destruct (bool_dec _) as [H2| H2]. {
+  apply Nat.ltb_lt, Nat.lt_1_r, length_zero_iff_nil in H2.
+  rewrite fold_left_app in H2.
+  rewrite fold_left_app in H2.
+  cbn in H2.
+...
+remember (a2 :: la) as l; cbn - [ last ] in H1; subst l.
 ...
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.

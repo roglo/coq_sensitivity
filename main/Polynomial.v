@@ -3898,21 +3898,24 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
 
-(* composition *)
+(* evaluation of a polynomial in x *)
 
-Definition rlap_compose rla rlb :=
-  fold_left (λ accu a, lap_add (lap_mul accu (rev rlb)) [a]) rla [].
-
-Definition lap_compose la lb :=
-  rlap_compose (rev la) (rev lb).
-
-(* *)
+Definition eval_rlap rla x :=
+  fold_left (λ accu a, (accu * x + a)%L) rla 0%L.
 
 Definition eval_lap la x :=
-  (List.fold_right (λ c accu, accu * x + c) 0 la)%L.
+  eval_rlap (rev la) x.
 
 Definition eval_polyn pol :=
   eval_lap (lap pol).
+
+(* composition *)
+
+Definition rlap_compose rla rlb :=
+  fold_left (λ (accu : list T) (a : T), (accu * rev rlb + [a])%lap) rla [].
+
+Definition lap_compose la lb :=
+  rlap_compose (rev la) (rev lb).
 
 (* roots *)
 
@@ -3920,10 +3923,10 @@ Theorem eval_lap_is_rngl_eval_polyn :
   ∀ la x, eval_lap la x = rngl_eval_polyn la x.
 Proof.
 intros.
-unfold eval_lap.
+unfold eval_lap, eval_rlap.
 induction la as [| a]; [ easy | cbn ].
-f_equal; f_equal.
-apply IHla.
+rewrite fold_left_app; cbn.
+now rewrite IHla.
 Qed.
 
 End a.
