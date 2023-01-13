@@ -2544,6 +2544,17 @@ Qed.
 
 (* *)
 
+Theorem lap_opt_has_no_sous : ∀ P,
+  let _ := lap_ring_like_op in
+  if rngl_has_sous then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_sous; cbn.
+unfold lap_opt_opp_or_sous.
+destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+now destruct opp.
+Qed.
+
 Theorem polyn_opt_has_no_sous : ∀ P,
   let _ := polyn_ring_like_op in
   if rngl_has_sous then P else not_applicable.
@@ -2555,6 +2566,19 @@ destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
+Theorem lap_opt_has_no_inv : ∀ P,
+  let _ := lap_ring_like_op in
+  if rngl_has_inv then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_inv; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (bool_dec rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
+destruct (bool_dec rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (bool_dec rngl_has_inv); [ | easy ].
+now destruct rngl_opt_inv_or_quot.
+Qed.
+
 Theorem polyn_opt_has_no_inv : ∀ P,
   let _ := polyn_ring_like_op in
   if rngl_has_inv then P else not_applicable.
@@ -2564,6 +2588,19 @@ unfold rngl_has_inv; cbn.
 unfold polyn_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
 destruct (bool_dec rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (bool_dec rngl_has_inv); [ | easy ].
+now destruct rngl_opt_inv_or_quot.
+Qed.
+
+Theorem lap_opt_has_no_inv_and : ∀ e P,
+  let _ := lap_ring_like_op in
+  if (rngl_has_inv && e)%bool then P else not_applicable.
+Proof.
+intros.
+unfold rngl_has_inv; cbn.
+unfold lap_opt_inv_or_quot.
+destruct (bool_dec rngl_mul_is_comm); [ | easy ].
+destruct (bool_dec rngl_has_opp); [ | easy ].
 destruct (bool_dec rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
@@ -3928,13 +3965,15 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_comm := lap_opt_mul_comm;
      rngl_opt_mul_1_r := lap_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
+(*
      rngl_opt_add_opp_l := lap_opt_add_opp_l;
-     rngl_opt_add_sub := ?rngl_opt_add_sub;
-     rngl_opt_sub_sub_sub_add := ?rngl_opt_sub_sub_sub_add;
-     rngl_opt_mul_sub_distr_l := ?rngl_opt_mul_sub_distr_l;
-     rngl_opt_mul_sub_distr_r := ?rngl_opt_mul_sub_distr_r;
-     rngl_opt_mul_inv_l := ?rngl_opt_mul_inv_l;
-     rngl_opt_mul_inv_r := ?rngl_opt_mul_inv_r;
+*)
+     rngl_opt_add_sub := lap_opt_has_no_sous _;
+     rngl_opt_sub_sub_sub_add := lap_opt_has_no_sous _;
+     rngl_opt_mul_sub_distr_l := lap_opt_has_no_sous _;
+     rngl_opt_mul_sub_distr_r := lap_opt_has_no_sous _;
+     rngl_opt_mul_inv_l := lap_opt_has_no_inv _;
+     rngl_opt_mul_inv_r := lap_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := ?rngl_opt_mul_div;
      rngl_opt_mul_quot_r := ?rngl_opt_mul_quot_r;
      rngl_opt_eqb_eq := ?rngl_opt_eqb_eq;
@@ -4049,4 +4088,4 @@ Notation "a * b" := (lap_mul a b) : lap_scope.
 Notation "a / b" := (lap_quot a b) : lap_scope.
 Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
 Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
- lap_scope.
+  lap_scope.
