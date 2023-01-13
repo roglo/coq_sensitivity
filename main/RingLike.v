@@ -1616,6 +1616,15 @@ Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
      Rsub_def := rngl_Rsub_def;
      Ropp_def := rngl_Ropp_def |}.
 
+Theorem rngl_pow_0_l :
+  rngl_has_opp_or_sous = true →
+  ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
+Proof.
+intros Hos *.
+destruct n; [ easy | cbn ].
+apply (rngl_mul_0_l Hos).
+Qed.
+
 Theorem rngl_pow_0_r : ∀ a, (a ^ 0 = 1)%L.
 Proof. easy. Qed.
 

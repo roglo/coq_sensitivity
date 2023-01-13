@@ -229,7 +229,13 @@ destruct blen. {
 }
 unfold rlap_compose, rlap_horner, iter_list.
 rewrite rev_involutive.
+...
 rewrite List_fold_left_map.
+destruct lb as [| b1]; [ easy | ].
+destruct lb as [| b2]; [ easy | ].
+rewrite List_last_cons_cons.
+cbn in Hbl.
+do 2 apply Nat.succ_inj in Hbl.
 ...
 last_fold_left_lap_mul_add:
   ∀ (la : list T) (b c : T),
