@@ -171,11 +171,13 @@ rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 now do 2 rewrite List_last_cons_cons.
 Qed.
 
-Theorem glop p q :
+Theorem glop :
+  rngl_has_eqb = true →
+  ∀ p q,
   lap q ≠ []
   → has_polyn_prop (lap p ° lap q) = true.
 Proof.
-intros Hq.
+intros Heb * Hq.
 destruct p as (la, pa).
 destruct q as (lb, pb).
 move lb before la.
@@ -190,6 +192,7 @@ destruct pb as [pb| pb]. {
   now apply is_empty_list_empty in pb; subst lb.
 }
 right.
+apply (rngl_neqb_neq Heb) in pa, pb.
 Theorem last_lap_compose :
   rngl_has_opp_or_sous = true →
   ∀ la lb,
@@ -257,7 +260,6 @@ destruct la as [| a2]. {
 specialize (IHla _ Hbl) as H1.
 rewrite List_last_cons_cons in H1.
 ...
-
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
   cbn - [ last ].
