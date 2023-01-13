@@ -247,8 +247,17 @@ destruct la as [| a2]. {
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
   cbn - [ last ].
+  clear Hbl.
+  revert b1.
+  induction lb as [| b2]; intros; [ easy | ].
+  cbn - [ last ].
+  do 2 rewrite List_last_cons_cons.
+  apply IHlb.
+}
+specialize (IHla _ Hbl) as H1.
+rewrite List_last_cons_cons in H1.
 ...
-  destruct lb as [| b0]; [ easy | ].
+
   destruct lb as [| b1]; [ easy | ].
   rewrite List_last_cons_cons.
   cbn - [ last ].
