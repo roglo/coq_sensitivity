@@ -4098,6 +4098,13 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
 Qed.
 
 (*
+Check rngl_opt_add_opp_l.
+Check rngl_opt_mul_div.
+Check rngl_opt_eqb_eq.
+Check rngl_characteristic_prop.
+*)
+
+(*
 Definition lap_ring_like_prop : ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
