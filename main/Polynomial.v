@@ -3906,17 +3906,6 @@ Definition rlap_compose rla rlb :=
 Definition lap_compose la lb :=
   rlap_compose (rev la) (rev lb).
 
-(*
-Definition old_lap_compose la lb :=
-  List.fold_right (λ c accu, lap_add (lap_mul accu lb) [c]) [] la.
-
-Definition lap_compose2 la lb :=
-  List.fold_right
-    (λ i accu,
-     lap_add accu (lap_mul [List.nth i la 0] (lap_power lb i)))%L
-    [] (List.seq 0 (length la)).
-*)
-
 (* *)
 
 Definition eval_lap la x :=
