@@ -3917,6 +3917,28 @@ Definition rlap_compose rla rlb :=
 Definition lap_compose la lb :=
   rlap_compose (rev la) (rev lb).
 
+(* grouping together "eval" and "compose" *)
+
+Definition gen_eval_rlap A (zero : A) (add mul : A → A → A) rla x :=
+  fold_left (λ accu a, add (mul accu x) a) rla zero.
+
+Definition eval_rlap' :=
+  gen_eval_rlap 0%L rngl_add rngl_mul.
+
+Definition rlap_compose' rla rlb :=
+  let ro := lap_ring_like_op in
+  gen_eval_rlap [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
+
+(*
+TODO: prove equality
+- between eval_rlap and eval_rlap'
+- between rlap_compose and rlap_compose'
+Check eval_rlap.
+Check eval_rlap'.
+Check rlap_compose.
+Check rlap_compose'.
+*)
+
 (* roots *)
 
 Theorem eval_lap_is_rngl_eval_polyn :
