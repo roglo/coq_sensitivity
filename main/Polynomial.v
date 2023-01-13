@@ -3918,6 +3918,7 @@ Definition lap_compose la lb :=
   rlap_compose (rev la) (rev lb).
 
 (* grouping together "eval" and "compose" *)
+(* is it anecdotal or useful? *)
 
 Definition gen_eval_rlap A (zero : A) (add mul : A → A → A) rla x :=
   fold_left (λ accu a, add (mul accu x) a) rla zero.
@@ -3929,15 +3930,17 @@ Definition rlap_compose' rla rlb :=
   let ro := lap_ring_like_op in
   gen_eval_rlap [] lap_add lap_mul (map (λ a, [a]) rla) (rev rlb).
 
-(*
-TODO: prove equality
-- between eval_rlap and eval_rlap'
-- between rlap_compose and rlap_compose'
-Check eval_rlap.
-Check eval_rlap'.
-Check rlap_compose.
-Check rlap_compose'.
-*)
+Theorem eval_rlap_eval_rlap' : ∀ rla a,
+  eval_rlap rla a = eval_rlap' rla a.
+Proof. easy. Qed.
+
+Theorem rlap_compose_rlap_compose' : ∀ rla rlb,
+  rlap_compose rla rlb = rlap_compose' rla rlb.
+Proof.
+intros.
+unfold rlap_compose', gen_eval_rlap.
+now rewrite List_fold_left_map.
+Qed.
 
 (* roots *)
 
