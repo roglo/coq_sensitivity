@@ -228,8 +228,14 @@ destruct blen. {
   apply last_fold_left_lap_mul_add.
 }
 unfold rlap_compose, rlap_horner, iter_list.
-rewrite List_fold_left_map.
 rewrite rev_involutive.
+rewrite List_fold_left_map.
+...
+last_fold_left_lap_mul_add:
+  ∀ (la : list T) (b c : T),
+    last (fold_left (λ (accu : list T) (a : T), (accu * [b] + [a])%lap) la [c])
+      0%L = fold_left (λ x y : T, (x * b + y)%L) la c
+...
 ...
 revert lb Hbl.
 induction la as [| a]; intros; cbn. {
