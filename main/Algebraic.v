@@ -252,12 +252,9 @@ destruct lb as [| b1]. {
     destruct lb as [| b1]; [ easy | ].
     destruct lb; [ clear H1 | easy ].
     symmetry in Hlb; cbn.
-...
+    destruct la as [| a0]; [ easy | ].
     unfold eval_lap, eval_rlap, rlap_horner, iter_list; cbn.
     rewrite fold_left_app; cbn; f_equal; symmetry.
-    destruct la as [| a0]; [ easy | ].
-    cbn in Hlb |-*.
-    rewrite map_app, fold_left_app in Hlb; cbn in Hlb.
     rewrite fold_left_app; cbn.
     destruct la as [| a1]; cbn. {
       rewrite rngl_mul_0_l; [ | easy ].
@@ -266,7 +263,6 @@ destruct lb as [| b1]. {
       now injection Hlb; clear Hlb; intros; subst a0.
     }
     cbn in Hlb.
-    rewrite map_app, fold_left_app in Hlb; cbn in Hlb.
 ...
 }
 cbn - [ last ].
