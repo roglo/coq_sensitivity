@@ -4020,45 +4020,16 @@ apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
-(*
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
-  if rngl_characteristic =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
-  else
-    (∀ i : nat, 0 < i < rngl_characteristic → rngl_of_nat i ≠ 0%L) ∧
-    rngl_of_nat rngl_characteristic = 0%L.
+  if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
+  else (∀ i : nat, 0 < i < 0 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 0 = 0%L.
 Proof.
-intros rol; subst rol.
-specialize rngl_characteristic_prop as H1.
-rewrite if_eqb_eq_dec in H1 |-*.
-destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
-  intros i.
-  specialize (H1 i) as H.
-  intros Hi; apply H; clear H.
-Check lap_polyn_rngl_of_nat_char_0.
-...
-  rewrite lap_polyn_rngl_of_nat_char_0 in Hi.
-} {
-  destruct H1 as (Hbef, Hch).
-  split. {
-    intros i Hi; cbn.
-    specialize (Hbef _ Hi) as H1.
-    intros H; apply H1; clear H1; rename H into H1.
-    generalize H1; intros H2.
-    apply (f_equal lap) in H2; cbn in H2.
-    now rewrite lap_polyn_rngl_of_nat_2 in H2.
-  }
-  apply eq_polyn_eq; cbn.
-  rewrite lap_polyn_rngl_of_nat.
-  rewrite lap_rngl_of_nat.
-  apply Nat.eqb_neq in Hcz.
-  rewrite <- if_eqb_eq_dec, Hcz.
-  apply Nat.eqb_neq in Hcz.
-  rewrite Hch; cbn.
-  now rewrite (rngl_eqb_refl Heb).
-}
+intros; subst rol.
+cbn - [ rngl_of_nat ].
+intros; cbn.
+now destruct (rngl_of_nat i).
 Qed.
-*)
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
@@ -4101,7 +4072,6 @@ Qed.
 Check rngl_opt_add_opp_l.
 Check rngl_opt_mul_div.
 Check rngl_opt_eqb_eq.
-Check rngl_characteristic_prop.
 *)
 
 (*
@@ -4111,7 +4081,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_has_dec_le := rngl_has_dec_le;
      rngl_is_integral := rngl_is_integral;
      rngl_is_alg_closed := false;
-     rngl_characteristic := rngl_characteristic;
+     rngl_characteristic := 0;
      rngl_add_comm := lap_add_comm;
      rngl_add_assoc := lap_add_assoc;
      rngl_add_0_l := lap_add_0_l;
@@ -4140,9 +4110,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_le_dec := lap_opt_le_dec;
      rngl_opt_integral := lap_opt_integral;
      rngl_opt_alg_closed := NA;
-(*
      rngl_characteristic_prop := lap_characteristic_prop;
-*)
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
