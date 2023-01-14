@@ -3690,7 +3690,7 @@ unfold rngl_has_quot, lap_opt_inv_or_quot; cbn.
 unfold rngl_quot; cbn.
 unfold lap_opt_inv_or_quot.
 rewrite Hco, Hop, Hiv, Hiq.
-destruct (bool_dec true); [ | easy ].
+destruct (bool_dec true) as [H| H]; [ clear H | easy ].
 apply lap_mul_div; try easy.
 ...
 Qed.
