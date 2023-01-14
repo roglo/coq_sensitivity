@@ -229,8 +229,14 @@ destruct blen. {
 }
 unfold rlap_compose, rlap_horner, iter_list.
 rewrite rev_involutive.
-...
 rewrite List_fold_left_map.
+remember (rev la) as rla eqn:Hrla.
+rewrite <- (rev_involutive la).
+rewrite <- Hrla.
+rewrite List_last_rev.
+rewrite rev_length.
+clear la Hrla.
+...
 destruct lb as [| b1]; [ easy | ].
 destruct lb as [| b2]; [ easy | ].
 rewrite List_last_cons_cons.
