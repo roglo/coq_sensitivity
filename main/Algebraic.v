@@ -199,12 +199,61 @@ Theorem last_lap_compose :
   last (la ° lb)%lap 0%L =
     match length lb with
     | 0 => hd 0%L la
-    | 1 => eval_lap ro la (hd 0%L lb)
+    | 1 => eval_lap la (hd 0%L lb)
     | _ => (last la 0 * last lb 0 ^ (length la - 1))%L
     end.
 Proof.
 intros Hos *.
 (* vérifier le cas "> 1" *)
+(**)
+destruct lb as [| b0]. {
+  cbn; unfold lap_compose, rlap_compose; cbn.
+  unfold rlap_horner, iter_list; cbn.
+  erewrite List_fold_left_ext_in. 2: {
+    intros b lb Hb.
+    now rewrite lap_mul_0_r, lap_add_0_l.
+  }
+  destruct la as [| a]; [ easy | cbn ].
+  now rewrite map_app, fold_left_app.
+}
+cbn - [ last ].
+destruct lb as [| b1]. {
+  cbn; unfold lap_compose, rlap_compose; cbn.
+  unfold rlap_horner, iter_list; cbn.
+  erewrite List_fold_left_ext_in. 2: {
+    intros b lb Hb.
+    rewrite lap_mul_const_r; [ | easy | easy ].
+    easy.
+  }
+  destruct la as [| a]; [ easy | cbn ].
+  rewrite map_app, fold_left_app; cbn.
+  rewrite last_lap_add.
+  rewrite map_length.
+  remember (fold_left _ _ _) as lb eqn:Hlb.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H1| H1]. {
+    subst lb.
+    apply Nat.ltb_lt in H1; cbn in H1 |-*.
+    apply Nat.lt_1_r, length_zero_iff_nil in H1.
+    unfold eval_lap, eval_rlap, rlap_horner, iter_list; cbn.
+    rewrite fold_left_app; cbn.
+    destruct la as [| a0]; cbn. {
+      now rewrite rngl_mul_0_l, rngl_add_0_l.
+    }
+    cbn in H1.
+    rewrite map_app in H1; cbn in H1.
+    rewrite fold_left_app in H1; cbn in H1.
+    now apply eq_lap_add_nil in H1.
+  }
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [H2| H2]. 2: {
+    apply Nat.ltb_ge in H1, H2; cbn in H1, H2 |-*.
+    unfold eval_lap, eval_rlap, rlap_horner, iter_list; cbn.
+    rewrite fold_left_app; cbn.
+    destruct la as [| a0]; [ now subst lb | cbn ].
+...
+}
+cbn - [ last ].
 ...
 unfold lap_compose.
 remember (length lb) as blen eqn:Hbl; symmetry in Hbl.
