@@ -32,7 +32,7 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
-Theorem last_fold_left_lap_mul_add : ∀ la b c,
+Theorem last_fold_left_lap_mul_const_add_const : ∀ la b c,
   last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
   fold_left (λ x y, (x * b + y)%L) la c.
 Proof.
@@ -225,7 +225,7 @@ destruct blen. {
   rewrite (rngl_mul_0_l Hos), rngl_add_0_l.
   unfold rlap_compose, rlap_horner, iter_list; cbn.
   rewrite List_fold_left_map.
-  apply last_fold_left_lap_mul_add.
+  apply last_fold_left_lap_mul_const_add_const.
 }
 unfold rlap_compose, rlap_horner, iter_list.
 rewrite rev_involutive.
@@ -236,12 +236,20 @@ rewrite <- Hrla.
 rewrite List_last_rev.
 rewrite rev_length.
 clear la Hrla.
-...
-destruct lb as [| b1]; [ easy | ].
-destruct lb as [| b2]; [ easy | ].
-rewrite List_last_cons_cons.
+destruct lb as [| b0]; [ easy | ].
 cbn in Hbl.
-do 2 apply Nat.succ_inj in Hbl.
+apply Nat.succ_inj in Hbl.
+destruct lb as [| b1]; intros; [ easy | ].
+cbn in Hbl; apply Nat.succ_inj in Hbl.
+...
+Theorem last_fold_left_lap_mul_cons_cons_add_const :
+  ∀ (la lb : list T) (b0 b1 : T),
+  last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la [])
+    0%L =
+  last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la []) 0%L.
+...
+rewrite last_fold_left_lap_mul_cons_cons_add_const.
+rewrite IHlb.
 ...
 last_fold_left_lap_mul_add:
   ∀ (la : list T) (b c : T),
