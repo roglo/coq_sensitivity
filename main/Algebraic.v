@@ -204,6 +204,8 @@ Theorem last_lap_compose :
     end.
 Proof.
 intros Hos *.
+(* vérifier le cas "> 1" *)
+...
 unfold lap_compose.
 remember (length lb) as blen eqn:Hbl; symmetry in Hbl.
 destruct blen. {
@@ -241,15 +243,29 @@ cbn in Hbl.
 apply Nat.succ_inj in Hbl.
 destruct lb as [| b1]; intros; [ easy | ].
 cbn in Hbl; apply Nat.succ_inj in Hbl.
-...
+destruct rla as [| a]. {
+  now cbn; rewrite (rngl_mul_0_l Hos).
+}
+cbn - [ last ].
 Theorem last_fold_left_lap_mul_cons_cons_add_const :
-  ∀ (la lb : list T) (b0 b1 : T),
-  last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la [])
+  ∀ (la lb lc : list T) (b0 b1 : T),
+  last (fold_left (λ accu a, (accu * (b0 :: b1 :: lb) + [a])%lap) la lc)
     0%L =
-  last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la []) 0%L.
-...
+  last (fold_left (λ accu a, (accu * (b1 :: lb) + [a])%lap) la lc) 0%L.
+Admitted.
 rewrite last_fold_left_lap_mul_cons_cons_add_const.
-rewrite IHlb.
+rewrite List_last_cons_cons.
+clear b0 blen Hbl.
+rewrite Nat.sub_0_r.
+revert b1.
+induction lb as [| b2]; intros. {
+  cbn.
+  rewrite last_fold_left_lap_mul_const_add_const.
+  (* bin non *)
+...
+}
+rewrite last_fold_left_lap_mul_cons_cons_add_const.
+apply IHlb.
 ...
 last_fold_left_lap_mul_add:
   ∀ (la : list T) (b c : T),
