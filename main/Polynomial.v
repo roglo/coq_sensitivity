@@ -3691,9 +3691,8 @@ unfold rngl_quot; cbn.
 unfold lap_opt_inv_or_quot.
 rewrite Hco, Hop, Hiv, Hiq.
 destruct (bool_dec true); [ | easy ].
-Check lap_mul_div.
-...
 apply lap_mul_div; try easy.
+...
 Qed.
 *)
 
