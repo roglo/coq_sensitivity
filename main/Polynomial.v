@@ -40,8 +40,30 @@ Context {Heb : rngl_has_eqb = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
 Context (Hc1 : rngl_characteristic ≠ 1).
 
-Definition lap_eqb (eqb : T → _) (P Q : list T) :=
-  list_eqv eqb P Q.
+Fixpoint lap_all_0 zero (eqb : T → T → bool) (la : list T) :=
+  match la with
+  | [] => true
+  | a :: la' => if eqb a zero then lap_all_0 zero eqb la' else false
+  end.
+
+Fixpoint lap_eqb zero (eqb : T → _) (la lb : list T) :=
+  match la with
+  | [] => lap_all_0 zero eqb lb
+  | a :: la' =>
+      match lb with
+      | [] => lap_all_0 zero eqb la
+      | b :: lb' => if eqb a b then lap_eqb zero eqb la' lb' else false
+      end
+  end.
+
+(*
+End a.
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+Compute (lap_eqb 0%Q Q.eqb [1;0;0;0] [1;0;3]).
+*)
 
 Definition polyn_eqb (eqb : T → _) (P Q : polyn T) :=
   list_eqv eqb (lap P) (lap Q).
@@ -812,7 +834,7 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_mul := lap_mul;
      rngl_opt_opp_or_sous := lap_opt_opp_or_sous;
      rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_eqb := Some (lap_eqb rngl_eqb);
+     rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
      rngl_opt_le := None |}.
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
