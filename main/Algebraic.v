@@ -248,9 +248,25 @@ destruct lb as [| b1]. {
   rewrite if_bool_if_dec.
   destruct (bool_dec _) as [H2| H2]. 2: {
     apply Nat.ltb_ge in H1, H2; cbn in H1, H2 |-*.
+    apply Nat.le_antisymm in H1; [ clear H2 | easy ].
+    destruct lb as [| b1]; [ easy | ].
+    destruct lb; [ clear H1 | easy ].
+    symmetry in Hlb; cbn.
+...
     unfold eval_lap, eval_rlap, rlap_horner, iter_list; cbn.
+    rewrite fold_left_app; cbn; f_equal; symmetry.
+    destruct la as [| a0]; [ easy | ].
+    cbn in Hlb |-*.
+    rewrite map_app, fold_left_app in Hlb; cbn in Hlb.
     rewrite fold_left_app; cbn.
-    destruct la as [| a0]; [ now subst lb | cbn ].
+    destruct la as [| a1]; cbn. {
+      rewrite rngl_mul_0_l; [ | easy ].
+      rewrite rngl_add_0_l.
+      cbn in Hlb.
+      now injection Hlb; clear Hlb; intros; subst a0.
+    }
+    cbn in Hlb.
+    rewrite map_app, fold_left_app in Hlb; cbn in Hlb.
 ...
 }
 cbn - [ last ].
