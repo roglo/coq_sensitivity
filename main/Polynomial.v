@@ -4223,7 +4223,14 @@ Definition polyn_compose p q :=
 Definition monom (p : polyn T) i :=
   polyn_of_norm_lap [nth i (lap p) 0%L].
 
-(* to be completed
+Theorem lap_norm_lap : ∀ p, lap_norm (lap p) = lap p.
+Proof.
+intros p.
+apply last_lap_neq_0_lap_norm.
+apply lap_prop.
+Qed.
+
+(* to be completed *)
 Theorem polyn_compose_by_summation :
   let rop := polyn_ring_like_op in
   ∀ (p q : polyn T),
@@ -4257,7 +4264,49 @@ destruct len. {
   now destruct (a =? 0)%L.
 }
 cbn.
-(* ouais, bon... bof... *)
+destruct len. {
+  remember (lap p) as la eqn:Hla.
+  clear p Hla.
+  destruct la as [| a0]; [ easy | cbn ].
+  destruct la as [| a1]; [ easy | cbn ].
+  destruct la; [ clear Hlen; cbn | easy ].
+  unfold polyn_add, polyn_mul; cbn.
+  rewrite lap_mul_1_r, lap_norm_lap.
+  unfold polyn_norm.
+  apply eq_polyn_eq; cbn.
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Hpz| Hpz]. {
+    apply (rngl_eqb_eq Heb) in Hpz; subst a0; cbn.
+    rewrite if_bool_if_dec.
+    destruct (bool_dec _) as [Hp1| Hp1]. {
+      apply (rngl_eqb_eq Heb) in Hp1; subst a1; cbn.
+      rewrite Nat.sub_0_r.
+      destruct (lap q) as [| b lb]; cbn. {
+        now rewrite (rngl_eqb_refl Heb).
+      }
+      rewrite rngl_summation_only_one, rngl_add_0_r, lap_add_0_r.
+      rewrite (rngl_mul_0_l Hos).
+      rewrite strip_0s_app; cbn.
+      rewrite (rngl_eqb_refl Heb).
+      rewrite lap_convol_mul_const_l; [ cbn | easy ].
+      rewrite <- map_rev.
+      remember (rev lb) as rlb eqn:Hlb; clear b lb Hlb.
+      induction rlb as [| b]; [ easy | cbn ].
+      rewrite (rngl_mul_0_l Hos), (rngl_eqb_refl Heb).
+      apply IHrlb.
+    }
+    destruct (lap q) as [| b lb]; cbn. {
+      now rewrite (rngl_eqb_refl Heb).
+    }
+    rewrite rngl_summation_only_one, rngl_add_0_r, lap_add_0_r.
+    f_equal.
+    now rewrite rev_involutive, strip_0s_idemp.
+  }
+  destruct (lap q) as [| b lb]; cbn. {
+    rewrite Hpz.
+    rewrite if_bool_if_dec.
+    now destruct (bool_dec _); cbn; rewrite Hpz.
+  }
 ...
 
 Theorem polyn_horner_is_summation :
