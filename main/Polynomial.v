@@ -4230,7 +4230,7 @@ apply last_lap_neq_0_lap_norm.
 apply lap_prop.
 Qed.
 
-(* to be completed *)
+(* to be completed
 Theorem polyn_compose_by_summation :
   let rop := polyn_ring_like_op in
   ∀ (p q : polyn T),
