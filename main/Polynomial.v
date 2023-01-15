@@ -4357,6 +4357,28 @@ Qed.
 
 End a.
 
+(*
+Check polyn_ring_like_op.
+
+Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
+  iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.
+
+Definition lap_horner_1 {A} (to_T : A → _) la x :=
+  rlap_horner_1 to_T (rev la) x.
+
+Definition eval_rlap_1 := rlap_horner_1 id.
+Definition eval_lap_1 := lap_horner_1 id.
+Definition eval_polyn_1 pol := eval_lap_1 (lap pol).
+
+Check polyn_ring_like_op.
+
+Definition rlap_compose {A} :=
+  @rlap_horner_1 (polyn A).
+
+Print rlap_compose.
+...
+*)
+
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
