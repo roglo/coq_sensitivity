@@ -4194,6 +4194,9 @@ Qed.
 Definition rlap_horner A (zero : A) (add mul : A → A → A) rla x :=
   iter_list rla (λ accu a, add (mul accu x) a) zero.
 
+Definition lap_horner A (zero : A) (add mul : A → A → A) la x :=
+  rlap_horner zero add mul (rev la) x.
+
 Definition eval_rlap :=
   rlap_horner 0%L rngl_add rngl_mul.
 
@@ -4208,6 +4211,53 @@ Definition rlap_compose rla rlb :=
 
 Definition lap_compose la lb :=
   rlap_compose (rev la) (rev lb).
+
+(* compute the evaluation of a polynomial with powers *)
+
+Theorem monom_prop : ∀ a, a ≠ 0%L → has_polyn_prop [a] = true.
+Proof.
+intros * Haz.
+apply Bool.orb_true_iff; right; cbn.
+now apply rngl_neqb_neq in Haz.
+Qed.
+
+Definition monom Heb (p : polyn T) i :=
+  let c := nth i (lap p) 0%L in
+  match rngl_eq_dec Heb c 0%L with
+  | left _ => 0%pol
+  | right Hp => mk_polyn [c] (monom_prop Hp)
+  end.
+
+Definition polyn_of_norm_lap la :=
+  mk_polyn (lap_norm la) (polyn_norm_prop la).
+
+(* to be completed
+Theorem eval_polyn_on_polyn :
+  let rop := polyn_ring_like_op in
+  ∀ (p : polyn T) (x : polyn T),
+  ∑ (i = 0, length (lap p) - 1), (monom Heb p i * x ^ i)%pol =
+  polyn_of_norm_lap (lap_compose (lap p) (lap x)).
+(* mouais, ça se généralise peut-être à n'importe quel (x : A) (pas
+   seulement polyn T), pourvu que ce soit un ring-like *)
+...
+
+Theorem polyn_horner_is_summation :
+  ∀ A (ro : @ring_like_op A) (rp : @ring_like_prop A ro) (p : polyn T) (x : A),
+  ∑ (i = 0, length (lap p) - 1), (nth i (lap p) 0 * x ^ i)%L = 0%L.
+...
+
+Theorem polyn_horner_is_summation :
+  ∀ A (ro : @ring_like_op A) (rp : @ring_like_prop A ro) (p : polyn T) (x : A),
+  lap_horner 0%L rngl_add rngl_mul (lap p) x =
+    ∑ (i = 0, length (lap p) - 1), (nth i (lap p) 0 * x ^ i)%L.
+Print rlap_horner.
+Print lap_compose.
+Proof.
+(* c'est un peu chiant, parce que ça ne pourra pas s'appliquer aux "lap"
+   parce qu'ils ne sont pas des espèces d'anneau *)
+intros.
+...
+*)
 
 (* roots *)
 
