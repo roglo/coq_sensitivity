@@ -4214,31 +4214,50 @@ Definition lap_compose la lb :=
 
 (* compute the evaluation of a polynomial with powers *)
 
-Theorem monom_prop : ∀ a, a ≠ 0%L → has_polyn_prop [a] = true.
-Proof.
-intros * Haz.
-apply Bool.orb_true_iff; right; cbn.
-now apply rngl_neqb_neq in Haz.
-Qed.
-
-Definition monom Heb (p : polyn T) i :=
-  let c := nth i (lap p) 0%L in
-  match rngl_eq_dec Heb c 0%L with
-  | left _ => 0%pol
-  | right Hp => mk_polyn [c] (monom_prop Hp)
-  end.
-
 Definition polyn_of_norm_lap la :=
   mk_polyn (lap_norm la) (polyn_norm_prop la).
 
+Definition polyn_compose p q :=
+  polyn_of_norm_lap (lap_compose (lap p) (lap q)).
+
+Definition monom (p : polyn T) i :=
+  polyn_of_norm_lap [nth i (lap p) 0%L].
+
 (* to be completed
-Theorem eval_polyn_on_polyn :
+Theorem polyn_compose_by_summation :
   let rop := polyn_ring_like_op in
-  ∀ (p : polyn T) (x : polyn T),
-  ∑ (i = 0, length (lap p) - 1), (monom Heb p i * x ^ i)%pol =
-  polyn_of_norm_lap (lap_compose (lap p) (lap x)).
-(* mouais, ça se généralise peut-être à n'importe quel (x : A) (pas
-   seulement polyn T), pourvu que ce soit un ring-like *)
+  ∀ (p q : polyn T),
+  polyn_compose p q = ∑ (i = 0, length (lap p) - 1), (monom p i * q ^ i)%pol.
+Proof.
+intros rop *.
+unfold iter_seq, iter_list.
+unfold polyn_compose, monom.
+rewrite Nat.sub_0_r.
+unfold lap_compose, polyn_of_norm_lap; cbn.
+rewrite polyn_add_0_l, polyn_mul_1_r.
+unfold rlap_compose.
+rewrite rev_involutive.
+unfold rlap_horner, iter_list.
+remember (length (lap p) - 1) as len eqn:Hlen.
+symmetry in Hlen.
+destruct len. {
+  cbn.
+  apply eq_polyn_eq; cbn.
+  apply Nat.sub_0_le in Hlen.
+  apply Nat.le_1_r in Hlen.
+  destruct Hlen as [Hlen| Hlen]. {
+    apply length_zero_iff_nil in Hlen.
+    rewrite Hlen; cbn.
+    now rewrite (rngl_eqb_refl Heb).
+  }
+  remember (lap p) as la eqn:Hla; symmetry in Hla.
+  clear p Hla.
+  destruct la as [| a]; [ easy | ].
+  destruct la; [ clear Hlen; cbn | easy ].
+  now destruct (a =? 0)%L.
+}
+cbn.
+(* ouais, bon... bof... *)
 ...
 
 Theorem polyn_horner_is_summation :
