@@ -4307,6 +4307,22 @@ destruct len. {
     rewrite if_bool_if_dec.
     now destruct (bool_dec _); cbn; rewrite Hpz.
   }
+  rewrite rngl_summation_only_one, lap_add_0_r.
+  rewrite if_bool_if_dec.
+  rewrite strip_0s_app; cbn.
+  rewrite lap_convol_mul_const_l; [ cbn | easy ].
+  rewrite <- map_rev.
+  destruct (bool_dec _) as [H1z| H1z]. {
+    apply (rngl_eqb_eq Heb) in H1z; subst a1.
+    cbn; rewrite Hpz.
+    rewrite (rngl_mul_0_l Hos).
+    remember (rev lb) as rlb eqn:Hlb; clear b lb Hlb.
+    rewrite rngl_add_0_l, Hpz.
+    induction rlb as [| b]; [ easy | cbn ].
+    rewrite (rngl_mul_0_l Hos), (rngl_eqb_refl Heb).
+    apply IHrlb.
+  }
+  cbn.
 ...
 
 Theorem polyn_horner_is_summation :
