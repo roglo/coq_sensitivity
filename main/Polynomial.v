@@ -4424,14 +4424,38 @@ Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 Require Import NatRingLike.
 
 Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
+  let ro := nat_ring_like_op in
+  let rp := nat_ring_like_prop in
   polyn_ring_like_op eq_refl eq_refl.
 
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 
 Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
+  let ro := Z_ring_like_op in
   let rp := Z_ring_like_prop in
   polyn_ring_like_op eq_refl eq_refl.
+
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+
+Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
+  let ro := Q_ring_like_op in
+  let rp := Q_ring_like_prop in
+  polyn_ring_like_op eq_refl eq_refl.
+
+Require Import RnglAlg.MatRl.
+Require Import Matrix.
+
+Check mat_ring_like_op.
+Check mat_ring_like_prop.
+
+Set Printing All.
+Definition mat_polyn_ring_like_op n T ro rp (Hopp : rngl_has_opp = true) :
+    ring_like_op (square_matrix n T) :=
+  let rom := @mat_ring_like_op T ro n in
+  let rpm := @mat_ring_like_prop T ro rp Hopp n in
+  @polyn_ring_like_op (square_matrix n T) rom rpm.
 
 ...
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
