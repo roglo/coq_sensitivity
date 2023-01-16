@@ -21,7 +21,9 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
 Global Existing Instance Q_ring_like_op.
 *)
 
-Theorem Q_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Q.
+Theorem Q_characteristic_prop :
+  let roq := Q_ring_like_op in
+  ∀ i, rngl_of_nat (S i) ≠ 0%Q.
 Proof.
 intros.
 cbn - [ Q.add ].
@@ -47,8 +49,9 @@ intros * Hac Hbd.
 now apply Q.mul_le_mono_nonneg.
 Qed.
 
-Theorem Q_mul_le_compat_nonpos : ∀ a b c d,
-  (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
+Theorem Q_mul_le_compat_nonpos :
+  let roq := Q_ring_like_op in
+  ∀ a b c d, (c ≤ a ≤ 0 → d ≤ b ≤ 0 → a * b ≤ c * d)%L.
 Proof.
 intros * Hac Hbd.
 now apply Q.mul_le_mono_nonpos.

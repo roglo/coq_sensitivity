@@ -261,8 +261,6 @@ split. {
 }
 Qed.
 
-...
-
 Theorem squ_mat_add_comm :
   let rom := mat_ring_like_op in
   ∀ n (MA MB : square_matrix n T), (MA + MB)%L = (MB + MA)%L.
@@ -669,23 +667,23 @@ now apply rngl_mul_0_l.
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :
-  let rom := mat_ring_like_op in
+  let rom := mat_ring_like_op n in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
      rngl_has_dec_le := false;
      rngl_is_integral := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
-     rngl_add_comm := squ_mat_add_comm n;
-     rngl_add_assoc := squ_mat_add_assoc;
-     rngl_add_0_l := squ_mat_add_0_l;
-     rngl_mul_assoc := squ_mat_mul_assoc;
-     rngl_mul_1_l := squ_mat_mul_1_l;
-     rngl_mul_add_distr_l := squ_mat_mul_add_distr_l;
+     rngl_add_comm := @squ_mat_add_comm n;
+     rngl_add_assoc := @squ_mat_add_assoc n;
+     rngl_add_0_l := @squ_mat_add_0_l n;
+     rngl_mul_assoc := @squ_mat_mul_assoc n;
+     rngl_mul_1_l := @squ_mat_mul_1_l n;
+     rngl_mul_add_distr_l := @squ_mat_mul_add_distr_l n;
      rngl_opt_mul_comm := NA;
-     rngl_opt_mul_1_r := squ_mat_mul_1_r;
-     rngl_opt_mul_add_distr_r := squ_mat_mul_add_distr_r;
-     rngl_opt_add_opp_l := squ_mat_opt_add_opp_l;
+     rngl_opt_mul_1_r := @squ_mat_mul_1_r n;
+     rngl_opt_mul_add_distr_r := @squ_mat_mul_add_distr_r n;
+     rngl_opt_add_opp_l := @squ_mat_opt_add_opp_l n;
      rngl_opt_add_sub := NA;
      rngl_opt_sub_sub_sub_add := NA;
      rngl_opt_mul_sub_distr_l := NA;
