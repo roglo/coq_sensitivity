@@ -4157,11 +4157,13 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
-...
-  rewrite lap_rngl_of_nat.
+  destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
+    rewrite Hc1; cbn - [ lap_norm ].
+    now unfold lap_one; rewrite Hc1.
+  }
+  rewrite (lap_rngl_of_nat Hc1).
   apply Nat.eqb_neq in Hcz.
   rewrite <- if_eqb_eq_dec, Hcz.
-  apply Nat.eqb_neq in Hcz.
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Heb).
 }
@@ -4435,9 +4437,7 @@ Qed.
 
 End a.
 
-(**)
-Check polyn_ring_like_op.
-
+(*
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
   iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.
 
