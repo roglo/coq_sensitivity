@@ -4421,6 +4421,9 @@ Qed.
 End a.
 
 (* to be completed
+Check polyn_ring_like_op.
+Check polyn_ring_like_prop.
+...
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
   iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.
 
