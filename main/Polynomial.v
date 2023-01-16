@@ -933,6 +933,14 @@ destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
 now rewrite Haz.
 Qed.
 
+Theorem lap_norm_idemp : ∀ la, lap_norm (lap_norm la) = lap_norm la.
+Proof.
+intros.
+unfold lap_norm.
+rewrite rev_involutive.
+now rewrite strip_0s_idemp.
+Qed.
+
 Theorem lap_add_norm_idemp_l : ∀ la lb,
   lap_norm (lap_norm la + lb) = lap_norm (la + lb).
 Proof.
@@ -3972,10 +3980,8 @@ intros rop Hch * Hiz.
 subst rop.
 induction i; [ easy | clear Hiz; cbn ].
 (**)
-unfold polyn_one.
-...
+unfold lap_one.
 destruct (Nat.eq_dec _ _) as [H| H]; [ now rewrite Hch in H | ].
-cbn - [ lap_norm lap_add ].
 destruct i. {
   cbn; rewrite rngl_add_0_r.
   rewrite if_bool_if_dec.
@@ -4013,7 +4019,7 @@ clear Hchz.
 destruct Hch as (Hbef, Hch).
 induction i; [ easy | cbn ].
 remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
-unfold polyn_one.
+unfold lap_one.
 destruct (Nat.eq_dec _ _) as [Hc1'| Hc1']; [ easy | ].
 cbn - [ lap_add ]; clear Hc1'.
 destruct la as [| a]; cbn. {
@@ -4041,7 +4047,7 @@ destruct lb as [| b]. {
     injection IHi; clear IHi; intros; subst a la.
     clear Hlb.
     cbn in Hla.
-    unfold polyn_one in Hla.
+    unfold lap_one in Hla.
     destruct (Nat.eq_dec _ _) as [Hc1'| Hc1']; [ easy | ].
     cbn - [ lap_add ] in Hla.
     remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
@@ -4082,21 +4088,12 @@ intros.
 (**)
 induction n; [ easy | ].
 cbn - [ lap_add lap_norm ].
-unfold polyn_one.
+unfold lap_one.
 destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
-  specialize (rngl_characteristic_1 Hos Hc1) as H1.
-Print lap_one.
-...
-  cbn - [ lap_add ].
-  rewrite lap_add_0_l.
-  rewrite IHn.
-...
-  induction n. {
-    now cbn; rewrite (H1 1%L), (rngl_eqb_refl Heb).
-  }
-  rewrite IHn.
-...
-induction n; [ easy | cbn ].
+  do 2 rewrite lap_add_0_l.
+  rewrite IHn at 1.
+  apply lap_norm_idemp.
+}
 rewrite IHn; cbn.
 do 2 rewrite fold_lap_norm.
 remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
@@ -4119,6 +4116,7 @@ apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
+(*
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
   if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -4129,6 +4127,7 @@ cbn - [ rngl_of_nat ].
 intros; cbn.
 now destruct (rngl_of_nat i).
 Qed.
+*)
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
@@ -4158,6 +4157,7 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
   }
   apply eq_polyn_eq; cbn.
   rewrite lap_polyn_rngl_of_nat.
+...
   rewrite lap_rngl_of_nat.
   apply Nat.eqb_neq in Hcz.
   rewrite <- if_eqb_eq_dec, Hcz.
