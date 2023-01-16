@@ -157,6 +157,13 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
+Theorem rngl_has_opp_has_opp_or_sous : ∀ T (ro : ring_like_op T),
+  rngl_has_opp = true → rngl_has_opp_or_sous = true.
+Proof.
+intros * Hop.
+now apply rngl_has_opp_or_sous_iff; left.
+Qed.
+
 (* could be written with List.fold_right but this module is not
    supposed to include the module List (nor Nat) *)
 Fixpoint rngl_eval_polyn {T} {ro : ring_like_op T} l (x : T) :=

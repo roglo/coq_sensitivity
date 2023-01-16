@@ -2535,10 +2535,11 @@ Theorem lap_add_opp_r :
   → ∀ la, (la + - la)%lap = repeat 0%L (length la).
 Proof.
 intros Hop *.
+clear Hos.
 induction la as [| a]; [ easy | cbn ].
 rewrite fold_lap_opp.
 rewrite fold_rngl_sub; [ | easy ].
-rewrite rngl_sub_diag; [ | easy ].
+rewrite rngl_sub_diag; [ | now apply rngl_has_opp_has_opp_or_sous ].
 now f_equal.
 Qed.
 
@@ -4447,15 +4448,62 @@ Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
 Require Import RnglAlg.MatRl.
 Require Import Matrix.
 
-Check mat_ring_like_op.
-Check mat_ring_like_prop.
+(*
+Arguments rngl_has_opp_has_opp_or_sous {T ro} Hop.
+Check @rngl_has_opp_has_opp_or_sous.
 
-Set Printing All.
-Definition mat_polyn_ring_like_op n T ro rp (Hopp : rngl_has_opp = true) :
-    ring_like_op (square_matrix n T) :=
+Theorem toto : ∀ T (ro : ring_like_op T),
+  @rngl_has_opp T ro = true → @rngl_has_opp_or_sous T ro = true.
+Admitted.
+
+Definition mat_polyn_ring_like_op n T ro rp
+  (Hop : rngl_has_opp = true)
+  (Heb : rngl_has_eqb = true) :
+    ring_like_op (polyn (square_matrix n T)) :=
+  let rom := mat_ring_like_op ro n in
+  let rpm := @mat_ring_like_prop T ro rp Hop n in
+  polyn_ring_like_op Heb (toto _ Hop). (@rngl_has_opp_has_opp_or_sous _ _ Hop).
+...
+*)
+
+Definition mat_polyn_ring_like_op (n : nat) (T : Type) (ro : ring_like_op T)
+    (rp : @ring_like_prop T ro)
+    (Hop : @rngl_has_opp T ro = true)
+    (Heb : @rngl_has_eqb (square_matrix n T) (@mat_ring_like_op T ro n) = true)
+    (Hos : @rngl_has_opp_or_sous (square_matrix n T) (@mat_ring_like_op T ro n) = true) :=
   let rom := @mat_ring_like_op T ro n in
+  let rpm := @mat_ring_like_prop T ro rp Hop n in
+  @polyn_ring_like_op (square_matrix n T) (@mat_ring_like_op T ro n) rpm Heb Hos.
+
+Print mat_ring_like_op.
+Set Printing Implicit.
+Print polyn_ring_like_op.
+...
+
+Definition mat_polyn_ring_like_op n T ro rp
+  (Hop : rngl_has_opp = true)
+  (Heb : rngl_has_eqb = true)
+  (Hos : rngl_has_opp_or_sous = true) :
+    ring_like_op (polyn (square_matrix n T)) :=
+  let rom := mat_ring_like_op ro n in
+  let rpm := @mat_ring_like_prop T ro rp Hop n in
+  polyn_ring_like_op Heb Hos.
+Set Printing Implicit.
+Print mat_polyn_ring_like_op.
+
+...
+
+Definition mat_polyn_ring_like_op n T ro rp
+  (Hopp : rngl_has_opp = true)
+  (Heb : rngl_has_eqb = true)
+  (Hos : rngl_has_opp_or_sous = true) :
+    ring_like_op (polyn (square_matrix n T)) :=
+  let rom := mat_ring_like_op ro n in
   let rpm := @mat_ring_like_prop T ro rp Hopp n in
-  @polyn_ring_like_op (square_matrix n T) rom rpm.
+  polyn_ring_like_op Heb Hos.
+
+Set Printing Implicit.
+Print mat_polyn_ring_like_op.
 
 ...
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
