@@ -115,7 +115,9 @@ Definition Zn_ring_like_op n : ring_like_op (Zn n) :=
      rngl_opt_eqb := Some (Zn_eqb n);
      rngl_opt_le := None |}.
 
+(*
 Global Existing Instance Zn_ring_like_op.
+*)
 
 Theorem Zn_eq : ∀ n (a b : Zn n), proj1_sig a = proj1_sig b → a = b.
 Proof.
@@ -138,28 +140,36 @@ Qed.
 Section a.
 
 Context {n : nat}.
+(*
 Context (ro := Zn_ring_like_op n).
 Existing Instance ro.
+*)
 
-Theorem Zn_add_comm : ∀ (a b : Zn n), (a + b = b + a)%L.
+Theorem Zn_add_comm :
+  let roz := Zn_ring_like_op n in
+  ∀ (a b : Zn n), (a + b = b + a)%L.
 Proof.
-intros (a, Ha) (b, Hb).
+intros roz (a, Ha) (b, Hb).
 apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.add_comm.
 Qed.
 
-Theorem Zn_add_assoc : ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%L.
+Theorem Zn_add_assoc :
+  let roz := Zn_ring_like_op n in
+  ∀ (a b c : Zn n), (a + (b + c) = (a + b) + c)%L.
 Proof.
-intros.
+intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.add_mod_idemp_l; [ | easy ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
 now rewrite Nat.add_assoc.
 Qed.
 
-Theorem Zn_add_0_l : ∀ (a : Zn n), (0 + a = a)%L.
+Theorem Zn_add_0_l :
+  let roz := Zn_ring_like_op n in
+  ∀ (a : Zn n), (0 + a = a)%L.
 Proof.
-intros.
+intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite (Nat.mod_small 0); [ | apply Nat.lt_0_succ ].
 rewrite Nat.add_0_l.
@@ -168,18 +178,22 @@ destruct a as (a, Ha); cbn.
 now apply Nat.ltb_lt in Ha.
 Qed.
 
-Theorem Zn_mul_assoc : ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%L.
+Theorem Zn_mul_assoc :
+  let roz := Zn_ring_like_op n in
+  ∀ (a b c : Zn n), (a * (b * c) = (a * b) * c)%L.
 Proof.
-intros.
+intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_assoc.
 Qed.
 
-Theorem Zn_mul_1_l : ∀ (a : Zn n), (1 * a = a)%L.
+Theorem Zn_mul_1_l :
+  let roz := Zn_ring_like_op n in
+  ∀ (a : Zn n), (1 * a = a)%L.
 Proof.
-intros.
+intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.mul_mod_idemp_l; [ | easy ].
 rewrite Nat.mul_1_l.
@@ -188,10 +202,11 @@ apply Nat.ltb_lt in Ha.
 now apply Nat.mod_small.
 Qed.
 
-Theorem Zn_mul_add_distr_l : ∀ (a b c : Zn n),
-  (a * (b + c) = a * b + a * c)%L.
+Theorem Zn_mul_add_distr_l :
+  let roz := Zn_ring_like_op n in
+  ∀ (a b c : Zn n), (a * (b + c) = a * b + a * c)%L.
 Proof.
-intros.
+intros roz *.
 apply Zn_eq; cbn - [ "mod" ].
 rewrite Nat.add_mod_idemp_l; [ | easy ].
 rewrite Nat.add_mod_idemp_r; [ | easy ].
@@ -199,16 +214,20 @@ rewrite Nat.mul_mod_idemp_r; [ | easy ].
 now rewrite Nat.mul_add_distr_l.
 Qed.
 
-Theorem Zn_mul_comm : ∀ (a b : Zn n), (a * b = b * a)%L.
+Theorem Zn_mul_comm :
+  let roz := Zn_ring_like_op n in
+  ∀ (a b : Zn n), (a * b = b * a)%L.
 Proof.
-intros (a, Ha) (b, Hb).
+intros roz (a, Ha) (b, Hb).
 apply Zn_eq; cbn - [ "mod" ].
 now rewrite Nat.mul_comm.
 Qed.
 
-Theorem Zn_add_opp_l : ∀ (a : Zn n), (- a + a = 0)%L.
+Theorem Zn_add_opp_l :
+  let roz := Zn_ring_like_op n in
+  ∀ (a : Zn n), (- a + a = 0)%L.
 Proof.
-intros (a, Ha).
+intros roz (a, Ha).
 apply Zn_eq; cbn - [ "mod" "-" ].
 apply Nat.ltb_lt in Ha.
 rewrite Nat.add_mod_idemp_l; [ | easy ].
@@ -219,9 +238,11 @@ rewrite Nat.sub_add. 2: {
 now apply Nat.mod_same.
 Qed.
 
-Theorem Zn_eqb_eq : ∀ a b : Zn n, (a =? b)%L = true ↔ a = b.
+Theorem Zn_eqb_eq :
+  let roz := Zn_ring_like_op n in
+  ∀ a b : Zn n, (a =? b)%L = true ↔ a = b.
 Proof.
-intros (a, Ha) (b, Hb); cbn.
+intros roz (a, Ha) (b, Hb); cbn.
 split. {
   intros Hab.
   apply Nat.eqb_eq in Hab; subst b.
@@ -246,6 +267,7 @@ destruct (Nat.eq_dec a b) as [Hab| Hab]; [ left | right ]. {
 Qed.
 
 Theorem Zn_opt_mul_inv_l :
+  let roz := Zn_ring_like_op n in
   if rngl_has_inv then ∀ a : Zn n, a ≠ 0%L → (a⁻¹ * a)%L = 1%L
   else not_applicable.
 Proof.
@@ -298,14 +320,16 @@ destruct c; [ now rewrite Nat.mul_comm in Hc | flia Hn2 ].
 Qed.
 
 Theorem Zn_opt_mul_inv_r :
+  let roz := Zn_ring_like_op n in
   if (rngl_has_inv && negb true)%bool then
     ∀ a : Zn n, a ≠ 0%L → (a / a)%L = 1%L
   else not_applicable.
 Proof.
-now rewrite Bool.andb_false_r.
+now intros; rewrite Bool.andb_false_r.
 Qed.
 
 Theorem Zn_opt_mul_div :
+  let roz := Zn_ring_like_op n in
   if rngl_has_quot then ∀ a b : Zn n, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
@@ -316,15 +340,17 @@ now destruct p.
 Qed.
 
 Theorem Zn_opt_mul_quot_r :
+  let roz := Zn_ring_like_op n in
   if (rngl_has_quot && negb true)%bool then
     ∀ a b : Zn n, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
-now rewrite Bool.andb_false_r.
+now intros; rewrite Bool.andb_false_r.
 Qed.
 
-Theorem proj1_sig_Zn_of_nat : ∀ i,
-  proj1_sig (rngl_of_nat i) = i mod at_least_1 n.
+Theorem proj1_sig_Zn_of_nat :
+  let roz := Zn_ring_like_op n in
+  ∀ i, proj1_sig (rngl_of_nat i) = i mod at_least_1 n.
 Proof.
 intros.
 induction i. {
@@ -340,16 +366,18 @@ easy.
 Qed.
 
 Theorem Zn_characteristic_prop :
+  let roz := Zn_ring_like_op n in
   if at_least_1 n =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else
     (∀ i : nat, 0 < i < at_least_1 n → rngl_of_nat i ≠ 0%L) ∧
     rngl_of_nat (at_least_1 n) = 0%L.
 Proof.
+intros.
 split. {
   intros i Hi.
   cbn; intros H.
   specialize (@proj1_sig_Zn_of_nat i) as H1.
-  subst ro.
+  subst roz.
   unfold Zn in H.
   rewrite H in H1.
   cbn - [ "mod" ] in H1.
@@ -431,7 +459,9 @@ Definition lcm_ring_like_op : ring_like_op nat :=
 Section a.
 
 Context (ro := lcm_ring_like_op).
+(*
 Existing Instance ro.
+*)
 
 Theorem lcm_mul_add_distr_l : ∀ a b c,
   a * Nat.lcm b c = Nat.lcm (a * b) (a * c).
@@ -449,6 +479,7 @@ now left.
 Qed.
 
 Theorem lcm_characteristic_prop :
+  let rol := lcm_ring_like_op in
   if 1 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
   else (∀ i : nat, 0 < i < 1 → rngl_of_nat i ≠ 0%L) ∧ rngl_of_nat 1 = 0%L.
 Proof.
@@ -456,6 +487,7 @@ split; [ intros * Hi; flia Hi | easy ].
 Qed.
 
 Definition lcm_ring_like_prop :=
+  let rol := lcm_ring_like_op in
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
      rngl_is_integral := true;

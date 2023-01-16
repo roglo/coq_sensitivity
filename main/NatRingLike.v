@@ -17,15 +17,21 @@ Canonical Structure nat_ring_like_op : ring_like_op nat :=
      rngl_opt_eqb := Some Nat.eqb;
      rngl_opt_le := Some Nat.le |}.
 
+(*
 Global Existing Instance nat_ring_like_op.
+*)
 
 Theorem Nat_eq_mul_0 : ∀ n m, n * m = 0 → n = 0 ∨ m = 0.
 Proof. now intros; apply Nat.eq_mul_0. Qed.
 
-Theorem nat_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0.
+Theorem nat_characteristic_prop :
+  let ro := nat_ring_like_op in
+  ∀ i, rngl_of_nat (S i) ≠ 0.
 Proof. easy. Qed.
 
-Theorem Nat_mul_div : ∀ a b, b ≠ 0%L → (a * b / b)%L = a.
+Theorem Nat_mul_div :
+  let ro := nat_ring_like_op in
+  ∀ a b, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros * Hbz.
 now apply Nat.div_mul.
@@ -48,7 +54,9 @@ apply Heab.
 now apply Nat.le_antisymm; apply Nat.lt_le_incl.
 Qed.
 
-Theorem Nat_mul_sub_distr_l : ∀ a b c, (a * (b - c))%L = (a * b - a * c)%L.
+Theorem Nat_mul_sub_distr_l :
+  let ro := nat_ring_like_op in
+  ∀ a b c, (a * (b - c))%L = (a * b - a * c)%L.
 Proof.
 intros.
 apply Nat.mul_sub_distr_l.
@@ -99,7 +107,9 @@ Canonical Structure nat_ring_like_prop : ring_like_prop nat :=
      rngl_opt_mul_le_compat := Nat_mul_le_compat;
      rngl_opt_not_le := Nat_not_le |}.
 
+(*
 Global Existing Instance nat_ring_like_prop.
+*)
 
 (*
 Print nat_ring_like_op.

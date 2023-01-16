@@ -129,9 +129,12 @@ match rngl_opt_eqb with
 end in canonical instance mat_ring_like_op of rngl_opt_eqb, ignoring it. [projection-no-head-constant,typechecker]
 *)
 
+(*
 Existing Instance mat_ring_like_op.
+*)
 
 Theorem mat_ncols_of_nat {n} : ∀ i,
+  let rom := mat_ring_like_op in
   mat_ncols (@sm_mat n T (rngl_of_nat i)) = n.
 Proof.
 intros.
@@ -143,6 +146,7 @@ apply Nat.min_id.
 Qed.
 
 Theorem sm_mat_of_nat :
+  let rom := mat_ring_like_op in
   ∀ n m,
     sm_mat (rngl_of_nat m : square_matrix n T) = (rngl_of_nat m × mI n)%M.
 (*
@@ -193,11 +197,12 @@ unfold δ.
 now rewrite Nat.eqb_refl, rngl_mul_1_r.
 Qed.
 
-Theorem rngl_of_nat_is_correct_matrix {n} :
+Theorem rngl_of_nat_is_correct_matrix :
+  let rom := mat_ring_like_op in
   rngl_characteristic = 0
-  → ∀ i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)) = true.
+  → ∀ n i, is_correct_matrix (@sm_mat n T (rngl_of_nat i)) = true.
 Proof.
-intros Hch *.
+intros rom Hch *.
 apply is_scm_mat_iff.
 split. {
   intros Hc.
@@ -256,23 +261,29 @@ split. {
 }
 Qed.
 
-Theorem squ_mat_add_comm {n} : ∀ (MA MB : square_matrix n T),
-  (MA + MB)%L = (MB + MA)%L.
+...
+
+Theorem squ_mat_add_comm :
+  let rom := mat_ring_like_op in
+  ∀ n (MA MB : square_matrix n T), (MA + MB)%L = (MB + MA)%L.
 Proof.
 intros.
 apply square_matrix_eq.
 apply mat_add_comm.
 Qed.
 
-Theorem squ_mat_add_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA + (MB + MC) = (MA + MB) + MC)%L.
+Theorem squ_mat_add_assoc :
+  let rom := mat_ring_like_op in
+  ∀ n (MA MB MC : square_matrix n T), (MA + (MB + MC) = (MA + MB) + MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
 apply mat_add_assoc.
 Qed.
 
-Theorem squ_mat_add_0_l {n} : ∀ M : square_matrix n T, (0 + M)%L = M.
+Theorem squ_mat_add_0_l :
+  let rom := mat_ring_like_op in
+  ∀ n (M : square_matrix n T), (0 + M)%L = M.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -285,8 +296,9 @@ apply mat_add_0_l; cycle 1. {
 apply square_matrix_is_correct.
 Qed.
 
-Theorem squ_mat_mul_assoc {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA * (MB * MC) = (MA * MB) * MC)%L.
+Theorem squ_mat_mul_assoc :
+  let rom := mat_ring_like_op in
+  ∀ n (MA MB MC : square_matrix n T), (MA * (MB * MC) = (MA * MB) * MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -329,7 +341,9 @@ apply mat_mul_assoc; [ easy | | | ]. {
 }
 Qed.
 
-Theorem squ_mat_mul_1_l {n} : ∀ M : square_matrix n T, (1 * M)%L = M.
+Theorem squ_mat_mul_1_l :
+  let rom := mat_ring_like_op in
+  ∀ n (M : square_matrix n T), (1 * M)%L = M.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -337,8 +351,9 @@ apply mat_mul_1_l; [ easy | | symmetry; apply squ_mat_nrows ].
 apply square_matrix_is_correct.
 Qed.
 
-Theorem squ_mat_mul_add_distr_l {n} : ∀ (MA MB MC : square_matrix n T),
-  (MA * (MB + MC) = MA * MB + MA * MC)%L.
+Theorem squ_mat_mul_add_distr_l :
+  let rom := mat_ring_like_op in
+  ∀ n (MA MB MC : square_matrix n T), (MA * (MB + MC) = MA * MB + MA * MC)%L.
 Proof.
 intros.
 apply square_matrix_eq.
@@ -406,7 +421,9 @@ apply mat_mul_add_distr_l. {
 }
 Qed.
 
-Theorem squ_mat_mul_1_r {n} : ∀ M : square_matrix n T, (M * 1)%L = M.
+Theorem squ_mat_mul_1_r :
+  let rom := mat_ring_like_op in
+  ∀ n (M : square_matrix n T), (M * 1)%L = M.
 Proof.
 intros.
 apply square_matrix_eq; cbn.
@@ -414,7 +431,9 @@ apply mat_mul_1_r; [ easy | | symmetry; apply squ_mat_ncols ].
 apply square_matrix_is_correct.
 Qed.
 
-Theorem squ_mat_mul_add_distr_r {n} : ∀ (MA MB MC : square_matrix n T),
+Theorem squ_mat_mul_add_distr_r :
+  let rom := mat_ring_like_op in
+  ∀ n (MA MB MC : square_matrix n T),
   ((MA + MB) * MC = MA * MC + MB * MC)%L.
 Proof.
 intros.
@@ -479,7 +498,9 @@ apply mat_mul_add_distr_r; [ easy | | | | | ]. {
 }
 Qed.
 
-Theorem squ_mat_opt_add_opp_l {n} :
+Theorem squ_mat_opt_add_opp_l :
+  let rom := mat_ring_like_op in
+  ∀ n,
   if @rngl_has_opp (square_matrix n T) (mat_ring_like_op n) then
     ∀ M : square_matrix n T, (- M + M)%L = 0%L
   else not_applicable.
@@ -488,6 +509,7 @@ Theorem squ_mat_opt_add_opp_l {n} :
   else not_applicable.
 *)
 Proof.
+intros.
 remember (@rngl_has_opp (square_matrix n T) (mat_ring_like_op n)) as b
   eqn:Hb.
 symmetry in Hb.
@@ -647,13 +669,14 @@ now apply rngl_mul_0_l.
 Qed.
 
 Definition mat_ring_like_prop (n : nat) :
+  let rom := mat_ring_like_op in
   ring_like_prop (square_matrix n T) :=
   {| rngl_mul_is_comm := false;
      rngl_has_dec_le := false;
      rngl_is_integral := false;
      rngl_is_alg_closed := false;
      rngl_characteristic := if n =? 0 then 1 else rngl_characteristic;
-     rngl_add_comm := squ_mat_add_comm;
+     rngl_add_comm := squ_mat_add_comm n;
      rngl_add_assoc := squ_mat_add_assoc;
      rngl_add_0_l := squ_mat_add_0_l;
      rngl_mul_assoc := squ_mat_mul_assoc;

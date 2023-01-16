@@ -160,7 +160,7 @@ Definition having_eucl_div :=
   [-11; -7; -3; -2; -1; 2; 3; 5; 6; 7; 11; 13; 17; 19; 21;
    29; 33; 37; 41; 57; 73].
 
-Definition quad_int_ring_like_op {d} : ring_like_op (quad_int d) :=
+Definition quad_int_ring_like_op d : ring_like_op (quad_int d) :=
   {| rngl_zero := @qi_zero d;
      rngl_one := @qi_one d;
      rngl_add := @qi_add d;
@@ -194,7 +194,9 @@ Section a.
 
 Context [d : Z].
 Context (ro := @quad_int_ring_like_op d).
+(*
 Existing Instance ro.
+*)
 
 Theorem qi_re_im : ∀ (a : quad_int d), 〈 qi_re a + (qi_im a) √ d 〉%QI = a.
 Proof.
@@ -209,15 +211,18 @@ unfold "+"%QI.
 now rewrite Z.add_comm, (Z.add_comm (qi_im b)).
 Qed.
 
-Theorem quad_int_add_assoc : ∀ a b c : quad_int d,
-  (a + (b + c))%L = (a + b + c)%L.
+Theorem quad_int_add_assoc :
+  let ro := quad_int_ring_like_op d in
+  ∀ a b c : quad_int d, (a + (b + c))%L = (a + b + c)%L.
 Proof.
 intros; cbn.
 unfold "+"%QI; cbn.
 now do 2 rewrite Z.add_assoc.
 Qed.
 
-Theorem quad_int_add_0_l : ∀ a : quad_int d, (0 + a)%L = a.
+Theorem quad_int_add_0_l :
+  let ro := quad_int_ring_like_op d in
+  ∀ a : quad_int d, (0 + a)%L = a.
 Proof.
 intros; cbn.
 unfold "+"%QI; cbn.
@@ -232,7 +237,9 @@ unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_mul_1_l : ∀ a : quad_int d, (1 * a)%L = a.
+Theorem quad_int_mul_1_l :
+  let ro := quad_int_ring_like_op d in
+  ∀ a : quad_int d, (1 * a)%L = a.
 Proof.
 intros; cbn.
 unfold "*"%QI.
@@ -241,8 +248,9 @@ rewrite Z.mul_0_r, Z.mul_0_l, Z.add_0_r.
 now destruct a, a'.
 Qed.
 
-Theorem quad_int_mul_add_distr_l : ∀ a b c : quad_int d,
-  (a * (b + c))%L = (a * b + a * c)%L.
+Theorem quad_int_mul_add_distr_l :
+  let ro := quad_int_ring_like_op d in
+  ∀ a b c : quad_int d, (a * (b + c))%L = (a * b + a * c)%L.
 Proof.
 intros; cbn.
 unfold "*"%QI, "+"%QI; cbn.
@@ -256,7 +264,9 @@ unfold "*"%QI; cbn.
 f_equal; ring.
 Qed.
 
-Theorem quad_int_add_opp_l : ∀ a : quad_int d, (- a + a)%L = 0%L.
+Theorem quad_int_add_opp_l :
+  let ro := quad_int_ring_like_op d in
+  ∀ a : quad_int d, (- a + a)%L = 0%L.
 Proof.
 intros; cbn.
 unfold qi_opp, "+"%QI, "0"%QI; cbn.
@@ -717,8 +727,10 @@ Require Import Zeuclid.
 Section a.
 
 Context [d : Z].
+(*
 Context (ro := @quad_int_ring_like_op d).
 Existing Instance ro.
+*)
 
 Context {Hd1 : d ≠ 1}.
 Context {Hdsqu : square_free d}.
@@ -794,7 +806,9 @@ destruct (Z.eq_dec a b) as [Hab| Hab]. {
 }
 Qed.
 
-Theorem quad_int_characteristic_prop : ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
+Theorem quad_int_characteristic_prop :
+  let ro := @quad_int_ring_like_op d in
+  ∀ i : nat, rngl_of_nat (S i) ≠ 0%QI.
 Proof.
 (* proof perhaps a little bit complicated; maybe simpler proof to find *)
 intros * Hi; cbn in Hi.
@@ -840,7 +854,9 @@ apply square_free_not_mul_square in H; [ | easy | ]. {
 }
 Qed.
 
-Theorem quad_int_mul_div : ∀ a b : quad_int d, b ≠ 0%L → (a * b / b)%L = a.
+Theorem quad_int_mul_div :
+  let ro := @quad_int_ring_like_op d in
+  ∀ a b : quad_int d, b ≠ 0%L → (a * b / b)%L = a.
 Proof.
 intros * Hbz; cbn.
 unfold "*"%QI, "÷"%QI; cbn.
@@ -1096,6 +1112,7 @@ f_equal. {
 Qed.
 
 Canonical Structure quad_int_ring_like_prop : ring_like_prop (quad_int d) :=
+  let ro := quad_int_ring_like_op d in
   {| rngl_mul_is_comm := true;
      rngl_has_dec_le := false;
      rngl_is_integral := false;

@@ -1317,7 +1317,9 @@ rewrite <- loc_length_loc_bl_sens_list; f_equal.
 apply IHl.
 Qed.
 
-Theorem Nat_pow_from_sum : ∀ a n, a * n ≠ 0 →
+Theorem Nat_pow_from_sum :
+  let ro := nat_ring_like_op in
+  ∀ a n, a * n ≠ 0 →
   n ^ a = (n - 1) * (∑ (i = 0, a - 1), n ^ i) + 1.
 Proof.
 intros * Hanz.
@@ -1352,7 +1354,9 @@ rewrite <- Nat.mul_add_distr_r.
 now replace (1 + (n - 1)) with n by flia Hnz.
 Qed.
 
-Theorem fold_left_horner_eval_sum : ∀ k n a x,
+Theorem fold_left_horner_eval_sum :
+  let ro := nat_ring_like_op in
+  ∀ k n a x,
   fold_left (λ acc i : nat, acc * x + a (n + k - i))
     (seq (S k) n) (∑ (i = 0, k), a (n + i) * x ^ i) =
   fold_left (λ c i : nat, c + a (n + k - i) * x ^ (n + k - i))
@@ -1410,7 +1414,10 @@ rewrite iter_seq_eq_compat with (h := λ i, a (S n + i) * x ^ (S n + i))
 apply IHn.
 Qed.
 
-Theorem horner_is_eval_polyn : ∀ n a x,
+Theorem horner_is_eval_polyn :
+  let ro := nat_ring_like_op in
+  let rp := nat_ring_like_prop in
+  ∀ n a x,
   fold_left (λ acc i, acc * x + a (n - i)) (seq 0 (S n)) 0 =
   ∑ (i = 0, n), a i * x ^ i.
 Proof.
@@ -1426,7 +1433,9 @@ unfold iter_seq, iter_list.
 now cbn; rewrite Nat.sub_0_r.
 Qed.
 
-Theorem horner_is_eval_polyn2 : ∀ n a x,
+Theorem horner_is_eval_polyn2 :
+  let ro := nat_ring_like_op in
+  ∀ n a x,
   fold_left (λ acc i, acc * x + a i) (seq 0 (S n)) 0 =
   ∑ (i = 0, n), a (n - i) * x ^ i.
 Proof.

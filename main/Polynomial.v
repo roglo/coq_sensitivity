@@ -4420,12 +4420,19 @@ End a.
 
 Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
+(* to be completed
 Require Import NatRingLike.
 
 Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
   polyn_ring_like_op eq_refl eq_refl.
 
-(* to be completed
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+
+Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
+  let rp := Z_ring_like_prop in
+  polyn_ring_like_op eq_refl eq_refl.
+
 ...
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
   iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.

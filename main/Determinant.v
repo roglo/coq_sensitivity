@@ -1880,7 +1880,9 @@ split. {
 }
 Qed.
 
-Theorem det_any_permut_l : in_charac_0_field →
+Theorem det_any_permut_l :
+  let ron := nat_ring_like_op in
+  in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -1890,7 +1892,8 @@ Theorem det_any_permut_l : in_charac_0_field →
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k σ 0 + 1) (nth k μ 0 + 1)).
 Proof.
-intros Hif * Hnz Hr Hsm Hσ.
+intros ron Hif * Hnz Hr Hsm Hσ.
+subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : permut_seq_with_len n μ). {
@@ -2100,7 +2103,9 @@ rewrite permut_comp_isort_rank_l in Hill; [ | easy ].
 now rewrite comp_1_r in Hill.
 Qed.
 
-Theorem det_any_permut_r : in_charac_0_field →
+Theorem det_any_permut_r :
+  let ron := nat_ring_like_op in
+  in_charac_0_field →
   ∀ n (M : matrix T) (σ : list nat),
   n ≠ 0
   → mat_nrows M = n
@@ -2110,7 +2115,7 @@ Theorem det_any_permut_r : in_charac_0_field →
     (∑ (μ ∈ canon_sym_gr_list_list n), ε μ * ε σ *
      ∏ (k = 0, n - 1), mat_el M (nth k μ 0 + 1) (nth k σ 0 + 1))%L.
 Proof.
-intros Hif * Hnz Hr Hsm Hσ.
+intros ron Hif * Hnz Hr Hsm Hσ; subst ron.
 erewrite rngl_summation_list_eq_compat. 2: {
   intros μ Hμ.
   assert (Hpμ : permut_seq_with_len n μ). {

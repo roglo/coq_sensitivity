@@ -17,7 +17,9 @@ Canonical Structure Q_ring_like_op : ring_like_op Q :=
      rngl_opt_eqb := Some Q.eqb;
      rngl_opt_le := Some Q.le |}.
 
+(*
 Global Existing Instance Q_ring_like_op.
+*)
 
 Theorem Q_characteristic_prop : ∀ i, rngl_of_nat (S i) ≠ 0%Q.
 Proof.

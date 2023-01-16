@@ -118,7 +118,9 @@ Require Import Main.Misc Main.IterAdd Main.NatRingLike.
 (* I don't know how to call that; I temporarily call it "step". It is
    a number associated with a list; the next list must have a "step"
    whose value is nat successor (next of a step 42 must have a step 43 *)
-Definition step l := length l + ∑ (i = 1, length l), l.(i).
+Definition step l :=
+  let ron := nat_ring_like_op in
+  length l + ∑ (i = 1, length l), l.(i).
 
 (* I implemented that some years ago (hott.v in my reals) *)
 
