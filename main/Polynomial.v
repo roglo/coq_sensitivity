@@ -4105,7 +4105,6 @@ apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
 
-(*
 Theorem lap_characteristic_prop :
   let rol := lap_ring_like_op in
   if 0 =? 0 then ∀ i : nat, rngl_of_nat (S i) ≠ 0%L
@@ -4116,7 +4115,6 @@ cbn - [ rngl_of_nat ].
 intros; cbn.
 now destruct (rngl_of_nat i).
 Qed.
-*)
 
 Theorem polyn_characteristic_prop :
   let rop := polyn_ring_like_op in
@@ -4194,7 +4192,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_le_dec := lap_opt_le_dec;
      rngl_opt_integral := lap_opt_integral;
      rngl_opt_alg_closed := NA;
-     rngl_characteristic_prop := 3; (*lap_characteristic_prop;*)
+     rngl_characteristic_prop := lap_characteristic_prop;
      rngl_opt_le_refl := NA;
      rngl_opt_le_antisymm := NA;
      rngl_opt_le_trans := NA;
