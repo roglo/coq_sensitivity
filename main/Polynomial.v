@@ -4437,7 +4437,7 @@ Qed.
 
 End a.
 
-(*
+(* to be completed
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
   iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.
 
