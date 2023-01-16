@@ -871,6 +871,21 @@ rewrite <- rngl_mul_add_distr_r.
 now do 2 rewrite rngl_add_0_l.
 Qed.
 
+Theorem rngl_characteristic_1 :
+  rngl_has_opp_or_sous = true →
+  rngl_characteristic = 1 →
+  ∀ x, x = 0%L.
+Proof.
+intros Hos Hch *.
+specialize (rngl_characteristic_prop) as H1.
+rewrite Hch in H1; cbn in H1.
+destruct H1 as (_, H1).
+rewrite rngl_add_0_r in H1.
+assert (H : (x * 0)%L = x) by now rewrite <- H1, rngl_mul_1_r.
+rewrite <- H.
+apply (rngl_mul_0_r Hos).
+Qed.
+
 Theorem rngl_add_move_0_r :
   rngl_has_opp = true →
   ∀ a b, (a + b = 0)%L ↔ (a = - b)%L.
@@ -1230,13 +1245,46 @@ apply rngl_sub_diag.
 now apply rngl_has_opp_or_sous_iff; left.
 Qed.
 
+Theorem Nat_eqb_eq : ∀ a b, Nat.eqb a b = true ↔ a = b.
+Proof.
+intros.
+split; intros Hab. {
+  revert b Hab.
+  induction a; intros; [ now destruct b | ].
+  destruct b; [ easy | cbn in Hab ].
+  now f_equal; apply IHa.
+} {
+  now subst b; induction a.
+}
+Qed.
+
+Theorem Nat_eqb_neq : ∀ a b, Nat.eqb a b = false ↔ a ≠ b.
+Proof.
+intros.
+split; intros Hab. {
+  intros H.
+  apply Nat_eqb_eq in H.
+  now rewrite Hab in H.
+} {
+  remember (Nat.eqb a b) as ab eqn:Heab; symmetry in Heab.
+  destruct ab; [ | easy ].
+  now apply Nat_eqb_eq in Heab.
+}
+Qed.
+
 Theorem rngl_inv_neq_0 :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
-intros Hom Hin H10 * Haz H1.
+intros Hom Hin * Haz H1.
+remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+destruct ch. {
+  apply Nat_eqb_eq in Hch.
+  now specialize (rngl_characteristic_1 Hom Hch a).
+}
+apply Nat_eqb_neq in Hch.
+move Hch before Hin.
 symmetry in H1.
 apply rngl_mul_move_1_r in H1; [ | easy | easy ].
 rewrite rngl_mul_0_l in H1; [ | easy ].
@@ -1247,10 +1295,16 @@ Qed.
 Theorem rngl_inv_involutive :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
-intros Hos Hin H10 * Hxz.
+intros Hos Hin * Hxz.
+remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+destruct ch. {
+  apply Nat_eqb_eq in Hch.
+  now exfalso; apply Hxz, rngl_characteristic_1.
+}
+apply Nat_eqb_neq in Hch.
+move Hch before Hin.
 symmetry.
 specialize (rngl_div_diag) as div_diag.
 unfold rngl_div in div_diag.
@@ -1309,11 +1363,10 @@ Qed.
 Theorem rngl_inv_inj :
   rngl_has_opp_or_sous = true →
   rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →(a⁻¹ = b⁻¹)%L → a = b.
 Proof.
-intros Hom Hin H10 * Haz Hbz H.
-rewrite <- (rngl_inv_involutive Hom Hin H10 a); [ | easy ].
+intros Hom Hin * Haz Hbz H.
+rewrite <- (rngl_inv_involutive Hom Hin a); [ | easy ].
 rewrite H.
 now apply rngl_inv_involutive.
 Qed.
@@ -1461,10 +1514,17 @@ Qed.
 Theorem rngl_opp_inv :
   rngl_has_opp = true →
   rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ a, a ≠ 0%L → (- a⁻¹ = (- a)⁻¹)%L.
 Proof.
-intros Hop Hin H10 * Haz.
+intros Hop Hin * Haz.
+remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
+destruct ch. {
+  apply Nat_eqb_eq in Hch.
+  exfalso; apply Haz, rngl_characteristic_1; [ | easy ].
+  now apply rngl_has_opp_or_sous_iff; left.
+}
+apply Nat_eqb_neq in Hch.
+move Hch before Hin.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hin'.
 rewrite Hin in Hin'.
 specialize (Hin' (or_introl eq_refl)).

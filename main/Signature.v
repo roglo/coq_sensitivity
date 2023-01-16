@@ -1649,7 +1649,7 @@ rewrite product_product_if_permut; try easy. {
   rewrite rngl_mul_opp_l; [ | easy ].
   rewrite <- rngl_mul_opp_r; [ | easy ].
   f_equal.
-  rewrite rngl_opp_inv; [ | easy | easy | easy | ]. 2: {
+  rewrite rngl_opp_inv; [ | easy | easy | ]. 2: {
     intros H.
     apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply Hij; symmetry.
@@ -1672,7 +1672,7 @@ rewrite product_product_if_permut; try easy. {
     now apply (NoDup_nat _ Hp1) in H.
   } {
     revert H.
-    apply rngl_inv_neq_0; [ easy | easy | easy | ].
+    apply rngl_inv_neq_0; [ easy | easy | ].
     intros H.
     apply -> rngl_sub_move_0_r in H; [ | easy ].
     apply rngl_of_nat_inj in H; [ | easy | easy ].

@@ -38,7 +38,9 @@ Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
 Context {Hos : rngl_has_opp_or_sous = true}.
+(*
 Context (Hc1 : rngl_characteristic ≠ 1).
+*)
 
 Fixpoint lap_all_0 zero (eqb : T → T → bool) (la : list T) :=
   match la with
@@ -107,12 +109,16 @@ split; intros Hpq. {
 }
 Qed.
 
-Definition lap_one := [1%L].
+Definition lap_one :=
+  match Nat.eq_dec rngl_characteristic 1 with
+  | left _ => []
+  | right H => [1%L]
+  end.
 
 Theorem polyn_one_prop : has_polyn_prop lap_one = true.
 Proof.
 unfold lap_one.
-unfold has_polyn_prop; cbn.
+destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | cbn ].
 apply (rngl_neqb_neq Heb).
 now apply rngl_1_neq_0_iff.
 Qed.
@@ -636,6 +642,14 @@ Theorem rlap_quot_prop :
   → lq = [] ∨ hd 0%L lq ≠ 0%L.
 Proof.
 intros Hiv * Ha Hb Hab.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  destruct lq as [| q]; [ now left | right; cbn ].
+  destruct Hb as [Hb| Hb]; [ now subst lb | ].
+  destruct lb as [| b]; [ easy | cbn in Hb ].
+  now specialize (H1 b).
+}
+move Hch before Hiv.
 unfold rlap_quot_rem in Hab.
 remember (rlap_quot_rem_nb_iter _ _) as it eqn:Hit.
 symmetry in Hit.
@@ -678,7 +692,7 @@ apply rngl_integral in Hq; [ | easy | ]. 2: {
 }
 destruct Hq as [Hq| Hq]; [ easy | ].
 exfalso; revert Hq.
-apply rngl_inv_neq_0; [ easy | easy | easy | easy ].
+apply rngl_inv_neq_0; [ easy | easy | easy ].
 Qed.
 
 Theorem lap_quot_is_norm :
@@ -2008,10 +2022,13 @@ rewrite Nat.add_sub.
 now rewrite lap_convol_mul_const_r.
 Qed.
 
-Theorem lap_mul_1_l : ∀ la, (1 * la)%lap = la.
+Theorem lap_mul_1_l :
+  rngl_characteristic ≠ 1 →
+  ∀ la, (1 * la)%lap = la.
 Proof.
-intros.
+intros Hch *.
 unfold lap_one.
+destruct (Nat.eq_dec _ _) as [H| H]; [ easy | clear H ].
 rewrite lap_mul_const_l; cbn.
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_l; f_equal.
@@ -2022,6 +2039,7 @@ Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
 Proof.
 intros.
 unfold lap_one.
+...
 rewrite lap_mul_const_r; cbn.
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_r; f_equal.
@@ -2035,13 +2053,32 @@ destruct rngl_mul_is_comm; [ easy | ].
 apply lap_mul_1_r.
 Qed.
 
+Theorem is_empty_list_empty : ∀ A (la : list A),
+  is_empty_list la = true → la = [].
+Proof.
+intros * Ha.
+unfold is_empty_list in Ha.
+now destruct la.
+Qed.
+
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.
 Proof.
 intros (la, lapr).
 unfold "*"%pol.
+unfold polyn_one.
+apply eq_polyn_eq; cbn.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+  apply Bool.orb_true_iff in lapr.
+  destruct lapr as [lapr| lapr]. {
+    apply is_empty_list_empty in lapr.
+    now subst la.
+  }
+  apply (rngl_neqb_neq Heb) in lapr.
+  exfalso; apply lapr.
+  apply (rngl_characteristic_1 Hos Hch).
+}
 cbn - [ lap_mul ].
 rewrite lap_mul_1_l.
-apply eq_polyn_eq; cbn.
 now apply last_lap_neq_0_lap_norm.
 Qed.
 
@@ -2440,6 +2477,21 @@ Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
+unfold polyn_one.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
+  cbn.
+  rewrite lap_mul_0_r; symmetry; cbn.
+  specialize (rngl_characteristic_1 Hos Hch) as H1.
+  destruct a as (la, pa); cbn.
+  apply Bool.orb_true_iff in pa.
+  destruct pa as [pa| pa]. {
+    now apply is_empty_list_empty in pa.
+  }
+  apply (rngl_neqb_neq Heb) in pa.
+  exfalso; apply pa.
+  apply (rngl_characteristic_1 Hos Hch).
+}
+cbn - [ lap_mul ].
 rewrite lap_mul_1_r.
 apply last_lap_neq_0_lap_norm.
 now destruct a.
@@ -3216,14 +3268,6 @@ rewrite IHla; [ | now rewrite rev_length ].
 now rewrite rev_involutive.
 Qed.
 
-Theorem is_empty_list_empty : ∀ A (la : list A),
-  is_empty_list la = true → la = [].
-Proof.
-intros * Ha.
-unfold is_empty_list in Ha.
-now destruct la.
-Qed.
-
 Theorem lap_quot_rem_prop :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -3924,6 +3968,10 @@ Proof.
 intros rop Hch * Hiz.
 subst rop.
 induction i; [ easy | clear Hiz; cbn ].
+(**)
+unfold polyn_one.
+destruct (Nat.eq_dec _ _) as [H| H]; [ now rewrite Hch in H | ].
+cbn - [ lap_norm lap_add ].
 destruct i. {
   cbn; rewrite rngl_add_0_r.
   rewrite if_bool_if_dec.
@@ -3947,6 +3995,9 @@ Theorem lap_polyn_rngl_of_nat_2 :
   → lap (rngl_of_nat i) = [rngl_of_nat i].
 Proof.
 intros * Hi.
+destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
+  flia Hi Hc1.
+}
 specialize (proj1 rngl_1_neq_0_iff Hc1) as H11.
 specialize rngl_characteristic_prop as Hch.
 rewrite if_bool_if_dec in Hch.
@@ -3958,6 +4009,9 @@ clear Hchz.
 destruct Hch as (Hbef, Hch).
 induction i; [ easy | cbn ].
 remember (lap (rngl_of_nat i)) as la eqn:Hla; symmetry in Hla.
+unfold polyn_one.
+destruct (Nat.eq_dec _ _) as [Hc1'| Hc1']; [ easy | ].
+cbn - [ lap_add ]; clear Hc1'.
 destruct la as [| a]; cbn. {
   rewrite if_bool_if_dec.
   apply (rngl_eqb_neq Heb) in H11; rewrite H11.
@@ -3983,6 +4037,9 @@ destruct lb as [| b]. {
     injection IHi; clear IHi; intros; subst a la.
     clear Hlb.
     cbn in Hla.
+    unfold polyn_one in Hla.
+    destruct (Nat.eq_dec _ _) as [Hc1'| Hc1']; [ easy | ].
+    cbn - [ lap_add ] in Hla.
     remember (lap (rngl_of_nat i)) as lb eqn:Hlb; symmetry in Hlb.
     destruct lb as [| b]; cbn in Hla. {
       rewrite if_bool_if_dec in Hla.
@@ -4018,6 +4075,23 @@ Theorem lap_polyn_rngl_of_nat :
   ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
 Proof.
 intros.
+(**)
+induction n; [ easy | ].
+cbn - [ lap_add lap_norm ].
+unfold polyn_one.
+destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
+  specialize (rngl_characteristic_1 Hos Hc1) as H1.
+Print lap_one.
+...
+  cbn - [ lap_add ].
+  rewrite lap_add_0_l.
+  rewrite IHn.
+...
+  induction n. {
+    now cbn; rewrite (H1 1%L), (rngl_eqb_refl Heb).
+  }
+  rewrite IHn.
+...
 induction n; [ easy | cbn ].
 rewrite IHn; cbn.
 do 2 rewrite fold_lap_norm.
@@ -4357,7 +4431,7 @@ Qed.
 
 End a.
 
-(*
+(**)
 Check polyn_ring_like_op.
 
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
