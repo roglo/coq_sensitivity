@@ -109,14 +109,14 @@ split; intros Hpq. {
 }
 Qed.
 
-Definition lap_one' := [1%L].
+Definition lap_one := [1%L].
 
 Theorem polyn_one_prop :
   rngl_characteristic ≠ 1 →
-  has_polyn_prop lap_one' = true.
+  has_polyn_prop lap_one = true.
 Proof.
 intros Hc1.
-unfold lap_one'.
+unfold lap_one.
 unfold has_polyn_prop; cbn.
 apply (rngl_neqb_neq Heb).
 now apply rngl_1_neq_0_iff.
@@ -126,7 +126,7 @@ Definition polyn_zero := mk_polyn [] eq_refl.
 Definition polyn_one :=
   match Nat.eq_dec rngl_characteristic 1 with
   | left _ => polyn_zero
-  | right Hc1 => mk_polyn lap_one' (polyn_one_prop Hc1)
+  | right Hc1 => mk_polyn lap_one (polyn_one_prop Hc1)
   end.
 (* TODO: voir si on peut pas le définir par "lap_norm 1", un truc comme ça *)
 
@@ -847,7 +847,7 @@ Definition polyn_opt_inv_or_quot :
 
 Definition lap_ring_like_op : ring_like_op (list T) :=
   {| rngl_zero := [];
-     rngl_one := lap_one';
+     rngl_one := lap_one;
      rngl_add := lap_add;
      rngl_mul := lap_mul;
      rngl_opt_opp_or_sous := lap_opt_opp_or_sous;
@@ -896,7 +896,7 @@ Arguments lap_quot_rem (la lb)%lap.
 Arguments lap_quot (la lb)%lap.
 Arguments lap_rem (la lb)%lap.
 
-Notation "1" := lap_one' : lap_scope.
+Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
 Notation "a + b" := (lap_add a b) : lap_scope.
 Notation "a - b" := (lap_sub a b) : lap_scope.
@@ -2037,7 +2037,7 @@ Qed.
 Theorem lap_mul_1_l : ∀ la, (1 * la)%lap = la.
 Proof.
 intros.
-unfold lap_one'.
+unfold lap_one.
 rewrite lap_mul_const_l.
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_l; f_equal.
@@ -2047,7 +2047,7 @@ Qed.
 Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
 Proof.
 intros.
-unfold lap_one'.
+unfold lap_one.
 rewrite lap_mul_const_r; cbn.
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_r; f_equal.
@@ -4075,56 +4075,17 @@ Theorem lap_polyn_rngl_of_nat :
 Proof.
 intros.
 induction n; [ easy | cbn ].
+unfold polyn_one.
 rewrite IHn; cbn.
-unfold polyn_one.
-destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
-  cbn.
-...
-do 2 rewrite fold_lap_norm.
+rewrite fold_lap_norm.
 remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
-destruct la as [| a]; [ easy | cbn ].
-do 2 rewrite strip_0s_app.
-cbn.
-remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
-destruct lb as [| b]. {
-  rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]; [ cbn | easy ].
-  apply (rngl_eqb_eq Heb) in Haz; subst a.
-  now rewrite rngl_add_0_r.
-}
-cbn; rewrite rev_app_distr; cbn.
-rewrite rev_app_distr; cbn.
-rewrite rev_involutive.
-rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
-apply (rngl_eqb_eq Heb) in Hbz; subst b.
-now apply eq_strip_0s_cons in Hlb.
-Qed.
-...
-ntros.
-subst rop.
-induction n; [ easy | ].
-cbn - [ lap_add lap_norm ].
-unfold polyn_one.
 destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
-  cbn - [ lap_add lap_norm ].
-  rewrite lap_add_0_l.
-  rewrite IHn at 1.
-  rewrite lap_norm_idemp.
-  unfold lap_one'.
-  unfold lap_norm; cbn.
-  cbn.
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
-  rewrite H1.
-...
-  apply rngl_characteristic_1.
-  do 2 rewrite lap_add_0_l.
-  rewrite IHn at 1.
-  apply lap_norm_idemp.
+  rewrite (H1 1%L).
+  destruct la as [| a]; [ now cbn; rewrite (rngl_eqb_refl Heb) | ].
+  cbn; rewrite rev_involutive.
+  now rewrite strip_0s_idemp, rngl_add_0_l.
 }
-rewrite IHn; cbn.
-do 2 rewrite fold_lap_norm.
-remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
 destruct la as [| a]; [ easy | cbn ].
 do 2 rewrite strip_0s_app.
 cbn.
@@ -4184,14 +4145,8 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
   apply eq_polyn_eq; cbn.
-  rewrite lap_polyn_rngl_of_nat.
-  destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
-    rewrite Hc1; cbn - [ lap_norm ].
-    now unfold lap_one; rewrite Hc1.
-  }
-  rewrite (lap_rngl_of_nat Hc1).
-  apply Nat.eqb_neq in Hcz.
-  rewrite <- if_eqb_eq_dec, Hcz.
+  rewrite lap_polyn_rngl_of_nat, lap_rngl_of_nat.
+  destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Heb).
 }
