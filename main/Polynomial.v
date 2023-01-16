@@ -2035,11 +2035,13 @@ rewrite rngl_mul_1_l; f_equal.
 apply IHla.
 Qed.
 
-Theorem lap_mul_1_r : ∀ la, (la * 1)%lap = la.
+Theorem lap_mul_1_r :
+  rngl_characteristic ≠ 1 →
+  ∀ la, (la * 1)%lap = la.
 Proof.
-intros.
+intros Hch *.
 unfold lap_one.
-...
+destruct (Nat.eq_dec _ _) as [H| H]; [ easy | clear H ].
 rewrite lap_mul_const_r; cbn.
 induction la as [| a]; [ easy | cbn ].
 rewrite rngl_mul_1_r; f_equal.
@@ -2047,10 +2049,12 @@ apply IHla.
 Qed.
 
 Theorem lap_opt_mul_1_r :
+  rngl_characteristic ≠ 1 →
   if rngl_mul_is_comm then not_applicable else ∀ a, (a * 1)%lap = a.
 Proof.
+intros Hch.
 destruct rngl_mul_is_comm; [ easy | ].
-apply lap_mul_1_r.
+apply (lap_mul_1_r Hch).
 Qed.
 
 Theorem is_empty_list_empty : ∀ A (la : list A),
@@ -2071,14 +2075,15 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
   apply Bool.orb_true_iff in lapr.
   destruct lapr as [lapr| lapr]. {
     apply is_empty_list_empty in lapr.
-    now subst la.
+    subst la; cbn.
+    now rewrite lap_mul_0_r.
   }
   apply (rngl_neqb_neq Heb) in lapr.
   exfalso; apply lapr.
   apply (rngl_characteristic_1 Hos Hch).
 }
 cbn - [ lap_mul ].
-rewrite lap_mul_1_l.
+rewrite (lap_mul_1_l Hch).
 now apply last_lap_neq_0_lap_norm.
 Qed.
 
@@ -2477,22 +2482,17 @@ Theorem polyn_mul_1_r : ∀ a : polyn T, (a * 1)%pol = a.
 Proof.
 intros.
 apply eq_polyn_eq; cbn.
-unfold polyn_one.
 destruct (Nat.eq_dec rngl_characteristic 1) as [Hch| Hch]. {
-  cbn.
-  rewrite lap_mul_0_r; symmetry; cbn.
-  specialize (rngl_characteristic_1 Hos Hch) as H1.
   destruct a as (la, pa); cbn.
   apply Bool.orb_true_iff in pa.
   destruct pa as [pa| pa]. {
-    now apply is_empty_list_empty in pa.
+    now apply is_empty_list_empty in pa; subst la.
   }
   apply (rngl_neqb_neq Heb) in pa.
   exfalso; apply pa.
   apply (rngl_characteristic_1 Hos Hch).
 }
-cbn - [ lap_mul ].
-rewrite lap_mul_1_r.
+rewrite (lap_mul_1_r Hch).
 apply last_lap_neq_0_lap_norm.
 now destruct a.
 Qed.
@@ -3949,13 +3949,16 @@ now destruct H2.
 Qed.
 
 Theorem lap_rngl_of_nat :
+  rngl_characteristic ≠ 1 →
   let lop := lap_ring_like_op in
   ∀ n, rngl_of_nat n = if Nat.eq_dec n 0 then [] else [rngl_of_nat n].
 Proof.
-intros.
+intros Hc1 *.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now subst n | ].
 subst lop.
 induction n; [ easy | clear Hnz; cbn ].
+unfold lap_one.
+destruct (Nat.eq_dec _ _) as [H| H]; [ easy | ].
 destruct n; [ now cbn; rewrite rngl_add_0_r | ].
 now rewrite IHn.
 Qed.
@@ -3970,6 +3973,7 @@ subst rop.
 induction i; [ easy | clear Hiz; cbn ].
 (**)
 unfold polyn_one.
+...
 destruct (Nat.eq_dec _ _) as [H| H]; [ now rewrite Hch in H | ].
 cbn - [ lap_norm lap_add ].
 destruct i. {
