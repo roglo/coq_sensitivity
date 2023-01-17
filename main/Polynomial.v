@@ -4469,7 +4469,7 @@ Definition Q_polyn_ring_like_prop : ring_like_prop (polyn Q) :=
 
 (* polynomials of square matrices *)
 
-(* locally don't want this module to depend on Matrix & Mrl
+(* locally don't want this module to depend on Matrix & MatRl
 Require Import Matrix.
 Require Import RnglAlg.MatRl.
 
@@ -4490,7 +4490,7 @@ Definition mat_polyn_ring_like_prop n T ro rp eqb
 
 (* square matrices of polynomials *)
 
-(* locally don't want this module to depend on Matrix & Mrl
+(* locally don't want this module to depend on Matrix & MatRl
 Require Import Matrix.
 Require Import RnglAlg.MatRl.
 
