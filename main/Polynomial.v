@@ -4425,25 +4425,15 @@ Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
 (* polynomials of nat *)
 
-Definition gen_nat_polyn_ring_like_op
-    (ro : ring_like_op nat) (rp : ring_like_prop nat)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_op (polyn nat) :=
-  @polyn_ring_like_op nat ro rp Heb Hos.
-
-Definition gen_nat_polyn_ring_like_prop
-    (ro : ring_like_op nat) (rp : ring_like_prop nat)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_prop (polyn nat) :=
-  @polyn_ring_like_prop nat ro rp Heb Hos.
-
-(* works on nat_ring_like_op and _prop defined in NatRingLike
 Require Import NatRingLike.
+
 Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
-  gen_nat_polyn_ring_like_op nat_ring_like_prop eq_refl eq_refl.
+  @polyn_ring_like_op nat nat_ring_like_op nat_ring_like_prop
+    eq_refl eq_refl.
+
 Definition nat_polyn_ring_like_prop : ring_like_prop (polyn nat) :=
-  gen_nat_polyn_ring_like_prop nat_ring_like_prop eq_refl eq_refl.
-*)
+  @polyn_ring_like_prop nat nat_ring_like_op nat_ring_like_prop
+    eq_refl eq_refl.
 
 (* polynomials of Z *)
 
@@ -4473,10 +4463,25 @@ Definition Z_polyn_ring_like_prop : ring_like_prop (polyn Z) :=
 
 (* to be completed
 
+Require Import RnglAlg.Rational.
+
+Definition gen_Q_polyn_ring_like_op
+    (ro : ring_like_op Q) (rp : ring_like_prop Q)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_op (polyn Q) :=
+  @polyn_ring_like_op Q ro rp Heb Hos.
+
+Print polyn_ring_like_op.
+
+Definition gen_Q_polyn_ring_like_prop
+    (ro : ring_like_op Z) (rp : ring_like_prop Z)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_prop (polyn Z) :=
+  @polyn_ring_like_prop Z ro rp Heb Hos.
+
 ...
 
 Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
 
 Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
   let ro := Q_ring_like_op in
