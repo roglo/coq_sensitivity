@@ -4448,52 +4448,29 @@ Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
 Require Import RnglAlg.MatRl.
 Require Import Matrix.
 
-(*
-Arguments rngl_has_opp_has_opp_or_sous {T ro} Hop.
-Check @rngl_has_opp_has_opp_or_sous.
-
-Theorem toto : ∀ T (ro : ring_like_op T),
-  @rngl_has_opp T ro = true → @rngl_has_opp_or_sous T ro = true.
-Admitted.
-
-Definition mat_polyn_ring_like_op n T ro rp
-  (Hop : rngl_has_opp = true)
-  (Heb : rngl_has_eqb = true) :
-    ring_like_op (polyn (square_matrix n T)) :=
-  let rom := mat_ring_like_op ro n in
+Definition mat_polyn_ring_like_op n T ro (rp : ring_like_prop T)
+    (Hop : rngl_has_opp = true)
+    (Heb : @rngl_has_eqb (square_matrix n T) (mat_ring_like_op ro n) = true) :
+      ring_like_op (polyn (square_matrix n T)) :=
   let rpm := @mat_ring_like_prop T ro rp Hop n in
-  polyn_ring_like_op Heb (toto _ Hop). (@rngl_has_opp_has_opp_or_sous _ _ Hop).
-...
-*)
-
-Definition mat_polyn_ring_like_op (n : nat) (T : Type) (ro : ring_like_op T)
-    (rp : @ring_like_prop T ro)
-    (Hop : @rngl_has_opp T ro = true)
-    (Heb : @rngl_has_eqb (square_matrix n T) (@mat_ring_like_op T ro n) = true)
-    (Hos : @rngl_has_opp_or_sous (square_matrix n T) (@mat_ring_like_op T ro n) = true) :=
-  let rom := @mat_ring_like_op T ro n in
-  let rpm := @mat_ring_like_prop T ro rp Hop n in
-  @polyn_ring_like_op (square_matrix n T) (@mat_ring_like_op T ro n) rpm Heb Hos.
+  polyn_ring_like_op Heb eq_refl.
 
 Print mat_ring_like_op.
-Set Printing Implicit.
-Print polyn_ring_like_op.
 ...
+ah merde, il faut que rngl_opt_eqb pour les matrices soit Some et non pas None
+pour que son bool_of_option soit true
+...
+Print rngl_has_eqb.
+Print rngl_opt_eqb.
 
-Definition mat_polyn_ring_like_op n T ro rp
-  (Hop : rngl_has_opp = true)
-  (Heb : rngl_has_eqb = true)
-  (Hos : rngl_has_opp_or_sous = true) :
-    ring_like_op (polyn (square_matrix n T)) :=
-  let rom := mat_ring_like_op ro n in
+Definition mat_polyn_ring_like_op' n T ro (rp : ring_like_prop T)
+    (Hop : rngl_has_opp = true)
+    (Heb : @rngl_has_eqb (square_matrix n T) (mat_ring_like_op ro n) = true) :
+      ring_like_op (polyn (square_matrix n T)) :=
   let rpm := @mat_ring_like_prop T ro rp Hop n in
-  polyn_ring_like_op Heb Hos.
-Set Printing Implicit.
-Print mat_polyn_ring_like_op.
+  polyn_ring_like_op Heb eq_refl.
 
-...
-
-Definition mat_polyn_ring_like_op n T ro rp
+Definition mat_polyn_ring_like_op'' n T ro rp
   (Hopp : rngl_has_opp = true)
   (Heb : rngl_has_eqb = true)
   (Hos : rngl_has_opp_or_sous = true) :
