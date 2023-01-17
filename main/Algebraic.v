@@ -171,6 +171,7 @@ rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 now do 2 rewrite List_last_cons_cons.
 Qed.
 
+(* to be completed
 Theorem glop :
   rngl_has_eqb = true →
   ∀ p q,
@@ -527,6 +528,7 @@ destruct la as [| a3]. {
           (length lb + length lb)) 0%L =
   (a2 * (last (b5 :: lb) 0 * last (b5 :: lb) 0))%L
 ...
+*)
 
 (*
 résultant (selon le X) des polynomes Q et P(Y-X)
@@ -534,7 +536,7 @@ résultant (selon le X) des polynomes Q et P(Y-X)
 
 End a.
 
-(**)
+(* to be completed
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
