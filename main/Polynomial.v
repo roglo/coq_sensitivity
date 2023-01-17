@@ -4423,13 +4423,29 @@ Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
 (* examples *)
 
-(* to be completed
-Require Import NatRingLike.
+(* polynomials of nat *)
 
-Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
-  let ro := nat_ring_like_op in
-  let rp := nat_ring_like_prop in
-  polyn_ring_like_op eq_refl eq_refl.
+Definition nat_polyn_ring_like_op
+    (ro : ring_like_op nat) (rp : ring_like_prop nat)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_op (polyn nat) :=
+  @polyn_ring_like_op nat ro rp Heb Hos.
+
+Definition nat_polyn_ring_like_prop
+    (ro : ring_like_op nat) (rp : ring_like_prop nat)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_prop (polyn nat) :=
+  @polyn_ring_like_prop nat ro rp Heb Hos.
+
+(* works on nat_ring_like_op and _prop defined in NatRingLike
+Require Import NatRingLike.
+Definition nat_polyn_ring_like_op' : ring_like_op (polyn nat) :=
+  nat_polyn_ring_like_op nat_ring_like_prop eq_refl eq_refl.
+*)
+
+(* to be completed
+
+...
 
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
