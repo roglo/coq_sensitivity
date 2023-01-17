@@ -4425,88 +4425,107 @@ Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
 (* polynomials of nat *)
 
+(* commented because locally don't want to depend here on NatRingLike
 Require Import NatRingLike.
 
 Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
-  @polyn_ring_like_op nat nat_ring_like_op nat_ring_like_prop
+  @polyn_ring_like_op _ nat_ring_like_op nat_ring_like_prop
     eq_refl eq_refl.
 
 Definition nat_polyn_ring_like_prop : ring_like_prop (polyn nat) :=
-  @polyn_ring_like_prop nat nat_ring_like_op nat_ring_like_prop
+  @polyn_ring_like_prop _ nat_ring_like_op nat_ring_like_prop
     eq_refl eq_refl.
+*)
 
 (* polynomials of Z *)
 
-(* locally don't want this module to depend on ZArith
+(* commented because locally don't want to depend here on ZArith & Zrl
 Require Import ZArith.
-
-Definition gen_Z_polyn_ring_like_op
-    (ro : ring_like_op Z) (rp : ring_like_prop Z)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_op (polyn Z) :=
-  @polyn_ring_like_op Z ro rp Heb Hos.
-
-Definition gen_Z_polyn_ring_like_prop
-    (ro : ring_like_op Z) (rp : ring_like_prop Z)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_prop (polyn Z) :=
-  @polyn_ring_like_prop Z ro rp Heb Hos.
-
-(* works on Z_ring_like_op and _prop defined in Zrl.v
 Require Import RnglAlg.Zrl.
+
 Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
-  gen_Z_polyn_ring_like_op Z_ring_like_prop eq_refl eq_refl.
+  @polyn_ring_like_op Z Z_ring_like_op Z_ring_like_prop
+    eq_refl eq_refl.
+
 Definition Z_polyn_ring_like_prop : ring_like_prop (polyn Z) :=
-  gen_Z_polyn_ring_like_prop Z_ring_like_prop eq_refl eq_refl.
+  @polyn_ring_like_prop Z Z_ring_like_op Z_ring_like_prop
+    eq_refl eq_refl.
 *)
+
+(* polynomials of Q *)
+
+(* commented because don't want to depend here on Rational & Qrl
+Require Import RnglAlg.Rational.
+Require Import RnglAlg.Qrl.
+
+Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
+  @polyn_ring_like_op _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
+
+Definition Q_polyn_ring_like_prop : ring_like_prop (polyn Q) :=
+  @polyn_ring_like_prop _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
+*)
+
+(* polynomials of square matrices *)
+
+(* locally don't want this module to depend on Matrix & Mrl
+Require Import Matrix.
+Require Import RnglAlg.MatRl.
+
+Definition mat_polyn_ring_like_op n T ro rp eqb
+  (Hop : rngl_has_opp = true) :
+    ring_like_op (polyn (square_matrix n T)) :=
+  @polyn_ring_like_op _
+    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
+    eq_refl eq_refl.
+
+Definition mat_polyn_ring_like_prop n T ro rp eqb
+  (Hop : rngl_has_opp = true) :
+    ring_like_prop (polyn (square_matrix n T)) :=
+  @polyn_ring_like_prop _
+    (mat_ring_like_op ro eqb) (@mat_ring_like_prop T ro rp Hop eqb n)
+    eq_refl eq_refl.
+*)
+
+(* square matrices of polynomials *)
+
+(* locally don't want this module to depend on Matrix & Mrl
+Require Import Matrix.
+Require Import RnglAlg.MatRl.
+
+Definition mat_of_polyn_ring_like_op n T
+  (ro : ring_like_op T) (rp : ring_like_prop T) eqb
+  (Heq : rngl_has_eqb = true)
+  (Hos : rngl_has_opp_or_sous = true) :
+    ring_like_op (square_matrix n (polyn T)) :=
+  mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
+
+Theorem polyn_has_opp :
+  ∀ T (ro : ring_like_op T) (rp : ring_like_prop T) Heq Hop,
+  @rngl_has_opp (polyn T)
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_sous Hop)) = true.
+Proof.
+intros.
+unfold rngl_has_opp in Hop |-*.
+unfold polyn_ring_like_op; cbn.
+unfold polyn_opt_opp_or_sous; cbn.
+remember rngl_opt_opp_or_sous as os eqn:Hos; symmetry in Hos.
+destruct os as [os| ]; [ | easy ].
+now destruct os.
+Qed.
+
+Definition mat_of_polyn_ring_like_prop n T ro rp eqb
+  (Heq : rngl_has_eqb = true) (Hop : rngl_has_opp = true) :
+    ring_like_prop (square_matrix n (polyn T)) :=
+  @mat_ring_like_prop _
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_sous Hop))
+    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_sous Hop))
+    (polyn_has_opp rp Heq Hop) (polyn_eqb eqb) n.
 *)
 
 (* to be completed
 
-Require Import RnglAlg.Rational.
-
-Definition gen_Q_polyn_ring_like_op
-    (ro : ring_like_op Q) (rp : ring_like_prop Q)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_op (polyn Q) :=
-  @polyn_ring_like_op Q ro rp Heb Hos.
-
-Print polyn_ring_like_op.
-
-Definition gen_Q_polyn_ring_like_prop
-    (ro : ring_like_op Z) (rp : ring_like_prop Z)
-    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
-  ring_like_prop (polyn Z) :=
-  @polyn_ring_like_prop Z ro rp Heb Hos.
-
-...
-
-Require Import RnglAlg.Qrl.
-
-Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
-  let ro := Q_ring_like_op in
-  let rp := Q_ring_like_prop in
-  polyn_ring_like_op eq_refl eq_refl.
-
-Require Import RnglAlg.MatRl.
-Require Import Matrix.
-
-Definition polyn_of_mat_ring_like_op T ro rp (eqb : T → T → bool) n
-    (Hop : rngl_has_opp = true) : ring_like_op (polyn (square_matrix n T)) :=
-  let rom := mat_ring_like_op ro eqb in
-  let rpm := @mat_ring_like_prop T ro rp Hop eqb in
-  polyn_ring_like_op eq_refl eq_refl.
-(* TODO: prop *)
-
-Definition mat_of_polyn_ring_like_op T
-    (ro : ring_like_op T) (rp : ring_like_prop T) eqb n
-    (Heq : rngl_has_eqb = true)
-    (Hos : rngl_has_opp_or_sous = true) :
-    ring_like_op (square_matrix n (polyn T)) :=
-  let rop := polyn_ring_like_op Heq Hos in
-  mat_ring_like_op rop (polyn_eqb eqb).
-
-...
 Definition rlap_horner_1 {A} (to_T : A → _) rla x :=
   iter_list rla (λ accu a, (accu * x + to_T a)%L) 0%L.
 

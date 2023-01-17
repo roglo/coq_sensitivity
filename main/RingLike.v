@@ -1722,6 +1722,7 @@ Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%L.
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
+Arguments rngl_has_opp_has_opp_or_sous {T ro} Hop.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%L b%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.
