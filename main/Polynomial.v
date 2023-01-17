@@ -4425,13 +4425,13 @@ Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
 (* polynomials of nat *)
 
-Definition nat_polyn_ring_like_op
+Definition gen_nat_polyn_ring_like_op
     (ro : ring_like_op nat) (rp : ring_like_prop nat)
     (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
   ring_like_op (polyn nat) :=
   @polyn_ring_like_op nat ro rp Heb Hos.
 
-Definition nat_polyn_ring_like_prop
+Definition gen_nat_polyn_ring_like_prop
     (ro : ring_like_op nat) (rp : ring_like_prop nat)
     (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
   ring_like_prop (polyn nat) :=
@@ -4439,21 +4439,41 @@ Definition nat_polyn_ring_like_prop
 
 (* works on nat_ring_like_op and _prop defined in NatRingLike
 Require Import NatRingLike.
-Definition nat_polyn_ring_like_op' : ring_like_op (polyn nat) :=
-  nat_polyn_ring_like_op nat_ring_like_prop eq_refl eq_refl.
+Definition nat_polyn_ring_like_op : ring_like_op (polyn nat) :=
+  gen_nat_polyn_ring_like_op nat_ring_like_prop eq_refl eq_refl.
+Definition nat_polyn_ring_like_prop : ring_like_prop (polyn nat) :=
+  gen_nat_polyn_ring_like_prop nat_ring_like_prop eq_refl eq_refl.
+*)
+
+(* polynomials of Z *)
+
+(* locally don't want this module to depend on ZArith
+Require Import ZArith.
+
+Definition gen_Z_polyn_ring_like_op
+    (ro : ring_like_op Z) (rp : ring_like_prop Z)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_op (polyn Z) :=
+  @polyn_ring_like_op Z ro rp Heb Hos.
+
+Definition gen_Z_polyn_ring_like_prop
+    (ro : ring_like_op Z) (rp : ring_like_prop Z)
+    (Heb : rngl_has_eqb = true) (Hos : rngl_has_opp_or_sous = true) :
+  ring_like_prop (polyn Z) :=
+  @polyn_ring_like_prop Z ro rp Heb Hos.
+
+(* works on Z_ring_like_op and _prop defined in Zrl.v
+Require Import RnglAlg.Zrl.
+Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
+  gen_Z_polyn_ring_like_op Z_ring_like_prop eq_refl eq_refl.
+Definition Z_polyn_ring_like_prop : ring_like_prop (polyn Z) :=
+  gen_Z_polyn_ring_like_prop Z_ring_like_prop eq_refl eq_refl.
+*)
 *)
 
 (* to be completed
 
 ...
-
-Require Import RnglAlg.Zrl.
-Require Import ZArith.
-
-Definition Z_polyn_ring_like_op : ring_like_op (polyn Z) :=
-  let ro := Z_ring_like_op in
-  let rp := Z_ring_like_prop in
-  polyn_ring_like_op eq_refl eq_refl.
 
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
