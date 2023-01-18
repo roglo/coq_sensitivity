@@ -193,6 +193,30 @@ Qed.
 
 Definition lap_norm la := rev (strip_0s (rev la)).
 
+Theorem is_empty_list_empty : ∀ A (la : list A),
+  is_empty_list la = true → la = [].
+Proof.
+intros * Ha.
+unfold is_empty_list in Ha.
+now destruct la.
+Qed.
+
+(* tentative d'avoir une version de polyn_norm_prop la plus simple
+   possible pour que son calcul soit rapide car j'ai eu un problème
+   avec ça dans Algebraic.v
+Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
+Proof.
+intros.
+unfold has_polyn_prop.
+induction la as [| a] using rev_ind; [ easy | ].
+apply Bool.orb_true_iff; right.
+apply Bool.orb_true_iff in IHla.
+destruct IHla as [IHla| IHla]. {
+  apply is_empty_list_empty in IHla.
+Search (lap_norm (_ ++ _)).
+...
+*)
+
 Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
 Proof.
 intros.
@@ -2059,14 +2083,6 @@ Theorem lap_opt_mul_1_r :
 Proof.
 destruct rngl_mul_is_comm; [ easy | ].
 apply lap_mul_1_r.
-Qed.
-
-Theorem is_empty_list_empty : ∀ A (la : list A),
-  is_empty_list la = true → la = [].
-Proof.
-intros * Ha.
-unfold is_empty_list in Ha.
-now destruct la.
 Qed.
 
 Theorem polyn_mul_1_l : ∀ p, (1 * p)%pol = p.

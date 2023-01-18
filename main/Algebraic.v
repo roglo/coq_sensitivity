@@ -571,6 +571,9 @@ Compute (lap_compose Q_ring_like_op [1;0;1] [-1;1]).
 Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
   @polyn_ring_like_op _ Q_ring_like_op Q_ring_like_prop
     eq_refl eq_refl.
+Definition Q_polyn_ring_like_prop : ring_like_prop (polyn Q) :=
+  @polyn_ring_like_prop _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
 
 (*
 Definition polyn_Q_ring_like_op :=
@@ -586,6 +589,49 @@ Check
    [mk_polyn [-2;0;1] eq_refl]). (* x²-2 *)
 
 Check (@polyn_sylvester_mat _ Q_polyn_ring_like_op).
+
+Search polyn.
+Print polyn_of_norm_lap.
+
+Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   lap_norm roq [3]).
+Print polyn_norm_prop.
+About polyn_norm_prop.
+...
+Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   has_polyn_prop (lap_norm roq [3])).
+...
+Time Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   polyn_norm_prop rpq [3]).
+(* 14 s *)
+
+Time Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   @polyn_of_norm_lap Q roq rpq eq_refl [3]).
+(* 14 s *)
+
+Check
+  (let roqp := Q_polyn_ring_like_op in
+   let rpqp := Q_polyn_ring_like_prop in
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   map (λ i, polyn_of_norm_lap rpq [i]) [1;0;1]).
+
+   map (λ i, @mk_polyn (polyn Q) roqp [i]) [1;0;1]).
+   map (λ i : Q, [i]) [1;0;1]).
+
+...
+
+   map (λ i, @mk_polyn Q roq [i]) [1;0;1]).
+   mk_polyn [1;0;1] eq_refl). (* x²+1 *)
+...
 
 Compute
   (let roqp := Q_polyn_ring_like_op in
