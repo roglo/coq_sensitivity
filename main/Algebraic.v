@@ -536,34 +536,75 @@ résultant (selon le X) des polynomes Q et P(Y-X)
 
 End a.
 
-(* to be completed
+(* to be completed *)
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
+Inspect 7.
+
 Compute (
+  let _ := Q_ring_like_op in
   let rla := [2;3;5] in
   let rlb := [7;11] in
   last (rlap_compose rla rlb) 0).
-...
+(*
 2*7²
-Compute (
+*)
+(*
+Time Compute (
+  let _ := Q_ring_like_op in
   let la := [7;5;3;2] in
   let lb := [11;13] in
   last (lap_compose la lb) 0).
+(*
 2*13³
+(2.5 s)
+*)
+*)
 (*
 Compute (lap_compose Q_ring_like_op [-1;1] [1;0;1]).
 Compute (lap_compose Q_ring_like_op [1;0;1] [-1;1]).
 *)
 
+Definition Q_polyn_ring_like_op : ring_like_op (polyn Q) :=
+  @polyn_ring_like_op _ Q_ring_like_op Q_ring_like_prop
+    eq_refl eq_refl.
+
+(*
 Definition polyn_Q_ring_like_op :=
   @polyn_ring_like_op Q Q_ring_like_op Q_ring_like_prop eq_refl eq_refl
     (n_Sn _).
+*)
 
-Check (@polyn_sylvester_mat _ polyn_Q_ring_like_op).
-Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
+Check
+  (let roq := Q_ring_like_op in
+   [mk_polyn [1;0;1] eq_refl]). (* x²+1 *)
+Check
+  (let roq := Q_ring_like_op in
+   [mk_polyn [-2;0;1] eq_refl]). (* x²-2 *)
+
+Check (@polyn_sylvester_mat _ Q_polyn_ring_like_op).
+
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl). (* x²+1 *)
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²+1 *)
+
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   let p := @mk_polyn _ roqp [mk_polyn [1;0;1] eq_refl] eq_refl in
+   let q := @mk_polyn _ roqp [mk_polyn [-2;0;1] eq_refl] eq_refl in
+   @polyn_sylvester_mat _ roqp p q).
+(* oui, non, ça doit pas être ça... *)
+
+...
 
 Check (@lap_compose Q Q_ring_like_op).
 Check lap_compose.
