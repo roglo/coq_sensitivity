@@ -613,17 +613,6 @@ Definition polyn_of_Q_const c :=
   | right Haz => mk_polyn [c] (Q_single_has_polyn_prop Haz)
   end.
 
-Compute (
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   @polyn_of_Q_const 3).
-...
-Compute
-  (let roqp := Q_polyn_ring_like_op in
-   let rpqp := Q_polyn_ring_like_prop in
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   map polyn_of_Q_const [1;0;1]).
 Theorem has_polyn_prop_map_polyn_of_Q_const :
   let roq := Q_ring_like_op in
   let roqp := Q_polyn_ring_like_op in
@@ -643,6 +632,22 @@ unfold polyn_eqb; cbn.
 unfold polyn_of_Q_const.
 destruct (Q.eq_dec a 0) as [Haz| Haz]; [ now subst a | easy ].
 Qed.
+
+Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
+(*
+Notation "'mkp' x" := (mk_polyn x _) (at level 0, only printing, format "mkp  x"): polyn_scope.
+Notation "'〉'" := (@eq_refl nat (Nat.gcd _ _)) : Q_scope.
+*)
+Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   @polyn_of_Q_const 3).
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let rpqp := Q_polyn_ring_like_prop in
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   map polyn_of_Q_const [1;0;1]).
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
@@ -651,14 +656,12 @@ Compute
    let la := [1;0;1] in
    mk_polyn (map polyn_of_Q_const la)
      (has_polyn_prop_map_polyn_of_Q_const la eq_refl)).
-...
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    map polyn_of_Q_const [-2;0;1]).
-...
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
