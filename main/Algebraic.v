@@ -605,85 +605,28 @@ Print polyn_norm_prop.
 Print polyn_of_norm_lap.
 Check rngl_eq_dec.
 About mk_polyn.
-Theorem toto : ∀ c, c ≠ 0%Q → @has_polyn_prop Q Q_ring_like_op [c] = true.
+Theorem Q_single_has_polyn_prop :
+  ∀ c, c ≠ 0%Q → @has_polyn_prop Q Q_ring_like_op [c] = true.
 Proof.
 intros * Hcz; cbn.
-Search ((_ =? _)%Q = _).
-Search ((_ ≠? _)%Q = _).
-Search (negb (_ =? _)%Q = _).
-...
-destruct (Bool.bool_dec (c =? 0) false) as [Hz| Hz]; [ now rewrite Hz | ].
-destruct (Bool.bool_dec (c =? 0) true) as [Hz| Hz]. {
-  now apply Q.eqb_eq in Hz.
-}
-...
-exfalso; apply Hz; clear Hz.
-...
+now destruct c.
+Qed.
 Definition polyn_of_Q_const c :=
   match Q.eq_dec c 0 with
   | left _ => 0%pol
-  | right Haz => mk_polyn [c] 3
-  end.
-...
-Theorem neq_0_has_polyn_prop :
-  ∀ A (ro : ring_like_op A) (rp : ring_like_prop A),
-  rngl_has_eqb = true →
-  ∀ a, a ≠ 0%L → has_polyn_prop [a] = true.
-Proof.
-intros A ro rp Heb * Haz.
-apply Bool.orb_true_iff; right; cbn.
-now apply (@rngl_neqb_neq A ro rp Heb).
-Qed.
-...
-Definition polyn_of_const {A}
-    {ro : ring_like_op A} {rp : ring_like_prop A} {Heb} c :=
-  match rngl_eq_dec Heb c 0 with
-  | left _ => 0%pol
-  | right Haz => mk_polyn [c] (neq_0_has_polyn_prop rp Heb Haz)
+  | right Haz => mk_polyn [c] (Q_single_has_polyn_prop Haz)
   end.
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
-   has_polyn_prop (lap_norm roq [3])).
-Check (
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   @polyn_of_const Q roq rpq eq_refl 3).
-...
-Time Compute (
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   @polyn_of_const Q roq rpq eq_refl 3).
-(* 28 s *)
-...
-Time Compute (
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   polyn_norm_prop rpq [3]).
-(* 14 s *)
-
-Time Compute (
-   let roq := Q_ring_like_op in
-   let rpq := Q_ring_like_prop in
-   @polyn_of_norm_lap Q roq rpq eq_refl [3]).
-(* 14 s *)
-
-Check
+   @polyn_of_Q_const 3).
+Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
-   map (λ i, polyn_of_norm_lap rpq [i]) [1;0;1]).
-
-   map (λ i, @mk_polyn (polyn Q) roqp [i]) [1;0;1]).
-   map (λ i : Q, [i]) [1;0;1]).
-
+   map polyn_of_Q_const [1;0;1]).
 ...
-
-   map (λ i, @mk_polyn Q roq [i]) [1;0;1]).
-   mk_polyn [1;0;1] eq_refl). (* x²+1 *)
-...
-
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
