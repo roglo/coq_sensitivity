@@ -670,7 +670,12 @@ Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
    @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²+1 *)
-
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   @mk_polyn (polyn Q) roqp [mk_polyn [0;1] eq_refl] eq_refl). (* z *)
+(* mmm... z-x est un polynôme à deux variables *)
+...
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
