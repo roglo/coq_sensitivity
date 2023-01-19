@@ -626,6 +626,36 @@ Compute
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    map polyn_of_Q_const [1;0;1]).
+Theorem has_polyn_prop_map_polyn_of_Q_const :
+  let roq := Q_ring_like_op in
+  let roqp := Q_polyn_ring_like_op in
+  ∀ la,
+  has_polyn_prop la = true
+  → has_polyn_prop (map polyn_of_Q_const la) = true.
+Proof.
+intros * Hla.
+destruct la as [| a] using rev_ind; [ easy | clear IHla ].
+apply Bool.orb_true_iff in Hla.
+destruct Hla as [Hla| Hla]; [ now destruct la | ].
+rewrite last_last in Hla.
+rewrite map_app; cbn.
+Search (has_polyn_prop (_ ++ _)).
+...
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let rpqp := Q_polyn_ring_like_prop in
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   let la := [1;0;1] in
+   mk_polyn (map polyn_of_Q_const la)
+     (has_polyn_prop_map_polyn_of_Q_const la eq_refl)).
+...
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let rpqp := Q_polyn_ring_like_prop in
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   map polyn_of_Q_const [-2;0;1]).
 ...
 Compute
   (let roqp := Q_polyn_ring_like_op in
