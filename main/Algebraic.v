@@ -597,13 +597,39 @@ Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    lap_norm roq [3]).
+Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   mk_polyn [3]).
 Print polyn_norm_prop.
-About polyn_norm_prop.
-...
+Print polyn_of_norm_lap.
+Check rngl_eq_dec.
+About mk_polyn.
+Theorem neq_0_has_polyn_prop :
+  ∀ A (ro : ring_like_op A) (rp : ring_like_prop A),
+  rngl_has_eqb = true →
+  ∀ a, a ≠ 0%L → has_polyn_prop [a] = true.
+Proof.
+intros A ro rp Heb * Haz.
+apply Bool.orb_true_iff; right; cbn.
+now apply (@rngl_neqb_neq A ro rp Heb).
+Qed.
+Definition polyn_of_const {A}
+    {ro : ring_like_op A} {rp : ring_like_prop A} {Heb} c :=
+  match rngl_eq_dec Heb c 0 with
+  | left _ => 0%pol
+  | right Haz => mk_polyn [c] (neq_0_has_polyn_prop rp Heb Haz)
+  end.
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    has_polyn_prop (lap_norm roq [3])).
+...
+Time Compute (
+   let roq := Q_ring_like_op in
+   let rpq := Q_ring_like_prop in
+   @polyn_of_const Q roq rpq eq_refl 3).
+(* 28 s *)
 ...
 Time Compute (
    let roq := Q_ring_like_op in

@@ -4586,3 +4586,21 @@ Notation "a / b" := (lap_quot a b) : lap_scope.
 Notation "a 'mod' b" := (lap_rem a b) : lap_scope.
 Notation "a '°' b" := (lap_compose a b) (at level 40, left associativity) :
   lap_scope.
+
+Declare Scope polyn_scope.
+Delimit Scope polyn_scope with pol.
+
+Arguments polyn_zero {T ro}.
+Arguments polyn_one {T ro rp Heb}.
+Arguments polyn_add {T ro rp Heb} p1 p2.
+Arguments polyn_mul {T ro rp Heb} p1 p2.
+Arguments polyn_quot {T ro rp Heb Hos} pa pb.
+Arguments polyn_rem {T ro rp Heb} pa pb.
+
+Notation "0" := polyn_zero : polyn_scope.
+Notation "1" := polyn_one : polyn_scope.
+
+Notation "a + b" := (polyn_add a b) : polyn_scope.
+Notation "a * b" := (polyn_mul a b) : polyn_scope.
+Notation "a / b" := (polyn_quot a b) : polyn_scope.
+Notation "a 'mod' b" := (polyn_rem a b) : polyn_scope.
