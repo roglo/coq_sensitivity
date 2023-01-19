@@ -542,8 +542,6 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
-Inspect 7.
-
 Compute (
   let _ := Q_ring_like_op in
   let rla := [2;3;5] in
@@ -601,25 +599,25 @@ Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    mk_polyn [3]).
-Print polyn_norm_prop.
-Print polyn_of_norm_lap.
-Check rngl_eq_dec.
-About mk_polyn.
+
 Theorem Q_single_has_polyn_prop :
   ∀ c, c ≠ 0%Q → @has_polyn_prop Q Q_ring_like_op [c] = true.
 Proof.
 intros * Hcz; cbn.
 now destruct c.
 Qed.
+
 Definition polyn_of_Q_const c :=
   match Q.eq_dec c 0 with
   | left _ => 0%pol
   | right Haz => mk_polyn [c] (Q_single_has_polyn_prop Haz)
   end.
+
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
    @polyn_of_Q_const 3).
+...
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
@@ -639,8 +637,12 @@ apply Bool.orb_true_iff in Hla.
 destruct Hla as [Hla| Hla]; [ now destruct la | ].
 rewrite last_last in Hla.
 rewrite map_app; cbn.
-Search (has_polyn_prop (_ ++ _)).
-...
+apply Bool.orb_true_iff; right.
+rewrite last_last; cbn.
+unfold polyn_eqb; cbn.
+unfold polyn_of_Q_const.
+destruct (Q.eq_dec a 0) as [Haz| Haz]; [ now subst a | easy ].
+Qed.
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let rpqp := Q_polyn_ring_like_prop in
