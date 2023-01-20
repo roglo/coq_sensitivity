@@ -210,10 +210,13 @@ Proof.
 intros.
 unfold has_polyn_prop.
 induction la as [| a] using rev_ind; [ easy | ].
-apply Bool.orb_true_iff; right.
 apply Bool.orb_true_iff in IHla.
 destruct IHla as [IHla| IHla]. {
   apply is_empty_list_empty in IHla.
+Search (lap_norm (_ ++ _)).
+Search (lap_norm _ = []).
+...
+apply Bool.orb_true_iff; right.
 Search (lap_norm (_ ++ _)).
 ...
 *)
