@@ -201,9 +201,10 @@ unfold is_empty_list in Ha.
 now destruct la.
 Qed.
 
+(* to be completed
 (* tentative d'avoir une version de polyn_norm_prop la plus simple
    possible pour que son calcul soit rapide car j'ai eu un problème
-   avec ça dans Algebraic.v
+   avec ça dans Algebraic.v *)
 Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
 Proof.
 intros.

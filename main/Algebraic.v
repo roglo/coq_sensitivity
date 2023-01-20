@@ -633,10 +633,8 @@ unfold polyn_of_Q_const.
 destruct (Q.eq_dec a 0) as [Haz| Haz]; [ now subst a | easy ].
 Qed.
 
-Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
 (*
-Notation "'mkp' x" := (mk_polyn x _) (at level 0, only printing, format "mkp  x"): polyn_scope.
-Notation "'〉'" := (@eq_refl nat (Nat.gcd _ _)) : Q_scope.
+Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
 *)
 Compute (
    let roq := Q_ring_like_op in
@@ -665,11 +663,11 @@ Compute
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl). (* x²+1 *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl). (* x²+1 = p *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
-   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²+1 *)
+   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²-2 = q *)
 Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
@@ -682,6 +680,108 @@ Compute
   (let roqp := Q_polyn_ring_like_op in
    let roq := Q_ring_like_op in
    @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl). (* z-x *)
+
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl). (* x²-2 = q *)
+Compute
+  (let roqp := Q_polyn_ring_like_op in
+   let roq := Q_ring_like_op in
+   @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl). (* z-x *)
+
+Check @polyn_compose.
+Theorem toto : @rngl_has_eqb (polyn Q) Q_polyn_ring_like_op = true.
+easy.
+Qed.
+Check
+  (let T := polyn Q in
+   let ro := Q_polyn_ring_like_op in
+   let rp := Q_polyn_ring_like_prop in
+   @lap_compose T ro).
+Print polyn_compose.
+Print polyn_of_norm_lap.
+Compute
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   lap_norm Q_polyn_ring_like_op (lap q)).
+Compute
+  (let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   lap_norm Q_polyn_ring_like_op (lap z_x)).
+
+Compute
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   lap_compose (lap q) (lap z_x)).
+
+Print polyn_of_norm_lap.
+
+Check
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
+
+Print polyn_norm_prop.
+(* this theorem is much too long to compute *)
+...
+(* much too long *)
+Time Compute
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
+
+...
+polyn_compose = 
+λ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) (Heb : rngl_has_eqb = true) (p q : polyn T),
+  polyn_of_norm_lap rp (lap p ° lap q)%lap
+...
+Check
+  (let T := polyn Q in
+   let ro := Q_polyn_ring_like_op in
+   let rp := Q_polyn_ring_like_prop in
+   @polyn_compose T ro rp toto).
+...
+(* much too long *)
+Time Compute
+  (let T := polyn Q in
+   let ro := Q_polyn_ring_like_op in
+   let rp := Q_polyn_ring_like_prop in
+   @polyn_compose T ro rp toto).
+...
+
+     (@mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl)
+     (@mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl)%pol).
 ...
 Compute
   (let roqp := Q_polyn_ring_like_op in
