@@ -633,9 +633,6 @@ unfold polyn_of_Q_const.
 destruct (Q.eq_dec a 0) as [Haz| Haz]; [ now subst a | easy ].
 Qed.
 
-(*
-Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
-*)
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
@@ -786,6 +783,10 @@ apply is_empty_list_empty in H1.
 now apply app_eq_nil in H1.
 Qed.
 
+(*
+Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
+*)
+...
 Time Compute
   (let q :=
      let roqp := Q_polyn_ring_like_op in
@@ -798,8 +799,23 @@ Time Compute
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   Q_polyn_norm_prop (lap q ° lap z_x)%lap).
-
+   let r := @eval_polyn (polyn Q) Q_polyn_ring_like_op q z_x in
+   mk_polyn r (Q_polyn_norm_prop r)).
+...
+Time Compute
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   let r := (lap q ° lap z_x)%lap in
+   mk_polyn r (Q_polyn_norm_prop r)).
 ...
 Print polyn_norm_prop.
 (* this theorem is much too long to compute *)
@@ -816,7 +832,8 @@ Time Compute
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   polyn_norm_prop Q_polyn_ring_like_op (lap_compose (lap q) (lap z_x))).
+   let r := lap_compose (lap q) (lap z_x) in
+   polyn_norm_prop Q_polyn_ring_like_op r).
 
 ...
 polyn_compose = 
