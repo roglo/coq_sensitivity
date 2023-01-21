@@ -740,10 +740,47 @@ Check
    let z_x :=
      let roqp := Q_polyn_ring_like_op in
      let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
    polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
 
+Check
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   (*mk_polyn*) (lap_compose (lap q) (lap z_x))).
+Check polyn_norm_prop.
+Theorem Q_polyn_norm_prop :
+  let ro := Q_polyn_ring_like_op in
+  let rp := Q_polyn_ring_like_prop in
+  ∀ la : list (polyn Q), has_polyn_prop (@lap_norm _ ro la) = true.
+Proof.
+intros.
+About lap_norm.
+...
+Time Compute
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   Q_polyn_norm_prop (lap_compose (lap q) (lap z_x))).
+...
 Print polyn_norm_prop.
 (* this theorem is much too long to compute *)
 ...
@@ -757,7 +794,8 @@ Time Compute
    let z_x :=
      let roqp := Q_polyn_ring_like_op in
      let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
    polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
 

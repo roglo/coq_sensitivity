@@ -4601,6 +4601,7 @@ Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_sub {T ro} (la lb)%lap.
 Arguments lap_opp {T ro} la%lap.
 Arguments lap_mul {T ro} (la lb)%lap.
+Arguments lap_norm {T ro} la%lap.
 Arguments lap_quot_rem {T ro} (la lb)%lap.
 Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
