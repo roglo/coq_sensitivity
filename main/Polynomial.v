@@ -268,8 +268,8 @@ apply Bool.orb_true_iff in IHla.
 apply Bool.orb_true_iff; right.
 rewrite last_last.
 destruct IHla as [H1| H1]; [ | easy ].
-apply eq_strip_0s_cons in Hlb.
-now apply (rngl_neqb_neq Heb).
+apply is_empty_list_empty in H1.
+now apply app_eq_nil in H1.
 Qed.
 
 Definition polyn_norm la :=
@@ -4627,8 +4627,8 @@ Delimit Scope polyn_scope with pol.
 
 Arguments polyn_zero {T ro}.
 Arguments polyn_one {T ro rp Heb}.
-Arguments polyn_add {T ro rp Heb} p1 p2.
-Arguments polyn_mul {T ro rp Heb} p1 p2.
+Arguments polyn_add {T ro} p1 p2.
+Arguments polyn_mul {T ro} p1 p2.
 Arguments polyn_quot {T ro rp Heb Hos} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
 

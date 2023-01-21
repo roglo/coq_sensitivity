@@ -745,7 +745,7 @@ Check
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
+   polyn_norm_prop Q_polyn_ring_like_op (lap_compose (lap q) (lap z_x))).
 
 Check
   (let q :=
@@ -761,9 +761,9 @@ Check
    in
    (*mk_polyn*) (lap_compose (lap q) (lap z_x))).
 Check polyn_norm_prop.
+
 Theorem Q_polyn_norm_prop :
   let ro := Q_polyn_ring_like_op in
-  let rp := Q_polyn_ring_like_prop in
   ∀ la : list (polyn Q), has_polyn_prop (@lap_norm _ ro la) = true.
 Proof.
 intros.
@@ -782,15 +782,10 @@ apply Bool.orb_true_iff in IHla.
 apply Bool.orb_true_iff; right.
 rewrite last_last.
 destruct IHla as [H1| H1]; [ | easy ].
-apply eq_strip_0s_cons in Hlb; [ | easy | easy ].
-Check Q.eqb_eq.
-...
-Check Q.eqb_neq.
-Check Q.neqb_neq.
-apply (rngl_neqb_neq).
-now apply (rngl_neqb_neq Heb).
+apply is_empty_list_empty in H1.
+now apply app_eq_nil in H1.
 Qed.
-...
+
 Time Compute
   (let q :=
      let roqp := Q_polyn_ring_like_op in
@@ -803,11 +798,11 @@ Time Compute
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   Q_polyn_norm_prop (lap_compose (lap q) (lap z_x))).
+   Q_polyn_norm_prop (lap q ° lap z_x)%lap).
+
 ...
 Print polyn_norm_prop.
 (* this theorem is much too long to compute *)
-...
 (* much too long *)
 Time Compute
   (let q :=
@@ -821,7 +816,7 @@ Time Compute
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   polyn_norm_prop Q_polyn_ring_like_prop (lap_compose (lap q) (lap z_x))).
+   polyn_norm_prop Q_polyn_ring_like_op (lap_compose (lap q) (lap z_x))).
 
 ...
 polyn_compose = 
