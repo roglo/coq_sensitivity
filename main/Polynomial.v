@@ -207,6 +207,23 @@ Qed.
    avec ça dans Algebraic.v *)
 Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
 Proof.
+(*
+intros.
+apply Bool.orb_true_iff.
+remember (lap_norm la) as lb eqn:Hlb.
+destruct lb as [| b] using rev_ind; [ now left | right ].
+rewrite last_last.
+Search (lap_norm _ = _ ++ _).
+Show Proof.
+Theorem eq_lap_norm_app_const : ∀ la lb b,
+  lap_norm la = lb ++ [b] → b ≠ 0%L.
+Proof.
+intros * Hla.
+revert b lb Hla.
+induction la as [| a] using rev_ind; intros; [ now destruct lb | ].
+(* à voir... *)
+...
+*)
 intros.
 unfold has_polyn_prop.
 induction la as [| a] using rev_ind; [ easy | ].
