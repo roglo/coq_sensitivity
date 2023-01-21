@@ -210,23 +210,27 @@ Proof.
 intros.
 unfold has_polyn_prop.
 induction la as [| a] using rev_ind; [ easy | ].
-unfold lap_norm; cbn.
+apply Bool.orb_true_iff in IHla.
+apply Bool.orb_true_iff.
+unfold lap_norm at 1.
 rewrite rev_app_distr; cbn.
 rewrite if_bool_if_dec.
 destruct (bool_dec _) as [Haz| Haz]. {
-  apply Bool.orb_true_iff in IHla.
-  destruct IHla as [IHla| IHla]. {
-    unfold is_empty_list in IHla.
-...
-destruct IHla as [IHla| IHla]. {
-  apply is_empty_list_empty in IHla.
-...
-Search (lap_norm (_ ++ _)).
-Search (lap_norm _ = []).
-...
-apply Bool.orb_true_iff; right.
-Search (lap_norm (_ ++ _)).
-...
+  apply (rngl_eqb_eq Heb) in Haz; subst a.
+  destruct IHla as [IHla| IHla]; [ now left | right ].
+  unfold lap_norm; cbn.
+  rewrite rev_app_distr; cbn.
+  now rewrite (rngl_eqb_refl Heb).
+}
+cbn.
+right.
+unfold lap_norm; cbn.
+rewrite rev_app_distr; cbn.
+rewrite Haz; cbn.
+rewrite last_last.
+apply (rngl_eqb_neq Heb) in Haz.
+now apply (rngl_neqb_neq Heb) in Haz.
+Qed.
 *)
 
 Theorem polyn_norm_prop : ∀ la, has_polyn_prop (lap_norm la) = true.
