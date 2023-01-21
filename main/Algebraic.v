@@ -786,7 +786,7 @@ Qed.
 (*
 Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
 *)
-...
+(*
 Time Compute
   (let q :=
      let roqp := Q_polyn_ring_like_op in
@@ -802,6 +802,7 @@ Time Compute
    let r := @eval_polyn (polyn Q) Q_polyn_ring_like_op q z_x in
    mk_polyn r (Q_polyn_norm_prop r)).
 ...
+*)
 Time Compute
   (let q :=
      let roqp := Q_polyn_ring_like_op in
@@ -816,6 +817,30 @@ Time Compute
    in
    let r := (lap q ° lap z_x)%lap in
    mk_polyn r (Q_polyn_norm_prop r)).
+Time Compute
+  (let p :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl (* x²+1 *)
+   in
+   let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
+   let r :=
+     let r := (lap q ° lap z_x)%lap in
+     mk_polyn r (Q_polyn_norm_prop r)
+   in
+   (p, r)).
+...
+   polyn_sylvester_mat p r).
 ...
 Print polyn_norm_prop.
 (* this theorem is much too long to compute *)
