@@ -4597,6 +4597,8 @@ Print rlap_compose.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
+Arguments eval_lap {T ro} la%lap.
+Arguments has_polyn_prop {T ro} la%lap.
 Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_sub {T ro} (la lb)%lap.
 Arguments lap_opp {T ro} la%lap.
@@ -4608,8 +4610,7 @@ Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
-Arguments has_polyn_prop {T ro} la%lap.
-Arguments eval_lap {T ro} la%lap.
+Arguments strip_0s {T ro} la%lap.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.

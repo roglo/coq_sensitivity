@@ -594,7 +594,7 @@ Print polyn_of_norm_lap.
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
-   lap_norm roq [3]).
+   lap_norm [3]).
 Compute (
    let roq := Q_ring_like_op in
    let rpq := Q_ring_like_prop in
@@ -707,14 +707,17 @@ Compute
      let roq := Q_ring_like_op in
      @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
    in
-   lap_norm Q_polyn_ring_like_op (lap q)).
+   let roqp := Q_polyn_ring_like_op in
+   lap_norm (lap q)).
 Compute
   (let z_x :=
      let roqp := Q_polyn_ring_like_op in
      let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   lap_norm Q_polyn_ring_like_op (lap z_x)).
+   let roqp := Q_polyn_ring_like_op in
+   lap_norm (lap z_x)).
 
 Compute
   (let q :=
@@ -725,11 +728,10 @@ Compute
    let z_x :=
      let roqp := Q_polyn_ring_like_op in
      let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
    lap_compose (lap q) (lap z_x)).
-
-Print polyn_of_norm_lap.
 
 Check
   (let q :=
@@ -765,7 +767,29 @@ Theorem Q_polyn_norm_prop :
   ∀ la : list (polyn Q), has_polyn_prop (@lap_norm _ ro la) = true.
 Proof.
 intros.
-About lap_norm.
+unfold has_polyn_prop, lap_norm.
+induction la as [| a]; [ easy | cbn ].
+rewrite strip_0s_app.
+remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
+destruct lb as [| b]; cbn. {
+  rewrite if_bool_if_dec.
+  destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
+  now apply Bool.negb_true_iff.
+}
+cbn in IHla.
+rewrite last_last in IHla.
+apply Bool.orb_true_iff in IHla.
+apply Bool.orb_true_iff; right.
+rewrite last_last.
+destruct IHla as [H1| H1]; [ | easy ].
+apply eq_strip_0s_cons in Hlb; [ | easy | easy ].
+Check Q.eqb_eq.
+...
+Check Q.eqb_neq.
+Check Q.neqb_neq.
+apply (rngl_neqb_neq).
+now apply (rngl_neqb_neq Heb).
+Qed.
 ...
 Time Compute
   (let q :=
