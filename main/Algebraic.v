@@ -834,7 +834,6 @@ Time Compute (
     mk_polyn q (Q_polyn_norm_prop q)
   in
   polyn_sylvester_mat p q').
-Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
 Time Compute (
   let p :=
     let roq := Q_ring_like_op in
@@ -855,7 +854,7 @@ Time Compute (
 (* avec la Notation, ça répond vite, ce qui prouve que c'est l'affichage
    qui prend du temps *)
 (* résultat
-     = mkp ([〈9〉; 0; 〈-2〉; 0; 〈1〉])%pol
+     = mkp [〈9〉; 0; 〈-2〉; 0; 〈1〉]%pol
      : polyn Q
    ce qui est correct !!! Super !
  *)
