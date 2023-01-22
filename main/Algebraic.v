@@ -856,8 +856,9 @@ Time Compute (
     mk_polyn q (polyn_norm_prop Q_polyn_ring_like_op q)
   in
   resultant p q').
-(* avec la Notation, ça répond vite, ce qui prouve que c'est l'affichage
-   qui prend du temps *)
+(* avec la Notation, ça répond vite, ce qui prouve que l'affichage
+   qui prend du temps ; d'un autre côté, il y a un exemple plus
+   haut où ça a pas l'air d'être ça *)
 (* résultat
      = mkp [〈9〉; 0; 〈-2〉; 0; 〈1〉]%pol
      : polyn Q
