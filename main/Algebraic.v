@@ -784,9 +784,6 @@ now apply app_eq_nil in H1.
 Qed.
 
 (*
-Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
-*)
-(*
 Time Compute
   (let q :=
      let roqp := Q_polyn_ring_like_op in
@@ -816,7 +813,12 @@ Time Compute
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
    let r := (lap q ° lap z_x)%lap in
+(*
+   mk_polyn r (polyn_norm_prop Q_polyn_ring_like_op r)
+*)
+(* 32 s *)
    mk_polyn r (Q_polyn_norm_prop r)).
+(* 0.007 s *)
 Time Compute (
   let p :=
     let roqp := Q_polyn_ring_like_op in
