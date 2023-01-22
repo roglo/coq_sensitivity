@@ -819,28 +819,31 @@ Time Compute
    mk_polyn r (Q_polyn_norm_prop r)).
 Time Compute (
   let p :=
+    let roqp := Q_polyn_ring_like_op in
     let roq := Q_ring_like_op in
     let p :=
       [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
     in
-    mk_polyn p (Q_polyn_norm_prop p)
+    mk_polyn p (polyn_norm_prop _ p)
   in
   let q' :=
+    let roqp := Q_polyn_ring_like_op in
     let roq := Q_ring_like_op in
     let q :=
       [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
        mk_polyn [1] eq_refl]
     in
-    mk_polyn q (Q_polyn_norm_prop q)
+    mk_polyn q (polyn_norm_prop _ q)
   in
   polyn_sylvester_mat p q').
 Time Compute (
   let p :=
+    let roqp := Q_polyn_ring_like_op in
     let roq := Q_ring_like_op in
     let p :=
       [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
     in
-    mk_polyn p (Q_polyn_norm_prop p)
+    mk_polyn p (polyn_norm_prop _ p)
   in
   let q' :=
     let roq := Q_ring_like_op in
@@ -848,7 +851,7 @@ Time Compute (
       [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
        mk_polyn [1] eq_refl]
     in
-    mk_polyn q (Q_polyn_norm_prop q)
+    mk_polyn q (polyn_norm_prop Q_polyn_ring_like_op q)
   in
   resultant p q').
 (* avec la Notation, ça répond vite, ce qui prouve que c'est l'affichage
@@ -859,83 +862,6 @@ Time Compute (
    ce qui est correct !!! Super !
  *)
 ...
-Time Compute
-  (let p :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [1;0;1] eq_refl] eq_refl (* x²+1 *)
-   in
-   let q :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
-   in
-   let z_x :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp
-       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
-   in
-   let r :=
-     let r := (lap q ° lap z_x)%lap in
-     mk_polyn r (Q_polyn_norm_prop r)
-   in
-   (p, r)).
-...
-   polyn_sylvester_mat p r).
-...
-Print polyn_norm_prop.
-(* this theorem is much too long to compute *)
-(* much too long *)
-Time Compute
-  (let q :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
-   in
-   let z_x :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp
-       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
-   in
-   let r := lap_compose (lap q) (lap z_x) in
-   polyn_norm_prop Q_polyn_ring_like_op r).
-
-...
-polyn_compose = 
-λ (T : Type) (ro : ring_like_op T) (rp : ring_like_prop T) (Heb : rngl_has_eqb = true) (p q : polyn T),
-  polyn_of_norm_lap rp (lap p ° lap q)%lap
-...
-Check
-  (let T := polyn Q in
-   let ro := Q_polyn_ring_like_op in
-   let rp := Q_polyn_ring_like_prop in
-   @polyn_compose T ro rp toto).
-...
-(* much too long *)
-Time Compute
-  (let T := polyn Q in
-   let ro := Q_polyn_ring_like_op in
-   let rp := Q_polyn_ring_like_prop in
-   @polyn_compose T ro rp toto).
-...
-
-     (@mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl)
-     (@mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl)%pol).
-...
-Compute
-  (let roqp := Q_polyn_ring_like_op in
-   let roq := Q_ring_like_op in
-   let p := @mk_polyn _ roqp [mk_polyn [1;0;1] eq_refl] eq_refl in
-   let q := @mk_polyn _ roqp [mk_polyn [-2;0;1] eq_refl] eq_refl in
-   @polyn_sylvester_mat _ roqp p q).
-(* oui, non, ça doit pas être ça... *)
-...
-
-Check (@lap_compose Q Q_ring_like_op).
-Check lap_compose.
-.
 Print fold_right.
 Theorem last_list_fold_right : ∀ A B (f : B → list A → list A) a l,
   last (fold_right f a l) = a.
