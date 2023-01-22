@@ -852,6 +852,13 @@ Time Compute (
     mk_polyn q (Q_polyn_norm_prop q)
   in
   resultant p q').
+(* avec la Notation, ça répond vite, ce qui prouve que c'est l'affichage
+   qui prend du temps *)
+(* résultat
+     = mkp ([〈9〉; 0; 〈-2〉; 0; 〈1〉])%pol
+     : polyn Q
+   ce qui est correct !!! Super !
+ *)
 ...
 Time Compute
   (let p :=
