@@ -838,7 +838,9 @@ Time Compute (
     mk_polyn q (polyn_norm_prop _ q)
   in
   polyn_sylvester_mat p q').
+Check rngl_eqb.
 Time Compute (
+(**)
   let p :=
     let roqp := Q_polyn_ring_like_op in
     let roq := Q_ring_like_op in
@@ -847,6 +849,19 @@ Time Compute (
     in
     mk_polyn p (polyn_norm_prop _ p)
   in
+...
+(*
+  (* essai d'être plus général *)
+  let p :=
+    let roqp := Q_polyn_ring_like_op in
+    let roq := Q_ring_like_op in
+    let p := map (λ i, if rngl_eqb i 0%L then polyn_zero else mk_polyn [i] eq_refl) [1;0;1] in
+    mk_polyn p (polyn_norm_prop _ p)
+  in
+  ... mouais faut voir, en regardant, polyn_of_Q_const, qu'il faut
+  ... un eq_dec dans les rngl, afin d'avoir la preuve que i ne vaut pas
+  ... 0 dans le cas "else" ci-dessus
+*)
   let q' :=
     let roq := Q_ring_like_op in
     let q :=
