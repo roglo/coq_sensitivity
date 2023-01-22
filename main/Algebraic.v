@@ -817,6 +817,42 @@ Time Compute
    in
    let r := (lap q ° lap z_x)%lap in
    mk_polyn r (Q_polyn_norm_prop r)).
+Time Compute (
+  let p :=
+    let roq := Q_ring_like_op in
+    let p :=
+      [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
+    in
+    mk_polyn p (Q_polyn_norm_prop p)
+  in
+  let q' :=
+    let roq := Q_ring_like_op in
+    let q :=
+      [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
+       mk_polyn [1] eq_refl]
+    in
+    mk_polyn q (Q_polyn_norm_prop q)
+  in
+  polyn_sylvester_mat p q').
+Notation "'mkp' x" := (mk_polyn x _) (at level 0): polyn_scope.
+Time Compute (
+  let p :=
+    let roq := Q_ring_like_op in
+    let p :=
+      [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
+    in
+    mk_polyn p (Q_polyn_norm_prop p)
+  in
+  let q' :=
+    let roq := Q_ring_like_op in
+    let q :=
+      [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
+       mk_polyn [1] eq_refl]
+    in
+    mk_polyn q (Q_polyn_norm_prop q)
+  in
+  resultant p q').
+...
 Time Compute
   (let p :=
      let roqp := Q_polyn_ring_like_op in
