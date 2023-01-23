@@ -875,8 +875,13 @@ apply Bool.orb_true_iff.
 ...
 *)
 
+Set Printing All.
 ...
-(* interminable... *)
+ "Pos
+    (GQ.GQmake0 (PQ.PQmake (PQ.mknn (S (S O))) (PQ.mknn O))
+       (@eq_refl nat (S O)))" has type "Q" while it is expected to have type
+ "@eq bool (@has_polyn_prop (@polyn Q Q_ring_like_op) ?ro p) true".
+...
 Time Compute (
 (*
   let p :=
@@ -895,7 +900,11 @@ Time Compute (
     let roq := Q_ring_like_op in
     let rpq := Q_ring_like_prop in
     let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
+    mk_polyn p 3
+(*
     mk_polyn (lap_norm p) (@polyn_norm_prop (polyn Q) roqp p)
+(rend le truc interminable en temps)
+*)
   in
 (**)
   let q' :=
