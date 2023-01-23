@@ -875,12 +875,13 @@ apply Bool.orb_true_iff.
 ...
 *)
 
-Set Printing All.
-...
- "Pos
-    (GQ.GQmake0 (PQ.PQmake (PQ.mknn (S (S O))) (PQ.mknn O))
-       (@eq_refl nat (S O)))" has type "Q" while it is expected to have type
- "@eq bool (@has_polyn_prop (@polyn Q Q_ring_like_op) ?ro p) true".
+Print polyn_of_const.
+Check rngl_eq_dec.
+Time Compute (
+    let rpq := Q_ring_like_prop in
+  rngl_eq_dec Q_has_eqb 1 0).
+(* 14 s *)
+Print polyn_of_const.
 ...
 Time Compute (
 (*
@@ -900,13 +901,15 @@ Time Compute (
     let roq := Q_ring_like_op in
     let rpq := Q_ring_like_prop in
     let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
-    mk_polyn p 3
-(*
+p
+in p).
+(**)
+    mk_polyn p (glop roqp p)
+in p).
     mk_polyn (lap_norm p) (@polyn_norm_prop (polyn Q) roqp p)
 (rend le truc interminable en temps)
-*)
   in
-(**)
+*)
   let q' :=
     let roq := Q_ring_like_op in
     let q :=
@@ -916,6 +919,7 @@ Time Compute (
     mk_polyn q (polyn_norm_prop Q_polyn_ring_like_op q)
   in
   resultant p q').
+...
 (* avec la Notation, ça répond vite, ce qui prouve que l'affichage
    qui prend du temps ; d'un autre côté, il y a un exemple plus
    haut où ça a pas l'air d'être ça *)
