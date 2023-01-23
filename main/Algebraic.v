@@ -875,6 +875,8 @@ apply Bool.orb_true_iff.
 ...
 *)
 
+...
+(* interminable... *)
 Time Compute (
 (*
   let p :=
@@ -893,7 +895,7 @@ Time Compute (
     let roq := Q_ring_like_op in
     let rpq := Q_ring_like_prop in
     let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
-    mk_polyn p (@polyn_norm_prop (polyn Q) roqp p)
+    mk_polyn (lap_norm p) (@polyn_norm_prop (polyn Q) roqp p)
   in
 (**)
   let q' :=
