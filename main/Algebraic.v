@@ -600,6 +600,23 @@ Compute (
    let rpq := Q_ring_like_prop in
    mk_polyn [3]).
 
+Theorem single_has_polyn_prop :
+  ∀ T op (rp : ring_like_prop T),
+  rngl_has_eqb = true →
+  ∀ c, c ≠ 0%L → @has_polyn_prop T op [c] = true.
+Proof.
+intros T op rp Heb * Hcz; cbn.
+apply Bool.negb_true_iff.
+now apply rngl_eqb_neq.
+Qed.
+
+Definition polyn_of_const {T} (ro : ring_like_op T) rp
+    (Heb : rngl_has_eqb = true) (c : T) :=
+  match rngl_eq_dec Heb c 0 with
+  | left _ => 0%pol
+  | right Hcz => mk_polyn [c] (single_has_polyn_prop rp Heb Hcz)
+  end.
+
 Theorem Q_single_has_polyn_prop :
   ∀ c, c ≠ 0%Q → @has_polyn_prop Q Q_ring_like_op [c] = true.
 Proof.
@@ -688,9 +705,6 @@ Compute
    @mk_polyn (polyn Q) roqp [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl). (* z-x *)
 
 Check @polyn_compose.
-Theorem toto : @rngl_has_eqb (polyn Q) Q_polyn_ring_like_op = true.
-easy.
-Qed.
 Check
   (let T := polyn Q in
    let ro := Q_polyn_ring_like_op in
@@ -783,6 +797,12 @@ apply is_empty_list_empty in H1.
 now apply app_eq_nil in H1.
 Qed.
 
+Theorem Q_has_eqb : @rngl_has_eqb Q Q_ring_like_op = true.
+Proof. easy. Qed.
+
+Theorem Q_polyn_has_eqb : @rngl_has_eqb (polyn Q) Q_polyn_ring_like_op = true.
+Proof. easy. Qed.
+
 (*
 Time Compute
   (let q :=
@@ -839,8 +859,24 @@ Time Compute (
   in
   polyn_sylvester_mat p q').
 Check rngl_eqb.
+Check polyn_of_const.
+Check (polyn_of_const Q_ring_like_prop).
+Search (@rngl_has_eqb Q).
+Check polyn_norm_prop.
+
+(*
+Theorem toto :
+  let roqp := Q_polyn_ring_like_op in
+  ∀ la,
+  has_polyn_prop (map (polyn_of_const Q_ring_like_prop Q_has_eqb) la) = true.
+Proof.
+intros.
+apply Bool.orb_true_iff.
+...
+*)
+
 Time Compute (
-(**)
+(*
   let p :=
     let roqp := Q_polyn_ring_like_op in
     let roq := Q_ring_like_op in
@@ -849,19 +885,17 @@ Time Compute (
     in
     mk_polyn p (polyn_norm_prop _ p)
   in
-...
-(*
+*)
   (* essai d'être plus général *)
   let p :=
     let roqp := Q_polyn_ring_like_op in
+    let rpqp := Q_polyn_ring_like_prop in
     let roq := Q_ring_like_op in
-    let p := map (λ i, if rngl_eqb i 0%L then polyn_zero else mk_polyn [i] eq_refl) [1;0;1] in
-    mk_polyn p (polyn_norm_prop _ p)
+    let rpq := Q_ring_like_prop in
+    let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
+    mk_polyn p (@polyn_norm_prop (polyn Q) roqp p)
   in
-  ... mouais faut voir, en regardant, polyn_of_Q_const, qu'il faut
-  ... un eq_dec dans les rngl, afin d'avoir la preuve que i ne vaut pas
-  ... 0 dans le cas "else" ci-dessus
-*)
+(**)
   let q' :=
     let roq := Q_ring_like_op in
     let q :=
