@@ -26,6 +26,9 @@ Definition rlap_sylvester_list_list (rla rlb : list T) : list (list T) :=
 Definition rlap_sylvester_mat (rla rlb : list T) : matrix T :=
   mk_mat (rlap_sylvester_list_list rla rlb).
 
+Definition lap_resultant (p q : list T) :=
+  det (rlap_sylvester_mat (rev p) (rev q)).
+
 Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
   mk_mat (rlap_sylvester_list_list (rev (lap p)) (rev (lap q))).
 
@@ -119,7 +122,7 @@ apply IHla.
 Qed.
 
 Theorem last_lap_mul_const_l_add_const_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b la,
   last ([a] * la + [b])%lap 0%L =
     match length la with
@@ -195,7 +198,7 @@ destruct pb as [pb| pb]. {
 right.
 apply (rngl_neqb_neq Heb) in pa, pb.
 Theorem last_lap_compose :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ la lb,
   last (la ° lb)%lap 0%L =
     match length lb with
@@ -803,6 +806,46 @@ Proof. easy. Qed.
 Theorem Q_polyn_has_eqb : @rngl_has_eqb (polyn Q) Q_polyn_ring_like_op = true.
 Proof. easy. Qed.
 
+Time Compute (
+  let p :=
+    let roqp := Q_polyn_ring_like_op in
+    let roq := Q_ring_like_op in
+    let p :=
+      [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
+    in
+    mk_polyn p (polyn_norm_prop _ p)
+  in
+  let q' :=
+    let roq := Q_ring_like_op in
+    let q :=
+      [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
+       mk_polyn [1] eq_refl]
+    in
+    mk_polyn q (polyn_norm_prop Q_polyn_ring_like_op q)
+  in
+  resultant p q').
+(*
+     = mkp [〈9〉; 0; 〈-2〉; 0; 〈1〉]%pol
+     : polyn Q
+ok
+*)
+Time Compute (
+  let roq := Q_ring_like_op in
+  let rpq := Q_ring_like_prop in
+  let rol := lap_ring_like_op in
+  let rpl := lap_ring_like_prop in
+  let p := [[1]; []; [1]] in
+  let q := [[-2;0;1]; [0;-2]; [1]] in
+  lap_resultant (map (λ i, rev i) (rev p)) (map (λ i, rev i) (rev q))).
+(*
+     = [〈6〉; 0; 〈-4〉; 0; 〈4〉]
+     : list Q
+bad *)
+(*
+     = [〈5〉; 0; 0; 0; 〈1〉]
+     : list Q
+bad
+*)
 ...
 
 (*
