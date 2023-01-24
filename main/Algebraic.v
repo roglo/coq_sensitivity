@@ -803,6 +803,8 @@ Proof. easy. Qed.
 Theorem Q_polyn_has_eqb : @rngl_has_eqb (polyn Q) Q_polyn_ring_like_op = true.
 Proof. easy. Qed.
 
+...
+
 (*
 Time Compute
   (let q :=
