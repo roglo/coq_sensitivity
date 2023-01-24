@@ -3680,6 +3680,7 @@ Arguments lap_norm_mul {T ro rp} Heb Hos Hiv (la lb)%lap.
 Arguments lap_mul_div {T ro rp} Heb Hos Hic Hop Hiv (la lb)%lap.
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
+Arguments lap_ring_like_op {T ro rp}.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -3705,7 +3706,6 @@ Record polyn T {ro : ring_like_op T} := mk_polyn
 
 Arguments polyn T {ro}.
 Arguments mk_polyn {T ro} lap%list.
-Arguments lap {T ro}.
 
 Section a.
 
@@ -3855,8 +3855,6 @@ Notation "a - b" := (polyn_sub a b) : polyn_scope.
 Notation "a * b" := (polyn_mul a b) : polyn_scope.
 Notation "a / b" := (polyn_quot a b) : polyn_scope.
 Notation "'mkp' x" := (mk_polyn x _) (at level 0, x at level 0): polyn_scope.
-
-Arguments lap {T ro} p%pol.
 
 Theorem polyn_add_comm : ∀ a b, (a + b)%pol = (b + a)%pol.
 Proof.
@@ -4068,6 +4066,7 @@ destruct (bool_dec rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
+Arguments lap {T ro} p%pol.
 Arguments polyn_quot_rem (pa pb)%pol.
 
 Theorem polyn_quot_rem_prop :
@@ -4370,7 +4369,6 @@ induction n; [ easy | cbn ].
 unfold polyn_one.
 rewrite IHn; cbn.
 rewrite fold_lap_norm.
-...
 remember (@rngl_of_nat _ lop n) as la eqn:Hla; symmetry in Hla.
 destruct (Nat.eq_dec _ _) as [Hc1| Hc1]. {
   specialize (rngl_characteristic_1 Hos Hc1) as H1.
@@ -4485,7 +4483,7 @@ Definition monom (p : polyn T) i :=
 Theorem lap_norm_lap : ∀ p, lap_norm (lap p) = lap p.
 Proof.
 intros p.
-apply has_polyn_prop_lap_norm.
+apply (has_polyn_prop_lap_norm Heb).
 apply lap_prop.
 Qed.
 
@@ -4602,7 +4600,7 @@ intros.
 ...
 *)
 
-Arguments polyn_ring_like_op {T ro rp} Heb Hos.
+End a.
 
 Declare Scope polyn_scope.
 Delimit Scope polyn_scope with pol.
@@ -4613,6 +4611,7 @@ Arguments polyn_add {T ro} p1 p2.
 Arguments polyn_mul {T ro} p1 p2.
 Arguments polyn_quot {T ro rp Heb Hos} pa pb.
 Arguments polyn_rem {T ro rp Heb} pa pb.
+Arguments polyn_ring_like_op {T ro rp} Heb Hos.
 
 Notation "0" := polyn_zero : polyn_scope.
 Notation "1" := polyn_one : polyn_scope.
