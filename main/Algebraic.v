@@ -833,18 +833,13 @@ Time Compute (
   let roq := Q_ring_like_op in
   let rpq := Q_ring_like_prop in
   let rol := lap_ring_like_op in
-  let rpl := lap_ring_like_prop in
   let p := [[1]; []; [1]] in
   let q := [[-2;0;1]; [0;-2]; [1]] in
-  lap_resultant (map (λ i, rev i) (rev p)) (map (λ i, rev i) (rev q))).
+  lap_resultant p q).
 (*
-     = [〈6〉; 0; 〈-4〉; 0; 〈4〉]
+     = [〈9〉; 0; 〈-2〉; 0; 〈1〉]
      : list Q
-bad *)
-(*
-     = [〈5〉; 0; 0; 0; 〈1〉]
-     : list Q
-bad
+ok
 *)
 ...
 

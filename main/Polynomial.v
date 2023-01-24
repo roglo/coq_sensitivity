@@ -907,9 +907,15 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_one := lap_one;
      rngl_add := lap_add;
      rngl_mul := lap_mul;
+(**)
+     rngl_opt_opp_or_subt := lap_opt_opp_or_subt;
+     rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
+     rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
+(*
      rngl_opt_opp_or_subt := None (*lap_opt_opp_or_subt*);
      rngl_opt_inv_or_quot := None (*lap_opt_inv_or_quot*);
      rngl_opt_eqb := None (*Some (lap_eqb rngl_zero rngl_eqb)*);
+*)
      rngl_opt_le := None |}.
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
@@ -3845,14 +3851,15 @@ Theorem lap_opt_mul_quot_r :
     ∀ a b, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
-easy.
 (*
+easy.
+*)
 intros rol.
 unfold rngl_has_quot; cbn.
 unfold lap_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
-*)
+(**)
 Qed.
 
 Theorem polyn_opt_mul_quot_r :
@@ -4210,6 +4217,7 @@ Check rngl_opt_mul_div.
 Check rngl_opt_eqb_eq.
 *)
 
+(*
 Definition lap_ring_like_prop : ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -4248,6 +4256,7 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
+*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
