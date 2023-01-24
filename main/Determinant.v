@@ -386,7 +386,7 @@ Theorem det_is_det' :
   → det M = det' M.
 Proof.
 intros Hic Hop Hin H10 * Hm.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold det'.
@@ -514,7 +514,7 @@ Theorem det'_is_det'' :
   ∀ (M : matrix T), det' M = det'' M.
 Proof.
 intros Hop Heq *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
@@ -730,7 +730,7 @@ Theorem determinant_multilinear :
         b * det (mat_repl_vect' i M V))%L.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (square_matrix_ncols _ Hsm) as Hcn.
@@ -1149,7 +1149,7 @@ assert (H10 : rngl_characteristic ≠ 1). {
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
 }
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1510,7 +1510,7 @@ Theorem determinant_same_rows : in_charac_0_field →
 Proof.
 intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
@@ -2416,7 +2416,7 @@ now rewrite mat_subm_transp.
 Qed.
 
 Theorem det_mI :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ n, det (mI n) = 1%L.
 Proof.
 intros Hop *; cbn.

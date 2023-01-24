@@ -82,7 +82,7 @@ Theorem rngl_0_le_squ :
   ∀ n, (0 ≤ n * n)%L.
 Proof.
 intros Hld Hop Hor *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 rewrite <- (rngl_mul_0_r Hos 0).
@@ -124,7 +124,7 @@ Theorem eq_vect_squ_0 :
   ∀ v, ≺ v, v ≻ = 0%L → v = vect_zero (vect_size v).
 Proof.
 intros Hop Hed Hdo Hor * Hvvz.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold vect_dot_mul in Hvvz.
@@ -175,7 +175,7 @@ flia Hi.
 Qed.
 
 Theorem Rayleigh_quotient_mul_scal_l_zero :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ c M,
   Rayleigh_quotient M (c × vect_zero (mat_nrows M)) =
   Rayleigh_quotient M (vect_zero (mat_nrows M)).
@@ -227,7 +227,7 @@ Theorem RQ_mul_scal_prop :
 Proof.
 intros Hof * Hsm Hsr Hcz.
 destruct Hof as (Hic & Hop & Heq & Hld & Hdo & Hin & Hor).
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (vect_eq_dec Heq V (vect_zero (mat_nrows M))) as [Hvz| Hvz]. {
@@ -278,7 +278,7 @@ Theorem Rayleigh_quotient_of_eigenvector :
   → Rayleigh_quotient M V = μ.
 Proof.
 intros Hic Hop Hii Hdo Hin Hdl * Hvz Hmv.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -395,7 +395,7 @@ Qed.
 
 Theorem mat_mul_vect_dot_vect :
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ (M : matrix T) U V,
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -481,7 +481,7 @@ Qed.
 
 Theorem for_symm_squ_mat_eigen_vect_mat_is_ortho :
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_has_eqb = true →
   rngl_has_inv = true →
   ∀ n (M : matrix T) ev eV A,
@@ -675,7 +675,7 @@ Qed.
    see the comment for the theorem below *)
 Lemma diagonalized_matrix_prop_1 :
   rngl_mul_is_comm = true →
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ n (M : matrix T) ev eV D U,
   mat_nrows M = n
   → length eV = n
@@ -967,7 +967,7 @@ assert (H10 : rngl_characteristic ≠ 1). {
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
 }
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1088,8 +1088,8 @@ assert
            (≺ U • v, D • (U • v) ≻ / ≺ U • v, U • v ≻)%L). {
   intros v Hsv.
   destruct Hof as (Hic & Hop & Heq & Hde & Hit & Hiv & Hor).
-  assert (Hos : rngl_has_opp_or_sous = true). {
-    now apply rngl_has_opp_or_sous_iff; left.
+  assert (Hos : rngl_has_opp_or_subt = true). {
+    now apply rngl_has_opp_or_subt_iff; left.
   }
   unfold eigenvalues_and_norm_vectors in HeV.
   destruct HeV as (Hvs & Hvd & Hvn & Hmv).

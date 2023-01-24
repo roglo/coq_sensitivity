@@ -1221,7 +1221,7 @@ Theorem matrix_comatrix_transp_mul : in_charac_0_field →
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1407,7 +1407,7 @@ Theorem comatrix_transp_matrix_mul : in_charac_0_field →
   → ((com M)⁺ * M = det M × mI (mat_nrows M))%M.
 Proof.
 intros Hif * Hsm.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.

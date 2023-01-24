@@ -657,7 +657,7 @@ Theorem det_isort_rows_with_dup : in_charac_0_field →
       (ε kl * det (mat_select_rows (isort Nat.leb kl) A))%L.
 Proof.
 intros Hif * Hcm Hac Hkl Hadk.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -734,7 +734,7 @@ assert (H10 : rngl_characteristic ≠ 1). {
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
 }
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1277,7 +1277,7 @@ Theorem rngl_summation_cart_prod_repeat_filter_no_dup :
     ε kl * f kl.
 Proof.
 intros Hop Heqb *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 assert (Hel : equality (list_eqv eqb)). {
@@ -1622,7 +1622,7 @@ Lemma Cauchy_Binet_formula_step_2 : in_charac_0_field →
     (∑ (l ∈ cart_prod_rep_seq m), ε l * ∏ (i = 1, m), mat_el B kl.(i) l.(i)).
 Proof.
 intros Hif * Hmz.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
@@ -1802,7 +1802,7 @@ Lemma Cauchy_Binet_formula_step_5_1 : in_charac_0_field →
     det (mat_select_rows jl B).
 Proof.
 intros Hif *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.

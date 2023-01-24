@@ -7,16 +7,16 @@
      ring_like_prop, holding their properties.
    In class ring_like_prop, we can set,
      to make a semiring:
-        rngl_opt_opp_or_sous = Some (inr sous) where sous is a subtraction
-        rngl_opt_opp_or_sous = None otherwise
+        rngl_opt_opp_or_subt = Some (inr subt) where subt is a subtraction
+        rngl_opt_opp_or_subt = None otherwise
         rngl_opt_inv_or_quot = Some (inr quot) where quot is a quotient
         rngl_opt_inv_or_quot = None otherwise
      to make a ring:
-        rngl_opt_opp_or_sous = Some (inl opp), where opp is the opposite
+        rngl_opt_opp_or_subt = Some (inl opp), where opp is the opposite
         rngl_opt_inv_or_quot = Some (inr quot) where quot is a quotient
         rngl_opt_inv_or_quot = None otherwise
      to make a field:
-        rngl_opt_opp_or_sous = Some (inl opp), where opp is the opposite
+        rngl_opt_opp_or_subt = Some (inl opp), where opp is the opposite
         rngl_opt_inv_or_quot = Some (inl inv), where inv is the inverse
    Multiplication can be commutative or not by setting rngl_mul_is_comm
    to true or false.
@@ -39,7 +39,7 @@
      - with commutative addition or not
      - with 0 or without, right or left
      - with 1 or without, right or left
-     - with specific subtraction (sous) or not
+     - with specific subtraction (subt) or not
      - with specific division or not
      and so on. *)
 
@@ -57,7 +57,7 @@ Class ring_like_op T :=
     rngl_one : T;
     rngl_add : T → T → T;
     rngl_mul : T → T → T;
-    rngl_opt_opp_or_sous : option (sum (T → T) (T → T → T));
+    rngl_opt_opp_or_subt : option (sum (T → T) (T → T → T));
     rngl_opt_inv_or_quot : option (sum (T → T) (T → T → T));
     rngl_opt_eqb : option (T → T → bool);
     rngl_opt_le : option (T → T → Prop) }.
@@ -65,20 +65,20 @@ Class ring_like_op T :=
 Declare Scope ring_like_scope.
 Delimit Scope ring_like_scope with L.
 
-Definition rngl_has_opp_or_sous {T} {R : ring_like_op T} :=
-  bool_of_option rngl_opt_opp_or_sous.
+Definition rngl_has_opp_or_subt {T} {R : ring_like_op T} :=
+  bool_of_option rngl_opt_opp_or_subt.
 
 Definition rngl_has_inv_or_quot {T} {R : ring_like_op T} :=
   bool_of_option rngl_opt_inv_or_quot.
 
 Definition rngl_has_opp {T} {R : ring_like_op T} :=
-  match rngl_opt_opp_or_sous with
+  match rngl_opt_opp_or_subt with
   | Some (inl _) => true
   | _ => false
   end.
 
-Definition rngl_has_sous {T} {R : ring_like_op T} :=
-  match rngl_opt_opp_or_sous with
+Definition rngl_has_subt {T} {R : ring_like_op T} :=
+  match rngl_opt_opp_or_subt with
   | Some (inr _) => true
   | _ => false
   end.
@@ -96,14 +96,14 @@ Definition rngl_has_quot {T} {R : ring_like_op T} :=
   end.
 
 Definition rngl_opp {T} {R : ring_like_op T} a :=
-  match rngl_opt_opp_or_sous with
+  match rngl_opt_opp_or_subt with
   | Some (inl rngl_opp) => rngl_opp a
   | _ => rngl_zero
   end.
 
-Definition rngl_sous {T} {R : ring_like_op T} a b :=
-  match rngl_opt_opp_or_sous with
-  | Some (inr rngl_sous) => rngl_sous a b
+Definition rngl_subt {T} {R : ring_like_op T} a b :=
+  match rngl_opt_opp_or_subt with
+  | Some (inr rngl_subt) => rngl_subt a b
   | _ => rngl_zero
   end.
 
@@ -121,7 +121,7 @@ Definition rngl_quot {T} {R : ring_like_op T} a b :=
 
 Definition rngl_sub {T} {R : ring_like_op T} a b :=
   if rngl_has_opp then rngl_add a (rngl_opp b)
-  else if rngl_has_sous then rngl_sous a b
+  else if rngl_has_subt then rngl_subt a b
   else rngl_zero.
 
 Definition rngl_div {T} {R : ring_like_op T} a b :=
@@ -129,18 +129,18 @@ Definition rngl_div {T} {R : ring_like_op T} a b :=
   else if rngl_has_quot then rngl_quot a b
   else rngl_zero.
 
-Theorem rngl_has_opp_or_sous_iff {T} {R : ring_like_op T} :
-  rngl_has_opp_or_sous = true
-  ↔ rngl_has_opp = true ∨ rngl_has_sous = true.
+Theorem rngl_has_opp_or_subt_iff {T} {R : ring_like_op T} :
+  rngl_has_opp_or_subt = true
+  ↔ rngl_has_opp = true ∨ rngl_has_subt = true.
 Proof.
-unfold rngl_has_opp_or_sous, bool_of_option.
-unfold rngl_has_opp, rngl_has_sous.
-destruct rngl_opt_opp_or_sous as [opp_sous| ]. 2: {
+unfold rngl_has_opp_or_subt, bool_of_option.
+unfold rngl_has_opp, rngl_has_subt.
+destruct rngl_opt_opp_or_subt as [opp_subt| ]. 2: {
   split; [ now left | ].
   now intros [|].
 }
 split; [ intros _ | easy ].
-now destruct opp_sous; [ left | right ].
+now destruct opp_subt; [ left | right ].
 Qed.
 
 Theorem rngl_has_inv_or_quot_iff {T} {R : ring_like_op T} :
@@ -157,11 +157,11 @@ split; [ intros _ | easy ].
 now destruct inv_quot; [ left | right ].
 Qed.
 
-Theorem rngl_has_opp_has_opp_or_sous : ∀ T (ro : ring_like_op T),
-  rngl_has_opp = true → rngl_has_opp_or_sous = true.
+Theorem rngl_has_opp_has_opp_or_subt : ∀ T (ro : ring_like_op T),
+  rngl_has_opp = true → rngl_has_opp_or_subt = true.
 Proof.
 intros * Hop.
-now apply rngl_has_opp_or_sous_iff; left.
+now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
 (* could be written with List.fold_right but this module is not
@@ -240,18 +240,18 @@ Class ring_like_prop T {ro : ring_like_op T} :=
     (* when has opposite *)
     rngl_opt_add_opp_l :
       if rngl_has_opp then ∀ a : T, (- a + a = 0)%L else not_applicable;
-    (* when has subtraction (sous) *)
+    (* when has subtraction (subt) *)
     rngl_opt_add_sub :
-      if rngl_has_sous then ∀ a b, (a + b - b)%L = a
+      if rngl_has_subt then ∀ a b, (a + b - b)%L = a
       else not_applicable;
     rngl_opt_sub_sub_sub_add :
-      if rngl_has_sous then ∀ a b c, ((a - b) - c = a - (b + c))%L
+      if rngl_has_subt then ∀ a b c, ((a - b) - c = a - (b + c))%L
       else not_applicable;
     rngl_opt_mul_sub_distr_l :
-      if rngl_has_sous then ∀ a b c : T, (a * (b - c) = a * b - a * c)%L
+      if rngl_has_subt then ∀ a b c : T, (a * (b - c) = a * b - a * c)%L
       else not_applicable;
     rngl_opt_mul_sub_distr_r :
-      if rngl_has_sous then
+      if rngl_has_subt then
         if rngl_mul_is_comm then not_applicable
         else ∀ a b c : T, ((a - b) * c = a * c - b * c)%L
       else not_applicable;
@@ -623,7 +623,7 @@ now unfold rngl_div; rewrite Hin.
 Qed.
 
 Theorem rngl_sub_diag :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a, (a - a = 0)%L.
 Proof.
 intros Hos *.
@@ -635,7 +635,7 @@ destruct op. {
   rewrite rngl_add_comm.
   now apply rngl_add_opp_l.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
@@ -643,7 +643,7 @@ destruct mo. {
   specialize (H1 0%L a).
   now rewrite rngl_add_0_l in H1.
 }
-apply rngl_has_opp_or_sous_iff in Hos.
+apply rngl_has_opp_or_subt_iff in Hos.
 destruct Hos; congruence.
 Qed.
 
@@ -687,7 +687,7 @@ destruct Hiq; congruence.
 Qed.
 
 Theorem rngl_add_sub :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b, (a + b - b = a)%L.
 Proof.
 intros Hom *.
@@ -700,14 +700,14 @@ destruct op. {
   rewrite (rngl_add_comm b).
   now rewrite rngl_add_opp_l, rngl_add_0_r.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
   rewrite Hmo in H1.
   apply H1.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
+apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
@@ -752,7 +752,7 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_add_cancel_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, (a + b = a + c)%L → (b = c)%L.
 Proof.
 intros Hom * Habc.
@@ -768,7 +768,7 @@ destruct op. {
   rewrite rngl_sub_diag in Habc; [ | easy ].
   now do 2 rewrite rngl_add_0_r in Habc.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
@@ -778,7 +778,7 @@ destruct mo. {
   rewrite rngl_add_comm in H2.
   now rewrite H1 in H2.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
+apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
@@ -824,7 +824,7 @@ destruct Hii; congruence.
 Qed.
 
 Theorem rngl_add_sub_eq_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, (a + b = c → c - a = b)%L.
 Proof.
 intros Hom * Hab.
@@ -834,7 +834,7 @@ now apply rngl_add_sub.
 Qed.
 
 Theorem rngl_add_sub_eq_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
    ∀ a b c, (a + b = c → c - b = a)%L.
 Proof.
 intros Hom * Hab.
@@ -850,7 +850,7 @@ now rewrite Hab.
 Qed.
 
 Theorem rngl_add_cancel_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, (a + c = b + c)%L → (a = b)%L.
 Proof.
 intros Hom * Habc.
@@ -859,7 +859,7 @@ now do 2 rewrite rngl_add_sub in Habc.
 Qed.
 
 Theorem rngl_mul_0_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a, (a * 0 = 0)%L.
 Proof.
 intros Hom *.
@@ -869,7 +869,7 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_mul_0_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a, (0 * a = 0)%L.
 Proof.
 intros Hom a.
@@ -879,7 +879,7 @@ now do 2 rewrite rngl_add_0_l.
 Qed.
 
 Theorem rngl_characteristic_1 :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_characteristic = 1 →
   ∀ x, x = 0%L.
 Proof.
@@ -900,7 +900,7 @@ Proof.
 intros Hro *.
 split; intros H. {
   apply rngl_sub_compat_l with (c := b) in H.
-  rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
+  rewrite rngl_add_sub in H; [ | now apply rngl_has_opp_or_subt_iff; left ].
   unfold rngl_sub in H.
   rewrite Hro in H.
   now rewrite rngl_add_0_l in H.
@@ -917,15 +917,15 @@ Proof.
 intros Hro *.
 specialize (rngl_mul_add_distr_l a b (- b)%L) as H.
 rewrite fold_rngl_sub in H; [ | easy ].
-rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
-rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_sous_iff; left ].
+rewrite rngl_sub_diag in H; [ | now apply rngl_has_opp_or_subt_iff; left ].
+rewrite rngl_mul_0_r in H; [ | now apply rngl_has_opp_or_subt_iff; left ].
 symmetry in H.
 rewrite rngl_add_comm in H.
 now apply rngl_add_move_0_r in H.
 Qed.
 
 Theorem rngl_mul_sub_distr_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, (a * (b - c) = a * b - a * c)%L.
 Proof.
 intros Hom *.
@@ -935,12 +935,12 @@ destruct op. {
   rewrite rngl_mul_add_distr_l.
   now rewrite rngl_mul_opp_r.
 }
-remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
+remember rngl_has_subt as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_mul_sub_distr_l as H1.
   now rewrite Hmo in H1.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
+apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
@@ -957,7 +957,7 @@ apply rngl_mul_1_r.
 Qed.
 
 Theorem rngl_div_0_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_has_inv_or_quot = true →
   ∀ a, a ≠ 0%L → (0 / a)%L = 0%L.
 Proof.
@@ -1002,7 +1002,7 @@ split. {
 Qed.
 
 Theorem rngl_integral :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
   ∀ a b, (a * b = 0)%L → a = 0%L ∨ b = 0%L.
 Proof.
@@ -1059,7 +1059,7 @@ split. {
   intros Hab.
   rewrite Hab.
   apply rngl_sub_diag.
-  now apply rngl_has_opp_or_sous_iff; left.
+  now apply rngl_has_opp_or_subt_iff; left.
 }
 Qed.
 
@@ -1101,11 +1101,11 @@ transitivity (0 + - 0)%L. {
 }
 rewrite fold_rngl_sub; [ | easy ].
 apply rngl_sub_diag.
-now apply rngl_has_opp_or_sous_iff; left.
+now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
 Theorem rngl_sub_0_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a, (a - 0 = a)%L.
 Proof.
 intros Hom *.
@@ -1117,7 +1117,7 @@ destruct op. {
   rewrite rngl_opp_0; [ | easy ].
   apply rngl_add_0_r.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_add_sub as H1.
@@ -1125,7 +1125,7 @@ destruct mo. {
   specialize (H1 a 0%L) as H2.
   now rewrite rngl_add_0_r in H2.
 }
-apply rngl_has_opp_or_sous_iff in Hom.
+apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
@@ -1134,7 +1134,7 @@ Theorem rngl_opp_add_distr :
   ∀ a b, (- (a + b) = - b - a)%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hop'.
 rewrite Hop in Hop'.
 apply rngl_add_cancel_l with (a := (a + b)%L); [ now apply Hop'; left | ].
 rewrite (fold_rngl_sub Hop).
@@ -1150,7 +1150,7 @@ now apply Hop'; left.
 Qed.
 
 Theorem rngl_add_sub_simpl_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c : T, (a + b - (a + c) = b - c)%L.
 Proof.
 intros Hom *.
@@ -1168,7 +1168,7 @@ destruct op. {
   rewrite fold_rngl_sub; [ | easy ].
   rewrite rngl_sub_diag, rngl_add_0_l; [ easy | easy ].
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_sub_sub_sub_add as H1.
@@ -1177,7 +1177,7 @@ destruct mo. {
   rewrite rngl_add_comm.
   rewrite rngl_add_sub; [ easy | easy ].
 }
-apply rngl_has_opp_or_sous_iff in Hom.
+apply rngl_has_opp_or_subt_iff in Hom.
 destruct Hom; congruence.
 Qed.
 
@@ -1249,7 +1249,7 @@ symmetry.
 apply (rngl_add_move_0_r Hro).
 rewrite (fold_rngl_sub Hro).
 apply rngl_sub_diag.
-now apply rngl_has_opp_or_sous_iff; left.
+now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
 Theorem Nat_eqb_eq : ∀ a b, Nat.eqb a b = true ↔ a = b.
@@ -1280,7 +1280,7 @@ split; intros Hab. {
 Qed.
 
 Theorem rngl_inv_neq_0 :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_has_inv = true →
   ∀ a, a ≠ 0%L → (a⁻¹ ≠ 0)%L.
 Proof.
@@ -1300,7 +1300,7 @@ now apply rngl_1_neq_0_iff in H1.
 Qed.
 
 Theorem rngl_inv_involutive :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_has_inv = true →
   ∀ x, x ≠ 0%L → (x⁻¹⁻¹)%L = x.
 Proof.
@@ -1334,7 +1334,7 @@ intros Hro *.
 specialize (rngl_mul_add_distr_r (- a)%L a b) as H.
 rewrite rngl_add_opp_l in H; [ | easy ].
 rewrite rngl_mul_0_l in H. 2: {
-  now apply rngl_has_opp_or_sous_iff; left.
+  now apply rngl_has_opp_or_subt_iff; left.
 }
 symmetry in H.
 now apply rngl_add_move_0_r in H.
@@ -1368,7 +1368,7 @@ now apply rngl_opp_involutive.
 Qed.
 
 Theorem rngl_inv_inj :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →(a⁻¹ = b⁻¹)%L → a = b.
 Proof.
@@ -1379,7 +1379,7 @@ now apply rngl_inv_involutive.
 Qed.
 
 Theorem rngl_inv_mul_distr :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_is_integral = true →
   rngl_has_inv = true →
   ∀ a b, a ≠ 0%L → b ≠ 0%L →((a * b)⁻¹ = b⁻¹ * a⁻¹)%L.
@@ -1445,7 +1445,7 @@ now rewrite rngl_opp_involutive.
 Qed.
 
 Theorem rngl_sub_add_distr :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, (a - (b + c) = a - b - c)%L.
 Proof.
 intros Hos *.
@@ -1458,13 +1458,13 @@ destruct op. {
   rewrite rngl_add_assoc.
   apply rngl_add_add_swap.
 }
-remember rngl_has_sous as mo eqn:Hmo.
+remember rngl_has_subt as mo eqn:Hmo.
 symmetry in Hmo.
 destruct mo. {
   specialize rngl_opt_sub_sub_sub_add as H1.
   now rewrite Hmo in H1.
 }
-apply rngl_has_opp_or_sous_iff in Hos.
+apply rngl_has_opp_or_subt_iff in Hos.
 now destruct Hos; congruence.
 Qed.
 
@@ -1495,7 +1495,7 @@ now specialize (rngl_char_prop i) as H.
 Qed.
 
 Theorem rngl_of_nat_inj :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_characteristic = 0 →
   ∀ i j,
   rngl_of_nat i = rngl_of_nat j
@@ -1528,7 +1528,7 @@ remember (Nat.eqb rngl_characteristic 1) as ch eqn:Hch; symmetry in Hch.
 destruct ch. {
   apply Nat_eqb_eq in Hch.
   exfalso; apply Haz, rngl_characteristic_1; [ | easy ].
-  now apply rngl_has_opp_or_sous_iff; left.
+  now apply rngl_has_opp_or_subt_iff; left.
 }
 apply Nat_eqb_neq in Hch.
 move Hch before Hin.
@@ -1585,7 +1585,7 @@ now apply rngl_div_diag.
 Qed.
 
 Theorem rngl_mul_sub_distr_r :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b c, ((a - b) * c = a * c - b * c)%L.
 Proof.
 intros Hos *.
@@ -1595,7 +1595,7 @@ destruct op. {
   rewrite rngl_mul_add_distr_r.
   now rewrite rngl_mul_opp_l.
 }
-remember rngl_has_sous as mo eqn:Hmo; symmetry in Hmo.
+remember rngl_has_subt as mo eqn:Hmo; symmetry in Hmo.
 destruct mo. {
   remember rngl_mul_is_comm as ic eqn:Hic; symmetry in Hic.
   destruct ic. {
@@ -1612,12 +1612,12 @@ destruct mo. {
     apply H1.
   }
 }
-apply rngl_has_opp_or_sous_iff in Hos.
+apply rngl_has_opp_or_subt_iff in Hos.
 destruct Hos; congruence.
 Qed.
 
 Theorem eq_rngl_add_same_0 :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   (rngl_is_integral || (rngl_has_inv_or_quot && rngl_has_eqb))%bool = true →
   rngl_characteristic = 0 →
   ∀ a,
@@ -1669,7 +1669,7 @@ Proof.
 intros.
 rewrite fold_rngl_sub; [ | easy ].
 apply rngl_sub_diag.
-now apply rngl_has_opp_or_sous_iff; left.
+now apply rngl_has_opp_or_subt_iff; left.
 Qed.
 
 Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
@@ -1684,7 +1684,7 @@ Definition rngl_ring_theory : ring_theory _ _ _ _ _ _ _ :=
      Ropp_def := rngl_Ropp_def |}.
 
 Theorem rngl_pow_0_l :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ n, (0 ^ n)%L = match n with 0 => 1%L | _ => 0%L end.
 Proof.
 intros Hos *.
@@ -1722,7 +1722,7 @@ Arguments rngl_add_cancel_l {T}%type {ro rp} Hom (a b c)%L.
 Arguments rngl_add_opp_l {T}%type {ro rp} Hro.
 Arguments rngl_add_sub {T}%type {ro rp} Hom (a b)%L.
 Arguments rngl_eq_dec {T ro rp} Heq (a b)%L.
-Arguments rngl_has_opp_has_opp_or_sous {T ro} Hop.
+Arguments rngl_has_opp_has_opp_or_subt {T ro} Hop.
 Arguments rngl_integral {T}%type {ro rp}.
 Arguments rngl_inv_mul_distr {T}%type {ro rp} Hom Hin Hdo a%L b%L.
 Arguments rngl_le_trans {T}%type {ro rp} Hor (a b c)%L.

@@ -167,7 +167,7 @@ Theorem rngl_of_nat_sub :
      else (- rngl_of_nat (i - j))%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hop'.
 specialize (Hop' (or_introl Hop)).
 move Hop' before Hop.
 rewrite if_ltb_lt_dec.
@@ -209,7 +209,7 @@ now cbn; rewrite <- rngl_add_assoc; f_equal.
 Qed.
 
 Theorem rngl_of_nat_mul :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ a b, (rngl_of_nat a * rngl_of_nat b)%L = rngl_of_nat (a * b).
 Proof.
 intros Hom *.
@@ -221,7 +221,7 @@ apply rngl_of_nat_add.
 Qed.
 
 Theorem rngl_product_rngl_of_nat :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ n, (∏ (i = 1, n), rngl_of_nat i)%L = rngl_of_nat (fact n).
 Proof.
 intros Hom *.
@@ -267,7 +267,7 @@ Theorem rngl_sub_is_mul_sign_abs :
   (sign_diff a b * rngl_of_nat (abs_diff a b))%L.
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hop'.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hop'.
 specialize (Hop' (or_introl Hop)).
 move Hop' before Hop.
 unfold sign_diff, abs_diff.
@@ -339,7 +339,7 @@ destruct (lt_dec a b) as [Hab1| Hab1]. {
 Qed.
 
 Theorem rngl_product_product_div_eq_1 :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
@@ -677,7 +677,7 @@ apply (@permut_swap_mul_cancel n); try easy; [ flia Hi | flia Hj ].
 Qed.
 
 Theorem product_product_if_permut :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_mul_is_comm = true →
   rngl_has_inv = true →
   rngl_is_integral = true →
@@ -713,7 +713,7 @@ Theorem rngl_product_product_abs_diff_div_diff : in_charac_0_field →
       else 1)) = 1%L.
 Proof.
 intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hp.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -854,7 +854,7 @@ Proof.
 intros Hif * Hij1.
 destruct Hif as (Hic & Hop & Hin & Hit & _ & Hch).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -1302,7 +1302,7 @@ assert (H10 : rngl_characteristic ≠ 1). {
   destruct Hif as (_ & _ & _ & _ & _ & H1).
   now rewrite H1.
 }
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -1381,7 +1381,7 @@ Theorem signature_comp_fun_expand_2_1 :
 Proof.
 intros Hop Hin Hic Hit Hch * (Hp2, Hn).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hch.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
@@ -1475,7 +1475,7 @@ Theorem signature_comp_fun_expand_2_2 :
 Proof.
 intros Hop Hin Hic Hit Hch *.
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hch.
 unfold rngl_div; rewrite Hin.
@@ -1563,7 +1563,7 @@ Theorem signature_comp_fun_changement_of_variable :
 Proof.
 intros Hop Hin Hic Heq Hit Hch * (Hp1, Hn1) (Hp2, Hn2).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hch.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ now move Hnz at top; subst n | ].
@@ -1871,7 +1871,7 @@ Theorem sign_diff_mul :
   sign_diff (a * c + b * d) (a * d + b * c).
 Proof.
 intros Hop *.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 unfold sign_diff.
@@ -2590,7 +2590,7 @@ Theorem ε_when_dup :
   → ε la = 0%L.
 Proof.
 intros Hop Heq * Haa.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hos.
 symmetry.
@@ -2646,7 +2646,7 @@ Theorem sign_comp : in_charac_0_field →
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
 intros Hif * Hbp.
-specialize (proj2 rngl_has_opp_or_sous_iff) as Hos.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.

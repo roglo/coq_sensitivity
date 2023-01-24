@@ -83,7 +83,7 @@ Definition vect_dot_mul' (U V : vector T) :=
   vect_el U i * vect_el V i.
 
 Theorem vect_dot_mul_dot_mul' :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ U V,
   vect_dot_mul U V = vect_dot_mul' U V.
 Proof.
@@ -195,7 +195,7 @@ Theorem vect_mul_scal_size : ∀ a V, vect_size (a × V) = vect_size V.
 Proof. now intros; cbn; rewrite map_length. Qed.
 
 Theorem vect_dot_mul_scal_mul_comm :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   rngl_mul_is_comm = true →
   ∀ (a : T) (U V : vector T),
   ≺ U, a × V ≻ = (a * ≺ U, V ≻)%L.
@@ -217,7 +217,7 @@ now apply rngl_mul_comm.
 Qed.
 
 Theorem vect_scal_mul_dot_mul_comm :
-  rngl_has_opp_or_sous = true →
+  rngl_has_opp_or_subt = true →
   ∀ (a : T) (U V : vector T),
   ≺ a × U, V ≻ = (a * ≺ U, V ≻)%L.
 Proof.

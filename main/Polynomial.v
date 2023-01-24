@@ -37,7 +37,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 Context {Heb : rngl_has_eqb = true}.
-Context {Hos : rngl_has_opp_or_sous = true}.
+Context {Hos : rngl_has_opp_or_subt = true}.
 (*
 Context (Hc1 : rngl_characteristic ≠ 1).
 *)
@@ -844,17 +844,17 @@ Definition polyn_quot_rem (pa pb : polyn T) : polyn T * polyn T :=
 
 (* polyn opposite or subtraction *)
 
-Definition lap_opt_opp_or_sous :
+Definition lap_opt_opp_or_subt :
   option ((list T → list T) + (list T → list T → list T)) :=
-  match rngl_opt_opp_or_sous with
+  match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl lap_opp)
   | Some (inr _) => None
   | None => None
   end.
 
-Definition polyn_opt_opp_or_sous :
+Definition polyn_opt_opp_or_subt :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match rngl_opt_opp_or_sous with
+  match rngl_opt_opp_or_subt with
   | Some (inl _) => Some (inl polyn_opp)
   | Some (inr _) => None
   | None => None
@@ -907,9 +907,9 @@ Definition lap_ring_like_op : ring_like_op (list T) :=
      rngl_one := lap_one;
      rngl_add := lap_add;
      rngl_mul := lap_mul;
-     rngl_opt_opp_or_sous := lap_opt_opp_or_sous;
-     rngl_opt_inv_or_quot := lap_opt_inv_or_quot;
-     rngl_opt_eqb := Some (lap_eqb rngl_zero rngl_eqb);
+     rngl_opt_opp_or_subt := None (*lap_opt_opp_or_subt*);
+     rngl_opt_inv_or_quot := None (*lap_opt_inv_or_quot*);
+     rngl_opt_eqb := None (*Some (lap_eqb rngl_zero rngl_eqb)*);
      rngl_opt_le := None |}.
 
 Definition polyn_ring_like_op : ring_like_op (polyn T) :=
@@ -917,7 +917,7 @@ Definition polyn_ring_like_op : ring_like_op (polyn T) :=
      rngl_one := polyn_one;
      rngl_add := polyn_add;
      rngl_mul := polyn_mul;
-     rngl_opt_opp_or_sous := polyn_opt_opp_or_sous;
+     rngl_opt_opp_or_subt := polyn_opt_opp_or_subt;
      rngl_opt_inv_or_quot := polyn_opt_inv_or_quot;
      rngl_opt_eqb := Some (polyn_eqb rngl_eqb);
      rngl_opt_le := None |}.
@@ -2589,7 +2589,7 @@ clear Hos.
 induction la as [| a]; [ easy | cbn ].
 rewrite fold_lap_opp.
 rewrite fold_rngl_sub; [ | easy ].
-rewrite rngl_sub_diag; [ | now apply rngl_has_opp_has_opp_or_sous ].
+rewrite rngl_sub_diag; [ | now apply rngl_has_opp_has_opp_or_subt ].
 now f_equal.
 Qed.
 
@@ -2634,12 +2634,12 @@ intros.
 destruct op; [ | easy ].
 intros la.
 unfold rngl_opp; cbn.
-unfold lap_opt_opp_or_sous.
+unfold lap_opt_opp_or_subt.
 specialize lap_add_opp_l as add_opp_l.
 unfold rngl_has_opp in Hop, add_opp_l.
 cbn in Hop, add_opp_l.
-unfold lap_opt_opp_or_sous in Hop, add_opp_l.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+unfold lap_opt_opp_or_subt in Hop, add_opp_l.
+destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 destruct opp as [opp| ]; [ | easy ].
 rewrite add_opp_l; [ | easy ].
 (* question of equality *)
@@ -2659,37 +2659,37 @@ intros.
 destruct op; [ | easy ].
 intros a.
 unfold rngl_opp; cbn.
-unfold polyn_opt_opp_or_sous.
+unfold polyn_opt_opp_or_subt.
 specialize polyn_add_opp_l as add_opp_l.
 unfold rngl_has_opp in Hop, add_opp_l.
 cbn in Hop, add_opp_l.
-unfold polyn_opt_opp_or_sous in Hop, add_opp_l.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+unfold polyn_opt_opp_or_subt in Hop, add_opp_l.
+destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 destruct opp as [opp| ]; [ | easy ].
 now apply add_opp_l.
 Qed.
 
 (* *)
 
-Theorem lap_opt_has_no_sous : ∀ P,
+Theorem lap_opt_has_no_subt : ∀ P,
   let _ := lap_ring_like_op in
-  if rngl_has_sous then P else not_applicable.
+  if rngl_has_subt then P else not_applicable.
 Proof.
 intros.
-unfold rngl_has_sous; cbn.
-unfold lap_opt_opp_or_sous.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+unfold rngl_has_subt; cbn.
+unfold lap_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
-Theorem polyn_opt_has_no_sous : ∀ P,
+Theorem polyn_opt_has_no_subt : ∀ P,
   let _ := polyn_ring_like_op in
-  if rngl_has_sous then P else not_applicable.
+  if rngl_has_subt then P else not_applicable.
 Proof.
 intros.
-unfold rngl_has_sous; cbn.
-unfold polyn_opt_opp_or_sous.
-destruct rngl_opt_opp_or_sous as [opp| ]; [ | easy ].
+unfold rngl_has_subt; cbn.
+unfold polyn_opt_opp_or_subt.
+destruct rngl_opt_opp_or_subt as [opp| ]; [ | easy ].
 now destruct opp.
 Qed.
 
@@ -3790,7 +3790,7 @@ Qed.
 
 (*
 Theorem lap_opt_mul_div :
-  let _ := lap_ring_like_op in
+  let lop := lap_ring_like_op in
   if rngl_has_quot then ∀ a b, b ≠ 0%L → (a * b / b)%L = a
   else not_applicable.
 Proof.
@@ -3845,11 +3845,14 @@ Theorem lap_opt_mul_quot_r :
     ∀ a b, b ≠ 0%L → (b * a / b)%L = a
   else not_applicable.
 Proof.
+easy.
+(*
 intros rol.
 unfold rngl_has_quot; cbn.
 unfold lap_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
+*)
 Qed.
 
 Theorem polyn_opt_mul_quot_r :
@@ -4207,7 +4210,6 @@ Check rngl_opt_mul_div.
 Check rngl_opt_eqb_eq.
 *)
 
-(* to be completed, if possible
 Definition lap_ring_like_prop : ring_like_prop (list T) :=
   let rol := lap_ring_like_op in
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -4224,22 +4226,16 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_comm := lap_opt_mul_comm;
      rngl_opt_mul_1_r := lap_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := lap_opt_mul_add_distr_r;
-(*
-     rngl_opt_add_opp_l := lap_opt_add_opp_l;
-*)
-     rngl_opt_add_sub := lap_opt_has_no_sous _;
-     rngl_opt_sub_sub_sub_add := lap_opt_has_no_sous _;
-     rngl_opt_mul_sub_distr_l := lap_opt_has_no_sous _;
-     rngl_opt_mul_sub_distr_r := lap_opt_has_no_sous _;
-     rngl_opt_mul_inv_l := lap_opt_has_no_inv _;
-     rngl_opt_mul_inv_r := lap_opt_has_no_inv_and _ _;
-(*
-     rngl_opt_mul_div := lap_opt_mul_div;
-*)
+     rngl_opt_add_opp_l := NA; (*lap_opt_add_opp_l;*)
+     rngl_opt_add_sub := NA; (*lap_opt_has_no_subt _;*)
+     rngl_opt_sub_sub_sub_add := NA; (*lap_opt_has_no_subt _;*)
+     rngl_opt_mul_sub_distr_l := NA; (*lap_opt_has_no_subt _;*)
+     rngl_opt_mul_sub_distr_r := NA; (*lap_opt_has_no_subt _;*)
+     rngl_opt_mul_inv_l := NA; (*lap_opt_has_no_inv _;*)
+     rngl_opt_mul_inv_r := NA; (*lap_opt_has_no_inv_and _ _;*)
+     rngl_opt_mul_div := NA; (*lap_opt_mul_div;*)
      rngl_opt_mul_quot_r := lap_opt_mul_quot_r;
-(*
-     rngl_opt_eqb_eq := lap_opt_eqb_eq;
-*)
+     rngl_opt_eqb_eq := NA; (*lap_opt_eqb_eq;*)
      rngl_opt_le_dec := lap_opt_le_dec;
      rngl_opt_integral := lap_opt_integral;
      rngl_opt_alg_closed := NA;
@@ -4252,8 +4248,6 @@ Definition lap_ring_like_prop : ring_like_prop (list T) :=
      rngl_opt_mul_le_compat_nonpos := NA;
      rngl_opt_mul_le_compat := NA;
      rngl_opt_not_le := NA |}.
-...
-*)
 
 Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
   {| rngl_mul_is_comm := rngl_mul_is_comm;
@@ -4271,10 +4265,10 @@ Definition polyn_ring_like_prop : ring_like_prop (polyn T) :=
      rngl_opt_mul_1_r := polyn_opt_mul_1_r;
      rngl_opt_mul_add_distr_r := polyn_opt_mul_add_distr_r;
      rngl_opt_add_opp_l := polyn_opt_add_opp_l;
-     rngl_opt_add_sub := polyn_opt_has_no_sous _;
-     rngl_opt_sub_sub_sub_add := polyn_opt_has_no_sous _;
-     rngl_opt_mul_sub_distr_l := polyn_opt_has_no_sous _;
-     rngl_opt_mul_sub_distr_r := polyn_opt_has_no_sous _;
+     rngl_opt_add_sub := polyn_opt_has_no_subt _;
+     rngl_opt_sub_sub_sub_add := polyn_opt_has_no_subt _;
+     rngl_opt_mul_sub_distr_l := polyn_opt_has_no_subt _;
+     rngl_opt_mul_sub_distr_r := polyn_opt_has_no_subt _;
      rngl_opt_mul_inv_l := polyn_opt_has_no_inv _;
      rngl_opt_mul_inv_r := polyn_opt_has_no_inv_and _ _;
      rngl_opt_mul_div := polyn_opt_mul_div;
@@ -4547,20 +4541,20 @@ Require Import RnglAlg.MatRl.
 Definition mat_of_polyn_ring_like_op n T
   (ro : ring_like_op T) (rp : ring_like_prop T) eqb
   (Heq : rngl_has_eqb = true)
-  (Hos : rngl_has_opp_or_sous = true) :
+  (Hos : rngl_has_opp_or_subt = true) :
     ring_like_op (square_matrix n (polyn T)) :=
   mat_ring_like_op (polyn_ring_like_op Heq Hos) (polyn_eqb eqb).
 
 Theorem polyn_has_opp :
   ∀ T (ro : ring_like_op T) (rp : ring_like_prop T) Heq Hop,
   @rngl_has_opp (polyn T)
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_sous Hop)) = true.
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop)) = true.
 Proof.
 intros.
 unfold rngl_has_opp in Hop |-*.
 unfold polyn_ring_like_op; cbn.
-unfold polyn_opt_opp_or_sous; cbn.
-remember rngl_opt_opp_or_sous as os eqn:Hos; symmetry in Hos.
+unfold polyn_opt_opp_or_subt; cbn.
+remember rngl_opt_opp_or_subt as os eqn:Hos; symmetry in Hos.
 destruct os as [os| ]; [ | easy ].
 now destruct os.
 Qed.
@@ -4569,8 +4563,8 @@ Definition mat_of_polyn_ring_like_prop n T ro rp eqb
   (Heq : rngl_has_eqb = true) (Hop : rngl_has_opp = true) :
     ring_like_prop (square_matrix n (polyn T)) :=
   @mat_ring_like_prop _
-    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_sous Hop))
-    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_sous Hop))
+    (polyn_ring_like_op Heq (rngl_has_opp_has_opp_or_subt Hop))
+    (@polyn_ring_like_prop _ ro rp Heq (rngl_has_opp_has_opp_or_subt Hop))
     (polyn_has_opp rp Heq Hop) (polyn_eqb eqb) n.
 *)
 
