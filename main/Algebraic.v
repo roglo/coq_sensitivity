@@ -877,6 +877,24 @@ apply Bool.orb_true_iff.
 
 Print polyn_of_const.
 Check rngl_eq_dec.
+Print rngl_eq_dec.
+Definition rngl_eq_dec' T (ro : ring_like_op T) (rp : ring_like_prop T)
+    (Heq : rngl_has_eqb = true) (a b : T) :=
+  (if (a =? b)%L as b0 return ((a =? b)%L = b0 → {a = b} + {a ≠ b}) then
+     λ Hab1, left (match rngl_eqb_eq Heq a b with conj x _ => x Hab1 end)
+   else
+     λ Hab1, right (match rngl_eqb_neq Heq a b with conj x _ => x Hab1 end)
+  ) eq_refl.
+Time Compute (
+  rngl_eq_dec' _ Q_has_eqb 1 0).
+  rngl_eq_dec' Q_ring_like_prop Q_has_eqb 1 0).
+(* 14 s *)
+...
+     = right
+         match rngl_eqb_neq Q_has_eqb 〈1〉 0 with
+         | conj x _ => x eq_refl
+         end
+     : {1 = 0} + {1 ≠ 0}
 Time Compute (
     let rpq := Q_ring_like_prop in
   rngl_eq_dec Q_has_eqb 1 0).
