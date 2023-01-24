@@ -835,6 +835,8 @@ Time Compute (
   let q := [-2;0;1] in
 (*
   eval_lap (map (λ i, [i]) q) [-1;1]
+  lap_compose (map (λ i, [i]) [-1;1]) (map (λ i, [i]) q)
+  lap_compose (map (λ i, [i]) q) (map (λ i, [i]) [-1;1])
 *)
   lap_compose (map (λ i, [i]) q) (map (λ i, [i]) [-1;1])
 ).
