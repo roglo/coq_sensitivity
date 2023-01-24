@@ -887,6 +887,7 @@ Definition rngl_eq_dec' T (ro : ring_like_op T) (rp : ring_like_prop T)
   ) eq_refl.
 Time Compute (
   rngl_eq_dec' _ Q_has_eqb 1 0).
+Time Compute (
   rngl_eq_dec' Q_ring_like_prop Q_has_eqb 1 0).
 (* 14 s *)
 ...
