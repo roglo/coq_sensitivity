@@ -833,7 +833,10 @@ Time Compute (
   let rpq := Q_ring_like_prop in
   let rol := lap_ring_like_op in
   let q := [-2;0;1] in
-  lap_compose (map (λ i, [i]) [-1;1]) (map (λ i, [i]) q)
+(*
+  eval_lap (map (λ i, [i]) q) [-1;1]
+*)
+  lap_compose (map (λ i, [i]) q) (map (λ i, [i]) [-1;1])
 ).
 (* non *)
 
