@@ -848,41 +848,33 @@ Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;1]).
 Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-2]).
 Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-3]).
 Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;1;1]).
+
 ...
 
+(* bon, ci-dessous, ça prend toujours plein de temps à calculer
+   par Compute, même si tous les implicites sont donnés implicitement ;
+   je croyais que c'était à cause d'implicites non explicites que
+   ça prenait du temps mais non *)
+Set Printing All.
+Time Check
+  (let q :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
+   in
+   let z_x :=
+     let roqp := Q_polyn_ring_like_op in
+     let roq := Q_ring_like_op in
+     @mk_polyn (polyn Q) roqp
+       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
+   in
 (*
-Time Compute
-  (let q :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
-   in
-   let z_x :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp
-       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
-   in
-   let r := @eval_polyn (polyn Q) Q_polyn_ring_like_op q z_x in
-   mk_polyn r (Q_polyn_norm_prop r)).
-...
-*)
-Time Compute
-  (let q :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp [mk_polyn [-2;0;1] eq_refl] eq_refl (* x²-2 *)
-   in
-   let z_x :=
-     let roqp := Q_polyn_ring_like_op in
-     let roq := Q_ring_like_op in
-     @mk_polyn (polyn Q) roqp
-       [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
-   in
    let r := (lap q ° lap z_x)%lap in
-(*
-   mk_polyn r (polyn_norm_prop Q_polyn_ring_like_op r)
 *)
+   let r := @lap_compose (polyn Q) Q_polyn_ring_like_op (lap q) (lap z_x) in
+(**)
+   let qpro := Q_polyn_ring_like_op in
+   mk_polyn (@lap_norm (polyn Q) qpro r) (polyn_norm_prop r)).
 (* 32 s *)
    mk_polyn r (Q_polyn_norm_prop r)).
 (* 0.007 s *)
