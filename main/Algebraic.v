@@ -837,31 +837,17 @@ Definition r_algeb_sum_cancel_lap T
   let q' := map (λ i, [i]) (rev rq) in
   rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
 
-Compute (
+Definition Q_r_algeb_sum_cancel_lap :=
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;0;-2]).
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;0;1]).
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro [1;0;-2] [1;0;-2]).
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro [1;0;-2] [1;0;-3]).
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;1;1]).
+  r_algeb_sum_cancel_lap qro lro.
+
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;-2]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;1]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-2]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-3]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;1;1]).
 ...
 
 (*
