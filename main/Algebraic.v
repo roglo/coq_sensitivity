@@ -69,6 +69,7 @@ Compute (Q_r_lap_cancelling_sum_zeros [1;0;-2] [1;0;-2]).
 Compute (Q_r_lap_cancelling_sum_zeros [1;0;-2] [1;0;-3]).
 Compute (Q_r_lap_cancelling_sum_zeros [1;0;1] [1;1;1]).
 Compute (Q_r_lap_cancelling_sum_zeros [1;2;3;4;5] [1;1;1]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;0;-2] [1;0;1]).
 
 (* faudrait le prouver, que ce polynôme résultant (c'est le cas de
    le dire, puisqu'il faut passer par le "résultant") annule bien
