@@ -53,7 +53,11 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
       (seq 0 (length q))
   in
+(**)
   lap_resultant p' q'.
+(*
+  det (mat_transp (rlap_sylvester_mat (rev p') (rev q'))).
+*)
 
 Definition toto A (ro : ring_like_op A) (rol : ring_like_op (list A)) (q : list A) :=
   let q' :=
@@ -101,12 +105,15 @@ Compute (toto' [-2; 0; 1]). (* x²-2 *)
      : list (list Q)
 z²-2x²
 *)
-...
 
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
+...
 Compute (Q_r_algeb_add [1;0;1] [1;0;1]).
+Compute (Q_r_algeb_mul [1;0;1] [1;0;1]).
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-2]).
+Compute (Q_r_algeb_mul [1;0;-2] [1;0;-2]).
+...
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-3]).
 Compute (Q_r_algeb_add [1;0;1] [1;1;1]).
 Compute (Q_r_algeb_add [1;2;3;4;5] [1;1;1]).
