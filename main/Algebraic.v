@@ -46,10 +46,30 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
   let q' := map (λ i, [i]) q in
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
 
+Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    p q :=
+  let p' := map (λ i, [i]) p in
+  let q' :=
+    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
+      (seq 0 (length q))
+  in
+  lap_resultant p' q'.
+
+Definition toto A (ro : ring_like_op A) (rol : ring_like_op (list A)) (q : list A) :=
+  let q' :=
+    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
+      (seq 0 (length q))
+  in
+  q'.
+
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=
   rev (algeb_add ro rol (rev rp) (rev rq)).
+
+Definition r_algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    rp rq :=
+  rev (algeb_mul ro rol (rev rp) (rev rq)).
 
 (* test *)
 Require Import RnglAlg.Qrl.
@@ -63,7 +83,28 @@ Definition Q_r_algeb_add :=
   let lro := lap_ring_like_op in
   r_algeb_add qro lro.
 
+Definition Q_r_algeb_mul :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_mul qro lro.
+
+Definition toto' q :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  toto qro lro q.
+
+Compute (toto' [-2; 0; 1]). (* x²-2 *)
+(*
+     = [[0; 0; 〈-2〉]; [0; 0]; [〈1〉]]
+     : list (list Q)
+z²-2x²
+*)
+...
+
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
+Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_add [1;0;1] [1;0;1]).
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-2]).
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-3]).
