@@ -759,7 +759,8 @@ Check
      @mk_polyn (polyn Q) roqp
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
-   polyn_norm_prop Q_polyn_ring_like_op (lap_compose (lap q) (lap z_x))).
+   let rpqp := Q_polyn_ring_like_op in
+   polyn_norm_prop (lap_compose (lap q) (lap z_x))).
 
 Check
   (let q :=
@@ -774,7 +775,6 @@ Check
        [mk_polyn [0;-1] eq_refl; mk_polyn [1] eq_refl] eq_refl
    in
    (*mk_polyn*) (lap_compose (lap q) (lap z_x))).
-Check polyn_norm_prop.
 
 Theorem Q_polyn_norm_prop :
   let ro := Q_polyn_ring_like_op in
@@ -813,7 +813,7 @@ Time Compute (
     let p :=
       [mk_polyn [1] eq_refl; mk_polyn [] eq_refl; mk_polyn [1] eq_refl]
     in
-    mk_polyn p (polyn_norm_prop _ p)
+    mk_polyn p (polyn_norm_prop p)
   in
   let q' :=
     let roq := Q_ring_like_op in
@@ -821,7 +821,8 @@ Time Compute (
       [mk_polyn [-2;0;1] eq_refl; mk_polyn [0;-2] eq_refl;
        mk_polyn [1] eq_refl]
     in
-    mk_polyn q (polyn_norm_prop Q_polyn_ring_like_op q)
+    let roqp := Q_polyn_ring_like_op in
+    mk_polyn q (polyn_norm_prop q)
   in
   resultant p q').
 (*
@@ -830,18 +831,18 @@ Time Compute (
 ok
 *)
 Time Compute (
+  let roq := Q_ring_like_op in
   let rpq := Q_ring_like_prop in
   let rol := lap_ring_like_op in
   let p := map (λ i, [i]) [1; 0; 1] in
   let q := map (λ i, [i]) [-2; 0; 1] in
-  let q' := lap_compose q [[0;-1];[1]] in (* q (z-x) *)
+  let q' := @lap_compose _ _ q [[0;-1];[1]] in
   lap_resultant p q').
 (*
      = [〈9〉; 0; 〈-2〉; 0; 〈1〉]
      : list Q
 ok
 *)
-...
 
 (*
 Time Compute
