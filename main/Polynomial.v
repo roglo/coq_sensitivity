@@ -3660,7 +3660,7 @@ Arguments lap_quot {T ro} (la lb)%lap.
 Arguments lap_rem {T ro} (la lb)%lap.
 Arguments lap_compose {T ro} (la lb)%lap.
 Arguments lap_convol_mul {T ro} (la lb)%lap (i len)%nat.
-Arguments polyn_norm_prop {T} ro} la%lap.
+Arguments polyn_norm_prop {T ro} la%lap.
 Arguments polyn_one_prop {T ro rp} Heb Hc1.
 Arguments rlap_compose {T ro} (rla rlb)%lap.
 Arguments strip_0s {T ro} la%lap.
