@@ -37,11 +37,19 @@ Definition resultant (p q : polyn T) :=
 
 End a.
 
-Definition r_algeb_sum_cancel_lap A
+(* polynomial cancelling the sum of zeros of two polynomials rp and rq *)
+(* e.g. if rp=x²+1 and rq=x²-2 whose zeros are, resp. i and √2, return
+   a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
+Definition lap_cancelling_sum_zeros A
+    (ro : ring_like_op A) (rol : ring_like_op (list A)) p q :=
+  let p' := map (λ i, [i]) p in
+  let q' := map (λ i, [i]) q in
+  lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
+
+(* same, with powers in decreasing order, for testing and readability *)
+Definition r_lap_cancelling_sum_zeros A
     (ro : ring_like_op A) (rol : ring_like_op (list A)) rp rq :=
-  let p' := map (λ i, [i]) (rev rp) in
-  let q' := map (λ i, [i]) (rev rq) in
-  rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
+  rev (lap_cancelling_sum_zeros ro rol (rev rp) (rev rq)).
 
 (* test *)
 Require Import RnglAlg.Qrl.
@@ -49,17 +57,17 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
-Definition Q_r_algeb_sum_cancel_lap :=
+Definition Q_r_lap_cancelling_sum_zeros :=
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
-  r_algeb_sum_cancel_lap qro lro.
+  r_lap_cancelling_sum_zeros qro lro.
 
-Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;-2]).
-Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;1]).
-Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-2]).
-Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-3]).
-Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;1;1]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;1] [1;0;-2]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;1] [1;0;1]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;-2] [1;0;-2]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;-2] [1;0;-3]).
+Compute (Q_r_lap_cancelling_sum_zeros [1;0;1] [1;1;1]).
 
 ...
 
