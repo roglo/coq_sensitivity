@@ -830,19 +830,39 @@ Time Compute (
      : polyn Q
 ok
 *)
-Time Compute (
-  let roq := Q_ring_like_op in
-  let rpq := Q_ring_like_prop in
-  let rol := lap_ring_like_op in
-  let p := map (λ i, [i]) [1; 0; 1] in
-  let q := map (λ i, [i]) [-2; 0; 1] in
-  let q' := @lap_compose _ _ q [[0;-1];[1]] in
-  lap_resultant p q').
-(*
-     = [〈9〉; 0; 〈-2〉; 0; 〈1〉]
-     : list Q
-ok
-*)
+
+Definition r_algeb_sum_cancel_lap T
+    (ro : ring_like_op T) (rol : ring_like_op (list T)) rp rq :=
+  let p' := map (λ i, [i]) (rev rp) in
+  let q' := map (λ i, [i]) (rev rq) in
+  rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
+
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;0;-2]).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;0;1]).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro [1;0;-2] [1;0;-2]).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro [1;0;-2] [1;0;-3]).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro [1;0;1] [1;1;1]).
+...
 
 (*
 Time Compute
