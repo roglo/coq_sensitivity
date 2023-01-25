@@ -35,6 +35,34 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
+End a.
+
+Definition r_algeb_sum_cancel_lap A
+    (ro : ring_like_op A) (rol : ring_like_op (list A)) rp rq :=
+  let p' := map (λ i, [i]) (rev rp) in
+  let q' := map (λ i, [i]) (rev rq) in
+  rev (lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L).
+
+(* test *)
+Require Import RnglAlg.Qrl.
+Require Import RnglAlg.Rational.
+Import Q.Notations.
+Open Scope Q_scope.
+
+Definition Q_r_algeb_sum_cancel_lap :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_algeb_sum_cancel_lap qro lro.
+
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;-2]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;0;1]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-2]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-3]).
+Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;1;1]).
+
+...
+
 Theorem last_fold_left_lap_mul_const_add_const : ∀ la b c,
   last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
   fold_left (λ x y, (x * b + y)%L) la c.
@@ -173,6 +201,8 @@ rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 now do 2 rewrite List_last_cons_cons.
 Qed.
+
+...
 
 (* to be completed
 Theorem glop :
