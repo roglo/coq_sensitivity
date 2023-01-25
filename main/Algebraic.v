@@ -70,6 +70,19 @@ Compute (Q_r_lap_cancelling_sum_zeros [1;0;-2] [1;0;-3]).
 Compute (Q_r_lap_cancelling_sum_zeros [1;0;1] [1;1;1]).
 Compute (Q_r_lap_cancelling_sum_zeros [1;2;3;4;5] [1;1;1]).
 
+(* faudrait le prouver, que ce polynôme résultant (c'est le cas de
+   le dire, puisqu'il faut passer par le "résultant") annule bien
+   la somme des zéros des deux polynômes.
+     À partir de ça, on pourrait définir un nombre algébrique comme
+   étant le couple formé d'un polynôme et d'un entier "i" entre 1 et
+   le degré dudit polynôme, représentant le i-ième zéro de ce polynôme.
+     L'ennui, c'est comment ranger ces zéros ? dans quel ordre ? comment
+   les identifier ? et si (P,i) et (Q,j) sont deux algébriques, leur
+   somme serait le nombre algébrique (R,k). Pour R, on calcule le
+   résultant, comme ci-dessus, mais comment déterminer k ? fonction de
+   i et j, j'imagine, mais aussi peut-être de P et Q ? chais pas.
+*)
+
 ...
 
 Theorem last_fold_left_lap_mul_const_add_const : ∀ la b c,
