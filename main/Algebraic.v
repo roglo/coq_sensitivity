@@ -106,16 +106,31 @@ Compute (toto' [-2; 0; 1]). (* x²-2 *)
 z²-2x²
 *)
 
+Compute (Q_r_algeb_add [1;-1] [1;-2]).
+...
+     = [〈-1〉; 〈-1〉]
+     : list Q
+ça va pas du tout, ça devrait annuler 3
+...
+Compute (Q_r_algeb_add [1;1] [1;-2]).
+...
+     = [〈-1〉; 〈-3〉]
+     : list Q
+bizarre, ça, ça devrait annuler 1
+...
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
-...
 Compute (Q_r_algeb_add [1;0;1] [1;0;1]).
 Compute (Q_r_algeb_mul [1;0;1] [1;0;1]).
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-2]).
 Compute (Q_r_algeb_mul [1;0;-2] [1;0;-2]).
-...
 Compute (Q_r_algeb_add [1;0;-2] [1;0;-3]).
+Compute (Q_r_algeb_mul [1;0;-2] [1;0;-3]).
 Compute (Q_r_algeb_add [1;0;1] [1;1;1]).
+Compute (Q_r_algeb_mul [1;0;1] [1;1;1]).
+Compute (Q_r_algeb_add [1;1;1] [1;0;1]).
+Compute (Q_r_algeb_mul [1;1;1] [1;0;1]).
+...
 Compute (Q_r_algeb_add [1;2;3;4;5] [1;1;1]).
 Compute (Q_r_algeb_add [1;0;0;-2] [1;0;1]).
 
