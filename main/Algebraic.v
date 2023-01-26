@@ -44,7 +44,11 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
   let q' := map (λ i, [i]) q in
+(**)
+  lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
+(*
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
+*)
 
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
@@ -53,11 +57,7 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
       (seq 0 (length q))
   in
-(**)
   lap_resultant p' q'.
-(*
-  det (mat_transp (rlap_sylvester_mat (rev p') (rev q'))).
-*)
 
 Definition toto A (ro : ring_like_op A) (rol : ring_like_op (list A)) (q : list A) :=
   let q' :=
@@ -107,17 +107,43 @@ z²-2x²
 *)
 
 Compute (Q_r_algeb_add [1;-1] [1;-2]).
-...
-     = [〈-1〉; 〈-1〉]
-     : list Q
-ça va pas du tout, ça devrait annuler 3
-...
+(*
+     = [〈1〉; 〈-3〉]
+*)
 Compute (Q_r_algeb_add [1;1] [1;-2]).
+(*
+     = [〈1〉; 〈-1〉]
+*)
+Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
+(*
+     = [〈1〉; 0; 〈-2〉; 0; 〈9〉]
+*)
+Compute (Q_r_algeb_add [1;0;1] [1;0;-3]).
+(*
+     = [〈1〉; 0; 〈-4〉; 0; 〈16〉]
+(i+√3)=x
+√3=x-i
+3=x²-2ix-1
+2ix=x²-4
+-4x²=x⁴-8x²+16
+x⁴-4x²+16=0
+c'est bon
+*)
+Compute (Q_r_algeb_add [1;0;-2] [1;0;0;-2]).
+(*
+     = [〈1〉; 0; 〈-6〉; 〈-4〉; 〈12〉; 〈-24〉; 〈-4〉]
+x⁶-6x⁴-4x³+12x²-24x-4
+√2+∛2=x
+∛2=x-√2
+2=x³-3x²√2+6x-2√2
+√2(3x²+2)=x³+6x-2
+2(9x⁴+12x²+4)=x⁶+2x³(6x-2)+(6x-2)²
+18x⁴+24x²+8=x⁶+12x⁴-4x³+36x²-24x+4
+x⁶-6x⁴-4x³+12x²-24x-4
+yeah !
+*)
 ...
-     = [〈-1〉; 〈-3〉]
-     : list Q
-bizarre, ça, ça devrait annuler 1
-...
+
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_add [1;0;1] [1;0;1]).
