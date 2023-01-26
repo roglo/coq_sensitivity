@@ -67,7 +67,7 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
   in
   lap_resultant p' q'.
 (* this version is false but I think it makes the polynomial cancelling
-   α/β, not αβ; then perhaps fixable *)
+   α/β, not αβ; therefore perhaps fixable *)
 (*
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
