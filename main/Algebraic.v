@@ -78,6 +78,11 @@ remember (rev q) as rq eqn:Hrq.
 clear p q Hrp Hrq.
 move rq before rp.
 ...
+unfold rlap_sylvester_mat.
+unfold rlap_sylvester_list_list.
+rewrite rev_length.
+rewrite map_length.
+...
 
 (**)
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
