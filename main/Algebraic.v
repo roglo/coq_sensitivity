@@ -57,6 +57,17 @@ in z ?
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
 *)
 
+Theorem algeb_add_cancelling :
+  ∀ A (ro : ring_like_op A) (rol : ring_like_op (list A)) p q α β,
+  eval_lap p α = 0%L
+  → eval_lap q β = 0%L
+  → eval_lap
+      (lap_resultant (map (λ i, [i]) p)
+         (lap_compose (map (λ i, [i]) q) [[0; 1]; [-1]])%L) (α + β)%L = 0%L.
+Proof.
+intros * Hp Hq.
+...
+
 (**)
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
