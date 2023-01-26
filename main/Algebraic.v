@@ -57,7 +57,7 @@ in z ?
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
 *)
 
-(*
+(**)
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
@@ -66,7 +66,9 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
       (seq 0 (length q))
   in
   lap_resultant p' q'.
-*)
+(* this version is false but I think it makes the polynomial cancelling
+   α/β, not αβ; then perhaps fixable *)
+(*
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
@@ -75,7 +77,7 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
   in
   lap_resultant p' q'.
 (* fails on (x²-2)(x³-2) *)
-(**)
+*)
 
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
