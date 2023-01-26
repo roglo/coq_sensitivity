@@ -63,7 +63,8 @@ Theorem algeb_add_cancelling :
   → eval_lap q β = 0%L
   → eval_lap
       (lap_resultant (map (λ i, [i]) p)
-         (lap_compose (map (λ i, [i]) q) [[0; 1]; [-1]])%L) (α + β)%L = 0%L.
+         (map (λ i, [i]) q ° [[0%L; 1%L]; [(-1)%L]])%lap)
+      (α + β)%L = 0%L.
 Proof.
 intros * Hp Hq.
 ...
