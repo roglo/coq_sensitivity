@@ -145,6 +145,14 @@ x⁶-6x⁴-4x³+12x²-24x-4
 x⁶-6x⁴-4x³+12x²-24x-4
 yeah !
 *)
+
+Compute (Q_r_algeb_mul [1;-1] [1;-2]).
+(*
+     = [〈-2〉; 〈1〉]
+-2x+1
+incorrect
+should be x-2
+*)
 ...
 
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
