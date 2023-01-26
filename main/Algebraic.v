@@ -51,10 +51,13 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
   lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
 (*
 litterature says Q(z-X) but must be Q(-z+X) to make examples work
+or else, we should consider it as a polynomial in X, not a polynomial
+in z ?
 ...
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
 *)
 
+(*
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
@@ -63,13 +66,16 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
       (seq 0 (length q))
   in
   lap_resultant p' q'.
-
-Definition toto A (ro : ring_like_op A) (rol : ring_like_op (list A)) (q : list A) :=
+*)
+Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    p q :=
+  let p' := map (λ i, [i]) p in
   let q' :=
-    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
-      (seq 0 (length q))
+    map (λ i, repeat 0%L i ++ [nth i q 0%L]) (seq 0 (length q))
   in
-  q'.
+  lap_resultant p' q'.
+(* fails on (x²-2)(x³-2) *)
+(**)
 
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
@@ -97,19 +103,6 @@ Definition Q_r_algeb_mul :=
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   r_algeb_mul qro lro.
-
-Definition toto' q :=
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  toto qro lro q.
-
-Compute (toto' [-2; 0; 1]). (* x²-2 *)
-(*
-     = [[0; 0; 〈-2〉]; [0; 0]; [〈1〉]]
-     : list (list Q)
-z²-2x²
-*)
 
 Compute (Q_r_algeb_add [1;-1] [1;-2]).
 (*
@@ -150,10 +143,26 @@ yeah !
 
 Compute (Q_r_algeb_mul [1;-1] [1;-2]).
 (*
-     = [〈-2〉; 〈1〉]
--2x+1
-incorrect
-should be x-2
+     = [〈1〉; 〈-2〉]
+*)
+Compute (Q_r_algeb_mul [1;1] [1;-2]).
+(*
+     = [〈-1〉; 〈-2〉]
+*)
+Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
+(*
+     = [〈1〉; 0; 〈4〉; 0; 〈4〉]
+*)
+Compute (Q_r_algeb_mul [1;0;1] [1;0;-3]).
+(*
+     = [〈1〉; 0; 〈6〉; 0; 〈9〉]
+*)
+Compute (Q_r_algeb_mul [1;0;-2] [1;0;0;-2]).
+(*
+     = [〈-8〉; 0; 0; 0; 0; 0; 〈4〉]
+-8x⁶+4
+seems bad
+should be x⁶-32
 *)
 ...
 
