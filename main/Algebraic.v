@@ -22,6 +22,9 @@ Definition rlap_sylvester_list_list (rla rlb : list T) : list (list T) :=
   let n := length rlb - 1 in
   map (λ i, repeat 0%L i ++ rla ++ repeat 0%L (n - 1 - i)) (seq 0 n) ++
   map (λ i, repeat 0%L i ++ rlb ++ repeat 0%L (m - 1 - i)) (seq 0 m).
+(* it is possible to define it as the transposition of the above
+   definition; avoiding a transposition to express its properties,
+   they say *)
 
 Definition rlap_sylvester_mat (rla rlb : list T) : matrix T :=
   mk_mat (rlap_sylvester_list_list rla rlb).
