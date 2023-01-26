@@ -3647,7 +3647,8 @@ Print rlap_compose.
 Declare Scope lap_scope.
 Delimit Scope lap_scope with lap.
 
-Arguments eval_lap {T ro} la%lap.
+Arguments eval_lap {T ro} la%lap x%L.
+Arguments eval_rlap {T ro} rla%lap x%L.
 Arguments has_polyn_prop {T ro} la%lap.
 Arguments lap_add {T ro} (la lb)%lap.
 Arguments lap_sub {T ro} (la lb)%lap.

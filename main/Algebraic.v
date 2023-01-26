@@ -67,6 +67,16 @@ Theorem algeb_add_cancelling :
       (α + β)%L = 0%L.
 Proof.
 intros * Hp Hq.
+unfold lap_resultant.
+unfold eval_lap in Hp, Hq.
+rewrite <- map_rev.
+unfold lap_compose.
+rewrite <- map_rev.
+cbn - [ det ].
+remember (rev p) as rp eqn:Hrp.
+remember (rev q) as rq eqn:Hrq.
+clear p q Hrp Hrq.
+move rq before rp.
 ...
 
 (**)
