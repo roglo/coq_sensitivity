@@ -50,6 +50,8 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
 (**)
   lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
 (*
+litterature says Q(z-X) but must be Q(-z+X) to make examples work
+...
   lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
 *)
 
