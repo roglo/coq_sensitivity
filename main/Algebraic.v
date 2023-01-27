@@ -47,16 +47,19 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
   let q' := map (λ i, [i]) q in
-(**)
   lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
-(*
-litterature says Q(z-X) but must be Q(-z+X) to make examples work
-or else, we should consider it as a polynomial in X, not a polynomial
-in z ?
-...
-  lap_resultant p' (lap_compose q' [[0; -1]; [1]])%L.
-*)
 
+
+Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    p q :=
+  let p' := map (λ i, [i]) p in
+  let q' :=
+    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth (length q - 1 - i) q 0%L])
+      (seq 0 (length q))
+  in
+  lap_resultant p' q'.
+
+(*
 Theorem algeb_add_cancelling :
   ∀ A (ro : ring_like_op A) (rol : ring_like_op (list A)) p q α β,
   eval_lap p α = 0%L
@@ -83,27 +86,6 @@ unfold rlap_sylvester_list_list.
 rewrite rev_length.
 rewrite map_length.
 ...
-
-(**)
-Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    p q :=
-  let p' := map (λ i, [i]) p in
-  let q' :=
-    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth i q 0%L])
-      (seq 0 (length q))
-  in
-  lap_resultant p' q'.
-(* this version is false but I think it makes the polynomial cancelling
-   α/β, not αβ; therefore perhaps fixable *)
-(*
-Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    p q :=
-  let p' := map (λ i, [i]) p in
-  let q' :=
-    map (λ i, repeat 0%L i ++ [nth i q 0%L]) (seq 0 (length q))
-  in
-  lap_resultant p' q'.
-(* fails on (x²-2)(x³-2) *)
 *)
 
 (* same, with powers in decreasing order, for testing and readability *)
@@ -176,7 +158,7 @@ Compute (Q_r_algeb_mul [1;-1] [1;-2]).
 *)
 Compute (Q_r_algeb_mul [1;1] [1;-2]).
 (*
-     = [〈-1〉; 〈-2〉]
+     = [〈1〉; 〈2〉]
 *)
 Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
 (*
@@ -188,10 +170,7 @@ Compute (Q_r_algeb_mul [1;0;1] [1;0;-3]).
 *)
 Compute (Q_r_algeb_mul [1;0;-2] [1;0;0;-2]).
 (*
-     = [〈-8〉; 0; 0; 0; 0; 0; 〈4〉]
--8x⁶+4
-seems bad
-should be x⁶-32
+     = [〈1〉; 0; 0; 0; 0; 0; 〈-32〉]
 *)
 ...
 
