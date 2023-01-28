@@ -94,6 +94,11 @@ U and V such that R(Y ) = U(X, Y )P(X + Y ) + V (X, Y )Q(X).
 ...
 *)
 
+Print Nat.Bezout.
+Check Nat.bezout_1_gcd.
+
+...
+
 (* same, with powers in decreasing order, for testing and readability *)
 Definition r_algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     rp rq :=
