@@ -94,8 +94,7 @@ U and V such that R(Y ) = U(X, Y )P(X + Y ) + V (X, Y )Q(X).
 ...
 *)
 
-Print Nat.Bezout.
-Check Nat.bezout_1_gcd.
+(* Bezout: see my appli coq_euler_prod_form/master/Totient.v *)
 
 ...
 
