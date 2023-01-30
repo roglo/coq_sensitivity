@@ -3676,7 +3676,7 @@ Arguments lap_norm_mul {T ro rp} Heb Hos Hiv (la lb)%lap.
 Arguments lap_mul_div {T ro rp} Heb Hos Hic Hop Hiv (la lb)%lap.
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
-Arguments lap_ring_like_op {T ro (*rp*)}.
+Arguments lap_ring_like_op {T ro}.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
