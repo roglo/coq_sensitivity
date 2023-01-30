@@ -140,6 +140,13 @@ Compute (gcd_and_bezout Q_ring_like_op [-1;1] [2;1]).
 
 ...
 
+(* cata *)
+Time Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  @gcd_bezout_loop (list Q) lap_ring_like_op 2 [[-1];[1]] [[2];[1]]).
+...
+
 (* catastrophe *)
 Time Compute (
   let qro := Q_ring_like_op in
