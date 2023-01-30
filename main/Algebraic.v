@@ -138,6 +138,81 @@ Open Scope Q_scope.
 Compute (gcd_and_bezout Q_ring_like_op [-1;1] [2;1]).
 (* chais pas si ça fait du sens... *)
 
+Set Printing All.
+Print rlap_quot_rem_step.
+Print rngl_div.
+...
+Time Compute (
+  let T := list Q in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let la := [[-1];[1]] in
+  let lb := [[2];[1]] in
+  let rla := @rev T la in
+  let rlb := @rev T lb in
+  let a := hd [1] rla in
+  let b := hd [1] rlb in
+  let rla' := tail rla in
+  let rlb' := tail rlb in
+  @rngl_div T lro a b).
+...
+Print rlap_quot_rem_loop.
+(* non *)
+Time Compute (
+  let T := list Q in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let la := [[-1];[1]] in
+  let lb := [[2];[1]] in
+  let rla := @rev T la in
+  let rlb := @rev T lb in
+  @rlap_quot_rem_step T lro rla rlb).
+Print rlap_quot_rem.
+(* non *)
+Time Compute (
+  let T := list Q in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let la := [[-1];[1]] in
+  let lb := [[2];[1]] in
+  let rla := @rev T la in
+  let rlb := @rev T lb in
+  @rlap_quot_rem_loop T lro 1 rla rlb).
+...
+Time Compute (
+  let T := list Q in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let la := [[-1];[1]] in
+  let lb := [[2];[1]] in
+  let rla := @rev T la in
+  let rlb := @rev T lb in
+  @rlap_quot_rem_nb_iter T rla rlb).
+(* 3 *)
+Print lap_rem.
+(* cata *)
+Time Compute (
+  let T := list Q in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let la := [[-1];[1]] in
+  let lb := [[2];[1]] in
+  @rlap_quot_rem T lro (@rev T la) (@rev T lb)).
+...
+Print rlap_quot_rem.
+Check (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let a := [[-1];[1]] in
+  let b := [[2];[1]] in
+  (a mod b)%lap).
+
 ...
 
 (* cata *)
