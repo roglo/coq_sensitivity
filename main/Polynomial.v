@@ -715,17 +715,13 @@ Definition lap_opt_opp_or_subt :
 
 Definition lap_opt_inv_or_quot :
   option ((list T → list T) + (list T → list T → list T)) :=
-  match bool_dec rngl_mul_is_comm with
-  | left Hco =>
-      match bool_dec rngl_has_opp with
-      | left Hop =>
-          match bool_dec rngl_has_inv with
-         | left Hiv =>
-             match rngl_opt_inv_or_quot with
-             | Some _ => Some (inr lap_quot)
-             | None => None
-             end
-          | right _ => None
+  match bool_dec rngl_has_opp with
+  | left Hop =>
+      match bool_dec rngl_has_inv with
+      | left Hiv =>
+          match rngl_opt_inv_or_quot with
+          | Some _ => Some (inr lap_quot)
+          | None => None
           end
       | right _ => None
       end
@@ -2321,7 +2317,6 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
 destruct (bool_dec rngl_has_opp) as [Hop| Hop]; [ | easy ].
 destruct (bool_dec rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
@@ -2334,7 +2329,6 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm); [ | easy ].
 destruct (bool_dec rngl_has_opp); [ | easy ].
 destruct (bool_dec rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
@@ -3324,6 +3318,7 @@ apply lap_mul_div; try easy.
 Qed.
 *)
 
+(*
 Theorem lap_opt_mul_quot_r :
   let rol := lap_ring_like_op in
   if (rngl_has_quot && negb rngl_mul_is_comm)%bool then
@@ -3338,8 +3333,8 @@ unfold rngl_has_quot; cbn.
 unfold lap_opt_inv_or_quot.
 destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
-(**)
 Qed.
+*)
 
 (*
 Theorem lap_opt_eqb_eq :
@@ -3681,7 +3676,7 @@ Arguments lap_norm_mul {T ro rp} Heb Hos Hiv (la lb)%lap.
 Arguments lap_mul_div {T ro rp} Heb Hos Hic Hop Hiv (la lb)%lap.
 Arguments all_0_lap_norm_nil {T ro rp} Heb la%lap.
 Arguments last_lap_mul {T ro rp} Hos (la lb)%lap.
-Arguments lap_ring_like_op {T ro rp}.
+Arguments lap_ring_like_op {T ro (*rp*)}.
 
 Notation "1" := lap_one : lap_scope.
 Notation "- a" := (lap_opp a) : lap_scope.
@@ -4361,8 +4356,8 @@ now injection IHi; clear IHi; intros; subst a la.
 Qed.
 
 Theorem lap_polyn_rngl_of_nat :
-  let rop := polyn_ring_like_op in
   let lop := lap_ring_like_op in
+  let rop := polyn_ring_like_op in
   ∀ n, lap (rngl_of_nat n) = lap_norm (rngl_of_nat n).
 Proof.
 intros.
@@ -4424,7 +4419,8 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hcz| Hcz]. {
     now rewrite lap_polyn_rngl_of_nat_2 in H2.
   }
   apply eq_polyn_eq; cbn.
-  rewrite lap_polyn_rngl_of_nat, lap_rngl_of_nat.
+  rewrite lap_polyn_rngl_of_nat.
+  rewrite (lap_rngl_of_nat rp).
   destruct (Nat.eq_dec _ _) as [Hc1| Hc1]; [ easy | ].
   rewrite Hch; cbn.
   now rewrite (rngl_eqb_refl Heb).

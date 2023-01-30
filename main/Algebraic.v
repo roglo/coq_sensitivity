@@ -138,9 +138,19 @@ Open Scope Q_scope.
 Compute (gcd_and_bezout Q_ring_like_op [-1;1] [2;1]).
 (* chais pas si ça fait du sens... *)
 
-Set Printing All.
 Print rlap_quot_rem_step.
 Print rngl_div.
+Print rngl_has_inv.
+Print lap_ring_like_op.
+Print lap_opt_inv_or_quot.
+...
+Compute (
+  let T := Q in
+  let qro := Q_ring_like_op in
+  @lap_opt_inv_or_quot _ lap_ring_like_op).
+...
+Compute (@lap_opt_inv_or_quot _ lap_ring_like_op).
+Print lap_opt_inv_or_quot.
 ...
 Time Compute (
   let T := list Q in
