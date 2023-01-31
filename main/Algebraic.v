@@ -49,7 +49,6 @@ Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
   let q' := map (λ i, [i]) q in
   lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
 
-
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
@@ -148,6 +147,22 @@ Time Compute (
   let q := [[2];[1]] in
   @gcd_and_bezout (list Q) lap_ring_like_op p q).
 
+Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    p q :=
+  let p' := map (λ i, [i]) p in
+  let q' := map (λ i, [i]) q in
+  lap_resultant
+    (lap_compose p' [[0; 1]; [1]])%L
+    (lap_compose q' [[0; 1]; [1]])%L.
+Definition r_glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    rp rq :=
+  rev (glop_add ro rol (rev rp) (rev rq)).
+Definition Q_r_glop_add :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_glop_add qro lro.
+Compute (Q_r_glop_add [1;1] [1;-2]).
 ...
 
 Definition Q_r_algeb_add :=
