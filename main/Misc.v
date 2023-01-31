@@ -179,7 +179,7 @@ Theorem bool_dec : ∀ b, { b = true } + { b = false }.
 Proof.
 intros.
 now destruct b; [ left | right ].
-Qed.
+Defined.
 
 Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
   (if b then x else y) =
