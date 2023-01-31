@@ -175,18 +175,12 @@ Qed.
 
 (* conversions if ...? into if ..._dec *)
 
-Theorem bool_dec : ∀ b, { b = true } + { b = false }.
-Proof.
-intros.
-now destruct b; [ left | right ].
-Defined.
-
 Theorem if_bool_if_dec : ∀ A (b : bool) (x y : A),
   (if b then x else y) =
-  if bool_dec b then x else y.
+  if Sumbool.sumbool_of_bool b then x else y.
 Proof.
 intros.
-now destruct (bool_dec b); subst b.
+now destruct (Sumbool.sumbool_of_bool b); subst b.
 Qed.
 
 Theorem if_eqb_eq_dec : ∀ A i j (a b : A),
@@ -825,7 +819,7 @@ Theorem butn_length : ∀ A n (l : list A),
 Proof.
 intros.
 unfold Nat.b2n; rewrite if_bool_if_dec.
-destruct (bool_dec (n <? length l)) as [Hnl| Hnl]. 2: {
+destruct (Sumbool.sumbool_of_bool (n <? length l)) as [Hnl| Hnl]. 2: {
   apply Nat.ltb_ge in Hnl; rewrite Nat.sub_0_r.
   now rewrite butn_out.
 }
@@ -925,7 +919,7 @@ destruct n. {
 }
 unfold Nat.b2n.
 rewrite if_bool_if_dec.
-destruct (bool_dec (S n <? S len)) as [Hn| Hn]. {
+destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
   apply Nat.ltb_lt in Hn.
   cbn - [ butn ].
   rewrite Nat.sub_0_r, butn_cons; cbn.
@@ -1419,7 +1413,7 @@ split; intros Hla. {
   apply NoDup_cons_iff.
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
-  destruct (bool_dec (member eqb a la)) as [Hal| Hal]; [ easy | ].
+  destruct (Sumbool.sumbool_of_bool _) as [Hal| Hal]; [ easy | ].
   split; [ | now apply IHla ].
   intros H.
   now specialize (proj1 (member_false_iff Heqb _ _) Hal a H).
@@ -1427,7 +1421,7 @@ split; intros Hla. {
   induction la as [| a]; [ easy | cbn ].
   rewrite if_bool_if_dec.
   apply NoDup_cons_iff in Hla.
-  destruct (bool_dec (member eqb a la)) as [Hal| Hal]; [ | now apply IHla ].
+  destruct (Sumbool.sumbool_of_bool _) as [Hal| Hal]; [ | now apply IHla ].
   apply (member_true_iff Heqb) in Hal.
   destruct Hla as (Hala & Hnd).
   destruct Hal as (l1 & l2 & H); subst la.

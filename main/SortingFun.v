@@ -3649,7 +3649,7 @@ split; intros Hs. {
   }
   cbn in Hs.
   rewrite if_bool_if_dec in Hs.
-  destruct (bool_dec (rel a c)) as [Hac| Hac]. {
+  destruct (Sumbool.sumbool_of_bool (rel a c)) as [Hac| Hac]. {
     injection Hs; clear Hs; intros; subst b lb; left.
     split; [ easy | ].
     split; [ easy | ].

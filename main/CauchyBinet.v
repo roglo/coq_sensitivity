@@ -1075,7 +1075,7 @@ Proof.
 intros * Heqb *.
 induction la as [| a]; [ easy | cbn ].
 rewrite if_bool_if_dec.
-destruct (bool_dec (f a)) as [Hfa| Hfa]. {
+destruct (Sumbool.sumbool_of_bool (f a)) as [Hfa| Hfa]. {
   rewrite Hfa; cbn.
   apply permutation_skip; [ now intros b; apply Heqb | ].
   apply IHla.

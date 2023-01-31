@@ -96,7 +96,7 @@ split. {
   induction la as [| a]; intros; [ now destruct i | cbn ].
   cbn in Hla.
   rewrite if_bool_if_dec in Hla.
-  destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
   apply (rngl_eqb_eq Heb) in Haz.
   destruct i; [ easy | ].
   now apply IHla.
@@ -104,7 +104,7 @@ split. {
   intros Hla.
   induction la as [| a]; [ easy | cbn ].
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply IHla.
     intros i.
     now specialize (Hla (S i)).
@@ -121,7 +121,7 @@ intros * Hab.
 intros H; subst b.
 induction la as [| a]; [ easy | cbn in Hab ].
 rewrite if_bool_if_dec in Hab.
-destruct (bool_dec _) as [Haz| Haz]; [ congruence | ].
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ congruence | ].
 injection Hab; clear Hab; intros Hab Ha; subst a.
 now rewrite (rngl_eqb_refl Heb) in Haz.
 Qed.
@@ -145,7 +145,7 @@ rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; cbn. {
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | cbn ].
   now apply Bool.negb_true_iff.
 }
 cbn in IHla.
@@ -368,7 +368,7 @@ split; intros Hla. {
   destruct lb as [| b]. {
     cbn.
     rewrite if_bool_if_dec.
-    destruct (bool_dec _) as [H1| H1]; [ easy | exfalso ].
+    destruct (Sumbool.sumbool_of_bool _) as [H1| H1]; [ easy | exfalso ].
     apply (rngl_eqb_neq Heb) in H1.
     now specialize (Hla 0); cbn in Hla.
   }
@@ -416,7 +416,7 @@ remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   cbn.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
     cbn; subst a; f_equal.
     assert (H : lap_norm la = []). {
@@ -495,7 +495,7 @@ unfold rlap_quot_rem_step in Hrab.
 destruct rlb as [| b]; [ easy | ].
 destruct rla as [| a]; [ easy | ].
 rewrite if_bool_if_dec in Hrab.
-destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrab; clear Hrab; intros; subst cq rlr.
 rewrite lap_sub_length, map_length.
@@ -690,7 +690,7 @@ unfold has_polyn_prop.
 destruct rlr as [| r]; [ easy | ].
 cbn; rewrite if_bool_if_dec.
 apply Bool.orb_true_iff.
-destruct (bool_dec _) as [Hrz| Hrz]. {
+destruct (Sumbool.sumbool_of_bool _) as [Hrz| Hrz]. {
   rewrite List_last_rev.
   remember (strip_0s rlr) as rl eqn:Hrl;symmetry in Hrl.
   destruct rl as [| a]; [ now left | right; cbn ].
@@ -715,9 +715,9 @@ Definition lap_opt_opp_or_subt :
 
 Definition lap_opt_inv_or_quot :
   option ((list T → list T) + (list T → list T → list T)) :=
-  match bool_dec rngl_has_opp with
+  match Sumbool.sumbool_of_bool rngl_has_opp with
   | left Hop =>
-      match bool_dec rngl_has_inv with
+      match Sumbool.sumbool_of_bool rngl_has_inv with
       | left Hiv =>
           match rngl_opt_inv_or_quot with
           | Some _ => Some (inr lap_quot)
@@ -784,7 +784,7 @@ Proof.
 intros.
 induction la as [| a]; [ easy | cbn ].
 rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ easy | cbn ].
 now rewrite Haz.
 Qed.
 
@@ -813,7 +813,7 @@ remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   cbn.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     apply (rngl_eqb_eq Heb) in Haz.
     subst a; rewrite rngl_add_0_l; cbn.
     now rewrite strip_0s_app.
@@ -1150,7 +1150,7 @@ remember (strip_0s (rev la)) as lc eqn:Hlc; symmetry in Hlc.
 destruct lc as [| c]. {
   cbn.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     cbn.
     apply (rngl_eqb_eq Heb) in Haz.
     destruct lb as [| b]; [ easy | cbn ].
@@ -1328,9 +1328,9 @@ destruct la as [| a]; [ easy | ].
 cbn in Hll, Hlen.
 apply Nat.succ_inj in Hlen.
 do 2 rewrite if_bool_if_dec in Hll.
-destruct (bool_dec _) as [Haz| Haz]. {
+destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
   apply (rngl_eqb_eq Heb) in Haz; subst a.
-  destruct (bool_dec _) as [Hbz| Hbz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
     apply (rngl_eqb_eq Heb) in Hbz; subst b.
     f_equal.
     now apply IHlb.
@@ -1341,7 +1341,7 @@ destruct (bool_dec _) as [Haz| Haz]. {
   induction la as [| a]; [ easy | ].
   cbn in Hll.
   rewrite if_bool_if_dec in Hll.
-  destruct (bool_dec _) as [Haz| Haz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
     cbn in Hlen.
     clear a Haz.
     apply IHla; [ easy | flia Hlen ].
@@ -1349,7 +1349,7 @@ destruct (bool_dec _) as [Haz| Haz]. {
   rewrite Hll in Hlen; cbn in Hlen.
   flia Hlen.
 }
-destruct (bool_dec _) as [Hbz| Hbz]. {
+destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
   exfalso; clear b Hbz.
   clear - Haz Hll Hlen.
   assert (H : length lb ≤ length la) by flia Hlen.
@@ -1357,7 +1357,7 @@ destruct (bool_dec _) as [Hbz| Hbz]. {
   induction lb as [| b]; [ easy | ].
   cbn in Hll.
   rewrite if_bool_if_dec in Hll.
-  destruct (bool_dec _) as [Hbz| Hbz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
     cbn in Hlen.
     clear b Hbz.
     apply IHlb; [ easy | flia Hlen ].
@@ -1416,7 +1416,7 @@ induction la as [| a]; intros. {
         remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
         destruct lb as [| b]; [ | easy ].
         rewrite if_bool_if_dec in Hlc.
-        destruct (bool_dec _) as [Haz| Haz]; [ | easy ].
+        destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ | easy ].
         now apply (rngl_eqb_eq Heb) in Haz.
       }
       apply IHla.
@@ -1427,7 +1427,7 @@ induction la as [| a]; intros. {
     }
     cbn.
     rewrite if_bool_if_dec.
-    destruct (bool_dec _) as [Haz| Haz]. {
+    destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]. {
       apply (rngl_eqb_eq Heb) in Haz.
       assert (Hlb : ∀ i, nth i lb 0%L = 0%L). {
         intros.
@@ -1450,7 +1450,7 @@ induction la as [| a]; intros. {
     remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
     destruct ld as [| d]. {
       rewrite if_bool_if_dec.
-      destruct (bool_dec _) as [Hbz| Hbz]. {
+      destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
         apply (rngl_eqb_eq Heb) in Hbz; subst b.
         now specialize (Hi 0).
       }
@@ -1478,7 +1478,7 @@ induction la as [| a]; intros. {
   remember (strip_0s (rev lb)) as ld eqn:Hld; symmetry in Hld.
   destruct ld as [| d]. {
     rewrite if_bool_if_dec.
-    destruct (bool_dec _) as [Hbz| Hbz]. {
+    destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]. {
       apply (rngl_eqb_eq Heb) in Hbz; subst b.
       specialize (IHla lb).
       assert (H : ∀ i : nat, nth i la 0%L = nth i lb 0%L). {
@@ -2317,8 +2317,8 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_has_opp) as [Hop| Hop]; [ | easy ].
-destruct (bool_dec rngl_has_inv); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
@@ -2329,8 +2329,8 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_has_opp); [ | easy ].
-destruct (bool_dec rngl_has_inv); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
@@ -2649,7 +2649,7 @@ intros Hco Hop Hiv * Hbz Hrl.
 destruct rlb as [| b]; [ easy | cbn in Hbz, Hrl ].
 destruct rla as [| a]; [ easy | ].
 rewrite if_bool_if_dec in Hrl.
-destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
 apply Nat.ltb_ge in Hab.
 injection Hrl; clear Hrl; intros H1 H2; subst cq rlr.
 remember (a / b)%L as cq eqn:Hcq.
@@ -2824,7 +2824,7 @@ apply IHit in Hqr. 2: {
   cbn in Hqrlr.
   destruct rla as [| a]; [ easy | ].
   rewrite if_bool_if_dec in Hqrlr.
-  destruct (bool_dec _) as [Hab| Hab]; [ easy | ].
+  destruct (Sumbool.sumbool_of_bool _) as [Hab| Hab]; [ easy | ].
   apply Nat.ltb_ge in Hab.
   injection Hqrlr; clear Hqrlr; intros; subst cq rlr.
   rewrite lap_sub_length.
@@ -2872,7 +2872,7 @@ destruct lb as [| b]. {
   specialize (proj1 (eq_strip_0s_rev_nil _) Hlb) as H1.
   clear Hlb IHla.
   rewrite if_bool_if_dec, lap_add_comm.
-  destruct (bool_dec _) as [Hcz| Hcz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hcz| Hcz]. {
     apply (rngl_eqb_eq Heb) in Hcz; subst c; cbn.
     rewrite rngl_add_0_r; f_equal.
     symmetry.
@@ -3026,7 +3026,7 @@ destruct lq as [| q]. {
   destruct rlr as [| r]; [ easy | ].
   cbn in Hr |-*.
   rewrite if_bool_if_dec in Hr |-*.
-  destruct (bool_dec _) as [Hrz| Hrz]; [ | easy ].
+  destruct (Sumbool.sumbool_of_bool _) as [Hrz| Hrz]; [ | easy ].
   apply (rngl_eqb_eq Heb) in Hrz.
   subst r.
   cbn in H1.
@@ -3300,9 +3300,9 @@ Proof.
 intros rol; subst rol.
 unfold rngl_has_quot; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
-destruct (bool_dec rngl_has_opp) as [Hop| ]; [ | easy ].
-destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv| ]; [ | easy ].
 remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [inv| ]; [ | easy ].
 intros a b Hbz.
@@ -3312,7 +3312,7 @@ unfold rngl_has_quot, lap_opt_inv_or_quot; cbn.
 unfold rngl_quot; cbn.
 unfold lap_opt_inv_or_quot.
 rewrite Hco, Hop, Hiv, Hiq.
-destruct (bool_dec true) as [H| H]; [ clear H | easy ].
+destruct (Sumbool.sumbool_of_bool true) as [H| H]; [ clear H | easy ].
 apply lap_mul_div; try easy.
 ...
 Qed.
@@ -3331,7 +3331,8 @@ easy.
 intros rol.
 unfold rngl_has_quot; cbn.
 unfold lap_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| Hco];
+  rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 *)
@@ -3372,7 +3373,8 @@ Theorem lap_opt_integral :
   else not_applicable.
 Proof.
 intros rol; subst rol.
-destruct (bool_dec rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
+remember rngl_is_integral as it eqn:Hii; symmetry in Hii.
+destruct it; [ | easy ].
 intros la lb Hab.
 cbn in Hab.
 enough (H : la = [] ∨ lb = []). {
@@ -3770,7 +3772,7 @@ Definition polyn_sub p1 p2 := polyn_add p1 (polyn_opp p2).
 Definition polyn_mul p1 p2 := polyn_norm (lap_mul (lap p1) (lap p2)).
 
 Definition polyn_quot (pa pb : polyn T) : polyn T :=
-  match bool_dec rngl_has_inv with
+  match Sumbool.sumbool_of_bool rngl_has_inv with
   | left Hiv =>
       let lq := lap_quot (lap pa) (lap pb) in
       mk_polyn lq
@@ -3802,11 +3804,11 @@ Definition polyn_opt_opp_or_subt :
 
 Definition polyn_opt_inv_or_quot :
   option ((polyn T → polyn T) + (polyn T → polyn T → polyn T)) :=
-  match bool_dec rngl_mul_is_comm with
+  match Sumbool.sumbool_of_bool rngl_mul_is_comm with
   | left Hco =>
-      match bool_dec rngl_has_opp with
+      match Sumbool.sumbool_of_bool rngl_has_opp with
       | left Hop =>
-          match bool_dec rngl_has_inv with
+          match Sumbool.sumbool_of_bool rngl_has_inv with
          | left Hiv =>
              match rngl_opt_inv_or_quot with
              | Some _ => Some (inr polyn_quot)
@@ -4043,9 +4045,9 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
-destruct (bool_dec rngl_has_opp) as [Hop| Hop]; [ | easy ].
-destruct (bool_dec rngl_has_inv); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hic| Hic]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| Hop]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
@@ -4056,9 +4058,9 @@ Proof.
 intros.
 unfold rngl_has_inv; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm); [ | easy ].
-destruct (bool_dec rngl_has_opp); [ | easy ].
-destruct (bool_dec rngl_has_inv); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp); [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv); [ | easy ].
 now destruct rngl_opt_inv_or_quot.
 Qed.
 
@@ -4092,7 +4094,7 @@ specialize (H1 H Hpr); clear H.
 assert (H : lap_quot_rem la lb = (lq, lr)). {
   unfold polyn_quot_rem in Hab.
   unfold polyn_quot, polyn_rem in Hab; cbn in Hab.
-  destruct (bool_dec rngl_has_inv) as [Hiv2| Hiv2]. {
+  destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv2| Hiv2]. {
     injection Hab; clear Hab; intros; subst lr lq.
     unfold lap_quot_rem.
     unfold lap_quot, lap_rem.
@@ -4136,7 +4138,7 @@ clear Hbz; rename H into Hbz.
 apply eq_polyn_eq; cbn.
 unfold polyn_norm; cbn.
 unfold polyn_quot; cbn.
-destruct (bool_dec _) as [Hiv2| Hiv2]. {
+destruct (Sumbool.sumbool_of_bool _) as [Hiv2| Hiv2]. {
   cbn; rewrite (lap_norm_mul Heb Hos Hiv _ _ pa pb).
   now apply lap_mul_div.
 }
@@ -4151,9 +4153,9 @@ Proof.
 intros rop; subst rop.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hco| ]; [ | easy ].
-destruct (bool_dec rngl_has_opp) as [Hop| ]; [ | easy ].
-destruct (bool_dec rngl_has_inv) as [Hiv| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_mul_is_comm) as [Hco| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_opp) as [Hop| ]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_has_inv) as [Hiv| ]; [ | easy ].
 remember rngl_opt_inv_or_quot as iq eqn:Hiq; symmetry in Hiq.
 destruct iq as [inv| ]; [ | easy ].
 intros a b Hbz.
@@ -4163,7 +4165,7 @@ unfold rngl_has_quot, polyn_opt_inv_or_quot; cbn.
 unfold rngl_quot; cbn.
 unfold polyn_opt_inv_or_quot.
 rewrite Hco, Hop, Hiv, Hiq.
-destruct (bool_dec true); [ | easy ].
+destruct (Sumbool.sumbool_of_bool true); [ | easy ].
 now apply polyn_mul_div.
 Qed.
 
@@ -4176,7 +4178,7 @@ Proof.
 intros rop.
 unfold rngl_has_quot; cbn.
 unfold polyn_opt_inv_or_quot.
-destruct (bool_dec rngl_mul_is_comm) as [Hco| Hco]; rewrite Hco; [ | easy ].
+destruct (Sumbool.sumbool_of_bool _) as [Hco| Hco]; rewrite Hco; [ | easy ].
 now rewrite Bool.andb_false_r.
 Qed.
 
@@ -4213,7 +4215,7 @@ Theorem polyn_opt_integral :
   else not_applicable.
 Proof.
 intros rop; subst rop.
-destruct (bool_dec rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
+destruct (Sumbool.sumbool_of_bool rngl_is_integral) as [Hii| Hii]; rewrite Hii; [ | easy ].
 intros * Hab.
 cbn in Hab.
 apply (f_equal lap) in Hab.
@@ -4261,13 +4263,13 @@ destruct (Nat.eq_dec _ _) as [H| H]; [ now rewrite Hch in H | ].
 destruct i. {
   cbn; rewrite rngl_add_0_r.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [H11| H11]; [ | easy ].
+  destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
   apply (rngl_eqb_eq Heb) in H11.
   now apply rngl_1_neq_0_iff in H11.
 }
 rewrite IHi; [ cbn | easy ].
 rewrite if_bool_if_dec.
-destruct (bool_dec _) as [H11| H11]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool _) as [H11| H11]; [ | easy ].
 clear IHi; exfalso.
 apply (rngl_eqb_eq Heb) in H11.
 specialize rngl_characteristic_prop as H1.
@@ -4287,7 +4289,7 @@ destruct (Nat.eq_dec rngl_characteristic 1) as [Hc1| Hc1]. {
 specialize (proj1 rngl_1_neq_0_iff Hc1) as H11.
 specialize rngl_characteristic_prop as Hch.
 rewrite if_bool_if_dec in Hch.
-destruct (bool_dec _) as [Hchz| Hchz]. {
+destruct (Sumbool.sumbool_of_bool _) as [Hchz| Hchz]. {
   apply Nat.eqb_eq in Hchz.
   now rewrite Hchz in Hi.
 }
@@ -4301,7 +4303,7 @@ cbn - [ lap_add ]; clear Hc1'.
 destruct la as [| a]; cbn. {
   rewrite if_bool_if_dec.
   apply (rngl_eqb_neq Heb) in H11; rewrite H11.
-  destruct (bool_dec _) as [| H]; [ easy | clear H ].
+  destruct (Sumbool.sumbool_of_bool _) as [| H]; [ easy | clear H ].
   cbn; f_equal; symmetry.
   rewrite <- rngl_add_0_r.
   apply rngl_add_compat_l.
@@ -4315,7 +4317,7 @@ remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   cbn.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [H12| H12]. {
+  destruct (Sumbool.sumbool_of_bool _) as [H12| H12]. {
     exfalso; apply (rngl_eqb_eq Heb) in H12.
     destruct i; [ easy | ].
     assert (H : 0 < S i < rngl_characteristic) by flia Hi.
@@ -4331,7 +4333,7 @@ destruct lb as [| b]. {
       rewrite if_bool_if_dec in Hla.
       apply (rngl_eqb_neq Heb) in H11.
       rewrite H11 in Hla.
-      destruct (bool_dec _) as [| H]; [ easy | clear H ].
+      destruct (Sumbool.sumbool_of_bool _) as [| H]; [ easy | clear H ].
       cbn in Hla.
       injection Hla; clear Hla; intros Hla; symmetry in Hla.
       rewrite <- rngl_add_0_r in Hla.
@@ -4379,7 +4381,7 @@ cbn.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]. {
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]; [ cbn | easy ].
+  destruct (Sumbool.sumbool_of_bool _) as [Haz| Haz]; [ cbn | easy ].
   apply (rngl_eqb_eq Heb) in Haz; subst a.
   now rewrite rngl_add_0_r.
 }
@@ -4387,7 +4389,7 @@ cbn; rewrite rev_app_distr; cbn.
 rewrite rev_app_distr; cbn.
 rewrite rev_involutive.
 rewrite if_bool_if_dec.
-destruct (bool_dec _) as [Hbz| Hbz]; [ | easy ].
+destruct (Sumbool.sumbool_of_bool _) as [Hbz| Hbz]; [ | easy ].
 apply (rngl_eqb_eq Heb) in Hbz; subst b.
 now apply eq_strip_0s_cons in Hlb.
 Qed.
@@ -4529,10 +4531,10 @@ destruct len. {
   unfold polyn_norm.
   apply eq_polyn_eq; cbn.
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Hpz| Hpz]. {
+  destruct (Sumbool.sumbool_of_bool _) as [Hpz| Hpz]. {
     apply (rngl_eqb_eq Heb) in Hpz; subst a0; cbn.
     rewrite if_bool_if_dec.
-    destruct (bool_dec _) as [Hp1| Hp1]. {
+    destruct (Sumbool.sumbool_of_bool _) as [Hp1| Hp1]. {
       apply (rngl_eqb_eq Heb) in Hp1; subst a1; cbn.
       rewrite Nat.sub_0_r.
       destruct (lap q) as [| b lb]; cbn. {
@@ -4559,14 +4561,14 @@ destruct len. {
   destruct (lap q) as [| b lb]; cbn. {
     rewrite Hpz.
     rewrite if_bool_if_dec.
-    now destruct (bool_dec _); cbn; rewrite Hpz.
+    now destruct (Sumbool.sumbool_of_bool _); cbn; rewrite Hpz.
   }
   rewrite rngl_summation_only_one, lap_add_0_r.
   rewrite if_bool_if_dec.
   rewrite strip_0s_app; cbn.
   rewrite lap_convol_mul_const_l; [ cbn | easy ].
   rewrite <- map_rev.
-  destruct (bool_dec _) as [H1z| H1z]. {
+  destruct (Sumbool.sumbool_of_bool _) as [H1z| H1z]. {
     apply (rngl_eqb_eq Heb) in H1z; subst a1.
     cbn; rewrite Hpz.
     rewrite (rngl_mul_0_l Hos).
