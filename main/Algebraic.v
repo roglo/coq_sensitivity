@@ -127,8 +127,6 @@ Fixpoint gcd_bezout_loop T (ro : ring_like_op T) n a b :=
 Definition gcd_and_bezout T ro a b :=
   @gcd_bezout_loop T ro (length a + length b + 1) a b.
 
-Check gcd_and_bezout.
-
 (* test *)
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
@@ -142,6 +140,14 @@ Time Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   @gcd_and_bezout (list Q) lap_ring_like_op [[-1];[1]] [[2];[1]]).
+Time Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let p := lap_compose [[-1];[1]] [[0;1];[1]] in
+  let q := [[2];[1]] in
+  @gcd_and_bezout (list Q) lap_ring_like_op p q).
+
 ...
 
 Definition Q_r_algeb_add :=
