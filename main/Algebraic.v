@@ -132,44 +132,6 @@ Require Import RnglAlg.Rational.
 Import Q.Notations.
 Open Scope Q_scope.
 
-Compute (gcd_and_bezout Q_ring_like_op [-1;0;1] [2;0;1]).
-(* chais pas si ça fait du sens... *)
-
-Time Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  @gcd_and_bezout (list Q) lap_ring_like_op [[-1];[];[1]] [[2];[];[1]]).
-Time Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  let p := lap_compose [[-1];[];[1]] [[0;1];[];[1]] in
-  let q := [[2];[1]] in
-  @gcd_and_bezout (list Q) lap_ring_like_op p q).
-
-Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    p q :=
-  let p' := map (λ i, [i]) p in
-  let q' := map (λ i, [i]) q in
-  lap_resultant
-    (lap_compose p' [[0; 1]; [1]])%L
-    (lap_compose q' [[0; 1]; [1]])%L.
-Definition glip A (ro : ring_like_op A) (rol : ring_like_op (list A)) p :=
-  let p' := map (λ i, [i]) p in
-  @lap_compose (list A) rol p' [[0; 1]; [1]]%L.
-Definition r_glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    rp rq :=
-  rev (glop_add ro rol (rev rp) (rev rq)).
-Definition Q_r_glop_add :=
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  r_glop_add qro lro.
-Compute (Q_r_glop_add [1;0;1] [1;0;-2]).
-Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
-(* oh, puis zut *)
-...
-
 Definition Q_r_algeb_add :=
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -239,6 +201,29 @@ Compute (Q_r_algeb_mul [1;0;-2] [1;0;0;-2]).
 (*
      = [〈1〉; 0; 0; 0; 0; 0; 〈-32〉]
 *)
+
+Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    p q :=
+  let p' := map (λ i, [i]) p in
+  let q' := map (λ i, [i]) q in
+  lap_resultant
+    (lap_compose p' [[0; 1]; [1]])%L
+    (lap_compose q' [[0; 1]; [1]])%L.
+Definition glip A (ro : ring_like_op A) (rol : ring_like_op (list A)) p :=
+  let p' := map (λ i, [i]) p in
+  @lap_compose (list A) rol p' [[0; 1]; [1]]%L.
+Definition r_glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
+    rp rq :=
+  rev (glop_add ro rol (rev rp) (rev rq)).
+Definition Q_r_glop_add :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  r_glop_add qro lro.
+Compute (Q_r_glop_add [1;0;1] [1;0;-2]).
+...
+Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
+(* oh, puis zut *)
 ...
 
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
@@ -269,6 +254,23 @@ Compute (Q_r_algeb_add [1;0;0;-2] [1;0;1]).
    résultant, comme ci-dessus, mais comment déterminer k ? fonction de
    i et j, j'imagine, mais aussi peut-être de P et Q ? chais pas.
 *)
+
+...
+
+Compute (gcd_and_bezout Q_ring_like_op [-1;0;1] [2;0;1]).
+(* chais pas si ça fait du sens... *)
+
+Time Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  @gcd_and_bezout (list Q) lap_ring_like_op [[-1];[];[1]] [[2];[];[1]]).
+Time Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let p := lap_compose [[-1];[];[1]] [[0;1];[];[1]] in
+  let q := [[2];[1]] in
+  @gcd_and_bezout (list Q) lap_ring_like_op p q).
 
 ...
 
