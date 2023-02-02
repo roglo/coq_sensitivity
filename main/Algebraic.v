@@ -103,6 +103,7 @@ U and V such that R(Y) = U(X,Y)P(X+Y) + V(X,Y)Q(X).
 
 (* how to calculate U and V from R, P and Q? *)
 
+(*
 ...
 
 (* Bezout: see my appli coq_euler_prod_form/master/Totient.v *)
@@ -128,6 +129,7 @@ Fixpoint gcd_bezout_loop T (ro : ring_like_op T) n a b :=
 
 Definition gcd_and_bezout T ro a b :=
   @gcd_bezout_loop T ro (length a + length b + 1) a b.
+*)
 
 (* test *)
 Require Import RnglAlg.Qrl.
@@ -234,7 +236,6 @@ Compute
      : list (list Q)
 *)
 (* -x³+x²-2yx+y² *)
-...
 
 Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
@@ -255,6 +256,21 @@ Definition Q_r_glop_add :=
   let lro := lap_ring_like_op in
   r_glop_add qro lro.
 Compute (Q_r_glop_add [1;0;1] [1;0;-2]).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let rp := [[1]; [0; 2]; [1;0;1]] in
+  let rq := [[1]; [0; 2]; [1;0;-2]] in
+  lap_resultant (rev rp) (rev rq)).
+(* From Cyril Cohen's Phd Thesis, page 27
+  properties of the resultant
+    ResX(P(X,Y), Q(X,Y)) ∈ R[Y]
+  of polynomials P,Q ∈ R[X,Y] where F is a field:
+    ∃U,V ∈ R[X,Y], ResX(P,Q) = UP + VQ
+  and
+    ResX(P,Q)=0 ⇔ P and Q are not coprime as polynomials in X
+*)
 ...
 Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
 (* oh, puis zut *)
