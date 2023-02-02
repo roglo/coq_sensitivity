@@ -279,6 +279,11 @@ Compute (
   let rq := [[1]; []; [-2]] in
   rev (lap_resultant (rev rp) (rev rq))).
 ...
+Time Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  lap_resultant (rev [5;0;0;-7;5;-3]) (rev [1;0;0;0;-4;0;0;6])).
+...
 Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
 (* oh, puis zut *)
 ...
