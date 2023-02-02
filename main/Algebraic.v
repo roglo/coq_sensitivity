@@ -202,6 +202,33 @@ Compute (Q_r_algeb_mul [1;0;-2] [1;0;0;-2]).
      = [〈1〉; 0; 0; 0; 0; 0; 〈-32〉]
 *)
 
+(*
+  x = t²
+  y = t²(t+1)
+
+  t²-x = 0
+  t³+t-y = 0
+*)
+Check
+  (@lap_resultant (list (list Q)) lap_ring_like_op).
+Check (mk_polyn [[[];[1]]; []; [[1]]]).
+Print Q_r_algeb_add.
+(* example taken from YouTube video
+     https://www.youtube.com/watch?v=pjnq5LP1ESY
+   a way to eliminate the variable t from a parametric function
+     x = t²
+     y = t²(t+1)
+ *)
+Compute
+  (let T := Q in
+   let roq := Q_ring_like_op in
+   let rol := lap_ring_like_op in
+   @lap_resultant (list (list Q)) lap_ring_like_op
+     [[[];[-1]]; []; [[1]]]            (* t²-x *)
+     [[[0; -1]]; []; [[1]]; [[1]]]).   (* t³+t²-y *)
+(* -x³+x²-2yx+y² *)
+...
+
 Definition glop_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
