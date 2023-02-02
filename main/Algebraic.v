@@ -262,7 +262,7 @@ Compute (
   let lro := lap_ring_like_op in
   let rp := [[1]; [0; 2]; [1;0;1]] in
   let rq := [[1]; [0; 2]; [1;0;-2]] in
-  lap_resultant (rev rp) (rev rq)).
+  rev (lap_resultant (rev rp) (rev rq))).
 (* From Cyril Cohen's Phd Thesis, page 27
   properties of the resultant
     ResX(P(X,Y), Q(X,Y)) ∈ R[Y]
@@ -271,6 +271,13 @@ Compute (
   and
     ResX(P,Q)=0 ⇔ P and Q are not coprime as polynomials in X
 *)
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let rp := [[1]; [0; 2]; [1;0;1]] in
+  let rq := [[1]; []; [-2]] in
+  lap_resultant (rev rp) (rev rq)).
 ...
 Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
 (* oh, puis zut *)
