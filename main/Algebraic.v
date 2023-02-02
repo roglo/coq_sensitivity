@@ -261,7 +261,7 @@ Compute (
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   let rp := [[1]; [0; 2]; [1;0;1]] in
-  let rq := [[1]; [0; 2]; [1;0;-2]] in
+  let rq := [[1]; [0; 2]; [-2;0;1]] in
   rev (lap_resultant (rev rp) (rev rq))).
 (* From Cyril Cohen's Phd Thesis, page 27
   properties of the resultant
