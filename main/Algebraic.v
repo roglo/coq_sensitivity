@@ -277,7 +277,7 @@ Compute (
   let lro := lap_ring_like_op in
   let rp := [[1]; [0; 2]; [1;0;1]] in
   let rq := [[1]; []; [-2]] in
-  lap_resultant (rev rp) (rev rq)).
+  rev (lap_resultant (rev rp) (rev rq))).
 ...
 Compute (glip Q_ring_like_op lap_ring_like_op [1;1]).
 (* oh, puis zut *)
