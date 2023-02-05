@@ -278,6 +278,10 @@ Compute (
   let rp := [[1]; [0; 2]; [1;0;1]] in
   let rq := [[1]; []; [-2]] in
   rev (lap_resultant (rev rp) (rev rq))).
+(* example in video https://www.youtube.com/watch?v=WvbAfhOH4ik *)
+Compute (
+  let qro := Q_ring_like_op in
+  rlap_quot_rem _ [1;0;0;-2;8;1;0;-16;-2] [1;0;0;0;8;1]).
 ...
 Time Compute (
   let qro := Q_ring_like_op in
