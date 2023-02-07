@@ -105,6 +105,7 @@ U and V such that R(Y) = U(X,Y)P(X+Y) + V(X,Y)Q(X).
 
 (*
 ...
+*)
 
 (* Bezout: see my appli coq_euler_prod_form/master/Totient.v *)
 
@@ -129,9 +130,31 @@ Fixpoint gcd_bezout_loop T (ro : ring_like_op T) n a b :=
 
 Definition gcd_and_bezout T ro a b :=
   @gcd_bezout_loop T ro (length a + length b + 1) a b.
-*)
+
+Check gcd_and_bezout.
+(**)
 
 (* test *)
+(*
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+Open Scope Z_scope.
+
+Compute (
+  let zro := Z_ring_like_op in
+  rlap_quot_rem _ [4; 0; 6] [2; 1]).
+(*
+     = ([2; -1], [7])
+     : list Z * list Z
+*)
+Compute (
+  let zro := Z_ring_like_op in
+  rlap_quot_rem _ [1; 0; 1] [1; -2]).
+(*
+     = ([1; 2], [5])
+     : list Z * list Z
+*)
+*)
 Require Import RnglAlg.Qrl.
 Require Import RnglAlg.Rational.
 Import Q.Notations.
@@ -148,6 +171,21 @@ Definition Q_r_algeb_mul :=
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   r_algeb_mul qro lro.
+
+Compute (
+  let qro := Q_ring_like_op in
+  rlap_quot_rem _ [4; 0; 6] [2; 1]).
+(*
+     = ([〈2〉; 〈-1〉], [〈7〉])
+     : list Q * list Q
+*)
+
+Compute (
+  let qro := Q_ring_like_op in
+  rlap_quot_rem _ [1; 0; 1] [1; -2]).
+
+...
+*)
 
 Compute (Q_r_algeb_add [1;-1] [1;-2]).
 (*
