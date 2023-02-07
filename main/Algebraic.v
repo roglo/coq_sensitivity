@@ -149,9 +149,9 @@ Compute (
 *)
 Compute (
   let zro := Z_ring_like_op in
-  rlap_quot_rem _ [1; 0; 1] [1; -2]).
+  rlap_quot_rem _ [1; 0; 1] [1; 0; -2]).
 (*
-     = ([1; 2], [5])
+     = ([1], [0; 3])
      : list Z * list Z
 *)
 *)
@@ -182,7 +182,11 @@ Compute (
 
 Compute (
   let qro := Q_ring_like_op in
-  rlap_quot_rem _ [1; 0; 1] [1; -2]).
+  rlap_quot_rem _ [1; 0; 1] [1; 0; -2]).
+(*
+     = ([〈1〉], [0; 〈3〉])
+     : list Q * list Q
+*)
 
 ...
 *)
