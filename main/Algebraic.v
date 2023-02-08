@@ -198,8 +198,8 @@ Compute (
   let q' := map (λ i, [i]) q in
   rev
     (lap_resultant
-       p'
-       (lap_compose q' [[0; 1]; [-1]])%L)).
+       (lap_compose p' [[0; 1]; [1]])%L
+       q')).
 ...
 *)
 
