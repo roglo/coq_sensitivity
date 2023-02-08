@@ -188,6 +188,18 @@ Compute (
      : list Q * list Q
 *)
 
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let p := [1; 0; 1] in
+  let q := [-2; 0; 1] in
+  let p' := map (λ i, [i]) p in
+  let q' := map (λ i, [i]) q in
+  rev
+    (lap_resultant
+       p'
+       (lap_compose q' [[0; 1]; [-1]])%L)).
 ...
 *)
 
