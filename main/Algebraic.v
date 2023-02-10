@@ -42,10 +42,17 @@ Definition glop_U (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let S := rlap_sylvester_list_list rla rlb in
-  let a := repeat 0%L (m - 1) ++ rla in
   let S' :=
-    map (λ i, map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
-      (seq 0 (length S))
+    map
+      (λ i,
+         let a := repeat 0%L (m - 1 - i) ++ rla in
+         map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+      (seq 0 m) ++
+    map
+      (λ i,
+         let a := repeat 0%L (m + n - 1 - i) ++ rlb in
+         map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+      (seq m n)
   in
   S'.
 
@@ -351,8 +358,16 @@ Compute (
 
 Compute (
   let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
+  det (mk_mat (glop_U rla rlb))).
+...
+Compute (
+  let qro := Q_ring_like_op in
+  let rla := [1;2;3] in
+  let rlb := [4;5;6;7] in
   glop_U rla rlb).
 
 ...
