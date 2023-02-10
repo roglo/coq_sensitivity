@@ -362,6 +362,14 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
+  mk_mat (glop_U rla rlb)).
+...
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
   det (mk_mat (glop_U rla rlb))).
 ...
 Compute (
