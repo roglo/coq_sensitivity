@@ -38,6 +38,11 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
+Definition glop_U (rla rlb : list T) :=
+  let S := rlap_sylvester_list_list rla rlb in
+  let S' := map (firstn (length S - 1)) S in
+  S'.
+
 End a.
 
 (* polynomial cancelling the sum of zeros of two polynomials rp and rq *)
@@ -188,6 +193,7 @@ Compute (
      : list Q * list Q
 *)
 
+(*
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -336,6 +342,13 @@ Compute (
 Compute (
   let qro := Q_ring_like_op in
   rlap_quot_rem _ [1;0;0;-2;8;1;0;-16;-2] [1;0;0;0;8;1]).
+
+Compute (
+  let qro := Q_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  glop_U rla rlb).
+
 ...
 Time Compute (
   let qro := Q_ring_like_op in
