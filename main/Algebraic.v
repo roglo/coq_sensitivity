@@ -39,8 +39,14 @@ Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
 Definition glop_U (rla rlb : list T) :=
+  let n := length rla - 1 in
+  let m := length rlb - 1 in
   let S := rlap_sylvester_list_list rla rlb in
-  let S' := map (firstn (length S - 1)) S in
+  let a := repeat 0%L (m - 1) ++ rla in
+  let S' :=
+    map (λ i, map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+      (seq 0 (length S))
+  in
   S'.
 
 End a.
