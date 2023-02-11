@@ -205,6 +205,9 @@ Definition Q_r_algeb_mul :=
   let lro := lap_ring_like_op in
   r_algeb_mul qro lro.
 
+Definition Q_list_ring_like_op : ring_like_op (list (list Q)) :=
+  @lap_ring_like_op (list Q) (@lap_ring_like_op Q Q_ring_like_op).
+
 Compute (
   let qro := Q_ring_like_op in
   rlap_quot_rem _ [4; 0; 6] [2; 1]).
@@ -399,10 +402,6 @@ Compute (
   let rla := [1;2;3] in
   let rlb := [4;5;6;7] in
   (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
-Check lap_resultant.
-Check rlap_resultant'.
-Definition Q_list_ring_like_op : ring_like_op (list (list Q)) :=
-  @lap_ring_like_op (list Q) (@lap_ring_like_op Q Q_ring_like_op).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
