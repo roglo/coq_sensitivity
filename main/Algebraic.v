@@ -42,19 +42,16 @@ Definition glop_U (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let S := rlap_sylvester_list_list rla rlb in
-  let S' :=
-    map
-      (λ i,
-         let a := repeat 0%L (m - 1 - i) ++ rev rla in
-         map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
-      (seq 0 m) ++
-    map
-      (λ i,
-         let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
-         map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
-      (seq m n)
-  in
-  S'.
+  map
+    (λ i,
+       let a := repeat 0%L (m - 1 - i) ++ rev rla in
+       map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+    (seq 0 m) ++
+  map
+    (λ i,
+       let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
+       map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+    (seq m n).
 
 End a.
 
