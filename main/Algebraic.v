@@ -38,7 +38,7 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
-Definition glop_U (rla rlb : list T) :=
+Definition rlap_sylvester_list_list' (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let S := rlap_sylvester_list_list rla rlb in
@@ -52,6 +52,12 @@ Definition glop_U (rla rlb : list T) :=
        let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
        map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
     (seq m n).
+
+Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
+  mk_mat (rlap_sylvester_list_list' rla rlb).
+
+Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
+  rev (det (rlap_sylvester_mat' (rev p) (rev q))).
 
 End a.
 
@@ -359,28 +365,30 @@ Compute (
   let lro := lap_ring_like_op in
   let rla := [1;2] in
   let rlb := [3;4;5] in
-  mk_mat (glop_U rla rlb)).
+  mk_mat (rlap_sylvester_list_list' rla rlb)).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  mk_mat (glop_U rla rlb)).
+  mk_mat (rlap_sylvester_list_list' rla rlb)).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  (rev (det (mk_mat (glop_U rla rlb))), lap_resultant rla rlb)).
+  (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   let rla := [1;2;3] in
   let rlb := [4;5;6;7] in
-  (rev (det (mk_mat (glop_U rla rlb))), lap_resultant rla rlb)).
+  (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
+Check lap_resultant.
+Check rlap_resultant'.
 ...
 Time Compute (
   let qro := Q_ring_like_op in
