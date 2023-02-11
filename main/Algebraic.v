@@ -450,8 +450,8 @@ Compute (
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := glop_U p q in
   let V := glop_U q p in
-  (U * map (λ i, [i]) rla + V * map (λ i, [i]) rlb)%lap).
-(* bin non, c'est pas ça ; enfin si, juste le terme constant *)
+  (U * p + V * q)%lap).
+(* bin non, c'est pas ça *)
 ...
 Time Compute (
   let qro := Q_ring_like_op in
