@@ -64,7 +64,7 @@ Definition glop_U (rla rlb : list T) :=
   let m := length rlb - 1 in
   let s := rlap_sylvester_list_list rla rlb in
   let s' := mk_mat (map (λ l, firstn (length l - 1) l) (tl s)) in
-  let c := repeat 0%L (m - 1) ++ [det s'] in
+  let c := repeat 0%L (m - 1) ++ [if odd (m + n) then det s' else (- det s')%L] in
   c.
 (*
   let c := (-1)^(m+n) * a * det s' in
@@ -421,6 +421,13 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   lap_norm (rev (map (λ i, rev i) (rlap_resultant' _ p q)))).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  mk_mat (rlap_sylvester_list_list' rla rlb)).
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
