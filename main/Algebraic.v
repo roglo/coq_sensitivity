@@ -67,9 +67,9 @@ Definition glop_U (rla rlb : list T) :=
   let s' := map (λ l, firstn (length l - 1) l) (tl s) in
 (*
   let c := (-1)^(m+n) * a * det s' in
-*)
   c.
-...
+*)
+  s'.
 
 End a.
 
@@ -401,6 +401,27 @@ Compute (
   (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
 Check lap_resultant.
 Check rlap_resultant'.
+Definition Q_list_ring_like_op : ring_like_op (list (list Q)) :=
+  @lap_ring_like_op (list Q) (@lap_ring_like_op Q Q_ring_like_op).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  rev (lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  lap_norm (rev (map (λ i, rev i) (rlap_resultant' _ p q)))).
 ...
 Time Compute (
   let qro := Q_ring_like_op in
