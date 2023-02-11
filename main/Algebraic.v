@@ -65,6 +65,7 @@ Definition glop_U (rla rlb : list T) :=
   let s := rlap_sylvester_list_list rla rlb in
   let a := repeat 0%L (m - 1) ++ [1%L] in
   let s' := map (λ l, firstn (length l - 1) l) (tl s) in
+  let c := ((-1)^(n+n))%L in
 (*
   let c := (-1)^(m+n) * a * det s' in
   c.
