@@ -440,6 +440,7 @@ Compute (
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   glop_U p q).
 Compute (
+  let U :=
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
@@ -448,8 +449,25 @@ Compute (
   let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  (map (λ i, [i]) (rev rla) * glop_U p q)%lap).
-(* ouais... chais pas... *)
+  glop_U p q in
+  let V :=
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  let rlb := [1;0;1] in
+  let rla := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  glop_U p q in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  (U * map (λ i, [i]) rla + V * map (λ i, [i]) rlb)%lap).
+(* bin non, c'est pas du tout ça *)
 ...
 Time Compute (
   let qro := Q_ring_like_op in
