@@ -41,16 +41,16 @@ Definition resultant (p q : polyn T) :=
 Definition rlap_sylvester_list_list' (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
-  let S := rlap_sylvester_list_list rla rlb in
+  let s := rlap_sylvester_list_list rla rlb in
   map
     (λ i,
        let a := repeat 0%L (m - 1 - i) ++ rev rla in
-       map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
     (seq 0 m) ++
   map
     (λ i,
        let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
-       map (λ a, [a]) (firstn (length S - 1) (nth i S [])) ++ [a])
+       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
     (seq m n).
 
 Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
@@ -58,6 +58,18 @@ Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
 
 Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
   rev (det (rlap_sylvester_mat' (rev p) (rev q))).
+
+Definition glop_U (rla rlb : list T) :=
+  let n := length rla - 1 in
+  let m := length rlb - 1 in
+  let s := rlap_sylvester_list_list rla rlb in
+  let a := repeat 0%L (m - 1) ++ [1%L] in
+  let s' := map (λ l, firstn (length l - 1) l) (tl s) in
+(*
+  let c := (-1)^(m+n) * a * det s' in
+*)
+  c.
+...
 
 End a.
 
