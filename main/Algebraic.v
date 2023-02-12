@@ -62,17 +62,16 @@ Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
 Definition glop_U (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list' rla rlb in
-(*
+  let s := rlap_sylvester_list_list rla rlb in
   let s' := mk_mat (map (λ l, firstn (length l - 1) l) (tl s)) in
-*)
+(*
   let s' := mk_mat (map (λ l, l) (tl s)) in
  s'.
-(*
+*)
  let s'' := mk_mat (map (λ l, firstn (length l - 1) l) (hd [] s :: tl (tl s))) in
   (repeat 0%L (m - 2) ++ [if even (m + n) then det s'' else (- det s'')%L] +
    repeat 0%L (m - 1) ++ [if odd (m + n) then det s' else (- det s')%L])%lap.
-*)
+(**)
 (*
   let c := (-1)^(m+n) * a * det s' in
   c.
@@ -454,6 +453,7 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   glop_U p q).
+(*
 ...
      = {|
          mat_list_list :=
@@ -479,6 +479,7 @@ Print glop_U.
            [[〈1〉]; [0]; [〈-2〉]; [0; 〈-2〉; 0; 〈1〉]]; [[0]; [〈1〉]; [0]; [〈-2〉; 0; 〈1〉]]]
        |}
 ...
+*)
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
