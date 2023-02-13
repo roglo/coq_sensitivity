@@ -63,7 +63,11 @@ Definition glop_U (rla rlb : list T) :=
   let rol := lap_ring_like_op in
   let n := length rla - 1 in
   let m := length rlb - 1 in
+(**)
+  let s := rlap_sylvester_list_list rla rlb in
+(*
   let s := rlap_sylvester_list_list' rla rlb in
+*)
   let s' := mk_mat (map (λ l, firstn (length l - 1) l) (tl s)) in
   let s'' :=
     mk_mat (map (λ l, firstn (length l - 1) l) (hd [] s :: tl (tl s)))
@@ -494,11 +498,9 @@ Compute (
   let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := map (λ i, [i]) (rev rlb) in
   let U := @glop_U Q qro rla rlb in
   let V := @glop_U Q qro rlb rla in
-  (U * p + V * q)%lap).
+  (U * rev rla + V * rev rlb)%lap).
 (* oui *)
 Compute (
   let qro := Q_ring_like_op in
@@ -509,24 +511,10 @@ Compute (
   let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := @glop_U Q qro rla rlb in
-  let V := @glop_U Q qro rlb rla in
+  let U := @glop_U _ _ (rev p) (rev q) in
+  let V := @glop_U _ _ (rev q) (rev p) in
   (U * p + V * q)%lap).
-(* non *)
-...
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  let qlro := Q_list_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := glop_U p q in
-  let V := glop_U q p in
-  (U * p + V * q)%lap).
-(* bin non, c'est pas ça *)
+(* oui !!! *)
 ...
 Time Compute (
   let qro := Q_ring_like_op in
