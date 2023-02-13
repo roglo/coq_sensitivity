@@ -494,6 +494,12 @@ Compute (
   let V := @glop_U Q qro (rev rlb) (rev rla) in
 (**)
   (U * p + V * q)%lap).
+(*
+p = [[〈1〉]; [0]; [〈1〉]]
+q = [[〈-2〉]; [0]; [〈1〉]]
+U = [[〈6〉]; [0]]
+V = [[〈3〉]; [0]]
+*)
 ...
 Compute (
   let qro := Q_ring_like_op in
