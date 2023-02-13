@@ -484,22 +484,24 @@ Compute (
   let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
+  lap_resultant (rev rla) (rev rlb)).
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := map (λ i, [i]) (rev rlb) in
 (*
   let U := @glop_U (list Q) lro p q in
   let V := @glop_U (list Q) lro q p in
 *)
-  let U := @glop_U Q qro (rev rla) (rev rlb) in
-  let V := @glop_U Q qro (rev rlb) (rev rla) in
+  let U := @glop_U Q qro rla rlb in
+  let V := @glop_U Q qro rlb rla in
 (**)
   (U * p + V * q)%lap).
-(*
-p = [[〈1〉]; [0]; [〈1〉]]
-q = [[〈-2〉]; [0]; [〈1〉]]
-U = [[〈6〉]; [0]]
-V = [[〈3〉]; [0]]
-*)
 ...
 Compute (
   let qro := Q_ring_like_op in
