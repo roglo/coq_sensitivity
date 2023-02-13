@@ -515,6 +515,21 @@ Compute (
   let V := @glop_U _ _ (rev q) (rev p) in
   (U * p + V * q)%lap).
 (* oui !!! *)
+Compute (
+  let qro := Q_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  ([[1];[];[1]] * [[3;0;3];[0;-2]] +
+     [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
+(*
+  x²+1            -2yx+3y²+3
+     x²-2yx+y²-2             2y+y²-3
+*)
+Compute (
+  let qro := Q_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+@lap_norm _ lap_ring_like_op
+  ([[1];[];[1]] * [[3;0;3];[0;-2]] +
+     [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
 ...
 Time Compute (
   let qro := Q_ring_like_op in
