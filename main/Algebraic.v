@@ -60,14 +60,11 @@ Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
   rev (det (rlap_sylvester_mat' (rev p) (rev q))).
 
 Definition glop_U (rla rlb : list T) :=
+  let rol := lap_ring_like_op in
   let n := length rla - 1 in
   let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list rla rlb in
+  let s := rlap_sylvester_list_list' rla rlb in
   let s' := mk_mat (map (λ l, firstn (length l - 1) l) (tl s)) in
-(*
-  let s' := mk_mat (map (λ l, l) (tl s)) in
- s'.
-*)
  let s'' := mk_mat (map (λ l, firstn (length l - 1) l) (hd [] s :: tl (tl s))) in
   (repeat 0%L (m - 2) ++ [if even (m + n) then det s'' else (- det s'')%L] +
    repeat 0%L (m - 1) ++ [if odd (m + n) then det s' else (- det s')%L])%lap.
@@ -480,6 +477,24 @@ Print glop_U.
        |}
 ...
 *)
+Compute (
+  let qro := Q_ring_like_op in
+  let qrp := Q_ring_like_prop in
+  let lro := lap_ring_like_op in
+  let qlro := Q_list_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := map (λ i, [i]) (rev rlb) in
+(*
+  let U := @glop_U (list Q) lro p q in
+  let V := @glop_U (list Q) lro q p in
+*)
+  let U := @glop_U Q qro (rev rla) (rev rlb) in
+  let V := @glop_U Q qro (rev rlb) (rev rla) in
+(**)
+  (U * p + V * q)%lap).
+...
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
