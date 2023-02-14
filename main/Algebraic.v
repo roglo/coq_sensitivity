@@ -38,34 +38,12 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
-(*
-Definition rlap_sylvester_list_list' (rla rlb : list T) :=
-  let n := length rla - 1 in
-  let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list rla rlb in
-  map
-    (λ i,
-       let a := repeat 0%L (m - 1 - i) ++ rev rla in
-       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
-    (seq 0 m) ++
-  map
-    (λ i,
-       let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
-       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
-    (seq m n).
-
-Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
-  mk_mat (rlap_sylvester_list_list' rla rlb).
-
-Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
-  rev (det (rlap_sylvester_mat' (rev p) (rev q))).
-*)
-
-Definition glop_U (rla rlb : list T) :=
+(* U such that PU+QV=res(P,Q) *)
+Definition bezout_resultant_coeff (rP rQ : list T) :=
   let rol := lap_ring_like_op in
-  let n := length rla - 1 in
-  let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list rla rlb in
+  let n := length rP - 1 in
+  let m := length rQ - 1 in
+  let s := rlap_sylvester_list_list rP rQ in
   ∑ (i = 0, m - 1),
     let j := (m - 1 - i)%nat in
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
@@ -456,8 +434,8 @@ Compute (
   let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let U := @glop_U Q qro rla rlb in
-  let V := @glop_U Q qro rlb rla in
+  let U := @bezout_resultant_coeff Q qro rla rlb in
+  let V := @bezout_resultant_coeff Q qro rlb rla in
   ((U * rev rla + V * rev rlb)%lap, lap_resultant rla rlb)).
 (* oui *)
 Compute (
@@ -469,9 +447,10 @@ Compute (
   let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := @glop_U _ _ (rev p) (rev q) in
-  let V := @glop_U _ _ (rev q) (rev p) in
+  let U := @bezout_resultant_coeff _ _ (rev p) (rev q) in
+  let V := @bezout_resultant_coeff _ _ (rev q) (rev p) in
   ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui !!! *)
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -481,11 +460,9 @@ Compute (
   let rlb := [1;0;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := @glop_U _ _ (rev p) (rev q) in
-  let V := @glop_U _ _ (rev q) (rev p) in
+  let U := @bezout_resultant_coeff _ _ (rev p) (rev q) in
+  let V := @bezout_resultant_coeff _ _ (rev q) (rev p) in
   ((U * p + V * q)%lap, lap_resultant p q)).
-...
-(* oui !!! *)
 Compute (
   let qro := Q_ring_like_op in
   let qlro := Q_list_ring_like_op in
