@@ -64,13 +64,9 @@ Definition glop_U (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let s := rlap_sylvester_list_list rla rlb in
-  ((let s'' :=
-      mk_mat (map (λ l, firstn (length l - 1) l) (hd [] s :: tl (tl s)))
-    in
-    repeat 0%L (m - 2) ++ [if even (m + n) then det s'' else (- det s'')%L]) +
-   (let s' :=
-      mk_mat (map (λ l, firstn (length l - 1) l) (tl s))
-    in
+  ((let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn 1 s)) in
+    repeat 0%L (m - 2) ++ [if even (m + n) then det s' else (- det s')%L]) +
+   (let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn 0 s)) in
     repeat 0%L (m - 1) ++ [if odd (m + n) then det s' else (- det s')%L]))%lap.
 
 End a.
@@ -520,8 +516,8 @@ Compute (
 Compute (
   let qro := Q_ring_like_op in
   let qlro := Q_list_ring_like_op in
-@lap_norm _ lap_ring_like_op
-  ([[1];[];[1]] * [[3;0;3];[0;-2]] +
+  @lap_norm _ lap_ring_like_op
+    ([[1];[];[1]] * [[3;0;3];[0;-2]] +
      [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
 ...
 Time Compute (
