@@ -38,6 +38,27 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
+Definition rlap_sylvester_list_list' (rla rlb : list T) :=
+  let n := length rla - 1 in
+  let m := length rlb - 1 in
+  let s := rlap_sylvester_list_list rla rlb in
+  map
+    (λ i,
+       let a := repeat 0%L (m - 1 - i) ++ rev rla in
+       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
+    (seq 0 m) ++
+  map
+    (λ i,
+       let a := repeat 0%L (m + n - 1 - i) ++ rev rlb in
+       map (λ a, [a]) (firstn (length s - 1) (nth i s [])) ++ [a])
+    (seq m n).
+
+Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
+  mk_mat (rlap_sylvester_list_list' rla rlb).
+
+Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
+  rev (det (rlap_sylvester_mat' (rev p) (rev q))).
+
 (* U such that PU+QV=res(P,Q) *)
 Definition bezout_resultant_coeff (P Q : list T) :=
   let rol := lap_ring_like_op in
@@ -367,6 +388,7 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   mk_mat (rlap_sylvester_list_list' rla rlb)).
+*)
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -374,6 +396,7 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
+(*
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -457,6 +480,18 @@ Compute (
   let V := bezout_resultant_coeff q p in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-1] in
+  let rlb := [1;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let U := bezout_resultant_coeff p q in
+  let V := bezout_resultant_coeff q p in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* non *)
+...
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
