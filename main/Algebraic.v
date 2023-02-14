@@ -64,10 +64,12 @@ Definition glop_U (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
   let s := rlap_sylvester_list_list rla rlb in
-  ((let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn 1 s)) in
-    repeat 0%L (m - 2) ++ [if even (m + n) then det s' else (- det s')%L]) +
-   (let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn 0 s)) in
-    repeat 0%L (m - 1) ++ [if odd (m + n) then det s' else (- det s')%L]))%lap.
+  ((let i := 1%nat in
+    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+    repeat 0%L (m - 1 - i) ++ [if even (m + n) then det s' else (- det s')%L]) +
+   (let i := 0%nat in
+    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+    repeat 0%L (m - 1 - i) ++ [if odd (m + n) then det s' else (- det s')%L]))%lap.
 
 End a.
 
