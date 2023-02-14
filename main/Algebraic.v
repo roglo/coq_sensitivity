@@ -483,8 +483,8 @@ Compute (
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
-  let rla := [1;-1] in
-  let rlb := [1;-2] in
+  let rla := [1;-2] in
+  let rlb := [1;-3] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := bezout_resultant_coeff p q in
