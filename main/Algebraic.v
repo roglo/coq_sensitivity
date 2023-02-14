@@ -38,6 +38,7 @@ Definition polyn_sylvester_mat (p q : polyn T) : matrix T :=
 Definition resultant (p q : polyn T) :=
   det (polyn_sylvester_mat p q).
 
+(*
 Definition rlap_sylvester_list_list' (rla rlb : list T) :=
   let n := length rla - 1 in
   let m := length rlb - 1 in
@@ -58,36 +59,17 @@ Definition rlap_sylvester_mat' (rla rlb : list T) : matrix (list T) :=
 
 Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
   rev (det (rlap_sylvester_mat' (rev p) (rev q))).
-
-Definition glop_U (rla rlb : list T) :=
-  let rol := lap_ring_like_op in
-  let n := length rla - 1 in
-  let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list rla rlb in
-  ((let i := 0%nat in
-    let j := (m - 1 - i)%nat in
-    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    minus_one_pow (m + n - i + 1) * (repeat 0%L j ++ [det s'])) +
-   (let i := 1%nat in
-    let j := (m - 1 - i)%nat in
-    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    minus_one_pow (m + n - i + 1) * (repeat 0%L j ++ [det s'])))%lap.
-
-(*
-Definition glop_U (rla rlb : list T) :=
-  let rol := lap_ring_like_op in
-  let n := length rla - 1 in
-  let m := length rlb - 1 in
-  let s := rlap_sylvester_list_list rla rlb in
-  ((let i := 1%nat in
-    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    repeat 0%L (m - 1 - i) ++
-      [if odd (m + n - i) then det s' else (- det s')%L]) +
-   (let i := 0%nat in
-    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    repeat 0%L (m - 1 - i) ++
-      [if odd (m + n - i) then det s' else (- det s')%L]))%lap.
 *)
+
+Definition glop_U (rla rlb : list T) :=
+  let rol := lap_ring_like_op in
+  let n := length rla - 1 in
+  let m := length rlb - 1 in
+  let s := rlap_sylvester_list_list rla rlb in
+  ∑ (i = 0, m - 1),
+    let j := (m - 1 - i)%nat in
+    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+    (minus_one_pow (m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
 End a.
 
@@ -392,6 +374,7 @@ Compute (
   let qro := Q_ring_like_op in
   rlap_quot_rem _ [1;0;0;-2;8;1;0;-16;-2] [1;0;0;0;8;1]).
 
+(*
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -420,6 +403,7 @@ Compute (
   let rla := [1;2;3] in
   let rlb := [4;5;6;7] in
   (rlap_resultant' lro rla rlb, lap_resultant rla rlb)).
+*)
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -429,6 +413,7 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   rev (lap_resultant p q)).
+(*
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
@@ -446,6 +431,7 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   mk_mat (rlap_sylvester_list_list' rla rlb)).
+*)
 (*
      = {|
          mat_list_list :=
@@ -454,43 +440,6 @@ Compute (
            [[〈1〉]; [0]; [〈-2〉]; [0; 〈-2〉; 0; 〈1〉]];
            [[0]; [〈1〉]; [0]; [〈-2〉; 0; 〈1〉]]]
        |}
-*)
-Compute (
-  let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  let qlro := Q_list_ring_like_op in
-  let rla := [1;0;1] in
-  let rlb := [1;0;-2] in
-  let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  glop_U p q).
-(*
-...
-     = {|
-         mat_list_list :=
-           [[[[]]; [[〈1〉]]; [[0]]; [[〈1〉]; [0]; [〈1〉]]];
-            [[[〈-2〉; 0; 〈1〉]]; [[0; 〈-2〉]]; [[〈1〉]]; [[]; [〈1〉];
-             [0; 〈-2〉]; [〈-2〉; 0; 〈1〉]]];
-            [[[]]; [[〈-2〉; 0; 〈1〉]]; [[0; 〈-2〉]];
-             [[〈1〉]; [0; 〈-2〉]; [〈-2〉; 0; 〈1〉]]]]
-       |}
-Print glop_U.
-     = {|
-         mat_list_list :=
-           [[[]; [〈1〉]; [0]; [〈1〉]];
-            [[〈-2〉; 0; 〈1〉]; [0; 〈-2〉]; [〈1〉]; []];
-            [[]; [〈-2〉; 0; 〈1〉]; [0; 〈-2〉]; [〈1〉]]]
-       |}
-     : matrix (list Q)
-...
-  let s' := mk_mat (map (λ l, firstn (length l - 1) l) (tl s)) in
-     = {|
-         mat_list_list :=
-           [[[〈1〉]; [0]; [〈1〉]; [0; 〈1〉; 0; 〈1〉]]; [[0]; [〈1〉]; [0]; [〈1〉; 0; 〈1〉]];
-           [[〈1〉]; [0]; [〈-2〉]; [0; 〈-2〉; 0; 〈1〉]]; [[0]; [〈1〉]; [0]; [〈-2〉; 0; 〈1〉]]]
-       |}
-...
 *)
 Compute (
   let qro := Q_ring_like_op in
@@ -523,7 +472,6 @@ Compute (
   let U := @glop_U _ _ (rev p) (rev q) in
   let V := @glop_U _ _ (rev q) (rev p) in
   ((U * p + V * q)%lap, lap_resultant p q)).
-...
 Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
