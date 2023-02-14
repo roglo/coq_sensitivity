@@ -66,10 +66,10 @@ Definition glop_U (rla rlb : list T) :=
   let s := rlap_sylvester_list_list rla rlb in
   ((let i := 1%nat in
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    repeat 0%L (m - 1 - i) ++ [if even (m + n) then det s' else (- det s')%L]) +
+    repeat 0%L (m - 1 - i) ++ [if odd (m + n - i) then det s' else (- det s')%L]) +
    (let i := 0%nat in
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
-    repeat 0%L (m - 1 - i) ++ [if odd (m + n) then det s' else (- det s')%L]))%lap.
+    repeat 0%L (m - 1 - i) ++ [if odd (m + n - i) then det s' else (- det s')%L]))%lap.
 
 End a.
 
