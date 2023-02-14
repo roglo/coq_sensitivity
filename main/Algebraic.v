@@ -429,40 +429,46 @@ Compute (
   lap_resultant (rev rla) (rev rlb)).
 Compute (
   let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
-  let lro := lap_ring_like_op in
-  let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
-  let U := @bezout_resultant_coeff Q qro (rev rla) (rev rlb) in
-  let V := @bezout_resultant_coeff Q qro (rev rlb) (rev rla) in
+  let U := bezout_resultant_coeff (rev rla) (rev rlb) in
+  let V := bezout_resultant_coeff (rev rlb) (rev rla) in
   ((U * rev rla + V * rev rlb)%lap, lap_resultant rla rlb)).
 (* oui *)
 Compute (
   let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
-  let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := @bezout_resultant_coeff _ _ p q in
-  let V := @bezout_resultant_coeff _ _ q p in
+  let U := bezout_resultant_coeff p q in
+  let V := bezout_resultant_coeff q p in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui !!! *)
 Compute (
   let qro := Q_ring_like_op in
-  let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
-  let qlro := Q_list_ring_like_op in
   let rla := [1;0;1] in
   let rlb := [1;0;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
-  let U := @bezout_resultant_coeff _ _ p q in
-  let V := @bezout_resultant_coeff _ _ q p in
+  let U := bezout_resultant_coeff p q in
+  let V := bezout_resultant_coeff q p in
   ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;0;-2] in
+  let rlb := [1;0;0;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let U := bezout_resultant_coeff p q in
+  let V := bezout_resultant_coeff q p in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* non *)
+...
 Compute (
   let qro := Q_ring_like_op in
   let qlro := Q_list_ring_like_op in
