@@ -491,6 +491,7 @@ Compute (
   let V := bezout_resultant_coeff q p in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* non *)
+(* il faudrait que V vaille 1 et non -1 *)
 ...
 Compute (
   let qro := Q_ring_like_op in
