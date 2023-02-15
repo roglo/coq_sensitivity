@@ -72,6 +72,16 @@ Definition bezout_resultant_coeff k (P Q : list T) :=
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
     (minus_one_pow (k * m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
+Definition bezout_resultant_glop (P Q : list T) :=
+  let rol := lap_ring_like_op in
+  let n := length P - 1 in
+  let m := length Q - 1 in
+  let s := rlap_sylvester_list_list (rev P) (rev Q) in
+  ∑ (i = m, m + n - 1),
+    let j := (m + n - 1 - i)%nat in
+    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+    (minus_one_pow (m + n + i + 1) * (repeat 0%L j ++ [det s']))%lap.
+
 Definition bezout_resultant_coeff' (k : nat) (P Q : list T) :=
   let rol := lap_ring_like_op in
   let n := length P - 1 in
@@ -491,12 +501,12 @@ Compute (
   let U := bezout_resultant_coeff 1 p q in
 (*
   let V := bezout_resultant_coeff_2 p q in
-*)
   let V := bezout_resultant_coeff' 2 q p in
+*)
+  let V := bezout_resultant_glop p q in
 (**)
   ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui mais... *)
-...
+(* oui *)
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
@@ -505,8 +515,13 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := bezout_resultant_coeff 1 p q in
+(*
   let V := bezout_resultant_coeff_2 p q in
+*)
+  let V := bezout_resultant_glop p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
+(* non *)
+...
 (* oui *)
 Compute (
   let qro := Q_ring_like_op in
