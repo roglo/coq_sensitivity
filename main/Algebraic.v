@@ -72,12 +72,6 @@ Definition bezout_resultant_coeff k (P Q : list T) :=
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
     (minus_one_pow (k * m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
-Print butn.
-Search (firstn _ (skipn _ _)).
-Search (skipn _ (firstn _ _)).
-Search (skipn (S _)).
-Search (skipn _ (_ ++ _)).
-
 Definition bezout_resultant_coeff_2 (P Q : list T) :=
   let rol := lap_ring_like_op in
   let n := length P - 1 in
@@ -88,7 +82,7 @@ Definition bezout_resultant_coeff_2 (P Q : list T) :=
     let s' :=
       mk_mat
         (map (λ l, firstn (length l - 1) l)
-           (butn (i - m) (skipn m s) ++ firstn m s))
+           (butn (i - m) (skipn m s ++ firstn m s)))
     in
     (minus_one_pow (2 * m + 2 * n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
