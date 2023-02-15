@@ -82,14 +82,13 @@ Definition bezout_resultant_coeff_2 (P Q : list T) :=
   let rol := lap_ring_like_op in
   let n := length P - 1 in
   let m := length Q - 1 in
-  let s' := rlap_sylvester_list_list (rev P) (rev Q) in
+  let s := rlap_sylvester_list_list (rev P) (rev Q) in
   ∑ (i = m, m + n - 1),
     let j := (m + n - 1 - i)%nat in
     let s' :=
       mk_mat
         (map (λ l, firstn (length l - 1) l)
-           (skipn m (firstn i s') ++
-            skipn (S (i - m)) (skipn m s') ++ firstn m s'))
+           (butn (i - m) (skipn m s) ++ firstn m s))
     in
     (minus_one_pow (2 * m + 2 * n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
