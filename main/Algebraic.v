@@ -471,6 +471,21 @@ Compute (
   let V := bezout_resultant_coeff_2 p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-4] in
+  let rlb := [1;0;0;0;-3] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let U := bezout_resultant_coeff 1 p q in
+(*
+  let V := bezout_resultant_coeff_2 p q in
+*)
+  let V := bezout_resultant_coeff 2 q p in
+(**)
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* non *)
 ...
 Compute (
   let qro := Q_ring_like_op in
