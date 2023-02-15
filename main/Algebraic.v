@@ -72,6 +72,44 @@ Definition bezout_resultant_coeff k (P Q : list T) :=
     let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
     (minus_one_pow (k * m + n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
+Print butn.
+Search (firstn _ (skipn _ _)).
+Search (skipn _ (firstn _ _)).
+Search (skipn (S _)).
+Search (skipn _ (_ ++ _)).
+
+Definition bezout_resultant_coeff_2 (P Q : list T) :=
+  let rol := lap_ring_like_op in
+  let n := length P - 1 in
+  let m := length Q - 1 in
+  let s' := rlap_sylvester_list_list (rev P) (rev Q) in
+  ∑ (i = m, m + n - 1),
+    let j := (m + n - 1 - i)%nat in
+    let s' :=
+      mk_mat
+        (map (λ l, firstn (length l - 1) l)
+           (skipn m (firstn i s') ++
+(*
+           (firstn (i - m) (skipn m s' (*++ firstn m s'*)) ++
+*)
+            skipn (S (i - m)) (skipn m s') ++ 
+              skipn (S (i - m) - length (skipn m s')) (firstn m s')))
+(*
+            skipn (S (i - m)) (skipn m s' ++ firstn m s')))
+*)
+    in
+    (minus_one_pow (2 * m + 2 * n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
+
+Definition old_bezout_resultant_coeff_2 (P Q : list T) :=
+  let rol := lap_ring_like_op in
+  let n := length P - 1 in
+  let m := length Q - 1 in
+  let s := rlap_sylvester_list_list (rev Q) (rev P) in
+  ∑ (i = 0, n - 1),
+    let j := (n - 1 - i)%nat in
+    let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
+    (minus_one_pow (m + 2 * n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
+
 End a.
 
 (* polynomial cancelling the sum of zeros of two polynomials rp and rq *)
@@ -444,9 +482,10 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := bezout_resultant_coeff 1 p q in
-  let V := bezout_resultant_coeff 2 q p in
+  let V := bezout_resultant_coeff_2 p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
+...
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
@@ -455,7 +494,7 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := bezout_resultant_coeff 1 p q in
-  let V := bezout_resultant_coeff 2 q p in
+  let V := bezout_resultant_coeff_2 p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
 Compute (
@@ -466,7 +505,7 @@ Compute (
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
   let U := bezout_resultant_coeff 1 p q in
-  let V := bezout_resultant_coeff 2 q p in
+  let V := bezout_resultant_coeff_2 p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
 ...
