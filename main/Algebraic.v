@@ -89,14 +89,7 @@ Definition bezout_resultant_coeff_2 (P Q : list T) :=
       mk_mat
         (map (λ l, firstn (length l - 1) l)
            (skipn m (firstn i s') ++
-(*
-           (firstn (i - m) (skipn m s' (*++ firstn m s'*)) ++
-*)
-            skipn (S (i - m)) (skipn m s') ++ 
-              skipn (S (i - m) - length (skipn m s')) (firstn m s')))
-(*
-            skipn (S (i - m)) (skipn m s' ++ firstn m s')))
-*)
+            skipn (S (i - m)) (skipn m s') ++ firstn m s'))
     in
     (minus_one_pow (2 * m + 2 * n - i + 1) * (repeat 0%L j ++ [det s']))%lap.
 
