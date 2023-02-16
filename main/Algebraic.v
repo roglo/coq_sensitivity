@@ -79,29 +79,22 @@ Definition bezout_resultant_coeff (P Q : list T) :=
 End a.
 
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
-    {rol : ring_like_op (list A)} (l : list A) :=
+    {rol : ring_like_op _} (l : list A) :=
   lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
+
+Definition lap_compose_y_div_x A {ro : ring_like_op A} (l : list A) :=
+  map (λ i, repeat 0%L (length l - 1 - i) ++ [nth (length l - 1 - i) l 0%L])
+    (seq 0 (length l)).
 
 (* polynomial cancelling the sum of zeros of two polynomials p and q *)
 (* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
    a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
-Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    p q :=
+Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op _) p q :=
   lap_resultant (map (λ i, [i]) p) (lap_compose_y_minus_x q).
 
 (* polynomial cancelling the product of zeros of two polynomials p and q *)
-Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
-    p q :=
-  let p' := map (λ i, [i]) p in
-  let q' :=
-    map (λ i, repeat 0%L (length q - 1 - i) ++ [nth (length q - 1 - i) q 0%L])
-      (seq 0 (length q))
-  in
-  lap_resultant p' q'.
-
-(* essayer de comprendre ce que j'ai programmé, là *)
-
-...
+Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op _) p q :=
+  lap_resultant (map (λ i, [i]) p) (lap_compose_y_div_x q).
 
 (*
 Theorem algeb_add_cancelling :
@@ -255,6 +248,11 @@ x⁶-6x⁴-4x³+12x²-24x-4
 x⁶-6x⁴-4x³+12x²-24x-4
 yeah !
 *)
+
+Compute (
+  let _ := Q_ring_like_op in
+  let _ := lap_ring_like_op in
+  lap_compose_y_div_x [0;1;2;3]).
 
 Compute (Q_r_algeb_mul [1;-1] [1;-2]).
 (*
@@ -449,7 +447,35 @@ Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
   let rla := [1;0;1] in
+  let rlb := [1;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_div_x (rev rlb) in
+  let (U, V) := bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
   let rlb := [1;0;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_minus_x (rev rlb) in
+  let (U, V) := bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+(* oui *)
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;0;1] in
+  let rlb := [1;0;0;-2] in
+  let p := map (λ i, [i]) (rev rla) in
+  let q := lap_compose_y_div_x (rev rlb) in
+  let (U, V) := bezout_resultant_coeff p q in
+  ((U * p + V * q)%lap, lap_resultant p q)).
+Compute (
+  let qro := Q_ring_like_op in
+  let lro := lap_ring_like_op in
+  let rla := [1;-4] in
+  let rlb := [1;0;0;0;-3] in
   let p := map (λ i, [i]) (rev rla) in
   let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
@@ -461,10 +487,10 @@ Compute (
   let rla := [1;-4] in
   let rlb := [1;0;0;0;-3] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose_y_minus_x (rev rlb) in
+  let q := lap_compose_y_div_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
-(* oui *)
+...
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
