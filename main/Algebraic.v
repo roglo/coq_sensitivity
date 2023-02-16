@@ -7,7 +7,8 @@ Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul.
-Require Import Polynomial Matrix Determinant Signature.
+Require Import Polynomial Matrix Determinant.
+Require Import Signature PermutSeq MyVector.
 
 (* Sylvester matrix *)
 
@@ -87,11 +88,18 @@ injection Hbr; clear Hbr; intros HV HU.
 subst rol.
 remember (length P - 1) as n eqn:Hn.
 remember (length Q - 1) as m eqn:Hm.
-remember (rlap_sylvester_list_list (rev P) (rev Q)) as s eqn:Hs.
+remember (rlap_sylvester_list_list (rev P) (rev Q)) as ll eqn:Hll.
 move m before n.
+unfold lap_resultant.
+unfold rlap_sylvester_mat.
+rewrite <- Hll.
+unfold det.
+Print determinant_loop.
+(* hou la la, ça promet d'être compliqué, ça ;
+   le jeu en vaut-il la chandelle ? *)
 ...
-*)
 
+(*
 End a.
 
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
