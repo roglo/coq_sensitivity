@@ -78,8 +78,8 @@ Definition bezout_resultant_coeff (P Q : list T) :=
 
 End a.
 
-(* polynomial cancelling the sum of zeros of two polynomials rp and rq *)
-(* e.g. if rp=x²+1 and rq=x²-2 whose zeros are, resp. i and √2, return
+(* polynomial cancelling the sum of zeros of two polynomials p and q *)
+(* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
    a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
 Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
