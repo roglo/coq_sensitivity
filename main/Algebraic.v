@@ -99,7 +99,6 @@ Print determinant_loop.
    le jeu en vaut-il la chandelle ? *)
 ...
 
-(*
 End a.
 
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
@@ -517,7 +516,6 @@ Compute (
   let q := lap_compose_y_div_x (rev rlb) in
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
-...
 Compute (
   let qro := Q_ring_like_op in
   let lro := lap_ring_like_op in
@@ -538,7 +536,6 @@ Compute (
   let (U, V) := lap_bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
-...
 Compute (
   let qro := Q_ring_like_op in
   let qlro := Q_list_ring_like_op in
@@ -554,13 +551,14 @@ Compute (
   @lap_norm _ lap_ring_like_op
     ([[1];[];[1]] * [[3;0;3];[0;-2]] +
      [[-2;0;1];[0;-2];[1]] * [[-3;0;1];[0;2]])%L).
-...
+(*
 Time Compute (
   let qro := Q_ring_like_op in
   let qrp := Q_ring_like_prop in
   let lro := lap_ring_like_op in
   lap_resultant (rev [5;0;0;-7;5;-3]) (rev [1;0;0;0;-4;0;0;6])).
 ...
+*)
 
 Compute (Q_r_algeb_add [1;0;1] [1;0;-2]).
 Compute (Q_r_algeb_mul [1;0;1] [1;0;-2]).
@@ -574,7 +572,6 @@ Compute (Q_r_algeb_add [1;0;1] [1;1;1]).
 Compute (Q_r_algeb_mul [1;0;1] [1;1;1]).
 Compute (Q_r_algeb_add [1;1;1] [1;0;1]).
 Compute (Q_r_algeb_mul [1;1;1] [1;0;1]).
-...
 Compute (Q_r_algeb_add [1;2;3;4;5] [1;1;1]).
 Compute (Q_r_algeb_add [1;0;0;-2] [1;0;1]).
 
@@ -591,8 +588,7 @@ Compute (Q_r_algeb_add [1;0;0;-2] [1;0;1]).
    i et j, j'imagine, mais aussi peut-être de P et Q ? chais pas.
 *)
 
-...
-
+(*
 Theorem last_fold_left_lap_mul_const_add_const : ∀ la b c,
   last (fold_left (λ accu a, (accu * [b] + [a])%lap) la [c]) 0%L =
   fold_left (λ x y, (x * b + y)%L) la c.
@@ -666,6 +662,7 @@ cbn - [ last ].
 do 3 rewrite List_last_cons_cons.
 now rewrite <- IHlen.
 Qed.
+*)
 
 Theorem List_last_map : ∀ A B a b (f : A → B) la,
   f a = b → last (map f la) b = f (last la a).
@@ -679,6 +676,7 @@ do 2 rewrite List_last_cons_cons.
 apply IHla.
 Qed.
 
+(*
 Theorem last_lap_mul_const_l_add_const_r :
   rngl_has_opp_or_subt = true →
   ∀ a b la,
@@ -731,8 +729,7 @@ rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 rewrite (List_last_map 0%L); [ | apply (rngl_mul_0_r Hos) ].
 now do 2 rewrite List_last_cons_cons.
 Qed.
-
-...
+*)
 
 (* to be completed
 Theorem glop :
@@ -1097,22 +1094,6 @@ destruct la as [| a3]. {
 résultant (selon le X) des polynomes Q et P(Y-X)
 *)
 
-End a.
-
-(* to be completed *)
-Require Import RnglAlg.Qrl.
-Require Import RnglAlg.Rational.
-Import Q.Notations.
-Open Scope Q_scope.
-
-Compute (
-  let _ := Q_ring_like_op in
-  let rla := [2;3;5] in
-  let rlb := [7;11] in
-  last (rlap_compose rla rlb) 0).
-(*
-2*7²
-*)
 (*
 Time Compute (
   let _ := Q_ring_like_op in
@@ -1336,6 +1317,7 @@ Check
    in
    (*mk_polyn*) (lap_compose (lap q) (lap z_x))).
 
+(*
 Theorem Q_polyn_norm_prop :
   let ro := Q_polyn_ring_like_op in
   ∀ la : list (polyn Q), has_polyn_prop (@lap_norm _ ro la) = true.
@@ -1347,7 +1329,7 @@ rewrite strip_0s_app.
 remember (strip_0s (rev la)) as lb eqn:Hlb; symmetry in Hlb.
 destruct lb as [| b]; cbn. {
   rewrite if_bool_if_dec.
-  destruct (bool_dec _) as [Haz| Haz]; [ easy | cbn ].
+  destruct (Bool.bool_dec _) as [Haz| Haz]; [ easy | cbn ].
   now apply Bool.negb_true_iff.
 }
 cbn in IHla.
@@ -1359,6 +1341,7 @@ destruct IHla as [H1| H1]; [ | easy ].
 apply is_empty_list_empty in H1.
 now apply app_eq_nil in H1.
 Qed.
+*)
 
 Theorem Q_has_eqb : @rngl_has_eqb Q Q_ring_like_op = true.
 Proof. easy. Qed.
@@ -1409,8 +1392,6 @@ Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-2]).
 Compute (Q_r_algeb_sum_cancel_lap [1;0;-2] [1;0;-3]).
 Compute (Q_r_algeb_sum_cancel_lap [1;0;1] [1;1;1]).
 
-...
-
 (* bon, ci-dessous, ça prend toujours plein de temps à calculer
    par Compute, même si tous les implicites sont donnés implicitement ;
    je croyais que c'était à cause d'implicites non explicites que
@@ -1436,8 +1417,11 @@ Time Check
    let qpro := Q_polyn_ring_like_op in
    mk_polyn (@lap_norm (polyn Q) qpro r) (polyn_norm_prop r)).
 (* 32 s *)
+(*
    mk_polyn r (Q_polyn_norm_prop r)).
+*)
 (* 0.007 s *)
+(*
 Time Compute (
   let p :=
     let roqp := Q_polyn_ring_like_op in
@@ -1457,6 +1441,7 @@ Time Compute (
     mk_polyn q (polyn_norm_prop _ q)
   in
   polyn_sylvester_mat p q').
+*)
 Check rngl_eqb.
 Check polyn_of_const.
 Check (polyn_of_const Q_ring_like_prop).
@@ -1484,6 +1469,7 @@ Definition rngl_eq_dec' T (ro : ring_like_op T) (rp : ring_like_prop T)
    else
      λ Hab1, right (match rngl_eqb_neq Heq a b with conj x _ => x Hab1 end)
   ) eq_refl.
+(*
 Time Compute (
   rngl_eq_dec' _ Q_has_eqb 1 0).
 Time Compute (
@@ -1501,6 +1487,8 @@ Time Compute (
 (* 14 s *)
 Print polyn_of_const.
 ...
+*)
+(*
 Time Compute (
 (*
   let p :=
@@ -1521,13 +1509,13 @@ Time Compute (
     let p := map (polyn_of_const rpq Q_has_eqb) [1;0;1] in
 p
 in p).
-(**)
+*)
+(*
     mk_polyn p (glop roqp p)
 in p).
     mk_polyn (lap_norm p) (@polyn_norm_prop (polyn Q) roqp p)
 (rend le truc interminable en temps)
   in
-*)
   let q' :=
     let roq := Q_ring_like_op in
     let q :=
@@ -1538,6 +1526,7 @@ in p).
   in
   resultant p q').
 ...
+*)
 (* avec la Notation, ça répond vite, ce qui prouve que l'affichage
    qui prend du temps ; d'un autre côté, il y a un exemple plus
    haut où ça a pas l'air d'être ça *)
@@ -1546,8 +1535,8 @@ in p).
      : polyn Q
    ce qui est correct !!! Super !
  *)
-...
 Print fold_right.
+(*
 Theorem last_list_fold_right : ∀ A B (f : B → list A → list A) a l,
   last (fold_right f a l) = a.
 ...
@@ -1568,6 +1557,7 @@ Definition polyn_compose {A} {ro} (p q : polyn A) :=
   mk_polyn (lap_compose ro (lap p) (lap q)) (glop p q).
 
 Print polyn_compose.
+*)
 
 (* p sur K[x], p' sur L[x]
    calculer p (p') dans L[x]
@@ -1576,11 +1566,12 @@ voir lap_compose.
 ...
    Q[x] inclus dans Q[Q[x]].
 *)
-...
 
+(*
 Check [mk_polyn [1;0;1] eq_refl]. (* x²+1) *)
 Check [mk_polyn [-2;0;1] eq_refl]. (* x²-2) *)
 Check (@mk_polyn (polyn Q)).
+*)
 (*
 Theorem glop :
   (@rngl_characteristic Q Q_ring_like_op Q_ring_like_prop) ≠ 1%nat.
@@ -1596,6 +1587,7 @@ Check mk_polyn.
 Search has_polyn_prop.
 *)
 
+(*
 Compute (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl)).
 Compute (mat_nrows (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4;5]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
 Time Compute (det (polyn_sylvester_mat (mk_polyn (rev [1;2;3;4]) eq_refl) (mk_polyn (rev [6;7;8;9]) eq_refl))).
