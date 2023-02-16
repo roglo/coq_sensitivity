@@ -85,6 +85,10 @@ unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
 subst rol.
+remember (length P - 1) as n eqn:Hn.
+remember (length Q - 1) as m eqn:Hm.
+remember (rlap_sylvester_list_list (rev P) (rev Q)) as s eqn:Hs.
+move m before n.
 ...
 *)
 
