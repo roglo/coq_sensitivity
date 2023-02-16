@@ -81,11 +81,13 @@ End a.
 (* polynomial cancelling the sum of zeros of two polynomials p and q *)
 (* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
    a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
+Definition lap_compose_y_minus_x A {ro : ring_like_op A}
+    {rol : ring_like_op (list A)} (l : list A) :=
+  lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
+
 Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
-  let p' := map (λ i, [i]) p in
-  let q' := map (λ i, [i]) q in
-  lap_resultant p' (lap_compose q' [[0; 1]; [-1]])%L.
+  lap_resultant (map (λ i, [i]) p) (lap_compose_y_minus_x q).
 
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
@@ -434,7 +436,7 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui !!! *)
@@ -444,7 +446,7 @@ Compute (
   let rla := [1;0;1] in
   let rlb := [1;0;0;-2] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -454,7 +456,7 @@ Compute (
   let rla := [1;-4] in
   let rlb := [1;0;0;0;-3] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -464,7 +466,7 @@ Compute (
   let rla := [1;-2] in
   let rlb := [1;-3] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
@@ -474,7 +476,7 @@ Compute (
   let rla := [1;0;0;-2] in
   let rlb := [1;0;0;-3] in
   let p := map (λ i, [i]) (rev rla) in
-  let q := lap_compose (map (λ i, [i]) (rev rlb)) [[0; 1]; [-1]] in
+  let q := lap_compose_y_minus_x (rev rlb) in
   let (U, V) := bezout_resultant_coeff p q in
   ((U * p + V * q)%lap, lap_resultant p q)).
 (* oui *)
