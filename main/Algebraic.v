@@ -81,6 +81,10 @@ Theorem lap_bezout_is_resultant : ∀ (P Q U V : list T),
   → lap_norm (U * P + V * Q)%lap = [lap_resultant P Q].
 Proof.
 intros * Hbr.
+unfold lap_bezout_resultant_coeff in Hbr.
+remember lap_ring_like_op as rol eqn:Hrol.
+injection Hbr; clear Hbr; intros HV HU.
+subst rol.
 ...
 *)
 
