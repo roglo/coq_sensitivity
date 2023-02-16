@@ -78,17 +78,18 @@ Definition bezout_resultant_coeff (P Q : list T) :=
 
 End a.
 
-(* polynomial cancelling the sum of zeros of two polynomials p and q *)
-(* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
-   a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
     {rol : ring_like_op (list A)} (l : list A) :=
   lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
 
+(* polynomial cancelling the sum of zeros of two polynomials p and q *)
+(* e.g. if p=x²+1 and q=x²-2 whose zeros are, resp. i and √2, return
+   a polynomial cancelling i+√2 (namely x⁴-2x²+9) *)
 Definition algeb_add A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   lap_resultant (map (λ i, [i]) p) (lap_compose_y_minus_x q).
 
+(* polynomial cancelling the product of zeros of two polynomials p and q *)
 Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
     p q :=
   let p' := map (λ i, [i]) p in
@@ -97,6 +98,10 @@ Definition algeb_mul A (ro : ring_like_op A) (rol : ring_like_op (list A))
       (seq 0 (length q))
   in
   lap_resultant p' q'.
+
+(* essayer de comprendre ce que j'ai programmé, là *)
+
+...
 
 (*
 Theorem algeb_add_cancelling :
