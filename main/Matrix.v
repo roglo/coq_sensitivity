@@ -433,7 +433,7 @@ Definition mat_mul_scal_l s (M : matrix T) :=
 
 (* matrix whose k-th column is replaced by a vector *)
 
-Definition mat_repl_vect' k (M : matrix T) (V : vector T) :=
+Definition mat_repl_vect k (M : matrix T) (V : vector T) :=
   mk_mat (map2 (replace_at (k - 1)) (mat_list_list M) (vect_list V)).
 
 Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
@@ -442,7 +442,7 @@ Theorem mat_el_repl_vect : ∀ (M : matrix T) V i j k,
   → 1 ≤ i ≤ mat_nrows M
   → 1 ≤ j ≤ mat_ncols M
   → 1 ≤ k ≤ mat_ncols M
-  → mat_el (mat_repl_vect' k M V) i j =
+  → mat_el (mat_repl_vect k M V) i j =
     if Nat.eq_dec j k then vect_el V i else mat_el M i j.
 Proof.
 intros * Hm His Hir Hjc Hkc; cbn.
@@ -495,7 +495,7 @@ Qed.
 
 Theorem mat_repl_vect_nrows : ∀ k (M : matrix T) V,
   vect_size V = mat_nrows M
-  → mat_nrows (mat_repl_vect' k M V) = mat_nrows M.
+  → mat_nrows (mat_repl_vect k M V) = mat_nrows M.
 Proof.
 intros * Hv; cbn.
 rewrite map2_length.
@@ -506,7 +506,7 @@ Qed.
 Theorem mat_repl_vect_ncols : ∀ k (M : matrix T) V,
   1 ≤ k ≤ mat_ncols M
   → vect_size V = mat_ncols M
-  → mat_ncols (mat_repl_vect' k M V) = mat_ncols M.
+  → mat_ncols (mat_repl_vect k M V) = mat_ncols M.
 Proof.
 intros * Hkc Hv.
 (* works with nrows=0 *)
@@ -552,7 +552,7 @@ Theorem mat_repl_vect_is_square : ∀ k (M : matrix T) V,
   1 ≤ k ≤ mat_ncols M
   → vect_size V = mat_nrows M
   → is_square_matrix M = true
-  → is_square_matrix (mat_repl_vect' k M V) = true.
+  → is_square_matrix (mat_repl_vect k M V) = true.
 Proof.
 intros * Hkc Hv Hm.
 specialize (square_matrix_ncols _ Hm) as Hcn.

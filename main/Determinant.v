@@ -725,9 +725,9 @@ Theorem determinant_multilinear :
   → vect_size U = n
   → vect_size V = n
   → 1 ≤ i ≤ n
-  → det (mat_repl_vect' i M (a × U + b × V)%V) =
-       (a * det (mat_repl_vect' i M U) +
-        b * det (mat_repl_vect' i M V))%L.
+  → det (mat_repl_vect i M (a × U + b × V)%V) =
+       (a * det (mat_repl_vect i M U) +
+        b * det (mat_repl_vect i M V))%L.
 Proof.
 intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.

@@ -106,6 +106,7 @@ Print determinant_loop.
 
 End a.
 
+(*
 Definition lap_compose_y_minus_x A {ro : ring_like_op A}
     {rol : ring_like_op _} (l : list A) :=
   lap_compose (map (λ i, [i]) l) [[0; 1]; [-1]]%L.
@@ -1607,4 +1608,5 @@ Compute (let m := rlap_sylvester_mat [1;2;3;4] [6;7;8] in (mat_nrows m, mat_ncol
 Compute (let m := rlap_sylvester_mat [1;2;3] [6;7] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
 Compute (let m := rlap_sylvester_mat [2] [6;7] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
 Compute (let m := rlap_sylvester_mat [2;3] [6] in (mat_nrows m, mat_ncols m, m, is_square_matrix m)).
+*)
 *)

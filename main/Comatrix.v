@@ -9,6 +9,7 @@ Import List List.ListNotations.
 Require Import Misc RingLike IterAdd IterMul Pigeonhole.
 Require Import PermutationFun SortingFun SortRank.
 Require Import Matrix PermutSeq Signature Determinant.
+Require Import MyVector.
 Import matrix_Notations.
 
 Section a.
@@ -973,6 +974,18 @@ apply mat_transp_el; [ | flia Hj | flia Hi ].
 apply comatrix_is_correct.
 now apply squ_mat_is_corr.
 Qed.
+
+(* Cramer's rule *)
+
+(* to be completed
+Theorem cramer_s_rule :
+  ∀ (M : matrix T) (U V : vector T),
+  is_square_matrix M = true
+  → (M • U)%V = V
+  → ∀ i,
+  vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
+...
+*)
 
 (*
 The following two theorems, "determinant_with_row" and determinant_with_bad_row
