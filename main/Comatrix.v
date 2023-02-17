@@ -978,12 +978,15 @@ Qed.
 (* Cramer's rule *)
 
 (* to be completed
-Theorem cramer_s_rule :
+Theorem cramer_s_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → (M • U)%V = V
   → ∀ i,
   vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
+Proof.
+intros Hif * Hsm Hmuv *.
+specialize (laplace_formula_on_rows Hif M) as H1.
 ...
 *)
 
