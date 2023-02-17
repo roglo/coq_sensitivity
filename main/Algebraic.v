@@ -63,6 +63,7 @@ Definition rlap_resultant' (rol : ring_like_op (list T)) (p q : list T) :=
 *)
 
 (* U and V such that PU+QV=res(P,Q) *)
+(* see Serge Lang's book, "Algebra", section "the resultant" *)
 Definition lap_bezout_resultant_coeff (P Q : list T) :=
   let rol := lap_ring_like_op in
   let n := length P - 1 in
@@ -97,6 +98,10 @@ unfold det.
 Print determinant_loop.
 (* hou la la, ça promet d'être compliqué, ça ;
    le jeu en vaut-il la chandelle ? *)
+(* needs at least the proof of Cramer's rule ; at the time when I write
+   this comment (17 feb 2023), I do not have it *)
+(* also needs a proof that the determinant can be computed by the last
+   column *)
 ...
 
 End a.
