@@ -1656,18 +1656,25 @@ rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
 
+Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
+
 (* Cramer's rule *)
 
 (* to be completed
 Theorem cramer_s_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
+  → det M ≠ 0%L
   → (M • U)%V = V
   → ∀ i,
-  vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
+  1 ≤ i ≤ mat_nrows M
+  → vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
-intros Hif * Hsm Hmuv *.
-specialize (laplace_formula_on_rows Hif M) as H1.
+intros Hif * Hsm Hmz Hmuv k Hk.
+assert (H1 : (M⁻¹ = (1%L / det M) × (com M)⁺)%M). {
+  specialize (matrix_comatrix_transp_mul Hif M Hsm) as H1.
+  specialize (laplace_formula_on_rows Hif M Hsm Hk) as H2.
+  specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
 ...
 *)
 
