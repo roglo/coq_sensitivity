@@ -1768,7 +1768,7 @@ Theorem cramer_s_rule : in_charac_0_field →
   → (M • U)%V = V
   → ∀ i,
   1 ≤ i ≤ mat_nrows M
-  → vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
+  → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hif * Hsm Hmz Hmuv k Hk.
 specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
