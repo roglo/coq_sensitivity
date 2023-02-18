@@ -975,21 +975,6 @@ apply comatrix_is_correct.
 now apply squ_mat_is_corr.
 Qed.
 
-(* Cramer's rule *)
-
-(* to be completed
-Theorem cramer_s_rule : in_charac_0_field →
-  ∀ (M : matrix T) (U V : vector T),
-  is_square_matrix M = true
-  → (M • U)%V = V
-  → ∀ i,
-  vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
-Proof.
-intros Hif * Hsm Hmuv *.
-specialize (laplace_formula_on_rows Hif M) as H1.
-...
-*)
-
 (*
 The following two theorems, "determinant_with_row" and determinant_with_bad_row
 have some similitudes.
@@ -1670,6 +1655,23 @@ rewrite mat_mul_scal_l_mul_assoc.
 rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 now apply mat_mul_scal_1_l.
 Qed.
+
+(* Cramer's rule *)
+
+(* to be completed
+Theorem cramer_s_rule : in_charac_0_field →
+  ∀ (M : matrix T) (U V : vector T),
+  is_square_matrix M = true
+  → (M • U)%V = V
+  → ∀ i,
+  vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
+Proof.
+intros Hif * Hsm Hmuv *.
+specialize (laplace_formula_on_rows Hif M) as H1.
+...
+*)
+
+(* *)
 
 Theorem minus_one_pow_mul_same :
   rngl_has_opp = true →
