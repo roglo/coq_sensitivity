@@ -1761,17 +1761,37 @@ Qed.
 (* Cramer's rule *)
 
 (* to be completed
-Theorem cramer_s_rule : in_charac_0_field →
+Theorem cramer_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
-  → det M ≠ 0%L
+  → vect_size U = mat_nrows M
+ → det M ≠ 0%L
   → (M • U)%V = V
   → ∀ i,
   1 ≤ i ≤ mat_nrows M
   → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
-intros Hif * Hsm Hmz Hmuv k Hk.
+intros Hif * Hsm Hum Hmz Hmuv k Hk.
 specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
+apply (f_equal (mat_mul_vect_r (M⁻¹)%M)) in Hmuv.
+rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
+  now destruct Hif.
+} {
+  apply mat_inv_is_corr.
+  now apply squ_mat_is_corr.
+} {
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_inv_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
+  now rewrite square_matrix_ncols in Hcz.
+} {
+  now rewrite square_matrix_ncols.
+}
+rewrite mat_mul_inv_l in Hmuv; [ | easy | easy | easy ].
+rewrite mat_vect_mul_1_l in Hmuv; [ | now destruct Hif | easy ].
+rewrite H1 in Hmuv.
 ...
 *)
 
