@@ -1675,6 +1675,10 @@ assert (H1 : (M⁻¹ = (1%L / det M) × (com M)⁺)%M). {
   specialize (matrix_comatrix_transp_mul Hif M Hsm) as H1.
   specialize (laplace_formula_on_rows Hif M Hsm Hk) as H2.
   specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
+  apply (f_equal (mat_mul M⁻¹)) in H1.
+  rewrite mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
+Search (det _ ≠ 0%L).
+Search (mat_nrows _ = 0).
 ...
 *)
 
