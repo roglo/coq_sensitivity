@@ -1679,6 +1679,85 @@ apply mat_transp_is_corr.
 now apply comatrix_is_correct.
 Qed.
 
+Theorem mat_inv_det_comm : in_charac_0_field →
+  ∀ M,
+  is_square_matrix M = true
+  → det M ≠ 0%L
+  → (M⁻¹ = (1%L / det M) × (com M)⁺)%M.
+Proof.
+intros Hif * Hsm Hmz.
+specialize (matrix_comatrix_transp_mul Hif M Hsm) as H1.
+specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
+apply (f_equal (mat_mul M⁻¹)) in H1.
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
+  destruct M as (ll).
+  cbn in Hrz.
+  apply length_zero_iff_nil in Hrz; subst ll.
+  cbn.
+  unfold mat_transp, mat_inv, com; cbn.
+  unfold mat_transp; cbn.
+  rewrite rngl_inv_1; [ | now destruct Hif | ]. 2: {
+    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    now rewrite Hch.
+  }
+  rewrite rngl_div_1_r; cycle 1. {
+    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    now apply rngl_has_inv_or_quot_iff; left.
+  } {
+    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    now rewrite Hch.
+  }
+  easy.
+}
+assert (Hcz : mat_ncols M ≠ 0). {
+  now rewrite (square_matrix_ncols _ Hsm).
+}
+rewrite mat_mul_assoc in H1; [ | now destruct Hif | easy | easy | ]. 2: {
+  rewrite mat_inv_ncols.
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec _ _).
+}
+rewrite H3 in H1.
+rewrite mat_mul_1_l in H1; [ | now destruct Hif | | ]; cycle 1. {
+  apply mat_transp_is_corr.
+  apply comatrix_is_correct.
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_transp_nrows.
+  rewrite comatrix_ncols.
+  symmetry; apply (square_matrix_ncols _ Hsm).
+}
+rewrite mat_mul_mul_scal_l in H1; cycle 1. {
+  now destruct Hif.
+} {
+  now destruct Hif.
+} {
+  apply mI_is_correct_matrix.
+} {
+  rewrite mat_inv_ncols.
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec _ _).
+} {
+  rewrite mat_inv_ncols.
+  rewrite mI_nrows.
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec _ _).
+}
+rewrite mat_mul_1_r in H1; [ | now destruct Hif | | ]; cycle 1. {
+  apply mat_inv_is_corr.
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_inv_ncols.
+  rewrite if_eqb_eq_dec.
+  now destruct (Nat.eq_dec _ _).
+}
+rewrite H1.
+rewrite mat_mul_scal_l_mul_assoc.
+rewrite rngl_div_1_l; [ | now destruct Hif ].
+rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
+symmetry; apply mat_mul_scal_1_l.
+Qed.
+
 (* Cramer's rule *)
 
 (* to be completed
@@ -1692,67 +1771,7 @@ Theorem cramer_s_rule : in_charac_0_field →
   → vect_el V i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hif * Hsm Hmz Hmuv k Hk.
-assert (H1 : (M⁻¹ = (1%L / det M) × (com M)⁺)%M). {
-  specialize (matrix_comatrix_transp_mul Hif M Hsm) as H1.
-(*
-  specialize (laplace_formula_on_rows Hif M Hsm Hk) as H2.
-*)
-  specialize (mat_mul_inv_l Hif M Hsm Hmz) as H3.
-  apply (f_equal (mat_mul M⁻¹)) in H1.
-  rewrite mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
-    flia Hk.
-  } {
-    rewrite (square_matrix_ncols _ Hsm); flia Hk.
-  } {
-    rewrite mat_inv_ncols.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
-    now rewrite (square_matrix_ncols _ Hsm) in Hcz.
-  }
-  rewrite H3 in H1.
-  rewrite mat_mul_1_l in H1; [ | now destruct Hif | | ]; cycle 1. {
-    apply mat_transp_is_corr.
-    apply comatrix_is_correct.
-    now apply squ_mat_is_corr.
-  } {
-    rewrite mat_transp_nrows.
-    rewrite comatrix_ncols.
-    symmetry; apply (square_matrix_ncols _ Hsm).
-  }
-  rewrite mat_mul_mul_scal_l in H1; cycle 1. {
-    now destruct Hif.
-  } {
-    now destruct Hif.
-  } {
-    apply mI_is_correct_matrix.
-  } {
-    rewrite mat_inv_ncols.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | flia Hk ].
-    rewrite (square_matrix_ncols _ Hsm) in Hcz.
-    flia Hcz Hk.
-  } {
-    rewrite mat_inv_ncols.
-    rewrite mI_nrows.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
-    now rewrite (square_matrix_ncols _ Hsm) in Hcz.
-  }
-  rewrite mat_mul_1_r in H1; [ | now destruct Hif | | ]; cycle 1. {
-    apply mat_inv_is_corr.
-    now apply squ_mat_is_corr.
-  } {
-    rewrite mat_inv_ncols.
-    rewrite if_eqb_eq_dec.
-    destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
-    now rewrite (square_matrix_ncols _ Hsm) in Hcz.
-  }
-  rewrite H1.
-  rewrite mat_mul_scal_l_mul_assoc.
-  rewrite rngl_div_1_l; [ | now destruct Hif ].
-  rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
-  symmetry; apply mat_mul_scal_1_l.
-}
+specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
 ...
 *)
 
