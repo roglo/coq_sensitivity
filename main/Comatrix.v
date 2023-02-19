@@ -1792,6 +1792,18 @@ rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
 rewrite mat_mul_inv_l in Hmuv; [ | easy | easy | easy ].
 rewrite mat_vect_mul_1_l in Hmuv; [ | now destruct Hif | easy ].
 rewrite H1 in Hmuv.
+rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
+  now destruct Hif.
+} {
+  apply mat_transp_is_corr.
+  apply comatrix_is_correct.
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_transp_ncols.
+  rewrite comatrix_ncols, comatrix_nrows.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]. {
+    rewrite (square_matrix_ncols _ Hsm) in Hcz.
 ...
 *)
 
