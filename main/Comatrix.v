@@ -1758,6 +1758,16 @@ rewrite rngl_mul_inv_l; [ | now destruct Hif | easy ].
 symmetry; apply mat_mul_scal_1_l.
 Qed.
 
+Theorem vect_el_mul_scal_l : ∀ μ V i,
+  1 ≤ i ≤ vect_size V
+  → vect_el (μ × V) i = (μ * vect_el V i)%L.
+Proof.
+intros * Hi; cbn.
+apply (List_map_nth' 0%L).
+rewrite fold_vect_size.
+flia Hi.
+Qed.
+
 (* Cramer's rule *)
 
 (* to be completed
@@ -1813,6 +1823,12 @@ rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
     now rewrite Huv.
   }
 }
+(**)
+rewrite Hmuv.
+rewrite vect_el_mul_scal_l. 2: {
+  split; [ easy | ].
+Search (vect_size (_ • _)%V).
+...
 rewrite Hmuv; cbn - [ det ].
 rewrite List_map_seq_length.
 rewrite (List_map_nth' 0%L). 2: {
