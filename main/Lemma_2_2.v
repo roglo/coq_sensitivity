@@ -1071,15 +1071,15 @@ Theorem m_o_mll_2x2_2x1 : ∀ n (M1 M2 M3 M4 M5 M6 : matrix T),
      mat_of_mat_list_list [[M1 * M5 + M2 * M6]; [M3 * M5 + M4 * M6]]%M.
 Proof.
 intros * Hs1 Hs3 Hs5 Hr1 Hr2 Hr3 Hr4 Hr5 Hc2 Hc4 Hc6.
-specialize (square_matrix_ncols _ Hs1) as Hc1.
+specialize (squ_mat_ncols _ Hs1) as Hc1.
 apply is_scm_mat_iff in Hs1.
 destruct Hs1 as (_ & Hc1').
 rewrite Hr1 in Hc1, Hc1'.
-specialize (square_matrix_ncols _ Hs3) as Hc3.
+specialize (squ_mat_ncols _ Hs3) as Hc3.
 apply is_scm_mat_iff in Hs3.
 destruct Hs3 as (_ & Hc3').
 rewrite Hr3 in Hc3, Hc3'.
-specialize (square_matrix_ncols _ Hs5) as Hc5.
+specialize (squ_mat_ncols _ Hs5) as Hc5.
 apply is_scm_mat_iff in Hs5.
 destruct Hs5 as (Hcr5 & Hc5').
 rewrite Hr5 in Hc5, Hc5'.
@@ -1398,8 +1398,8 @@ Theorem is_corr_mat_of_list_list_squ_1_2 : ∀ MA MB,
   → is_correct_matrix (mat_of_mat_list_list [[MA]; [MB]]) = true.
 Proof.
 intros * Hab Ha Hb.
-specialize (square_matrix_ncols MA Ha) as Hcan.
-specialize (square_matrix_ncols MB Hb) as Hcbn.
+specialize (squ_mat_ncols MA Ha) as Hcan.
+specialize (squ_mat_ncols MB Hb) as Hcbn.
 remember (mat_nrows MA) as n eqn:Hn.
 rename Hn into Hra; rename Hab into Hrb.
 symmetry in Hra, Hrb.

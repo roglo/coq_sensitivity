@@ -536,7 +536,7 @@ rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
 } {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {
-  specialize (square_matrix_ncols _ Hsm) as Hc1.
+  specialize (squ_mat_ncols _ Hsm) as Hc1.
   apply is_scm_mat_iff.
   apply is_scm_mat_iff in Hsm.
   destruct Hsm as (Hcr & Hc).
@@ -687,7 +687,7 @@ Theorem laplace_formula_on_rows : in_charac_0_field →
   → det M = ∑ (j = 1, mat_ncols M), mat_el M i j * mat_el (com M) i j.
 Proof.
 intros Hif * Hsm Hlin.
-specialize (square_matrix_ncols M Hsm) as Hc.
+specialize (squ_mat_ncols M Hsm) as Hc.
 rewrite Hc.
 specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
 destruct H1 as (Hcr & Hc').
@@ -859,7 +859,7 @@ Theorem comatrix_is_square : ∀ M,
   → is_square_matrix (com M) = true.
 Proof.
 intros * Hsm.
-specialize (square_matrix_ncols _ Hsm) as Hc.
+specialize (squ_mat_ncols _ Hsm) as Hc.
 apply is_scm_mat_iff in Hsm.
 apply is_scm_mat_iff.
 rewrite comatrix_ncols.
@@ -1065,7 +1065,7 @@ Theorem determinant_with_bad_row : in_charac_0_field →
     minus_one_pow (i + j) * mat_el M k j * det (subm i j M) = 0%L.
 Proof.
 intros Hif * Hsm Hir Hkr Hik.
-specialize (square_matrix_ncols _ Hsm) as Hc.
+specialize (squ_mat_ncols _ Hsm) as Hc.
 remember
   (mk_mat
      (map
@@ -1452,7 +1452,7 @@ apply map_ext_in.
 intros j Hj; apply in_seq in Hj.
 move j before i.
 rewrite laplace_formula_on_cols with (j := S j); [ | easy | easy | ]. 2: {
-  rewrite square_matrix_ncols; [ cbn | easy ].
+  rewrite squ_mat_ncols; [ cbn | easy ].
   flia Hj.
 }
 unfold mat_mul_el.
@@ -1548,7 +1548,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
   }
   specialize (H1 Hsmt).
   rewrite mat_transp_nrows in H1.
-  rewrite square_matrix_ncols in H1; [ | easy ].
+  rewrite squ_mat_ncols in H1; [ | easy ].
   assert (H : 1 ≤ S i ≤ mat_nrows M) by flia Hi.
   specialize (H1 H); clear H.
   assert (H : 1 ≤ S j ≤ mat_nrows M) by flia Hj.
@@ -1559,10 +1559,10 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     intros k Hk.
     rewrite <- determinant_transpose; [ | easy | ]. 2: {
       apply is_squ_mat_subm. {
-        rewrite mat_transp_nrows, square_matrix_ncols; [ | easy ].
+        rewrite mat_transp_nrows, squ_mat_ncols; [ | easy ].
         flia Hk Hi.
       } {
-        rewrite mat_transp_nrows, square_matrix_ncols; [ | easy ].
+        rewrite mat_transp_nrows, squ_mat_ncols; [ | easy ].
         flia Hk Hi.
       }
       now apply mat_transp_is_square.
@@ -1572,14 +1572,14 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
     } {
       rewrite mat_transp_ncols.
       assert (H : (mat_ncols M =? 0) = false). {
-        rewrite square_matrix_ncols; [ | easy ].
+        rewrite squ_mat_ncols; [ | easy ].
         apply Nat.eqb_neq; flia Hi.
       }
       now rewrite H.
     } {
       rewrite mat_transp_nrows.
       split; [ flia | ].
-      rewrite square_matrix_ncols; [ | easy ].
+      rewrite squ_mat_ncols; [ | easy ].
       flia Hi.
     }
     rewrite mat_transp_involutive. 2: {
@@ -1710,7 +1710,7 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   easy.
 }
 assert (Hcz : mat_ncols M ≠ 0). {
-  now rewrite (square_matrix_ncols _ Hsm).
+  now rewrite (squ_mat_ncols _ Hsm).
 }
 rewrite mat_mul_assoc in H1; [ | now destruct Hif | easy | easy | ]. 2: {
   rewrite mat_inv_ncols.
@@ -1725,7 +1725,7 @@ rewrite mat_mul_1_l in H1; [ | now destruct Hif | | ]; cycle 1. {
 } {
   rewrite mat_transp_nrows.
   rewrite comatrix_ncols.
-  symmetry; apply (square_matrix_ncols _ Hsm).
+  symmetry; apply (squ_mat_ncols _ Hsm).
 }
 rewrite mat_mul_mul_scal_l in H1; cycle 1. {
   now destruct Hif.
@@ -1785,9 +1785,9 @@ rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
   rewrite mat_inv_ncols.
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
-  now rewrite square_matrix_ncols in Hcz.
+  now rewrite squ_mat_ncols in Hcz.
 } {
-  now rewrite square_matrix_ncols.
+  now rewrite squ_mat_ncols.
 }
 rewrite mat_mul_inv_l in Hmuv; [ | easy | easy | easy ].
 rewrite mat_vect_mul_1_l in Hmuv; [ | now destruct Hif | easy ].
@@ -1803,7 +1803,7 @@ rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
   rewrite comatrix_ncols, comatrix_nrows.
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hcz| Hcz]. {
-    rewrite (square_matrix_ncols _ Hsm) in Hcz.
+    rewrite (squ_mat_ncols _ Hsm) in Hcz.
 ...
 *)
 

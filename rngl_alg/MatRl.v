@@ -56,7 +56,7 @@ split; [ | apply square_matrix_add_is_square ].
 apply Nat.eqb_eq; cbn.
 rewrite map2_length.
 do 2 rewrite fold_mat_nrows.
-do 2 rewrite squ_mat_nrows.
+do 2 rewrite smat_nrows.
 apply Nat.min_id.
 Qed.
 
@@ -69,7 +69,7 @@ apply Bool.andb_true_iff.
 split; [ | apply square_matrix_mul_is_square ].
 apply Nat.eqb_eq; cbn.
 rewrite List_map_seq_length.
-apply squ_mat_nrows.
+apply smat_nrows.
 Qed.
 
 Theorem square_matrix_opp_prop : ∀ n (M : square_matrix n T),
@@ -80,7 +80,7 @@ apply Bool.andb_true_iff.
 split; [ | apply square_matrix_opp_is_square ].
 apply Nat.eqb_eq; cbn.
 rewrite map_length.
-apply squ_mat_nrows.
+apply smat_nrows.
 Qed.
 
 Definition smZ n : square_matrix n T :=
@@ -236,11 +236,11 @@ split. {
   } {
     now rewrite mI_nrows.
   } {
-    now rewrite squ_mat_nrows.
+    now rewrite smat_nrows.
   } {
     now rewrite mI_ncols.
   } {
-    now rewrite squ_mat_ncols.
+    now rewrite smat_ncols.
   }
   rewrite mat_el_mI_diag in Hlla; [ | easy ].
   subst rom.
@@ -294,9 +294,9 @@ intros.
 apply square_matrix_eq.
 cbn.
 apply mat_add_0_l; cycle 1. {
-  symmetry; apply squ_mat_nrows.
+  symmetry; apply smat_nrows.
 } {
-  symmetry; apply squ_mat_ncols.
+  symmetry; apply smat_ncols.
 }
 apply square_matrix_is_correct.
 Qed.
@@ -354,7 +354,7 @@ Theorem squ_mat_mul_1_l :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply mat_mul_1_l; [ easy | | symmetry; apply squ_mat_nrows ].
+apply mat_mul_1_l; [ easy | | symmetry; apply smat_nrows ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -436,7 +436,7 @@ Theorem squ_mat_mul_1_r :
 Proof.
 intros.
 apply square_matrix_eq; cbn.
-apply mat_mul_1_r; [ easy | | symmetry; apply squ_mat_ncols ].
+apply mat_mul_1_r; [ easy | | symmetry; apply smat_ncols ].
 apply square_matrix_is_correct.
 Qed.
 
@@ -636,11 +636,11 @@ destruct (Nat.eq_dec rngl_characteristic 0) as [Hch| Hcn]. {
     } {
       now rewrite mI_nrows.
     } {
-      now rewrite squ_mat_nrows.
+      now rewrite smat_nrows.
     } {
       now rewrite mI_ncols.
     } {
-      now rewrite squ_mat_ncols.
+      now rewrite smat_ncols.
     }
     rewrite mat_el_mI_diag; [ | easy ].
     now rewrite IHi.

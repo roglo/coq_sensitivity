@@ -318,7 +318,7 @@ f_equal.
 apply (Eqdep_dec.UIP_dec Bool.bool_dec).
 Qed.
 
-Theorem square_matrix_ncols {T} : ∀ (M : matrix T),
+Theorem squ_mat_ncols {T} : ∀ (M : matrix T),
   is_square_matrix M = true
   → mat_ncols M = mat_nrows M.
 Proof.
@@ -338,7 +338,7 @@ Theorem squ_mat_is_corr {T} : ∀ (M : matrix T),
   → is_correct_matrix M = true.
 Proof.
 intros * Hsm.
-specialize (square_matrix_ncols _ Hsm) as Hc.
+specialize (squ_mat_ncols _ Hsm) as Hc.
 apply is_scm_mat_iff in Hsm.
 apply is_scm_mat_iff.
 split; [ easy | ].
@@ -555,7 +555,7 @@ Theorem mat_repl_vect_is_square : ∀ k (M : matrix T) V,
   → is_square_matrix (mat_repl_vect k M V) = true.
 Proof.
 intros * Hkc Hv Hm.
-specialize (square_matrix_ncols _ Hm) as Hcn.
+specialize (squ_mat_ncols _ Hm) as Hcn.
 apply is_scm_mat_iff in Hm.
 apply is_scm_mat_iff.
 destruct Hm as (Hcr & Hc).
@@ -2280,7 +2280,7 @@ Theorem is_squ_mat_subm : ∀ (M : matrix T) i j,
 Proof.
 intros * Hi Hj Hm.
 apply is_scm_mat_iff.
-specialize (square_matrix_ncols _ Hm) as Hcm.
+specialize (squ_mat_ncols _ Hm) as Hcm.
 destruct (Nat.eq_dec (mat_nrows M) 1) as [Hr1| Hr1]. {
   rewrite Hr1 in Hi, Hj.
   replace i with 1 by flia Hi.
@@ -2393,7 +2393,7 @@ Qed.
 
 (* ring of square matrices *)
 
-Theorem squ_mat_nrows : ∀ n (M : square_matrix n T),
+Theorem smat_nrows : ∀ n (M : square_matrix n T),
   mat_nrows (sm_mat M) = n.
 Proof.
 intros.
@@ -2403,7 +2403,7 @@ destruct Hmp as (Hr & Hmp).
 now apply Nat.eqb_eq in Hr.
 Qed.
 
-Theorem squ_mat_ncols : ∀ n (M : square_matrix n T),
+Theorem smat_ncols : ∀ n (M : square_matrix n T),
   mat_ncols (sm_mat M) = n.
 Proof.
 intros.
@@ -2559,11 +2559,11 @@ Proof.
 intros * Ha Hb Hrab.
 apply is_scm_mat_iff; cbn.
 rewrite List_map_seq_length.
-rewrite (square_matrix_ncols MB); [ | easy ].
+rewrite (squ_mat_ncols MB); [ | easy ].
 split. {
   intros Hcc.
   unfold mat_ncols in Hcc; cbn in Hcc.
-  rewrite square_matrix_ncols in Hcc; [ | easy ].
+  rewrite squ_mat_ncols in Hcc; [ | easy ].
   rewrite <- Hrab in Hcc.
   apply length_zero_iff_nil in Hcc.
   destruct (Nat.eq_dec (mat_nrows MA) 0) as [Hrz| Hrz]; [ easy | ].
@@ -2614,19 +2614,19 @@ split. {
   intros Hco; cbn.
   rewrite map_length.
   rewrite fold_mat_nrows.
-  rewrite squ_mat_nrows.
+  rewrite smat_nrows.
   destruct (Nat.eq_dec n 0) as [Hnz| Hnz]; [ easy | exfalso ].
   apply Nat.neq_0_lt_0 in Hnz.
   unfold mat_ncols in Hco.
   cbn in Hco.
   apply length_zero_iff_nil in Hco.
   rewrite (List_map_hd []) in Hco. 2: {
-    now rewrite fold_mat_nrows, squ_mat_nrows.
+    now rewrite fold_mat_nrows, smat_nrows.
   }
   apply map_eq_nil in Hco.
   apply (f_equal length) in Hco.
   rewrite fold_mat_ncols in Hco.
-  rewrite squ_mat_ncols in Hco.
+  rewrite smat_ncols in Hco.
   now rewrite Hco in Hnz.
 } {
   intros l Hl.
@@ -2813,7 +2813,7 @@ Theorem mat_subm_transp :
   → ((subm j i M)⁺ = subm i j M⁺)%M.
 Proof.
 intros * Hsm Hi Hj.
-specialize (square_matrix_ncols _ Hsm) as Hcr.
+specialize (squ_mat_ncols _ Hsm) as Hcr.
 destruct (Nat.eq_dec (mat_ncols M) 1) as [Hc1| Hc1]. {
   rewrite Hc1 in Hi.
   rewrite <- Hcr, Hc1 in Hj.
@@ -2974,7 +2974,7 @@ Theorem mat_transp_is_square : ∀ M,
   → is_square_matrix M⁺ = true.
 Proof.
 intros * Hsm.
-specialize (square_matrix_ncols _ Hsm) as Hc.
+specialize (squ_mat_ncols _ Hsm) as Hc.
 apply is_scm_mat_iff in Hsm.
 apply is_scm_mat_iff.
 destruct Hsm as (Hcr & Hcl).
@@ -3107,7 +3107,7 @@ Arguments mI_is_correct_matrix {T}%type {ro} n%nat.
 Arguments minus_one_pow {T ro}.
 Arguments mI {T ro} n%nat.
 Arguments mZ {T ro} (m n)%nat.
-Arguments square_matrix_ncols {T}%type M%M.
+Arguments squ_mat_ncols {T}%type M%M.
 Arguments subm {T} i%nat j%nat M%M.
 Arguments δ {T}%type {ro} (i j)%nat.
 

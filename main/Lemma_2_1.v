@@ -238,7 +238,7 @@ unfold Rayleigh_quotient.
 rewrite <- mat_mul_scal_vect_comm; [ | easy | easy | | ]; cycle 1. {
   now apply squ_mat_is_corr.
 } {
-  now rewrite square_matrix_ncols.
+  now rewrite squ_mat_ncols.
 }
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
 rewrite vect_dot_mul_scal_mul_comm; [ | easy | easy ].
@@ -420,7 +420,7 @@ cbn.
 do 3 rewrite map_length.
 rewrite seq_length.
 rewrite fold_mat_nrows.
-rewrite square_matrix_ncols; [ | easy ].
+rewrite squ_mat_ncols; [ | easy ].
 rewrite Nat.min_id.
 destruct M as (ll).
 destruct U as (lu).
@@ -634,7 +634,7 @@ destruct (Nat.eq_dec i j) as [Hij| Hij]. {
 (*
   replace (M⁺)%M with M in H1. 2: {
     unfold mat_transp; cbn.
-    rewrite square_matrix_ncols; [ rewrite Hr | easy ].
+    rewrite squ_mat_ncols; [ rewrite Hr | easy ].
     destruct M as (ll); cbn in Hr, Hsy |-*; f_equal.
     rewrite (List_map_nth_seq ll []) at 1.
     rewrite Hr.
@@ -811,8 +811,8 @@ rewrite seq_nth. 2: {
 cbn.
 rewrite <- Hmd.
 unfold mat_mul_el.
-rewrite square_matrix_ncols; [ | easy ].
-rewrite square_matrix_ncols; [ | easy ].
+rewrite squ_mat_ncols; [ | easy ].
+rewrite squ_mat_ncols; [ | easy ].
 rewrite Hrn.
 replace (mat_nrows U) with n. 2: {
   rewrite Hmo; cbn.
@@ -992,7 +992,7 @@ rewrite <- mat_mul_assoc in H1; [ | now destruct Hif | | | ]; cycle 1. {
   now rewrite Ho, mat_with_vect_ncols.
 } {
   rewrite Ho, mat_with_vect_nrows.
-  rewrite square_matrix_ncols; [ easy | now destruct Hsy ].
+  rewrite squ_mat_ncols; [ easy | now destruct Hsy ].
 }
 assert (Hsu : is_square_matrix U = true). {
   rewrite Ho; apply mat_with_vect_is_square.
@@ -1007,7 +1007,7 @@ assert (Hdu : det U ≠ 0%L). {
     now apply mat_transp_is_square.
   } {
     rewrite mat_transp_nrows.
-    now apply square_matrix_ncols.
+    now apply squ_mat_ncols.
   }
   rewrite (determinant_transpose Hif) in Huu; [ | easy ].
   rewrite det_mI in Huu; [ | easy ].
@@ -1023,7 +1023,7 @@ rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   } {
     now rewrite Ho, mat_with_vect_ncols.
   } {
-    rewrite Ho, mat_with_vect_nrows, square_matrix_ncols; [ easy | ].
+    rewrite Ho, mat_with_vect_nrows, squ_mat_ncols; [ easy | ].
     now unfold is_symm_mat in Hsy.
   }
   rewrite mat_mul_inv_r; [ | easy | | apply Hdu ]. 2: {
@@ -1037,7 +1037,7 @@ rewrite mat_mul_inv_r in H1; [ | easy | | apply Hdu ]. {
   }
   rewrite Ho, mat_with_vect_nrows; symmetry.
   rewrite <- Hrn.
-  apply square_matrix_ncols.
+  apply squ_mat_ncols.
   now destruct Hsy.
 } {
   rewrite Ho.
@@ -1100,11 +1100,11 @@ assert
     rewrite mat_mul_nrows in Hmin.
     rewrite mat_mul_nrows in Hmin.
     rewrite mat_transp_nrows in Hmin.
-    rewrite square_matrix_ncols in Hmin; [ | easy ].
+    rewrite squ_mat_ncols in Hmin; [ | easy ].
     congruence.
   }
   assert (Huc : mat_ncols U = n). {
-    now rewrite square_matrix_ncols.
+    now rewrite squ_mat_ncols.
   }
   assert (Hu'r : mat_nrows U⁺ = n). {
     now rewrite mat_transp_nrows.
@@ -1131,7 +1131,7 @@ assert
   assert (H2 : mat_ncols (U⁺ * D) = n). {
     rewrite mat_mul_ncols; [ congruence | ].
     rewrite mat_transp_nrows.
-    rewrite square_matrix_ncols; [ | easy ].
+    rewrite squ_mat_ncols; [ | easy ].
     congruence.
   }
   assert (Huu1 : (U * U⁺ = mI n)%M) by _admit.
@@ -1194,7 +1194,7 @@ assert (Huc : mat_ncols U = n). {
   congruence.
 }
 assert (Hur : mat_nrows U = n). {
-  now rewrite square_matrix_ncols in Huc.
+  now rewrite squ_mat_ncols in Huc.
 }
 assert (HneV : n ≤ length eV). {
   unfold eigenvalues_and_norm_vectors in HeV.
@@ -1329,10 +1329,10 @@ erewrite rngl_summation_eq_compat. 2: {
   } {
     rewrite mat_transp_nrows.
     rewrite Hvs; [ | apply nth_In; flia Hi HneV ].
-    now rewrite square_matrix_ncols, Hr.
+    now rewrite squ_mat_ncols, Hr.
   } {
     rewrite mat_transp_nrows, Hsx.
-    now rewrite square_matrix_ncols, Hr.
+    now rewrite squ_mat_ncols, Hr.
   }
   rewrite <- Htm.
   erewrite (Hmv i _ _ Hi eq_refl); [ | easy ].
@@ -1424,7 +1424,7 @@ assert (Hcu : mat_ncols U = n). {
   congruence.
 }
 assert (Hru : mat_nrows U = n). {
-  now rewrite square_matrix_ncols in Hcu.
+  now rewrite squ_mat_ncols in Hcu.
 }
 move Hru before Hsy; move Hcu before Hru.
 unfold Rayleigh_quotient.
@@ -1539,7 +1539,7 @@ assert (Hcu : mat_ncols U = n). {
   congruence.
 }
 assert (Hru : mat_nrows U = n). {
-  now rewrite square_matrix_ncols in Hcu.
+  now rewrite squ_mat_ncols in Hcu.
 }
 move Hru after Hcu.
 unfold Rayleigh_quotient.

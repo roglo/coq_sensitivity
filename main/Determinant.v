@@ -733,7 +733,7 @@ intros Hic Hop Hin H10 * Hsm Hr Hu Hv Hi.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
-specialize (square_matrix_ncols _ Hsm) as Hcn.
+specialize (squ_mat_ncols _ Hsm) as Hcn.
 (* using the snd version of determinants: determinant' *)
 rewrite det_is_det'; try easy. 2: {
   apply mat_repl_vect_is_square; [ congruence | cbn | easy ].
@@ -1009,7 +1009,7 @@ Proof.
 intros * Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr.
 symmetry in Hr.
-specialize (square_matrix_ncols _ Hsm) as Hcn.
+specialize (squ_mat_ncols _ Hsm) as Hcn.
 specialize (squ_mat_is_corr M Hsm) as Hco.
 apply is_scm_mat_iff in Hsm.
 apply is_scm_mat_iff.
@@ -1514,7 +1514,7 @@ specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-specialize (square_matrix_ncols M Hsm) as Hc.
+specialize (squ_mat_ncols M Hsm) as Hc.
 assert (HM : det M = (- det M)%L). {
   rewrite <- Hr in Hpn, Hqn.
   rewrite <- determinant_alternating with (p := p) (q := q); try easy.
@@ -1625,8 +1625,8 @@ Theorem det_add_row_row : ∀ n (A B C : matrix T),
   → det A = (det B + det C)%L.
 Proof.
 intros * Hnz Hra Hrb Hrc Hsma Hsmb Hsmc Hbc Hb Hc.
-specialize (square_matrix_ncols _ Hsma) as Hca.
-specialize (square_matrix_ncols _ Hsmb) as Hcb.
+specialize (squ_mat_ncols _ Hsma) as Hca.
+specialize (squ_mat_ncols _ Hsmb) as Hcb.
 rewrite Hra in Hca.
 rewrite Hrb in Hcb.
 destruct n; [ easy | clear Hnz; cbn ].
@@ -2363,13 +2363,13 @@ remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   unfold det.
   rewrite mat_transp_nrows, Hr.
-  rewrite square_matrix_ncols; [ | easy ].
+  rewrite squ_mat_ncols; [ | easy ].
   now rewrite Hr, Hnz.
 }
 specialize (mat_transp_is_square M Hsm) as Hts.
 assert (Hs : permut_seq_with_len n (seq 0 n)) by apply seq_permut_seq_with_len.
 assert (Hr' : mat_nrows M⁺ = n). {
-  now rewrite mat_transp_nrows, square_matrix_ncols.
+  now rewrite mat_transp_nrows, squ_mat_ncols.
 }
 rewrite (det_any_permut_l Hif M Hnz Hr Hsm Hs).
 rewrite (det_any_permut_r Hif (M⁺)%M Hnz Hr' Hts Hs).
@@ -2391,12 +2391,12 @@ assert (Hpr : nth k p 0 < mat_nrows M). {
   flia Hnz Hk.
 }
 rewrite (List_map_nth' 0). 2: {
-  now rewrite seq_length, square_matrix_ncols.
+  now rewrite seq_length, squ_mat_ncols.
 }
 rewrite (List_map_nth' 0); [ | rewrite seq_length, Hr; flia Hk Hnz ].
 rewrite seq_nth; [ | rewrite Hr; flia Hk Hnz ].
 rewrite Nat.add_0_l.
-rewrite seq_nth; [ | now rewrite square_matrix_ncols ].
+rewrite seq_nth; [ | now rewrite squ_mat_ncols ].
 now do 2 rewrite Nat.add_1_r.
 Qed.
 
@@ -2409,7 +2409,7 @@ Theorem det_subm_transp : in_charac_0_field →
 Proof.
 intros Hif * Hsm Hi Hj.
 rewrite <- determinant_transpose; [ | easy | ]. 2: {
-  rewrite square_matrix_ncols in Hi; [ | easy ].
+  rewrite squ_mat_ncols in Hi; [ | easy ].
   now apply is_squ_mat_subm.
 }
 now rewrite mat_subm_transp.

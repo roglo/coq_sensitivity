@@ -1488,7 +1488,7 @@ Theorem mat_select_all_rows : ∀ A,
   → mat_select_rows (seq 1 (mat_nrows A)) A = A.
 Proof.
 intros * Hsm.
-specialize (square_matrix_ncols A Hsm) as Hc.
+specialize (squ_mat_ncols A Hsm) as Hc.
 generalize Hsm; intros H.
 apply is_scm_mat_iff in H.
 destruct H as (_, Hcla).
@@ -2180,8 +2180,8 @@ destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
   subst lla llb; cbn.
   symmetry; apply rngl_mul_1_l.
 }
-specialize (square_matrix_ncols A Hsma) as Hac.
-specialize (square_matrix_ncols B Hsmb) as Hbc.
+specialize (squ_mat_ncols A Hsma) as Hac.
+specialize (squ_mat_ncols B Hsmb) as Hbc.
 rewrite Har in Hac; rewrite Hbr in Hbc.
 specialize (squ_mat_is_corr A Hsma) as Hca.
 specialize (squ_mat_is_corr B Hsmb) as Hcb.
@@ -2210,8 +2210,8 @@ assert (H : is_correct_matrix A = true) by now apply squ_mat_is_corr.
 specialize (H1 H); clear H.
 assert (H : is_correct_matrix B = true) by now apply squ_mat_is_corr.
 specialize (H1 H); clear H.
-assert (Hca : mat_ncols A = n) by now rewrite square_matrix_ncols.
-assert (Hcb : mat_ncols B = n) by now rewrite square_matrix_ncols.
+assert (Hca : mat_ncols A = n) by now rewrite squ_mat_ncols.
+assert (Hcb : mat_ncols B = n) by now rewrite squ_mat_ncols.
 specialize (H1 Hra Hca Hrb Hcb).
 rewrite H1.
 unfold sub_lists_of_seq_1_n.
