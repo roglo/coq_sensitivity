@@ -1772,6 +1772,10 @@ Theorem cramer_rule : in_charac_0_field →
   → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
 Proof.
 intros Hif * Hsm Hum Hmz Hmuv k Hk.
+assert (Huv : vect_size V = vect_size U). {
+  rewrite <- Hmuv; cbn.
+  now rewrite map_length.
+}
 specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
 apply (f_equal (mat_mul_vect_r (M⁻¹)%M)) in Hmuv.
 rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
@@ -1804,6 +1808,36 @@ rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
   rewrite if_eqb_eq_dec.
   destruct (Nat.eq_dec _ _) as [Hcz| Hcz]. {
     rewrite (squ_mat_ncols _ Hsm) in Hcz.
+    now rewrite Huv, Hum.
+  } {
+    now rewrite Huv.
+  }
+}
+rewrite Hmuv; cbn - [ det ].
+rewrite List_map_seq_length.
+rewrite (List_map_nth' 0%L). 2: {
+  do 2 rewrite map_length.
+  rewrite seq_length.
+  rewrite comatrix_ncols, (squ_mat_ncols _ Hsm).
+  flia Hk.
+}
+rewrite (List_map_nth' []). 2: {
+  rewrite List_map_seq_length.
+  rewrite comatrix_ncols, (squ_mat_ncols _ Hsm).
+  flia Hk.
+}
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite rngl_div_1_l; [ | now destruct Hif ].
+unfold rngl_div.
+destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+rewrite Hin.
+f_equal.
+rewrite comatrix_ncols.
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, (squ_mat_ncols _ Hsm); flia Hk.
+}
+unfold mat_repl_vect.
+(* pppp.... *)
 ...
 *)
 
