@@ -1774,9 +1774,102 @@ intros; cbn.
 now rewrite map_length.
 Qed.
 
+(* to be completed
+Theorem det_mat_repl_vect : in_charac_0_field →
+  ∀ M V,
+  is_square_matrix M = true
+  → vect_size V = mat_nrows M
+  → ∀ k, 1 ≤ k ≤ mat_ncols M
+  → det (mat_repl_vect k M V) = vect_el ((com M)⁺ • V) k.
+Proof.
+intros Hif * Hsm Hvm * Hk.
+specialize (squ_mat_is_corr _ Hsm) as Hcm.
+move Hcm before Hsm.
+assert (Hk' : k - 1 < mat_ncols M) by flia Hk.
+rewrite laplace_formula_on_cols with (j := k); [ | easy | | ]; cycle 1. {
+  now apply mat_repl_vect_is_square.
+} {
+  rewrite <- (squ_mat_ncols _ Hsm) in Hvm.
+  now rewrite mat_repl_vect_ncols.
+}
+rewrite mat_repl_vect_nrows; [ | easy ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite mat_el_repl_vect; [ | easy | now rewrite Hvm | easy | easy | easy ].
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+}
+cbn - [ mat_el vect_el ].
+unfold mat_mul_vect_r.
+cbn - [ mat_el com ].
+rewrite comatrix_ncols.
+rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
+unfold vect_dot_mul.
+cbn - [ mat_el com ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite map2_map_l.
+rewrite map2_map2_seq_l with (d := 0).
+rewrite map2_map2_seq_r with (d := 0%L).
+rewrite seq_length.
+rewrite fold_vect_size, Hvm.
+rewrite comatrix_nrows.
+rewrite map2_diag.
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_seq_summation. 2: {
+  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
+}
+symmetry.
+rewrite rngl_summation_rshift.
+rewrite Nat.add_0_l.
+rewrite <- Nat_succ_sub_succ_r. 2: {
+  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
+}
+rewrite Nat.sub_0_r.
+apply rngl_summation_eq_compat.
+intros i Hi.
+assert (Hi' : i - 1 < mat_nrows M) by flia Hi.
+rewrite fold_vect_el.
+rewrite <- Nat_succ_sub_succ_r; [ | flia Hi ].
+rewrite Nat.sub_0_r.
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+f_equal.
+unfold com.
+cbn - [ det ].
+rewrite seq_nth; [ | easy ].
+rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+rewrite (seq_nth _ _ Hi').
+rewrite Nat.add_comm, Nat.sub_add; [ | easy ].
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (seq_nth _ _ Hi').
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+rewrite (seq_nth _ _ Hk').
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, map2_length.
+  rewrite fold_mat_nrows, fold_vect_size, Hvm.
+  now rewrite Nat.min_id.
+}
+rewrite seq_nth. 2: {
+  rewrite map2_length.
+  rewrite fold_mat_nrows, fold_vect_size, Hvm.
+  now rewrite Nat.min_id.
+}
+rewrite (List_map_nth' 0). 2: {
+  rewrite seq_length, mat_repl_vect_ncols; [ easy | easy | ].
+  now rewrite (squ_mat_ncols _ Hsm).
+}
+rewrite seq_nth. 2: {
+  rewrite mat_repl_vect_ncols; [ easy | easy | ].
+  now rewrite (squ_mat_ncols _ Hsm).
+}
+f_equal.
+rewrite (Nat.add_comm _ (i - 1)), Nat.sub_add; [ | easy ].
+rewrite (Nat.add_comm _ (k - 1)), Nat.sub_add; [ | easy ].
+unfold mat_repl_vect.
+unfold subm.
+cbn - [ det ].
+Search (map _ (butn _)).
+
 (* Cramer's rule *)
 
-(* to be completed
 Theorem cramer_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
@@ -1844,62 +1937,6 @@ unfold rngl_div.
 destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
 rewrite Hin; f_equal.
 symmetry.
-Theorem det_mat_repl_vect : in_charac_0_field →
-  ∀ M V,
-  is_square_matrix M = true
-  → vect_size V = mat_nrows M
-  → ∀ k, 1 ≤ k ≤ mat_ncols M
-  → det (mat_repl_vect k M V) = vect_el ((com M)⁺ • V) k.
-Proof.
-intros Hif * Hsm Hvm * Hk.
-specialize (squ_mat_is_corr _ Hsm) as Hcm.
-move Hcm before Hsm.
-assert (Hk' : k - 1 < mat_ncols M) by flia Hk.
-rewrite laplace_formula_on_cols with (j := k); [ | easy | | ]; cycle 1. {
-  now apply mat_repl_vect_is_square.
-} {
-  rewrite <- (squ_mat_ncols _ Hsm) in Hvm.
-  now rewrite mat_repl_vect_ncols.
-}
-rewrite mat_repl_vect_nrows; [ | easy ].
-erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  rewrite mat_el_repl_vect; [ | easy | now rewrite Hvm | easy | easy | easy ].
-  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-}
-cbn - [ mat_el vect_el ].
-unfold mat_mul_vect_r.
-cbn - [ mat_el com ].
-rewrite comatrix_ncols.
-rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
-unfold vect_dot_mul.
-cbn - [ mat_el com ].
-rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
-rewrite map2_map_l.
-rewrite map2_map2_seq_l with (d := 0).
-rewrite map2_map2_seq_r with (d := 0%L).
-rewrite seq_length.
-rewrite fold_vect_size, Hvm.
-rewrite comatrix_nrows.
-rewrite map2_diag.
-rewrite rngl_summation_list_map.
-rewrite rngl_summation_seq_summation. 2: {
-  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
-}
-symmetry.
-rewrite rngl_summation_rshift.
-rewrite Nat.add_0_l.
-rewrite <- Nat_succ_sub_succ_r. 2: {
-  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
-}
-rewrite Nat.sub_0_r.
-apply rngl_summation_eq_compat.
-intros i Hi.
-rewrite fold_vect_el.
-rewrite <- Nat_succ_sub_succ_r; [ | flia Hi ].
-rewrite Nat.sub_0_r.
-rewrite rngl_mul_comm; [ | now destruct Hif ].
-f_equal.
 ... ...
 apply det_mat_repl_vect.
 ...
