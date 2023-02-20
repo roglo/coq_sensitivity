@@ -1776,7 +1776,7 @@ Qed.
 
 (* Cramer's rule *)
 
-(* to be completed *)
+(* to be completed
 Theorem cramer_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
