@@ -1776,7 +1776,7 @@ Qed.
 
 (* Cramer's rule *)
 
-(* to be completed
+(* to be completed *)
 Theorem cramer_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
@@ -1857,9 +1857,28 @@ erewrite rngl_summation_eq_compat. 2: {
   } {
     now rewrite (squ_mat_ncols _ Hsm).
   }
-  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+  easy.
 }
 cbn - [ mat_el vect_el ].
+unfold mat_mul_vect_r.
+cbn - [ mat_el com ].
+rewrite comatrix_ncols.
+rewrite (List_map_nth' []).
+unfold vect_dot_mul.
+cbn - [ mat_el com ].
+rewrite (List_map_nth' 0).
+rewrite map2_map_l.
+rewrite map2_map2_seq_r with (d := 0%L).
+rewrite fold_vect_size, Huv, Hum.
+rewrite comatrix_nrows.
+erewrite map2_ext_in. 2: {
+(* ah oui mais non *)
+Search (map2 _ _ (seq _ _)).
+Search (seq (S _)).
+...
+rewrite map2_map2_seq_l with (d := 0).
+rewrite seq_length.
 ...
 *)
 
