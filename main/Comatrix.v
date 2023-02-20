@@ -1867,6 +1867,7 @@ unfold mat_repl_vect.
 unfold subm.
 cbn - [ det ].
 Search (map _ (butn _)).
+...
 
 (* Cramer's rule *)
 
