@@ -1843,7 +1843,23 @@ rewrite rngl_div_1_l; [ | now destruct Hif ].
 unfold rngl_div.
 destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
 rewrite Hin; f_equal.
-Check laplace_formula_on_rows.
+symmetry.
+rewrite laplace_formula_on_cols with (j := k).
+rewrite mat_repl_vect_nrows.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite mat_el_repl_vect; [ | | | easy | | ]; cycle 1. {
+    now apply squ_mat_is_corr.
+  } {
+    now rewrite Huv, Hum.
+  } {
+    now rewrite (squ_mat_ncols _ Hsm).
+  } {
+    now rewrite (squ_mat_ncols _ Hsm).
+  }
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
+}
+cbn - [ mat_el vect_el ].
 ...
 *)
 
