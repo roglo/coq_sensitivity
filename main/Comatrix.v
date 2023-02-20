@@ -1866,7 +1866,23 @@ rewrite (Nat.add_comm _ (k - 1)), Nat.sub_add; [ | easy ].
 unfold mat_repl_vect.
 unfold subm.
 cbn - [ det ].
+Search map2.
+Print map2.
 Search (map _ (butn _)).
+Search (butn _ (map2 _ _ _)).
+
+Theorem butn_map2 : ∀ A B C (f : A → B → C) la lb i,
+  butn i (map2 f la lb) = map2 f (butn i la) (butn i lb).
+Proof.
+intros.
+unfold butn.
+Search (map2 _ (_ ++ _)).
+rewrite map2_app_l.
+rewrite firstn_length.
+Search (firstn _ (map2 _ _ _)).
+...
+rewrite butn_map2.
+Search map
 ...
 
 (* Cramer's rule *)
