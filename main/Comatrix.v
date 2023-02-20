@@ -1854,6 +1854,7 @@ Proof.
 intros Hif * Hsm Hvm * Hk.
 specialize (squ_mat_is_corr _ Hsm) as Hcm.
 move Hcm before Hsm.
+assert (Hk' : k - 1 < mat_ncols M) by flia Hk.
 rewrite laplace_formula_on_cols with (j := k); [ | easy | | ]; cycle 1. {
   now apply mat_repl_vect_is_square.
 } {
@@ -1870,10 +1871,10 @@ cbn - [ mat_el vect_el ].
 unfold mat_mul_vect_r.
 cbn - [ mat_el com ].
 rewrite comatrix_ncols.
-rewrite (List_map_nth' []).
+rewrite (List_map_nth' []); [ | now rewrite List_map_seq_length ].
 unfold vect_dot_mul.
 cbn - [ mat_el com ].
-rewrite (List_map_nth' 0).
+rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
 rewrite map2_map_l.
 rewrite map2_map2_seq_l with (d := 0).
 rewrite map2_map2_seq_r with (d := 0%L).
@@ -1882,17 +1883,22 @@ rewrite fold_vect_size, Hvm.
 rewrite comatrix_nrows.
 rewrite map2_diag.
 rewrite rngl_summation_list_map.
-rewrite rngl_summation_seq_summation.
+rewrite rngl_summation_seq_summation. 2: {
+  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
+}
 symmetry.
 rewrite rngl_summation_rshift.
-rewrite Nat.add_0_l, <- Nat_succ_sub_succ_r.
+rewrite Nat.add_0_l.
+rewrite <- Nat_succ_sub_succ_r. 2: {
+  rewrite <- (squ_mat_ncols _ Hsm); flia Hk.
+}
 rewrite Nat.sub_0_r.
 apply rngl_summation_eq_compat.
 intros i Hi.
 rewrite fold_vect_el.
 rewrite <- Nat_succ_sub_succ_r; [ | flia Hi ].
 rewrite Nat.sub_0_r.
-rewrite rngl_mul_comm.
+rewrite rngl_mul_comm; [ | now destruct Hif ].
 f_equal.
 ... ...
 apply det_mat_repl_vect.
