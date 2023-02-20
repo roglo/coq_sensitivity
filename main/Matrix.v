@@ -3092,6 +3092,7 @@ Arguments mat_ncols {T}%type M%M.
 Arguments mat_nrows {T}%type M%M.
 Arguments mat_opp {T ro} M%M.
 Arguments mat_repl_vect_is_square {T}%type {ro} [k]%nat M%M V%V.
+Arguments mat_repl_vect_ncols {T ro} [k]%nat M%M V%V.
 Arguments matrix_eq {T ro} (MA MB)%M.
 Arguments mat_subm_transp {T ro} [i j]%nat.
 Arguments mat_sub {T ro} MA%M MB%M.

@@ -1844,21 +1844,27 @@ unfold rngl_div.
 destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
 rewrite Hin; f_equal.
 symmetry.
-rewrite laplace_formula_on_cols with (j := k).
-rewrite mat_repl_vect_nrows.
+Theorem det_mat_repl_vect : in_charac_0_field →
+  ∀ M V,
+  is_square_matrix M = true
+  → vect_size V = mat_nrows M
+  → ∀ k, 1 ≤ k ≤ mat_ncols M
+  → det (mat_repl_vect k M V) = vect_el ((com M)⁺ • V) k.
+Proof.
+intros Hif * Hsm Hvm * Hk.
+specialize (squ_mat_is_corr _ Hsm) as Hcm.
+move Hcm before Hsm.
+rewrite laplace_formula_on_cols with (j := k); [ | easy | | ]; cycle 1. {
+  now apply mat_repl_vect_is_square.
+} {
+  rewrite <- (squ_mat_ncols _ Hsm) in Hvm.
+  now rewrite mat_repl_vect_ncols.
+}
+rewrite mat_repl_vect_nrows; [ | easy ].
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite mat_el_repl_vect; [ | | | easy | | ]; cycle 1. {
-    now apply squ_mat_is_corr.
-  } {
-    now rewrite Huv, Hum.
-  } {
-    now rewrite (squ_mat_ncols _ Hsm).
-  } {
-    now rewrite (squ_mat_ncols _ Hsm).
-  }
-  rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
-  easy.
+  rewrite mat_el_repl_vect; [ | easy | now rewrite Hvm | easy | easy | easy ].
+  now rewrite <- if_eqb_eq_dec, Nat.eqb_refl.
 }
 cbn - [ mat_el vect_el ].
 unfold mat_mul_vect_r.
@@ -1869,16 +1875,27 @@ unfold vect_dot_mul.
 cbn - [ mat_el com ].
 rewrite (List_map_nth' 0).
 rewrite map2_map_l.
-rewrite map2_map2_seq_r with (d := 0%L).
-rewrite fold_vect_size, Huv, Hum.
-rewrite comatrix_nrows.
-erewrite map2_ext_in. 2: {
-(* ah oui mais non *)
-Search (map2 _ _ (seq _ _)).
-Search (seq (S _)).
-...
 rewrite map2_map2_seq_l with (d := 0).
+rewrite map2_map2_seq_r with (d := 0%L).
 rewrite seq_length.
+rewrite fold_vect_size, Hvm.
+rewrite comatrix_nrows.
+rewrite map2_diag.
+rewrite rngl_summation_list_map.
+rewrite rngl_summation_seq_summation.
+symmetry.
+rewrite rngl_summation_rshift.
+rewrite Nat.add_0_l, <- Nat_succ_sub_succ_r.
+rewrite Nat.sub_0_r.
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite fold_vect_el.
+rewrite <- Nat_succ_sub_succ_r; [ | flia Hi ].
+rewrite Nat.sub_0_r.
+rewrite rngl_mul_comm.
+f_equal.
+... ...
+apply det_mat_repl_vect.
 ...
 *)
 
