@@ -1768,6 +1768,12 @@ rewrite fold_vect_size.
 flia Hi.
 Qed.
 
+Theorem vect_size_mat_mul_vect_r : ∀ A V, vect_size (A • V) = mat_nrows A.
+Proof.
+intros; cbn.
+now rewrite map_length.
+Qed.
+
 (* Cramer's rule *)
 
 (* to be completed
@@ -1827,33 +1833,17 @@ rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
 rewrite Hmuv.
 rewrite vect_el_mul_scal_l. 2: {
   split; [ easy | ].
-Search (vect_size (_ • _)%V).
-...
-rewrite Hmuv; cbn - [ det ].
-rewrite List_map_seq_length.
-rewrite (List_map_nth' 0%L). 2: {
-  do 2 rewrite map_length.
-  rewrite seq_length.
-  rewrite comatrix_ncols, (squ_mat_ncols _ Hsm).
-  flia Hk.
-}
-rewrite (List_map_nth' []). 2: {
-  rewrite List_map_seq_length.
-  rewrite comatrix_ncols, (squ_mat_ncols _ Hsm).
-  flia Hk.
+  rewrite vect_size_mat_mul_vect_r.
+  rewrite mat_transp_nrows.
+  rewrite comatrix_ncols.
+  now rewrite (squ_mat_ncols _ Hsm).
 }
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite rngl_div_1_l; [ | now destruct Hif ].
 unfold rngl_div.
 destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
-rewrite Hin.
-f_equal.
-rewrite comatrix_ncols.
-rewrite (List_map_nth' 0). 2: {
-  rewrite seq_length, (squ_mat_ncols _ Hsm); flia Hk.
-}
-unfold mat_repl_vect.
-(* pppp.... *)
+rewrite Hin; f_equal.
+Check laplace_formula_on_rows.
 ...
 *)
 
