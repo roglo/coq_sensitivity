@@ -649,6 +649,39 @@ rewrite minus_one_pow_succ; [ | easy ].
 now symmetry; apply rngl_mul_opp_l.
 Qed.
 
+(* to be completed
+Theorem glop_determinant_subm_mat_swap_rows_0_i :
+  ∀ (M : matrix T) i j,
+  is_square_matrix M = true
+  → 1 < i ≤ mat_nrows M
+  → 1 ≤ j ≤ mat_nrows M
+  → det (subm 1 j (mat_swap_rows 1 i M)) =
+    (minus_one_pow i * det (subm i j M))%L.
+Proof.
+intros * Hsm (Hiz, Hin) Hjn.
+destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
+rewrite subm_mat_swap_rows_circ. 2: {
+  split; [ flia Hiz | easy ].
+}
+destruct i; [ flia Hiz | ].
+rewrite minus_one_pow_succ; [ | easy ].
+replace (S i - 2) with (i - 1) by flia.
+rewrite subm_fold_left_lt; [ | flia Hiz ].
+rewrite determinant_circular_shift_rows; [ | easy | | ]. {
+  destruct i; [ flia Hiz | ].
+  rewrite Nat_sub_succ_1.
+  rewrite minus_one_pow_succ; [ | easy ].
+  now rewrite rngl_opp_involutive.
+} {
+  rewrite mat_nrows_subm.
+  generalize Hin; intros H.
+  apply Nat.leb_le in H; rewrite H; clear H; cbn.
+  flia Hin Hiz.
+}
+apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
+Qed.
+*)
+
 Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   ∀ (M : matrix T) i j,
   is_square_matrix M = true
