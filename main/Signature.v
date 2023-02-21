@@ -1290,6 +1290,83 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
+(* to be completed
+Theorem glop_signature_comp_fun_expand_1 :
+  ∀ n f g,
+  permut_seq_with_len n f
+  → permut_seq_with_len n g
+  → (∏ (i = 0, n - 1),
+        (∏ (j = 0, n - 1),
+         if i <? j then
+           rngl_sub_nat (nth (nth j g O) f O) (nth (nth i g O) f O)
+         else 1) /
+      ∏ (i = 0, n - 1),
+        (∏ (j = 0, n - 1),
+         if i <? j then rngl_sub_nat (nth j g O) (nth i g O)
+         else 1))%L =
+    (∏ (i = 0, n - 1),
+       (∏ (j = 0, n - 1),
+        if i <? j then rngl_sub_nat (nth j f O) (nth i f O) else 1) /
+      ∏ (i = 0, n - 1),
+       (∏ (j = 0, n - 1),
+        if i <? j then rngl_sub_nat j i else 1))%L
+  → ε (f ° g) = (ε f * ε g)%L.
+Proof.
+intros * (Hfp, Hfn) (Hgp, Hgn) Hs.
+assert (H10 : rngl_characteristic ≠ 1). {
+  now rewrite (cf_characteristic Hif).
+}
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hos (or_introl H)); clear H.
+specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
+assert (H : rngl_has_inv = true) by now destruct Hif.
+specialize (Hiq (or_introl H)); clear H.
+rewrite <- ε'_ε; [ | easy | now apply (comp_permut_seq n) ].
+rewrite <- ε'_ε; [ | easy | easy ].
+rewrite <- ε'_ε; [ | easy | easy ].
+unfold ε', comp_list; cbn - [ "<?" ].
+rewrite map_length, Hfn, Hgn.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  move Hnz at top; subst n.
+  unfold "<?".
+  do 8 rewrite rngl_product_only_one; cbn.
+  symmetry.
+  rewrite rngl_div_1_r; [ | easy | easy ].
+  apply rngl_mul_1_l.
+}
+erewrite rngl_product_eq_compat. 2: {
+  intros i Hi.
+  erewrite rngl_product_eq_compat. 2: {
+    intros j Hj.
+    rewrite (List_map_nth' 0); [ | flia Hj Hgn Hnz ].
+    rewrite (List_map_nth' 0); [ | flia Hi Hgn Hnz ].
+    easy.
+  }
+  easy.
+}
+rewrite <- Hs; symmetry.
+destruct Hif as (Hop, Hic, Hin, Hit, Hde, Hch).
+apply rngl_div_mul_div; [ easy | ].
+intros Hij.
+apply rngl_product_integral in Hij; [ | easy | easy | easy ].
+destruct Hij as (i & Hi & Hij).
+apply rngl_product_integral in Hij; [ | easy | easy | easy ].
+destruct Hij as (j & Hj & Hij).
+rewrite if_ltb_lt_dec in Hij.
+destruct (lt_dec i j) as [Hlij| Hlij]. 2: {
+  apply rngl_1_neq_0_iff in Hij; [ easy | ].
+  now rewrite Hch.
+}
+apply -> rngl_sub_move_0_r in Hij; [ | easy ].
+apply rngl_of_nat_inj in Hij; [ | easy | easy ].
+apply permut_seq_iff in Hgp.
+destruct Hgp as (_, Hgp).
+apply (NoDup_nat _ Hgp) in Hij; [ | flia Hj Hgn Hnz | flia Hi Hgn Hnz ].
+flia Hi Hj Hlij Hij.
+Qed.
+*)
+
 Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   ∀ n f g,
   permut_seq_with_len n f
@@ -2655,20 +2732,21 @@ Qed.
 
 (* to be completed
 Theorem glop_sign_comp :
+  rngl_has_opp = true →
+  rngl_has_eqb = true →
   ∀ la lb,
   permut_seq_with_len (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
-intros * Hbp.
+intros Hop Heq * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   symmetry.
-  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | easy ].
+  rewrite ε_when_dup; [ | easy | easy | easy ].
   symmetry.
-  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
     intros H; apply Haa; clear Haa.
     now apply NoDup_comp_iff in H.
   }
@@ -2680,6 +2758,8 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   symmetry.
   rewrite <- ε_collapse_ε; [ | easy ].
   symmetry.
+Check signature_comp_fun_expand_1.
+...
   apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
     apply collapse_permut_seq_with_len.
   }
