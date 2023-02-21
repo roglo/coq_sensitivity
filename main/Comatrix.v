@@ -1808,7 +1808,6 @@ destruct i; [ easy | cbn; f_equal ].
 apply IHla.
 Qed.
 
-(* to be completed
 Theorem det_mat_repl_vect : in_charac_0_field →
   ∀ M V,
   is_square_matrix M = true
@@ -1923,46 +1922,10 @@ erewrite map_ext_in. 2: {
   rewrite butn_0_cons.
   now rewrite fold_butn.
 }
-Search (map _ (seq _ _)).
-Check map_butn_seq.
-(* ah fait chier, hein, fait chier *)
-...
-  rewrite firstn_O, app_nil_l.
-...
-  cbn - [ skipn ].
-Search (skipn 1).
-Search (skip
+now rewrite <- List_map_map_seq.
+Qed.
 
-...
-  rewrite firstn_all2.
-...
-apply Nat.ltb_lt in Hi'; rewrite Hi'.
-cbn - [ det ].
-...
-Search (map2 _ _ _ = map2 _ _ _).
-Theorem map2_swap : ∀ (A B C : Type) (f : A → B → C) la lb,
-  map2 f la lb = map2 (λ b a, f a b) lb la.
-...
-rewrite map2_swap.
-Search map2.
-...
-Inspect 3.
-Search map2.
-Print map2.
-Search (map _ (butn _)).
-Search (butn _ (map2 _ _ _)).
-...
-intros.
-unfold butn.
-Search (map2 _ (_ ++ _)).
-rewrite map2_app_l.
-rewrite firstn_length.
-Search (firstn _ (map2 _ _ _)).
-rewrite firstn_map2.
-...
-rewrite butn_map2.
-Search map
-...
+(* to be completed
 
 (* Cramer's rule *)
 
@@ -2030,11 +1993,11 @@ rewrite vect_el_mul_scal_l. 2: {
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite rngl_div_1_l; [ | now destruct Hif ].
 unfold rngl_div.
+...
 destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
 rewrite Hin; f_equal.
 symmetry.
-... ...
-apply det_mat_repl_vect.
+apply (det_mat_repl_vect Hif).
 ...
 *)
 
