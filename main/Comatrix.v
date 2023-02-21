@@ -2014,10 +2014,11 @@ Qed.
 End a.
 
 Arguments com {T}%type {ro} M%M.
-Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
-Arguments mat_inv {T}%type {ro} M%M.
-Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
+Arguments cramer_rule {T ro rp} _ [M%M U%V V%V] _ _ _ _ [i]%nat _.
 Arguments laplace_formula_on_cols {T}%type {ro rp} Hif M%M [j]%nat.
+Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
+Arguments mat_inv {T}%type {ro} M%M.
+Arguments mat_mul_inv_r {T}%type {ro rp} Hof M%L.
 
 Notation "A ⁻¹" := (mat_inv A) (at level 1, format "A ⁻¹") : M_scope.
 

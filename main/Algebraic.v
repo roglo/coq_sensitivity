@@ -7,7 +7,7 @@ Require Import Utf8 Arith.
 Import List ListNotations Init.Nat.
 
 Require Import Misc RingLike IterAdd IterMul.
-Require Import Polynomial Matrix Determinant.
+Require Import Polynomial Matrix Determinant Comatrix.
 Require Import Signature PermutSeq MyVector.
 
 (* Sylvester matrix *)
@@ -98,10 +98,9 @@ unfold det.
 Print determinant_loop.
 (* hou la la, ça promet d'être compliqué, ça ;
    le jeu en vaut-il la chandelle ? *)
-(* needs at least the proof of Cramer's rule ; at the time when I write
-   this comment (17 feb 2023), I do not have it *)
-(* also needs a proof that the determinant can be computed by the last
+(* needs a proof that the determinant can be computed by the last
    column *)
+Check cramer_rule.
 ...
 
 End a.
