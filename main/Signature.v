@@ -2902,6 +2902,7 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   rewrite <- ε_collapse_ε; [ | easy ].
   symmetry.
 Check signature_comp_fun_expand_1.
+Search ε.
 Print ε'.
 ...
   apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
