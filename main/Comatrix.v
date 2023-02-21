@@ -684,12 +684,13 @@ Qed.
 
 (* to be completed
 Theorem glop_laplace_formula_on_rows :
+  rngl_has_opp = true →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
   → 1 ≤ i ≤ mat_nrows M
   → det M = ∑ (j = 1, mat_ncols M), mat_el M i j * mat_el (com M) i j.
 Proof.
-intros * Hsm Hlin.
+intros Hop * Hsm Hlin.
 specialize (squ_mat_ncols M Hsm) as Hc.
 rewrite Hc.
 specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
@@ -705,19 +706,27 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   cbn - [ butn ].
   apply rngl_summation_eq_compat.
   intros j Hj.
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
   rewrite seq_nth; [ | rewrite Hc; flia Hj Hnz ].
   rewrite map_length.
   cbn - [ butn ].
   rewrite <- Nat.sub_succ_l; [ | easy ].
   rewrite Nat_sub_succ_1.
-  f_equal; f_equal.
   rewrite butn_length, fold_mat_nrows.
   apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
-  now rewrite Hnz.
+  rewrite Hnz.
+  rewrite rngl_mul_assoc.
+  f_equal.
+...
+(* faire un lemme qui prouve que mimus_one_pow commute si rngl_has_opp *)
+  unfold minus_one_pow.
+  remember (S j mod 2) as k eqn:Hk; symmetry in Hk.
+  destruct k. {
+    now rewrite rngl_mul_1_r, rngl_mul_1_l.
+  }
+  rewrite (rngl_mul_opp_l Hop).
+  rewrite (rngl_mul_opp_r Hop).
+  now rewrite rngl_mul_1_l, rngl_mul_1_r.
 }
 unfold det.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
@@ -725,17 +734,16 @@ rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
 rewrite Nat_sub_succ_1.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
-  intros j Hj.
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hj.
-  cbn.
+  intros j Hj; cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hlin ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
   rewrite seq_nth; [ | flia Hlin ].
   rewrite seq_nth; [ | flia Hj Hc Hnz ].
   rewrite (Nat.add_comm 1), Nat.sub_add; [ | flia Hlin ].
   rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
-  rewrite rngl_mul_comm; [ | easy ].
-  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite map_length, butn_length, fold_mat_nrows.
+  assert (H : i - 1 < mat_nrows M) by flia Hlin.
+  apply Nat.ltb_lt in H; rewrite H; cbn.
   easy.
 }
 cbn.
@@ -743,7 +751,7 @@ rename i into p.
 remember (mat_swap_rows 1 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  rewrite map_length, butn_length, fold_mat_nrows.
+...
   rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite Nat.add_comm.
   rewrite minus_one_pow_add_r; [ | now destruct Hif ].
