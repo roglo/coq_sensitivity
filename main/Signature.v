@@ -1119,6 +1119,12 @@ Theorem glop_ε'_ε :
   ∀ p, permut_seq p → ε' p = ε p.
 Proof.
 intros * Hp.
+Print ε.
+Print ε'.
+(* il faudrait une version de ε' qui ne fasse pas de division *)
+...
+Print rngl_sub_nat.
+Print ε.
 ...
 apply ε'_ε_1; [ | ].
 apply ε'_ε_1; [ easy | ].
@@ -1458,7 +1464,6 @@ Proof.
 intros Hop * (Hfp, Hfn) (Hgp, Hgn) Hs.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
-Check ε'_ε.
 ...
 rewrite <- ε'_ε; [ | | now apply (comp_permut_seq n) ].
 rewrite <- ε'_ε; [ | easy | easy ].
@@ -2897,6 +2902,7 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   rewrite <- ε_collapse_ε; [ | easy ].
   symmetry.
 Check signature_comp_fun_expand_1.
+Print ε'.
 ...
   apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
     apply collapse_permut_seq_with_len.
