@@ -964,8 +964,7 @@ Theorem diagonalized_matrix_prop : in_charac_0_field →
 Proof.
 intros Hif * Hrn Hlev Hevn Hsy Hvv * Hd Ho.
 assert (H10 : rngl_characteristic ≠ 1). {
-  destruct Hif as (_ & _ & _ & _ & _ & H1).
-  now rewrite H1.
+  now rewrite (cf_characteristic Hif).
 }
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.

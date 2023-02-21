@@ -1146,8 +1146,7 @@ Theorem determinant_alternating : in_charac_0_field →
 Proof.
 intros Hif * Hpq Hp Hq Hsm.
 assert (H10 : rngl_characteristic ≠ 1). {
-  destruct Hif as (_ & _ & _ & _ & _ & H1).
-  now rewrite H1.
+  now rewrite (cf_characteristic Hif).
 }
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
@@ -1190,7 +1189,7 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch) in Hsm.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
@@ -1359,7 +1358,7 @@ erewrite rngl_summation_eq_compat. 2: {
 cbn.
 erewrite rngl_summation_eq_compat. 2: {
   intros k (_, Hk).
-  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch) in Hsm.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic (ε (f k))).
   rewrite <- rngl_mul_assoc.
   rewrite transposition_signature; try easy.
@@ -1508,7 +1507,8 @@ Theorem determinant_same_rows : in_charac_0_field →
   → (∀ j, 1 ≤ j → mat_el M p j = mat_el M q j)
   → det M = 0%L.
 Proof.
-intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hsm Hpq Hpn Hqn Hjpq.
+intros Hif * Hsm Hpq Hpn Hqn Hjpq.
+destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
@@ -1764,8 +1764,7 @@ Theorem det_by_any_sym_gr : in_charac_0_field →
 Proof.
 intros Hif * Hnz Hr Hsm Hsg.
 assert (H10 : rngl_characteristic ≠ 1). {
-  destruct Hif as (_ & _ & _ & _ & _ & H1).
-  now rewrite H1.
+  now rewrite (cf_characteristic Hif).
 }
 rewrite det_is_det'; try now destruct Hif.
 unfold det'.
@@ -2148,7 +2147,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
     rewrite comp_length, isort_rank_length.
     now destruct Hpμ.
   }
-  destruct Hif as (Hic & Hop & Hiv & Hit & Hde & Hch) in Hsm.
+  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
   rewrite NoDup_ε_square; [ | easy | ]. 2: {
@@ -2200,7 +2199,7 @@ erewrite rngl_summation_eq_compat. 2: {
     now rewrite canon_sym_gr_list_length.
   }
   cbn.
-  destruct Hif as (Hic & Hop & Hiv & Hit & Hde & Hch) in Hsm.
+  destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch) in Hsm.
   rewrite rngl_product_map_permut; [ | easy | easy ].
   easy.
 }

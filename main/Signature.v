@@ -712,7 +712,8 @@ Theorem rngl_product_product_abs_diff_div_diff : in_charac_0_field →
         rngl_of_nat (j - i)
       else 1)) = 1%L.
 Proof.
-intros (Hic & Hop & Hin & Hit & Hde & Hch) * Hp.
+intros Hif * Hp.
+destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -852,7 +853,7 @@ Theorem ε'_ε_1 : in_charac_0_field →
   → ε' p = ε p.
 Proof.
 intros Hif * Hij1.
-destruct Hif as (Hic & Hop & Hin & Hit & _ & Hch).
+destruct Hif as (Hic, Hop, Hin, Hit, _, Hch).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
@@ -1299,8 +1300,7 @@ Theorem signature_comp_fun_expand_1 : in_charac_0_field →
 Proof.
 intros Hif * (Hfp, Hfn) (Hgp, Hgn) Hs.
 assert (H10 : rngl_characteristic ≠ 1). {
-  destruct Hif as (_ & _ & _ & _ & _ & H1).
-  now rewrite H1.
+  now rewrite (cf_characteristic Hif).
 }
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
@@ -1332,7 +1332,7 @@ erewrite rngl_product_eq_compat. 2: {
   easy.
 }
 rewrite <- Hs; symmetry.
-destruct Hif as (Hop & Hic & Hin & Hit & Hde & Hch).
+destruct Hif as (Hop, Hic, Hin, Hit, Hde, Hch).
 apply rngl_div_mul_div; [ easy | ].
 intros Hij.
 apply rngl_product_integral in Hij; [ | easy | easy | easy ].
@@ -2669,7 +2669,7 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
     apply collapse_permut_seq_with_len.
   }
-  destruct Hif as (Hop & Hic & Hin & Hit & Hde & Hch).
+  destruct Hif as (Hop, Hic, Hin, Hit, Hde, Hch).
   rewrite signature_comp_fun_expand_2_1; try easy.
   rewrite signature_comp_fun_expand_2_2; try easy.
   apply signature_comp_fun_changement_of_variable; try easy.

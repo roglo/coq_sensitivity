@@ -1635,13 +1635,13 @@ specialize (char_prop 1); cbn in char_prop.
 now rewrite rngl_add_0_r in char_prop.
 Qed.
 
-Definition in_charac_0_field :=
-  rngl_mul_is_comm = true ∧
-  rngl_has_opp = true ∧
-  rngl_has_inv = true ∧
-  rngl_is_integral = true ∧
-  rngl_has_eqb = true ∧
-  rngl_characteristic = 0.
+Record in_charac_0_field :=
+  { cf_mul_is_comm : rngl_mul_is_comm = true;
+    cf_has_opp : rngl_has_opp = true;
+    cf_has_inv : rngl_has_inv = true;
+    cf_is_integral : rngl_is_integral = true;
+    cf_has_eqb : rngl_has_eqb = true;
+    cf_characteristic : rngl_characteristic = 0 }.
 
 End a.
 

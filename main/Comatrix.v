@@ -523,7 +523,8 @@ Theorem determinant_circular_shift_rows : in_charac_0_field →
   → det (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M') (seq 0 i) M) =
     (minus_one_pow i * det M)%L.
 Proof.
-intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hin Hsm.
+intros Hif * Hin Hsm.
+destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 revert M Hsm Hr.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
@@ -656,7 +657,8 @@ Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
   → det (subm 1 j (mat_swap_rows 1 i M)) =
     (minus_one_pow i * det (subm i j M))%L.
 Proof.
-intros (Hic & Hop & Hiv & Hit & Hde & Hch) * Hsm (Hiz, Hin) Hjn.
+intros Hif * Hsm (Hiz, Hin) Hjn.
+destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
 rewrite subm_mat_swap_rows_circ. 2: {
   split; [ flia Hiz | easy ].
 }
@@ -702,7 +704,7 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   cbn - [ butn ].
   apply rngl_summation_eq_compat.
   intros j Hj.
-  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
   rewrite rngl_mul_comm; [ | easy ].
   rewrite rngl_mul_mul_swap; [ | easy ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
@@ -723,7 +725,7 @@ rewrite Nat_sub_succ_1.
 symmetry.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-  destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch) in Hj.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hj.
   cbn.
   rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hlin ].
   rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
@@ -1697,14 +1699,14 @@ destruct (Nat.eq_dec (mat_nrows M) 0) as [Hrz| Hrz]. {
   unfold mat_transp, mat_inv, com; cbn.
   unfold mat_transp; cbn.
   rewrite rngl_inv_1; [ | now destruct Hif | ]. 2: {
-    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
     now rewrite Hch.
   }
   rewrite rngl_div_1_r; cycle 1. {
-    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
     now apply rngl_has_inv_or_quot_iff; left.
   } {
-    destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
+    destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
     now rewrite Hch.
   }
   easy.
@@ -1925,8 +1927,6 @@ erewrite map_ext_in. 2: {
 now rewrite <- List_map_map_seq.
 Qed.
 
-(* to be completed
-
 (* Cramer's rule *)
 
 Theorem cramer_rule : in_charac_0_field →
@@ -1993,13 +1993,11 @@ rewrite vect_el_mul_scal_l. 2: {
 rewrite rngl_mul_comm; [ | now destruct Hif ].
 rewrite rngl_div_1_l; [ | now destruct Hif ].
 unfold rngl_div.
-...
-destruct Hif as (Hic & Hop & Hin & Hit & Hde & Hch).
-rewrite Hin; f_equal.
+rewrite (cf_has_inv Hif); f_equal.
 symmetry.
-apply (det_mat_repl_vect Hif).
-...
-*)
+rewrite <- (squ_mat_ncols _ Hsm) in Hk.
+apply (det_mat_repl_vect Hif); [ easy | congruence | easy ].
+Qed.
 
 (* *)
 
