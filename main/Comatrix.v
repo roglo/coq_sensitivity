@@ -516,6 +516,141 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
+(*
+Theorem glop_determinant_circular_shift_rows :
+  ∀ (M : matrix T) i,
+  i < mat_nrows M
+  → is_square_matrix M = true
+  → det (fold_left (λ M' k, mat_swap_rows (k + 1) (k + 2) M') (seq 0 i) M) =
+    (minus_one_pow i * det M)%L.
+Proof.
+intros * Hin Hsm.
+destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+revert M Hsm Hr.
+induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
+assert (H : i < n) by flia Hin.
+specialize (IHi H); clear H.
+rewrite seq_S; cbn.
+rewrite fold_left_app; cbn - [ det ].
+rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
+  rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
+} {
+  rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
+} {
+  specialize (squ_mat_ncols _ Hsm) as Hc1.
+  apply is_scm_mat_iff.
+  apply is_scm_mat_iff in Hsm.
+  destruct Hsm as (Hcr & Hc).
+  rewrite Hr in Hc1.
+  rewrite mat_nrows_fold_left_swap.
+  split. {
+    intros Hc'.
+    unfold mat_ncols in Hc'.
+    rewrite fold_left_mat_fold_left_list_list in Hc'.
+    cbn in Hc'.
+    erewrite List_fold_left_ext_in in Hc'. 2: {
+      intros j ll' Hj.
+      erewrite map_ext_in. 2: {
+        intros k Hk.
+        now rewrite Nat.add_sub, Nat.add_succ_r, Nat_sub_succ_1.
+      }
+      easy.
+    }
+    apply length_zero_iff_nil in Hc'.
+    rewrite List_hd_nth_0 in Hc'.
+    rewrite nth_fold_left_map_transp in Hc'.
+    rewrite fold_mat_nrows in Hc'.
+    do 2 rewrite Nat.add_0_l in Hc'.
+    destruct (le_dec (mat_nrows M) 0) as [Hlz| Hlz]. {
+      now apply Nat.le_0_r in Hlz.
+    }
+    apply Nat.nle_gt in Hlz.
+    destruct (Nat.eq_dec 0 i) as [Hiz| Hiz]. {
+      subst i.
+      apply Hcr.
+      unfold mat_ncols.
+      rewrite List_hd_nth_0.
+      now rewrite Hc'.
+    }
+    rewrite Nat.sub_0_r in Hc'.
+    destruct (le_dec (mat_nrows M) i) as [Hri| Hri]. {
+      unfold mat_nrows in Hc'.
+      rewrite <- List_fold_left_map_nth_len in Hc'.
+      rewrite nth_fold_left_map_transp' in Hc'; cycle 1. {
+        rewrite fold_mat_nrows.
+        flia Hin Hr.
+      } {
+        now rewrite fold_mat_nrows.
+      }
+      cbn in Hc'.
+      apply (f_equal length) in Hc'.
+      rewrite Hc in Hc'. 2: {
+        apply nth_In.
+        rewrite fold_mat_nrows.
+        flia Hr Hin.
+      }
+      easy.
+    }
+    apply Nat.nle_gt in Hri.
+    cbn in Hc'.
+    apply (f_equal length) in Hc'.
+    rewrite Hc in Hc'. 2: {
+      apply nth_In.
+      rewrite fold_mat_nrows.
+      flia Hr Hin.
+    }
+    easy.
+  }
+  intros la Hla.
+  rewrite fold_left_mat_fold_left_list_list in Hla.
+  cbn in Hla.
+  apply In_nth with (d := []) in Hla.
+  rewrite length_fold_left_map_transp, fold_mat_nrows in Hla.
+  destruct Hla as (j & Hj & Hla).
+  erewrite List_fold_left_ext_in in Hla. 2: {
+    intros k ll' Hk.
+    erewrite map_ext_in. 2: {
+      intros l Hl.
+      now rewrite Nat.add_sub, Nat.add_succ_r, Nat_sub_succ_1.
+    }
+    easy.
+  }
+  rewrite nth_fold_left_map_transp in Hla.
+  rewrite fold_mat_nrows in Hla.
+  rewrite Nat.add_0_l in Hla.
+  destruct (le_dec (mat_nrows M) j) as [H| H]; [ flia Hj H | clear H ].
+  destruct (Nat.eq_dec j i) as [Hji| Hji]. {
+    subst la.
+    apply Hc, nth_In.
+    rewrite fold_mat_nrows; flia Hj.
+  }
+  destruct (le_dec (mat_nrows M) 0) as [H| H]; [ flia Hj H | clear H ].
+  destruct (le_dec (mat_nrows M) i) as [H| H]; [ flia Hin Hr H | clear H ].
+  subst la.
+  unfold Nat.b2n.
+  rewrite Bool.andb_if.
+  do 2 rewrite if_leb_le_dec.
+  destruct (le_dec 0 j) as [Hjz| Hjz]. {
+    destruct (le_dec j i) as [Hji'| Hji']. {
+      apply Hc, nth_In.
+      rewrite fold_mat_nrows.
+      rewrite Hr in Hj |-*.
+      flia Hji' Hin.
+    }
+    apply Nat.nle_gt in Hji'.
+    rewrite Nat.add_0_r.
+    apply Hc, nth_In.
+    now rewrite fold_mat_nrows.
+  }
+  now apply Nat.nle_gt in Hjz.
+}
+rewrite IHi; [ | easy | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+now symmetry; apply rngl_mul_opp_l.
+Qed.
+*)
+
 Theorem determinant_circular_shift_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   i < mat_nrows M
@@ -651,6 +786,7 @@ Qed.
 
 (* to be completed
 Theorem glop_determinant_subm_mat_swap_rows_0_i :
+  rngl_has_opp = true →
   ∀ (M : matrix T) i j,
   is_square_matrix M = true
   → 1 < i ≤ mat_nrows M
@@ -658,8 +794,10 @@ Theorem glop_determinant_subm_mat_swap_rows_0_i :
   → det (subm 1 j (mat_swap_rows 1 i M)) =
     (minus_one_pow i * det (subm i j M))%L.
 Proof.
-intros * Hsm (Hiz, Hin) Hjn.
+intros Hop * Hsm (Hiz, Hin) Hjn.
+(*
 destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
+*)
 rewrite subm_mat_swap_rows_circ. 2: {
   split; [ flia Hiz | easy ].
 }
@@ -667,6 +805,8 @@ destruct i; [ flia Hiz | ].
 rewrite minus_one_pow_succ; [ | easy ].
 replace (S i - 2) with (i - 1) by flia.
 rewrite subm_fold_left_lt; [ | flia Hiz ].
+...
+rewrite determinant_circular_shift_rows; [ | | | ]. {
 rewrite determinant_circular_shift_rows; [ | easy | | ]. {
   destruct i; [ flia Hiz | ].
   rewrite Nat_sub_succ_1.
@@ -680,6 +820,7 @@ rewrite determinant_circular_shift_rows; [ | easy | | ]. {
 }
 apply is_squ_mat_subm; [ flia Hin | flia Hjn | easy ].
 Qed.
+...
 *)
 
 Theorem determinant_subm_mat_swap_rows_0_i : in_charac_0_field →
