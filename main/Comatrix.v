@@ -1929,6 +1929,78 @@ Qed.
 
 (* Cramer's rule *)
 
+(* to be completed
+Theorem glop_cramer's_rule : in_charac_0_field →
+  ∀ (M : matrix T) (U V : vector T),
+  is_square_matrix M = true
+  → vect_size U = mat_nrows M
+ → det M ≠ 0%L
+  → (M • U)%V = V
+  → ∀ i,
+  1 ≤ i ≤ mat_nrows M
+  → vect_el U i = (det (mat_repl_vect i M V) / det M)%L.
+Proof.
+intros Hif * Hsm Hum Hmz Hmuv k Hk.
+assert (Huv : vect_size V = vect_size U). {
+  rewrite <- Hmuv; cbn.
+  now rewrite map_length.
+}
+specialize (mat_inv_det_comm Hif M Hsm Hmz) as H1.
+apply (f_equal (mat_mul_vect_r (M⁻¹)%M)) in Hmuv.
+rewrite mat_vect_mul_assoc in  Hmuv; cycle 1. {
+  now destruct Hif.
+} {
+  apply mat_inv_is_corr.
+  now apply squ_mat_is_corr.
+} {
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_inv_ncols.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]; [ | easy ].
+  now rewrite squ_mat_ncols in Hcz.
+} {
+  now rewrite squ_mat_ncols.
+}
+rewrite mat_mul_inv_l in Hmuv; [ | easy | easy | easy ].
+rewrite mat_vect_mul_1_l in Hmuv; [ | now destruct Hif | easy ].
+rewrite H1 in Hmuv.
+rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
+  now destruct Hif.
+} {
+  apply mat_transp_is_corr.
+  apply comatrix_is_correct.
+  now apply squ_mat_is_corr.
+} {
+  rewrite mat_transp_ncols.
+  rewrite comatrix_ncols, comatrix_nrows.
+  rewrite if_eqb_eq_dec.
+  destruct (Nat.eq_dec _ _) as [Hcz| Hcz]. {
+    rewrite (squ_mat_ncols _ Hsm) in Hcz.
+    now rewrite Huv, Hum.
+  } {
+    now rewrite Huv.
+  }
+}
+rewrite Hmuv.
+rewrite vect_el_mul_scal_l. 2: {
+  split; [ easy | ].
+  rewrite vect_size_mat_mul_vect_r.
+  rewrite mat_transp_nrows.
+  rewrite comatrix_ncols.
+  now rewrite (squ_mat_ncols _ Hsm).
+}
+rewrite rngl_mul_comm; [ | now destruct Hif ].
+rewrite rngl_div_1_l; [ | now destruct Hif ].
+unfold rngl_div.
+rewrite (cf_has_inv Hif); f_equal.
+symmetry.
+rewrite <- (squ_mat_ncols _ Hsm) in Hk.
+apply (det_mat_repl_vect Hif); [ easy | congruence | easy ].
+Qed.
+...
+*)
+
 Theorem cramer's_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
