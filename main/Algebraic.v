@@ -94,8 +94,10 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
+(*
 unfold det; cbn.
 Print determinant_loop.
+*)
 (* hou la la, ça promet d'être compliqué, ça ;
    le jeu en vaut-il la chandelle ? *)
 (* needs a proof that the determinant can be computed by the last
