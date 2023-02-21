@@ -106,6 +106,21 @@ set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
 specialize (Hcr rop rpp).
 assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
+    apply Hif.
+  } {
+    unfold rngl_has_opp; cbn.
+    unfold polyn_opt_opp_or_subt.
+cbn.
+...
+rewrite (cf_has_opp Hif).
+...
+rewrite rop.
+Set Printing All.
+    apply rngl_has_opp_or_subt_iff.
+
+Print polyn_ring_like_op.
+apply polyn_opt_opp_or_subt.
+    apply rngl_has_opp.
 ...
 specialize (cramer's_rule Hif) as Hcr.
 specialize (Hcr (mk_mat ll)).
