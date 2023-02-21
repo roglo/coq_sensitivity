@@ -2750,14 +2750,12 @@ Qed.
 Theorem ε_of_sym_gr_permut_succ :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   ∀ n k,
   k < (S n)!
   → ε (canon_sym_gr_list (S n) k) =
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
-intros Hic Hop Hin H10 * Hkn.
+intros Hic Hop * Hkn.
 unfold ε at 1.
 rewrite canon_sym_gr_list_length.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
@@ -3118,7 +3116,7 @@ Arguments sign_diff {T}%type {ro} (u v)%nat.
 
 Arguments ε_nil {T ro rp}.
 Arguments ε_permut {T}%type {ro} (n k)%nat.
-Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} _ (n k)%nat.
+Arguments ε_of_sym_gr_permut_succ {T}%type {ro rp} Hic Hop (n k)%nat.
 Arguments comp_permut_seq n%nat [σ₁ σ₂]%list.
 Arguments map_nth_permut_seq n%nat [la lb]%list.
 Arguments permut_isort_rank_comp n%nat [la lb]%list.

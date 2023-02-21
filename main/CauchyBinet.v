@@ -1377,14 +1377,12 @@ Proof. now intros; subst n. Qed.
 Theorem det_is_det''' :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
-  rngl_has_inv = true →
-  rngl_characteristic ≠ 1 →
   rngl_has_eqb = true →
   ∀ M, is_square_matrix M = true
   → det M = det''' M.
 Proof.
-intros Hic Hop Hin H10 Heq * Hm.
-rewrite det_is_det''; [ | easy | easy | easy | easy | easy | easy ].
+intros Hic Hop Heq * Hm.
+rewrite det_is_det''; [ | easy | easy | easy | easy ].
 unfold det'', det'''.
 unfold cart_prod_rep_seq.
 rewrite rngl_summation_cart_prod_sub_lists_all_permut; [ | easy | easy ].
