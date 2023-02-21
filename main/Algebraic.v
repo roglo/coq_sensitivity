@@ -108,19 +108,28 @@ assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
   split. {
     apply Hif.
   } {
-    unfold rngl_has_opp; cbn.
-    unfold polyn_opt_opp_or_subt.
-cbn.
-...
-rewrite (cf_has_opp Hif).
-...
-rewrite rop.
+    specialize (cf_has_opp Hif) as H.
+    unfold rngl_has_opp in H |-*; cbn.
+    unfold polyn_opt_opp_or_subt; cbn.
+    destruct rngl_opt_opp_or_subt as [s| ]; [ | easy ].
+    now destruct s.
+  } {
 Set Printing All.
-    apply rngl_has_opp_or_subt_iff.
-
-Print polyn_ring_like_op.
-apply polyn_opt_opp_or_subt.
-    apply rngl_has_opp.
+(* ah mais non, les polynômes n'ont pas d'inverse ! *)
+...
+    specialize (cf_has_inv Hif) as H.
+    unfold rngl_has_inv in H |-*; cbn.
+    unfold polyn_opt_inv_or_quot; cbn.
+    rewrite (cf_mul_is_comm Hif); cbn.
+    rewrite (cf_has_opp Hif); cbn.
+    rewrite (cf_has_inv Hif); cbn.
+    remember rngl_opt_inv_or_quot as x eqn:Hx.
+    symmetry in Hx.
+    destruct x as [inv_quot| ]; [ | easy ].
+    destruct inv_quot as [inv| ]; [ | easy ].
+...
+    destruct rngl_opt_inv_or_quot as [inv_quot| ]; [ | easy ].
+    destruct inv_quot as [inv| ]; [ | easy ].
 ...
 specialize (cramer's_rule Hif) as Hcr.
 specialize (Hcr (mk_mat ll)).
