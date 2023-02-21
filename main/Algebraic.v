@@ -78,11 +78,12 @@ Definition lap_bezout_resultant_coeff (P Q : list T) :=
      let s' := mk_mat (map (λ l, firstn (length l - 1) l) (butn i s)) in
      (minus_one_pow (m + n + i + 1) * (repeat 0%L j ++ [det s']))%lap).
 
-Theorem lap_bezout_is_resultant : ∀ (P Q U V : list T),
+Theorem lap_bezout_is_resultant : in_charac_0_field →
+  ∀ (P Q U V : list T),
   lap_bezout_resultant_coeff P Q = (U, V)
   → lap_norm (U * P + V * Q)%lap = [lap_resultant P Q].
 Proof.
-intros * Hbr.
+intros Hif * Hbr.
 unfold lap_bezout_resultant_coeff in Hbr.
 remember lap_ring_like_op as rol eqn:Hrol.
 injection Hbr; clear Hbr; intros HV HU.
@@ -94,15 +95,9 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
-(*
-unfold det; cbn.
-Print determinant_loop.
-*)
-(* hou la la, ça promet d'être compliqué, ça ;
-   le jeu en vaut-il la chandelle ? *)
-(* needs a proof that the determinant can be computed by the last
-   column *)
-Check cramer_rule.
+specialize (cramer_rule Hif) as Hcr.
+specialize (Hcr (mk_mat ll)).
+specialize (Hcr (mk_vect (repeat 1%L (n + m)))).
 ...
 
 End a.
