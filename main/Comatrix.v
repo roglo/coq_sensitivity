@@ -516,7 +516,7 @@ rewrite <- IHm; [ | flia Hmi ].
 apply subm_mat_swap_rows_lt; flia Hmi.
 Qed.
 
-(*
+(* to be completed
 Theorem glop_determinant_circular_shift_rows :
   ∀ (M : matrix T) i,
   i < mat_nrows M
@@ -525,7 +525,9 @@ Theorem glop_determinant_circular_shift_rows :
     (minus_one_pow i * det M)%L.
 Proof.
 intros * Hin Hsm.
+(*
 destruct Hif as (Hic, Hop, Hiv, Hit, Hde, Hch).
+*)
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
 revert M Hsm Hr.
 induction i; intros; [ now cbn; rewrite rngl_mul_1_l | ].
@@ -533,6 +535,8 @@ assert (H : i < n) by flia Hin.
 specialize (IHi H); clear H.
 rewrite seq_S; cbn.
 rewrite fold_left_app; cbn - [ det ].
+rewrite determinant_alternating; [ | | flia | | | ]; cycle 1. {
+...
 rewrite determinant_alternating; [ | easy | flia | | | ]; cycle 1. {
   rewrite mat_nrows_fold_left_swap, Hr; flia Hin.
 } {

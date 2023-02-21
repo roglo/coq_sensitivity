@@ -1136,6 +1136,370 @@ destruct (Nat.eq_dec j q) as [Hjq| Hjq]. {
 now apply nth_canon_sym_gr_list_inj1 in Hij.
 Qed.
 
+(* to be completed
+Theorem glop_determinant_alternating :
+  ∀ (M : matrix T) p q,
+  p ≠ q
+  → 1 ≤ p ≤ mat_nrows M
+  → 1 ≤ q ≤ mat_nrows M
+  → is_square_matrix M = true
+  → det (mat_swap_rows p q M) = (- det M)%L.
+Proof.
+intros * Hpq Hp Hq Hsm.
+assert (H10 : rngl_characteristic ≠ 1). {
+  now rewrite (cf_characteristic Hif).
+}
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+rewrite det_is_det'; try now destruct Hif. 2: {
+  rewrite <- Hr in Hp, Hq.
+  now apply mat_swap_rows_is_square.
+}
+unfold det'.
+rewrite mat_swap_rows_nrows.
+rewrite Hr.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite (rngl_product_shift 1); [ | flia Hp ].
+  rewrite Nat.sub_diag.
+  erewrite rngl_product_eq_compat. 2: {
+    intros i Hi.
+    now rewrite Nat.add_comm, Nat.add_sub.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  rewrite rngl_product_change_var with
+    (g := transposition (p - 1) (q - 1)) (h := transposition (p - 1) (q - 1)).
+  2: {
+    intros i Hi.
+    apply transposition_involutive.
+  }
+  rewrite Nat.sub_0_r.
+  rewrite <- Nat.sub_succ_l; [ | flia Hp ].
+  rewrite Nat_sub_succ_1.
+  easy.
+}
+cbn - [ mat_swap_rows ].
+assert (Hp' : p - 1 < n) by flia Hp.
+assert (Hq' : q - 1 < n) by flia Hq.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
+  rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
+      (lb := seq 0 n); [ | easy | ]. 2: {
+    remember (map _ _) as la eqn:Hla.
+    replace n with (length la) by now rewrite Hla, List_map_seq_length.
+    subst la.
+    now apply transposition_permut_seq_with_len.
+  }
+  easy.
+}
+cbn - [ mat_swap_rows ].
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    replace (mat_el _ _ _) with
+      (mat_el M (i + 1)
+         (nth (transposition (p - 1) (q - 1) i) (canon_sym_gr_list n k) 0 + 1)).
+    2: {
+      cbn.
+      unfold mat_el; f_equal.
+      unfold list_swap_elem.
+      do 2 rewrite Nat.add_sub.
+      rewrite (List_map_nth' 0). 2: {
+        rewrite seq_length.
+        rewrite fold_mat_nrows, Hr.
+        apply in_seq in Hi.
+        now apply transposition_lt.
+      }
+      rewrite fold_mat_nrows, Hr.
+      unfold transposition.
+      do 2 rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
+        subst i.
+        rewrite seq_nth; [ | easy ].
+        rewrite Nat.add_0_l.
+        rewrite Nat.eqb_refl.
+        apply Nat.neq_sym in Hpq.
+        destruct (Nat.eq_dec (q - 1) (p - 1)) as [H| H]; [ | easy ].
+        now rewrite H.
+      }
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
+        subst i.
+        rewrite seq_nth; [ | easy ].
+        rewrite Nat.add_0_l.
+        rewrite <- if_eqb_eq_dec.
+        now rewrite Nat.eqb_refl.
+      }
+      apply in_seq in Hi.
+      rewrite seq_nth; [ | easy ].
+      rewrite Nat.add_0_l.
+      rewrite if_eqb_eq_dec.
+      destruct (Nat.eq_dec i (p - 1)) as [H| H]; [ easy | clear H ].
+      now destruct (Nat.eq_dec i (q - 1)).
+    }
+    easy.
+  }
+  easy.
+}
+cbn.
+set (f := λ k, list_swap_elem 0 (canon_sym_gr_list n k) (p - 1) (q - 1)).
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  erewrite rngl_product_list_eq_compat. 2: {
+    intros i Hi.
+    apply in_seq in Hi.
+    replace (nth _ _ 0) with
+       (nth i (list_swap_elem 0 (canon_sym_gr_list n k) (p - 1) (q - 1)) 0).
+    2: {
+(* lemme à faire *)
+      unfold list_swap_elem.
+      rewrite (List_map_nth' 0). 2: {
+        now rewrite seq_length, canon_sym_gr_list_length.
+      }
+      rewrite seq_nth; [ easy | now rewrite canon_sym_gr_list_length ].
+    }
+    fold (f k).
+    easy.
+  }
+  easy.
+}
+cbn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k Hk.
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  erewrite rngl_product_seq_product; [ | flia Hp ].
+  rewrite Nat.add_0_l.
+  replace (canon_sym_gr_list n k) with
+     (map (λ i, nth (transposition (p - 1) (q - 1) i) (f k) 0) (seq 0 n)).
+  2: {
+    rewrite List_map_nth_seq with (d := 0).
+    rewrite canon_sym_gr_list_length.
+    apply map_ext_in.
+    intros i Hi; cbn.
+    apply in_seq in Hi.
+    unfold f, list_swap_elem.
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length, canon_sym_gr_list_length.
+      now apply transposition_lt.
+    }
+    rewrite seq_nth. 2: {
+      rewrite canon_sym_gr_list_length.
+      now apply transposition_lt.
+    }
+    rewrite Nat.add_0_l.
+    now rewrite transposition_involutive.
+  }
+  replace (map (λ i, nth (transposition (p - 1) (q - 1) i) (f k) 0) (seq 0 n))
+  with (f k ° map (λ i, transposition (p - 1) (q - 1) i) (seq 0 n)). 2: {
+    unfold "°"; cbn.
+    now rewrite map_map.
+  }
+  rewrite sign_comp; [ | easy | ]. 2: {
+    split. 2: {
+      rewrite List_map_seq_length.
+      unfold f.
+      rewrite list_swap_elem_length.
+      symmetry.
+      apply canon_sym_gr_list_length.
+    }
+    apply permut_seq_iff.
+    split. {
+      intros i Hi.
+      rewrite List_map_seq_length.
+      apply In_nth with (d := 0) in Hi.
+      rewrite List_map_seq_length in Hi.
+      destruct Hi as (j & Hj & Hji).
+      rewrite (List_map_nth' 0) in Hji; [ | now rewrite seq_length ].
+      rewrite seq_nth in Hji; [ | easy ].
+      rewrite <- Hji.
+      now apply transposition_lt.
+    }
+    apply (NoDup_map_iff 0).
+    rewrite seq_length.
+    intros i j Hi Hj Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    cbn in Hij.
+    unfold transposition in Hij.
+    do 4 rewrite if_eqb_eq_dec in Hij.
+    destruct (Nat.eq_dec i (p - 1)) as [Hip| Hip]. {
+      subst i.
+      destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
+      symmetry in Hij.
+      destruct (Nat.eq_dec j (q - 1)); [ | easy ].
+      congruence.
+    }
+    destruct (Nat.eq_dec i (q - 1)) as [Hiq| Hiq]. {
+      subst i.
+      symmetry in Hij.
+      destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
+      now destruct (Nat.eq_dec j (q - 1)).
+    }
+    destruct (Nat.eq_dec j (p - 1)) as [Hjp| Hjp]; [ easy | ].
+    now destruct (Nat.eq_dec j (q - 1)).
+  }
+  easy.
+}
+cbn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros k (_, Hk).
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
+  rewrite (rngl_mul_comm Hic (ε (f k))).
+  rewrite <- rngl_mul_assoc.
+  rewrite transposition_signature; try easy.
+  flia Hp Hq Hpq.
+}
+cbn - [ f ].
+rewrite <- rngl_mul_summation_distr_l; [ | easy ].
+rewrite rngl_mul_opp_l; [ | now destruct Hif ].
+f_equal.
+rewrite rngl_mul_1_l.
+symmetry.
+set (g := λ k, canon_sym_gr_list_inv n (f k)).
+rewrite rngl_summation_change_var with (g := g) (h := g). 2: {
+  intros k (_, Hk).
+  assert (Hkn : k < n!). {
+    specialize (fact_neq_0 n) as Hn.
+    flia Hk Hn.
+  }
+  unfold g, f.
+  unfold list_swap_elem.
+  do 2 rewrite canon_sym_gr_list_length.
+  erewrite map_ext_in. 2: {
+    intros i Hi; apply in_seq in Hi.
+    rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+(* lemme à faire ? *)
+      split; [ | now rewrite map_length, seq_length ].
+      apply permut_seq_iff.
+      split. {
+        intros j Hj.
+        rewrite map_length, seq_length.
+        apply in_map_iff in Hj.
+        destruct Hj as (m & Hmj & Hm).
+        apply in_seq in Hm.
+        rewrite <- Hmj.
+        apply canon_sym_gr_list_ub; [ easy | ].
+        apply transposition_lt; [ flia Hp | flia Hq | easy ].
+      } {
+        apply (NoDup_map_iff 0).
+        rewrite seq_length.
+        intros u v Hu Hv Huv.
+        rewrite seq_nth in Huv; [ | easy ].
+        rewrite seq_nth in Huv; [ | easy ].
+        cbn in Huv.
+        now apply nth_transposition_canon_sym_gr_list_inj in Huv.
+      }
+    }
+    rewrite (List_map_nth' 0). 2: {
+      rewrite seq_length.
+      now apply transposition_lt.
+    }
+    rewrite seq_nth. 2: {
+      now apply transposition_lt.
+    }
+    rewrite Nat.add_0_l.
+    rewrite transposition_involutive.
+    easy.
+  }
+  rewrite <- List_map_nth_seq'; [ | now rewrite canon_sym_gr_list_length ].
+  now apply canon_sym_gr_list_inv_canon_sym_gr_list.
+}
+rewrite Nat.sub_0_r.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat_sub_succ_1.
+rewrite (rngl_summation_list_permut _ Nat.eqb_eq) with (lb := seq 0 n!);
+    cycle 1. {
+  remember (map _ _) as la eqn:Hla.
+  replace n! with (length la) by now rewrite Hla, List_map_seq_length.
+  subst la.
+(* lemma to do? *)
+  unfold g, f.
+  apply permut_seq_iff.
+  split. {
+    intros i Hi.
+    rewrite map_length, seq_length.
+    apply in_map_iff in Hi.
+    destruct Hi as (j & Hji & Hj).
+    apply in_seq in Hj.
+    rewrite <- Hji.
+    apply canon_sym_gr_list_inv_ub.
+    apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
+    now apply canon_sym_gr_list_permut_seq_with_len.
+  } {
+    apply (NoDup_map_iff 0).
+    rewrite seq_length.
+    intros i j Hi Hj Hij.
+    rewrite seq_nth in Hij; [ | easy ].
+    rewrite seq_nth in Hij; [ | easy ].
+    do 2 rewrite Nat.add_0_l in Hij.
+    apply rank_of_permut_in_canon_gr_list_inj in Hij; cycle 1. {
+      apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
+      now apply canon_sym_gr_list_permut_seq_with_len.
+    } {
+      apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
+      now apply canon_sym_gr_list_permut_seq_with_len.
+    }
+(* lemme à faire ? *)
+    unfold list_swap_elem in Hij.
+    do 2 rewrite canon_sym_gr_list_length in Hij.
+    apply nth_canon_sym_gr_list_inj2 with (n := n); [ easy | easy | ].
+    intros k Hkn.
+    apply ext_in_map with (a := transposition (p - 1) (q - 1) k) in Hij. 2: {
+      apply in_seq.
+      split; [ flia | ].
+      now apply transposition_lt.
+    }
+    now rewrite transposition_involutive in Hij.
+  }
+}
+rewrite det_is_det'; try now destruct Hif.
+unfold det'.
+rewrite rngl_summation_seq_summation; [ | apply fact_neq_0 ].
+rewrite Nat.add_0_l.
+rewrite Hr.
+apply rngl_summation_eq_compat.
+intros k Hk.
+assert (Hkn : k < n!). {
+  specialize (fact_neq_0 n) as Hn.
+  flia Hk Hn.
+}
+assert (Hc : canon_sym_gr_list n k = f (g k)). {
+  unfold g, f.
+  rewrite canon_sym_gr_list_canon_sym_gr_list_inv. 2: {
+    apply list_swap_elem_permut_seq_with_len; [ easy | easy | ].
+    now apply canon_sym_gr_list_permut_seq_with_len.
+  }
+  rewrite list_swap_elem_involutive; [ easy | | ]. {
+    now rewrite canon_sym_gr_list_length.
+  } {
+    now rewrite canon_sym_gr_list_length.
+  }
+}
+f_equal; [ now rewrite Hc | ].
+rewrite (rngl_product_shift 1); [ | flia Hp ].
+apply rngl_product_eq_compat.
+intros i Hi.
+rewrite Nat.add_comm, Nat.add_sub.
+now rewrite Hc.
+Qed.
+*)
+
 Theorem determinant_alternating : in_charac_0_field →
   ∀ (M : matrix T) p q,
   p ≠ q
