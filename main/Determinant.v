@@ -500,6 +500,8 @@ symmetry.
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite minus_one_pow_succ; [ | easy ].
 rewrite rngl_opp_involutive; [ | easy ].
+About ε_of_sym_gr_permut_succ.
+...
 apply ε_of_sym_gr_permut_succ; try easy.
 apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
 apply Nat.sub_lt; [ | easy ].
