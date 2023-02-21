@@ -95,6 +95,18 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
+specialize @cramer's_rule as Hcr.
+specialize (Hcr (polyn T)).
+assert (Hos : rngl_has_opp_or_subt = true). {
+  apply rngl_has_opp_or_subt_iff; left.
+  apply (cf_has_opp Hif).
+}
+set (rop := polyn_ring_like_op (cf_has_eqb Hif) Hos).
+set (rpp := @polyn_ring_like_prop T ro rp (cf_has_eqb Hif) Hos).
+specialize (Hcr rop rpp).
+assert (Hifp : @in_charac_0_field (polyn T) rop rpp). {
+  split. {
+...
 specialize (cramer's_rule Hif) as Hcr.
 specialize (Hcr (mk_mat ll)).
 ...
