@@ -784,7 +784,10 @@ Proof. easy. Qed.
 Theorem butn_nil : ∀ A n, butn n ([] : list A) = [].
 Proof. now intros; destruct n. Qed.
 
-Theorem butn_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
+Theorem butn_0_cons : ∀ A (a : A) la, butn 0 (a :: la) = la.
+Proof. easy. Qed.
+
+Theorem butn_succ_cons : ∀ A (a : A) la n, butn (S n) (a :: la) = a :: butn n la.
 Proof.
 intros.
 unfold butn.
@@ -798,7 +801,7 @@ intros.
 revert n.
 induction la as [| a]; intros; cbn; [ now do 2 rewrite butn_nil | ].
 destruct n; [ easy | ].
-do 2 rewrite butn_cons.
+do 2 rewrite butn_succ_cons.
 cbn; f_equal.
 apply IHla.
 Qed.
@@ -810,7 +813,7 @@ revert i Hi.
 induction l as [| a]; intros; [ apply butn_nil | ].
 destruct i; [ easy | ].
 cbn in Hi; apply Nat.succ_le_mono in Hi.
-rewrite butn_cons.
+rewrite butn_succ_cons.
 now rewrite IHl.
 Qed.
 
@@ -828,7 +831,7 @@ revert n Hnl.
 induction l as [| a]; intros; [ easy | ].
 cbn; rewrite Nat.sub_0_r.
 destruct n; [ easy | ].
-rewrite butn_cons; cbn.
+rewrite butn_succ_cons; cbn.
 cbn in Hnl.
 apply Nat.succ_lt_mono in Hnl.
 rewrite IHl; [ | easy ].
@@ -849,7 +852,7 @@ induction l as [| a]; intros; cbn. {
 destruct j; [ now rewrite Nat.add_1_r | ].
 destruct i; [ easy | ].
 apply Nat.succ_le_mono in Hji.
-rewrite butn_cons; cbn.
+rewrite butn_succ_cons; cbn.
 now apply IHl.
 Qed.
 
@@ -866,7 +869,7 @@ induction l as [| a]; intros; cbn. {
 destruct j; [ easy | ].
 destruct i; [ easy | ].
 apply Nat.succ_lt_mono in Hij.
-rewrite butn_cons; cbn.
+rewrite butn_succ_cons; cbn.
 now apply IHl.
 Qed.
 
@@ -893,7 +896,7 @@ induction l as [| b]; intros. {
   now rewrite butn_nil in Ha.
 }
 destruct i; [ now right | ].
-rewrite butn_cons in Ha.
+rewrite butn_succ_cons in Ha.
 destruct Ha as [Ha| Ha]; [ now left | right ].
 now apply IHl in Ha.
 Qed.
@@ -922,7 +925,7 @@ rewrite if_bool_if_dec.
 destruct (Sumbool.sumbool_of_bool (S n <? S len)) as [Hn| Hn]. {
   apply Nat.ltb_lt in Hn.
   cbn - [ butn ].
-  rewrite Nat.sub_0_r, butn_cons; cbn.
+  rewrite Nat.sub_0_r, butn_succ_cons; cbn.
   apply Nat.succ_lt_mono in Hn.
   rewrite IHlen.
   destruct len; [ easy | ].

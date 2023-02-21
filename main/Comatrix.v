@@ -1900,8 +1900,51 @@ rewrite (Nat.add_comm _ (k - 1)), Nat.sub_add; [ | easy ].
 unfold mat_repl_vect.
 unfold subm.
 cbn - [ det ].
-rewrite butn_map2.
+rewrite map_butn.
+rewrite map_butn.
 rewrite map_map2.
+rewrite map2_map2_seq_l with (d := []).
+rewrite map2_map2_seq_r with (d := 0%L).
+rewrite fold_mat_nrows.
+rewrite fold_vect_size.
+rewrite Hvm.
+rewrite map2_diag.
+symmetry.
+erewrite map_ext_in. 2: {
+  intros j Hj.
+  apply in_seq in Hj.
+  unfold replace_at.
+  rewrite butn_app.
+  rewrite firstn_length.
+  rewrite fold_corr_mat_ncols; [ | easy | easy ].
+  rewrite min_l; [ | flia Hk ].
+  rewrite Nat.ltb_irrefl.
+  rewrite Nat.sub_diag.
+  rewrite butn_0_cons.
+  now rewrite fold_butn.
+}
+Search (map _ (seq _ _)).
+Check map_butn_seq.
+(* ah fait chier, hein, fait chier *)
+...
+  rewrite firstn_O, app_nil_l.
+...
+  cbn - [ skipn ].
+Search (skipn 1).
+Search (skip
+
+...
+  rewrite firstn_all2.
+...
+apply Nat.ltb_lt in Hi'; rewrite Hi'.
+cbn - [ det ].
+...
+Search (map2 _ _ _ = map2 _ _ _).
+Theorem map2_swap : ∀ (A B C : Type) (f : A → B → C) la lb,
+  map2 f la lb = map2 (λ b a, f a b) lb la.
+...
+rewrite map2_swap.
+Search map2.
 ...
 Inspect 3.
 Search map2.
