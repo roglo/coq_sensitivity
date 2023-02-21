@@ -682,6 +682,127 @@ Qed.
 
 (* Laplace formulas *)
 
+(* to be completed
+Theorem glop_laplace_formula_on_rows :
+  ∀ (M : matrix T) i,
+  is_square_matrix M = true
+  → 1 ≤ i ≤ mat_nrows M
+  → det M = ∑ (j = 1, mat_ncols M), mat_el M i j * mat_el (com M) i j.
+Proof.
+intros * Hsm Hlin.
+specialize (squ_mat_ncols M Hsm) as Hc.
+rewrite Hc.
+specialize (proj1 (is_scm_mat_iff _ M) Hsm) as H1.
+destruct H1 as (Hcr & Hc').
+destruct (Nat.eq_dec (mat_nrows M) 0) as [Hnz| Hnz]. {
+  rewrite Hnz in Hlin; flia Hlin.
+}
+destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
+  subst i; cbn.
+  symmetry.
+  unfold det.
+  replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
+  cbn - [ butn ].
+  apply rngl_summation_eq_compat.
+  intros j Hj.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch).
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
+  rewrite seq_nth; [ | rewrite Hc; flia Hj Hnz ].
+  rewrite map_length.
+  cbn - [ butn ].
+  rewrite <- Nat.sub_succ_l; [ | easy ].
+  rewrite Nat_sub_succ_1.
+  f_equal; f_equal.
+  rewrite butn_length, fold_mat_nrows.
+  apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
+  now rewrite Hnz.
+}
+unfold det.
+replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+symmetry.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hj.
+  cbn.
+  rewrite (List_map_nth' 0); [ | rewrite seq_length; flia Hlin ].
+  rewrite (List_map_nth' 0); [ | rewrite seq_length, Hc; flia Hj Hnz ].
+  rewrite seq_nth; [ | flia Hlin ].
+  rewrite seq_nth; [ | flia Hj Hc Hnz ].
+  rewrite (Nat.add_comm 1), Nat.sub_add; [ | flia Hlin ].
+  rewrite (Nat.add_comm 1), Nat.sub_add; [ | easy ].
+  rewrite rngl_mul_comm; [ | easy ].
+  rewrite rngl_mul_mul_swap; [ | easy ].
+  easy.
+}
+cbn.
+rename i into p.
+remember (mat_swap_rows 1 p M) as M'.
+erewrite rngl_summation_eq_compat. 2: {
+  intros j Hj.
+  rewrite map_length, butn_length, fold_mat_nrows.
+  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
+  rewrite Nat.add_comm.
+  rewrite minus_one_pow_add_r; [ | now destruct Hif ].
+  do 2 rewrite <- rngl_mul_assoc.
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  rewrite rngl_mul_assoc.
+  specialize determinant_subm_mat_swap_rows_0_i as H1.
+  specialize (H1 Hif).
+  specialize (H1 M p j Hsm).
+  cbn - [ butn ] in H1.
+  rewrite map_length, map_butn, butn_length in H1.
+  rewrite list_swap_elem_length, fold_mat_nrows in H1.
+  rewrite butn_length, map_length, fold_mat_nrows in H1.
+  apply Nat.neq_0_lt_0, Nat.ltb_lt in Hnz.
+  rewrite Hnz in H1; cbn - [ "<?" ] in H1.
+  apply Nat.ltb_lt in Hnz.
+  rewrite <- H1; [ | flia Hi1 Hlin | flia Hj Hnz ].
+  clear H1.
+  rewrite rngl_mul_comm; [ | now destruct Hif ].
+  rewrite rngl_mul_assoc, rngl_mul_mul_swap; [ | now destruct Hif ].
+  replace (mat_el M p j) with (mat_el (mat_swap_rows 1 p M) 0 j). 2: {
+    unfold mat_swap_rows.
+    cbn; unfold list_swap_elem.
+    rewrite fold_mat_nrows.
+    rewrite (List_map_nth' 0); [ | now rewrite seq_length ].
+    rewrite seq_nth; [ | easy ].
+    rewrite Nat.add_0_r, transposition_1.
+    easy.
+  }
+  rewrite <- HeqM'.
+  easy.
+}
+cbn.
+subst M'.
+rewrite <- rngl_opp_involutive; [ | now destruct Hif ].
+rewrite fold_det.
+assert (H1 : 1 ≠ p) by flia Hlin Hi1.
+assert (H2 : p - 1 < mat_nrows M) by flia Hlin.
+apply Nat.neq_0_lt_0 in Hnz.
+rewrite <- (determinant_alternating Hif M H1); [ | easy | easy | easy ].
+unfold det.
+rewrite mat_swap_rows_nrows.
+remember (determinant_loop (mat_nrows M)) as x eqn:Hx.
+replace (mat_nrows M) with (S (mat_nrows M - 1)) in Hx by flia Hlin.
+subst x.
+rewrite determinant_succ.
+rewrite <- Nat.sub_succ_l; [ | flia Hnz ].
+rewrite Nat_sub_succ_1.
+rewrite rngl_opp_summation; [ | now destruct Hif ].
+apply rngl_summation_eq_compat.
+intros i Hi.
+rewrite <- rngl_mul_opp_l; [ | now destruct Hif ].
+rewrite <- rngl_mul_opp_l; [ | now destruct Hif ].
+rewrite minus_one_pow_succ; [ | now destruct Hif ].
+rewrite rngl_opp_involutive; [ | now destruct Hif ].
+easy.
+Qed.
+*)
+
 Theorem laplace_formula_on_rows : in_charac_0_field →
   ∀ (M : matrix T) i,
   is_square_matrix M = true
@@ -1224,11 +1345,13 @@ Theorem glop_matrix_comatrix_transp_mul :
   is_square_matrix M = true
   → (M * (com M)⁺ = det M × mI (mat_nrows M))%M.
 Proof.
-intros Hif * Hsm.
+intros * Hsm.
+(*
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
 specialize (Hos (or_introl H)); clear H.
 move Hos before Hif.
+*)
 destruct M as (ll); cbn - [ det ].
 unfold "*"%M, "×"%M, mat_nrows; cbn - [ det ]; f_equal.
 rewrite map_map.
@@ -1237,6 +1360,8 @@ rewrite map_map.
 apply map_ext_in.
 intros i Hi; apply in_seq in Hi.
 assert (Hll : 0 < length ll) by flia Hi.
+Check laplace_formula_on_rows.
+...
 rewrite laplace_formula_on_rows with (i := S i); try easy. 2: {
   cbn; flia Hi.
 }
