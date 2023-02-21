@@ -376,6 +376,137 @@ Qed.
 
 (* det and det' are equal *)
 
+(* to be completed
+Theorem glop_det_is_det' :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_characteristic ≠ 1 →
+  ∀ (M : matrix T),
+  is_square_matrix M = true
+  → det M = det' M.
+Proof.
+intros Hic Hop H10 * Hm.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+unfold det'.
+remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+unfold det.
+rewrite Hr.
+revert M Hm Hr.
+induction n; intros. {
+  cbn.
+  rewrite rngl_summation_only_one.
+  rewrite all_1_rngl_product_1; [ | intros * Hi; flia Hi ].
+  unfold ε, iter_seq, iter_list; unfold "<?"; cbn.
+  now do 3 rewrite rngl_mul_1_l.
+}
+rewrite determinant_succ.
+destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
+  subst n; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_summation_only_one; cbn.
+  rewrite rngl_product_only_one; cbn.
+  unfold ε; cbn.
+  do 2 rewrite rngl_product_only_one; cbn.
+  now rewrite rngl_mul_1_r.
+}
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite IHn; cycle 1. {
+    apply is_squ_mat_subm; [ rewrite Hr | rewrite Hr; flia Hi | easy ].
+    split; [ easy | now apply -> Nat.succ_le_mono ].
+  } {
+    rewrite mat_nrows_subm, Hr; cbn.
+    apply Nat.sub_0_r.
+  }
+  easy.
+}
+cbn - [ canon_sym_gr_list fact nth ].
+clear IHn.
+erewrite rngl_summation_eq_compat. 2: {
+  intros i Hi.
+  rewrite rngl_mul_summation_distr_l; [ | easy ].
+  easy.
+}
+cbn - [ canon_sym_gr_list fact nth ].
+rewrite (rngl_summation_shift 1); [ | flia ].
+rewrite Nat.sub_diag, Nat_sub_succ_1.
+rewrite rngl_summation_summation_distr.
+rewrite <- Nat.sub_succ_l; [ | apply Nat.neq_0_lt_0, fact_neq_0 ].
+rewrite Nat_sub_succ_1.
+rewrite <- Nat_fact_succ.
+apply rngl_summation_eq_compat.
+intros k Hk.
+(* elimination of "mat_el M 1 (1 + k / (n!)" *)
+symmetry.
+rewrite rngl_product_split_first; [ | flia ].
+rewrite Nat.sub_diag.
+rewrite Nat.add_1_r.
+cbn - [ canon_sym_gr_list nth ].
+remember (mat_el M 1 _) as x eqn:Hx.
+rewrite rngl_mul_comm; [ | easy ].
+symmetry.
+rewrite <- rngl_mul_assoc.
+rewrite rngl_mul_comm; [ | easy ].
+do 3 rewrite <- rngl_mul_assoc.
+f_equal.
+(* elimination done *)
+(* separation factors "∏" and "ε" *)
+rewrite rngl_mul_comm; [ | easy ].
+rewrite <- rngl_mul_assoc.
+f_equal. {
+  (* equality of the two "∏" *)
+  rewrite (rngl_product_shift 1); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite (rngl_product_shift 2 2); [ | flia Hnz ].
+  rewrite Nat.sub_diag.
+  rewrite Nat.sub_succ.
+  apply rngl_product_eq_compat.
+  intros i Hi.
+  rewrite Nat.add_comm, Nat.add_sub.
+  unfold mat_el.
+  do 3 rewrite Nat.add_sub.
+  replace (2 + i - 1) with (S i) by flia.
+  cbn - [ subm fact ].
+  rewrite (List_map_nth' 0). 2: {
+    rewrite canon_sym_gr_list_length; flia Hi Hnz.
+  }
+  cbn - [ butn ].
+  rewrite (List_map_nth' []). 2: {
+    apply is_scm_mat_iff in Hm.
+    destruct Hm as (Hcr & Hc).
+    rewrite butn_length, fold_mat_nrows, Hr.
+    unfold "<?"; cbn; flia Hi Hnz.
+  }
+  rewrite Nat.sub_0_r.
+  unfold succ_when_ge, Nat.b2n.
+  rewrite if_leb_le_dec.
+  destruct (le_dec (k / n!) _) as [H1| H1]. {
+    rewrite nth_butn_before; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite (Nat.add_1_r i).
+  } {
+    apply Nat.nle_gt in H1.
+    rewrite Nat.add_0_r.
+    rewrite nth_butn_after; [ | easy ].
+    rewrite nth_butn_before; [ | easy ].
+    now rewrite Nat.add_1_r.
+  }
+  (* end proof equality of the two "∏" *)
+}
+(* equality of the two "ε" *)
+symmetry.
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite minus_one_pow_succ; [ | easy ].
+rewrite rngl_opp_involutive; [ | easy ].
+apply ε_of_sym_gr_permut_succ; try easy.
+apply (le_lt_trans _ ((S n)! - 1)); [ easy | ].
+apply Nat.sub_lt; [ | easy ].
+apply Nat.le_succ_l, Nat.neq_0_lt_0, fact_neq_0.
+Qed.
+*)
+
 Theorem det_is_det' :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -1138,6 +1269,10 @@ Qed.
 
 (* to be completed
 Theorem glop_determinant_alternating :
+  rngl_mul_is_comm = true →
+  rngl_has_opp = true →
+  rngl_has_inv = true →
+  rngl_characteristic ≠ 1 →
   ∀ (M : matrix T) p q,
   p ≠ q
   → 1 ≤ p ≤ mat_nrows M
@@ -1145,17 +1280,13 @@ Theorem glop_determinant_alternating :
   → is_square_matrix M = true
   → det (mat_swap_rows p q M) = (- det M)%L.
 Proof.
-intros * Hpq Hp Hq Hsm.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-move Hos before Hif.
+intros Hic Hop Hin H10 * Hpq Hp Hq Hsm.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
+rewrite det_is_det'; try easy.
+...
 rewrite det_is_det'; try now destruct Hif. 2: {
   rewrite <- Hr in Hp, Hq.
+  apply mat_swap_rows_is_square.
   now apply mat_swap_rows_is_square.
 }
 unfold det'.
