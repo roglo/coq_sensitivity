@@ -1981,7 +1981,6 @@ rewrite <- mat_mul_scal_vect_assoc in Hmuv; cycle 1. {
     now rewrite Huv.
   }
 }
-(**)
 rewrite Hmuv.
 rewrite vect_el_mul_scal_l. 2: {
   split; [ easy | ].
