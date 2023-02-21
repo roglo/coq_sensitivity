@@ -1929,7 +1929,7 @@ Qed.
 
 (* Cramer's rule *)
 
-Theorem cramer_rule : in_charac_0_field →
+Theorem cramer's_rule : in_charac_0_field →
   ∀ (M : matrix T) (U V : vector T),
   is_square_matrix M = true
   → vect_size U = mat_nrows M
@@ -2014,7 +2014,7 @@ Qed.
 End a.
 
 Arguments com {T}%type {ro} M%M.
-Arguments cramer_rule {T ro rp} _ [M%M U%V V%V] _ _ _ _ [i]%nat _.
+Arguments cramer's_rule {T ro rp} _ [M%M U%V V%V] _ _ _ _ [i]%nat _.
 Arguments laplace_formula_on_cols {T}%type {ro rp} Hif M%M [j]%nat.
 Arguments laplace_formula_on_rows {T}%type {ro rp} Hif M%M [i]%nat.
 Arguments mat_inv {T}%type {ro} M%M.

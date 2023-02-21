@@ -95,8 +95,9 @@ move m before n.
 unfold lap_resultant.
 unfold rlap_sylvester_mat.
 rewrite <- Hll.
-specialize (cramer_rule Hif) as Hcr.
+specialize (cramer's_rule Hif) as Hcr.
 specialize (Hcr (mk_mat ll)).
+...
 specialize (Hcr (mk_vect (repeat 1%L (n + m)))).
 ...
 
