@@ -984,6 +984,16 @@ rewrite Hij1.
 apply rngl_mul_1_r.
 Qed.
 
+(* to be completed
+Theorem glop_ε'_ε :
+  ∀ p, permut_seq p → ε' p = ε p.
+Proof.
+intros * Hp.
+apply ε'_ε_1; [ easy | ].
+now rewrite rngl_product_product_abs_diff_div_diff.
+Qed.
+*)
+
 Theorem ε'_ε : in_charac_0_field →
   ∀ p, permut_seq p → ε' p = ε p.
 Proof.
@@ -1292,6 +1302,7 @@ Qed.
 
 (* to be completed
 Theorem glop_signature_comp_fun_expand_1 :
+  rngl_has_opp = true →
   ∀ n f g,
   permut_seq_with_len n f
   → permut_seq_with_len n g
@@ -1312,17 +1323,12 @@ Theorem glop_signature_comp_fun_expand_1 :
         if i <? j then rngl_sub_nat j i else 1))%L
   → ε (f ° g) = (ε f * ε g)%L.
 Proof.
-intros * (Hfp, Hfn) (Hgp, Hgn) Hs.
-assert (H10 : rngl_characteristic ≠ 1). {
-  now rewrite (cf_characteristic Hif).
-}
+intros Hop * (Hfp, Hfn) (Hgp, Hgn) Hs.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-assert (H : rngl_has_opp = true) by now destruct Hif.
-specialize (Hos (or_introl H)); clear H.
-specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
-assert (H : rngl_has_inv = true) by now destruct Hif.
-specialize (Hiq (or_introl H)); clear H.
-rewrite <- ε'_ε; [ | easy | now apply (comp_permut_seq n) ].
+specialize (Hos (or_introl Hop)).
+Check ε'_ε.
+...
+rewrite <- ε'_ε; [ | | now apply (comp_permut_seq n) ].
 rewrite <- ε'_ε; [ | easy | easy ].
 rewrite <- ε'_ε; [ | easy | easy ].
 unfold ε', comp_list; cbn - [ "<?" ].
