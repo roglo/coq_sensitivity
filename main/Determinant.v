@@ -1146,12 +1146,10 @@ Theorem glop_determinant_alternating :
   → det (mat_swap_rows p q M) = (- det M)%L.
 Proof.
 intros Hic Hop Hin H10 * Hpq Hp Hq Hsm.
+clear Hin H10.
 remember (mat_nrows M) as n eqn:Hr; symmetry in Hr.
-rewrite det_is_det'; try easy.
-...
-rewrite det_is_det'; try now destruct Hif. 2: {
+rewrite det_is_det'; [ | easy | easy | ]. 2: {
   rewrite <- Hr in Hp, Hq.
-  apply mat_swap_rows_is_square.
   now apply mat_swap_rows_is_square.
 }
 unfold det'.
@@ -1186,7 +1184,6 @@ assert (Hp' : p - 1 < n) by flia Hp.
 assert (Hq' : q - 1 < n) by flia Hq.
 erewrite rngl_summation_eq_compat. 2: {
   intros k Hk.
-  destruct Hif as (Hic, Hop, Hin, Hit, Hde, Hch) in Hsm.
   rewrite (rngl_product_list_permut _ Nat.eqb_eq) with
       (lb := seq 0 n); [ | easy | ]. 2: {
     remember (map _ _) as la eqn:Hla.
@@ -1306,6 +1303,9 @@ erewrite rngl_summation_eq_compat. 2: {
     unfold "°"; cbn.
     now rewrite map_map.
   }
+About sign_comp.
+  rewrite sign_comp; [ | | ].
+...
   rewrite sign_comp; [ | easy | ]. 2: {
     split. 2: {
       rewrite List_map_seq_length.

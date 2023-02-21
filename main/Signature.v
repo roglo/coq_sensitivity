@@ -2653,6 +2653,45 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
 }
 Qed.
 
+(* to be completed
+Theorem glop_sign_comp :
+  ∀ la lb,
+  permut_seq_with_len (length la) lb
+  → ε (la ° lb) = (ε la * ε lb)%L.
+Proof.
+intros * Hbp.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+assert (H : rngl_has_opp = true) by now destruct Hif.
+specialize (Hos (or_introl H)); clear H.
+move Hos before Hif.
+destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | easy ].
+  symmetry.
+  rewrite ε_when_dup; [ | now destruct Hif | now destruct Hif | ]. 2: {
+    intros H; apply Haa; clear Haa.
+    now apply NoDup_comp_iff in H.
+  }
+  symmetry.
+  now apply rngl_mul_0_l.
+} {
+  rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
+  rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
+  symmetry.
+  rewrite <- ε_collapse_ε; [ | easy ].
+  symmetry.
+  apply (signature_comp_fun_expand_1 Hif (length la)); [ | easy | ]. {
+    apply collapse_permut_seq_with_len.
+  }
+  destruct Hif as (Hop, Hic, Hin, Hit, Hde, Hch).
+  rewrite signature_comp_fun_expand_2_1; try easy.
+  rewrite signature_comp_fun_expand_2_2; try easy.
+  apply signature_comp_fun_changement_of_variable; try easy.
+  apply collapse_permut_seq_with_len.
+}
+Qed.
+*)
+
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   permut_seq_with_len (length la) lb
