@@ -717,16 +717,8 @@ destruct (Nat.eq_dec i 1) as [Hi1| Hi1]. {
   rewrite Hnz.
   rewrite rngl_mul_assoc.
   f_equal.
-...
-(* faire un lemme qui prouve que mimus_one_pow commute si rngl_has_opp *)
-  unfold minus_one_pow.
-  remember (S j mod 2) as k eqn:Hk; symmetry in Hk.
-  destruct k. {
-    now rewrite rngl_mul_1_r, rngl_mul_1_l.
-  }
-  rewrite (rngl_mul_opp_l Hop).
-  rewrite (rngl_mul_opp_r Hop).
-  now rewrite rngl_mul_1_l, rngl_mul_1_r.
+  symmetry.
+  apply (minus_one_pow_mul_comm Hop).
 }
 unfold det.
 replace (mat_nrows M) with (S (mat_nrows M - 1)) by flia Hnz.
@@ -751,14 +743,13 @@ rename i into p.
 remember (mat_swap_rows 1 p M) as M'.
 erewrite rngl_summation_eq_compat. 2: {
   intros j Hj.
-...
-  rewrite rngl_mul_mul_swap; [ | now destruct Hif ].
   rewrite Nat.add_comm.
-  rewrite minus_one_pow_add_r; [ | now destruct Hif ].
-  do 2 rewrite <- rngl_mul_assoc.
-  rewrite rngl_mul_comm; [ | now destruct Hif ].
-  rewrite rngl_mul_assoc.
+  rewrite (minus_one_pow_add_r Hop).
   specialize determinant_subm_mat_swap_rows_0_i as H1.
+...
+(* peut-être qu'il faut que la multiplication soit commutative
+   quand même... ? *)
+...
   specialize (H1 Hif).
   specialize (H1 M p j Hsm).
   cbn - [ butn ] in H1.

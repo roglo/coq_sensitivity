@@ -78,6 +78,19 @@ rewrite (List_map_nth' 0); [ | flia Hj Hij ].
 easy.
 Qed.
 
+Theorem minus_one_pow_mul_comm :
+  rngl_has_opp = true →
+  ∀ i x, (minus_one_pow i * x = x * minus_one_pow i)%L.
+Proof.
+intros Hop *.
+unfold minus_one_pow.
+remember (i mod 2) as k eqn:Hk; symmetry in Hk.
+destruct k; [ now rewrite rngl_mul_1_r, rngl_mul_1_l | ].
+rewrite (rngl_mul_opp_l Hop).
+rewrite (rngl_mul_opp_r Hop).
+now rewrite rngl_mul_1_l, rngl_mul_1_r.
+Qed.
+
 Theorem minus_one_pow_succ :
   rngl_has_opp = true →
   ∀ i, minus_one_pow (S i) = (- minus_one_pow i)%L.
@@ -3117,5 +3130,6 @@ Arguments ε_when_dup {T ro rp} Hop Hde [la]%list.
 
 Arguments minus_one_pow {T}%type {ro} n%nat.
 Arguments minus_one_pow_add_r {T}%type {ro rp} Hop (i j)%nat.
+Arguments minus_one_pow_mul_comm {T ro rp} Hop i%nat x%L.
 Arguments minus_one_pow_succ {T}%type {ro rp} _ i%nat.
 Arguments minus_one_pow_succ_succ {T}%type {ro rp} _ i%nat.
