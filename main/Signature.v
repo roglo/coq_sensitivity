@@ -2893,6 +2893,10 @@ Theorem glop_sign_comp :
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
 intros Hop Heq * Hbp.
+unfold ε.
+rewrite comp_length.
+...
+intros Hop Heq * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
