@@ -31,17 +31,19 @@ Fixpoint ε' i q :=
       end
   end.
 
-Fixpoint ε (p : list nat) :=
+Fixpoint ε₀ (p : list nat) :=
   match p with
   | [] => 1%L
   | i :: q =>
       match ε' i q with
-      | Lt => ε q
+      | Lt => ε₀ q
       | Eq => 0%L
-      | Gt => (- ε q)%L
+      | Gt => (- ε₀ q)%L
       end
   end.
+*)
 
+(*
 End a.
 
 Require Import RnglAlg.Zrl ZArith.
@@ -73,10 +75,12 @@ End a.
 Require Import RnglAlg.Zrl.
 Require Import ZArith.
 
+Definition ro := RnglAlg.Zrl.Z_ring_like_op.
 Compute (ε Z_ring_like_op []).
 Compute (ε Z_ring_like_op [3;5;3]).
 Compute (canon_sym_gr_list_list 3).
-Compute (map (λ l, (l, ε Z_ring_like_op l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (l, ε Z_ring_like_op l, ε₀ Z_ring_like_op l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (l, ε ro l, ε₀ ro l)) (cart_prod (repeat (seq 1 4) 3))).
 Check no_dup.
 *)
 
