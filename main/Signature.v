@@ -16,7 +16,7 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-(* version of signature of a permutation using sign *)
+(* version of signature (parity) of a permutation using sign *)
 
 Definition sign_diff u v :=
   match Nat.compare u v with
