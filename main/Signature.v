@@ -33,22 +33,25 @@ Fixpoint ε' i q :=
 
 Fixpoint ε (p : list nat) :=
   match p with
-  | [] => Lt
+  | [] => 1%L
   | i :: q =>
       match ε' i q with
       | Lt => ε q
-      | Eq => Eq
-      | Gt => CompOpp (ε q)
+      | Eq => 0%L
+      | Gt => (- ε q)%L
       end
   end.
 
 End a.
 
-Compute (ε []).
-Compute (ε [3;5;3]).
+Require Import RnglAlg.Zrl ZArith.
+
+Definition ro := RnglAlg.Zrl.Z_ring_like_op.
+Compute (ε ro []).
+Compute (ε ro [3;5;3]).
 Compute (canon_sym_gr_list_list 3).
-Compute (map (λ l, (l, ε l)) (canon_sym_gr_list_list 4)).
-Check no_dup.
+Compute (map (λ l, (l, ε ro l)) (canon_sym_gr_list_list 4)).
+Compute (map (λ l, (l, ε ro l)) (cart_prod (repeat (seq 1 4) 3))).
 ...
 *)
 
@@ -63,6 +66,19 @@ Definition ε (p : list nat) :=
   let n := length p in
   ∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
   if i <? j then sign_diff (nth j p O) (nth i p O) else 1.
+
+(*
+End a.
+
+Require Import RnglAlg.Zrl.
+Require Import ZArith.
+
+Compute (ε Z_ring_like_op []).
+Compute (ε Z_ring_like_op [3;5;3]).
+Compute (canon_sym_gr_list_list 3).
+Compute (map (λ l, (l, ε Z_ring_like_op l)) (canon_sym_gr_list_list 4)).
+Check no_dup.
+*)
 
 Definition rngl_sub_nat i j := (rngl_of_nat i - rngl_of_nat j)%L.
 
