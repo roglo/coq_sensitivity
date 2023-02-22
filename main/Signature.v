@@ -18,6 +18,40 @@ Context (rp : ring_like_prop T).
 
 (* version of signature (parity) of a permutation using sign *)
 
+(* possible other definition *)
+(* to be completed
+Fixpoint ε' i q :=
+  match q with
+  | [] => Lt
+  | j :: r =>
+      match Nat.compare i j with
+      | Lt => ε' i r
+      | Eq => Eq
+      | Gt => CompOpp (ε' i r)
+      end
+  end.
+
+Fixpoint ε (p : list nat) :=
+  match p with
+  | [] => Lt
+  | i :: q =>
+      match ε' i q with
+      | Lt => ε q
+      | Eq => Eq
+      | Gt => CompOpp (ε q)
+      end
+  end.
+
+End a.
+
+Compute (ε []).
+Compute (ε [3;5;3]).
+Compute (canon_sym_gr_list_list 3).
+Compute (map (λ l, (l, ε l)) (canon_sym_gr_list_list 4)).
+Check no_dup.
+...
+*)
+
 Definition sign_diff u v :=
   match Nat.compare u v with
   | Lt => (-1)%L
