@@ -2686,6 +2686,7 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
 rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
+...
 rewrite <- ε_collapse_ε; [ | easy ].
 symmetry.
 Search collapse.
