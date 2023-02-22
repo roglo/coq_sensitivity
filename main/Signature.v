@@ -857,7 +857,13 @@ now destruct (lt_dec i j).
 Qed.
 
 (* to be completed
+je pense que ça ne marchera pas, ça...
 Theorem glop_ε'_ε_1 :
+  rngl_has_opp_or_subt = true →
+  rngl_has_inv_or_quot = true →
+  rngl_characteristic ≠ 1 →
+  rngl_mul_is_comm = true →
+  rngl_is_integral = true →
   ∀ p,
   (∏ (i = 0, length p - 1),
    ∏ (j = 0, length p - 1),
@@ -866,7 +872,8 @@ Theorem glop_ε'_ε_1 :
    else 1) = 1%L
   → ε' p = ε p.
 Proof.
-intros * Hij1.
+intros Hos Hiq Hch Hic Hit * Hij1.
+(*
 destruct Hif as (Hic, Hop, Hin, Hit, _, Hch).
 assert (H10 : rngl_characteristic ≠ 1) by now rewrite Hch.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
@@ -875,6 +882,7 @@ move Hos before Hop.
 specialize (proj2 rngl_has_inv_or_quot_iff) as Hiq.
 specialize (Hiq (or_introl Hin)).
 move Hiq before Hin.
+*)
 unfold ε', rngl_sub_nat.
 do 2 rewrite rngl_product_product_if.
 destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
@@ -888,6 +896,9 @@ destruct (le_dec (length p) 1) as [Hn1| Hn1]. {
   apply rngl_div_1_r; [ easy | easy ].
 }
 apply Nat.nle_gt in Hn1.
+About rngl_product_div_distr.
+rewrite <- rngl_product_div_distr; try easy.
+...
 rewrite <- rngl_product_div_distr; try easy. 2: {
   intros i Hi.
   erewrite rngl_product_eq_compat. 2: {

@@ -24,9 +24,6 @@ Section a.
 Context {T : Type}.
 Context (ro : ring_like_op T).
 Context {rp : ring_like_prop T}.
-(*
-Existing Instance ro.
-*)
 
 Theorem fold_left_rngl_mul_fun_from_1 : ∀ A a l (f : A → _),
   (fold_left (λ c i, c * f i) l a =
