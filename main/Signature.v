@@ -1090,6 +1090,74 @@ split. {
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem ε_aux_app : ∀ i p q,
+  (∀ j k, j ∈ i :: p → k ∈ q → j < k)
+  → ε_aux i (p ++ q) = ε_aux i p.
+Proof.
+intros * Hpq.
+revert i q Hpq.
+induction p as [| j]; intros; cbn. {
+  assert (H : ∀ k, k ∈ q → i < k). {
+    intros.
+    apply Hpq; [ now left | easy ].
+  }
+  clear Hpq; rename H into Hq.
+  induction q as [| k]; [ easy | cbn ].
+  specialize (Hq k (or_introl eq_refl)) as H.
+  apply Nat.compare_lt_iff in H; rewrite H.
+  apply IHq.
+  intros j Hj.
+  now apply Hq; right.
+}
+destruct (i ?= j); [ easy | | ]. {
+  apply IHp.
+  intros k l Hk Hl.
+  apply Hpq; [ | easy ].
+  destruct Hk; [ now left | now right; right ].
+} {
+  f_equal.
+  apply IHp.
+  intros k l Hk Hl.
+  apply Hpq; [ | easy ].
+  destruct Hk; [ now left | now right; right ].
+}
+Qed.
+
+Theorem ε_app : ∀ p q,
+  (∀ i j, i ∈ p → j ∈ q → i < j)
+  → ε (p ++ q) = (ε p * ε q)%L.
+Proof.
+intros * Hpq.
+revert q Hpq.
+induction p as [| i]; intros. {
+  cbn; symmetry; f_equal.
+  apply rngl_mul_1_l.
+}
+cbn.
+rewrite IHp. 2: {
+  intros j k Hj Hk.
+  apply Hpq; [ now right | easy ].
+}
+rewrite <- rngl_mul_assoc; f_equal.
+now apply ε_aux_app.
+Qed.
+
+Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%L.
+Proof.
+intros.
+revert sta.
+induction len; intros; [ easy | ].
+rewrite seq_S.
+rewrite ε_app. 2: {
+  intros * Hi Hj.
+  apply in_seq in Hi.
+  destruct Hj as [Hj| ]; [ now subst j | easy ].
+}
+cbn.
+do 2 rewrite rngl_mul_1_r.
+apply IHlen.
+Qed.
+
 Theorem transposition_signature_lt :
   rngl_mul_is_comm = true →
   rngl_has_opp = true →
@@ -1158,47 +1226,22 @@ erewrite map_ext_in. 2: {
   easy.
 }
 rewrite map_id.
-Search (ε (_ ++ _)).
-(* pppp... *)
-...
-rewrite <- (firstn_skipn p (seq 0 n)).
-rewrite map_app.
-rewrite List_firstn_seq.
-rewrite Nat.min_l; [ | flia Hpq Hq ].
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  apply in_seq in Hi; cbn in Hi.
-  destruct Hi as (_, Hi).
-  replace (i =? q) with false. 2: {
-    symmetry; apply Nat.eqb_neq; flia Hpq Hi.
+rewrite ε_app. 2: {
+  intros * Hi Hj.
+  apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
+  destruct Hj as [Hj| Hj]. {
+    subst j.
+    now transitivity p.
   }
-  apply Nat.lt_neq in Hi.
-  apply Nat.eqb_neq in Hi; rewrite Hi.
-  easy.
-}
-rewrite map_id.
-rewrite <- (firstn_skipn 1 (seq 0 n)).
-rewrite skipn_app.
-rewrite firstn_length, seq_length.
-rewrite List_firstn_seq.
-rewrite Nat.min_l; [ | flia Hq ].
-rewrite List_skipn_skipn; cbn.
-rewrite map_app.
-erewrite map_ext_in. 2: {
-  intros i Hi.
-  destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
-    subst p; rewrite skipn_O in Hi.
-    cbn in Hi; destruct Hi; [ subst i | easy ].
-    rewrite Nat.eqb_refl.
-    easy.
+  apply in_app_iff in Hj.
+  destruct Hj as [Hj| Hj]. {
+    apply in_seq in Hj; flia Hi Hj.
   }
-  replace p with (S (p - 1)) in Hi by flia Hpz.
-  now cbn in Hi; rewrite skipn_nil in Hi.
+  destruct Hj as [Hj| Hj]; [ now subst j | ].
+  apply in_seq in Hj; flia Hi Hpq Hj.
 }
-rewrite List_skipn_seq; [ cbn | flia Hpq Hq ].
-(* bizarre, cette histoire de différencier le cas p=0 *)
+rewrite ε_seq, rngl_mul_1_l.
 ...
-remember (map (add q)) as f.
 erewrite map_ext_in. 2: {
   intros i Hi.
   apply in_seq in Hi.
@@ -3332,6 +3375,7 @@ destruct H1 as [H1| H1]; rewrite H1. {
 }
 Qed.
 
+(*
 Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%L.
 Proof.
 intros.
@@ -3365,6 +3409,7 @@ apply all_1_rngl_product_1.
 intros i Hi.
 now apply all_1_rngl_product_1.
 Qed.
+*)
 
 End a.
 
