@@ -1100,6 +1100,67 @@ Theorem transposition_signature_lt :
 Proof.
 intros Hic Hop * Hpq Hq.
 unfold transposition.
+(**)
+rewrite (List_seq_cut p). 2: {
+  apply in_seq.
+  split; [ easy | cbn ].
+  now transitivity q.
+}
+rewrite (List_seq_cut q (S p)). 2: {
+  apply in_seq; cbn.
+  split; [ easy | flia Hq ].
+}
+rewrite Nat.sub_0_r, Nat.add_0_l.
+replace (S p + (n - S p) - S q) with (n - S q) by flia Hpq.
+do 4 rewrite map_app.
+cbn.
+do 2 rewrite Nat.eqb_refl.
+replace (q =? p) with false. 2: {
+  symmetry; apply Nat.eqb_neq.
+  intros H; subst q.
+  now apply Nat.lt_irrefl in Hpq.
+}
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; cbn in Hi.
+  destruct Hi as (_, Hi).
+  replace (i =? q) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hpq Hi.
+  }
+  apply Nat.lt_neq in Hi.
+  apply Nat.eqb_neq in Hi; rewrite Hi.
+  easy.
+}
+rewrite map_id.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; cbn in Hi.
+  replace (S (p + (q - S p))) with q in Hi by flia Hpq.
+  replace (i =? p) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hi.
+  }
+  replace (i =? q) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hi.
+  }
+  easy.
+}
+rewrite map_id.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; cbn in Hi.
+  replace (S (q + _)) with n in Hi by flia Hpq Hq.
+  replace (i =? p) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hpq Hi.
+  }
+  replace (i =? q) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hi.
+  }
+  easy.
+}
+rewrite map_id.
+Search (ε (_ ++ _)).
+(* pppp... *)
+...
 rewrite <- (firstn_skipn p (seq 0 n)).
 rewrite map_app.
 rewrite List_firstn_seq.
