@@ -3,7 +3,7 @@
 Set Nested Proofs Allowed.
 Set Implicit Arguments.
 
-Require Import Utf8 Arith.
+Require Import Utf8 Arith Init.Nat.
 Import List List.ListNotations.
 
 Require Import Misc RingLike.
@@ -1098,6 +1098,71 @@ Theorem transposition_signature_lt :
   → q < n
   → ε (map (transposition p q) (seq 0 n)) = (-1)%L.
 Proof.
+intros Hic Hop * Hpq Hq.
+unfold transposition.
+rewrite <- (firstn_skipn p (seq 0 n)).
+rewrite map_app.
+rewrite List_firstn_seq.
+rewrite Nat.min_l; [ | flia Hpq Hq ].
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi; cbn in Hi.
+  destruct Hi as (_, Hi).
+  replace (i =? q) with false. 2: {
+    symmetry; apply Nat.eqb_neq; flia Hpq Hi.
+  }
+  apply Nat.lt_neq in Hi.
+  apply Nat.eqb_neq in Hi; rewrite Hi.
+  easy.
+}
+rewrite map_id.
+rewrite <- (firstn_skipn 1 (seq 0 n)).
+rewrite skipn_app.
+rewrite firstn_length, seq_length.
+rewrite List_firstn_seq.
+rewrite Nat.min_l; [ | flia Hq ].
+rewrite List_skipn_skipn; cbn.
+rewrite map_app.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+    subst p; rewrite skipn_O in Hi.
+    cbn in Hi; destruct Hi; [ subst i | easy ].
+    rewrite Nat.eqb_refl.
+    easy.
+  }
+  replace p with (S (p - 1)) in Hi by flia Hpz.
+  now cbn in Hi; rewrite skipn_nil in Hi.
+}
+rewrite List_skipn_seq; [ cbn | flia Hpq Hq ].
+(* bizarre, cette histoire de différencier le cas p=0 *)
+...
+remember (map (add q)) as f.
+erewrite map_ext_in. 2: {
+  intros i Hi.
+  apply in_seq in Hi.
+...
+  replace (i =? p) with false. 2: {
+    symmetry.
+    apply Nat.eqb_neq.
+    intros H; subst i.
+    cbn in Hi.
+    destruct p; [ cbn in Hi; flia Hi | ].
+    cbn in Hi.
+flia Hpq Hq Hi.
+...
+destruct (Nat.eq_dec p 0) as [Hpz| Hpz]. {
+  subst p.
+  rewrite skipn_O.
+  cbn - [ ε skipn ].
+  erewrite map_ext_in. 2: {
+    intros i Hi.
+    apply in_seq in Hi; cbn in Hi.
+    rewrite if_eqb_eq_dec.
+    destruct (Nat.eq_dec i 0) as [H| H]; [ flia Hi H | clear H ].
+    easy.
+  }
+...
 intros Hic Hop * Hpq Hq.
 revert p q Hpq Hq.
 induction n; intros; [ easy | ].
