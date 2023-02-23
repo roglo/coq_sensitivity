@@ -16,32 +16,24 @@ Context {T : Type}.
 Context (ro : ring_like_op T).
 Context (rp : ring_like_prop T).
 
-(* version of signature (parity) of a permutation using sign *)
+(* version of signature (parity) of a list of nat *)
 
-(* possible other definition *)
-(* to be completed
-Fixpoint ε' i q :=
-  match q with
-  | [] => Lt
-  | j :: r =>
-      match Nat.compare i j with
-      | Lt => ε' i r
-      | Eq => Eq
-      | Gt => CompOpp (ε' i r)
-      end
-  end.
-
-Fixpoint ε₀ (p : list nat) :=
-  match p with
+Fixpoint ε_aux i l :=
+  match l with
   | [] => 1%L
-  | i :: q =>
-      match ε' i q with
-      | Lt => ε₀ q
+  | j :: l' =>
+      match i ?= j with
+      | Lt => ε_aux i l'
       | Eq => 0%L
-      | Gt => (- ε₀ q)%L
+      | Gt => (- ε_aux i l')%L
       end
   end.
-*)
+
+Fixpoint ε (l : list nat) :=
+  match l with
+  | [] => 1%L
+  | i :: q => (ε_aux i q * ε q)%L
+  end.
 
 (*
 End a.
@@ -57,6 +49,7 @@ Compute (map (λ l, (l, ε ro l)) (cart_prod (repeat (seq 1 4) 3))).
 ...
 *)
 
+(* old version
 Definition sign_diff u v :=
   match Nat.compare u v with
   | Lt => (-1)%L
@@ -68,6 +61,7 @@ Definition ε (p : list nat) :=
   let n := length p in
   ∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
   if i <? j then sign_diff (nth j p O) (nth i p O) else 1.
+*)
 
 (*
 End a.
@@ -84,9 +78,11 @@ Compute (map (λ l, (l, ε ro l, ε₀ ro l)) (cart_prod (repeat (seq 1 4) 3))).
 Check no_dup.
 *)
 
+(*
 Definition rngl_sub_nat i j := (rngl_of_nat i - rngl_of_nat j)%L.
+*)
 
-(* other definition of ε *)
+(* still other definition of ε
 
 Definition ε' (p : list nat) :=
   let n := length p in
@@ -95,41 +91,39 @@ Definition ε' (p : list nat) :=
    (∏ (i = 0, n - 1), ∏ (j = 0, n - 1),
     if i <? j then rngl_sub_nat j i else 1))%L.
 
-Definition minus_one_pow n :=
-  match n mod 2 with
-  | 0 => 1%L
-  | _ => (- 1%L)%L
-  end.
-
 Theorem fold_ε : ∀ p,
   ∏ (i = 0, length p - 1),
   (∏ (j = 0, length p - 1),
    (if i <? j then sign_diff (nth j p O) (nth i p O) else 1)) =
   ε p.
 Proof. easy. Qed.
+*)
+
+Definition minus_one_pow n :=
+  match n mod 2 with
+  | 0 => 1%L
+  | _ => (- 1%L)%L
+  end.
 
 Theorem ε_nil : ε [] = 1%L.
+Proof. easy. Qed.
+
+Theorem ε_aux_map_S : ∀ i l,  ε_aux (S i) (map S l) = ε_aux i l.
 Proof.
-unfold ε; cbn.
-rewrite rngl_product_only_one.
-now rewrite rngl_product_only_one.
+intros.
+revert i.
+induction l as [| j]; intros; [ easy | cbn ].
+rewrite IHl.
+now destruct (i ?= j).
 Qed.
 
 Theorem ε_map_S : ∀ l, ε (map S l) = ε l.
 Proof.
 intros.
-unfold ε.
-rewrite map_length.
-apply rngl_product_eq_compat.
-intros i (_, Hi).
-apply rngl_product_eq_compat.
-intros j (_, Hj).
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-unfold sign_diff.
-rewrite (List_map_nth' 0); [ | flia Hj Hij ].
-rewrite (List_map_nth' 0); [ | flia Hj Hij ].
-easy.
+induction l as [| i]; [ easy | cbn ].
+rewrite IHl.
+f_equal.
+apply ε_aux_map_S.
 Qed.
 
 Theorem minus_one_pow_mul_comm :
@@ -308,6 +302,7 @@ rewrite Nat.mul_comm.
 now apply rngl_of_nat_mul.
 Qed.
 
+(*
 Definition sign_diff' u v := if u <? v then (-1)%L else 1%L.
 
 Theorem sign_diff'_sign_diff : ∀ u v,
@@ -326,7 +321,9 @@ apply Nat.nlt_ge in Huv1, Hvu1.
 exfalso; apply Huv; clear Huv.
 now apply Nat.le_antisymm.
 Qed.
+*)
 
+(*
 Theorem rngl_sub_is_mul_sign_abs :
   rngl_has_opp = true →
   ∀ a b,
@@ -360,7 +357,9 @@ destruct ab. {
   now apply Nat.ltb_lt in Hab; rewrite Hab.
 }
 Qed.
+*)
 
+(*
 Theorem rngl_sign_diff'_sub_div_abs :
   rngl_has_opp = true →
   rngl_has_inv = true →
@@ -404,6 +403,7 @@ destruct (lt_dec a b) as [Hab1| Hab1]. {
   now apply Nat.compare_gt_iff in H; rewrite H.
 }
 Qed.
+*)
 
 Theorem rngl_product_product_div_eq_1 :
   rngl_has_opp_or_subt = true →
@@ -910,6 +910,7 @@ do 3 rewrite if_ltb_lt_dec.
 now destruct (lt_dec i j).
 Qed.
 
+(*
 Theorem ε'_ε_1 : in_charac_0_field →
   ∀ p,
   (∏ (i = 0, length p - 1),
@@ -1045,6 +1046,7 @@ intros Hif * Hp.
 apply ε'_ε_1; [ easy | ].
 now rewrite rngl_product_product_abs_diff_div_diff.
 Qed.
+*)
 
 Theorem transposition_permut_seq_with_len : ∀ p q n,
   p < n → q < n → permut_seq_with_len n (map (transposition p q) (seq 0 n)).
@@ -1096,6 +1098,27 @@ Theorem transposition_signature_lt :
   → q < n
   → ε (map (transposition p q) (seq 0 n)) = (-1)%L.
 Proof.
+intros Hic Hop * Hpq Hq.
+revert p q Hpq Hq.
+induction n; intros; [ easy | ].
+rewrite seq_S; cbn.
+rewrite map_app; cbn.
+destruct (Nat.eq_dec q n) as [Hqn| Hqn]. {
+  subst q; clear Hq.
+  rewrite transposition_2.
+  unfold transposition.
+  erewrite map_ext_in. 2: {
+    intros q Hq.
+    apply in_seq in Hq; cbn in Hq.
+    destruct Hq as (_, Hq).
+    apply Nat.lt_neq in Hq.
+    apply Nat.eqb_neq in Hq; rewrite Hq.
+    easy.
+  }
+...
+destruct q; [ easy | ].
+apply
+...
 intros Hic Hop * Hpq Hq.
 unfold ε; cbn - [ "<?" ].
 rewrite List_map_seq_length.
