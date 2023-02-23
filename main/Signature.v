@@ -1229,14 +1229,9 @@ rewrite map_id.
 rewrite ε_app. 2: {
   intros * Hi Hj.
   apply in_seq in Hi; cbn in Hi; destruct Hi as (_, Hi).
-  destruct Hj as [Hj| Hj]. {
-    subst j.
-    now transitivity p.
-  }
+  destruct Hj as [Hj| Hj]; [ now subst j; transitivity p | ].
   apply in_app_iff in Hj.
-  destruct Hj as [Hj| Hj]. {
-    apply in_seq in Hj; flia Hi Hj.
-  }
+  destruct Hj as [Hj| Hj]; [ apply in_seq in Hj; flia Hi Hj | ].
   destruct Hj as [Hj| Hj]; [ now subst j | ].
   apply in_seq in Hj; flia Hi Hpq Hj.
 }
