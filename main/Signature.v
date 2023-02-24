@@ -1185,6 +1185,18 @@ destruct (i ?= j). {
 }
 Qed.
 
+Theorem ε_aux_dup :
+  rngl_has_opp = true →
+  ∀ i l1 l2, ε_aux i (l1 ++ i :: l2) = 0%L.
+Proof.
+intros Hop *.
+revert i l2.
+induction l1 as [| j]; intros; cbn; [ now rewrite Nat.compare_refl | ].
+destruct (i ?= j); [ easy | apply IHl1 | ].
+rewrite IHl1.
+apply (rngl_opp_0 Hop).
+Qed.
+
 Theorem ε_app2 :
   rngl_has_opp = true →
   ∀ p q,
@@ -2764,19 +2776,32 @@ split. {
 }
 Qed.
 
+Theorem ε_dup :
+  rngl_has_opp = true →
+  ∀ i l1 l2 l3, ε (l1 ++ i :: l2 ++ i :: l3) = 0%L.
+Proof.
+intros Hop *.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos after Hop.
+revert i l2 l3.
+induction l1 as [| j]; intros. {
+  rewrite app_nil_l; cbn.
+  rewrite (ε_aux_dup Hop).
+  apply (rngl_mul_0_l Hos).
+}
+cbn.
+rewrite IHl1.
+apply (rngl_mul_0_r Hos).
+Qed.
+
 Theorem ε_when_dup :
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ la,
   ¬ NoDup la
   → ε la = 0%L.
 Proof.
-intros Hop Heq * Haa.
-clear Heq.
-specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
-specialize (Hos (or_introl Hop)).
-move Hos after Hop.
-(**)
+intros Hop * Haa.
 assert (H : no_dup Nat.eqb la = false). {
   apply Bool.negb_true_iff.
   apply Bool.eq_true_not_negb.
@@ -2787,96 +2812,31 @@ clear Haa; rename H into Haa.
 apply (no_dup_false_iff Nat.eqb_eq) in Haa.
 destruct Haa as (l1 & l2 & l3 & i & Haa).
 subst la.
-induction l1 as [| j]. {
-  cbn.
-  induction l2 as [| k]. {
-    cbn.
-    rewrite Nat.compare_refl.
-    now apply rngl_mul_0_l.
-  }
-  cbn.
-Search ε.
-...
-symmetry.
-remember (rngl_eqb (ε la) 0%L) as ez eqn:Hez; symmetry in Hez.
-destruct ez; [ now apply rngl_eqb_eq in Hez | exfalso ].
-apply (rngl_eqb_neq Heq) in Hez.
-apply Haa; clear Haa.
-apply nat_NoDup.
-intros i j Hi Hj Hij.
-destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
-apply Hez; clear Hez.
-destruct (lt_dec i j) as [Hlij| Hlij]. {
-Search (_ = _ ++ _ :: _).
-...
-nth_split:
-  ∀ (A : Type) (n : nat) (l : list A) (d : A),
-    n < length l → ∃ l1 l2 : list A, l = l1 ++ nth n l d :: l2 ∧ length l1 = n
-no_dup_false_iff:
-  ∀ (A : Type) (eqb : A → A → bool),
-    equality eqb
-    → ∀ la : list A, no_dup eqb la = false ↔ (∃ (l1 l2 l3 : list A) (a : A), la = l1 ++ a :: l2 ++ a :: l3)
-...
-  erewrite (rngl_product_split3 i). 2: {
-    split; [ easy | flia Hi ].
-  }
-  remember (∏ (_ = _, _), _) as x eqn:Hx.
-  erewrite (rngl_product_split3 j); subst x. 2: {
-    split; [ easy | flia Hj ].
-  }
-  apply Nat.ltb_lt in Hlij; rewrite Hlij.
-  rewrite Hij.
-  rewrite sign_diff_id.
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  easy.
-} {
-  assert (H : j < i) by flia Heqj Hlij.
-  clear Hlij; rename H into Hlij.
-  erewrite (rngl_product_split3 j). 2: {
-    split; [ easy | flia Hj ].
-  }
-  remember (∏ (_ = _, _), _) as x eqn:Hx.
-  erewrite (rngl_product_split3 i); subst x. 2: {
-    split; [ easy | flia Hi ].
-  }
-  apply Nat.ltb_lt in Hlij; rewrite Hlij.
-  rewrite Hij.
-  rewrite sign_diff_id.
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  rewrite rngl_mul_0_r; [ | easy ].
-  rewrite rngl_mul_0_l; [ | easy ].
-  easy.
-}
+apply (ε_dup Hop).
 Qed.
-
-...
 
 Theorem sign_comp :
   rngl_has_opp = true →
-  rngl_has_eqb = true →
   ∀ la lb,
   permut_seq_with_len (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
-intros Hop Heq * Hbp.
+intros Hop * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
 destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   symmetry.
-  rewrite ε_when_dup; [ | easy | easy | easy ].
+  rewrite ε_when_dup; [ | easy | easy ].
   symmetry.
-  rewrite ε_when_dup; [ | easy | easy | ]. 2: {
+  rewrite ε_when_dup; [ | easy | ]. 2: {
     intros H; apply Haa; clear Haa.
     now apply NoDup_comp_iff in H.
   }
   symmetry.
-  now apply rngl_mul_0_l.
+  apply (rngl_mul_0_l Hos).
 }
+...
 rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
