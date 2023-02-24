@@ -2772,9 +2772,31 @@ Theorem ε_when_dup :
   → ε la = 0%L.
 Proof.
 intros Hop Heq * Haa.
+clear Heq.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
-move Hos before Hos.
+move Hos after Hop.
+(**)
+assert (H : no_dup Nat.eqb la = false). {
+  apply Bool.negb_true_iff.
+  apply Bool.eq_true_not_negb.
+  intros H; apply Haa.
+  now apply (no_dup_NoDup Nat.eqb_eq).
+}
+clear Haa; rename H into Haa.
+apply (no_dup_false_iff Nat.eqb_eq) in Haa.
+destruct Haa as (l1 & l2 & l3 & i & Haa).
+subst la.
+induction l1 as [| j]. {
+  cbn.
+  induction l2 as [| k]. {
+    cbn.
+    rewrite Nat.compare_refl.
+    now apply rngl_mul_0_l.
+  }
+  cbn.
+Search ε.
+...
 symmetry.
 remember (rngl_eqb (ε la) 0%L) as ez eqn:Hez; symmetry in Hez.
 destruct ez; [ now apply rngl_eqb_eq in Hez | exfalso ].
@@ -2785,6 +2807,15 @@ intros i j Hi Hj Hij.
 destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
 apply Hez; clear Hez.
 destruct (lt_dec i j) as [Hlij| Hlij]. {
+Search (_ = _ ++ _ :: _).
+...
+nth_split:
+  ∀ (A : Type) (n : nat) (l : list A) (d : A),
+    n < length l → ∃ l1 l2 : list A, l = l1 ++ nth n l d :: l2 ∧ length l1 = n
+no_dup_false_iff:
+  ∀ (A : Type) (eqb : A → A → bool),
+    equality eqb
+    → ∀ la : list A, no_dup eqb la = false ↔ (∃ (l1 l2 l3 : list A) (a : A), la = l1 ++ a :: l2 ++ a :: l3)
 ...
   erewrite (rngl_product_split3 i). 2: {
     split; [ easy | flia Hi ].
