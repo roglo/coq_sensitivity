@@ -2645,18 +2645,6 @@ rewrite <- (squ_mat_ncols _ Hsm) in Hk.
 apply (det_mat_repl_vect Hif); [ easy | congruence | easy ].
 Qed.
 
-(* *)
-
-Theorem minus_one_pow_mul_same :
-  rngl_has_opp = true →
-  ∀ i, (minus_one_pow i * minus_one_pow i = 1)%L.
-Proof.
-intros Hop *.
-unfold minus_one_pow.
-destruct (i mod 2); [ apply rngl_mul_1_l | ].
-now apply rngl_squ_opp_1.
-Qed.
-
 End a.
 
 Arguments com {T}%type {ro} M%M.
