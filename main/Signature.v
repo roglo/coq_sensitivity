@@ -2782,11 +2782,10 @@ apply (rngl_eqb_neq Heq) in Hez.
 apply Haa; clear Haa.
 apply nat_NoDup.
 intros i j Hi Hj Hij.
-...
-unfold ε in Hez.
 destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
 apply Hez; clear Hez.
 destruct (lt_dec i j) as [Hlij| Hlij]. {
+...
   erewrite (rngl_product_split3 i). 2: {
     split; [ easy | flia Hi ].
   }
