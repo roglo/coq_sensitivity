@@ -1339,6 +1339,14 @@ cbn - [ ε ].
 rewrite Nat.mul_1_r.
 replace (ε [p]) with 1%L by now cbn; rewrite rngl_mul_1_l.
 rewrite rngl_mul_1_r.
+rewrite (minus_one_pow_succ Hop).
+rewrite (rngl_mul_opp_l Hop); f_equal; cbn.
+...
+replace (q - S p) with (length (seq (S p) (q - S p))) at 1. 2: {
+  now rewrite seq_length.
+}
+rewrite rngl_mul_assoc.
+rewrite <- ε_aux_app2.
 ...
 remember (n - S q) as len eqn:Hlen.
 replace n with (S (q + len)) by flia Hlen Hq.
