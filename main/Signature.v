@@ -176,7 +176,7 @@ rewrite minus_one_pow_succ; [ | easy ].
 now apply rngl_opp_involutive.
 Qed.
 
-Theorem minus_one_pow_add_r :
+Theorem minus_one_pow_add :
   rngl_has_opp = true →
   ∀ i j, minus_one_pow (i + j) = (minus_one_pow i * minus_one_pow j)%L.
 Proof.
@@ -1142,6 +1142,74 @@ rewrite <- rngl_mul_assoc; f_equal.
 now apply ε_aux_app.
 Qed.
 
+Theorem ε_aux_app2 :
+  rngl_has_opp = true →
+  ∀ i p q,
+  (∀ j k, j ∈ i :: p → k ∈ q → k < j)
+  → ε_aux i (p ++ q) = (minus_one_pow (length q) * ε_aux i p)%L.
+Proof.
+intros Hop * Hpq.
+revert i q Hpq.
+induction p as [| j]; intros; cbn. {
+  rewrite rngl_mul_1_r.
+  assert (H : ∀ k, k ∈ q → k < i). {
+    intros.
+    apply Hpq; [ now left | easy ].
+  }
+  clear Hpq; rename H into Hq.
+  induction q as [| k]; [ easy | cbn ].
+  specialize (Hq k (or_introl eq_refl)) as H.
+  apply Nat.compare_lt_iff in H.
+  apply (f_equal CompOpp) in H; cbn in H.
+  rewrite <- Nat.compare_antisym in H; rewrite H.
+  rewrite (minus_one_pow_succ Hop); f_equal.
+  apply IHq.
+  intros j Hj.
+  now apply Hq; right.
+}
+destruct (i ?= j). {
+  symmetry; apply rngl_mul_0_r.
+  now apply rngl_has_opp_or_subt_iff; left.
+} {
+  apply IHp.
+  intros k l Hk Hl.
+  apply Hpq; [ | easy ].
+  destruct Hk; [ now left | now right; right ].
+} {
+  rewrite (rngl_mul_opp_r Hop).
+  f_equal.
+  apply IHp.
+  intros k l Hk Hl.
+  apply Hpq; [ | easy ].
+  destruct Hk; [ now left | now right; right ].
+}
+Qed.
+
+Theorem ε_app2 :
+  rngl_has_opp = true →
+  ∀ p q,
+  (∀ i j, i ∈ p → j ∈ q → j < i)
+  → ε (p ++ q) = (minus_one_pow (length p * length q) * ε p * ε q)%L.
+Proof.
+intros Hop * Hpq.
+revert q Hpq.
+induction p as [| i]; intros. {
+  cbn; symmetry; f_equal.
+  now do 2 rewrite rngl_mul_1_l.
+}
+cbn.
+rewrite IHp. 2: {
+  intros j k Hj Hk.
+  apply Hpq; [ now right | easy ].
+}
+do 3 rewrite rngl_mul_assoc.
+f_equal; f_equal.
+rewrite (minus_one_pow_add Hop).
+do 2 rewrite <- (minus_one_pow_mul_comm Hop).
+rewrite <- rngl_mul_assoc; f_equal.
+now apply ε_aux_app2.
+Qed.
+
 Theorem ε_seq : ∀ sta len, ε (seq sta len) = 1%L.
 Proof.
 intros.
@@ -1257,6 +1325,20 @@ rewrite ε_app. 2: {
 }
 rewrite ε_seq, rngl_mul_1_r.
 clear n Hq.
+rewrite (ε_app2 Hop). 2: {
+  intros i j Hi Hj.
+  destruct Hj; [ subst j | easy ].
+  apply in_app_iff in Hi.
+  destruct Hi as [Hi| Hi]. {
+    destruct Hi; [ now subst i | easy ].
+  }
+  now apply in_seq in Hi.
+}
+rewrite app_length, seq_length.
+cbn - [ ε ].
+rewrite Nat.mul_1_r.
+replace (ε [p]) with 1%L by now cbn; rewrite rngl_mul_1_l.
+rewrite rngl_mul_1_r.
 ...
 remember (n - S q) as len eqn:Hlen.
 replace n with (S (q + len)) by flia Hlen Hq.
