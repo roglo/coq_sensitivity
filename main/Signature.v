@@ -1168,7 +1168,6 @@ Theorem transposition_signature_lt :
 Proof.
 intros Hic Hop * Hpq Hq.
 unfold transposition.
-(**)
 rewrite (List_seq_cut p). 2: {
   apply in_seq.
   split; [ easy | cbn ].
@@ -1236,6 +1235,35 @@ rewrite ε_app. 2: {
   apply in_seq in Hj; flia Hi Hpq Hj.
 }
 rewrite ε_seq, rngl_mul_1_l.
+rewrite List_cons_is_app.
+rewrite (List_cons_is_app p).
+do 2 rewrite app_assoc.
+rewrite ε_app. 2: {
+  intros i j Hi Hj.
+  apply in_seq in Hj.
+  rewrite Nat.add_comm, Nat.sub_add in Hj; [ | easy ].
+  apply in_app_iff in Hi.
+  destruct Hi as [Hi| Hi]. {
+    apply in_app_iff in Hi.
+    destruct Hi as [Hi| Hi]. {
+      destruct Hi; [ now subst i | easy ].
+    }
+    apply in_seq in Hi.
+    rewrite Nat.add_comm, Nat.sub_add in Hi; [ | easy ].
+    now transitivity q.
+  }
+  destruct Hi; [ subst i | easy ].
+  now transitivity q.
+}
+rewrite ε_seq, rngl_mul_1_r.
+clear n Hq.
+...
+remember (n - S q) as len eqn:Hlen.
+replace n with (S (q + len)) by flia Hlen Hq.
+clear n Hq Hlen.
+revert p q Hpq.
+induction len; intros. {
+  cbn - [ ε ].
 ...
 erewrite map_ext_in. 2: {
   intros i Hi.
