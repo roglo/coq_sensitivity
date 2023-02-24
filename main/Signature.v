@@ -2764,7 +2764,6 @@ split. {
 }
 Qed.
 
-(*
 Theorem ε_when_dup :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -2783,6 +2782,7 @@ apply (rngl_eqb_neq Heq) in Hez.
 apply Haa; clear Haa.
 apply nat_NoDup.
 intros i j Hi Hj Hij.
+...
 unfold ε in Hez.
 destruct (Nat.eq_dec i j) as [Heij| Heqj]; [ easy | exfalso ].
 apply Hez; clear Hez.
@@ -2822,17 +2822,10 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
   easy.
 }
 Qed.
-*)
 
-(* to be completed
-(*
-problème : la preuve initiale utilise l'inverse
-du coup, ça fait que les preuves sur le déterminant nécessitent l'inverse
-ce qui fait qu'on ne peut pas faire de preuves sur les déterminants de matrices
-de polynômes, puisque les polynômes n'ont pas d'inverse ;
-d'où problème avec Algebraic.v où je fais de telles matrices
-*)
-Theorem glop_sign_comp :
+...
+
+Theorem sign_comp :
   rngl_has_opp = true →
   rngl_has_eqb = true →
   ∀ la lb,
@@ -2878,23 +2871,12 @@ Print ε'.
 Qed.
 *)
 
+
 Theorem sign_comp : in_charac_0_field →
   ∀ la lb,
   permut_seq_with_len (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
-intros Hif * Hbp.
-destruct Hbp as (Hsb, Hb).
-unfold permut_seq in Hsb.
-revert lb Hbp.
-induction la as [| i]; intros; cbn. {
-  destruct Hbp as (Hsb & Hb).
-  apply length_zero_iff_nil in Hb; subst lb.
-  symmetry; apply rngl_mul_1_l.
-}
-destruct lb as [| j]; [ now destruct Hbp | ].
-cbn - [ nth ].
-...
 intros Hif * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
