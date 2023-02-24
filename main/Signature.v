@@ -1444,8 +1444,7 @@ Qed.
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
-...
-
+(*
 Theorem signature_comp_fun_expand_1 : in_charac_0_field →
   ∀ n f g,
   permut_seq_with_len n f
@@ -1890,6 +1889,7 @@ destruct b1. {
   }
 }
 Qed.
+*)
 
 Theorem butn_permut_seq_with_len : ∀ n i l,
   permut_seq_with_len (S n) l
@@ -2033,6 +2033,7 @@ apply butn_permut_seq_with_len; [ easy | | ]. {
 }
 Qed.
 
+(*
 Theorem sign_diff_mul :
   rngl_has_opp = true →
    ∀ a b c d,
@@ -2107,6 +2108,7 @@ rewrite sign_diff'_sign_diff; [ | easy ].
 rewrite sign_diff'_sign_diff; [ | easy ].
 now apply sign_diff_mul.
 Qed.
+*)
 
 Theorem map_nth_permut_seq : ∀ n la lb,
   permut_seq_with_len n la
@@ -2458,6 +2460,8 @@ Qed.
 
 Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
+intros * Hnd.
+...
 intros * Hnd.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
   now apply length_zero_iff_nil in Hlz; subst l; cbn.
