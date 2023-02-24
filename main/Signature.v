@@ -2458,9 +2458,17 @@ destruct c1. {
 }
 Qed.
 
+(*
 Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
+unfold collapse.
+...
+induction l as [| i]; [ easy | ].
+cbn - [ isort_rank ].
+Print isort_rank.
+Search (isort_rank _ (_ :: _)).
+Check collapse_keeps_order.
 ...
 intros * Hnd.
 destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
@@ -2478,6 +2486,7 @@ destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
 unfold sign_diff.
 rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
 Qed.
+*)
 
 Theorem permut_isort : ∀ ord,
   antisymmetric ord
@@ -2755,6 +2764,7 @@ split. {
 }
 Qed.
 
+(*
 Theorem ε_when_dup :
   rngl_has_opp = true →
   rngl_has_eqb = true →
@@ -2812,6 +2822,7 @@ destruct (lt_dec i j) as [Hlij| Hlij]. {
   easy.
 }
 Qed.
+*)
 
 (* to be completed
 (*
@@ -2872,6 +2883,18 @@ Theorem sign_comp : in_charac_0_field →
   permut_seq_with_len (length la) lb
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
+intros Hif * Hbp.
+destruct Hbp as (Hsb, Hb).
+unfold permut_seq in Hsb.
+revert lb Hbp.
+induction la as [| i]; intros; cbn. {
+  destruct Hbp as (Hsb & Hb).
+  apply length_zero_iff_nil in Hb; subst lb.
+  symmetry; apply rngl_mul_1_l.
+}
+destruct lb as [| j]; [ now destruct Hbp | ].
+cbn - [ nth ].
+...
 intros Hif * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 assert (H : rngl_has_opp = true) by now destruct Hif.
