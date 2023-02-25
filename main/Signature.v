@@ -2474,8 +2474,7 @@ Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
 induction l as [| i]; [ easy | ].
-cbn - [ isort_rank ].
-Check collapse_keeps_order.
+cbn - [ collapse ].
 ...
 Print isort_rank.
 Search (isort_rank _ (_ :: _)).
