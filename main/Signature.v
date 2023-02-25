@@ -2473,6 +2473,29 @@ Qed.
 Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
+specialize (collapse_keeps_order Hnd) as H1.
+assert
+  (Hl :
+     ∀ A (d : A) l,
+     l = iter_list (seq 0 (length l)) (λ l' i, l' ++ [nth i l d]) []). {
+  clear l Hnd H1.
+  intros.
+  unfold iter_list.
+  induction l as [| a] using rev_ind; [ easy | ].
+  rewrite app_length, Nat.add_1_r.
+  rewrite seq_S; cbn - [ nth ].
+  rewrite fold_left_app; cbn - [ nth ].
+  rewrite app_nth2; [ | now unfold ge ].
+  rewrite Nat.sub_diag; f_equal.
+  rewrite IHl at 1.
+  apply List_fold_left_ext_in.
+  intros i l' Hi.
+  f_equal; f_equal.
+  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
+  now rewrite app_nth1.
+}
+...
+intros * Hnd.
 induction l as [| i]; [ easy | ].
 cbn - [ collapse ].
 ...
