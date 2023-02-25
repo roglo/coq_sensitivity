@@ -2470,8 +2470,32 @@ destruct c1. {
 }
 Qed.
 
-Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
+Theorem ε_collapse_ε :
+  rngl_has_opp_or_subt = true →
+  ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
+intros Hos * Hnd.
+induction l as [| a]; [ easy | ].
+cbn - [ collapse ].
+rewrite <- IHl; [ | now apply NoDup_cons_iff in Hnd ].
+clear IHl.
+destruct l as [| a1]; [ easy | ].
+cbn - [ collapse ].
+remember (a ?= a1) as c eqn:Hc; symmetry in Hc.
+destruct c. {
+  apply Nat.compare_eq_iff in Hc; subst a1.
+  apply NoDup_cons_iff in Hnd.
+  destruct Hnd as (H, _).
+  now exfalso; apply H; left.
+} {
+  apply Nat.compare_lt_iff in Hc.
+  remember (a1 :: l) as l1; cbn; subst l1.
+  destruct l as [| a2]. {
+    cbn.
+    apply Nat.lt_le_incl in Hc.
+    now apply Nat.leb_le in Hc; rewrite Hc.
+  }
+...
 intros * Hnd.
 specialize (collapse_keeps_order Hnd) as H1.
 assert
@@ -2494,10 +2518,6 @@ assert
   apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
   now rewrite app_nth1.
 }
-...
-intros * Hnd.
-induction l as [| i]; [ easy | ].
-cbn - [ collapse ].
 ...
 Print isort_rank.
 Search (isort_rank _ (_ :: _)).
