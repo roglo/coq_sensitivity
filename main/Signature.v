@@ -2470,14 +2470,13 @@ destruct c1. {
 }
 Qed.
 
-(*
 Theorem ε_collapse_ε : ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros * Hnd.
-unfold collapse.
-...
 induction l as [| i]; [ easy | ].
 cbn - [ isort_rank ].
+Check collapse_keeps_order.
+...
 Print isort_rank.
 Search (isort_rank _ (_ :: _)).
 Check collapse_keeps_order.
@@ -2835,9 +2834,9 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   }
   symmetry.
   apply (rngl_mul_0_l Hos).
-}
+} {
 ...
-rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
+  rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
 ...
