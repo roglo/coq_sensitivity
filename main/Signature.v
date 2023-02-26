@@ -2973,6 +2973,18 @@ rewrite (ε_app_cons Hop). 2: {
   destruct Hk as [Hk| Hk]. {
     apply in_map_iff in Hk.
     destruct Hk as (u & Huk & Hu).
+    subst k.
+    destruct Ha as (Ha, Hla).
+    destruct Hb as (Hb, Hlb).
+    unfold permut_seq in Ha, Hb.
+    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
+    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
+    rewrite Hlb in Hb.
+    rewrite Hla in Ha.
+    assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; left.
+    apply Hb in H.
+    apply in_seq in H.
+(* oh pis zut, j'y suis presque mais faut réfléchir *)
 ...
 specialize butn_permut_seq_with_len as H2.
 specialize permut_without_highest as H3.
