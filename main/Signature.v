@@ -2470,126 +2470,66 @@ destruct c1. {
 }
 Qed.
 
-Definition keeps_order {A} f g (l : list A) :=
-  ∀ i j, i < length (f l) → j < length (f l) →
-    (nth i (f l) 0 ?= nth j (f l) 0) = (nth i (g l) 0 ?= nth j (g l) 0).
+Definition keep_order la lb :=
+  ∀ i j,  i < length la → j < length la →
+  (nth i la 0 ?= nth j la 0) = (nth i lb 0 ?= nth j lb 0).
 
-Theorem ε_glop_ε :
-  rngl_has_opp_or_subt = true →
-  ∀ A f g (l : list A),
-  keeps_order f g l
-  → length (f l) = length (g l)
-  → ε (f l) = ε (g l).
+Theorem ε_keep_order :
+  ∀ la lb, keep_order la lb → length la = length lb → ε la = ε lb.
 Proof.
-intros Hos * Hko Hfg.
-remember (length (f l)) as n eqn:Hf; symmetry in Hf.
-symmetry in Hfg; rename Hfg into Hg.
-revert f g l Hko Hf Hg.
-induction n; intros. {
-  apply length_zero_iff_nil in Hf, Hg.
-  f_equal; congruence.
+intros * Hko Hab.
+revert lb Hko Hab.
+induction la as [| a]; intros. {
+  symmetry in Hab.
+  now apply length_zero_iff_nil in Hab; subst lb.
 }
-(* non, ça marche pas *)
-...
-destruct l as [| a]. {
-  unfold keeps_order in Hko.
-  rewrite Hf in Hko.
-...
+destruct lb as [| b]; [ easy | ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+cbn; rewrite IHla with (lb := lb); [ | | easy ]. 2: {
+  intros i j Hi Hj.
+  apply (Hko (S i) (S j)); now cbn; apply -> Nat.succ_lt_mono.
 }
-specialize (IHn (λ l, f (a :: l)) (λ l, g (a :: l))).
-cbn in IHn.
-apply IHn.
-unfold keeps_order in Hko |-*.
-intros i j Hi Hj.
-apply Hko; [ cbn; flia Hi | cbn; flia Hj ].
-(* ouais, non, c'est pas ça *)
-...
+f_equal.
+clear IHla.
+move b before a.
+revert a b lb Hko Hab.
+induction la as [| a']; intros. {
+  symmetry in Hab.
+  now apply length_zero_iff_nil in Hab; subst lb.
+}
+destruct lb as [| b']; [ easy | ].
+cbn in Hab; apply Nat.succ_inj in Hab.
+cbn.
+specialize (Hko 0 1) as H1; cbn in H1.
+rewrite <- H1; [ | easy | now apply -> Nat.succ_lt_mono ].
+remember (a ?= a') as c eqn:Hc; symmetry in Hc.
+assert (H : ε_aux a la = ε_aux b lb). {
+  apply IHla; [ | easy ].
+  intros i j Hi Hj.
+  destruct i. {
+    destruct j; [ now do 2 rewrite Nat.compare_refl | ].
+    apply (Hko 0 (S (S j))); [ now cbn | ].
+    now cbn; apply -> Nat.succ_lt_mono.
+  }
+  destruct j. {
+    apply (Hko (S (S i)) 0); [ | now cbn ].
+    now cbn; apply -> Nat.succ_lt_mono.
+  }
+  apply (Hko (S (S i)) (S (S j))); now cbn; apply -> Nat.succ_lt_mono.
+}
+destruct c; [ easy | easy | now f_equal ].
+Qed.
 
 Theorem ε_collapse_ε :
   rngl_has_opp_or_subt = true →
   ∀ l, NoDup l → ε (collapse l) = ε l.
 Proof.
 intros Hos * Hnd.
-destruct l as [| a]; [ easy | ].
-cbn - [ collapse ].
-destruct l as [| a1]; [ easy | ].
-cbn - [ collapse ].
-remember (a ?= a1) as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply Nat.compare_eq_iff in Hc; subst a1.
-  apply NoDup_cons_iff in Hnd.
-  destruct Hnd as (H, _).
-  now exfalso; apply H; left.
-} {
-  apply Nat.compare_lt_iff in Hc.
-...
-intros Hos * Hnd.
-induction l as [| a]; [ easy | ].
-cbn - [ collapse ].
-rewrite <- IHl; [ | now apply NoDup_cons_iff in Hnd ].
-clear IHl.
-destruct l as [| a1]; [ easy | ].
-cbn - [ collapse ].
-remember (a ?= a1) as c eqn:Hc; symmetry in Hc.
-destruct c. {
-  apply Nat.compare_eq_iff in Hc; subst a1.
-  apply NoDup_cons_iff in Hnd.
-  destruct Hnd as (H, _).
-  now exfalso; apply H; left.
-} {
-  apply Nat.compare_lt_iff in Hc.
-...
-  remember (a1 :: l) as l1; cbn; subst l1.
-  destruct l as [| a2]. {
-    cbn.
-    apply Nat.lt_le_incl in Hc.
-    now apply Nat.leb_le in Hc; rewrite Hc.
-  }
-...
-intros * Hnd.
-specialize (collapse_keeps_order Hnd) as H1.
-assert
-  (Hl :
-     ∀ A (d : A) l,
-     l = iter_list (seq 0 (length l)) (λ l' i, l' ++ [nth i l d]) []). {
-  clear l Hnd H1.
-  intros.
-  unfold iter_list.
-  induction l as [| a] using rev_ind; [ easy | ].
-  rewrite app_length, Nat.add_1_r.
-  rewrite seq_S; cbn - [ nth ].
-  rewrite fold_left_app; cbn - [ nth ].
-  rewrite app_nth2; [ | now unfold ge ].
-  rewrite Nat.sub_diag; f_equal.
-  rewrite IHl at 1.
-  apply List_fold_left_ext_in.
-  intros i l' Hi.
-  f_equal; f_equal.
-  apply in_seq in Hi; destruct Hi as (_, Hi); cbn in Hi.
-  now rewrite app_nth1.
-}
-...
-Print isort_rank.
-Search (isort_rank _ (_ :: _)).
-Check collapse_keeps_order.
-...
-intros * Hnd.
-destruct (Nat.eq_dec (length l) 0) as [Hlz| Hlz]. {
-  now apply length_zero_iff_nil in Hlz; subst l; cbn.
-}
-unfold ε.
-rewrite collapse_length.
-apply rngl_product_eq_compat.
-intros i (_, Hi).
-apply rngl_product_eq_compat.
-intros j (_, Hj).
-move j before i.
-do 2 rewrite if_ltb_lt_dec.
-destruct (lt_dec i j) as [Hij| Hij]; [ | easy ].
-unfold sign_diff.
-rewrite collapse_keeps_order; [ easy | easy | flia Hj Hlz | flia Hi Hlz ].
+apply ε_keep_order; [ | apply collapse_length ].
+intros i j Hi Hj.
+rewrite collapse_length in Hi, Hj.
+now apply (collapse_keeps_order Hnd).
 Qed.
-*)
 
 Theorem permut_isort : ∀ ord,
   antisymmetric ord
@@ -2927,9 +2867,8 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
   symmetry.
   apply (rngl_mul_0_l Hos).
 } {
-...
-  rewrite <- ε_collapse_ε; [ | now apply NoDup_comp_iff ].
-rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
+  rewrite <- ε_collapse_ε; [ | easy | now apply NoDup_comp_iff ].
+  rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 symmetry.
 ...
 rewrite <- ε_collapse_ε; [ | easy ].
