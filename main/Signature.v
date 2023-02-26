@@ -2912,6 +2912,7 @@ subst lb.
 rewrite map_app.
 cbn.
 rewrite Hin.
+Search (ε (_ ++ _)).
 ...
 specialize butn_permut_seq_with_len as H2.
 specialize permut_without_highest as H3.
