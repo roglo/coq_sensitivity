@@ -2870,9 +2870,9 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
 rewrite <- ε_collapse_ε; [ | easy | now apply NoDup_comp_iff ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 rewrite <- (ε_collapse_ε Hos Haa).
-destruct Hbp as (Hb, H2).
+destruct Hbp as (Hb, Hab).
 clear Haa.
-rewrite <- (collapse_length la) in H2.
+rewrite <- (collapse_length la) in Hab.
 specialize (collapse_permut_seq_with_len la) as Ha.
 destruct Ha as (Ha, _).
 remember (collapse la) as lc eqn:Hlc.
