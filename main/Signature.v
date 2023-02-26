@@ -2870,14 +2870,56 @@ destruct (ListDec.NoDup_dec Nat.eq_dec la) as [Haa| Haa]. 2: {
 rewrite <- ε_collapse_ε; [ | easy | now apply NoDup_comp_iff ].
 rewrite collapse_comp; [ | easy | now destruct Hbp | now destruct Hbp ].
 rewrite <- (ε_collapse_ε Hos Haa).
+rewrite <- (collapse_length la) in Hbp.
 destruct Hbp as (Hb, Hab).
 clear Haa.
-rewrite <- (collapse_length la) in Hab.
 specialize (collapse_permut_seq_with_len la) as Ha.
 destruct Ha as (Ha, _).
 remember (collapse la) as lc eqn:Hlc.
 clear la Hlc; rename lc into la.
 move Ha after Hb; move la after lb.
+(**)
+assert (Hc : permut_seq (la ° lb)). {
+  apply comp_permut_seq with (n := length la); now split.
+}
+rename Hab into Hlb.
+move Hc before Hb.
+remember (length la) as n eqn:Hla; symmetry in Hla.
+assert (Hlc : length (la ° lb) = n) by now rewrite comp_length.
+revert la lb Ha Hb Hc Hla Hlb Hlc.
+induction n; intros; cbn. {
+  apply length_zero_iff_nil in Hla, Hlb; subst la lb.
+  symmetry; apply rngl_mul_1_l.
+}
+Search (permut_seq_with_len (S _)).
+...
+permut_without_highest:
+  ∀ (n : nat) (l : list nat),
+    permut_seq_with_len (S n) l
+    → ∃ i : nat,
+        i < length l ∧ nth i l 0 = n ∧ permut_seq_with_len n (butn i l)
+...
+Search (_ ++ _ :: _).
+in_split:
+  ∀ (A : Type) (x : A) (l : list A),
+    x ∈ l → ∃ l1 l2 : list A, l = l1 ++ x :: l2
+nth_split:
+  ∀ (A : Type) (n : nat) (l : list A) (d : A),
+    n < length l → ∃ l1 l2 : list A, l = l1 ++ nth n l d :: l2 ∧ length l1 = n
+...
+remember (la ° lb) as lc eqn:Hlc; symmetry in Hlc.
+revert la lb Ha Hb Hab Hlc.
+induction lc as [| c]; intros. {
+  unfold "°" in Hlc.
+  apply map_eq_nil in Hlc; subst lb.
+  symmetry in Hab; apply length_zero_iff_nil in Hab; subst la.
+  symmetry; apply rngl_mul_1_l.
+}
+cbn.
+unfold "°" in Hlc.
+...
+destruct lb as [| b]; [ easy | cbn in Hlc |-* ].
+injection Hlc; clear Hlc; intros Hlc Hc.
 ...
 (**)
 unfold permut_seq in Ha, Hb.
