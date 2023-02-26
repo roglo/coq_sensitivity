@@ -1090,6 +1090,61 @@ split. {
 now rewrite map_length, seq_length.
 Qed.
 
+Theorem ε_app_cons :
+  rngl_has_opp = true →
+  ∀ n la lb,
+  (∀ a, a ∈ la ++ lb → a < n)
+  → ε (la ++ n :: lb) = (minus_one_pow (length lb) * ε (la ++ lb))%L.
+Proof.
+intros Hop * Hab.
+revert n lb Hab.
+induction la as [| a]; intros; cbn. {
+  f_equal; cbn in Hab.
+  induction lb as [| b]; [ easy | cbn ].
+  specialize (Hab b (or_introl eq_refl)) as H1.
+  remember (n ?= b) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    now apply Nat.compare_eq_iff in Hc; subst b; apply Nat.lt_irrefl in H1.
+  } {
+    apply Nat.compare_lt_iff in Hc; flia H1 Hc.
+  }
+  rewrite (minus_one_pow_succ Hop).
+  f_equal.
+  apply IHlb.
+  intros a Ha.
+  now apply Hab; right.
+}
+rewrite IHla. 2: {
+  intros b Hb.
+  now apply Hab; right.
+}
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+rewrite (minus_one_pow_mul_comm Hop); f_equal.
+clear IHla.
+revert a lb Hab.
+induction la as [| a']; intros; cbn. {
+  specialize (Hab a (or_introl eq_refl)).
+  apply Nat.compare_lt_iff in Hab.
+  now rewrite Hab.
+}
+remember (a ?= a') as c eqn:Hc; symmetry in Hc.
+destruct c; [ easy | | ]. {
+  apply IHla.
+  intros b Hb.
+  apply Hab.
+  cbn in Hb |-*.
+  destruct Hb; [ now left | now right; right ].
+} {
+  f_equal.
+  apply IHla.
+  intros b Hb.
+  apply Hab.
+  cbn in Hb |-*.
+  destruct Hb; [ now left | now right; right ].
+}
+Qed.
+
 Theorem ε_aux_app : ∀ i p q,
   (∀ j k, j ∈ i :: p → k ∈ q → j < k)
   → ε_aux i (p ++ q) = ε_aux i p.
@@ -2912,41 +2967,12 @@ subst lb.
 rewrite map_app.
 cbn.
 rewrite Hin.
-Theorem toto :
-  rngl_has_opp = true →
-  ∀ n la lb,
-  (∀ a, a ∈ la ++ lb → a < n)
-  → ε (la ++ n :: lb) = (minus_one_pow (length lb) * ε la * ε lb)%L.
-Proof.
-intros Hop * Hab.
-revert n lb Hab.
-induction la as [| a]; intros; cbn. {
-  rewrite rngl_mul_1_r; f_equal; cbn in Hab.
-  induction lb as [| b]; [ easy | cbn ].
-  specialize (Hab b (or_introl eq_refl)) as H1.
-  remember (n ?= b) as c eqn:Hc; symmetry in Hc.
-  destruct c. {
-    now apply Nat.compare_eq_iff in Hc; subst b; apply Nat.lt_irrefl in H1.
-  } {
-    apply Nat.compare_lt_iff in Hc; flia H1 Hc.
-  }
-  rewrite (minus_one_pow_succ Hop).
-  f_equal.
-  apply IHlb.
-  intros a Ha.
-  now apply Hab; right.
-}
-rewrite IHla. 2: {
-  intros b Hb.
-  now apply Hab; right.
-}
-do 3 rewrite rngl_mul_assoc.
-f_equal; f_equal.
-rewrite (minus_one_pow_mul_comm Hop); f_equal.
-...
-rewrite toto.
-...
-ε (la ++ n :: lb) = (-1)^(length lb) * ε la * ε lb
+rewrite (ε_app_cons Hop). 2: {
+  intros k Hk.
+  apply in_app_or in Hk.
+  destruct Hk as [Hk| Hk]. {
+    apply in_map_iff in Hk.
+    destruct Hk as (u & Huk & Hu).
 ...
 specialize butn_permut_seq_with_len as H2.
 specialize permut_without_highest as H3.
