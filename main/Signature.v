@@ -2476,17 +2476,29 @@ Definition keeps_order {A} f g (l : list A) :=
 
 Theorem ε_glop_ε :
   rngl_has_opp_or_subt = true →
-  ∀ A f g (l : list A), keeps_order f g l → f [] = g [] → ε (f l) = ε (g l).
+  ∀ A f g (l : list A),
+  keeps_order f g l
+  → length (f l) = length (g l)
+  → ε (f l) = ε (g l).
 Proof.
 intros Hos * Hko Hfg.
-revert f g Hko Hfg.
-induction l as [| a]; intros. {
-  unfold keeps_order in Hko.
-  now rewrite Hfg.
+remember (length (f l)) as n eqn:Hf; symmetry in Hf.
+symmetry in Hfg; rename Hfg into Hg.
+revert f g l Hko Hf Hg.
+induction n; intros. {
+  apply length_zero_iff_nil in Hf, Hg.
+  f_equal; congruence.
 }
-specialize (IHl (λ l, f (a :: l)) (λ l, g (a :: l))).
-cbn in IHl.
-apply IHl.
+(* non, ça marche pas *)
+...
+destruct l as [| a]. {
+  unfold keeps_order in Hko.
+  rewrite Hf in Hko.
+...
+}
+specialize (IHn (λ l, f (a :: l)) (λ l, g (a :: l))).
+cbn in IHn.
+apply IHn.
 unfold keeps_order in Hko |-*.
 intros i j Hi Hj.
 apply Hko; [ cbn; flia Hi | cbn; flia Hj ].
