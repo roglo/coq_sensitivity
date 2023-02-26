@@ -2878,20 +2878,21 @@ destruct Ha as (Ha, _).
 remember (collapse la) as lc eqn:Hlc.
 clear la Hlc; rename lc into la.
 move Ha after Hb; move la after lb.
-(**)
-assert (Hc : permut_seq (la ° lb)). {
-  apply comp_permut_seq with (n := length la); now split.
-}
-rename Hab into Hlb.
-move Hc before Hb.
 remember (length la) as n eqn:Hla; symmetry in Hla.
-assert (Hlc : length (la ° lb) = n) by now rewrite comp_length.
-revert la lb Ha Hb Hc Hla Hlb Hlc.
+rename Hab into Hlb.
+assert (H : permut_seq_with_len n la) by easy.
+clear Ha Hla; rename H into Ha.
+assert (H : permut_seq_with_len n lb) by easy.
+clear Hb Hlb; rename H into Hb.
+revert la lb Ha Hb.
 induction n; intros; cbn. {
+  destruct Ha as (_, Hla).
+  destruct Hb as (_, Hlb).
   apply length_zero_iff_nil in Hla, Hlb; subst la lb.
   symmetry; apply rngl_mul_1_l.
 }
-Search (permut_seq_with_len (S _)).
+specialize (permut_without_highest Ha) as H1.
+destruct H1 as (i & Hi & Hin & H1).
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
