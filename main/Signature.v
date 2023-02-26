@@ -2470,23 +2470,27 @@ destruct c1. {
 }
 Qed.
 
-Definition keeps_order f g l :=
-  ∀ i j, i < length l → j < length l →
-    (nth i (f l) 0 ?= nth j (g l) 0) = (nth i l 0 ?= nth j l 0).
+Definition keeps_order {A} f g (l : list A) :=
+  ∀ i j, i < length (f l) → j < length (f l) →
+    (nth i (f l) 0 ?= nth j (f l) 0) = (nth i (g l) 0 ?= nth j (g l) 0).
 
 Theorem ε_glop_ε :
   rngl_has_opp_or_subt = true →
-  ∀ f g l, keeps_order f g l → ε (f l) = ε (g l).
+  ∀ A f g (l : list A), keeps_order f g l → f [] = g [] → ε (f l) = ε (g l).
 Proof.
-intros Hos * Hko.
-revert f g Hko.
+intros Hos * Hko Hfg.
+revert f g Hko Hfg.
 induction l as [| a]; intros. {
   unfold keeps_order in Hko.
-(* ouais, non, c'est pas ça *)
-...
+  now rewrite Hfg.
+}
 specialize (IHl (λ l, f (a :: l)) (λ l, g (a :: l))).
 cbn in IHl.
 apply IHl.
+unfold keeps_order in Hko |-*.
+intros i j Hi Hj.
+apply Hko; [ cbn; flia Hi | cbn; flia Hj ].
+(* ouais, non, c'est pas ça *)
 ...
 
 Theorem ε_collapse_ε :
