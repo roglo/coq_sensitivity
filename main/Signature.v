@@ -2893,6 +2893,29 @@ induction n; intros; cbn. {
 }
 specialize (permut_without_highest Ha) as H1.
 destruct H1 as (i & Hi & Hin & H1).
+unfold "°".
+specialize permut_list_surj as H2.
+specialize (H2 i lb).
+assert (H : permut_seq lb) by now destruct Hb.
+specialize (H2 H); clear H.
+replace (length la) with (S n) in Hi by now destruct Ha.
+replace (length lb) with (S n) in H2 by now destruct Hb.
+specialize (H2 Hi).
+destruct H2 as (j & Hj & Hji).
+specialize nth_split as H2.
+specialize (H2 _ j lb 0).
+replace (length lb) with (S n) in H2 by now destruct Hb.
+specialize (H2 Hj).
+destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
+rewrite Hji in Hlb.
+subst lb.
+rewrite map_app.
+cbn.
+rewrite Hin.
+...
+specialize butn_permut_seq_with_len as H2.
+specialize permut_without_highest as H3.
+specialize (H2 n i lb Hb).
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
