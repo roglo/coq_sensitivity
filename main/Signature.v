@@ -2879,6 +2879,38 @@ remember (collapse la) as lc eqn:Hlc.
 clear la Hlc; rename lc into la.
 move Ha after Hb; move la after lb.
 ...
+(**)
+unfold permut_seq in Ha, Hb.
+apply (permutation_sym Nat.eqb_eq) in Hb.
+apply (permutation_trans Nat.eqb_eq) with (la := la) in Hb. 2: {
+  now rewrite <- H2 in Ha.
+}
+(**)
+clear Ha.
+(**)
+revert lb Hb H2.
+induction la as [| a]; intros. {
+  apply length_zero_iff_nil in H2; subst lb.
+  cbn; symmetry; apply rngl_mul_1_l.
+}
+apply permutation_cons_l_iff in Hb.
+remember (extract _ _) as lal eqn:Hlal; symmetry in Hlal.
+destruct lal as [((bef, x), aft) | ]; [ | easy ].
+apply extract_Some_iff in Hlal.
+destruct Hlal as (Hbef & H & Hli).
+apply Nat.eqb_eq in H; subst x.
+subst lb.
+rewrite app_length in H2; cbn in H2.
+rewrite Nat.add_succ_r in H2.
+apply Nat.succ_inj in H2.
+rewrite <- app_length in H2.
+specialize (IHla _ Hb H2) as H1.
+cbn.
+unfold "°".
+rewrite map_app.
+cbn - [ nth ].
+Search (ε (_ ++ _)).
+...
 symmetry.
 ...
 rewrite <- ε_collapse_ε; [ | easy ].
