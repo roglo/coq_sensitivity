@@ -2916,6 +2916,39 @@ Theorem sign_comp :
   → ε (la ° lb) = (ε la * ε lb)%L.
 Proof.
 intros Hop * Hbp.
+remember (length la) as n eqn:Hla; symmetry in Hla.
+revert la lb Hla Hbp.
+induction n; intros; cbn. {
+  destruct Hbp as (Hb, Hbl).
+  apply length_zero_iff_nil in Hla, Hbl; subst la lb.
+  symmetry; apply rngl_mul_1_l.
+}
+specialize (permut_without_highest Hbp) as H1.
+destruct H1 as (i & Hi & Hin & H1).
+specialize permut_list_surj as H2.
+specialize (H2 i lb).
+assert (H : permut_seq lb) by now destruct Hbp.
+specialize (H2 H Hi); clear H.
+destruct H2 as (j & Hj & Hji).
+specialize nth_split as H2.
+specialize (H2 _ j lb 0 Hj).
+destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
+rewrite Hji in Hlb.
+specialize (IHn (removelast la) (butn i lb)) as H2.
+assert (H : length (removelast la) = n). {
+  specialize (@app_removelast_last _ la 0) as H3.
+  assert (H : la ≠ []) by now intros H; rewrite H in Hla.
+  specialize (H3 H); clear H.
+  apply (f_equal length) in H3.
+  rewrite app_length, Hla in H3; cbn in H3.
+  now rewrite Nat.add_1_r in H3; apply Nat.succ_inj in H3.
+}
+specialize (H2 H H1); clear H.
+...
+rewrite (@app_removelast_last _ la 0).
+rewrite app_removelast_last with (l := la) (d := 0).
+...
+intros Hop * Hbp.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
