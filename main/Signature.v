@@ -3055,6 +3055,12 @@ destruct H2 as (la1 & la2 & Hla & Hil1).
 rewrite Hin in Hla.
 subst la.
 rewrite (ε_app_cons Hop). 2: {
+  intros u Hu.
+  destruct H1 as (Ha1, Ha2).
+  generalize Ha1; intros Ha'.
+  apply permut_seq_iff in Ha'.
+  destruct Ha' as (Ha3, Ha4).
+Search (NoDup (butn _ _)).
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
