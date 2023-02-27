@@ -3033,7 +3033,7 @@ move k before i.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
     rewrite Hlb in Hb.
     rewrite Hla in Ha.
-...
+(**)
     assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; right; right.
     apply Hb in H.
     apply in_seq in H; cbn in H; destruct H as (_, H).
@@ -3051,9 +3051,10 @@ move k before i.
     clear Hn.
     apply NoDup_app_iff in Hb2.
     destruct Hb2 as (Hb2 & Hb3 & Hb4).
-    specialize (Hb4 _ Hu).
-    now apply Hb4; left.
+(**)
+    now apply NoDup_cons_iff in Hb3.
   }
+}
 ...
 specialize butn_permut_seq_with_len as H2.
 specialize permut_without_highest as H3.
