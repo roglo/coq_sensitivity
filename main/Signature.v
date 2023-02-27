@@ -2976,6 +2976,14 @@ rewrite (ε_app_cons Hop). 2: {
     subst k.
     destruct Ha as (Ha, Hla).
     destruct Hb as (Hb, Hlb).
+    generalize Ha; intros Ha'.
+    apply permut_seq_iff in Ha'.
+    destruct Ha' as (Ha1, Ha2).
+    unfold AllLt in Ha1.
+    generalize Hb; intros Hb'.
+    apply permut_seq_iff in Hb'.
+    destruct Hb' as (Hb1, Hb2).
+    unfold AllLt in Hb1.
     unfold permut_seq in Ha, Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
@@ -2983,8 +2991,24 @@ rewrite (ε_app_cons Hop). 2: {
     rewrite Hla in Ha.
     assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; left.
     apply Hb in H.
-    apply in_seq in H.
-(* oh pis zut, j'y suis presque mais faut réfléchir *)
+    apply in_seq in H; cbn in H; destruct H as (_, H).
+    rewrite <- Hla in H.
+    rewrite Hla in Ha1.
+    specialize (Ha1 (nth u la 0)) as H2.
+    assert (H5 : nth u la 0 ∈ la) by now apply nth_In.
+    specialize (H2 H5).
+    destruct (Nat.eq_dec (nth u la 0) n) as [Hn| Hn]; [ | flia H2 Hn ].
+    exfalso.
+    rewrite <- Hin in Hn.
+    rewrite <- Hla in Hi.
+    specialize (NoDup_nat la Ha2 u i H Hi Hn) as H3.
+    subst u.
+    clear Hn.
+    apply NoDup_app_iff in Hb2.
+    destruct Hb2 as (Hb2 & Hb3 & Hb4).
+    specialize (Hb4 _ Hu).
+    now apply Hb4; left.
+  }
 ...
 specialize butn_permut_seq_with_len as H2.
 specialize permut_without_highest as H3.
