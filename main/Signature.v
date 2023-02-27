@@ -2970,24 +2970,24 @@ rewrite Hin.
 rewrite (ε_app_cons Hop). 2: {
   intros k Hk.
   apply in_app_or in Hk.
-  destruct Hk as [Hk| Hk]. {
 clear - Hk Ha Hb Hin Hi.
 move Ha before Hb.
 move k before i.
+  destruct Ha as (Ha, Hla).
+  destruct Hb as (Hb, Hlb).
+  generalize Ha; intros Ha'.
+  apply permut_seq_iff in Ha'.
+  destruct Ha' as (Ha1, Ha2).
+  unfold AllLt in Ha1.
+  generalize Hb; intros Hb'.
+  apply permut_seq_iff in Hb'.
+  destruct Hb' as (Hb1, Hb2).
+  unfold AllLt in Hb1.
+  unfold permut_seq in Ha, Hb.
+  destruct Hk as [Hk| Hk]. {
     apply in_map_iff in Hk.
     destruct Hk as (u & Huk & Hu).
     subst k.
-    destruct Ha as (Ha, Hla).
-    destruct Hb as (Hb, Hlb).
-    generalize Ha; intros Ha'.
-    apply permut_seq_iff in Ha'.
-    destruct Ha' as (Ha1, Ha2).
-    unfold AllLt in Ha1.
-    generalize Hb; intros Hb'.
-    apply permut_seq_iff in Hb'.
-    destruct Hb' as (Hb1, Hb2).
-    unfold AllLt in Hb1.
-    unfold permut_seq in Ha, Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
     rewrite Hlb in Hb.
@@ -3012,28 +3012,13 @@ move k before i.
     specialize (Hb4 _ Hu).
     now apply Hb4; left.
   } {
-clear - Hk Ha Hb Hin Hi.
-move Ha before Hb.
-move k before i.
     apply in_map_iff in Hk.
     destruct Hk as (u & Huk & Hu).
     subst k.
-    destruct Ha as (Ha, Hla).
-    destruct Hb as (Hb, Hlb).
-    generalize Ha; intros Ha'.
-    apply permut_seq_iff in Ha'.
-    destruct Ha' as (Ha1, Ha2).
-    unfold AllLt in Ha1.
-    generalize Hb; intros Hb'.
-    apply permut_seq_iff in Hb'.
-    destruct Hb' as (Hb1, Hb2).
-    unfold AllLt in Hb1.
-    unfold permut_seq in Ha, Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
     rewrite Hlb in Hb.
     rewrite Hla in Ha.
-(**)
     assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; right; right.
     apply Hb in H.
     apply in_seq in H; cbn in H; destruct H as (_, H).
