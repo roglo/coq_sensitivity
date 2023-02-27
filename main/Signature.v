@@ -2925,6 +2925,25 @@ induction n; intros; cbn. {
 }
 specialize (permut_without_highest Hbp) as H1.
 destruct H1 as (i & Hi & Hin & H1).
+(**)
+specialize nth_split as H2.
+specialize (H2 _ i lb 0 Hi).
+destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
+rewrite Hin in Hlb.
+specialize (IHn (removelast la) (butn i lb)) as H2.
+assert (H : length (removelast la) = n). {
+  specialize (@app_removelast_last _ la 0) as H3.
+  assert (H : la ≠ []) by now intros H; rewrite H in Hla.
+  specialize (H3 H); clear H.
+  apply (f_equal length) in H3.
+  rewrite app_length, Hla in H3; cbn in H3.
+  now rewrite Nat.add_1_r in H3; apply Nat.succ_inj in H3.
+}
+specialize (H2 H H1); clear H.
+unfold "°".
+rewrite Hlb.
+rewrite map_app; cbn.
+...
 specialize permut_list_surj as H2.
 specialize (H2 i lb).
 assert (H : permut_seq lb) by now destruct Hbp.
@@ -2944,6 +2963,7 @@ assert (H : length (removelast la) = n). {
   now rewrite Nat.add_1_r in H3; apply Nat.succ_inj in H3.
 }
 specialize (H2 H H1); clear H.
+unfold "°".
 ...
 rewrite (@app_removelast_last _ la 0).
 rewrite app_removelast_last with (l := la) (d := 0).
