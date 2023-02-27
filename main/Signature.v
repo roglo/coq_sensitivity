@@ -3039,80 +3039,22 @@ rewrite (ε_app_cons Hop). 2: {
 rewrite map_length.
 rewrite <- map_app.
 rewrite fold_comp_list.
+specialize permut_without_highest as H2.
+specialize (H2 n (lb1 ++ i :: lb2) Hb).
+destruct H2 as (k & Hkl & Hn & H2).
+rewrite app_length in Hkl; cbn in Hkl.
+rewrite Nat.add_succ_r, <- app_length in Hkl.
+specialize (IHn _ _ H1 H2) as H3.
+remember (lb1 ++ i :: lb2) as lb eqn:Hlb.
+rename H2 into H4.
+specialize nth_split as H2.
+specialize (H2 _ i la 0).
+replace (length la) with (S n) in H2 by now destruct Ha.
+specialize (H2 Hi).
+destruct H2 as (la1 & la2 & Hla & Hil1).
+rewrite Hin in Hla.
+subst la.
 rewrite (ε_app_cons Hop). 2: {
-  intros k Hk.
-...
-  apply in_app_or in Hk.
-  clear - Hk Ha Hb Hin Hi.
-  move Ha before Hb.
-  move k before i.
-(**)
-  destruct Ha as (Ha, Hla).
-  destruct Hb as (Hb, Hlb).
-  generalize Ha; intros Ha'.
-  apply permut_seq_iff in Ha'.
-  destruct Ha' as (Ha1, Ha2).
-  unfold AllLt in Ha1.
-  generalize Hb; intros Hb'.
-  apply permut_seq_iff in Hb'.
-  destruct Hb' as (Hb1, Hb2).
-  unfold AllLt in Hb1.
-  unfold permut_seq in Ha, Hb.
-  rewrite Hla in Ha.
-  rewrite Hlb in Hb.
-  destruct Hk as [Hk| Hk]. {
-    apply in_map_iff in Hk.
-    destruct Hk as (u & Huk & Hu).
-    subst k.
-    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
-    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
-    assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; left.
-    apply Hb in H.
-    apply in_seq in H; cbn in H; destruct H as (_, H).
-    rewrite <- Hla in H.
-    rewrite Hla in Ha1.
-    specialize (Ha1 (nth u la 0)) as H2.
-    assert (H5 : nth u la 0 ∈ la) by now apply nth_In.
-    specialize (H2 H5).
-    destruct (Nat.eq_dec (nth u la 0) n) as [Hn| Hn]; [ | flia H2 Hn ].
-    exfalso.
-    rewrite <- Hin in Hn.
-    rewrite <- Hla in Hi.
-    specialize (NoDup_nat la Ha2 u i H Hi Hn) as H3.
-    subst u.
-    apply NoDup_app_iff in Hb2.
-    destruct Hb2 as (Hb2 & Hb3 & Hb4).
-    specialize (Hb4 _ Hu).
-    now apply Hb4; left.
-  } {
-    apply in_map_iff in Hk.
-    destruct Hk as (u & Huk & Hu).
-    subst k.
-    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
-    apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
-    assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; right; right.
-    apply Hb in H.
-    apply in_seq in H; cbn in H; destruct H as (_, H).
-    rewrite <- Hla in H.
-    rewrite Hla in Ha1.
-    specialize (Ha1 (nth u la 0)) as H2.
-    assert (H5 : nth u la 0 ∈ la) by now apply nth_In.
-    specialize (H2 H5).
-    destruct (Nat.eq_dec (nth u la 0) n) as [Hn| Hn]; [ | flia H2 Hn ].
-    exfalso.
-    rewrite <- Hin in Hn.
-    rewrite <- Hla in Hi.
-    specialize (NoDup_nat la Ha2 u i H Hi Hn) as H3.
-    subst u.
-    apply NoDup_app_iff in Hb2.
-    destruct Hb2 as (Hb2 & Hb3 & Hb4).
-    now apply NoDup_cons_iff in Hb3.
-  }
-}
-...
-specialize butn_permut_seq_with_len as H2.
-specialize permut_without_highest as H3.
-specialize (H2 n i lb Hb).
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
