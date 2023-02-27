@@ -2901,6 +2901,14 @@ subst la.
 apply (ε_dup Hop).
 Qed.
 
+Theorem comp_map : ∀ la lb,
+  la ° lb = map (λ i, nth (nth i lb 0) la 0) (seq 0 (length lb)).
+Proof.
+intros.
+unfold "°".
+now rewrite (List_map_map_seq _ 0).
+Qed.
+
 Theorem sign_comp :
   rngl_has_opp = true →
   ∀ la lb,
@@ -3070,7 +3078,17 @@ rewrite (ε_app_cons Hop). 2: {
   rewrite app_nil_l, Nat.sub_succ_l in Ha5; [ | easy ].
   rewrite Nat.sub_diag in Ha5; cbn in Ha5.
   apply in_app_or in Hu.
+  rewrite firstn_app in Ha6.
+  rewrite skipn_app in Ha6.
+  rewrite Hil1 in Ha6.
+  rewrite Nat.sub_succ_l in Ha6; [ | easy ].
+  rewrite Nat.sub_diag, firstn_O in Ha6.
+  rewrite app_nil_r in Ha6.
+  rewrite firstn_all2 in Ha6; [ | now rewrite Hil1 ].
+  rewrite skipn_all2 in Ha6; [ | rewrite Hil1; flia ].
+  cbn in Ha6.
   destruct Hu as [Hu| Hu]. {
+...
 Theorem glop : ∀ i la lb,
   i < length lb → nth i (la ° lb) 0 = nth (nth i lb 0) la 0.
 Proof.
