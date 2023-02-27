@@ -3106,27 +3106,55 @@ rewrite (ε_app_cons Hop). 2: {
     rewrite Hla in H2.
     destruct (Nat.eq_dec u n) as [Hun| Hun]; [ | flia H2 Hun ].
     subst u; exfalso.
-...
     apply (In_nth _ _ 0) in Hu.
     destruct Hu as (v & Hvl & Hv).
-    specialize (NoDup_nat _ Ha2 i v) as H5.
+    specialize (NoDup_nat _ Ha2 i (S i + v)) as H5.
     assert (H : i < length (la1 ++ n :: la2)). {
       rewrite app_length, Hil1; cbn; flia.
     }
     specialize (H5 H); clear H.
-    assert (H : v < length (la1 ++ n :: la2)). {
-      rewrite app_length; cbn; flia Hvl.
+    assert (H : S i + v < length (la1 ++ n :: la2)). {
+      rewrite app_length, Hil1; cbn.
+      rewrite Nat.add_succ_r.
+      apply -> Nat.succ_lt_mono.
+      now apply Nat.add_lt_mono_l.
     }
     specialize (H5 H); clear H.
     rewrite Hin in H5.
-...
-    rewrite app_nth2 in H5.
-
-    rewrite app_nth2 in H5; [ | easy ].
-    rewrite Hv in H5.
-    specialize (H5 eq_refl); subst v.
-    rewrite Hil1 in Hvl.
-    now apply Nat.lt_irrefl in Hvl.
+    rewrite app_nth2 in H5; [ | rewrite Hil1; flia ].
+    rewrite Hil1, Nat.add_comm, <- Nat.add_succ_comm, Nat.add_sub in H5.
+    cbn in H5; symmetry in Hv.
+    specialize (H5 Hv).
+    flia H5.
+  }
+}
+unfold butn in H3.
+rewrite firstn_app in H3.
+rewrite Hil1, Nat.sub_diag, firstn_O, app_nil_r in H3.
+rewrite firstn_all2 in H3; [ | now rewrite Hil1 ].
+rewrite skipn_app in H3.
+rewrite skipn_all2 in H3; [ | flia Hil1 ].
+rewrite app_nil_l in H3.
+rewrite Hil1, Nat.sub_succ_l, Nat.sub_diag in H3; [ | easy ].
+remember (S k) as sk; cbn in H3; subst sk.
+rewrite fold_butn in H3.
+generalize Hlb; intros H.
+apply (f_equal length) in H.
+rewrite app_length in H; cbn in H.
+rewrite Hjl1 in H.
+generalize Hb; intros H5.
+destruct H5 as (H5, H6).
+rewrite H6 in H.
+rewrite Nat.add_succ_r in H.
+apply Nat.succ_inj in H.
+generalize Ha; intros H7.
+destruct H7 as (H7, H8).
+rewrite app_length in H8; cbn in H8.
+rewrite Hil1 in H8.
+rewrite Nat.add_succ_r in H8.
+apply Nat.succ_inj in H8.
+replace (length lb2) with (n - j) by flia H.
+replace (length la2) with (n - i) by flia H8.
 ...
 Theorem glop : ∀ i la lb,
   i < length lb → nth i (la ° lb) 0 = nth (nth i lb 0) la 0.
