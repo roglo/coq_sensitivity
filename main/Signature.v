@@ -3071,7 +3071,15 @@ rewrite (ε_app_cons Hop). 2: {
   rewrite Nat.sub_diag in Ha5; cbn in Ha5.
   apply in_app_or in Hu.
   destruct Hu as [Hu| Hu]. {
-}
+Theorem glop : ∀ i la lb,
+  i < length lb → nth i (la ° lb) 0 = nth (nth i lb 0) la 0.
+Proof.
+intros * Hib.
+unfold "°".
+now rewrite (List_map_nth' 0).
+Qed.
+Check glop.
+Search (map _ (seq _ _)).
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
