@@ -3060,7 +3060,18 @@ rewrite (ε_app_cons Hop). 2: {
   generalize Ha1; intros Ha'.
   apply permut_seq_iff in Ha'.
   destruct Ha' as (Ha3, Ha4).
-Search (NoDup (butn _ _)).
+  apply NoDup_app_iff in Ha4.
+  destruct Ha4 as (Ha4 & Ha5 & Ha6).
+  rewrite <- Hil1 in Ha4, Ha5.
+  rewrite firstn_app in Ha4.
+  rewrite firstn_all, Nat.sub_diag, firstn_O, app_nil_r in Ha4.
+  rewrite skipn_app in Ha5.
+  rewrite skipn_all2 in Ha5; [ | flia ].
+  rewrite app_nil_l, Nat.sub_succ_l in Ha5; [ | easy ].
+  rewrite Nat.sub_diag in Ha5; cbn in Ha5.
+  apply in_app_or in Hu.
+  destruct Hu as [Hu| Hu]. {
+}
 ...
 permut_without_highest:
   ∀ (n : nat) (l : list nat),
