@@ -3064,30 +3064,69 @@ rewrite Hin in Hla.
 subst la.
 rewrite (ε_app_cons Hop). 2: {
   intros u Hu.
-  destruct H1 as (Ha1, Ha2).
-  generalize Ha1; intros Ha'.
-  apply permut_seq_iff in Ha'.
-  destruct Ha' as (Ha3, Ha4).
-  apply NoDup_app_iff in Ha4.
-  destruct Ha4 as (Ha4 & Ha5 & Ha6).
-  rewrite <- Hil1 in Ha4, Ha5.
-  rewrite firstn_app in Ha4.
-  rewrite firstn_all, Nat.sub_diag, firstn_O, app_nil_r in Ha4.
-  rewrite skipn_app in Ha5.
-  rewrite skipn_all2 in Ha5; [ | flia ].
-  rewrite app_nil_l, Nat.sub_succ_l in Ha5; [ | easy ].
-  rewrite Nat.sub_diag in Ha5; cbn in Ha5.
   apply in_app_or in Hu.
-  rewrite firstn_app in Ha6.
-  rewrite skipn_app in Ha6.
-  rewrite Hil1 in Ha6.
-  rewrite Nat.sub_succ_l in Ha6; [ | easy ].
-  rewrite Nat.sub_diag, firstn_O in Ha6.
-  rewrite app_nil_r in Ha6.
-  rewrite firstn_all2 in Ha6; [ | now rewrite Hil1 ].
-  rewrite skipn_all2 in Ha6; [ | rewrite Hil1; flia ].
-  cbn in Ha6.
   destruct Hu as [Hu| Hu]. {
+    destruct Ha as (Ha, Hla).
+    generalize Ha; intros Ha'.
+    apply permut_seq_iff in Ha'.
+    destruct Ha' as (Ha1, Ha2).
+    unfold AllLt in Ha1.
+    specialize (Ha1 u) as H2.
+    assert (H : u ∈ la1 ++ n :: la2) by now apply in_or_app; left.
+    specialize (H2 H); clear H.
+    rewrite Hla in H2.
+    destruct (Nat.eq_dec u n) as [Hun| Hun]; [ | flia H2 Hun ].
+    subst u; exfalso.
+    apply (In_nth _ _ 0) in Hu.
+    destruct Hu as (v & Hvl & Hv).
+    specialize (NoDup_nat _ Ha2 i v) as H5.
+    assert (H : i < length (la1 ++ n :: la2)). {
+      rewrite app_length, Hil1; cbn; flia.
+    }
+    specialize (H5 H); clear H.
+    assert (H : v < length (la1 ++ n :: la2)). {
+      rewrite app_length; cbn; flia Hvl.
+    }
+    specialize (H5 H); clear H.
+    rewrite Hin in H5.
+    rewrite app_nth1 in H5; [ | easy ].
+    rewrite Hv in H5.
+    specialize (H5 eq_refl); subst v.
+    rewrite Hil1 in Hvl.
+    now apply Nat.lt_irrefl in Hvl.
+  } {
+    destruct Ha as (Ha, Hla).
+    generalize Ha; intros Ha'.
+    apply permut_seq_iff in Ha'.
+    destruct Ha' as (Ha1, Ha2).
+    unfold AllLt in Ha1.
+    specialize (Ha1 u) as H2.
+    assert (H : u ∈ la1 ++ n :: la2) by now apply in_or_app; right; right.
+    specialize (H2 H); clear H.
+    rewrite Hla in H2.
+    destruct (Nat.eq_dec u n) as [Hun| Hun]; [ | flia H2 Hun ].
+    subst u; exfalso.
+...
+    apply (In_nth _ _ 0) in Hu.
+    destruct Hu as (v & Hvl & Hv).
+    specialize (NoDup_nat _ Ha2 i v) as H5.
+    assert (H : i < length (la1 ++ n :: la2)). {
+      rewrite app_length, Hil1; cbn; flia.
+    }
+    specialize (H5 H); clear H.
+    assert (H : v < length (la1 ++ n :: la2)). {
+      rewrite app_length; cbn; flia Hvl.
+    }
+    specialize (H5 H); clear H.
+    rewrite Hin in H5.
+...
+    rewrite app_nth2 in H5.
+
+    rewrite app_nth2 in H5; [ | easy ].
+    rewrite Hv in H5.
+    specialize (H5 eq_refl); subst v.
+    rewrite Hil1 in Hvl.
+    now apply Nat.lt_irrefl in Hvl.
 ...
 Theorem glop : ∀ i la lb,
   i < length lb → nth i (la ° lb) 0 = nth (nth i lb 0) la 0.
