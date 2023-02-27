@@ -2970,9 +2970,10 @@ rewrite Hin.
 rewrite (ε_app_cons Hop). 2: {
   intros k Hk.
   apply in_app_or in Hk.
-clear - Hk Ha Hb Hin Hi.
-move Ha before Hb.
-move k before i.
+  clear - Hk Ha Hb Hin Hi.
+  move Ha before Hb.
+  move k before i.
+(**)
   destruct Ha as (Ha, Hla).
   destruct Hb as (Hb, Hlb).
   generalize Ha; intros Ha'.
@@ -2984,14 +2985,14 @@ move k before i.
   destruct Hb' as (Hb1, Hb2).
   unfold AllLt in Hb1.
   unfold permut_seq in Ha, Hb.
+  rewrite Hla in Ha.
+  rewrite Hlb in Hb.
   destruct Hk as [Hk| Hk]. {
     apply in_map_iff in Hk.
     destruct Hk as (u & Huk & Hu).
     subst k.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
-    rewrite Hlb in Hb.
-    rewrite Hla in Ha.
     assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; left.
     apply Hb in H.
     apply in_seq in H; cbn in H; destruct H as (_, H).
@@ -3006,7 +3007,6 @@ move k before i.
     rewrite <- Hla in Hi.
     specialize (NoDup_nat la Ha2 u i H Hi Hn) as H3.
     subst u.
-    clear Hn.
     apply NoDup_app_iff in Hb2.
     destruct Hb2 as (Hb2 & Hb3 & Hb4).
     specialize (Hb4 _ Hu).
@@ -3017,8 +3017,6 @@ move k before i.
     subst k.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Hb.
     apply (permutation_in_iff Nat.eqb_eq) with (a := u) in Ha.
-    rewrite Hlb in Hb.
-    rewrite Hla in Ha.
     assert (H : u ∈ lb1 ++ i :: lb2) by now apply in_or_app; right; right.
     apply Hb in H.
     apply in_seq in H; cbn in H; destruct H as (_, H).
@@ -3033,10 +3031,8 @@ move k before i.
     rewrite <- Hla in Hi.
     specialize (NoDup_nat la Ha2 u i H Hi Hn) as H3.
     subst u.
-    clear Hn.
     apply NoDup_app_iff in Hb2.
     destruct Hb2 as (Hb2 & Hb3 & Hb4).
-(**)
     now apply NoDup_cons_iff in Hb3.
   }
 }
