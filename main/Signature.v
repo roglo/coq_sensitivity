@@ -2925,12 +2925,25 @@ induction n; intros; cbn. {
 }
 specialize (permut_without_highest Hbp) as H1.
 destruct H1 as (i & Hi & Hin & H1).
-(**)
 specialize nth_split as H2.
 specialize (H2 _ i lb 0 Hi).
 destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
 rewrite Hin in Hlb.
 specialize (IHn (butn i lb) H1) as H2.
+rewrite Hlb, butn_app, Hjl1, Nat.ltb_irrefl in H2.
+rewrite Nat.sub_diag in H2.
+cbn in H2.
+assert
+  (H3 : ∀ la, length la = n →
+     ε ((la ° lb1) ++ (la ° lb2)) = (ε la * ε (lb1 ++ lb2))%L). {
+  intros lc Hlc.
+  specialize (H2 lc Hlc).
+  unfold "°" in H2.
+  rewrite map_app in H2.
+  now do 2 rewrite fold_comp_list in H2.
+}
+Search (_ ° (_ ++ _)).
+(* « comp_list_app_distr_l » *)
 ...
 assert (H : length (removelast la) = n). {
   specialize (@app_removelast_last _ la 0) as H3.
