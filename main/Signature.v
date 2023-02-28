@@ -2909,6 +2909,9 @@ unfold "°".
 now rewrite (List_map_map_seq _ 0).
 Qed.
 
+Theorem fold_ε_cons : ∀ i q, (ε_aux i q * ε q)%L = ε (i :: q).
+Proof. easy. Qed.
+
 (*
 End a.
 
@@ -2956,8 +2959,6 @@ assert
   rewrite <- comp_list_app_distr_l.
   now apply H2.
 }
-...
-(*
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.
 rewrite fold_comp_list.
@@ -2981,10 +2982,205 @@ rewrite (ε_app_cons Hop lb1). 2: {
 rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
 rewrite <- (minus_one_pow_mul_comm Hop).
+Theorem glop :
+  rngl_has_opp = true →
+  rngl_mul_is_comm = true →
+  ∀ la lb a,
+  ε (la ++ a :: lb) = (minus_one_pow (length lb) * ε (la ++ lb ++ [a]))%L.
+Proof.
+intros Hop Hic *.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+revert a lb.
+induction la as [| a']; intros; cbn. {
+  revert a.
+  induction lb as [| b]; intros; [ symmetry; apply rngl_mul_1_l | cbn ].
+  remember (a ?= b) as c eqn:Hc; symmetry in Hc.
+  destruct c. {
+    apply Nat.compare_eq_iff in Hc; subst b.
+    rewrite (rngl_mul_0_l Hos).
+    rewrite (ε_aux_dup Hop a lb []).
+    rewrite (rngl_mul_0_l Hos).
+    now rewrite (rngl_mul_0_r Hos).
+  } {
+    apply Nat.compare_lt_iff in Hc.
+    rewrite IHlb.
+    rewrite rngl_mul_assoc.
+    rewrite <- (minus_one_pow_mul_comm Hop).
+    rewrite (minus_one_pow_succ Hop).
+    rewrite (rngl_mul_opp_l Hop).
+    rewrite <- (rngl_mul_opp_r Hop).
+    rewrite <- rngl_mul_assoc; f_equal.
+    rewrite fold_ε_cons.
+    clear IHlb.
+    revert a b Hc.
+    induction lb as [| b']; intros; cbn. {
+      remember (b ?= a) as d eqn:Hd; symmetry in Hd.
+      destruct d. {
+        apply Nat.compare_eq_iff in Hd; subst b.
+        now apply Nat.lt_irrefl in Hc.
+      } {
+        apply Nat.compare_lt_iff in Hd; flia Hc Hd.
+      }
+      clear Hd.
+      rewrite <- (rngl_mul_opp_l Hop).
+      now rewrite (rngl_opp_involutive Hop).
+    }
+    remember (a ?= b') as ab eqn:Hab; symmetry in Hab.
+    remember (b ?= b') as bb eqn:Hbb; symmetry in Hbb.
+    destruct ab. {
+      apply Nat.compare_eq_iff in Hab; subst b'.
+      rewrite (rngl_mul_0_l Hos).
+      destruct bb. {
+        rewrite (rngl_mul_0_l Hos).
+        symmetry; apply (rngl_opp_0 Hop).
+      } {
+        apply Nat.compare_lt_iff in Hbb; flia Hc Hbb.
+      }
+      rewrite (ε_aux_dup Hop a lb []).
+      rewrite (rngl_mul_0_l Hos).
+      rewrite (rngl_mul_0_r Hos).
+      symmetry; apply (rngl_opp_0 Hop).
+    } {
+      apply Nat.compare_lt_iff in Hab.
+      destruct bb. {
+        apply Nat.compare_eq_iff in Hbb; subst b'.
+        rewrite (ε_aux_dup Hop b lb []).
+        do 2 rewrite (rngl_mul_0_l Hos).
+        rewrite (rngl_mul_0_r Hos).
+        symmetry; apply (rngl_opp_0 Hop).
+      } {
+        apply Nat.compare_lt_iff in Hbb.
+        rewrite rngl_mul_assoc.
+        rewrite (rngl_mul_mul_swap Hic).
+        rewrite (IHlb _ _ Hc); cbn.
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite -> rngl_mul_assoc.
+        f_equal.
+        do 2 rewrite <- rngl_mul_assoc.
+        f_equal.
+        rewrite (rngl_mul_comm Hic).
+        f_equal.
+        clear IHlb Hc.
+        induction lb as [| b'']; cbn. {
+          remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
+          destruct bb2. {
+            apply Nat.compare_eq_iff in Hbb2; subst b'.
+            now apply Nat.lt_irrefl in Hbb.
+          } {
+            apply Nat.compare_lt_iff in Hbb2; flia Hbb Hbb2.
+          }
+          remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
+          destruct ba; [ | | easy ]. {
+            apply Nat.compare_eq_iff in Hba; subst b'.
+            now apply Nat.lt_irrefl in Hab.
+          } {
+            apply Nat.compare_lt_iff in Hba; flia Hab Hba.
+          }
+        }
+        now rewrite IHlb.
+      } {
+        apply Nat.compare_gt_iff in Hbb.
+        rewrite rngl_mul_assoc.
+        rewrite (rngl_mul_mul_swap Hic).
+        rewrite (IHlb _ _ Hc); cbn.
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite -> rngl_mul_assoc.
+        f_equal.
+        do 2 rewrite <- rngl_mul_assoc.
+        rewrite (rngl_mul_opp_l Hop).
+        rewrite <- (rngl_mul_opp_r Hop).
+        f_equal.
+        rewrite (rngl_mul_comm Hic).
+        rewrite <- (rngl_mul_opp_l Hop).
+        f_equal.
+        clear IHlb Hc.
+        induction lb as [| b'']; cbn. {
+          remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
+          destruct bb2. {
+            apply Nat.compare_eq_iff in Hbb2; subst b'.
+            now apply Nat.lt_irrefl in Hbb.
+          } {
+            remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
+            destruct ba; [ | | now rewrite (rngl_opp_involutive Hop) ]. {
+              apply Nat.compare_eq_iff in Hba; subst b'.
+              now apply Nat.lt_irrefl in Hab.
+            } {
+              apply Nat.compare_lt_iff in Hba; flia Hab Hba.
+            }
+          }
+          apply Nat.compare_gt_iff in Hbb2; flia Hbb Hbb2.
+        }
+        remember (b' ?= b'') as bb2 eqn:Hbb2; symmetry in Hbb2.
+        destruct bb2; [ | easy | now rewrite IHlb ].
+        symmetry; apply (rngl_opp_0 Hop).
+      }
+    }
+    apply Nat.compare_gt_iff in Hab.
+    destruct bb. {
+      apply Nat.compare_eq_iff in Hbb; subst b'.
+      rewrite (ε_aux_dup Hop b lb []).
+      do 2 rewrite (rngl_mul_0_l Hos).
+      rewrite (rngl_mul_0_r Hos).
+      symmetry; apply (rngl_opp_0 Hop).
+    } {
+      apply Nat.compare_lt_iff in Hbb.
+      flia Hc Hab Hbb.
+    }
+    apply Nat.compare_gt_iff in Hbb.
+    rewrite (rngl_mul_opp_l Hop).
+    f_equal.
+    rewrite rngl_mul_assoc.
+    rewrite (rngl_mul_mul_swap Hic).
+    rewrite (IHlb _ _ Hc).
+    do 2 rewrite (rngl_mul_opp_l Hop).
+    cbn.
+    rewrite <- rngl_mul_assoc.
+    f_equal; f_equal.
+    rewrite (rngl_mul_comm Hic).
+    f_equal.
+    clear IHlb Hc.
+    induction lb as [| b'']; cbn. {
+      remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
+      destruct bb2. {
+        apply Nat.compare_eq_iff in Hbb2; subst b'.
+        now apply Nat.lt_irrefl in Hbb.
+      } {
+        remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
+        destruct ba; [ | easy | ]. {
+          apply Nat.compare_eq_iff in Hba; subst b'.
+          now apply Nat.lt_irrefl in Hab.
+        } {
+          apply Nat.compare_gt_iff in Hba; flia Hab Hba.
+        }
+      } {
+        apply Nat.compare_gt_iff in Hbb2; flia Hbb Hbb2.
+      }
+    }
+    now rewrite IHlb.
+  }
 ...
-Theorem glop : ∀ la lb a,
-  ε (la ++ a :: lb) = (ε (la ++ lb) * ε_aux a lb)%L.
-(* chais pas si c'est vrai, ça *)
+
+(*
+End a.
+
+Arguments ε {T}%type {ro}.
+Arguments minus_one_pow {T}%type {ro} n%nat.
+Require Import RnglAlg.Zrl ZArith.
+
+Definition ro := RnglAlg.Zrl.Z_ring_like_op.
+
+About minus_one_pow.
+
+Compute (
+  let roz := ro in
+  let a := 7 in
+  let la := [6;19;5;18] in
+  let lb := [3;15;9] in
+  (ε (la ++ a :: lb) = (minus_one_pow (length lb) * ε (la ++ lb ++ [a]))%L)).
+).
+...
 rewrite glop.
 ...
 *)
