@@ -2956,8 +2956,8 @@ assert
   rewrite <- comp_list_app_distr_l.
   now apply H2.
 }
-(*
 ...
+(*
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.
 rewrite fold_comp_list.
@@ -2981,6 +2981,11 @@ rewrite (ε_app_cons Hop lb1). 2: {
 rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
 rewrite <- (minus_one_pow_mul_comm Hop).
+...
+Theorem glop : ∀ la lb a,
+  ε (la ++ a :: lb) = (ε (la ++ lb) * ε_aux a lb)%L.
+(* chais pas si c'est vrai, ça *)
+rewrite glop.
 ...
 *)
 assert (H : length (removelast la) = n). {
