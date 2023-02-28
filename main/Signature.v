@@ -2956,6 +2956,7 @@ assert
   rewrite <- comp_list_app_distr_l.
   now apply H2.
 }
+(*
 ...
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.
@@ -2981,6 +2982,7 @@ rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
 rewrite <- (minus_one_pow_mul_comm Hop).
 ...
+*)
 assert (H : length (removelast la) = n). {
   specialize (@app_removelast_last _ la 0) as H4.
   assert (H : la ≠ []) by now intros H; rewrite H in Hla.
@@ -2990,12 +2992,25 @@ assert (H : length (removelast la) = n). {
   now rewrite Nat.add_1_r in H4; apply Nat.succ_inj in H4.
 }
 specialize (H2 _ H) as H4; clear H.
-...
-remember (nth _ _ _ :: _) as lc.
-...
-unfold "°".
-rewrite Hlb.
-rewrite map_app; cbn.
+specialize app_removelast_last as H5.
+specialize (H5 _ la 0).
+assert (H : la ≠ []) by now intros H; rewrite H in Hla.
+specialize (H5 H); clear H.
+rewrite H5 at 1.
+rewrite Hlb at 1.
+rewrite comp_list_app_distr_l; cbn.
+assert (Hrl : length (removelast la) = n). {
+  apply Nat.succ_inj.
+  rewrite <- Hla.
+  rewrite H5 at 2.
+  rewrite app_length; cbn.
+  now rewrite Nat.add_1_r.
+}
+rewrite app_nth2; [ | now unfold ge; rewrite Hrl ].
+rewrite Hrl, Nat.sub_diag; cbn.
+rewrite <- H5.
+rewrite fold_comp_list.
+Check comp_list_app_distr_l.
 ...
 specialize permut_list_surj as H2.
 specialize (H2 i lb).
