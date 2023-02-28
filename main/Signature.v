@@ -2963,18 +2963,19 @@ rewrite (ε_app_cons Hop lb1). 2: {
 rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
 rewrite <- (minus_one_pow_mul_comm Hop).
-Search (minus_one_pow _ * ε _)%L.
-(* bof *)
 ...
 assert (H : length (removelast la) = n). {
-  specialize (@app_removelast_last _ la 0) as H3.
+  specialize (@app_removelast_last _ la 0) as H4.
   assert (H : la ≠ []) by now intros H; rewrite H in Hla.
-  specialize (H3 H); clear H.
-  apply (f_equal length) in H3.
-  rewrite app_length, Hla in H3; cbn in H3.
-  now rewrite Nat.add_1_r in H3; apply Nat.succ_inj in H3.
+  specialize (H4 H); clear H.
+  apply (f_equal length) in H4.
+  rewrite app_length, Hla in H4; cbn in H4.
+  now rewrite Nat.add_1_r in H4; apply Nat.succ_inj in H4.
 }
-specialize (H2 _ H) as H3; clear H.
+specialize (H2 _ H) as H4; clear H.
+...
+remember (nth _ _ _ :: _) as lc.
+...
 unfold "°".
 rewrite Hlb.
 rewrite map_app; cbn.
