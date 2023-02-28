@@ -2909,6 +2909,22 @@ unfold "°".
 now rewrite (List_map_map_seq _ 0).
 Qed.
 
+(*
+End a.
+
+Arguments ε {T}%type {ro}.
+Require Import RnglAlg.Zrl ZArith.
+
+Definition ro := RnglAlg.Zrl.Z_ring_like_op.
+
+Compute (
+  let roz := ro in
+  let la := [3;4;18;19;12;11] in
+  let lb := [2;1;4;0;3] in
+  (la ° lb, ε (la ° lb), (ε (la ++ repeat O (length lb - length la)) * ε lb)%L)
+).
+*)
+
 Theorem sign_comp :
   rngl_has_opp = true →
   ∀ la lb,
@@ -2940,6 +2956,7 @@ assert
   rewrite <- comp_list_app_distr_l.
   now apply H2.
 }
+...
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.
 rewrite fold_comp_list.
