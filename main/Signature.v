@@ -2917,7 +2917,7 @@ Theorem sign_comp :
 Proof.
 intros Hop * Hbp.
 remember (length la) as n eqn:Hla; symmetry in Hla.
-revert la lb Hla Hbp.
+revert lb Hbp la Hla.
 induction n; intros; cbn. {
   destruct Hbp as (Hb, Hbl).
   apply length_zero_iff_nil in Hla, Hbl; subst la lb.
@@ -2930,7 +2930,8 @@ specialize nth_split as H2.
 specialize (H2 _ i lb 0 Hi).
 destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
 rewrite Hin in Hlb.
-specialize (IHn (removelast la) (butn i lb)) as H2.
+specialize (IHn (butn i lb) H1) as H2.
+...
 assert (H : length (removelast la) = n). {
   specialize (@app_removelast_last _ la 0) as H3.
   assert (H : la ≠ []) by now intros H; rewrite H in Hla.
@@ -2939,7 +2940,7 @@ assert (H : length (removelast la) = n). {
   rewrite app_length, Hla in H3; cbn in H3.
   now rewrite Nat.add_1_r in H3; apply Nat.succ_inj in H3.
 }
-specialize (H2 H H1); clear H.
+specialize (H2 _ H) as H3; clear H.
 unfold "°".
 rewrite Hlb.
 rewrite map_app; cbn.
