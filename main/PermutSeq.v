@@ -118,6 +118,14 @@ apply IHlen. {
 }
 Qed.
 
+Theorem comp_list_app_distr_l : ∀ la lb lc,
+  la ° (lb ++ lc) = la ° lb ++ la ° lc.
+Proof.
+intros.
+unfold "°".
+now rewrite map_app.
+Qed.
+
 (* *)
 
 Theorem NoDup_nat : ∀ l,

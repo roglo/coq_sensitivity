@@ -2937,13 +2937,34 @@ assert
   (H3 : ∀ la, length la = n →
      ε ((la ° lb1) ++ (la ° lb2)) = (ε la * ε (lb1 ++ lb2))%L). {
   intros lc Hlc.
-  specialize (H2 lc Hlc).
-  unfold "°" in H2.
-  rewrite map_app in H2.
-  now do 2 rewrite fold_comp_list in H2.
+  rewrite <- comp_list_app_distr_l.
+  now apply H2.
 }
-Search (_ ° (_ ++ _)).
-(* « comp_list_app_distr_l » *)
+rewrite Hlb.
+rewrite comp_list_app_distr_l; cbn.
+rewrite fold_comp_list.
+rewrite (ε_app_cons Hop lb1). 2: {
+  intros j Hj.
+  rewrite Hlb, butn_app in H1.
+  rewrite Hjl1, Nat.ltb_irrefl, Nat.sub_diag in H1.
+  cbn in H1.
+  destruct H1 as (H11, H12).
+  generalize H11; intros H13.
+  apply permut_list_NoDup in H13.
+  apply (In_nth _ _ 0) in Hj.
+  destruct Hj as (k & Hnk & Hk).
+  subst j.
+  apply permut_list_ub in H11.
+  specialize (H11 (nth k (lb1 ++ lb2) 0)).
+  rewrite H12 in H11.
+  apply H11.
+  now apply nth_In.
+}
+rewrite (minus_one_pow_mul_comm Hop).
+rewrite rngl_mul_assoc.
+rewrite <- (minus_one_pow_mul_comm Hop).
+Search (minus_one_pow _ * ε _)%L.
+(* bof *)
 ...
 assert (H : length (removelast la) = n). {
   specialize (@app_removelast_last _ la 0) as H3.
