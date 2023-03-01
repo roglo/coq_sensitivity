@@ -2214,7 +2214,7 @@ split. {
   rewrite map_length.
   rewrite <- Hji.
   rewrite Hσ2, <- Hl2.
-  apply permut_list_ub; [ easy | ].
+  apply permut_seq_ub; [ easy | ].
   apply nth_In.
   rewrite Hl2, <- Hσ2.
   apply permut_seq_iff in Hσ1.
@@ -2316,7 +2316,7 @@ erewrite rngl_summation_eq_compat. 2: {
       rewrite <- Hkj.
       destruct Hσ as (H1, H2).
       rewrite <- H2 in Hk.
-      apply permut_list_ub; [ easy | ].
+      apply permut_seq_ub; [ easy | ].
       now apply nth_In.
     }
     easy.
@@ -2511,7 +2511,7 @@ erewrite rngl_summation_list_eq_compat. 2: {
   rewrite (rngl_mul_comm Hic _ (ε μ)).
   rewrite rngl_mul_assoc.
   rewrite NoDup_ε_square; [ | easy | ]. 2: {
-    apply permut_list_NoDup.
+    apply permut_seq_NoDup.
     now destruct Hpμ.
   }
   rewrite rngl_mul_1_l.
@@ -2554,7 +2554,7 @@ erewrite rngl_summation_eq_compat. 2: {
       flia Hi H.
     }
     rewrite <- Hkj.
-    apply permut_list_ub; [ apply Hc | ].
+    apply permut_seq_ub; [ apply Hc | ].
     apply nth_In.
     now rewrite canon_sym_gr_list_length.
   }
@@ -2636,7 +2636,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-        apply permut_list_ub; [ | now apply nth_In ].
+        apply permut_seq_ub; [ | now apply nth_In ].
         apply isort_rank_permut_seq.
       }
       rewrite isort_rank_length.
@@ -2653,7 +2653,7 @@ split. {
     rewrite permut_isort_permut; [ | now destruct Hσ | ]. 2: {
       rewrite <- Hu2.
       eapply Nat.lt_le_trans. {
-        apply permut_list_ub; [ | now apply nth_In ].
+        apply permut_seq_ub; [ | now apply nth_In ].
         apply isort_rank_permut_seq.
       }
       rewrite isort_rank_length.

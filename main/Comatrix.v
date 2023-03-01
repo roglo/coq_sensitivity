@@ -1115,7 +1115,7 @@ split. {
   rewrite <- Hji.
   destruct Hσ as (H1, H2).
   rewrite <- H2 in Hj |-*.
-  apply permut_list_ub; [ easy | now apply nth_In ].
+  apply permut_seq_ub; [ easy | now apply nth_In ].
 } {
   apply (NoDup_map_iff 0).
   rewrite seq_length.
