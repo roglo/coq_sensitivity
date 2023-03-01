@@ -3416,11 +3416,18 @@ replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   apply Nat.succ_inj in H4.
   rewrite <- H4.
   apply in_app_or in Hj.
-  destruct Hj as [Hj| Hj]. {
-    destruct H1 as (H11, H12).
-    apply permut_seq_NoDup in H11.
-...
-Search permut_seq.
+  destruct H1 as (H11, H12).
+  apply permut_seq_iff in H11.
+  destruct H11 as (H111, H112).
+  unfold AllLt in H111.
+  rewrite H12 in H111.
+  apply H111.
+  rewrite Hlb, butn_app, Hjl1.
+  rewrite Nat.ltb_irrefl.
+  apply in_or_app.
+  destruct Hj as [Hj| Hj]; [ now left | right ].
+  now rewrite Nat.sub_diag; cbn.
+}
 ...
 rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
 cbn; rewrite rngl_mul_1_l.
