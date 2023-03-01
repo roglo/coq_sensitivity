@@ -2912,13 +2912,59 @@ Qed.
 Theorem fold_ε_cons : ∀ i q, (ε_aux i q * ε q)%L = ε (i :: q).
 Proof. easy. Qed.
 
+Theorem ε_aux_in :
+  rngl_has_opp = true →
+  ∀ i la, ε_aux i la ∈ [-1; 0; 1]%L.
+Proof.
+intros Hop *.
+induction la as [| a]; cbn; [ now right; right; left | ].
+destruct (i ?= a); [ now right; left | | ]. {
+  destruct IHla as [Ha| Ha]; [ now left | ].
+  destruct Ha as [Ha| Ha]; [ now right; left | ].
+  destruct Ha as [Ha| Ha]; [ now right; right; left | easy ].
+} {
+  destruct IHla as [Ha| Ha]. {
+    now right; right; left; rewrite <- Ha, (rngl_opp_involutive Hop).
+  }
+  destruct Ha as [Ha| Ha]. {
+    now right; left; rewrite <- Ha, (rngl_opp_0 Hop).
+  }
+  destruct Ha as [Ha| Ha]; [ now left; rewrite <- Ha | easy ].
+}
+Qed.
+
+Theorem ε_aux_mul_comm :
+  rngl_has_opp = true →
+  ∀ i la a, (ε_aux i la * a = a * ε_aux i la)%L.
+Proof.
+intros Hop *.
+specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
+specialize (Hos (or_introl Hop)).
+move Hos before Hop.
+specialize (ε_aux_in Hop i la) as H1.
+destruct H1 as [H1| H1]. {
+  rewrite <- H1.
+  rewrite (rngl_mul_opp_l Hop), rngl_mul_1_l.
+  rewrite (rngl_mul_opp_r Hop), rngl_mul_1_r.
+  easy.
+}
+destruct H1 as [H1| H1]. {
+  rewrite <- H1.
+  rewrite (rngl_mul_0_l Hos).
+  rewrite (rngl_mul_0_r Hos).
+  easy.
+}
+destruct H1 as [H1| H1]; [ | easy ].
+rewrite <- H1.
+now rewrite rngl_mul_1_l, rngl_mul_1_r.
+Qed.
+
 Theorem ε_app_cons2 :
   rngl_has_opp = true →
-  rngl_mul_is_comm = true →
   ∀ la lb a,
   ε (la ++ a :: lb) = (minus_one_pow (length lb) * ε (la ++ lb ++ [a]))%L.
 Proof.
-intros Hop Hic *.
+intros Hop *.
 specialize (proj2 rngl_has_opp_or_subt_iff) as Hos.
 specialize (Hos (or_introl Hop)).
 move Hos before Hop.
@@ -2982,15 +3028,15 @@ induction la as [| a']; intros; cbn. {
         symmetry; apply (rngl_opp_0 Hop).
       } {
         apply Nat.compare_lt_iff in Hbb.
+        rewrite (ε_aux_mul_comm Hop b').
         rewrite rngl_mul_assoc.
-        rewrite (rngl_mul_mul_swap Hic).
         rewrite (IHlb _ _ Hc); cbn.
         rewrite (rngl_mul_opp_l Hop).
         rewrite -> rngl_mul_assoc.
         f_equal.
         do 2 rewrite <- rngl_mul_assoc.
         f_equal.
-        rewrite (rngl_mul_comm Hic).
+        rewrite (ε_aux_mul_comm Hop).
         f_equal.
         clear IHlb Hc.
         induction lb as [| b'']; cbn. {
@@ -3012,8 +3058,8 @@ induction la as [| a']; intros; cbn. {
         now rewrite IHlb.
       } {
         apply Nat.compare_gt_iff in Hbb.
+        rewrite (ε_aux_mul_comm Hop b').
         rewrite rngl_mul_assoc.
-        rewrite (rngl_mul_mul_swap Hic).
         rewrite (IHlb _ _ Hc); cbn.
         rewrite (rngl_mul_opp_l Hop).
         rewrite -> rngl_mul_assoc.
@@ -3022,8 +3068,8 @@ induction la as [| a']; intros; cbn. {
         rewrite (rngl_mul_opp_l Hop).
         rewrite <- (rngl_mul_opp_r Hop).
         f_equal.
-        rewrite (rngl_mul_comm Hic).
         rewrite <- (rngl_mul_opp_l Hop).
+        rewrite <- (ε_aux_mul_comm Hop).
         f_equal.
         clear IHlb Hc.
         induction lb as [| b'']; cbn. {
@@ -3061,14 +3107,14 @@ induction la as [| a']; intros; cbn. {
     apply Nat.compare_gt_iff in Hbb.
     rewrite (rngl_mul_opp_l Hop).
     f_equal.
+    rewrite (ε_aux_mul_comm Hop b').
     rewrite rngl_mul_assoc.
-    rewrite (rngl_mul_mul_swap Hic).
     rewrite (IHlb _ _ Hc).
     do 2 rewrite (rngl_mul_opp_l Hop).
     cbn.
     rewrite <- rngl_mul_assoc.
     f_equal; f_equal.
-    rewrite (rngl_mul_comm Hic).
+    rewrite <- (ε_aux_mul_comm Hop).
     f_equal.
     clear IHlb Hc.
     induction lb as [| b'']; cbn. {
@@ -3131,12 +3177,12 @@ induction la as [| a']; intros; cbn. {
         apply Nat.compare_eq_iff in Hbb; subst b'; flia Hc Hab.
       } {
         apply Nat.compare_lt_iff in Hbb.
+        rewrite (ε_aux_mul_comm Hop b').
         rewrite rngl_mul_assoc.
-        rewrite (rngl_mul_mul_swap Hic).
         rewrite (IHlb _ _ Hc); cbn.
         rewrite <- rngl_mul_assoc.
         f_equal.
-        rewrite (rngl_mul_comm Hic).
+        rewrite <- (ε_aux_mul_comm Hop).
         f_equal.
         clear IHlb Hc.
         induction lb as [| b'']; cbn. {
@@ -3170,13 +3216,13 @@ induction la as [| a']; intros; cbn. {
     } {
       apply Nat.compare_lt_iff in Hbb.
       rewrite (rngl_mul_opp_l Hop).
+      rewrite (ε_aux_mul_comm Hop b').
       rewrite rngl_mul_assoc.
-      rewrite (rngl_mul_mul_swap Hic).
       rewrite (IHlb _ _ Hc); cbn.
       rewrite <- (rngl_mul_opp_r Hop).
       rewrite <- rngl_mul_assoc.
       f_equal.
-      rewrite (rngl_mul_comm Hic).
+      rewrite (ε_aux_mul_comm Hop).
       f_equal.
       clear IHlb Hc.
       induction lb as [| b'']; cbn. {
@@ -3204,12 +3250,13 @@ induction la as [| a']; intros; cbn. {
     apply Nat.compare_gt_iff in Hbb.
     do 2 rewrite (rngl_mul_opp_l Hop).
     f_equal.
+    rewrite (ε_aux_mul_comm Hop b').
     rewrite rngl_mul_assoc.
-    rewrite (rngl_mul_mul_swap Hic).
     rewrite (IHlb _ _ Hc).
-    rewrite rngl_mul_assoc.
-    rewrite (rngl_mul_mul_swap Hic).
     cbn.
+    rewrite <- rngl_mul_assoc.
+    f_equal.
+    rewrite <- (ε_aux_mul_comm Hop); cbn.
     f_equal.
     clear IHlb Hc.
     induction lb as [| b'']; cbn. {
