@@ -3382,6 +3382,20 @@ rewrite <- comp_list_app_distr_l.
 specialize (@app_removelast_last _ la 0) as H4.
 assert (H : la ≠ []) by now intros H; rewrite H in Hla.
 specialize (H4 H); clear H.
+rewrite List_last_nth in H4.
+rewrite Hla in H4; cbn in H4.
+rewrite Nat.sub_0_r in H4.
+replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
+  rewrite H4 at 2.
+  unfold "°".
+  apply map_ext_in.
+  intros j Hj.
+  rewrite app_nth1; [ easy | ].
+  apply (f_equal length) in H4.
+  rewrite app_length, Nat.add_1_r in H4.
+  rewrite Hla in H4.
+  apply Nat.succ_inj in H4.
+  rewrite <- H4.
 ...
 rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
 cbn; rewrite rngl_mul_1_l.
