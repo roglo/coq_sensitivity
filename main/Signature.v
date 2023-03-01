@@ -2959,7 +2959,7 @@ rewrite <- H1.
 now rewrite rngl_mul_1_l, rngl_mul_1_r.
 Qed.
 
-Theorem ε_aux_app_any_less :
+Theorem ε_aux_app_less_less :
   ∀ a b c la,
   a < c
   → b < c
@@ -2983,6 +2983,35 @@ induction la as [| b'']; cbn. {
   }
 }
 now rewrite IHla.
+Qed.
+
+Theorem ε_aux_app_less_greater :
+  rngl_has_opp = true →
+  ∀ a b c la,
+  a < c
+  → c < b
+  → ε_aux c (la ++ [b]) = (- ε_aux c (la ++ [a]))%L.
+Proof.
+intros Hop * Hac Hcb.
+induction la as [| d]; cbn. {
+  remember (c ?= b) as cb2 eqn:Hcb2; symmetry in Hcb2.
+  destruct cb2. {
+    apply Nat.compare_eq_iff in Hcb2; subst c.
+    now apply Nat.lt_irrefl in Hcb.
+  } {
+    remember (c ?= a) as ca eqn:Hca; symmetry in Hca.
+    destruct ca; [ | | now rewrite (rngl_opp_involutive Hop) ]. {
+      apply Nat.compare_eq_iff in Hca; subst c.
+      now apply Nat.lt_irrefl in Hac.
+    } {
+      apply Nat.compare_lt_iff in Hca; flia Hac Hca.
+    }
+  }
+  apply Nat.compare_gt_iff in Hcb2; flia Hcb Hcb2.
+}
+remember (c ?= d) as cd eqn:Hcd; symmetry in Hcd.
+destruct cd; [ | easy | now rewrite IHla ].
+symmetry; apply (rngl_opp_0 Hop).
 Qed.
 
 Theorem ε_aux_mul_ε_app_from_ε_cons_app :
@@ -3043,8 +3072,7 @@ destruct ab2. {
     f_equal.
     rewrite (ε_aux_mul_comm Hop).
     f_equal.
-    now apply ε_aux_app_any_less.
-(*******)
+    now apply ε_aux_app_less_less.
   } {
     apply Nat.compare_gt_iff in Hbb.
     rewrite (ε_aux_mul_comm Hop b').
@@ -3060,26 +3088,8 @@ destruct ab2. {
     rewrite <- (rngl_mul_opp_l Hop).
     rewrite <- (ε_aux_mul_comm Hop).
     f_equal.
-    clear IHla Hab.
-    induction la as [| b'']; cbn. {
-      remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
-      destruct bb2. {
-        apply Nat.compare_eq_iff in Hbb2; subst b'.
-        now apply Nat.lt_irrefl in Hbb.
-      } {
-        remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
-        destruct ba; [ | | now rewrite (rngl_opp_involutive Hop) ]. {
-          apply Nat.compare_eq_iff in Hba; subst b'.
-          now apply Nat.lt_irrefl in Hab2.
-        } {
-          apply Nat.compare_lt_iff in Hba; flia Hab2 Hba.
-        }
-      }
-      apply Nat.compare_gt_iff in Hbb2; flia Hbb Hbb2.
-    }
-    remember (b' ?= b'') as bb2 eqn:Hbb2; symmetry in Hbb2.
-    destruct bb2; [ | easy | now rewrite IHla ].
-    symmetry; apply (rngl_opp_0 Hop).
+(*******)
+    now apply (ε_aux_app_less_greater Hop).
   }
 }
 apply Nat.compare_gt_iff in Hab2.
@@ -3312,7 +3322,7 @@ move Hos before Hop.
 revert a lb.
 induction la as [| a']; intros; cbn. {
   rewrite fold_ε_cons.
-(*********)
+(********)
   apply (ε_cons_from_ε_app Hop).
 }
 rewrite IHla.
