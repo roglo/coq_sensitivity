@@ -3022,7 +3022,6 @@ Theorem ε_aux_app_gt_gt :
 Proof.
 intros * Hab2 Hbb.
 symmetry.
-(*******)
 induction la as [| b'']; cbn. {
   remember (a ?= c) as bb2 eqn:Hbb2; symmetry in Hbb2.
   destruct bb2. {
@@ -3232,28 +3231,8 @@ destruct bb. {
   f_equal.
   rewrite (ε_aux_mul_comm Hop).
   f_equal.
-  clear IHla Hc.
-  induction la as [| b'']; cbn. {
-    remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
-    destruct bb2. {
-      apply Nat.compare_eq_iff in Hbb2; subst b'.
-      now apply Nat.lt_irrefl in Hbb.
-    } {
-      apply Nat.compare_lt_iff in Hbb2; flia Hbb Hbb2.
-    }
-    rewrite (rngl_opp_involutive Hop).
-    remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
-    destruct ba; [ | easy | ]. {
-      apply Nat.compare_eq_iff in Hba; subst b'.
-      now apply Nat.lt_irrefl in Hab.
-    } {
-      apply Nat.compare_gt_iff in Hba; flia Hab Hba.
-    }
-  }
-  rewrite IHla.
-  remember (b' ?= b'') as bb2 eqn:Hbb2; symmetry in Hbb2.
-  destruct bb2; [ | easy | easy ].
-  apply (rngl_opp_0 Hop).
+  symmetry.
+  now apply ε_aux_app_lt_gt.
 }
 apply Nat.compare_gt_iff in Hbb.
 do 2 rewrite (rngl_mul_opp_l Hop).
@@ -3266,25 +3245,7 @@ rewrite <- rngl_mul_assoc.
 f_equal.
 rewrite <- (ε_aux_mul_comm Hop); cbn.
 f_equal.
-clear IHla Hc.
-induction la as [| b'']; cbn. {
-  remember (b' ?= b) as bb2 eqn:Hbb2; symmetry in Hbb2.
-  destruct bb2. {
-    apply Nat.compare_eq_iff in Hbb2; subst b'.
-    now apply Nat.lt_irrefl in Hbb.
-  } {
-    remember (b' ?= a) as ba eqn:Hba; symmetry in Hba.
-    destruct ba; [ | easy | ]. {
-      apply Nat.compare_eq_iff in Hba; subst b'.
-      now apply Nat.lt_irrefl in Hab.
-    } {
-      apply Nat.compare_gt_iff in Hba; flia Hab Hba.
-    }
-  } {
-    apply Nat.compare_gt_iff in Hbb2; flia Hbb Hbb2.
-  }
-}
-now rewrite IHla.
+now apply ε_aux_app_gt_gt.
 Qed.
 
 Theorem ε_cons_from_ε_app :
@@ -3332,6 +3293,29 @@ destruct c. {
 }
 Qed.
 
+Theorem ε_aux_app_cons_ε_aux_app_app :
+  rngl_has_opp = true →
+  ∀ a b la lb,
+  ε_aux a (la ++ b :: lb) = ε_aux a (la ++ lb ++ [b]).
+Proof.
+intros Hop *.
+induction la as [| a']; cbn; [ | now rewrite IHla ].
+remember (a ?= b) as aa eqn:Haa; symmetry in Haa.
+destruct aa. {
+  apply Nat.compare_eq_iff in Haa; subst a.
+  now rewrite (ε_aux_dup Hop).
+} {
+  induction lb as [| b']; cbn; [ now rewrite Haa | ].
+  now rewrite IHlb.
+} {
+  induction lb as [| b']; cbn; [ now rewrite Haa | ].
+  rewrite IHlb.
+  remember (a ?= b') as ab eqn:Hab; symmetry in Hab.
+  destruct ab; [ | easy | easy ].
+  apply (rngl_opp_0 Hop).
+}
+Qed.
+
 Theorem ε_app_cons2 :
   rngl_has_opp = true →
   ∀ la lb a,
@@ -3344,7 +3328,6 @@ move Hos before Hop.
 revert a lb.
 induction la as [| a']; intros; cbn. {
   rewrite fold_ε_cons.
-... ...
   apply (ε_cons_from_ε_app Hop).
 }
 rewrite IHla.
@@ -3353,40 +3336,8 @@ rewrite <- (minus_one_pow_mul_comm Hop).
 rewrite <- rngl_mul_assoc.
 f_equal; f_equal.
 clear IHla.
-induction la as [| a'']; cbn. {
-  remember (a' ?= a) as aa eqn:Haa; symmetry in Haa.
-  destruct aa. {
-    apply Nat.compare_eq_iff in Haa; subst a'.
-    now rewrite (ε_aux_dup Hop).
-  } {
-    induction lb as [| b]; cbn; [ now rewrite Haa | ].
-    now rewrite IHlb.
-  } {
-    induction lb as [| b]; cbn; [ now rewrite Haa | ].
-    rewrite IHlb.
-    remember (a' ?= b) as ab eqn:Hab; symmetry in Hab.
-    destruct ab; [ | easy | easy ].
-    apply (rngl_opp_0 Hop).
-  }
-}
-now rewrite IHla.
+apply (ε_aux_app_cons_ε_aux_app_app Hop).
 Qed.
-
-(*
-End a.
-
-Arguments ε {T}%type {ro}.
-Require Import RnglAlg.Zrl ZArith.
-
-Definition ro := RnglAlg.Zrl.Z_ring_like_op.
-
-Compute (
-  let roz := ro in
-  let la := [3;4;18;19;12;11] in
-  let lb := [2;1;4;0;3] in
-  (la ° lb, ε (la ° lb), (ε (la ++ repeat O (length lb - length la)) * ε lb)%L)
-).
-*)
 
 Theorem sign_comp :
   rngl_has_opp = true →
