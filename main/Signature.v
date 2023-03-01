@@ -847,7 +847,7 @@ erewrite rngl_product_list_eq_compat. 2: {
     symmetry.
     apply permut_permut_isort; [ easy | ].
     rewrite <- Hui.
-    apply permut_list_ub; [ easy | now apply nth_In ].
+    apply permut_seq_ub; [ easy | now apply nth_In ].
   }
   erewrite rngl_product_list_eq_compat. 2: {
     intros j Hj.
@@ -857,7 +857,7 @@ erewrite rngl_product_list_eq_compat. 2: {
       symmetry.
       apply permut_permut_isort; [ easy | ].
       rewrite <- Hvj.
-      apply permut_list_ub; [ easy | now apply nth_In ].
+      apply permut_seq_ub; [ easy | now apply nth_In ].
     }
     easy.
   }
@@ -1467,7 +1467,7 @@ split. {
   destruct Hi as (j & Hji & Hj).
   subst i.
   rewrite Hp22, <- Hp12.
-  apply permut_list_ub; [ easy | ].
+  apply permut_seq_ub; [ easy | ].
   apply nth_In.
   apply permut_seq_iff in Hp21.
   apply Hp21 in Hj.
@@ -3380,11 +3380,11 @@ rewrite (ε_app_cons Hop lb1). 2: {
   cbn in H1.
   destruct H1 as (H11, H12).
   generalize H11; intros H13.
-  apply permut_list_NoDup in H13.
+  apply permut_seq_NoDup in H13.
   apply (In_nth _ _ 0) in Hj.
   destruct Hj as (k & Hnk & Hk).
   subst j.
-  apply permut_list_ub in H11.
+  apply permut_seq_ub in H11.
   specialize (H11 (nth k (lb1 ++ lb2) 0)).
   rewrite H12 in H11.
   apply H11.
@@ -3415,6 +3415,12 @@ replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   rewrite Hla in H4.
   apply Nat.succ_inj in H4.
   rewrite <- H4.
+  apply in_app_or in Hj.
+  destruct Hj as [Hj| Hj]. {
+    destruct H1 as (H11, H12).
+    apply permut_seq_NoDup in H11.
+...
+Search permut_seq.
 ...
 rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
 cbn; rewrite rngl_mul_1_l.

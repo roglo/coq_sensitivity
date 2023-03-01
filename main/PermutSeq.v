@@ -21,7 +21,7 @@ Notation "σ₁ ° σ₂" := (comp_list σ₁ σ₂) (at level 40, left associat
 Definition permut_seq l := permutation Nat.eqb l (seq 0 (length l)).
 Definition permut_seq_with_len n f := permut_seq f ∧ length f = n.
 
-Theorem permut_list_NoDup : ∀ l, permut_seq l → NoDup l.
+Theorem permut_seq_NoDup : ∀ l, permut_seq l → NoDup l.
 Proof.
 intros * Hp.
 unfold permut_seq in Hp.
@@ -29,7 +29,7 @@ apply (permutation_sym Nat.eqb_eq) in Hp.
 apply (permutation_NoDup Nat.eqb_eq Hp (seq_NoDup _ _)).
 Qed.
 
-Theorem permut_list_ub : ∀ l, permut_seq l → AllLt l (length l).
+Theorem permut_seq_ub : ∀ l, permut_seq l → AllLt l (length l).
 Proof.
 intros * Hp.
 unfold permut_seq in Hp.
@@ -44,7 +44,7 @@ Theorem permut_seq_iff : ∀ l,
 Proof.
 intros.
 split; intros Hl. {
-  now split; [ apply permut_list_ub | apply permut_list_NoDup ].
+  now split; [ apply permut_seq_ub | apply permut_seq_NoDup ].
 }
 destruct Hl as (Hp1, Hp2).
 unfold permut_seq.
@@ -156,7 +156,7 @@ specialize (pigeonhole_list (length l) (n :: l)) as H1.
 specialize (H1 (Nat.lt_succ_diag_r _)).
 assert (H : ∀ x, x ∈ n :: l → x < length l). {
   intros z Hz.
-  destruct Hz as [Hz| Hz]; [ now subst z | now apply permut_list_ub ].
+  destruct Hz as [Hz| Hz]; [ now subst z | now apply permut_seq_ub ].
 }
 specialize (H1 H); clear H.
 remember (pigeonhole_comp_list (n :: l)) as xx eqn:Hxx.
@@ -177,7 +177,7 @@ destruct x. {
   }
   cbn in Hnxx.
   cbn in Hx'l; apply Nat.succ_lt_mono in Hx'l.
-  specialize (permut_list_NoDup Hp) as Hp2.
+  specialize (permut_seq_NoDup Hp) as Hp2.
   specialize (NoDup_nat _ Hp2 x x' Hxl Hx'l Hnxx) as H1.
   now destruct H1.
 }
@@ -239,7 +239,7 @@ apply map_ext_in.
 intros i Hi.
 rewrite (List_map_nth' 0); [ easy | ].
 rewrite Hg, <- Hh.
-now apply permut_list_ub.
+now apply permut_seq_ub.
 Qed.
 
 Arguments permut_comp_assoc n%nat [f g h]%list.
@@ -447,10 +447,10 @@ assert
 clear H1.
 specialize (H2 (nth i l 0)) as H2.
 assert (H : nth i l 0 < length l). {
-  apply permut_list_ub; [ easy | now apply nth_In ].
+  apply permut_seq_ub; [ easy | now apply nth_In ].
 }
 specialize (H2 H); clear H.
-apply NoDup_nat in H2; [ easy | now apply permut_list_NoDup | | easy ].
+apply NoDup_nat in H2; [ easy | now apply permut_seq_NoDup | | easy ].
 apply isort_rank_ub.
 now intros H; subst l.
 Qed.
@@ -507,7 +507,7 @@ apply (NoDup_nat _ H3) in H2; [ easy | | ]. 2: {
   now rewrite isort_rank_length.
 }
 rewrite isort_rank_length.
-apply permut_list_ub; [ easy | ].
+apply permut_seq_ub; [ easy | ].
 apply nth_In.
 apply isort_rank_ub.
 now intros H; subst l.
@@ -646,7 +646,7 @@ split; cbn. {
   destruct Hi as (j & Hji & Hj).
   apply in_seq in Hj.
   rewrite <- Hji.
-  apply permut_list_ub; [ easy | ].
+  apply permut_seq_ub; [ easy | ].
   apply nth_In.
   now apply transposition_lt.
 } {
@@ -660,7 +660,7 @@ split; cbn. {
   do 2 rewrite Nat.add_0_l in Hij.
   unfold transposition in Hij.
   do 4 rewrite if_eqb_eq_dec in Hij.
-  apply permut_list_NoDup in Hσ.
+  apply permut_seq_NoDup in Hσ.
   destruct (Nat.eq_dec i p) as [Hip| Hip]. {
     subst i.
     destruct (Nat.eq_dec j p) as [Hjp| Hjp]; [ congruence | ].
@@ -1397,7 +1397,7 @@ f_equal. {
     apply (In_nth _ _ 0) in Hi.
     destruct Hi as (j & Hj & Hji).
     rewrite <- Hji.
-    apply permut_list_ub; [ | now apply nth_In ].
+    apply permut_seq_ub; [ | now apply nth_In ].
     apply sub_canon_permut_list_permut_seq_with_len.
     now apply permut_seq_iff.
   } {
