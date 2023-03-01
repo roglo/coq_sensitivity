@@ -3088,7 +3088,7 @@ destruct ab2. {
     rewrite <- (rngl_mul_opp_l Hop).
     rewrite <- (ε_aux_mul_comm Hop).
     f_equal.
-(*******)
+... ...
     now apply (ε_aux_app_less_greater Hop).
   }
 }
@@ -3163,7 +3163,7 @@ destruct c. {
   rewrite <- (rngl_mul_opp_r Hop).
   rewrite <- rngl_mul_assoc; f_equal.
   rewrite fold_ε_cons.
-(*******)
+... ...
   now apply (ε_aux_mul_ε_app_from_ε_cons_app Hop).
 } {
   apply Nat.compare_gt_iff in Hc.
@@ -3322,7 +3322,7 @@ move Hos before Hop.
 revert a lb.
 induction la as [| a']; intros; cbn. {
   rewrite fold_ε_cons.
-(********)
+... ...
   apply (ε_cons_from_ε_app Hop).
 }
 rewrite IHla.
