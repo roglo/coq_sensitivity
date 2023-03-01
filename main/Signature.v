@@ -3379,6 +3379,14 @@ rewrite comp_length.
 f_equal.
 rewrite app_assoc.
 rewrite <- comp_list_app_distr_l.
+specialize (@app_removelast_last _ la 0) as H4.
+assert (H : la ≠ []) by now intros H; rewrite H in Hla.
+specialize (H4 H); clear H.
+...
+rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
+cbn; rewrite rngl_mul_1_l.
+...
+  ε (la ° (lb1 ++ lb2) ++ [nth n la 0]) = (ε la * ε (lb1 ++ lb2))%L
 ...
 
 (*
