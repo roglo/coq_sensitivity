@@ -3479,9 +3479,51 @@ Search (ε_aux _ (_ ° _)).
 Theorem ε_aux_permut :
   rngl_has_opp = true →
   ∀ i la lb,
+  permutation Nat.eqb la lb
+  → ε_aux i la = ε_aux i lb.
+Proof.
+intros Hop * Hp.
+... ...
+apply (ε_aux_permut Hop).
+unfold "°".
+Search (permutation _ _ (map _ _)).
+...
+Theorem ε_aux_permut :
+  rngl_has_opp = true →
+  ∀ i la lb,
   permut_seq_with_len (length la) lb
   → ε_aux i la = ε_aux i (la ° lb).
 Proof.
+intros Hop * Hsb.
+remember (length la) as n eqn:Hla; symmetry in Hla.
+revert la lb Hla Hsb.
+induction n; intros; cbn. {
+  destruct Hsb as (Hsb, Hsbl).
+  now apply length_zero_iff_nil in Hla, Hsbl; subst la lb.
+}
+specialize (permut_without_highest Hsb) as H1.
+destruct H1 as (j & Hj & Hjn & H1).
+specialize nth_split as H2.
+specialize (H2 _ j lb 0 Hj).
+destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
+rewrite Hjn in Hlb.
+specialize (@app_removelast_last _ la 0) as H4.
+assert (H : la ≠ []) by now intros H; rewrite H in Hla.
+specialize (H4 H); clear H.
+replace n with (length la - 1) by flia Hla.
+assert (Hra : length (removelast la) = n). {
+  apply (f_equal length) in H4.
+  rewrite app_length, Nat.add_1_r in H4.
+  rewrite Hla in H4.
+  now apply Nat.succ_inj in H4.
+}
+specialize (IHn (removelast la) (butn j lb) Hra H1) as H2.
+...
+specialize (IHn (butn i lb) H1) as H2.
+rewrite Hlb, butn_app, Hjl1, Nat.ltb_irrefl in H2.
+rewrite Nat.sub_diag in H2.
+cbn in H2.
+...
 intros Hop * Hsb.
 revert la Hsb.
 induction lb as [| b]; intros. {
@@ -3523,8 +3565,15 @@ destruct ab. {
   destruct H2 as (la1 & la2 & Hla & Hjl1).
   rewrite Hla at 1.
   rewrite ε_aux_app_cons_lt; [ | easy ].
-  rewrite IHlb.
-  rewrite Hla.
+...
+  rewrite IHlb. 2: {
+    apply (f_equal length) in Hla.
+    rewrite app_length in Hla; cbn in Hla.
+    rewrite Nat.add_succ_r, <- app_length in Hla.
+    rewrite <- Hsbl in Hla; cbn in Hla.
+    apply Nat.succ_inj in Hla.
+    rewrite <- Hla.
+    split; [ | easy ].
 Search ((_ ++ _) ° _).
 ...
 Theorem glop :
