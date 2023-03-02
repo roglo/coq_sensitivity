@@ -3526,6 +3526,7 @@ destruct ab. {
   rewrite IHlb.
   rewrite Hla.
 Search ((_ ++ _) ° _).
+...
 Theorem glop :
   ∀ i j la lb lc,
   (∀ c, c ∈ lc → c < length (la ++ j :: lb))
