@@ -41,6 +41,7 @@ Definition minus_one_pow n :=
   | _ => (- 1%L)%L
   end.
 
+(*
 Theorem ε_nil : ε [] = 1%L.
 Proof. easy. Qed.
 
@@ -61,6 +62,7 @@ rewrite IHl.
 f_equal.
 apply ε_aux_map_S.
 Qed.
+*)
 
 Theorem minus_one_pow_mul_comm :
   rngl_has_opp = true →
@@ -102,6 +104,7 @@ rewrite Hk in H1.
 flia H1.
 Qed.
 
+(*
 Theorem minus_one_pow_succ_succ :
   rngl_has_opp = true →
   ∀ i, minus_one_pow (S (S i)) = minus_one_pow i.
@@ -784,6 +787,7 @@ split. {
 }
 now rewrite map_length, seq_length.
 Qed.
+*)
 
 Theorem ε_app_cons :
   rngl_has_opp = true →
@@ -840,6 +844,7 @@ destruct c; [ easy | | ]. {
 }
 Qed.
 
+(*
 Theorem ε_aux_app : ∀ i p q,
   (∀ j k, j ∈ i :: p → k ∈ q → j < k)
   → ε_aux i (p ++ q) = ε_aux i p.
@@ -934,6 +939,7 @@ destruct (i ?= j). {
   destruct Hk; [ now left | now right; right ].
 }
 Qed.
+*)
 
 Theorem ε_aux_dup :
   rngl_has_opp = true →
@@ -947,6 +953,7 @@ rewrite IHl1.
 apply (rngl_opp_0 Hop).
 Qed.
 
+(*
 Theorem ε_app2 :
   rngl_has_opp = true →
   ∀ p q,
@@ -987,6 +994,7 @@ cbn.
 do 2 rewrite rngl_mul_1_r.
 apply IHlen.
 Qed.
+*)
 
 Theorem minus_one_pow_mul_same :
   rngl_has_opp = true →
@@ -998,6 +1006,7 @@ destruct (i mod 2); [ apply rngl_mul_1_l | ].
 now apply rngl_squ_opp_1.
 Qed.
 
+(*
 Theorem transposition_signature_lt :
   rngl_has_opp = true →
   ∀ n p q,
@@ -1203,6 +1212,7 @@ unfold "°".
 rewrite map_length.
 now destruct Hp2.
 Qed.
+*)
 
 (* ε (σ₁ ° σ₂) = ε σ₁ * ε σ₂ *)
 
@@ -1348,6 +1358,7 @@ apply butn_permut_seq_with_len; [ easy | | ]. {
 }
 Qed.
 
+(*
 Theorem map_nth_permut_seq : ∀ n la lb,
   permut_seq_with_len n la
   → permut_seq_with_len n lb
@@ -1377,10 +1388,12 @@ split. {
   apply (NoDup_nat _ Hab) in Hjk; [ easy | | ]; now rewrite comp_length.
 }
 Qed.
+*)
 
 Theorem fold_comp_list : ∀ la lb, map (λ i, nth i la 0) lb = la ° lb.
 Proof. easy. Qed.
 
+(*
 Theorem permut_comp_cancel_l : ∀ n la lb lc,
   NoDup la
   → length la = n
@@ -2079,6 +2092,7 @@ intros.
 unfold "°".
 now rewrite (List_map_map_seq _ 0).
 Qed.
+*)
 
 Theorem fold_ε_cons : ∀ i q, (ε_aux i q * ε q)%L = ε (i :: q).
 Proof. easy. Qed.
