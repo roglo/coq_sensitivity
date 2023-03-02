@@ -3461,17 +3461,82 @@ rewrite (minus_one_pow_mul_same Hop) in H5.
 rewrite rngl_mul_1_l in H5.
 rewrite <- H5.
 rewrite <- rngl_mul_assoc; f_equal.
+cbn; f_equal.
+Search (ε_aux _ (_ ° _)).
+Theorem ε_aux_permut :
+  rngl_has_opp = true →
+  ∀ i la lb,
+  permut_seq_with_len (length la) lb
+  → ε_aux i la = ε_aux i (la ° lb).
+Proof.
+intros Hop * Hsb.
+revert la Hsb.
+induction lb as [| b]; intros. {
+  destruct Hsb as (Hsb, Hsbl).
+  symmetry in Hsbl.
+  now apply length_zero_iff_nil in Hsbl; subst la.
+}
+cbn.
+rewrite fold_comp_list.
+remember (i ?= nth b la 0) as ab eqn:Hab; symmetry in Hab.
+destruct ab. {
+  apply Nat.compare_eq_iff in Hab.
+  destruct Hsb as (Hsb, Hsbl).
+  subst i.
+  specialize nth_split as H2.
+  specialize (H2 _ b la 0).
+  assert (Hb : b < length la). {
+    apply permut_seq_iff in Hsb.
+    destruct Hsb as (Hallb, Hnd).
+    specialize (Hallb b (or_introl eq_refl)) as H3.
+    now rewrite Hsbl in H3.
+  }
+  specialize (H2 Hb).
+  destruct H2 as (la1 & la2 & Hla & Hjl1).
+  rewrite Hla at 2.
+  now apply (ε_aux_dup Hop).
+} {
+  apply Nat.compare_lt_iff in Hab.
 ...
-ε (i :: q) = (ε_aux i q * ε q)
-ε_aux i q = ε (i :: q) * ε q
+  destruct Hsb as (Hsb, Hsbl).
+  specialize nth_split as H2.
+  specialize (H2 _ i la 0).
+  assert (Hb : b < length la). {
+    apply permut_seq_iff in Hsb.
+    destruct Hsb as (Hallb, Hnd).
+    specialize (Hallb b (or_introl eq_refl)) as H3.
+    now rewrite Hsbl in H3.
+  }
+  specialize (H2 Hb).
+  destruct H2 as (la1 & la2 & Hla & Hjl1).
+  rewrite Hla at 1.
+
+
+Search (ε_aux _ (_ ° _)).
 ...
-rewrite comp_list_app_distr_l.
-Search (ε_aux _ (_ ++ _)).
+  now apply (ε_aux_dup Hop).
 ...
-rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
-cbn; rewrite rngl_mul_1_l.
+ε_aux_dup:
+  rngl_has_opp = true
+  → ∀ (i : nat) (l1 l2 : list nat), ε_aux i (l1 ++ i :: l2) = 0%L
 ...
-  ε (la ° (lb1 ++ lb2) ++ [nth n la 0]) = (ε la * ε (lb1 ++ lb2))%L
+  destruct la as [| a']; [ easy | ].
+... ...
+apply ε_aux_permut.
+rewrite Hra.
+unfold butn in H1.
+rewrite Hlb in H1.
+rewrite firstn_app in H1.
+rewrite Hjl1, Nat.sub_diag in H1.
+rewrite firstn_O, app_nil_r in H1.
+rewrite <- Hjl1 in H1 at 1.
+rewrite firstn_all in H1.
+rewrite skipn_app in H1.
+rewrite Hjl1, Nat.sub_succ_l in H1; [ | easy ].
+rewrite Nat.sub_diag in H1.
+rewrite <- Hjl1 in H1.
+rewrite skipn_all2 in H1; [ | flia ].
+easy.
 ...
 
 (*
