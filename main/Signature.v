@@ -3404,17 +3404,19 @@ specialize (H4 H); clear H.
 rewrite List_last_nth in H4.
 rewrite Hla in H4; cbn in H4.
 rewrite Nat.sub_0_r in H4.
+assert (Hra : length (removelast la) = n). {
+  apply (f_equal length) in H4.
+  rewrite app_length, Nat.add_1_r in H4.
+  rewrite Hla in H4.
+  now apply Nat.succ_inj in H4.
+}
 replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   rewrite H4 at 2.
   unfold "°".
   apply map_ext_in.
   intros j Hj.
   rewrite app_nth1; [ easy | ].
-  apply (f_equal length) in H4.
-  rewrite app_length, Nat.add_1_r in H4.
-  rewrite Hla in H4.
-  apply Nat.succ_inj in H4.
-  rewrite <- H4.
+  rewrite Hra.
   apply in_app_or in Hj.
   destruct H1 as (H11, H12).
   apply permut_seq_iff in H11.
@@ -3428,6 +3430,34 @@ replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   destruct Hj as [Hj| Hj]; [ now left | right ].
   now rewrite Nat.sub_diag; cbn.
 }
+specialize (ε_app_cons2 Hop) as H5.
+specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (nth n la 0)).
+do 2 rewrite app_nil_l in H5.
+rewrite comp_length in H5.
+assert (Hbbl : length (lb1 ++ lb2) = n). {
+  apply (f_equal length) in Hlb.
+  rewrite app_length in Hlb; cbn in Hlb.
+  rewrite Nat.add_succ_r, <- app_length in Hlb.
+  destruct Hbp as (Hbp1, Hbp2).
+  rewrite Hbp2 in Hlb.
+  now apply Nat.succ_inj in Hlb.
+}
+rewrite Hbbl in H5.
+apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
+rewrite rngl_mul_assoc in H5.
+rewrite (minus_one_pow_mul_same Hop) in H5.
+rewrite rngl_mul_1_l in H5.
+rewrite <- H5; cbn; clear H5.
+rewrite (H2 _ Hra).
+do 2 rewrite rngl_mul_assoc.
+f_equal.
+symmetry.
+...
+ε (i :: q) = (ε_aux i q * ε q)
+ε_aux i q = ε (i :: q) * ε q
+...
+rewrite comp_list_app_distr_l.
+Search (ε_aux _ (_ ++ _)).
 ...
 rewrite (ε_app_cons2 Hop (la ° (lb1 ++ lb2)) [] (nth n la 0)).
 cbn; rewrite rngl_mul_1_l.
