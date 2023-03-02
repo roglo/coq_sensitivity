@@ -3346,10 +3346,58 @@ Theorem ε_aux_app_cons_lt :
 Proof.
 intros * Hij.
 revert i j lb Hij.
+induction la as [| a]; intros; cbn; [ | now rewrite IHla ].
+now apply Nat.compare_lt_iff in Hij; rewrite Hij.
+Qed.
+
+Theorem ε_aux_app_cons_gt :
+  rngl_has_opp = true →
+  ∀ i j la lb,
+  j < i
+  → ε_aux i (la ++ j :: lb) = (- ε_aux i (la ++ lb))%L.
+Proof.
+intros Hop * Hij.
+revert i j lb Hij.
 induction la as [| a]; intros; cbn. {
-  now apply Nat.compare_lt_iff in Hij; rewrite Hij.
+  now apply Nat.compare_gt_iff in Hij; rewrite Hij.
 }
-now rewrite IHla; [ | easy ].
+rewrite (IHla _ _ _ Hij).
+destruct (i ?= a); [ | easy | easy ].
+symmetry; apply (rngl_opp_0 Hop).
+Qed.
+
+Theorem ε_aux_permut :
+  rngl_has_opp = true →
+  ∀ i la lb,
+  permutation Nat.eqb la lb
+  → ε_aux i la = ε_aux i lb.
+Proof.
+intros Hop * Hp.
+revert lb Hp.
+induction la as [| a]; intros; cbn. {
+  now apply permutation_nil_l in Hp; subst lb.
+}
+apply permutation_cons_l_iff in Hp.
+remember (extract _ _) as lxl eqn:Hlxl; symmetry in Hlxl.
+destruct lxl as [((bef, x), aft)| ]; [ | easy ].
+apply extract_Some_iff in Hlxl.
+destruct Hlxl as (Hbef & Hx & Haft).
+apply Nat.eqb_eq in Hx; subst x.
+remember (i ?= a) as ia eqn:Hia; symmetry in Hia.
+subst lb.
+destruct ia. {
+  apply Nat.compare_eq_iff in Hia; subst a.
+  symmetry; apply (ε_aux_dup Hop).
+} {
+  apply Nat.compare_lt_iff in Hia.
+  rewrite (ε_aux_app_cons_lt _ _ Hia).
+  now apply IHla.
+} {
+  apply Nat.compare_gt_iff in Hia.
+  rewrite (ε_aux_app_cons_gt Hop _ _ Hia).
+  f_equal.
+  now apply IHla.
+}
 Qed.
 
 Theorem sign_comp :
@@ -3475,18 +3523,41 @@ rewrite rngl_mul_1_l in H5.
 rewrite <- H5.
 rewrite <- rngl_mul_assoc; f_equal.
 cbn; f_equal.
-Search (ε_aux _ (_ ° _)).
-Theorem ε_aux_permut :
-  rngl_has_opp = true →
-  ∀ i la lb,
-  permutation Nat.eqb la lb
-  → ε_aux i la = ε_aux i lb.
-Proof.
-intros Hop * Hp.
-... ...
 apply (ε_aux_permut Hop).
 unfold "°".
+rewrite (List_map_nth_seq (removelast la) 0) at 1.
+rewrite Hra.
 Search (permutation _ _ (map _ _)).
+apply permutation_map with (eqba := Nat.eqb). {
+  unfold equality; apply Nat.eqb_eq.
+} {
+  unfold equality; apply Nat.eqb_eq.
+}
+rewrite Hlb in H1.
+...
+(* ajouter nécessairement que i ∉ lb1 *)
+Theorem butn_app_cons :
+  ∀ A i b (la lb : list A),
+  i = length la
+  → butn i (la ++ b :: lb) = butn i (la ++ lb).
+Proof.
+intros * Hia.
+unfold butn.
+do 2 rewrite firstn_app.
+rewrite Hia, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite firstn_all2; [ | easy ].
+rewrite firstn_O, app_nil_r.
+do 2 rewrite skipn_app.
+rewrite Nat.sub_succ_l, Nat.sub_diag; [ | easy ].
+f_equal; f_equal.
+rewrite skipn_cons.
+...
+remember (S k) as sk; cbn in H3; subst sk.
+rewrite fold_butn in H3.
+generalize Hlb; intros H.
+... ...
+rewrite butn_app_cons in H1; [ | easy ].
+apply (@permut_seq_permutation n).
 ...
 Theorem ε_aux_permut :
   rngl_has_opp = true →
@@ -3932,6 +4003,7 @@ rewrite (ε_app_cons Hop). 2: {
     flia H5.
   }
 }
+...
 unfold butn in H3.
 rewrite firstn_app in H3.
 rewrite Hil1, Nat.sub_diag, firstn_O, app_nil_r in H3.

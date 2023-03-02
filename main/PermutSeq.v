@@ -354,6 +354,20 @@ rewrite (permutation_assoc_length Heqb); [ | easy ].
 now apply (permutation_permutation_assoc Heqb).
 Qed.
 
+Theorem permut_seq_permutation : ∀ n la lb,
+  permut_seq_with_len n la
+  → permut_seq_with_len n lb
+  → permutation Nat.eqb la lb.
+Proof.
+intros * Ha Hb.
+destruct Ha as (Ha, Hal).
+destruct Hb as (Hb, Hbl).
+unfold permut_seq in Ha, Hb.
+eapply (permutation_trans Nat.eqb_eq); [ apply Ha | ].
+rewrite Hal, <- Hbl.
+now apply (permutation_sym Nat.eqb_eq).
+Qed.
+
 Theorem permutation_permut : ∀ la lb,
   permutation Nat.eqb la lb
   → permut_seq la
