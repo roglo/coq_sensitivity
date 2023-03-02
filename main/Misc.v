@@ -980,6 +980,22 @@ destruct (lt_dec i (length l1)) as [Hil| Hil]. {
 }
 Qed.
 
+Theorem butn_app_cons :
+  ∀ A i b (la lb : list A),
+  i = length la
+  → butn i (la ++ b :: lb) = la ++ lb.
+Proof.
+intros * Hia.
+unfold butn.
+rewrite firstn_app.
+rewrite Hia, Nat.sub_diag, firstn_O, app_nil_r.
+rewrite firstn_all2; [ | easy ].
+rewrite skipn_app.
+rewrite Nat.sub_succ_l, Nat.sub_diag; [ | easy ].
+rewrite skipn_all2; [ | flia ].
+now rewrite skipn_cons, skipn_O.
+Qed.
+
 (* end butn *)
 
 (* insert in a list (reverse of butn) *)
