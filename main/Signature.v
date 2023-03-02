@@ -3454,10 +3454,13 @@ symmetry.
 specialize (ε_app_cons2 Hop [] (removelast la) (last la 0)) as H5.
 cbn - [ ε ] in H5.
 rewrite Hra in H5.
-rewrite <- app_removelast_last in H5.
-...
-Search (ε (_ ++ _)).
-Search (ε_aux (_ ° _)).
+rewrite <- app_removelast_last in H5; [ | now intros H; subst la ].
+apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
+rewrite rngl_mul_assoc in H5.
+rewrite (minus_one_pow_mul_same Hop) in H5.
+rewrite rngl_mul_1_l in H5.
+rewrite <- H5.
+rewrite <- rngl_mul_assoc; f_equal.
 ...
 ε (i :: q) = (ε_aux i q * ε q)
 ε_aux i q = ε (i :: q) * ε q
