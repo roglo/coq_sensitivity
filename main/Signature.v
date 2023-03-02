@@ -3451,7 +3451,11 @@ rewrite (H2 _ Hra).
 do 2 rewrite rngl_mul_assoc.
 f_equal.
 symmetry.
-
+specialize (ε_app_cons2 Hop [] (removelast la) (last la 0)) as H5.
+cbn - [ ε ] in H5.
+rewrite Hra in H5.
+rewrite <- app_removelast_last in H5.
+...
 Search (ε (_ ++ _)).
 Search (ε_aux (_ ° _)).
 ...
