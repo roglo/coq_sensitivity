@@ -3401,9 +3401,8 @@ rewrite <- comp_list_app_distr_l.
 specialize (@app_removelast_last _ la 0) as H4.
 assert (H : la ≠ []) by now intros H; rewrite H in Hla.
 specialize (H4 H); clear H.
-rewrite List_last_nth in H4.
-rewrite Hla in H4; cbn in H4.
-rewrite Nat.sub_0_r in H4.
+replace n with (length la - 1) by flia Hla.
+rewrite <- List_last_nth.
 assert (Hra : length (removelast la) = n). {
   apply (f_equal length) in H4.
   rewrite app_length, Nat.add_1_r in H4.
@@ -3431,7 +3430,7 @@ replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   now rewrite Nat.sub_diag; cbn.
 }
 specialize (ε_app_cons2 Hop) as H5.
-specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (nth n la 0)).
+specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (last la 0)).
 do 2 rewrite app_nil_l in H5.
 rewrite comp_length in H5.
 assert (Hbbl : length (lb1 ++ lb2) = n). {
@@ -3452,6 +3451,9 @@ rewrite (H2 _ Hra).
 do 2 rewrite rngl_mul_assoc.
 f_equal.
 symmetry.
+
+Search (ε (_ ++ _)).
+Search (ε_aux (_ ° _)).
 ...
 ε (i :: q) = (ε_aux i q * ε q)
 ε_aux i q = ε (i :: q) * ε q
