@@ -3339,6 +3339,19 @@ clear IHla.
 apply (ε_aux_app_cons_ε_aux_app_app Hop).
 Qed.
 
+Theorem ε_aux_app_cons_lt :
+  ∀ i j la lb,
+  i < j
+  → ε_aux i (la ++ j :: lb) = ε_aux i (la ++ lb).
+Proof.
+intros * Hij.
+revert i j lb Hij.
+induction la as [| a]; intros; cbn. {
+  now apply Nat.compare_lt_iff in Hij; rewrite Hij.
+}
+now rewrite IHla; [ | easy ].
+Qed.
+
 Theorem sign_comp :
   rngl_has_opp = true →
   ∀ la lb,
@@ -3497,10 +3510,9 @@ destruct ab. {
   now apply (ε_aux_dup Hop).
 } {
   apply Nat.compare_lt_iff in Hab.
-...
   destruct Hsb as (Hsb, Hsbl).
   specialize nth_split as H2.
-  specialize (H2 _ i la 0).
+  specialize (H2 _ b la 0).
   assert (Hb : b < length la). {
     apply permut_seq_iff in Hsb.
     destruct Hsb as (Hallb, Hnd).
@@ -3510,9 +3522,52 @@ destruct ab. {
   specialize (H2 Hb).
   destruct H2 as (la1 & la2 & Hla & Hjl1).
   rewrite Hla at 1.
-
+  rewrite ε_aux_app_cons_lt; [ | easy ].
+  rewrite IHlb.
+  rewrite Hla.
+Search ((_ ++ _) ° _).
+Theorem glop :
+  ∀ i j la lb lc,
+  (∀ c, c ∈ lc → c < length (la ++ j :: lb))
+  → i < j
+  → ε_aux i ((la ++ j :: lb) ° lc) = ε_aux i ((la ++ lb) ° lc).
+Proof.
+intros * Hc Hij.
+revert i j la lb Hc Hij.
+induction lc as [| c]; intros; [ easy | cbn ].
+do 2 rewrite fold_comp_list.
+rewrite IHlc; [ | | easy ]. 2: {
+  intros d Hd.
+  now apply Hc; right.
+}
+remember (i ?= _) as iajb eqn:Hiajb; symmetry in Hiajb.
+remember (i ?= _) as iab eqn:Hiab in |-*; symmetry in Hiab.
+destruct iajb. {
+  apply Nat.compare_eq_iff in Hiajb.
+  destruct iab; [ easy | | ]. {
+    apply Nat.compare_lt_iff in Hiab.
+    destruct (lt_dec c (length la)) as [Hca| Hca]. {
+      rewrite app_nth1 in Hiajb; [ | easy ].
+      rewrite app_nth1 in Hiab; [ | easy ].
+      rewrite Hiajb in Hiab.
+      now apply Nat.lt_irrefl in Hiab.
+    }
+    apply Nat.nlt_ge in Hca.
+    rewrite app_nth2 in Hiajb; [ | easy ].
+    rewrite app_nth2 in Hiab; [ | easy ].
+    destruct (lt_dec (length la) c) as [Hac| Hac]. {
+...
+rewrite glop.
 
 Search (ε_aux _ (_ ° _)).
+...
+  unfold "°" at 2.
+...
+  rewrite (ε_aux_app_cons_ε_aux_app_app Hop).
+  specialize (ε_aux_app) as H1.
+  specialize (H1 i (la1 ++ la2) [nth b la 0]).
+cbn.
+Search (ε_aux _ (_ ++ _)).
 ...
   now apply (ε_aux_dup Hop).
 ...
