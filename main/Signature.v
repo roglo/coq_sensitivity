@@ -2802,7 +2802,15 @@ Compute (
   let x := canon_sym_gr_list n (k mod n!) in
   (k < (S n)!, map (succ_when_ge (k / n!)) x, k / n!)).
 Print canon_sym_gr_list.
+remember (canon_sym_gr_list (S n) k) as σ eqn:Hσ.
+remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
+specialize (canon_sym_gr_succ_values Hσ Hσ') as H1.
+move σ' before σ.
+...
 cbn - [ ε ].
+rewrite (ε_cons_from_ε_app Hop).
+rewrite map_length.
+rewrite canon_sym_gr_list_length.
 ...
 revert k Hkn.
 induction n; intros; [ now apply Nat.lt_1_r in Hkn; subst k | ].
