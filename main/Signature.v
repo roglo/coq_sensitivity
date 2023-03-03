@@ -810,31 +810,28 @@ induction n; intros; cbn. {
   apply length_zero_iff_nil in Hla, Hbl; subst la lb.
   symmetry; apply rngl_mul_1_l.
 }
+(* removing the highest value, "n" in "lb", permutation of {0..n} *)
 specialize (permut_without_highest Hbp) as H1.
 destruct H1 as (i & Hi & Hin & H1).
+(* taking lb1 and lb2 such that lb=lb1++n::lb2 *)
 specialize nth_split as H2.
 specialize (H2 _ i lb 0 Hi).
 destruct H2 as (lb1 & lb2 & Hlb & Hjl1).
 rewrite Hin in Hlb.
-specialize (IHn (butn i lb) H1) as H2.
-rewrite Hlb, butn_app, Hjl1, Nat.ltb_irrefl in H2.
-rewrite Nat.sub_diag in H2.
-cbn in H2.
-assert
-  (H3 : ∀ la, length la = n →
-     ε ((la ° lb1) ++ (la ° lb2)) = (ε la * ε (lb1 ++ lb2))%L). {
-  intros lc Hlc.
-  rewrite <- comp_list_app_distr_l.
-  now apply H2.
-}
+(* proving that "lb1++lb2" is a permuation of {0..n-1} *)
+rewrite Hlb in H1.
+rewrite butn_app_cons in H1; [ | easy ].
+(* replacing lb with lb1++n::lb2 in the goal... *)
 rewrite Hlb.
 rewrite comp_list_app_distr_l; cbn.
 rewrite fold_comp_list.
+(* ... we can make "(-1)^len(lb2)" appear in both sides of the equality *)
+(* first, in the lhs *)
+rewrite (ε_app_cons2 Hop).
+rewrite comp_length.
+(* second, in the rhs *)
 rewrite (ε_app_cons Hop lb1). 2: {
   intros j Hj.
-  rewrite Hlb, butn_app in H1.
-  rewrite Hjl1, Nat.ltb_irrefl, Nat.sub_diag in H1.
-  cbn in H1.
   destruct H1 as (H11, H12).
   generalize H11; intros H13.
   apply permut_seq_NoDup in H13.
@@ -847,12 +844,12 @@ rewrite (ε_app_cons Hop lb1). 2: {
   apply H11.
   now apply nth_In.
 }
-rewrite (minus_one_pow_mul_comm Hop).
+do 2 rewrite (minus_one_pow_mul_comm Hop).
 rewrite rngl_mul_assoc.
-rewrite <- (minus_one_pow_mul_comm Hop).
-rewrite (ε_app_cons2 Hop).
-rewrite comp_length.
+(* so, this "(-1)^len(lb2)" can disappear *)
 f_equal.
+(* this operation makes the last (n-th) element of "la" appear appended
+   to "la°(lb1++lb2)" *)
 rewrite app_assoc.
 rewrite <- comp_list_app_distr_l.
 specialize (@app_removelast_last _ la 0) as H4.
@@ -860,36 +857,15 @@ assert (H : la ≠ []) by now intros H; rewrite H in Hla.
 specialize (H4 H); clear H.
 replace n with (length la - 1) by flia Hla.
 rewrite <- List_last_nth.
+(* we know that "la" without its last element (its n-th element) has
+   length "n"... *)
 assert (Hra : length (removelast la) = n). {
   apply (f_equal length) in H4.
   rewrite app_length, Nat.add_1_r in H4.
   rewrite Hla in H4.
   now apply Nat.succ_inj in H4.
 }
-replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
-  rewrite H4 at 2.
-  unfold "°".
-  apply map_ext_in.
-  intros j Hj.
-  rewrite app_nth1; [ easy | ].
-  rewrite Hra.
-  apply in_app_or in Hj.
-  destruct H1 as (H11, H12).
-  apply permut_seq_iff in H11.
-  destruct H11 as (H111, H112).
-  unfold AllLt in H111.
-  rewrite H12 in H111.
-  apply H111.
-  rewrite Hlb, butn_app, Hjl1.
-  rewrite Nat.ltb_irrefl.
-  apply in_or_app.
-  destruct Hj as [Hj| Hj]; [ now left | right ].
-  now rewrite Nat.sub_diag; cbn.
-}
-specialize (ε_app_cons2 Hop) as H5.
-specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (last la 0)).
-do 2 rewrite app_nil_l in H5.
-rewrite comp_length in H5.
+(* and that "lb1++lb2" also has length "n" *)
 assert (Hbbl : length (lb1 ++ lb2) = n). {
   apply (f_equal length) in Hlb.
   rewrite app_length in Hlb; cbn in Hlb.
@@ -898,15 +874,42 @@ assert (Hbbl : length (lb1 ++ lb2) = n). {
   rewrite Hbp2 in Hlb.
   now apply Nat.succ_inj in Hlb.
 }
+(* since "lb1++lb2" does not contain "n", the expression "la°(lb1++lb2)"
+   can be replaced by "(la without its last)°(lb1++lb2) *)
+replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
+  rewrite H4 at 2.
+  unfold "°".
+  apply map_ext_in.
+  intros j Hj.
+  rewrite app_nth1; [ easy | ].
+  rewrite Hra.
+  destruct H1 as (H11, H12).
+  apply permut_seq_iff in H11.
+  destruct H11 as (H111, H112).
+  unfold AllLt in H111.
+  rewrite H12 in H111.
+  now apply H111.
+}
+(* we can make "(-1)^n" appear in the lhs... *)
+specialize (ε_app_cons2 Hop) as H5.
+specialize (H5 [] (removelast la ° (lb1 ++ lb2)) (last la 0)).
+do 2 rewrite app_nil_l in H5.
+rewrite comp_length in H5.
 rewrite Hbbl in H5.
 apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
 rewrite rngl_mul_assoc in H5.
 rewrite (minus_one_pow_mul_same Hop) in H5.
 rewrite rngl_mul_1_l in H5.
 rewrite <- H5; cbn; clear H5.
-rewrite (H2 _ Hra).
+(* ... and the right factor of the lhs, being
+   "ε((la without last)°(lb1++lb2)", can be replaced using
+   the induction hypothesis *)
+rewrite (IHn (lb1 ++ lb2) H1 _ Hra).
 do 2 rewrite rngl_mul_assoc.
+(* these operation make "ε(lb1++lb2)" appear as factors in both sides
+   of the goal, we can remove them *)
 f_equal.
+(* the lhs, "ε(la)", is "(-1)^n" times "ε(last la++all but last la)" *)
 symmetry.
 specialize (ε_app_cons2 Hop [] (removelast la) (last la 0)) as H5.
 cbn - [ ε ] in H5.
@@ -916,22 +919,23 @@ apply (f_equal (rngl_mul (minus_one_pow n))) in H5.
 rewrite rngl_mul_assoc in H5.
 rewrite (minus_one_pow_mul_same Hop) in H5.
 rewrite rngl_mul_1_l in H5.
-rewrite <- H5.
-rewrite <- rngl_mul_assoc; f_equal.
-cbn; f_equal.
+rewrite <- H5; cbn.
+(* both sides now contain "(-1)^" and "ε(la without last)" that we can
+   eliminate *)
+rewrite <- rngl_mul_assoc; f_equal; cbn; f_equal.
+(* the goal now contain equality between two "ε_aux (last la)" which
+   can be proven saying when their second arguments are permutations
+   the one to the other *)
 apply (ε_aux_permut Hop).
 unfold "°".
 rewrite (List_map_nth_seq (removelast la) 0) at 1.
 rewrite Hra.
-Search (permutation _ _ (map _ _)).
 apply permutation_map with (eqba := Nat.eqb). {
   unfold equality; apply Nat.eqb_eq.
 } {
   unfold equality; apply Nat.eqb_eq.
 }
-rewrite Hlb in H1.
-rewrite butn_app_cons in H1; [ | easy ].
-apply (@permut_seq_permutation n); [ | easy ].
+apply (@permut_seq_permutation n); [ | apply H1 ].
 apply seq_permut_seq_with_len.
 Qed.
 
