@@ -875,7 +875,7 @@ assert (Hbbl : length (lb1 ++ lb2) = n). {
   now apply Nat.succ_inj in Hlb.
 }
 (* since "lb1++lb2" does not contain "n", the expression "la°(lb1++lb2)"
-   can be replaced by "(la without its last)°(lb1++lb2) *)
+   can be replaced by "(la without its last)°(lb1++lb2)" *)
 replace (la ° (lb1 ++ lb2)) with (removelast la ° (lb1 ++ lb2)). 2: {
   rewrite H4 at 2.
   unfold "°".
