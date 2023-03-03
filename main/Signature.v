@@ -939,8 +939,6 @@ apply (@permut_seq_permutation n); [ | apply H1 ].
 apply seq_permut_seq_with_len.
 Qed.
 
-...
-
 (* *)
 
 (*
@@ -2798,6 +2796,7 @@ Theorem ε_of_sym_gr_permut_succ :
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
 intros Hic Hop * Hkn.
+...
 unfold ε at 1.
 rewrite canon_sym_gr_list_length.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
