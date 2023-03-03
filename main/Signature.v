@@ -2801,6 +2801,8 @@ Compute (
   let k := 388 in
   let x := canon_sym_gr_list n (k mod n!) in
   (k < (S n)!, map (succ_when_ge (k / n!)) x, k / n!)).
+Print canon_sym_gr_list.
+cbn - [ ε ].
 ...
 revert k Hkn.
 induction n; intros; [ now apply Nat.lt_1_r in Hkn; subst k | ].
