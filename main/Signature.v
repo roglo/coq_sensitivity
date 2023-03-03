@@ -2796,7 +2796,28 @@ Theorem ε_of_sym_gr_permut_succ :
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
 intros Hic Hop * Hkn.
+cbn - [ ε ].
+remember (canon_sym_gr_list n (k mod n!)) as la eqn:Hla.
+Search (ε (_ :: _)).
+rewrite (ε_cons_from_ε_app Hop).
+rewrite map_length.
+rewrite Hla at 1.
+rewrite canon_sym_gr_list_length.
+Search (ε (_ ++ _)).
+Compute (
+  let n := 5 in
+  let k := 388 in
+  let x := canon_sym_gr_list n (k mod n!) in
+  (k < (S n)!, map (succ_when_ge (k / n!)) x, k / n!)).
+Check canon_sym_gr_succ_values.
+revert k la Hkn Hla.
+induction n; intros; cbn - [ div fact ]. {
+  apply Nat.lt_1_r in Hkn; subst k.
+  cbn in Hla; subst la.
+  now cbn; rewrite rngl_mul_1_l.
+}
 ...
+intros Hic Hop * Hkn.
 unfold ε at 1.
 rewrite canon_sym_gr_list_length.
 destruct (Nat.eq_dec n 0) as [Hnz| Hnz]. {
