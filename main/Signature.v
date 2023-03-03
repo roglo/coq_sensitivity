@@ -2801,6 +2801,11 @@ remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
 Compute (
   let n := 5 in
   let k := 388 in
+  (canon_sym_gr_list (S n) k, k / n!, canon_sym_gr_list n (k mod n!))).
+...
+Compute (
+  let n := 5 in
+  let k := 388 in
   let σ' := canon_sym_gr_list n (k mod n!) in
   (k < (S n)!, k / n!, map (succ_when_ge (k / n!)) σ', σ')).
 Print canon_sym_gr_list.
