@@ -2822,11 +2822,49 @@ destruct n. {
   replace 4 with (2 * 2) by easy.
   rewrite Nat.div_add; [ | easy ].
   rewrite Nat.mod_add; [ | easy ].
-  destruct k. {
-    now cbn; rewrite (rngl_opp_involutive Hop).
-  }
-  destruct k; [ | flia Hkn ].
-  now cbn; rewrite (rngl_opp_involutive Hop).
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  do 12 apply Nat.succ_lt_mono in Hkn.
+  cbn - [ div "mod" ].
+  do 2 rewrite Nat.div_1_r.
+  rewrite Nat.mod_1_r.
+  do 6 rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  do 12 rewrite <- Nat.add_1_r.
+  do 11 rewrite <- Nat.add_assoc.
+  cbn - [ div "mod" ].
+  replace 12 with (2 * 6) by easy.
+  rewrite Nat.div_add; [ | easy ].
+  rewrite Nat.mod_add; [ | easy ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  destruct k; [ now cbn; rewrite (rngl_opp_involutive Hop) | ].
+  flia Hkn.
 }
 ...
 remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
