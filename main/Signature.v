@@ -41,6 +41,34 @@ Definition minus_one_pow n :=
   | _ => (- 1%L)%L
   end.
 
+(* for testing with a elementary ring-like *)
+
+Inductive test_rl := Minus_one | Zero | One.
+
+Definition test_ring_like_op :=
+  let test_opp a :=
+    match a with
+    | Minus_one => One
+    | Zero => Zero
+    | One => Minus_one
+    end
+  in
+  {| rngl_zero := Zero;
+     rngl_one := One;
+     rngl_add _ _ := Zero;
+     rngl_mul a b :=
+       match a with
+       | Zero => Zero
+       | Minus_one => test_opp b
+       | One => b
+       end;
+   rngl_opt_opp_or_subt := Some (inl test_opp);
+   rngl_opt_inv_or_quot := None;
+   rngl_opt_eqb := None;
+   rngl_opt_le := None |}.
+
+(* *)
+
 Theorem minus_one_pow_mul_comm :
   rngl_has_opp = true →
   ∀ i x, (minus_one_pow i * x = x * minus_one_pow i)%L.
@@ -2795,6 +2823,30 @@ Theorem ε_of_sym_gr_permut_succ :
   → ε (canon_sym_gr_list (S n) k) =
     (minus_one_pow (k / n!) * ε (canon_sym_gr_list n (k mod n!)))%L.
 Proof.
+intros Hic Hop * Hkn.
+cbn.
+f_equal. {
+...
+
+(*
+End a.
+
+Compute (
+  let ro := test_ring_like_op in
+  let n := 5 in
+  let k := 390 in
+(**)
+map (λ k,
+  (ε ro (map (succ_when_ge (k / n!)) (canon_sym_gr_list n (k mod n!))) =
+   ε ro (canon_sym_gr_list n (k mod n!)))) (seq 110 50)
+(*
+map (λ k,
+  ε_aux ro (k / n!)%nat (map (succ_when_ge (k / n!)) (canon_sym_gr_list n (k mod n!))) =
+  minus_one_pow ro (k / n!)) (seq 600 50)
+*)
+).
+*)
+...
 intros Hic Hop * Hkn.
 cbn - [ ε ].
 destruct n; [ now apply Nat.lt_1_r in Hkn; subst k | ].
