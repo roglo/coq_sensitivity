@@ -2826,6 +2826,27 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
+  revert k Hkn.
+  induction n; intros; [ now apply Nat.lt_1_r in Hkn; subst k | ].
+  specialize (IHn (k / S n)) as H1.
+  assert (H : k / S n < (S n)!). {
+    apply Nat.div_lt_upper_bound; [ easy | ].
+...
+  }
+  specialize (H1 H); clear H.
+  assert (H : k / S n / n! = k / (S n)!). {
+    rewrite Nat.div_div; [ | easy | apply fact_neq_0 ].
+    now rewrite <- Nat_fact_succ.
+  }
+  rewrite H in H1.
+  rewrite <- H1.
+(* euh... non *)
+...
+Compute (
+  let n := 3 in
+  map (λ k, map (succ_when_ge (k / n!)) (canon_sym_gr_list n (k mod n!)))
+   (seq 0 50)
+).
 ...
 
 (*
