@@ -2811,6 +2811,23 @@ destruct n. {
   destruct k; [ easy | ].
   destruct k; [ easy | ].
   do 4 apply Nat.succ_lt_mono in Hkn.
+  cbn - [ div "mod" ].
+  do 2 rewrite Nat.div_1_r.
+  rewrite Nat.mod_1_r.
+  do 4 rewrite rngl_mul_assoc.
+  f_equal; f_equal.
+  do 4 rewrite <- Nat.add_1_r.
+  do 3 rewrite <- Nat.add_assoc.
+  cbn - [ div "mod" ].
+  replace 4 with (2 * 2) by easy.
+  rewrite Nat.div_add; [ | easy ].
+  rewrite Nat.mod_add; [ | easy ].
+  destruct k. {
+    now cbn; rewrite (rngl_opp_involutive Hop).
+  }
+  destruct k; [ | flia Hkn ].
+  now cbn; rewrite (rngl_opp_involutive Hop).
+}
 ...
 remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
 Compute (
