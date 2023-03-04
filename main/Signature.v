@@ -2859,25 +2859,22 @@ f_equal. {
 (**)
     clear His.
     rewrite map_map.
+    destruct (Nat.eq_dec i 0) as [Hiz| Hiz]. {
+      subst i; cbn.
 ...
-    apply Nat.compare_lt_iff in His.
-    unfold succ_when_ge, Nat.b2n in His.
-    rewrite if_leb_le_dec in His.
-    destruct (le_dec i (j / n!)) as [Hijn| Hijn]; [ | flia Hijn His ].
+    }
+    specialize (IHn (i - 1) (j / S n)) as H1.
 ...
-    rewrite map_map.
     erewrite map_ext_in. 2: {
       intros k Hk.
       apply in_canon_sym_gr_list in Hk. 2: {
         apply Nat.mod_upper_bound, fact_neq_0.
       }
-      unfold succ_when_ge in His |-*.
-      unfold Nat.b2n in His |-*.
-      rewrite if_leb_le_dec in His |-*.
-      destruct (le_dec i (j / n!)) as [Hij| Hij]. 2: {
-
-
-      destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. {
+      unfold succ_when_ge.
+      unfold Nat.b2n.
+      rewrite if_leb_le_dec.
+      destruct (le_dec (j / n!) k) as [Hjnk| Hjnk]. 2: {
+        apply Nat.nle_gt in Hjnk.
 ...
 End a.
 
