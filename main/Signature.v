@@ -2797,6 +2797,21 @@ Theorem ε_of_sym_gr_permut_succ :
 Proof.
 intros Hic Hop * Hkn.
 cbn - [ ε ].
+destruct n; [ now apply Nat.lt_1_r in Hkn; subst k | ].
+destruct n. {
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  flia Hkn.
+}
+destruct n. {
+  cbn in Hkn.
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  destruct k; [ easy | ].
+  do 4 apply Nat.succ_lt_mono in Hkn.
+...
 remember (canon_sym_gr_list n (k mod n!)) as σ' eqn:Hσ'.
 Compute (
   let n := 5 in
