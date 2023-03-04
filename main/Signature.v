@@ -2826,6 +2826,107 @@ Proof.
 intros Hic Hop * Hkn.
 cbn.
 f_equal. {
+  remember (k / n!) as i eqn:Hi.
+  remember (k mod n!) as j eqn:Hj.
+  assert (Hin : i ≤ n). {
+    rewrite Hi.
+    apply Nat.lt_succ_r.
+    apply Nat.div_lt_upper_bound; [ apply fact_neq_0 | ].
+    now rewrite Nat.mul_comm, <- Nat_fact_succ.
+  }
+  assert (Hjn : j < n!). {
+    rewrite Hj.
+    apply Nat.mod_upper_bound, fact_neq_0.
+  }
+  clear k Hkn Hi Hj.
+  revert i j Hin Hjn.
+  induction n; intros; [ now apply Nat.le_0_r in Hin; subst i | cbn ].
+  remember (i ?= succ_when_ge i (j / n!)) as is eqn:His; symmetry in His.
+  destruct is. {
+    apply Nat.compare_eq_iff in His.
+    exfalso.
+    unfold succ_when_ge in His.
+    unfold Nat.b2n in His.
+    rewrite if_leb_le_dec in His.
+    destruct (le_dec i (j / n!)) as [Hij| Hij]. {
+      rewrite His, Nat.add_1_r in Hij.
+      now apply Nat.nlt_ge in Hij; apply Hij.
+    }
+    rewrite His, Nat.add_0_r in Hij.
+    apply Nat.nle_gt in Hij.
+    now apply Nat.lt_irrefl in Hij.
+  } {
+    apply Nat.compare_lt_iff in His.
+    rewrite map_map.
+    erewrite map_ext_in. 2: {
+      intros k Hk.
+      apply in_canon_sym_gr_list in Hk. 2: {
+        apply Nat.mod_upper_bound, fact_neq_0.
+      }
+      unfold succ_when_ge.
+...
+End a.
+
+Require Import RnglAlg.Zrl ZArith.
+
+Compute (
+  let ro := RnglAlg.Zrl.Z_ring_like_op in
+(*
+  let ro := test_ring_like_op in
+*)
+  let n := 4 in
+map (λ i,
+  map (λ j,
+(i ≤ n, j < n!,
+    ε_aux ro i (map (succ_when_ge i) (canon_sym_gr_list n j)) =
+    minus_one_pow ro i))
+    (seq 0 n!))
+  (seq 0 (S n))
+).
+...
+Compute (
+  let ro := test_ring_like_op in
+  let n := 3 in
+  let i := 3 in
+  let j := 6 in
+    ε_aux ro i (map (succ_when_ge i) (canon_sym_gr_list n j)) =
+    minus_one_pow ro i
+).
+...
+Compute (
+  let ro := test_ring_like_op in
+  let n := 3 in
+map (λ i,
+  map (λ j,
+    ε_aux ro i (map (succ_when_ge i) (canon_sym_gr_list n j)) =
+    minus_one_pow ro i)
+    (seq 0 15))
+  (seq 0 (S n))
+).
+...
+Compute (
+  let ro := test_ring_like_op in
+  let n := 5 in
+(*
+map (λ k,
+  (ε ro (map (succ_when_ge (k / n!)) (canon_sym_gr_list n (k mod n!))) =
+   ε ro (canon_sym_gr_list n (k mod n!)))) (seq 0 15)
+*)
+map (λ k,
+  ε_aux ro (k / n!)%nat (map (succ_when_ge (k / n!)) (canon_sym_gr_list n (k mod n!))) =
+  minus_one_pow ro (k / n!)) (seq 0 10)
+(**)
+).
+...
+Compute (
+  let ro := test_ring_like_op in
+  let n := 3 in
+map (λ j,
+  map (λ i,
+    ε_aux ro i (map (succ_when_ge i) (canon_sym_gr_list n j)) =
+      minus_one_pow ro i) (seq 0 n)) (seq 0 n)
+).
+...
   revert k Hkn.
   induction n; intros; [ now apply Nat.lt_1_r in Hkn; subst k | ].
   specialize (IHn (k / S n)) as H1.
